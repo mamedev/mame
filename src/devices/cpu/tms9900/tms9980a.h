@@ -5,10 +5,11 @@
     See tms9980a.c and tms9900.c for documentation
 */
 
-#ifndef __TMS9980A_H__
-#define __TMS9980A_H__
+#ifndef MAME_CPU_TMS9900_TMS9980A_H
+#define MAME_CPU_TMS9900_TMS9980A_H
 
-#include "emu.h"
+#pragma once
+
 #include "debugger.h"
 #include "tms9900.h"
 
@@ -26,7 +27,7 @@ enum
 class tms9980a_device : public tms99xx_device
 {
 public:
-	tms9980a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tms9980a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	void        mem_read(void) override;
@@ -35,22 +36,22 @@ protected:
 
 	void        resolve_lines() override;
 
-	UINT16      read_workspace_register_debug(int reg) override;
-	void        write_workspace_register_debug(int reg, UINT16 data) override;
+	uint16_t      read_workspace_register_debug(int reg) override;
+	void        write_workspace_register_debug(int reg, uint16_t data) override;
 
-	UINT32      execute_min_cycles() const override;
-	UINT32      execute_max_cycles() const override;
-	UINT32      execute_input_lines() const override;
+	uint32_t      execute_min_cycles() const override;
+	uint32_t      execute_max_cycles() const override;
+	uint32_t      execute_input_lines() const override;
 	void        execute_set_input(int irqline, int state) override;
 
-	UINT32      disasm_min_opcode_bytes() const override;
-	UINT32      disasm_max_opcode_bytes() const override;
-	offs_t      disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	uint32_t      disasm_min_opcode_bytes() const override;
+	uint32_t      disasm_max_opcode_bytes() const override;
+	offs_t      disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 	address_space_config    m_program_config80;
 	address_space_config    m_io_config80;
 };
 
 // device type definition
-extern const device_type TMS9980A;
+DECLARE_DEVICE_TYPE(TMS9980A, tms9980a_device)
 
-#endif /* __TMS9980A_H__ */
+#endif // MAME_CPU_TMS9900_TMS9980A_H

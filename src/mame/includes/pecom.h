@@ -1,11 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:Miodrag Milanovic
-#ifndef __PECOM__
-#define __PECOM__
+#ifndef MAME_INCLUDES_PECOM_H
+#define MAME_INCLUDES_PECOM_H
 
 #include "cpu/cosmac/cosmac.h"
 #include "imagedev/cassette.h"
 #include "machine/ram.h"
+#include "sound/cdp1869.h"
 
 #define SCREEN_TAG  "screen"
 #define CDP1802_TAG "cdp1802"
@@ -31,7 +32,7 @@ public:
 	required_device<cosmac_device> m_cdp1802;
 	required_device<cdp1869_device> m_cdp1869;
 
-	std::unique_ptr<UINT8[]> m_charram;           /* character generator ROM */
+	std::unique_ptr<uint8_t[]> m_charram;           /* character generator ROM */
 	int m_reset;                /* CPU mode */
 	int m_dma;              /* memory refresh DMA */
 
@@ -73,4 +74,4 @@ protected:
 
 MACHINE_CONFIG_EXTERN( pecom_video );
 
-#endif
+#endif // MAME_INCLUDES_PECOM_H

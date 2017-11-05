@@ -15,7 +15,7 @@
 ****************************************************************/
 
 
-const device_type EINSTEIN_KEYBOARD_DAISY = &device_creator<einstein_keyboard_daisy_device>;
+DEFINE_DEVICE_TYPE(EINSTEIN_KEYBOARD_DAISY, einstein_keyboard_daisy_device, "einstein_keyboard", "Einstein keyboard daisy chain")
 
 
 //**************************************************************************
@@ -26,9 +26,9 @@ const device_type EINSTEIN_KEYBOARD_DAISY = &device_creator<einstein_keyboard_da
 //  z80ctc_device - constructor
 //-------------------------------------------------
 
-einstein_keyboard_daisy_device::einstein_keyboard_daisy_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, EINSTEIN_KEYBOARD_DAISY, "Einstein keyboard daisy chain", tag, owner, clock, "einstein_keyboard", __FILE__),
-		device_z80daisy_interface(mconfig, *this)
+einstein_keyboard_daisy_device::einstein_keyboard_daisy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, EINSTEIN_KEYBOARD_DAISY, tag, owner, clock)
+	, device_z80daisy_interface(mconfig, *this)
 {
 }
 
@@ -79,7 +79,7 @@ void einstein_keyboard_daisy_device::z80daisy_irq_reti()
 {
 }
 
-const device_type EINSTEIN_ADC_DAISY = &device_creator<einstein_adc_daisy_device>;
+DEFINE_DEVICE_TYPE(EINSTEIN_ADC_DAISY, einstein_adc_daisy_device, "einstein_adc", "Einstein ADC daisy chain")
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -89,9 +89,9 @@ const device_type EINSTEIN_ADC_DAISY = &device_creator<einstein_adc_daisy_device
 //  z80ctc_device - constructor
 //-------------------------------------------------
 
-einstein_adc_daisy_device::einstein_adc_daisy_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, EINSTEIN_ADC_DAISY, "Einstein ADC daisy chain", tag, owner, clock, "einstein_adc_daisy", __FILE__),
-		device_z80daisy_interface(mconfig, *this)
+einstein_adc_daisy_device::einstein_adc_daisy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, EINSTEIN_ADC_DAISY, tag, owner, clock)
+	, device_z80daisy_interface(mconfig, *this)
 {
 }
 
@@ -143,7 +143,7 @@ void einstein_adc_daisy_device::z80daisy_irq_reti()
 }
 
 
-const device_type EINSTEIN_FIRE_DAISY = &device_creator<einstein_fire_daisy_device>;
+DEFINE_DEVICE_TYPE(EINSTEIN_FIRE_DAISY, einstein_fire_daisy_device, "einstein_fire", "Einstein fire button daisy chain")
 
 
 //**************************************************************************
@@ -154,9 +154,9 @@ const device_type EINSTEIN_FIRE_DAISY = &device_creator<einstein_fire_daisy_devi
 //  z80ctc_device - constructor
 //-------------------------------------------------
 
-einstein_fire_daisy_device::einstein_fire_daisy_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, EINSTEIN_FIRE_DAISY, "Einstein fire button daisy chain", tag, owner, clock, "einstein_fire_daisy", __FILE__),
-		device_z80daisy_interface(mconfig, *this)
+einstein_fire_daisy_device::einstein_fire_daisy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, EINSTEIN_FIRE_DAISY, tag, owner, clock)
+	, device_z80daisy_interface(mconfig, *this)
 {
 }
 

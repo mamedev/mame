@@ -85,11 +85,6 @@ static SLOT_INTERFACE_START( swtpc09_floppies )
 	SLOT_INTERFACE("35hd",   FLOPPY_35_HD)        // flex 1.44mb disk from swtpc emu (emulator only?)
 SLOT_INTERFACE_END
 
-WRITE_LINE_MEMBER(swtpc09_state::write_acia_clock)
-{
-	m_acia->write_txc(state);
-	m_acia->write_rxc(state);
-}
 
 /***************************************************************************
  Machine definitions
@@ -97,7 +92,7 @@ WRITE_LINE_MEMBER(swtpc09_state::write_acia_clock)
 
 /* Machine driver */
 /* MPU09, MPID, MPS2 DMF2 */
-static MACHINE_CONFIG_START( swtpc09, swtpc09_state )
+static MACHINE_CONFIG_START( swtpc09 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, 1000000)
 	MCFG_CPU_PROGRAM_MAP(swtpc09_mem)
@@ -107,11 +102,10 @@ static MACHINE_CONFIG_START( swtpc09, swtpc09_state )
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("acia", acia6850_device, write_rxd))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("acia", acia6850_device, write_cts))
 
-	MCFG_DEVICE_ADD("ptm", PTM6840, 0)
-	MCFG_PTM6840_INTERNAL_CLOCK(2000000)
+	MCFG_DEVICE_ADD("ptm", PTM6840, 2000000)
 	MCFG_PTM6840_EXTERNAL_CLOCKS(50, 0, 50)
-	MCFG_PTM6840_OUT0_CB(WRITE8(swtpc09_state, ptm_o1_callback))
-	MCFG_PTM6840_OUT2_CB(WRITE8(swtpc09_state, ptm_o3_callback))
+	MCFG_PTM6840_OUT0_CB(WRITELINE(swtpc09_state, ptm_o1_callback))
+	MCFG_PTM6840_OUT2_CB(WRITELINE(swtpc09_state, ptm_o3_callback))
 	MCFG_PTM6840_IRQ_CB(WRITELINE(swtpc09_state, ptm_irq))
 
 	MCFG_DEVICE_ADD("pia", PIA6821, 0)
@@ -125,7 +119,8 @@ static MACHINE_CONFIG_START( swtpc09, swtpc09_state )
 	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(swtpc09_state, acia_interrupt))
 
 	MCFG_DEVICE_ADD("acia_clock", CLOCK, 153600)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(swtpc09_state, write_acia_clock))
+	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("acia", acia6850_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("acia", acia6850_device, write_rxc))
 
 	MCFG_FD1793_ADD("fdc", XTAL_1MHz)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(swtpc09_state, fdc_intrq_w))
@@ -138,7 +133,7 @@ static MACHINE_CONFIG_START( swtpc09, swtpc09_state )
 MACHINE_CONFIG_END
 
 /* MPU09, MPID, MPS2 DC4 PIAIDE*/
-static MACHINE_CONFIG_START( swtpc09i, swtpc09_state )
+static MACHINE_CONFIG_START( swtpc09i )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, 1000000)
 	MCFG_CPU_PROGRAM_MAP(swtpc09_mem)
@@ -148,11 +143,10 @@ static MACHINE_CONFIG_START( swtpc09i, swtpc09_state )
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("acia", acia6850_device, write_rxd))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("acia", acia6850_device, write_cts))
 
-	MCFG_DEVICE_ADD("ptm", PTM6840, 0)
-	MCFG_PTM6840_INTERNAL_CLOCK(2000000)
+	MCFG_DEVICE_ADD("ptm", PTM6840, 2000000)
 	MCFG_PTM6840_EXTERNAL_CLOCKS(50, 0, 50)
-	MCFG_PTM6840_OUT0_CB(WRITE8(swtpc09_state, ptm_o1_callback))
-	MCFG_PTM6840_OUT2_CB(WRITE8(swtpc09_state, ptm_o3_callback))
+	MCFG_PTM6840_OUT0_CB(WRITELINE(swtpc09_state, ptm_o1_callback))
+	MCFG_PTM6840_OUT2_CB(WRITELINE(swtpc09_state, ptm_o3_callback))
 	MCFG_PTM6840_IRQ_CB(WRITELINE(swtpc09_state, ptm_irq))
 
 	MCFG_DEVICE_ADD("pia", PIA6821, 0)
@@ -166,7 +160,8 @@ static MACHINE_CONFIG_START( swtpc09i, swtpc09_state )
 	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(swtpc09_state, acia_interrupt))
 
 	MCFG_DEVICE_ADD("acia_clock", CLOCK, 153600)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(swtpc09_state, write_acia_clock))
+	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("acia", acia6850_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("acia", acia6850_device, write_rxc))
 
 	MCFG_FD1793_ADD("fdc", XTAL_1MHz)
 
@@ -187,7 +182,7 @@ MACHINE_CONFIG_END
 
 
 /* MPU09, MPID, MPS2 DMF3 */
-static MACHINE_CONFIG_START( swtpc09d3, swtpc09_state )
+static MACHINE_CONFIG_START( swtpc09d3 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, 2000000)
 	MCFG_CPU_PROGRAM_MAP(swtpc09_mem)
@@ -197,11 +192,10 @@ static MACHINE_CONFIG_START( swtpc09d3, swtpc09_state )
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("acia", acia6850_device, write_rxd))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("acia", acia6850_device, write_cts))
 
-	MCFG_DEVICE_ADD("ptm", PTM6840, 0)
-	MCFG_PTM6840_INTERNAL_CLOCK(2000000)
+	MCFG_DEVICE_ADD("ptm", PTM6840, 2000000)
 	MCFG_PTM6840_EXTERNAL_CLOCKS(50, 0, 50)
-	MCFG_PTM6840_OUT0_CB(WRITE8(swtpc09_state, ptm_o1_callback))
-	MCFG_PTM6840_OUT2_CB(WRITE8(swtpc09_state, ptm_o3_callback))
+	MCFG_PTM6840_OUT0_CB(WRITELINE(swtpc09_state, ptm_o1_callback))
+	MCFG_PTM6840_OUT2_CB(WRITELINE(swtpc09_state, ptm_o3_callback))
 	MCFG_PTM6840_IRQ_CB(WRITELINE(swtpc09_state, ptm_irq))
 
 	MCFG_DEVICE_ADD("pia", PIA6821, 0)
@@ -213,10 +207,11 @@ static MACHINE_CONFIG_START( swtpc09d3, swtpc09_state )
 	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
 	MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
 	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(swtpc09_state, acia_interrupt))
-	MCFG_ACIA6850_IRQ_HANDLER(DEVWRITELINE("maincpu", m6809_device, irq_line))
+	MCFG_ACIA6850_IRQ_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
 
 	MCFG_DEVICE_ADD("acia_clock", CLOCK, 153600)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(swtpc09_state, write_acia_clock))
+	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("acia", acia6850_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("acia", acia6850_device, write_rxc))
 
 	MCFG_FD1793_ADD("fdc", XTAL_1MHz)
 
@@ -258,8 +253,8 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME       PARENT  COMPAT    MACHINE   INPUT   INIT     COMPANY  FULLNAME   FLAGS */
-COMP( 1980, swtpc09,         0,      0,   swtpc09,   swtpc09, swtpc09_state,   swtpc09, "SWTPC", "swtpc S/09 Sbug", MACHINE_NO_SOUND_HW)
-COMP( 1980, swtpc09i,   swtpc09,      0,  swtpc09i,   swtpc09, swtpc09_state,  swtpc09i, "SWTPC", "swtpc S/09 Sbug + piaide", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
-COMP( 1980, swtpc09u,   swtpc09,      0,   swtpc09,   swtpc09, swtpc09_state,  swtpc09u, "SWTPC", "swtpc S/09 UNIBug + DMF2", MACHINE_NO_SOUND_HW)
-COMP( 1980, swtpc09d3,  swtpc09,      0, swtpc09d3,   swtpc09, swtpc09_state, swtpc09d3, "SWTPC", "swtpc S/09 UNIBug + DMF3", MACHINE_NO_SOUND_HW)
+//    YEAR  NAME       PARENT    COMPAT  MACHINE    INPUT    STATE          INIT       COMPANY  FULLNAME                    FLAGS
+COMP( 1980, swtpc09,   0,        0,      swtpc09,   swtpc09, swtpc09_state, swtpc09,   "SWTPC", "swtpc S/09 Sbug",          MACHINE_NO_SOUND_HW )
+COMP( 1980, swtpc09i,  swtpc09,  0,      swtpc09i,  swtpc09, swtpc09_state, swtpc09i,  "SWTPC", "swtpc S/09 Sbug + piaide", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1980, swtpc09u,  swtpc09,  0,      swtpc09,   swtpc09, swtpc09_state, swtpc09u,  "SWTPC", "swtpc S/09 UNIBug + DMF2", MACHINE_NO_SOUND_HW )
+COMP( 1980, swtpc09d3, swtpc09,  0,      swtpc09d3, swtpc09, swtpc09_state, swtpc09d3, "SWTPC", "swtpc S/09 UNIBug + DMF3", MACHINE_NO_SOUND_HW )

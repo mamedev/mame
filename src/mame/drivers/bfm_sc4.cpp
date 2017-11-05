@@ -40,12 +40,170 @@
 #include "includes/bfm_sc4.h"
 #include "machine/bfm_sc45_helper.h"
 
-#include "sc4fd7tha.lh"
+#include "cpu/m68000/m68000.h"
+#include "machine/68307.h"
+#include "machine/68340.h"
+#include "video/awpvid.h"
+//DMD01
+#include "cpu/m6809/m6809.h"
+
+#include "speaker.h"
+
+#include "bfm_sc4.lh"
+#include "sc4_dmd.lh"
+
 #include "sc4dnd.lh"
 #include "sc4dndtp.lh"
 #include "sc4dnddw.lh"
-#include "bfm_sc4.lh"
-#include "sc4_dmd.lh"
+
+// MFME2MAME layouts:
+#include "sc4acesh.lh"
+#include "sc4bantm.lh"
+#include "sc4bedcl.lh"
+#include "sc4blast.lh"
+#include "sc4blokq.lh"
+#include "sc4bobcl.lh"
+#include "sc4brksp.lh"
+#include "sc4brollb.lh"
+#include "sc4cabin.lh"
+#include "sc4canca.lh"
+#include "sc4captn.lh"
+#include "sc4cariqd.lh"
+#include "sc4carrya.lh"
+#include "sc4cashm.lh"
+#include "sc4cclasd.lh"
+#include "sc4cclim.lh"
+#include "sc4cfcas.lh"
+#include "sc4chainb.lh"
+#include "sc4chavy.lh"
+#include "sc4chick.lh"
+#include "sc4chuba.lh"
+#include "sc4clashd.lh"
+#include "sc4clue.lh"
+#include "sc4cmania.lh"
+#include "sc4cmous.lh"
+#include "sc4cnfr.lh"
+#include "sc4coro.lh"
+#include "sc4crc.lh"
+#include "sc4crcla.lh"
+#include "sc4crzgna.lh"
+#include "sc4crzkya.lh"
+#include "sc4cvanif.lh"
+#include "sc4cvclb.lh"
+#include "sc4monot.lh"
+#include "sc4mspid.lh"
+
+#include "sc4dayltf.lh"
+#include "sc4deepi.lh"
+#include "sc4derby.lh"
+#include "sc4dmineb.lh"
+#include "sc4drubyb.lh"
+#include "sc4duckqa.lh"
+#include "sc4dyna.lh"
+#include "sc4eascsc.lh"
+#include "sc4emmerc.lh"
+#include "sc4fastfb.lh"
+#include "sc4fd7tha.lh"
+#include "sc4fever.lh"
+#include "sc4fire.lh"
+#include "sc4fpitcb.lh"
+#include "sc4ftopib.lh"
+#include "sc4fullt.lh"
+#include "sc4fwpcs.lh"
+#include "sc4gaga.lh"
+#include "sc4gball.lh"
+#include "sc4gd.lh"
+#include "sc4gdclb.lh"
+#include "sc4ggdlxf.lh"
+#include "sc4gldcl.lh"
+#include "sc4gslam.lh"
+#include "sc4gx.lh"
+#include "sc4hdd.lh"
+#include "sc4hi5.lh"
+#include "sc4hilo.lh"
+#include "sc4himi.lh"
+#include "sc4hissa.lh"
+#include "sc4holyw.lh"
+#include "sc4hotpr.lh"
+#include "sc4hotwd.lh"
+#include "sc4hyde.lh"
+#include "sc4sprng.lh"
+
+#include "sc4jack.lh"
+#include "sc4kalei.lh"
+#include "sc4knokb.lh"
+#include "sc4lirb.lh"
+#include "sc4lined.lh"
+#include "sc4lockb.lh"
+#include "sc4lkbcl.lh"
+#include "sc4mmmg.lh"
+#include "sc4mgr.lh"
+#include "sc4mtbb.lh"
+#include "sc4mtbclb.lh"
+#include "sc4monoba.lh"
+#include "sc4mondxe.lh"
+#include "sc4mr2rc.lh"
+#include "sc4motor.lh"
+#include "sc4mou.lh"
+#include "sc4nmtj.lh"
+#include "sc4nudita.lh"
+#include "sc4pacqpa.lh"
+#include "sc4paccl.lh"
+#include "sc4pstata.lh"
+#include "sc4pgold.lh"
+#include "sc4po8.lh"
+#include "sc4ppclb.lh"
+#include "sc4pipe.lh"
+#include "sc4plumb.lh"
+#include "sc4polic.lh"
+#include "sc4pony.lh"
+#include "sc4potsha.lh"
+#include "sc4pwrbq.lh"
+#include "sc4pwrsg.lh"
+#include "sc4pen1c.lh"
+#include "sc4qmodo.lh"
+#include "sc4quidrb.lh"
+#include "sc4rhxcsa.lh"
+#include "sc4rhxcl.lh"
+#include "sc4redsq.lh"
+#include "sc4rotc.lh"
+#include "sc4revod.lh"
+#include "sc4richl.lh"
+#include "sc4rttt.lh"
+#include "sc4roksc.lh"
+#include "sc4rogds.lh"
+#include "sc4rmo.lh"
+#include "sc4rtc.lh"
+#include "sc4srrca.lh"
+#include "sc4smk7.lh"
+#include "sc4slci.lh"
+#include "sc4solgl.lh"
+#include "sc4slihd.lh"
+#include "sc4sparkd.lh"
+#include "sc4sbust.lh"
+#include "sc4starpk.lh"
+#include "sc4strk.lh"
+#include "sc4sahed.lh"
+#include "sc4susk.lh"
+#include "sc4suscl.lh"
+#include "sc4s6cd.lh"
+#include "sc4taekw.lh"
+#include "sc4takcl.lh"
+#include "sc4tempt.lh"
+#include "sc4lions.lh"
+#include "sc4tic2.lh"
+#include "sc4tbana.lh"
+#include "sc4tload.lh"
+#include "sc4tpshta.lh"
+#include "sc4trail.lh"
+#include "sc4ttomb.lh"
+#include "sc4tridn.lh"
+#include "sc4tfclb.lh"
+#include "sc4vrgclb.lh"
+#include "sc4wldjkc.lh"
+#include "sc4xmarka.lh"
+
+
 
 /*
 
@@ -99,24 +257,16 @@
 
 
 
-#include "cpu/m68000/m68000.h"
-#include "machine/68307.h"
-#include "machine/68340.h"
-#include "video/awpvid.h"
-//DMD01
-#include "cpu/m6809/m6809.h"
 
 
-
-UINT8 sc4_state::read_input_matrix(int row)
+uint8_t sc4_state::read_input_matrix(int row)
 {
-	ioport_port* portnames[16] = { m_io1, m_io2, m_io3, m_io4, m_io5, m_io6, m_io7, m_io8, m_io9, m_io10, m_io11, m_io12 };
-	UINT8 value;
+	uint8_t value;
 
 	if (row<4)
-		value = (read_safe(portnames[row], 0x00) & 0x1f) + ((read_safe(portnames[row+8], 0x00) & 0x07) << 5);
+		value = (m_io_ports[row].read_safe(0x00) & 0x1f) + ((m_io_ports[row+8].read_safe(0x00) & 0x07) << 5);
 	else
-		value = (read_safe(portnames[row], 0x00) & 0x1f) + ((read_safe(portnames[row+4], 0x00) & 0x18) << 2);
+		value = (m_io_ports[row].read_safe(0x00) & 0x1f) + ((m_io_ports[row+4].read_safe(0x00) & 0x18) << 2);
 
 	return value;
 }
@@ -130,16 +280,16 @@ READ16_MEMBER(sc4_state::sc4_cs1_r)
 		// allow some sets to boot, should probably return this data on Mbus once we figure out what it is
 		if ((pc == m_chk41addr) && (offset == m_chk41addr>>1))
 		{
-			UINT32 r_A0 = space.device().state().state_int(M68K_A0);
-			UINT32 r_A1 = space.device().state().state_int(M68K_A1);
-			UINT32 r_D1 = space.device().state().state_int(M68K_D1);
+			uint32_t r_A0 = space.device().state().state_int(M68K_A0);
+			uint32_t r_A1 = space.device().state().state_int(M68K_A1);
+			uint32_t r_D1 = space.device().state().state_int(M68K_D1);
 
 			if (r_D1 == 0x7)
 			{
 				bool valid = true;
 				for (int i=0;i<8;i++)
 				{
-					UINT8 code = space.read_byte(r_A0+i);
+					uint8_t code = space.read_byte(r_A0+i);
 					if (code != 0xff) // assume our mbus code just returns 0xff for now..
 						valid = false;
 				}
@@ -152,7 +302,7 @@ READ16_MEMBER(sc4_state::sc4_cs1_r)
 					printf("Ident code? ");
 					for (int i=0;i<8;i++)
 					{
-						UINT8 code = space.read_byte(r_A1+i);
+						uint8_t code = space.read_byte(r_A1+i);
 						printf("%02x",code);
 						space.write_byte(r_A0+i, code);
 					}
@@ -162,7 +312,7 @@ READ16_MEMBER(sc4_state::sc4_cs1_r)
 		}
 
 
-		return m_cpuregion->u16(offset);
+		return m_cpuregion->as_u16(offset);
 	}
 	else
 		logerror("%08x maincpu read access offset %08x mem_mask %04x cs %d\n", pc, offset*2, mem_mask, 1);
@@ -176,7 +326,7 @@ READ16_MEMBER(sc4_state::sc4_mem_r)
 	int cs = m_maincpu->get_cs(offset * 2);
 	int base = 0, end = 0, base2 = 0, end2 = 0;
 //  if (!(debugger_access())) printf("cs is %d\n", cs);
-	UINT16 retvalue;
+	uint16_t retvalue;
 
 
 	switch ( cs )
@@ -205,13 +355,13 @@ READ16_MEMBER(sc4_state::sc4_mem_r)
 
 				if (addr < 0x0080)
 				{
-					UINT16 retvalue = 0x0000;
-					if (mem_mask&0xff00)
+					uint16_t retvalue = 0x0000;
+					if (ACCESSING_BITS_8_15)
 					{
 						logerror("mem_mask&0xff00 unhandled\n");
 					}
 
-					if (mem_mask&0x00ff)
+					if (ACCESSING_BITS_0_7)
 					{
 						retvalue = read_input_matrix((addr & 0x00f0)>>4);
 					}
@@ -319,9 +469,33 @@ WRITE8_MEMBER(bfm_sc45_state::mux_output2_w)
 
 	// others drive 7-segs with it..  so rendering it there as well in our debug layouts
 
-	// todo: reorder properly!
-	UINT8 bf7segdata = BITSWAP8(data,7,6,5,4,3,2,1,0);
-	output().set_digit_value(offset, bf7segdata);
+	if (m_segment_34_encoding)
+	{
+		m_segment_34_cache[offset] = data;
+
+		uint16_t short_data;
+		uint8_t byte_data_first_segment;
+		uint8_t byte_data_second_segment;
+		for (int digit = 0; digit < 32; digit += 2)
+		{
+			short_data = (m_segment_34_cache[digit + 1] << 8) | m_segment_34_cache[digit];
+			byte_data_first_segment = (short_data >> 1) & 15;
+			byte_data_second_segment = (short_data >> 6) & 15;
+			output().set_digit_value(digit, SEGMENT_34_ENCODING_LOOKUP[byte_data_first_segment]);
+			output().set_digit_value(digit + 1, SEGMENT_34_ENCODING_LOOKUP[byte_data_second_segment]);
+
+			if (digit == 0 || digit == 2)
+			{
+				byte_data_first_segment = (short_data >> 11) & 15;
+				output().set_digit_value((digit / 2) + 32, SEGMENT_34_ENCODING_LOOKUP[byte_data_first_segment]);
+			}
+		}
+	}
+	else
+	{
+		uint8_t bf7segdata = BITSWAP8(data,0,7,6,5,4,3,2,1);
+		output().set_digit_value(offset, bf7segdata);
+	}
 }
 
 WRITE16_MEMBER(sc4_state::sc4_mem_w)
@@ -358,12 +532,12 @@ WRITE16_MEMBER(sc4_state::sc4_mem_w)
 
 				if (addr < 0x0200)
 				{
-					if (mem_mask&0xff00)
+					if (ACCESSING_BITS_8_15)
 					{
 						logerror("lamp write mem_mask&0xff00 unhandled\n");
 					}
 
-					if (mem_mask&0x00ff)
+					if (ACCESSING_BITS_0_7)
 					{   // lamps
 						mux_output_w(space, (addr & 0x01f0)>>4, data);
 					}
@@ -371,12 +545,12 @@ WRITE16_MEMBER(sc4_state::sc4_mem_w)
 				}
 				else if ((addr >= 0x1000) && (addr < 0x1200))
 				{
-					if (mem_mask&0xff00)
+					if (ACCESSING_BITS_8_15)
 					{
 						logerror("lamp write mem_mask&0xff00 unhandled\n");
 					}
 
-					if (mem_mask&0x00ff)
+					if (ACCESSING_BITS_0_7)
 					{   // lamps
 						mux_output2_w(space, (addr & 0x01f0)>>4, data);
 					}
@@ -452,7 +626,7 @@ ADDRESS_MAP_END
 READ32_MEMBER(sc4_adder4_state::adder4_mem_r)
 {
 	int pc = space.device().safe_pc();
-	int cs = m68340_get_cs(m_adder4cpu, offset * 4);
+	int cs = m_adder4cpu->get_cs(offset * 4);
 
 	switch ( cs )
 	{
@@ -474,7 +648,7 @@ READ32_MEMBER(sc4_adder4_state::adder4_mem_r)
 WRITE32_MEMBER(sc4_adder4_state::adder4_mem_w)
 {
 	int pc = space.device().safe_pc();
-	int cs = m68340_get_cs(m_adder4cpu, offset * 4);
+	int cs = m_adder4cpu->get_cs(offset * 4);
 
 	switch ( cs )
 	{
@@ -535,7 +709,7 @@ void bfm_sc45_state::bfm_sc45_write_serial_vfd(bool cs, bool clock, bool data)
 					if ( vfd_ser_count == 8 )
 					{
 						vfd_ser_count = 0;
-						if (machine().device("matrix"))
+						if (m_dm01)
 						{
 							m_dm01->writedata(vfd_ser_value);
 						}
@@ -556,20 +730,20 @@ void bfm_sc45_state::bfm_sc45_write_serial_vfd(bool cs, bool clock, bool data)
 }
 
 
-void sc4_state::bfm_sc4_68307_porta_w(address_space &space, bool dedicated, UINT8 data, UINT8 line_mask)
+void sc4_state::bfm_sc4_68307_porta_w(address_space &space, bool dedicated, uint8_t data, uint8_t line_mask)
 {
 	m_reel12_latch = data;
 
 	if(m_reel1)
 	{
 		m_reel1->update( data    &0x0f);
-		awp_draw_reel(machine(),"reel1", m_reel1);
+		awp_draw_reel(machine(),"reel1", *m_reel1);
 	}
 
 	if (m_reel2)
 	{
 		m_reel2->update((data>>4)&0x0f);
-		awp_draw_reel(machine(),"reel2", m_reel2);
+		awp_draw_reel(machine(),"reel2", *m_reel2);
 	}
 }
 
@@ -580,7 +754,7 @@ WRITE8_MEMBER( sc4_state::bfm_sc4_reel3_w )
 	if(m_reel3)
 	{
 		m_reel3->update( data    &0x0f);
-		awp_draw_reel(machine(),"reel3", m_reel3);
+		awp_draw_reel(machine(),"reel3", *m_reel3);
 	}
 }
 
@@ -591,11 +765,11 @@ WRITE8_MEMBER( sc4_state::bfm_sc4_reel4_w )
 	if(m_reel4)
 	{
 		m_reel4->update( data    &0x0f);
-		awp_draw_reel(machine(),"reel4", m_reel4);
+		awp_draw_reel(machine(),"reel4", *m_reel4);
 	}
 }
 
-void sc4_state::bfm_sc4_68307_portb_w(address_space &space, bool dedicated, UINT16 data, UINT16 line_mask)
+void sc4_state::bfm_sc4_68307_portb_w(address_space &space, bool dedicated, uint16_t data, uint16_t line_mask)
 {
 //  if (dedicated == false)
 	{
@@ -610,14 +784,14 @@ void sc4_state::bfm_sc4_68307_portb_w(address_space &space, bool dedicated, UINT
 	}
 
 }
-UINT8 sc4_state::bfm_sc4_68307_porta_r(address_space &space, bool dedicated, UINT8 line_mask)
+uint8_t sc4_state::bfm_sc4_68307_porta_r(address_space &space, bool dedicated, uint8_t line_mask)
 {
 	int pc = space.device().safe_pc();
 	logerror("%08x bfm_sc4_68307_porta_r\n", pc);
 	return 0xbb;// machine().rand();
 }
 
-UINT16 sc4_state::bfm_sc4_68307_portb_r(address_space &space, bool dedicated, UINT16 line_mask)
+uint16_t sc4_state::bfm_sc4_68307_portb_r(address_space &space, bool dedicated, uint16_t line_mask)
 {
 	if (dedicated==false)
 	{
@@ -643,13 +817,11 @@ MACHINE_START_MEMBER(sc4_state,sc4)
 {
 	m_nvram->set_base(m_mainram, sizeof(m_mainram));
 
-
 	m_maincpu->set_port_callbacks(
-		m68307_porta_read_delegate(FUNC(sc4_state::bfm_sc4_68307_porta_r),this),
-		m68307_porta_write_delegate(FUNC(sc4_state::bfm_sc4_68307_porta_w),this),
-		m68307_portb_read_delegate(FUNC(sc4_state::bfm_sc4_68307_portb_r),this),
-		m68307_portb_write_delegate(FUNC(sc4_state::bfm_sc4_68307_portb_w),this) );
-
+			m68307_cpu_device::porta_read_delegate(FUNC(sc4_state::bfm_sc4_68307_porta_r), this),
+			m68307_cpu_device::porta_write_delegate(FUNC(sc4_state::bfm_sc4_68307_porta_w), this),
+			m68307_cpu_device::portb_read_delegate(FUNC(sc4_state::bfm_sc4_68307_portb_r), this),
+			m68307_cpu_device::portb_write_delegate(FUNC(sc4_state::bfm_sc4_68307_portb_w), this));
 }
 
 
@@ -685,20 +857,20 @@ WRITE8_MEMBER(sc4_state::bfm_sc4_duart_output_w)
 	if(m_reel5)
 	{
 		m_reel5->update( data    &0x0f);
-		awp_draw_reel(machine(),"reel5", m_reel5);
+		awp_draw_reel(machine(),"reel5", *m_reel5);
 	}
 
 	if (m_reel6)
 	{
 		m_reel6->update((data>>4)&0x0f);
-		awp_draw_reel(machine(),"reel6", m_reel6);
+		awp_draw_reel(machine(),"reel6", *m_reel6);
 	}
 }
 
 
 WRITE_LINE_MEMBER(sc4_state::m68307_duart_txa)
 {
-	logerror("m68307_duart_tx %02x\n",state);
+	logerror("m68307_duart_tx %02x\n", state);
 }
 
 READ8_MEMBER(sc4_state::m68307_duart_input_r)
@@ -718,7 +890,7 @@ WRITE_LINE_MEMBER(sc4_state::bfmdm01_busy)
 	// Must tie back to inputs somehow!
 }
 
-MACHINE_CONFIG_FRAGMENT( sc4_common )
+MACHINE_CONFIG_START( sc4_common )
 	MCFG_CPU_ADD("maincpu", M68307, 16000000)    // 68307! (EC000 core)
 	MCFG_CPU_PROGRAM_MAP(sc4_map)
 	MCFG_MC68307_SERIAL_A_TX_CALLBACK(WRITELINE(sc4_state, m68307_duart_txa))
@@ -749,7 +921,7 @@ MACHINE_CONFIG_FRAGMENT( sc4_common )
 MACHINE_CONFIG_END
 
 //Standard 6 reels all connected
-MACHINE_CONFIG_START( sc4, sc4_state )
+MACHINE_CONFIG_START( sc4 )
 	MCFG_FRAGMENT_ADD(sc4_common)
 
 	MCFG_STARPOINT_RM20_48STEP_ADD("reel1")
@@ -767,7 +939,7 @@ MACHINE_CONFIG_START( sc4, sc4_state )
 MACHINE_CONFIG_END
 
 //Standard 3 reels
-MACHINE_CONFIG_START( sc4_3reel, sc4_state )
+MACHINE_CONFIG_START( sc4_3reel )
 	MCFG_FRAGMENT_ADD(sc4_common)
 
 	MCFG_STARPOINT_RM20_48STEP_ADD("reel1")
@@ -780,7 +952,7 @@ MACHINE_CONFIG_START( sc4_3reel, sc4_state )
 MACHINE_CONFIG_END
 
 //Standard 4 reels
-MACHINE_CONFIG_START( sc4_4reel, sc4_state )
+MACHINE_CONFIG_START( sc4_4reel )
 	MCFG_FRAGMENT_ADD(sc4_common)
 
 	MCFG_STARPOINT_RM20_48STEP_ADD("reel1")
@@ -794,7 +966,7 @@ MACHINE_CONFIG_START( sc4_4reel, sc4_state )
 MACHINE_CONFIG_END
 
 //4 reels, with the last connected to RL4 not RL3
-MACHINE_CONFIG_START( sc4_4reel_alt, sc4_state )
+MACHINE_CONFIG_START( sc4_4reel_alt )
 
 	MCFG_FRAGMENT_ADD(sc4_common)
 
@@ -811,7 +983,7 @@ MACHINE_CONFIG_END
 
 
 //Standard 5 reels
-MACHINE_CONFIG_START( sc4_5reel, sc4_state )
+MACHINE_CONFIG_START( sc4_5reel )
 	MCFG_FRAGMENT_ADD(sc4_common)
 
 	MCFG_STARPOINT_RM20_48STEP_ADD("reel1")
@@ -827,7 +999,7 @@ MACHINE_CONFIG_START( sc4_5reel, sc4_state )
 MACHINE_CONFIG_END
 
 //5 reels, with RL4 skipped
-MACHINE_CONFIG_START( sc4_5reel_alt, sc4_state )
+MACHINE_CONFIG_START( sc4_5reel_alt )
 	MCFG_FRAGMENT_ADD(sc4_common)
 
 	MCFG_STARPOINT_RM20_48STEP_ADD("reel1")
@@ -845,7 +1017,7 @@ MACHINE_CONFIG_START( sc4_5reel_alt, sc4_state )
 MACHINE_CONFIG_END
 
 //6 reels, last 200 steps
-MACHINE_CONFIG_START( sc4_200_std, sc4_state )
+MACHINE_CONFIG_START( sc4_200_std )
 
 	MCFG_FRAGMENT_ADD(sc4_common)
 
@@ -864,7 +1036,7 @@ MACHINE_CONFIG_START( sc4_200_std, sc4_state )
 MACHINE_CONFIG_END
 
 //6 reels, last 200 steps
-MACHINE_CONFIG_START( sc4_200_alt, sc4_state )
+MACHINE_CONFIG_START( sc4_200_alt )
 	MCFG_FRAGMENT_ADD(sc4_common)
 
 	MCFG_STARPOINT_RM20_48STEP_ADD("reel1")
@@ -882,7 +1054,7 @@ MACHINE_CONFIG_START( sc4_200_alt, sc4_state )
 MACHINE_CONFIG_END
 
 //6 reels, RL4 200 steps
-MACHINE_CONFIG_START( sc4_200_alta, sc4_state )
+MACHINE_CONFIG_START( sc4_200_alta )
 	MCFG_FRAGMENT_ADD(sc4_common)
 
 	MCFG_STARPOINT_RM20_48STEP_ADD("reel1")
@@ -900,7 +1072,7 @@ MACHINE_CONFIG_START( sc4_200_alta, sc4_state )
 MACHINE_CONFIG_END
 
 //6 reels, 3 48 step, 3 200 step
-MACHINE_CONFIG_START( sc4_200_altb, sc4_state )
+MACHINE_CONFIG_START( sc4_200_altb )
 	MCFG_FRAGMENT_ADD(sc4_common)
 
 	MCFG_STARPOINT_200STEP_ADD("reel1")
@@ -918,7 +1090,7 @@ MACHINE_CONFIG_START( sc4_200_altb, sc4_state )
 MACHINE_CONFIG_END
 
 //5 reels, last one 200 steps
-MACHINE_CONFIG_START( sc4_200_5r, sc4_state )
+MACHINE_CONFIG_START( sc4_200_5r )
 	MCFG_FRAGMENT_ADD(sc4_common)
 
 	MCFG_STARPOINT_RM20_48STEP_ADD("reel1")
@@ -936,7 +1108,7 @@ MACHINE_CONFIG_END
 
 
 //5 reels, last one 200 steps, RL4 skipped
-MACHINE_CONFIG_START( sc4_200_5ra, sc4_state )
+MACHINE_CONFIG_START( sc4_200_5ra )
 	MCFG_FRAGMENT_ADD(sc4_common)
 
 	MCFG_STARPOINT_RM20_48STEP_ADD("reel1")
@@ -953,7 +1125,7 @@ MACHINE_CONFIG_START( sc4_200_5ra, sc4_state )
 MACHINE_CONFIG_END
 
 //5 reels, last one 200 steps, RL5 skipped
-MACHINE_CONFIG_START( sc4_200_5rb, sc4_state )
+MACHINE_CONFIG_START( sc4_200_5rb )
 	MCFG_FRAGMENT_ADD(sc4_common)
 
 	MCFG_STARPOINT_RM20_48STEP_ADD("reel1")
@@ -970,7 +1142,7 @@ MACHINE_CONFIG_START( sc4_200_5rb, sc4_state )
 MACHINE_CONFIG_END
 
 //5 reels, RL5 200 steps, RL4 skipped
-MACHINE_CONFIG_START( sc4_200_5rc, sc4_state )
+MACHINE_CONFIG_START( sc4_200_5rc )
 	MCFG_FRAGMENT_ADD(sc4_common)
 
 	MCFG_STARPOINT_RM20_48STEP_ADD("reel1")
@@ -987,7 +1159,7 @@ MACHINE_CONFIG_START( sc4_200_5rc, sc4_state )
 MACHINE_CONFIG_END
 
 //4 reels, last one 200 steps
-MACHINE_CONFIG_START( sc4_200_4r, sc4_state )
+MACHINE_CONFIG_START( sc4_200_4r )
 	MCFG_FRAGMENT_ADD(sc4_common)
 
 	MCFG_STARPOINT_RM20_48STEP_ADD("reel1")
@@ -1001,7 +1173,7 @@ MACHINE_CONFIG_START( sc4_200_4r, sc4_state )
 MACHINE_CONFIG_END
 
 //4 reels, last one 200 steps, RL4 skipped
-MACHINE_CONFIG_START( sc4_200_4ra, sc4_state )
+MACHINE_CONFIG_START( sc4_200_4ra )
 	MCFG_FRAGMENT_ADD(sc4_common)
 
 	MCFG_STARPOINT_RM20_48STEP_ADD("reel1")
@@ -1017,7 +1189,7 @@ MACHINE_CONFIG_END
 
 
 //4 reels, last one 200 steps, RL4,5 skipped
-MACHINE_CONFIG_START( sc4_200_4rb, sc4_state )
+MACHINE_CONFIG_START( sc4_200_4rb )
 	MCFG_FRAGMENT_ADD(sc4_common)
 
 	MCFG_STARPOINT_RM20_48STEP_ADD("reel1")
@@ -1031,7 +1203,7 @@ MACHINE_CONFIG_START( sc4_200_4rb, sc4_state )
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(sc4_state, reel6_optic_cb))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START( sc4_4reel_200, sc4_state )
+MACHINE_CONFIG_START( sc4_4reel_200 )
 	MCFG_FRAGMENT_ADD(sc4_common)
 
 	MCFG_STARPOINT_200STEP_ADD("reel1")
@@ -1044,7 +1216,7 @@ MACHINE_CONFIG_START( sc4_4reel_200, sc4_state )
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(sc4_state, reel4_optic_cb))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START( sc4_3reel_200, sc4_state )
+MACHINE_CONFIG_START( sc4_3reel_200 )
 	MCFG_FRAGMENT_ADD(sc4_common)
 
 	MCFG_STARPOINT_200STEP_ADD("reel1")
@@ -1055,7 +1227,7 @@ MACHINE_CONFIG_START( sc4_3reel_200, sc4_state )
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(sc4_state, reel3_optic_cb))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START( sc4_3reel_200_48, sc4_state )
+MACHINE_CONFIG_START( sc4_3reel_200_48 )
 
 	MCFG_FRAGMENT_ADD(sc4_common)
 
@@ -1069,18 +1241,18 @@ MACHINE_CONFIG_START( sc4_3reel_200_48, sc4_state )
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(sc4_state, reel4_optic_cb))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START( sc4_no_reels, sc4_state )
+MACHINE_CONFIG_START( sc4_no_reels )
 	MCFG_FRAGMENT_ADD(sc4_common)
 MACHINE_CONFIG_END
 
 MACHINE_START_MEMBER(sc4_adder4_state,adder4)
 {
-	m_adder4cpuregion = (UINT32*)memregion( "adder4" )->base();
-	m_adder4ram = make_unique_clear<UINT32[]>(0x10000);
+	m_adder4cpuregion = (uint32_t*)memregion( "adder4" )->base();
+	m_adder4ram = make_unique_clear<uint32_t[]>(0x10000);
 	MACHINE_START_CALL_MEMBER(sc4);
 }
 
-MACHINE_CONFIG_START( sc4_adder4, sc4_adder4_state )
+MACHINE_CONFIG_START( sc4_adder4 )
 	MCFG_FRAGMENT_ADD(sc4_common)
 
 	MCFG_CPU_ADD("adder4", M68340, 25175000)     // 68340 (CPU32 core)
@@ -1089,16 +1261,13 @@ MACHINE_CONFIG_START( sc4_adder4, sc4_adder4_state )
 	MCFG_MACHINE_START_OVERRIDE(sc4_adder4_state, adder4 )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START( sc4dmd, sc4_state )
+MACHINE_CONFIG_START( sc4dmd )
 	MCFG_FRAGMENT_ADD(sc4_common)
 	/* video hardware */
 
 	//MCFG_DEFAULT_LAYOUT(layout_sc4_dmd)
-	MCFG_DEVICE_ADD("dm01", BF_DM01, 0)
-	MCFG_BF_DM01_BUSY_CB(WRITELINE(sc4_state, bfmdm01_busy))
-	MCFG_CPU_ADD("matrix", M6809, 2000000 )             /* matrix board 6809 CPU at 2 Mhz ?? I don't know the exact freq.*/
-	MCFG_CPU_PROGRAM_MAP(bfm_dm01_memmap)
-	MCFG_CPU_PERIODIC_INT_DRIVER(sc4_state, nmi_line_assert, 1500 )          /* generate 1500 NMI's per second ?? what is the exact freq?? */
+	MCFG_DEVICE_ADD("dm01", BFM_DM01, 0)
+	MCFG_BFM_DM01_BUSY_CB(WRITELINE(sc4_state, bfmdm01_busy))
 
 	MCFG_MACHINE_START_OVERRIDE(sc4_state, sc4 )
 
@@ -1544,7 +1713,7 @@ INPUT_PORTS_END
 #define MACHINE_FLAGS MACHINE_NOT_WORKING|MACHINE_CLICKABLE_ARTWORK
 #define MACHINE_FLAGS_NOSOUND MACHINE_FLAGS|MACHINE_NO_SOUND
 
-bool compare_mbus(UINT16* rom)
+bool compare_mbus(uint16_t* rom)
 {
 	for (int i=0;i<11;i++)
 	{
@@ -1564,7 +1733,7 @@ bool compare_mbus(UINT16* rom)
 	return true;
 }
 
-void sc4_state::find_mbus(UINT16* rom)
+void sc4_state::find_mbus(uint16_t* rom)
 {
 	for (int i=0;i<(0x100000-0x40)/2;i++)
 	{
@@ -1591,7 +1760,7 @@ INPUT_PORTS_END
 
 DRIVER_INIT_MEMBER(sc4_state,sc4)
 {
-	UINT8 *src = memregion( "maincpu" )->base();
+	uint8_t *src = memregion( "maincpu" )->base();
 	// SC4 identification sequence 0x80 0x00 0xf0 0x7d
 	if (((src[0] == 0x80) && (src[2] == 0xf0)) || ((src[1] == 0x00) && (src[3] == 0x7d)))
 	{
@@ -1621,14 +1790,14 @@ DRIVER_INIT_MEMBER(sc4_state,sc4)
 
 
 	// debug helpers to find strings used for inputs and where the buttons map
-	bfm_sc45_layout_helper(machine());
+//  bfm_sc45_layout_helper(machine());
 
 }
 
 DRIVER_INIT_MEMBER(sc4_state,sc4mbus)
 {
 	DRIVER_INIT_CALL(sc4);
-	UINT16 *rom = (UINT16 *)memregion("maincpu")->base();
+	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 	find_mbus(rom);
 }
 
@@ -25020,32 +25189,32 @@ INPUT_PORTS_END
 
 // can't get past 'read meters'
 // PR2516 PAYSTATIONV2.0         PAYSTATIONSND            PAYSTATION
-GAMEL( 200?, sc4pstat    ,0,         sc4_4reel, sc4pstat, sc4_state, sc4pstat, ROT0, "QPS","Paystation (V2.0) (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4pstatb   ,sc4pstat,  sc4_4reel, sc4pstat, sc4_state, sc4pstat, ROT0, "QPS","Paystation (V2.0) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4pstat    ,0,         sc4_4reel, sc4pstat, sc4_state, sc4pstat, ROT0, "QPS","Paystation (V2.0) (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4pstata )
+GAMEL( 200?, sc4pstatb   ,sc4pstat,  sc4_4reel, sc4pstat, sc4_state, sc4pstat, ROT0, "QPS","Paystation (V2.0) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4pstata )
 // PR2516 PAYSTATIONV2.1         PAYSTATIONSND            PAYSTATION
-GAMEL( 200?, sc4pstata   ,sc4pstat,  sc4_4reel, sc4pstat, sc4_state, sc4pstat, ROT0, "QPS","Paystation (V2.1) (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4pstatc   ,sc4pstat,  sc4_4reel, sc4pstat, sc4_state, sc4pstat, ROT0, "QPS","Paystation (V2.1) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4pstata   ,sc4pstat,  sc4_4reel, sc4pstat, sc4_state, sc4pstat, ROT0, "QPS","Paystation (V2.1) (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4pstata )
+GAMEL( 200?, sc4pstatc   ,sc4pstat,  sc4_4reel, sc4pstat, sc4_state, sc4pstat, ROT0, "QPS","Paystation (V2.1) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4pstata )
 // PR2516 PAYSTATIONV2.2         PAYSTATIONSND            PAYSTATION
-GAMEL( 200?, sc4pstatd   ,sc4pstat,  sc4_4reel, sc4pstat, sc4_state, sc4pstat, ROT0, "QPS","Paystation (V2.2) (Qps) (Scorpion 4)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4pstatd   ,sc4pstat,  sc4_4reel, sc4pstat, sc4_state, sc4pstat, ROT0, "QPS","Paystation (V2.2) (Qps) (Scorpion 4)", MACHINE_FLAGS, layout_sc4pstata )
 // PR2516 PAYSTATIONV2.3         PAYSTATIONSND            PAYSTATION
-GAMEL( 200?, sc4pstate   ,sc4pstat,  sc4_4reel, sc4pstat, sc4_state, sc4pstat, ROT0, "QPS","Paystation (V2.3) (Qps) (Scorpion 4)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4pstate   ,sc4pstat,  sc4_4reel, sc4pstat, sc4_state, sc4pstat, ROT0, "QPS","Paystation (V2.3) (Qps) (Scorpion 4)", MACHINE_FLAGS, layout_sc4pstata )
 
 // ones below can be 'played' (skip 'read meters' with cancel)
 // PR2516 PAYSTATIONV4.0         PAYSTATIONSND            PAYSTATION
-GAMEL( 200?, sc4pstath   ,sc4pstat,  sc4_4reel, sc4pstat, sc4_state, sc4pstat, ROT0, "QPS","Paystation (V4.0) (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4pstatm   ,sc4pstat,  sc4_4reel, sc4pstat, sc4_state, sc4pstat, ROT0, "QPS","Paystation (V4.0) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4pstath   ,sc4pstat,  sc4_4reel, sc4pstat, sc4_state, sc4pstat, ROT0, "QPS","Paystation (V4.0) (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4pstata )
+GAMEL( 200?, sc4pstatm   ,sc4pstat,  sc4_4reel, sc4pstat, sc4_state, sc4pstat, ROT0, "QPS","Paystation (V4.0) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4pstata )
 // PR2516 PAYSTATIONV011         PAYSTATIONSND            PAYSTATION
-GAMEL( 200?, sc4pstatf   ,sc4pstat,  sc4_4reel, sc4pstat, sc4_state, sc4pstat_mbus, ROT0, "QPS","Paystation (V011) (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4pstati   ,sc4pstat,  sc4_4reel, sc4pstat, sc4_state, sc4pstat_mbus, ROT0, "QPS","Paystation (V011) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4pstatf   ,sc4pstat,  sc4_4reel, sc4pstat, sc4_state, sc4pstat_mbus, ROT0, "QPS","Paystation (V011) (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4pstata )
+GAMEL( 200?, sc4pstati   ,sc4pstat,  sc4_4reel, sc4pstat, sc4_state, sc4pstat_mbus, ROT0, "QPS","Paystation (V011) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4pstata )
 // PR2516 PAYSTATION 012         PAYSTATIONSND            PAYSTATION
-GAMEL( 200?, sc4pstatn   ,sc4pstat,  sc4_4reel, sc4pstat, sc4_state, sc4pstat, ROT0, "QPS","Paystation (V012) (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4pstatp   ,sc4pstat,  sc4_4reel, sc4pstat, sc4_state, sc4pstat, ROT0, "QPS","Paystation (V012) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4pstatn   ,sc4pstat,  sc4_4reel, sc4pstat, sc4_state, sc4pstat, ROT0, "QPS","Paystation (V012) (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4pstata )
+GAMEL( 200?, sc4pstatp   ,sc4pstat,  sc4_4reel, sc4pstat, sc4_state, sc4pstat, ROT0, "QPS","Paystation (V012) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4pstata )
 // PR2516 PAYSTATIONV041         PAYSTATIONSND            PAYSTATION
-GAMEL( 200?, sc4pstatg   ,sc4pstat,  sc4_4reel, sc4pstat, sc4_state, sc4pstat_mbus, ROT0, "QPS","Paystation (V041) (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4pstatj   ,sc4pstat,  sc4_4reel, sc4pstat, sc4_state, sc4pstat_mbus, ROT0, "QPS","Paystation (V041) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4pstatg   ,sc4pstat,  sc4_4reel, sc4pstat, sc4_state, sc4pstat_mbus, ROT0, "QPS","Paystation (V041) (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4pstata )
+GAMEL( 200?, sc4pstatj   ,sc4pstat,  sc4_4reel, sc4pstat, sc4_state, sc4pstat_mbus, ROT0, "QPS","Paystation (V041) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4pstata )
 // PR2516 PAYSTATION 042         PAYSTATIONSND            PAYSTATION
-GAMEL( 200?, sc4pstato   ,sc4pstat,  sc4_4reel, sc4pstat, sc4_state, sc4pstat, ROT0, "QPS","Paystation (V042) (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4pstatq   ,sc4pstat,  sc4_4reel, sc4pstat, sc4_state, sc4pstat, ROT0, "QPS","Paystation (V042) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4pstato   ,sc4pstat,  sc4_4reel, sc4pstat, sc4_state, sc4pstat, ROT0, "QPS","Paystation (V042) (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4pstata )
+GAMEL( 200?, sc4pstatq   ,sc4pstat,  sc4_4reel, sc4pstat, sc4_state, sc4pstat, ROT0, "QPS","Paystation (V042) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4pstata )
 
 
 DRIVER_INIT_MEMBER(sc4_state,sc4cvani)
@@ -25100,16 +25269,16 @@ INPUT_PORTS_START( sc4cvani ) // this structure is generated
 INPUT_PORTS_END
 
 // PR2052 CASHLVANIA         VANIASND           CASH'!'VANIA
-GAMEL( 200?, sc4cvani    ,0,         sc4_200_4rb, sc4cvani, sc4_state, sc4cvani, ROT0, "QPS","Cashvania (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cvania   ,sc4cvani,  sc4_200_4rb, sc4cvani, sc4_state, sc4cvani, ROT0, "QPS","Cashvania (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cvanib   ,sc4cvani,  sc4_200_4rb, sc4cvani, sc4_state, sc4cvani, ROT0, "QPS","Cashvania (Qps) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cvanic   ,sc4cvani,  sc4_200_4rb, sc4cvani, sc4_state, sc4cvani, ROT0, "QPS","Cashvania (Qps) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cvanid   ,sc4cvani,  sc4_200_4rb, sc4cvani, sc4_state, sc4cvani, ROT0, "QPS","Cashvania (Qps) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cvanie   ,sc4cvani,  sc4_200_4rb, sc4cvani, sc4_state, sc4cvani, ROT0, "QPS","Cashvania (Qps) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cvanif   ,sc4cvani,  sc4_200_4rb, sc4cvani, sc4_state, sc4cvani, ROT0, "QPS","Cashvania (Qps) (Scorpion 4) (set 7)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cvanig   ,sc4cvani,  sc4_200_4rb, sc4cvani, sc4_state, sc4cvani, ROT0, "QPS","Cashvania (Qps) (Scorpion 4) (set 8)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cvanih   ,sc4cvani,  sc4_200_4rb, sc4cvani, sc4_state, sc4cvani, ROT0, "QPS","Cashvania (Qps) (Scorpion 4) (set 9)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cvanii   ,sc4cvani,  sc4_200_4rb, sc4cvani, sc4_state, sc4cvani, ROT0, "QPS","Cashvania (Qps) (Scorpion 4) (set 10)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4cvani    ,0,         sc4_200_4rb, sc4cvani, sc4_state, sc4cvani, ROT0, "QPS","Cashvania (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4cvanif )
+GAMEL( 200?, sc4cvania   ,sc4cvani,  sc4_200_4rb, sc4cvani, sc4_state, sc4cvani, ROT0, "QPS","Cashvania (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4cvanif )
+GAMEL( 200?, sc4cvanib   ,sc4cvani,  sc4_200_4rb, sc4cvani, sc4_state, sc4cvani, ROT0, "QPS","Cashvania (Qps) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4cvanif )
+GAMEL( 200?, sc4cvanic   ,sc4cvani,  sc4_200_4rb, sc4cvani, sc4_state, sc4cvani, ROT0, "QPS","Cashvania (Qps) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4cvanif )
+GAMEL( 200?, sc4cvanid   ,sc4cvani,  sc4_200_4rb, sc4cvani, sc4_state, sc4cvani, ROT0, "QPS","Cashvania (Qps) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_sc4cvanif )
+GAMEL( 200?, sc4cvanie   ,sc4cvani,  sc4_200_4rb, sc4cvani, sc4_state, sc4cvani, ROT0, "QPS","Cashvania (Qps) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_sc4cvanif )
+GAMEL( 200?, sc4cvanif   ,sc4cvani,  sc4_200_4rb, sc4cvani, sc4_state, sc4cvani, ROT0, "QPS","Cashvania (Qps) (Scorpion 4) (set 7)", MACHINE_FLAGS, layout_sc4cvanif )
+GAMEL( 200?, sc4cvanig   ,sc4cvani,  sc4_200_4rb, sc4cvani, sc4_state, sc4cvani, ROT0, "QPS","Cashvania (Qps) (Scorpion 4) (set 8)", MACHINE_FLAGS, layout_sc4cvanif )
+GAMEL( 200?, sc4cvanih   ,sc4cvani,  sc4_200_4rb, sc4cvani, sc4_state, sc4cvani, ROT0, "QPS","Cashvania (Qps) (Scorpion 4) (set 9)", MACHINE_FLAGS, layout_sc4cvanif )
+GAMEL( 200?, sc4cvanii   ,sc4cvani,  sc4_200_4rb, sc4cvani, sc4_state, sc4cvani, ROT0, "QPS","Cashvania (Qps) (Scorpion 4) (set 10)", MACHINE_FLAGS, layout_sc4cvanif )
 
 
 DRIVER_INIT_MEMBER(sc4_state,sc4cvclb)
@@ -25173,16 +25342,16 @@ INPUT_PORTS_START( sc4cvclb ) // this structure is generated
 INPUT_PORTS_END
 
 // PRXXXX CLUBCASHLVANIA V1.0         CLUBVANIASND         CLUB  CASH!VANIA
-GAMEL( 200?, sc4cvclb    ,0,         sc4_200_4rb, sc4cvclb, sc4_state, sc4cvclb, ROT0, "QPS","Cashvania Club (V1.0) (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cvclba   ,sc4cvclb,  sc4_200_4rb, sc4cvclb, sc4_state, sc4cvclb, ROT0, "QPS","Cashvania Club (V1.0) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cvclbc   ,sc4cvclb,  sc4_200_4rb, sc4cvclb, sc4_state, sc4cvclb, ROT0, "QPS","Cashvania Club (V1.0) (Qps) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cvclbd   ,sc4cvclb,  sc4_200_4rb, sc4cvclb, sc4_state, sc4cvclb, ROT0, "QPS","Cashvania Club (V1.0) (Qps) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4cvclb    ,0,         sc4_200_4rb, sc4cvclb, sc4_state, sc4cvclb, ROT0, "QPS","Cashvania Club (V1.0) (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4cvclb )
+GAMEL( 200?, sc4cvclba   ,sc4cvclb,  sc4_200_4rb, sc4cvclb, sc4_state, sc4cvclb, ROT0, "QPS","Cashvania Club (V1.0) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4cvclb )
+GAMEL( 200?, sc4cvclbc   ,sc4cvclb,  sc4_200_4rb, sc4cvclb, sc4_state, sc4cvclb, ROT0, "QPS","Cashvania Club (V1.0) (Qps) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4cvclb )
+GAMEL( 200?, sc4cvclbd   ,sc4cvclb,  sc4_200_4rb, sc4cvclb, sc4_state, sc4cvclb, ROT0, "QPS","Cashvania Club (V1.0) (Qps) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4cvclb )
 // PRXXXX CLUBCASHLVANIA V2.0         CLUBVANIASND         CLUB  CASH!VANIA
-GAMEL( 200?, sc4cvclbb   ,sc4cvclb,  sc4_200_4rb, sc4cvclb, sc4_state, sc4cvclb, ROT0, "QPS","Cashvania Club (V2.0) (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cvclbe   ,sc4cvclb,  sc4_200_4rb, sc4cvclb, sc4_state, sc4cvclb, ROT0, "QPS","Cashvania Club (V2.0) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4cvclbb   ,sc4cvclb,  sc4_200_4rb, sc4cvclb, sc4_state, sc4cvclb, ROT0, "QPS","Cashvania Club (V2.0) (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4cvclb )
+GAMEL( 200?, sc4cvclbe   ,sc4cvclb,  sc4_200_4rb, sc4cvclb, sc4_state, sc4cvclb, ROT0, "QPS","Cashvania Club (V2.0) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4cvclb )
 // PRXXXX CLUBCASHLVANIA 411         CLUBVANIASND         CLUB  CASH!VANIA
-GAMEL( 200?, sc4cvclbf   ,sc4cvclb,  sc4_200_4rb, sc4cvclb, sc4_state, sc4cvclb_mbus, ROT0, "QPS","Cashvania Club (V411) (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cvclbg   ,sc4cvclb,  sc4_200_4rb, sc4cvclb, sc4_state, sc4cvclb_mbus, ROT0, "QPS","Cashvania Club (V411) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4cvclbf   ,sc4cvclb,  sc4_200_4rb, sc4cvclb, sc4_state, sc4cvclb_mbus, ROT0, "QPS","Cashvania Club (V411) (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4cvclb )
+GAMEL( 200?, sc4cvclbg   ,sc4cvclb,  sc4_200_4rb, sc4cvclb, sc4_state, sc4cvclb_mbus, ROT0, "QPS","Cashvania Club (V411) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4cvclb )
 
 
 
@@ -25452,14 +25621,14 @@ INPUT_PORTS_START( sc4captn ) // this structure is generated
 INPUT_PORTS_END
 
 // PR2013 CAPTAIN CASH         CCASH SOUNDS           CAPTAIN  CASH
-GAMEL( 200?, sc4captn    ,0,         sc4_4reel, sc4captn, sc4_state, sc4captn, ROT0, "Qps","Captain Cash (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4captnb   ,sc4captn,  sc4_4reel, sc4captn, sc4_state, sc4captn, ROT0, "Qps","Captain Cash (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4captnc   ,sc4captn,  sc4_4reel, sc4captn, sc4_state, sc4captn, ROT0, "Qps","Captain Cash (Qps) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4captn    ,0,         sc4_4reel, sc4captn, sc4_state, sc4captn, ROT0, "Qps","Captain Cash (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4captn )
+GAMEL( 200?, sc4captnb   ,sc4captn,  sc4_4reel, sc4captn, sc4_state, sc4captn, ROT0, "Qps","Captain Cash (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4captn )
+GAMEL( 200?, sc4captnc   ,sc4captn,  sc4_4reel, sc4captn, sc4_state, sc4captn, ROT0, "Qps","Captain Cash (Qps) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4captn )
 // PR9999 CAPTAIN CASH         CCASH SOUNDS           CAPTAIN CASH  (invalid project number)
-GAMEL( 200?, sc4captna   ,sc4captn,  sc4_4reel, sc4captn, sc4_state, sc4captn, ROT0, "Qps","Captain Cash (Qps) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4captnd   ,sc4captn,  sc4_4reel, sc4captn, sc4_state, sc4captn, ROT0, "Qps","Captain Cash (Qps) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4captne   ,sc4captn,  sc4_4reel, sc4captn, sc4_state, sc4captn, ROT0, "Qps","Captain Cash (Qps) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4captnf   ,sc4captn,  sc4_4reel, sc4captn, sc4_state, sc4captn, ROT0, "Qps","Captain Cash (Qps) (Scorpion 4) (set 7)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4captna   ,sc4captn,  sc4_4reel, sc4captn, sc4_state, sc4captn, ROT0, "Qps","Captain Cash (Qps) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4captn )
+GAMEL( 200?, sc4captnd   ,sc4captn,  sc4_4reel, sc4captn, sc4_state, sc4captn, ROT0, "Qps","Captain Cash (Qps) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_sc4captn )
+GAMEL( 200?, sc4captne   ,sc4captn,  sc4_4reel, sc4captn, sc4_state, sc4captn, ROT0, "Qps","Captain Cash (Qps) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_sc4captn )
+GAMEL( 200?, sc4captnf   ,sc4captn,  sc4_4reel, sc4captn, sc4_state, sc4captn, ROT0, "Qps","Captain Cash (Qps) (Scorpion 4) (set 7)", MACHINE_FLAGS, layout_sc4captn )
 
 
 DRIVER_INIT_MEMBER(sc4_state,sc4cmous)
@@ -25514,11 +25683,11 @@ INPUT_PORTS_START( sc4cmous ) // this structure is generated
 INPUT_PORTS_END
 
 // PR2534 CASH AND MOUSE V041         CASHANDMOUSESND          CASH AND MOUSE
-GAMEL( 200?, sc4cmous    ,0,         sc4_5reel, sc4cmous, sc4_state, sc4cmous, ROT0, "Qps","Cash & Mouse (V041) (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cmousb   ,sc4cmous,  sc4_5reel, sc4cmous, sc4_state, sc4cmous, ROT0, "Qps","Cash & Mouse (V041) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4cmous    ,0,         sc4_5reel, sc4cmous, sc4_state, sc4cmous, ROT0, "Qps","Cash & Mouse (V041) (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4cmous )
+GAMEL( 200?, sc4cmousb   ,sc4cmous,  sc4_5reel, sc4cmous, sc4_state, sc4cmous, ROT0, "Qps","Cash & Mouse (V041) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4cmous )
 // PR2534 CASH AND MOUSE V011         CASHANDMOUSESND          CASH AND MOUSE
-GAMEL( 200?, sc4cmousa   ,sc4cmous,  sc4_5reel, sc4cmous, sc4_state, sc4cmous, ROT0, "Qps","Cash & Mouse (V011) (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cmousc   ,sc4cmous,  sc4_5reel, sc4cmous, sc4_state, sc4cmous, ROT0, "Qps","Cash & Mouse (V011) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4cmousa   ,sc4cmous,  sc4_5reel, sc4cmous, sc4_state, sc4cmous, ROT0, "Qps","Cash & Mouse (V011) (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4cmous )
+GAMEL( 200?, sc4cmousc   ,sc4cmous,  sc4_5reel, sc4cmous, sc4_state, sc4cmous, ROT0, "Qps","Cash & Mouse (V011) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4cmous )
 
 
 
@@ -25719,15 +25888,15 @@ INPUT_PORTS_END
 
 
 // PR2061 CASHRAKER         RAKERSND             CASHRAKER
-GAMEL( 200?, sc4cr       ,0,         sc4_4reel_alt, sc4cr, sc4_state, sc4cr, ROT0, "Qps","Cash Raker (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cra      ,sc4cr,     sc4_4reel_alt, sc4cr, sc4_state, sc4cr, ROT0, "Qps","Cash Raker (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4crb      ,sc4cr,     sc4_4reel_alt, sc4cr, sc4_state, sc4cr, ROT0, "Qps","Cash Raker (Qps) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4cr       ,0,         sc4_4reel_alt, sc4cr, sc4_state, sc4cr, ROT0, "Qps","Cash Raker (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4crc )
+GAMEL( 200?, sc4cra      ,sc4cr,     sc4_4reel_alt, sc4cr, sc4_state, sc4cr, ROT0, "Qps","Cash Raker (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4crc )
+GAMEL( 200?, sc4crb      ,sc4cr,     sc4_4reel_alt, sc4cr, sc4_state, sc4cr, ROT0, "Qps","Cash Raker (Qps) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4crc )
 // PR2061 CASHRAKER V2.1         RAKERSND             CASHRAKER
-GAMEL( 200?, sc4crc      ,sc4cr,     sc4_4reel_alt, sc4cr, sc4_state, sc4cr, ROT0, "Qps","Cash Raker (V2.1) (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cre      ,sc4cr,     sc4_4reel_alt, sc4cr, sc4_state, sc4cr, ROT0, "Qps","Cash Raker (V2.1) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4crc      ,sc4cr,     sc4_4reel_alt, sc4cr, sc4_state, sc4cr, ROT0, "Qps","Cash Raker (V2.1) (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4crc )
+GAMEL( 200?, sc4cre      ,sc4cr,     sc4_4reel_alt, sc4cr, sc4_state, sc4cr, ROT0, "Qps","Cash Raker (V2.1) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4crc )
 // PR2061 CASHRAKER V2.2         RAKERSND             CASHRAKER
-GAMEL( 200?, sc4crd      ,sc4cr,     sc4_4reel_alt, sc4cr, sc4_state, sc4cr, ROT0, "Qps","Cash Raker (V2.2) (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4crf      ,sc4cr,     sc4_4reel_alt, sc4cr, sc4_state, sc4cr, ROT0, "Qps","Cash Raker (V2.2) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4crd      ,sc4cr,     sc4_4reel_alt, sc4cr, sc4_state, sc4cr, ROT0, "Qps","Cash Raker (V2.2) (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4crc )
+GAMEL( 200?, sc4crf      ,sc4cr,     sc4_4reel_alt, sc4cr, sc4_state, sc4cr, ROT0, "Qps","Cash Raker (V2.2) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4crc )
 
 
 
@@ -25790,16 +25959,16 @@ INPUT_PORTS_START( sc4crcl ) // this structure is generated
 INPUT_PORTS_END
 
 // PR????  CLUB CASHRAKER V1.0         CLUBRAKERSND          CLUB CASHRAKER
-GAMEL( 200?, sc4crcl     ,0,         sc4_5reel, sc4crcl, sc4_state, sc4crcl, ROT0, "Qps","Cash Raker Club (V1.0) (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4crclb    ,sc4crcl,   sc4_5reel, sc4crcl, sc4_state, sc4crcl, ROT0, "Qps","Cash Raker Club (V1.0) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4crcl     ,0,         sc4_5reel, sc4crcl, sc4_state, sc4crcl, ROT0, "Qps","Cash Raker Club (V1.0) (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4crcla )
+GAMEL( 200?, sc4crclb    ,sc4crcl,   sc4_5reel, sc4crcl, sc4_state, sc4crcl, ROT0, "Qps","Cash Raker Club (V1.0) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4crcla )
 // PR????  CLUB CASHRAKER V1.1         CLUBRAKERSND          CLUB CASHRAKER
-GAMEL( 200?, sc4crcla    ,sc4crcl,   sc4_5reel, sc4crcl, sc4_state, sc4crcl, ROT0, "Qps","Cash Raker Club (V1.1) (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4crclc    ,sc4crcl,   sc4_5reel, sc4crcl, sc4_state, sc4crcl, ROT0, "Qps","Cash Raker Club (V1.1) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4crcla    ,sc4crcl,   sc4_5reel, sc4crcl, sc4_state, sc4crcl, ROT0, "Qps","Cash Raker Club (V1.1) (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4crcla )
+GAMEL( 200?, sc4crclc    ,sc4crcl,   sc4_5reel, sc4crcl, sc4_state, sc4crcl, ROT0, "Qps","Cash Raker Club (V1.1) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4crcla )
 // PR????  CLUB CASHRAKER V1.3         CLUBRAKERSND          CLUB CASHRAKER
-GAMEL( 200?, sc4crcld    ,sc4crcl,   sc4_5reel, sc4crcl, sc4_state, sc4crcl, ROT0, "Qps","Cash Raker Club (V1.3) (Qps) (Scorpion 4)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4crcld    ,sc4crcl,   sc4_5reel, sc4crcl, sc4_state, sc4crcl, ROT0, "Qps","Cash Raker Club (V1.3) (Qps) (Scorpion 4)", MACHINE_FLAGS, layout_sc4crcla )
 // PR????  CLUB CASHRAKER 411         CLUBRAKERSND          CLUB CASHRAKER
-GAMEL( 200?, sc4crcle    ,sc4crcl,   sc4_5reel, sc4crcl, sc4_state, sc4crcl_mbus, ROT0, "Qps","Cash Raker Club (411) (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4crclf    ,sc4crcl,   sc4_5reel, sc4crcl, sc4_state, sc4crcl_mbus, ROT0, "Qps","Cash Raker Club (411) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4crcle    ,sc4crcl,   sc4_5reel, sc4crcl, sc4_state, sc4crcl_mbus, ROT0, "Qps","Cash Raker Club (411) (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4crcla )
+GAMEL( 200?, sc4crclf    ,sc4crcl,   sc4_5reel, sc4crcl, sc4_state, sc4crcl_mbus, ROT0, "Qps","Cash Raker Club (411) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4crcla )
 
 
 DRIVER_INIT_MEMBER(sc4_state,sc4cashm)
@@ -25848,12 +26017,12 @@ INPUT_PORTS_START( sc4cashm ) // this structure is generated
 INPUT_PORTS_END
 
 // PR2008 CASHANOVA         CASH SOUNDS
-GAMEL( 200?, sc4cashm    ,0,         sc4_4reel, sc4cashm, sc4_state, sc4cashm, ROT0, "Mazooma","Cashanova (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cashma   ,sc4cashm,  sc4_4reel, sc4cashm, sc4_state, sc4cashm, ROT0, "Mazooma","Cashanova (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cashmb   ,sc4cashm,  sc4_4reel, sc4cashm, sc4_state, sc4cashm, ROT0, "Mazooma","Cashanova (Mazooma) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cashmc   ,sc4cashm,  sc4_4reel, sc4cashm, sc4_state, sc4cashm, ROT0, "Mazooma","Cashanova (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cashmd   ,sc4cashm,  sc4_4reel, sc4cashm, sc4_state, sc4cashm, ROT0, "Mazooma","Cashanova (Mazooma) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cashme   ,sc4cashm,  sc4_4reel, sc4cashm, sc4_state, sc4cashm, ROT0, "Mazooma","Cashanova (Mazooma) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4cashm    ,0,         sc4_4reel, sc4cashm, sc4_state, sc4cashm, ROT0, "Mazooma","Cashanova (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4cashm )
+GAMEL( 200?, sc4cashma   ,sc4cashm,  sc4_4reel, sc4cashm, sc4_state, sc4cashm, ROT0, "Mazooma","Cashanova (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4cashm )
+GAMEL( 200?, sc4cashmb   ,sc4cashm,  sc4_4reel, sc4cashm, sc4_state, sc4cashm, ROT0, "Mazooma","Cashanova (Mazooma) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4cashm )
+GAMEL( 200?, sc4cashmc   ,sc4cashm,  sc4_4reel, sc4cashm, sc4_state, sc4cashm, ROT0, "Mazooma","Cashanova (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4cashm )
+GAMEL( 200?, sc4cashmd   ,sc4cashm,  sc4_4reel, sc4cashm, sc4_state, sc4cashm, ROT0, "Mazooma","Cashanova (Mazooma) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_sc4cashm )
+GAMEL( 200?, sc4cashme   ,sc4cashm,  sc4_4reel, sc4cashm, sc4_state, sc4cashm, ROT0, "Mazooma","Cashanova (Mazooma) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_sc4cashm )
 
 
 
@@ -25988,7 +26157,7 @@ INPUT_PORTS_START( sc4chick ) // this structure is generated
 INPUT_PORTS_END
 
 // PR7060CASINO CHICKEN DALES         TTTWO SOUNDS         CHICKEN DALES
-GAMEL( 200?, sc4chick    ,0,         sc4_3reel, sc4chick, sc4_state, sc4chick, ROT0, "Mazooma","Chickendales (Mazooma) (Scorpion 4)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4chick    ,0,         sc4_3reel, sc4chick, sc4_state, sc4chick, ROT0, "Mazooma","Chickendales (Mazooma) (Scorpion 4)", MACHINE_FLAGS, layout_sc4chick )
 
 
 DRIVER_INIT_MEMBER(sc4_state,sc4ccogs)
@@ -26118,29 +26287,29 @@ INPUT_PORTS_START( sc4cclime ) // this structure is generated
 INPUT_PORTS_END
 
 // PR1129 CASINO CRAZY CLIMBER         PR1129 CRAZY CLIMBER SOUNDS11
-GAMEL( 200?, sc4cclim    ,0,         sc4_3reel, sc4cclime, sc4_state, sc4cclim, ROT0, "BFM","Casino Crazy Climber (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cclima   ,sc4cclim,  sc4_3reel, sc4cclime, sc4_state, sc4cclim, ROT0, "BFM","Casino Crazy Climber (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cclimb   ,sc4cclim,  sc4_3reel, sc4cclime, sc4_state, sc4cclim, ROT0, "BFM","Casino Crazy Climber (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cclimc   ,sc4cclim,  sc4_3reel, sc4cclime, sc4_state, sc4cclim, ROT0, "BFM","Casino Crazy Climber (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cclimd   ,sc4cclim,  sc4_3reel, sc4cclime, sc4_state, sc4cclim, ROT0, "BFM","Casino Crazy Climber (Bellfruit) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cclimh   ,sc4cclim,  sc4_3reel, sc4cclime, sc4_state, sc4cclim, ROT0, "BFM","Casino Crazy Climber (Bellfruit) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cclimi   ,sc4cclim,  sc4_3reel, sc4cclime, sc4_state, sc4cclim, ROT0, "BFM","Casino Crazy Climber (Bellfruit) (Scorpion 4) (set 7)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cclimm   ,sc4cclim,  sc4_3reel, sc4cclime, sc4_state, sc4cclim, ROT0, "BFM","Casino Crazy Climber (Bellfruit) (Scorpion 4) (set 8)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cclimn   ,sc4cclim,  sc4_3reel, sc4cclime, sc4_state, sc4cclim, ROT0, "BFM","Casino Crazy Climber (Bellfruit) (Scorpion 4) (set 9)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cclimo   ,sc4cclim,  sc4_3reel, sc4cclime, sc4_state, sc4cclim, ROT0, "BFM","Casino Crazy Climber (Bellfruit) (Scorpion 4) (set 10)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cclimp   ,sc4cclim,  sc4_3reel, sc4cclime, sc4_state, sc4cclim, ROT0, "BFM","Casino Crazy Climber (Bellfruit) (Scorpion 4) (set 11)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cclims   ,sc4cclim,  sc4_3reel, sc4cclime, sc4_state, sc4cclim, ROT0, "BFM","Casino Crazy Climber (Bellfruit) (Scorpion 4) (set 12)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4cclim    ,0,         sc4_3reel, sc4cclime, sc4_state, sc4cclim, ROT0, "BFM","Casino Crazy Climber (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4cclim )
+GAMEL( 200?, sc4cclima   ,sc4cclim,  sc4_3reel, sc4cclime, sc4_state, sc4cclim, ROT0, "BFM","Casino Crazy Climber (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4cclim )
+GAMEL( 200?, sc4cclimb   ,sc4cclim,  sc4_3reel, sc4cclime, sc4_state, sc4cclim, ROT0, "BFM","Casino Crazy Climber (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4cclim )
+GAMEL( 200?, sc4cclimc   ,sc4cclim,  sc4_3reel, sc4cclime, sc4_state, sc4cclim, ROT0, "BFM","Casino Crazy Climber (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4cclim )
+GAMEL( 200?, sc4cclimd   ,sc4cclim,  sc4_3reel, sc4cclime, sc4_state, sc4cclim, ROT0, "BFM","Casino Crazy Climber (Bellfruit) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_sc4cclim )
+GAMEL( 200?, sc4cclimh   ,sc4cclim,  sc4_3reel, sc4cclime, sc4_state, sc4cclim, ROT0, "BFM","Casino Crazy Climber (Bellfruit) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_sc4cclim )
+GAMEL( 200?, sc4cclimi   ,sc4cclim,  sc4_3reel, sc4cclime, sc4_state, sc4cclim, ROT0, "BFM","Casino Crazy Climber (Bellfruit) (Scorpion 4) (set 7)", MACHINE_FLAGS, layout_sc4cclim )
+GAMEL( 200?, sc4cclimm   ,sc4cclim,  sc4_3reel, sc4cclime, sc4_state, sc4cclim, ROT0, "BFM","Casino Crazy Climber (Bellfruit) (Scorpion 4) (set 8)", MACHINE_FLAGS, layout_sc4cclim )
+GAMEL( 200?, sc4cclimn   ,sc4cclim,  sc4_3reel, sc4cclime, sc4_state, sc4cclim, ROT0, "BFM","Casino Crazy Climber (Bellfruit) (Scorpion 4) (set 9)", MACHINE_FLAGS, layout_sc4cclim )
+GAMEL( 200?, sc4cclimo   ,sc4cclim,  sc4_3reel, sc4cclime, sc4_state, sc4cclim, ROT0, "BFM","Casino Crazy Climber (Bellfruit) (Scorpion 4) (set 10)", MACHINE_FLAGS, layout_sc4cclim )
+GAMEL( 200?, sc4cclimp   ,sc4cclim,  sc4_3reel, sc4cclime, sc4_state, sc4cclim, ROT0, "BFM","Casino Crazy Climber (Bellfruit) (Scorpion 4) (set 11)", MACHINE_FLAGS, layout_sc4cclim )
+GAMEL( 200?, sc4cclims   ,sc4cclim,  sc4_3reel, sc4cclime, sc4_state, sc4cclim, ROT0, "BFM","Casino Crazy Climber (Bellfruit) (Scorpion 4) (set 12)", MACHINE_FLAGS, layout_sc4cclim )
 // PR1129 CASINO CRAZY CLIMBER         CRAZY CLIMBER S.SITE  PR1129 CRAZY CLIMBER SOUNDS11
-GAMEL( 200?, sc4cclime   ,sc4cclim,  sc4_3reel, sc4cclime, sc4_state, sc4cclim_mbus, ROT0, "BFM","Casino Crazy Climber (Bellfruit) (Scorpion 4) (set 13)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cclimf   ,sc4cclim,  sc4_3reel, sc4cclime, sc4_state, sc4cclim_mbus, ROT0, "BFM","Casino Crazy Climber (Bellfruit) (Scorpion 4) (set 14)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cclimg   ,sc4cclim,  sc4_3reel, sc4cclime, sc4_state, sc4cclim_mbus, ROT0, "BFM","Casino Crazy Climber (Bellfruit) (Scorpion 4) (set 15)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cclimj   ,sc4cclim,  sc4_3reel, sc4cclime, sc4_state, sc4cclim_mbus, ROT0, "BFM","Casino Crazy Climber (Bellfruit) (Scorpion 4) (set 16)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cclimk   ,sc4cclim,  sc4_3reel, sc4cclime, sc4_state, sc4cclim_mbus, ROT0, "BFM","Casino Crazy Climber (Bellfruit) (Scorpion 4) (set 17)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4ccliml   ,sc4cclim,  sc4_3reel, sc4cclime, sc4_state, sc4cclim_mbus, ROT0, "BFM","Casino Crazy Climber (Bellfruit) (Scorpion 4) (set 18)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cclimq   ,sc4cclim,  sc4_3reel, sc4cclime, sc4_state, sc4cclim_mbus, ROT0, "BFM","Casino Crazy Climber (Bellfruit) (Scorpion 4) (set 19)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cclimr   ,sc4cclim,  sc4_3reel, sc4cclime, sc4_state, sc4cclim_mbus, ROT0, "BFM","Casino Crazy Climber (Bellfruit) (Scorpion 4) (set 20)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cclimt   ,sc4cclim,  sc4_3reel, sc4cclime, sc4_state, sc4cclim_mbus, ROT0, "BFM","Casino Crazy Climber (Bellfruit) (Scorpion 4) (set 21)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cclimu   ,sc4cclim,  sc4_3reel, sc4cclime, sc4_state, sc4cclim_mbus, ROT0, "BFM","Casino Crazy Climber (Bellfruit) (Scorpion 4) (set 22)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4cclime   ,sc4cclim,  sc4_3reel, sc4cclime, sc4_state, sc4cclim_mbus, ROT0, "BFM","Casino Crazy Climber (Bellfruit) (Scorpion 4) (set 13)", MACHINE_FLAGS, layout_sc4cclim )
+GAMEL( 200?, sc4cclimf   ,sc4cclim,  sc4_3reel, sc4cclime, sc4_state, sc4cclim_mbus, ROT0, "BFM","Casino Crazy Climber (Bellfruit) (Scorpion 4) (set 14)", MACHINE_FLAGS, layout_sc4cclim )
+GAMEL( 200?, sc4cclimg   ,sc4cclim,  sc4_3reel, sc4cclime, sc4_state, sc4cclim_mbus, ROT0, "BFM","Casino Crazy Climber (Bellfruit) (Scorpion 4) (set 15)", MACHINE_FLAGS, layout_sc4cclim )
+GAMEL( 200?, sc4cclimj   ,sc4cclim,  sc4_3reel, sc4cclime, sc4_state, sc4cclim_mbus, ROT0, "BFM","Casino Crazy Climber (Bellfruit) (Scorpion 4) (set 16)", MACHINE_FLAGS, layout_sc4cclim )
+GAMEL( 200?, sc4cclimk   ,sc4cclim,  sc4_3reel, sc4cclime, sc4_state, sc4cclim_mbus, ROT0, "BFM","Casino Crazy Climber (Bellfruit) (Scorpion 4) (set 17)", MACHINE_FLAGS, layout_sc4cclim )
+GAMEL( 200?, sc4ccliml   ,sc4cclim,  sc4_3reel, sc4cclime, sc4_state, sc4cclim_mbus, ROT0, "BFM","Casino Crazy Climber (Bellfruit) (Scorpion 4) (set 18)", MACHINE_FLAGS, layout_sc4cclim )
+GAMEL( 200?, sc4cclimq   ,sc4cclim,  sc4_3reel, sc4cclime, sc4_state, sc4cclim_mbus, ROT0, "BFM","Casino Crazy Climber (Bellfruit) (Scorpion 4) (set 19)", MACHINE_FLAGS, layout_sc4cclim )
+GAMEL( 200?, sc4cclimr   ,sc4cclim,  sc4_3reel, sc4cclime, sc4_state, sc4cclim_mbus, ROT0, "BFM","Casino Crazy Climber (Bellfruit) (Scorpion 4) (set 20)", MACHINE_FLAGS, layout_sc4cclim )
+GAMEL( 200?, sc4cclimt   ,sc4cclim,  sc4_3reel, sc4cclime, sc4_state, sc4cclim_mbus, ROT0, "BFM","Casino Crazy Climber (Bellfruit) (Scorpion 4) (set 21)", MACHINE_FLAGS, layout_sc4cclim )
+GAMEL( 200?, sc4cclimu   ,sc4cclim,  sc4_3reel, sc4cclime, sc4_state, sc4cclim_mbus, ROT0, "BFM","Casino Crazy Climber (Bellfruit) (Scorpion 4) (set 22)", MACHINE_FLAGS, layout_sc4cclim )
 
 
 
@@ -26311,31 +26480,31 @@ INPUT_PORTS_START( sc4crzkyi ) // this structure is generated
 INPUT_PORTS_END
 
 // PR1128 CASINO CRAZY KEYS         PR1128 CRAZY KEYS SOUNDS11
-GAMEL( 200?, sc4crzky    ,0,         sc4_3reel, sc4crzkyi, sc4_state, sc4crzky, ROT0, "BFM","Casino Crazy Keys (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4crzkya   ,sc4crzky,  sc4_3reel, sc4crzkyi, sc4_state, sc4crzky, ROT0, "BFM","Casino Crazy Keys (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4crzkyb   ,sc4crzky,  sc4_3reel, sc4crzkyi, sc4_state, sc4crzky, ROT0, "BFM","Casino Crazy Keys (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4crzkyc   ,sc4crzky,  sc4_3reel, sc4crzkyi, sc4_state, sc4crzky, ROT0, "BFM","Casino Crazy Keys (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4crzkyd   ,sc4crzky,  sc4_3reel, sc4crzkyi, sc4_state, sc4crzky, ROT0, "BFM","Casino Crazy Keys (Bellfruit) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4crzkye   ,sc4crzky,  sc4_3reel, sc4crzkyi, sc4_state, sc4crzky, ROT0, "BFM","Casino Crazy Keys (Bellfruit) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4crzkyf   ,sc4crzky,  sc4_3reel, sc4crzkyi, sc4_state, sc4crzky, ROT0, "BFM","Casino Crazy Keys (Bellfruit) (Scorpion 4) (set 7)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4crzkyg   ,sc4crzky,  sc4_3reel, sc4crzkyi, sc4_state, sc4crzky, ROT0, "BFM","Casino Crazy Keys (Bellfruit) (Scorpion 4) (set 8)", MACHINE_FLAGS, layout_bfm_sc4 ) // incomplete pairing
-GAMEL( 200?, sc4crzkyh   ,sc4crzky,  sc4_3reel, sc4crzkyi, sc4_state, sc4crzky, ROT0, "BFM","Casino Crazy Keys (Bellfruit) (Scorpion 4) (set 9)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4crzkyl   ,sc4crzky,  sc4_3reel, sc4crzkyi, sc4_state, sc4crzky, ROT0, "BFM","Casino Crazy Keys (Bellfruit) (Scorpion 4) (set 10)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4crzkym   ,sc4crzky,  sc4_3reel, sc4crzkyi, sc4_state, sc4crzky, ROT0, "BFM","Casino Crazy Keys (Bellfruit) (Scorpion 4) (set 11)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4crzkyn   ,sc4crzky,  sc4_3reel, sc4crzkyi, sc4_state, sc4crzky, ROT0, "BFM","Casino Crazy Keys (Bellfruit) (Scorpion 4) (set 12)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4crzkyt   ,sc4crzky,  sc4_3reel, sc4crzkyi, sc4_state, sc4crzky, ROT0, "BFM","Casino Crazy Keys (Bellfruit) (Scorpion 4) (set 13)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4crzkyu   ,sc4crzky,  sc4_3reel, sc4crzkyi, sc4_state, sc4crzky, ROT0, "BFM","Casino Crazy Keys (Bellfruit) (Scorpion 4) (set 14)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4crzky    ,0,         sc4_3reel, sc4crzkyi, sc4_state, sc4crzky, ROT0, "BFM","Casino Crazy Keys (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4crzkya )
+GAMEL( 200?, sc4crzkya   ,sc4crzky,  sc4_3reel, sc4crzkyi, sc4_state, sc4crzky, ROT0, "BFM","Casino Crazy Keys (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4crzkya )
+GAMEL( 200?, sc4crzkyb   ,sc4crzky,  sc4_3reel, sc4crzkyi, sc4_state, sc4crzky, ROT0, "BFM","Casino Crazy Keys (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4crzkya )
+GAMEL( 200?, sc4crzkyc   ,sc4crzky,  sc4_3reel, sc4crzkyi, sc4_state, sc4crzky, ROT0, "BFM","Casino Crazy Keys (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4crzkya )
+GAMEL( 200?, sc4crzkyd   ,sc4crzky,  sc4_3reel, sc4crzkyi, sc4_state, sc4crzky, ROT0, "BFM","Casino Crazy Keys (Bellfruit) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_sc4crzkya )
+GAMEL( 200?, sc4crzkye   ,sc4crzky,  sc4_3reel, sc4crzkyi, sc4_state, sc4crzky, ROT0, "BFM","Casino Crazy Keys (Bellfruit) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_sc4crzkya )
+GAMEL( 200?, sc4crzkyf   ,sc4crzky,  sc4_3reel, sc4crzkyi, sc4_state, sc4crzky, ROT0, "BFM","Casino Crazy Keys (Bellfruit) (Scorpion 4) (set 7)", MACHINE_FLAGS, layout_sc4crzkya )
+GAMEL( 200?, sc4crzkyg   ,sc4crzky,  sc4_3reel, sc4crzkyi, sc4_state, sc4crzky, ROT0, "BFM","Casino Crazy Keys (Bellfruit) (Scorpion 4) (set 8)", MACHINE_FLAGS, layout_sc4crzkya ) // incomplete pairing
+GAMEL( 200?, sc4crzkyh   ,sc4crzky,  sc4_3reel, sc4crzkyi, sc4_state, sc4crzky, ROT0, "BFM","Casino Crazy Keys (Bellfruit) (Scorpion 4) (set 9)", MACHINE_FLAGS, layout_sc4crzkya )
+GAMEL( 200?, sc4crzkyl   ,sc4crzky,  sc4_3reel, sc4crzkyi, sc4_state, sc4crzky, ROT0, "BFM","Casino Crazy Keys (Bellfruit) (Scorpion 4) (set 10)", MACHINE_FLAGS, layout_sc4crzkya )
+GAMEL( 200?, sc4crzkym   ,sc4crzky,  sc4_3reel, sc4crzkyi, sc4_state, sc4crzky, ROT0, "BFM","Casino Crazy Keys (Bellfruit) (Scorpion 4) (set 11)", MACHINE_FLAGS, layout_sc4crzkya )
+GAMEL( 200?, sc4crzkyn   ,sc4crzky,  sc4_3reel, sc4crzkyi, sc4_state, sc4crzky, ROT0, "BFM","Casino Crazy Keys (Bellfruit) (Scorpion 4) (set 12)", MACHINE_FLAGS, layout_sc4crzkya )
+GAMEL( 200?, sc4crzkyt   ,sc4crzky,  sc4_3reel, sc4crzkyi, sc4_state, sc4crzky, ROT0, "BFM","Casino Crazy Keys (Bellfruit) (Scorpion 4) (set 13)", MACHINE_FLAGS, layout_sc4crzkya )
+GAMEL( 200?, sc4crzkyu   ,sc4crzky,  sc4_3reel, sc4crzkyi, sc4_state, sc4crzky, ROT0, "BFM","Casino Crazy Keys (Bellfruit) (Scorpion 4) (set 14)", MACHINE_FLAGS, layout_sc4crzkya )
 // PR1128 CASINO CRAZY KEYS         CRAZY KEYS  ARCADE  PR1128 CRAZY KEYS SOUNDS11
-GAMEL( 200?, sc4crzkyi   ,sc4crzky,  sc4_3reel, sc4crzkyi, sc4_state, sc4crzky_mbus, ROT0, "BFM","Casino Crazy Keys Arcade (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4crzkyj   ,sc4crzky,  sc4_3reel, sc4crzkyi, sc4_state, sc4crzky_mbus, ROT0, "BFM","Casino Crazy Keys Arcade (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4crzkyk   ,sc4crzky,  sc4_3reel, sc4crzkyi, sc4_state, sc4crzky_mbus, ROT0, "BFM","Casino Crazy Keys Arcade (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4crzkyo   ,sc4crzky,  sc4_3reel, sc4crzkyi, sc4_state, sc4crzky_mbus, ROT0, "BFM","Casino Crazy Keys Arcade (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4crzkyp   ,sc4crzky,  sc4_3reel, sc4crzkyi, sc4_state, sc4crzky_mbus, ROT0, "BFM","Casino Crazy Keys Arcade (Bellfruit) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4crzkyq   ,sc4crzky,  sc4_3reel, sc4crzkyi, sc4_state, sc4crzky_mbus, ROT0, "BFM","Casino Crazy Keys Arcade (Bellfruit) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4crzkyr   ,sc4crzky,  sc4_3reel, sc4crzkyi, sc4_state, sc4crzky_mbus, ROT0, "BFM","Casino Crazy Keys Arcade (Bellfruit) (Scorpion 4) (set 7)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4crzkys   ,sc4crzky,  sc4_3reel, sc4crzkyi, sc4_state, sc4crzky_mbus, ROT0, "BFM","Casino Crazy Keys Arcade (Bellfruit) (Scorpion 4) (set 8)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4crzkyv   ,sc4crzky,  sc4_3reel, sc4crzkyi, sc4_state, sc4crzky_mbus, ROT0, "BFM","Casino Crazy Keys Arcade (Bellfruit) (Scorpion 4) (set 9)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4crzkyw   ,sc4crzky,  sc4_3reel, sc4crzkyi, sc4_state, sc4crzky_mbus, ROT0, "BFM","Casino Crazy Keys Arcade (Bellfruit) (Scorpion 4) (set 10)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4crzkyi   ,sc4crzky,  sc4_3reel, sc4crzkyi, sc4_state, sc4crzky_mbus, ROT0, "BFM","Casino Crazy Keys Arcade (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4crzkya )
+GAMEL( 200?, sc4crzkyj   ,sc4crzky,  sc4_3reel, sc4crzkyi, sc4_state, sc4crzky_mbus, ROT0, "BFM","Casino Crazy Keys Arcade (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4crzkya )
+GAMEL( 200?, sc4crzkyk   ,sc4crzky,  sc4_3reel, sc4crzkyi, sc4_state, sc4crzky_mbus, ROT0, "BFM","Casino Crazy Keys Arcade (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4crzkya )
+GAMEL( 200?, sc4crzkyo   ,sc4crzky,  sc4_3reel, sc4crzkyi, sc4_state, sc4crzky_mbus, ROT0, "BFM","Casino Crazy Keys Arcade (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4crzkya )
+GAMEL( 200?, sc4crzkyp   ,sc4crzky,  sc4_3reel, sc4crzkyi, sc4_state, sc4crzky_mbus, ROT0, "BFM","Casino Crazy Keys Arcade (Bellfruit) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_sc4crzkya )
+GAMEL( 200?, sc4crzkyq   ,sc4crzky,  sc4_3reel, sc4crzkyi, sc4_state, sc4crzky_mbus, ROT0, "BFM","Casino Crazy Keys Arcade (Bellfruit) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_sc4crzkya )
+GAMEL( 200?, sc4crzkyr   ,sc4crzky,  sc4_3reel, sc4crzkyi, sc4_state, sc4crzky_mbus, ROT0, "BFM","Casino Crazy Keys Arcade (Bellfruit) (Scorpion 4) (set 7)", MACHINE_FLAGS, layout_sc4crzkya )
+GAMEL( 200?, sc4crzkys   ,sc4crzky,  sc4_3reel, sc4crzkyi, sc4_state, sc4crzky_mbus, ROT0, "BFM","Casino Crazy Keys Arcade (Bellfruit) (Scorpion 4) (set 8)", MACHINE_FLAGS, layout_sc4crzkya )
+GAMEL( 200?, sc4crzkyv   ,sc4crzky,  sc4_3reel, sc4crzkyi, sc4_state, sc4crzky_mbus, ROT0, "BFM","Casino Crazy Keys Arcade (Bellfruit) (Scorpion 4) (set 9)", MACHINE_FLAGS, layout_sc4crzkya )
+GAMEL( 200?, sc4crzkyw   ,sc4crzky,  sc4_3reel, sc4crzkyi, sc4_state, sc4crzky_mbus, ROT0, "BFM","Casino Crazy Keys Arcade (Bellfruit) (Scorpion 4) (set 10)", MACHINE_FLAGS, layout_sc4crzkya )
 
 
 
@@ -26390,10 +26559,10 @@ INPUT_PORTS_START( sc4deepi ) // this structure is generated
 INPUT_PORTS_END
 
 // PR2099 DEEP IMPACT         DIMP SOUNDS         DEEP IMPACT
-GAMEL( 200?, sc4deepi    ,0,         sc4_5reel, sc4deepi, sc4_state, sc4deepi, ROT0, "Mazooma","Deep Impact (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4deepia   ,sc4deepi,  sc4_5reel, sc4deepi, sc4_state, sc4deepi, ROT0, "Mazooma","Deep Impact (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4deepib   ,sc4deepi,  sc4_5reel, sc4deepi, sc4_state, sc4deepi, ROT0, "Mazooma","Deep Impact (Mazooma) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4deepid   ,sc4deepi,  sc4_5reel, sc4deepi, sc4_state, sc4deepi, ROT0, "Mazooma","Deep Impact (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4deepi    ,0,         sc4_5reel, sc4deepi, sc4_state, sc4deepi, ROT0, "Mazooma","Deep Impact (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4deepi )
+GAMEL( 200?, sc4deepia   ,sc4deepi,  sc4_5reel, sc4deepi, sc4_state, sc4deepi, ROT0, "Mazooma","Deep Impact (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4deepi )
+GAMEL( 200?, sc4deepib   ,sc4deepi,  sc4_5reel, sc4deepi, sc4_state, sc4deepi, ROT0, "Mazooma","Deep Impact (Mazooma) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4deepi )
+GAMEL( 200?, sc4deepid   ,sc4deepi,  sc4_5reel, sc4deepi, sc4_state, sc4deepi, ROT0, "Mazooma","Deep Impact (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4deepi )
 
 
 
@@ -26554,8 +26723,8 @@ INPUT_PORTS_START( sc4duckq ) // this structure is generated
 INPUT_PORTS_END
 
 // PR2519 THEDUCKSOFHAZZARD V1.0         DUCKSOFHAZZARDSND         DUCKS OF HAZZARD
-GAMEL( 200?, sc4duckq    ,0,         sc4_4reel_alt, sc4duckq, sc4_state, sc4duckq, ROT0, "Qps","Ducks Of Hazzard (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4duckqa   ,sc4duckq,  sc4_4reel_alt, sc4duckq, sc4_state, sc4duckq, ROT0, "Qps","Ducks Of Hazzard (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4duckq    ,0,         sc4_4reel_alt, sc4duckq, sc4_state, sc4duckq, ROT0, "Qps","Ducks Of Hazzard (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4duckqa )
+GAMEL( 200?, sc4duckqa   ,sc4duckq,  sc4_4reel_alt, sc4duckq, sc4_state, sc4duckq, ROT0, "Qps","Ducks Of Hazzard (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4duckqa )
 
 
 DRIVER_INIT_MEMBER(sc4_state,sc4eascs)
@@ -26621,18 +26790,18 @@ INPUT_PORTS_START( sc4eascs ) // this structure is generated
 INPUT_PORTS_END
 
 // PR1326 CASINO EASY STREAK         PR1326 EASY STREAK SOUNDS11  (actually expects PR1326_CAS_EASY_STREAK_SOUNDS11 ? )
-GAMEL( 200?, sc4eascs    ,0,         sc4_3reel, sc4eascs, sc4_state, sc4eascs, ROT0, "BFM","Casino Easy Streak (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4eascsa   ,sc4eascs,  sc4_3reel, sc4eascs, sc4_state, sc4eascs, ROT0, "BFM","Casino Easy Streak (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4eascsb   ,sc4eascs,  sc4_3reel, sc4eascs, sc4_state, sc4eascs, ROT0, "BFM","Casino Easy Streak (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4eascsc   ,sc4eascs,  sc4_3reel, sc4eascs, sc4_state, sc4eascs, ROT0, "BFM","Casino Easy Streak (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4eascsd   ,sc4eascs,  sc4_3reel, sc4eascs, sc4_state, sc4eascs, ROT0, "BFM","Casino Easy Streak (Bellfruit) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4eascse   ,sc4eascs,  sc4_3reel, sc4eascs, sc4_state, sc4eascs, ROT0, "BFM","Casino Easy Streak (Bellfruit) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4eascsf   ,sc4eascs,  sc4_3reel, sc4eascs, sc4_state, sc4eascs, ROT0, "BFM","Casino Easy Streak (Bellfruit) (Scorpion 4) (set 7)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4eascsg   ,sc4eascs,  sc4_3reel, sc4eascs, sc4_state, sc4eascs, ROT0, "BFM","Casino Easy Streak (Bellfruit) (Scorpion 4) (set 8)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4eascsh   ,sc4eascs,  sc4_3reel, sc4eascs, sc4_state, sc4eascs, ROT0, "BFM","Casino Easy Streak (Bellfruit) (Scorpion 4) (set 9)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4eascsi   ,sc4eascs,  sc4_3reel, sc4eascs, sc4_state, sc4eascs, ROT0, "BFM","Casino Easy Streak (Bellfruit) (Scorpion 4) (set 10)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4eascsj   ,sc4eascs,  sc4_3reel, sc4eascs, sc4_state, sc4eascs, ROT0, "BFM","Casino Easy Streak (Bellfruit) (Scorpion 4) (set 11)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4eascsk   ,sc4eascs,  sc4_3reel, sc4eascs, sc4_state, sc4eascs, ROT0, "BFM","Casino Easy Streak (Bellfruit) (Scorpion 4) (set 12)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4eascs    ,0,         sc4_3reel, sc4eascs, sc4_state, sc4eascs, ROT0, "BFM","Casino Easy Streak (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4eascsc )
+GAMEL( 200?, sc4eascsa   ,sc4eascs,  sc4_3reel, sc4eascs, sc4_state, sc4eascs, ROT0, "BFM","Casino Easy Streak (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4eascsc )
+GAMEL( 200?, sc4eascsb   ,sc4eascs,  sc4_3reel, sc4eascs, sc4_state, sc4eascs, ROT0, "BFM","Casino Easy Streak (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4eascsc )
+GAMEL( 200?, sc4eascsc   ,sc4eascs,  sc4_3reel, sc4eascs, sc4_state, sc4eascs, ROT0, "BFM","Casino Easy Streak (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4eascsc )
+GAMEL( 200?, sc4eascsd   ,sc4eascs,  sc4_3reel, sc4eascs, sc4_state, sc4eascs, ROT0, "BFM","Casino Easy Streak (Bellfruit) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_sc4eascsc )
+GAMEL( 200?, sc4eascse   ,sc4eascs,  sc4_3reel, sc4eascs, sc4_state, sc4eascs, ROT0, "BFM","Casino Easy Streak (Bellfruit) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_sc4eascsc )
+GAMEL( 200?, sc4eascsf   ,sc4eascs,  sc4_3reel, sc4eascs, sc4_state, sc4eascs, ROT0, "BFM","Casino Easy Streak (Bellfruit) (Scorpion 4) (set 7)", MACHINE_FLAGS, layout_sc4eascsc )
+GAMEL( 200?, sc4eascsg   ,sc4eascs,  sc4_3reel, sc4eascs, sc4_state, sc4eascs, ROT0, "BFM","Casino Easy Streak (Bellfruit) (Scorpion 4) (set 8)", MACHINE_FLAGS, layout_sc4eascsc )
+GAMEL( 200?, sc4eascsh   ,sc4eascs,  sc4_3reel, sc4eascs, sc4_state, sc4eascs, ROT0, "BFM","Casino Easy Streak (Bellfruit) (Scorpion 4) (set 9)", MACHINE_FLAGS, layout_sc4eascsc )
+GAMEL( 200?, sc4eascsi   ,sc4eascs,  sc4_3reel, sc4eascs, sc4_state, sc4eascs, ROT0, "BFM","Casino Easy Streak (Bellfruit) (Scorpion 4) (set 10)", MACHINE_FLAGS, layout_sc4eascsc )
+GAMEL( 200?, sc4eascsj   ,sc4eascs,  sc4_3reel, sc4eascs, sc4_state, sc4eascs, ROT0, "BFM","Casino Easy Streak (Bellfruit) (Scorpion 4) (set 11)", MACHINE_FLAGS, layout_sc4eascsc )
+GAMEL( 200?, sc4eascsk   ,sc4eascs,  sc4_3reel, sc4eascs, sc4_state, sc4eascs, ROT0, "BFM","Casino Easy Streak (Bellfruit) (Scorpion 4) (set 12)", MACHINE_FLAGS, layout_sc4eascsc )
 
 
 DRIVER_INIT_MEMBER(sc4_state,sc4fastf)
@@ -26692,10 +26861,10 @@ INPUT_PORTS_START( sc4fastf ) // this structure is generated
 INPUT_PORTS_END
 
 // PR2071 FAST 'N' FURIOUS         FNF SOUNDS         FAST 'N' FURIOUS
-GAMEL( 200?, sc4fastf    ,0,         sc4_200_4rb, sc4fastf, sc4_state, sc4fastf, ROT0, "Mazooma","Fast 'n' Furious (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4fastfa   ,sc4fastf,  sc4_200_4rb, sc4fastf, sc4_state, sc4fastf, ROT0, "Mazooma","Fast 'n' Furious (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4fastfb   ,sc4fastf,  sc4_200_4rb, sc4fastf, sc4_state, sc4fastf, ROT0, "Mazooma","Fast 'n' Furious (Mazooma) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4fastfc   ,sc4fastf,  sc4_200_4rb, sc4fastf, sc4_state, sc4fastf, ROT0, "Mazooma","Fast 'n' Furious (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4fastf    ,0,         sc4_200_4rb, sc4fastf, sc4_state, sc4fastf, ROT0, "Mazooma","Fast 'n' Furious (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4fastfb )
+GAMEL( 200?, sc4fastfa   ,sc4fastf,  sc4_200_4rb, sc4fastf, sc4_state, sc4fastf, ROT0, "Mazooma","Fast 'n' Furious (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4fastfb )
+GAMEL( 200?, sc4fastfb   ,sc4fastf,  sc4_200_4rb, sc4fastf, sc4_state, sc4fastf, ROT0, "Mazooma","Fast 'n' Furious (Mazooma) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4fastfb )
+GAMEL( 200?, sc4fastfc   ,sc4fastf,  sc4_200_4rb, sc4fastf, sc4_state, sc4fastf, ROT0, "Mazooma","Fast 'n' Furious (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4fastfb )
 
 
 DRIVER_INIT_MEMBER(sc4_state,sc4ffru)
@@ -26808,8 +26977,8 @@ INPUT_PORTS_START( sc4fire ) // this structure is generated
 INPUT_PORTS_END
 
 // PR2082 FIRE POWER         FPOW SOUNDS         FIRE POWER
-GAMEL( 200?, sc4fire     ,0,         sc4_4reel_alt, sc4fire, sc4_state, sc4fire, ROT0, "Mazooma","Firepower (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4firea    ,sc4fire,   sc4_4reel_alt, sc4fire, sc4_state, sc4fire, ROT0, "Mazooma","Firepower (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4fire     ,0,         sc4_4reel_alt, sc4fire, sc4_state, sc4fire, ROT0, "Mazooma","Firepower (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4fire )
+GAMEL( 200?, sc4firea    ,sc4fire,   sc4_4reel_alt, sc4fire, sc4_state, sc4fire, ROT0, "Mazooma","Firepower (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4fire )
 
 
 DRIVER_INIT_MEMBER(sc4_state,sc4frenz)
@@ -26936,19 +27105,19 @@ INPUT_PORTS_START( sc4ftopi ) // this structure is generated
 INPUT_PORTS_END
 
 // PR2027 FRUITOPIA         FRUITOPIASND             FRUITOPIA
-GAMEL( 200?, sc4ftopi    ,0,         sc4_4reel_alt, sc4ftopi, sc4_state, sc4ftopi, ROT0, "Qps","Fruitopia (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4ftopia   ,sc4ftopi,  sc4_4reel_alt, sc4ftopi, sc4_state, sc4ftopi, ROT0, "Qps","Fruitopia (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4ftopib   ,sc4ftopi,  sc4_4reel_alt, sc4ftopi, sc4_state, sc4ftopi, ROT0, "Qps","Fruitopia (Qps) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4ftopic   ,sc4ftopi,  sc4_4reel_alt, sc4ftopi, sc4_state, sc4ftopi, ROT0, "Qps","Fruitopia (Qps) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4ftopi    ,0,         sc4_4reel_alt, sc4ftopi, sc4_state, sc4ftopi, ROT0, "Qps","Fruitopia (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4ftopib )
+GAMEL( 200?, sc4ftopia   ,sc4ftopi,  sc4_4reel_alt, sc4ftopi, sc4_state, sc4ftopi, ROT0, "Qps","Fruitopia (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4ftopib )
+GAMEL( 200?, sc4ftopib   ,sc4ftopi,  sc4_4reel_alt, sc4ftopi, sc4_state, sc4ftopi, ROT0, "Qps","Fruitopia (Qps) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4ftopib )
+GAMEL( 200?, sc4ftopic   ,sc4ftopi,  sc4_4reel_alt, sc4ftopi, sc4_state, sc4ftopi, ROT0, "Qps","Fruitopia (Qps) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4ftopib )
 // PR2027 FRUITOPIA_17/04/03 V1.1         FRUITOPIASND             FRUITOPIA
-GAMEL( 200?, sc4ftopif   ,sc4ftopi,  sc4_4reel_alt, sc4ftopi, sc4_state, sc4ftopi, ROT0, "Qps","Fruitopia (V1.1) (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4ftopii   ,sc4ftopi,  sc4_4reel_alt, sc4ftopi, sc4_state, sc4ftopi, ROT0, "Qps","Fruitopia (V1.1) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4ftopif   ,sc4ftopi,  sc4_4reel_alt, sc4ftopi, sc4_state, sc4ftopi, ROT0, "Qps","Fruitopia (V1.1) (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4ftopib )
+GAMEL( 200?, sc4ftopii   ,sc4ftopi,  sc4_4reel_alt, sc4ftopi, sc4_state, sc4ftopi, ROT0, "Qps","Fruitopia (V1.1) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4ftopib )
 // PR2027 FRUITOPIA V2.1         FRUITOPIASND             FRUITOPIA
-GAMEL( 200?, sc4ftopid   ,sc4ftopi,  sc4_4reel_alt, sc4ftopi, sc4_state, sc4ftopi, ROT0, "Qps","Fruitopia (V2.1) (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4ftopig   ,sc4ftopi,  sc4_4reel_alt, sc4ftopi, sc4_state, sc4ftopi, ROT0, "Qps","Fruitopia (V2.1) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4ftopid   ,sc4ftopi,  sc4_4reel_alt, sc4ftopi, sc4_state, sc4ftopi, ROT0, "Qps","Fruitopia (V2.1) (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4ftopib )
+GAMEL( 200?, sc4ftopig   ,sc4ftopi,  sc4_4reel_alt, sc4ftopi, sc4_state, sc4ftopi, ROT0, "Qps","Fruitopia (V2.1) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4ftopib )
 // PR2027 FRUITOPIA V2.2         FRUITOPIASND             FRUITOPIA
-GAMEL( 200?, sc4ftopie   ,sc4ftopi,  sc4_4reel_alt, sc4ftopi, sc4_state, sc4ftopi, ROT0, "Qps","Fruitopia (V2.2) (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4ftopih   ,sc4ftopi,  sc4_4reel_alt, sc4ftopi, sc4_state, sc4ftopi, ROT0, "Qps","Fruitopia (V2.2) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4ftopie   ,sc4ftopi,  sc4_4reel_alt, sc4ftopi, sc4_state, sc4ftopi, ROT0, "Qps","Fruitopia (V2.2) (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4ftopib )
+GAMEL( 200?, sc4ftopih   ,sc4ftopi,  sc4_4reel_alt, sc4ftopi, sc4_state, sc4ftopi, ROT0, "Qps","Fruitopia (V2.2) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4ftopib )
 
 DRIVER_INIT_MEMBER(sc4_state,sc4fullt)
 {
@@ -27003,20 +27172,20 @@ INPUT_PORTS_START( sc4fullt ) // this structure is generated
 INPUT_PORTS_END
 
 // PR2537 FULL THROTTLE 011         FULLTHROTTLESND          FULL  THROTTLE
-GAMEL( 200?, sc4fullt    ,0,         sc4_5reel, sc4fullt, sc4_state, sc4fullt, ROT0, "Qps","Full Throttle (011) (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4fulltb   ,sc4fullt,  sc4_5reel, sc4fullt, sc4_state, sc4fullt, ROT0, "Qps","Full Throttle (011) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4fullt    ,0,         sc4_5reel, sc4fullt, sc4_state, sc4fullt, ROT0, "Qps","Full Throttle (011) (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4fullt )
+GAMEL( 200?, sc4fulltb   ,sc4fullt,  sc4_5reel, sc4fullt, sc4_state, sc4fullt, ROT0, "Qps","Full Throttle (011) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4fullt )
 // PR2537 FULL THROTTLE 041         FULLTHROTTLESND          FULL  THROTTLE
-GAMEL( 200?, sc4fullta   ,sc4fullt,  sc4_5reel, sc4fullt, sc4_state, sc4fullt, ROT0, "Qps","Full Throttle (041) (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4fulltc   ,sc4fullt,  sc4_5reel, sc4fullt, sc4_state, sc4fullt, ROT0, "Qps","Full Throttle (041) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4fullta   ,sc4fullt,  sc4_5reel, sc4fullt, sc4_state, sc4fullt, ROT0, "Qps","Full Throttle (041) (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4fullt )
+GAMEL( 200?, sc4fulltc   ,sc4fullt,  sc4_5reel, sc4fullt, sc4_state, sc4fullt, ROT0, "Qps","Full Throttle (041) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4fullt )
 // PR2537 FULL THROTTLE 012         FULLTHROTTLESND          FULL  THROTTLE
-GAMEL( 200?, sc4fulltd   ,sc4fullt,  sc4_5reel, sc4fullt, sc4_state, sc4fullt, ROT0, "Qps","Full Throttle (012) (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4fulltg   ,sc4fullt,  sc4_5reel, sc4fullt, sc4_state, sc4fullt, ROT0, "Qps","Full Throttle (012) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4fulltd   ,sc4fullt,  sc4_5reel, sc4fullt, sc4_state, sc4fullt, ROT0, "Qps","Full Throttle (012) (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4fullt )
+GAMEL( 200?, sc4fulltg   ,sc4fullt,  sc4_5reel, sc4fullt, sc4_state, sc4fullt, ROT0, "Qps","Full Throttle (012) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4fullt )
 // PR2537 FULL THROTTLE 042         FULLTHROTTLESND          FULL  THROTTLE
-GAMEL( 200?, sc4fullte   ,sc4fullt,  sc4_5reel, sc4fullt, sc4_state, sc4fullt, ROT0, "Qps","Full Throttle (042) (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4fullth   ,sc4fullt,  sc4_5reel, sc4fullt, sc4_state, sc4fullt, ROT0, "Qps","Full Throttle (042) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4fullte   ,sc4fullt,  sc4_5reel, sc4fullt, sc4_state, sc4fullt, ROT0, "Qps","Full Throttle (042) (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4fullt )
+GAMEL( 200?, sc4fullth   ,sc4fullt,  sc4_5reel, sc4fullt, sc4_state, sc4fullt, ROT0, "Qps","Full Throttle (042) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4fullt )
 // R2537 FULL THROTTLE 013         FULLTHROTTLESND          FULL  THROTTLE
-GAMEL( 200?, sc4fulltf   ,sc4fullt,  sc4_5reel, sc4fullt, sc4_state, sc4fullt, ROT0, "Qps","Full Throttle (013) (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4fullti   ,sc4fullt,  sc4_5reel, sc4fullt, sc4_state, sc4fullt, ROT0, "Qps","Full Throttle (013) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4fulltf   ,sc4fullt,  sc4_5reel, sc4fullt, sc4_state, sc4fullt, ROT0, "Qps","Full Throttle (013) (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4fullt )
+GAMEL( 200?, sc4fullti   ,sc4fullt,  sc4_5reel, sc4fullt, sc4_state, sc4fullt, ROT0, "Qps","Full Throttle (013) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4fullt )
 
 
 DRIVER_INIT_MEMBER(sc4_state,sc4ziggy)
@@ -27150,8 +27319,8 @@ INPUT_PORTS_START( sc4gldcl ) // this structure is generated
 INPUT_PORTS_END
 
 // PR2292 CLUB GLADIATOR         CLUB GLADIATOR  CLUB  CLUB GLAD SOUNDS         CLUB GLADIATOR
-GAMEL( 200?, sc4gldcl    ,0,         sc4_5reel, sc4gldcl, sc4_state, sc4gldcl, ROT0, "QPS","Gladiator Club (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4gldcla   ,sc4gldcl,  sc4_5reel, sc4gldcl, sc4_state, sc4gldcl, ROT0, "QPS","Gladiator Club (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4gldcl    ,0,         sc4_5reel, sc4gldcl, sc4_state, sc4gldcl, ROT0, "QPS","Gladiator Club (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4gldcl )
+GAMEL( 200?, sc4gldcla   ,sc4gldcl,  sc4_5reel, sc4gldcl, sc4_state, sc4gldcl, ROT0, "QPS","Gladiator Club (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4gldcl )
 
 
 
@@ -27556,16 +27725,16 @@ INPUT_PORTS_END
 // GGDX
 // these were in the golden game sets
 // PR2201  GOLDEN X         GOLDEN GAME MAZ GXDX SOUNDS         GOLDEN GAME DLX
-GAMEL( 200?, sc4ggdlx    ,0,         sc4, sc4ggdlx, sc4_state, sc4ggame, ROT0, "Mazooma","Golden Game Deluxe (Mazooma) (PR2201) (Scorpion 4) (GGDX, set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4ggdlxc   ,sc4ggdlx,  sc4, sc4ggdlx, sc4_state, sc4ggame, ROT0, "Mazooma","Golden Game Deluxe (Mazooma) (PR2201) (Scorpion 4) (GGDX, set 2)", MACHINE_FLAGS, layout_bfm_sc4 )// ^^
+GAMEL( 200?, sc4ggdlx    ,0,         sc4, sc4ggdlx, sc4_state, sc4ggame, ROT0, "Mazooma","Golden Game Deluxe (Mazooma) (PR2201) (Scorpion 4) (GGDX, set 1)", MACHINE_FLAGS, layout_sc4ggdlxf )
+GAMEL( 200?, sc4ggdlxc   ,sc4ggdlx,  sc4, sc4ggdlx, sc4_state, sc4ggame, ROT0, "Mazooma","Golden Game Deluxe (Mazooma) (PR2201) (Scorpion 4) (GGDX, set 2)", MACHINE_FLAGS, layout_sc4ggdlxf )// ^^
 // PR2201  GOLDEN X         GOLDEN GAME DLX MAZ GXDX SOUNDS         GOLDEN X
-GAMEL( 200?, sc4ggdlxa   ,sc4ggdlx,  sc4, sc4ggdlx, sc4_state, sc4ggame, ROT0, "Mazooma","Golden Game Deluxe (Mazooma) (PR2201) (Scorpion 4) (GGDX, set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4ggdlxb   ,sc4ggdlx,  sc4, sc4ggdlx, sc4_state, sc4ggame, ROT0, "Mazooma","Golden Game Deluxe (Mazooma) (PR2201) (Scorpion 4) (GGDX, set 4)", MACHINE_FLAGS, layout_bfm_sc4 )// ^^
-GAMEL( 200?, sc4ggdlxd   ,sc4ggdlx,  sc4, sc4ggdlx, sc4_state, sc4ggame, ROT0, "Mazooma","Golden Game Deluxe (Mazooma) (PR2201) (Scorpion 4) (GGDX, set 5)", MACHINE_FLAGS, layout_bfm_sc4 )// ^^
-GAMEL( 200?, sc4ggdlxe   ,sc4ggdlx,  sc4, sc4ggdlx, sc4_state, sc4ggame, ROT0, "Mazooma","Golden Game Deluxe (Mazooma) (PR2201) (Scorpion 4) (GGDX, set 6)", MACHINE_FLAGS, layout_bfm_sc4 )// ^^
+GAMEL( 200?, sc4ggdlxa   ,sc4ggdlx,  sc4, sc4ggdlx, sc4_state, sc4ggame, ROT0, "Mazooma","Golden Game Deluxe (Mazooma) (PR2201) (Scorpion 4) (GGDX, set 3)", MACHINE_FLAGS, layout_sc4ggdlxf )
+GAMEL( 200?, sc4ggdlxb   ,sc4ggdlx,  sc4, sc4ggdlx, sc4_state, sc4ggame, ROT0, "Mazooma","Golden Game Deluxe (Mazooma) (PR2201) (Scorpion 4) (GGDX, set 4)", MACHINE_FLAGS, layout_sc4ggdlxf )// ^^
+GAMEL( 200?, sc4ggdlxd   ,sc4ggdlx,  sc4, sc4ggdlx, sc4_state, sc4ggame, ROT0, "Mazooma","Golden Game Deluxe (Mazooma) (PR2201) (Scorpion 4) (GGDX, set 5)", MACHINE_FLAGS, layout_sc4ggdlxf )// ^^
+GAMEL( 200?, sc4ggdlxe   ,sc4ggdlx,  sc4, sc4ggdlx, sc4_state, sc4ggame, ROT0, "Mazooma","Golden Game Deluxe (Mazooma) (PR2201) (Scorpion 4) (GGDX, set 6)", MACHINE_FLAGS, layout_sc4ggdlxf )// ^^
 // PR2201  GOLDEN GAME DELUXE         GOLDEN GAME MAZ GXDX SOUNDS         GOLDEN GAME DLX
-GAMEL( 200?, sc4ggdlxf   ,sc4ggdlx,  sc4, sc4ggdlx, sc4_state, sc4ggame, ROT0, "Mazooma","Golden Game Deluxe (Mazooma) (PR2201) (Scorpion 4) (GGDX, set 7)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4ggdlxg   ,sc4ggdlx,  sc4, sc4ggdlx, sc4_state, sc4ggame, ROT0, "Mazooma","Golden Game Deluxe (Mazooma) (PR2201) (Scorpion 4) (GGDX, set 8)", MACHINE_FLAGS, layout_bfm_sc4 )// ^^
+GAMEL( 200?, sc4ggdlxf   ,sc4ggdlx,  sc4, sc4ggdlx, sc4_state, sc4ggame, ROT0, "Mazooma","Golden Game Deluxe (Mazooma) (PR2201) (Scorpion 4) (GGDX, set 7)", MACHINE_FLAGS, layout_sc4ggdlxf )
+GAMEL( 200?, sc4ggdlxg   ,sc4ggdlx,  sc4, sc4ggdlx, sc4_state, sc4ggame, ROT0, "Mazooma","Golden Game Deluxe (Mazooma) (PR2201) (Scorpion 4) (GGDX, set 8)", MACHINE_FLAGS, layout_sc4ggdlxf )// ^^
 
 
 
@@ -27760,18 +27929,18 @@ INPUT_PORTS_START( sc4himi ) // this structure is generated
 INPUT_PORTS_END
 
 // PR2999 HIGH 'N' MIGHTY         MITY SOUNDS         HIGH 'N' MIGHTY
-GAMEL( 200?, sc4himi     ,0,         sc4_4reel_alt, sc4himi, sc4_state, sc4himi, ROT0, "Mazooma","High 'n' Mighty (PR2999) (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4himic    ,sc4himi,   sc4_4reel_alt, sc4himi, sc4_state, sc4himi, ROT0, "Mazooma","High 'n' Mighty (PR2999) (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4himif    ,sc4himi,   sc4_4reel_alt, sc4himi, sc4_state, sc4himi, ROT0, "Mazooma","High 'n' Mighty (PR2999) (Mazooma) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4himig    ,sc4himi,   sc4_4reel_alt, sc4himi, sc4_state, sc4himi, ROT0, "Mazooma","High 'n' Mighty (PR2999) (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4himih    ,sc4himi,   sc4_4reel_alt, sc4himi, sc4_state, sc4himi, ROT0, "Mazooma","High 'n' Mighty (PR2999) (Mazooma) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4himii    ,sc4himi,   sc4_4reel_alt, sc4himi, sc4_state, sc4himi, ROT0, "Mazooma","High 'n' Mighty (PR2999) (Mazooma) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4himi     ,0,         sc4_4reel_alt, sc4himi, sc4_state, sc4himi, ROT0, "Mazooma","High 'n' Mighty (PR2999) (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4himi )
+GAMEL( 200?, sc4himic    ,sc4himi,   sc4_4reel_alt, sc4himi, sc4_state, sc4himi, ROT0, "Mazooma","High 'n' Mighty (PR2999) (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4himi )
+GAMEL( 200?, sc4himif    ,sc4himi,   sc4_4reel_alt, sc4himi, sc4_state, sc4himi, ROT0, "Mazooma","High 'n' Mighty (PR2999) (Mazooma) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4himi )
+GAMEL( 200?, sc4himig    ,sc4himi,   sc4_4reel_alt, sc4himi, sc4_state, sc4himi, ROT0, "Mazooma","High 'n' Mighty (PR2999) (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4himi )
+GAMEL( 200?, sc4himih    ,sc4himi,   sc4_4reel_alt, sc4himi, sc4_state, sc4himi, ROT0, "Mazooma","High 'n' Mighty (PR2999) (Mazooma) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_sc4himi )
+GAMEL( 200?, sc4himii    ,sc4himi,   sc4_4reel_alt, sc4himi, sc4_state, sc4himi, ROT0, "Mazooma","High 'n' Mighty (PR2999) (Mazooma) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_sc4himi )
 // PR2119 HIGH 'N' MIGHTY         MITY SOUNDS         HIGH 'N' MIGHTY
-GAMEL( 200?, sc4himia    ,sc4himi,   sc4_4reel_alt, sc4himi, sc4_state, sc4himi, ROT0, "Mazooma","High 'n' Mighty (PR2119) (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4himie    ,sc4himi,   sc4_4reel_alt, sc4himi, sc4_state, sc4himi, ROT0, "Mazooma","High 'n' Mighty (PR2119) (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4himia    ,sc4himi,   sc4_4reel_alt, sc4himi, sc4_state, sc4himi, ROT0, "Mazooma","High 'n' Mighty (PR2119) (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4himi )
+GAMEL( 200?, sc4himie    ,sc4himi,   sc4_4reel_alt, sc4himi, sc4_state, sc4himi, ROT0, "Mazooma","High 'n' Mighty (PR2119) (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4himi )
 // PR2067 HIGH 'N' MIGHTY         MITY SOUNDS         HIGH 'N' MIGHTY
-GAMEL( 200?, sc4himib    ,sc4himi,   sc4_4reel_alt, sc4himi, sc4_state, sc4himi, ROT0, "Mazooma","High 'n' Mighty (PR2067) (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4himid    ,sc4himi,   sc4_4reel_alt, sc4himi, sc4_state, sc4himi, ROT0, "Mazooma","High 'n' Mighty (PR2067) (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4himib    ,sc4himi,   sc4_4reel_alt, sc4himi, sc4_state, sc4himi, ROT0, "Mazooma","High 'n' Mighty (PR2067) (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4himi )
+GAMEL( 200?, sc4himid    ,sc4himi,   sc4_4reel_alt, sc4himi, sc4_state, sc4himi, ROT0, "Mazooma","High 'n' Mighty (PR2067) (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4himi )
 
 
 
@@ -27838,14 +28007,14 @@ INPUT_PORTS_START( sc4hi5 ) // this structure is generated
 INPUT_PORTS_END
 
 // PR1003 HIGH FIVE         PR1003 HIGH FIVE SOUNDS11
-GAMEL( 200?, sc4hi5      ,0,         sc4_4reel, sc4hi5, sc4_state, sc4hi5, ROT0, "BFM","High 5 (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4hi5b     ,sc4hi5,    sc4_4reel, sc4hi5, sc4_state, sc4hi5, ROT0, "BFM","High 5 (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4hi5d     ,sc4hi5,    sc4_4reel, sc4hi5, sc4_state, sc4hi5, ROT0, "BFM","High 5 (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4hi5f     ,sc4hi5,    sc4_4reel, sc4hi5, sc4_state, sc4hi5, ROT0, "BFM","High 5 (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4hi5a     ,sc4hi5,    sc4_4reel, sc4hi5, sc4_state, sc4hi5, ROT0, "BFM / Whitbread","High 5 (Bellfruit / Whitbread) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4hi5c     ,sc4hi5,    sc4_4reel, sc4hi5, sc4_state, sc4hi5, ROT0, "BFM / Whitbread","High 5 (Bellfruit / Whitbread) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4hi5e     ,sc4hi5,    sc4_4reel, sc4hi5, sc4_state, sc4hi5, ROT0, "BFM / Whitbread","High 5 (Bellfruit / Whitbread) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4hi5g     ,sc4hi5,    sc4_4reel, sc4hi5, sc4_state, sc4hi5, ROT0, "BFM / Whitbread","High 5 (Bellfruit / Whitbread) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4hi5      ,0,         sc4_4reel, sc4hi5, sc4_state, sc4hi5, ROT0, "BFM","High 5 (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4hi5 )
+GAMEL( 200?, sc4hi5b     ,sc4hi5,    sc4_4reel, sc4hi5, sc4_state, sc4hi5, ROT0, "BFM","High 5 (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4hi5 )
+GAMEL( 200?, sc4hi5d     ,sc4hi5,    sc4_4reel, sc4hi5, sc4_state, sc4hi5, ROT0, "BFM","High 5 (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4hi5 )
+GAMEL( 200?, sc4hi5f     ,sc4hi5,    sc4_4reel, sc4hi5, sc4_state, sc4hi5, ROT0, "BFM","High 5 (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4hi5 )
+GAMEL( 200?, sc4hi5a     ,sc4hi5,    sc4_4reel, sc4hi5, sc4_state, sc4hi5, ROT0, "BFM / Whitbread","High 5 (Bellfruit / Whitbread) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4hi5 )
+GAMEL( 200?, sc4hi5c     ,sc4hi5,    sc4_4reel, sc4hi5, sc4_state, sc4hi5, ROT0, "BFM / Whitbread","High 5 (Bellfruit / Whitbread) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4hi5 )
+GAMEL( 200?, sc4hi5e     ,sc4hi5,    sc4_4reel, sc4hi5, sc4_state, sc4hi5, ROT0, "BFM / Whitbread","High 5 (Bellfruit / Whitbread) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4hi5 )
+GAMEL( 200?, sc4hi5g     ,sc4hi5,    sc4_4reel, sc4hi5, sc4_state, sc4hi5, ROT0, "BFM / Whitbread","High 5 (Bellfruit / Whitbread) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4hi5 )
 
 
 DRIVER_INIT_MEMBER(sc4_state,sc4sprng)
@@ -27900,7 +28069,7 @@ INPUT_PORTS_START( sc4sprng ) // this structure is generated
 INPUT_PORTS_END
 
 //  PR2066 HIGHLY SPRUNG         HIGH SOUNDS          HIGHLY SPRUNG
-GAMEL( 200?, sc4sprng    ,0,         sc4_4reel_alt, sc4sprng, sc4_state, sc4sprng, ROT0, "Mazooma","Highly Sprung (Mazooma) (Scorpion 4)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4sprng    ,0,         sc4_4reel_alt, sc4sprng, sc4_state, sc4sprng, ROT0, "Mazooma","Highly Sprung (Mazooma) (Scorpion 4)", MACHINE_FLAGS, layout_sc4sprng )
 
 
 DRIVER_INIT_MEMBER(sc4_state,sc4hilo)
@@ -27979,18 +28148,18 @@ INPUT_PORTS_START( sc4hilo ) // this structure is generated
 INPUT_PORTS_END
 
 // PR1013 HILOWATHA         PR1013 HILOWATHA SOUNDS11
-GAMEL( 200?, sc4hilo     ,0,         sc4_200_4ra, sc4hilo, sc4_state, sc4hilo, ROT0, "BFM","Hilowatha (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4hiloa    ,sc4hilo,   sc4_200_4ra, sc4hilo, sc4_state, sc4hilo, ROT0, "BFM","Hilowatha (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4hilob    ,sc4hilo,   sc4_200_4ra, sc4hilo, sc4_state, sc4hilo, ROT0, "BFM","Hilowatha (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4hiloc    ,sc4hilo,   sc4_200_4ra, sc4hilo, sc4_state, sc4hilo, ROT0, "BFM","Hilowatha (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4hilod    ,sc4hilo,   sc4_200_4ra, sc4hilo, sc4_state, sc4hilo, ROT0, "BFM","Hilowatha (Bellfruit) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4hiloe    ,sc4hilo,   sc4_200_4ra, sc4hilo, sc4_state, sc4hilo, ROT0, "BFM","Hilowatha (Bellfruit) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4hilof    ,sc4hilo,   sc4_200_4ra, sc4hilo, sc4_state, sc4hilo, ROT0, "BFM","Hilowatha (Bellfruit) (Scorpion 4) (set 7)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4hilog    ,sc4hilo,   sc4_200_4ra, sc4hilo, sc4_state, sc4hilo, ROT0, "BFM","Hilowatha (Bellfruit) (Scorpion 4) (set 8)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4hiloh    ,sc4hilo,   sc4_200_4ra, sc4hilo, sc4_state, sc4hilo, ROT0, "BFM","Hilowatha (Bellfruit) (Scorpion 4) (set 9)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4hiloi    ,sc4hilo,   sc4_200_4ra, sc4hilo, sc4_state, sc4hilo, ROT0, "BFM","Hilowatha (Bellfruit) (Scorpion 4) (set 10)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4hiloj    ,sc4hilo,   sc4_200_4ra, sc4hilo, sc4_state, sc4hilo, ROT0, "BFM","Hilowatha (Bellfruit) (Scorpion 4) (set 11)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4hilok    ,sc4hilo,   sc4_200_4ra, sc4hilo, sc4_state, sc4hilo, ROT0, "BFM","Hilowatha (Bellfruit) (Scorpion 4) (set 12)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4hilo     ,0,         sc4_200_4ra, sc4hilo, sc4_state, sc4hilo, ROT0, "BFM","Hilowatha (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4hilo )
+GAMEL( 200?, sc4hiloa    ,sc4hilo,   sc4_200_4ra, sc4hilo, sc4_state, sc4hilo, ROT0, "BFM","Hilowatha (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4hilo )
+GAMEL( 200?, sc4hilob    ,sc4hilo,   sc4_200_4ra, sc4hilo, sc4_state, sc4hilo, ROT0, "BFM","Hilowatha (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4hilo )
+GAMEL( 200?, sc4hiloc    ,sc4hilo,   sc4_200_4ra, sc4hilo, sc4_state, sc4hilo, ROT0, "BFM","Hilowatha (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4hilo )
+GAMEL( 200?, sc4hilod    ,sc4hilo,   sc4_200_4ra, sc4hilo, sc4_state, sc4hilo, ROT0, "BFM","Hilowatha (Bellfruit) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_sc4hilo )
+GAMEL( 200?, sc4hiloe    ,sc4hilo,   sc4_200_4ra, sc4hilo, sc4_state, sc4hilo, ROT0, "BFM","Hilowatha (Bellfruit) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_sc4hilo )
+GAMEL( 200?, sc4hilof    ,sc4hilo,   sc4_200_4ra, sc4hilo, sc4_state, sc4hilo, ROT0, "BFM","Hilowatha (Bellfruit) (Scorpion 4) (set 7)", MACHINE_FLAGS, layout_sc4hilo )
+GAMEL( 200?, sc4hilog    ,sc4hilo,   sc4_200_4ra, sc4hilo, sc4_state, sc4hilo, ROT0, "BFM","Hilowatha (Bellfruit) (Scorpion 4) (set 8)", MACHINE_FLAGS, layout_sc4hilo )
+GAMEL( 200?, sc4hiloh    ,sc4hilo,   sc4_200_4ra, sc4hilo, sc4_state, sc4hilo, ROT0, "BFM","Hilowatha (Bellfruit) (Scorpion 4) (set 9)", MACHINE_FLAGS, layout_sc4hilo )
+GAMEL( 200?, sc4hiloi    ,sc4hilo,   sc4_200_4ra, sc4hilo, sc4_state, sc4hilo, ROT0, "BFM","Hilowatha (Bellfruit) (Scorpion 4) (set 10)", MACHINE_FLAGS, layout_sc4hilo )
+GAMEL( 200?, sc4hiloj    ,sc4hilo,   sc4_200_4ra, sc4hilo, sc4_state, sc4hilo, ROT0, "BFM","Hilowatha (Bellfruit) (Scorpion 4) (set 11)", MACHINE_FLAGS, layout_sc4hilo )
+GAMEL( 200?, sc4hilok    ,sc4hilo,   sc4_200_4ra, sc4hilo, sc4_state, sc4hilo, ROT0, "BFM","Hilowatha (Bellfruit) (Scorpion 4) (set 12)", MACHINE_FLAGS, layout_sc4hilo )
 
 
 
@@ -28268,14 +28437,14 @@ INPUT_PORTS_START( sc4jack ) // this structure is generated
 INPUT_PORTS_END
 
 // PR2078 JACK THE KIPPER         JKIP SOUNDS         JACK THE KIPPER
-GAMEL( 200?, sc4jack     ,0,         sc4_200_5ra, sc4jack, sc4_state, sc4jack, ROT0, "Mazooma","Jack The Kipper (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4jacka    ,sc4jack,   sc4_200_5ra, sc4jack, sc4_state, sc4jack, ROT0, "Mazooma","Jack The Kipper (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4jackb    ,sc4jack,   sc4_200_5ra, sc4jack, sc4_state, sc4jack, ROT0, "Mazooma","Jack The Kipper (Mazooma) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4jackc    ,sc4jack,   sc4_200_5ra, sc4jack, sc4_state, sc4jack, ROT0, "Mazooma","Jack The Kipper (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4jackd    ,sc4jack,   sc4_200_5ra, sc4jack, sc4_state, sc4jack, ROT0, "Mazooma","Jack The Kipper (Mazooma) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4jacke    ,sc4jack,   sc4_200_5ra, sc4jack, sc4_state, sc4jack, ROT0, "Mazooma","Jack The Kipper (Mazooma) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4jackf    ,sc4jack,   sc4_200_5ra, sc4jack, sc4_state, sc4jack, ROT0, "Mazooma","Jack The Kipper (Mazooma) (Scorpion 4) (set 7)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4jackg    ,sc4jack,   sc4_200_5ra, sc4jack, sc4_state, sc4jack, ROT0, "Mazooma","Jack The Kipper (Mazooma) (Scorpion 4) (set 8)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4jack     ,0,         sc4_200_5ra, sc4jack, sc4_state, sc4jack, ROT0, "Mazooma","Jack The Kipper (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4jack )
+GAMEL( 200?, sc4jacka    ,sc4jack,   sc4_200_5ra, sc4jack, sc4_state, sc4jack, ROT0, "Mazooma","Jack The Kipper (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4jack )
+GAMEL( 200?, sc4jackb    ,sc4jack,   sc4_200_5ra, sc4jack, sc4_state, sc4jack, ROT0, "Mazooma","Jack The Kipper (Mazooma) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4jack )
+GAMEL( 200?, sc4jackc    ,sc4jack,   sc4_200_5ra, sc4jack, sc4_state, sc4jack, ROT0, "Mazooma","Jack The Kipper (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4jack )
+GAMEL( 200?, sc4jackd    ,sc4jack,   sc4_200_5ra, sc4jack, sc4_state, sc4jack, ROT0, "Mazooma","Jack The Kipper (Mazooma) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_sc4jack )
+GAMEL( 200?, sc4jacke    ,sc4jack,   sc4_200_5ra, sc4jack, sc4_state, sc4jack, ROT0, "Mazooma","Jack The Kipper (Mazooma) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_sc4jack )
+GAMEL( 200?, sc4jackf    ,sc4jack,   sc4_200_5ra, sc4jack, sc4_state, sc4jack, ROT0, "Mazooma","Jack The Kipper (Mazooma) (Scorpion 4) (set 7)", MACHINE_FLAGS, layout_sc4jack )
+GAMEL( 200?, sc4jackg    ,sc4jack,   sc4_200_5ra, sc4jack, sc4_state, sc4jack, ROT0, "Mazooma","Jack The Kipper (Mazooma) (Scorpion 4) (set 8)", MACHINE_FLAGS, layout_sc4jack )
 
 
 
@@ -28630,14 +28799,14 @@ INPUT_PORTS_START( sc4kalei ) // this structure is generated
 INPUT_PORTS_END
 
 // PR2538 KALEIDOSCOPE 011         KALEIDOSCOPESND           KALEIDOSCOPE
-GAMEL( 200?, sc4kalei    ,0,         sc4_4reel_alt, sc4kalei, sc4_state, sc4kalei, ROT0, "Qps","Kaleidoscope (011) (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4kaleib   ,sc4kalei,  sc4_4reel_alt, sc4kalei, sc4_state, sc4kalei, ROT0, "Qps","Kaleidoscope (011) (Qps) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4kalei    ,0,         sc4_4reel_alt, sc4kalei, sc4_state, sc4kalei, ROT0, "Qps","Kaleidoscope (011) (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4kalei )
+GAMEL( 200?, sc4kaleib   ,sc4kalei,  sc4_4reel_alt, sc4kalei, sc4_state, sc4kalei, ROT0, "Qps","Kaleidoscope (011) (Qps) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4kalei )
 // PR2538 KALEIDOSCOPE 041         KALEIDOSCOPESND           KALEIDOSCOPE
-GAMEL( 200?, sc4kaleia   ,sc4kalei,  sc4_4reel_alt, sc4kalei, sc4_state, sc4kalei, ROT0, "Qps","Kaleidoscope (041) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4kaleic   ,sc4kalei,  sc4_4reel_alt, sc4kalei, sc4_state, sc4kalei, ROT0, "Qps","Kaleidoscope (041) (Qps) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4kaleia   ,sc4kalei,  sc4_4reel_alt, sc4kalei, sc4_state, sc4kalei, ROT0, "Qps","Kaleidoscope (041) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4kalei )
+GAMEL( 200?, sc4kaleic   ,sc4kalei,  sc4_4reel_alt, sc4kalei, sc4_state, sc4kalei, ROT0, "Qps","Kaleidoscope (041) (Qps) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4kalei )
 // PR2538 KALEIDOSCOPE 051         KALEIDOSCOPESND           KALEIDOSCOPE
-GAMEL( 200?, sc4kaleid   ,sc4kalei,  sc4_4reel_alt, sc4kalei, sc4_state, sc4kalei, ROT0, "Qps","Kaleidoscope (051) (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4kaleie   ,sc4kalei,  sc4_4reel_alt, sc4kalei, sc4_state, sc4kalei, ROT0, "Qps","Kaleidoscope (051) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4kaleid   ,sc4kalei,  sc4_4reel_alt, sc4kalei, sc4_state, sc4kalei, ROT0, "Qps","Kaleidoscope (051) (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4kalei )
+GAMEL( 200?, sc4kaleie   ,sc4kalei,  sc4_4reel_alt, sc4kalei, sc4_state, sc4kalei, ROT0, "Qps","Kaleidoscope (051) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4kalei )
 
 
 DRIVER_INIT_MEMBER(sc4_state,sc4lir)
@@ -28690,16 +28859,16 @@ INPUT_PORTS_START( sc4lir ) // this structure is generated
 INPUT_PORTS_END
 
 // PR1001  LET IT ROLL         PR1001 LETITROLL SOUNDS11
-GAMEL( 200?, sc4lir      ,0,         sc4_4reel, sc4lir, sc4_state, sc4lir, ROT0, "BFM","Let It Roll (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4lira     ,sc4lir,    sc4_4reel, sc4lir, sc4_state, sc4lir, ROT0, "BFM","Let It Roll (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4lirb     ,sc4lir,    sc4_4reel, sc4lir, sc4_state, sc4lir, ROT0, "BFM","Let It Roll (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4lirc     ,sc4lir,    sc4_4reel, sc4lir, sc4_state, sc4lir, ROT0, "BFM","Let It Roll (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4lird     ,sc4lir,    sc4_4reel, sc4lir, sc4_state, sc4lir, ROT0, "BFM","Let It Roll (Bellfruit) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4lire     ,sc4lir,    sc4_4reel, sc4lir, sc4_state, sc4lir, ROT0, "BFM","Let It Roll (Bellfruit) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4lirf     ,sc4lir,    sc4_4reel, sc4lir, sc4_state, sc4lir, ROT0, "BFM","Let It Roll (Bellfruit) (Scorpion 4) (set 7)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4lirg     ,sc4lir,    sc4_4reel, sc4lir, sc4_state, sc4lir, ROT0, "BFM","Let It Roll (Bellfruit) (Scorpion 4) (set 8)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4lirh     ,sc4lir,    sc4_4reel, sc4lir, sc4_state, sc4lir, ROT0, "BFM","Let It Roll (Bellfruit) (Scorpion 4) (set 9)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4liri     ,sc4lir,    sc4_4reel, sc4lir, sc4_state, sc4lir, ROT0, "BFM","Let It Roll (Bellfruit) (Scorpion 4) (set 10)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4lir      ,0,         sc4_4reel, sc4lir, sc4_state, sc4lir, ROT0, "BFM","Let It Roll (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4lirb )
+GAMEL( 200?, sc4lira     ,sc4lir,    sc4_4reel, sc4lir, sc4_state, sc4lir, ROT0, "BFM","Let It Roll (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4lirb )
+GAMEL( 200?, sc4lirb     ,sc4lir,    sc4_4reel, sc4lir, sc4_state, sc4lir, ROT0, "BFM","Let It Roll (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4lirb )
+GAMEL( 200?, sc4lirc     ,sc4lir,    sc4_4reel, sc4lir, sc4_state, sc4lir, ROT0, "BFM","Let It Roll (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4lirb )
+GAMEL( 200?, sc4lird     ,sc4lir,    sc4_4reel, sc4lir, sc4_state, sc4lir, ROT0, "BFM","Let It Roll (Bellfruit) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_sc4lirb )
+GAMEL( 200?, sc4lire     ,sc4lir,    sc4_4reel, sc4lir, sc4_state, sc4lir, ROT0, "BFM","Let It Roll (Bellfruit) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_sc4lirb )
+GAMEL( 200?, sc4lirf     ,sc4lir,    sc4_4reel, sc4lir, sc4_state, sc4lir, ROT0, "BFM","Let It Roll (Bellfruit) (Scorpion 4) (set 7)", MACHINE_FLAGS, layout_sc4lirb )
+GAMEL( 200?, sc4lirg     ,sc4lir,    sc4_4reel, sc4lir, sc4_state, sc4lir, ROT0, "BFM","Let It Roll (Bellfruit) (Scorpion 4) (set 8)", MACHINE_FLAGS, layout_sc4lirb )
+GAMEL( 200?, sc4lirh     ,sc4lir,    sc4_4reel, sc4lir, sc4_state, sc4lir, ROT0, "BFM","Let It Roll (Bellfruit) (Scorpion 4) (set 9)", MACHINE_FLAGS, layout_sc4lirb )
+GAMEL( 200?, sc4liri     ,sc4lir,    sc4_4reel, sc4lir, sc4_state, sc4lir, ROT0, "BFM","Let It Roll (Bellfruit) (Scorpion 4) (set 10)", MACHINE_FLAGS, layout_sc4lirb )
 
 
 
@@ -28837,14 +29006,14 @@ INPUT_PORTS_START( sc4lockb ) // this structure is generated
 INPUT_PORTS_END
 
 // PR1108 LOCKBUSTER         PR1108 LOCKBUSTER SOUNDS11
-GAMEL( 200?, sc4lockb    ,0,         sc4_4reel_alt, sc4lockb, sc4_state, sc4lockb, ROT0, "BFM","Lock Buster (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4lockba   ,sc4lockb,  sc4_4reel_alt, sc4lockb, sc4_state, sc4lockb, ROT0, "BFM","Lock Buster (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4lockbb   ,sc4lockb,  sc4_4reel_alt, sc4lockb, sc4_state, sc4lockb, ROT0, "BFM","Lock Buster (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4lockbc   ,sc4lockb,  sc4_4reel_alt, sc4lockb, sc4_state, sc4lockb, ROT0, "BFM","Lock Buster (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4lockbd   ,sc4lockb,  sc4_4reel_alt, sc4lockb, sc4_state, sc4lockb, ROT0, "BFM","Lock Buster (Bellfruit) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4lockbe   ,sc4lockb,  sc4_4reel_alt, sc4lockb, sc4_state, sc4lockb, ROT0, "BFM","Lock Buster (Bellfruit) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4lockbf   ,sc4lockb,  sc4_4reel_alt, sc4lockb, sc4_state, sc4lockb, ROT0, "BFM","Lock Buster (Bellfruit) (Scorpion 4) (set 7)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4lockbg   ,sc4lockb,  sc4_4reel_alt, sc4lockb, sc4_state, sc4lockb, ROT0, "BFM","Lock Buster (Bellfruit) (Scorpion 4) (set 8)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4lockb    ,0,         sc4_4reel_alt, sc4lockb, sc4_state, sc4lockb, ROT0, "BFM","Lock Buster (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4lockb )
+GAMEL( 200?, sc4lockba   ,sc4lockb,  sc4_4reel_alt, sc4lockb, sc4_state, sc4lockb, ROT0, "BFM","Lock Buster (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4lockb )
+GAMEL( 200?, sc4lockbb   ,sc4lockb,  sc4_4reel_alt, sc4lockb, sc4_state, sc4lockb, ROT0, "BFM","Lock Buster (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4lockb )
+GAMEL( 200?, sc4lockbc   ,sc4lockb,  sc4_4reel_alt, sc4lockb, sc4_state, sc4lockb, ROT0, "BFM","Lock Buster (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4lockb )
+GAMEL( 200?, sc4lockbd   ,sc4lockb,  sc4_4reel_alt, sc4lockb, sc4_state, sc4lockb, ROT0, "BFM","Lock Buster (Bellfruit) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_sc4lockb )
+GAMEL( 200?, sc4lockbe   ,sc4lockb,  sc4_4reel_alt, sc4lockb, sc4_state, sc4lockb, ROT0, "BFM","Lock Buster (Bellfruit) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_sc4lockb )
+GAMEL( 200?, sc4lockbf   ,sc4lockb,  sc4_4reel_alt, sc4lockb, sc4_state, sc4lockb, ROT0, "BFM","Lock Buster (Bellfruit) (Scorpion 4) (set 7)", MACHINE_FLAGS, layout_sc4lockb )
+GAMEL( 200?, sc4lockbg   ,sc4lockb,  sc4_4reel_alt, sc4lockb, sc4_state, sc4lockb, ROT0, "BFM","Lock Buster (Bellfruit) (Scorpion 4) (set 8)", MACHINE_FLAGS, layout_sc4lockb )
 
 
 
@@ -28917,19 +29086,19 @@ INPUT_PORTS_START( sc4lkbcl ) // this structure is generated
 INPUT_PORTS_END
 
 // PR1321 CLUB LOCKBUSTER         PR1321 CLUB LOCKBUSTER SOUNDS11
-GAMEL( 200?, sc4lkbcl    ,0,         sc4_5reel, sc4lkbcl, sc4_state, sc4lkbcl, ROT0, "BFM","Lock Buster Club (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4lkbclb   ,sc4lkbcl,  sc4_5reel, sc4lkbcl, sc4_state, sc4lkbcl, ROT0, "BFM","Lock Buster Club (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4lkbcle   ,sc4lkbcl,  sc4_5reel, sc4lkbcl, sc4_state, sc4lkbcl, ROT0, "BFM","Lock Buster Club (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4lkbclg   ,sc4lkbcl,  sc4_5reel, sc4lkbcl, sc4_state, sc4lkbcl, ROT0, "BFM","Lock Buster Club (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4lkbcl    ,0,         sc4_5reel, sc4lkbcl, sc4_state, sc4lkbcl, ROT0, "BFM","Lock Buster Club (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4lkbcl )
+GAMEL( 200?, sc4lkbclb   ,sc4lkbcl,  sc4_5reel, sc4lkbcl, sc4_state, sc4lkbcl, ROT0, "BFM","Lock Buster Club (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4lkbcl )
+GAMEL( 200?, sc4lkbcle   ,sc4lkbcl,  sc4_5reel, sc4lkbcl, sc4_state, sc4lkbcl, ROT0, "BFM","Lock Buster Club (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4lkbcl )
+GAMEL( 200?, sc4lkbclg   ,sc4lkbcl,  sc4_5reel, sc4lkbcl, sc4_state, sc4lkbcl, ROT0, "BFM","Lock Buster Club (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4lkbcl )
 // PR1321 CLUB LOCKBUSTER         CLUB LOCKBUSTER CLUB  PR1321 CLUB LOCKBUSTER SOUNDS11
-GAMEL( 200?, sc4lkbclh   ,sc4lkbcl,  sc4_5reel, sc4lkbcl, sc4_state, sc4lkbcl_mbus, ROT0, "BFM","Lock Buster Club (Bellfruit) (Scorpion 4) (311 Club, set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4lkbcli   ,sc4lkbcl,  sc4_5reel, sc4lkbcl, sc4_state, sc4lkbcl_mbus, ROT0, "BFM","Lock Buster Club (Bellfruit) (Scorpion 4) (311 Club, set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4lkbclh   ,sc4lkbcl,  sc4_5reel, sc4lkbcl, sc4_state, sc4lkbcl_mbus, ROT0, "BFM","Lock Buster Club (Bellfruit) (Scorpion 4) (311 Club, set 1)", MACHINE_FLAGS, layout_sc4lkbcl )
+GAMEL( 200?, sc4lkbcli   ,sc4lkbcl,  sc4_5reel, sc4lkbcl, sc4_state, sc4lkbcl_mbus, ROT0, "BFM","Lock Buster Club (Bellfruit) (Scorpion 4) (311 Club, set 2)", MACHINE_FLAGS, layout_sc4lkbcl )
 // PR1321 CLUB LOCKBUSTER EURO         PR1321 CLUB LOCKBUSTER SOUNDS11
-GAMEL( 200?, sc4lkbcla   ,sc4lkbcl,  sc4_5reel, sc4lkbcl, sc4_state, sc4lkbcl, ROT0, "BFM","Lock Buster Club (Euro) (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4lkbclc   ,sc4lkbcl,  sc4_5reel, sc4lkbcl, sc4_state, sc4lkbcl, ROT0, "BFM","Lock Buster Club (Euro) (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4lkbcla   ,sc4lkbcl,  sc4_5reel, sc4lkbcl, sc4_state, sc4lkbcl, ROT0, "BFM","Lock Buster Club (Euro) (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4lkbcl )
+GAMEL( 200?, sc4lkbclc   ,sc4lkbcl,  sc4_5reel, sc4lkbcl, sc4_state, sc4lkbcl, ROT0, "BFM","Lock Buster Club (Euro) (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4lkbcl )
 // PR1321 CLUB LOCKBUSTER FERRY         PR1321 CLUB LOCKBUSTER SOUNDS11
-GAMEL( 200?, sc4lkbcld   ,sc4lkbcl,  sc4_5reel, sc4lkbcl, sc4_state, sc4lkbcl, ROT0, "BFM","Lock Buster Club (Ferry) (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4lkbclf   ,sc4lkbcl,  sc4_5reel, sc4lkbcl, sc4_state, sc4lkbcl, ROT0, "BFM","Lock Buster Club (Ferry) (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4lkbcld   ,sc4lkbcl,  sc4_5reel, sc4lkbcl, sc4_state, sc4lkbcl, ROT0, "BFM","Lock Buster Club (Ferry) (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4lkbcl )
+GAMEL( 200?, sc4lkbclf   ,sc4lkbcl,  sc4_5reel, sc4lkbcl, sc4_state, sc4lkbcl, ROT0, "BFM","Lock Buster Club (Ferry) (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4lkbcl )
 
 
 
@@ -29356,20 +29525,20 @@ INPUT_PORTS_START( sc4monob ) // this structure is generated
 INPUT_PORTS_END
 
 // PR2121 MONOPOLY         MPLY SOUNDS         MONOPOLY
-GAMEL( 200?, sc4monob    ,0,         sc4_4reel_alt, sc4monob, sc4_state, sc4monob, ROT0, "BFM","Monopoly (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4monoba   ,sc4monob,  sc4_4reel_alt, sc4monob, sc4_state, sc4monob, ROT0, "BFM","Monopoly (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4monobb   ,sc4monob,  sc4_4reel_alt, sc4monob, sc4_state, sc4monob, ROT0, "BFM","Monopoly (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4monobc   ,sc4monob,  sc4_4reel_alt, sc4monob, sc4_state, sc4monob, ROT0, "BFM","Monopoly (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4monobd   ,sc4monob,  sc4_4reel_alt, sc4monob, sc4_state, sc4monob, ROT0, "BFM","Monopoly (Bellfruit) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4monobe   ,sc4monob,  sc4_4reel_alt, sc4monob, sc4_state, sc4monob, ROT0, "BFM","Monopoly (Bellfruit) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4monobf   ,sc4monob,  sc4_4reel_alt, sc4monob, sc4_state, sc4monob, ROT0, "BFM","Monopoly (Bellfruit) (Scorpion 4) (set 7)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4monobg   ,sc4monob,  sc4_4reel_alt, sc4monob, sc4_state, sc4monob, ROT0, "BFM","Monopoly (Bellfruit) (Scorpion 4) (set 8)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4monobh   ,sc4monob,  sc4_4reel_alt, sc4monob, sc4_state, sc4monob, ROT0, "BFM","Monopoly (Bellfruit) (Scorpion 4) (set 9)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4monobi   ,sc4monob,  sc4_4reel_alt, sc4monob, sc4_state, sc4monob, ROT0, "BFM","Monopoly (Bellfruit) (Scorpion 4) (set 10)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4monobj   ,sc4monob,  sc4_4reel_alt, sc4monob, sc4_state, sc4monob, ROT0, "BFM","Monopoly (Bellfruit) (Scorpion 4) (set 11)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4monobk   ,sc4monob,  sc4_4reel_alt, sc4monob, sc4_state, sc4monob, ROT0, "BFM","Monopoly (Bellfruit) (Scorpion 4) (set 12)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4monobl   ,sc4monob,  sc4_4reel_alt, sc4monob, sc4_state, sc4monob, ROT0, "BFM","Monopoly (Bellfruit) (Scorpion 4) (set 13)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4monobm   ,sc4monob,  sc4_4reel_alt, sc4monob, sc4_state, sc4monob, ROT0, "BFM","Monopoly (Bellfruit) (Scorpion 4) (set 14)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4monob    ,0,         sc4_4reel_alt, sc4monob, sc4_state, sc4monob, ROT0, "BFM","Monopoly (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4monoba )
+GAMEL( 200?, sc4monoba   ,sc4monob,  sc4_4reel_alt, sc4monob, sc4_state, sc4monob, ROT0, "BFM","Monopoly (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4monoba )
+GAMEL( 200?, sc4monobb   ,sc4monob,  sc4_4reel_alt, sc4monob, sc4_state, sc4monob, ROT0, "BFM","Monopoly (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4monoba )
+GAMEL( 200?, sc4monobc   ,sc4monob,  sc4_4reel_alt, sc4monob, sc4_state, sc4monob, ROT0, "BFM","Monopoly (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4monoba )
+GAMEL( 200?, sc4monobd   ,sc4monob,  sc4_4reel_alt, sc4monob, sc4_state, sc4monob, ROT0, "BFM","Monopoly (Bellfruit) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_sc4monoba )
+GAMEL( 200?, sc4monobe   ,sc4monob,  sc4_4reel_alt, sc4monob, sc4_state, sc4monob, ROT0, "BFM","Monopoly (Bellfruit) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_sc4monoba )
+GAMEL( 200?, sc4monobf   ,sc4monob,  sc4_4reel_alt, sc4monob, sc4_state, sc4monob, ROT0, "BFM","Monopoly (Bellfruit) (Scorpion 4) (set 7)", MACHINE_FLAGS, layout_sc4monoba )
+GAMEL( 200?, sc4monobg   ,sc4monob,  sc4_4reel_alt, sc4monob, sc4_state, sc4monob, ROT0, "BFM","Monopoly (Bellfruit) (Scorpion 4) (set 8)", MACHINE_FLAGS, layout_sc4monoba )
+GAMEL( 200?, sc4monobh   ,sc4monob,  sc4_4reel_alt, sc4monob, sc4_state, sc4monob, ROT0, "BFM","Monopoly (Bellfruit) (Scorpion 4) (set 9)", MACHINE_FLAGS, layout_sc4monoba )
+GAMEL( 200?, sc4monobi   ,sc4monob,  sc4_4reel_alt, sc4monob, sc4_state, sc4monob, ROT0, "BFM","Monopoly (Bellfruit) (Scorpion 4) (set 10)", MACHINE_FLAGS, layout_sc4monoba )
+GAMEL( 200?, sc4monobj   ,sc4monob,  sc4_4reel_alt, sc4monob, sc4_state, sc4monob, ROT0, "BFM","Monopoly (Bellfruit) (Scorpion 4) (set 11)", MACHINE_FLAGS, layout_sc4monoba )
+GAMEL( 200?, sc4monobk   ,sc4monob,  sc4_4reel_alt, sc4monob, sc4_state, sc4monob, ROT0, "BFM","Monopoly (Bellfruit) (Scorpion 4) (set 12)", MACHINE_FLAGS, layout_sc4monoba )
+GAMEL( 200?, sc4monobl   ,sc4monob,  sc4_4reel_alt, sc4monob, sc4_state, sc4monob, ROT0, "BFM","Monopoly (Bellfruit) (Scorpion 4) (set 13)", MACHINE_FLAGS, layout_sc4monoba )
+GAMEL( 200?, sc4monobm   ,sc4monob,  sc4_4reel_alt, sc4monob, sc4_state, sc4monob, ROT0, "BFM","Monopoly (Bellfruit) (Scorpion 4) (set 14)", MACHINE_FLAGS, layout_sc4monoba )
 
 
 
@@ -29424,17 +29593,17 @@ INPUT_PORTS_END
 // So which Top Box roms should thse use? Why do some play without one?
 
 // Waits for Top Box
-GAMEL( 200?, sc4mondxd   ,sc4mondx,  sc4_3reel_200, sc4mondx, sc4_state, sc4mondx, ROT0, "Mazooma","Monopoly Deluxe (PR2202, MPDX 1.1) (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )// PR2202 MONOPOLY DELUXE         MONOPOLY  DELUXE  MAZ       MONOPOLY  TRIPLE
-GAMEL( 200?, sc4mondxg   ,sc4mondx,  sc4_3reel_200, sc4mondx, sc4_state, sc4mondx, ROT0, "Mazooma","Monopoly Deluxe (PR2202, MPDX 1.1) (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )// ^^
+GAMEL( 200?, sc4mondxd   ,sc4mondx,  sc4_3reel_200, sc4mondx, sc4_state, sc4mondx, ROT0, "Mazooma","Monopoly Deluxe (PR2202, MPDX 1.1) (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4mondxe )// PR2202 MONOPOLY DELUXE         MONOPOLY  DELUXE  MAZ       MONOPOLY  TRIPLE
+GAMEL( 200?, sc4mondxg   ,sc4mondx,  sc4_3reel_200, sc4mondx, sc4_state, sc4mondx, ROT0, "Mazooma","Monopoly Deluxe (PR2202, MPDX 1.1) (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4mondxe )// ^^
 // Plays without Top Box
-GAMEL( 200?, sc4mondxe   ,sc4mondx,  sc4_3reel_200, sc4mondx, sc4_state, sc4mondx, ROT0, "Mazooma","Monopoly Deluxe (PR2202, MPDX 1.1) (Mazooma) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )// PR2202 MONOPOLY         MONOPOLY  TRIPLE  MAZ       MONOPOLY  DELUXE
-GAMEL( 200?, sc4mondxf   ,sc4mondx,  sc4_3reel_200, sc4mondx, sc4_state, sc4mondx, ROT0, "Mazooma","Monopoly Deluxe (PR2202, MPDX 1.1) (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )// ^^
+GAMEL( 200?, sc4mondxe   ,sc4mondx,  sc4_3reel_200, sc4mondx, sc4_state, sc4mondx, ROT0, "Mazooma","Monopoly Deluxe (PR2202, MPDX 1.1) (Mazooma) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4mondxe )// PR2202 MONOPOLY         MONOPOLY  TRIPLE  MAZ       MONOPOLY  DELUXE
+GAMEL( 200?, sc4mondxf   ,sc4mondx,  sc4_3reel_200, sc4mondx, sc4_state, sc4mondx, ROT0, "Mazooma","Monopoly Deluxe (PR2202, MPDX 1.1) (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4mondxe )// ^^
 // Waits for Top Box
-GAMEL( 200?, sc4mondx    ,0,         sc4_3reel_200, sc4mondx, sc4_state, sc4mondx, ROT0, "Mazooma","Monopoly Deluxe (PR2202, MPDX 1.0) (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )// PR2202 MONOPOLY DELUXE         MONOPOLY DELUXE MAZ MPDX SOUNDS             MONOPOLY
-GAMEL( 200?, sc4mondxa   ,sc4mondx,  sc4_3reel_200, sc4mondx, sc4_state, sc4mondx, ROT0, "Mazooma","Monopoly Deluxe (PR2202, MPDX 1.0) (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )// ^^
+GAMEL( 200?, sc4mondx    ,0,         sc4_3reel_200, sc4mondx, sc4_state, sc4mondx, ROT0, "Mazooma","Monopoly Deluxe (PR2202, MPDX 1.0) (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4mondxe )// PR2202 MONOPOLY DELUXE         MONOPOLY DELUXE MAZ MPDX SOUNDS             MONOPOLY
+GAMEL( 200?, sc4mondxa   ,sc4mondx,  sc4_3reel_200, sc4mondx, sc4_state, sc4mondx, ROT0, "Mazooma","Monopoly Deluxe (PR2202, MPDX 1.0) (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4mondxe )// ^^
 // Plays without Top Box
-GAMEL( 200?, sc4mondxb   ,sc4mondx,  sc4_3reel_200, sc4mondx, sc4_state, sc4mondx, ROT0, "Mazooma","Monopoly Deluxe (PR2202, MPDX 1.0) (Mazooma) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )// ^^
-GAMEL( 200?, sc4mondxc   ,sc4mondx,  sc4_3reel_200, sc4mondx, sc4_state, sc4mondx, ROT0, "Mazooma","Monopoly Deluxe (PR2202, MPDX 1.0) (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )// ^^
+GAMEL( 200?, sc4mondxb   ,sc4mondx,  sc4_3reel_200, sc4mondx, sc4_state, sc4mondx, ROT0, "Mazooma","Monopoly Deluxe (PR2202, MPDX 1.0) (Mazooma) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4mondxe )// ^^
+GAMEL( 200?, sc4mondxc   ,sc4mondx,  sc4_3reel_200, sc4mondx, sc4_state, sc4mondx, ROT0, "Mazooma","Monopoly Deluxe (PR2202, MPDX 1.0) (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4mondxe )// ^^
 
 
 
@@ -29561,9 +29730,9 @@ INPUT_PORTS_START( sc4mou ) // this structure is generated
 INPUT_PORTS_END
 
 // PR2523 MOVE ON UP V1.0         MOVEONUPSND            MOVE ON UP
-GAMEL( 200?, sc4mou      ,0,         sc4_4reel_alt, sc4mou, sc4_state, sc4mou, ROT0, "Qps","Move On Up (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4moua     ,sc4mou,    sc4_4reel_alt, sc4mou, sc4_state, sc4mou, ROT0, "Qps","Move On Up (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4moub     ,sc4mou,    sc4_4reel_alt, sc4mou, sc4_state, sc4mou, ROT0, "Qps","Move On Up (Qps) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4mou      ,0,         sc4_4reel_alt, sc4mou, sc4_state, sc4mou, ROT0, "Qps","Move On Up (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4mou )
+GAMEL( 200?, sc4moua     ,sc4mou,    sc4_4reel_alt, sc4mou, sc4_state, sc4mou, ROT0, "Qps","Move On Up (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4mou )
+GAMEL( 200?, sc4moub     ,sc4mou,    sc4_4reel_alt, sc4mou, sc4_state, sc4mou, ROT0, "Qps","Move On Up (Qps) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4mou )
 
 
 DRIVER_INIT_MEMBER(sc4_state,sc4nmtj)
@@ -29624,11 +29793,11 @@ INPUT_PORTS_START( sc4nmtj ) // this structure is generated
 INPUT_PORTS_END
 
 // PR2171 NEVER MIND JPS         NMTJ SOUNDS         NEVER MIND JPS
-GAMEL( 200?, sc4nmtj     ,0,         sc4_200_4ra, sc4nmtj, sc4_state, sc4nmtj, ROT0, "Mazooma","Never Mind The Jackpots (Mazooma) (Scorpion 4) (011)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4nmtja    ,sc4nmtj,   sc4_200_4ra, sc4nmtj, sc4_state, sc4nmtj, ROT0, "Mazooma","Never Mind The Jackpots (Mazooma) (Scorpion 4) (014, set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4nmtjc    ,sc4nmtj,   sc4_200_4ra, sc4nmtj, sc4_state, sc4nmtj, ROT0, "Mazooma","Never Mind The Jackpots (Mazooma) (Scorpion 4) (014, set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4nmtjb    ,sc4nmtj,   sc4_200_4ra, sc4nmtj, sc4_state, sc4nmtj, ROT0, "Mazooma","Never Mind The Jackpots (Mazooma) (Scorpion 4) (044, set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4nmtjd    ,sc4nmtj,   sc4_200_4ra, sc4nmtj, sc4_state, sc4nmtj, ROT0, "Mazooma","Never Mind The Jackpots (Mazooma) (Scorpion 4) (044, set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4nmtj     ,0,         sc4_200_4ra, sc4nmtj, sc4_state, sc4nmtj, ROT0, "Mazooma","Never Mind The Jackpots (Mazooma) (Scorpion 4) (011)", MACHINE_FLAGS, layout_sc4nmtj )
+GAMEL( 200?, sc4nmtja    ,sc4nmtj,   sc4_200_4ra, sc4nmtj, sc4_state, sc4nmtj, ROT0, "Mazooma","Never Mind The Jackpots (Mazooma) (Scorpion 4) (014, set 1)", MACHINE_FLAGS, layout_sc4nmtj )
+GAMEL( 200?, sc4nmtjc    ,sc4nmtj,   sc4_200_4ra, sc4nmtj, sc4_state, sc4nmtj, ROT0, "Mazooma","Never Mind The Jackpots (Mazooma) (Scorpion 4) (014, set 2)", MACHINE_FLAGS, layout_sc4nmtj )
+GAMEL( 200?, sc4nmtjb    ,sc4nmtj,   sc4_200_4ra, sc4nmtj, sc4_state, sc4nmtj, ROT0, "Mazooma","Never Mind The Jackpots (Mazooma) (Scorpion 4) (044, set 1)", MACHINE_FLAGS, layout_sc4nmtj )
+GAMEL( 200?, sc4nmtjd    ,sc4nmtj,   sc4_200_4ra, sc4nmtj, sc4_state, sc4nmtj, ROT0, "Mazooma","Never Mind The Jackpots (Mazooma) (Scorpion 4) (044, set 2)", MACHINE_FLAGS, layout_sc4nmtj )
 
 
 DRIVER_INIT_MEMBER(sc4_state,sc4oyf)
@@ -29831,10 +30000,10 @@ INPUT_PORTS_START( sc4paccl ) // this structure is generated
 INPUT_PORTS_END
 
 // PR2018 PACMAN CLUB         CLUB PACMAN SOUNDS         PACMAN C L U B
-GAMEL( 200?, sc4paccl    ,0,         sc4_5reel, sc4paccl, sc4_state, sc4paccl, ROT0, "Mazooma","Pac Man Club (PR2018, CPAC) (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4paccla   ,sc4paccl,  sc4_5reel, sc4paccl, sc4_state, sc4paccl, ROT0, "Mazooma","Pac Man Club (PR2018, CPAC) (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4pacclb   ,sc4paccl,  sc4_5reel, sc4paccl, sc4_state, sc4paccl, ROT0, "Mazooma","Pac Man Club (PR2018, CPAC) (Mazooma) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4pacclc   ,sc4paccl,  sc4_5reel, sc4paccl, sc4_state, sc4paccl, ROT0, "Mazooma","Pac Man Club (PR2018, CPAC) (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4paccl    ,0,         sc4_5reel, sc4paccl, sc4_state, sc4paccl, ROT0, "Mazooma","Pac Man Club (PR2018, CPAC) (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4paccl )
+GAMEL( 200?, sc4paccla   ,sc4paccl,  sc4_5reel, sc4paccl, sc4_state, sc4paccl, ROT0, "Mazooma","Pac Man Club (PR2018, CPAC) (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4paccl )
+GAMEL( 200?, sc4pacclb   ,sc4paccl,  sc4_5reel, sc4paccl, sc4_state, sc4paccl, ROT0, "Mazooma","Pac Man Club (PR2018, CPAC) (Mazooma) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4paccl )
+GAMEL( 200?, sc4pacclc   ,sc4paccl,  sc4_5reel, sc4paccl, sc4_state, sc4paccl, ROT0, "Mazooma","Pac Man Club (PR2018, CPAC) (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4paccl )
 
 
 // REEL 4 ERR 24 (what type should be here??)
@@ -29964,12 +30133,12 @@ INPUT_PORTS_START( sc4pgold ) // this structure is generated
 INPUT_PORTS_END
 
 // PR1012 PHARAOH'S GOLD         PR1012 PHARAOHS GOLD SOUNDS11
-GAMEL( 200?, sc4pgold    ,0,         sc4_200_5r, sc4pgold, sc4_state, sc4pgold, ROT0, "BFM","Pharaoh's Gold (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4pgolda   ,sc4pgold,  sc4_200_5r, sc4pgold, sc4_state, sc4pgold, ROT0, "BFM","Pharaoh's Gold (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4pgoldb   ,sc4pgold,  sc4_200_5r, sc4pgold, sc4_state, sc4pgold, ROT0, "BFM","Pharaoh's Gold (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4pgoldc   ,sc4pgold,  sc4_200_5r, sc4pgold, sc4_state, sc4pgold, ROT0, "BFM","Pharaoh's Gold (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4pgoldd   ,sc4pgold,  sc4_200_5r, sc4pgold, sc4_state, sc4pgold, ROT0, "BFM","Pharaoh's Gold (Bellfruit) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4pgoldf   ,sc4pgold,  sc4_200_5r, sc4pgold, sc4_state, sc4pgold, ROT0, "BFM","Pharaoh's Gold (Bellfruit) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4pgold    ,0,         sc4_200_5r, sc4pgold, sc4_state, sc4pgold, ROT0, "BFM","Pharaoh's Gold (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4pgold )
+GAMEL( 200?, sc4pgolda   ,sc4pgold,  sc4_200_5r, sc4pgold, sc4_state, sc4pgold, ROT0, "BFM","Pharaoh's Gold (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4pgold )
+GAMEL( 200?, sc4pgoldb   ,sc4pgold,  sc4_200_5r, sc4pgold, sc4_state, sc4pgold, ROT0, "BFM","Pharaoh's Gold (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4pgold )
+GAMEL( 200?, sc4pgoldc   ,sc4pgold,  sc4_200_5r, sc4pgold, sc4_state, sc4pgold, ROT0, "BFM","Pharaoh's Gold (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4pgold )
+GAMEL( 200?, sc4pgoldd   ,sc4pgold,  sc4_200_5r, sc4pgold, sc4_state, sc4pgold, ROT0, "BFM","Pharaoh's Gold (Bellfruit) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_sc4pgold )
+GAMEL( 200?, sc4pgoldf   ,sc4pgold,  sc4_200_5r, sc4pgold, sc4_state, sc4pgold, ROT0, "BFM","Pharaoh's Gold (Bellfruit) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_sc4pgold )
 
 
 
@@ -30029,11 +30198,11 @@ INPUT_PORTS_START( sc4ppclb ) // this structure is generated
 INPUT_PORTS_END
 
 // PR2236 CLUB PINK PANTHER 411         CLUBPINKPANTHERSND         CLUB PINKPANTHER
-GAMEL( 200?, sc4ppclb    ,0,         sc4, sc4ppclb, sc4_state, sc4ppclb, ROT0, "Qps","Pink Panther Club (411) (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // also in a set marked 'Pink Pannther Think Pink'
-GAMEL( 200?, sc4ppclbb   ,sc4ppclb,  sc4, sc4ppclb, sc4_state, sc4ppclb, ROT0, "Qps","Pink Panther Club (411) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4ppclb    ,0,         sc4, sc4ppclb, sc4_state, sc4ppclb, ROT0, "Qps","Pink Panther Club (411) (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4ppclb ) // also in a set marked 'Pink Pannther Think Pink'
+GAMEL( 200?, sc4ppclbb   ,sc4ppclb,  sc4, sc4ppclb, sc4_state, sc4ppclb, ROT0, "Qps","Pink Panther Club (411) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4ppclb )
 // PR2236 CLUB PINK PANTHER 412         CLUBPINKPANTHERSND         CLUB PINKPANTHER
-GAMEL( 200?, sc4ppclba   ,sc4ppclb,  sc4, sc4ppclb, sc4_state, sc4ppclb, ROT0, "Qps","Pink Panther Club (412) (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4ppclbc   ,sc4ppclb,  sc4, sc4ppclb, sc4_state, sc4ppclb, ROT0, "Qps","Pink Panther Club (412) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4ppclba   ,sc4ppclb,  sc4, sc4ppclb, sc4_state, sc4ppclb, ROT0, "Qps","Pink Panther Club (412) (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4ppclb )
+GAMEL( 200?, sc4ppclbc   ,sc4ppclb,  sc4, sc4ppclb, sc4_state, sc4ppclb, ROT0, "Qps","Pink Panther Club (412) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4ppclb )
 
 
 DRIVER_INIT_MEMBER(sc4_state,sc4pipe)
@@ -30089,8 +30258,8 @@ INPUT_PORTS_START( sc4pipe ) // this structure is generated
 INPUT_PORTS_END
 
 // PR2110 PIPING HOT         PIPE SOUNDS         PIPING HOT
-GAMEL( 200?, sc4pipe     ,0,         sc4_4reel_alt, sc4pipe, sc4_state, sc4pipe, ROT0, "Mazooma","Piping Hot (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4pipea    ,sc4pipe,   sc4_4reel_alt, sc4pipe, sc4_state, sc4pipe, ROT0, "Mazooma","Piping Hot (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4pipe     ,0,         sc4_4reel_alt, sc4pipe, sc4_state, sc4pipe, ROT0, "Mazooma","Piping Hot (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4pipe )
+GAMEL( 200?, sc4pipea    ,sc4pipe,   sc4_4reel_alt, sc4pipe, sc4_state, sc4pipe, ROT0, "Mazooma","Piping Hot (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4pipe )
 
 DRIVER_INIT_MEMBER(sc4_state,sc4plumb)
 {
@@ -30144,14 +30313,14 @@ INPUT_PORTS_START( sc4plumb ) // this structure is generated
 INPUT_PORTS_END
 
 //  QPS142 CLUB PLUMB CRAZY  413         CLUBPLUMBCRAZYSND         CLUB PLUMB CRAZY
-GAMEL( 200?, sc4plumb    ,0,         sc4_5reel, sc4plumb, sc4_state, sc4plumb, ROT0, "Qps","Plumb Crazy Club (413) (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4plumba   ,sc4plumb,  sc4_5reel, sc4plumb, sc4_state, sc4plumb, ROT0, "Qps","Plumb Crazy Club (413) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4plumb    ,0,         sc4_5reel, sc4plumb, sc4_state, sc4plumb, ROT0, "Qps","Plumb Crazy Club (413) (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4plumb )
+GAMEL( 200?, sc4plumba   ,sc4plumb,  sc4_5reel, sc4plumb, sc4_state, sc4plumb, ROT0, "Qps","Plumb Crazy Club (413) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4plumb )
 // QPS142 CLUB PLUMB CRAZY  411         CLUBPLUMBCRAZYSND         CLUB PLUMB CRAZY
-GAMEL( 200?, sc4plumbb   ,sc4plumb,  sc4_5reel, sc4plumb, sc4_state, sc4plumb, ROT0, "Qps","Plumb Crazy Club (411) (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4plumbc   ,sc4plumb,  sc4_5reel, sc4plumb, sc4_state, sc4plumb, ROT0, "Qps","Plumb Crazy Club (411) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4plumbb   ,sc4plumb,  sc4_5reel, sc4plumb, sc4_state, sc4plumb, ROT0, "Qps","Plumb Crazy Club (411) (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4plumb )
+GAMEL( 200?, sc4plumbc   ,sc4plumb,  sc4_5reel, sc4plumb, sc4_state, sc4plumb, ROT0, "Qps","Plumb Crazy Club (411) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4plumb )
 // QPS142 CLUB PLUMB CRAZY  412         CLUBPLUMBCRAZYSND         CLUB PLUMB CRAZY
-GAMEL( 200?, sc4plumbd   ,sc4plumb,  sc4_5reel, sc4plumb, sc4_state, sc4plumb, ROT0, "Qps","Plumb Crazy Club (412) (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4plumbe   ,sc4plumb,  sc4_5reel, sc4plumb, sc4_state, sc4plumb, ROT0, "Qps","Plumb Crazy Club (412) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4plumbd   ,sc4plumb,  sc4_5reel, sc4plumb, sc4_state, sc4plumb, ROT0, "Qps","Plumb Crazy Club (412) (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4plumb )
+GAMEL( 200?, sc4plumbe   ,sc4plumb,  sc4_5reel, sc4plumb, sc4_state, sc4plumb, ROT0, "Qps","Plumb Crazy Club (412) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4plumb )
 
 
 DRIVER_INIT_MEMBER(sc4_state,sc4polic)
@@ -30201,11 +30370,11 @@ INPUT_PORTS_START( sc4polic ) // this structure is generated
 INPUT_PORTS_END
 
 // PR2514 POLICE SQUID V1.0          POLICESQUIDSND           POLICE SQUID
-GAMEL( 200?, sc4polic    ,0,         sc4_5reel, sc4polic, sc4_state, sc4polic, ROT0, "Qps","Police Squid (V1.0) (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4policb   ,sc4polic,  sc4_5reel, sc4polic, sc4_state, sc4polic, ROT0, "Qps","Police Squid (V1.0) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4polic    ,0,         sc4_5reel, sc4polic, sc4_state, sc4polic, ROT0, "Qps","Police Squid (V1.0) (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4polic )
+GAMEL( 200?, sc4policb   ,sc4polic,  sc4_5reel, sc4polic, sc4_state, sc4polic, ROT0, "Qps","Police Squid (V1.0) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4polic )
 // PR2514 POLICE SQUID V2.0         POLICESQUIDSND           POLICE SQUID
-GAMEL( 200?, sc4polica   ,sc4polic,  sc4_5reel, sc4polic, sc4_state, sc4polic, ROT0, "Qps","Police Squid (V2.0) (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4policc   ,sc4polic,  sc4_5reel, sc4polic, sc4_state, sc4polic, ROT0, "Qps","Police Squid (V2.0) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4polica   ,sc4polic,  sc4_5reel, sc4polic, sc4_state, sc4polic, ROT0, "Qps","Police Squid (V2.0) (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4polic )
+GAMEL( 200?, sc4policc   ,sc4polic,  sc4_5reel, sc4polic, sc4_state, sc4polic, ROT0, "Qps","Police Squid (V2.0) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4polic )
 
 
 
@@ -30258,8 +30427,8 @@ INPUT_PORTS_START( sc4potsh ) // this structure is generated
 INPUT_PORTS_END
 
 // QPS143 POT SHOT V1.0         POTSHOTSND             POT SHOT
-GAMEL( 200?, sc4potsh    ,0,         sc4_4reel, sc4potsh, sc4_state, sc4potsh, ROT0, "Qps","Pot Shot (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4potsha   ,sc4potsh,  sc4_4reel, sc4potsh, sc4_state, sc4potsh, ROT0, "Qps","Pot Shot (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4potsh    ,0,         sc4_4reel, sc4potsh, sc4_state, sc4potsh, ROT0, "Qps","Pot Shot (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4potsha )
+GAMEL( 200?, sc4potsha   ,sc4potsh,  sc4_4reel, sc4potsh, sc4_state, sc4potsh, ROT0, "Qps","Pot Shot (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4potsha )
 
 
 DRIVER_INIT_MEMBER(sc4_state,sc4pogbl)
@@ -30380,10 +30549,10 @@ INPUT_PORTS_START( sc4pwrsg ) // this structure is generated
 INPUT_PORTS_END
 
 // PR2053 POWERSURGE         SURGESND            POWERSURGE
-GAMEL( 200?, sc4pwrsg    ,0,         sc4_200_5r, sc4pwrsg, sc4_state, sc4pwrsg, ROT0, "Qps","Power Surge (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4pwrsga   ,sc4pwrsg,  sc4_200_5r, sc4pwrsg, sc4_state, sc4pwrsg, ROT0, "Qps","Power Surge (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4pwrsgb   ,sc4pwrsg,  sc4_200_5r, sc4pwrsg, sc4_state, sc4pwrsg, ROT0, "Qps","Power Surge (Qps) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4pwrsgc   ,sc4pwrsg,  sc4_200_5r, sc4pwrsg, sc4_state, sc4pwrsg, ROT0, "Qps","Power Surge (Qps) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4pwrsg    ,0,         sc4_200_5r, sc4pwrsg, sc4_state, sc4pwrsg, ROT0, "Qps","Power Surge (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4pwrsg )
+GAMEL( 200?, sc4pwrsga   ,sc4pwrsg,  sc4_200_5r, sc4pwrsg, sc4_state, sc4pwrsg, ROT0, "Qps","Power Surge (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4pwrsg )
+GAMEL( 200?, sc4pwrsgb   ,sc4pwrsg,  sc4_200_5r, sc4pwrsg, sc4_state, sc4pwrsg, ROT0, "Qps","Power Surge (Qps) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4pwrsg )
+GAMEL( 200?, sc4pwrsgc   ,sc4pwrsg,  sc4_200_5r, sc4pwrsg, sc4_state, sc4pwrsg, ROT0, "Qps","Power Surge (Qps) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4pwrsg )
 
 
 DRIVER_INIT_MEMBER(sc4_state,sc4pir)
@@ -30508,11 +30677,11 @@ INPUT_PORTS_START( sc4qmodo ) // this structure is generated
 INPUT_PORTS_END
 
 // QUAZZI MO' DOUGH..........QUAZZSND.......  (no standard header)
-GAMEL( 200?, sc4qmodo    ,       0,  sc4_4reel, sc4qmodo, sc4_state, sc4qmodo, ROT0, "Qps","Quazzi Mo' Dough (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4qmodoa   ,sc4qmodo,  sc4_4reel, sc4qmodo, sc4_state, sc4qmodo, ROT0, "Qps","Quazzi Mo' Dough (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4qmodob   ,sc4qmodo,  sc4_4reel, sc4qmodo, sc4_state, sc4qmodo, ROT0, "Qps","Quazzi Mo' Dough (Qps) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4qmodoc   ,sc4qmodo,  sc4_4reel, sc4qmodo, sc4_state, sc4qmodo, ROT0, "Qps","Quazzi Mo' Dough (Qps) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4qmodod   ,sc4qmodo,  sc4_4reel, sc4qmodo, sc4_state, sc4qmodo, ROT0, "Qps","Quazzi Mo' Dough (Qps) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4qmodo    ,       0,  sc4_4reel, sc4qmodo, sc4_state, sc4qmodo, ROT0, "Qps","Quazzi Mo' Dough (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4qmodo )
+GAMEL( 200?, sc4qmodoa   ,sc4qmodo,  sc4_4reel, sc4qmodo, sc4_state, sc4qmodo, ROT0, "Qps","Quazzi Mo' Dough (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4qmodo )
+GAMEL( 200?, sc4qmodob   ,sc4qmodo,  sc4_4reel, sc4qmodo, sc4_state, sc4qmodo, ROT0, "Qps","Quazzi Mo' Dough (Qps) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4qmodo )
+GAMEL( 200?, sc4qmodoc   ,sc4qmodo,  sc4_4reel, sc4qmodo, sc4_state, sc4qmodo, ROT0, "Qps","Quazzi Mo' Dough (Qps) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4qmodo )
+GAMEL( 200?, sc4qmodod   ,sc4qmodo,  sc4_4reel, sc4qmodo, sc4_state, sc4qmodo, ROT0, "Qps","Quazzi Mo' Dough (Qps) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_sc4qmodo )
 
 
 
@@ -30566,10 +30735,10 @@ INPUT_PORTS_START( sc4quidr ) // this structure is generated
 		// 0x0010 - "hopdmp" // standard input (expected here)
 INPUT_PORTS_END
 
-GAMEL( 200?, sc4quidr    ,0,         sc4_4reel, sc4quidr, sc4_state, sc4quidr, ROT0, "Qps","Quid Rock (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4quidra   ,sc4quidr,  sc4_4reel, sc4quidr, sc4_state, sc4quidr, ROT0, "Qps","Quid Rock (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4quidrb   ,sc4quidr,  sc4_4reel, sc4quidr, sc4_state, sc4quidr, ROT0, "Qps","Quid Rock (Qps) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4quidrc   ,sc4quidr,  sc4_4reel, sc4quidr, sc4_state, sc4quidr, ROT0, "Qps","Quid Rock (Qps) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4quidr    ,0,         sc4_4reel, sc4quidr, sc4_state, sc4quidr, ROT0, "Qps","Quid Rock (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4quidrb )
+GAMEL( 200?, sc4quidra   ,sc4quidr,  sc4_4reel, sc4quidr, sc4_state, sc4quidr, ROT0, "Qps","Quid Rock (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4quidrb )
+GAMEL( 200?, sc4quidrb   ,sc4quidr,  sc4_4reel, sc4quidr, sc4_state, sc4quidr, ROT0, "Qps","Quid Rock (Qps) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4quidrb )
+GAMEL( 200?, sc4quidrc   ,sc4quidr,  sc4_4reel, sc4quidr, sc4_state, sc4quidr, ROT0, "Qps","Quid Rock (Qps) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4quidrb )
 
 
 DRIVER_INIT_MEMBER(sc4_state,sc4rdrag)
@@ -30816,11 +30985,11 @@ INPUT_PORTS_START( sc4rotc ) // this structure is generated
 INPUT_PORTS_END
 
 // PR2132 RETURN OF THE COUNT         ROTC SOUNDS         THE COUNT
-GAMEL( 200?, sc4rotc     ,0,         sc4_4reel_alt, sc4rotc, sc4_state, sc4rotc, ROT0, "Mazooma","Return Of The Count (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4rotca    ,sc4rotc,   sc4_4reel_alt, sc4rotc, sc4_state, sc4rotc, ROT0, "Mazooma","Return Of The Count (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4rotcb    ,sc4rotc,   sc4_4reel_alt, sc4rotc, sc4_state, sc4rotc, ROT0, "Mazooma","Return Of The Count (Mazooma) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4rotcc    ,sc4rotc,   sc4_4reel_alt, sc4rotc, sc4_state, sc4rotc, ROT0, "Mazooma","Return Of The Count (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4rotcd    ,sc4rotc,   sc4_4reel_alt, sc4rotc, sc4_state, sc4rotc, ROT0, "Mazooma","Return Of The Count (Mazooma) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4rotc     ,0,         sc4_4reel_alt, sc4rotc, sc4_state, sc4rotc, ROT0, "Mazooma","Return Of The Count (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4rotc )
+GAMEL( 200?, sc4rotca    ,sc4rotc,   sc4_4reel_alt, sc4rotc, sc4_state, sc4rotc, ROT0, "Mazooma","Return Of The Count (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4rotc )
+GAMEL( 200?, sc4rotcb    ,sc4rotc,   sc4_4reel_alt, sc4rotc, sc4_state, sc4rotc, ROT0, "Mazooma","Return Of The Count (Mazooma) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4rotc )
+GAMEL( 200?, sc4rotcc    ,sc4rotc,   sc4_4reel_alt, sc4rotc, sc4_state, sc4rotc, ROT0, "Mazooma","Return Of The Count (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4rotc )
+GAMEL( 200?, sc4rotcd    ,sc4rotc,   sc4_4reel_alt, sc4rotc, sc4_state, sc4rotc, ROT0, "Mazooma","Return Of The Count (Mazooma) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_sc4rotc )
 
 
 DRIVER_INIT_MEMBER(sc4_state,sc4rttt)
@@ -30877,12 +31046,12 @@ INPUT_PORTS_START( sc4rttt ) // this structure is generated
 INPUT_PORTS_END
 
 // PR2089 RISE TO THE TOP         RISE SOUNDS         RISE TO THE TOP
-GAMEL( 200?, sc4rttt     ,0,         sc4_4reel_alt, sc4rttt, sc4_state, sc4rttt, ROT0, "Mazooma","Rise To The Top (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4rttta    ,sc4rttt,   sc4_4reel_alt, sc4rttt, sc4_state, sc4rttt, ROT0, "Mazooma","Rise To The Top (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4rtttb    ,sc4rttt,   sc4_4reel_alt, sc4rttt, sc4_state, sc4rttt_mbus, ROT0, "Mazooma","Rise To The Top (Mazooma) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4rtttc    ,sc4rttt,   sc4_4reel_alt, sc4rttt, sc4_state, sc4rttt_mbus, ROT0, "Mazooma","Rise To The Top (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4rtttd    ,sc4rttt,   sc4_4reel_alt, sc4rttt, sc4_state, sc4rttt_mbus, ROT0, "Mazooma","Rise To The Top (Mazooma) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4rttte    ,sc4rttt,   sc4_4reel_alt, sc4rttt, sc4_state, sc4rttt_mbus, ROT0, "Mazooma","Rise To The Top (Mazooma) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4rttt     ,0,         sc4_4reel_alt, sc4rttt, sc4_state, sc4rttt, ROT0, "Mazooma","Rise To The Top (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4rttt )
+GAMEL( 200?, sc4rttta    ,sc4rttt,   sc4_4reel_alt, sc4rttt, sc4_state, sc4rttt, ROT0, "Mazooma","Rise To The Top (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4rttt )
+GAMEL( 200?, sc4rtttb    ,sc4rttt,   sc4_4reel_alt, sc4rttt, sc4_state, sc4rttt_mbus, ROT0, "Mazooma","Rise To The Top (Mazooma) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4rttt )
+GAMEL( 200?, sc4rtttc    ,sc4rttt,   sc4_4reel_alt, sc4rttt, sc4_state, sc4rttt_mbus, ROT0, "Mazooma","Rise To The Top (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4rttt )
+GAMEL( 200?, sc4rtttd    ,sc4rttt,   sc4_4reel_alt, sc4rttt, sc4_state, sc4rttt_mbus, ROT0, "Mazooma","Rise To The Top (Mazooma) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_sc4rttt )
+GAMEL( 200?, sc4rttte    ,sc4rttt,   sc4_4reel_alt, sc4rttt, sc4_state, sc4rttt_mbus, ROT0, "Mazooma","Rise To The Top (Mazooma) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_sc4rttt )
 
 DRIVER_INIT_MEMBER(sc4_state,sc4roksc)
 {
@@ -30936,11 +31105,11 @@ INPUT_PORTS_START( sc4roksc ) // this structure is generated
 INPUT_PORTS_END
 
 // PR2527 ROCKET SCIENCE V1.1         ROCKETSCIENCESND          ROCKET SCIENCE
-GAMEL( 200?, sc4roksc    ,0,         sc4_4reel_alt, sc4roksc, sc4_state, sc4roksc, ROT0, "Qps","Rocket Science (V1.1) (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4rokscb   ,sc4roksc,  sc4_4reel_alt, sc4roksc, sc4_state, sc4roksc, ROT0, "Qps","Rocket Science (V1.1) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4roksc    ,0,         sc4_4reel_alt, sc4roksc, sc4_state, sc4roksc, ROT0, "Qps","Rocket Science (V1.1) (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4roksc )
+GAMEL( 200?, sc4rokscb   ,sc4roksc,  sc4_4reel_alt, sc4roksc, sc4_state, sc4roksc, ROT0, "Qps","Rocket Science (V1.1) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4roksc )
 // PR2527 ROCKET SCIENCE 011         ROCKETSCIENCESND          ROCKET SCIENCE
-GAMEL( 200?, sc4roksca   ,sc4roksc,  sc4_4reel_alt, sc4roksc, sc4_state, sc4roksc, ROT0, "Qps","Rocket Science (011) (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4rokscc   ,sc4roksc,  sc4_4reel_alt, sc4roksc, sc4_state, sc4roksc, ROT0, "Qps","Rocket Science (011) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4roksca   ,sc4roksc,  sc4_4reel_alt, sc4roksc, sc4_state, sc4roksc, ROT0, "Qps","Rocket Science (011) (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4roksc )
+GAMEL( 200?, sc4rokscc   ,sc4roksc,  sc4_4reel_alt, sc4roksc, sc4_state, sc4roksc, ROT0, "Qps","Rocket Science (011) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4roksc )
 
 DRIVER_INIT_MEMBER(sc4_state,sc4blast)
 {
@@ -30995,14 +31164,14 @@ INPUT_PORTS_END
 
 // only starts 2nd time (requires valid ram?)
 // PR2539 BLAST OFF011         ROCKETSCIENCESND            BLAST  OFF
-GAMEL( 200?, sc4blast    ,0,         sc4_4reel_alt, sc4blast, sc4_state, sc4blast, ROT0, "Qps","Blast Off (011) (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4blastb   ,sc4blast,  sc4_4reel_alt, sc4blast, sc4_state, sc4blast, ROT0, "Qps","Blast Off (011) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4blast    ,0,         sc4_4reel_alt, sc4blast, sc4_state, sc4blast, ROT0, "Qps","Blast Off (011) (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4blast )
+GAMEL( 200?, sc4blastb   ,sc4blast,  sc4_4reel_alt, sc4blast, sc4_state, sc4blast, ROT0, "Qps","Blast Off (011) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4blast )
 // PR2539 BLAST OFF041         ROCKETSCIENCESND            BLAST  OFF
-GAMEL( 200?, sc4blasta   ,sc4blast,  sc4_4reel_alt, sc4blast, sc4_state, sc4blast, ROT0, "Qps","Blast Off (041) (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4blastc   ,sc4blast,  sc4_4reel_alt, sc4blast, sc4_state, sc4blast, ROT0, "Qps","Blast Off (041) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4blasta   ,sc4blast,  sc4_4reel_alt, sc4blast, sc4_state, sc4blast, ROT0, "Qps","Blast Off (041) (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4blast )
+GAMEL( 200?, sc4blastc   ,sc4blast,  sc4_4reel_alt, sc4blast, sc4_state, sc4blast, ROT0, "Qps","Blast Off (041) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4blast )
 // PR2539 BLAST OFF 042         ROCKETSCIENCESND            BLAST  OFF
-GAMEL( 200?, sc4blastd   ,sc4blast,  sc4_4reel_alt, sc4blast, sc4_state, sc4blast, ROT0, "Qps","Blast Off (042) (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4blaste   ,sc4blast,  sc4_4reel_alt, sc4blast, sc4_state, sc4blast, ROT0, "Qps","Blast Off (042) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4blastd   ,sc4blast,  sc4_4reel_alt, sc4blast, sc4_state, sc4blast, ROT0, "Qps","Blast Off (042) (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4blast )
+GAMEL( 200?, sc4blaste   ,sc4blast,  sc4_4reel_alt, sc4blast, sc4_state, sc4blast, ROT0, "Qps","Blast Off (042) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4blast )
 
 
 
@@ -31059,17 +31228,17 @@ INPUT_PORTS_END
 
 
 // PR2060 ROGAN DOSH         ROGANSND            ROGAN DOSH
-GAMEL( 200?, sc4rogds    ,0,         sc4_200_4ra, sc4rogds, sc4_state, sc4rogds, ROT0, "Qps","Rogan Dosh (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4rogdsa   ,sc4rogds,  sc4_200_4ra, sc4rogds, sc4_state, sc4rogds, ROT0, "Qps","Rogan Dosh (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4rogdsb   ,sc4rogds,  sc4_200_4ra, sc4rogds, sc4_state, sc4rogds, ROT0, "Qps","Rogan Dosh (Qps) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4rogdsc   ,sc4rogds,  sc4_200_4ra, sc4rogds, sc4_state, sc4rogds, ROT0, "Qps","Rogan Dosh (Qps) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4rogds    ,0,         sc4_200_4ra, sc4rogds, sc4_state, sc4rogds, ROT0, "Qps","Rogan Dosh (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4rogds )
+GAMEL( 200?, sc4rogdsa   ,sc4rogds,  sc4_200_4ra, sc4rogds, sc4_state, sc4rogds, ROT0, "Qps","Rogan Dosh (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4rogds )
+GAMEL( 200?, sc4rogdsb   ,sc4rogds,  sc4_200_4ra, sc4rogds, sc4_state, sc4rogds, ROT0, "Qps","Rogan Dosh (Qps) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4rogds )
+GAMEL( 200?, sc4rogdsc   ,sc4rogds,  sc4_200_4ra, sc4rogds, sc4_state, sc4rogds, ROT0, "Qps","Rogan Dosh (Qps) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4rogds )
 // PR2060 ROGAN DOSH V1.6         ROGANSND            ROGAN DOSH
-GAMEL( 200?, sc4rogdse   ,sc4rogds,  sc4_200_4ra, sc4rogds, sc4_state, sc4rogds, ROT0, "Qps","Rogan Dosh (v1.6) (Qps) (Scorpion 4)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4rogdse   ,sc4rogds,  sc4_200_4ra, sc4rogds, sc4_state, sc4rogds, ROT0, "Qps","Rogan Dosh (v1.6) (Qps) (Scorpion 4)", MACHINE_FLAGS, layout_sc4rogds )
 // PR2060 ROGAN DOSH V2.0         ROGANSND            ROGAN DOSH
-GAMEL( 200?, sc4rogdsd   ,sc4rogds,  sc4_200_4ra, sc4rogds, sc4_state, sc4rogds, ROT0, "Qps","Rogan Dosh (v2.0) (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4rogdsf   ,sc4rogds,  sc4_200_4ra, sc4rogds, sc4_state, sc4rogds, ROT0, "Qps","Rogan Dosh (v2.0) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4rogdsd   ,sc4rogds,  sc4_200_4ra, sc4rogds, sc4_state, sc4rogds, ROT0, "Qps","Rogan Dosh (v2.0) (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4rogds )
+GAMEL( 200?, sc4rogdsf   ,sc4rogds,  sc4_200_4ra, sc4rogds, sc4_state, sc4rogds, ROT0, "Qps","Rogan Dosh (v2.0) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4rogds )
 // PR2060 ROGAN DOSH V2.1         ROGANSND            ROGAN DOSH
-GAMEL( 200?, sc4rogdsg   ,sc4rogds,  sc4_200_4ra, sc4rogds, sc4_state, sc4rogds, ROT0, "Qps","Rogan Dosh (v2.1) (Qps) (Scorpion 4)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4rogdsg   ,sc4rogds,  sc4_200_4ra, sc4rogds, sc4_state, sc4rogds, ROT0, "Qps","Rogan Dosh (v2.1) (Qps) (Scorpion 4)", MACHINE_FLAGS, layout_sc4rogds )
 
 
 
@@ -31129,11 +31298,11 @@ INPUT_PORTS_END
 
 
 // PR2034 ROLLING THUNDER         ROL SOUNDS          ROLLING THUNDER
-GAMEL( 200?, sc4rt       ,0,         sc4_200_4ra, sc4rt, sc4_state, sc4rt, ROT0, "Mazooma","Rolling Thunder (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4rta      ,sc4rt,     sc4_200_4ra, sc4rt, sc4_state, sc4rt, ROT0, "Mazooma","Rolling Thunder (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4rtb      ,sc4rt,     sc4_200_4ra, sc4rt, sc4_state, sc4rt, ROT0, "Mazooma","Rolling Thunder (Mazooma) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4rtc      ,sc4rt,     sc4_200_4ra, sc4rt, sc4_state, sc4rt, ROT0, "Mazooma","Rolling Thunder (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4rtd      ,sc4rt,     sc4_200_4ra, sc4rt, sc4_state, sc4rt, ROT0, "Mazooma","Rolling Thunder (Mazooma) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4rt       ,0,         sc4_200_4ra, sc4rt, sc4_state, sc4rt, ROT0, "Mazooma","Rolling Thunder (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4rtc )
+GAMEL( 200?, sc4rta      ,sc4rt,     sc4_200_4ra, sc4rt, sc4_state, sc4rt, ROT0, "Mazooma","Rolling Thunder (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4rtc )
+GAMEL( 200?, sc4rtb      ,sc4rt,     sc4_200_4ra, sc4rt, sc4_state, sc4rt, ROT0, "Mazooma","Rolling Thunder (Mazooma) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4rtc )
+GAMEL( 200?, sc4rtc      ,sc4rt,     sc4_200_4ra, sc4rt, sc4_state, sc4rt, ROT0, "Mazooma","Rolling Thunder (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4rtc )
+GAMEL( 200?, sc4rtd      ,sc4rt,     sc4_200_4ra, sc4rt, sc4_state, sc4rt, ROT0, "Mazooma","Rolling Thunder (Mazooma) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_sc4rtc )
 
 
 
@@ -31188,10 +31357,10 @@ INPUT_PORTS_END
 
 // missing sound roms, doesn't play, same game code and sound ident as Rolling Thunder?
 // PR2034 BANK ROLL         ROL SOUNDS          BANK ROLL
-GAMEL( 200?, sc4broll    ,0,         sc4_200_4ra, sc4broll, sc4_state, sc4, ROT0, "Mazooma","Bank Roll (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
-GAMEL( 200?, sc4brolla   ,sc4broll,  sc4_200_4ra, sc4broll, sc4_state, sc4, ROT0, "Mazooma","Bank Roll (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
-GAMEL( 200?, sc4brollb   ,sc4broll,  sc4_200_4ra, sc4broll, sc4_state, sc4, ROT0, "Mazooma","Bank Roll (Mazooma) (Scorpion 4) (set 3)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
-GAMEL( 200?, sc4brollc   ,sc4broll,  sc4_200_4ra, sc4broll, sc4_state, sc4, ROT0, "Mazooma","Bank Roll (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
+GAMEL( 200?, sc4broll    ,0,         sc4_200_4ra, sc4broll, sc4_state, sc4, ROT0, "Mazooma","Bank Roll (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS_NOSOUND, layout_sc4brollb )
+GAMEL( 200?, sc4brolla   ,sc4broll,  sc4_200_4ra, sc4broll, sc4_state, sc4, ROT0, "Mazooma","Bank Roll (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS_NOSOUND, layout_sc4brollb )
+GAMEL( 200?, sc4brollb   ,sc4broll,  sc4_200_4ra, sc4broll, sc4_state, sc4, ROT0, "Mazooma","Bank Roll (Mazooma) (Scorpion 4) (set 3)", MACHINE_FLAGS_NOSOUND, layout_sc4brollb )
+GAMEL( 200?, sc4brollc   ,sc4broll,  sc4_200_4ra, sc4broll, sc4_state, sc4, ROT0, "Mazooma","Bank Roll (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS_NOSOUND, layout_sc4brollb )
 
 
 
@@ -31563,22 +31732,22 @@ INPUT_PORTS_START( sc4slc ) // this structure is generated
 INPUT_PORTS_END
 
 // PR1423 CLUB SNAKES N LADDERS         PR1423 CSNK SOUNDS11         SNAKES N LADDERS
-GAMEL( 2003, sc4slc      ,0,         sc4_5reel, sc4slc, sc4_state, sc4slc, ROT0, "BFM","Snakes & Ladders Club (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 2003, sc4slcb     ,sc4slc,    sc4_5reel, sc4slc, sc4_state, sc4slc, ROT0, "BFM","Snakes & Ladders Club (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 2003, sc4slcc     ,sc4slc,    sc4_5reel, sc4slc, sc4_state, sc4slc, ROT0, "BFM","Snakes & Ladders Club (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 2003, sc4slce     ,sc4slc,    sc4_5reel, sc4slc, sc4_state, sc4slc, ROT0, "BFM","Snakes & Ladders Club (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 2003, sc4slci     ,sc4slc,    sc4_5reel, sc4slc, sc4_state, sc4slc, ROT0, "BFM","Snakes & Ladders Club (Bellfruit) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 2003, sc4slcm     ,sc4slc,    sc4_5reel, sc4slc, sc4_state, sc4slc, ROT0, "BFM","Snakes & Ladders Club (Bellfruit) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 2003, sc4slcn     ,sc4slc,    sc4_5reel, sc4slc, sc4_state, sc4slc, ROT0, "BFM","Snakes & Ladders Club (Bellfruit) (Scorpion 4) (set 7)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 2003, sc4slc      ,0,         sc4_5reel, sc4slc, sc4_state, sc4slc, ROT0, "BFM","Snakes & Ladders Club (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4slci )
+GAMEL( 2003, sc4slcb     ,sc4slc,    sc4_5reel, sc4slc, sc4_state, sc4slc, ROT0, "BFM","Snakes & Ladders Club (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4slci )
+GAMEL( 2003, sc4slcc     ,sc4slc,    sc4_5reel, sc4slc, sc4_state, sc4slc, ROT0, "BFM","Snakes & Ladders Club (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4slci )
+GAMEL( 2003, sc4slce     ,sc4slc,    sc4_5reel, sc4slc, sc4_state, sc4slc, ROT0, "BFM","Snakes & Ladders Club (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4slci )
+GAMEL( 2003, sc4slci     ,sc4slc,    sc4_5reel, sc4slc, sc4_state, sc4slc, ROT0, "BFM","Snakes & Ladders Club (Bellfruit) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_sc4slci )
+GAMEL( 2003, sc4slcm     ,sc4slc,    sc4_5reel, sc4slc, sc4_state, sc4slc, ROT0, "BFM","Snakes & Ladders Club (Bellfruit) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_sc4slci )
+GAMEL( 2003, sc4slcn     ,sc4slc,    sc4_5reel, sc4slc, sc4_state, sc4slc, ROT0, "BFM","Snakes & Ladders Club (Bellfruit) (Scorpion 4) (set 7)", MACHINE_FLAGS, layout_sc4slci )
 // PR1423 CLUB SNAKES N LADDERS         SNAKES N LADDERS  CLUB  PR1423 CSNK SOUNDS11         SNAKES N LADDERS
-GAMEL( 2003, sc4slca     ,sc4slc,    sc4_5reel, sc4slc, sc4_state, sc4slc_mbus, ROT0, "BFM","Snakes & Ladders Club (Bellfruit) (Scorpion 4) (set 8)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 2003, sc4slcd     ,sc4slc,    sc4_5reel, sc4slc, sc4_state, sc4slc_mbus, ROT0, "BFM","Snakes & Ladders Club (Bellfruit) (Scorpion 4) (set 9)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 2003, sc4slcf     ,sc4slc,    sc4_5reel, sc4slc, sc4_state, sc4slc_mbus, ROT0, "BFM","Snakes & Ladders Club (Bellfruit) (Scorpion 4) (set 10)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 2003, sc4slcg     ,sc4slc,    sc4_5reel, sc4slc, sc4_state, sc4slc_mbus, ROT0, "BFM","Snakes & Ladders Club (Bellfruit) (Scorpion 4) (set 11)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 2003, sc4slcj     ,sc4slc,    sc4_5reel, sc4slc, sc4_state, sc4slc_mbus, ROT0, "BFM","Snakes & Ladders Club (Bellfruit) (Scorpion 4) (set 13)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 2003, sc4slck     ,sc4slc,    sc4_5reel, sc4slc, sc4_state, sc4slc_mbus, ROT0, "BFM","Snakes & Ladders Club (Bellfruit) (Scorpion 4) (set 14)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 2003, sc4slcl     ,sc4slc,    sc4_5reel, sc4slc, sc4_state, sc4slc, ROT0, "BFM","Snakes & Ladders Club (Bellfruit) (Scorpion 4) (set 15)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 2003, sc4slch     ,sc4slc,    sc4_5reel, sc4slc, sc4_state, sc4slc, ROT0, "BFM","Snakes & Ladders Club (Bellfruit) (Scorpion 4) (set 12)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 2003, sc4slca     ,sc4slc,    sc4_5reel, sc4slc, sc4_state, sc4slc_mbus, ROT0, "BFM","Snakes & Ladders Club (Bellfruit) (Scorpion 4) (set 8)", MACHINE_FLAGS, layout_sc4slci )
+GAMEL( 2003, sc4slcd     ,sc4slc,    sc4_5reel, sc4slc, sc4_state, sc4slc_mbus, ROT0, "BFM","Snakes & Ladders Club (Bellfruit) (Scorpion 4) (set 9)", MACHINE_FLAGS, layout_sc4slci )
+GAMEL( 2003, sc4slcf     ,sc4slc,    sc4_5reel, sc4slc, sc4_state, sc4slc_mbus, ROT0, "BFM","Snakes & Ladders Club (Bellfruit) (Scorpion 4) (set 10)", MACHINE_FLAGS, layout_sc4slci )
+GAMEL( 2003, sc4slcg     ,sc4slc,    sc4_5reel, sc4slc, sc4_state, sc4slc_mbus, ROT0, "BFM","Snakes & Ladders Club (Bellfruit) (Scorpion 4) (set 11)", MACHINE_FLAGS, layout_sc4slci )
+GAMEL( 2003, sc4slcj     ,sc4slc,    sc4_5reel, sc4slc, sc4_state, sc4slc_mbus, ROT0, "BFM","Snakes & Ladders Club (Bellfruit) (Scorpion 4) (set 13)", MACHINE_FLAGS, layout_sc4slci )
+GAMEL( 2003, sc4slck     ,sc4slc,    sc4_5reel, sc4slc, sc4_state, sc4slc_mbus, ROT0, "BFM","Snakes & Ladders Club (Bellfruit) (Scorpion 4) (set 14)", MACHINE_FLAGS, layout_sc4slci )
+GAMEL( 2003, sc4slcl     ,sc4slc,    sc4_5reel, sc4slc, sc4_state, sc4slc, ROT0, "BFM","Snakes & Ladders Club (Bellfruit) (Scorpion 4) (set 15)", MACHINE_FLAGS, layout_sc4slci )
+GAMEL( 2003, sc4slch     ,sc4slc,    sc4_5reel, sc4slc, sc4_state, sc4slc, ROT0, "BFM","Snakes & Ladders Club (Bellfruit) (Scorpion 4) (set 12)", MACHINE_FLAGS, layout_sc4slci )
 
 
 
@@ -31655,10 +31824,10 @@ INPUT_PORTS_START( sc4solgl ) // this structure is generated
 INPUT_PORTS_END
 
 // PR1010  SOLID GOLD         PR1010 SOLID GOLD SOUNDS11
-GAMEL( 200?, sc4solgl    ,0,         sc4_200_4ra, sc4solgl, sc4_state, sc4solgl, ROT0, "BFM","Solid Gold (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4solgla   ,sc4solgl,  sc4_200_4ra, sc4solgl, sc4_state, sc4solgl, ROT0, "BFM","Solid Gold (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4solglb   ,sc4solgl,  sc4_200_4ra, sc4solgl, sc4_state, sc4solgl, ROT0, "BFM","Solid Gold (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4solglc   ,sc4solgl,  sc4_200_4ra, sc4solgl, sc4_state, sc4solgl, ROT0, "BFM","Solid Gold (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4solgl    ,0,         sc4_200_4ra, sc4solgl, sc4_state, sc4solgl, ROT0, "BFM","Solid Gold (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4solgl )
+GAMEL( 200?, sc4solgla   ,sc4solgl,  sc4_200_4ra, sc4solgl, sc4_state, sc4solgl, ROT0, "BFM","Solid Gold (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4solgl )
+GAMEL( 200?, sc4solglb   ,sc4solgl,  sc4_200_4ra, sc4solgl, sc4_state, sc4solgl, ROT0, "BFM","Solid Gold (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4solgl )
+GAMEL( 200?, sc4solglc   ,sc4solgl,  sc4_200_4ra, sc4solgl, sc4_state, sc4solgl, ROT0, "BFM","Solid Gold (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4solgl )
 
 
 DRIVER_INIT_MEMBER(sc4_state,sc4sace)
@@ -31765,8 +31934,8 @@ INPUT_PORTS_START( sc4sbust ) // this structure is generated
 INPUT_PORTS_END
 
 //  PR2506 SPACEBUSTER         BUSTERSND            SPACEBUSTER
-GAMEL( 200?, sc4sbust    ,0,         sc4_4reel_alt, sc4sbust, sc4_state, sc4sbust, ROT0, "Qps","Space Buster (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4sbusta   ,sc4sbust,  sc4_4reel_alt, sc4sbust, sc4_state, sc4sbust, ROT0, "Qps","Space Buster (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4sbust    ,0,         sc4_4reel_alt, sc4sbust, sc4_state, sc4sbust, ROT0, "Qps","Space Buster (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4sbust )
+GAMEL( 200?, sc4sbusta   ,sc4sbust,  sc4_4reel_alt, sc4sbust, sc4_state, sc4sbust, ROT0, "Qps","Space Buster (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4sbust )
 
 
 
@@ -31895,9 +32064,9 @@ INPUT_PORTS_START( sc4sahed ) // this structure is generated
 INPUT_PORTS_END
 
 //  PRxxxx STREAKS AHEAD V1.0         STREAKSSND          STREAKS  AHEAD
-GAMEL( 200?, sc4sahed    ,0,         sc4_200_4rb, sc4sahed, sc4_state, sc4sahed, ROT0, "Qps","Streaks Ahead (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4saheda   ,sc4sahed,  sc4_200_4rb, sc4sahed, sc4_state, sc4sahed, ROT0, "Qps","Streaks Ahead (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4sahedb   ,sc4sahed,  sc4_200_4rb, sc4sahed, sc4_state, sc4sahed, ROT0, "Qps","Streaks Ahead (Qps) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4sahed    ,0,         sc4_200_4rb, sc4sahed, sc4_state, sc4sahed, ROT0, "Qps","Streaks Ahead (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4sahed )
+GAMEL( 200?, sc4saheda   ,sc4sahed,  sc4_200_4rb, sc4sahed, sc4_state, sc4sahed, ROT0, "Qps","Streaks Ahead (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4sahed )
+GAMEL( 200?, sc4sahedb   ,sc4sahed,  sc4_200_4rb, sc4sahed, sc4_state, sc4sahed, ROT0, "Qps","Streaks Ahead (Qps) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4sahed )
 
 
 DRIVER_INIT_MEMBER(sc4_state,sc4strx)
@@ -32040,10 +32209,10 @@ INPUT_PORTS_START( sc4suscl ) // this structure is generated
 INPUT_PORTS_END
 
 // PR2357 CLUB SUITS U SIR         SUITS U SIR CLUB  CLUB SUIT SOUNDS
-GAMEL( 200?, sc4suscl    ,0,         sc4_5reel, sc4suscl, sc4_state, sc4suscl, ROT0, "Qps","Suits U Sir Club (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4susclb   ,sc4suscl,  sc4_5reel, sc4suscl, sc4_state, sc4suscl, ROT0, "Qps","Suits U Sir Club (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4susclc   ,sc4suscl,  sc4_5reel, sc4suscl, sc4_state, sc4suscl_mbus, ROT0, "Qps","Suits U Sir Club (Qps) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4suscla   ,sc4suscl,  sc4_5reel, sc4suscl, sc4_state, sc4suscl_mbus, ROT0, "Qps","Suits U Sir Club (Qps) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4suscl    ,0,         sc4_5reel, sc4suscl, sc4_state, sc4suscl, ROT0, "Qps","Suits U Sir Club (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4suscl )
+GAMEL( 200?, sc4susclb   ,sc4suscl,  sc4_5reel, sc4suscl, sc4_state, sc4suscl, ROT0, "Qps","Suits U Sir Club (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4suscl )
+GAMEL( 200?, sc4susclc   ,sc4suscl,  sc4_5reel, sc4suscl, sc4_state, sc4suscl_mbus, ROT0, "Qps","Suits U Sir Club (Qps) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4suscl )
+GAMEL( 200?, sc4suscla   ,sc4suscl,  sc4_5reel, sc4suscl, sc4_state, sc4suscl_mbus, ROT0, "Qps","Suits U Sir Club (Qps) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4suscl )
 
 
 
@@ -32107,17 +32276,17 @@ INPUT_PORTS_END
 
 
 // PR2515 TAE KWON DOUGH         TAEKWONSND          TAE KWON DOUGH
-GAMEL( 200?, sc4taekw    ,0,         sc4_200_4rb, sc4taekw, sc4_state, sc4taekw, ROT0, "Qps","Tae Kwon Dough (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4taekwa   ,sc4taekw,  sc4_200_4rb, sc4taekw, sc4_state, sc4taekw, ROT0, "Qps","Tae Kwon Dough (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4taekwb   ,sc4taekw,  sc4_200_4rb, sc4taekw, sc4_state, sc4taekw, ROT0, "Qps","Tae Kwon Dough (Qps) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4taekwg   ,sc4taekw,  sc4_200_4rb, sc4taekw, sc4_state, sc4taekw, ROT0, "Qps","Tae Kwon Dough (Qps) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4taekwh   ,sc4taekw,  sc4_200_4rb, sc4taekw, sc4_state, sc4taekw, ROT0, "Qps","Tae Kwon Dough (Qps) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4taekwi   ,sc4taekw,  sc4_200_4rb, sc4taekw, sc4_state, sc4taekw, ROT0, "Qps","Tae Kwon Dough (Qps) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4taekwj   ,sc4taekw,  sc4_200_4rb, sc4taekw, sc4_state, sc4taekw, ROT0, "Qps","Tae Kwon Dough (Qps) (Scorpion 4) (set 7)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4taekwc   ,sc4taekw,  sc4_200_4rb, sc4taekw, sc4_state, sc4taekw_mbus, ROT0, "Qps","Tae Kwon Dough (Qps) (Scorpion 4) (set 8)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4taekwd   ,sc4taekw,  sc4_200_4rb, sc4taekw, sc4_state, sc4taekw_mbus, ROT0, "Qps","Tae Kwon Dough (Qps) (Scorpion 4) (set 9)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4taekwe   ,sc4taekw,  sc4_200_4rb, sc4taekw, sc4_state, sc4taekw_mbus, ROT0, "Qps","Tae Kwon Dough (Qps) (Scorpion 4) (set 10)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4taekwf   ,sc4taekw,  sc4_200_4rb, sc4taekw, sc4_state, sc4taekw_mbus, ROT0, "Qps","Tae Kwon Dough (Qps) (Scorpion 4) (set 11)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4taekw    ,0,         sc4_200_4rb, sc4taekw, sc4_state, sc4taekw, ROT0, "Qps","Tae Kwon Dough (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4taekw )
+GAMEL( 200?, sc4taekwa   ,sc4taekw,  sc4_200_4rb, sc4taekw, sc4_state, sc4taekw, ROT0, "Qps","Tae Kwon Dough (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4taekw )
+GAMEL( 200?, sc4taekwb   ,sc4taekw,  sc4_200_4rb, sc4taekw, sc4_state, sc4taekw, ROT0, "Qps","Tae Kwon Dough (Qps) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4taekw )
+GAMEL( 200?, sc4taekwg   ,sc4taekw,  sc4_200_4rb, sc4taekw, sc4_state, sc4taekw, ROT0, "Qps","Tae Kwon Dough (Qps) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4taekw )
+GAMEL( 200?, sc4taekwh   ,sc4taekw,  sc4_200_4rb, sc4taekw, sc4_state, sc4taekw, ROT0, "Qps","Tae Kwon Dough (Qps) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_sc4taekw )
+GAMEL( 200?, sc4taekwi   ,sc4taekw,  sc4_200_4rb, sc4taekw, sc4_state, sc4taekw, ROT0, "Qps","Tae Kwon Dough (Qps) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_sc4taekw )
+GAMEL( 200?, sc4taekwj   ,sc4taekw,  sc4_200_4rb, sc4taekw, sc4_state, sc4taekw, ROT0, "Qps","Tae Kwon Dough (Qps) (Scorpion 4) (set 7)", MACHINE_FLAGS, layout_sc4taekw )
+GAMEL( 200?, sc4taekwc   ,sc4taekw,  sc4_200_4rb, sc4taekw, sc4_state, sc4taekw_mbus, ROT0, "Qps","Tae Kwon Dough (Qps) (Scorpion 4) (set 8)", MACHINE_FLAGS, layout_sc4taekw )
+GAMEL( 200?, sc4taekwd   ,sc4taekw,  sc4_200_4rb, sc4taekw, sc4_state, sc4taekw_mbus, ROT0, "Qps","Tae Kwon Dough (Qps) (Scorpion 4) (set 9)", MACHINE_FLAGS, layout_sc4taekw )
+GAMEL( 200?, sc4taekwe   ,sc4taekw,  sc4_200_4rb, sc4taekw, sc4_state, sc4taekw_mbus, ROT0, "Qps","Tae Kwon Dough (Qps) (Scorpion 4) (set 10)", MACHINE_FLAGS, layout_sc4taekw )
+GAMEL( 200?, sc4taekwf   ,sc4taekw,  sc4_200_4rb, sc4taekw, sc4_state, sc4taekw_mbus, ROT0, "Qps","Tae Kwon Dough (Qps) (Scorpion 4) (set 11)", MACHINE_FLAGS, layout_sc4taekw )
 
 
 
@@ -32260,20 +32429,20 @@ INPUT_PORTS_START( sc4takcl ) // this structure is generated
 INPUT_PORTS_END
 
 // PR1323 CLUB TAKE NOTE         PR1323 CNOT SOUNDS11
-GAMEL( 200?, sc4takcl    ,0,         sc4_5reel, sc4takcl, sc4_state, sc4takcl, ROT0, "BFM","Take Note Club (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4takcld   ,sc4takcl,  sc4_5reel, sc4takcl, sc4_state, sc4takcl, ROT0, "BFM","Take Note Club (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4takcli   ,sc4takcl,  sc4_5reel, sc4takcl, sc4_state, sc4takcl, ROT0, "BFM","Take Note Club (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4takclj   ,sc4takcl,  sc4_5reel, sc4takcl, sc4_state, sc4takcl, ROT0, "BFM","Take Note Club (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4takcl    ,0,         sc4_5reel, sc4takcl, sc4_state, sc4takcl, ROT0, "BFM","Take Note Club (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4takcl )
+GAMEL( 200?, sc4takcld   ,sc4takcl,  sc4_5reel, sc4takcl, sc4_state, sc4takcl, ROT0, "BFM","Take Note Club (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4takcl )
+GAMEL( 200?, sc4takcli   ,sc4takcl,  sc4_5reel, sc4takcl, sc4_state, sc4takcl, ROT0, "BFM","Take Note Club (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4takcl )
+GAMEL( 200?, sc4takclj   ,sc4takcl,  sc4_5reel, sc4takcl, sc4_state, sc4takcl, ROT0, "BFM","Take Note Club (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4takcl )
 //  PR1323 CLUB TAKE NOTE         CLUB TAKE NOTE  CLUB  PR1323 CNOT SOUNDS11
-GAMEL( 200?, sc4takclg   ,sc4takcl,  sc4_5reel, sc4takcl, sc4_state, sc4takcl_mbus, ROT0, "BFM","Take Note Club (Bellfruit) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4takclh   ,sc4takcl,  sc4_5reel, sc4takcl, sc4_state, sc4takcl_mbus, ROT0, "BFM","Take Note Club (Bellfruit) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4takclg   ,sc4takcl,  sc4_5reel, sc4takcl, sc4_state, sc4takcl_mbus, ROT0, "BFM","Take Note Club (Bellfruit) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_sc4takcl )
+GAMEL( 200?, sc4takclh   ,sc4takcl,  sc4_5reel, sc4takcl, sc4_state, sc4takcl_mbus, ROT0, "BFM","Take Note Club (Bellfruit) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_sc4takcl )
 // PR1323 CLUB TAKE NOTE 500         PR1323 CNOT SOUNDS11
-GAMEL( 200?, sc4takcla   ,sc4takcl,  sc4_5reel, sc4takcl, sc4_state, sc4takcl, ROT0, "BFM","Take Note Club 500 (Bellfruit) (Scorpion 4)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4takcla   ,sc4takcl,  sc4_5reel, sc4takcl, sc4_state, sc4takcl, ROT0, "BFM","Take Note Club 500 (Bellfruit) (Scorpion 4)", MACHINE_FLAGS, layout_sc4takcl )
 // PR1323 CLUB TAKE NOTE FERRY         PR1323 CNOT SOUNDS11
-GAMEL( 200?, sc4takclb   ,sc4takcl,  sc4_5reel, sc4takcl, sc4_state, sc4takcl, ROT0, "BFM","Take Note Club (Ferry) (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4takclc   ,sc4takcl,  sc4_5reel, sc4takcl, sc4_state, sc4takcl, ROT0, "BFM","Take Note Club (Ferry) (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4takcle   ,sc4takcl,  sc4_5reel, sc4takcl, sc4_state, sc4takcl, ROT0, "BFM","Take Note Club (Ferry) (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4takclf   ,sc4takcl,  sc4_5reel, sc4takcl, sc4_state, sc4takcl, ROT0, "BFM","Take Note Club (Ferry) (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4takclb   ,sc4takcl,  sc4_5reel, sc4takcl, sc4_state, sc4takcl, ROT0, "BFM","Take Note Club (Ferry) (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4takcl )
+GAMEL( 200?, sc4takclc   ,sc4takcl,  sc4_5reel, sc4takcl, sc4_state, sc4takcl, ROT0, "BFM","Take Note Club (Ferry) (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4takcl )
+GAMEL( 200?, sc4takcle   ,sc4takcl,  sc4_5reel, sc4takcl, sc4_state, sc4takcl, ROT0, "BFM","Take Note Club (Ferry) (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4takcl )
+GAMEL( 200?, sc4takclf   ,sc4takcl,  sc4_5reel, sc4takcl, sc4_state, sc4takcl, ROT0, "BFM","Take Note Club (Ferry) (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4takcl )
 
 DRIVER_INIT_MEMBER(sc4_state,sc4tetri)
 {
@@ -32403,8 +32572,8 @@ INPUT_PORTS_START( sc4tbana ) // this structure is generated
 INPUT_PORTS_END
 
 // PR1110 TOP BANANA         PR1110 TOP BANANA SOUNDS11
-GAMEL( 200?, sc4tbana    ,0,         sc4_200_5rb, sc4tbana, sc4_state, sc4tbana, ROT0, "BFM","Top Banana (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4tbanaa   ,sc4tbana,  sc4_200_5rb, sc4tbana, sc4_state, sc4tbana, ROT0, "BFM","Top Banana (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4tbana    ,0,         sc4_200_5rb, sc4tbana, sc4_state, sc4tbana, ROT0, "BFM","Top Banana (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4tbana )
+GAMEL( 200?, sc4tbanaa   ,sc4tbana,  sc4_200_5rb, sc4tbana, sc4_state, sc4tbana, ROT0, "BFM","Top Banana (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4tbana )
 
 
 // REEL 4 ERR 24  (what should be here?)
@@ -32518,7 +32687,7 @@ INPUT_PORTS_START( sc4tload ) // this structure is generated
 INPUT_PORTS_END
 
 // PR2112 TOP LOADER         LOAD SOUNDS         TOP LOADER
-GAMEL( 200?, sc4tload    ,0,         sc4_4reel_alt, sc4tload, sc4_state, sc4tload, ROT0, "Mazooma","Top Loader (Mazooma) (Scorpion 4)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4tload    ,0,         sc4_4reel_alt, sc4tload, sc4_state, sc4tload, ROT0, "Mazooma","Top Loader (Mazooma) (Scorpion 4)", MACHINE_FLAGS, layout_sc4tload )
 
 
 
@@ -32599,10 +32768,10 @@ INPUT_PORTS_START( sc4ttomb ) // this structure is generated
 INPUT_PORTS_END
 
 // PR1305 TREASURE TOMB         PR1305 TRES TOMB SOUNDS11         /    HIT SHOT
-GAMEL( 200?, sc4ttomb    ,0,         sc4_200_4rb, sc4ttomb, sc4_state, sc4ttomb, ROT0, "BFM","Treasure Tomb (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4ttomba   ,sc4ttomb,  sc4_200_4rb, sc4ttomb, sc4_state, sc4ttomb, ROT0, "BFM","Treasure Tomb (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4ttombb   ,sc4ttomb,  sc4_200_4rb, sc4ttomb, sc4_state, sc4ttomb, ROT0, "BFM","Treasure Tomb (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4ttombc   ,sc4ttomb,  sc4_200_4rb, sc4ttomb, sc4_state, sc4ttomb, ROT0, "BFM","Treasure Tomb (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4ttomb    ,0,         sc4_200_4rb, sc4ttomb, sc4_state, sc4ttomb, ROT0, "BFM","Treasure Tomb (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4ttomb )
+GAMEL( 200?, sc4ttomba   ,sc4ttomb,  sc4_200_4rb, sc4ttomb, sc4_state, sc4ttomb, ROT0, "BFM","Treasure Tomb (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4ttomb )
+GAMEL( 200?, sc4ttombb   ,sc4ttomb,  sc4_200_4rb, sc4ttomb, sc4_state, sc4ttomb, ROT0, "BFM","Treasure Tomb (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4ttomb )
+GAMEL( 200?, sc4ttombc   ,sc4ttomb,  sc4_200_4rb, sc4ttomb, sc4_state, sc4ttomb, ROT0, "BFM","Treasure Tomb (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4ttomb )
 
 
 
@@ -32652,8 +32821,8 @@ INPUT_PORTS_START( sc4tridn ) // this structure is generated
 INPUT_PORTS_END
 
 // PR2103 THE TRIDENT         TRID SOUNDS         THE TRIDENT
-GAMEL( 200?, sc4tridn    ,0,         sc4_5reel, sc4tridn, sc4_state, sc4tridn, ROT0, "Mazooma","The Trident (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4tridna   ,sc4tridn,  sc4_5reel, sc4tridn, sc4_state, sc4tridn, ROT0, "Mazooma","The Trident (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4tridn    ,0,         sc4_5reel, sc4tridn, sc4_state, sc4tridn, ROT0, "Mazooma","The Trident (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4tridn )
+GAMEL( 200?, sc4tridna   ,sc4tridn,  sc4_5reel, sc4tridn, sc4_state, sc4tridn, ROT0, "Mazooma","The Trident (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4tridn )
 
 
 
@@ -32734,17 +32903,17 @@ INPUT_PORTS_START( sc4vrgcl ) // this structure is generated
 INPUT_PORTS_END
 
 // PR1037 CLUB VERY RICH GEEZER         PR1037 RICH SOUNDS11         VERY RICH GEEZER
-GAMEL( 200?, sc4vrgcl    ,0,         sc4_200_5rb, sc4vrgcl, sc4_state, sc4vrgcl, ROT0, "BFM","Very Rich Geezer Club (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4vrgcla   ,sc4vrgcl,  sc4_200_5rb, sc4vrgcl, sc4_state, sc4vrgcl, ROT0, "BFM","Very Rich Geezer Club (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4vrgclb   ,sc4vrgcl,  sc4_200_5rb, sc4vrgcl, sc4_state, sc4vrgcl, ROT0, "BFM","Very Rich Geezer Club (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4vrgclc   ,sc4vrgcl,  sc4_200_5rb, sc4vrgcl, sc4_state, sc4vrgcl, ROT0, "BFM","Very Rich Geezer Club (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4vrgcld   ,sc4vrgcl,  sc4_200_5rb, sc4vrgcl, sc4_state, sc4vrgcl, ROT0, "BFM","Very Rich Geezer Club (Bellfruit) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4vrgcle   ,sc4vrgcl,  sc4_200_5rb, sc4vrgcl, sc4_state, sc4vrgcl, ROT0, "BFM","Very Rich Geezer Club (Bellfruit) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4vrgclf   ,sc4vrgcl,  sc4_200_5rb, sc4vrgcl, sc4_state, sc4vrgcl, ROT0, "BFM","Very Rich Geezer Club (Bellfruit) (Scorpion 4) (set 7)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4vrgclg   ,sc4vrgcl,  sc4_200_5rb, sc4vrgcl, sc4_state, sc4vrgcl, ROT0, "BFM","Very Rich Geezer Club (Bellfruit) (Scorpion 4) (set 8)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4vrgcl    ,0,         sc4_200_5rb, sc4vrgcl, sc4_state, sc4vrgcl, ROT0, "BFM","Very Rich Geezer Club (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4vrgclb )
+GAMEL( 200?, sc4vrgcla   ,sc4vrgcl,  sc4_200_5rb, sc4vrgcl, sc4_state, sc4vrgcl, ROT0, "BFM","Very Rich Geezer Club (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4vrgclb )
+GAMEL( 200?, sc4vrgclb   ,sc4vrgcl,  sc4_200_5rb, sc4vrgcl, sc4_state, sc4vrgcl, ROT0, "BFM","Very Rich Geezer Club (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4vrgclb )
+GAMEL( 200?, sc4vrgclc   ,sc4vrgcl,  sc4_200_5rb, sc4vrgcl, sc4_state, sc4vrgcl, ROT0, "BFM","Very Rich Geezer Club (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4vrgclb )
+GAMEL( 200?, sc4vrgcld   ,sc4vrgcl,  sc4_200_5rb, sc4vrgcl, sc4_state, sc4vrgcl, ROT0, "BFM","Very Rich Geezer Club (Bellfruit) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_sc4vrgclb )
+GAMEL( 200?, sc4vrgcle   ,sc4vrgcl,  sc4_200_5rb, sc4vrgcl, sc4_state, sc4vrgcl, ROT0, "BFM","Very Rich Geezer Club (Bellfruit) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_sc4vrgclb )
+GAMEL( 200?, sc4vrgclf   ,sc4vrgcl,  sc4_200_5rb, sc4vrgcl, sc4_state, sc4vrgcl, ROT0, "BFM","Very Rich Geezer Club (Bellfruit) (Scorpion 4) (set 7)", MACHINE_FLAGS, layout_sc4vrgclb )
+GAMEL( 200?, sc4vrgclg   ,sc4vrgcl,  sc4_200_5rb, sc4vrgcl, sc4_state, sc4vrgcl, ROT0, "BFM","Very Rich Geezer Club (Bellfruit) (Scorpion 4) (set 8)", MACHINE_FLAGS, layout_sc4vrgclb )
 // PR1037 CLUB VERY RICH GEEZER         VERY RICH GEEZER  CLUB  PR1037 RICH SOUNDS11         VERY RICH GEEZER
-GAMEL( 200?, sc4vrgclh   ,sc4vrgcl,  sc4_200_5rb, sc4vrgcl, sc4_state, sc4vrgcl_mbus, ROT0, "BFM","Very Rich Geezer Club (Bellfruit) (Scorpion 4) (set 9)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4vrgcli   ,sc4vrgcl,  sc4_200_5rb, sc4vrgcl, sc4_state, sc4vrgcl_mbus, ROT0, "BFM","Very Rich Geezer Club (Bellfruit) (Scorpion 4) (set 10)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4vrgclh   ,sc4vrgcl,  sc4_200_5rb, sc4vrgcl, sc4_state, sc4vrgcl_mbus, ROT0, "BFM","Very Rich Geezer Club (Bellfruit) (Scorpion 4) (set 9)", MACHINE_FLAGS, layout_sc4vrgclb )
+GAMEL( 200?, sc4vrgcli   ,sc4vrgcl,  sc4_200_5rb, sc4vrgcl, sc4_state, sc4vrgcl_mbus, ROT0, "BFM","Very Rich Geezer Club (Bellfruit) (Scorpion 4) (set 10)", MACHINE_FLAGS, layout_sc4vrgclb )
 
 
 DRIVER_INIT_MEMBER(sc4_state,sc4leg)
@@ -33285,8 +33454,8 @@ INPUT_PORTS_START( sc4xmark ) // this structure is generated
 INPUT_PORTS_END
 
 // PR1116 X MARKS THE SPOT         PR1116 X MARKS THE SPOT SOUNDS11
-GAMEL( 200?, sc4xmark    ,0,         sc4_200_4rb, sc4xmark, sc4_state, sc4xmark, ROT0, "BFM","X Marks The Spot (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4xmarka   ,sc4xmark,  sc4_200_4rb, sc4xmark, sc4_state, sc4xmark, ROT0, "BFM","X Marks The Spot (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4xmark    ,0,         sc4_200_4rb, sc4xmark, sc4_state, sc4xmark, ROT0, "BFM","X Marks The Spot (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4xmarka )
+GAMEL( 200?, sc4xmarka   ,sc4xmark,  sc4_200_4rb, sc4xmark, sc4_state, sc4xmark, ROT0, "BFM","X Marks The Spot (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4xmarka )
 
 
 
@@ -33350,14 +33519,14 @@ INPUT_PORTS_START( sc4blokq ) // this structure is generated
 INPUT_PORTS_END
 
 // PR2025 BLOCK BUSTER         BUSTERSND           BLOCK BUSTER
-GAMEL( 200?, sc4blokq    ,0,         sc4_200_4ra, sc4blokq, sc4_state, sc4blokq, ROT0, "Qps","Blockbuster (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4blokqa   ,sc4blokq,  sc4_200_4ra, sc4blokq, sc4_state, sc4blokq, ROT0, "Qps","Blockbuster (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4blokqb   ,sc4blokq,  sc4_200_4ra, sc4blokq, sc4_state, sc4blokq, ROT0, "Qps","Blockbuster (Qps) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4blokqc   ,sc4blokq,  sc4_200_4ra, sc4blokq, sc4_state, sc4blokq, ROT0, "Qps","Blockbuster (Qps) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4blokqd   ,sc4blokq,  sc4_200_4ra, sc4blokq, sc4_state, sc4blokq, ROT0, "Qps","Blockbuster (Qps) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4blokqe   ,sc4blokq,  sc4_200_4ra, sc4blokq, sc4_state, sc4blokq, ROT0, "Qps","Blockbuster (Qps) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4blokq    ,0,         sc4_200_4ra, sc4blokq, sc4_state, sc4blokq, ROT0, "Qps","Blockbuster (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4blokq )
+GAMEL( 200?, sc4blokqa   ,sc4blokq,  sc4_200_4ra, sc4blokq, sc4_state, sc4blokq, ROT0, "Qps","Blockbuster (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4blokq )
+GAMEL( 200?, sc4blokqb   ,sc4blokq,  sc4_200_4ra, sc4blokq, sc4_state, sc4blokq, ROT0, "Qps","Blockbuster (Qps) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4blokq )
+GAMEL( 200?, sc4blokqc   ,sc4blokq,  sc4_200_4ra, sc4blokq, sc4_state, sc4blokq, ROT0, "Qps","Blockbuster (Qps) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4blokq )
+GAMEL( 200?, sc4blokqd   ,sc4blokq,  sc4_200_4ra, sc4blokq, sc4_state, sc4blokq, ROT0, "Qps","Blockbuster (Qps) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_sc4blokq )
+GAMEL( 200?, sc4blokqe   ,sc4blokq,  sc4_200_4ra, sc4blokq, sc4_state, sc4blokq, ROT0, "Qps","Blockbuster (Qps) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_sc4blokq )
 // PR2025 BLOCK BUSTER         BUSTERSND           BLOCK BUSTER  (same as sc4blokq ?)
-GAMEL( 200?, sc4bbust    ,sc4blokq,  sc4_200_4ra, sc4blokq, sc4_state, sc4blokq, ROT0, "Mazooma","Blockbuster (Mazooma) (Scorpion 4)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4bbust    ,sc4blokq,  sc4_200_4ra, sc4blokq, sc4_state, sc4blokq, ROT0, "Mazooma","Blockbuster (Mazooma) (Scorpion 4)", MACHINE_FLAGS, layout_sc4blokq )
 
 
 
@@ -33599,26 +33768,26 @@ INPUT_PORTS_START( sc4po8 ) // this structure is generated
 INPUT_PORTS_END
 
 // PR2530 PIECES OF EIGHT V1.0         PIECESOFEIGHTSND         PIECES OF EIGHT
-GAMEL( 200?, sc4po8      ,0,         sc4_4reel, sc4po8, sc4_state, sc4po8, ROT0, "Qps","Pieces Of Eight (V1.0) (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4po8e     ,sc4po8,    sc4_4reel, sc4po8, sc4_state, sc4po8, ROT0, "Qps","Pieces Of Eight (V1.0) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4po8f     ,sc4po8,    sc4_4reel, sc4po8, sc4_state, sc4po8, ROT0, "Qps","Pieces Of Eight (V1.0) (Qps) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4po8      ,0,         sc4_4reel, sc4po8, sc4_state, sc4po8, ROT0, "Qps","Pieces Of Eight (V1.0) (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4po8 )
+GAMEL( 200?, sc4po8e     ,sc4po8,    sc4_4reel, sc4po8, sc4_state, sc4po8, ROT0, "Qps","Pieces Of Eight (V1.0) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4po8 )
+GAMEL( 200?, sc4po8f     ,sc4po8,    sc4_4reel, sc4po8, sc4_state, sc4po8, ROT0, "Qps","Pieces Of Eight (V1.0) (Qps) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4po8 )
 // PR2530 PIECES OF EIGHT V1.1         PIECESOFEIGHTSND         PIECES OF EIGHT
-GAMEL( 200?, sc4po8a     ,sc4po8,    sc4_4reel, sc4po8, sc4_state, sc4po8, ROT0, "Qps","Pieces Of Eight (V1.1) (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4po8b     ,sc4po8,    sc4_4reel, sc4po8, sc4_state, sc4po8, ROT0, "Qps","Pieces Of Eight (V1.1) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4po8g     ,sc4po8,    sc4_4reel, sc4po8, sc4_state, sc4po8, ROT0, "Qps","Pieces Of Eight (V1.1) (Qps) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4po8h     ,sc4po8,    sc4_4reel, sc4po8, sc4_state, sc4po8, ROT0, "Qps","Pieces Of Eight (V1.1) (Qps) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4po8a     ,sc4po8,    sc4_4reel, sc4po8, sc4_state, sc4po8, ROT0, "Qps","Pieces Of Eight (V1.1) (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4po8 )
+GAMEL( 200?, sc4po8b     ,sc4po8,    sc4_4reel, sc4po8, sc4_state, sc4po8, ROT0, "Qps","Pieces Of Eight (V1.1) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4po8 )
+GAMEL( 200?, sc4po8g     ,sc4po8,    sc4_4reel, sc4po8, sc4_state, sc4po8, ROT0, "Qps","Pieces Of Eight (V1.1) (Qps) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4po8 )
+GAMEL( 200?, sc4po8h     ,sc4po8,    sc4_4reel, sc4po8, sc4_state, sc4po8, ROT0, "Qps","Pieces Of Eight (V1.1) (Qps) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4po8 )
 // PR2530 PIECES OF EIGHT 011         PIECESOFEIGHTSND         PIECES OF EIGHT
-GAMEL( 200?, sc4po8c     ,sc4po8,    sc4_4reel, sc4po8, sc4_state, sc4po8_mbus, ROT0, "Qps","Pieces Of Eight (011) (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4po8m     ,sc4po8,    sc4_4reel, sc4po8, sc4_state, sc4po8_mbus, ROT0, "QPS","Pieces Of Eight (011) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4po8c     ,sc4po8,    sc4_4reel, sc4po8, sc4_state, sc4po8_mbus, ROT0, "Qps","Pieces Of Eight (011) (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4po8 )
+GAMEL( 200?, sc4po8m     ,sc4po8,    sc4_4reel, sc4po8, sc4_state, sc4po8_mbus, ROT0, "QPS","Pieces Of Eight (011) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4po8 )
 // PR2530 PIECES OF EIGHT 012         PIECESOFEIGHTSND         PIECES OF EIGHT
-GAMEL( 200?, sc4po8i     ,sc4po8,    sc4_4reel, sc4po8, sc4_state, sc4po8, ROT0, "Qps","Pieces Of Eight (012) (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4po8k     ,sc4po8,    sc4_4reel, sc4po8, sc4_state, sc4po8, ROT0, "Qps","Pieces Of Eight (012) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4po8i     ,sc4po8,    sc4_4reel, sc4po8, sc4_state, sc4po8, ROT0, "Qps","Pieces Of Eight (012) (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4po8 )
+GAMEL( 200?, sc4po8k     ,sc4po8,    sc4_4reel, sc4po8, sc4_state, sc4po8, ROT0, "Qps","Pieces Of Eight (012) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4po8 )
 // PR2530 PIECES OF EIGHT 041         PIECESOFEIGHTSND         PIECES OF EIGHT
-GAMEL( 200?, sc4po8d     ,sc4po8,    sc4_4reel, sc4po8, sc4_state, sc4po8_mbus, ROT0, "Qps","Pieces Of Eight (041) (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4po8n     ,sc4po8,    sc4_4reel, sc4po8, sc4_state, sc4po8_mbus, ROT0, "QPS","Pieces Of Eight (041) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4po8d     ,sc4po8,    sc4_4reel, sc4po8, sc4_state, sc4po8_mbus, ROT0, "Qps","Pieces Of Eight (041) (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4po8 )
+GAMEL( 200?, sc4po8n     ,sc4po8,    sc4_4reel, sc4po8, sc4_state, sc4po8_mbus, ROT0, "QPS","Pieces Of Eight (041) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4po8 )
 // PR2530 PIECES OF EIGHT 042         PIECESOFEIGHTSND         PIECES OF EIGHT
-GAMEL( 200?, sc4po8j     ,sc4po8,    sc4_4reel, sc4po8, sc4_state, sc4po8, ROT0, "Qps","Pieces Of Eight (042) (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4po8l     ,sc4po8,    sc4_4reel, sc4po8, sc4_state, sc4po8, ROT0, "Qps","Pieces Of Eight (042) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4po8j     ,sc4po8,    sc4_4reel, sc4po8, sc4_state, sc4po8, ROT0, "Qps","Pieces Of Eight (042) (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4po8 )
+GAMEL( 200?, sc4po8l     ,sc4po8,    sc4_4reel, sc4po8, sc4_state, sc4po8, ROT0, "Qps","Pieces Of Eight (042) (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4po8 )
 
 
 
@@ -33980,10 +34149,10 @@ INPUT_PORTS_START( sc4bantm ) // this structure is generated
 INPUT_PORTS_END
 
 // PR2301 BANTAM OF THE OPERA         BANTAM SOUNDS         BANTAMOFTHEOPERA
-GAMEL( 200?, sc4bantm    ,0,         sc4_200_4ra, sc4bantm, sc4_state, sc4bantm, ROT0, "Mazooma","Bantam Of The Opera (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4bantma   ,sc4bantm,  sc4_200_4ra, sc4bantm, sc4_state, sc4bantm, ROT0, "Mazooma","Bantam Of The Opera (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4bantmb   ,sc4bantm,  sc4_200_4ra, sc4bantm, sc4_state, sc4bantm, ROT0, "Mazooma","Bantam Of The Opera (Mazooma) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4bantmc   ,sc4bantm,  sc4_200_4ra, sc4bantm, sc4_state, sc4bantm, ROT0, "Mazooma","Bantam Of The Opera (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4bantm    ,0,         sc4_200_4ra, sc4bantm, sc4_state, sc4bantm, ROT0, "Mazooma","Bantam Of The Opera (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4bantm )
+GAMEL( 200?, sc4bantma   ,sc4bantm,  sc4_200_4ra, sc4bantm, sc4_state, sc4bantm, ROT0, "Mazooma","Bantam Of The Opera (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4bantm )
+GAMEL( 200?, sc4bantmb   ,sc4bantm,  sc4_200_4ra, sc4bantm, sc4_state, sc4bantm, ROT0, "Mazooma","Bantam Of The Opera (Mazooma) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4bantm )
+GAMEL( 200?, sc4bantmc   ,sc4bantm,  sc4_200_4ra, sc4bantm, sc4_state, sc4bantm, ROT0, "Mazooma","Bantam Of The Opera (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4bantm )
 
 
 
@@ -34478,20 +34647,20 @@ INPUT_PORTS_START( sc4cabin ) // this structure is generated
 INPUT_PORTS_END
 
 // PR2209 CABIN FEVER         CABF SOUNDS         CABIN FEVER
-GAMEL( 200?, sc4cabin    ,0,         sc4, sc4cabin, sc4_state, sc4cabin, ROT0, "Mazooma","Cabin Fever (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cabina   ,sc4cabin,  sc4, sc4cabin, sc4_state, sc4cabin, ROT0, "Mazooma","Cabin Fever (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cabinb   ,sc4cabin,  sc4, sc4cabin, sc4_state, sc4cabin, ROT0, "Mazooma","Cabin Fever (Mazooma) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cabinc   ,sc4cabin,  sc4, sc4cabin, sc4_state, sc4cabin, ROT0, "Mazooma","Cabin Fever (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cabind   ,sc4cabin,  sc4, sc4cabin, sc4_state, sc4cabin, ROT0, "Mazooma","Cabin Fever (Mazooma) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cabine   ,sc4cabin,  sc4, sc4cabin, sc4_state, sc4cabin, ROT0, "Mazooma","Cabin Fever (Mazooma) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cabinf   ,sc4cabin,  sc4, sc4cabin, sc4_state, sc4cabin, ROT0, "Mazooma","Cabin Fever (Mazooma) (Scorpion 4) (set 7)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cabing   ,sc4cabin,  sc4, sc4cabin, sc4_state, sc4cabin, ROT0, "Mazooma","Cabin Fever (Mazooma) (Scorpion 4) (set 8)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cabinh   ,sc4cabin,  sc4, sc4cabin, sc4_state, sc4cabin, ROT0, "Mazooma","Cabin Fever (Mazooma) (Scorpion 4) (set 9)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cabini   ,sc4cabin,  sc4, sc4cabin, sc4_state, sc4cabin, ROT0, "Mazooma","Cabin Fever (Mazooma) (Scorpion 4) (set 10)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cabinj   ,sc4cabin,  sc4, sc4cabin, sc4_state, sc4cabin, ROT0, "Mazooma","Cabin Fever (Mazooma) (Scorpion 4) (set 11)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cabink   ,sc4cabin,  sc4, sc4cabin, sc4_state, sc4cabin, ROT0, "Mazooma","Cabin Fever (Mazooma) (Scorpion 4) (set 12)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cabinl   ,sc4cabin,  sc4, sc4cabin, sc4_state, sc4cabin, ROT0, "Mazooma","Cabin Fever (Mazooma) (Scorpion 4) (set 13)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cabinm   ,sc4cabin,  sc4, sc4cabin, sc4_state, sc4cabin, ROT0, "Mazooma","Cabin Fever (Mazooma) (Scorpion 4) (set 14)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4cabin    ,0,         sc4, sc4cabin, sc4_state, sc4cabin, ROT0, "Mazooma","Cabin Fever (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4cabin )
+GAMEL( 200?, sc4cabina   ,sc4cabin,  sc4, sc4cabin, sc4_state, sc4cabin, ROT0, "Mazooma","Cabin Fever (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4cabin )
+GAMEL( 200?, sc4cabinb   ,sc4cabin,  sc4, sc4cabin, sc4_state, sc4cabin, ROT0, "Mazooma","Cabin Fever (Mazooma) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4cabin )
+GAMEL( 200?, sc4cabinc   ,sc4cabin,  sc4, sc4cabin, sc4_state, sc4cabin, ROT0, "Mazooma","Cabin Fever (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4cabin )
+GAMEL( 200?, sc4cabind   ,sc4cabin,  sc4, sc4cabin, sc4_state, sc4cabin, ROT0, "Mazooma","Cabin Fever (Mazooma) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_sc4cabin )
+GAMEL( 200?, sc4cabine   ,sc4cabin,  sc4, sc4cabin, sc4_state, sc4cabin, ROT0, "Mazooma","Cabin Fever (Mazooma) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_sc4cabin )
+GAMEL( 200?, sc4cabinf   ,sc4cabin,  sc4, sc4cabin, sc4_state, sc4cabin, ROT0, "Mazooma","Cabin Fever (Mazooma) (Scorpion 4) (set 7)", MACHINE_FLAGS, layout_sc4cabin )
+GAMEL( 200?, sc4cabing   ,sc4cabin,  sc4, sc4cabin, sc4_state, sc4cabin, ROT0, "Mazooma","Cabin Fever (Mazooma) (Scorpion 4) (set 8)", MACHINE_FLAGS, layout_sc4cabin )
+GAMEL( 200?, sc4cabinh   ,sc4cabin,  sc4, sc4cabin, sc4_state, sc4cabin, ROT0, "Mazooma","Cabin Fever (Mazooma) (Scorpion 4) (set 9)", MACHINE_FLAGS, layout_sc4cabin )
+GAMEL( 200?, sc4cabini   ,sc4cabin,  sc4, sc4cabin, sc4_state, sc4cabin, ROT0, "Mazooma","Cabin Fever (Mazooma) (Scorpion 4) (set 10)", MACHINE_FLAGS, layout_sc4cabin )
+GAMEL( 200?, sc4cabinj   ,sc4cabin,  sc4, sc4cabin, sc4_state, sc4cabin, ROT0, "Mazooma","Cabin Fever (Mazooma) (Scorpion 4) (set 11)", MACHINE_FLAGS, layout_sc4cabin )
+GAMEL( 200?, sc4cabink   ,sc4cabin,  sc4, sc4cabin, sc4_state, sc4cabin, ROT0, "Mazooma","Cabin Fever (Mazooma) (Scorpion 4) (set 12)", MACHINE_FLAGS, layout_sc4cabin )
+GAMEL( 200?, sc4cabinl   ,sc4cabin,  sc4, sc4cabin, sc4_state, sc4cabin, ROT0, "Mazooma","Cabin Fever (Mazooma) (Scorpion 4) (set 13)", MACHINE_FLAGS, layout_sc4cabin )
+GAMEL( 200?, sc4cabinm   ,sc4cabin,  sc4, sc4cabin, sc4_state, sc4cabin, ROT0, "Mazooma","Cabin Fever (Mazooma) (Scorpion 4) (set 14)", MACHINE_FLAGS, layout_sc4cabin )
 
 
 DRIVER_INIT_MEMBER(sc4_state,sc4cari)
@@ -34616,14 +34785,14 @@ INPUT_PORTS_START( sc4cariq ) // this structure is generated
 INPUT_PORTS_END
 
 // these lack identification strings, and it's not the same game as above
-GAMEL( 200?, sc4cariq    ,0,         sc4_4reel, sc4cariq, sc4_state, sc4cariq, ROT0, "Qps","Caribbean Cash (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cariqa   ,sc4cariq,  sc4_4reel, sc4cariq, sc4_state, sc4cariq, ROT0, "Qps","Caribbean Cash (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cariqb   ,sc4cariq,  sc4_4reel, sc4cariq, sc4_state, sc4cariq, ROT0, "Qps","Caribbean Cash (Qps) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cariqc   ,sc4cariq,  sc4_4reel, sc4cariq, sc4_state, sc4cariq, ROT0, "Qps","Caribbean Cash (Qps) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cariqd   ,sc4cariq,  sc4_4reel, sc4cariq, sc4_state, sc4cariq, ROT0, "Qps","Caribbean Cash (Qps) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cariqe   ,sc4cariq,  sc4_4reel, sc4cariq, sc4_state, sc4cariq, ROT0, "Qps","Caribbean Cash (Qps) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cariqf   ,sc4cariq,  sc4_4reel, sc4cariq, sc4_state, sc4cariq, ROT0, "Qps","Caribbean Cash (Qps) (Scorpion 4) (set 7)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cariqg   ,sc4cariq,  sc4_4reel, sc4cariq, sc4_state, sc4cariq, ROT0, "Qps","Caribbean Cash (Qps) (Scorpion 4) (set 8)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4cariq    ,0,         sc4_4reel, sc4cariq, sc4_state, sc4cariq, ROT0, "Qps","Caribbean Cash (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4cariqd )
+GAMEL( 200?, sc4cariqa   ,sc4cariq,  sc4_4reel, sc4cariq, sc4_state, sc4cariq, ROT0, "Qps","Caribbean Cash (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4cariqd )
+GAMEL( 200?, sc4cariqb   ,sc4cariq,  sc4_4reel, sc4cariq, sc4_state, sc4cariq, ROT0, "Qps","Caribbean Cash (Qps) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4cariqd )
+GAMEL( 200?, sc4cariqc   ,sc4cariq,  sc4_4reel, sc4cariq, sc4_state, sc4cariq, ROT0, "Qps","Caribbean Cash (Qps) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4cariqd )
+GAMEL( 200?, sc4cariqd   ,sc4cariq,  sc4_4reel, sc4cariq, sc4_state, sc4cariq, ROT0, "Qps","Caribbean Cash (Qps) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_sc4cariqd )
+GAMEL( 200?, sc4cariqe   ,sc4cariq,  sc4_4reel, sc4cariq, sc4_state, sc4cariq, ROT0, "Qps","Caribbean Cash (Qps) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_sc4cariqd )
+GAMEL( 200?, sc4cariqf   ,sc4cariq,  sc4_4reel, sc4cariq, sc4_state, sc4cariq, ROT0, "Qps","Caribbean Cash (Qps) (Scorpion 4) (set 7)", MACHINE_FLAGS, layout_sc4cariqd )
+GAMEL( 200?, sc4cariqg   ,sc4cariq,  sc4_4reel, sc4cariq, sc4_state, sc4cariq, ROT0, "Qps","Caribbean Cash (Qps) (Scorpion 4) (set 8)", MACHINE_FLAGS, layout_sc4cariqd )
 
 
 DRIVER_INIT_MEMBER(sc4_state,sc4cblas)
@@ -34899,14 +35068,14 @@ INPUT_PORTS_START( sc4chavy ) // this structure is generated
 INPUT_PORTS_END
 
 // PR2305 CHAVVY CHASE         CHVY SOUNDS
-GAMEL( 200?, sc4chavy    ,0,         sc4_5reel_alt, sc4chavy, sc4_state, sc4chavy, ROT0, "Mazooma","Chavy Chase (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4chavya   ,sc4chavy,  sc4_5reel_alt, sc4chavy, sc4_state, sc4chavy, ROT0, "Mazooma","Chavy Chase (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4chavyb   ,sc4chavy,  sc4_5reel_alt, sc4chavy, sc4_state, sc4chavy, ROT0, "Mazooma","Chavy Chase (Mazooma) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4chavyc   ,sc4chavy,  sc4_5reel_alt, sc4chavy, sc4_state, sc4chavy, ROT0, "Mazooma","Chavy Chase (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4chavyd   ,sc4chavy,  sc4_5reel_alt, sc4chavy, sc4_state, sc4chavy, ROT0, "Mazooma","Chavy Chase (Mazooma) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4chavye   ,sc4chavy,  sc4_5reel_alt, sc4chavy, sc4_state, sc4chavy, ROT0, "Mazooma","Chavy Chase (Mazooma) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4chavyf   ,sc4chavy,  sc4_5reel_alt, sc4chavy, sc4_state, sc4chavy, ROT0, "Mazooma","Chavy Chase (Mazooma) (Scorpion 4) (set 7)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4chavyg   ,sc4chavy,  sc4_5reel_alt, sc4chavy, sc4_state, sc4chavy, ROT0, "Mazooma","Chavy Chase (Mazooma) (Scorpion 4) (set 8)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4chavy    ,0,         sc4_5reel_alt, sc4chavy, sc4_state, sc4chavy, ROT0, "Mazooma","Chavy Chase (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4chavy )
+GAMEL( 200?, sc4chavya   ,sc4chavy,  sc4_5reel_alt, sc4chavy, sc4_state, sc4chavy, ROT0, "Mazooma","Chavy Chase (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4chavy )
+GAMEL( 200?, sc4chavyb   ,sc4chavy,  sc4_5reel_alt, sc4chavy, sc4_state, sc4chavy, ROT0, "Mazooma","Chavy Chase (Mazooma) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4chavy )
+GAMEL( 200?, sc4chavyc   ,sc4chavy,  sc4_5reel_alt, sc4chavy, sc4_state, sc4chavy, ROT0, "Mazooma","Chavy Chase (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4chavy )
+GAMEL( 200?, sc4chavyd   ,sc4chavy,  sc4_5reel_alt, sc4chavy, sc4_state, sc4chavy, ROT0, "Mazooma","Chavy Chase (Mazooma) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_sc4chavy )
+GAMEL( 200?, sc4chavye   ,sc4chavy,  sc4_5reel_alt, sc4chavy, sc4_state, sc4chavy, ROT0, "Mazooma","Chavy Chase (Mazooma) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_sc4chavy )
+GAMEL( 200?, sc4chavyf   ,sc4chavy,  sc4_5reel_alt, sc4chavy, sc4_state, sc4chavy, ROT0, "Mazooma","Chavy Chase (Mazooma) (Scorpion 4) (set 7)", MACHINE_FLAGS, layout_sc4chavy )
+GAMEL( 200?, sc4chavyg   ,sc4chavy,  sc4_5reel_alt, sc4chavy, sc4_state, sc4chavy, ROT0, "Mazooma","Chavy Chase (Mazooma) (Scorpion 4) (set 8)", MACHINE_FLAGS, layout_sc4chavy )
 
 
 DRIVER_INIT_MEMBER(sc4_state,sc4cmani)
@@ -34986,8 +35155,8 @@ INPUT_PORTS_START( sc4cmani ) // this structure is generated
 INPUT_PORTS_END
 
 // PR1308 COLOUR MANIA         PR1308 COLOUR MAN SOUNDS11
-GAMEL( 200?, sc4cmani    ,0,         sc4_200_4rb, sc4cmani, sc4_state, sc4cmani, ROT0, "BFM","Colour Mania (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cmania   ,sc4cmani,  sc4_200_4rb, sc4cmani, sc4_state, sc4cmani, ROT0, "BFM","Colour Mania (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4cmani    ,0,         sc4_200_4rb, sc4cmani, sc4_state, sc4cmani, ROT0, "BFM","Colour Mania (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4cmania )
+GAMEL( 200?, sc4cmania   ,sc4cmani,  sc4_200_4rb, sc4cmani, sc4_state, sc4cmani, ROT0, "BFM","Colour Mania (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4cmania )
 
 
 DRIVER_INIT_MEMBER(sc4_state,sc4ctl)
@@ -35198,14 +35367,14 @@ INPUT_PORTS_START( sc4coro ) // this structure is generated
 INPUT_PORTS_END
 
 // PR2252 CORONATION  ST         CORRY SOUNDS                 CORONATION  ST
-GAMEL( 200?, sc4coro     ,0,         sc4_4reel_alt, sc4coro, sc4_state, sc4coro, ROT0, "Mazooma","Coronation Street (PR2252) (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4coroa    ,sc4coro,   sc4_4reel_alt, sc4coro, sc4_state, sc4coro, ROT0, "Mazooma","Coronation Street (PR2252) (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4corof    ,sc4coro,   sc4_4reel_alt, sc4coro, sc4_state, sc4coro, ROT0, "Mazooma","Coronation Street (PR2252) (Mazooma) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4corog    ,sc4coro,   sc4_4reel_alt, sc4coro, sc4_state, sc4coro, ROT0, "Mazooma","Coronation Street (PR2252) (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4coroj    ,sc4coro,   sc4_4reel_alt, sc4coro, sc4_state, sc4coro, ROT0, "Mazooma","Coronation Street (PR2252) (Mazooma) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4corok    ,sc4coro,   sc4_4reel_alt, sc4coro, sc4_state, sc4coro, ROT0, "Mazooma","Coronation Street (PR2252) (Mazooma) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4corol    ,sc4coro,   sc4_4reel_alt, sc4coro, sc4_state, sc4coro, ROT0, "Mazooma","Coronation Street (PR2252) (Mazooma) (Scorpion 4) (set 7)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4corom    ,sc4coro,   sc4_4reel_alt, sc4coro, sc4_state, sc4coro, ROT0, "Mazooma","Coronation Street (PR2252) (Mazooma) (Scorpion 4) (set 8)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4coro     ,0,         sc4_4reel_alt, sc4coro, sc4_state, sc4coro, ROT0, "Mazooma","Coronation Street (PR2252) (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4coro )
+GAMEL( 200?, sc4coroa    ,sc4coro,   sc4_4reel_alt, sc4coro, sc4_state, sc4coro, ROT0, "Mazooma","Coronation Street (PR2252) (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4coro )
+GAMEL( 200?, sc4corof    ,sc4coro,   sc4_4reel_alt, sc4coro, sc4_state, sc4coro, ROT0, "Mazooma","Coronation Street (PR2252) (Mazooma) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4coro )
+GAMEL( 200?, sc4corog    ,sc4coro,   sc4_4reel_alt, sc4coro, sc4_state, sc4coro, ROT0, "Mazooma","Coronation Street (PR2252) (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4coro )
+GAMEL( 200?, sc4coroj    ,sc4coro,   sc4_4reel_alt, sc4coro, sc4_state, sc4coro, ROT0, "Mazooma","Coronation Street (PR2252) (Mazooma) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_sc4coro )
+GAMEL( 200?, sc4corok    ,sc4coro,   sc4_4reel_alt, sc4coro, sc4_state, sc4coro, ROT0, "Mazooma","Coronation Street (PR2252) (Mazooma) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_sc4coro )
+GAMEL( 200?, sc4corol    ,sc4coro,   sc4_4reel_alt, sc4coro, sc4_state, sc4coro, ROT0, "Mazooma","Coronation Street (PR2252) (Mazooma) (Scorpion 4) (set 7)", MACHINE_FLAGS, layout_sc4coro )
+GAMEL( 200?, sc4corom    ,sc4coro,   sc4_4reel_alt, sc4coro, sc4_state, sc4coro, ROT0, "Mazooma","Coronation Street (PR2252) (Mazooma) (Scorpion 4) (set 8)", MACHINE_FLAGS, layout_sc4coro )
 
 
 DRIVER_INIT_MEMBER(sc4_state,sc4corod)
@@ -35665,6 +35834,8 @@ GAMEL( 200?, sc4dndcse   ,sc4dndcs,  sc4, sc4dndcs5, sc4_state, sc4dndcs, ROT0, 
 
 DRIVER_INIT_MEMBER(sc4_state,sc4dndbb)
 {
+	m_segment_34_encoding = true;
+
 	DRIVER_INIT_CALL(sc4mbus);
 }
 
@@ -36337,6 +36508,8 @@ GAMEL( 200?, sc4dndrae   ,sc4dndra,  sc4_5reel_alt, sc4dndra70, sc4_state, sc4dn
 
 DRIVER_INIT_MEMBER(sc4_state,sc4dndbd)
 {
+	m_segment_34_encoding = true;
+
 	DRIVER_INIT_CALL(sc4mbus);
 }
 
@@ -36528,6 +36701,8 @@ GAMEL( 200?, sc4dndbrg   ,sc4dndbr,  sc4_5reel_alt, sc4dndbr70, sc4_state, sc4dn
 
 DRIVER_INIT_MEMBER(sc4_state,sc4dndcc)
 {
+	m_segment_34_encoding = true;
+
 	DRIVER_INIT_CALL(sc4mbus);
 }
 
@@ -36812,6 +36987,8 @@ GAMEL( 200?, sc4dnddfe   ,sc4dnddf,  sc4_200_alt, sc4dnddf70, sc4_state, sc4dndd
 
 DRIVER_INIT_MEMBER(sc4_state,sc4dndpg)
 {
+	m_segment_34_encoding = true;
+
 	DRIVER_INIT_CALL(sc4mbus);
 }
 
@@ -37451,6 +37628,8 @@ GAMEL( 200?, sc4dndben   ,sc4dndbe,  sc4_5reel_alt, sc4dndbe35, sc4_state, sc4dn
 
 DRIVER_INIT_MEMBER(sc4_state,sc4dndbc)
 {
+	m_segment_34_encoding = true;
+
 	DRIVER_INIT_CALL(sc4mbus);
 }
 
@@ -37603,12 +37782,12 @@ INPUT_PORTS_START( sc4dmine ) // this structure is generated
 INPUT_PORTS_END
 
 // PR1307 AWP DIAMOND MINE         PR1307 DIAM MINE SOUNDS11
-GAMEL( 200?, sc4dmine    ,0,         sc4_5reel, sc4dmine, sc4_state, sc4dmine, ROT0, "BFM","Diamond Mine (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4dminea   ,sc4dmine,  sc4_5reel, sc4dmine, sc4_state, sc4dmine, ROT0, "BFM","Diamond Mine (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4dmineb   ,sc4dmine,  sc4_5reel, sc4dmine, sc4_state, sc4dmine, ROT0, "BFM","Diamond Mine (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4dminec   ,sc4dmine,  sc4_5reel, sc4dmine, sc4_state, sc4dmine, ROT0, "BFM","Diamond Mine (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4dmined   ,sc4dmine,  sc4_5reel, sc4dmine, sc4_state, sc4dmine, ROT0, "BFM","Diamond Mine (Bellfruit) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4dminee   ,sc4dmine,  sc4_5reel, sc4dmine, sc4_state, sc4dmine, ROT0, "BFM","Diamond Mine (Bellfruit) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4dmine    ,0,         sc4_5reel, sc4dmine, sc4_state, sc4dmine, ROT0, "BFM","Diamond Mine (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4dmineb )
+GAMEL( 200?, sc4dminea   ,sc4dmine,  sc4_5reel, sc4dmine, sc4_state, sc4dmine, ROT0, "BFM","Diamond Mine (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4dmineb )
+GAMEL( 200?, sc4dmineb   ,sc4dmine,  sc4_5reel, sc4dmine, sc4_state, sc4dmine, ROT0, "BFM","Diamond Mine (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4dmineb )
+GAMEL( 200?, sc4dminec   ,sc4dmine,  sc4_5reel, sc4dmine, sc4_state, sc4dmine, ROT0, "BFM","Diamond Mine (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4dmineb )
+GAMEL( 200?, sc4dmined   ,sc4dmine,  sc4_5reel, sc4dmine, sc4_state, sc4dmine, ROT0, "BFM","Diamond Mine (Bellfruit) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_sc4dmineb )
+GAMEL( 200?, sc4dminee   ,sc4dmine,  sc4_5reel, sc4dmine, sc4_state, sc4dmine, ROT0, "BFM","Diamond Mine (Bellfruit) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_sc4dmineb )
 
 
 
@@ -37921,10 +38100,10 @@ INPUT_PORTS_START( sc4emmer ) // this structure is generated
 INPUT_PORTS_END
 
 // PR2313 EMMERDALE         EMMR SOUNDS         EMMERDALE
-GAMEL( 200?, sc4emmer    ,0,         sc4_4reel_alt, sc4emmer, sc4_state, sc4emmer, ROT0, "Mazooma","Emmerdale (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4emmera   ,sc4emmer,  sc4_4reel_alt, sc4emmer, sc4_state, sc4emmer, ROT0, "Mazooma","Emmerdale (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4emmerb   ,sc4emmer,  sc4_4reel_alt, sc4emmer, sc4_state, sc4emmer, ROT0, "Mazooma","Emmerdale (Mazooma) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4emmerc   ,sc4emmer,  sc4_4reel_alt, sc4emmer, sc4_state, sc4emmer, ROT0, "Mazooma","Emmerdale (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4emmer    ,0,         sc4_4reel_alt, sc4emmer, sc4_state, sc4emmer, ROT0, "Mazooma","Emmerdale (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4emmerc )
+GAMEL( 200?, sc4emmera   ,sc4emmer,  sc4_4reel_alt, sc4emmer, sc4_state, sc4emmer, ROT0, "Mazooma","Emmerdale (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4emmerc )
+GAMEL( 200?, sc4emmerb   ,sc4emmer,  sc4_4reel_alt, sc4emmer, sc4_state, sc4emmer, ROT0, "Mazooma","Emmerdale (Mazooma) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4emmerc )
+GAMEL( 200?, sc4emmerc   ,sc4emmer,  sc4_4reel_alt, sc4emmer, sc4_state, sc4emmer, ROT0, "Mazooma","Emmerdale (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4emmerc )
 
 DRIVER_INIT_MEMBER(sc4_state,sc4evol)
 {
@@ -38288,14 +38467,14 @@ INPUT_PORTS_START( sc4gd ) // this structure is generated
 INPUT_PORTS_END
 
 // PR1016 GOLD DIGGER         PR1016 GOLD DIGGER SOUNDS11
-GAMEL( 200?, sc4gd       ,0,         sc4_200_4r, sc4gd, sc4_state, sc4gd, ROT0, "BFM","Gold Digger (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4gda      ,sc4gd,     sc4_200_4r, sc4gd, sc4_state, sc4gd, ROT0, "BFM","Gold Digger (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4gdb      ,sc4gd,     sc4_200_4r, sc4gd, sc4_state, sc4gd, ROT0, "BFM","Gold Digger (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4gdc      ,sc4gd,     sc4_200_4r, sc4gd, sc4_state, sc4gd, ROT0, "BFM","Gold Digger (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4gdd      ,sc4gd,     sc4_200_4r, sc4gd, sc4_state, sc4gd, ROT0, "BFM","Gold Digger (Bellfruit) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4gde      ,sc4gd,     sc4_200_4r, sc4gd, sc4_state, sc4gd, ROT0, "BFM","Gold Digger (Bellfruit) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4gdf      ,sc4gd,     sc4_200_4r, sc4gd, sc4_state, sc4gd, ROT0, "BFM","Gold Digger (Bellfruit) (Scorpion 4) (set 7)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4gdg      ,sc4gd,     sc4_200_4r, sc4gd, sc4_state, sc4gd, ROT0, "BFM","Gold Digger (Bellfruit) (Scorpion 4) (set 8)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4gd       ,0,         sc4_200_4r, sc4gd, sc4_state, sc4gd, ROT0, "BFM","Gold Digger (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4gd )
+GAMEL( 200?, sc4gda      ,sc4gd,     sc4_200_4r, sc4gd, sc4_state, sc4gd, ROT0, "BFM","Gold Digger (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4gd )
+GAMEL( 200?, sc4gdb      ,sc4gd,     sc4_200_4r, sc4gd, sc4_state, sc4gd, ROT0, "BFM","Gold Digger (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4gd )
+GAMEL( 200?, sc4gdc      ,sc4gd,     sc4_200_4r, sc4gd, sc4_state, sc4gd, ROT0, "BFM","Gold Digger (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4gd )
+GAMEL( 200?, sc4gdd      ,sc4gd,     sc4_200_4r, sc4gd, sc4_state, sc4gd, ROT0, "BFM","Gold Digger (Bellfruit) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_sc4gd )
+GAMEL( 200?, sc4gde      ,sc4gd,     sc4_200_4r, sc4gd, sc4_state, sc4gd, ROT0, "BFM","Gold Digger (Bellfruit) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_sc4gd )
+GAMEL( 200?, sc4gdf      ,sc4gd,     sc4_200_4r, sc4gd, sc4_state, sc4gd, ROT0, "BFM","Gold Digger (Bellfruit) (Scorpion 4) (set 7)", MACHINE_FLAGS, layout_sc4gd )
+GAMEL( 200?, sc4gdg      ,sc4gd,     sc4_200_4r, sc4gd, sc4_state, sc4gd, ROT0, "BFM","Gold Digger (Bellfruit) (Scorpion 4) (set 8)", MACHINE_FLAGS, layout_sc4gd )
 
 DRIVER_INIT_MEMBER(sc4_state,sc4gdclb)
 {
@@ -38358,18 +38537,18 @@ INPUT_PORTS_START( sc4gdclb ) // this structure is generated
 INPUT_PORTS_END
 
 // PR1137 CLUB GOLD DIGGER         PR1137 GOLDD CL SOUNDS11
-GAMEL( 200?, sc4gdclb    ,0,         sc4_200_std, sc4gdclb, sc4_state, sc4gdclb, ROT0, "BFM","Gold Digger Club (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4gdclba   ,sc4gdclb,  sc4_200_std, sc4gdclb, sc4_state, sc4gdclb, ROT0, "BFM","Gold Digger Club (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4gdclbb   ,sc4gdclb,  sc4_200_std, sc4gdclb, sc4_state, sc4gdclb, ROT0, "BFM","Gold Digger Club (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4gdclbc   ,sc4gdclb,  sc4_200_std, sc4gdclb, sc4_state, sc4gdclb, ROT0, "BFM","Gold Digger Club (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4gdclbd   ,sc4gdclb,  sc4_200_std, sc4gdclb, sc4_state, sc4gdclb, ROT0, "BFM","Gold Digger Club (Bellfruit) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4gdclbe   ,sc4gdclb,  sc4_200_std, sc4gdclb, sc4_state, sc4gdclb, ROT0, "BFM","Gold Digger Club (Bellfruit) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4gdclbf   ,sc4gdclb,  sc4_200_std, sc4gdclb, sc4_state, sc4gdclb, ROT0, "BFM","Gold Digger Club (Bellfruit) (Scorpion 4) (set 7)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4gdclbg   ,sc4gdclb,  sc4_200_std, sc4gdclb, sc4_state, sc4gdclb, ROT0, "BFM","Gold Digger Club (Bellfruit) (Scorpion 4) (set 8)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4gdclbh   ,sc4gdclb,  sc4_200_std, sc4gdclb, sc4_state, sc4gdclb, ROT0, "BFM","Gold Digger Club (Bellfruit) (Scorpion 4) (set 9)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4gdclbi   ,sc4gdclb,  sc4_200_std, sc4gdclb, sc4_state, sc4gdclb, ROT0, "BFM","Gold Digger Club (Bellfruit) (Scorpion 4) (set 10)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4gdclbj   ,sc4gdclb,  sc4_200_std, sc4gdclb, sc4_state, sc4gdclb, ROT0, "BFM","Gold Digger Club (Bellfruit) (Scorpion 4) (set 11)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4gdclbk   ,sc4gdclb,  sc4_200_std, sc4gdclb, sc4_state, sc4gdclb, ROT0, "BFM","Gold Digger Club (Bellfruit) (Scorpion 4) (set 12)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4gdclb    ,0,         sc4_200_std, sc4gdclb, sc4_state, sc4gdclb, ROT0, "BFM","Gold Digger Club (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4gdclb )
+GAMEL( 200?, sc4gdclba   ,sc4gdclb,  sc4_200_std, sc4gdclb, sc4_state, sc4gdclb, ROT0, "BFM","Gold Digger Club (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4gdclb )
+GAMEL( 200?, sc4gdclbb   ,sc4gdclb,  sc4_200_std, sc4gdclb, sc4_state, sc4gdclb, ROT0, "BFM","Gold Digger Club (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4gdclb )
+GAMEL( 200?, sc4gdclbc   ,sc4gdclb,  sc4_200_std, sc4gdclb, sc4_state, sc4gdclb, ROT0, "BFM","Gold Digger Club (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4gdclb )
+GAMEL( 200?, sc4gdclbd   ,sc4gdclb,  sc4_200_std, sc4gdclb, sc4_state, sc4gdclb, ROT0, "BFM","Gold Digger Club (Bellfruit) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_sc4gdclb )
+GAMEL( 200?, sc4gdclbe   ,sc4gdclb,  sc4_200_std, sc4gdclb, sc4_state, sc4gdclb, ROT0, "BFM","Gold Digger Club (Bellfruit) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_sc4gdclb )
+GAMEL( 200?, sc4gdclbf   ,sc4gdclb,  sc4_200_std, sc4gdclb, sc4_state, sc4gdclb, ROT0, "BFM","Gold Digger Club (Bellfruit) (Scorpion 4) (set 7)", MACHINE_FLAGS, layout_sc4gdclb )
+GAMEL( 200?, sc4gdclbg   ,sc4gdclb,  sc4_200_std, sc4gdclb, sc4_state, sc4gdclb, ROT0, "BFM","Gold Digger Club (Bellfruit) (Scorpion 4) (set 8)", MACHINE_FLAGS, layout_sc4gdclb )
+GAMEL( 200?, sc4gdclbh   ,sc4gdclb,  sc4_200_std, sc4gdclb, sc4_state, sc4gdclb, ROT0, "BFM","Gold Digger Club (Bellfruit) (Scorpion 4) (set 9)", MACHINE_FLAGS, layout_sc4gdclb )
+GAMEL( 200?, sc4gdclbi   ,sc4gdclb,  sc4_200_std, sc4gdclb, sc4_state, sc4gdclb, ROT0, "BFM","Gold Digger Club (Bellfruit) (Scorpion 4) (set 10)", MACHINE_FLAGS, layout_sc4gdclb )
+GAMEL( 200?, sc4gdclbj   ,sc4gdclb,  sc4_200_std, sc4gdclb, sc4_state, sc4gdclb, ROT0, "BFM","Gold Digger Club (Bellfruit) (Scorpion 4) (set 11)", MACHINE_FLAGS, layout_sc4gdclb )
+GAMEL( 200?, sc4gdclbk   ,sc4gdclb,  sc4_200_std, sc4gdclb, sc4_state, sc4gdclb, ROT0, "BFM","Gold Digger Club (Bellfruit) (Scorpion 4) (set 12)", MACHINE_FLAGS, layout_sc4gdclb )
 
 
 DRIVER_INIT_MEMBER(sc4_state,sc4gball)
@@ -38438,10 +38617,10 @@ INPUT_PORTS_END
 
 // this is a football themed game... completely different to golden balls casino
 // PR1604 AWP GOLDEN BALLS         PR1604 GOLDEN BALLS SOUNDS12      GOLDEN BALLS  S.SITE
-GAMEL( 200?, sc4gball    ,0,         sc4_4reel_alt, sc4gball, sc4_state, sc4gball, ROT0, "BFM","Golden Balls (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4gballa   ,sc4gball,  sc4_4reel_alt, sc4gball, sc4_state, sc4gball, ROT0, "BFM","Golden Balls (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4gballb   ,sc4gball,  sc4_4reel_alt, sc4gball, sc4_state, sc4gball, ROT0, "BFM","Golden Balls (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4gballc   ,sc4gball,  sc4_4reel_alt, sc4gball, sc4_state, sc4gball, ROT0, "BFM","Golden Balls (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4gball    ,0,         sc4_4reel_alt, sc4gball, sc4_state, sc4gball, ROT0, "BFM","Golden Balls (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4gball )
+GAMEL( 200?, sc4gballa   ,sc4gball,  sc4_4reel_alt, sc4gball, sc4_state, sc4gball, ROT0, "BFM","Golden Balls (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4gball )
+GAMEL( 200?, sc4gballb   ,sc4gball,  sc4_4reel_alt, sc4gball, sc4_state, sc4gball, ROT0, "BFM","Golden Balls (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4gball )
+GAMEL( 200?, sc4gballc   ,sc4gball,  sc4_4reel_alt, sc4gball, sc4_state, sc4gball, ROT0, "BFM","Golden Balls (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4gball )
 
 
 DRIVER_INIT_MEMBER(sc4_state,sc4gunp)
@@ -38804,14 +38983,14 @@ INPUT_PORTS_START( sc4hiss ) // this structure is generated
 INPUT_PORTS_END
 
 // PR2176 HISSING QUID         VIPA SOUNDS         HISSING QUID
-GAMEL( 200?, sc4hiss     ,0,         sc4_200_4r, sc4hiss, sc4_state, sc4hiss, ROT0, "Qps","Hissing Quid (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4hissa    ,sc4hiss,   sc4_200_4r, sc4hiss, sc4_state, sc4hiss, ROT0, "Qps","Hissing Quid (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4hissb    ,sc4hiss,   sc4_200_4r, sc4hiss, sc4_state, sc4hiss, ROT0, "Qps","Hissing Quid (Qps) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4hissc    ,sc4hiss,   sc4_200_4r, sc4hiss, sc4_state, sc4hiss, ROT0, "Qps","Hissing Quid (Qps) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4hissd    ,sc4hiss,   sc4_200_4r, sc4hiss, sc4_state, sc4hiss, ROT0, "Qps","Hissing Quid (Qps) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4hisse    ,sc4hiss,   sc4_200_4r, sc4hiss, sc4_state, sc4hiss, ROT0, "Qps","Hissing Quid (Qps) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4hissf    ,sc4hiss,   sc4_200_4r, sc4hiss, sc4_state, sc4hiss, ROT0, "Qps","Hissing Quid (Qps) (Scorpion 4) (set 7)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4hissg    ,sc4hiss,   sc4_200_4r, sc4hiss, sc4_state, sc4hiss, ROT0, "Qps","Hissing Quid (Qps) (Scorpion 4) (set 8)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4hiss     ,0,         sc4_200_4r, sc4hiss, sc4_state, sc4hiss, ROT0, "Qps","Hissing Quid (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4hissa )
+GAMEL( 200?, sc4hissa    ,sc4hiss,   sc4_200_4r, sc4hiss, sc4_state, sc4hiss, ROT0, "Qps","Hissing Quid (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4hissa )
+GAMEL( 200?, sc4hissb    ,sc4hiss,   sc4_200_4r, sc4hiss, sc4_state, sc4hiss, ROT0, "Qps","Hissing Quid (Qps) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4hissa )
+GAMEL( 200?, sc4hissc    ,sc4hiss,   sc4_200_4r, sc4hiss, sc4_state, sc4hiss, ROT0, "Qps","Hissing Quid (Qps) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4hissa )
+GAMEL( 200?, sc4hissd    ,sc4hiss,   sc4_200_4r, sc4hiss, sc4_state, sc4hiss, ROT0, "Qps","Hissing Quid (Qps) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_sc4hissa )
+GAMEL( 200?, sc4hisse    ,sc4hiss,   sc4_200_4r, sc4hiss, sc4_state, sc4hiss, ROT0, "Qps","Hissing Quid (Qps) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_sc4hissa )
+GAMEL( 200?, sc4hissf    ,sc4hiss,   sc4_200_4r, sc4hiss, sc4_state, sc4hiss, ROT0, "Qps","Hissing Quid (Qps) (Scorpion 4) (set 7)", MACHINE_FLAGS, layout_sc4hissa )
+GAMEL( 200?, sc4hissg    ,sc4hiss,   sc4_200_4r, sc4hiss, sc4_state, sc4hiss, ROT0, "Qps","Hissing Quid (Qps) (Scorpion 4) (set 8)", MACHINE_FLAGS, layout_sc4hissa )
 
 
 
@@ -39035,14 +39214,14 @@ INPUT_PORTS_START( sc4hotwd ) // this structure is generated
 INPUT_PORTS_END
 
 // PR1311 HOT WAD         PR1311 HOT WAD SOUNDS11
-GAMEL( 200?, sc4hotwd    ,0,         sc4_4reel_alt, sc4hotwd, sc4_state, sc4hotwd, ROT0, "BFM","Hot Wad (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4hotwda   ,sc4hotwd,  sc4_4reel_alt, sc4hotwd, sc4_state, sc4hotwd, ROT0, "BFM","Hot Wad (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4hotwd    ,0,         sc4_4reel_alt, sc4hotwd, sc4_state, sc4hotwd, ROT0, "BFM","Hot Wad (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4hotwd )
+GAMEL( 200?, sc4hotwda   ,sc4hotwd,  sc4_4reel_alt, sc4hotwd, sc4_state, sc4hotwd, ROT0, "BFM","Hot Wad (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4hotwd )
 // PAY UNIT ERR 17
 // PR1311 HOT WAD         PR1311 HOT WAD SOUNDS11         2 HOT WAD S.SITE
-GAMEL( 200?, sc4hotwdb   ,sc4hotwd,  sc4_4reel_alt, sc4hotwd, sc4_state, sc4hotwd, ROT0, "BFM","Hot Wad (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4hotwdc   ,sc4hotwd,  sc4_4reel_alt, sc4hotwd, sc4_state, sc4hotwd, ROT0, "BFM","Hot Wad (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4hotwdd   ,sc4hotwd,  sc4_4reel_alt, sc4hotwd, sc4_state, sc4hotwd, ROT0, "BFM","Hot Wad (Bellfruit) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4hotwde   ,sc4hotwd,  sc4_4reel_alt, sc4hotwd, sc4_state, sc4hotwd, ROT0, "BFM","Hot Wad (Bellfruit) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4hotwdb   ,sc4hotwd,  sc4_4reel_alt, sc4hotwd, sc4_state, sc4hotwd, ROT0, "BFM","Hot Wad (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4hotwd )
+GAMEL( 200?, sc4hotwdc   ,sc4hotwd,  sc4_4reel_alt, sc4hotwd, sc4_state, sc4hotwd, ROT0, "BFM","Hot Wad (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4hotwd )
+GAMEL( 200?, sc4hotwdd   ,sc4hotwd,  sc4_4reel_alt, sc4hotwd, sc4_state, sc4hotwd, ROT0, "BFM","Hot Wad (Bellfruit) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_sc4hotwd )
+GAMEL( 200?, sc4hotwde   ,sc4hotwd,  sc4_4reel_alt, sc4hotwd, sc4_state, sc4hotwd, ROT0, "BFM","Hot Wad (Bellfruit) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_sc4hotwd )
 
 
 DRIVER_INIT_MEMBER(sc4_state,sc4celeb)
@@ -39554,14 +39733,14 @@ INPUT_PORTS_END
 
 
 // PR2282 MENTALMONEYMONSTERS         MMMO SOUNDS          MONEY MONSTERS
-GAMEL( 200?, sc4mmm      ,0,         sc4_4reel_alt, sc4mmm, sc4_state, sc4mmm, ROT0, "Mazooma","Mental Money Monsters (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4mmma     ,sc4mmm,    sc4_4reel_alt, sc4mmm, sc4_state, sc4mmm, ROT0, "Mazooma","Mental Money Monsters (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4mmmb     ,sc4mmm,    sc4_4reel_alt, sc4mmm, sc4_state, sc4mmm, ROT0, "Mazooma","Mental Money Monsters (Mazooma) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4mmmc     ,sc4mmm,    sc4_4reel_alt, sc4mmm, sc4_state, sc4mmm, ROT0, "Mazooma","Mental Money Monsters (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4mmmd     ,sc4mmm,    sc4_4reel_alt, sc4mmm, sc4_state, sc4mmm, ROT0, "Mazooma","Mental Money Monsters (Mazooma) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4mmme     ,sc4mmm,    sc4_4reel_alt, sc4mmm, sc4_state, sc4mmm, ROT0, "Mazooma","Mental Money Monsters (Mazooma) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4mmmf     ,sc4mmm,    sc4_4reel_alt, sc4mmm, sc4_state, sc4mmm, ROT0, "Mazooma","Mental Money Monsters (Mazooma) (Scorpion 4) (set 7)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4mmmg     ,sc4mmm,    sc4_4reel_alt, sc4mmm, sc4_state, sc4mmm, ROT0, "Mazooma","Mental Money Monsters (Mazooma) (Scorpion 4) (set 8)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4mmm      ,0,         sc4_4reel_alt, sc4mmm, sc4_state, sc4mmm, ROT0, "Mazooma","Mental Money Monsters (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4mmmg )
+GAMEL( 200?, sc4mmma     ,sc4mmm,    sc4_4reel_alt, sc4mmm, sc4_state, sc4mmm, ROT0, "Mazooma","Mental Money Monsters (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4mmmg )
+GAMEL( 200?, sc4mmmb     ,sc4mmm,    sc4_4reel_alt, sc4mmm, sc4_state, sc4mmm, ROT0, "Mazooma","Mental Money Monsters (Mazooma) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4mmmg )
+GAMEL( 200?, sc4mmmc     ,sc4mmm,    sc4_4reel_alt, sc4mmm, sc4_state, sc4mmm, ROT0, "Mazooma","Mental Money Monsters (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4mmmg )
+GAMEL( 200?, sc4mmmd     ,sc4mmm,    sc4_4reel_alt, sc4mmm, sc4_state, sc4mmm, ROT0, "Mazooma","Mental Money Monsters (Mazooma) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_sc4mmmg )
+GAMEL( 200?, sc4mmme     ,sc4mmm,    sc4_4reel_alt, sc4mmm, sc4_state, sc4mmm, ROT0, "Mazooma","Mental Money Monsters (Mazooma) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_sc4mmmg )
+GAMEL( 200?, sc4mmmf     ,sc4mmm,    sc4_4reel_alt, sc4mmm, sc4_state, sc4mmm, ROT0, "Mazooma","Mental Money Monsters (Mazooma) (Scorpion 4) (set 7)", MACHINE_FLAGS, layout_sc4mmmg )
+GAMEL( 200?, sc4mmmg     ,sc4mmm,    sc4_4reel_alt, sc4mmm, sc4_state, sc4mmm, ROT0, "Mazooma","Mental Money Monsters (Mazooma) (Scorpion 4) (set 8)", MACHINE_FLAGS, layout_sc4mmmg )
 
 DRIVER_INIT_MEMBER(sc4_state,sc4mmad)
 {
@@ -40079,12 +40258,12 @@ INPUT_PORTS_START( sc4mr2r ) // this structure is generated
 INPUT_PORTS_END
 
 // PR2329 MONOPOLY ROAD TO RICHES         MR2R SOUNDS          ROAD TO RICHES
-GAMEL( 200?, sc4mr2r     ,0,         sc4_4reel_alt, sc4mr2r, sc4_state, sc4mr2r, ROT0, "Mazooma","Monopoly Road To Riches (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4mr2ra    ,sc4mr2r,   sc4_4reel_alt, sc4mr2r, sc4_state, sc4mr2r, ROT0, "Mazooma","Monopoly Road To Riches (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4mr2rb    ,sc4mr2r,   sc4_4reel_alt, sc4mr2r, sc4_state, sc4mr2r, ROT0, "Mazooma","Monopoly Road To Riches (Mazooma) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4mr2rc    ,sc4mr2r,   sc4_4reel_alt, sc4mr2r, sc4_state, sc4mr2r, ROT0, "Mazooma","Monopoly Road To Riches (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4mr2rd    ,sc4mr2r,   sc4_4reel_alt, sc4mr2r, sc4_state, sc4mr2r, ROT0, "Mazooma","Monopoly Road To Riches (Mazooma) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4mr2re    ,sc4mr2r,   sc4_4reel_alt, sc4mr2r, sc4_state, sc4mr2r, ROT0, "Mazooma","Monopoly Road To Riches (Mazooma) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4mr2r     ,0,         sc4_4reel_alt, sc4mr2r, sc4_state, sc4mr2r, ROT0, "Mazooma","Monopoly Road To Riches (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4mr2rc )
+GAMEL( 200?, sc4mr2ra    ,sc4mr2r,   sc4_4reel_alt, sc4mr2r, sc4_state, sc4mr2r, ROT0, "Mazooma","Monopoly Road To Riches (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4mr2rc )
+GAMEL( 200?, sc4mr2rb    ,sc4mr2r,   sc4_4reel_alt, sc4mr2r, sc4_state, sc4mr2r, ROT0, "Mazooma","Monopoly Road To Riches (Mazooma) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4mr2rc )
+GAMEL( 200?, sc4mr2rc    ,sc4mr2r,   sc4_4reel_alt, sc4mr2r, sc4_state, sc4mr2r, ROT0, "Mazooma","Monopoly Road To Riches (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4mr2rc )
+GAMEL( 200?, sc4mr2rd    ,sc4mr2r,   sc4_4reel_alt, sc4mr2r, sc4_state, sc4mr2r, ROT0, "Mazooma","Monopoly Road To Riches (Mazooma) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_sc4mr2rc )
+GAMEL( 200?, sc4mr2re    ,sc4mr2r,   sc4_4reel_alt, sc4mr2r, sc4_state, sc4mr2r, ROT0, "Mazooma","Monopoly Road To Riches (Mazooma) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_sc4mr2rc )
 
 
 DRIVER_INIT_MEMBER(sc4_state,sc4nmare)
@@ -40528,12 +40707,12 @@ INPUT_PORTS_START( sc4pony ) // this structure is generated
 INPUT_PORTS_END
 
 // PR1408 PONY EXPRESS         PR1408 PONY EXPRESS SOUNDS11      PONY EXPRESS  S.SITE
-GAMEL( 200?, sc4pony     ,0,         sc4_200_5r, sc4pony, sc4_state, sc4pony, ROT0, "BFM","Pony Express (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4ponya    ,sc4pony,   sc4_200_5r, sc4pony, sc4_state, sc4pony, ROT0, "BFM","Pony Express (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4ponyb    ,sc4pony,   sc4_200_5r, sc4pony, sc4_state, sc4pony, ROT0, "BFM","Pony Express (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4ponyc    ,sc4pony,   sc4_200_5r, sc4pony, sc4_state, sc4pony, ROT0, "BFM","Pony Express (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4ponyd    ,sc4pony,   sc4_200_5r, sc4pony, sc4_state, sc4pony, ROT0, "BFM","Pony Express (Bellfruit) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4ponye    ,sc4pony,   sc4_200_5r, sc4pony, sc4_state, sc4pony, ROT0, "BFM","Pony Express (Bellfruit) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_bfm_sc4 ) // incomplete pairing
+GAMEL( 200?, sc4pony     ,0,         sc4_200_5r, sc4pony, sc4_state, sc4pony, ROT0, "BFM","Pony Express (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4pony )
+GAMEL( 200?, sc4ponya    ,sc4pony,   sc4_200_5r, sc4pony, sc4_state, sc4pony, ROT0, "BFM","Pony Express (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4pony )
+GAMEL( 200?, sc4ponyb    ,sc4pony,   sc4_200_5r, sc4pony, sc4_state, sc4pony, ROT0, "BFM","Pony Express (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4pony )
+GAMEL( 200?, sc4ponyc    ,sc4pony,   sc4_200_5r, sc4pony, sc4_state, sc4pony, ROT0, "BFM","Pony Express (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4pony )
+GAMEL( 200?, sc4ponyd    ,sc4pony,   sc4_200_5r, sc4pony, sc4_state, sc4pony, ROT0, "BFM","Pony Express (Bellfruit) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_sc4pony )
+GAMEL( 200?, sc4ponye    ,sc4pony,   sc4_200_5r, sc4pony, sc4_state, sc4pony, ROT0, "BFM","Pony Express (Bellfruit) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_sc4pony ) // incomplete pairing
 
 
 DRIVER_INIT_MEMBER(sc4_state,sc4popey)
@@ -40829,12 +41008,12 @@ INPUT_PORTS_START( sc4rhxcs ) // this structure is generated
 INPUT_PORTS_END
 
 // PR2364 CASINO RED HOT X         RED HOT X CRHX SOUNDS         RED HOT X
-GAMEL( 200?, sc4rhxcs    ,0,         sc4_3reel_200_48, sc4rhxcs, sc4_state, sc4rhxcs, ROT0, "Mazooma","Red Hot X Casino (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4rhxcsa   ,sc4rhxcs,  sc4_3reel_200_48, sc4rhxcs, sc4_state, sc4rhxcs, ROT0, "Mazooma","Red Hot X Casino (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4rhxcsb   ,sc4rhxcs,  sc4_3reel_200_48, sc4rhxcs, sc4_state, sc4rhxcs, ROT0, "Mazooma","Red Hot X Casino (Mazooma) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4rhxcsc   ,sc4rhxcs,  sc4_3reel_200_48, sc4rhxcs, sc4_state, sc4rhxcs, ROT0, "Mazooma","Red Hot X Casino (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4rhxcsd   ,sc4rhxcs,  sc4_3reel_200_48, sc4rhxcs, sc4_state, sc4rhxcs, ROT0, "Mazooma","Red Hot X Casino (Mazooma) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4rhxcse   ,sc4rhxcs,  sc4_3reel_200_48, sc4rhxcs, sc4_state, sc4rhxcs, ROT0, "Mazooma","Red Hot X Casino (Mazooma) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4rhxcs    ,0,         sc4_3reel_200_48, sc4rhxcs, sc4_state, sc4rhxcs, ROT0, "Mazooma","Red Hot X Casino (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4rhxcsa )
+GAMEL( 200?, sc4rhxcsa   ,sc4rhxcs,  sc4_3reel_200_48, sc4rhxcs, sc4_state, sc4rhxcs, ROT0, "Mazooma","Red Hot X Casino (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4rhxcsa )
+GAMEL( 200?, sc4rhxcsb   ,sc4rhxcs,  sc4_3reel_200_48, sc4rhxcs, sc4_state, sc4rhxcs, ROT0, "Mazooma","Red Hot X Casino (Mazooma) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4rhxcsa )
+GAMEL( 200?, sc4rhxcsc   ,sc4rhxcs,  sc4_3reel_200_48, sc4rhxcs, sc4_state, sc4rhxcs, ROT0, "Mazooma","Red Hot X Casino (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4rhxcsa )
+GAMEL( 200?, sc4rhxcsd   ,sc4rhxcs,  sc4_3reel_200_48, sc4rhxcs, sc4_state, sc4rhxcs, ROT0, "Mazooma","Red Hot X Casino (Mazooma) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_sc4rhxcsa )
+GAMEL( 200?, sc4rhxcse   ,sc4rhxcs,  sc4_3reel_200_48, sc4rhxcs, sc4_state, sc4rhxcs, ROT0, "Mazooma","Red Hot X Casino (Mazooma) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_sc4rhxcsa )
 
 
 
@@ -40895,10 +41074,10 @@ INPUT_PORTS_END
 
 
 // PR2557 RED SQUARE         REDS SOUNDS            RED SQUARE
-GAMEL( 200?, sc4redsq    ,0,         sc4_4reel, sc4redsq, sc4_state, sc4redsq, ROT0, "Mazooma","Red Square (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4redsqa   ,sc4redsq,  sc4_4reel, sc4redsq, sc4_state, sc4redsq, ROT0, "Mazooma","Red Square (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4redsqb   ,sc4redsq,  sc4_4reel, sc4redsq, sc4_state, sc4redsq, ROT0, "Mazooma","Red Square (Mazooma) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4redsqc   ,sc4redsq,  sc4_4reel, sc4redsq, sc4_state, sc4redsq, ROT0, "Mazooma","Red Square (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4redsq    ,0,         sc4_4reel, sc4redsq, sc4_state, sc4redsq, ROT0, "Mazooma","Red Square (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4redsq )
+GAMEL( 200?, sc4redsqa   ,sc4redsq,  sc4_4reel, sc4redsq, sc4_state, sc4redsq, ROT0, "Mazooma","Red Square (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4redsq )
+GAMEL( 200?, sc4redsqb   ,sc4redsq,  sc4_4reel, sc4redsq, sc4_state, sc4redsq, ROT0, "Mazooma","Red Square (Mazooma) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4redsq )
+GAMEL( 200?, sc4redsqc   ,sc4redsq,  sc4_4reel, sc4redsq, sc4_state, sc4redsq, ROT0, "Mazooma","Red Square (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4redsq )
 
 
 
@@ -41266,14 +41445,14 @@ INPUT_PORTS_START( sc4sus ) // this structure is generated
 INPUT_PORTS_END
 
 // PR2255 SUITUSIR         SUIT SOUNDS         SUITS U SIR
-GAMEL( 200?, sc4sus      ,0,         sc4_4reel_alt, sc4sus, sc4_state, sc4sus, ROT0, "Qps","Suits U Sir (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4susc     ,sc4sus,    sc4_4reel_alt, sc4sus, sc4_state, sc4sus, ROT0, "Qps","Suits U Sir (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4susf     ,sc4sus,    sc4_4reel_alt, sc4sus, sc4_state, sc4sus, ROT0, "Qps","Suits U Sir (Qps) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4susg     ,sc4sus,    sc4_4reel_alt, sc4sus, sc4_state, sc4sus, ROT0, "Qps","Suits U Sir (Qps) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4sush     ,sc4sus,    sc4_4reel_alt, sc4sus, sc4_state, sc4sus, ROT0, "Qps","Suits U Sir (Qps) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4susi     ,sc4sus,    sc4_4reel_alt, sc4sus, sc4_state, sc4sus, ROT0, "Qps","Suits U Sir (Qps) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4susj     ,sc4sus,    sc4_4reel_alt, sc4sus, sc4_state, sc4sus, ROT0, "Qps","Suits U Sir (Qps) (Scorpion 4) (set 7)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4susk     ,sc4sus,    sc4_4reel_alt, sc4sus, sc4_state, sc4sus, ROT0, "Qps","Suits U Sir (Qps) (Scorpion 4) (set 8)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4sus      ,0,         sc4_4reel_alt, sc4sus, sc4_state, sc4sus, ROT0, "Qps","Suits U Sir (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4susk )
+GAMEL( 200?, sc4susc     ,sc4sus,    sc4_4reel_alt, sc4sus, sc4_state, sc4sus, ROT0, "Qps","Suits U Sir (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4susk )
+GAMEL( 200?, sc4susf     ,sc4sus,    sc4_4reel_alt, sc4sus, sc4_state, sc4sus, ROT0, "Qps","Suits U Sir (Qps) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4susk )
+GAMEL( 200?, sc4susg     ,sc4sus,    sc4_4reel_alt, sc4sus, sc4_state, sc4sus, ROT0, "Qps","Suits U Sir (Qps) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4susk )
+GAMEL( 200?, sc4sush     ,sc4sus,    sc4_4reel_alt, sc4sus, sc4_state, sc4sus, ROT0, "Qps","Suits U Sir (Qps) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_sc4susk )
+GAMEL( 200?, sc4susi     ,sc4sus,    sc4_4reel_alt, sc4sus, sc4_state, sc4sus, ROT0, "Qps","Suits U Sir (Qps) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_sc4susk )
+GAMEL( 200?, sc4susj     ,sc4sus,    sc4_4reel_alt, sc4sus, sc4_state, sc4sus, ROT0, "Qps","Suits U Sir (Qps) (Scorpion 4) (set 7)", MACHINE_FLAGS, layout_sc4susk )
+GAMEL( 200?, sc4susk     ,sc4sus,    sc4_4reel_alt, sc4sus, sc4_state, sc4sus, ROT0, "Qps","Suits U Sir (Qps) (Scorpion 4) (set 8)", MACHINE_FLAGS, layout_sc4susk )
 
 
 DRIVER_INIT_MEMBER(sc4_state,sc4sslam)
@@ -41616,10 +41795,10 @@ INPUT_PORTS_START( sc4trail ) // this structure is generated
 INPUT_PORTS_END
 
 // PR2170 TRAIL BLAZER         TRAB SOUNDS                  TRAIL BLAZER
-GAMEL( 200?, sc4trail    ,0,         sc4_4reel_alt, sc4trail, sc4_state, sc4trail, ROT0, "Mazooma","Trailblazer (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4traila   ,sc4trail,  sc4_4reel_alt, sc4trail, sc4_state, sc4trail, ROT0, "Mazooma","Trailblazer (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4trailb   ,sc4trail,  sc4_4reel_alt, sc4trail, sc4_state, sc4trail, ROT0, "Mazooma","Trailblazer (Mazooma) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4trailc   ,sc4trail,  sc4_4reel_alt, sc4trail, sc4_state, sc4trail, ROT0, "Mazooma","Trailblazer (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4trail    ,0,         sc4_4reel_alt, sc4trail, sc4_state, sc4trail, ROT0, "Mazooma","Trailblazer (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4trail )
+GAMEL( 200?, sc4traila   ,sc4trail,  sc4_4reel_alt, sc4trail, sc4_state, sc4trail, ROT0, "Mazooma","Trailblazer (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4trail )
+GAMEL( 200?, sc4trailb   ,sc4trail,  sc4_4reel_alt, sc4trail, sc4_state, sc4trail, ROT0, "Mazooma","Trailblazer (Mazooma) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4trail )
+GAMEL( 200?, sc4trailc   ,sc4trail,  sc4_4reel_alt, sc4trail, sc4_state, sc4trail, ROT0, "Mazooma","Trailblazer (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4trail )
 
 
 
@@ -41853,10 +42032,10 @@ INPUT_PORTS_START( sc4chain ) // this structure is generated
 INPUT_PORTS_END
 
 // PR1316 AWP CHAIN REACTION         PR1312 CHAIN REACT SOUNDS11
-GAMEL( 200?, sc4chain    ,0,         sc4_5reel_alt, sc4chain, sc4_state, sc4chain, ROT0, "BFM","Chain Reaction (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4chaina   ,sc4chain,  sc4_5reel_alt, sc4chain, sc4_state, sc4chain, ROT0, "BFM","Chain Reaction (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4chainb   ,sc4chain,  sc4_5reel_alt, sc4chain, sc4_state, sc4chain, ROT0, "BFM","Chain Reaction (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4chainc   ,sc4chain,  sc4_5reel_alt, sc4chain, sc4_state, sc4chain, ROT0, "BFM","Chain Reaction (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4chain    ,0,         sc4_5reel_alt, sc4chain, sc4_state, sc4chain, ROT0, "BFM","Chain Reaction (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4chainb )
+GAMEL( 200?, sc4chaina   ,sc4chain,  sc4_5reel_alt, sc4chain, sc4_state, sc4chain, ROT0, "BFM","Chain Reaction (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4chainb )
+GAMEL( 200?, sc4chainb   ,sc4chain,  sc4_5reel_alt, sc4chain, sc4_state, sc4chain, ROT0, "BFM","Chain Reaction (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4chainb )
+GAMEL( 200?, sc4chainc   ,sc4chain,  sc4_5reel_alt, sc4chain, sc4_state, sc4chain, ROT0, "BFM","Chain Reaction (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4chainb )
 
 
 DRIVER_INIT_MEMBER(sc4_state,sc4clown)
@@ -42192,10 +42371,10 @@ INPUT_PORTS_START( sc4acesh ) // this structure is generated
 INPUT_PORTS_END
 
 // PR2070 ACES HIGH         ACEHI SOUNDS            ACES HIGH
-GAMEL( 200?, sc4acesh    ,0,         sc4_200_5rc, sc4acesh, sc4_state, sc4acesh, ROT0, "Mazooma","Aces High (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4acesha   ,sc4acesh,  sc4_200_5rc, sc4acesh, sc4_state, sc4acesh, ROT0, "Mazooma","Aces High (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4aceshb   ,sc4acesh,  sc4_200_5rc, sc4acesh, sc4_state, sc4acesh, ROT0, "Mazooma","Aces High (Mazooma) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4aceshc   ,sc4acesh,  sc4_200_5rc, sc4acesh, sc4_state, sc4acesh, ROT0, "Mazooma","Aces High (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4acesh    ,0,         sc4_200_5rc, sc4acesh, sc4_state, sc4acesh, ROT0, "Mazooma","Aces High (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4acesh )
+GAMEL( 200?, sc4acesha   ,sc4acesh,  sc4_200_5rc, sc4acesh, sc4_state, sc4acesh, ROT0, "Mazooma","Aces High (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4acesh )
+GAMEL( 200?, sc4aceshb   ,sc4acesh,  sc4_200_5rc, sc4acesh, sc4_state, sc4acesh, ROT0, "Mazooma","Aces High (Mazooma) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4acesh )
+GAMEL( 200?, sc4aceshc   ,sc4acesh,  sc4_200_5rc, sc4acesh, sc4_state, sc4acesh, ROT0, "Mazooma","Aces High (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4acesh )
 
 
 DRIVER_INIT_MEMBER(sc4_state,sc4bed)
@@ -42326,12 +42505,12 @@ INPUT_PORTS_START( sc4bedcl ) // this structure is generated
 INPUT_PORTS_END
 
 // PR2102 CLUB BEDAZZLED         CBED SOUNDS         CLUB BEDAZZLED
-GAMEL( 200?, sc4bedcl    ,0,         sc4_5reel, sc4bedcl, sc4_state, sc4bedcl, ROT0, "Mazooma","Bedazzled Club (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4bedcl    ,0,         sc4_5reel, sc4bedcl, sc4_state, sc4bedcl, ROT0, "Mazooma","Bedazzled Club (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4bedcl )
 // PR2102 CLUB BEDAZZLED         CLUB BEDAZZLED  CLUB  CBED SOUNDS         CLUB BEDAZZLED
-GAMEL( 200?, sc4bedcla   ,sc4bedcl,  sc4_5reel, sc4bedcl, sc4_state, sc4bedcl, ROT0, "Mazooma","Bedazzled Club (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4bedclb   ,sc4bedcl,  sc4_5reel, sc4bedcl, sc4_state, sc4bedcl, ROT0, "Mazooma","Bedazzled Club (Mazooma) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4bedclc   ,sc4bedcl,  sc4_5reel, sc4bedcl, sc4_state, sc4bedcl, ROT0, "Mazooma","Bedazzled Club (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4bedcld   ,sc4bedcl,  sc4_5reel, sc4bedcl, sc4_state, sc4bedcl, ROT0, "Mazooma","Bedazzled Club (Mazooma) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4bedcla   ,sc4bedcl,  sc4_5reel, sc4bedcl, sc4_state, sc4bedcl, ROT0, "Mazooma","Bedazzled Club (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4bedcl )
+GAMEL( 200?, sc4bedclb   ,sc4bedcl,  sc4_5reel, sc4bedcl, sc4_state, sc4bedcl, ROT0, "Mazooma","Bedazzled Club (Mazooma) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4bedcl )
+GAMEL( 200?, sc4bedclc   ,sc4bedcl,  sc4_5reel, sc4bedcl, sc4_state, sc4bedcl, ROT0, "Mazooma","Bedazzled Club (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4bedcl )
+GAMEL( 200?, sc4bedcld   ,sc4bedcl,  sc4_5reel, sc4bedcl, sc4_state, sc4bedcl, ROT0, "Mazooma","Bedazzled Club (Mazooma) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_sc4bedcl )
 
 DRIVER_INIT_MEMBER(sc4_state,sc4bblas)
 {
@@ -42521,8 +42700,8 @@ INPUT_PORTS_START( sc4bobcl ) // this structure is generated
 INPUT_PORTS_END
 
 // PR2298 CLUB BOBBY DAZZLER         CLUB BOB DAZZLER  CLUB  CLUBBOBD SOUNDS
-GAMEL( 200?, sc4bobcl    ,0,         sc4_5reel, sc4bobcl, sc4_state, sc4bobcl, ROT0, "Mazooma","Bobby Dazzler Club (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4bobcla   ,sc4bobcl,  sc4_5reel, sc4bobcl, sc4_state, sc4bobcl, ROT0, "Mazooma","Bobby Dazzler Club (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4bobcl    ,0,         sc4_5reel, sc4bobcl, sc4_state, sc4bobcl, ROT0, "Mazooma","Bobby Dazzler Club (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4bobcl )
+GAMEL( 200?, sc4bobcla   ,sc4bobcl,  sc4_5reel, sc4bobcl, sc4_state, sc4bobcl, ROT0, "Mazooma","Bobby Dazzler Club (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4bobcl )
 
 DRIVER_INIT_MEMBER(sc4_state,sc4brksp)
 {
@@ -42577,8 +42756,8 @@ INPUT_PORTS_START( sc4brksp ) // this structure is generated
 INPUT_PORTS_END
 
 // PR2033 BREAK THE SPELL         SPELL SOUNDS         BREAK THE SPELL
-GAMEL( 200?, sc4brksp    ,0,         sc4_5reel, sc4brksp, sc4_state, sc4brksp, ROT0, "Mazooma","Break The Spell (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4brkspa   ,sc4brksp,  sc4_5reel, sc4brksp, sc4_state, sc4brksp, ROT0, "Mazooma","Break The Spell (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4brksp    ,0,         sc4_5reel, sc4brksp, sc4_state, sc4brksp, ROT0, "Mazooma","Break The Spell (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4brksp )
+GAMEL( 200?, sc4brkspa   ,sc4brksp,  sc4_5reel, sc4brksp, sc4_state, sc4brksp, ROT0, "Mazooma","Break The Spell (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4brksp )
 
 DRIVER_INIT_MEMBER(sc4_state,sc4bulcl)
 {
@@ -42719,8 +42898,8 @@ INPUT_PORTS_START( sc4carry ) // this structure is generated
 INPUT_PORTS_END
 
 // PR1113 CARRY ON WINNING         PR1113 CARRY ON WINNING SOUNDS11
-GAMEL( 200?, sc4carry    ,0,         sc4_4reel_alt, sc4carry, sc4_state, sc4carry, ROT0, "BFM","Carry On Winning (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4carrya   ,sc4carry,  sc4_4reel_alt, sc4carry, sc4_state, sc4carry, ROT0, "BFM","Carry On Winning (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4carry    ,0,         sc4_4reel_alt, sc4carry, sc4_state, sc4carry, ROT0, "BFM","Carry On Winning (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4carrya )
+GAMEL( 200?, sc4carrya   ,sc4carry,  sc4_4reel_alt, sc4carry, sc4_state, sc4carry, ROT0, "BFM","Carry On Winning (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4carrya )
 
 INPUT_PORTS_START( sc4cbaz ) // this structure is generated
 		PORT_INCLUDE( sc4_base )
@@ -42846,14 +43025,14 @@ INPUT_PORTS_START( sc4clash ) // this structure is generated
 INPUT_PORTS_END
 
 // PR2118 CASH ON THE LASH         COTL SOUNDS         CASH ON THE LASH
-GAMEL( 200?, sc4clash    ,0,         sc4, sc4clash, sc4_state, sc4mbus, ROT0, "Mazooma","Cash On The Lash (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4clasha   ,sc4clash,  sc4, sc4clash, sc4_state, sc4mbus, ROT0, "Mazooma","Cash On The Lash (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4clashb   ,sc4clash,  sc4, sc4clash, sc4_state, sc4mbus, ROT0, "Mazooma","Cash On The Lash (Mazooma) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4clashc   ,sc4clash,  sc4, sc4clash, sc4_state, sc4mbus, ROT0, "Mazooma","Cash On The Lash (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4clashd   ,sc4clash,  sc4, sc4clash, sc4_state, sc4, ROT0, "Mazooma","Cash On The Lash (Mazooma) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4clashe   ,sc4clash,  sc4, sc4clash, sc4_state, sc4, ROT0, "Mazooma","Cash On The Lash (Mazooma) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4clashf   ,sc4clash,  sc4, sc4clash, sc4_state, sc4, ROT0, "Mazooma","Cash On The Lash (Mazooma) (Scorpion 4) (set 7)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4clashg   ,sc4clash,  sc4, sc4clash, sc4_state, sc4, ROT0, "Mazooma","Cash On The Lash (Mazooma) (Scorpion 4) (set 8)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4clash    ,0,         sc4, sc4clash, sc4_state, sc4mbus, ROT0, "Mazooma","Cash On The Lash (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4clashd )
+GAMEL( 200?, sc4clasha   ,sc4clash,  sc4, sc4clash, sc4_state, sc4mbus, ROT0, "Mazooma","Cash On The Lash (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4clashd )
+GAMEL( 200?, sc4clashb   ,sc4clash,  sc4, sc4clash, sc4_state, sc4mbus, ROT0, "Mazooma","Cash On The Lash (Mazooma) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4clashd )
+GAMEL( 200?, sc4clashc   ,sc4clash,  sc4, sc4clash, sc4_state, sc4mbus, ROT0, "Mazooma","Cash On The Lash (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4clashd )
+GAMEL( 200?, sc4clashd   ,sc4clash,  sc4, sc4clash, sc4_state, sc4, ROT0, "Mazooma","Cash On The Lash (Mazooma) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_sc4clashd )
+GAMEL( 200?, sc4clashe   ,sc4clash,  sc4, sc4clash, sc4_state, sc4, ROT0, "Mazooma","Cash On The Lash (Mazooma) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_sc4clashd )
+GAMEL( 200?, sc4clashf   ,sc4clash,  sc4, sc4clash, sc4_state, sc4, ROT0, "Mazooma","Cash On The Lash (Mazooma) (Scorpion 4) (set 7)", MACHINE_FLAGS, layout_sc4clashd )
+GAMEL( 200?, sc4clashg   ,sc4clash,  sc4, sc4clash, sc4_state, sc4, ROT0, "Mazooma","Cash On The Lash (Mazooma) (Scorpion 4) (set 8)", MACHINE_FLAGS, layout_sc4clashd )
 
 
 INPUT_PORTS_START( sc4cckey ) // this structure is generated
@@ -43509,12 +43688,12 @@ INPUT_PORTS_START( sc4derby ) // this structure is generated
 INPUT_PORTS_END
 
 // PR1006  DEMOLITION DERBY         PR1006 DEMDERBY SOUNDS11
-GAMEL( 200?, sc4derby    ,0,         sc4_200_5r, sc4derby, sc4_state, sc4derby, ROT0, "BFM","Demolition Derby (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4derbya   ,sc4derby,  sc4_200_5r, sc4derby, sc4_state, sc4derby, ROT0, "BFM","Demolition Derby (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4derbyb   ,sc4derby,  sc4_200_5r, sc4derby, sc4_state, sc4derby, ROT0, "BFM","Demolition Derby (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4derbyc   ,sc4derby,  sc4_200_5r, sc4derby, sc4_state, sc4derby, ROT0, "BFM","Demolition Derby (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4derbyd   ,sc4derby,  sc4_200_5r, sc4derby, sc4_state, sc4derby, ROT0, "BFM","Demolition Derby (Bellfruit) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4derbye   ,sc4derby,  sc4_200_5r, sc4derby, sc4_state, sc4derby, ROT0, "BFM","Demolition Derby (Bellfruit) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4derby    ,0,         sc4_200_5r, sc4derby, sc4_state, sc4derby, ROT0, "BFM","Demolition Derby (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4derby )
+GAMEL( 200?, sc4derbya   ,sc4derby,  sc4_200_5r, sc4derby, sc4_state, sc4derby, ROT0, "BFM","Demolition Derby (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4derby )
+GAMEL( 200?, sc4derbyb   ,sc4derby,  sc4_200_5r, sc4derby, sc4_state, sc4derby, ROT0, "BFM","Demolition Derby (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4derby )
+GAMEL( 200?, sc4derbyc   ,sc4derby,  sc4_200_5r, sc4derby, sc4_state, sc4derby, ROT0, "BFM","Demolition Derby (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4derby )
+GAMEL( 200?, sc4derbyd   ,sc4derby,  sc4_200_5r, sc4derby, sc4_state, sc4derby, ROT0, "BFM","Demolition Derby (Bellfruit) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_sc4derby )
+GAMEL( 200?, sc4derbye   ,sc4derby,  sc4_200_5r, sc4derby, sc4_state, sc4derby, ROT0, "BFM","Demolition Derby (Bellfruit) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_sc4derby )
 
 INPUT_PORTS_START( sc4dbldm ) // this structure is generated
 		PORT_INCLUDE( sc4_base )
@@ -43613,8 +43792,8 @@ INPUT_PORTS_START( sc4dyna ) // this structure is generated
 INPUT_PORTS_END
 
 // PR1104 DYNAMITE         PR1104 DYNAMITE SOUNDS11
-GAMEL( 200?, sc4dyna     ,0,         sc4, sc4dyna, sc4_state, sc4, ROT0, "BFM","Dynamite (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4dynaa    ,sc4dyna,   sc4, sc4dyna, sc4_state, sc4, ROT0, "BFM","Dynamite (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4dyna     ,0,         sc4, sc4dyna, sc4_state, sc4, ROT0, "BFM","Dynamite (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4dyna )
+GAMEL( 200?, sc4dynaa    ,sc4dyna,   sc4, sc4dyna, sc4_state, sc4, ROT0, "BFM","Dynamite (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4dyna )
 
 INPUT_PORTS_START( sc4easy ) // this structure is generated
 		PORT_INCLUDE( sc4_base )
@@ -43896,16 +44075,16 @@ INPUT_PORTS_END
 
 // we have FEVER SOUNDS12 but it accepts those?
 // PR1007 FEVER         PR1007 FEVER SOUNDS11
-GAMEL( 200?, sc4fever    ,0,         sc4_200_alta, sc4fever, sc4_state, sc4fever, ROT0, "BFM","Fever (PR1007) (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
-GAMEL( 200?, sc4fevera   ,sc4fever,  sc4_200_alta, sc4fever, sc4_state, sc4fever, ROT0, "BFM","Fever (PR1007) (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
-GAMEL( 200?, sc4feverb   ,sc4fever,  sc4_200_alta, sc4fever, sc4_state, sc4fever, ROT0, "BFM","Fever (PR1007) (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
-GAMEL( 200?, sc4feverc   ,sc4fever,  sc4_200_alta, sc4fever, sc4_state, sc4fever, ROT0, "BFM","Fever (PR1007) (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
-GAMEL( 200?, sc4feverd   ,sc4fever,  sc4_200_alta, sc4fever, sc4_state, sc4fever, ROT0, "BFM","Fever (PR1007) (Bellfruit) (Scorpion 4) (set 5)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
-GAMEL( 200?, sc4fevere   ,sc4fever,  sc4_200_alta, sc4fever, sc4_state, sc4fever, ROT0, "BFM","Fever (PR1007) (Bellfruit) (Scorpion 4) (set 6)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
-GAMEL( 200?, sc4feverf   ,sc4fever,  sc4_200_alta, sc4fever, sc4_state, sc4fever, ROT0, "BFM","Fever (PR1007) (Bellfruit) (Scorpion 4) (set 7)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
-GAMEL( 200?, sc4feverg   ,sc4fever,  sc4_200_alta, sc4fever, sc4_state, sc4fever, ROT0, "BFM","Fever (PR1007) (Bellfruit) (Scorpion 4) (set 8)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
-GAMEL( 200?, sc4feverh   ,sc4fever,  sc4_200_alta, sc4fever, sc4_state, sc4fever, ROT0, "BFM","Fever (PR1007) (Bellfruit) (Scorpion 4) (set 9)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
-GAMEL( 200?, sc4feverk   ,sc4fever,  sc4_200_alta, sc4fever, sc4_state, sc4fever, ROT0, "BFM","Fever (PR1007) (Bellfruit) (Scorpion 4) (set 10)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
+GAMEL( 200?, sc4fever    ,0,         sc4_200_alta, sc4fever, sc4_state, sc4fever, ROT0, "BFM","Fever (PR1007) (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS_NOSOUND, layout_sc4fever )
+GAMEL( 200?, sc4fevera   ,sc4fever,  sc4_200_alta, sc4fever, sc4_state, sc4fever, ROT0, "BFM","Fever (PR1007) (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS_NOSOUND, layout_sc4fever )
+GAMEL( 200?, sc4feverb   ,sc4fever,  sc4_200_alta, sc4fever, sc4_state, sc4fever, ROT0, "BFM","Fever (PR1007) (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS_NOSOUND, layout_sc4fever )
+GAMEL( 200?, sc4feverc   ,sc4fever,  sc4_200_alta, sc4fever, sc4_state, sc4fever, ROT0, "BFM","Fever (PR1007) (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS_NOSOUND, layout_sc4fever )
+GAMEL( 200?, sc4feverd   ,sc4fever,  sc4_200_alta, sc4fever, sc4_state, sc4fever, ROT0, "BFM","Fever (PR1007) (Bellfruit) (Scorpion 4) (set 5)", MACHINE_FLAGS_NOSOUND, layout_sc4fever )
+GAMEL( 200?, sc4fevere   ,sc4fever,  sc4_200_alta, sc4fever, sc4_state, sc4fever, ROT0, "BFM","Fever (PR1007) (Bellfruit) (Scorpion 4) (set 6)", MACHINE_FLAGS_NOSOUND, layout_sc4fever )
+GAMEL( 200?, sc4feverf   ,sc4fever,  sc4_200_alta, sc4fever, sc4_state, sc4fever, ROT0, "BFM","Fever (PR1007) (Bellfruit) (Scorpion 4) (set 7)", MACHINE_FLAGS_NOSOUND, layout_sc4fever )
+GAMEL( 200?, sc4feverg   ,sc4fever,  sc4_200_alta, sc4fever, sc4_state, sc4fever, ROT0, "BFM","Fever (PR1007) (Bellfruit) (Scorpion 4) (set 8)", MACHINE_FLAGS_NOSOUND, layout_sc4fever )
+GAMEL( 200?, sc4feverh   ,sc4fever,  sc4_200_alta, sc4fever, sc4_state, sc4fever, ROT0, "BFM","Fever (PR1007) (Bellfruit) (Scorpion 4) (set 9)", MACHINE_FLAGS_NOSOUND, layout_sc4fever )
+GAMEL( 200?, sc4feverk   ,sc4fever,  sc4_200_alta, sc4fever, sc4_state, sc4fever, ROT0, "BFM","Fever (PR1007) (Bellfruit) (Scorpion 4) (set 10)", MACHINE_FLAGS_NOSOUND, layout_sc4fever )
 
 
 
@@ -46433,11 +46612,11 @@ INPUT_PORTS_END
 
 // gives an 'init comms' countdown
 // PR1439 DIAMONDS & RUBIES         PR1436 TRIPLE CASINO SOUNDS11
-GAMEL( 200?, sc4druby    ,0,         sc4, sc4druby, sc4_state, sc4, ROT0, "BFM","Diamonds & Rubies (Bellfruit) (Scorpion 4) (Top Box?, set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4drubya   ,sc4druby,  sc4, sc4druby, sc4_state, sc4, ROT0, "BFM","Diamonds & Rubies (Bellfruit) (Scorpion 4) (Top Box?, set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4drubyb   ,sc4druby,  sc4, sc4druby, sc4_state, sc4, ROT0, "BFM","Diamonds & Rubies (Bellfruit) (Scorpion 4) (Top Box?, set 3)", MACHINE_FLAGS, layout_bfm_sc4 ) // incomplete pairing
-GAMEL( 200?, sc4drubyc   ,sc4druby,  sc4, sc4druby, sc4_state, sc4, ROT0, "BFM","Diamonds & Rubies (Bellfruit) (Scorpion 4) (Top Box?, set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4drubyd   ,sc4druby,  sc4, sc4druby, sc4_state, sc4, ROT0, "BFM","Diamonds & Rubies (Bellfruit) (Scorpion 4) (Top Box?, set 5)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4druby    ,0,         sc4, sc4druby, sc4_state, sc4, ROT0, "BFM","Diamonds & Rubies (Bellfruit) (Scorpion 4) (Top Box?, set 1)", MACHINE_FLAGS, layout_sc4drubyb )
+GAMEL( 200?, sc4drubya   ,sc4druby,  sc4, sc4druby, sc4_state, sc4, ROT0, "BFM","Diamonds & Rubies (Bellfruit) (Scorpion 4) (Top Box?, set 2)", MACHINE_FLAGS, layout_sc4drubyb )
+GAMEL( 200?, sc4drubyb   ,sc4druby,  sc4, sc4druby, sc4_state, sc4, ROT0, "BFM","Diamonds & Rubies (Bellfruit) (Scorpion 4) (Top Box?, set 3)", MACHINE_FLAGS, layout_sc4drubyb ) // incomplete pairing
+GAMEL( 200?, sc4drubyc   ,sc4druby,  sc4, sc4druby, sc4_state, sc4, ROT0, "BFM","Diamonds & Rubies (Bellfruit) (Scorpion 4) (Top Box?, set 4)", MACHINE_FLAGS, layout_sc4drubyb )
+GAMEL( 200?, sc4drubyd   ,sc4druby,  sc4, sc4druby, sc4_state, sc4, ROT0, "BFM","Diamonds & Rubies (Bellfruit) (Scorpion 4) (Top Box?, set 5)", MACHINE_FLAGS, layout_sc4drubyb )
 
 
 /****************************************************************************************************************************************************************************************************************/
@@ -46988,8 +47167,8 @@ INPUT_PORTS_END
 
 // This is a different game
 // PR2057 KNOCK OUT         PKOT SOUNDS            KNOCK OUT
-GAMEL( 200?, sc4knokb    ,0,         sc4_200_5r, sc4knokb, sc4_state, sc4knokb, ROT0, "Mazooma","Knock Out (PR2057, PKOT) (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
-GAMEL( 200?, sc4knokc    ,sc4knokb,  sc4_200_5r, sc4knokb, sc4_state, sc4knokb, ROT0, "Mazooma","Knock Out (PR2057, PKOT) (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
+GAMEL( 200?, sc4knokb    ,0,         sc4_200_5r, sc4knokb, sc4_state, sc4knokb, ROT0, "Mazooma","Knock Out (PR2057, PKOT) (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS_NOSOUND, layout_sc4knokb )
+GAMEL( 200?, sc4knokc    ,sc4knokb,  sc4_200_5r, sc4knokb, sc4_state, sc4knokb, ROT0, "Mazooma","Knock Out (PR2057, PKOT) (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS_NOSOUND, layout_sc4knokb )
 
 
 DRIVER_INIT_MEMBER(sc4_state,sc4maxcc)
@@ -47304,14 +47483,14 @@ INPUT_PORTS_START( sc4clue ) // this structure is generated
 INPUT_PORTS_END
 
 // PR2230 CLUEDO         CLUE SOUNDS              CLUEDO
-GAMEL( 200?, sc4clue     ,0,         sc4, sc4clue, sc4_state, sc4, ROT0, "Mazooma","Cluedo (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
-GAMEL( 200?, sc4cluea    ,sc4clue,   sc4, sc4clue, sc4_state, sc4, ROT0, "Mazooma","Cluedo (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
-GAMEL( 200?, sc4clueb    ,sc4clue,   sc4, sc4clue, sc4_state, sc4, ROT0, "Mazooma","Cluedo (Mazooma) (Scorpion 4) (set 3)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
-GAMEL( 200?, sc4cluec    ,sc4clue,   sc4, sc4clue, sc4_state, sc4, ROT0, "Mazooma","Cluedo (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
-GAMEL( 200?, sc4clued    ,sc4clue,   sc4, sc4clue, sc4_state, sc4, ROT0, "Mazooma","Cluedo (Mazooma) (Scorpion 4) (set 5)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
-GAMEL( 200?, sc4cluee    ,sc4clue,   sc4, sc4clue, sc4_state, sc4, ROT0, "Mazooma","Cluedo (Mazooma) (Scorpion 4) (set 6)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
-GAMEL( 200?, sc4cluef    ,sc4clue,   sc4, sc4clue, sc4_state, sc4, ROT0, "Mazooma","Cluedo (Mazooma) (Scorpion 4) (set 7)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
-GAMEL( 200?, sc4clueg    ,sc4clue,   sc4, sc4clue, sc4_state, sc4, ROT0, "Mazooma","Cluedo (Mazooma) (Scorpion 4) (set 8)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
+GAMEL( 200?, sc4clue     ,0,         sc4, sc4clue, sc4_state, sc4, ROT0, "Mazooma","Cluedo (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS_NOSOUND, layout_sc4clue )
+GAMEL( 200?, sc4cluea    ,sc4clue,   sc4, sc4clue, sc4_state, sc4, ROT0, "Mazooma","Cluedo (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS_NOSOUND, layout_sc4clue )
+GAMEL( 200?, sc4clueb    ,sc4clue,   sc4, sc4clue, sc4_state, sc4, ROT0, "Mazooma","Cluedo (Mazooma) (Scorpion 4) (set 3)", MACHINE_FLAGS_NOSOUND, layout_sc4clue )
+GAMEL( 200?, sc4cluec    ,sc4clue,   sc4, sc4clue, sc4_state, sc4, ROT0, "Mazooma","Cluedo (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS_NOSOUND, layout_sc4clue )
+GAMEL( 200?, sc4clued    ,sc4clue,   sc4, sc4clue, sc4_state, sc4, ROT0, "Mazooma","Cluedo (Mazooma) (Scorpion 4) (set 5)", MACHINE_FLAGS_NOSOUND, layout_sc4clue )
+GAMEL( 200?, sc4cluee    ,sc4clue,   sc4, sc4clue, sc4_state, sc4, ROT0, "Mazooma","Cluedo (Mazooma) (Scorpion 4) (set 6)", MACHINE_FLAGS_NOSOUND, layout_sc4clue )
+GAMEL( 200?, sc4cluef    ,sc4clue,   sc4, sc4clue, sc4_state, sc4, ROT0, "Mazooma","Cluedo (Mazooma) (Scorpion 4) (set 7)", MACHINE_FLAGS_NOSOUND, layout_sc4clue )
+GAMEL( 200?, sc4clueg    ,sc4clue,   sc4, sc4clue, sc4_state, sc4, ROT0, "Mazooma","Cluedo (Mazooma) (Scorpion 4) (set 8)", MACHINE_FLAGS_NOSOUND, layout_sc4clue )
 
 INPUT_PORTS_START( sc4ducks ) // this structure is generated
 		PORT_INCLUDE( sc4_base )
@@ -47972,14 +48151,14 @@ INPUT_PORTS_START( sc4tpsht ) // this structure is generated
 INPUT_PORTS_END
 
 // PR2211 TOP OF THE SHOTS         TOTS SOUNDS         TOP OF THE SHOTS
-GAMEL( 200?, sc4tpsht    ,0,         sc4, sc4tpsht, sc4_state, sc4, ROT0, "Mazooma","Top Of The Shots (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
-GAMEL( 200?, sc4tpshta   ,sc4tpsht,  sc4, sc4tpsht, sc4_state, sc4, ROT0, "Mazooma","Top Of The Shots (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
-GAMEL( 200?, sc4tpshtb   ,sc4tpsht,  sc4, sc4tpsht, sc4_state, sc4, ROT0, "Mazooma","Top Of The Shots (Mazooma) (Scorpion 4) (set 3)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
-GAMEL( 200?, sc4tpshtc   ,sc4tpsht,  sc4, sc4tpsht, sc4_state, sc4, ROT0, "Mazooma","Top Of The Shots (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
-GAMEL( 200?, sc4tpshtd   ,sc4tpsht,  sc4, sc4tpsht, sc4_state, sc4, ROT0, "Mazooma","Top Of The Shots (Mazooma) (Scorpion 4) (set 5)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
-GAMEL( 200?, sc4tpshte   ,sc4tpsht,  sc4, sc4tpsht, sc4_state, sc4, ROT0, "Mazooma","Top Of The Shots (Mazooma) (Scorpion 4) (set 6)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
-GAMEL( 200?, sc4tpshtf   ,sc4tpsht,  sc4, sc4tpsht, sc4_state, sc4, ROT0, "Mazooma","Top Of The Shots (Mazooma) (Scorpion 4) (set 7)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
-GAMEL( 200?, sc4tpshtg   ,sc4tpsht,  sc4, sc4tpsht, sc4_state, sc4, ROT0, "Mazooma","Top Of The Shots (Mazooma) (Scorpion 4) (set 8)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
+GAMEL( 200?, sc4tpsht    ,0,         sc4, sc4tpsht, sc4_state, sc4, ROT0, "Mazooma","Top Of The Shots (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS_NOSOUND, layout_sc4tpshta )
+GAMEL( 200?, sc4tpshta   ,sc4tpsht,  sc4, sc4tpsht, sc4_state, sc4, ROT0, "Mazooma","Top Of The Shots (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS_NOSOUND, layout_sc4tpshta )
+GAMEL( 200?, sc4tpshtb   ,sc4tpsht,  sc4, sc4tpsht, sc4_state, sc4, ROT0, "Mazooma","Top Of The Shots (Mazooma) (Scorpion 4) (set 3)", MACHINE_FLAGS_NOSOUND, layout_sc4tpshta )
+GAMEL( 200?, sc4tpshtc   ,sc4tpsht,  sc4, sc4tpsht, sc4_state, sc4, ROT0, "Mazooma","Top Of The Shots (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS_NOSOUND, layout_sc4tpshta )
+GAMEL( 200?, sc4tpshtd   ,sc4tpsht,  sc4, sc4tpsht, sc4_state, sc4, ROT0, "Mazooma","Top Of The Shots (Mazooma) (Scorpion 4) (set 5)", MACHINE_FLAGS_NOSOUND, layout_sc4tpshta )
+GAMEL( 200?, sc4tpshte   ,sc4tpsht,  sc4, sc4tpsht, sc4_state, sc4, ROT0, "Mazooma","Top Of The Shots (Mazooma) (Scorpion 4) (set 6)", MACHINE_FLAGS_NOSOUND, layout_sc4tpshta )
+GAMEL( 200?, sc4tpshtf   ,sc4tpsht,  sc4, sc4tpsht, sc4_state, sc4, ROT0, "Mazooma","Top Of The Shots (Mazooma) (Scorpion 4) (set 7)", MACHINE_FLAGS_NOSOUND, layout_sc4tpshta )
+GAMEL( 200?, sc4tpshtg   ,sc4tpsht,  sc4, sc4tpsht, sc4_state, sc4, ROT0, "Mazooma","Top Of The Shots (Mazooma) (Scorpion 4) (set 8)", MACHINE_FLAGS_NOSOUND, layout_sc4tpshta )
 
 
 INPUT_PORTS_START( sc4adren ) // this structure is generated
@@ -48603,10 +48782,10 @@ INPUT_PORTS_START( sc4hyde ) // this structure is generated
 INPUT_PORTS_END
 
 // PR2036 HYDE & STREAK         HYDE SOUNDS          HYDE & STREAK
-GAMEL( 200?, sc4hyde     ,0,         sc4, sc4hyde, sc4_state, sc4, ROT0, "Mazooma","Hyde & Streak (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
-GAMEL( 200?, sc4hydea    ,sc4hyde,   sc4, sc4hyde, sc4_state, sc4, ROT0, "Mazooma","Hyde & Streak (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
-GAMEL( 200?, sc4hydeb    ,sc4hyde,   sc4, sc4hyde, sc4_state, sc4, ROT0, "Mazooma","Hyde & Streak (Mazooma) (Scorpion 4) (set 3)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
-GAMEL( 200?, sc4hydec    ,sc4hyde,   sc4, sc4hyde, sc4_state, sc4, ROT0, "Mazooma","Hyde & Streak (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
+GAMEL( 200?, sc4hyde     ,0,         sc4, sc4hyde, sc4_state, sc4, ROT0, "Mazooma","Hyde & Streak (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS_NOSOUND, layout_sc4hyde )
+GAMEL( 200?, sc4hydea    ,sc4hyde,   sc4, sc4hyde, sc4_state, sc4, ROT0, "Mazooma","Hyde & Streak (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS_NOSOUND, layout_sc4hyde )
+GAMEL( 200?, sc4hydeb    ,sc4hyde,   sc4, sc4hyde, sc4_state, sc4, ROT0, "Mazooma","Hyde & Streak (Mazooma) (Scorpion 4) (set 3)", MACHINE_FLAGS_NOSOUND, layout_sc4hyde )
+GAMEL( 200?, sc4hydec    ,sc4hyde,   sc4, sc4hyde, sc4_state, sc4, ROT0, "Mazooma","Hyde & Streak (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS_NOSOUND, layout_sc4hyde )
 
 INPUT_PORTS_START( sc4rtclb ) // this structure is generated
 		PORT_INCLUDE( sc4_base )
@@ -48678,14 +48857,14 @@ GAMEL( 200?, sc4rtclba   ,sc4rtclb,  sc4, sc4rtclb, sc4_state, sc4, ROT0, "Mazoo
 
 // doesn't like the sound roms we have (WILDJACK SOUNDS)
 // PR0000 WILD JACKPOTS         WJPT SOUNDS         WILD JACKPOTS
-GAMEL( 200?, sc4wldjk    ,0,         sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Wild Jackpots (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
-GAMEL( 200?, sc4wldjka   ,sc4wldjk,  sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Wild Jackpots (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
-GAMEL( 200?, sc4wldjkb   ,sc4wldjk,  sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Wild Jackpots (Mazooma) (Scorpion 4) (set 3)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
-GAMEL( 200?, sc4wldjkc   ,sc4wldjk,  sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Wild Jackpots (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
-GAMEL( 200?, sc4wldjkd   ,sc4wldjk,  sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Wild Jackpots (Mazooma) (Scorpion 4) (set 5)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
-GAMEL( 200?, sc4wldjke   ,sc4wldjk,  sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Wild Jackpots (Mazooma) (Scorpion 4) (set 6)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
-GAMEL( 200?, sc4wldjkf   ,sc4wldjk,  sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Wild Jackpots (Mazooma) (Scorpion 4) (set 7)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
-GAMEL( 200?, sc4wldjkg   ,sc4wldjk,  sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Wild Jackpots (Mazooma) (Scorpion 4) (set 8)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
+GAMEL( 200?, sc4wldjk    ,0,         sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Wild Jackpots (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS_NOSOUND, layout_sc4wldjkc )
+GAMEL( 200?, sc4wldjka   ,sc4wldjk,  sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Wild Jackpots (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS_NOSOUND, layout_sc4wldjkc )
+GAMEL( 200?, sc4wldjkb   ,sc4wldjk,  sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Wild Jackpots (Mazooma) (Scorpion 4) (set 3)", MACHINE_FLAGS_NOSOUND, layout_sc4wldjkc )
+GAMEL( 200?, sc4wldjkc   ,sc4wldjk,  sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Wild Jackpots (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS_NOSOUND, layout_sc4wldjkc )
+GAMEL( 200?, sc4wldjkd   ,sc4wldjk,  sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Wild Jackpots (Mazooma) (Scorpion 4) (set 5)", MACHINE_FLAGS_NOSOUND, layout_sc4wldjkc )
+GAMEL( 200?, sc4wldjke   ,sc4wldjk,  sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Wild Jackpots (Mazooma) (Scorpion 4) (set 6)", MACHINE_FLAGS_NOSOUND, layout_sc4wldjkc )
+GAMEL( 200?, sc4wldjkf   ,sc4wldjk,  sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Wild Jackpots (Mazooma) (Scorpion 4) (set 7)", MACHINE_FLAGS_NOSOUND, layout_sc4wldjkc )
+GAMEL( 200?, sc4wldjkg   ,sc4wldjk,  sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Wild Jackpots (Mazooma) (Scorpion 4) (set 8)", MACHINE_FLAGS_NOSOUND, layout_sc4wldjkc )
 
 // only sc4jive has this structure intact
 INPUT_PORTS_START( sc4jive ) // this structure is generated
@@ -48850,10 +49029,10 @@ INPUT_PORTS_START( sc4monot ) // this structure is generated
 		// 0x0010 - "deflt" // standard input (expected here)
 INPUT_PORTS_END
 
-GAMEL( 200?, sc4monot    ,0,         sc4, sc4monot, sc4_state, sc4, ROT0, "Mazooma","Monopoly TTT (PR2133) (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 ) // PR2133MONOPOLY TTT         MONOPOLY TTT  MAZ MONL SOUNDS         MONOPOLY
-GAMEL( 200?, sc4monota   ,sc4monot,  sc4, sc4monot, sc4_state, sc4, ROT0, "Mazooma","Monopoly TTT (PR2133) (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 ) // ^^
-GAMEL( 200?, sc4monotb   ,sc4monot,  sc4, sc4monot, sc4_state, sc4, ROT0, "Mazooma","Monopoly TTT (PR2133) (Mazooma) (Scorpion 4) (set 3)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 ) // ^^
-GAMEL( 200?, sc4monotc   ,sc4monot,  sc4, sc4monot, sc4_state, sc4, ROT0, "Mazooma","Monopoly TTT (PR2133) (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 ) // PR2133MONOPOLY TTT         MONOPOLY TTT  ARCADE  MONL SOUNDS         MONOPOLY
+GAMEL( 200?, sc4monot    ,0,         sc4, sc4monot, sc4_state, sc4, ROT0, "Mazooma","Monopoly TTT (PR2133) (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS_NOSOUND, layout_sc4monot ) // PR2133MONOPOLY TTT         MONOPOLY TTT  MAZ MONL SOUNDS         MONOPOLY
+GAMEL( 200?, sc4monota   ,sc4monot,  sc4, sc4monot, sc4_state, sc4, ROT0, "Mazooma","Monopoly TTT (PR2133) (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS_NOSOUND, layout_sc4monot ) // ^^
+GAMEL( 200?, sc4monotb   ,sc4monot,  sc4, sc4monot, sc4_state, sc4, ROT0, "Mazooma","Monopoly TTT (PR2133) (Mazooma) (Scorpion 4) (set 3)", MACHINE_FLAGS_NOSOUND, layout_sc4monot ) // ^^
+GAMEL( 200?, sc4monotc   ,sc4monot,  sc4, sc4monot, sc4_state, sc4, ROT0, "Mazooma","Monopoly TTT (PR2133) (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS_NOSOUND, layout_sc4monot ) // PR2133MONOPOLY TTT         MONOPOLY TTT  ARCADE  MONL SOUNDS         MONOPOLY
 
 INPUT_PORTS_START( sc4r2r ) // this structure is generated
 		PORT_INCLUDE( sc4_base )
@@ -48963,12 +49142,12 @@ INPUT_PORTS_START( sc4revo ) // this structure is generated
 INPUT_PORTS_END
 
 // PR2020 REVOLVER         REV SOUNDS               REVOLVER
-GAMEL( 200?, sc4revo     ,0,         sc4, sc4revo, sc4_state, sc4, ROT0, "Mazooma","Revolver (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
-GAMEL( 200?, sc4revoa    ,sc4revo,   sc4, sc4revo, sc4_state, sc4, ROT0, "Mazooma","Revolver (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
-GAMEL( 200?, sc4revob    ,sc4revo,   sc4, sc4revo, sc4_state, sc4, ROT0, "Mazooma","Revolver (Mazooma) (Scorpion 4) (set 3)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
-GAMEL( 200?, sc4revoc    ,sc4revo,   sc4, sc4revo, sc4_state, sc4, ROT0, "Mazooma","Revolver (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
-GAMEL( 200?, sc4revod    ,sc4revo,   sc4, sc4revo, sc4_state, sc4, ROT0, "Mazooma","Revolver (Mazooma) (Scorpion 4) (set 5)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
-GAMEL( 200?, sc4revoe    ,sc4revo,   sc4, sc4revo, sc4_state, sc4, ROT0, "Mazooma","Revolver (Mazooma) (Scorpion 4) (set 6)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
+GAMEL( 200?, sc4revo     ,0,         sc4, sc4revo, sc4_state, sc4, ROT0, "Mazooma","Revolver (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS_NOSOUND, layout_sc4revod )
+GAMEL( 200?, sc4revoa    ,sc4revo,   sc4, sc4revo, sc4_state, sc4, ROT0, "Mazooma","Revolver (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS_NOSOUND, layout_sc4revod )
+GAMEL( 200?, sc4revob    ,sc4revo,   sc4, sc4revo, sc4_state, sc4, ROT0, "Mazooma","Revolver (Mazooma) (Scorpion 4) (set 3)", MACHINE_FLAGS_NOSOUND, layout_sc4revod )
+GAMEL( 200?, sc4revoc    ,sc4revo,   sc4, sc4revo, sc4_state, sc4, ROT0, "Mazooma","Revolver (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS_NOSOUND, layout_sc4revod )
+GAMEL( 200?, sc4revod    ,sc4revo,   sc4, sc4revo, sc4_state, sc4, ROT0, "Mazooma","Revolver (Mazooma) (Scorpion 4) (set 5)", MACHINE_FLAGS_NOSOUND, layout_sc4revod )
+GAMEL( 200?, sc4revoe    ,sc4revo,   sc4, sc4revo, sc4_state, sc4, ROT0, "Mazooma","Revolver (Mazooma) (Scorpion 4) (set 6)", MACHINE_FLAGS_NOSOUND, layout_sc4revod )
 
 INPUT_PORTS_START( sc4slih ) // this structure is generated
 		PORT_INCLUDE( sc4_base )
@@ -49018,12 +49197,12 @@ INPUT_PORTS_END
 
 // half size sound roms
 // PR2145 SOME LIKE IT HOT         SLIH SOUNDS         SOME LIKE IT HOT
-GAMEL( 200?, sc4slih     ,0,         sc4, sc4slih, sc4_state, sc4, ROT0, "Mazooma","Some Like It Hot (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
-GAMEL( 200?, sc4sliha    ,sc4slih,   sc4, sc4slih, sc4_state, sc4, ROT0, "Mazooma","Some Like It Hot (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
-GAMEL( 200?, sc4slihb    ,sc4slih,   sc4, sc4slih, sc4_state, sc4, ROT0, "Mazooma","Some Like It Hot (Mazooma) (Scorpion 4) (set 3)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
-GAMEL( 200?, sc4slihc    ,sc4slih,   sc4, sc4slih, sc4_state, sc4, ROT0, "Mazooma","Some Like It Hot (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
-GAMEL( 200?, sc4slihd    ,sc4slih,   sc4, sc4slih, sc4_state, sc4, ROT0, "Mazooma","Some Like It Hot (Mazooma) (Scorpion 4) (set 5)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
-GAMEL( 200?, sc4slihe    ,sc4slih,   sc4, sc4slih, sc4_state, sc4, ROT0, "Mazooma","Some Like It Hot (Mazooma) (Scorpion 4) (set 6)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
+GAMEL( 200?, sc4slih     ,0,         sc4, sc4slih, sc4_state, sc4, ROT0, "Mazooma","Some Like It Hot (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS_NOSOUND, layout_sc4slihd )
+GAMEL( 200?, sc4sliha    ,sc4slih,   sc4, sc4slih, sc4_state, sc4, ROT0, "Mazooma","Some Like It Hot (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS_NOSOUND, layout_sc4slihd )
+GAMEL( 200?, sc4slihb    ,sc4slih,   sc4, sc4slih, sc4_state, sc4, ROT0, "Mazooma","Some Like It Hot (Mazooma) (Scorpion 4) (set 3)", MACHINE_FLAGS_NOSOUND, layout_sc4slihd )
+GAMEL( 200?, sc4slihc    ,sc4slih,   sc4, sc4slih, sc4_state, sc4, ROT0, "Mazooma","Some Like It Hot (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS_NOSOUND, layout_sc4slihd )
+GAMEL( 200?, sc4slihd    ,sc4slih,   sc4, sc4slih, sc4_state, sc4, ROT0, "Mazooma","Some Like It Hot (Mazooma) (Scorpion 4) (set 5)", MACHINE_FLAGS_NOSOUND, layout_sc4slihd )
+GAMEL( 200?, sc4slihe    ,sc4slih,   sc4, sc4slih, sc4_state, sc4, ROT0, "Mazooma","Some Like It Hot (Mazooma) (Scorpion 4) (set 6)", MACHINE_FLAGS_NOSOUND, layout_sc4slihd )
 
 INPUT_PORTS_START( sc4gcb ) // this structure is generated
 		PORT_INCLUDE( sc4_base )
@@ -49111,12 +49290,12 @@ DRIVER_INIT_MEMBER(sc4_state,sc4spark)
 
 
 // PR6912 SOUTH PARK         PR6912 SOUTH PARK SOUNDS11            SOUTH PARK
-GAMEL( 200?, sc4spark    ,0,         sc4_4reel, sc4, sc4_state, sc4spark, ROT0, "BFM","South Park (BFM) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4sparka   ,sc4spark,  sc4_4reel, sc4, sc4_state, sc4spark, ROT0, "BFM","South Park (BFM) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4sparkb   ,sc4spark,  sc4_4reel, sc4, sc4_state, sc4spark, ROT0, "BFM","South Park (BFM) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4sparkc   ,sc4spark,  sc4_4reel, sc4, sc4_state, sc4spark, ROT0, "BFM","South Park (BFM) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4sparkd   ,sc4spark,  sc4_4reel, sc4, sc4_state, sc4spark, ROT0, "BFM","South Park (BFM) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4sparke   ,sc4spark,  sc4_4reel, sc4, sc4_state, sc4spark, ROT0, "BFM","South Park (BFM) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4spark    ,0,         sc4_4reel, sc4, sc4_state, sc4spark, ROT0, "BFM","South Park (BFM) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4sparkd )
+GAMEL( 200?, sc4sparka   ,sc4spark,  sc4_4reel, sc4, sc4_state, sc4spark, ROT0, "BFM","South Park (BFM) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4sparkd )
+GAMEL( 200?, sc4sparkb   ,sc4spark,  sc4_4reel, sc4, sc4_state, sc4spark, ROT0, "BFM","South Park (BFM) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4sparkd )
+GAMEL( 200?, sc4sparkc   ,sc4spark,  sc4_4reel, sc4, sc4_state, sc4spark, ROT0, "BFM","South Park (BFM) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4sparkd )
+GAMEL( 200?, sc4sparkd   ,sc4spark,  sc4_4reel, sc4, sc4_state, sc4spark, ROT0, "BFM","South Park (BFM) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_sc4sparkd )
+GAMEL( 200?, sc4sparke   ,sc4spark,  sc4_4reel, sc4, sc4_state, sc4spark, ROT0, "BFM","South Park (BFM) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_sc4sparkd )
 
 
 
@@ -49140,13 +49319,13 @@ DRIVER_INIT_MEMBER(sc4_state,sc4gslam)
 }
 
 // PR6934 GRAND SLAM         PR6934 SLM2 SOUNDS11            GRAND SLAM
-GAMEL( 200?, sc4gslam    ,0,         sc4, sc4, sc4_state, sc4gslam, ROT0, "BFM","Grandslam Club (BFM) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4gslama   ,sc4gslam,  sc4, sc4, sc4_state, sc4gslam, ROT0, "BFM","Grandslam Club (BFM) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4gslamb   ,sc4gslam,  sc4, sc4, sc4_state, sc4gslam, ROT0, "BFM","Grandslam Club (BFM) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4gslamc   ,sc4gslam,  sc4, sc4, sc4_state, sc4gslam, ROT0, "BFM","Grandslam Club (BFM) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4gslamd   ,sc4gslam,  sc4, sc4, sc4_state, sc4gslam, ROT0, "BFM","Grandslam Club (BFM) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4gslame   ,sc4gslam,  sc4, sc4, sc4_state, sc4gslam, ROT0, "BFM","Grandslam Club (BFM) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4gslamf   ,sc4gslam,  sc4, sc4, sc4_state, sc4gslam, ROT0, "BFM","Grandslam Club (BFM) (Scorpion 4) (set 7)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4gslam    ,0,         sc4, sc4, sc4_state, sc4gslam, ROT0, "BFM","Grandslam Club (BFM) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4gslam )
+GAMEL( 200?, sc4gslama   ,sc4gslam,  sc4, sc4, sc4_state, sc4gslam, ROT0, "BFM","Grandslam Club (BFM) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4gslam )
+GAMEL( 200?, sc4gslamb   ,sc4gslam,  sc4, sc4, sc4_state, sc4gslam, ROT0, "BFM","Grandslam Club (BFM) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4gslam )
+GAMEL( 200?, sc4gslamc   ,sc4gslam,  sc4, sc4, sc4_state, sc4gslam, ROT0, "BFM","Grandslam Club (BFM) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4gslam )
+GAMEL( 200?, sc4gslamd   ,sc4gslam,  sc4, sc4, sc4_state, sc4gslam, ROT0, "BFM","Grandslam Club (BFM) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_sc4gslam )
+GAMEL( 200?, sc4gslame   ,sc4gslam,  sc4, sc4, sc4_state, sc4gslam, ROT0, "BFM","Grandslam Club (BFM) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_sc4gslam )
+GAMEL( 200?, sc4gslamf   ,sc4gslam,  sc4, sc4, sc4_state, sc4gslam, ROT0, "BFM","Grandslam Club (BFM) (Scorpion 4) (set 7)", MACHINE_FLAGS, layout_sc4gslam )
 
 
 
@@ -49158,10 +49337,10 @@ DRIVER_INIT_MEMBER(sc4_state,sc4canca)
 }
 
 // PR7017CASINO CAN CAN CASH          PR7017,Casino CAN CAN CASH,         LINE SOUNDS         CAN CAN CASH
-GAMEL( 200?, sc4canca    ,0,         sc4_4reel, sc4, sc4_state, sc4canca, ROT0, "Mazooma","Can Can Cash Casino (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cancaa   ,sc4canca,  sc4_4reel, sc4, sc4_state, sc4canca, ROT0, "Mazooma","Can Can Cash Casino (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cancab   ,sc4canca,  sc4_4reel, sc4, sc4_state, sc4canca, ROT0, "Mazooma","Can Can Cash Casino (Mazooma) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cancac   ,sc4canca,  sc4_4reel, sc4, sc4_state, sc4canca, ROT0, "Mazooma","Can Can Cash Casino (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4canca    ,0,         sc4_4reel, sc4, sc4_state, sc4canca, ROT0, "Mazooma","Can Can Cash Casino (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4canca )
+GAMEL( 200?, sc4cancaa   ,sc4canca,  sc4_4reel, sc4, sc4_state, sc4canca, ROT0, "Mazooma","Can Can Cash Casino (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4canca )
+GAMEL( 200?, sc4cancab   ,sc4canca,  sc4_4reel, sc4, sc4_state, sc4canca, ROT0, "Mazooma","Can Can Cash Casino (Mazooma) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4canca )
+GAMEL( 200?, sc4cancac   ,sc4canca,  sc4_4reel, sc4, sc4_state, sc4canca, ROT0, "Mazooma","Can Can Cash Casino (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4canca )
 
 
 
@@ -49171,17 +49350,17 @@ DRIVER_INIT_MEMBER(sc4_state,sc4hotpr)
 }
 
 // PR6911 HOT PROPERTY         PR6911 HOT PROPERTY SOUNDS11           HOT PROPERTY
-GAMEL( 200?, sc4hotpr    ,0,         sc4_4reel, sc4, sc4_state, sc4hotpr, ROT0, "BFM",             "Hot Property (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4hotprb   ,sc4hotpr,  sc4_4reel, sc4, sc4_state, sc4hotpr, ROT0, "BFM",             "Hot Property (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4hotprd   ,sc4hotpr,  sc4_4reel, sc4, sc4_state, sc4hotpr, ROT0, "BFM",             "Hot Property (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4hotpre   ,sc4hotpr,  sc4_4reel, sc4, sc4_state, sc4hotpr, ROT0, "BFM",             "Hot Property (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4hotpra   ,sc4hotpr,  sc4_4reel, sc4, sc4_state, sc4hotpr, ROT0, "BFM / Whitbread", "Hot Property (Bellfruit) (Scorpion 4) (Whitbread, set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4hotprc   ,sc4hotpr,  sc4_4reel, sc4, sc4_state, sc4hotpr, ROT0, "BFM / Whitbread", "Hot Property (Bellfruit) (Scorpion 4) (Whitbread, set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4hotpr    ,0,         sc4_4reel, sc4, sc4_state, sc4hotpr, ROT0, "BFM",             "Hot Property (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4hotpr )
+GAMEL( 200?, sc4hotprb   ,sc4hotpr,  sc4_4reel, sc4, sc4_state, sc4hotpr, ROT0, "BFM",             "Hot Property (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4hotpr )
+GAMEL( 200?, sc4hotprd   ,sc4hotpr,  sc4_4reel, sc4, sc4_state, sc4hotpr, ROT0, "BFM",             "Hot Property (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4hotpr )
+GAMEL( 200?, sc4hotpre   ,sc4hotpr,  sc4_4reel, sc4, sc4_state, sc4hotpr, ROT0, "BFM",             "Hot Property (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4hotpr )
+GAMEL( 200?, sc4hotpra   ,sc4hotpr,  sc4_4reel, sc4, sc4_state, sc4hotpr, ROT0, "BFM / Whitbread", "Hot Property (Bellfruit) (Scorpion 4) (Whitbread, set 1)", MACHINE_FLAGS, layout_sc4hotpr )
+GAMEL( 200?, sc4hotprc   ,sc4hotpr,  sc4_4reel, sc4, sc4_state, sc4hotpr, ROT0, "BFM / Whitbread", "Hot Property (Bellfruit) (Scorpion 4) (Whitbread, set 2)", MACHINE_FLAGS, layout_sc4hotpr )
 // is this some kind of reworked / licensed version of Hot Property?
 // PR6911 HOT PROPERTY         PR6911 HOT PROPERTY SOUNDS11        $$  CASH 'N' BURN
-GAMEL( 200?, sc4cburn    ,sc4hotpr,  sc4_4reel, sc4, sc4_state, sc4hotpr, ROT0, "Qps","Cash 'n' Burn (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4cburn    ,sc4hotpr,  sc4_4reel, sc4, sc4_state, sc4hotpr, ROT0, "Qps","Cash 'n' Burn (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4hotpr )
 // PR6911 HOT PROPERTY V4.0         PR6911 HOT PROPERTY SOUNDS11        $   CASH 'N' BURN
-GAMEL( 200?, sc4cburna   ,sc4hotpr,  sc4_4reel, sc4, sc4_state, sc4hotpr, ROT0, "Qps","Cash 'n' Burn (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4cburna   ,sc4hotpr,  sc4_4reel, sc4, sc4_state, sc4hotpr, ROT0, "Qps","Cash 'n' Burn (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4hotpr )
 
 
 
@@ -49193,17 +49372,17 @@ DRIVER_INIT_MEMBER(sc4_state,sc4cnfr)
 
 
 // PR6815 CASH N FRUIT         PR6815 CASH N FRUIT SOUNDS11
-GAMEL( 200?, sc4cnfr     ,0,         sc4_4reel, sc4, sc4_state, sc4cnfr, ROT0, "BFM","Cash 'n' Fruit (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cnfra    ,sc4cnfr,   sc4_4reel, sc4, sc4_state, sc4cnfr, ROT0, "BFM","Cash 'n' Fruit (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cnfrb    ,sc4cnfr,   sc4_4reel, sc4, sc4_state, sc4cnfr, ROT0, "BFM","Cash 'n' Fruit (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cnfre    ,sc4cnfr,   sc4_4reel, sc4, sc4_state, sc4cnfr, ROT0, "BFM","Cash 'n' Fruit (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cnfrf    ,sc4cnfr,   sc4_4reel, sc4, sc4_state, sc4cnfr, ROT0, "BFM","Cash 'n' Fruit (Bellfruit) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cnfrg    ,sc4cnfr,   sc4_4reel, sc4, sc4_state, sc4cnfr, ROT0, "BFM","Cash 'n' Fruit (Bellfruit) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4cnfr     ,0,         sc4_4reel, sc4, sc4_state, sc4cnfr, ROT0, "BFM","Cash 'n' Fruit (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4cnfr )
+GAMEL( 200?, sc4cnfra    ,sc4cnfr,   sc4_4reel, sc4, sc4_state, sc4cnfr, ROT0, "BFM","Cash 'n' Fruit (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4cnfr )
+GAMEL( 200?, sc4cnfrb    ,sc4cnfr,   sc4_4reel, sc4, sc4_state, sc4cnfr, ROT0, "BFM","Cash 'n' Fruit (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4cnfr )
+GAMEL( 200?, sc4cnfre    ,sc4cnfr,   sc4_4reel, sc4, sc4_state, sc4cnfr, ROT0, "BFM","Cash 'n' Fruit (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4cnfr )
+GAMEL( 200?, sc4cnfrf    ,sc4cnfr,   sc4_4reel, sc4, sc4_state, sc4cnfr, ROT0, "BFM","Cash 'n' Fruit (Bellfruit) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_sc4cnfr )
+GAMEL( 200?, sc4cnfrg    ,sc4cnfr,   sc4_4reel, sc4, sc4_state, sc4cnfr, ROT0, "BFM","Cash 'n' Fruit (Bellfruit) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_sc4cnfr )
 // PR4615 CASH N FRUIT S+P98         PR6815 CASH N FRUIT SOUNDS11
-GAMEL( 200?, sc4cnfrc    ,sc4cnfr,   sc4_4reel, sc4, sc4_state, sc4cnfr, ROT0, "BFM","Cash 'n' Fruit S+P98 (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cnfrd    ,sc4cnfr,   sc4_4reel, sc4, sc4_state, sc4cnfr, ROT0, "BFM","Cash 'n' Fruit S+P98 (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cnfrh    ,sc4cnfr,   sc4_4reel, sc4, sc4_state, sc4cnfr, ROT0, "BFM","Cash 'n' Fruit S+P98 (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cnfri    ,sc4cnfr,   sc4_4reel, sc4, sc4_state, sc4cnfr, ROT0, "BFM","Cash 'n' Fruit S+P98 (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4cnfrc    ,sc4cnfr,   sc4_4reel, sc4, sc4_state, sc4cnfr, ROT0, "BFM","Cash 'n' Fruit S+P98 (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4cnfr )
+GAMEL( 200?, sc4cnfrd    ,sc4cnfr,   sc4_4reel, sc4, sc4_state, sc4cnfr, ROT0, "BFM","Cash 'n' Fruit S+P98 (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4cnfr )
+GAMEL( 200?, sc4cnfrh    ,sc4cnfr,   sc4_4reel, sc4, sc4_state, sc4cnfr, ROT0, "BFM","Cash 'n' Fruit S+P98 (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4cnfr )
+GAMEL( 200?, sc4cnfri    ,sc4cnfr,   sc4_4reel, sc4, sc4_state, sc4cnfr, ROT0, "BFM","Cash 'n' Fruit S+P98 (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4cnfr )
 
 
 
@@ -49230,40 +49409,40 @@ DRIVER_INIT_MEMBER(sc4_state,sc4cclas_mbus)
 }
 
 // PR7148 CLUB CLASS         PR7148 CLUB CLASS SOUNDS11            CLUB  CLASS
-GAMEL( 200?, sc4cclas    ,0,         sc4, sc4, sc4_state, sc4cclas, ROT0, "BFM","Club Class (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cclasa   ,sc4cclas,  sc4, sc4, sc4_state, sc4cclas, ROT0, "BFM","Club Class (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cclasb   ,sc4cclas,  sc4, sc4, sc4_state, sc4cclas, ROT0, "BFM","Club Class (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cclasc   ,sc4cclas,  sc4, sc4, sc4_state, sc4cclas, ROT0, "BFM","Club Class (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cclasd   ,sc4cclas,  sc4, sc4, sc4_state, sc4cclas, ROT0, "BFM","Club Class (Bellfruit) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cclasf   ,sc4cclas,  sc4, sc4, sc4_state, sc4cclas, ROT0, "BFM","Club Class (Bellfruit) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cclasi   ,sc4cclas,  sc4, sc4, sc4_state, sc4cclas, ROT0, "BFM","Club Class (Bellfruit) (Scorpion 4) (set 7)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cclasj   ,sc4cclas,  sc4, sc4, sc4_state, sc4cclas, ROT0, "BFM","Club Class (Bellfruit) (Scorpion 4) (set 8)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cclask   ,sc4cclas,  sc4, sc4, sc4_state, sc4cclas, ROT0, "BFM","Club Class (Bellfruit) (Scorpion 4) (set 9)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cclasl   ,sc4cclas,  sc4, sc4, sc4_state, sc4cclas, ROT0, "BFM","Club Class (Bellfruit) (Scorpion 4) (set 10)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cclasm   ,sc4cclas,  sc4, sc4, sc4_state, sc4cclas, ROT0, "BFM","Club Class (Bellfruit) (Scorpion 4) (set 11)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cclasn   ,sc4cclas,  sc4, sc4, sc4_state, sc4cclas, ROT0, "BFM","Club Class (Bellfruit) (Scorpion 4) (set 12)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cclaso   ,sc4cclas,  sc4, sc4, sc4_state, sc4cclas, ROT0, "BFM","Club Class (Bellfruit) (Scorpion 4) (set 13)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cclasq   ,sc4cclas,  sc4, sc4, sc4_state, sc4cclas, ROT0, "BFM","Club Class (Bellfruit) (Scorpion 4) (set 14)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cclasr   ,sc4cclas,  sc4, sc4, sc4_state, sc4cclas, ROT0, "BFM","Club Class (Bellfruit) (Scorpion 4) (set 15)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cclass   ,sc4cclas,  sc4, sc4, sc4_state, sc4cclas, ROT0, "BFM","Club Class (Bellfruit) (Scorpion 4) (set 16)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cclast   ,sc4cclas,  sc4, sc4, sc4_state, sc4cclas, ROT0, "BFM","Club Class (Bellfruit) (Scorpion 4) (set 17)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cclasu   ,sc4cclas,  sc4, sc4, sc4_state, sc4cclas, ROT0, "BFM","Club Class (Bellfruit) (Scorpion 4) (set 18)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cclasv   ,sc4cclas,  sc4, sc4, sc4_state, sc4cclas, ROT0, "BFM","Club Class (Bellfruit) (Scorpion 4) (set 19)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cclasw   ,sc4cclas,  sc4, sc4, sc4_state, sc4cclas, ROT0, "BFM","Club Class (Bellfruit) (Scorpion 4) (set 20)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4cclas    ,0,         sc4, sc4, sc4_state, sc4cclas, ROT0, "BFM","Club Class (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4cclasd )
+GAMEL( 200?, sc4cclasa   ,sc4cclas,  sc4, sc4, sc4_state, sc4cclas, ROT0, "BFM","Club Class (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4cclasd )
+GAMEL( 200?, sc4cclasb   ,sc4cclas,  sc4, sc4, sc4_state, sc4cclas, ROT0, "BFM","Club Class (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4cclasd )
+GAMEL( 200?, sc4cclasc   ,sc4cclas,  sc4, sc4, sc4_state, sc4cclas, ROT0, "BFM","Club Class (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4cclasd )
+GAMEL( 200?, sc4cclasd   ,sc4cclas,  sc4, sc4, sc4_state, sc4cclas, ROT0, "BFM","Club Class (Bellfruit) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_sc4cclasd )
+GAMEL( 200?, sc4cclasf   ,sc4cclas,  sc4, sc4, sc4_state, sc4cclas, ROT0, "BFM","Club Class (Bellfruit) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_sc4cclasd )
+GAMEL( 200?, sc4cclasi   ,sc4cclas,  sc4, sc4, sc4_state, sc4cclas, ROT0, "BFM","Club Class (Bellfruit) (Scorpion 4) (set 7)", MACHINE_FLAGS, layout_sc4cclasd )
+GAMEL( 200?, sc4cclasj   ,sc4cclas,  sc4, sc4, sc4_state, sc4cclas, ROT0, "BFM","Club Class (Bellfruit) (Scorpion 4) (set 8)", MACHINE_FLAGS, layout_sc4cclasd )
+GAMEL( 200?, sc4cclask   ,sc4cclas,  sc4, sc4, sc4_state, sc4cclas, ROT0, "BFM","Club Class (Bellfruit) (Scorpion 4) (set 9)", MACHINE_FLAGS, layout_sc4cclasd )
+GAMEL( 200?, sc4cclasl   ,sc4cclas,  sc4, sc4, sc4_state, sc4cclas, ROT0, "BFM","Club Class (Bellfruit) (Scorpion 4) (set 10)", MACHINE_FLAGS, layout_sc4cclasd )
+GAMEL( 200?, sc4cclasm   ,sc4cclas,  sc4, sc4, sc4_state, sc4cclas, ROT0, "BFM","Club Class (Bellfruit) (Scorpion 4) (set 11)", MACHINE_FLAGS, layout_sc4cclasd )
+GAMEL( 200?, sc4cclasn   ,sc4cclas,  sc4, sc4, sc4_state, sc4cclas, ROT0, "BFM","Club Class (Bellfruit) (Scorpion 4) (set 12)", MACHINE_FLAGS, layout_sc4cclasd )
+GAMEL( 200?, sc4cclaso   ,sc4cclas,  sc4, sc4, sc4_state, sc4cclas, ROT0, "BFM","Club Class (Bellfruit) (Scorpion 4) (set 13)", MACHINE_FLAGS, layout_sc4cclasd )
+GAMEL( 200?, sc4cclasq   ,sc4cclas,  sc4, sc4, sc4_state, sc4cclas, ROT0, "BFM","Club Class (Bellfruit) (Scorpion 4) (set 14)", MACHINE_FLAGS, layout_sc4cclasd )
+GAMEL( 200?, sc4cclasr   ,sc4cclas,  sc4, sc4, sc4_state, sc4cclas, ROT0, "BFM","Club Class (Bellfruit) (Scorpion 4) (set 15)", MACHINE_FLAGS, layout_sc4cclasd )
+GAMEL( 200?, sc4cclass   ,sc4cclas,  sc4, sc4, sc4_state, sc4cclas, ROT0, "BFM","Club Class (Bellfruit) (Scorpion 4) (set 16)", MACHINE_FLAGS, layout_sc4cclasd )
+GAMEL( 200?, sc4cclast   ,sc4cclas,  sc4, sc4, sc4_state, sc4cclas, ROT0, "BFM","Club Class (Bellfruit) (Scorpion 4) (set 17)", MACHINE_FLAGS, layout_sc4cclasd )
+GAMEL( 200?, sc4cclasu   ,sc4cclas,  sc4, sc4, sc4_state, sc4cclas, ROT0, "BFM","Club Class (Bellfruit) (Scorpion 4) (set 18)", MACHINE_FLAGS, layout_sc4cclasd )
+GAMEL( 200?, sc4cclasv   ,sc4cclas,  sc4, sc4, sc4_state, sc4cclas, ROT0, "BFM","Club Class (Bellfruit) (Scorpion 4) (set 19)", MACHINE_FLAGS, layout_sc4cclasd )
+GAMEL( 200?, sc4cclasw   ,sc4cclas,  sc4, sc4, sc4_state, sc4cclas, ROT0, "BFM","Club Class (Bellfruit) (Scorpion 4) (set 20)", MACHINE_FLAGS, layout_sc4cclasd )
 // PR7148 CLUB CLASS         CLUB CLASS  CLUB  PR7148 CLUB CLASS SOUNDS11            CLUB  CLASS
-GAMEL( 200?, sc4cclasx   ,sc4cclas,  sc4, sc4, sc4_state, sc4cclas_mbus, ROT0, "BFM","Club Class (Bellfruit) (Scorpion 4) (set 21)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cclasy   ,sc4cclas,  sc4, sc4, sc4_state, sc4cclas_mbus, ROT0, "BFM","Club Class (Bellfruit) (Scorpion 4) (set 22)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cclasz   ,sc4cclas,  sc4, sc4, sc4_state, sc4cclas_mbus, ROT0, "BFM","Club Class (Bellfruit) (Scorpion 4) (set 23)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cclas0   ,sc4cclas,  sc4, sc4, sc4_state, sc4cclas_mbus, ROT0, "BFM","Club Class (Bellfruit) (Scorpion 4) (set 24)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cclas1   ,sc4cclas,  sc4, sc4, sc4_state, sc4cclas_mbus, ROT0, "BFM","Club Class (Bellfruit) (Scorpion 4) (set 25)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cclas2   ,sc4cclas,  sc4, sc4, sc4_state, sc4cclas_mbus, ROT0, "BFM","Club Class (Bellfruit) (Scorpion 4) (set 26)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cclas3   ,sc4cclas,  sc4, sc4, sc4_state, sc4cclas_mbus, ROT0, "BFM","Club Class (Bellfruit) (Scorpion 4) (set 27)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cclas4   ,sc4cclas,  sc4, sc4, sc4_state, sc4cclas_mbus, ROT0, "BFM","Club Class (Bellfruit) (Scorpion 4) (set 28)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4cclasx   ,sc4cclas,  sc4, sc4, sc4_state, sc4cclas_mbus, ROT0, "BFM","Club Class (Bellfruit) (Scorpion 4) (set 21)", MACHINE_FLAGS, layout_sc4cclasd )
+GAMEL( 200?, sc4cclasy   ,sc4cclas,  sc4, sc4, sc4_state, sc4cclas_mbus, ROT0, "BFM","Club Class (Bellfruit) (Scorpion 4) (set 22)", MACHINE_FLAGS, layout_sc4cclasd )
+GAMEL( 200?, sc4cclasz   ,sc4cclas,  sc4, sc4, sc4_state, sc4cclas_mbus, ROT0, "BFM","Club Class (Bellfruit) (Scorpion 4) (set 23)", MACHINE_FLAGS, layout_sc4cclasd )
+GAMEL( 200?, sc4cclas0   ,sc4cclas,  sc4, sc4, sc4_state, sc4cclas_mbus, ROT0, "BFM","Club Class (Bellfruit) (Scorpion 4) (set 24)", MACHINE_FLAGS, layout_sc4cclasd )
+GAMEL( 200?, sc4cclas1   ,sc4cclas,  sc4, sc4, sc4_state, sc4cclas_mbus, ROT0, "BFM","Club Class (Bellfruit) (Scorpion 4) (set 25)", MACHINE_FLAGS, layout_sc4cclasd )
+GAMEL( 200?, sc4cclas2   ,sc4cclas,  sc4, sc4, sc4_state, sc4cclas_mbus, ROT0, "BFM","Club Class (Bellfruit) (Scorpion 4) (set 26)", MACHINE_FLAGS, layout_sc4cclasd )
+GAMEL( 200?, sc4cclas3   ,sc4cclas,  sc4, sc4, sc4_state, sc4cclas_mbus, ROT0, "BFM","Club Class (Bellfruit) (Scorpion 4) (set 27)", MACHINE_FLAGS, layout_sc4cclasd )
+GAMEL( 200?, sc4cclas4   ,sc4cclas,  sc4, sc4, sc4_state, sc4cclas_mbus, ROT0, "BFM","Club Class (Bellfruit) (Scorpion 4) (set 28)", MACHINE_FLAGS, layout_sc4cclasd )
 // PR7148 CLUB CLASS 65% FERRY         PR7148 CLUB CLASS SOUNDS11            CLUB  CLASS
-GAMEL( 200?, sc4cclase   ,sc4cclas,  sc4, sc4, sc4_state, sc4cclas, ROT0, "BFM","Club Class (65% Ferry) (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cclasg   ,sc4cclas,  sc4, sc4, sc4_state, sc4cclas, ROT0, "BFM","Club Class (65% Ferry) (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cclash   ,sc4cclas,  sc4, sc4, sc4_state, sc4cclas, ROT0, "BFM","Club Class (65% Ferry) (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cclasp   ,sc4cclas,  sc4, sc4, sc4_state, sc4cclas, ROT0, "BFM","Club Class (65% Ferry) (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4cclase   ,sc4cclas,  sc4, sc4, sc4_state, sc4cclas, ROT0, "BFM","Club Class (65% Ferry) (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4cclasd )
+GAMEL( 200?, sc4cclasg   ,sc4cclas,  sc4, sc4, sc4_state, sc4cclas, ROT0, "BFM","Club Class (65% Ferry) (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4cclasd )
+GAMEL( 200?, sc4cclash   ,sc4cclas,  sc4, sc4, sc4_state, sc4cclas, ROT0, "BFM","Club Class (65% Ferry) (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4cclasd )
+GAMEL( 200?, sc4cclasp   ,sc4cclas,  sc4, sc4, sc4_state, sc4cclas, ROT0, "BFM","Club Class (65% Ferry) (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4cclasd )
 
 
 DRIVER_INIT_MEMBER(sc4_state,sc4crcc)
@@ -49306,58 +49485,58 @@ DRIVER_INIT_MEMBER(sc4_state,sc4cfcas_mbus)
 }
 
 // PR6923 CASINO CRAZY FRUITS         PR6923 CRAZY FRUITS SOUNDS11
-GAMEL( 200?, sc4cfcas    ,0,         sc4_3reel, sc4, sc4_state, sc4cfcas, ROT0, "BFM","Casino Crazy Fruits (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cfcasa   ,sc4cfcas,  sc4_3reel, sc4, sc4_state, sc4cfcas, ROT0, "BFM","Casino Crazy Fruits (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cfcasb   ,sc4cfcas,  sc4_3reel, sc4, sc4_state, sc4cfcas, ROT0, "BFM","Casino Crazy Fruits (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cfcase   ,sc4cfcas,  sc4_3reel, sc4, sc4_state, sc4cfcas, ROT0, "BFM","Casino Crazy Fruits (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cfcasf   ,sc4cfcas,  sc4_3reel, sc4, sc4_state, sc4cfcas, ROT0, "BFM","Casino Crazy Fruits (Bellfruit) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cfcask   ,sc4cfcas,  sc4_3reel, sc4, sc4_state, sc4cfcas, ROT0, "BFM","Casino Crazy Fruits (Bellfruit) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cfcasm   ,sc4cfcas,  sc4_3reel, sc4, sc4_state, sc4cfcas, ROT0, "BFM","Casino Crazy Fruits (Bellfruit) (Scorpion 4) (set 7)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cfcasp   ,sc4cfcas,  sc4_3reel, sc4, sc4_state, sc4cfcas, ROT0, "BFM","Casino Crazy Fruits (Bellfruit) (Scorpion 4) (set 8)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cfcasq   ,sc4cfcas,  sc4_3reel, sc4, sc4_state, sc4cfcas, ROT0, "BFM","Casino Crazy Fruits (Bellfruit) (Scorpion 4) (set 9)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cfcass   ,sc4cfcas,  sc4_3reel, sc4, sc4_state, sc4cfcas, ROT0, "BFM","Casino Crazy Fruits (Bellfruit) (Scorpion 4) (set 10)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cfcast   ,sc4cfcas,  sc4_3reel, sc4, sc4_state, sc4cfcas, ROT0, "BFM","Casino Crazy Fruits (Bellfruit) (Scorpion 4) (set 11)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cfcasu   ,sc4cfcas,  sc4_3reel, sc4, sc4_state, sc4cfcas, ROT0, "BFM","Casino Crazy Fruits (Bellfruit) (Scorpion 4) (set 12)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cfcasv   ,sc4cfcas,  sc4_3reel, sc4, sc4_state, sc4cfcas, ROT0, "BFM","Casino Crazy Fruits (Bellfruit) (Scorpion 4) (set 13)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cfcasw   ,sc4cfcas,  sc4_3reel, sc4, sc4_state, sc4cfcas, ROT0, "BFM","Casino Crazy Fruits (Bellfruit) (Scorpion 4) (set 14)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cfcasx   ,sc4cfcas,  sc4_3reel, sc4, sc4_state, sc4cfcas, ROT0, "BFM","Casino Crazy Fruits (Bellfruit) (Scorpion 4) (set 15)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cfcasy   ,sc4cfcas,  sc4_3reel, sc4, sc4_state, sc4cfcas, ROT0, "BFM","Casino Crazy Fruits (Bellfruit) (Scorpion 4) (set 16)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cfcasz   ,sc4cfcas,  sc4_3reel, sc4, sc4_state, sc4cfcas, ROT0, "BFM","Casino Crazy Fruits (Bellfruit) (Scorpion 4) (set 17)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cfcas0   ,sc4cfcas,  sc4_3reel, sc4, sc4_state, sc4cfcas, ROT0, "BFM","Casino Crazy Fruits (Bellfruit) (Scorpion 4) (set 18)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cfcas1   ,sc4cfcas,  sc4_3reel, sc4, sc4_state, sc4cfcas, ROT0, "BFM","Casino Crazy Fruits (Bellfruit) (Scorpion 4) (set 19)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cfcas2   ,sc4cfcas,  sc4_3reel, sc4, sc4_state, sc4cfcas, ROT0, "BFM","Casino Crazy Fruits (Bellfruit) (Scorpion 4) (set 20)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cfcas6   ,sc4cfcas,  sc4_3reel, sc4, sc4_state, sc4cfcas, ROT0, "BFM","Casino Crazy Fruits (Bellfruit) (Scorpion 4) (set 21)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cfcas7   ,sc4cfcas,  sc4_3reel, sc4, sc4_state, sc4cfcas, ROT0, "BFM","Casino Crazy Fruits (Bellfruit) (Scorpion 4) (set 22)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cfcas8   ,sc4cfcas,  sc4_3reel, sc4, sc4_state, sc4cfcas, ROT0, "BFM","Casino Crazy Fruits (Bellfruit) (Scorpion 4) (set 23)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cfcasaa  ,sc4cfcas,  sc4_3reel, sc4, sc4_state, sc4cfcas, ROT0, "BFM","Casino Crazy Fruits (Bellfruit) (Scorpion 4) (set 24)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cfcasaf  ,sc4cfcas,  sc4_3reel, sc4, sc4_state, sc4cfcas, ROT0, "BFM","Casino Crazy Fruits (Bellfruit) (Scorpion 4) (set 25)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cfcasag  ,sc4cfcas,  sc4_3reel, sc4, sc4_state, sc4cfcas, ROT0, "BFM","Casino Crazy Fruits (Bellfruit) (Scorpion 4) (set 26)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cfcasah  ,sc4cfcas,  sc4_3reel, sc4, sc4_state, sc4cfcas, ROT0, "BFM","Casino Crazy Fruits (Bellfruit) (Scorpion 4) (set 27)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cfcasai  ,sc4cfcas,  sc4_3reel, sc4, sc4_state, sc4cfcas, ROT0, "BFM","Casino Crazy Fruits (Bellfruit) (Scorpion 4) (set 28)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cfcasaj  ,sc4cfcas,  sc4_3reel, sc4, sc4_state, sc4cfcas, ROT0, "BFM","Casino Crazy Fruits (Bellfruit) (Scorpion 4) (set 29)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cfcasak  ,sc4cfcas,  sc4_3reel, sc4, sc4_state, sc4cfcas, ROT0, "BFM","Casino Crazy Fruits (Bellfruit) (Scorpion 4) (set 30)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cfcasal  ,sc4cfcas,  sc4_3reel, sc4, sc4_state, sc4cfcas, ROT0, "BFM","Casino Crazy Fruits (Bellfruit) (Scorpion 4) (set 31)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cfcasam  ,sc4cfcas,  sc4_3reel, sc4, sc4_state, sc4cfcas, ROT0, "BFM","Casino Crazy Fruits (Bellfruit) (Scorpion 4) (set 32)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4cfcas    ,0,         sc4_3reel, sc4, sc4_state, sc4cfcas, ROT0, "BFM","Casino Crazy Fruits (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4cfcas )
+GAMEL( 200?, sc4cfcasa   ,sc4cfcas,  sc4_3reel, sc4, sc4_state, sc4cfcas, ROT0, "BFM","Casino Crazy Fruits (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4cfcas )
+GAMEL( 200?, sc4cfcasb   ,sc4cfcas,  sc4_3reel, sc4, sc4_state, sc4cfcas, ROT0, "BFM","Casino Crazy Fruits (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4cfcas )
+GAMEL( 200?, sc4cfcase   ,sc4cfcas,  sc4_3reel, sc4, sc4_state, sc4cfcas, ROT0, "BFM","Casino Crazy Fruits (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4cfcas )
+GAMEL( 200?, sc4cfcasf   ,sc4cfcas,  sc4_3reel, sc4, sc4_state, sc4cfcas, ROT0, "BFM","Casino Crazy Fruits (Bellfruit) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_sc4cfcas )
+GAMEL( 200?, sc4cfcask   ,sc4cfcas,  sc4_3reel, sc4, sc4_state, sc4cfcas, ROT0, "BFM","Casino Crazy Fruits (Bellfruit) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_sc4cfcas )
+GAMEL( 200?, sc4cfcasm   ,sc4cfcas,  sc4_3reel, sc4, sc4_state, sc4cfcas, ROT0, "BFM","Casino Crazy Fruits (Bellfruit) (Scorpion 4) (set 7)", MACHINE_FLAGS, layout_sc4cfcas )
+GAMEL( 200?, sc4cfcasp   ,sc4cfcas,  sc4_3reel, sc4, sc4_state, sc4cfcas, ROT0, "BFM","Casino Crazy Fruits (Bellfruit) (Scorpion 4) (set 8)", MACHINE_FLAGS, layout_sc4cfcas )
+GAMEL( 200?, sc4cfcasq   ,sc4cfcas,  sc4_3reel, sc4, sc4_state, sc4cfcas, ROT0, "BFM","Casino Crazy Fruits (Bellfruit) (Scorpion 4) (set 9)", MACHINE_FLAGS, layout_sc4cfcas )
+GAMEL( 200?, sc4cfcass   ,sc4cfcas,  sc4_3reel, sc4, sc4_state, sc4cfcas, ROT0, "BFM","Casino Crazy Fruits (Bellfruit) (Scorpion 4) (set 10)", MACHINE_FLAGS, layout_sc4cfcas )
+GAMEL( 200?, sc4cfcast   ,sc4cfcas,  sc4_3reel, sc4, sc4_state, sc4cfcas, ROT0, "BFM","Casino Crazy Fruits (Bellfruit) (Scorpion 4) (set 11)", MACHINE_FLAGS, layout_sc4cfcas )
+GAMEL( 200?, sc4cfcasu   ,sc4cfcas,  sc4_3reel, sc4, sc4_state, sc4cfcas, ROT0, "BFM","Casino Crazy Fruits (Bellfruit) (Scorpion 4) (set 12)", MACHINE_FLAGS, layout_sc4cfcas )
+GAMEL( 200?, sc4cfcasv   ,sc4cfcas,  sc4_3reel, sc4, sc4_state, sc4cfcas, ROT0, "BFM","Casino Crazy Fruits (Bellfruit) (Scorpion 4) (set 13)", MACHINE_FLAGS, layout_sc4cfcas )
+GAMEL( 200?, sc4cfcasw   ,sc4cfcas,  sc4_3reel, sc4, sc4_state, sc4cfcas, ROT0, "BFM","Casino Crazy Fruits (Bellfruit) (Scorpion 4) (set 14)", MACHINE_FLAGS, layout_sc4cfcas )
+GAMEL( 200?, sc4cfcasx   ,sc4cfcas,  sc4_3reel, sc4, sc4_state, sc4cfcas, ROT0, "BFM","Casino Crazy Fruits (Bellfruit) (Scorpion 4) (set 15)", MACHINE_FLAGS, layout_sc4cfcas )
+GAMEL( 200?, sc4cfcasy   ,sc4cfcas,  sc4_3reel, sc4, sc4_state, sc4cfcas, ROT0, "BFM","Casino Crazy Fruits (Bellfruit) (Scorpion 4) (set 16)", MACHINE_FLAGS, layout_sc4cfcas )
+GAMEL( 200?, sc4cfcasz   ,sc4cfcas,  sc4_3reel, sc4, sc4_state, sc4cfcas, ROT0, "BFM","Casino Crazy Fruits (Bellfruit) (Scorpion 4) (set 17)", MACHINE_FLAGS, layout_sc4cfcas )
+GAMEL( 200?, sc4cfcas0   ,sc4cfcas,  sc4_3reel, sc4, sc4_state, sc4cfcas, ROT0, "BFM","Casino Crazy Fruits (Bellfruit) (Scorpion 4) (set 18)", MACHINE_FLAGS, layout_sc4cfcas )
+GAMEL( 200?, sc4cfcas1   ,sc4cfcas,  sc4_3reel, sc4, sc4_state, sc4cfcas, ROT0, "BFM","Casino Crazy Fruits (Bellfruit) (Scorpion 4) (set 19)", MACHINE_FLAGS, layout_sc4cfcas )
+GAMEL( 200?, sc4cfcas2   ,sc4cfcas,  sc4_3reel, sc4, sc4_state, sc4cfcas, ROT0, "BFM","Casino Crazy Fruits (Bellfruit) (Scorpion 4) (set 20)", MACHINE_FLAGS, layout_sc4cfcas )
+GAMEL( 200?, sc4cfcas6   ,sc4cfcas,  sc4_3reel, sc4, sc4_state, sc4cfcas, ROT0, "BFM","Casino Crazy Fruits (Bellfruit) (Scorpion 4) (set 21)", MACHINE_FLAGS, layout_sc4cfcas )
+GAMEL( 200?, sc4cfcas7   ,sc4cfcas,  sc4_3reel, sc4, sc4_state, sc4cfcas, ROT0, "BFM","Casino Crazy Fruits (Bellfruit) (Scorpion 4) (set 22)", MACHINE_FLAGS, layout_sc4cfcas )
+GAMEL( 200?, sc4cfcas8   ,sc4cfcas,  sc4_3reel, sc4, sc4_state, sc4cfcas, ROT0, "BFM","Casino Crazy Fruits (Bellfruit) (Scorpion 4) (set 23)", MACHINE_FLAGS, layout_sc4cfcas )
+GAMEL( 200?, sc4cfcasaa  ,sc4cfcas,  sc4_3reel, sc4, sc4_state, sc4cfcas, ROT0, "BFM","Casino Crazy Fruits (Bellfruit) (Scorpion 4) (set 24)", MACHINE_FLAGS, layout_sc4cfcas )
+GAMEL( 200?, sc4cfcasaf  ,sc4cfcas,  sc4_3reel, sc4, sc4_state, sc4cfcas, ROT0, "BFM","Casino Crazy Fruits (Bellfruit) (Scorpion 4) (set 25)", MACHINE_FLAGS, layout_sc4cfcas )
+GAMEL( 200?, sc4cfcasag  ,sc4cfcas,  sc4_3reel, sc4, sc4_state, sc4cfcas, ROT0, "BFM","Casino Crazy Fruits (Bellfruit) (Scorpion 4) (set 26)", MACHINE_FLAGS, layout_sc4cfcas )
+GAMEL( 200?, sc4cfcasah  ,sc4cfcas,  sc4_3reel, sc4, sc4_state, sc4cfcas, ROT0, "BFM","Casino Crazy Fruits (Bellfruit) (Scorpion 4) (set 27)", MACHINE_FLAGS, layout_sc4cfcas )
+GAMEL( 200?, sc4cfcasai  ,sc4cfcas,  sc4_3reel, sc4, sc4_state, sc4cfcas, ROT0, "BFM","Casino Crazy Fruits (Bellfruit) (Scorpion 4) (set 28)", MACHINE_FLAGS, layout_sc4cfcas )
+GAMEL( 200?, sc4cfcasaj  ,sc4cfcas,  sc4_3reel, sc4, sc4_state, sc4cfcas, ROT0, "BFM","Casino Crazy Fruits (Bellfruit) (Scorpion 4) (set 29)", MACHINE_FLAGS, layout_sc4cfcas )
+GAMEL( 200?, sc4cfcasak  ,sc4cfcas,  sc4_3reel, sc4, sc4_state, sc4cfcas, ROT0, "BFM","Casino Crazy Fruits (Bellfruit) (Scorpion 4) (set 30)", MACHINE_FLAGS, layout_sc4cfcas )
+GAMEL( 200?, sc4cfcasal  ,sc4cfcas,  sc4_3reel, sc4, sc4_state, sc4cfcas, ROT0, "BFM","Casino Crazy Fruits (Bellfruit) (Scorpion 4) (set 31)", MACHINE_FLAGS, layout_sc4cfcas )
+GAMEL( 200?, sc4cfcasam  ,sc4cfcas,  sc4_3reel, sc4, sc4_state, sc4cfcas, ROT0, "BFM","Casino Crazy Fruits (Bellfruit) (Scorpion 4) (set 32)", MACHINE_FLAGS, layout_sc4cfcas )
 // OK
-GAMEL( 200?, sc4cfcasr   ,sc4cfcas,  sc4_3reel, sc4, sc4_state, sc4cfcas_mbus, ROT0, "BFM","Casino Crazy Fruits (ZYPF) (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cfcasl   ,sc4cfcas,  sc4_3reel, sc4, sc4_state, sc4cfcas_mbus, ROT0, "BFM","Casino Crazy Fruits (ZYPF) (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cfcasi   ,sc4cfcas,  sc4_3reel, sc4, sc4_state, sc4cfcas_mbus, ROT0, "BFM","Casino Crazy Fruits (ZYFR) (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cfcasj   ,sc4cfcas,  sc4_3reel, sc4, sc4_state, sc4cfcas_mbus, ROT0, "BFM","Casino Crazy Fruits (ZYFR) (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cfcasn   ,sc4cfcas,  sc4_3reel, sc4, sc4_state, sc4cfcas_mbus, ROT0, "BFM","Casino Crazy Fruits (ZYFR) (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cfcaso   ,sc4cfcas,  sc4_3reel, sc4, sc4_state, sc4cfcas_mbus, ROT0, "BFM","Casino Crazy Fruits (ZYFR) (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4cfcasr   ,sc4cfcas,  sc4_3reel, sc4, sc4_state, sc4cfcas_mbus, ROT0, "BFM","Casino Crazy Fruits (ZYPF) (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4cfcas )
+GAMEL( 200?, sc4cfcasl   ,sc4cfcas,  sc4_3reel, sc4, sc4_state, sc4cfcas_mbus, ROT0, "BFM","Casino Crazy Fruits (ZYPF) (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4cfcas )
+GAMEL( 200?, sc4cfcasi   ,sc4cfcas,  sc4_3reel, sc4, sc4_state, sc4cfcas_mbus, ROT0, "BFM","Casino Crazy Fruits (ZYFR) (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4cfcas )
+GAMEL( 200?, sc4cfcasj   ,sc4cfcas,  sc4_3reel, sc4, sc4_state, sc4cfcas_mbus, ROT0, "BFM","Casino Crazy Fruits (ZYFR) (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4cfcas )
+GAMEL( 200?, sc4cfcasn   ,sc4cfcas,  sc4_3reel, sc4, sc4_state, sc4cfcas_mbus, ROT0, "BFM","Casino Crazy Fruits (ZYFR) (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4cfcas )
+GAMEL( 200?, sc4cfcaso   ,sc4cfcas,  sc4_3reel, sc4, sc4_state, sc4cfcas_mbus, ROT0, "BFM","Casino Crazy Fruits (ZYFR) (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4cfcas )
 // PAY UNIT ERR 17
-GAMEL( 200?, sc4cfcasc   ,sc4cfcas,  sc4_3reel, sc4, sc4_state, sc4cfcas_mbus, ROT0, "BFM","Casino Crazy Fruits (ZYFR) (Bellfruit) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cfcasd   ,sc4cfcas,  sc4_3reel, sc4, sc4_state, sc4cfcas_mbus, ROT0, "BFM","Casino Crazy Fruits (ZYFR) (Bellfruit) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cfcasg   ,sc4cfcas,  sc4_3reel, sc4, sc4_state, sc4cfcas_mbus, ROT0, "BFM","Casino Crazy Fruits (ZYFR) (Bellfruit) (Scorpion 4) (set 7)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cfcash   ,sc4cfcas,  sc4_3reel, sc4, sc4_state, sc4cfcas_mbus, ROT0, "BFM","Casino Crazy Fruits (ZYFR) (Bellfruit) (Scorpion 4) (set 8)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cfcas3   ,sc4cfcas,  sc4_3reel, sc4, sc4_state, sc4cfcas_mbus, ROT0, "BFM","Casino Crazy Fruits (ZYFR) (Bellfruit) (Scorpion 4) (set 9)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cfcas9   ,sc4cfcas,  sc4_3reel, sc4, sc4_state, sc4cfcas_mbus, ROT0, "BFM","Casino Crazy Fruits (ZYFR) (Bellfruit) (Scorpion 4) (set 10)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cfcasab  ,sc4cfcas,  sc4_3reel, sc4, sc4_state, sc4cfcas_mbus, ROT0, "BFM","Casino Crazy Fruits (ZYFR) (Bellfruit) (Scorpion 4) (set 11)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cfcasac  ,sc4cfcas,  sc4_3reel, sc4, sc4_state, sc4cfcas_mbus, ROT0, "BFM","Casino Crazy Fruits (ZYFR) (Bellfruit) (Scorpion 4) (set 12)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cfcas4   ,sc4cfcas,  sc4_3reel, sc4, sc4_state, sc4cfcas_mbus, ROT0, "BFM","Casino Crazy Fruits (CCFR) (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cfcas5   ,sc4cfcas,  sc4_3reel, sc4, sc4_state, sc4cfcas_mbus, ROT0, "BFM","Casino Crazy Fruits (CCFR) (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cfcasad  ,sc4cfcas,  sc4_3reel, sc4, sc4_state, sc4cfcas_mbus, ROT0, "BFM","Casino Crazy Fruits (CCFR) (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4cfcasae  ,sc4cfcas,  sc4_3reel, sc4, sc4_state, sc4cfcas_mbus, ROT0, "BFM","Casino Crazy Fruits (CCFR) (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4cfcasc   ,sc4cfcas,  sc4_3reel, sc4, sc4_state, sc4cfcas_mbus, ROT0, "BFM","Casino Crazy Fruits (ZYFR) (Bellfruit) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_sc4cfcas )
+GAMEL( 200?, sc4cfcasd   ,sc4cfcas,  sc4_3reel, sc4, sc4_state, sc4cfcas_mbus, ROT0, "BFM","Casino Crazy Fruits (ZYFR) (Bellfruit) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_sc4cfcas )
+GAMEL( 200?, sc4cfcasg   ,sc4cfcas,  sc4_3reel, sc4, sc4_state, sc4cfcas_mbus, ROT0, "BFM","Casino Crazy Fruits (ZYFR) (Bellfruit) (Scorpion 4) (set 7)", MACHINE_FLAGS, layout_sc4cfcas )
+GAMEL( 200?, sc4cfcash   ,sc4cfcas,  sc4_3reel, sc4, sc4_state, sc4cfcas_mbus, ROT0, "BFM","Casino Crazy Fruits (ZYFR) (Bellfruit) (Scorpion 4) (set 8)", MACHINE_FLAGS, layout_sc4cfcas )
+GAMEL( 200?, sc4cfcas3   ,sc4cfcas,  sc4_3reel, sc4, sc4_state, sc4cfcas_mbus, ROT0, "BFM","Casino Crazy Fruits (ZYFR) (Bellfruit) (Scorpion 4) (set 9)", MACHINE_FLAGS, layout_sc4cfcas )
+GAMEL( 200?, sc4cfcas9   ,sc4cfcas,  sc4_3reel, sc4, sc4_state, sc4cfcas_mbus, ROT0, "BFM","Casino Crazy Fruits (ZYFR) (Bellfruit) (Scorpion 4) (set 10)", MACHINE_FLAGS, layout_sc4cfcas )
+GAMEL( 200?, sc4cfcasab  ,sc4cfcas,  sc4_3reel, sc4, sc4_state, sc4cfcas_mbus, ROT0, "BFM","Casino Crazy Fruits (ZYFR) (Bellfruit) (Scorpion 4) (set 11)", MACHINE_FLAGS, layout_sc4cfcas )
+GAMEL( 200?, sc4cfcasac  ,sc4cfcas,  sc4_3reel, sc4, sc4_state, sc4cfcas_mbus, ROT0, "BFM","Casino Crazy Fruits (ZYFR) (Bellfruit) (Scorpion 4) (set 12)", MACHINE_FLAGS, layout_sc4cfcas )
+GAMEL( 200?, sc4cfcas4   ,sc4cfcas,  sc4_3reel, sc4, sc4_state, sc4cfcas_mbus, ROT0, "BFM","Casino Crazy Fruits (CCFR) (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4cfcas )
+GAMEL( 200?, sc4cfcas5   ,sc4cfcas,  sc4_3reel, sc4, sc4_state, sc4cfcas_mbus, ROT0, "BFM","Casino Crazy Fruits (CCFR) (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4cfcas )
+GAMEL( 200?, sc4cfcasad  ,sc4cfcas,  sc4_3reel, sc4, sc4_state, sc4cfcas_mbus, ROT0, "BFM","Casino Crazy Fruits (CCFR) (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4cfcas )
+GAMEL( 200?, sc4cfcasae  ,sc4cfcas,  sc4_3reel, sc4, sc4_state, sc4cfcas_mbus, ROT0, "BFM","Casino Crazy Fruits (CCFR) (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4cfcas )
 
 
 
@@ -49375,44 +49554,44 @@ GAMEL( 200?, sc4cfclbb   ,sc4cfclb,  sc4_5reel, sc4, sc4_state, sc4cfclb, ROT0, 
 
 
 // PR7141 CRAZY GANG         PR7141 CRAZY GANG SOUNDS11            CRAZY GANG
-GAMEL( 200?, sc4crzgn    ,0,         sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Gang (Bellfruit) (Scorpion 4) (set 1, Top Box)", MACHINE_FLAGS, layout_bfm_sc4 ) // Top Box
-GAMEL( 200?, sc4crzgnb   ,sc4crzgn,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Gang (Bellfruit) (Scorpion 4) (set 2, Top Box)", MACHINE_FLAGS, layout_bfm_sc4 ) // Top Box
-GAMEL( 200?, sc4crzgng   ,sc4crzgn,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Gang (Bellfruit) (Scorpion 4) (set 3, Top Box)", MACHINE_FLAGS, layout_bfm_sc4 ) // Top Box
-GAMEL( 200?, sc4crzgnj   ,sc4crzgn,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Gang (Bellfruit) (Scorpion 4) (set 4, Top Box)", MACHINE_FLAGS, layout_bfm_sc4 ) // Top Box
+GAMEL( 200?, sc4crzgn    ,0,         sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Gang (Bellfruit) (Scorpion 4) (set 1, Top Box)", MACHINE_FLAGS, layout_sc4crzgna ) // Top Box
+GAMEL( 200?, sc4crzgnb   ,sc4crzgn,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Gang (Bellfruit) (Scorpion 4) (set 2, Top Box)", MACHINE_FLAGS, layout_sc4crzgna ) // Top Box
+GAMEL( 200?, sc4crzgng   ,sc4crzgn,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Gang (Bellfruit) (Scorpion 4) (set 3, Top Box)", MACHINE_FLAGS, layout_sc4crzgna ) // Top Box
+GAMEL( 200?, sc4crzgnj   ,sc4crzgn,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Gang (Bellfruit) (Scorpion 4) (set 4, Top Box)", MACHINE_FLAGS, layout_sc4crzgna ) // Top Box
 // none of these do anything with the reels, probably waiting for the Top Box?
-GAMEL( 200?, sc4crzgna   ,sc4crzgn,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Gang (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4crzgnc   ,sc4crzgn,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Gang (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4crzgnd   ,sc4crzgn,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Gang (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4crzgne   ,sc4crzgn,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Gang (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4crzgnf   ,sc4crzgn,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Gang (Bellfruit) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4crzgnh   ,sc4crzgn,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Gang (Bellfruit) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4crzgni   ,sc4crzgn,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Gang (Bellfruit) (Scorpion 4) (set 7)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4crzgnk   ,sc4crzgn,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Gang (Bellfruit) (Scorpion 4) (set 8)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4crzgnl   ,sc4crzgn,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Gang (Bellfruit) (Scorpion 4) (set 9)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4crzgnm   ,sc4crzgn,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Gang (Bellfruit) (Scorpion 4) (set 10)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4crzgnn   ,sc4crzgn,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Gang (Bellfruit) (Scorpion 4) (set 11)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4crzgno   ,sc4crzgn,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Gang (Bellfruit) (Scorpion 4) (set 12)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4crzgnp   ,sc4crzgn,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Gang (Bellfruit) (Scorpion 4) (set 13)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4crzgnq   ,sc4crzgn,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Gang (Bellfruit) (Scorpion 4) (set 14)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4crzgnx   ,sc4crzgn,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Gang (Bellfruit) (Scorpion 4) (set 15)", MACHINE_FLAGS, layout_bfm_sc4 ) // incomplete pairing
-GAMEL( 200?, sc4crzgny   ,sc4crzgn,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Gang (Bellfruit) (Scorpion 4) (set 16)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4crzgnz   ,sc4crzgn,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Gang (Bellfruit) (Scorpion 4) (set 17)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4crzgn0   ,sc4crzgn,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Gang (Bellfruit) (Scorpion 4) (set 18)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4crzgn1   ,sc4crzgn,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Gang (Bellfruit) (Scorpion 4) (set 19)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4crzgn2   ,sc4crzgn,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Gang (Bellfruit) (Scorpion 4) (set 20)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4crzgna   ,sc4crzgn,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Gang (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4crzgna )
+GAMEL( 200?, sc4crzgnc   ,sc4crzgn,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Gang (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4crzgna )
+GAMEL( 200?, sc4crzgnd   ,sc4crzgn,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Gang (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4crzgna )
+GAMEL( 200?, sc4crzgne   ,sc4crzgn,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Gang (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4crzgna )
+GAMEL( 200?, sc4crzgnf   ,sc4crzgn,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Gang (Bellfruit) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_sc4crzgna )
+GAMEL( 200?, sc4crzgnh   ,sc4crzgn,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Gang (Bellfruit) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_sc4crzgna )
+GAMEL( 200?, sc4crzgni   ,sc4crzgn,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Gang (Bellfruit) (Scorpion 4) (set 7)", MACHINE_FLAGS, layout_sc4crzgna )
+GAMEL( 200?, sc4crzgnk   ,sc4crzgn,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Gang (Bellfruit) (Scorpion 4) (set 8)", MACHINE_FLAGS, layout_sc4crzgna )
+GAMEL( 200?, sc4crzgnl   ,sc4crzgn,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Gang (Bellfruit) (Scorpion 4) (set 9)", MACHINE_FLAGS, layout_sc4crzgna )
+GAMEL( 200?, sc4crzgnm   ,sc4crzgn,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Gang (Bellfruit) (Scorpion 4) (set 10)", MACHINE_FLAGS, layout_sc4crzgna )
+GAMEL( 200?, sc4crzgnn   ,sc4crzgn,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Gang (Bellfruit) (Scorpion 4) (set 11)", MACHINE_FLAGS, layout_sc4crzgna )
+GAMEL( 200?, sc4crzgno   ,sc4crzgn,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Gang (Bellfruit) (Scorpion 4) (set 12)", MACHINE_FLAGS, layout_sc4crzgna )
+GAMEL( 200?, sc4crzgnp   ,sc4crzgn,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Gang (Bellfruit) (Scorpion 4) (set 13)", MACHINE_FLAGS, layout_sc4crzgna )
+GAMEL( 200?, sc4crzgnq   ,sc4crzgn,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Gang (Bellfruit) (Scorpion 4) (set 14)", MACHINE_FLAGS, layout_sc4crzgna )
+GAMEL( 200?, sc4crzgnx   ,sc4crzgn,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Gang (Bellfruit) (Scorpion 4) (set 15)", MACHINE_FLAGS, layout_sc4crzgna ) // incomplete pairing
+GAMEL( 200?, sc4crzgny   ,sc4crzgn,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Gang (Bellfruit) (Scorpion 4) (set 16)", MACHINE_FLAGS, layout_sc4crzgna )
+GAMEL( 200?, sc4crzgnz   ,sc4crzgn,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Gang (Bellfruit) (Scorpion 4) (set 17)", MACHINE_FLAGS, layout_sc4crzgna )
+GAMEL( 200?, sc4crzgn0   ,sc4crzgn,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Gang (Bellfruit) (Scorpion 4) (set 18)", MACHINE_FLAGS, layout_sc4crzgna )
+GAMEL( 200?, sc4crzgn1   ,sc4crzgn,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Gang (Bellfruit) (Scorpion 4) (set 19)", MACHINE_FLAGS, layout_sc4crzgna )
+GAMEL( 200?, sc4crzgn2   ,sc4crzgn,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Gang (Bellfruit) (Scorpion 4) (set 20)", MACHINE_FLAGS, layout_sc4crzgna )
 // NUMBER PR7141 CRAZY GANG         PR7141 CRAZY GANG SOUNDS11        CRAZY GANG  ARCADE
-GAMEL( 200?, sc4crzgnr   ,sc4crzgn,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Gang Arcade (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4crzgns   ,sc4crzgn,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Gang Arcade (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4crzgnt   ,sc4crzgn,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Gang Arcade (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4crzgnu   ,sc4crzgn,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Gang Arcade (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4crzgnv   ,sc4crzgn,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Gang Arcade (Bellfruit) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4crzgnw   ,sc4crzgn,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Gang Arcade (Bellfruit) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4crzgn3   ,sc4crzgn,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Gang Arcade (Bellfruit) (Scorpion 4) (set 7)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4crzgn4   ,sc4crzgn,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Gang Arcade (Bellfruit) (Scorpion 4) (set 8)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4crzgn5   ,sc4crzgn,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Gang Arcade (Bellfruit) (Scorpion 4) (set 9)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4crzgn6   ,sc4crzgn,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Gang Arcade (Bellfruit) (Scorpion 4) (set 10)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4crzgn7   ,sc4crzgn,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Gang Arcade (Bellfruit) (Scorpion 4) (set 11)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4crzgn8   ,sc4crzgn,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Gang Arcade (Bellfruit) (Scorpion 4) (set 12)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4crzgnr   ,sc4crzgn,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Gang Arcade (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4crzgna )
+GAMEL( 200?, sc4crzgns   ,sc4crzgn,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Gang Arcade (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4crzgna )
+GAMEL( 200?, sc4crzgnt   ,sc4crzgn,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Gang Arcade (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4crzgna )
+GAMEL( 200?, sc4crzgnu   ,sc4crzgn,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Gang Arcade (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4crzgna )
+GAMEL( 200?, sc4crzgnv   ,sc4crzgn,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Gang Arcade (Bellfruit) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_sc4crzgna )
+GAMEL( 200?, sc4crzgnw   ,sc4crzgn,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Gang Arcade (Bellfruit) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_sc4crzgna )
+GAMEL( 200?, sc4crzgn3   ,sc4crzgn,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Gang Arcade (Bellfruit) (Scorpion 4) (set 7)", MACHINE_FLAGS, layout_sc4crzgna )
+GAMEL( 200?, sc4crzgn4   ,sc4crzgn,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Gang Arcade (Bellfruit) (Scorpion 4) (set 8)", MACHINE_FLAGS, layout_sc4crzgna )
+GAMEL( 200?, sc4crzgn5   ,sc4crzgn,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Gang Arcade (Bellfruit) (Scorpion 4) (set 9)", MACHINE_FLAGS, layout_sc4crzgna )
+GAMEL( 200?, sc4crzgn6   ,sc4crzgn,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Gang Arcade (Bellfruit) (Scorpion 4) (set 10)", MACHINE_FLAGS, layout_sc4crzgna )
+GAMEL( 200?, sc4crzgn7   ,sc4crzgn,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Gang Arcade (Bellfruit) (Scorpion 4) (set 11)", MACHINE_FLAGS, layout_sc4crzgna )
+GAMEL( 200?, sc4crzgn8   ,sc4crzgn,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Gang Arcade (Bellfruit) (Scorpion 4) (set 12)", MACHINE_FLAGS, layout_sc4crzgna )
 
 
 
@@ -49440,21 +49619,21 @@ DRIVER_INIT_MEMBER(sc4_state,sc4daylt)
 
 
 // PR6801 DAYLIGHT ROBBERY         PR6801 DAYLIGHT SOUNDS
-GAMEL( 200?, sc4daylt    ,0,         sc4_4reel_200, sc4, sc4_state, sc4daylt, ROT0, "BFM","Daylight Robbery (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4daylta   ,sc4daylt,  sc4_4reel_200, sc4, sc4_state, sc4daylt, ROT0, "BFM","Daylight Robbery (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4dayltb   ,sc4daylt,  sc4_4reel_200, sc4, sc4_state, sc4daylt, ROT0, "BFM","Daylight Robbery (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4dayltc   ,sc4daylt,  sc4_4reel_200, sc4, sc4_state, sc4daylt, ROT0, "BFM","Daylight Robbery (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4dayltg   ,sc4daylt,  sc4_4reel_200, sc4, sc4_state, sc4daylt, ROT0, "BFM","Daylight Robbery (Bellfruit) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4daylth   ,sc4daylt,  sc4_4reel_200, sc4, sc4_state, sc4daylt, ROT0, "BFM","Daylight Robbery (Bellfruit) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4daylti   ,sc4daylt,  sc4_4reel_200, sc4, sc4_state, sc4daylt, ROT0, "BFM","Daylight Robbery (Bellfruit) (Scorpion 4) (set 7)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4dayltj   ,sc4daylt,  sc4_4reel_200, sc4, sc4_state, sc4daylt, ROT0, "BFM","Daylight Robbery (Bellfruit) (Scorpion 4) (set 8)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4daylt    ,0,         sc4_4reel_200, sc4, sc4_state, sc4daylt, ROT0, "BFM","Daylight Robbery (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4dayltf )
+GAMEL( 200?, sc4daylta   ,sc4daylt,  sc4_4reel_200, sc4, sc4_state, sc4daylt, ROT0, "BFM","Daylight Robbery (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4dayltf )
+GAMEL( 200?, sc4dayltb   ,sc4daylt,  sc4_4reel_200, sc4, sc4_state, sc4daylt, ROT0, "BFM","Daylight Robbery (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4dayltf )
+GAMEL( 200?, sc4dayltc   ,sc4daylt,  sc4_4reel_200, sc4, sc4_state, sc4daylt, ROT0, "BFM","Daylight Robbery (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4dayltf )
+GAMEL( 200?, sc4dayltg   ,sc4daylt,  sc4_4reel_200, sc4, sc4_state, sc4daylt, ROT0, "BFM","Daylight Robbery (Bellfruit) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_sc4dayltf )
+GAMEL( 200?, sc4daylth   ,sc4daylt,  sc4_4reel_200, sc4, sc4_state, sc4daylt, ROT0, "BFM","Daylight Robbery (Bellfruit) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_sc4dayltf )
+GAMEL( 200?, sc4daylti   ,sc4daylt,  sc4_4reel_200, sc4, sc4_state, sc4daylt, ROT0, "BFM","Daylight Robbery (Bellfruit) (Scorpion 4) (set 7)", MACHINE_FLAGS, layout_sc4dayltf )
+GAMEL( 200?, sc4dayltj   ,sc4daylt,  sc4_4reel_200, sc4, sc4_state, sc4daylt, ROT0, "BFM","Daylight Robbery (Bellfruit) (Scorpion 4) (set 8)", MACHINE_FLAGS, layout_sc4dayltf )
 // PR4601 DAYLIGHT ROBBERY SP98         PR6801 DAYLIGHT SOUNDS
-GAMEL( 200?, sc4dayltd   ,sc4daylt,  sc4_4reel_200, sc4, sc4_state, sc4daylt, ROT0, "BFM","Daylight Robbery SP98 (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4daylte   ,sc4daylt,  sc4_4reel_200, sc4, sc4_state, sc4daylt, ROT0, "BFM","Daylight Robbery SP98 (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4dayltf   ,sc4daylt,  sc4_4reel_200, sc4, sc4_state, sc4daylt, ROT0, "BFM","Daylight Robbery SP98 (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4dayltk   ,sc4daylt,  sc4_4reel_200, sc4, sc4_state, sc4daylt, ROT0, "BFM","Daylight Robbery SP98 (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4dayltl   ,sc4daylt,  sc4_4reel_200, sc4, sc4_state, sc4daylt, ROT0, "BFM","Daylight Robbery SP98 (Bellfruit) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4dayltm   ,sc4daylt,  sc4_4reel_200, sc4, sc4_state, sc4daylt, ROT0, "BFM","Daylight Robbery SP98 (Bellfruit) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4dayltd   ,sc4daylt,  sc4_4reel_200, sc4, sc4_state, sc4daylt, ROT0, "BFM","Daylight Robbery SP98 (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4dayltf )
+GAMEL( 200?, sc4daylte   ,sc4daylt,  sc4_4reel_200, sc4, sc4_state, sc4daylt, ROT0, "BFM","Daylight Robbery SP98 (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4dayltf )
+GAMEL( 200?, sc4dayltf   ,sc4daylt,  sc4_4reel_200, sc4, sc4_state, sc4daylt, ROT0, "BFM","Daylight Robbery SP98 (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4dayltf )
+GAMEL( 200?, sc4dayltk   ,sc4daylt,  sc4_4reel_200, sc4, sc4_state, sc4daylt, ROT0, "BFM","Daylight Robbery SP98 (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4dayltf )
+GAMEL( 200?, sc4dayltl   ,sc4daylt,  sc4_4reel_200, sc4, sc4_state, sc4daylt, ROT0, "BFM","Daylight Robbery SP98 (Bellfruit) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_sc4dayltf )
+GAMEL( 200?, sc4dayltm   ,sc4daylt,  sc4_4reel_200, sc4, sc4_state, sc4daylt, ROT0, "BFM","Daylight Robbery SP98 (Bellfruit) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_sc4dayltf )
 
 
 
@@ -49492,19 +49671,19 @@ DRIVER_INIT_MEMBER(sc4_state,sc4fpitc)
 }
 
 // PR7119 FEVER_PITCH         PR7119 FEVER PITCH SOUNDS11
-GAMEL( 200?, sc4fpitc    ,0,         sc4_4reel, sc4, sc4_state, sc4fpitc, ROT0, "BFM","Fever Pitch (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4fpitca   ,sc4fpitc,  sc4_4reel, sc4, sc4_state, sc4fpitc, ROT0, "BFM","Fever Pitch (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4fpitcb   ,sc4fpitc,  sc4_4reel, sc4, sc4_state, sc4fpitc, ROT0, "BFM","Fever Pitch (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4fpitcd   ,sc4fpitc,  sc4_4reel, sc4, sc4_state, sc4fpitc, ROT0, "BFM","Fever Pitch (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4fpitce   ,sc4fpitc,  sc4_4reel, sc4, sc4_state, sc4fpitc, ROT0, "BFM","Fever Pitch (Bellfruit) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4fpitcf   ,sc4fpitc,  sc4_4reel, sc4, sc4_state, sc4fpitc, ROT0, "BFM","Fever Pitch (Bellfruit) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4fpitch   ,sc4fpitc,  sc4_4reel, sc4, sc4_state, sc4fpitc, ROT0, "BFM","Fever Pitch (Bellfruit) (Scorpion 4) (set 7)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4fpitci   ,sc4fpitc,  sc4_4reel, sc4, sc4_state, sc4fpitc, ROT0, "BFM","Fever Pitch (Bellfruit) (Scorpion 4) (set 8)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4fpitcj   ,sc4fpitc,  sc4_4reel, sc4, sc4_state, sc4fpitc, ROT0, "BFM","Fever Pitch (Bellfruit) (Scorpion 4) (set 9)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4fpitck   ,sc4fpitc,  sc4_4reel, sc4, sc4_state, sc4fpitc, ROT0, "BFM","Fever Pitch (Bellfruit) (Scorpion 4) (set 10)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4fpitc    ,0,         sc4_4reel, sc4, sc4_state, sc4fpitc, ROT0, "BFM","Fever Pitch (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4fpitcb )
+GAMEL( 200?, sc4fpitca   ,sc4fpitc,  sc4_4reel, sc4, sc4_state, sc4fpitc, ROT0, "BFM","Fever Pitch (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4fpitcb )
+GAMEL( 200?, sc4fpitcb   ,sc4fpitc,  sc4_4reel, sc4, sc4_state, sc4fpitc, ROT0, "BFM","Fever Pitch (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4fpitcb )
+GAMEL( 200?, sc4fpitcd   ,sc4fpitc,  sc4_4reel, sc4, sc4_state, sc4fpitc, ROT0, "BFM","Fever Pitch (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4fpitcb )
+GAMEL( 200?, sc4fpitce   ,sc4fpitc,  sc4_4reel, sc4, sc4_state, sc4fpitc, ROT0, "BFM","Fever Pitch (Bellfruit) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_sc4fpitcb )
+GAMEL( 200?, sc4fpitcf   ,sc4fpitc,  sc4_4reel, sc4, sc4_state, sc4fpitc, ROT0, "BFM","Fever Pitch (Bellfruit) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_sc4fpitcb )
+GAMEL( 200?, sc4fpitch   ,sc4fpitc,  sc4_4reel, sc4, sc4_state, sc4fpitc, ROT0, "BFM","Fever Pitch (Bellfruit) (Scorpion 4) (set 7)", MACHINE_FLAGS, layout_sc4fpitcb )
+GAMEL( 200?, sc4fpitci   ,sc4fpitc,  sc4_4reel, sc4, sc4_state, sc4fpitc, ROT0, "BFM","Fever Pitch (Bellfruit) (Scorpion 4) (set 8)", MACHINE_FLAGS, layout_sc4fpitcb )
+GAMEL( 200?, sc4fpitcj   ,sc4fpitc,  sc4_4reel, sc4, sc4_state, sc4fpitc, ROT0, "BFM","Fever Pitch (Bellfruit) (Scorpion 4) (set 9)", MACHINE_FLAGS, layout_sc4fpitcb )
+GAMEL( 200?, sc4fpitck   ,sc4fpitc,  sc4_4reel, sc4, sc4_state, sc4fpitc, ROT0, "BFM","Fever Pitch (Bellfruit) (Scorpion 4) (set 10)", MACHINE_FLAGS, layout_sc4fpitcb )
 // these 2 fail to show anything
-GAMEL( 200?, sc4fpitcc   ,sc4fpitc,  sc4_4reel, sc4, sc4_state, sc4fpitc, ROT0, "BFM","Fever Pitch (Bellfruit) (Scorpion 4) (set 11)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4fpitcg   ,sc4fpitc,  sc4_4reel, sc4, sc4_state, sc4fpitc, ROT0, "BFM","Fever Pitch (Bellfruit) (Scorpion 4) (set 12)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4fpitcc   ,sc4fpitc,  sc4_4reel, sc4, sc4_state, sc4fpitc, ROT0, "BFM","Fever Pitch (Bellfruit) (Scorpion 4) (set 11)", MACHINE_FLAGS, layout_sc4fpitcb )
+GAMEL( 200?, sc4fpitcg   ,sc4fpitc,  sc4_4reel, sc4, sc4_state, sc4fpitc, ROT0, "BFM","Fever Pitch (Bellfruit) (Scorpion 4) (set 12)", MACHINE_FLAGS, layout_sc4fpitcb )
 
 
 
@@ -49530,13 +49709,13 @@ DRIVER_INIT_MEMBER(sc4_state,sc4fwp)
 
 
 // PR2016 WAYSPAYS         PR2016,5WAYSPAYS,         FWAY SOUNDS           5 WAYS PAYS
-GAMEL( 200?, sc4fwp      ,0,         sc4_4reel, sc4, sc4_state, sc4fwp, ROT0, "Mazooma","Five Ways Pays (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4fwpa     ,sc4fwp,    sc4_4reel, sc4, sc4_state, sc4fwp, ROT0, "Mazooma","Five Ways Pays (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4fwpb     ,sc4fwp,    sc4_4reel, sc4, sc4_state, sc4fwp, ROT0, "Mazooma","Five Ways Pays (Mazooma) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4fwpc     ,sc4fwp,    sc4_4reel, sc4, sc4_state, sc4fwp, ROT0, "Mazooma","Five Ways Pays (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4fwpcs    ,sc4fwp,    sc4_4reel, sc4, sc4_state, sc4fwp, ROT0, "Mazooma","Five Ways Pays (Mazooma) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_bfm_sc4 ) // marked as 'casino'
-GAMEL( 200?, sc4fwpcsa   ,sc4fwp,    sc4_4reel, sc4, sc4_state, sc4fwp, ROT0, "Mazooma","Five Ways Pays (Mazooma) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4fwpcsb   ,sc4fwp,    sc4_4reel, sc4, sc4_state, sc4fwp, ROT0, "Mazooma","Five Ways Pays (Mazooma) (Scorpion 4) (set 7)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4fwp      ,0,         sc4_4reel, sc4, sc4_state, sc4fwp, ROT0, "Mazooma","Five Ways Pays (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4fwpcs )
+GAMEL( 200?, sc4fwpa     ,sc4fwp,    sc4_4reel, sc4, sc4_state, sc4fwp, ROT0, "Mazooma","Five Ways Pays (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4fwpcs )
+GAMEL( 200?, sc4fwpb     ,sc4fwp,    sc4_4reel, sc4, sc4_state, sc4fwp, ROT0, "Mazooma","Five Ways Pays (Mazooma) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4fwpcs )
+GAMEL( 200?, sc4fwpc     ,sc4fwp,    sc4_4reel, sc4, sc4_state, sc4fwp, ROT0, "Mazooma","Five Ways Pays (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4fwpcs )
+GAMEL( 200?, sc4fwpcs    ,sc4fwp,    sc4_4reel, sc4, sc4_state, sc4fwp, ROT0, "Mazooma","Five Ways Pays (Mazooma) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_sc4fwpcs ) // marked as 'casino'
+GAMEL( 200?, sc4fwpcsa   ,sc4fwp,    sc4_4reel, sc4, sc4_state, sc4fwp, ROT0, "Mazooma","Five Ways Pays (Mazooma) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_sc4fwpcs )
+GAMEL( 200?, sc4fwpcsb   ,sc4fwp,    sc4_4reel, sc4, sc4_state, sc4fwp, ROT0, "Mazooma","Five Ways Pays (Mazooma) (Scorpion 4) (set 7)", MACHINE_FLAGS, layout_sc4fwpcs )
 
 
 
@@ -49636,16 +49815,16 @@ GAMEL( 200?, sc4bonbxj   ,sc4bonbx,  sc4_3reel_200, sc4, sc4_state, sc4bonbx, RO
 GAMEL( 200?, sc4bonbxk   ,sc4bonbx,  sc4_3reel_200, sc4, sc4_state, sc4bonbx, ROT0, "Mazooma","Bar X (Mazooma) (Scorpion 4) (set 12)", MACHINE_FLAGS, layout_bfm_sc4 )
 GAMEL( 200?, sc4bonbxl   ,sc4bonbx,  sc4_3reel_200, sc4, sc4_state, sc4bonbx, ROT0, "Mazooma","Bar X (Mazooma) (Scorpion 4) (set 13)", MACHINE_FLAGS, layout_bfm_sc4 )
 // PR7036 GOLDEN X         BARX SOUNDS  (these were listed as Golden X Casino but seem to be Bar X / Bonus Bar X)
-GAMEL( 200?, sc4gx       ,sc4bonbx,  sc4_3reel_200, sc4, sc4_state, sc4gx, ROT0, "Mazooma","Bar X (Mazooma) (Scorpion 4) (BARX, set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4gxcasa   ,sc4bonbx,  sc4_3reel_200, sc4, sc4_state, sc4gx, ROT0, "Mazooma","Bar X (Mazooma) (Scorpion 4) (BARX, set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4gxcasb   ,sc4bonbx,  sc4_3reel_200, sc4, sc4_state, sc4gx, ROT0, "Mazooma","Bar X (Mazooma) (Scorpion 4) (BARX, set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4gxcasc   ,sc4bonbx,  sc4_3reel_200, sc4, sc4_state, sc4gx, ROT0, "Mazooma","Bar X (Mazooma) (Scorpion 4) (BARX, set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4gxcasd   ,sc4bonbx,  sc4_3reel_200, sc4, sc4_state, sc4gx, ROT0, "Mazooma","Bar X (Mazooma) (Scorpion 4) (BARX, set 5)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4gx       ,sc4bonbx,  sc4_3reel_200, sc4, sc4_state, sc4gx, ROT0, "Mazooma","Bar X (Mazooma) (Scorpion 4) (BARX, set 1)", MACHINE_FLAGS, layout_sc4gx )
+GAMEL( 200?, sc4gxcasa   ,sc4bonbx,  sc4_3reel_200, sc4, sc4_state, sc4gx, ROT0, "Mazooma","Bar X (Mazooma) (Scorpion 4) (BARX, set 2)", MACHINE_FLAGS, layout_sc4gx )
+GAMEL( 200?, sc4gxcasb   ,sc4bonbx,  sc4_3reel_200, sc4, sc4_state, sc4gx, ROT0, "Mazooma","Bar X (Mazooma) (Scorpion 4) (BARX, set 3)", MACHINE_FLAGS, layout_sc4gx )
+GAMEL( 200?, sc4gxcasc   ,sc4bonbx,  sc4_3reel_200, sc4, sc4_state, sc4gx, ROT0, "Mazooma","Bar X (Mazooma) (Scorpion 4) (BARX, set 4)", MACHINE_FLAGS, layout_sc4gx )
+GAMEL( 200?, sc4gxcasd   ,sc4bonbx,  sc4_3reel_200, sc4, sc4_state, sc4gx, ROT0, "Mazooma","Bar X (Mazooma) (Scorpion 4) (BARX, set 5)", MACHINE_FLAGS, layout_sc4gx )
 // PR7036GOLDEN X         BARX SOUNDS         GOLDEN
-GAMEL( 200?, sc4gxcase   ,sc4bonbx,  sc4_3reel_200, sc4, sc4_state, sc4gx, ROT0, "Mazooma","Bar X (Mazooma) (Scorpion 4) (BARX, set 6)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4gxcasf   ,sc4bonbx,  sc4_3reel_200, sc4, sc4_state, sc4gx, ROT0, "Mazooma","Bar X (Mazooma) (Scorpion 4) (BARX, set 7)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4gxa      ,sc4bonbx,  sc4_3reel_200, sc4, sc4_state, sc4gx, ROT0, "Mazooma","Bar X (Mazooma) (Scorpion 4) (BARX, set 8)", MACHINE_FLAGS, layout_bfm_sc4 ) // wasn't marked as Casino
-GAMEL( 200?, sc4gxb      ,sc4bonbx,  sc4_3reel_200, sc4, sc4_state, sc4gx, ROT0, "Mazooma","Bar X (Mazooma) (Scorpion 4) (BARX, set 9)", MACHINE_FLAGS, layout_bfm_sc4 ) // wasn't marked as Casino
+GAMEL( 200?, sc4gxcase   ,sc4bonbx,  sc4_3reel_200, sc4, sc4_state, sc4gx, ROT0, "Mazooma","Bar X (Mazooma) (Scorpion 4) (BARX, set 6)", MACHINE_FLAGS, layout_sc4gx )
+GAMEL( 200?, sc4gxcasf   ,sc4bonbx,  sc4_3reel_200, sc4, sc4_state, sc4gx, ROT0, "Mazooma","Bar X (Mazooma) (Scorpion 4) (BARX, set 7)", MACHINE_FLAGS, layout_sc4gx )
+GAMEL( 200?, sc4gxa      ,sc4bonbx,  sc4_3reel_200, sc4, sc4_state, sc4gx, ROT0, "Mazooma","Bar X (Mazooma) (Scorpion 4) (BARX, set 8)", MACHINE_FLAGS, layout_sc4gx ) // wasn't marked as Casino
+GAMEL( 200?, sc4gxb      ,sc4bonbx,  sc4_3reel_200, sc4, sc4_state, sc4gx, ROT0, "Mazooma","Bar X (Mazooma) (Scorpion 4) (BARX, set 9)", MACHINE_FLAGS, layout_sc4gx ) // wasn't marked as Casino
 
 
 
@@ -49805,10 +49984,10 @@ DRIVER_INIT_MEMBER(sc4_state,sc4gag)
 
 // the (PR7019, GRAN) sets requires 3:2 and 3:3 ON to boot, (PR7019, GRAB) I'm not sure
 // PR7019 GRAB A GRANNY         GRANNY SOUNDS
-GAMEL( 200?, sc4gag      ,0,         sc4_4reel, sc4, sc4_state, sc4gag, ROT0, "Mazooma","Grab A Granny (PR7019, GRAB) (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4gagb     ,sc4gag,    sc4_4reel, sc4, sc4_state, sc4gag, ROT0, "Mazooma","Grab A Granny (PR7019, GRAB) (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4gaga     ,sc4gag,    sc4_4reel, sc4, sc4_state, sc4gag, ROT0, "Mazooma","Grab A Granny (PR7019, GRAN) (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4gagc     ,sc4gag,    sc4_4reel, sc4, sc4_state, sc4gag, ROT0, "Mazooma","Grab A Granny (PR7019, GRAN) (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4gag      ,0,         sc4_4reel, sc4, sc4_state, sc4gag, ROT0, "Mazooma","Grab A Granny (PR7019, GRAB) (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4gaga )
+GAMEL( 200?, sc4gagb     ,sc4gag,    sc4_4reel, sc4, sc4_state, sc4gag, ROT0, "Mazooma","Grab A Granny (PR7019, GRAB) (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4gaga )
+GAMEL( 200?, sc4gaga     ,sc4gag,    sc4_4reel, sc4, sc4_state, sc4gag, ROT0, "Mazooma","Grab A Granny (PR7019, GRAN) (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4gaga )
+GAMEL( 200?, sc4gagc     ,sc4gag,    sc4_4reel, sc4, sc4_state, sc4gag, ROT0, "Mazooma","Grab A Granny (PR7019, GRAN) (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4gaga )
 
 
 
@@ -49832,10 +50011,10 @@ DRIVER_INIT_MEMBER(sc4_state,sc4holyw)
 }
 
 // PR7115 HOLLYWOOD         PR7115 HOLLYWOOD SOUNDS11
-GAMEL( 200?, sc4holyw    ,0,         sc4_4reel, sc4, sc4_state, sc4holyw, ROT0, "BFM","Hollywood (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4holywb   ,sc4holyw,  sc4_4reel, sc4, sc4_state, sc4holyw, ROT0, "BFM","Hollywood (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4holywa   ,sc4holyw,  sc4_4reel, sc4, sc4_state, sc4holyw, ROT0, "BFM / Whitbread","Hollywood (Bellfruit / Whitbread) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4holywc   ,sc4holyw,  sc4_4reel, sc4, sc4_state, sc4holyw, ROT0, "BFM / Whitbread","Hollywood (Bellfruit / Whitbread) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4holyw    ,0,         sc4_4reel, sc4, sc4_state, sc4holyw, ROT0, "BFM","Hollywood (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4holyw )
+GAMEL( 200?, sc4holywb   ,sc4holyw,  sc4_4reel, sc4, sc4_state, sc4holyw, ROT0, "BFM","Hollywood (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4holyw )
+GAMEL( 200?, sc4holywa   ,sc4holyw,  sc4_4reel, sc4, sc4_state, sc4holyw, ROT0, "BFM / Whitbread","Hollywood (Bellfruit / Whitbread) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4holyw )
+GAMEL( 200?, sc4holywc   ,sc4holyw,  sc4_4reel, sc4, sc4_state, sc4holyw, ROT0, "BFM / Whitbread","Hollywood (Bellfruit / Whitbread) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4holyw )
 
 
 
@@ -49875,27 +50054,27 @@ DRIVER_INIT_MEMBER(sc4_state,sc4lined_mbus)
 }
 
 // PR7067CASINO LINE DANCER         LINE SOUNDS         LINE DANCER
-GAMEL( 200?, sc4lined    ,0,         sc4_3reel, sc4, sc4_state, sc4lined, ROT0, "Mazooma","Line Dancer (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4lineda   ,sc4lined,  sc4_3reel, sc4, sc4_state, sc4lined, ROT0, "Mazooma","Line Dancer (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4lined    ,0,         sc4_3reel, sc4, sc4_state, sc4lined, ROT0, "Mazooma","Line Dancer (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4lined )
+GAMEL( 200?, sc4lineda   ,sc4lined,  sc4_3reel, sc4, sc4_state, sc4lined, ROT0, "Mazooma","Line Dancer (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4lined )
 // PAY UNIT ERR 17 alarm during startup
-GAMEL( 200?, sc4linedb   ,sc4lined,  sc4_3reel, sc4, sc4_state, sc4lined, ROT0, "Mazooma","Line Dancer (Mazooma) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4linedc   ,sc4lined,  sc4_3reel, sc4, sc4_state, sc4lined, ROT0, "Mazooma","Line Dancer (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4linedb   ,sc4lined,  sc4_3reel, sc4, sc4_state, sc4lined, ROT0, "Mazooma","Line Dancer (Mazooma) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4lined )
+GAMEL( 200?, sc4linedc   ,sc4lined,  sc4_3reel, sc4, sc4_state, sc4lined, ROT0, "Mazooma","Line Dancer (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4lined )
 // PR7067CASINO LINE DANCER           LINE DANCER     ARCADE  LINE SOUNDS         LINE DANCER
 // PAY UNIT ERR 17 alarm during startup
-GAMEL( 200?, sc4linedd   ,sc4lined,  sc4_3reel, sc4, sc4_state, sc4lined_mbus, ROT0, "Mazooma","Line Dancer Arcade (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4linede   ,sc4lined,  sc4_3reel, sc4, sc4_state, sc4lined_mbus, ROT0, "Mazooma","Line Dancer Arcade (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4linedd   ,sc4lined,  sc4_3reel, sc4, sc4_state, sc4lined_mbus, ROT0, "Mazooma","Line Dancer Arcade (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4lined )
+GAMEL( 200?, sc4linede   ,sc4lined,  sc4_3reel, sc4, sc4_state, sc4lined_mbus, ROT0, "Mazooma","Line Dancer Arcade (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4lined )
 // ok
-GAMEL( 200?, sc4linedf   ,sc4lined,  sc4_3reel, sc4, sc4_state, sc4lined, ROT0, "Mazooma","Line Dancer Arcade (Mazooma) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4linedg   ,sc4lined,  sc4_3reel, sc4, sc4_state, sc4lined, ROT0, "Mazooma","Line Dancer Arcade (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4linedh   ,sc4lined,  sc4_3reel, sc4, sc4_state, sc4lined, ROT0, "Mazooma","Line Dancer Arcade (Mazooma) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4linedi   ,sc4lined,  sc4_3reel, sc4, sc4_state, sc4lined, ROT0, "Mazooma","Line Dancer Arcade (Mazooma) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4linedf   ,sc4lined,  sc4_3reel, sc4, sc4_state, sc4lined, ROT0, "Mazooma","Line Dancer Arcade (Mazooma) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4lined )
+GAMEL( 200?, sc4linedg   ,sc4lined,  sc4_3reel, sc4, sc4_state, sc4lined, ROT0, "Mazooma","Line Dancer Arcade (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4lined )
+GAMEL( 200?, sc4linedh   ,sc4lined,  sc4_3reel, sc4, sc4_state, sc4lined, ROT0, "Mazooma","Line Dancer Arcade (Mazooma) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_sc4lined )
+GAMEL( 200?, sc4linedi   ,sc4lined,  sc4_3reel, sc4, sc4_state, sc4lined, ROT0, "Mazooma","Line Dancer Arcade (Mazooma) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_sc4lined )
 // PR7067CASINO LINE DANCER         LINE SOUNDS         LINE DANCER (same as above?)
-GAMEL( 200?, sc4ldcas    ,sc4lined,  sc4_3reel, sc4, sc4_state, sc4lined, ROT0, "Mazooma","Line Dancer Casino (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4ldcasa   ,sc4lined,  sc4_3reel, sc4, sc4_state, sc4lined, ROT0, "Mazooma","Line Dancer Casino (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4ldcasb   ,sc4lined,  sc4_3reel, sc4, sc4_state, sc4lined, ROT0, "Mazooma","Line Dancer Casino (Mazooma) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4ldcasc   ,sc4lined,  sc4_3reel, sc4, sc4_state, sc4lined, ROT0, "Mazooma","Line Dancer Casino (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4ldcasd   ,sc4lined,  sc4_3reel, sc4, sc4_state, sc4lined, ROT0, "Mazooma","Line Dancer Casino (Mazooma) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4ldcase   ,sc4lined,  sc4_3reel, sc4, sc4_state, sc4lined, ROT0, "Mazooma","Line Dancer Casino (Mazooma) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4ldcas    ,sc4lined,  sc4_3reel, sc4, sc4_state, sc4lined, ROT0, "Mazooma","Line Dancer Casino (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4lined )
+GAMEL( 200?, sc4ldcasa   ,sc4lined,  sc4_3reel, sc4, sc4_state, sc4lined, ROT0, "Mazooma","Line Dancer Casino (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4lined )
+GAMEL( 200?, sc4ldcasb   ,sc4lined,  sc4_3reel, sc4, sc4_state, sc4lined, ROT0, "Mazooma","Line Dancer Casino (Mazooma) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4lined )
+GAMEL( 200?, sc4ldcasc   ,sc4lined,  sc4_3reel, sc4, sc4_state, sc4lined, ROT0, "Mazooma","Line Dancer Casino (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4lined )
+GAMEL( 200?, sc4ldcasd   ,sc4lined,  sc4_3reel, sc4, sc4_state, sc4lined, ROT0, "Mazooma","Line Dancer Casino (Mazooma) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_sc4lined )
+GAMEL( 200?, sc4ldcase   ,sc4lined,  sc4_3reel, sc4, sc4_state, sc4lined, ROT0, "Mazooma","Line Dancer Casino (Mazooma) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_sc4lined )
 
 
 
@@ -49982,21 +50161,21 @@ DRIVER_INIT_MEMBER(sc4_state,sc4mgrm)
 }
 
 // PR1132 CASINO MONEY GO ROUND         PR1132 MONEY GO ROUND SOUNDS11
-GAMEL( 200?, sc4mgr      ,0,         sc4_200_4r, sc4, sc4_state, sc4mgr, ROT0, "BFM","Money Go Round Casino (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4mgra     ,sc4mgr,    sc4_200_4r, sc4, sc4_state, sc4mgr, ROT0, "BFM","Money Go Round Casino (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4mgrh     ,sc4mgr,    sc4_200_4r, sc4, sc4_state, sc4mgr, ROT0, "BFM","Money Go Round Casino (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4mgri     ,sc4mgr,    sc4_200_4r, sc4, sc4_state, sc4mgr, ROT0, "BFM","Money Go Round Casino (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4mgr      ,0,         sc4_200_4r, sc4, sc4_state, sc4mgr, ROT0, "BFM","Money Go Round Casino (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4mgr )
+GAMEL( 200?, sc4mgra     ,sc4mgr,    sc4_200_4r, sc4, sc4_state, sc4mgr, ROT0, "BFM","Money Go Round Casino (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4mgr )
+GAMEL( 200?, sc4mgrh     ,sc4mgr,    sc4_200_4r, sc4, sc4_state, sc4mgr, ROT0, "BFM","Money Go Round Casino (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4mgr )
+GAMEL( 200?, sc4mgri     ,sc4mgr,    sc4_200_4r, sc4, sc4_state, sc4mgr, ROT0, "BFM","Money Go Round Casino (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4mgr )
 // PR1132 CASINO MONEY GO ROUND         PR1132 MONEY GO ROUND SOUNDS11    MONEY GO ROUND  S.SITE
-GAMEL( 200?, sc4mgrb     ,sc4mgr,    sc4_200_4r, sc4, sc4_state, sc4mgrm, ROT0, "BFM","Money Go Round Casino (Bellfruit) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4mgrc     ,sc4mgr,    sc4_200_4r, sc4, sc4_state, sc4mgrm, ROT0, "BFM","Money Go Round Casino (Bellfruit) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4mgrd     ,sc4mgr,    sc4_200_4r, sc4, sc4_state, sc4mgrm, ROT0, "BFM","Money Go Round Casino (Bellfruit) (Scorpion 4) (set 7)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4mgre     ,sc4mgr,    sc4_200_4r, sc4, sc4_state, sc4mgrm, ROT0, "BFM","Money Go Round Casino (Bellfruit) (Scorpion 4) (set 8)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4mgrf     ,sc4mgr,    sc4_200_4r, sc4, sc4_state, sc4mgrm, ROT0, "BFM","Money Go Round Casino (Bellfruit) (Scorpion 4) (set 9)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4mgrg     ,sc4mgr,    sc4_200_4r, sc4, sc4_state, sc4mgrm, ROT0, "BFM","Money Go Round Casino (Bellfruit) (Scorpion 4) (set 10)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4mgrj     ,sc4mgr,    sc4_200_4r, sc4, sc4_state, sc4mgrm, ROT0, "BFM","Money Go Round Casino (Bellfruit) (Scorpion 4) (set 11)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4mgrk     ,sc4mgr,    sc4_200_4r, sc4, sc4_state, sc4mgrm, ROT0, "BFM","Money Go Round Casino (Bellfruit) (Scorpion 4) (set 12)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4mgrl     ,sc4mgr,    sc4_200_4r, sc4, sc4_state, sc4mgrm, ROT0, "BFM","Money Go Round Casino (Bellfruit) (Scorpion 4) (set 13)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4mgrm     ,sc4mgr,    sc4_200_4r, sc4, sc4_state, sc4mgrm, ROT0, "BFM","Money Go Round Casino (Bellfruit) (Scorpion 4) (set 14)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4mgrb     ,sc4mgr,    sc4_200_4r, sc4, sc4_state, sc4mgrm, ROT0, "BFM","Money Go Round Casino (Bellfruit) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_sc4mgr )
+GAMEL( 200?, sc4mgrc     ,sc4mgr,    sc4_200_4r, sc4, sc4_state, sc4mgrm, ROT0, "BFM","Money Go Round Casino (Bellfruit) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_sc4mgr )
+GAMEL( 200?, sc4mgrd     ,sc4mgr,    sc4_200_4r, sc4, sc4_state, sc4mgrm, ROT0, "BFM","Money Go Round Casino (Bellfruit) (Scorpion 4) (set 7)", MACHINE_FLAGS, layout_sc4mgr )
+GAMEL( 200?, sc4mgre     ,sc4mgr,    sc4_200_4r, sc4, sc4_state, sc4mgrm, ROT0, "BFM","Money Go Round Casino (Bellfruit) (Scorpion 4) (set 8)", MACHINE_FLAGS, layout_sc4mgr )
+GAMEL( 200?, sc4mgrf     ,sc4mgr,    sc4_200_4r, sc4, sc4_state, sc4mgrm, ROT0, "BFM","Money Go Round Casino (Bellfruit) (Scorpion 4) (set 9)", MACHINE_FLAGS, layout_sc4mgr )
+GAMEL( 200?, sc4mgrg     ,sc4mgr,    sc4_200_4r, sc4, sc4_state, sc4mgrm, ROT0, "BFM","Money Go Round Casino (Bellfruit) (Scorpion 4) (set 10)", MACHINE_FLAGS, layout_sc4mgr )
+GAMEL( 200?, sc4mgrj     ,sc4mgr,    sc4_200_4r, sc4, sc4_state, sc4mgrm, ROT0, "BFM","Money Go Round Casino (Bellfruit) (Scorpion 4) (set 11)", MACHINE_FLAGS, layout_sc4mgr )
+GAMEL( 200?, sc4mgrk     ,sc4mgr,    sc4_200_4r, sc4, sc4_state, sc4mgrm, ROT0, "BFM","Money Go Round Casino (Bellfruit) (Scorpion 4) (set 12)", MACHINE_FLAGS, layout_sc4mgr )
+GAMEL( 200?, sc4mgrl     ,sc4mgr,    sc4_200_4r, sc4, sc4_state, sc4mgrm, ROT0, "BFM","Money Go Round Casino (Bellfruit) (Scorpion 4) (set 13)", MACHINE_FLAGS, layout_sc4mgr )
+GAMEL( 200?, sc4mgrm     ,sc4mgr,    sc4_200_4r, sc4, sc4_state, sc4mgrm, ROT0, "BFM","Money Go Round Casino (Bellfruit) (Scorpion 4) (set 14)", MACHINE_FLAGS, layout_sc4mgr )
 
 
 
@@ -50012,21 +50191,21 @@ DRIVER_INIT_MEMBER(sc4_state,sc4mspid_mbus)
 }
 
 // PR1325 CASINO MONEY SPIDER         PR1325 MONEYSPIDER SOUNDS11
-GAMEL( 200?, sc4mspid    ,0,         sc4_200_4r, sc4, sc4_state, sc4mspid, ROT0, "BFM","Casino Money Spider (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4mspida   ,sc4mspid,  sc4_200_4r, sc4, sc4_state, sc4mspid, ROT0, "BFM","Casino Money Spider (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4mspidb   ,sc4mspid,  sc4_200_4r, sc4, sc4_state, sc4mspid, ROT0, "BFM","Casino Money Spider (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4mspidc   ,sc4mspid,  sc4_200_4r, sc4, sc4_state, sc4mspid, ROT0, "BFM","Casino Money Spider (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4mspidd   ,sc4mspid,  sc4_200_4r, sc4, sc4_state, sc4mspid, ROT0, "BFM","Casino Money Spider (Bellfruit) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4mspide   ,sc4mspid,  sc4_200_4r, sc4, sc4_state, sc4mspid, ROT0, "BFM","Casino Money Spider (Bellfruit) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4mspidf   ,sc4mspid,  sc4_200_4r, sc4, sc4_state, sc4mspid, ROT0, "BFM","Casino Money Spider (Bellfruit) (Scorpion 4) (set 7)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4mspidg   ,sc4mspid,  sc4_200_4r, sc4, sc4_state, sc4mspid, ROT0, "BFM","Casino Money Spider (Bellfruit) (Scorpion 4) (set 8)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4mspidj   ,sc4mspid,  sc4_200_4r, sc4, sc4_state, sc4mspid, ROT0, "BFM","Casino Money Spider (Bellfruit) (Scorpion 4) (set 9)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4mspidk   ,sc4mspid,  sc4_200_4r, sc4, sc4_state, sc4mspid, ROT0, "BFM","Casino Money Spider (Bellfruit) (Scorpion 4) (set 10)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4mspidl   ,sc4mspid,  sc4_200_4r, sc4, sc4_state, sc4mspid, ROT0, "BFM","Casino Money Spider (Bellfruit) (Scorpion 4) (set 11)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4mspidm   ,sc4mspid,  sc4_200_4r, sc4, sc4_state, sc4mspid, ROT0, "BFM","Casino Money Spider (Bellfruit) (Scorpion 4) (set 12)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4mspid    ,0,         sc4_200_4r, sc4, sc4_state, sc4mspid, ROT0, "BFM","Casino Money Spider (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4mspid )
+GAMEL( 200?, sc4mspida   ,sc4mspid,  sc4_200_4r, sc4, sc4_state, sc4mspid, ROT0, "BFM","Casino Money Spider (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4mspid )
+GAMEL( 200?, sc4mspidb   ,sc4mspid,  sc4_200_4r, sc4, sc4_state, sc4mspid, ROT0, "BFM","Casino Money Spider (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4mspid )
+GAMEL( 200?, sc4mspidc   ,sc4mspid,  sc4_200_4r, sc4, sc4_state, sc4mspid, ROT0, "BFM","Casino Money Spider (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4mspid )
+GAMEL( 200?, sc4mspidd   ,sc4mspid,  sc4_200_4r, sc4, sc4_state, sc4mspid, ROT0, "BFM","Casino Money Spider (Bellfruit) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_sc4mspid )
+GAMEL( 200?, sc4mspide   ,sc4mspid,  sc4_200_4r, sc4, sc4_state, sc4mspid, ROT0, "BFM","Casino Money Spider (Bellfruit) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_sc4mspid )
+GAMEL( 200?, sc4mspidf   ,sc4mspid,  sc4_200_4r, sc4, sc4_state, sc4mspid, ROT0, "BFM","Casino Money Spider (Bellfruit) (Scorpion 4) (set 7)", MACHINE_FLAGS, layout_sc4mspid )
+GAMEL( 200?, sc4mspidg   ,sc4mspid,  sc4_200_4r, sc4, sc4_state, sc4mspid, ROT0, "BFM","Casino Money Spider (Bellfruit) (Scorpion 4) (set 8)", MACHINE_FLAGS, layout_sc4mspid )
+GAMEL( 200?, sc4mspidj   ,sc4mspid,  sc4_200_4r, sc4, sc4_state, sc4mspid, ROT0, "BFM","Casino Money Spider (Bellfruit) (Scorpion 4) (set 9)", MACHINE_FLAGS, layout_sc4mspid )
+GAMEL( 200?, sc4mspidk   ,sc4mspid,  sc4_200_4r, sc4, sc4_state, sc4mspid, ROT0, "BFM","Casino Money Spider (Bellfruit) (Scorpion 4) (set 10)", MACHINE_FLAGS, layout_sc4mspid )
+GAMEL( 200?, sc4mspidl   ,sc4mspid,  sc4_200_4r, sc4, sc4_state, sc4mspid, ROT0, "BFM","Casino Money Spider (Bellfruit) (Scorpion 4) (set 11)", MACHINE_FLAGS, layout_sc4mspid )
+GAMEL( 200?, sc4mspidm   ,sc4mspid,  sc4_200_4r, sc4, sc4_state, sc4mspid, ROT0, "BFM","Casino Money Spider (Bellfruit) (Scorpion 4) (set 12)", MACHINE_FLAGS, layout_sc4mspid )
 // PR1325 CASINO MONEY SPIDER         MONEY SPIDER  ARCADE  PR1325 MONEYSPIDER SOUNDS11
-GAMEL( 200?, sc4mspidh   ,sc4mspid,  sc4_200_4r, sc4, sc4_state, sc4mspid_mbus, ROT0, "BFM","Casino Money Spider (Bellfruit) (Scorpion 4) (set 13)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4mspidi   ,sc4mspid,  sc4_200_4r, sc4, sc4_state, sc4mspid_mbus, ROT0, "BFM","Casino Money Spider (Bellfruit) (Scorpion 4) (set 14)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4mspidh   ,sc4mspid,  sc4_200_4r, sc4, sc4_state, sc4mspid_mbus, ROT0, "BFM","Casino Money Spider (Bellfruit) (Scorpion 4) (set 13)", MACHINE_FLAGS, layout_sc4mspid )
+GAMEL( 200?, sc4mspidi   ,sc4mspid,  sc4_200_4r, sc4, sc4_state, sc4mspid_mbus, ROT0, "BFM","Casino Money Spider (Bellfruit) (Scorpion 4) (set 14)", MACHINE_FLAGS, layout_sc4mspid )
 
 
 
@@ -50054,18 +50233,18 @@ DRIVER_INIT_MEMBER(sc4_state,sc4mtb)
 }
 
 // PR6803 MONEY TO BURN         PR6803 BURN SOUNDS11
-GAMEL( 200?, sc4mtb      ,0,         sc4_4reel, sc4, sc4_state, sc4mtb, ROT0, "BFM","Money To Burn (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4mtba     ,sc4mtb,    sc4_4reel, sc4, sc4_state, sc4mtb, ROT0, "BFM","Money To Burn (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4mtbb     ,sc4mtb,    sc4_4reel, sc4, sc4_state, sc4mtb, ROT0, "BFM","Money To Burn (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4mtbe     ,sc4mtb,    sc4_4reel, sc4, sc4_state, sc4mtb, ROT0, "BFM","Money To Burn (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4mtbf     ,sc4mtb,    sc4_4reel, sc4, sc4_state, sc4mtb, ROT0, "BFM","Money To Burn (Bellfruit) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4mtbg     ,sc4mtb,    sc4_4reel, sc4, sc4_state, sc4mtb, ROT0, "BFM","Money To Burn (Bellfruit) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4mtbj     ,sc4mtb,    sc4_4reel, sc4, sc4_state, sc4mtb, ROT0, "BFM","Money To Burn (Bellfruit) (Scorpion 4) (set 7)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4mtb      ,0,         sc4_4reel, sc4, sc4_state, sc4mtb, ROT0, "BFM","Money To Burn (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4mtbb )
+GAMEL( 200?, sc4mtba     ,sc4mtb,    sc4_4reel, sc4, sc4_state, sc4mtb, ROT0, "BFM","Money To Burn (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4mtbb )
+GAMEL( 200?, sc4mtbb     ,sc4mtb,    sc4_4reel, sc4, sc4_state, sc4mtb, ROT0, "BFM","Money To Burn (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4mtbb )
+GAMEL( 200?, sc4mtbe     ,sc4mtb,    sc4_4reel, sc4, sc4_state, sc4mtb, ROT0, "BFM","Money To Burn (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4mtbb )
+GAMEL( 200?, sc4mtbf     ,sc4mtb,    sc4_4reel, sc4, sc4_state, sc4mtb, ROT0, "BFM","Money To Burn (Bellfruit) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_sc4mtbb )
+GAMEL( 200?, sc4mtbg     ,sc4mtb,    sc4_4reel, sc4, sc4_state, sc4mtb, ROT0, "BFM","Money To Burn (Bellfruit) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_sc4mtbb )
+GAMEL( 200?, sc4mtbj     ,sc4mtb,    sc4_4reel, sc4, sc4_state, sc4mtb, ROT0, "BFM","Money To Burn (Bellfruit) (Scorpion 4) (set 7)", MACHINE_FLAGS, layout_sc4mtbb )
 // PR4603 MONEY TO BURN SP98         PR6803 BURN SOUNDS11
-GAMEL( 200?, sc4mtbc     ,sc4mtb,    sc4_4reel, sc4, sc4_state, sc4mtb, ROT0, "BFM","Money To Burn SP98 (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4mtbd     ,sc4mtb,    sc4_4reel, sc4, sc4_state, sc4mtb, ROT0, "BFM","Money To Burn SP98 (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4mtbh     ,sc4mtb,    sc4_4reel, sc4, sc4_state, sc4mtb, ROT0, "BFM","Money To Burn SP98 (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4mtbi     ,sc4mtb,    sc4_4reel, sc4, sc4_state, sc4mtb, ROT0, "BFM","Money To Burn SP98 (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4mtbc     ,sc4mtb,    sc4_4reel, sc4, sc4_state, sc4mtb, ROT0, "BFM","Money To Burn SP98 (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4mtbb )
+GAMEL( 200?, sc4mtbd     ,sc4mtb,    sc4_4reel, sc4, sc4_state, sc4mtb, ROT0, "BFM","Money To Burn SP98 (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4mtbb )
+GAMEL( 200?, sc4mtbh     ,sc4mtb,    sc4_4reel, sc4, sc4_state, sc4mtb, ROT0, "BFM","Money To Burn SP98 (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4mtbb )
+GAMEL( 200?, sc4mtbi     ,sc4mtb,    sc4_4reel, sc4, sc4_state, sc4mtb, ROT0, "BFM","Money To Burn SP98 (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4mtbb )
 
 
 DRIVER_INIT_MEMBER(sc4_state,sc4mtbcl)
@@ -50075,22 +50254,22 @@ DRIVER_INIT_MEMBER(sc4_state,sc4mtbcl)
 
 
 // PR6932 CLUB MONEY TO BURN         PR6932 BURN SOUNDS11
-GAMEL( 200?, sc4mtbcl    ,0,         sc4_5reel, sc4, sc4_state, sc4mtbcl, ROT0, "BFM","Money To Burn Club (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4mtbcla   ,sc4mtbcl,  sc4_5reel, sc4, sc4_state, sc4mtbcl, ROT0, "BFM","Money To Burn Club (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4mtbclb   ,sc4mtbcl,  sc4_5reel, sc4, sc4_state, sc4mtbcl, ROT0, "BFM","Money To Burn Club (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4mtbclc   ,sc4mtbcl,  sc4_5reel, sc4, sc4_state, sc4mtbcl, ROT0, "BFM","Money To Burn Club (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4mtbcld   ,sc4mtbcl,  sc4_5reel, sc4, sc4_state, sc4mtbcl, ROT0, "BFM","Money To Burn Club (Bellfruit) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4mtbcle   ,sc4mtbcl,  sc4_5reel, sc4, sc4_state, sc4mtbcl, ROT0, "BFM","Money To Burn Club (Bellfruit) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4mtbclf   ,sc4mtbcl,  sc4_5reel, sc4, sc4_state, sc4mtbcl, ROT0, "BFM","Money To Burn Club (Bellfruit) (Scorpion 4) (set 7)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4mtbclg   ,sc4mtbcl,  sc4_5reel, sc4, sc4_state, sc4mtbcl, ROT0, "BFM","Money To Burn Club (Bellfruit) (Scorpion 4) (set 8)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4mtbclh   ,sc4mtbcl,  sc4_5reel, sc4, sc4_state, sc4mtbcl, ROT0, "BFM","Money To Burn Club (Bellfruit) (Scorpion 4) (set 9)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4mtbcli   ,sc4mtbcl,  sc4_5reel, sc4, sc4_state, sc4mtbcl, ROT0, "BFM","Money To Burn Club (Bellfruit) (Scorpion 4) (set 10)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4mtbclj   ,sc4mtbcl,  sc4_5reel, sc4, sc4_state, sc4mtbcl, ROT0, "BFM","Money To Burn Club (Bellfruit) (Scorpion 4) (set 11)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4mtbclk   ,sc4mtbcl,  sc4_5reel, sc4, sc4_state, sc4mtbcl, ROT0, "BFM","Money To Burn Club (Bellfruit) (Scorpion 4) (set 12)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4mtbcll   ,sc4mtbcl,  sc4_5reel, sc4, sc4_state, sc4mtbcl, ROT0, "BFM","Money To Burn Club (Bellfruit) (Scorpion 4) (set 13)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4mtbclm   ,sc4mtbcl,  sc4_5reel, sc4, sc4_state, sc4mtbcl, ROT0, "BFM","Money To Burn Club (Bellfruit) (Scorpion 4) (set 14)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4mtbcln   ,sc4mtbcl,  sc4_5reel, sc4, sc4_state, sc4mtbcl, ROT0, "BFM","Money To Burn Club (Bellfruit) (Scorpion 4) (set 15)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4mtbclo   ,sc4mtbcl,  sc4_5reel, sc4, sc4_state, sc4mtbcl, ROT0, "BFM","Money To Burn Club (Bellfruit) (Scorpion 4) (set 16)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4mtbcl    ,0,         sc4_5reel, sc4, sc4_state, sc4mtbcl, ROT0, "BFM","Money To Burn Club (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4mtbclb )
+GAMEL( 200?, sc4mtbcla   ,sc4mtbcl,  sc4_5reel, sc4, sc4_state, sc4mtbcl, ROT0, "BFM","Money To Burn Club (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4mtbclb )
+GAMEL( 200?, sc4mtbclb   ,sc4mtbcl,  sc4_5reel, sc4, sc4_state, sc4mtbcl, ROT0, "BFM","Money To Burn Club (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4mtbclb )
+GAMEL( 200?, sc4mtbclc   ,sc4mtbcl,  sc4_5reel, sc4, sc4_state, sc4mtbcl, ROT0, "BFM","Money To Burn Club (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4mtbclb )
+GAMEL( 200?, sc4mtbcld   ,sc4mtbcl,  sc4_5reel, sc4, sc4_state, sc4mtbcl, ROT0, "BFM","Money To Burn Club (Bellfruit) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_sc4mtbclb )
+GAMEL( 200?, sc4mtbcle   ,sc4mtbcl,  sc4_5reel, sc4, sc4_state, sc4mtbcl, ROT0, "BFM","Money To Burn Club (Bellfruit) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_sc4mtbclb )
+GAMEL( 200?, sc4mtbclf   ,sc4mtbcl,  sc4_5reel, sc4, sc4_state, sc4mtbcl, ROT0, "BFM","Money To Burn Club (Bellfruit) (Scorpion 4) (set 7)", MACHINE_FLAGS, layout_sc4mtbclb )
+GAMEL( 200?, sc4mtbclg   ,sc4mtbcl,  sc4_5reel, sc4, sc4_state, sc4mtbcl, ROT0, "BFM","Money To Burn Club (Bellfruit) (Scorpion 4) (set 8)", MACHINE_FLAGS, layout_sc4mtbclb )
+GAMEL( 200?, sc4mtbclh   ,sc4mtbcl,  sc4_5reel, sc4, sc4_state, sc4mtbcl, ROT0, "BFM","Money To Burn Club (Bellfruit) (Scorpion 4) (set 9)", MACHINE_FLAGS, layout_sc4mtbclb )
+GAMEL( 200?, sc4mtbcli   ,sc4mtbcl,  sc4_5reel, sc4, sc4_state, sc4mtbcl, ROT0, "BFM","Money To Burn Club (Bellfruit) (Scorpion 4) (set 10)", MACHINE_FLAGS, layout_sc4mtbclb )
+GAMEL( 200?, sc4mtbclj   ,sc4mtbcl,  sc4_5reel, sc4, sc4_state, sc4mtbcl, ROT0, "BFM","Money To Burn Club (Bellfruit) (Scorpion 4) (set 11)", MACHINE_FLAGS, layout_sc4mtbclb )
+GAMEL( 200?, sc4mtbclk   ,sc4mtbcl,  sc4_5reel, sc4, sc4_state, sc4mtbcl, ROT0, "BFM","Money To Burn Club (Bellfruit) (Scorpion 4) (set 12)", MACHINE_FLAGS, layout_sc4mtbclb )
+GAMEL( 200?, sc4mtbcll   ,sc4mtbcl,  sc4_5reel, sc4, sc4_state, sc4mtbcl, ROT0, "BFM","Money To Burn Club (Bellfruit) (Scorpion 4) (set 13)", MACHINE_FLAGS, layout_sc4mtbclb )
+GAMEL( 200?, sc4mtbclm   ,sc4mtbcl,  sc4_5reel, sc4, sc4_state, sc4mtbcl, ROT0, "BFM","Money To Burn Club (Bellfruit) (Scorpion 4) (set 14)", MACHINE_FLAGS, layout_sc4mtbclb )
+GAMEL( 200?, sc4mtbcln   ,sc4mtbcl,  sc4_5reel, sc4, sc4_state, sc4mtbcl, ROT0, "BFM","Money To Burn Club (Bellfruit) (Scorpion 4) (set 15)", MACHINE_FLAGS, layout_sc4mtbclb )
+GAMEL( 200?, sc4mtbclo   ,sc4mtbcl,  sc4_5reel, sc4, sc4_state, sc4mtbcl, ROT0, "BFM","Money To Burn Club (Bellfruit) (Scorpion 4) (set 16)", MACHINE_FLAGS, layout_sc4mtbclb )
 
 
 
@@ -50184,9 +50363,9 @@ DRIVER_INIT_MEMBER(sc4_state,sc4pacqp)
 
 
 // PR7072 PAC MAN         PACP SOUNDS             PAC-MAN
-GAMEL( 200?, sc4pacqp    ,0,         sc4_4reel, sc4, sc4_state, sc4pacqp, ROT0, "QPS","Pac Man (PR7072, QPAC) (QPS) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4pacqpa   ,sc4pacqp,  sc4_4reel, sc4, sc4_state, sc4pacqp, ROT0, "QPS","Pac Man (PR7072, QPAC) (QPS) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4pacqpb   ,sc4pacqp,  sc4_4reel, sc4, sc4_state, sc4pacqp, ROT0, "QPS","Pac Man (PR7072, QPAC) (QPS) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4pacqp    ,0,         sc4_4reel, sc4, sc4_state, sc4pacqp, ROT0, "QPS","Pac Man (PR7072, QPAC) (QPS) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4pacqpa )
+GAMEL( 200?, sc4pacqpa   ,sc4pacqp,  sc4_4reel, sc4, sc4_state, sc4pacqp, ROT0, "QPS","Pac Man (PR7072, QPAC) (QPS) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4pacqpa )
+GAMEL( 200?, sc4pacqpb   ,sc4pacqp,  sc4_4reel, sc4, sc4_state, sc4pacqp, ROT0, "QPS","Pac Man (PR7072, QPAC) (QPS) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4pacqpa )
 
 
 
@@ -50287,11 +50466,11 @@ DRIVER_INIT_MEMBER(sc4_state,sc4pen1)
 
 
 // PR6914 PUBLIC ENEMY         PR6914 PUBLIC ENEMY SOUNDS11           PUBLIC ENEMY
-GAMEL( 200?, sc4pen1     ,0,         sc4_4reel, sc4, sc4_state, sc4pen1, ROT0, "BFM","Public Enemy No1 (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4pen1a    ,sc4pen1,   sc4_4reel, sc4, sc4_state, sc4pen1, ROT0, "BFM","Public Enemy No1 (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4pen1b    ,sc4pen1,   sc4_4reel, sc4, sc4_state, sc4pen1, ROT0, "BFM","Public Enemy No1 (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4pen1c    ,sc4pen1,   sc4_4reel, sc4, sc4_state, sc4pen1, ROT0, "BFM","Public Enemy No1 (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4pen1d    ,sc4pen1,   sc4_4reel, sc4, sc4_state, sc4pen1, ROT0, "BFM","Public Enemy No1 (Bellfruit) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4pen1     ,0,         sc4_4reel, sc4, sc4_state, sc4pen1, ROT0, "BFM","Public Enemy No1 (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4pen1c )
+GAMEL( 200?, sc4pen1a    ,sc4pen1,   sc4_4reel, sc4, sc4_state, sc4pen1, ROT0, "BFM","Public Enemy No1 (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4pen1c )
+GAMEL( 200?, sc4pen1b    ,sc4pen1,   sc4_4reel, sc4, sc4_state, sc4pen1, ROT0, "BFM","Public Enemy No1 (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4pen1c )
+GAMEL( 200?, sc4pen1c    ,sc4pen1,   sc4_4reel, sc4, sc4_state, sc4pen1, ROT0, "BFM","Public Enemy No1 (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4pen1c )
+GAMEL( 200?, sc4pen1d    ,sc4pen1,   sc4_4reel, sc4, sc4_state, sc4pen1, ROT0, "BFM","Public Enemy No1 (Bellfruit) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_sc4pen1c )
 
 
 DRIVER_INIT_MEMBER(sc4_state,sc4rich)
@@ -50300,19 +50479,19 @@ DRIVER_INIT_MEMBER(sc4_state,sc4rich)
 }
 
 // PR7118 RICH GEEZER         PR7118 RICH GEEZER SOUNDS11
-GAMEL( 200?, sc4rich     ,0,         sc4_200_5r, sc4, sc4_state, sc4rich, ROT0, "BFM","Rich Geezer (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4richa    ,sc4rich,   sc4_200_5r, sc4, sc4_state, sc4rich, ROT0, "BFM","Rich Geezer (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4richb    ,sc4rich,   sc4_200_5r, sc4, sc4_state, sc4rich, ROT0, "BFM","Rich Geezer (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4richc    ,sc4rich,   sc4_200_5r, sc4, sc4_state, sc4rich, ROT0, "BFM","Rich Geezer (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4richd    ,sc4rich,   sc4_200_5r, sc4, sc4_state, sc4rich, ROT0, "BFM","Rich Geezer (Bellfruit) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4riche    ,sc4rich,   sc4_200_5r, sc4, sc4_state, sc4rich, ROT0, "BFM","Rich Geezer (Bellfruit) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4richf    ,sc4rich,   sc4_200_5r, sc4, sc4_state, sc4rich, ROT0, "BFM","Rich Geezer (Bellfruit) (Scorpion 4) (set 7)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4richg    ,sc4rich,   sc4_200_5r, sc4, sc4_state, sc4rich, ROT0, "BFM","Rich Geezer (Bellfruit) (Scorpion 4) (set 8)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4richh    ,sc4rich,   sc4_200_5r, sc4, sc4_state, sc4rich, ROT0, "BFM","Rich Geezer (Bellfruit) (Scorpion 4) (set 9)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4richi    ,sc4rich,   sc4_200_5r, sc4, sc4_state, sc4rich, ROT0, "BFM","Rich Geezer (Bellfruit) (Scorpion 4) (set 10)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4richj    ,sc4rich,   sc4_200_5r, sc4, sc4_state, sc4rich, ROT0, "BFM","Rich Geezer (Bellfruit) (Scorpion 4) (set 11)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4richk    ,sc4rich,   sc4_200_5r, sc4, sc4_state, sc4rich, ROT0, "BFM","Rich Geezer (Bellfruit) (Scorpion 4) (set 12)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4richl    ,sc4rich,   sc4_200_5r, sc4, sc4_state, sc4rich, ROT0, "BFM","Rich Geezer (Bellfruit) (Scorpion 4) (set 13)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4rich     ,0,         sc4_200_5r, sc4, sc4_state, sc4rich, ROT0, "BFM","Rich Geezer (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4richl )
+GAMEL( 200?, sc4richa    ,sc4rich,   sc4_200_5r, sc4, sc4_state, sc4rich, ROT0, "BFM","Rich Geezer (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4richl )
+GAMEL( 200?, sc4richb    ,sc4rich,   sc4_200_5r, sc4, sc4_state, sc4rich, ROT0, "BFM","Rich Geezer (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4richl )
+GAMEL( 200?, sc4richc    ,sc4rich,   sc4_200_5r, sc4, sc4_state, sc4rich, ROT0, "BFM","Rich Geezer (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4richl )
+GAMEL( 200?, sc4richd    ,sc4rich,   sc4_200_5r, sc4, sc4_state, sc4rich, ROT0, "BFM","Rich Geezer (Bellfruit) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_sc4richl )
+GAMEL( 200?, sc4riche    ,sc4rich,   sc4_200_5r, sc4, sc4_state, sc4rich, ROT0, "BFM","Rich Geezer (Bellfruit) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_sc4richl )
+GAMEL( 200?, sc4richf    ,sc4rich,   sc4_200_5r, sc4, sc4_state, sc4rich, ROT0, "BFM","Rich Geezer (Bellfruit) (Scorpion 4) (set 7)", MACHINE_FLAGS, layout_sc4richl )
+GAMEL( 200?, sc4richg    ,sc4rich,   sc4_200_5r, sc4, sc4_state, sc4rich, ROT0, "BFM","Rich Geezer (Bellfruit) (Scorpion 4) (set 8)", MACHINE_FLAGS, layout_sc4richl )
+GAMEL( 200?, sc4richh    ,sc4rich,   sc4_200_5r, sc4, sc4_state, sc4rich, ROT0, "BFM","Rich Geezer (Bellfruit) (Scorpion 4) (set 9)", MACHINE_FLAGS, layout_sc4richl )
+GAMEL( 200?, sc4richi    ,sc4rich,   sc4_200_5r, sc4, sc4_state, sc4rich, ROT0, "BFM","Rich Geezer (Bellfruit) (Scorpion 4) (set 10)", MACHINE_FLAGS, layout_sc4richl )
+GAMEL( 200?, sc4richj    ,sc4rich,   sc4_200_5r, sc4, sc4_state, sc4rich, ROT0, "BFM","Rich Geezer (Bellfruit) (Scorpion 4) (set 11)", MACHINE_FLAGS, layout_sc4richl )
+GAMEL( 200?, sc4richk    ,sc4rich,   sc4_200_5r, sc4, sc4_state, sc4rich, ROT0, "BFM","Rich Geezer (Bellfruit) (Scorpion 4) (set 12)", MACHINE_FLAGS, layout_sc4richl )
+GAMEL( 200?, sc4richl    ,sc4rich,   sc4_200_5r, sc4, sc4_state, sc4rich, ROT0, "BFM","Rich Geezer (Bellfruit) (Scorpion 4) (set 13)", MACHINE_FLAGS, layout_sc4richl )
 
 
 
@@ -50327,29 +50506,29 @@ DRIVER_INIT_MEMBER(sc4_state,sc4srrmz_mbus)
 }
 
 // PR7141 SHAKE RATTLE ROLL         LINE SOUNDS         *  SHAKE RATT ROLL
-GAMEL( 200?, sc4srrmz    ,0,         sc4_3reel, sc4, sc4_state, sc4srrmz, ROT0, "Mazooma","Shake Rattle Roll (Mazooma) (Scorpion 4) (Top Box)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4srrmz    ,0,         sc4_3reel, sc4, sc4_state, sc4srrmz, ROT0, "Mazooma","Shake Rattle Roll (Mazooma) (Scorpion 4) (Top Box)", MACHINE_FLAGS, layout_sc4srrca )
 // PR7079CASINO SHAKE RATTLE AND ROL         PR7079,Casino SHAKE RATTLE AND ROLL,         LINE SOUNDS         ROCK AND ROLL
-GAMEL( 200?, sc4srrmza   ,sc4srrmz,  sc4_3reel, sc4, sc4_state, sc4srrmz, ROT0, "Mazooma","Shake Rattle Roll Casino (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4srrmzb   ,sc4srrmz,  sc4_3reel, sc4, sc4_state, sc4srrmz, ROT0, "Mazooma","Shake Rattle Roll Casino (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4srrmzc   ,sc4srrmz,  sc4_3reel, sc4, sc4_state, sc4srrmz, ROT0, "Mazooma","Shake Rattle Roll Casino (Mazooma) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4srrmze   ,sc4srrmz,  sc4_3reel, sc4, sc4_state, sc4srrmz, ROT0, "Mazooma","Shake Rattle Roll Casino (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4srrmza   ,sc4srrmz,  sc4_3reel, sc4, sc4_state, sc4srrmz, ROT0, "Mazooma","Shake Rattle Roll Casino (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4srrca )
+GAMEL( 200?, sc4srrmzb   ,sc4srrmz,  sc4_3reel, sc4, sc4_state, sc4srrmz, ROT0, "Mazooma","Shake Rattle Roll Casino (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4srrca )
+GAMEL( 200?, sc4srrmzc   ,sc4srrmz,  sc4_3reel, sc4, sc4_state, sc4srrmz, ROT0, "Mazooma","Shake Rattle Roll Casino (Mazooma) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4srrca )
+GAMEL( 200?, sc4srrmze   ,sc4srrmz,  sc4_3reel, sc4, sc4_state, sc4srrmz, ROT0, "Mazooma","Shake Rattle Roll Casino (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4srrca )
 // PR7079CASINO SHAKE RATTLE AND ROL         PR7079,Casino SHAKE RATTLE AND ROLL,         LINE SOUNDS         ROCK AND ROLL  (the same as some of the above.. )
-GAMEL( 200?, sc4srrca    ,sc4srrmz,  sc4_3reel, sc4, sc4_state, sc4srrmz, ROT0, "Mazooma","Shake Rattle Roll Casino (Mazooma) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4srrcaa   ,sc4srrmz,  sc4_3reel, sc4, sc4_state, sc4srrmz, ROT0, "Mazooma","Shake Rattle Roll Casino (Mazooma) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4srrcab   ,sc4srrmz,  sc4_3reel, sc4, sc4_state, sc4srrmz, ROT0, "Mazooma","Shake Rattle Roll Casino (Mazooma) (Scorpion 4) (set 7)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4srrcac   ,sc4srrmz,  sc4_3reel, sc4, sc4_state, sc4srrmz, ROT0, "Mazooma","Shake Rattle Roll Casino (Mazooma) (Scorpion 4) (set 8)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4srrcad   ,sc4srrmz,  sc4_3reel, sc4, sc4_state, sc4srrmz, ROT0, "Mazooma","Shake Rattle Roll Casino (Mazooma) (Scorpion 4) (set 9)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4srrcae   ,sc4srrmz,  sc4_3reel, sc4, sc4_state, sc4srrmz, ROT0, "Mazooma","Shake Rattle Roll Casino (Mazooma) (Scorpion 4) (set 10)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4srrca    ,sc4srrmz,  sc4_3reel, sc4, sc4_state, sc4srrmz, ROT0, "Mazooma","Shake Rattle Roll Casino (Mazooma) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_sc4srrca )
+GAMEL( 200?, sc4srrcaa   ,sc4srrmz,  sc4_3reel, sc4, sc4_state, sc4srrmz, ROT0, "Mazooma","Shake Rattle Roll Casino (Mazooma) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_sc4srrca )
+GAMEL( 200?, sc4srrcab   ,sc4srrmz,  sc4_3reel, sc4, sc4_state, sc4srrmz, ROT0, "Mazooma","Shake Rattle Roll Casino (Mazooma) (Scorpion 4) (set 7)", MACHINE_FLAGS, layout_sc4srrca )
+GAMEL( 200?, sc4srrcac   ,sc4srrmz,  sc4_3reel, sc4, sc4_state, sc4srrmz, ROT0, "Mazooma","Shake Rattle Roll Casino (Mazooma) (Scorpion 4) (set 8)", MACHINE_FLAGS, layout_sc4srrca )
+GAMEL( 200?, sc4srrcad   ,sc4srrmz,  sc4_3reel, sc4, sc4_state, sc4srrmz, ROT0, "Mazooma","Shake Rattle Roll Casino (Mazooma) (Scorpion 4) (set 9)", MACHINE_FLAGS, layout_sc4srrca )
+GAMEL( 200?, sc4srrcae   ,sc4srrmz,  sc4_3reel, sc4, sc4_state, sc4srrmz, ROT0, "Mazooma","Shake Rattle Roll Casino (Mazooma) (Scorpion 4) (set 10)", MACHINE_FLAGS, layout_sc4srrca )
 // PR7079CASINO SHAKE RATTLE AND ROL         SHAK RATTLE ROLL  ARCADE  PR7079,Casino SHAKE RATTLE AND ROLL,         LINE SOUNDS
-GAMEL( 200?, sc4srrmzd   ,sc4srrmz,  sc4_3reel, sc4, sc4_state, sc4srrmz_mbus, ROT0, "Mazooma","Shake Rattle Roll Arcade (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4srrmzf   ,sc4srrmz,  sc4_3reel, sc4, sc4_state, sc4srrmz_mbus, ROT0, "Mazooma","Shake Rattle Roll Arcade (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4srrmzg   ,sc4srrmz,  sc4_3reel, sc4, sc4_state, sc4srrmz_mbus, ROT0, "Mazooma","Shake Rattle Roll Arcade (Mazooma) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4srrmzh   ,sc4srrmz,  sc4_3reel, sc4, sc4_state, sc4srrmz_mbus, ROT0, "Mazooma","Shake Rattle Roll Arcade (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4srrmzi   ,sc4srrmz,  sc4_3reel, sc4, sc4_state, sc4srrmz_mbus, ROT0, "Mazooma","Shake Rattle Roll Arcade (Mazooma) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4srrmzj   ,sc4srrmz,  sc4_3reel, sc4, sc4_state, sc4srrmz_mbus, ROT0, "Mazooma","Shake Rattle Roll Arcade (Mazooma) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4srrmzk   ,sc4srrmz,  sc4_3reel, sc4, sc4_state, sc4srrmz_mbus, ROT0, "Mazooma","Shake Rattle Roll Arcade (Mazooma) (Scorpion 4) (set 7)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4srrmzl   ,sc4srrmz,  sc4_3reel, sc4, sc4_state, sc4srrmz_mbus, ROT0, "Mazooma","Shake Rattle Roll Arcade (Mazooma) (Scorpion 4) (set 8)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4srrmzm   ,sc4srrmz,  sc4_3reel, sc4, sc4_state, sc4srrmz_mbus, ROT0, "Mazooma","Shake Rattle Roll Arcade (Mazooma) (Scorpion 4) (set 9)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4srrmzd   ,sc4srrmz,  sc4_3reel, sc4, sc4_state, sc4srrmz_mbus, ROT0, "Mazooma","Shake Rattle Roll Arcade (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4srrca )
+GAMEL( 200?, sc4srrmzf   ,sc4srrmz,  sc4_3reel, sc4, sc4_state, sc4srrmz_mbus, ROT0, "Mazooma","Shake Rattle Roll Arcade (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4srrca )
+GAMEL( 200?, sc4srrmzg   ,sc4srrmz,  sc4_3reel, sc4, sc4_state, sc4srrmz_mbus, ROT0, "Mazooma","Shake Rattle Roll Arcade (Mazooma) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4srrca )
+GAMEL( 200?, sc4srrmzh   ,sc4srrmz,  sc4_3reel, sc4, sc4_state, sc4srrmz_mbus, ROT0, "Mazooma","Shake Rattle Roll Arcade (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4srrca )
+GAMEL( 200?, sc4srrmzi   ,sc4srrmz,  sc4_3reel, sc4, sc4_state, sc4srrmz_mbus, ROT0, "Mazooma","Shake Rattle Roll Arcade (Mazooma) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_sc4srrca )
+GAMEL( 200?, sc4srrmzj   ,sc4srrmz,  sc4_3reel, sc4, sc4_state, sc4srrmz_mbus, ROT0, "Mazooma","Shake Rattle Roll Arcade (Mazooma) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_sc4srrca )
+GAMEL( 200?, sc4srrmzk   ,sc4srrmz,  sc4_3reel, sc4, sc4_state, sc4srrmz_mbus, ROT0, "Mazooma","Shake Rattle Roll Arcade (Mazooma) (Scorpion 4) (set 7)", MACHINE_FLAGS, layout_sc4srrca )
+GAMEL( 200?, sc4srrmzl   ,sc4srrmz,  sc4_3reel, sc4, sc4_state, sc4srrmz_mbus, ROT0, "Mazooma","Shake Rattle Roll Arcade (Mazooma) (Scorpion 4) (set 8)", MACHINE_FLAGS, layout_sc4srrca )
+GAMEL( 200?, sc4srrmzm   ,sc4srrmz,  sc4_3reel, sc4, sc4_state, sc4srrmz_mbus, ROT0, "Mazooma","Shake Rattle Roll Arcade (Mazooma) (Scorpion 4) (set 9)", MACHINE_FLAGS, layout_sc4srrca )
 
 
 DRIVER_INIT_MEMBER(sc4_state,sc4sirpz)
@@ -50373,7 +50552,7 @@ DRIVER_INIT_MEMBER(sc4_state,sc4smk7)
 
 
 // PR6924 SMOKIN SEVENS         PR6924 SMOKIN SEVENS SOUNDS11
-GAMEL( 200?, sc4smk7     ,0,         sc4_3reel, sc4, sc4_state, sc4smk7, ROT0, "BFM","Smoking 7's (Bellfruit) (Scorpion 4)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4smk7     ,0,         sc4_3reel, sc4, sc4_state, sc4smk7, ROT0, "BFM","Smoking 7's (Bellfruit) (Scorpion 4)", MACHINE_FLAGS, layout_sc4smk7 )
 
 
 
@@ -50385,18 +50564,18 @@ DRIVER_INIT_MEMBER(sc4_state,sc4starp)
 
 
 // PR6805 STARPRIZE         PR6805 STARPRIZE SOUNDS
-GAMEL( 200?, sc4starp    ,0,         sc4_4reel, sc4, sc4_state, sc4starp, ROT0, "BFM","Starprize (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4starpa   ,sc4starp,  sc4_4reel, sc4, sc4_state, sc4starp, ROT0, "BFM","Starprize (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4starpb   ,sc4starp,  sc4_4reel, sc4, sc4_state, sc4starp, ROT0, "BFM","Starprize (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4starpc   ,sc4starp,  sc4_4reel, sc4, sc4_state, sc4starp, ROT0, "BFM","Starprize (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4starpd   ,sc4starp,  sc4_4reel, sc4, sc4_state, sc4starp, ROT0, "BFM","Starprize (Bellfruit) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4starpe   ,sc4starp,  sc4_4reel, sc4, sc4_state, sc4starp, ROT0, "BFM","Starprize (Bellfruit) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4starpf   ,sc4starp,  sc4_4reel, sc4, sc4_state, sc4starp, ROT0, "BFM","Starprize (Bellfruit) (Scorpion 4) (set 7)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4starpg   ,sc4starp,  sc4_4reel, sc4, sc4_state, sc4starp, ROT0, "BFM","Starprize (Bellfruit) (Scorpion 4) (set 8)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4starph   ,sc4starp,  sc4_4reel, sc4, sc4_state, sc4starp, ROT0, "BFM","Starprize (Bellfruit) (Scorpion 4) (set 9)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4starpi   ,sc4starp,  sc4_4reel, sc4, sc4_state, sc4starp, ROT0, "BFM","Starprize (Bellfruit) (Scorpion 4) (set 10)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4starpj   ,sc4starp,  sc4_4reel, sc4, sc4_state, sc4starp, ROT0, "BFM","Starprize (Bellfruit) (Scorpion 4) (set 11)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4starpk   ,sc4starp,  sc4_4reel, sc4, sc4_state, sc4starp, ROT0, "BFM","Starprize (Bellfruit) (Scorpion 4) (set 12)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4starp    ,0,         sc4_4reel, sc4, sc4_state, sc4starp, ROT0, "BFM","Starprize (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4starpk )
+GAMEL( 200?, sc4starpa   ,sc4starp,  sc4_4reel, sc4, sc4_state, sc4starp, ROT0, "BFM","Starprize (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4starpk )
+GAMEL( 200?, sc4starpb   ,sc4starp,  sc4_4reel, sc4, sc4_state, sc4starp, ROT0, "BFM","Starprize (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4starpk )
+GAMEL( 200?, sc4starpc   ,sc4starp,  sc4_4reel, sc4, sc4_state, sc4starp, ROT0, "BFM","Starprize (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4starpk )
+GAMEL( 200?, sc4starpd   ,sc4starp,  sc4_4reel, sc4, sc4_state, sc4starp, ROT0, "BFM","Starprize (Bellfruit) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_sc4starpk )
+GAMEL( 200?, sc4starpe   ,sc4starp,  sc4_4reel, sc4, sc4_state, sc4starp, ROT0, "BFM","Starprize (Bellfruit) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_sc4starpk )
+GAMEL( 200?, sc4starpf   ,sc4starp,  sc4_4reel, sc4, sc4_state, sc4starp, ROT0, "BFM","Starprize (Bellfruit) (Scorpion 4) (set 7)", MACHINE_FLAGS, layout_sc4starpk )
+GAMEL( 200?, sc4starpg   ,sc4starp,  sc4_4reel, sc4, sc4_state, sc4starp, ROT0, "BFM","Starprize (Bellfruit) (Scorpion 4) (set 8)", MACHINE_FLAGS, layout_sc4starpk )
+GAMEL( 200?, sc4starph   ,sc4starp,  sc4_4reel, sc4, sc4_state, sc4starp, ROT0, "BFM","Starprize (Bellfruit) (Scorpion 4) (set 9)", MACHINE_FLAGS, layout_sc4starpk )
+GAMEL( 200?, sc4starpi   ,sc4starp,  sc4_4reel, sc4, sc4_state, sc4starp, ROT0, "BFM","Starprize (Bellfruit) (Scorpion 4) (set 10)", MACHINE_FLAGS, layout_sc4starpk )
+GAMEL( 200?, sc4starpj   ,sc4starp,  sc4_4reel, sc4, sc4_state, sc4starp, ROT0, "BFM","Starprize (Bellfruit) (Scorpion 4) (set 11)", MACHINE_FLAGS, layout_sc4starpk )
+GAMEL( 200?, sc4starpk   ,sc4starp,  sc4_4reel, sc4, sc4_state, sc4starp, ROT0, "BFM","Starprize (Bellfruit) (Scorpion 4) (set 12)", MACHINE_FLAGS, layout_sc4starpk )
 
 
 
@@ -50407,18 +50586,18 @@ DRIVER_INIT_MEMBER(sc4_state,sc4strk)
 }
 
 //  PR2167CASINO THE STREAK         PR7017,CASINO STREAK,         STRK SOUNDS         THE STREAK
-GAMEL( 200?, sc4strk     ,0,         sc4_3reel, sc4, sc4_state, sc4strk, ROT0, "Mazooma","The Streak (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4strka    ,sc4strk,   sc4_3reel, sc4, sc4_state, sc4strk, ROT0, "Mazooma","The Streak (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4strkb    ,sc4strk,   sc4_3reel, sc4, sc4_state, sc4strk, ROT0, "Mazooma","The Streak (Mazooma) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4strkc    ,sc4strk,   sc4_3reel, sc4, sc4_state, sc4strk, ROT0, "Mazooma","The Streak (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4strkd    ,sc4strk,   sc4_3reel, sc4, sc4_state, sc4strk, ROT0, "Mazooma","The Streak (Mazooma) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4strke    ,sc4strk,   sc4_3reel, sc4, sc4_state, sc4strk, ROT0, "Mazooma","The Streak (Mazooma) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4strkf    ,sc4strk,   sc4_3reel, sc4, sc4_state, sc4strk, ROT0, "Mazooma","The Streak (Mazooma) (Scorpion 4) (set 7)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4strkg    ,sc4strk,   sc4_3reel, sc4, sc4_state, sc4strk, ROT0, "Mazooma","The Streak (Mazooma) (Scorpion 4) (set 8)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4strkh    ,sc4strk,   sc4_3reel, sc4, sc4_state, sc4strk, ROT0, "Mazooma","The Streak (Mazooma) (Scorpion 4) (set 9)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4strki    ,sc4strk,   sc4_3reel, sc4, sc4_state, sc4strk, ROT0, "Mazooma","The Streak (Mazooma) (Scorpion 4) (set 10)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4strkj    ,sc4strk,   sc4_3reel, sc4, sc4_state, sc4strk, ROT0, "Mazooma","The Streak (Mazooma) (Scorpion 4) (set 11)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4strkk    ,sc4strk,   sc4_3reel, sc4, sc4_state, sc4strk, ROT0, "Mazooma","The Streak (Mazooma) (Scorpion 4) (set 12)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4strk     ,0,         sc4_3reel, sc4, sc4_state, sc4strk, ROT0, "Mazooma","The Streak (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4strk )
+GAMEL( 200?, sc4strka    ,sc4strk,   sc4_3reel, sc4, sc4_state, sc4strk, ROT0, "Mazooma","The Streak (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4strk )
+GAMEL( 200?, sc4strkb    ,sc4strk,   sc4_3reel, sc4, sc4_state, sc4strk, ROT0, "Mazooma","The Streak (Mazooma) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4strk )
+GAMEL( 200?, sc4strkc    ,sc4strk,   sc4_3reel, sc4, sc4_state, sc4strk, ROT0, "Mazooma","The Streak (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4strk )
+GAMEL( 200?, sc4strkd    ,sc4strk,   sc4_3reel, sc4, sc4_state, sc4strk, ROT0, "Mazooma","The Streak (Mazooma) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_sc4strk )
+GAMEL( 200?, sc4strke    ,sc4strk,   sc4_3reel, sc4, sc4_state, sc4strk, ROT0, "Mazooma","The Streak (Mazooma) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_sc4strk )
+GAMEL( 200?, sc4strkf    ,sc4strk,   sc4_3reel, sc4, sc4_state, sc4strk, ROT0, "Mazooma","The Streak (Mazooma) (Scorpion 4) (set 7)", MACHINE_FLAGS, layout_sc4strk )
+GAMEL( 200?, sc4strkg    ,sc4strk,   sc4_3reel, sc4, sc4_state, sc4strk, ROT0, "Mazooma","The Streak (Mazooma) (Scorpion 4) (set 8)", MACHINE_FLAGS, layout_sc4strk )
+GAMEL( 200?, sc4strkh    ,sc4strk,   sc4_3reel, sc4, sc4_state, sc4strk, ROT0, "Mazooma","The Streak (Mazooma) (Scorpion 4) (set 9)", MACHINE_FLAGS, layout_sc4strk )
+GAMEL( 200?, sc4strki    ,sc4strk,   sc4_3reel, sc4, sc4_state, sc4strk, ROT0, "Mazooma","The Streak (Mazooma) (Scorpion 4) (set 10)", MACHINE_FLAGS, layout_sc4strk )
+GAMEL( 200?, sc4strkj    ,sc4strk,   sc4_3reel, sc4, sc4_state, sc4strk, ROT0, "Mazooma","The Streak (Mazooma) (Scorpion 4) (set 11)", MACHINE_FLAGS, layout_sc4strk )
+GAMEL( 200?, sc4strkk    ,sc4strk,   sc4_3reel, sc4, sc4_state, sc4strk, ROT0, "Mazooma","The Streak (Mazooma) (Scorpion 4) (set 12)", MACHINE_FLAGS, layout_sc4strk )
 
 
 
@@ -50468,15 +50647,15 @@ DRIVER_INIT_MEMBER(sc4_state,sc4s6c)
 }
 
 // PR6834 SUPER 6 FIXED 65%         PR6834 SSIX SOUNDS11
-GAMEL( 200?, sc4s6c      ,0,         sc4, sc4, sc4_state, sc4s6c, ROT0, "BFM","Super 6 Club (65% Fixed) (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4s6cb     ,sc4s6c,    sc4, sc4, sc4_state, sc4s6c, ROT0, "BFM","Super 6 Club (65% Fixed) (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4s6c      ,0,         sc4, sc4, sc4_state, sc4s6c, ROT0, "BFM","Super 6 Club (65% Fixed) (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4s6cd )
+GAMEL( 200?, sc4s6cb     ,sc4s6c,    sc4, sc4, sc4_state, sc4s6c, ROT0, "BFM","Super 6 Club (65% Fixed) (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4s6cd )
 // PR6834 SUPER 6         PR6834 SSIX SOUNDS11
-GAMEL( 200?, sc4s6ca     ,sc4s6c,    sc4, sc4, sc4_state, sc4s6c, ROT0, "BFM","Super 6 Club (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4s6cc     ,sc4s6c,    sc4, sc4, sc4_state, sc4s6c, ROT0, "BFM","Super 6 Club (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4s6cd     ,sc4s6c,    sc4, sc4, sc4_state, sc4s6c, ROT0, "BFM","Super 6 Club (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4s6ce     ,sc4s6c,    sc4, sc4, sc4_state, sc4s6c, ROT0, "BFM","Super 6 Club (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4s6ca     ,sc4s6c,    sc4, sc4, sc4_state, sc4s6c, ROT0, "BFM","Super 6 Club (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4s6cd )
+GAMEL( 200?, sc4s6cc     ,sc4s6c,    sc4, sc4, sc4_state, sc4s6c, ROT0, "BFM","Super 6 Club (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4s6cd )
+GAMEL( 200?, sc4s6cd     ,sc4s6c,    sc4, sc4, sc4_state, sc4s6c, ROT0, "BFM","Super 6 Club (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4s6cd )
+GAMEL( 200?, sc4s6ce     ,sc4s6c,    sc4, sc4, sc4_state, sc4s6c, ROT0, "BFM","Super 6 Club (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4s6cd )
 
-GAMEL( 200?, sc4s6cf     ,sc4s6c,    sc4, sc4, sc4_state, sc4s6c, ROT0, "BFM","Super 6 Club (Bellfruit) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4s6cf     ,sc4s6c,    sc4, sc4, sc4_state, sc4s6c, ROT0, "BFM","Super 6 Club (Bellfruit) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_sc4s6cd )
 
 
 
@@ -50493,23 +50672,23 @@ DRIVER_INIT_MEMBER(sc4_state,sc4tic2_mbus)
 
 
 // PR7060CASINO TICTACTWO         TTTWO SOUNDS         TIC TAC TWO
-GAMEL( 200?, sc4tic2     ,0,         sc4_3reel, sc4, sc4_state, sc4tic2, ROT0, "Mazooma","Tic Tac Two Casino (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4tic2a    ,sc4tic2,   sc4_3reel, sc4, sc4_state, sc4tic2, ROT0, "Mazooma","Tic Tac Two Casino (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4tic2b    ,sc4tic2,   sc4_3reel, sc4, sc4_state, sc4tic2, ROT0, "Mazooma","Tic Tac Two Casino (Mazooma) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4tic2c    ,sc4tic2,   sc4_3reel, sc4, sc4_state, sc4tic2, ROT0, "Mazooma","Tic Tac Two Casino (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4tic2d    ,sc4tic2,   sc4_3reel, sc4, sc4_state, sc4tic2, ROT0, "Mazooma","Tic Tac Two Casino (Mazooma) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4tic2e    ,sc4tic2,   sc4_3reel, sc4, sc4_state, sc4tic2, ROT0, "Mazooma","Tic Tac Two Casino (Mazooma) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4tic2f    ,sc4tic2,   sc4_3reel, sc4, sc4_state, sc4tic2, ROT0, "Mazooma","Tic Tac Two Casino (Mazooma) (Scorpion 4) (set 7)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4tic2g    ,sc4tic2,   sc4_3reel, sc4, sc4_state, sc4tic2, ROT0, "Mazooma","Tic Tac Two Casino (Mazooma) (Scorpion 4) (set 8)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4tic2n    ,sc4tic2,   sc4_3reel, sc4, sc4_state, sc4tic2, ROT0, "Mazooma","Tic Tac Two Casino (Mazooma) (Scorpion 4) (set 9)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4tic2o    ,sc4tic2,   sc4_3reel, sc4, sc4_state, sc4tic2, ROT0, "Mazooma","Tic Tac Two Casino (Mazooma) (Scorpion 4) (set 10)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4tic2     ,0,         sc4_3reel, sc4, sc4_state, sc4tic2, ROT0, "Mazooma","Tic Tac Two Casino (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4tic2 )
+GAMEL( 200?, sc4tic2a    ,sc4tic2,   sc4_3reel, sc4, sc4_state, sc4tic2, ROT0, "Mazooma","Tic Tac Two Casino (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4tic2 )
+GAMEL( 200?, sc4tic2b    ,sc4tic2,   sc4_3reel, sc4, sc4_state, sc4tic2, ROT0, "Mazooma","Tic Tac Two Casino (Mazooma) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4tic2 )
+GAMEL( 200?, sc4tic2c    ,sc4tic2,   sc4_3reel, sc4, sc4_state, sc4tic2, ROT0, "Mazooma","Tic Tac Two Casino (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4tic2 )
+GAMEL( 200?, sc4tic2d    ,sc4tic2,   sc4_3reel, sc4, sc4_state, sc4tic2, ROT0, "Mazooma","Tic Tac Two Casino (Mazooma) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_sc4tic2 )
+GAMEL( 200?, sc4tic2e    ,sc4tic2,   sc4_3reel, sc4, sc4_state, sc4tic2, ROT0, "Mazooma","Tic Tac Two Casino (Mazooma) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_sc4tic2 )
+GAMEL( 200?, sc4tic2f    ,sc4tic2,   sc4_3reel, sc4, sc4_state, sc4tic2, ROT0, "Mazooma","Tic Tac Two Casino (Mazooma) (Scorpion 4) (set 7)", MACHINE_FLAGS, layout_sc4tic2 )
+GAMEL( 200?, sc4tic2g    ,sc4tic2,   sc4_3reel, sc4, sc4_state, sc4tic2, ROT0, "Mazooma","Tic Tac Two Casino (Mazooma) (Scorpion 4) (set 8)", MACHINE_FLAGS, layout_sc4tic2 )
+GAMEL( 200?, sc4tic2n    ,sc4tic2,   sc4_3reel, sc4, sc4_state, sc4tic2, ROT0, "Mazooma","Tic Tac Two Casino (Mazooma) (Scorpion 4) (set 9)", MACHINE_FLAGS, layout_sc4tic2 )
+GAMEL( 200?, sc4tic2o    ,sc4tic2,   sc4_3reel, sc4, sc4_state, sc4tic2, ROT0, "Mazooma","Tic Tac Two Casino (Mazooma) (Scorpion 4) (set 10)", MACHINE_FLAGS, layout_sc4tic2 )
 // PR7060CASINO TICTACTWO           TIC TAC TWO     ARCADE  TTTWO SOUNDS                 TIC TAC TWO
-GAMEL( 200?, sc4tic2i    ,sc4tic2,   sc4_3reel, sc4, sc4_state, sc4tic2_mbus, ROT0, "Mazooma","Tic Tac Two Casino Arcade (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4tic2j    ,sc4tic2,   sc4_3reel, sc4, sc4_state, sc4tic2_mbus, ROT0, "Mazooma","Tic Tac Two Casino Arcade (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4tic2k    ,sc4tic2,   sc4_3reel, sc4, sc4_state, sc4tic2_mbus, ROT0, "Mazooma","Tic Tac Two Casino Arcade (Mazooma) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4tic2h    ,sc4tic2,   sc4_3reel, sc4, sc4_state, sc4tic2, ROT0, "Mazooma","Tic Tac Two Casino Arcade (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4tic2l    ,sc4tic2,   sc4_3reel, sc4, sc4_state, sc4tic2, ROT0, "Mazooma","Tic Tac Two Casino Arcade (Mazooma) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4tic2m    ,sc4tic2,   sc4_3reel, sc4, sc4_state, sc4tic2, ROT0, "Mazooma","Tic Tac Two Casino Arcade (Mazooma) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4tic2i    ,sc4tic2,   sc4_3reel, sc4, sc4_state, sc4tic2_mbus, ROT0, "Mazooma","Tic Tac Two Casino Arcade (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4tic2 )
+GAMEL( 200?, sc4tic2j    ,sc4tic2,   sc4_3reel, sc4, sc4_state, sc4tic2_mbus, ROT0, "Mazooma","Tic Tac Two Casino Arcade (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4tic2 )
+GAMEL( 200?, sc4tic2k    ,sc4tic2,   sc4_3reel, sc4, sc4_state, sc4tic2_mbus, ROT0, "Mazooma","Tic Tac Two Casino Arcade (Mazooma) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4tic2 )
+GAMEL( 200?, sc4tic2h    ,sc4tic2,   sc4_3reel, sc4, sc4_state, sc4tic2, ROT0, "Mazooma","Tic Tac Two Casino Arcade (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4tic2 )
+GAMEL( 200?, sc4tic2l    ,sc4tic2,   sc4_3reel, sc4, sc4_state, sc4tic2, ROT0, "Mazooma","Tic Tac Two Casino Arcade (Mazooma) (Scorpion 4) (set 5)", MACHINE_FLAGS, layout_sc4tic2 )
+GAMEL( 200?, sc4tic2m    ,sc4tic2,   sc4_3reel, sc4, sc4_state, sc4tic2, ROT0, "Mazooma","Tic Tac Two Casino Arcade (Mazooma) (Scorpion 4) (set 6)", MACHINE_FLAGS, layout_sc4tic2 )
 
 
 
@@ -50722,10 +50901,10 @@ GAMEL( 200?, sc4rhxw     ,sc4rhx,    sc4_200_altb, sc4, sc4_state, sc4rhx, ROT0,
 
 
 // PR2056  RED HOT X CLUB         REDX SOUNDS         RED HOT X CLUB
-GAMEL( 200?, sc4rhxcl    ,0,         sc4, sc4, sc4_state, sc4rhx, ROT0, "Mazooma","Red Hot X Club (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4rhxcla   ,sc4rhxcl,  sc4, sc4, sc4_state, sc4rhx, ROT0, "Mazooma","Red Hot X Club (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4rhxclb   ,sc4rhxcl,  sc4, sc4, sc4_state, sc4rhx, ROT0, "Mazooma","Red Hot X Club (Mazooma) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4rhxclc   ,sc4rhxcl,  sc4, sc4, sc4_state, sc4rhx, ROT0, "Mazooma","Red Hot X Club (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4rhxcl    ,0,         sc4, sc4, sc4_state, sc4rhx, ROT0, "Mazooma","Red Hot X Club (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4rhxcl )
+GAMEL( 200?, sc4rhxcla   ,sc4rhxcl,  sc4, sc4, sc4_state, sc4rhx, ROT0, "Mazooma","Red Hot X Club (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4rhxcl )
+GAMEL( 200?, sc4rhxclb   ,sc4rhxcl,  sc4, sc4, sc4_state, sc4rhx, ROT0, "Mazooma","Red Hot X Club (Mazooma) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4rhxcl )
+GAMEL( 200?, sc4rhxclc   ,sc4rhxcl,  sc4, sc4, sc4_state, sc4rhx, ROT0, "Mazooma","Red Hot X Club (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS, layout_sc4rhxcl )
 
 
 
@@ -50764,17 +50943,17 @@ GAMEL( 200?, sc4vivcsg   ,sc4vivcs,  sc4_3reel, sc4, sc4_state, sc4vivcs, ROT0, 
 
 
 // PR7054 POWER BALL         POWERBALL SOUNDS
-GAMEL( 200?, sc4pwrbq    ,0,         sc4, sc4, sc4_state, sc4, ROT0, "Qps","Power Ball (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4pwrbqa   ,sc4pwrbq,  sc4, sc4, sc4_state, sc4, ROT0, "Qps","Power Ball (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4pwrbq    ,0,         sc4, sc4, sc4_state, sc4, ROT0, "Qps","Power Ball (Qps) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4pwrbq )
+GAMEL( 200?, sc4pwrbqa   ,sc4pwrbq,  sc4, sc4, sc4_state, sc4, ROT0, "Qps","Power Ball (Qps) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4pwrbq )
 
 
 
 
 // fails to boot, like many of the Pole Position sets, probably needs some specific dips setting due to buggy code?
 // PR7008 CHUBBY DOES VEGAS         VEGAS SOUNDS11
-GAMEL( 200?, sc4chub     ,0,         sc4_4reel, sc4, sc4_state, sc4, ROT0, "Mazooma","Chubby Does Vegas (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4chuba    ,sc4chub,   sc4_4reel, sc4, sc4_state, sc4, ROT0, "Mazooma","Chubby Does Vegas (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4chubb    ,sc4chub,   sc4_4reel, sc4, sc4_state, sc4, ROT0, "Mazooma","Chubby Does Vegas (Mazooma) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4chub     ,0,         sc4_4reel, sc4, sc4_state, sc4, ROT0, "Mazooma","Chubby Does Vegas (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4chuba )
+GAMEL( 200?, sc4chuba    ,sc4chub,   sc4_4reel, sc4, sc4_state, sc4, ROT0, "Mazooma","Chubby Does Vegas (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4chuba )
+GAMEL( 200?, sc4chubb    ,sc4chub,   sc4_4reel, sc4, sc4_state, sc4, ROT0, "Mazooma","Chubby Does Vegas (Mazooma) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4chuba )
 
 
 // no sound roms, doesn't init properly (doesn't even attempt reel test)
@@ -50860,8 +51039,8 @@ GAMEL( 200?, sc4mbagsc   ,sc4mbags,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Mone
 
 // sound roms are bad, missing first 0x10000 bytes with header
 // PR6938 TUTTI FRUTTI         PR6938 FRUT SOUNDS11           TUTTI FRUTTI
-GAMEL( 200?, sc4tfclb    ,0,         sc4, sc4, sc4_state, sc4, ROT0, "BFM","Tutti Frutti Club (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
-GAMEL( 200?, sc4tfclba   ,sc4tfclb,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Tutti Frutti Club (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
+GAMEL( 200?, sc4tfclb    ,0,         sc4, sc4, sc4_state, sc4, ROT0, "BFM","Tutti Frutti Club (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS_NOSOUND, layout_sc4tfclb )
+GAMEL( 200?, sc4tfclba   ,sc4tfclb,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Tutti Frutti Club (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS_NOSOUND, layout_sc4tfclb )
 
 
 
@@ -50942,27 +51121,27 @@ GAMEL( 200?, sc4wtcf     ,sc4wtc,    sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","
 
 // half size sound rom, or missing a rom
 // PR7017 THREE LIONS         LION SOUNDS
-GAMEL( 200?, sc4lions    ,0,         sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Three Lions (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
-GAMEL( 200?, sc4lionsa   ,sc4lions,  sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Three Lions (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
-GAMEL( 200?, sc4lionsb   ,sc4lions,  sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Three Lions (Mazooma) (Scorpion 4) (set 3)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
-GAMEL( 200?, sc4lionsc   ,sc4lions,  sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Three Lions (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
-GAMEL( 200?, sc4lionsd   ,sc4lions,  sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Three Lions (Mazooma) (Scorpion 4) (set 5)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
-GAMEL( 200?, sc4lionse   ,sc4lions,  sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Three Lions (Mazooma) (Scorpion 4) (set 6)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
-GAMEL( 200?, sc4lionsf   ,sc4lions,  sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Three Lions (Mazooma) (Scorpion 4) (set 7)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
+GAMEL( 200?, sc4lions    ,0,         sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Three Lions (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS_NOSOUND, layout_sc4lions )
+GAMEL( 200?, sc4lionsa   ,sc4lions,  sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Three Lions (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS_NOSOUND, layout_sc4lions )
+GAMEL( 200?, sc4lionsb   ,sc4lions,  sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Three Lions (Mazooma) (Scorpion 4) (set 3)", MACHINE_FLAGS_NOSOUND, layout_sc4lions )
+GAMEL( 200?, sc4lionsc   ,sc4lions,  sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Three Lions (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS_NOSOUND, layout_sc4lions )
+GAMEL( 200?, sc4lionsd   ,sc4lions,  sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Three Lions (Mazooma) (Scorpion 4) (set 5)", MACHINE_FLAGS_NOSOUND, layout_sc4lions )
+GAMEL( 200?, sc4lionse   ,sc4lions,  sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Three Lions (Mazooma) (Scorpion 4) (set 6)", MACHINE_FLAGS_NOSOUND, layout_sc4lions )
+GAMEL( 200?, sc4lionsf   ,sc4lions,  sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Three Lions (Mazooma) (Scorpion 4) (set 7)", MACHINE_FLAGS_NOSOUND, layout_sc4lions )
 
 
 
 
 // wrong sound roms
 // PROJECT NUMBER PR7113  TEMPTATION         PR7113 TEMPTATION SOUNDS11
-GAMEL( 200?, sc4tempt    ,0,         sc4, sc4, sc4_state, sc4, ROT0, "BFM","Temptation (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
-GAMEL( 200?, sc4tempta   ,sc4tempt,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Temptation (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
-GAMEL( 200?, sc4temptb   ,sc4tempt,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Temptation (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
-GAMEL( 200?, sc4temptc   ,sc4tempt,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Temptation (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
-GAMEL( 200?, sc4temptd   ,sc4tempt,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Temptation (Bellfruit) (Scorpion 4) (set 5)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
-GAMEL( 200?, sc4tempte   ,sc4tempt,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Temptation (Bellfruit) (Scorpion 4) (set 6)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
-GAMEL( 200?, sc4temptf   ,sc4tempt,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Temptation (Bellfruit) (Scorpion 4) (set 7)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
-GAMEL( 200?, sc4temptg   ,sc4tempt,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Temptation (Bellfruit) (Scorpion 4) (set 8)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
+GAMEL( 200?, sc4tempt    ,0,         sc4, sc4, sc4_state, sc4, ROT0, "BFM","Temptation (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS_NOSOUND, layout_sc4tempt )
+GAMEL( 200?, sc4tempta   ,sc4tempt,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Temptation (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS_NOSOUND, layout_sc4tempt )
+GAMEL( 200?, sc4temptb   ,sc4tempt,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Temptation (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS_NOSOUND, layout_sc4tempt )
+GAMEL( 200?, sc4temptc   ,sc4tempt,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Temptation (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS_NOSOUND, layout_sc4tempt )
+GAMEL( 200?, sc4temptd   ,sc4tempt,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Temptation (Bellfruit) (Scorpion 4) (set 5)", MACHINE_FLAGS_NOSOUND, layout_sc4tempt )
+GAMEL( 200?, sc4tempte   ,sc4tempt,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Temptation (Bellfruit) (Scorpion 4) (set 6)", MACHINE_FLAGS_NOSOUND, layout_sc4tempt )
+GAMEL( 200?, sc4temptf   ,sc4tempt,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Temptation (Bellfruit) (Scorpion 4) (set 7)", MACHINE_FLAGS_NOSOUND, layout_sc4tempt )
+GAMEL( 200?, sc4temptg   ,sc4tempt,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Temptation (Bellfruit) (Scorpion 4) (set 8)", MACHINE_FLAGS_NOSOUND, layout_sc4tempt )
 
 // half size sound rom, or missing a rom
 // PR7016 TAKE THE PISTE         PISTE SOUNDS
@@ -50976,15 +51155,15 @@ GAMEL( 200?, sc4ttpf     ,sc4ttp,    sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","
 
 
 // PR6806 MOTORWAY MAYHEM         PR6806 MAYH SOUNDS11
-GAMEL( 200?, sc4motor    ,0,         sc4, sc4, sc4_state, sc4, ROT0, "BFM","Motorway Mania (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
-GAMEL( 200?, sc4motora   ,sc4motor,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Motorway Mania (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
-GAMEL( 200?, sc4motorb   ,sc4motor,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Motorway Mania (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
-GAMEL( 200?, sc4motorc   ,sc4motor,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Motorway Mania (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
-GAMEL( 200?, sc4motord   ,sc4motor,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Motorway Mania (Bellfruit) (Scorpion 4) (set 5)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
-GAMEL( 200?, sc4motore   ,sc4motor,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Motorway Mania (Bellfruit) (Scorpion 4) (set 6)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
-GAMEL( 200?, sc4motorf   ,sc4motor,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Motorway Mania (Bellfruit) (Scorpion 4) (set 7)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
-GAMEL( 200?, sc4motorg   ,sc4motor,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Motorway Mania (Bellfruit) (Scorpion 4) (set 8)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
-GAMEL( 200?, sc4motorh   ,sc4motor,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Motorway Mania (Bellfruit) (Scorpion 4) (set 9)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
+GAMEL( 200?, sc4motor    ,0,         sc4, sc4, sc4_state, sc4, ROT0, "BFM","Motorway Mania (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS_NOSOUND, layout_sc4motor )
+GAMEL( 200?, sc4motora   ,sc4motor,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Motorway Mania (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS_NOSOUND, layout_sc4motor )
+GAMEL( 200?, sc4motorb   ,sc4motor,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Motorway Mania (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS_NOSOUND, layout_sc4motor )
+GAMEL( 200?, sc4motorc   ,sc4motor,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Motorway Mania (Bellfruit) (Scorpion 4) (set 4)", MACHINE_FLAGS_NOSOUND, layout_sc4motor )
+GAMEL( 200?, sc4motord   ,sc4motor,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Motorway Mania (Bellfruit) (Scorpion 4) (set 5)", MACHINE_FLAGS_NOSOUND, layout_sc4motor )
+GAMEL( 200?, sc4motore   ,sc4motor,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Motorway Mania (Bellfruit) (Scorpion 4) (set 6)", MACHINE_FLAGS_NOSOUND, layout_sc4motor )
+GAMEL( 200?, sc4motorf   ,sc4motor,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Motorway Mania (Bellfruit) (Scorpion 4) (set 7)", MACHINE_FLAGS_NOSOUND, layout_sc4motor )
+GAMEL( 200?, sc4motorg   ,sc4motor,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Motorway Mania (Bellfruit) (Scorpion 4) (set 8)", MACHINE_FLAGS_NOSOUND, layout_sc4motor )
+GAMEL( 200?, sc4motorh   ,sc4motor,  sc4, sc4, sc4_state, sc4, ROT0, "BFM","Motorway Mania (Bellfruit) (Scorpion 4) (set 9)", MACHINE_FLAGS_NOSOUND, layout_sc4motor )
 
 // sound roms are bad dumps
 //  PR6915 stag night         PR6915 STAG NIGHT SOUNDS11
@@ -50992,22 +51171,22 @@ GAMEL( 200?, sc4stag     ,0,         sc4, sc4, sc4_state, sc4, ROT0, "BFM","Stag
 GAMEL( 200?, sc4staga    ,sc4stag,   sc4, sc4, sc4_state, sc4, ROT0, "BFM","Stag Night (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
 
 // PR7016 HICKORY DICKORY DOSH         HICKORY SOUNDS
-GAMEL( 200?, sc4hdd      ,0,         sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Hickory Dickory Dosh (PR7016) (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
-GAMEL( 200?, sc4hddc     ,sc4hdd,    sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Hickory Dickory Dosh (PR7016) (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
-GAMEL( 200?, sc4hddd     ,sc4hdd,    sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Hickory Dickory Dosh (PR7016) (Mazooma) (Scorpion 4) (set 3)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
+GAMEL( 200?, sc4hdd      ,0,         sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Hickory Dickory Dosh (PR7016) (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS_NOSOUND, layout_sc4hdd )
+GAMEL( 200?, sc4hddc     ,sc4hdd,    sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Hickory Dickory Dosh (PR7016) (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS_NOSOUND, layout_sc4hdd )
+GAMEL( 200?, sc4hddd     ,sc4hdd,    sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Hickory Dickory Dosh (PR7016) (Mazooma) (Scorpion 4) (set 3)", MACHINE_FLAGS_NOSOUND, layout_sc4hdd )
 // PR7045 HICKORY DICKORY DOSH         HICKORY SOUNDS
-GAMEL( 200?, sc4hdda     ,sc4hdd,    sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Hickory Dickory Dosh (PR7045) (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
-GAMEL( 200?, sc4hddb     ,sc4hdd,    sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Hickory Dickory Dosh (PR7045) (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
-GAMEL( 200?, sc4hdde     ,sc4hdd,    sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Hickory Dickory Dosh (PR7045) (Mazooma) (Scorpion 4) (set 3)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
-GAMEL( 200?, sc4hddf     ,sc4hdd,    sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Hickory Dickory Dosh (PR7045) (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
+GAMEL( 200?, sc4hdda     ,sc4hdd,    sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Hickory Dickory Dosh (PR7045) (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS_NOSOUND, layout_sc4hdd )
+GAMEL( 200?, sc4hddb     ,sc4hdd,    sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Hickory Dickory Dosh (PR7045) (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS_NOSOUND, layout_sc4hdd )
+GAMEL( 200?, sc4hdde     ,sc4hdd,    sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Hickory Dickory Dosh (PR7045) (Mazooma) (Scorpion 4) (set 3)", MACHINE_FLAGS_NOSOUND, layout_sc4hdd )
+GAMEL( 200?, sc4hddf     ,sc4hdd,    sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Hickory Dickory Dosh (PR7045) (Mazooma) (Scorpion 4) (set 4)", MACHINE_FLAGS_NOSOUND, layout_sc4hdd )
 
 
 // // does NOT want 'WILD SOUNDS' from 'PR7065 WET 'N' WILD'
 // PR2043 NUDGE IT         WILD SOUNDS             NUDGE IT
-GAMEL( 200?, sc4nudit    ,0,         sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Nudge It (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
+GAMEL( 200?, sc4nudit    ,0,         sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Nudge It (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS_NOSOUND, layout_sc4nudita )
 // PR2043 NUDGE IT         NGIT SOUNDS             NUDGE IT
-GAMEL( 200?, sc4nudita   ,sc4nudit,  sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Nudge It (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4nuditb   ,sc4nudit,  sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Nudge It (Mazooma) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4nudita   ,sc4nudit,  sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Nudge It (Mazooma) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_sc4nudita )
+GAMEL( 200?, sc4nuditb   ,sc4nudit,  sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Nudge It (Mazooma) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_sc4nudita )
 
 // PR6908  OUTLAW          PR6908 OUTLAW SOUNDS11
 GAMEL( 200?, sc4outlw    ,0,         sc4, sc4, sc4_state, sc4, ROT0, "BFM","Outlaw (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
@@ -51030,8 +51209,8 @@ GAMEL( 200?, sc4r66      ,0,         sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","
 
 
 // PR1031 CASINO ROLL ME OVER         PR1031 ROLL ME OVER SOUNDS11
-GAMEL( 200?, sc4rmo      ,0,         sc4, sc4, sc4_state, sc4, ROT0, "BFM","Roll Me Over Casino (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
-GAMEL( 200?, sc4rmoa     ,sc4rmo,    sc4, sc4, sc4_state, sc4, ROT0, "BFM","Roll Me Over Casino (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS_NOSOUND, layout_bfm_sc4 )
+GAMEL( 200?, sc4rmo      ,0,         sc4, sc4, sc4_state, sc4, ROT0, "BFM","Roll Me Over Casino (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS_NOSOUND, layout_sc4rmo )
+GAMEL( 200?, sc4rmoa     ,sc4rmo,    sc4, sc4, sc4_state, sc4, ROT0, "BFM","Roll Me Over Casino (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS_NOSOUND, layout_sc4rmo )
 
 
 // missing sound roms
@@ -51263,11 +51442,11 @@ GAMEL( 200?, sc4cashg    ,0,         sc4, sc4, sc4_state, sc4, ROT0, "Mazooma / 
 /****************************************************************************************************************************************************************************************************************/
 
 
-GAMEL( 200?, ad4skill    ,0,         sc4_adder4, sc4, sc4_state, sc4, ROT0, "BFM","Skill Dice (BFM) (Scorpion 4 + Adder 4)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, ad4film     ,0,         sc4_adder4, sc4, sc4_state, sc4, ROT0, "BFM","Film Premiere (Video?) (Bellfruit) (Adder 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // the 68k vectors differ from usual, but it contains the expected strings for an Adder 4 title.   No main program roms tho? :/
-GAMEL( 200?, ad4filma    ,ad4film,   sc4_adder4, sc4, sc4_state, sc4, ROT0, "BFM","Film Premiere (Video?) (Bellfruit) (Adder 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // ^^
-GAMEL( 200?, ad4ctl      ,0,         sc4_adder4, sc4, sc4_state, sc4, ROT0, "BFM","Cop The Lot Club (Video) (Bellfruit) (Adder 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, ad4ctla     ,ad4ctl,    sc4_adder4, sc4, sc4_state, sc4, ROT0, "BFM","Cop The Lot Club (Video) (Bellfruit) (Adder 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, ad4skill    ,0,         sc4_adder4, sc4, sc4_adder4_state, sc4, ROT0, "BFM","Skill Dice (BFM) (Scorpion 4 + Adder 4)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, ad4film     ,0,         sc4_adder4, sc4, sc4_adder4_state, sc4, ROT0, "BFM","Film Premiere (Video?) (Bellfruit) (Adder 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 ) // the 68k vectors differ from usual, but it contains the expected strings for an Adder 4 title.   No main program roms tho? :/
+GAMEL( 200?, ad4filma    ,ad4film,   sc4_adder4, sc4, sc4_adder4_state, sc4, ROT0, "BFM","Film Premiere (Video?) (Bellfruit) (Adder 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 ) // ^^
+GAMEL( 200?, ad4ctl      ,0,         sc4_adder4, sc4, sc4_adder4_state, sc4, ROT0, "BFM","Cop The Lot Club (Video) (Bellfruit) (Adder 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, ad4ctla     ,ad4ctl,    sc4_adder4, sc4, sc4_adder4_state, sc4, ROT0, "BFM","Cop The Lot Club (Video) (Bellfruit) (Adder 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
 // PR1036 CLUB COP THE LOT         PR1036 CLOT SOUNDS11           COP THE LOT
 // shows nothing on the VFD, but boots (to very little)
 GAMEL( 200?, sc4ctlcl    ,0,         sc4, sc4, sc4_state, sc4, ROT0, "BFM","Cop The Lot Club (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )

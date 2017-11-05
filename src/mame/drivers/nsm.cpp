@@ -17,10 +17,13 @@ ToDo:
 
 *********************************************************************************/
 
+#include "emu.h"
 #include "machine/genpin.h"
 
 #include "cpu/tms9900/tms9995.h"
 #include "sound/ay8910.h"
+#include "speaker.h"
+
 #include "nsm.lh"
 
 
@@ -43,8 +46,8 @@ protected:
 	// driver_device overrides
 	virtual void machine_reset() override;
 private:
-	UINT8 m_cru_data[9];
-	UINT8 m_cru_count;
+	uint8_t m_cru_data[9];
+	uint8_t m_cru_count;
 };
 
 static ADDRESS_MAP_START( nsm_map, AS_PROGRAM, 8, nsm_state )
@@ -90,7 +93,7 @@ WRITE8_MEMBER( nsm_state::cru_w )
 	}
 	m_cru_data[m_cru_count] |= (data << offset);
 
-	UINT8 i,j;
+	uint8_t i,j;
 	int segments;
 	if (!m_cru_count && (offset == 7))
 	{
@@ -116,7 +119,7 @@ void nsm_state::machine_reset()
 	static_cast<tms9995_device*>(machine().device("maincpu"))->ready_line(ASSERT_LINE);
 }
 
-static MACHINE_CONFIG_START( nsm, nsm_state )
+static MACHINE_CONFIG_START( nsm )
 	// CPU TMS9995, standard variant; no line connection
 	MCFG_TMS99xx_ADD("maincpu", TMS9995, 11052000, nsm_map, nsm_io_map)
 
@@ -153,4 +156,4 @@ ROM_END
 / The Games (1985)
 /-------------------------------------------------------------------*/
 
-GAME(1985,  firebird,  0,  nsm,  nsm, driver_device, 0,  ROT0, "NSM", "Hot Fire Birds", MACHINE_NOT_WORKING | MACHINE_MECHANICAL)
+GAME(1985,  firebird,  0,  nsm,  nsm, nsm_state, 0,  ROT0, "NSM", "Hot Fire Birds", MACHINE_NOT_WORKING | MACHINE_MECHANICAL)

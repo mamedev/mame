@@ -16,9 +16,9 @@ void orao_state::video_start()
 {
 }
 
-UINT32 orao_state::screen_update_orao(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t orao_state::screen_update_orao(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 code;
+	uint8_t code;
 	int y, x, b;
 
 	int addr = 0;

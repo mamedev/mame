@@ -36,7 +36,9 @@ Notes:
 
 */
 
+#include "emu.h"
 #include "xl80.h"
+#include "screen.h"
 
 
 
@@ -55,7 +57,7 @@ Notes:
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_XL80 = &device_creator<c64_xl80_device>;
+DEFINE_DEVICE_TYPE(C64_XL80, c64_xl80_device, "c64_xl80", "C64 XL 80 cartridge")
 
 
 //-------------------------------------------------
@@ -72,7 +74,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *c64_xl80_device::device_rom_region() const
+const tiny_rom_entry *c64_xl80_device::device_rom_region() const
 {
 	return ROM_NAME( c64_xl80 );
 }
@@ -87,9 +89,9 @@ MC6845_UPDATE_ROW( c64_xl80_device::crtc_update_row )
 
 	for (int column = 0; column < x_count; column++)
 	{
-		UINT8 code = m_ram[((ma + column) & 0x7ff)];
-		UINT16 addr = (code << 3) | (ra & 0x07);
-		UINT8 data = m_char_rom->base()[addr & 0x7ff];
+		uint8_t code = m_ram[((ma + column) & 0x7ff)];
+		uint16_t addr = (code << 3) | (ra & 0x07);
+		uint8_t data = m_char_rom->base()[addr & 0x7ff];
 
 		if (column == cursor_x)
 		{
@@ -118,11 +120,11 @@ GFXDECODE_END
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( c64_xl80 )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( c64_xl80 )
-	MCFG_SCREEN_ADD_MONOCHROME(MC6845_SCREEN_TAG, RASTER, rgb_t::white)
+MACHINE_CONFIG_MEMBER( c64_xl80_device::device_add_mconfig )
+	MCFG_SCREEN_ADD_MONOCHROME(MC6845_SCREEN_TAG, RASTER, rgb_t::white())
 	MCFG_SCREEN_UPDATE_DEVICE(HD46505SP_TAG, h46505_device, screen_update)
 	MCFG_SCREEN_SIZE(80*8, 24*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 80*8-1, 0, 24*8-1)
@@ -138,17 +140,6 @@ static MACHINE_CONFIG_FRAGMENT( c64_xl80 )
 MACHINE_CONFIG_END
 
 
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor c64_xl80_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( c64_xl80 );
-}
-
-
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -158,8 +149,8 @@ machine_config_constructor c64_xl80_device::device_mconfig_additions() const
 //  c64_xl80_device - constructor
 //-------------------------------------------------
 
-c64_xl80_device::c64_xl80_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, C64_XL80, "XL 80", tag, owner, clock, "c64_xl80", __FILE__),
+c64_xl80_device::c64_xl80_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, C64_XL80, tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_crtc(*this, HD46505SP_TAG),
 	m_palette(*this, "palette"),
@@ -193,7 +184,7 @@ void c64_xl80_device::device_reset()
 //  c64_cd_r - cartridge data read
 //-------------------------------------------------
 
-UINT8 c64_xl80_device::c64_cd_r(address_space &space, offs_t offset, UINT8 data, int sphi2, int ba, int roml, int romh, int io1, int io2)
+uint8_t c64_xl80_device::c64_cd_r(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
 	if (!io2 && BIT(offset, 2))
 	{
@@ -219,7 +210,7 @@ UINT8 c64_xl80_device::c64_cd_r(address_space &space, offs_t offset, UINT8 data,
 //  c64_cd_w - cartridge data write
 //-------------------------------------------------
 
-void c64_xl80_device::c64_cd_w(address_space &space, offs_t offset, UINT8 data, int sphi2, int ba, int roml, int romh, int io1, int io2)
+void c64_xl80_device::c64_cd_w(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
 	if (offset >= 0x9800 && offset < 0xa000)
 	{

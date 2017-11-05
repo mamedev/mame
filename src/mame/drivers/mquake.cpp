@@ -35,20 +35,22 @@
 
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
 #include "includes/amiga.h"
-#include "sound/es5503.h"
+
+#include "cpu/m68000/m68000.h"
 #include "machine/nvram.h"
 #include "machine/amigafdc.h"
+#include "sound/es5503.h"
+#include "speaker.h"
 
 
 class mquake_state : public amiga_state
 {
 public:
 	mquake_state(const machine_config &mconfig, device_type type, const char *tag)
-	: amiga_state(mconfig, type, tag),
-	m_es5503(*this, "es5503"),
-	m_es5503_rom(*this, "es5503")
+		: amiga_state(mconfig, type, tag),
+		m_es5503(*this, "es5503"),
+		m_es5503_rom(*this, "es5503")
 	{ }
 
 	DECLARE_DRIVER_INIT(mquake);
@@ -60,7 +62,7 @@ public:
 
 private:
 	required_device<es5503_device> m_es5503;
-	required_region_ptr<UINT8> m_es5503_rom;
+	required_region_ptr<uint8_t> m_es5503_rom;
 };
 
 
@@ -77,7 +79,7 @@ READ8_MEMBER( mquake_state::es5503_sample_r )
 	return m_es5503_rom[offset + (m_es5503->get_channel_strobe() * 0x10000)];
 }
 
-static ADDRESS_MAP_START( mquake_es5503_map, AS_0, 8, mquake_state )
+static ADDRESS_MAP_START( mquake_es5503_map, 0, 8, mquake_state )
 	AM_RANGE(0x000000, 0x1ffff) AM_READ(es5503_sample_r)
 ADDRESS_MAP_END
 
@@ -300,7 +302,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( mquake, mquake_state )
+static MACHINE_CONFIG_START( mquake )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, amiga_state::CLK_7M_NTSC)
@@ -326,15 +328,17 @@ static MACHINE_CONFIG_START( mquake, mquake_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("amiga", AMIGA, amiga_state::CLK_C1_NTSC)
+	MCFG_SOUND_ADD("amiga", PAULA_8364, amiga_state::CLK_C1_NTSC)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 	MCFG_SOUND_ROUTE(2, "rspeaker", 0.50)
 	MCFG_SOUND_ROUTE(3, "lspeaker", 0.50)
+	MCFG_PAULA_MEM_READ_CB(READ16(amiga_state, chip_ram_r))
+	MCFG_PAULA_INT_CB(WRITELINE(amiga_state, paula_int_w))
 
 	MCFG_ES5503_ADD("es5503", amiga_state::CLK_7M_NTSC)       /* ES5503 is likely mono due to channel strobe used as bank select */
 	MCFG_ES5503_OUTPUT_CHANNELS(1)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, mquake_es5503_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, mquake_es5503_map)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.50)
 

@@ -14,7 +14,10 @@
 #include "emu.h"
 #include "machine/tc009xlvc.h"
 
-const device_type TC0091LVC = &device_creator<tc0091lvc_device>;
+#include "screen.h"
+
+
+DEFINE_DEVICE_TYPE(TC0091LVC, tc0091lvc_device, "tc009xlvc", "Taito TC0091LVC")
 
 
 READ8_MEMBER(tc0091lvc_device::tc0091lvc_paletteram_r)
@@ -27,8 +30,8 @@ WRITE8_MEMBER(tc0091lvc_device::tc0091lvc_paletteram_w)
 	m_palette_ram[offset & 0x1ff] = data;
 
 	{
-		UINT8 r,g,b,i;
-		UINT16 pal;
+		uint8_t r,g,b,i;
+		uint16_t pal;
 
 		pal = (m_palette_ram[offset & ~1]<<0) | (m_palette_ram[offset | 1]<<8);
 
@@ -153,7 +156,7 @@ WRITE8_MEMBER(tc0091lvc_device::tc0091lvc_spr_w)
 	tx_tilemap->mark_all_dirty();
 }
 
-static ADDRESS_MAP_START( tc0091lvc_map8, AS_0, 8, tc0091lvc_device )
+static ADDRESS_MAP_START( tc0091lvc_map8, 0, 8, tc0091lvc_device )
 	AM_RANGE(0x014000, 0x017fff) AM_READWRITE(tc0091lvc_pcg1_r, tc0091lvc_pcg1_w)
 	AM_RANGE(0x018000, 0x018fff) AM_READWRITE(tc0091lvc_vram0_r, tc0091lvc_vram0_w)
 	AM_RANGE(0x019000, 0x019fff) AM_READWRITE(tc0091lvc_vram1_r, tc0091lvc_vram1_w)
@@ -164,11 +167,11 @@ static ADDRESS_MAP_START( tc0091lvc_map8, AS_0, 8, tc0091lvc_device )
 	AM_RANGE(0x080000, 0x0801ff) AM_READWRITE(tc0091lvc_paletteram_r,tc0091lvc_paletteram_w)
 ADDRESS_MAP_END
 
-tc0091lvc_device::tc0091lvc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, TC0091LVC, "Taito TC0091LVC", tag, owner, clock, "tc0091lvc", __FILE__),
-		device_memory_interface(mconfig, *this),
-		m_space_config("tc0091lvc", ENDIANNESS_LITTLE, 8,20, 0, nullptr, *ADDRESS_MAP_NAME(tc0091lvc_map8)),
-		m_gfxdecode(*this)
+tc0091lvc_device::tc0091lvc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, TC0091LVC, tag, owner, clock)
+	, device_memory_interface(mconfig, *this)
+	, m_space_config("tc0091lvc", ENDIANNESS_LITTLE, 8,20, 0, nullptr, *ADDRESS_MAP_NAME(tc0091lvc_map8))
+	, m_gfxdecode(*this, finder_base::DUMMY_TAG)
 {
 }
 
@@ -182,17 +185,6 @@ void tc0091lvc_device::static_set_gfxdecode_tag(device_t &device, const char *ta
 	downcast<tc0091lvc_device &>(device).m_gfxdecode.set_tag(tag);
 }
 
-
-void tc0091lvc_device::device_config_complete()
-{
-//  int address_bits = 20;
-
-//  m_space_config = address_space_config("janshi_vdp", ENDIANNESS_LITTLE, 8,  address_bits, 0, *ADDRESS_MAP_NAME(tc0091lvc_map8));
-}
-
-void tc0091lvc_device::device_validity_check(validity_checker &valid) const
-{
-}
 
 TILE_GET_INFO_MEMBER(tc0091lvc_device::get_bg0_tile_info)
 {
@@ -225,7 +217,7 @@ TILE_GET_INFO_MEMBER(tc0091lvc_device::get_bg1_tile_info)
 TILE_GET_INFO_MEMBER(tc0091lvc_device::get_tx_tile_info)
 {
 	int attr = m_tvram[2 * tile_index + 1];
-	UINT16 code = m_tvram[2 * tile_index]
+	uint16_t code = m_tvram[2 * tile_index]
 			| ((attr & 0x07) << 8);
 
 	SET_TILE_INFO_MEMBER(m_gfx_index,
@@ -267,9 +259,9 @@ void tc0091lvc_device::device_start()
 	m_tvram = m_pcg_ram + 0xa000;
 	m_sprram = m_pcg_ram + 0xb000;
 
-	tx_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0091lvc_device::get_tx_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
-	bg0_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0091lvc_device::get_bg0_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
-	bg1_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0091lvc_device::get_bg1_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
+	tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0091lvc_device::get_tx_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
+	bg0_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0091lvc_device::get_bg0_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
+	bg1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0091lvc_device::get_bg1_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
 
 	tx_tilemap->set_transparent_pen(0);
 	bg0_tilemap->set_transparent_pen(0);
@@ -285,21 +277,19 @@ void tc0091lvc_device::device_start()
 
 	//printf("m_gfx_index %d\n", m_gfx_index);
 
-	palette_device &palette = m_gfxdecode->palette();
-	m_gfxdecode->set_gfx(m_gfx_index, std::make_unique<gfx_element>(palette, char_layout, (UINT8 *)m_pcg_ram, 0, palette.entries() / 16, 0));
+	device_palette_interface &palette = m_gfxdecode->palette();
+	m_gfxdecode->set_gfx(m_gfx_index, std::make_unique<gfx_element>(&palette, char_layout, (uint8_t *)m_pcg_ram, 0, palette.entries() / 16, 0));
 }
 
-void tc0091lvc_device::device_reset()
+device_memory_interface::space_config_vector tc0091lvc_device::memory_space_config() const
 {
+	return space_config_vector {
+		std::make_pair(0, &m_space_config)
+	};
 }
 
-const address_space_config *tc0091lvc_device::memory_space_config(address_spacenum spacenum) const
-{
-	return (spacenum == 0) ? &m_space_config : nullptr;
-}
 
-
-void tc0091lvc_device::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 global_flip )
+void tc0091lvc_device::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t global_flip )
 {
 	gfx_element *gfx = m_gfxdecode->gfx(1);
 	int count;
@@ -329,11 +319,11 @@ void tc0091lvc_device::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap
 	}
 }
 
-UINT32 tc0091lvc_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t tc0091lvc_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT32 count;
+	uint32_t count;
 	int x,y;
-	UINT8 global_flip;
+	uint8_t global_flip;
 
 	bitmap.fill(m_gfxdecode->palette().black_pen(), cliprect);
 

@@ -16,11 +16,13 @@
 
 */
 
+#include "emu.h"
 #include "rp5c01.h"
 
 
-// device type definition
-const device_type RP5C01 = &device_creator<rp5c01_device>;
+// device type definitions
+DEFINE_DEVICE_TYPE(RP5C01, rp5c01_device, "rp5c01", "Ricoh RP5C01 RTC")
+DEFINE_DEVICE_TYPE(TC8521, tc8521_device, "tc8521", "Toshiba TC8521 RTC")
 
 
 //**************************************************************************
@@ -167,8 +169,13 @@ inline void rp5c01_device::check_alarm()
 //  rp5c01_device - constructor
 //-------------------------------------------------
 
-rp5c01_device::rp5c01_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, RP5C01, "RP5C01", tag, owner, clock, "rp5c01", __FILE__),
+rp5c01_device::rp5c01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: rp5c01_device(mconfig, RP5C01, tag, owner, clock)
+{
+}
+
+rp5c01_device::rp5c01_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock),
 		device_rtc_interface(mconfig, *this),
 		device_nvram_interface(mconfig, *this),
 		m_out_alarm_cb(*this),
@@ -201,6 +208,12 @@ void rp5c01_device::device_start()
 		m_16hz_timer->adjust(attotime::from_hz(clock() / 1024), 0, attotime::from_hz(clock() / 1024));
 	}
 
+	memset(m_reg, 0, sizeof(m_reg));
+	memset(m_ram, 0, sizeof(m_ram));
+
+	// 24 hour mode
+	m_reg[MODE01][REGISTER_12_24_SELECT] = 1;
+
 	// state saving
 	save_item(NAME(m_reg[MODE00]));
 	save_item(NAME(m_reg[MODE01]));
@@ -210,23 +223,6 @@ void rp5c01_device::device_start()
 	save_item(NAME(m_alarm_on));
 	save_item(NAME(m_1hz));
 	save_item(NAME(m_16hz));
-}
-
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void rp5c01_device::device_reset()
-{
-	memset(m_reg, 0, sizeof(m_reg));
-	memset(m_ram, 0, sizeof(m_ram));
-
-	// 24 hour mode
-	m_reg[MODE01][REGISTER_12_24_SELECT] = 1;
-
-	if (m_battery_backed && clock() > 0)
-		set_current_time(machine());
 }
 
 
@@ -316,7 +312,7 @@ void rp5c01_device::nvram_write(emu_file &file)
 
 READ8_MEMBER( rp5c01_device::read )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 	offset &= 0x0f;
 
 	switch (offset)
@@ -425,4 +421,13 @@ WRITE8_MEMBER( rp5c01_device::write )
 		if (LOG) logerror("RP5C01 '%s' Register %u Write %02x\n", tag(), offset, data);
 		break;
 	}
+}
+
+//-------------------------------------------------
+//  tc8521_device - constructor
+//-------------------------------------------------
+
+tc8521_device::tc8521_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: rp5c01_device(mconfig, TC8521, tag, owner, clock)
+{
 }

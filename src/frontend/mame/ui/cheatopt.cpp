@@ -18,7 +18,6 @@
 
 
 namespace ui {
-
 // itemrefs for key menu items
 #define ITEMREF_CHEATS_RESET_ALL            ((void *) 0x0001)
 #define ITEMREF_CHEATS_RELOAD_ALL           ((void *) 0x0002)
@@ -52,8 +51,8 @@ void menu_cheat::handle()
 		/* handle reset all + reset all cheats for reload all option */
 		if ((menu_event->itemref == ITEMREF_CHEATS_RESET_ALL || menu_event->itemref == ITEMREF_CHEATS_RELOAD_ALL) && menu_event->iptkey == IPT_UI_SELECT)
 		{
-			for (cheat_entry &curcheat : mame_machine_manager::instance()->cheat().entries())
-				if (curcheat.select_default_state())
+			for (auto &curcheat : mame_machine_manager::instance()->cheat().entries())
+				if (curcheat->select_default_state())
 					changed = true;
 		}
 
@@ -109,7 +108,7 @@ void menu_cheat::handle()
 		/* handle autofire menu */
 		if (menu_event->itemref == ITEMREF_CHEATS_AUTOFIRE_SETTINGS && menu_event->iptkey == IPT_UI_SELECT)
 		{
-			menu::stack_push<menu_autofire>(ui(), container);
+			menu::stack_push<menu_autofire>(ui(), container());
 		}
 
 		/* if things changed, update */
@@ -123,39 +122,42 @@ void menu_cheat::handle()
     menu_cheat_populate - populate the cheat menu
 -------------------------------------------------*/
 
-menu_cheat::menu_cheat(mame_ui_manager &mui, render_container *container) : menu(mui, container)
+menu_cheat::menu_cheat(mame_ui_manager &mui, render_container &container) : menu(mui, container)
 {
 }
 
-void menu_cheat::populate()
+void menu_cheat::populate(float &customtop, float &custombottom)
 {
 	/* iterate over cheats */
 	std::string text;
 	std::string subtext;
 
 	// add the autofire menu
-	item_append(_("Autofire Settings"), nullptr, 0, (void *)ITEMREF_CHEATS_AUTOFIRE_SETTINGS);
+	item_append(_("Autofire Settings"), "", 0, (void *)ITEMREF_CHEATS_AUTOFIRE_SETTINGS);
 
 	/* add a separator */
 	item_append(menu_item_type::SEPARATOR);
 
 	// add other cheats
 	if (!mame_machine_manager::instance()->cheat().entries().empty()) {
-		for (cheat_entry &curcheat : mame_machine_manager::instance()->cheat().entries())
+		for (auto &curcheat : mame_machine_manager::instance()->cheat().entries())
 		{
-			UINT32 flags;
-			curcheat.menu_text(text, subtext, flags);
-			item_append(text.c_str(), subtext.c_str(), flags, &curcheat);
+			uint32_t flags;
+			curcheat->menu_text(text, subtext, flags);
+			if (text == MENU_SEPARATOR_ITEM)
+				item_append(menu_item_type::SEPARATOR, flags);
+			else
+				item_append(text, subtext, flags, curcheat.get());
 		}
 
 		/* add a separator */
 		item_append(menu_item_type::SEPARATOR);
 
 		/* add a reset all option */
-		item_append(_("Reset All"), nullptr, 0, (void *)ITEMREF_CHEATS_RESET_ALL);
+		item_append(_("Reset All"), "", 0, (void *)ITEMREF_CHEATS_RESET_ALL);
 
 		/* add a reload all cheats option */
-		item_append(_("Reload All"), nullptr, 0, (void *)ITEMREF_CHEATS_RELOAD_ALL);
+		item_append(_("Reload All"), "", 0, (void *)ITEMREF_CHEATS_RELOAD_ALL);
 	}
 }
 
@@ -172,7 +174,7 @@ menu_cheat::~menu_cheat()
     menu
 -------------------------------------------------*/
 
-menu_autofire::menu_autofire(mame_ui_manager &mui, render_container *container) : menu(mui, container), last_toggle(false)
+menu_autofire::menu_autofire(mame_ui_manager &mui, render_container &container) : menu(mui, container), last_toggle(false)
 {
 	const screen_device *screen = mui.machine().first_screen();
 
@@ -262,7 +264,7 @@ void menu_autofire::handle()
     menu
 -------------------------------------------------*/
 
-void menu_autofire::populate()
+void menu_autofire::populate(float &customtop, float &custombottom)
 {
 	char temp_text[64];
 
@@ -273,10 +275,10 @@ void menu_autofire::populate()
 
 	/* iterate over the input ports and add autofire toggle items */
 	int menu_items = 0;
-	for (ioport_port &port : machine().ioport().ports())
+	for (auto &port : machine().ioport().ports())
 	{
 		bool is_first_button = true;
-		for (ioport_field &field : port.fields())
+		for (ioport_field &field : port.second->fields())
 		{
 			if (field.type() >= IPT_BUTTON1 && field.type() <= IPT_BUTTON16)
 			{
@@ -311,7 +313,7 @@ void menu_autofire::populate()
 	if (menu_items==0)
 	{
 		item_append(menu_item_type::SEPARATOR);
-		item_append(_("No buttons found on this machine!"), nullptr, FLAG_DISABLE, nullptr);
+		item_append(_("No buttons found on this machine!"), "", FLAG_DISABLE, nullptr);
 	}
 
 	/* add a separator */

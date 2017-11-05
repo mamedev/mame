@@ -20,9 +20,13 @@ Notes:
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "sound/2203intf.h"
 #include "includes/goindol.h"
+
+#include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
+#include "sound/2203intf.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 WRITE8_MEMBER(goindol_state::goindol_bankswitch_w)
@@ -81,7 +85,7 @@ static ADDRESS_MAP_START( goindol_map, AS_PROGRAM, 8, goindol_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("ram")
-	AM_RANGE(0xc800, 0xc800) AM_READNOP AM_WRITE(soundlatch_byte_w) // watchdog?
+	AM_RANGE(0xc800, 0xc800) AM_READNOP AM_DEVWRITE("soundlatch", generic_latch_8_device, write) // watchdog?
 	AM_RANGE(0xc810, 0xc810) AM_WRITE(goindol_bankswitch_w)
 	AM_RANGE(0xc820, 0xc820) AM_READ_PORT("DIAL")
 	AM_RANGE(0xc820, 0xd820) AM_WRITEONLY AM_SHARE("fg_scrolly")
@@ -107,7 +111,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, goindol_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xa000, 0xa001) AM_DEVWRITE("ymsnd", ym2203_device, write)
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xd800, 0xd800) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xd800, 0xd800) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
 
@@ -215,7 +219,7 @@ GFXDECODE_END
 
 void goindol_state::machine_start()
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x4000);
 
@@ -229,7 +233,7 @@ void goindol_state::machine_reset()
 	m_prot_toggle = 0;
 }
 
-static MACHINE_CONFIG_START( goindol, goindol_state )
+static MACHINE_CONFIG_START( goindol )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)  /* XTAL confirmed, divisor is not */
@@ -251,10 +255,12 @@ static MACHINE_CONFIG_START( goindol, goindol_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", goindol)
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", 256)
+	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/8)   /* Confirmed pitch from recording */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
@@ -372,7 +378,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(goindol_state,goindol)
 {
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 
 
 	/* I hope that's all patches to avoid protection */
@@ -404,4 +410,4 @@ DRIVER_INIT_MEMBER(goindol_state,goindol)
 GAME( 1987, goindol,  0,       goindol, goindol, goindol_state, goindol, ROT90, "SunA",    "Goindol (World)", MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
 GAME( 1987, goindolu, goindol, goindol, goindol, goindol_state, goindol, ROT90, "SunA",    "Goindol (US)",    MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
 GAME( 1987, goindolk, goindol, goindol, goindol, goindol_state, goindol, ROT90, "SunA",    "Goindol (Korea)", MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, homo,     goindol, goindol, homo, driver_device,    0,       ROT90, "bootleg", "Homo", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, homo,     goindol, goindol, homo,    goindol_state, 0,       ROT90, "bootleg", "Homo",            MACHINE_SUPPORTS_SAVE )

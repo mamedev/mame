@@ -101,6 +101,8 @@
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/6840ptm.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class vpoker_state : public driver_device
@@ -112,13 +114,13 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")  { }
 
-	std::unique_ptr<UINT8[]> m_videoram;
-	UINT8 m_blit_ram[8];
+	std::unique_ptr<uint8_t[]> m_videoram;
+	uint8_t m_blit_ram[8];
 	DECLARE_READ8_MEMBER(blitter_r);
 	DECLARE_WRITE8_MEMBER(blitter_w);
 	DECLARE_WRITE_LINE_MEMBER(ptm_irq);
 	virtual void video_start() override;
-	UINT32 screen_update_vpoker(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_vpoker(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -127,12 +129,12 @@ public:
 
 void vpoker_state::video_start()
 {
-	m_videoram = std::make_unique<UINT8[]>(0x200);
+	m_videoram = std::make_unique<uint8_t[]>(0x200);
 }
 
-UINT32 vpoker_state::screen_update_vpoker(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t vpoker_state::screen_update_vpoker(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 *videoram = m_videoram.get();
+	uint8_t *videoram = m_videoram.get();
 	gfx_element *gfx = m_gfxdecode->gfx(0);
 	int count = 0x0000;
 
@@ -163,7 +165,7 @@ READ8_MEMBER(vpoker_state::blitter_r)
 
 WRITE8_MEMBER(vpoker_state::blitter_w)
 {
-	UINT8 *videoram = m_videoram.get();
+	uint8_t *videoram = m_videoram.get();
 
 	m_blit_ram[offset] = data;
 
@@ -625,7 +627,7 @@ WRITE_LINE_MEMBER(vpoker_state::ptm_irq)
 	m_maincpu->set_input_line(M6809_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static MACHINE_CONFIG_START( vpoker, vpoker_state )
+static MACHINE_CONFIG_START( vpoker )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M6809,XTAL_4MHz)
@@ -647,8 +649,7 @@ static MACHINE_CONFIG_START( vpoker, vpoker_state )
 	MCFG_PALETTE_ADD_3BIT_GBR("palette")
 
 	/* 6840 PTM */
-	MCFG_DEVICE_ADD("6840ptm", PTM6840, 0)
-	MCFG_PTM6840_INTERNAL_CLOCK(XTAL_4MHz)
+	MCFG_DEVICE_ADD("6840ptm", PTM6840, XTAL_4MHz)
 	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
 	MCFG_PTM6840_IRQ_CB(WRITELINE(vpoker_state, ptm_irq))
 
@@ -701,6 +702,6 @@ ROM_START( 5acespkr )
 ROM_END
 
 
-/*    YEAR  NAME      PARENT  MACHINE  INPUT     STATE          INIT  ROT    COMPANY               FULLNAME                  FLAGS... */
-GAME( 198?, vpoker,   0,      vpoker,  vpoker,   driver_device, 0,    ROT0, "Videotronics, Inc.", "Videotronics Draw Poker", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 198?, 5acespkr, 0,      vpoker,  5acespkr, driver_device, 0,    ROT0, "<unknown>",          "5-Aces Poker",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME      PARENT  MACHINE  INPUT     STATE         INIT  ROT   COMPANY               FULLNAME                   FLAGS
+GAME( 198?, vpoker,   0,      vpoker,  vpoker,   vpoker_state, 0,    ROT0, "Videotronics, Inc.", "Videotronics Draw Poker", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 198?, 5acespkr, 0,      vpoker,  5acespkr, vpoker_state, 0,    ROT0, "<unknown>",          "5-Aces Poker",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

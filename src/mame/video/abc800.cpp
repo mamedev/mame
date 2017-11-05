@@ -6,7 +6,9 @@
  *
  ****************************************************************************/
 
+#include "emu.h"
 #include "includes/abc80x.h"
+#include "screen.h"
 
 
 
@@ -72,25 +74,25 @@ void abc800c_state::hr_update(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	const pen_t *pen = m_palette->pens();
 
-	UINT16 addr = 0;
+	uint16_t addr = 0;
 
-	for (int y = m_hrs; y < MIN(cliprect.max_y + 1, m_hrs + 480); y += 2)
+	for (int y = m_hrs; y < std::min(cliprect.max_y + 1, m_hrs + 480); y += 2)
 	{
 		int x = 0;
 
 		for (int sx = 0; sx < 64; sx++)
 		{
-			UINT8 data = m_video_ram[addr++];
+			uint8_t data = m_video_ram[addr++];
 
 			for (int dot = 0; dot < 4; dot++)
 			{
-				UINT16 fgctl_addr = ((m_fgctl & 0x7f) << 2) | ((data >> 6) & 0x03);
-				UINT8 fgctl = m_fgctl_prom->base()[fgctl_addr];
+				uint16_t fgctl_addr = ((m_fgctl & 0x7f) << 2) | ((data >> 6) & 0x03);
+				uint8_t fgctl = m_fgctl_prom->base()[fgctl_addr];
 				int color = fgctl & 0x07;
 
 				if (color)
 				{
-					bool black = bitmap.pix32(y, x) == rgb_t::black;
+					bool black = bitmap.pix32(y, x) == rgb_t::black();
 					bool opaque = !BIT(fgctl, 3);
 
 					if (black || opaque)
@@ -123,10 +125,10 @@ void abc800_state::video_start()
 //  SCREEN_UPDATE( abc800c )
 //-------------------------------------------------
 
-UINT32 abc800c_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t abc800c_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	// clear screen
-	bitmap.fill(rgb_t::black, cliprect);
+	bitmap.fill(rgb_t::black(), cliprect);
 
 	// draw text
 	if (!BIT(m_fgctl, 7))
@@ -169,10 +171,10 @@ PALETTE_INIT_MEMBER( abc800c_state, abc800c )
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( abc800c_video )
+//  MACHINE_CONFIG_START( abc800c_video )
 //-------------------------------------------------
 
-MACHINE_CONFIG_FRAGMENT( abc800c_video )
+MACHINE_CONFIG_START( abc800c_video )
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MCFG_SCREEN_UPDATE_DRIVER(abc800c_state, screen_update)
 	MCFG_SCREEN_REFRESH_RATE(50)
@@ -200,21 +202,21 @@ MACHINE_CONFIG_END
 
 void abc800m_state::hr_update(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	UINT16 addr = 0;
+	uint16_t addr = 0;
 
 	const pen_t *pen = m_palette->pens();
 
-	for (int y = m_hrs + VERTICAL_PORCH_HACK; y < MIN(cliprect.max_y + 1, m_hrs + VERTICAL_PORCH_HACK + 240); y++)
+	for (int y = m_hrs + VERTICAL_PORCH_HACK; y < std::min(cliprect.max_y + 1, m_hrs + VERTICAL_PORCH_HACK + 240); y++)
 	{
 		int x = HORIZONTAL_PORCH_HACK;
 
 		for (int sx = 0; sx < 64; sx++)
 		{
-			UINT8 data = m_video_ram[addr++];
+			uint8_t data = m_video_ram[addr++];
 
 			for (int dot = 0; dot < 4; dot++)
 			{
-				UINT16 fgctl_addr = ((m_fgctl & 0x7f) << 2) | ((data >> 6) & 0x03);
+				uint16_t fgctl_addr = ((m_fgctl & 0x7f) << 2) | ((data >> 6) & 0x03);
 				int color = (m_fgctl_prom->base()[fgctl_addr] & 0x07) ? 1 : 0;
 
 				bitmap.pix32(y, x++) = pen[color];
@@ -242,8 +244,8 @@ MC6845_UPDATE_ROW( abc800m_state::abc800m_update_row )
 	{
 		int bit;
 
-		UINT16 address = (m_char_ram[(ma + column) & 0x7ff] << 4) | (ra & 0x0f);
-		UINT8 data = (m_char_rom->base()[address & 0x7ff] & 0x3f);
+		uint16_t address = (m_char_ram[(ma + column) & 0x7ff] << 4) | (ra & 0x0f);
+		uint8_t data = (m_char_rom->base()[address & 0x7ff] & 0x3f);
 
 		if (column == cursor_x)
 		{
@@ -271,10 +273,10 @@ MC6845_UPDATE_ROW( abc800m_state::abc800m_update_row )
 //  SCREEN_UPDATE( abc800m )
 //-------------------------------------------------
 
-UINT32 abc800m_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t abc800m_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	// clear screen
-	bitmap.fill(rgb_t::black, cliprect);
+	bitmap.fill(rgb_t::black(), cliprect);
 
 	// draw HR graphics
 	hr_update(bitmap, cliprect);
@@ -290,10 +292,10 @@ UINT32 abc800m_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( abc800m_video )
+//  MACHINE_CONFIG_START( abc800m_video )
 //-------------------------------------------------
 
-MACHINE_CONFIG_FRAGMENT( abc800m_video )
+MACHINE_CONFIG_START( abc800m_video )
 	MCFG_MC6845_ADD(MC6845_TAG, MC6845, SCREEN_TAG, ABC800_CCLK)
 	MCFG_MC6845_SHOW_BORDER_AREA(true)
 	MCFG_MC6845_CHAR_WIDTH(ABC800_CHAR_WIDTH)
@@ -302,10 +304,7 @@ MACHINE_CONFIG_FRAGMENT( abc800m_video )
 
 	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t(0xff, 0xff, 0x00))
 	MCFG_SCREEN_UPDATE_DRIVER(abc800m_state, screen_update)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_SIZE(768, 312)
-	MCFG_SCREEN_VISIBLE_AREA(0,768-1, 0, 312-1)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_12MHz, 0x300, 0, 0x1e0, 0x13a, 0, 0xf0)
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 MACHINE_CONFIG_END

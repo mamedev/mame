@@ -80,6 +80,7 @@ Notes: (all IC's shown)
 #include "emu.h"
 
 #include "cpu/upd7810/upd7810.h"
+#include "cpu/z80/z80.h"
 
 #define CPU_TAG "maincpu"
 
@@ -122,7 +123,7 @@ void mps1230_state::machine_reset()
 static ADDRESS_MAP_START( mps1230_map, AS_PROGRAM, 8, mps1230_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0xc000, 0xdfff) AM_RAM // as per the service manual
-	AM_RANGE(0xff00, 0xffff) AM_RAM // tested at PC=77, then used for the 7810's stack
+	AM_RANGE(0xff80, 0xffff) AM_RAM // internal in cpu
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -132,8 +133,13 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( mps1230 )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( mps1230, mps1230_state )
+static MACHINE_CONFIG_START( mps1230 )
 	MCFG_CPU_ADD(CPU_TAG, UPD7810, 11060000)
+	MCFG_CPU_PROGRAM_MAP(mps1230_map)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_START( mps1000 )
+	MCFG_CPU_ADD(CPU_TAG, Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(mps1230_map)
 MACHINE_CONFIG_END
 
@@ -149,6 +155,8 @@ ROM_START(mps1000)
 	// I can't tell the PCB reference because this was dumped from spare EPROMs from a drawer
 	// The dump seems to be good because the data content of all of my 4 spare EPROMs matched perfectly.
 	ROM_LOAD( "mps_1000_vers_2.20_12-06-86.rom", 0x000000, 0x02000, CRC(0a91ea8a) SHA1(ccb679f3d1f7f4eddb4e8899fe9e9a594dcfca5d) )
+	// this is another Z80-based bios.
+	ROM_LOAD( "hwh_28.06.88_ep12-2_s80r2.rom", 0x002000, 0x002000, CRC(1d17c586) SHA1(1afd1d1bbebe4d79c3cfcc30ac617b1a8ddb99e1) ) // to locate at 0000
 ROM_END
 
 ROM_START(mps1230)
@@ -157,6 +165,6 @@ ROM_START(mps1230)
 	ROM_LOAD( "peek.f03ee",   0x000000, 0x010000, CRC(b5215f25) SHA1(dcfdd16942652447c472301392d9b39514547af1) ) // ver 2.1E, 09/AUG/1989
 ROM_END
 
-/*    YEAR  NAME      PARENT    COMPAT    MACHINE      INPUT     INIT              COMPANY                         FULLNAME */
-COMP( 1986, mps1000,  0,        0,        mps1230,     mps1230,  driver_device, 0, "Commodore Business Machines", "MPS-1000 Printer", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_TYPE_OTHER )
-COMP( 1988, mps1230,  0,        0,        mps1230,     mps1230,  driver_device, 0, "Commodore Business Machines", "MPS-1230 NLQ Printer", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_TYPE_OTHER )
+/*    YEAR  NAME      PARENT    COMPAT    MACHINE      INPUT     STATE          INIT  COMPANY                        FULLNAME */
+COMP( 1986, mps1000,  0,        0,        mps1000,     mps1230,  mps1230_state, 0,    "Commodore Business Machines", "MPS-1000 Printer",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_TYPE_OTHER )
+COMP( 1988, mps1230,  0,        0,        mps1230,     mps1230,  mps1230_state, 0,    "Commodore Business Machines", "MPS-1230 NLQ Printer", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_TYPE_OTHER )

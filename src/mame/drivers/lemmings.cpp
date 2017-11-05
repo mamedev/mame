@@ -18,11 +18,15 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/lemmings.h"
+
 #include "cpu/m6809/m6809.h"
 #include "cpu/m68000/m68000.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 #include "sound/okim6295.h"
-#include "includes/lemmings.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 WRITE16_MEMBER(lemmings_state::lemmings_control_w)
 {
@@ -44,27 +48,12 @@ READ16_MEMBER(lemmings_state::lemmings_trackball_r)
 	return 0;
 }
 
-
-
-
-
-void lemmings_state::lemmings_sound_cb( address_space &space, UINT16 data, UINT16 mem_mask )
-{
-	m_soundlatch->write(space, 0, data & 0xff);
-	m_audiocpu->set_input_line(1, HOLD_LINE);
-}
-
-WRITE8_MEMBER(lemmings_state::lemmings_sound_ack_w)
-{
-	m_audiocpu->set_input_line(1, CLEAR_LINE);
-}
-
 READ16_MEMBER( lemmings_state::lem_protection_region_0_146_r )
 {
 	int real_address = 0 + (offset *2);
 	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
-	UINT8 cs = 0;
-	UINT16 data = m_deco146->read_data( deco146_addr, mem_mask, cs );
+	uint8_t cs = 0;
+	uint16_t data = m_deco146->read_data( deco146_addr, mem_mask, cs );
 	return data;
 }
 
@@ -72,7 +61,7 @@ WRITE16_MEMBER( lemmings_state::lem_protection_region_0_146_w )
 {
 	int real_address = 0 + (offset *2);
 	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
-	UINT8 cs = 0;
+	uint8_t cs = 0;
 	m_deco146->write_data( space, deco146_addr, data, mem_mask, cs );
 }
 
@@ -102,7 +91,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, lemmings_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x0800, 0x0801) AM_DEVREADWRITE("ymsnd", ym2151_device,read,write)
 	AM_RANGE(0x1000, 0x1000) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0x1800, 0x1800) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITE(lemmings_sound_ack_w)
+	AM_RANGE(0x1800, 0x1800) AM_DEVREAD("ioprot", deco_146_base_device, soundlatch_r) AM_WRITENOP // writes an extra irq ack?
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -229,7 +218,7 @@ void lemmings_state::machine_start()
 {
 }
 
-static MACHINE_CONFIG_START( lemmings, lemmings_state )
+static MACHINE_CONFIG_START( lemmings )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 14000000)
@@ -250,7 +239,7 @@ static MACHINE_CONFIG_START( lemmings, lemmings_state )
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(lemmings_state, screen_update_lemmings)
-	MCFG_SCREEN_VBLANK_DRIVER(lemmings_state, screen_eof_lemmings)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(lemmings_state, screen_vblank_lemmings))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lemmings)
 	MCFG_PALETTE_ADD("palette", 1024)
@@ -266,8 +255,11 @@ static MACHINE_CONFIG_START( lemmings, lemmings_state )
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 
 	MCFG_DECO146_ADD("ioprot")
+	MCFG_DECO146_IN_PORTA_CB(IOPORT("INPUTS"))
+	MCFG_DECO146_IN_PORTB_CB(IOPORT("SYSTEM"))
+	MCFG_DECO146_IN_PORTC_CB(IOPORT("DSW"))
 	MCFG_DECO146_SET_USE_MAGIC_ADDRESS_XOR
-	MCFG_DECO146_SET_SOUNDLATCH_CALLBACK(lemmings_state, lemmings_sound_cb)
+	MCFG_DECO146_SOUNDLATCH_IRQ_CB(INPUTLINE("audiocpu", 1))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -279,7 +271,7 @@ static MACHINE_CONFIG_START( lemmings, lemmings_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.45)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.45)
 
-	MCFG_OKIM6295_ADD("oki", 1023924, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", 1023924, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 MACHINE_CONFIG_END
@@ -318,4 +310,4 @@ ROM_END
 
 /******************************************************************************/
 
-GAME( 1991, lemmings, 0, lemmings, lemmings, driver_device, 0, ROT0, "Data East USA", "Lemmings (US prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, lemmings, 0, lemmings, lemmings, lemmings_state, 0, ROT0, "Data East USA", "Lemmings (US prototype)", MACHINE_SUPPORTS_SAVE )

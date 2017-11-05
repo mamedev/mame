@@ -3,7 +3,7 @@
 #include "machine/c117.h"
 #include "sound/dac.h"
 #include "sound/namco.h"
-#include "video/c116.h"
+#include "video/namco_c116.h"
 
 class namcos1_state : public driver_device
 {
@@ -16,7 +16,8 @@ public:
 		m_mcu(*this, "mcu"),
 		m_c116(*this, "c116"),
 		m_c117(*this, "c117"),
-		m_dac(*this, "dac"),
+		m_dac0(*this, "dac0"),
+		m_dac1(*this, "dac1"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_videoram(*this, "videoram"),
@@ -34,25 +35,22 @@ public:
 	required_device<cpu_device> m_mcu;
 	required_device<namco_c116_device> m_c116;
 	required_device<namco_c117_device> m_c117;
-	required_device<dac_device> m_dac;
+	required_device<dac_8bit_r2r_device> m_dac0;
+	required_device<dac_8bit_r2r_device> m_dac1;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_spriteram;
-	required_shared_ptr<UINT8> m_playfield_control;
-	required_shared_ptr<UINT8> m_triram;
-	required_region_ptr<UINT8> m_rom;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<uint8_t> m_playfield_control;
+	required_shared_ptr<uint8_t> m_triram;
+	required_region_ptr<uint8_t> m_rom;
 
 	required_memory_bank m_soundbank;
 	required_memory_bank m_mcubank;
 
 	required_ioport m_io_dipsw;
 
-	int m_dac0_value;
-	int m_dac1_value;
-	int m_dac0_gain;
-	int m_dac1_gain;
 	int m_key_id;
 	int m_key_reg;
 	int m_key_rng;
@@ -63,7 +61,7 @@ public:
 	unsigned int m_key_quotient;
 	unsigned int m_key_reminder;
 	unsigned int m_key_numerator_high_word;
-	UINT8 m_key[8];
+	uint8_t m_key[8];
 	int m_mcu_patch_data;
 	int m_reset;
 	int m_input_count;
@@ -71,17 +69,15 @@ public:
 	int m_strobe_count;
 	int m_stored_input[2];
 	tilemap_t *m_bg_tilemap[6];
-	UINT8 *m_tilemap_maskdata;
+	uint8_t *m_tilemap_maskdata;
 	int m_copy_sprites;
-	UINT8 m_drawmode_table[16];
+	uint8_t m_drawmode_table[16];
 
 	DECLARE_WRITE_LINE_MEMBER(subres_w);
 	DECLARE_WRITE8_MEMBER(irq_ack_w);
 	DECLARE_READ8_MEMBER(dsw_r);
 	DECLARE_WRITE8_MEMBER(coin_w);
 	DECLARE_WRITE8_MEMBER(dac_gain_w);
-	DECLARE_WRITE8_MEMBER(dac0_w);
-	DECLARE_WRITE8_MEMBER(dac1_w);
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(mcu_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(mcu_patch_w);
@@ -136,11 +132,9 @@ public:
 	TILE_GET_INFO_MEMBER(fg_get_info5);
 
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof(screen_device &screen, bool state);
-	void update_DACs();
-	void init_DACs();
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 
 private:
-	inline void get_tile_info(tile_data &tileinfo,int tile_index,UINT8 *info_vram);
+	inline void get_tile_info(tile_data &tileinfo,int tile_index,uint8_t *info_vram);
 };

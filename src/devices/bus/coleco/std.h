@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_COLECO_STD_H
+#define MAME_BUS_COLECO_STD_H
 
-#ifndef __COLECOVISION_STANDARD_CARTRIDGE__
-#define __COLECOVISION_STANDARD_CARTRIDGE__
+#pragma once
 
 #include "exp.h"
 
@@ -26,19 +26,19 @@ class colecovision_standard_cartridge_device : public device_t,
 {
 public:
 	// construction/destruction
-	colecovision_standard_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	colecovision_standard_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 
 	// device_colecovision_expansion_card_interface overrides
-	virtual UINT8 bd_r(address_space &space, offs_t offset, UINT8 data, int _8000, int _a000, int _c000, int _e000) override;
+	virtual uint8_t bd_r(address_space &space, offs_t offset, uint8_t data, int _8000, int _a000, int _c000, int _e000) override;
 };
 
 
 // device type definition
-extern const device_type COLECOVISION_STANDARD;
+DECLARE_DEVICE_TYPE(COLECOVISION_STANDARD, colecovision_standard_cartridge_device)
 
 
-#endif
+#endif // MAME_BUS_COLECO_STD_H

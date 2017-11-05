@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert, R. Belmont
-#ifndef _watchdog_h_
-#define _watchdog_h_
+#ifndef MAME_OSD_WATCHDOG_H
+#define MAME_OSD_WATCHDOG_H
+#pragma once
+
 //============================================================
 //
 //  watchdog.h - watchdog handling
@@ -11,26 +13,34 @@
 //============================================================
 
 #include "osdsync.h"
+
 #include <atomic>
+#include <cstdint>
+#include <memory>
 #include <thread>
+
 
 class osd_watchdog
 {
 public:
-	osd_watchdog(void);
-	~osd_watchdog(void);
+	osd_watchdog();
+	~osd_watchdog();
 
-	void reset() { m_event.set(); }
-
-	osd_event &     event(void) { return m_event; }
-	INT32           do_exit(void) const { return m_do_exit; }
 	osd_ticks_t     getTimeout(void) const { return m_timeout; }
 	void            setTimeout(int timeout);
-private:
-	osd_event       m_event;
-	std::thread*    m_thread;
-	std::atomic<INT32>  m_do_exit;
 
-	osd_ticks_t     m_timeout;
+	void            reset() { m_event.set(); }
+
+private:
+	static void *watchdog_thread(void *param);
+
+	void clear_event() { m_event.reset(); }
+	bool wait() { return m_event.wait(getTimeout()); }
+	bool do_exit(void) const { return m_do_exit != 0; }
+
+	osd_ticks_t                     m_timeout;
+	osd_event                       m_event;
+	std::atomic<std::int32_t>       m_do_exit;
+	std::unique_ptr<std::thread>    m_thread;
 };
-#endif
+#endif // MAME_OSD_WATCHDOG_H

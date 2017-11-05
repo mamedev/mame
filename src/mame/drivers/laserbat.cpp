@@ -77,13 +77,14 @@
 */
 
 #include "emu.h"
-
 #include "includes/laserbat.h"
 
 #include "cpu/m6800/m6800.h"
 #include "cpu/s2650/s2650.h"
 
 #include "machine/clock.h"
+
+#include "speaker.h"
 
 
 WRITE8_MEMBER(laserbat_state_base::ct_io_w)
@@ -136,8 +137,7 @@ WRITE8_MEMBER(laserbat_state_base::ct_io_w)
 
 READ8_MEMBER(laserbat_state_base::rrowx_r)
 {
-	ioport_port *const mux_ports[] = { m_row0, m_row1, m_sw1, m_sw2 };
-	return (m_mpx_p_1_2 ? m_row2 : mux_ports[m_input_mux])->read();
+	return (m_mpx_p_1_2 ? m_row2 : m_mux_ports[m_input_mux])->read();
 }
 
 /*
@@ -192,8 +192,6 @@ static ADDRESS_MAP_START( laserbat_io_map, AS_IO, 8, laserbat_state_base )
 	AM_RANGE(0x05, 0x05)                    AM_WRITE(wcov_w)
 	AM_RANGE(0x06, 0x06)                    AM_WRITE(ct_io_w)
 	AM_RANGE(0x07, 0x07)                    AM_WRITE(csound2_w)
-
-	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("SENSE")
 ADDRESS_MAP_END
 
 
@@ -278,9 +276,6 @@ static INPUT_PORTS_START( laserbat_base )
 	PORT_DIPNAME( 0x80, 0x80, "Coin C" )                PORT_DIPLOCATION("SW-2:8")
 	PORT_DIPSETTING(    0x00, DEF_STR(2C_1C) )
 	PORT_DIPSETTING(    0x80, DEF_STR(1C_1C) )
-
-	PORT_START("SENSE")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 INPUT_PORTS_END
 
 
@@ -461,18 +456,19 @@ void laserbat_state_base::device_timer(emu_timer &timer, device_timer_id id, int
 		video_line(ptr, param);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in laserbat_state_base::device_timer");
+		assert_always(false, "Unknown id in laserbat_state_base::device_timer");
 	}
 }
 
 
-static MACHINE_CONFIG_START( laserbat_base, laserbat_state_base )
+static MACHINE_CONFIG_START( laserbat_base )
 
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", S2650, XTAL_14_31818MHz/4)
 	MCFG_CPU_PROGRAM_MAP(laserbat_map)
 	MCFG_CPU_IO_MAP(laserbat_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", laserbat_state_base, laserbat_interrupt)
+	MCFG_S2650_SENSE_INPUT(DEVREADLINE("screen", screen_device, vblank))
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -498,14 +494,14 @@ static MACHINE_CONFIG_START( laserbat_base, laserbat_state_base )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED_CLASS( laserbat, laserbat_base, laserbat_state )
+static MACHINE_CONFIG_DERIVED( laserbat, laserbat_base )
 
 	// video hardware
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(laserbat_state, laserbat)
 
 	// sound board devices
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_SOUND_ADD("csg", SN76477, 0) // audio output not used
 	MCFG_SN76477_NOISE_PARAMS(RES_K(47), RES_K(270), CAP_P(1000)) // R21, switchable R30/R23/R24/R25/R29/R28/R27/R26, C21
@@ -523,23 +519,23 @@ static MACHINE_CONFIG_DERIVED_CLASS( laserbat, laserbat_base, laserbat_state )
 	MCFG_SN76477_ENABLE(0)                          // AB SOUND
 
 	MCFG_TMS3615_ADD("synth_low", XTAL_4MHz/16/2) // from the other one's /2 clock output
-	MCFG_SOUND_ROUTE(TMS3615_FOOTAGE_8, "mono", 1.0)
+	MCFG_SOUND_ROUTE(tms3615_device::FOOTAGE_8, "speaker", 1.0)
 
 	MCFG_TMS3615_ADD("synth_high", XTAL_4MHz/16) // 4MHz divided down with a 74LS161
-	MCFG_SOUND_ROUTE(TMS3615_FOOTAGE_8, "mono", 1.0)
+	MCFG_SOUND_ROUTE(tms3615_device::FOOTAGE_8, "speaker", 1.0)
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED_CLASS( catnmous, laserbat_base, catnmous_state )
+static MACHINE_CONFIG_DERIVED( catnmous, laserbat_base )
 
 	// video hardware
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(catnmous_state, catnmous)
 
 	// sound board devices
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_ZACCARIA_1B11107("audiopcb")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("audiopcb", ZACCARIA_1B11107, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 MACHINE_CONFIG_END
 
@@ -728,7 +724,7 @@ ROM_START( catnmousa )
 ROM_END
 
 
-GAME( 1981, laserbat,  0,        laserbat, laserbat, laserbat_state_base, laserbat, ROT0,  "Zaccaria", "Laser Battle",                    MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, lazarian,  laserbat, laserbat, lazarian, laserbat_state_base, laserbat, ROT0,  "Zaccaria (Bally Midway license)", "Lazarian", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, catnmous,  0,        catnmous, catnmous, laserbat_state_base, laserbat, ROT90, "Zaccaria", "Cat and Mouse (set 1)",           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, catnmousa, catnmous, catnmous, catnmous, laserbat_state_base, laserbat, ROT90, "Zaccaria", "Cat and Mouse (set 2)",           MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, laserbat,  0,        laserbat, laserbat, laserbat_state, laserbat, ROT0,  "Zaccaria", "Laser Battle",                    MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, lazarian,  laserbat, laserbat, lazarian, laserbat_state, laserbat, ROT0,  "Zaccaria (Bally Midway license)", "Lazarian", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, catnmous,  0,        catnmous, catnmous, catnmous_state, laserbat, ROT90, "Zaccaria", "Cat and Mouse (set 1)",           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, catnmousa, catnmous, catnmous, catnmous, catnmous_state, laserbat, ROT90, "Zaccaria", "Cat and Mouse (set 2)",           MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

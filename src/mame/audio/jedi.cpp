@@ -9,10 +9,11 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/jedi.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/tms5220.h"
 #include "sound/pokey.h"
-#include "includes/jedi.h"
+#include "speaker.h"
 
 
 
@@ -69,9 +70,9 @@ WRITE8_MEMBER(jedi_state::irq_ack_w)
  *
  *************************************/
 
-WRITE8_MEMBER(jedi_state::jedi_audio_reset_w)
+WRITE_LINE_MEMBER(jedi_state::audio_reset_w)
 {
-	m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_RESET, state ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -189,7 +190,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-MACHINE_CONFIG_FRAGMENT( jedi_audio )
+MACHINE_CONFIG_START( jedi_audio )
 
 	MCFG_CPU_ADD("audiocpu", M6502, JEDI_AUDIO_CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(audio_map)

@@ -59,10 +59,14 @@ chdman createhd -o ST125N.chd -chs 41921,1,1 -ss 512
 
 */
 
+#include "emu.h"
+#include <functional>
+
+#include "includes/rmnimbus.h"
 #include "debugger.h"
 #include "debug/debugcon.h"
+#include "debug/debugcpu.h"
 #include "imagedev/flopdrv.h"
-#include "includes/rmnimbus.h"
 
 
 
@@ -90,13 +94,13 @@ chdman createhd -o ST125N.chd -chs 41921,1,1 -ss 512
 
 /* 8031/8051 Peripheral controller */
 
-#define IPC_OUT_ADDR        0X01
-#define IPC_OUT_READ_PEND   0X02
-#define IPC_OUT_BYTE_AVAIL  0X04
+#define IPC_OUT_ADDR        0x01
+#define IPC_OUT_READ_PEND   0x02
+#define IPC_OUT_BYTE_AVAIL  0x04
 
-#define IPC_IN_ADDR         0X01
-#define IPC_IN_BYTE_AVAIL   0X02
-#define IPC_IN_READ_PEND    0X04
+#define IPC_IN_ADDR         0x01
+#define IPC_IN_BYTE_AVAIL   0x02
+#define IPC_IN_READ_PEND    0x04
 
 /* IO unit */
 
@@ -141,50 +145,48 @@ enum
 
 struct t_area_params
 {
-	UINT16  ofs_brush;
-	UINT16  seg_brush;
-	UINT16  ofs_data;
-	UINT16  seg_data;
-	UINT16  count;
+	uint16_t  ofs_brush;
+	uint16_t  seg_brush;
+	uint16_t  ofs_data;
+	uint16_t  seg_data;
+	uint16_t  count;
 };
 
 struct t_plot_string_params
 {
-	UINT16  ofs_font;
-	UINT16  seg_font;
-	UINT16  ofs_data;
-	UINT16  seg_data;
-	UINT16  x;
-	UINT16  y;
-	UINT16  length;
+	uint16_t  ofs_font;
+	uint16_t  seg_font;
+	uint16_t  ofs_data;
+	uint16_t  seg_data;
+	uint16_t  x;
+	uint16_t  y;
+	uint16_t  length;
 };
 
 struct t_nimbus_brush
 {
-	UINT16  style;
-	UINT16  style_index;
-	UINT16  colour1;
-	UINT16  colour2;
-	UINT16  transparency;
-	UINT16  boundary_spec;
-	UINT16  boundary_colour;
-	UINT16  save_colour;
+	uint16_t  style;
+	uint16_t  style_index;
+	uint16_t  colour1;
+	uint16_t  colour2;
+	uint16_t  transparency;
+	uint16_t  boundary_spec;
+	uint16_t  boundary_colour;
+	uint16_t  save_colour;
 };
 
 
-static void nimbus_debug(running_machine &machine, int ref, int params, const char *param[]);
-
 static int instruction_hook(device_t &device, offs_t curpc);
-static void decode_subbios(device_t *device,offs_t pc, UINT8 raw_flag);
+static void decode_subbios(device_t *device,offs_t pc, uint8_t raw_flag);
 static void decode_dos21(device_t *device,offs_t pc);
-static void decode_dssi_generic(device_t *device,UINT16  ds, UINT16 si, UINT8 raw_flag);
-static void decode_dssi_f_fill_area(device_t *device,UINT16  ds, UINT16 si, UINT8 raw_flag);
-static void decode_dssi_f_plot_character_string(device_t *device,UINT16  ds, UINT16 si, UINT8 raw_flag);
-static void decode_dssi_f_set_new_clt(device_t *device,UINT16  ds, UINT16 si, UINT8 raw_flag);
-static void decode_dssi_f_plonk_char(device_t *device,UINT16  ds, UINT16 si, UINT8 raw_flag);
-static void decode_dssi_f_rw_sectors(device_t *device,UINT16  ds, UINT16 si, UINT8 raw_flag);
+static void decode_dssi_generic(device_t *device,uint16_t  ds, uint16_t si, uint8_t raw_flag);
+static void decode_dssi_f_fill_area(device_t *device,uint16_t  ds, uint16_t si, uint8_t raw_flag);
+static void decode_dssi_f_plot_character_string(device_t *device,uint16_t  ds, uint16_t si, uint8_t raw_flag);
+static void decode_dssi_f_set_new_clt(device_t *device,uint16_t  ds, uint16_t si, uint8_t raw_flag);
+static void decode_dssi_f_plonk_char(device_t *device,uint16_t  ds, uint16_t si, uint8_t raw_flag);
+static void decode_dssi_f_rw_sectors(device_t *device,uint16_t  ds, uint16_t si, uint8_t raw_flag);
 
-void rmnimbus_state::external_int(UINT8 vector, bool state)
+void rmnimbus_state::external_int(uint8_t vector, bool state)
 {
 	if(!state && (vector != m_vector))
 		return;
@@ -229,7 +231,8 @@ void rmnimbus_state::machine_start()
 	/* setup debug commands */
 	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
 	{
-		debug_console_register_command(machine(), "nimbus_debug", CMDFLAG_NONE, 0, 0, 1, nimbus_debug);
+		using namespace std::placeholders;
+		machine().debugger().console().register_command("nimbus_debug", CMDFLAG_NONE, 0, 0, 1, std::bind(&rmnimbus_state::debug_command, this, _1, _2));
 
 		/* set up the instruction hook */
 		m_maincpu->debug()->set_instruction_hook(instruction_hook);
@@ -239,18 +242,18 @@ void rmnimbus_state::machine_start()
 	m_fdc->dden_w(0);
 }
 
-static void nimbus_debug(running_machine &machine, int ref, int params, const char *param[])
+void rmnimbus_state::debug_command(int ref, const std::vector<std::string> &params)
 {
-	rmnimbus_state *state = machine.driver_data<rmnimbus_state>();
-	if(params>0)
+	if (params.size() > 0)
 	{
 		int temp;
-		sscanf(param[0],"%d",&temp); state->m_debug_machine = temp;
+		sscanf(params[0].c_str(), "%d", &temp);
+		m_debug_machine = temp;
 	}
 	else
 	{
-		debug_console_printf(machine,"Error usage : nimbus_debug <debuglevel>\n");
-		debug_console_printf(machine,"Current debuglevel=%02X\n",state->m_debug_machine);
+		machine().debugger().console().printf("Error usage : nimbus_debug <debuglevel>\n");
+		machine().debugger().console().printf("Current debuglevel=%02X\n", m_debug_machine);
 	}
 }
 
@@ -262,9 +265,9 @@ static int instruction_hook(device_t &device, offs_t curpc)
 {
 	rmnimbus_state  *state = device.machine().driver_data<rmnimbus_state>();
 	address_space   &space = device.memory().space(AS_PROGRAM);
-	UINT8           *addr_ptr;
+	uint8_t           *addr_ptr;
 
-	addr_ptr = (UINT8*)space.get_read_ptr(curpc);
+	addr_ptr = (uint8_t*)space.get_read_ptr(curpc);
 
 	if ((addr_ptr !=nullptr) && (addr_ptr[0]==0xCD))
 	{
@@ -287,21 +290,21 @@ static int instruction_hook(device_t &device, offs_t curpc)
 #define set_drv(drv_name)       sprintf(drv_str,drv_name)
 #define set_func(func_name)     sprintf(func_str,func_name)
 
-static void decode_subbios(device_t *device,offs_t pc, UINT8 raw_flag)
+static void decode_subbios(device_t *device,offs_t pc, uint8_t raw_flag)
 {
 	char    type_str[80];
 	char    drv_str[80];
 	char    func_str[80];
 
-	void (*dump_dssi)(device_t *,UINT16, UINT16 ,UINT8) = nullptr;
+	void (*dump_dssi)(device_t *,uint16_t, uint16_t ,uint8_t) = nullptr;
 
 	device_t *cpu = device->machine().device(MAINCPU_TAG);
 
-	UINT16  ax = cpu->state().state_int(I8086_AX);
-	UINT16  bx = cpu->state().state_int(I8086_BX);
-	UINT16  cx = cpu->state().state_int(I8086_CX);
-	UINT16  ds = cpu->state().state_int(I8086_DS);
-	UINT16  si = cpu->state().state_int(I8086_SI);
+	uint16_t  ax = cpu->state().state_int(I8086_AX);
+	uint16_t  bx = cpu->state().state_int(I8086_BX);
+	uint16_t  cx = cpu->state().state_int(I8086_CX);
+	uint16_t  ds = cpu->state().state_int(I8086_DS);
+	uint16_t  si = cpu->state().state_int(I8086_SI);
 
 	// *** TEMP Don't show f_enquire_display_line calls !
 	if((cx==6) && (ax==43))
@@ -627,7 +630,7 @@ static void decode_subbios(device_t *device,offs_t pc, UINT8 raw_flag)
 	}
 }
 
-static inline void *get_dssi_ptr(address_space &space, UINT16   ds, UINT16 si)
+static inline void *get_dssi_ptr(address_space &space, uint16_t   ds, uint16_t si)
 {
 	int             addr;
 
@@ -637,17 +640,17 @@ static inline void *get_dssi_ptr(address_space &space, UINT16   ds, UINT16 si)
 	return space.get_read_ptr(addr);
 }
 
-static void decode_dssi_generic(device_t *device,UINT16  ds, UINT16 si, UINT8 raw_flag)
+static void decode_dssi_generic(device_t *device,uint16_t  ds, uint16_t si, uint8_t raw_flag)
 {
 	rmnimbus_state  *state = device->machine().driver_data<rmnimbus_state>();
 	address_space &space = state->m_maincpu->space(AS_PROGRAM);
-	UINT16  *params;
+	uint16_t  *params;
 	int     count;
 
 	if(raw_flag)
 		return;
 
-	params=(UINT16  *)get_dssi_ptr(space,ds,si);
+	params=(uint16_t  *)get_dssi_ptr(space,ds,si);
 
 	for(count=0; count<10; count++)
 		device->logerror("%04X ",params[count]);
@@ -656,12 +659,12 @@ static void decode_dssi_generic(device_t *device,UINT16  ds, UINT16 si, UINT8 ra
 }
 
 
-static void decode_dssi_f_fill_area(device_t *device,UINT16  ds, UINT16 si, UINT8 raw_flag)
+static void decode_dssi_f_fill_area(device_t *device,uint16_t  ds, uint16_t si, uint8_t raw_flag)
 {
 	rmnimbus_state  *state = device->machine().driver_data<rmnimbus_state>();
 	address_space &space = state->m_maincpu->space(AS_PROGRAM);
 
-	UINT16          *addr_ptr;
+	uint16_t          *addr_ptr;
 	t_area_params   *area_params;
 	t_nimbus_brush  *brush;
 	int             cocount;
@@ -685,14 +688,14 @@ static void decode_dssi_f_fill_area(device_t *device,UINT16  ds, UINT16 si, UINT
 		device->logerror("Brush params\n");
 		device->logerror("Style=%04X,          StyleIndex=%04X\n",brush->style,brush->style_index);
 		device->logerror("Colour1=%04X,        Colour2=%04X\n",brush->colour1,brush->colour2);
-		device->logerror("transparency=%04X,   boundry_spec=%04X\n",brush->transparency,brush->boundary_spec);
-		device->logerror("boundry colour=%04X, save colour=%04X\n",brush->boundary_colour,brush->save_colour);
+		device->logerror("transparency=%04X,   boundary_spec=%04X\n",brush->transparency,brush->boundary_spec);
+		device->logerror("boundary colour=%04X, save colour=%04X\n",brush->boundary_colour,brush->save_colour);
 
 
 		OUTPUT_SEGOFS("SegData:OfsData",area_params->seg_data,area_params->ofs_data);
 	}
 
-	addr_ptr = (UINT16 *)space.get_read_ptr(LINEAR_ADDR(area_params->seg_data,area_params->ofs_data));
+	addr_ptr = (uint16_t *)space.get_read_ptr(LINEAR_ADDR(area_params->seg_data,area_params->ofs_data));
 	for(cocount=0; cocount < area_params->count; cocount++)
 	{
 		if(raw_flag)
@@ -710,12 +713,12 @@ static void decode_dssi_f_fill_area(device_t *device,UINT16  ds, UINT16 si, UINT
 		device->logerror("\n");
 }
 
-static void decode_dssi_f_plot_character_string(device_t *device,UINT16  ds, UINT16 si, UINT8 raw_flag)
+static void decode_dssi_f_plot_character_string(device_t *device,uint16_t  ds, uint16_t si, uint8_t raw_flag)
 {
 	rmnimbus_state  *state = device->machine().driver_data<rmnimbus_state>();
 	address_space &space = state->m_maincpu->space(AS_PROGRAM);
 
-	UINT8                   *char_ptr;
+	uint8_t                   *char_ptr;
 	t_plot_string_params    *plot_string_params;
 	int                     charno;
 
@@ -729,7 +732,7 @@ static void decode_dssi_f_plot_character_string(device_t *device,UINT16  ds, UIN
 
 	device->logerror("x=%d, y=%d, length=%d\n",plot_string_params->x,plot_string_params->y,plot_string_params->length);
 
-	char_ptr=(UINT8*)space.get_read_ptr(LINEAR_ADDR(plot_string_params->seg_data,plot_string_params->ofs_data));
+	char_ptr=(uint8_t*)space.get_read_ptr(LINEAR_ADDR(plot_string_params->seg_data,plot_string_params->ofs_data));
 
 	if (plot_string_params->length==0xFFFF)
 		device->logerror("%s",char_ptr);
@@ -740,13 +743,13 @@ static void decode_dssi_f_plot_character_string(device_t *device,UINT16  ds, UIN
 	device->logerror("\n");
 }
 
-static void decode_dssi_f_set_new_clt(device_t *device,UINT16  ds, UINT16 si, UINT8 raw_flag)
+static void decode_dssi_f_set_new_clt(device_t *device,uint16_t  ds, uint16_t si, uint8_t raw_flag)
 {
 	rmnimbus_state  *state = device->machine().driver_data<rmnimbus_state>();
 	address_space &space = state->m_maincpu->space(AS_PROGRAM);
-	UINT16  *new_colours;
+	uint16_t  *new_colours;
 	int     colour;
-	new_colours=(UINT16  *)get_dssi_ptr(space,ds,si);
+	new_colours=(uint16_t  *)get_dssi_ptr(space,ds,si);
 
 	if(raw_flag)
 		return;
@@ -758,12 +761,12 @@ static void decode_dssi_f_set_new_clt(device_t *device,UINT16  ds, UINT16 si, UI
 
 }
 
-static void decode_dssi_f_plonk_char(device_t *device,UINT16  ds, UINT16 si, UINT8 raw_flag)
+static void decode_dssi_f_plonk_char(device_t *device,uint16_t  ds, uint16_t si, uint8_t raw_flag)
 {
 	rmnimbus_state  *state = device->machine().driver_data<rmnimbus_state>();
 	address_space &space = state->m_maincpu->space(AS_PROGRAM);
-	UINT16  *params;
-	params=(UINT16  *)get_dssi_ptr(space,ds,si);
+	uint16_t  *params;
+	params=(uint16_t  *)get_dssi_ptr(space,ds,si);
 
 	if(raw_flag)
 		return;
@@ -773,17 +776,17 @@ static void decode_dssi_f_plonk_char(device_t *device,UINT16  ds, UINT16 si, UIN
 	device->logerror("plonked_char=%c\n",params[0]);
 }
 
-static void decode_dssi_f_rw_sectors(device_t *device,UINT16  ds, UINT16 si, UINT8 raw_flag)
+static void decode_dssi_f_rw_sectors(device_t *device,uint16_t  ds, uint16_t si, uint8_t raw_flag)
 {
 	rmnimbus_state  *state = device->machine().driver_data<rmnimbus_state>();
 	address_space &space = state->m_maincpu->space(AS_PROGRAM);
-	UINT16  *params;
+	uint16_t  *params;
 	int     param_no;
 
 	if(raw_flag)
 		return;
 
-	params=(UINT16  *)get_dssi_ptr(space,ds,si);
+	params=(uint16_t  *)get_dssi_ptr(space,ds,si);
 
 	for(param_no=0;param_no<16;param_no++)
 		device->logerror("%04X ",params[param_no]);
@@ -795,18 +798,18 @@ static void decode_dos21(device_t *device,offs_t pc)
 {
 	device_t *cpu = device->machine().device(MAINCPU_TAG);
 
-	UINT16  ax = cpu->state().state_int(I8086_AX);
-	UINT16  bx = cpu->state().state_int(I8086_BX);
-	UINT16  cx = cpu->state().state_int(I8086_CX);
-	UINT16  dx = cpu->state().state_int(I8086_DX);
-	UINT16  cs = cpu->state().state_int(I8086_CS);
-	UINT16  ds = cpu->state().state_int(I8086_DS);
-	UINT16  es = cpu->state().state_int(I8086_ES);
-	UINT16  ss = cpu->state().state_int(I8086_SS);
+	uint16_t  ax = cpu->state().state_int(I8086_AX);
+	uint16_t  bx = cpu->state().state_int(I8086_BX);
+	uint16_t  cx = cpu->state().state_int(I8086_CX);
+	uint16_t  dx = cpu->state().state_int(I8086_DX);
+	uint16_t  cs = cpu->state().state_int(I8086_CS);
+	uint16_t  ds = cpu->state().state_int(I8086_DS);
+	uint16_t  es = cpu->state().state_int(I8086_ES);
+	uint16_t  ss = cpu->state().state_int(I8086_SS);
 
-	UINT16  si = cpu->state().state_int(I8086_SI);
-	UINT16  di = cpu->state().state_int(I8086_DI);
-	UINT16  bp = cpu->state().state_int(I8086_BP);
+	uint16_t  si = cpu->state().state_int(I8086_SI);
+	uint16_t  di = cpu->state().state_int(I8086_DI);
+	uint16_t  bp = cpu->state().state_int(I8086_BP);
 
 	device->logerror("=======================================================================\n");
 	device->logerror("DOS Int 0x21 call at %05X\n",pc);
@@ -913,13 +916,13 @@ void rmnimbus_state::nimbus_bank_memory()
 	int     ramblock = 0;
 	int     blockno;
 	char    bank[10];
-	UINT8   *ram    = &m_ram->pointer()[0];
-	UINT8   *map_blocks[3];
-	UINT8   *map_base;
+	uint8_t   *ram    = &m_ram->pointer()[0];
+	uint8_t   *map_blocks[3];
+	uint8_t   *map_base;
 	int     map_blockno;
 	int     block_ofs;
 
-	UINT8   ramsel = (m_mcu_reg080 & 0x1F);
+	uint8_t   ramsel = (m_mcu_reg080 & 0x1F);
 
 	// Invalid ramsel, return.
 	if((ramsel & 0x07)!=0x07)
@@ -1037,7 +1040,7 @@ WRITE_LINE_MEMBER(rmnimbus_state::nimbus_fdc_drq_w)
 	m_maincpu->drq1_w(state && FDC_DRQ_ENABLED());
 }
 
-UINT8 rmnimbus_state::fdc_driveno(UINT8 drivesel)
+uint8_t rmnimbus_state::fdc_driveno(uint8_t drivesel)
 {
 	switch (drivesel)
 	{
@@ -1119,7 +1122,7 @@ READ8_MEMBER(rmnimbus_state::scsi_r)
 */
 WRITE8_MEMBER(rmnimbus_state::fdc_ctl_w)
 {
-	UINT8 reg400_old = m_nimbus_drives.reg400;
+	uint8_t reg400_old = m_nimbus_drives.reg400;
 	char drive[5];
 	floppy_image_device *floppy;
 
@@ -1270,7 +1273,7 @@ void rmnimbus_state::ipc_dumpregs()
 READ8_MEMBER(rmnimbus_state::nimbus_pc8031_r)
 {
 	int pc=space.device().safe_pc();
-	UINT8   result;
+	uint8_t   result;
 
 	switch(offset*2)
 	{
@@ -1320,7 +1323,7 @@ WRITE8_MEMBER(rmnimbus_state::nimbus_pc8031_w)
 READ8_MEMBER(rmnimbus_state::nimbus_pc8031_iou_r)
 {
 	int pc=space.device().safe_pc();
-	UINT8   result = 0;
+	uint8_t   result = 0;
 
 	switch (offset & 0x01)
 	{
@@ -1384,7 +1387,7 @@ WRITE8_MEMBER(rmnimbus_state::nimbus_pc8031_iou_w)
 READ8_MEMBER(rmnimbus_state::nimbus_pc8031_port_r)
 {
 	int pc=space.device().safe_pc();
-	UINT8   result = 0;
+	uint8_t   result = 0;
 
 	if(LOG_PC8031_PORT)
 		logerror("8031: PCPORTR %04X read of %04X returns %02X\n",pc,offset,result);
@@ -1433,7 +1436,7 @@ WRITE8_MEMBER(rmnimbus_state::nimbus_pc8031_port_w)
 READ8_MEMBER(rmnimbus_state::nimbus_iou_r)
 {
 	int pc=space.device().safe_pc();
-	UINT8   result=0;
+	uint8_t   result=0;
 
 	if(offset==0)
 	{
@@ -1484,7 +1487,7 @@ void rmnimbus_state::rmni_sound_reset()
 {
 	m_msm->reset_w(1);
 
-	m_last_playmode = MSM5205_S48_4B;
+	m_last_playmode = msm5205_device::S48_4B;
 	m_msm->playmode_w(m_last_playmode);
 
 	m_ay8910_a=0;
@@ -1537,12 +1540,12 @@ void rmnimbus_state::mouse_js_reset()
 
 void rmnimbus_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	UINT8   x = 0;
-	UINT8   y = 0;
+	uint8_t   x = 0;
+	uint8_t   y = 0;
 //  int     pc=m_maincpu->pc();
 
-	UINT8   intstate_x;
-	UINT8   intstate_y;
+	uint8_t   intstate_x;
+	uint8_t   intstate_y;
 	int     xint;
 	int     yint;
 
@@ -1550,10 +1553,10 @@ void rmnimbus_state::device_timer(emu_timer &timer, device_timer_id id, int para
 	x = m_io_mousex->read();
 	y = m_io_mousey->read();
 
-	UINT8   mxa;
-	UINT8   mxb;
-	UINT8   mya;
-	UINT8   myb;
+	uint8_t   mxa;
+	uint8_t   mxb;
+	uint8_t   mya;
+	uint8_t   myb;
 
 	//logerror("poll_mouse()\n");
 
@@ -1680,7 +1683,7 @@ READ8_MEMBER(rmnimbus_state::nimbus_mouse_js_r)
 	    7       ?? always reads 1
 
 	*/
-	UINT8 result;
+	uint8_t result;
 	//int pc=m_maincpu->_pc();
 
 	if (m_io_config->read() & 0x01)

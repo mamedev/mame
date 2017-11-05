@@ -26,7 +26,7 @@ Imagetek Inc 14220 071
 --
 Written by Hau
 03/29/2009
-based on driver from drivers/metro.c by Luca Elia
+based on driver from drivers/metro.cpp by Luca Elia
 spthx to kikur,Cha,teioh,kokkyu,teruchu,aya,sgo
 ---
 
@@ -37,11 +37,15 @@ fix comms so it boots, it's a bit of a hack for hyperduel at the moment ;-)
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
-#include "sound/2151intf.h"
-#include "sound/okim6295.h"
-#include "sound/2413intf.h"
 #include "includes/hyprduel.h"
+
+#include "cpu/m68000/m68000.h"
+#include "sound/okim6295.h"
+#include "sound/ym2151.h"
+#include "sound/ym2413.h"
+
+#include "speaker.h"
+
 
 /***************************************************************************
                                 Interrupts
@@ -59,7 +63,7 @@ TIMER_CALLBACK_MEMBER(hyprduel_state::vblank_end_callback)
 	m_requested_int &= ~param;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(hyprduel_state::hyprduel_interrupt)
+TIMER_DEVICE_CALLBACK_MEMBER(hyprduel_state::interrupt)
 {
 	int line = param;
 
@@ -69,7 +73,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(hyprduel_state::hyprduel_interrupt)
 		m_requested_int |= 0x20;
 		m_maincpu->set_input_line(2, HOLD_LINE);
 		/* the duration is a guess */
-		machine().scheduler().timer_set(attotime::from_usec(2500), timer_expired_delegate(FUNC(hyprduel_state::vblank_end_callback),this), 0x20);
+		m_vblank_end_timer->adjust(attotime::from_usec(2500), 0x20);
 	}
 	else
 		m_requested_int |= 0x12;        /* hsync */
@@ -77,12 +81,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(hyprduel_state::hyprduel_interrupt)
 	update_irq_state();
 }
 
-READ16_MEMBER(hyprduel_state::hyprduel_irq_cause_r)
+READ16_MEMBER(hyprduel_state::irq_cause_r)
 {
 	return m_requested_int;
 }
 
-WRITE16_MEMBER(hyprduel_state::hyprduel_irq_cause_w)
+WRITE16_MEMBER(hyprduel_state::irq_cause_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -96,7 +100,7 @@ WRITE16_MEMBER(hyprduel_state::hyprduel_irq_cause_w)
 }
 
 
-WRITE16_MEMBER(hyprduel_state::hyprduel_subcpu_control_w)
+WRITE16_MEMBER(hyprduel_state::subcpu_control_w)
 {
 	switch (data)
 	{
@@ -196,9 +200,9 @@ TIMER_CALLBACK_MEMBER(hyprduel_state::magerror_irq_callback)
     that the blitter can readily use (which is a form of compression)
 */
 
-READ16_MEMBER(hyprduel_state::hyprduel_bankedrom_r)
+READ16_MEMBER(hyprduel_state::bankedrom_r)
 {
-	UINT8 *ROM = memregion("gfx1")->base();
+	uint8_t *ROM = memregion("gfx1")->base();
 	size_t  len = memregion("gfx1")->bytes();
 
 	offset = offset * 2 + 0x10000 * (*m_rombank);
@@ -253,44 +257,44 @@ READ16_MEMBER(hyprduel_state::hyprduel_bankedrom_r)
 
 ***************************************************************************/
 
-TIMER_CALLBACK_MEMBER(hyprduel_state::hyprduel_blit_done)
+TIMER_CALLBACK_MEMBER(hyprduel_state::blit_done)
 {
 	m_requested_int |= 1 << m_blitter_bit;
 	update_irq_state();
 }
 
-inline int hyprduel_state::blt_read( const UINT8 *ROM, const int offs )
+inline int hyprduel_state::blt_read( const uint8_t *ROM, const int offs )
 {
 	return ROM[offs];
 }
 
-void hyprduel_state::blt_write( address_space &space, const int tmap, const offs_t offs, const UINT16 data, const UINT16 mask )
+void hyprduel_state::blt_write( address_space &space, const int tmap, const offs_t offs, const uint16_t data, const uint16_t mask )
 {
 	switch( tmap )
 	{
-		case 1: hyprduel_vram_0_w(space, offs,data,mask);   break;
-		case 2: hyprduel_vram_1_w(space, offs, data, mask); break;
-		case 3: hyprduel_vram_2_w(space, offs, data, mask); break;
+		case 1: vram_0_w(space, offs,data,mask);   break;
+		case 2: vram_1_w(space, offs, data, mask); break;
+		case 3: vram_2_w(space, offs, data, mask); break;
 	}
 //  logerror("%s : Blitter %X] %04X <- %04X & %04X\n", space.machine().describe_context(), tmap, offs, data, mask);
 }
 
 
-WRITE16_MEMBER(hyprduel_state::hyprduel_blitter_w)
+WRITE16_MEMBER(hyprduel_state::blitter_w)
 {
 	COMBINE_DATA(&m_blitter_regs[offset]);
 
 	if (offset == 0xc / 2)
 	{
-		UINT8 *src = memregion("gfx1")->base();
+		uint8_t *src = memregion("gfx1")->base();
 		size_t  src_len = memregion("gfx1")->bytes();
 
-		UINT32 tmap = (m_blitter_regs[0x00 / 2] << 16) + m_blitter_regs[0x02 / 2];
-		UINT32 src_offs = (m_blitter_regs[0x04 / 2] << 16) + m_blitter_regs[0x06 / 2];
-		UINT32 dst_offs = (m_blitter_regs[0x08 / 2] << 16) + m_blitter_regs[0x0a / 2];
+		uint32_t tmap = (m_blitter_regs[0x00 / 2] << 16) + m_blitter_regs[0x02 / 2];
+		uint32_t src_offs = (m_blitter_regs[0x04 / 2] << 16) + m_blitter_regs[0x06 / 2];
+		uint32_t dst_offs = (m_blitter_regs[0x08 / 2] << 16) + m_blitter_regs[0x0a / 2];
 
 		int shift = (dst_offs & 0x80) ? 0 : 8;
-		UINT16 mask = (dst_offs & 0x80) ? 0x00ff : 0xff00;
+		uint16_t mask = (dst_offs & 0x80) ? 0x00ff : 0xff00;
 
 //      logerror("CPU #0 PC %06X : Blitter regs %08X, %08X, %08X\n", space.device().safe_pc(), tmap, src_offs, dst_offs);
 
@@ -308,7 +312,7 @@ WRITE16_MEMBER(hyprduel_state::hyprduel_blitter_w)
 
 		while (1)
 		{
-			UINT16 b1, b2, count;
+			uint16_t b1, b2, count;
 
 			src_offs %= src_len;
 			b1 = blt_read(src, src_offs);
@@ -328,7 +332,7 @@ WRITE16_MEMBER(hyprduel_state::hyprduel_blitter_w)
 					   another blit. */
 					if (b1 == 0)
 					{
-						machine().scheduler().timer_set(attotime::from_usec(500), timer_expired_delegate(FUNC(hyprduel_state::hyprduel_blit_done),this));
+						m_blit_done_timer->adjust(attotime::from_usec(500));
 						return;
 					}
 
@@ -411,27 +415,27 @@ WRITE16_MEMBER(hyprduel_state::hyprduel_blitter_w)
 
 static ADDRESS_MAP_START( hyprduel_map, AS_PROGRAM, 16, hyprduel_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x400000, 0x41ffff) AM_RAM_WRITE(hyprduel_vram_0_w) AM_SHARE("vram_0")     /* Layer 0 */
-	AM_RANGE(0x420000, 0x43ffff) AM_RAM_WRITE(hyprduel_vram_1_w) AM_SHARE("vram_1")     /* Layer 1 */
-	AM_RANGE(0x440000, 0x45ffff) AM_RAM_WRITE(hyprduel_vram_2_w) AM_SHARE("vram_2")     /* Layer 2 */
-	AM_RANGE(0x460000, 0x46ffff) AM_READ(hyprduel_bankedrom_r)      /* Banked ROM */
-	AM_RANGE(0x470000, 0x473fff) AM_RAM_WRITE(hyprduel_paletteram_w) AM_SHARE("paletteram") /* Palette */
+	AM_RANGE(0x400000, 0x41ffff) AM_RAM_WRITE(vram_0_w) AM_SHARE("vram_0")     /* Layer 0 */
+	AM_RANGE(0x420000, 0x43ffff) AM_RAM_WRITE(vram_1_w) AM_SHARE("vram_1")     /* Layer 1 */
+	AM_RANGE(0x440000, 0x45ffff) AM_RAM_WRITE(vram_2_w) AM_SHARE("vram_2")     /* Layer 2 */
+	AM_RANGE(0x460000, 0x46ffff) AM_READ(bankedrom_r)      /* Banked ROM */
+	AM_RANGE(0x470000, 0x473fff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram") /* Palette */
 	AM_RANGE(0x474000, 0x474fff) AM_RAM AM_SHARE("spriteram")           /* Sprites */
 	AM_RANGE(0x475000, 0x477fff) AM_RAM         /* only used memory test */
 	AM_RANGE(0x478000, 0x4787ff) AM_RAM AM_SHARE("tiletable")   /* Tiles Set */
-	AM_RANGE(0x478840, 0x47884d) AM_WRITE(hyprduel_blitter_w) AM_SHARE("blitter_regs")  /* Tiles Blitter */
-	AM_RANGE(0x478860, 0x47886b) AM_WRITE(hyprduel_window_w) AM_SHARE("window")         /* Tilemap Window */
-	AM_RANGE(0x478870, 0x47887b) AM_RAM_WRITE(hyprduel_scrollreg_w) AM_SHARE("scroll")      /* Scroll Regs */
-	AM_RANGE(0x47887c, 0x47887d) AM_WRITE(hyprduel_scrollreg_init_w)
+	AM_RANGE(0x478840, 0x47884d) AM_WRITE(blitter_w) AM_SHARE("blitter_regs")  /* Tiles Blitter */
+	AM_RANGE(0x478860, 0x47886b) AM_WRITE(window_w) AM_SHARE("window")         /* Tilemap Window */
+	AM_RANGE(0x478870, 0x47887b) AM_RAM_WRITE(scrollreg_w) AM_SHARE("scroll")      /* Scroll Regs */
+	AM_RANGE(0x47887c, 0x47887d) AM_WRITE(scrollreg_init_w)
 	AM_RANGE(0x478880, 0x478881) AM_WRITENOP
 	AM_RANGE(0x478890, 0x478891) AM_WRITENOP
 	AM_RANGE(0x4788a0, 0x4788a1) AM_WRITENOP
-	AM_RANGE(0x4788a2, 0x4788a3) AM_READWRITE(hyprduel_irq_cause_r, hyprduel_irq_cause_w)   /* IRQ Cause,Acknowledge */
+	AM_RANGE(0x4788a2, 0x4788a3) AM_READWRITE(irq_cause_r, irq_cause_w)   /* IRQ Cause,Acknowledge */
 	AM_RANGE(0x4788a4, 0x4788a5) AM_RAM AM_SHARE("irq_enable")      /* IRQ Enable */
 	AM_RANGE(0x4788aa, 0x4788ab) AM_RAM AM_SHARE("rombank")     /* Rom Bank */
 	AM_RANGE(0x4788ac, 0x4788ad) AM_RAM AM_SHARE("screenctrl")  /* Screen Control */
 	AM_RANGE(0x479700, 0x479713) AM_RAM AM_SHARE("videoregs")   /* Video Registers */
-	AM_RANGE(0x800000, 0x800001) AM_WRITE(hyprduel_subcpu_control_w)
+	AM_RANGE(0x800000, 0x800001) AM_WRITE(subcpu_control_w)
 	AM_RANGE(0xc00000, 0xc07fff) AM_RAM AM_SHARE("sharedram1")
 	AM_RANGE(0xe00000, 0xe00001) AM_READ_PORT("SERVICE") AM_WRITENOP
 	AM_RANGE(0xe00002, 0xe00003) AM_READ_PORT("DSW")
@@ -457,23 +461,23 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( magerror_map, AS_PROGRAM, 16, hyprduel_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x400000, 0x400001) AM_WRITE(hyprduel_subcpu_control_w)
-	AM_RANGE(0x800000, 0x81ffff) AM_RAM_WRITE(hyprduel_vram_0_w) AM_SHARE("vram_0")     /* Layer 0 */
-	AM_RANGE(0x820000, 0x83ffff) AM_RAM_WRITE(hyprduel_vram_1_w) AM_SHARE("vram_1")     /* Layer 1 */
-	AM_RANGE(0x840000, 0x85ffff) AM_RAM_WRITE(hyprduel_vram_2_w) AM_SHARE("vram_2")     /* Layer 2 */
-	AM_RANGE(0x860000, 0x86ffff) AM_READ(hyprduel_bankedrom_r)      /* Banked ROM */
-	AM_RANGE(0x870000, 0x873fff) AM_RAM_WRITE(hyprduel_paletteram_w) AM_SHARE("paletteram") /* Palette */
+	AM_RANGE(0x400000, 0x400001) AM_WRITE(subcpu_control_w)
+	AM_RANGE(0x800000, 0x81ffff) AM_RAM_WRITE(vram_0_w) AM_SHARE("vram_0")     /* Layer 0 */
+	AM_RANGE(0x820000, 0x83ffff) AM_RAM_WRITE(vram_1_w) AM_SHARE("vram_1")     /* Layer 1 */
+	AM_RANGE(0x840000, 0x85ffff) AM_RAM_WRITE(vram_2_w) AM_SHARE("vram_2")     /* Layer 2 */
+	AM_RANGE(0x860000, 0x86ffff) AM_READ(bankedrom_r)      /* Banked ROM */
+	AM_RANGE(0x870000, 0x873fff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram") /* Palette */
 	AM_RANGE(0x874000, 0x874fff) AM_RAM AM_SHARE("spriteram")       /* Sprites */
 	AM_RANGE(0x875000, 0x877fff) AM_RAM         /* only used memory test */
 	AM_RANGE(0x878000, 0x8787ff) AM_RAM AM_SHARE("tiletable")   /* Tiles Set */
-	AM_RANGE(0x878840, 0x87884d) AM_WRITE(hyprduel_blitter_w) AM_SHARE("blitter_regs")  /* Tiles Blitter */
-	AM_RANGE(0x878860, 0x87886b) AM_WRITE(hyprduel_window_w) AM_SHARE("window")         /* Tilemap Window */
-	AM_RANGE(0x878870, 0x87887b) AM_RAM_WRITE(hyprduel_scrollreg_w) AM_SHARE("scroll")      /* Scroll Regs */
-	AM_RANGE(0x87887c, 0x87887d) AM_WRITE(hyprduel_scrollreg_init_w)
+	AM_RANGE(0x878840, 0x87884d) AM_WRITE(blitter_w) AM_SHARE("blitter_regs")  /* Tiles Blitter */
+	AM_RANGE(0x878860, 0x87886b) AM_WRITE(window_w) AM_SHARE("window")         /* Tilemap Window */
+	AM_RANGE(0x878870, 0x87887b) AM_RAM_WRITE(scrollreg_w) AM_SHARE("scroll")      /* Scroll Regs */
+	AM_RANGE(0x87887c, 0x87887d) AM_WRITE(scrollreg_init_w)
 	AM_RANGE(0x878880, 0x878881) AM_WRITENOP
 	AM_RANGE(0x878890, 0x878891) AM_WRITENOP
 	AM_RANGE(0x8788a0, 0x8788a1) AM_WRITENOP
-	AM_RANGE(0x8788a2, 0x8788a3) AM_READWRITE(hyprduel_irq_cause_r, hyprduel_irq_cause_w)   /* IRQ Cause, Acknowledge */
+	AM_RANGE(0x8788a2, 0x8788a3) AM_READWRITE(irq_cause_r, irq_cause_w)   /* IRQ Cause, Acknowledge */
 	AM_RANGE(0x8788a4, 0x8788a5) AM_RAM AM_SHARE("irq_enable")      /* IRQ Enable */
 	AM_RANGE(0x8788aa, 0x8788ab) AM_RAM AM_SHARE("rombank")     /* Rom Bank */
 	AM_RANGE(0x8788ac, 0x8788ad) AM_RAM AM_SHARE("screenctrl")  /* Screen Control */
@@ -634,6 +638,9 @@ MACHINE_START_MEMBER(hyprduel_state,hyprduel)
 	save_item(NAME(m_requested_int));
 	save_item(NAME(m_subcpu_resetline));
 	save_item(NAME(m_cpu_trigger));
+
+	m_blit_done_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hyprduel_state::blit_done), this));
+	m_vblank_end_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hyprduel_state::vblank_end_callback), this));
 }
 
 MACHINE_START_MEMBER(hyprduel_state,magerror)
@@ -642,12 +649,12 @@ MACHINE_START_MEMBER(hyprduel_state,magerror)
 	m_magerror_irq_timer->adjust(attotime::zero, 0, attotime::from_hz(968));        /* tempo? */
 }
 
-static MACHINE_CONFIG_START( hyprduel, hyprduel_state )
+static MACHINE_CONFIG_START( hyprduel )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,20000000/2)      /* 10MHz */
 	MCFG_CPU_PROGRAM_MAP(hyprduel_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", hyprduel_state, hyprduel_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", hyprduel_state, interrupt, "screen", 0, 1)
 
 	MCFG_CPU_ADD("sub", M68000,20000000/2)      /* 10MHz */
 	MCFG_CPU_PROGRAM_MAP(hyprduel_map2)
@@ -661,7 +668,7 @@ static MACHINE_CONFIG_START( hyprduel, hyprduel_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(320, 224)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, FIRST_VISIBLE_LINE, LAST_VISIBLE_LINE)
-	MCFG_SCREEN_UPDATE_DRIVER(hyprduel_state, screen_update_hyprduel)
+	MCFG_SCREEN_UPDATE_DRIVER(hyprduel_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 14220)
@@ -677,18 +684,18 @@ static MACHINE_CONFIG_START( hyprduel, hyprduel_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
 
-	MCFG_OKIM6295_ADD("oki", 4000000/16/16*132, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", 4000000/16/16*132, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.57)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.57)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( magerror, hyprduel_state )
+static MACHINE_CONFIG_START( magerror )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,20000000/2)      /* 10MHz */
 	MCFG_CPU_PROGRAM_MAP(magerror_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", hyprduel_state, hyprduel_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", hyprduel_state, interrupt, "screen", 0, 1)
 
 	MCFG_CPU_ADD("sub", M68000,20000000/2)      /* 10MHz */
 	MCFG_CPU_PROGRAM_MAP(magerror_map2)
@@ -702,7 +709,7 @@ static MACHINE_CONFIG_START( magerror, hyprduel_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(320, 224)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, FIRST_VISIBLE_LINE, LAST_VISIBLE_LINE)
-	MCFG_SCREEN_UPDATE_DRIVER(hyprduel_state, screen_update_hyprduel)
+	MCFG_SCREEN_UPDATE_DRIVER(hyprduel_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 14220)
@@ -717,7 +724,7 @@ static MACHINE_CONFIG_START( magerror, hyprduel_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.00)
 
-	MCFG_OKIM6295_ADD("oki", 4000000/16/16*132, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", 4000000/16/16*132, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.57)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.57)
 MACHINE_CONFIG_END

@@ -28,7 +28,7 @@ TILE_GET_INFO_MEMBER(mjkjidai_state::get_tile_info)
 
 void mjkjidai_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(mjkjidai_state::get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(mjkjidai_state::get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
 }
 
 
@@ -75,9 +75,9 @@ WRITE8_MEMBER(mjkjidai_state::mjkjidai_ctrl_w)
 
 void mjkjidai_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
-	UINT8 *spriteram = &m_videoram[0];
-	UINT8 *spriteram_2 = &m_videoram[0x800];
-	UINT8 *spriteram_3 = &m_videoram[0x1000];
+	uint8_t *spriteram = &m_videoram[0];
+	uint8_t *spriteram_2 = &m_videoram[0x800];
+	uint8_t *spriteram_3 = &m_videoram[0x1000];
 	int offs;
 
 	for (offs = 0x20-2;offs >= 0;offs -= 2)
@@ -114,7 +114,7 @@ void mjkjidai_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect
 
 
 
-UINT32 mjkjidai_state::screen_update_mjkjidai(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t mjkjidai_state::screen_update_mjkjidai(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if (!m_display_enable)
 		bitmap.fill(m_palette->black_pen(), cliprect);

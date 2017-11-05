@@ -4,8 +4,8 @@ function(glmCreateTestGTC NAME)
 		add_executable(${SAMPLE_NAME} ${NAME}.cpp)
 
 		add_test(
-		    NAME ${SAMPLE_NAME}
-		    COMMAND $<TARGET_FILE:${SAMPLE_NAME}> )
+			NAME ${SAMPLE_NAME}
+			COMMAND $<TARGET_FILE:${SAMPLE_NAME}> )
 	endif(GLM_TEST_ENABLE)
 endfunction()
 

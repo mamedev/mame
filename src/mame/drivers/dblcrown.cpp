@@ -47,8 +47,12 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
+#include "machine/i8255.h"
 #include "machine/nvram.h"
+#include "machine/timer.h"
 #include "machine/watchdog.h"
+#include "screen.h"
+#include "speaker.h"
 
 #include "dblcrown.lh"
 #define DEBUG_VRAM
@@ -71,17 +75,15 @@ public:
 	required_device<palette_device> m_palette;
 
 	// screen updates
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	UINT8 m_bank;
-	UINT8 m_irq_src;
-	std::unique_ptr<UINT8[]> m_pal_ram;
-	std::unique_ptr<UINT8[]> m_vram;
-	UINT8 m_vram_bank[2];
-	UINT8 m_mux_data;
-	UINT8 m_lamps_data;
+	uint8_t m_bank;
+	uint8_t m_irq_src;
+	std::unique_ptr<uint8_t[]> m_pal_ram;
+	std::unique_ptr<uint8_t[]> m_vram;
+	uint8_t m_vram_bank[2];
+	uint8_t m_mux_data;
 
-	DECLARE_READ8_MEMBER(bank_r);
 	DECLARE_WRITE8_MEMBER(bank_w);
 	DECLARE_READ8_MEMBER(irq_source_r);
 	DECLARE_WRITE8_MEMBER(irq_source_w);
@@ -91,12 +93,10 @@ public:
 	DECLARE_WRITE8_MEMBER(vram_w);
 	DECLARE_READ8_MEMBER(vram_bank_r);
 	DECLARE_WRITE8_MEMBER(vram_bank_w);
-	DECLARE_READ8_MEMBER(mux_r);
 	DECLARE_WRITE8_MEMBER(mux_w);
 	DECLARE_READ8_MEMBER(in_mux_r);
 	DECLARE_READ8_MEMBER(in_mux_type_r);
 	DECLARE_WRITE8_MEMBER(output_w);
-	DECLARE_READ8_MEMBER(lamps_r);
 	DECLARE_WRITE8_MEMBER(lamps_w);
 	DECLARE_WRITE8_MEMBER(watchdog_w);
 
@@ -113,13 +113,13 @@ protected:
 
 void dblcrown_state::video_start()
 {
-	m_pal_ram = std::make_unique<UINT8[]>(0x200 * 2);
-	m_vram = std::make_unique<UINT8[]>(0x1000 * 0x10);
+	m_pal_ram = std::make_unique<uint8_t[]>(0x200 * 2);
+	m_vram = std::make_unique<uint8_t[]>(0x1000 * 0x10);
 
 	save_pointer(NAME(m_vram.get()), 0x1000 * 0x10);
 }
 
-UINT32 dblcrown_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
+uint32_t dblcrown_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	gfx_element *gfx = m_gfxdecode->gfx(0);
 	gfx_element *gfx_2 = m_gfxdecode->gfx(1);
@@ -132,8 +132,8 @@ UINT32 dblcrown_state::screen_update( screen_device &screen, bitmap_ind16 &bitma
 	{
 		for (x = 0; x < 32; x++)
 		{
-			UINT16 tile = ((m_vram[count]) | (m_vram[count+1] << 8)) & 0xfff;
-			UINT8 col = (m_vram[count+1] >> 4);
+			uint16_t tile = ((m_vram[count]) | (m_vram[count+1] << 8)) & 0xfff;
+			uint8_t col = (m_vram[count+1] >> 4);
 
 			gfx_2->opaque(bitmap, cliprect, tile, col, 0, 0, x * 16, y * 16);
 
@@ -147,8 +147,8 @@ UINT32 dblcrown_state::screen_update( screen_device &screen, bitmap_ind16 &bitma
 	{
 		for (x = 0; x < 64; x++)
 		{
-			UINT16 tile = ((m_vram[count]) | (m_vram[count + 1] << 8)) & 0xfff;
-			UINT8 col = (m_vram[count + 1] >> 4); // ok?
+			uint16_t tile = ((m_vram[count]) | (m_vram[count + 1] << 8)) & 0xfff;
+			uint8_t col = (m_vram[count + 1] >> 4); // ok?
 
 			gfx->transpen(bitmap, cliprect, tile, col, 0, 0, x * 8, y * 8, 0);
 
@@ -157,11 +157,6 @@ UINT32 dblcrown_state::screen_update( screen_device &screen, bitmap_ind16 &bitma
 	}
 
 	return 0;
-}
-
-READ8_MEMBER( dblcrown_state::bank_r)
-{
-	return m_bank;
 }
 
 WRITE8_MEMBER( dblcrown_state::bank_w)
@@ -210,7 +205,7 @@ WRITE8_MEMBER( dblcrown_state::palette_w)
 
 READ8_MEMBER( dblcrown_state::vram_r)
 {
-	UINT32 hi_offs;
+	uint32_t hi_offs;
 	hi_offs = m_vram_bank[(offset & 0x1000) >> 12] << 12;
 
 	return m_vram[(offset & 0xfff) | hi_offs];
@@ -218,14 +213,14 @@ READ8_MEMBER( dblcrown_state::vram_r)
 
 WRITE8_MEMBER( dblcrown_state::vram_w)
 {
-	UINT32 hi_offs;
+	uint32_t hi_offs;
 	hi_offs = m_vram_bank[(offset & 0x1000) >> 12] << 12;
 
 	m_vram[(offset & 0xfff) | hi_offs] = data;
 
 	#ifdef DEBUG_VRAM
 	{
-		UINT8 *VRAM = memregion("vram")->base();
+		uint8_t *VRAM = memregion("vram")->base();
 
 		VRAM[(offset & 0xfff) | hi_offs] = data;
 		m_gfxdecode->gfx(0)->mark_dirty(((offset & 0xfff) | hi_offs) / 32);
@@ -246,11 +241,6 @@ WRITE8_MEMBER( dblcrown_state::vram_bank_w)
 		printf("vram bank = %02x\n",data);
 }
 
-READ8_MEMBER( dblcrown_state::mux_r)
-{
-	return m_mux_data;
-}
-
 WRITE8_MEMBER( dblcrown_state::mux_w)
 {
 	m_mux_data = data;
@@ -260,7 +250,7 @@ READ8_MEMBER( dblcrown_state::in_mux_r )
 {
 	const char *const muxnames[] = { "IN0", "IN1", "IN2", "IN3" };
 	int i;
-	UINT8 res;
+	uint8_t res;
 
 	res = 0;
 
@@ -277,7 +267,7 @@ READ8_MEMBER( dblcrown_state::in_mux_type_r )
 {
 	const char *const muxnames[] = { "IN0", "IN1", "IN2", "IN3" };
 	int i;
-	UINT8 res;
+	uint8_t res;
 
 	res = 0xff;
 
@@ -307,11 +297,6 @@ WRITE8_MEMBER( dblcrown_state::output_w )
 }
 
 
-READ8_MEMBER( dblcrown_state::lamps_r )
-{
-	return m_lamps_data;
-}
-
 WRITE8_MEMBER( dblcrown_state::lamps_w )
 {
 /*  bits
@@ -333,8 +318,6 @@ WRITE8_MEMBER( dblcrown_state::lamps_w )
 	output().set_lamp_value(5, (data >> 5) & 1);  /* Hold 3 */
 	output().set_lamp_value(6, (data >> 6) & 1);  /* Hold 2 */
 	output().set_lamp_value(7, (data >> 7) & 1);  /* Hold 1 */
-
-	m_lamps_data = data;
 }
 
 WRITE8_MEMBER(dblcrown_state::watchdog_w)
@@ -377,17 +360,15 @@ static ADDRESS_MAP_START( dblcrown_io, AS_IO, 8, dblcrown_state )
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSWD")
 	AM_RANGE(0x04, 0x04) AM_READ(in_mux_r)
 	AM_RANGE(0x05, 0x05) AM_READ(in_mux_type_r)
-	AM_RANGE(0x10, 0x10) AM_READWRITE(lamps_r, lamps_w)
-	AM_RANGE(0x11, 0x11) AM_READWRITE(bank_r, bank_w)
-	AM_RANGE(0x12, 0x12) AM_READWRITE(mux_r, mux_w)
-	AM_RANGE(0x20, 0x21) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
+	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("ppi", i8255_device, read, write)
+	AM_RANGE(0x20, 0x21) AM_DEVWRITE("ymz", ymz284_device, address_data_w)
 	AM_RANGE(0x30, 0x30) AM_WRITE(watchdog_w)
 	AM_RANGE(0x40, 0x40) AM_WRITE(output_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( dblcrown )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Memory Reset")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MEMORY_RESET )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Credit Reset")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN ) PORT_NAME("Note")
@@ -555,7 +536,7 @@ GFXDECODE_END
 
 void dblcrown_state::machine_start()
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	membank("rom_bank")->configure_entries(0, 0x20, &ROM[0], 0x2000);
 }
 
@@ -611,7 +592,7 @@ It needs at least 64 instances because 0xa05b will be eventually nuked by the vb
 }
 
 
-static MACHINE_CONFIG_START( dblcrown, dblcrown_state )
+static MACHINE_CONFIG_START( dblcrown )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
@@ -638,9 +619,14 @@ static MACHINE_CONFIG_START( dblcrown, dblcrown_state )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
+	MCFG_DEVICE_ADD("ppi", I8255, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(dblcrown_state, lamps_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(dblcrown_state, bank_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(dblcrown_state, mux_w))
+
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8910, SND_CLOCK)
+	MCFG_SOUND_ADD("ymz", YMZ284, SND_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
 
@@ -668,5 +654,5 @@ ROM_START( dblcrown )
 ROM_END
 
 
-/*     YEAR  NAME      PARENT    MACHINE   INPUT     STATE          INIT   ROT    COMPANY                FULLNAME                FLAGS                    LAYOUT  */
-GAMEL( 1997, dblcrown, 0,        dblcrown, dblcrown, driver_device, 0,     ROT0, "Cadence Technology",  "Double Crown (v1.0.3)", MACHINE_IMPERFECT_GRAPHICS, layout_dblcrown ) // 1997 DYNA copyright in tile GFX
+/*     YEAR  NAME      PARENT    MACHINE   INPUT     STATE           INIT   ROT    COMPANY                FULLNAME                FLAGS                    LAYOUT  */
+GAMEL( 1997, dblcrown, 0,        dblcrown, dblcrown, dblcrown_state, 0,     ROT0, "Cadence Technology",  "Double Crown (v1.0.3)", MACHINE_IMPERFECT_GRAPHICS, layout_dblcrown ) // 1997 DYNA copyright in tile GFX

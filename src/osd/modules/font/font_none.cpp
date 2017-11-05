@@ -15,7 +15,7 @@ public:
 
 	virtual bool open(std::string const &font_path, std::string const &name, int &height) override { return false; }
 	virtual void close() override { }
-	virtual bool get_bitmap(unicode_char chnum, bitmap_argb32 &bitmap, std::int32_t &width, std::int32_t &xoffs, std::int32_t &yoffs) override { return false; }
+	virtual bool get_bitmap(char32_t chnum, bitmap_argb32 &bitmap, std::int32_t &width, std::int32_t &xoffs, std::int32_t &yoffs) override { return false; }
 };
 
 class font_none : public osd_module, public font_module

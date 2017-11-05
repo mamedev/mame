@@ -21,12 +21,16 @@
 
 ***********************************************************************************/
 #include "emu.h"
-#include "sound/ay8910.h"
-#include "machine/nvram.h"
+
 #include "cpu/mcs51/mcs51.h"
 #include "machine/i2cmem.h"
+#include "machine/nvram.h"
+#include "sound/ay8910.h"
+#include "screen.h"
+#include "speaker.h"
 
 #include "splus.lh"
+
 
 #define DEBUG_OUTPUT 0
 
@@ -60,21 +64,21 @@ public:
 		m_p1_unknown = 0x00;
 	}
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 	{
 		return 0;
 	}
 
 	// Pointers to External RAM
-	required_shared_ptr<UINT8> m_cmosl_ram;
-	required_shared_ptr<UINT8> m_cmosh_ram;
+	required_shared_ptr<uint8_t> m_cmosl_ram;
+	required_shared_ptr<uint8_t> m_cmosh_ram;
 
 	// Program and Reel Data
-	optional_shared_ptr<UINT8> m_program_ram;
-	required_shared_ptr<UINT8> m_reel_ram;
+	optional_shared_ptr<uint8_t> m_program_ram;
+	required_shared_ptr<uint8_t> m_reel_ram;
 
 	// IO Ports
-	required_shared_ptr<UINT8> m_io_port;
+	required_shared_ptr<uint8_t> m_io_port;
 	required_ioport m_i10;
 	required_ioport m_i20;
 	required_ioport m_i30;
@@ -84,21 +88,21 @@ public:
 	int m_sda_dir;
 
 	// Coin-In States
-	UINT8 m_coin_state;
-	UINT64 m_last_cycles;
-	UINT64 m_last_coin_out;
-	UINT8 m_coin_out_state;
+	uint8_t m_coin_state;
+	uint64_t m_last_cycles;
+	uint64_t m_last_coin_out;
+	uint8_t m_coin_out_state;
 
-	UINT8 m_bank10;
-	UINT8 m_bank20;
-	UINT8 m_bank30;
-	UINT8 m_bank40;
+	uint8_t m_bank10;
+	uint8_t m_bank20;
+	uint8_t m_bank30;
+	uint8_t m_bank40;
 
-	UINT8 m_p1_reels;
-	UINT8 m_p1_unknown;
+	uint8_t m_p1_reels;
+	uint8_t m_p1_unknown;
 
-	INT16 m_stepper_pos[5];
-	UINT8 m_stop_pos[5];
+	int16_t m_stepper_pos[5];
+	uint8_t m_stop_pos[5];
 
 	DECLARE_WRITE8_MEMBER(splus_io_w);
 	DECLARE_WRITE8_MEMBER(splus_load_pulse_w);
@@ -122,7 +126,7 @@ public:
 #define MAX_STEPPER         200     // 1.8 Degree Stepper Motor = 200 full-steps per revolution, but 400 when in half-step mode
 #define STEPPER_DIVISOR     9.09 //18.18    // To allow for 22 stop positions
 
-static const UINT8 optics[200] = {
+static const uint8_t optics[200] = {
 	0x07, 0x07, 0x00, 0x07, 0x07, 0x07, 0x07, 0x07, 0x07, 0x07, 0x07, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 	0x07, 0x07, 0x00, 0x07, 0x07, 0x07, 0x07, 0x07, 0x07, 0x07, 0x07, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 	0x07, 0x07, 0x00, 0x07, 0x07, 0x07, 0x07, 0x07, 0x07, 0x07, 0x07, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -195,13 +199,13 @@ WRITE8_MEMBER(splus_state::splus_io_w)
 
 WRITE8_MEMBER(splus_state::splus_load_pulse_w)
 {
-//  UINT8 out = 0;
+//  uint8_t out = 0;
 //    out = ((~m_io_port[1] & 0xf0)>>4); // Output Bank
 }
 
 WRITE8_MEMBER(splus_state::splus_serial_w)
 {
-	UINT8 out = 0;
+	uint8_t out = 0;
 	out = ((~m_io_port[1] & 0xe0)>>5); // Output Bank
 
 	switch (out)
@@ -342,10 +346,10 @@ WRITE8_MEMBER(splus_state::splus_serial_w)
 
 WRITE8_MEMBER(splus_state::splus_7seg_w)
 {
-	static const UINT8 ls48_map[16] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x58,0x4c,0x62,0x69,0x78,0x00 };
+	static const uint8_t ls48_map[16] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x58,0x4c,0x62,0x69,0x78,0x00 };
 
-	UINT8 seg;
-	UINT8 val;
+	uint8_t seg;
+	uint8_t val;
 
 	seg = ((~data & 0xf0)>>4); // Segment Number
 	val = (~data & 0x0f); // Digit Value
@@ -373,13 +377,13 @@ WRITE8_MEMBER(splus_state::i2c_nvram_w)
 
 READ8_MEMBER(splus_state::splus_serial_r)
 {
-	UINT8 coin_out = 0x00;
-	UINT8 coin_optics = 0x00;
-	UINT8 door_optics = 0x00;
-	UINT32 curr_cycles = m_maincpu->total_cycles();
+	uint8_t coin_out = 0x00;
+	uint8_t coin_optics = 0x00;
+	uint8_t door_optics = 0x00;
+	uint32_t curr_cycles = m_maincpu->total_cycles();
 
-	UINT8 in = 0x00;
-	UINT8 val = 0x00;
+	uint8_t in = 0x00;
+	uint8_t val = 0x00;
 	in = ((~m_io_port[1] & 0xe0)>>5); // Input Bank
 
 	switch (in)
@@ -553,8 +557,8 @@ READ8_MEMBER(splus_state::splus_reel_optics_r)
         Bit 6 = ???
         Bit 7 = I2C EEPROM SDA
 */
-	UINT8 reel_optics = 0x00;
-	UINT8 sda = 0;
+	uint8_t reel_optics = 0x00;
+	uint8_t sda = 0;
 
 	// Return Reel Positions
 	reel_optics = (optics[199-(m_stepper_pos[4])] & 0x10) | (optics[199-(m_stepper_pos[3])] & 0x08) | (optics[199-(m_stepper_pos[2])] & 0x04) | (optics[199-(m_stepper_pos[1])] & 0x02) | (optics[199-(m_stepper_pos[0])] & 0x01);
@@ -575,7 +579,7 @@ READ8_MEMBER(splus_state::splus_reel_optics_r)
 
 DRIVER_INIT_MEMBER(splus_state,splus)
 {
-	UINT8 *reel_data = memregion( "reeldata" )->base();
+	uint8_t *reel_data = memregion( "reeldata" )->base();
 
 	// Load Reel Data
 	memcpy(m_reel_ram, &reel_data[0x0000], 0x2000);
@@ -678,7 +682,7 @@ INPUT_PORTS_END
 *     Machine Driver     *
 *************************/
 
-static MACHINE_CONFIG_START( splus, splus_state )   // basic machine hardware
+static MACHINE_CONFIG_START( splus )   // basic machine hardware
 	MCFG_CPU_ADD("maincpu", I80C32, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(splus_map)
 	MCFG_CPU_IO_MAP(splus_iomap)
@@ -722,5 +726,5 @@ ROM_END
 *      Game Drivers      *
 *************************/
 
-/*     YEAR  NAME        PARENT  MACHINE  INPUT   INIT     ROT    COMPANY                                  FULLNAME                       FLAGS             LAYOUT  */
+//     YEAR  NAME        PARENT  MACHINE  INPUT  STATE         INIT     ROT    COMPANY                                FULLNAME                       FLAGS                LAYOUT
 GAMEL( 1994, spss4240,   0,      splus,   splus, splus_state,  splus,   ROT0,  "IGT - International Game Technology", "S-Plus (SS4240) Coral Reef",  MACHINE_NOT_WORKING, layout_splus )

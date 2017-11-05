@@ -130,14 +130,18 @@ sounds.
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/darius.h"
+#include "audio/taitosnd.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/watchdog.h"
-#include "audio/taitosnd.h"
 #include "sound/2203intf.h"
-#include "sound/msm5205.h"
 #include "sound/flt_vol.h"
-#include "includes/darius.h"
+#include "sound/msm5205.h"
+#include "screen.h"
+#include "speaker.h"
+
 #include "darius.lh"
 
 
@@ -171,7 +175,7 @@ READ16_MEMBER(darius_state::darius_ioc_r)
 	switch (offset)
 	{
 		case 0x01:
-			return (m_tc0140syt->master_comm_r(space, 0) & 0xff);    /* sound interface read */
+			return (m_ciu->master_comm_r(space, 0) & 0xff);    /* sound interface read */
 
 		case 0x04:
 			return ioport("P1")->read();
@@ -200,12 +204,12 @@ WRITE16_MEMBER(darius_state::darius_ioc_w)
 	{
 		case 0x00:  /* sound interface write */
 
-			m_tc0140syt->master_port_w(space, 0, data & 0xff);
+			m_ciu->master_port_w(space, 0, data & 0xff);
 			return;
 
 		case 0x01:  /* sound interface write */
 
-			m_tc0140syt->master_comm_w(space, 0, data & 0xff);
+			m_ciu->master_comm_w(space, 0, data & 0xff);
 			return;
 
 		case 0x28:  /* unknown, written by both cpus - always 0? */
@@ -456,8 +460,8 @@ static ADDRESS_MAP_START( darius_sound_map, AS_PROGRAM, 8, darius_state )
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
 	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ym2", ym2203_device, read, write)
-	AM_RANGE(0xb000, 0xb000) AM_READNOP AM_DEVWRITE("tc0140syt", tc0140syt_device, slave_port_w)
-	AM_RANGE(0xb001, 0xb001) AM_DEVREADWRITE("tc0140syt", tc0140syt_device, slave_comm_r, slave_comm_w)
+	AM_RANGE(0xb000, 0xb000) AM_READNOP AM_DEVWRITE("ciu", pc060ha_device, slave_port_w)
+	AM_RANGE(0xb001, 0xb001) AM_DEVREADWRITE("ciu", pc060ha_device, slave_comm_r, slave_comm_w)
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(darius_fm0_pan)
 	AM_RANGE(0xc400, 0xc400) AM_WRITE(darius_fm1_pan)
 	AM_RANGE(0xc800, 0xc800) AM_WRITE(darius_psg0_pan)
@@ -681,16 +685,6 @@ static GFXDECODE_START( darius )
 GFXDECODE_END
 
 
-/**************************************************************
-                        YM2203 (SOUND)
-**************************************************************/
-
-/* handler called by the YM2203 emulator when the internal timers cause an IRQ */
-WRITE_LINE_MEMBER(darius_state::irqhandler) /* assumes Z80 sandwiched between 68Ks */
-{
-	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
 /***********************************************************
                        MACHINE DRIVERS
 ***********************************************************/
@@ -740,7 +734,7 @@ void darius_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( darius, darius_state )
+static MACHINE_CONFIG_START( darius )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)  /* 8 MHz */
@@ -803,7 +797,7 @@ static MACHINE_CONFIG_START( darius, darius_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ym1", YM2203, XTAL_8MHz/2) /* 4 MHz */
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(darius_state, irqhandler))
+	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0)) /* assumes Z80 sandwiched between 68Ks */
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(darius_state, darius_write_portA0))  /* portA write */
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(darius_state, darius_write_portB0))  /* portB write */
 	MCFG_SOUND_ROUTE(0, "filter0.0l", 0.08)
@@ -829,7 +823,7 @@ static MACHINE_CONFIG_START( darius, darius_state )
 
 	MCFG_SOUND_ADD("msm", MSM5205, XTAL_384kHz)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(darius_state, darius_adpcm_int))   /* interrupt function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 8KHz   */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8KHz   */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "msm5205.l", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "msm5205.r", 1.0)
 
@@ -872,9 +866,9 @@ static MACHINE_CONFIG_START( darius, darius_state )
 	MCFG_FILTER_VOLUME_ADD("msm5205.r", 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MCFG_DEVICE_ADD("tc0140syt", TC0140SYT, 0)
-	MCFG_TC0140SYT_MASTER_CPU("maincpu")
-	MCFG_TC0140SYT_SLAVE_CPU("audiocpu")
+	MCFG_DEVICE_ADD("ciu", PC060HA, 0)
+	MCFG_PC060HA_MASTER_CPU("maincpu")
+	MCFG_PC060HA_SLAVE_CPU("audiocpu")
 MACHINE_CONFIG_END
 
 
@@ -1166,8 +1160,8 @@ ROM_START( dariuse )
 ROM_END
 
 
-GAME( 1986, darius,   0,        darius,   darius,  driver_device, 0, ROT0, "Taito Corporation Japan",   "Darius (World, rev 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, dariusu,  darius,   darius,   dariusu, driver_device, 0, ROT0, "Taito America Corporation", "Darius (US, rev 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, dariusj,  darius,   darius,   dariusj, driver_device, 0, ROT0, "Taito Corporation",         "Darius (Japan, rev 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, dariuso,  darius,   darius,   dariusj, driver_device, 0, ROT0, "Taito Corporation",         "Darius (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, dariuse,  darius,   darius,   dariusu, driver_device, 0, ROT0, "Taito Corporation",         "Darius Extra Version (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, darius,   0,        darius,   darius,  darius_state, 0, ROT0, "Taito Corporation Japan",   "Darius (World, rev 2)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1986, dariusu,  darius,   darius,   dariusu, darius_state, 0, ROT0, "Taito America Corporation", "Darius (US, rev 2)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1986, dariusj,  darius,   darius,   dariusj, darius_state, 0, ROT0, "Taito Corporation",         "Darius (Japan, rev 1)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1986, dariuso,  darius,   darius,   dariusj, darius_state, 0, ROT0, "Taito Corporation",         "Darius (Japan)",               MACHINE_SUPPORTS_SAVE )
+GAME( 1986, dariuse,  darius,   darius,   dariusu, darius_state, 0, ROT0, "Taito Corporation",         "Darius Extra Version (Japan)", MACHINE_SUPPORTS_SAVE )

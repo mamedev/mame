@@ -9,6 +9,7 @@
 
 */
 
+#include "emu.h"
 #include "tp0320.h"
 #include "debugger.h"
 
@@ -21,7 +22,7 @@
 // - 64-term microinstructions PLA between the RAM and ROM, similar to TMS0980,
 //   plus separate lines for custom opcode handling like TMS0270, used for SETR and RSTR
 // - 24-term output PLA above LCD RAM
-const device_type TP0320 = &device_creator<tp0320_cpu_device>; // 28-pin SDIP, ..
+DEFINE_DEVICE_TYPE(TP0320, tp0320_cpu_device, "tp0320", "TP0320") // 28-pin SDIP, ..
 
 
 // internal memory maps
@@ -36,46 +37,42 @@ ADDRESS_MAP_END
 
 
 // device definitions
-tp0320_cpu_device::tp0320_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: tms0980_cpu_device(mconfig, TP0320, "TP0320", tag, owner, clock, 7 /* o pins */, 10 /* r pins */, 7 /* pc bits */, 9 /* byte width */, 4 /* x width */, 12 /* prg width */, ADDRESS_MAP_NAME(program_11bit_9), 8 /* data width */, ADDRESS_MAP_NAME(data_192x4), "tp0320", __FILE__)
-{ }
-
-
-// machine configs
-static MACHINE_CONFIG_FRAGMENT(tp0320)
-
-	// main opcodes PLA(partial), microinstructions PLA
-	MCFG_PLA_ADD("ipla", 9, 6, 8)
-	MCFG_PLA_FILEFORMAT(PLA_FMT_BERKELEY)
-	MCFG_PLA_ADD("mpla", 6, 22, 64)
-	MCFG_PLA_FILEFORMAT(PLA_FMT_BERKELEY)
-MACHINE_CONFIG_END
-
-machine_config_constructor tp0320_cpu_device::device_mconfig_additions() const
+tp0320_cpu_device::tp0320_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: tms0980_cpu_device(mconfig, TP0320, tag, owner, clock, 7 /* o pins */, 10 /* r pins */, 7 /* pc bits */, 9 /* byte width */, 4 /* x width */, 12 /* prg width */, ADDRESS_MAP_NAME(program_11bit_9), 8 /* data width */, ADDRESS_MAP_NAME(data_192x4))
 {
-	return MACHINE_CONFIG_NAME(tp0320);
 }
 
 
+// machine configs
+MACHINE_CONFIG_MEMBER(tp0320_cpu_device::device_add_mconfig)
+
+	// main opcodes PLA(partial), microinstructions PLA
+	MCFG_PLA_ADD("ipla", 9, 6, 8)
+	MCFG_PLA_FILEFORMAT(BERKELEY)
+	MCFG_PLA_ADD("mpla", 6, 22, 64)
+	MCFG_PLA_FILEFORMAT(BERKELEY)
+MACHINE_CONFIG_END
+
+
 // disasm
-offs_t tp0320_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t tp0320_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, u32 options)
 {
 	extern CPU_DISASSEMBLE(tp0320);
-	return CPU_DISASSEMBLE_NAME(tp0320)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(tp0320)(this, stream, pc, oprom, opram, options);
 }
 
 
 // device_reset
-UINT32 tp0320_cpu_device::decode_micro(UINT8 sel)
+u32 tp0320_cpu_device::decode_micro(u8 sel)
 {
-	UINT32 decode = 0;
+	u32 decode = 0;
 
 	sel = BITSWAP8(sel,7,6,0,1,2,3,4,5); // lines are reversed
-	UINT32 mask = m_mpla->read(sel);
+	u32 mask = m_mpla->read(sel);
 	mask ^= 0x0bff0; // invert active-negative
 
-	//                                                    _____  _______  ______  _____  _____  ______  _____  _____  ______  _____         _____
-	const UINT32 md[22] = { M_AUTA, M_AUTY, M_SSS, M_STO, M_YTP, M_NDMTP, M_DMTP, M_MTP, M_CKP, M_15TN, M_CKN, M_MTN, M_NATN, M_ATN, M_CME, M_CIN, M_SSE, M_CKM, M_NE, M_C8, M_SETR, M_RSTR };
+	//                                                 _____  _______  ______  _____  _____  ______  _____  _____  ______  _____         _____
+	const u32 md[22] = { M_AUTA, M_AUTY, M_SSS, M_STO, M_YTP, M_NDMTP, M_DMTP, M_MTP, M_CKP, M_15TN, M_CKN, M_MTN, M_NATN, M_ATN, M_CME, M_CIN, M_SSE, M_CKM, M_NE, M_C8, M_SETR, M_RSTR };
 
 	for (int bit = 0; bit < 22 && bit < m_mpla->outputs(); bit++)
 		if (mask & (1 << bit))

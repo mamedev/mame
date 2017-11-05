@@ -8,6 +8,8 @@
 
     Known bugs:
         * lghost sprites seem to be slightly out of sync
+        * lghost gun offset correction is not perfect yet - we should be able
+          to get an exact conversion from the disasm
         * vdp gfx on 2nd attract level of lghost are corrupt at top of stairs
           after attract mode loops
         * pauses in lghost where all sprites vanish
@@ -30,12 +32,13 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "machine/segaic16.h"
-#include "machine/nvram.h"
 #include "includes/segas18.h"
+#include "includes/segaipt.h"
+
+#include "machine/nvram.h"
 #include "sound/2612intf.h"
 #include "sound/rf5c68.h"
-#include "includes/segaipt.h"
+#include "speaker.h"
 
 /*************************************
  *
@@ -43,9 +46,9 @@
  *
  *************************************/
 
-void segas18_state::memory_mapper(sega_315_5195_mapper_device &mapper, UINT8 index)
+void segas18_state::memory_mapper(sega_315_5195_mapper_device &mapper, uint8_t index)
 {
-	UINT32 romsize = m_maincpu_region->bytes();
+	uint32_t romsize = m_maincpu_region->bytes();
 	switch (index)
 	{
 		case 7:
@@ -122,14 +125,14 @@ void segas18_state::memory_mapper(sega_315_5195_mapper_device &mapper, UINT8 ind
  *
  *************************************/
 
-UINT8 segas18_state::mapper_sound_r()
+uint8_t segas18_state::mapper_sound_r()
 {
 	return m_mcu_data;
 }
 
-void segas18_state::mapper_sound_w(UINT8 data)
+void segas18_state::mapper_sound_w(uint8_t data)
 {
-	soundlatch_write(data & 0xff);
+	m_soundlatch->write(m_soundcpu->space(AS_PROGRAM), 0, data & 0xff);
 	m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -143,7 +146,7 @@ void segas18_state::init_generic(segas18_rom_board rom_board)
 
 	// configure VDP
 	m_vdp->set_use_cram(1);
-	m_vdp->set_vdp_pal(FALSE);
+	m_vdp->set_vdp_pal(false);
 	m_vdp->set_framerate(60);
 	m_vdp->set_total_scanlines(262);
 	m_vdp->stop_timers(); // 315-5124 timers
@@ -152,8 +155,6 @@ void segas18_state::init_generic(segas18_rom_board rom_board)
 	save_item(NAME(m_mcu_data));
 	save_item(NAME(m_lghost_value));
 	save_item(NAME(m_lghost_select));
-	save_item(NAME(m_wwally_last_x));
-	save_item(NAME(m_wwally_last_y));
 }
 
 
@@ -379,7 +380,7 @@ READ16_MEMBER( segas18_state::ddcrew_custom_io_r )
 
 READ16_MEMBER( segas18_state::lghost_custom_io_r )
 {
-	UINT16 result;
+	uint16_t result;
 	switch (offset)
 	{
 		case 0x3010/2:
@@ -395,22 +396,175 @@ READ16_MEMBER( segas18_state::lghost_custom_io_r )
 
 WRITE16_MEMBER( segas18_state::lghost_custom_io_w )
 {
+	uint8_t pos_value_x, pos_value_y;
+
 	switch (offset)
 	{
+		// Player 1, Y axis
 		case 0x3010/2:
-			m_lghost_value = 255 - ioport("GUNY1")->read();
+
+			pos_value_x = ioport("GUNX1")->read();
+			pos_value_y = 255 - ioport("GUNY1")->read();
+
+			// Offset adjustment is disabled?
+			if (!ioport("FAKE")->read())
+				m_lghost_value = pos_value_y;
+
+			// Depending of the position on the X axis, we need to calculate the Y offset accordingly
+			else if (pos_value_x >= 50 && pos_value_x <= 99)
+			{
+				// Linear function (decreasing)
+				if (pos_value_y >= 130 && pos_value_y <= 225)
+					m_lghost_value = round(pos_value_y * 0.94 + 0.80);
+				// Keep real value as no offset is needed
+				else
+					m_lghost_value = pos_value_y;
+			}
+			else if (pos_value_x >= 100 && pos_value_x <= 199)
+			{
+				// Linear function (decreasing)
+				if (pos_value_y >= 100 && pos_value_y <= 225)
+					m_lghost_value = round(pos_value_y * 0.89 + 6.00);
+				// Keep real value as no offset is needed
+				else
+					m_lghost_value = pos_value_y;
+			}
+			else if (pos_value_x >= 200 && pos_value_x <= 249)
+			{
+				// Linear function (decreasing) #1
+				if (pos_value_y >= 30 && pos_value_y <= 55)
+					m_lghost_value = round(pos_value_y * 0.78 + 18.28);
+
+				// Linear function (decreasing) #2
+				else if (pos_value_y >= 100 && pos_value_y <= 205)
+					m_lghost_value = round(pos_value_y * 0.70 + 28.00);
+				// Linear function (decreasing) #2
+				else if (pos_value_y >= 206 && pos_value_y <= 225)
+					m_lghost_value = round(pos_value_y * 1.58 - 151.48);
+				// Keep real value as no offset is needed
+				else
+					m_lghost_value = pos_value_y;
+			}
+			// if crosshair is near the left edge, keep real value as no offset is needed
+			else
+				m_lghost_value = pos_value_y;
 			break;
 
+		// Player 1, X axis
 		case 0x3012/2:
-			m_lghost_value = ioport("GUNX1")->read();
+
+			pos_value_x = ioport("GUNX1")->read();
+
+			// Offset adjustment is disabled?
+			if (!ioport("FAKE")->read())
+				m_lghost_value = pos_value_x;
+
+			// Here, linear functions (increasing) are used
+			// The line is divided in two parts to get more precise results
+
+			// Linear function (increasing) #1
+			else if (pos_value_x >= 26 && pos_value_x <= 85)
+				m_lghost_value = round(pos_value_x * 1.13 + 0.95);
+
+			// Linear function (increasing) #2
+			else if (pos_value_x >= 86 && pos_value_x <= 140)
+				m_lghost_value = round(pos_value_x * 1.10 + 4.00);
+
+			// Here, linear functions (decreasing) are used
+			// The line is divided in two parts to get more precise results
+
+			// Linear function (decreasing) #1
+			else if (pos_value_x >= 141 && pos_value_x <= 190)
+				m_lghost_value = round(pos_value_x * 1.02 + 11.20);
+
+			// Linear function (decreasing) #2
+			else if (pos_value_x >= 191 && pos_value_x <= 240)
+				m_lghost_value = round(pos_value_x * 0.76 + 62.60);
+
+			// if crosshair is near the edges, keep real value as no offset is needed
+			else
+				m_lghost_value = pos_value_x;
 			break;
 
+		// Player 2 and 3, Y axis
 		case 0x3014/2:
-			m_lghost_value = 255 - ioport(m_lghost_select ? "GUNY3" : "GUNY2")->read();
+
+			// Player 3, Y axis
+			if (m_lghost_select)
+			{
+				pos_value_x = ioport("GUNX3")->read();
+				pos_value_y = 255 - ioport("GUNY3")->read();
+
+				// Offset adjustment is disabled?
+				if (!ioport("FAKE")->read())
+					m_lghost_value = pos_value_y;
+
+				// Depending of the position on the X axis, we need to calculate the Y offset accordingly
+				else if (pos_value_x >= 128 && pos_value_x <= 255)
+				{
+					// Linear function (increasing)
+					if (pos_value_y >= 30 && pos_value_y <= 125)
+						m_lghost_value = round(pos_value_y * 1.01 + 11.82);
+					// Linear function (decreasing)
+					else if (pos_value_y >= 126 && pos_value_y <= 235)
+						m_lghost_value = round(pos_value_y * 0.94 + 21.90);
+					// Keep real value as no offset is needed
+					else
+						m_lghost_value = pos_value_y;
+				}
+				else if (pos_value_x >= 17 && pos_value_x <= 127)
+				{
+					// Linear function (increasing)
+					if (pos_value_y >= 40 && pos_value_y <= 145)
+						m_lghost_value = round(pos_value_y * 0.82 + 31.80);
+					// Linear function (decreasing)
+					else if (pos_value_y >= 200 && pos_value_y <= 225)
+						m_lghost_value = round(pos_value_y * 0.83 + 29.95);
+					// Keep real value as no offset is needed
+					else
+						m_lghost_value = pos_value_y;
+				}
+				// Keep real value as no offset is needed
+				else
+					m_lghost_value = pos_value_y;
+			}
+			// Player 2, Y axis. It doesn't need any offset adjustement.
+			else
+				m_lghost_value = 255 - ioport("GUNY2")->read();
 			break;
 
+		// Player 2 and 3, X axis
 		case 0x3016/2:
-			m_lghost_value = ioport(m_lghost_select ? "GUNX3" : "GUNX2")->read();
+
+			// Player 3, X axis
+			if (m_lghost_select)
+			{
+				pos_value_x = ioport("GUNX3")->read();
+
+				// Offset adjustment is disabled?
+				if (!ioport("FAKE")->read())
+					m_lghost_value = pos_value_x;
+
+				// Right edge of screen, constant value
+				else if (pos_value_x >= 17 && pos_value_x <= 34)
+					m_lghost_value = pos_value_x - 17;
+
+				// Linear function (increasing)
+				else if (pos_value_x >= 35 && pos_value_x <= 110)
+					m_lghost_value = round(pos_value_x * 0.94 - 14.08);
+
+				// Linear function (decreasing) #1
+				else if (pos_value_x >= 111 && pos_value_x <= 225)
+					m_lghost_value = round(pos_value_x * 1.15 - 35.65);
+
+				// if crosshair is near the edges, keep real value as no offset is needed*/
+				else
+					m_lghost_value = pos_value_x;
+				break;
+			}
+			// Player 2, X axis. It doesn't need any offset adjustement.
+			else
+				m_lghost_value = ioport("GUNX2")->read();
 			break;
 
 		case 0x3020/2:
@@ -437,52 +591,17 @@ WRITE8_MEMBER( segas18_state::lghost_gun_recoil_w )
 
 READ16_MEMBER( segas18_state::wwally_custom_io_r )
 {
-	switch (offset)
-	{
-		case 0x3000/2:
-			return (ioport("TRACKX1")->read() - m_wwally_last_x[0]) & 0xff;
+	if (offset >= 0x3000/2 && offset < 0x3018/2)
+		return m_upd4701[(offset & 0x0018/2) >> 2]->read_xy(space, offset & 0x0006/2);
 
-		case 0x3004/2:
-			return (ioport("TRACKY1")->read() - m_wwally_last_y[0]) & 0xff;
-
-		case 0x3008/2:
-			return (ioport("TRACKX2")->read() - m_wwally_last_x[1]) & 0xff;
-
-		case 0x300c/2:
-			return (ioport("TRACKY2")->read() - m_wwally_last_y[1]) & 0xff;
-
-		case 0x3010/2:
-			return (ioport("TRACKX3")->read() - m_wwally_last_x[2]) & 0xff;
-
-		case 0x3014/2:
-			return (ioport("TRACKY3")->read() - m_wwally_last_y[2]) & 0xff;
-	}
 	return open_bus_r(space, 0, mem_mask);
 }
 
 
 WRITE16_MEMBER( segas18_state::wwally_custom_io_w )
 {
-	switch (offset)
-	{
-		case 0x3000/2:
-		case 0x3004/2:
-			m_wwally_last_x[0] = ioport("TRACKX1")->read();
-			m_wwally_last_y[0] = ioport("TRACKY1")->read();
-			break;
-
-		case 0x3008/2:
-		case 0x300c/2:
-			m_wwally_last_x[1] = ioport("TRACKX2")->read();
-			m_wwally_last_y[1] = ioport("TRACKY2")->read();
-			break;
-
-		case 0x3010/2:
-		case 0x3014/2:
-			m_wwally_last_x[2] = ioport("TRACKX3")->read();
-			m_wwally_last_y[2] = ioport("TRACKY3")->read();
-			break;
-	}
+	if (offset >= 0x3000/2 && offset < 0x3018/2)
+		m_upd4701[(offset & 0x0018/2) >> 2]->reset_xy(space, 0);
 }
 
 
@@ -526,7 +645,7 @@ static ADDRESS_MAP_START( system18_map, AS_PROGRAM, 16, segas18_state )
 	AM_RANGE(0x500000, 0x503fff) AM_RAM AM_SHARE("workram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 16, segas18_state )
+static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 16, segas18_state )
 	AM_RANGE(0x00000, 0xfffff) AM_ROMBANK("fd1094_decrypted_opcodes")
 ADDRESS_MAP_END
 
@@ -551,7 +670,7 @@ static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, segas18_state )
 	AM_RANGE(0x80, 0x83) AM_MIRROR(0x0c) AM_DEVREADWRITE("ym1", ym3438_device, read, write)
 	AM_RANGE(0x90, 0x93) AM_MIRROR(0x0c) AM_DEVREADWRITE("ym2", ym3438_device, read, write)
 	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x1f) AM_WRITE(soundbank_w)
-	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x1f) AM_READ(soundlatch_byte_r) AM_WRITE(mcu_data_w)
+	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x1f) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITE(mcu_data_w)
 ADDRESS_MAP_END
 
 
@@ -1005,6 +1124,11 @@ static INPUT_PORTS_START( lghost )
 
 	PORT_START("GUNY3")
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(5) PORT_PLAYER(3)
+
+	PORT_START("FAKE")
+	PORT_CONFNAME( 0x01, 0x01, "Correct P1/P3 Gun Offsets")
+	PORT_CONFSETTING(    0x00, DEF_STR( No ) )
+	PORT_CONFSETTING(    0x01, DEF_STR( Yes ) )
 INPUT_PORTS_END
 
 
@@ -1127,22 +1251,22 @@ static INPUT_PORTS_START( wwally )
 	//"SW2:8" unused
 
 	PORT_START("TRACKX1")
-	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(75) PORT_KEYDELTA(5) PORT_REVERSE
+	PORT_BIT( 0xfff, 0x000, IPT_TRACKBALL_X ) PORT_SENSITIVITY(75) PORT_KEYDELTA(5) PORT_REVERSE PORT_RESET
 
 	PORT_START("TRACKY1")
-	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(75) PORT_KEYDELTA(5)
+	PORT_BIT( 0xfff, 0x000, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(75) PORT_KEYDELTA(5) PORT_RESET
 
 	PORT_START("TRACKX2")
-	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(75) PORT_KEYDELTA(5) PORT_PLAYER(2) PORT_REVERSE
+	PORT_BIT( 0xfff, 0x000, IPT_TRACKBALL_X ) PORT_SENSITIVITY(75) PORT_KEYDELTA(5) PORT_PLAYER(2) PORT_REVERSE PORT_RESET
 
 	PORT_START("TRACKY2")
-	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(75) PORT_KEYDELTA(5) PORT_PLAYER(2)
+	PORT_BIT( 0xfff, 0x000, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(75) PORT_KEYDELTA(5) PORT_PLAYER(2) PORT_RESET
 
 	PORT_START("TRACKX3")
-	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(75) PORT_KEYDELTA(5) PORT_PLAYER(3) PORT_REVERSE
+	PORT_BIT( 0xfff, 0x000, IPT_TRACKBALL_X ) PORT_SENSITIVITY(75) PORT_KEYDELTA(5) PORT_PLAYER(3) PORT_REVERSE PORT_RESET
 
 	PORT_START("TRACKY3")
-	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(75) PORT_KEYDELTA(5) PORT_PLAYER(3)
+	PORT_BIT( 0xfff, 0x000, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(75) PORT_KEYDELTA(5) PORT_PLAYER(3) PORT_RESET
 INPUT_PORTS_END
 
 
@@ -1195,7 +1319,7 @@ WRITE_LINE_MEMBER(segas18_state::ym3438_irq_handler)
 }
 
 
-static MACHINE_CONFIG_START( system18, segas18_state )
+static MACHINE_CONFIG_START( system18 )
 
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)
@@ -1251,6 +1375,8 @@ static MACHINE_CONFIG_START( system18, segas18_state )
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ym1", YM3438, 8000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 	MCFG_YM2612_IRQ_HANDLER(WRITELINE(segas18_state, ym3438_irq_handler))
@@ -1284,6 +1410,34 @@ static MACHINE_CONFIG_DERIVED( lghost, system18 )
 	// basic machine hardware
 	MCFG_DEVICE_MODIFY("io")
 	MCFG_315_5296_OUT_PORTC_CB(WRITE8(segas18_state, lghost_gun_recoil_w))
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( wwally_fd1094, system18_fd1094 )
+	MCFG_DEVICE_ADD("upd1", UPD4701A, 0)
+	MCFG_UPD4701_PORTX("TRACKX1")
+	MCFG_UPD4701_PORTY("TRACKY1")
+
+	MCFG_DEVICE_ADD("upd2", UPD4701A, 0)
+	MCFG_UPD4701_PORTX("TRACKX2")
+	MCFG_UPD4701_PORTY("TRACKY2")
+
+	MCFG_DEVICE_ADD("upd3", UPD4701A, 0)
+	MCFG_UPD4701_PORTX("TRACKX3")
+	MCFG_UPD4701_PORTY("TRACKY3")
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( wwally, system18 )
+	MCFG_DEVICE_ADD("upd1", UPD4701A, 0)
+	MCFG_UPD4701_PORTX("TRACKX1")
+	MCFG_UPD4701_PORTY("TRACKY1")
+
+	MCFG_DEVICE_ADD("upd2", UPD4701A, 0)
+	MCFG_UPD4701_PORTX("TRACKX2")
+	MCFG_UPD4701_PORTY("TRACKY2")
+
+	MCFG_DEVICE_ADD("upd3", UPD4701A, 0)
+	MCFG_UPD4701_PORTX("TRACKX3")
+	MCFG_UPD4701_PORTY("TRACKY3")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( system18_i8751, system18 )
@@ -1347,7 +1501,7 @@ ROM_START( astorm )
 	ROM_LOAD16_BYTE( "epr-13086.bin", 0x180000, 0x40000, CRC(8c9a71c4) SHA1(40b774765ac888792aad46b6351a24b7ef40d2dc) )
 
 	ROM_REGION( 0x210000, "soundcpu", ROMREGION_ERASEFF ) // sound CPU
-	ROM_LOAD( "epr-13083a.bin", 0x010000, 0x20000, CRC(e7528e06) SHA1(1f4e618692c20aeb316d578c5ded12440eb072ab) ) // Also known to have EPR-13083B like astormj
+	ROM_LOAD( "epr-13083a.bin", 0x010000, 0x20000, CRC(e7528e06) SHA1(1f4e618692c20aeb316d578c5ded12440eb072ab) ) // Also known to come with EPR-13083B rom instead of EPR-13083A (like astormj)
 	ROM_LOAD( "epr-13076.bin",  0x090000, 0x40000, CRC(94e6c76e) SHA1(f99e58a9bf372c41af211bd9b9ea3ac5b924c6ed) )
 	ROM_LOAD( "epr-13077.bin",  0x110000, 0x40000, CRC(e2ec0d8d) SHA1(225b0d223b7282cba7710300a877fb4a2c6dbabb) )
 	ROM_LOAD( "epr-13078.bin",  0x190000, 0x40000, CRC(15684dc5) SHA1(595051006de24f791dae937584e502ff2fa31d9c) )
@@ -1383,7 +1537,7 @@ ROM_START( astorm3 )
 	ROM_LOAD16_BYTE( "epr-13086.bin", 0x180000, 0x40000, CRC(8c9a71c4) SHA1(40b774765ac888792aad46b6351a24b7ef40d2dc) )
 
 	ROM_REGION( 0x210000, "soundcpu", ROMREGION_ERASEFF ) // sound CPU
-	ROM_LOAD( "epr-13083.bin", 0x010000, 0x20000, CRC(5df3af20) SHA1(e49105fcfd5bf37d14bd760f6adca5ce2412883d) )
+	ROM_LOAD( "epr-13083.bin", 0x010000, 0x20000, CRC(5df3af20) SHA1(e49105fcfd5bf37d14bd760f6adca5ce2412883d) ) // Also known to come with EPR-13083A rom instead of EPR-13083
 	ROM_LOAD( "epr-13076.bin", 0x090000, 0x40000, CRC(94e6c76e) SHA1(f99e58a9bf372c41af211bd9b9ea3ac5b924c6ed) )
 	ROM_LOAD( "epr-13077.bin", 0x110000, 0x40000, CRC(e2ec0d8d) SHA1(225b0d223b7282cba7710300a877fb4a2c6dbabb) )
 	ROM_LOAD( "epr-13078.bin", 0x190000, 0x40000, CRC(15684dc5) SHA1(595051006de24f791dae937584e502ff2fa31d9c) )
@@ -2760,11 +2914,15 @@ ROM_END
     Shadow Dancer, Sega System 18
     CPU: 68000
     ROM Board: 171-5873B
+
+    game No. 833-7246-03
+    pcb  No. 837-7248-01
+    rom  No. 834-7247-02
 */
 ROM_START( shdancer )
 	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code
-	ROM_LOAD16_BYTE( "shdancer.a6",  0x000000, 0x40000, CRC(3d5b3fa9) SHA1(370dd6e8ab9fb9e77eee9262d13fbdb4cf575abc) )
-	ROM_LOAD16_BYTE( "shdancer.a5",  0x000001, 0x40000, CRC(2596004e) SHA1(1b993aa74e7559f7e99253fd2144db9449c04cce) )
+	ROM_LOAD16_BYTE( "epr-12774b.a6",  0x000000, 0x40000, CRC(3d5b3fa9) SHA1(370dd6e8ab9fb9e77eee9262d13fbdb4cf575abc) )
+	ROM_LOAD16_BYTE( "epr-12773b.a5",  0x000001, 0x40000, CRC(2596004e) SHA1(1b993aa74e7559f7e99253fd2144db9449c04cce) )
 
 	ROM_REGION( 0xc0000, "gfx1", 0 ) // tiles
 	ROM_LOAD( "mpr-12712.b1",  0x00000, 0x40000, CRC(9bdabe3d) SHA1(4bb30fa2d4cdefe4a864cef7153b516bc5b02c42) )
@@ -2782,7 +2940,7 @@ ROM_START( shdancer )
 	ROM_LOAD16_BYTE( "epr-12723.a8",  0x180000, 0x40000, CRC(c606cf90) SHA1(cb53ae9a6da1eb31c584173d1fbbd1c8539fb54c) )
 
 	ROM_REGION( 0x210000, "soundcpu", ROMREGION_ERASEFF ) // sound CPU
-	ROM_LOAD( "epr-12720.a4",  0x10000, 0x20000, CRC(7a0d8de1) SHA1(eca5e2104e5b3e772d083a718171234f06ea8a55) )
+	ROM_LOAD( "epr-12987.a4",  0x10000, 0x20000, CRC(d1c020cc) SHA1(7823e31fc44180570ee2512a73e993533204b5ab) )
 	ROM_LOAD( "mpr-12715.b4",  0x90000, 0x40000, CRC(07051a52) SHA1(d48658497f4a34665d3e051f893ff057c38925ae) )
 ROM_END
 
@@ -3069,8 +3227,8 @@ GAME( 1989, shdancer,  0,        system18,             shdancer, segas18_state, 
 GAME( 1989, shdancerj, shdancer, system18,             shdancer, segas18_state, generic_shad, ROT0,   "Sega",          "Shadow Dancer (Japan)", 0 )
 GAME( 1989, shdancer1, shdancer, system18,             shdancer, segas18_state, generic_shad, ROT0,   "Sega",          "Shadow Dancer (US)", 0 )
 
-GAME( 1992, wwallyj,   0,        system18_fd1094,      wwally,   segas18_state, wwally,       ROT0,   "Sega",          "Wally wo Sagase! (rev B, Japan) (FD1094 317-0197B)", 0 ) // the roms do contain an english logo so maybe there is a world / us set too
-GAME( 1992, wwallyja,  wwallyj,  system18_fd1094,      wwally,   segas18_state, wwally,       ROT0,   "Sega",          "Wally wo Sagase! (rev A, Japan) (FD1094 317-0197A)", 0 )
+GAME( 1992, wwallyj,   0,        wwally_fd1094,        wwally,   segas18_state, wwally,       ROT0,   "Sega",          "Wally wo Sagase! (rev B, Japan) (FD1094 317-0197B)", 0 ) // the roms do contain an english logo so maybe there is a world / us set too
+GAME( 1992, wwallyja,  wwallyj,  wwally_fd1094,        wwally,   segas18_state, wwally,       ROT0,   "Sega",          "Wally wo Sagase! (rev A, Japan) (FD1094 317-0197A)", 0 )
 
 // decrypted bootleg sets
 
@@ -3100,5 +3258,5 @@ GAME( 1990, mwalkd,     mwalk,    system18_i8751,mwalk,    segas18_state, generi
 GAME( 1990, mwalkud,    mwalk,    system18_i8751,mwalka,   segas18_state, generic_5874, ROT0,   "bootleg",          "Michael Jackson's Moonwalker (US) (bootleg of FD1094/8751 317-0158)", 0 )
 GAME( 1990, mwalkjd,    mwalk,    system18_i8751,mwalk,    segas18_state, generic_5874, ROT0,   "bootleg",          "Michael Jackson's Moonwalker (Japan) (bootleg of FD1094/8751 317-0157 set)", 0 )
 
-GAME( 1992, wwallyjd,   wwallyj,  system18,      wwally,   segas18_state, wwally,       ROT0,   "bootleg",          "Wally wo Sagase! (rev B, Japan) (bootleg of FD1094 317-0197B set)", 0 )
-GAME( 1992, wwallyjad,  wwallyj,  system18,      wwally,   segas18_state, wwally,       ROT0,   "bootleg",          "Wally wo Sagase! (rev A, Japan) (bootleg of FD1094 317-0197A set)", 0 )
+GAME( 1992, wwallyjd,   wwallyj,  wwally,        wwally,   segas18_state, wwally,       ROT0,   "bootleg",          "Wally wo Sagase! (rev B, Japan) (bootleg of FD1094 317-0197B set)", 0 )
+GAME( 1992, wwallyjad,  wwallyj,  wwally,        wwally,   segas18_state, wwally,       ROT0,   "bootleg",          "Wally wo Sagase! (rev A, Japan) (bootleg of FD1094 317-0197A set)", 0 )

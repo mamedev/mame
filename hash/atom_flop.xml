@@ -26,6 +26,32 @@
 		</part>
 	</software>
 
+	<software name="egghead">
+		<description>Egghead in Space (32K)</description>
+		<year>2016</year>
+		<publisher>Retro Software</publisher>
+		<info name="author" value="Kees van Oss" />
+		<info name="usage" value="Load with *RUN&quot;EHRUN&quot;" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102400">
+				<rom name="egghead.dsk" size="102400" crc="a25a9305" sha1="68d53a0e9419c7dca4ba8b525595d12926ab1c85" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="f14">
+		<description>F14 Tomcat (32K)</description>
+		<year>2015</year>
+		<publisher>Retro Software</publisher>
+		<info name="author" value="Kees van Oss" />
+		<info name="usage" value="Load with *RUN&quot;F14RUN&quot;" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102400">
+				<rom name="f14.dsk" size="102400" crc="b0b213c2" sha1="a4691fd7590884e0da96cf92f90c31786a74fd93" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="gala">
 		<description>Galaforce (32K)</description>
 		<year>2012</year>
@@ -35,6 +61,18 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="102400">
 				<rom name="gala.dsk" size="102400" crc="db52a3ae" sha1="ffece5ae2295818f649735c5b7711e740dfe4731" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="galxians">
+		<description>Galaxians (12K)</description>
+		<year>1982</year>
+		<publisher>Aardvark</publisher>
+		<info name="usage" value="Load with *RUN&quot;GALAXI&quot;" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102400">
+				<rom name="Galaxians(Aardvark).dsk" size="102400" crc="142fff89" sha1="5edca5333d5584ed64f980f15c67698873db93ff" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -126,6 +164,19 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="102400">
 				<rom name="jungle.dsk" size="102400" crc="92c50fe2" sha1="a6ffbdbf0f2f7b5c4038d44632a14e1b89682db0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="manicmin">
+		<description>Manic Miner (32K)</description>
+		<year>2017</year>
+		<publisher>Retro Software</publisher>
+		<info name="author" value="Kees van Oss" />
+		<info name="usage" value="Load with *RUN&quot;MMRUN&quot;" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102400">
+				<rom name="mm.dsk" size="102400" crc="744d5ac9" sha1="7990c552cacf4af428251afc2fde452bdd2bb1af" offset="0" />
 			</dataarea>
 		</part>
 	</software>

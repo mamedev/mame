@@ -60,15 +60,21 @@
 ******************************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/tms9900/tms9980a.h"
+#include "imagedev/cassette.h"
+#include "machine/timer.h"
 #include "machine/tms9901.h"
 #include "machine/tms9902.h"
-#include "video/tms9928a.h"
-#include "imagedev/cassette.h"
-#include "sound/speaker.h"
+#include "sound/spkrdev.h"
 #include "sound/wave.h"
+#include "video/tms9928a.h"
+
+#include "speaker.h"
+
 #include "tm990189.lh"
 #include "tm990189v.lh"
+
 
 #define TMS9901_0_TAG "tms9901_usr"
 #define TMS9901_1_TAG "tms9901_sys"
@@ -77,15 +83,16 @@ class tm990189_state : public driver_device
 {
 public:
 	tm990189_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-	m_tms9980a(*this, "maincpu"),
-	m_speaker(*this, "speaker"),
-	m_cass(*this, "cassette"),
-	m_tms9918(*this, "tms9918" ),
-	m_maincpu(*this, "maincpu"),
-	m_cassette(*this, "cassette"),
-	m_tms9901_usr(*this, TMS9901_0_TAG),
-	m_tms9901_sys(*this, TMS9901_1_TAG) { }
+		: driver_device(mconfig, type, tag)
+		, m_tms9980a(*this, "maincpu")
+		, m_speaker(*this, "speaker")
+		, m_cass(*this, "cassette")
+		, m_tms9918(*this, "tms9918")
+		, m_maincpu(*this, "maincpu")
+		, m_cassette(*this, "cassette")
+		, m_tms9901_usr(*this, TMS9901_0_TAG)
+		, m_tms9901_sys(*this, TMS9901_1_TAG)
+	{ }
 
 	required_device<tms9980a_device> m_tms9980a;
 	required_device<speaker_sound_device> m_speaker;
@@ -101,17 +108,17 @@ public:
 	int m_digitsel;
 	int m_segment;
 	emu_timer *m_displayena_timer;
-	UINT8 m_segment_state[10];
-	UINT8 m_old_segment_state[10];
-	UINT8 m_LED_state;
+	uint8_t m_segment_state[10];
+	uint8_t m_old_segment_state[10];
+	uint8_t m_LED_state;
 	emu_timer *m_joy1x_timer;
 	emu_timer *m_joy1y_timer;
 	emu_timer *m_joy2x_timer;
 	emu_timer *m_joy2y_timer;
 	device_image_interface *m_rs232_fp;
-	UINT8 m_rs232_rts;
+	uint8_t m_rs232_rts;
 	emu_timer *m_rs232_input_timer;
-	UINT8 m_bogus_read_save;
+	uint8_t m_bogus_read_save;
 
 	DECLARE_WRITE8_MEMBER( external_operation );
 
@@ -176,17 +183,17 @@ MACHINE_RESET_MEMBER(tm990189_state,tm990_189)
 
 MACHINE_START_MEMBER(tm990189_state,tm990_189)
 {
-	m_displayena_timer = machine().scheduler().timer_alloc(FUNC_NULL);
+	m_displayena_timer = machine().scheduler().timer_alloc(timer_expired_delegate());
 }
 
 MACHINE_START_MEMBER(tm990189_state,tm990_189_v)
 {
-	m_displayena_timer = machine().scheduler().timer_alloc(FUNC_NULL);
+	m_displayena_timer = machine().scheduler().timer_alloc(timer_expired_delegate());
 
-	m_joy1x_timer = machine().scheduler().timer_alloc(FUNC_NULL);
-	m_joy1y_timer = machine().scheduler().timer_alloc(FUNC_NULL);
-	m_joy2x_timer = machine().scheduler().timer_alloc(FUNC_NULL);
-	m_joy2y_timer = machine().scheduler().timer_alloc(FUNC_NULL);
+	m_joy1x_timer = machine().scheduler().timer_alloc(timer_expired_delegate());
+	m_joy1y_timer = machine().scheduler().timer_alloc(timer_expired_delegate());
+	m_joy2x_timer = machine().scheduler().timer_alloc(timer_expired_delegate());
+	m_joy2y_timer = machine().scheduler().timer_alloc(timer_expired_delegate());
 }
 
 MACHINE_RESET_MEMBER(tm990189_state,tm990_189_v)
@@ -202,13 +209,13 @@ MACHINE_RESET_MEMBER(tm990189_state,tm990_189_v)
 
 TIMER_CALLBACK_MEMBER(tm990189_state::clear_load)
 {
-	m_load_state = FALSE;
+	m_load_state = false;
 	m_tms9980a->set_input_line(INT_9980A_LOAD, CLEAR_LINE);
 }
 
 void tm990189_state::hold_load()
 {
-	m_load_state = TRUE;
+	m_load_state = true;
 	m_tms9980a->set_input_line(INT_9980A_LOAD, ASSERT_LINE);
 	machine().scheduler().timer_set(attotime::from_msec(100), timer_expired_delegate(FUNC(tm990189_state::clear_load),this));
 }
@@ -238,7 +245,7 @@ void tm990189_state::draw_digit()
 
 TIMER_DEVICE_CALLBACK_MEMBER(tm990189_state::display_callback)
 {
-	UINT8 i;
+	uint8_t i;
 	char ledname[8];
 	// since the segment data is cleared after being used, the old_segment is there
 	// in case the segment data hasn't been refreshed yet.
@@ -309,8 +316,8 @@ WRITE8_MEMBER( tm990189_state::sys9901_interrupt_callback )
 
 READ8_MEMBER( tm990189_state::sys9901_r )
 {
-	UINT8 data = 0;
-	if (offset == TMS9901_CB_INT7)
+	uint8_t data = 0;
+	if (offset == tms9901_device::CB_INT7)
 	{
 		static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7", "LINE8" };
 
@@ -429,7 +436,7 @@ class tm990_189_rs232_image_device :    public device_t,
 {
 public:
 	// construction/destruction
-	tm990_189_rs232_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tm990_189_rs232_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// image-level overrides
 	virtual iodevice_t image_type() const override { return IO_SERIAL; }
@@ -439,31 +446,23 @@ public:
 	virtual bool is_creatable() const override { return 1; }
 	virtual bool must_be_loaded() const override { return 0; }
 	virtual bool is_reset_on_load() const override { return 0; }
-	virtual const char *image_interface() const override { return nullptr; }
 	virtual const char *file_extensions() const override { return ""; }
-	virtual const option_guide *create_option_guide() const override { return nullptr; }
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-	virtual bool call_load() override;
+	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
 protected:
 	// device-level overrides
-	virtual void device_config_complete() override;
 	virtual void device_start() override;
 };
 
-const device_type TM990_189_RS232 = &device_creator<tm990_189_rs232_image_device>;
+DEFINE_DEVICE_TYPE(TM990_189_RS232, tm990_189_rs232_image_device, "tm990_189_rs232_image", "TM990/189 RS232 port")
 
-tm990_189_rs232_image_device::tm990_189_rs232_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, TM990_189_RS232, "TM990/189 RS232 port", tag, owner, clock, "tm990_189_rs232_image", __FILE__),
-		device_image_interface(mconfig, *this)
+tm990_189_rs232_image_device::tm990_189_rs232_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, TM990_189_RS232, tag, owner, clock)
+	, device_image_interface(mconfig, *this)
 {
-}
-
-void tm990_189_rs232_image_device::device_config_complete()
-{
-	update_names();
 }
 
 void tm990_189_rs232_image_device::device_start()
@@ -473,7 +472,7 @@ void tm990_189_rs232_image_device::device_start()
 void tm990_189_rs232_image_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	//tm990189_state *state = machine.driver_data<tm990189_state>();
-	UINT8 buf;
+	uint8_t buf;
 	if (/*state->m_rs232_rts &&*/ /*(mame_ftell(state->m_rs232_fp) < mame_fsize(state->m_rs232_fp))*/1)
 	{
 		tms9902_device* tms9902 = static_cast<tms9902_device*>(machine().device("tms9902"));
@@ -482,14 +481,14 @@ void tm990_189_rs232_image_device::device_timer(emu_timer &timer, device_timer_i
 	}
 }
 
-bool tm990_189_rs232_image_device::call_load()
+image_init_result tm990_189_rs232_image_device::call_load()
 {
 	tm990189_state *state = machine().driver_data<tm990189_state>();
 	tms9902_device* tms9902 = static_cast<tms9902_device*>(machine().device("tms9902"));
 	tms9902->rcv_dsr(ASSERT_LINE);
 	state->m_rs232_input_timer = timer_alloc();
 	state->m_rs232_input_timer->adjust(attotime::zero, 0, attotime::from_msec(10));
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 
@@ -515,7 +514,7 @@ void tm990_189_rs232_image_device::call_unload()
 
 WRITE8_MEMBER( tm990189_state::xmit_callback )
 {
-	UINT8 buf = data;
+	uint8_t buf = data;
 	if (m_rs232_fp) m_rs232_fp->fwrite(&buf, 1);
 }
 
@@ -599,7 +598,7 @@ WRITE8_MEMBER( tm990189_state::video_vdp_w )
 
 READ8_MEMBER( tm990189_state::video_joy_r )
 {
-	UINT8 data = ioport("BUTTONS")->read();
+	uint8_t data = ioport("BUTTONS")->read();
 
 	if (m_joy1x_timer->remaining() < attotime::zero)
 		data |= 0x01;
@@ -628,7 +627,7 @@ WRITE8_MEMBER( tm990189_state::video_joy_w )
 // user tms9901 setup
 static const tms9901_interface usr9901reset_param =
 {
-    TMS9901_INT1 | TMS9901_INT2 | TMS9901_INT3 | TMS9901_INT4 | TMS9901_INT5 | TMS9901_INT6,    // only input pins whose state is always known
+    tms9901_device::INT1 | tms9901_device::INT2 | tms9901_device::INT3 | tms9901_device::INT4 | tms9901_device::INT5 | tms9901_device::INT6,    // only input pins whose state is always known
 
     // Read handler. Covers all input lines (see tms9901.h)
     DEVCB_NOOP,
@@ -805,7 +804,7 @@ static ADDRESS_MAP_START( tm990_189_cru_map, AS_IO, 8, tm990189_state )
 	AM_RANGE(0x0400, 0x05ff) AM_DEVWRITE("tms9902", tms9902_device, cruwrite)   /* optional tms9902 */
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( tm990_189, tm990189_state )
+static MACHINE_CONFIG_START( tm990_189 )
 	/* basic machine hardware */
 	MCFG_TMS99xx_ADD("maincpu", TMS9980A, 2000000, tm990_189_memmap, tm990_189_cru_map)
 	MCFG_TMS99xx_EXTOP_HANDLER( WRITE8(tm990189_state, external_operation) )
@@ -862,7 +861,7 @@ static MACHINE_CONFIG_START( tm990_189, tm990189_state )
 	MCFG_TIMER_START_DELAY(attotime::from_msec(150))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( tm990_189_v, tm990189_state )
+static MACHINE_CONFIG_START( tm990_189_v )
 	/* basic machine hardware */
 	MCFG_TMS99xx_ADD("maincpu", TMS9980A, 2000000, tm990_189_v_memmap, tm990_189_cru_map)
 	MCFG_TMS99xx_EXTOP_HANDLER( WRITE8(tm990189_state, external_operation) )
@@ -958,7 +957,7 @@ ROM_END
 
 static INPUT_PORTS_START(tm990_189)
 
-	PORT_START( "LOADINT ")
+	PORT_START( "LOADINT")
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Load interrupt") PORT_CODE(KEYCODE_PRTSCR) PORT_CHANGED_MEMBER(DEVICE_SELF, tm990189_state, load_interrupt, 1)
 
 	/* 45-key calculator-like alphanumeric keyboard... */
@@ -1044,6 +1043,6 @@ static INPUT_PORTS_START(tm990_189)
 	PORT_BIT( 0x3ff, 0x1aa,  IPT_AD_STICK_Y) PORT_SENSITIVITY(JOYSTICK_SENSITIVITY) PORT_KEYDELTA(JOYSTICK_DELTA) PORT_MINMAX(0xd2,0x282 ) PORT_PLAYER(2) PORT_REVERSE
 INPUT_PORTS_END
 
-/*    YEAR  NAME      PARENT    COMPAT  MACHINE      INPUT       INIT    COMPANY                 FULLNAME */
-COMP( 1978, 990189,   0,        0,      tm990_189,   tm990_189, driver_device,  0, "Texas Instruments", "TM 990/189 University Board microcomputer" , 0)
-COMP( 1980, 990189v,  990189,   0,      tm990_189_v, tm990_189, driver_device,  0, "Texas Instruments", "TM 990/189 University Board microcomputer with Video Board Interface" , 0)
+//    YEAR  NAME      PARENT    COMPAT  MACHINE      INPUT      STATE           INIT  COMPANY              FULLNAME                                                                FLAGS
+COMP( 1978, 990189,   0,        0,      tm990_189,   tm990_189, tm990189_state, 0,    "Texas Instruments", "TM 990/189 University Board microcomputer",                            0 )
+COMP( 1980, 990189v,  990189,   0,      tm990_189_v, tm990_189, tm990189_state, 0,    "Texas Instruments", "TM 990/189 University Board microcomputer with Video Board Interface", 0 )

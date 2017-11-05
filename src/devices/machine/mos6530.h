@@ -29,20 +29,15 @@
 
 **********************************************************************/
 
-#ifndef __MIOT6530_H__
-#define __MIOT6530_H__
+#ifndef MAME_MACHINE_MOS6530_H
+#define MAME_MACHINE_MOS6530_H
+
+#pragma once
 
 
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
-
-struct mos6530_port
-{
-	UINT8 m_in;
-	UINT8 m_out;
-	UINT8 m_ddr;
-};
 
 /***************************************************************************
     MACROS / CONSTANTS
@@ -51,22 +46,21 @@ struct mos6530_port
 class mos6530_device : public device_t
 {
 public:
-	mos6530_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	~mos6530_device() {}
+	mos6530_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &set_in_pa_callback(device_t &device, _Object object) { return downcast<mos6530_device &>(device).m_in_pa_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_pa_callback(device_t &device, _Object object) { return downcast<mos6530_device &>(device).m_out_pa_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_in_pb_callback(device_t &device, _Object object) { return downcast<mos6530_device &>(device).m_in_pb_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_pb_callback(device_t &device, _Object object) { return downcast<mos6530_device &>(device).m_out_pb_cb.set_callback(object); }
+	template <class Object> static devcb_base &set_in_pa_callback(device_t &device, Object &&cb) { return downcast<mos6530_device &>(device).m_in_pa_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_pa_callback(device_t &device, Object &&cb) { return downcast<mos6530_device &>(device).m_out_pa_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_in_pb_callback(device_t &device, Object &&cb) { return downcast<mos6530_device &>(device).m_in_pb_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_pb_callback(device_t &device, Object &&cb) { return downcast<mos6530_device &>(device).m_out_pb_cb.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 
-	UINT8 porta_in_get();
-	UINT8 portb_in_get();
+	uint8_t porta_in_get();
+	uint8_t portb_in_get();
 
-	UINT8 porta_out_get();
-	UINT8 portb_out_get();
+	uint8_t porta_out_get();
+	uint8_t portb_out_get();
 
 protected:
 	// device-level overrides
@@ -75,6 +69,18 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
+	enum
+	{
+		TIMER_END_CALLBACK
+	};
+
+	struct mos6530_port
+	{
+		uint8_t m_in;
+		uint8_t m_out;
+		uint8_t m_ddr;
+	};
+
 	// internal state
 	devcb_read8    m_in_pa_cb;
 	devcb_write8   m_out_pa_cb;
@@ -84,28 +90,23 @@ private:
 
 	mos6530_port    m_port[2];
 
-	UINT8           m_irqstate;
-	UINT8           m_irqenable;
+	uint8_t           m_irqstate;
+	uint8_t           m_irqenable;
 
-	UINT8           m_timershift;
-	UINT8           m_timerstate;
+	uint8_t           m_timershift;
+	uint8_t           m_timerstate;
 	emu_timer *     m_timer;
 
-	UINT32          m_clock;
+	uint32_t          m_clock;
 
 	void update_irqstate();
-	UINT8 get_timer();
+	uint8_t get_timer();
 
-	void porta_in_set(UINT8 data, UINT8 mask);
-	void portb_in_set(UINT8 data, UINT8 mask);
-
-	enum
-	{
-		TIMER_END_CALLBACK
-	};
+	void porta_in_set(uint8_t data, uint8_t mask);
+	void portb_in_set(uint8_t data, uint8_t mask);
 };
 
-extern const device_type MOS6530;
+DECLARE_DEVICE_TYPE(MOS6530, mos6530_device)
 
 
 #define MCFG_MOS6530_IN_PA_CB(_devcb) \
@@ -120,5 +121,4 @@ extern const device_type MOS6530;
 #define MCFG_MOS6530_OUT_PB_CB(_devcb) \
 	devcb = &mos6530_device::set_out_pb_callback(*device, DEVCB_##_devcb);
 
-
-#endif
+#endif // MAME_MACHINE_MOS6530_H

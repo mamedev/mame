@@ -20,8 +20,8 @@
 //**************************************************************************
 
 // these constants are returned from the irq_state function
-const UINT8 Z80_DAISY_INT = 0x01;       // interrupt request mask
-const UINT8 Z80_DAISY_IEO = 0x02;       // interrupt disable mask (IEO)
+const uint8_t Z80_DAISY_INT = 0x01;       // interrupt request mask
+const uint8_t Z80_DAISY_IEO = 0x02;       // interrupt disable mask (IEO)
 
 
 
@@ -97,7 +97,7 @@ protected:
 
 	// callbacks
 	int daisy_update_irq_state();
-	int daisy_call_ack_device();
+	device_z80daisy_interface *daisy_get_irq_device();
 	void daisy_call_reti_device();
 
 private:

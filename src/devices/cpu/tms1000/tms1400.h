@@ -6,8 +6,10 @@
 
 */
 
-#ifndef _TMS1400_H_
-#define _TMS1400_H_
+#ifndef MAME_CPU_TMS1000_TMS1400_H
+#define MAME_CPU_TMS1000_TMS1400_H
+
+#pragma once
 
 #include "tms1100.h"
 
@@ -15,13 +17,14 @@
 class tms1400_cpu_device : public tms1100_cpu_device
 {
 public:
-	tms1400_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	tms1400_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT8 o_pins, UINT8 r_pins, UINT8 pc_bits, UINT8 byte_bits, UINT8 x_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, const char *shortname, const char *source);
+	tms1400_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
+	tms1400_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 o_pins, u8 r_pins, u8 pc_bits, u8 byte_bits, u8 x_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data);
+
 	// overrides
 	virtual void device_reset() override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	virtual void op_br() override;
 	virtual void op_call() override;
@@ -34,28 +37,29 @@ protected:
 class tms1470_cpu_device : public tms1400_cpu_device
 {
 public:
-	tms1470_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tms1470_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
 
 class tms1600_cpu_device : public tms1400_cpu_device
 {
 public:
-	tms1600_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	tms1600_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT8 o_pins, UINT8 r_pins, UINT8 pc_bits, UINT8 byte_bits, UINT8 x_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, const char *shortname, const char *source);
+	tms1600_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+protected:
+	tms1600_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 o_pins, u8 r_pins, u8 pc_bits, u8 byte_bits, u8 x_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data);
 };
 
 class tms1670_cpu_device : public tms1600_cpu_device
 {
 public:
-	tms1670_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tms1670_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
 
-extern const device_type TMS1400;
-extern const device_type TMS1470;
-extern const device_type TMS1600;
-extern const device_type TMS1670;
+DECLARE_DEVICE_TYPE(TMS1400, tms1400_cpu_device)
+DECLARE_DEVICE_TYPE(TMS1470, tms1470_cpu_device)
+DECLARE_DEVICE_TYPE(TMS1600, tms1600_cpu_device)
+DECLARE_DEVICE_TYPE(TMS1670, tms1670_cpu_device)
 
-
-#endif /* _TMS1400_H_ */
+#endif // MAME_CPU_TMS1000_TMS1400_H

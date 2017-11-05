@@ -79,8 +79,12 @@ Notes:
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
 #include "includes/galpani2.h"
+
+#include "cpu/m68000/m68000.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 /***************************************************************************
 
@@ -124,7 +128,7 @@ WRITE16_MEMBER(galpani2_state::galpani2_eeprom_w)
 
 void galpani2_state::machine_start()
 {
-	UINT8 *ROM = memregion("subdata")->base();
+	uint8_t *ROM = memregion("subdata")->base();
 	membank("subdatabank")->configure_entries(0, 0x2000000/0x0800000, ROM, 0x0800000);
 	membank("subdatabank")->set_entry(0);
 
@@ -172,7 +176,7 @@ WRITE8_MEMBER(galpani2_state::galpani2_mcu_init_w)
 {
 	address_space &srcspace = m_maincpu->space(AS_PROGRAM);
 	address_space &dstspace = m_subcpu->space(AS_PROGRAM);
-	UINT32 mcu_address, mcu_data;
+	uint32_t mcu_address, mcu_data;
 
 	for ( mcu_address = 0x100010; mcu_address < (0x100010 + 6); mcu_address += 1 )
 	{
@@ -186,7 +190,7 @@ void galpani2_state::galpani2_mcu_nmi1()
 {
 	address_space &srcspace = m_maincpu->space(AS_PROGRAM);
 	address_space &dstspace = m_subcpu->space(AS_PROGRAM);
-	UINT32 mcu_list, mcu_command, mcu_address, mcu_extra, mcu_src, mcu_dst, mcu_size;
+	uint32_t mcu_list, mcu_command, mcu_address, mcu_extra, mcu_src, mcu_dst, mcu_size;
 
 	for ( mcu_list = 0x100021; mcu_list < (0x100021 + 0x40); mcu_list += 4 )
 	{
@@ -331,14 +335,14 @@ WRITE8_MEMBER(galpani2_state::galpani2_coin_lockout_w)
 
 WRITE8_MEMBER(galpani2_state::galpani2_oki1_bank_w)
 {
-	UINT8 *ROM = memregion("oki1")->base();
+	uint8_t *ROM = memregion("oki1")->base();
 	logerror("%s : %s bank %08X\n",machine().describe_context(),tag(),data);
 	memcpy(ROM + 0x30000, ROM + 0x40000 + 0x10000 * (~data & 0xf), 0x10000);
 }
 
 WRITE8_MEMBER(galpani2_state::galpani2_oki2_bank_w)
 {
-	m_oki2->set_bank_base(0x40000 * (data & 0xf) );
+	m_oki2->set_rom_bank(data & 0xf);
 	logerror("%s : %s bank %08X\n",machine().describe_context(),tag(),data);
 }
 
@@ -615,7 +619,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(galpani2_state::galpani2_interrupt2)
 		m_subcpu->set_input_line(3, HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( galpani2, galpani2_state )
+static MACHINE_CONFIG_START( galpani2 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_27MHz/2)       /* Confirmed on galpani2i PCB */
@@ -656,10 +660,10 @@ static MACHINE_CONFIG_START( galpani2, galpani2_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_OKIM6295_ADD("oki1", XTAL_20MHz/10, OKIM6295_PIN7_HIGH)    /* Confirmed on galpani2i PCB */
+	MCFG_OKIM6295_ADD("oki1", XTAL_20MHz/10, PIN7_HIGH)    /* Confirmed on galpani2i PCB */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 
-	MCFG_OKIM6295_ADD("oki2", XTAL_20MHz/10, OKIM6295_PIN7_HIGH)    /* Confirmed on galpani2i PCB */
+	MCFG_OKIM6295_ADD("oki2", XTAL_20MHz/10, PIN7_HIGH)    /* Confirmed on galpani2i PCB */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
@@ -1196,15 +1200,15 @@ ROM_START( gp2quiz )
 	ROM_LOAD( "gp2-101-0044.u60",  0x200000, 0x100000, CRC(3c45134f) SHA1(a5362bfcc6beb6e776c1bce4544475f8947fccea) )
 ROM_END
 
-GAME( 1993, galpani2,  0,        galpani2, galpani2, driver_device, 0, ROT90, "Kaneko", "Gals Panic II (Asia)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, galpani2e, galpani2, galpani2, galpani2, driver_device, 0, ROT90, "Kaneko", "Gals Panic II (English)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, galpani2e2,galpani2, galpani2, galpani2, driver_device, 0, ROT90, "Kaneko", "Gals Panic II (English, 2 PCB ver.)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, galpani2g, galpani2, galpani2, galpani2, driver_device, 0, ROT90, "Kaneko", "Gals Panic II (Germany, 2 PCB ver.)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, galpani2i, galpani2, galpani2, galpani2, driver_device, 0, ROT90, "Kaneko", "Gals Panic II (Italy, single PCB)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, galpani2gs,galpani2, galpani2, galpani2, driver_device, 0, ROT90, "Kaneko", "Gals Panic II (Germany, single PCB)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, galpani2t, galpani2, galpani2, galpani2, driver_device, 0, ROT90, "Kaneko", "Gals Panic II (Taiwan)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, galpani2j, galpani2, galpani2, galpani2, driver_device, 0, ROT90, "Kaneko", "Gals Panic II (Japan)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE ) // it is a 'quiz edition' but the title screen doesn't say, maybe all Japanese versions have the Quiz
+GAME( 1993, galpani2,  0,        galpani2, galpani2, galpani2_state, 0, ROT90, "Kaneko", "Gals Panic II (Asia)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, galpani2e, galpani2, galpani2, galpani2, galpani2_state, 0, ROT90, "Kaneko", "Gals Panic II (English)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, galpani2e2,galpani2, galpani2, galpani2, galpani2_state, 0, ROT90, "Kaneko", "Gals Panic II (English, 2 PCB ver.)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, galpani2g, galpani2, galpani2, galpani2, galpani2_state, 0, ROT90, "Kaneko", "Gals Panic II (Germany, 2 PCB ver.)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, galpani2i, galpani2, galpani2, galpani2, galpani2_state, 0, ROT90, "Kaneko", "Gals Panic II (Italy, single PCB)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, galpani2gs,galpani2, galpani2, galpani2, galpani2_state, 0, ROT90, "Kaneko", "Gals Panic II (Germany, single PCB)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, galpani2t, galpani2, galpani2, galpani2, galpani2_state, 0, ROT90, "Kaneko", "Gals Panic II (Taiwan)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, galpani2j, galpani2, galpani2, galpani2, galpani2_state, 0, ROT90, "Kaneko", "Gals Panic II (Japan)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE ) // it is a 'quiz edition' but the title screen doesn't say, maybe all Japanese versions have the Quiz
 
-GAME( 1993, gp2quiz,  0,        galpani2, galpani2, driver_device, 0, ROT90, "Kaneko", "Gals Panic II - Quiz Version", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE ) // this one has 'quiz edition' on the title screen
+GAME( 1993, gp2quiz,   0,        galpani2, galpani2, galpani2_state, 0, ROT90, "Kaneko", "Gals Panic II - Quiz Version", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE ) // this one has 'quiz edition' on the title screen
 
-GAME( 1994, gp2se,    0,        galpani2, gp2se, driver_device,    0, ROT90, "Kaneko", "Gals Panic II' - Special Edition (Japan)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, gp2se,     0,        galpani2, gp2se,    galpani2_state, 0, ROT90, "Kaneko", "Gals Panic II' - Special Edition (Japan)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )

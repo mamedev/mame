@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Andrew Gardner
+#include "emu.h"
 #include <QtWidgets/QAction>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QMenuBar>
@@ -76,7 +77,7 @@ MainWindow::MainWindow(running_machine* machine, QWidget* parent) :
 	rightActComments->setActionGroup(rightBarGroup);
 	rightActRaw->setShortcut(QKeySequence("Ctrl+R"));
 	rightActEncrypted->setShortcut(QKeySequence("Ctrl+E"));
-	rightActComments->setShortcut(QKeySequence("Ctrl+C"));
+	rightActComments->setShortcut(QKeySequence("Ctrl+N"));
 	rightActRaw->setChecked(true);
 	connect(rightBarGroup, &QActionGroup::triggered, this, &MainWindow::rightBarChanged);
 
@@ -213,13 +214,13 @@ bool MainWindow::eventFilter(QObject* obj, QEvent* event)
 void MainWindow::toggleBreakpointAtCursor(bool changedTo)
 {
 	debug_view_disasm *const dasmView = downcast<debug_view_disasm*>(m_dasmFrame->view()->view());
-	if (dasmView->cursor_visible() && (debug_cpu_get_visible_cpu(*m_machine) == dasmView->source()->device()))
+	if (dasmView->cursor_visible() && (m_machine->debugger().cpu().get_visible_cpu() == dasmView->source()->device()))
 	{
 		offs_t const address = downcast<debug_view_disasm *>(dasmView)->selected_address();
 		device_debug *const cpuinfo = dasmView->source()->device()->debug();
 
 		// Find an existing breakpoint at this address
-		INT32 bpindex = -1;
+		int32_t bpindex = -1;
 		for (device_debug::breakpoint* bp = cpuinfo->breakpoint_first();
 				bp != nullptr;
 				bp = bp->next())
@@ -241,7 +242,7 @@ void MainWindow::toggleBreakpointAtCursor(bool changedTo)
 		{
 			command = string_format("bpclear 0x%X", bpindex);
 		}
-		debug_console_execute_command(*m_machine, command.c_str(), 1);
+		m_machine->debugger().console().execute_command(command.c_str(), true);
 	}
 
 	refreshAll();
@@ -251,7 +252,7 @@ void MainWindow::toggleBreakpointAtCursor(bool changedTo)
 void MainWindow::enableBreakpointAtCursor(bool changedTo)
 {
 	debug_view_disasm *const dasmView = downcast<debug_view_disasm*>(m_dasmFrame->view()->view());
-	if (dasmView->cursor_visible() && (debug_cpu_get_visible_cpu(*m_machine) == dasmView->source()->device()))
+	if (dasmView->cursor_visible() && (m_machine->debugger().cpu().get_visible_cpu() == dasmView->source()->device()))
 	{
 		offs_t const address = dasmView->selected_address();
 		device_debug *const cpuinfo = dasmView->source()->device()->debug();
@@ -263,9 +264,9 @@ void MainWindow::enableBreakpointAtCursor(bool changedTo)
 
 		if (bp != nullptr)
 		{
-			INT32 const bpindex = bp->index();
+			int32_t const bpindex = bp->index();
 			std::string command = string_format(bp->enabled() ? "bpdisable 0x%X" : "bpenable 0x%X", bpindex);
-			debug_console_execute_command(*m_machine, command.c_str(), 1);
+			m_machine->debugger().console().execute_command(command.c_str(), true);
 		}
 	}
 
@@ -276,11 +277,11 @@ void MainWindow::enableBreakpointAtCursor(bool changedTo)
 void MainWindow::runToCursor(bool changedTo)
 {
 	debug_view_disasm* dasmView = downcast<debug_view_disasm*>(m_dasmFrame->view()->view());
-	if (dasmView->cursor_visible() && (debug_cpu_get_visible_cpu(*m_machine) == dasmView->source()->device()))
+	if (dasmView->cursor_visible() && (m_machine->debugger().cpu().get_visible_cpu() == dasmView->source()->device()))
 	{
 		offs_t address = downcast<debug_view_disasm*>(dasmView)->selected_address();
 		std::string command = string_format("go 0x%X", address);
-		debug_console_execute_command(*m_machine, command.c_str(), 1);
+		m_machine->debugger().console().execute_command(command.c_str(), true);
 	}
 }
 
@@ -315,14 +316,12 @@ void MainWindow::executeCommand(bool withClear)
 	// A blank command is a "silent step"
 	if (command == "")
 	{
-		debug_cpu_get_visible_cpu(*m_machine)->debug()->single_step();
+		m_machine->debugger().cpu().get_visible_cpu()->debug()->single_step();
 		return;
 	}
 
 	// Send along the command
-	debug_console_execute_command(*m_machine,
-									command.toLocal8Bit().data(),
-									true);
+	m_machine->debugger().console().execute_command(command.toLocal8Bit().data(), true);
 
 	// Add history & set the index to be the top of the stack
 	addToHistory(command);
@@ -348,7 +347,7 @@ void MainWindow::mountImage(bool changedTo)
 	device_image_interface *img = iter.byindex(imageIndex);
 	if (img == nullptr)
 	{
-		debug_console_printf(*m_machine, "Something is wrong with the mount menu.\n");
+		m_machine->debugger().console().printf("Something is wrong with the mount menu.\n");
 		refreshAll();
 		return;
 	}
@@ -359,9 +358,9 @@ void MainWindow::mountImage(bool changedTo)
 													QDir::currentPath(),
 													tr("All files (*.*)"));
 
-	if (img->load(filename.toUtf8().data()) != IMAGE_INIT_PASS)
+	if (img->load(filename.toUtf8().data()) != image_init_result::PASS)
 	{
-		debug_console_printf(*m_machine, "Image could not be mounted.\n");
+		m_machine->debugger().console().printf("Image could not be mounted.\n");
 		refreshAll();
 		return;
 	}
@@ -377,7 +376,7 @@ void MainWindow::mountImage(bool changedTo)
 	const QString newTitle = baseString + QString(" : ") + QString(img->filename());
 	parentMenuItem->setTitle(newTitle);
 
-	debug_console_printf(*m_machine, "Image %s mounted successfully.\n", filename.toUtf8().data());
+	m_machine->debugger().console().printf("Image %s mounted successfully.\n", filename.toUtf8().data());
 	refreshAll();
 }
 
@@ -401,7 +400,7 @@ void MainWindow::unmountImage(bool changedTo)
 	const QString newTitle = baseString + QString(" : ") + QString("[empty slot]");
 	parentMenuItem->setTitle(newTitle);
 
-	debug_console_printf(*m_machine, "Image successfully unmounted.\n");
+	m_machine->debugger().console().printf("Image successfully unmounted.\n");
 	refreshAll();
 }
 
@@ -409,7 +408,7 @@ void MainWindow::unmountImage(bool changedTo)
 void MainWindow::dasmViewUpdated()
 {
 	debug_view_disasm *const dasmView = downcast<debug_view_disasm*>(m_dasmFrame->view()->view());
-	bool const haveCursor = dasmView->cursor_visible() && (debug_cpu_get_visible_cpu(*m_machine) == dasmView->source()->device());
+	bool const haveCursor = dasmView->cursor_visible() && (m_machine->debugger().cpu().get_visible_cpu() == dasmView->source()->device());
 	bool haveBreakpoint = false;
 	bool breakpointEnabled = false;
 	if (haveCursor)
@@ -528,20 +527,20 @@ void MainWindowQtConfig::applyToQWidget(QWidget* widget)
 }
 
 
-void MainWindowQtConfig::addToXmlDataNode(xml_data_node* node) const
+void MainWindowQtConfig::addToXmlDataNode(util::xml::data_node &node) const
 {
 	WindowQtConfig::addToXmlDataNode(node);
-	xml_set_attribute_int(node, "rightbar", m_rightBar);
-	xml_set_attribute(node, "qtwindowstate", m_windowState.toPercentEncoding().data());
+	node.set_attribute_int("rightbar", m_rightBar);
+	node.set_attribute("qtwindowstate", m_windowState.toPercentEncoding().data());
 }
 
 
-void MainWindowQtConfig::recoverFromXmlNode(xml_data_node* node)
+void MainWindowQtConfig::recoverFromXmlNode(util::xml::data_node const &node)
 {
 	WindowQtConfig::recoverFromXmlNode(node);
-	const char* state = xml_get_attribute_string(node, "qtwindowstate", "");
+	const char* state = node.get_attribute_string("qtwindowstate", "");
 	m_windowState = QByteArray::fromPercentEncoding(state);
-	m_rightBar = xml_get_attribute_int(node, "rightbar", m_rightBar);
+	m_rightBar = node.get_attribute_int("rightbar", m_rightBar);
 }
 
 DasmDockWidget::~DasmDockWidget()

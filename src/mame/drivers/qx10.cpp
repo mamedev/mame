@@ -31,19 +31,24 @@
 ****************************************************************************/
 
 
+#include "emu.h"
+
 #include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
-#include "machine/pit8253.h"
-#include "machine/pic8259.h"
-#include "machine/z80dart.h"
-#include "machine/mc146818.h"
-#include "machine/i8255.h"
 #include "machine/am9517a.h"
-#include "video/upd7220.h"
-#include "machine/upd765.h"
-#include "machine/ram.h"
+#include "machine/i8255.h"
+#include "machine/mc146818.h"
+#include "machine/pic8259.h"
+#include "machine/pit8253.h"
 #include "machine/qx10kbd.h"
+#include "machine/ram.h"
+#include "machine/upd765.h"
+#include "machine/z80dart.h"
+#include "video/upd7220.h"
+
+#include "screen.h"
 #include "softlist.h"
+
 
 #define MAIN_CLK    15974400
 
@@ -89,11 +94,11 @@ public:
 	required_device<upd7220_device> m_hgdc;
 	required_device<mc146818_device> m_rtc;
 	required_device<rs232_port_device> m_kbd;
-	UINT8 m_vram_bank;
-	//required_shared_ptr<UINT8> m_video_ram;
-	std::unique_ptr<UINT16[]> m_video_ram;
+	uint8_t m_vram_bank;
+	//required_shared_ptr<uint8_t> m_video_ram;
+	std::unique_ptr<uint16_t[]> m_video_ram;
 
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -125,7 +130,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(keyboard_clk);
 	DECLARE_WRITE_LINE_MEMBER(keyboard_irq);
 
-	UINT8 *m_char_rom;
+	uint8_t *m_char_rom;
 
 	/* FDD */
 	int     m_fdcint;
@@ -136,12 +141,12 @@ public:
 	int     m_membank;
 	int     m_memprom;
 	int     m_memcmos;
-	UINT8   m_cmosram[0x800];
+	uint8_t   m_cmosram[0x800];
 
-	UINT8 m_color_mode;
+	uint8_t m_color_mode;
 
 	struct{
-		UINT8 rx;
+		uint8_t rx;
 	}m_rs232c;
 
 	DECLARE_PALETTE_INIT(qx10);
@@ -157,7 +162,7 @@ UPD7220_DISPLAY_PIXELS_MEMBER( qx10_state::hgdc_display_pixels )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	int xi,gfx[3];
-	UINT8 pen;
+	uint8_t pen;
 
 	if(m_color_mode)
 	{
@@ -189,9 +194,9 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( qx10_state::hgdc_draw_text )
 	int xi,yi;
 	int tile;
 	int attr;
-	UINT8 color;
-	UINT8 tile_data;
-	UINT8 pen;
+	uint8_t color;
+	uint8_t tile_data;
+	uint8_t pen;
 
 	for( x = 0; x < pitch; x++ )
 	{
@@ -235,7 +240,7 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( qx10_state::hgdc_draw_text )
 	}
 }
 
-UINT32 qx10_state::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect )
+uint32_t qx10_state::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect )
 {
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
@@ -518,7 +523,7 @@ ADDRESS_MAP_END
 {
     if(newval && !oldval)
     {
-        m_keyb.rx = (UINT8)(FPTR)(param) & 0x7f;
+        m_keyb.rx = (uint8_t)(uintptr_t)(param) & 0x7f;
         m_pic_m->ir4_w(1);
     }
 
@@ -619,7 +624,7 @@ GFXDECODE_END
 void qx10_state::video_start()
 {
 	// allocate memory
-	m_video_ram = make_unique_clear<UINT16[]>(0x30000);
+	m_video_ram = make_unique_clear<uint16_t[]>(0x30000);
 
 	// find memory regions
 	m_char_rom = memregion("chargen")->base();
@@ -652,15 +657,15 @@ WRITE16_MEMBER( qx10_state::vram_w )
 	COMBINE_DATA(&m_video_ram[offset + (0x20000 * bank)]);
 }
 
-static ADDRESS_MAP_START( upd7220_map, AS_0, 16, qx10_state )
-	AM_RANGE(0x00000, 0x5ffff) AM_READWRITE(vram_r,vram_w)
+static ADDRESS_MAP_START( upd7220_map, 0, 16, qx10_state )
+	AM_RANGE(0x00000, 0x3ffff) AM_READWRITE(vram_r,vram_w)
 ADDRESS_MAP_END
 
 static SLOT_INTERFACE_START(keyboard)
 	SLOT_INTERFACE("qx10", QX10_KEYBOARD)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( qx10, qx10_state )
+static MACHINE_CONFIG_START( qx10 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, MAIN_CLK / 4)
 	MCFG_CPU_PROGRAM_MAP(qx10_mem)
@@ -707,10 +712,16 @@ static MACHINE_CONFIG_START( qx10, qx10_state )
 	MCFG_PIT8253_CLK2(MAIN_CLK / 8)
 	MCFG_PIT8253_OUT2_HANDLER(DEVWRITELINE("upd7201", z80dart_device, rxtxcb_w))
 
-	MCFG_PIC8259_ADD("pic8259_master", INPUTLINE("maincpu", 0), VCC, READ8(qx10_state, get_slave_ack))
-	MCFG_PIC8259_ADD("pic8259_slave", DEVWRITELINE("pic8259_master", pic8259_device, ir7_w), GND, NOOP)
+	MCFG_DEVICE_ADD("pic8259_master", PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
+	MCFG_PIC8259_IN_SP_CB(VCC)
+	MCFG_PIC8259_CASCADE_ACK_CB(READ8(qx10_state, get_slave_ack))
 
-	MCFG_UPD7201_ADD("upd7201", MAIN_CLK/4, 0, 0, 0, 0) // channel b clock set by pit2 channel 2
+	MCFG_DEVICE_ADD("pic8259_slave", PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(DEVWRITELINE("pic8259_master", pic8259_device, ir7_w))
+	MCFG_PIC8259_IN_SP_CB(GND)
+
+	MCFG_DEVICE_ADD("upd7201", UPD7201, MAIN_CLK/4) // channel b clock set by pit2 channel 2
 	// Channel A: Keyboard
 	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE("kbd", rs232_port_device, write_txd))
 	// Channel B: RS232
@@ -735,7 +746,7 @@ static MACHINE_CONFIG_START( qx10, qx10_state )
 	MCFG_DEVICE_ADD("i8255", I8255, 0)
 
 	MCFG_DEVICE_ADD("upd7220", UPD7220, MAIN_CLK/6) // unk clock
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, upd7220_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, upd7220_map)
 	MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(qx10_state, hgdc_display_pixels)
 	MCFG_UPD7220_DRAW_TEXT_CALLBACK_OWNER(qx10_state, hgdc_draw_text)
 	MCFG_VIDEO_SET_SCREEN("screen")
@@ -783,5 +794,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY   FULLNAME       FLAGS */
-COMP( 1983, qx10,  0,       0,  qx10,   qx10, driver_device,     0,       "Epson",   "QX-10",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+/*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  STATE        INIT     COMPANY   FULLNAME       FLAGS */
+COMP( 1983, qx10,  0,      0,      qx10,    qx10,  qx10_state,  0,       "Epson",  "QX-10",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

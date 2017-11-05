@@ -10,7 +10,7 @@
 #include "includes/alesis.h"
 
 
-void alesis_state::update_lcd_symbols(bitmap_ind16 &bitmap, UINT8 pos, UINT8 y, UINT8 x, int state)
+void alesis_state::update_lcd_symbols(bitmap_ind16 &bitmap, uint8_t pos, uint8_t y, uint8_t x, int state)
 {
 	if (pos == 6)
 	{

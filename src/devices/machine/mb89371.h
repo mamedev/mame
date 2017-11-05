@@ -8,28 +8,28 @@
  *
  */
 
-#ifndef __MB89371_H__
-#define __MB89371_H__
+#ifndef MAME_MACHINE_MB89371_H
+#define MAME_MACHINE_MB89371_H
 
-#include "emu.h"
+#pragma once
+
 
 class mb89371_device : public device_t
 {
 public:
 	// construction/destruction
-	mb89371_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mb89371_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_WRITE8_MEMBER( write );
 	DECLARE_READ8_MEMBER( read );
 
 protected:
-
 	// device-level overrides
 	virtual void device_start() override;
 };
 
 
 // device type definition
-extern const device_type MB89371;
+DECLARE_DEVICE_TYPE(MB89371, mb89371_device)
 
-#endif
+#endif // MAME_MACHINE_MB89371_H

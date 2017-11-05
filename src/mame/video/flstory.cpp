@@ -55,7 +55,7 @@ TILE_GET_INFO_MEMBER(flstory_state::get_rumba_tile_info)
 
 VIDEO_START_MEMBER(flstory_state,flstory)
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(flstory_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(flstory_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 //  m_bg_tilemap->set_transparent_pen(15);
 	m_bg_tilemap->set_transmask(0, 0x3fff, 0xc000); /* split type 0 has pens 0-13 transparent in front half */
 	m_bg_tilemap->set_transmask(1, 0x8000, 0x7fff); /* split type 1 has pen 15 transparent in front half */
@@ -72,7 +72,7 @@ VIDEO_START_MEMBER(flstory_state,flstory)
 
 VIDEO_START_MEMBER(flstory_state,rumba)
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(flstory_state::get_rumba_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(flstory_state::get_rumba_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 //  m_bg_tilemap->set_transparent_pen(15);
 	m_bg_tilemap->set_transmask(0, 0x3fff, 0xc000); /* split type 0 has pens 0-13 transparent in front half */
 	m_bg_tilemap->set_transmask(1, 0x8000, 0x7fff); /* split type 1 has pen 15 transparent in front half */
@@ -89,7 +89,7 @@ VIDEO_START_MEMBER(flstory_state,rumba)
 
 VIDEO_START_MEMBER(flstory_state,victnine)
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(flstory_state::victnine_get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(flstory_state::victnine_get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_bg_tilemap->set_scroll_cols(32);
 
 	m_paletteram.resize(m_palette->entries());
@@ -210,7 +210,7 @@ void flstory_state::flstory_draw_sprites( bitmap_ind16 &bitmap, const rectangle 
 	}
 }
 
-UINT32 flstory_state::screen_update_flstory(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t flstory_state::screen_update_flstory(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0 | TILEMAP_DRAW_LAYER1, 0);
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 1 | TILEMAP_DRAW_LAYER1, 0);
@@ -267,14 +267,14 @@ void flstory_state::victnine_draw_sprites( bitmap_ind16 &bitmap, const rectangle
 	}
 }
 
-UINT32 flstory_state::screen_update_victnine(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t flstory_state::screen_update_victnine(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	victnine_draw_sprites(bitmap, cliprect);
 	return 0;
 }
 
-UINT32 flstory_state::screen_update_rumba(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t flstory_state::screen_update_rumba(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0 | TILEMAP_DRAW_LAYER1, 0);
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 1 | TILEMAP_DRAW_LAYER1, 0);

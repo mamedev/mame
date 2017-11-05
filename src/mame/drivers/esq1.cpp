@@ -180,12 +180,15 @@ NOTES:
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "bus/midi/midi.h"
 #include "cpu/m6809/m6809.h"
-#include "sound/es5503.h"
 #include "machine/mc68681.h"
 #include "machine/wd_fdc.h"
 #include "machine/esqpanel.h"
+#include "sound/es5503.h"
+#include "speaker.h"
+
 
 #define WD1772_TAG      "wd1772"
 
@@ -194,12 +197,12 @@ class esq1_filters : public device_t,
 {
 public:
 	// construction/destruction
-	esq1_filters(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	esq1_filters(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void set_vca(int channel, UINT8 value);
-	void set_vpan(int channel, UINT8 value);
-	void set_vq(int channel, UINT8 value);
-	void set_vfc(int channel, UINT8 value);
+	void set_vca(int channel, uint8_t value);
+	void set_vpan(int channel, uint8_t value);
+	void set_vq(int channel, uint8_t value);
+	void set_vfc(int channel, uint8_t value);
 
 protected:
 	// device-level overrides
@@ -210,7 +213,7 @@ protected:
 
 private:
 	struct filter {
-		UINT8 vca, vpan, vq, vfc;
+		uint8_t vca, vpan, vq, vfc;
 		double amp, lamp, ramp;
 		double a[5], b[5];
 		double x[4], y[4];
@@ -223,15 +226,15 @@ private:
 	void recalc_filter(filter &f);
 };
 
-static const device_type ESQ1_FILTERS = &device_creator<esq1_filters>;
+DEFINE_DEVICE_TYPE(ESQ1_FILTERS, esq1_filters, "esq1_filters", "ESQ1 Filters stage")
 
-esq1_filters::esq1_filters(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, ESQ1_FILTERS, "ESQ1 Filters stage", tag, owner, clock, "esq1-filters", __FILE__),
-		device_sound_interface(mconfig, *this)
+esq1_filters::esq1_filters(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, ESQ1_FILTERS, tag, owner, clock)
+	, device_sound_interface(mconfig, *this)
 {
 }
 
-void esq1_filters::set_vca(int channel, UINT8 value)
+void esq1_filters::set_vca(int channel, uint8_t value)
 {
 	if(filters[channel].vca != value) {
 		stream->update();
@@ -240,7 +243,7 @@ void esq1_filters::set_vca(int channel, UINT8 value)
 	}
 }
 
-void esq1_filters::set_vpan(int channel, UINT8 value)
+void esq1_filters::set_vpan(int channel, uint8_t value)
 {
 	if(filters[channel].vpan != value) {
 		stream->update();
@@ -249,7 +252,7 @@ void esq1_filters::set_vpan(int channel, UINT8 value)
 	}
 }
 
-void esq1_filters::set_vq(int channel, UINT8 value)
+void esq1_filters::set_vq(int channel, uint8_t value)
 {
 	if(filters[channel].vq != value) {
 		stream->update();
@@ -258,7 +261,7 @@ void esq1_filters::set_vq(int channel, UINT8 value)
 	}
 }
 
-void esq1_filters::set_vfc(int channel, UINT8 value)
+void esq1_filters::set_vfc(int channel, uint8_t value)
 {
 	if(filters[channel].vfc != value) {
 		stream->update();
@@ -395,7 +398,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<mc68681_device> m_duart;
 	required_device<esq1_filters> m_filters;
-	optional_device<wd1772_t> m_fdc;
+	optional_device<wd1772_device> m_fdc;
 	optional_device<esqpanel2x40_device> m_panel;
 	optional_device<midi_port_device> m_mdout;
 
@@ -416,12 +419,12 @@ public:
 
 	int m_mapper_state;
 	int m_seq_bank;
-	UINT8 m_seqram[0x10000];
-	UINT8 m_dosram[0x2000];
+	uint8_t m_seqram[0x10000];
+	uint8_t m_dosram[0x2000];
 	virtual void machine_reset() override;
 	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
 
-	void send_through_panel(UINT8 data);
+	void send_through_panel(uint8_t data);
 };
 
 
@@ -562,7 +565,7 @@ WRITE_LINE_MEMBER(esq1_state::duart_tx_b)
 	m_panel->rx_w(state);
 }
 
-void esq1_state::send_through_panel(UINT8 data)
+void esq1_state::send_through_panel(uint8_t data)
 {
 	m_panel->xmit_char(data);
 }
@@ -571,17 +574,17 @@ INPUT_CHANGED_MEMBER(esq1_state::key_stroke)
 {
 	if (oldval == 0 && newval == 1)
 	{
-		send_through_panel((UINT8)(FPTR)param);
-		send_through_panel((UINT8)(FPTR)0x00);
+		send_through_panel((uint8_t)(uintptr_t)param);
+		send_through_panel((uint8_t)(uintptr_t)0x00);
 	}
 	else if (oldval == 1 && newval == 0)
 	{
-		send_through_panel((UINT8)(FPTR)param&0x7f);
-		send_through_panel((UINT8)(FPTR)0x00);
+		send_through_panel((uint8_t)(uintptr_t)param&0x7f);
+		send_through_panel((uint8_t)(uintptr_t)0x00);
 	}
 }
 
-static MACHINE_CONFIG_START( esq1, esq1_state )
+static MACHINE_CONFIG_START( esq1 )
 	MCFG_CPU_ADD("maincpu", M6809E, 4000000)    // how fast is it?
 	MCFG_CPU_PROGRAM_MAP(esq1_map)
 
@@ -592,7 +595,7 @@ static MACHINE_CONFIG_START( esq1, esq1_state )
 	MCFG_MC68681_B_TX_CALLBACK(WRITELINE(esq1_state, duart_tx_b))
 	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(esq1_state, duart_output))
 
-	MCFG_ESQPANEL2x40_ADD("panel")
+	MCFG_ESQPANEL2X40_ADD("panel")
 	MCFG_ESQPANEL_TX_CALLBACK(DEVWRITELINE("duart", mc68681_device, rx_b_w))
 
 	MCFG_MIDI_PORT_ADD("mdin", midiin_slot, "midiin")
@@ -693,6 +696,6 @@ ROM_START( esqm )
 ROM_END
 
 
-CONS( 1986, esq1, 0   , 0, esq1, esq1, driver_device, 0, "Ensoniq", "ESQ-1", MACHINE_NOT_WORKING )
-CONS( 1986, esqm, esq1, 0, esq1, esq1, driver_device, 0, "Ensoniq", "ESQ-M", MACHINE_NOT_WORKING )
-CONS( 1988, sq80, 0,    0, sq80, esq1, driver_device, 0, "Ensoniq", "SQ-80", MACHINE_NOT_WORKING )
+CONS( 1986, esq1, 0   , 0, esq1, esq1, esq1_state, 0, "Ensoniq", "ESQ-1", MACHINE_NOT_WORKING )
+CONS( 1986, esqm, esq1, 0, esq1, esq1, esq1_state, 0, "Ensoniq", "ESQ-M", MACHINE_NOT_WORKING )
+CONS( 1988, sq80, 0,    0, sq80, esq1, esq1_state, 0, "Ensoniq", "SQ-80", MACHINE_NOT_WORKING )

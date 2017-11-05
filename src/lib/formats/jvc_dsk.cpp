@@ -14,6 +14,7 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "imageutl.h"
 #include "jvc_dsk.h"
 
 jvc_format::jvc_format()
@@ -37,15 +38,18 @@ const char *jvc_format::extensions() const
 
 bool jvc_format::parse_header(io_generic *io, int &header_size, int &tracks, int &heads, int &sectors, int &sector_size, int &base_sector_id)
 {
-	UINT64 size = io_generic_size(io);
+	// The JVC format has a header whose size is the size of the image modulo 256.  Currently, we only
+	// handle up to five header bytes
+	uint64_t size = io_generic_size(io);
 	header_size = size % 256;
-	UINT8 header[5];
+	uint8_t header[5];
 
+	// if we know that this is a header of a bad size, we can fail
+	// immediately; otherwise read the header
+	if (header_size >= sizeof(header))
+		return false;
 	if (header_size > 0)
 		io_generic_read(io, header, 0, header_size);
-
-	if (header_size > 5)
-		return false;
 
 	// default values
 	heads = 1;
@@ -65,20 +69,46 @@ bool jvc_format::parse_header(io_generic *io, int &header_size, int &tracks, int
 		// no break
 	case 1: sectors = header[0];
 		// no break
-	case 0: tracks = (size - header_size) / sector_size / sectors;
+	case 0: tracks = (size - header_size) / sector_size / sectors / heads;
 		break;
 	}
+
+	// os-9 format disk images often don't have a header, but can contain
+	// various geometries. we try to open the file as os-9 image here and
+	// see if the values we get make sense
+	if (header_size == 0 && size > 0x20)
+	{
+		uint8_t os9_header[0x20];
+		io_generic_read(io, os9_header, 0, 0x20);
+
+		int os9_total_sectors = pick_integer_be(os9_header, 0x00, 3);
+		int os9_heads = BIT(os9_header[0x10], 0) ? 2 : 1;
+		int os9_sectors = pick_integer_be(os9_header, 0x11, 2);
+		int os9_tracks = os9_total_sectors / os9_sectors / os9_heads;
+
+		// now let's see if we have valid info
+		if ((os9_tracks * os9_heads * os9_sectors * 256) == size)
+		{
+			tracks = os9_tracks;
+			heads = os9_heads;
+			sectors = os9_sectors;
+
+			osd_printf_verbose("OS-9 format disk image detected.\n");
+		}
+	}
+
+	osd_printf_verbose("Floppy disk image geometry: %d tracks, %d head(s), %d sectors with %d bytes.\n", tracks, heads, sectors, sector_size);
 
 	return tracks * heads * sectors * sector_size == (size - header_size);
 }
 
-int jvc_format::identify(io_generic *io, UINT32 form_factor)
+int jvc_format::identify(io_generic *io, uint32_t form_factor)
 {
 	int header_size, tracks, heads, sectors, sector_size, sector_base_id;
 	return parse_header(io, header_size, tracks, heads, sectors, sector_size, sector_base_id) ? 50 : 0;
 }
 
-bool jvc_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
+bool jvc_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 {
 	int header_size, track_count, head_count, sector_count, sector_size, sector_base_id;
 
@@ -96,7 +126,7 @@ bool jvc_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 		for (int head = 0; head < head_count ; head++)
 		{
 			desc_pc_sector sectors[256];
-			UINT8 sector_data[10000];
+			uint8_t sector_data[10000];
 			int sector_offset = 0;
 
 			for (int i = 0; i < sector_count; i++)
@@ -125,10 +155,10 @@ bool jvc_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 
 bool jvc_format::save(io_generic *io, floppy_image *image)
 {
-	UINT8 bitstream[500000/8];
-	UINT8 sector_data[50000];
+	uint8_t bitstream[500000/8];
+	uint8_t sector_data[50000];
 	desc_xs sectors[256];
-	UINT64 file_offset = 0;
+	uint64_t file_offset = 0;
 
 	int track_count, head_count;
 	image->get_actual_geometry(track_count, head_count);
@@ -136,7 +166,7 @@ bool jvc_format::save(io_generic *io, floppy_image *image)
 	// we'll write a header if the disk is two-sided
 	if (head_count == 2)
 	{
-		UINT8 header[2];
+		uint8_t header[2];
 		header[0] = 18;
 		header[1] = 2;
 		io_generic_write(io, header, file_offset, sizeof(header));

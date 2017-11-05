@@ -39,13 +39,14 @@ plugin_options::plugin_options()
 void plugin_options::parse_json(std::string path)
 {
 	// first try to open as a directory
-	osd_directory *directory = osd_opendir(path.c_str());
-	if (directory != nullptr)
+	osd_subst_env(path, path);
+	osd::directory::ptr directory = osd::directory::open(path);
+	if (directory)
 	{
 		// iterate over all files in the directory
-		for (const osd_directory_entry *entry = osd_readdir(directory); entry != nullptr; entry = osd_readdir(directory))
+		for (const osd::directory::entry *entry = directory->read(); entry != nullptr; entry = directory->read())
 		{
-			if (entry->type == ENTTYPE_FILE)
+			if (entry->type == osd::directory::entry::entry_type::FILE)
 			{
 				std::string name = entry->name;
 				if (name == "plugin.json")
@@ -74,13 +75,13 @@ void plugin_options::parse_json(std::string path)
 
 						if (type=="plugin")
 						{
-							add_entry(core_strdup(plugin_name.c_str()),core_strdup(description.c_str()), OPTION_BOOLEAN, start ? "1" : "0");
+							add_entry({ std::move(plugin_name) }, core_strdup(description.c_str()), option_type::BOOLEAN, start ? "1" : "0");
 						}
 					}
 
 				}
 			}
-			else if (entry->type == ENTTYPE_DIR)
+			else if (entry->type == osd::directory::entry::entry_type::DIR)
 			{
 				std::string name = entry->name;
 				if (!(name == "." || name == ".."))
@@ -89,8 +90,5 @@ void plugin_options::parse_json(std::string path)
 				}
 			}
 		}
-
-		// close the directory and be done
-		osd_closedir(directory);
 	}
 }

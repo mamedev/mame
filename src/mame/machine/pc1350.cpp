@@ -93,7 +93,7 @@ void pc1350_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 		m_power=0;
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in pc1350_state::device_timer");
+		assert_always(false, "Unknown id in pc1350_state::device_timer");
 	}
 }
 
@@ -127,8 +127,8 @@ void pc1350_state::machine_start()
 		space.nop_readwrite(0x2000, 0x3fff);
 	}
 
-	UINT8 *ram = memregion("maincpu")->base() + 0x2000;
-	UINT8 *cpu = m_maincpu->internal_ram();
+	uint8_t *ram = memregion("maincpu")->base() + 0x2000;
+	uint8_t *cpu = m_maincpu->internal_ram();
 
 	machine().device<nvram_device>("cpu_nvram")->set_base(cpu, 96);
 	machine().device<nvram_device>("ram_nvram")->set_base(ram, 0x5000);

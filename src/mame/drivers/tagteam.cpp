@@ -27,21 +27,19 @@ TODO:
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/tagteam.h"
+
 #include "cpu/m6502/m6502.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
-#include "includes/tagteam.h"
+#include "sound/volt_reg.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 void tagteam_state::machine_start()
 {
 	save_item(NAME(m_sound_nmi_mask));
-}
-
-WRITE8_MEMBER(tagteam_state::sound_command_w)
-{
-	soundlatch_byte_w(space, offset, data);
-	m_audiocpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
 }
 
 WRITE8_MEMBER(tagteam_state::irq_clear_w)
@@ -53,7 +51,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, tagteam_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x2000, 0x2000) AM_READ_PORT("P2") AM_WRITE(flipscreen_w)
 	AM_RANGE(0x2001, 0x2001) AM_READ_PORT("P1") AM_WRITE(control_w)
-	AM_RANGE(0x2002, 0x2002) AM_READ_PORT("DSW1") AM_WRITE(sound_command_w)
+	AM_RANGE(0x2002, 0x2002) AM_READ_PORT("DSW1") AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0x2003, 0x2003) AM_READ_PORT("DSW2") AM_WRITE(irq_clear_w)
 	AM_RANGE(0x4000, 0x43ff) AM_READWRITE(mirrorvideoram_r, mirrorvideoram_w)
 	AM_RANGE(0x4400, 0x47ff) AM_READWRITE(mirrorcolorram_r, mirrorcolorram_w)
@@ -73,9 +71,9 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, tagteam_state )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
 	AM_RANGE(0x2000, 0x2001) AM_DEVWRITE("ay1", ay8910_device, data_address_w)
 	AM_RANGE(0x2002, 0x2003) AM_DEVWRITE("ay2", ay8910_device, data_address_w)
-	AM_RANGE(0x2004, 0x2004) AM_DEVWRITE("dac", dac_device, write_unsigned8)
+	AM_RANGE(0x2004, 0x2004) AM_DEVWRITE("dac", dac_byte_interface, write)
 	AM_RANGE(0x2005, 0x2005) AM_WRITE(sound_nmi_mask_w)
-	AM_RANGE(0x2007, 0x2007) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x2007, 0x2007) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -209,7 +207,7 @@ INTERRUPT_GEN_MEMBER(tagteam_state::sound_timer_irq)
 }
 
 
-static MACHINE_CONFIG_START( tagteam, tagteam_state )
+static MACHINE_CONFIG_START( tagteam )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, XTAL_12MHz/8)
@@ -234,16 +232,20 @@ static MACHINE_CONFIG_START( tagteam, tagteam_state )
 	MCFG_PALETTE_INIT_OWNER(tagteam_state, tagteam)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", M6502_IRQ_LINE))
 
 	MCFG_SOUND_ADD("ay1", AY8910, XTAL_12MHz/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 
 	MCFG_SOUND_ADD("ay2", AY8910, XTAL_12MHz/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -312,5 +314,5 @@ ROM_END
 
 
 
-GAME( 1983, bigprowr, 0,        tagteam, bigprowr, driver_device, 0, ROT270, "Technos Japan", "The Big Pro Wrestling!", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, tagteam,  bigprowr, tagteam, tagteam, driver_device,  0, ROT270, "Technos Japan (Data East license)", "Tag Team Wrestling", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, bigprowr, 0,        tagteam, bigprowr, tagteam_state, 0, ROT270, "Technos Japan",                     "The Big Pro Wrestling!", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, tagteam,  bigprowr, tagteam, tagteam,  tagteam_state, 0, ROT270, "Technos Japan (Data East license)", "Tag Team Wrestling",     MACHINE_SUPPORTS_SAVE )

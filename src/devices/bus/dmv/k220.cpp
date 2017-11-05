@@ -77,19 +77,6 @@ ROM_START( dmv_k220 )
 	ROM_REGION(0x0800, "ram", ROMREGION_ERASE)
 ROM_END
 
-static MACHINE_CONFIG_FRAGMENT( dmv_k220 )
-	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(dmv_k220_device, porta_w))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("SWITCH"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(dmv_k220_device, portc_w))
-
-	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
-	MCFG_PIT8253_CLK0(XTAL_1MHz)  // CLK1
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(dmv_k220_device, write_out0))
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(dmv_k220_device, write_out1))
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(dmv_k220_device, write_out2))
-MACHINE_CONFIG_END
-
 static INPUT_PORTS_START( dmv_k220 )
 	PORT_START("SWITCH")
 	PORT_DIPNAME( 0x01, 0x00, "Select 1" )
@@ -122,7 +109,7 @@ INPUT_PORTS_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type DMV_K220 = &device_creator<dmv_k220_device>;
+DEFINE_DEVICE_TYPE(DMV_K220, dmv_k220_device, "dmv_k220", "K220 diagnostic")
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -132,14 +119,15 @@ const device_type DMV_K220 = &device_creator<dmv_k220_device>;
 //  dmv_k220_device - constructor
 //-------------------------------------------------
 
-dmv_k220_device::dmv_k220_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-		: device_t(mconfig, DMV_K220, "K220 diagnostic", tag, owner, clock, "dmv_k220", __FILE__),
-		device_dmvslot_interface( mconfig, *this ),
-		m_pit(*this, "pit8253"),
-		m_ppi(*this, "ppi8255"),
-		m_ram(*this, "ram"),
-		m_rom(*this, "rom"), m_portc(0)
-	{
+dmv_k220_device::dmv_k220_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, DMV_K220, tag, owner, clock)
+	, device_dmvslot_interface(mconfig, *this)
+	, m_pit(*this, "pit8253")
+	, m_ppi(*this, "ppi8255")
+	, m_ram(*this, "ram")
+	, m_rom(*this, "rom")
+	, m_portc(0)
+{
 }
 
 //-------------------------------------------------
@@ -149,8 +137,8 @@ dmv_k220_device::dmv_k220_device(const machine_config &mconfig, const char *tag,
 void dmv_k220_device::device_start()
 {
 	address_space &space = machine().device<cpu_device>("maincpu")->space(AS_IO);
-	space.install_readwrite_handler(0x08, 0x0b, 0, 0, read8_delegate(FUNC(pit8253_device::read), &(*m_pit)), write8_delegate(FUNC(pit8253_device::write), &(*m_pit)), 0);
-	space.install_readwrite_handler(0x0c, 0x0f, 0, 0, read8_delegate(FUNC(i8255_device::read), &(*m_ppi)), write8_delegate(FUNC(i8255_device::write), &(*m_ppi)), 0);
+	space.install_readwrite_handler(0x08, 0x0b, read8_delegate(FUNC(pit8253_device::read), &(*m_pit)), write8_delegate(FUNC(pit8253_device::write), &(*m_pit)), 0);
+	space.install_readwrite_handler(0x0c, 0x0f, read8_delegate(FUNC(i8255_device::read), &(*m_ppi)), write8_delegate(FUNC(i8255_device::write), &(*m_ppi)), 0);
 }
 
 //-------------------------------------------------
@@ -164,14 +152,21 @@ void dmv_k220_device::device_reset()
 }
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor dmv_k220_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( dmv_k220 );
-}
+MACHINE_CONFIG_MEMBER( dmv_k220_device::device_add_mconfig )
+	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(dmv_k220_device, porta_w))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("SWITCH"))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(dmv_k220_device, portc_w))
+
+	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
+	MCFG_PIT8253_CLK0(XTAL_1MHz)  // CLK1
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(dmv_k220_device, write_out0))
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(dmv_k220_device, write_out1))
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(dmv_k220_device, write_out2))
+MACHINE_CONFIG_END
 
 //-------------------------------------------------
 //  input_ports - device-specific input ports
@@ -186,7 +181,7 @@ ioport_constructor dmv_k220_device::device_input_ports() const
 //  device_rom_region
 //-------------------------------------------------
 
-const rom_entry *dmv_k220_device::device_rom_region() const
+const tiny_rom_entry *dmv_k220_device::device_rom_region() const
 {
 	return ROM_NAME( dmv_k220 );
 }
@@ -195,7 +190,7 @@ const rom_entry *dmv_k220_device::device_rom_region() const
 //  read
 //-------------------------------------------------
 
-bool dmv_k220_device::read(offs_t offset, UINT8 &data)
+bool dmv_k220_device::read(offs_t offset, uint8_t &data)
 {
 	if ((m_portc & 0x01) && offset >= 0x2000 && offset < 0x6000)
 	{
@@ -215,7 +210,7 @@ bool dmv_k220_device::read(offs_t offset, UINT8 &data)
 //  write
 //-------------------------------------------------
 
-bool dmv_k220_device::write(offs_t offset, UINT8 data)
+bool dmv_k220_device::write(offs_t offset, uint8_t data)
 {
 	if ((m_portc & 0x01) && offset >= 0x2000 && offset < 0x4000)
 	{
@@ -234,7 +229,7 @@ bool dmv_k220_device::write(offs_t offset, UINT8 data)
 WRITE8_MEMBER( dmv_k220_device::porta_w )
 {
 	// 74LS247 BCD-to-Seven-Segment Decoder
-	static UINT8 bcd2hex[] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f, 0x58, 0x4c, 0x62, 0x69, 0x78, 0x00 };
+	static uint8_t bcd2hex[] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f, 0x58, 0x4c, 0x62, 0x69, 0x78, 0x00 };
 
 	machine().output().set_digit_value(0, bcd2hex[(data >> 4) & 0x0f]);
 	machine().output().set_digit_value(1, bcd2hex[data & 0x0f]);

@@ -23,20 +23,11 @@
 
 **********************************************************************/
 
+#ifndef MAME_VIDEO_CRT9212_H
+#define MAME_VIDEO_CRT9212_H
+
 #pragma once
 
-#ifndef __CRT9212__
-#define __CRT9212__
-
-#include "emu.h"
-
-
-
-//**************************************************************************
-//  MACROS / CONSTANTS
-//**************************************************************************
-
-const int CRT9212_RAM_SIZE  = 135;
 
 
 
@@ -45,16 +36,16 @@ const int CRT9212_RAM_SIZE  = 135;
 //**************************************************************************
 
 #define MCFG_CRT9212_WEN2_VCC() \
-	crt9212_t::static_set_wen2(*device, 1);
+	crt9212_device::static_set_wen2(*device, 1);
 
 #define MCFG_CRT9212_DOUT_CALLBACK(_write) \
-	devcb = &crt9212_t::set_dout_wr_callback(*device, DEVCB_##_write);
+	devcb = &crt9212_device::set_dout_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_CRT9212_ROF_CALLBACK(_write) \
-	devcb = &crt9212_t::set_rof_wr_callback(*device, DEVCB_##_write);
+	devcb = &crt9212_device::set_rof_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_CRT9212_WOF_CALLBACK(_write) \
-	devcb = &crt9212_t::set_wof_wr_callback(*device, DEVCB_##_write);
+	devcb = &crt9212_device::set_wof_wr_callback(*device, DEVCB_##_write);
 
 
 
@@ -62,19 +53,19 @@ const int CRT9212_RAM_SIZE  = 135;
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> crt9212_t
+// ======================> crt9212_device
 
-class crt9212_t :  public device_t
+class crt9212_device : public device_t
 {
 public:
 	// construction/destruction
-	crt9212_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	crt9212_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	static void static_set_wen2(device_t &device, int state) { downcast<crt9212_t &>(device).m_wen2 = state; }
+	static void static_set_wen2(device_t &device, int state) { downcast<crt9212_device &>(device).m_wen2 = state; }
 
-	template<class _Object> static devcb_base &set_dout_wr_callback(device_t &device, _Object object) { return downcast<crt9212_t &>(device).m_write_dout.set_callback(object); }
-	template<class _Object> static devcb_base &set_rof_wr_callback(device_t &device, _Object object) { return downcast<crt9212_t &>(device).m_write_rof.set_callback(object); }
-	template<class _Object> static devcb_base &set_wof_wr_callback(device_t &device, _Object object) { return downcast<crt9212_t &>(device).m_write_wof.set_callback(object); }
+	template <class Object> static devcb_base &set_dout_wr_callback(device_t &device, Object &&cb) { return downcast<crt9212_device &>(device).m_write_dout.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_rof_wr_callback(device_t &device, Object &&cb) { return downcast<crt9212_device &>(device).m_write_rof.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_wof_wr_callback(device_t &device, Object &&cb) { return downcast<crt9212_device &>(device).m_write_wof.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_WRITE8_MEMBER( write ) { m_data = data; }
 	DECLARE_WRITE_LINE_MEMBER( clrcnt_w );
@@ -91,12 +82,14 @@ protected:
 	virtual void device_start() override;
 
 private:
+	static constexpr int RAM_SIZE  = 135;
+
 	devcb_write8           m_write_dout;
 	devcb_write_line       m_write_rof;
 	devcb_write_line       m_write_wof;
 
 	// inputs
-	UINT8 m_data;
+	uint8_t m_data;
 	int m_clrcnt;
 	int m_tog;
 	int m_ren;
@@ -108,10 +101,10 @@ private:
 
 	// internal state
 	bool m_clrcnt_edge;
-	UINT8 m_data_latch;
+	uint8_t m_data_latch;
 	int m_ren_int;
 	int m_wen_int;
-	UINT8 m_ram[CRT9212_RAM_SIZE][2];
+	uint8_t m_ram[RAM_SIZE][2];
 	int m_buffer;
 	int m_rac;
 	int m_wac;

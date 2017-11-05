@@ -12,7 +12,7 @@
 
 
 
-inline UINT8 clamp_5bit(INT8 val)
+inline uint8_t clamp_5bit(int8_t val)
 {
 	if (val < 0)
 		return 0;
@@ -24,15 +24,15 @@ inline UINT8 clamp_5bit(INT8 val)
 }
 
 
-UINT32 turrett_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t turrett_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int page = (m_video_ctrl & 1) ^ 1;
 
-	const UINT16 *vram = m_video_ram[page].get();
+	const uint16_t *vram = m_video_ram[page].get();
 
-	INT8 fade_b = m_video_fade & 0x1f;
-	INT8 fade_g = (m_video_fade >> 5) & 0x1f;
-	INT8 fade_r = (m_video_fade >> 10) & 0x1f;
+	int8_t fade_b = m_video_fade & 0x1f;
+	int8_t fade_g = (m_video_fade >> 5) & 0x1f;
+	int8_t fade_r = (m_video_fade >> 10) & 0x1f;
 
 	if (m_video_fade & 0x8000)
 	{
@@ -43,22 +43,22 @@ UINT32 turrett_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 	for (int y = cliprect.min_y; y <= cliprect.max_y; ++y)
 	{
-		const UINT16 *src = &vram[y * X_VISIBLE + cliprect.min_x];
-		UINT16 *dest = &bitmap.pix16(y, cliprect.min_x);
+		const uint16_t *src = &vram[y * X_VISIBLE + cliprect.min_x];
+		uint16_t *dest = &bitmap.pix16(y, cliprect.min_x);
 
 		if (m_video_fade != 0)
 		{
 			for (int x = cliprect.min_x; x <= cliprect.max_x; ++x)
 			{
-				UINT16 srcpix = *src++;
+				uint16_t srcpix = *src++;
 
-				UINT8 src_b = srcpix & 0x1f;
-				UINT8 src_g = (srcpix >> 5) & 0x1f;
-				UINT8 src_r = (srcpix >> 10) & 0x1f;
+				uint8_t src_b = srcpix & 0x1f;
+				uint8_t src_g = (srcpix >> 5) & 0x1f;
+				uint8_t src_r = (srcpix >> 10) & 0x1f;
 
-				UINT8 dst_b = clamp_5bit(src_b + fade_b);
-				UINT8 dst_g = clamp_5bit(src_g + fade_g);
-				UINT8 dst_r = clamp_5bit(src_r + fade_r);
+				uint8_t dst_b = clamp_5bit(src_b + fade_b);
+				uint8_t dst_g = clamp_5bit(src_g + fade_g);
+				uint8_t dst_r = clamp_5bit(src_r + fade_r);
 
 				*dest++ = (dst_r << 10) | (dst_g << 5) | dst_b;
 			}
@@ -76,9 +76,9 @@ UINT32 turrett_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 }
 
 
-UINT32 turrett_state::write_video_ram(UINT16 data)
+uint32_t turrett_state::write_video_ram(uint16_t data)
 {
-	UINT32 clocks = 1;
+	uint32_t clocks = 1;
 
 	if (!m_skip_x && !m_skip_y)
 	{
@@ -94,22 +94,22 @@ UINT32 turrett_state::write_video_ram(UINT16 data)
 		{
 			int address = m_y_pos * X_VISIBLE + m_x_pos;
 
-			UINT16 *vramptr = &m_video_ram[m_video_ctrl & 1][address];
-			UINT16 srcpix = data;
-			UINT16 dstpix = data;
+			uint16_t *vramptr = &m_video_ram[m_video_ctrl & 1][address];
+			uint16_t srcpix = data;
+			uint16_t dstpix = data;
 
 			// Blending enabled?
 			if (data & 0x8000)
 			{
 				dstpix = *vramptr;
 
-				UINT8 src_b = srcpix & 0x1f;
-				UINT8 src_g = (srcpix >> 5) & 0x1f;
-				UINT8 src_r = (srcpix >> 10) & 0x1f;
+				uint8_t src_b = srcpix & 0x1f;
+				uint8_t src_g = (srcpix >> 5) & 0x1f;
+				uint8_t src_r = (srcpix >> 10) & 0x1f;
 
-				UINT8 dst_b = dstpix & 0x1f;
-				UINT8 dst_g = (dstpix >> 5) & 0x1f;
-				UINT8 dst_r = (dstpix >> 10) & 0x1f;
+				uint8_t dst_b = dstpix & 0x1f;
+				uint8_t dst_g = (dstpix >> 5) & 0x1f;
+				uint8_t dst_r = (dstpix >> 10) & 0x1f;
 
 				// Additive
 				if (m_video_ctrl & 2)
@@ -192,7 +192,7 @@ void turrett_state::update_video_addr(void)
 
 READ32_MEMBER( turrett_state::video_r )
 {
-	UINT32 ret = 0;
+	uint32_t ret = 0;
 
 	if (offset == 3 && mem_mask == 0x0000ffff)
 	{
@@ -301,14 +301,14 @@ WRITE32_MEMBER( turrett_state::dma_w )
 	}
 	else
 	{
-		UINT32 clocks = 0;
-		UINT32 words = data & 0x0fffffff;
+		uint32_t clocks = 0;
+		uint32_t words = data & 0x0fffffff;
 
 		// IDE to DRAM
 		if (data & 0x10000000)
 		{
-			UINT32 addr = m_dma_addr[bank];
-			UINT16 *ram = bank ? m_bank_b : m_bank_a;
+			uint32_t addr = m_dma_addr[bank];
+			uint16_t *ram = bank ? m_bank_b : m_bank_a;
 
 			while (words--)
 			{
@@ -324,7 +324,7 @@ WRITE32_MEMBER( turrett_state::dma_w )
 		{
 			while (words--)
 			{
-				UINT16 data = m_ata->read_cs0(space, 0, 0xffff);
+				uint16_t data = m_ata->read_cs0(space, 0, 0xffff);
 
 				// TODO: Verify if this is correct
 				if ((data & 0xc400) == 0xc400)
@@ -351,14 +351,14 @@ WRITE32_MEMBER( turrett_state::dma_w )
 		// RAM to video RAM
 		else if (data & 0x80000000)
 		{
-			UINT32 addr = m_dma_addr[bank];
-			UINT16 *ram = bank ? m_bank_b : m_bank_a;
+			uint32_t addr = m_dma_addr[bank];
+			uint16_t *ram = bank ? m_bank_b : m_bank_a;
 
 			//bool first = true; // Does it matter?
 
 			while (words--)
 			{
-				UINT16 val = ram[addr++];
+				uint16_t val = ram[addr++];
 				//++clocks;
 
 				switch (val & 0xc400)

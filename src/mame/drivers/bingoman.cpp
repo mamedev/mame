@@ -241,6 +241,8 @@
 
 #include "emu.h"
 #include "cpu/h8/h83002.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class bingoman_state : public driver_device
@@ -255,7 +257,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 
 	// screen updates
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_PALETTE_INIT(bingoman);
 protected:
 	// driver_device overrides
@@ -269,7 +271,7 @@ void bingoman_state::video_start()
 {
 }
 
-UINT32 bingoman_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
+uint32_t bingoman_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	return 0;
 }
@@ -369,7 +371,7 @@ PALETTE_INIT_MEMBER(bingoman_state, bingoman)
 {
 }
 
-static MACHINE_CONFIG_START( bingoman, bingoman_state )
+static MACHINE_CONFIG_START( bingoman )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", H83002, XTAL_20MHz) /* TODO: correct CPU type */
@@ -463,5 +465,5 @@ ROM_END
 ***************************************************************************/
 
 /*    YEAR  NAME       PARENT    MACHINE    INPUT     STATE           INIT  ROT    COMPANY          FULLNAME                    FLAGS   */
-GAME( 1993, bingoman,  0,        bingoman,  bingoman, driver_device,  0,    ROT0, "HP Automaten",  "Bingo Mania (P03-P07-P14)", MACHINE_IS_SKELETON )
-GAME( 1993, bingomana, bingoman, bingoman,  bingoman, driver_device,  0,    ROT0, "HP Automaten",  "Bingo Mania (A03)",         MACHINE_IS_SKELETON )
+GAME( 1993, bingoman,  0,        bingoman,  bingoman, bingoman_state, 0,    ROT0, "HP Automaten",  "Bingo Mania (P03-P07-P14)", MACHINE_IS_SKELETON )
+GAME( 1993, bingomana, bingoman, bingoman,  bingoman, bingoman_state, 0,    ROT0, "HP Automaten",  "Bingo Mania (A03)",         MACHINE_IS_SKELETON )

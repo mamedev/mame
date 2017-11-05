@@ -11,21 +11,21 @@
 #include "emu.h"
 #include "m65ce02.h"
 
-const device_type M65CE02 = &device_creator<m65ce02_device>;
+DEFINE_DEVICE_TYPE(M65CE02, m65ce02_device, "m65ce02", "M65CE02")
 
-m65ce02_device::m65ce02_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	m65c02_device(mconfig, M65CE02, "M65CE02", tag, owner, clock, "m65ce02", __FILE__), TMP3(0), Z(0), B(0)
+m65ce02_device::m65ce02_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	m65ce02_device(mconfig, M65CE02, tag, owner, clock)
 {
 }
 
-m65ce02_device::m65ce02_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
-	m65c02_device(mconfig, type, name, tag, owner, clock, shortname, source), TMP3(0), Z(0), B(0)
+m65ce02_device::m65ce02_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	m65c02_device(mconfig, type, tag, owner, clock), TMP3(0), Z(0), B(0)
 {
 }
 
-offs_t m65ce02_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t m65ce02_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
-	return disassemble_generic(buffer, pc, oprom, opram, options, disasm_entries);
+	return disassemble_generic(stream, pc, oprom, opram, options, disasm_entries);
 }
 
 void m65ce02_device::init()

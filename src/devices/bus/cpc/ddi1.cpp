@@ -1,19 +1,20 @@
 // license:BSD-3-Clause
 // copyright-holders:Barry Rodewald
 /*
- * ddi1.c  --  Amstrad DDI-1 Floppy Disk Drive interface
+ * ddi1.cpp  --  Amstrad DDI-1 Floppy Disk Drive interface
  */
 
 #include "emu.h"
 #include "ddi1.h"
-#include "includes/amstrad.h"
 #include "softlist.h"
+
+SLOT_INTERFACE_EXTERN(cpc_exp_cards);
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type CPC_DDI1 = &device_creator<cpc_ddi1_device>;
+DEFINE_DEVICE_TYPE(CPC_DDI1, cpc_ddi1_device, "cpc_ddi1", "Amstrad DDI-1")
 
 static SLOT_INTERFACE_START( ddi1_floppies )
 	SLOT_INTERFACE( "3ssdd", FLOPPY_3_SSDD )
@@ -32,13 +33,13 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *cpc_ddi1_device::device_rom_region() const
+const tiny_rom_entry *cpc_ddi1_device::device_rom_region() const
 {
 	return ROM_NAME( cpc_ddi1 );
 }
 
 // device machine config
-static MACHINE_CONFIG_FRAGMENT( cpc_ddi1 )
+MACHINE_CONFIG_MEMBER( cpc_ddi1_device::device_add_mconfig )
 	MCFG_UPD765A_ADD("upd765", true, true)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:0", ddi1_floppies, "3ssdd", floppy_image_device::default_floppy_formats)
 	MCFG_SOFTWARE_LIST_ADD("flop_list","cpc_flop")
@@ -52,17 +53,13 @@ static MACHINE_CONFIG_FRAGMENT( cpc_ddi1 )
 
 MACHINE_CONFIG_END
 
-machine_config_constructor cpc_ddi1_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( cpc_ddi1 );
-}
 
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
 
-cpc_ddi1_device::cpc_ddi1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, CPC_DDI1, "DDI-1", tag, owner, clock, "cpc_ddi1", __FILE__),
+cpc_ddi1_device::cpc_ddi1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, CPC_DDI1, tag, owner, clock),
 	device_cpc_expansion_card_interface(mconfig, *this), m_slot(nullptr),
 	m_fdc(*this,"upd765"),
 	m_connector(*this,"upd765:0"), m_rom_active(false), m_romen(false)
@@ -79,9 +76,9 @@ void cpc_ddi1_device::device_start()
 	address_space& space = cpu->memory().space(AS_IO);
 	m_slot = dynamic_cast<cpc_expansion_slot_device *>(owner());
 
-	space.install_write_handler(0xfa7e,0xfa7f,0,0,write8_delegate(FUNC(cpc_ddi1_device::motor_w),this));
-	space.install_readwrite_handler(0xfb7e,0xfb7f,0,0,read8_delegate(FUNC(cpc_ddi1_device::fdc_r),this),write8_delegate(FUNC(cpc_ddi1_device::fdc_w),this));
-	space.install_write_handler(0xdf00,0xdfff,0,0,write8_delegate(FUNC(cpc_ddi1_device::rombank_w),this));
+	space.install_write_handler(0xfa7e,0xfa7f,write8_delegate(FUNC(cpc_ddi1_device::motor_w),this));
+	space.install_readwrite_handler(0xfb7e,0xfb7f,read8_delegate(FUNC(cpc_ddi1_device::fdc_r),this),write8_delegate(FUNC(cpc_ddi1_device::fdc_w),this));
+	space.install_write_handler(0xdf00,0xdfff,write8_delegate(FUNC(cpc_ddi1_device::rombank_w),this));
 }
 
 //-------------------------------------------------
@@ -127,7 +124,7 @@ WRITE8_MEMBER(cpc_ddi1_device::fdc_w)
 
 READ8_MEMBER(cpc_ddi1_device::fdc_r)
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	switch(offset)
 	{
@@ -150,13 +147,13 @@ WRITE8_MEMBER(cpc_ddi1_device::rombank_w)
 	m_slot->rom_select(space,0,data);
 }
 
-void cpc_ddi1_device::set_mapping(UINT8 type)
+void cpc_ddi1_device::set_mapping(uint8_t type)
 {
 	if(type != MAP_UPPER)
 		return;
 	if(m_rom_active)
 	{
-		UINT8* ROM = memregion("disc_rom")->base();
+		uint8_t* ROM = memregion("disc_rom")->base();
 		membank(":bank7")->set_base(ROM);
 		membank(":bank8")->set_base(ROM+0x2000);
 	}

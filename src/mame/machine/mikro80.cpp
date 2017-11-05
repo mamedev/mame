@@ -17,7 +17,7 @@
 DRIVER_INIT_MEMBER(mikro80_state,mikro80)
 {
 	/* set initialy ROM to be visible on first bank */
-	UINT8 *RAM = m_region_maincpu->base();
+	uint8_t *RAM = m_region_maincpu->base();
 	memset(RAM,0x0000,0x0800); // make frist page empty by default
 	m_bank1->configure_entries(1, 2, RAM, 0x0000);
 	m_bank1->configure_entries(0, 2, RAM, 0xf800);
@@ -32,7 +32,7 @@ DRIVER_INIT_MEMBER(mikro80_state,radio99)
 
 READ8_MEMBER(mikro80_state::mikro80_8255_portb_r)
 {
-	UINT8 key = 0xff;
+	uint8_t key = 0xff;
 	if ((m_keyboard_mask & 0x01)!=0) { key &= m_io_line0->read(); }
 	if ((m_keyboard_mask & 0x02)!=0) { key &= m_io_line1->read(); }
 	if ((m_keyboard_mask & 0x04)!=0) { key &= m_io_line2->read(); }
@@ -66,7 +66,7 @@ void mikro80_state::device_timer(emu_timer &timer, device_timer_id id, int param
 		m_bank1->set_entry(0);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in mikro80_state::device_timer");
+		assert_always(false, "Unknown id in mikro80_state::device_timer");
 	}
 }
 
@@ -102,4 +102,9 @@ READ8_MEMBER(mikro80_state::mikro80_tape_r)
 			return 0x00;
 	}
 	return 0xff;
+}
+
+WRITE8_MEMBER(mikro80_state::radio99_sound_w)
+{
+	m_dac->write(BIT(data, 1));
 }

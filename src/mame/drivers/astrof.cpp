@@ -59,8 +59,8 @@
 
 
 #include "emu.h"
-#include "cpu/m6502/m6502.h"
 #include "includes/astrof.h"
+#include "cpu/m6502/m6502.h"
 
 
 #define MASTER_CLOCK        (XTAL_10_595MHz)
@@ -125,7 +125,7 @@ CUSTOM_INPUT_MEMBER(astrof_state::astrof_p1_controls_r)
 
 CUSTOM_INPUT_MEMBER(astrof_state::astrof_p2_controls_r)
 {
-	UINT32 ret;
+	uint32_t ret;
 
 	/* on an upright cabinet, a single set of controls
 	   is connected to both sets of pins on the edge
@@ -141,7 +141,7 @@ CUSTOM_INPUT_MEMBER(astrof_state::astrof_p2_controls_r)
 
 CUSTOM_INPUT_MEMBER(astrof_state::tomahawk_controls_r)
 {
-	UINT32 ret;
+	uint32_t ret;
 
 	/* on a cocktail cabinet, two sets of controls are
 	   multiplexed on a single set of inputs
@@ -170,25 +170,25 @@ CUSTOM_INPUT_MEMBER(astrof_state::tomahawk_controls_r)
 void astrof_state::video_start()
 {
 	/* allocate the color RAM -- half the size of the video RAM as A0 is not connected */
-	m_colorram = std::make_unique<UINT8[]>(m_videoram.bytes() / 2);
+	m_colorram = std::make_unique<uint8_t[]>(m_videoram.bytes() / 2);
 	save_pointer(NAME(m_colorram.get()), m_videoram.bytes() / 2);
 }
 
 
-rgb_t astrof_state::make_pen( UINT8 data )
+rgb_t astrof_state::make_pen( uint8_t data )
 {
-	UINT8 r1_bit = m_red_on ? 0x01 : (data >> 0) & 0x01;
-	UINT8 r2_bit = m_red_on ? 0x01 : (data >> 1) & 0x01;
-	UINT8 g1_bit = (data >> 2) & 0x01;
-	UINT8 g2_bit = (data >> 3) & 0x01;
-	UINT8 b1_bit = (data >> 4) & 0x01;
-	UINT8 b2_bit = (data >> 5) & 0x01;
+	uint8_t r1_bit = m_red_on ? 0x01 : (data >> 0) & 0x01;
+	uint8_t r2_bit = m_red_on ? 0x01 : (data >> 1) & 0x01;
+	uint8_t g1_bit = (data >> 2) & 0x01;
+	uint8_t g2_bit = (data >> 3) & 0x01;
+	uint8_t b1_bit = (data >> 4) & 0x01;
+	uint8_t b2_bit = (data >> 5) & 0x01;
 
 	/* this is probably not quite right, but I don't have the
 	   knowledge to figure out the actual weights - ZV */
-	UINT8 r = (0xc0 * r1_bit) + (0x3f * r2_bit);
-	UINT8 g = (0xc0 * g1_bit) + (0x3f * g2_bit);
-	UINT8 b = (0xc0 * b1_bit) + (0x3f * b2_bit);
+	uint8_t r = (0xc0 * r1_bit) + (0x3f * r2_bit);
+	uint8_t g = (0xc0 * g1_bit) + (0x3f * g2_bit);
+	uint8_t b = (0xc0 * b1_bit) + (0x3f * b2_bit);
 
 	return rgb_t(r, g, b);
 }
@@ -197,9 +197,9 @@ rgb_t astrof_state::make_pen( UINT8 data )
 void astrof_state::astrof_get_pens( pen_t *pens )
 {
 	offs_t i;
-	UINT8 bank = (m_astrof_palette_bank ? 0x10 : 0x00);
-	UINT8 config = read_safe(ioport("FAKE"), 0x00);
-	UINT8 *prom = memregion("proms")->base();
+	uint8_t bank = (m_astrof_palette_bank ? 0x10 : 0x00);
+	uint8_t config = m_fake_port.read_safe(0x00);
+	uint8_t *prom = memregion("proms")->base();
 
 	/* a common wire hack to the pcb causes the prom halves to be inverted */
 	/* this results in e.g. astrof background being black */
@@ -224,7 +224,7 @@ void astrof_state::astrof_get_pens( pen_t *pens )
 
 	for (i = 0; i < ASTROF_NUM_PENS; i++)
 	{
-		UINT8 data = prom[bank | i];
+		uint8_t data = prom[bank | i];
 		pens[i] = make_pen(data);
 	}
 }
@@ -233,13 +233,13 @@ void astrof_state::astrof_get_pens( pen_t *pens )
 void astrof_state::tomahawk_get_pens( pen_t *pens )
 {
 	offs_t i;
-	UINT8 *prom = memregion("proms")->base();
-	UINT8 config = read_safe(ioport("FAKE"), 0x00);
+	uint8_t *prom = memregion("proms")->base();
+	uint8_t config = m_fake_port.read_safe(0x00);
 
 	for (i = 0; i < TOMAHAWK_NUM_PENS; i++)
 	{
-		UINT8 data;
-		UINT8 pen;
+		uint8_t data;
+		uint8_t pen;
 
 		/* a common wire hack to the pcb causes the prom halves to be inverted */
 		/* this results in e.g. astrof background being black */
@@ -289,7 +289,7 @@ WRITE8_MEMBER(astrof_state::video_control_1_w)
 	m_flipscreen = ((data >> 0) & 0x01) & ioport("CAB")->read();
 
 	/* this ties to the CLR pin of the shift registers */
-	m_screen_off = (data & 0x02) ? TRUE : FALSE;
+	m_screen_off = (data & 0x02) ? true : false;
 
 	/* D2 - not connected in the schematics, but at one point Astro Fighter sets it to 1 */
 	/* D3-D7 - not connected */
@@ -298,16 +298,16 @@ WRITE8_MEMBER(astrof_state::video_control_1_w)
 }
 
 
-void astrof_state::astrof_set_video_control_2( UINT8 data )
+void astrof_state::astrof_set_video_control_2( uint8_t data )
 {
 	/* D0 - OUT0 - goes to edge conn. pin A10 - was perhaps meant to be a start lamp */
 	/* D1 - OUT1 - goes to edge conn. pin A11 - was perhaps meant to be a start lamp */
 
 	/* D2 - selects one of the two palette banks */
-	m_astrof_palette_bank = (data & 0x04) ? TRUE : FALSE;
+	m_astrof_palette_bank = (data & 0x04) ? true : false;
 
 	/* D3 - turns on the red color gun regardless of the value in the color PROM */
-	m_red_on = (data & 0x08) ? TRUE : FALSE;
+	m_red_on = (data & 0x08) ? true : false;
 
 	/* D4-D7 - not connected */
 }
@@ -319,13 +319,13 @@ WRITE8_MEMBER(astrof_state::astrof_video_control_2_w)
 }
 
 
-void astrof_state::spfghmk2_set_video_control_2( UINT8 data )
+void astrof_state::spfghmk2_set_video_control_2( uint8_t data )
 {
 	/* D0 - OUT0 - goes to edge conn. pin A10 - was perhaps meant to be a start lamp */
 	/* D1 - OUT1 - goes to edge conn. pin A11 - was perhaps meant to be a start lamp */
 
 	/* D2 - selects one of the two palette banks */
-	m_astrof_palette_bank = (data & 0x04) ? TRUE : FALSE;
+	m_astrof_palette_bank = (data & 0x04) ? true : false;
 
 	/* D3-D7 - not connected */
 }
@@ -337,14 +337,14 @@ WRITE8_MEMBER(astrof_state::spfghmk2_video_control_2_w)
 }
 
 
-void astrof_state::tomahawk_set_video_control_2( UINT8 data )
+void astrof_state::tomahawk_set_video_control_2( uint8_t data )
 {
 	/* D0 - OUT0 - goes to edge conn. pin A10 - was perhaps meant to be a start lamp */
 	/* D1 - OUT1 - goes to edge conn. pin A11 - was perhaps meant to be a start lamp */
 	/* D2 - not connected */
 
 	/* D3 - turns on the red color gun regardless of the value in the color PROM */
-	m_red_on = (data & 0x08) ? TRUE : FALSE;
+	m_red_on = (data & 0x08) ? true : false;
 }
 
 WRITE8_MEMBER(astrof_state::tomahawk_video_control_2_w)
@@ -360,16 +360,16 @@ void astrof_state::video_update_common( bitmap_rgb32 &bitmap, const rectangle &c
 
 	for (offs = 0; offs < m_videoram.bytes(); offs++)
 	{
-		UINT8 data;
+		uint8_t data;
 		int i;
 
-		UINT8 color = m_colorram[offs >> 1];
+		uint8_t color = m_colorram[offs >> 1];
 
 		pen_t back_pen = pens[(color & (num_pens-1)) | 0x00];
 		pen_t fore_pen = pens[(color & (num_pens-1)) | 0x01];
 
-		UINT8 y = offs;
-		UINT8 x = offs >> 8 << 3;
+		uint8_t y = offs;
+		uint8_t x = offs >> 8 << 3;
 
 		if (!m_flipscreen)
 			y = ~y;
@@ -398,7 +398,7 @@ void astrof_state::video_update_common( bitmap_rgb32 &bitmap, const rectangle &c
 }
 
 
-UINT32 astrof_state::screen_update_astrof(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t astrof_state::screen_update_astrof(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	pen_t pens[ASTROF_NUM_PENS];
 
@@ -410,7 +410,7 @@ UINT32 astrof_state::screen_update_astrof(screen_device &screen, bitmap_rgb32 &b
 }
 
 
-UINT32 astrof_state::screen_update_tomahawk(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t astrof_state::screen_update_tomahawk(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	pen_t pens[TOMAHAWK_NUM_PENS];
 
@@ -498,7 +498,7 @@ MACHINE_START_MEMBER(astrof_state,spfghmk2)
 
 
 	/* the red background circuit is disabled */
-	m_red_on = FALSE;
+	m_red_on = false;
 
 	/* register for state saving */
 	save_item(NAME(m_flipscreen));
@@ -910,7 +910,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( base, astrof_state )
+static MACHINE_CONFIG_START( base )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, MAIN_CPU_CLOCK)
@@ -1172,6 +1172,64 @@ ROM_START( acombat3 )
 	ROM_LOAD( "8f-clr.bin",   0x0000, 0x0100, CRC(3bf3ccb0) SHA1(d61d19d38045f42a9adecf295e479fee239bed48) )
 ROM_END
 
+ROM_START( acombat4 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "11.bin", 0xd000, 0x0400, CRC(9ba57987) SHA1(becf89b7d474f86839f13f9be5502c91491e8584) )
+	ROM_LOAD( "10.bin", 0xd400, 0x0400, CRC(22493f2a) SHA1(4a2569f500c022b77d99855ca38a3591ed56e055) )
+	ROM_LOAD( "9.bin",  0xd800, 0x0400, CRC(354cf432) SHA1(138956ea8064eba0dcd8b2f175d4981b689a2077) )
+	ROM_LOAD( "8.bin",  0xdc00, 0x0400, CRC(4cee0c8b) SHA1(98bfdda9d2d368db16d6e9090536b09d8337c0e5) )
+	ROM_LOAD( "4.bin",  0xe000, 0x0400, CRC(9cb477f3) SHA1(6866264aa8d0479cee237a00e4a919e3981144a5) )
+	ROM_LOAD( "6.bin",  0xe400, 0x0400, CRC(272de8f1) SHA1(e917b3b8bb96fedacd6d5cb3d1c30977818f2e85) )
+	ROM_LOAD( "5.bin",  0xe800, 0x0400, CRC(ff25acaa) SHA1(5cb360c556c9b36039ae05702e6900b82fe5676b) )
+	ROM_LOAD( "3.bin",  0xec00, 0x0400, CRC(6edf202d) SHA1(a4cab2f10a99e0a4b1c571168e17cbee1d18cf06) )
+	ROM_LOAD( "7.bin",  0xf000, 0x0400, CRC(47dccb04) SHA1(b6b6c6685c93ac9531efb970b2e82ad68eea87ba) )
+	ROM_LOAD( "1.bin",  0xf400, 0x0400, CRC(5874584f) SHA1(8794c17ac156e7c59631d683bbf100036ab45713) )
+	ROM_LOAD( "2.bin",  0xf800, 0x0400, CRC(b206deda) SHA1(9ab52920c06ed6beb38bc7f97ffd00e8ad46c17d) )
+	ROM_LOAD( "0.bin",  0xfc00, 0x0400, CRC(4d52948a) SHA1(bcf9590a8049cada958531f6b7ae0d499c1096e2) )
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "8f-clr.bin",   0x0000, 0x0100, CRC(3bf3ccb0) SHA1(d61d19d38045f42a9adecf295e479fee239bed48) )
+
+	ROM_REGION( 0x0100, "user1", 0 )    /* decryption table */
+	ROM_LOAD( "74471.cpu",  0x0000, 0x0100, CRC(a6bdd18c) SHA1(438bfc543730afdb531204585f17a68ddc03ded0) )
+ROM_END
+
+/* Star Fighter (VGG)
+CPUs
+QTY     Type    clock   position    function
+1x  R6502-13    2a  8-bit Microprocessor - main
+1x  TBA810      2f  Audio Amplifier - sound
+1x  oscillator  10595   9c
+
+ROMs
+QTY     Type    position    status
+6x  TMS2716     0-5     dumped
+1x  MMI6341-1J  12c     dumped
+
+RAMs
+QTY     Type    position
+19x     ITT4027     1-19
+2x  2114L3PC    5b,6b
+
+Others
+1x 22x2 edge connector
+1x trimmer (volume)(1f)
+1x 8 DIP switches bank (1e)
+1x 4 DIP switches bank (6e)*/
+
+ROM_START( strfight )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "sf00.bin",       0xd000, 0x0800, CRC(35662bf6) SHA1(f8e4a116c6eedc25949dd4c2744e83a3cc6a4a41) )
+	ROM_LOAD( "sf01.bin",       0xd800, 0x0800, CRC(535f97bd) SHA1(7ea3e02627364db0ae6cbbfc5452a85624540c12) )
+	ROM_LOAD( "sf02.bin",       0xe000, 0x0800, CRC(2146c290) SHA1(82a7334fbe1a05fc3a58db881c46be6368cab4fd) )
+	ROM_LOAD( "sf03.bin",       0xe800, 0x0800, CRC(53e7ac18) SHA1(131016eac8785141bccc446b024d556f12f7484d) )
+	ROM_LOAD( "sf04.bin",       0xf000, 0x0800, CRC(059dd113) SHA1(23f908e8f456843a3360ece713dba8d2b4d16a63) )
+	ROM_LOAD( "sf05.bin",       0xf800, 0x0800, CRC(f4669140) SHA1(45b53ed9e65d16fd463df812cbf3d796bd30424f) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "mmi6341-1j.12c", 0x0000, 0x0200, CRC(528034d3) SHA1(29ef9cfe2540f9a1fb9d0184a4c8fd74a4d6e6ba) )
+ROM_END
+
 ROM_START( sstarbtl )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "b.bin",        0xd000, 0x0400, CRC(16ad2bcc) SHA1(e7f55d17ee18afbb045cd0fd8d3ffc0c8300130a) )
@@ -1271,8 +1329,8 @@ ROM_END
 DRIVER_INIT_MEMBER(astrof_state,abattle)
 {
 	/* use the protection PROM to decrypt the ROMs */
-	UINT8 *rom = memregion("maincpu")->base();
-	UINT8 *prom = memregion("user1")->base();
+	uint8_t *rom = memregion("maincpu")->base();
+	uint8_t *prom = memregion("user1")->base();
 	int i;
 
 	for(i = 0xd000; i < 0x10000; i++)
@@ -1286,7 +1344,7 @@ DRIVER_INIT_MEMBER(astrof_state,abattle)
 
 DRIVER_INIT_MEMBER(astrof_state,afire)
 {
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 	int i;
 
 	for(i = 0xd000; i < 0x10000; i++)
@@ -1300,7 +1358,7 @@ DRIVER_INIT_MEMBER(astrof_state,afire)
 
 DRIVER_INIT_MEMBER(astrof_state,sstarbtl)
 {
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 	int i;
 
 	for(i = 0xd000; i < 0x10000; i++)
@@ -1325,19 +1383,21 @@ DRIVER_INIT_MEMBER(astrof_state,acombat3)
  *
  *************************************/
 
-GAME( 1979, astrof,   0,        astrof,   astrof, driver_device,  0,       ROT90, "Data East",             "Astro Fighter (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, astrof2,  astrof,   astrof,   astrof, driver_device,  0,       ROT90, "Data East",             "Astro Fighter (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, astrof3,  astrof,   astrof,   astrof, driver_device,  0,       ROT90, "Data East",             "Astro Fighter (set 3)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, abattle,  astrof,   abattle,  abattle, astrof_state,  abattle, ROT90, "bootleg? (Sidam)",      "Astro Battle (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, abattle2, astrof,   abattle,  abattle, astrof_state,  abattle, ROT90, "bootleg? (Sidam)",      "Astro Battle (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, afire,    astrof,   abattle,  abattle, astrof_state,  afire,   ROT90, "bootleg (Rene Pierre)", "Astro Fire", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, acombat,  astrof,   abattle,  abattle, astrof_state,  afire,   ROT90, "bootleg",               "Astro Combat (newer, CB)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, acombato, astrof,   abattle,  abattle, astrof_state,  afire,   ROT90, "bootleg",               "Astro Combat (older, PZ)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, acombat3, astrof,   abattle,  abattle, astrof_state,  acombat3,ROT90, "bootleg (Proel)",       "Astro Combat (unencrypted)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, sstarbtl, astrof,   abattle,  abattle, astrof_state,  sstarbtl,ROT90, "bootleg",               "Super Star Battle", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, astrof,   0,        astrof,   astrof,   astrof_state,  0,       ROT90, "Data East",             "Astro Fighter (set 1)",         MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, astrof2,  astrof,   astrof,   astrof,   astrof_state,  0,       ROT90, "Data East",             "Astro Fighter (set 2)",         MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, astrof3,  astrof,   astrof,   astrof,   astrof_state,  0,       ROT90, "Data East",             "Astro Fighter (set 3)",         MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, abattle,  astrof,   abattle,  abattle,  astrof_state,  abattle, ROT90, "bootleg? (Sidam)",      "Astro Battle (set 1)",          MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, abattle2, astrof,   abattle,  abattle,  astrof_state,  abattle, ROT90, "bootleg? (Sidam)",      "Astro Battle (set 2)",          MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, afire,    astrof,   abattle,  abattle,  astrof_state,  afire,   ROT90, "bootleg (Rene Pierre)", "Astro Fire",                    MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, acombat,  astrof,   abattle,  abattle,  astrof_state,  afire,   ROT90, "bootleg",               "Astro Combat (newer, CB)",      MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, acombato, astrof,   abattle,  abattle,  astrof_state,  afire,   ROT90, "bootleg",               "Astro Combat (older, PZ)",      MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, acombat3, astrof,   abattle,  abattle,  astrof_state,  acombat3,ROT90, "bootleg (Proel)",       "Astro Combat (unencrypted)",    MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, acombat4, astrof,   abattle,  abattle,  astrof_state,  abattle, ROT90, "bootleg (Proel)",       "Astro Combat (encrypted)",      MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, strfight, astrof,   abattle,  abattle,  astrof_state,  acombat3,ROT90, "bootleg (VGG)",         "Star Fighter (bootleg of Astro Fighter)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, sstarbtl, astrof,   abattle,  abattle,  astrof_state,  sstarbtl,ROT90, "bootleg",               "Super Star Battle",             MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1979, spfghmk2, 0,        spfghmk2, spfghmk2, driver_device,0,       ROT90, "Data East",            "Space Fighter Mark II (set 1)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, spfghmk22,spfghmk2, spfghmk2, spfghmk22,driver_device,0,       ROT90, "Data East",            "Space Fighter Mark II (set 2)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, spfghmk2, 0,        spfghmk2, spfghmk2, astrof_state,  0,       ROT90, "Data East",             "Space Fighter Mark II (set 1)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, spfghmk22,spfghmk2, spfghmk2, spfghmk22,astrof_state,  0,       ROT90, "Data East",             "Space Fighter Mark II (set 2)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1980, tomahawk, 0,        tomahawk, tomahawk, driver_device,0,       ROT90, "Data East",            "Tomahawk 777 (rev 5)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, tomahawk1,tomahawk, tomahawk, tomahawk1,driver_device,0,       ROT90, "Data East",            "Tomahawk 777 (rev 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, tomahawk, 0,        tomahawk, tomahawk, astrof_state,  0,       ROT90, "Data East",             "Tomahawk 777 (rev 5)",          MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, tomahawk1,tomahawk, tomahawk, tomahawk1,astrof_state,  0,       ROT90, "Data East",             "Tomahawk 777 (rev 1)",          MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

@@ -17,7 +17,6 @@
 
 
 namespace ui {
-
 /***************************************************************************
     CONSTANTS
 ***************************************************************************/
@@ -42,23 +41,22 @@ namespace ui {
     input groups menu
 -------------------------------------------------*/
 
-menu_input_groups::menu_input_groups(mame_ui_manager &mui, render_container *container) : menu(mui, container)
+menu_input_groups::menu_input_groups(mame_ui_manager &mui, render_container &container) : menu(mui, container)
 {
 }
 
-void menu_input_groups::populate()
+void menu_input_groups::populate(float &customtop, float &custombottom)
 {
 	int player;
 
 	/* build up the menu */
-	item_append(_("User Interface"), nullptr, 0, (void *)(IPG_UI + 1));
+	item_append(_("User Interface"), "", 0, (void *)(IPG_UI + 1));
 	for (player = 0; player < MAX_PLAYERS; player++)
 	{
-		char buffer[40];
-		sprintf(buffer, "Player %d Controls", player + 1);
-		item_append(buffer, nullptr, 0, (void *)(FPTR)(IPG_PLAYER1 + player + 1));
+		auto s = string_format("Player %d Controls", player + 1);
+		item_append(s, "", 0, (void *)(uintptr_t)(IPG_PLAYER1 + player + 1));
 	}
-	item_append(_("Other Controls"), nullptr, 0, (void *)(FPTR)(IPG_OTHER + 1));
+	item_append(_("Other Controls"), "", 0, (void *)(uintptr_t)(IPG_OTHER + 1));
 }
 
 menu_input_groups::~menu_input_groups()
@@ -75,7 +73,7 @@ void menu_input_groups::handle()
 	/* process the menu */
 	const event *menu_event = process(0);
 	if (menu_event != nullptr && menu_event->iptkey == IPT_UI_SELECT)
-		menu::stack_push<menu_input_general>(ui(), container, int((long long)(menu_event->itemref)-1));
+		menu::stack_push<menu_input_general>(ui(), container(), int((long long)(menu_event->itemref)-1));
 }
 
 
@@ -85,12 +83,12 @@ void menu_input_groups::handle()
     input menu
 -------------------------------------------------*/
 
-menu_input_general::menu_input_general(mame_ui_manager &mui, render_container *container, int _group) : menu_input(mui, container)
+menu_input_general::menu_input_general(mame_ui_manager &mui, render_container &container, int _group) : menu_input(mui, container)
 {
 	group = _group;
 }
 
-void menu_input_general::populate()
+void menu_input_general::populate(float &customtop, float &custombottom)
 {
 	input_item_data *itemlist = nullptr;
 	int suborder[SEQ_TYPE_TOTAL];
@@ -124,6 +122,7 @@ void menu_input_general::populate()
 				item->defseq = &entry.defseq(seqtype);
 				item->sortorder = sortorder * 4 + suborder[seqtype];
 				item->type = ioport_manager::type_is_analog(entry.type()) ? (INPUT_TYPE_ANALOG + seqtype) : INPUT_TYPE_DIGITAL;
+				item->is_optional = false;
 				item->name = entry.name();
 				item->owner_name = nullptr;
 				item->next = itemlist;
@@ -148,11 +147,11 @@ menu_input_general::~menu_input_general()
     input menu
 -------------------------------------------------*/
 
-menu_input_specific::menu_input_specific(mame_ui_manager &mui, render_container *container) : menu_input(mui, container)
+menu_input_specific::menu_input_specific(mame_ui_manager &mui, render_container &container) : menu_input(mui, container)
 {
 }
 
-void menu_input_specific::populate()
+void menu_input_specific::populate(float &customtop, float &custombottom)
 {
 	input_item_data *itemlist = nullptr;
 	int suborder[SEQ_TYPE_TOTAL];
@@ -164,10 +163,10 @@ void menu_input_specific::populate()
 	suborder[SEQ_TYPE_INCREMENT] = 2;
 
 	/* iterate over the input ports and add menu items */
-	for (ioport_port &port : machine().ioport().ports())
+	for (auto &port : machine().ioport().ports())
 	{
 		port_count++;
-		for (ioport_field &field : port.fields())
+		for (ioport_field &field : port.second->fields())
 		{
 			ioport_type_class type_class = field.type_class();
 
@@ -175,7 +174,7 @@ void menu_input_specific::populate()
 			if (field.enabled() && (type_class == INPUT_CLASS_CONTROLLER || type_class == INPUT_CLASS_MISC || type_class == INPUT_CLASS_KEYBOARD))
 			{
 				input_seq_type seqtype;
-				UINT32 sortorder;
+				uint32_t sortorder;
 
 				/* determine the sorting order */
 				if (type_class == INPUT_CLASS_CONTROLLER)
@@ -201,6 +200,7 @@ void menu_input_specific::populate()
 					item->defseq = &field.defseq(seqtype);
 					item->sortorder = sortorder + suborder[seqtype];
 					item->type = field.is_analog() ? (INPUT_TYPE_ANALOG + seqtype) : INPUT_TYPE_DIGITAL;
+					item->is_optional = field.optional();
 					item->name = field.name();
 					item->owner_name = field.device().tag();
 					item->next = itemlist;
@@ -225,7 +225,7 @@ menu_input_specific::~menu_input_specific()
 /*-------------------------------------------------
     menu_input - display a menu for inputs
 -------------------------------------------------*/
-menu_input::menu_input(mame_ui_manager &mui, render_container *container) : menu(mui, container), last_sortorder(0), record_next(false)
+menu_input::menu_input(mame_ui_manager &mui, render_container &container) : menu(mui, container), last_sortorder(0), record_next(false)
 {
 	pollingitem = nullptr;
 	pollingref = nullptr;
@@ -405,7 +405,7 @@ void menu_input::populate_and_sort(input_item_data *itemlist)
 	/* build the menu */
 	for (curitem = 0; curitem < numitems; curitem++)
 	{
-		UINT32 flags = 0;
+		uint32_t flags = 0;
 
 		/* generate the name of the item itself, based off the base name and the type */
 		item = itemarray[curitem];
@@ -417,14 +417,16 @@ void menu_input::populate_and_sort(input_item_data *itemlist)
 				first_entry = false;
 			else
 				item_append(menu_item_type::SEPARATOR);
-			item_append(string_format("[root%s]", item->owner_name).c_str(), nullptr, 0, nullptr);
+			item_append(string_format("[root%s]", item->owner_name), "", 0, nullptr);
 			prev_owner.assign(item->owner_name);
 		}
 
 		std::string text = string_format(nameformat[item->type], item->name);
+		if (item->is_optional)
+			text = "(" + text + ")";
 
 		/* if we're polling this item, use some spaces with left/right arrows */
-		if (pollingref == item->ref)
+		if (pollingref == item->ref && pollingseq == item->seqtype)
 		{
 			subtext.assign("   ");
 			flags |= FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW;
@@ -438,7 +440,7 @@ void menu_input::populate_and_sort(input_item_data *itemlist)
 		}
 
 		/* add the item */
-		item_append(text.c_str(), subtext.c_str(), flags, item);
+		item_append(text, subtext, flags, item);
 	}
 }
 
@@ -448,7 +450,7 @@ void menu_input::populate_and_sort(input_item_data *itemlist)
     switches menu
 -------------------------------------------------*/
 
-menu_settings_dip_switches::menu_settings_dip_switches(mame_ui_manager &mui, render_container *container) : menu_settings(mui, container, IPT_DIPSWITCH)
+menu_settings_dip_switches::menu_settings_dip_switches(mame_ui_manager &mui, render_container &container) : menu_settings(mui, container, IPT_DIPSWITCH)
 {
 }
 
@@ -461,7 +463,7 @@ menu_settings_dip_switches::~menu_settings_dip_switches()
     driver config menu
 -------------------------------------------------*/
 
-menu_settings_driver_config::menu_settings_driver_config(mame_ui_manager &mui, render_container *container) : menu_settings(mui, container, IPT_CONFIG)
+menu_settings_driver_config::menu_settings_driver_config(mame_ui_manager &mui, render_container &container) : menu_settings(mui, container, IPT_CONFIG)
 {
 }
 
@@ -483,7 +485,7 @@ void menu_settings::handle()
 	if (menu_event != nullptr && menu_event->itemref != nullptr)
 	{
 		// reset
-		if ((FPTR)menu_event->itemref == 1)
+		if ((uintptr_t)menu_event->itemref == 1)
 		{
 			if (menu_event->iptkey == IPT_UI_SELECT)
 				machine().schedule_hard_reset();
@@ -531,12 +533,12 @@ void menu_settings::handle()
     switches menus
 -------------------------------------------------*/
 
-menu_settings::menu_settings(mame_ui_manager &mui, render_container *container, UINT32 _type) : menu(mui, container), diplist(nullptr), dipcount(0)
+menu_settings::menu_settings(mame_ui_manager &mui, render_container &container, uint32_t _type) : menu(mui, container), diplist(nullptr), dipcount(0)
 {
 	type = _type;
 }
 
-void menu_settings::populate()
+void menu_settings::populate(float &customtop, float &custombottom)
 {
 	dip_descriptor **diplist_tailptr;
 	std::string prev_owner;
@@ -548,37 +550,40 @@ void menu_settings::populate()
 	diplist_tailptr = &diplist;
 
 	/* loop over input ports and set up the current values */
-	for (ioport_port &port : machine().ioport().ports())
-		for (ioport_field &field : port.fields())
+	for (auto &port : machine().ioport().ports())
+		for (ioport_field &field : port.second->fields())
 			if (field.type() == type && field.enabled())
 			{
-				UINT32 flags = 0;
-
-				/* set the left/right flags appropriately */
-				if (field.has_previous_setting())
-					flags |= FLAG_LEFT_ARROW;
-				if (field.has_next_setting())
-					flags |= FLAG_RIGHT_ARROW;
-
-				/* add the menu item */
-				if (strcmp(field.device().tag(), prev_owner.c_str()) != 0)
+				if (!field.settings().empty())
 				{
-					if (first_entry)
-						first_entry = false;
-					else
-						item_append(menu_item_type::SEPARATOR);
-					string_format("[root%s]", field.device().tag());
-					item_append(string_format("[root%s]", field.device().tag()).c_str(), nullptr, 0, nullptr);
-					prev_owner.assign(field.device().tag());
-				}
+					uint32_t flags = 0;
 
-				item_append(field.name(), field.setting_name(), flags, (void *)&field);
+					/* set the left/right flags appropriately */
+					if (field.has_previous_setting())
+						flags |= FLAG_LEFT_ARROW;
+					if (field.has_next_setting())
+						flags |= FLAG_RIGHT_ARROW;
+
+					/* add the menu item */
+					if (strcmp(field.device().tag(), prev_owner.c_str()) != 0)
+					{
+						if (first_entry)
+							first_entry = false;
+						else
+							item_append(menu_item_type::SEPARATOR);
+						string_format("[root%s]", field.device().tag());
+						item_append(string_format("[root%s]", field.device().tag()), "", 0, nullptr);
+						prev_owner.assign(field.device().tag());
+					}
+
+					item_append(field.name(), field.setting_name(), flags, (void *)&field);
+				}
 
 				/* for DIP switches, build up the model */
 				if (type == IPT_DIPSWITCH && !field.diplocations().empty())
 				{
 					ioport_field::user_settings settings;
-					UINT32 accummask = field.mask();
+					uint32_t accummask = field.mask();
 
 					/* get current settings */
 					field.get_user_settings(settings);
@@ -586,7 +591,7 @@ void menu_settings::populate()
 					/* iterate over each bit in the field */
 					for (const ioport_diplocation &diploc : field.diplocations())
 					{
-						UINT32 mask = accummask & ~(accummask - 1);
+						uint32_t mask = accummask & ~(accummask - 1);
 						dip_descriptor *dip;
 
 						/* find the matching switch name */
@@ -620,7 +625,7 @@ void menu_settings::populate()
 		custombottom = dipcount ? dipcount * (DIP_SWITCH_HEIGHT + DIP_SWITCH_SPACING) + DIP_SWITCH_SPACING : 0;
 
 	item_append(menu_item_type::SEPARATOR);
-	item_append(_("Reset"),  nullptr, 0, (void *)1);
+	item_append(_("Reset"), "", 0, (void *)1);
 }
 
 menu_settings::~menu_settings()
@@ -643,16 +648,16 @@ void menu_settings_dip_switches::custom_render(void *selectedref, float top, flo
 	y2 = y1 + bottom;
 
 	// draw extra menu area
-	ui().draw_outlined_box(container, x1, y1, x2, y2, UI_BACKGROUND_COLOR);
+	ui().draw_outlined_box(container(), x1, y1, x2, y2, UI_BACKGROUND_COLOR);
 	y1 += (float)DIP_SWITCH_SPACING;
 
 	// iterate over DIP switches
 	for (dip_descriptor *dip = diplist; dip != nullptr; dip = dip->next)
 	{
-		UINT32 selectedmask = 0;
+		uint32_t selectedmask = 0;
 
 		// determine the mask of selected bits
-		if ((FPTR)selectedref != 1)
+		if ((uintptr_t)selectedref != 1)
 		{
 			ioport_field *field = (ioport_field *)selectedref;
 
@@ -674,10 +679,10 @@ void menu_settings_dip_switches::custom_render(void *selectedref, float top, flo
     DIP switch
 -------------------------------------------------*/
 
-void menu_settings_dip_switches::custom_render_one(float x1, float y1, float x2, float y2, const dip_descriptor *dip, UINT32 selectedmask)
+void menu_settings_dip_switches::custom_render_one(float x1, float y1, float x2, float y2, const dip_descriptor *dip, uint32_t selectedmask)
 {
-	float switch_field_width = SINGLE_TOGGLE_SWITCH_FIELD_WIDTH * container->manager().ui_aspect();
-	float switch_width = SINGLE_TOGGLE_SWITCH_WIDTH * container->manager().ui_aspect();
+	float switch_field_width = SINGLE_TOGGLE_SWITCH_FIELD_WIDTH * container().manager().ui_aspect();
+	float switch_width = SINGLE_TOGGLE_SWITCH_WIDTH * container().manager().ui_aspect();
 	int numtoggles, toggle;
 	float switch_toggle_gap;
 	float y1_off, y1_on;
@@ -689,14 +694,14 @@ void menu_settings_dip_switches::custom_render_one(float x1, float y1, float x2,
 	x1 += (x2 - x1 - numtoggles * switch_field_width) / 2;
 
 	/* draw the dip switch name */
-	ui().draw_text_full(  container,
+	ui().draw_text_full(container(),
 						dip->name,
 						0,
 						y1 + (DIP_SWITCH_HEIGHT - UI_TARGET_FONT_HEIGHT) / 2,
 						x1 - ui().get_string_width(" "),
-						JUSTIFY_RIGHT,
-						WRAP_NEVER,
-						DRAW_NORMAL,
+						ui::text_layout::RIGHT,
+						ui::text_layout::NEVER,
+						mame_ui_manager::NORMAL,
 						UI_TEXT_COLOR,
 						PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA),
 						nullptr ,
@@ -713,7 +718,7 @@ void menu_settings_dip_switches::custom_render_one(float x1, float y1, float x2,
 		float innerx1;
 
 		/* first outline the switch */
-		ui().draw_outlined_box(container, x1, y1, x1 + switch_field_width, y2, UI_BACKGROUND_COLOR);
+		ui().draw_outlined_box(container(), x1, y1, x1 + switch_field_width, y2, UI_BACKGROUND_COLOR);
 
 		/* compute x1/x2 for the inner filled in switch */
 		innerx1 = x1 + (switch_field_width - switch_width) / 2;
@@ -722,13 +727,13 @@ void menu_settings_dip_switches::custom_render_one(float x1, float y1, float x2,
 		if (dip->mask & (1 << toggle))
 		{
 			float innery1 = (dip->state & (1 << toggle)) ? y1_on : y1_off;
-			container->add_rect(innerx1, innery1, innerx1 + switch_width, innery1 + SINGLE_TOGGLE_SWITCH_HEIGHT,
+			container().add_rect(innerx1, innery1, innerx1 + switch_width, innery1 + SINGLE_TOGGLE_SWITCH_HEIGHT,
 								(selectedmask & (1 << toggle)) ? UI_DIPSW_COLOR : UI_TEXT_COLOR,
 								PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 		}
 		else
 		{
-			container->add_rect(innerx1, y1_off, innerx1 + switch_width, y1_on + SINGLE_TOGGLE_SWITCH_HEIGHT,
+			container().add_rect(innerx1, y1_off, innerx1 + switch_width, y1_on + SINGLE_TOGGLE_SWITCH_HEIGHT,
 								UI_UNAVAILABLE_COLOR,
 								PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 		}
@@ -806,20 +811,18 @@ void menu_analog::handle()
     settings menu
 -------------------------------------------------*/
 
-menu_analog::menu_analog(mame_ui_manager &mui, render_container *container) : menu(mui, container)
+menu_analog::menu_analog(mame_ui_manager &mui, render_container &container) : menu(mui, container)
 {
 }
 
-void menu_analog::populate()
+void menu_analog::populate(float &customtop, float &custombottom)
 {
-	std::string text;
-	std::string subtext;
 	std::string prev_owner;
 	bool first_entry = true;
 
 	/* loop over input ports and add the items */
-	for (ioport_port &port : machine().ioport().ports())
-		for (ioport_field &field : port.fields())
+	for (auto &port : machine().ioport().ports())
+		for (ioport_field &field : port.second->fields())
 			if (field.is_analog() && field.enabled())
 			{
 				ioport_field::user_settings settings;
@@ -857,14 +860,16 @@ void menu_analog::populate()
 					if (type != ANALOG_ITEM_CENTERSPEED || use_autocenter)
 					{
 						analog_item_data *data;
-						UINT32 flags = 0;
+						uint32_t flags = 0;
+						std::string text;
+						std::string subtext;
 						if (strcmp(field.device().tag(), prev_owner.c_str()) != 0)
 						{
 							if (first_entry)
 								first_entry = false;
 							else
 								item_append(menu_item_type::SEPARATOR);
-							item_append(string_format("[root%s]", field.device().tag()).c_str(), nullptr, 0, nullptr);
+							item_append(string_format("[root%s]", field.device().tag()), "", 0, nullptr);
 							prev_owner.assign(field.device().tag());
 						}
 
@@ -921,7 +926,7 @@ void menu_analog::populate()
 							flags |= FLAG_RIGHT_ARROW;
 
 						/* append a menu item */
-						item_append(text.c_str(), subtext.c_str(), flags, data);
+						item_append(std::move(text), std::move(subtext), flags, data);
 					}
 			}
 }

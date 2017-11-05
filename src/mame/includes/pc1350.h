@@ -32,11 +32,11 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_ram(*this, RAM_TAG) { }
 
-	UINT8 m_outa;
-	UINT8 m_outb;
+	uint8_t m_outa;
+	uint8_t m_outb;
 	int m_power;
-	UINT8 m_reg[0x1000];
-	UINT32 screen_update_pc1350(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint8_t m_reg[0x1000];
+	uint32_t screen_update_pc1350(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_WRITE8_MEMBER(pc1350_outa);
 	DECLARE_WRITE8_MEMBER(pc1350_outb);

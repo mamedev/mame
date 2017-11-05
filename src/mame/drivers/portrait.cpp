@@ -86,10 +86,15 @@ DM81LS95 = TriState buffer
 **************************************************************************/
 
 #include "emu.h"
+#include "includes/portrait.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/mcs48/mcs48.h"
+#include "machine/gen_latch.h"
 #include "machine/nvram.h"
-#include "includes/portrait.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 WRITE8_MEMBER(portrait_state::ctrl_w)
 {
@@ -123,7 +128,7 @@ static ADDRESS_MAP_START( portrait_map, AS_PROGRAM, 8, portrait_state )
 	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(fgvideo_write) AM_SHARE("fgvideoram")
 	AM_RANGE(0x9000, 0x91ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x9200, 0x97ff) AM_RAM
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(soundlatch_byte_w)
+	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0xa010, 0xa010) AM_WRITENOP // ?
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("DSW1")
 	AM_RANGE(0xa004, 0xa004) AM_READ_PORT("DSW2")
@@ -242,7 +247,7 @@ static GFXDECODE_START( portrait )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( portrait, portrait_state )
+static MACHINE_CONFIG_START( portrait )
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)     /* 4 MHz ? */
 	MCFG_CPU_PROGRAM_MAP(portrait_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", portrait_state,  irq0_line_hold)
@@ -268,6 +273,9 @@ static MACHINE_CONFIG_START( portrait, portrait_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("tms", TMS5200, 640000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -382,5 +390,5 @@ ROM_END
 
 
 
-GAME( 1983, portrait, 0,        portrait, portrait, driver_device,  0, ROT270, "Olympia", "Portraits (set 1)", MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, portraita,portrait, portrait, portrait, driver_device,  0, ROT270, "Olympia", "Portraits (set 2)", MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, portrait, 0,        portrait, portrait, portrait_state, 0, ROT270, "Olympia", "Portraits (set 1)", MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, portraita,portrait, portrait, portrait, portrait_state, 0, ROT270, "Olympia", "Portraits (set 2)", MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )

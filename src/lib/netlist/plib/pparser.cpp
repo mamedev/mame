@@ -5,14 +5,26 @@
  *
  */
 
+#include "pparser.h"
+#include "palloc.h"
+#include "putil.h"
+
 #include <cstdarg>
 
-#include "pparser.h"
-
-PLIB_NAMESPACE_START()
+namespace plib {
 // ----------------------------------------------------------------------------------------
 // A simple tokenizer
 // ----------------------------------------------------------------------------------------
+
+ptokenizer::ptokenizer(plib::putf8_reader &strm)
+: m_strm(strm), m_lineno(0), m_cur_line(""), m_px(m_cur_line.begin()), m_unget(0), m_string('"')
+{
+}
+
+ptokenizer::~ptokenizer()
+{
+}
+
 
 pstring ptokenizer::currentline_str()
 {
@@ -29,7 +41,7 @@ void ptokenizer::skipeol()
 		{
 			c = getc();
 			if (c != 13)
-				ungetc();
+				ungetc(c);
 			return;
 		}
 		c = getc();
@@ -39,22 +51,28 @@ void ptokenizer::skipeol()
 
 pstring::code_t ptokenizer::getc()
 {
-	if (m_px >= m_cur_line.len())
+	if (m_unget != 0)
 	{
+		pstring::code_t c = m_unget;
+		m_unget = 0;
+		return c;
+	}
+	if (m_px == m_cur_line.end())
+	{
+		m_lineno++;
 		if (m_strm.readline(m_cur_line))
-		{
-			m_cur_line += "\n";
-			m_px = 0;
-		}
+			m_px = m_cur_line.begin();
 		else
 			return 0;
+		return '\n';
 	}
-	return m_cur_line.code_at(m_px++);
+	pstring::code_t c = *(m_px++);
+	return c;
 }
 
-void ptokenizer::ungetc()
+void ptokenizer::ungetc(pstring::code_t c)
 {
-	m_px--;
+	m_unget = c;
 }
 
 void ptokenizer::require_token(const token_id_t &token_num)
@@ -62,11 +80,15 @@ void ptokenizer::require_token(const token_id_t &token_num)
 	require_token(get_token(), token_num);
 }
 
-void ptokenizer::require_token(const token_t tok, const token_id_t &token_num)
+void ptokenizer::require_token(const token_t &tok, const token_id_t &token_num)
 {
 	if (!tok.is(token_num))
 	{
-		error(pfmt("Expected token <{1}> got <{2}>")(m_tokens[token_num.id()])(tok.str()) );
+		pstring val("");
+		for (auto &i : m_tokens)
+			if (i.second.id() == token_num.id())
+				val = i.first;
+		error(pfmt("Expected token <{1}> got <{2}>")(val)(tok.str()) );
 	}
 }
 
@@ -95,7 +117,7 @@ pstring ptokenizer::get_identifier_or_number()
 	token_t tok = get_token();
 	if (!(tok.is_type(IDENTIFIER) || tok.is_type(NUMBER)))
 	{
-		error(pfmt("Expected an identifier, got <{1}>")(tok.str()) );
+		error(pfmt("Expected an identifier or number, got <{1}>")(tok.str()) );
 	}
 	return tok.str();
 }
@@ -161,7 +183,7 @@ ptokenizer::token_t ptokenizer::get_token_internal()
 {
 	/* skip ws */
 	pstring::code_t c = getc();
-	while (m_whitespace.find(c)>=0)
+	while (m_whitespace.find(c) != pstring::npos)
 	{
 		c = getc();
 		if (eof())
@@ -169,7 +191,7 @@ ptokenizer::token_t ptokenizer::get_token_internal()
 			return token_t(ENDOFFILE);
 		}
 	}
-	if (m_number_chars_start.find(c)>=0)
+	if (m_number_chars_start.find(c) != pstring::npos)
 	{
 		/* read number while we receive number or identifier chars
 		 * treat it as an identifier when there are identifier chars in it
@@ -178,32 +200,31 @@ ptokenizer::token_t ptokenizer::get_token_internal()
 		token_type ret = NUMBER;
 		pstring tokstr = "";
 		while (true) {
-			if (m_identifier_chars.find(c)>=0 && m_number_chars.find(c)<0)
+			if (m_identifier_chars.find(c) != pstring::npos && m_number_chars.find(c) == pstring::npos)
 				ret = IDENTIFIER;
-			else if (m_number_chars.find(c)<0)
+			else if (m_number_chars.find(c) == pstring::npos)
 				break;
 			tokstr += c;
 			c = getc();
 		}
-		ungetc();
+		ungetc(c);
 		return token_t(ret, tokstr);
 	}
-	else if (m_identifier_chars.find(c)>=0)
+	else if (m_identifier_chars.find(c) != pstring::npos)
 	{
 		/* read identifier till non identifier char */
 		pstring tokstr = "";
-		while (m_identifier_chars.find(c)>=0) {
+		while (m_identifier_chars.find(c) != pstring::npos)
+		{
 			tokstr += c;
 			c = getc();
 		}
-		ungetc();
-		token_id_t id = token_id_t(m_tokens.indexof(tokstr));
-		if (id.id() >= 0)
-			return token_t(id, tokstr);
+		ungetc(c);
+		auto id = m_tokens.find(tokstr);
+		if (id != m_tokens.end())
+			return token_t(id->second, tokstr);
 		else
-		{
 			return token_t(IDENTIFIER, tokstr);
-		}
 	}
 	else if (c == m_string)
 	{
@@ -220,32 +241,30 @@ ptokenizer::token_t ptokenizer::get_token_internal()
 	{
 		/* read identifier till first identifier char or ws */
 		pstring tokstr = "";
-		while ((m_identifier_chars.find(c)) < 0 && (m_whitespace.find(c) < 0)) {
+		while ((m_identifier_chars.find(c) == pstring::npos) && (m_whitespace.find(c) == pstring::npos))
+		{
 			tokstr += c;
 			/* expensive, check for single char tokens */
-			if (tokstr.len() == 1)
+			if (tokstr.length() == 1)
 			{
-				token_id_t id = token_id_t(m_tokens.indexof(tokstr));
-				if (id.id() >= 0)
-					return token_t(id, tokstr);
+				auto id = m_tokens.find(tokstr);
+				if (id != m_tokens.end())
+					return token_t(id->second, tokstr);
 			}
 			c = getc();
 		}
-		ungetc();
-		token_id_t id = token_id_t(m_tokens.indexof(tokstr));
-		if (id.id() >= 0)
-			return token_t(id, tokstr);
+		ungetc(c);
+		auto id = m_tokens.find(tokstr);
+		if (id != m_tokens.end())
+			return token_t(id->second, tokstr);
 		else
-		{
 			return token_t(UNKNOWN, tokstr);
-		}
 	}
-
 }
 
-ATTR_COLD void ptokenizer::error(const pstring &errs)
+void ptokenizer::error(const pstring &errs)
 {
-	verror("Error: " + errs, currentline_no(), currentline_str());
+	verror(errs, currentline_no(), currentline_str());
 	//throw error;
 }
 
@@ -253,7 +272,7 @@ ATTR_COLD void ptokenizer::error(const pstring &errs)
 // A simple preprocessor
 // ----------------------------------------------------------------------------------------
 
-ppreprocessor::ppreprocessor()
+ppreprocessor::ppreprocessor(std::vector<define_t> *defines)
 : m_ifflag(0), m_level(0), m_lineno(0)
 {
 	m_expr_sep.push_back("!");
@@ -267,7 +286,14 @@ ppreprocessor::ppreprocessor()
 	m_expr_sep.push_back(" ");
 	m_expr_sep.push_back("\t");
 
-	m_defines.add("__PLIB_PREPROCESSOR__", define_t("__PLIB_PREPROCESSOR__", "1"));
+	m_defines.insert({"__PLIB_PREPROCESSOR__", define_t("__PLIB_PREPROCESSOR__", "1")});
+	if (defines != nullptr)
+	{
+		for (auto & p : *defines)
+		{
+			m_defines.insert({p.m_name, p});
+		}
+	}
 }
 
 void ppreprocessor::error(const pstring &err)
@@ -277,7 +303,7 @@ void ppreprocessor::error(const pstring &err)
 
 
 
-double ppreprocessor::expr(const pstring_vector_t &sexpr, std::size_t &start, int prio)
+double ppreprocessor::expr(const std::vector<pstring> &sexpr, std::size_t &start, int prio)
 {
 	double val;
 	pstring tok=sexpr[start];
@@ -349,55 +375,55 @@ double ppreprocessor::expr(const pstring_vector_t &sexpr, std::size_t &start, in
 
 ppreprocessor::define_t *ppreprocessor::get_define(const pstring &name)
 {
-	int idx = m_defines.index_of(name);
-	if (idx >= 0)
-		return &m_defines.value_at(idx);
+	auto idx = m_defines.find(name);
+	if (idx != m_defines.end())
+		return &idx->second;
 	else
 		return nullptr;
 }
 
 pstring ppreprocessor::replace_macros(const pstring &line)
 {
-	pstring_vector_t elems(line, m_expr_sep);
-	pstringbuffer ret = "";
-	for (std::size_t i=0; i<elems.size(); i++)
+	std::vector<pstring> elems(psplit(line, m_expr_sep));
+	pstring ret("");
+	for (auto & elem : elems)
 	{
-		define_t *def = get_define(elems[i]);
+		define_t *def = get_define(elem);
 		if (def != nullptr)
-			ret.cat(def->m_replace);
+			ret += def->m_replace;
 		else
-			ret.cat(elems[i]);
+			ret += elem;
 	}
 	return ret;
 }
 
-static pstring catremainder(const pstring_vector_t &elems, std::size_t start, pstring sep)
+static pstring catremainder(const std::vector<pstring> &elems, std::size_t start, pstring sep)
 {
-	pstringbuffer ret = "";
-	for (std::size_t i=start; i<elems.size(); i++)
+	pstring ret("");
+	for (auto & elem : elems)
 	{
-		ret.cat(elems[i]);
-		ret.cat(sep);
+		ret += elem;
+		ret += sep;
 	}
 	return ret;
 }
 
 pstring  ppreprocessor::process_line(const pstring &line)
 {
-	pstring lt = line.replace("\t"," ").trim();
-	pstringbuffer ret;
+	pstring lt = line.replace_all("\t"," ").trim();
+	pstring ret;
 	m_lineno++;
 	// FIXME ... revise and extend macro handling
 	if (lt.startsWith("#"))
 	{
-		pstring_vector_t lti(lt, " ", true);
+		std::vector<pstring> lti(psplit(lt, " ", true));
 		if (lti[0].equals("#if"))
 		{
 			m_level++;
 			std::size_t start = 0;
 			lt = replace_macros(lt);
-			pstring_vector_t t(lt.substr(3).replace(" ",""), m_expr_sep);
-			int val = expr(t, start, 0);
+			std::vector<pstring> t(psplit(lt.substr(3).replace_all(" ",""), m_expr_sep));
+			int val = static_cast<int>(expr(t, start, 0));
 			if (val == 0)
 				m_ifflag |= (1 << m_level);
 		}
@@ -440,7 +466,7 @@ pstring  ppreprocessor::process_line(const pstring &line)
 			{
 				if (lti.size() != 3)
 					error("PREPRO: only simple defines allowed: " + line);
-				m_defines.add(lti[1], define_t(lti[1], lti[2]));
+				m_defines.insert({lti[1], define_t(lti[1], lti[2])});
 			}
 		}
 		else
@@ -451,15 +477,14 @@ pstring  ppreprocessor::process_line(const pstring &line)
 		lt = replace_macros(lt);
 		if (m_ifflag == 0)
 		{
-			ret.cat(lt);
-			ret.cat("\n");
+			ret += lt;
 		}
 	}
 	return ret;
 }
 
 
-postream & ppreprocessor::process_i(pistream &istrm, postream &ostrm)
+void ppreprocessor::process(putf8_reader &istrm, putf8_writer &ostrm)
 {
 	pstring line;
 	while (istrm.readline(line))
@@ -467,7 +492,6 @@ postream & ppreprocessor::process_i(pistream &istrm, postream &ostrm)
 		line = process_line(line);
 		ostrm.writeline(line);
 	}
-	return ostrm;
 }
 
-PLIB_NAMESPACE_END()
+}

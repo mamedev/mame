@@ -16,17 +16,16 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
 #include "mb88xx.h"
+#include "debugger.h"
 
 
-const device_type MB88 = &device_creator<mb88_cpu_device>;
-const device_type MB88201 = &device_creator<mb88201_cpu_device>;
-const device_type MB88202 = &device_creator<mb88202_cpu_device>;
-const device_type MB8841 = &device_creator<mb8841_cpu_device>;
-const device_type MB8842 = &device_creator<mb8842_cpu_device>;
-const device_type MB8843 = &device_creator<mb8843_cpu_device>;
-const device_type MB8844 = &device_creator<mb8844_cpu_device>;
+DEFINE_DEVICE_TYPE(MB88201, mb88201_cpu_device, "mb88201", "MB88201")
+DEFINE_DEVICE_TYPE(MB88202, mb88202_cpu_device, "mb88202", "MB88202")
+DEFINE_DEVICE_TYPE(MB8841,  mb8841_cpu_device,  "mb8841",  "MB8841")
+DEFINE_DEVICE_TYPE(MB8842,  mb8842_cpu_device,  "mb8842",  "MB8842")
+DEFINE_DEVICE_TYPE(MB8843,  mb8843_cpu_device,  "mb8843",  "MB8843")
+DEFINE_DEVICE_TYPE(MB8844,  mb8844_cpu_device,  "mb8844",  "MB8844")
 
 
 /***************************************************************************
@@ -51,9 +50,6 @@ const device_type MB8844 = &device_creator<mb8844_cpu_device>;
 
 #define RDMEM(a)            (m_data->read_byte(a))
 #define WRMEM(a,v)          (m_data->write_byte((a), (v)))
-
-#define READPORT(a)         (m_io->read_byte(a))
-#define WRITEPORT(a,v)      (m_io->write_byte((a), (v)))
 
 #define TEST_ST()           (m_st & 1)
 #define TEST_ZF()           (m_zf & 1)
@@ -109,64 +105,67 @@ static ADDRESS_MAP_START(data_7bit, AS_DATA, 8, mb88_cpu_device)
 ADDRESS_MAP_END
 
 
-mb88_cpu_device::mb88_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: cpu_device(mconfig, MB88, "MB88xx", tag, owner, clock, "mb88xx", __FILE__)
-	, m_program_config("program", ENDIANNESS_BIG, 8, 11, 0)
-	, m_data_config("data", ENDIANNESS_BIG, 8, 7, 0)
-	, m_io_config("io", ENDIANNESS_BIG, 8, 3, 0)
+mb88_cpu_device::mb88_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_width, int data_width)
+	: cpu_device(mconfig, type, tag, owner, clock)
+	, m_program_config("program", ENDIANNESS_BIG, 8, program_width, 0, (program_width == 9) ? ADDRESS_MAP_NAME(program_9bit) : (program_width == 10) ? ADDRESS_MAP_NAME(program_10bit) : ADDRESS_MAP_NAME(program_11bit))
+	, m_data_config("data", ENDIANNESS_BIG, 8, data_width, 0, (data_width == 4) ? ADDRESS_MAP_NAME(data_4bit) : (data_width == 5) ? ADDRESS_MAP_NAME(data_5bit) : (data_width == 6) ? ADDRESS_MAP_NAME(data_6bit) : ADDRESS_MAP_NAME(data_7bit))
 	, m_PLA(nullptr)
+	, m_read_k(*this)
+	, m_write_o(*this)
+	, m_write_p(*this)
+	, m_read_r{{*this}, {*this}, {*this}, {*this}}
+	, m_write_r{{*this}, {*this}, {*this}, {*this}}
+	, m_read_si(*this)
+	, m_write_so(*this)
+{
+}
+
+mb88201_cpu_device::mb88201_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: mb88_cpu_device(mconfig, MB88201, tag, owner, clock, 9, 4)
+{
+}
+
+mb88202_cpu_device::mb88202_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: mb88_cpu_device(mconfig, MB88202, tag, owner, clock, 10, 5)
 {
 }
 
 
-mb88_cpu_device::mb88_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, int program_width, int data_width)
-	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
-	, m_program_config("program", ENDIANNESS_BIG, 8, program_width, 0, ( (program_width == 9) ? ADDRESS_MAP_NAME(program_9bit) : (program_width == 10) ? ADDRESS_MAP_NAME(program_10bit) : ADDRESS_MAP_NAME(program_11bit) ) )
-	, m_data_config("data", ENDIANNESS_BIG, 8, data_width, 0, ( (data_width == 4) ? ADDRESS_MAP_NAME(data_4bit) : (data_width == 5) ? ADDRESS_MAP_NAME(data_5bit) : (data_width == 6) ? ADDRESS_MAP_NAME(data_6bit) : ADDRESS_MAP_NAME(data_7bit) ) )
-	, m_io_config("io", ENDIANNESS_BIG, 8, 3, 0)
-	, m_PLA(nullptr)
-{
-}
-
-mb88201_cpu_device::mb88201_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: mb88_cpu_device(mconfig, MB88201, "MB88201", tag, owner, clock, "mb88201", __FILE__, 9, 4)
-{
-}
-
-mb88202_cpu_device::mb88202_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: mb88_cpu_device(mconfig, MB88202, "MB88202", tag, owner, clock, "mb88202", __FILE__, 10, 5)
+mb8841_cpu_device::mb8841_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: mb88_cpu_device(mconfig, MB8841, tag, owner, clock, 11, 7)
 {
 }
 
 
-mb8841_cpu_device::mb8841_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: mb88_cpu_device(mconfig, MB8841, "MB8841", tag, owner, clock, "mb8841", __FILE__, 11, 7)
+mb8842_cpu_device::mb8842_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: mb88_cpu_device(mconfig, MB8842, tag, owner, clock, 11, 7)
 {
 }
 
 
-mb8842_cpu_device::mb8842_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: mb88_cpu_device(mconfig, MB8842, "MB8842", tag, owner, clock, "mb8842", __FILE__, 11, 7)
+mb8843_cpu_device::mb8843_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: mb88_cpu_device(mconfig, MB8843, tag, owner, clock, 10, 6)
 {
 }
 
 
-mb8843_cpu_device::mb8843_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: mb88_cpu_device(mconfig, MB8843, "MB8843", tag, owner, clock, "mb8843", __FILE__, 10, 6)
+mb8844_cpu_device::mb8844_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: mb88_cpu_device(mconfig, MB8844, tag, owner, clock, 10, 6)
 {
 }
 
-
-mb8844_cpu_device::mb8844_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: mb88_cpu_device(mconfig, MB8844, "MB8844", tag, owner, clock, "mb8844", __FILE__, 10, 6)
+device_memory_interface::space_config_vector mb88_cpu_device::memory_space_config() const
 {
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config),
+		std::make_pair(AS_DATA,    &m_data_config)
+	};
 }
 
-
-offs_t mb88_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t mb88_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( mb88 );
-	return CPU_DISASSEMBLE_NAME(mb88)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(mb88)(this, stream, pc, oprom, opram, options);
 }
 
 
@@ -179,7 +178,16 @@ void mb88_cpu_device::device_start()
 	m_program = &space(AS_PROGRAM);
 	m_direct = &m_program->direct();
 	m_data = &space(AS_DATA);
-	m_io = &space(AS_IO);
+
+	m_read_k.resolve_safe(0);
+	m_write_o.resolve_safe();
+	m_write_p.resolve_safe();
+	for (auto &cb : m_read_r)
+		cb.resolve_safe(0);
+	for (auto &cb : m_write_r)
+		cb.resolve_safe();
+	m_read_si.resolve_safe(0);
+	m_write_so.resolve_safe();
 
 	m_serial = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mb88_cpu_device::serial_timer), this));
 
@@ -222,6 +230,7 @@ void mb88_cpu_device::device_start()
 	state_add( MB88_SB,  "SB",  m_SB).formatstr("%01X");
 
 	state_add( STATE_GENPC, "GENPC", m_debugger_pc ).callimport().callexport().noshow();
+	state_add( STATE_GENPCBASE, "CURPC", m_debugger_pc ).callimport().callexport().noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_debugger_flags ).callimport().callexport().formatstr("%6s").noshow();
 	m_icountptr = &m_icount;
 }
@@ -241,6 +250,7 @@ void mb88_cpu_device::state_import(const device_state_entry &entry)
 			break;
 
 		case STATE_GENPC:
+		case STATE_GENPCBASE:
 			m_PC = m_debugger_pc & 0x3f;
 			m_PA = ( m_debugger_pc >> 6 ) & 0x1f;
 			break;
@@ -263,6 +273,7 @@ void mb88_cpu_device::state_export(const device_state_entry &entry)
 			break;
 
 		case STATE_GENPC:
+		case STATE_GENPCBASE:
 			m_debugger_pc = GETPC();
 			break;
 	}
@@ -329,7 +340,7 @@ TIMER_CALLBACK_MEMBER( mb88_cpu_device::serial_timer )
 	   the program can write to S and recover the value even if serial is enabled */
 	if (!m_sf)
 	{
-		m_SB = (m_SB >> 1) | (READPORT(MB88_PORTSI) ? 8 : 0);
+		m_SB = (m_SB >> 1) | (m_read_si() ? 8 : 0);
 
 		if (m_SBcount >= 4)
 		{
@@ -361,7 +372,7 @@ void mb88_cpu_device::execute_set_input(int inputnum, int state)
 	m_nf = (state != CLEAR_LINE) ? 1 : 0;
 }
 
-void mb88_cpu_device::update_pio_enable( UINT8 newpio )
+void mb88_cpu_device::update_pio_enable( uint8_t newpio )
 {
 	/* if the serial state has changed, configure the timer */
 	if ((m_pio ^ newpio) & 0x30)
@@ -457,7 +468,7 @@ void mb88_cpu_device::execute_run()
 {
 	while (m_icount > 0)
 	{
-		UINT8 opcode, arg, oc;
+		uint8_t opcode, arg, oc;
 
 		/* fetch the opcode */
 		debugger_instruction_hook(this, GETPC());
@@ -476,18 +487,18 @@ void mb88_cpu_device::execute_run()
 				break;
 
 			case 0x01: /* outO ZCS:...*/
-				WRITEPORT( MB88_PORTO, pla( m_A,TEST_CF()) );
+				m_write_o(pla(m_A, TEST_CF()));
 				m_st = 1;
 				break;
 
 			case 0x02: /* outP ZCS:... */
-				WRITEPORT( MB88_PORTP, m_A );
+				m_write_p(m_A);
 				m_st = 1;
 				break;
 
 			case 0x03: /* outR ZCS:... */
 				arg = m_Y;
-				WRITEPORT( MB88_PORTR0+(arg&3), m_A );
+				m_write_r[arg & 3](m_A);
 				m_st = 1;
 				break;
 
@@ -589,14 +600,14 @@ void mb88_cpu_device::execute_run()
 				break;
 
 			case 0x12: /* inK ZCS:x.. */
-				m_A = READPORT( MB88_PORTK ) & 0x0f;
+				m_A = m_read_k() & 0x0f;
 				UPDATE_ZF(m_A);
 				m_st = 1;
 				break;
 
 			case 0x13: /* inR ZCS:x.. */
 				arg = m_Y;
-				m_A = READPORT( MB88_PORTR0+(arg&3) ) & 0x0f;
+				m_A = m_read_r[arg & 3]() & 0x0f;
 				UPDATE_ZF(m_A);
 				m_st = 1;
 				break;
@@ -687,8 +698,8 @@ void mb88_cpu_device::execute_run()
 				break;
 
 			case 0x20: /* setR ZCS:... */
-				arg = READPORT( MB88_PORTR0+(m_Y/4) );
-				WRITEPORT( MB88_PORTR0+(m_Y/4), arg | ( 1 << (m_Y%4) ) );
+				arg = m_read_r[m_Y/4]();
+				m_write_r[m_Y/4](arg | (1 << (m_Y%4)));
 				m_st = 1;
 				break;
 
@@ -698,8 +709,8 @@ void mb88_cpu_device::execute_run()
 				break;
 
 			case 0x22: /* rstR ZCS:... */
-				arg = READPORT( MB88_PORTR0+(m_Y/4) );
-				WRITEPORT( MB88_PORTR0+(m_Y/4), arg & ~( 1 << (m_Y%4) ) );
+				arg = m_read_r[m_Y/4]();
+				m_write_r[m_Y/4](arg & ~(1 << (m_Y%4)));
 				m_st = 1;
 				break;
 
@@ -709,7 +720,7 @@ void mb88_cpu_device::execute_run()
 				break;
 
 			case 0x24: /* tstr ZCS:..x */
-				arg = READPORT( MB88_PORTR0+(m_Y/4) );
+				arg = m_read_r[m_Y/4]();
 				m_st = ( arg & ( 1 << (m_Y%4) ) ) ? 0 : 1;
 				break;
 
@@ -831,21 +842,21 @@ void mb88_cpu_device::execute_run()
 				break;
 
 			case 0x40:  case 0x41:  case 0x42:  case 0x43: /* setD ZCS:... */
-				arg = READPORT(MB88_PORTR0);
+				arg = m_read_r[0]();
 				arg |= (1 << (opcode&3));
-				WRITEPORT(MB88_PORTR0,arg);
+				m_write_r[0](arg);
 				m_st = 1;
 				break;
 
 			case 0x44:  case 0x45:  case 0x46:  case 0x47: /* rstD ZCS:... */
-				arg = READPORT(MB88_PORTR0);
+				arg = m_read_r[0]();
 				arg &= ~(1 << (opcode&3));
-				WRITEPORT(MB88_PORTR0,arg);
+				m_write_r[0](arg);
 				m_st = 1;
 				break;
 
 			case 0x48:  case 0x49:  case 0x4a:  case 0x4b: /* tstD ZCS:..x */
-				arg = READPORT(MB88_PORTR2);
+				arg = m_read_r[2]();
 				m_st = (arg & (1 << (opcode&3))) ? 0 : 1;
 				break;
 

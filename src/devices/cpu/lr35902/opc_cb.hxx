@@ -2,8 +2,8 @@
 // copyright-holders:Wilbert Pol
 #define RLC_8BIT(x)             \
 {                               \
-	UINT8 f;           \
-	(x)=(UINT8)(((x)<<1)|((x)>>7));      \
+	uint8_t f;           \
+	(x)=(uint8_t)(((x)<<1)|((x)>>7));      \
 	if( (x)&1 )                 \
 		f=FLAG_C;               \
 	else                        \
@@ -15,9 +15,9 @@
 
 #define RL_8BIT(x)              \
 {                               \
-	UINT8 r;           \
+	uint8_t r;           \
 	r=((x)&0x80)?FLAG_C:0;      \
-	(x)=(UINT8)(((x)<<1)|((m_F&FLAG_C)?1:0));    \
+	(x)=(uint8_t)(((x)<<1)|((m_F&FLAG_C)?1:0));    \
 	if( (x)==0 )                \
 		r|=FLAG_Z;              \
 	m_F=r;          \
@@ -25,8 +25,8 @@
 
 #define RRC_8BIT(x)             \
 {                               \
-	UINT8 f;           \
-	(x)=(UINT8)(((x)>>1)|((x)<<7));      \
+	uint8_t f;           \
+	(x)=(uint8_t)(((x)>>1)|((x)<<7));      \
 	if( (x)&0x80 )              \
 		f=FLAG_C;               \
 	else                        \
@@ -38,9 +38,9 @@
 
 #define RR_8BIT(x)              \
 {                               \
-	UINT8 r;           \
+	uint8_t r;           \
 	r=((x)&1)?FLAG_C:0;         \
-	(x)=(UINT8)(((x)>>1)|((m_F&FLAG_C)?0x80:0));     \
+	(x)=(uint8_t)(((x)>>1)|((m_F&FLAG_C)?0x80:0));     \
 	if( (x)==0 )                \
 		r|=FLAG_Z;              \
 	m_F=r;          \
@@ -48,7 +48,7 @@
 
 #define SLA_8BIT(x)             \
 {                               \
-	UINT8 f;           \
+	uint8_t f;           \
 	if( (x)&0x80 )              \
 		f=FLAG_C;               \
 	else                        \
@@ -61,19 +61,19 @@
 
 #define SRA_8BIT(x)             \
 {                               \
-	UINT8 f;           \
+	uint8_t f;           \
 	if( (x)&1 )                 \
 		f=FLAG_C;               \
 	else                        \
 		f=0;                    \
-	(x)=(UINT8)(((char)(x))>>1);     \
+	(x)=(uint8_t)(((char)(x))>>1);     \
 	if( (x)==0 )                \
 		f|=FLAG_Z;              \
 	m_F=f;          \
 }
 
 #define SWAP_8BIT(x)            \
-	(x)=(UINT8)(((x)>>4)|((x)<<4));      \
+	(x)=(uint8_t)(((x)>>4)|((x)<<4));      \
 	if( (x)==0 )                \
 		m_F=FLAG_Z; \
 	else                        \
@@ -82,7 +82,7 @@
 
 #define SRL_8BIT(x)             \
 {                               \
-	UINT8 f;           \
+	uint8_t f;           \
 	if( (x)&1 )                 \
 		f=FLAG_C;               \
 	else                        \
@@ -95,9 +95,9 @@
 
 #define BIT_8BIT(n,x)           \
 	if( (x)&(1<<(n)) )          \
-		m_F=(UINT8)(FLAG_H|(m_F&FLAG_C));  \
+		m_F=(uint8_t)(FLAG_H|(m_F&FLAG_C));  \
 	else                        \
-		m_F=(UINT8)(FLAG_Z|FLAG_H|(m_F&FLAG_C));
+		m_F=(uint8_t)(FLAG_Z|FLAG_H|(m_F&FLAG_C));
 
 #define RES_8BIT(n,x)   (x)&=~(1<<(n));
 
@@ -138,7 +138,7 @@ case 0x05:
 case 0x06:
 	/*      RLC (HL) */
 	{
-		UINT16 addr = ( m_H << 8 ) | m_L;
+		uint16_t addr = ( m_H << 8 ) | m_L;
 
 		x = mem_read_byte( addr );
 		RLC_8BIT (x)
@@ -183,7 +183,7 @@ case 0x0D:
 case 0x0E:
 	/*      RRC (HL) */
 	{
-		UINT16 addr = ( m_H << 8 ) | m_L;
+		uint16_t addr = ( m_H << 8 ) | m_L;
 
 		x = mem_read_byte( addr);
 		RRC_8BIT (x)
@@ -228,7 +228,7 @@ case 0x15:
 case 0x16:
 	/*      RL (HL) */
 	{
-		UINT16 addr = ( m_H << 8 ) | m_L;
+		uint16_t addr = ( m_H << 8 ) | m_L;
 
 		x = mem_read_byte( addr);
 		RL_8BIT (x)
@@ -273,7 +273,7 @@ case 0x1D:
 case 0x1E:
 	/*      RR (HL) */
 	{
-		UINT16 addr = ( m_H << 8 ) | m_L;
+		uint16_t addr = ( m_H << 8 ) | m_L;
 
 		x = mem_read_byte( addr);
 		RR_8BIT (x)
@@ -318,7 +318,7 @@ case 0x25:
 case 0x26:
 	/*      SLA (HL) */
 	{
-		UINT16 addr = ( m_H << 8 ) | m_L;
+		uint16_t addr = ( m_H << 8 ) | m_L;
 
 		x = mem_read_byte( addr);
 		SLA_8BIT (x)
@@ -363,7 +363,7 @@ case 0x2D:
 case 0x2E:
 	/*      SRA (HL) */
 	{
-		UINT16 addr = ( m_H << 8 ) | m_L;
+		uint16_t addr = ( m_H << 8 ) | m_L;
 
 		x = mem_read_byte( addr);
 		SRA_8BIT (x)
@@ -408,7 +408,7 @@ case 0x35:
 case 0x36:
 	/*      SWAP (HL) */
 	{
-		UINT16 addr = ( m_H << 8 ) | m_L;
+		uint16_t addr = ( m_H << 8 ) | m_L;
 
 		x = mem_read_byte( addr);
 		SWAP_8BIT (x)
@@ -453,7 +453,7 @@ case 0x3D:
 case 0x3E:
 	/*      SRL (HL) */
 	{
-		UINT16 addr = ( m_H << 8 ) | m_L;
+		uint16_t addr = ( m_H << 8 ) | m_L;
 
 		x = mem_read_byte( addr);
 		SRL_8BIT (x)
@@ -498,7 +498,7 @@ case 0x45:
 case 0x46:
 	/*      BIT 0,(HL) */
 	{
-		UINT16 addr = ( m_H << 8 ) | m_L;
+		uint16_t addr = ( m_H << 8 ) | m_L;
 
 		x = mem_read_byte( addr);
 		BIT_8BIT (0, x)
@@ -542,7 +542,7 @@ case 0x4D:
 case 0x4E:
 	/*      BIT 1,(HL) */
 	{
-		UINT16 addr = ( m_H << 8 ) | m_L;
+		uint16_t addr = ( m_H << 8 ) | m_L;
 
 		x = mem_read_byte( addr);
 		BIT_8BIT (1, x)
@@ -586,7 +586,7 @@ case 0x55:
 case 0x56:
 	/*      BIT 2,(HL) */
 	{
-		UINT16 addr = ( m_H << 8 ) | m_L;
+		uint16_t addr = ( m_H << 8 ) | m_L;
 
 		x = mem_read_byte( addr);
 		BIT_8BIT (2, x)
@@ -630,7 +630,7 @@ case 0x5D:
 case 0x5E:
 	/*      BIT 3,(HL) */
 	{
-		UINT16 addr = ( m_H << 8 ) | m_L;
+		uint16_t addr = ( m_H << 8 ) | m_L;
 
 		x = mem_read_byte( addr);
 		BIT_8BIT (3, x)
@@ -674,7 +674,7 @@ case 0x65:
 case 0x66:
 	/*      BIT 4,(HL) */
 	{
-		UINT16 addr = ( m_H << 8 ) | m_L;
+		uint16_t addr = ( m_H << 8 ) | m_L;
 
 		x = mem_read_byte( addr);
 		BIT_8BIT (4, x)
@@ -718,7 +718,7 @@ case 0x6D:
 case 0x6E:
 	/*      BIT 5,(HL) */
 	{
-		UINT16 addr = ( m_H << 8 ) | m_L;
+		uint16_t addr = ( m_H << 8 ) | m_L;
 
 		x = mem_read_byte( addr);
 		BIT_8BIT (5, x)
@@ -762,7 +762,7 @@ case 0x75:
 case 0x76:
 	/*      BIT 6,(HL) */
 	{
-		UINT16 addr = ( m_H << 8 ) | m_L;
+		uint16_t addr = ( m_H << 8 ) | m_L;
 
 		x = mem_read_byte( addr);
 		BIT_8BIT (6, x)
@@ -806,7 +806,7 @@ case 0x7D:
 case 0x7E:
 	/*      BIT 7,(HL) */
 	{
-		UINT16 addr = ( m_H << 8 ) | m_L;
+		uint16_t addr = ( m_H << 8 ) | m_L;
 
 		x = mem_read_byte( addr);
 		BIT_8BIT (7, x)
@@ -850,7 +850,7 @@ case 0x85:
 case 0x86:
 	/*      RES 0,(HL) */
 	{
-		UINT16 addr = ( m_H << 8 ) | m_L;
+		uint16_t addr = ( m_H << 8 ) | m_L;
 
 		x = mem_read_byte( addr);
 		RES_8BIT (0, x)
@@ -895,7 +895,7 @@ case 0x8D:
 case 0x8E:
 	/*      RES 1,(HL) */
 	{
-		UINT16 addr = ( m_H << 8 ) | m_L;
+		uint16_t addr = ( m_H << 8 ) | m_L;
 
 		x = mem_read_byte( addr);
 		RES_8BIT (1, x)
@@ -940,7 +940,7 @@ case 0x95:
 case 0x96:
 	/*      RES 2,(HL) */
 	{
-		UINT16 addr = ( m_H << 8 ) | m_L;
+		uint16_t addr = ( m_H << 8 ) | m_L;
 
 		x = mem_read_byte( addr);
 		RES_8BIT (2, x)
@@ -985,7 +985,7 @@ case 0x9D:
 case 0x9E:
 	/*      RES 3,(HL) */
 	{
-		UINT16 addr = ( m_H << 8 ) | m_L;
+		uint16_t addr = ( m_H << 8 ) | m_L;
 
 		x = mem_read_byte( addr);
 		RES_8BIT (3, x)
@@ -1030,7 +1030,7 @@ case 0xA5:
 case 0xA6:
 	/*      RES 4,(HL) */
 	{
-		UINT16 addr = ( m_H << 8 ) | m_L;
+		uint16_t addr = ( m_H << 8 ) | m_L;
 
 		x = mem_read_byte( addr);
 		RES_8BIT (4, x)
@@ -1075,7 +1075,7 @@ case 0xAD:
 case 0xAE:
 	/*      RES 5,(HL) */
 	{
-		UINT16 addr = ( m_H << 8 ) | m_L;
+		uint16_t addr = ( m_H << 8 ) | m_L;
 
 		x = mem_read_byte( addr);
 		RES_8BIT (5, x)
@@ -1120,7 +1120,7 @@ case 0xB5:
 case 0xB6:
 	/*      RES 6,(HL) */
 	{
-		UINT16 addr = ( m_H << 8 ) | m_L;
+		uint16_t addr = ( m_H << 8 ) | m_L;
 
 		x = mem_read_byte( addr);
 		RES_8BIT (6, x)
@@ -1165,7 +1165,7 @@ case 0xBD:
 case 0xBE:
 	/*      RES 7,(HL) */
 	{
-		UINT16 addr = ( m_H << 8 ) | m_L;
+		uint16_t addr = ( m_H << 8 ) | m_L;
 
 		x = mem_read_byte( addr);
 		RES_8BIT (7, x)
@@ -1210,7 +1210,7 @@ case 0xC5:
 case 0xC6:
 	/*      SET 0,(HL) */
 	{
-		UINT16 addr = ( m_H << 8 ) | m_L;
+		uint16_t addr = ( m_H << 8 ) | m_L;
 
 		x = mem_read_byte( addr);
 		SET_8BIT (0, x)
@@ -1255,7 +1255,7 @@ case 0xCD:
 case 0xCE:
 	/*      SET 1,(HL) */
 	{
-		UINT16 addr = ( m_H << 8 ) | m_L;
+		uint16_t addr = ( m_H << 8 ) | m_L;
 
 		x = mem_read_byte( addr);
 		SET_8BIT (1, x)
@@ -1300,7 +1300,7 @@ case 0xD5:
 case 0xD6:
 	/*      SET 2,(HL) */
 	{
-		UINT16 addr = ( m_H << 8 ) | m_L;
+		uint16_t addr = ( m_H << 8 ) | m_L;
 
 		x = mem_read_byte( addr);
 		SET_8BIT (2, x)
@@ -1345,7 +1345,7 @@ case 0xDD:
 case 0xDE:
 	/*      SET 3,(HL) */
 	{
-		UINT16 addr = ( m_H << 8 ) | m_L;
+		uint16_t addr = ( m_H << 8 ) | m_L;
 
 		x = mem_read_byte( addr);
 		SET_8BIT (3, x)
@@ -1390,7 +1390,7 @@ case 0xE5:
 case 0xE6:
 	/*      SET 4,(HL) */
 	{
-		UINT16 addr = ( m_H << 8 ) | m_L;
+		uint16_t addr = ( m_H << 8 ) | m_L;
 
 		x = mem_read_byte( addr);
 		SET_8BIT (4, x)
@@ -1435,7 +1435,7 @@ case 0xED:
 case 0xEE:
 	/*      SET 5,(HL) */
 	{
-		UINT16 addr = ( m_H << 8 ) | m_L;
+		uint16_t addr = ( m_H << 8 ) | m_L;
 
 		x = mem_read_byte( addr);
 		SET_8BIT (5, x)
@@ -1480,7 +1480,7 @@ case 0xF5:
 case 0xF6:
 	/*      SET 6,(HL) */
 	{
-		UINT16 addr = ( m_H << 8 ) | m_L;
+		uint16_t addr = ( m_H << 8 ) | m_L;
 
 		x = mem_read_byte( addr);
 		SET_8BIT (6, x)
@@ -1525,7 +1525,7 @@ case 0xFD:
 case 0xFE:
 	/*      SET 7,(HL) */
 	{
-		UINT16 addr = ( m_H << 8 ) | m_L;
+		uint16_t addr = ( m_H << 8 ) | m_L;
 
 		x = mem_read_byte( addr);
 		SET_8BIT (7, x)

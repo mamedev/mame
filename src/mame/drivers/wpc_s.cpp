@@ -60,7 +60,7 @@ protected:
 	required_device<cpu_device> maincpu;
 	required_device<dcs_audio_8k_device> dcs;
 	required_memory_bank rombank;
-	required_shared_ptr<UINT8> mainram;
+	required_shared_ptr<uint8_t> mainram;
 	required_device<nvram_device> nvram;
 	required_device<wpc_pic_device> pic;
 	required_device<wpc_lamp_device> lamp;
@@ -94,8 +94,8 @@ private:
 	static const char *const outputs_wd[54];
 	static const char *const lamps_wcs[64];
 	static const char *const outputs_wcs[54];
-	UINT8 firq_src, zc;
-	UINT16 rtc_base_day;
+	uint8_t firq_src, zc;
+	uint16_t rtc_base_day;
 };
 
 static ADDRESS_MAP_START( wpc_s_map, AS_PROGRAM, 8, wpc_s_state )
@@ -166,9 +166,9 @@ READ8_MEMBER(wpc_s_state::rtc_r)
 	// This may get wonky if the game is running on year change.  Find
 	// something better to do at that time.
 
-	UINT8 day = (systime.local_time.day - rtc_base_day) & 31;
-	UINT8 hour = systime.local_time.hour;
-	UINT8 min = systime.local_time.minute;
+	uint8_t day = (systime.local_time.day - rtc_base_day) & 31;
+	uint8_t hour = systime.local_time.hour;
+	uint8_t min = systime.local_time.minute;
 
 	switch(offset) {
 	case 0:
@@ -187,7 +187,7 @@ READ8_MEMBER(wpc_s_state::firq_src_r)
 
 READ8_MEMBER(wpc_s_state::zc_r)
 {
-	UINT8 res = zc;
+	uint8_t res = zc;
 	zc &= 0x7f;
 	return res;
 }
@@ -242,7 +242,7 @@ void wpc_s_state::machine_reset()
 	mainram[0x1804] = systime.local_time.weekday+1;
 	mainram[0x1805] = 0;
 	mainram[0x1806] = 1;
-	UINT16 checksum = 0;
+	uint16_t checksum = 0;
 	for(int i=0x1800; i<=0x1806; i++)
 		checksum += mainram[i];
 	checksum = ~checksum;
@@ -1967,7 +1967,7 @@ static INPUT_PORTS_START( tfs )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("UL Flipper Button")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( wpc_s, wpc_s_state )
+static MACHINE_CONFIG_START( wpc_s )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, XTAL_8MHz/4)
 	MCFG_CPU_PROGRAM_MAP(wpc_s_map)
@@ -2053,6 +2053,17 @@ ROM_END
 ROM_START(dh_lx2)
 	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_LOAD("harr_lx2.rom", 0x00000, 0x80000, CRC(d92c2d35) SHA1(68f08120fbc510db46b1fd0e68ec07fe536f77ca))
+	ROM_REGION16_LE(0x1000000, "dcs", ROMREGION_ERASEFF)
+	ROM_LOAD16_BYTE("dh_snd.u2", 0x000000, 0x080000, CRC(dce5339a) SHA1(c89ec1c2f4f5201cbc40c7038cd1219b200066c7))
+	ROM_LOAD16_BYTE("dh_snd.u3", 0x200000, 0x080000, CRC(27c30ada) SHA1(388c0e533d1d5c88ae020ef8d8b98db4c603c157))
+	ROM_LOAD16_BYTE("dh_snd.u4", 0x400000, 0x080000, CRC(8bde0089) SHA1(8efdcc60daef06c65acf5cb805790d2b82d3c091))
+	ROM_LOAD16_BYTE("dh_snd.u5", 0x600000, 0x080000, CRC(bfacfbdb) SHA1(aa443906a0945586ba5d2910972b333b5d316894))
+	ROM_LOAD16_BYTE("dh_snd.u6", 0x800000, 0x080000, CRC(793dcfb8) SHA1(c9b35e0511962f9fc372f98e937ee5989109056d))
+ROM_END
+
+ROM_START(dh_lf2)
+	ROM_REGION(0x80000, "maincpu", 0)
+	ROM_LOAD("harr_lf2.rom", 0x00000, 0x80000, CRC(c4931917) SHA1(f7a366fade194ad7b3671acf55d894e3c31992d0))
 	ROM_REGION16_LE(0x1000000, "dcs", ROMREGION_ERASEFF)
 	ROM_LOAD16_BYTE("dh_snd.u2", 0x000000, 0x080000, CRC(dce5339a) SHA1(c89ec1c2f4f5201cbc40c7038cd1219b200066c7))
 	ROM_LOAD16_BYTE("dh_snd.u3", 0x200000, 0x080000, CRC(27c30ada) SHA1(388c0e533d1d5c88ae020ef8d8b98db4c603c157))
@@ -2731,6 +2742,7 @@ GAME(1994,  corv_lx1,   corv_21,    wpc_s,  corv, wpc_s_state,  corv,  ROT0,  "B
 GAME(1994,  corv_lx2,   corv_21,    wpc_s,  corv, wpc_s_state,  corv,  ROT0,  "Bally",        "Corvette (LX2)",                    MACHINE_MECHANICAL)
 GAME(1994,  corv_la1,   corv_21,    wpc_s,  corv, wpc_s_state,  corv,  ROT0,  "Bally",        "Corvette (LA1)",                    MACHINE_MECHANICAL)
 GAME(1995,  dh_lx2,     0,          wpc_s,  dh,   wpc_s_state,  dh,    ROT0,  "Williams",     "Dirty Harry (LX-2)",                MACHINE_MECHANICAL)
+GAME(1995,  dh_lf2,     dh_lx2,     wpc_s,  dh,   wpc_s_state,  dh,    ROT0,  "Williams",     "Dirty Harry (LF-2)",                MACHINE_MECHANICAL)
 GAME(1995,  i500_11r,   0,          wpc_s,  i500, wpc_s_state,  i500,  ROT0,  "Bally",        "Indianapolis 500 (1.1R)",           MACHINE_MECHANICAL)
 GAME(1995,  i500_10r,   i500_11r,   wpc_s,  i500, wpc_s_state,  i500,  ROT0,  "Bally",        "Indianapolis 500 (1.0R)",           MACHINE_MECHANICAL)
 GAME(1995,  i500_11b,   i500_11r,   wpc_s,  i500, wpc_s_state,  i500,  ROT0,  "Bally",        "Indianapolis 500 (1.1 Belgium)",    MACHINE_MECHANICAL)

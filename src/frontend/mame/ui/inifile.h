@@ -8,12 +8,15 @@
 
 ***************************************************************************/
 
+#ifndef MAME_FRONTEND_UI_INIFILE_H
+#define MAME_FRONTEND_UI_INIFILE_H
+
 #pragma once
 
-#ifndef __UI_INIFILE_H__
-#define __UI_INIFILE_H__
+#include "ui/utils.h"
 
-#include "../frontend/mame/ui/utils.h"
+#include <unordered_set>
+
 
 //-------------------------------------------------
 //  INIFILE MANAGER
@@ -27,48 +30,25 @@ public:
 	// construction/destruction
 	inifile_manager(running_machine &machine, ui_options &moptions);
 
+	// load systems from category
+	void load_ini_category(size_t file, size_t category, std::unordered_set<game_driver const *> &result) const;
+
 	// getters
-	running_machine &machine() const { return m_machine; }
-	std::string get_file(int file = -1) { return ((file == -1) ? ini_index[c_file].first : ini_index[file].first); }
-	std::string get_category(int cat = -1) { return ((cat == -1) ? ini_index[c_file].second[c_cat].first : ini_index[c_file].second[cat].first); }
-	size_t total() { return ini_index.size(); }
-	size_t cat_total(int cat = -1) { return ((cat == -1) ? ini_index[c_file].second.size() : ini_index[cat].second.size()); }
-	UINT16 &cur_file() { return c_file; }
-	UINT16 &cur_cat() { return c_cat; }
-
-	// load games from category
-	void load_ini_category(std::vector<int> &temp_filter);
-
-	// setters
-	void move_file(int d) { c_file += d; c_cat = 0; }
-	void move_cat(int d) { c_cat += d; }
-	void set_cat(int i = -1) { (i == -1) ? c_cat = 0 : c_cat = i; }
-	void set_file(int i = -1) { (i == -1) ? c_file = 0 : c_file = i; }
+	size_t get_file_count() const { return m_ini_index.size(); }
+	std::string const &get_file_name(size_t file) const { return m_ini_index[file].first; }
+	size_t get_category_count(size_t file) const { return m_ini_index[file].second.size(); }
+	std::string const &get_category_name(size_t file, size_t category) const { return m_ini_index[file].second[category].first; }
 
 private:
-
 	// ini file structure
-	using categoryindex = std::vector<std::pair<std::string, long>>;
+	using categoryindex = std::vector<std::pair<std::string, int64_t>>;
 
-	// files indices
-	static UINT16 c_file, c_cat;
-	std::vector<std::pair<std::string, categoryindex>> ini_index;
-
-	// init category index
-	void init_category(std::string &filename);
-
-	// init file index
-	void directory_scan();
-
-	// file open/close/seek
-	bool parseopen(const char *filename);
-	void parseclose() { if (fp != nullptr) fclose(fp); }
+	void init_category(std::string &&filename, emu_file &file);
 
 	// internal state
-	running_machine &m_machine;  // reference to our machine
-	ui_options      &m_options;
-	std::string     m_fullpath;
-	FILE            *fp = nullptr;
+	ui_options &m_options;
+	std::vector<std::pair<std::string, categoryindex> > m_ini_index;
+
 };
 
 //-------------------------------------------------
@@ -81,8 +61,17 @@ public:
 	// construction/destruction
 	favorite_manager(running_machine &machine, ui_options &moptions);
 
+	// favorites comparator
+	struct ci_less
+	{
+		bool operator() (const std::string &s1, const std::string &s2) const
+		{
+			return (core_stricmp(s1.c_str(), s2.c_str()) < 0);
+		}
+	};
+
 	// favorite indices
-	std::vector<ui_software_info> m_list;
+	std::multimap<std::string, ui_software_info, ci_less> m_list;
 
 	// getters
 	running_machine &machine() const { return m_machine; }
@@ -95,20 +84,20 @@ public:
 	// check
 	bool isgame_favorite();
 	bool isgame_favorite(const game_driver *driver);
-	bool isgame_favorite(ui_software_info &swinfo);
+	bool isgame_favorite(ui_software_info const &swinfo);
 
 	// save
 	void save_favorite_games();
 
 	// remove
 	void remove_favorite_game();
-	void remove_favorite_game(ui_software_info &swinfo);
+	void remove_favorite_game(ui_software_info const &swinfo);
 
 private:
 	const char *favorite_filename = "favorites.ini";
 
 	// current
-	int m_current;
+	std::multimap<std::string, ui_software_info>::iterator m_current;
 
 	// parse file ui_favorite
 	void parse_favorite();
@@ -118,4 +107,4 @@ private:
 	ui_options &m_options;
 };
 
-#endif  /* __UI_INIFILE_H__ */
+#endif  // MAME_FRONTEND_UI_INIFILE_H

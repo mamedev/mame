@@ -10,6 +10,7 @@
 
 #include "emu.h"
 #include "cpu/t11/t11.h"
+#include "screen.h"
 
 
 class uknc_state : public driver_device
@@ -21,7 +22,7 @@ public:
 
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_uknc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_uknc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 };
 
@@ -51,12 +52,12 @@ void uknc_state::video_start()
 {
 }
 
-UINT32 uknc_state::screen_update_uknc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t uknc_state::screen_update_uknc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
 
-static MACHINE_CONFIG_START( uknc, uknc_state )
+static MACHINE_CONFIG_START( uknc )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", K1801VM2, 8000000)
 	MCFG_T11_INITIAL_MODE(0x8000)
@@ -89,5 +90,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY     FULLNAME       FLAGS */
-COMP( 1987, uknc,   0,      0,       uknc,      uknc, driver_device,    0,    "<unknown>",  "UKNC", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE         INIT  COMPANY       FULLNAME  FLAGS */
+COMP( 1987, uknc,   0,      0,       uknc,      uknc,  uknc_state,   0,    "<unknown>",  "UKNC",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

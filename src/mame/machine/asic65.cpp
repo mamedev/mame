@@ -36,7 +36,7 @@
 
 #define MAX_COMMANDS    0x2b
 
-static const UINT8 command_map[3][MAX_COMMANDS] =
+static const uint8_t command_map[3][MAX_COMMANDS] =
 {
 	{
 		/* standard version */
@@ -82,10 +82,10 @@ static const UINT8 command_map[3][MAX_COMMANDS] =
 	}
 };
 
-const device_type ASIC65 = &device_creator<asic65_device>;
+DEFINE_DEVICE_TYPE(ASIC65, asic65_device, "asic65", "Atari ASIC65")
 
-asic65_device::asic65_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, ASIC65, "Atari ASIC65", tag, owner, clock, "asic65", __FILE__),
+asic65_device::asic65_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, ASIC65, tag, owner, clock),
 	m_asic65_type(0),
 	m_command(0),
 	m_yorigin(0x1800),
@@ -106,16 +106,6 @@ asic65_device::asic65_device(const machine_config &mconfig, const char *tag, dev
 	{
 		elem = 0;
 	}
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void asic65_device::device_config_complete()
-{
 }
 
 //-------------------------------------------------
@@ -195,7 +185,7 @@ void asic65_device::device_timer(emu_timer &timer, device_timer_id id, int param
 			m_ourcpu->set_input_line(0, ASSERT_LINE);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in asic65_device::device_timer");
+		assert_always(false, "Unknown id in asic65_device::device_timer");
 	}
 }
 
@@ -239,8 +229,8 @@ WRITE16_MEMBER( asic65_device::data_w )
 
 READ16_MEMBER( asic65_device::read )
 {
-	INT64 element, result64 = 0;
-	UINT16 result = 0;
+	int64_t element, result64 = 0;
+	uint16_t result = 0;
 
 	/* rom-based just returns latched data */
 	if (m_asic65_type == ASIC65_ROMBASED)
@@ -282,21 +272,21 @@ READ16_MEMBER( asic65_device::read )
 
 		case OP_SIN:    /* sin */
 			if (m_param_index >= 1)
-				result = (int)(16384. * sin(M_PI * (double)(INT16)m_param[0] / 32768.));
+				result = (int)(16384. * sin(M_PI * (double)(int16_t)m_param[0] / 32768.));
 			break;
 
 		case OP_COS:    /* cos */
 			if (m_param_index >= 1)
-				result = (int)(16384. * cos(M_PI * (double)(INT16)m_param[0] / 32768.));
+				result = (int)(16384. * cos(M_PI * (double)(int16_t)m_param[0] / 32768.));
 			break;
 
 		case OP_ATAN:   /* vector angle */
 			if (m_param_index >= 4)
 			{
-				INT32 xint = (INT32)((m_param[0] << 16) | m_param[1]);
-				INT32 yint = (INT32)((m_param[2] << 16) | m_param[3]);
+				int32_t xint = (int32_t)((m_param[0] << 16) | m_param[1]);
+				int32_t yint = (int32_t)((m_param[2] << 16) | m_param[3]);
 				double a = atan2((double)yint, (double)xint);
-				result = (INT16)(a * 32768. / M_PI);
+				result = (int16_t)(a * 32768. / M_PI);
 			}
 			break;
 
@@ -305,29 +295,29 @@ READ16_MEMBER( asic65_device::read )
 			/* in Race Drivin' will be off */
 			if (m_param_index >= 9+6)
 			{
-				INT32 v0 = (INT32)((m_param[9] << 16) | m_param[10]);
-				INT32 v1 = (INT32)((m_param[11] << 16) | m_param[12]);
-				INT32 v2 = (INT32)((m_param[13] << 16) | m_param[14]);
+				int32_t v0 = (int32_t)((m_param[9] << 16) | m_param[10]);
+				int32_t v1 = (int32_t)((m_param[11] << 16) | m_param[12]);
+				int32_t v2 = (int32_t)((m_param[13] << 16) | m_param[14]);
 
 				/* 2 results per element */
 				switch (m_result_index / 2)
 				{
 					case 0:
-						result64 = (INT64)v0 * (INT16)m_param[0] +
-									(INT64)v1 * (INT16)m_param[3] +
-									(INT64)v2 * (INT16)m_param[6];
+						result64 = (int64_t)v0 * (int16_t)m_param[0] +
+									(int64_t)v1 * (int16_t)m_param[3] +
+									(int64_t)v2 * (int16_t)m_param[6];
 						break;
 
 					case 1:
-						result64 = (INT64)v0 * (INT16)m_param[1] +
-									(INT64)v1 * (INT16)m_param[4] +
-									(INT64)v2 * (INT16)m_param[7];
+						result64 = (int64_t)v0 * (int16_t)m_param[1] +
+									(int64_t)v1 * (int16_t)m_param[4] +
+									(int64_t)v2 * (int16_t)m_param[7];
 						break;
 
 					case 2:
-						result64 = (INT64)v0 * (INT16)m_param[2] +
-									(INT64)v1 * (INT16)m_param[5] +
-									(INT64)v2 * (INT16)m_param[8];
+						result64 = (int64_t)v0 * (int16_t)m_param[2] +
+									(int64_t)v1 * (int16_t)m_param[5] +
+									(int64_t)v2 * (int16_t)m_param[8];
 						break;
 				}
 
@@ -341,29 +331,29 @@ READ16_MEMBER( asic65_device::read )
 		case OP_MATRIXMULT: /* matrix multiply???? */
 			if (m_param_index >= 9+6)
 			{
-				INT32 v0 = (INT32)((m_param[9] << 16) | m_param[10]);
-				INT32 v1 = (INT32)((m_param[11] << 16) | m_param[12]);
-				INT32 v2 = (INT32)((m_param[13] << 16) | m_param[14]);
+				int32_t v0 = (int32_t)((m_param[9] << 16) | m_param[10]);
+				int32_t v1 = (int32_t)((m_param[11] << 16) | m_param[12]);
+				int32_t v2 = (int32_t)((m_param[13] << 16) | m_param[14]);
 
 				/* 2 results per element */
 				switch (m_result_index / 2)
 				{
 					case 0:
-						result64 = (INT64)v0 * (INT16)m_param[0] +
-									(INT64)v1 * (INT16)m_param[1] +
-									(INT64)v2 * (INT16)m_param[2];
+						result64 = (int64_t)v0 * (int16_t)m_param[0] +
+									(int64_t)v1 * (int16_t)m_param[1] +
+									(int64_t)v2 * (int16_t)m_param[2];
 						break;
 
 					case 1:
-						result64 = (INT64)v0 * (INT16)m_param[3] +
-									(INT64)v1 * (INT16)m_param[4] +
-									(INT64)v2 * (INT16)m_param[5];
+						result64 = (int64_t)v0 * (int16_t)m_param[3] +
+									(int64_t)v1 * (int16_t)m_param[4] +
+									(int64_t)v2 * (int16_t)m_param[5];
 						break;
 
 					case 2:
-						result64 = (INT64)v0 * (INT16)m_param[6] +
-									(INT64)v1 * (INT16)m_param[7] +
-									(INT64)v2 * (INT16)m_param[8];
+						result64 = (int64_t)v0 * (int16_t)m_param[6] +
+									(int64_t)v1 * (int16_t)m_param[7] +
+									(int64_t)v2 * (int16_t)m_param[8];
 						break;
 				}
 
@@ -389,22 +379,22 @@ READ16_MEMBER( asic65_device::read )
 				/* return 0 == scale factor for 1/z */
 				/* return 1 == transformed X */
 				/* return 2 == transformed Y, taking height into account */
-				element = (INT16)m_param[0];
+				element = (int16_t)m_param[0];
 				if (m_param_index == 2)
 				{
-					result64 = (element * (INT16)m_param[1]) >> 8;
+					result64 = (element * (int16_t)m_param[1]) >> 8;
 					result64 -= 1;
 					if (result64 > 0x3fff) result64 = 0;
 				}
 				else if (m_param_index == 3)
 				{
-					result64 = (element * (INT16)m_param[2]) >> 15;
+					result64 = (element * (int16_t)m_param[2]) >> 15;
 					result64 += 0xa8;
 				}
 				else if (m_param_index == 4)
 				{
-					result64 = (INT16)((element * (INT16)m_param[3]) >> 10);
-					result64 = (INT16)m_yorigin - result64 - (result64 << 1);
+					result64 = (int16_t)((element * (int16_t)m_param[3]) >> 10);
+					result64 = (int16_t)m_yorigin - result64 - (result64 << 1);
 				}
 				result = result64 & 0xffff;
 			}
@@ -416,13 +406,13 @@ READ16_MEMBER( asic65_device::read )
 
 		case OP_SETBANK:    /* set a bank */
 		{
-			static const UINT8 banklist[] =
+			static const uint8_t banklist[] =
 			{
 				1,4,0,4,4,3,4,2, 4,4,4,4,4,4,4,4,
 				3,3,4,4,1,1,0,0, 4,4,4,4,2,2,4,4,
 				4,4
 			};
-			static const UINT16 bankaddr[][8] =
+			static const uint16_t bankaddr[][8] =
 			{
 				{ 0x77c0,0x77ce,0x77c2,0x77cc,0x77c4,0x77ca,0x77c6,0x77c8 },
 				{ 0x77d0,0x77de,0x77d2,0x77dc,0x77d4,0x77da,0x77d6,0x77d8 },
@@ -442,7 +432,7 @@ READ16_MEMBER( asic65_device::read )
 
 		case OP_VERIFYBANK: /* verify a bank */
 		{
-			static const UINT16 bankverify[] =
+			static const uint16_t bankverify[] =
 			{
 				0x0eb2,0x1000,0x171b,0x3d28
 			};
@@ -516,10 +506,10 @@ READ16_MEMBER( asic65_device::stat_r )
 }
 
 
-READ16_MEMBER( asic65_device::get_bio )
+READ_LINE_MEMBER( asic65_device::get_bio )
 {
 	if (!m_tfull)
-		space.device().execute().spin_until_interrupt();
+		m_ourcpu->spin_until_interrupt();
 	return m_tfull ? CLEAR_LINE : ASSERT_LINE;
 }
 
@@ -539,34 +529,21 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( asic65_io_map, AS_IO, 16, asic65_device )
 	AM_RANGE(0, 0) AM_MIRROR(6) AM_READWRITE(m68k_r, m68k_w)
 	AM_RANGE(1, 1) AM_MIRROR(6) AM_READWRITE(stat_r, stat_w)
-	AM_RANGE(TMS32010_BIO, TMS32010_BIO) AM_READ(get_bio)
 ADDRESS_MAP_END
 
 
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
 
-/*************************************
- *
- *  Machine driver for ROM-based
- *
- *************************************/
-
-MACHINE_CONFIG_FRAGMENT( asic65 )
+MACHINE_CONFIG_MEMBER( asic65_device::device_add_mconfig )
 
 	/* ASIC65 */
 	MCFG_CPU_ADD("asic65cpu", TMS32010, 20000000)
 	MCFG_CPU_PROGRAM_MAP(asic65_program_map)
 	MCFG_CPU_IO_MAP(asic65_io_map)
+	MCFG_TMS32010_BIO_IN_CB(READLINE(asic65_device, get_bio))
 MACHINE_CONFIG_END
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor asic65_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( asic65 );
-}
 
 
 

@@ -1,8 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:Fabio Priuli,Acho A. Tang, R. Belmont
+#ifndef MAME_VIDEO_K051960_H
+#define MAME_VIDEO_K051960_H
+
 #pragma once
-#ifndef __K051960_H__
-#define __K051960_H__
+
+#include "screen.h"
 
 enum
 {
@@ -31,8 +34,7 @@ typedef device_delegate<void (int *code, int *color, int *priority, int *shadow)
 	devcb = &k051960_device::set_nmi_handler(*device, DEVCB_##_devcb);
 
 
-class k051960_device : public device_t,
-							public device_gfx_interface
+class k051960_device : public device_t, public device_gfx_interface
 {
 	static const gfx_layout spritelayout;
 	static const gfx_layout spritelayout_reverse;
@@ -42,14 +44,13 @@ class k051960_device : public device_t,
 	DECLARE_GFXDECODE_MEMBER(gfxinfo_gradius3);
 
 public:
-	k051960_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	~k051960_device() {}
+	k051960_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &set_irq_handler(device_t &device, _Object object)
-		{ return downcast<k051960_device &>(device).m_irq_handler.set_callback(object); }
+	template <class Object> static devcb_base &set_irq_handler(device_t &device, Object &&cb)
+	{ return downcast<k051960_device &>(device).m_irq_handler.set_callback(std::forward<Object>(cb)); }
 
-	template<class _Object> static devcb_base &set_nmi_handler(device_t &device, _Object object)
-		{ return downcast<k051960_device &>(device).m_nmi_handler.set_callback(object); }
+	template <class Object> static devcb_base &set_nmi_handler(device_t &device, Object &&cb)
+	{ return downcast<k051960_device &>(device).m_nmi_handler.set_callback(std::forward<Object>(cb)); }
 
 	// static configuration
 	static void set_k051960_callback(device_t &device, k051960_cb_delegate callback) { downcast<k051960_device &>(device).m_k051960_cb = callback; }
@@ -87,9 +88,9 @@ protected:
 
 private:
 	// internal state
-	std::unique_ptr<UINT8[]>   m_ram;
+	std::unique_ptr<uint8_t[]>   m_ram;
 
-	required_region_ptr<UINT8> m_sprite_rom;
+	required_region_ptr<uint8_t> m_sprite_rom;
 
 	required_device<screen_device> m_screen;
 	emu_timer *m_scanline_timer;
@@ -100,7 +101,7 @@ private:
 	devcb_write_line m_firq_handler;
 	devcb_write_line m_nmi_handler;
 
-	UINT8    m_spriterombank[3];
+	uint8_t    m_spriterombank[3];
 	int      m_romoffset;
 	int      m_spriteflip, m_readroms;
 	int m_nmi_enabled;
@@ -108,6 +109,6 @@ private:
 	int k051960_fetchromdata( int byte );
 };
 
-extern const device_type K051960;
+DECLARE_DEVICE_TYPE(K051960, k051960_device)
 
-#endif
+#endif // MAME_VIDEO_K051960_H

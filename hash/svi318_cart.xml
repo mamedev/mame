@@ -75,6 +75,7 @@ Amoured Assault SD233C // Was availible on Cartridge and/or Tape
 	</software>
 
 	<!-- http://www.pouet.net/prod.php?which=65911 -->
+	<!-- Requires Specravision 328 -->
 	<software name="prerelea">
 		<description>Pre-Release</description>
 		<year>2015</year>

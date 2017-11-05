@@ -9,16 +9,10 @@
  *
  *****************************************************************************/
 
+#ifndef MAME_CPU_CP1610_CP1610_H
+#define MAME_CPU_CP1610_CP1610_H
+
 #pragma once
-
-#ifndef __CP1610_H__
-#define __CP1610_H__
-
-enum
-{
-	CP1610_R0=1, CP1610_R1, CP1610_R2, CP1610_R3,
-	CP1610_R4, CP1610_R5, CP1610_R6, CP1610_R7
-};
 
 #define CP1610_INT_NONE     0
 #define CP1610_INT_INTRM    1                   /* Maskable */
@@ -26,18 +20,25 @@ enum
 #define CP1610_INT_INTR     INPUT_LINE_NMI      /* Non-Maskable */
 
 #define MCFG_CP1610_BEXT_CALLBACK(_read) \
-	downcast<cp1610_cpu_device *>(device)->set_bext_callback(DEVCB_##_read);
+	devcb = &downcast<cp1610_cpu_device *>(device)->set_bext_callback(DEVCB_##_read);
 
 
 class cp1610_cpu_device :  public cpu_device
 {
 public:
-	// construction/destruction
-	cp1610_cpu_device(const machine_config &mconfig, const char *_tag, device_t *_owner, UINT32 _clock);
-
-	template<class _read> void set_bext_callback(_read rd)
+	// public because drivers R7 through state interface on machine reset - where does the initial R7 actually come from?
+	enum
 	{
-		m_read_bext.set_callback(rd);
+		CP1610_R0=1, CP1610_R1, CP1610_R2, CP1610_R3,
+		CP1610_R4, CP1610_R5, CP1610_R6, CP1610_R7
+	};
+
+	// construction/destruction
+	cp1610_cpu_device(const machine_config &mconfig, const char *_tag, device_t *_owner, uint32_t _clock);
+
+	template <class Object> devcb_base &set_bext_callback(Object &&rd)
+	{
+		return m_read_bext.set_callback(std::forward<Object>(rd));
 	}
 
 protected:
@@ -46,30 +47,30 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual UINT32 execute_min_cycles() const override { return 1; }
-	virtual UINT32 execute_max_cycles() const override { return 7; }
-	virtual UINT32 execute_input_lines() const override { return 2; }
+	virtual uint32_t execute_min_cycles() const override { return 1; }
+	virtual uint32_t execute_max_cycles() const override { return 7; }
+	virtual uint32_t execute_input_lines() const override { return 2; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : nullptr; }
+	virtual space_config_vector memory_space_config() const override;
 
 	// device_state_interface overrides
-	void state_string_export(const device_state_entry &entry, std::string &str) const override;
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const override { return 2; }
-	virtual UINT32 disasm_max_opcode_bytes() const override { return 8; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	virtual uint32_t disasm_min_opcode_bytes() const override { return 2; }
+	virtual uint32_t disasm_max_opcode_bytes() const override { return 8; }
+	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 private:
 	address_space_config m_program_config;
 
-	UINT16  m_r[8];   /* registers */
-	UINT8   m_flags;  /* flags */
+	uint16_t  m_r[8];   /* registers */
+	uint8_t   m_flags;  /* flags */
 	int     m_intr_enabled;
-	UINT16  m_intr_vector;
+	uint16_t  m_intr_vector;
 	int     m_reset_state;
 	int     m_intr_state;
 	int     m_intrm_state;
@@ -197,20 +198,20 @@ private:
 	void cp1610_sdbd_xorat_i(int r, int d);
 	void cp1610_sdbd_xorat_d(int r, int d);
 	void cp1610_sdbd_xori(int d);
-	void cp1610_jsr(int r, UINT16 addr);
-	void cp1610_jsre(int r, UINT16 addr);
-	void cp1610_jsrd(int r, UINT16 addr);
-	void cp1610_j(UINT16 addr);
-	void cp1610_je(UINT16 addr);
-	void cp1610_jd(UINT16 addr);
+	void cp1610_jsr(int r, uint16_t addr);
+	void cp1610_jsre(int r, uint16_t addr);
+	void cp1610_jsrd(int r, uint16_t addr);
+	void cp1610_j(uint16_t addr);
+	void cp1610_je(uint16_t addr);
+	void cp1610_jd(uint16_t addr);
 	void cp1610_do_sdbd();
 	void cp1610_do_jumps();
 };
 
 
-extern const device_type CP1610;
+DECLARE_DEVICE_TYPE(CP1610, cp1610_cpu_device)
 
 
 CPU_DISASSEMBLE( cp1610 );
 
-#endif /* __CP1610_H__ */
+#endif // MAME_CPU_CP1610_CP1610_H

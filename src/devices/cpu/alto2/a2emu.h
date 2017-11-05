@@ -42,9 +42,9 @@ enum {
 };
 
 struct {
-	UINT16 ir;                                  //!< emulator instruction register
-	UINT8 skip;                                 //!< emulator skip
-	UINT8 cy;                                   //!< emulator carry
+	uint16_t ir;                                  //!< emulator instruction register
+	uint8_t skip;                                 //!< emulator skip
+	uint8_t cy;                                   //!< emulator carry
 }   m_emu;
 void bs_early_emu_disp();                       //!< bus source: drive bus by IR[8-15], possibly sign extended
 void f1_early_emu_block();                      //!< F1 func: block task

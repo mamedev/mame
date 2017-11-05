@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.10"/>
-<title>0.9.7: GLM_GTC_matrix_inverse</title>
+<title>0.9.8: GLM_GTC_random</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -18,7 +18,7 @@
  <tr style="height: 56px;">
   <td id="projectlogo"><img alt="Logo" src="logo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
-   <div id="projectname">0.9.7
+   <div id="projectname">0.9.8
    </div>
   </td>
  </tr>
@@ -39,82 +39,256 @@
   <div class="summary">
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
-<div class="title">GLM_GTC_matrix_inverse<div class="ingroups"><a class="el" href="a00160.html">GTC Extensions (Stable)</a></div></div>  </div>
+<div class="title">GLM_GTC_random<div class="ingroups"><a class="el" href="a00154.html">GTC Extensions (Stable)</a></div></div>  </div>
 </div><!--header-->
 <div class="contents">
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:gae0fcc5fc8783291f9702272de428fa0e"><td class="memTemplParams" colspan="2">template&lt;typename genType &gt; </td></tr>
-<tr class="memitem:gae0fcc5fc8783291f9702272de428fa0e"><td class="memTemplItemLeft" align="right" valign="top">GLM_FUNC_DECL genType&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="a00173.html#gae0fcc5fc8783291f9702272de428fa0e">affineInverse</a> (genType const &amp;m)</td></tr>
-<tr class="separator:gae0fcc5fc8783291f9702272de428fa0e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gab213cd0e3ead5f316d583f99d6312008"><td class="memTemplParams" colspan="2">template&lt;typename genType &gt; </td></tr>
-<tr class="memitem:gab213cd0e3ead5f316d583f99d6312008"><td class="memTemplItemLeft" align="right" valign="top">GLM_FUNC_DECL genType&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="a00173.html#gab213cd0e3ead5f316d583f99d6312008">inverseTranspose</a> (genType const &amp;m)</td></tr>
-<tr class="separator:gab213cd0e3ead5f316d583f99d6312008"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga5506dee301160e3a06aef9b9bc7a0a83"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
+<tr class="memitem:ga5506dee301160e3a06aef9b9bc7a0a83"><td class="memTemplItemLeft" align="right" valign="top">GLM_FUNC_DECL tvec3&lt; T, defaultp &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="a00173.html#ga5506dee301160e3a06aef9b9bc7a0a83">ballRand</a> (T Radius)</td></tr>
+<tr class="separator:ga5506dee301160e3a06aef9b9bc7a0a83"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gae989c26a2899b2fb7444abe7c275c29c"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
+<tr class="memitem:gae989c26a2899b2fb7444abe7c275c29c"><td class="memTemplItemLeft" align="right" valign="top">GLM_FUNC_DECL tvec2&lt; T, defaultp &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="a00173.html#gae989c26a2899b2fb7444abe7c275c29c">circularRand</a> (T Radius)</td></tr>
+<tr class="separator:gae989c26a2899b2fb7444abe7c275c29c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gad3a3ee7d26502a31ba552cb627a68606"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
+<tr class="memitem:gad3a3ee7d26502a31ba552cb627a68606"><td class="memTemplItemLeft" align="right" valign="top">GLM_FUNC_DECL tvec2&lt; T, defaultp &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="a00173.html#gad3a3ee7d26502a31ba552cb627a68606">diskRand</a> (T Radius)</td></tr>
+<tr class="separator:gad3a3ee7d26502a31ba552cb627a68606"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga5193a83e49e4fdc5652c084711083574"><td class="memTemplParams" colspan="2">template&lt;typename genType &gt; </td></tr>
+<tr class="memitem:ga5193a83e49e4fdc5652c084711083574"><td class="memTemplItemLeft" align="right" valign="top">GLM_FUNC_DECL genType&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="a00173.html#ga5193a83e49e4fdc5652c084711083574">gaussRand</a> (genType Mean, genType Deviation)</td></tr>
+<tr class="separator:ga5193a83e49e4fdc5652c084711083574"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga12aebc19b85a8c736f5801c2f7b9b716"><td class="memTemplParams" colspan="2">template&lt;typename genTYpe &gt; </td></tr>
+<tr class="memitem:ga12aebc19b85a8c736f5801c2f7b9b716"><td class="memTemplItemLeft" align="right" valign="top">GLM_FUNC_DECL genTYpe&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="a00173.html#ga12aebc19b85a8c736f5801c2f7b9b716">linearRand</a> (genTYpe Min, genTYpe Max)</td></tr>
+<tr class="separator:ga12aebc19b85a8c736f5801c2f7b9b716"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaba9cec867916d894d794a32897b7fdfd"><td class="memTemplParams" colspan="2">template&lt;typename T , precision P, template&lt; typename, precision &gt; class vecType&gt; </td></tr>
+<tr class="memitem:gaba9cec867916d894d794a32897b7fdfd"><td class="memTemplItemLeft" align="right" valign="top">GLM_FUNC_DECL vecType&lt; T, P &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="a00173.html#gaba9cec867916d894d794a32897b7fdfd">linearRand</a> (vecType&lt; T, P &gt; const &amp;Min, vecType&lt; T, P &gt; const &amp;Max)</td></tr>
+<tr class="separator:gaba9cec867916d894d794a32897b7fdfd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaa9a6fc2d7a295b3857f7db23b1053d9d"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
+<tr class="memitem:gaa9a6fc2d7a295b3857f7db23b1053d9d"><td class="memTemplItemLeft" align="right" valign="top">GLM_FUNC_DECL tvec3&lt; T, defaultp &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="a00173.html#gaa9a6fc2d7a295b3857f7db23b1053d9d">sphericalRand</a> (T Radius)</td></tr>
+<tr class="separator:gaa9a6fc2d7a295b3857f7db23b1053d9d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<p>Defines additional matrix inverting functions. </p>
-<p>&lt;<a class="el" href="a00073.html" title="OpenGL Mathematics (glm.g-truc.net) ">glm/gtc/matrix_inverse.hpp</a>&gt; need to be included to use these functionalities. </p>
+<p>Generate random number from various distribution methods. </p>
+<p>&lt;<a class="el" href="a00089.html" title="GLM_GTC_random ">glm/gtc/random.hpp</a>&gt; need to be included to use these functionalities. </p>
 <h2 class="groupheader">Function Documentation</h2>
-<a class="anchor" id="gae0fcc5fc8783291f9702272de428fa0e"></a>
+<a class="anchor" id="ga5506dee301160e3a06aef9b9bc7a0a83"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">GLM_FUNC_DECL genType glm::affineInverse </td>
+          <td class="memname">GLM_FUNC_DECL tvec3&lt;T, defaultp&gt; glm::ballRand </td>
           <td>(</td>
-          <td class="paramtype">genType const &amp;&#160;</td>
-          <td class="paramname"><em>m</em></td><td>)</td>
+          <td class="paramtype">T&#160;</td>
+          <td class="paramname"><em>Radius</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Fast matrix inverse for affine matrix. </p>
+<p>Generate a random 3D vector which coordinates are regulary distributed within the volume of a ball of a given radius. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">m</td><td>Input matrix to invert. </td></tr>
+    <tr><td class="paramname">Radius</td><td></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="tparams"><dt>Template Parameters</dt><dd>
-  <table class="tparams">
-    <tr><td class="paramname">genType</td><td>Squared floating-point matrix: half, float or double. Inverse of matrix based of half-precision floating point value is highly innacurate. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="a00173.html" title="Defines additional matrix inverting functions. ">GLM_GTC_matrix_inverse</a> </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="a00173.html" title="Generate random number from various distribution methods. ">GLM_GTC_random</a> </dd></dl>
 
 </div>
 </div>
-<a class="anchor" id="gab213cd0e3ead5f316d583f99d6312008"></a>
+<a class="anchor" id="gae989c26a2899b2fb7444abe7c275c29c"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">GLM_FUNC_DECL genType glm::inverseTranspose </td>
+          <td class="memname">GLM_FUNC_DECL tvec2&lt;T, defaultp&gt; glm::circularRand </td>
           <td>(</td>
-          <td class="paramtype">genType const &amp;&#160;</td>
-          <td class="paramname"><em>m</em></td><td>)</td>
+          <td class="paramtype">T&#160;</td>
+          <td class="paramname"><em>Radius</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Compute the inverse transpose of a matrix. </p>
+<p>Generate a random 2D vector which coordinates are regulary distributed on a circle of a given radius. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">m</td><td>Input matrix to invert transpose. </td></tr>
+    <tr><td class="paramname">Radius</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="a00173.html" title="Generate random number from various distribution methods. ">GLM_GTC_random</a> </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="gad3a3ee7d26502a31ba552cb627a68606"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">GLM_FUNC_DECL tvec2&lt;T, defaultp&gt; glm::diskRand </td>
+          <td>(</td>
+          <td class="paramtype">T&#160;</td>
+          <td class="paramname"><em>Radius</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Generate a random 2D vector which coordinates are regulary distributed within the area of a disk of a given radius. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">Radius</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="a00173.html" title="Generate random number from various distribution methods. ">GLM_GTC_random</a> </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="ga5193a83e49e4fdc5652c084711083574"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">GLM_FUNC_DECL genType glm::gaussRand </td>
+          <td>(</td>
+          <td class="paramtype">genType&#160;</td>
+          <td class="paramname"><em>Mean</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">genType&#160;</td>
+          <td class="paramname"><em>Deviation</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Generate random numbers in the interval [Min, Max], according a gaussian distribution. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">Mean</td><td></td></tr>
+    <tr><td class="paramname">Deviation</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="a00173.html" title="Generate random number from various distribution methods. ">GLM_GTC_random</a> </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="ga12aebc19b85a8c736f5801c2f7b9b716"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">GLM_FUNC_DECL genTYpe glm::linearRand </td>
+          <td>(</td>
+          <td class="paramtype">genTYpe&#160;</td>
+          <td class="paramname"><em>Min</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">genTYpe&#160;</td>
+          <td class="paramname"><em>Max</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Generate random numbers in the interval [Min, Max], according a linear distribution. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">Min</td><td></td></tr>
+    <tr><td class="paramname">Max</td><td></td></tr>
   </table>
   </dd>
 </dl>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">genType</td><td>Squared floating-point matrix: half, float or double. Inverse of matrix based of half-precision floating point value is highly innacurate. </td></tr>
+    <tr><td class="paramname">genType</td><td>Value type. Currently supported: float or double scalars. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="a00173.html" title="Defines additional matrix inverting functions. ">GLM_GTC_matrix_inverse</a> </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="a00173.html" title="Generate random number from various distribution methods. ">GLM_GTC_random</a> </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="gaba9cec867916d894d794a32897b7fdfd"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">GLM_FUNC_DECL vecType&lt;T, P&gt; glm::linearRand </td>
+          <td>(</td>
+          <td class="paramtype">vecType&lt; T, P &gt; const &amp;&#160;</td>
+          <td class="paramname"><em>Min</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">vecType&lt; T, P &gt; const &amp;&#160;</td>
+          <td class="paramname"><em>Max</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Generate random numbers in the interval [Min, Max], according a linear distribution. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">Min</td><td></td></tr>
+    <tr><td class="paramname">Max</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">T</td><td>Value type. Currently supported: float or double. </td></tr>
+    <tr><td class="paramname">vecType</td><td>A vertor type: tvec1, tvec2, tvec3, tvec4 or compatible </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="a00173.html" title="Generate random number from various distribution methods. ">GLM_GTC_random</a> </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="gaa9a6fc2d7a295b3857f7db23b1053d9d"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">GLM_FUNC_DECL tvec3&lt;T, defaultp&gt; glm::sphericalRand </td>
+          <td>(</td>
+          <td class="paramtype">T&#160;</td>
+          <td class="paramname"><em>Radius</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Generate a random 3D vector which coordinates are regulary distributed on a sphere of a given radius. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">Radius</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="a00173.html" title="Generate random number from various distribution methods. ">GLM_GTC_random</a> </dd></dl>
 
 </div>
 </div>

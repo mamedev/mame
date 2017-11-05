@@ -54,12 +54,11 @@
 
 **********************************************************************/
 
+#ifndef MAME_MACHINE_64H156_H
+#define MAME_MACHINE_64H156_H
+
 #pragma once
 
-#ifndef __C64H156__
-#define __C64H156__
-
-#include "emu.h"
 #include "imagedev/floppy.h"
 #include "formats/d64_dsk.h"
 #include "formats/g64_dsk.h"
@@ -92,11 +91,11 @@ class c64h156_device :  public device_t
 {
 public:
 	// construction/destruction
-	c64h156_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	c64h156_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &set_atn_wr_callback(device_t &device, _Object object) { return downcast<c64h156_device &>(device).m_write_atn.set_callback(object); }
-	template<class _Object> static devcb_base &set_sync_wr_callback(device_t &device, _Object object) { return downcast<c64h156_device &>(device).m_write_sync.set_callback(object); }
-	template<class _Object> static devcb_base &set_byte_wr_callback(device_t &device, _Object object) { return downcast<c64h156_device &>(device).m_write_byte.set_callback(object); }
+	template <class Object> static devcb_base &set_atn_wr_callback(device_t &device, Object &&cb) { return downcast<c64h156_device &>(device).m_write_atn.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_sync_wr_callback(device_t &device, Object &&cb) { return downcast<c64h156_device &>(device).m_write_sync.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_byte_wr_callback(device_t &device, Object &&cb) { return downcast<c64h156_device &>(device).m_write_byte.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER( yb_r );
 	DECLARE_WRITE8_MEMBER( yb_w );
@@ -122,6 +121,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_clock_changed() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
@@ -141,18 +141,18 @@ private:
 		int oe;
 		int soe;
 		int accl;
-		UINT8 accl_yb;
+		uint8_t accl_yb;
 
 		attotime edge;
-		UINT16 shift_reg;
+		uint16_t shift_reg;
 		int cycle_counter;
 		int cell_counter;
 		int bit_counter;
 		int zero_counter;
 		int cycles_until_random_flux;
 
-		UINT8 yb;
-		UINT8 shift_reg_write;
+		uint8_t yb;
+		uint8_t shift_reg_write;
 		attotime write_start_time;
 		attotime write_buffer[32];
 		int write_position;
@@ -171,7 +171,7 @@ private:
 	int m_soe;
 	int m_oe;
 	int m_ted;
-	UINT8 m_yb;
+	uint8_t m_yb;
 	int m_atni;
 	int m_atna;
 
@@ -196,10 +196,7 @@ private:
 };
 
 
-
 // device type definition
-extern const device_type C64H156;
+DECLARE_DEVICE_TYPE(C64H156, c64h156_device)
 
-
-
-#endif
+#endif // MAME_MACHINE_64H156_H

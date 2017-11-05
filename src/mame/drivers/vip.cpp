@@ -219,8 +219,11 @@ Notes:
 
 */
 
+#include "emu.h"
 #include "includes/vip.h"
+
 #include "softlist.h"
+#include "speaker.h"
 
 
 //**************************************************************************
@@ -266,7 +269,7 @@ READ8_MEMBER( vip_state::read )
 	int cdef = !((offset >= 0xc00) && (offset < 0x1000));
 	int minh = 0;
 
-	UINT8 data = m_exp->program_r(space, offset, cs, cdef, &minh);
+	uint8_t data = m_exp->program_r(space, offset, cs, cdef, &minh);
 
 	if (cs)
 	{
@@ -306,7 +309,7 @@ WRITE8_MEMBER( vip_state::write )
 
 READ8_MEMBER( vip_state::io_r )
 {
-	UINT8 data = m_exp->io_r(space, offset);
+	uint8_t data = m_exp->io_r(space, offset);
 
 	switch (offset)
 	{
@@ -477,7 +480,7 @@ READ_LINE_MEMBER( vip_state::ef4_r )
 WRITE_LINE_MEMBER( vip_state::q_w )
 {
 	// sound output
-	m_beeper->write(machine().driver_data()->generic_space(), NODE_01, state);
+	m_beeper->write(machine().dummy_space(), NODE_01, state);
 
 	// Q led
 	output().set_led_value(LED_Q, state);
@@ -530,7 +533,7 @@ WRITE_LINE_MEMBER( vip_state::vdc_ef1_w )
 	m_vdc_ef1 = state;
 }
 
-UINT32 vip_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t vip_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	m_vdc->screen_update(screen, bitmap, cliprect);
 
@@ -608,10 +611,10 @@ WRITE_LINE_MEMBER( vip_state::exp_dma_in_w )
 
 void vip_state::machine_start()
 {
-	UINT8 *ram = m_ram->pointer();
+	uint8_t *ram = m_ram->pointer();
 
 	// randomize RAM contents
-	for (UINT16 addr = 0; addr < m_ram->size(); addr++)
+	for (uint16_t addr = 0; addr < m_ram->size(); addr++)
 	{
 		ram[addr] = machine().rand() & 0xff;
 	}
@@ -620,7 +623,7 @@ void vip_state::machine_start()
 	output().set_led_value(LED_POWER, 1);
 
 	// reset sound
-	m_beeper->write(machine().driver_data()->generic_space(), NODE_01, 0);
+	m_beeper->write(machine().dummy_space(), NODE_01, 0);
 
 	// state saving
 	save_item(NAME(m_8000));
@@ -662,18 +665,18 @@ void vip_state::machine_reset()
 
 QUICKLOAD_LOAD_MEMBER( vip_state, vip )
 {
-	UINT8 *ram = m_ram->pointer();
-	UINT8 *chip8_ptr = nullptr;
+	uint8_t *ram = m_ram->pointer();
+	uint8_t *chip8_ptr = nullptr;
 	int chip8_size = 0;
 	int size = image.length();
 
-	if (strcmp(image.filetype(), "c8") == 0)
+	if (image.is_filetype("c8"))
 	{
 		/* CHIP-8 program */
 		chip8_ptr = m_chip8->base();
 		chip8_size = m_chip8->bytes();
 	}
-	else if (strcmp(image.filename(), "c8x") == 0)
+	else if (image.is_filetype("c8x"))
 	{
 		/* CHIP-8X program */
 		chip8_ptr = m_chip8x->base();
@@ -682,7 +685,7 @@ QUICKLOAD_LOAD_MEMBER( vip_state, vip )
 
 	if ((size + chip8_size) > m_ram->size())
 	{
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 	}
 
 	if (chip8_size > 0)
@@ -694,7 +697,7 @@ QUICKLOAD_LOAD_MEMBER( vip_state, vip )
 	/* load image to RAM */
 	image.fread(ram + chip8_size, size);
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 
@@ -707,7 +710,7 @@ QUICKLOAD_LOAD_MEMBER( vip_state, vip )
 //  MACHINE_CONFIG( vip )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( vip, vip_state )
+static MACHINE_CONFIG_START( vip )
 	// basic machine hardware
 	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, XTAL_3_52128MHz/2)
 	MCFG_CPU_PROGRAM_MAP(vip_mem)
@@ -805,6 +808,6 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY                             FULLNAME    FLAGS
-COMP( 1977, vip,    0,      0,      vip,        vip, driver_device, 0,      "RCA",  "Cosmac VIP (VP-711)",  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_COLORS )
-COMP( 1977, vp111,  vip,    0,      vp111,      vip, driver_device, 0,      "RCA",  "Cosmac VIP (VP-111)",  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_COLORS )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  STATE      INIT    COMPANY  FULLNAME                FLAGS
+COMP( 1977, vip,    0,      0,      vip,     vip,   vip_state, 0,      "RCA",   "Cosmac VIP (VP-711)",  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_COLORS )
+COMP( 1977, vp111,  vip,    0,      vp111,   vip,   vip_state, 0,      "RCA",   "Cosmac VIP (VP-111)",  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_COLORS )

@@ -124,91 +124,75 @@ WRITE16_MEMBER(tigeroad_state::f1dream_control_w)
 }
 
 
-READ16_MEMBER(tigeroad_state::pushman_68705_r)
+READ16_MEMBER(pushman_state::mcu_comm_r)
 {
-	if (offset == 0)
-		return m_latch;
-
-	if (offset == 3 && m_new_latch)
+	switch (offset & 0x03)
 	{
-		m_new_latch = 0;
-		return 0;
+	case 0: // read and acknowledge MCU reply
+		if (!machine().side_effect_disabled())
+			m_mcu_semaphore = false;
+		return m_mcu_latch;
+	case 2: // expects bit 0 to be high when MCU has accepted command (other bits ignored)
+		return m_host_semaphore ? 0xfffe : 0xffff;
+	case 3: // expects bit 0 to be low when MCU has sent response (other bits ignored)
+		return m_mcu_semaphore ? 0xfffe : 0xffff;
 	}
-	if (offset == 3 && !m_new_latch)
-		return 0xff;
-
-	return (m_shared_ram[2 * offset + 1] << 8) + m_shared_ram[2 * offset];
+	logerror("unknown MCU read offset %X & %04X\n", offset, mem_mask);
+	return 0xffff;
 }
 
-WRITE16_MEMBER(tigeroad_state::pushman_68705_w)
+WRITE16_MEMBER(pushman_state::pushman_mcu_comm_w)
 {
-	if (ACCESSING_BITS_8_15)
-		m_shared_ram[2 * offset] = data >> 8;
-	if (ACCESSING_BITS_0_7)
-		m_shared_ram[2 * offset + 1] = data & 0xff;
-
-	if (offset == 1)
+	switch (offset & 0x01)
 	{
-		m_mcu->set_input_line(M68705_IRQ_LINE, HOLD_LINE);
-		space.device().execute().spin();
-		m_new_latch = 0;
-	}
-}
-
-/* ElSemi - Bouncing balls protection. */
-READ16_MEMBER(tigeroad_state::bballs_68705_r)
-{
-	if (offset == 0)
-		return m_latch;
-	if (offset == 3 && m_new_latch)
-	{
-		m_new_latch = 0;
-		return 0;
-	}
-	if (offset == 3 && !m_new_latch)
-		return 0xff;
-
-	return (m_shared_ram[2 * offset + 1] << 8) + m_shared_ram[2 * offset];
-}
-
-WRITE16_MEMBER(tigeroad_state::bballs_68705_w)
-{
-	if (ACCESSING_BITS_8_15)
-		m_shared_ram[2 * offset] = data >> 8;
-	if (ACCESSING_BITS_0_7)
-		m_shared_ram[2 * offset + 1] = data & 0xff;
-
-	if (offset == 0)
-	{
-		m_latch = 0;
-		if (m_shared_ram[0] <= 0xf)
-		{
-			m_latch = m_shared_ram[0] << 2;
-			if (m_shared_ram[1])
-				m_latch |= 2;
-			m_new_latch = 1;
-		}
-		else if (m_shared_ram[0])
-		{
-			if (m_shared_ram[1])
-				m_latch |= 2;
-			m_new_latch = 1;
-		}
+	case 0:
+		m_host_latch = flipendian_int16(data);
+		break;
+	case 1:
+		m_mcu->pd_w(space, 0, data & 0x00ff);
+		m_host_semaphore = true;
+		m_mcu->set_input_line(M68705_IRQ_LINE, ASSERT_LINE);
+		break;
 	}
 }
 
-
-READ8_MEMBER(tigeroad_state::pushman_68000_r)
+WRITE16_MEMBER(pushman_state::bballs_mcu_comm_w)
 {
-	return m_shared_ram[offset];
+	m_host_latch = data;
+	m_host_semaphore = true;
+	m_mcu->set_input_line(M68705_IRQ_LINE, ASSERT_LINE);
 }
 
-WRITE8_MEMBER(tigeroad_state::pushman_68000_w)
+WRITE8_MEMBER(pushman_state::mcu_pa_w)
 {
-	if (offset == 2 && (m_shared_ram[2] & 2) == 0 && data & 2)
+	m_mcu_output = (m_mcu_output & 0xff00) | (u16(data) & 0x00ff);
+}
+
+WRITE8_MEMBER(pushman_state::mcu_pb_w)
+{
+	m_mcu_output = (m_mcu_output & 0x00ff) | (u16(data) << 8);
+}
+
+WRITE8_MEMBER(pushman_state::mcu_pc_w)
+{
+	if (BIT(data, 0))
 	{
-		m_latch = (m_shared_ram[1] << 8) | m_shared_ram[0];
-		m_new_latch = 1;
+		m_mcu->pa_w(space, 0, 0xff);
+		m_mcu->pb_w(space, 0, 0xff);
 	}
-	m_shared_ram[offset] = data;
+	else
+	{
+		m_host_semaphore = false;
+		m_mcu->set_input_line(M68705_IRQ_LINE, CLEAR_LINE);
+		m_mcu->pa_w(space, 0, (m_host_latch >> 0) & 0x00ff);
+		m_mcu->pb_w(space, 0, (m_host_latch >> 8) & 0x00ff);
+	}
+
+	if (BIT(m_mcu_latch_ctl, 1) && !BIT(data, 1))
+	{
+		m_mcu_latch = m_mcu_output & (BIT(m_mcu_latch_ctl, 0) ? 0xffff : m_host_latch);
+		m_mcu_semaphore = true;
+	}
+
+	m_mcu_latch_ctl = data;
 }

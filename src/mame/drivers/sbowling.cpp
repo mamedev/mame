@@ -42,9 +42,12 @@ PROMs : NEC B406 (1kx4) x2
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "cpu/mcs48/mcs48.h"
+#include "machine/timer.h"
 #include "machine/watchdog.h"
-#include "video/resnet.h"
 #include "sound/ay8910.h"
+#include "video/resnet.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class sbowling_state : public driver_device
@@ -57,16 +60,16 @@ public:
 		m_gfxdecode(*this, "gfxdecode") { }
 
 	required_device<cpu_device> m_maincpu;
-	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<uint8_t> m_videoram;
 	required_device<gfxdecode_device> m_gfxdecode;
 
 	int m_bgmap;
 	int m_system;
 	tilemap_t *m_tilemap;
 	std::unique_ptr<bitmap_ind16> m_tmpbitmap;
-	UINT32 m_color_prom_address;
-	UINT8 m_pix_sh;
-	UINT8 m_pix[2];
+	uint32_t m_color_prom_address;
+	uint8_t m_pix_sh;
+	uint8_t m_pix[2];
 
 	DECLARE_WRITE8_MEMBER(videoram_w);
 	DECLARE_WRITE8_MEMBER(pix_shift_w);
@@ -82,13 +85,13 @@ public:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(sbowling);
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void postload();
 };
 
 TILE_GET_INFO_MEMBER(sbowling_state::get_tile_info)
 {
-	UINT8 *rom = memregion("user1")->base();
+	uint8_t *rom = memregion("user1")->base();
 	int tileno = rom[tile_index + m_bgmap * 1024];
 
 	SET_TILE_INFO_MEMBER(0, tileno, 0, 0);
@@ -128,7 +131,7 @@ WRITE8_MEMBER(sbowling_state::videoram_w)
 	}
 }
 
-UINT32 sbowling_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t sbowling_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0x18, cliprect);
 	m_tilemap->draw(screen, bitmap, cliprect, 0, 0);
@@ -139,7 +142,7 @@ UINT32 sbowling_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 void sbowling_state::video_start()
 {
 	m_tmpbitmap = std::make_unique<bitmap_ind16>(32*8,32*8);
-	m_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(sbowling_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(sbowling_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	save_item(NAME(m_bgmap));
 	save_item(NAME(m_system));
@@ -167,7 +170,7 @@ WRITE8_MEMBER(sbowling_state::pix_data_w)
 }
 READ8_MEMBER(sbowling_state::pix_data_r)
 {
-	UINT32 p1, p0;
+	uint32_t p1, p0;
 	int res;
 	int sh = m_pix_sh & 7;
 
@@ -362,7 +365,7 @@ GFXDECODE_END
 
 PALETTE_INIT_MEMBER(sbowling_state, sbowling)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 
 	static const int resistances_rg[3] = { 470, 270, 100 };
 	static const int resistances_b[2]  = { 270, 100 };
@@ -399,7 +402,7 @@ PALETTE_INIT_MEMBER(sbowling_state, sbowling)
 	}
 }
 
-static MACHINE_CONFIG_START( sbowling, sbowling_state )
+static MACHINE_CONFIG_START( sbowling )
 	MCFG_CPU_ADD("maincpu", I8080, XTAL_19_968MHz/10)   /* ? */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(port_map)
@@ -446,4 +449,4 @@ ROM_START( sbowling )
 	ROM_LOAD( "kb09.6m",        0x0400, 0x0400, CRC(e29191a6) SHA1(9a2c78a96ef6d118f4dacbea0b7d454b66a452ae))
 ROM_END
 
-GAME( 1982, sbowling, 0, sbowling, sbowling, driver_device, 0, ROT90, "Taito Corporation", "Strike Bowling", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, sbowling, 0, sbowling, sbowling, sbowling_state, 0, ROT90, "Taito Corporation", "Strike Bowling", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

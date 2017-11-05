@@ -97,11 +97,11 @@
 		r1 = sm8500_b2w[ ( r1 >> 3 ) & 0x07 ];
 
 #define ARG_d8  r1 = mem_readbyte( m_PC++ ); \
-		s2 = m_PC + ((INT8)r1);
+		s2 = m_PC + ((int8_t)r1);
 
 #define ARG_Rbr r1 = mem_readbyte( m_PC++ ); \
 		r2 = mem_readbyte( m_PC++ ); \
-		s2 = m_PC + ((INT8)r2);
+		s2 = m_PC + ((int8_t)r2);
 
 #define ARG_ad16    s2 = mem_readword( m_PC ); \
 			m_PC += 2;
@@ -872,7 +872,7 @@ case 0x2A:  /* BBC FFii/i(Rr),#b,d8 - 16,12/14,10 cycles - Flags affected: -----
 	if ( mem_readbyte( s1 ) & s2 ) {
 		mycycles += 10;
 	} else {
-		m_PC = m_PC + ((INT8)d1);
+		m_PC = m_PC + ((int8_t)d1);
 		mycycles += 14;
 	}
 	if ( ( r1 & 0x38 ) == 0 ) {
@@ -882,7 +882,7 @@ case 0x2A:  /* BBC FFii/i(Rr),#b,d8 - 16,12/14,10 cycles - Flags affected: -----
 case 0x2B:  /* BBS FFii/i(Rr),#b,d8 - 16,12/14,10 cycles - Flags affected: -------- */
 	ARG_riBd;
 	if ( mem_readbyte( s1 ) & s2 ) {
-		m_PC = m_PC + ((INT8)d1);
+		m_PC = m_PC + ((int8_t)d1);
 		mycycles += 14;
 	} else {
 		mycycles += 10;
@@ -1307,7 +1307,7 @@ logerror( "%04X: DIV RRr,Rs!\n", m_PC-1 );
 	m_PS1 = m_PS1 & ~ ( FLAG_Z | FLAG_V );
 	s1 = mem_readbyte( r2 + 1 );
 	if ( s1 ) {
-		UINT16 div = mem_readword( r1 );
+		uint16_t div = mem_readword( r1 );
 		res = div / s1;
 		mem_writebyte( r2, div % s1 );
 		mem_writeword( r1, res );

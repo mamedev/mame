@@ -21,6 +21,7 @@ Release data from the Sega Retro project:
 
 **********************************************************************/
 
+#include "emu.h"
 #include "joypad.h"
 
 
@@ -29,7 +30,7 @@ Release data from the Sega Retro project:
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type SMS_JOYPAD = &device_creator<sms_joypad_device>;
+DEFINE_DEVICE_TYPE(SMS_JOYPAD, sms_joypad_device, "sms_joypad", "Sega SMS Control Pad")
 
 
 static INPUT_PORTS_START( sms_joypad )
@@ -64,8 +65,8 @@ ioport_constructor sms_joypad_device::device_input_ports() const
 //  sms_joypad_device - constructor
 //-------------------------------------------------
 
-sms_joypad_device::sms_joypad_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, SMS_JOYPAD, "Sega SMS Control Pad", tag, owner, clock, "sms_joypad", __FILE__),
+sms_joypad_device::sms_joypad_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, SMS_JOYPAD, tag, owner, clock),
 	device_sms_control_port_interface(mconfig, *this),
 	m_joypad(*this, "JOYPAD")
 {
@@ -85,7 +86,7 @@ void sms_joypad_device::device_start()
 //  sms_peripheral_r - joypad read
 //-------------------------------------------------
 
-UINT8 sms_joypad_device::peripheral_r()
+uint8_t sms_joypad_device::peripheral_r()
 {
 	return m_joypad->read();
 }

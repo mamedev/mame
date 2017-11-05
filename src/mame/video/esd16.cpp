@@ -37,6 +37,7 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 
 #include "emu.h"
 #include "includes/esd16.h"
+#include "screen.h"
 
 
 /***************************************************************************
@@ -54,7 +55,7 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 
 TILE_GET_INFO_MEMBER(esd16_state::get_tile_info_0)
 {
-	UINT16 code = m_vram_0[tile_index];
+	uint16_t code = m_vram_0[tile_index];
 	SET_TILE_INFO_MEMBER(1,
 			code,
 			m_tilemap0_color,
@@ -63,7 +64,7 @@ TILE_GET_INFO_MEMBER(esd16_state::get_tile_info_0)
 
 TILE_GET_INFO_MEMBER(esd16_state::get_tile_info_0_16x16)
 {
-	UINT16 code = m_vram_0[tile_index];
+	uint16_t code = m_vram_0[tile_index];
 	SET_TILE_INFO_MEMBER(2,
 			code,
 			m_tilemap0_color,
@@ -73,7 +74,7 @@ TILE_GET_INFO_MEMBER(esd16_state::get_tile_info_0_16x16)
 
 TILE_GET_INFO_MEMBER(esd16_state::get_tile_info_1)
 {
-	UINT16 code = m_vram_1[tile_index];
+	uint16_t code = m_vram_1[tile_index];
 	SET_TILE_INFO_MEMBER(1,
 			code,
 			m_tilemap1_color,
@@ -82,7 +83,7 @@ TILE_GET_INFO_MEMBER(esd16_state::get_tile_info_1)
 
 TILE_GET_INFO_MEMBER(esd16_state::get_tile_info_1_16x16)
 {
-	UINT16 code = m_vram_1[tile_index];
+	uint16_t code = m_vram_1[tile_index];
 	SET_TILE_INFO_MEMBER(2,
 			code,
 			m_tilemap1_color,
@@ -133,14 +134,14 @@ WRITE16_MEMBER(esd16_state::esd16_tilemap0_color_jumppop_w)
 
 void esd16_state::video_start()
 {
-	m_tilemap_0 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(esd16_state::get_tile_info_0),this), TILEMAP_SCAN_ROWS, 8, 8, 0x80, 0x40);
-	m_tilemap_1 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(esd16_state::get_tile_info_1),this), TILEMAP_SCAN_ROWS, 8, 8, 0x80, 0x40);
+	m_tilemap_0 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(esd16_state::get_tile_info_0),this), TILEMAP_SCAN_ROWS, 8, 8, 0x80, 0x40);
+	m_tilemap_1 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(esd16_state::get_tile_info_1),this), TILEMAP_SCAN_ROWS, 8, 8, 0x80, 0x40);
 
 	/* swatpolc changes tilemap 0 to 16x16 at various times */
-	m_tilemap_0_16x16 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(esd16_state::get_tile_info_0_16x16),this), TILEMAP_SCAN_ROWS, 16,16, 0x40, 0x40);
+	m_tilemap_0_16x16 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(esd16_state::get_tile_info_0_16x16),this), TILEMAP_SCAN_ROWS, 16,16, 0x40, 0x40);
 
 	/* hedpanic changes tilemap 1 to 16x16 at various times */
-	m_tilemap_1_16x16 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(esd16_state::get_tile_info_1_16x16),this), TILEMAP_SCAN_ROWS, 16,16, 0x40, 0x40);
+	m_tilemap_1_16x16 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(esd16_state::get_tile_info_1_16x16),this), TILEMAP_SCAN_ROWS, 16,16, 0x40, 0x40);
 
 	m_tilemap_0->set_scrolldx(-0x60 + 2, -0x60);
 	m_tilemap_1->set_scrolldx(-0x60, -0x60 + 2);
@@ -160,7 +161,7 @@ void esd16_state::video_start()
 
 ***************************************************************************/
 
-UINT32 esd16_state::screen_update_hedpanic(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t esd16_state::screen_update_hedpanic(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int layers_ctrl = -1;
 

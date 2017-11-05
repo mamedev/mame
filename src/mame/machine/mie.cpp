@@ -23,8 +23,8 @@
 // - Speed is all wrong
 
 
-const device_type MIE = &device_creator<mie_device>;
-const device_type MIE_JVS = &device_creator<mie_jvs_device>;
+DEFINE_DEVICE_TYPE(MIE,     mie_device,     "mie",     "Sega 315-6146 MIE")
+DEFINE_DEVICE_TYPE(MIE_JVS, mie_jvs_device, "mie_jvs", "JVS (MIE)")
 
 static ADDRESS_MAP_START( mie_map, AS_PROGRAM, 8, mie_device)
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
@@ -53,13 +53,6 @@ static ADDRESS_MAP_START( mie_port, AS_IO, 8, mie_device)
 	AM_RANGE(0x91, 0x91) AM_READ(jvs_sense_r)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_FRAGMENT( mie )
-	MCFG_CPU_ADD("mie", Z80, DERIVED_CLOCK(1,1))
-	MCFG_CPU_PROGRAM_MAP(mie_map)
-	MCFG_CPU_IO_MAP(mie_port)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE(DEVICE_SELF, mie_device,irq_callback)
-MACHINE_CONFIG_END
-
 ROM_START( mie )
 	ROM_REGION( 0x800, "mie", 0 )
 	ROM_LOAD( "315-6146.bin", 0x000, 0x800, CRC(9b197e35) SHA1(864d14d58732dd4e2ee538ccc71fa8df7013ba06))
@@ -77,23 +70,25 @@ void mie_device::static_set_jvs_name(device_t &device, const char *name)
 	mie.jvs_name = name;
 }
 
-const rom_entry *mie_device::device_rom_region() const
+const tiny_rom_entry *mie_device::device_rom_region() const
 {
 	return ROM_NAME(mie);
 }
 
-machine_config_constructor mie_device::device_mconfig_additions() const
+MACHINE_CONFIG_MEMBER( mie_device::device_add_mconfig )
+	MCFG_CPU_ADD("mie", Z80, DERIVED_CLOCK(1,1))
+	MCFG_CPU_PROGRAM_MAP(mie_map)
+	MCFG_CPU_IO_MAP(mie_port)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE(DEVICE_SELF, mie_device, irq_callback)
+MACHINE_CONFIG_END
+
+mie_jvs_device::mie_jvs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: jvs_host(mconfig, MIE_JVS, tag, owner, clock)
 {
-	return MACHINE_CONFIG_NAME(mie);
 }
 
-mie_jvs_device::mie_jvs_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: jvs_host(mconfig, MIE_JVS, "JVS (MIE)", tag, owner, clock, "mie_jvs", __FILE__)
-{
-}
-
-mie_device::mie_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: maple_device(mconfig, MIE, "Sega 315-6146 MIE", tag, owner, clock, "mie", __FILE__)
+mie_device::mie_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: maple_device(mconfig, MIE, tag, owner, clock)
 {
 	memset(gpio_name, 0, sizeof(gpio_name));
 	jvs_name = nullptr;
@@ -121,7 +116,7 @@ void mie_device::device_start()
 
 	// patch out MIE RAM test
 	// TODO: figure out why SH4 code doesn't wait long enough for internal firmware's RAM test completed in the case of reset
-	UINT32 *rom = (UINT32*)memregion("mie")->base();
+	uint32_t *rom = (uint32_t*)memregion("mie")->base();
 	rom[0x144/4] = 0x0001d8c3;
 }
 
@@ -148,7 +143,7 @@ READ8_MEMBER(mie_device::control_r)
 
 WRITE8_MEMBER(mie_device::control_w)
 {
-	UINT32 prev_control = control;
+	uint32_t prev_control = control;
 	int shift = offset*8;
 	control = (control & ~(255 << shift)) | (data << shift);
 
@@ -189,7 +184,7 @@ void mie_device::device_timer(emu_timer &_timer, device_timer_id id, int param, 
 	}
 }
 
-void mie_device::maple_w(const UINT32 *data, UINT32 in_size)
+void mie_device::maple_w(const uint32_t *data, uint32_t in_size)
 {
 	memcpy(tbuf, data, in_size*4);
 	lreg = in_size-1;
@@ -337,8 +332,8 @@ READ8_MEMBER(mie_device::jvs_r)
 	if (jvs_lcr & 0x80)
 		return 0;
 
-	const UINT8 *buf;
-	UINT32 size;
+	const uint8_t *buf;
+	uint32_t size;
 	jvs->get_encoded_reply(buf, size);
 	if(jvs_rpos >= size)
 		return 0;
@@ -363,8 +358,8 @@ READ8_MEMBER(mie_device::jvs_status_r)
 	// 01 = ready for reading
 	// 20 = ready for writing
 	// 40 = sending done
-	const UINT8 *buf;
-	UINT32 size;
+	const uint8_t *buf;
+	uint32_t size;
 	jvs->get_encoded_reply(buf, size);
 	return 0x60 | (jvs_rpos < size ? 1 : 0);
 }

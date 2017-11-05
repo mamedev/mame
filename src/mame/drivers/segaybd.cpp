@@ -57,15 +57,16 @@ MB89372 - Uses 3 serial data transfer protocols: ASYNC, COP & BOP. Has a built
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
 #include "includes/segaybd.h"
-#include "cpu/m68000/m68000.h"
-#include "machine/mb8421.h"
-#include "machine/segaic16.h"
-#include "machine/nvram.h"
-#include "sound/2151intf.h"
-#include "sound/segapcm.h"
 #include "includes/segaipt.h"
+
+#include "machine/mb8421.h"
+#include "machine/msm6253.h"
+#include "machine/nvram.h"
+#include "machine/315_5296.h"
+#include "sound/segapcm.h"
+#include "sound/ym2151.h"
+#include "speaker.h"
 
 #include "pdrift.lh"
 
@@ -74,8 +75,8 @@ MB89372 - Uses 3 serial data transfer protocols: ASYNC, COP & BOP. Has a built
 //  CONSTANTS
 //**************************************************************************
 
-const UINT32 MASTER_CLOCK = 50000000;
-const UINT32 SOUND_CLOCK = 32215900;
+const uint32_t MASTER_CLOCK = 50000000;
+const uint32_t SOUND_CLOCK = 32215900;
 
 // use this to fiddle with the IRQ2 timing
 #define TWEAK_IRQ2_SCANLINE     (0)
@@ -87,149 +88,64 @@ const UINT32 SOUND_CLOCK = 32215900;
 //**************************************************************************
 
 //-------------------------------------------------
-//  analog_r - handle analog input reads
+//  analog_mux - handle multiplexed analog input
+//  (HC4052 at IC121)
 //-------------------------------------------------
 
-READ16_MEMBER( segaybd_state::analog_r )
+ioport_value segaybd_state::analog_mux()
 {
-	int result = 0xff;
-	if (ACCESSING_BITS_0_7)
-	{
-		result = m_analog_data[offset & 3] & 0x80;
-		m_analog_data[offset & 3] <<= 1;
-	}
-	return result;
+	return m_adc_ports[3 + (m_misc_io_data & 3)].read_safe(0x80);
 }
 
 
 //-------------------------------------------------
-//  analog_w - handle analog input control writes
+//  output1_w - handle writes to I/O port D
 //-------------------------------------------------
 
-WRITE16_MEMBER( segaybd_state::analog_w )
+WRITE8_MEMBER(segaybd_state::output1_w)
 {
-	int selected = ((offset & 3) == 3) ? (3 + (m_misc_io_data[0x08/2] & 3)) : (offset & 3);
-	m_analog_data[offset & 3] = read_safe(m_adc_ports[selected], 0xff);
+	if (!m_output_cb1.isnull())
+		m_output_cb1(data);
 }
 
 
 //-------------------------------------------------
-//  io_chip_r - handle reads from the I/O chip
+//  misc_output_w - handle writes to I/O port E
 //-------------------------------------------------
 
-IOPORT_ARRAY_MEMBER( segaybd_state::digital_ports )
-{ "P1", "GENERAL", "LIMITSW", "PORTD", "PORTE", "DSW", "COINAGE", "PORTH" };
-
-READ16_MEMBER( segaybd_state::io_chip_r )
+WRITE8_MEMBER(segaybd_state::misc_output_w)
 {
-	offset &= 0x1f/2;
+	//
+	//  D7 = /KILL
+	//  D6 = CONT
+	//  D5 = /WDCL
+	//  D4 = /SRES
+	//  D3 = XRES
+	//  D2 = YRES
+	//  D1-D0 = ADC0-1
+	//
+	m_segaic16vid->set_display_enable(data & 0x80);
+	m_watchdog->write_line_ck(BIT(data, 5));
+	m_soundcpu->set_input_line(INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
+	m_subx->set_input_line(INPUT_LINE_RESET, (data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
+	m_suby->set_input_line(INPUT_LINE_RESET, (data & 0x04) ? ASSERT_LINE : CLEAR_LINE);
 
-	switch (offset)
-	{
-		// I/O ports
-		case 0x00/2:
-		case 0x02/2:
-		case 0x04/2:
-		case 0x06/2:
-		case 0x08/2:
-		case 0x0a/2:
-		case 0x0c/2:
-		case 0x0e/2:
-			// if the port is configured as an output, return the last thing written
-			if (m_misc_io_data[0x1e/2] & (1 << offset))
-				return m_misc_io_data[offset];
-
-			// otherwise, return an input port
-			return m_digital_ports[offset]->read();
-
-		// 'SEGA' protection
-		case 0x10/2:
-			return 'S';
-		case 0x12/2:
-			return 'E';
-		case 0x14/2:
-			return 'G';
-		case 0x16/2:
-			return 'A';
-
-		// CNT register & mirror
-		case 0x18/2:
-		case 0x1c/2:
-			return m_misc_io_data[0x1c/2];
-
-		// port direction register & mirror
-		case 0x1a/2:
-		case 0x1e/2:
-			return m_misc_io_data[0x1e/2];
-	}
-	return 0xffff;
+	m_misc_io_data = data;
 }
 
 
 //-------------------------------------------------
-//  io_chip_w - handle writes to the I/O chip
+//  output2_w - handle writes to I/O port H
 //-------------------------------------------------
 
-WRITE16_MEMBER( segaybd_state::io_chip_w )
+WRITE8_MEMBER(segaybd_state::output2_w)
 {
-	UINT8 old;
+	if (!m_output_cb2.isnull())
+		m_output_cb2(data);
 
-	// generic implementation
-	offset &= 0x1f/2;
-	old = m_misc_io_data[offset];
-	m_misc_io_data[offset] = data;
-
-	switch (offset)
-	{
-		// I/O ports
-		case 0x00/2:
-			break;
-		case 0x02/2:
-			break;
-		case 0x04/2:
-			break;
-		case 0x06/2:
-			if (!m_output_cb1.isnull())
-				m_output_cb1(data);
-			break;
-		case 0x0a/2:
-		case 0x0c/2:
-			break;
-
-		// miscellaneous output
-		case 0x08/2:
-			//
-			//  D7 = /KILL
-			//  D6 = CONT
-			//  D5 = /WDCL
-			//  D4 = /SRES
-			//  D3 = XRES
-			//  D2 = YRES
-			//  D1-D0 = ADC0-1
-			//
-			m_segaic16vid->set_display_enable(data & 0x80);
-			if (((old ^ data) & 0x20) && !(data & 0x20))
-				m_watchdog->watchdog_reset();
-			m_soundcpu->set_input_line(INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
-			m_subx->set_input_line(INPUT_LINE_RESET, (data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
-			m_suby->set_input_line(INPUT_LINE_RESET, (data & 0x04) ? ASSERT_LINE : CLEAR_LINE);
-			break;
-
-		// mute
-
-		case 0x0e/2:
-			if (!m_output_cb2.isnull())
-				m_output_cb2(data);
-
-			// D7 = /MUTE
-			// D6-D0 = FLT31-25
-			machine().sound().system_enable(data & 0x80);
-			break;
-
-		// CNT register
-		case 0x1c/2:
-			break;
-	}
+	// D7 = /MUTE
+	// D6-D0 = FLT31-25
+	machine().sound().system_enable(data & 0x80);
 }
 
 
@@ -238,7 +154,7 @@ WRITE16_MEMBER( segaybd_state::io_chip_w )
 //  port
 //-------------------------------------------------
 
-WRITE16_MEMBER( segaybd_state::sound_data_w )
+WRITE16_MEMBER(segaybd_state::sound_data_w)
 {
 	if (ACCESSING_BITS_0_7)
 		synchronize(TID_SOUND_WRITE, data & 0xff);
@@ -254,10 +170,10 @@ WRITE16_MEMBER( segaybd_state::sound_data_w )
 //  sound_data_r - read latched sound data
 //-------------------------------------------------
 
-READ8_MEMBER( segaybd_state::sound_data_r )
+READ8_MEMBER(segaybd_state::sound_data_r)
 {
 	m_soundcpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-	return soundlatch_read();
+	return m_soundlatch->read(space, 0);
 }
 
 
@@ -373,7 +289,7 @@ void segaybd_state::device_timer(emu_timer &timer, device_timer_id id, int param
 			break;
 
 		case TID_SOUND_WRITE:
-			soundlatch_write(param);
+			m_soundlatch->write(m_soundcpu->space(AS_PROGRAM), 0, param);
 			m_soundcpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 			break;
 
@@ -400,7 +316,7 @@ void segaybd_state::device_timer(emu_timer &timer, device_timer_id id, int param
 //  Galaxy Force
 //-------------------------------------------------
 
-void segaybd_state::gforce2_output_cb1(UINT16 data)
+void segaybd_state::gforce2_output_cb1(uint16_t data)
 {
 	logerror("gforce2_output_cb1: '%02X'\n", data & 0xFF);
 	//bits 4, 5, and 7 seem to be used to multiplex the "LIMITSW" port signals
@@ -414,7 +330,7 @@ void segaybd_state::gforce2_output_cb1(UINT16 data)
 //  Galaxy Force
 //-------------------------------------------------
 
-void segaybd_state::gforce2_output_cb2(UINT16 data)
+void segaybd_state::gforce2_output_cb2(uint16_t data)
 {
 	output().set_value("start_lamp", BIT(data, 2));
 }
@@ -425,7 +341,7 @@ void segaybd_state::gforce2_output_cb2(UINT16 data)
 //  G-Loc
 //-------------------------------------------------
 
-void segaybd_state::gloc_output_cb1(UINT16 data)
+void segaybd_state::gloc_output_cb1(uint16_t data)
 {
 	if (data < 32)
 	{
@@ -459,7 +375,7 @@ void segaybd_state::gloc_output_cb1(UINT16 data)
 //  G-Loc
 //-------------------------------------------------
 
-void segaybd_state::gloc_output_cb2(UINT16 data)
+void segaybd_state::gloc_output_cb2(uint16_t data)
 {
 	output().set_value("start_lamp", BIT(data, 2));
 	output().set_value("danger_lamp", BIT(data, 5));
@@ -472,7 +388,7 @@ void segaybd_state::gloc_output_cb2(UINT16 data)
 //  G-Loc R360
 //-------------------------------------------------
 
-void segaybd_state::r360_output_cb2(UINT16 data)
+void segaybd_state::r360_output_cb2(uint16_t data)
 {
 	// r360 cabinet
 	output().set_value("start_lamp", BIT(data, 2));
@@ -486,7 +402,7 @@ void segaybd_state::r360_output_cb2(UINT16 data)
 //  Power Drift
 //-------------------------------------------------
 
-void segaybd_state::pdrift_output_cb1(UINT16 data)
+void segaybd_state::pdrift_output_cb1(uint16_t data)
 {
 	// Note:  this is an approximation to get a relatively accurate bank value.  It is obviously not 100%
 
@@ -645,7 +561,7 @@ void segaybd_state::pdrift_output_cb1(UINT16 data)
 //  Power Drift
 //-------------------------------------------------
 
-void segaybd_state::pdrift_output_cb2(UINT16 data)
+void segaybd_state::pdrift_output_cb2(uint16_t data)
 {
 	output().set_value("start_lamp", BIT(data, 2));
 	output().set_value("upright_wheel_motor", BIT(data, 1));
@@ -657,7 +573,7 @@ void segaybd_state::pdrift_output_cb2(UINT16 data)
 //  Rail Chase
 //-------------------------------------------------
 
-void segaybd_state::rchase_output_cb2(UINT16 data)
+void segaybd_state::rchase_output_cb2(uint16_t data)
 {
 	output().set_value("left_start_lamp", BIT(data, 2));
 	output().set_value("right_start_lamp", BIT(data, 1));
@@ -709,8 +625,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, segaybd_state )
 	AM_RANGE(0x084000, 0x08401f) AM_MIRROR(0x001fe0) AM_DEVREADWRITE("divider_main", sega_315_5249_divider_device, read, write)
 //  AM_RANGE(0x086000, 0x087fff) /DEA0
 	AM_RANGE(0x0c0000, 0x0cffff) AM_RAM AM_SHARE("shareram")
-	AM_RANGE(0x100000, 0x10001f) AM_READWRITE(io_chip_r, io_chip_w)
-	AM_RANGE(0x100040, 0x100047) AM_READWRITE(analog_r, analog_w)
+	AM_RANGE(0x100000, 0x10001f) AM_DEVREADWRITE8("io", sega_315_5296_device, read, write, 0x00ff)
+	AM_RANGE(0x100040, 0x100047) AM_DEVREADWRITE8("adc", msm6253_device, d7_r, address_w, 0x00ff)
 	AM_RANGE(0x1f0000, 0x1fffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -784,7 +700,7 @@ WRITE_LINE_MEMBER(segaybd_state::mb8421_intr)
 
 READ16_MEMBER(segaybd_state::link_r)
 {
-	return rand();
+	return machine().rand();
 }
 
 READ16_MEMBER(segaybd_state::link2_r)
@@ -810,21 +726,23 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( link_map, AS_PROGRAM, 8, segaybd_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x2000, 0x3fff) AM_RAM
+	AM_RANGE(0x2000, 0x3fff) AM_RAM // 0x2000-0x2*** maybe shared with other boards?
 	AM_RANGE(0x4000, 0x47ff) AM_DEVREADWRITE("mb8421", mb8421_device, right_r, right_w)
 ADDRESS_MAP_END
 
+#if 0
 READ8_MEMBER(segaybd_state::link_portc0_r)
 {
 	return 0xf8;
 }
+#endif
 
 static ADDRESS_MAP_START( link_portmap, AS_IO, 8, segaybd_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 
-//  AM_RANGE(0x40, 0x40) AM_READ_PORT("LinkDSW")
-	AM_RANGE(0xc0, 0xc0) AM_READ(link_portc0_r)
+	AM_RANGE(0x40, 0x40) AM_READ_PORT("LinkID_DSW1")
+	AM_RANGE(0xc0, 0xc0) AM_READ_PORT("LinkID_DSW2")
 ADDRESS_MAP_END
 
 
@@ -862,12 +780,6 @@ static INPUT_PORTS_START( yboard_generic )
 	PORT_START("LIMITSW")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("PORTD")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("PORTE")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-
 	PORT_START("DSW")
 	PORT_DIPUNUSED_DIPLOC( 0x01, IP_ACTIVE_LOW, "SWB:1" )
 	PORT_DIPUNUSED_DIPLOC( 0x02, IP_ACTIVE_LOW, "SWB:2" )
@@ -880,9 +792,6 @@ static INPUT_PORTS_START( yboard_generic )
 
 	PORT_START("COINAGE")
 	SEGA_COINAGE_LOC(SWA)
-
-	PORT_START("PORTH")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -1229,11 +1138,11 @@ static INPUT_PORTS_START( pdriftl )
 	PORT_DIPSETTING(    0xb0, DEF_STR( 6C_1C ) )
 	PORT_DIPSETTING(    0x00, "Free Play (if Coin A too) or 1/1" )
 
-	PORT_START("LinkDSW")
+	PORT_START("LinkID_DSW1")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )  // Affects how the z80 access memory at 0x2000-0x2***
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
@@ -1254,6 +1163,39 @@ static INPUT_PORTS_START( pdriftl )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("LinkID_DSW2")
+	PORT_DIPNAME( 0x0f, 0x01, "Cabinet ID" )
+	PORT_DIPSETTING(    0x00, "0" )
+	PORT_DIPSETTING(    0x01, "1" ) // accessed unmapped areas if stand-alone isn't setup properly?
+	PORT_DIPSETTING(    0x02, "2" )
+	PORT_DIPSETTING(    0x03, "3" )
+	PORT_DIPSETTING(    0x04, "4" )
+	PORT_DIPSETTING(    0x05, "5" )
+	PORT_DIPSETTING(    0x06, "6" )
+	PORT_DIPSETTING(    0x07, "7" )
+	PORT_DIPSETTING(    0x08, "8" )
+	PORT_DIPSETTING(    0x09, "9" )
+	PORT_DIPSETTING(    0x0a, "10" )
+	PORT_DIPSETTING(    0x0b, "11" )
+	// enabled for debugging
+	PORT_DIPSETTING(    0x0c, "12 (invalid)" )
+	PORT_DIPSETTING(    0x0d, "13 (invalid)" )
+	PORT_DIPSETTING(    0x0e, "14 (invalid)" )
+	PORT_DIPSETTING(    0x0f, "15 (invalid)" )
+
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, "Communication Mode" )
+	PORT_DIPSETTING(    0x80, "Master/Slave" )
+	PORT_DIPSETTING(    0x00, "Stand-Alone" )
 INPUT_PORTS_END
 
 
@@ -1361,7 +1303,7 @@ INPUT_PORTS_END
 //  GENERIC MACHINE DRIVERS
 //**************************************************************************
 
-static MACHINE_CONFIG_START( yboard, segaybd_state )
+static MACHINE_CONFIG_START( yboard )
 
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK/4)
@@ -1380,7 +1322,24 @@ static MACHINE_CONFIG_START( yboard, segaybd_state )
 	MCFG_NVRAM_ADD_0FILL("backupram")
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	MCFG_MB3773_ADD("watchdog") // IC95
+
+	MCFG_DEVICE_ADD("io", SEGA_315_5296, MASTER_CLOCK/8)
+	MCFG_315_5296_IN_PORTA_CB(IOPORT("P1"))
+	MCFG_315_5296_IN_PORTB_CB(IOPORT("GENERAL"))
+	MCFG_315_5296_IN_PORTC_CB(IOPORT("LIMITSW"))
+	MCFG_315_5296_OUT_PORTD_CB(WRITE8(segaybd_state, output1_w))
+	MCFG_315_5296_OUT_PORTE_CB(WRITE8(segaybd_state, misc_output_w))
+	MCFG_315_5296_IN_PORTF_CB(IOPORT("DSW"))
+	MCFG_315_5296_IN_PORTG_CB(IOPORT("COINAGE"))
+	MCFG_315_5296_OUT_PORTH_CB(WRITE8(segaybd_state, output2_w))
+	// FMCS and CKOT connect to CS and OSC IN on MSM6253 below
+
+	MCFG_DEVICE_ADD("adc", MSM6253, 0)
+	MCFG_MSM6253_IN0_ANALOG_PORT("ADC.0")
+	MCFG_MSM6253_IN1_ANALOG_PORT("ADC.1")
+	MCFG_MSM6253_IN2_ANALOG_PORT("ADC.2")
+	MCFG_MSM6253_IN3_ANALOG_READ(segaybd_state, analog_mux)
 
 	MCFG_SEGA_315_5248_MULTIPLIER_ADD("multiplier_main")
 	MCFG_SEGA_315_5248_MULTIPLIER_ADD("multiplier_subx")
@@ -1409,13 +1368,15 @@ static MACHINE_CONFIG_START( yboard, segaybd_state )
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_YM2151_ADD("ymsnd", SOUND_CLOCK/8)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.43)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.43)
 
 	MCFG_SEGAPCM_ADD("pcm", SOUND_CLOCK/8)
-	MCFG_SEGAPCM_BANK(BANK_12M | BANK_MASKF8)
+	MCFG_SEGAPCM_BANK_MASK(BANK_12M, BANK_MASKF8)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -1985,6 +1946,86 @@ ROM_START( glocr360 )
 	ROM_LOAD( "epr-13036.107",  0x000000, 0x80000, CRC(7890c26c) SHA1(97e0678bb571de5cf732804f8909e5cbd24980f1) )
 	ROM_LOAD( "epr-13035.106",  0x080000, 0x80000, CRC(009fa13e) SHA1(c7b224b471696b12332fc7c403c127b19c297df7) )
 	ROM_LOAD( "epr-13625.105",  0x100000, 0x80000, CRC(fae71fd2) SHA1(c8468486b1ac74d3a6254d538f05034b1533e40b) )
+ROM_END
+
+//*************************************************************************************************************************
+//  G-Loc R-360 (Japan), Sega Y-board
+//  CPU: 68000 (317-????)
+//
+//    CPU BD   837-6565
+//  VIDEO BD   837-7403 + 837-7343 Daughter ROM board
+//   GAME BD   834-7660  R-360
+// DRIVER BD   837-7337
+//
+ROM_START( glocr360j )
+	ROM_REGION( 0x080000, "maincpu", 0 ) // M
+	ROM_LOAD16_BYTE( "epr-13321a.25",  0x000000, 0x20000, CRC(7c80f03f) SHA1(1c6958c4d08174e499a88af5fab00279b5ddd011) )
+	ROM_LOAD16_BYTE( "epr-13320a.24",  0x000001, 0x20000, CRC(9d3116fb) SHA1(3419278a384b3551b55e0223caea8f09533c89e1) )
+	ROM_LOAD16_BYTE( "epr-13323a.27",  0x040000, 0x20000, CRC(02e24a33) SHA1(4955b13e5e90945dfb9066597b16df63c2a09552) )
+	ROM_LOAD16_BYTE( "epr-13322a.26",  0x040001, 0x20000, CRC(94f67740) SHA1(3d1be8dc9c370cd024fae19bb0b2663995d13d0e) )
+
+	ROM_REGION( 0x040000, "subx", 0 ) // X
+	ROM_LOAD16_BYTE( "epr-13327.81",  0x000000, 0x20000, CRC(627036f9) SHA1(bae8a2b1a90088532e5d487e36265de9a1f38f84) )
+	ROM_LOAD16_BYTE( "epr-13326.80",  0x000001, 0x20000, CRC(162ac233) SHA1(863b93a38906e3d7f3446c2ee4914205f8123022) )
+
+	ROM_REGION( 0x040000, "suby", 0 ) // Y
+	ROM_LOAD16_BYTE( "epr-13325a.54",  0x000000, 0x20000, CRC(aba307e5) SHA1(a27a7d3699a95d7c6265a23157b2fefd362003dd) )
+	ROM_LOAD16_BYTE( "epr-13324a.53",  0x000001, 0x20000, CRC(eb1b19e5) SHA1(3d1d7299cb3befc22afc0db0376d7f94dec37367) )
+
+	ROM_REGION16_BE( 0x200000, "bsprites", 0)
+	ROM_LOAD16_BYTE( "epr-13039.16",  0x000000, 0x80000, CRC(d7e1266d) SHA1(b0fc4cc60a7e876ae2af343bba6da3fb926ea9c5) )
+	ROM_LOAD16_BYTE( "epr-13037.14",  0x000001, 0x80000, CRC(b801a250) SHA1(7d1f6a1f2022a4f302f22d11fa79057cf8134ad2) )
+	ROM_LOAD16_BYTE( "epr-13040.17",  0x100000, 0x80000, CRC(4aeb3a85) SHA1(5521fd2d3956839bdbe7b70a9e60cd9fb72a42f1) )
+	ROM_LOAD16_BYTE( "epr-13038.15",  0x100001, 0x80000, CRC(0b2edb6d) SHA1(04944d6e6f020cd6d33641110847706516630227) )
+
+	ROM_REGION64_BE( 0x1000000, "ysprites", 0 )
+	ROMX_LOAD( "epr-13048.67",  0x000000, 0x80000, CRC(fe1eb0dd) SHA1(5e292fc0b83505eb289e026d4be24c9038ef1418), ROM_SKIP(7) )
+	ROMX_LOAD( "epr-13056.75",  0x000001, 0x80000, CRC(5904f8e6) SHA1(fbb01dadc796624c360d44b7631e3f1f285abf2e), ROM_SKIP(7) )
+	ROMX_LOAD( "epr-13044.63",  0x000002, 0x80000, CRC(4d931f89) SHA1(ff603f4347e4728a2849d9f480893ad0af7abc5c), ROM_SKIP(7) )
+	ROMX_LOAD( "epr-13052.71",  0x000003, 0x80000, CRC(0291f040) SHA1(610dee2a31445f4a054111b7005278560a9c0702), ROM_SKIP(7) )
+	ROMX_LOAD( "epr-13064.86",  0x000004, 0x80000, CRC(5f8e651b) SHA1(f1a957e68dea40c23f6a5a208358ec6d6515fe60), ROM_SKIP(7) )
+	ROMX_LOAD( "epr-13072.114", 0x000005, 0x80000, CRC(6b85641a) SHA1(143a4684d5f303cd30880a2d5728dccbdd168da4), ROM_SKIP(7) )
+	ROMX_LOAD( "epr-13060.82",  0x000006, 0x80000, CRC(ee16ad97) SHA1(6af38cfaf694f686f8e4223fb0b13cd350a8b9e5), ROM_SKIP(7) )
+	ROMX_LOAD( "epr-13068.110", 0x000007, 0x80000, CRC(64d52bbb) SHA1(b6eab546edb2443e5da6c94ec811ec5084212e60), ROM_SKIP(7) )
+
+	ROMX_LOAD( "epr-13047.66",  0x400000, 0x80000, CRC(53340832) SHA1(8ece8a71ea8ed80458121622307a137fb13931f6), ROM_SKIP(7) )
+	ROMX_LOAD( "epr-13055.74",  0x400001, 0x80000, CRC(39b6b665) SHA1(d915db1d9bfe0c6ad3f7b447ce0cfdb42ec66ffe), ROM_SKIP(7) )
+	ROMX_LOAD( "epr-13043.62",  0x400002, 0x80000, CRC(208f16fd) SHA1(ce96708ea9886af4aba8730cbb98c0ca72b96f57), ROM_SKIP(7) )
+	ROMX_LOAD( "epr-13051.70",  0x400003, 0x80000, CRC(ad62cbd4) SHA1(09c008ce5cb97575a4312d2f22566bda72ecc4e2), ROM_SKIP(7) )
+	ROMX_LOAD( "epr-13063.85",  0x400004, 0x80000, CRC(c580bf6d) SHA1(cb72970377ad2acce499059aa8155711b8da8a11), ROM_SKIP(7) )
+	ROMX_LOAD( "epr-13071.113", 0x400005, 0x80000, CRC(df99ef99) SHA1(12648844c6e78dbd573b7bf0c981edb4d3012b58), ROM_SKIP(7) )
+	ROMX_LOAD( "epr-13059.81",  0x400006, 0x80000, CRC(4c982558) SHA1(e04902af2740ca098cd6bbf1f57cb25562754a76), ROM_SKIP(7) )
+	ROMX_LOAD( "epr-13067.109", 0x400007, 0x80000, CRC(f97f6119) SHA1(6f91fc28a1260ca4f1c695863717b27d1e45dc32), ROM_SKIP(7) )
+
+	ROMX_LOAD( "epr-13331.65",  0x800000, 0x80000, CRC(8ea8febe) SHA1(c5b68f955807d7d901b773ba8fba5c9a2d29afd1), ROM_SKIP(7) )
+	ROMX_LOAD( "epr-13333.73",  0x800001, 0x80000, CRC(5bcd37d4) SHA1(df25d3ef4acd3aea2484ff5760a63245eafcb66c), ROM_SKIP(7) )
+	ROMX_LOAD( "epr-13330.61",  0x800002, 0x80000, CRC(1e325d52) SHA1(91ffdb5d9926ea573550079ca0486a71baf70d07), ROM_SKIP(7) )
+	ROMX_LOAD( "epr-13332.69",  0x800003, 0x80000, CRC(8fd8067e) SHA1(ac438ae60fa08418b5590f5656e2d1ecc3e6eb15), ROM_SKIP(7) )
+	ROMX_LOAD( "epr-13335.84",  0x800004, 0x80000, CRC(98ea420b) SHA1(fc138a45e287e0c7c3ec1cc75aa6dabc9dca8d42), ROM_SKIP(7) )
+	ROMX_LOAD( "epr-13337.112", 0x800005, 0x80000, CRC(f55f00a4) SHA1(77f1e946c7bce69aa9f1f3e59af1e033338c9d95), ROM_SKIP(7) )
+	ROMX_LOAD( "epr-13334.80",  0x800006, 0x80000, CRC(72725060) SHA1(6002eca365a69816ac6e7ccba65ae73967e83a89), ROM_SKIP(7) )
+	ROMX_LOAD( "epr-13336.108", 0x800007, 0x80000, CRC(e2d4d477) SHA1(cdeefeb6d66433c121cac4e77453f6265bacf9e2), ROM_SKIP(7) )
+
+	ROMX_LOAD( "epr-13045.64",  0xc00000, 0x80000, CRC(54d5bc6d) SHA1(18a301c9e6c4a352f300a438d85c6e6952bf0738), ROM_SKIP(7) )
+	ROMX_LOAD( "epr-13053.72",  0xc00001, 0x80000, CRC(9502af13) SHA1(1a8c0fcd10f4c86af69c0107f486ca2eb8863f93), ROM_SKIP(7) )
+	ROMX_LOAD( "epr-13041.60",  0xc00002, 0x80000, CRC(d0a7402c) SHA1(8932503c570ec49fdb4706f4015608bd060bafa0), ROM_SKIP(7) )
+	ROMX_LOAD( "epr-13049.68",  0xc00003, 0x80000, CRC(5b9c0b6c) SHA1(17f2460b7dc0bd34dca3f90f2b553df4a7149147), ROM_SKIP(7) )
+	ROMX_LOAD( "epr-13061.83",  0xc00004, 0x80000, CRC(7b95ec3b) SHA1(284aba4effd9d376a7a8f510a6f675fcb3393d09), ROM_SKIP(7) )
+	ROMX_LOAD( "epr-13069.111", 0xc00005, 0x80000, CRC(e1f538f0) SHA1(55dc85faed1d5a7f2d586bac7e524c3fef3c53b4), ROM_SKIP(7) )
+	ROMX_LOAD( "epr-13057.79",  0xc00006, 0x80000, CRC(73baefee) SHA1(6e86edc8229dd6112034a7df79f7341a4120dc6b), ROM_SKIP(7) )
+	ROMX_LOAD( "epr-13065.107", 0xc00007, 0x80000, CRC(8937a655) SHA1(d38726a8a6fe68a002ac8d17f70ab83c2f814aa2), ROM_SKIP(7) )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )        // Z80 sound CPU
+	ROM_LOAD( "epr-13328.102",  0x000000, 0x10000, CRC(751cb2b1) SHA1(bf8aa50e3b9be6d63a3fe9d7b565fad95128f6f4) )
+
+	ROM_REGION( 0x200000, "pcm", ROMREGION_ERASEFF )    // SegaPCM samples
+	ROM_LOAD( "epr-13036.107",  0x000000, 0x80000, CRC(7890c26c) SHA1(97e0678bb571de5cf732804f8909e5cbd24980f1) )
+	ROM_LOAD( "epr-13035.106",  0x080000, 0x80000, CRC(009fa13e) SHA1(c7b224b471696b12332fc7c403c127b19c297df7) )
+	ROM_LOAD( "epr-13329.105",  0x100000, 0x80000, CRC(87a14f6b) SHA1(c2ec0b8916a0b5b1465905e2b2aeff0de3acf056) )
+
+	ROM_REGION( 0x030000, "driver", 0 ) // Driver board - 8MHz Z80 x 2, 8255AC x 2, Yamaha V9958, 32MHz OSC & 21.??727 MHz
+	ROM_LOAD( "epr-13317.ic22",  0x000000, 0x20000, CRC(b9f14f35) SHA1(a58d293640235d10eb315f74d107e7a1c973f562) ) // Z80 CPU code
+	ROM_LOAD( "epr-13316.ic27",  0x020000, 0x08000, CRC(83d6c6a3) SHA1(f72307c8c216ec918cf8bacf2a95243e114687ce) ) // Z80 CPU code
 ROM_END
 
 
@@ -2707,7 +2748,6 @@ DRIVER_INIT_MEMBER(segaybd_state,generic)
 
 	// save state
 	save_item(NAME(m_pdrift_bank));
-	save_item(NAME(m_analog_data));
 	save_item(NAME(m_irq2_scanline));
 	save_item(NAME(m_timer_irq_state));
 	save_item(NAME(m_vblank_irq_state));
@@ -2723,16 +2763,16 @@ DRIVER_INIT_MEMBER(segaybd_state,generic)
 DRIVER_INIT_MEMBER(segaybd_state,gforce2)
 {
 	DRIVER_INIT_CALL(generic);
-	m_output_cb1 = output_delegate(FUNC(segaybd_state::gforce2_output_cb1), this);
-	m_output_cb2 = output_delegate(FUNC(segaybd_state::gforce2_output_cb2), this);
+	m_output_cb1 = output_delegate(&segaybd_state::gforce2_output_cb1, this);
+	m_output_cb2 = output_delegate(&segaybd_state::gforce2_output_cb2, this);
 }
 
 DRIVER_INIT_MEMBER(segaybd_state,gloc)
 {
 	// because some of the output data isn't fully understood we need to "center" the rams
 	DRIVER_INIT_CALL(generic);
-	m_output_cb1 = output_delegate(FUNC(segaybd_state::gloc_output_cb1), this);
-	m_output_cb2 = output_delegate(FUNC(segaybd_state::gloc_output_cb2), this);
+	m_output_cb1 = output_delegate(&segaybd_state::gloc_output_cb1, this);
+	m_output_cb2 = output_delegate(&segaybd_state::gloc_output_cb2, this);
 
 	output().set_value("left_motor_position_nor", 16);
 	output().set_value("right_motor_position_nor", 16);
@@ -2741,21 +2781,21 @@ DRIVER_INIT_MEMBER(segaybd_state,gloc)
 DRIVER_INIT_MEMBER(segaybd_state,r360)
 {
 	DRIVER_INIT_CALL(generic);
-	m_output_cb2 = output_delegate(FUNC(segaybd_state::r360_output_cb2), this);
+	m_output_cb2 = output_delegate(&segaybd_state::r360_output_cb2, this);
 }
 
 DRIVER_INIT_MEMBER(segaybd_state,pdrift)
 {
 	// because some of the output data isn't fully understood we need to "center" the motor
 	DRIVER_INIT_CALL(generic);
-	m_output_cb1 = output_delegate(FUNC(segaybd_state::pdrift_output_cb1), this);
-	m_output_cb2 = output_delegate(FUNC(segaybd_state::pdrift_output_cb2), this);
+	m_output_cb1 = output_delegate(&segaybd_state::pdrift_output_cb1, this);
+	m_output_cb2 = output_delegate(&segaybd_state::pdrift_output_cb2, this);
 }
 
 DRIVER_INIT_MEMBER(segaybd_state,rchase)
 {
 	DRIVER_INIT_CALL(generic);
-	m_output_cb2 = output_delegate(FUNC(segaybd_state::rchase_output_cb2), this);
+	m_output_cb2 = output_delegate(&segaybd_state::rchase_output_cb2, this);
 }
 
 
@@ -2764,24 +2804,26 @@ DRIVER_INIT_MEMBER(segaybd_state,rchase)
 //  GAME DRIVERS
 //**************************************************************************
 
-//    YEAR, NAME,      PARENT,  MACHINE, INPUT,    INIT,                   MONITOR,COMPANY,FULLNAME,FLAGS,                                     LAYOUT
-GAME( 1988, gforce2,   0,        yboard,      gforce2,  segaybd_state, gforce2, ROT0,   "Sega", "Galaxy Force 2", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, gforce2sd, gforce2, yboard_deluxe,      gforce2,  segaybd_state, gforce2, ROT0,   "Sega", "Galaxy Force 2 (Super Deluxe unit)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, gforce2ja, gforce2,  yboard,      gforce2,  segaybd_state, gforce2, ROT0,   "Sega", "Galaxy Force 2 (Japan, Rev A)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, gforce2j,  gforce2,  yboard,      gforce2,  segaybd_state, gforce2, ROT0,   "Sega", "Galaxy Force 2 (Japan)", MACHINE_SUPPORTS_SAVE )
+//    YEAR, NAME,      PARENT,   MACHINE,       INPUT,    STATE,         INIT,    MONITOR,COMPANY,FULLNAME,FLAGS,                                     LAYOUT
+GAME( 1988, gforce2,   0,        yboard,        gforce2,  segaybd_state, gforce2, ROT0,   "Sega", "Galaxy Force 2", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, gforce2sd, gforce2,  yboard_deluxe, gforce2,  segaybd_state, gforce2, ROT0,   "Sega", "Galaxy Force 2 (Super Deluxe unit)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, gforce2ja, gforce2,  yboard,        gforce2,  segaybd_state, gforce2, ROT0,   "Sega", "Galaxy Force 2 (Japan, Rev A)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, gforce2j,  gforce2,  yboard,        gforce2,  segaybd_state, gforce2, ROT0,   "Sega", "Galaxy Force 2 (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1990, gloc,      0,        yboard,      gloc,     segaybd_state, gloc,    ROT0,   "Sega", "G-LOC Air Battle (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, glocu,     gloc,     yboard,      gloc,     segaybd_state, gloc,    ROT0,   "Sega", "G-LOC Air Battle (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, glocr360,  gloc,     yboard,      glocr360, segaybd_state, r360,    ROT0,   "Sega", "G-LOC R360", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, gloc,      0,        yboard,        gloc,     segaybd_state, gloc,    ROT0,   "Sega", "G-LOC Air Battle (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, glocu,     gloc,     yboard,        gloc,     segaybd_state, gloc,    ROT0,   "Sega", "G-LOC Air Battle (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, glocr360,  gloc,     yboard,        glocr360, segaybd_state, r360,    ROT0,   "Sega", "G-LOC R360 (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, glocr360j, gloc,     yboard,        glocr360, segaybd_state, r360,    ROT0,   "Sega", "G-LOC R360 (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAMEL(1988, pdrift,    0,        yboard,      pdrift,   segaybd_state, pdrift,  ROT0,   "Sega", "Power Drift (World, Rev A)", MACHINE_SUPPORTS_SAVE,   layout_pdrift )
-GAMEL(1988, pdrifta,   pdrift,   yboard,      pdrift,   segaybd_state, pdrift,  ROT0,   "Sega", "Power Drift (World)", MACHINE_SUPPORTS_SAVE,          layout_pdrift )
-GAMEL(1988, pdrifte,   pdrift,   yboard,      pdrifte,  segaybd_state, pdrift,  ROT0,   "Sega", "Power Drift (World, Earlier)", MACHINE_SUPPORTS_SAVE, layout_pdrift )
-GAMEL(1988, pdriftj,   pdrift,   yboard,      pdriftj,  segaybd_state, pdrift,  ROT0,   "Sega", "Power Drift (Japan)", MACHINE_SUPPORTS_SAVE,          layout_pdrift )
-GAMEL(1988, pdriftl,   pdrift,   yboard_link, pdriftl,  segaybd_state, pdrift,  ROT0,   "Sega", "Power Drift (Japan, Link Version)", MACHINE_SUPPORTS_SAVE|MACHINE_NOT_WORKING, layout_pdrift)
+GAMEL(1988, pdrift,    0,        yboard,        pdrift,   segaybd_state, pdrift,  ROT0,   "Sega", "Power Drift (World, Rev A)", MACHINE_SUPPORTS_SAVE,   layout_pdrift )
+GAMEL(1988, pdrifta,   pdrift,   yboard,        pdrift,   segaybd_state, pdrift,  ROT0,   "Sega", "Power Drift (World)", MACHINE_SUPPORTS_SAVE,          layout_pdrift )
+GAMEL(1988, pdrifte,   pdrift,   yboard,        pdrifte,  segaybd_state, pdrift,  ROT0,   "Sega", "Power Drift (World, Earlier)", MACHINE_SUPPORTS_SAVE, layout_pdrift )
+GAMEL(1988, pdriftj,   pdrift,   yboard,        pdriftj,  segaybd_state, pdrift,  ROT0,   "Sega", "Power Drift (Japan)", MACHINE_SUPPORTS_SAVE,          layout_pdrift )
 
-GAME( 1991, rchase,    0,        yboard,      rchase,   segaybd_state, rchase,  ROT0,   "Sega", "Rail Chase (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, rchasej,   rchase,   yboard,      rchase,   segaybd_state, rchase,  ROT0,   "Sega", "Rail Chase (Japan)", MACHINE_SUPPORTS_SAVE )
+GAMEL(1988, pdriftl,   0,        yboard_link,   pdriftl,  segaybd_state, pdrift,  ROT0,   "Sega", "Power Drift - Link Version (Japan, Rev A)", MACHINE_SUPPORTS_SAVE, layout_pdrift)
 
-GAME( 1991, strkfgtr,  0,        yboard,      strkfgtr, segaybd_state, gloc,    ROT0,   "Sega", "Strike Fighter (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, strkfgtrj, strkfgtr, yboard,      strkfgtr, segaybd_state, gloc,    ROT0,   "Sega", "Strike Fighter (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, rchase,    0,        yboard,        rchase,   segaybd_state, rchase,  ROT0,   "Sega", "Rail Chase (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, rchasej,   rchase,   yboard,        rchase,   segaybd_state, rchase,  ROT0,   "Sega", "Rail Chase (Japan)", MACHINE_SUPPORTS_SAVE )
+
+GAME( 1991, strkfgtr,  0,        yboard,        strkfgtr, segaybd_state, gloc,    ROT0,   "Sega", "Strike Fighter (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, strkfgtrj, strkfgtr, yboard,        strkfgtr, segaybd_state, gloc,    ROT0,   "Sega", "Strike Fighter (Japan)", MACHINE_SUPPORTS_SAVE )

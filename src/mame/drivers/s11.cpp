@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Miodrag Milanovic
+// copyright-holders:Miodrag Milanovic, Robbbert
 /****************************************************************************************
 
     Pinball
@@ -17,17 +17,16 @@ ToDo:
 
 *****************************************************************************************/
 
+#include "emu.h"
+#include "includes/s11.h"
 
-#include "machine/genpin.h"
 #include "cpu/m6800/m6800.h"
 #include "cpu/m6809/m6809.h"
-#include "machine/6821pia.h"
-#include "sound/hc55516.h"
-#include "sound/2151intf.h"
-#include "sound/dac.h"
-#include "audio/s11c_bg.h"
-#include "includes/s11.h"
+#include "sound/volt_reg.h"
+#include "speaker.h"
+
 #include "s11.lh"
+
 
 static ADDRESS_MAP_START( s11_main_map, AS_PROGRAM, 8, s11_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
@@ -143,7 +142,7 @@ void s11_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 	case TIMER_IRQ:
 		if(param == 1)
 		{
-			m_maincpu->set_input_line(M6800_IRQ_LINE,ASSERT_LINE);
+			m_maincpu->set_input_line(M6802_IRQ_LINE, ASSERT_LINE);
 			m_irq_timer->adjust(attotime::from_ticks(32,E_CLOCK),0);
 			if(m_pias)
 				m_pias->cb1_w(0);
@@ -153,7 +152,7 @@ void s11_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 		}
 		else
 		{
-			m_maincpu->set_input_line(M6800_IRQ_LINE,CLEAR_LINE);
+			m_maincpu->set_input_line(M6802_IRQ_LINE, CLEAR_LINE);
 			m_irq_timer->adjust(attotime::from_ticks(S11_IRQ_CYCLES,E_CLOCK),1);
 			if(m_pias)
 				m_pias->cb1_w(1);
@@ -223,12 +222,12 @@ WRITE_LINE_MEMBER( s11_state::pia21_ca2_w )
 
 WRITE8_MEMBER( s11_state::lamp0_w )
 {
-	m_maincpu->set_input_line(M6800_IRQ_LINE, CLEAR_LINE);
+	m_maincpu->set_input_line(M6802_IRQ_LINE, CLEAR_LINE);
 }
 
 WRITE8_MEMBER( s11_state::dig0_w )
 {
-	static const UINT8 patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x58, 0x4c, 0x62, 0x69, 0x78, 0 }; // 7447
+	static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x58, 0x4c, 0x62, 0x69, 0x78, 0 }; // 7447
 	data &= 0x7f;
 	m_strobe = data & 15;
 	m_diag = (data & 0x70) >> 4;
@@ -250,7 +249,7 @@ WRITE8_MEMBER( s11_state::dig1_w )
 
 READ8_MEMBER( s11_state::pia28_w7_r )
 {
-	UINT8 ret = 0x80;
+	uint8_t ret = 0x80;
 
 	ret |= m_strobe;
 	ret |= m_diag << 4;
@@ -342,21 +341,9 @@ WRITE_LINE_MEMBER( s11_state::pias_cb2_w )
 		m_hc55516->digit_w(state);
 }
 
-READ8_MEMBER( s11_state::dac_r )
+READ8_MEMBER( s11_state::sound_r )
 {
 	return m_sound_data;
-}
-
-WRITE8_MEMBER( s11_state::dac_w )
-{
-	if(m_dac)
-		m_dac->write_unsigned8(data);
-}
-
-WRITE8_MEMBER( s11_state::pia40_pa_w )
-{
-	if(m_dac1)
-		m_dac1->write_unsigned8(data);
 }
 
 WRITE_LINE_MEMBER( s11_state::ym2151_irq_w )
@@ -382,7 +369,7 @@ WRITE8_MEMBER( s11_state::pia40_pb_w )
 
 DRIVER_INIT_MEMBER( s11_state, s11 )
 {
-	UINT8 *ROM = memregion("audiocpu")->base();
+	uint8_t *ROM = memregion("audiocpu")->base();
 	membank("bank0")->configure_entries(0, 2, &ROM[0x10000], 0x4000);
 	membank("bank1")->configure_entries(0, 2, &ROM[0x18000], 0x4000);
 	membank("bank0")->set_entry(0);
@@ -392,7 +379,7 @@ DRIVER_INIT_MEMBER( s11_state, s11 )
 	m_irq_active = false;
 }
 
-static MACHINE_CONFIG_START( s11, s11_state )
+static MACHINE_CONFIG_START( s11 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6802, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(s11_main_map)
@@ -406,7 +393,7 @@ static MACHINE_CONFIG_START( s11, s11_state )
 
 	/* Devices */
 	MCFG_DEVICE_ADD("pia21", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(s11_state, dac_r))
+	MCFG_PIA_READPA_HANDLER(READ8(s11_state, sound_r))
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(s11_state, sound_w))
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(s11_state, sol2_w))
 	MCFG_PIA_CA2_HANDLER(WRITELINE(s11_state, pia21_ca2_w))
@@ -456,22 +443,24 @@ static MACHINE_CONFIG_START( s11, s11_state )
 	MCFG_CPU_ADD("audiocpu", M6808, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(s11_audio_map)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("dac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac1", -1.0, DAC_VREF_NEG_INPUT)
 
 	MCFG_SPEAKER_STANDARD_MONO("speech")
 	MCFG_SOUND_ADD("hc55516", HC55516, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speech", 1.00)
 
 	MCFG_DEVICE_ADD("pias", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(s11_state, dac_r))
+	MCFG_PIA_READPA_HANDLER(READ8(s11_state, sound_r))
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(s11_state, sound_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(s11_state, dac_w))
+	MCFG_PIA_WRITEPB_HANDLER(DEVWRITE8("dac", dac_byte_interface, write))
 	MCFG_PIA_CA2_HANDLER(WRITELINE(s11_state, pias_ca2_w))
 	MCFG_PIA_CB2_HANDLER(WRITELINE(s11_state, pias_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("audiocpu", m6808_cpu_device, irq_line))
-	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("audiocpu", m6808_cpu_device, irq_line))
+	MCFG_PIA_IRQA_HANDLER(INPUTLINE("audiocpu", M6808_IRQ_LINE))
+	MCFG_PIA_IRQB_HANDLER(INPUTLINE("audiocpu", M6808_IRQ_LINE))
 
 	/* Add the background music card */
 	MCFG_CPU_ADD("bgcpu", M6809E, 8000000) // MC68B09E
@@ -482,15 +471,14 @@ static MACHINE_CONFIG_START( s11, s11_state )
 	MCFG_YM2151_IRQ_HANDLER(WRITELINE(s11_state, ym2151_irq_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "bg", 0.50)
 
-	MCFG_DAC_ADD("dac1")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "bg", 0.50)
+	MCFG_SOUND_ADD("dac1", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "bg", 0.25)
 
 	MCFG_DEVICE_ADD("pia40", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(s11_state, pia40_pa_w))
+	MCFG_PIA_WRITEPA_HANDLER(DEVWRITE8("dac1", dac_byte_interface, write))
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(s11_state, pia40_pb_w))
 	MCFG_PIA_CB2_HANDLER(WRITELINE(s11_state, pia40_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("bgcpu", m6809e_device, firq_line))
-	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("bgcpu", m6809e_device, nmi_line))
+	MCFG_PIA_IRQA_HANDLER(INPUTLINE("bgcpu", M6809_FIRQ_LINE))
+	MCFG_PIA_IRQB_HANDLER(INPUTLINE("bgcpu", INPUT_LINE_NMI))
 MACHINE_CONFIG_END
 
 
@@ -499,9 +487,27 @@ MACHINE_CONFIG_END
 /-----------------------------*/
 ROM_START(grand_l4)
 	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("lzrd_u26.l4", 0x4000, 0x2000, CRC(5fe50db6) SHA1(7e2adfefce5c33ad605606574dbdfb2642aa0e85))
+	ROM_LOAD("lzrd_u26.l3", 0x4000, 0x2000, CRC(5fe50db6) SHA1(7e2adfefce5c33ad605606574dbdfb2642aa0e85))
 	ROM_RELOAD( 0x6000, 0x2000)
 	ROM_LOAD("lzrd_u27.l4", 0x8000, 0x8000, CRC(6462ca55) SHA1(0ebfa998d3cefc213ada9ed815d44977120e5d6d))
+	ROM_FILL(0x6035, 1, 0x00) // default to English
+
+	// according to the manual these should be 32K roms just like the other games here
+	ROM_REGION(0x20000, "audiocpu", ROMREGION_ERASEFF)
+	ROM_LOAD("lzrd_u21.l1", 0x1c000, 0x4000, CRC(98859d37) SHA1(08429b9e6a3b3007815373dc280b985e3441aa9f))
+	ROM_RELOAD( 0x18000, 0x4000)
+	ROM_LOAD("lzrd_u22.l1", 0x14000, 0x4000, CRC(4e782eba) SHA1(b44ab499128300175bdb57f07ffe2992c82e47e4))
+	ROM_RELOAD( 0x10000, 0x4000)
+
+	ROM_REGION(0x10000, "bgcpu", ROMREGION_ERASEFF)
+	ROM_LOAD("lzrd_u4.l1", 0x8000, 0x8000, CRC(4baafc11) SHA1(3507f5f37e02688fa56cf5bb303eaccdcedede06))
+ROM_END
+
+ROM_START(grand_l3)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("lzrd_u26.l3", 0x4000, 0x2000, CRC(5fe50db6) SHA1(7e2adfefce5c33ad605606574dbdfb2642aa0e85))
+	ROM_RELOAD( 0x6000, 0x2000)
+	ROM_LOAD("lzrd_u27.l3", 0x8000, 0x8000, CRC(9061dfdc) SHA1(06e0add721afa0a89ad4961cddbc5409f95362df))
 	ROM_FILL(0x6035, 1, 0x00) // default to English
 
 	// according to the manual these should be 32K roms just like the other games here
@@ -677,15 +683,16 @@ ROM_START(shfin_l1)
 ROM_END
 
 GAME( 1986, grand_l4, 0,        s11, s11, s11_state, s11, ROT0, "Williams", "Grand Lizard (L-4)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1986, hs_l4,    0,        s11, s11, s11_state, s11, ROT0, "Williams", "High Speed (L-4)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1986, hs_l3,    hs_l4,    s11, s11, s11_state, s11, ROT0, "Williams", "High Speed (L-3)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1986, rdkng_l4, 0,        s11, s11, s11_state, s11, ROT0, "Williams", "Road Kings (L-4)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1986, rdkng_l1, rdkng_l4, s11, s11, s11_state, s11, ROT0, "Williams", "Road Kings (L-1)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1986, rdkng_l2, rdkng_l4, s11, s11, s11_state, s11, ROT0, "Williams", "Road Kings (L-2)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1986, rdkng_l3, rdkng_l4, s11, s11, s11_state, s11, ROT0, "Williams", "Road Kings (L-3)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1986, grand_l3, grand_l4, s11, s11, s11_state, s11, ROT0, "Williams", "Grand Lizard (L-3)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1986, hs_l4,    0,        s11, s11, s11_state, s11, ROT0, "Williams", "High Speed (L-4)",   MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1986, hs_l3,    hs_l4,    s11, s11, s11_state, s11, ROT0, "Williams", "High Speed (L-3)",   MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1986, rdkng_l4, 0,        s11, s11, s11_state, s11, ROT0, "Williams", "Road Kings (L-4)",   MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1986, rdkng_l1, rdkng_l4, s11, s11, s11_state, s11, ROT0, "Williams", "Road Kings (L-1)",   MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1986, rdkng_l2, rdkng_l4, s11, s11, s11_state, s11, ROT0, "Williams", "Road Kings (L-2)",   MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1986, rdkng_l3, rdkng_l4, s11, s11, s11_state, s11, ROT0, "Williams", "Road Kings (L-3)",   MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
 
 GAME( 1986, tts_l2,   0,        s11, s11, s11_state, s11, ROT0, "Williams", "Tic-Tac-Strike (Shuffle) (L-2)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
 GAME( 1986, tts_l1,   tts_l2,   s11, s11, s11_state, s11, ROT0, "Williams", "Tic-Tac-Strike (Shuffle) (L-1)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-GAME( 1987, gmine_l2, 0,        s11, s11, s11_state, s11, ROT0, "Williams", "Gold Mine (Shuffle) (L-2)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1987, tdawg_l1, 0,        s11, s11, s11_state, s11, ROT0, "Williams", "Top Dawg (Shuffle) (L-1)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1987, shfin_l1, 0,        s11, s11, s11_state, s11, ROT0, "Williams", "Shuffle Inn (Shuffle) (L-1)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1987, gmine_l2, 0,        s11, s11, s11_state, s11, ROT0, "Williams", "Gold Mine (Shuffle) (L-2)",      MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1987, tdawg_l1, 0,        s11, s11, s11_state, s11, ROT0, "Williams", "Top Dawg (Shuffle) (L-1)",       MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1987, shfin_l1, 0,        s11, s11, s11_state, s11, ROT0, "Williams", "Shuffle Inn (Shuffle) (L-1)",    MACHINE_MECHANICAL | MACHINE_NOT_WORKING)

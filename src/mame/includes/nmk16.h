@@ -1,9 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:Mirko Buffoni,Nicola Salmoria,Bryan McPhail,David Haywood,R. Belmont,Alex Marshall,Angelo Salese,Luca Elia
 // thanks-to:Richard Bush
+
 #include "machine/nmk112.h"
 #include "sound/okim6295.h"
 #include "machine/nmk004.h"
+#include "machine/gen_latch.h"
+#include "machine/timer.h"
 
 class nmk16_state : public driver_device
 {
@@ -14,6 +17,10 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_oki1(*this, "oki1"),
 		m_oki2(*this, "oki2"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette"),
+		m_nmk004(*this, "nmk004"),
+		m_soundlatch(*this, "soundlatch"),
 		m_nmk_bgvideoram0(*this, "nmk_bgvideoram0"),
 		m_nmk_txvideoram(*this, "nmk_txvideoram"),
 		m_mainram(*this, "mainram"),
@@ -26,9 +33,6 @@ public:
 		m_nmk_bgvideoram3(*this, "nmk_bgvideoram3"),
 		m_afega_scroll_0(*this, "afega_scroll_0"),
 		m_afega_scroll_1(*this, "afega_scroll_1"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette"),
-		m_nmk004(*this, "nmk004"),
 		m_sprdma_base(0x8000)
 	{}
 
@@ -36,31 +40,35 @@ public:
 	optional_device<cpu_device> m_audiocpu;
 	optional_device<okim6295_device> m_oki1;
 	optional_device<okim6295_device> m_oki2;
-	required_shared_ptr<UINT16> m_nmk_bgvideoram0;
-	optional_shared_ptr<UINT16> m_nmk_txvideoram;
-	required_shared_ptr<UINT16> m_mainram;
-	optional_shared_ptr<UINT16> m_gunnail_scrollram;
-	optional_shared_ptr<UINT8> m_spriteram;
-	optional_shared_ptr<UINT16> m_nmk_fgvideoram;
-	optional_shared_ptr<UINT16> m_gunnail_scrollramy;
-	optional_shared_ptr<UINT16> m_nmk_bgvideoram1;
-	optional_shared_ptr<UINT16> m_nmk_bgvideoram2;
-	optional_shared_ptr<UINT16> m_nmk_bgvideoram3;
-	optional_shared_ptr<UINT16> m_afega_scroll_0;
-	optional_shared_ptr<UINT16> m_afega_scroll_1;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	optional_device<nmk004_device> m_nmk004;
+	optional_device<generic_latch_8_device> m_soundlatch;
+
+	required_shared_ptr<uint16_t> m_nmk_bgvideoram0;
+	optional_shared_ptr<uint16_t> m_nmk_txvideoram;
+	required_shared_ptr<uint16_t> m_mainram;
+	optional_shared_ptr<uint16_t> m_gunnail_scrollram;
+	optional_shared_ptr<uint8_t> m_spriteram;
+	optional_shared_ptr<uint16_t> m_nmk_fgvideoram;
+	optional_shared_ptr<uint16_t> m_gunnail_scrollramy;
+	optional_shared_ptr<uint16_t> m_nmk_bgvideoram1;
+	optional_shared_ptr<uint16_t> m_nmk_bgvideoram2;
+	optional_shared_ptr<uint16_t> m_nmk_bgvideoram3;
+	optional_shared_ptr<uint16_t> m_afega_scroll_0;
+	optional_shared_ptr<uint16_t> m_afega_scroll_1;
+
+
 	int m_sprdma_base;
 	int mask[4*2];
 	int m_simple_scroll;
 	int m_redraw_bitmap;
-	std::unique_ptr<UINT16[]> m_spriteram_old;
-	std::unique_ptr<UINT16[]> m_spriteram_old2;
+	std::unique_ptr<uint16_t[]> m_spriteram_old;
+	std::unique_ptr<uint16_t[]> m_spriteram_old2;
 	int m_bgbank;
 	int m_videoshift;
 	int m_bioship_background_bank;
-	UINT8 m_bioship_scroll[4];
+	uint8_t m_bioship_scroll[4];
 	tilemap_t *m_bg_tilemap0;
 	tilemap_t *m_bg_tilemap1;
 	tilemap_t *m_bg_tilemap2;
@@ -69,14 +77,14 @@ public:
 	tilemap_t *m_fg_tilemap;
 	std::unique_ptr<bitmap_ind16> m_background_bitmap;
 	int m_mustang_bg_xscroll;
-	UINT8 m_scroll[4];
-	UINT8 m_scroll_2[4];
-	UINT16 m_vscroll[4];
+	uint8_t m_scroll[4];
+	uint8_t m_scroll_2[4];
+	uint16_t m_vscroll[4];
 	int m_prot_count;
-	UINT8 m_input_pressed;
-	UINT8 m_start_helper;
-	UINT8 m_coin_count[2];
-	UINT8 m_coin_count_frac[2];
+	uint8_t m_input_pressed;
+	uint8_t m_start_helper;
+	uint8_t m_coin_count[2];
+	uint8_t m_coin_count_frac[2];
 	DECLARE_WRITE16_MEMBER(nmk16_mainram_strange_w);
 	DECLARE_WRITE16_MEMBER(ssmissin_sound_w);
 	DECLARE_WRITE8_MEMBER(ssmissin_soundbank_w);
@@ -151,26 +159,26 @@ public:
 	DECLARE_VIDEO_START(afega);
 	DECLARE_VIDEO_START(firehawk);
 	DECLARE_VIDEO_START(grdnstrm);
-	UINT32 screen_update_tharrier(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_manybloc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_macross(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_bioship(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_strahl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_gunnail(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_tdragon2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_bjtwin(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_afega(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_firehawk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_redhawki(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_redhawkb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_bubl2000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_tharrier(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_manybloc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_macross(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_bioship(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_strahl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_gunnail(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_tdragon2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_bjtwin(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_afega(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_firehawk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_redhawki(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_redhawkb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_bubl2000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(tdragon_mcu_sim);
 	TIMER_DEVICE_CALLBACK_MEMBER(hachamf_mcu_sim);
 	TIMER_DEVICE_CALLBACK_MEMBER(nmk16_scanline);
 	TIMER_DEVICE_CALLBACK_MEMBER(manybloc_scanline);
 	void nmk16_video_init();
-	inline void nmk16_draw_sprite(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16 *spr);
-	inline void nmk16_draw_sprite_flipsupported(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16 *spr);
+	inline void nmk16_draw_sprite(bitmap_ind16 &bitmap, const rectangle &cliprect, uint16_t *spr);
+	inline void nmk16_draw_sprite_flipsupported(bitmap_ind16 &bitmap, const rectangle &cliprect, uint16_t *spr);
 	void nmk16_draw_sprites_swap(bitmap_ind16 &bitmap, const rectangle &cliprect, int *bittbl);
 	void nmk16_draw_sprites_swap_flipsupported(bitmap_ind16 &bitmap, const rectangle &cliprect, int *bittbl);
 	void nmk16_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -185,11 +193,11 @@ public:
 	int nmk16_complexbg_sprswap_tx_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int bittbl[8]);
 	void video_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect,int dsw_flipscreen,int xoffset, int yoffset,int attr_mask);
 	void redhawki_video_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
-	void mcu_run(UINT8 dsw_setting);
-	UINT8 decode_byte(UINT8 src, const UINT8 *bitp);
-	UINT32 bjtwin_address_map_bg0(UINT32 addr);
-	UINT16 decode_word(UINT16 src, const UINT8 *bitp);
-	UINT32 bjtwin_address_map_sprites(UINT32 addr);
+	void mcu_run(uint8_t dsw_setting);
+	uint8_t decode_byte(uint8_t src, const uint8_t *bitp);
+	uint32_t bjtwin_address_map_bg0(uint32_t addr);
+	uint16_t decode_word(uint16_t src, const uint8_t *bitp);
+	uint32_t bjtwin_address_map_sprites(uint32_t addr);
 	void decode_gfx();
 	void decode_tdragonb();
 	void decode_ssmissin();

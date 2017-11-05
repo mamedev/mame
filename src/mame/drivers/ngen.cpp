@@ -62,20 +62,22 @@
 */
 
 #include "emu.h"
-#include "cpu/i86/i186.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/i386/i386.h"
-#include "video/mc6845.h"
-#include "machine/i8251.h"
+#include "cpu/i86/i186.h"
+#include "imagedev/harddriv.h"
 #include "machine/am9517a.h"
+#include "machine/clock.h"
+#include "machine/i8251.h"
+#include "machine/ngen_kb.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
-#include "machine/z80dart.h"
-#include "machine/wd_fdc.h"
 #include "machine/wd2010.h"
-#include "bus/rs232/rs232.h"
-#include "machine/ngen_kb.h"
-#include "machine/clock.h"
-#include "imagedev/harddriv.h"
+#include "machine/wd_fdc.h"
+#include "machine/z80dart.h"
+#include "video/mc6845.h"
+#include "screen.h"
+
 
 class ngen_state : public driver_device
 {
@@ -119,9 +121,9 @@ public:
 	DECLARE_WRITE8_MEMBER(dma_write_word);
 	MC6845_UPDATE_ROW(crtc_update_row);
 	// TODO: sort out what devices use which channels
-	DECLARE_READ8_MEMBER( dma_0_dack_r ) { UINT16 ret = 0xffff; m_dma_high_byte = ret & 0xff00; return ret; }
-	DECLARE_READ8_MEMBER( dma_1_dack_r ) { UINT16 ret = 0xffff; m_dma_high_byte = ret & 0xff00; return ret; }
-	DECLARE_READ8_MEMBER( dma_2_dack_r ) { UINT16 ret = 0xffff; m_dma_high_byte = ret & 0xff00; return ret; }
+	DECLARE_READ8_MEMBER( dma_0_dack_r ) { uint16_t ret = 0xffff; m_dma_high_byte = ret & 0xff00; return ret; }
+	DECLARE_READ8_MEMBER( dma_1_dack_r ) { uint16_t ret = 0xffff; m_dma_high_byte = ret & 0xff00; return ret; }
+	DECLARE_READ8_MEMBER( dma_2_dack_r ) { uint16_t ret = 0xffff; m_dma_high_byte = ret & 0xff00; return ret; }
 	DECLARE_READ8_MEMBER( dma_3_dack_r );
 	DECLARE_WRITE8_MEMBER( dma_0_dack_w ){ popmessage("IOW0: data %02x",data); }
 	DECLARE_WRITE8_MEMBER( dma_1_dack_w ){  }
@@ -159,28 +161,28 @@ private:
 	optional_memory_region m_disk_rom;
 	memory_array m_vram;
 	memory_array m_fontram;
-	optional_device<wd2797_t> m_fdc;
+	optional_device<wd2797_device> m_fdc;
 	optional_device<floppy_connector> m_fd0;
 	optional_device<pit8253_device> m_fdc_timer;
 	optional_device<wd2010_device> m_hdc;
 	optional_device<pit8253_device> m_hdc_timer;
-	optional_shared_ptr<UINT8> m_hd_buffer;
+	optional_shared_ptr<uint8_t> m_hd_buffer;
 
 	void set_dma_channel(int channel, int state);
 
-	UINT8 m_xbus_current;  // currently selected X-Bus module
-	UINT16 m_peripheral;
-	UINT16 m_upper;
-	UINT16 m_middle;
-	UINT16 m_port00;
-	UINT16 m_periph141;
-	UINT8 m_dma_offset[4];
-	INT8 m_dma_channel;
-	UINT16 m_dma_high_byte;
-	UINT16 m_control;
-	UINT16 m_disk_rom_ptr;
-	UINT8 m_hdc_control;
-	UINT8 m_disk_page;
+	uint8_t m_xbus_current;  // currently selected X-Bus module
+	uint16_t m_peripheral;
+	uint16_t m_upper;
+	uint16_t m_middle;
+	uint16_t m_port00;
+	uint16_t m_periph141;
+	uint8_t m_dma_offset[4];
+	int8_t m_dma_channel;
+	uint16_t m_dma_high_byte;
+	uint16_t m_control;
+	uint16_t m_disk_rom_ptr;
+	uint8_t m_hdc_control;
+	uint8_t m_disk_page;
 };
 
 class ngen386_state : public ngen_state
@@ -233,7 +235,7 @@ WRITE_LINE_MEMBER(ngen_state::timer_clk_out)
 
 WRITE16_MEMBER(ngen_state::cpu_peripheral_cb)
 {
-	UINT32 addr;
+	uint32_t addr;
 
 	switch(offset)
 	{
@@ -283,32 +285,32 @@ WRITE16_MEMBER(ngen_state::peripheral_w)
 	case 0x0d:
 	case 0x0e:
 	case 0x0f:
-		if(mem_mask & 0x00ff)
+		if(ACCESSING_BITS_0_7)
 			m_dmac->write(space,offset,data & 0xff);
 		break;
 	case 0x80: // DMA page offset?
 	case 0x81:
 	case 0x82:
 	case 0x83:
-		if(mem_mask & 0x00ff)
+		if(ACCESSING_BITS_0_7)
 			m_dma_offset[offset-0x80] = data & 0xff;
 		break;
 	case 0xc0:  // X-Bus modules reset
 		m_xbus_current = 0;
 		break;
 	case 0x10c:
-		if(mem_mask & 0x00ff)
+		if(ACCESSING_BITS_0_7)
 			m_pic->write(space,0,data & 0xff);
 		break;
 	case 0x10d:
-		if(mem_mask & 0x00ff)
+		if(ACCESSING_BITS_0_7)
 			m_pic->write(space,1,data & 0xff);
 		break;
 	case 0x110:
 	case 0x111:
 	case 0x112:
 	case 0x113:
-		if(mem_mask & 0x00ff)
+		if(ACCESSING_BITS_0_7)
 			m_pit->write(space,offset-0x110,data & 0xff);
 		break;
 	case 0x141:
@@ -316,19 +318,19 @@ WRITE16_MEMBER(ngen_state::peripheral_w)
 		COMBINE_DATA(&m_periph141);
 		break;
 	case 0x144:
-		if(mem_mask & 0x00ff)
+		if(ACCESSING_BITS_0_7)
 			m_crtc->address_w(space,0,data & 0xff);
 		break;
 	case 0x145:
-		if(mem_mask & 0x00ff)
+		if(ACCESSING_BITS_0_7)
 			m_crtc->register_w(space,0,data & 0xff);
 		break;
 	case 0x146:
-		if(mem_mask & 0x00ff)
+		if(ACCESSING_BITS_0_7)
 			m_viduart->data_w(space,0,data & 0xff);
 		break;
 	case 0x147:
-		if(mem_mask & 0x00ff)
+		if(ACCESSING_BITS_0_7)
 			m_viduart->control_w(space,0,data & 0xff);
 		break;
 	case 0x1a0:  // serial?
@@ -341,7 +343,7 @@ WRITE16_MEMBER(ngen_state::peripheral_w)
 
 READ16_MEMBER(ngen_state::peripheral_r)
 {
-	UINT16 ret = 0xffff;
+	uint16_t ret = 0xffff;
 	switch(offset)
 	{
 	case 0x00:
@@ -360,7 +362,7 @@ READ16_MEMBER(ngen_state::peripheral_r)
 	case 0x0d:
 	case 0x0e:
 	case 0x0f:
-		if(mem_mask & 0x00ff)
+		if(ACCESSING_BITS_0_7)
 			ret = m_dmac->read(space,offset);
 		logerror("DMA read offset %04x mask %04x returning %04x\n",offset,mem_mask,ret);
 		break;
@@ -368,42 +370,42 @@ READ16_MEMBER(ngen_state::peripheral_r)
 	case 0x81:
 	case 0x82:
 	case 0x83:
-		if(mem_mask & 0x00ff)
+		if(ACCESSING_BITS_0_7)
 			ret = m_dma_offset[offset-0x80] & 0xff;
 		break;
 	case 0x10c:
-		if(mem_mask & 0x00ff)
+		if(ACCESSING_BITS_0_7)
 			ret = m_pic->read(space,0);
 		break;
 	case 0x10d:
-		if(mem_mask & 0x00ff)
+		if(ACCESSING_BITS_0_7)
 			ret = m_pic->read(space,1);
 		break;
 	case 0x110:
 	case 0x111:
 	case 0x112:
 	case 0x113:
-		if(mem_mask & 0x00ff)
+		if(ACCESSING_BITS_0_7)
 			ret = m_pit->read(space,offset-0x110);
 		break;
 	case 0x141:
 		ret = m_periph141;
 		break;
 	case 0x144:
-		if(mem_mask & 0x00ff)
+		if(ACCESSING_BITS_0_7)
 			ret = m_crtc->status_r(space,0);
 		break;
 	case 0x145:
-		if(mem_mask & 0x00ff)
+		if(ACCESSING_BITS_0_7)
 			ret = m_crtc->register_r(space,0);
 		break;
 	case 0x146:
-		if(mem_mask & 0x00ff)
+		if(ACCESSING_BITS_0_7)
 			ret = m_viduart->data_r(space,0);
 		break;
 	case 0x147:  // keyboard UART
 		// expects bit 0 to be set (UART transmit ready)
-		if(mem_mask & 0x00ff)
+		if(ACCESSING_BITS_0_7)
 			ret = m_viduart->status_r(space,0);
 		break;
 	case 0x1a0:  // I/O control register?
@@ -422,7 +424,7 @@ READ16_MEMBER(ngen_state::peripheral_r)
 // TODO: make expansion modules slot devices
 WRITE16_MEMBER(ngen_state::xbus_w)
 {
-	UINT16 addr = (data & 0x00ff) << 8;
+	uint16_t addr = (data & 0x00ff) << 8;
 	cpu_device* cpu;
 
 	if(m_maincpu)
@@ -451,7 +453,7 @@ WRITE16_MEMBER(ngen_state::xbus_w)
 //  0x3141 - QIC Tape module
 READ16_MEMBER(ngen_state::xbus_r)
 {
-	UINT16 ret = 0xffff;
+	uint16_t ret = 0xffff;
 
 	switch(m_xbus_current)
 	{
@@ -478,11 +480,11 @@ WRITE16_MEMBER(ngen_state::hfd_w)
 		case 0x00:
 		case 0x01:
 		case 0x02:
-			if(mem_mask & 0x00ff)
+			if(ACCESSING_BITS_0_7)
 				m_fdc->write(space,offset,data & 0xff);
 			break;
 		case 0x03:
-			if(mem_mask & 0x00ff)
+			if(ACCESSING_BITS_0_7)
 			{
 				m_fdc->write(space,offset,data & 0xff);
 				m_fdc_timer->write_clk0(1);
@@ -490,22 +492,22 @@ WRITE16_MEMBER(ngen_state::hfd_w)
 			}
 			break;
 		case 0x04:
-			if(mem_mask & 0x00ff)
+			if(ACCESSING_BITS_0_7)
 				fdc_control_w(space,0,data & 0xff);
 			break;
 		case 0x05:
-			if(mem_mask & 0x00ff)
+			if(ACCESSING_BITS_0_7)
 				hdc_control_w(space,0,data & 0xff);
 			break;
 		case 0x07:
-			if(mem_mask & 0x00ff)
+			if(ACCESSING_BITS_0_7)
 				disk_addr_ext(space,0,data & 0xff);
 			break;
 		case 0x08:
 		case 0x09:
 		case 0x0a:
 		case 0x0b:
-			if(mem_mask & 0x00ff)
+			if(ACCESSING_BITS_0_7)
 				m_fdc_timer->write(space,offset-0x08,data & 0xff);
 			break;
 		case 0x10:
@@ -516,7 +518,7 @@ WRITE16_MEMBER(ngen_state::hfd_w)
 		case 0x15:
 		case 0x16:
 		case 0x17:
-			if(mem_mask & 0x00ff)
+			if(ACCESSING_BITS_0_7)
 				m_hdc->write(space,offset-0x10,data & 0xff);
 			logerror("WD1010 register %i write %02x mask %04x\n",offset-0x10,data & 0xff,mem_mask);
 			break;
@@ -524,7 +526,7 @@ WRITE16_MEMBER(ngen_state::hfd_w)
 		case 0x19:
 		case 0x1a:
 		case 0x1b:
-			if(mem_mask & 0x00ff)
+			if(ACCESSING_BITS_0_7)
 				m_hdc_timer->write(space,offset-0x18,data & 0xff);
 			break;
 	}
@@ -532,18 +534,18 @@ WRITE16_MEMBER(ngen_state::hfd_w)
 
 READ16_MEMBER(ngen_state::hfd_r)
 {
-	UINT16 ret = 0xffff;
+	uint16_t ret = 0xffff;
 
 	switch(offset)
 	{
 		case 0x00:
 		case 0x01:
 		case 0x02:
-			if(mem_mask & 0x00ff)
+			if(ACCESSING_BITS_0_7)
 				ret = m_fdc->read(space,offset);
 			break;
 		case 0x03:
-			if(mem_mask & 0x00ff)
+			if(ACCESSING_BITS_0_7)
 			{
 				ret = m_fdc->read(space,offset);
 				m_fdc_timer->write_clk0(1);
@@ -554,7 +556,7 @@ READ16_MEMBER(ngen_state::hfd_r)
 		case 0x09:
 		case 0x0a:
 		case 0x0b:
-			if(mem_mask & 0x00ff)
+			if(ACCESSING_BITS_0_7)
 				ret = m_fdc_timer->read(space,offset-0x08);
 			break;
 		case 0x10:
@@ -565,7 +567,7 @@ READ16_MEMBER(ngen_state::hfd_r)
 		case 0x15:
 		case 0x16:
 		case 0x17:
-			if(mem_mask & 0x00ff)
+			if(ACCESSING_BITS_0_7)
 				ret = m_hdc->read(space,offset-0x10);
 			logerror("WD1010 register %i read, mask %04x\n",offset-0x10,mem_mask);
 			break;
@@ -573,7 +575,7 @@ READ16_MEMBER(ngen_state::hfd_r)
 		case 0x19:
 		case 0x1a:
 		case 0x1b:
-			if(mem_mask & 0x00ff)
+			if(ACCESSING_BITS_0_7)
 				ret = m_hdc_timer->read(space,offset-0x18);
 			break;
 	}
@@ -684,7 +686,7 @@ WRITE_LINE_MEMBER( ngen_state::dack3_w ) { set_dma_channel(3, state); }
 
 READ8_MEMBER(ngen_state::dma_3_dack_r)
 {
-	UINT16 ret = 0xffff;
+	uint16_t ret = 0xffff;
 
 	if((m_hdc_control & 0x04) && m_disk_rom)
 	{
@@ -703,7 +705,7 @@ READ8_MEMBER(ngen_state::dma_3_dack_r)
 READ8_MEMBER(ngen_state::dma_read_word)
 {
 	cpu_device* cpu;
-	UINT16 result;
+	uint16_t result;
 
 	if(m_maincpu)
 		cpu = m_maincpu;
@@ -713,11 +715,11 @@ READ8_MEMBER(ngen_state::dma_read_word)
 
 	if(m_dma_channel == -1)
 		return 0xff;
-	offs_t page_offset = (((offs_t) m_dma_offset[m_dma_channel]) << 16) & 0xFE0000;
+	offs_t page_offset = ((offs_t) m_dma_offset[m_dma_channel]) << 16;
 
-	result = prog_space.read_word(page_offset + (offset << 1));
+	result = prog_space.read_word((page_offset & 0xfe0000) | (offset << 1));
 	m_dma_high_byte = result & 0xFF00;
-	popmessage("DMA byte address %06x read %04x\n",page_offset+(offset<<1),result);
+	popmessage("DMA byte address %06x read %04x\n", (page_offset & 0xfe0000) | (offset << 1),result);
 	return result & 0xff;
 }
 
@@ -734,20 +736,20 @@ WRITE8_MEMBER(ngen_state::dma_write_word)
 
 	if(m_dma_channel == -1)
 		return;
-	offs_t page_offset = (((offs_t) m_dma_offset[m_dma_channel]) << 16) & 0xFE0000;
+	offs_t page_offset = ((offs_t) m_dma_offset[m_dma_channel]) << 16;
 
-	prog_space.write_word(page_offset + (offset << 1), data);
-	popmessage("DMA byte address %06x write %04x\n",page_offset+(offset<<1), m_dma_high_byte | data);
+	prog_space.write_word((page_offset & 0xfe0000) | (offset << 1), data);
+	popmessage("DMA byte address %06x write %04x\n", (page_offset & 0xfe0000) | (offset << 1), m_dma_high_byte | data);
 }
 
 
 MC6845_UPDATE_ROW( ngen_state::crtc_update_row )
 {
-	UINT16 addr = ma;
+	uint16_t addr = ma;
 
 	for(int x=0;x<bitmap.width();x+=9)
 	{
-		UINT8 ch = m_vram.read16(addr++) & 0xff;
+		uint8_t ch = m_vram.read16(addr++) & 0xff;
 		for(int z=0;z<9;z++)
 		{
 			if(BIT(m_fontram.read16(ch*16+ra),8-z))
@@ -765,16 +767,16 @@ READ8_MEMBER( ngen_state::irq_cb )
 
 READ16_MEMBER( ngen_state::b38_keyboard_r )
 {
-	UINT8 ret = 0;
+	uint8_t ret = 0;
 	switch(offset)
 	{
 	case 0:
-		if(mem_mask & 0x00ff)
+		if(ACCESSING_BITS_0_7)
 			ret = m_viduart->data_r(space,0);
 		break;
 	case 1:  // keyboard UART
 		// expects bit 0 to be set (UART transmit ready)
-		if(mem_mask & 0x00ff)
+		if(ACCESSING_BITS_0_7)
 			ret = m_viduart->status_r(space,0);
 		break;
 	}
@@ -786,11 +788,11 @@ WRITE16_MEMBER( ngen_state::b38_keyboard_w )
 	switch(offset)
 	{
 	case 0:
-		if(mem_mask & 0x00ff)
+		if(ACCESSING_BITS_0_7)
 			m_viduart->data_w(space,0,data & 0xff);
 		break;
 	case 1:
-		if(mem_mask & 0x00ff)
+		if(ACCESSING_BITS_0_7)
 			m_viduart->control_w(space,0,data & 0xff);
 		break;
 	}
@@ -798,15 +800,15 @@ WRITE16_MEMBER( ngen_state::b38_keyboard_w )
 
 READ16_MEMBER( ngen_state::b38_crtc_r )
 {
-	UINT8 ret = 0;
+	uint8_t ret = 0;
 	switch(offset)
 	{
 	case 0:
-		if(mem_mask & 0x00ff)
+		if(ACCESSING_BITS_0_7)
 			ret = m_crtc->register_r(space,0);
 		break;
 	case 1:
-		if(mem_mask & 0x00ff)
+		if(ACCESSING_BITS_0_7)
 			ret = m_viduart->data_r(space,0);
 		break;
 	}
@@ -818,11 +820,11 @@ WRITE16_MEMBER( ngen_state::b38_crtc_w )
 	switch(offset)
 	{
 	case 0:
-		if(mem_mask & 0x00ff)
+		if(ACCESSING_BITS_0_7)
 			m_crtc->address_w(space,0,data & 0xff);
 		break;
 	case 1:
-		if(mem_mask & 0x00ff)
+		if(ACCESSING_BITS_0_7)
 			m_crtc->register_w(space,0,data & 0xff);
 		break;
 	}
@@ -909,7 +911,7 @@ static SLOT_INTERFACE_START( ngen_floppies )
 	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( ngen, ngen_state )
+static MACHINE_CONFIG_START( ngen )
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", I80186, XTAL_16MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(ngen_mem)
@@ -918,7 +920,8 @@ static MACHINE_CONFIG_START( ngen, ngen_state )
 	MCFG_80186_TMROUT0_HANDLER(WRITELINE(ngen_state, cpu_timer_w))
 	MCFG_80186_IRQ_SLAVE_ACK(READ8(ngen_state, irq_cb))
 
-	MCFG_PIC8259_ADD( "pic", DEVWRITELINE("maincpu",i80186_cpu_device,int0_w), VCC, NOOP)
+	MCFG_DEVICE_ADD("pic", PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(DEVWRITELINE("maincpu", i80186_cpu_device, int0_w))
 
 	MCFG_DEVICE_ADD("pit", PIT8254, 0)
 	MCFG_PIT8253_CLK0(78120/4)  // 19.53kHz, /4 of the CPU timer output?
@@ -947,7 +950,7 @@ static MACHINE_CONFIG_START( ngen, ngen_state )
 	MCFG_I8237_OUT_IOW_3_CB(WRITE8(ngen_state, dma_3_dack_w))
 
 	// I/O board
-	MCFG_UPD7201_ADD("iouart",0,0,0,0,0) // clocked by PIT channel 2?
+	MCFG_DEVICE_ADD("iouart", UPD7201, 0) // clocked by PIT channel 2?
 	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE("rs232_a", rs232_port_device, write_txd))
 	MCFG_Z80DART_OUT_TXDB_CB(DEVWRITELINE("rs232_b", rs232_port_device, write_txd))
 	MCFG_Z80DART_OUT_DTRA_CB(DEVWRITELINE("rs232_a", rs232_port_device, write_dtr))
@@ -1022,13 +1025,14 @@ static MACHINE_CONFIG_START( ngen, ngen_state )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( ngen386, ngen386_state )
+static MACHINE_CONFIG_START( ngen386 )
 	MCFG_CPU_ADD("i386cpu", I386, XTAL_50MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(ngen386_mem)
 	MCFG_CPU_IO_MAP(ngen386_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic", pic8259_device, inta_cb)
 
-	MCFG_PIC8259_ADD( "pic", INPUTLINE("i386cpu",0), VCC, NOOP)
+	MCFG_DEVICE_ADD("pic", PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("i386cpu", 0))
 
 	MCFG_DEVICE_ADD("pit", PIT8254, 0)
 	MCFG_PIT8253_CLK0(78120/4)  // 19.53kHz, /4 of the CPU timer output?
@@ -1057,7 +1061,7 @@ static MACHINE_CONFIG_START( ngen386, ngen386_state )
 	MCFG_I8237_OUT_IOW_3_CB(WRITE8(ngen_state, dma_3_dack_w))
 
 	// I/O board
-	MCFG_UPD7201_ADD("iouart",0,0,0,0,0) // clocked by PIT channel 2?
+	MCFG_DEVICE_ADD("iouart", UPD7201, 0) // clocked by PIT channel 2?
 	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE("rs232_a", rs232_port_device, write_txd))
 	MCFG_Z80DART_OUT_TXDB_CB(DEVWRITELINE("rs232_b", rs232_port_device, write_txd))
 	MCFG_Z80DART_OUT_DTRA_CB(DEVWRITELINE("rs232_a", rs232_port_device, write_dtr))
@@ -1174,6 +1178,6 @@ ROM_START( 386i )
 ROM_END
 
 
-COMP( 1983, ngen,    0,      0,      ngen,           ngen, driver_device, 0,      "Convergent Technologies",  "NGEN CP-001", MACHINE_IS_SKELETON | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1991, ngenb38, ngen,   0,      ngen386,        ngen, driver_device, 0,      "Financial Products Corp.", "B28/38",      MACHINE_IS_SKELETON | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1990, 386i,    ngen,   0,      386i,           ngen, driver_device, 0,      "Convergent Technologies",  "386i",        MACHINE_IS_SKELETON | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1983, ngen,    0,      0,      ngen,           ngen, ngen_state,    0,      "Convergent Technologies",  "NGEN CP-001", MACHINE_IS_SKELETON )
+COMP( 1991, ngenb38, ngen,   0,      ngen386,        ngen, ngen386_state, 0,      "Financial Products Corp.", "B28/38",      MACHINE_IS_SKELETON )
+COMP( 1990, 386i,    ngen,   0,      386i,           ngen, ngen386_state, 0,      "Convergent Technologies",  "386i",        MACHINE_IS_SKELETON )

@@ -10,14 +10,16 @@
     February 2012: Rewritten as class
 
 ***************************************************************************/
-#ifndef __TMC0430__
-#define __TMC0430__
+#ifndef MAME_MACHINE_TMC0430_H
+#define MAME_MACHINE_TMC0430_H
+
+#pragma once
 
 extern const device_type TMC0430;
 
 #ifndef READ8Z_MEMBER
-#define DECLARE_READ8Z_MEMBER(name)     void name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT8 *value, ATTR_UNUSED UINT8 mem_mask = 0xff)
-#define READ8Z_MEMBER(name)             void name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT8 *value, ATTR_UNUSED UINT8 mem_mask)
+#define DECLARE_READ8Z_MEMBER(name)     void name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED uint8_t *value, ATTR_UNUSED uint8_t mem_mask = 0xff)
+#define READ8Z_MEMBER(name)             void name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED uint8_t *value, ATTR_UNUSED uint8_t mem_mask)
 #endif
 
 enum
@@ -29,9 +31,9 @@ enum
 class tmc0430_device : public device_t
 {
 public:
-	tmc0430_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tmc0430_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &set_ready_wr_callback(device_t &device, _Object object) { return downcast<tmc0430_device &>(device).m_gromready.set_callback(object); }
+	template <class Object> static devcb_base &set_ready_wr_callback(device_t &device, Object &&cb) { return downcast<tmc0430_device &>(device).m_gromready.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8Z_MEMBER(readz);
 	DECLARE_WRITE8_MEMBER(write);
@@ -53,16 +55,19 @@ public:
 
 	int debug_get_address();
 
+	// Allow for checking the state of the GROM so we can turn off the clock
+	bool idle() { return (m_phase == 0 && m_current_clock_level==CLEAR_LINE); }
+
 protected:
-	void device_start(void) override;
-	void device_reset(void) override;
+	void device_start() override;
+	void device_reset() override;
 
 private:
 	// Ready callback. This line is usually connected to the READY pin of the CPU.
 	devcb_write_line   m_gromready;
 
 	// Clock line level
-	line_state m_current_clock_level;
+	int m_current_clock_level;
 
 	// Currently active GROM ident
 	int m_current_ident;
@@ -94,18 +99,18 @@ private:
 
 	// The address pointer is always expected to be in the range 0x0000 - 0xffff, even
 	// when this GROM is not addressed.
-	UINT16 m_address;
+	uint16_t m_address;
 
 	/* GROM data buffer. */
-	UINT8 m_buffer;
+	uint8_t m_buffer;
 
 	/* Pointer to the memory region contained in this GROM. */
-	UINT8 *m_memptr;
+	uint8_t *m_memptr;
 };
 
 #define MCFG_GROM_ADD(_tag, _ident, _region, _offset, _ready)    \
-	MCFG_DEVICE_ADD(_tag, TMC0430, 0)  \
-	tmc0430_device::set_region_and_ident(*device, _region, _offset, _ident); \
-	tmc0430_device::set_ready_wr_callback(*device, DEVCB_##_ready);
+		MCFG_DEVICE_ADD(_tag, TMC0430, 0)  \
+		tmc0430_device::set_region_and_ident(*device, _region, _offset, _ident); \
+		tmc0430_device::set_ready_wr_callback(*device, DEVCB_##_ready);
 
-#endif
+#endif // MAME_MACHINE_TMC0430_H

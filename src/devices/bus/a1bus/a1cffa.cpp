@@ -8,6 +8,7 @@
 
 *********************************************************************/
 
+#include "emu.h"
 #include "a1cffa.h"
 
 /***************************************************************************
@@ -21,11 +22,7 @@
 #define CFFA_ROM_REGION "cffa_rom"
 #define CFFA_ATA_TAG    "cffa_ata"
 
-const device_type A1BUS_CFFA = &device_creator<a1bus_cffa_device>;
-
-MACHINE_CONFIG_FRAGMENT( cffa )
-	MCFG_ATA_INTERFACE_ADD(CFFA_ATA_TAG, ata_devices, "hdd", nullptr, false)
-MACHINE_CONFIG_END
+DEFINE_DEVICE_TYPE(A1BUS_CFFA, a1bus_cffa_device, "cffa1", "CFFA Compact Flash for Apple I")
 
 ROM_START( cffa )
 	ROM_REGION(0x2000, CFFA_ROM_REGION, 0)
@@ -33,16 +30,14 @@ ROM_START( cffa )
 ROM_END
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor a1bus_cffa_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( cffa );
-}
+MACHINE_CONFIG_MEMBER( a1bus_cffa_device::device_add_mconfig )
+	MCFG_ATA_INTERFACE_ADD(CFFA_ATA_TAG, ata_devices, "hdd", nullptr, false)
+MACHINE_CONFIG_END
 
-const rom_entry *a1bus_cffa_device::device_rom_region() const
+const tiny_rom_entry *a1bus_cffa_device::device_rom_region() const
 {
 	return ROM_NAME( cffa );
 }
@@ -51,17 +46,18 @@ const rom_entry *a1bus_cffa_device::device_rom_region() const
 //  LIVE DEVICE
 //**************************************************************************
 
-a1bus_cffa_device::a1bus_cffa_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-		device_t(mconfig, A1BUS_CFFA, "CFFA Compact Flash for Apple I", tag, owner, clock, "cffa1", __FILE__),
-		device_a1bus_card_interface(mconfig, *this),
-		m_ata(*this, CFFA_ATA_TAG), m_rom(nullptr), m_lastdata(0), m_writeprotect(false)
+a1bus_cffa_device::a1bus_cffa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: a1bus_cffa_device(mconfig, A1BUS_CFFA, tag, owner, clock)
 {
 }
 
-a1bus_cffa_device::a1bus_cffa_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
-		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		device_a1bus_card_interface(mconfig, *this),
-		m_ata(*this, CFFA_ATA_TAG), m_rom(nullptr), m_lastdata(0), m_writeprotect(false)
+a1bus_cffa_device::a1bus_cffa_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
+	, device_a1bus_card_interface(mconfig, *this)
+	, m_ata(*this, CFFA_ATA_TAG)
+	, m_rom(nullptr)
+	, m_lastdata(0)
+	, m_writeprotect(false)
 {
 }
 
@@ -76,7 +72,7 @@ void a1bus_cffa_device::device_start()
 	m_rom = device().machine().root_device().memregion(this->subtag(CFFA_ROM_REGION).c_str())->base();
 
 	install_device(0xafe0, 0xafff, read8_delegate(FUNC(a1bus_cffa_device::cffa_r), this), write8_delegate(FUNC(a1bus_cffa_device::cffa_w), this));
-	install_bank(0x9000, 0xafdf, 0, 0, (char *)"bank_cffa1", m_rom);
+	install_bank(0x9000, 0xafdf, (char *)"bank_cffa1", m_rom);
 
 	save_item(NAME(m_lastdata));
 	save_item(NAME(m_writeprotect));

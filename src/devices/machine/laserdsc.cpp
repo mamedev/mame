@@ -31,21 +31,21 @@
 //**************************************************************************
 
 // these specs code from IEC 60857, for NTSC players
-const UINT32 LEAD_IN_MIN_RADIUS_IN_UM = 53500;      // 53.5 mm
-const UINT32 PROGRAM_MIN_RADIUS_IN_UM = 55000;      // 55 mm
-const UINT32 PROGRAM_MAX_RADIUS_IN_UM = 145000;     // 145 mm
-const UINT32 LEAD_OUT_MIN_SIZE_IN_UM = 2000;        // 2 mm
+const uint32_t LEAD_IN_MIN_RADIUS_IN_UM = 53500;      // 53.5 mm
+const uint32_t PROGRAM_MIN_RADIUS_IN_UM = 55000;      // 55 mm
+const uint32_t PROGRAM_MAX_RADIUS_IN_UM = 145000;     // 145 mm
+const uint32_t LEAD_OUT_MIN_SIZE_IN_UM = 2000;        // 2 mm
 
 // the track pitch is defined as a range; we pick a nominal pitch
 // that ensures we can fit 54,000 tracks
-//const UINT32 MIN_TRACK_PITCH_IN_NM = 1400;          // 1.4 um
-//const UINT32 MAX_TRACK_PITCH_IN_NM = 2000;          // 2 um
-const UINT32 NOMINAL_TRACK_PITCH_IN_NM = (PROGRAM_MAX_RADIUS_IN_UM - PROGRAM_MIN_RADIUS_IN_UM) * 1000 / 54000;
+//const uint32_t MIN_TRACK_PITCH_IN_NM = 1400;          // 1.4 um
+//const uint32_t MAX_TRACK_PITCH_IN_NM = 2000;          // 2 um
+const uint32_t NOMINAL_TRACK_PITCH_IN_NM = (PROGRAM_MAX_RADIUS_IN_UM - PROGRAM_MIN_RADIUS_IN_UM) * 1000 / 54000;
 
 // we simulate extra lead-in and lead-out tracks
-const UINT32 VIRTUAL_LEAD_IN_TRACKS = (PROGRAM_MIN_RADIUS_IN_UM - LEAD_IN_MIN_RADIUS_IN_UM) * 1000 / NOMINAL_TRACK_PITCH_IN_NM;
-const UINT32 MAX_TOTAL_TRACKS = 54000;
-const UINT32 VIRTUAL_LEAD_OUT_TRACKS = LEAD_OUT_MIN_SIZE_IN_UM * 1000 / NOMINAL_TRACK_PITCH_IN_NM;
+const uint32_t VIRTUAL_LEAD_IN_TRACKS = (PROGRAM_MIN_RADIUS_IN_UM - LEAD_IN_MIN_RADIUS_IN_UM) * 1000 / NOMINAL_TRACK_PITCH_IN_NM;
+const uint32_t MAX_TOTAL_TRACKS = 54000;
+const uint32_t VIRTUAL_LEAD_OUT_TRACKS = LEAD_OUT_MIN_SIZE_IN_UM * 1000 / NOMINAL_TRACK_PITCH_IN_NM;
 
 
 
@@ -57,8 +57,8 @@ const UINT32 VIRTUAL_LEAD_OUT_TRACKS = LEAD_OUT_MIN_SIZE_IN_UM * 1000 / NOMINAL_
 //  laserdisc_device - constructor
 //-------------------------------------------------
 
-laserdisc_device::laserdisc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+laserdisc_device::laserdisc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
 		device_video_interface(mconfig, *this),
 		m_overwidth(0),
@@ -92,7 +92,7 @@ laserdisc_device::laserdisc_device(const machine_config &mconfig, device_type ty
 		m_overenable(false),
 		m_overindex(0),
 		m_overtex(nullptr),
-		m_overlay_palette(*this)
+		m_overlay_palette(*this, finder_base::DUMMY_TAG)
 {
 	// initialize overlay_config
 	m_orig_config.m_overposx = m_orig_config.m_overposy = 0.0f;
@@ -121,7 +121,7 @@ laserdisc_device::~laserdisc_device()
 //  read from the disc
 //-------------------------------------------------
 
-UINT32 laserdisc_device::get_field_code(laserdisc_field_code code, bool zero_if_squelched)
+uint32_t laserdisc_device::get_field_code(laserdisc_field_code code, bool zero_if_squelched)
 {
 	// return nothing if the video is off (external devices can't sense)
 	if (zero_if_squelched && m_videosquelch)
@@ -152,7 +152,7 @@ UINT32 laserdisc_device::get_field_code(laserdisc_field_code code, bool zero_if_
 //  screen_update - handle updating the screen
 //-------------------------------------------------
 
-UINT32 laserdisc_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t laserdisc_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	// handle the overlay if present
 	screen_bitmap &overbitmap = m_overbitmap[m_overindex];
@@ -162,7 +162,7 @@ UINT32 laserdisc_device::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 		rectangle clip(m_overclip);
 		clip.min_y = cliprect.min_y * overbitmap.height() / bitmap.height();
 		if (cliprect.min_y == screen.visible_area().min_y)
-			clip.min_y = MIN(clip.min_y, m_overclip.min_y);
+			clip.min_y = std::min(clip.min_y, m_overclip.min_y);
 		clip.max_y = (cliprect.max_y + 1) * overbitmap.height() / bitmap.height() - 1;
 
 		// call the update callback
@@ -212,9 +212,9 @@ UINT32 laserdisc_device::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 //  delegate
 //-------------------------------------------------
 
-void laserdisc_device::static_set_get_disc(device_t &device, laserdisc_get_disc_delegate callback)
+void laserdisc_device::static_set_get_disc(device_t &device, get_disc_delegate &&callback)
 {
-	downcast<laserdisc_device &>(device).m_getdisc_callback = callback;
+	downcast<laserdisc_device &>(device).m_getdisc_callback = std::move(callback);
 }
 
 
@@ -223,9 +223,9 @@ void laserdisc_device::static_set_get_disc(device_t &device, laserdisc_get_disc_
 //  delegate
 //-------------------------------------------------
 
-void laserdisc_device::static_set_audio(device_t &device, laserdisc_audio_delegate callback)
+void laserdisc_device::static_set_audio(device_t &device, audio_delegate &&callback)
 {
-	downcast<laserdisc_device &>(device).m_audio_callback = callback;
+	downcast<laserdisc_device &>(device).m_audio_callback = std::move(callback);
 }
 
 
@@ -233,24 +233,24 @@ void laserdisc_device::static_set_audio(device_t &device, laserdisc_audio_delega
 //  static_set_overlay - set the overlay parameters
 //-------------------------------------------------
 
-void laserdisc_device::static_set_overlay(device_t &device, UINT32 width, UINT32 height, screen_update_ind16_delegate update)
+void laserdisc_device::static_set_overlay(device_t &device, uint32_t width, uint32_t height, screen_update_ind16_delegate &&update)
 {
 	laserdisc_device &ld = downcast<laserdisc_device &>(device);
 	ld.m_overwidth = width;
 	ld.m_overheight = height;
 	ld.m_overclip.set(0, width - 1, 0, height - 1);
-	ld.m_overupdate_ind16 = update;
+	ld.m_overupdate_ind16 = std::move(update);
 	ld.m_overupdate_rgb32 = screen_update_rgb32_delegate();
 }
 
-void laserdisc_device::static_set_overlay(device_t &device, UINT32 width, UINT32 height, screen_update_rgb32_delegate update)
+void laserdisc_device::static_set_overlay(device_t &device, uint32_t width, uint32_t height, screen_update_rgb32_delegate &&update)
 {
 	laserdisc_device &ld = downcast<laserdisc_device &>(device);
 	ld.m_overwidth = width;
 	ld.m_overheight = height;
 	ld.m_overclip.set(0, width - 1, 0, height - 1);
 	ld.m_overupdate_ind16 = screen_update_ind16_delegate();
-	ld.m_overupdate_rgb32 = update;
+	ld.m_overupdate_rgb32 = std::move(update);
 }
 
 
@@ -259,7 +259,7 @@ void laserdisc_device::static_set_overlay(device_t &device, UINT32 width, UINT32
 //  memregion
 //-------------------------------------------------
 
-void laserdisc_device::static_set_overlay_clip(device_t &device, INT32 minx, INT32 maxx, INT32 miny, INT32 maxy)
+void laserdisc_device::static_set_overlay_clip(device_t &device, int32_t minx, int32_t maxx, int32_t miny, int32_t maxy)
 {
 	downcast<laserdisc_device &>(device).m_overclip.set(minx, maxx, miny, maxy);
 }
@@ -321,7 +321,7 @@ void laserdisc_device::device_start()
 	init_audio();
 
 	// register callbacks
-	machine().configuration().config_register("laserdisc", config_saveload_delegate(FUNC(laserdisc_device::config_load), this), config_saveload_delegate(FUNC(laserdisc_device::config_save), this));
+	machine().configuration().config_register("laserdisc", config_load_delegate(&laserdisc_device::config_load, this), config_save_delegate(&laserdisc_device::config_save, this));
 }
 
 
@@ -416,8 +416,8 @@ void laserdisc_device::device_timer(emu_timer &timer, device_timer_id id, int pa
 void laserdisc_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
 	// compute AND values based on the squelch
-	INT16 leftand = (m_audiosquelch & 1) ? 0x0000 : 0xffff;
-	INT16 rightand = (m_audiosquelch & 2) ? 0x0000 : 0xffff;
+	int16_t leftand = (m_audiosquelch & 1) ? 0x0000 : 0xffff;
+	int16_t rightand = (m_audiosquelch & 2) ? 0x0000 : 0xffff;
 
 	// see if we have enough samples to fill the buffer; if not, drop out
 	int samples_avail = m_audiobufin - m_audiobufout;
@@ -436,8 +436,8 @@ void laserdisc_device::sound_stream_update(sound_stream &stream, stream_sample_t
 	// otherwise, stream from our buffer
 	else
 	{
-		INT16 *buffer0 = &m_audiobuffer[0][0];
-		INT16 *buffer1 = &m_audiobuffer[1][0];
+		int16_t *buffer0 = &m_audiobuffer[0][0];
+		int16_t *buffer1 = &m_audiobuffer[1][0];
 		int sampout = m_audiobufout;
 
 		// copy samples, clearing behind us as we go
@@ -479,7 +479,7 @@ void laserdisc_device::sound_stream_update(sound_stream &stream, stream_sample_t
 //  slider speed
 //-------------------------------------------------
 
-void laserdisc_device::set_slider_speed(INT32 tracks_per_vsync)
+void laserdisc_device::set_slider_speed(int32_t tracks_per_vsync)
 {
 	// update to the current time
 	update_slider_pos();
@@ -507,7 +507,7 @@ void laserdisc_device::set_slider_speed(INT32 tracks_per_vsync)
 //  a certain number of tracks
 //-------------------------------------------------
 
-void laserdisc_device::advance_slider(INT32 numtracks)
+void laserdisc_device::advance_slider(int32_t numtracks)
 {
 	// first update to the current time
 	update_slider_pos();
@@ -550,9 +550,9 @@ laserdisc_device::slider_position laserdisc_device::get_slider_position()
 //  that works for most situations
 //-------------------------------------------------
 
-INT32 laserdisc_device::generic_update(const vbi_metadata &vbi, int fieldnum, const attotime &curtime, player_state_info &newstate)
+int32_t laserdisc_device::generic_update(const vbi_metadata &vbi, int fieldnum, const attotime &curtime, player_state_info &newstate)
 {
-	INT32 advanceby = 0;
+	int32_t advanceby = 0;
 	int frame;
 
 	// start by assuming the state doesn't change
@@ -688,7 +688,7 @@ INT32 laserdisc_device::generic_update(const vbi_metadata &vbi, int fieldnum, co
 			// otherwise, if we got frame data from the VBI, update our seeking logic
 			else if (m_player_state.m_substate == 0 && frame != FRAME_NOT_PRESENT)
 			{
-				INT32 delta = (m_player_state.m_param - 2) - frame;
+				int32_t delta = (m_player_state.m_param - 2) - frame;
 
 				// if we're within a couple of frames, just play until we hit it
 				if (delta >= 0 && delta <= 2)
@@ -700,8 +700,8 @@ INT32 laserdisc_device::generic_update(const vbi_metadata &vbi, int fieldnum, co
 					if (delta < 0)
 						delta--;
 					advanceby = delta;
-					advanceby = MIN(advanceby, GENERIC_SEARCH_SPEED);
-					advanceby = MAX(advanceby, -GENERIC_SEARCH_SPEED);
+					advanceby = std::min(advanceby, GENERIC_SEARCH_SPEED);
+					advanceby = std::max(advanceby, -GENERIC_SEARCH_SPEED);
 				}
 			}
 
@@ -772,7 +772,7 @@ void laserdisc_device::init_disc()
 			throw emu_fatalerror("Laserdisc video must be interlaced!");
 
 		// determine the maximum track and allocate a frame buffer
-		UINT32 totalhunks = m_disc->hunk_count();
+		uint32_t totalhunks = m_disc->hunk_count();
 		m_chdtracks = totalhunks / 2;
 
 		// allocate memory for the precomputed per-frame metadata
@@ -780,7 +780,7 @@ void laserdisc_device::init_disc()
 		if (err != CHDERR_NONE || m_vbidata.size() != totalhunks * VBI_PACKED_BYTES)
 			throw emu_fatalerror("Precomputed VBI metadata missing or incorrect size");
 	}
-	m_maxtrack = MAX(m_maxtrack, VIRTUAL_LEAD_IN_TRACKS + VIRTUAL_LEAD_OUT_TRACKS + m_chdtracks);
+	m_maxtrack = std::max(m_maxtrack, VIRTUAL_LEAD_IN_TRACKS + VIRTUAL_LEAD_OUT_TRACKS + m_chdtracks);
 }
 
 
@@ -792,7 +792,7 @@ void laserdisc_device::init_disc()
 void laserdisc_device::init_video()
 {
 	// register for VBLANK callbacks
-	m_screen->register_vblank_callback(vblank_state_delegate(FUNC(laserdisc_device::vblank_state_changed), this));
+	m_screen->register_vblank_callback(vblank_state_delegate(&laserdisc_device::vblank_state_changed, this));
 
 	// allocate palette for applying brightness/contrast/gamma
 	m_videopalette = palette_t::alloc(256);
@@ -869,7 +869,7 @@ void laserdisc_device::init_audio()
 	m_stream = stream_alloc(0, 2, 48000);
 
 	// allocate audio buffers
-	m_audiomaxsamples = ((UINT64)m_samplerate * 1000000 + m_fps_times_1million - 1) / m_fps_times_1million;
+	m_audiomaxsamples = ((uint64_t)m_samplerate * 1000000 + m_fps_times_1million - 1) / m_fps_times_1million;
 	m_audiobufsize = m_audiomaxsamples * 4;
 	m_audiobuffer[0].resize(m_audiobufsize);
 	m_audiobuffer[1].resize(m_audiobufsize);
@@ -885,15 +885,15 @@ void laserdisc_device::init_audio()
 //  given color pattern
 //-------------------------------------------------
 
-void laserdisc_device::fillbitmap_yuy16(bitmap_yuy16 &bitmap, UINT8 yval, UINT8 cr, UINT8 cb)
+void laserdisc_device::fillbitmap_yuy16(bitmap_yuy16 &bitmap, uint8_t yval, uint8_t cr, uint8_t cb)
 {
-	UINT16 color0 = (yval << 8) | cb;
-	UINT16 color1 = (yval << 8) | cr;
+	uint16_t color0 = (yval << 8) | cb;
+	uint16_t color1 = (yval << 8) | cr;
 
 	// write 32 bits of color (2 pixels at a time)
 	for (int y = 0; y < bitmap.height(); y++)
 	{
-		UINT16 *dest = &bitmap.pix16(y);
+		uint16_t *dest = &bitmap.pix16(y);
 		for (int x = 0; x < bitmap.width() / 2; x++)
 		{
 			*dest++ = color0;
@@ -925,14 +925,14 @@ void laserdisc_device::update_slider_pos()
 		// determine how many tracks we covered and advance
 		if (m_attospertrack >= 0)
 		{
-			INT32 tracks_covered = delta / m_attospertrack;
+			int32_t tracks_covered = delta / m_attospertrack;
 			add_and_clamp_track(tracks_covered);
 			if (tracks_covered != 0)
 				m_sliderupdate += attotime(0, tracks_covered * m_attospertrack);
 		}
 		else
 		{
-			INT32 tracks_covered = delta / -m_attospertrack;
+			int32_t tracks_covered = delta / -m_attospertrack;
 			add_and_clamp_track(-tracks_covered);
 			if (tracks_covered != 0)
 				m_sliderupdate += attotime(0, tracks_covered * -m_attospertrack);
@@ -986,10 +986,10 @@ laserdisc_device::frame_data &laserdisc_device::current_frame()
 void laserdisc_device::read_track_data()
 {
 	// compute the chdhunk number we are going to read
-	INT32 chdtrack = m_curtrack - 1 - VIRTUAL_LEAD_IN_TRACKS;
-	chdtrack = MAX(chdtrack, 0);
-	chdtrack = MIN(chdtrack, m_chdtracks - 1);
-	UINT32 readhunk = chdtrack * 2 + m_fieldnum;
+	int32_t chdtrack = m_curtrack - 1 - VIRTUAL_LEAD_IN_TRACKS;
+	chdtrack = (std::max<int32_t>)(chdtrack, 0);
+	chdtrack = (std::min<uint32_t>)(chdtrack, m_chdtracks - 1);
+	uint32_t readhunk = chdtrack * 2 + m_fieldnum;
 
 	// cheat and look up the metadata we are about to retrieve
 	vbi_metadata vbidata = { 0 };
@@ -1046,7 +1046,7 @@ void laserdisc_device::read_track_data()
 	// set the VBI data for the new field from our precomputed data
 	if (!m_vbidata.empty())
 	{
-		UINT32 vbiframe;
+		uint32_t vbiframe;
 		vbi_metadata_unpack(&m_metadata[m_fieldnum], &vbiframe, &m_vbidata[readhunk * VBI_PACKED_BYTES]);
 	}
 
@@ -1118,8 +1118,8 @@ void laserdisc_device::process_track_data()
 			if (m_avhuff_config.audio[chnum] == &m_audiobuffer[chnum][0])
 			{
 				// move data to the end
-				int samplesleft = m_audiobufsize - m_audiobufin;
-				samplesleft = MIN(samplesleft, m_audiocursamples);
+				uint32_t samplesleft = m_audiobufsize - m_audiobufin;
+				samplesleft = std::min(samplesleft, m_audiocursamples);
 				memmove(&m_audiobuffer[chnum][m_audiobufin], &m_audiobuffer[chnum][0], samplesleft * 2);
 
 				// shift data at the beginning
@@ -1142,10 +1142,10 @@ void laserdisc_device::process_track_data()
 //  configuration file
 //-------------------------------------------------
 
-void laserdisc_device::config_load(config_type cfg_type, xml_data_node *parentnode)
+void laserdisc_device::config_load(config_type cfg_type, util::xml::data_node const *parentnode)
 {
 	// we only care about game files
-	if (cfg_type != config_type::CONFIG_TYPE_GAME)
+	if (cfg_type != config_type::GAME)
 		return;
 
 	// might not have any data
@@ -1153,20 +1153,20 @@ void laserdisc_device::config_load(config_type cfg_type, xml_data_node *parentno
 		return;
 
 	// iterate over overlay nodes
-	for (xml_data_node *ldnode = xml_get_sibling(parentnode->child, "device"); ldnode != nullptr; ldnode = xml_get_sibling(ldnode->next, "device"))
+	for (util::xml::data_node const *ldnode = parentnode->get_child("device"); ldnode != nullptr; ldnode = ldnode->get_next_sibling("device"))
 	{
-		const char *devtag = xml_get_attribute_string(ldnode, "tag", "");
+		const char *devtag = ldnode->get_attribute_string("tag", "");
 		if (strcmp(devtag, tag()) == 0)
 		{
 			// handle the overlay node
-			xml_data_node *overnode = xml_get_sibling(ldnode->child, "overlay");
+			util::xml::data_node const *const overnode = ldnode->get_child("overlay");
 			if (overnode != nullptr)
 			{
 				// fetch positioning controls
-				m_overposx = xml_get_attribute_float(overnode, "hoffset", m_overposx);
-				m_overscalex = xml_get_attribute_float(overnode, "hstretch", m_overscalex);
-				m_overposy = xml_get_attribute_float(overnode, "voffset", m_overposy);
-				m_overscaley = xml_get_attribute_float(overnode, "vstretch", m_overscaley);
+				m_overposx = overnode->get_attribute_float("hoffset", m_overposx);
+				m_overscalex = overnode->get_attribute_float("hstretch", m_overscalex);
+				m_overposy = overnode->get_attribute_float("voffset", m_overposy);
+				m_overscaley = overnode->get_attribute_float("vstretch", m_overscaley);
 			}
 		}
 	}
@@ -1178,52 +1178,52 @@ void laserdisc_device::config_load(config_type cfg_type, xml_data_node *parentno
 //  file
 //-------------------------------------------------
 
-void laserdisc_device::config_save(config_type cfg_type, xml_data_node *parentnode)
+void laserdisc_device::config_save(config_type cfg_type, util::xml::data_node *parentnode)
 {
 	// we only care about game files
-	if (cfg_type != config_type::CONFIG_TYPE_GAME)
+	if (cfg_type != config_type::GAME)
 		return;
 
 	// create a node
-	xml_data_node *ldnode = xml_add_child(parentnode, "device", nullptr);
+	util::xml::data_node *const ldnode = parentnode->add_child("device", nullptr);
 	if (ldnode != nullptr)
 	{
 		// output the basics
-		xml_set_attribute(ldnode, "tag", tag());
+		ldnode->set_attribute("tag", tag());
 
 		// add an overlay node
-		xml_data_node *overnode = xml_add_child(ldnode, "overlay", nullptr);
+		util::xml::data_node *const overnode = ldnode->add_child("overlay", nullptr);
 		bool changed = false;
 		if (overnode != nullptr)
 		{
 			// output the positioning controls
 			if (m_overposx != m_orig_config.m_overposx)
 			{
-				xml_set_attribute_float(overnode, "hoffset", m_overposx);
+				overnode->set_attribute_float("hoffset", m_overposx);
 				changed = true;
 			}
 
 			if (m_overscalex != m_orig_config.m_overscalex)
 			{
-				xml_set_attribute_float(overnode, "hstretch", m_overscalex);
+				overnode->set_attribute_float("hstretch", m_overscalex);
 				changed = true;
 			}
 
 			if (m_overposy != m_orig_config.m_overposy)
 			{
-				xml_set_attribute_float(overnode, "voffset", m_overposy);
+				overnode->set_attribute_float("voffset", m_overposy);
 				changed = true;
 			}
 
 			if (m_overscaley != m_orig_config.m_overscaley)
 			{
-				xml_set_attribute_float(overnode, "vstretch", m_overscaley);
+				overnode->set_attribute_float("vstretch", m_overscaley);
 				changed = true;
 			}
 		}
 
 		// if nothing changed, kill the node
 		if (!changed)
-			xml_delete_node(ldnode);
+			ldnode->delete_node();
 	}
 }

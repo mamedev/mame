@@ -60,7 +60,7 @@ bbc_bzr
 	TMP = read_pc();
 	read_pc_noinc();
 	if(!(TMP2 & (1 << ((IR>>5) & 7)))) {
-		PC += INT8(TMP);
+		PC += int8_t(TMP);
 	}
 	prefetch();
 
@@ -70,7 +70,7 @@ bbs_bzr
 	TMP = read_pc();
 	read_pc_noinc();
 	if(TMP2 & (1 << ((IR>>5) & 7))) {
-		PC += INT8(TMP);
+		PC += int8_t(TMP);
 	}
 	prefetch();
 
@@ -78,7 +78,7 @@ bbc_bar
 	TMP = read_pc();
 	read_pc_noinc();
 	if(!(A & (1 << ((IR>>5) & 7)))) {
-		PC += INT8(TMP);
+		PC += int8_t(TMP);
 	}
 	prefetch();
 
@@ -86,7 +86,7 @@ bbs_bar
 	TMP = read_pc();
 	read_pc_noinc();
 	if(A & (1 << ((IR>>5) & 7))) {
-		PC += INT8(TMP);
+		PC += int8_t(TMP);
 	}
 	prefetch();
 
@@ -100,10 +100,10 @@ rrf_zpg
 bra_rel
 	TMP = read_pc();
 	read_pc_noinc();
-	if(page_changing(PC, INT8(TMP))) {
-		read_arg(set_l(PC, PC+INT8(TMP)));
+	if(page_changing(PC, int8_t(TMP))) {
+		read_arg(set_l(PC, PC+int8_t(TMP)));
 	}
-	PC += INT8(TMP);
+	PC += int8_t(TMP);
 	prefetch();
 
 jmp_zpi
@@ -226,7 +226,7 @@ adct_zpg
 adct_zpx
 	TMP = read_pc();
 	read(TMP);
-	TMP = read(UINT8(TMP+X));
+	TMP = read(uint8_t(TMP+X));
 	TMP2 = read(X);
 	do_adct(TMP);
 	write(X, TMP2);
@@ -311,7 +311,7 @@ andt_zpx
 	TMP = read_pc();
 	read(TMP);
 	TMP2 = read(X);
-	TMP2 &= read(UINT8(TMP+X));
+	TMP2 &= read(uint8_t(TMP+X));
 	set_nz(TMP2);
 	write(X, TMP2);
 	prefetch();
@@ -393,7 +393,7 @@ cmpt_zpg
 cmpt_zpx
 	TMP = read_pc();
 	read(TMP);
-	TMP = read(UINT8(TMP+X));
+	TMP = read(uint8_t(TMP+X));
 	TMP2 = read(X);
 	do_cmp(TMP2, TMP);
 	prefetch();
@@ -491,7 +491,7 @@ eort_zpx
 	TMP = read_pc();
 	read(TMP);
 	TMP2 = read(X);
-	TMP2 ^= read(UINT8(TMP+X));
+	TMP2 ^= read(uint8_t(TMP+X));
 	set_nz(TMP2);
 	write(X, TMP2);
 	prefetch();
@@ -579,7 +579,7 @@ ldt_zpg
 ldt_zpx
 	TMP = read_pc();
 	read(TMP);
-	TMP2 = read(UINT8(TMP+X));
+	TMP2 = read(uint8_t(TMP+X));
 	set_nz(TMP2);
 	write(X, TMP2);
 	prefetch();
@@ -663,7 +663,7 @@ ort_zpx
 	TMP = read_pc();
 	read(TMP);
 	TMP2 = read(X);
-	TMP2 |= read(UINT8(TMP+X));
+	TMP2 |= read(uint8_t(TMP+X));
 	set_nz(TMP2);
 	write(X, TMP2);
 	prefetch();
@@ -744,7 +744,7 @@ sbct_zpg
 sbct_zpx
 	TMP = read_pc();
 	read(TMP);
-	TMP = read(UINT8(TMP+X));
+	TMP = read(uint8_t(TMP+X));
 	TMP2 = read(X);
 	do_sbct(TMP);
 	write(X, TMP2);

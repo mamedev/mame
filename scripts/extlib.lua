@@ -10,10 +10,11 @@ local extlibs = {
 	zlib       = { "z",         "3rdparty/zlib" },
 	jpeg       = { "jpeg",      "3rdparty/libjpeg" },
 	flac       = { "FLAC",      "3rdparty/libflac/include" },
+	sqlite3    = { "sqlite3",   "3rdparty/sqlite3" },
 	portmidi   = { "portmidi",  "3rdparty/portmidi/pm_common" },
 	portaudio  = { "portaudio", "3rdparty/portaudio/include" },
 	lua        = { "lua",       "3rdparty/lua/src" },
-	uv         = { "uv" ,       "3rdparty/libuv/include" },
+	utf8proc   = { "utf8proc",  "3rdparty/utf8proc" },
 }
 
 -- system lib options
@@ -38,6 +39,11 @@ newoption {
 }
 
 newoption {
+	trigger = 'with-system-sqlite3',
+	description = 'Use system SQLite library',
+}
+
+newoption {
 	trigger = 'with-system-portmidi',
 	description = 'Use system PortMidi library',
 }
@@ -53,8 +59,8 @@ newoption {
 }
 
 newoption {
-	trigger = 'with-system-uv',
-	description = 'Use system uv library',
+	trigger = "with-system-utf8proc",
+	description = "Use system utf8proc library",
 }
 
 -- build helpers

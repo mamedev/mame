@@ -5,9 +5,12 @@
     audio\avalnche.c
 
 *************************************************************************/
+
 #include "emu.h"
 #include "includes/avalnche.h"
+#include "machine/74259.h"
 #include "sound/discrete.h"
+#include "speaker.h"
 
 
 /* Avalanche Discrete Sound Input Nodes */
@@ -25,32 +28,6 @@
 WRITE8_MEMBER(avalnche_state::avalnche_noise_amplitude_w)
 {
 	m_discrete->write(space, AVALNCHE_SOUNDLVL_DATA, data & 0x3f);
-}
-
-WRITE8_MEMBER(avalnche_state::avalnche_attract_enable_w)
-{
-	m_discrete->write(space, AVALNCHE_ATTRACT_EN, data & 0x01);
-}
-
-WRITE8_MEMBER(avalnche_state::avalnche_audio_w)
-{
-	int bit = data & 0x01;
-
-	switch (offset & 0x07)
-	{
-	case 0x00:      /* AUD0 */
-		m_discrete->write(space, AVALNCHE_AUD0_EN, bit);
-		break;
-
-	case 0x01:      /* AUD1 */
-		m_discrete->write(space, AVALNCHE_AUD1_EN, bit);
-		break;
-
-	case 0x02:      /* AUD2 */
-	default:
-		m_discrete->write(space, AVALNCHE_AUD2_EN, bit);
-		break;
-	}
 }
 
 
@@ -78,7 +55,7 @@ static const discrete_lfsr_desc avalnche_lfsr={
 #define AVALNCHE_AUD2_SND           NODE_12
 #define AVALNCHE_SOUNDLVL_AUD0_SND  NODE_13
 
-DISCRETE_SOUND_START(avalnche)
+static DISCRETE_SOUND_START(avalnche)
 	/************************************************/
 	/* avalnche  Effects Relataive Gain Table       */
 	/*                                              */
@@ -126,12 +103,44 @@ DISCRETE_SOUND_START(avalnche)
 DISCRETE_SOUND_END
 
 
+MACHINE_CONFIG_START( avalnche_sound )
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
+	MCFG_DISCRETE_INTF(avalnche)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	MCFG_DEVICE_MODIFY("latch")
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<AVALNCHE_ATTRACT_EN>))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<AVALNCHE_AUD0_EN>))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<AVALNCHE_AUD1_EN>))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<AVALNCHE_AUD2_EN>))
+MACHINE_CONFIG_END
+
+
+MACHINE_CONFIG_START( catch_sound ) // just a stub here...
+	MCFG_DEVICE_MODIFY("latch")
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(NOOP) // It is attract_enable just like avalnche, but not hooked up yet.
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(avalnche_state, catch_aud0_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(avalnche_state, catch_aud1_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(avalnche_state, catch_aud2_w))
+MACHINE_CONFIG_END
+
+
 /***************************************************************************
   Catch memory audio output handlers
 ***************************************************************************/
 
-WRITE8_MEMBER(avalnche_state::catch_audio_w)
+WRITE_LINE_MEMBER(avalnche_state::catch_aud0_w)
 {
 	/* Different from avalnche, it plays a sound (offset 0/1/2) on data bit 0 rising edge.
 	There's no indication that the game silences sound, it's probably done automatically. */
+}
+
+WRITE_LINE_MEMBER(avalnche_state::catch_aud1_w)
+{
+}
+
+WRITE_LINE_MEMBER(avalnche_state::catch_aud2_w)
+{
 }

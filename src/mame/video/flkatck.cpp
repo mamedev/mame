@@ -8,6 +8,7 @@
 
 #include "emu.h"
 #include "includes/flkatck.h"
+#include "screen.h"
 
 /***************************************************************************
 
@@ -17,11 +18,11 @@
 
 TILE_GET_INFO_MEMBER(flkatck_state::get_tile_info_A)
 {
-	UINT8 ctrl_0 = m_k007121->ctrlram_r(generic_space(), 0);
-	UINT8 ctrl_2 = m_k007121->ctrlram_r(generic_space(), 2);
-	UINT8 ctrl_3 = m_k007121->ctrlram_r(generic_space(), 3);
-	UINT8 ctrl_4 = m_k007121->ctrlram_r(generic_space(), 4);
-	UINT8 ctrl_5 = m_k007121->ctrlram_r(generic_space(), 5);
+	uint8_t ctrl_0 = m_k007121->ctrlram_r(generic_space(), 0);
+	uint8_t ctrl_2 = m_k007121->ctrlram_r(generic_space(), 2);
+	uint8_t ctrl_3 = m_k007121->ctrlram_r(generic_space(), 3);
+	uint8_t ctrl_4 = m_k007121->ctrlram_r(generic_space(), 4);
+	uint8_t ctrl_5 = m_k007121->ctrlram_r(generic_space(), 5);
 	int attr = m_k007121_ram[tile_index];
 	int code = m_k007121_ram[tile_index + 0x400];
 	int bit0 = (ctrl_5 >> 0) & 0x03;
@@ -40,7 +41,7 @@ TILE_GET_INFO_MEMBER(flkatck_state::get_tile_info_A)
 
 	if ((attr == 0x0d) && (!ctrl_0) && (!ctrl_2))
 		bank = 0;   /*  this allows the game to print text
-                    in all banks selected by the k007121 */
+		            in all banks selected by the k007121 */
 
 	SET_TILE_INFO_MEMBER(0,
 			code + 256*bank,
@@ -68,8 +69,8 @@ TILE_GET_INFO_MEMBER(flkatck_state::get_tile_info_B)
 
 void flkatck_state::video_start()
 {
-	m_k007121_tilemap[0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(flkatck_state::get_tile_info_A),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_k007121_tilemap[1] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(flkatck_state::get_tile_info_B),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_k007121_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(flkatck_state::get_tile_info_A),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_k007121_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(flkatck_state::get_tile_info_B),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 
@@ -124,12 +125,12 @@ WRITE8_MEMBER(flkatck_state::flkatck_k007121_regs_w)
 
 ***************************************************************************/
 
-UINT32 flkatck_state::screen_update_flkatck(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t flkatck_state::screen_update_flkatck(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	rectangle clip[2];
 	const rectangle &visarea = screen.visible_area();
 
-	address_space &space = machine().driver_data()->generic_space();
+	address_space &space = machine().dummy_space();
 	if (m_flipscreen)
 	{
 		clip[0] = visarea;
@@ -162,7 +163,7 @@ UINT32 flkatck_state::screen_update_flkatck(screen_device &screen, bitmap_ind16 
 
 	/* draw the graphics */
 	m_k007121_tilemap[0]->draw(screen, bitmap, clip[0], 0, 0);
-	m_k007121->sprites_draw(bitmap, cliprect, m_gfxdecode->gfx(0), m_gfxdecode->palette(), &m_k007121_ram[0x1000], 0, 40, 0, screen.priority(), (UINT32)-1, true);
+	m_k007121->sprites_draw(bitmap, cliprect, m_gfxdecode->gfx(0), m_gfxdecode->palette(), &m_k007121_ram[0x1000], 0, 40, 0, screen.priority(), (uint32_t)-1, true);
 	m_k007121_tilemap[1]->draw(screen, bitmap, clip[1], 0, 0);
 	return 0;
 }

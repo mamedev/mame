@@ -34,10 +34,6 @@
 
 osd_video_config video_config;
 
-// monitor info
-osd_monitor_info *osd_monitor_info::list = nullptr;
-
-
 //============================================================
 //  LOCAL VARIABLES
 //============================================================
@@ -49,7 +45,6 @@ osd_monitor_info *osd_monitor_info::list = nullptr;
 
 static void check_osd_inputs(running_machine &machine);
 
-static float get_aspect(const char *defdata, const char *data, int report_error);
 static void get_resolution(const char *defdata, const char *data, osd_window_config *config, int report_error);
 
 
@@ -64,9 +59,6 @@ bool sdl_osd_interface::video_init()
 	// extract data from the options
 	extract_video_config();
 
-	// set up monitors first
-	sdl_monitor_info::init();
-
 	// we need the beam width in a float, contrary to what the core does.
 	video_config.beamwidth = options().beam_width_min();
 
@@ -79,10 +71,10 @@ bool sdl_osd_interface::video_init()
 	{
 		osd_window_config conf;
 		memset(&conf, 0, sizeof(conf));
-		get_resolution(options().resolution(), options().resolution(index), &conf, TRUE);
+		get_resolution(options().resolution(), options().resolution(index), &conf, true);
 
 		// create window ...
-		std::shared_ptr<sdl_window_info> win = std::make_shared<sdl_window_info>(machine(), index, osd_monitor_info::pick_monitor(reinterpret_cast<osd_options &>(options()), index), &conf);
+		std::shared_ptr<sdl_window_info> win = std::make_shared<sdl_window_info>(machine(), index, m_monitor_module->pick_monitor(reinterpret_cast<osd_options &>(options()), index), &conf);
 
 		if (win->window_init())
 			return false;
@@ -98,34 +90,6 @@ bool sdl_osd_interface::video_init()
 void sdl_osd_interface::video_exit()
 {
 	window_exit();
-	sdl_monitor_info::exit();
-}
-
-
-//============================================================
-//  sdlvideo_monitor_refresh
-//============================================================
-
-inline osd_rect SDL_Rect_to_osd_rect(const SDL_Rect &r)
-{
-	return osd_rect(r.x, r.y, r.w, r.h);
-}
-
-void sdl_monitor_info::refresh()
-{
-	SDL_DisplayMode dmode;
-
-	#if defined(SDLMAME_WIN32)
-	SDL_GetDesktopDisplayMode(m_handle, &dmode);
-	#else
-	SDL_GetCurrentDisplayMode(m_handle, &dmode);
-	#endif
-	SDL_Rect dimensions;
-	SDL_GetDisplayBounds(m_handle, &dimensions);
-
-	m_pos_size = SDL_Rect_to_osd_rect(dimensions);
-	m_usuable_pos_size = SDL_Rect_to_osd_rect(dimensions);
-	m_is_primary = (m_handle == 0);
 }
 
 //============================================================
@@ -140,7 +104,7 @@ void sdl_osd_interface::update(bool skip_redraw)
 	if (!skip_redraw)
 	{
 //      profiler_mark(PROFILER_BLIT);
-		for (auto window : sdl_window_list)
+		for (auto window : osd_common_t::s_window_list)
 			window->update();
 //      profiler_mark(PROFILER_END);
 	}
@@ -154,116 +118,6 @@ void sdl_osd_interface::update(bool skip_redraw)
 		debugger_update();
 }
 
-
-//============================================================
-//  init_monitors
-//============================================================
-
-void sdl_monitor_info::init()
-{
-	osd_monitor_info **tailptr;
-
-	// make a list of monitors
-	osd_monitor_info::list = nullptr;
-	tailptr = &osd_monitor_info::list;
-
-	{
-		int i;
-
-		osd_printf_verbose("Enter init_monitors\n");
-
-		for (i = 0; i < SDL_GetNumVideoDisplays(); i++)
-		{
-			sdl_monitor_info *monitor;
-
-			char temp[64];
-			snprintf(temp, sizeof(temp)-1, "%s%d", OSDOPTION_SCREEN,i);
-
-			// allocate a new monitor info
-
-			monitor = global_alloc_clear<sdl_monitor_info>(i, temp, 1.0f);
-
-			osd_printf_verbose("Adding monitor %s (%d x %d)\n", monitor->devicename(),
-					monitor->position_size().width(), monitor->position_size().height());
-
-			// guess the aspect ratio assuming square pixels
-			monitor->set_aspect((float)(monitor->position_size().width()) / (float)(monitor->position_size().height()));
-
-			// hook us into the list
-			*tailptr = monitor;
-			tailptr = &monitor->m_next;
-		}
-	}
-	osd_printf_verbose("Leave init_monitors\n");
-}
-
-void sdl_monitor_info::exit()
-{
-	// free all of our monitor information
-	while (sdl_monitor_info::list != nullptr)
-	{
-		osd_monitor_info *temp = sdl_monitor_info::list;
-		sdl_monitor_info::list = temp->next();
-		global_free(temp);
-	}
-}
-
-
-//============================================================
-//  pick_monitor
-//============================================================
-
-osd_monitor_info *osd_monitor_info::pick_monitor(osd_options &generic_options, int index)
-{
-	sdl_options &options = reinterpret_cast<sdl_options &>(generic_options);
-	osd_monitor_info *monitor;
-	const char *scrname, *scrname2;
-	int moncount = 0;
-	float aspect;
-
-	// get the screen option
-	scrname = options.screen();
-	scrname2 = options.screen(index);
-
-	// decide which one we want to use
-	if (strcmp(scrname2, "auto") != 0)
-		scrname = scrname2;
-
-	// get the aspect ratio
-	aspect = get_aspect(options.aspect(), options.aspect(index), TRUE);
-
-	// look for a match in the name first
-	if (scrname != nullptr && (scrname[0] != 0))
-	{
-		for (monitor = osd_monitor_info::list; monitor != nullptr; monitor = monitor->next())
-		{
-			moncount++;
-			if (strcmp(scrname, monitor->devicename()) == 0)
-				goto finishit;
-		}
-	}
-
-	// didn't find it; alternate monitors until we hit the jackpot
-	index %= moncount;
-	for (monitor = osd_monitor_info::list; monitor != nullptr; monitor = monitor->next())
-		if (index-- == 0)
-			goto finishit;
-
-	// return the primary just in case all else fails
-	for (monitor = osd_monitor_info::list; monitor != nullptr; monitor = monitor->next())
-		if (monitor->is_primary())
-			goto finishit;
-
-	// FIXME: FatalError?
-finishit:
-	if (aspect != 0)
-	{
-		monitor->set_aspect(aspect);
-	}
-	return monitor;
-}
-
-
 //============================================================
 //  check_osd_inputs
 //============================================================
@@ -273,11 +127,11 @@ static void check_osd_inputs(running_machine &machine)
 	// check for toggling fullscreen mode
 	if (machine.ui_input().pressed(IPT_OSD_1))
 	{
-		for (auto curwin : sdl_window_list)
-			curwin->toggle_full_screen();
+		for (auto curwin : osd_common_t::s_window_list)
+			std::static_pointer_cast<sdl_window_info>(curwin)->toggle_full_screen();
 	}
 
-	auto window = sdl_window_list.front();
+	auto window = osd_common_t::s_window_list.front();
 	if (machine.ui_input().pressed(IPT_OSD_2))
 	{
 		//FIXME: on a per window basis
@@ -304,10 +158,10 @@ static void check_osd_inputs(running_machine &machine)
 	#endif
 
 	if (machine.ui_input().pressed(IPT_OSD_6))
-		window->modify_prescale(-1);
+		std::static_pointer_cast<sdl_window_info>(window)->modify_prescale(-1);
 
 	if (machine.ui_input().pressed(IPT_OSD_7))
-		window->modify_prescale(1);
+		std::static_pointer_cast<sdl_window_info>(window)->modify_prescale(1);
 
 	if (machine.ui_input().pressed(IPT_OSD_8))
 		window->renderer().record();
@@ -336,7 +190,7 @@ void sdl_osd_interface::extract_video_config()
 
 	// if we are in debug mode, never go full screen
 	if (machine().debug_flags & DEBUG_FLAG_OSD_ENABLED)
-		video_config.windowed = TRUE;
+		video_config.windowed = true;
 
 	// default to working video please
 	video_config.novideo = 0;
@@ -388,7 +242,7 @@ void sdl_osd_interface::extract_video_config()
 	video_config.syncrefresh   = options().sync_refresh();
 	if (!video_config.waitvsync && video_config.syncrefresh)
 	{
-		osd_printf_warning("-syncrefresh specified without -waitsync. Reverting to -nosyncrefresh\n");
+		osd_printf_warning("-syncrefresh specified without -waitvsync. Reverting to -nosyncrefresh\n");
 		video_config.syncrefresh = 0;
 	}
 
@@ -476,26 +330,6 @@ void sdl_osd_interface::extract_video_config()
 		osd_printf_warning("scalemode is only for -video soft, overriding\n");
 		video_config.scale_mode = VIDEO_SCALE_MODE_NONE;
 	}
-}
-
-
-//============================================================
-//  get_aspect
-//============================================================
-
-static float get_aspect(const char *defdata, const char *data, int report_error)
-{
-	int num = 0, den = 1;
-
-	if (strcmp(data, OSDOPTVAL_AUTO) == 0)
-	{
-		if (strcmp(defdata,OSDOPTVAL_AUTO) == 0)
-			return 0;
-		data = defdata;
-	}
-	if (sscanf(data, "%d:%d", &num, &den) != 2 && report_error)
-		osd_printf_error("Illegal aspect ratio value = %s\n", data);
-	return (float)num / (float)den;
 }
 
 

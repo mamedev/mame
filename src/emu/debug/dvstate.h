@@ -8,8 +8,10 @@
 
 ***************************************************************************/
 
-#ifndef __DVSTATE_H__
-#define __DVSTATE_H__
+#ifndef MAME_EMU_DEBUG_DVSTATE_H
+#define MAME_EMU_DEBUG_DVSTATE_H
+
+#pragma once
 
 #include "debugvw.h"
 
@@ -35,7 +37,6 @@ private:
 // debug view for state
 class debug_view_state : public debug_view
 {
-	friend resource_pool_object<debug_view_state>::~resource_pool_object();
 	friend class debug_view_manager;
 
 	// construction/destruction
@@ -48,16 +49,30 @@ protected:
 	virtual void view_notify(debug_view_notification type) override;
 
 private:
-	struct state_item
+	class state_item
 	{
-		state_item(int index, const char *name, UINT8 valuechars);
+	public:
+		state_item(int index, const char *name, u8 valuechars);
+		state_item(const state_item &) = default;
+		state_item(state_item &&) = default;
+		state_item &operator=(const state_item &) = default;
+		state_item &operator=(state_item &&) = default;
 
-		state_item *        m_next;             // next item
-		UINT64              m_lastval;          // last value
-		UINT64              m_currval;          // current value
-		int                 m_index;            // index
-		UINT8               m_vallen;           // number of value chars
-		std::string         m_symbol;           // symbol
+		u64 value() const { return m_currval; }
+		bool changed() const { return m_lastval != m_currval; }
+		int index() const { return m_index; }
+		u8 value_length() const { return m_vallen; }
+
+		void update(u64 newval, bool save);
+
+	private:
+		u64         m_lastval;          // last value
+		u64         m_currval;          // current value
+		int         m_index;            // index
+		u8          m_vallen;           // number of value chars
+
+	public:
+		std::string m_symbol;           // symbol
 	};
 
 	// internal helpers
@@ -66,17 +81,17 @@ private:
 	void recompute();
 
 	// internal state
-	int                 m_divider;              // dividing column
-	UINT64              m_last_update;          // execution counter at last update
-	state_item *        m_state_list;           // state data
+	int                     m_divider;              // dividing column
+	u64                     m_last_update;          // execution counter at last update
+	std::vector<state_item> m_state_list;           // state data
 
 	// constants
-	static const int REG_DIVIDER    = -10;
-	static const int REG_CYCLES     = -11;
-	static const int REG_BEAMX      = -12;
-	static const int REG_BEAMY      = -13;
-	static const int REG_FRAME      = -14;
+	static constexpr int REG_DIVIDER    = -10;
+	static constexpr int REG_CYCLES     = -11;
+	static constexpr int REG_BEAMX      = -12;
+	static constexpr int REG_BEAMY      = -13;
+	static constexpr int REG_FRAME      = -14;
 };
 
 
-#endif
+#endif // MAME_EMU_DEBUG_DVSTATE_H

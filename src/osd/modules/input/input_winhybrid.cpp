@@ -11,14 +11,13 @@
 
 #if defined(OSD_WINDOWS)
 
-#include <wbemcli.h>
 #include <list>
 #include <vector>
 
 // standard windows headers
-#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <wrl/client.h>
+#include <wbemcli.h>
 
 // XInput/DirectInput
 #include <xinput.h>
@@ -28,11 +27,9 @@
 
 // MAME headers
 #include "emu.h"
-#include "osdepend.h"
 
 // MAMEOS headers
 #include "strconv.h"
-#include "winutil.h"
 #include "winmain.h"
 
 #include "input_common.h"
@@ -96,6 +93,41 @@ struct bstr_deleter
 	{
 		if (bstr != nullptr)
 			SysFreeString(bstr);
+	}
+};
+
+class variant_wrapper
+{
+private:
+	DISABLE_COPYING(variant_wrapper);
+	VARIANT m_variant;
+
+public:
+	variant_wrapper()
+		: m_variant({0})
+	{
+	}
+
+	~variant_wrapper()
+	{
+		Clear();
+	}
+
+	const VARIANT & Get() const
+	{
+		return m_variant;
+	}
+
+	VARIANT* ClearAndGetAddressOf()
+	{
+		Clear();
+		return &m_variant;
+	}
+
+	void Clear()
+	{
+		if (m_variant.vt != VT_EMPTY)
+			VariantClear(&m_variant);
 	}
 };
 
@@ -167,7 +199,7 @@ public:
 			goto exit;
 		}
 
-		if (!win_window_list.empty() && win_window_list.front()->win_has_menu())
+		if (!osd_common_t::s_window_list.empty() && osd_common_t::s_window_list.front()->win_has_menu())
 			cooperative_level = DISCL_BACKGROUND | DISCL_NONEXCLUSIVE;
 
 		// allocate and link in a new device
@@ -206,7 +238,7 @@ protected:
 		// Enumerate all the directinput joysticks and add them if they aren't xinput compatible
 		result = m_dinput_helper->enum_attached_devices(DI8DEVCLASS_GAMECTRL, this, &machine);
 		if (result != DI_OK)
-			fatalerror("DirectInput: Unable to enumerate keyboards (result=%08X)\n", static_cast<UINT32>(result));
+			fatalerror("DirectInput: Unable to enumerate keyboards (result=%08X)\n", static_cast<uint32_t>(result));
 
 		xinput_joystick_device *devinfo;
 
@@ -218,7 +250,7 @@ protected:
 			{
 				XINPUT_STATE state = { 0 };
 
-				if (m_xinput_helper->XInputGetState(i, &state) == ERROR_SUCCESS)
+				if (m_xinput_helper->xinput_get_state(i, &state) == ERROR_SUCCESS)
 				{
 					// allocate and link in a new device
 					devinfo = m_xinput_helper->create_xinput_device(machine, i, *this);
@@ -294,8 +326,8 @@ private:
 		bstr_ptr bstrClassName;
 		bstr_ptr bstrNamespace;
 		DWORD uReturned = 0;
-		UINT iDevice = 0;
-		VARIANT var;
+		UINT iDevice;
+		variant_wrapper var;
 		HRESULT hr;
 
 		// CoInit if needed
@@ -376,20 +408,20 @@ private:
 					continue;
 
 				// For each device, get its device ID
-				hr = pDevices[iDevice]->Get(bstrDeviceID.get(), 0L, &var, nullptr, nullptr);
-				if (SUCCEEDED(hr) && var.vt == VT_BSTR && var.bstrVal != nullptr)
+				hr = pDevices[iDevice]->Get(bstrDeviceID.get(), 0L, var.ClearAndGetAddressOf(), nullptr, nullptr);
+				if (SUCCEEDED(hr) && var.Get().vt == VT_BSTR && var.Get().bstrVal != nullptr)
 				{
 					// Check if the device ID contains "IG_".  If it does, then it's an XInput device
 					// Unfortunately this information can not be found by just using DirectInput
-					if (wcsstr(var.bstrVal, L"IG_"))
+					if (wcsstr(var.Get().bstrVal, L"IG_"))
 					{
 						// If it does, then get the VID/PID from var.bstrVal
 						DWORD dwPid = 0, dwVid = 0;
-						WCHAR* strVid = wcsstr(var.bstrVal, L"VID_");
+						WCHAR* strVid = wcsstr(var.Get().bstrVal, L"VID_");
 						if (strVid && swscanf(strVid, L"VID_%4X", &dwVid) != 1)
 							dwVid = 0;
 
-						WCHAR* strPid = wcsstr(var.bstrVal, L"PID_");
+						WCHAR* strPid = wcsstr(var.Get().bstrVal, L"PID_");
 						if (strPid && swscanf(strPid, L"PID_%4X", &dwPid) != 1)
 							dwPid = 0;
 

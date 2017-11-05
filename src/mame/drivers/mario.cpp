@@ -92,11 +92,13 @@ write:
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "machine/z80dma.h"
-#include "sound/ay8910.h"
-
 #include "includes/mario.h"
+
+#include "cpu/z80/z80.h"
+#include "machine/74259.h"
+#include "machine/z80dma.h"
+#include "screen.h"
+
 
 /*************************************
  *
@@ -116,14 +118,21 @@ WRITE8_MEMBER(mario_state::memory_write_byte)
 	return prog_space.write_byte(offset, data);
 }
 
-WRITE8_MEMBER(mario_state::mario_z80dma_rdy_w)
+WRITE_LINE_MEMBER(mario_state::nmi_mask_w)
 {
-	m_z80dma->rdy_w(data & 0x01);
+	m_nmi_mask = state;
+	if (!state)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(mario_state::nmi_mask_w)
+WRITE_LINE_MEMBER(mario_state::coin_counter_1_w)
 {
-	m_nmi_mask = data & 1;
+	machine().bookkeeping().coin_counter_w(0, state);
+}
+
+WRITE_LINE_MEMBER(mario_state::coin_counter_2_w)
+{
+	machine().bookkeeping().coin_counter_w(1, state);
 }
 
 /*************************************
@@ -141,11 +150,7 @@ static ADDRESS_MAP_START( mario_map, AS_PROGRAM, 8, mario_state)
 	AM_RANGE(0x7c80, 0x7c80) AM_READ_PORT("IN1") AM_WRITE(mario_sh2_w) /* Luigi run sample */
 	AM_RANGE(0x7d00, 0x7d00) AM_WRITE(mario_scroll_w)
 	AM_RANGE(0x7e00, 0x7e00) AM_WRITE(mario_sh_tuneselect_w)
-	AM_RANGE(0x7e80, 0x7e80) AM_WRITE(mario_gfxbank_w)
-	AM_RANGE(0x7e82, 0x7e82) AM_WRITE(mario_flip_w)
-	AM_RANGE(0x7e83, 0x7e83) AM_WRITE(mario_palettebank_w)
-	AM_RANGE(0x7e84, 0x7e84) AM_WRITE(nmi_mask_w)
-	AM_RANGE(0x7e85, 0x7e85) AM_WRITE(mario_z80dma_rdy_w)   /* ==> DMA Chip */
+	AM_RANGE(0x7e80, 0x7e87) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
 	AM_RANGE(0x7f00, 0x7f07) AM_WRITE(mario_sh3_w) /* Sound port */
 	AM_RANGE(0x7f80, 0x7f80) AM_READ_PORT("DSW")    /* DSW */
 	AM_RANGE(0xf000, 0xffff) AM_ROM
@@ -159,12 +164,8 @@ static ADDRESS_MAP_START( masao_map, AS_PROGRAM, 8, mario_state)
 	AM_RANGE(0x7c00, 0x7c00) AM_READ_PORT("IN0")
 	AM_RANGE(0x7c80, 0x7c80) AM_READ_PORT("IN1")
 	AM_RANGE(0x7d00, 0x7d00) AM_WRITE(mario_scroll_w)
-	AM_RANGE(0x7e00, 0x7e00) AM_WRITE(soundlatch_byte_w)
-	AM_RANGE(0x7e80, 0x7e80) AM_WRITE(mario_gfxbank_w)
-	AM_RANGE(0x7e82, 0x7e82) AM_WRITE(mario_flip_w)
-	AM_RANGE(0x7e83, 0x7e83) AM_WRITE(mario_palettebank_w)
-	AM_RANGE(0x7e84, 0x7e84) AM_WRITE(nmi_mask_w)
-	AM_RANGE(0x7e85, 0x7e85) AM_WRITE(mario_z80dma_rdy_w)   /* ==> DMA Chip */
+	AM_RANGE(0x7e00, 0x7e00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
+	AM_RANGE(0x7e80, 0x7e87) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
 	AM_RANGE(0x7f00, 0x7f00) AM_WRITE(masao_sh_irqtrigger_w)
 	AM_RANGE(0x7f80, 0x7f80) AM_READ_PORT("DSW")    /* DSW */
 	AM_RANGE(0xf000, 0xffff) AM_ROM
@@ -173,34 +174,6 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( mario_io_map, AS_IO, 8, mario_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("z80dma", z80dma_device, read, write)  /* dma controller */
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( mariobl_map, AS_PROGRAM, 8, mario_state)
-	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x6000, 0x6fff) AM_RAM
-	AM_RANGE(0x7000, 0x71ff) AM_RAM AM_SHARE("spriteram") /* physical sprite ram */
-	AM_RANGE(0x7200, 0x72ff) AM_RAM // attrram? (only enough for sprites?)
-	AM_RANGE(0x7300, 0x737f) AM_RAM // probably x-scroll?
-	AM_RANGE(0x7380, 0x7380) AM_WRITE(mariobl_scroll_w)
-	AM_RANGE(0x7281, 0x73ff) AM_RAM // seems to have scroll vals for every column on this bl
-	AM_RANGE(0x7400, 0x77ff) AM_RAM_WRITE(mario_videoram_w) AM_SHARE("videoram")
-	//AM_RANGE(0xa000, 0xa000) AM_READ_PORT("IN1")
-	AM_RANGE(0xa000, 0xa000) AM_READNOP   /* watchdog? */
-	AM_RANGE(0xa100, 0xa100) AM_READ_PORT("DSW")    /* DSW */
-	AM_RANGE(0xa206, 0xa206) AM_WRITE(mario_gfxbank_w)
-
-	AM_RANGE(0x8000, 0x9fff) AM_ROM
-	AM_RANGE(0xb000, 0xbfff) AM_ROM
-	AM_RANGE(0xe000, 0xffff) AM_ROM
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( mariobl_io_map, AS_IO, 8, mario_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("ay1", ay8910_device, data_r, address_w)
-	AM_RANGE(0x01, 0x01) AM_DEVWRITE("ay1", ay8910_device, data_w)
-	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("ay2", ay8910_device, data_r, address_w)
-	AM_RANGE(0x81, 0x81) AM_DEVWRITE("ay2", ay8910_device, data_w)
 ADDRESS_MAP_END
 
 
@@ -309,115 +282,6 @@ static INPUT_PORTS_START( marioj )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( mariobl )
-
-	PORT_START("SYSTEM")
-	PORT_SERVICE_NO_TOGGLE( 0x01, IP_ACTIVE_LOW )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
-
-	PORT_START("INPUTS")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
-
-	PORT_START("DSW")
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW1:!1,!2")
-	PORT_DIPSETTING(    0x00, "3" )
-	PORT_DIPSETTING(    0x01, "4" )
-	PORT_DIPSETTING(    0x02, "5" )
-	PORT_DIPSETTING(    0x03, "6" )
-	PORT_DIPNAME( 0x1c, 0x00, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1:!3,!4,!5")
-	PORT_DIPSETTING(    0x08, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x18, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(    0x14, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0x1c, DEF_STR( 1C_6C ) )
-	PORT_DIPNAME( 0x20, 0x20, "2 Players Game" )        PORT_DIPLOCATION("SW1:!6")
-	PORT_DIPSETTING(    0x00, "1 Credit" )
-	PORT_DIPSETTING(    0x20, "2 Credits" )
-	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW1:!7,!8")
-	PORT_DIPSETTING(    0x00, "20k 50k 30k+" )
-	PORT_DIPSETTING(    0x40, "30k 60k 30k+" )
-	PORT_DIPSETTING(    0x80, "40k 70k 30k+" )
-	PORT_DIPSETTING(    0xc0, DEF_STR( None ) )
-
-	PORT_START("MONITOR")
-	PORT_CONFNAME( 0x01, 0x00, "Monitor" )
-	PORT_CONFSETTING(    0x00, "Nintendo" )
-	PORT_CONFSETTING(    0x01, "Std 15.72Khz" )
-
-INPUT_PORTS_END
-
-
-
-static INPUT_PORTS_START( dkong3abl )
-
-	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
-
-	PORT_START("INPUTS")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
-
-	PORT_START("DSW")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("MONITOR")
-	PORT_CONFNAME( 0x01, 0x00, "Monitor" )
-	PORT_CONFSETTING(    0x00, "Nintendo" )
-	PORT_CONFSETTING(    0x01, "Std 15.72Khz" )
-
-INPUT_PORTS_END
 
 /*************************************
  *
@@ -455,42 +319,6 @@ static GFXDECODE_START( mario )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0, 32 )
 GFXDECODE_END
 
-static const gfx_layout spritelayout_bl =
-{
-	16,16,  /* 16*16 sprites */
-	RGN_FRAC(1,3),    /* 256 sprites */
-	3,  /* 3 bits per pixel */
-	{ RGN_FRAC(2,3),RGN_FRAC(1,3),RGN_FRAC(0,3) },
-	{ 0, 1, 2, 3, 4, 5, 6, 7,
-			64,65,66,67,68,69,70,71 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-			16*8, 17*8, 18*8, 19*8, 20*8, 21*8, 22*8, 23*8 },
-	16*16
-};
-
-static GFXDECODE_START( mariobl )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,      0, 32 )
-	GFXDECODE_ENTRY( "gfx2", 0, spritelayout_bl, 0, 32 )
-GFXDECODE_END
-
-static const gfx_layout spritelayout_bl2 =
-{
-	16,16,  /* 16*16 sprites */
-	RGN_FRAC(1,2),    /* 256 sprites */
-	2,  /* 3 bits per pixel */
-	{ RGN_FRAC(1,2),RGN_FRAC(0,2) },
-	{ 0, 1, 2, 3, 4, 5, 6, 7,
-			64,65,66,67,68,69,70,71 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-			16*8, 17*8, 18*8, 19*8, 20*8, 21*8, 22*8, 23*8 },
-	16*16
-};
-
-static GFXDECODE_START( dkong3abl )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,      0, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0, spritelayout_bl2,     0, 32 )
-GFXDECODE_END
-
 
 /*************************************
  *
@@ -501,10 +329,10 @@ GFXDECODE_END
 INTERRUPT_GEN_MEMBER(mario_state::vblank_irq)
 {
 	if(m_nmi_mask)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-static MACHINE_CONFIG_START( mario_base, mario_state )
+static MACHINE_CONFIG_START( mario_base )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, Z80_CLOCK) /* verified on pcb */
@@ -518,10 +346,20 @@ static MACHINE_CONFIG_START( mario_base, mario_state )
 	MCFG_Z80DMA_IN_MREQ_CB(READ8(mario_state, memory_read_byte))
 	MCFG_Z80DMA_OUT_MREQ_CB(WRITE8(mario_state, memory_write_byte))
 
+	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 2L (7E80H)
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(mario_state, gfx_bank_w)) // ~T ROM
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(NOOP) // 2 PSL
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(mario_state, flip_w)) // FLIP
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(mario_state, palette_bank_w)) // CREF 0
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(mario_state, nmi_mask_w)) // NMI EI
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(DEVWRITELINE("z80dma", z80dma_device, rdy_w)) // DMA SET
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(mario_state, coin_counter_1_w)) // COUNTER 2 (misnumbered on schematic)
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(mario_state, coin_counter_2_w)) // COUNTER 1 (misnumbered on schematic)
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(mario_state, screen_update_mario)
+	MCFG_SCREEN_UPDATE_DRIVER(mario_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mario)
 	MCFG_PALETTE_ADD("palette", 256)
@@ -530,18 +368,10 @@ static MACHINE_CONFIG_START( mario_base, mario_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mario, mario_base )
-
-	/* basic machine hardware */
-
-	/* sound hardware */
 	MCFG_FRAGMENT_ADD(mario_audio)
 MACHINE_CONFIG_END
 
-
 static MACHINE_CONFIG_DERIVED( masao, mario_base )
-
-	/* basic machine hardware */
-
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(4000000)        /* 4.000 MHz (?) */
 	MCFG_CPU_PROGRAM_MAP(masao_map)
@@ -550,75 +380,6 @@ static MACHINE_CONFIG_DERIVED( masao, mario_base )
 	MCFG_FRAGMENT_ADD(masao_audio)
 MACHINE_CONFIG_END
 
-/*
-Mario Bros japan bootleg on Ambush hardware
-
-This romset (japanese version) comes from a faulty bootleg pcb.Game differences are none.
-Note:it runs on a modified (extended) Tecfri's Ambush hardware.
-Main cpu Z80
-Sound ic AY-3-8910 x2 -instead of AY-3-8912 x2 of Ambush
-Work ram 4Kb (6116 x2) -double of Ambush
-OSC: 18,432 Mhz
-Rom definition:
-mbjba-6, mbjba-7, mbjba-8 main program
-mbjba-1 to mbjba-5 gfx (chars,sprites)
-Eproms are 2732,2764,27128
-
-Dumped by tirino73
-*/
-
-static MACHINE_CONFIG_START( mariobl, mario_state )
-
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6)      /* XTAL confirmed, divisor guessed */
-	MCFG_CPU_PROGRAM_MAP(mariobl_map)
-	MCFG_CPU_IO_MAP(mariobl_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mario_state,  irq0_line_hold)
-
-	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(mario_state, screen_update_mariobl)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mariobl)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(mario_state, mario)
-
-	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL_18_432MHz/6/2)   /* XTAL confirmed, divisor guessed */
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("SYSTEM"))
-//  MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(mario_state, ay1_outputb_w))
-
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
-
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL_18_432MHz/6/2)   /* XTAL confirmed, divisor guessed */
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("INPUTS"))
-//  MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(mario_state, ay2_outputb_w))
-
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
-
-MACHINE_CONFIG_END
-
-/*
-Donkey Kong 3 bootleg on Ambush hardware
-
-This romset comes from a faulty bootleg pcb.Game differences are none.
-Note:it runs on a modified (extended) Tecfri's Ambush hardware.
-Main cpu Z80
-Sound ic AY-3-8910 x2 -instead of AY-3-8912 x2 of Ambush
-Work ram 4Kb (6116 x2) -double of Ambush
-OSC: 18,432 Mhz
-Rom definition:
-dk3ba-5,dk3ba-6,dk3ba-7 main program
-dk3ba-1 to dk3ba-4 gfx (chars,sprites)
-Eproms are 2732,2764,27128
-
-Dumped by tirino73 >isolani1973@libero.it<
-*/
-static MACHINE_CONFIG_DERIVED( dkong3abl, mariobl )
-	MCFG_GFXDECODE_MODIFY("gfxdecode", dkong3abl)
-MACHINE_CONFIG_END
 
 /*************************************
  *
@@ -788,43 +549,6 @@ ROM_START( masao )
 	ROM_LOAD( "tma1-c-4p.4p",     0x0000, 0x0200, CRC(afc9bd41) SHA1(90b739c4c7f24a88b6ac5ca29b06c032906a2801) )
 ROM_END
 
-ROM_START( mariobl )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "mbjba-8.7i",    0x0000, 0x4000, CRC(344c959d) SHA1(162e39c3a17e0dcde3b7eefebe224318c8884de2) )
-	ROM_LOAD( "mbjba-7.7g",    0x4000, 0x2000, CRC(06faf308) SHA1(8c213d9390c168034c1673f3dd97b99322b3485a) )
-	ROM_LOAD( "mbjba-6.7f",    0xe000, 0x2000, CRC(761dd670) SHA1(6d6e45ced8c535cdf56e0ed1bcedb342e9e10a55) )
-
-	ROM_REGION( 0x2000, "gfx1", ROMREGION_INVERT )
-	ROM_LOAD( "mbjba-4.4l",   0x1000, 0x1000, CRC(9379e836) SHA1(fcce66c1b2c5120441840b80723c7d209d42bc45) )
-	ROM_LOAD( "mbjba-5.4n",   0x0000, 0x1000, CRC(9bbcf9fb) SHA1(a917241a3bd94bff72f509d6b3ab8358b9c03eac) )
-
-	ROM_REGION( 0x6000, "gfx2", 0 )
-	ROM_LOAD( "mbjba-1.3l",   0x4000, 0x2000, CRC(c772cb8f) SHA1(7fd6dd9888928fad5c50d96b4ecff954ea8975ce) )
-	ROM_LOAD( "mbjba-2.3ls",  0x2000, 0x2000, CRC(7b58c92e) SHA1(25dfce7a4a93f661f495cc80378d445a2b064ba7) )
-	ROM_LOAD( "mbjba-3.3ns",  0x0000, 0x2000, CRC(3981adb2) SHA1(c12a0c2ae04de6969f4b2dae3bdefc4515d87c55) )
-
-	ROM_REGION( 0x0200, "proms", 0 ) // no prom was present in the dump, assuming to be the same
-	ROM_LOAD( "tma1-c-4p.4p",     0x0000, 0x0200, CRC(afc9bd41) SHA1(90b739c4c7f24a88b6ac5ca29b06c032906a2801) )
-ROM_END
-
-ROM_START( dkong3abl )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "dk3ba-7.7i",    0x0000, 0x4000, CRC(a9263275) SHA1(c3867f6b0d379b70669b3b954e582533406db203) )
-	ROM_LOAD( "dk3ba-6.7g",    0x4000, 0x2000, CRC(31b8401d) SHA1(0e3dfea0c7fe99d48c5d984c47fa746caf0879f3) )
-	ROM_CONTINUE(0x8000,0x2000)
-	ROM_LOAD( "dk3ba-5.7f",    0xb000, 0x1000, CRC(07d3fd88) SHA1(721f401d077e3e051672513f9df5614eeb0f6466) )
-
-	ROM_REGION( 0x2000, "gfx1", ROMREGION_INVERT )
-	ROM_LOAD( "dk3ba-3.4l",   0x1000, 0x1000, CRC(67ac65d4) SHA1(d28bdb99310370513597ca80185ac6c56a11f63c) )
-	ROM_LOAD( "dk3ba-4.4n",   0x0000, 0x1000, CRC(84b319d6) SHA1(eaf160948f8cd4fecfdd909876de7cd16340885c) )
-
-	ROM_REGION( 0x4000, "gfx2", 0 )
-	ROM_LOAD( "dk3ba-1.3l",   0x0000, 0x2000, CRC(d4a88e04) SHA1(4f797c25d26c1022dcf026021979ef0fbab48baf) )
-	ROM_LOAD( "dk3ba-2.3m",   0x2000, 0x2000, CRC(f71185ee) SHA1(6652cf958d7afa8bb8dcfded997bb418a75223d8) )
-
-	ROM_REGION( 0x0200, "proms", 0 ) // no prom was present in the dump, probably need to use the original ones again
-	ROM_LOAD( "tma1-c-4p.4p",     0x0000, 0x0200, CRC(afc9bd41) SHA1(90b739c4c7f24a88b6ac5ca29b06c032906a2801) ) // this is from mario.. remove
-ROM_END
 
 /*************************************
  *
@@ -832,12 +556,8 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, mario,    0,       mario,   mario, driver_device,  0, ROT0, "Nintendo of America", "Mario Bros. (US, Revision F)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, marioe,   mario,   mario,   marioe, driver_device,   0, ROT0, "Nintendo of America", "Mario Bros. (US, Revision E)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, marioo,   mario,   mario,   marioo, driver_device,  0, ROT0, "Nintendo of America", "Mario Bros. (US, Unknown Rev)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, marioj,   mario,   mario,   marioj, driver_device,  0, ROT0, "Nintendo", "Mario Bros. (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, masao,    mario,   masao,   mario, driver_device,   0, ROT0, "bootleg", "Masao", MACHINE_SUPPORTS_SAVE )
-
-// todo, these might have a better home than in here
-GAME( 1983, mariobl,  mario,   mariobl, mariobl,driver_device,  0, ROT180, "bootleg", "Mario Bros. (Japan, bootleg)", MACHINE_SUPPORTS_SAVE ) // was listed as 'on extended Ambush hardware' but doesn't seem similar apart from the sound system?
-GAME( 1983, dkong3abl,dkong3,  dkong3abl,dkong3abl,driver_device,0, ROT90,  "bootleg", "Donkey Kong 3 (bootleg with 2xAY8910)", MACHINE_NOT_WORKING ) //  likewise, put here because it's similar to mariobl
+GAME( 1983, mario,    0,       mario,   mario,  mario_state, 0, ROT0, "Nintendo of America", "Mario Bros. (US, Revision F)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1983, marioe,   mario,   mario,   marioe, mario_state, 0, ROT0, "Nintendo of America", "Mario Bros. (US, Revision E)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1983, marioo,   mario,   mario,   marioo, mario_state, 0, ROT0, "Nintendo of America", "Mario Bros. (US, Unknown Rev)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1983, marioj,   mario,   mario,   marioj, mario_state, 0, ROT0, "Nintendo",            "Mario Bros. (Japan, Revision C)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, masao,    mario,   masao,   mario,  mario_state, 0, ROT0, "bootleg",             "Masao",                           MACHINE_SUPPORTS_SAVE )

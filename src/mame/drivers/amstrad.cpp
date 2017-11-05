@@ -110,6 +110,7 @@ Some bugs left :
 
 #include "machine/ram.h"
 #include "softlist.h"
+#include "speaker.h"
 
 #define MANUFACTURER_NAME 0x07
 #define TV_REFRESH_RATE 0x10
@@ -235,7 +236,7 @@ static INPUT_PORTS_START( amstrad_keyboard )
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_Q)          PORT_CHAR('q') PORT_CHAR('Q')
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Tab")                   PORT_CODE(KEYCODE_TAB)        PORT_CHAR(9)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_A)          PORT_CHAR('a') PORT_CHAR('A')
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Caps Lock")             PORT_CODE(KEYCODE_CAPSLOCK)   PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK)) PORT_TOGGLE
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Caps Lock")             PORT_CODE(KEYCODE_CAPSLOCK)   PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK)) // No physical toggle
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_Z)          PORT_CHAR('z') PORT_CHAR('Z')
 
 	PORT_START("kbrow.9")
@@ -266,11 +267,11 @@ INPUT_CHANGED_MEMBER(amstrad_state::cpc_monitor_changed)
 {
 	if ( (m_io_green_display->read()) & 0x01 )
 	{
-		PALETTE_INIT_NAME( amstrad_cpc_green )(m_palette);
+		PALETTE_INIT_NAME( amstrad_cpc_green )(*m_palette);
 	}
 	else
 	{
-		PALETTE_INIT_NAME( amstrad_cpc )(m_palette);
+		PALETTE_INIT_NAME( amstrad_cpc )(*m_palette);
 	}
 }
 
@@ -626,7 +627,9 @@ static INPUT_PORTS_START( gx4000 )
 	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("kbrow.3")
-	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x07, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME(DEF_STR(Pause)) PORT_CODE(KEYCODE_1)
+	PORT_BIT(0xf0, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("kbrow.4")
 	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
@@ -726,7 +729,7 @@ static INPUT_PORTS_START( aleste )
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)  PORT_NAME("F5  F10")   PORT_CODE(KEYCODE_F5)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)  PORT_NAME("HELP")      PORT_CODE(KEYCODE_PGDN)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)  PORT_NAME("INS")       PORT_CODE(KEYCODE_DEL)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)  PORT_NAME("Funny looking Russian symbol")     PORT_CODE(KEYCODE_END)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)  PORT_NAME("\xD0\xAA  _") PORT_CODE(KEYCODE_HOME)
 
 	PORT_INCLUDE(crtc_links)
 	PORT_INCLUDE(amx_mouse)
@@ -791,7 +794,7 @@ FLOPPY_FORMATS_MEMBER( amstrad_state::aleste_floppy_formats )
 	FLOPPY_MSX_FORMAT
 FLOPPY_FORMATS_END
 
-static MACHINE_CONFIG_FRAGMENT( cpcplus_cartslot )
+static MACHINE_CONFIG_START( cpcplus_cartslot )
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "gx4000_cart")
 	MCFG_GENERIC_EXTENSIONS("bin,cpr")
 	MCFG_GENERIC_MANDATORY
@@ -882,7 +885,7 @@ SLOT_INTERFACE_START(amstrad_centronics_devices)
 	SLOT_INTERFACE("digiblst", CENTRONICS_DIGIBLASTER)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( amstrad_base, amstrad_state )
+static MACHINE_CONFIG_START( amstrad_base )
 	/* Machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(amstrad_mem)
@@ -904,7 +907,7 @@ static MACHINE_CONFIG_START( amstrad_base, amstrad_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS( XTAL_16MHz, 1024, 32, 32 + 640 + 64, 312, 56 + 15, 200 + 15 )
 	MCFG_SCREEN_UPDATE_DRIVER(amstrad_state, screen_update_amstrad)
-	MCFG_SCREEN_VBLANK_DRIVER(amstrad_state, screen_eof_amstrad)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(amstrad_state, screen_vblank_amstrad))
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -1007,7 +1010,7 @@ static MACHINE_CONFIG_DERIVED( kccomp, cpc6128 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( cpcplus, amstrad_state )
+static MACHINE_CONFIG_START( cpcplus )
 	/* Machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_40MHz / 10)
 	MCFG_CPU_PROGRAM_MAP(amstrad_mem)
@@ -1029,7 +1032,7 @@ static MACHINE_CONFIG_START( cpcplus, amstrad_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS( ( XTAL_40MHz * 2 ) / 5, 1024, 32, 32 + 640 + 64, 312, 56 + 15, 200 + 15 )
 	MCFG_SCREEN_UPDATE_DRIVER(amstrad_state, screen_update_amstrad)
-	MCFG_SCREEN_VBLANK_DRIVER(amstrad_state, screen_eof_amstrad)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(amstrad_state, screen_vblank_amstrad))
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -1086,7 +1089,7 @@ static MACHINE_CONFIG_START( cpcplus, amstrad_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( gx4000, amstrad_state )
+static MACHINE_CONFIG_START( gx4000 )
 	/* Machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_40MHz / 10)
 	MCFG_CPU_PROGRAM_MAP(amstrad_mem)
@@ -1108,7 +1111,7 @@ static MACHINE_CONFIG_START( gx4000, amstrad_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS( ( XTAL_40MHz * 2 ) / 5, 1024, 32, 32 + 640 + 64, 312, 56 + 15, 200 + 15 )
 	MCFG_SCREEN_UPDATE_DRIVER(amstrad_state, screen_update_amstrad)
-	MCFG_SCREEN_VBLANK_DRIVER(amstrad_state, screen_eof_amstrad)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(amstrad_state, screen_vblank_amstrad))
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -1283,14 +1286,14 @@ ROM_END
  *
  *************************************/
 
-/*    YEAR  NAME      PARENT    COMPAT  MACHINE        INPUT     INIT     COMPANY                FULLNAME                                     FLAGS */
-COMP( 1984, cpc464,   0,        0,      cpc464,        cpc464, driver_device,   0,       "Amstrad plc",         "Amstrad CPC464",                            0 )
-COMP( 1985, cpc664,   cpc464,   0,      cpc664,       cpc664, driver_device,   0,       "Amstrad plc",         "Amstrad CPC664",                            0 )
-COMP( 1985, cpc6128,  cpc464,   0,      cpc6128,       cpc6128, driver_device,  0,       "Amstrad plc",         "Amstrad CPC6128",                           0 )
-COMP( 1985, cpc6128f, cpc464,   0,      cpc6128,       cpc6128f, driver_device, 0,       "Amstrad plc",         "Amstrad CPC6128 (France, AZERTY Keyboard)", 0 )
-COMP( 1985, cpc6128s, cpc464,   0,      cpc6128,       cpc6128s, driver_device, 0,       "Amstrad plc",         "Amstrad CPC6128 (Sweden/Finland)",            0 )
-COMP( 1990, cpc464p,  0,        0,      cpcplus,       plus, driver_device,     0,       "Amstrad plc",         "Amstrad CPC464+",                           0 )
-COMP( 1990, cpc6128p, 0,        0,      cpcplus,       plus, driver_device,     0,       "Amstrad plc",         "Amstrad CPC6128+",                          0 )
-CONS( 1990, gx4000,   0,        0,      gx4000,        gx4000, driver_device,   0,       "Amstrad plc",         "Amstrad GX4000",                            0 )
-COMP( 1989, kccomp,   cpc464,   0,      kccomp,        kccomp, driver_device,   0,       "VEB Mikroelektronik", "KC Compact",                                0 )
-COMP( 1993, al520ex,  cpc464,   0,      aleste,        aleste, driver_device,   0,       "Patisonic",           "Aleste 520EX",                              MACHINE_IMPERFECT_SOUND )
+/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     STATE          INIT  COMPANY                FULLNAME                                     FLAGS */
+COMP( 1984, cpc464,   0,        0,      cpc464,   cpc464,   amstrad_state, 0,    "Amstrad plc",         "Amstrad CPC464",                            0 )
+COMP( 1985, cpc664,   cpc464,   0,      cpc664,   cpc664,   amstrad_state, 0,    "Amstrad plc",         "Amstrad CPC664",                            0 )
+COMP( 1985, cpc6128,  cpc464,   0,      cpc6128,  cpc6128,  amstrad_state, 0,    "Amstrad plc",         "Amstrad CPC6128",                           0 )
+COMP( 1985, cpc6128f, cpc464,   0,      cpc6128,  cpc6128f, amstrad_state, 0,    "Amstrad plc",         "Amstrad CPC6128 (France, AZERTY Keyboard)", 0 )
+COMP( 1985, cpc6128s, cpc464,   0,      cpc6128,  cpc6128s, amstrad_state, 0,    "Amstrad plc",         "Amstrad CPC6128 (Sweden/Finland)",          0 )
+COMP( 1990, cpc464p,  0,        0,      cpcplus,  plus,     amstrad_state, 0,    "Amstrad plc",         "Amstrad CPC464+",                           0 )
+COMP( 1990, cpc6128p, 0,        0,      cpcplus,  plus,     amstrad_state, 0,    "Amstrad plc",         "Amstrad CPC6128+",                          0 )
+CONS( 1990, gx4000,   0,        0,      gx4000,   gx4000,   amstrad_state, 0,    "Amstrad plc",         "Amstrad GX4000",                            0 )
+COMP( 1989, kccomp,   cpc464,   0,      kccomp,   kccomp,   amstrad_state, 0,    "VEB Mikroelektronik", "KC Compact",                                0 )
+COMP( 1993, al520ex,  cpc464,   0,      aleste,   aleste,   amstrad_state, 0,    "Patisonic",           "Aleste 520EX",                              MACHINE_IMPERFECT_SOUND )

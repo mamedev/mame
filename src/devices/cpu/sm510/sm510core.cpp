@@ -4,14 +4,18 @@
 
   Sharp SM510 MCU core implementation
 
+  TODO:
+  - X
+
 */
 
+#include "emu.h"
 #include "sm510.h"
 #include "debugger.h"
 
 
 // MCU types
-const device_type SM510 = &device_creator<sm510_device>;
+DEFINE_DEVICE_TYPE(SM510, sm510_device, "sm510", "SM510") // 2.7Kx8 ROM, 128x4 RAM(32x4 for LCD)
 
 
 // internal memory maps
@@ -30,16 +34,48 @@ ADDRESS_MAP_END
 
 
 // device definitions
-sm510_device::sm510_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: sm510_base_device(mconfig, SM510, "SM510", tag, owner, clock, 2 /* stack levels */, 12 /* prg width */, ADDRESS_MAP_NAME(program_2_7k), 7 /* data width */, ADDRESS_MAP_NAME(data_96_32x4), "sm510", __FILE__)
-{ }
+sm510_device::sm510_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: sm510_base_device(mconfig, SM510, tag, owner, clock, 2 /* stack levels */, 12 /* prg width */, ADDRESS_MAP_NAME(program_2_7k), 7 /* data width */, ADDRESS_MAP_NAME(data_96_32x4))
+{
+}
 
 
 // disasm
-offs_t sm510_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t sm510_device::disasm_disassemble(std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, u32 options)
 {
 	extern CPU_DISASSEMBLE(sm510);
-	return CPU_DISASSEMBLE_NAME(sm510)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(sm510)(this, stream, pc, oprom, opram, options);
+}
+
+
+
+//-------------------------------------------------
+//  buzzer controller
+//-------------------------------------------------
+
+void sm510_device::clock_melody()
+{
+	u8 out = 0;
+
+	if (m_r_direct)
+	{
+		// direct output
+		out = m_r & 3;
+	}
+	else
+	{
+		// buzzer from divider, R2 inverse phase
+		out = m_div >> 2 & 1;
+		out |= (out << 1 ^ 2);
+		out &= m_r;
+	}
+
+	// output to R pins
+	if (out != m_r_out)
+	{
+		m_write_r(0, out, 0xff);
+		m_r_out = out;
+	}
 }
 
 

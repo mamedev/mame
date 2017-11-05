@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:smf
+#include "emu.h"
 #include "cdu76s.h"
 
 void sony_cdu76s_device::ExecCommand()
@@ -15,7 +16,7 @@ void sony_cdu76s_device::ExecCommand()
 	}
 }
 
-void sony_cdu76s_device::ReadData( UINT8 *data, int dataLength )
+void sony_cdu76s_device::ReadData( uint8_t *data, int dataLength )
 {
 	switch ( command[0] )
 	{
@@ -39,9 +40,9 @@ void sony_cdu76s_device::ReadData( UINT8 *data, int dataLength )
 }
 
 // device type definition
-const device_type CDU76S = &device_creator<sony_cdu76s_device>;
+DEFINE_DEVICE_TYPE(CDU76S, sony_cdu76s_device, "cdu76s", "Sony CDU-76S")
 
-sony_cdu76s_device::sony_cdu76s_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	scsicd_device(mconfig, CDU76S, "Sony CDU-76S", tag, owner, clock, "cdu76s", __FILE__)
+sony_cdu76s_device::sony_cdu76s_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	scsicd_device(mconfig, CDU76S, tag, owner, clock)
 {
 }

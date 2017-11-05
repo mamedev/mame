@@ -12,9 +12,9 @@
 
 #include "ui/barcode.h"
 #include "ui/ui.h"
+#include "ui/utils.h"
 
 namespace ui {
-
 // itemrefs for key menu items
 #define ITEMREF_NEW_BARCODE    ((void *) 0x0001)
 #define ITEMREF_ENTER_BARCODE  ((void *) 0x0002)
@@ -32,7 +32,7 @@ namespace ui {
 //  ctor
 //-------------------------------------------------
 
-menu_barcode_reader::menu_barcode_reader(mame_ui_manager &mui, render_container *container, barcode_reader_device *device)
+menu_barcode_reader::menu_barcode_reader(mame_ui_manager &mui, render_container &container, barcode_reader_device *device)
 	: menu_device_control<barcode_reader_device>(mui, container, device)
 {
 }
@@ -50,7 +50,7 @@ menu_barcode_reader::~menu_barcode_reader()
 //  populate - populates the barcode input menu
 //-------------------------------------------------
 
-void menu_barcode_reader::populate()
+void menu_barcode_reader::populate(float &customtop, float &custombottom)
 {
 	if (current_device())
 	{
@@ -58,24 +58,24 @@ void menu_barcode_reader::populate()
 		const char *new_barcode;
 
 		// selected device
-		item_append(current_display_name().c_str(), "", current_display_flags(), ITEMREF_SELECT_READER);
+		item_append(current_display_name(), "", current_display_flags(), ITEMREF_SELECT_READER);
 
 		// append the "New Barcode" item
-		if (get_selection() == ITEMREF_NEW_BARCODE)
+		if (get_selection_ref() == ITEMREF_NEW_BARCODE)
 		{
 			buffer.append(m_barcode_buffer);
 			new_barcode = buffer.c_str();
 		}
 		else
 		{
-			new_barcode = m_barcode_buffer;
+			new_barcode = m_barcode_buffer.c_str();
 		}
 
 		item_append(_("New Barcode:"), new_barcode, 0, ITEMREF_NEW_BARCODE);
 
 		// finish up the menu
 		item_append(menu_item_type::SEPARATOR);
-		item_append(_("Enter Code"), nullptr, 0, ITEMREF_ENTER_BARCODE);
+		item_append(_("Enter Code"), "", 0, ITEMREF_ENTER_BARCODE);
 
 		customtop = ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
 	}
@@ -89,8 +89,7 @@ void menu_barcode_reader::populate()
 void menu_barcode_reader::handle()
 {
 	// rebuild the menu (so to update the selected device, if the user has pressed L or R)
-	reset(reset_options::REMEMBER_POSITION);
-	populate();
+	repopulate(reset_options::REMEMBER_POSITION);
 
 	// process the menu
 	const event *event = process(PROCESS_LR_REPEAT);
@@ -122,36 +121,23 @@ void menu_barcode_reader::handle()
 				{
 					current_device()->write_code(tmp_file.c_str(), tmp_file.length());
 					// if sending was successful, reset char buffer
-					if (m_barcode_buffer[0] != '\0')
-						memset(m_barcode_buffer, '\0', ARRAY_LENGTH(m_barcode_buffer));
+					m_barcode_buffer.clear();
 					reset(reset_options::REMEMBER_POSITION);
 				}
 			}
 			break;
 
 		case IPT_SPECIAL:
-			if (get_selection() == ITEMREF_NEW_BARCODE)
+			if (get_selection_ref() == ITEMREF_NEW_BARCODE)
 			{
-				auto const buflen = std::strlen(m_barcode_buffer);
-
-				// if it's a backspace and we can handle it, do so
-				if ((event->unichar == 8) || (event->unichar == 0x7f))
-				{
-					if (0 < buflen)
-						*const_cast<char *>(utf8_previous_char(&m_barcode_buffer[buflen])) = 0;
-				}
-				else if ((event->unichar >= '0') && (event->unichar <= '9'))
-				{
-					event->append_char(m_barcode_buffer, buflen);
-				}
-				reset(reset_options::REMEMBER_POSITION);
+				if (input_character(m_barcode_buffer, event->unichar, uchar_is_digit))
+					reset(reset_options::REMEMBER_POSITION);
 			}
 			break;
 
 		case IPT_UI_CANCEL:
 			// reset the char buffer also in this case
-			if (m_barcode_buffer[0] != '\0')
-				memset(m_barcode_buffer, '\0', ARRAY_LENGTH(m_barcode_buffer));
+			m_barcode_buffer.clear();
 			break;
 		}
 	}

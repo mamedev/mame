@@ -35,21 +35,21 @@ TODO:
 
 static FILE* rdp_exec;
 
-UINT32 n64_rdp::s_special_9bit_clamptable[512];
+uint32_t n64_rdp::s_special_9bit_clamptable[512];
 
-bool n64_rdp::rdp_range_check(UINT32 addr)
+bool n64_rdp::rdp_range_check(uint32_t addr)
 {
 	if(m_misc_state.m_fb_size == 0) return false;
 
-	INT32 fbcount = ((m_misc_state.m_fb_width * m_scissor.m_yl) << (m_misc_state.m_fb_size - 1)) * 3;
-	INT32 fbaddr = m_misc_state.m_fb_address & 0x007fffff;
+	int32_t fbcount = ((m_misc_state.m_fb_width * m_scissor.m_yl) << (m_misc_state.m_fb_size - 1)) * 3;
+	int32_t fbaddr = m_misc_state.m_fb_address & 0x007fffff;
 	if ((addr >= fbaddr) && (addr < (fbaddr + fbcount)))
 	{
 		return false;
 	}
 
-	INT32 zbcount = m_misc_state.m_fb_width * m_scissor.m_yl * 2;
-	INT32 zbaddr = m_misc_state.m_zb_address & 0x007fffff;
+	int32_t zbcount = m_misc_state.m_fb_width * m_scissor.m_yl * 2;
+	int32_t zbaddr = m_misc_state.m_zb_address & 0x007fffff;
 	if ((addr >= zbaddr) && (addr < (zbaddr + zbcount)))
 	{
 		return false;
@@ -65,11 +65,11 @@ bool n64_rdp::rdp_range_check(UINT32 addr)
 // The functions in this file should be moved into the parent Processor class.
 #include "rdpfiltr.hxx"
 
-INT32 n64_rdp::get_alpha_cvg(INT32 comb_alpha, rdp_span_aux* userdata, const rdp_poly_state &object)
+int32_t n64_rdp::get_alpha_cvg(int32_t comb_alpha, rdp_span_aux* userdata, const rdp_poly_state &object)
 {
-	INT32 temp = comb_alpha;
-	INT32 temp2 = userdata->m_current_pix_cvg;
-	INT32 temp3 = 0;
+	int32_t temp = comb_alpha;
+	int32_t temp2 = userdata->m_current_pix_cvg;
+	int32_t temp3 = 0;
 
 	if (object.m_other_modes.cvg_times_alpha)
 	{
@@ -95,13 +95,14 @@ void n64_state::video_start()
 
 	m_rdp->set_machine(machine());
 	m_rdp->init_internal_state();
+	m_rdp->set_n64_periphs(machine().device<n64_periphs>("rcp"));
 
 	m_rdp->m_blender.set_machine(machine());
 	m_rdp->m_blender.set_processor(m_rdp);
 
 	m_rdp->m_tex_pipe.set_machine(machine());
 
-	m_rdp->m_aux_buf = make_unique_clear<UINT8[]>(EXTENT_AUX_COUNT);
+	m_rdp->m_aux_buf = make_unique_clear<uint8_t[]>(EXTENT_AUX_COUNT);
 
 	if (LOG_RDP_EXECUTION)
 	{
@@ -109,13 +110,13 @@ void n64_state::video_start()
 	}
 }
 
-UINT32 n64_state::screen_update_n64(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t n64_state::screen_update_n64(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	n64_periphs* n64 = machine().device<n64_periphs>("rcp");
 
-	//UINT16* frame_buffer = (UINT16*)&rdram[(n64->vi_origin & 0xffffff) >> 2];
-	//UINT8* cvg_buffer = &m_rdp.m_hidden_bits[((n64->vi_origin & 0xffffff) >> 2) >> 1];
-	//INT32 vibuffering = ((n64->vi_control & 2) && fsaa && divot);
+	//uint16_t* frame_buffer = (uint16_t*)&rdram[(n64->vi_origin & 0xffffff) >> 2];
+	//uint8_t* cvg_buffer = &m_rdp.m_hidden_bits[((n64->vi_origin & 0xffffff) >> 2) >> 1];
+	//int32_t vibuffering = ((n64->vi_control & 2) && fsaa && divot);
 
 	//vibuffering = 0; // Disabled for now
 
@@ -128,7 +129,7 @@ UINT32 n64_state::screen_update_n64(screen_device &screen, bitmap_rgb32 &bitmap,
 	        {
 	            for (i=0; i < hres; i++)
 	            {
-	                UINT16 pix;
+	                uint16_t pix;
 	                pix = frame_buffer[pixels ^ WORD_ADDR_XOR];
 	                curpixel_cvg = ((pix & 1) << 2) | (cvg_buffer[pixels ^ BYTE_ADDR_XOR] & 3); // Reuse of this variable
 	                if (curpixel_cvg < 7 && i > 1 && j > 1 && i < (hres - 2) && j < (vres - 2) && fsaa)
@@ -151,6 +152,8 @@ UINT32 n64_state::screen_update_n64(screen_device &screen, bitmap_rgb32 &bitmap,
 	}
 	*/
 
+	m_rdp->mark_frame();
+
 	if (n64->vi_blank)
 	{
 		bitmap.fill(0, screen.visible_area());
@@ -162,12 +165,13 @@ UINT32 n64_state::screen_update_n64(screen_device &screen, bitmap_rgb32 &bitmap,
 	return 0;
 }
 
-void n64_state::screen_eof_n64(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(n64_state::screen_vblank_n64)
 {
 }
 
 void n64_periphs::video_update(bitmap_rgb32 &bitmap)
 {
+
 	if(vi_control & 0x40) /* Interlace */
 	{
 		field ^= 1;
@@ -195,26 +199,26 @@ void n64_periphs::video_update(bitmap_rgb32 &bitmap)
 
 void n64_periphs::video_update16(bitmap_rgb32 &bitmap)
 {
-	//INT32 fsaa = (((n64->vi_control >> 8) & 3) < 2);
-	//INT32 divot = (n64->vi_control >> 4) & 1;
+	//int32_t fsaa = (((n64->vi_control >> 8) & 3) < 2);
+	//int32_t divot = (n64->vi_control >> 4) & 1;
 
-	//UINT32 prev_cvg = 0;
-	//UINT32 next_cvg = 0;
-	//INT32 dither_filter = (n64->vi_control >> 16) & 1;
-	//INT32 vibuffering = ((n64->vi_control & 2) && fsaa && divot);
+	//uint32_t prev_cvg = 0;
+	//uint32_t next_cvg = 0;
+	//int32_t dither_filter = (n64->vi_control >> 16) & 1;
+	//int32_t vibuffering = ((n64->vi_control & 2) && fsaa && divot);
 
-	UINT16* frame_buffer = (UINT16*)&m_rdram[(vi_origin & 0xffffff) >> 2];
-	//UINT32 hb = ((n64->vi_origin & 0xffffff) >> 2) >> 1;
-	//UINT8* hidden_buffer = &m_hidden_bits[hb];
+	uint16_t* frame_buffer = (uint16_t*)&m_rdram[(vi_origin & 0xffffff) >> 2];
+	//uint32_t hb = ((n64->vi_origin & 0xffffff) >> 2) >> 1;
+	//uint8_t* hidden_buffer = &m_hidden_bits[hb];
 
-	INT32 hdiff = (vi_hstart & 0x3ff) - ((vi_hstart >> 16) & 0x3ff);
+	int32_t hdiff = (vi_hstart & 0x3ff) - ((vi_hstart >> 16) & 0x3ff);
 	float hcoeff = ((float)(vi_xscale & 0xfff) / (1 << 10));
-	UINT32 hres = ((float)hdiff * hcoeff);
-	INT32 invisiblewidth = vi_width - hres;
+	uint32_t hres = ((float)hdiff * hcoeff);
+	int32_t invisiblewidth = vi_width - hres;
 
-	INT32 vdiff = ((vi_vstart & 0x3ff) - ((vi_vstart >> 16) & 0x3ff)) >> 1;
+	int32_t vdiff = ((vi_vstart & 0x3ff) - ((vi_vstart >> 16) & 0x3ff)) >> 1;
 	float vcoeff = ((float)(vi_yscale & 0xfff) / (1 << 10));
-	UINT32 vres = ((float)vdiff * vcoeff);
+	uint32_t vres = ((float)vdiff * vcoeff);
 
 	if (vdiff <= 0 || hdiff <= 0)
 	{
@@ -232,21 +236,21 @@ void n64_periphs::video_update16(bitmap_rgb32 &bitmap)
 		vres = bitmap.height();
 	}
 
-	UINT32 pixels = 0;
+	uint32_t pixels = 0;
 
 	if (frame_buffer)
 	{
-		for(INT32 j = 0; j < vres; j++)
+		for(int32_t j = 0; j < vres; j++)
 		{
-			UINT32* d = &bitmap.pix32(j);
+			uint32_t* d = &bitmap.pix32(j);
 
-			for(INT32 i = 0; i < hres; i++)
+			for(int32_t i = 0; i < hres; i++)
 			{
-				UINT16 pix = frame_buffer[pixels ^ WORD_ADDR_XOR];
+				uint16_t pix = frame_buffer[pixels ^ WORD_ADDR_XOR];
 
-				const UINT8 r = ((pix >> 8) & 0xf8) | (pix >> 13);
-				const UINT8 g = ((pix >> 3) & 0xf8) | ((pix >>  8) & 0x07);
-				const UINT8 b = ((pix << 2) & 0xf8) | ((pix >>  3) & 0x07);
+				const uint8_t r = ((pix >> 8) & 0xf8) | (pix >> 13);
+				const uint8_t g = ((pix >> 3) & 0xf8) | ((pix >>  8) & 0x07);
+				const uint8_t b = ((pix << 2) & 0xf8) | ((pix >>  3) & 0x07);
 				d[i] = (r << 16) | (g << 8) | b;
 				pixels++;
 			}
@@ -257,20 +261,20 @@ void n64_periphs::video_update16(bitmap_rgb32 &bitmap)
 
 void n64_periphs::video_update32(bitmap_rgb32 &bitmap)
 {
-	INT32 gamma = (vi_control >> 3) & 1;
-	INT32 gamma_dither = (vi_control >> 2) & 1;
-	//INT32 vibuffering = ((n64->vi_control & 2) && fsaa && divot);
+	int32_t gamma = (vi_control >> 3) & 1;
+	int32_t gamma_dither = (vi_control >> 2) & 1;
+	//int32_t vibuffering = ((n64->vi_control & 2) && fsaa && divot);
 
-	UINT32* frame_buffer32 = (UINT32*)&m_rdram[(vi_origin & 0xffffff) >> 2];
+	uint32_t* frame_buffer32 = (uint32_t*)&m_rdram[(vi_origin & 0xffffff) >> 2];
 
-	const INT32 hdiff = (vi_hstart & 0x3ff) - ((vi_hstart >> 16) & 0x3ff);
+	const int32_t hdiff = (vi_hstart & 0x3ff) - ((vi_hstart >> 16) & 0x3ff);
 	const float hcoeff = ((float)(vi_xscale & 0xfff) / (1 << 10));
-	UINT32 hres = ((float)hdiff * hcoeff);
-	INT32 invisiblewidth = vi_width - hres;
+	uint32_t hres = ((float)hdiff * hcoeff);
+	int32_t invisiblewidth = vi_width - hres;
 
-	const INT32 vdiff = ((vi_vstart & 0x3ff) - ((vi_vstart >> 16) & 0x3ff)) >> 1;
+	const int32_t vdiff = ((vi_vstart & 0x3ff) - ((vi_vstart >> 16) & 0x3ff)) >> 1;
 	const float vcoeff = ((float)(vi_yscale & 0xfff) / (1 << 10));
-	const UINT32 vres = ((float)vdiff * vcoeff);
+	const uint32_t vres = ((float)vdiff * vcoeff);
 
 	if (vdiff <= 0 || hdiff <= 0)
 	{
@@ -285,18 +289,18 @@ void n64_periphs::video_update32(bitmap_rgb32 &bitmap)
 
 	if (frame_buffer32)
 	{
-		for (INT32 j = 0; j < vres; j++)
+		for (int32_t j = 0; j < vres; j++)
 		{
-			UINT32* d = &bitmap.pix32(j);
-			for (INT32 i = 0; i < hres; i++)
+			uint32_t* d = &bitmap.pix32(j);
+			for (int32_t i = 0; i < hres; i++)
 			{
-				UINT32 pix = *frame_buffer32++;
+				uint32_t pix = *frame_buffer32++;
 				if (gamma || gamma_dither)
 				{
-					INT32 r = (pix >> 24) & 0xff;
-					INT32 g = (pix >> 16) & 0xff;
-					INT32 b = (pix >> 8) & 0xff;
-					INT32 dith = 0;
+					int32_t r = (pix >> 24) & 0xff;
+					int32_t g = (pix >> 16) & 0xff;
+					int32_t b = (pix >> 8) & 0xff;
+					int32_t dith = 0;
 					if (gamma_dither)
 					{
 						dith = get_random() & 0x3f;
@@ -337,15 +341,15 @@ void n64_periphs::video_update32(bitmap_rgb32 &bitmap)
 
 /*****************************************************************************/
 
-void n64_rdp::tc_div_no_perspective(INT32 ss, INT32 st, INT32 sw, INT32* sss, INT32* sst)
+void n64_rdp::tc_div_no_perspective(int32_t ss, int32_t st, int32_t sw, int32_t* sss, int32_t* sst)
 {
 	*sss = (SIGN16(ss)) & 0x1ffff;
 	*sst = (SIGN16(st)) & 0x1ffff;
 }
 
-void n64_rdp::tc_div(INT32 ss, INT32 st, INT32 sw, INT32* sss, INT32* sst)
+void n64_rdp::tc_div(int32_t ss, int32_t st, int32_t sw, int32_t* sss, int32_t* sst)
 {
-	INT32 w_carry = 0;
+	int32_t w_carry = 0;
 	if ((sw & 0x8000) || !(sw & 0x7fff))
 	{
 		w_carry = 1;
@@ -353,26 +357,26 @@ void n64_rdp::tc_div(INT32 ss, INT32 st, INT32 sw, INT32* sss, INT32* sst)
 
 	sw &= 0x7fff;
 
-	INT32 shift;
+	int32_t shift;
 	for (shift = 1; shift <= 14 && !((sw << shift) & 0x8000); shift++);
 	shift -= 1;
 
-	INT32 normout = (sw << shift) & 0x3fff;
-	INT32 wnorm = (normout & 0xff) << 2;
+	int32_t normout = (sw << shift) & 0x3fff;
+	int32_t wnorm = (normout & 0xff) << 2;
 	normout >>= 8;
 
-	INT32 temppoint = m_norm_point_rom[normout];
-	INT32 tempslope = m_norm_slope_rom[normout];
+	int32_t temppoint = m_norm_point_rom[normout];
+	int32_t tempslope = m_norm_slope_rom[normout];
 
-	INT32 tlu_rcp = ((-(tempslope * wnorm)) >> 10) + temppoint;
+	int32_t tlu_rcp = ((-(tempslope * wnorm)) >> 10) + temppoint;
 
-	INT32 sprod = SIGN16(ss) * tlu_rcp;
-	INT32 tprod = SIGN16(st) * tlu_rcp;
-	INT32 tempmask = ((1 << (shift + 1)) - 1) << (29 - shift);
-	INT32 shift_value = 13 - shift;
+	int32_t sprod = SIGN16(ss) * tlu_rcp;
+	int32_t tprod = SIGN16(st) * tlu_rcp;
+	int32_t tempmask = ((1 << (shift + 1)) - 1) << (29 - shift);
+	int32_t shift_value = 13 - shift;
 
-	INT32 outofbounds_s = sprod & tempmask;
-	INT32 outofbounds_t = tprod & tempmask;
+	int32_t outofbounds_s = sprod & tempmask;
+	int32_t outofbounds_t = tprod & tempmask;
 	if (shift == 0xe)
 	{
 		*sss = sprod << 1;
@@ -384,10 +388,10 @@ void n64_rdp::tc_div(INT32 ss, INT32 st, INT32 sw, INT32* sss, INT32* sst)
 		*sst = tprod = (tprod >> shift_value);
 	}
 	//compute clamp flags
-	INT32 under_s = 0;
-	INT32 under_t = 0;
-	INT32 over_s = 0;
-	INT32 over_t = 0;
+	int32_t under_s = 0;
+	int32_t under_t = 0;
+	int32_t over_s = 0;
+	int32_t over_t = 0;
 
 	if (outofbounds_s != tempmask && outofbounds_s != 0)
 	{
@@ -420,7 +424,7 @@ void n64_rdp::tc_div(INT32 ss, INT32 st, INT32 sw, INT32* sss, INT32* sst)
 	*sst = (*sst & 0x1ffff) | (over_t << 18) | (under_t << 17);
 }
 
-INT32 n64_rdp::color_combiner_equation(INT32 a, INT32 b, INT32 c, INT32 d)
+int32_t n64_rdp::color_combiner_equation(int32_t a, int32_t b, int32_t c, int32_t d)
 {
 	a = KURT_AKELEY_SIGN9(a);
 	b = KURT_AKELEY_SIGN9(b);
@@ -432,7 +436,7 @@ INT32 n64_rdp::color_combiner_equation(INT32 a, INT32 b, INT32 c, INT32 d)
 	return a;
 }
 
-INT32 n64_rdp::alpha_combiner_equation(INT32 a, INT32 b, INT32 c, INT32 d)
+int32_t n64_rdp::alpha_combiner_equation(int32_t a, int32_t b, int32_t c, int32_t d)
 {
 	a = KURT_AKELEY_SIGN9(a);
 	b = KURT_AKELEY_SIGN9(b);
@@ -444,7 +448,7 @@ INT32 n64_rdp::alpha_combiner_equation(INT32 a, INT32 b, INT32 c, INT32 d)
 	return a;
 }
 
-void n64_rdp::set_suba_input_rgb(color_t** input, INT32 code, rdp_span_aux* userdata)
+void n64_rdp::set_suba_input_rgb(color_t** input, int32_t code, rdp_span_aux* userdata)
 {
 	switch (code & 0xf)
 	{
@@ -463,7 +467,7 @@ void n64_rdp::set_suba_input_rgb(color_t** input, INT32 code, rdp_span_aux* user
 	}
 }
 
-void n64_rdp::set_subb_input_rgb(color_t** input, INT32 code, rdp_span_aux* userdata)
+void n64_rdp::set_subb_input_rgb(color_t** input, int32_t code, rdp_span_aux* userdata)
 {
 	switch (code & 0xf)
 	{
@@ -482,7 +486,7 @@ void n64_rdp::set_subb_input_rgb(color_t** input, INT32 code, rdp_span_aux* user
 	}
 }
 
-void n64_rdp::set_mul_input_rgb(color_t** input, INT32 code, rdp_span_aux* userdata)
+void n64_rdp::set_mul_input_rgb(color_t** input, int32_t code, rdp_span_aux* userdata)
 {
 	switch (code & 0x1f)
 	{
@@ -510,7 +514,7 @@ void n64_rdp::set_mul_input_rgb(color_t** input, INT32 code, rdp_span_aux* userd
 	}
 }
 
-void n64_rdp::set_add_input_rgb(color_t** input, INT32 code, rdp_span_aux* userdata)
+void n64_rdp::set_add_input_rgb(color_t** input, int32_t code, rdp_span_aux* userdata)
 {
 	switch (code & 0x7)
 	{
@@ -525,7 +529,7 @@ void n64_rdp::set_add_input_rgb(color_t** input, INT32 code, rdp_span_aux* userd
 	}
 }
 
-void n64_rdp::set_sub_input_alpha(color_t** input, INT32 code, rdp_span_aux* userdata)
+void n64_rdp::set_sub_input_alpha(color_t** input, int32_t code, rdp_span_aux* userdata)
 {
 	switch (code & 0x7)
 	{
@@ -540,7 +544,7 @@ void n64_rdp::set_sub_input_alpha(color_t** input, INT32 code, rdp_span_aux* use
 	}
 }
 
-void n64_rdp::set_mul_input_alpha(color_t** input, INT32 code, rdp_span_aux* userdata)
+void n64_rdp::set_mul_input_alpha(color_t** input, int32_t code, rdp_span_aux* userdata)
 {
 	switch (code & 0x7)
 	{
@@ -555,7 +559,7 @@ void n64_rdp::set_mul_input_alpha(color_t** input, INT32 code, rdp_span_aux* use
 	}
 }
 
-void n64_rdp::set_blender_input(INT32 cycle, INT32 which, color_t** input_rgb, color_t** input_a, INT32 a, INT32 b, rdp_span_aux* userdata)
+void n64_rdp::set_blender_input(int32_t cycle, int32_t which, color_t** input_rgb, color_t** input_a, int32_t a, int32_t b, rdp_span_aux* userdata)
 {
 	switch (a & 0x3)
 	{
@@ -598,7 +602,7 @@ void n64_rdp::set_blender_input(INT32 cycle, INT32 which, color_t** input_rgb, c
 	}
 }
 
-const UINT8 n64_rdp::s_bayer_matrix[16] =
+const uint8_t n64_rdp::s_bayer_matrix[16] =
 { /* Bayer matrix */
 		0,  4,  1, 5,
 		6,  2,  7, 3,
@@ -606,7 +610,7 @@ const UINT8 n64_rdp::s_bayer_matrix[16] =
 		7,  3,  6, 2
 };
 
-const UINT8 n64_rdp::s_magic_matrix[16] =
+const uint8_t n64_rdp::s_magic_matrix[16] =
 { /* Magic square matrix */
 		0,  6,  1, 7,
 		4,  2,  5, 3,
@@ -630,8 +634,8 @@ const z_decompress_entry_t n64_rdp::m_z_dec_table[8] =
 
 void n64_rdp::z_build_com_table(void)
 {
-	UINT16 altmem = 0;
-	for(INT32 z = 0; z < 0x40000; z++)
+	uint16_t altmem = 0;
+	for(int32_t z = 0; z < 0x40000; z++)
 	{
 		switch((z >> 11) & 0x7f)
 		{
@@ -788,62 +792,62 @@ void n64_rdp::z_build_com_table(void)
 
 void n64_rdp::precalc_cvmask_derivatives(void)
 {
-	const UINT8 yarray[16] = {0, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0};
-	const UINT8 xarray[16] = {0, 3, 2, 2, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0};
+	const uint8_t yarray[16] = {0, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0};
+	const uint8_t xarray[16] = {0, 3, 2, 2, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0};
 
-	for (INT32 i = 0; i < 0x10000; i++)
+	for (int32_t i = 0; i < 0x10000; i++)
 	{
 		m_compressed_cvmasks[i] = (i & 1) | ((i & 4) >> 1) | ((i & 0x20) >> 3) | ((i & 0x80) >> 4) |
 		((i & 0x100) >> 4) | ((i & 0x400) >> 5) | ((i & 0x2000) >> 7) | ((i & 0x8000) >> 8);
 	}
 
-	for (INT32 i = 0; i < 0x100; i++)
+	for (int32_t i = 0; i < 0x100; i++)
 	{
-		UINT16 mask = decompress_cvmask_frombyte(i);
+		uint16_t mask = decompress_cvmask_frombyte(i);
 		cvarray[i].cvg = cvarray[i].cvbit = 0;
 		cvarray[i].cvbit = (i >> 7) & 1;
-		for (INT32 k = 0; k < 8; k++)
+		for (int32_t k = 0; k < 8; k++)
 		{
 			cvarray[i].cvg += ((i >> k) & 1);
 		}
 
-		UINT16 masky = 0;
-		for (INT32 k = 0; k < 4; k++)
+		uint16_t masky = 0;
+		for (int32_t k = 0; k < 4; k++)
 		{
 			masky |= ((mask & (0xf000 >> (k << 2))) > 0) << k;
 		}
-		UINT8 offy = yarray[masky];
+		uint8_t offy = yarray[masky];
 
-		UINT16 maskx = (mask & (0xf000 >> (offy << 2))) >> ((offy ^ 3) << 2);
-		UINT8 offx = xarray[maskx];
+		uint16_t maskx = (mask & (0xf000 >> (offy << 2))) >> ((offy ^ 3) << 2);
+		uint8_t offx = xarray[maskx];
 
 		cvarray[i].xoff = offx;
 		cvarray[i].yoff = offy;
 	}
 }
 
-UINT16 n64_rdp::decompress_cvmask_frombyte(UINT8 x)
+uint16_t n64_rdp::decompress_cvmask_frombyte(uint8_t x)
 {
-	UINT16 y = (x & 1) | ((x & 2) << 1) | ((x & 4) << 3) | ((x & 8) << 4) |
+	uint16_t y = (x & 1) | ((x & 2) << 1) | ((x & 4) << 3) | ((x & 8) << 4) |
 		((x & 0x10) << 4) | ((x & 0x20) << 5) | ((x & 0x40) << 7) | ((x & 0x80) << 8);
 	return y;
 }
 
-void n64_rdp::lookup_cvmask_derivatives(UINT32 mask, UINT8* offx, UINT8* offy, rdp_span_aux* userdata)
+void n64_rdp::lookup_cvmask_derivatives(uint32_t mask, uint8_t* offx, uint8_t* offy, rdp_span_aux* userdata)
 {
-	const UINT32 index = m_compressed_cvmasks[mask];
+	const uint32_t index = m_compressed_cvmasks[mask];
 	userdata->m_current_pix_cvg = cvarray[index].cvg;
 	userdata->m_current_cvg_bit = cvarray[index].cvbit;
 	*offx = cvarray[index].xoff;
 	*offy = cvarray[index].yoff;
 }
 
-void n64_rdp::z_store(const rdp_poly_state &object, UINT32 zcurpixel, UINT32 dzcurpixel, UINT32 z, UINT32 enc)
+void n64_rdp::z_store(const rdp_poly_state &object, uint32_t zcurpixel, uint32_t dzcurpixel, uint32_t z, uint32_t enc)
 {
-	UINT16 zval = m_z_com_table[z & 0x3ffff]|(enc >> 2);
+	uint16_t zval = m_z_com_table[z & 0x3ffff]|(enc >> 2);
 	if(zcurpixel <= MEM16_LIMIT)
 	{
-		((UINT16*)m_rdram)[zcurpixel ^ WORD_ADDR_XOR] = zval;
+		((uint16_t*)m_rdram)[zcurpixel ^ WORD_ADDR_XOR] = zval;
 	}
 	if(dzcurpixel <= MEM8_LIMIT)
 	{
@@ -851,7 +855,7 @@ void n64_rdp::z_store(const rdp_poly_state &object, UINT32 zcurpixel, UINT32 dzc
 	}
 }
 
-INT32 n64_rdp::normalize_dzpix(INT32 sum)
+int32_t n64_rdp::normalize_dzpix(int32_t sum)
 {
 	if (sum & 0xc000)
 	{
@@ -861,7 +865,7 @@ INT32 n64_rdp::normalize_dzpix(INT32 sum)
 	{
 		return 1;
 	}
-	for(INT32 count = 0x2000; count > 0; count >>= 1)
+	for(int32_t count = 0x2000; count > 0; count >>= 1)
 	{
 		if (sum & count)
 		{
@@ -871,29 +875,29 @@ INT32 n64_rdp::normalize_dzpix(INT32 sum)
 	return 0;
 }
 
-UINT32 n64_rdp::z_decompress(UINT32 zcurpixel)
+uint32_t n64_rdp::z_decompress(uint32_t zcurpixel)
 {
 	return m_z_complete_dec_table[(RREADIDX16(zcurpixel) >> 2) & 0x3fff];
 }
 
-UINT32 n64_rdp::dz_decompress(UINT32 zcurpixel, UINT32 dzcurpixel)
+uint32_t n64_rdp::dz_decompress(uint32_t zcurpixel, uint32_t dzcurpixel)
 {
-	const UINT16 zval = RREADIDX16(zcurpixel);
-	const UINT8 dzval = (((dzcurpixel) <= 0x7fffff) ? (m_hidden_bits[(dzcurpixel) ^ BYTE_ADDR_XOR]) : 0);
-	const UINT32 dz_compressed = ((zval & 3) << 2) | (dzval & 3);
+	const uint16_t zval = RREADIDX16(zcurpixel);
+	const uint8_t dzval = (((dzcurpixel) <= 0x7fffff) ? (m_hidden_bits[(dzcurpixel) ^ BYTE_ADDR_XOR]) : 0);
+	const uint32_t dz_compressed = ((zval & 3) << 2) | (dzval & 3);
 	return (1 << dz_compressed);
 }
 
-UINT32 n64_rdp::dz_compress(UINT32 value)
+uint32_t n64_rdp::dz_compress(uint32_t value)
 {
-	INT32 j = 0;
+	int32_t j = 0;
 	for (; value > 1; j++, value >>= 1);
 	return j;
 }
 
-void n64_rdp::get_dither_values(INT32 x, INT32 y, INT32* cdith, INT32* adith, const rdp_poly_state& object)
+void n64_rdp::get_dither_values(int32_t x, int32_t y, int32_t* cdith, int32_t* adith, const rdp_poly_state& object)
 {
-	const INT32 dithindex = ((y & 3) << 2) | (x & 3);
+	const int32_t dithindex = ((y & 3) << 2) | (x & 3);
 	switch((object.m_other_modes.rgb_dither_sel << 2) | object.m_other_modes.alpha_dither_sel)
 	{
 	case 0:
@@ -952,7 +956,7 @@ void n64_rdp::get_dither_values(INT32 x, INT32 y, INT32* cdith, INT32* adith, co
 		break;
 	case 14:
 		*cdith = 0;
-		*adith = m_machine->rand() & 7;
+		*adith = machine().rand() & 7;
 		break;
 	case 15:
 		*adith = *cdith = 0;
@@ -960,22 +964,22 @@ void n64_rdp::get_dither_values(INT32 x, INT32 y, INT32* cdith, INT32* adith, co
 	}
 }
 
-INT32 CLAMP(INT32 in, INT32 min, INT32 max)
+int32_t CLAMP(int32_t in, int32_t min, int32_t max)
 {
 	if(in < min) return min;
 	if(in > max) return max;
 	return in;
 }
 
-bool n64_rdp::z_compare(UINT32 zcurpixel, UINT32 dzcurpixel, UINT32 sz, UINT16 dzpix, rdp_span_aux* userdata, const rdp_poly_state &object)
+bool n64_rdp::z_compare(uint32_t zcurpixel, uint32_t dzcurpixel, uint32_t sz, uint16_t dzpix, rdp_span_aux* userdata, const rdp_poly_state &object)
 {
 	bool force_coplanar = false;
 	sz &= 0x3ffff;
 
-	UINT32 oz;
-	UINT32 dzmem;
-	UINT32 zval;
-	INT32 rawdzmem;
+	uint32_t oz;
+	uint32_t dzmem;
+	uint32_t zval;
+	int32_t rawdzmem;
 
 	if (object.m_other_modes.z_compare_en)
 	{
@@ -996,10 +1000,10 @@ bool n64_rdp::z_compare(UINT32 zcurpixel, UINT32 dzcurpixel, UINT32 sz, UINT16 d
 	userdata->m_shift_a = CLAMP(userdata->m_dzpix_enc - rawdzmem, 0, 4);
 	userdata->m_shift_b = CLAMP(rawdzmem - userdata->m_dzpix_enc, 0, 4);
 
-	INT32 precision_factor = (zval >> 13) & 0xf;
+	int32_t precision_factor = (zval >> 13) & 0xf;
 	if (precision_factor < 3)
 	{
-		INT32 dzmemmodifier = 16 >> precision_factor;
+		int32_t dzmemmodifier = 16 >> precision_factor;
 		if (dzmem == 0x8000)
 		{
 			force_coplanar = true;
@@ -1019,8 +1023,8 @@ bool n64_rdp::z_compare(UINT32 zcurpixel, UINT32 dzcurpixel, UINT32 sz, UINT16 d
 		dzmem = 0xffff;
 	}
 
-	UINT32 dznew = (dzmem > dzpix) ? dzmem : (UINT32)dzpix;
-	UINT32 dznotshift = dznew;
+	uint32_t dznew = (dzmem > dzpix) ? dzmem : (uint32_t)dzpix;
+	uint32_t dznotshift = dznew;
 	dznew <<= 3;
 
 	bool farther = (sz + dznew) >= oz;
@@ -1035,8 +1039,8 @@ bool n64_rdp::z_compare(UINT32 zcurpixel, UINT32 dzcurpixel, UINT32 sz, UINT16 d
 	userdata->m_blend_enable = (object.m_other_modes.force_blend || (!overflow && object.m_other_modes.antialias_en && farther)) ? 1 : 0;
 	userdata->m_pre_wrap = overflow;
 
-	INT32 cvgcoeff = 0;
-	UINT32 dzenc = 0;
+	int32_t cvgcoeff = 0;
+	uint32_t dzenc = 0;
 
 	if (object.m_other_modes.z_mode == 1 && infront && farther && overflow)
 	{
@@ -1050,8 +1054,8 @@ bool n64_rdp::z_compare(UINT32 zcurpixel, UINT32 dzcurpixel, UINT32 sz, UINT16 d
 		return true;
 	}
 
-	INT32 diff = (INT32)sz - (INT32)dznew;
-	bool nearer = diff <= (INT32)oz;
+	int32_t diff = (int32_t)sz - (int32_t)dznew;
+	bool nearer = diff <= (int32_t)oz;
 	bool max = (oz == 0x3ffff);
 	if (force_coplanar)
 	{
@@ -1073,7 +1077,7 @@ bool n64_rdp::z_compare(UINT32 zcurpixel, UINT32 dzcurpixel, UINT32 sz, UINT16 d
 	return false;
 }
 
-UINT32 n64_rdp::get_log2(UINT32 lod_clamp)
+uint32_t n64_rdp::get_log2(uint32_t lod_clamp)
 {
 	if (lod_clamp < 2)
 	{
@@ -1081,7 +1085,7 @@ UINT32 n64_rdp::get_log2(UINT32 lod_clamp)
 	}
 	else
 	{
-		for (INT32 i = 7; i > 0; i--)
+		for (int32_t i = 7; i > 0; i--)
 		{
 			if ((lod_clamp >> i) & 1)
 			{
@@ -1095,22 +1099,22 @@ UINT32 n64_rdp::get_log2(UINT32 lod_clamp)
 
 /*****************************************************************************/
 
-UINT32 n64_rdp::read_data(UINT32 address)
+uint64_t n64_rdp::read_data(uint32_t address)
 {
 	if (m_status & 0x1)     // XBUS_DMEM_DMA enabled
 	{
-		return m_dmem[(address & 0xfff) / 4];
+		return (uint64_t(m_dmem[(address & 0xfff) / 4]) << 32) | m_dmem[((address + 4) & 0xfff) / 4];
 	}
 	else
 	{
-		return m_rdram[((address & 0xffffff) / 4)];
+		return (uint64_t(m_rdram[((address & 0xffffff) / 4)]) << 32) | m_rdram[(((address + 4) & 0xffffff) / 4)];
 	}
 }
 
 const char* n64_rdp::s_image_format[] = { "RGBA", "YUV", "CI", "IA", "I", "???", "???", "???" };
 const char* n64_rdp::s_image_size[] = { "4-bit", "8-bit", "16-bit", "32-bit" };
 
-const INT32 n64_rdp::s_rdp_command_length[64] =
+const int32_t n64_rdp::s_rdp_command_length[64] =
 {
 	8,          // 0x00, No Op
 	8,          // 0x01, ???
@@ -1192,39 +1196,38 @@ void n64_rdp::disassemble(char* buffer)
 	char drdy[32], dgdy[32], dbdy[32], dady[32];
 	char drde[32], dgde[32], dbde[32], dade[32];
 
-	UINT32 cmd[64];
+	uint64_t cmd[32];
 
-	const UINT32 length = m_cmd_ptr * 4;
+	const uint32_t length = m_cmd_ptr * 8;
 	if (length < 8)
 	{
 		sprintf(buffer, "ERROR: length = %d\n", length);
 		return;
 	}
 
-	cmd[0] = m_cmd_data[m_cmd_cur+0];
-	cmd[1] = m_cmd_data[m_cmd_cur+1];
+	cmd[0] = m_cmd_data[m_cmd_cur];
 
-	const INT32 tile = (cmd[1] >> 24) & 0x7;
-	sprintf(sl, "%4.2f", (float)((cmd[0] >> 12) & 0xfff) / 4.0f);
-	sprintf(tl, "%4.2f", (float)((cmd[0] >>  0) & 0xfff) / 4.0f);
-	sprintf(sh, "%4.2f", (float)((cmd[1] >> 12) & 0xfff) / 4.0f);
-	sprintf(th, "%4.2f", (float)((cmd[1] >>  0) & 0xfff) / 4.0f);
+	const int32_t tile = (cmd[0] >> 56) & 0x7;
+	sprintf(sl, "%4.2f", (float)((cmd[0] >> 44) & 0xfff) / 4.0f);
+	sprintf(tl, "%4.2f", (float)((cmd[0] >> 32) & 0xfff) / 4.0f);
+	sprintf(sh, "%4.2f", (float)((cmd[0] >> 12) & 0xfff) / 4.0f);
+	sprintf(th, "%4.2f", (float)((cmd[0] >>  0) & 0xfff) / 4.0f);
 
-	const char* format = s_image_format[(cmd[0] >> 21) & 0x7];
-	const char* size = s_image_size[(cmd[0] >> 19) & 0x3];
+	const char* format = s_image_format[(cmd[0] >> 53) & 0x7];
+	const char* size = s_image_size[(cmd[0] >> 51) & 0x3];
 
-	const UINT32 r = (cmd[1] >> 24) & 0xff;
-	const UINT32 g = (cmd[1] >> 16) & 0xff;
-	const UINT32 b = (cmd[1] >>  8) & 0xff;
-	const UINT32 a = (cmd[1] >>  0) & 0xff;
+	const uint32_t r = (cmd[0] >> 24) & 0xff;
+	const uint32_t g = (cmd[0] >> 16) & 0xff;
+	const uint32_t b = (cmd[0] >>  8) & 0xff;
+	const uint32_t a = (cmd[0] >>  0) & 0xff;
 
-	const UINT32 command = (cmd[0] >> 24) & 0x3f;
+	const uint32_t command = (cmd[0] >> 56) & 0x3f;
 	switch (command)
 	{
 		case 0x00:  sprintf(buffer, "No Op"); break;
 		case 0x08:      // Tri_NoShade
 		{
-			const INT32 lft = (command >> 23) & 0x1;
+			const int32_t lft = (cmd[0] >> 55) & 0x1;
 
 			if (length != s_rdp_command_length[command])
 			{
@@ -1232,29 +1235,26 @@ void n64_rdp::disassemble(char* buffer)
 				return;
 			}
 
+			cmd[1] = m_cmd_data[m_cmd_cur+1];
 			cmd[2] = m_cmd_data[m_cmd_cur+2];
 			cmd[3] = m_cmd_data[m_cmd_cur+3];
-			cmd[4] = m_cmd_data[m_cmd_cur+4];
-			cmd[5] = m_cmd_data[m_cmd_cur+5];
-			cmd[6] = m_cmd_data[m_cmd_cur+6];
-			cmd[7] = m_cmd_data[m_cmd_cur+7];
 
-			sprintf(yl,     "%4.4f", (float)((cmd[0] >>  0) & 0x1fff) / 4.0f);
-			sprintf(ym,     "%4.4f", (float)((cmd[1] >> 16) & 0x1fff) / 4.0f);
-			sprintf(yh,     "%4.4f", (float)((cmd[1] >>  0) & 0x1fff) / 4.0f);
-			sprintf(xl,     "%4.4f", (float)(cmd[2] / 65536.0f));
-			sprintf(dxldy,  "%4.4f", (float)(cmd[3] / 65536.0f));
-			sprintf(xh,     "%4.4f", (float)(cmd[4] / 65536.0f));
-			sprintf(dxhdy,  "%4.4f", (float)(cmd[5] / 65536.0f));
-			sprintf(xm,     "%4.4f", (float)(cmd[6] / 65536.0f));
-			sprintf(dxmdy,  "%4.4f", (float)(cmd[7] / 65536.0f));
+			sprintf(yl,     "%4.4f", (float)((cmd[0] >> 32) & 0x1fff) / 4.0f);
+			sprintf(ym,     "%4.4f", (float)((cmd[0] >> 16) & 0x1fff) / 4.0f);
+			sprintf(yh,     "%4.4f", (float)((cmd[0] >>  0) & 0x1fff) / 4.0f);
+			sprintf(xl,     "%4.4f", (float)int32_t(cmd[1] >> 32) / 65536.0f);
+			sprintf(dxldy,  "%4.4f", (float)int32_t(cmd[1])       / 65536.0f);
+			sprintf(xh,     "%4.4f", (float)int32_t(cmd[2] >> 32) / 65536.0f);
+			sprintf(dxhdy,  "%4.4f", (float)int32_t(cmd[2])       / 65536.0f);
+			sprintf(xm,     "%4.4f", (float)int32_t(cmd[3] >> 32) / 65536.0f);
+			sprintf(dxmdy,  "%4.4f", (float)int32_t(cmd[3])       / 65536.0f);
 
 			sprintf(buffer, "Tri_NoShade            %d, XL: %s, XM: %s, XH: %s, YL: %s, YM: %s, YH: %s\n", lft, xl,xm,xh,yl,ym,yh);
 			break;
 		}
 		case 0x09:      // Tri_NoShadeZ
 		{
-			const INT32 lft = (command >> 23) & 0x1;
+			const int32_t lft = (cmd[0] >> 55) & 0x1;
 
 			if (length != s_rdp_command_length[command])
 			{
@@ -1262,29 +1262,26 @@ void n64_rdp::disassemble(char* buffer)
 				return;
 			}
 
+			cmd[1] = m_cmd_data[m_cmd_cur+1];
 			cmd[2] = m_cmd_data[m_cmd_cur+2];
 			cmd[3] = m_cmd_data[m_cmd_cur+3];
-			cmd[4] = m_cmd_data[m_cmd_cur+4];
-			cmd[5] = m_cmd_data[m_cmd_cur+5];
-			cmd[6] = m_cmd_data[m_cmd_cur+6];
-			cmd[7] = m_cmd_data[m_cmd_cur+7];
 
-			sprintf(yl,     "%4.4f", (float)((cmd[0] >>  0) & 0x1fff) / 4.0f);
-			sprintf(ym,     "%4.4f", (float)((cmd[1] >> 16) & 0x1fff) / 4.0f);
-			sprintf(yh,     "%4.4f", (float)((cmd[1] >>  0) & 0x1fff) / 4.0f);
-			sprintf(xl,     "%4.4f", (float)(cmd[2] / 65536.0f));
-			sprintf(dxldy,  "%4.4f", (float)(cmd[3] / 65536.0f));
-			sprintf(xh,     "%4.4f", (float)(cmd[4] / 65536.0f));
-			sprintf(dxhdy,  "%4.4f", (float)(cmd[5] / 65536.0f));
-			sprintf(xm,     "%4.4f", (float)(cmd[6] / 65536.0f));
-			sprintf(dxmdy,  "%4.4f", (float)(cmd[7] / 65536.0f));
+			sprintf(yl,     "%4.4f", (float)((cmd[0] >> 32) & 0x1fff) / 4.0f);
+			sprintf(ym,     "%4.4f", (float)((cmd[0] >> 16) & 0x1fff) / 4.0f);
+			sprintf(yh,     "%4.4f", (float)((cmd[0] >>  0) & 0x1fff) / 4.0f);
+			sprintf(xl,     "%4.4f", (float)int32_t(cmd[1] >> 32) / 65536.0f);
+			sprintf(dxldy,  "%4.4f", (float)int32_t(cmd[1])       / 65536.0f);
+			sprintf(xh,     "%4.4f", (float)int32_t(cmd[2] >> 32) / 65536.0f);
+			sprintf(dxhdy,  "%4.4f", (float)int32_t(cmd[2])       / 65536.0f);
+			sprintf(xm,     "%4.4f", (float)int32_t(cmd[3] >> 32) / 65536.0f);
+			sprintf(dxmdy,  "%4.4f", (float)int32_t(cmd[3])       / 65536.0f);
 
 			sprintf(buffer, "Tri_NoShadeZ            %d, XL: %s, XM: %s, XH: %s, YL: %s, YM: %s, YH: %s\n", lft, xl,xm,xh,yl,ym,yh);
 			break;
 		}
 		case 0x0a:      // Tri_Tex
 		{
-			const INT32 lft = (command >> 23) & 0x1;
+			const int32_t lft = (cmd[0] >> 55) & 0x1;
 
 			if (length < s_rdp_command_length[command])
 			{
@@ -1292,34 +1289,33 @@ void n64_rdp::disassemble(char* buffer)
 				return;
 			}
 
-			for (INT32 i = 2; i < 24; i++)
+			for (int32_t i = 1; i < 12; i++)
 			{
 				cmd[i] = m_cmd_data[m_cmd_cur+i];
 			}
 
-			sprintf(yl,     "%4.4f", (float)((cmd[0] >>  0) & 0x1fff) / 4.0f);
-			sprintf(ym,     "%4.4f", (float)((cmd[1] >> 16) & 0x1fff) / 4.0f);
-			sprintf(yh,     "%4.4f", (float)((cmd[1] >>  0) & 0x1fff) / 4.0f);
-			sprintf(xl,     "%4.4f", (float)((INT32)cmd[2] / 65536.0f));
-			sprintf(dxldy,  "%4.4f", (float)((INT32)cmd[3] / 65536.0f));
-			sprintf(xh,     "%4.4f", (float)((INT32)cmd[4] / 65536.0f));
-			sprintf(dxhdy,  "%4.4f", (float)((INT32)cmd[5] / 65536.0f));
-			sprintf(xm,     "%4.4f", (float)((INT32)cmd[6] / 65536.0f));
-			sprintf(dxmdy,  "%4.4f", (float)((INT32)cmd[7] / 65536.0f));
+			sprintf(yl,     "%4.4f", (float)((cmd[0] >> 32) & 0x1fff) / 4.0f);
+			sprintf(ym,     "%4.4f", (float)((cmd[0] >> 16) & 0x1fff) / 4.0f);
+			sprintf(yh,     "%4.4f", (float)((cmd[0] >>  0) & 0x1fff) / 4.0f);
+			sprintf(xl,     "%4.4f", (float)int32_t(cmd[1] >> 32) / 65536.0f);
+			sprintf(dxldy,  "%4.4f", (float)int32_t(cmd[1])       / 65536.0f);
+			sprintf(xh,     "%4.4f", (float)int32_t(cmd[2] >> 32) / 65536.0f);
+			sprintf(dxhdy,  "%4.4f", (float)int32_t(cmd[2])       / 65536.0f);
+			sprintf(xm,     "%4.4f", (float)int32_t(cmd[3] >> 32) / 65536.0f);
+			sprintf(dxmdy,  "%4.4f", (float)int32_t(cmd[3])       / 65536.0f);
 
-			sprintf(s,      "%4.4f", (float)(INT32)((cmd[ 8] & 0xffff0000) | ((cmd[12] >> 16) & 0xffff)) / 65536.0f);
-			sprintf(t,      "%4.4f", (float)(INT32)(((cmd[ 8] & 0xffff) << 16) | (cmd[12] & 0xffff)) / 65536.0f);
-			sprintf(w,      "%4.4f", (float)(INT32)((cmd[ 9] & 0xffff0000) | ((cmd[13] >> 16) & 0xffff)) / 65536.0f);
-			sprintf(dsdx,   "%4.4f", (float)(INT32)((cmd[10] & 0xffff0000) | ((cmd[14] >> 16) & 0xffff)) / 65536.0f);
-			sprintf(dtdx,   "%4.4f", (float)(INT32)(((cmd[10] & 0xffff) << 16) | (cmd[14] & 0xffff)) / 65536.0f);
-			sprintf(dwdx,   "%4.4f", (float)(INT32)((cmd[11] & 0xffff0000) | ((cmd[15] >> 16) & 0xffff)) / 65536.0f);
-			sprintf(dsde,   "%4.4f", (float)(INT32)((cmd[16] & 0xffff0000) | ((cmd[20] >> 16) & 0xffff)) / 65536.0f);
-			sprintf(dtde,   "%4.4f", (float)(INT32)(((cmd[16] & 0xffff) << 16) | (cmd[20] & 0xffff)) / 65536.0f);
-			sprintf(dwde,   "%4.4f", (float)(INT32)((cmd[17] & 0xffff0000) | ((cmd[21] >> 16) & 0xffff)) / 65536.0f);
-			sprintf(dsdy,   "%4.4f", (float)(INT32)((cmd[18] & 0xffff0000) | ((cmd[22] >> 16) & 0xffff)) / 65536.0f);
-			sprintf(dtdy,   "%4.4f", (float)(INT32)(((cmd[18] & 0xffff) << 16) | (cmd[22] & 0xffff)) / 65536.0f);
-			sprintf(dwdy,   "%4.4f", (float)(INT32)((cmd[19] & 0xffff0000) | ((cmd[23] >> 16) & 0xffff)) / 65536.0f);
-
+			sprintf(s,      "%4.4f", (float)int32_t( ((cmd[4] >> 32) & 0xffff0000)        | ((cmd[ 6] >> 48) & 0xffff)) / 65536.0f);
+			sprintf(t,      "%4.4f", (float)int32_t((((cmd[4] >> 32) & 0x0000ffff) << 16) | ((cmd[ 6] >> 32) & 0xffff)) / 65536.0f);
+			sprintf(w,      "%4.4f", (float)int32_t(  (cmd[4]        & 0xffff0000)        | ((cmd[ 6] >> 16) & 0xffff)) / 65536.0f);
+			sprintf(dsdx,   "%4.4f", (float)int32_t( ((cmd[5] >> 32) & 0xffff0000)        | ((cmd[ 7] >> 48) & 0xffff)) / 65536.0f);
+			sprintf(dtdx,   "%4.4f", (float)int32_t((((cmd[5] >> 32) & 0x0000ffff) << 16) | ((cmd[ 7] >> 32) & 0xffff)) / 65536.0f);
+			sprintf(dwdx,   "%4.4f", (float)int32_t(  (cmd[5]        & 0xffff0000)        | ((cmd[ 7] >> 16) & 0xffff)) / 65536.0f);
+			sprintf(dsde,   "%4.4f", (float)int32_t( ((cmd[8] >> 32) & 0xffff0000)        | ((cmd[10] >> 48) & 0xffff)) / 65536.0f);
+			sprintf(dtde,   "%4.4f", (float)int32_t((((cmd[8] >> 32) & 0x0000ffff) << 16) | ((cmd[10] >> 32) & 0xffff)) / 65536.0f);
+			sprintf(dwde,   "%4.4f", (float)int32_t(  (cmd[8]        & 0xffff0000)        | ((cmd[10] >> 16) & 0xffff)) / 65536.0f);
+			sprintf(dsdy,   "%4.4f", (float)int32_t( ((cmd[9] >> 32) & 0xffff0000)        | ((cmd[11] >> 48) & 0xffff)) / 65536.0f);
+			sprintf(dtdy,   "%4.4f", (float)int32_t((((cmd[9] >> 32) & 0x0000ffff) << 16) | ((cmd[11] >> 32) & 0xffff)) / 65536.0f);
+			sprintf(dwdy,   "%4.4f", (float)int32_t(  (cmd[9]        & 0xffff0000)        | ((cmd[11] >> 16) & 0xffff)) / 65536.0f);
 
 			buffer+=sprintf(buffer, "Tri_Tex               %d, XL: %s, XM: %s, XH: %s, YL: %s, YM: %s, YH: %s\n", lft, xl,xm,xh,yl,ym,yh);
 			buffer+=sprintf(buffer, "                              ");
@@ -1334,7 +1330,7 @@ void n64_rdp::disassemble(char* buffer)
 		}
 		case 0x0b:      // Tri_TexZ
 		{
-			const INT32 lft = (command >> 23) & 0x1;
+			const int32_t lft = (cmd[0] >> 55) & 0x1;
 
 			if (length < s_rdp_command_length[command])
 			{
@@ -1342,34 +1338,33 @@ void n64_rdp::disassemble(char* buffer)
 				return;
 			}
 
-			for (INT32 i = 2; i < 24; i++)
+			for (int32_t i = 1; i < 12; i++)
 			{
 				cmd[i] = m_cmd_data[m_cmd_cur+i];
 			}
 
-			sprintf(yl,     "%4.4f", (float)((cmd[0] >>  0) & 0x1fff) / 4.0f);
-			sprintf(ym,     "%4.4f", (float)((cmd[1] >> 16) & 0x1fff) / 4.0f);
-			sprintf(yh,     "%4.4f", (float)((cmd[1] >>  0) & 0x1fff) / 4.0f);
-			sprintf(xl,     "%4.4f", (float)((INT32)cmd[2] / 65536.0f));
-			sprintf(dxldy,  "%4.4f", (float)((INT32)cmd[3] / 65536.0f));
-			sprintf(xh,     "%4.4f", (float)((INT32)cmd[4] / 65536.0f));
-			sprintf(dxhdy,  "%4.4f", (float)((INT32)cmd[5] / 65536.0f));
-			sprintf(xm,     "%4.4f", (float)((INT32)cmd[6] / 65536.0f));
-			sprintf(dxmdy,  "%4.4f", (float)((INT32)cmd[7] / 65536.0f));
+			sprintf(yl,     "%4.4f", (float)((cmd[0] >> 32) & 0x1fff) / 4.0f);
+			sprintf(ym,     "%4.4f", (float)((cmd[0] >> 16) & 0x1fff) / 4.0f);
+			sprintf(yh,     "%4.4f", (float)((cmd[0] >>  0) & 0x1fff) / 4.0f);
+			sprintf(xl,     "%4.4f", (float)int32_t(cmd[1] >> 32) / 65536.0f);
+			sprintf(dxldy,  "%4.4f", (float)int32_t(cmd[1])       / 65536.0f);
+			sprintf(xh,     "%4.4f", (float)int32_t(cmd[2] >> 32) / 65536.0f);
+			sprintf(dxhdy,  "%4.4f", (float)int32_t(cmd[2])       / 65536.0f);
+			sprintf(xm,     "%4.4f", (float)int32_t(cmd[3] >> 32) / 65536.0f);
+			sprintf(dxmdy,  "%4.4f", (float)int32_t(cmd[3])       / 65536.0f);
 
-			sprintf(s,      "%4.4f", (float)(INT32)((cmd[ 8] & 0xffff0000) | ((cmd[12] >> 16) & 0xffff)) / 65536.0f);
-			sprintf(t,      "%4.4f", (float)(INT32)(((cmd[ 8] & 0xffff) << 16) | (cmd[12] & 0xffff)) / 65536.0f);
-			sprintf(w,      "%4.4f", (float)(INT32)((cmd[ 9] & 0xffff0000) | ((cmd[13] >> 16) & 0xffff)) / 65536.0f);
-			sprintf(dsdx,   "%4.4f", (float)(INT32)((cmd[10] & 0xffff0000) | ((cmd[14] >> 16) & 0xffff)) / 65536.0f);
-			sprintf(dtdx,   "%4.4f", (float)(INT32)(((cmd[10] & 0xffff) << 16) | (cmd[14] & 0xffff)) / 65536.0f);
-			sprintf(dwdx,   "%4.4f", (float)(INT32)((cmd[11] & 0xffff0000) | ((cmd[15] >> 16) & 0xffff)) / 65536.0f);
-			sprintf(dsde,   "%4.4f", (float)(INT32)((cmd[16] & 0xffff0000) | ((cmd[20] >> 16) & 0xffff)) / 65536.0f);
-			sprintf(dtde,   "%4.4f", (float)(INT32)(((cmd[16] & 0xffff) << 16) | (cmd[20] & 0xffff)) / 65536.0f);
-			sprintf(dwde,   "%4.4f", (float)(INT32)((cmd[17] & 0xffff0000) | ((cmd[21] >> 16) & 0xffff)) / 65536.0f);
-			sprintf(dsdy,   "%4.4f", (float)(INT32)((cmd[18] & 0xffff0000) | ((cmd[22] >> 16) & 0xffff)) / 65536.0f);
-			sprintf(dtdy,   "%4.4f", (float)(INT32)(((cmd[18] & 0xffff) << 16) | (cmd[22] & 0xffff)) / 65536.0f);
-			sprintf(dwdy,   "%4.4f", (float)(INT32)((cmd[19] & 0xffff0000) | ((cmd[23] >> 16) & 0xffff)) / 65536.0f);
-
+			sprintf(s,      "%4.4f", (float)int32_t( ((cmd[4] >> 32) & 0xffff0000)        | ((cmd[ 6] >> 48) & 0xffff)) / 65536.0f);
+			sprintf(t,      "%4.4f", (float)int32_t((((cmd[4] >> 32) & 0x0000ffff) << 16) | ((cmd[ 6] >> 32) & 0xffff)) / 65536.0f);
+			sprintf(w,      "%4.4f", (float)int32_t(  (cmd[4]        & 0xffff0000)        | ((cmd[ 6] >> 16) & 0xffff)) / 65536.0f);
+			sprintf(dsdx,   "%4.4f", (float)int32_t( ((cmd[5] >> 32) & 0xffff0000)        | ((cmd[ 7] >> 48) & 0xffff)) / 65536.0f);
+			sprintf(dtdx,   "%4.4f", (float)int32_t((((cmd[5] >> 32) & 0x0000ffff) << 16) | ((cmd[ 7] >> 32) & 0xffff)) / 65536.0f);
+			sprintf(dwdx,   "%4.4f", (float)int32_t(  (cmd[5]        & 0xffff0000)        | ((cmd[ 7] >> 16) & 0xffff)) / 65536.0f);
+			sprintf(dsde,   "%4.4f", (float)int32_t( ((cmd[8] >> 32) & 0xffff0000)        | ((cmd[10] >> 48) & 0xffff)) / 65536.0f);
+			sprintf(dtde,   "%4.4f", (float)int32_t((((cmd[8] >> 32) & 0x0000ffff) << 16) | ((cmd[10] >> 32) & 0xffff)) / 65536.0f);
+			sprintf(dwde,   "%4.4f", (float)int32_t(  (cmd[8]        & 0xffff0000)        | ((cmd[10] >> 16) & 0xffff)) / 65536.0f);
+			sprintf(dsdy,   "%4.4f", (float)int32_t( ((cmd[9] >> 32) & 0xffff0000)        | ((cmd[11] >> 48) & 0xffff)) / 65536.0f);
+			sprintf(dtdy,   "%4.4f", (float)int32_t((((cmd[9] >> 32) & 0x0000ffff) << 16) | ((cmd[11] >> 32) & 0xffff)) / 65536.0f);
+			sprintf(dwdy,   "%4.4f", (float)int32_t(  (cmd[9]        & 0xffff0000)        | ((cmd[11] >> 16) & 0xffff)) / 65536.0f);
 
 			buffer+=sprintf(buffer, "Tri_TexZ               %d, XL: %s, XM: %s, XH: %s, YL: %s, YM: %s, YH: %s\n", lft, xl,xm,xh,yl,ym,yh);
 			buffer+=sprintf(buffer, "                              ");
@@ -1384,7 +1379,7 @@ void n64_rdp::disassemble(char* buffer)
 		}
 		case 0x0c:      // Tri_Shade
 		{
-			const INT32 lft = (command >> 23) & 0x1;
+			const int32_t lft = (command >> 23) & 0x1;
 
 			if (length != s_rdp_command_length[command])
 			{
@@ -1392,36 +1387,37 @@ void n64_rdp::disassemble(char* buffer)
 				return;
 			}
 
-			for (INT32 i = 2; i < 24; i++)
+			for (int32_t i = 1; i < 12; i++)
 			{
 				cmd[i] = m_cmd_data[i];
 			}
 
-			sprintf(yl,     "%4.4f", (float)((cmd[0] >>  0) & 0x1fff) / 4.0f);
-			sprintf(ym,     "%4.4f", (float)((cmd[1] >> 16) & 0x1fff) / 4.0f);
-			sprintf(yh,     "%4.4f", (float)((cmd[1] >>  0) & 0x1fff) / 4.0f);
-			sprintf(xl,     "%4.4f", (float)((INT32)cmd[2] / 65536.0f));
-			sprintf(dxldy,  "%4.4f", (float)((INT32)cmd[3] / 65536.0f));
-			sprintf(xh,     "%4.4f", (float)((INT32)cmd[4] / 65536.0f));
-			sprintf(dxhdy,  "%4.4f", (float)((INT32)cmd[5] / 65536.0f));
-			sprintf(xm,     "%4.4f", (float)((INT32)cmd[6] / 65536.0f));
-			sprintf(dxmdy,  "%4.4f", (float)((INT32)cmd[7] / 65536.0f));
-			sprintf(rt,     "%4.4f", (float)(INT32)((cmd[8] & 0xffff0000) | ((cmd[12] >> 16) & 0xffff)) / 65536.0f);
-			sprintf(gt,     "%4.4f", (float)(INT32)(((cmd[8] & 0xffff) << 16) | (cmd[12] & 0xffff)) / 65536.0f);
-			sprintf(bt,     "%4.4f", (float)(INT32)((cmd[9] & 0xffff0000) | ((cmd[13] >> 16) & 0xffff)) / 65536.0f);
-			sprintf(at,     "%4.4f", (float)(INT32)(((cmd[9] & 0xffff) << 16) | (cmd[13] & 0xffff)) / 65536.0f);
-			sprintf(drdx,   "%4.4f", (float)(INT32)((cmd[10] & 0xffff0000) | ((cmd[14] >> 16) & 0xffff)) / 65536.0f);
-			sprintf(dgdx,   "%4.4f", (float)(INT32)(((cmd[10] & 0xffff) << 16) | (cmd[14] & 0xffff)) / 65536.0f);
-			sprintf(dbdx,   "%4.4f", (float)(INT32)((cmd[11] & 0xffff0000) | ((cmd[15] >> 16) & 0xffff)) / 65536.0f);
-			sprintf(dadx,   "%4.4f", (float)(INT32)(((cmd[11] & 0xffff) << 16) | (cmd[15] & 0xffff)) / 65536.0f);
-			sprintf(drde,   "%4.4f", (float)(INT32)((cmd[16] & 0xffff0000) | ((cmd[20] >> 16) & 0xffff)) / 65536.0f);
-			sprintf(dgde,   "%4.4f", (float)(INT32)(((cmd[16] & 0xffff) << 16) | (cmd[20] & 0xffff)) / 65536.0f);
-			sprintf(dbde,   "%4.4f", (float)(INT32)((cmd[17] & 0xffff0000) | ((cmd[21] >> 16) & 0xffff)) / 65536.0f);
-			sprintf(dade,   "%4.4f", (float)(INT32)(((cmd[17] & 0xffff) << 16) | (cmd[21] & 0xffff)) / 65536.0f);
-			sprintf(drdy,   "%4.4f", (float)(INT32)((cmd[18] & 0xffff0000) | ((cmd[22] >> 16) & 0xffff)) / 65536.0f);
-			sprintf(dgdy,   "%4.4f", (float)(INT32)(((cmd[18] & 0xffff) << 16) | (cmd[22] & 0xffff)) / 65536.0f);
-			sprintf(dbdy,   "%4.4f", (float)(INT32)((cmd[19] & 0xffff0000) | ((cmd[23] >> 16) & 0xffff)) / 65536.0f);
-			sprintf(dady,   "%4.4f", (float)(INT32)(((cmd[19] & 0xffff) << 16) | (cmd[23] & 0xffff)) / 65536.0f);
+			sprintf(yl,     "%4.4f", (float)((cmd[0] >> 32) & 0x1fff) / 4.0f);
+			sprintf(ym,     "%4.4f", (float)((cmd[0] >> 16) & 0x1fff) / 4.0f);
+			sprintf(yh,     "%4.4f", (float)((cmd[0] >>  0) & 0x1fff) / 4.0f);
+			sprintf(xl,     "%4.4f", (float)int32_t(cmd[1] >> 32) / 65536.0f);
+			sprintf(dxldy,  "%4.4f", (float)int32_t(cmd[1])       / 65536.0f);
+			sprintf(xh,     "%4.4f", (float)int32_t(cmd[2] >> 32) / 65536.0f);
+			sprintf(dxhdy,  "%4.4f", (float)int32_t(cmd[2])       / 65536.0f);
+			sprintf(xm,     "%4.4f", (float)int32_t(cmd[3] >> 32) / 65536.0f);
+			sprintf(dxmdy,  "%4.4f", (float)int32_t(cmd[3])       / 65536.0f);
+
+			sprintf(rt,     "%4.4f", (float)int32_t( ((cmd[4] >> 32) & 0xffff0000)        | ((cmd[ 6] >> 48) & 0xffff)) / 65536.0f);
+			sprintf(gt,     "%4.4f", (float)int32_t((((cmd[4] >> 32) & 0x0000ffff) << 16) | ((cmd[ 6] >> 32) & 0xffff)) / 65536.0f);
+			sprintf(bt,     "%4.4f", (float)int32_t(  (cmd[4]        & 0xffff0000)        | ((cmd[ 6] >> 16) & 0xffff)) / 65536.0f);
+			sprintf(at,     "%4.4f", (float)int32_t( ((cmd[4]        & 0x0000ffff) << 16) | ( cmd[ 6]        & 0xffff)) / 65536.0f);
+			sprintf(drdx,   "%4.4f", (float)int32_t( ((cmd[5] >> 32) & 0xffff0000)        | ((cmd[ 7] >> 48) & 0xffff)) / 65536.0f);
+			sprintf(dgdx,   "%4.4f", (float)int32_t((((cmd[5] >> 32) & 0x0000ffff) << 16) | ((cmd[ 7] >> 32) & 0xffff)) / 65536.0f);
+			sprintf(dbdx,   "%4.4f", (float)int32_t(  (cmd[5]        & 0xffff0000)        | ((cmd[ 7] >> 16) & 0xffff)) / 65536.0f);
+			sprintf(dadx,   "%4.4f", (float)int32_t( ((cmd[5]        & 0x0000ffff) << 16) | ( cmd[ 7]        & 0xffff)) / 65536.0f);
+			sprintf(drde,   "%4.4f", (float)int32_t( ((cmd[8] >> 32) & 0xffff0000)        | ((cmd[10] >> 48) & 0xffff)) / 65536.0f);
+			sprintf(dgde,   "%4.4f", (float)int32_t((((cmd[8] >> 32) & 0x0000ffff) << 16) | ((cmd[10] >> 32) & 0xffff)) / 65536.0f);
+			sprintf(dbde,   "%4.4f", (float)int32_t(  (cmd[8]        & 0xffff0000)        | ((cmd[10] >> 16) & 0xffff)) / 65536.0f);
+			sprintf(dade,   "%4.4f", (float)int32_t( ((cmd[8]        & 0x0000ffff) << 16) | ( cmd[10]        & 0xffff)) / 65536.0f);
+			sprintf(drdy,   "%4.4f", (float)int32_t( ((cmd[9] >> 32) & 0xffff0000)        | ((cmd[11] >> 48) & 0xffff)) / 65536.0f);
+			sprintf(dgdy,   "%4.4f", (float)int32_t((((cmd[9] >> 32) & 0x0000ffff) << 16) | ((cmd[11] >> 32) & 0xffff)) / 65536.0f);
+			sprintf(dbdy,   "%4.4f", (float)int32_t(  (cmd[9]        & 0xffff0000)        | ((cmd[11] >> 16) & 0xffff)) / 65536.0f);
+			sprintf(dady,   "%4.4f", (float)int32_t( ((cmd[9]        & 0x0000ffff) << 16) | ( cmd[11]        & 0xffff)) / 65536.0f);
 
 			buffer+=sprintf(buffer, "Tri_Shade              %d, XL: %s, XM: %s, XH: %s, YL: %s, YM: %s, YH: %s\n", lft, xl,xm,xh,yl,ym,yh);
 			buffer+=sprintf(buffer, "                              ");
@@ -1436,7 +1432,7 @@ void n64_rdp::disassemble(char* buffer)
 		}
 		case 0x0d:      // Tri_ShadeZ
 		{
-			const INT32 lft = (command >> 23) & 0x1;
+			const int32_t lft = (command >> 23) & 0x1;
 
 			if (length != s_rdp_command_length[command])
 			{
@@ -1444,36 +1440,37 @@ void n64_rdp::disassemble(char* buffer)
 				return;
 			}
 
-			for (INT32 i = 2; i < 24; i++)
+			for (int32_t i = 1; i < 12; i++)
 			{
 				cmd[i] = m_cmd_data[i];
 			}
 
-			sprintf(yl,     "%4.4f", (float)((cmd[0] >>  0) & 0x1fff) / 4.0f);
-			sprintf(ym,     "%4.4f", (float)((cmd[1] >> 16) & 0x1fff) / 4.0f);
-			sprintf(yh,     "%4.4f", (float)((cmd[1] >>  0) & 0x1fff) / 4.0f);
-			sprintf(xl,     "%4.4f", (float)((INT32)cmd[2] / 65536.0f));
-			sprintf(dxldy,  "%4.4f", (float)((INT32)cmd[3] / 65536.0f));
-			sprintf(xh,     "%4.4f", (float)((INT32)cmd[4] / 65536.0f));
-			sprintf(dxhdy,  "%4.4f", (float)((INT32)cmd[5] / 65536.0f));
-			sprintf(xm,     "%4.4f", (float)((INT32)cmd[6] / 65536.0f));
-			sprintf(dxmdy,  "%4.4f", (float)((INT32)cmd[7] / 65536.0f));
-			sprintf(rt,     "%4.4f", (float)(INT32)((cmd[8] & 0xffff0000) | ((cmd[12] >> 16) & 0xffff)) / 65536.0f);
-			sprintf(gt,     "%4.4f", (float)(INT32)(((cmd[8] & 0xffff) << 16) | (cmd[12] & 0xffff)) / 65536.0f);
-			sprintf(bt,     "%4.4f", (float)(INT32)((cmd[9] & 0xffff0000) | ((cmd[13] >> 16) & 0xffff)) / 65536.0f);
-			sprintf(at,     "%4.4f", (float)(INT32)(((cmd[9] & 0xffff) << 16) | (cmd[13] & 0xffff)) / 65536.0f);
-			sprintf(drdx,   "%4.4f", (float)(INT32)((cmd[10] & 0xffff0000) | ((cmd[14] >> 16) & 0xffff)) / 65536.0f);
-			sprintf(dgdx,   "%4.4f", (float)(INT32)(((cmd[10] & 0xffff) << 16) | (cmd[14] & 0xffff)) / 65536.0f);
-			sprintf(dbdx,   "%4.4f", (float)(INT32)((cmd[11] & 0xffff0000) | ((cmd[15] >> 16) & 0xffff)) / 65536.0f);
-			sprintf(dadx,   "%4.4f", (float)(INT32)(((cmd[11] & 0xffff) << 16) | (cmd[15] & 0xffff)) / 65536.0f);
-			sprintf(drde,   "%4.4f", (float)(INT32)((cmd[16] & 0xffff0000) | ((cmd[20] >> 16) & 0xffff)) / 65536.0f);
-			sprintf(dgde,   "%4.4f", (float)(INT32)(((cmd[16] & 0xffff) << 16) | (cmd[20] & 0xffff)) / 65536.0f);
-			sprintf(dbde,   "%4.4f", (float)(INT32)((cmd[17] & 0xffff0000) | ((cmd[21] >> 16) & 0xffff)) / 65536.0f);
-			sprintf(dade,   "%4.4f", (float)(INT32)(((cmd[17] & 0xffff) << 16) | (cmd[21] & 0xffff)) / 65536.0f);
-			sprintf(drdy,   "%4.4f", (float)(INT32)((cmd[18] & 0xffff0000) | ((cmd[22] >> 16) & 0xffff)) / 65536.0f);
-			sprintf(dgdy,   "%4.4f", (float)(INT32)(((cmd[18] & 0xffff) << 16) | (cmd[22] & 0xffff)) / 65536.0f);
-			sprintf(dbdy,   "%4.4f", (float)(INT32)((cmd[19] & 0xffff0000) | ((cmd[23] >> 16) & 0xffff)) / 65536.0f);
-			sprintf(dady,   "%4.4f", (float)(INT32)(((cmd[19] & 0xffff) << 16) | (cmd[23] & 0xffff)) / 65536.0f);
+			sprintf(yl,     "%4.4f", (float)((cmd[0] >> 32) & 0x1fff) / 4.0f);
+			sprintf(ym,     "%4.4f", (float)((cmd[0] >> 16) & 0x1fff) / 4.0f);
+			sprintf(yh,     "%4.4f", (float)((cmd[0] >>  0) & 0x1fff) / 4.0f);
+			sprintf(xl,     "%4.4f", (float)int32_t(cmd[1] >> 32) / 65536.0f);
+			sprintf(dxldy,  "%4.4f", (float)int32_t(cmd[1])       / 65536.0f);
+			sprintf(xh,     "%4.4f", (float)int32_t(cmd[2] >> 32) / 65536.0f);
+			sprintf(dxhdy,  "%4.4f", (float)int32_t(cmd[2])       / 65536.0f);
+			sprintf(xm,     "%4.4f", (float)int32_t(cmd[3] >> 32) / 65536.0f);
+			sprintf(dxmdy,  "%4.4f", (float)int32_t(cmd[3])       / 65536.0f);
+
+			sprintf(rt,     "%4.4f", (float)int32_t( ((cmd[4] >> 32) & 0xffff0000)        | ((cmd[ 6] >> 48) & 0xffff)) / 65536.0f);
+			sprintf(gt,     "%4.4f", (float)int32_t((((cmd[4] >> 32) & 0x0000ffff) << 16) | ((cmd[ 6] >> 32) & 0xffff)) / 65536.0f);
+			sprintf(bt,     "%4.4f", (float)int32_t(  (cmd[4]        & 0xffff0000)        | ((cmd[ 6] >> 16) & 0xffff)) / 65536.0f);
+			sprintf(at,     "%4.4f", (float)int32_t( ((cmd[4]        & 0x0000ffff) << 16) | ( cmd[ 6]        & 0xffff)) / 65536.0f);
+			sprintf(drdx,   "%4.4f", (float)int32_t( ((cmd[5] >> 32) & 0xffff0000)        | ((cmd[ 7] >> 48) & 0xffff)) / 65536.0f);
+			sprintf(dgdx,   "%4.4f", (float)int32_t((((cmd[5] >> 32) & 0x0000ffff) << 16) | ((cmd[ 7] >> 32) & 0xffff)) / 65536.0f);
+			sprintf(dbdx,   "%4.4f", (float)int32_t(  (cmd[5]        & 0xffff0000)        | ((cmd[ 7] >> 16) & 0xffff)) / 65536.0f);
+			sprintf(dadx,   "%4.4f", (float)int32_t( ((cmd[5]        & 0x0000ffff) << 16) | ( cmd[ 7]        & 0xffff)) / 65536.0f);
+			sprintf(drde,   "%4.4f", (float)int32_t( ((cmd[8] >> 32) & 0xffff0000)        | ((cmd[10] >> 48) & 0xffff)) / 65536.0f);
+			sprintf(dgde,   "%4.4f", (float)int32_t((((cmd[8] >> 32) & 0x0000ffff) << 16) | ((cmd[10] >> 32) & 0xffff)) / 65536.0f);
+			sprintf(dbde,   "%4.4f", (float)int32_t(  (cmd[8]        & 0xffff0000)        | ((cmd[10] >> 16) & 0xffff)) / 65536.0f);
+			sprintf(dade,   "%4.4f", (float)int32_t( ((cmd[8]        & 0x0000ffff) << 16) | ( cmd[10]        & 0xffff)) / 65536.0f);
+			sprintf(drdy,   "%4.4f", (float)int32_t( ((cmd[9] >> 32) & 0xffff0000)        | ((cmd[11] >> 48) & 0xffff)) / 65536.0f);
+			sprintf(dgdy,   "%4.4f", (float)int32_t((((cmd[9] >> 32) & 0x0000ffff) << 16) | ((cmd[11] >> 32) & 0xffff)) / 65536.0f);
+			sprintf(dbdy,   "%4.4f", (float)int32_t(  (cmd[9]        & 0xffff0000)        | ((cmd[11] >> 16) & 0xffff)) / 65536.0f);
+			sprintf(dady,   "%4.4f", (float)int32_t( ((cmd[9]        & 0x0000ffff) << 16) | ( cmd[11]        & 0xffff)) / 65536.0f);
 
 			buffer+=sprintf(buffer, "Tri_ShadeZ              %d, XL: %s, XM: %s, XH: %s, YL: %s, YM: %s, YH: %s\n", lft, xl,xm,xh,yl,ym,yh);
 			buffer+=sprintf(buffer, "                              ");
@@ -1488,7 +1485,7 @@ void n64_rdp::disassemble(char* buffer)
 		}
 		case 0x0e:      // Tri_TexShade
 		{
-			const INT32 lft = (command >> 23) & 0x1;
+			const int32_t lft = (command >> 23) & 0x1;
 
 			if (length < s_rdp_command_length[command])
 			{
@@ -1496,50 +1493,50 @@ void n64_rdp::disassemble(char* buffer)
 				return;
 			}
 
-			for (INT32 i = 2; i < 40; i++)
+			for (int32_t i = 1; i < 20; i++)
 			{
 				cmd[i] = m_cmd_data[m_cmd_cur+i];
 			}
 
-			sprintf(yl,     "%4.4f", (float)((cmd[0] >>  0) & 0x1fff) / 4.0f);
-			sprintf(ym,     "%4.4f", (float)((cmd[1] >> 16) & 0x1fff) / 4.0f);
-			sprintf(yh,     "%4.4f", (float)((cmd[1] >>  0) & 0x1fff) / 4.0f);
-			sprintf(xl,     "%4.4f", (float)((INT32)cmd[2] / 65536.0f));
-			sprintf(dxldy,  "%4.4f", (float)((INT32)cmd[3] / 65536.0f));
-			sprintf(xh,     "%4.4f", (float)((INT32)cmd[4] / 65536.0f));
-			sprintf(dxhdy,  "%4.4f", (float)((INT32)cmd[5] / 65536.0f));
-			sprintf(xm,     "%4.4f", (float)((INT32)cmd[6] / 65536.0f));
-			sprintf(dxmdy,  "%4.4f", (float)((INT32)cmd[7] / 65536.0f));
-			sprintf(rt,     "%4.4f", (float)(INT32)((cmd[8] & 0xffff0000) | ((cmd[12] >> 16) & 0xffff)) / 65536.0f);
-			sprintf(gt,     "%4.4f", (float)(INT32)(((cmd[8] & 0xffff) << 16) | (cmd[12] & 0xffff)) / 65536.0f);
-			sprintf(bt,     "%4.4f", (float)(INT32)((cmd[9] & 0xffff0000) | ((cmd[13] >> 16) & 0xffff)) / 65536.0f);
-			sprintf(at,     "%4.4f", (float)(INT32)(((cmd[9] & 0xffff) << 16) | (cmd[13] & 0xffff)) / 65536.0f);
-			sprintf(drdx,   "%4.4f", (float)(INT32)((cmd[10] & 0xffff0000) | ((cmd[14] >> 16) & 0xffff)) / 65536.0f);
-			sprintf(dgdx,   "%4.4f", (float)(INT32)(((cmd[10] & 0xffff) << 16) | (cmd[14] & 0xffff)) / 65536.0f);
-			sprintf(dbdx,   "%4.4f", (float)(INT32)((cmd[11] & 0xffff0000) | ((cmd[15] >> 16) & 0xffff)) / 65536.0f);
-			sprintf(dadx,   "%4.4f", (float)(INT32)(((cmd[11] & 0xffff) << 16) | (cmd[15] & 0xffff)) / 65536.0f);
-			sprintf(drde,   "%4.4f", (float)(INT32)((cmd[16] & 0xffff0000) | ((cmd[20] >> 16) & 0xffff)) / 65536.0f);
-			sprintf(dgde,   "%4.4f", (float)(INT32)(((cmd[16] & 0xffff) << 16) | (cmd[20] & 0xffff)) / 65536.0f);
-			sprintf(dbde,   "%4.4f", (float)(INT32)((cmd[17] & 0xffff0000) | ((cmd[21] >> 16) & 0xffff)) / 65536.0f);
-			sprintf(dade,   "%4.4f", (float)(INT32)(((cmd[17] & 0xffff) << 16) | (cmd[21] & 0xffff)) / 65536.0f);
-			sprintf(drdy,   "%4.4f", (float)(INT32)((cmd[18] & 0xffff0000) | ((cmd[22] >> 16) & 0xffff)) / 65536.0f);
-			sprintf(dgdy,   "%4.4f", (float)(INT32)(((cmd[18] & 0xffff) << 16) | (cmd[22] & 0xffff)) / 65536.0f);
-			sprintf(dbdy,   "%4.4f", (float)(INT32)((cmd[19] & 0xffff0000) | ((cmd[23] >> 16) & 0xffff)) / 65536.0f);
-			sprintf(dady,   "%4.4f", (float)(INT32)(((cmd[19] & 0xffff) << 16) | (cmd[23] & 0xffff)) / 65536.0f);
+			sprintf(yl,     "%4.4f", (float)((cmd[0] >> 32) & 0x1fff) / 4.0f);
+			sprintf(ym,     "%4.4f", (float)((cmd[0] >> 16) & 0x1fff) / 4.0f);
+			sprintf(yh,     "%4.4f", (float)((cmd[0] >>  0) & 0x1fff) / 4.0f);
+			sprintf(xl,     "%4.4f", (float)int32_t(cmd[1] >> 32) / 65536.0f);
+			sprintf(dxldy,  "%4.4f", (float)int32_t(cmd[1])       / 65536.0f);
+			sprintf(xh,     "%4.4f", (float)int32_t(cmd[2] >> 32) / 65536.0f);
+			sprintf(dxhdy,  "%4.4f", (float)int32_t(cmd[2])       / 65536.0f);
+			sprintf(xm,     "%4.4f", (float)int32_t(cmd[3] >> 32) / 65536.0f);
+			sprintf(dxmdy,  "%4.4f", (float)int32_t(cmd[3])       / 65536.0f);
 
-			sprintf(s,      "%4.4f", (float)(INT32)((cmd[24] & 0xffff0000) | ((cmd[28] >> 16) & 0xffff)) / 65536.0f);
-			sprintf(t,      "%4.4f", (float)(INT32)(((cmd[24] & 0xffff) << 16) | (cmd[28] & 0xffff)) / 65536.0f);
-			sprintf(w,      "%4.4f", (float)(INT32)((cmd[25] & 0xffff0000) | ((cmd[29] >> 16) & 0xffff)) / 65536.0f);
-			sprintf(dsdx,   "%4.4f", (float)(INT32)((cmd[26] & 0xffff0000) | ((cmd[30] >> 16) & 0xffff)) / 65536.0f);
-			sprintf(dtdx,   "%4.4f", (float)(INT32)(((cmd[26] & 0xffff) << 16) | (cmd[30] & 0xffff)) / 65536.0f);
-			sprintf(dwdx,   "%4.4f", (float)(INT32)((cmd[27] & 0xffff0000) | ((cmd[31] >> 16) & 0xffff)) / 65536.0f);
-			sprintf(dsde,   "%4.4f", (float)(INT32)((cmd[32] & 0xffff0000) | ((cmd[36] >> 16) & 0xffff)) / 65536.0f);
-			sprintf(dtde,   "%4.4f", (float)(INT32)(((cmd[32] & 0xffff) << 16) | (cmd[36] & 0xffff)) / 65536.0f);
-			sprintf(dwde,   "%4.4f", (float)(INT32)((cmd[33] & 0xffff0000) | ((cmd[37] >> 16) & 0xffff)) / 65536.0f);
-			sprintf(dsdy,   "%4.4f", (float)(INT32)((cmd[34] & 0xffff0000) | ((cmd[38] >> 16) & 0xffff)) / 65536.0f);
-			sprintf(dtdy,   "%4.4f", (float)(INT32)(((cmd[34] & 0xffff) << 16) | (cmd[38] & 0xffff)) / 65536.0f);
-			sprintf(dwdy,   "%4.4f", (float)(INT32)((cmd[35] & 0xffff0000) | ((cmd[39] >> 16) & 0xffff)) / 65536.0f);
+			sprintf(rt,     "%4.4f", (float)int32_t( ((cmd[4] >> 32) & 0xffff0000)        | ((cmd[ 6] >> 48) & 0xffff)) / 65536.0f);
+			sprintf(gt,     "%4.4f", (float)int32_t((((cmd[4] >> 32) & 0x0000ffff) << 16) | ((cmd[ 6] >> 32) & 0xffff)) / 65536.0f);
+			sprintf(bt,     "%4.4f", (float)int32_t(  (cmd[4]        & 0xffff0000)        | ((cmd[ 6] >> 16) & 0xffff)) / 65536.0f);
+			sprintf(at,     "%4.4f", (float)int32_t( ((cmd[4]        & 0x0000ffff) << 16) | ( cmd[ 6]        & 0xffff)) / 65536.0f);
+			sprintf(drdx,   "%4.4f", (float)int32_t( ((cmd[5] >> 32) & 0xffff0000)        | ((cmd[ 7] >> 48) & 0xffff)) / 65536.0f);
+			sprintf(dgdx,   "%4.4f", (float)int32_t((((cmd[5] >> 32) & 0x0000ffff) << 16) | ((cmd[ 7] >> 32) & 0xffff)) / 65536.0f);
+			sprintf(dbdx,   "%4.4f", (float)int32_t(  (cmd[5]        & 0xffff0000)        | ((cmd[ 7] >> 16) & 0xffff)) / 65536.0f);
+			sprintf(dadx,   "%4.4f", (float)int32_t( ((cmd[5]        & 0x0000ffff) << 16) | ( cmd[ 7]        & 0xffff)) / 65536.0f);
+			sprintf(drde,   "%4.4f", (float)int32_t( ((cmd[8] >> 32) & 0xffff0000)        | ((cmd[10] >> 48) & 0xffff)) / 65536.0f);
+			sprintf(dgde,   "%4.4f", (float)int32_t((((cmd[8] >> 32) & 0x0000ffff) << 16) | ((cmd[10] >> 32) & 0xffff)) / 65536.0f);
+			sprintf(dbde,   "%4.4f", (float)int32_t(  (cmd[8]        & 0xffff0000)        | ((cmd[10] >> 16) & 0xffff)) / 65536.0f);
+			sprintf(dade,   "%4.4f", (float)int32_t( ((cmd[8]        & 0x0000ffff) << 16) | ( cmd[10]        & 0xffff)) / 65536.0f);
+			sprintf(drdy,   "%4.4f", (float)int32_t( ((cmd[9] >> 32) & 0xffff0000)        | ((cmd[11] >> 48) & 0xffff)) / 65536.0f);
+			sprintf(dgdy,   "%4.4f", (float)int32_t((((cmd[9] >> 32) & 0x0000ffff) << 16) | ((cmd[11] >> 32) & 0xffff)) / 65536.0f);
+			sprintf(dbdy,   "%4.4f", (float)int32_t(  (cmd[9]        & 0xffff0000)        | ((cmd[11] >> 16) & 0xffff)) / 65536.0f);
+			sprintf(dady,   "%4.4f", (float)int32_t( ((cmd[9]        & 0x0000ffff) << 16) | ( cmd[11]        & 0xffff)) / 65536.0f);
 
+			sprintf(s,      "%4.4f", (float)int32_t( ((cmd[4] >> 32) & 0xffff0000)        | ((cmd[ 6] >> 48) & 0xffff)) / 65536.0f);
+			sprintf(t,      "%4.4f", (float)int32_t((((cmd[4] >> 32) & 0x0000ffff) << 16) | ((cmd[ 6] >> 32) & 0xffff)) / 65536.0f);
+			sprintf(w,      "%4.4f", (float)int32_t(  (cmd[4]        & 0xffff0000)        | ((cmd[ 6] >> 16) & 0xffff)) / 65536.0f);
+			sprintf(dsdx,   "%4.4f", (float)int32_t( ((cmd[5] >> 32) & 0xffff0000)        | ((cmd[ 7] >> 48) & 0xffff)) / 65536.0f);
+			sprintf(dtdx,   "%4.4f", (float)int32_t((((cmd[5] >> 32) & 0x0000ffff) << 16) | ((cmd[ 7] >> 32) & 0xffff)) / 65536.0f);
+			sprintf(dwdx,   "%4.4f", (float)int32_t(  (cmd[5]        & 0xffff0000)        | ((cmd[ 7] >> 16) & 0xffff)) / 65536.0f);
+			sprintf(dsde,   "%4.4f", (float)int32_t( ((cmd[8] >> 32) & 0xffff0000)        | ((cmd[10] >> 48) & 0xffff)) / 65536.0f);
+			sprintf(dtde,   "%4.4f", (float)int32_t((((cmd[8] >> 32) & 0x0000ffff) << 16) | ((cmd[10] >> 32) & 0xffff)) / 65536.0f);
+			sprintf(dwde,   "%4.4f", (float)int32_t(  (cmd[8]        & 0xffff0000)        | ((cmd[10] >> 16) & 0xffff)) / 65536.0f);
+			sprintf(dsdy,   "%4.4f", (float)int32_t( ((cmd[9] >> 32) & 0xffff0000)        | ((cmd[11] >> 48) & 0xffff)) / 65536.0f);
+			sprintf(dtdy,   "%4.4f", (float)int32_t((((cmd[9] >> 32) & 0x0000ffff) << 16) | ((cmd[11] >> 32) & 0xffff)) / 65536.0f);
+			sprintf(dwdy,   "%4.4f", (float)int32_t(  (cmd[9]        & 0xffff0000)        | ((cmd[11] >> 16) & 0xffff)) / 65536.0f);
 
 			buffer+=sprintf(buffer, "Tri_TexShade           %d, XL: %s, XM: %s, XH: %s, YL: %s, YM: %s, YH: %s\n", lft, xl,xm,xh,yl,ym,yh);
 			buffer+=sprintf(buffer, "                              ");
@@ -1563,7 +1560,7 @@ void n64_rdp::disassemble(char* buffer)
 		}
 		case 0x0f:      // Tri_TexShadeZ
 		{
-			const INT32 lft = (command >> 23) & 0x1;
+			const int32_t lft = (command >> 23) & 0x1;
 
 			if (length < s_rdp_command_length[command])
 			{
@@ -1571,50 +1568,50 @@ void n64_rdp::disassemble(char* buffer)
 				return;
 			}
 
-			for (INT32 i = 2; i < 40; i++)
+			for (int32_t i = 1; i < 20; i++)
 			{
 				cmd[i] = m_cmd_data[m_cmd_cur+i];
 			}
 
-			sprintf(yl,     "%4.4f", (float)((cmd[0] >>  0) & 0x1fff) / 4.0f);
-			sprintf(ym,     "%4.4f", (float)((cmd[1] >> 16) & 0x1fff) / 4.0f);
-			sprintf(yh,     "%4.4f", (float)((cmd[1] >>  0) & 0x1fff) / 4.0f);
-			sprintf(xl,     "%4.4f", (float)((INT32)cmd[2] / 65536.0f));
-			sprintf(dxldy,  "%4.4f", (float)((INT32)cmd[3] / 65536.0f));
-			sprintf(xh,     "%4.4f", (float)((INT32)cmd[4] / 65536.0f));
-			sprintf(dxhdy,  "%4.4f", (float)((INT32)cmd[5] / 65536.0f));
-			sprintf(xm,     "%4.4f", (float)((INT32)cmd[6] / 65536.0f));
-			sprintf(dxmdy,  "%4.4f", (float)((INT32)cmd[7] / 65536.0f));
-			sprintf(rt,     "%4.4f", (float)(INT32)((cmd[8] & 0xffff0000) | ((cmd[12] >> 16) & 0xffff)) / 65536.0f);
-			sprintf(gt,     "%4.4f", (float)(INT32)(((cmd[8] & 0xffff) << 16) | (cmd[12] & 0xffff)) / 65536.0f);
-			sprintf(bt,     "%4.4f", (float)(INT32)((cmd[9] & 0xffff0000) | ((cmd[13] >> 16) & 0xffff)) / 65536.0f);
-			sprintf(at,     "%4.4f", (float)(INT32)(((cmd[9] & 0xffff) << 16) | (cmd[13] & 0xffff)) / 65536.0f);
-			sprintf(drdx,   "%4.4f", (float)(INT32)((cmd[10] & 0xffff0000) | ((cmd[14] >> 16) & 0xffff)) / 65536.0f);
-			sprintf(dgdx,   "%4.4f", (float)(INT32)(((cmd[10] & 0xffff) << 16) | (cmd[14] & 0xffff)) / 65536.0f);
-			sprintf(dbdx,   "%4.4f", (float)(INT32)((cmd[11] & 0xffff0000) | ((cmd[15] >> 16) & 0xffff)) / 65536.0f);
-			sprintf(dadx,   "%4.4f", (float)(INT32)(((cmd[11] & 0xffff) << 16) | (cmd[15] & 0xffff)) / 65536.0f);
-			sprintf(drde,   "%4.4f", (float)(INT32)((cmd[16] & 0xffff0000) | ((cmd[20] >> 16) & 0xffff)) / 65536.0f);
-			sprintf(dgde,   "%4.4f", (float)(INT32)(((cmd[16] & 0xffff) << 16) | (cmd[20] & 0xffff)) / 65536.0f);
-			sprintf(dbde,   "%4.4f", (float)(INT32)((cmd[17] & 0xffff0000) | ((cmd[21] >> 16) & 0xffff)) / 65536.0f);
-			sprintf(dade,   "%4.4f", (float)(INT32)(((cmd[17] & 0xffff) << 16) | (cmd[21] & 0xffff)) / 65536.0f);
-			sprintf(drdy,   "%4.4f", (float)(INT32)((cmd[18] & 0xffff0000) | ((cmd[22] >> 16) & 0xffff)) / 65536.0f);
-			sprintf(dgdy,   "%4.4f", (float)(INT32)(((cmd[18] & 0xffff) << 16) | (cmd[22] & 0xffff)) / 65536.0f);
-			sprintf(dbdy,   "%4.4f", (float)(INT32)((cmd[19] & 0xffff0000) | ((cmd[23] >> 16) & 0xffff)) / 65536.0f);
-			sprintf(dady,   "%4.4f", (float)(INT32)(((cmd[19] & 0xffff) << 16) | (cmd[23] & 0xffff)) / 65536.0f);
+			sprintf(yl,     "%4.4f", (float)((cmd[0] >> 32) & 0x1fff) / 4.0f);
+			sprintf(ym,     "%4.4f", (float)((cmd[0] >> 16) & 0x1fff) / 4.0f);
+			sprintf(yh,     "%4.4f", (float)((cmd[0] >>  0) & 0x1fff) / 4.0f);
+			sprintf(xl,     "%4.4f", (float)int32_t(cmd[1] >> 32) / 65536.0f);
+			sprintf(dxldy,  "%4.4f", (float)int32_t(cmd[1])       / 65536.0f);
+			sprintf(xh,     "%4.4f", (float)int32_t(cmd[2] >> 32) / 65536.0f);
+			sprintf(dxhdy,  "%4.4f", (float)int32_t(cmd[2])       / 65536.0f);
+			sprintf(xm,     "%4.4f", (float)int32_t(cmd[3] >> 32) / 65536.0f);
+			sprintf(dxmdy,  "%4.4f", (float)int32_t(cmd[3])       / 65536.0f);
 
-			sprintf(s,      "%4.4f", (float)(INT32)((cmd[24] & 0xffff0000) | ((cmd[28] >> 16) & 0xffff)) / 65536.0f);
-			sprintf(t,      "%4.4f", (float)(INT32)(((cmd[24] & 0xffff) << 16) | (cmd[28] & 0xffff)) / 65536.0f);
-			sprintf(w,      "%4.4f", (float)(INT32)((cmd[25] & 0xffff0000) | ((cmd[29] >> 16) & 0xffff)) / 65536.0f);
-			sprintf(dsdx,   "%4.4f", (float)(INT32)((cmd[26] & 0xffff0000) | ((cmd[30] >> 16) & 0xffff)) / 65536.0f);
-			sprintf(dtdx,   "%4.4f", (float)(INT32)(((cmd[26] & 0xffff) << 16) | (cmd[30] & 0xffff)) / 65536.0f);
-			sprintf(dwdx,   "%4.4f", (float)(INT32)((cmd[27] & 0xffff0000) | ((cmd[31] >> 16) & 0xffff)) / 65536.0f);
-			sprintf(dsde,   "%4.4f", (float)(INT32)((cmd[32] & 0xffff0000) | ((cmd[36] >> 16) & 0xffff)) / 65536.0f);
-			sprintf(dtde,   "%4.4f", (float)(INT32)(((cmd[32] & 0xffff) << 16) | (cmd[36] & 0xffff)) / 65536.0f);
-			sprintf(dwde,   "%4.4f", (float)(INT32)((cmd[33] & 0xffff0000) | ((cmd[37] >> 16) & 0xffff)) / 65536.0f);
-			sprintf(dsdy,   "%4.4f", (float)(INT32)((cmd[34] & 0xffff0000) | ((cmd[38] >> 16) & 0xffff)) / 65536.0f);
-			sprintf(dtdy,   "%4.4f", (float)(INT32)(((cmd[34] & 0xffff) << 16) | (cmd[38] & 0xffff)) / 65536.0f);
-			sprintf(dwdy,   "%4.4f", (float)(INT32)((cmd[35] & 0xffff0000) | ((cmd[39] >> 16) & 0xffff)) / 65536.0f);
+			sprintf(rt,     "%4.4f", (float)int32_t( ((cmd[4] >> 32) & 0xffff0000)        | ((cmd[ 6] >> 48) & 0xffff)) / 65536.0f);
+			sprintf(gt,     "%4.4f", (float)int32_t((((cmd[4] >> 32) & 0x0000ffff) << 16) | ((cmd[ 6] >> 32) & 0xffff)) / 65536.0f);
+			sprintf(bt,     "%4.4f", (float)int32_t(  (cmd[4]        & 0xffff0000)        | ((cmd[ 6] >> 16) & 0xffff)) / 65536.0f);
+			sprintf(at,     "%4.4f", (float)int32_t( ((cmd[4]        & 0x0000ffff) << 16) | ( cmd[ 6]        & 0xffff)) / 65536.0f);
+			sprintf(drdx,   "%4.4f", (float)int32_t( ((cmd[5] >> 32) & 0xffff0000)        | ((cmd[ 7] >> 48) & 0xffff)) / 65536.0f);
+			sprintf(dgdx,   "%4.4f", (float)int32_t((((cmd[5] >> 32) & 0x0000ffff) << 16) | ((cmd[ 7] >> 32) & 0xffff)) / 65536.0f);
+			sprintf(dbdx,   "%4.4f", (float)int32_t(  (cmd[5]        & 0xffff0000)        | ((cmd[ 7] >> 16) & 0xffff)) / 65536.0f);
+			sprintf(dadx,   "%4.4f", (float)int32_t( ((cmd[5]        & 0x0000ffff) << 16) | ( cmd[ 7]        & 0xffff)) / 65536.0f);
+			sprintf(drde,   "%4.4f", (float)int32_t( ((cmd[8] >> 32) & 0xffff0000)        | ((cmd[10] >> 48) & 0xffff)) / 65536.0f);
+			sprintf(dgde,   "%4.4f", (float)int32_t((((cmd[8] >> 32) & 0x0000ffff) << 16) | ((cmd[10] >> 32) & 0xffff)) / 65536.0f);
+			sprintf(dbde,   "%4.4f", (float)int32_t(  (cmd[8]        & 0xffff0000)        | ((cmd[10] >> 16) & 0xffff)) / 65536.0f);
+			sprintf(dade,   "%4.4f", (float)int32_t( ((cmd[8]        & 0x0000ffff) << 16) | ( cmd[10]        & 0xffff)) / 65536.0f);
+			sprintf(drdy,   "%4.4f", (float)int32_t( ((cmd[9] >> 32) & 0xffff0000)        | ((cmd[11] >> 48) & 0xffff)) / 65536.0f);
+			sprintf(dgdy,   "%4.4f", (float)int32_t((((cmd[9] >> 32) & 0x0000ffff) << 16) | ((cmd[11] >> 32) & 0xffff)) / 65536.0f);
+			sprintf(dbdy,   "%4.4f", (float)int32_t(  (cmd[9]        & 0xffff0000)        | ((cmd[11] >> 16) & 0xffff)) / 65536.0f);
+			sprintf(dady,   "%4.4f", (float)int32_t( ((cmd[9]        & 0x0000ffff) << 16) | ( cmd[11]        & 0xffff)) / 65536.0f);
 
+			sprintf(s,      "%4.4f", (float)int32_t( ((cmd[4] >> 32) & 0xffff0000)        | ((cmd[ 6] >> 48) & 0xffff)) / 65536.0f);
+			sprintf(t,      "%4.4f", (float)int32_t((((cmd[4] >> 32) & 0x0000ffff) << 16) | ((cmd[ 6] >> 32) & 0xffff)) / 65536.0f);
+			sprintf(w,      "%4.4f", (float)int32_t(  (cmd[4]        & 0xffff0000)        | ((cmd[ 6] >> 16) & 0xffff)) / 65536.0f);
+			sprintf(dsdx,   "%4.4f", (float)int32_t( ((cmd[5] >> 32) & 0xffff0000)        | ((cmd[ 7] >> 48) & 0xffff)) / 65536.0f);
+			sprintf(dtdx,   "%4.4f", (float)int32_t((((cmd[5] >> 32) & 0x0000ffff) << 16) | ((cmd[ 7] >> 32) & 0xffff)) / 65536.0f);
+			sprintf(dwdx,   "%4.4f", (float)int32_t(  (cmd[5]        & 0xffff0000)        | ((cmd[ 7] >> 16) & 0xffff)) / 65536.0f);
+			sprintf(dsde,   "%4.4f", (float)int32_t( ((cmd[8] >> 32) & 0xffff0000)        | ((cmd[10] >> 48) & 0xffff)) / 65536.0f);
+			sprintf(dtde,   "%4.4f", (float)int32_t((((cmd[8] >> 32) & 0x0000ffff) << 16) | ((cmd[10] >> 32) & 0xffff)) / 65536.0f);
+			sprintf(dwde,   "%4.4f", (float)int32_t(  (cmd[8]        & 0xffff0000)        | ((cmd[10] >> 16) & 0xffff)) / 65536.0f);
+			sprintf(dsdy,   "%4.4f", (float)int32_t( ((cmd[9] >> 32) & 0xffff0000)        | ((cmd[11] >> 48) & 0xffff)) / 65536.0f);
+			sprintf(dtdy,   "%4.4f", (float)int32_t((((cmd[9] >> 32) & 0x0000ffff) << 16) | ((cmd[11] >> 32) & 0xffff)) / 65536.0f);
+			sprintf(dwdy,   "%4.4f", (float)int32_t(  (cmd[9]        & 0xffff0000)        | ((cmd[11] >> 16) & 0xffff)) / 65536.0f);
 
 			buffer+=sprintf(buffer, "Tri_TexShadeZ           %d, XL: %s, XM: %s, XH: %s, YL: %s, YM: %s, YH: %s\n", lft, xl,xm,xh,yl,ym,yh);
 			buffer+=sprintf(buffer, "                              ");
@@ -1644,12 +1641,12 @@ void n64_rdp::disassemble(char* buffer)
 				sprintf(buffer, "ERROR: Texture_Rectangle length = %d\n", length);
 				return;
 			}
-			cmd[2] = m_cmd_data[m_cmd_cur+2];
-			cmd[3] = m_cmd_data[m_cmd_cur+3];
-			sprintf(s,    "%4.4f", (float)(INT16)((cmd[2] >> 16) & 0xffff) / 32.0f);
-			sprintf(t,    "%4.4f", (float)(INT16)((cmd[2] >>  0) & 0xffff) / 32.0f);
-			sprintf(dsdx, "%4.4f", (float)(INT16)((cmd[3] >> 16) & 0xffff) / 1024.0f);
-			sprintf(dtdy, "%4.4f", (float)(INT16)((cmd[3] >> 16) & 0xffff) / 1024.0f);
+
+			cmd[1] = m_cmd_data[m_cmd_cur+1];
+			sprintf(s,    "%4.4f", (float)int16_t((cmd[1] >> 48) & 0xffff) / 32.0f);
+			sprintf(t,    "%4.4f", (float)int16_t((cmd[1] >> 32) & 0xffff) / 32.0f);
+			sprintf(dsdx, "%4.4f", (float)int16_t((cmd[1] >> 16) & 0xffff) / 1024.0f);
+			sprintf(dtdy, "%4.4f", (float)int16_t((cmd[1] >>  0) & 0xffff) / 1024.0f);
 
 			if (command == 0x24)
 					sprintf(buffer, "Texture_Rectangle      %d, %s, %s, %s, %s,  %s, %s, %s, %s", tile, sh, th, sl, tl, s, t, dsdx, dtdy);
@@ -1663,46 +1660,46 @@ void n64_rdp::disassemble(char* buffer)
 		case 0x28:  sprintf(buffer, "Sync_Tile"); break;
 		case 0x29:  sprintf(buffer, "Sync_Full"); break;
 		case 0x2d:  sprintf(buffer, "Set_Scissor            %s, %s, %s, %s", sl, tl, sh, th); break;
-		case 0x2e:  sprintf(buffer, "Set_Prim_Depth         %04X, %04X", (cmd[1] >> 16) & 0xffff, cmd[1] & 0xffff); break;
-		case 0x2f:  sprintf(buffer, "Set_Other_Modes        %08X %08X", cmd[0], cmd[1]); break;
+		case 0x2e:  sprintf(buffer, "Set_Prim_Depth         %04X, %04X", uint32_t(cmd[0] >> 16) & 0xffff, (uint32_t)cmd[0] & 0xffff); break;
+		case 0x2f:  sprintf(buffer, "Set_Other_Modes        %08X %08X", uint32_t(cmd[0] >> 32), (uint32_t)cmd[0]); break;
 		case 0x30:  sprintf(buffer, "Load_TLUT              %d, %s, %s, %s, %s", tile, sl, tl, sh, th); break;
 		case 0x32:  sprintf(buffer, "Set_Tile_Size          %d, %s, %s, %s, %s", tile, sl, tl, sh, th); break;
-		case 0x33:  sprintf(buffer, "Load_Block             %d, %03X, %03X, %03X, %03X", tile, (cmd[0] >> 12) & 0xfff, cmd[0] & 0xfff, (cmd[1] >> 12) & 0xfff, cmd[1] & 0xfff); break;
+		case 0x33:  sprintf(buffer, "Load_Block             %d, %03X, %03X, %03X, %03X", tile, uint32_t(cmd[0] >> 44) & 0xfff, uint32_t(cmd[0] >> 32) & 0xfff, uint32_t(cmd[0] >> 12) & 0xfff, uint32_t(cmd[0]) & 0xfff); break;
 		case 0x34:  sprintf(buffer, "Load_Tile              %d, %s, %s, %s, %s", tile, sl, tl, sh, th); break;
-		case 0x35:  sprintf(buffer, "Set_Tile               %d, %s, %s, %d, %04X", tile, format, size, ((cmd[0] >> 9) & 0x1ff) * 8, (cmd[0] & 0x1ff) * 8); break;
+		case 0x35:  sprintf(buffer, "Set_Tile               %d, %s, %s, %d, %04X", tile, format, size, (uint32_t(cmd[0] >> 41) & 0x1ff) * 8, (uint32_t(cmd[0] >> 32) & 0x1ff) * 8); break;
 		case 0x36:  sprintf(buffer, "Fill_Rectangle         %s, %s, %s, %s", sh, th, sl, tl); break;
 		case 0x37:  sprintf(buffer, "Set_Fill_Color         R: %d, G: %d, B: %d, A: %d", r, g, b, a); break;
 		case 0x38:  sprintf(buffer, "Set_Fog_Color          R: %d, G: %d, B: %d, A: %d", r, g, b, a); break;
 		case 0x39:  sprintf(buffer, "Set_Blend_Color        R: %d, G: %d, B: %d, A: %d", r, g, b, a); break;
-		case 0x3a:  sprintf(buffer, "Set_Prim_Color         %d, %d, R: %d, G: %d, B: %d, A: %d", (cmd[0] >> 8) & 0x1f, cmd[0] & 0xff, r, g, b, a); break;
+		case 0x3a:  sprintf(buffer, "Set_Prim_Color         %d, %d, R: %d, G: %d, B: %d, A: %d", uint32_t(cmd[0] >> 40) & 0x1f, uint32_t(cmd[0] >> 32) & 0xff, r, g, b, a); break;
 		case 0x3b:  sprintf(buffer, "Set_Env_Color          R: %d, G: %d, B: %d, A: %d", r, g, b, a); break;
-		case 0x3c:  sprintf(buffer, "Set_Combine            %08X %08X", cmd[0], cmd[1]); break;
-		case 0x3d:  sprintf(buffer, "Set_Texture_Image      %s, %s, %d, %08X", format, size, (cmd[0] & 0x1ff)+1, cmd[1]); break;
-		case 0x3e:  sprintf(buffer, "Set_Mask_Image         %08X", cmd[1]); break;
-		case 0x3f:  sprintf(buffer, "Set_Color_Image        %s, %s, %d, %08X", format, size, (cmd[0] & 0x1ff)+1, cmd[1]); break;
-		default:    sprintf(buffer, "Unknown (%08X %08X)", cmd[0], cmd[1]); break;
+		case 0x3c:  sprintf(buffer, "Set_Combine            %08X %08X", uint32_t(cmd[0] >> 32), (uint32_t)cmd[0]); break;
+		case 0x3d:  sprintf(buffer, "Set_Texture_Image      %s, %s, %d, %08X", format, size, (uint32_t(cmd[0] >> 32) & 0x1ff) + 1, (uint32_t)cmd[0]); break;
+		case 0x3e:  sprintf(buffer, "Set_Mask_Image         %08X", (uint32_t)cmd[0]); break;
+		case 0x3f:  sprintf(buffer, "Set_Color_Image        %s, %s, %d, %08X", format, size, (uint32_t(cmd[0] >> 32) & 0x1ff) + 1, (uint32_t)cmd[0]); break;
+		default:    sprintf(buffer, "Unknown (%08X %08X)", uint32_t(cmd[0] >> 32), (uint32_t)cmd[0]); break;
 	}
 }
 
 /*****************************************************************************/
 
-static UINT32 rightcvghex(UINT32 x, UINT32 fmask)
+static uint32_t rightcvghex(uint32_t x, uint32_t fmask)
 {
-	UINT32 stickybit = ((x >> 1) & 0x1fff) > 0;
-	UINT32 covered = ((x >> 14) & 3) + stickybit;
+	uint32_t stickybit = ((x >> 1) & 0x1fff) > 0;
+	uint32_t covered = ((x >> 14) & 3) + stickybit;
 	covered = (0xf0 >> covered) & 0xf;
 	return (covered & fmask);
 }
 
-static UINT32 leftcvghex(UINT32 x, UINT32 fmask)
+static uint32_t leftcvghex(uint32_t x, uint32_t fmask)
 {
-	UINT32 stickybit = ((x >> 1) & 0x1fff) > 0;
-	UINT32 covered = ((x >> 14) & 3) + stickybit;
+	uint32_t stickybit = ((x >> 1) & 0x1fff) > 0;
+	uint32_t covered = ((x >> 14) & 3) + stickybit;
 	covered = 0xf >> covered;
 	return (covered & fmask);
 }
 
-static INT32 CLIP(INT32 value,INT32 min,INT32 max)
+static int32_t CLIP(int32_t value,int32_t min,int32_t max)
 {
 	if (value < min)
 	{
@@ -1718,16 +1715,16 @@ static INT32 CLIP(INT32 value,INT32 min,INT32 max)
 	}
 }
 
-void n64_rdp::compute_cvg_noflip(extent_t* spans, INT32* majorx, INT32* minorx, INT32* majorxint, INT32* minorxint, INT32 scanline, INT32 yh, INT32 yl, INT32 base)
+void n64_rdp::compute_cvg_noflip(extent_t* spans, int32_t* majorx, int32_t* minorx, int32_t* majorxint, int32_t* minorxint, int32_t scanline, int32_t yh, int32_t yl, int32_t base)
 {
-	INT32 purgestart = 0xfff;
-	INT32 purgeend = 0;
+	int32_t purgestart = 0xfff;
+	int32_t purgeend = 0;
 	const bool writablescanline = !(scanline & ~0x3ff);
-	const INT32 scanlinespx = scanline << 2;
+	const int32_t scanlinespx = scanline << 2;
 
 	if (!writablescanline) return;
 
-	for(INT32 i = 0; i < 4; i++)
+	for(int32_t i = 0; i < 4; i++)
 	{
 		if (minorxint[i] < purgestart)
 		{
@@ -1741,26 +1738,26 @@ void n64_rdp::compute_cvg_noflip(extent_t* spans, INT32* majorx, INT32* minorx, 
 
 	purgestart = CLIP(purgestart, 0, 1023);
 	purgeend = CLIP(purgeend, 0, 1023);
-	INT32 length = purgeend - purgestart;
+	int32_t length = purgeend - purgestart;
 
 	if (length < 0) return;
 
 	rdp_span_aux* userdata = (rdp_span_aux*)spans[scanline - base].userdata;
 	memset(&userdata->m_cvg[purgestart], 0, (length + 1) << 1);
 
-	for(INT32 i = 0; i < 4; i++)
+	for(int32_t i = 0; i < 4; i++)
 	{
-		INT32 minorcur = minorx[i];
-		INT32 majorcur = majorx[i];
-		INT32 minorcurint = minorxint[i];
-		INT32 majorcurint = majorxint[i];
+		int32_t minorcur = minorx[i];
+		int32_t majorcur = majorx[i];
+		int32_t minorcurint = minorxint[i];
+		int32_t majorcurint = majorxint[i];
 		length = majorcurint - minorcurint;
 
-		INT32 fmask = (i & 1) ? 5 : 0xa;
-		INT32 maskshift = (i ^ 3) << 2;
-		INT32 fmaskshifted = fmask << maskshift;
-		INT32 fleft = CLIP(minorcurint + 1, 0, 647);
-		INT32 fright = CLIP(majorcurint - 1, 0, 647);
+		int32_t fmask = (i & 1) ? 5 : 0xa;
+		int32_t maskshift = (i ^ 3) << 2;
+		int32_t fmaskshifted = fmask << maskshift;
+		int32_t fleft = CLIP(minorcurint + 1, 0, 647);
+		int32_t fright = CLIP(majorcurint - 1, 0, 647);
 		bool valid_y = ((scanlinespx + i) >= yh && (scanlinespx + i) < yl);
 		if (valid_y && length >= 0)
 		{
@@ -1779,7 +1776,7 @@ void n64_rdp::compute_cvg_noflip(extent_t* spans, INT32* majorx, INT32* minorx, 
 			{
 				if (!(majorcurint & ~0x3ff))
 				{
-					INT32 samecvg = leftcvghex(minorcur, fmask) & rightcvghex(majorcur, fmask);
+					int32_t samecvg = leftcvghex(minorcur, fmask) & rightcvghex(majorcur, fmask);
 					userdata->m_cvg[majorcurint] |= (samecvg << maskshift);
 				}
 			}
@@ -1791,16 +1788,16 @@ void n64_rdp::compute_cvg_noflip(extent_t* spans, INT32* majorx, INT32* minorx, 
 	}
 }
 
-void n64_rdp::compute_cvg_flip(extent_t* spans, INT32* majorx, INT32* minorx, INT32* majorxint, INT32* minorxint, INT32 scanline, INT32 yh, INT32 yl, INT32 base)
+void n64_rdp::compute_cvg_flip(extent_t* spans, int32_t* majorx, int32_t* minorx, int32_t* majorxint, int32_t* minorxint, int32_t scanline, int32_t yh, int32_t yl, int32_t base)
 {
-	INT32 purgestart = 0xfff;
-	INT32 purgeend = 0;
+	int32_t purgestart = 0xfff;
+	int32_t purgeend = 0;
 	const bool writablescanline = !(scanline & ~0x3ff);
-	const INT32 scanlinespx = scanline << 2;
+	const int32_t scanlinespx = scanline << 2;
 
 	if(!writablescanline) return;
 
-	for(INT32 i = 0; i < 4; i++)
+	for(int32_t i = 0; i < 4; i++)
 	{
 		if (majorxint[i] < purgestart)
 		{
@@ -1815,26 +1812,26 @@ void n64_rdp::compute_cvg_flip(extent_t* spans, INT32* majorx, INT32* minorx, IN
 	purgestart = CLIP(purgestart, 0, 1023);
 	purgeend = CLIP(purgeend, 0, 1023);
 
-	INT32 length = purgeend - purgestart;
+	int32_t length = purgeend - purgestart;
 
 	if (length < 0) return;
 
 	rdp_span_aux* userdata = (rdp_span_aux*)spans[scanline - base].userdata;
 	memset(&userdata->m_cvg[purgestart], 0, (length + 1) << 1);
 
-	for(INT32 i = 0; i < 4; i++)
+	for(int32_t i = 0; i < 4; i++)
 	{
-		INT32 minorcur = minorx[i];
-		INT32 majorcur = majorx[i];
-		INT32 minorcurint = minorxint[i];
-		INT32 majorcurint = majorxint[i];
+		int32_t minorcur = minorx[i];
+		int32_t majorcur = majorx[i];
+		int32_t minorcurint = minorxint[i];
+		int32_t majorcurint = majorxint[i];
 		length = minorcurint - majorcurint;
 
-		INT32 fmask = (i & 1) ? 5 : 0xa;
-		INT32 maskshift = (i ^ 3) << 2;
-		INT32 fmaskshifted = fmask << maskshift;
-		INT32 fleft = CLIP(majorcurint + 1, 0, 647);
-		INT32 fright = CLIP(minorcurint - 1, 0, 647);
+		int32_t fmask = (i & 1) ? 5 : 0xa;
+		int32_t maskshift = (i ^ 3) << 2;
+		int32_t fmaskshifted = fmask << maskshift;
+		int32_t fleft = CLIP(majorcurint + 1, 0, 647);
+		int32_t fright = CLIP(minorcurint - 1, 0, 647);
 		bool valid_y = ((scanlinespx + i) >= yh && (scanlinespx + i) < yl);
 		if (valid_y && length >= 0)
 		{
@@ -1853,7 +1850,7 @@ void n64_rdp::compute_cvg_flip(extent_t* spans, INT32* majorx, INT32* minorx, IN
 			{
 				if (!(majorcurint & ~0x3ff))
 				{
-					INT32 samecvg = rightcvghex(minorcur, fmask) & leftcvghex(majorcur, fmask);
+					int32_t samecvg = rightcvghex(minorcur, fmask) & leftcvghex(majorcur, fmask);
 					userdata->m_cvg[majorcurint] |= (samecvg << maskshift);
 				}
 			}
@@ -1865,57 +1862,55 @@ void n64_rdp::compute_cvg_flip(extent_t* spans, INT32* majorx, INT32* minorx, IN
 	}
 }
 
+#define SIGN(x, numb)   (((x) & ((1 << numb) - 1)) | -((x) & (1 << (numb - 1))))
+
 void n64_rdp::draw_triangle(bool shade, bool texture, bool zbuffer, bool rect)
 {
-	const UINT32* cmd_data = rect ? m_temp_rect_data : m_cmd_data;
-	const UINT32 fifo_index = rect ? 0 : m_cmd_cur;
-	const UINT32 w1 = cmd_data[fifo_index + 0];
-	const UINT32 w2 = cmd_data[fifo_index + 1];
+	const uint64_t* cmd_data = rect ? m_temp_rect_data : m_cmd_data;
+	const uint32_t fifo_index = rect ? 0 : m_cmd_cur;
+	const uint64_t w1 = cmd_data[fifo_index + 0];
 
-	INT32 flip = (w1 & 0x00800000) ? 1 : 0;
-	m_misc_state.m_max_level = ((w1 >> 19) & 7);
-	INT32 tilenum = (w1 >> 16) & 0x7;
+	int32_t flip = int32_t(w1 >> 55) & 1;
+	m_misc_state.m_max_level = uint32_t(w1 >> 51) & 7;
+	int32_t tilenum = int32_t(w1 >> 48) & 0x7;
 
-	INT32 dsdiff = 0, dtdiff = 0, dwdiff = 0, drdiff = 0, dgdiff = 0, dbdiff = 0, dadiff = 0, dzdiff = 0;
-	INT32 dsdeh = 0, dtdeh = 0, dwdeh = 0, drdeh = 0, dgdeh = 0, dbdeh = 0, dadeh = 0, dzdeh = 0;
-	INT32 dsdxh = 0, dtdxh = 0, dwdxh = 0, drdxh = 0, dgdxh = 0, dbdxh = 0, dadxh = 0, dzdxh = 0;
-	INT32 dsdyh = 0, dtdyh = 0, dwdyh = 0, drdyh = 0, dgdyh = 0, dbdyh = 0, dadyh = 0, dzdyh = 0;
+	int32_t dsdiff = 0, dtdiff = 0, dwdiff = 0, drdiff = 0, dgdiff = 0, dbdiff = 0, dadiff = 0, dzdiff = 0;
+	int32_t dsdeh = 0, dtdeh = 0, dwdeh = 0, drdeh = 0, dgdeh = 0, dbdeh = 0, dadeh = 0, dzdeh = 0;
+	int32_t dsdxh = 0, dtdxh = 0, dwdxh = 0, drdxh = 0, dgdxh = 0, dbdxh = 0, dadxh = 0, dzdxh = 0;
+	int32_t dsdyh = 0, dtdyh = 0, dwdyh = 0, drdyh = 0, dgdyh = 0, dbdyh = 0, dadyh = 0, dzdyh = 0;
 
-	INT32 maxxmx = 0; // maxxmx / minxhx very opaque names, consider re-naming
-	INT32 minxmx = 0;
-	INT32 maxxhx = 0;
-	INT32 minxhx = 0;
+	int32_t maxxmx = 0; // maxxmx / minxhx very opaque names, consider re-naming
+	int32_t minxmx = 0;
+	int32_t maxxhx = 0;
+	int32_t minxhx = 0;
 
-	INT32 shade_base = fifo_index + 8;
-	INT32 texture_base = fifo_index + 8;
-	INT32 zbuffer_base = fifo_index + 8;
+	int32_t shade_base = fifo_index + 4;
+	int32_t texture_base = fifo_index + 4;
+	int32_t zbuffer_base = fifo_index + 4;
 	if(shade)
 	{
-		texture_base += 16;
-		zbuffer_base += 16;
+		texture_base += 8;
+		zbuffer_base += 8;
 	}
 	if(texture)
 	{
-		zbuffer_base += 16;
+		zbuffer_base += 8;
 	}
 
-	UINT32 w3 = cmd_data[fifo_index + 2];
-	UINT32 w4 = cmd_data[fifo_index + 3];
-	UINT32 w5 = cmd_data[fifo_index + 4];
-	UINT32 w6 = cmd_data[fifo_index + 5];
-	UINT32 w7 = cmd_data[fifo_index + 6];
-	UINT32 w8 = cmd_data[fifo_index + 7];
+	uint64_t w2 = cmd_data[fifo_index + 1];
+	uint64_t w3 = cmd_data[fifo_index + 2];
+	uint64_t w4 = cmd_data[fifo_index + 3];
 
-	INT32 yl = (w1 & 0x3fff);
-	INT32 ym = ((w2 >> 16) & 0x3fff);
-	INT32 yh = ((w2 >>  0) & 0x3fff);
-	INT32 xl = (INT32)(w3 & 0x3fffffff);
-	INT32 xh = (INT32)(w5 & 0x3fffffff);
-	INT32 xm = (INT32)(w7 & 0x3fffffff);
+	int32_t yl = int32_t(w1 >> 32) & 0x3fff;
+	int32_t ym = int32_t(w1 >> 16) & 0x3fff;
+	int32_t yh = int32_t(w1 >>  0) & 0x3fff;
+	int32_t xl = (int32_t)(w2 >> 32) & 0x3fffffff;
+	int32_t xh = (int32_t)(w3 >> 32) & 0x3fffffff;
+	int32_t xm = (int32_t)(w4 >> 32) & 0x3fffffff;
 	// Inverse slopes in 16.16 format
-	INT32 dxldy = (INT32)(w4);
-	INT32 dxhdy = (INT32)(w6);
-	INT32 dxmdy = (INT32)(w8);
+	int32_t dxldy = (int32_t)w2;
+	int32_t dxhdy = (int32_t)w3;
+	int32_t dxmdy = (int32_t)w4;
 
 	if (yl & 0x2000)  yl |= 0xffffc000;
 	if (ym & 0x2000)  ym |= 0xffffc000;
@@ -1925,41 +1920,43 @@ void n64_rdp::draw_triangle(bool shade, bool texture, bool zbuffer, bool rect)
 	if (xm & 0x20000000)  xm |= 0xc0000000;
 	if (xh & 0x20000000)  xh |= 0xc0000000;
 
-	INT32 r    = (cmd_data[shade_base+0 ] & 0xffff0000) | ((cmd_data[shade_base+4 ] >> 16) & 0x0000ffff);
-	INT32 g    = ((cmd_data[shade_base+0 ] << 16) & 0xffff0000) | (cmd_data[shade_base+4 ] & 0x0000ffff);
-	INT32 b    = (cmd_data[shade_base+1 ] & 0xffff0000) | ((cmd_data[shade_base+5 ] >> 16) & 0x0000ffff);
-	INT32 a    = ((cmd_data[shade_base+1 ] << 16) & 0xffff0000) | (cmd_data[shade_base+5 ] & 0x0000ffff);
-	const INT32 drdx = (cmd_data[shade_base+2 ] & 0xffff0000) | ((cmd_data[shade_base+6 ] >> 16) & 0x0000ffff);
-	const INT32 dgdx = ((cmd_data[shade_base+2 ] << 16) & 0xffff0000) | (cmd_data[shade_base+6 ] & 0x0000ffff);
-	const INT32 dbdx = (cmd_data[shade_base+3 ] & 0xffff0000) | ((cmd_data[shade_base+7 ] >> 16) & 0x0000ffff);
-	const INT32 dadx = ((cmd_data[shade_base+3 ] << 16) & 0xffff0000) | (cmd_data[shade_base+7 ] & 0x0000ffff);
-	const INT32 drde = (cmd_data[shade_base+8 ] & 0xffff0000) | ((cmd_data[shade_base+12] >> 16) & 0x0000ffff);
-	const INT32 dgde = ((cmd_data[shade_base+8 ] << 16) & 0xffff0000) | (cmd_data[shade_base+12] & 0x0000ffff);
-	const INT32 dbde = (cmd_data[shade_base+9 ] & 0xffff0000) | ((cmd_data[shade_base+13] >> 16) & 0x0000ffff);
-	const INT32 dade = ((cmd_data[shade_base+9 ] << 16) & 0xffff0000) | (cmd_data[shade_base+13] & 0x0000ffff);
-	const INT32 drdy = (cmd_data[shade_base+10] & 0xffff0000) | ((cmd_data[shade_base+14] >> 16) & 0x0000ffff);
-	const INT32 dgdy = ((cmd_data[shade_base+10] << 16) & 0xffff0000) | (cmd_data[shade_base+14] & 0x0000ffff);
-	const INT32 dbdy = (cmd_data[shade_base+11] & 0xffff0000) | ((cmd_data[shade_base+15] >> 16) & 0x0000ffff);
-	const INT32 dady = ((cmd_data[shade_base+11] << 16) & 0xffff0000) | (cmd_data[shade_base+15] & 0x0000ffff);
-	INT32 s    = (cmd_data[texture_base+0 ] & 0xffff0000) | ((cmd_data[texture_base+4 ] >> 16) & 0x0000ffff);
-	INT32 t    = ((cmd_data[texture_base+0 ] << 16) & 0xffff0000) | (cmd_data[texture_base+4 ] & 0x0000ffff);
-	INT32 w    = (cmd_data[texture_base+1 ] & 0xffff0000) | ((cmd_data[texture_base+5 ] >> 16) & 0x0000ffff);
-	const INT32 dsdx = (cmd_data[texture_base+2 ] & 0xffff0000) | ((cmd_data[texture_base+6 ] >> 16) & 0x0000ffff);
-	const INT32 dtdx = ((cmd_data[texture_base+2 ] << 16) & 0xffff0000) | (cmd_data[texture_base+6 ] & 0x0000ffff);
-	const INT32 dwdx = (cmd_data[texture_base+3 ] & 0xffff0000) | ((cmd_data[texture_base+7 ] >> 16) & 0x0000ffff);
-	const INT32 dsde = (cmd_data[texture_base+8 ] & 0xffff0000) | ((cmd_data[texture_base+12] >> 16) & 0x0000ffff);
-	const INT32 dtde = ((cmd_data[texture_base+8 ] << 16) & 0xffff0000) | (cmd_data[texture_base+12] & 0x0000ffff);
-	const INT32 dwde = (cmd_data[texture_base+9 ] & 0xffff0000) | ((cmd_data[texture_base+13] >> 16) & 0x0000ffff);
-	const INT32 dsdy = (cmd_data[texture_base+10] & 0xffff0000) | ((cmd_data[texture_base+14] >> 16) & 0x0000ffff);
-	const INT32 dtdy = ((cmd_data[texture_base+10] << 16) & 0xffff0000) | (cmd_data[texture_base+14] & 0x0000ffff);
-	const INT32 dwdy = (cmd_data[texture_base+11] & 0xffff0000) | ((cmd_data[texture_base+15] >> 16) & 0x0000ffff);
-	INT32 z    = cmd_data[zbuffer_base+0];
-	const INT32 dzdx = cmd_data[zbuffer_base+1];
-	const INT32 dzde = cmd_data[zbuffer_base+2];
-	const INT32 dzdy = cmd_data[zbuffer_base+3];
+	int32_t r    = int32_t(((cmd_data[shade_base] >> 32) & 0xffff0000) | ((cmd_data[shade_base + 2] >> 48) & 0x0000ffff));
+	int32_t g    = int32_t(((cmd_data[shade_base] >> 16) & 0xffff0000) | ((cmd_data[shade_base + 2] >> 32) & 0x0000ffff));
+	int32_t b    = int32_t( (cmd_data[shade_base]        & 0xffff0000) | ((cmd_data[shade_base + 2] >> 16) & 0x0000ffff));
+	int32_t a    = int32_t(((cmd_data[shade_base] << 16) & 0xffff0000) |  (cmd_data[shade_base + 2]        & 0x0000ffff));
+	const int32_t drdx = int32_t(((cmd_data[shade_base + 1] >> 32) & 0xffff0000) | ((cmd_data[shade_base + 3] >> 48) & 0x0000ffff));
+	const int32_t dgdx = int32_t(((cmd_data[shade_base + 1] >> 16) & 0xffff0000) | ((cmd_data[shade_base + 3] >> 32) & 0x0000ffff));
+	const int32_t dbdx = int32_t( (cmd_data[shade_base + 1]        & 0xffff0000) | ((cmd_data[shade_base + 3] >> 16) & 0x0000ffff));
+	const int32_t dadx = int32_t(((cmd_data[shade_base + 1] << 16) & 0xffff0000) |  (cmd_data[shade_base + 3]        & 0x0000ffff));
+	const int32_t drde = int32_t(((cmd_data[shade_base + 4] >> 32) & 0xffff0000) | ((cmd_data[shade_base + 6] >> 48) & 0x0000ffff));
+	const int32_t dgde = int32_t(((cmd_data[shade_base + 4] >> 16) & 0xffff0000) | ((cmd_data[shade_base + 6] >> 32) & 0x0000ffff));
+	const int32_t dbde = int32_t( (cmd_data[shade_base + 4]        & 0xffff0000) | ((cmd_data[shade_base + 6] >> 16) & 0x0000ffff));
+	const int32_t dade = int32_t(((cmd_data[shade_base + 4] << 16) & 0xffff0000) |  (cmd_data[shade_base + 6]        & 0x0000ffff));
+	const int32_t drdy = int32_t(((cmd_data[shade_base + 5] >> 32) & 0xffff0000) | ((cmd_data[shade_base + 7] >> 48) & 0x0000ffff));
+	const int32_t dgdy = int32_t(((cmd_data[shade_base + 5] >> 16) & 0xffff0000) | ((cmd_data[shade_base + 7] >> 32) & 0x0000ffff));
+	const int32_t dbdy = int32_t( (cmd_data[shade_base + 5]        & 0xffff0000) | ((cmd_data[shade_base + 7] >> 16) & 0x0000ffff));
+	const int32_t dady = int32_t(((cmd_data[shade_base + 5] << 16) & 0xffff0000) |  (cmd_data[shade_base + 7]        & 0x0000ffff));
 
-	const INT32 dzdy_dz = (dzdy >> 16) & 0xffff;
-	const INT32 dzdx_dz = (dzdx >> 16) & 0xffff;
+	int32_t s    = int32_t(((cmd_data[texture_base] >> 32) & 0xffff0000) | ((cmd_data[texture_base+ 2 ] >> 48) & 0x0000ffff));
+	int32_t t    = int32_t(((cmd_data[texture_base] >> 16) & 0xffff0000) | ((cmd_data[texture_base+ 2 ] >> 32) & 0x0000ffff));
+	int32_t w    = int32_t( (cmd_data[texture_base]        & 0xffff0000) | ((cmd_data[texture_base+ 2 ] >> 16) & 0x0000ffff));
+	const int32_t dsdx = int32_t(((cmd_data[texture_base + 1] >> 32) & 0xffff0000) | ((cmd_data[texture_base + 3] >> 48) & 0x0000ffff));
+	const int32_t dtdx = int32_t(((cmd_data[texture_base + 1] >> 16) & 0xffff0000) | ((cmd_data[texture_base + 3] >> 32) & 0x0000ffff));
+	const int32_t dwdx = int32_t( (cmd_data[texture_base + 1]        & 0xffff0000) | ((cmd_data[texture_base + 3] >> 16) & 0x0000ffff));
+	const int32_t dsde = int32_t(((cmd_data[texture_base + 4] >> 32) & 0xffff0000) | ((cmd_data[texture_base + 6] >> 48) & 0x0000ffff));
+	const int32_t dtde = int32_t(((cmd_data[texture_base + 4] >> 16) & 0xffff0000) | ((cmd_data[texture_base + 6] >> 32) & 0x0000ffff));
+	const int32_t dwde = int32_t( (cmd_data[texture_base + 4]        & 0xffff0000) | ((cmd_data[texture_base + 6] >> 16) & 0x0000ffff));
+	const int32_t dsdy = int32_t(((cmd_data[texture_base + 5] >> 32) & 0xffff0000) | ((cmd_data[texture_base + 7] >> 48) & 0x0000ffff));
+	const int32_t dtdy = int32_t(((cmd_data[texture_base + 5] >> 16) & 0xffff0000) | ((cmd_data[texture_base + 7] >> 32) & 0x0000ffff));
+	const int32_t dwdy = int32_t( (cmd_data[texture_base + 5]        & 0xffff0000) | ((cmd_data[texture_base + 7] >> 16) & 0x0000ffff));
+
+	int32_t z    = int32_t(cmd_data[zbuffer_base] >> 32);
+	const int32_t dzdx = int32_t(cmd_data[zbuffer_base]);
+	const int32_t dzde = int32_t(cmd_data[zbuffer_base+1] >> 32);
+	const int32_t dzdy = int32_t(cmd_data[zbuffer_base+1]);
+
+	const int32_t dzdy_dz = (dzdy >> 16) & 0xffff;
+	const int32_t dzdx_dz = (dzdx >> 16) & 0xffff;
 
 	extent_t spans[2048];
 #ifdef MAME_DEBUG
@@ -1972,7 +1969,7 @@ void n64_rdp::draw_triangle(bool shade, bool texture, bool zbuffer, bool rect)
 	m_span_base.m_span_dady = dady;
 	m_span_base.m_span_dzdy = m_other_modes.z_source_sel ? 0 : dzdy;
 
-	UINT32 temp_dzpix = ((dzdy_dz & 0x8000) ? ((~dzdy_dz) & 0x7fff) : dzdy_dz) + ((dzdx_dz & 0x8000) ? ((~dzdx_dz) & 0x7fff) : dzdx_dz);
+	uint32_t temp_dzpix = ((dzdy_dz & 0x8000) ? ((~dzdy_dz) & 0x7fff) : dzdy_dz) + ((dzdx_dz & 0x8000) ? ((~dzdx_dz) & 0x7fff) : dzdx_dz);
 	m_span_base.m_span_dr = drdx & ~0x1f;
 	m_span_base.m_span_dg = dgdx & ~0x1f;
 	m_span_base.m_span_db = dbdx & ~0x1f;
@@ -1984,14 +1981,14 @@ void n64_rdp::draw_triangle(bool shade, bool texture, bool zbuffer, bool rect)
 	m_span_base.m_span_dymax = 0;
 	m_span_base.m_span_dzpix = m_dzpix_normalize[temp_dzpix & 0xffff];
 
-	INT32 xleft_inc = (dxmdy >> 2) & ~1;
-	INT32 xright_inc = (dxhdy >> 2) & ~1;
+	int32_t xleft_inc = (dxmdy >> 2) & ~1;
+	int32_t xright_inc = (dxhdy >> 2) & ~1;
 
-	INT32 xright = xh & ~1;
-	INT32 xleft = xm & ~1;
+	int32_t xright = xh & ~1;
+	int32_t xleft = xm & ~1;
 
-	const INT32 sign_dxhdy = (dxhdy & 0x80000000) ? 1 : 0;
-	const INT32 do_offset = !(sign_dxhdy ^ (flip));
+	const int32_t sign_dxhdy = (dxhdy & 0x80000000) ? 1 : 0;
+	const int32_t do_offset = !(sign_dxhdy ^ (flip));
 
 	if (do_offset)
 	{
@@ -2027,18 +2024,18 @@ void n64_rdp::draw_triangle(bool shade, bool texture, bool zbuffer, bool rect)
 	dadxh = dadx >> 8;
 	dzdxh = dzdx >> 8;
 
-	const INT32 ycur = yh & ~3;
-	const INT32 ylfar = yl | 3;
-	const INT32 ldflag = (sign_dxhdy ^ flip) ? 0 : 3;
-	INT32 majorx[4];
-	INT32 minorx[4];
-	INT32 majorxint[4];
-	INT32 minorxint[4];
+	const int32_t ycur = yh & ~3;
+	const int32_t ylfar = yl | 3;
+	const int32_t ldflag = (sign_dxhdy ^ flip) ? 0 : 3;
+	int32_t majorx[4];
+	int32_t minorx[4];
+	int32_t majorxint[4];
+	int32_t minorxint[4];
 
-	INT32 xfrac = ((xright >> 8) & 0xff);
+	int32_t xfrac = ((xright >> 8) & 0xff);
 
-	const INT32 clipy1 = m_scissor.m_yh;
-	const INT32 clipy2 = m_scissor.m_yl;
+	const int32_t clipy1 = m_scissor.m_yh;
+	const int32_t clipy2 = m_scissor.m_yl;
 
 	// Trivial reject
 	if((ycur >> 2) >= clipy2 && (ylfar >> 2) >= clipy2)
@@ -2054,12 +2051,12 @@ void n64_rdp::draw_triangle(bool shade, bool texture, bool zbuffer, bool rect)
 	rdp_poly_state* object = nullptr;
 	bool valid = false;
 
-	INT32* minx = flip ? &minxhx : &minxmx;
-	INT32* maxx = flip ? &maxxmx : &maxxhx;
-	INT32* startx = flip ? maxx : minx;
-	INT32* endx = flip ? minx : maxx;
+	int32_t* minx = flip ? &minxhx : &minxmx;
+	int32_t* maxx = flip ? &maxxmx : &maxxhx;
+	int32_t* startx = flip ? maxx : minx;
+	int32_t* endx = flip ? minx : maxx;
 
-	for (INT32 k = ycur; k <= ylfar; k++)
+	for (int32_t k = ycur; k <= ylfar; k++)
 	{
 		if (k == ym)
 		{
@@ -2067,11 +2064,11 @@ void n64_rdp::draw_triangle(bool shade, bool texture, bool zbuffer, bool rect)
 			xleft_inc = (dxldy >> 2) & ~1;
 		}
 
-		const INT32 xstart = xleft >> 16;
-		const INT32 xend = xright >> 16;
-		const INT32 j = k >> 2;
-		const INT32 spanidx = (k - ycur) >> 2;
-		const INT32  spix = k & 3;
+		const int32_t xstart = xleft >> 16;
+		const int32_t xend = xright >> 16;
+		const int32_t j = k >> 2;
+		const int32_t spanidx = (k - ycur) >> 2;
+		const int32_t  spix = k & 3;
 		bool valid_y = !(k < yh || k >= yl);
 
 		if (spanidx >= 0 && spanidx < 2048)
@@ -2110,7 +2107,7 @@ void n64_rdp::draw_triangle(bool shade, bool texture, bool zbuffer, bool rect)
 					new_object = false;
 				}
 
-				spans[spanidx].userdata = (void*)((UINT8*)m_aux_buf.get() + m_aux_buf_ptr);
+				spans[spanidx].userdata = (void*)((uint8_t*)m_aux_buf.get() + m_aux_buf_ptr);
 				valid = true;
 				m_aux_buf_ptr += sizeof(rdp_span_aux);
 
@@ -2215,207 +2212,180 @@ void n64_rdp::triangle(bool shade, bool texture, bool zbuffer)
 	m_pipe_clean = false;
 }
 
-void n64_rdp::cmd_triangle(UINT32 w1, UINT32 w2)
+void n64_rdp::cmd_triangle(uint64_t w1)
 {
 	triangle(false, false, false);
 }
 
-void n64_rdp::cmd_triangle_z(UINT32 w1, UINT32 w2)
+void n64_rdp::cmd_triangle_z(uint64_t w1)
 {
 	triangle(false, false, true);
 }
 
-void n64_rdp::cmd_triangle_t(UINT32 w1, UINT32 w2)
+void n64_rdp::cmd_triangle_t(uint64_t w1)
 {
 	triangle(false, true, false);
 }
 
-void n64_rdp::cmd_triangle_tz(UINT32 w1, UINT32 w2)
+void n64_rdp::cmd_triangle_tz(uint64_t w1)
 {
 	triangle(false, true, true);
 }
 
-void n64_rdp::cmd_triangle_s(UINT32 w1, UINT32 w2)
+void n64_rdp::cmd_triangle_s(uint64_t w1)
 {
 	triangle(true, false, false);
 }
 
-void n64_rdp::cmd_triangle_sz(UINT32 w1, UINT32 w2)
+void n64_rdp::cmd_triangle_sz(uint64_t w1)
 {
 	triangle(true, false, true);
 }
 
-void n64_rdp::cmd_triangle_st(UINT32 w1, UINT32 w2)
+void n64_rdp::cmd_triangle_st(uint64_t w1)
 {
 	triangle(true, true, false);
 }
 
-void n64_rdp::cmd_triangle_stz(UINT32 w1, UINT32 w2)
+void n64_rdp::cmd_triangle_stz(uint64_t w1)
 {
 	triangle(true, true, true);
 }
 
-void n64_rdp::cmd_tex_rect(UINT32 w1, UINT32 w2)
+void n64_rdp::cmd_tex_rect(uint64_t w1)
 {
-	const UINT32* data = m_cmd_data + m_cmd_cur;
+	const uint64_t* data = m_cmd_data + m_cmd_cur;
 
-	const UINT32 w3 = data[2];
-	const UINT32 w4 = data[3];
+	const uint64_t w2 = data[1];
 
-	const INT32 tilenum  = (w2 >> 24) & 0x7;
-	const INT32 xh   = (w2 >> 12) & 0xfff;
-	const INT32 xl = (w1 >> 12) & 0xfff;
-	const INT32 yh   = (w2 >>  0) & 0xfff;
-	INT32 yl   = (w1 >>  0) & 0xfff;
+	const uint64_t tilenum = (w1 >> 24) & 0x7;
+	const uint64_t xh = (w1 >> 12) & 0xfff;
+	const uint64_t xl = (w1 >> 44) & 0xfff;
+	const uint64_t yh = (w1 >>  0) & 0xfff;
+	uint64_t yl       = (w1 >> 32) & 0xfff;
 
-	const INT32 s = (w3 >> 16) & 0xffff;
-	const INT32 t = (w3 >>  0) & 0xffff;
-	const INT32 dsdx = SIGN16((w4 >> 16) & 0xffff);
-	const INT32 dtdy = SIGN16((w4 >>  0) & 0xffff);
+	const uint64_t s  = (w2 >> 48) & 0xffff;
+	const uint64_t t  = (w2 >> 32) & 0xffff;
+	const uint64_t dsdx = SIGN16((w2 >> 16) & 0xffff);
+	const uint64_t dtdy = SIGN16((w2 >>  0) & 0xffff);
 
 	if (m_other_modes.cycle_type == CYCLE_TYPE_FILL || m_other_modes.cycle_type == CYCLE_TYPE_COPY)
 	{
 		yl |= 3;
 	}
 
-	const INT32 xlint = (xl >> 2) & 0x3ff;
-	const INT32 xhint = (xh >> 2) & 0x3ff;
+	const uint64_t xlint = (xl >> 2) & 0x3ff;
+	const uint64_t xhint = (xh >> 2) & 0x3ff;
 
-	UINT32* ewdata = m_temp_rect_data;
-	ewdata[0] = (0x24 << 24) | ((0x80 | tilenum) << 16) | yl;   // command, flipped, tile, yl
-	ewdata[1] = (yl << 16) | yh;                                // ym, yh
-	ewdata[2] = (xlint << 16) | ((xl & 3) << 14);               // xl, xl frac
-	// ewdata[3] = 0;                                              dxldy, dxldy frac
-	ewdata[4] = (xhint << 16) | ((xh & 3) << 14);               // xh, xh frac
-	// ewdata[5] = 0;                                              dxhdy, dxhdy frac
-	ewdata[6] = (xlint << 16) | ((xl & 3) << 14);               // xm, xm frac
-	//ewdata[7] = 0;                                               dxmdy, dxmdy frac
-	memset(&ewdata[8], 0, 16 * sizeof(UINT32));                 // shade
-	ewdata[24] = (s << 16) | t;                                 // s, t
-	// ewdata[25] = 0;                                             w
-	ewdata[26] = ((dsdx >> 5) << 16);                           // dsdx, dtdx
-	// ewdata[27] = 0;                                             dwdx
-	// ewdata[28] = 0;                                             s frac, t frac
-	// ewdata[29] = 0;                                             w frac
-	ewdata[30] = ((dsdx & 0x1f) << 11) << 16;                   // dsdx frac, dtdx frac
-	// ewdata[31] = 0;                                             dwdx frac
-	ewdata[32] = (dtdy >> 5) & 0xffff;                          // dsde, dtde
-	// ewdata[33] = 0;                                             dwde
-	ewdata[34] = (dtdy >> 5) & 0xffff;                          // dsdy, dtdy
-	// ewdata[35] = 0;                                             dwdy
-	ewdata[36] = (dtdy & 0x1f) << 11;                           // dsde frac, dtde frac
-	// ewdata[37] = 0;                                             dwde frac
-	ewdata[38] = (dtdy & 0x1f) << 11;                           // dsdy frac, dtdy frac
-	// ewdata[39] = 0;                                          // dwdy frac
+	uint64_t* ewdata = m_temp_rect_data;
+	ewdata[0] = ((uint64_t)0x24 << 56) | ((0x80L | tilenum) << 48) | (yl << 32) | (yl << 16) | yh;   // command, flipped, tile, yl
+	ewdata[1] = (xlint << 48) | ((xl & 3) << 46);               // xl, xl frac, dxldy (0), dxldy frac (0)
+	ewdata[2] = (xhint << 48) | ((xh & 3) << 46);               // xh, xh frac, dxhdy (0), dxhdy frac (0)
+	ewdata[3] = (xlint << 48) | ((xl & 3) << 46);               // xm, xm frac, dxmdy (0), dxmdy frac (0)
+	memset(&ewdata[4], 0, 8 * sizeof(uint64_t));                // shade
+	ewdata[12] = (s << 48) | (t << 32);                         // s, t, w (0)
+	ewdata[13] = (dsdx >> 5) << 48;                             // dsdx, dtdx, dwdx (0)
+	ewdata[14] = 0;                                             // s frac (0), t frac (0), w frac (0)
+	ewdata[15] = (dsdx & 0x1f) << 59;                           // dsdx frac, dtdx frac, dwdx frac (0)
+	ewdata[16] = ((dtdy >> 5) & 0xffff) << 32;                  // dsde, dtde, dwde (0)
+	ewdata[17] = ((dtdy >> 5) & 0xffff) << 32;                  // dsdy, dtdy, dwdy (0)
+	ewdata[18] = ((dtdy & 0x1f) << 11) << 32;                   // dsde frac, dtde frac, dwde frac (0)
+	ewdata[38] = ((dtdy & 0x1f) << 11) << 32;                   // dsdy frac, dtdy frac, dwdy frac (0)
 	// ewdata[40-43] = 0;                                       // depth
 
 	draw_triangle(true, true, false, true);
 }
 
-void n64_rdp::cmd_tex_rect_flip(UINT32 w1, UINT32 w2)
+void n64_rdp::cmd_tex_rect_flip(uint64_t w1)
 {
-	const UINT32* data = m_cmd_data + m_cmd_cur;
+	const uint64_t* data = m_cmd_data + m_cmd_cur;
 
-	const UINT32 w3 = data[2];
-	const UINT32 w4 = data[3];
+	const uint64_t w2 = data[1];
 
-	const INT32 tilenum  = (w2 >> 24) & 0x7;
-	const INT32 xh   = (w2 >> 12) & 0xfff;
-	const INT32 xl = (w1 >> 12) & 0xfff;
-	const INT32 yh   = (w2 >>  0) & 0xfff;
-	INT32 yl   = (w1 >>  0) & 0xfff;
+	const uint64_t tilenum  = (w1 >> 56) & 0x7;
+	const uint64_t xh = (w1 >> 12) & 0xfff;
+	const uint64_t xl = (w1 >> 44) & 0xfff;
+	const uint64_t yh = (w1 >>  0) & 0xfff;
+	uint64_t yl       = (w1 >> 32) & 0xfff;
 
-	const INT32 s = (w3 >> 16) & 0xffff;
-	const INT32 t = (w3 >>  0) & 0xffff;
-	const INT32 dsdx = SIGN16((w4 >> 16) & 0xffff);
-	const INT32 dtdy = SIGN16((w4 >>  0) & 0xffff);
+	const uint64_t s  = (w2 >> 48) & 0xffff;
+	const uint64_t t  = (w2 >> 32) & 0xffff;
+	const uint64_t dsdx = SIGN16((w2 >> 16) & 0xffff);
+	const uint64_t dtdy = SIGN16((w2 >>  0) & 0xffff);
 
 	if (m_other_modes.cycle_type == CYCLE_TYPE_FILL || m_other_modes.cycle_type == CYCLE_TYPE_COPY)
 	{
 		yl |= 3;
 	}
 
-	const INT32 xlint = (xl >> 2) & 0x3ff;
-	const INT32 xhint = (xh >> 2) & 0x3ff;
+	const uint64_t xlint = (xl >> 2) & 0x3ff;
+	const uint64_t xhint = (xh >> 2) & 0x3ff;
 
-	UINT32* ewdata = m_temp_rect_data;
-	ewdata[0] = (0x25 << 24) | ((0x80 | tilenum) << 16) | yl;   // command, flipped, tile, yl
-	ewdata[1] = (yl << 16) | yh;                                // ym, yh
-	ewdata[2] = (xlint << 16) | ((xl & 3) << 14);               // xl, xl frac
-	// ewdata[3] = 0;                                              dxldy, dxldy frac
-	ewdata[4] = (xhint << 16) | ((xh & 3) << 14);               // xh, xh frac
-	// ewdata[5] = 0;                                              dxhdy, dxhdy frac
-	ewdata[6] = (xlint << 16) | ((xl & 3) << 14);               // xm, xm frac
-	// ewdata[7] = 0;                                              dxmdy, dxmdy frac
-	memset(&ewdata[8], 0, 16 * sizeof(UINT32));                 // shade
-	ewdata[24] = (s << 16) | t;                                 // s, t
-	// ewdata[25] = 0;                                          // w
-	ewdata[26] = (dtdy >> 5) & 0xffff;                          // dsdx, dtdx
-	// ewdata[27] = 0;                                             dwdx
-	// ewdata[28] = 0;                                             s frac, t frac
-	// ewdata[29] = 0;                                             w frac
-	ewdata[30] = ((dtdy & 0x1f) << 11);                         // dsdx frac, dtdx frac
-	// ewdata[31] = 0;                                             dwdx frac
-	ewdata[32] = (dsdx >> 5) << 16;                             // dsde, dtde
-	// ewdata[33] = 0;                                             dwde
-	ewdata[34] = (dsdx >> 5) << 16;                             // dsdy, dtdy
-	// ewdata[35] = 0;                                             dwdy
-	ewdata[36] = (dsdx & 0x1f) << 27;                           // dsde frac, dtde frac
-	// ewdata[37] = 0;                                             dwde frac
-	ewdata[38] = (dsdx & 0x1f) << 27;                           // dsdy frac, dtdy frac
-	// ewdata[39] = 0;                                          // dwdy frac
-	// ewdata[40-43] = 0;                                       // depth
+	uint64_t* ewdata = m_temp_rect_data;
+	ewdata[0] = ((uint64_t)0x25 << 56) | ((0x80L | tilenum) << 48) | (yl << 32) | (yl << 16) | yh;   // command, flipped, tile, yl
+	ewdata[1] = (xlint << 48) | ((xl & 3) << 46);               // xl, xl frac, dxldy (0), dxldy frac (0)
+	ewdata[2] = (xhint << 48) | ((xh & 3) << 46);               // xh, xh frac, dxhdy (0), dxhdy frac (0)
+	ewdata[3] = (xlint << 48) | ((xl & 3) << 46);               // xm, xm frac, dxmdy (0), dxmdy frac (0)
+	memset(&ewdata[4], 0, 8 * sizeof(uint64_t));                // shade
+	ewdata[12] = (s << 48) | (t << 32);                         // s, t, w (0)
+	ewdata[13] = ((dtdy >> 5) & 0xffff) << 32;                  // dsdx, dtdx, dwdx (0)
+	ewdata[14] = 0;                                             // s frac (0), t frac (0), w frac (0)
+	ewdata[15] = ((dtdy & 0x1f) << 43);                         // dsdx frac, dtdx frac, dwdx frac (0)
+	ewdata[16] = (dsdx >> 5) << 48;                             // dsde, dtde, dwde (0)
+	ewdata[17] = (dsdx >> 5) << 48;                             // dsdy, dtdy, dwdy (0)
+	ewdata[18] = (dsdx & 0x1f) << 59;                           // dsde frac, dtde frac, dwde frac (0)
+	ewdata[19] = (dsdx & 0x1f) << 59;                           // dsdy frac, dtdy frac, dwdy frac (0)
 
 	draw_triangle(true, true, false, true);
 }
 
-void n64_rdp::cmd_sync_load(UINT32 w1, UINT32 w2)
+void n64_rdp::cmd_sync_load(uint64_t w1)
 {
 	//wait("SyncLoad");
 }
 
-void n64_rdp::cmd_sync_pipe(UINT32 w1, UINT32 w2)
+void n64_rdp::cmd_sync_pipe(uint64_t w1)
 {
 	//wait("SyncPipe");
 }
 
-void n64_rdp::cmd_sync_tile(UINT32 w1, UINT32 w2)
+void n64_rdp::cmd_sync_tile(uint64_t w1)
 {
 	//wait("SyncTile");
 }
 
-void n64_rdp::cmd_sync_full(UINT32 w1, UINT32 w2)
+void n64_rdp::cmd_sync_full(uint64_t w1)
 {
 	//wait("SyncFull");
-	dp_full_sync(*m_machine);
+	m_n64_periphs->dp_full_sync();
 }
 
-void n64_rdp::cmd_set_key_gb(UINT32 w1, UINT32 w2)
+void n64_rdp::cmd_set_key_gb(uint64_t w1)
 {
-	m_key_scale.set_b(w2 & 0xff);
-	m_key_scale.set_g((w2 >> 16) & 0xff);
+	m_key_scale.set_b(uint32_t(w1 >>  0) & 0xff);
+	m_key_scale.set_g(uint32_t(w1 >> 16) & 0xff);
 }
 
-void n64_rdp::cmd_set_key_r(UINT32 w1, UINT32 w2)
+void n64_rdp::cmd_set_key_r(uint64_t w1)
 {
-	m_key_scale.set_r(w2 & 0xff);
+	m_key_scale.set_r(uint32_t(w1 & 0xff));
 }
 
-void n64_rdp::cmd_set_fill_color32(UINT32 w1, UINT32 w2)
+void n64_rdp::cmd_set_fill_color32(uint64_t w1)
 {
 	//wait("SetFillColor");
-	m_fill_color = w2;
+	m_fill_color = (uint32_t)w1;
 }
 
-void n64_rdp::cmd_set_convert(UINT32 w1, UINT32 w2)
+void n64_rdp::cmd_set_convert(uint64_t w1)
 {
 	if(!m_pipe_clean) { m_pipe_clean = true; wait("SetConvert"); }
-	INT32 k0 = (w1 >> 13) & 0x1ff;
-	INT32 k1 = (w1 >> 4) & 0x1ff;
-	INT32 k2 = ((w1 & 0xf) << 5) | ((w2 >> 27) & 0x1f);
-	INT32 k3 = (w2 >> 18) & 0x1ff;
-	INT32 k4 = (w2 >> 9) & 0x1ff;
-	INT32 k5 = w2 & 0x1ff;
+	int32_t k0 = int32_t(w1 >> 45) & 0x1ff;
+	int32_t k1 = int32_t(w1 >> 36) & 0x1ff;
+	int32_t k2 = int32_t(w1 >> 27) & 0x1ff;
+	int32_t k3 = int32_t(w1 >> 18) & 0x1ff;
+	int32_t k4 = int32_t(w1 >>  9) & 0x1ff;
+	int32_t k5 = int32_t(w1 >>  0) & 0x1ff;
 
 	k0 = (SIGN9(k0) << 1) + 1;
 	k1 = (SIGN9(k1) << 1) + 1;
@@ -2425,82 +2395,84 @@ void n64_rdp::cmd_set_convert(UINT32 w1, UINT32 w2)
 	set_yuv_factors(rgbaint_t(0, k0, k2, k3), rgbaint_t(0, 0, k1, 0), rgbaint_t(k4, k4, k4, k4), rgbaint_t(k5, k5, k5, k5));
 }
 
-void n64_rdp::cmd_set_scissor(UINT32 w1, UINT32 w2)
+void n64_rdp::cmd_set_scissor(uint64_t w1)
 {
-	m_scissor.m_xh = ((w1 >> 12) & 0xfff) >> 2;
-	m_scissor.m_yh = ((w1 >>  0) & 0xfff) >> 2;
-	m_scissor.m_xl = ((w2 >> 12) & 0xfff) >> 2;
-	m_scissor.m_yl = ((w2 >>  0) & 0xfff) >> 2;
+	m_scissor.m_xh = ((w1 >> 44) & 0xfff) >> 2;
+	m_scissor.m_yh = ((w1 >> 32) & 0xfff) >> 2;
+	m_scissor.m_xl = ((w1 >> 12) & 0xfff) >> 2;
+	m_scissor.m_yl = ((w1 >>  0) & 0xfff) >> 2;
 
 	// TODO: handle f & o?
 }
 
-void n64_rdp::cmd_set_prim_depth(UINT32 w1, UINT32 w2)
+void n64_rdp::cmd_set_prim_depth(uint64_t w1)
 {
-	m_misc_state.m_primitive_z = w2 & 0x7fff0000;
-	m_misc_state.m_primitive_dz = (UINT16)(w1);
+	m_misc_state.m_primitive_z = (uint32_t)(w1 & 0x7fff0000);
+	m_misc_state.m_primitive_dz = (uint16_t)(w1 >> 32);
 }
 
-void n64_rdp::cmd_set_other_modes(UINT32 w1, UINT32 w2)
+void n64_rdp::cmd_set_other_modes(uint64_t w1)
 {
 	//wait("SetOtherModes");
-	m_other_modes.cycle_type       = (w1 >> 20) & 0x3; // 01
-	m_other_modes.persp_tex_en     = (w1 & 0x80000) ? 1 : 0; // 1
-	m_other_modes.detail_tex_en        = (w1 & 0x40000) ? 1 : 0; // 0
-	m_other_modes.sharpen_tex_en   = (w1 & 0x20000) ? 1 : 0; // 0
-	m_other_modes.tex_lod_en       = (w1 & 0x10000) ? 1 : 0; // 0
-	m_other_modes.en_tlut          = (w1 & 0x08000) ? 1 : 0; // 0
-	m_other_modes.tlut_type            = (w1 & 0x04000) ? 1 : 0; // 0
-	m_other_modes.sample_type      = (w1 & 0x02000) ? 1 : 0; // 1
-	m_other_modes.mid_texel            = (w1 & 0x01000) ? 1 : 0; // 0
-	m_other_modes.bi_lerp0         = (w1 & 0x00800) ? 1 : 0; // 1
-	m_other_modes.bi_lerp1         = (w1 & 0x00400) ? 1 : 0; // 1
-	m_other_modes.convert_one      = (w1 & 0x00200) ? 1 : 0; // 0
-	m_other_modes.key_en           = (w1 & 0x00100) ? 1 : 0; // 0
-	m_other_modes.rgb_dither_sel   = (w1 >> 6) & 0x3; // 00
-	m_other_modes.alpha_dither_sel = (w1 >> 4) & 0x3; // 01
-	m_other_modes.blend_m1a_0      = (w2 >> 30) & 0x3; // 11
-	m_other_modes.blend_m1a_1      = (w2 >> 28) & 0x3; // 00
-	m_other_modes.blend_m1b_0      = (w2 >> 26) & 0x3; // 10
-	m_other_modes.blend_m1b_1      = (w2 >> 24) & 0x3; // 00
-	m_other_modes.blend_m2a_0      = (w2 >> 22) & 0x3; // 00
-	m_other_modes.blend_m2a_1      = (w2 >> 20) & 0x3; // 01
-	m_other_modes.blend_m2b_0      = (w2 >> 18) & 0x3; // 00
-	m_other_modes.blend_m2b_1      = (w2 >> 16) & 0x3; // 01
-	m_other_modes.force_blend      = (w2 >> 14) & 1; // 0
-	m_other_modes.blend_shift       = m_other_modes.force_blend ? 5 : 2;
-	m_other_modes.alpha_cvg_select = (w2 >> 13) & 1; // 1
-	m_other_modes.cvg_times_alpha  = (w2 >> 12) & 1; // 0
-	m_other_modes.z_mode           = (w2 >> 10) & 0x3; // 00
-	m_other_modes.cvg_dest         = (w2 >> 8) & 0x3; // 00
-	m_other_modes.color_on_cvg     = (w2 >> 7) & 1; // 0
-	m_other_modes.image_read_en    = (w2 >> 6) & 1; // 1
-	m_other_modes.z_update_en      = (w2 >> 5) & 1; // 1
-	m_other_modes.z_compare_en     = (w2 >> 4) & 1; // 1
-	m_other_modes.antialias_en     = (w2 >> 3) & 1; // 1
-	m_other_modes.z_source_sel     = (w2 >> 2) & 1; // 0
-	m_other_modes.dither_alpha_en  = (w2 >> 1) & 1; // 0
-	m_other_modes.alpha_compare_en = (w2) & 1; // 0
+	m_other_modes.cycle_type       = (w1 >> 52) & 0x3; // 01
+	m_other_modes.persp_tex_en     = (w1 >> 51) & 1; // 1
+	m_other_modes.detail_tex_en    = (w1 >> 50) & 1; // 0
+	m_other_modes.sharpen_tex_en   = (w1 >> 49) & 1; // 0
+	m_other_modes.tex_lod_en       = (w1 >> 48) & 1; // 0
+	m_other_modes.en_tlut          = (w1 >> 47) & 1; // 0
+	m_other_modes.tlut_type        = (w1 >> 46) & 1; // 0
+	m_other_modes.sample_type      = (w1 >> 45) & 1; // 1
+	m_other_modes.mid_texel        = (w1 >> 44) & 1; // 0
+	m_other_modes.bi_lerp0         = (w1 >> 43) & 1; // 1
+	m_other_modes.bi_lerp1         = (w1 >> 42) & 1; // 1
+	m_other_modes.convert_one      = (w1 >> 41) & 1; // 0
+	m_other_modes.key_en           = (w1 >> 40) & 1; // 0
+	m_other_modes.rgb_dither_sel   = (w1 >> 38) & 0x3; // 00
+	m_other_modes.alpha_dither_sel = (w1 >> 36) & 0x3; // 01
+	m_other_modes.blend_m1a_0      = (w1 >> 30) & 0x3; // 11
+	m_other_modes.blend_m1a_1      = (w1 >> 28) & 0x3; // 00
+	m_other_modes.blend_m1b_0      = (w1 >> 26) & 0x3; // 10
+	m_other_modes.blend_m1b_1      = (w1 >> 24) & 0x3; // 00
+	m_other_modes.blend_m2a_0      = (w1 >> 22) & 0x3; // 00
+	m_other_modes.blend_m2a_1      = (w1 >> 20) & 0x3; // 01
+	m_other_modes.blend_m2b_0      = (w1 >> 18) & 0x3; // 00
+	m_other_modes.blend_m2b_1      = (w1 >> 16) & 0x3; // 01
+	m_other_modes.force_blend      = (w1 >> 14) & 1; // 0
+	m_other_modes.blend_shift      = m_other_modes.force_blend ? 5 : 2;
+	m_other_modes.alpha_cvg_select = (w1 >> 13) & 1; // 1
+	m_other_modes.cvg_times_alpha  = (w1 >> 12) & 1; // 0
+	m_other_modes.z_mode           = (w1 >> 10) & 0x3; // 00
+	m_other_modes.cvg_dest         = (w1 >> 8) & 0x3; // 00
+	m_other_modes.color_on_cvg     = (w1 >> 7) & 1; // 0
+	m_other_modes.image_read_en    = (w1 >> 6) & 1; // 1
+	m_other_modes.z_update_en      = (w1 >> 5) & 1; // 1
+	m_other_modes.z_compare_en     = (w1 >> 4) & 1; // 1
+	m_other_modes.antialias_en     = (w1 >> 3) & 1; // 1
+	m_other_modes.z_source_sel     = (w1 >> 2) & 1; // 0
+	m_other_modes.dither_alpha_en  = (w1 >> 1) & 1; // 0
+	m_other_modes.alpha_compare_en = (w1 >> 0) & 1; // 0
 	m_other_modes.alpha_dither_mode = (m_other_modes.alpha_compare_en << 1) | m_other_modes.dither_alpha_en;
 }
 
-void n64_rdp::cmd_load_tlut(UINT32 w1, UINT32 w2)
+void n64_rdp::cmd_load_tlut(uint64_t w1)
 {
 	//wait("LoadTLUT");
 	n64_tile_t* tile = m_tiles;
 
-	const INT32 tilenum = (w2 >> 24) & 0x7;
-	const INT32 sl = tile[tilenum].sl = ((w1 >> 12) & 0xfff);
-	const INT32 tl = tile[tilenum].tl =  w1 & 0xfff;
-	const INT32 sh = tile[tilenum].sh = ((w2 >> 12) & 0xfff);
-	const INT32 th = tile[tilenum].th = w2 & 0xfff;
+	const int32_t tilenum = (w1 >> 24) & 0x7;
+	const int32_t sl = tile[tilenum].sl = int32_t(w1 >> 44) & 0xfff;
+	const int32_t tl = tile[tilenum].tl = int32_t(w1 >> 32) & 0xfff;
+	const int32_t sh = tile[tilenum].sh = int32_t(w1 >> 12) & 0xfff;
+	const int32_t th = tile[tilenum].th = int32_t(w1 >>  0) & 0xfff;
 
 	if (tl != th)
 	{
 		fatalerror("Load tlut: tl=%d, th=%d\n",tl,th);
 	}
 
-	const INT32 count = ((sh >> 2) - (sl >> 2) + 1) << 2;
+	m_capture.data_begin();
+
+	const int32_t count = ((sh >> 2) - (sl >> 2) + 1) << 2;
 
 	switch (m_misc_state.m_ti_size)
 	{
@@ -2510,15 +2482,16 @@ void n64_rdp::cmd_load_tlut(UINT32 w1, UINT32 w2)
 			{
 				fatalerror("rdp_load_tlut: loading tlut into low half at %d qwords\n",tile[tilenum].tmem);
 			}
-			INT32 srcstart = (m_misc_state.m_ti_address + (tl >> 2) * (m_misc_state.m_ti_width << 1) + (sl >> 1)) >> 1;
-			INT32 dststart = tile[tilenum].tmem << 2;
-			UINT16* dst = get_tmem16();
+			int32_t srcstart = (m_misc_state.m_ti_address + (tl >> 2) * (m_misc_state.m_ti_width << 1) + (sl >> 1)) >> 1;
+			int32_t dststart = tile[tilenum].tmem << 2;
+			uint16_t* dst = get_tmem16();
 
-			for (INT32 i = 0; i < count; i += 4)
+			for (int32_t i = 0; i < count; i += 4)
 			{
 				if (dststart < 2048)
 				{
 					dst[dststart] = U_RREADIDX16(srcstart);
+					m_capture.data_block()->put16(dst[dststart]);
 					dst[dststart + 1] = dst[dststart];
 					dst[dststart + 2] = dst[dststart];
 					dst[dststart + 3] = dst[dststart];
@@ -2531,44 +2504,46 @@ void n64_rdp::cmd_load_tlut(UINT32 w1, UINT32 w2)
 		default:    fatalerror("RDP: load_tlut: size = %d\n", m_misc_state.m_ti_size);
 	}
 
+	m_capture.data_end();
+
 	m_tiles[tilenum].sth = rgbaint_t(m_tiles[tilenum].sh, m_tiles[tilenum].sh, m_tiles[tilenum].th, m_tiles[tilenum].th);
 	m_tiles[tilenum].stl = rgbaint_t(m_tiles[tilenum].sl, m_tiles[tilenum].sl, m_tiles[tilenum].tl, m_tiles[tilenum].tl);
 }
 
-void n64_rdp::cmd_set_tile_size(UINT32 w1, UINT32 w2)
+void n64_rdp::cmd_set_tile_size(uint64_t w1)
 {
 	//wait("SetTileSize");
 
-	const INT32 tilenum = (w2 >> 24) & 0x7;
+	const int32_t tilenum = int32_t(w1 >> 24) & 0x7;
 
-	m_tiles[tilenum].sl = (w1 >> 12) & 0xfff;
-	m_tiles[tilenum].tl = (w1 >>  0) & 0xfff;
-	m_tiles[tilenum].sh = (w2 >> 12) & 0xfff;
-	m_tiles[tilenum].th = (w2 >>  0) & 0xfff;
+	m_tiles[tilenum].sl = int32_t(w1 >> 44) & 0xfff;
+	m_tiles[tilenum].tl = int32_t(w1 >> 32) & 0xfff;
+	m_tiles[tilenum].sh = int32_t(w1 >> 12) & 0xfff;
+	m_tiles[tilenum].th = int32_t(w1 >>  0) & 0xfff;
 
 	m_tiles[tilenum].sth = rgbaint_t(m_tiles[tilenum].sh, m_tiles[tilenum].sh, m_tiles[tilenum].th, m_tiles[tilenum].th);
 	m_tiles[tilenum].stl = rgbaint_t(m_tiles[tilenum].sl, m_tiles[tilenum].sl, m_tiles[tilenum].tl, m_tiles[tilenum].tl);
 }
 
-void n64_rdp::cmd_load_block(UINT32 w1, UINT32 w2)
+void n64_rdp::cmd_load_block(uint64_t w1)
 {
 	//wait("LoadBlock");
 	n64_tile_t* tile = m_tiles;
 
-	const INT32 tilenum = (w2 >> 24) & 0x7;
-	UINT16* tc = get_tmem16();
+	const int32_t tilenum = int32_t(w1 >> 24) & 0x7;
+	uint16_t* tc = get_tmem16();
 
-	INT32 sl = tile[tilenum].sl = ((w1 >> 12) & 0xfff);
-	INT32 tl = tile[tilenum].tl = ((w1 >>  0) & 0xfff);
-	INT32 sh = tile[tilenum].sh = ((w2 >> 12) & 0xfff);
-	const INT32 dxt = ((w2 >>  0) & 0xfff);
+	int32_t sl = tile[tilenum].sl = int32_t(w1 >> 44) & 0xfff;
+	int32_t tl = tile[tilenum].tl = int32_t(w1 >> 32) & 0xfff;
+	int32_t sh = tile[tilenum].sh = int32_t(w1 >> 12) & 0xfff;
+	const int32_t dxt             = int32_t(w1 >>  0) & 0xfff;
 
 	if (sh < sl)
 	{
 		fatalerror("load_block: sh < sl\n");
 	}
 
-	INT32 width = (sh - sl) + 1;
+	int32_t width = (sh - sl) + 1;
 
 	width = (width << m_misc_state.m_ti_size) >> 1;
 	if (width & 7)
@@ -2577,22 +2552,24 @@ void n64_rdp::cmd_load_block(UINT32 w1, UINT32 w2)
 	}
 	width >>= 3;
 
-	const INT32 tb = tile[tilenum].tmem << 2;
+	const int32_t tb = tile[tilenum].tmem << 2;
 
-	const INT32 tiwinwords = (m_misc_state.m_ti_width << m_misc_state.m_ti_size) >> 2;
-	const INT32 slinwords = (sl << m_misc_state.m_ti_size) >> 2;
+	const int32_t tiwinwords = (m_misc_state.m_ti_width << m_misc_state.m_ti_size) >> 2;
+	const int32_t slinwords = (sl << m_misc_state.m_ti_size) >> 2;
 
-	const UINT32 src = (m_misc_state.m_ti_address >> 1) + (tl * tiwinwords) + slinwords;
+	const uint32_t src = (m_misc_state.m_ti_address >> 1) + (tl * tiwinwords) + slinwords;
+
+	m_capture.data_begin();
 
 	if (dxt != 0)
 	{
-		INT32 j = 0;
-		INT32 t = 0;
-		INT32 oldt = 0;
+		int32_t j = 0;
+		int32_t t = 0;
+		int32_t oldt = 0;
 
 		if (tile[tilenum].size != PIXEL_SIZE_32BIT && tile[tilenum].format != FORMAT_YUV)
 		{
-			for (INT32 i = 0; i < width; i ++)
+			for (int32_t i = 0; i < width; i ++)
 			{
 				oldt = t;
 				t = ((j >> 11) & 1) ? WORD_XOR_DWORD_SWAP : WORD_ADDR_XOR;
@@ -2601,19 +2578,25 @@ void n64_rdp::cmd_load_block(UINT32 w1, UINT32 w2)
 					i += tile[tilenum].line;
 				}
 
-				INT32 ptr = tb + (i << 2);
-				INT32 srcptr = src + (i << 2);
+				int32_t ptr = tb + (i << 2);
+				int32_t srcptr = src + (i << 2);
 
 				tc[(ptr ^ t) & 0x7ff] = U_RREADIDX16(srcptr);
 				tc[((ptr + 1) ^ t) & 0x7ff] = U_RREADIDX16(srcptr + 1);
 				tc[((ptr + 2) ^ t) & 0x7ff] = U_RREADIDX16(srcptr + 2);
 				tc[((ptr + 3) ^ t) & 0x7ff] = U_RREADIDX16(srcptr + 3);
+
+				m_capture.data_block()->put16(U_RREADIDX16(srcptr));
+				m_capture.data_block()->put16(U_RREADIDX16(srcptr+1));
+				m_capture.data_block()->put16(U_RREADIDX16(srcptr+2));
+				m_capture.data_block()->put16(U_RREADIDX16(srcptr+3));
+
 				j += dxt;
 			}
 		}
 		else if (tile[tilenum].format == FORMAT_YUV)
 		{
-			for (INT32 i = 0; i < width; i ++)
+			for (int32_t i = 0; i < width; i ++)
 			{
 				oldt = t;
 				t = ((j >> 11) & 1) ? WORD_XOR_DWORD_SWAP : WORD_ADDR_XOR;
@@ -2622,11 +2605,11 @@ void n64_rdp::cmd_load_block(UINT32 w1, UINT32 w2)
 					i += tile[tilenum].line;
 				}
 
-				INT32 ptr = ((tb + (i << 1)) ^ t) & 0x3ff;
-				INT32 srcptr = src + (i << 2);
+				int32_t ptr = ((tb + (i << 1)) ^ t) & 0x3ff;
+				int32_t srcptr = src + (i << 2);
 
-				INT32 first = U_RREADIDX16(srcptr);
-				INT32 sec = U_RREADIDX16(srcptr + 1);
+				int32_t first = U_RREADIDX16(srcptr);
+				int32_t sec = U_RREADIDX16(srcptr + 1);
 				tc[ptr] = ((first >> 8) << 8) | (sec >> 8);
 				tc[ptr | 0x400] = ((first & 0xff) << 8) | (sec & 0xff);
 
@@ -2636,26 +2619,35 @@ void n64_rdp::cmd_load_block(UINT32 w1, UINT32 w2)
 				tc[ptr] = ((first >> 8) << 8) | (sec >> 8);
 				tc[ptr | 0x400] = ((first & 0xff) << 8) | (sec & 0xff);
 
+				m_capture.data_block()->put16(U_RREADIDX16(srcptr));
+				m_capture.data_block()->put16(U_RREADIDX16(srcptr+1));
+				m_capture.data_block()->put16(U_RREADIDX16(srcptr+2));
+				m_capture.data_block()->put16(U_RREADIDX16(srcptr+3));
 				j += dxt;
 			}
 		}
 		else
 		{
-			for (INT32 i = 0; i < width; i ++)
+			for (int32_t i = 0; i < width; i ++)
 			{
 				oldt = t;
 				t = ((j >> 11) & 1) ? WORD_XOR_DWORD_SWAP : WORD_ADDR_XOR;
 				if (t != oldt)
 					i += tile[tilenum].line;
 
-				INT32 ptr = ((tb + (i << 1)) ^ t) & 0x3ff;
-				INT32 srcptr = src + (i << 2);
+				int32_t ptr = ((tb + (i << 1)) ^ t) & 0x3ff;
+				int32_t srcptr = src + (i << 2);
 				tc[ptr] = U_RREADIDX16(srcptr);
 				tc[ptr | 0x400] = U_RREADIDX16(srcptr + 1);
 
 				ptr = ((tb + (i << 1) + 1) ^ t) & 0x3ff;
 				tc[ptr] = U_RREADIDX16(srcptr + 2);
 				tc[ptr | 0x400] = U_RREADIDX16(srcptr + 3);
+
+				m_capture.data_block()->put16(U_RREADIDX16(srcptr));
+				m_capture.data_block()->put16(U_RREADIDX16(srcptr+1));
+				m_capture.data_block()->put16(U_RREADIDX16(srcptr+2));
+				m_capture.data_block()->put16(U_RREADIDX16(srcptr+3));
 
 				j += dxt;
 			}
@@ -2666,24 +2658,29 @@ void n64_rdp::cmd_load_block(UINT32 w1, UINT32 w2)
 	{
 		if (tile[tilenum].size != PIXEL_SIZE_32BIT && tile[tilenum].format != FORMAT_YUV)
 		{
-			for (INT32 i = 0; i < width; i ++)
+			for (int32_t i = 0; i < width; i ++)
 			{
-				INT32 ptr = tb + (i << 2);
-				INT32 srcptr = src + (i << 2);
+				int32_t ptr = tb + (i << 2);
+				int32_t srcptr = src + (i << 2);
 				tc[(ptr ^ WORD_ADDR_XOR) & 0x7ff] = U_RREADIDX16(srcptr);
 				tc[((ptr + 1) ^ WORD_ADDR_XOR) & 0x7ff] = U_RREADIDX16(srcptr + 1);
 				tc[((ptr + 2) ^ WORD_ADDR_XOR) & 0x7ff] = U_RREADIDX16(srcptr + 2);
 				tc[((ptr + 3) ^ WORD_ADDR_XOR) & 0x7ff] = U_RREADIDX16(srcptr + 3);
+
+				m_capture.data_block()->put16(U_RREADIDX16(srcptr));
+				m_capture.data_block()->put16(U_RREADIDX16(srcptr+1));
+				m_capture.data_block()->put16(U_RREADIDX16(srcptr+2));
+				m_capture.data_block()->put16(U_RREADIDX16(srcptr+3));
 			}
 		}
 		else if (tile[tilenum].format == FORMAT_YUV)
 		{
-			for (INT32 i = 0; i < width; i ++)
+			for (int32_t i = 0; i < width; i ++)
 			{
-				INT32 ptr = ((tb + (i << 1)) ^ WORD_ADDR_XOR) & 0x3ff;
-				INT32 srcptr = src + (i << 2);
-				INT32 first = U_RREADIDX16(srcptr);
-				INT32 sec = U_RREADIDX16(srcptr + 1);
+				int32_t ptr = ((tb + (i << 1)) ^ WORD_ADDR_XOR) & 0x3ff;
+				int32_t srcptr = src + (i << 2);
+				int32_t first = U_RREADIDX16(srcptr);
+				int32_t sec = U_RREADIDX16(srcptr + 1);
 				tc[ptr] = ((first >> 8) << 8) | (sec >> 8);//UV pair
 				tc[ptr | 0x400] = ((first & 0xff) << 8) | (sec & 0xff);
 
@@ -2692,49 +2689,61 @@ void n64_rdp::cmd_load_block(UINT32 w1, UINT32 w2)
 				sec = U_RREADIDX16(srcptr + 3);
 				tc[ptr] = ((first >> 8) << 8) | (sec >> 8);
 				tc[ptr | 0x400] = ((first & 0xff) << 8) | (sec & 0xff);
+
+				m_capture.data_block()->put16(U_RREADIDX16(srcptr));
+				m_capture.data_block()->put16(U_RREADIDX16(srcptr+1));
+				m_capture.data_block()->put16(U_RREADIDX16(srcptr+2));
+				m_capture.data_block()->put16(U_RREADIDX16(srcptr+3));
 			}
 		}
 		else
 		{
-			for (INT32 i = 0; i < width; i ++)
+			for (int32_t i = 0; i < width; i ++)
 			{
-				INT32 ptr = ((tb + (i << 1)) ^ WORD_ADDR_XOR) & 0x3ff;
-				INT32 srcptr = src + (i << 2);
+				int32_t ptr = ((tb + (i << 1)) ^ WORD_ADDR_XOR) & 0x3ff;
+				int32_t srcptr = src + (i << 2);
 				tc[ptr] = U_RREADIDX16(srcptr);
 				tc[ptr | 0x400] = U_RREADIDX16(srcptr + 1);
 
 				ptr = ((tb + (i << 1) + 1) ^ WORD_ADDR_XOR) & 0x3ff;
 				tc[ptr] = U_RREADIDX16(srcptr + 2);
 				tc[ptr | 0x400] = U_RREADIDX16(srcptr + 3);
+
+				m_capture.data_block()->put16(U_RREADIDX16(srcptr));
+				m_capture.data_block()->put16(U_RREADIDX16(srcptr+1));
+				m_capture.data_block()->put16(U_RREADIDX16(srcptr+2));
+				m_capture.data_block()->put16(U_RREADIDX16(srcptr+3));
 			}
 		}
 		tile[tilenum].th = tl;
 	}
 
+	m_capture.data_end();
+
 	m_tiles[tilenum].sth = rgbaint_t(m_tiles[tilenum].sh, m_tiles[tilenum].sh, m_tiles[tilenum].th, m_tiles[tilenum].th);
 	m_tiles[tilenum].stl = rgbaint_t(m_tiles[tilenum].sl, m_tiles[tilenum].sl, m_tiles[tilenum].tl, m_tiles[tilenum].tl);
 }
 
-void n64_rdp::cmd_load_tile(UINT32 w1, UINT32 w2)
+void n64_rdp::cmd_load_tile(uint64_t w1)
 {
 	//wait("LoadTile");
 	n64_tile_t* tile = m_tiles;
-	const INT32 tilenum = (w2 >> 24) & 0x7;
+	const int32_t tilenum = int32_t(w1 >> 24) & 0x7;
 
-	tile[tilenum].sl    = ((w1 >> 12) & 0xfff);
-	tile[tilenum].tl    = ((w1 >>  0) & 0xfff);
-	tile[tilenum].sh    = ((w2 >> 12) & 0xfff);
-	tile[tilenum].th    = ((w2 >>  0) & 0xfff);
+	tile[tilenum].sl    = int32_t(w1 >> 44) & 0xfff;
+	tile[tilenum].tl    = int32_t(w1 >> 32) & 0xfff;
+	tile[tilenum].sh    = int32_t(w1 >> 12) & 0xfff;
+	tile[tilenum].th    = int32_t(w1 >>  0) & 0xfff;
 
-	const INT32 sl = tile[tilenum].sl >> 2;
-	const INT32 tl = tile[tilenum].tl >> 2;
-	const INT32 sh = tile[tilenum].sh >> 2;
-	const INT32 th = tile[tilenum].th >> 2;
+	const int32_t sl = tile[tilenum].sl >> 2;
+	const int32_t tl = tile[tilenum].tl >> 2;
+	const int32_t sh = tile[tilenum].sh >> 2;
+	const int32_t th = tile[tilenum].th >> 2;
 
-	const INT32 width = (sh - sl) + 1;
-	const INT32 height = (th - tl) + 1;
+	const int32_t width = (sh - sl) + 1;
+	const int32_t height = (th - tl) + 1;
 /*
-    INT32 topad;
+    int32_t topad;
     if (m_misc_state.m_ti_size < 3)
     {
         topad = (width * m_misc_state.m_ti_size) & 0x7;
@@ -2746,61 +2755,68 @@ void n64_rdp::cmd_load_tile(UINT32 w1, UINT32 w2)
     topad = 0; // ????
 */
 
+	m_capture.data_begin();
+
 	switch (m_misc_state.m_ti_size)
 	{
 		case PIXEL_SIZE_8BIT:
 		{
-			const UINT32 src = m_misc_state.m_ti_address;
-			const INT32 tb = tile[tilenum].tmem << 3;
-			UINT8* tc = get_tmem8();
+			const uint32_t src = m_misc_state.m_ti_address;
+			const int32_t tb = tile[tilenum].tmem << 3;
+			uint8_t* tc = get_tmem8();
 
-			for (INT32 j = 0; j < height; j++)
+			for (int32_t j = 0; j < height; j++)
 			{
-				const INT32 tline = tb + ((tile[tilenum].line << 3) * j);
-				const INT32 s = ((j + tl) * m_misc_state.m_ti_width) + sl;
-				const INT32 xorval8 = ((j & 1) ? BYTE_XOR_DWORD_SWAP : BYTE_ADDR_XOR);
+				const int32_t tline = tb + ((tile[tilenum].line << 3) * j);
+				const int32_t s = ((j + tl) * m_misc_state.m_ti_width) + sl;
+				const int32_t xorval8 = ((j & 1) ? BYTE_XOR_DWORD_SWAP : BYTE_ADDR_XOR);
 
-				for (INT32 i = 0; i < width; i++)
+				for (int32_t i = 0; i < width; i++)
 				{
-					tc[((tline + i) ^ xorval8) & 0xfff] = U_RREADADDR8(src + s + i);
+					const uint8_t data = U_RREADADDR8(src + s + i);
+					m_capture.data_block()->put8(data);
+					tc[((tline + i) ^ xorval8) & 0xfff] = data;
 				}
 			}
 			break;
 		}
 		case PIXEL_SIZE_16BIT:
 		{
-			const UINT32 src = m_misc_state.m_ti_address >> 1;
-			UINT16* tc = get_tmem16();
+			const uint32_t src = m_misc_state.m_ti_address >> 1;
+			uint16_t* tc = get_tmem16();
 
 			if (tile[tilenum].format != FORMAT_YUV)
 			{
-				for (INT32 j = 0; j < height; j++)
+				for (int32_t j = 0; j < height; j++)
 				{
-					const INT32 tb = tile[tilenum].tmem << 2;
-					const INT32 tline = tb + ((tile[tilenum].line << 2) * j);
-					const INT32 s = ((j + tl) * m_misc_state.m_ti_width) + sl;
-					const INT32 xorval16 = (j & 1) ? WORD_XOR_DWORD_SWAP : WORD_ADDR_XOR;
+					const int32_t tb = tile[tilenum].tmem << 2;
+					const int32_t tline = tb + ((tile[tilenum].line << 2) * j);
+					const int32_t s = ((j + tl) * m_misc_state.m_ti_width) + sl;
+					const int32_t xorval16 = (j & 1) ? WORD_XOR_DWORD_SWAP : WORD_ADDR_XOR;
 
-					for (INT32 i = 0; i < width; i++)
+					for (int32_t i = 0; i < width; i++)
 					{
-						UINT32 taddr = (tline + i) ^ xorval16;
-						tc[taddr & 0x7ff] = U_RREADIDX16(src + s + i);
+						const uint32_t taddr = (tline + i) ^ xorval16;
+						const uint16_t data = U_RREADIDX16(src + s + i);
+						m_capture.data_block()->put16(data);
+						tc[taddr & 0x7ff] = data;
 					}
 				}
 			}
 			else
 			{
-				for (INT32 j = 0; j < height; j++)
+				for (int32_t j = 0; j < height; j++)
 				{
-					const INT32 tb = tile[tilenum].tmem << 3;
-					const INT32 tline = tb + ((tile[tilenum].line << 3) * j);
-					const INT32 s = ((j + tl) * m_misc_state.m_ti_width) + sl;
-					const INT32 xorval8 = (j & 1) ? BYTE_XOR_DWORD_SWAP : BYTE_ADDR_XOR;
+					const int32_t tb = tile[tilenum].tmem << 3;
+					const int32_t tline = tb + ((tile[tilenum].line << 3) * j);
+					const int32_t s = ((j + tl) * m_misc_state.m_ti_width) + sl;
+					const int32_t xorval8 = (j & 1) ? BYTE_XOR_DWORD_SWAP : BYTE_ADDR_XOR;
 
-					for (INT32 i = 0; i < width; i++)
+					for (int32_t i = 0; i < width; i++)
 					{
-						UINT32 taddr = ((tline + i) ^ xorval8) & 0x7ff;
-						UINT16 yuvword = U_RREADIDX16(src + s + i);
+						uint32_t taddr = ((tline + i) ^ xorval8) & 0x7ff;
+						uint16_t yuvword = U_RREADIDX16(src + s + i);
+						m_capture.data_block()->put16(yuvword);
 						get_tmem8()[taddr] = yuvword >> 8;
 						get_tmem8()[taddr | 0x800] = yuvword & 0xff;
 					}
@@ -2810,20 +2826,21 @@ void n64_rdp::cmd_load_tile(UINT32 w1, UINT32 w2)
 		}
 		case PIXEL_SIZE_32BIT:
 		{
-			const UINT32 src = m_misc_state.m_ti_address >> 2;
-			const INT32 tb = (tile[tilenum].tmem << 2);
-			UINT16* tc16 = get_tmem16();
+			const uint32_t src = m_misc_state.m_ti_address >> 2;
+			const int32_t tb = (tile[tilenum].tmem << 2);
+			uint16_t* tc16 = get_tmem16();
 
-			for (INT32 j = 0; j < height; j++)
+			for (int32_t j = 0; j < height; j++)
 			{
-				const INT32 tline = tb + ((tile[tilenum].line << 2) * j);
+				const int32_t tline = tb + ((tile[tilenum].line << 2) * j);
 
-				const INT32 s = ((j + tl) * m_misc_state.m_ti_width) + sl;
-				const INT32 xorval32cur = (j & 1) ? WORD_XOR_DWORD_SWAP : WORD_ADDR_XOR;
-				for (INT32 i = 0; i < width; i++)
+				const int32_t s = ((j + tl) * m_misc_state.m_ti_width) + sl;
+				const int32_t xorval32cur = (j & 1) ? WORD_XOR_DWORD_SWAP : WORD_ADDR_XOR;
+				for (int32_t i = 0; i < width; i++)
 				{
-					UINT32 c = U_RREADIDX32(src + s + i);
-					UINT32 ptr = ((tline + i) ^ xorval32cur) & 0x3ff;
+					uint32_t c = U_RREADIDX32(src + s + i);
+					m_capture.data_block()->put32(c);
+					uint32_t ptr = ((tline + i) ^ xorval32cur) & 0x3ff;
 					tc16[ptr] = c >> 16;
 					tc16[ptr | 0x400] = c & 0xffff;
 				}
@@ -2834,29 +2851,31 @@ void n64_rdp::cmd_load_tile(UINT32 w1, UINT32 w2)
 		default:    fatalerror("RDP: load_tile: size = %d\n", m_misc_state.m_ti_size);
 	}
 
+	m_capture.data_end();
+
 	m_tiles[tilenum].sth = rgbaint_t(m_tiles[tilenum].sh, m_tiles[tilenum].sh, m_tiles[tilenum].th, m_tiles[tilenum].th);
 	m_tiles[tilenum].stl = rgbaint_t(m_tiles[tilenum].sl, m_tiles[tilenum].sl, m_tiles[tilenum].tl, m_tiles[tilenum].tl);
 }
 
-void n64_rdp::cmd_set_tile(UINT32 w1, UINT32 w2)
+void n64_rdp::cmd_set_tile(uint64_t w1)
 {
 	//wait("SetTile");
-	const INT32 tilenum = (w2 >> 24) & 0x7;
+	const int32_t tilenum = int32_t(w1 >> 24) & 0x7;
 	n64_tile_t* tex_tile = &m_tiles[tilenum];
 
-	tex_tile->format    = (w1 >> 21) & 0x7;
-	tex_tile->size      = (w1 >> 19) & 0x3;
-	tex_tile->line      = (w1 >>  9) & 0x1ff;
-	tex_tile->tmem      = (w1 >>  0) & 0x1ff;
-	tex_tile->palette   = (w2 >> 20) & 0xf;
-	tex_tile->ct        = (w2 >> 19) & 0x1;
-	tex_tile->mt        = (w2 >> 18) & 0x1;
-	tex_tile->mask_t    = (w2 >> 14) & 0xf;
-	tex_tile->shift_t   = (w2 >> 10) & 0xf;
-	tex_tile->cs        = (w2 >>  9) & 0x1;
-	tex_tile->ms        = (w2 >>  8) & 0x1;
-	tex_tile->mask_s    = (w2 >>  4) & 0xf;
-	tex_tile->shift_s   = (w2 >>  0) & 0xf;
+	tex_tile->format    = int32_t(w1 >> 53) & 0x7;
+	tex_tile->size      = int32_t(w1 >> 51) & 0x3;
+	tex_tile->line      = int32_t(w1 >> 41) & 0x1ff;
+	tex_tile->tmem      = int32_t(w1 >> 32) & 0x1ff;
+	tex_tile->palette   = int32_t(w1 >> 20) & 0xf;
+	tex_tile->ct        = int32_t(w1 >> 19) & 0x1;
+	tex_tile->mt        = int32_t(w1 >> 18) & 0x1;
+	tex_tile->mask_t    = int32_t(w1 >> 14) & 0xf;
+	tex_tile->shift_t   = int32_t(w1 >> 10) & 0xf;
+	tex_tile->cs        = int32_t(w1 >>  9) & 0x1;
+	tex_tile->ms        = int32_t(w1 >>  8) & 0x1;
+	tex_tile->mask_s    = int32_t(w1 >>  4) & 0xf;
+	tex_tile->shift_s   = int32_t(w1 >>  0) & 0xf;
 
 	tex_tile->lshift_s  = (tex_tile->shift_s >= 11) ? (16 - tex_tile->shift_s) : 0;
 	tex_tile->rshift_s  = (tex_tile->shift_s < 11) ? tex_tile->shift_s : 0;
@@ -2892,106 +2911,104 @@ void n64_rdp::cmd_set_tile(UINT32 w1, UINT32 w2)
 	//m_pending_mode_block = true;
 }
 
-void n64_rdp::cmd_fill_rect(UINT32 w1, UINT32 w2)
+void n64_rdp::cmd_fill_rect(uint64_t w1)
 {
 	//if(m_pending_mode_block) { wait("Block on pending mode-change"); m_pending_mode_block = false; }
-	const UINT32 xh = (w2 >> 12) & 0xfff;
-	const UINT32 xl = (w1 >> 12) & 0xfff;
-	const UINT32 yh = (w2 >>  0) & 0xfff;
-	UINT32 yl = (w1 >>  0) & 0xfff;
+	const uint64_t xh = (w1 >> 12) & 0xfff;
+	const uint64_t xl = (w1 >> 44) & 0xfff;
+	const uint64_t yh = (w1 >>  0) & 0xfff;
+	uint64_t yl       = (w1 >> 32) & 0xfff;
 
 	if (m_other_modes.cycle_type == CYCLE_TYPE_FILL || m_other_modes.cycle_type == CYCLE_TYPE_COPY)
 	{
 		yl |= 3;
 	}
 
-	const UINT32 xlint = (xl >> 2) & 0x3ff;
-	const UINT32 xhint = (xh >> 2) & 0x3ff;
+	const uint64_t xlint = (xl >> 2) & 0x3ff;
+	const uint64_t xhint = (xh >> 2) & 0x3ff;
 
-	UINT32* ewdata = m_temp_rect_data;
-	ewdata[0] = (0x3680 << 16) | yl;//command, flipped, tile, yl
-	ewdata[1] = (yl << 16) | yh;//ym, yh
-	ewdata[2] = (xlint << 16) | ((xl & 3) << 14);//xl, xl frac
-	ewdata[3] = 0;//dxldy, dxldy frac
-	ewdata[4] = (xhint << 16) | ((xh & 3) << 14);//xh, xh frac
-	ewdata[5] = 0;//dxhdy, dxhdy frac
-	ewdata[6] = (xlint << 16) | ((xl & 3) << 14);//xm, xm frac
-	ewdata[7] = 0;//dxmdy, dxmdy frac
-	memset(&ewdata[8], 0, 36 * sizeof(UINT32));//shade, texture, depth
+	uint64_t* ewdata = m_temp_rect_data;
+	ewdata[0] = ((uint64_t)0x3680 << 48) | (yl << 32) | (yl << 16) | yh; // command, flipped, tile, yl, ym, yh
+	ewdata[1] = (xlint << 48) | ((xl & 3) << 46); // xl, xl frac, dxldy (0), dxldy frac (0)
+	ewdata[2] = (xhint << 48) | ((xh & 3) << 46); // xh, xh frac, dxhdy (0), dxhdy frac (0)
+	ewdata[3] = (xlint << 48) | ((xl & 3) << 46); // xm, xm frac, dxmdy (0), dxmdy frac (0)
+	memset(&ewdata[4], 0, 18 * sizeof(uint64_t));//shade, texture, depth
 
 	draw_triangle(false, false, false, true);
 }
 
-void n64_rdp::cmd_set_fog_color(UINT32 w1, UINT32 w2)
+void n64_rdp::cmd_set_fog_color(uint64_t w1)
 {
-	m_fog_color.set(w2 & 0xff, (w2 >> 24) & 0xff, (w2 >> 16) & 0xff, (w2 >> 8) & 0xff);
+	m_fog_color.set(uint8_t(w1), uint8_t(w1 >> 24), uint8_t(w1 >> 16), uint8_t(w1 >> 8));
 }
 
-void n64_rdp::cmd_set_blend_color(UINT32 w1, UINT32 w2)
+void n64_rdp::cmd_set_blend_color(uint64_t w1)
 {
-	m_blend_color.set(w2 & 0xff, (w2 >> 24) & 0xff, (w2 >> 16) & 0xff, (w2 >> 8) & 0xff);
+	m_blend_color.set(uint8_t(w1), uint8_t(w1 >> 24), uint8_t(w1 >> 16), uint8_t(w1 >> 8));
 }
 
-void n64_rdp::cmd_set_prim_color(UINT32 w1, UINT32 w2)
+void n64_rdp::cmd_set_prim_color(uint64_t w1)
 {
-	m_misc_state.m_min_level = (w1 >> 8) & 0x1f;
-	const UINT8 prim_lod_fraction = w1 & 0xff;
+	m_misc_state.m_min_level = uint32_t(w1 >> 40) & 0x1f;
+	const uint8_t prim_lod_fraction(w1 >> 32);
 	m_prim_lod_fraction.set(prim_lod_fraction, prim_lod_fraction, prim_lod_fraction, prim_lod_fraction);
 
-	m_prim_color.set(w2 & 0xff, (w2 >> 24) & 0xff, (w2 >> 16) & 0xff, (w2 >> 8) & 0xff);
-	m_prim_alpha.set(w2 & 0xff, w2 & 0xff, w2 & 0xff, w2 & 0xff);
+	const uint8_t alpha(w1);
+	m_prim_color.set(alpha, uint8_t(w1 >> 24), uint8_t(w1 >> 16), uint8_t(w1 >> 8));
+	m_prim_alpha.set(alpha, alpha, alpha, alpha);
 }
 
-void n64_rdp::cmd_set_env_color(UINT32 w1, UINT32 w2)
+void n64_rdp::cmd_set_env_color(uint64_t w1)
 {
-	m_env_color.set(w2 & 0xff, (w2 >> 24) & 0xff, (w2 >> 16) & 0xff, (w2 >> 8) & 0xff);
-	m_env_alpha.set(w2 & 0xff, w2 & 0xff, w2 & 0xff, w2 & 0xff);
+	const uint8_t alpha(w1);
+	m_env_color.set(alpha, uint8_t(w1 >> 24), uint8_t(w1 >> 16), uint8_t(w1 >> 8));
+	m_env_alpha.set(alpha, alpha, alpha, alpha);
 }
 
-void n64_rdp::cmd_set_combine(UINT32 w1, UINT32 w2)
+void n64_rdp::cmd_set_combine(uint64_t w1)
 {
-	m_combine.sub_a_rgb0    = (w1 >> 20) & 0xf;
-	m_combine.mul_rgb0      = (w1 >> 15) & 0x1f;
-	m_combine.sub_a_a0      = (w1 >> 12) & 0x7;
-	m_combine.mul_a0        = (w1 >>  9) & 0x7;
-	m_combine.sub_a_rgb1    = (w1 >>  5) & 0xf;
-	m_combine.mul_rgb1      = (w1 >>  0) & 0x1f;
+	m_combine.sub_a_rgb0    = uint32_t(w1 >> 52) & 0xf;
+	m_combine.mul_rgb0      = uint32_t(w1 >> 47) & 0x1f;
+	m_combine.sub_a_a0      = uint32_t(w1 >> 44) & 0x7;
+	m_combine.mul_a0        = uint32_t(w1 >> 41) & 0x7;
+	m_combine.sub_a_rgb1    = uint32_t(w1 >> 37) & 0xf;
+	m_combine.mul_rgb1      = uint32_t(w1 >> 32) & 0x1f;
 
-	m_combine.sub_b_rgb0    = (w2 >> 28) & 0xf;
-	m_combine.sub_b_rgb1    = (w2 >> 24) & 0xf;
-	m_combine.sub_a_a1      = (w2 >> 21) & 0x7;
-	m_combine.mul_a1        = (w2 >> 18) & 0x7;
-	m_combine.add_rgb0      = (w2 >> 15) & 0x7;
-	m_combine.sub_b_a0      = (w2 >> 12) & 0x7;
-	m_combine.add_a0        = (w2 >>  9) & 0x7;
-	m_combine.add_rgb1      = (w2 >>  6) & 0x7;
-	m_combine.sub_b_a1      = (w2 >>  3) & 0x7;
-	m_combine.add_a1        = (w2 >>  0) & 0x7;
+	m_combine.sub_b_rgb0    = uint32_t(w1 >> 28) & 0xf;
+	m_combine.sub_b_rgb1    = uint32_t(w1 >> 24) & 0xf;
+	m_combine.sub_a_a1      = uint32_t(w1 >> 21) & 0x7;
+	m_combine.mul_a1        = uint32_t(w1 >> 18) & 0x7;
+	m_combine.add_rgb0      = uint32_t(w1 >> 15) & 0x7;
+	m_combine.sub_b_a0      = uint32_t(w1 >> 12) & 0x7;
+	m_combine.add_a0        = uint32_t(w1 >>  9) & 0x7;
+	m_combine.add_rgb1      = uint32_t(w1 >>  6) & 0x7;
+	m_combine.sub_b_a1      = uint32_t(w1 >>  3) & 0x7;
+	m_combine.add_a1        = uint32_t(w1 >>  0) & 0x7;
 }
 
-void n64_rdp::cmd_set_texture_image(UINT32 w1, UINT32 w2)
+void n64_rdp::cmd_set_texture_image(uint64_t w1)
 {
-	m_misc_state.m_ti_format  = (w1 >> 21) & 0x7;
-	m_misc_state.m_ti_size    = (w1 >> 19) & 0x3;
-	m_misc_state.m_ti_width   = (w1 & 0x3ff) + 1;
-	m_misc_state.m_ti_address = w2 & 0x01ffffff;
+	m_misc_state.m_ti_format  = uint32_t(w1 >> 53) & 0x7;
+	m_misc_state.m_ti_size    = uint32_t(w1 >> 51) & 0x3;
+	m_misc_state.m_ti_width   = (uint32_t(w1 >> 32) & 0x3ff) + 1;
+	m_misc_state.m_ti_address = uint32_t(w1) & 0x01ffffff;
 }
 
-void n64_rdp::cmd_set_mask_image(UINT32 w1, UINT32 w2)
+void n64_rdp::cmd_set_mask_image(uint64_t w1)
 {
 	//wait("SetMaskImage");
 
-	m_misc_state.m_zb_address = w2 & 0x01ffffff;
+	m_misc_state.m_zb_address = uint32_t(w1) & 0x01ffffff;
 }
 
-void n64_rdp::cmd_set_color_image(UINT32 w1, UINT32 w2)
+void n64_rdp::cmd_set_color_image(uint64_t w1)
 {
 	//wait("SetColorImage");
 
-	m_misc_state.m_fb_format  = (w1 >> 21) & 0x7;
-	m_misc_state.m_fb_size    = (w1 >> 19) & 0x3;
-	m_misc_state.m_fb_width   = (w1 & 0x3ff) + 1;
-	m_misc_state.m_fb_address = w2 & 0x01ffffff;
+	m_misc_state.m_fb_format  = uint32_t(w1 >> 53) & 0x7;
+	m_misc_state.m_fb_size    = uint32_t(w1 >> 51) & 0x3;
+	m_misc_state.m_fb_width   = (uint32_t(w1 >> 32) & 0x3ff) + 1;
+	m_misc_state.m_fb_address = uint32_t(w1) & 0x01ffffff;
 
 	if (m_misc_state.m_fb_format < 2 || m_misc_state.m_fb_format > 32) // Jet Force Gemini sets the format to 4, Intensity.  Protection?
 	{
@@ -3001,12 +3018,12 @@ void n64_rdp::cmd_set_color_image(UINT32 w1, UINT32 w2)
 
 /*****************************************************************************/
 
-void n64_rdp::cmd_invalid(UINT32 w1, UINT32 w2)
+void n64_rdp::cmd_invalid(uint64_t w1)
 {
-	fatalerror("n64_rdp::Invalid: %d, %08x %08x\n", (w1 >> 24) & 0x3f, w1, w2);
+	fatalerror("n64_rdp::Invalid: %d, %08x %08x\n", uint32_t(w1 >> 56) & 0x3f, uint32_t(w1 >> 32), (uint32_t)w1);
 }
 
-void n64_rdp::cmd_noop(UINT32 w1, UINT32 w2)
+void n64_rdp::cmd_noop(uint64_t w1)
 {
 	// Do nothing
 }
@@ -3014,7 +3031,7 @@ void n64_rdp::cmd_noop(UINT32 w1, UINT32 w2)
 
 void n64_rdp::process_command_list()
 {
-	INT32 length = m_end - m_current;
+	int32_t length = m_end - m_current;
 
 	if(length < 0)
 	{
@@ -3023,15 +3040,15 @@ void n64_rdp::process_command_list()
 	}
 
 	// load command data
-	for(INT32 i = 0; i < length; i += 4)
+	for(int32_t i = 0; i < length; i += 8)
 	{
 		m_cmd_data[m_cmd_ptr++] = read_data((m_current & 0x1fffffff) + i);
 	}
 
 	m_current = m_end;
 
-	UINT32 cmd = (m_cmd_data[0] >> 24) & 0x3f;
-	UINT32 cmd_length = (m_cmd_ptr + 1) * 4;
+	uint32_t cmd = (m_cmd_data[0] >> 56) & 0x3f;
+	uint32_t cmd_length = uint32_t(m_cmd_ptr + 1) * 8;
 
 	set_status(get_status() &~ DP_STATUS_FREEZE);
 
@@ -3043,78 +3060,79 @@ void n64_rdp::process_command_list()
 
 	while (m_cmd_cur < m_cmd_ptr)
 	{
-		cmd = (m_cmd_data[m_cmd_cur] >> 24) & 0x3f;
+		cmd = (m_cmd_data[m_cmd_cur] >> 56) & 0x3f;
 
-		if (((m_cmd_ptr - m_cmd_cur) * 4) < s_rdp_command_length[cmd])
+		if (((m_cmd_ptr - m_cmd_cur) * 8) < s_rdp_command_length[cmd])
 		{
 			return;
 			//fatalerror("rdp_process_list: not enough rdp command data: cur = %d, ptr = %d, expected = %d\n", m_cmd_cur, m_cmd_ptr, s_rdp_command_length[cmd]);
 		}
+
+		m_capture.command(&m_cmd_data[m_cmd_cur], s_rdp_command_length[cmd] / 8);
 
 		if (LOG_RDP_EXECUTION)
 		{
 			char string[4000];
 			disassemble(string);
 
-			fprintf(rdp_exec, "%08X: %08X %08X   %s\n", m_start+(m_cmd_cur * 4), m_cmd_data[m_cmd_cur+0], m_cmd_data[m_cmd_cur+1], string);
+			fprintf(rdp_exec, "%08X: %08X%08X   %s\n", m_start+(m_cmd_cur * 8), uint32_t(m_cmd_data[m_cmd_cur] >> 32), (uint32_t)m_cmd_data[m_cmd_cur], string);
 			fflush(rdp_exec);
 		}
 
 		// execute the command
-		UINT32 w1 = m_cmd_data[m_cmd_cur+0];
-		UINT32 w2 = m_cmd_data[m_cmd_cur+1];
+		uint64_t w = m_cmd_data[m_cmd_cur];
 
 		switch(cmd)
 		{
-			case 0x00:  cmd_noop(w1, w2);           break;
+			case 0x00:  cmd_noop(w);           break;
 
-			case 0x08:  cmd_triangle(w1, w2);       break;
-			case 0x09:  cmd_triangle_z(w1, w2);     break;
-			case 0x0a:  cmd_triangle_t(w1, w2);     break;
-			case 0x0b:  cmd_triangle_tz(w1, w2);    break;
-			case 0x0c:  cmd_triangle_s(w1, w2);     break;
-			case 0x0d:  cmd_triangle_sz(w1, w2);    break;
-			case 0x0e:  cmd_triangle_st(w1, w2);    break;
-			case 0x0f:  cmd_triangle_stz(w1, w2);   break;
+			case 0x08:  cmd_triangle(w);       break;
+			case 0x09:  cmd_triangle_z(w);     break;
+			case 0x0a:  cmd_triangle_t(w);     break;
+			case 0x0b:  cmd_triangle_tz(w);    break;
+			case 0x0c:  cmd_triangle_s(w);     break;
+			case 0x0d:  cmd_triangle_sz(w);    break;
+			case 0x0e:  cmd_triangle_st(w);    break;
+			case 0x0f:  cmd_triangle_stz(w);   break;
 
-			case 0x24:  cmd_tex_rect(w1, w2);       break;
-			case 0x25:  cmd_tex_rect_flip(w1, w2);  break;
+			case 0x24:  cmd_tex_rect(w);       break;
+			case 0x25:  cmd_tex_rect_flip(w);  break;
 
-			case 0x26:  cmd_sync_load(w1, w2);      break;
-			case 0x27:  cmd_sync_pipe(w1, w2);      break;
-			case 0x28:  cmd_sync_tile(w1, w2);      break;
-			case 0x29:  cmd_sync_full(w1, w2);      break;
+			case 0x26:  cmd_sync_load(w);      break;
+			case 0x27:  cmd_sync_pipe(w);      break;
+			case 0x28:  cmd_sync_tile(w);      break;
+			case 0x29:  cmd_sync_full(w);      break;
 
-			case 0x2a:  cmd_set_key_gb(w1, w2);     break;
-			case 0x2b:  cmd_set_key_r(w1, w2);      break;
+			case 0x2a:  cmd_set_key_gb(w);     break;
+			case 0x2b:  cmd_set_key_r(w);      break;
 
-			case 0x2c:  cmd_set_convert(w1, w2);    break;
-			case 0x3c:  cmd_set_combine(w1, w2);    break;
-			case 0x2d:  cmd_set_scissor(w1, w2);    break;
-			case 0x2e:  cmd_set_prim_depth(w1, w2); break;
-			case 0x2f:  cmd_set_other_modes(w1, w2); break;
+			case 0x2c:  cmd_set_convert(w);    break;
+			case 0x3c:  cmd_set_combine(w);    break;
+			case 0x2d:  cmd_set_scissor(w);    break;
+			case 0x2e:  cmd_set_prim_depth(w); break;
+			case 0x2f:  cmd_set_other_modes(w);break;
 
-			case 0x30:  cmd_load_tlut(w1, w2);      break;
-			case 0x33:  cmd_load_block(w1, w2);     break;
-			case 0x34:  cmd_load_tile(w1, w2);      break;
+			case 0x30:  cmd_load_tlut(w);      break;
+			case 0x33:  cmd_load_block(w);     break;
+			case 0x34:  cmd_load_tile(w);      break;
 
-			case 0x32:  cmd_set_tile_size(w1, w2);  break;
-			case 0x35:  cmd_set_tile(w1, w2);       break;
+			case 0x32:  cmd_set_tile_size(w);  break;
+			case 0x35:  cmd_set_tile(w);       break;
 
-			case 0x36:  cmd_fill_rect(w1, w2);      break;
+			case 0x36:  cmd_fill_rect(w);      break;
 
-			case 0x37:  cmd_set_fill_color32(w1, w2); break;
-			case 0x38:  cmd_set_fog_color(w1, w2);  break;
-			case 0x39:  cmd_set_blend_color(w1, w2); break;
-			case 0x3a:  cmd_set_prim_color(w1, w2); break;
-			case 0x3b:  cmd_set_env_color(w1, w2);  break;
+			case 0x37:  cmd_set_fill_color32(w); break;
+			case 0x38:  cmd_set_fog_color(w);  break;
+			case 0x39:  cmd_set_blend_color(w);break;
+			case 0x3a:  cmd_set_prim_color(w); break;
+			case 0x3b:  cmd_set_env_color(w);  break;
 
-			case 0x3d:  cmd_set_texture_image(w1, w2); break;
-			case 0x3e:  cmd_set_mask_image(w1, w2);  break;
-			case 0x3f:  cmd_set_color_image(w1, w2); break;
+			case 0x3d:  cmd_set_texture_image(w); break;
+			case 0x3e:  cmd_set_mask_image(w);  break;
+			case 0x3f:  cmd_set_color_image(w); break;
 		}
 
-		m_cmd_cur += s_rdp_command_length[cmd] / 4;
+		m_cmd_cur += s_rdp_command_length[cmd] / 8;
 	};
 	m_cmd_ptr = 0;
 	m_cmd_cur = 0;
@@ -3124,7 +3142,7 @@ void n64_rdp::process_command_list()
 
 /*****************************************************************************/
 
-n64_rdp::n64_rdp(n64_state &state, UINT32* rdram, UINT32* dmem) : poly_manager<UINT32, rdp_poly_state, 8, 32000>(state.machine())
+n64_rdp::n64_rdp(n64_state &state, uint32_t* rdram, uint32_t* dmem) : poly_manager<uint32_t, rdp_poly_state, 8, 32000>(state.machine())
 {
 	ignore = false;
 	dolog = false;
@@ -3152,24 +3170,25 @@ n64_rdp::n64_rdp(n64_state &state, UINT32* rdram, UINT32* dmem) : poly_manager<U
 	m_tmem = nullptr;
 
 	m_machine = nullptr;
+	m_n64_periphs = nullptr;
 
 	//memset(m_hidden_bits, 3, 8388608);
 
 	m_prim_lod_fraction.set(0, 0, 0, 0);
 	z_build_com_table();
 
-	memset(m_temp_rect_data, 0, sizeof(UINT32) * 0x1000);
+	memset(m_temp_rect_data, 0, sizeof(uint32_t) * 0x1000);
 
-	for (INT32 i = 0; i < 0x4000; i++)
+	for (int32_t i = 0; i < 0x4000; i++)
 	{
-		UINT32 exponent = (i >> 11) & 7;
-		UINT32 mantissa = i & 0x7ff;
+		uint32_t exponent = (i >> 11) & 7;
+		uint32_t mantissa = i & 0x7ff;
 		m_z_complete_dec_table[i] = ((mantissa << m_z_dec_table[exponent].shift) + m_z_dec_table[exponent].add) & 0x3fffff;
 	}
 
 	precalc_cvmask_derivatives();
 
-	for(INT32 i = 0; i < 0x200; i++)
+	for(int32_t i = 0; i < 0x200; i++)
 	{
 		switch((i >> 7) & 3)
 		{
@@ -3186,27 +3205,27 @@ n64_rdp::n64_rdp(n64_state &state, UINT32* rdram, UINT32* dmem) : poly_manager<U
 		}
 	}
 
-	for(INT32 i = 0; i < 32; i++)
+	for(int32_t i = 0; i < 32; i++)
 	{
 		m_replicated_rgba[i] = (i << 3) | ((i >> 2) & 7);
 	}
 
-	for(INT32 i = 0; i < 0x10000; i++)
+	for(int32_t i = 0; i < 0x10000; i++)
 	{
-		m_dzpix_normalize[i] = (UINT16)normalize_dzpix(i & 0xffff);
+		m_dzpix_normalize[i] = (uint16_t)normalize_dzpix(i & 0xffff);
 	}
 
 	m_compute_cvg[0] = &n64_rdp::compute_cvg_noflip;
 	m_compute_cvg[1] = &n64_rdp::compute_cvg_flip;
 }
 
-void n64_rdp::render_spans(INT32 start, INT32 end, INT32 tilenum, bool flip, extent_t* spans, bool rect, rdp_poly_state* object)
+void n64_rdp::render_spans(int32_t start, int32_t end, int32_t tilenum, bool flip, extent_t* spans, bool rect, rdp_poly_state* object)
 {
-	const INT32 clipy1 = m_scissor.m_yh;
-	const INT32 clipy2 = m_scissor.m_yl;
+	const int32_t clipy1 = m_scissor.m_yh;
+	const int32_t clipy2 = m_scissor.m_yl;
 	const rectangle clip(m_scissor.m_xh, m_scissor.m_xl, m_scissor.m_yh, m_scissor.m_yl);
 
-	INT32 offset = 0;
+	int32_t offset = 0;
 
 	if (clipy2 <= 0)
 	{
@@ -3246,32 +3265,32 @@ void n64_rdp::render_spans(INT32 start, INT32 end, INT32 tilenum, bool flip, ext
 	switch(m_other_modes.cycle_type)
 	{
 		case CYCLE_TYPE_1:
-			render_triangle_custom(clip, render_delegate(FUNC(n64_rdp::span_draw_1cycle), this), start, (end - start) + 1, spans + offset);
+			render_triangle_custom(clip, render_delegate(&n64_rdp::span_draw_1cycle, this), start, (end - start) + 1, spans + offset);
 			break;
 
 		case CYCLE_TYPE_2:
-			render_triangle_custom(clip, render_delegate(FUNC(n64_rdp::span_draw_2cycle), this), start, (end - start) + 1, spans + offset);
+			render_triangle_custom(clip, render_delegate(&n64_rdp::span_draw_2cycle, this), start, (end - start) + 1, spans + offset);
 			break;
 
 		case CYCLE_TYPE_COPY:
-			render_triangle_custom(clip, render_delegate(FUNC(n64_rdp::span_draw_copy), this), start, (end - start) + 1, spans + offset);
+			render_triangle_custom(clip, render_delegate(&n64_rdp::span_draw_copy, this), start, (end - start) + 1, spans + offset);
 			break;
 
 		case CYCLE_TYPE_FILL:
-			render_triangle_custom(clip, render_delegate(FUNC(n64_rdp::span_draw_fill), this), start, (end - start) + 1, spans + offset);
+			render_triangle_custom(clip, render_delegate(&n64_rdp::span_draw_fill, this), start, (end - start) + 1, spans + offset);
 			break;
 	}
 	wait("render spans");
 }
 
-void n64_rdp::rgbaz_clip(INT32 sr, INT32 sg, INT32 sb, INT32 sa, INT32* sz, rdp_span_aux* userdata)
+void n64_rdp::rgbaz_clip(int32_t sr, int32_t sg, int32_t sb, int32_t sa, int32_t* sz, rdp_span_aux* userdata)
 {
 	userdata->m_shade_color.set(sa, sr, sg, sb);
 	userdata->m_shade_color.clamp_and_clear(0xfffffe00);
-	UINT32 a = userdata->m_shade_color.get_a();
+	uint32_t a = userdata->m_shade_color.get_a();
 	userdata->m_shade_alpha.set(a, a, a, a);
 
-	INT32 zanded = (*sz) & 0x60000;
+	int32_t zanded = (*sz) & 0x60000;
 
 	zanded >>= 17;
 	switch(zanded)
@@ -3283,7 +3302,7 @@ void n64_rdp::rgbaz_clip(INT32 sr, INT32 sg, INT32 sb, INT32 sa, INT32* sz, rdp_
 	}
 }
 
-void n64_rdp::rgbaz_correct_triangle(INT32 offx, INT32 offy, INT32* r, INT32* g, INT32* b, INT32* a, INT32* z, rdp_span_aux* userdata, const rdp_poly_state &object)
+void n64_rdp::rgbaz_correct_triangle(int32_t offx, int32_t offy, int32_t* r, int32_t* g, int32_t* b, int32_t* a, int32_t* z, rdp_span_aux* userdata, const rdp_poly_state &object)
 {
 	if (userdata->m_current_pix_cvg == 8)
 	{
@@ -3295,17 +3314,17 @@ void n64_rdp::rgbaz_correct_triangle(INT32 offx, INT32 offy, INT32* r, INT32* g,
 	}
 	else
 	{
-		INT32 summand_xr = offx * SIGN13(object.m_span_base.m_span_dr >> 14);
-		INT32 summand_yr = offy * SIGN13(object.m_span_base.m_span_drdy >> 14);
-		INT32 summand_xb = offx * SIGN13(object.m_span_base.m_span_db >> 14);
-		INT32 summand_yb = offy * SIGN13(object.m_span_base.m_span_dbdy >> 14);
-		INT32 summand_xg = offx * SIGN13(object.m_span_base.m_span_dg >> 14);
-		INT32 summand_yg = offy * SIGN13(object.m_span_base.m_span_dgdy >> 14);
-		INT32 summand_xa = offx * SIGN13(object.m_span_base.m_span_da >> 14);
-		INT32 summand_ya = offy * SIGN13(object.m_span_base.m_span_dady >> 14);
+		int32_t summand_xr = offx * SIGN13(object.m_span_base.m_span_dr >> 14);
+		int32_t summand_yr = offy * SIGN13(object.m_span_base.m_span_drdy >> 14);
+		int32_t summand_xb = offx * SIGN13(object.m_span_base.m_span_db >> 14);
+		int32_t summand_yb = offy * SIGN13(object.m_span_base.m_span_dbdy >> 14);
+		int32_t summand_xg = offx * SIGN13(object.m_span_base.m_span_dg >> 14);
+		int32_t summand_yg = offy * SIGN13(object.m_span_base.m_span_dgdy >> 14);
+		int32_t summand_xa = offx * SIGN13(object.m_span_base.m_span_da >> 14);
+		int32_t summand_ya = offy * SIGN13(object.m_span_base.m_span_dady >> 14);
 
-		INT32 summand_xz = offx * SIGN22(object.m_span_base.m_span_dz >> 10);
-		INT32 summand_yz = offy * SIGN22(object.m_span_base.m_span_dzdy >> 10);
+		int32_t summand_xz = offx * SIGN22(object.m_span_base.m_span_dz >> 10);
+		int32_t summand_yz = offy * SIGN22(object.m_span_base.m_span_dzdy >> 10);
 
 		*r = ((*r << 2) + summand_xr + summand_yr) >> 4;
 		*g = ((*g << 2) + summand_xg + summand_yg) >> 4;
@@ -3315,13 +3334,13 @@ void n64_rdp::rgbaz_correct_triangle(INT32 offx, INT32 offy, INT32* r, INT32* g,
 	}
 }
 
-inline void n64_rdp::write_pixel(UINT32 curpixel, color_t& color, rdp_span_aux* userdata, const rdp_poly_state &object)
+inline void n64_rdp::write_pixel(uint32_t curpixel, color_t& color, rdp_span_aux* userdata, const rdp_poly_state &object)
 {
 	if (object.m_misc_state.m_fb_size == 2) // 16-bit framebuffer
 	{
-		const UINT32 fb = (object.m_misc_state.m_fb_address >> 1) + curpixel;
+		const uint32_t fb = (object.m_misc_state.m_fb_address >> 1) + curpixel;
 
-		UINT16 finalcolor;
+		uint16_t finalcolor;
 		if (object.m_other_modes.color_on_cvg && !userdata->m_pre_wrap)
 		{
 			finalcolor = RREADIDX16(fb) & 0xfffe;
@@ -3337,7 +3356,7 @@ inline void n64_rdp::write_pixel(UINT32 curpixel, color_t& color, rdp_span_aux* 
 			case 0:
 				if (userdata->m_blend_enable)
 				{
-					UINT32 finalcvg = userdata->m_current_pix_cvg + userdata->m_current_mem_cvg;
+					uint32_t finalcvg = userdata->m_current_pix_cvg + userdata->m_current_mem_cvg;
 					if (finalcvg & 8)
 					{
 						finalcvg = 7;
@@ -3347,14 +3366,14 @@ inline void n64_rdp::write_pixel(UINT32 curpixel, color_t& color, rdp_span_aux* 
 				}
 				else
 				{
-					const UINT32 finalcvg = (userdata->m_current_pix_cvg - 1) & 7;
+					const uint32_t finalcvg = (userdata->m_current_pix_cvg - 1) & 7;
 					RWRITEIDX16(fb, finalcolor | (finalcvg >> 2));
 					HWRITEADDR8(fb, finalcvg & 3);
 				}
 				break;
 			case 1:
 			{
-				const UINT32 finalcvg = (userdata->m_current_pix_cvg + userdata->m_current_mem_cvg) & 7;
+				const uint32_t finalcvg = (userdata->m_current_pix_cvg + userdata->m_current_mem_cvg) & 7;
 				RWRITEIDX16(fb, finalcolor | (finalcvg >> 2));
 				HWRITEADDR8(fb, finalcvg & 3);
 				break;
@@ -3371,9 +3390,9 @@ inline void n64_rdp::write_pixel(UINT32 curpixel, color_t& color, rdp_span_aux* 
 	}
 	else // 32-bit framebuffer
 	{
-		const UINT32 fb = (object.m_misc_state.m_fb_address >> 2) + curpixel;
+		const uint32_t fb = (object.m_misc_state.m_fb_address >> 2) + curpixel;
 
-		UINT32 finalcolor;
+		uint32_t finalcolor;
 		if (object.m_other_modes.color_on_cvg && !userdata->m_pre_wrap)
 		{
 			finalcolor = RREADIDX32(fb) & 0xffffff00;
@@ -3388,7 +3407,7 @@ inline void n64_rdp::write_pixel(UINT32 curpixel, color_t& color, rdp_span_aux* 
 			case 0:
 				if (userdata->m_blend_enable)
 				{
-					UINT32 finalcvg = userdata->m_current_pix_cvg + userdata->m_current_mem_cvg;
+					uint32_t finalcvg = userdata->m_current_pix_cvg + userdata->m_current_mem_cvg;
 					if (finalcvg & 8)
 					{
 						finalcvg = 7;
@@ -3414,16 +3433,16 @@ inline void n64_rdp::write_pixel(UINT32 curpixel, color_t& color, rdp_span_aux* 
 	}
 }
 
-inline void n64_rdp::read_pixel(UINT32 curpixel, rdp_span_aux* userdata, const rdp_poly_state &object)
+inline void n64_rdp::read_pixel(uint32_t curpixel, rdp_span_aux* userdata, const rdp_poly_state &object)
 {
 	if (object.m_misc_state.m_fb_size == 2) // 16-bit framebuffer
 	{
-		const UINT16 fword = RREADIDX16((object.m_misc_state.m_fb_address >> 1) + curpixel);
+		const uint16_t fword = RREADIDX16((object.m_misc_state.m_fb_address >> 1) + curpixel);
 
 		userdata->m_memory_color.set(0, GETHICOL(fword), GETMEDCOL(fword), GETLOWCOL(fword));
 		if (object.m_other_modes.image_read_en)
 		{
-			UINT8 hbyte = HREADADDR8((object.m_misc_state.m_fb_address >> 1) + curpixel);
+			uint8_t hbyte = HREADADDR8((object.m_misc_state.m_fb_address >> 1) + curpixel);
 			userdata->m_memory_color.set_a(userdata->m_current_mem_cvg << 5);
 			userdata->m_current_mem_cvg = ((fword & 1) << 2) | (hbyte & 3);
 		}
@@ -3435,7 +3454,7 @@ inline void n64_rdp::read_pixel(UINT32 curpixel, rdp_span_aux* userdata, const r
 	}
 	else // 32-bit framebuffer
 	{
-		const UINT32 mem = RREADIDX32((object.m_misc_state.m_fb_address >> 2) + curpixel);
+		const uint32_t mem = RREADIDX32((object.m_misc_state.m_fb_address >> 2) + curpixel);
 		userdata->m_memory_color.set(0, (mem >> 24) & 0xff, (mem >> 16) & 0xff, (mem >> 8) & 0xff);
 		if (object.m_other_modes.image_read_en)
 		{
@@ -3450,12 +3469,12 @@ inline void n64_rdp::read_pixel(UINT32 curpixel, rdp_span_aux* userdata, const r
 	}
 }
 
-inline void n64_rdp::copy_pixel(UINT32 curpixel, color_t& color, const rdp_poly_state &object)
+inline void n64_rdp::copy_pixel(uint32_t curpixel, color_t& color, const rdp_poly_state &object)
 {
-	const UINT32 current_pix_cvg = color.get_a() ? 7 : 0;
-	const UINT8 r = color.get_r(); // Vectorize me
-	const UINT8 g = color.get_g();
-	const UINT8 b = color.get_b();
+	const uint32_t current_pix_cvg = color.get_a() ? 7 : 0;
+	const uint8_t r = color.get_r(); // Vectorize me
+	const uint8_t g = color.get_g();
+	const uint8_t b = color.get_b();
 	if (object.m_misc_state.m_fb_size == 2) // 16-bit framebuffer
 	{
 		RWRITEIDX16((object.m_misc_state.m_fb_address >> 1) + curpixel, ((r >> 3) << 11) | ((g >> 3) << 6) | ((b >> 3) << 1) | ((current_pix_cvg >> 2) & 1));
@@ -3467,11 +3486,11 @@ inline void n64_rdp::copy_pixel(UINT32 curpixel, color_t& color, const rdp_poly_
 	}
 }
 
-inline void n64_rdp::fill_pixel(UINT32 curpixel, const rdp_poly_state &object)
+inline void n64_rdp::fill_pixel(uint32_t curpixel, const rdp_poly_state &object)
 {
 	if (object.m_misc_state.m_fb_size == 2) // 16-bit framebuffer
 	{
-		UINT16 val;
+		uint16_t val;
 		if (curpixel & 1)
 		{
 			val = object.m_fill_color & 0xffff;
@@ -3491,13 +3510,13 @@ inline void n64_rdp::fill_pixel(UINT32 curpixel, const rdp_poly_state &object)
 	}
 }
 
-void n64_rdp::span_draw_1cycle(INT32 scanline, const extent_t &extent, const rdp_poly_state &object, INT32 threadid)
+void n64_rdp::span_draw_1cycle(int32_t scanline, const extent_t &extent, const rdp_poly_state &object, int32_t threadid)
 {
 	assert(object.m_misc_state.m_fb_size >= 2 && object.m_misc_state.m_fb_size < 4);
 
-	const INT32 clipx1 = object.m_scissor.m_xh;
-	const INT32 clipx2 = object.m_scissor.m_xl;
-	const INT32 tilenum = object.tilenum;
+	const int32_t clipx1 = object.m_scissor.m_xh;
+	const int32_t clipx2 = object.m_scissor.m_xl;
+	const int32_t tilenum = object.tilenum;
 	const bool flip = object.flip;
 
 	span_param_t r; r.w = extent.param[SPAN_R].start;
@@ -3509,8 +3528,8 @@ void n64_rdp::span_draw_1cycle(INT32 scanline, const extent_t &extent, const rdp
 	span_param_t t; t.w = extent.param[SPAN_T].start;
 	span_param_t w; w.w = extent.param[SPAN_W].start;
 
-	const UINT32 zb = object.m_misc_state.m_zb_address >> 1;
-	const UINT32 zhb = object.m_misc_state.m_zb_address;
+	const uint32_t zb = object.m_misc_state.m_zb_address >> 1;
+	const uint32_t zhb = object.m_misc_state.m_zb_address;
 
 #ifdef PTR64
 	assert(extent.userdata != (const void *)0xcccccccccccccccc);
@@ -3522,12 +3541,12 @@ void n64_rdp::span_draw_1cycle(INT32 scanline, const extent_t &extent, const rdp
 	m_tex_pipe.calculate_clamp_diffs(tilenum, userdata, object);
 
 	const bool partialreject = (userdata->m_color_inputs.blender2b_a[0] == &userdata->m_inv_pixel_color && userdata->m_color_inputs.blender1b_a[0] == &userdata->m_pixel_color);
-	const INT32 sel0 = (userdata->m_color_inputs.blender2b_a[0] == &userdata->m_memory_color) ? 1 : 0;
+	const int32_t sel0 = (userdata->m_color_inputs.blender2b_a[0] == &userdata->m_memory_color) ? 1 : 0;
 
-	INT32 drinc, dginc, dbinc, dainc;
-	INT32 dzinc, dzpix;
-	INT32 dsinc, dtinc, dwinc;
-	INT32 xinc;
+	int32_t drinc, dginc, dbinc, dainc;
+	int32_t dzinc, dzpix;
+	int32_t dsinc, dtinc, dwinc;
+	int32_t xinc;
 
 	if (!flip)
 	{
@@ -3554,15 +3573,15 @@ void n64_rdp::span_draw_1cycle(INT32 scanline, const extent_t &extent, const rdp
 		xinc = 1;
 	}
 
-	const INT32 fb_index = object.m_misc_state.m_fb_width * scanline;
+	const int32_t fb_index = object.m_misc_state.m_fb_width * scanline;
 
-	const INT32 xstart = extent.startx;
-	const INT32 xend = userdata->m_unscissored_rx;
-	const INT32 xend_scissored = extent.stopx;
+	const int32_t xstart = extent.startx;
+	const int32_t xend = userdata->m_unscissored_rx;
+	const int32_t xend_scissored = extent.stopx;
 
-	INT32 x = xend;
+	int32_t x = xend;
 
-	const INT32 length = flip ? (xstart - xend) : (xend - xstart);
+	const int32_t length = flip ? (xstart - xend) : (xend - xstart);
 
 	if(object.m_other_modes.z_source_sel)
 	{
@@ -3578,11 +3597,11 @@ void n64_rdp::span_draw_1cycle(INT32 scanline, const extent_t &extent, const rdp
 	if (object.m_misc_state.m_fb_size < 2 || object.m_misc_state.m_fb_size > 4)
 		fatalerror("unsupported m_fb_size %d\n", object.m_misc_state.m_fb_size);
 
-	const INT32 blend_index = (object.m_other_modes.alpha_cvg_select ? 2 : 0) | ((object.m_other_modes.rgb_dither_sel < 3) ? 1 : 0);
-	const INT32 cycle0 = ((object.m_other_modes.sample_type & 1) << 1) | (object.m_other_modes.bi_lerp0 & 1);
+	const int32_t blend_index = (object.m_other_modes.alpha_cvg_select ? 2 : 0) | ((object.m_other_modes.rgb_dither_sel < 3) ? 1 : 0);
+	const int32_t cycle0 = ((object.m_other_modes.sample_type & 1) << 1) | (object.m_other_modes.bi_lerp0 & 1);
 
-	INT32 sss = 0;
-	INT32 sst = 0;
+	int32_t sss = 0;
+	int32_t sst = 0;
 
 	if (object.m_other_modes.persp_tex_en)
 	{
@@ -3594,18 +3613,18 @@ void n64_rdp::span_draw_1cycle(INT32 scanline, const extent_t &extent, const rdp
 	}
 
 	userdata->m_start_span = true;
-	for (INT32 j = 0; j <= length; j++)
+	for (int32_t j = 0; j <= length; j++)
 	{
-		INT32 sr = r.w >> 14;
-		INT32 sg = g.w >> 14;
-		INT32 sb = b.w >> 14;
-		INT32 sa = a.w >> 14;
-		INT32 sz = (z.w >> 10) & 0x3fffff;
+		int32_t sr = r.w >> 14;
+		int32_t sg = g.w >> 14;
+		int32_t sb = b.w >> 14;
+		int32_t sa = a.w >> 14;
+		int32_t sz = (z.w >> 10) & 0x3fffff;
 		const bool valid_x = (flip) ? (x >= xend_scissored) : (x <= xend_scissored);
 
 		if (x >= clipx1 && x < clipx2 && valid_x)
 		{
-			UINT8 offx, offy;
+			uint8_t offx, offy;
 			lookup_cvmask_derivatives(userdata->m_cvg[x], &offx, &offy, userdata);
 
 			m_tex_pipe.lod_1cycle(&sss, &sst, s.w, t.w, w.w, dsinc, dtinc, dwinc, userdata, object);
@@ -3614,10 +3633,10 @@ void n64_rdp::span_draw_1cycle(INT32 scanline, const extent_t &extent, const rdp
 			rgbaz_clip(sr, sg, sb, sa, &sz, userdata);
 
 			((m_tex_pipe).*(m_tex_pipe.m_cycle[cycle0]))(&userdata->m_texel0_color, &userdata->m_texel0_color, sss, sst, tilenum, 0, userdata, object);
-			UINT32 t0a = userdata->m_texel0_color.get_a();
+			uint32_t t0a = userdata->m_texel0_color.get_a();
 			userdata->m_texel0_alpha.set(t0a, t0a, t0a, t0a);
 
-			const UINT8 noise = rand() << 3; // Not accurate
+			const uint8_t noise = machine().rand() << 3; // Not accurate
 			userdata->m_noise_color.set(0, noise, noise, noise);
 
 			rgbaint_t rgbsub_a(*userdata->m_color_inputs.combiner_rgbsub_a[1]);
@@ -3647,16 +3666,16 @@ void n64_rdp::span_draw_1cycle(INT32 scanline, const extent_t &extent, const rdp
 			//Alpha coverage combiner
 			userdata->m_pixel_color.set_a(get_alpha_cvg(userdata->m_pixel_color.get_a(), userdata, object));
 
-			const UINT32 curpixel = fb_index + x;
-			const UINT32 zbcur = zb + curpixel;
-			const UINT32 zhbcur = zhb + curpixel;
+			const uint32_t curpixel = fb_index + x;
+			const uint32_t zbcur = zb + curpixel;
+			const uint32_t zhbcur = zhb + curpixel;
 
 			read_pixel(curpixel, userdata, object);
 
 			if(z_compare(zbcur, zhbcur, sz, dzpix, userdata, object))
 			{
-				INT32 cdith = 0;
-				INT32 adith = 0;
+				int32_t cdith = 0;
+				int32_t adith = 0;
 				get_dither_values(scanline, j, &cdith, &adith, object);
 
 				color_t blended_pixel;
@@ -3689,13 +3708,13 @@ void n64_rdp::span_draw_1cycle(INT32 scanline, const extent_t &extent, const rdp
 	}
 }
 
-void n64_rdp::span_draw_2cycle(INT32 scanline, const extent_t &extent, const rdp_poly_state &object, INT32 threadid)
+void n64_rdp::span_draw_2cycle(int32_t scanline, const extent_t &extent, const rdp_poly_state &object, int32_t threadid)
 {
 	assert(object.m_misc_state.m_fb_size >= 2 && object.m_misc_state.m_fb_size < 4);
 
-	const INT32 clipx1 = object.m_scissor.m_xh;
-	const INT32 clipx2 = object.m_scissor.m_xl;
-	const INT32 tilenum = object.tilenum;
+	const int32_t clipx1 = object.m_scissor.m_xh;
+	const int32_t clipx2 = object.m_scissor.m_xl;
+	const int32_t tilenum = object.tilenum;
 	const bool flip = object.flip;
 
 	span_param_t r; r.w = extent.param[SPAN_R].start;
@@ -3707,16 +3726,16 @@ void n64_rdp::span_draw_2cycle(INT32 scanline, const extent_t &extent, const rdp
 	span_param_t t; t.w = extent.param[SPAN_T].start;
 	span_param_t w; w.w = extent.param[SPAN_W].start;
 
-	const UINT32 zb = object.m_misc_state.m_zb_address >> 1;
-	const UINT32 zhb = object.m_misc_state.m_zb_address;
+	const uint32_t zb = object.m_misc_state.m_zb_address >> 1;
+	const uint32_t zhb = object.m_misc_state.m_zb_address;
 
-	INT32 tile2 = (tilenum + 1) & 7;
-	INT32 tile1 = tilenum;
-	const UINT32 prim_tile = tilenum;
+	int32_t tile2 = (tilenum + 1) & 7;
+	int32_t tile1 = tilenum;
+	const uint32_t prim_tile = tilenum;
 
-	INT32 newtile1 = tile1;
-	INT32 news = 0;
-	INT32 newt = 0;
+	int32_t newtile1 = tile1;
+	int32_t news = 0;
+	int32_t newt = 0;
 
 #ifdef PTR64
 	assert(extent.userdata != (const void *)0xcccccccccccccccc);
@@ -3728,13 +3747,13 @@ void n64_rdp::span_draw_2cycle(INT32 scanline, const extent_t &extent, const rdp
 	m_tex_pipe.calculate_clamp_diffs(tile1, userdata, object);
 
 	bool partialreject = (userdata->m_color_inputs.blender2b_a[1] == &userdata->m_inv_pixel_color && userdata->m_color_inputs.blender1b_a[1] == &userdata->m_pixel_color);
-	INT32 sel0 = (userdata->m_color_inputs.blender2b_a[0] == &userdata->m_memory_color) ? 1 : 0;
-	INT32 sel1 = (userdata->m_color_inputs.blender2b_a[1] == &userdata->m_memory_color) ? 1 : 0;
+	int32_t sel0 = (userdata->m_color_inputs.blender2b_a[0] == &userdata->m_memory_color) ? 1 : 0;
+	int32_t sel1 = (userdata->m_color_inputs.blender2b_a[1] == &userdata->m_memory_color) ? 1 : 0;
 
-	INT32 drinc, dginc, dbinc, dainc;
-	INT32 dzinc, dzpix;
-	INT32 dsinc, dtinc, dwinc;
-	INT32 xinc;
+	int32_t drinc, dginc, dbinc, dainc;
+	int32_t dzinc, dzpix;
+	int32_t dsinc, dtinc, dwinc;
+	int32_t xinc;
 
 	if (!flip)
 	{
@@ -3761,18 +3780,18 @@ void n64_rdp::span_draw_2cycle(INT32 scanline, const extent_t &extent, const rdp
 		xinc = 1;
 	}
 
-	const INT32 fb_index = object.m_misc_state.m_fb_width * scanline;
+	const int32_t fb_index = object.m_misc_state.m_fb_width * scanline;
 
-	INT32 cdith = 0;
-	INT32 adith = 0;
+	int32_t cdith = 0;
+	int32_t adith = 0;
 
-	const INT32 xstart = extent.startx;
-	const INT32 xend = userdata->m_unscissored_rx;
-	const INT32 xend_scissored = extent.stopx;
+	const int32_t xstart = extent.startx;
+	const int32_t xend = userdata->m_unscissored_rx;
+	const int32_t xend_scissored = extent.stopx;
 
-	INT32 x = xend;
+	int32_t x = xend;
 
-	const INT32 length = flip ? (xstart - xend) : (xend - xstart);
+	const int32_t length = flip ? (xstart - xend) : (xend - xstart);
 
 	if(object.m_other_modes.z_source_sel)
 	{
@@ -3788,12 +3807,12 @@ void n64_rdp::span_draw_2cycle(INT32 scanline, const extent_t &extent, const rdp
 	if (object.m_misc_state.m_fb_size < 2 || object.m_misc_state.m_fb_size > 4)
 		fatalerror("unsupported m_fb_size %d\n", object.m_misc_state.m_fb_size);
 
-	const INT32 blend_index = (object.m_other_modes.alpha_cvg_select ? 2 : 0) | ((object.m_other_modes.rgb_dither_sel < 3) ? 1 : 0);
-	const INT32 cycle0 = ((object.m_other_modes.sample_type & 1) << 1) | (object.m_other_modes.bi_lerp0 & 1);
-	const INT32 cycle1 = ((object.m_other_modes.sample_type & 1) << 1) | (object.m_other_modes.bi_lerp1 & 1);
+	const int32_t blend_index = (object.m_other_modes.alpha_cvg_select ? 2 : 0) | ((object.m_other_modes.rgb_dither_sel < 3) ? 1 : 0);
+	const int32_t cycle0 = ((object.m_other_modes.sample_type & 1) << 1) | (object.m_other_modes.bi_lerp0 & 1);
+	const int32_t cycle1 = ((object.m_other_modes.sample_type & 1) << 1) | (object.m_other_modes.bi_lerp1 & 1);
 
-	INT32 sss = 0;
-	INT32 sst = 0;
+	int32_t sss = 0;
+	int32_t sst = 0;
 
 	if (object.m_other_modes.persp_tex_en)
 	{
@@ -3805,23 +3824,23 @@ void n64_rdp::span_draw_2cycle(INT32 scanline, const extent_t &extent, const rdp
 	}
 
 	userdata->m_start_span = true;
-	for (INT32 j = 0; j <= length; j++)
+	for (int32_t j = 0; j <= length; j++)
 	{
-		INT32 sr = r.w >> 14;
-		INT32 sg = g.w >> 14;
-		INT32 sb = b.w >> 14;
-		INT32 sa = a.w >> 14;
-		INT32 sz = (z.w >> 10) & 0x3fffff;
+		int32_t sr = r.w >> 14;
+		int32_t sg = g.w >> 14;
+		int32_t sb = b.w >> 14;
+		int32_t sa = a.w >> 14;
+		int32_t sz = (z.w >> 10) & 0x3fffff;
 
 		const bool valid_x = (flip) ? (x >= xend_scissored) : (x <= xend_scissored);
 
 		if (x >= clipx1 && x < clipx2 && valid_x)
 		{
-			const UINT32 compidx = m_compressed_cvmasks[userdata->m_cvg[x]];
+			const uint32_t compidx = m_compressed_cvmasks[userdata->m_cvg[x]];
 			userdata->m_current_pix_cvg = cvarray[compidx].cvg;
 			userdata->m_current_cvg_bit = cvarray[compidx].cvbit;
-			const UINT8 offx = cvarray[compidx].xoff;
-			const UINT8 offy = cvarray[compidx].yoff;
+			const uint8_t offx = cvarray[compidx].xoff;
+			const uint8_t offy = cvarray[compidx].yoff;
 			//lookup_cvmask_derivatives(userdata->m_cvg[x], &offx, &offy, userdata);
 
 			m_tex_pipe.lod_2cycle(&sss, &sst, s.w, t.w, w.w, dsinc, dtinc, dwinc, prim_tile, &tile1, &tile2, userdata, object);
@@ -3837,14 +3856,14 @@ void n64_rdp::span_draw_2cycle(INT32 scanline, const extent_t &extent, const rdp
 			((m_tex_pipe).*(m_tex_pipe.m_cycle[cycle1]))(&userdata->m_texel1_color, &userdata->m_texel0_color, sss, sst, tile2, 1, userdata, object);
 			((m_tex_pipe).*(m_tex_pipe.m_cycle[cycle1]))(&userdata->m_next_texel_color, &userdata->m_next_texel_color, sss, sst, tile2, 1, userdata, object);
 
-			UINT32 t0a = userdata->m_texel0_color.get_a();
-			UINT32 t1a = userdata->m_texel1_color.get_a();
-			UINT32 tna = userdata->m_next_texel_color.get_a();
+			uint32_t t0a = userdata->m_texel0_color.get_a();
+			uint32_t t1a = userdata->m_texel1_color.get_a();
+			uint32_t tna = userdata->m_next_texel_color.get_a();
 			userdata->m_texel0_alpha.set(t0a, t0a, t0a, t0a);
 			userdata->m_texel1_alpha.set(t1a, t1a, t1a, t1a);
 			userdata->m_next_texel_alpha.set(tna, tna, tna, tna);
 
-			const UINT8 noise = rand() << 3; // Not accurate
+			const uint8_t noise = machine().rand() << 3; // Not accurate
 			userdata->m_noise_color.set(0, noise, noise, noise);
 
 			rgbaint_t rgbsub_a(*userdata->m_color_inputs.combiner_rgbsub_a[0]);
@@ -3874,7 +3893,7 @@ void n64_rdp::span_draw_2cycle(INT32 scanline, const extent_t &extent, const rdp
 			userdata->m_texel0_color.set(userdata->m_texel1_color);
 			userdata->m_texel1_color.set(userdata->m_next_texel_color);
 
-			UINT32 ca = userdata->m_combined_color.get_a();
+			uint32_t ca = userdata->m_combined_color.get_a();
 			userdata->m_combined_alpha.set(ca, ca, ca, ca);
 			userdata->m_texel0_alpha.set(userdata->m_texel1_alpha);
 			userdata->m_texel1_alpha.set(userdata->m_next_texel_alpha);
@@ -3906,9 +3925,9 @@ void n64_rdp::span_draw_2cycle(INT32 scanline, const extent_t &extent, const rdp
 			//Alpha coverage combiner
 			userdata->m_pixel_color.set_a(get_alpha_cvg(userdata->m_pixel_color.get_a(), userdata, object));
 
-			const UINT32 curpixel = fb_index + x;
-			const UINT32 zbcur = zb + curpixel;
-			const UINT32 zhbcur = zhb + curpixel;
+			const uint32_t curpixel = fb_index + x;
+			const uint32_t zbcur = zb + curpixel;
+			const uint32_t zhbcur = zhb + curpixel;
 
 			read_pixel(curpixel, userdata, object);
 
@@ -3945,43 +3964,43 @@ void n64_rdp::span_draw_2cycle(INT32 scanline, const extent_t &extent, const rdp
 	}
 }
 
-void n64_rdp::span_draw_copy(INT32 scanline, const extent_t &extent, const rdp_poly_state &object, INT32 threadid)
+void n64_rdp::span_draw_copy(int32_t scanline, const extent_t &extent, const rdp_poly_state &object, int32_t threadid)
 {
-	const INT32 clipx1 = object.m_scissor.m_xh;
-	const INT32 clipx2 = object.m_scissor.m_xl;
-	const INT32 tilenum = object.tilenum;
+	const int32_t clipx1 = object.m_scissor.m_xh;
+	const int32_t clipx2 = object.m_scissor.m_xl;
+	const int32_t tilenum = object.tilenum;
 	const bool flip = object.flip;
 
 	rdp_span_aux* userdata = (rdp_span_aux*)extent.userdata;
-	const INT32 xstart = extent.startx;
-	const INT32 xend = userdata->m_unscissored_rx;
-	const INT32 xend_scissored = extent.stopx;
-	const INT32 xinc = flip ? 1 : -1;
-	const INT32 length = flip ? (xstart - xend) : (xend - xstart);
+	const int32_t xstart = extent.startx;
+	const int32_t xend = userdata->m_unscissored_rx;
+	const int32_t xend_scissored = extent.stopx;
+	const int32_t xinc = flip ? 1 : -1;
+	const int32_t length = flip ? (xstart - xend) : (xend - xstart);
 
 	span_param_t s; s.w = extent.param[SPAN_S].start;
 	span_param_t t; t.w = extent.param[SPAN_T].start;
 
-	const INT32 ds = object.m_span_base.m_span_ds / 4;
-	const INT32 dt = object.m_span_base.m_span_dt / 4;
-	const INT32 dsinc = flip ? (ds) : -ds;
-	const INT32 dtinc = flip ? (dt) : -dt;
+	const int32_t ds = object.m_span_base.m_span_ds / 4;
+	const int32_t dt = object.m_span_base.m_span_dt / 4;
+	const int32_t dsinc = flip ? (ds) : -ds;
+	const int32_t dtinc = flip ? (dt) : -dt;
 
-	const INT32 fb_index = object.m_misc_state.m_fb_width * scanline;
+	const int32_t fb_index = object.m_misc_state.m_fb_width * scanline;
 
-	INT32 x = xend;
+	int32_t x = xend;
 
-	for (INT32 j = 0; j <= length; j++)
+	for (int32_t j = 0; j <= length; j++)
 	{
 		const bool valid_x = (flip) ? (x >= xend_scissored) : (x <= xend_scissored);
 
 		if (x >= clipx1 && x < clipx2 && valid_x)
 		{
-			INT32 sss = s.h.h;
-			INT32 sst = t.h.h;
+			int32_t sss = s.h.h;
+			int32_t sst = t.h.h;
 			m_tex_pipe.copy(&userdata->m_texel0_color, sss, sst, tilenum, object, userdata);
 
-			UINT32 curpixel = fb_index + x;
+			uint32_t curpixel = fb_index + x;
 			if ((userdata->m_texel0_color.get_a() != 0) || (!object.m_other_modes.alpha_compare_en))
 			{
 				copy_pixel(curpixel, userdata->m_texel0_color, object);
@@ -3994,27 +4013,27 @@ void n64_rdp::span_draw_copy(INT32 scanline, const extent_t &extent, const rdp_p
 	}
 }
 
-void n64_rdp::span_draw_fill(INT32 scanline, const extent_t &extent, const rdp_poly_state &object, INT32 threadid)
+void n64_rdp::span_draw_fill(int32_t scanline, const extent_t &extent, const rdp_poly_state &object, int32_t threadid)
 {
 	assert(object.m_misc_state.m_fb_size >= 2 && object.m_misc_state.m_fb_size < 4);
 
 	const bool flip = object.flip;
 
-	const INT32 clipx1 = object.m_scissor.m_xh;
-	const INT32 clipx2 = object.m_scissor.m_xl;
+	const int32_t clipx1 = object.m_scissor.m_xh;
+	const int32_t clipx2 = object.m_scissor.m_xl;
 
-	const INT32 xinc = flip ? 1 : -1;
+	const int32_t xinc = flip ? 1 : -1;
 
-	const INT32 fb_index = object.m_misc_state.m_fb_width * scanline;
+	const int32_t fb_index = object.m_misc_state.m_fb_width * scanline;
 
-	const INT32 xstart = extent.startx;
-	const INT32 xend_scissored = extent.stopx;
+	const int32_t xstart = extent.startx;
+	const int32_t xend_scissored = extent.stopx;
 
-	INT32 x = xend_scissored;
+	int32_t x = xend_scissored;
 
-	const INT32 length = flip ? (xstart - xend_scissored) : (xend_scissored - xstart);
+	const int32_t length = flip ? (xstart - xend_scissored) : (xend_scissored - xstart);
 
-	for (INT32 j = 0; j <= length; j++)
+	for (int32_t j = 0; j <= length; j++)
 	{
 		if (x >= clipx1 && x < clipx2)
 		{

@@ -42,25 +42,25 @@ public:
 	{ }
 
 	/* memory pointers */
-	required_shared_ptr<UINT16> m_spritemap;
-	required_shared_ptr<UINT16> m_spriteram;
-	required_shared_ptr<UINT16> m_pivram;
-	required_shared_ptr<UINT16> m_piv_ctrlram;
+	required_shared_ptr<uint16_t> m_spritemap;
+	required_shared_ptr<uint16_t> m_spriteram;
+	required_shared_ptr<uint16_t> m_pivram;
+	required_shared_ptr<uint16_t> m_piv_ctrlram;
 
 	/* video-related */
 	tilemap_t   *m_piv_tilemap[3];
-	UINT16      m_piv_ctrl_reg;
-	UINT16      m_piv_zoom[3];
-	UINT16      m_piv_scrollx[3];
-	UINT16      m_piv_scrolly[3];
-	UINT16      m_rotate_ctrl[8];
+	uint16_t      m_piv_ctrl_reg;
+	uint16_t      m_piv_zoom[3];
+	uint16_t      m_piv_scrollx[3];
+	uint16_t      m_piv_scrolly[3];
+	uint16_t      m_rotate_ctrl[8];
 	int         m_piv_xoffs;
 	int         m_piv_yoffs;
-	UINT8       m_dislayer[4];
+	uint8_t       m_dislayer[4];
 
 	/* misc */
-	UINT16      m_cpua_ctrl;
-	UINT16      m_port_sel;
+	uint16_t      m_cpua_ctrl;
+	uint16_t      m_port_sel;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -76,6 +76,7 @@ public:
 	optional_ioport m_unknown;
 	optional_ioport m_fake;
 
+	DECLARE_WRITE8_MEMBER(coins_w);
 	DECLARE_WRITE16_MEMBER(cpua_ctrl_w);
 	DECLARE_READ16_MEMBER(lan_status_r);
 	DECLARE_WRITE16_MEMBER(rotate_port_w);
@@ -97,15 +98,14 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_VIDEO_START(wgp2);
-	UINT32 screen_update_wgp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_wgp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(wgp_cpub_interrupt);
 	void wgp_postload();
 	inline void common_get_piv_tile_info( tile_data &tileinfo, int tile_index, int num );
 	void wgp_core_vh_start( int piv_xoffs, int piv_yoffs );
 	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs );
-	void wgp_piv_layer_draw( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, UINT32 priority );
+	void wgp_piv_layer_draw( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, uint32_t priority );
 	void parse_control();
-	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;

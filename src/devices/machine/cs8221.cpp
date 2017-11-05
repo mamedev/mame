@@ -16,18 +16,21 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "machine/ram.h"
 #include "machine/cs8221.h"
+#include "machine/ram.h"
+
+#define LOG_GENERAL     (1U << 0)
+#define LOG_REGISTER    (1U << 1)
+#define LOG_MEMORY      (1U << 2)
+
+#define VERBOSE (LOG_REGISTER | LOG_MEMORY)
+#include "logmacro.h"
+
+#define LOGREGISTER(...)    LOGMASKED(LOG_REGISTER, __VA_ARGS__)
+#define LOGMEMORY(...)      LOGMASKED(LOG_MEMORY,   __VA_ARGS__)
 
 
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-#define LOG_REGISTER    1
-#define LOG_MEMORY      1
-
-const device_type CS8221 = &device_creator<cs8221_device>;
+DEFINE_DEVICE_TYPE(CS8221, cs8221_device, "cs8221", "CS8221 NEAT")
 
 
 static const char *const register_names[] =
@@ -58,8 +61,8 @@ static const char *const register_names[] =
 //  cs8221_device - constructor
 //-------------------------------------------------
 
-cs8221_device::cs8221_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, CS8221, "CS8221", tag, owner, clock, "cs8221", __FILE__),
+cs8221_device::cs8221_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, CS8221, tag, owner, clock),
 		m_address(0),
 		m_address_valid(false)
 {
@@ -105,6 +108,10 @@ void cs8221_device::device_reset()
 //**************************************************************************
 //  READ/WRITE HANDLERS
 //**************************************************************************
+DEVICE_ADDRESS_MAP_START( map, 16, cs8221_device )
+	AM_RANGE(0x0022, 0x0023) AM_DEVWRITE8("cs8221", cs8221_device, address_w, 0x00ff)
+	AM_RANGE(0x0022, 0x0023) AM_DEVREADWRITE8("cs8221", cs8221_device, data_r, data_w, 0xff00)
+ADDRESS_MAP_END
 
 WRITE8_MEMBER( cs8221_device::address_w )
 {
@@ -114,12 +121,11 @@ WRITE8_MEMBER( cs8221_device::address_w )
 
 READ8_MEMBER( cs8221_device::data_r )
 {
-	UINT8 result = 0xff;
+	uint8_t result = 0xff;
 
 	if (m_address_valid)
 	{
-		if (LOG_REGISTER)
-			logerror("cs8221_device: read %s = %02x\n", register_names[m_address & 0x0f], m_registers[m_address & 0x0f]);
+		LOGREGISTER("cs8221_device: read %s = %02x\n", register_names[m_address & 0x0f], m_registers[m_address & 0x0f]);
 
 		result = m_registers[m_address & 0x0f];
 	}
@@ -134,8 +140,7 @@ WRITE8_MEMBER( cs8221_device::data_w )
 {
 	if (m_address_valid)
 	{
-		if (LOG_REGISTER)
-			logerror("cs8221_device: write %s = %02x\n", register_names[m_address & 0x0f], data);
+		LOGREGISTER("cs8221_device: write %s = %02x\n", register_names[m_address & 0x0f], data);
 
 		// update register with new data
 		m_registers[m_address & 0x0f] = data;

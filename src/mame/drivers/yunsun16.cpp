@@ -47,7 +47,7 @@ Stephh's notes (based on the games M68000 code and some tests) :
 
 2) 'magicbua'
 
-  - Additionnal 1P Vs COM mode with always only 1 winning round.
+  - Additional 1P Vs COM mode with always only 1 winning round.
   - Starting in 1P Vs 2P mode costs 2 credits. If no "Continue Play", the winner continues.
     And when a player joins in, if no "Continue Play", the winner also continues.
   - There is an ingame bug when in 1P Vs 2P mode : whatever the settings are, there will
@@ -71,7 +71,7 @@ Stephh's notes (based on the games M68000 code and some tests) :
 4) 'bombkick'
 
   - DSW1 bits 3 and 4 determine difficulty (code at 0x0003a4). But DSW1 bit 4 is also used
-    in combinaison with DSW1 bit 5 to determine the number of special powers (code at 0x0003c2) !
+    in combination with DSW1 bit 5 to determine the number of special powers (code at 0x0003c2) !
     This means that you can have 2 or 3 special powers when you set difficulty to "Easy" or "Normal",
     but you'll ALWAYS have 3 special powers when you set difficulty to "Hard" or "Very Hard".
   - DSW2 bits 2 to 7 are checked when you select a level :
@@ -89,10 +89,12 @@ Stephh's notes (based on the games M68000 code and some tests) :
 
 #include "emu.h"
 #include "includes/yunsun16.h"
-#include "cpu/z80/z80.h"
+
 #include "cpu/m68000/m68000.h"
+#include "cpu/z80/z80.h"
 #include "sound/okim6295.h"
 #include "sound/3812intf.h"
+#include "speaker.h"
 
 
 /***************************************************************************
@@ -143,7 +145,7 @@ number 0 on each voice. That sample is 00000-00000.
 */
 		if ((data & 0xff) != 0x3a)
 		{
-			soundlatch_byte_w(space, 0, data & 0xff);
+			m_soundlatch->write(space, 0, data & 0xff);
 			m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 		}
 	}
@@ -171,11 +173,11 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_port_map, AS_IO, 8, yunsun16_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x11) AM_DEVREADWRITE("ymsnd", ym3812_device, read, write)
-	AM_RANGE(0x18, 0x18) AM_READ(soundlatch_byte_r )                        // From Main CPU
+	AM_RANGE(0x18, 0x18) AM_DEVREAD("soundlatch", generic_latch_8_device, read)     // From Main CPU
 	AM_RANGE(0x1c, 0x1c) AM_DEVREADWRITE("oki", okim6295_device, read, write)       // M6295
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( oki_map, AS_0, 8, yunsun16_state )
+static ADDRESS_MAP_START( oki_map, 0, 8, yunsun16_state )
 	AM_RANGE(0x00000, 0x1ffff) AM_ROM
 	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("okibank")
 	ADDRESS_MAP_END
@@ -584,7 +586,7 @@ MACHINE_RESET_MEMBER(yunsun16_state, shocking)
                                 Magic Bubble
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( magicbub, yunsun16_state )
+static MACHINE_CONFIG_START( magicbub )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
@@ -610,12 +612,14 @@ static MACHINE_CONFIG_START( magicbub, yunsun16_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_16MHz/4)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_16MHz/16, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL_16MHz/16, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
 MACHINE_CONFIG_END
@@ -625,7 +629,7 @@ MACHINE_CONFIG_END
                                 Shocking
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( shocking, yunsun16_state )
+static MACHINE_CONFIG_START( shocking )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
@@ -648,10 +652,10 @@ static MACHINE_CONFIG_START( shocking, yunsun16_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_16MHz/16, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL_16MHz/16, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, oki_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 MACHINE_CONFIG_END
 
 
@@ -1016,10 +1020,10 @@ ROM_END
 
 GAME( 199?, magicbub,   0,        magicbub, magicbub, yunsun16_state, magicbub, ROT0,   "Yun Sung", "Magic Bubble",                              MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 199?, magicbuba,  magicbub, magicbub, magicbua, yunsun16_state, magicbub, ROT0,   "Yun Sung", "Magic Bubble (Adult version, YS-1302 PCB)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 199?, magicbubb,  magicbub, shocking, magicbua, driver_device,  0,        ROT0,   "Yun Sung", "Magic Bubble (Adult version, YS-0211 PCB)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, paprazzi,   0,        shocking, paprazzi, driver_device,  0,        ROT270, "Yun Sung", "Paparazzi",                                 MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1997, shocking,   0,        shocking, shocking, driver_device,  0,        ROT0,   "Yun Sung", "Shocking",                                  MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1997, shockingk,  shocking, shocking, shocking, driver_device,  0,        ROT0,   "Yun Sung", "Shocking (Korea, set 1)",                   MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1997, shockingko, shocking, shocking, shocking, driver_device,  0,        ROT0,   "Yun Sung", "Shocking (Korea, set 2)",                   MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1998, bombkick,   0,        shocking, bombkick, driver_device,  0,        ROT0,   "Yun Sung", "Bomb Kick (set 1)",                         MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1998, bombkicka,  bombkick, shocking, bombkick, driver_device,  0,        ROT0,   "Yun Sung", "Bomb Kick (set 2)",                         MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 199?, magicbubb,  magicbub, shocking, magicbua, yunsun16_state, 0,        ROT0,   "Yun Sung", "Magic Bubble (Adult version, YS-0211 PCB)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, paprazzi,   0,        shocking, paprazzi, yunsun16_state, 0,        ROT270, "Yun Sung", "Paparazzi",                                 MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1997, shocking,   0,        shocking, shocking, yunsun16_state, 0,        ROT0,   "Yun Sung", "Shocking",                                  MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1997, shockingk,  shocking, shocking, shocking, yunsun16_state, 0,        ROT0,   "Yun Sung", "Shocking (Korea, set 1)",                   MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1997, shockingko, shocking, shocking, shocking, yunsun16_state, 0,        ROT0,   "Yun Sung", "Shocking (Korea, set 2)",                   MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, bombkick,   0,        shocking, bombkick, yunsun16_state, 0,        ROT0,   "Yun Sung", "Bomb Kick (set 1)",                         MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, bombkicka,  bombkick, shocking, bombkick, yunsun16_state, 0,        ROT0,   "Yun Sung", "Bomb Kick (set 2)",                         MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

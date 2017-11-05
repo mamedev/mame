@@ -6,12 +6,11 @@
 
 ***************************************************************************/
 
+#ifndef MAME_BUS_SVI3X8_EXPANDER_SV603_H
+#define MAME_BUS_SVI3X8_EXPANDER_SV603_H
+
 #pragma once
 
-#ifndef __SVI3X8_EXPANDER_SV603_H__
-#define __SVI3X8_EXPANDER_SV603_H__
-
-#include "emu.h"
 #include "expander.h"
 #include "sound/sn76496.h"
 #include "bus/generic/slot.h"
@@ -28,7 +27,7 @@ class sv603_device : public device_t, public device_svi_expander_interface
 {
 public:
 	// construction/destruction
-	sv603_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sv603_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// from host
 	virtual DECLARE_READ8_MEMBER( mreq_r ) override;
@@ -39,8 +38,8 @@ public:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cartridge);
 
 protected:
-	virtual const rom_entry *device_rom_region() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -51,6 +50,6 @@ private:
 };
 
 // device type definition
-extern const device_type SV603;
+DECLARE_DEVICE_TYPE(SV603, sv603_device)
 
-#endif // __SVI3X8_EXPANDER_SV603_H__
+#endif // MAME_BUS_SVI3X8_EXPANDER_SV603_H

@@ -6,12 +6,13 @@
  *
  ****************************************************************************/
 
-#ifndef VTECH2_H_
-#define VTECH2_H_
-#include "sound/speaker.h"
-#include "imagedev/cassette.h"
-#include "bus/generic/slot.h"
+#ifndef MAME_INCLUDES_VTECH2_H
+#define MAME_INCLUDES_VTECH2_H
+
 #include "bus/generic/carts.h"
+#include "bus/generic/slot.h"
+#include "imagedev/cassette.h"
+#include "sound/spkrdev.h"
 
 #define TRKSIZE_FM  3172    /* size of a standard FM mode track */
 
@@ -27,17 +28,17 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")  { }
 
-	UINT8 *m_videoram;
+	uint8_t *m_videoram;
 	int m_laser_latch;
 	char m_laser_frame_message[64+1];
 	int m_laser_frame_time;
-	UINT8 *m_mem;
+	uint8_t *m_mem;
 	int m_laser_bank_mask;
 	int m_laser_bank[4];
 	int m_laser_video_bank;
-	UINT8 m_laser_track_x2[2];
-	UINT8 m_laser_fdc_status;
-	UINT8 m_laser_fdc_data[TRKSIZE_FM];
+	uint8_t m_laser_track_x2[2];
+	uint8_t m_laser_fdc_status;
+	uint8_t m_laser_fdc_data[TRKSIZE_FM];
 	int m_laser_data;
 	int m_laser_fdc_edge;
 	int m_laser_fdc_bits;
@@ -65,7 +66,7 @@ public:
 	DECLARE_PALETTE_INIT(vtech2);
 	DECLARE_MACHINE_RESET(laser500);
 	DECLARE_MACHINE_RESET(laser700);
-	UINT32 screen_update_laser(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_laser(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vtech2_interrupt);
 
 	int mra_bank(int bank, int offs);
@@ -93,4 +94,4 @@ public:
 };
 
 
-#endif /* VTECH2_H_ */
+#endif // MAME_INCLUDES_VTECH2_H

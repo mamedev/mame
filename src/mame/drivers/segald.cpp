@@ -22,6 +22,7 @@ Todo:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/ldv1000.h"
+#include "speaker.h"
 
 #define SCHEMATIC_CLOCK (20000000)
 
@@ -39,16 +40,16 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette") { }
 
-	UINT8 m_nmi_enable;
+	uint8_t m_nmi_enable;
 
 	required_device<pioneer_ldv1000_device> m_laserdisc;
-	required_shared_ptr<UINT8> m_obj_ram;
-	required_shared_ptr<UINT8> m_out_ram;
-	required_shared_ptr<UINT8> m_color_ram;
-	required_shared_ptr<UINT8> m_fix_ram;
+	required_shared_ptr<uint8_t> m_obj_ram;
+	required_shared_ptr<uint8_t> m_out_ram;
+	required_shared_ptr<uint8_t> m_color_ram;
+	required_shared_ptr<uint8_t> m_fix_ram;
 
-	UINT8 m_ldv1000_input_latch;
-	UINT8 m_ldv1000_output_latch;
+	uint8_t m_ldv1000_input_latch;
+	uint8_t m_ldv1000_output_latch;
 
 	DECLARE_READ8_MEMBER(astron_DISC_read);
 	DECLARE_READ8_MEMBER(astron_OUT_read);
@@ -62,7 +63,7 @@ public:
 	DECLARE_WRITE8_MEMBER(astron_io_bankswitch_w);
 	DECLARE_DRIVER_INIT(astron);
 	virtual void machine_start() override;
-	UINT32 screen_update_astron(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_astron(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void astron_draw_characters(bitmap_rgb32 &bitmap,const rectangle &cliprect);
 	void astron_draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
@@ -73,7 +74,7 @@ public:
 /* VIDEO GOODS */
 void segald_state::astron_draw_characters(bitmap_rgb32 &bitmap,const rectangle &cliprect)
 {
-	UINT8 characterX, characterY;
+	uint8_t characterX, characterY;
 
 	for (characterX = 0; characterX < 32; characterX++)
 	{
@@ -89,14 +90,14 @@ void segald_state::astron_draw_characters(bitmap_rgb32 &bitmap,const rectangle &
 void segald_state::astron_draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	/* Heisted from Daphne */
-	const UINT8 SPR_Y_TOP     = 0;
-/*  const UINT8 SPR_Y_BOTTOM  = 1;*/
-	const UINT8 SPR_X_LO      = 2;
-/*  const UINT8 SPR_X_HI      = 3;*/
-/*  const UINT8 SPR_SKIP_LO   = 4;*/
-/*  const UINT8 SPR_SKIP_HI   = 5;*/
-/*  const UINT8 SPR_GFXOFS_LO = 6;*/
-/*  const UINT8 SPR_GFXOFS_HI = 7;*/
+	const uint8_t SPR_Y_TOP     = 0;
+/*  const uint8_t SPR_Y_BOTTOM  = 1;*/
+	const uint8_t SPR_X_LO      = 2;
+/*  const uint8_t SPR_X_HI      = 3;*/
+/*  const uint8_t SPR_SKIP_LO   = 4;*/
+/*  const uint8_t SPR_SKIP_HI   = 5;*/
+/*  const uint8_t SPR_GFXOFS_LO = 6;*/
+/*  const uint8_t SPR_GFXOFS_HI = 7;*/
 
 	int sx,sy;
 	int spr_number;
@@ -114,7 +115,7 @@ void segald_state::astron_draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cl
 }
 
 
-UINT32 segald_state::screen_update_astron(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t segald_state::screen_update_astron(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
 
@@ -212,9 +213,9 @@ WRITE8_MEMBER(segald_state::astron_OBJ_write)
 
 WRITE8_MEMBER(segald_state::astron_COLOR_write)
 {
-	UINT8 r, g, b, a;
-	UINT8 highBits, lowBits;
-	const UINT8 palIndex = offset >> 1;
+	uint8_t r, g, b, a;
+	uint8_t highBits, lowBits;
+	const uint8_t palIndex = offset >> 1;
 
 	/* Combine */
 	m_color_ram[offset] = data;
@@ -366,7 +367,7 @@ void segald_state::machine_start()
 
 
 /* DRIVER */
-static MACHINE_CONFIG_START( astron, segald_state )
+static MACHINE_CONFIG_START( astron )
 
 	/* main cpu */
 	MCFG_CPU_ADD("maincpu", Z80, SCHEMATIC_CLOCK/4)
@@ -599,15 +600,15 @@ ROM_END
 
 DRIVER_INIT_MEMBER(segald_state,astron)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 2, &ROM[0x8000], 0x4000);
 }
 
 
-//    YEAR, NAME,     PARENT,  MACHINE,INPUT,  INIT,   MONITOR,COMPANY,FULLNAME,FLAGS
-GAME( 1983, astron,   0,       astron, astron, segald_state, astron, ROT0,   "Sega", "Astron Belt", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
-GAME( 1983, astronp,  astron,  astron, astron, segald_state, astron, ROT0,   "Sega", "Astron Belt (Pioneer LDV1000)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+//    YEAR, NAME,     PARENT,  MACHINE,INPUT,  STATE,        INIT,   MONITOR,COMPANY,FULLNAME,FLAGS
+GAME( 1983, astron,   0,       astron, astron, segald_state, astron, ROT0,   "Sega", "Astron Belt",                             MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME( 1983, astronp,  astron,  astron, astron, segald_state, astron, ROT0,   "Sega", "Astron Belt (Pioneer LDV1000)",           MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME( 1983, cobraseg, astron,  astron, astron, segald_state, astron, ROT0,   "Sega", "Cobra Command (Sega LaserDisc Hardware)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
-GAME( 1983, galaxyr,  0,       astron, astron, segald_state, astron, ROT0,   "Sega", "Galaxy Ranger", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
-GAME( 1983, galaxyrp, galaxyr, astron, astron, segald_state, astron, ROT0,   "Sega", "Galaxy Ranger (Pioneer LDV1000)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
-GAME( 1983, sblazerp, galaxyr, astron, astron, segald_state, astron, ROT0,   "Sega", "Star Blazer (Pioneer LDV1000)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME( 1983, galaxyr,  0,       astron, astron, segald_state, astron, ROT0,   "Sega", "Galaxy Ranger",                           MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME( 1983, galaxyrp, galaxyr, astron, astron, segald_state, astron, ROT0,   "Sega", "Galaxy Ranger (Pioneer LDV1000)",         MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME( 1983, sblazerp, galaxyr, astron, astron, segald_state, astron, ROT0,   "Sega", "Star Blazer (Pioneer LDV1000)",           MACHINE_NOT_WORKING|MACHINE_NO_SOUND)

@@ -94,8 +94,6 @@
 #include "includes/mac.h"
 #include "machine/applefdc.h"
 #include "machine/sonydriv.h"
-#include "debug/debugcpu.h"
-#include "debugger.h"
 
 #define AUDIO_IS_CLASSIC (m_model <= MODEL_MAC_CLASSIC)
 #define MAC_HAS_VIA2    ((m_model >= MODEL_MAC_II) && (m_model != MODEL_MAC_IIFX))
@@ -117,8 +115,6 @@
 #define LOG_KEYBOARD    0
 #define LOG_MEMORY      0
 #endif
-
-static offs_t mac_dasm_override(device_t &device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, int options);
 
 // returns non-zero if this Mac has ADB
 int mac_state::has_adb()
@@ -152,27 +148,27 @@ void mac_state::mac_install_memory(offs_t memory_begin, offs_t memory_end,
 	offs_t memory_size, void *memory_data, int is_rom, const char *bank)
 {
 	address_space& space = m_maincpu->space(AS_PROGRAM);
-	offs_t memory_mask;
+	offs_t memory_mirror;
 
-	memory_size = MIN(memory_size, (memory_end + 1 - memory_begin));
-	memory_mask = memory_size - 1;
+	memory_size = std::min(memory_size, (memory_end + 1 - memory_begin));
+	memory_mirror = (memory_end - memory_begin) & ~(memory_size - 1);
 
 	if (!is_rom)
 	{
-		space.install_readwrite_bank(memory_begin, memory_end, memory_mask, 0, bank);
+		space.install_readwrite_bank(memory_begin, memory_end & ~memory_mirror, memory_mirror, bank);
 	}
 	else
 	{
-		space.unmap_write(memory_begin, memory_end, memory_mask, 0);
-		space.install_read_bank(memory_begin, memory_end, memory_mask, 0, bank);
+		space.unmap_write(memory_begin, memory_end);
+		space.install_read_bank(memory_begin, memory_end & ~memory_mirror, memory_mirror, bank);
 	}
 
 	membank(bank)->set_base(memory_data);
 
 	if (LOG_MEMORY)
 	{
-		printf("mac_install_memory(): bank=%s range=[0x%06x...0x%06x] mask=0x%06x ptr=0x%p\n",
-			bank, memory_begin, memory_end, memory_mask, memory_data);
+		printf("mac_install_memory(): bank=%s range=[0x%06x...0x%06x] mirror=0x%06x ptr=0x%p\n",
+			bank, memory_begin, memory_end, memory_mirror, memory_data);
 	}
 }
 
@@ -318,7 +314,7 @@ void mac_state::set_scc_waitrequest(int waitrequest)
 void mac_state::v8_resize()
 {
 	offs_t memory_size;
-	UINT8 *memory_data;
+	uint8_t *memory_data;
 	int is_rom;
 
 	is_rom = (m_overlay) ? 1 : 0;
@@ -329,14 +325,14 @@ void mac_state::v8_resize()
 		/* ROM mirror */
 		memory_size = memregion("bootrom")->bytes();
 		memory_data = memregion("bootrom")->base();
-		is_rom = TRUE;
+		is_rom = true;
 	}
 	else
 	{
 		/* RAM */
 		memory_size = m_ram->size();
 		memory_data = m_ram->pointer();
-		is_rom = FALSE;
+		is_rom = false;
 	}
 
 //    printf("mac_v8_resize: memory_size = %x, ctrl bits %02x (overlay %d = %s)\n", memory_size, m_rbv_regs[1] & 0xe0, m_overlay, is_rom ? "ROM" : "RAM");
@@ -351,16 +347,16 @@ void mac_state::v8_resize()
 	else
 	{
 		address_space& space = m_maincpu->space(AS_PROGRAM);
-		UINT32 onboard_amt, simm_amt, simm_size;
-		static const UINT32 simm_sizes[4] = { 0, 2*1024*1024, 4*1024*1024, 8*1024*1024 };
+		uint32_t onboard_amt, simm_amt, simm_size;
+		static const uint32_t simm_sizes[4] = { 0, 2*1024*1024, 4*1024*1024, 8*1024*1024 };
 
 		// re-install ROM in its normal place
-		size_t rom_mask = memregion("bootrom")->bytes() - 1;
-		m_maincpu->space(AS_PROGRAM).install_read_bank(0xa00000, 0xafffff, rom_mask, 0, "bankR");
+		size_t rom_mirror = 0xfffff ^ (memregion("bootrom")->bytes() - 1);
+		m_maincpu->space(AS_PROGRAM).install_read_bank(0xa00000, 0xafffff, rom_mirror, "bankR");
 		membank("bankR")->set_base((void *)memregion("bootrom")->base());
 
 		// force unmap of entire RAM region
-		space.unmap_write(0, 0x9fffff, 0x9fffff, 0);
+		space.unmap_write(0, 0x9fffff);
 
 		// LC and Classic II have 2 MB built-in, all other V8-style machines have 4 MB
 		// we reserve the first 2 or 4 MB of mess_ram for the onboard,
@@ -402,11 +398,11 @@ void mac_state::v8_resize()
 void mac_state::set_memory_overlay(int overlay)
 {
 	offs_t memory_size;
-	UINT8 *memory_data;
+	uint8_t *memory_data;
 	int is_rom;
 
 	/* normalize overlay */
-	overlay = overlay ? TRUE : FALSE;
+	overlay = overlay ? true : false;
 
 	if (overlay != m_overlay)
 	{
@@ -416,14 +412,14 @@ void mac_state::set_memory_overlay(int overlay)
 			/* ROM mirror */
 			memory_size = memregion("bootrom")->bytes();
 			memory_data = memregion("bootrom")->base();
-			is_rom = TRUE;
+			is_rom = true;
 		}
 		else
 		{
 			/* RAM */
 			memory_size = m_ram->size();
 			memory_data = m_ram->pointer();
-			is_rom = FALSE;
+			is_rom = false;
 		}
 
 		/* install the memory */
@@ -444,23 +440,23 @@ void mac_state::set_memory_overlay(int overlay)
 				mac_install_memory(0x00000000, memory_size-1, memory_size, memory_data, is_rom, "bank1");
 			}
 		}
-		else if ((m_model == MODEL_MAC_PORTABLE) || (m_model == MODEL_MAC_PB100) || (m_model == MODEL_MAC_IIVX) || (m_model == MODEL_MAC_IIFX))
+		else if ((m_model == MODEL_MAC_PORTABLE) || (m_model == MODEL_MAC_PB100) || (m_model == MODEL_MAC_IIFX))
 		{
 			address_space& space = m_maincpu->space(AS_PROGRAM);
-			space.unmap_write(0x000000, 0x9fffff, 0x9fffff, 0);
+			space.unmap_write(0x000000, 0x9fffff);
 			mac_install_memory(0x000000, memory_size-1, memory_size, memory_data, is_rom, "bank1");
 		}
 		else if ((m_model == MODEL_MAC_PB140) || (m_model == MODEL_MAC_PB160) || ((m_model >= MODEL_MAC_PBDUO_210) && (m_model <= MODEL_MAC_PBDUO_270c)))
 		{
 			address_space& space = m_maincpu->space(AS_PROGRAM);
-			space.unmap_write(0x000000, 0xffffff, 0xffffff, 0);
+			space.unmap_write(0x000000, 0xffffff);
 			mac_install_memory(0x000000, memory_size-1, memory_size, memory_data, is_rom, "bank1");
 		}
-		else if ((m_model >= MODEL_MAC_II) && (m_model <= MODEL_MAC_SE30))
+		else if ((m_model >= MODEL_MAC_II) && (m_model <= MODEL_MAC_SE30) && (m_model != MODEL_MAC_IIVX) && (m_model != MODEL_MAC_IIVI))
 		{
 			mac_install_memory(0x00000000, 0x3fffffff, memory_size, memory_data, is_rom, "bank1");
 		}
-		else if ((m_model == MODEL_MAC_LC_III) || (m_model == MODEL_MAC_LC_III_PLUS) || (m_model >= MODEL_MAC_LC_475 && m_model <= MODEL_MAC_LC_580))   // up to 36 MB
+		else if ((m_model == MODEL_MAC_IIVX) || (m_model == MODEL_MAC_IIVI) || (m_model == MODEL_MAC_LC_III) || (m_model == MODEL_MAC_LC_III_PLUS) || (m_model >= MODEL_MAC_LC_475 && m_model <= MODEL_MAC_LC_580))   // up to 36 MB
 		{
 			mac_install_memory(0x00000000, memory_size-1, memory_size, memory_data, is_rom, "bank1");
 
@@ -470,8 +466,8 @@ void mac_state::set_memory_overlay(int overlay)
 			}
 			else
 			{
-				size_t rom_mask = memregion("bootrom")->bytes() - 1;
-				m_maincpu->space(AS_PROGRAM).install_read_bank(0x40000000, 0x4fffffff, rom_mask, 0, "bankR");
+				size_t rom_mirror = 0xfffffff ^ (memregion("bootrom")->bytes() - 1);
+				m_maincpu->space(AS_PROGRAM).install_read_bank(0x40000000, 0x4fffffff & ~rom_mirror, rom_mirror, "bankR");
 				membank("bankR")->set_base((void *)memregion("bootrom")->base());
 			}
 		}
@@ -494,7 +490,7 @@ void mac_state::set_memory_overlay(int overlay)
 READ32_MEMBER(mac_state::rom_switch_r)
 {
 	offs_t ROM_size = memregion("bootrom")->bytes();
-	UINT32 *ROM_data = (UINT32 *)memregion("bootrom")->base();
+	uint32_t *ROM_data = (uint32_t *)memregion("bootrom")->base();
 
 	// disable the overlay
 	if (m_overlay)
@@ -502,7 +498,7 @@ READ32_MEMBER(mac_state::rom_switch_r)
 		set_memory_overlay(0);
 	}
 
-//  printf("rom_switch_r: offset %08x ROM_size -1 = %08x, masked = %08x\n", offset, ROM_size-1, offset & ((ROM_size - 1)>>2));
+	//printf("rom_switch_r: offset %08x ROM_size -1 = %08x, masked = %08x\n", offset, ROM_size-1, offset & ((ROM_size - 1)>>2));
 
 	return ROM_data[offset & ((ROM_size - 1)>>2)];
 }
@@ -542,7 +538,6 @@ int mac_state::scan_keyboard()
 	int i, j;
 	int keybuf = 0;
 	int keycode;
-	ioport_port *ports[7] = { m_key0, m_key1, m_key2, m_key3, m_key4, m_key5, m_key6 };
 
 	if (m_keycode_buf_index)
 	{
@@ -551,7 +546,7 @@ int mac_state::scan_keyboard()
 
 	for (i=0; i<7; i++)
 	{
-		keybuf = ports[i]->read();
+		keybuf = m_keys[i]->read();
 
 		if (keybuf != m_key_matrix[i])
 		{
@@ -648,8 +643,8 @@ void mac_state::keyboard_init()
 	int i;
 
 	/* init flag */
-	m_kbd_comm = FALSE;
-	m_kbd_receive = FALSE;
+	m_kbd_comm = false;
+	m_kbd_receive = false;
 	m_kbd_shift_reg=0;
 	m_kbd_shift_count=0;
 
@@ -686,34 +681,34 @@ TIMER_CALLBACK_MEMBER(mac_state::kbd_clock)
 {
 	int i;
 
-	if (m_kbd_comm == TRUE)
+	if (m_kbd_comm == true)
 	{
 		for (i=0; i<8; i++)
 		{
 			/* Put data on CB2 if we are sending*/
-			if (m_kbd_receive == FALSE)
+			if (m_kbd_receive == false)
 				m_via1->write_cb2(m_kbd_shift_reg&0x80?1:0);
 			m_kbd_shift_reg <<= 1;
 			m_via1->write_cb1(0);
 			m_via1->write_cb1(1);
 		}
-		if (m_kbd_receive == TRUE)
+		if (m_kbd_receive == true)
 		{
-			m_kbd_receive = FALSE;
+			m_kbd_receive = false;
 			/* Process the command received from mac */
 			keyboard_receive(m_kbd_shift_reg & 0xff);
 		}
 		else
 		{
 			/* Communication is over */
-			m_kbd_comm = FALSE;
+			m_kbd_comm = false;
 		}
 	}
 }
 
 void mac_state::kbd_shift_out(int data)
 {
-	if (m_kbd_comm == TRUE)
+	if (m_kbd_comm == true)
 	{
 		m_kbd_shift_reg = data;
 		machine().scheduler().timer_set(attotime::from_msec(1), timer_expired_delegate(FUNC(mac_state::kbd_clock),this));
@@ -722,14 +717,14 @@ void mac_state::kbd_shift_out(int data)
 
 WRITE_LINE_MEMBER(mac_state::mac_via_out_cb2)
 {
-	if (m_kbd_comm == FALSE && state == 0)
+	if (m_kbd_comm == false && state == 0)
 	{
 		/* Mac pulls CB2 down to initiate communication */
-		m_kbd_comm = TRUE;
-		m_kbd_receive = TRUE;
+		m_kbd_comm = true;
+		m_kbd_receive = true;
 		machine().scheduler().timer_set(attotime::from_usec(100), timer_expired_delegate(FUNC(mac_state::kbd_clock),this));
 	}
-	if (m_kbd_comm == TRUE && m_kbd_receive == TRUE)
+	if (m_kbd_comm == true && m_kbd_receive == true)
 	{
 		/* Shift in what mac is sending */
 		m_kbd_shift_reg = (m_kbd_shift_reg & ~1) | state;
@@ -1172,7 +1167,7 @@ void mac_state::scc_mouse_irq(int x, int y)
 READ16_MEMBER ( mac_state::mac_scc_r )
 {
 	scc8530_t *scc = space.machine().device<scc8530_t>("scc");
-	UINT16 result;
+	uint16_t result;
 
 	result = scc->reg_r(space, offset);
 	return (result << 8) | result;
@@ -1206,7 +1201,7 @@ READ16_MEMBER ( mac_state::mac_iwm_r )
 	 * this driver along
 	 */
 
-	UINT16 result = 0;
+	uint16_t result = 0;
 	applefdc_base_device *fdc = space.machine().device<applefdc_base_device>("fdc");
 
 	result = fdc->read(offset >> 8);
@@ -1243,10 +1238,15 @@ WRITE_LINE_MEMBER(mac_state::mac_adb_via_out_cb2)
 	}
 	else
 	{
+		m_adb_command <<= 1;
 		if (state)
+		{
 			m_adb_command |= 1;
+		}
 		else
+		{
 			m_adb_command &= ~1;
+		}
 	}
 }
 
@@ -1426,7 +1426,6 @@ READ8_MEMBER(mac_state::mac_via_in_b_pmu)
 
 WRITE8_MEMBER(mac_state::mac_via_out_a)
 {
-	mac_sound_device *sound = machine().device<mac_sound_device>("custom");
 	device_t *fdc = machine().device("fdc");
 //  printf("VIA1 OUT A: %02x (PC %x)\n", data, m_maincpu->safe_pc());
 
@@ -1440,12 +1439,13 @@ WRITE8_MEMBER(mac_state::mac_via_out_a)
 
 	if (m_model < MODEL_MAC_SE) // SE no longer has dual buffers
 	{
-		sound->set_sound_buffer((data & 0x08) >> 3);
+		m_main_buffer = ((data & 0x08) == 0x08) ? true : false;
 	}
 
 	if (m_model < MODEL_MAC_II)
 	{
-		sound->set_volume(data & 0x07);
+		m_snd_vol = data & 0x07;
+		update_volume();
 	}
 
 	/* Early Mac models had VIA A4 control overlaying.  In the Mac SE (and
@@ -1470,17 +1470,37 @@ WRITE8_MEMBER(mac_state::mac_via_out_a_pmu)
 
 WRITE8_MEMBER(mac_state::mac_via_out_b)
 {
-	mac_sound_device *sound = machine().device<mac_sound_device>("custom");
 //  printf("VIA1 OUT B: %02x (PC %x)\n", data, m_maincpu->safe_pc());
 
 	if (AUDIO_IS_CLASSIC)
 	{
-		sound->enable_sound((data & 0x80) == 0);
+		m_snd_enable = (data & 0x80) == 0;
+		update_volume();
 	}
 
 	m_rtc->ce_w((data & 0x04)>>2);
 	m_rtc->data_w(data & 0x01);
 	m_rtc->clk_w((data >> 1) & 0x01);
+}
+
+void mac_state::update_volume(void)
+{
+	if (AUDIO_IS_CLASSIC)
+	{
+		if (!m_snd_enable)
+		{
+			// ls161 clear input
+			m_dac->set_output_gain(ALL_OUTPUTS, 0);
+		}
+		else
+		{
+			// sound -> r13 (470k)
+			// sound -> r12 (470k) -> 4016 (pa0 != 0)
+			// sound -> r17 (150k) -> 4016 (pa1 != 0)
+			// sound -> r16 (68k)  -> 4016 (pa2 != 0)
+			m_dac->set_output_gain(ALL_OUTPUTS, 8.0 / (m_snd_vol + 1));
+		}
+	}
 }
 
 WRITE8_MEMBER(mac_state::mac_via_out_b_bbadb)
@@ -1613,7 +1633,7 @@ WRITE_LINE_MEMBER(mac_state::mac_via_irq)
 
 READ16_MEMBER ( mac_state::mac_via_r )
 {
-	UINT16 data;
+	uint16_t data;
 
 	offset >>= 8;
 	offset &= 0x0f;
@@ -1684,7 +1704,7 @@ WRITE16_MEMBER ( mac_state::mac_via2_w )
 
 READ8_MEMBER(mac_state::mac_via2_in_a)
 {
-	UINT8 result;
+	uint8_t result;
 
 	if ((m_model == MODEL_MAC_QUADRA_700) || (m_model == MODEL_MAC_QUADRA_900) || (m_model == MODEL_MAC_QUADRA_950))
 	{
@@ -1951,6 +1971,10 @@ void mac_state::machine_reset()
 		{
 			m_overlay_timeout->adjust(attotime::never);
 		}
+		else if ((m_model >= MODEL_MAC_IIVX) && (m_model <= MODEL_MAC_IIVI))
+		{
+			m_overlay_timeout->adjust(attotime::never);
+		}
 		else
 		{
 			m_overlay_timeout->adjust(m_maincpu->cycles_to_attotime(8));
@@ -1960,12 +1984,7 @@ void mac_state::machine_reset()
 	/* setup videoram */
 	this->m_screen_buffer = 1;
 
-	/* setup 'classic' sound */
-	if (machine().device("custom") != nullptr)
-	{
-		machine().device<mac_sound_device>("custom")->set_sound_buffer(0);
-	}
-	else if (MAC_HAS_VIA2)  // prime CB1 for ASC and slot interrupts
+	if (MAC_HAS_VIA2)  // prime CB1 for ASC and slot interrupts
 	{
 		m_via2_ca1_hack = 1;
 		m_via2->write_ca1(1);
@@ -1979,17 +1998,11 @@ void mac_state::machine_reset()
 
 	if ((m_model == MODEL_MAC_SE) || (m_model == MODEL_MAC_CLASSIC))
 	{
-		machine().device<mac_sound_device>("custom")->set_sound_buffer(1);
-
 		// classic will fail RAM test and try to boot appletalk if RAM is not all zero
 		memset(m_ram->pointer(), 0, m_ram->size());
 	}
 
 	m_scsi_interrupt = 0;
-	if ((m_maincpu->debug()) && (m_model < MODEL_MAC_POWERMAC_6100))
-	{
-		m_maincpu->debug()->set_dasm_override(mac_dasm_override);
-	}
 
 	m_drive_select = 0;
 	m_scsiirq_enable = 0;
@@ -2111,11 +2124,11 @@ void mac_state::mac_driver_init(model_t model)
 	if (model < MODEL_MAC_PORTABLE)
 	{
 		/* set up RAM mirror at 0x600000-0x6fffff (0x7fffff ???) */
-		mac_install_memory(0x600000, 0x6fffff, m_ram->size(), m_ram->pointer(), FALSE, "bank2");
+		mac_install_memory(0x600000, 0x6fffff, m_ram->size(), m_ram->pointer(), false, "bank2");
 
 		/* set up ROM at 0x400000-0x4fffff (-0x5fffff for mac 128k/512k/512ke) */
 		mac_install_memory(0x400000, (model >= MODEL_MAC_PLUS) ? 0x4fffff : 0x5fffff,
-			memregion("bootrom")->bytes(), memregion("bootrom")->base(), TRUE, "bank3");
+			memregion("bootrom")->bytes(), memregion("bootrom")->base(), true, "bank3");
 	}
 
 	m_overlay = -1;
@@ -2159,9 +2172,6 @@ DRIVER_INIT_MEMBER(mac_state,label)     \
 	mac_driver_init(model); \
 }
 
-MAC_DRIVER_INIT(mac128k512k, MODEL_MAC_128K512K)
-MAC_DRIVER_INIT(mac512ke, MODEL_MAC_512KE)
-MAC_DRIVER_INIT(macplus, MODEL_MAC_PLUS)
 MAC_DRIVER_INIT(macse, MODEL_MAC_SE)
 MAC_DRIVER_INIT(macclassic, MODEL_MAC_CLASSIC)
 MAC_DRIVER_INIT(maclc, MODEL_MAC_LC)
@@ -2190,10 +2200,10 @@ MAC_DRIVER_INIT(maciifdhd, MODEL_MAC_II_FDHD)
 MAC_DRIVER_INIT(maciix, MODEL_MAC_IIX)
 MAC_DRIVER_INIT(maclc520, MODEL_MAC_LC_520)
 
-void mac_state::nubus_slot_interrupt(UINT8 slot, UINT32 state)
+void mac_state::nubus_slot_interrupt(uint8_t slot, uint32_t state)
 {
-	static const UINT8 masks[8] = { 0x1, 0x2, 0x4, 0x8, 0x10, 0x20, 0x40, 0x80 };
-	UINT8 mask = 0x3f;
+	static const uint8_t masks[8] = { 0x1, 0x2, 0x4, 0x8, 0x10, 0x20, 0x40, 0x80 };
+	uint8_t mask = 0x3f;
 
 	// quadra 700/900/950 use the top 2 bits of the interrupt register for ethernet and video
 	if ((m_model == MODEL_MAC_QUADRA_700) || (m_model == MODEL_MAC_QUADRA_900) || (m_model == MODEL_MAC_QUADRA_950))
@@ -2249,7 +2259,7 @@ void mac_state::vblank_irq()
 
 #ifndef MAC_USE_EMULATED_KBD
 	/* handle keyboard */
-	if (m_kbd_comm == TRUE && m_kbd_receive == FALSE)
+	if (m_kbd_comm == true && m_kbd_receive == false)
 	{
 		int keycode = scan_keyboard();
 
@@ -2298,11 +2308,6 @@ void mac_state::vblank_irq()
 TIMER_CALLBACK_MEMBER(mac_state::mac_scanline_tick)
 {
 	int scanline;
-
-	if (machine().device("custom") != nullptr)
-	{
-		machine().device<mac_sound_device>("custom")->sh_updatebuffer();
-	}
 
 	if (m_rbv_vbltime > 0)
 	{
@@ -2365,11 +2370,11 @@ WRITE_LINE_MEMBER(mac_state::nubus_irq_e_w)
  * This is debug code that will output diagnostics regarding OS traps called
  * *************************************************************************/
 
-const char *lookup_trap(UINT16 opcode)
+const char *lookup_trap(uint16_t opcode)
 {
 	static const struct
 	{
-		UINT16 trap;
+		uint16_t trap;
 		const char *name;
 	} traps[] =
 	{
@@ -3185,9 +3190,9 @@ const char *lookup_trap(UINT16 opcode)
 
 
 
-static offs_t mac_dasm_override(device_t &device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, int options)
+offs_t mac_state::mac_dasm_override(device_t &device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
 {
-	UINT16 opcode;
+	uint16_t opcode;
 	unsigned result = 0;
 	const char *trap;
 
@@ -3195,9 +3200,9 @@ static offs_t mac_dasm_override(device_t &device, char *buffer, offs_t pc, const
 	if ((opcode & 0xF000) == 0xA000)
 	{
 		trap = lookup_trap(opcode);
-		if (trap)
+		if (trap != nullptr)
 		{
-			strcpy(buffer, trap);
+			stream << trap;
 			result = 2;
 		}
 	}
@@ -3267,9 +3272,9 @@ void mac_state::mac_tracetrap(const char *cpu_name_local, int addr, int trap)
 	switch(trap)
 	{
 	case 0xa004:    /* _Control */
-		ioVRefNum = *((INT16*) (mem + a0 + 22));
-		ioCRefNum = *((INT16*) (mem + a0 + 24));
-		csCode = *((UINT16*) (mem + a0 + 26));
+		ioVRefNum = *((int16_t*) (mem + a0 + 22));
+		ioCRefNum = *((int16_t*) (mem + a0 + 24));
+		csCode = *((uint16_t*) (mem + a0 + 26));
 		sprintf(s->state().state_int(" ioVRefNum=%i ioCRefNum=%i csCode=%i", ioVRefNum, ioCRefNum, csCode);
 
 		for (i = 0; i < ARRAY_LENGTH(cscodes); i++)
@@ -3284,18 +3289,18 @@ void mac_state::mac_tracetrap(const char *cpu_name_local, int addr, int trap)
 		break;
 
 	case 0xa002:    /* _Read */
-		ioCompletion = (*((INT16*) (mem + a0 + 12)) << 16) + *((INT16*) (mem + a0 + 14));
-		ioVRefNum = *((INT16*) (mem + a0 + 22));
-		ioRefNum = *((INT16*) (mem + a0 + 24));
-		ioBuffer = (*((INT16*) (mem + a0 + 32)) << 16) + *((INT16*) (mem + a0 + 34));
-		ioReqCount = (*((INT16*) (mem + a0 + 36)) << 16) + *((INT16*) (mem + a0 + 38));
-		ioPosOffset = (*((INT16*) (mem + a0 + 46)) << 16) + *((INT16*) (mem + a0 + 48));
+		ioCompletion = (*((int16_t*) (mem + a0 + 12)) << 16) + *((int16_t*) (mem + a0 + 14));
+		ioVRefNum = *((int16_t*) (mem + a0 + 22));
+		ioRefNum = *((int16_t*) (mem + a0 + 24));
+		ioBuffer = (*((int16_t*) (mem + a0 + 32)) << 16) + *((int16_t*) (mem + a0 + 34));
+		ioReqCount = (*((int16_t*) (mem + a0 + 36)) << 16) + *((int16_t*) (mem + a0 + 38));
+		ioPosOffset = (*((int16_t*) (mem + a0 + 46)) << 16) + *((int16_t*) (mem + a0 + 48));
 		sprintf(s, " ioCompletion=0x%08x ioVRefNum=%i ioRefNum=%i ioBuffer=0x%08x ioReqCount=%i ioPosOffset=%i",
 			ioCompletion, ioVRefNum, ioRefNum, ioBuffer, ioReqCount, ioPosOffset);
 		break;
 
 	case 0xa04e:    /* _AddDrive */
-		sprintf(s, " drvrRefNum=%i drvNum=%i qEl=0x%08x", (int) (INT16) d0, (int) (INT16) d1, a0);
+		sprintf(s, " drvrRefNum=%i drvNum=%i qEl=0x%08x", (int) (int16_t) d0, (int) (int16_t) d1, a0);
 		break;
 
 	case 0xa9a0:    /* _GetResource */
@@ -3303,11 +3308,11 @@ void mac_state::mac_tracetrap(const char *cpu_name_local, int addr, int trap)
 		 * since this is just trace code it isn't much of an issue
 		 */
 		sprintf(s, " type='%c%c%c%c' id=%i", (char) mem[a7+3], (char) mem[a7+2],
-			(char) mem[a7+5], (char) mem[a7+4], *((INT16*) (mem + a7)));
+			(char) mem[a7+5], (char) mem[a7+4], *((int16_t*) (mem + a7)));
 		break;
 
 	case 0xa815:    /* _SCSIDispatch */
-		i = *((UINT16*) (mem + a7));
+		i = *((uint16_t*) (mem + a7));
 		if (i < ARRAY_LENGTH(scsisels))
 			if (scsisels[i])
 				sprintf(s, " (%s)", scsisels[i]);

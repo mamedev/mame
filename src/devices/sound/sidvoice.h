@@ -1,111 +1,112 @@
 // license:BSD-3-Clause
 // copyright-holders:Peter Trauner
-#pragma once
+#ifndef MAME_SOUND_SIDVOICE_H
+#define MAME_SOUND_SIDVOICE_H
 
-#ifndef __SIDVOICE_H__
-#define __SIDVOICE_H__
+#pragma once
 
 
 /*
   approximation of the sid6581 chip
   this part is for 1 (of the 3) voices of a chip
 */
-#include "sound/mos6581.h"
-
-struct sw_storage
-{
-	UINT16 len;
-#if defined(DIRECT_FIXPOINT)
-	UINT32 stp;
-#else
-	UINT32 pnt;
-	INT16 stp;
-#endif
-};
-
 struct SID6581_t;
 
 struct sidOperator
 {
+	struct sw_storage
+	{
+		uint16_t len;
+#if defined(DIRECT_FIXPOINT)
+		uint32_t stp;
+#else
+		uint32_t pnt;
+		int16_t stp;
+#endif
+	};
+
 	SID6581_t *sid;
-	UINT8 reg[7];
-	UINT32 SIDfreq;
-	UINT16 SIDpulseWidth;
-	UINT8 SIDctrl;
-	UINT8 SIDAD, SIDSR;
+	uint8_t reg[7];
+	uint32_t SIDfreq;
+	uint16_t SIDpulseWidth;
+	uint8_t SIDctrl;
+	uint8_t SIDAD, SIDSR;
 
 	sidOperator* carrier;
 	sidOperator* modulator;
 	int sync;
 
-	UINT16 pulseIndex, newPulseIndex;
-	UINT16 curSIDfreq;
-	UINT16 curNoiseFreq;
+	uint16_t pulseIndex, newPulseIndex;
+	uint16_t curSIDfreq;
+	uint16_t curNoiseFreq;
 
-	UINT8 output;//, outputMask;
+	uint8_t output;//, outputMask;
 
 	char filtVoiceMask;
 	int filtEnabled;
 	float filtLow, filtRef;
-	INT8 filtIO;
+	int8_t filtIO;
 
-	INT32 cycleLenCount;
+	int32_t cycleLenCount;
 #if defined(DIRECT_FIXPOINT)
 	cpuLword cycleLen, cycleAddLen;
 #else
-	UINT32 cycleAddLenPnt;
-	UINT16 cycleLen, cycleLenPnt;
+	uint32_t cycleAddLenPnt;
+	uint16_t cycleLen, cycleLenPnt;
 #endif
 
-	INT8(*outProc)(sidOperator *);
-	void(*waveProc)(sidOperator *);
+	int8_t (*outProc)(sidOperator *);
+	void (*waveProc)(sidOperator *);
 
 #if defined(DIRECT_FIXPOINT)
 	cpuLword waveStep, waveStepAdd;
 #else
-	UINT16 waveStep, waveStepAdd;
-	UINT32 waveStepPnt, waveStepAddPnt;
+	uint16_t waveStep, waveStepAdd;
+	uint32_t waveStepPnt, waveStepAddPnt;
 #endif
-	UINT16 waveStepOld;
-	struct sw_storage wavePre[2];
+	uint16_t waveStepOld;
+	sw_storage wavePre[2];
 
 #if defined(DIRECT_FIXPOINT) && defined(LARGE_NOISE_TABLE)
 	cpuLword noiseReg;
 #elif defined(DIRECT_FIXPOINT)
 	cpuLBword noiseReg;
 #else
-	UINT32 noiseReg;
+	uint32_t noiseReg;
 #endif
-	UINT32 noiseStep, noiseStepAdd;
-	UINT8 noiseOutput;
+	uint32_t noiseStep, noiseStepAdd;
+	uint8_t noiseOutput;
 	int noiseIsLocked;
 
-	UINT8 ADSRctrl;
+	uint8_t ADSRctrl;
 //  int gateOnCtrl, gateOffCtrl;
-	UINT16 (*ADSRproc)(sidOperator *);
+	uint16_t (*ADSRproc)(sidOperator *);
 
 #ifdef SID_FPUENVE
 	float fenveStep, fenveStepAdd;
-	UINT32 enveStep;
+	uint32_t enveStep;
 #elif defined(DIRECT_FIXPOINT)
 	cpuLword enveStep, enveStepAdd;
 #else
-	UINT16 enveStep, enveStepAdd;
-	UINT32 enveStepPnt, enveStepAddPnt;
+	uint16_t enveStep, enveStepAdd;
+	uint32_t enveStepPnt, enveStepAddPnt;
 #endif
-	UINT8 enveVol, enveSusVol;
-	UINT16 enveShortAttackCount;
+	uint8_t enveVol, enveSusVol;
+	uint16_t enveShortAttackCount;
+
+	void clear();
+
+	void set();
+	void set2();
+	static int8_t wave_calc_normal(sidOperator *pVoice);
+
+private:
+	void wave_calc_cycle_len();
 };
 
-typedef INT8 (*ptr2sidFunc)(sidOperator *);
-typedef UINT16 (*ptr2sidUwordFunc)(sidOperator *);
+typedef int8_t (*ptr2sidFunc)(sidOperator *);
+typedef uint16_t (*ptr2sidUwordFunc)(sidOperator *);
 typedef void (*ptr2sidVoidFunc)(sidOperator *);
-
-void sidClearOperator( sidOperator* pVoice );
-
-void sidEmuSet(sidOperator* pVoice);
-void sidEmuSet2(sidOperator* pVoice);
-INT8 sidWaveCalcNormal(sidOperator* pVoice);
 
 void sidInitWaveformTables(int type);
 void sidInitMixerEngine(running_machine &machine);
@@ -117,4 +118,4 @@ extern ptr2sidVoidFunc sid8580ModeNormalTable[16];
 extern ptr2sidVoidFunc sid8580ModeRingTable[16];
 #endif
 
-#endif /* __SIDVOICE_H__ */
+#endif // MAME_SOUND_SIDVOICE_H

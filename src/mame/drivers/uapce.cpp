@@ -93,13 +93,17 @@ Alien Crush & Pac_Land: dumps made from PC-Engine dumps of JP versions
 */
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
+#include "machine/pcecommn.h"
+
 #include "cpu/h6280/h6280.h"
+#include "cpu/z80/z80.h"
 #include "video/huc6260.h"
 #include "video/huc6270.h"
 #include "sound/c6280.h"
-#include "machine/pcecommn.h"
 #include "sound/discrete.h"
+
+#include "screen.h"
+#include "speaker.h"
 
 
 class uapce_state : public pce_common_state
@@ -109,14 +113,13 @@ public:
 		: pce_common_state(mconfig, type, tag),
 		m_discrete(*this, "discrete") { }
 
-	UINT8 m_jamma_if_control_latch;
+	uint8_t m_jamma_if_control_latch;
 	DECLARE_WRITE8_MEMBER(jamma_if_control_latch_w);
 	DECLARE_READ8_MEMBER(jamma_if_control_latch_r);
 	DECLARE_READ8_MEMBER(jamma_if_read_dsw);
-	virtual UINT8 joy_read() override;
+	virtual uint8_t joy_read() override;
 	virtual void machine_reset() override;
 	required_device<discrete_device> m_discrete;
-	DECLARE_WRITE_LINE_MEMBER(pce_irq_changed);
 };
 
 #define UAPCE_SOUND_EN  NODE_10
@@ -131,7 +134,7 @@ DISCRETE_SOUND_END
 
 WRITE8_MEMBER(uapce_state::jamma_if_control_latch_w)
 {
-	UINT8 diff = data ^ m_jamma_if_control_latch;
+	uint8_t diff = data ^ m_jamma_if_control_latch;
 	m_jamma_if_control_latch = data;
 
 /*  D7 : Controls relay which connects the PCE R-AUDIO output to the common audio path.
@@ -179,7 +182,7 @@ READ8_MEMBER(uapce_state::jamma_if_control_latch_r)
 
 READ8_MEMBER(uapce_state::jamma_if_read_dsw)
 {
-	UINT8 dsw_val;
+	uint8_t dsw_val;
 
 	dsw_val = ioport("DSW" )->read();
 
@@ -219,7 +222,7 @@ READ8_MEMBER(uapce_state::jamma_if_read_dsw)
 	return dsw_val & 1;
 }
 
-UINT8 uapce_state::joy_read()
+uint8_t uapce_state::joy_read()
 {
 	if ( m_jamma_if_control_latch & 0x10 )
 	{
@@ -247,15 +250,7 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( uapce )
-	PORT_START( "JOY" )
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) /* button I */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) /* button II */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) /* select */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 ) /* run */
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PCE_STANDARD_INPUT_PORT_P1
 
 	PORT_START( "DSW" )
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) )
@@ -277,7 +272,7 @@ static INPUT_PORTS_START( uapce )
 	PORT_DIPSETTING(    0x30, "12 minute Timed Play" )
 	PORT_DIPSETTING(    0x38, "20 minute Timed Play" )
 	PORT_DIPNAME( 0x40, 0x40, "Buy-In Feature" )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
@@ -302,13 +297,8 @@ static ADDRESS_MAP_START( pce_io , AS_IO, 8, uapce_state )
 	AM_RANGE( 0x00, 0x03) AM_DEVREADWRITE( "huc6270", huc6270_device, read, write )
 ADDRESS_MAP_END
 
-WRITE_LINE_MEMBER(uapce_state::pce_irq_changed)
-{
-	m_maincpu->set_input_line(0, state);
-}
 
-
-static MACHINE_CONFIG_START( uapce, uapce_state )
+static MACHINE_CONFIG_START( uapce )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", H6280, PCE_MAIN_CLOCK/3)
 	MCFG_CPU_PROGRAM_MAP(pce_mem)
@@ -321,7 +311,7 @@ static MACHINE_CONFIG_START( uapce, uapce_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PCE_MAIN_CLOCK, HUC6260_WPF, 64, 64 + 1024 + 64, HUC6260_LPF, 18, 18 + 242)
+	MCFG_SCREEN_RAW_PARAMS(PCE_MAIN_CLOCK, huc6260_device::WPF, 64, 64 + 1024 + 64, huc6260_device::LPF, 18, 18 + 242)
 	MCFG_SCREEN_UPDATE_DRIVER( pce_common_state, screen_update )
 	MCFG_SCREEN_PALETTE("huc6260:palette")
 
@@ -332,7 +322,7 @@ static MACHINE_CONFIG_START( uapce, uapce_state )
 	MCFG_HUC6260_HSYNC_CHANGED_CB(DEVWRITELINE("huc6270", huc6270_device, hsync_changed))
 	MCFG_DEVICE_ADD( "huc6270", HUC6270, 0 )
 	MCFG_HUC6270_VRAM_SIZE(0x10000)
-	MCFG_HUC6270_IRQ_CHANGED_CB(WRITELINE(uapce_state, pce_irq_changed))
+	MCFG_HUC6270_IRQ_CHANGED_CB(INPUTLINE("maincpu", 0))
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker","rspeaker")
 	MCFG_SOUND_ADD("c6280", C6280, PCE_MAIN_CLOCK/6)
@@ -380,7 +370,7 @@ ROM_START(paclandp)
 	ROM_LOAD( "u1.bin", 0x0000, 0x800, CRC(f5e538a9) SHA1(19ac9525c9ad6bea1789cc9e63cdb7fe949867d9) )
 ROM_END
 
-GAME( 1989, blazlaz, 0, uapce, uapce, pce_common_state, pce_common, ROT0, "Hudson Soft", "Blazing Lazers", MACHINE_IMPERFECT_SOUND )
-GAME( 1989, keith,   0, uapce, uapce, pce_common_state, pce_common, ROT0, "Hudson Soft", "Keith Courage In Alpha Zones", MACHINE_IMPERFECT_SOUND )
-GAME( 1989, aliencr, 0, uapce, uapce, pce_common_state, pce_common, ROT0, "Hudson Soft", "Alien Crush", MACHINE_IMPERFECT_SOUND )
-GAME( 1989, paclandp,0, uapce, uapce, pce_common_state, pce_common, ROT0, "Namco", "Pac-Land (United Amusements PC Engine)", MACHINE_IMPERFECT_SOUND )
+GAME( 1989, blazlaz, 0, uapce, uapce, uapce_state, pce_common, ROT0, "Hudson Soft", "Blazing Lazers (United Amusements PC Engine)",                         MACHINE_IMPERFECT_SOUND )
+GAME( 1989, keith,   0, uapce, uapce, uapce_state, pce_common, ROT0, "Hudson Soft", "Keith Courage In Alpha Zones (United Amusements PC Engine)",           MACHINE_IMPERFECT_SOUND )
+GAME( 1989, aliencr, 0, uapce, uapce, uapce_state, pce_common, ROT0, "Hudson Soft", "Alien Crush (United Amusements PC Engine)",                            MACHINE_IMPERFECT_SOUND )
+GAME( 1989, paclandp,0, uapce, uapce, uapce_state, pce_common, ROT0, "Namco",       "Pac-Land (United Amusements PC Engine)",                               MACHINE_IMPERFECT_SOUND )

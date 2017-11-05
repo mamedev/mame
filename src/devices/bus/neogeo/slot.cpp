@@ -6,13 +6,14 @@
 
  ***********************************************************************************************************/
 
+#include "emu.h"
 #include "slot.h"
 
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type NEOGEO_CART_SLOT = &device_creator<neogeo_cart_slot_device>;
+DEFINE_DEVICE_TYPE(NEOGEO_CART_SLOT, neogeo_cart_slot_device, "neogeo_cart_slot", "Neo Geo Cartridge Slot")
 
 
 //-------------------------------------------------
@@ -39,13 +40,13 @@ device_neogeo_cart_interface::~device_neogeo_cart_interface()
 {
 }
 
-UINT32 device_neogeo_cart_interface::get_region_mask(UINT8* rgn, UINT32 rgn_size)
+uint32_t device_neogeo_cart_interface::get_region_mask(uint8_t* rgn, uint32_t rgn_size)
 {
 	// get mask based on the length rounded up to the nearest power of 2
-	UINT32 mask = 0xffffffff;
-	UINT32 len = rgn_size;
+	uint32_t mask = 0xffffffff;
+	uint32_t len = rgn_size;
 
-	for (UINT32 bit = 0x80000000; bit != 0; bit >>= 1)
+	for (uint32_t bit = 0x80000000; bit != 0; bit >>= 1)
 	{
 		if ((len * 2 - 1) & bit)
 			break;
@@ -56,14 +57,14 @@ UINT32 device_neogeo_cart_interface::get_region_mask(UINT8* rgn, UINT32 rgn_size
 	return mask;
 }
 
-void device_neogeo_cart_interface::optimize_sprites(UINT8* region_sprites, UINT32 region_sprites_size)
+void device_neogeo_cart_interface::optimize_sprites(uint8_t* region_sprites, uint32_t region_sprites_size)
 {
 	// convert the sprite graphics data into a format that allows faster blitting
-	UINT32 spritegfx_address_mask = get_region_mask(region_sprites, region_sprites_size);
-	UINT8 *src = region_sprites;
+	uint32_t spritegfx_address_mask = get_region_mask(region_sprites, region_sprites_size);
+	uint8_t *src = region_sprites;
 
 	m_sprites_opt.resize(spritegfx_address_mask + 1);
-	UINT8 *dest = &m_sprites_opt[0];
+	uint8_t *dest = &m_sprites_opt[0];
 
 	for (unsigned i = 0; i < region_sprites_size; i += 0x80, src += 0x80)
 	{
@@ -96,11 +97,11 @@ void device_neogeo_cart_interface::optimize_sprites(UINT8* region_sprites, UINT3
 //-------------------------------------------------
 //  neogeo_cart_slot_device - constructor
 //-------------------------------------------------
-neogeo_cart_slot_device::neogeo_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT16 clock) :
-						device_t(mconfig, NEOGEO_CART_SLOT, "Neo Geo Cartridge Slot", tag, owner, clock, "neogeo_cart_slot", __FILE__),
-						device_image_interface(mconfig, *this),
-						device_slot_interface(mconfig, *this),
-						m_cart(nullptr)
+neogeo_cart_slot_device::neogeo_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint16_t clock) :
+	device_t(mconfig, NEOGEO_CART_SLOT, tag, owner, clock),
+	device_image_interface(mconfig, *this),
+	device_slot_interface(mconfig, *this),
+	m_cart(nullptr)
 {
 }
 
@@ -120,18 +121,6 @@ neogeo_cart_slot_device::~neogeo_cart_slot_device()
 void neogeo_cart_slot_device::device_start()
 {
 	m_cart = dynamic_cast<device_neogeo_cart_interface *>(get_card_device());
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void neogeo_cart_slot_device::device_config_complete()
-{
-	// set brief and instance name
-	update_names();
 }
 
 
@@ -234,15 +223,15 @@ void neogeo_cart_slot_device::set_cart_type(const char *slot)
  -------------------------------------------------*/
 
 
-bool neogeo_cart_slot_device::call_load()
+image_init_result neogeo_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		if (software_entry() != nullptr)
+		if (loaded_through_softlist())
 		{
-			UINT16 *ROM16;
-			UINT8 *ROM8;
-			UINT32 len;
+			uint16_t *ROM16;
+			uint8_t *ROM8;
+			uint32_t len;
 
 			const char *pcb_name = get_feature("slot");
 			if (pcb_name)
@@ -302,7 +291,7 @@ bool neogeo_cart_slot_device::call_load()
 			}
 
 			m_cart->decrypt_all(
-				(UINT8*)m_cart->get_rom_base(), m_cart->get_rom_size(),
+				(uint8_t*)m_cart->get_rom_base(), m_cart->get_rom_size(),
 				m_cart->get_sprites_base(), m_cart->get_sprites_size(),
 				m_cart->get_fixed_base(), m_cart->get_fixed_size(),
 				m_cart->get_ym_base(), m_cart->get_ym_size(),
@@ -314,11 +303,11 @@ bool neogeo_cart_slot_device::call_load()
 			// a different format (we then always access such alt format for drawing)
 			m_cart->optimize_sprites(m_cart->get_sprites_base(), m_cart->get_sprites_size());
 
-			return IMAGE_INIT_PASS;
+			return image_init_result::PASS;
 		}
 	}
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 
@@ -331,21 +320,10 @@ void neogeo_cart_slot_device::call_unload()
 }
 
 /*-------------------------------------------------
- call softlist load
- -------------------------------------------------*/
-
-bool neogeo_cart_slot_device::call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry)
-{
-	machine().rom_load().load_software_part_region(*this, swlist, swname, start_entry );
-	return TRUE;
-}
-
-
-/*-------------------------------------------------
  get default card software
  -------------------------------------------------*/
 
-std::string neogeo_cart_slot_device::get_default_card_software()
+std::string neogeo_cart_slot_device::get_default_card_software(get_default_card_software_hook &hook) const
 {
 	return software_get_default_slot("rom");
 }

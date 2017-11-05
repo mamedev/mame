@@ -13,7 +13,7 @@ public:
 		m_watchdog(*this, "watchdog"),
 		m_gfxdecode(*this, "gfxdecode") { }
 
-	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<uint8_t> m_videoram;
 	tilemap_t *m_bg_tilemap;
 	DECLARE_WRITE8_MEMBER(ampoker2_port30_w);
 	DECLARE_WRITE8_MEMBER(ampoker2_port31_w);
@@ -31,7 +31,7 @@ public:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(ampoker2);
 	DECLARE_VIDEO_START(sigma2k);
-	UINT32 screen_update_ampoker2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_ampoker2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<watchdog_timer_device> m_watchdog;
 	required_device<gfxdecode_device> m_gfxdecode;

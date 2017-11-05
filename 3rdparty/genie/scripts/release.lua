@@ -29,17 +29,17 @@ function dorelease()
 
 	print("Updating embedded scripts...")
 
-	local z = exec("genie embed")
+	local z = exec(_PREMAKE_COMMAND .. " embed")
 	if z ~= true then
 		error("** Failed to update the embedded scripts", 0)
 	end
 
 
 	print("Generating project files...")
-	
-	exec("genie /to=../build/gmake.windows /os=windows gmake")
-	exec("genie /to=../build/gmake.linux /os=linux gmake")
-	exec("genie /to=../build/gmake.darwin /os=macosx /platform=universal32 gmake")
+
+	exec(_PREMAKE_COMMAND .. " /to=../build/gmake.windows /os=windows gmake")
+	exec(_PREMAKE_COMMAND .. " /to=../build/gmake.linux /os=linux gmake")
+	exec(_PREMAKE_COMMAND .. " /to=../build/gmake.darwin /os=macosx /platform=universal32 gmake")
 
 	print("")
 	print( "Finished.")

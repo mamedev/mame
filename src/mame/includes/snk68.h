@@ -1,7 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail, Acho A. Tang, Nicola Salmoria
+
+#include "machine/gen_latch.h"
 #include "sound/upd7759.h"
 #include "video/snk68_spr.h"
+#include "screen.h"
+
 class snk68_state : public driver_device
 {
 public:
@@ -12,9 +16,10 @@ public:
 		m_upd7759(*this, "upd"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
+		m_sprites(*this, "sprites"),
+		m_soundlatch(*this, "soundlatch"),
 		m_pow_fg_videoram(*this, "pow_fg_videoram"),
-		m_spriteram(*this, "spriteram"),
-		m_sprites(*this, "sprites")
+		m_spriteram(*this, "spriteram")
 		{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -22,19 +27,19 @@ public:
 	required_device<upd7759_device> m_upd7759;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
-
-	required_shared_ptr<UINT16> m_pow_fg_videoram;
-	required_shared_ptr<UINT16> m_spriteram;
-
 	required_device<snk68_spr_device> m_sprites;
+	required_device<generic_latch_8_device> m_soundlatch;
 
-	UINT8 m_invert_controls;
+	required_shared_ptr<uint16_t> m_pow_fg_videoram;
+	required_shared_ptr<uint16_t> m_spriteram;
+
+	uint8_t m_invert_controls;
 	bool m_sprite_flip_axis;
 	tilemap_t *m_fg_tilemap;
-	UINT32 m_fg_tile_offset;
+	uint32_t m_fg_tile_offset;
 
 	// common
-	DECLARE_WRITE16_MEMBER(sound_w);
+	DECLARE_WRITE8_MEMBER(sound_w);
 	DECLARE_WRITE8_MEMBER(D7759_write_port_0_w);
 	DECLARE_WRITE8_MEMBER(D7759_upd_reset_w);
 
@@ -61,7 +66,7 @@ public:
 	DECLARE_VIDEO_START(searchar);
 	void common_video_start();
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void tile_callback_pow(int &tile, int& fx, int& fy, int& region);
 	void tile_callback_notpow(int &tile, int& fx, int& fy, int& region);

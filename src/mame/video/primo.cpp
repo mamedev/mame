@@ -18,13 +18,13 @@
 void primo_state::primo_draw_scanline(bitmap_ind16 &bitmap, int primo_scanline)
 {
 	int x, i;
-	UINT8 data;
+	uint8_t data;
 
 	/* set up scanline */
-	UINT16 *scanline = &bitmap.pix16(primo_scanline);
+	uint16_t *scanline = &bitmap.pix16(primo_scanline);
 
 	/* address of current line in Primo video memory */
-	const UINT8* primo_video_ram_line = (const UINT8*)m_maincpu->space(AS_PROGRAM).get_read_ptr(m_video_memory_base + 32 * primo_scanline);
+	const uint8_t* primo_video_ram_line = (const uint8_t*)m_maincpu->space(AS_PROGRAM).get_read_ptr(m_video_memory_base + 32 * primo_scanline);
 
 	for (x=0; x<256; x+=8)
 	{
@@ -37,7 +37,7 @@ void primo_state::primo_draw_scanline(bitmap_ind16 &bitmap, int primo_scanline)
 }
 
 
-UINT32 primo_state::screen_update_primo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t primo_state::screen_update_primo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int primo_scanline;
 

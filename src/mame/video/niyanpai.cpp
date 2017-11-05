@@ -24,8 +24,8 @@ WRITE16_MEMBER(niyanpai_state::palette_w)
 {
 	int r, g, b;
 	int offs_h, offs_l;
-	UINT16 oldword = m_palette_ptr[offset];
-	UINT16 newword;
+	uint16_t oldword = m_palette_ptr[offset];
+	uint16_t newword;
 
 	COMBINE_DATA(&m_palette_ptr[offset]);
 	newword = m_palette_ptr[offset];
@@ -62,7 +62,7 @@ WRITE16_MEMBER(niyanpai_state::palette_w)
 int niyanpai_state::blitter_r(int vram, int offset)
 {
 	int ret;
-	UINT8 *GFXROM = memregion("gfx1")->base();
+	uint8_t *GFXROM = memregion("gfx1")->base();
 
 	switch (offset)
 	{
@@ -74,7 +74,7 @@ int niyanpai_state::blitter_r(int vram, int offset)
 	return ret;
 }
 
-void niyanpai_state::blitter_w(int vram, int offset, UINT8 data)
+void niyanpai_state::blitter_w(int vram, int offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -107,12 +107,12 @@ void niyanpai_state::blitter_w(int vram, int offset, UINT8 data)
 	}
 }
 
-void niyanpai_state::clutsel_w(int vram, UINT8 data)
+void niyanpai_state::clutsel_w(int vram, uint8_t data)
 {
 	m_clutsel[vram] = data;
 }
 
-void niyanpai_state::clut_w(int vram, int offset, UINT8 data)
+void niyanpai_state::clut_w(int vram, int offset, uint8_t data)
 {
 	m_clut[vram][((m_clutsel[vram] & 0xff) * 0x10) + (offset & 0x0f)] = data;
 }
@@ -124,7 +124,7 @@ void niyanpai_state::clut_w(int vram, int offset, UINT8 data)
 void niyanpai_state::vramflip(int vram)
 {
 	int x, y;
-	UINT16 color1, color2;
+	uint16_t color1, color2;
 	int width = m_screen->width();
 	int height = m_screen->height();
 
@@ -158,7 +158,7 @@ void niyanpai_state::vramflip(int vram)
 
 void niyanpai_state::update_pixel(int vram, int x, int y)
 {
-	UINT16 color = m_videoram[vram][(y * m_screen->width()) + x];
+	uint16_t color = m_videoram[vram][(y * m_screen->width()) + x];
 	m_tmpbitmap[vram].pix16(y, x) = color;
 }
 
@@ -170,13 +170,13 @@ void niyanpai_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		m_nb19010_busyflag = 1;
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in niyanpai_state::device_timer");
+		assert_always(false, "Unknown id in niyanpai_state::device_timer");
 	}
 }
 
 void niyanpai_state::gfxdraw(int vram)
 {
-	UINT8 *GFX = memregion("gfx1")->base();
+	uint8_t *GFX = memregion("gfx1")->base();
 	int width = m_screen->width();
 
 	int x, y;
@@ -185,7 +185,7 @@ void niyanpai_state::gfxdraw(int vram)
 	int sizex, sizey;
 	int skipx, skipy;
 	int ctrx, ctry;
-	UINT16 color, color1, color2;
+	uint16_t color, color1, color2;
 	int gfxaddr, gfxlen;
 
 	m_nb19010_busyctr = 0;
@@ -361,16 +361,16 @@ void niyanpai_state::video_start()
 	m_screen->register_screen_bitmap(m_tmpbitmap[0]);
 	m_screen->register_screen_bitmap(m_tmpbitmap[1]);
 	m_screen->register_screen_bitmap(m_tmpbitmap[2]);
-	m_videoram[0] = make_unique_clear<UINT16[]>(width * height);
-	m_videoram[1] = make_unique_clear<UINT16[]>(width * height);
-	m_videoram[2] = make_unique_clear<UINT16[]>(width * height);
-	m_videoworkram[0] = make_unique_clear<UINT16[]>(width * height);
-	m_videoworkram[1] = make_unique_clear<UINT16[]>(width * height);
-	m_videoworkram[2] = make_unique_clear<UINT16[]>(width * height);
-	m_palette_ptr = std::make_unique<UINT16[]>(0x480);
-	m_clut[0] = std::make_unique<UINT8[]>(0x1000);
-	m_clut[1] = std::make_unique<UINT8[]>(0x1000);
-	m_clut[2] = std::make_unique<UINT8[]>(0x1000);
+	m_videoram[0] = make_unique_clear<uint16_t[]>(width * height);
+	m_videoram[1] = make_unique_clear<uint16_t[]>(width * height);
+	m_videoram[2] = make_unique_clear<uint16_t[]>(width * height);
+	m_videoworkram[0] = make_unique_clear<uint16_t[]>(width * height);
+	m_videoworkram[1] = make_unique_clear<uint16_t[]>(width * height);
+	m_videoworkram[2] = make_unique_clear<uint16_t[]>(width * height);
+	m_palette_ptr = std::make_unique<uint16_t[]>(0x480);
+	m_clut[0] = std::make_unique<uint8_t[]>(0x1000);
+	m_clut[1] = std::make_unique<uint8_t[]>(0x1000);
+	m_clut[2] = std::make_unique<uint8_t[]>(0x1000);
 	m_nb19010_busyflag = 1;
 	m_blitter_timer = timer_alloc(TIMER_BLITTER);
 
@@ -411,7 +411,7 @@ void niyanpai_state::video_start()
 
 
 ******************************************************************************/
-UINT32 niyanpai_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t niyanpai_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int i;
 	int x, y;

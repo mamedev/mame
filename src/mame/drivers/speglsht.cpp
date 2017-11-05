@@ -1,4 +1,4 @@
-// license:LGPL-2.1+
+// license:BSD-3-Clause
 // copyright-holders:Tomasz Slanina
 /*
 Super Eagle Shot
@@ -123,11 +123,11 @@ public:
 			m_subcpu(*this, "sub")
 			{ }
 
-	required_shared_ptr<UINT8> m_shared;
-	required_shared_ptr<UINT32> m_framebuffer;
-	UINT32 m_videoreg;
+	required_shared_ptr<uint8_t> m_shared;
+	required_shared_ptr<uint32_t> m_framebuffer;
+	uint32_t m_videoreg;
 	std::unique_ptr<bitmap_ind16> m_bitmap;
-	required_shared_ptr<UINT32> m_cop_ram;
+	required_shared_ptr<uint32_t> m_cop_ram;
 	DECLARE_READ32_MEMBER(shared_r);
 	DECLARE_WRITE32_MEMBER(shared_w);
 	DECLARE_WRITE32_MEMBER(videoreg_w);
@@ -138,7 +138,7 @@ public:
 	DECLARE_MACHINE_RESET(speglsht);
 	virtual void machine_start() override;
 	DECLARE_VIDEO_START(speglsht);
-	UINT32 screen_update_speglsht(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_speglsht(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<palette_device> m_palette;
 	required_device<st0016_cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
@@ -213,12 +213,12 @@ WRITE32_MEMBER(speglsht_state::cop_w)
 //matrix * vector
 READ32_MEMBER(speglsht_state::cop_r)
 {
-	INT32 *cop=(INT32*)&m_cop_ram[0];
+	int32_t *cop=(int32_t*)&m_cop_ram[0];
 
 	union
 	{
-		INT32  a;
-		UINT32 b;
+		int32_t  a;
+		uint32_t b;
 	}temp;
 
 	switch (offset)
@@ -262,10 +262,9 @@ static ADDRESS_MAP_START( speglsht_mem, AS_PROGRAM, 32, speglsht_state )
 	AM_RANGE(0x01b00000, 0x01b07fff) AM_RAM //cleared ...  video related ?
 	AM_RANGE(0x01c00000, 0x01dfffff) AM_ROM AM_REGION("user2", 0)
 	AM_RANGE(0x0a000000, 0x0a003fff) AM_READWRITE(shared_r, shared_w)
+	AM_RANGE(0x0fc00000, 0x0fdfffff) AM_ROM AM_MIRROR(0x10000000) AM_REGION("user1", 0)
 	AM_RANGE(0x1eff0000, 0x1eff001f) AM_RAM
 	AM_RANGE(0x1eff003c, 0x1eff003f) AM_READ(irq_ack_clear)
-	AM_RANGE(0x1fc00000, 0x1fdfffff) AM_ROM AM_REGION("user1", 0)
-	AM_RANGE(0x2fc00000, 0x2fdfffff) AM_ROM AM_REGION("user1", 0) // mirror for interrupts
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( speglsht )
@@ -360,7 +359,7 @@ VIDEO_START_MEMBER(speglsht_state,speglsht)
 		bitmap.pix32(y, x) = (b) | ((g)<<8) | ((r)<<16); \
 }
 
-UINT32 speglsht_state::screen_update_speglsht(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t speglsht_state::screen_update_speglsht(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int x,y,dy;
 
@@ -382,7 +381,7 @@ UINT32 speglsht_state::screen_update_speglsht(screen_device &screen, bitmap_rgb3
 	//copy temporary bitmap to rgb 32 bit bitmap
 	for(y=cliprect.min_y; y<cliprect.max_y;y++)
 	{
-		UINT16 *srcline = &m_bitmap->pix16(y);
+		uint16_t *srcline = &m_bitmap->pix16(y);
 		for(x=cliprect.min_x; x<cliprect.max_x;x++)
 		{
 			if(srcline[x])
@@ -396,7 +395,7 @@ UINT32 speglsht_state::screen_update_speglsht(screen_device &screen, bitmap_rgb3
 	return 0;
 }
 
-static MACHINE_CONFIG_START( speglsht, speglsht_state )
+static MACHINE_CONFIG_START( speglsht )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",ST0016_CPU, 8000000) /* 8 MHz ? */
 	MCFG_CPU_PROGRAM_MAP(st0016_mem)

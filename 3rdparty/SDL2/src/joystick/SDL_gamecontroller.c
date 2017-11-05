@@ -45,7 +45,8 @@ struct _SDL_HatMapping
     Uint8 mask;
 };
 
-#define k_nMaxReverseEntries 20
+/* We need 36 entries for Android (as of SDL v2.0.4) */
+#define k_nMaxReverseEntries 48
 
 /**
  * We are encoding the "HAT" as 0xhm. where h == hat ID and m == mask
@@ -106,6 +107,35 @@ int SDL_PrivateGameControllerAxis(SDL_GameController * gamecontroller, SDL_GameC
 int SDL_PrivateGameControllerButton(SDL_GameController * gamecontroller, SDL_GameControllerButton button, Uint8 state);
 
 /*
+ * If there is an existing add event in the queue, it needs to be modified
+ * to have the right value for which, because the number of controllers in
+ * the system is now one less.
+ */
+static void UpdateEventsForDeviceRemoval()
+{
+    int i, num_events;
+    SDL_Event *events;
+
+    num_events = SDL_PeepEvents(NULL, 0, SDL_PEEKEVENT, SDL_CONTROLLERDEVICEADDED, SDL_CONTROLLERDEVICEADDED);
+    if (num_events <= 0) {
+        return;
+    }
+
+    events = SDL_stack_alloc(SDL_Event, num_events);
+    if (!events) {
+        return;
+    }
+
+    num_events = SDL_PeepEvents(events, num_events, SDL_GETEVENT, SDL_CONTROLLERDEVICEADDED, SDL_CONTROLLERDEVICEADDED);
+    for (i = 0; i < num_events; ++i) {
+        --events[i].cdevice.which;
+    }
+    SDL_PeepEvents(events, num_events, SDL_ADDEVENT, 0, 0);
+
+    SDL_stack_free(events);
+}
+
+/*
  * Event filter to fire controller events from joystick ones
  */
 int SDL_GameControllerEventWatcher(void *userdata, SDL_Event * event)
@@ -115,7 +145,11 @@ int SDL_GameControllerEventWatcher(void *userdata, SDL_Event * event)
         {
             SDL_GameController *controllerlist;
 
-            if (event->jaxis.axis >= k_nMaxReverseEntries) break;
+            if (event->jaxis.axis >= k_nMaxReverseEntries)
+            {
+                SDL_SetError("SDL_GameControllerEventWatcher: Axis index %d too large, ignoring motion", (int)event->jaxis.axis);
+                break;
+            }
 
             controllerlist = SDL_gamecontrollers;
             while (controllerlist) {
@@ -126,8 +160,8 @@ int SDL_GameControllerEventWatcher(void *userdata, SDL_Event * event)
                         switch (axis) {
                             case SDL_CONTROLLER_AXIS_TRIGGERLEFT:
                             case SDL_CONTROLLER_AXIS_TRIGGERRIGHT:
-                                /* Shift it to be 0 - 32767. */
                                 value = value / 2 + 16384;
+                                break;
                             default:
                                 break;
                         }
@@ -146,7 +180,11 @@ int SDL_GameControllerEventWatcher(void *userdata, SDL_Event * event)
         {
             SDL_GameController *controllerlist;
 
-            if (event->jbutton.button >= k_nMaxReverseEntries) break;
+            if (event->jbutton.button >= k_nMaxReverseEntries)
+            {
+                SDL_SetError("SDL_GameControllerEventWatcher: Button index %d too large, ignoring update", (int)event->jbutton.button);
+                break;
+            }
 
             controllerlist = SDL_gamecontrollers;
             while (controllerlist) {
@@ -223,9 +261,12 @@ int SDL_GameControllerEventWatcher(void *userdata, SDL_Event * event)
             while (controllerlist) {
                 if (controllerlist->joystick->instance_id == event->jdevice.which) {
                     SDL_Event deviceevent;
+
                     deviceevent.type = SDL_CONTROLLERDEVICEREMOVED;
                     deviceevent.cdevice.which = event->jdevice.which;
                     SDL_PushEvent(&deviceevent);
+
+                    UpdateEventsForDeviceRemoval();
                     break;
                 }
                 controllerlist = controllerlist->next;
@@ -861,7 +902,6 @@ SDL_GameControllerInit(void)
 {
     int i = 0;
     const char *pMappingString = NULL;
-    s_pSupportedControllers = NULL;
     pMappingString = s_ControllerMappings[i];
     while (pMappingString) {
         SDL_GameControllerAddMapping(pMappingString);
@@ -971,6 +1011,20 @@ SDL_GameControllerOpen(int device_index)
 
     SDL_PrivateLoadButtonMapping(&gamecontroller->mapping, pSupportedController->guid, pSupportedController->name, pSupportedController->mapping);
 
+    /* The triggers are mapped from -32768 to 32767, where -32768 is the 'unpressed' value */
+    {
+        int leftTriggerMapping = gamecontroller->mapping.axes[SDL_CONTROLLER_AXIS_TRIGGERLEFT];
+        int rightTriggerMapping = gamecontroller->mapping.axes[SDL_CONTROLLER_AXIS_TRIGGERRIGHT];
+        if (leftTriggerMapping >= 0) {
+            gamecontroller->joystick->axes[leftTriggerMapping] =
+            gamecontroller->joystick->axes_zero[leftTriggerMapping] = (Sint16)-32768;
+        }
+        if (rightTriggerMapping >= 0) {
+            gamecontroller->joystick->axes[rightTriggerMapping] =
+            gamecontroller->joystick->axes_zero[rightTriggerMapping] = (Sint16)-32768;
+        }
+    }
+
     /* Add joystick to list */
     ++gamecontroller->ref_count;
     /* Link the joystick in the list */
@@ -1007,7 +1061,7 @@ SDL_GameControllerGetAxis(SDL_GameController * gamecontroller, SDL_GameControlle
         switch (axis) {
             case SDL_CONTROLLER_AXIS_TRIGGERLEFT:
             case SDL_CONTROLLER_AXIS_TRIGGERRIGHT:
-                /* Shift it to be 0 - 32767. */
+                /* Shift it to be 0 - 32767 */
                 value = value / 2 + 16384;
             default:
                 break;

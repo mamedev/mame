@@ -47,6 +47,8 @@ Notes:
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
+#include "screen.h"
+#include "speaker.h"
 
 #define MASTER_CLOCK    XTAL_16MHz
 
@@ -69,9 +71,9 @@ public:
 	optional_device<okim6295_device> m_oki2;
 	required_device<okim6295_device> m_oki1;
 	/* memory pointers */
-	required_shared_ptr<UINT16> m_spriteram_1;
-	required_shared_ptr<UINT16> m_spriteram_2;
-	required_shared_ptr<UINT16> m_bgram;
+	required_shared_ptr<uint16_t> m_spriteram_1;
+	required_shared_ptr<uint16_t> m_spriteram_2;
+	required_shared_ptr<uint16_t> m_bgram;
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
@@ -85,7 +87,7 @@ public:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_k3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_k3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -106,15 +108,15 @@ TILE_GET_INFO_MEMBER(k3_state::get_k3_bg_tile_info)
 
 void k3_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(k3_state::get_k3_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(k3_state::get_k3_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 }
 
 void k3_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	gfx_element *gfx = m_gfxdecode->gfx(0);
-	UINT16 *source = m_spriteram_1;
-	UINT16 *source2 = m_spriteram_2;
-	UINT16 *finish = source + 0x1000 / 2;
+	uint16_t *source = m_spriteram_1;
+	uint16_t *source2 = m_spriteram_2;
+	uint16_t *finish = source + 0x1000 / 2;
 
 	while (source < finish)
 	{
@@ -134,7 +136,7 @@ void k3_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 	}
 }
 
-UINT32 k3_state::screen_update_k3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t k3_state::screen_update_k3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	draw_sprites(bitmap, cliprect);
@@ -154,8 +156,8 @@ WRITE16_MEMBER(k3_state::k3_scrolly_w)
 
 WRITE16_MEMBER(k3_state::k3_soundbanks_w)
 {
-	m_oki2->set_bank_base((data & 4) ? 0x40000 : 0);
-	m_oki1->set_bank_base((data & 2) ? 0x40000 : 0);
+	m_oki2->set_rom_bank((data & 4) >> 2);
+	m_oki1->set_rom_bank((data & 2) >> 1);
 }
 
 WRITE16_MEMBER(k3_state::flagrall_soundbanks_w)
@@ -176,7 +178,7 @@ WRITE16_MEMBER(k3_state::flagrall_soundbanks_w)
 	if (data & 0xfcc9)
 		popmessage("unk control %04x", data & 0xfcc9);
 
-	m_oki1->set_bank_base(0x40000 * ((data & 0x6)>>1) );
+	m_oki1->set_rom_bank((data & 0x6) >> 1);
 
 }
 
@@ -295,7 +297,7 @@ static INPUT_PORTS_START( flagrall )
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_START1 ) // needed to use the continue feature even if it's not used to start the game
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -365,7 +367,7 @@ void k3_state::machine_start()
 {
 }
 
-static MACHINE_CONFIG_START( flagrall, k3_state )
+static MACHINE_CONFIG_START( flagrall )
 
 	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK ) // ?
 	MCFG_CPU_PROGRAM_MAP(flagrall_map)
@@ -386,7 +388,7 @@ static MACHINE_CONFIG_START( flagrall, k3_state )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki1", MASTER_CLOCK/16, OKIM6295_PIN7_HIGH)  /* dividers? */
+	MCFG_OKIM6295_ADD("oki1", MASTER_CLOCK/16, PIN7_HIGH)  /* dividers? */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -396,7 +398,7 @@ static MACHINE_CONFIG_DERIVED( k3, flagrall )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(k3_map)
 
-	MCFG_OKIM6295_ADD("oki2", MASTER_CLOCK/16, OKIM6295_PIN7_HIGH) /* dividers? */
+	MCFG_OKIM6295_ADD("oki2", MASTER_CLOCK/16, PIN7_HIGH) /* dividers? */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_SCREEN_MODIFY("screen")
@@ -424,6 +426,35 @@ ROM_START( 1945kiii )
 	ROM_LOAD( "m16m-3.u61", 0x00000, 0x200000, CRC(32fc80dd) SHA1(bee32493a250e9f21997114bba26b9535b1b636c) )
 ROM_END
 
+ROM_START( 1945kiiin )
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
+	ROM_LOAD16_BYTE( "U34", 0x00001, 0x80000, CRC(d0cf4f03) SHA1(3455927221afae5103c02b12c1b855f416c47e91) ) /* 27C040 ROM had no label */
+	ROM_LOAD16_BYTE( "U35", 0x00000, 0x80000, CRC(056c64ed) SHA1(b0eddad9c950676b94316d3aeb32f3ed4b9ade0f) ) /* 27C040 ROM had no label */
+
+	ROM_REGION( 0x080000, "oki2", 0 ) /* Samples */
+	ROM_LOAD( "snd-2.su4", 0x00000, 0x80000, CRC(47e3952e) SHA1(d56524621a3f11981e4434e02f5fdb7e89fff0b4) ) /* ROM had no label, but same data as SND-2.SU4 */
+
+	ROM_REGION( 0x080000, "oki1", 0 ) /* Samples */
+	ROM_LOAD( "snd-1.su7", 0x00000, 0x80000, CRC(bbb7f0ff) SHA1(458cf3a0c2d42110bc2427db675226c6b8d30999) ) /* ROM had no label, but same data as SND-1.SU7 */
+
+	ROM_REGION( 0x400000, "gfx1", 0 ) // sprites
+	ROM_LOAD32_BYTE( "U5",  0x000000, 0x080000, CRC(f328f85e) SHA1(fe1e1b86a77a9b6da0f69b20da64e69b874d8ef9) ) /* These 4 27C040 ROMs had no label */
+	ROM_LOAD32_BYTE( "U6",  0x000001, 0x080000, CRC(cfdabf1b) SHA1(9822def10e5213d1b5c86034637481b5349bfb70) )
+	ROM_LOAD32_BYTE( "U7",  0x000002, 0x080000, CRC(59a6a944) SHA1(20a109edddd8ab9530b94b3b2d2f8a85af2c08f8) )
+	ROM_LOAD32_BYTE( "U8",  0x000003, 0x080000, CRC(59995aaf) SHA1(29c2c638b0dd2bf1e79707ea6f5b38b37f45b822) )
+
+	ROM_LOAD32_BYTE( "U58", 0x200000, 0x080000, CRC(6acf2ce4) SHA1(4b18678a9e03beb24494270d19c57bca32a72592) ) /* These 4 27C040  ROMs had no label */
+	ROM_LOAD32_BYTE( "U59", 0x200001, 0x080000, CRC(ca6ff210) SHA1(d7e476bb41c193654495f5ed6ba39980cb3660bc) )
+	ROM_LOAD32_BYTE( "U60", 0x200002, 0x080000, CRC(91eb038a) SHA1(b24082ba1675e87881a321ba87e079a1a027dfa4) )
+	ROM_LOAD32_BYTE( "U61", 0x200003, 0x080000, CRC(1b358c6d) SHA1(1abe6422b420fd064a32ed9ca9a28c85996d4e57) )
+
+	ROM_REGION( 0x200000, "gfx2", 0 )
+	ROM_LOAD32_BYTE( "5.U102", 0x000000, 0x80000, CRC(91b70a6b) SHA1(e53f62212d6e3ab5f892944b1933385a85e0ba8a) ) /* These 4 ROMs had no label */
+	ROM_LOAD32_BYTE( "6.U103", 0x000001, 0x80000, CRC(7b5bfb85) SHA1(ef59d64513c7f7e6ee3dcc9bb7bb0e14a71ca957) ) /* Same data as M16M-3.U61, just split up */
+	ROM_LOAD32_BYTE( "7.U104", 0x000002, 0x80000, CRC(cdafcedf) SHA1(82becd002a16185220131085db6576eb763429c8) )
+	ROM_LOAD32_BYTE( "8.U105", 0x000003, 0x80000, CRC(2c3895d5) SHA1(ab5837d996c1bb70071db02f07412c182d7547f8) )
+ROM_END
+
 ROM_START( 1945kiiio )
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "3.U34", 0x00001, 0x80000, CRC(5515baa0) SHA1(6fd4c9b7cc27035d6baaafa73f5f5930bfde62a4) )
@@ -435,7 +466,7 @@ ROM_START( 1945kiiio )
 	ROM_REGION( 0x080000, "oki1", 0 ) /* Samples */
 	ROM_LOAD( "S13.SU4", 0x00000, 0x80000, CRC(d45aec3b) SHA1(fc182a10e19687eb2f2f4a1d2ad976814185f0fc))
 
-	ROM_REGION( 0x400000, "gfx1", 0 )
+	ROM_REGION( 0x400000, "gfx1", 0 ) // sprites
 	ROM_LOAD32_BYTE( "9.U5",   0x000000, 0x080000, CRC(be0f432e) SHA1(7d63f97a8cb38c5351f2cd2f720de16a0c4ab1d7) )
 	ROM_LOAD32_BYTE( "10.U6",  0x000001, 0x080000, CRC(cf9127b2) SHA1(e02f436662f47d8bb5a9d726889c6e86cf64bdcf) )
 	ROM_LOAD32_BYTE( "11.U7",  0x000002, 0x080000, CRC(644ee8cc) SHA1(1742e31ba48a93c005cce0dc575d9b5d739d1dce) )
@@ -446,8 +477,8 @@ ROM_START( 1945kiiio )
 	ROM_LOAD32_BYTE( "15.U60", 0x200002, 0x080000, CRC(86ab6c7c) SHA1(59acaee6ba78a22f1423832a116ad41e19522aa1) )
 	ROM_LOAD32_BYTE( "16.U61", 0x200003, 0x080000, CRC(ff419080) SHA1(542819bdd60976bddfa96570321ba3f7fb6fbf23) )
 
-	ROM_REGION( 0x200000, "gfx2", 0 )
-	ROM_LOAD32_BYTE( "5.U102", 0x000000, 0x80000, CRC(91b70a6b) SHA1(e53f62212d6e3ab5f892944b1933385a85e0ba8a) )
+	ROM_REGION( 0x200000, "gfx2", 0 ) // bg tiles
+	ROM_LOAD32_BYTE( "5.U102", 0x000000, 0x80000, CRC(91b70a6b) SHA1(e53f62212d6e3ab5f892944b1933385a85e0ba8a) ) /* Same data as M16M-3.U61, just split up */
 	ROM_LOAD32_BYTE( "6.U103", 0x000001, 0x80000, CRC(7b5bfb85) SHA1(ef59d64513c7f7e6ee3dcc9bb7bb0e14a71ca957) )
 	ROM_LOAD32_BYTE( "7.U104", 0x000002, 0x80000, CRC(cdafcedf) SHA1(82becd002a16185220131085db6576eb763429c8) )
 	ROM_LOAD32_BYTE( "8.U105", 0x000003, 0x80000, CRC(2c3895d5) SHA1(ab5837d996c1bb70071db02f07412c182d7547f8) )
@@ -464,7 +495,7 @@ ROM_START( flagrall )
 	ROM_LOAD( "13_su4.bin", 0x00000, 0x80000, CRC(7b0630b3) SHA1(c615e6630ffd12c122762751c25c249393bf7abd) )
 	ROM_LOAD( "14_su6.bin", 0x80000, 0x40000, CRC(593b038f) SHA1(b00dcf321fe541ee52c34b79e69c44f3d7a9cd7c) )
 
-	ROM_REGION( 0x300000, "gfx1", 0 )
+	ROM_REGION( 0x300000, "gfx1", 0 ) // sprites
 	ROM_LOAD32_BYTE( "1_u5.bin",  0x000000, 0x080000, CRC(9377704b) SHA1(ac516a8ba6d1a70086469504c2a46d47a1f4560b) )
 	ROM_LOAD32_BYTE( "5_u6.bin",  0x000001, 0x080000, CRC(1ac0bd0c) SHA1(ab71bb84e61f5c7168601695f332a8d4a30d9948) )
 	ROM_LOAD32_BYTE( "2_u7.bin",  0x000002, 0x080000, CRC(5f6db2b3) SHA1(84caa019d3b75be30a14d19ccc2f28e5e94028bd) )
@@ -475,13 +506,14 @@ ROM_START( flagrall )
 	ROM_LOAD32_BYTE( "7_u60.bin", 0x200002, 0x040000, CRC(f187a7bf) SHA1(f4ce9ac9fe376250fe426de6ee404fc7841ef08a) )
 	ROM_LOAD32_BYTE( "8_u61.bin", 0x200003, 0x040000, CRC(b73fa441) SHA1(a5a3533563070c870276ead5e2f9cb9aaba303cc))
 
-	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_REGION( 0x100000, "gfx2", 0 ) // bg tiles
 	ROM_LOAD( "10_u102.bin", 0x00000, 0x80000, CRC(b1fd3279) SHA1(4a75581e13d43bef441ce81eae518c2f6bc1d5f8) )
 	ROM_LOAD( "9_u103.bin",  0x80000, 0x80000, CRC(01e6d654) SHA1(821d61a5b16f5cb76e2a805c8504db1ef38c3a48) )
 ROM_END
 
 
-GAME( 2000, 1945kiii, 0,        k3,       k3,       driver_device, 0, ROT270, "Oriental Soft", "1945k III (newer, OPCX2 PCB)", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, 1945kiiio,1945kiii, k3,       k3,       driver_device, 0, ROT270, "Oriental Soft", "1945k III (older, OPCX1 PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 2000, 1945kiii,  0,        k3,       k3,       k3_state, 0, ROT270, "Oriental Soft", "1945k III (newer, OPCX2 PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 2000, 1945kiiin, 1945kiii, k3,       k3,       k3_state, 0, ROT270, "Oriental Soft", "1945k III (newer, OPCX1 PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, 1945kiiio, 1945kiii, k3,       k3,       k3_state, 0, ROT270, "Oriental Soft", "1945k III (older, OPCX1 PCB)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1996, flagrall, 0,        flagrall, flagrall, driver_device, 0, ROT0,   "Promat?",     "'96 Flag Rally", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, flagrall,  0,        flagrall, flagrall, k3_state, 0, ROT0,   "Promat?",       "'96 Flag Rally",               MACHINE_SUPPORTS_SAVE )

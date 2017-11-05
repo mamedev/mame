@@ -11,7 +11,7 @@
 
 
 #include "emu.h"
-#include "includes/phoenix.h"
+#include "audio/phoenix.h"
 
 /****************************************************************************
  * 4006
@@ -30,7 +30,7 @@
  * [This information is part of the GIICM]
  *
  * Pin 8 and 9 are connected to an EXOR gate and the inverted
- * output (EXNOR) is fed back to pin 1 (and the pseudo polynome output).
+ * output (EXNOR) is fed back to pin 1 (and the pseudo polynomial output).
  *
  *      1D5          1Q1  2D4       2Q0  3D4       3Q0  4D5      4Q1 4Q0
  *      +--+--+--+--+--+  +--+--+--+--+  +--+--+--+--+  +--+--+--+--+--+
@@ -48,21 +48,11 @@
 
 
 
-const device_type PHOENIX = &device_creator<phoenix_sound_device>;
+DEFINE_DEVICE_TYPE(PHOENIX, phoenix_sound_device, "phoenix_sound", "Phoenix Audio Custom")
 
-phoenix_sound_device::phoenix_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, PHOENIX, "Phoenix Audio Custom", tag, owner, clock, "phoenix_sound", __FILE__),
-		device_sound_interface(mconfig, *this)
-{
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void phoenix_sound_device::device_config_complete()
+phoenix_sound_device::phoenix_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, PHOENIX, tag, owner, clock)
+	, device_sound_interface(mconfig, *this)
 {
 }
 
@@ -73,7 +63,7 @@ void phoenix_sound_device::device_config_complete()
 void phoenix_sound_device::device_start()
 {
 	int i, j;
-	UINT32 shiftreg;
+	uint32_t shiftreg;
 
 	m_sound_latch_a = 0;
 	memset(&m_c24_state, 0, sizeof(m_c24_state));
@@ -83,12 +73,12 @@ void phoenix_sound_device::device_start()
 	m_discrete = machine().device<discrete_device>("discrete");
 	m_tms = machine().device<tms36xx_device>("tms");
 
-	m_poly18 = std::make_unique<UINT32[]>(1ul << (18-5));
+	m_poly18 = std::make_unique<uint32_t[]>(1ul << (18-5));
 
 	shiftreg = 0;
 	for( i = 0; i < (1ul << (18-5)); i++ )
 	{
-		UINT32 bits = 0;
+		uint32_t bits = 0;
 		for( j = 0; j < 32; j++ )
 		{
 			bits = (bits >> 1) | (shiftreg << 31);

@@ -54,6 +54,7 @@
 
 #include "emu.h"
 #include "cpu/score/score.h"
+#include "screen.h"
 
 
 #define LOG_SPG290_REGISTER_ACCESS  (1)
@@ -74,18 +75,18 @@ public:
 	virtual void machine_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-	UINT32 spg290_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t spg290_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_READ32_MEMBER(spg290_regs_r);
 	DECLARE_WRITE32_MEMBER(spg290_regs_w);
 	void spg290_timers_update();
-	void spg290_vblank_irq(screen_device &screen, bool state);
-	inline UINT32 spg290_read_mem(UINT32 offset);
-	inline void spg290_write_mem(UINT32 offset, UINT32 data);
-	void spg290_argb1555(bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT16 posy, UINT16 posx, UINT16 argb);
-	void spg290_rgb565(bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT16 posy, UINT16 posx, UINT16 rgb, UINT32 transrgb);
-	void spg290_blit_sprite(bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT32 control, UINT32 attribute, UINT32 *palettes, UINT32 buf_start);
-	void spg290_blit_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT32 control, UINT32 attribute, int posy, int posx, UINT32 nptr, UINT32 buf_start, UINT32 transrgb);
-	void spg290_blit_character(bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT32 control, UINT32 attribute, int posy, int posx, UINT32 nptr, UINT32 buf_start, UINT32 transrgb);
+	DECLARE_WRITE_LINE_MEMBER(spg290_vblank_irq);
+	inline uint32_t spg290_read_mem(uint32_t offset);
+	inline void spg290_write_mem(uint32_t offset, uint32_t data);
+	void spg290_argb1555(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint16_t posy, uint16_t posx, uint16_t argb);
+	void spg290_rgb565(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint16_t posy, uint16_t posx, uint16_t rgb, uint32_t transrgb);
+	void spg290_blit_sprite(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint32_t control, uint32_t attribute, uint32_t *palettes, uint32_t buf_start);
+	void spg290_blit_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint32_t control, uint32_t attribute, int posy, int posx, uint32_t nptr, uint32_t buf_start, uint32_t transrgb);
+	void spg290_blit_character(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint32_t control, uint32_t attribute, int posy, int posx, uint32_t nptr, uint32_t buf_start, uint32_t transrgb);
 
 private:
 	static const device_timer_id TIMER_SPG290 = 0;
@@ -93,57 +94,57 @@ private:
 
 	struct spg290_miu
 	{
-		UINT32  status;
+		uint32_t  status;
 	};
 
 	struct spg290_ppu
 	{
-		UINT32  control;
-		UINT32  irq_control;
-		UINT32  irq_status;
-		UINT32  sprite_max;
-		UINT32  sprite_buf_start;
-		UINT32  frame_buff[3];
-		UINT32  palettes[0x200];
-		UINT32  tx_hoffset[0x200];
-		UINT32  tx_hcomp[0x200];
-		UINT32  transrgb;
+		uint32_t  control;
+		uint32_t  irq_control;
+		uint32_t  irq_status;
+		uint32_t  sprite_max;
+		uint32_t  sprite_buf_start;
+		uint32_t  frame_buff[3];
+		uint32_t  palettes[0x200];
+		uint32_t  tx_hoffset[0x200];
+		uint32_t  tx_hcomp[0x200];
+		uint32_t  transrgb;
 
 		struct ppu_spite
 		{
-			UINT32  control;
-			UINT32  attribute;
+			uint32_t  control;
+			uint32_t  attribute;
 		} sprites[0x200];
 
 		struct ppu_tx
 		{
-			UINT32  control;
-			UINT32  attribute;
-			UINT32  posx;
-			UINT32  posy;
-			UINT32  nptr;
-			UINT32  buf_start[3];
+			uint32_t  control;
+			uint32_t  attribute;
+			uint32_t  posx;
+			uint32_t  posy;
+			uint32_t  nptr;
+			uint32_t  buf_start[3];
 		} txs[3];
 	};
 
 	struct spg290_timer
 	{
-		UINT32  control;
-		UINT32  control2;
-		UINT16  preload;
-		UINT16  counter;
+		uint32_t  control;
+		uint32_t  control2;
+		uint16_t  preload;
+		uint16_t  counter;
 	};
 
 	struct spg290_i2c
 	{
-		UINT32  config;
-		UINT32  irq_control;
-		UINT32  clock;
-		UINT8   count;
-		UINT32  id;
-		UINT32  port_addr;
-		UINT32  wdata;
-		UINT32  rdata;
+		uint32_t  config;
+		uint32_t  irq_control;
+		uint32_t  clock;
+		uint8_t   count;
+		uint32_t  id;
+		uint32_t  port_addr;
+		uint32_t  wdata;
+		uint32_t  rdata;
 	};
 
 	spg290_miu      m_miu;
@@ -157,7 +158,7 @@ private:
 
 
 #if LOG_SPG290_REGISTER_ACCESS
-static void log_spg290_regs(device_t *device,UINT8 module, UINT16 reg, UINT32 mem_mask, bool write, UINT32 data=0)
+static void log_spg290_regs(device_t *device,uint8_t module, uint16_t reg, uint32_t mem_mask, bool write, uint32_t data=0)
 {
 	static const char *const modules_name[] =
 	{
@@ -187,8 +188,8 @@ static void log_spg290_regs(device_t *device,UINT8 module, UINT16 reg, UINT32 me
 
 READ32_MEMBER(hyperscan_state::spg290_regs_r)
 {
-	UINT32 addr = offset << 2;
-	UINT32 data = 0;
+	uint32_t addr = offset << 2;
+	uint32_t data = 0;
 
 	if (addr == 0x010000)           // PPU Control
 	{
@@ -223,7 +224,7 @@ READ32_MEMBER(hyperscan_state::spg290_regs_r)
 #if LOG_SPG290_REGISTER_ACCESS
 	//else
 	{
-		if (!space.debugger_access())
+		if (!machine().side_effect_disabled())
 			log_spg290_regs(this,(offset >> 14) & 0xff, (offset<<2) & 0xffff, mem_mask, false);
 	}
 #endif
@@ -233,7 +234,7 @@ READ32_MEMBER(hyperscan_state::spg290_regs_r)
 
 WRITE32_MEMBER(hyperscan_state::spg290_regs_w)
 {
-	UINT32 addr = offset << 2;
+	uint32_t addr = offset << 2;
 
 	if (addr == 0x010000)               // PPU Control
 	{
@@ -341,7 +342,7 @@ WRITE32_MEMBER(hyperscan_state::spg290_regs_w)
 	}
 	else if (addr == 0x2100e4)                  // Timer Source Clock Selection
 	{
-		UINT32 timers_clk = XTAL_27MHz / ((data & 0xff) + 1);
+		uint32_t timers_clk = XTAL_27MHz / ((data & 0xff) + 1);
 		m_update_timer->adjust(attotime::from_hz(timers_clk), 0, attotime::from_hz(timers_clk));
 	}
 	else if(addr == 0x130020)                   // I2C configuration
@@ -358,7 +359,7 @@ WRITE32_MEMBER(hyperscan_state::spg290_regs_w)
 	else if(addr == 0x130028)                   // I2C clock setting
 	{
 		COMBINE_DATA(&m_i2c.clock);
-		UINT32 i2c_clk = XTAL_27MHz / ((m_i2c.clock & 0x3ff) + 1);
+		uint32_t i2c_clk = XTAL_27MHz / ((m_i2c.clock & 0x3ff) + 1);
 		m_i2c_timer->adjust(attotime::from_hz(i2c_clk), 0, attotime::from_hz(i2c_clk));
 	}
 	else if(addr == 0x13002c)                   // I2C ID
@@ -386,23 +387,23 @@ WRITE32_MEMBER(hyperscan_state::spg290_regs_w)
 #if LOG_SPG290_REGISTER_ACCESS
 	//else
 	{
-		if (!space.debugger_access())
+		if (!machine().side_effect_disabled())
 			log_spg290_regs(this,(offset >> 14) & 0xff, (offset<<2) & 0xffff, mem_mask, true, data);
 	}
 #endif
 }
 
-inline UINT32 hyperscan_state::spg290_read_mem(UINT32 offset)
+inline uint32_t hyperscan_state::spg290_read_mem(uint32_t offset)
 {
 	return m_maincpu->space(0).read_dword(offset);
 }
 
-inline void hyperscan_state::spg290_write_mem(UINT32 offset, UINT32 data)
+inline void hyperscan_state::spg290_write_mem(uint32_t offset, uint32_t data)
 {
 	return m_maincpu->space(0).write_dword(offset, data);
 }
 
-void hyperscan_state::spg290_argb1555(bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT16 posy, UINT16 posx, UINT16 argb)
+void hyperscan_state::spg290_argb1555(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint16_t posy, uint16_t posx, uint16_t argb)
 {
 	if (!(argb & 0x8000) && cliprect.contains(posx, posy))
 	{
@@ -411,7 +412,7 @@ void hyperscan_state::spg290_argb1555(bitmap_rgb32 &bitmap, const rectangle &cli
 	}
 }
 
-void hyperscan_state::spg290_rgb565(bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT16 posy, UINT16 posx, UINT16 rgb, UINT32 transrgb)
+void hyperscan_state::spg290_rgb565(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint16_t posy, uint16_t posx, uint16_t rgb, uint32_t transrgb)
 {
 	if ((!(transrgb & 0x10000) || (transrgb & 0xffff) != rgb) && cliprect.contains(posx, posy))
 	{
@@ -420,33 +421,33 @@ void hyperscan_state::spg290_rgb565(bitmap_rgb32 &bitmap, const rectangle &clipr
 	}
 }
 
-void hyperscan_state::spg290_blit_sprite(bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT32 control, UINT32 attribute, UINT32 *palettes, UINT32 buf_start)
+void hyperscan_state::spg290_blit_sprite(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint32_t control, uint32_t attribute, uint32_t *palettes, uint32_t buf_start)
 {
-	UINT32 sprite_base = buf_start + ((control & 0xffff) << 8);
-	UINT16 sprite_x    = (control >> 16) & 0x3ff;
-	UINT16 sprite_y    = (attribute >> 16) & 0x3ff;
-	UINT8 sprite_hsize = 8 << ((attribute >> 4) & 0x03);
-	UINT8 sprite_vsize = 8 << ((attribute >> 6) & 0x03);
-	UINT8 bit_pixel    = ((attribute & 3) + 1) << 1;
-	UINT8 pixel_word   = 32 / bit_pixel;
-	UINT8 word_line    = sprite_hsize / pixel_word;
-	UINT8 sprite_flip  = (attribute >> 2) & 0x03;
+	uint32_t sprite_base = buf_start + ((control & 0xffff) << 8);
+	uint16_t sprite_x    = (control >> 16) & 0x3ff;
+	uint16_t sprite_y    = (attribute >> 16) & 0x3ff;
+	uint8_t sprite_hsize = 8 << ((attribute >> 4) & 0x03);
+	uint8_t sprite_vsize = 8 << ((attribute >> 6) & 0x03);
+	uint8_t bit_pixel    = ((attribute & 3) + 1) << 1;
+	uint8_t pixel_word   = 32 / bit_pixel;
+	uint8_t word_line    = sprite_hsize / pixel_word;
+	uint8_t sprite_flip  = (attribute >> 2) & 0x03;
 
 	for (int y=0; y < sprite_vsize; y++)
 		for (int x=0; x < word_line; x++)
 		{
-			UINT32 data = spg290_read_mem(sprite_base + (y * pixel_word + x) * 4);
+			uint32_t data = spg290_read_mem(sprite_base + (y * pixel_word + x) * 4);
 
 			for (int b=0; b < pixel_word; b++)
 			{
-				UINT16 pen = ((data >> (b * bit_pixel)) & ((1 << bit_pixel) - 1));
-				UINT16 posx;
+				uint16_t pen = ((data >> (b * bit_pixel)) & ((1 << bit_pixel) - 1));
+				uint16_t posx;
 				if (sprite_flip & 0x01)
 					posx = sprite_x + (sprite_hsize - (x * word_line + b));
 				else
 					posx = sprite_x + x * (word_line) + b;
 
-				UINT16 posy;
+				uint16_t posy;
 				if (sprite_flip & 0x02)
 					posy = sprite_y + (sprite_vsize - y);
 				else
@@ -457,22 +458,22 @@ void hyperscan_state::spg290_blit_sprite(bitmap_rgb32 &bitmap, const rectangle &
 		}
 }
 
-void hyperscan_state::spg290_blit_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT32 control, UINT32 attribute, int posy, int posx, UINT32 nptr, UINT32 buf_start, UINT32 transrgb)
+void hyperscan_state::spg290_blit_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint32_t control, uint32_t attribute, int posy, int posx, uint32_t nptr, uint32_t buf_start, uint32_t transrgb)
 {
 	for (int y=0; y<512; y++)
 	{
 		int line = (control & 0x04) ? 0 : y;
-		UINT32 tx_start = spg290_read_mem(nptr + (posy + line) * 4);
+		uint32_t tx_start = spg290_read_mem(nptr + (posy + line) * 4);
 
 		for (int x=0; x < 1024>>1; x++)
 		{
-			UINT32 data = spg290_read_mem(buf_start + (tx_start + posx) * 2 + x * 4);
+			uint32_t data = spg290_read_mem(buf_start + (tx_start + posx) * 2 + x * 4);
 
 			for (int b=0; b < 2; b++)
 			{
-				UINT16 posx = x * 2 + b;
-				UINT16 posy = y;
-				UINT16 pix = (data >> (b*16)) & 0xffff;
+				uint16_t posx = x * 2 + b;
+				uint16_t posy = y;
+				uint16_t pix = (data >> (b*16)) & 0xffff;
 
 				if (control & 0x0080)
 					spg290_argb1555(bitmap, cliprect, posy, posx, pix);
@@ -483,13 +484,13 @@ void hyperscan_state::spg290_blit_bitmap(bitmap_rgb32 &bitmap, const rectangle &
 	}
 }
 
-void hyperscan_state::spg290_blit_character(bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT32 control, UINT32 attribute, int posy, int posx, UINT32 nptr, UINT32 buf_start, UINT32 transrgb)
+void hyperscan_state::spg290_blit_character(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint32_t control, uint32_t attribute, int posy, int posx, uint32_t nptr, uint32_t buf_start, uint32_t transrgb)
 {
 	// TODO
 }
 
 
-UINT32 hyperscan_state::spg290_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t hyperscan_state::spg290_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	if (m_ppu.control & 0x1000)
 	{
@@ -515,7 +516,7 @@ UINT32 hyperscan_state::spg290_screen_update(screen_device &screen, bitmap_rgb32
 	}
 	else
 	{
-		bitmap.fill(rgb_t::black, cliprect);
+		bitmap.fill(rgb_t::black(), cliprect);
 	}
 
 	return 0;
@@ -548,7 +549,7 @@ void hyperscan_state::spg290_timers_update()
 		}
 }
 
-void hyperscan_state::spg290_vblank_irq(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(hyperscan_state::spg290_vblank_irq)
 {
 	if (state && m_ppu.irq_control & 0x01)      // VBlanking Start IRQ
 	{
@@ -588,8 +589,8 @@ static ADDRESS_MAP_START(spg290_mem, AS_PROGRAM, 32, hyperscan_state)
 	AM_RANGE(0x08000000, 0x09ffffff) AM_READWRITE(spg290_regs_r, spg290_regs_w)
 	AM_RANGE(0x0a000000, 0x0a003fff) AM_RAM                         // internal SRAM
 	AM_RANGE(0x0b000000, 0x0b007fff) AM_ROM AM_REGION("spg290", 0)  // internal ROM
-	AM_RANGE(0x1e000000, 0x1e0fffff) AM_ROM AM_REGION("bios", 0) AM_MIRROR(0x0e000000)
-	AM_RANGE(0x1f000000, 0x1f0fffff) AM_ROM AM_REGION("bios", 0) AM_MIRROR(0x0e000000)
+	AM_RANGE(0x10000000, 0x100fffff) AM_ROM AM_REGION("bios", 0) AM_MIRROR(0x0e000000)
+	AM_RANGE(0x11000000, 0x110fffff) AM_ROM AM_REGION("bios", 0) AM_MIRROR(0x0e000000)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -615,7 +616,7 @@ void hyperscan_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( hyperscan, hyperscan_state )
+static MACHINE_CONFIG_START( hyperscan )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SCORE7, XTAL_27MHz * 4)   // 108MHz S+core 7
 	MCFG_CPU_PROGRAM_MAP(spg290_mem)
@@ -627,7 +628,7 @@ static MACHINE_CONFIG_START( hyperscan, hyperscan_state )
 	MCFG_SCREEN_UPDATE_DRIVER(hyperscan_state, spg290_screen_update)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_SCREEN_VBLANK_DRIVER(hyperscan_state, spg290_vblank_irq)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(hyperscan_state, spg290_vblank_irq))
 MACHINE_CONFIG_END
 
 
@@ -643,5 +644,5 @@ ROM_END
 
 /* Driver */
 
-/*  YEAR  NAME  PARENT  COMPAT   MACHINE    INPUT   INIT    COMPANY   FULLNAME     FLAGS */
-COMP( 2006, hs,   0,  0,  hyperscan ,  hyperscan , driver_device,   0, "Mattel",   "HyperScan",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME  PARENT  COMPAT  MACHINE    INPUT      STATE            INIT  COMPANY   FULLNAME     FLAGS
+COMP( 2006, hs,   0,      0,      hyperscan, hyperscan, hyperscan_state, 0,    "Mattel", "HyperScan", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

@@ -19,9 +19,204 @@
 
 */
 
-#include "includes/wangpc.h"
-#include "bus/rs232/rs232.h"
+#include "emu.h"
 #include "softlist.h"
+#include "bus/centronics/ctronics.h"
+#include "bus/rs232/rs232.h"
+#include "bus/wangpc/wangpc.h"
+#include "cpu/i86/i86.h"
+#include "formats/pc_dsk.h"
+#include "machine/am9517a.h"
+#include "machine/i8255.h"
+#include "machine/im6402.h"
+#include "machine/mc2661.h"
+#include "machine/pit8253.h"
+#include "machine/pic8259.h"
+#include "machine/ram.h"
+#include "machine/upd765.h"
+#include "machine/wangpckb.h"
+
+#define I8086_TAG       "i8086"
+#define AM9517A_TAG     "am9517a"
+#define I8259A_TAG      "i8259"
+#define I8255A_TAG      "i8255a"
+#define I8253_TAG       "i8253"
+#define IM6402_TAG      "im6402"
+#define SCN2661_TAG     "scn2661"
+#define UPD765_TAG      "upd765"
+#define CENTRONICS_TAG  "centronics"
+#define RS232_TAG       "rs232"
+#define WANGPC_KEYBOARD_TAG "wangpckb"
+
+class wangpc_state : public driver_device
+{
+public:
+	// constructor
+	wangpc_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, I8086_TAG),
+		m_dmac(*this, AM9517A_TAG),
+		m_pic(*this, I8259A_TAG),
+		m_ppi(*this, I8255A_TAG),
+		m_pit(*this, I8253_TAG),
+		m_uart(*this, IM6402_TAG),
+		m_epci(*this, SCN2661_TAG),
+		m_fdc(*this, UPD765_TAG),
+		m_ram(*this, RAM_TAG),
+		m_floppy0(*this, UPD765_TAG ":0:525dd"),
+		m_floppy1(*this, UPD765_TAG ":1:525dd"),
+		m_centronics(*this, CENTRONICS_TAG),
+		m_cent_data_in(*this, "cent_data_in"),
+		m_cent_data_out(*this, "cent_data_out"),
+		m_bus(*this, WANGPC_BUS_TAG),
+		m_sw(*this, "SW"),
+		m_timer2_irq(1),
+		m_centronics_ack(1),
+		m_dav(1),
+		m_dma_eop(1),
+		m_uart_dr(0),
+		m_uart_tbre(0),
+		m_fpu_irq(0),
+		m_bus_irq2(0),
+		m_enable_eop(0),
+		m_disable_dreq2(0),
+		m_fdc_drq(0),
+		m_fdc_dd0(0),
+		m_fdc_dd1(0),
+		m_fdc_tc(0),
+		m_ds1(false),
+		m_ds2(false)
+	{
+	}
+
+	required_device<cpu_device> m_maincpu;
+	required_device<am9517a_device> m_dmac;
+	required_device<pic8259_device> m_pic;
+	required_device<i8255_device> m_ppi;
+	required_device<pit8253_device> m_pit;
+	required_device<im6402_device> m_uart;
+	required_device<mc2661_device> m_epci;
+	required_device<upd765a_device> m_fdc;
+	required_device<ram_device> m_ram;
+	required_device<floppy_image_device> m_floppy0;
+	required_device<floppy_image_device> m_floppy1;
+	required_device<centronics_device> m_centronics;
+	required_device<input_buffer_device> m_cent_data_in;
+	required_device<output_latch_device> m_cent_data_out;
+	required_device<wangpcbus_device> m_bus;
+	required_ioport m_sw;
+
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	void select_drive();
+	void check_level1_interrupts();
+	void check_level2_interrupts();
+	void update_fdc_drq();
+	void update_fdc_tc();
+
+	DECLARE_WRITE8_MEMBER( fdc_ctrl_w );
+	DECLARE_READ8_MEMBER( deselect_drive1_r );
+	DECLARE_WRITE8_MEMBER( deselect_drive1_w );
+	DECLARE_READ8_MEMBER( select_drive1_r );
+	DECLARE_WRITE8_MEMBER( select_drive1_w );
+	DECLARE_READ8_MEMBER( deselect_drive2_r );
+	DECLARE_WRITE8_MEMBER( deselect_drive2_w );
+	DECLARE_READ8_MEMBER( select_drive2_r );
+	DECLARE_WRITE8_MEMBER( select_drive2_w );
+	DECLARE_READ8_MEMBER( motor1_off_r );
+	DECLARE_WRITE8_MEMBER( motor1_off_w );
+	DECLARE_READ8_MEMBER( motor1_on_r );
+	DECLARE_WRITE8_MEMBER( motor1_on_w );
+	DECLARE_READ8_MEMBER( motor2_off_r );
+	DECLARE_WRITE8_MEMBER( motor2_off_w );
+	DECLARE_READ8_MEMBER( motor2_on_r );
+	DECLARE_WRITE8_MEMBER( motor2_on_w );
+	DECLARE_READ8_MEMBER( fdc_reset_r );
+	DECLARE_WRITE8_MEMBER( fdc_reset_w );
+	DECLARE_READ8_MEMBER( fdc_tc_r );
+	DECLARE_WRITE8_MEMBER( fdc_tc_w );
+	DECLARE_WRITE8_MEMBER( dma_page_w );
+	DECLARE_READ8_MEMBER( status_r );
+	DECLARE_WRITE8_MEMBER( timer0_irq_clr_w );
+	DECLARE_READ8_MEMBER( timer2_irq_clr_r );
+	DECLARE_WRITE8_MEMBER( nmi_mask_w );
+	DECLARE_READ8_MEMBER( led_on_r );
+	DECLARE_WRITE8_MEMBER( fpu_mask_w );
+	DECLARE_READ8_MEMBER( dma_eop_clr_r );
+	DECLARE_WRITE8_MEMBER( uart_tbre_clr_w );
+	DECLARE_READ8_MEMBER( uart_r );
+	DECLARE_WRITE8_MEMBER( uart_w );
+	DECLARE_READ8_MEMBER( centronics_r );
+	DECLARE_WRITE8_MEMBER( centronics_w );
+	DECLARE_READ8_MEMBER( busy_clr_r );
+	DECLARE_WRITE8_MEMBER( acknlg_clr_w );
+	DECLARE_READ8_MEMBER( led_off_r );
+	DECLARE_WRITE8_MEMBER( parity_nmi_clr_w );
+	DECLARE_READ8_MEMBER( option_id_r );
+
+	DECLARE_WRITE_LINE_MEMBER( hrq_w );
+	DECLARE_WRITE_LINE_MEMBER( eop_w );
+	DECLARE_READ8_MEMBER( memr_r );
+	DECLARE_WRITE8_MEMBER( memw_w );
+	DECLARE_READ8_MEMBER( ior2_r );
+	DECLARE_WRITE8_MEMBER( iow2_w );
+	DECLARE_WRITE_LINE_MEMBER( dack0_w );
+	DECLARE_WRITE_LINE_MEMBER( dack1_w );
+	DECLARE_WRITE_LINE_MEMBER( dack2_w );
+	DECLARE_WRITE_LINE_MEMBER( dack3_w );
+	DECLARE_READ8_MEMBER( ppi_pa_r );
+	DECLARE_READ8_MEMBER( ppi_pb_r );
+	DECLARE_READ8_MEMBER( ppi_pc_r );
+	DECLARE_WRITE8_MEMBER( ppi_pc_w );
+	DECLARE_WRITE_LINE_MEMBER( pit2_w );
+	DECLARE_WRITE_LINE_MEMBER( uart_dr_w );
+	DECLARE_WRITE_LINE_MEMBER( uart_tbre_w );
+	DECLARE_WRITE_LINE_MEMBER( epci_irq_w );
+	DECLARE_WRITE_LINE_MEMBER( write_centronics_ack );
+	DECLARE_WRITE_LINE_MEMBER( write_centronics_busy );
+	DECLARE_WRITE_LINE_MEMBER( write_centronics_fault );
+	DECLARE_WRITE_LINE_MEMBER( write_centronics_perror );
+	DECLARE_WRITE_LINE_MEMBER( bus_irq2_w );
+
+	DECLARE_FLOPPY_FORMATS( floppy_formats );
+
+	DECLARE_WRITE_LINE_MEMBER( fdc_irq );
+	DECLARE_WRITE_LINE_MEMBER( fdc_drq );
+
+	image_init_result on_disk0_load(floppy_image_device *image);
+	void on_disk0_unload(floppy_image_device *image);
+	image_init_result on_disk1_load(floppy_image_device *image);
+	void on_disk1_unload(floppy_image_device *image);
+
+	uint8_t m_dma_page[4];
+	int m_dack;
+
+	int m_timer2_irq;
+	int m_centronics_ack;
+	int m_centronics_busy;
+	int m_centronics_fault;
+	int m_centronics_perror;
+	int m_dav;
+	int m_dma_eop;
+	int m_uart_dr;
+	int m_uart_tbre;
+	int m_fpu_irq;
+	int m_bus_irq2;
+
+	int m_enable_eop;
+	int m_disable_dreq2;
+	int m_fdc_drq;
+	int m_fdc_dd0;
+	int m_fdc_dd1;
+	int m_fdc_tc;
+	int m_ds1;
+	int m_ds2;
+
+	int m_led[6];
+};
+
+
 
 //**************************************************************************
 //  MACROS/CONSTANTS
@@ -255,7 +450,7 @@ READ8_MEMBER( wangpc_state::status_r )
 
 	*/
 
-	UINT8 data = 0x03;
+	uint8_t data = 0x03;
 
 	// floppy interrupts
 	data |= m_fdc->get_irq() << 3;
@@ -369,7 +564,7 @@ READ8_MEMBER( wangpc_state::uart_r )
 
 	check_level2_interrupts();
 
-	UINT8 data = m_uart->read(space, 0);
+	uint8_t data = m_uart->read(space, 0);
 
 	if (LOG) logerror("%s: UART read %02x\n", machine().describe_context(), data);
 
@@ -449,7 +644,7 @@ READ8_MEMBER( wangpc_state::busy_clr_r )
 {
 	if (LOG) logerror("%s: BUSY clear\n", machine().describe_context());
 
-	m_centronics_busy = 1;
+	m_centronics_busy = 0;
 	check_level1_interrupts();
 
 	return 0xff;
@@ -514,7 +709,7 @@ READ8_MEMBER( wangpc_state::option_id_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	// FDC interrupt
 	data |= (m_fdc_dd0 || m_fdc_dd1 || (int) m_fdc->get_irq()) << 7;
@@ -713,7 +908,7 @@ WRITE_LINE_MEMBER( wangpc_state::dack3_w )
 
 void wangpc_state::check_level1_interrupts()
 {
-	int state = !m_timer2_irq || m_epci->rxrdy_r() || m_epci->txemt_r() || !m_centronics_ack || !m_dav || !m_centronics_busy;
+	int state = !m_timer2_irq || m_epci->rxrdy_r() || m_epci->txemt_r() || !m_centronics_ack || !m_dav || m_centronics_busy;
 
 	m_pic->ir1_w(state);
 }
@@ -746,7 +941,7 @@ READ8_MEMBER( wangpc_state::ppi_pa_r )
 
 	*/
 
-	UINT8 data = 0x08 | 0x02 | 0x01;
+	uint8_t data = 0x08 | 0x02 | 0x01;
 
 	data |= m_dav << 2;
 	data |= m_centronics_busy << 4;
@@ -774,7 +969,7 @@ READ8_MEMBER( wangpc_state::ppi_pb_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	// timer 2 interrupt
 	data |= m_timer2_irq;
@@ -983,10 +1178,10 @@ WRITE_LINE_MEMBER( wangpc_state::bus_irq2_w )
 void wangpc_state::machine_start()
 {
 	// connect floppy callbacks
-	m_floppy0->setup_load_cb(floppy_image_device::load_cb(FUNC(wangpc_state::on_disk0_load), this));
-	m_floppy0->setup_unload_cb(floppy_image_device::unload_cb(FUNC(wangpc_state::on_disk0_unload), this));
-	m_floppy1->setup_load_cb(floppy_image_device::load_cb(FUNC(wangpc_state::on_disk1_load), this));
-	m_floppy1->setup_unload_cb(floppy_image_device::unload_cb(FUNC(wangpc_state::on_disk1_unload), this));
+	m_floppy0->setup_load_cb(floppy_image_device::load_cb(&wangpc_state::on_disk0_load, this));
+	m_floppy0->setup_unload_cb(floppy_image_device::unload_cb(&wangpc_state::on_disk0_unload, this));
+	m_floppy1->setup_load_cb(floppy_image_device::load_cb(&wangpc_state::on_disk1_load, this));
+	m_floppy1->setup_unload_cb(floppy_image_device::unload_cb(&wangpc_state::on_disk1_unload, this));
 
 	// state saving
 	save_item(NAME(m_dma_page));
@@ -1025,11 +1220,11 @@ void wangpc_state::machine_reset()
 //  on_disk0_change -
 //-------------------------------------------------
 
-int wangpc_state::on_disk0_load(floppy_image_device *image)
+image_init_result wangpc_state::on_disk0_load(floppy_image_device *image)
 {
 	on_disk0_unload(image);
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 void wangpc_state::on_disk0_unload(floppy_image_device *image)
@@ -1045,11 +1240,11 @@ void wangpc_state::on_disk0_unload(floppy_image_device *image)
 //  on_disk1_change -
 //-------------------------------------------------
 
-int wangpc_state::on_disk1_load(floppy_image_device *image)
+image_init_result wangpc_state::on_disk1_load(floppy_image_device *image)
 {
 	on_disk1_unload(image);
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 void wangpc_state::on_disk1_unload(floppy_image_device *image)
@@ -1070,7 +1265,7 @@ void wangpc_state::on_disk1_unload(floppy_image_device *image)
 //  MACHINE_CONFIG( wangpc )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( wangpc, wangpc_state )
+static MACHINE_CONFIG_START( wangpc )
 	MCFG_CPU_ADD(I8086_TAG, I8086, 8000000)
 	MCFG_CPU_PROGRAM_MAP(wangpc_mem)
 	MCFG_CPU_IO_MAP(wangpc_io)
@@ -1094,7 +1289,8 @@ static MACHINE_CONFIG_START( wangpc, wangpc_state )
 	MCFG_AM9517A_OUT_DACK_2_CB(WRITELINE(wangpc_state, dack2_w))
 	MCFG_AM9517A_OUT_DACK_3_CB(WRITELINE(wangpc_state, dack3_w))
 
-	MCFG_PIC8259_ADD(I8259A_TAG, INPUTLINE(I8086_TAG, INPUT_LINE_IRQ0), VCC, NOOP)
+	MCFG_DEVICE_ADD(I8259A_TAG, PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(INPUTLINE(I8086_TAG, INPUT_LINE_IRQ0))
 
 	MCFG_DEVICE_ADD(I8255A_TAG, I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(READ8(wangpc_state, ppi_pa_r))
@@ -1109,7 +1305,7 @@ static MACHINE_CONFIG_START( wangpc, wangpc_state )
 	MCFG_PIT8253_CLK2(500000)
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(wangpc_state, pit2_w))
 
-	MCFG_IM6402_ADD(IM6402_TAG, 0, 62500*16) // HACK for wangpckb in IM6402 derives clocks from data line
+	MCFG_IM6402_ADD(IM6402_TAG, 62500*16, 62500*16)
 	MCFG_IM6402_TRO_CALLBACK(DEVWRITELINE(WANGPC_KEYBOARD_TAG, wangpc_keyboard_device, write_rxd))
 	MCFG_IM6402_DR_CALLBACK(WRITELINE(wangpc_state, uart_dr_w))
 	MCFG_IM6402_TBRE_CALLBACK(WRITELINE(wangpc_state, uart_tbre_w))
@@ -1191,4 +1387,4 @@ ROM_END
 //  GAME DRIVERS
 //**************************************************************************
 
-COMP( 1985, wangpc, 0, 0, wangpc, wangpc, driver_device, 0, "Wang Laboratories", "Wang Professional Computer", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1985, wangpc, 0, 0, wangpc, wangpc, wangpc_state, 0, "Wang Laboratories", "Wang Professional Computer", MACHINE_SUPPORTS_SAVE )

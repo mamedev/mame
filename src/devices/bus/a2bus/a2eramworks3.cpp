@@ -10,7 +10,6 @@
 *********************************************************************/
 
 #include "emu.h"
-#include "includes/apple2.h"
 #include "a2eramworks3.h"
 
 
@@ -22,22 +21,21 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type A2EAUX_RAMWORKS3 = &device_creator<a2eaux_ramworks3_device>;
+DEFINE_DEVICE_TYPE(A2EAUX_RAMWORKS3, a2eaux_ramworks3_device, "a2erwks3", "Applied Engineering RamWorks III")
 
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
 
-a2eaux_ramworks3_device::a2eaux_ramworks3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-		device_t(mconfig, A2EAUX_RAMWORKS3, "Applied Engineering RamWorks III", tag, owner, clock, "a2erwks3", __FILE__),
-		device_a2eauxslot_card_interface(mconfig, *this),
-	m_bank(0)
+a2eaux_ramworks3_device::a2eaux_ramworks3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+		a2eaux_ramworks3_device(mconfig, A2EAUX_RAMWORKS3, tag, owner, clock)
 {
 }
 
-a2eaux_ramworks3_device::a2eaux_ramworks3_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
-		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		device_a2eauxslot_card_interface(mconfig, *this), m_bank(0)
+a2eaux_ramworks3_device::a2eaux_ramworks3_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+		device_t(mconfig, type, tag, owner, clock),
+		device_a2eauxslot_card_interface(mconfig, *this),
+		m_bank(0)
 {
 }
 
@@ -57,22 +55,22 @@ void a2eaux_ramworks3_device::device_reset()
 	m_bank = 0;
 }
 
-UINT8 a2eaux_ramworks3_device::read_auxram(UINT16 offset)
+uint8_t a2eaux_ramworks3_device::read_auxram(uint16_t offset)
 {
 	return m_ram[offset+m_bank];
 }
 
-void a2eaux_ramworks3_device::write_auxram(UINT16 offset, UINT8 data)
+void a2eaux_ramworks3_device::write_auxram(uint16_t offset, uint8_t data)
 {
 	m_ram[offset+m_bank] = data;
 }
 
-UINT8 *a2eaux_ramworks3_device::get_vram_ptr()
+uint8_t *a2eaux_ramworks3_device::get_vram_ptr()
 {
 	return &m_ram[0];
 }
 
-UINT8 *a2eaux_ramworks3_device::get_auxbank_ptr()
+uint8_t *a2eaux_ramworks3_device::get_auxbank_ptr()
 {
 	return &m_ram[m_bank];
 }
@@ -90,7 +88,7 @@ UINT8 *a2eaux_ramworks3_device::get_auxbank_ptr()
     However, the software will recognize and correctly use a configuration in which
     all of banks 00-7F are populated for a total of 8 megabytes.  So that's what we do.
 */
-void a2eaux_ramworks3_device::write_c07x(address_space &space, UINT8 offset, UINT8 data)
+void a2eaux_ramworks3_device::write_c07x(address_space &space, uint8_t offset, uint8_t data)
 {
 	// write to C073?
 	if (offset == 3)

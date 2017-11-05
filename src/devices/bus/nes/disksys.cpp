@@ -47,20 +47,14 @@ static const floppy_interface nes_floppy_interface =
 	"floppy_5_25"
 };
 
-static MACHINE_CONFIG_FRAGMENT( nes_disksys )
+
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+MACHINE_CONFIG_MEMBER( nes_disksys_device::device_add_mconfig )
 	MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, nes_floppy_interface)
 MACHINE_CONFIG_END
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor nes_disksys_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( nes_disksys );
-}
-
 
 
 ROM_START( disksys )
@@ -75,13 +69,13 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *nes_disksys_device::device_rom_region() const
+const tiny_rom_entry *nes_disksys_device::device_rom_region() const
 {
 	return ROM_NAME( disksys );
 }
 
 
-void nes_disksys_device::load_proc(device_image_interface &image)
+void nes_disksys_device::load_proc(device_image_interface &image, bool is_created)
 {
 	nes_disksys_device *disk_sys = static_cast<nes_disksys_device *>(image.device().owner());
 	disk_sys->load_disk(image);
@@ -100,23 +94,24 @@ void nes_disksys_device::unload_proc(device_image_interface &image)
 //
 //------------------------------------------------
 
-const device_type NES_DISKSYS = &device_creator<nes_disksys_device>;
+DEFINE_DEVICE_TYPE(NES_DISKSYS, nes_disksys_device, "fc_disksys", "FC RAM Expansion + Disk System PCB")
 
 
-nes_disksys_device::nes_disksys_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: nes_nrom_device(mconfig, NES_DISKSYS, "FC RAM Expansion + Disk System PCB", tag, owner, clock, "fc_disksys", __FILE__), m_2c33_rom(nullptr),
-						m_fds_data(nullptr),
-						m_disk(*this, FLOPPY_0), irq_timer(nullptr), m_irq_count(0), m_irq_count_latch(0), m_irq_enable(0), m_irq_transfer(0), m_fds_motor_on(0), m_fds_door_closed(0), m_fds_current_side(0), m_fds_head_position(0), m_fds_status0(0), m_read_mode(0), m_drive_ready(0),
-						m_fds_sides(0), m_fds_last_side(0), m_fds_count(0)
-				{
+nes_disksys_device::nes_disksys_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: nes_nrom_device(mconfig, NES_DISKSYS, tag, owner, clock)
+	, m_2c33_rom(*this, "drive")
+	, m_fds_data(nullptr)
+	, m_disk(*this, FLOPPY_0)
+	, irq_timer(nullptr)
+	, m_irq_count(0), m_irq_count_latch(0), m_irq_enable(0), m_irq_transfer(0), m_fds_motor_on(0), m_fds_door_closed(0), m_fds_current_side(0), m_fds_head_position(0), m_fds_status0(0), m_read_mode(0), m_drive_ready(0)
+	, m_fds_sides(0), m_fds_last_side(0), m_fds_count(0)
+{
 }
 
 
 void nes_disksys_device::device_start()
 {
 	common_start();
-
-	m_2c33_rom = (UINT8*)memregion("drive")->base();
 
 	m_disk->floppy_install_load_proc(nes_disksys_device::load_proc);
 	m_disk->floppy_install_unload_proc(nes_disksys_device::unload_proc);
@@ -289,7 +284,7 @@ WRITE8_MEMBER(nes_disksys_device::write_ex)
 READ8_MEMBER(nes_disksys_device::read_ex)
 {
 	LOG_MMC(("Famicom Disk System read_ex, offset: %04x\n", offset));
-	UINT8 ret;
+	uint8_t ret;
 
 	if (offset >= 0x20 && offset < 0x60)
 	{
@@ -301,7 +296,7 @@ READ8_MEMBER(nes_disksys_device::read_ex)
 		case 0x10:
 			// $4030 - disk status 0
 			// bit0 - Timer Interrupt (1: an IRQ occurred)
-			// bit1 - Byte transfer flag (Set to 1 every time 8 bits have been transfered between
+			// bit1 - Byte transfer flag (Set to 1 every time 8 bits have been transferred between
 			//        the RAM adaptor & disk drive through $4024/$4031; Reset to 0 when $4024,
 			//        $4031, or $4030 has been serviced)
 			// bit4 - CRC control (0: CRC passed; 1: CRC error)
@@ -416,7 +411,7 @@ void nes_disksys_device::load_disk(device_image_interface &image)
 	m_fds_sides = (image.length() - header) / 65500;
 
 	if (!m_fds_data)
-		m_fds_data = std::make_unique<UINT8[]>(m_fds_sides * 65500);
+		m_fds_data = std::make_unique<uint8_t[]>(m_fds_sides * 65500);
 
 	// if there is an header, skip it
 	image.fseek(header, SEEK_SET);

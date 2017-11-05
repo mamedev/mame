@@ -6,13 +6,17 @@
 // The mcu does host communication and control of the dma-dac unit
 // TODO: UART is connected to MIDI port, mixer, adc
 
+#include "emu.h"
 #include "sb16.h"
 
-const device_type ISA16_SB16 = &device_creator<sb16_lle_device>;
+#include "speaker.h"
+
+
+DEFINE_DEVICE_TYPE(ISA16_SB16, sb16_lle_device, "sb16", "SoundBlaster 16 Audio Adapter LLE")
 
 READ8_MEMBER( sb16_lle_device::dsp_data_r )
 {
-	if(!space.debugger_access())
+	if(!machine().side_effect_disabled())
 		m_data_in = false;
 
 	return m_in_byte;
@@ -55,13 +59,13 @@ READ8_MEMBER( sb16_lle_device::adc_data_r )
 
 WRITE8_MEMBER( sb16_lle_device::dac_data_w )
 {
-	m_dacl->write_unsigned8(data);
-	m_dacr->write_unsigned8(data);
+	m_ldac->write(data << 8);
+	m_rdac->write(data << 8);
 }
 
 READ8_MEMBER( sb16_lle_device::p1_r )
 {
-	UINT8 ret = 0;
+	uint8_t ret = 0;
 	ret |= m_data_out << 0;
 	ret |= m_data_in << 1;
 	return ret;
@@ -141,7 +145,7 @@ READ8_MEMBER( sb16_lle_device::dma_stat_r )
 	 * bit6 -
 	 * bit7 -
 	*/
-	UINT8 ret = (m_dma16_done << 1) | m_dma8_done;
+	uint8_t ret = (m_dma16_done << 1) | m_dma8_done;
 	return ret;
 }
 
@@ -401,7 +405,12 @@ static ADDRESS_MAP_START(sb16_io, AS_IO, 8, sb16_lle_device)
 	AM_RANGE(MCS51_PORT_P2, MCS51_PORT_P2) AM_READWRITE(p2_r, p2_w)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_FRAGMENT( sb16 )
+const tiny_rom_entry *sb16_lle_device::device_rom_region() const
+{
+	return ROM_NAME( sb16 );
+}
+
+MACHINE_CONFIG_MEMBER( sb16_lle_device::device_add_mconfig )
 	MCFG_CPU_ADD("sb16_cpu", I80C52, XTAL_24MHz)
 	MCFG_CPU_IO_MAP(sb16_io)
 
@@ -412,23 +421,11 @@ static MACHINE_CONFIG_FRAGMENT( sb16 )
 	MCFG_SOUND_ROUTE(2, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(3, "rspeaker", 1.00)
 
-	MCFG_SOUND_ADD("dacl", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.00)
-	MCFG_SOUND_ADD("dacr", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.00)
+	MCFG_SOUND_ADD("ldac", DAC_16BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5) // unknown DAC
+	MCFG_SOUND_ADD("rdac", DAC_16BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5) // unknown DAC
 
 	MCFG_PC_JOY_ADD("pc_joy")
 MACHINE_CONFIG_END
-
-const rom_entry *sb16_lle_device::device_rom_region() const
-{
-	return ROM_NAME( sb16 );
-}
-
-machine_config_constructor sb16_lle_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( sb16 );
-}
 
 READ8_MEMBER( sb16_lle_device::host_data_r )
 {
@@ -442,9 +439,9 @@ WRITE8_MEMBER( sb16_lle_device::host_cmd_w )
 	m_in_byte = data;
 }
 
-UINT8 sb16_lle_device::dack_r(int line)
+uint8_t sb16_lle_device::dack_r(int line)
 {
-	UINT8 ret = m_adc_fifo[m_adc_fifo_tail].b[m_adc_h + (m_adc_r * 2)];
+	uint8_t ret = m_adc_fifo[m_adc_fifo_tail].b[m_adc_h + (m_adc_r * 2)];
 
 	if(m_ctrl8 & 2)
 		return 0;
@@ -485,7 +482,7 @@ UINT8 sb16_lle_device::dack_r(int line)
 	return ret;
 }
 
-void sb16_lle_device::dack_w(int line, UINT8 data)
+void sb16_lle_device::dack_w(int line, uint8_t data)
 {
 	if(m_ctrl8 & 2)
 		return;
@@ -527,9 +524,9 @@ void sb16_lle_device::dack_w(int line, UINT8 data)
 		m_isa->drq1_w(0);
 }
 
-UINT16 sb16_lle_device::dack16_r(int line)
+uint16_t sb16_lle_device::dack16_r(int line)
 {
-	UINT16 ret = m_adc_fifo[m_adc_fifo_tail].h[m_adc_r];
+	uint16_t ret = m_adc_fifo[m_adc_fifo_tail].h[m_adc_r];
 
 	if(m_ctrl16 & 2)
 		return 0;
@@ -562,7 +559,7 @@ UINT16 sb16_lle_device::dack16_r(int line)
 	return ret;
 }
 
-void sb16_lle_device::dack16_w(int line, UINT16 data)
+void sb16_lle_device::dack16_w(int line, uint16_t data)
 {
 	if(m_ctrl16 & 2)
 		return;
@@ -639,7 +636,7 @@ READ8_MEMBER( sb16_lle_device::invalid_r )
 // just using the old dummy mpu401 for now
 READ8_MEMBER( sb16_lle_device::mpu401_r )
 {
-	UINT8 res;
+	uint8_t res;
 
 	m_irq_midi = false;
 	m_isa->irq5_w((m_irq8 || m_irq16 || m_irq_midi) ? ASSERT_LINE : CLEAR_LINE);
@@ -678,11 +675,11 @@ WRITE8_MEMBER( sb16_lle_device::mpu401_w )
 
 }
 
-sb16_lle_device::sb16_lle_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, ISA16_SB16, "SoundBlaster 16 Audio Adapter LLE", tag, owner, clock, "sb16", __FILE__),
+sb16_lle_device::sb16_lle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, ISA16_SB16, tag, owner, clock),
 	device_isa16_card_interface(mconfig, *this),
-	m_dacl(*this, "dacl"),
-	m_dacr(*this, "dacr"),
+	m_ldac(*this, "ldac"),
+	m_rdac(*this, "rdac"),
 	m_joy(*this, "pc_joy"),
 	m_cpu(*this, "sb16_cpu"), m_data_in(false), m_in_byte(0), m_data_out(false), m_out_byte(0), m_freq(0), m_mode(0), m_dac_fifo_ctrl(0), m_adc_fifo_ctrl(0), m_ctrl8(0), m_ctrl16(0), m_mpu_byte(0),
 	m_dma8_len(0), m_dma16_len(0), m_dma8_cnt(0), m_dma16_cnt(0), m_adc_fifo_head(0), m_adc_fifo_tail(0), m_dac_fifo_head(0), m_dac_fifo_tail(0), m_adc_r(false), m_dac_r(false), m_adc_h(false),
@@ -693,8 +690,8 @@ sb16_lle_device::sb16_lle_device(const machine_config &mconfig, const char *tag,
 void sb16_lle_device::device_start()
 {
 	//address_space &space = m_cpu->space(AS_PROGRAM);
-	UINT8 *rom = memregion("sb16_cpu")->base();
-	UINT8 *xor_table = memregion("xor_table")->base();
+	uint8_t *rom = memregion("sb16_cpu")->base();
+	uint8_t *xor_table = memregion("xor_table")->base();
 
 	for(int i = 0; i < 0x2000; i++)
 		rom[i] = rom[i] ^ xor_table[i & 0x3f];
@@ -703,17 +700,17 @@ void sb16_lle_device::device_start()
 	ymf262_device *ymf262 = subdevice<ymf262_device>("ymf262");
 	set_isa_device();
 
-	m_isa->install_device(0x0200, 0x0207, 0, 0, read8_delegate(FUNC(pc_joy_device::joy_port_r), subdevice<pc_joy_device>("pc_joy")), write8_delegate(FUNC(pc_joy_device::joy_port_w), subdevice<pc_joy_device>("pc_joy")));
-	m_isa->install_device(0x0226, 0x0227, 0, 0, read8_delegate(FUNC(sb16_lle_device::invalid_r), this), write8_delegate(FUNC(sb16_lle_device::dsp_reset_w), this));
-	m_isa->install_device(0x022a, 0x022b, 0, 0, read8_delegate(FUNC(sb16_lle_device::host_data_r), this), write8_delegate(FUNC(sb16_lle_device::invalid_w), this) );
-	m_isa->install_device(0x022c, 0x022d, 0, 0, read8_delegate(FUNC(sb16_lle_device::dsp_wbuf_status_r), this), write8_delegate(FUNC(sb16_lle_device::host_cmd_w), this) );
-	m_isa->install_device(0x022e, 0x022f, 0, 0, read8_delegate(FUNC(sb16_lle_device::dsp_rbuf_status_r), this), write8_delegate(FUNC(sb16_lle_device::invalid_w), this) );
-	m_isa->install_device(0x0330, 0x0331, 0, 0, read8_delegate(FUNC(sb16_lle_device::mpu401_r), this), write8_delegate(FUNC(sb16_lle_device::mpu401_w), this));
-	m_isa->install_device(0x0388, 0x0389, 0, 0, read8_delegate(FUNC(ymf262_device::read), ymf262), write8_delegate(FUNC(ymf262_device::write), ymf262));
-	m_isa->install_device(0x0220, 0x0223, 0, 0, read8_delegate(FUNC(ymf262_device::read), ymf262), write8_delegate(FUNC(ymf262_device::write), ymf262));
-	m_isa->install_device(0x0228, 0x0229, 0, 0, read8_delegate(FUNC(ymf262_device::read), ymf262), write8_delegate(FUNC(ymf262_device::write), ymf262));
-	m_isa->set_dma_channel(1, this, FALSE);
-	m_isa->set_dma_channel(5, this, FALSE);
+	m_isa->install_device(0x0200, 0x0207, read8_delegate(FUNC(pc_joy_device::joy_port_r), subdevice<pc_joy_device>("pc_joy")), write8_delegate(FUNC(pc_joy_device::joy_port_w), subdevice<pc_joy_device>("pc_joy")));
+	m_isa->install_device(0x0226, 0x0227, read8_delegate(FUNC(sb16_lle_device::invalid_r), this), write8_delegate(FUNC(sb16_lle_device::dsp_reset_w), this));
+	m_isa->install_device(0x022a, 0x022b, read8_delegate(FUNC(sb16_lle_device::host_data_r), this), write8_delegate(FUNC(sb16_lle_device::invalid_w), this) );
+	m_isa->install_device(0x022c, 0x022d, read8_delegate(FUNC(sb16_lle_device::dsp_wbuf_status_r), this), write8_delegate(FUNC(sb16_lle_device::host_cmd_w), this) );
+	m_isa->install_device(0x022e, 0x022f, read8_delegate(FUNC(sb16_lle_device::dsp_rbuf_status_r), this), write8_delegate(FUNC(sb16_lle_device::invalid_w), this) );
+	m_isa->install_device(0x0330, 0x0331, read8_delegate(FUNC(sb16_lle_device::mpu401_r), this), write8_delegate(FUNC(sb16_lle_device::mpu401_w), this));
+	m_isa->install_device(0x0388, 0x0389, read8_delegate(FUNC(ymf262_device::read), ymf262), write8_delegate(FUNC(ymf262_device::write), ymf262));
+	m_isa->install_device(0x0220, 0x0223, read8_delegate(FUNC(ymf262_device::read), ymf262), write8_delegate(FUNC(ymf262_device::write), ymf262));
+	m_isa->install_device(0x0228, 0x0229, read8_delegate(FUNC(ymf262_device::read), ymf262), write8_delegate(FUNC(ymf262_device::write), ymf262));
+	m_isa->set_dma_channel(1, this, false);
+	m_isa->set_dma_channel(5, this, false);
 	m_timer = timer_alloc();
 }
 
@@ -741,7 +738,7 @@ void sb16_lle_device::device_reset()
 
 void sb16_lle_device::device_timer(emu_timer &timer, device_timer_id tid, int param, void *ptr)
 {
-	UINT16 dacl = 0, dacr = 0, adcl = 0, adcr = 0;
+	uint16_t dacl = 0, dacr = 0, adcl = 0, adcr = 0;
 	if(m_mode & 2)
 	{
 		// it might be possible to run the adc though dma simultaneously but the rom doesn't appear to permit it
@@ -754,20 +751,20 @@ void sb16_lle_device::device_timer(emu_timer &timer, device_timer_id tid, int pa
 		switch(m_mode & 0xa0) // dac 16
 		{
 			case 0x00: // unsigned stereo
-				dacl = (m_dac_fifo[m_dac_fifo_tail].h[0] - 0x8000);
-				dacr = (m_dac_fifo[m_dac_fifo_tail].h[1] - 0x8000);
-				break;
-			case 0x20: // signed stereo
 				dacl = m_dac_fifo[m_dac_fifo_tail].h[0];
 				dacr = m_dac_fifo[m_dac_fifo_tail].h[1];
 				break;
-			case 0x80: // unsigned mono
-				dacl = (m_dac_fifo[m_dac_fifo_tail].h[0] - 0x8000);
-				dacr = (m_dac_fifo[m_dac_fifo_tail].h[0] - 0x8000);
+			case 0x20: // signed stereo
+				dacl = (m_dac_fifo[m_dac_fifo_tail].h[0] ^ 0x8000);
+				dacr = (m_dac_fifo[m_dac_fifo_tail].h[1] ^ 0x8000);
 				break;
-			case 0xa0: // signed mono
+			case 0x80: // unsigned mono
 				dacl = m_dac_fifo[m_dac_fifo_tail].h[0];
 				dacr = m_dac_fifo[m_dac_fifo_tail].h[0];
+				break;
+			case 0xa0: // signed mono
+				dacl = (m_dac_fifo[m_dac_fifo_tail].h[0] ^ 0x8000);
+				dacr = (m_dac_fifo[m_dac_fifo_tail].h[0] ^ 0x8000);
 				break;
 		}
 		switch(m_mode & 0x50) // adc 8; placeholder
@@ -795,20 +792,20 @@ void sb16_lle_device::device_timer(emu_timer &timer, device_timer_id tid, int pa
 		switch(m_mode & 0x50) // dac 8
 		{
 			case 0x00: // unsigned stereo
-				dacl = (m_dac_fifo[m_dac_fifo_tail].b[0] - 0x80) << 8;
-				dacr = (m_dac_fifo[m_dac_fifo_tail].b[2] - 0x80) << 8;
-				break;
-			case 0x10: // signed stereo
 				dacl = m_dac_fifo[m_dac_fifo_tail].b[0] << 8;
 				dacr = m_dac_fifo[m_dac_fifo_tail].b[2] << 8;
 				break;
-			case 0x40: // unsigned mono
-				dacl = (m_dac_fifo[m_dac_fifo_tail].b[0] - 0x80) << 8;
-				dacr = (m_dac_fifo[m_dac_fifo_tail].b[0] - 0x80) << 8;
+			case 0x10: // signed stereo
+				dacl = (m_dac_fifo[m_dac_fifo_tail].b[0] ^ 0x80) << 8;
+				dacr = (m_dac_fifo[m_dac_fifo_tail].b[2] ^ 0x80) << 8;
 				break;
-			case 0x50: // signed mono
+			case 0x40: // unsigned mono
 				dacl = m_dac_fifo[m_dac_fifo_tail].b[0] << 8;
 				dacr = m_dac_fifo[m_dac_fifo_tail].b[0] << 8;
+				break;
+			case 0x50: // signed mono
+				dacl = (m_dac_fifo[m_dac_fifo_tail].b[0] ^ 0x80) << 8;
+				dacr = (m_dac_fifo[m_dac_fifo_tail].b[0] ^ 0x80) << 8;
 				break;
 		}
 		switch(m_mode & 0xa0) // adc 16; placeholder
@@ -831,8 +828,8 @@ void sb16_lle_device::device_timer(emu_timer &timer, device_timer_id tid, int pa
 				break;
 		}
 	}
-	m_dacr->write(dacr);
-	m_dacl->write(dacl);
+	m_rdac->write(dacr);
+	m_ldac->write(dacl);
 
 	if(!(m_ctrl8 & 2))
 		m_isa->drq1_w(1);

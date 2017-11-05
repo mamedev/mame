@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "joystick.h"
 
 
@@ -14,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type VCS_JOYSTICK = &device_creator<vcs_joystick_device>;
+DEFINE_DEVICE_TYPE(VCS_JOYSTICK, vcs_joystick_device, "vcs_joystick", "Atari / CBM Digital joystick")
 
 
 static INPUT_PORTS_START( vcs_joystick )
@@ -47,8 +48,8 @@ ioport_constructor vcs_joystick_device::device_input_ports() const
 //  vcs_joystick_device - constructor
 //-------------------------------------------------
 
-vcs_joystick_device::vcs_joystick_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, VCS_JOYSTICK, "Atari / CBM Digital joystick", tag, owner, clock, "vcs_joystick", __FILE__),
+vcs_joystick_device::vcs_joystick_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, VCS_JOYSTICK, tag, owner, clock),
 	device_vcs_control_port_interface(mconfig, *this),
 	m_joy(*this, "JOY")
 {
@@ -68,7 +69,7 @@ void vcs_joystick_device::device_start()
 //  vcs_joy_r - joystick read
 //-------------------------------------------------
 
-UINT8 vcs_joystick_device::vcs_joy_r()
+uint8_t vcs_joystick_device::vcs_joy_r()
 {
 	return m_joy->read();
 }

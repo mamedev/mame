@@ -8,6 +8,7 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "joystick.h"
 
 
@@ -22,7 +23,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type CGENIE_JOYSTICK = &device_creator<cgenie_joystick_device>;
+DEFINE_DEVICE_TYPE(CGENIE_JOYSTICK, cgenie_joystick_device, "cgenie_joystick", "Joystick Interface EG2013")
 
 //-------------------------------------------------
 //  input_ports - device-specific input ports
@@ -92,11 +93,11 @@ ioport_constructor cgenie_joystick_device::device_input_ports() const
 //  cgenie_joystick_device - constructor
 //-------------------------------------------------
 
-cgenie_joystick_device::cgenie_joystick_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, CGENIE_JOYSTICK, "Joystick Interface EG2013", tag, owner, clock, "cgenie_joystick", __FILE__),
-	device_parallel_interface(mconfig, *this),
-	m_joy(*this, "JOY"),
-	m_keypad(*this, "KEYPAD"),
+cgenie_joystick_device::cgenie_joystick_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, CGENIE_JOYSTICK, tag, owner, clock),
+	device_cg_parallel_interface(mconfig, *this),
+	m_joy(*this, "JOY.%u", 0),
+	m_keypad(*this, "KEYPAD.%u", 0),
 	m_select(0)
 {
 }
@@ -122,7 +123,7 @@ void cgenie_joystick_device::device_reset()
 //  IMPLEMENTATION
 //**************************************************************************
 
-void cgenie_joystick_device::pa_w(UINT8 data)
+void cgenie_joystick_device::pa_w(uint8_t data)
 {
 	if (VERBOSE)
 		logerror("%s: pa_w %02x\n", tag(), data);
@@ -131,9 +132,9 @@ void cgenie_joystick_device::pa_w(UINT8 data)
 	m_select = data & 0x3f;
 }
 
-UINT8 cgenie_joystick_device::pb_r()
+uint8_t cgenie_joystick_device::pb_r()
 {
-	UINT8 data = 0x0f;
+	uint8_t data = 0x0f;
 
 	// read button state
 	for (int i = 0; i < 4; i++)

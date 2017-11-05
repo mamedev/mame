@@ -6,8 +6,10 @@
 
 ***************************************************************************/
 
-#ifndef __ISA_LPT_H__
-#define __ISA_LPT_H__
+#ifndef MAME_BUS_ISA_LPT_H
+#define MAME_BUS_ISA_LPT_H
+
+#pragma once
 
 #include "isa.h"
 
@@ -23,28 +25,27 @@ class isa8_lpt_device : public device_t,
 {
 public:
 	// construction/destruction
-	isa8_lpt_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual ioport_constructor device_input_ports() const override;
+	isa8_lpt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	bool is_primary() { return m_is_primary; }
-
-	WRITE_LINE_MEMBER(pc_cpu_line);
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override;
+
 private:
+	WRITE_LINE_MEMBER(pc_cpu_line);
 
 	// internal state
 	bool m_is_primary;
 };
 
 // device type definition
-extern const device_type ISA8_LPT;
+DECLARE_DEVICE_TYPE(ISA8_LPT, isa8_lpt_device)
 
-#endif /* __ISA_LPT_H__ */
+#endif // MAME_BUS_ISA_LPT_H

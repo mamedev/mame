@@ -8,10 +8,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_MACHINE_EEPROM_H
+#define MAME_MACHINE_EEPROM_H
 
-#ifndef __EEPROM_H__
-#define __EEPROM_H__
+#pragma once
 
 
 
@@ -44,13 +44,8 @@
 // ======================> eeprom_base_device
 
 class eeprom_base_device :  public device_t,
-							public device_memory_interface,
 							public device_nvram_interface
 {
-protected:
-	// construction/destruction
-	eeprom_base_device(const machine_config &mconfig, device_type devtype, const char *name, const char *tag, device_t *owner, const char *shortname, const char *file);
-
 public:
 	// timing constants
 	enum timing_type
@@ -64,49 +59,50 @@ public:
 
 	// inline configuration helpers
 	static void static_set_size(device_t &device, int cells, int cellbits);
-	static void static_set_default_data(device_t &device, const UINT8 *data, UINT32 size);
-	static void static_set_default_data(device_t &device, const UINT16 *data, UINT32 size);
-	static void static_set_default_value(device_t &device, UINT32 value);
+	static void static_set_default_data(device_t &device, const uint8_t *data, uint32_t size);
+	static void static_set_default_data(device_t &device, const uint16_t *data, uint32_t size);
+	static void static_set_default_value(device_t &device, uint32_t value);
 	static void static_set_timing(device_t &device, timing_type type, const attotime &duration);
 
 	// read/write/erase data
-	UINT32 read(offs_t address);
-	void write(offs_t address, UINT32 data);
-	void write_all(UINT32 data);
+	uint32_t read(offs_t address);
+	void write(offs_t address, uint32_t data);
+	void write_all(uint32_t data);
 	void erase(offs_t address);
 	void erase_all();
 
 	// status
 	bool ready() const { return machine().time() >= m_completion_time; }
 
+	// internal read/write without side-effects
+	uint32_t internal_read(offs_t address);
+	void internal_write(offs_t address, uint32_t data);
+
 protected:
+	// construction/destruction
+	eeprom_base_device(const machine_config &mconfig, device_type devtype, const char *tag, device_t *owner);
+
 	// device-level overrides
 	virtual void device_validity_check(validity_checker &valid) const override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-
-	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
 
 	// device_nvram_interface overrides
 	virtual void nvram_default() override;
 	virtual void nvram_read(emu_file &file) override;
 	virtual void nvram_write(emu_file &file) override;
 
-	// internal read/write without side-effects
-	UINT32 internal_read(offs_t address);
-	void internal_write(offs_t address, UINT32 data);
-
 	optional_memory_region  m_region;
 
+	std::unique_ptr<uint8_t []> m_data;
+
 	// configuration state
-	UINT32                  m_cells;
-	UINT8                   m_address_bits;
-	UINT8                   m_data_bits;
-	address_space_config    m_space_config;
-	generic_ptr             m_default_data;
-	UINT32                  m_default_data_size;
-	UINT32                  m_default_value;
+	uint32_t                  m_cells;
+	uint8_t                   m_address_bits;
+	uint8_t                   m_data_bits;
+	const void *            m_default_data;
+	uint32_t                  m_default_data_size;
+	uint32_t                  m_default_value;
 	bool                    m_default_value_set;
 	attotime                m_operation_time[TIMING_COUNT];
 
@@ -114,5 +110,4 @@ protected:
 	attotime                m_completion_time;
 };
 
-
-#endif
+#endif // MAME_MACHINE_EEPROM_H

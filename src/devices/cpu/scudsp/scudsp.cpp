@@ -91,11 +91,12 @@
  *****************************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
 #include "scudsp.h"
 
+#include "debugger.h"
 
-const device_type SCUDSP = &device_creator<scudsp_cpu_device>;
+
+DEFINE_DEVICE_TYPE(SCUDSP, scudsp_cpu_device, "scudsp", "Sega SCUDSP")
 
 /* FLAGS */
 #define PRF m_flags & 0x04000000
@@ -128,7 +129,7 @@ const device_type SCUDSP = &device_creator<scudsp_cpu_device>;
 #define scudsp_readmem(A,MD) m_data->read_dword((A | (MD << 6)) << 2)
 #define scudsp_writemem(A,MD,B) m_data->write_dword((A | (MD << 6)) << 2, B)
 
-UINT32 scudsp_cpu_device::scudsp_get_source_mem_reg_value( UINT32 mode )
+uint32_t scudsp_cpu_device::scudsp_get_source_mem_reg_value( uint32_t mode )
 {
 	if ( mode < 0x8 )
 	{
@@ -139,17 +140,17 @@ UINT32 scudsp_cpu_device::scudsp_get_source_mem_reg_value( UINT32 mode )
 		switch( mode )
 		{
 			case 0x9:
-				return (UINT32)((m_alu & U64(0x00000000ffffffff)) >> 0);
+				return u32((m_alu & 0x00000000ffffffffU) >> 0);
 			case 0xA:
-				return (UINT32)((m_alu & U64(0x0000ffffffff0000)) >> 16);
+				return u32((m_alu & 0x0000ffffffff0000U) >> 16);
 		}
 	}
 	return 0;
 }
 
-UINT32 scudsp_cpu_device::scudsp_get_source_mem_value(UINT8 mode)
+uint32_t scudsp_cpu_device::scudsp_get_source_mem_value(uint8_t mode)
 {
-	UINT32 value = 0;
+	uint32_t value = 0;
 
 	switch( mode )
 	{
@@ -186,7 +187,7 @@ UINT32 scudsp_cpu_device::scudsp_get_source_mem_value(UINT8 mode)
 	return value;
 }
 
-void scudsp_cpu_device::scudsp_set_dest_mem_reg( UINT32 mode, UINT32 value )
+void scudsp_cpu_device::scudsp_set_dest_mem_reg( uint32_t mode, uint32_t value )
 {
 	switch( mode )
 	{
@@ -244,7 +245,7 @@ void scudsp_cpu_device::scudsp_set_dest_mem_reg( UINT32 mode, UINT32 value )
 	}
 }
 
-void scudsp_cpu_device::scudsp_set_dest_mem_reg_2( UINT32 mode, UINT32 value )
+void scudsp_cpu_device::scudsp_set_dest_mem_reg_2( uint32_t mode, uint32_t value )
 {
 	if ( mode < 0xb )
 	{
@@ -263,9 +264,9 @@ void scudsp_cpu_device::scudsp_set_dest_mem_reg_2( UINT32 mode, UINT32 value )
 	}
 }
 
-UINT32 scudsp_cpu_device::scudsp_compute_condition( UINT32 condition )
+uint32_t scudsp_cpu_device::scudsp_compute_condition( uint32_t condition )
 {
-	UINT32 result = 0;
+	uint32_t result = 0;
 
 	switch( condition & 0xf )
 	{
@@ -293,7 +294,7 @@ UINT32 scudsp_cpu_device::scudsp_compute_condition( UINT32 condition )
 	return result;
 }
 
-void scudsp_cpu_device::scudsp_set_dest_dma_mem( UINT32 memcode, UINT32 value, UINT32 counter )
+void scudsp_cpu_device::scudsp_set_dest_dma_mem( uint32_t memcode, uint32_t value, uint32_t counter )
 {
 	if ( memcode < 4 )
 	{
@@ -321,7 +322,7 @@ void scudsp_cpu_device::scudsp_set_dest_dma_mem( UINT32 memcode, UINT32 value, U
 	}
 }
 
-UINT32 scudsp_cpu_device::scudsp_get_mem_source_dma( UINT32 memcode, UINT32 counter )
+uint32_t scudsp_cpu_device::scudsp_get_mem_source_dma( uint32_t memcode, uint32_t counter )
 {
 	switch( memcode & 0x3 )
 	{
@@ -345,7 +346,7 @@ READ32_MEMBER( scudsp_cpu_device::program_control_r )
 
 WRITE32_MEMBER( scudsp_cpu_device::program_control_w )
 {
-	UINT32 oldval, newval;
+	uint32_t oldval, newval;
 
 	oldval = (m_flags & 0xffffff00) | (m_pc & 0xff);
 	newval = oldval;
@@ -382,7 +383,7 @@ WRITE32_MEMBER( scudsp_cpu_device::ram_address_control_w )
 
 READ32_MEMBER( scudsp_cpu_device::ram_address_r )
 {
-	UINT32 data;
+	uint32_t data;
 
 	data = scudsp_get_source_mem_value( ((m_ra & 0xc0) >> 6) + 4 );
 
@@ -394,10 +395,10 @@ WRITE32_MEMBER( scudsp_cpu_device::ram_address_w )
 	scudsp_set_dest_mem_reg( (m_ra & 0xc0) >> 6, data );
 }
 
-void scudsp_cpu_device::scudsp_operation(UINT32 opcode)
+void scudsp_cpu_device::scudsp_operation(uint32_t opcode)
 {
-	INT64 i1,i2;
-	INT32 i3;
+	int64_t i1,i2;
+	int32_t i3;
 	int update_ct[4] = {0,0,0,0};
 	int dsp_mem;
 
@@ -409,14 +410,14 @@ void scudsp_cpu_device::scudsp_operation(UINT32 opcode)
 			break;
 		case 0x1:   /* AND */
 			i3 = m_acl.si & m_pl.si;
-			m_alu = (UINT64)(UINT32)i3;
+			m_alu = (uint64_t)(uint32_t)i3;
 			SET_Z(i3 == 0);
 			SET_C(0);
 			SET_S(i3 < 0);
 			break;
 		case 0x2:   /* OR */
 			i3 = m_acl.si | m_pl.si;
-			m_alu = (UINT64)(UINT32)i3;
+			m_alu = (uint64_t)(uint32_t)i3;
 			SET_C(0);
 			SET_S(i3 < 0);
 			/* TODO: Croc and some early Psygnosis games wants Z to be 1 when the result of this one is negative.
@@ -427,65 +428,65 @@ void scudsp_cpu_device::scudsp_operation(UINT32 opcode)
 			break;
 		case 0x3:   /* XOR */
 			i3 = m_acl.si ^ m_pl.si;
-			m_alu = (UINT64)(UINT32)i3;
+			m_alu = (uint64_t)(uint32_t)i3;
 			SET_Z(i3 == 0);
 			SET_C(0);
 			SET_S(i3 < 0);
 			break;
 		case 0x4:   /* ADD */
 			i3 = m_acl.si + m_pl.si;
-			m_alu = (UINT64)(UINT32)i3;
+			m_alu = (uint64_t)(uint32_t)i3;
 			//SET_Z(i3 == 0);
-			SET_Z( (i3 & S64(0xffffffffffff)) == 0 );
+			SET_Z( (i3 & s64(0xffffffffffffU)) == 0 );
 			//SET_S(i3 < 0);
-			SET_S( i3 & S64(0x1000000000000));
-			SET_C(i3 & S64(0x100000000));
+			SET_S( i3 & s64(0x1000000000000U));
+			SET_C(i3 & s64(0x100000000U));
 			SET_V(((i3) ^ (m_acl.si)) & ((i3) ^ (m_pl.si)) & 0x80000000);
 			break;
 		case 0x5:   /* SUB */
 			i3 = m_acl.si - m_pl.si;
-			m_alu = (UINT64)(UINT32)i3;
+			m_alu = (uint64_t)(uint32_t)i3;
 			SET_Z(i3 == 0);
-			SET_C(i3 & S64(0x100000000));
+			SET_C(i3 & s64(0x100000000U));
 			SET_S(i3 < 0);
 			SET_V(((m_pl.si) ^ (m_acl.si)) & ((m_pl.si) ^ (i3)) & 0x80000000);
 			break;
 		case 0x6:   /* AD2 */
-			i1 = CONCAT_64((INT32)m_ph.si,m_pl.si);
-			i2 = CONCAT_64((INT32)m_ach.si,m_acl.si);
+			i1 = concat_64((int32_t)m_ph.si,m_pl.si);
+			i2 = concat_64((int32_t)m_ach.si,m_acl.si);
 			m_alu = i1 + i2;
-			SET_Z((m_alu & S64(0xffffffffffff)) == 0);
-			SET_S((m_alu & S64(0x800000000000)) > 0);
-			SET_C((m_alu) & S64(0x1000000000000));
-			SET_V(((m_alu) ^ (i1)) & ((m_alu) ^ (i2)) & S64(0x800000000000));
+			SET_Z((m_alu & s64(0xffffffffffffU)) == 0);
+			SET_S((m_alu & s64(0x800000000000U)) > 0);
+			SET_C((m_alu) & s64(0x1000000000000U));
+			SET_V(((m_alu) ^ (i1)) & ((m_alu) ^ (i2)) & s64(0x800000000000U));
 			break;
 		case 0x7:   /* ??? */
 			/* Unrecognized opcode */
 			break;
 		case 0x8:   /* SR */
 			i3 = (m_acl.si >> 1) | (m_acl.si & 0x80000000);/*MSB does not change*/
-			m_alu = (UINT64)(UINT32)i3;
+			m_alu = (uint64_t)(uint32_t)i3;
 			SET_Z(i3 == 0);
 			SET_S(i3 < 0);
 			SET_C(m_acl.ui & 0x80000000);
 			break;
 		case 0x9:   /* RR */
 			i3 = ((m_acl.ui >> 1) & 0x7fffffff) | ((m_acl.ui << 31) & 0x80000000);
-			m_alu = (UINT64)(UINT32)i3;
+			m_alu = (uint64_t)(uint32_t)i3;
 			SET_Z( i3 == 0 );
 			SET_S( i3 < 0 );
 			SET_C( m_acl.ui & 0x1 );
 			break;
 		case 0xa:   /* SL */
 			i3 = m_acl.si << 1;
-			m_alu = (UINT64)(UINT32)i3;
+			m_alu = (uint64_t)(uint32_t)i3;
 			SET_Z( i3 == 0 );
 			SET_S( i3 < 0 );
 			SET_C( m_acl.ui & 0x80000000 );
 			break;
 		case 0xB:   /* RL */
 			i3 = ((m_acl.si << 1) & 0xfffffffe) | ((m_acl.si >> 31) & 0x1);
-			m_alu = (UINT64)(UINT32)i3;
+			m_alu = (uint64_t)(uint32_t)i3;
 			SET_Z( i3 == 0 );
 			SET_S( i3 < 0 );
 			SET_C( m_acl.ui & 0x80000000 );
@@ -523,8 +524,8 @@ void scudsp_cpu_device::scudsp_operation(UINT32 opcode)
 		case 0x1:   /* NOP ? */
 			break;
 		case 0x2:   /* MOV MUL,P */
-			m_ph.ui = (UINT16)((m_mul & U64(0x0000ffff00000000)) >> 32);
-			m_pl.ui = (UINT32)((m_mul & U64(0x00000000ffffffff)) >> 0);
+			m_ph.ui = u16((m_mul & 0x0000ffff00000000U) >> 32);
+			m_pl.ui = u32((m_mul & 0x00000000ffffffffU) >> 0);
 			break;
 		case 0x3:   /* MOV [s],P */
 			dsp_mem = (opcode & 0x700000) >> 20;
@@ -560,8 +561,8 @@ void scudsp_cpu_device::scudsp_operation(UINT32 opcode)
 			m_ach.ui = 0;
 			break;
 		case 0x2:   /* MOV ALU,A */
-			m_ach.ui = (UINT16)((m_alu & U64(0x0000ffff00000000)) >> 32);
-			m_acl.ui = (UINT32)((m_alu & U64(0x00000000ffffffff)) >> 0);
+			m_ach.ui = u16((m_alu & 0x0000ffff00000000U) >> 32);
+			m_acl.ui = u32((m_alu & 0x00000000ffffffffU) >> 0);
 			break;
 		case 0x3:   /* MOV [s], A */
 			dsp_mem = (opcode & 0x1C000 ) >> 14;
@@ -588,7 +589,7 @@ void scudsp_cpu_device::scudsp_operation(UINT32 opcode)
 		case 0x0:   /* NOP */
 			break;
 		case 0x1:   /* MOV SImm,[d] */
-			scudsp_set_dest_mem_reg( (opcode & 0xf00) >> 8, (INT32)(INT8)(opcode & 0xff) );
+			scudsp_set_dest_mem_reg( (opcode & 0xf00) >> 8, (int32_t)(int8_t)(opcode & 0xff) );
 			break;
 		case 0x2:
 			/* ??? */
@@ -601,9 +602,9 @@ void scudsp_cpu_device::scudsp_operation(UINT32 opcode)
 	m_icount -= 1;
 }
 
-void scudsp_cpu_device::scudsp_move_immediate( UINT32 opcode )
+void scudsp_cpu_device::scudsp_move_immediate( uint32_t opcode )
 {
-	UINT32 value;
+	uint32_t value;
 
 	if ( opcode & 0x2000000 )
 	{
@@ -623,12 +624,12 @@ void scudsp_cpu_device::scudsp_move_immediate( UINT32 opcode )
 	m_icount -= 1;
 }
 
-void scudsp_cpu_device::scudsp_dma( UINT32 opcode )
+void scudsp_cpu_device::scudsp_dma( uint32_t opcode )
 {
-	UINT8 hold = (opcode &  0x4000) >> 14;
-	UINT32 add = (opcode & 0x38000) >> 15;
-	UINT32 dir_from_D0 = (opcode & 0x1000 ) >> 12;
-	UINT32 dsp_mem = (opcode & 0x300) >> 8;
+	uint8_t hold = (opcode &  0x4000) >> 14;
+	uint32_t add = (opcode & 0x38000) >> 15;
+	uint32_t dir_from_D0 = (opcode & 0x1000 ) >> 12;
+	uint32_t dsp_mem = (opcode & 0x300) >> 8;
 
 	T0F_1;
 
@@ -676,7 +677,7 @@ void scudsp_cpu_device::scudsp_dma( UINT32 opcode )
 	/* HACK ALERT: It looks like that scheduling craps out the m_dma parameters, why this happens I don't know ... */
 	#if INSTA_DMA
 	{
-		UINT32 data;
+		uint32_t data;
 		if ( m_dma.dir == 0 )
 		{
 			for(m_dma.count = 0;m_dma.count < m_dma.size; m_dma.count++)
@@ -726,7 +727,7 @@ void scudsp_cpu_device::scudsp_dma( UINT32 opcode )
 	m_icount -= 1;
 }
 
-void scudsp_cpu_device::scudsp_jump( UINT32 opcode )
+void scudsp_cpu_device::scudsp_jump( uint32_t opcode )
 {
 	if ( opcode & 0x3f80000 )
 	{
@@ -745,7 +746,7 @@ void scudsp_cpu_device::scudsp_jump( UINT32 opcode )
 	m_icount -= 1;
 }
 
-void scudsp_cpu_device::scudsp_loop(UINT32 opcode)
+void scudsp_cpu_device::scudsp_loop(uint32_t opcode)
 {
 	if ( opcode & 0x8000000 )
 	{
@@ -770,7 +771,7 @@ void scudsp_cpu_device::scudsp_loop(UINT32 opcode)
 	m_icount -= 1;
 }
 
-void scudsp_cpu_device::scudsp_end(UINT32 opcode)
+void scudsp_cpu_device::scudsp_end(uint32_t opcode)
 {
 	if(opcode & 0x08000000)
 	{
@@ -784,7 +785,7 @@ void scudsp_cpu_device::scudsp_end(UINT32 opcode)
 	m_icount -= 1;
 }
 
-void scudsp_cpu_device::scudsp_illegal(UINT32 opcode)
+void scudsp_cpu_device::scudsp_illegal(uint32_t opcode)
 {
 	fatalerror("scudsp illegal opcode at 0x%04x\n", m_pc);
 	m_icount -= 1;
@@ -792,7 +793,7 @@ void scudsp_cpu_device::scudsp_illegal(UINT32 opcode)
 
 void scudsp_cpu_device::scudsp_exec_dma()
 {
-	UINT32 data;
+	uint32_t data;
 	if ( m_dma.dir == 0 )
 	{
 		data = (m_in_dma_cb(m_dma.src)<<16) | m_in_dma_cb(m_dma.src+2);
@@ -833,7 +834,7 @@ void scudsp_cpu_device::scudsp_exec_dma()
 /* Execute cycles */
 void scudsp_cpu_device::execute_run()
 {
-	UINT32 opcode;
+	uint32_t opcode;
 
 	do
 	{
@@ -884,7 +885,7 @@ void scudsp_cpu_device::execute_run()
 
 		if ( m_update_mul == 1 )
 		{
-			m_mul = (INT64)m_rx.si * (INT64)m_ry.si;
+			m_mul = (int64_t)m_rx.si * (int64_t)m_ry.si;
 			m_update_mul = 0;
 		}
 
@@ -894,6 +895,14 @@ void scudsp_cpu_device::execute_run()
 		}
 
 	} while( m_icount > 0 );
+}
+
+device_memory_interface::space_config_vector scudsp_cpu_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config),
+		std::make_pair(AS_DATA,    &m_data_config)
+	};
 }
 
 void scudsp_cpu_device::device_start()
@@ -960,14 +969,14 @@ void scudsp_cpu_device::device_start()
 	state_add( SCUDSP_DELAY, "DELAY", m_delay ).formatstr("%02X").noshow();
 	state_add( SCUDSP_TOP, "TOP", m_top).formatstr("%02X");
 	state_add( SCUDSP_LOP, "LOP", m_lop).formatstr("%03X");
-	state_add( SCUDSP_RX, "RX", m_rx).formatstr("%08X");
+	state_add( SCUDSP_RX, "RX", m_rx.ui).formatstr("%08X");
 	state_add( SCUDSP_MUL, "MUL", m_mul).formatstr("%012X");
-	state_add( SCUDSP_RY, "RY", m_ry).formatstr("%08X");
+	state_add( SCUDSP_RY, "RY", m_ry.ui).formatstr("%08X");
 	state_add( SCUDSP_ALU, "ALU", m_alu).formatstr("%012X");
-	state_add( SCUDSP_PH, "PH", m_ph).formatstr("%04X");
-	state_add( SCUDSP_PL, "PL", m_pl).formatstr("%08X");
-	state_add( SCUDSP_ACH, "ACH", m_ach).formatstr("%04X");
-	state_add( SCUDSP_ACL, "ACL", m_acl).formatstr("%08X");
+	state_add( SCUDSP_PH, "PH", m_ph.ui).formatstr("%04X");
+	state_add( SCUDSP_PL, "PL", m_pl.ui).formatstr("%08X");
+	state_add( SCUDSP_ACH, "ACH", m_ach.ui).formatstr("%04X");
+	state_add( SCUDSP_ACL, "ACL", m_acl.ui).formatstr("%08X");
 	state_add( SCUDSP_RA0, "RA0", m_ra0).formatstr("%08X");
 	state_add( SCUDSP_WA0, "WA0", m_wa0).formatstr("%08X");
 	state_add( SCUDSP_RA, "RA", m_ra ).formatstr("%02X");
@@ -975,7 +984,8 @@ void scudsp_cpu_device::device_start()
 	state_add( SCUDSP_CT1, "CT1", m_ct1 ).formatstr("%02X");
 	state_add( SCUDSP_CT2, "CT2", m_ct2 ).formatstr("%02X");
 	state_add( SCUDSP_CT3, "CT3", m_ct3 ).formatstr("%02X");
-	state_add( STATE_GENPC, "curpc", m_pc ).noshow();
+	state_add( STATE_GENPC, "GENPC", m_pc ).noshow();
+	state_add( STATE_GENPCBASE, "CURPC", m_pc ).noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_flags ).formatstr("%17s").noshow();
 
 	m_out_irq_cb.resolve_safe();
@@ -999,13 +1009,21 @@ void scudsp_cpu_device::execute_set_input(int irqline, int state)
 	}
 }
 
-scudsp_cpu_device::scudsp_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: cpu_device(mconfig, SCUDSP, "SCUDSP", tag, owner, clock, "scudsp", __FILE__)
+static ADDRESS_MAP_START( program_map, AS_PROGRAM, 32, scudsp_cpu_device )
+	AM_RANGE(0x00, 0xff) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( data_map, AS_DATA, 32, scudsp_cpu_device )
+	AM_RANGE(0x00, 0xff) AM_RAM
+ADDRESS_MAP_END
+
+scudsp_cpu_device::scudsp_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: cpu_device(mconfig, SCUDSP, tag, owner, clock)
 	, m_out_irq_cb(*this)
 	, m_in_dma_cb(*this)
 	, m_out_dma_cb(*this)
-	, m_program_config("program", ENDIANNESS_BIG, 32, 8, -2)
-	, m_data_config("data", ENDIANNESS_BIG, 32, 8, -2)
+	, m_program_config("program", ENDIANNESS_BIG, 32, 8, -2, ADDRESS_MAP_NAME(program_map))
+	, m_data_config("data", ENDIANNESS_BIG, 32, 8, -2, ADDRESS_MAP_NAME(data_map))
 {
 }
 
@@ -1032,8 +1050,8 @@ void scudsp_cpu_device::state_string_export(const device_state_entry &entry, std
 }
 
 
-offs_t scudsp_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t scudsp_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( scudsp );
-	return CPU_DISASSEMBLE_NAME(scudsp)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(scudsp)(this, stream, pc, oprom, opram, options);
 }

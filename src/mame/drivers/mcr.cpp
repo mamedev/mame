@@ -21,7 +21,7 @@
         * Timber
         * Discs of Tron (Squawk n' Talk)
         * NFL Football (Squawk n' Talk + laserdisk)
-        * Demolition Derby (Turbo Chip Squeak)
+        * Demolition Derby (Turbo Cheap Squeak)
 
 ****************************************************************************
 
@@ -207,11 +207,11 @@
     91658 = Lamp Sequencer (DOTron)
     91659 = Flashing Fluorescent Assembly (DOTron)
     91660 = Squawk & Talk (DOTron, NFLFoot)
-    91671 = Chip Squeak Deluxe (SpyHunt)
+    91671 = Cheap Squeak Deluxe (SpyHunt)
     91673 = Lamp Driver (SpyHunt)
     91695 = IPU laserdisk controller (NFLFoot)
     91794 = Optical Encoder Deluxe (DemoDerb)
-    91799 = Turbo Chip Squeak (DemoDerb)
+    91799 = Turbo Cheap Squeak (DemoDerb)
 
 ****************************************************************************
 
@@ -284,19 +284,22 @@
 
 
 #include "emu.h"
-#include "audio/midway.h"
-#include "sound/samples.h"
-#include "machine/nvram.h"
 #include "includes/mcr.h"
+
+#include "audio/midway.h"
+#include "machine/nvram.h"
+#include "sound/samples.h"
+#include "screen.h"
+#include "speaker.h"
 
 #include "dpoker.lh"
 
 
-static UINT8 input_mux;
-static UINT8 last_op4;
+static uint8_t input_mux;
+static uint8_t last_op4;
 
-static UINT8 dpoker_coin_status;
-static UINT8 dpoker_output;
+static uint8_t dpoker_coin_status;
+static uint8_t dpoker_output;
 
 
 
@@ -411,7 +414,7 @@ READ8_MEMBER(mcr_state::dpoker_ip0_r)
 	// d3: Coin-out Down
 	// d6: Coin-drop Hit
 	// d7: Coin-drop Release
-	UINT8 p0 = ioport("ssio:IP0")->read();
+	uint8_t p0 = ioport("ssio:IP0")->read();
 	p0 |= (dpoker_coin_status >> 1 & 1);
 	p0 ^= (p0 << 1 & 0x80) | dpoker_coin_status;
 	return p0;
@@ -642,7 +645,7 @@ WRITE8_MEMBER(mcr_state::dotron_op4_w)
 READ8_MEMBER(mcr_state::nflfoot_ip2_r)
 {
 	/* bit 7 = J3-2 on IPU board = TXDA on SIO */
-	UINT8 val = m_sio_txda << 7;
+	uint8_t val = m_sio_txda << 7;
 
 	if (space.device().safe_pc() != 0x107)
 		logerror("%04X:ip2_r = %02X\n", space.device().safe_pc(), val);
@@ -691,7 +694,7 @@ WRITE8_MEMBER(mcr_state::demoderb_op4_w)
 {
 	if (data & 0x40) input_mux = 1;
 	if (data & 0x80) input_mux = 0;
-	m_turbo_chip_squeak->write(space, offset, data);
+	m_turbo_cheap_squeak->write(space, offset, data);
 }
 
 
@@ -1753,7 +1756,7 @@ static const char *const twotiger_sample_names[] =
  *************************************/
 
 /* 90009 CPU board plus 90908/90913/91483 sound board */
-static MACHINE_CONFIG_START( mcr_90009, mcr_state )
+static MACHINE_CONFIG_START( mcr_90009 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MAIN_OSC_MCR_I/8)
@@ -1791,7 +1794,7 @@ static MACHINE_CONFIG_START( mcr_90009, mcr_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_MIDWAY_SSIO_ADD("ssio")
+	MCFG_SOUND_ADD("ssio", MIDWAY_SSIO, 0)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -1868,7 +1871,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( mcr_91490_snt, mcr_91490 )
 
 	/* basic machine hardware */
-	MCFG_MIDWAY_SQUAWK_N_TALK_ADD("snt")
+	MCFG_SOUND_ADD("snt", MIDWAY_SQUAWK_N_TALK, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -1896,18 +1899,18 @@ static MACHINE_CONFIG_DERIVED( mcr_91490_ipu, mcr_91490_snt )
 	MCFG_DEVICE_ADD("ipu_pio1", Z80PIO, 7372800/2)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("ipu", INPUT_LINE_IRQ0))
 
-	MCFG_Z80SIO0_ADD("ipu_sio", 7372800/2, 0, 0, 0, 0)
+	MCFG_DEVICE_ADD("ipu_sio", Z80SIO0, 7372800/2)
 	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("ipu", INPUT_LINE_IRQ0))
 	MCFG_Z80DART_OUT_TXDA_CB(WRITELINE(mcr_state, sio_txda_w))
 	MCFG_Z80DART_OUT_TXDB_CB(WRITELINE(mcr_state, sio_txdb_w))
 MACHINE_CONFIG_END
 
 
-/* 91490 CPU board plus 90908/90913/91483 sound board plus Turbo Chip Squeak sound board */
+/* 91490 CPU board plus 90908/90913/91483 sound board plus Turbo Cheap Squeak sound board */
 static MACHINE_CONFIG_DERIVED( mcr_91490_tcs, mcr_91490 )
 
 	/* basic machine hardware */
-	MCFG_MIDWAY_TURBO_CHIP_SQUEAK_ADD("tcs")
+	MCFG_SOUND_ADD("tcs", MIDWAY_TURBO_CHEAP_SQUEAK, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -2036,13 +2039,9 @@ ROM_START( dpoker )
 	ROM_LOAD( "vppp.d6",      0x5000, 0x1000, CRC(b0023bf1) SHA1(77a57a42dd403ef56f334ca295b5b43e94b99598) )
 	ROM_LOAD( "vppp.d7",      0x6000, 0x1000, CRC(a4012f5a) SHA1(011e77a6634fbb02a6ae99fe6685c92f2fad3fee) )
 
-	// The sound board was missing in this pcb set, we'll use the roms from Kick as placeholder.
-	// Funnily enough, according to a cabinet recording, the sound is actually very similar to Kickman.
-	ROM_REGION( 0x10000, "ssio:cpu", 0 )
-	ROM_LOAD( "vssp.a7",      0x0000, 0x1000, BAD_DUMP CRC(9e35c02e) SHA1(92afd0126dcfb2d4401927b2cf261090e186b6fa) )
-	ROM_LOAD( "vssp.a8",      0x1000, 0x1000, BAD_DUMP CRC(ca2b7c28) SHA1(fdcca3b755822c045c3c321cccc3f58112e2ad11) )
-	ROM_LOAD( "vssp.a9",      0x2000, 0x1000, BAD_DUMP CRC(d1901551) SHA1(fd7d6059f8ac59f95ae6f8ef12fbfce7ed16ec12) )
-	ROM_LOAD( "vssp.a10",     0x3000, 0x1000, BAD_DUMP CRC(d36ddcdc) SHA1(2d3ec83b9fa5a9d309c393a0c3ee45f0ba8192c9) )
+	ROM_REGION( 0x10000, "ssio:cpu", ROMREGION_ERASEFF ) // a9 and a10 are unpopulated
+	ROM_LOAD( "vssp.a7",      0x0000, 0x1000, CRC(f78b2283) SHA1(b69f987112f82c92f5cf38ca2577195a4972cc47) )
+	ROM_LOAD( "vssp.a8",      0x1000, 0x1000, CRC(3f531bd0) SHA1(0e860bb5af83985b7143abdab5715f46c6a1e804) )
 
 	ROM_REGION( 0x02000, "gfx1", 0 )
 	ROM_LOAD( "vpbg.g4",      0x0000, 0x1000, CRC(9fe9aad8) SHA1(f9174bcce3886548b8c18c5a06995d5c69ce5486) )
@@ -2858,7 +2857,7 @@ DRIVER_INIT_MEMBER(mcr_state,twotiger)
 	mcr_init(90010, 91399, 90913);
 
 	machine().device<midway_ssio_device>("ssio")->set_custom_output(4, 0xff, write8_delegate(FUNC(mcr_state::twotiger_op4_w),this));
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xe800, 0xefff, 0, 0x1000, read8_delegate(FUNC(mcr_state::twotiger_videoram_r),this), write8_delegate(FUNC(mcr_state::twotiger_videoram_w),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xe800, 0xefff, 0, 0x1000, 0, read8_delegate(FUNC(mcr_state::twotiger_videoram_r),this), write8_delegate(FUNC(mcr_state::twotiger_videoram_w),this));
 }
 
 
@@ -2930,7 +2929,7 @@ GAME( 1981, solarfox, 0,        mcr_90009,     solarfox, mcr_state, solarfox,  R
 GAME( 1981, kick,     0,        mcr_90009,     kick, mcr_state,     kick,      ORIENTATION_SWAP_XY,        "Midway", "Kick (upright)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, kickman,  kick,     mcr_90009,     kick, mcr_state,     kick,      ORIENTATION_SWAP_XY,        "Midway", "Kickman (upright)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, kickc,    kick,     mcr_90009,     kickc, mcr_state,    kick,      ROT90,                      "Midway", "Kick (cocktail)", MACHINE_SUPPORTS_SAVE )
-GAMEL(1985, dpoker,   0,        mcr_90009_dp,  dpoker, mcr_state,   dpoker,    ROT0,                       "Bally",  "Draw Poker (Bally, 03-20)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_dpoker )
+GAMEL(1985, dpoker,   0,        mcr_90009_dp,  dpoker, mcr_state,   dpoker,    ROT0,                       "Bally",  "Draw Poker (Bally, 03-20)", MACHINE_SUPPORTS_SAVE, layout_dpoker )
 
 /* 90010 CPU board + 91399 video gen + 90913 sound I/O */
 GAME( 1981, shollow,  0,        mcr_90010,     shollow, mcr_state,  mcr_90010, ROT90, "Bally Midway", "Satan's Hollow (set 1)", MACHINE_SUPPORTS_SAVE )
@@ -2968,6 +2967,6 @@ GAME( 1983, dotrone,  dotron,   mcr_91490_snt, dotrone, mcr_state,  dotrone,   O
 /* 91490 CPU board + 91464 video gen + 91657 sound I/O + Squawk n' Talk + IPU laserdisk interface */
 GAME( 1983, nflfoot,  0,        mcr_91490_ipu, nflfoot, mcr_state,  nflfoot,   ROT0,  "Bally Midway", "NFL Football", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 
-/* 91490 CPU board + 91464 video gen + 90913 sound I/O + Turbo Chip Squeak */
+/* 91490 CPU board + 91464 video gen + 90913 sound I/O + Turbo Cheap Squeak */
 GAME( 1984, demoderb, 0,        mcr_91490_tcs, demoderb, mcr_state, demoderb,  ROT0,  "Bally Midway", "Demolition Derby", MACHINE_SUPPORTS_SAVE )
 GAME( 1984, demoderbc,demoderb, mcr_91490_tcs, demoderbc,mcr_state, demoderb,  ROT0,  "Bally Midway", "Demolition Derby (cocktail)", MACHINE_SUPPORTS_SAVE )

@@ -6,12 +6,11 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_COMX35_CLM_H
+#define MAME_BUS_COMX35_CLM_H
+
 #pragma once
 
-#ifndef __COMX_CLM__
-#define __COMX_CLM__
-
-#include "emu.h"
 #include "exp.h"
 #include "video/mc6845.h"
 
@@ -29,36 +28,35 @@ class comx_clm_device : public device_t,
 {
 public:
 	// construction/destruction
-	comx_clm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-	// optional information overrides
-	virtual const rom_entry *device_rom_region() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
-	// not really public
-	MC6845_UPDATE_ROW( crtc_update_row );
+	comx_clm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
+	// optional information overrides
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
+
 	// device_comx_expansion_card_interface overrides
 	virtual int comx_ef4_r() override;
-	virtual UINT8 comx_mrd_r(address_space &space, offs_t offset, int *extrom) override;
-	virtual void comx_mwr_w(address_space &space, offs_t offset, UINT8 data) override;
+	virtual uint8_t comx_mrd_r(address_space &space, offs_t offset, int *extrom) override;
+	virtual void comx_mwr_w(address_space &space, offs_t offset, uint8_t data) override;
 
 private:
+	MC6845_UPDATE_ROW( crtc_update_row );
+
 	required_device<mc6845_device> m_crtc;
 	required_device<palette_device> m_palette;
 	required_memory_region m_rom;
 	required_memory_region m_char_rom;
-	optional_shared_ptr<UINT8> m_video_ram;
+	optional_shared_ptr<uint8_t> m_video_ram;
 };
 
 
 // device type definition
-extern const device_type COMX_CLM;
+DECLARE_DEVICE_TYPE(COMX_CLM, comx_clm_device)
 
 
-#endif
+#endif // MAME_BUS_COMX35_CLM_H

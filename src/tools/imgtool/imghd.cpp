@@ -46,7 +46,7 @@ static imgtoolerr_t map_chd_error(chd_error chderr)
 
     Create a MAME HD image
 */
-imgtoolerr_t imghd_create(imgtool_stream *stream, UINT32 hunksize, UINT32 cylinders, UINT32 heads, UINT32 sectors, UINT32 seclen)
+imgtoolerr_t imghd_create(imgtool::stream &stream, uint32_t hunksize, uint32_t cylinders, uint32_t heads, uint32_t sectors, uint32_t seclen)
 {
 	imgtoolerr_t err = IMGTOOLERR_SUCCESS;
 	chd_file chd;
@@ -63,17 +63,17 @@ imgtoolerr_t imghd_create(imgtool_stream *stream, UINT32 hunksize, UINT32 cylind
 		hunksize = 1024;    /* default value */
 
 	/* bail if we are read only */
-	if (stream_isreadonly(stream))
+	if (stream.is_read_only())
 	{
 		err = IMGTOOLERR_READONLY;
 		return err;
 	}
 
 	/* calculations */
-	const UINT64 logicalbytes = (UINT64)cylinders * heads * sectors * seclen;
+	const uint64_t logicalbytes = (uint64_t)cylinders * heads * sectors * seclen;
 
 	/* create the new hard drive */
-	rc = chd.create(*stream_core_file(stream), logicalbytes, hunksize, seclen, compression);
+	rc = chd.create(*stream.core_file(), logicalbytes, hunksize, seclen, compression);
 	if (rc != CHDERR_NONE)
 	{
 		err = map_chd_error(rc);
@@ -81,7 +81,7 @@ imgtoolerr_t imghd_create(imgtool_stream *stream, UINT32 hunksize, UINT32 cylind
 	}
 
 	/* open the new hard drive */
-	rc = chd.open(*stream_core_file(stream));
+	rc = chd.open(*stream.core_file());
 
 	if (rc != CHDERR_NONE)
 	{
@@ -99,7 +99,7 @@ imgtoolerr_t imghd_create(imgtool_stream *stream, UINT32 hunksize, UINT32 cylind
 	}
 
 	/* alloc and zero buffer */
-	dynamic_buffer cache;
+	std::vector<uint8_t> cache;
 	cache.resize(hunksize);
 	memset(&cache[0], 0, hunksize);
 
@@ -125,28 +125,27 @@ imgtoolerr_t imghd_create(imgtool_stream *stream, UINT32 hunksize, UINT32 cylind
 
     Open stream as a MAME HD image
 */
-imgtoolerr_t imghd_open(imgtool_stream *stream, struct mess_hard_disk_file *hard_disk)
+imgtoolerr_t imghd_open(imgtool::stream &stream, struct mess_hard_disk_file *hard_disk)
 {
 	chd_error chderr;
 	imgtoolerr_t err = IMGTOOLERR_SUCCESS;
 
 	hard_disk->hard_disk = nullptr;
-	hard_disk->chd = nullptr;
 
-	chderr = hard_disk->chd->open(*stream_core_file(stream), stream_isreadonly(stream));
+	chderr = hard_disk->chd.open(*stream.core_file(), !stream.is_read_only());
 	if (chderr)
 	{
 		err = map_chd_error(chderr);
 		goto done;
 	}
 
-	hard_disk->hard_disk = hard_disk_open(hard_disk->chd);
+	hard_disk->hard_disk = hard_disk_open(&hard_disk->chd);
 	if (!hard_disk->hard_disk)
 	{
 		err = IMGTOOLERR_UNEXPECTED;
 		goto done;
 	}
-	hard_disk->stream = stream;
+	hard_disk->stream = &stream;
 
 done:
 	if (err)
@@ -169,7 +168,10 @@ void imghd_close(struct mess_hard_disk_file *disk)
 		disk->hard_disk = nullptr;
 	}
 	if (disk->stream)
-		stream_close(disk->stream);
+	{
+		delete disk->stream;
+		disk->stream = nullptr;
+	}
 }
 
 
@@ -179,9 +181,9 @@ void imghd_close(struct mess_hard_disk_file *disk)
 
     Read sector(s) from MAME HD image
 */
-imgtoolerr_t imghd_read(struct mess_hard_disk_file *disk, UINT32 lbasector, void *buffer)
+imgtoolerr_t imghd_read(struct mess_hard_disk_file *disk, uint32_t lbasector, void *buffer)
 {
-	UINT32 reply;
+	uint32_t reply;
 	reply = hard_disk_read(disk->hard_disk, lbasector, buffer);
 	return (imgtoolerr_t)(reply ? IMGTOOLERR_SUCCESS : map_chd_error((chd_error)reply));
 }
@@ -193,9 +195,9 @@ imgtoolerr_t imghd_read(struct mess_hard_disk_file *disk, UINT32 lbasector, void
 
     Write sector(s) from MAME HD image
 */
-imgtoolerr_t imghd_write(struct mess_hard_disk_file *disk, UINT32 lbasector, const void *buffer)
+imgtoolerr_t imghd_write(struct mess_hard_disk_file *disk, uint32_t lbasector, const void *buffer)
 {
-	UINT32 reply;
+	uint32_t reply;
 	reply = hard_disk_write(disk->hard_disk, lbasector, buffer);
 	return (imgtoolerr_t)(reply ? IMGTOOLERR_SUCCESS : map_chd_error((chd_error)reply));
 }
@@ -215,7 +217,7 @@ const hard_disk_info *imghd_get_header(struct mess_hard_disk_file *disk)
 }
 
 
-static imgtoolerr_t mess_hd_image_create(imgtool_image *image, imgtool_stream *f, option_resolution *createoptions);
+static imgtoolerr_t mess_hd_image_create(imgtool::image &image, imgtool::stream::ptr &&stream, util::option_resolution *createoptions);
 
 enum
 {
@@ -226,7 +228,7 @@ enum
 	mess_hd_createopts_seclen    = 'F'
 };
 
-static OPTION_GUIDE_START( mess_hd_create_optionguide )
+OPTION_GUIDE_START( mess_hd_create_optionguide )
 	OPTION_INT(mess_hd_createopts_blocksize, "blocksize", "Sectors Per Block" )
 	OPTION_INT(mess_hd_createopts_cylinders, "cylinders", "Cylinders" )
 	OPTION_INT(mess_hd_createopts_heads, "heads",   "Heads" )
@@ -237,7 +239,7 @@ OPTION_GUIDE_END
 #define mess_hd_create_optionspecs "B[1]-2048;C1-[32]-65536;D1-[8]-64;E1-[128]-4096;F128/256/[512]/1024/2048/4096/8192/16384/32768/65536"
 
 
-void hd_get_info(const imgtool_class *imgclass, UINT32 state, union imgtoolinfo *info)
+void hd_get_info(const imgtool_class *imgclass, uint32_t state, union imgtoolinfo *info)
 {
 	switch(state)
 	{
@@ -247,23 +249,23 @@ void hd_get_info(const imgtool_class *imgclass, UINT32 state, union imgtoolinfo 
 
 		case IMGTOOLINFO_PTR_CREATE:                        info->create = mess_hd_image_create; break;
 
-		case IMGTOOLINFO_PTR_CREATEIMAGE_OPTGUIDE:          info->createimage_optguide = mess_hd_create_optionguide; break;
+		case IMGTOOLINFO_PTR_CREATEIMAGE_OPTGUIDE:          info->createimage_optguide = &mess_hd_create_optionguide; break;
 		case IMGTOOLINFO_STR_CREATEIMAGE_OPTSPEC:           strcpy(info->s = imgtool_temp_str(), mess_hd_create_optionspecs); break;
 	}
 }
 
 
 
-static imgtoolerr_t mess_hd_image_create(imgtool_image *image, imgtool_stream *f, option_resolution *createoptions)
+static imgtoolerr_t mess_hd_image_create(imgtool::image &image, imgtool::stream::ptr &&stream, util::option_resolution *createoptions)
 {
-	UINT32  blocksize, cylinders, heads, sectors, seclen;
+	uint32_t  blocksize, cylinders, heads, sectors, seclen;
 
 	/* read options */
-	blocksize = option_resolution_lookup_int(createoptions, mess_hd_createopts_blocksize);
-	cylinders = option_resolution_lookup_int(createoptions, mess_hd_createopts_cylinders);
-	heads = option_resolution_lookup_int(createoptions, mess_hd_createopts_heads);
-	sectors = option_resolution_lookup_int(createoptions, mess_hd_createopts_sectors);
-	seclen = option_resolution_lookup_int(createoptions, mess_hd_createopts_seclen);
+	blocksize = createoptions->lookup_int(mess_hd_createopts_blocksize);
+	cylinders = createoptions->lookup_int(mess_hd_createopts_cylinders);
+	heads = createoptions->lookup_int(mess_hd_createopts_heads);
+	sectors = createoptions->lookup_int(mess_hd_createopts_sectors);
+	seclen = createoptions->lookup_int(mess_hd_createopts_seclen);
 
-	return imghd_create(f, blocksize, cylinders, heads, sectors, seclen);
+	return imghd_create(*stream.get(), blocksize, cylinders, heads, sectors, seclen);
 }

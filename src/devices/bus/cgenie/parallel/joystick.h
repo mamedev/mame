@@ -6,12 +6,11 @@
 
 ***************************************************************************/
 
+#ifndef MAME_BUS_CGENIE_PARALLEL_JOYSTICK_H
+#define MAME_BUS_CGENIE_PARALLEL_JOYSTICK_H
+
 #pragma once
 
-#ifndef __CGENIE_PARALLEL_JOYSTICK_H__
-#define __CGENIE_PARALLEL_JOYSTICK_H__
-
-#include "emu.h"
 #include "parallel.h"
 
 
@@ -21,28 +20,28 @@
 
 // ======================> cgenie_joystick_device
 
-class cgenie_joystick_device : public device_t, public device_parallel_interface
+class cgenie_joystick_device : public device_t, public device_cg_parallel_interface
 {
 public:
 	// construction/destruction
-	cgenie_joystick_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	cgenie_joystick_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual ioport_constructor device_input_ports() const override;
 
-	virtual void pa_w(UINT8 data) override;
-	virtual UINT8 pb_r() override;
+	virtual void pa_w(uint8_t data) override;
+	virtual uint8_t pb_r() override;
 
 private:
 	required_ioport_array<4> m_joy;
 	required_ioport_array<6> m_keypad;
 
-	UINT8 m_select;
+	uint8_t m_select;
 };
 
 // device type definition
-extern const device_type CGENIE_JOYSTICK;
+DECLARE_DEVICE_TYPE(CGENIE_JOYSTICK, cgenie_joystick_device)
 
-#endif // __CGENIE_PARALLEL_JOYSTICK_H__
+#endif // MAME_BUS_CGENIE_PARALLEL_JOYSTICK_H

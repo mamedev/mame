@@ -169,6 +169,8 @@ static const nes_pcb pcb_list[] =
 	{ "ks7031",           KAISER_KS7031 },  //  used in Dracula II (FDS Conversion)
 	{ "ks7012",           KAISER_KS7012 },     // used in Zanac (FDS Conversion)
 	{ "ks7013b",          KAISER_KS7013B },    // used in Highway Star (FDS Conversion)
+	{ "ks7016",           KAISER_KS7016 },  // used in Exciting Basketball (FDS Conversion)
+	{ "ks7037",           KAISER_KS7037 },  // Metroid FDS Chinese
 	{ "gs2015",           RCM_GS2015 },
 	{ "gs2004",           RCM_GS2004 },
 	{ "gs2013",           RCM_GS2013 },
@@ -183,11 +185,13 @@ static const nes_pcb pcb_list[] =
 	{ "daou_306",         OPENCORP_DAOU306 },
 	{ "subor0",           SUBOR_TYPE0 },
 	{ "subor1",           SUBOR_TYPE1 },
+	{ "subor2",           SUBOR_TYPE2 },
 	{ "cc21",             UNL_CC21 },
 	{ "xiaozy",           UNL_XIAOZY },
 	{ "edu2k",            UNL_EDU2K },
 	{ "t230",             UNL_T230 },
 	{ "mk2",              UNL_MK2 },
+	{ "zemina",           ZEMINA_BOARD },
 	// misc bootleg boards
 	{ "ax5705",           UNL_AX5705 },
 	{ "sc127",            UNL_SC127 },
@@ -299,6 +303,7 @@ static const nes_pcb pcb_list[] =
 	{ "unl_bb",           UNL_BB },
 	{ "unl_malisb",       UNL_MALISB },
 	{ "sgpipe",           BTL_SHUIGUAN },
+	{ "rt01",             UNL_RT01 },   // Russian Test Cart
 	{ "unl_whero",        UNL_WORLDHERO },
 	{ "unl_43272",        UNL_43272 },
 	{ "tf1201",           UNL_TF1201 },
@@ -317,17 +322,13 @@ static const nes_pcb pcb_list[] =
 	{ "coolboy",          UNSUPPORTED_BOARD },
 	{ "btl_900218",       UNSUPPORTED_BOARD },  // pirate The Lord of King, to be emulated soon
 	{ "a9746",            UNSUPPORTED_BOARD },
-	{ "dance2k",          UNSUPPORTED_BOARD },
 	{ "pec586",           UNSUPPORTED_BOARD },
-	{ "bmc_f15",          UNSUPPORTED_BOARD },	// 150-in-1 Unchained Melody
-	{ "bmc_hp898f",       UNSUPPORTED_BOARD },	// Primasoft 9999999-in-1
-	{ "bmc_8in1",         UNSUPPORTED_BOARD },	// Super 8-in-1 (Incl. Rockin' Kats)
-	{ "unl_eh8813a",      UNSUPPORTED_BOARD },	// Dr. Mario II
-	{ "unl_158b",         UNSUPPORTED_BOARD },	// Blood of Jurassic
-	{ "unl_drgnfgt",      UNSUPPORTED_BOARD },	// Dragon Fighter by Flying Star
-	{ "ks7016",           UNSUPPORTED_BOARD },	// Exciting Basketball FDS
-	{ "ks7037",           UNSUPPORTED_BOARD },	// Metroid FDS Chinese
-	{ "rt01",             UNSUPPORTED_BOARD },	// Russian Test Cart
+	{ "bmc_f15",          UNSUPPORTED_BOARD },  // 150-in-1 Unchained Melody
+	{ "bmc_hp898f",       UNSUPPORTED_BOARD },  // Primasoft 9999999-in-1
+	{ "bmc_8in1",         UNSUPPORTED_BOARD },  // Super 8-in-1 (Incl. Rockin' Kats)
+	{ "unl_eh8813a",      UNSUPPORTED_BOARD },  // Dr. Mario II
+	{ "unl_158b",         UNSUPPORTED_BOARD },  // Blood of Jurassic
+	{ "unl_drgnfgt",      UNSUPPORTED_BOARD },  // Dragon Fighter by Flying Star
 	{ "test",             TEST_BOARD },
 	{ "unknown",          UNKNOWN_BOARD }  //  a few pirate dumps uses the wrong mapper...
 };
@@ -436,10 +437,10 @@ static int nes_cart_get_line( const char *feature )
 
 void nes_cart_slot_device::call_load_pcb()
 {
-	UINT32 vram_size = 0, prgram_size = 0, battery_size = 0, mapper_sram_size = 0;
+	uint32_t vram_size = 0, prgram_size = 0, battery_size = 0, mapper_sram_size = 0;
 	// SETUP step 1: getting PRG, VROM, VRAM sizes
-	UINT32 prg_size = get_software_region_length("prg");
-	UINT32 vrom_size = get_software_region_length("chr");
+	uint32_t prg_size = get_software_region_length("prg");
+	uint32_t vrom_size = get_software_region_length("chr");
 	vram_size = get_software_region_length("vram");
 	vram_size += get_software_region_length("vram2");
 
@@ -477,7 +478,7 @@ void nes_cart_slot_device::call_load_pcb()
 		{
 			// A few boards uses 4-screen mirroring: Gauntlet (DDROM or TRR1ROM or Tengen 800004),
 			// Rad Racer II (TVROM), and Napoleon Senki (IREM LROG017 with 74*161/161/21/138)
-			m_cart->set_four_screen_vram(TRUE);
+			m_cart->set_four_screen_vram(true);
 			m_cart->set_mirroring(PPU_MIRROR_4SCREEN);
 		}
 		if (!strcmp(mirroring, "pcb_controlled"))
@@ -487,7 +488,7 @@ void nes_cart_slot_device::call_load_pcb()
 			// See e.g. HES 6-in-1 vs other HES games, Irem Major League vs other G-101 games,
 			// Sunsoft-2 Shanghai vs Mito Koumon, Camerica BF9093 games vs BF9097 games, etc.
 			// Boards where all games control mirroring do not make real use of this.
-			m_cart->set_pcb_ctrl_mirror(TRUE);
+			m_cart->set_pcb_ctrl_mirror(true);
 		}
 	}
 
@@ -513,7 +514,7 @@ void nes_cart_slot_device::call_load_pcb()
 	if (m_pcb_id == TAITO_X1_005 && get_feature("x1-pin17") != nullptr && get_feature("x1-pin31") != nullptr)
 	{
 		if (!strcmp(get_feature("x1-pin17"), "CIRAM A10") && !strcmp(get_feature("x1-pin31"), "NC"))
-			m_cart->set_x1_005_alt(TRUE);
+			m_cart->set_x1_005_alt(true);
 	}
 
 	if (m_pcb_id == KONAMI_VRC2)
@@ -554,7 +555,7 @@ void nes_cart_slot_device::call_load_pcb()
 	// pirate variants of boards with bus conflict are often not suffering from it
 	// and actually games glitch if bus conflict is emulated...
 	if (get_feature("bus_conflict") && !strcmp(get_feature("bus_conflict"), "no"))
-		m_cart->set_bus_conflict(FALSE);
+		m_cart->set_bus_conflict(false);
 
 
 	// SETUP step 4: logging what we have found
@@ -595,13 +596,13 @@ void nes_cart_slot_device::call_load_pcb()
 	// A few boards have internal RAM with a battery (MMC6, Taito X1-005 & X1-017, etc.)
 	if (battery_size || mapper_sram_size)
 	{
-		UINT32 tot_size = battery_size + mapper_sram_size;
-		dynamic_buffer temp_nvram(tot_size);
+		uint32_t tot_size = battery_size + mapper_sram_size;
+		std::vector<uint8_t> temp_nvram(tot_size);
 
 		// some games relies on specific battery patterns to work
 		// (e.g. Silva Saga does not work with SRAM fully initialized to 0x00)
 		// and we use the info from xml here to prepare a default NVRAM
-		dynamic_buffer default_nvram(tot_size);
+		std::vector<uint8_t> default_nvram(tot_size);
 		if (battery_size)
 			memcpy(&default_nvram[0], get_software_region("bwram"), battery_size);
 		if (mapper_sram_size)

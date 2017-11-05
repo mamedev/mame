@@ -1,12 +1,12 @@
 /*
- * Copyright 2011-2016 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
 #include "bgfx_p.h"
 
 #if BX_PLATFORM_NACL && (BGFX_CONFIG_RENDERER_OPENGLES || BGFX_CONFIG_RENDERER_OPENGL)
-#	include <bgfx/bgfxplatform.h>
+#	include <bgfx/platform.h>
 #	include "renderer_gl.h"
 
 namespace bgfx { namespace gl

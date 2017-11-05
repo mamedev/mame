@@ -29,7 +29,7 @@ void galeb_state::video_start()
 {
 }
 
-UINT32 galeb_state::screen_update_galeb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t galeb_state::screen_update_galeb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x,y;
 

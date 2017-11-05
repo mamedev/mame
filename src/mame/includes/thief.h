@@ -4,10 +4,10 @@
 #include "video/tms9927.h"
 
 struct coprocessor_t {
-	std::unique_ptr<UINT8[]> context_ram;
-	UINT8 bank;
-	std::unique_ptr<UINT8[]> image_ram;
-	UINT8 param[0x9];
+	std::unique_ptr<uint8_t[]> context_ram;
+	uint8_t bank;
+	std::unique_ptr<uint8_t[]> image_ram;
+	uint8_t param[0x9];
 };
 
 class thief_state : public driver_device
@@ -20,11 +20,11 @@ public:
 		m_tms(*this, "tms"),
 		m_palette(*this, "palette") { }
 
-	std::unique_ptr<UINT8[]> m_videoram;
-	UINT8 m_input_select;
-	UINT8 m_read_mask;
-	UINT8 m_write_mask;
-	UINT8 m_video_control;
+	std::unique_ptr<uint8_t[]> m_videoram;
+	uint8_t m_input_select;
+	uint8_t m_read_mask;
+	uint8_t m_write_mask;
+	uint8_t m_video_control;
 	coprocessor_t m_coprocessor;
 	DECLARE_WRITE8_MEMBER(thief_input_select_w);
 	DECLARE_READ8_MEMBER(thief_io_r);
@@ -42,9 +42,9 @@ public:
 	DECLARE_WRITE8_MEMBER(tape_control_w);
 	DECLARE_DRIVER_INIT(thief);
 	virtual void video_start() override;
-	UINT32 screen_update_thief(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_thief(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(thief_interrupt);
-	UINT16 fetch_image_addr( coprocessor_t &thief_coprocessor );
+	uint16_t fetch_image_addr( coprocessor_t &thief_coprocessor );
 	void tape_set_audio( int track, int bOn );
 	void tape_set_motor( int bOn );
 	required_device<cpu_device> m_maincpu;

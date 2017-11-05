@@ -1,4 +1,4 @@
-// license:LGPL-2.1+
+// license:BSD-3-Clause
 // copyright-holders:Tomasz Slanina
 
 /************************************
@@ -25,8 +25,11 @@
 #include "cpu/mcs51/mcs51.h"
 #include "sound/okim6295.h"
 #include "video/mc6845.h"
+#include "screen.h"
+#include "speaker.h"
 
 #include "cardline.lh"
+
 
 #define MASTER_CLOCK XTAL_12MHz
 
@@ -43,11 +46,11 @@ public:
 		m_screen(*this, "screen")
 	{ }
 
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_colorram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_colorram;
 
-	UINT8 m_video;
-	UINT8 m_hsync_q;
+	uint8_t m_video;
+	uint8_t m_hsync_q;
 
 	DECLARE_WRITE8_MEMBER(vram_w);
 	DECLARE_WRITE8_MEMBER(attr_w);
@@ -92,8 +95,8 @@ MC6845_BEGIN_UPDATE( cardline_state::crtc_begin_update )
 
 MC6845_UPDATE_ROW( cardline_state::crtc_update_row )
 {
-	UINT8 *gfx;
-	UINT16 x = 0;
+	uint8_t *gfx;
+	uint16_t x = 0;
 	int gfx_ofs;
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 
@@ -112,7 +115,7 @@ MC6845_UPDATE_ROW( cardline_state::crtc_update_row )
 
 	gfx = memregion("gfx1")->base();
 
-	for (UINT8 cx = 0; cx < x_count; cx++)
+	for (uint8_t cx = 0; cx < x_count; cx++)
 	{
 		int bg_tile = (m_videoram[ma + gfx_ofs] | (m_colorram[ma + gfx_ofs]<<8)) & 0x3fff;
 		int bg_pal_ofs = ((m_colorram[ma + gfx_ofs] & 0x80) ? 256 : 0);
@@ -285,7 +288,7 @@ GFXDECODE_END
 
 PALETTE_INIT_MEMBER(cardline_state, cardline)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i,r,g,b,data;
 	int bit0,bit1,bit2;
 	for (i = 0;i < palette.entries();i++)
@@ -310,7 +313,7 @@ PALETTE_INIT_MEMBER(cardline_state, cardline)
 	}
 }
 
-static MACHINE_CONFIG_START( cardline, cardline_state )
+static MACHINE_CONFIG_START( cardline )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I80C32, MASTER_CLOCK)
@@ -346,7 +349,7 @@ static MACHINE_CONFIG_START( cardline, cardline_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", 1056000, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
@@ -374,4 +377,4 @@ ROM_START( cardline )
 
 ROM_END
 
-GAME( 199?, cardline,  0,       cardline,  cardline, driver_device,  0, ROT0, "Veltmeijer", "Card Line" , MACHINE_SUPPORTS_SAVE)
+GAME( 199?, cardline,  0,       cardline,  cardline, cardline_state,  0, ROT0, "Veltmeijer", "Card Line" , MACHINE_SUPPORTS_SAVE)

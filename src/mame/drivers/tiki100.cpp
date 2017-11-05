@@ -22,8 +22,13 @@
 
 */
 
+#include "emu.h"
 #include "includes/tiki100.h"
+
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
 
 /* Memory Banking */
 
@@ -31,10 +36,10 @@ READ8_MEMBER( tiki100_state::mrq_r )
 {
 	bool mdis = 1;
 
-	UINT8 data = m_exp->mrq_r(space, offset, 0xff, mdis);
+	uint8_t data = m_exp->mrq_r(space, offset, 0xff, mdis);
 
 	offs_t prom_addr = mdis << 5 | m_vire << 4 | m_rome << 3 | (offset >> 13);
-	UINT8 prom = m_prom->base()[prom_addr] ^ 0xff;
+	uint8_t prom = m_prom->base()[prom_addr] ^ 0xff;
 
 	if (prom & ROM0)
 	{
@@ -48,7 +53,7 @@ READ8_MEMBER( tiki100_state::mrq_r )
 
 	if (prom & VIR)
 	{
-		UINT16 addr = (offset + (m_scroll << 7)) & TIKI100_VIDEORAM_MASK;
+		uint16_t addr = (offset + (m_scroll << 7)) & TIKI100_VIDEORAM_MASK;
 
 		data = m_video_ram[addr];
 	}
@@ -65,11 +70,11 @@ WRITE8_MEMBER( tiki100_state::mrq_w )
 {
 	bool mdis = 1;
 	offs_t prom_addr = mdis << 5 | m_vire << 4 | m_rome << 3 | (offset >> 13);
-	UINT8 prom = m_prom->base()[prom_addr] ^ 0xff;
+	uint8_t prom = m_prom->base()[prom_addr] ^ 0xff;
 
 	if (prom & VIR)
 	{
-		UINT16 addr = (offset + (m_scroll << 7)) & TIKI100_VIDEORAM_MASK;
+		uint16_t addr = (offset + (m_scroll << 7)) & TIKI100_VIDEORAM_MASK;
 
 		m_video_ram[addr] = data;
 	}
@@ -84,7 +89,7 @@ WRITE8_MEMBER( tiki100_state::mrq_w )
 
 READ8_MEMBER( tiki100_state::iorq_r )
 {
-	UINT8 data = m_exp->iorq_r(space, offset, 0xff);
+	uint8_t data = m_exp->iorq_r(space, offset, 0xff);
 
 	switch ((offset & 0xff) >> 2)
 	{
@@ -178,22 +183,11 @@ WRITE8_MEMBER( tiki100_state::iorq_w )
 
 READ8_MEMBER( tiki100_state::keyboard_r )
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
-	switch (m_keylatch)
+	if (m_keylatch < 12)
 	{
-	case 0: data = m_y1->read(); break;
-	case 1: data = m_y2->read(); break;
-	case 2: data = m_y3->read(); break;
-	case 3: data = m_y4->read(); break;
-	case 4: data = m_y5->read(); break;
-	case 5: data = m_y6->read(); break;
-	case 6: data = m_y7->read(); break;
-	case 7: data = m_y8->read(); break;
-	case 8: data = m_y9->read(); break;
-	case 9: data = m_y10->read(); break;
-	case 10: data = m_y11->read(); break;
-	case 11: data = m_y12->read(); break;
+		data = m_y[m_keylatch]->read();
 	}
 
 	m_keylatch++;
@@ -229,7 +223,7 @@ WRITE8_MEMBER( tiki100_state::video_mode_w )
 	if (BIT(data, 7))
 	{
 		int color = data & 0x0f;
-		UINT8 colordata = ~m_palette_val;
+		uint8_t colordata = ~m_palette_val;
 
 		m_palette->set_pen_color(color, pal3bit(colordata >> 5), pal3bit(colordata >> 2), pal2bit(colordata >> 0));
 	}
@@ -457,17 +451,17 @@ INPUT_PORTS_END
 
 /* Video */
 
-UINT32 tiki100_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t tiki100_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	UINT16 addr = (m_scroll << 7);
+	uint16_t addr = (m_scroll << 7);
 	int sx, y, pixel, mode = (m_mode >> 4) & 0x03;
 
 	for (y = 0; y < 256; y++)
 	{
 		for (sx = 0; sx < 128; sx++)
 		{
-			UINT8 data = m_video_ram[addr & TIKI100_VIDEORAM_MASK];
+			uint8_t data = m_video_ram[addr & TIKI100_VIDEORAM_MASK];
 
 			switch (mode)
 			{
@@ -562,7 +556,7 @@ READ8_MEMBER( tiki100_state::pio_pb_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	// centronics
 	data |= m_centronics_ack << 4;
@@ -701,7 +695,7 @@ void tiki100_state::machine_reset()
 
 /* Machine Driver */
 
-static MACHINE_CONFIG_START( tiki100, tiki100_state )
+static MACHINE_CONFIG_START( tiki100 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_8MHz/2)
 	MCFG_CPU_PROGRAM_MAP(tiki100_mem)
@@ -725,7 +719,7 @@ static MACHINE_CONFIG_START( tiki100, tiki100_state )
 	MCFG_TIKI100_BUS_SLOT_ADD("slot3", nullptr)
 
 	/* devices */
-	MCFG_Z80DART_ADD(Z80DART_TAG, XTAL_8MHz/4, 0, 0, 0, 0 )
+	MCFG_DEVICE_ADD(Z80DART_TAG, Z80DART, XTAL_8MHz/4)
 	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_txd))
 	MCFG_Z80DART_OUT_DTRA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_dtr))
 	MCFG_Z80DART_OUT_RTSA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_rts))
@@ -813,6 +807,6 @@ ROM_END
 
 /* System Drivers */
 
-/*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT    COMPANY             FULLNAME        FLAGS */
-COMP( 1984, kontiki,    0,          0,      tiki100,    tiki100, driver_device, 0,      "Kontiki Data A/S", "KONTIKI 100",  MACHINE_SUPPORTS_SAVE )
-COMP( 1984, tiki100,    kontiki,    0,      tiki100,    tiki100, driver_device, 0,      "Tiki Data A/S",    "TIKI 100",     MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT    STATE          INIT    COMPANY             FULLNAME        FLAGS
+COMP( 1984, kontiki,    0,          0,      tiki100,    tiki100, tiki100_state, 0,      "Kontiki Data A/S", "KONTIKI 100",  MACHINE_SUPPORTS_SAVE )
+COMP( 1984, tiki100,    kontiki,    0,      tiki100,    tiki100, tiki100_state, 0,      "Tiki Data A/S",    "TIKI 100",     MACHINE_SUPPORTS_SAVE )

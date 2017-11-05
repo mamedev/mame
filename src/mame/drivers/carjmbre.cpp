@@ -40,8 +40,11 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "video/resnet.h"
+#include "machine/gen_latch.h"
 #include "sound/ay8910.h"
+#include "video/resnet.h"
+#include "screen.h"
+#include "speaker.h"
 
 class carjmbre_state : public driver_device
 {
@@ -59,13 +62,13 @@ public:
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_spriteram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
 	bool m_nmi_enabled;
-	UINT8 m_bgcolor;
+	uint8_t m_bgcolor;
 	tilemap_t *m_tilemap;
 
 	DECLARE_WRITE8_MEMBER(bgcolor_w);
@@ -75,7 +78,7 @@ public:
 	INTERRUPT_GEN_MEMBER(vblank_nmi);
 
 	DECLARE_PALETTE_INIT(carjmbre);
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 
@@ -125,7 +128,7 @@ static const res_net_info carjmbre_net_info =
 
 PALETTE_INIT_MEMBER(carjmbre_state, carjmbre)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	std::vector<rgb_t> rgb;
 
 	compute_res_net_all(rgb, color_prom, carjmbre_decode_info, carjmbre_net_info);
@@ -157,12 +160,12 @@ TILE_GET_INFO_MEMBER(carjmbre_state::get_tile_info)
 
 void carjmbre_state::video_start()
 {
-	m_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(carjmbre_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(carjmbre_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_tilemap->set_transparent_pen(0);
 }
 
 
-UINT32 carjmbre_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t carjmbre_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_bgcolor, cliprect);
 	m_tilemap->draw(screen, bitmap, cliprect, 0, 0);
@@ -241,7 +244,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, carjmbre_state )
 	AM_RANGE(0x9800, 0x98ff) AM_RAM AM_SHARE("spriteram") // 5101*2
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("IN1")
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("IN2")
-	AM_RANGE(0xb800, 0xb800) AM_READ_PORT("DSW") AM_WRITE(soundlatch_byte_w)
+	AM_RANGE(0xb800, 0xb800) AM_READ_PORT("DSW") AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 ADDRESS_MAP_END
 
 
@@ -254,7 +257,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, carjmbre_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x00, 0x00) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x20, 0x21) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
 	AM_RANGE(0x22, 0x22) AM_WRITENOP // bdir/bc2/bc1 1/0/1 inactive write
 	AM_RANGE(0x24, 0x24) AM_DEVREAD("ay1", ay8910_device, data_r)
@@ -342,7 +345,7 @@ static GFXDECODE_START( carjmbre )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( carjmbre, carjmbre_state )
+static MACHINE_CONFIG_START( carjmbre )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6)
@@ -368,8 +371,12 @@ static MACHINE_CONFIG_START( carjmbre, carjmbre_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ay1", AY8910, XTAL_18_432MHz/6/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+
 	MCFG_SOUND_ADD("ay2", AY8910, XTAL_18_432MHz/6/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -412,4 +419,4 @@ ROM_START( carjmbre )
 ROM_END
 
 
-GAME( 1983, carjmbre, 0, carjmbre, carjmbre, driver_device, 0, ROT90, "Omori Electric Co., Ltd.", "Car Jamboree", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1983, carjmbre, 0, carjmbre, carjmbre, carjmbre_state, 0, ROT90, "Omori Electric Co., Ltd.", "Car Jamboree", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_GRAPHICS )

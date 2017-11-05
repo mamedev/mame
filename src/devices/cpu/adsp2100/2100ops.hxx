@@ -49,7 +49,7 @@
 #define CALC_NZVC_SUB(s,d,r) CLR_FLAGS; CALC_N(r); CALC_Z(r); CALC_V(s,d,r); CALC_C_SUB(r)
 
 /* ADSP-218x constants */
-static const INT32 constants[] =
+static const int32_t constants[] =
 {
 	0x0001, 0xfffe, 0x0002, 0xfffd, 0x0004, 0xfffb, 0x0008, 0xfff7,
 	0x0010, 0xffef, 0x0020, 0xffdf, 0x0040, 0xffbf, 0x0080, 0xff7f,
@@ -112,7 +112,7 @@ inline void adsp21xx_device::update_mstat()
     PC stack handlers
 ===========================================================================*/
 
-inline UINT32 adsp21xx_device::pc_stack_top()
+inline uint32_t adsp21xx_device::pc_stack_top()
 {
 	if (m_pc_sp > 0)
 		return m_pc_stack[m_pc_sp - 1];
@@ -120,7 +120,7 @@ inline UINT32 adsp21xx_device::pc_stack_top()
 		return m_pc_stack[0];
 }
 
-inline void adsp21xx_device::set_pc_stack_top(UINT32 top)
+inline void adsp21xx_device::set_pc_stack_top(uint32_t top)
 {
 	if (m_pc_sp > 0)
 		m_pc_stack[m_pc_sp - 1] = top;
@@ -140,7 +140,7 @@ inline void adsp21xx_device::pc_stack_push()
 		m_sstat |= PC_OVER;
 }
 
-inline void adsp21xx_device::pc_stack_push_val(UINT32 val)
+inline void adsp21xx_device::pc_stack_push_val(uint32_t val)
 {
 	if (m_pc_sp < PC_STACK_DEPTH)
 	{
@@ -163,7 +163,7 @@ inline void adsp21xx_device::pc_stack_pop()
 	m_pc = m_pc_stack[m_pc_sp];
 }
 
-inline UINT32 adsp21xx_device::pc_stack_pop_val()
+inline uint32_t adsp21xx_device::pc_stack_pop_val()
 {
 	if (m_pc_sp > 0)
 	{
@@ -179,7 +179,7 @@ inline UINT32 adsp21xx_device::pc_stack_pop_val()
     CNTR stack handlers
 ===========================================================================*/
 
-inline UINT32 adsp21xx_device::cntr_stack_top()
+inline uint32_t adsp21xx_device::cntr_stack_top()
 {
 	if (m_cntr_sp > 0)
 		return m_cntr_stack[m_cntr_sp - 1];
@@ -215,7 +215,7 @@ inline void adsp21xx_device::cntr_stack_pop()
     LOOP stack handlers
 ===========================================================================*/
 
-inline UINT32 adsp21xx_device::loop_stack_top()
+inline uint32_t adsp21xx_device::loop_stack_top()
 {
 	if (m_loop_sp > 0)
 		return m_loop_stack[m_loop_sp - 1];
@@ -223,7 +223,7 @@ inline UINT32 adsp21xx_device::loop_stack_top()
 		return m_loop_stack[0];
 }
 
-inline void adsp21xx_device::loop_stack_push(UINT32 value)
+inline void adsp21xx_device::loop_stack_push(uint32_t value)
 {
 	if (m_loop_sp < LOOP_STACK_DEPTH)
 	{
@@ -250,7 +250,7 @@ inline void adsp21xx_device::loop_stack_pop()
 		}
 		else
 		{
-			m_loop = m_loop_stack[m_loop_sp -1] >> 4;
+			m_loop = m_loop_stack[m_loop_sp - 1] >> 4;
 			m_loop_condition = m_loop_stack[m_loop_sp - 1] & 15;
 		}
 	}
@@ -311,7 +311,7 @@ inline int adsp21xx_device::condition(int c)
 
 int adsp21xx_device::slow_condition()
 {
-	if ((INT32)--m_cntr > 0)
+	if ((int32_t)--m_cntr > 0)
 		return 1;
 	else
 	{
@@ -337,7 +337,7 @@ inline void adsp21xx_device::update_l(int which)
 	m_base[which] = m_i[which] & m_lmask[which];
 }
 
-void adsp21xx_device::write_reg0(int regnum, INT32 val)
+void adsp21xx_device::write_reg0(int regnum, int32_t val)
 {
 	switch (regnum)
 	{
@@ -350,17 +350,17 @@ void adsp21xx_device::write_reg0(int regnum, INT32 val)
 		case 0x06:  m_core.my0.s = val;                 break;
 		case 0x07:  m_core.my1.s = val;                 break;
 		case 0x08:  m_core.si.s = val;                  break;
-		case 0x09:  m_core.se.s = (INT8)val;            break;
+		case 0x09:  m_core.se.s = (int8_t)val;            break;
 		case 0x0a:  m_core.ar.s = val;                  break;
 		case 0x0b:  m_core.mr.mrx.mr0.s = val;          break;
-		case 0x0c:  m_core.mr.mrx.mr1.s = val; m_core.mr.mrx.mr2.s = (INT16)val >> 15;  break;
-		case 0x0d:  m_core.mr.mrx.mr2.s = (INT8)val;    break;
+		case 0x0c:  m_core.mr.mrx.mr1.s = val; m_core.mr.mrx.mr2.s = (int16_t)val >> 15;  break;
+		case 0x0d:  m_core.mr.mrx.mr2.s = (int8_t)val;    break;
 		case 0x0e:  m_core.sr.srx.sr0.s = val;          break;
 		case 0x0f:  m_core.sr.srx.sr1.s = val;          break;
 	}
 }
 
-void adsp21xx_device::write_reg1(int regnum, INT32 val)
+void adsp21xx_device::write_reg1(int regnum, int32_t val)
 {
 	int index = regnum & 3;
 	switch (regnum >> 2)
@@ -371,7 +371,7 @@ void adsp21xx_device::write_reg1(int regnum, INT32 val)
 			break;
 
 		case 1:
-			m_m[index] = (INT32)(val << 18) >> 18;
+			m_m[index] = (int32_t)(val << 18) >> 18;
 			break;
 
 		case 2:
@@ -380,12 +380,16 @@ void adsp21xx_device::write_reg1(int regnum, INT32 val)
 			break;
 
 		case 3:
-			logerror("ADSP %04x: Writing to an invalid register!\n", m_ppc);
+			// Check for DMOVLAY instruction callback
+			if (regnum == 0xf && !m_dmovlay_cb.isnull())
+				m_dmovlay_cb(val & 0x3fff);
+			else
+				logerror("ADSP %04x: Writing to an invalid register! RGP=01 RegCode=%1X Val=%04X\n", m_ppc, regnum, val);
 			break;
 	}
 }
 
-void adsp21xx_device::write_reg2(int regnum, INT32 val)
+void adsp21xx_device::write_reg2(int regnum, int32_t val)
 {
 	int index = 4 + (regnum & 3);
 	switch (regnum >> 2)
@@ -396,7 +400,7 @@ void adsp21xx_device::write_reg2(int regnum, INT32 val)
 			break;
 
 		case 1:
-			m_m[index] = (INT32)(val << 18) >> 18;
+			m_m[index] = (int32_t)(val << 18) >> 18;
 			break;
 
 		case 2:
@@ -410,7 +414,7 @@ void adsp21xx_device::write_reg2(int regnum, INT32 val)
 	}
 }
 
-void adsp21xx_device::write_reg3(int regnum, INT32 val)
+void adsp21xx_device::write_reg3(int regnum, int32_t val)
 {
 	switch (regnum)
 	{
@@ -419,7 +423,7 @@ void adsp21xx_device::write_reg3(int regnum, INT32 val)
 		case 0x03:  m_imask = val & m_imask_mask; check_irqs();     break;
 		case 0x04:  m_icntl = val & 0x001f; check_irqs();           break;
 		case 0x05:  cntr_stack_push(); m_cntr = val & 0x3fff;       break;
-		case 0x06:  m_core.sb.s = (INT32)(val << 27) >> 27;         break;
+		case 0x06:  m_core.sb.s = (int32_t)(val << 27) >> 27;         break;
 		case 0x07:  m_px = val;                                     break;
 		case 0x09:  if (!m_sport_tx_cb.isnull()) m_sport_tx_cb(0, val, 0xffff); break;
 		case 0x0b:  if (!m_sport_tx_cb.isnull()) m_sport_tx_cb(1, val, 0xffff); break;
@@ -430,7 +434,7 @@ void adsp21xx_device::write_reg3(int regnum, INT32 val)
 				/* clear timer */
 				if (val & 0x0002) m_irq_latch[ADSP2181_IRQ0] = 0;
 				if (val & 0x0004) m_irq_latch[ADSP2181_IRQ1] = 0;
-				/* clear BDMA */
+				if (val & 0x0008) m_irq_latch[ADSP2181_BDMA] = 0;
 				if (val & 0x0010) m_irq_latch[ADSP2181_IRQE] = 0;
 				if (val & 0x0020) m_irq_latch[ADSP2181_SPORT0_RX] = 0;
 				if (val & 0x0040) m_irq_latch[ADSP2181_SPORT0_TX] = 0;
@@ -438,7 +442,7 @@ void adsp21xx_device::write_reg3(int regnum, INT32 val)
 				/* force timer */
 				if (val & 0x0200) m_irq_latch[ADSP2181_IRQ0] = 1;
 				if (val & 0x0400) m_irq_latch[ADSP2181_IRQ1] = 1;
-				/* force BDMA */
+				if (val & 0x0800) m_irq_latch[ADSP2181_BDMA] = 1;
 				if (val & 0x1000) m_irq_latch[ADSP2181_IRQE] = 1;
 				if (val & 0x2000) m_irq_latch[ADSP2181_SPORT0_RX] = 1;
 				if (val & 0x4000) m_irq_latch[ADSP2181_SPORT0_TX] = 1;
@@ -475,22 +479,22 @@ void adsp21xx_device::write_reg3(int regnum, INT32 val)
     register reading
 ===========================================================================*/
 
-INT32 adsp21xx_device::read_reg0(int regnum)
+int32_t adsp21xx_device::read_reg0(int regnum)
 {
 	return *m_read0_ptr[regnum];
 }
 
-INT32 adsp21xx_device::read_reg1(int regnum)
+int32_t adsp21xx_device::read_reg1(int regnum)
 {
 	return *m_read1_ptr[regnum];
 }
 
-INT32 adsp21xx_device::read_reg2(int regnum)
+int32_t adsp21xx_device::read_reg2(int regnum)
 {
 	return *m_read2_ptr[regnum];
 }
 
-INT32 adsp21xx_device::read_reg3(int regnum)
+int32_t adsp21xx_device::read_reg3(int regnum)
 {
 	switch (regnum)
 	{
@@ -505,7 +509,7 @@ INT32 adsp21xx_device::read_reg3(int regnum)
 		case 0x08:  if (!m_sport_rx_cb.isnull()) return m_sport_rx_cb(0); else return 0;
 		case 0x0a:  if (!m_sport_rx_cb.isnull()) return m_sport_rx_cb(1); else return 0;
 		case 0x0f:  return pc_stack_pop_val();
-		default:    logerror("ADSP %04x: Reading from an invalid register!\n", m_ppc); return 0;
+		default:    logerror("ADSP %04x: Reading from an invalid register! RGP=b11 RegCode=%1X\n", m_ppc, regnum); return 0;
 	}
 }
 
@@ -515,13 +519,13 @@ INT32 adsp21xx_device::read_reg3(int regnum)
     Modulus addressing logic
 ===========================================================================*/
 
-inline void adsp21xx_device::modify_address(UINT32 ireg, UINT32 mreg)
+inline void adsp21xx_device::modify_address(uint32_t ireg, uint32_t mreg)
 {
-	UINT32 base = m_base[ireg];
-	UINT32 i = m_i[ireg];
-	UINT32 l = m_l[ireg];
+	uint32_t base = m_base[ireg];
+	uint32_t i = m_i[ireg];
+	uint32_t l = m_l[ireg];
 
-	i += m_m[mreg];
+	i = (i + m_m[mreg]) & 0x3fff;
 	if (i < base) i += l;
 	else if (i >= base + l) i -= l;
 	m_i[ireg] = i;
@@ -533,47 +537,48 @@ inline void adsp21xx_device::modify_address(UINT32 ireg, UINT32 mreg)
     Data memory accessors
 ===========================================================================*/
 
-inline void adsp21xx_device::data_write_dag1(UINT32 op, INT32 val)
+inline void adsp21xx_device::data_write_dag1(uint32_t op, int32_t val)
 {
-	UINT32 ireg = (op >> 2) & 3;
-	UINT32 mreg = op & 3;
-	UINT32 base = m_base[ireg];
-	UINT32 i = m_i[ireg];
-	UINT32 l = m_l[ireg];
+	uint32_t ireg = (op >> 2) & 3;
+	uint32_t mreg = op & 3;
+	uint32_t base = m_base[ireg];
+	uint32_t i = m_i[ireg];
+	uint32_t l = m_l[ireg];
 
 	if ( m_mstat & MSTAT_REVERSE )
 	{
-		UINT32 ir = m_reverse_table[ i & 0x3fff ];
+		uint32_t ir = m_reverse_table[ i & 0x3fff ];
 		data_write(ir, val);
 	}
 	else
 		data_write(i, val);
 
-	i += m_m[mreg];
+	i = (i + m_m[mreg]) & 0x3fff;
 	if (i < base) i += l;
 	else if (i >= base + l) i -= l;
+
 	m_i[ireg] = i;
 }
 
 
-inline UINT32 adsp21xx_device::data_read_dag1(UINT32 op)
+inline uint32_t adsp21xx_device::data_read_dag1(uint32_t op)
 {
-	UINT32 ireg = (op >> 2) & 3;
-	UINT32 mreg = op & 3;
-	UINT32 base = m_base[ireg];
-	UINT32 i = m_i[ireg];
-	UINT32 l = m_l[ireg];
-	UINT32 res;
+	uint32_t ireg = (op >> 2) & 3;
+	uint32_t mreg = op & 3;
+	uint32_t base = m_base[ireg];
+	uint32_t i = m_i[ireg];
+	uint32_t l = m_l[ireg];
+	uint32_t res;
 
 	if (m_mstat & MSTAT_REVERSE)
 	{
-		UINT32 ir = m_reverse_table[i & 0x3fff];
+		uint32_t ir = m_reverse_table[i & 0x3fff];
 		res = data_read(ir);
 	}
 	else
 		res = data_read(i);
 
-	i += m_m[mreg];
+	i = (i + m_m[mreg]) & 0x3fff;
 	if (i < base) i += l;
 	else if (i >= base + l) i -= l;
 	m_i[ireg] = i;
@@ -581,34 +586,34 @@ inline UINT32 adsp21xx_device::data_read_dag1(UINT32 op)
 	return res;
 }
 
-inline void adsp21xx_device::data_write_dag2(UINT32 op, INT32 val)
+inline void adsp21xx_device::data_write_dag2(uint32_t op, int32_t val)
 {
-	UINT32 ireg = 4 + ((op >> 2) & 3);
-	UINT32 mreg = 4 + (op & 3);
-	UINT32 base = m_base[ireg];
-	UINT32 i = m_i[ireg];
-	UINT32 l = m_l[ireg];
+	uint32_t ireg = 4 + ((op >> 2) & 3);
+	uint32_t mreg = 4 + (op & 3);
+	uint32_t base = m_base[ireg];
+	uint32_t i = m_i[ireg];
+	uint32_t l = m_l[ireg];
 
 	data_write(i, val);
 
-	i += m_m[mreg];
+	i = (i + m_m[mreg]) & 0x3fff;
 	if (i < base) i += l;
 	else if (i >= base + l) i -= l;
 	m_i[ireg] = i;
 }
 
 
-inline UINT32 adsp21xx_device::data_read_dag2(UINT32 op)
+inline uint32_t adsp21xx_device::data_read_dag2(uint32_t op)
 {
-	UINT32 ireg = 4 + ((op >> 2) & 3);
-	UINT32 mreg = 4 + (op & 3);
-	UINT32 base = m_base[ireg];
-	UINT32 i = m_i[ireg];
-	UINT32 l = m_l[ireg];
+	uint32_t ireg = 4 + ((op >> 2) & 3);
+	uint32_t mreg = 4 + (op & 3);
+	uint32_t base = m_base[ireg];
+	uint32_t i = m_i[ireg];
+	uint32_t l = m_l[ireg];
 
-	UINT32 res = data_read(i);
+	uint32_t res = data_read(i);
 
-	i += m_m[mreg];
+	i = (i + m_m[mreg]) & 0x3fff;
 	if (i < base) i += l;
 	else if (i >= base + l) i -= l;
 	m_i[ireg] = i;
@@ -620,37 +625,37 @@ inline UINT32 adsp21xx_device::data_read_dag2(UINT32 op)
     Program memory accessors
 ===========================================================================*/
 
-inline void adsp21xx_device::pgm_write_dag2(UINT32 op, INT32 val)
+inline void adsp21xx_device::pgm_write_dag2(uint32_t op, int32_t val)
 {
-	UINT32 ireg = 4 + ((op >> 2) & 3);
-	UINT32 mreg = 4 + (op & 3);
-	UINT32 base = m_base[ireg];
-	UINT32 i = m_i[ireg];
-	UINT32 l = m_l[ireg];
+	uint32_t ireg = 4 + ((op >> 2) & 3);
+	uint32_t mreg = 4 + (op & 3);
+	uint32_t base = m_base[ireg];
+	uint32_t i = m_i[ireg];
+	uint32_t l = m_l[ireg];
 
 	program_write(i, (val << 8) | m_px);
 
-	i += m_m[mreg];
+	i = (i + m_m[mreg]) & 0x3fff;
 	if (i < base) i += l;
 	else if (i >= base + l) i -= l;
 	m_i[ireg] = i;
 }
 
 
-inline UINT32 adsp21xx_device::pgm_read_dag2(UINT32 op)
+inline uint32_t adsp21xx_device::pgm_read_dag2(uint32_t op)
 {
-	UINT32 ireg = 4 + ((op >> 2) & 3);
-	UINT32 mreg = 4 + (op & 3);
-	UINT32 base = m_base[ireg];
-	UINT32 i = m_i[ireg];
-	UINT32 l = m_l[ireg];
-	UINT32 res;
+	uint32_t ireg = 4 + ((op >> 2) & 3);
+	uint32_t mreg = 4 + (op & 3);
+	uint32_t base = m_base[ireg];
+	uint32_t i = m_i[ireg];
+	uint32_t l = m_l[ireg];
+	uint32_t res;
 
 	res = program_read(i);
 	m_px = res;
 	res >>= 8;
 
-	i += m_m[mreg];
+	i = (i + m_m[mreg]) & 0x3fff;
 	if (i < base) i += l;
 	else if (i >= base + l) i -= l;
 	m_i[ireg] = i;
@@ -664,16 +669,16 @@ inline UINT32 adsp21xx_device::pgm_read_dag2(UINT32 op)
     register reading
 ===========================================================================*/
 
-#define ALU_GETXREG_UNSIGNED(x) (*(UINT16 *)m_alu_xregs[x])
-#define ALU_GETYREG_UNSIGNED(y) (*(UINT16 *)m_alu_yregs[y])
+#define ALU_GETXREG_UNSIGNED(x) (*(uint16_t *)m_alu_xregs[x])
+#define ALU_GETYREG_UNSIGNED(y) (*(uint16_t *)m_alu_yregs[y])
 
-#define MAC_GETXREG_UNSIGNED(x) (*(UINT16 *)m_mac_xregs[x])
-#define MAC_GETXREG_SIGNED(x)   (*( INT16 *)m_mac_xregs[x])
-#define MAC_GETYREG_UNSIGNED(y) (*(UINT16 *)m_mac_yregs[y])
-#define MAC_GETYREG_SIGNED(y)   (*( INT16 *)m_mac_yregs[y])
+#define MAC_GETXREG_UNSIGNED(x) (*(uint16_t *)m_mac_xregs[x])
+#define MAC_GETXREG_SIGNED(x)   (*( int16_t *)m_mac_xregs[x])
+#define MAC_GETYREG_UNSIGNED(y) (*(uint16_t *)m_mac_yregs[y])
+#define MAC_GETYREG_SIGNED(y)   (*( int16_t *)m_mac_yregs[y])
 
-#define SHIFT_GETXREG_UNSIGNED(x) (*(UINT16 *)m_shift_xregs[x])
-#define SHIFT_GETXREG_SIGNED(x)   (*( INT16 *)m_shift_xregs[x])
+#define SHIFT_GETXREG_UNSIGNED(x) (*(uint16_t *)m_shift_xregs[x])
+#define SHIFT_GETXREG_SIGNED(x)   (*( int16_t *)m_shift_xregs[x])
 
 
 
@@ -683,9 +688,9 @@ inline UINT32 adsp21xx_device::pgm_read_dag2(UINT32 op)
 
 void adsp21xx_device::alu_op_ar(int op)
 {
-	INT32 xop = (op >> 8) & 7;
-	INT32 yop = (op >> 11) & 3;
-	INT32 res;
+	int32_t xop = (op >> 8) & 7;
+	int32_t yop = (op >> 11) & 3;
+	int32_t res;
 
 	switch (op & (15<<13))  /*JB*/
 	{
@@ -821,9 +826,9 @@ void adsp21xx_device::alu_op_ar(int op)
 
 void adsp21xx_device::alu_op_ar_const(int op)
 {
-	INT32 xop = (op >> 8) & 7;
-	INT32 yop = constants[((op >> 5) & 0x07) | ((op >> 8) & 0x18)];
-	INT32 res;
+	int32_t xop = (op >> 8) & 7;
+	int32_t yop = constants[((op >> 5) & 0x07) | ((op >> 8) & 0x18)];
+	int32_t res;
 
 	switch (op & (15<<13))  /*JB*/
 	{
@@ -947,9 +952,9 @@ void adsp21xx_device::alu_op_ar_const(int op)
 
 void adsp21xx_device::alu_op_af(int op)
 {
-	INT32 xop = (op >> 8) & 7;
-	INT32 yop = (op >> 11) & 3;
-	INT32 res;
+	int32_t xop = (op >> 8) & 7;
+	int32_t yop = (op >> 11) & 3;
+	int32_t res;
 
 	switch (op & (15<<13))  /*JB*/
 	{
@@ -1082,9 +1087,9 @@ void adsp21xx_device::alu_op_af(int op)
 
 void adsp21xx_device::alu_op_af_const(int op)
 {
-	INT32 xop = (op >> 8) & 7;
-	INT32 yop = constants[((op >> 5) & 0x07) | ((op >> 8) & 0x18)];
-	INT32 res;
+	int32_t xop = (op >> 8) & 7;
+	int32_t yop = constants[((op >> 5) & 0x07) | ((op >> 8) & 0x18)];
+	int32_t res;
 
 	switch (op & (15<<13))  /*JB*/
 	{
@@ -1205,9 +1210,9 @@ void adsp21xx_device::alu_op_af_const(int op)
 
 void adsp21xx_device::alu_op_none(int op)
 {
-	INT32 xop = (op >> 8) & 7;
-	INT32 yop = (op >> 11) & 3;
-	INT32 res;
+	int32_t xop = (op >> 8) & 7;
+	int32_t yop = (op >> 11) & 3;
+	int32_t res;
 
 	switch (op & (15<<13))  /*JB*/
 	{
@@ -1334,11 +1339,11 @@ void adsp21xx_device::alu_op_none(int op)
 
 void adsp21xx_device::mac_op_mr(int op)
 {
-	INT8 shift = ((m_mstat & MSTAT_INTEGER) >> 4) ^ 1;
-	INT32 xop = (op >> 8) & 7;
-	INT32 yop = (op >> 11) & 3;
-	INT32 temp;
-	INT64 res;
+	int8_t shift = ((m_mstat & MSTAT_INTEGER) >> 4) ^ 1;
+	int32_t xop = (op >> 8) & 7;
+	int32_t yop = (op >> 11) & 3;
+	int32_t temp;
+	int64_t res;
 
 	switch (op & (15<<13))  /*JB*/
 	{
@@ -1350,15 +1355,15 @@ void adsp21xx_device::mac_op_mr(int op)
 			xop = MAC_GETXREG_SIGNED(xop);
 			yop = MAC_GETYREG_SIGNED(yop);
 			temp = (xop * yop) << shift;
-			res = (INT64)temp;
+			res = (int64_t)temp;
 #if 0
-			if ((res & 0xffff) == 0x8000) res &= ~((UINT64)0x10000);
+			if ((res & 0xffff) == 0x8000) res &= ~((uint64_t)0x10000);
 			else res += (res & 0x8000) << 1;
 #else
 			temp &= 0xffff;
 			res += 0x8000;
 			if ( temp == 0x8000 )
-				res &= ~((UINT64)0x10000);
+				res &= ~((uint64_t)0x10000);
 #endif
 			break;
 		case 0x02<<13:
@@ -1366,15 +1371,15 @@ void adsp21xx_device::mac_op_mr(int op)
 			xop = MAC_GETXREG_SIGNED(xop);
 			yop = MAC_GETYREG_SIGNED(yop);
 			temp = (xop * yop) << shift;
-			res = m_core.mr.mr + (INT64)temp;
+			res = m_core.mr.mr + (int64_t)temp;
 #if 0
-			if ((res & 0xffff) == 0x8000) res &= ~((UINT64)0x10000);
+			if ((res & 0xffff) == 0x8000) res &= ~((uint64_t)0x10000);
 			else res += (res & 0x8000) << 1;
 #else
 			temp &= 0xffff;
 			res += 0x8000;
 			if ( temp == 0x8000 )
-				res &= ~((UINT64)0x10000);
+				res &= ~((uint64_t)0x10000);
 #endif
 			break;
 		case 0x03<<13:
@@ -1382,15 +1387,15 @@ void adsp21xx_device::mac_op_mr(int op)
 			xop = MAC_GETXREG_SIGNED(xop);
 			yop = MAC_GETYREG_SIGNED(yop);
 			temp = (xop * yop) << shift;
-			res = m_core.mr.mr - (INT64)temp;
+			res = m_core.mr.mr - (int64_t)temp;
 #if 0
-			if ((res & 0xffff) == 0x8000) res &= ~((UINT64)0x10000);
+			if ((res & 0xffff) == 0x8000) res &= ~((uint64_t)0x10000);
 			else res += (res & 0x8000) << 1;
 #else
 			temp &= 0xffff;
 			res += 0x8000;
 			if ( temp == 0x8000 )
-				res &= ~((UINT64)0x10000);
+				res &= ~((uint64_t)0x10000);
 #endif
 			break;
 		case 0x04<<13:
@@ -1398,84 +1403,84 @@ void adsp21xx_device::mac_op_mr(int op)
 			xop = MAC_GETXREG_SIGNED(xop);
 			yop = MAC_GETYREG_SIGNED(yop);
 			temp = (xop * yop) << shift;
-			res = (INT64)temp;
+			res = (int64_t)temp;
 			break;
 		case 0x05<<13:
 			/* X * Y (SU) */
 			xop = MAC_GETXREG_SIGNED(xop);
 			yop = MAC_GETYREG_UNSIGNED(yop);
 			temp = (xop * yop) << shift;
-			res = (INT64)temp;
+			res = (int64_t)temp;
 			break;
 		case 0x06<<13:
 			/* X * Y (US) */
 			xop = MAC_GETXREG_UNSIGNED(xop);
 			yop = MAC_GETYREG_SIGNED(yop);
 			temp = (xop * yop) << shift;
-			res = (INT64)temp;
+			res = (int64_t)temp;
 			break;
 		case 0x07<<13:
 			/* X * Y (UU) */
 			xop = MAC_GETXREG_UNSIGNED(xop);
 			yop = MAC_GETYREG_UNSIGNED(yop);
 			temp = (xop * yop) << shift;
-			res = (INT64)temp;
+			res = (int64_t)temp;
 			break;
 		case 0x08<<13:
 			/* MR + X * Y (SS) */
 			xop = MAC_GETXREG_SIGNED(xop);
 			yop = MAC_GETYREG_SIGNED(yop);
 			temp = (xop * yop) << shift;
-			res = m_core.mr.mr + (INT64)temp;
+			res = m_core.mr.mr + (int64_t)temp;
 			break;
 		case 0x09<<13:
 			/* MR + X * Y (SU) */
 			xop = MAC_GETXREG_SIGNED(xop);
 			yop = MAC_GETYREG_UNSIGNED(yop);
 			temp = (xop * yop) << shift;
-			res = m_core.mr.mr + (INT64)temp;
+			res = m_core.mr.mr + (int64_t)temp;
 			break;
 		case 0x0a<<13:
 			/* MR + X * Y (US) */
 			xop = MAC_GETXREG_UNSIGNED(xop);
 			yop = MAC_GETYREG_SIGNED(yop);
 			temp = (xop * yop) << shift;
-			res = m_core.mr.mr + (INT64)temp;
+			res = m_core.mr.mr + (int64_t)temp;
 			break;
 		case 0x0b<<13:
 			/* MR + X * Y (UU) */
 			xop = MAC_GETXREG_UNSIGNED(xop);
 			yop = MAC_GETYREG_UNSIGNED(yop);
 			temp = (xop * yop) << shift;
-			res = m_core.mr.mr + (INT64)temp;
+			res = m_core.mr.mr + (int64_t)temp;
 			break;
 		case 0x0c<<13:
 			/* MR - X * Y (SS) */
 			xop = MAC_GETXREG_SIGNED(xop);
 			yop = MAC_GETYREG_SIGNED(yop);
 			temp = (xop * yop) << shift;
-			res = m_core.mr.mr - (INT64)temp;
+			res = m_core.mr.mr - (int64_t)temp;
 			break;
 		case 0x0d<<13:
 			/* MR - X * Y (SU) */
 			xop = MAC_GETXREG_SIGNED(xop);
 			yop = MAC_GETYREG_UNSIGNED(yop);
 			temp = (xop * yop) << shift;
-			res = m_core.mr.mr - (INT64)temp;
+			res = m_core.mr.mr - (int64_t)temp;
 			break;
 		case 0x0e<<13:
 			/* MR - X * Y (US) */
 			xop = MAC_GETXREG_UNSIGNED(xop);
 			yop = MAC_GETYREG_SIGNED(yop);
 			temp = (xop * yop) << shift;
-			res = m_core.mr.mr - (INT64)temp;
+			res = m_core.mr.mr - (int64_t)temp;
 			break;
 		case 0x0f<<13:
 			/* MR - X * Y (UU) */
 			xop = MAC_GETXREG_UNSIGNED(xop);
 			yop = MAC_GETYREG_UNSIGNED(yop);
 			temp = (xop * yop) << shift;
-			res = m_core.mr.mr - (INT64)temp;
+			res = m_core.mr.mr - (int64_t)temp;
 			break;
 		default:
 			res = 0;    /* just to keep the compiler happy */
@@ -1497,10 +1502,10 @@ void adsp21xx_device::mac_op_mr(int op)
 
 void adsp21xx_device::mac_op_mr_xop(int op)
 {
-	INT8 shift = ((m_mstat & MSTAT_INTEGER) >> 4) ^ 1;
-	INT32 xop = (op >> 8) & 7;
-	INT32 temp;
-	INT64 res;
+	int8_t shift = ((m_mstat & MSTAT_INTEGER) >> 4) ^ 1;
+	int32_t xop = (op >> 8) & 7;
+	int32_t temp;
+	int64_t res;
 
 	switch (op & (15<<13))  /*JB*/
 	{
@@ -1511,118 +1516,118 @@ void adsp21xx_device::mac_op_mr_xop(int op)
 			/* X * Y (RND) */
 			xop = MAC_GETXREG_SIGNED(xop);
 			temp = (xop * xop) << shift;
-			res = (INT64)temp;
+			res = (int64_t)temp;
 #if 0
-			if ((res & 0xffff) == 0x8000) res &= ~((UINT64)0x10000);
+			if ((res & 0xffff) == 0x8000) res &= ~((uint64_t)0x10000);
 			else res += (res & 0x8000) << 1;
 #else
 			temp &= 0xffff;
 			res += 0x8000;
 			if ( temp == 0x8000 )
-				res &= ~((UINT64)0x10000);
+				res &= ~((uint64_t)0x10000);
 #endif
 			break;
 		case 0x02<<13:
 			/* MR + X * Y (RND) */
 			xop = MAC_GETXREG_SIGNED(xop);
 			temp = (xop * xop) << shift;
-			res = m_core.mr.mr + (INT64)temp;
+			res = m_core.mr.mr + (int64_t)temp;
 #if 0
-			if ((res & 0xffff) == 0x8000) res &= ~((UINT64)0x10000);
+			if ((res & 0xffff) == 0x8000) res &= ~((uint64_t)0x10000);
 			else res += (res & 0x8000) << 1;
 #else
 			temp &= 0xffff;
 			res += 0x8000;
 			if ( temp == 0x8000 )
-				res &= ~((UINT64)0x10000);
+				res &= ~((uint64_t)0x10000);
 #endif
 			break;
 		case 0x03<<13:
 			/* MR - X * Y (RND) */
 			xop = MAC_GETXREG_SIGNED(xop);
 			temp = (xop * xop) << shift;
-			res = m_core.mr.mr - (INT64)temp;
+			res = m_core.mr.mr - (int64_t)temp;
 #if 0
-			if ((res & 0xffff) == 0x8000) res &= ~((UINT64)0x10000);
+			if ((res & 0xffff) == 0x8000) res &= ~((uint64_t)0x10000);
 			else res += (res & 0x8000) << 1;
 #else
 			temp &= 0xffff;
 			res += 0x8000;
 			if ( temp == 0x8000 )
-				res &= ~((UINT64)0x10000);
+				res &= ~((uint64_t)0x10000);
 #endif
 			break;
 		case 0x04<<13:
 			/* X * Y (SS)       Clear when y = 0 */
 			xop = MAC_GETXREG_SIGNED(xop);
 			temp = (xop * xop) << shift;
-			res = (INT64)temp;
+			res = (int64_t)temp;
 			break;
 		case 0x05<<13:
 			/* X * Y (SU) */
 			xop = MAC_GETXREG_SIGNED(xop);
 			temp = (xop * xop) << shift;
-			res = (INT64)temp;
+			res = (int64_t)temp;
 			break;
 		case 0x06<<13:
 			/* X * Y (US) */
 			xop = MAC_GETXREG_UNSIGNED(xop);
 			temp = (xop * xop) << shift;
-			res = (INT64)temp;
+			res = (int64_t)temp;
 			break;
 		case 0x07<<13:
 			/* X * Y (UU) */
 			xop = MAC_GETXREG_UNSIGNED(xop);
 			temp = (xop * xop) << shift;
-			res = (INT64)temp;
+			res = (int64_t)temp;
 			break;
 		case 0x08<<13:
 			/* MR + X * Y (SS) */
 			xop = MAC_GETXREG_SIGNED(xop);
 			temp = (xop * xop) << shift;
-			res = m_core.mr.mr + (INT64)temp;
+			res = m_core.mr.mr + (int64_t)temp;
 			break;
 		case 0x09<<13:
 			/* MR + X * Y (SU) */
 			xop = MAC_GETXREG_SIGNED(xop);
 			temp = (xop * xop) << shift;
-			res = m_core.mr.mr + (INT64)temp;
+			res = m_core.mr.mr + (int64_t)temp;
 			break;
 		case 0x0a<<13:
 			/* MR + X * Y (US) */
 			xop = MAC_GETXREG_UNSIGNED(xop);
 			temp = (xop * xop) << shift;
-			res = m_core.mr.mr + (INT64)temp;
+			res = m_core.mr.mr + (int64_t)temp;
 			break;
 		case 0x0b<<13:
 			/* MR + X * Y (UU) */
 			xop = MAC_GETXREG_UNSIGNED(xop);
 			temp = (xop * xop) << shift;
-			res = m_core.mr.mr + (INT64)temp;
+			res = m_core.mr.mr + (int64_t)temp;
 			break;
 		case 0x0c<<13:
 			/* MR - X * Y (SS) */
 			xop = MAC_GETXREG_SIGNED(xop);
 			temp = (xop * xop) << shift;
-			res = m_core.mr.mr - (INT64)temp;
+			res = m_core.mr.mr - (int64_t)temp;
 			break;
 		case 0x0d<<13:
 			/* MR - X * Y (SU) */
 			xop = MAC_GETXREG_SIGNED(xop);
 			temp = (xop * xop) << shift;
-			res = m_core.mr.mr - (INT64)temp;
+			res = m_core.mr.mr - (int64_t)temp;
 			break;
 		case 0x0e<<13:
 			/* MR - X * Y (US) */
 			xop = MAC_GETXREG_UNSIGNED(xop);
 			temp = (xop * xop) << shift;
-			res = m_core.mr.mr - (INT64)temp;
+			res = m_core.mr.mr - (int64_t)temp;
 			break;
 		case 0x0f<<13:
 			/* MR - X * Y (UU) */
 			xop = MAC_GETXREG_UNSIGNED(xop);
 			temp = (xop * xop) << shift;
-			res = m_core.mr.mr - (INT64)temp;
+			res = m_core.mr.mr - (int64_t)temp;
 			break;
 		default:
 			res = 0;    /* just to keep the compiler happy */
@@ -1644,11 +1649,11 @@ void adsp21xx_device::mac_op_mr_xop(int op)
 
 void adsp21xx_device::mac_op_mf(int op)
 {
-	INT8 shift = ((m_mstat & MSTAT_INTEGER) >> 4) ^ 1;
-	INT32 xop = (op >> 8) & 7;
-	INT32 yop = (op >> 11) & 3;
-	INT32 temp;
-	INT64 res;
+	int8_t shift = ((m_mstat & MSTAT_INTEGER) >> 4) ^ 1;
+	int32_t xop = (op >> 8) & 7;
+	int32_t yop = (op >> 11) & 3;
+	int32_t temp;
+	int64_t res;
 
 	switch (op & (15<<13))  /*JB*/
 	{
@@ -1660,15 +1665,15 @@ void adsp21xx_device::mac_op_mf(int op)
 			xop = MAC_GETXREG_SIGNED(xop);
 			yop = MAC_GETYREG_SIGNED(yop);
 			temp = (xop * yop) << shift;
-			res = (INT64)temp;
+			res = (int64_t)temp;
 #if 0
-			if ((res & 0xffff) == 0x8000) res &= ~((UINT64)0x10000);
+			if ((res & 0xffff) == 0x8000) res &= ~((uint64_t)0x10000);
 			else res += (res & 0x8000) << 1;
 #else
 			temp &= 0xffff;
 			res += 0x8000;
 			if ( temp == 0x8000 )
-				res &= ~((UINT64)0x10000);
+				res &= ~((uint64_t)0x10000);
 #endif
 			break;
 		case 0x02<<13:
@@ -1676,15 +1681,15 @@ void adsp21xx_device::mac_op_mf(int op)
 			xop = MAC_GETXREG_SIGNED(xop);
 			yop = MAC_GETYREG_SIGNED(yop);
 			temp = (xop * yop) << shift;
-			res = m_core.mr.mr + (INT64)temp;
+			res = m_core.mr.mr + (int64_t)temp;
 #if 0
-			if ((res & 0xffff) == 0x8000) res &= ~((UINT64)0x10000);
+			if ((res & 0xffff) == 0x8000) res &= ~((uint64_t)0x10000);
 			else res += (res & 0x8000) << 1;
 #else
 			temp &= 0xffff;
 			res += 0x8000;
 			if ( temp == 0x8000 )
-				res &= ~((UINT64)0x10000);
+				res &= ~((uint64_t)0x10000);
 #endif
 			break;
 		case 0x03<<13:
@@ -1692,15 +1697,15 @@ void adsp21xx_device::mac_op_mf(int op)
 			xop = MAC_GETXREG_SIGNED(xop);
 			yop = MAC_GETYREG_SIGNED(yop);
 			temp = (xop * yop) << shift;
-			res = m_core.mr.mr - (INT64)temp;
+			res = m_core.mr.mr - (int64_t)temp;
 #if 0
-			if ((res & 0xffff) == 0x8000) res &= ~((UINT64)0x10000);
+			if ((res & 0xffff) == 0x8000) res &= ~((uint64_t)0x10000);
 			else res += (res & 0x8000) << 1;
 #else
 			temp &= 0xffff;
 			res += 0x8000;
 			if ( temp == 0x8000 )
-				res &= ~((UINT64)0x10000);
+				res &= ~((uint64_t)0x10000);
 #endif
 			break;
 		case 0x04<<13:
@@ -1708,84 +1713,84 @@ void adsp21xx_device::mac_op_mf(int op)
 			xop = MAC_GETXREG_SIGNED(xop);
 			yop = MAC_GETYREG_SIGNED(yop);
 			temp = (xop * yop) << shift;
-			res = (INT64)temp;
+			res = (int64_t)temp;
 			break;
 		case 0x05<<13:
 			/* X * Y (SU) */
 			xop = MAC_GETXREG_SIGNED(xop);
 			yop = MAC_GETYREG_UNSIGNED(yop);
 			temp = (xop * yop) << shift;
-			res = (INT64)temp;
+			res = (int64_t)temp;
 			break;
 		case 0x06<<13:
 			/* X * Y (US) */
 			xop = MAC_GETXREG_UNSIGNED(xop);
 			yop = MAC_GETYREG_SIGNED(yop);
 			temp = (xop * yop) << shift;
-			res = (INT64)temp;
+			res = (int64_t)temp;
 			break;
 		case 0x07<<13:
 			/* X * Y (UU) */
 			xop = MAC_GETXREG_UNSIGNED(xop);
 			yop = MAC_GETYREG_UNSIGNED(yop);
 			temp = (xop * yop) << shift;
-			res = (INT64)temp;
+			res = (int64_t)temp;
 			break;
 		case 0x08<<13:
 			/* MR + X * Y (SS) */
 			xop = MAC_GETXREG_SIGNED(xop);
 			yop = MAC_GETYREG_SIGNED(yop);
 			temp = (xop * yop) << shift;
-			res = m_core.mr.mr + (INT64)temp;
+			res = m_core.mr.mr + (int64_t)temp;
 			break;
 		case 0x09<<13:
 			/* MR + X * Y (SU) */
 			xop = MAC_GETXREG_SIGNED(xop);
 			yop = MAC_GETYREG_UNSIGNED(yop);
 			temp = (xop * yop) << shift;
-			res = m_core.mr.mr + (INT64)temp;
+			res = m_core.mr.mr + (int64_t)temp;
 			break;
 		case 0x0a<<13:
 			/* MR + X * Y (US) */
 			xop = MAC_GETXREG_UNSIGNED(xop);
 			yop = MAC_GETYREG_SIGNED(yop);
 			temp = (xop * yop) << shift;
-			res = m_core.mr.mr + (INT64)temp;
+			res = m_core.mr.mr + (int64_t)temp;
 			break;
 		case 0x0b<<13:
 			/* MR + X * Y (UU) */
 			xop = MAC_GETXREG_UNSIGNED(xop);
 			yop = MAC_GETYREG_UNSIGNED(yop);
 			temp = (xop * yop) << shift;
-			res = m_core.mr.mr + (INT64)temp;
+			res = m_core.mr.mr + (int64_t)temp;
 			break;
 		case 0x0c<<13:
 			/* MR - X * Y (SS) */
 			xop = MAC_GETXREG_SIGNED(xop);
 			yop = MAC_GETYREG_SIGNED(yop);
 			temp = (xop * yop) << shift;
-			res = m_core.mr.mr - (INT64)temp;
+			res = m_core.mr.mr - (int64_t)temp;
 			break;
 		case 0x0d<<13:
 			/* MR - X * Y (SU) */
 			xop = MAC_GETXREG_SIGNED(xop);
 			yop = MAC_GETYREG_UNSIGNED(yop);
 			temp = (xop * yop) << shift;
-			res = m_core.mr.mr - (INT64)temp;
+			res = m_core.mr.mr - (int64_t)temp;
 			break;
 		case 0x0e<<13:
 			/* MR - X * Y (US) */
 			xop = MAC_GETXREG_UNSIGNED(xop);
 			yop = MAC_GETYREG_SIGNED(yop);
 			temp = (xop * yop) << shift;
-			res = m_core.mr.mr - (INT64)temp;
+			res = m_core.mr.mr - (int64_t)temp;
 			break;
 		case 0x0f<<13:
 			/* MR - X * Y (UU) */
 			xop = MAC_GETXREG_UNSIGNED(xop);
 			yop = MAC_GETYREG_UNSIGNED(yop);
 			temp = (xop * yop) << shift;
-			res = m_core.mr.mr - (INT64)temp;
+			res = m_core.mr.mr - (int64_t)temp;
 			break;
 		default:
 			res = 0;    /* just to keep the compiler happy */
@@ -1793,7 +1798,7 @@ void adsp21xx_device::mac_op_mf(int op)
 	}
 
 	/* set the final value */
-	m_core.mf.u = (UINT32)res >> 16;
+	m_core.mf.u = (uint32_t)res >> 16;
 }
 
 
@@ -1804,10 +1809,10 @@ void adsp21xx_device::mac_op_mf(int op)
 
 void adsp21xx_device::mac_op_mf_xop(int op)
 {
-	INT8 shift = ((m_mstat & MSTAT_INTEGER) >> 4) ^ 1;
-	INT32 xop = (op >> 8) & 7;
-	INT32 temp;
-	INT64 res;
+	int8_t shift = ((m_mstat & MSTAT_INTEGER) >> 4) ^ 1;
+	int32_t xop = (op >> 8) & 7;
+	int32_t temp;
+	int64_t res;
 
 	switch (op & (15<<13))  /*JB*/
 	{
@@ -1818,118 +1823,118 @@ void adsp21xx_device::mac_op_mf_xop(int op)
 			/* X * Y (RND) */
 			xop = MAC_GETXREG_SIGNED(xop);
 			temp = (xop * xop) << shift;
-			res = (INT64)temp;
+			res = (int64_t)temp;
 #if 0
-			if ((res & 0xffff) == 0x8000) res &= ~((UINT64)0x10000);
+			if ((res & 0xffff) == 0x8000) res &= ~((uint64_t)0x10000);
 			else res += (res & 0x8000) << 1;
 #else
 			temp &= 0xffff;
 			res += 0x8000;
 			if ( temp == 0x8000 )
-				res &= ~((UINT64)0x10000);
+				res &= ~((uint64_t)0x10000);
 #endif
 			break;
 		case 0x02<<13:
 			/* MR + X * Y (RND) */
 			xop = MAC_GETXREG_SIGNED(xop);
 			temp = (xop * xop) << shift;
-			res = m_core.mr.mr + (INT64)temp;
+			res = m_core.mr.mr + (int64_t)temp;
 #if 0
-			if ((res & 0xffff) == 0x8000) res &= ~((UINT64)0x10000);
+			if ((res & 0xffff) == 0x8000) res &= ~((uint64_t)0x10000);
 			else res += (res & 0x8000) << 1;
 #else
 			temp &= 0xffff;
 			res += 0x8000;
 			if ( temp == 0x8000 )
-				res &= ~((UINT64)0x10000);
+				res &= ~((uint64_t)0x10000);
 #endif
 			break;
 		case 0x03<<13:
 			/* MR - X * Y (RND) */
 			xop = MAC_GETXREG_SIGNED(xop);
 			temp = (xop * xop) << shift;
-			res = m_core.mr.mr - (INT64)temp;
+			res = m_core.mr.mr - (int64_t)temp;
 #if 0
-			if ((res & 0xffff) == 0x8000) res &= ~((UINT64)0x10000);
+			if ((res & 0xffff) == 0x8000) res &= ~((uint64_t)0x10000);
 			else res += (res & 0x8000) << 1;
 #else
 			temp &= 0xffff;
 			res += 0x8000;
 			if ( temp == 0x8000 )
-				res &= ~((UINT64)0x10000);
+				res &= ~((uint64_t)0x10000);
 #endif
 			break;
 		case 0x04<<13:
 			/* X * Y (SS)       Clear when y = 0 */
 			xop = MAC_GETXREG_SIGNED(xop);
 			temp = (xop * xop) << shift;
-			res = (INT64)temp;
+			res = (int64_t)temp;
 			break;
 		case 0x05<<13:
 			/* X * Y (SU) */
 			xop = MAC_GETXREG_SIGNED(xop);
 			temp = (xop * xop) << shift;
-			res = (INT64)temp;
+			res = (int64_t)temp;
 			break;
 		case 0x06<<13:
 			/* X * Y (US) */
 			xop = MAC_GETXREG_UNSIGNED(xop);
 			temp = (xop * xop) << shift;
-			res = (INT64)temp;
+			res = (int64_t)temp;
 			break;
 		case 0x07<<13:
 			/* X * Y (UU) */
 			xop = MAC_GETXREG_UNSIGNED(xop);
 			temp = (xop * xop) << shift;
-			res = (INT64)temp;
+			res = (int64_t)temp;
 			break;
 		case 0x08<<13:
 			/* MR + X * Y (SS) */
 			xop = MAC_GETXREG_SIGNED(xop);
 			temp = (xop * xop) << shift;
-			res = m_core.mr.mr + (INT64)temp;
+			res = m_core.mr.mr + (int64_t)temp;
 			break;
 		case 0x09<<13:
 			/* MR + X * Y (SU) */
 			xop = MAC_GETXREG_SIGNED(xop);
 			temp = (xop * xop) << shift;
-			res = m_core.mr.mr + (INT64)temp;
+			res = m_core.mr.mr + (int64_t)temp;
 			break;
 		case 0x0a<<13:
 			/* MR + X * Y (US) */
 			xop = MAC_GETXREG_UNSIGNED(xop);
 			temp = (xop * xop) << shift;
-			res = m_core.mr.mr + (INT64)temp;
+			res = m_core.mr.mr + (int64_t)temp;
 			break;
 		case 0x0b<<13:
 			/* MR + X * Y (UU) */
 			xop = MAC_GETXREG_UNSIGNED(xop);
 			temp = (xop * xop) << shift;
-			res = m_core.mr.mr + (INT64)temp;
+			res = m_core.mr.mr + (int64_t)temp;
 			break;
 		case 0x0c<<13:
 			/* MR - X * Y (SS) */
 			xop = MAC_GETXREG_SIGNED(xop);
 			temp = (xop * xop) << shift;
-			res = m_core.mr.mr - (INT64)temp;
+			res = m_core.mr.mr - (int64_t)temp;
 			break;
 		case 0x0d<<13:
 			/* MR - X * Y (SU) */
 			xop = MAC_GETXREG_SIGNED(xop);
 			temp = (xop * xop) << shift;
-			res = m_core.mr.mr - (INT64)temp;
+			res = m_core.mr.mr - (int64_t)temp;
 			break;
 		case 0x0e<<13:
 			/* MR - X * Y (US) */
 			xop = MAC_GETXREG_UNSIGNED(xop);
 			temp = (xop * xop) << shift;
-			res = m_core.mr.mr - (INT64)temp;
+			res = m_core.mr.mr - (int64_t)temp;
 			break;
 		case 0x0f<<13:
 			/* MR - X * Y (UU) */
 			xop = MAC_GETXREG_UNSIGNED(xop);
 			temp = (xop * xop) << shift;
-			res = m_core.mr.mr - (INT64)temp;
+			res = m_core.mr.mr - (int64_t)temp;
 			break;
 		default:
 			res = 0;    /* just to keep the compiler happy */
@@ -1937,7 +1942,7 @@ void adsp21xx_device::mac_op_mf_xop(int op)
 	}
 
 	/* set the final value */
-	m_core.mf.u = (UINT32)res >> 16;
+	m_core.mf.u = (uint32_t)res >> 16;
 }
 
 
@@ -1948,9 +1953,9 @@ void adsp21xx_device::mac_op_mf_xop(int op)
 
 void adsp21xx_device::shift_op(int op)
 {
-	INT8 sc = m_core.se.s;
-	INT32 xop = (op >> 8) & 7;
-	UINT32 res;
+	int8_t sc = m_core.se.s;
+	int32_t xop = (op >> 8) & 7;
+	uint32_t res;
 
 	switch (op & (15<<11))  /*JB*/
 	{
@@ -1958,14 +1963,14 @@ void adsp21xx_device::shift_op(int op)
 			/* LSHIFT (HI) */
 			xop = SHIFT_GETXREG_UNSIGNED(xop) << 16;
 			if (sc > 0) res = (sc < 32) ? (xop << sc) : 0;
-			else res = (sc > -32) ? ((UINT32)xop >> -sc) : 0;
+			else res = (sc > -32) ? ((uint32_t)xop >> -sc) : 0;
 			m_core.sr.sr = res;
 			break;
 		case 0x01<<11:
 			/* LSHIFT (HI, OR) */
 			xop = SHIFT_GETXREG_UNSIGNED(xop) << 16;
 			if (sc > 0) res = (sc < 32) ? (xop << sc) : 0;
-			else res = (sc > -32) ? ((UINT32)xop >> -sc) : 0;
+			else res = (sc > -32) ? ((uint32_t)xop >> -sc) : 0;
 			m_core.sr.sr |= res;
 			break;
 		case 0x02<<11:
@@ -2015,7 +2020,7 @@ void adsp21xx_device::shift_op(int op)
 			xop = SHIFT_GETXREG_SIGNED(xop) << 16;
 			if (sc > 0)
 			{
-				xop = ((UINT32)xop >> 1) | ((m_astat & CFLAG) << 28);
+				xop = ((uint32_t)xop >> 1) | ((m_astat & CFLAG) << 28);
 				res = xop >> (sc - 1);
 			}
 			else res = (sc > -32) ? (xop << -sc) : 0;
@@ -2026,7 +2031,7 @@ void adsp21xx_device::shift_op(int op)
 			xop = SHIFT_GETXREG_SIGNED(xop) << 16;
 			if (sc > 0)
 			{
-				xop = ((UINT32)xop >> 1) | ((m_astat & CFLAG) << 28);
+				xop = ((uint32_t)xop >> 1) | ((m_astat & CFLAG) << 28);
 				res = xop >> (sc - 1);
 			}
 			else res = (sc > -32) ? (xop << -sc) : 0;
@@ -2130,9 +2135,9 @@ void adsp21xx_device::shift_op(int op)
 
 void adsp21xx_device::shift_op_imm(int op)
 {
-	INT8 sc = (INT8)op;
-	INT32 xop = (op >> 8) & 7;
-	UINT32 res;
+	int8_t sc = (int8_t)op;
+	int32_t xop = (op >> 8) & 7;
+	uint32_t res;
 
 	switch (op & (15<<11))  /*JB*/
 	{
@@ -2140,14 +2145,14 @@ void adsp21xx_device::shift_op_imm(int op)
 			/* LSHIFT (HI) */
 			xop = SHIFT_GETXREG_UNSIGNED(xop) << 16;
 			if (sc > 0) res = (sc < 32) ? (xop << sc) : 0;
-			else res = (sc > -32) ? ((UINT32)xop >> -sc) : 0;
+			else res = (sc > -32) ? ((uint32_t)xop >> -sc) : 0;
 			m_core.sr.sr = res;
 			break;
 		case 0x01<<11:
 			/* LSHIFT (HI, OR) */
 			xop = SHIFT_GETXREG_UNSIGNED(xop) << 16;
 			if (sc > 0) res = (sc < 32) ? (xop << sc) : 0;
-			else res = (sc > -32) ? ((UINT32)xop >> -sc) : 0;
+			else res = (sc > -32) ? ((uint32_t)xop >> -sc) : 0;
 			m_core.sr.sr |= res;
 			break;
 		case 0x02<<11:
@@ -2197,7 +2202,7 @@ void adsp21xx_device::shift_op_imm(int op)
 			xop = SHIFT_GETXREG_SIGNED(xop) << 16;
 			if (sc > 0)
 			{
-				xop = ((UINT32)xop >> 1) | ((m_astat & CFLAG) << 28);
+				xop = ((uint32_t)xop >> 1) | ((m_astat & CFLAG) << 28);
 				res = xop >> (sc - 1);
 			}
 			else res = (sc > -32) ? (xop << -sc) : 0;
@@ -2208,7 +2213,7 @@ void adsp21xx_device::shift_op_imm(int op)
 			xop = SHIFT_GETXREG_SIGNED(xop) << 16;
 			if (sc > 0)
 			{
-				xop = ((UINT32)xop >> 1) | ((m_astat & CFLAG) << 28);
+				xop = ((uint32_t)xop >> 1) | ((m_astat & CFLAG) << 28);
 				res = xop >> (sc - 1);
 			}
 			else res = (sc > -32) ? (xop << -sc) : 0;

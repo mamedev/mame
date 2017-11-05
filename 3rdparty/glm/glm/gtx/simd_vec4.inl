@@ -1,11 +1,8 @@
+/// @ref gtx_simd_vec4
+/// @file glm/gtx/simd_vec4.inl
+
 namespace glm{
 namespace detail{
-
-template <int Value>
-struct shuffle_mask
-{
-	enum{value = Value};
-};
 
 //////////////////////////////////////
 // Implicit basic constructors

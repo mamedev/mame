@@ -7,13 +7,17 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/88games.h"
+
 #include "cpu/m6809/konami.h"
 #include "cpu/z80/z80.h"
-#include "sound/2151intf.h"
 #include "machine/gen_latch.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
-#include "includes/88games.h"
+#include "sound/ym2151.h"
+
+#include "screen.h"
+#include "speaker.h"
 
 
 /*************************************
@@ -278,7 +282,7 @@ WRITE8_MEMBER( _88games_state::banking_callback )
 
 void _88games_state::machine_start()
 {
-	UINT8 *ROM = memregion("maincpu")->base() + 0x10000;
+	uint8_t *ROM = memregion("maincpu")->base() + 0x10000;
 
 	m_bank0000->configure_entries(0, 8, &ROM[0x0000], 0x2000);
 	m_bank1000->configure_entries(0, 8, &ROM[0x1000], 0x2000);
@@ -298,7 +302,7 @@ void _88games_state::machine_reset()
 	m_k88games_priority = 0;
 }
 
-static MACHINE_CONFIG_START( 88games, _88games_state )
+static MACHINE_CONFIG_START( 88games )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", KONAMI, 3000000) /* ? */
@@ -532,6 +536,6 @@ ROM_END
  *
  *************************************/
 
-GAME( 1988, 88games,  0,       88games, 88games, driver_device, 0, ROT0, "Konami", "'88 Games", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, konami88, 88games, 88games, 88games, driver_device, 0, ROT0, "Konami", "Konami '88", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, hypsptsp, 88games, 88games, 88games, driver_device, 0, ROT0, "Konami", "Hyper Sports Special (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, 88games,  0,       88games, 88games, _88games_state, 0, ROT0, "Konami", "'88 Games", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, konami88, 88games, 88games, 88games, _88games_state, 0, ROT0, "Konami", "Konami '88", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, hypsptsp, 88games, 88games, 88games, _88games_state, 0, ROT0, "Konami", "Hyper Sports Special (Japan)", MACHINE_SUPPORTS_SAVE )

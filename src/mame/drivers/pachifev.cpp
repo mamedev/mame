@@ -1,4 +1,4 @@
-// license:LGPL-2.1+
+// license:BSD-3-Clause
 // copyright-holders:Tomasz Slanina
 /**********************************************************************************************************
 
@@ -62,10 +62,10 @@ Stephh's notes (based on the game TMS9995 code and some tests) :
         When you continue, only the balls aren't reset, while score, time and level (GASP !) are.
         If you want to continue in a 2 players game, BOTH players will have to continue, which means that
         you must have at least 2 credits ("REPLAY") and that you can't continue player 2 without player 1.
-      * If you manage to get a score, use BUTTON1 to cycle through avaiable symbols (letters A-Z and '.'),
+      * If you manage to get a score, use BUTTON1 to cycle through available symbols (letters A-Z and '.'),
         and pull the plunger to at least 63% (the code expects a value >= 0xa0) to go to next initial.
         Be aware that again there is a timer to do so, but that again the timer is not displayed.
-  - Usefull addresses :
+  - Useful addresses :
       * 0xe001.b : level (0x00-0x04 : 0x01 = level 1 - 0x02 = level 2 - 0x00 = level 3 - 0x3 = bonus - 0x04 = level 4)
       * 0xe00f.b : player (0x00 = P1 - 0x01 = P2)
       * 0xe016.w : P1 balls (MSB first)
@@ -81,9 +81,10 @@ Stephh's notes (based on the game TMS9995 code and some tests) :
 
 #include "emu.h"
 #include "cpu/tms9900/tms9995.h"
-#include "video/tms9928a.h"
 #include "sound/msm5205.h"
 #include "sound/sn76496.h"
+#include "video/tms9928a.h"
+#include "speaker.h"
 
 #define USE_MSM 0
 #define NUM_PLUNGER_REPEATS    50
@@ -102,10 +103,10 @@ public:
 	int m_previous_power;
 	int m_cnt;
 
-	UINT32 m_adpcm_pos;
-	UINT8 m_adpcm_idle;
-	UINT8 m_trigger;
-	UINT8 m_adpcm_data;
+	uint32_t m_adpcm_pos;
+	uint8_t m_adpcm_idle;
+	uint8_t m_trigger;
+	uint8_t m_adpcm_data;
 	DECLARE_WRITE8_MEMBER(controls_w);
 	DECLARE_READ8_MEMBER(controls_r);
 	virtual void machine_start() override;
@@ -264,7 +265,7 @@ WRITE_LINE_MEMBER(pachifev_state::pf_adpcm_int)
 	}
 	else
 	{
-		UINT8 *ROM = memregion("adpcm")->base();
+		uint8_t *ROM = memregion("adpcm")->base();
 
 		m_adpcm_data = ((m_trigger ? (ROM[m_adpcm_pos] & 0x0f) : (ROM[m_adpcm_pos] & 0xf0)>>4) );
 		m_msm->data_w(m_adpcm_data & 0xf);
@@ -307,7 +308,7 @@ INTERRUPT_GEN_MEMBER(pachifev_state::pachifev_vblank_irq)
 		/* (bit 5 of 0xf0aa : 0 = player 1 and 1 = player 2 - bit 6 of 0xf0aa : 0 = upright and 1 = cocktail). */
 		/* All I found is that in main RAM, 0xe00f.b determines the player : 0x00 = player 1 and 0x01 = player 2. */
 		address_space &ramspace = device.memory().space(AS_PROGRAM);
-		UINT8 player = 0;
+		uint8_t player = 0;
 
 		if ((ramspace.read_byte(0xe00f) == 0x01) && ((ioport("DSW1")->read() & 0x08) == 0x00))
 			player = 1;
@@ -338,7 +339,7 @@ void pachifev_state::machine_start()
 	save_item(NAME(m_cnt));
 }
 
-static MACHINE_CONFIG_START( pachifev, pachifev_state )
+static MACHINE_CONFIG_START( pachifev )
 
 	// CPU TMS9995, standard variant; no line connections
 	MCFG_TMS99xx_ADD("maincpu", TMS9995, XTAL_12MHz, pachifev_map, pachifev_cru)
@@ -379,4 +380,4 @@ ROM_START( pachifev )
 
 ROM_END
 
-GAME( 1983, pachifev,  0,       pachifev,  pachifev, driver_device,  0, ROT270, "Sanki Denshi Kogyo", "Pachifever", MACHINE_IMPERFECT_SOUND )
+GAME( 1983, pachifev,  0,       pachifev,  pachifev, pachifev_state,  0, ROT270, "Sanki Denshi Kogyo", "Pachifever", MACHINE_IMPERFECT_SOUND )

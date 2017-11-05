@@ -16,6 +16,7 @@
 #include "machine/z80ctc.h"
 #include "sound/sn76496.h"
 #include "machine/ram.h"
+#include "machine/timer.h"
 
 #define Z80_TAG         "z80"
 #define Z80CTC_TAG      "z80ctc"
@@ -31,14 +32,14 @@ class mtx_state : public driver_device
 {
 public:
 	mtx_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, Z80_TAG),
-		m_sn(*this, SN76489A_TAG),
-		m_z80ctc(*this, Z80CTC_TAG),
-		m_z80dart(*this, Z80DART_TAG),
-		m_cassette(*this, "cassette"),
-		m_centronics(*this, CENTRONICS_TAG),
-		m_ram(*this, RAM_TAG)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, Z80_TAG)
+		, m_sn(*this, SN76489A_TAG)
+		, m_z80ctc(*this, Z80CTC_TAG)
+		, m_z80dart(*this, Z80DART_TAG)
+		, m_cassette(*this, "cassette")
+		, m_centronics(*this, CENTRONICS_TAG)
+		, m_ram(*this, RAM_TAG)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -50,14 +51,14 @@ public:
 	required_device<ram_device> m_ram;
 
 	/* keyboard state */
-	UINT8 m_key_sense;
+	uint8_t m_key_sense;
 
 	/* video state */
-	UINT8 *m_video_ram;
-	UINT8 *m_attr_ram;
+	uint8_t *m_video_ram;
+	uint8_t *m_attr_ram;
 
 	/* sound state */
-	UINT8 m_sound_latch;
+	uint8_t m_sound_latch;
 
 	/* timers */
 	device_t *m_cassette_timer;
@@ -92,7 +93,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_fault);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_perror);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_select);
-	void bankswitch(UINT8 data);
+	void bankswitch(uint8_t data);
 	DECLARE_SNAPSHOT_LOAD_MEMBER( mtx );
 };
 

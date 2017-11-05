@@ -31,12 +31,10 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_VIP_BYTEIO_H
+#define MAME_BUS_VIP_BYTEIO_H
+
 #pragma once
-
-#ifndef __VIP_BYTEIO_PORT__
-#define __VIP_BYTEIO_PORT__
-
-#include "emu.h"
 
 
 
@@ -72,13 +70,13 @@ class vip_byteio_port_device : public device_t,
 {
 public:
 	// construction/destruction
-	vip_byteio_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	vip_byteio_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template<class _inst> void set_inst_callback(_inst inst) { m_write_inst.set_callback(inst); }
 
 	// computer interface
-	UINT8 in_r();
-	void out_w(UINT8 data);
+	uint8_t in_r();
+	void out_w(uint8_t data);
 	DECLARE_READ_LINE_MEMBER( ef3_r );
 	DECLARE_READ_LINE_MEMBER( ef4_r );
 	DECLARE_WRITE_LINE_MEMBER( q_w );
@@ -103,24 +101,24 @@ protected:
 class device_vip_byteio_port_interface : public device_slot_card_interface
 {
 public:
-	// construction/destruction
-	device_vip_byteio_port_interface(const machine_config &mconfig, device_t &device);
-
-	virtual UINT8 vip_in_r() { return 0xff; };
-	virtual void vip_out_w(UINT8 data) { };
+	virtual uint8_t vip_in_r() { return 0xff; }
+	virtual void vip_out_w(uint8_t data) { }
 
 	virtual int vip_ef3_r() { return CLEAR_LINE; }
 	virtual int vip_ef4_r() { return CLEAR_LINE; }
 
-	virtual void vip_q_w(int state) { };
+	virtual void vip_q_w(int state) { }
 
 protected:
+	// construction/destruction
+	device_vip_byteio_port_interface(const machine_config &mconfig, device_t &device);
+
 	vip_byteio_port_device *m_slot;
 };
 
 
 // device type definition
-extern const device_type VIP_BYTEIO_PORT;
+DECLARE_DEVICE_TYPE(VIP_BYTEIO_PORT, vip_byteio_port_device)
 
 
 // slot devices
@@ -128,6 +126,4 @@ extern const device_type VIP_BYTEIO_PORT;
 
 SLOT_INTERFACE_EXTERN( vip_byteio_cards );
 
-
-
-#endif
+#endif // MAME_BUS_VIP_BYTEIO_H

@@ -87,7 +87,7 @@ bool GetTextConfig(const AString &s, CObjectVector<CTextConfigPair> &pairs)
         break;
       if (c == '\\')
       {
-        char c = s[pos++];
+        c = s[pos++];
         switch (c)
         {
           case 'n': message += '\n'; break;

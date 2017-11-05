@@ -359,13 +359,10 @@ HRESULT Extract(
     op.stream = NULL;
     op.filePath = arcPath;
 
-    HRESULT result = arcLink.Open3(op, openCallback);
+    HRESULT result = arcLink.Open_Strict(op, openCallback);
 
     if (result == E_ABORT)
       return result;
-
-    if (result == S_OK && arcLink.NonOpen_ErrorInfo.ErrorFormatIndex >= 0)
-      result = S_FALSE;
 
     // arcLink.Set_ErrorsText();
     RINOK(extractCallback->OpenResult(codecs, arcLink, arcPath, result));
@@ -375,10 +372,10 @@ HRESULT Extract(
       thereAreNotOpenArcs = true;
       if (!options.StdInMode)
       {
-        NFind::CFileInfo fi;
-        if (fi.Find(us2fs(arcPath)))
-          if (!fi.IsDir())
-            totalPackProcessed += fi.Size;
+        NFind::CFileInfo fi2;
+        if (fi2.Find(us2fs(arcPath)))
+          if (!fi2.IsDir())
+            totalPackProcessed += fi2.Size;
       }
       continue;
     }

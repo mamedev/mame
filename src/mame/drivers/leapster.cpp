@@ -210,7 +210,9 @@ PCB - LEAPSTER-TV:
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 #include "cpu/arcompact/arcompact.h"
+#include "screen.h"
 #include "softlist.h"
+
 
 class leapster_state : public driver_device
 {
@@ -225,13 +227,13 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	UINT32 screen_update_leapster(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_leapster(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(leapster_cart);
 	DECLARE_DRIVER_INIT(leapster);
 
 	DECLARE_READ32_MEMBER(leapster_random_r)
 	{
-		return rand() | (rand()<<16); // there is a loop checking that this is above a certain value
+		return machine().rand() | (machine().rand()<<16); // there is a loop checking that this is above a certain value
 	}
 
 	DECLARE_WRITE32_MEMBER(leapster_aux004b_w)
@@ -254,19 +256,19 @@ INPUT_PORTS_END
 
 
 
-UINT32 leapster_state::screen_update_leapster(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t leapster_state::screen_update_leapster(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
 
 DEVICE_IMAGE_LOAD_MEMBER( leapster_state, leapster_cart )
 {
-	UINT32 size = m_cart->common_get_size("rom");
+	uint32_t size = m_cart->common_get_size("rom");
 
 	m_cart->rom_alloc(size, GENERIC_ROM32_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 void leapster_state::machine_start()
@@ -296,10 +298,10 @@ static ADDRESS_MAP_START( leapster_map, AS_PROGRAM, 32, leapster_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( leapster_aux, AS_IO, 32, leapster_state )
-	AM_RANGE(0x00000012c, 0x00000012f) AM_WRITE(leapster_aux004b_w) // this address isn't used by ARC internal stuff afaik, so probably leapster specific
+	AM_RANGE(0x00000004b, 0x00000004b) AM_WRITE(leapster_aux004b_w) // this address isn't used by ARC internal stuff afaik, so probably leapster specific
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( leapster, leapster_state )
+static MACHINE_CONFIG_START( leapster )
 	/* basic machine hardware */
 	// CPU is ArcTangent-A5 '5.1' (ARCompact core)
 	MCFG_CPU_ADD("maincpu", ARCA5, 96000000/10)
@@ -336,5 +338,5 @@ DRIVER_INIT_MEMBER(leapster_state,leapster)
 {
 }
 
-CONS(2003,  leapster,    0,         0,  leapster,    leapster, leapster_state, leapster,    "LeapFrog",   "Leapster (Germany)",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IS_SKELETON )
-CONS(2005,  leapstertv,  leapster,  0,  leapster,    leapster, leapster_state, leapster,    "LeapFrog",   "Leapster TV (Germany)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IS_SKELETON )
+CONS( 2003,  leapster,    0,         0,  leapster,    leapster, leapster_state, leapster,    "LeapFrog",   "Leapster (Germany)",    MACHINE_IS_SKELETON )
+CONS( 2005,  leapstertv,  leapster,  0,  leapster,    leapster, leapster_state, leapster,    "LeapFrog",   "Leapster TV (Germany)", MACHINE_IS_SKELETON )

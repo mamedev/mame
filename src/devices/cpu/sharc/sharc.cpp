@@ -6,13 +6,13 @@
 */
 
 #include "emu.h"
-#include "debugger.h"
 #include "sharc.h"
 #include "sharcfe.h"
 
+#include "debugger.h"
 
-#define ENABLE_DRC					0
-#define DISABLE_FAST_REGISTERS		1
+
+#define DISABLE_FAST_REGISTERS      1
 
 
 
@@ -53,41 +53,62 @@ enum
 	SHARC_B12,      SHARC_B13,      SHARC_B14,      SHARC_B15
 };
 
+DEFINE_DEVICE_TYPE(ADSP21062, adsp21062_device, "adsp21062", "ADSP21062")
 
-#define ROPCODE(pc)     ((UINT64)(m_internal_ram[((pc-0x20000) * 3) + 0]) << 32) | \
-						((UINT64)(m_internal_ram[((pc-0x20000) * 3) + 1]) << 16) | \
-						((UINT64)(m_internal_ram[((pc-0x20000) * 3) + 2]) << 0)
-
-
-const device_type ADSP21062 = &device_creator<adsp21062_device>;
-
-
-// This is just used to stop the debugger from complaining about executing from I/O space
 static ADDRESS_MAP_START( internal_pgm, AS_PROGRAM, 64, adsp21062_device )
-	AM_RANGE(0x20000, 0x7ffff) AM_RAM AM_SHARE("x")
+	AM_RANGE(0x20000, 0x24fff) AM_READWRITE(pm0_r, pm0_w)
+	AM_RANGE(0x28000, 0x2cfff) AM_READWRITE(pm1_r, pm1_w)
+	AM_RANGE(0x30000, 0x34fff) AM_READWRITE(pm1_r, pm1_w)
+	AM_RANGE(0x38000, 0x3cfff) AM_READWRITE(pm1_r, pm1_w)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( internal_data, AS_DATA, 32, adsp21062_device )
+	AM_RANGE(0x00000, 0x000ff) AM_READWRITE(iop_r, iop_w)
+	AM_RANGE(0x20000, 0x27fff) AM_RAM AM_SHARE("block0")
+	AM_RANGE(0x28000, 0x2ffff) AM_RAM AM_SHARE("block1")
+	AM_RANGE(0x30000, 0x37fff) AM_RAM AM_SHARE("block1")
+	AM_RANGE(0x38000, 0x3ffff) AM_RAM AM_SHARE("block1")
+	AM_RANGE(0x40000, 0x4ffff) AM_READWRITE(dmw0_r, dmw0_w)
+	AM_RANGE(0x50000, 0x5ffff) AM_READWRITE(dmw1_r, dmw1_w)
+	AM_RANGE(0x60000, 0x6ffff) AM_READWRITE(dmw1_r, dmw1_w)
+	AM_RANGE(0x70000, 0x7ffff) AM_READWRITE(dmw1_r, dmw1_w)
+ADDRESS_MAP_END
 
-adsp21062_device::adsp21062_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: cpu_device(mconfig, ADSP21062, "ADSP21062", tag, owner, clock, "adsp21062", __FILE__)
+adsp21062_device::adsp21062_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: cpu_device(mconfig, ADSP21062, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 64, 24, -3, ADDRESS_MAP_NAME(internal_pgm))
-	, m_data_config("data", ENDIANNESS_LITTLE, 32, 32, -2)
+	, m_data_config("data", ENDIANNESS_LITTLE, 32, 32, -2, ADDRESS_MAP_NAME(internal_data))
 	, m_boot_mode(BOOT_MODE_HOST)
 	, m_cache(CACHE_SIZE + sizeof(sharc_internal_state))
 	, m_drcuml(nullptr)
 	, m_drcfe(nullptr)
+	, m_block0(*this, "block0")
+	, m_block1(*this, "block1")
+	, m_enable_drc(false)
 {
 }
 
+device_memory_interface::space_config_vector adsp21062_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config),
+		std::make_pair(AS_DATA,    &m_data_config)
+	};
+}
 
-offs_t adsp21062_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t adsp21062_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( sharc );
-	return CPU_DISASSEMBLE_NAME(sharc)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(sharc)(this, stream, pc, oprom, opram, options);
+}
+
+void adsp21062_device::enable_recompiler()
+{
+	m_enable_drc = allow_drc();
 }
 
 
-void adsp21062_device::CHANGE_PC(UINT32 newpc)
+void adsp21062_device::CHANGE_PC(uint32_t newpc)
 {
 	m_core->pc = newpc;
 	m_core->daddr = newpc;
@@ -95,7 +116,7 @@ void adsp21062_device::CHANGE_PC(UINT32 newpc)
 	m_core->nfaddr = newpc+2;
 }
 
-void adsp21062_device::CHANGE_PC_DELAYED(UINT32 newpc)
+void adsp21062_device::CHANGE_PC_DELAYED(uint32_t newpc)
 {
 	m_core->nfaddr = newpc;
 
@@ -131,7 +152,7 @@ TIMER_CALLBACK_MEMBER(adsp21062_device::sharc_iop_delayed_write_callback)
 	m_core->delayed_iop_timer->adjust(attotime::never, 0);
 }
 
-void adsp21062_device::sharc_iop_delayed_w(UINT32 reg, UINT32 data, int cycles)
+void adsp21062_device::sharc_iop_delayed_w(uint32_t reg, uint32_t data, int cycles)
 {
 	m_core->iop_delayed_reg = reg;
 	m_core->iop_delayed_data = data;
@@ -139,11 +160,98 @@ void adsp21062_device::sharc_iop_delayed_w(UINT32 reg, UINT32 data, int cycles)
 	m_core->delayed_iop_timer->adjust(cycles_to_attotime(cycles), 0);
 }
 
+// 0 012 0h 0l 1h
+// 1 453 2h 2l 1l
+// 2 678 3h 3l 4h
+// 3 ab9 5h 5l 4l
+// 4 cde 6h 6l 7h
+
+READ64_MEMBER( adsp21062_device::pm0_r)
+{
+	offs_t slot = offset >> 12;
+	offs_t base = (offset & 0xfff) + (slot >> 1) * (3<<12);
+	if(slot & 1)
+		return (uint64_t(m_block0[base + 0x2000]) << 16) | (m_block0[base + 0x1000] & 0xffff);
+	else
+		return (uint64_t(m_block0[base         ]) << 16) | (m_block0[base + 0x1000] >> 16);
+}
+
+WRITE64_MEMBER(adsp21062_device::pm0_w)
+{
+	offs_t slot = offset >> 12;
+	offs_t base = (offset & 0xfff) + (slot >> 1) * (3<<12);
+	if(slot & 1) {
+		if(ACCESSING_BITS_0_15)
+			m_block0[base + 0x1000] = (m_block0[base + 0x1000] & 0xffff0000) | (data & 0xffff);
+		m_block0[base + 0x2000] = (m_block0[base + 0x2000] & ~(mem_mask >> 16)) | ((data & mem_mask) >> 16);
+	} else {
+		m_block0[base + 0x0000] = (m_block0[base + 0x0000] & ~(mem_mask >> 16)) | ((data & mem_mask) >> 16);
+		if(ACCESSING_BITS_0_15)
+			m_block0[base + 0x1000] = (m_block0[base + 0x1000] & 0xffff) | ((data & 0xffff) << 16);
+	}
+}
+
+READ64_MEMBER( adsp21062_device::pm1_r)
+{
+	offs_t slot = offset >> 12;
+	offs_t base = (offset & 0xfff) + (slot >> 1) * (3<<12);
+	if(slot & 1)
+		return (uint64_t(m_block1[base + 0x2000]) << 16) | (m_block1[base + 0x1000] & 0xffff);
+	else
+		return (uint64_t(m_block1[base         ]) << 16) | (m_block1[base + 0x1000] >> 16);
+}
+
+WRITE64_MEMBER(adsp21062_device::pm1_w)
+{
+	offs_t slot = offset >> 12;
+	offs_t base = (offset & 0xfff) + (slot >> 1) * (3<<12);
+	if(slot & 1) {
+		if(ACCESSING_BITS_0_15)
+			m_block1[base + 0x1000] = (m_block1[base + 0x1000] & 0xffff0000) | (data & 0xffff);
+		m_block1[base + 0x2000] = (m_block1[base + 0x2000] & ~(mem_mask >> 16)) | ((data & mem_mask) >> 16);
+	} else {
+		m_block1[base + 0x0000] = (m_block1[base + 0x0000] & ~(mem_mask >> 16)) | ((data & mem_mask) >> 16);
+		if(ACCESSING_BITS_0_15)
+			m_block1[base + 0x1000] = (m_block1[base + 0x1000] & 0xffff) | ((data & 0xffff) << 16);
+	}
+}
+
+READ32_MEMBER( adsp21062_device::dmw0_r)
+{
+	if(offset & 1)
+		return m_block0[offset >> 1] >> 16;
+	else
+		return m_block0[offset >> 1] & 0xffff;
+}
+
+WRITE32_MEMBER(adsp21062_device::dmw0_w)
+{
+	if(offset & 1)
+		m_block0[offset >> 1] = (m_block0[offset >> 1] & 0xffff) | (data << 16);
+	else
+		m_block0[offset >> 1] = (m_block0[offset >> 1] & 0xffff0000) | (data & 0xffff);
+}
+
+READ32_MEMBER( adsp21062_device::dmw1_r)
+{
+	if(offset & 1)
+		return m_block1[offset >> 1] >> 16;
+	else
+		return m_block1[offset >> 1] & 0xffff;
+}
+
+WRITE32_MEMBER(adsp21062_device::dmw1_w)
+{
+	if(offset & 1)
+		m_block1[offset >> 1] = (m_block1[offset >> 1] & 0xffff) | (data << 16);
+	else
+		m_block1[offset >> 1] = (m_block1[offset >> 1] & 0xffff0000) | (data & 0xffff);
+}
 
 /* IOP registers */
-UINT32 adsp21062_device::sharc_iop_r(UINT32 address)
+READ32_MEMBER( adsp21062_device::iop_r)
 {
-	switch (address)
+	switch (offset)
 	{
 		case 0x00: return 0;    // System configuration
 
@@ -151,13 +259,13 @@ UINT32 adsp21062_device::sharc_iop_r(UINT32 address)
 		{
 			return m_core->dma_status;
 		}
-		default:        fatalerror("sharc_iop_r: Unimplemented IOP reg %02X at %08X\n", address, m_core->pc);
+		default:        fatalerror("sharc_iop_r: Unimplemented IOP reg %02X at %08X\n", offset, m_core->pc);
 	}
 }
 
-void adsp21062_device::sharc_iop_w(UINT32 address, UINT32 data)
+WRITE32_MEMBER(adsp21062_device::iop_w)
 {
-	switch (address)
+	switch (offset)
 	{
 		case 0x00: break;       // System configuration
 		case 0x02: break;       // External Memory Wait State Configuration
@@ -170,10 +278,10 @@ void adsp21062_device::sharc_iop_w(UINT32 address, UINT32 data)
 				m_core->extdma_shift = 0;
 
 			#if 0
-			UINT64 r = pm_read48(m_core->dma[6].int_index);
+			uint64_t r = pm_read48(m_core->dma[6].int_index);
 
-			r &= ~((UINT64)(0xffff) << (m_core->extdma_shift*16));
-			r |= ((UINT64)data & 0xffff) << (m_core->extdma_shift*16);
+			r &= ~((uint64_t)(0xffff) << (m_core->extdma_shift*16));
+			r |= ((uint64_t)data & 0xffff) << (m_core->extdma_shift*16);
 
 			pm_write48(m_core->dma[6].int_index, r);
 
@@ -235,7 +343,7 @@ void adsp21062_device::sharc_iop_w(UINT32 address, UINT32 data)
 		case 0x4e: m_core->dma[7].ext_modifier = data; return;
 		case 0x4f: m_core->dma[7].ext_count = data; return;
 
-		default:        fatalerror("sharc_iop_w: Unimplemented IOP reg %02X, %08X at %08X\n", address, data, m_core->pc);
+		default:        fatalerror("sharc_iop_w: Unimplemented IOP reg %02X, %08X at %08X\n", offset, data, m_core->pc);
 	}
 }
 
@@ -259,7 +367,7 @@ void adsp21062_device::build_opcode_table()
 
 	for (i=0; i < 512; i++)
 	{
-		UINT16 op = i << 7;
+		uint16_t op = i << 7;
 
 		for (j=0; j < num_ops; j++)
 		{
@@ -280,7 +388,7 @@ void adsp21062_device::build_opcode_table()
 
 /*****************************************************************************/
 
-void adsp21062_device::external_iop_write(UINT32 address, UINT32 data)
+void adsp21062_device::external_iop_write(uint32_t address, uint32_t data)
 {
 	if (address == 0x1c)
 	{
@@ -292,11 +400,11 @@ void adsp21062_device::external_iop_write(UINT32 address, UINT32 data)
 	else
 	{
 		osd_printf_debug("SHARC IOP write %08X, %08X\n", address, data);
-		sharc_iop_w(address, data);
+		m_data->write_dword(address << 2, data);
 	}
 }
 
-void adsp21062_device::external_dma_write(UINT32 address, UINT64 data)
+void adsp21062_device::external_dma_write(uint32_t address, uint64_t data)
 {
 	/*
 	All addresses in the 17-bit index registers are offset by 0x0002 0000, the
@@ -308,9 +416,9 @@ void adsp21062_device::external_dma_write(UINT32 address, UINT64 data)
 		case 2:         // 16/48 packing
 		{
 			int shift = address % 3;
-			UINT64 r = pm_read48((m_core->dma[6].int_index & 0x1ffff) | 0x20000);
+			uint64_t r = pm_read48((m_core->dma[6].int_index & 0x1ffff) | 0x20000);
 
-			r &= ~((UINT64)(0xffff) << (shift*16));
+			r &= ~((uint64_t)(0xffff) << (shift*16));
 			r |= (data & 0xffff) << (shift*16);
 
 			pm_write48((m_core->dma[6].int_index & 0x1ffff) | 0x20000, r);
@@ -331,27 +439,23 @@ void adsp21062_device::external_dma_write(UINT32 address, UINT64 data)
 void adsp21062_device::device_start()
 {
 	int saveindex;
-	
+
 	m_core = (sharc_internal_state *)m_cache.alloc_near(sizeof(sharc_internal_state));
 	memset(m_core, 0, sizeof(sharc_internal_state));
 
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
 	m_data = &space(AS_DATA);
 
 	build_opcode_table();
 
-	m_internal_ram_block0 = &m_internal_ram[0];
-	m_internal_ram_block1 = &m_internal_ram[0x20000/2];
-
 	// init UML generator
-	UINT32 umlflags = 0;
+	uint32_t umlflags = 0;
 	m_drcuml = std::make_unique<drcuml_state>(*this, m_cache, umlflags, 1, 24, 0);
 
 	// add UML symbols
 	m_drcuml->symbol_add(&m_core->pc, sizeof(m_core->pc), "pc");
 	m_drcuml->symbol_add(&m_core->icount, sizeof(m_core->icount), "icount");
-	
+
 	for (int i=0; i < 16; i++)
 	{
 		char buf[10];
@@ -407,7 +511,7 @@ void adsp21062_device::device_start()
 	m_drcuml->symbol_add(&m_core->astat_drc.sz, sizeof(m_core->astat_drc.sz), "astat_sz");
 	m_drcuml->symbol_add(&m_core->astat_drc.sv, sizeof(m_core->astat_drc.sv), "astat_sv");
 	m_drcuml->symbol_add(&m_core->astat_drc.ss, sizeof(m_core->astat_drc.ss), "astat_ss");
-	
+
 	m_drcuml->symbol_add(&m_core->arg0, sizeof(m_core->arg0), "arg0");
 	m_drcuml->symbol_add(&m_core->arg1, sizeof(m_core->arg1), "arg1");
 	m_drcuml->symbol_add(&m_core->arg2, sizeof(m_core->arg2), "arg2");
@@ -439,7 +543,7 @@ void adsp21062_device::device_start()
 			m_regmap[3] = uml::I7;
 	}
 
-	m_cache_dirty = true;
+	m_core->cache_dirty = 1;
 
 
 	m_core->delayed_iop_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(adsp21062_device::sharc_iop_delayed_write_callback), this));
@@ -610,8 +714,6 @@ void adsp21062_device::device_start()
 
 	save_item(NAME(m_core->px));
 
-	save_pointer(NAME(m_internal_ram), 2 * 0x10000);
-
 	save_item(NAME(m_core->opcode));
 
 	save_item(NAME(m_core->nfaddr));
@@ -755,13 +857,15 @@ void adsp21062_device::device_start()
 	state_add( SHARC_B15,    "B15", m_core->dag2.b[7]).formatstr("%08X");
 
 	state_add( STATE_GENPC, "GENPC", m_core->pc).noshow();
+	state_add( STATE_GENPCBASE, "CURPC", m_core->pc).noshow();
 
 	m_icountptr = &m_core->icount;
 }
 
 void adsp21062_device::device_reset()
 {
-	memset(m_internal_ram, 0, 2 * 0x10000 * sizeof(UINT16));
+	memset(m_block0, 0, 0x8000 * sizeof(uint32_t));
+	memset(m_block1, 0, 0x8000 * sizeof(uint32_t));
 
 	switch(m_boot_mode)
 	{
@@ -807,6 +911,8 @@ void adsp21062_device::device_reset()
 	m_core->lstkp = 0;
 	m_core->pcstkp = 0;
 	m_core->interrupt_active = 0;
+
+	m_drcfe->flush();
 }
 
 
@@ -890,51 +996,54 @@ void adsp21062_device::check_interrupts()
 
 void adsp21062_device::execute_run()
 {
-#if ENABLE_DRC
-	if (m_core->irq_pending != 0)
+	if (m_enable_drc)
 	{
-		m_core->idle = 0;
-	}
-	execute_run_drc();
-	return;
-#else
-	if (m_core->idle && m_core->irq_pending == 0)
-	{
-		m_core->icount = 0;
-		debugger_instruction_hook(this, m_core->daddr);
-	}
-	if (m_core->irq_pending != 0)
-	{
-		check_interrupts();
-		m_core->idle = 0;
-	}
-
-	while (m_core->icount > 0 && !m_core->idle)
-	{
-		m_core->pc = m_core->daddr;
-		m_core->daddr = m_core->faddr;
-		m_core->faddr = m_core->nfaddr;
-		m_core->nfaddr++;
-
-		m_core->astat_old_old_old = m_core->astat_old_old;
-		m_core->astat_old_old = m_core->astat_old;
-		m_core->astat_old = m_core->astat;
-
-		debugger_instruction_hook(this, m_core->pc);
-
-		m_core->opcode = ROPCODE(m_core->pc);		
-
-		// handle looping
-		if (m_core->pc == m_core->laddr.addr)
+		if (m_core->irq_pending != 0)
 		{
-			switch (m_core->laddr.loop_type)
+			m_core->idle = 0;
+		}
+		execute_run_drc();
+		return;
+	}
+	else
+	{
+		if (m_core->idle && m_core->irq_pending == 0)
+		{
+			m_core->icount = 0;
+			debugger_instruction_hook(this, m_core->daddr);
+		}
+		if (m_core->irq_pending != 0)
+		{
+			check_interrupts();
+			m_core->idle = 0;
+		}
+
+		while (m_core->icount > 0 && !m_core->idle)
+		{
+			m_core->pc = m_core->daddr;
+			m_core->daddr = m_core->faddr;
+			m_core->faddr = m_core->nfaddr;
+			m_core->nfaddr++;
+
+			m_core->astat_old_old_old = m_core->astat_old_old;
+			m_core->astat_old_old = m_core->astat_old;
+			m_core->astat_old = m_core->astat;
+
+			debugger_instruction_hook(this, m_core->pc);
+
+			m_core->opcode = m_program->read_qword(m_core->pc << 3);
+
+			// handle looping
+			if (m_core->pc == m_core->laddr.addr)
 			{
+				switch (m_core->laddr.loop_type)
+				{
 				case 0:     // arithmetic condition-based
 				{
 					int condition = m_core->laddr.code;
 
 					{
-						UINT32 looptop = TOP_PC();
+						uint32_t looptop = TOP_PC();
 						if (m_core->pc - looptop > 2)
 						{
 							m_core->astat = m_core->astat_old_old_old;
@@ -978,114 +1087,25 @@ void adsp21062_device::execute_run()
 						CHANGE_PC(TOP_PC());
 					}
 				}
+				}
 			}
-		}
 
-		(this->*m_sharc_op[(m_core->opcode >> 39) & 0x1ff])();
-
+			(this->*m_sharc_op[(m_core->opcode >> 39) & 0x1ff])();
 
 
 
-		// System register latency effect
-		if (m_core->systemreg_latency_cycles > 0)
-		{
-			--m_core->systemreg_latency_cycles;
-			if (m_core->systemreg_latency_cycles <= 0)
+
+			// System register latency effect
+			if (m_core->systemreg_latency_cycles > 0)
 			{
-				systemreg_write_latency_effect();
-			}
-		}
-
-		--m_core->icount;
-	};
-#endif
-}
-
-bool adsp21062_device::memory_read(address_spacenum spacenum, offs_t offset, int size, UINT64 &value)
-{
-	if (spacenum == AS_PROGRAM)
-	{
-		int address = offset >> 3;
-
-		if (address >= 0x20000 && address < 0x30000)
-		{
-			switch (size)
-			{
-				case 1:
+				--m_core->systemreg_latency_cycles;
+				if (m_core->systemreg_latency_cycles <= 0)
 				{
-					int frac = offset & 7;
-					value = (pm_read48(offset >> 3) >> ((frac^7) * 8)) & 0xff;
-					break;
-				}
-				case 8:
-				{
-					value = pm_read48(offset >> 3);
-					break;
+					systemreg_write_latency_effect();
 				}
 			}
-		}
-		else
-		{
-			value = 0;
-		}
-	}
-	else if (spacenum == AS_DATA)
-	{
-		int address = offset >> 2;
 
-		if (address >= 0x20000)
-		{
-			switch (size)
-			{
-				case 1:
-				{
-					int frac = offset & 3;
-					value = (dm_read32(offset >> 2) >> ((frac^3) * 8)) & 0xff;
-					break;
-				}
-				case 2:
-				{
-					int frac = (offset >> 1) & 1;
-					value = (dm_read32(offset >> 2) >> ((frac^1) * 16)) & 0xffff;
-					break;
-				}
-				case 4:
-				{
-					value = dm_read32(offset >> 2);
-					break;
-				}
-			}
-		}
-		else
-		{
-			value = 0;
-		}
+			--m_core->icount;
+		};
 	}
-	return true;
-}
-
-bool adsp21062_device::memory_readop(offs_t offset, int size, UINT64 &value)
-{
-	UINT64 mask = (size < 8) ? (((UINT64)1 << (8 * size)) - 1) : ~(UINT64)0;
-	int shift = 8 * (offset & 7);
-	offset >>= 3;
-
-	if (offset >= 0x20000 && offset < 0x28000)
-	{
-		UINT64 op = ((UINT64)(m_internal_ram_block0[((offset-0x20000) * 3) + 0]) << 32) |
-					((UINT64)(m_internal_ram_block0[((offset-0x20000) * 3) + 1]) << 16) |
-					((UINT64)(m_internal_ram_block0[((offset-0x20000) * 3) + 2]) << 0);
-		value = (op >> shift) & mask;
-		return true;
-	}
-	else if (offset >= 0x28000 && offset < 0x30000)
-	{
-		UINT64 op = ((UINT64)(m_internal_ram_block1[((offset-0x28000) * 3) + 0]) << 32) |
-					((UINT64)(m_internal_ram_block1[((offset-0x28000) * 3) + 1]) << 16) |
-					((UINT64)(m_internal_ram_block1[((offset-0x28000) * 3) + 2]) << 0);
-		value = (op >> shift) & mask;
-		return true;
-	}
-
-	return false;
 }

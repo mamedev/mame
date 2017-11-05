@@ -29,6 +29,8 @@ always false - counter was reloaded and incremented before interrupt occurs
 #include "cpu/m6502/m6502.h"
 #include "machine/6821pia.h"
 #include "sound/ay8910.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class tugboat_state : public driver_device
@@ -52,10 +54,10 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
-	required_shared_ptr<UINT8> m_ram;
+	required_shared_ptr<uint8_t> m_ram;
 
-	UINT8 m_hd46505_0_reg[18];
-	UINT8 m_hd46505_1_reg[18];
+	uint8_t m_hd46505_0_reg[18];
+	uint8_t m_hd46505_1_reg[18];
 	int m_reg0;
 	int m_reg1;
 	int m_ctrl;
@@ -72,7 +74,7 @@ public:
 	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(tugboat);
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_tilemap(bitmap_ind16 &bitmap,const rectangle &cliprect,
 		int addr,int gfx0,int gfx1,int transparency);
 
@@ -102,7 +104,7 @@ void tugboat_state::video_start()
     just four 1k resistors. */
 PALETTE_INIT_MEMBER(tugboat_state, tugboat)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 	for (i = 0;i < palette.entries();i++)
@@ -178,14 +180,14 @@ void tugboat_state::draw_tilemap(bitmap_ind16 &bitmap,const rectangle &cliprect,
 	}
 }
 
-UINT32 tugboat_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t tugboat_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int startaddr0 = m_hd46505_0_reg[0x0c]*256 + m_hd46505_0_reg[0x0d];
 	int startaddr1 = m_hd46505_1_reg[0x0c]*256 + m_hd46505_1_reg[0x0d];
 
 
-	draw_tilemap(bitmap,cliprect,startaddr0,0,1,FALSE);
-	draw_tilemap(bitmap,cliprect,startaddr1,2,3,TRUE);
+	draw_tilemap(bitmap,cliprect,startaddr0,0,1,false);
+	draw_tilemap(bitmap,cliprect,startaddr1,2,3,true);
 	return 0;
 }
 
@@ -219,7 +221,7 @@ void tugboat_state::device_timer(emu_timer &timer, device_timer_id id, int param
 		m_interrupt_timer->adjust(m_screen->frame_period());
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in tugboat_state::device_timer");
+		assert_always(false, "Unknown id in tugboat_state::device_timer");
 	}
 }
 
@@ -356,7 +358,7 @@ static GFXDECODE_START( tugboat )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( tugboat, tugboat_state )
+static MACHINE_CONFIG_START( tugboat )
 	MCFG_CPU_ADD("maincpu", M6502, 2000000) /* 2 MHz ???? */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", tugboat_state,  nmi_line_pulse)
@@ -470,6 +472,6 @@ ROM_START( berenstn )
 ROM_END
 
 
-GAME( 1982, tugboat,  0, tugboat, tugboat, driver_device,  0, ROT90, "Enter-Tech, Ltd.", "Tugboat",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, noahsark, 0, tugboat, noahsark, driver_device, 0, ROT90, "Enter-Tech, Ltd.", "Noah's Ark", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, berenstn, 0, tugboat, noahsark, driver_device, 0, ROT90, "Enter-Tech, Ltd.", "The Berenstain Bears in Big Paw's Cave", MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, tugboat,  0, tugboat, tugboat,  tugboat_state,  0, ROT90, "Enter-Tech, Ltd.", "Tugboat",                                MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, noahsark, 0, tugboat, noahsark, tugboat_state,  0, ROT90, "Enter-Tech, Ltd.", "Noah's Ark",                             MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, berenstn, 0, tugboat, noahsark, tugboat_state,  0, ROT90, "Enter-Tech, Ltd.", "The Berenstain Bears in Big Paw's Cave", MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )

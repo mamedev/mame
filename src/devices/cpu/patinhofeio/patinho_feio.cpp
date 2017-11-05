@@ -1,13 +1,13 @@
 // license:GPL-2.0+
 // copyright-holders:Felipe Sanches
 /*
-	CPU emulation for Patinho Feio, the first computer designed and manufactured in Brazil
+    CPU emulation for Patinho Feio, the first computer designed and manufactured in Brazil
 */
 
 #include "emu.h"
-#include "debugger.h"
 #include "patinhofeio_cpu.h"
-#include "includes/patinhofeio.h"
+#include "debugger.h"
+#include "includes/patinhofeio.h" // FIXME: this is a dependency from devices on MAME
 
 #define PC       m_pc //The program counter is called "contador de instrucoes" (IC) in portuguese
 #define ACC      m_acc
@@ -32,7 +32,7 @@
 #define ADDRESS_MASK_4K    0xFFF
 #define INCREMENT_PC_4K    (PC = (PC+1) & ADDRESS_MASK_4K)
 
-void patinho_feio_cpu_device::set_flag(UINT8 flag, bool state){
+void patinho_feio_cpu_device::set_flag(uint8_t flag, bool state){
 	if (state){
 		FLAGS |= flag;
 	} else {
@@ -49,27 +49,34 @@ void patinho_feio_cpu_device::compute_effective_address(unsigned int addr){
 	}
 }
 
-const device_type PATINHO_FEIO  = &device_creator<patinho_feio_cpu_device>;
+DEFINE_DEVICE_TYPE(PATO_FEIO_CPU, patinho_feio_cpu_device, "pato_feio_cpu", "Patinho Feio CPU")
 
 //Internal 4kbytes of RAM
 static ADDRESS_MAP_START(prog_8bit, AS_PROGRAM, 8, patinho_feio_cpu_device)
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("internalram")
 ADDRESS_MAP_END
 
-patinho_feio_cpu_device::patinho_feio_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: cpu_device(mconfig, PATINHO_FEIO, "PATINHO FEIO", tag, owner, clock, "patinho_feio_cpu", __FILE__),
-		m_program_config("program", ENDIANNESS_LITTLE, 8, 12, 0, ADDRESS_MAP_NAME(prog_8bit)),
-		m_icount(0),
-		m_rc_read_cb(*this),
-		m_buttons_read_cb(*this),
-		/* These arrays of *this are very ugly. I wonder if there's a better way of coding this... */
-		m_iodev_read_cb{*this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this},
-		m_iodev_write_cb{*this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this},
-		m_iodev_status_cb{*this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this}
+patinho_feio_cpu_device::patinho_feio_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: cpu_device(mconfig, PATO_FEIO_CPU, tag, owner, clock)
+	, m_program_config("program", ENDIANNESS_LITTLE, 8, 12, 0, ADDRESS_MAP_NAME(prog_8bit))
+	, m_icount(0)
+	, m_rc_read_cb(*this)
+	, m_buttons_read_cb(*this)
+	// These arrays of *this are very ugly. I wonder if there's a better way of coding this...
+	, m_iodev_read_cb{*this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this}
+	, m_iodev_write_cb{*this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this}
+	, m_iodev_status_cb{*this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this, *this}
 {
 }
 
-UINT16 patinho_feio_cpu_device::read_panel_keys_register(){
+device_memory_interface::space_config_vector patinho_feio_cpu_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config)
+	};
+}
+
+uint16_t patinho_feio_cpu_device::read_panel_keys_register(){
 	if (!m_rc_read_cb.isnull())
 		m_rc = m_rc_read_cb(0);
 	else
@@ -78,7 +85,7 @@ UINT16 patinho_feio_cpu_device::read_panel_keys_register(){
 	return m_rc;
 }
 
-void patinho_feio_cpu_device::transfer_byte_from_external_device(UINT8 channel, UINT8 data){
+void patinho_feio_cpu_device::transfer_byte_from_external_device(uint8_t channel, uint8_t data){
 	m_iodev_incoming_byte[channel] = data;
 	m_iodev_status[channel] = IODEV_READY;
 	m_iodev_control[channel] = NO_REQUEST;
@@ -91,11 +98,11 @@ void patinho_feio_cpu_device::device_start()
 //TODO: implement handling of these special purpose registers
 //      which are also mapped to the first few main memory positions:
 //
-//      ERI: "Endereço de Retorno de Interrupção"
+//      ERI: "Endereco de Retorno de Interrupcao"
 //           "Interrupt Return Address"
 //           stored at addresses 002 and 003
 //
-//      ETI: "início de uma rotina de tratamento de interrupção (se houver)"
+//      ETI: "inicio de uma rotina de tratamento de interrupcao (se houver)"
 //           "start of an interrupt service routine (if any)"
 //           stored at address 004 (and 005 as well?)
 //
@@ -117,6 +124,7 @@ void patinho_feio_cpu_device::device_start()
 	state_add( PATINHO_FEIO_EXT,        "EXT",      m_ext        ).mask(0xFF);
 	state_add( PATINHO_FEIO_IDX,        "IDX",      m_idx        ).mask(0xFF);
 	state_add(STATE_GENPC, "GENPC", m_pc).formatstr("0%06O").noshow();
+	state_add(STATE_GENPCBASE, "CURPC", m_pc).formatstr("0%06O").noshow();
 	state_add(STATE_GENFLAGS,  "GENFLAGS",  m_flags).noshow().formatstr("%8s");
 
 	if (m_rc_read_cb.isnull()){
@@ -170,7 +178,7 @@ void patinho_feio_cpu_device::execute_run() {
 
 		if (!m_run){
 			if (!m_buttons_read_cb.isnull()){
-				UINT16 buttons = m_buttons_read_cb(0);
+				uint16_t buttons = m_buttons_read_cb(0);
 				if (buttons & BUTTON_PARTIDA){
 					/* "startup" button */
 					switch (m_mode){
@@ -229,8 +237,8 @@ void patinho_feio_cpu_device::execute_instruction()
 		case 0xD8:
 			//SOMI="Soma Imediato":
 			//     Add an immediate into the accumulator
-			set_flag(V, ((((INT16) ACC) + ((INT16) READ_BYTE_PATINHO(PC))) >> 8));
-			set_flag(T, ((((INT8) (ACC & 0x7F)) + ((INT8) (READ_BYTE_PATINHO(PC) & 0x7F))) >> 7) == V);
+			set_flag(V, ((((int16_t) ACC) + ((int16_t) READ_BYTE_PATINHO(PC))) >> 8));
+			set_flag(T, ((((int8_t) (ACC & 0x7F)) + ((int8_t) (READ_BYTE_PATINHO(PC) & 0x7F))) >> 7) == V);
 			ACC += READ_BYTE_PATINHO(PC);
 			INCREMENT_PC_4K;
 			return;
@@ -333,7 +341,7 @@ void patinho_feio_cpu_device::execute_instruction()
 		case 0x90:
 			//ST 0 = "Se T=0, Pula"
 			//       If T is zero, skip the next instruction
-                        if ((FLAGS & T) == 0)
+						if ((FLAGS & T) == 0)
 				INCREMENT_PC_4K; //skip
 			return;
 		case 0x91:
@@ -348,7 +356,7 @@ void patinho_feio_cpu_device::execute_instruction()
 		case 0x92:
 			//ST 1 = "Se T=1, Pula"
 			//       If T is one, skip the next instruction
-                        if ((FLAGS & T) == 1)
+						if ((FLAGS & T) == 1)
 				INCREMENT_PC_4K; //skip
 			return;
 		case 0x93:
@@ -363,7 +371,7 @@ void patinho_feio_cpu_device::execute_instruction()
 		case 0x94:
 			//SV 0 = "Se V=0, Pula"
 			//       If V is zero, skip the next instruction
-                        if ((FLAGS & V) == 0)
+						if ((FLAGS & V) == 0)
 				INCREMENT_PC_4K; //skip
 			return;
 		case 0x95:
@@ -378,7 +386,7 @@ void patinho_feio_cpu_device::execute_instruction()
 		case 0x96:
 			//SV 1 = "Se V=1, Pula"
 			//       If V is one, skip the next instruction
-                        if ((FLAGS & V) == 1)
+						if ((FLAGS & V) == 1)
 				INCREMENT_PC_4K; //skip
 			return;
 		case 0x97:
@@ -391,17 +399,17 @@ void patinho_feio_cpu_device::execute_instruction()
 			}
 			return;
 		case 0x98:
-			//PUL="Pula para /002 a limpa estado de interrupção"
+			//PUL="Pula para /002 a limpa estado de interrupcao"
 			//     Jump to address /002 and disables interrupts
-                        PC = 0x002;
+						PC = 0x002;
 			m_interrupts_enabled = false;
 			return;
 		case 0x99:
-			//TRE="Troca conteúdos de ACC e EXT"
+			//TRE="Troca conteudos de ACC e EXT"
 			//     Exchange the value of the accumulator with the ACC extension register
-                        value = ACC;
-                        ACC = READ_ACC_EXTENSION_REG();
-                        WRITE_ACC_EXTENSION_REG(value);
+						value = ACC;
+						ACC = READ_ACC_EXTENSION_REG();
+						WRITE_ACC_EXTENSION_REG(value);
 			return;
 		case 0x9A:
 			//INIB="Inibe"
@@ -621,7 +629,7 @@ void patinho_feio_cpu_device::execute_instruction()
 					{
 						case 0:
 							// FNC /n0: Desliga flip-flop PERMITE/IMPEDE para
-							//          o dispositivo n (isto é, impede inter-
+							//          o dispositivo n (isto e, impede inter-
 							//          -rupcao do dispositivo n).
 							//
 							//          Turns off the interrupt ENABLE/DISABLE
@@ -654,7 +662,7 @@ void patinho_feio_cpu_device::execute_instruction()
 							break;
 						case 5:
 							// FNC /n5: Liga flip-flop PERMITE/IMPEDE para  o
-							//          dispositivo n (isto é, permite inter-
+							//          dispositivo n (isto e, permite inter-
 							//          -rupcao do dispositivo n).
 							//
 							//          Turns on the interrupt ENABLE/DISABLE
@@ -681,7 +689,7 @@ void patinho_feio_cpu_device::execute_instruction()
 							m_iodev_control[channel] = NO_REQUEST;
 							break;
 						case 8:
-							// FNC /n8: Só funciona na leitora de fita, ca-
+							// FNC /n8: So funciona na leitora de fita, ca-
 							//          nal /E. Ignora todos os "feed-fra-
 							//          -mes" ("bytes" nulos) da fita, ate' a
 							//          proxima perfuracao (1o "byte" nao
@@ -695,7 +703,7 @@ void patinho_feio_cpu_device::execute_instruction()
 								//TODO: Implement-me!
 							} else {
 								printf("Function 8 of the /FNC instruction can only be used with"\
-								       "the papertape reader device at channel /E.\n");
+										"the papertape reader device at channel /E.\n");
 							}
 							break;
 						default:
@@ -705,7 +713,7 @@ void patinho_feio_cpu_device::execute_instruction()
 				case 0x20:
 					//SAL="Salta"
 					//    Skips a couple bytes if a condition is met
-                                        skip = false;
+										skip = false;
 					switch(function)
 					{
 						case 1:
@@ -774,8 +782,8 @@ void patinho_feio_cpu_device::execute_instruction()
 	printf("unimplemented opcode: 0x%02X\n", m_opcode);
 }
 
-offs_t patinho_feio_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t patinho_feio_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( patinho_feio );
-	return CPU_DISASSEMBLE_NAME(patinho_feio)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(patinho_feio)(this, stream, pc, oprom, opram, options);
 }

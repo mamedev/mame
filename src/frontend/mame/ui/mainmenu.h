@@ -8,20 +8,21 @@
 
 ***************************************************************************/
 
-#pragma once
-
 #ifndef MAME_FRONTEND_UI_MAINMENU_H
 #define MAME_FRONTEND_UI_MAINMENU_H
+
+#pragma once
+
+#include "ui/menu.h"
+
 
 namespace ui {
 
 class menu_main : public menu
 {
 public:
-	menu_main(mame_ui_manager &mui, render_container *container);
+	menu_main(mame_ui_manager &mui, render_container &container);
 	virtual ~menu_main();
-	virtual void populate() override;
-	virtual void handle() override;
 
 private:
 	enum {
@@ -53,6 +54,9 @@ private:
 		REMOVE_FAVORITE,
 		QUIT_GAME
 	};
+
+	virtual void populate(float &customtop, float &custombottom) override;
+	virtual void handle() override;
 };
 
 } // namespace ui

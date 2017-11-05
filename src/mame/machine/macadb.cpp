@@ -78,14 +78,13 @@ static const char *const adb_statenames[4] = { "NEW", "EVEN", "ODD", "IDLE" };
 int mac_state::adb_pollkbd(int update)
 {
 	int i, j, keybuf, report, codes[2], result;
-	ioport_port *ports[6] = { m_key0, m_key1,   m_key2, m_key3, m_key4, m_key5 };
 
 	codes[0] = codes[1] = 0xff; // key up
 	report = result = 0;
 
 	for (i = 0; i < 6; i++)
 	{
-		keybuf = ports[i]->read();
+		keybuf = m_keys[i]->read();
 
 		// any changes in this row?
 		if ((keybuf != m_key_matrix[i]) && (report < 2))
@@ -233,7 +232,7 @@ int mac_state::adb_pollmouse()
 	return 0;
 }
 
-void mac_state::adb_accummouse( UINT8 *MouseX, UINT8 *MouseY )
+void mac_state::adb_accummouse( uint8_t *MouseX, uint8_t *MouseY )
 {
 	int MouseCountX = 0, MouseCountY = 0;
 	int NewX, NewY;
@@ -273,8 +272,8 @@ void mac_state::adb_accummouse( UINT8 *MouseX, UINT8 *MouseY )
 
 	m_adb_lastbutton = m_mouse0->read() & 0x01;
 
-	*MouseX = (UINT8)MouseCountX;
-	*MouseY = (UINT8)MouseCountY;
+	*MouseX = (uint8_t)MouseCountX;
+	*MouseY = (uint8_t)MouseCountY;
 }
 
 void mac_state::adb_talk()
@@ -284,7 +283,7 @@ void mac_state::adb_talk()
 	addr = (m_adb_command>>4);
 	reg = (m_adb_command & 3);
 
-//  printf("Mac sent %x (cmd %d addr %d reg %d mr %d kr %d)\n", mac->m_adb_command, (mac->m_adb_command>>2)&3, addr, reg, m_adb_mouseaddr, m_adb_keybaddr);
+	//printf("Mac sent %x (cmd %d addr %d reg %d mr %d kr %d)\n", m_adb_command, (m_adb_command>>2)&3, addr, reg, m_adb_mouseaddr, m_adb_keybaddr);
 
 	if (m_adb_waiting_cmd)
 	{
@@ -353,7 +352,7 @@ void mac_state::adb_talk()
 				m_adb_direction = 0;    // output to Mac
 				if (addr == m_adb_mouseaddr)
 				{
-					UINT8 mouseX, mouseY;
+					uint8_t mouseX, mouseY;
 
 					#if LOG_ADB || LOG_ADB_TALK_LISTEN
 					printf("Talking to mouse, register %x\n", reg);
@@ -638,21 +637,15 @@ TIMER_CALLBACK_MEMBER(mac_state::mac_adb_tick)
 	}
 	else
 	{
-		// do one clock transition on CB1 to advance the VIA shifter
-		m_adb_extclock ^= 1;
-		m_via1->write_cb1(m_adb_extclock);
-
-		if (m_adb_direction)
-		{
-			m_adb_command <<= 1;
-		}
-		else
+		// for input to Mac, the VIA reads on the *other* clock edge, so update this here
+		if (!m_adb_direction)
 		{
 			m_via1->write_cb2((m_adb_send & 0x80)>>7);
 			m_adb_send <<= 1;
 		}
 
-		m_adb_extclock ^= 1;
+		// do one clock transition on CB1 to advance the VIA shifter
+		m_via1->write_cb1(m_adb_extclock ^ 1);
 		m_via1->write_cb1(m_adb_extclock);
 
 		m_adb_timer_ticks--;
@@ -759,7 +752,7 @@ TIMER_CALLBACK_MEMBER(mac_state::mac_pmu_tick)
 	}
 }
 
-void mac_state::pmu_one_byte_reply(UINT8 result)
+void mac_state::pmu_one_byte_reply(uint8_t result)
 {
 	m_pm_out[0] = m_pm_out[1] = 1;  // length
 	m_pm_out[2] = result;
@@ -767,7 +760,7 @@ void mac_state::pmu_one_byte_reply(UINT8 result)
 	m_pmu_send_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(200)));
 }
 
-void mac_state::pmu_three_byte_reply(UINT8 result1, UINT8 result2, UINT8 result3)
+void mac_state::pmu_three_byte_reply(uint8_t result1, uint8_t result2, uint8_t result3)
 {
 	m_pm_out[0] = m_pm_out[1] = 3;  // length
 	m_pm_out[2] = result1;

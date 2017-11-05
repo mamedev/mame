@@ -14,7 +14,7 @@
 
 PALETTE_INIT_MEMBER(marineb_state, marineb)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 	for (i = 0; i < palette.entries(); i++)
@@ -49,8 +49,8 @@ PALETTE_INIT_MEMBER(marineb_state, marineb)
 
 TILE_GET_INFO_MEMBER(marineb_state::get_tile_info)
 {
-	UINT8 code = m_videoram[tile_index];
-	UINT8 col = m_colorram[tile_index];
+	uint8_t code = m_videoram[tile_index];
+	uint8_t col = m_colorram[tile_index];
 
 	SET_TILE_INFO_MEMBER(0,
 					code | ((col & 0xc0) << 2),
@@ -68,7 +68,7 @@ TILE_GET_INFO_MEMBER(marineb_state::get_tile_info)
 
 void marineb_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(marineb_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(marineb_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_bg_tilemap->set_scroll_cols(32);
 
 	save_item(NAME(m_palette_bank));
@@ -107,7 +107,7 @@ WRITE8_MEMBER(marineb_state::marineb_column_scroll_w)
 
 WRITE8_MEMBER(marineb_state::marineb_palette_bank_0_w)
 {
-	UINT8 old = m_palette_bank;
+	uint8_t old = m_palette_bank;
 
 	m_palette_bank = (m_palette_bank & 0x02) | (data & 0x01);
 
@@ -120,7 +120,7 @@ WRITE8_MEMBER(marineb_state::marineb_palette_bank_0_w)
 
 WRITE8_MEMBER(marineb_state::marineb_palette_bank_1_w)
 {
-	UINT8 old = m_palette_bank;
+	uint8_t old = m_palette_bank;
 
 	m_palette_bank = (m_palette_bank & 0x01) | ((data & 0x01) << 1);
 
@@ -131,16 +131,16 @@ WRITE8_MEMBER(marineb_state::marineb_palette_bank_1_w)
 }
 
 
-WRITE8_MEMBER(marineb_state::marineb_flipscreen_x_w)
+WRITE_LINE_MEMBER(marineb_state::flipscreen_x_w)
 {
-	m_flipscreen_x = data ^ m_marineb_active_low_flipscreen;
+	m_flipscreen_x = state;
 	m_bg_tilemap->set_flip((m_flipscreen_x ? TILEMAP_FLIPX : 0) | (m_flipscreen_y ? TILEMAP_FLIPY : 0));
 }
 
 
-WRITE8_MEMBER(marineb_state::marineb_flipscreen_y_w)
+WRITE_LINE_MEMBER(marineb_state::flipscreen_y_w)
 {
-	m_flipscreen_y = data ^ m_marineb_active_low_flipscreen;
+	m_flipscreen_y = state;
 	m_bg_tilemap->set_flip((m_flipscreen_x ? TILEMAP_FLIPX : 0) | (m_flipscreen_y ? TILEMAP_FLIPY : 0));
 }
 
@@ -164,7 +164,7 @@ void marineb_state::set_tilemap_scrolly( int cols )
 }
 
 
-UINT32 marineb_state::screen_update_marineb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t marineb_state::screen_update_marineb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int offs;
 
@@ -225,7 +225,7 @@ UINT32 marineb_state::screen_update_marineb(screen_device &screen, bitmap_ind16 
 }
 
 
-UINT32 marineb_state::screen_update_changes(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t marineb_state::screen_update_changes(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int offs, sx, sy, code, col, flipx, flipy;
 
@@ -303,7 +303,7 @@ UINT32 marineb_state::screen_update_changes(screen_device &screen, bitmap_ind16 
 }
 
 
-UINT32 marineb_state::screen_update_springer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t marineb_state::screen_update_springer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int offs;
 
@@ -362,7 +362,7 @@ UINT32 marineb_state::screen_update_springer(screen_device &screen, bitmap_ind16
 }
 
 
-UINT32 marineb_state::screen_update_hoccer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t marineb_state::screen_update_hoccer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int offs;
 
@@ -405,7 +405,7 @@ UINT32 marineb_state::screen_update_hoccer(screen_device &screen, bitmap_ind16 &
 }
 
 
-UINT32 marineb_state::screen_update_hopprobo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t marineb_state::screen_update_hopprobo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int offs;
 

@@ -8,10 +8,8 @@
 
 ***************************************************************************/
 
-#ifndef __VOODOO_H__
-#define __VOODOO_H__
-
-#include "video/polylgcy.h"
+#ifndef MAME_VIDEO_VOODOO_H
+#define MAME_VIDEO_VOODOO_H
 
 #define VOODOO_GPU_ACCEL
 #ifdef VOODOO_GPU_ACCEL
@@ -19,6 +17,10 @@
 #endif
 
 #pragma once
+
+
+#include "video/polylgcy.h"
+#include "video/rgbutil.h"
 
 
 /*************************************
@@ -344,7 +346,7 @@ enum
  *
  *************************************/
 
-static const UINT8 register_alias_map[0x40] =
+static const uint8_t register_alias_map[0x40] =
 {
 	vdstatus,     0x004/4,    vertexAx,   vertexAy,
 	vertexBx,   vertexBy,   vertexCx,   vertexCy,
@@ -373,7 +375,7 @@ static const UINT8 register_alias_map[0x40] =
  *
  *************************************/
 
-static const UINT8 voodoo_register_access[0x100] =
+static const uint8_t voodoo_register_access[0x100] =
 {
 	/* 0x000 */
 	REG_RP,     0,          REG_WPF,    REG_WPF,
@@ -464,7 +466,7 @@ static const UINT8 voodoo_register_access[0x100] =
 };
 
 
-static const UINT8 voodoo2_register_access[0x100] =
+static const uint8_t voodoo2_register_access[0x100] =
 {
 	/* 0x000 */
 	REG_RP,     REG_RWPT,   REG_WPF,    REG_WPF,
@@ -555,7 +557,7 @@ static const UINT8 voodoo2_register_access[0x100] =
 };
 
 
-static const UINT8 banshee_register_access[0x100] =
+static const uint8_t banshee_register_access[0x100] =
 {
 	/* 0x000 */
 	REG_RP,     REG_RWPT,   REG_WPF,    REG_WPF,
@@ -1014,7 +1016,7 @@ static const char *const banshee_agp_reg_name[] =
  *
  *************************************/
 
-static const UINT8 dither_matrix_4x4[16] =
+static const uint8_t dither_matrix_4x4[16] =
 {
 		0,  8,  2, 10,
 	12,  4, 14,  6,
@@ -1022,15 +1024,39 @@ static const UINT8 dither_matrix_4x4[16] =
 	15,  7, 13,  5
 };
 
-static const UINT8 dither_matrix_2x2[16] =
+//static const uint8_t dither_matrix_2x2[16] =
+//{
+//      2, 10,  2, 10,
+//  14,  6, 14,  6,
+//      2, 10,  2, 10,
+//  14,  6, 14,  6
+//};
+// Using this matrix allows iteagle video memory tests to pass
+static const uint8_t dither_matrix_2x2[16] =
 {
-		2, 10,  2, 10,
-	14,  6, 14,  6,
-		2, 10,  2, 10,
-	14,  6, 14,  6
+	8, 10, 8, 10,
+	11, 9, 11, 9,
+	8, 10, 8, 10,
+	11, 9, 11, 9
 };
 
+// Dither 4x4 subtraction matrix used in alpha blending
+static const uint8_t dither_subtract_4x4[16] =
+{
+	(15 - 0) >> 1,  (15 - 8) >> 1,  (15 - 2) >> 1, (15 - 10) >> 1,
+	(15 - 12) >> 1,  (15 - 4) >> 1, (15 - 14) >> 1,  (15 - 6) >> 1,
+	(15 - 3) >> 1, (15 - 11) >> 1,  (15 - 1) >> 1,  (15 - 9) >> 1,
+	(15 - 15) >> 1,  (15 - 7) >> 1, (15 - 13) >> 1,  (15 - 5) >> 1
+};
 
+// Dither 2x2 subtraction matrix used in alpha blending
+static const uint8_t dither_subtract_2x2[16] =
+{
+	(15 - 8) >> 1, (15 - 10) >> 1, (15 - 8) >> 1, (15 - 10) >> 1,
+	(15 - 11) >> 1, (15 - 9) >> 1, (15 - 11) >> 1, (15 - 9) >> 1,
+	(15 - 8) >> 1, (15 - 10) >> 1, (15 - 8) >> 1, (15 - 10) >> 1,
+	(15 - 11) >> 1, (15 - 9) >> 1, (15 - 11) >> 1, (15 - 9) >> 1
+};
 
 /*************************************
  *
@@ -1051,7 +1077,7 @@ static const UINT8 dither_matrix_2x2[16] =
 	(b) = (((val) >> 3) & 0xf8) | (((val) >> 8) & 0x07);    \
 	(c) = (((val) << 2) & 0xf8) | (((val) >> 3) & 0x07);
 #define EXTRACT_1555_TO_8888(val, a, b, c, d)               \
-	(a) = ((INT16)(val) >> 15) & 0xff;                      \
+	(a) = ((int16_t)(val) >> 15) & 0xff;                      \
 	EXTRACT_x555_TO_888(val, b, c, d)
 #define EXTRACT_5551_TO_8888(val, a, b, c, d)               \
 	EXTRACT_555x_TO_888(val, a, b, c)                       \
@@ -1367,339 +1393,24 @@ static const UINT8 dither_matrix_2x2[16] =
 
 
 
-struct voodoo_state;
-struct poly_extra_data;
-class voodoo_device;
-
 struct rgba
 {
 #ifdef LSB_FIRST
-	UINT8               b, g, r, a;
+	uint8_t               b, g, r, a;
 #else
-	UINT8               a, r, g, b;
+	uint8_t               a, r, g, b;
 #endif
 };
 
 
 union voodoo_reg
 {
-	INT32               i;
-	UINT32              u;
+	int32_t               i;
+	uint32_t              u;
 	float               f;
 	rgba                rgb;
 };
 
-
-
-struct voodoo_stats
-{
-	UINT8               lastkey;                /* last key state */
-	UINT8               display;                /* display stats? */
-	INT32               swaps;                  /* total swaps */
-	INT32               stalls;                 /* total stalls */
-	INT32               total_triangles;        /* total triangles */
-	INT32               total_pixels_in;        /* total pixels in */
-	INT32               total_pixels_out;       /* total pixels out */
-	INT32               total_chroma_fail;      /* total chroma fail */
-	INT32               total_zfunc_fail;       /* total z func fail */
-	INT32               total_afunc_fail;       /* total a func fail */
-	INT32               total_clipped;          /* total clipped */
-	INT32               total_stippled;         /* total stippled */
-	INT32               lfb_writes;             /* LFB writes */
-	INT32               lfb_reads;              /* LFB reads */
-	INT32               reg_writes;             /* register writes */
-	INT32               reg_reads;              /* register reads */
-	INT32               tex_writes;             /* texture writes */
-	INT32               texture_mode[16];       /* 16 different texture modes */
-	UINT8               render_override;        /* render override */
-	char                buffer[1024];           /* string */
-};
-
-
-/* note that this structure is an even 64 bytes long */
-struct stats_block
-{
-	INT32               pixels_in;              /* pixels in statistic */
-	INT32               pixels_out;             /* pixels out statistic */
-	INT32               chroma_fail;            /* chroma test fail statistic */
-	INT32               zfunc_fail;             /* z function test fail statistic */
-	INT32               afunc_fail;             /* alpha function test fail statistic */
-	INT32               clip_fail;              /* clipping fail statistic */
-	INT32               stipple_count;          /* stipple statistic */
-	INT32               filler[64/4 - 7];       /* pad this structure to 64 bytes */
-};
-
-
-struct fifo_state
-{
-	UINT32 *            base;                   /* base of the FIFO */
-	INT32               size;                   /* size of the FIFO */
-	INT32               in;                     /* input pointer */
-	INT32               out;                    /* output pointer */
-};
-
-
-struct cmdfifo_info
-{
-	UINT8               enable;                 /* enabled? */
-	UINT8               count_holes;            /* count holes? */
-	UINT32              base;                   /* base address in framebuffer RAM */
-	UINT32              end;                    /* end address in framebuffer RAM */
-	UINT32              rdptr;                  /* current read pointer */
-	UINT32              amin;                   /* minimum address */
-	UINT32              amax;                   /* maximum address */
-	UINT32              depth;                  /* current depth */
-	UINT32              holes;                  /* number of holes */
-};
-
-
-struct pci_state
-{
-	fifo_state          fifo;                   /* PCI FIFO */
-	UINT32              init_enable;            /* initEnable value */
-	UINT8               stall_state;            /* state of the system if we're stalled */
-	UINT8               op_pending;             /* true if an operation is pending */
-	attotime            op_end_time;            /* time when the pending operation ends */
-	emu_timer *         continue_timer;         /* timer to use to continue processing */
-	UINT32              fifo_mem[64*2];         /* memory backing the PCI FIFO */
-};
-
-
-struct ncc_table
-{
-	UINT8               dirty;                  /* is the texel lookup dirty? */
-	voodoo_reg *        reg;                    /* pointer to our registers */
-	INT32               ir[4], ig[4], ib[4];    /* I values for R,G,B */
-	INT32               qr[4], qg[4], qb[4];    /* Q values for R,G,B */
-	INT32               y[16];                  /* Y values */
-	rgb_t *             palette;                /* pointer to associated RGB palette */
-	rgb_t *             palettea;               /* pointer to associated ARGB palette */
-	rgb_t               texel[256];             /* texel lookup */
-};
-
-
-struct tmu_state
-{
-	UINT8 *             ram;                    /* pointer to our RAM */
-	UINT32              mask;                   /* mask to apply to pointers */
-	voodoo_reg *        reg;                    /* pointer to our register base */
-	UINT32              regdirty;               /* true if the LOD/mode/base registers have changed */
-
-	UINT32              texaddr_mask;           /* mask for texture address */
-	UINT8               texaddr_shift;          /* shift for texture address */
-
-	INT64               starts, startt;         /* starting S,T (14.18) */
-	INT64               startw;                 /* starting W (2.30) */
-	INT64               dsdx, dtdx;             /* delta S,T per X */
-	INT64               dwdx;                   /* delta W per X */
-	INT64               dsdy, dtdy;             /* delta S,T per Y */
-	INT64               dwdy;                   /* delta W per Y */
-
-	INT32               lodmin, lodmax;         /* min, max LOD values */
-	INT32               lodbias;                /* LOD bias */
-	UINT32              lodmask;                /* mask of available LODs */
-	UINT32              lodoffset[9];           /* offset of texture base for each LOD */
-	INT32               detailmax;              /* detail clamp */
-	INT32               detailbias;             /* detail bias */
-	UINT8               detailscale;            /* detail scale */
-
-	UINT32              wmask;                  /* mask for the current texture width */
-	UINT32              hmask;                  /* mask for the current texture height */
-
-	UINT32              bilinear_mask;          /* mask for bilinear resolution (0xf0 for V1, 0xff for V2) */
-
-	ncc_table           ncc[2];                 /* two NCC tables */
-
-	rgb_t *             lookup;                 /* currently selected lookup */
-	rgb_t *             texel[16];              /* texel lookups for each format */
-
-	rgb_t               palette[256];           /* palette lookup table */
-	rgb_t               palettea[256];          /* palette+alpha lookup table */
-};
-
-
-struct tmu_shared_state
-{
-	rgb_t               rgb332[256];            /* RGB 3-3-2 lookup table */
-	rgb_t               alpha8[256];            /* alpha 8-bit lookup table */
-	rgb_t               int8[256];              /* intensity 8-bit lookup table */
-	rgb_t               ai44[256];              /* alpha, intensity 4-4 lookup table */
-
-	rgb_t               rgb565[65536];          /* RGB 5-6-5 lookup table */
-	rgb_t               argb1555[65536];        /* ARGB 1-5-5-5 lookup table */
-	rgb_t               argb4444[65536];        /* ARGB 4-4-4-4 lookup table */
-};
-
-
-struct setup_vertex
-{
-	float               x, y;                   /* X, Y coordinates */
-	float               z, wb;                  /* Z and broadcast W values */
-	float               r, g, b, a;             /* A, R, G, B values */
-	float               s0, t0, w0;             /* W, S, T for TMU 0 */
-	float               s1, t1, w1;             /* W, S, T for TMU 1 */
-};
-
-
-struct fbi_state
-{
-	UINT8 *             ram;                    /* pointer to frame buffer RAM */
-	UINT32              mask;                   /* mask to apply to pointers */
-	UINT32              rgboffs[3];             /* word offset to 3 RGB buffers */
-	UINT32              auxoffs;                /* word offset to 1 aux buffer */
-
-	UINT8               frontbuf;               /* front buffer index */
-	UINT8               backbuf;                /* back buffer index */
-	UINT8               swaps_pending;          /* number of pending swaps */
-	UINT8               video_changed;          /* did the frontbuffer video change? */
-
-	UINT32              yorigin;                /* Y origin subtract value */
-	UINT32              lfb_base;               /* base of LFB in memory */
-	UINT8               lfb_stride;             /* stride of LFB accesses in bits */
-
-	UINT32              width;                  /* width of current frame buffer */
-	UINT32              height;                 /* height of current frame buffer */
-	UINT32              xoffs;                  /* horizontal offset (back porch) */
-	UINT32              yoffs;                  /* vertical offset (back porch) */
-	UINT32              vsyncscan;              /* vertical sync scanline */
-	UINT32              rowpixels;              /* pixels per row */
-	UINT32              tile_width;             /* width of video tiles */
-	UINT32              tile_height;            /* height of video tiles */
-	UINT32              x_tiles;                /* number of tiles in the X direction */
-
-	emu_timer *         vblank_timer;           /* VBLANK timer */
-	UINT8               vblank;                 /* VBLANK state */
-	UINT8               vblank_count;           /* number of VBLANKs since last swap */
-	UINT8               vblank_swap_pending;    /* a swap is pending, waiting for a vblank */
-	UINT8               vblank_swap;            /* swap when we hit this count */
-	UINT8               vblank_dont_swap;       /* don't actually swap when we hit this point */
-
-	/* triangle setup info */
-	UINT8               cheating_allowed;       /* allow cheating? */
-	INT32               sign;                   /* triangle sign */
-	INT16               ax, ay;                 /* vertex A x,y (12.4) */
-	INT16               bx, by;                 /* vertex B x,y (12.4) */
-	INT16               cx, cy;                 /* vertex C x,y (12.4) */
-	INT32               startr, startg, startb, starta; /* starting R,G,B,A (12.12) */
-	INT32               startz;                 /* starting Z (20.12) */
-	INT64               startw;                 /* starting W (16.32) */
-	INT32               drdx, dgdx, dbdx, dadx; /* delta R,G,B,A per X */
-	INT32               dzdx;                   /* delta Z per X */
-	INT64               dwdx;                   /* delta W per X */
-	INT32               drdy, dgdy, dbdy, dady; /* delta R,G,B,A per Y */
-	INT32               dzdy;                   /* delta Z per Y */
-	INT64               dwdy;                   /* delta W per Y */
-
-	stats_block         lfb_stats;              /* LFB-access statistics */
-
-	UINT8               sverts;                 /* number of vertices ready */
-	setup_vertex        svert[3];               /* 3 setup vertices */
-
-	fifo_state          fifo;                   /* framebuffer memory fifo */
-	cmdfifo_info        cmdfifo[2];             /* command FIFOs */
-
-	UINT8               fogblend[64];           /* 64-entry fog table */
-	UINT8               fogdelta[64];           /* 64-entry fog table */
-	UINT8               fogdelta_mask;          /* mask for for delta (0xff for V1, 0xfc for V2) */
-
-	rgb_t               pen[65536];             /* mapping from pixels to pens */
-	rgb_t               clut[512];              /* clut gamma data */
-	UINT8               clut_dirty;             /* do we need to recompute? */
-};
-
-
-struct dac_state
-{
-	UINT8               reg[8];                 /* 8 registers */
-	UINT8               read_result;            /* pending read result */
-};
-
-
-struct raster_info
-{
-	raster_info *       next;                   /* pointer to next entry with the same hash */
-	poly_draw_scanline_func callback;           /* callback pointer */
-	UINT8               is_generic;             /* TRUE if this is one of the generic rasterizers */
-	UINT8               display;                /* display index */
-	UINT32              hits;                   /* how many hits (pixels) we've used this for */
-	UINT32              polys;                  /* how many polys we've used this for */
-	UINT32              eff_color_path;         /* effective fbzColorPath value */
-	UINT32              eff_alpha_mode;         /* effective alphaMode value */
-	UINT32              eff_fog_mode;           /* effective fogMode value */
-	UINT32              eff_fbz_mode;           /* effective fbzMode value */
-	UINT32              eff_tex_mode_0;         /* effective textureMode value for TMU #0 */
-	UINT32              eff_tex_mode_1;         /* effective textureMode value for TMU #1 */
-	UINT32              hash;
-};
-
-
-struct poly_extra_data
-{
-	voodoo_device * device;
-	raster_info *       info;                   /* pointer to rasterizer information */
-
-	INT16               ax, ay;                 /* vertex A x,y (12.4) */
-	INT32               startr, startg, startb, starta; /* starting R,G,B,A (12.12) */
-	INT32               startz;                 /* starting Z (20.12) */
-	INT64               startw;                 /* starting W (16.32) */
-	INT32               drdx, dgdx, dbdx, dadx; /* delta R,G,B,A per X */
-	INT32               dzdx;                   /* delta Z per X */
-	INT64               dwdx;                   /* delta W per X */
-	INT32               drdy, dgdy, dbdy, dady; /* delta R,G,B,A per Y */
-	INT32               dzdy;                   /* delta Z per Y */
-	INT64               dwdy;                   /* delta W per Y */
-
-	INT64               starts0, startt0;       /* starting S,T (14.18) */
-	INT64               startw0;                /* starting W (2.30) */
-	INT64               ds0dx, dt0dx;           /* delta S,T per X */
-	INT64               dw0dx;                  /* delta W per X */
-	INT64               ds0dy, dt0dy;           /* delta S,T per Y */
-	INT64               dw0dy;                  /* delta W per Y */
-	INT32               lodbase0;               /* used during rasterization */
-
-	INT64               starts1, startt1;       /* starting S,T (14.18) */
-	INT64               startw1;                /* starting W (2.30) */
-	INT64               ds1dx, dt1dx;           /* delta S,T per X */
-	INT64               dw1dx;                  /* delta W per X */
-	INT64               ds1dy, dt1dy;           /* delta S,T per Y */
-	INT64               dw1dy;                  /* delta W per Y */
-	INT32               lodbase1;               /* used during rasterization */
-
-	UINT16              dither[16];             /* dither matrix, for fastfill */
-};
-
-
-struct banshee_info
-{
-	UINT32              io[0x40];               /* I/O registers */
-	UINT32              agp[0x80];              /* AGP registers */
-	UINT8               vga[0x20];              /* VGA registers */
-	UINT8               crtc[0x27];             /* VGA CRTC registers */
-	UINT8               seq[0x05];              /* VGA sequencer registers */
-	UINT8               gc[0x05];               /* VGA graphics controller registers */
-	UINT8               att[0x15];              /* VGA attribute registers */
-	UINT8               attff;                  /* VGA attribute flip-flop */
-
-	UINT32              blt_regs[0x20];         /* 2D Blitter registers */
-	UINT32              blt_dst_base;
-	UINT32              blt_dst_x;
-	UINT32              blt_dst_y;
-	UINT32              blt_dst_width;
-	UINT32              blt_dst_height;
-	UINT32              blt_dst_stride;
-	UINT32              blt_dst_bpp;
-	UINT32              blt_cmd;
-	UINT32              blt_src_base;
-	UINT32              blt_src_x;
-	UINT32              blt_src_y;
-	UINT32              blt_src_width;
-	UINT32              blt_src_height;
-	UINT32              blt_src_stride;
-	UINT32              blt_src_bpp;
-};
-
-
-typedef voodoo_reg rgb_union;
 
 
 
@@ -1746,127 +1457,443 @@ enum
 #define MCFG_VOODOO_STALL_CB(_devcb) \
 	devcb = &voodoo_device::static_set_stall_callback(*device, DEVCB_##_devcb);
 
+#define MCFG_VOODOO_PCIINT_CB(_devcb) \
+	devcb = &voodoo_device::static_set_pciint_callback(*device, DEVCB_##_devcb);
 
 /***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/
-
-struct stats_block;
 
 /* ----- device interface ----- */
 
 class voodoo_device : public device_t
 {
 public:
-	voodoo_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	~voodoo_device();
-
 
 	static void static_set_fbmem(device_t &device, int value) { downcast<voodoo_device &>(device).m_fbmem = value; }
 	static void static_set_tmumem(device_t &device, int value1, int value2) { downcast<voodoo_device &>(device).m_tmumem0 = value1; downcast<voodoo_device &>(device).m_tmumem1 = value2; }
 	static void static_set_screen_tag(device_t &device, const char *tag) { downcast<voodoo_device &>(device).m_screen = tag; }
 	static void static_set_cpu_tag(device_t &device, const char *tag) { downcast<voodoo_device &>(device).m_cputag = tag; }
-	template<class _Object> static devcb_base &static_set_vblank_callback(device_t &device, _Object object) { return downcast<voodoo_device &>(device).m_vblank.set_callback(object); }
-	template<class _Object> static devcb_base &static_set_stall_callback(device_t &device, _Object object)  { return downcast<voodoo_device &>(device).m_stall.set_callback(object); }
+	template <class Object> static devcb_base &static_set_vblank_callback(device_t &device, Object &&cb) { return downcast<voodoo_device &>(device).m_vblank.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &static_set_stall_callback(device_t &device, Object &&cb)  { return downcast<voodoo_device &>(device).m_stall.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &static_set_pciint_callback(device_t &device, Object &&cb) { return downcast<voodoo_device &>(device).m_pciint.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ32_MEMBER( voodoo_r );
 	DECLARE_WRITE32_MEMBER( voodoo_w );
 
-	// access to legacy token
-	void common_start_voodoo(UINT8 type);
-
-	UINT8               m_fbmem;
-	UINT8               m_tmumem0;
-	UINT8               m_tmumem1;
+	uint8_t               m_fbmem;
+	uint8_t               m_tmumem0;
+	uint8_t               m_tmumem1;
 	const char *        m_screen;
 	const char *        m_cputag;
 	devcb_write_line   m_vblank;
 	devcb_write_line   m_stall;
+	// This is for internally generated PCI interrupts in Voodoo3
+	devcb_write_line   m_pciint;
 
 	TIMER_CALLBACK_MEMBER( vblank_off_callback );
 	TIMER_CALLBACK_MEMBER( stall_cpu_callback );
 	TIMER_CALLBACK_MEMBER( vblank_callback );
 
-	static void voodoo_postload(voodoo_device *vd);
+	void voodoo_postload();
 
 	int voodoo_update(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	int voodoo_get_type();
 	int voodoo_is_stalled();
-	void voodoo_set_init_enable(UINT32 newval);
+	void voodoo_set_init_enable(uint32_t newval);
+
+protected:
+	voodoo_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t vdt);
+
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_stop() override;
+	virtual void device_reset() override;
+
+	struct tmu_shared_state;
+
+	struct voodoo_stats
+	{
+		uint8_t               lastkey;                /* last key state */
+		uint8_t               display;                /* display stats? */
+		int32_t               swaps;                  /* total swaps */
+		int32_t               stalls;                 /* total stalls */
+		int32_t               total_triangles;        /* total triangles */
+		int32_t               total_pixels_in;        /* total pixels in */
+		int32_t               total_pixels_out;       /* total pixels out */
+		int32_t               total_chroma_fail;      /* total chroma fail */
+		int32_t               total_zfunc_fail;       /* total z func fail */
+		int32_t               total_afunc_fail;       /* total a func fail */
+		int32_t               total_clipped;          /* total clipped */
+		int32_t               total_stippled;         /* total stippled */
+		int32_t               lfb_writes;             /* LFB writes */
+		int32_t               lfb_reads;              /* LFB reads */
+		int32_t               reg_writes;             /* register writes */
+		int32_t               reg_reads;              /* register reads */
+		int32_t               tex_writes;             /* texture writes */
+		int32_t               texture_mode[16];       /* 16 different texture modes */
+		uint8_t               render_override;        /* render override */
+		char                buffer[1024];           /* string */
+	};
+
+
+	/* note that this structure is an even 64 bytes long */
+	struct stats_block
+	{
+		int32_t               pixels_in;              /* pixels in statistic */
+		int32_t               pixels_out;             /* pixels out statistic */
+		int32_t               chroma_fail;            /* chroma test fail statistic */
+		int32_t               zfunc_fail;             /* z function test fail statistic */
+		int32_t               afunc_fail;             /* alpha function test fail statistic */
+		int32_t               clip_fail;              /* clipping fail statistic */
+		int32_t               stipple_count;          /* stipple statistic */
+		int32_t               filler[64/4 - 7];       /* pad this structure to 64 bytes */
+	};
+
+
+	struct fifo_state
+	{
+		void reset() { in = out = 0; }
+		void add(uint32_t data);
+		uint32_t remove();
+		uint32_t peek() { return base[out]; }
+		bool empty() const { return in == out; }
+		bool full() const { return ((in + 1) == out) || ((in == (size - 1)) && (out == 0)); }
+		int32_t items() const;
+		int32_t space() const { return size - 1 - items(); }
+
+		uint32_t *            base;                   /* base of the FIFO */
+		int32_t               size;                   /* size of the FIFO */
+		int32_t               in;                     /* input pointer */
+		int32_t               out;                    /* output pointer */
+	};
+
+
+	struct cmdfifo_info
+	{
+		uint8_t               enable;                 /* enabled? */
+		uint8_t               count_holes;            /* count holes? */
+		uint32_t              base;                   /* base address in framebuffer RAM */
+		uint32_t              end;                    /* end address in framebuffer RAM */
+		uint32_t              rdptr;                  /* current read pointer */
+		uint32_t              amin;                   /* minimum address */
+		uint32_t              amax;                   /* maximum address */
+		uint32_t              depth;                  /* current depth */
+		uint32_t              holes;                  /* number of holes */
+	};
+
+
+	struct pci_state
+	{
+		fifo_state          fifo;                   /* PCI FIFO */
+		uint32_t              init_enable;            /* initEnable value */
+		uint8_t               stall_state;            /* state of the system if we're stalled */
+		uint8_t               op_pending;             /* true if an operation is pending */
+		attotime            op_end_time;            /* time when the pending operation ends */
+		emu_timer *         continue_timer;         /* timer to use to continue processing */
+		uint32_t              fifo_mem[64*2];         /* memory backing the PCI FIFO */
+	};
+
+
+	struct tmu_state
+	{
+		class stw_t;
+		void recompute_texture_params();
+		void init(uint8_t vdt, tmu_shared_state &share, voodoo_reg *r, void *memory, int tmem);
+		int32_t prepare();
+		static int32_t new_log2(double &value, const int &offset);
+		rgbaint_t genTexture(int32_t x, const uint8_t *dither4, const uint32_t TEXMODE, rgb_t *LOOKUP, int32_t LODBASE, const stw_t &iterstw, int32_t &lod);
+		rgbaint_t combineTexture(const uint32_t TEXMODE, const rgbaint_t& c_local, const rgbaint_t& c_other, int32_t lod);
+
+		struct ncc_table
+		{
+			void write(offs_t regnum, uint32_t data);
+			void update();
+
+			uint8_t               dirty;                  /* is the texel lookup dirty? */
+			voodoo_reg *        reg;                    /* pointer to our registers */
+			int32_t               ir[4], ig[4], ib[4];    /* I values for R,G,B */
+			int32_t               qr[4], qg[4], qb[4];    /* Q values for R,G,B */
+			int32_t               y[16];                  /* Y values */
+			rgb_t *             palette;                /* pointer to associated RGB palette */
+			rgb_t *             palettea;               /* pointer to associated ARGB palette */
+			rgb_t               texel[256];             /* texel lookup */
+		};
+
+		uint8_t *             ram;                    /* pointer to our RAM */
+		uint32_t              mask;                   /* mask to apply to pointers */
+		voodoo_reg *        reg;                    /* pointer to our register base */
+		uint32_t              regdirty;               /* true if the LOD/mode/base registers have changed */
+
+		uint32_t              texaddr_mask;           /* mask for texture address */
+		uint8_t               texaddr_shift;          /* shift for texture address */
+
+		int64_t               starts, startt;         /* starting S,T (14.18) */
+		int64_t               startw;                 /* starting W (2.30) */
+		int64_t               dsdx, dtdx;             /* delta S,T per X */
+		int64_t               dwdx;                   /* delta W per X */
+		int64_t               dsdy, dtdy;             /* delta S,T per Y */
+		int64_t               dwdy;                   /* delta W per Y */
+
+		int32_t               lodmin, lodmax;         /* min, max LOD values */
+		int32_t               lodbias;                /* LOD bias */
+		uint32_t              lodmask;                /* mask of available LODs */
+		uint32_t              lodoffset[9];           /* offset of texture base for each LOD */
+		int32_t               detailmax;              /* detail clamp */
+		int32_t               detailbias;             /* detail bias */
+		uint8_t               detailscale;            /* detail scale */
+
+		uint32_t              wmask;                  /* mask for the current texture width */
+		uint32_t              hmask;                  /* mask for the current texture height */
+
+		uint32_t              bilinear_mask;          /* mask for bilinear resolution (0xf0 for V1, 0xff for V2) */
+
+		ncc_table           ncc[2];                 /* two NCC tables */
+
+		rgb_t *             lookup;                 /* currently selected lookup */
+		rgb_t *             texel[16];              /* texel lookups for each format */
+
+		rgb_t               palette[256];           /* palette lookup table */
+		rgb_t               palettea[256];          /* palette+alpha lookup table */
+	};
+
+
+	struct tmu_shared_state
+	{
+		void init();
+
+		rgb_t               rgb332[256];            /* RGB 3-3-2 lookup table */
+		rgb_t               alpha8[256];            /* alpha 8-bit lookup table */
+		rgb_t               int8[256];              /* intensity 8-bit lookup table */
+		rgb_t               ai44[256];              /* alpha, intensity 4-4 lookup table */
+
+		rgb_t*              rgb565;                 /* RGB 5-6-5 lookup table */
+		rgb_t               argb1555[65536];        /* ARGB 1-5-5-5 lookup table */
+		rgb_t               argb4444[65536];        /* ARGB 4-4-4-4 lookup table */
+	};
+
+
+	struct fbi_state
+	{
+		struct setup_vertex
+		{
+			float               x, y;                   /* X, Y coordinates */
+			float               z, wb;                  /* Z and broadcast W values */
+			float               r, g, b, a;             /* A, R, G, B values */
+			float               s0, t0, w0;             /* W, S, T for TMU 0 */
+			float               s1, t1, w1;             /* W, S, T for TMU 1 */
+		};
+
+		uint8_t *             ram;                    /* pointer to frame buffer RAM */
+		uint32_t              mask;                   /* mask to apply to pointers */
+		uint32_t              rgboffs[3];             /* word offset to 3 RGB buffers */
+		uint32_t              auxoffs;                /* word offset to 1 aux buffer */
+
+		uint8_t               frontbuf;               /* front buffer index */
+		uint8_t               backbuf;                /* back buffer index */
+		uint8_t               swaps_pending;          /* number of pending swaps */
+		uint8_t               video_changed;          /* did the frontbuffer video change? */
+
+		uint32_t              yorigin;                /* Y origin subtract value */
+		uint32_t              lfb_base;               /* base of LFB in memory */
+		uint8_t               lfb_stride;             /* stride of LFB accesses in bits */
+
+		uint32_t              width;                  /* width of current frame buffer */
+		uint32_t              height;                 /* height of current frame buffer */
+		uint32_t              xoffs;                  /* horizontal offset (back porch) */
+		uint32_t              yoffs;                  /* vertical offset (back porch) */
+		uint32_t              vsyncscan;              /* vertical sync scanline */
+		uint32_t              rowpixels;              /* pixels per row */
+		uint32_t              tile_width;             /* width of video tiles */
+		uint32_t              tile_height;            /* height of video tiles */
+		uint32_t              x_tiles;                /* number of tiles in the X direction */
+
+		emu_timer *         vblank_timer;           /* VBLANK timer */
+		uint8_t               vblank;                 /* VBLANK state */
+		uint8_t               vblank_count;           /* number of VBLANKs since last swap */
+		uint8_t               vblank_swap_pending;    /* a swap is pending, waiting for a vblank */
+		uint8_t               vblank_swap;            /* swap when we hit this count */
+		uint8_t               vblank_dont_swap;       /* don't actually swap when we hit this point */
+
+		/* triangle setup info */
+		uint8_t               cheating_allowed;       /* allow cheating? */
+		int32_t               sign;                   /* triangle sign */
+		int16_t               ax, ay;                 /* vertex A x,y (12.4) */
+		int16_t               bx, by;                 /* vertex B x,y (12.4) */
+		int16_t               cx, cy;                 /* vertex C x,y (12.4) */
+		int32_t               startr, startg, startb, starta; /* starting R,G,B,A (12.12) */
+		int32_t               startz;                 /* starting Z (20.12) */
+		int64_t               startw;                 /* starting W (16.32) */
+		int32_t               drdx, dgdx, dbdx, dadx; /* delta R,G,B,A per X */
+		int32_t               dzdx;                   /* delta Z per X */
+		int64_t               dwdx;                   /* delta W per X */
+		int32_t               drdy, dgdy, dbdy, dady; /* delta R,G,B,A per Y */
+		int32_t               dzdy;                   /* delta Z per Y */
+		int64_t               dwdy;                   /* delta W per Y */
+
+		stats_block         lfb_stats;              /* LFB-access statistics */
+
+		uint8_t               sverts;                 /* number of vertices ready */
+		setup_vertex        svert[3];               /* 3 setup vertices */
+
+		fifo_state          fifo;                   /* framebuffer memory fifo */
+		cmdfifo_info        cmdfifo[2];             /* command FIFOs */
+
+		uint8_t               fogblend[64];           /* 64-entry fog table */
+		uint8_t               fogdelta[64];           /* 64-entry fog table */
+		uint8_t               fogdelta_mask;          /* mask for for delta (0xff for V1, 0xfc for V2) */
+
+		rgb_t               pen[65536];             /* mapping from pixels to pens */
+		rgb_t               clut[512];              /* clut gamma data */
+		uint8_t               clut_dirty;             /* do we need to recompute? */
+		rgb_t               rgb565[65536];          /* RGB 5-6-5 lookup table */
+	};
+
+
+	struct dac_state
+	{
+		void data_w(uint8_t regum, uint8_t data);
+		void data_r(uint8_t regnum);
+
+		uint8_t               reg[8];                 /* 8 registers */
+		uint8_t               read_result;            /* pending read result */
+	};
+
+
+	struct raster_info
+	{
+		uint32_t compute_hash() const;
+
+		raster_info *       next;                   /* pointer to next entry with the same hash */
+		poly_draw_scanline_func callback;           /* callback pointer */
+		bool                  is_generic;             /* true if this is one of the generic rasterizers */
+		uint8_t               display;                /* display index */
+		uint32_t              hits;                   /* how many hits (pixels) we've used this for */
+		uint32_t              polys;                  /* how many polys we've used this for */
+		uint32_t              eff_color_path;         /* effective fbzColorPath value */
+		uint32_t              eff_alpha_mode;         /* effective alphaMode value */
+		uint32_t              eff_fog_mode;           /* effective fogMode value */
+		uint32_t              eff_fbz_mode;           /* effective fbzMode value */
+		uint32_t              eff_tex_mode_0;         /* effective textureMode value for TMU #0 */
+		uint32_t              eff_tex_mode_1;         /* effective textureMode value for TMU #1 */
+		uint32_t              hash;
+	};
+
+
+	struct poly_extra_data;
+
+
+	struct banshee_info
+	{
+		uint32_t              io[0x40];               /* I/O registers */
+		uint32_t              agp[0x80];              /* AGP registers */
+		uint8_t               vga[0x20];              /* VGA registers */
+		uint8_t               crtc[0x27];             /* VGA CRTC registers */
+		uint8_t               seq[0x05];              /* VGA sequencer registers */
+		uint8_t               gc[0x05];               /* VGA graphics controller registers */
+		uint8_t               att[0x15];              /* VGA attribute registers */
+		uint8_t               attff;                  /* VGA attribute flip-flop */
+
+		uint32_t              blt_regs[0x20];         /* 2D Blitter registers */
+		uint32_t              blt_dst_base;
+		uint32_t              blt_dst_x;
+		uint32_t              blt_dst_y;
+		uint32_t              blt_dst_width;
+		uint32_t              blt_dst_height;
+		uint32_t              blt_dst_stride;
+		uint32_t              blt_dst_bpp;
+		uint32_t              blt_cmd;
+		uint32_t              blt_src_base;
+		uint32_t              blt_src_x;
+		uint32_t              blt_src_y;
+		uint32_t              blt_src_width;
+		uint32_t              blt_src_height;
+		uint32_t              blt_src_stride;
+		uint32_t              blt_src_bpp;
+	};
+
+
+	static const raster_info predef_raster_table[];
 
 	// not all of these need to be static, review.
 
-	static void check_stalled_cpu(voodoo_device* vd, attotime current_time);
+	void check_stalled_cpu(attotime current_time);
 	static void flush_fifos( voodoo_device* vd, attotime current_time);
 	static void init_fbi(voodoo_device *vd, fbi_state *f, void *memory, int fbmem);
-	static INT32 register_w(voodoo_device *vd, offs_t offset, UINT32 data);
-	static INT32 swapbuffer(voodoo_device *vd, UINT32 data);
-	static void init_tmu(voodoo_device *vd, tmu_state *t, voodoo_reg *reg, void *memory, int tmem);
-	static INT32 lfb_w(voodoo_device *vd, offs_t offset, UINT32 data, UINT32 mem_mask);
-	static INT32 texture_w(voodoo_device *vd, offs_t offset, UINT32 data);
-	static INT32 lfb_direct_w(voodoo_device *vd, offs_t offset, UINT32 data, UINT32 mem_mask);
-	static INT32 banshee_2d_w(voodoo_device *vd, offs_t offset, UINT32 data);
-	static void stall_cpu(voodoo_device *vd, int state, attotime current_time);
-	static void soft_reset(voodoo_device *vd);
-	static void recompute_video_memory(voodoo_device *vd);
-	static INT32 fastfill(voodoo_device *vd);
-	static INT32 triangle(voodoo_device *vd);
-	static INT32 begin_triangle(voodoo_device *vd);
-	static INT32 draw_triangle(voodoo_device *vd);
+	static int32_t register_w(voodoo_device *vd, offs_t offset, uint32_t data);
+	static int32_t swapbuffer(voodoo_device *vd, uint32_t data);
+	static int32_t lfb_w(voodoo_device *vd, offs_t offset, uint32_t data, uint32_t mem_mask);
+	static int32_t texture_w(voodoo_device *vd, offs_t offset, uint32_t data);
+	int32_t lfb_direct_w(offs_t offset, uint32_t data, uint32_t mem_mask);
+	static int32_t banshee_2d_w(voodoo_device *vd, offs_t offset, uint32_t data);
+	void stall_cpu(int state, attotime current_time);
+	void soft_reset();
+	void recompute_video_memory();
+	static int32_t fastfill(voodoo_device *vd);
+	static int32_t triangle(voodoo_device *vd);
+	static int32_t begin_triangle(voodoo_device *vd);
+	static int32_t draw_triangle(voodoo_device *vd);
+	static int32_t setup_and_draw_triangle(voodoo_device *vd);
+	static int32_t triangle_create_work_item(voodoo_device* vd,uint16_t *drawbuf, int texcount);
 #ifdef VOODOO_GPU_ACCEL
 	voodoo_gpu m_gpu;
-	static INT32 gpu_setup_triangle(voodoo_device *vd);
+	static int32_t gpu_setup_triangle(voodoo_device *vd);
 	static void gpu_draw_triangle(voodoo_device *vd);
 #endif
-	static INT32 setup_and_draw_triangle(voodoo_device *vd);
-	static INT32 triangle_create_work_item(voodoo_device* vd,UINT16 *drawbuf, int texcount);
 	static raster_info *add_rasterizer(voodoo_device *vd, const raster_info *cinfo);
 	static raster_info *find_rasterizer(voodoo_device *vd, int texcount);
 	static void dump_rasterizer_stats(voodoo_device *vd);
-	static void init_tmu_shared(tmu_shared_state *s);
+
+	void accumulate_statistics(const stats_block &block);
+	void update_statistics(bool accumulate);
+	void reset_counters();
+
+	static uint32_t register_r(voodoo_device *vd, offs_t offset);
 
 	static void swap_buffers(voodoo_device *vd);
-	static UINT32 cmdfifo_execute(voodoo_device *vd, cmdfifo_info *f);
-	static INT32 cmdfifo_execute_if_ready(voodoo_device* vd, cmdfifo_info *f);
-	static void cmdfifo_w(voodoo_device *vd, cmdfifo_info *f, offs_t offset, UINT32 data);
+	int cmdfifo_compute_expected_depth(cmdfifo_info &f);
+	static uint32_t cmdfifo_execute(voodoo_device *vd, cmdfifo_info *f);
+	int32_t cmdfifo_execute_if_ready(cmdfifo_info &f);
+	static void cmdfifo_w(voodoo_device *vd, cmdfifo_info *f, offs_t offset, uint32_t data);
 
-	static void raster_fastfill(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid);
-	static void raster_generic_0tmu(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid);
-	static void raster_generic_1tmu(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid);
-	static void raster_generic_2tmu(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid);
+	static void init_save_state(voodoo_device *vd);
+
+	static void raster_fastfill(void *dest, int32_t scanline, const poly_extent *extent, const void *extradata, int threadid);
+	static void raster_generic_0tmu(void *dest, int32_t scanline, const poly_extent *extent, const void *extradata, int threadid);
+	static void raster_generic_1tmu(void *dest, int32_t scanline, const poly_extent *extent, const void *extradata, int threadid);
+	static void raster_generic_2tmu(void *dest, int32_t scanline, const poly_extent *extent, const void *extradata, int threadid);
 
 #define RASTERIZER_HEADER(name) \
-	static void raster_##name(void *destbase, INT32 y, const poly_extent *extent, const void *extradata, int threadid);
+	static void raster_##name(void *destbase, int32_t y, const poly_extent *extent, const void *extradata, int threadid);
 #define RASTERIZER_ENTRY(fbzcp, alpha, fog, fbz, tex0, tex1) \
 	RASTERIZER_HEADER(fbzcp##_##alpha##_##fog##_##fbz##_##tex0##_##tex1)
 #include "voodoo_rast.hxx"
 
 #undef RASTERIZER_ENTRY
 
+	static bool chromaKeyTest(voodoo_device *vd, stats_block *stats, uint32_t fbzModeReg, rgbaint_t rgaIntColor);
+	static bool alphaMaskTest(stats_block *stats, uint32_t fbzModeReg, uint8_t alpha);
+	static bool alphaTest(uint8_t alpharef, stats_block *stats, uint32_t alphaModeReg, uint8_t alpha);
+	static bool depthTest(uint16_t zaColorReg, stats_block *stats, int32_t destDepth, uint32_t fbzModeReg, int32_t biasdepth);
+	static bool combineColor(voodoo_device *vd, stats_block *STATS, uint32_t FBZCOLORPATH, uint32_t FBZMODE, rgbaint_t TEXELARGB, int32_t ITERZ, int64_t ITERW, rgbaint_t &srcColor);
 
-
-protected:
-	// device-level overrides
-	virtual void device_config_complete() override;
-	virtual void device_stop() override;
-	virtual void device_reset() override;
+// FIXME: this stuff should not be public
 public:
-	// voodoo_state
-	UINT8               index;                  /* index of board */
-	voodoo_device *device;               /* pointer to our containing device */
+	uint8_t               index;                  /* index of board */
 	screen_device *screen;              /* the screen we are acting on */
 	device_t *cpu;                  /* the CPU we interact with */
-	UINT8               vd_type;                   /* type of system */
-	UINT8               chipmask;               /* mask for which chips are available */
-	UINT32              freq;                   /* operating frequency */
+	const uint8_t         vd_type;                   /* type of system */
+	uint8_t               chipmask;               /* mask for which chips are available */
+	uint32_t              freq;                   /* operating frequency */
 	attoseconds_t       attoseconds_per_cycle;  /* attoseconds per cycle */
-	UINT32              extra_cycles;           /* extra cycles not yet accounted for */
+	uint32_t              extra_cycles;           /* extra cycles not yet accounted for */
 	int                 trigger;                /* trigger used for stalling */
 
 	voodoo_reg          reg[0x400];             /* raw registers */
-	const UINT8 *       regaccess;              /* register access array */
+	const uint8_t *       regaccess;              /* register access array */
 	const char *const * regnames;               /* register names array */
-	UINT8               alt_regmap;             /* enable alternate register map? */
+	uint8_t               alt_regmap;             /* enable alternate register map? */
 
 	pci_state           pci;                    /* PCI state */
 	dac_state           dac;                    /* DAC state */
@@ -1882,44 +1909,35 @@ public:
 	voodoo_stats        stats;                  /* internal statistics */
 
 	offs_t              last_status_pc;         /* PC of last status description (for logging) */
-	UINT32              last_status_value;      /* value of last status read (for logging) */
+	uint32_t              last_status_value;      /* value of last status read (for logging) */
 
 	int                 next_rasterizer;        /* next rasterizer index */
 	raster_info         rasterizer[MAX_RASTERIZERS]; /* array of rasterizers */
 	raster_info *       raster_hash[RASTER_HASH_SIZE]; /* hash table of rasterizers */
 
 	bool                send_config;
-	UINT32              tmu_config;
+	uint32_t              tmu_config;
 
 };
 
 class voodoo_1_device : public voodoo_device
 {
 public:
-	voodoo_1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-protected:
-	// device-level overrides
-	virtual void device_start() override;
+	voodoo_1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
-extern const device_type VOODOO_1;
 
 class voodoo_2_device : public voodoo_device
 {
 public:
-	voodoo_2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-protected:
-	// device-level overrides
-	virtual void device_start() override;
+	voodoo_2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
-extern const device_type VOODOO_2;
 
 class voodoo_banshee_device : public voodoo_device
 {
 public:
-	voodoo_banshee_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	voodoo_banshee_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	voodoo_banshee_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_READ32_MEMBER( banshee_r );
 	DECLARE_WRITE32_MEMBER( banshee_w );
@@ -1932,23 +1950,106 @@ public:
 	DECLARE_WRITE8_MEMBER(banshee_vga_w);
 
 protected:
+	voodoo_banshee_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t vdt);
+
 	// device-level overrides
-	virtual void device_start() override;
 	DECLARE_READ32_MEMBER( banshee_agp_r );
 	DECLARE_WRITE32_MEMBER( banshee_agp_w );
 };
 
-extern const device_type VOODOO_BANSHEE;
 
 class voodoo_3_device : public voodoo_banshee_device
 {
 public:
-	voodoo_3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-protected:
-	// device-level overrides
-	virtual void device_start() override;
+	voodoo_3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
-extern const device_type VOODOO_3;
 
+DECLARE_DEVICE_TYPE(VOODOO_1,       voodoo_1_device)
+DECLARE_DEVICE_TYPE(VOODOO_2,       voodoo_2_device)
+DECLARE_DEVICE_TYPE(VOODOO_BANSHEE, voodoo_banshee_device)
+DECLARE_DEVICE_TYPE(VOODOO_3,       voodoo_3_device)
+
+// use SSE on 64-bit implementations, where it can be assumed
+#if 1 && ((!defined(MAME_DEBUG) || defined(__OPTIMIZE__)) && (defined(__SSE2__) || defined(_MSC_VER)) && defined(PTR64))
+#include <emmintrin.h>
+#ifdef __SSE4_1__
+#include <smmintrin.h>
 #endif
+class voodoo_device::tmu_state::stw_t
+{
+public:
+	stw_t() {}
+	stw_t(const stw_t& other) = default;
+	stw_t &operator=(const stw_t& other) = default;
+
+	inline void set(s64 s, s64 t, s64 w) { m_st = _mm_set_pd(s, t); m_w = _mm_set1_pd(w); }
+	inline int is_w_neg() const { return _mm_comilt_sd(m_w, _mm_set1_pd(0.0)); }
+	inline void get_st_shiftr(s32 &s, s32 &t, const s32 &shift) const {
+		s64 tmpS = _mm_cvtsd_si64(_mm_shuffle_pd(m_st, _mm_setzero_pd(), 1));
+		s = tmpS >> shift;
+		s64 tmpT = _mm_cvtsd_si64(m_st);
+		t = tmpT >> shift;
+	}
+	inline void add(const stw_t& other)
+	{
+		m_st = _mm_add_pd(m_st, other.m_st);
+		m_w = _mm_add_pd(m_w, other.m_w);
+	}
+	inline void calc_stow(s32 &sow, s32 &tow, int32_t &oowlog) const
+	{
+		__m128d tmp = _mm_div_pd(m_st, m_w);
+		// Allow for 8 bits of decimal in integer
+		tmp = _mm_mul_pd(tmp, _mm_set1_pd(256.0));
+		__m128i tmp2 = _mm_cvttpd_epi32(tmp);
+#ifdef __SSE4_1__
+		sow = _mm_extract_epi32(tmp2, 0);
+		tow = _mm_extract_epi32(tmp2, 1);
+#else
+		sow = _mm_cvtsi128_si32(_mm_shuffle_epi32(tmp2, _MM_SHUFFLE(0, 0, 0, 1)));
+		tow = _mm_cvtsi128_si32(tmp2);
+#endif
+		double dW = _mm_cvtsd_f64(m_w);
+		oowlog = -new_log2(dW, 0);
+	}
+private:
+	__m128d m_st;
+	__m128d m_w;
+};
+#else
+class voodoo_device::tmu_state::stw_t
+{
+public:
+	stw_t() {}
+	stw_t(const stw_t& other) = default;
+	stw_t &operator=(const stw_t& other) = default;
+
+	inline void set(s64 s, s64 t, s64 w) { m_s = s; m_t = t; m_w = w; }
+	inline int is_w_neg() const { return (m_w < 0) ? 1 : 0; }
+	inline void get_st_shiftr(s32 &s, s32 &t, const s32 &shift) const {
+		s = m_s >> shift;
+		t = m_t >> shift;
+	}
+	inline void add(const stw_t& other)
+	{
+		m_s += other.m_s;
+		m_t += other.m_t;
+		m_w += other.m_w;
+	}
+	// Computes s/w and t/w and returns log2 of 1/w
+	// s, t and c are 16.32 values.  The results are 24.8.
+	inline void calc_stow(s32 &sow, s32 &tow, int32_t &oowlog) const
+	{
+		double recip = double(1ULL << (47 - 39)) / m_w;
+		double resAD = m_s * recip;
+		double resBD = m_t * recip;
+		oowlog = new_log2(recip, 56);
+		sow = resAD;
+		tow = resBD;
+	}
+private:
+	s64 m_s, m_t, m_w;
+};
+#endif
+
+#endif // MAME_VIDEO_VOODOO_H

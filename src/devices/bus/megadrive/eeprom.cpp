@@ -51,126 +51,89 @@
 //  md_rom_device - constructor
 //-------------------------------------------------
 
-const device_type MD_STD_EEPROM = &device_creator<md_std_eeprom_device>;
-const device_type MD_EEPROM_NBAJAM = &device_creator<md_eeprom_nbajam_device>;
-const device_type MD_EEPROM_NBAJAMTE = &device_creator<md_eeprom_nbajamte_device>;
-const device_type MD_EEPROM_NFLQB = &device_creator<md_eeprom_nflqb_device>;
-const device_type MD_EEPROM_CSLAM = &device_creator<md_eeprom_cslam_device>;
-const device_type MD_EEPROM_NHLPA = &device_creator<md_eeprom_nhlpa_device>;
-const device_type MD_EEPROM_BLARA = &device_creator<md_eeprom_blara_device>;
+DEFINE_DEVICE_TYPE(MD_STD_EEPROM,      md_std_eeprom_device,      "md_std_eeprom",      "MD Standard cart + EEPROM")
+DEFINE_DEVICE_TYPE(MD_EEPROM_NBAJAM,   md_eeprom_nbajam_device,   "md_eeprom_nbajam",   "MD NBA Jam")
+DEFINE_DEVICE_TYPE(MD_EEPROM_NBAJAMTE, md_eeprom_nbajamte_device, "md_eeprom_nbajamte", "MD NBA Jam TE") // and a few more
+DEFINE_DEVICE_TYPE(MD_EEPROM_NFLQB,    md_eeprom_nflqb_device,    "md_eeprom_nflqb",    "MD NFL Quarterback 96")
+DEFINE_DEVICE_TYPE(MD_EEPROM_CSLAM,    md_eeprom_cslam_device,    "md_eeprom_cslam",    "MD College Slam")
+DEFINE_DEVICE_TYPE(MD_EEPROM_NHLPA,    md_eeprom_nhlpa_device,    "md_eeprom_nhlpa",    "MD NHLPA 93")
+DEFINE_DEVICE_TYPE(MD_EEPROM_BLARA,    md_eeprom_blara_device,    "md_eeprom_blara",    "MD Brian Lara")
 
 
-md_std_eeprom_device::md_std_eeprom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
-					: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-					device_md_cart_interface( mconfig, *this ),
-					m_i2cmem(*this, "i2cmem"), m_i2c_mem(0), m_i2c_clk(0)
-				{
-}
-
-md_std_eeprom_device::md_std_eeprom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: device_t(mconfig, MD_STD_EEPROM, "MD Standard cart + EEPROM", tag, owner, clock, "md_std_eeprom", __FILE__),
-					device_md_cart_interface( mconfig, *this ),
-					m_i2cmem(*this, "i2cmem"), m_i2c_mem(0), m_i2c_clk(0)
-				{
-}
-
-md_eeprom_nbajam_device::md_eeprom_nbajam_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: md_std_eeprom_device(mconfig, MD_EEPROM_NBAJAM, "MD NBA Jam", tag, owner, clock, "md_eeprom_nbajam", __FILE__)
+md_std_eeprom_device::md_std_eeprom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
+	, device_md_cart_interface(mconfig, *this)
+	, m_i2cmem(*this, "i2cmem"), m_i2c_mem(0), m_i2c_clk(0)
 {
 }
 
-md_eeprom_nbajamte_device::md_eeprom_nbajamte_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: md_std_eeprom_device(mconfig, MD_EEPROM_NBAJAMTE, "MD NBA Jam TE (and a few more)", tag, owner, clock, "md_eeprom_nbajamte", __FILE__)
+md_std_eeprom_device::md_std_eeprom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: md_std_eeprom_device(mconfig, MD_STD_EEPROM, tag, owner, clock)
 {
 }
 
-md_eeprom_cslam_device::md_eeprom_cslam_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: md_std_eeprom_device(mconfig, MD_EEPROM_CSLAM, "MD College Slam", tag, owner, clock, "md_eeprom_cslam", __FILE__)
+md_eeprom_nbajam_device::md_eeprom_nbajam_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: md_std_eeprom_device(mconfig, MD_EEPROM_NBAJAM, tag, owner, clock)
 {
 }
 
-md_eeprom_nflqb_device::md_eeprom_nflqb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: md_std_eeprom_device(mconfig, MD_EEPROM_NFLQB, "MD NFL Quarterback 96", tag, owner, clock, "md_eeprom_nflqb", __FILE__)
+md_eeprom_nbajamte_device::md_eeprom_nbajamte_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: md_std_eeprom_device(mconfig, MD_EEPROM_NBAJAMTE, tag, owner, clock)
 {
 }
 
-md_eeprom_nhlpa_device::md_eeprom_nhlpa_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: md_std_eeprom_device(mconfig, MD_EEPROM_NHLPA, "MD NHLPA 93", tag, owner, clock, "md_eeprom_nhlpa", __FILE__)
+md_eeprom_nflqb_device::md_eeprom_nflqb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: md_std_eeprom_device(mconfig, MD_EEPROM_NFLQB, tag, owner, clock)
 {
 }
 
-md_eeprom_blara_device::md_eeprom_blara_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: md_std_eeprom_device(mconfig, MD_EEPROM_BLARA, "MD Brian Lara", tag, owner, clock, "md_eeprom_blara", __FILE__)
+md_eeprom_cslam_device::md_eeprom_cslam_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: md_std_eeprom_device(mconfig, MD_EEPROM_CSLAM, tag, owner, clock)
+{
+}
+
+md_eeprom_nhlpa_device::md_eeprom_nhlpa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: md_std_eeprom_device(mconfig, MD_EEPROM_NHLPA, tag, owner, clock)
+{
+}
+
+md_eeprom_blara_device::md_eeprom_blara_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: md_std_eeprom_device(mconfig, MD_EEPROM_BLARA, tag, owner, clock)
 {
 }
 
 
 //-------------------------------------------------
-//  SERIAL I2C DEVICE
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-
-// MD_STD_EEPROM & MD_EEPROM_NHLPA
-MACHINE_CONFIG_FRAGMENT( md_i2c_24c01 )
+MACHINE_CONFIG_MEMBER( md_std_eeprom_device::device_add_mconfig )
 	MCFG_24C01_ADD("i2cmem")
 MACHINE_CONFIG_END
 
-// MD_EEPROM_NBAJAM & MD_EEPROM_NBAJAMTE
-MACHINE_CONFIG_FRAGMENT( md_i2c_24c02 )
+MACHINE_CONFIG_MEMBER( md_eeprom_nbajam_device::device_add_mconfig )
 	MCFG_24C02_ADD("i2cmem")
 MACHINE_CONFIG_END
 
-// MD_EEPROM_NFLQB
-MACHINE_CONFIG_FRAGMENT( md_i2c_24c16 )
-	MCFG_24C16_ADD("i2cmem")
+MACHINE_CONFIG_MEMBER( md_eeprom_nbajamte_device::device_add_mconfig )
+	MCFG_24C02_ADD("i2cmem")
 MACHINE_CONFIG_END
 
-// MD_EEPROM_CSLAM & MD_EEPROM_BLARA
-MACHINE_CONFIG_FRAGMENT( md_i2c_24c64 )
+MACHINE_CONFIG_MEMBER( md_eeprom_cslam_device::device_add_mconfig )
 	MCFG_24C64_ADD("i2cmem")
 MACHINE_CONFIG_END
 
+MACHINE_CONFIG_MEMBER( md_eeprom_nflqb_device::device_add_mconfig )
+	MCFG_24C16_ADD("i2cmem")
+MACHINE_CONFIG_END
 
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
+MACHINE_CONFIG_MEMBER( md_eeprom_nhlpa_device::device_add_mconfig )
+	MCFG_24C01_ADD("i2cmem")
+MACHINE_CONFIG_END
 
-machine_config_constructor md_std_eeprom_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( md_i2c_24c01 );
-}
-
-machine_config_constructor md_eeprom_nbajam_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( md_i2c_24c02 );
-}
-
-machine_config_constructor md_eeprom_nbajamte_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( md_i2c_24c02 );
-}
-
-machine_config_constructor md_eeprom_cslam_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( md_i2c_24c64 );
-}
-
-machine_config_constructor md_eeprom_nflqb_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( md_i2c_24c16 );
-}
-
-machine_config_constructor md_eeprom_nhlpa_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( md_i2c_24c01 );
-}
-
-machine_config_constructor md_eeprom_blara_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( md_i2c_24c64 );
-}
-
+MACHINE_CONFIG_MEMBER( md_eeprom_blara_device::device_add_mconfig )
+	MCFG_24C64_ADD("i2cmem")
+MACHINE_CONFIG_END
 
 void md_std_eeprom_device::device_start()
 {
@@ -378,20 +341,20 @@ WRITE16_MEMBER(md_eeprom_blara_device::write)
 // TEMPORARY ADDITION UNTIL WE FIND OUT WHAT IS MISSING IN THE CORE X24C02 CODE
 // THIS IS A CUSTOM I2C EEPROM EMULATION THAT ALLOWS NBA JAM TO WORK
 
-const device_type MD_EEPROM_NBAJAM_ALT = &device_creator<md_eeprom_nbajam_device_alt>;
+DEFINE_DEVICE_TYPE(MD_EEPROM_NBAJAM_ALT, md_eeprom_nbajam_alt_device, "md_eeprom_nbajama", "MD NBA Jam (Alt)")
 
-md_eeprom_nbajam_device_alt::md_eeprom_nbajam_device_alt(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-		: md_std_eeprom_device(mconfig, MD_EEPROM_NBAJAM_ALT, "MD NBA Jam (Alt)", tag, owner, clock, "md_eeprom_nbajama", __FILE__)
+md_eeprom_nbajam_alt_device::md_eeprom_nbajam_alt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: md_std_eeprom_device(mconfig, MD_EEPROM_NBAJAM_ALT, tag, owner, clock)
 {
 }
 
-void md_eeprom_nbajam_device_alt::device_start()
+void md_eeprom_nbajam_alt_device::device_start()
 {
 	eeprom_i2c_init();
 }
 
 
-void md_eeprom_nbajam_device_alt::eeprom_i2c_init()
+void md_eeprom_nbajam_alt_device::eeprom_i2c_init()
 {
 	m_eeprom_cnt = 0;
 	m_eeprom_readwrite = 0;
@@ -410,7 +373,7 @@ void md_eeprom_nbajam_device_alt::eeprom_i2c_init()
 
 
 // this is analogous to i2cmem.cpp implementation of write_sda
-void md_eeprom_nbajam_device_alt::idle_devsel_check()
+void md_eeprom_nbajam_alt_device::idle_devsel_check()
 {
 	if (m_eeprom_scl)
 	{
@@ -431,7 +394,7 @@ void md_eeprom_nbajam_device_alt::idle_devsel_check()
 	}
 }
 
-void md_eeprom_nbajam_device_alt::eeprom_i2c_update(void)
+void md_eeprom_nbajam_alt_device::eeprom_i2c_update(void)
 {
 	switch (m_eeprom_cur_state)
 	{
@@ -555,8 +518,8 @@ void md_eeprom_nbajam_device_alt::eeprom_i2c_update(void)
 					m_eeprom_byte = ((m_eeprom_byte << 1) | m_eeprom_sda) & 0xff;
 				else
 				{
-					UINT8 *nvram = (UINT8 *)&m_nvram[0];
-					UINT16 sram_address = m_eeprom_slave_mask | (m_eeprom_devsel * 0x100) | m_eeprom_word_address;
+					uint8_t *nvram = (uint8_t *)&m_nvram[0];
+					uint16_t sram_address = m_eeprom_slave_mask | (m_eeprom_devsel * 0x100) | m_eeprom_word_address;
 					nvram[sram_address & 0xffff] = m_eeprom_byte;
 					m_eeprom_byte = 0;
 
@@ -574,17 +537,17 @@ void md_eeprom_nbajam_device_alt::eeprom_i2c_update(void)
 	//printf("Write line : status %d SDA %x SCL %x (count %d)\n", m_eeprom_cur_state, m_eeprom_sda, m_eeprom_scl, m_eeprom_cnt);
 }
 
-UINT8 md_eeprom_nbajam_device_alt::eeprom_i2c_out()
+uint8_t md_eeprom_nbajam_alt_device::eeprom_i2c_out()
 {
-	UINT8 res = m_eeprom_sda;
+	uint8_t res = m_eeprom_sda;
 
 	switch (m_eeprom_cur_state)
 	{
 		case STATE_I2C_READ_DATA:
 			if (m_eeprom_cnt < 9)
 			{
-				UINT8 *nvram = (UINT8 *)&m_nvram[0];
-				UINT16 sram_address = m_eeprom_slave_mask | (m_eeprom_devsel * 0x100) | m_eeprom_word_address;
+				uint8_t *nvram = (uint8_t *)&m_nvram[0];
+				uint16_t sram_address = m_eeprom_slave_mask | (m_eeprom_devsel * 0x100) | m_eeprom_word_address;
 				sram_address &= 0xffff;
 
 				res = (nvram[sram_address] >> (8 - m_eeprom_cnt)) & 1;
@@ -614,7 +577,7 @@ UINT8 md_eeprom_nbajam_device_alt::eeprom_i2c_out()
 }
 
 
-READ16_MEMBER(md_eeprom_nbajam_device_alt::read)
+READ16_MEMBER(md_eeprom_nbajam_alt_device::read)
 {
 	if (offset == 0x200000/2)
 	{
@@ -626,7 +589,7 @@ READ16_MEMBER(md_eeprom_nbajam_device_alt::read)
 		return 0xffff;
 }
 
-WRITE16_MEMBER(md_eeprom_nbajam_device_alt::write)
+WRITE16_MEMBER(md_eeprom_nbajam_alt_device::write)
 {
 	if (offset == 0x200000/2)
 	{

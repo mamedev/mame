@@ -24,15 +24,16 @@
 
 */
 
+#include "emu.h"
 #include "64h156.h"
 
+//#define VERBOSE 1
+#include "logmacro.h"
 
 
 //**************************************************************************
 //  MACROS / CONSTANTS
 //**************************************************************************
-
-#define LOG 0
 
 #define CYCLES_UNTIL_ANALOG_DESYNC      288 // 18 us
 
@@ -42,7 +43,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64H156 = &device_creator<c64h156_device>;
+DEFINE_DEVICE_TYPE(C64H156, c64h156_device, "c64h156", "Commodore 64H156")
 
 
 
@@ -54,8 +55,8 @@ const device_type C64H156 = &device_creator<c64h156_device>;
 //  c64h156_device - constructor
 //-------------------------------------------------
 
-c64h156_device::c64h156_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, C64H156, "64H156", tag, owner, clock, "c64h156", __FILE__),
+c64h156_device::c64h156_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, C64H156, tag, owner, clock),
 	m_write_atn(*this),
 	m_write_sync(*this),
 	m_write_byte(*this),
@@ -69,8 +70,7 @@ c64h156_device::c64h156_device(const machine_config &mconfig, const char *tag, d
 	m_ted(0),
 	m_yb(0),
 	m_atni(0),
-	m_atna(0),
-	m_period(attotime::from_hz(clock))
+	m_atna(0)
 {
 	memset(&cur_live, 0x00, sizeof(cur_live));
 	cur_live.tm = attotime::never;
@@ -105,6 +105,17 @@ void c64h156_device::device_start()
 	save_item(NAME(m_yb));
 	save_item(NAME(m_atni));
 	save_item(NAME(m_atna));
+}
+
+
+//-------------------------------------------------
+//  device_clock_changed - called when the
+//  device clock is altered in any way
+//-------------------------------------------------
+
+void c64h156_device::device_clock_changed()
+{
+	m_period = attotime::from_hz(clock());
 }
 
 
@@ -144,7 +155,7 @@ void c64h156_device::live_start()
 	cur_live.soe = m_soe;
 	cur_live.accl = m_accl;
 	cur_live.zero_counter = 0;
-	cur_live.cycles_until_random_flux = (rand() % 31) + 289;
+	cur_live.cycles_until_random_flux = (machine().rand() % 31) + 289;
 
 	checkpoint_live = cur_live;
 
@@ -189,7 +200,7 @@ bool c64h156_device::write_next_bit(bool bit, const attotime &limit)
 	if(bit && cur_live.write_position < ARRAY_LENGTH(cur_live.write_buffer))
 		cur_live.write_buffer[cur_live.write_position++] = cur_live.tm - m_period;
 
-	if (LOG) logerror("%s write bit %u (%u)\n", cur_live.tm.as_string(), cur_live.bit_counter, bit);
+	LOG("%s write bit %u (%u)\n", cur_live.tm.as_string(), cur_live.bit_counter, bit);
 
 	return false;
 }
@@ -199,7 +210,7 @@ void c64h156_device::commit(const attotime &tm)
 	if(cur_live.write_start_time.is_never() || tm == cur_live.write_start_time || !cur_live.write_position)
 		return;
 
-	if (LOG) logerror("%s committing %u transitions since %s\n", tm.as_string(), cur_live.write_position, cur_live.write_start_time.as_string());
+	LOG("%s committing %u transitions since %s\n", tm.as_string(), cur_live.write_position, cur_live.write_start_time.as_string());
 
 	m_floppy->write_flux(cur_live.write_start_time, tm, cur_live.write_position, cur_live.write_buffer);
 
@@ -282,73 +293,73 @@ void c64h156_device::live_run(const attotime &limit)
 				cur_live.cell_counter = 0;
 			} else {
 				cur_live.cycle_counter++;
-			}
 
-			if (cur_live.cycle_counter == 16) {
-				cur_live.cycle_counter = cur_live.ds;
+				if (cur_live.cycle_counter == 16) {
+					cur_live.cycle_counter = cur_live.ds;
 
-				cur_live.cell_counter++;
-				cur_live.cell_counter &= 0xf;
-			}
-
-			if (!BIT(cell_counter, 1) && BIT(cur_live.cell_counter, 1)) {
-				// read bit
-				cur_live.shift_reg <<= 1;
-				cur_live.shift_reg |= !(BIT(cur_live.cell_counter, 3) || BIT(cur_live.cell_counter, 2));
-				cur_live.shift_reg &= 0x3ff;
-
-				if (LOG) logerror("%s read bit %u (%u) >> %03x, oe=%u soe=%u sync=%u byte=%u\n", cur_live.tm.as_string(), cur_live.bit_counter,
-					!(BIT(cur_live.cell_counter, 3) || BIT(cur_live.cell_counter, 2)), cur_live.shift_reg, cur_live.oe, cur_live.soe, cur_live.sync, cur_live.byte);
-
-				syncpoint = true;
-			}
-
-			if (BIT(cell_counter, 1) && !BIT(cur_live.cell_counter, 1) && !cur_live.oe) { // TODO WPS
-				write_next_bit(BIT(cur_live.shift_reg_write, 7), limit);
-			}
-
-			int sync = !((cur_live.shift_reg == 0x3ff) && cur_live.oe);
-
-			if (!sync) {
-				cur_live.bit_counter = 8;
-			} else if (!BIT(cell_counter, 1) && BIT(cur_live.cell_counter, 1) && cur_live.sync) {
-				cur_live.bit_counter++;
-				cur_live.bit_counter &= 0xf;
-			}
-
-			int byte = !(((cur_live.bit_counter & 7) == 7) && cur_live.soe && !(cur_live.cell_counter & 2));
-			int load = !(((cur_live.bit_counter & 7) == 7) && ((cur_live.cell_counter & 3) == 3));
-
-			if (!load) {
-				if (cur_live.oe) {
-					cur_live.shift_reg_write = cur_live.shift_reg;
-					if (LOG) logerror("%s load write shift register from read shift register %02x\n",cur_live.tm.as_string(),cur_live.shift_reg_write);
-				} else {
-					cur_live.shift_reg_write = cur_live.yb;
-					if (LOG) logerror("%s load write shift register from YB %02x\n",cur_live.tm.as_string(),cur_live.shift_reg_write);
+					cur_live.cell_counter++;
+					cur_live.cell_counter &= 0xf;
 				}
-			} else if (!BIT(cell_counter, 1) && BIT(cur_live.cell_counter, 1)) {
-				cur_live.shift_reg_write <<= 1;
-				cur_live.shift_reg_write &= 0xff;
-				if (LOG) logerror("%s shift write register << %02x\n", cur_live.tm.as_string(), cur_live.shift_reg_write);
-			}
 
-			// update signals
-			if (byte != cur_live.byte) {
-				if (!byte || !cur_live.accl) {
-					if (LOG) logerror("%s BYTE %02x\n", cur_live.tm.as_string(), cur_live.shift_reg & 0xff);
-					cur_live.byte = byte;
+				if (!BIT(cell_counter, 1) && BIT(cur_live.cell_counter, 1)) {
+					// read bit
+					cur_live.shift_reg <<= 1;
+					cur_live.shift_reg |= !(BIT(cur_live.cell_counter, 3) || BIT(cur_live.cell_counter, 2));
+					cur_live.shift_reg &= 0x3ff;
+
+					LOG("%s read bit %u (%u) >> %03x, oe=%u soe=%u sync=%u byte=%u\n", cur_live.tm.as_string(), cur_live.bit_counter,
+						!(BIT(cur_live.cell_counter, 3) || BIT(cur_live.cell_counter, 2)), cur_live.shift_reg, cur_live.oe, cur_live.soe, cur_live.sync, cur_live.byte);
+
 					syncpoint = true;
 				}
-				if (!byte) {
-					cur_live.accl_yb = cur_live.shift_reg & 0xff;
-				}
-			}
 
-			if (sync != cur_live.sync) {
-				if (LOG) logerror("%s SYNC %u\n", cur_live.tm.as_string(),sync);
-				cur_live.sync = sync;
-				syncpoint = true;
+				if (BIT(cell_counter, 1) && !BIT(cur_live.cell_counter, 1) && !cur_live.oe) { // TODO WPS
+					write_next_bit(BIT(cur_live.shift_reg_write, 7), limit);
+				}
+
+				int sync = !((cur_live.shift_reg == 0x3ff) && cur_live.oe);
+
+				if (!sync) {
+					cur_live.bit_counter = 8;
+				} else if (!BIT(cell_counter, 1) && BIT(cur_live.cell_counter, 1) && cur_live.sync) {
+					cur_live.bit_counter++;
+					cur_live.bit_counter &= 0xf;
+				}
+
+				int byte = !(((cur_live.bit_counter & 7) == 7) && cur_live.soe && !(cur_live.cell_counter & 2));
+				int load = !(((cur_live.bit_counter & 7) == 7) && ((cur_live.cell_counter & 3) == 3));
+
+				if (!load) {
+					if (cur_live.oe) {
+						cur_live.shift_reg_write = cur_live.shift_reg;
+						LOG("%s load write shift register from read shift register %02x\n",cur_live.tm.as_string(),cur_live.shift_reg_write);
+					} else {
+						cur_live.shift_reg_write = cur_live.yb;
+						LOG("%s load write shift register from YB %02x\n",cur_live.tm.as_string(),cur_live.shift_reg_write);
+					}
+				} else if (!BIT(cell_counter, 1) && BIT(cur_live.cell_counter, 1)) {
+					cur_live.shift_reg_write <<= 1;
+					cur_live.shift_reg_write &= 0xff;
+					LOG("%s shift write register << %02x\n", cur_live.tm.as_string(), cur_live.shift_reg_write);
+				}
+
+				// update signals
+				if (byte != cur_live.byte) {
+					if (!byte || !cur_live.accl) {
+						LOG("%s BYTE %02x\n", cur_live.tm.as_string(), cur_live.shift_reg & 0xff);
+						cur_live.byte = byte;
+						syncpoint = true;
+					}
+					if (!byte) {
+						cur_live.accl_yb = cur_live.shift_reg & 0xff;
+					}
+				}
+
+				if (sync != cur_live.sync) {
+					LOG("%s SYNC %u\n", cur_live.tm.as_string(),sync);
+					cur_live.sync = sync;
+					syncpoint = true;
+				}
 			}
 
 			if (syncpoint) {
@@ -391,7 +402,7 @@ int c64h156_device::get_next_bit(attotime &tm, const attotime &limit)
 			bit = 1;
 
 			cur_live.zero_counter = 0;
-			cur_live.cycles_until_random_flux = (rand() % 31) + 289;
+			cur_live.cycles_until_random_flux = (machine().rand() % 31) + 289;
 
 			get_next_edge(next);
 		}
@@ -399,7 +410,7 @@ int c64h156_device::get_next_bit(attotime &tm, const attotime &limit)
 
 	if (cur_live.zero_counter >= cur_live.cycles_until_random_flux) {
 		cur_live.zero_counter = 0;
-		cur_live.cycles_until_random_flux = (rand() % 367) + 33;
+		cur_live.cycles_until_random_flux = (machine().rand() % 367) + 33;
 
 		bit = 1;
 	}
@@ -433,7 +444,7 @@ WRITE8_MEMBER( c64h156_device::yb_w )
 		live_sync();
 		m_yb = cur_live.yb = data;
 		checkpoint();
-		if (LOG) logerror("%s YB %02x\n", machine().time().as_string(), data);
+		LOG("%s YB %02x\n", machine().time().as_string(), data);
 		live_run();
 	}
 
@@ -460,7 +471,7 @@ WRITE_LINE_MEMBER( c64h156_device::accl_w )
 		live_sync();
 		m_accl = cur_live.accl = state;
 		checkpoint();
-		if (LOG) logerror("%s ACCL %u\n", machine().time().as_string(), state);
+		LOG("%s ACCL %u\n", machine().time().as_string(), state);
 		live_run();
 	}
 }
@@ -481,7 +492,7 @@ WRITE_LINE_MEMBER( c64h156_device::ted_w )
 		}
 		m_ted = state;
 		checkpoint();
-		if (LOG) logerror("%s TED %u\n", machine().time().as_string(), state);
+		LOG("%s TED %u\n", machine().time().as_string(), state);
 		live_run();
 	}
 }
@@ -497,7 +508,7 @@ WRITE_LINE_MEMBER( c64h156_device::mtr_w )
 	{
 		live_sync();
 		m_mtr = state;
-		if (LOG) logerror("%s MTR %u\n", machine().time().as_string(), state);
+		LOG("%s MTR %u\n", machine().time().as_string(), state);
 		m_floppy->mon_w(!state);
 		checkpoint();
 
@@ -530,7 +541,7 @@ WRITE_LINE_MEMBER( c64h156_device::oe_w )
 			start_writing(machine().time());
 		}
 		checkpoint();
-		if (LOG) logerror("%s OE %u\n", machine().time().as_string(), state);
+		LOG("%s OE %u\n", machine().time().as_string(), state);
 		live_run();
 	}
 }
@@ -547,7 +558,7 @@ WRITE_LINE_MEMBER( c64h156_device::soe_w )
 		live_sync();
 		m_soe = cur_live.soe = state;
 		checkpoint();
-		if (LOG) logerror("%s SOE %u\n", machine().time().as_string(), state);
+		LOG("%s SOE %u\n", machine().time().as_string(), state);
 		live_run();
 	}
 }
@@ -559,7 +570,7 @@ WRITE_LINE_MEMBER( c64h156_device::soe_w )
 
 WRITE_LINE_MEMBER( c64h156_device::atni_w )
 {
-	if (LOG) logerror("ATNI %u\n", state);
+	LOG("ATNI %u\n", state);
 
 	m_atni = state;
 
@@ -573,7 +584,7 @@ WRITE_LINE_MEMBER( c64h156_device::atni_w )
 
 WRITE_LINE_MEMBER( c64h156_device::atna_w )
 {
-	if (LOG) logerror("ATNA %u\n", state);
+	LOG("ATNA %u\n", state);
 
 	m_atna = state;
 
@@ -646,7 +657,7 @@ void c64h156_device::ds_w(int ds)
 		live_sync();
 		m_ds = cur_live.ds = ds;
 		checkpoint();
-		if (LOG) logerror("%s DS %u\n", machine().time().as_string(), ds);
+		LOG("%s DS %u\n", machine().time().as_string(), ds);
 		live_run();
 	}
 }

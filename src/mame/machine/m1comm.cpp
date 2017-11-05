@@ -26,7 +26,7 @@ MODEL-1 COMMUNICATION BD 837-8842 171-6293B (C) SEGA 1992
 |--------------------------------------------------------------------------------|
 Notes:
       15112.17 - AMD AM27C100 128k x8 EPROM (DIP32, labelled 'EPR-15112')
-      Z80      - Zilog Z0840004PSC Z80 CPU, running at 4.000MHz (DIP40)
+      Z80      - Zilog Z0840008PSC Z80 CPU, running at 8.000MHz (DIP40)
       MB8464   - Fujitsu MB8464 8k x8 SRAM (DIP28)
       MB8421   - Fujitsu MB8421-12LP 2k x8 SRAM (SDIP52)
       MB8431   - Fujitsu MB8431-90LP 2k x8 SRAM (SDIP52)
@@ -57,7 +57,8 @@ Notes:
 
 #define Z80_TAG     "m1commcpu"
 
-//#define __M1COMM_VERBOSE__
+#define VERBOSE 0
+#include "logmacro.h"
 
 /*************************************
  *  M1COMM Memory Map
@@ -65,7 +66,7 @@ Notes:
 static ADDRESS_MAP_START( m1comm_mem, AS_PROGRAM, 8, m1comm_device )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
-	AM_RANGE(0xC000, 0xffff) AM_READWRITE(share_r, share_w)
+	AM_RANGE(0xc000, 0xffff) AM_READWRITE(share_r, share_w)
 ADDRESS_MAP_END
 
 /*************************************
@@ -73,45 +74,40 @@ ADDRESS_MAP_END
  *************************************/
 static ADDRESS_MAP_START( m1comm_io, AS_IO, 8, m1comm_device )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x1F) AM_READWRITE(dlc_reg_r, dlc_reg_w)
-	AM_RANGE(0x20, 0x2F) AM_READWRITE(dma_reg_r, dma_reg_w)
+	AM_RANGE(0x00, 0x1f) AM_READWRITE(dlc_reg_r, dlc_reg_w)
+	AM_RANGE(0x20, 0x2f) AM_READWRITE(dma_reg_r, dma_reg_w)
 	AM_RANGE(0x40, 0x40) AM_READWRITE(syn_r, syn_w)
 	AM_RANGE(0x60, 0x60) AM_READWRITE(zfg_r, zfg_w)
-	AM_RANGE(0xFFFF, 0xFFFF) AM_RAM
+	AM_RANGE(0xff, 0xff) AM_RAM
 ADDRESS_MAP_END
 
-MACHINE_CONFIG_FRAGMENT( m1comm )
-	MCFG_CPU_ADD(Z80_TAG, Z80, 4000000) /* 32 MHz / 8 */
-	MCFG_CPU_PROGRAM_MAP(m1comm_mem)
-	MCFG_CPU_IO_MAP(m1comm_io)
-MACHINE_CONFIG_END
 
 ROM_START( m1comm )
 	ROM_REGION( 0x20000, Z80_TAG, ROMREGION_ERASEFF )
-	ROM_LOAD( "epr-15112.17", 0x0000, 0x20000, CRC(4950E771) )
+	ROM_LOAD( "epr-15112.17", 0x0000, 0x20000, CRC(4950e771) SHA1(99014124e0324dd114cb22f55159d18b597a155a) )
 ROM_END
 
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type M1COMM = &device_creator<m1comm_device>;
+DEFINE_DEVICE_TYPE(M1COMM, m1comm_device, "m1comm", "Model 1 Communication Board")
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor m1comm_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( m1comm );
-}
+MACHINE_CONFIG_MEMBER( m1comm_device::device_add_mconfig )
+	MCFG_CPU_ADD(Z80_TAG, Z80, 8000000) /* 32 MHz / 4 */
+	MCFG_CPU_PROGRAM_MAP(m1comm_mem)
+	MCFG_CPU_IO_MAP(m1comm_io)
+MACHINE_CONFIG_END
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *m1comm_device::device_rom_region() const
+const tiny_rom_entry *m1comm_device::device_rom_region() const
 {
 	return ROM_NAME( m1comm );
 }
@@ -124,8 +120,8 @@ const rom_entry *m1comm_device::device_rom_region() const
 //  m1comm_device - constructor
 //-------------------------------------------------
 
-m1comm_device::m1comm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, M1COMM, "MODEL-1 COMMUNICATION BD", tag, owner, clock, "m1comm", __FILE__),
+m1comm_device::m1comm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, M1COMM, tag, owner, clock),
 	m_commcpu(*this, Z80_TAG),
 	m_line_rx(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE ),
 	m_line_tx(OPEN_FLAG_READ)
@@ -173,48 +169,38 @@ READ8_MEMBER(m1comm_device::dlc_reg_r)
 	if (!m_cn)
 	{
 		device_reset();
-		return 0xFF;
+		return 0xff;
 	}
 	// dirty hack to keep Z80 in RESET state
 
-	UINT8 result = m_dlc_reg[offset];
-#ifdef __M1COMM_VERBOSE__
-	printf("m1comm-dlc_reg_r: read register %02x for value %02x\n", offset, result);
-#endif
+	uint8_t result = m_dlc_reg[offset];
+	LOG("m1comm-dlc_reg_r: read register %02x for value %02x\n", offset, result);
 	return result;
 }
 
 WRITE8_MEMBER(m1comm_device::dlc_reg_w)
 {
 	m_dlc_reg[offset] = data;
-#ifdef __M1COMM_VERBOSE__
-	printf("m1comm-dlc_reg_w: write register %02x for value %02x\n", offset, data);
-#endif
+	LOG("m1comm-dlc_reg_w: write register %02x for value %02x\n", offset, data);
 }
 
 READ8_MEMBER(m1comm_device::dma_reg_r)
 {
-	UINT8 result = m_dma_reg[offset];
-#ifdef __M1COMM_VERBOSE__
-	printf("m1comm-dma_reg_r: read register %02x for value %02x\n", offset, result);
-#endif
+	uint8_t result = m_dma_reg[offset];
+	LOG("m1comm-dma_reg_r: read register %02x for value %02x\n", offset, result);
 	return result;
 }
 
 WRITE8_MEMBER(m1comm_device::dma_reg_w)
 {
-#ifdef __M1COMM_VERBOSE__
-	printf("m1comm-dma_reg_w: %02x %02x\n", offset, data);
-#endif
+	LOG("m1comm-dma_reg_w: %02x %02x\n", offset, data);
 	m_dma_reg[offset] = data;
 }
 
 READ8_MEMBER(m1comm_device::syn_r)
 {
-	UINT8 result = m_syn | 0xFC;
-#ifdef __M1COMM_VERBOSE__
-	printf("m1comm-syn_r: read register %02x for value %02x\n", offset, result);
-#endif
+	uint8_t result = m_syn | 0xfc;
+	LOG("m1comm-syn_r: read register %02x for value %02x\n", offset, result);
 	return result;
 }
 
@@ -222,38 +208,32 @@ WRITE8_MEMBER(m1comm_device::syn_w)
 {
 	m_syn = data & 0x03;
 
-#ifdef __M1COMM_VERBOSE__
 	switch (data & 0x02)
 	{
-		case 0x00:
-			printf("m1comm-syn_w: VINT disabled\n");
-			break;
+	case 0x00:
+		LOG("m1comm-syn_w: VINT disabled\n");
+		break;
 
-		case 0x02:
-			printf("m1comm-syn_w: VINT enabled\n");
-			break;
+	case 0x02:
+		LOG("m1comm-syn_w: VINT enabled\n");
+		break;
 
-		default:
-			printf("m1comm-syn_w: %02x\n", data);
-			break;
+	default:
+		LOG("m1comm-syn_w: %02x\n", data);
+		break;
 	}
-#endif
 }
 
 READ8_MEMBER(m1comm_device::zfg_r)
 {
-	UINT8 result = m_zfg | (~m_fg << 7) | 0x7e;
-#ifdef __M1COMM_VERBOSE__
-	printf("m1comm-zfg_r: read register %02x for value %02x\n", offset, result);
-#endif
+	uint8_t result = m_zfg | (~m_fg << 7) | 0x7e;
+	LOG("m1comm-zfg_r: read register %02x for value %02x\n", offset, result);
 	return result;
 }
 
 WRITE8_MEMBER(m1comm_device::zfg_w)
 {
-#ifdef __M1COMM_VERBOSE__
-	printf("m1comm-zfg_w: %02x\n", data);
-#endif
+	LOG("m1comm-zfg_w: %02x\n", data);
 	m_zfg = data & 0x01;
 }
 
@@ -276,7 +256,7 @@ WRITE8_MEMBER(m1comm_device::cn_w)
 {
 	m_cn = data & 0x01;
 
-#ifndef __M1COMM_SIMULATION__
+#ifndef M1COMM_SIMULATION
 	if (!m_cn)
 		device_reset();
 	else
@@ -285,13 +265,14 @@ WRITE8_MEMBER(m1comm_device::cn_w)
 	if (!m_cn)
 	{
 		// reset command
-		printf("M1COMM: board disabled\n");
+		osd_printf_verbose("M1COMM: board disabled\n");
 		m_linkenable = 0x00;
+		m_zfg = 0x00;
 	}
 	else
 	{
 		// init command
-		printf("M1COMM: board enabled\n");
+		osd_printf_verbose("M1COMM: board enabled\n");
 		m_linkenable = 0x01;
 		m_linkid = 0x00;
 		m_linkalive = 0x00;
@@ -316,20 +297,18 @@ WRITE8_MEMBER(m1comm_device::fg_w)
 
 void m1comm_device::check_vint_irq()
 {
-#ifndef __M1COMM_SIMULATION__
+#ifndef M1COMM_SIMULATION
 	if (m_syn & 0x02)
 	{
 		m_commcpu->set_input_line_and_vector(0, HOLD_LINE, 0xef);
-#ifdef __M1COMM_VERBOSE__
-		printf("m1comm-INT5\n");
-#endif
+		LOG("m1comm-INT5\n");
 	}
 #else
 	comm_tick();
 #endif
 }
 
-#ifdef __M1COMM_SIMULATION__
+#ifdef M1COMM_SIMULATION
 void m1comm_device::comm_tick()
 {
 	if (m_linkenable == 0x01)
@@ -355,14 +334,14 @@ void m1comm_device::comm_tick()
 			// check rx socket
 			if (!m_line_rx.is_open())
 			{
-				printf("M1COMM: listen on %s\n", m_localhost);
+				osd_printf_verbose("M1COMM: listen on %s\n", m_localhost);
 				m_line_rx.open(m_localhost);
 			}
 
 			// check tx socket
 			if (!m_line_tx.is_open())
 			{
-				printf("M1COMM: connect to %s\n", m_remotehost);
+				osd_printf_verbose("M1COMM: connect to %s\n", m_remotehost);
 				m_line_tx.open(m_remotehost);
 			}
 
@@ -415,8 +394,9 @@ void m1comm_device::comm_tick()
 							}
 
 							// consider it done
-							printf("M1COMM: link established - id %02x of %02x\n", m_linkid, m_linkcount);
+							osd_printf_verbose("M1COMM: link established - id %02x of %02x\n", m_linkid, m_linkcount);
 							m_linkalive = 0x01;
+							m_zfg = 0x01;
 
 							// write to shared mem
 							m_shared[0] = 0x01;
@@ -433,7 +413,7 @@ void m1comm_device::comm_tick()
 							recv = m_line_rx.read(m_buffer, togo);
 							togo -= recv;
 						}
-						printf("M1COMM: droped a message...\n");
+						osd_printf_verbose("M1COMM: dropped a message...\n");
 					}
 
 					if (m_linkalive == 0x00)
@@ -461,8 +441,9 @@ void m1comm_device::comm_tick()
 						m_line_tx.write(m_buffer, dataSize);
 
 						// consider it done
-						printf("M1COMM: link established - id %02x of %02x\n", m_linkid, m_linkcount);
+						osd_printf_verbose("M1COMM: link established - id %02x of %02x\n", m_linkid, m_linkcount);
 						m_linkalive = 0x01;
+						m_zfg = 0x01;
 
 						// write to shared mem
 						m_shared[0] = 0x01;
@@ -530,7 +511,7 @@ void m1comm_device::comm_tick()
 						recv = m_line_rx.read(m_buffer, togo);
 						togo -= recv;
 					}
-					printf("M1COMM: droped a message...\n");
+					osd_printf_verbose("M1COMM: dropped a message...\n");
 				}
 				recv = m_line_rx.read(m_buffer, dataSize);
 			}

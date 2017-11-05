@@ -32,18 +32,23 @@ TODO:
 
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "video/mc6847.h"
-#include "machine/i8251.h"
-#include "machine/clock.h"
-#include "sound/ay8910.h"
-#include "imagedev/cassette.h"
-#include "sound/wave.h"
-#include "formats/fc100_cas.h"
-#include "machine/buffer.h"
+
 #include "bus/centronics/ctronics.h"
-#include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "bus/generic/slot.h"
+#include "cpu/z80/z80.h"
+#include "imagedev/cassette.h"
+#include "machine/buffer.h"
+#include "machine/clock.h"
+#include "machine/i8251.h"
+#include "machine/timer.h"
+#include "sound/ay8910.h"
+#include "sound/wave.h"
+#include "video/mc6847.h"
+
+#include "speaker.h"
+
+#include "formats/fc100_cas.h"
 
 
 class fc100_state : public driver_device
@@ -54,11 +59,12 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_vdg(*this, "vdg")
 		, m_p_videoram(*this, "videoram")
+		, m_p_chargen(*this, "chargen")
 		, m_cass(*this, "cassette")
 		, m_cart(*this, "cartslot")
 		, m_uart(*this, "uart")
 		, m_centronics(*this, "centronics")
-		, m_keyboard(*this, "KEY")
+		, m_keyboard(*this, "KEY.%u", 0)
 	{ }
 
 	DECLARE_READ8_MEMBER(mc6847_videoram_r);
@@ -69,13 +75,10 @@ public:
 	DECLARE_WRITE8_MEMBER(port60_w);
 	DECLARE_WRITE8_MEMBER(port70_w);
 	DECLARE_WRITE_LINE_MEMBER(txdata_callback);
-	DECLARE_WRITE_LINE_MEMBER(uart_clock_w);
 	DECLARE_DRIVER_INIT(fc100);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_c);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_p);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_k);
-
-	UINT8 *m_p_chargen;
 
 	MC6847_GET_CHARROM_MEMBER(get_char_rom)
 	{
@@ -86,23 +89,24 @@ private:
 	virtual void machine_reset() override;
 
 	// graphics signals
-	UINT8 m_ag;
-	UINT8 m_gm2;
-	UINT8 m_gm1;
-	UINT8 m_gm0;
-	UINT8 m_as;
-	UINT8 m_css;
-	UINT8 m_intext;
-	UINT8 m_inv;
-	UINT8 m_cass_data[4];
+	uint8_t m_ag;
+	uint8_t m_gm2;
+	uint8_t m_gm1;
+	uint8_t m_gm0;
+	uint8_t m_as;
+	uint8_t m_css;
+	uint8_t m_intext;
+	uint8_t m_inv;
+	uint8_t m_cass_data[4];
 	bool m_cass_state;
 	bool m_cassold;
-	UINT8 m_key_pressed;
+	uint8_t m_key_pressed;
 	bool m_banksw_unlocked;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6847_base_device> m_vdg;
-	required_shared_ptr<UINT8> m_p_videoram;
+	required_shared_ptr<uint8_t> m_p_videoram;
+	required_region_ptr<u8> m_p_chargen;
 	required_device<cassette_image_device> m_cass;
 	required_device<generic_slot_device> m_cart;
 	required_device<i8251_device> m_uart;
@@ -290,7 +294,7 @@ READ8_MEMBER( fc100_state::port00_r )
 TIMER_DEVICE_CALLBACK_MEMBER( fc100_state::timer_k)
 {
 	/* scan the keyboard */
-	UINT8 i;
+	uint8_t i;
 
 	for (i = 0; i < 16; i++)
 	{
@@ -359,8 +363,8 @@ READ8_MEMBER( fc100_state::mc6847_videoram_r )
 	}
 
 	// Standard text
-	UINT8 data = m_p_videoram[offset];
-	UINT8 attr = m_p_videoram[offset+0x200];
+	uint8_t data = m_p_videoram[offset];
+	uint8_t attr = m_p_videoram[offset+0x200];
 
 	// unknown bits 1,2,4,7
 	m_vdg->inv_w( BIT( attr, 0 ));
@@ -415,12 +419,6 @@ WRITE_LINE_MEMBER( fc100_state::txdata_callback )
 	m_cass_state = state;
 }
 
-WRITE_LINE_MEMBER( fc100_state::uart_clock_w )
-{
-	m_uart->write_txc(state);
-	m_uart->write_rxc(state);
-}
-
 TIMER_DEVICE_CALLBACK_MEMBER( fc100_state::timer_c )
 {
 	m_cass_data[3]++;
@@ -441,7 +439,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( fc100_state::timer_p)
 {
 	/* cassette - turn 1200/2400Hz to a bit */
 	m_cass_data[1]++;
-	UINT8 cass_ws = (m_cass->input() > +0.03) ? 1 : 0;
+	uint8_t cass_ws = (m_cass->input() > +0.03) ? 1 : 0;
 
 	if (cass_ws != m_cass_data[0])
 	{
@@ -479,7 +477,6 @@ void fc100_state::machine_start()
 
 void fc100_state::machine_reset()
 {
-	m_p_chargen = memregion("chargen")->base();
 	m_cass_data[0] = m_cass_data[1] = m_cass_data[2] = m_cass_data[3] = 0;
 	m_cass_state = 0;
 	m_cassold = 0;
@@ -501,15 +498,15 @@ WRITE8_MEMBER( fc100_state::port70_w )
 
 DRIVER_INIT_MEMBER( fc100_state, fc100 )
 {
-	UINT8 *ram = memregion("ram")->base();
-	UINT8 *cgen = memregion("chargen")->base()+0x800;
+	uint8_t *ram = memregion("ram")->base();
+	uint8_t *cgen = memregion("chargen")->base()+0x800;
 
 	membank("bankr")->configure_entry(0, &cgen[0]);
 	membank("bankw")->configure_entry(0, &ram[0]);
 	membank("bankr")->configure_entry(1, &ram[0]);
 }
 
-static MACHINE_CONFIG_START( fc100, fc100_state )
+static MACHINE_CONFIG_START( fc100 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_7_15909MHz/2)
 	MCFG_CPU_PROGRAM_MAP(fc100_mem)
@@ -519,7 +516,7 @@ static MACHINE_CONFIG_START( fc100, fc100_state )
 	MCFG_DEVICE_ADD("vdg", M5C6847P1, XTAL_7_15909MHz/3)  // Clock not verified
 	MCFG_MC6847_INPUT_CALLBACK(READ8(fc100_state, mc6847_videoram_r))
 	MCFG_MC6847_CHARROM_CALLBACK(fc100_state, get_char_rom)
-	MCFG_MC6847_FIXED_MODE(MC6847_MODE_INTEXT)
+	MCFG_MC6847_FIXED_MODE(m5c6847p1_device::MODE_INTEXT)
 	// other lines not connected
 
 	MCFG_SCREEN_MC6847_NTSC_ADD("screen", "vdg")
@@ -545,7 +542,9 @@ static MACHINE_CONFIG_START( fc100, fc100_state )
 	MCFG_DEVICE_ADD("uart", I8251, 0)
 	MCFG_I8251_TXD_HANDLER(WRITELINE(fc100_state, txdata_callback))
 	MCFG_DEVICE_ADD("uart_clock", CLOCK, XTAL_4_9152MHz/16/16) // gives 19200
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(fc100_state, uart_clock_w))
+	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("uart", i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart", i8251_device, write_rxc))
+
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_c", fc100_state, timer_c, attotime::from_hz(4800)) // cass write
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_p", fc100_state, timer_p, attotime::from_hz(40000)) // cass read
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_k", fc100_state, timer_k, attotime::from_hz(300)) // keyb scan
@@ -574,5 +573,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE  INPUT   CLASS          INIT    COMPANY    FULLNAME  FLAGS */
-CONS( 1982, fc100,  0,      0,       fc100,   fc100,  fc100_state, fc100,   "Goldstar", "FC-100", MACHINE_NOT_WORKING )
+//    YEAR  NAME    PARENT  COMPAT   MACHINE  INPUT   CLASS        INIT    COMPANY     FULLNAME  FLAGS
+CONS( 1982, fc100,  0,      0,       fc100,   fc100,  fc100_state, fc100,  "Goldstar", "FC-100", MACHINE_NOT_WORKING )

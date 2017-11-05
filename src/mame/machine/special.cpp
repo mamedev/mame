@@ -11,6 +11,7 @@
 
 
 
+#include "emu.h"
 #include "includes/special.h"
 
 
@@ -18,7 +19,7 @@
 DRIVER_INIT_MEMBER(special_state,special)
 {
 	/* set initialy ROM to be visible on first bank */
-	UINT8 *RAM = m_region_maincpu->base();
+	uint8_t *RAM = m_region_maincpu->base();
 	memset(RAM,0x0000,0x3000); // make first page empty by default
 	m_bank1->configure_entries(1, 2, RAM, 0x0000);
 	m_bank1->configure_entries(0, 2, RAM, 0xc000);
@@ -39,7 +40,7 @@ READ8_MEMBER( special_state::specialist_8255_porta_r )
 
 READ8_MEMBER( special_state::specialist_8255_portb_r )
 {
-	UINT8 dat = 0xff;
+	uint8_t dat = 0xff;
 
 	if ((m_specialist_8255_porta & 0x01)==0) dat &= m_io_line0->read();
 	if ((m_specialist_8255_porta & 0x02)==0) dat &= m_io_line1->read();
@@ -55,7 +56,7 @@ READ8_MEMBER( special_state::specialist_8255_portb_r )
 	if ((m_specialist_8255_portc & 0x08)==0) dat &= m_io_line11->read();
 
 	// shift key
-	if BIT(~m_io_line12->read(), 0)
+	if (BIT(~m_io_line12->read(), 0))
 		dat &= 0xfd;
 
 	// cassette
@@ -70,7 +71,7 @@ READ8_MEMBER( special_state::specialist_8255_portb_r )
 
 READ8_MEMBER( special_state::specimx_8255_portb_r )
 {
-	UINT8 dat = 0xff;
+	uint8_t dat = 0xff;
 
 	if ((m_specialist_8255_porta & 0x01)==0) dat &= m_io_line0->read();
 	if ((m_specialist_8255_porta & 0x02)==0) dat &= m_io_line1->read();
@@ -86,7 +87,7 @@ READ8_MEMBER( special_state::specimx_8255_portb_r )
 	if ((m_specialist_8255_portc & 0x08)==0) dat &= m_io_line11->read();
 
 	// shift key
-	if BIT(~m_io_line12->read(), 0)
+	if (BIT(~m_io_line12->read(), 0))
 		dat &= 0xfd;
 
 	// cassette
@@ -121,7 +122,7 @@ WRITE8_MEMBER( special_state::specialist_8255_portc_w )
 
 	m_cassette->output(BIT(data, 7) ? 1 : -1);
 
-	m_dac->write_unsigned8(BIT(data, 5)); //beeper
+	m_dac->write(BIT(data, 5)); //beeper
 }
 
 void special_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
@@ -139,7 +140,7 @@ void special_state::device_timer(emu_timer &timer, device_timer_id id, int param
 		break;
 	}
 	default:
-		assert_always(FALSE, "Unknown id in special_state::device_timer");
+		assert_always(false, "Unknown id in special_state::device_timer");
 	}
 }
 
@@ -170,10 +171,10 @@ READ8_MEMBER( special_state::specimx_video_color_r )
 	return m_specimx_color;
 }
 
-void special_state::specimx_set_bank(offs_t i, UINT8 data)
+void special_state::specimx_set_bank(offs_t i, uint8_t data)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	UINT8 *ram = m_ram->pointer();
+	uint8_t *ram = m_ram->pointer();
 
 	space.install_write_bank(0xc000, 0xffbf, "bank3");
 	space.install_write_bank(0xffc0, 0xffdf, "bank4");
@@ -272,12 +273,12 @@ WRITE8_MEMBER( special_state::specimx_disk_ctrl_w )
 
 void special_state::erik_set_bank()
 {
-	UINT8 bank1 = m_RR_register & 3;
-	UINT8 bank2 = (m_RR_register >> 2) & 3;
-	UINT8 bank3 = (m_RR_register >> 4) & 3;
-	UINT8 bank4 = (m_RR_register >> 6) & 3;
-	UINT8 *mem = m_region_maincpu->base();
-	UINT8 *ram = m_ram->pointer();
+	uint8_t bank1 = m_RR_register & 3;
+	uint8_t bank2 = (m_RR_register >> 2) & 3;
+	uint8_t bank3 = (m_RR_register >> 4) & 3;
+	uint8_t bank4 = (m_RR_register >> 6) & 3;
+	uint8_t *mem = m_region_maincpu->base();
+	uint8_t *ram = m_ram->pointer();
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	space.install_write_bank(0x0000, 0x3fff, "bank1");
@@ -337,7 +338,7 @@ void special_state::erik_set_bank()
 			m_bank4->set_base(mem + 0x1c000);
 			space.unmap_write(0xf000, 0xf7ff);
 			space.nop_read(0xf000, 0xf7ff);
-			space.install_readwrite_handler(0xf800, 0xf803, 0, 0x7fc, read8_delegate(FUNC(i8255_device::read), (i8255_device*)m_ppi), write8_delegate(FUNC(i8255_device::write), (i8255_device*)m_ppi));
+			space.install_readwrite_handler(0xf800, 0xf803, 0, 0x7fc, 0, read8_delegate(FUNC(i8255_device::read), (i8255_device*)m_ppi), write8_delegate(FUNC(i8255_device::write), (i8255_device*)m_ppi));
 			break;
 	}
 }

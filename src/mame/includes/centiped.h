@@ -7,6 +7,9 @@
 *************************************************************************/
 
 #include "machine/eepromser.h"
+#include "machine/timer.h"
+#include "sound/ay8910.h"
+#include "screen.h"
 
 class centiped_state : public driver_device
 {
@@ -22,23 +25,31 @@ public:
 		m_eeprom(*this, "eeprom"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_aysnd(*this, "aysnd") { }
 
-	optional_shared_ptr<UINT8> m_rambase;
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_spriteram;
-	optional_shared_ptr<UINT8> m_paletteram;
-	optional_shared_ptr<UINT8> m_bullsdrt_tiles_bankram;
+	optional_shared_ptr<uint8_t> m_rambase;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_spriteram;
+	optional_shared_ptr<uint8_t> m_paletteram;
+	optional_shared_ptr<uint8_t> m_bullsdrt_tiles_bankram;
 
-	UINT8 m_oldpos[4];
-	UINT8 m_sign[4];
-	UINT8 m_dsw_select;
-	UINT8 m_control_select;
-	UINT8 m_flipscreen;
-	UINT8 m_prg_bank;
-	UINT8 m_gfx_bank;
-	UINT8 m_bullsdrt_sprites_bank;
-	UINT8 m_penmask[64];
+	required_device<cpu_device> m_maincpu;
+	optional_device<eeprom_serial_93cxx_device> m_eeprom;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+	optional_device<ay8910_device> m_aysnd;
+
+	uint8_t m_oldpos[4];
+	uint8_t m_sign[4];
+	uint8_t m_dsw_select;
+	uint8_t m_control_select;
+	uint8_t m_flipscreen;
+	uint8_t m_prg_bank;
+	uint8_t m_gfx_bank;
+	uint8_t m_bullsdrt_sprites_bank;
+	uint8_t m_penmask[64];
 	tilemap_t *m_bg_tilemap;
 
 	// drivers/centiped.c
@@ -47,14 +58,19 @@ public:
 	DECLARE_READ8_MEMBER(centiped_IN2_r);
 	DECLARE_READ8_MEMBER(milliped_IN1_r);
 	DECLARE_READ8_MEMBER(milliped_IN2_r);
-	DECLARE_WRITE8_MEMBER(input_select_w);
-	DECLARE_WRITE8_MEMBER(control_select_w);
+	DECLARE_WRITE_LINE_MEMBER(input_select_w);
+	DECLARE_WRITE_LINE_MEMBER(control_select_w);
 	DECLARE_READ8_MEMBER(mazeinv_input_r);
 	DECLARE_WRITE8_MEMBER(mazeinv_input_select_w);
 	DECLARE_READ8_MEMBER(bullsdrt_data_port_r);
-	DECLARE_WRITE8_MEMBER(led_w);
-	DECLARE_WRITE8_MEMBER(coin_count_w);
-	DECLARE_WRITE8_MEMBER(bullsdrt_coin_count_w);
+	DECLARE_WRITE_LINE_MEMBER(led_1_w);
+	DECLARE_WRITE_LINE_MEMBER(led_2_w);
+	DECLARE_WRITE_LINE_MEMBER(led_3_w);
+	DECLARE_WRITE_LINE_MEMBER(led_4_w);
+	DECLARE_WRITE_LINE_MEMBER(coin_counter_left_w);
+	DECLARE_WRITE_LINE_MEMBER(coin_counter_center_w);
+	DECLARE_WRITE_LINE_MEMBER(coin_counter_right_w);
+	DECLARE_WRITE_LINE_MEMBER(bullsdrt_coin_count_w);
 	DECLARE_READ8_MEMBER(caterplr_unknown_r);
 	DECLARE_WRITE8_MEMBER(caterplr_AY8910_w);
 	DECLARE_READ8_MEMBER(caterplr_AY8910_r);
@@ -64,7 +80,7 @@ public:
 
 	// video/centiped.c
 	DECLARE_WRITE8_MEMBER(centiped_videoram_w);
-	DECLARE_WRITE8_MEMBER(centiped_flip_screen_w);
+	DECLARE_WRITE_LINE_MEMBER(flip_screen_w);
 	DECLARE_WRITE8_MEMBER(multiped_gfxbank_w);
 	DECLARE_WRITE8_MEMBER(bullsdrt_tilesbank_w);
 	DECLARE_WRITE8_MEMBER(bullsdrt_sprites_bank_w);
@@ -85,18 +101,13 @@ public:
 	DECLARE_VIDEO_START(milliped);
 	DECLARE_VIDEO_START(warlords);
 	DECLARE_PALETTE_INIT(warlords);
-	UINT32 screen_update_centiped(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_bullsdrt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_milliped(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_warlords(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_centiped(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_bullsdrt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_milliped(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_warlords(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(generate_interrupt);
 	void init_penmask();
 	void init_common();
-	void milliped_set_color(offs_t offset, UINT8 data);
+	void milliped_set_color(offs_t offset, uint8_t data);
 	inline int read_trackball(int idx, int switch_port);
-	required_device<cpu_device> m_maincpu;
-	optional_device<eeprom_serial_93cxx_device> m_eeprom;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
 };

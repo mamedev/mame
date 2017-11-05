@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "final.h"
 
 
@@ -14,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_FINAL = &device_creator<c64_final_cartridge_device>;
+DEFINE_DEVICE_TYPE(C64_FINAL, c64_final_cartridge_device, "c64_final", "C64 Final Cartridge")
 
 
 //-------------------------------------------------
@@ -62,8 +63,8 @@ ioport_constructor c64_final_cartridge_device::device_input_ports() const
 //  c64_final_cartridge_device - constructor
 //-------------------------------------------------
 
-c64_final_cartridge_device::c64_final_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, C64_FINAL, "C64 Final cartridge", tag, owner, clock, "c64_final", __FILE__),
+c64_final_cartridge_device::c64_final_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, C64_FINAL, tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this)
 {
 }
@@ -93,7 +94,7 @@ void c64_final_cartridge_device::device_reset()
 //  c64_cd_r - cartridge data read
 //-------------------------------------------------
 
-UINT8 c64_final_cartridge_device::c64_cd_r(address_space &space, offs_t offset, UINT8 data, int sphi2, int ba, int roml, int romh, int io1, int io2)
+uint8_t c64_final_cartridge_device::c64_cd_r(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
 	if (!roml || !romh || !io1 || !io2)
 	{
@@ -119,7 +120,7 @@ UINT8 c64_final_cartridge_device::c64_cd_r(address_space &space, offs_t offset, 
 //  c64_cd_w - cartridge data write
 //-------------------------------------------------
 
-void c64_final_cartridge_device::c64_cd_w(address_space &space, offs_t offset, UINT8 data, int sphi2, int ba, int roml, int romh, int io1, int io2)
+void c64_final_cartridge_device::c64_cd_w(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
 	if (!io1)
 	{

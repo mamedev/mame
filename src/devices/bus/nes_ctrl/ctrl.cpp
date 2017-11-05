@@ -40,6 +40,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "ctrl.h"
 // slot devices
 #include "4score.h"
@@ -63,7 +64,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type NES_CONTROL_PORT = &device_creator<nes_control_port_device>;
+DEFINE_DEVICE_TYPE(NES_CONTROL_PORT, nes_control_port_device, "nes_control_port", "Nintendo NES/FC control port")
 
 
 
@@ -76,7 +77,7 @@ const device_type NES_CONTROL_PORT = &device_creator<nes_control_port_device>;
 //-------------------------------------------------
 
 device_nes_control_port_interface::device_nes_control_port_interface(const machine_config &mconfig, device_t &device) :
-									device_slot_card_interface(mconfig, device)
+	device_slot_card_interface(mconfig, device)
 {
 	m_port = dynamic_cast<nes_control_port_device *>(device.owner());
 }
@@ -100,9 +101,10 @@ device_nes_control_port_interface::~device_nes_control_port_interface()
 //  nes_control_port_device - constructor
 //-------------------------------------------------
 
-nes_control_port_device::nes_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-						device_t(mconfig, NES_CONTROL_PORT, "Nintendo NES/FC control port", tag, owner, clock, "nes_control_port", __FILE__),
-						device_slot_interface(mconfig, *this), m_device(nullptr)
+nes_control_port_device::nes_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, NES_CONTROL_PORT, tag, owner, clock),
+	device_slot_interface(mconfig, *this),
+	m_device(nullptr)
 {
 }
 
@@ -127,31 +129,31 @@ void nes_control_port_device::device_start()
 }
 
 
-UINT8 nes_control_port_device::read_bit0()
+uint8_t nes_control_port_device::read_bit0()
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 	if (m_device)
 		data = m_device->read_bit0();
 	return data;
 }
 
-UINT8 nes_control_port_device::read_bit34()
+uint8_t nes_control_port_device::read_bit34()
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 	if (m_device)
 		data = m_device->read_bit34();
 	return data;
 }
 
-UINT8 nes_control_port_device::read_exp(offs_t offset)
+uint8_t nes_control_port_device::read_exp(offs_t offset)
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 	if (m_device)
 		data = m_device->read_exp(offset);
 	return data;
 }
 
-void nes_control_port_device::write(UINT8 data)
+void nes_control_port_device::write(uint8_t data)
 {
 	if (m_device)
 		m_device->write(data);

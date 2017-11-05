@@ -1,5 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Takahiro Nogi
+#include "screen.h"
+#include "machine/gen_latch.h"
+
 class magmax_state : public driver_device
 {
 public:
@@ -12,26 +15,26 @@ public:
 		m_scroll_y(*this, "scroll_y"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
+		m_soundlatch(*this, "soundlatch"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette") { }
 
-	required_shared_ptr<UINT16> m_videoram;
-	required_shared_ptr<UINT16> m_spriteram;
-	required_shared_ptr<UINT16> m_vreg;
-	required_shared_ptr<UINT16> m_scroll_x;
-	required_shared_ptr<UINT16> m_scroll_y;
+	required_shared_ptr<uint16_t> m_videoram;
+	required_shared_ptr<uint16_t> m_spriteram;
+	required_shared_ptr<uint16_t> m_vreg;
+	required_shared_ptr<uint16_t> m_scroll_x;
+	required_shared_ptr<uint16_t> m_scroll_y;
 
-	UINT8 m_sound_latch;
-	UINT8 m_LS74_clr;
-	UINT8 m_LS74_q;
-	UINT8 m_gain_control;
+	uint8_t m_sound_latch;
+	uint8_t m_LS74_clr;
+	uint8_t m_LS74_q;
+	uint8_t m_gain_control;
 	emu_timer *m_interrupt_timer;
 	int m_flipscreen;
-	std::unique_ptr<UINT32[]> m_prom_tab;
+	std::unique_ptr<uint32_t[]> m_prom_tab;
 	bitmap_ind16 m_bitmap;
-	DECLARE_WRITE16_MEMBER(magmax_sound_w);
-	DECLARE_READ8_MEMBER(magmax_sound_irq_ack);
+	DECLARE_WRITE16_MEMBER(cpu_irq_ack_w);
 	DECLARE_READ8_MEMBER(magmax_sound_r);
 	DECLARE_WRITE16_MEMBER(magmax_vreg_w);
 	DECLARE_WRITE8_MEMBER(ay8910_portB_0_w);
@@ -40,10 +43,11 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(magmax);
-	UINT32 screen_update_magmax(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_magmax(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(scanline_callback);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;

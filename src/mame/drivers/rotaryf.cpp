@@ -15,9 +15,16 @@ driver by Barry Rodewald
 */
 
 #include "emu.h"
+
 #include "cpu/i8085/i8085.h"
+#include "machine/i8255.h"
+#include "machine/timer.h"
 #include "sound/samples.h"
 #include "sound/sn76477.h"
+
+#include "screen.h"
+#include "speaker.h"
+
 
 class rotaryf_state : public driver_device
 {
@@ -28,24 +35,26 @@ public:
 		m_samples(*this, "samples"),
 		m_sn(*this, "snsnd"),
 		m_videoram(*this, "videoram")
-	{ }
+	{
+	}
 
 	required_device<cpu_device> m_maincpu;
 	required_device<samples_device> m_samples;
 	required_device<sn76477_device> m_sn;
 
-	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<uint8_t> m_videoram;
 
-	DECLARE_READ8_MEMBER(port29_r);
-	DECLARE_WRITE8_MEMBER(port28_w);
+	DECLARE_READ8_MEMBER(portb_r);
+	DECLARE_WRITE8_MEMBER(porta_w);
+	DECLARE_WRITE8_MEMBER(portc_w);
 	DECLARE_WRITE8_MEMBER(port30_w);
 
 	bool m_flipscreen;
-	UINT8 m_last;
+	uint8_t m_last;
 
 	virtual void machine_start() override;
 
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(rotaryf_interrupt);
 };
@@ -69,22 +78,24 @@ static const char *const rotaryf_sample_names[] =
 
 void rotaryf_state::machine_start()
 {
+	m_last = 0xff;
+
 	save_item(NAME(m_flipscreen));
 	save_item(NAME(m_last));
 }
 
-READ8_MEMBER( rotaryf_state::port29_r )
+READ8_MEMBER(rotaryf_state::portb_r)
 {
-	UINT8 data = ioport("INPUTS")->read();
+	uint8_t data = ioport("INPUTS")->read();
 
 	if (m_flipscreen) return data;
 
 	return (data & 0xCD) | ((data & 0x01) << 1) | ((data & 0x0c) << 2);
 }
 
-WRITE8_MEMBER( rotaryf_state::port28_w )
+WRITE8_MEMBER(rotaryf_state::porta_w)
 {
-	UINT8 rising_bits = data & ~m_last;
+	uint8_t rising_bits = data & ~m_last;
 
 	if (BIT(rising_bits, 0)) m_samples->start (3, 7);   /* Hit Saucer */
 	if (BIT(rising_bits, 2)) m_samples->start (5, 8);   /* Bonus */
@@ -105,7 +116,17 @@ WRITE8_MEMBER( rotaryf_state::port28_w )
 	m_last = data;
 }
 
-WRITE8_MEMBER( rotaryf_state::port30_w )
+WRITE8_MEMBER(rotaryf_state::portc_w)
+{
+	if (data == 0xff)
+		return;
+
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 1));
+
+	// bit 5 set when game starts, but isn't coin lockout?
+}
+
+WRITE8_MEMBER(rotaryf_state::port30_w)
 {
 	/* bit 0 = player 2 is playing */
 
@@ -141,13 +162,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(rotaryf_state::rotaryf_interrupt)
  *
  *************************************/
 
-UINT32 rotaryf_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t rotaryf_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	offs_t offs;
 	pen_t pens[2];
-	pens[0] = rgb_t::black;
-	pens[1] = rgb_t::white;
-	UINT8 i,x,y,data;
+	pens[0] = rgb_t::black();
+	pens[1] = rgb_t::white();
+	uint8_t i,x,y,data;
 
 	for (offs = 0; offs < m_videoram.bytes(); offs++)
 	{
@@ -178,18 +199,13 @@ static ADDRESS_MAP_START( rotaryf_map, AS_PROGRAM, 8, rotaryf_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( rotaryf_io_map, AS_IO, 8, rotaryf_state )
-	AM_RANGE(0x21, 0x21) AM_READ_PORT("COIN")
-	AM_RANGE(0x26, 0x26) AM_READ_PORT("DSW")
-	AM_RANGE(0x29, 0x29) AM_READ(port29_r)
-
 	AM_RANGE(0x02, 0x02) AM_WRITENOP
 	AM_RANGE(0x04, 0x04) AM_WRITENOP
 	AM_RANGE(0x07, 0x07) AM_WRITENOP
 	AM_RANGE(0x20, 0x20) AM_WRITENOP
-	AM_RANGE(0x21, 0x21) AM_WRITENOP
-	AM_RANGE(0x28, 0x28) AM_WRITE(port28_w)
-	AM_RANGE(0x2a, 0x2a) AM_WRITENOP
-	AM_RANGE(0x2b, 0x2b) AM_WRITENOP
+	AM_RANGE(0x21, 0x21) AM_READ_PORT("COIN") AM_WRITENOP
+	AM_RANGE(0x26, 0x26) AM_READ_PORT("DSW")
+	AM_RANGE(0x28, 0x2b) AM_DEVREADWRITE("ppi", i8255_device, read, write)
 	AM_RANGE(0x30, 0x30) AM_WRITE(port30_w)
 ADDRESS_MAP_END
 
@@ -240,13 +256,19 @@ static INPUT_PORTS_START( rotaryf )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( rotaryf, rotaryf_state )
+static MACHINE_CONFIG_START( rotaryf )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8085A,4000000) /* ?? MHz */
 	MCFG_CPU_PROGRAM_MAP(rotaryf_map)
 	MCFG_CPU_IO_MAP(rotaryf_io_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", rotaryf_state, rotaryf_interrupt, "screen", 0, 1)
+
+	MCFG_DEVICE_ADD("ppi", I8255, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(rotaryf_state, porta_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(rotaryf_state, portb_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(rotaryf_state, portc_w))
+	//MCFG_I8255_TRISTATE_PORTC_CB(CONSTANT(0))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -291,4 +313,4 @@ ROM_START( rotaryf )
 ROM_END
 
 
-GAME( 1979, rotaryf, 0, rotaryf, rotaryf, driver_device, 0, ROT270, "Kasco", "Rotary Fighter", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, rotaryf, 0, rotaryf, rotaryf, rotaryf_state, 0, ROT270, "Kasco", "Rotary Fighter", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

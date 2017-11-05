@@ -2,7 +2,7 @@
 // copyright-holders:Olivier Galibert
 /***************************************************************************
 
-    m6502.c
+    n2a03.cpp
 
     6502, NES variant
 
@@ -11,7 +11,7 @@
 #include "emu.h"
 #include "n2a03.h"
 
-const device_type N2A03 = &device_creator<n2a03_device>;
+DEFINE_DEVICE_TYPE(N2A03, n2a03_device, "n2a03", "N2A03")
 
 READ8_MEMBER(n2a03_device::psg1_4014_r)
 {
@@ -49,16 +49,16 @@ ADDRESS_MAP_END
 
 
 
-n2a03_device::n2a03_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	m6502_device(mconfig, N2A03, "N2A03", tag, owner, clock, "n2a03", __FILE__),
-	m_apu(*this, "nesapu"),
-	m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0, ADDRESS_MAP_NAME(n2a03_map))
+n2a03_device::n2a03_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	m6502_device(mconfig, N2A03, tag, owner, clock),
+	m_apu(*this, "nesapu")
 {
+	program_config.m_internal_map = ADDRESS_MAP_NAME(n2a03_map);
 }
 
-offs_t n2a03_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t n2a03_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
-	return disassemble_generic(buffer, pc, oprom, opram, options, disasm_entries);
+	return disassemble_generic(stream, pc, oprom, opram, options, disasm_entries);
 }
 
 void n2a03_device::device_start()
@@ -66,77 +66,33 @@ void n2a03_device::device_start()
 	if(!m_apu->started())
 		throw device_missing_dependencies();
 
-	if(direct_disabled)
-		mintf = new mi_2a03_nd;
-	else
-		mintf = new mi_2a03_normal;
-
-	m_apu->set_tag_memory(tag());
-
-	init();
+	m6502_device::device_start();
 }
 
-UINT8 n2a03_device::mi_2a03_normal::read(UINT16 adr)
+void n2a03_device::device_clock_changed()
 {
-	return program->read_byte(adr);
+	m_apu->set_unscaled_clock(clock());
 }
 
-UINT8 n2a03_device::mi_2a03_normal::read_sync(UINT16 adr)
+WRITE_LINE_MEMBER(n2a03_device::apu_irq)
 {
-	return sdirect->read_byte(adr);
+	// games relying on the APU_IRQ don't seem to work anyway? (nes software list : timelord, mig29sf, firehawk)
+	set_input_line(N2A03_APU_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-UINT8 n2a03_device::mi_2a03_normal::read_arg(UINT16 adr)
+READ8_MEMBER(n2a03_device::apu_read_mem)
 {
-	return direct->read_byte(adr);
+	return mintf->program->read_byte(offset);
 }
 
-void n2a03_device::mi_2a03_normal::write(UINT16 adr, UINT8 val)
-{
-	program->write_byte(adr, val);
-}
-
-UINT8 n2a03_device::mi_2a03_nd::read(UINT16 adr)
-{
-	return program->read_byte(adr);
-}
-
-UINT8 n2a03_device::mi_2a03_nd::read_sync(UINT16 adr)
-{
-	return sprogram->read_byte(adr);
-}
-
-UINT8 n2a03_device::mi_2a03_nd::read_arg(UINT16 adr)
-{
-	return program->read_byte(adr);
-}
-
-void n2a03_device::mi_2a03_nd::write(UINT16 adr, UINT8 val)
-{
-	program->write_byte(adr, val);
-}
-
-const address_space_config *n2a03_device::memory_space_config(address_spacenum spacenum) const
-{
-	switch(spacenum)
-	{
-	case AS_PROGRAM:           return &m_program_config;
-	case AS_DECRYPTED_OPCODES: return has_configured_map(AS_DECRYPTED_OPCODES) ? &sprogram_config : nullptr;
-	default:                   return nullptr;
-	}
-}
-
-static MACHINE_CONFIG_FRAGMENT( n2a03_device )
+MACHINE_CONFIG_MEMBER( n2a03_device::device_add_mconfig )
 	MCFG_SOUND_ADD("nesapu", NES_APU, DERIVED_CLOCK(1,1) )
+	MCFG_NES_APU_IRQ_HANDLER(WRITELINE(n2a03_device, apu_irq))
+	MCFG_NES_APU_MEM_READ_CALLBACK(READ8(n2a03_device, apu_read_mem))
 
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, ":mono", 0.50)
 
 MACHINE_CONFIG_END
-
-machine_config_constructor n2a03_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( n2a03_device );
-}
 
 
 #include "cpu/m6502/n2a03.hxx"

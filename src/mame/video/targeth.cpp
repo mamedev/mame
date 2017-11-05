@@ -73,8 +73,8 @@ WRITE16_MEMBER(targeth_state::vram_w)
 
 void targeth_state::video_start()
 {
-	m_pant[0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(targeth_state::get_tile_info_screen0),this),TILEMAP_SCAN_ROWS,16,16,64,32);
-	m_pant[1] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(targeth_state::get_tile_info_screen1),this),TILEMAP_SCAN_ROWS,16,16,64,32);
+	m_pant[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(targeth_state::get_tile_info_screen0),this),TILEMAP_SCAN_ROWS,16,16,64,32);
+	m_pant[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(targeth_state::get_tile_info_screen1),this),TILEMAP_SCAN_ROWS,16,16,64,32);
 
 	m_pant[0]->set_transparent_pen(0);
 }
@@ -129,7 +129,7 @@ void targeth_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 
 ***************************************************************************/
 
-UINT32 targeth_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t targeth_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* set scroll registers */
 	m_pant[0]->set_scrolly(0, m_vregs[0]);

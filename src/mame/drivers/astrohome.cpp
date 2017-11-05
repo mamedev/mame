@@ -7,24 +7,29 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
 #include "includes/astrocde.h"
+
+#include "cpu/z80/z80.h"
 #include "machine/ram.h"
 #include "sound/astrocde.h"
+
 #include "bus/astrocde/slot.h"
 #include "bus/astrocde/rom.h"
 #include "bus/astrocde/exp.h"
 #include "bus/astrocde/ram.h"
+
 #include "softlist.h"
+#include "speaker.h"
+
 
 class astrocde_mess_state : public astrocde_state
 {
 public:
 	astrocde_mess_state(const machine_config &mconfig, device_type type, const char *tag)
-		: astrocde_state(mconfig, type, tag),
-		m_cart(*this, "cartslot"),
-		m_exp(*this, "exp")
-		{ }
+		: astrocde_state(mconfig, type, tag)
+		, m_cart(*this, "cartslot")
+		, m_exp(*this, "exp")
+	{ }
 
 	required_device<astrocade_cart_slot_device> m_cart;
 	required_device<astrocade_exp_device> m_exp;
@@ -54,7 +59,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( astrocade_io, AS_IO, 8, astrocde_mess_state )
-	AM_RANGE(0x00, 0x1f) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE(astrocade_data_chip_register_r, astrocade_data_chip_register_w)
+	AM_RANGE(0x00, 0x1f) AM_SELECT(0xff00) AM_READWRITE(astrocade_data_chip_register_r, astrocade_data_chip_register_w)
 ADDRESS_MAP_END
 
 /*************************************
@@ -185,7 +190,7 @@ static SLOT_INTERFACE_START(astrocade_exp)
 SLOT_INTERFACE_END
 
 
-static MACHINE_CONFIG_START( astrocde, astrocde_mess_state )
+static MACHINE_CONFIG_START( astrocde )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, ASTROCADE_CLOCK/4)        /* 1.789 MHz */
 	MCFG_CPU_PROGRAM_MAP(astrocade_mem)
@@ -267,7 +272,7 @@ MACHINE_START_MEMBER(astrocde_mess_state, astrocde)
  *
  *************************************/
 
-/*    YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT     INIT      COMPANY                FULLNAME                     FLAGS */
-CONS( 1978, astrocde, 0,        0,        astrocde, astrocde, astrocde_state, astrocde, "Bally Manufacturing", "Bally Professional Arcade", MACHINE_SUPPORTS_SAVE )
-CONS( 1977, astrocdl, astrocde, 0,        astrocde, astrocde, astrocde_state, astrocde, "Bally Manufacturing", "Bally Home Library Computer", MACHINE_SUPPORTS_SAVE )
-CONS( 1977, astrocdw, astrocde, 0,        astrocde, astrocde, astrocde_state, astrocde, "Bally Manufacturing", "Bally Computer System", MACHINE_SUPPORTS_SAVE )
+/*    YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT     STATE                INIT      COMPANY                FULLNAME                       FLAGS */
+CONS( 1978, astrocde, 0,        0,        astrocde, astrocde, astrocde_mess_state, astrocde, "Bally Manufacturing", "Bally Professional Arcade",   MACHINE_SUPPORTS_SAVE )
+CONS( 1977, astrocdl, astrocde, 0,        astrocde, astrocde, astrocde_mess_state, astrocde, "Bally Manufacturing", "Bally Home Library Computer", MACHINE_SUPPORTS_SAVE )
+CONS( 1977, astrocdw, astrocde, 0,        astrocde, astrocde, astrocde_mess_state, astrocde, "Bally Manufacturing", "Bally Computer System",       MACHINE_SUPPORTS_SAVE )

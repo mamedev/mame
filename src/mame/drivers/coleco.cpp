@@ -63,8 +63,11 @@
 
 */
 
+#include "emu.h"
 #include "includes/coleco.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
 
 /* Read/Write Handlers */
 
@@ -219,7 +222,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(coleco_state::paddle_update_callback)
 
 			// change pulse intervals relative to spinner/trackball speed
 			m_joy_pulse_reload[port] = freq;
-			m_joy_pulse_timer[port]->adjust(min(freq, m_joy_pulse_timer[port]->remaining()), port);
+			m_joy_pulse_timer[port]->adjust(std::min(freq, m_joy_pulse_timer[port]->remaining()), port);
 		}
 	}
 }
@@ -229,20 +232,20 @@ READ8_MEMBER( coleco_state::cart_r )
 	return m_cart->bd_r(space, offset & 0x7fff, 0, 0, 0, 0, 0);
 }
 
-UINT8 coleco_state::coleco_scan_paddles(UINT8 *joy_status0, UINT8 *joy_status1)
+uint8_t coleco_state::coleco_scan_paddles(uint8_t *joy_status0, uint8_t *joy_status1)
 {
-	UINT8 ctrl_sel = (m_ctrlsel != nullptr) ? m_ctrlsel->read() : 0;
+	uint8_t ctrl_sel = m_ctrlsel.read_safe(0);
 
 	/* which controller shall we read? */
 	if ((ctrl_sel & 0x07) == 0x02)          // Super Action Controller P1
-		*joy_status0 = (m_sac_slide1 != nullptr) ? m_sac_slide1->read() : 0;
+		*joy_status0 = m_sac_slide1.read_safe(0);
 	else if ((ctrl_sel & 0x07) == 0x03)     // Driving Controller P1
-		*joy_status0 = (m_driv_wheel1 != nullptr) ? m_driv_wheel1->read() : 0;
+		*joy_status0 = m_driv_wheel1.read_safe(0);
 
 	if ((ctrl_sel & 0x70) == 0x20)          // Super Action Controller P2
-		*joy_status1 = (m_sac_slide2 != nullptr) ? m_sac_slide2->read() : 0;
+		*joy_status1 = m_sac_slide2.read_safe(0);
 	else if ((ctrl_sel & 0x70) == 0x30)     // Driving Controller P2
-		*joy_status1 = (m_driv_wheel2 != nullptr) ? m_driv_wheel2->read() : 0;
+		*joy_status1 = m_driv_wheel2.read_safe(0);
 
 	/* In principle, even if not supported by any game, I guess we could have two Super
 	   Action Controllers plugged into the Roller controller ports. Since I found no info
@@ -250,26 +253,26 @@ UINT8 coleco_state::coleco_scan_paddles(UINT8 *joy_status0, UINT8 *joy_status1)
 	   the Roller trackball inputs and actually use the latter ones, when both are selected. */
 	if (ctrl_sel & 0x80)                    // Roller controller
 	{
-		*joy_status0 = (m_roller_x != nullptr) ? m_roller_x->read() : 0;
-		*joy_status1 = (m_roller_y != nullptr) ? m_roller_y->read() : 0;
+		*joy_status0 = m_roller_x.read_safe(0);
+		*joy_status1 = m_roller_y.read_safe(0);
 	}
 
 	return *joy_status0 | *joy_status1;
 }
 
 
-UINT8 coleco_state::coleco_paddle_read(int port, int joy_mode, UINT8 joy_status)
+uint8_t coleco_state::coleco_paddle_read(int port, int joy_mode, uint8_t joy_status)
 {
-	UINT8 ctrl_sel = (m_ctrlsel != nullptr ) ? m_ctrlsel->read() : 0;
-	UINT8 ctrl_extra = ctrl_sel & 0x80;
+	uint8_t ctrl_sel = m_ctrlsel.read_safe(0);
+	uint8_t ctrl_extra = ctrl_sel & 0x80;
 	ctrl_sel = ctrl_sel >> (port*4) & 7;
 
 	/* Keypad and fire 1 (SAC Yellow Button) */
 	if (joy_mode == 0)
 	{
 		/* No key pressed by default */
-		UINT8 data = 0x0f;
-		UINT16 ipt = 0xffff;
+		uint8_t data = 0x0f;
+		uint16_t ipt = 0xffff;
 
 		if (ctrl_sel == 0)          // ColecoVision Controller
 			ipt = port ? m_std_keypad2->read() : m_std_keypad1->read();
@@ -300,7 +303,7 @@ UINT8 coleco_state::coleco_paddle_read(int port, int joy_mode, UINT8 joy_status)
 	/* Joystick and fire 2 (SAC Red Button) */
 	else
 	{
-		UINT8 data = 0x7f;
+		uint8_t data = 0x7f;
 
 		if (ctrl_sel == 0)          // ColecoVision Controller
 			data = port ? m_std_joy2->read() : m_std_joy1->read();
@@ -352,15 +355,15 @@ void coleco_state::machine_reset()
 	m_last_nmi_state = 0;
 }
 
-//static int coleco_cart_verify(const UINT8 *cartdata, size_t size)
+//static image_verify_result coleco_cart_verify(const uint8_t *cartdata, size_t size)
 //{
-//  int retval = IMAGE_VERIFY_FAIL;
+//  int retval = image_verify_result::FAIL;
 //
 //  /* Verify the file is in Colecovision format */
 //  if ((cartdata[0] == 0xAA) && (cartdata[1] == 0x55)) /* Production Cartridge */
-//      retval = IMAGE_VERIFY_PASS;
+//      retval = image_verify_result::PASS;
 //  if ((cartdata[0] == 0x55) && (cartdata[1] == 0xAA)) /* "Test" Cartridge. Some games use this method to skip ColecoVision title screen and delay */
-//      retval = IMAGE_VERIFY_PASS;
+//      retval = image_verify_result::PASS;
 //
 //  return retval;
 //}
@@ -368,7 +371,7 @@ void coleco_state::machine_reset()
 
 /* Machine Drivers */
 
-static MACHINE_CONFIG_START( coleco, coleco_state )
+static MACHINE_CONFIG_START( coleco )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_7_15909MHz/2) // 3.579545 MHz
@@ -484,10 +487,10 @@ ROM_END
 
 /* System Drivers */
 
-//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT   INIT              COMPANY             FULLNAME                            FLAGS
-CONS( 1982, coleco,   0,        0,      coleco,   coleco, driver_device, 0, "Coleco",           "ColecoVision (NTSC)",              0 )
-CONS( 1982, onyx,     coleco,   0,      coleco,   coleco, driver_device, 0, "Microdigital",     "Onyx (Brazil/Prototype)",          0 )
-CONS( 1983, colecop,  coleco,   0,      colecop,  coleco, driver_device, 0, "Coleco",           "ColecoVision (PAL)",               0 )
-CONS( 1986, czz50,    0,        coleco, czz50,    czz50,  driver_device, 0, "Bit Corporation",  "Chuang Zao Zhe 50",                0 )
-CONS( 1988, dina,     czz50,    0,      dina,     czz50,  driver_device, 0, "Telegames",        "Dina",                             0 )
-CONS( 1988, prsarcde, czz50,    0,      czz50,    czz50,  driver_device, 0, "Telegames",        "Personal Arcade",                  0 )
+//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT   STATE         INIT  COMPANY             FULLNAME                            FLAGS
+CONS( 1982, coleco,   0,        0,      coleco,   coleco, coleco_state, 0,    "Coleco",           "ColecoVision (NTSC)",              0 )
+CONS( 1982, onyx,     coleco,   0,      coleco,   coleco, coleco_state, 0,    "Microdigital",     "Onyx (Brazil/Prototype)",          0 )
+CONS( 1983, colecop,  coleco,   0,      colecop,  coleco, coleco_state, 0,    "Coleco",           "ColecoVision (PAL)",               0 )
+CONS( 1986, czz50,    0,        coleco, czz50,    czz50,  coleco_state, 0,    "Bit Corporation",  "Chuang Zao Zhe 50",                0 )
+CONS( 1988, dina,     czz50,    0,      dina,     czz50,  coleco_state, 0,    "Telegames",        "Dina",                             0 )
+CONS( 1988, prsarcde, czz50,    0,      czz50,    czz50,  coleco_state, 0,    "Telegames",        "Personal Arcade",                  0 )

@@ -2,8 +2,8 @@
 // copyright-holders:Olivier Galibert
 // Intel I82541 ethernet controller
 
-#ifndef I82541_H
-#define I82541_H
+#ifndef MAME_MACHINE_I82541_H
+#define MAME_MACHINE_I82541_H
 
 #include "pci.h"
 
@@ -12,7 +12,7 @@
 
 class i82541_device : public pci_device {
 public:
-	i82541_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	i82541_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	virtual void device_start() override;
@@ -24,6 +24,6 @@ private:
 	DECLARE_ADDRESS_MAP(registers_io_map, 32);
 };
 
-extern const device_type I82541;
+DECLARE_DEVICE_TYPE(I82541, i82541_device)
 
-#endif
+#endif // MAME_MACHINE_I82541_H

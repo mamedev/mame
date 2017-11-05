@@ -48,7 +48,8 @@ TILE_GET_INFO_MEMBER(shisen_state::get_bg_tile_info)
 
 void shisen_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(shisen_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,
+	m_bg_tilemap = &machine().tilemap().create(
+			*m_gfxdecode, tilemap_get_info_delegate(FUNC(shisen_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,
 			8, 8, 64, 32);
 
 	membank("bank1")->configure_entries(0, 8, memregion("maincpu")->base() + 0x10000, 0x4000);
@@ -56,7 +57,7 @@ void shisen_state::video_start()
 	save_item(NAME(m_gfxbank));
 }
 
-UINT32 shisen_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t shisen_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// on Irem boards, screen flip is handled in both hardware and software.
 	// this game doesn't have cocktail mode so if there's software control we don't

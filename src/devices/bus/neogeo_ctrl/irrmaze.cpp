@@ -2,17 +2,18 @@
 // copyright-holders:Fabio Priuli
 /**********************************************************************
 
-    SNK Neo Geo Irritation Maze Analog Controller emulation
+    SNK Neo Geo Irritating Maze Trackball Controller emulation
 
 **********************************************************************/
 
+#include "emu.h"
 #include "irrmaze.h"
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type NEOGEO_IRRMAZE = &device_creator<neogeo_irrmaze_device>;
+DEFINE_DEVICE_TYPE(NEOGEO_IRRMAZE, neogeo_irrmaze_device, "neogeo_irrmaze", "SNK Neo Geo Irritating Maze Trackball controller")
 
 
 static INPUT_PORTS_START( neogeo_irrmaze )
@@ -49,12 +50,12 @@ ioport_constructor neogeo_irrmaze_device::device_input_ports() const
 //  neogeo_irrmaze_device - constructor
 //-------------------------------------------------
 
-neogeo_irrmaze_device::neogeo_irrmaze_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-					device_t(mconfig, NEOGEO_IRRMAZE, "SNK Neo Geo Irritating Maze Analog Controller", tag, owner, clock, "neogeo_irrmaze", __FILE__),
-					device_neogeo_ctrl_edge_interface(mconfig, *this),
-					m_tx(*this, "TRACK_X"),
-					m_ty(*this, "TRACK_Y"),
-					m_buttons(*this, "BUTTONS")
+neogeo_irrmaze_device::neogeo_irrmaze_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, NEOGEO_IRRMAZE, tag, owner, clock),
+	device_neogeo_ctrl_edge_interface(mconfig, *this),
+	m_tx(*this, "TRACK_X"),
+	m_ty(*this, "TRACK_Y"),
+	m_buttons(*this, "BUTTONS")
 {
 }
 
@@ -85,7 +86,7 @@ void neogeo_irrmaze_device::device_reset()
 
 READ8_MEMBER(neogeo_irrmaze_device::in0_r)
 {
-	UINT8 res = 0;
+	uint8_t res = 0;
 	if (m_ctrl_sel & 0x01)
 		res = m_ty->read();
 	else
@@ -107,7 +108,7 @@ READ8_MEMBER(neogeo_irrmaze_device::in1_r)
 //  write_ctrlsel
 //-------------------------------------------------
 
-void neogeo_irrmaze_device::write_ctrlsel(UINT8 data)
+void neogeo_irrmaze_device::write_ctrlsel(uint8_t data)
 {
 	m_ctrl_sel = data;
 }

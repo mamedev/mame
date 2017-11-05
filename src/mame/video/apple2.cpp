@@ -44,7 +44,7 @@
     register
 -------------------------------------------------*/
 
-inline UINT32 apple2_state::effective_a2()
+inline uint32_t apple2_state::effective_a2()
 {
 	return m_flags & m_a2_videomask;
 }
@@ -55,7 +55,7 @@ inline UINT32 apple2_state::effective_a2()
     video address lookup
 -------------------------------------------------*/
 
-UINT32 apple2_state::compute_video_address(int col, int row)
+uint32_t apple2_state::compute_video_address(int col, int row)
 {
 	/* special Apple II addressing - gotta love it */
 	return (((row & 0x07) << 7) | ((row & 0x18) * 5 + col));
@@ -73,8 +73,8 @@ void apple2_state::adjust_begin_and_end_row(const rectangle &cliprect, int *begi
 	assert((*beginrow % 8) == 0);
 	assert((*endrow % 8) == 7);
 
-	*beginrow = MAX(*beginrow, cliprect.min_y - (cliprect.min_y % 8));
-	*endrow = MIN(*endrow, cliprect.max_y - (cliprect.max_y % 8) + 7);
+	*beginrow = std::max(*beginrow, cliprect.min_y - (cliprect.min_y % 8));
+	*endrow = std::min(*endrow, cliprect.max_y - (cliprect.max_y % 8) + 7);
 
 	/* sanity check again */
 	assert((*beginrow % 8) == 0);
@@ -92,16 +92,16 @@ void apple2_state::adjust_begin_and_end_row(const rectangle &cliprect, int *begi
     textual character
 -------------------------------------------------*/
 
-inline void apple2_state::apple2_plot_text_character(bitmap_ind16 &bitmap, int xpos, int ypos, int xscale, UINT32 code,
-	const UINT8 *textgfx_data, UINT32 textgfx_datalen, UINT32 my_a2)
+inline void apple2_state::apple2_plot_text_character(bitmap_ind16 &bitmap, int xpos, int ypos, int xscale, uint32_t code,
+	const uint8_t *textgfx_data, uint32_t textgfx_datalen, uint32_t my_a2)
 {
 	int x, y, i;
 	int fg = m_fgcolor;
 	int bg = m_bgcolor;
-	const UINT8 *chardata;
-	UINT16 color;
+	const uint8_t *chardata;
+	uint16_t color;
 
-	if (m_sysconfig != nullptr)
+	if (m_sysconfig.found())
 	{
 		switch (m_sysconfig->read() & 0x03)
 		{
@@ -203,9 +203,9 @@ inline void apple2_state::apple2_plot_text_character(bitmap_ind16 &bitmap, int x
 void apple2_state::apple2_text_draw(bitmap_ind16 &bitmap, const rectangle &cliprect, int page, int beginrow, int endrow)
 {
 	int row, col;
-	UINT32 start_address = (page ? 0x0800 : 0x0400);
-	UINT32 address;
-	UINT32 my_a2 = effective_a2();
+	uint32_t start_address = (page ? 0x0800 : 0x0400);
+	uint32_t address;
+	uint32_t my_a2 = effective_a2();
 
 	/* perform adjustments */
 	adjust_begin_and_end_row(cliprect, &beginrow, &endrow);
@@ -241,9 +241,9 @@ void apple2_state::apple2_text_draw(bitmap_ind16 &bitmap, const rectangle &clipr
 void apple2_state::apple2_lores_draw(bitmap_ind16 &bitmap, const rectangle &cliprect, int page, int beginrow, int endrow)
 {
 	int row, col, y, x;
-	UINT8 code;
-	UINT32 start_address = (page ? 0x0800 : 0x0400);
-	UINT32 address;
+	uint8_t code;
+	uint32_t start_address = (page ? 0x0800 : 0x0400);
+	uint32_t address;
 
 	/* perform adjustments */
 	adjust_begin_and_end_row(cliprect, &beginrow, &endrow);
@@ -280,21 +280,16 @@ void apple2_state::apple2_lores_draw(bitmap_ind16 &bitmap, const rectangle &clip
 
 void apple2_state::apple2_hires_draw(bitmap_ind16 &bitmap, const rectangle &cliprect, int page, int beginrow, int endrow)
 {
-	const UINT8 *vram, *vaux;
+	const uint8_t *vram, *vaux;
 	int row, col, b;
 	int offset;
 	int columns;
-	UINT8 vram_row[82];
-	UINT16 v;
-	UINT16 *p;
-	UINT32 w;
-	UINT16 *artifact_map_ptr;
-	int mon_type = 0;
-
-	if (m_sysconfig != nullptr)
-	{
-		mon_type = m_sysconfig->read() & 0x03;
-	}
+	uint8_t vram_row[82];
+	uint16_t v;
+	uint16_t *p;
+	uint32_t w;
+	uint16_t *artifact_map_ptr;
+	int mon_type = m_sysconfig.read_safe(0) & 0x03;
 
 	/* sanity checks */
 	if (beginrow < cliprect.min_y)
@@ -345,9 +340,9 @@ void apple2_state::apple2_hires_draw(bitmap_ind16 &bitmap, const rectangle &clip
 
 		for (col = 0; col < columns; col++)
 		{
-			w =     (((UINT32) vram_row[col+0] & 0x7f) <<  0)
-				|   (((UINT32) vram_row[col+1] & 0x7f) <<  7)
-				|   (((UINT32) vram_row[col+2] & 0x7f) << 14);
+			w =     (((uint32_t) vram_row[col+0] & 0x7f) <<  0)
+				|   (((uint32_t) vram_row[col+1] & 0x7f) <<  7)
+				|   (((uint32_t) vram_row[col+2] & 0x7f) << 14);
 
 			switch(columns)
 			{
@@ -468,19 +463,19 @@ void apple2_state::apple2_hires_draw(bitmap_ind16 &bitmap, const rectangle &clip
     VIDEO CORE
 ***************************************************************************/
 
-void apple2_state::apple2_video_start(const UINT8 *vram, const UINT8 *aux_vram, UINT32 ignored_softswitches, int hires_modulo)
+void apple2_state::apple2_video_start(const uint8_t *vram, const uint8_t *aux_vram, uint32_t ignored_softswitches, int hires_modulo)
 {
 	int i, j;
-	UINT16 c;
-	UINT8 *apple2_font;
+	uint16_t c;
+	uint8_t *apple2_font;
 
-	static const UINT8 hires_artifact_color_table[] =
+	static const uint8_t hires_artifact_color_table[] =
 	{
 		BLACK,  PURPLE, GREEN,  WHITE,
 		BLACK,  BLUE,   ORANGE, WHITE
 	};
 
-	static const UINT8 dhires_artifact_color_table[] =
+	static const uint8_t dhires_artifact_color_table[] =
 	{
 		BLACK,      DKGREEN,    BROWN,  GREEN,
 		DKRED,      DKGRAY,     ORANGE, YELLOW,
@@ -500,10 +495,10 @@ void apple2_state::apple2_video_start(const UINT8 *vram, const UINT8 *aux_vram, 
 	m_textgfx_datalen = memregion("gfx1")->bytes();
 
 	/* 2^3 dependent pixels * 2 color sets * 2 offsets */
-	m_hires_artifact_map = std::make_unique<UINT16[]>(8 * 2 * 2);
+	m_hires_artifact_map = std::make_unique<uint16_t[]>(8 * 2 * 2);
 
 	/* 2^4 dependent pixels */
-	m_dhires_artifact_map = std::make_unique<UINT16[]>(16);
+	m_dhires_artifact_map = std::make_unique<uint16_t[]>(16);
 
 	/* build hires artifact map */
 	for (i = 0; i < 8; i++)
@@ -609,10 +604,10 @@ VIDEO_START_MEMBER(apple2_state,apple2c)
 	apple2_video_start(m_ram->pointer(), m_ram->pointer()+0x10000, 0, 8);
 }
 
-UINT32 apple2_state::screen_update_apple2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t apple2_state::screen_update_apple2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int page;
-	UINT32 new_a2;
+	uint32_t new_a2;
 
 	/* calculate the m_flash value */
 	m_flash = ((machine().time() * 4).seconds() & 1) ? 1 : 0;
@@ -673,25 +668,25 @@ UINT32 apple2_state::screen_update_apple2(screen_device &screen, bitmap_ind16 &b
     New implementation
 */
 
-const device_type APPLE2_VIDEO = &device_creator<a2_video_device>;
+DEFINE_DEVICE_TYPE(APPLE2_VIDEO, a2_video_device, "a2video", "Apple II video")
 
 //-------------------------------------------------
 //  a2_video_device - constructor
 //-------------------------------------------------
 
-a2_video_device::a2_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, APPLE2_VIDEO, "Apple II video", tag, owner, clock, "a2video", __FILE__)
+a2_video_device::a2_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, APPLE2_VIDEO, tag, owner, clock)
 {
 }
 
 void a2_video_device::device_start()
 {
-	static const UINT8 hires_artifact_color_table[] =
+	static const uint8_t hires_artifact_color_table[] =
 	{
 		BLACK,  PURPLE, GREEN,  WHITE,
 		BLACK,  BLUE,   ORANGE, WHITE
 	};
-	static const UINT8 dhires_artifact_color_table[] =
+	static const uint8_t dhires_artifact_color_table[] =
 	{
 		BLACK,      DKGREEN,    BROWN,  GREEN,
 		DKRED,      DKGRAY,     ORANGE, YELLOW,
@@ -701,10 +696,10 @@ void a2_video_device::device_start()
 
 	// generate hi-res artifact data
 	int i, j;
-	UINT16 c;
+	uint16_t c;
 
 	/* 2^3 dependent pixels * 2 color sets * 2 offsets */
-	m_hires_artifact_map = std::make_unique<UINT16[]>(8 * 2 * 2);
+	m_hires_artifact_map = std::make_unique<uint16_t[]>(8 * 2 * 2);
 
 	/* build hires artifact map */
 	for (i = 0; i < 8; i++)
@@ -731,7 +726,7 @@ void a2_video_device::device_start()
 	}
 
 	/* 2^4 dependent pixels */
-	m_dhires_artifact_map = std::make_unique<UINT16[]>(16);
+	m_dhires_artifact_map = std::make_unique<uint16_t[]>(16);
 
 	/* build double hires artifact map */
 	for (i = 0; i < 16; i++)
@@ -762,12 +757,12 @@ void a2_video_device::device_reset()
 	m_sysconfig = 0;
 }
 
-void a2_video_device::plot_text_character(bitmap_ind16 &bitmap, int xpos, int ypos, int xscale, UINT32 code,
-	const UINT8 *textgfx_data, UINT32 textgfx_datalen, int fg, int bg)
+void a2_video_device::plot_text_character(bitmap_ind16 &bitmap, int xpos, int ypos, int xscale, uint32_t code,
+	const uint8_t *textgfx_data, uint32_t textgfx_datalen, int fg, int bg)
 {
 	int x, y, i;
-	const UINT8 *chardata;
-	UINT16 color;
+	const uint8_t *chardata;
+	uint16_t color;
 
 	if (!m_altcharset)
 	{
@@ -811,12 +806,12 @@ void a2_video_device::plot_text_character(bitmap_ind16 &bitmap, int xpos, int yp
 	}
 }
 
-void a2_video_device::plot_text_character_orig(bitmap_ind16 &bitmap, int xpos, int ypos, int xscale, UINT32 code,
-	const UINT8 *textgfx_data, UINT32 textgfx_datalen, int fg, int bg)
+void a2_video_device::plot_text_character_orig(bitmap_ind16 &bitmap, int xpos, int ypos, int xscale, uint32_t code,
+	const uint8_t *textgfx_data, uint32_t textgfx_datalen, int fg, int bg)
 {
 	int x, y, i;
-	const UINT8 *chardata;
-	UINT16 color;
+	const uint8_t *chardata;
+	uint16_t color;
 
 	if ((code >= 0x40) && (code <= 0x7f))
 	{
@@ -851,12 +846,12 @@ void a2_video_device::plot_text_character_orig(bitmap_ind16 &bitmap, int xpos, i
 	}
 }
 
-void a2_video_device::plot_text_character_jplus(bitmap_ind16 &bitmap, int xpos, int ypos, int xscale, UINT32 code,
-	const UINT8 *textgfx_data, UINT32 textgfx_datalen, int fg, int bg)
+void a2_video_device::plot_text_character_jplus(bitmap_ind16 &bitmap, int xpos, int ypos, int xscale, uint32_t code,
+	const uint8_t *textgfx_data, uint32_t textgfx_datalen, int fg, int bg)
 {
 	int x, y, i;
-	const UINT8 *chardata;
-	UINT16 color;
+	const uint8_t *chardata;
+	uint16_t color;
 
 	if ((code >= 0x40) && (code <= 0x7f))
 	{
@@ -897,12 +892,12 @@ void a2_video_device::plot_text_character_jplus(bitmap_ind16 &bitmap, int xpos, 
 	}
 }
 
-void a2_video_device::plot_text_character_ultr(bitmap_ind16 &bitmap, int xpos, int ypos, int xscale, UINT32 code,
-	const UINT8 *textgfx_data, UINT32 textgfx_datalen, int fg, int bg)
+void a2_video_device::plot_text_character_ultr(bitmap_ind16 &bitmap, int xpos, int ypos, int xscale, uint32_t code,
+	const uint8_t *textgfx_data, uint32_t textgfx_datalen, int fg, int bg)
 {
 	int x, y, i;
-	const UINT8 *chardata;
-	UINT16 color;
+	const uint8_t *chardata;
+	uint16_t color;
 
 	if ((code >= 0x40) && (code <= 0x7f))
 	{
@@ -934,9 +929,9 @@ void a2_video_device::plot_text_character_ultr(bitmap_ind16 &bitmap, int xpos, i
 void a2_video_device::lores_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow)
 {
 	int row, col, y, x;
-	UINT8 code;
-	UINT32 start_address = m_page2 ? 0x0800 : 0x0400;
-	UINT32 address;
+	uint8_t code;
+	uint32_t start_address = m_page2 ? 0x0800 : 0x0400;
+	uint32_t address;
 	int fg = 0;
 
 	switch (m_sysconfig & 0x03)
@@ -948,8 +943,8 @@ void a2_video_device::lores_update(screen_device &screen, bitmap_ind16 &bitmap, 
 	}
 
 	/* perform adjustments */
-	beginrow = MAX(beginrow, cliprect.min_y - (cliprect.min_y % 8));
-	endrow = MIN(endrow, cliprect.max_y - (cliprect.max_y % 8) + 7);
+	beginrow = std::max(beginrow, cliprect.min_y - (cliprect.min_y % 8));
+	endrow = std::min(endrow, cliprect.max_y - (cliprect.max_y % 8) + 7);
 
 	if (!(m_sysconfig & 0x03))
 	{
@@ -983,7 +978,7 @@ void a2_video_device::lores_update(screen_device &screen, bitmap_ind16 &bitmap, 
 		{
 			for (col = 0; col < 40; col++)
 			{
-				UINT8 bits;
+				uint8_t bits;
 
 				/* calculate adderss */
 				address = start_address + ((((row/8) & 0x07) << 7) | (((row/8) & 0x18) * 5 + col));
@@ -1015,9 +1010,9 @@ void a2_video_device::lores_update(screen_device &screen, bitmap_ind16 &bitmap, 
 void a2_video_device::dlores_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow)
 {
 	int row, col, y;
-	UINT8 code, auxcode;
-	UINT32 start_address = m_page2 ? 0x0800 : 0x0400;
-	UINT32 address;
+	uint8_t code, auxcode;
+	uint32_t start_address = m_page2 ? 0x0800 : 0x0400;
+	uint32_t address;
 	static const int aux_colors[16] = { 0, 2, 4, 6, 8, 0xa, 0xc, 0xe, 1, 3, 5, 7, 9, 0xb, 0xd, 0xf };
 	int fg = 0;
 
@@ -1030,8 +1025,8 @@ void a2_video_device::dlores_update(screen_device &screen, bitmap_ind16 &bitmap,
 	}
 
 	/* perform adjustments */
-	beginrow = MAX(beginrow, cliprect.min_y - (cliprect.min_y % 8));
-	endrow = MIN(endrow, cliprect.max_y - (cliprect.max_y % 8) + 7);
+	beginrow = std::max(beginrow, cliprect.min_y - (cliprect.min_y % 8));
+	endrow = std::min(endrow, cliprect.max_y - (cliprect.max_y % 8) + 7);
 
 	if (!(m_sysconfig & 0x03))
 	{
@@ -1049,7 +1044,7 @@ void a2_video_device::dlores_update(screen_device &screen, bitmap_ind16 &bitmap,
 				/* and now draw */
 				for (y = 0; y < 4; y++)
 				{
-					UINT16 *vram = &bitmap.pix16(row + y, (col * 14));
+					uint16_t *vram = &bitmap.pix16(row + y, (col * 14));
 
 					*vram++ = aux_colors[(auxcode >> 0) & 0x0F];
 					*vram++ = aux_colors[(auxcode >> 0) & 0x0F];
@@ -1068,7 +1063,7 @@ void a2_video_device::dlores_update(screen_device &screen, bitmap_ind16 &bitmap,
 				}
 				for (y = 4; y < 8; y++)
 				{
-					UINT16 *vram = &bitmap.pix16(row + y, (col * 14));
+					uint16_t *vram = &bitmap.pix16(row + y, (col * 14));
 
 					*vram++ = aux_colors[(auxcode >> 4) & 0x0F];
 					*vram++ = aux_colors[(auxcode >> 4) & 0x0F];
@@ -1094,7 +1089,7 @@ void a2_video_device::dlores_update(screen_device &screen, bitmap_ind16 &bitmap,
 		{
 			for (col = 0; col < 40; col++)
 			{
-				UINT8 bits, abits;
+				uint8_t bits, abits;
 
 				/* calculate adderss */
 				address = start_address + ((((row/8) & 0x07) << 7) | (((row/8) & 0x18) * 5 + col));
@@ -1109,7 +1104,7 @@ void a2_video_device::dlores_update(screen_device &screen, bitmap_ind16 &bitmap,
 				/* and now draw */
 				for (y = 0; y < 4; y++)
 				{
-					UINT16 *vram = &bitmap.pix16(row + y, (col * 14));
+					uint16_t *vram = &bitmap.pix16(row + y, (col * 14));
 
 					*vram++ = abits & (1 << 0) ? fg : 0;
 					*vram++ = abits & (1 << 1) ? fg : 0;
@@ -1132,7 +1127,7 @@ void a2_video_device::dlores_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 				for (y = 4; y < 8; y++)
 				{
-					UINT16 *vram = &bitmap.pix16(row + y, (col * 14));
+					uint16_t *vram = &bitmap.pix16(row + y, (col * 14));
 
 					*vram++ = abits & (1 << 0) ? fg : 0;
 					*vram++ = abits & (1 << 1) ? fg : 0;
@@ -1157,9 +1152,9 @@ void a2_video_device::dlores_update(screen_device &screen, bitmap_ind16 &bitmap,
 void a2_video_device::text_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow)
 {
 	int row, col;
-	UINT32 start_address;
-	UINT32 address;
-	UINT8 *aux_page = m_ram_ptr;
+	uint32_t start_address;
+	uint32_t address;
+	uint8_t *aux_page = m_ram_ptr;
 	int fg = 0;
 	int bg = 0;
 
@@ -1176,8 +1171,8 @@ void a2_video_device::text_update(screen_device &screen, bitmap_ind16 &bitmap, c
 		start_address = m_page2 ? 0x800 : 0x400;
 	}
 
-	beginrow = MAX(beginrow, cliprect.min_y - (cliprect.min_y % 8));
-	endrow = MIN(endrow, cliprect.max_y - (cliprect.max_y % 8) + 7);
+	beginrow = std::max(beginrow, cliprect.min_y - (cliprect.min_y % 8));
+	endrow = std::min(endrow, cliprect.max_y - (cliprect.max_y % 8) + 7);
 
 	switch (m_sysconfig & 0x03)
 	{
@@ -1218,13 +1213,13 @@ void a2_video_device::text_update(screen_device &screen, bitmap_ind16 &bitmap, c
 void a2_video_device::text_update_orig(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow)
 {
 	int row, col;
-	UINT32 start_address = m_page2 ? 0x800 : 0x400;
-	UINT32 address;
+	uint32_t start_address = m_page2 ? 0x800 : 0x400;
+	uint32_t address;
 	int fg = 0;
 	int bg = 0;
 
-	beginrow = MAX(beginrow, cliprect.min_y - (cliprect.min_y % 8));
-	endrow = MIN(endrow, cliprect.max_y - (cliprect.max_y % 8) + 7);
+	beginrow = std::max(beginrow, cliprect.min_y - (cliprect.min_y % 8));
+	endrow = std::min(endrow, cliprect.max_y - (cliprect.max_y % 8) + 7);
 
 	switch (m_sysconfig & 0x03)
 	{
@@ -1249,13 +1244,13 @@ void a2_video_device::text_update_orig(screen_device &screen, bitmap_ind16 &bitm
 void a2_video_device::text_update_jplus(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow)
 {
 	int row, col;
-	UINT32 start_address = m_page2 ? 0x800 : 0x400;
-	UINT32 address;
+	uint32_t start_address = m_page2 ? 0x800 : 0x400;
+	uint32_t address;
 	int fg = 0;
 	int bg = 0;
 
-	beginrow = MAX(beginrow, cliprect.min_y - (cliprect.min_y % 8));
-	endrow = MIN(endrow, cliprect.max_y - (cliprect.max_y % 8) + 7);
+	beginrow = std::max(beginrow, cliprect.min_y - (cliprect.min_y % 8));
+	endrow = std::min(endrow, cliprect.max_y - (cliprect.max_y % 8) + 7);
 
 	switch (m_sysconfig & 0x03)
 	{
@@ -1280,13 +1275,13 @@ void a2_video_device::text_update_jplus(screen_device &screen, bitmap_ind16 &bit
 void a2_video_device::text_update_ultr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow)
 {
 	int row, col;
-	UINT32 start_address = m_page2 ? 0x800 : 0x400;
-	UINT32 address;
+	uint32_t start_address = m_page2 ? 0x800 : 0x400;
+	uint32_t address;
 	int fg = 0;
 	int bg = 0;
 
-	beginrow = MAX(beginrow, cliprect.min_y - (cliprect.min_y % 8));
-	endrow = MIN(endrow, cliprect.max_y - (cliprect.max_y % 8) + 7);
+	beginrow = std::max(beginrow, cliprect.min_y - (cliprect.min_y % 8));
+	endrow = std::min(endrow, cliprect.max_y - (cliprect.max_y % 8) + 7);
 
 	switch (m_sysconfig & 0x03)
 	{
@@ -1310,14 +1305,14 @@ void a2_video_device::text_update_ultr(screen_device &screen, bitmap_ind16 &bitm
 
 void a2_video_device::hgr_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow)
 {
-	const UINT8 *vram;
+	const uint8_t *vram;
 	int row, col, b;
 	int offset;
-	UINT8 vram_row[42];
-	UINT16 v;
-	UINT16 *p;
-	UINT32 w;
-	UINT16 *artifact_map_ptr;
+	uint8_t vram_row[42];
+	uint16_t v;
+	uint16_t *p;
+	uint32_t w;
+	uint16_t *artifact_map_ptr;
 	int mon_type = m_sysconfig & 0x03;
 	int begincol = 0, endcol = 40;
 
@@ -1358,9 +1353,9 @@ void a2_video_device::hgr_update(screen_device &screen, bitmap_ind16 &bitmap, co
 
 		for (col = 0; col < 40; col++)
 		{
-			w =     (((UINT32) vram_row[col+0] & 0x7f) <<  0)
-				|   (((UINT32) vram_row[col+1] & 0x7f) <<  7)
-				|   (((UINT32) vram_row[col+2] & 0x7f) << 14);
+			w =     (((uint32_t) vram_row[col+0] & 0x7f) <<  0)
+				|   (((uint32_t) vram_row[col+1] & 0x7f) <<  7)
+				|   (((uint32_t) vram_row[col+2] & 0x7f) << 14);
 
 
 			// verified on h/w: setting dhires w/o 80col emulates a rev. 0 Apple ][ with no orange/blue
@@ -1371,6 +1366,12 @@ void a2_video_device::hgr_update(screen_device &screen, bitmap_ind16 &bitmap, co
 			else
 			{
 				artifact_map_ptr = &m_hires_artifact_map[((vram_row[col + 1] & 0x80) >> 7) * 16];
+			}
+
+			// CEC mono HGR mode
+			if ((m_monohgr) && (mon_type == 0))
+			{
+				mon_type = 1;
 			}
 
 			switch (mon_type)
@@ -1424,14 +1425,14 @@ void a2_video_device::hgr_update(screen_device &screen, bitmap_ind16 &bitmap, co
 // similar to regular A2 except page 2 is at $A000
 void a2_video_device::hgr_update_tk2000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow)
 {
-	const UINT8 *vram;
+	const uint8_t *vram;
 	int row, col, b;
 	int offset;
-	UINT8 vram_row[42];
-	UINT16 v;
-	UINT16 *p;
-	UINT32 w;
-	UINT16 *artifact_map_ptr;
+	uint8_t vram_row[42];
+	uint16_t v;
+	uint16_t *p;
+	uint32_t w;
+	uint16_t *artifact_map_ptr;
 	int mon_type = m_sysconfig & 0x03;
 
 	/* sanity checks */
@@ -1459,9 +1460,9 @@ void a2_video_device::hgr_update_tk2000(screen_device &screen, bitmap_ind16 &bit
 
 		for (col = 0; col < 40; col++)
 		{
-			w =     (((UINT32) vram_row[col+0] & 0x7f) <<  0)
-				|   (((UINT32) vram_row[col+1] & 0x7f) <<  7)
-				|   (((UINT32) vram_row[col+2] & 0x7f) << 14);
+			w =     (((uint32_t) vram_row[col+0] & 0x7f) <<  0)
+				|   (((uint32_t) vram_row[col+1] & 0x7f) <<  7)
+				|   (((uint32_t) vram_row[col+2] & 0x7f) << 14);
 
 			switch (mon_type)
 			{
@@ -1514,13 +1515,13 @@ void a2_video_device::hgr_update_tk2000(screen_device &screen, bitmap_ind16 &bit
 
 void a2_video_device::dhgr_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow)
 {
-	const UINT8 *vram, *vaux;
+	const uint8_t *vram, *vaux;
 	int row, col, b;
 	int offset;
-	UINT8 vram_row[82];
-	UINT16 v;
-	UINT16 *p;
-	UINT32 w;
+	uint8_t vram_row[82];
+	uint16_t v;
+	uint16_t *p;
+	uint32_t w;
 	int page = m_page2 ? 0x4000 : 0x2000;
 	int mon_type = m_sysconfig & 0x03;
 
@@ -1559,9 +1560,9 @@ void a2_video_device::dhgr_update(screen_device &screen, bitmap_ind16 &bitmap, c
 
 		for (col = 0; col < 80; col++)
 		{
-			w =     (((UINT32) vram_row[col+0] & 0x7f) <<  0)
-				|   (((UINT32) vram_row[col+1] & 0x7f) <<  7)
-				|   (((UINT32) vram_row[col+2] & 0x7f) << 14);
+			w =     (((uint32_t) vram_row[col+0] & 0x7f) <<  0)
+				|   (((uint32_t) vram_row[col+1] & 0x7f) <<  7)
+				|   (((uint32_t) vram_row[col+2] & 0x7f) << 14);
 
 			switch (mon_type)
 			{
@@ -1613,7 +1614,7 @@ void a2_video_device::dhgr_update(screen_device &screen, bitmap_ind16 &bitmap, c
  */
 static const rgb_t apple2_palette[] =
 {
-	rgb_t::black,
+	rgb_t::black(),
 	rgb_t(0xE3, 0x1E, 0x60), /* Dark Red */
 	rgb_t(0x60, 0x4E, 0xBD), /* Dark Blue */
 	rgb_t(0xFF, 0x44, 0xFD), /* Purple */

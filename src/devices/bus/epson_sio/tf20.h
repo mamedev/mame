@@ -8,17 +8,16 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_EPSON_SIO_TF20_H
+#define MAME_BUS_EPSON_SIO_TF20_H
+
 #pragma once
 
-#ifndef __TF20_H__
-#define __TF20_H__
-
-#include "emu.h"
+#include "epson_sio.h"
 #include "cpu/z80/z80.h"
 #include "machine/ram.h"
 #include "machine/upd765.h"
 #include "machine/z80dart.h"
-#include "epson_sio.h"
 
 
 //**************************************************************************
@@ -30,17 +29,29 @@ class epson_tf20_device : public device_t,
 {
 public:
 	// construction/destruction
-	epson_tf20_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-	// optional information overrides
-	virtual const rom_entry *device_rom_region() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual ioport_constructor device_input_ports() const override;
+	epson_tf20_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// not really public
 	DECLARE_READ8_MEMBER( rom_disable_r );
 	DECLARE_READ8_MEMBER( upd765_tc_r );
 	DECLARE_WRITE8_MEMBER( fdc_control_w );
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+	// optional information overrides
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override;
+
+	// device_epson_sio_interface overrides
+	virtual void tx_w(int level) override;
+	virtual void pout_w(int level) override;
+
+private:
 	IRQ_CALLBACK_MEMBER( irq_callback );
 	DECLARE_WRITE_LINE_MEMBER( txda_w );
 	DECLARE_WRITE_LINE_MEMBER( dtra_w );
@@ -49,17 +60,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( rxc_w );
 	DECLARE_WRITE_LINE_MEMBER( pinc_w );
 
-protected:
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-
-	// device_epson_sio_interface overrides
-	virtual void tx_w(int level) override;
-	virtual void pout_w(int level) override;
-
-private:
 	required_device<cpu_device> m_cpu;
 	required_device<ram_device> m_ram;
 	required_device<upd765a_device> m_fdc;
@@ -85,7 +85,7 @@ private:
 
 
 // device type definition
-extern const device_type EPSON_TF20;
+DECLARE_DEVICE_TYPE(EPSON_TF20, epson_tf20_device)
 
 
-#endif // __TF20_H__
+#endif // MAME_BUS_EPSON_SIO_TF20_H

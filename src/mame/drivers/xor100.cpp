@@ -4,6 +4,11 @@
 
         XOR S-100-12
 
+        XOR Data Science was apparently a 1982 reincorporation of a Huntington Beach-based
+        company previously known as Delta Products. At least some of the S-100 boards used
+        in XOR's systems were originally developed and documented under the former company
+        name.
+
 *****************************************************************************************************
 
         All input must be in upper case.
@@ -35,6 +40,7 @@
 */
 
 
+#include "emu.h"
 #include "includes/xor100.h"
 #include "bus/rs232/rs232.h"
 
@@ -65,7 +71,7 @@ void xor100_state::bankswitch()
 			program.unmap_write(0x0000, 0xffff);
 		}
 
-		program.install_read_bank(0x0000, 0xf7ff, 0x07ff, 0, "bank2");
+		program.install_read_bank(0x0000, 0x07ff, 0xf000, "bank2");
 		program.install_read_bank(0xf800, 0xffff, "bank3");
 		membank("bank2")->set_entry(0);
 		membank("bank3")->set_entry(0);
@@ -184,7 +190,7 @@ READ8_MEMBER( xor100_state::fdc_wait_r )
 
 	*/
 
-	if (!space.debugger_access())
+	if (!machine().side_effect_disabled())
 	{
 		if (!m_fdc_irq && !m_fdc_drq)
 		{
@@ -360,20 +366,6 @@ static INPUT_PORTS_START( xor100 )
 	PORT_CONFSETTING( 0x01, "Disabled" )
 INPUT_PORTS_END
 
-/* COM5016 Interface */
-
-WRITE_LINE_MEMBER( xor100_state::com5016_fr_w )
-{
-	m_uart_a->write_txc(state);
-	m_uart_a->write_rxc(state);
-}
-
-WRITE_LINE_MEMBER( xor100_state::com5016_ft_w )
-{
-	m_uart_b->write_txc(state);
-	m_uart_b->write_rxc(state);
-}
-
 /* Printer 8255A Interface */
 
 WRITE_LINE_MEMBER( xor100_state::write_centronics_busy )
@@ -403,7 +395,7 @@ READ8_MEMBER(xor100_state::i8255_pc_r)
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	/* on line */
 	data |= m_centronics_select << 4;
@@ -475,8 +467,8 @@ SLOT_INTERFACE_END
 void xor100_state::machine_start()
 {
 	int banks = m_ram->size() / 0x10000;
-	UINT8 *ram = m_ram->pointer();
-	UINT8 *rom = m_rom->base();
+	uint8_t *ram = m_ram->pointer();
+	uint8_t *rom = m_rom->base();
 
 	/* setup memory banking */
 	membank("bank1")->configure_entries(1, banks, ram, 0x10000);
@@ -511,7 +503,7 @@ void xor100_state::post_load()
 
 /* Machine Driver */
 
-static MACHINE_CONFIG_START( xor100, xor100_state )
+static MACHINE_CONFIG_START( xor100 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_8MHz/2)
 	MCFG_CPU_PROGRAM_MAP(xor100_mem)
@@ -539,8 +531,10 @@ static MACHINE_CONFIG_START( xor100, xor100_state )
 	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 
 	MCFG_DEVICE_ADD(COM5016_TAG, COM8116, XTAL_5_0688MHz)
-	MCFG_COM8116_FR_HANDLER(WRITELINE(xor100_state, com5016_fr_w))
-	MCFG_COM8116_FT_HANDLER(WRITELINE(xor100_state, com5016_ft_w))
+	MCFG_COM8116_FR_HANDLER(DEVWRITELINE(I8251_A_TAG, i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE(I8251_A_TAG, i8251_device, write_rxc))
+	MCFG_COM8116_FT_HANDLER(DEVWRITELINE(I8251_B_TAG, i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE(I8251_B_TAG, i8251_device, write_rxc))
 
 	MCFG_DEVICE_ADD(I8255A_TAG, I8255A, 0)
 	MCFG_I8255_OUT_PORTA_CB(DEVWRITE8("cent_data_out", output_latch_device, write))
@@ -567,18 +561,18 @@ static MACHINE_CONFIG_START( xor100, xor100_state )
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
 	// S-100
-	MCFG_S100_BUS_ADD()
+	MCFG_DEVICE_ADD(S100_TAG, S100_BUS, XTAL_8MHz/4)
 	MCFG_S100_RDY_CALLBACK(INPUTLINE(Z80_TAG, Z80_INPUT_LINE_BOGUSWAIT))
-	MCFG_S100_SLOT_ADD("s100_1", xor100_s100_cards, nullptr)
-	MCFG_S100_SLOT_ADD("s100_2", xor100_s100_cards, nullptr)
-	MCFG_S100_SLOT_ADD("s100_3", xor100_s100_cards, nullptr)
-	MCFG_S100_SLOT_ADD("s100_4", xor100_s100_cards, nullptr)
-	MCFG_S100_SLOT_ADD("s100_5", xor100_s100_cards, nullptr)
-	MCFG_S100_SLOT_ADD("s100_6", xor100_s100_cards, nullptr)
-	MCFG_S100_SLOT_ADD("s100_7", xor100_s100_cards, nullptr)
-	MCFG_S100_SLOT_ADD("s100_8", xor100_s100_cards, nullptr)
-	MCFG_S100_SLOT_ADD("s100_9", xor100_s100_cards, nullptr)
-	MCFG_S100_SLOT_ADD("s100_10", xor100_s100_cards, nullptr)
+	MCFG_S100_SLOT_ADD(S100_TAG ":1", xor100_s100_cards, nullptr)
+	MCFG_S100_SLOT_ADD(S100_TAG ":2", xor100_s100_cards, nullptr)
+	MCFG_S100_SLOT_ADD(S100_TAG ":3", xor100_s100_cards, nullptr)
+	MCFG_S100_SLOT_ADD(S100_TAG ":4", xor100_s100_cards, nullptr)
+	MCFG_S100_SLOT_ADD(S100_TAG ":5", xor100_s100_cards, nullptr)
+	MCFG_S100_SLOT_ADD(S100_TAG ":6", xor100_s100_cards, nullptr)
+	MCFG_S100_SLOT_ADD(S100_TAG ":7", xor100_s100_cards, nullptr)
+	MCFG_S100_SLOT_ADD(S100_TAG ":8", xor100_s100_cards, nullptr)
+	MCFG_S100_SLOT_ADD(S100_TAG ":9", xor100_s100_cards, nullptr)
+	MCFG_S100_SLOT_ADD(S100_TAG ":10", xor100_s100_cards, nullptr)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -596,5 +590,5 @@ ROM_END
 
 /* System Drivers */
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT       INIT    COMPANY                 FULLNAME        FLAGS */
-COMP( 1980, xor100, 0,      0,      xor100,     xor100, driver_device,     0,   "Xor Data Science",     "XOR S-100-12", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW)
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   STATE         INIT  COMPANY             FULLNAME        FLAGS
+COMP( 1980, xor100, 0,      0,      xor100,  xor100, xor100_state, 0,    "XOR Data Science", "XOR S-100-12", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )

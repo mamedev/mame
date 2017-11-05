@@ -24,17 +24,13 @@ Notes:
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/spdodgeb.h"
+
 #include "cpu/m6502/m6502.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/3812intf.h"
-#include "includes/spdodgeb.h"
+#include "speaker.h"
 
-
-WRITE8_MEMBER(spdodgeb_state::sound_command_w)
-{
-	soundlatch_byte_w(space, offset, data);
-	m_audiocpu->set_input_line(M6809_IRQ_LINE, HOLD_LINE);
-}
 
 WRITE8_MEMBER(spdodgeb_state::spd_adpcm_w)
 {
@@ -77,7 +73,7 @@ void spdodgeb_state::spd_adpcm_int( msm5205_device *device, int chip )
 	}
 	else
 	{
-		UINT8 *ROM = memregion("adpcm")->base() + 0x10000 * chip;
+		uint8_t *ROM = memregion("adpcm")->base() + 0x10000 * chip;
 
 		m_adpcm_data[chip] = ROM[m_adpcm_pos[chip]++];
 		device->data_w(m_adpcm_data[chip] >> 4);
@@ -166,8 +162,8 @@ void spdodgeb_state::mcu63705_update_inputs()
 #define A 0x10
 #define D 0x20
 
-	UINT8 curr_port[2];
-	UINT8 curr_dash[2];
+	uint8_t curr_port[2];
+	uint8_t curr_dash[2];
 	int p;
 
 	for (p=0; p<=1; p++)
@@ -246,7 +242,7 @@ static ADDRESS_MAP_START( spdodgeb_map, AS_PROGRAM, 8, spdodgeb_state )
 	AM_RANGE(0x2000, 0x2fff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x3000, 0x3000) AM_READ_PORT("IN0") //AM_WRITENOP
 	AM_RANGE(0x3001, 0x3001) AM_READ_PORT("DSW") //AM_WRITENOP
-	AM_RANGE(0x3002, 0x3002) AM_WRITE(sound_command_w)
+	AM_RANGE(0x3002, 0x3002) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 //  AM_RANGE(0x3003, 0x3003) AM_WRITENOP
 	AM_RANGE(0x3004, 0x3004) AM_WRITE(scrollx_lo_w)
 //  AM_RANGE(0x3005, 0x3005) AM_WRITENOP         /* mcu63701_output_w */
@@ -259,10 +255,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( spdodgeb_sound_map, AS_PROGRAM, 8, spdodgeb_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x1000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x1000, 0x1000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x2800, 0x2801) AM_DEVWRITE("ymsnd", ym3812_device, write)
 	AM_RANGE(0x3800, 0x3807) AM_WRITE(spd_adpcm_w)
-	AM_RANGE(0x8000, 0xffff) AM_ROM
+	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("audiocpu", 0)
 ADDRESS_MAP_END
 
 
@@ -374,8 +370,8 @@ static const gfx_layout spritelayout =
 };
 
 static GFXDECODE_START( spdodgeb )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0x000, 32 )   /* colors 0x000-0x1ff */
-	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0x200, 32 )   /* colors 0x200-0x3ff */
+	GFXDECODE_ENTRY( "text", 0, charlayout,   0x000, 32 )   /* colors 0x000-0x1ff */
+	GFXDECODE_ENTRY( "sprites", 0, spritelayout, 0x200, 32 )   /* colors 0x200-0x3ff */
 GFXDECODE_END
 
 
@@ -407,7 +403,7 @@ void spdodgeb_state::machine_reset()
 	m_last_dash[0] = m_last_dash[1] = 0;
 }
 
-static MACHINE_CONFIG_START( spdodgeb, spdodgeb_state )
+static MACHINE_CONFIG_START( spdodgeb )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, XTAL_12MHz/6)   /* 2MHz ? */
@@ -430,6 +426,9 @@ static MACHINE_CONFIG_START( spdodgeb, spdodgeb_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", M6809_IRQ_LINE))
+
 	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_12MHz/4)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", M6809_FIRQ_LINE))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
@@ -437,13 +436,13 @@ static MACHINE_CONFIG_START( spdodgeb, spdodgeb_state )
 
 	MCFG_SOUND_ADD("msm1", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(spdodgeb_state, spd_adpcm_int_1))  /* interrupt function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)  /* 8kHz? */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)  /* 8kHz? */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 
 	MCFG_SOUND_ADD("msm2", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(spdodgeb_state, spd_adpcm_int_2))  /* interrupt function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)  /* 8kHz? */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)  /* 8kHz? */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 MACHINE_CONFIG_END
@@ -451,22 +450,21 @@ MACHINE_CONFIG_END
 
 
 ROM_START( spdodgeb )
-	ROM_REGION( 0x18000, "maincpu", 0 )
-	ROM_LOAD( "22a-04.139",   0x10000, 0x08000, CRC(66071fda) SHA1(4a239295900e6234a2a693321ca821671747a58e) )  /* Two banks */
-	ROM_CONTINUE(             0x08000, 0x08000 )         /* Static code */
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "22a-04.139",   0x00000, 0x10000, CRC(66071fda) SHA1(4a239295900e6234a2a693321ca821671747a58e) )  /* First 0x8000: Two banks, second 0x8000: Static */
 
-	ROM_REGION( 0x10000, "audiocpu", 0 ) /* audio cpu */
-	ROM_LOAD( "22j5-0.33",    0x08000, 0x08000, CRC(c31e264e) SHA1(0828a2094122e3934b784ec9ad7c2b89d91a83bb) )
+	ROM_REGION( 0x08000, "audiocpu", 0 ) /* audio cpu */
+	ROM_LOAD( "22j5-0.33",    0x00000, 0x08000, CRC(c31e264e) SHA1(0828a2094122e3934b784ec9ad7c2b89d91a83bb) )
 
 	ROM_REGION( 0x10000, "mcu", 0 ) /* I/O mcu */
 	/* Not hooked up yet, we need to add HD63701Y0 support to the hd63701 core (with extra io ports, serial ports, and timers). */
 	ROM_LOAD( "22ja-0.162",   0x0c000, 0x04000, CRC(7162a97b) SHA1(d6d4ee025e73a340428345f08711cd32f9169a8c) )
 
-	ROM_REGION( 0x40000, "gfx1", 0 ) /* text */
+	ROM_REGION( 0x40000, "text", 0 ) /* text */
 	ROM_LOAD( "22a-4.121",    0x00000, 0x20000, CRC(acc26051) SHA1(445224238cce420990894824d95447e3f63a9ef0) )
 	ROM_LOAD( "22a-3.107",    0x20000, 0x20000, CRC(10bb800d) SHA1(265a3d67669034d17713b505ef55cd1c90f8d205) )
 
-	ROM_REGION( 0x40000, "gfx2", 0 )
+	ROM_REGION( 0x40000, "sprites", 0 )
 	ROM_LOAD( "22a-1.2",      0x00000, 0x20000, CRC(3bd1c3ec) SHA1(40f61552ea6f7a81915fe3e13f75dc1dc69da33e) )
 	ROM_LOAD( "22a-2.35",     0x20000, 0x20000, CRC(409e1be1) SHA1(35a77fc8fe6fc212734e2f452dbde9b8cf696f61) )
 
@@ -511,22 +509,21 @@ TJ22J2-0.35 /
 */
 
 ROM_START( nkdodge )
-	ROM_REGION( 0x18000, "maincpu", 0 )
-	ROM_LOAD( "22j4-0.139",   0x10000, 0x08000, CRC(aa674fd8) SHA1(4e8d3e07b54d23b221cb39cf10389bc7a56c4021) )  /* Two banks */
-	ROM_CONTINUE(             0x08000, 0x08000 )         /* Static code */
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "22j4-0.139",   0x00000, 0x10000, CRC(aa674fd8) SHA1(4e8d3e07b54d23b221cb39cf10389bc7a56c4021) )  /* First 0x8000: Two banks, second 0x8000: Static */
 
-	ROM_REGION( 0x10000, "audiocpu", 0 ) /* audio cpu */
-	ROM_LOAD( "22j5-0.33",    0x08000, 0x08000, CRC(c31e264e) SHA1(0828a2094122e3934b784ec9ad7c2b89d91a83bb) )
+	ROM_REGION( 0x08000, "audiocpu", 0 ) /* audio cpu */
+	ROM_LOAD( "22j5-0.33",    0x00000, 0x08000, CRC(c31e264e) SHA1(0828a2094122e3934b784ec9ad7c2b89d91a83bb) )
 
 	ROM_REGION( 0x10000, "mcu", 0 ) /* I/O mcu */
 	/* Not hooked up yet, we need to add HD63701Y0 support to the hd63701 core (with extra io ports, serial ports, and timers). */
 	ROM_LOAD( "22ja-0.162",   0x0c000, 0x04000, CRC(7162a97b) SHA1(d6d4ee025e73a340428345f08711cd32f9169a8c) )
 
-	ROM_REGION( 0x40000, "gfx1", 0 ) /* text */
+	ROM_REGION( 0x40000, "text", 0 ) /* text */
 	ROM_LOAD( "tj22j4-0.121",    0x00000, 0x20000, CRC(d2922b3f) SHA1(30ad37f8355c732b545017c2fc56879256b650be) )
 	ROM_LOAD( "tj22j3-0.107",    0x20000, 0x20000, CRC(79cd1315) SHA1(2d7a877e59f704b10b5f609e60fa565c68f5fdb0) )
 
-	ROM_REGION( 0x40000, "gfx2", 0 )
+	ROM_REGION( 0x40000, "sprites", 0 )
 	ROM_LOAD( "tj22j1-0.2",      0x00000, 0x20000, CRC(9ed27a8d) SHA1(d80d275bbe91f3e1bd0495a2d7a3be0280a7cda1) )
 	ROM_LOAD( "tj22j2-0.35",     0x20000, 0x20000, CRC(768934f9) SHA1(922f3154dcfb29c2e5c1bebc53247136160f1229) )
 
@@ -542,23 +539,22 @@ ROM_END
 /* the bootleg just seems to have the gfx roms in a different format, program is identical */
 
 ROM_START( nkdodgeb )
-	ROM_REGION( 0x18000, "maincpu", 0 )
-	ROM_LOAD( "12.bin",       0x10000, 0x08000, CRC(aa674fd8) SHA1(4e8d3e07b54d23b221cb39cf10389bc7a56c4021) )  /* Two banks */
-	ROM_CONTINUE(             0x08000, 0x08000 )         /* Static code */
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "12.bin",       0x00000, 0x10000, CRC(aa674fd8) SHA1(4e8d3e07b54d23b221cb39cf10389bc7a56c4021) )  /* First 0x8000: Two banks, second 0x8000: Static */
 
-	ROM_REGION( 0x10000, "audiocpu", 0 ) /* audio cpu */
-	ROM_LOAD( "22j5-0.33",    0x08000, 0x08000, CRC(c31e264e) SHA1(0828a2094122e3934b784ec9ad7c2b89d91a83bb) )
+	ROM_REGION( 0x08000, "audiocpu", 0 ) /* audio cpu */
+	ROM_LOAD( "22j5-0.33",    0x00000, 0x08000, CRC(c31e264e) SHA1(0828a2094122e3934b784ec9ad7c2b89d91a83bb) )
 
 	ROM_REGION( 0x10000, "mcu", 0 ) /* I/O mcu */
 	ROM_LOAD( "63701.bin",    0xc000, 0x4000, NO_DUMP ) /* missing; does this bootleg board use an i/o mcu at all? */
 
-	ROM_REGION( 0x40000, "gfx1", 0 ) /* text */
+	ROM_REGION( 0x40000, "text", 0 ) /* text */
 	ROM_LOAD( "10.bin",       0x00000, 0x10000, CRC(442326fd) SHA1(e0e9e1dfdca3edd6e2522f55c191b40b81b8eaff) )
 	ROM_LOAD( "11.bin",       0x10000, 0x10000, CRC(2140b070) SHA1(7a9d89eb6130b1dd21236fefaeb09a29c7f0d208) )
 	ROM_LOAD( "9.bin",        0x20000, 0x10000, CRC(18660ac1) SHA1(be6a47eea9649d7b9ff8b30a4de643522c9869e6) )
 	ROM_LOAD( "8.bin",        0x30000, 0x10000, CRC(5caae3c9) SHA1(f81a1c4ce2117d41e81542d417ff3573ea0f5313) )
 
-	ROM_REGION( 0x40000, "gfx2", 0 )
+	ROM_REGION( 0x40000, "sprites", 0 )
 	ROM_LOAD( "2.bin",        0x00000, 0x10000, CRC(1271583e) SHA1(98a597f2be1abdac6c4de811cfa8a53549bc6904) )
 	ROM_LOAD( "1.bin",        0x10000, 0x10000, CRC(5ae6cccf) SHA1(6bd385d6559b54c681d05eed2e91bfc2aa3e6844) )
 	ROM_LOAD( "4.bin",        0x20000, 0x10000, CRC(f5022822) SHA1(fa67b1f70da80365f14776b712df6f656e603fb0) )
@@ -575,6 +571,6 @@ ROM_END
 
 
 
-GAME( 1987, spdodgeb, 0,        spdodgeb, spdodgeb, driver_device, 0, ROT0, "Technos Japan", "Super Dodge Ball (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, nkdodge,  spdodgeb, spdodgeb, spdodgeb, driver_device, 0, ROT0, "Technos Japan", "Nekketsu Koukou Dodgeball Bu (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, nkdodgeb, spdodgeb, spdodgeb, spdodgeb, driver_device, 0, ROT0, "bootleg", "Nekketsu Koukou Dodgeball Bu (Japan, bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, spdodgeb, 0,        spdodgeb, spdodgeb, spdodgeb_state, 0, ROT0, "Technos Japan", "Super Dodge Ball (US)",                         MACHINE_SUPPORTS_SAVE )
+GAME( 1987, nkdodge,  spdodgeb, spdodgeb, spdodgeb, spdodgeb_state, 0, ROT0, "Technos Japan", "Nekketsu Koukou Dodgeball Bu (Japan)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1987, nkdodgeb, spdodgeb, spdodgeb, spdodgeb, spdodgeb_state, 0, ROT0, "bootleg",       "Nekketsu Koukou Dodgeball Bu (Japan, bootleg)", MACHINE_SUPPORTS_SAVE )

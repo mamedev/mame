@@ -19,16 +19,16 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_colorram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_colorram;
 
-	UINT8 m_crtc_vreg[0x100];
-	UINT8 m_crtc_index;
-	UINT8 m_flip_scr;
-	UINT8 m_mux_data;
-	UINT8 m_km_status;
-	UINT8 m_coin_settings;
-	UINT8 m_coin_impulse;
+	uint8_t m_crtc_vreg[0x100];
+	uint8_t m_crtc_index;
+	uint8_t m_flip_scr;
+	uint8_t m_mux_data;
+	uint8_t m_km_status;
+	uint8_t m_coin_settings;
+	uint8_t m_coin_impulse;
 
 	DECLARE_READ8_MEMBER(key_matrix_r);
 	DECLARE_WRITE8_MEMBER(key_matrix_w);
@@ -41,7 +41,7 @@ public:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(speedatk);
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	UINT8 iox_key_matrix_calc(UINT8 p_side);
+	uint8_t iox_key_matrix_calc(uint8_t p_side);
 };

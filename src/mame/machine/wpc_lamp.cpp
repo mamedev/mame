@@ -4,10 +4,10 @@
 #include "emu.h"
 #include "wpc_lamp.h"
 
-const device_type WPC_LAMP = &device_creator<wpc_lamp_device>;
+DEFINE_DEVICE_TYPE(WPC_LAMP, wpc_lamp_device, "wpc_lamp", "Williams Pinball Controller Lamp Control")
 
-wpc_lamp_device::wpc_lamp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, WPC_LAMP, "Williams Pinball Controller Lamp Control", tag, owner, clock, "wpc_lamp", __FILE__)
+wpc_lamp_device::wpc_lamp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, WPC_LAMP, tag, owner, clock)
 {
 	names = nullptr;
 }
@@ -60,7 +60,7 @@ void wpc_lamp_device::device_reset()
 void wpc_lamp_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	for(int i=0; i<64; i++) {
-		UINT8 s = state[i];
+		uint8_t s = state[i];
 		state[i] = s >> 1;
 		if((s & 0xc0) == 0x40 || (s & 0xc0) == 0x80) {
 			char buffer[256];

@@ -50,47 +50,57 @@
 
 ****************************************************************************/
 
+#include "emu.h"
 #include "bus/rs232/keyboard.h"
 #include "cpu/s2650/s2650.h"
+#include "cpu/z80/z80daisy.h"
+#include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
-#include "sound/wave.h"
 #include "imagedev/snapquik.h"
+#include "machine/timer.h"
+#include "machine/z80ctc.h"
+#include "machine/z80pio.h"
+#include "sound/wave.h"
+#include "screen.h"
+#include "speaker.h"
 
-#define KEYBOARD_TAG "keyboard"
 
 class binbug_state : public driver_device
 {
 public:
 	binbug_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_rs232(*this, KEYBOARD_TAG),
-		m_cass(*this, "cassette"),
-		m_p_videoram(*this, "videoram"),
-		m_p_attribram(*this, "attribram"),
-		m_maincpu(*this, "maincpu")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_cass(*this, "cassette")
+		, m_p_videoram(*this, "videoram")
+		, m_p_attribram(*this, "attribram")
+		, m_p_chargen(*this, "chargen")
+		, m_rs232(*this, "keyboard")
 	{
 	}
 
 	DECLARE_WRITE8_MEMBER(binbug_ctrl_w);
-	DECLARE_READ8_MEMBER(binbug_serial_r);
+	DECLARE_READ_LINE_MEMBER(binbug_serial_r);
 	DECLARE_WRITE_LINE_MEMBER(binbug_serial_w);
-	const UINT8 *m_p_chargen;
-	UINT8 m_framecnt;
-	virtual void video_start() override;
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	optional_device<rs232_port_device> m_rs232;
-	required_device<cassette_image_device> m_cass;
-	required_shared_ptr<UINT8> m_p_videoram;
-	required_shared_ptr<UINT8> m_p_attribram;
-	required_device<cpu_device> m_maincpu;
 	DECLARE_QUICKLOAD_LOAD_MEMBER( binbug );
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	// needed by dg680 class
+	required_device<cpu_device> m_maincpu;
+	required_device<cassette_image_device> m_cass;
+
+private:
+	uint8_t m_framecnt;
+	required_shared_ptr<uint8_t> m_p_videoram;
+	required_shared_ptr<uint8_t> m_p_attribram;
+	required_region_ptr<u8> m_p_chargen;
+	optional_device<rs232_port_device> m_rs232;
 };
 
 WRITE8_MEMBER( binbug_state::binbug_ctrl_w )
 {
 }
 
-READ8_MEMBER( binbug_state::binbug_serial_r )
+READ_LINE_MEMBER( binbug_state::binbug_serial_r )
 {
 	return m_rs232->rxd_r() & (m_cass->input() < 0.03);
 }
@@ -108,26 +118,20 @@ static ADDRESS_MAP_START(binbug_mem, AS_PROGRAM, 8, binbug_state)
 	AM_RANGE( 0x7c00, 0x7fff) AM_RAM AM_SHARE("attribram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(binbug_io, AS_IO, 8, binbug_state)
+static ADDRESS_MAP_START(binbug_data, AS_DATA, 8, binbug_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(S2650_CTRL_PORT, S2650_CTRL_PORT) AM_WRITE(binbug_ctrl_w)
-	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ(binbug_serial_r)
 ADDRESS_MAP_END
 
 /* Input ports */
 static INPUT_PORTS_START( binbug )
 INPUT_PORTS_END
 
-void binbug_state::video_start()
-{
-	m_p_chargen = memregion("chargen")->base();
-}
-
-UINT32 binbug_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t binbug_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 // attributes bit 0 = flash, bit 1 = lores. Also bit 7 of the character = reverse-video (text only).
-	UINT8 y,ra,chr,gfx,attr,inv,gfxbit;
-	UINT16 sy=0,ma=0,x;
+	uint8_t y,ra,chr,gfx,attr,inv,gfxbit;
+	uint16_t sy=0,ma=0,x;
 	bool flash;
 	m_framecnt++;
 
@@ -135,7 +139,7 @@ UINT32 binbug_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 	{
 		for (ra = 0; ra < 16; ra++)
 		{
-			UINT16 *p = &bitmap.pix16(sy++);
+			uint16_t *p = &bitmap.pix16(sy++);
 
 			for (x = ma; x < ma + 64; x++)
 			{
@@ -224,9 +228,9 @@ QUICKLOAD_LOAD_MEMBER( binbug_state, binbug )
 	int quick_addr = 0x440;
 	int exec_addr;
 	int quick_length;
-	dynamic_buffer quick_data;
+	std::vector<uint8_t> quick_data;
 	int read_;
-	int result = IMAGE_INIT_FAIL;
+	image_init_result result = image_init_result::FAIL;
 
 	quick_length = image.length();
 	if (quick_length < 0x0444)
@@ -273,7 +277,7 @@ QUICKLOAD_LOAD_MEMBER( binbug_state, binbug )
 				// Start the quickload
 				m_maincpu->set_state_int(S2650_PC, exec_addr);
 
-				result = IMAGE_INIT_PASS;
+				result = image_init_result::PASS;
 			}
 		}
 	}
@@ -289,15 +293,16 @@ static DEVICE_INPUT_DEFAULTS_START( keyboard )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
 DEVICE_INPUT_DEFAULTS_END
 
-static MACHINE_CONFIG_START( binbug, binbug_state )
+static MACHINE_CONFIG_START( binbug )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",S2650, XTAL_1MHz)
 	MCFG_CPU_PROGRAM_MAP(binbug_mem)
-	MCFG_CPU_IO_MAP(binbug_io)
-	MCFG_S2650_FLAG_HANDLER(WRITELINE(binbug_state, binbug_serial_w))
+	MCFG_CPU_DATA_MAP(binbug_data)
+	MCFG_S2650_SENSE_INPUT(READLINE(binbug_state, binbug_serial_r))
+	MCFG_S2650_FLAG_OUTPUT(WRITELINE(binbug_state, binbug_serial_w))
 
 	/* video hardware */
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::amber)
+	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::amber())
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_UPDATE_DRIVER(binbug_state, screen_update)
@@ -309,7 +314,7 @@ static MACHINE_CONFIG_START( binbug, binbug_state )
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* Keyboard */
-	MCFG_RS232_PORT_ADD(KEYBOARD_TAG, default_rs232_devices, "keyboard")
+	MCFG_RS232_PORT_ADD("keyboard", default_rs232_devices, "keyboard")
 	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("keyboard", keyboard)
 
 	/* Cassette */
@@ -335,8 +340,8 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   CLASS         INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1980, binbug, pipbug,   0,     binbug,    binbug, driver_device, 0,  "MicroByte", "BINBUG 3.6", 0 )
+//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   CLASS         INIT  COMPANY      FULLNAME      FLAGS
+COMP( 1980, binbug, pipbug,   0,     binbug,    binbug, binbug_state, 0,    "MicroByte", "BINBUG 3.6", 0 )
 
 
 
@@ -399,35 +404,29 @@ ToDo:
 */
 
 
-#include "cpu/z80/z80.h"
-#include "machine/z80ctc.h"
-#include "machine/z80pio.h"
-#include "cpu/z80/z80daisy.h"
-
-
 class dg680_state : public binbug_state
 {
 public:
 	dg680_state(const machine_config &mconfig, device_type type, const char *tag)
-		: binbug_state(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_ctc(*this, "z80ctc"),
-	m_pio(*this, "z80pio")
-	{ }
+		: binbug_state(mconfig, type, tag)
+		, m_ctc(*this, "z80ctc")
+		, m_pio(*this, "z80pio")
+		{ }
 
 	DECLARE_READ8_MEMBER(porta_r);
 	DECLARE_READ8_MEMBER(portb_r);
 	DECLARE_WRITE8_MEMBER(portb_w);
 	DECLARE_READ8_MEMBER(port08_r);
 	DECLARE_WRITE8_MEMBER(port08_w);
-	DECLARE_WRITE8_MEMBER(kbd_put);
+	void kbd_put(u8 data);
 	TIMER_DEVICE_CALLBACK_MEMBER(time_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(uart_tick);
-	UINT8 m_pio_b;
-	UINT8 m_term_data;
-	UINT8 m_protection[0x100];
+
+private:
+	uint8_t m_pio_b;
+	uint8_t m_term_data;
+	uint8_t m_protection[0x100];
 	virtual void machine_reset() override;
-	required_device<cpu_device> m_maincpu;
 	required_device<z80ctc_device> m_ctc;
 	required_device<z80pio_device> m_pio;
 };
@@ -470,7 +469,7 @@ static const z80_daisy_config dg680_daisy_chain[] =
 static INPUT_PORTS_START( dg680 )
 INPUT_PORTS_END
 
-WRITE8_MEMBER( dg680_state::kbd_put )
+void dg680_state::kbd_put(u8 data)
 {
 	m_term_data = data;
 	/* strobe in keyboard data */
@@ -480,7 +479,7 @@ WRITE8_MEMBER( dg680_state::kbd_put )
 
 READ8_MEMBER( dg680_state::porta_r )
 {
-	UINT8 data = m_term_data;
+	uint8_t data = m_term_data;
 	m_term_data = 0;
 	return data;
 }
@@ -499,13 +498,13 @@ WRITE8_MEMBER( dg680_state::portb_w )
 
 READ8_MEMBER( dg680_state::port08_r )
 {
-	UINT8 breg = m_maincpu->state_int(Z80_B);
+	uint8_t breg = m_maincpu->state_int(Z80_B);
 	return m_protection[breg];
 }
 
 WRITE8_MEMBER( dg680_state::port08_w )
 {
-	UINT8 breg = m_maincpu->state_int(Z80_B);
+	uint8_t breg = m_maincpu->state_int(Z80_B);
 	m_protection[breg] = data;
 }
 
@@ -526,7 +525,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(dg680_state::uart_tick)
 	m_ctc->trg3(0);
 }
 
-static MACHINE_CONFIG_START( dg680, dg680_state )
+static MACHINE_CONFIG_START( dg680 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_8MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(dg680_mem)
@@ -534,7 +533,7 @@ static MACHINE_CONFIG_START( dg680, dg680_state )
 	MCFG_Z80_DAISY_CHAIN(dg680_daisy_chain)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::amber)
+	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::amber())
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_UPDATE_DRIVER(binbug_state, screen_update)
@@ -547,7 +546,7 @@ static MACHINE_CONFIG_START( dg680, dg680_state )
 
 	/* Keyboard */
 	MCFG_DEVICE_ADD("keyb", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(WRITE8(dg680_state, kbd_put))
+	MCFG_GENERIC_KEYBOARD_CB(PUT(dg680_state, kbd_put))
 
 	/* Cassette */
 	MCFG_CASSETTE_ADD( "cassette" )
@@ -586,5 +585,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME   PARENT  COMPAT   MACHINE  INPUT    CLASS       INIT    COMPANY            FULLNAME       FLAGS */
-COMP( 1980, dg680, 0,      0,       dg680,   dg680, driver_device, 0,  "David Griffiths", "DG680 with DGOS-Z80 1.4", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME   PARENT  COMPAT   MACHINE  INPUT  CLASS        INIT  COMPANY            FULLNAME                   FLAGS
+COMP( 1980, dg680, 0,      0,       dg680,   dg680, dg680_state, 0,    "David Griffiths", "DG680 with DGOS-Z80 1.4", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

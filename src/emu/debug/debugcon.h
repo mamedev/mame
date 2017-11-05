@@ -8,11 +8,14 @@
 
 *********************************************************************/
 
-#ifndef __DEBUGCON_H__
-#define __DEBUGCON_H__
+#ifndef MAME_EMU_DEBUG_DEBUGCON_H
+#define MAME_EMU_DEBUG_DEBUGCON_H
 
-#include "emu.h"
+#pragma once
+
 #include "textbuf.h"
+
+#include <functional>
 
 
 /***************************************************************************
@@ -66,44 +69,69 @@
 ***************************************************************************/
 
 /* CMDERR is an error code for command evaluation */
-typedef UINT32 CMDERR;
+typedef u32 CMDERR;
 
-
-
-/***************************************************************************
-    FUNCTION PROTOTYPES
-***************************************************************************/
-
-/* initialization */
-void            debug_console_init(running_machine &machine);
-
-/* command handling */
-CMDERR          debug_console_execute_command(running_machine &machine, const char *command, int echo);
-CMDERR          debug_console_validate_command(running_machine &machine, const char *command);
-void            debug_console_register_command(running_machine &machine, const char *command, UINT32 flags, int ref, int minparams, int maxparams, void (*handler)(running_machine &machine, int ref, int params, const char **param));
-const char *    debug_cmderr_to_string(CMDERR error);
-
-/* console management */
-void            debug_console_vprintf(running_machine &machine, util::format_argument_pack<std::ostream> const &args);
-void            debug_console_vprintf(running_machine &machine, util::format_argument_pack<std::ostream> &&args);
-void            debug_console_vprintf_wrap(running_machine &machine, int wrapcol, util::format_argument_pack<std::ostream> const &args);
-void            debug_console_vprintf_wrap(running_machine &machine, int wrapcol, util::format_argument_pack<std::ostream> &&args);
-text_buffer *   debug_console_get_textbuf(void);
-
-/* errorlog management */
-void            debug_errorlog_write_line(const running_machine &machine, const char *line);
-text_buffer *   debug_errorlog_get_textbuf(void);
-
-/* convenience templates */
-template <typename Format, typename... Params>
-inline void debug_console_printf(running_machine &machine, Format &&fmt, Params &&...args)
+class debugger_console
 {
-	debug_console_vprintf(machine, util::make_format_argument_pack(std::forward<Format>(fmt), std::forward<Params>(args)...));
-}
-template <typename Format, typename... Params>
-inline void debug_console_printf_wrap(running_machine &machine, int wrapcol, Format &&fmt, Params &&...args)
-{
-	debug_console_vprintf_wrap(machine, wrapcol, util::make_format_argument_pack(std::forward<Format>(fmt), std::forward<Params>(args)...));
-}
+public:
+	debugger_console(running_machine &machine);
 
-#endif
+	/* command handling */
+	CMDERR          execute_command(const std::string &command, bool echo);
+	CMDERR          validate_command(const char *command);
+	void            register_command(const char *command, u32 flags, int ref, int minparams, int maxparams, std::function<void(int, const std::vector<std::string> &)> handler);
+
+	/* console management */
+	void            vprintf(util::format_argument_pack<std::ostream> const &args);
+	void            vprintf(util::format_argument_pack<std::ostream> &&args);
+	void            vprintf_wrap(int wrapcol, util::format_argument_pack<std::ostream> const &args);
+	void            vprintf_wrap(int wrapcol, util::format_argument_pack<std::ostream> &&args);
+	text_buffer *   get_console_textbuf() const { return m_console_textbuf; }
+
+	/* errorlog management */
+	void            errorlog_write_line(const char *line);
+	text_buffer *   get_errorlog_textbuf() const { return m_errorlog_textbuf; }
+
+	/* convenience templates */
+	template <typename Format, typename... Params>
+	inline void printf(Format &&fmt, Params &&...args)
+	{
+		vprintf(util::make_format_argument_pack(std::forward<Format>(fmt), std::forward<Params>(args)...));
+	}
+	template <typename Format, typename... Params>
+	inline void printf_wrap(int wrapcol, Format &&fmt, Params &&...args)
+	{
+		vprintf_wrap(wrapcol, util::make_format_argument_pack(std::forward<Format>(fmt), std::forward<Params>(args)...));
+	}
+
+	static std::string cmderr_to_string(CMDERR error);
+
+private:
+	void exit();
+
+	void trim_parameter(char **paramptr, bool keep_quotes);
+	CMDERR internal_execute_command(bool execute, int params, char **param);
+	CMDERR internal_parse_command(const std::string &original_command, bool execute);
+
+	struct debug_command
+	{
+		debug_command * next;
+		char            command[32];
+		const char *    params;
+		const char *    help;
+		std::function<void(int, const std::vector<std::string> &)> handler;
+		u32             flags;
+		int             ref;
+		int             minparams;
+		int             maxparams;
+	};
+
+	running_machine &m_machine;
+
+	text_buffer     *m_console_textbuf;
+	text_buffer     *m_errorlog_textbuf;
+
+	debug_command   *m_commandlist;
+};
+
+#endif // MAME_EMU_DEBUG_DEBUGCON_H

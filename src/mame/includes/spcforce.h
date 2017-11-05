@@ -26,16 +26,16 @@ public:
 	required_device<sn76496_device> m_sn2;
 	required_device<sn76496_device> m_sn3;
 
-	required_shared_ptr<UINT8> m_scrollram;
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_colorram;
+	required_shared_ptr<uint8_t> m_scrollram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_colorram;
 
 	int m_sn76496_latch;
 	int m_sn76496_select;
 	int m_sn1_ready;
 	int m_sn2_ready;
 	int m_sn3_ready;
-	UINT8 m_irq_mask;
+	uint8_t m_irq_mask;
 
 	DECLARE_WRITE8_MEMBER(SN76496_latch_w);
 	DECLARE_READ8_MEMBER(SN76496_select_r);
@@ -43,15 +43,17 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_sn1_ready);
 	DECLARE_WRITE_LINE_MEMBER(write_sn2_ready);
 	DECLARE_WRITE_LINE_MEMBER(write_sn3_ready);
-	DECLARE_READ8_MEMBER(t0_r);
+	DECLARE_READ_LINE_MEMBER(t0_r);
 	DECLARE_WRITE8_MEMBER(soundtrigger_w);
-	DECLARE_WRITE8_MEMBER(irq_mask_w);
-	DECLARE_WRITE8_MEMBER(flip_screen_w);
+	DECLARE_WRITE8_MEMBER(misc_outputs_w);
+	DECLARE_WRITE_LINE_MEMBER(irq_mask_w);
+	DECLARE_WRITE_LINE_MEMBER(flip_screen_w);
+	DECLARE_WRITE_LINE_MEMBER(unknown_w);
 
 	virtual void machine_start() override;
 	DECLARE_PALETTE_INIT(spcforce);
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 };

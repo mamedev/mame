@@ -158,13 +158,16 @@ OSC3: 48.384MHz
 */
 
 #include "emu.h"
-#include "includes/namcoic.h"
+#include "includes/namcofl.h"
+#include "machine/namcoic.h"
+
 #include "cpu/i960/i960.h"
 #include "sound/c352.h"
 #include "machine/namcomcu.h"
 #include "machine/nvram.h"
+#include "speaker.h"
+
 #include "namcofl.lh"
-#include "includes/namcofl.h"
 
 
 READ32_MEMBER(namcofl_state::fl_unk1_r)
@@ -188,13 +191,13 @@ WRITE32_MEMBER(namcofl_state::namcofl_sysreg_w)
 	{
 		if (data == 0)  // RAM at 00000000, ROM at 10000000
 		{
-			membank("bank1")->set_base(m_workram.get());
-			membank("bank2")->set_base(memregion("maincpu")->base() );
+			membank("bank1")->set_entry(1);
+			membank("bank2")->set_entry(1);
 		}
 		else        // ROM at 00000000, RAM at 10000000
 		{
-			membank("bank1")->set_base(memregion("maincpu")->base() );
-			membank("bank2")->set_base(m_workram.get());
+			membank("bank1")->set_entry(0);
+			membank("bank2")->set_entry(0);
 		}
 	}
 }
@@ -206,22 +209,9 @@ WRITE8_MEMBER(namcofl_state::namcofl_c116_w)
 
 	if ((offset & 0x180e) == 0x180a)
 	{
-		UINT16 triggerscanline=m_c116->get_reg(5)-(32+1);
+		uint16_t triggerscanline=m_c116->get_reg(5)-(32+1);
 		m_raster_interrupt_timer->adjust(m_screen->time_until_pos(triggerscanline));
 	}
-}
-
-READ32_MEMBER(namcofl_state::namcofl_share_r)
-{
-	return (m_shareram[offset*2+1] << 16) | m_shareram[offset*2];
-}
-
-WRITE32_MEMBER(namcofl_state::namcofl_share_w)
-{
-	COMBINE_DATA(m_shareram+offset*2);
-	data >>= 16;
-	mem_mask >>= 16;
-	COMBINE_DATA(m_shareram+offset*2+1);
 }
 
 static ADDRESS_MAP_START( namcofl_mem, AS_PROGRAM, 32, namcofl_state )
@@ -230,7 +220,7 @@ static ADDRESS_MAP_START( namcofl_mem, AS_PROGRAM, 32, namcofl_state )
 	AM_RANGE(0x20000000, 0x201fffff) AM_ROM AM_REGION("data", 0)
 	AM_RANGE(0x30000000, 0x30001fff) AM_RAM AM_SHARE("nvram") /* nvram */
 	AM_RANGE(0x30100000, 0x30100003) AM_WRITE(namcofl_spritebank_w)
-	AM_RANGE(0x30284000, 0x3028bfff) AM_READWRITE(namcofl_share_r, namcofl_share_w)
+	AM_RANGE(0x30284000, 0x3028bfff) AM_RAM AM_SHARE("shareram")
 	AM_RANGE(0x30300000, 0x30303fff) AM_RAM /* COMRAM */
 	AM_RANGE(0x30380000, 0x303800ff) AM_READ(fl_network_r ) /* network registers */
 	AM_RANGE(0x30400000, 0x30407fff) AM_DEVREAD8("c116", namco_c116_device,read,0xffffffff) AM_WRITE8(namcofl_c116_w,0xffffffff)
@@ -282,16 +272,16 @@ READ8_MEMBER(namcofl_state::port7_r)
 	switch (m_mcu_port6 & 0xf0)
 	{
 		case 0x00:
-			return ioport("IN0")->read();
+			return m_in0->read();
 
 		case 0x20:
-			return ioport("MISC")->read();
+			return m_misc->read();
 
 		case 0x40:
-			return ioport("IN1")->read();
+			return m_in1->read();
 
 		case 0x60:
-			return ioport("IN2")->read();
+			return m_in2->read();
 
 		default:
 			break;
@@ -302,17 +292,17 @@ READ8_MEMBER(namcofl_state::port7_r)
 
 READ8_MEMBER(namcofl_state::dac7_r)
 {
-	return read_safe(ioport("ACCEL"), 0xff);
+	return m_accel.read_safe(0xff);
 }
 
 READ8_MEMBER(namcofl_state::dac6_r)
 {
-	return read_safe(ioport("BRAKE"), 0xff);
+	return m_brake.read_safe(0xff);
 }
 
 READ8_MEMBER(namcofl_state::dac5_r)
 {
-	return read_safe(ioport("WHEEL"), 0xff);
+	return m_wheel.read_safe(0xff);
 }
 
 READ8_MEMBER(namcofl_state::dac4_r){ return 0xff; }
@@ -525,14 +515,14 @@ GFXDECODE_END
 TIMER_CALLBACK_MEMBER(namcofl_state::network_interrupt_callback)
 {
 	m_maincpu->set_input_line(I960_IRQ0, ASSERT_LINE);
-	machine().scheduler().timer_set(m_screen->frame_period(), timer_expired_delegate(FUNC(namcofl_state::network_interrupt_callback),this));
+	m_network_interrupt_timer->adjust(m_screen->frame_period());
 }
 
 
 TIMER_CALLBACK_MEMBER(namcofl_state::vblank_interrupt_callback)
 {
 	m_maincpu->set_input_line(I960_IRQ2, ASSERT_LINE);
-	machine().scheduler().timer_set(m_screen->frame_period(), timer_expired_delegate(FUNC(namcofl_state::vblank_interrupt_callback),this));
+	m_vblank_interrupt_timer->adjust(m_screen->frame_period());
 }
 
 
@@ -562,22 +552,32 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcofl_state::mcu_adc_cb)
 MACHINE_START_MEMBER(namcofl_state,namcofl)
 {
 	m_raster_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(namcofl_state::raster_interrupt_callback),this));
+	m_network_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(namcofl_state::network_interrupt_callback),this));
+	m_vblank_interrupt_timer =  machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(namcofl_state::vblank_interrupt_callback),this));
+
+	membank("bank1")->configure_entry(0, memregion("maincpu")->base());
+	membank("bank1")->configure_entry(1, m_workram.get());
+	membank("bank1")->set_entry(0);
+
+	membank("bank2")->configure_entry(0, m_workram.get());
+	membank("bank2")->configure_entry(1, memregion("maincpu")->base());
+	membank("bank2")->set_entry(0);
 }
 
 
 MACHINE_RESET_MEMBER(namcofl_state,namcofl)
 {
-	machine().scheduler().timer_set(m_screen->time_until_pos(m_screen->visible_area().max_y + 3), timer_expired_delegate(FUNC(namcofl_state::network_interrupt_callback),this));
-	machine().scheduler().timer_set(m_screen->time_until_pos(m_screen->visible_area().max_y + 1), timer_expired_delegate(FUNC(namcofl_state::vblank_interrupt_callback),this));
-
-	membank("bank1")->set_base(memregion("maincpu")->base() );
-	membank("bank2")->set_base(m_workram.get() );
+	m_network_interrupt_timer->adjust(m_screen->time_until_pos(m_screen->visible_area().max_y + 3));
+	m_vblank_interrupt_timer->adjust(m_screen->time_until_pos(m_screen->visible_area().max_y + 1));
 
 	memset(m_workram.get(), 0x00, 0x100000);
+
+	membank("bank1")->set_entry(0);
+	membank("bank2")->set_entry(0);
 }
 
 
-static MACHINE_CONFIG_START( namcofl, namcofl_state )
+static MACHINE_CONFIG_START( namcofl )
 	MCFG_CPU_ADD("maincpu", I960, 20000000) // i80960KA-20 == 20 MHz part
 	MCFG_CPU_PROGRAM_MAP(namcofl_mem)
 
@@ -611,10 +611,10 @@ static MACHINE_CONFIG_START( namcofl, namcofl_state )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_C352_ADD("c352", 48384000/2, 288)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 1.00)
-	MCFG_SOUND_ROUTE(1, "lspeaker", 1.00)
-	MCFG_SOUND_ROUTE(2, "rspeaker", 1.00)
-	MCFG_SOUND_ROUTE(3, "lspeaker", 1.00)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
+	//MCFG_SOUND_ROUTE(2, "lspeaker", 1.00) // Second DAC not present.
+	//MCFG_SOUND_ROUTE(3, "rspeaker", 1.00)
 MACHINE_CONFIG_END
 
 ROM_START( speedrcr )
@@ -790,10 +790,11 @@ ROM_END
 
 void namcofl_state::common_init()
 {
-	m_workram = std::make_unique<UINT32[]>(0x100000/4);
+	m_workram = std::make_unique<uint32_t[]>(0x100000/4);
+	save_pointer(NAME(m_workram.get()), 0x100000/4),
 
-	membank("bank1")->set_base(memregion("maincpu")->base() );
-	membank("bank2")->set_base(m_workram.get());
+	save_item(NAME(m_mcu_port6));
+	save_item(NAME(m_sprbank));
 }
 
 DRIVER_INIT_MEMBER(namcofl_state,speedrcr)
@@ -808,7 +809,7 @@ DRIVER_INIT_MEMBER(namcofl_state,finalapr)
 	m_gametype = NAMCOFL_FINAL_LAP_R;
 }
 
-GAME ( 1995, speedrcr,         0, namcofl, speedrcr, namcofl_state, speedrcr, ROT0, "Namco", "Speed Racer", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAMEL( 1995, finalapr,         0, namcofl, finalapr, namcofl_state, finalapr, ROT0, "Namco", "Final Lap R (Rev. B)", MACHINE_IMPERFECT_SOUND, layout_namcofl )
-GAMEL( 1995, finalapro, finalapr, namcofl, finalapr, namcofl_state, finalapr, ROT0, "Namco", "Final Lap R", MACHINE_IMPERFECT_SOUND, layout_namcofl )
-GAMEL( 1995, finalaprj, finalapr, namcofl, finalapr, namcofl_state, finalapr, ROT0, "Namco", "Final Lap R (Japan Rev. C)", MACHINE_IMPERFECT_SOUND, layout_namcofl )
+GAME ( 1995, speedrcr,         0, namcofl, speedrcr, namcofl_state, speedrcr, ROT0, "Namco", "Speed Racer", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAMEL( 1995, finalapr,         0, namcofl, finalapr, namcofl_state, finalapr, ROT0, "Namco", "Final Lap R (Rev. B)", MACHINE_SUPPORTS_SAVE, layout_namcofl )
+GAMEL( 1995, finalapro, finalapr, namcofl, finalapr, namcofl_state, finalapr, ROT0, "Namco", "Final Lap R", MACHINE_SUPPORTS_SAVE, layout_namcofl )
+GAMEL( 1995, finalaprj, finalapr, namcofl, finalapr, namcofl_state, finalapr, ROT0, "Namco", "Final Lap R (Japan Rev. C)", MACHINE_SUPPORTS_SAVE, layout_namcofl )

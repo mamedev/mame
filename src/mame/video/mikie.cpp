@@ -30,7 +30,7 @@
 
 PALETTE_INIT_MEMBER(mikie_state, mikie)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	static const int resistances[4] = { 2200, 1000, 470, 220 };
 	double rweights[4], gweights[4], bweights[4];
 	int i;
@@ -81,7 +81,7 @@ PALETTE_INIT_MEMBER(mikie_state, mikie)
 
 		for (j = 0; j < 8; j++)
 		{
-			UINT8 ctabentry = (j << 5) | ((~i & 0x100) >> 4) | (color_prom[i] & 0x0f);
+			uint8_t ctabentry = (j << 5) | ((~i & 0x100) >> 4) | (color_prom[i] & 0x0f);
 			m_palette->set_pen_indirect(((i & 0x100) << 3) | (j << 8) | (i & 0xff), ctabentry);
 		}
 	}
@@ -108,13 +108,10 @@ WRITE8_MEMBER(mikie_state::mikie_palettebank_w)
 	}
 }
 
-WRITE8_MEMBER(mikie_state::mikie_flipscreen_w)
+WRITE_LINE_MEMBER(mikie_state::flipscreen_w)
 {
-	if (flip_screen() != (data & 0x01))
-	{
-		flip_screen_set(data & 0x01);
-		machine().tilemap().mark_all_dirty();
-	}
+	flip_screen_set(state);
+	machine().tilemap().mark_all_dirty();
 }
 
 TILE_GET_INFO_MEMBER(mikie_state::get_bg_tile_info)
@@ -134,12 +131,12 @@ TILE_GET_INFO_MEMBER(mikie_state::get_bg_tile_info)
 
 void mikie_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(mikie_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(mikie_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 void mikie_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 *spriteram = m_spriteram;
+	uint8_t *spriteram = m_spriteram;
 	int offs;
 
 	for (offs = 0; offs < m_spriteram.bytes(); offs += 4)
@@ -166,7 +163,7 @@ void mikie_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 	}
 }
 
-UINT32 mikie_state::screen_update_mikie(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t mikie_state::screen_update_mikie(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(0), 0);
 	draw_sprites(bitmap, cliprect);

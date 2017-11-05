@@ -1,7 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:hap, Mariusz Wojcieszek
 /* Brazilian bootleg board from 1989. Forte II Games, Industria Brasileira.
-MAME driver by Mariusz Wojcieszek & hap, based on information from Alexandre.
+MAME driver by Mariusz Wojcieszek & hap, based on
+information from Alexandre Souza (a.k.a. "Tabajara").
 
 Hardware is based on MSX1, excluding i8255 PPI:
  64KB RAM, largely unused
@@ -12,12 +13,25 @@ Hardware is based on MSX1, excluding i8255 PPI:
  (no dipswitches)
 
 Games:
-Pesadelo (means Nightmare in Portuguese), 1989 bootleg of Knightmare (Majou
+Pesadelo (means 'nightmare' in Portuguese), 1989 bootleg of Knightmare (Majou
 Densetsu in Japan) (C) 1986 Konami, originally released exclusively on MSX.
 This arcade conversion has been made a bit harder, eg. bonus power-ups deplete
 three times quicker, and the game starts at a later, more difficult level.
-A rough translation of the text after inserting a coin: Coins won't accumulate,
-insert a new coin after the game is over if you want another play.
+A precise translation of the Brazilian Portuguese text displayed
+upon inserting a coin is:
+
+  NIGHTMARE DIFFICULTY-LEVEL 2 DOES NOT ACCUMULATE
+  CREDITS , ONLY INSERT A NEW
+  COIN AFTER THE END OF THE GAME
+  IN ORDER TO START THE GAME PRESS
+  THE FIRE BUTTON.
+
+               GOOD LUCK!
+
+If the coin detector is activated for a few seconds, an error message
+meaning STUCK COIN shows up blinking and beeping:
+
+               FICHA PRESA
 
 According to Alexandre, there are more games for this board, but not
 found/dumped yet. */
@@ -26,6 +40,8 @@ found/dumped yet. */
 #include "cpu/z80/z80.h"
 #include "video/tms9928a.h"
 #include "sound/ay8910.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class forte2_state : public driver_device
@@ -38,7 +54,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 
-	UINT8 m_input_mask;
+	uint8_t m_input_mask;
 
 	DECLARE_READ8_MEMBER(forte2_ay8910_read_input);
 	DECLARE_WRITE8_MEMBER(forte2_ay8910_set_input_mask);
@@ -101,7 +117,7 @@ void forte2_state::machine_start()
 }
 
 
-static MACHINE_CONFIG_START( pesadelo, forte2_state )
+static MACHINE_CONFIG_START( pesadelo )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_3_579545MHz)
@@ -125,7 +141,7 @@ MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER(forte2_state,pesadelo)
 {
-	UINT8 *mem = memregion("maincpu")->base();
+	uint8_t *mem = memregion("maincpu")->base();
 	int memsize = memregion("maincpu")->bytes();
 
 	// data swap
@@ -135,7 +151,7 @@ DRIVER_INIT_MEMBER(forte2_state,pesadelo)
 	}
 
 	// address line swap
-	dynamic_buffer buf(memsize);
+	std::vector<uint8_t> buf(memsize);
 	memcpy(&buf[0], mem, memsize);
 	for (int i = 0; i < memsize; i++)
 	{

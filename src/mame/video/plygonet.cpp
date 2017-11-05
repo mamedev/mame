@@ -10,8 +10,9 @@
 */
 
 #include "emu.h"
-
 #include "includes/plygonet.h"
+#include "screen.h"
+
 
 /* TTL text plane */
 
@@ -38,14 +39,14 @@ TILE_GET_INFO_MEMBER(polygonet_state::roz_get_tile_info)
 
 READ32_MEMBER(polygonet_state::polygonet_ttl_ram_r)
 {
-	UINT32 *vram = (UINT32 *)m_ttl_vram;
+	uint32_t *vram = (uint32_t *)m_ttl_vram;
 
 	return vram[offset];
 }
 
 WRITE32_MEMBER(polygonet_state::polygonet_ttl_ram_w)
 {
-	UINT32 *vram = (UINT32 *)m_ttl_vram;
+	uint32_t *vram = (uint32_t *)m_ttl_vram;
 
 	COMBINE_DATA(&vram[offset]);
 
@@ -55,14 +56,14 @@ WRITE32_MEMBER(polygonet_state::polygonet_ttl_ram_w)
 
 READ32_MEMBER(polygonet_state::polygonet_roz_ram_r)
 {
-	UINT32 *vram = (UINT32 *)m_roz_vram;
+	uint32_t *vram = (uint32_t *)m_roz_vram;
 
 	return vram[offset];
 }
 
 WRITE32_MEMBER(polygonet_state::polygonet_roz_ram_w)
 {
-	UINT32 *vram = (UINT32 *)m_roz_vram;
+	uint32_t *vram = (uint32_t *)m_roz_vram;
 
 	COMBINE_DATA(&vram[offset]);
 
@@ -104,12 +105,12 @@ void polygonet_state::video_start()
 	m_gfxdecode->set_gfx(m_ttl_gfx_index, std::make_unique<gfx_element>(m_palette, charlayout, memregion("gfx1")->base(), 0, m_palette->entries() / 16, 0));
 
 	/* create the tilemap */
-	m_ttl_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(polygonet_state::ttl_get_tile_info),this), tilemap_mapper_delegate(FUNC(polygonet_state::plygonet_scan),this),  8, 8, 64, 32);
+	m_ttl_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(polygonet_state::ttl_get_tile_info),this), tilemap_mapper_delegate(FUNC(polygonet_state::plygonet_scan),this),  8, 8, 64, 32);
 
 	m_ttl_tilemap->set_transparent_pen(0);
 
 	/* set up the roz t-map too */
-	m_roz_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(polygonet_state::roz_get_tile_info),this), tilemap_mapper_delegate(FUNC(polygonet_state::plygonet_scan_cols),this), 16, 16, 32, 64);
+	m_roz_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(polygonet_state::roz_get_tile_info),this), tilemap_mapper_delegate(FUNC(polygonet_state::plygonet_scan_cols),this), 16, 16, 32, 64);
 	m_roz_tilemap->set_transparent_pen(0);
 
 	/* save states */
@@ -118,7 +119,7 @@ void polygonet_state::video_start()
 	save_item(NAME(m_roz_vram));
 }
 
-UINT32 polygonet_state::screen_update_polygonet(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t polygonet_state::screen_update_polygonet(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	screen.priority().fill(0);
 	bitmap.fill(m_palette->black_pen(), cliprect);

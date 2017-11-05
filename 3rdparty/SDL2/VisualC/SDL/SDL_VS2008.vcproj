@@ -140,7 +140,6 @@
 				PreprocessorDefinitions="_DEBUG;_WINDOWS"
 				RuntimeLibrary="2"
 				BufferSecurityCheck="false"
-				EnableEnhancedInstructionSet="1"
 				WarningLevel="3"
 				DebugInformationFormat="1"
 				OmitDefaultLibName="true"
@@ -305,7 +304,6 @@
 				PreprocessorDefinitions="NDEBUG;_WINDOWS"
 				RuntimeLibrary="2"
 				BufferSecurityCheck="false"
-				EnableEnhancedInstructionSet="1"
 				WarningLevel="3"
 				DebugInformationFormat="3"
 				OmitDefaultLibName="true"
@@ -769,10 +767,6 @@
 		</File>
 		<File
 			RelativePath="..\..\src\audio\SDL_audiodev_c.h"
-			>
-		</File>
-		<File
-			RelativePath="..\..\src\audio\SDL_audiomem.h"
 			>
 		</File>
 		<File

@@ -125,13 +125,13 @@ const struct SupportedCassetteFormats formats[] = {
 };
 
 
-static const char *get_extension(const char *name)
+static std::string get_extension(const char *name)
 {
 	const char *s;
 	s = name;
 	if (s != nullptr)
 		s = strrchr(s, '.');
-	return s ? s+1 : nullptr;
+	return s ? std::string(s+1) : "";
 }
 
 static void display_usage(void)
@@ -190,7 +190,7 @@ int CLIB_DECL main(int argc, char *argv[])
 					return -1;
 				}
 
-				if (cassette_open_choices(f, &stdio_ioprocs, get_extension(argv[3]), selected_formats, CASSETTE_FLAG_READONLY, &cassette))  {
+				if (cassette_open_choices(f, &stdio_ioprocs, get_extension(argv[3]), selected_formats, CASSETTE_FLAG_READONLY, &cassette) != cassette_image::error::SUCCESS)  {
 					fprintf(stderr, "Invalid format of input file.\n");
 					fclose(f);
 					return -1;

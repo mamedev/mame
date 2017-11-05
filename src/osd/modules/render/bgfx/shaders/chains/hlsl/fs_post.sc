@@ -11,6 +11,8 @@ $input v_color0, v_texcoord0
 // Autos
 uniform vec4 u_swap_xy;
 uniform vec4 u_source_dims; // size of the guest machine
+uniform vec4 u_target_dims;
+uniform vec4 u_target_scale;
 uniform vec4 u_quad_dims;
 uniform vec4 u_screen_scale;
 uniform vec4 u_screen_offset;
@@ -63,13 +65,19 @@ vec2 GetAdjustedCoords(vec2 coord)
 	return coord;
 }
 
-vec2 GetShadowCoord(vec2 QuadCoord, vec2 SourceCoord)
+vec2 GetShadowCoord(vec2 TargetCoord, vec2 SourceCoord)
 {
+	// base-target dimensions (remove oversampling)
+	vec2 BaseTargetDims = u_target_dims.xy / u_target_scale.xy;
+	BaseTargetDims = u_swap_xy.x > 0.0
+		? BaseTargetDims.yx
+		: BaseTargetDims.xy;
+
 	vec2 canvasCoord = u_shadow_tile_mode.x == 0.0
-		? QuadCoord + u_shadow_uv_offset.xy / u_quad_dims.xy
+		? TargetCoord + u_shadow_uv_offset.xy / BaseTargetDims
 		: SourceCoord + u_shadow_uv_offset.xy / u_source_dims.xy;
 	vec2 canvasTexelDims = u_shadow_tile_mode.x == 0.0
-		? vec2(1.0, 1.0) / u_quad_dims.xy
+		? vec2(1.0, 1.0) / BaseTargetDims
 		: vec2(1.0, 1.0) / u_source_dims.xy;
 
 	vec2 shadowUV = u_shadow_uv.xy;
@@ -148,8 +156,18 @@ void main()
 
 			float ColorBrightness = 0.299 * BaseColor.r + 0.587 * BaseColor.g + 0.114 * BaseColor.b;
 
-			float ScanCoord = BaseCoord.y * u_source_dims.y * u_scanline_scale.x * 3.1415927; // PI
-			float ScanCoordJitter = u_scanline_jitter.x * u_jitter_amount.x * 1.618034; // PHI
+			float ScanCoord = BaseCoord.y;
+			ScanCoord += u_swap_xy.x > 0.0
+				? u_quad_dims.x <= u_source_dims.x * 2.0
+					? 0.5 / u_quad_dims.x // uncenter scanlines if the quad is less than twice the size of the source
+					: 0.0
+				: u_quad_dims.y <= u_source_dims.y * 2.0
+					? 0.5 / u_quad_dims.y // uncenter scanlines if the quad is less than twice the size of the source
+					: 0.0;
+
+			ScanCoord *= u_source_dims.y * u_scanline_scale.x * 3.1415927; // PI
+
+			float ScanCoordJitter = u_scanline_jitter.x * u_jitter_amount.x * 1.5707963; // half PI
 			float ScanSine = sin(ScanCoord + ScanCoordJitter);
 			float ScanlineWide = u_scanline_height.x + u_scanline_variation.x * max(1.0, u_scanline_height.x) * (1.0 - ColorBrightness);
 			float ScanSineScaled = pow(ScanSine * ScanSine, ScanlineWide);

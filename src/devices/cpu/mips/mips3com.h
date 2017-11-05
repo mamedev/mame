@@ -59,7 +59,7 @@
 
 
 
-#define LOPTR(x)                ((UINT32 *)(x) + NATIVE_ENDIAN_VALUE_LE_BE(0,1))
+#define LOPTR(x)                ((uint32_t *)(x) + NATIVE_ENDIAN_VALUE_LE_BE(0,1))
 
 
 /***************************************************************************
@@ -182,8 +182,8 @@
 #define IS_FLOAT(o)     (((o) & (1 << 23)) == 0)
 #define IS_INTEGRAL(o)  (((o) & (1 << 23)) != 0)
 
-#define SIMMVAL         ((INT16)op)
-#define UIMMVAL         ((UINT16)op)
+#define SIMMVAL         ((int16_t)op)
+#define UIMMVAL         ((uint16_t)op)
 #define LIMMVAL         (op & 0x03ffffff)
 
 

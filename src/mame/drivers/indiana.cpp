@@ -14,10 +14,15 @@
 
 ****************************************************************************/
 
+#include "emu.h"
 #include "bus/rs232/keyboard.h"
 #include "cpu/m68000/m68000.h"
+#include "bus/isa/com.h"
+#include "bus/isa/fdc.h"
+#include "bus/isa/ide.h"
 #include "bus/isa/isa.h"
 #include "bus/isa/isa_cards.h"
+#include "bus/isa/vga.h"
 #include "machine/mc68901.h"
 
 #define M68K_TAG "maincpu"
@@ -42,9 +47,9 @@ static ADDRESS_MAP_START(indiana_mem, AS_PROGRAM, 32, indiana_state)
 	AM_RANGE(0x00100000, 0x00107fff) AM_MIRROR(0x7f8f8000) AM_RAM // SRAM 32Kb of SRAM
 	AM_RANGE(0x00200000, 0x002fffff) AM_DEVREADWRITE8(MFP_TAG, mc68901_device, read, write, 0xffffffff) AM_MIRROR(0x7f800000) // MFP
 	AM_RANGE(0x00400000, 0x004fffff) AM_DEVREADWRITE16(ISABUS_TAG, isa16_device, io16_swap_r, io16_swap_w, 0xffffffff) AM_MIRROR(0x7f800000) // 16 bit PC IO
-	AM_RANGE(0x00500000, 0x005fffff) AM_DEVREADWRITE16(ISABUS_TAG, isa16_device, prog16_swap_r, prog16_swap_w, 0xffffffff) AM_MIRROR(0x7f800000) // 16 bit PC MEM
+	AM_RANGE(0x00500000, 0x005fffff) AM_DEVREADWRITE16(ISABUS_TAG, isa16_device, mem16_swap_r, mem16_swap_w, 0xffffffff) AM_MIRROR(0x7f800000) // 16 bit PC MEM
 	AM_RANGE(0x00600000, 0x006fffff) AM_DEVREADWRITE8(ISABUS_TAG, isa16_device, io_r, io_w, 0xffffffff) AM_MIRROR(0x7f800000) // 8 bit PC IO
-	AM_RANGE(0x00700000, 0x007fffff) AM_DEVREADWRITE8(ISABUS_TAG, isa16_device, prog_r, prog_w, 0xffffffff) AM_MIRROR(0x7f800000) // 8 bit PC MEM
+	AM_RANGE(0x00700000, 0x007fffff) AM_DEVREADWRITE8(ISABUS_TAG, isa16_device, mem_r, mem_w, 0xffffffff) AM_MIRROR(0x7f800000) // 8 bit PC MEM
 	AM_RANGE(0x80000000, 0x803fffff) AM_RAM // 4 MB RAM
 	AM_RANGE(0xfffe0000, 0xfffe7fff) AM_RAM // SRAM mirror?
 ADDRESS_MAP_END
@@ -81,7 +86,7 @@ static DEVICE_INPUT_DEFAULTS_START( keyboard )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
 DEVICE_INPUT_DEFAULTS_END
 
-static MACHINE_CONFIG_START( indiana, indiana_state )
+static MACHINE_CONFIG_START( indiana )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(M68K_TAG, M68030, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(indiana_mem)
@@ -118,5 +123,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY                  FULLNAME                               FLAGS */
-COMP( 1993, indiana,  0,       0,    indiana,   indiana, indiana_state,  indiana,  "Indiana University", "Indiana University 68030 board", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME     PARENT  COMPAT  MACHINE    INPUT    STATE           INIT      COMPANY               FULLNAME                          FLAGS
+COMP( 1993, indiana, 0,      0,      indiana,   indiana, indiana_state,  indiana,  "Indiana University", "Indiana University 68030 board", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

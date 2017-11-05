@@ -63,12 +63,12 @@ bgfx_texture* texture_manager::create_png_texture(std::string path, std::string 
 	}
 
 	uint8_t *data = new uint8_t[bitmap.width() * bitmap.height() * 4];
-	UINT32 *data32 = reinterpret_cast<UINT32 *>(data);
+	uint32_t *data32 = reinterpret_cast<uint32_t *>(data);
 
 	const uint32_t width = bitmap.width();
 	const uint32_t height = bitmap.height();
 	const uint32_t rowpixels = bitmap.rowpixels();
-	UINT32* base = reinterpret_cast<UINT32 *>(bitmap.raw_pixptr(0));
+	uint32_t* base = reinterpret_cast<uint32_t *>(bitmap.raw_pixptr(0));
 	for (int y = 0; y < height; y++)
 	{
 		copy_util::copyline_argb32(data32 + y * width, base + y * rowpixels, width, nullptr);

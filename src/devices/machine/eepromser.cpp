@@ -118,11 +118,11 @@
 #define VERBOSE_PRINTF 0
 #define VERBOSE_LOGERROR 0
 
-#define LOG0(x) do { if (VERBOSE_PRINTF >= 1) printf x; logerror x; } while (0)
-#define LOG1(x) do { if (VERBOSE_PRINTF >= 1) printf x; if (VERBOSE_LOGERROR >= 1) logerror x; } while (0)
-#define LOG2(x) do { if (VERBOSE_PRINTF >= 2) printf x; if (VERBOSE_LOGERROR >= 2) logerror x; } while (0)
-#define LOG3(x) do { if (VERBOSE_PRINTF >= 3) printf x; if (VERBOSE_LOGERROR >= 3) logerror x; } while (0)
-#define LOG4(x) do { if (VERBOSE_PRINTF >= 4) printf x; if (VERBOSE_LOGERROR >= 4) logerror x; } while (0)
+#define LOG0(...) do { if (VERBOSE_PRINTF >= 1) printf(__VA_ARGS__); logerror(__VA_ARGS__); } while (0)
+#define LOG1(...) do { if (VERBOSE_PRINTF >= 1) printf(__VA_ARGS__); if (VERBOSE_LOGERROR >= 1) logerror(__VA_ARGS__); } while (0)
+#define LOG2(...) do { if (VERBOSE_PRINTF >= 2) printf(__VA_ARGS__); if (VERBOSE_LOGERROR >= 2) logerror(__VA_ARGS__); } while (0)
+#define LOG3(...) do { if (VERBOSE_PRINTF >= 3) printf(__VA_ARGS__); if (VERBOSE_LOGERROR >= 3) logerror(__VA_ARGS__); } while (0)
+#define LOG4(...) do { if (VERBOSE_PRINTF >= 4) printf(__VA_ARGS__); if (VERBOSE_LOGERROR >= 4) logerror(__VA_ARGS__); } while (0)
 
 
 
@@ -143,10 +143,11 @@ ALLOW_SAVE_TYPE(eeprom_serial_base_device::eeprom_state);
 //  eeprom_serial_base_device - constructor
 //-------------------------------------------------
 
-eeprom_serial_base_device::eeprom_serial_base_device(const machine_config &mconfig, device_type devtype, const char *name, const char *tag, device_t *owner, const char *shortname, const char *file)
-	: eeprom_base_device(mconfig, devtype, name, tag, owner, shortname, file),
+eeprom_serial_base_device::eeprom_serial_base_device(const machine_config &mconfig, device_type devtype, const char *tag, device_t *owner)
+	: eeprom_base_device(mconfig, devtype, tag, owner),
 		m_command_address_bits(0),
 		m_streaming_enabled(false),
+		m_output_on_falling_clock_enabled(false),
 		m_state(STATE_IN_RESET),
 		m_cs_state(CLEAR_LINE),
 		m_last_cs_rising_edge_time(attotime::zero),
@@ -183,6 +184,17 @@ void eeprom_serial_base_device::static_set_address_bits(device_t &device, int ad
 void eeprom_serial_base_device::static_enable_streaming(device_t &device)
 {
 	downcast<eeprom_serial_base_device &>(device).m_streaming_enabled = true;
+}
+
+
+//-----------------------------------------------------------------
+//  static_enable_output_on_falling_clock - configuration helper
+//  to enable updating the output on the falling edge of the clock
+//-----------------------------------------------------------------
+
+void eeprom_serial_base_device::static_enable_output_on_falling_clock(device_t &device)
+{
+	downcast<eeprom_serial_base_device &>(device).m_output_on_falling_clock_enabled = true;
 }
 
 
@@ -252,7 +264,7 @@ void eeprom_serial_base_device::base_cs_write(int state)
 		return;
 
 	// set the new state
-	LOG4(("  cs_write(%d)\n", state));
+	LOG4("  cs_write(%d)\n", state);
 	m_cs_state = state;
 
 	// remember the rising edge time so we don't process CLK signals at the same time
@@ -275,7 +287,7 @@ void eeprom_serial_base_device::base_clk_write(int state)
 		return;
 
 	// set the new state
-	LOG4(("  clk_write(%d)\n", state));
+	LOG4("  clk_write(%d)\n", state);
 	m_clk_state = state;
 	handle_event((m_clk_state == ASSERT_LINE) ? EVENT_CLK_RISING_EDGE : EVENT_CLK_FALLING_EDGE);
 }
@@ -289,8 +301,8 @@ void eeprom_serial_base_device::base_clk_write(int state)
 void eeprom_serial_base_device::base_di_write(int state)
 {
 	if (state != 0 && state != 1)
-		LOG0(("EEPROM: Unexpected data at input 0x%X treated as %d\n", state, state & 1));
-	LOG3(("  di_write(%d)\n", state));
+		LOG0("EEPROM: Unexpected data at input 0x%X treated as %d\n", state, state & 1);
+	LOG3("  di_write(%d)\n", state);
 	m_di_state = state & 1;
 }
 
@@ -306,7 +318,7 @@ int eeprom_serial_base_device::base_do_read()
 	// to send back a 1 value; the only exception is if reading data and the current output
 	// bit is a 0
 	int result = (m_state == STATE_READING_DATA && ((m_shift_register & 0x80000000) == 0)) ? CLEAR_LINE : ASSERT_LINE;
-	LOG3(("  do_read(%d)\n", result));
+	LOG3("  do_read(%d)\n", result);
 	return result;
 }
 
@@ -320,7 +332,7 @@ int eeprom_serial_base_device::base_ready_read()
 {
 	// ready by default, except during long operations
 	int result = ready() ? ASSERT_LINE : CLEAR_LINE;
-	LOG3(("  ready_read(%d)\n", result));
+	LOG3("  ready_read(%d)\n", result);
 	return result;
 }
 
@@ -351,7 +363,7 @@ void eeprom_serial_base_device::set_state(eeprom_state newstate)
 	for (int index = 0; index < ARRAY_LENGTH(s_state_names); index++)
 		if (s_state_names[index].state == newstate)
 			newstate_string = s_state_names[index].string;
-	LOG2(("New state: %s\n", newstate_string));
+	LOG2("New state: %s\n", newstate_string);
 #endif
 
 	// switch to the new state
@@ -368,20 +380,20 @@ void eeprom_serial_base_device::handle_event(eeprom_event event)
 {
 #if (VERBOSE_PRINTF > 0 || VERBOSE_LOGERROR > 0)
 	// for debugging purposes
-	if ((event & EVENT_CS_RISING_EDGE) != 0) LOG2(("Event: CS rising\n"));
-	if ((event & EVENT_CS_FALLING_EDGE) != 0) LOG2(("Event: CS falling\n"));
+	if ((event & EVENT_CS_RISING_EDGE) != 0) LOG2("Event: CS rising\n");
+	if ((event & EVENT_CS_FALLING_EDGE) != 0) LOG2("Event: CS falling\n");
 	if ((event & EVENT_CLK_RISING_EDGE) != 0)
 	{
 		if (m_state == STATE_WAIT_FOR_COMMAND || m_state == STATE_WAIT_FOR_DATA)
-			LOG2(("Event: CLK rising (%d, DI=%d)\n", m_bits_accum + 1, m_di_state));
+			LOG2("Event: CLK rising (%d, DI=%d)\n", m_bits_accum + 1, m_di_state);
 		else if (m_state == STATE_READING_DATA)
-			LOG2(("Event: CLK rising (%d, DO=%d)\n", m_bits_accum + 1, (m_shift_register >> 30) & 1));
+			LOG2("Event: CLK rising (%d, DO=%d)\n", m_bits_accum + 1, (m_shift_register >> 30) & 1);
 		else if (m_state == STATE_WAIT_FOR_START_BIT)
-			LOG2(("Event: CLK rising (%d)\n", m_di_state));
+			LOG2("Event: CLK rising (%d)\n", m_di_state);
 		else
-			LOG2(("Event: CLK rising\n"));
+			LOG2("Event: CLK rising\n");
 	}
-	if ((event & EVENT_CLK_FALLING_EDGE) != 0) LOG4(("Event: CLK falling\n"));
+	if ((event & EVENT_CLK_FALLING_EDGE) != 0) LOG4("Event: CLK falling\n");
 #endif
 
 	// switch off the current state
@@ -422,7 +434,7 @@ void eeprom_serial_base_device::handle_event(eeprom_event event)
 
 		// CS is asserted; reading data, clock the shift register; falling CS will reset us
 		case STATE_READING_DATA:
-			if (event == EVENT_CLK_RISING_EDGE)
+			if (event == (m_output_on_falling_clock_enabled ? EVENT_CLK_FALLING_EDGE : EVENT_CLK_RISING_EDGE))
 			{
 				int bit_index = m_bits_accum++;
 
@@ -436,13 +448,13 @@ void eeprom_serial_base_device::handle_event(eeprom_event event)
 			{
 				set_state(STATE_IN_RESET);
 				if (m_streaming_enabled)
-					LOG1(("  (%d cells read)\n", m_bits_accum / m_data_bits));
+					LOG1("  (%d cells read)\n", m_bits_accum / m_data_bits);
 				if (!m_streaming_enabled && m_bits_accum > m_data_bits + 1)
-					LOG0(("EEPROM: Overclocked read by %d bits\n", m_bits_accum - m_data_bits));
+					LOG0("EEPROM: Overclocked read by %d bits\n", m_bits_accum - m_data_bits);
 				else if (m_streaming_enabled && m_bits_accum > m_data_bits + 1 && m_bits_accum % m_data_bits > 2)
-					LOG0(("EEPROM: Overclocked read by %d bits\n", m_bits_accum % m_data_bits));
+					LOG0("EEPROM: Overclocked read by %d bits\n", m_bits_accum % m_data_bits);
 				else if (m_bits_accum < m_data_bits)
-					LOG0(("EEPROM: CS deasserted in READING_DATA after %d bits\n", m_bits_accum));
+					LOG0("EEPROM: CS deasserted in READING_DATA after %d bits\n", m_bits_accum);
 			}
 			break;
 
@@ -457,7 +469,7 @@ void eeprom_serial_base_device::handle_event(eeprom_event event)
 			else if (event == EVENT_CS_FALLING_EDGE)
 			{
 				set_state(STATE_IN_RESET);
-				LOG0(("EEPROM: CS deasserted in STATE_WAIT_FOR_DATA after %d bits\n", m_bits_accum));
+				LOG0("EEPROM: CS deasserted in STATE_WAIT_FOR_DATA after %d bits\n", m_bits_accum);
 			}
 			break;
 
@@ -498,7 +510,7 @@ void eeprom_serial_base_device::execute_command()
 	for (int index = 0; index < ARRAY_LENGTH(s_command_names); index++)
 		if (s_command_names[index].command == m_command)
 			command_string = s_command_names[index].string;
-	LOG1((command_string, m_address));
+	LOG1(command_string, m_address);
 #endif
 
 	// each command advances differently
@@ -523,7 +535,7 @@ void eeprom_serial_base_device::execute_command()
 		case COMMAND_ERASE:
 			if (m_locked)
 			{
-				LOG0(("EEPROM: Attempt to erase while locked\n"));
+				LOG0("EEPROM: Attempt to erase while locked\n");
 				set_state(STATE_IN_RESET);
 				break;
 			}
@@ -547,7 +559,7 @@ void eeprom_serial_base_device::execute_command()
 		case COMMAND_ERASEALL:
 			if (m_locked)
 			{
-				LOG0(("EEPROM: Attempt to erase all while locked\n"));
+				LOG0("EEPROM: Attempt to erase all while locked\n");
 				set_state(STATE_IN_RESET);
 				break;
 			}
@@ -579,7 +591,7 @@ void eeprom_serial_base_device::execute_write_command()
 	for (int index = 0; index < ARRAY_LENGTH(s_command_names); index++)
 		if (s_command_names[index].command == m_command)
 			command_string = s_command_names[index].string;
-	LOG1((command_string, m_address, m_shift_register));
+	LOG1(command_string, m_address, m_shift_register);
 #endif
 
 	// each command advances differently
@@ -589,7 +601,7 @@ void eeprom_serial_base_device::execute_write_command()
 		case COMMAND_WRITE:
 			if (m_locked)
 			{
-				LOG0(("EEPROM: Attempt to write to address 0x%X while locked\n", m_address));
+				LOG0("EEPROM: Attempt to write to address 0x%X while locked\n", m_address);
 				set_state(STATE_IN_RESET);
 				break;
 			}
@@ -602,7 +614,7 @@ void eeprom_serial_base_device::execute_write_command()
 		case COMMAND_WRITEALL:
 			if (m_locked)
 			{
-				LOG0(("EEPROM: Attempt to write all while locked\n"));
+				LOG0("EEPROM: Attempt to write all while locked\n");
 				set_state(STATE_IN_RESET);
 				break;
 			}
@@ -625,8 +637,8 @@ void eeprom_serial_base_device::execute_write_command()
 //  eeprom_serial_93cxx_device - constructor
 //-------------------------------------------------
 
-eeprom_serial_93cxx_device::eeprom_serial_93cxx_device(const machine_config &mconfig, device_type devtype, const char *name, const char *tag, device_t *owner, const char *shortname, const char *file)
-	: eeprom_serial_base_device(mconfig, devtype, name, tag, owner, shortname, file)
+eeprom_serial_93cxx_device::eeprom_serial_93cxx_device(const machine_config &mconfig, device_type devtype, const char *tag, device_t *owner)
+	: eeprom_serial_base_device(mconfig, devtype, tag, owner)
 {
 }
 
@@ -663,7 +675,7 @@ void eeprom_serial_93cxx_device::parse_command_and_address()
 
 	// warn about out-of-range addresses
 	if (m_address >= (1 << m_address_bits))
-		LOG0(("EEPROM: out-of-range address 0x%X provided (maximum should be 0x%X)\n", m_address, (1 << m_address_bits) - 1));
+		LOG0("EEPROM: out-of-range address 0x%X provided (maximum should be 0x%X)\n", m_address, (1 << m_address_bits) - 1);
 }
 
 
@@ -692,8 +704,8 @@ WRITE_LINE_MEMBER(eeprom_serial_93cxx_device::di_write) { base_di_write(state); 
 //  eeprom_serial_er5911_device - constructor
 //-------------------------------------------------
 
-eeprom_serial_er5911_device::eeprom_serial_er5911_device(const machine_config &mconfig, device_type devtype, const char *name, const char *tag, device_t *owner, const char *shortname, const char *file)
-	: eeprom_serial_base_device(mconfig, devtype, name, tag, owner, shortname, file)
+eeprom_serial_er5911_device::eeprom_serial_er5911_device(const machine_config &mconfig, device_type devtype, const char *tag, device_t *owner)
+	: eeprom_serial_base_device(mconfig, devtype, tag, owner)
 {
 }
 
@@ -730,7 +742,7 @@ void eeprom_serial_er5911_device::parse_command_and_address()
 
 	// warn about out-of-range addresses
 	if (m_address >= (1 << m_address_bits))
-		LOG0(("EEPROM: out-of-range address 0x%X provided (maximum should be 0x%X)\n", m_address, (1 << m_address_bits) - 1));
+		LOG0("EEPROM: out-of-range address 0x%X provided (maximum should be 0x%X)\n", m_address, (1 << m_address_bits) - 1);
 }
 
 
@@ -760,8 +772,8 @@ WRITE_LINE_MEMBER(eeprom_serial_er5911_device::di_write) { base_di_write(state);
 //  eeprom_serial_x24c44_device - constructor
 //-------------------------------------------------
 
-eeprom_serial_x24c44_device::eeprom_serial_x24c44_device(const machine_config &mconfig, device_type devtype, const char *name, const char *tag, device_t *owner, const char *shortname, const char *file)
-	: eeprom_serial_base_device(mconfig, devtype, name, tag, owner, shortname, file)
+eeprom_serial_x24c44_device::eeprom_serial_x24c44_device(const machine_config &mconfig, device_type devtype, const char *tag, device_t *owner)
+	: eeprom_serial_base_device(mconfig, devtype, tag, owner)
 {
 }
 
@@ -780,7 +792,7 @@ void eeprom_serial_x24c44_device::device_start()
 	// start the base class
 	eeprom_base_device::device_start();
 
-	INT16 i=0;
+	int16_t i=0;
 	m_ram_length=0xf;
 
 	for (i=0;i<16;i++){
@@ -806,8 +818,8 @@ void eeprom_serial_x24c44_device::device_start()
 }
 
 void eeprom_serial_x24c44_device::copy_eeprom_to_ram(){
-	UINT16 i=0;
-	LOG1(("EEPROM TO RAM COPY!!!\n"));
+	uint16_t i=0;
+	LOG1("EEPROM TO RAM COPY!!!\n");
 	for (i=0;i<16;i++){
 		m_ram_data[i]=read(i);
 	}
@@ -817,15 +829,15 @@ void eeprom_serial_x24c44_device::copy_eeprom_to_ram(){
 
 
 void eeprom_serial_x24c44_device::copy_ram_to_eeprom(){
-	UINT16 i=0;
+	uint16_t i=0;
 	if (m_store_latch){
-		LOG1(("RAM TO EEPROM COPY\n"));
+		LOG1("RAM TO EEPROM COPY\n");
 		for (i=0;i<16;i++){
 			write(i, m_ram_data[i]);
 		}
 		m_store_latch=0;
 	}else{
-		LOG0(("Store command with store latch not set!\n"));
+		LOG0("Store command with store latch not set!\n");
 	}
 
 }
@@ -860,7 +872,7 @@ void eeprom_serial_x24c44_device::execute_command()
 	for (int index = 0; index < ARRAY_LENGTH(s_command_names); index++)
 		if (s_command_names[index].command == m_command)
 			command_string = s_command_names[index].string;
-	LOG1((command_string, m_address));
+	LOG1(command_string, m_address);
 #endif
 
 	// each command advances differently
@@ -910,23 +922,23 @@ void eeprom_serial_x24c44_device::execute_command()
 
 void eeprom_serial_x24c44_device::handle_event(eeprom_event event)
 {
-//UINT32 tmp=0;
+//uint32_t tmp=0;
 #if (VERBOSE_PRINTF > 0 || VERBOSE_LOGERROR > 0)
 	// for debugging purposes
-	if ((event & EVENT_CS_RISING_EDGE) != 0) LOG2(("Event: CS rising\n"));
-	if ((event & EVENT_CS_FALLING_EDGE) != 0) LOG2(("Event: CS falling\n"));
+	if ((event & EVENT_CS_RISING_EDGE) != 0) LOG2("Event: CS rising\n");
+	if ((event & EVENT_CS_FALLING_EDGE) != 0) LOG2("Event: CS falling\n");
 	if ((event & EVENT_CLK_RISING_EDGE) != 0)
 	{
 		if (m_state == STATE_WAIT_FOR_COMMAND || m_state == STATE_WAIT_FOR_DATA)
-			LOG2(("Event: CLK rising (%d, DI=%d)\n", m_bits_accum + 1, m_di_state));
+			LOG2("Event: CLK rising (%d, DI=%d)\n", m_bits_accum + 1, m_di_state);
 		else if (m_state == STATE_READING_DATA)
-			LOG2(("Event: CLK rising (%d, DO=%d)\n", m_bits_accum + 1, (m_shift_register >> 30) & 1));
+			LOG2("Event: CLK rising (%d, DO=%d)\n", m_bits_accum + 1, (m_shift_register >> 30) & 1);
 		else if (m_state == STATE_WAIT_FOR_START_BIT)
-			LOG2(("Event: CLK rising (%d)\n", m_di_state));
+			LOG2("Event: CLK rising (%d)\n", m_di_state);
 		else
-			LOG2(("Event: CLK rising\n"));
+			LOG2("Event: CLK rising\n");
 	}
-	if ((event & EVENT_CLK_FALLING_EDGE) != 0) LOG4(("Event: CLK falling\n"));
+	if ((event & EVENT_CLK_FALLING_EDGE) != 0) LOG4("Event: CLK falling\n");
 #endif
 
 	// switch off the current state
@@ -993,9 +1005,10 @@ void eeprom_serial_x24c44_device::handle_event(eeprom_event event)
 
 					m_shift_register=m_shift_register<<16;
 
-					LOG1(("read from RAM addr %02X data(from ram) %04X ,m_shift_register vale %04X \n",m_address,m_ram_data[m_address],m_shift_register));
-					}
-				else{
+					LOG1("read from RAM addr %02X data(from ram) %04X ,m_shift_register vale %04X \n",m_address,m_ram_data[m_address],m_shift_register);
+				}
+				else
+				{
 					m_shift_register = (m_shift_register << 1) | 1;
 
 				}
@@ -1005,13 +1018,13 @@ void eeprom_serial_x24c44_device::handle_event(eeprom_event event)
 				set_state(STATE_IN_RESET);
 				m_reading=0;
 				if (m_streaming_enabled)
-					LOG1(("  (%d cells read)\n", m_bits_accum / m_data_bits));
+					LOG1("  (%d cells read)\n", m_bits_accum / m_data_bits);
 				if (!m_streaming_enabled && m_bits_accum > m_data_bits + 1)
-					LOG1(("EEPROM: Overclocked read by %d bits\n", m_bits_accum - m_data_bits));
+					LOG1("EEPROM: Overclocked read by %d bits\n", m_bits_accum - m_data_bits);
 				else if (m_streaming_enabled && m_bits_accum > m_data_bits + 1 && m_bits_accum % m_data_bits > 2)
-					LOG1(("EEPROM: Overclocked read by %d bits\n", m_bits_accum % m_data_bits));
+					LOG1("EEPROM: Overclocked read by %d bits\n", m_bits_accum % m_data_bits);
 				else if (m_bits_accum < m_data_bits)
-					LOG1(("EEPROM: CS deasserted in READING_DATA after %d bits\n", m_bits_accum));
+					LOG1("EEPROM: CS deasserted in READING_DATA after %d bits\n", m_bits_accum);
 			}
 			break;
 
@@ -1020,19 +1033,20 @@ void eeprom_serial_x24c44_device::handle_event(eeprom_event event)
 			if (event == EVENT_CLK_RISING_EDGE)
 			{
 				m_shift_register = (m_shift_register << 1) | m_di_state;
-				if (++m_bits_accum == m_data_bits){
-				//m_shift_register=BITSWAP16(m_shift_register, 0, 1, 2, 3, 4, 5,6,7, 8, 9,10,11,12,13,14,15);
-				//m_shift_register=BITSWAP16(m_shift_register, 7, 6, 5, 4, 3, 2,1,0,15,14,13,12,11,10, 9, 8);
-				m_shift_register=BITSWAP16(m_shift_register,8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7);
-				m_ram_data[m_address]=m_shift_register;
+				if (++m_bits_accum == m_data_bits)
+				{
+					//m_shift_register=BITSWAP16(m_shift_register, 0, 1, 2, 3, 4, 5,6,7, 8, 9,10,11,12,13,14,15);
+					//m_shift_register=BITSWAP16(m_shift_register, 7, 6, 5, 4, 3, 2,1,0,15,14,13,12,11,10, 9, 8);
+					m_shift_register=BITSWAP16(m_shift_register,8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7);
+					m_ram_data[m_address]=m_shift_register;
 
-				LOG1(("write to RAM addr=%02X data=%04X\n",m_address,m_shift_register));
+					LOG1("write to RAM addr=%02X data=%04X\n",m_address,m_shift_register);
 				}
 			}
 			else if (event == EVENT_CS_FALLING_EDGE)
 			{
 				set_state(STATE_IN_RESET);
-				LOG1(("EEPROM: CS deasserted in STATE_WAIT_FOR_DATA after %d bits\n", m_bits_accum));
+				LOG1("EEPROM: CS deasserted in STATE_WAIT_FOR_DATA after %d bits\n", m_bits_accum);
 			}
 			break;
 
@@ -1060,48 +1074,53 @@ void eeprom_serial_x24c44_device::parse_command_and_address()
 
 	m_address = (m_command_address_accum >> 3) & 0x0f;
 
-	LOG1(("EEPROM: command= %04X, address %02X\n", m_command_address_accum& 0x07, m_address));
+	LOG1("EEPROM: command= %04X, address %02X\n", m_command_address_accum& 0x07, m_address);
 
 	switch (m_command_address_accum & 0x07)
 	{
 		case 0: //reset write enable latch
-				LOG0(("Lock eeprom\n"));
-				m_command = COMMAND_LOCK;   break;
+			LOG0("Lock eeprom\n");
+			m_command = COMMAND_LOCK;
+			break;
 		case 3: //write data into ram
-				LOG0(("Write to ram\n"));
-				m_command = COMMAND_WRITE;  break;
+			LOG0("Write to ram\n");
+			m_command = COMMAND_WRITE;
+			break;
 		case 4: //set write enable latch
-				LOG0(("Unlock eeprom\n"));
-				m_command = COMMAND_UNLOCK; break;
+			LOG0("Unlock eeprom\n");
+			m_command = COMMAND_UNLOCK;
+			break;
 		case 1: //store ram data in eeprom
-				LOG0(("copy ram to eeprom\n"));
-				m_command = COMMAND_COPY_RAM_TO_EEPROM;   break;
+			LOG0("copy ram to eeprom\n");
+			m_command = COMMAND_COPY_RAM_TO_EEPROM;
+			break;
 		case 5: //reload eeprom data into ram
-				LOG0(("copy eeprom to ram\n"));
-				m_command = COMMAND_COPY_EEPROM_TO_RAM; break;
+			LOG0("copy eeprom to ram\n");
+			m_command = COMMAND_COPY_EEPROM_TO_RAM;
+			break;
 		case 2: //reserved (Sleep on x2444)
 			m_command = COMMAND_INVALID;
-				break;
-
+			break;
 	}
 
 }
 
 void eeprom_serial_x24c44_device::parse_command_and_address_2_bit()
 {
-	if ((m_command_address_accum & 0x03) == 0x03){
+	if ((m_command_address_accum & 0x03) == 0x03)
+	{
 		m_command = COMMAND_READ;
 		m_address = ((m_command_address_accum >> 2) & 0x0f);
 		m_shift_register = 0;
 		set_state(STATE_READING_DATA);
-		LOG1(("parse command_and_address_2_bit found a read command\n"));
+		LOG1("parse command_and_address_2_bit found a read command\n");
 		m_reading=1;
 		m_bits_accum=0;
 	}
 
 	// warn about out-of-range addresses
 	if (m_address >= (1 << m_address_bits))
-		LOG1(("EEPROM: out-of-range address 0x%X provided (maximum should be 0x%X)\n", m_address, (1 << m_address_bits) - 1));
+		LOG1("EEPROM: out-of-range address 0x%X provided (maximum should be 0x%X)\n", m_address, (1 << m_address_bits) - 1);
 }
 
 
@@ -1127,13 +1146,14 @@ WRITE_LINE_MEMBER(eeprom_serial_x24c44_device::di_write) { base_di_write(state);
 
 // macro for defining a new device class
 #define DEFINE_SERIAL_EEPROM_DEVICE(_baseclass, _lowercase, _uppercase, _bits, _cells, _addrbits) \
-eeprom_serial_##_lowercase##_##_bits##bit_device::eeprom_serial_##_lowercase##_##_bits##bit_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) \
-	: eeprom_serial_##_baseclass##_device(mconfig, EEPROM_SERIAL_##_uppercase##_##_bits##BIT, "Serial EEPROM " #_uppercase " (" #_cells "x" #_bits ")", tag, owner, #_lowercase "_" #_bits, __FILE__) \
+eeprom_serial_##_lowercase##_##_bits##bit_device::eeprom_serial_##_lowercase##_##_bits##bit_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) \
+	: eeprom_serial_##_baseclass##_device(mconfig, EEPROM_SERIAL_##_uppercase##_##_bits##BIT, tag, owner) \
 { \
 	static_set_size(*this, _cells, _bits); \
 	static_set_address_bits(*this, _addrbits); \
 } \
-const device_type EEPROM_SERIAL_##_uppercase##_##_bits##BIT = &device_creator<eeprom_serial_##_lowercase##_##_bits##bit_device>;
+DEFINE_DEVICE_TYPE(EEPROM_SERIAL_##_uppercase##_##_bits##BIT, eeprom_serial_##_lowercase##_##_bits##bit_device, #_lowercase "_" #_bits, "Serial EEPROM " #_uppercase " (" #_cells "x" #_bits ")")
+
 // standard 93CX6 class of 16-bit EEPROMs
 DEFINE_SERIAL_EEPROM_DEVICE(93cxx, 93c06, 93C06, 16, 16, 6)
 DEFINE_SERIAL_EEPROM_DEVICE(93cxx, 93c46, 93C46, 16, 64, 6)
@@ -1142,6 +1162,12 @@ DEFINE_SERIAL_EEPROM_DEVICE(93cxx, 93c57, 93C57, 16, 128, 7)
 DEFINE_SERIAL_EEPROM_DEVICE(93cxx, 93c66, 93C66, 16, 256, 8)
 DEFINE_SERIAL_EEPROM_DEVICE(93cxx, 93c76, 93C76, 16, 512, 10)
 DEFINE_SERIAL_EEPROM_DEVICE(93cxx, 93c86, 93C86, 16, 1024, 10)
+
+// Seiko S-29X90 class of 16-bit EEPROMs. They always use 13 address bits, despite needing only 6-8.
+// The output is updated on the falling edge of the clock. Streaming is enabled
+DEFINE_SERIAL_EEPROM_DEVICE(93cxx, s29190, S29190, 16, 64, 13)
+DEFINE_SERIAL_EEPROM_DEVICE(93cxx, s29290, S29290, 16, 128, 13)
+DEFINE_SERIAL_EEPROM_DEVICE(93cxx, s29390, S29390, 16, 256, 13)
 
 // some manufacturers use pin 6 as an "ORG" pin which, when pulled low, configures memory for 8-bit accesses
 DEFINE_SERIAL_EEPROM_DEVICE(93cxx, 93c46, 93C46, 8, 128, 7)

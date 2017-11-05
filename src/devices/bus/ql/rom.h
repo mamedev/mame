@@ -25,13 +25,12 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_QL_ROM_H
+#define MAME_BUS_QL_ROM_H
+
 #pragma once
 
-#ifndef __QL_ROM_CARTRIDGE_SLOT__
-#define __QL_ROM_CARTRIDGE_SLOT__
-
-#include "emu.h"
-
+#include "softlist_dev.h"
 
 
 //**************************************************************************
@@ -50,53 +49,53 @@
 
 // ======================> device_ql_rom_cartridge_card_interface
 
-class ql_rom_cartridge_slot_t;
+class ql_rom_cartridge_slot_device;
 
 class device_ql_rom_cartridge_card_interface : public device_slot_card_interface
 {
-	friend class ql_rom_cartridge_slot_t;
+	friend class ql_rom_cartridge_slot_device;
 
 public:
 	// construction/destruction
-	device_ql_rom_cartridge_card_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_ql_rom_cartridge_card_interface();
 
 	virtual void romoeh_w(int state) { m_romoeh = state; }
-	virtual UINT8 read(address_space &space, offs_t offset, UINT8 data) { return data; }
-	virtual void write(address_space &space, offs_t offset, UINT8 data) { }
+	virtual uint8_t read(address_space &space, offs_t offset, uint8_t data) { return data; }
+	virtual void write(address_space &space, offs_t offset, uint8_t data) { }
 
 protected:
-	ql_rom_cartridge_slot_t *m_slot;
+	device_ql_rom_cartridge_card_interface(const machine_config &mconfig, device_t &device);
 
-	optional_shared_ptr<UINT8> m_rom;
+	ql_rom_cartridge_slot_device *m_slot;
+
+	optional_shared_ptr<uint8_t> m_rom;
 
 	int m_romoeh;
 };
 
 
-// ======================> ql_rom_cartridge_slot_t
+// ======================> ql_rom_cartridge_slot_device
 
-class ql_rom_cartridge_slot_t : public device_t,
+class ql_rom_cartridge_slot_device : public device_t,
 								public device_slot_interface,
 								public device_image_interface
 {
 public:
 	// construction/destruction
-	ql_rom_cartridge_slot_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ql_rom_cartridge_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// computer interface
-	UINT8 read(address_space &space, offs_t offset, UINT8 data) { if (m_card) data = m_card->read(space, offset, data); return data; }
-	void write(address_space &space, offs_t offset, UINT8 data) { if (m_card) m_card->write(space, offset, data); }
+	uint8_t read(address_space &space, offs_t offset, uint8_t data) { if (m_card) data = m_card->read(space, offset, data); return data; }
+	void write(address_space &space, offs_t offset, uint8_t data) { if (m_card) m_card->write(space, offset, data); }
 	DECLARE_WRITE_LINE_MEMBER( romoeh_w ) { if (m_card) m_card->romoeh_w(state); }
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete() override { update_names(); }
 	virtual void device_start() override;
 
 	// image-level overrides
-	virtual bool call_load() override;
-	virtual bool call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry) override;
+	virtual image_init_result call_load() override;
+	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
 
 	virtual iodevice_t image_type() const override { return IO_CARTSLOT; }
 
@@ -107,20 +106,17 @@ protected:
 	virtual bool is_reset_on_load() const override { return 1; }
 	virtual const char *image_interface() const override { return "ql_cart"; }
 	virtual const char *file_extensions() const override { return "rom,bin"; }
-	virtual const option_guide *create_option_guide() const override { return nullptr; }
 
 	// slot interface overrides
-	virtual std::string get_default_card_software() override;
+	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
 	device_ql_rom_cartridge_card_interface *m_card;
 };
 
 
 // device type definition
-extern const device_type QL_ROM_CARTRIDGE_SLOT;
+DECLARE_DEVICE_TYPE(QL_ROM_CARTRIDGE_SLOT, ql_rom_cartridge_slot_device)
 
 SLOT_INTERFACE_EXTERN( ql_rom_cartridge_cards );
 
-
-
-#endif
+#endif // MAME_BUS_QL_ROM_H

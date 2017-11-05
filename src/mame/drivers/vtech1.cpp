@@ -31,17 +31,22 @@ Todo:
 ***************************************************************************/
 
 #include "emu.h"
-#include "formats/imageutl.h"
-#include "cpu/z80/z80.h"
-#include "video/mc6847.h"
+
 #include "bus/vtech/ioexp/ioexp.h"
 #include "bus/vtech/memexp/memexp.h"
-#include "sound/wave.h"
-#include "sound/speaker.h"
-#include "imagedev/snapquik.h"
+#include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
-#include "formats/vt_cas.h"
+#include "imagedev/snapquik.h"
+#include "sound/spkrdev.h"
+#include "sound/wave.h"
+#include "video/mc6847.h"
+
 #include "softlist.h"
+#include "speaker.h"
+
+#include "formats/imageutl.h"
+#include "formats/vt_cas.h"
+
 
 /***************************************************************************
     CONSTANTS & MACROS
@@ -85,17 +90,17 @@ public:
 	DECLARE_SNAPSHOT_LOAD_MEMBER( vtech1 );
 
 private:
-	static const UINT8 VZ_BASIC = 0xf0;
-	static const UINT8 VZ_MCODE = 0xf1;
+	static const uint8_t VZ_BASIC = 0xf0;
+	static const uint8_t VZ_MCODE = 0xf1;
 
-	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<uint8_t> m_videoram;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6847_base_device> m_mc6847;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<cassette_image_device> m_cassette;
-	required_device<ioexp_slot_device> m_ioexp;
-	required_device<memexp_slot_device> m_memexp;
+	required_device<vtech_ioexp_slot_device> m_ioexp;
+	required_device<vtech_memexp_slot_device> m_memexp;
 };
 
 
@@ -106,7 +111,7 @@ private:
 SNAPSHOT_LOAD_MEMBER( vtech1_state, vtech1 )
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	UINT8 header[24];
+	uint8_t header[24];
 	char pgmname[18];
 
 	// get the header
@@ -118,16 +123,16 @@ SNAPSHOT_LOAD_MEMBER( vtech1_state, vtech1 )
 	pgmname[16] = '\0';
 
 	// get start and end addresses
-	UINT16 start = pick_integer_le(header, 22, 2);
-	UINT16 end = start + snapshot_size - sizeof(header);
-	UINT16 size = end - start;
+	uint16_t start = pick_integer_le(header, 22, 2);
+	uint16_t end = start + snapshot_size - sizeof(header);
+	uint16_t size = end - start;
 
 	// write it to ram
-	UINT8 *ptr = (UINT8 *)image.ptr() + sizeof(header);
+	uint8_t *ptr = (uint8_t *)image.ptr() + sizeof(header);
 
-	for (UINT16 addr = start; addr <= end; addr++, ptr++)
+	for (uint16_t addr = start; addr <= end; addr++, ptr++)
 	{
-		UINT8 to_write = *ptr;
+		uint8_t to_write = *ptr;
 		space.write_byte(addr, to_write);
 
 		// verify
@@ -136,7 +141,7 @@ SNAPSHOT_LOAD_MEMBER( vtech1_state, vtech1 )
 			image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Insufficient RAM to load snapshot");
 			image.message("Insufficient RAM to load snapshot (%d bytes needed) [%s]", size, pgmname);
 
-			return IMAGE_INIT_FAIL;
+			return image_init_result::FAIL;
 		}
 	}
 
@@ -165,10 +170,10 @@ SNAPSHOT_LOAD_MEMBER( vtech1_state, vtech1 )
 	default:
 		image.seterror(IMAGE_ERROR_UNSUPPORTED, "Snapshot format not supported.");
 		image.message("Snapshot format not supported.");
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 	}
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 
@@ -184,7 +189,7 @@ READ8_MEMBER( vtech1_state::vtech1_lightpen_r )
 
 READ8_MEMBER( vtech1_state::vtech1_keyboard_r )
 {
-	UINT8 result = 0x3f;
+	uint8_t result = 0x3f;
 
 	// bit 0 to 5, keyboard input
 	if (!BIT(offset, 0)) result &= ioport("keyboard_0")->read();
@@ -412,9 +417,9 @@ INPUT_PORTS_END
     MACHINE DRIVERS
 ***************************************************************************/
 
-static const INT16 speaker_levels[] = {-32768, 0, 32767, 0};
+static const int16_t speaker_levels[] = {-32768, 0, 32767, 0};
 
-static MACHINE_CONFIG_START( laser110, vtech1_state )
+static MACHINE_CONFIG_START( laser110 )
 
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", Z80, VTECH1_CLK)  /* 3.57950 MHz */
@@ -428,7 +433,7 @@ static MACHINE_CONFIG_START( laser110, vtech1_state )
 	MCFG_MC6847_FSYNC_CALLBACK(INPUTLINE("maincpu", 0)) MCFG_DEVCB_INVERT
 	MCFG_MC6847_INPUT_CALLBACK(READ8(vtech1_state, mc6847_videoram_r))
 	MCFG_MC6847_BW(true)
-	MCFG_MC6847_FIXED_MODE(MC6847_MODE_GM1)
+	MCFG_MC6847_FIXED_MODE(mc6847_pal_device::MODE_GM1)
 	// GM2 = GND, GM0 = GND, INTEXT = GND
 	// other lines not connected
 
@@ -460,7 +465,7 @@ static MACHINE_CONFIG_DERIVED( laser200, laser110 )
 	MCFG_DEVICE_ADD("mc6847", MC6847_PAL, XTAL_4_433619MHz)
 	MCFG_MC6847_FSYNC_CALLBACK(INPUTLINE("maincpu", 0)) MCFG_DEVCB_INVERT
 	MCFG_MC6847_INPUT_CALLBACK(READ8(vtech1_state, mc6847_videoram_r))
-	MCFG_MC6847_FIXED_MODE(MC6847_MODE_GM1)
+	MCFG_MC6847_FIXED_MODE(mc6847_pal_device::MODE_GM1)
 	// GM2 = GND, GM0 = GND, INTEXT = GND
 	// other lines not connected
 MACHINE_CONFIG_END
@@ -484,7 +489,7 @@ static MACHINE_CONFIG_DERIVED( laser310h, laser310 )
 	MCFG_DEVICE_ADD("mc6847", MC6847_PAL, XTAL_4_433619MHz)
 	MCFG_MC6847_FSYNC_CALLBACK(INPUTLINE("maincpu", 0)) MCFG_DEVCB_INVERT
 	MCFG_MC6847_INPUT_CALLBACK(READ8(vtech1_state, mc6847_videoram_r))
-	MCFG_MC6847_FIXED_MODE(MC6847_MODE_GM1)
+	MCFG_MC6847_FIXED_MODE(mc6847_pal_device::MODE_GM1)
 	// INTEXT = GND
 	// other lines not connected
 MACHINE_CONFIG_END
@@ -545,7 +550,7 @@ ROM_END
     GAME DRIVERS
 ***************************************************************************/
 
-//    YEAR  NAME       PARENT    COMPAT  MACHINE    INPUT   INIT                   COMPANY                   FULLNAME                          FLAGS
+//    YEAR  NAME       PARENT    COMPAT  MACHINE    INPUT   STATE         INIT     COMPANY                   FULLNAME                          FLAGS
 COMP( 1983, laser110,  0,        0,      laser110,  vtech1, vtech1_state, vtech1,  "Video Technology",       "Laser 110",                      0 )
 COMP( 1983, laser200,  0,        0,      laser200,  vtech1, vtech1_state, vtech1,  "Video Technology",       "Laser 200",                      0 )
 COMP( 1983, vz200de,   laser200, 0,      laser200,  vtech1, vtech1_state, vtech1,  "Video Technology",       "VZ-200 (Germany & Netherlands)", MACHINE_NOT_WORKING )
@@ -555,4 +560,4 @@ COMP( 1984, laser210,  0,        0,      laser210,  vtech1, vtech1_state, vtech1
 COMP( 1984, vz200,     laser210, 0,      laser210,  vtech1, vtech1_state, vtech1,  "Dick Smith Electronics", "VZ-200 (Oceania)",               0 )
 COMP( 1984, laser310,  0,        0,      laser310,  vtech1, vtech1_state, vtech1,  "Video Technology",       "Laser 310",                      0 )
 COMP( 1984, vz300,     laser310, 0,      laser310,  vtech1, vtech1_state, vtech1,  "Dick Smith Electronics", "VZ-300 (Oceania)",               0 )
-COMP( 1984, laser310h, laser310, 0,      laser310h, vtech1, vtech1_state, vtech1h, "Video Technology",       "Laser 310 (SHRG)",               MACHINE_UNOFFICIAL)
+COMP( 1984, laser310h, laser310, 0,      laser310h, vtech1, vtech1_state, vtech1h, "Video Technology",       "Laser 310 (SHRG)",               MACHINE_UNOFFICIAL )

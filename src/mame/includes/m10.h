@@ -8,6 +8,7 @@
 
 #include "sound/samples.h"
 #include "machine/74123.h"
+#include "screen.h"
 
 #define IREMM10_MASTER_CLOCK        (12500000)
 
@@ -55,25 +56,26 @@ public:
 		m_palette(*this, "palette") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_memory;
-	required_shared_ptr<UINT8> m_rom;
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_colorram;
-	required_shared_ptr<UINT8> m_chargen;
+	required_shared_ptr<uint8_t> m_memory;
+	required_shared_ptr<uint8_t> m_rom;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_colorram;
+	required_shared_ptr<uint8_t> m_chargen;
 
 	/* video-related */
 	tilemap_t *         m_tx_tilemap;
 	gfx_element *       m_back_gfx;
 
 	/* this is currently unused, because it is needed by gfx_layout (which has no machine) */
-	UINT32              extyoffs[32 * 8];
+	uint32_t              extyoffs[32 * 8];
 
 	/* video state */
-	UINT8               m_bottomline;
-	UINT8               m_flip;
+	uint8_t               m_bottomline;
+	uint8_t               m_flip;
 
 	/* misc */
 	int                 m_last;
+	emu_timer *m_interrupt_timer;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -105,8 +107,8 @@ public:
 	DECLARE_VIDEO_START(m10);
 	DECLARE_PALETTE_INIT(m10);
 	DECLARE_VIDEO_START(m15);
-	UINT32 screen_update_m10(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_m15(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_m10(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_m15(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(m15_interrupt);
 	TIMER_CALLBACK_MEMBER(interrupt_callback);
 	DECLARE_WRITE8_MEMBER(ic8j1_output_changed);

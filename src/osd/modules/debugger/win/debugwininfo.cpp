@@ -6,15 +6,18 @@
 //
 //============================================================
 
+#include "emu.h"
 #include "debugwininfo.h"
 
 #include "debugviewinfo.h"
 
+#include "debugger.h"
 #include "debug/debugcpu.h"
 #include "window.h"
 #include "winutf8.h"
 
 #include "winutil.h"
+#include "modules/lib/osdobj_common.h"
 
 
 bool debugwin_info::s_window_class_registered = false;
@@ -23,7 +26,6 @@ bool debugwin_info::s_window_class_registered = false;
 debugwin_info::debugwin_info(debugger_windows_interface &debugger, bool is_main_console, LPCSTR title, WNDPROC handler) :
 	debugbase_info(debugger),
 	m_is_main_console(is_main_console),
-	m_next(nullptr),
 	m_wnd(nullptr),
 	m_handler(handler),
 	m_minwidth(200),
@@ -35,7 +37,7 @@ debugwin_info::debugwin_info(debugger_windows_interface &debugger, bool is_main_
 	register_window_class();
 
 	m_wnd = win_create_window_ex_utf8(DEBUG_WINDOW_STYLE_EX, "MAMEDebugWindow", title, DEBUG_WINDOW_STYLE,
-			0, 0, 100, 100, win_window_list.front()->platform_window<HWND>(), create_standard_menubar(), GetModuleHandleUni(), this);
+			0, 0, 100, 100, std::static_pointer_cast<win_window_info>(osd_common_t::s_window_list.front())->platform_window(), create_standard_menubar(), GetModuleHandleUni(), this);
 	if (m_wnd == nullptr)
 		return;
 
@@ -296,31 +298,31 @@ bool debugwin_info::handle_command(WPARAM wparam, LPARAM lparam)
 		case ID_RUN_AND_HIDE:
 			debugger().hide_all();
 		case ID_RUN:
-			debug_cpu_get_visible_cpu(machine())->debug()->go();
+			machine().debugger().cpu().get_visible_cpu()->debug()->go();
 			return true;
 
 		case ID_NEXT_CPU:
-			debug_cpu_get_visible_cpu(machine())->debug()->go_next_device();
+			machine().debugger().cpu().get_visible_cpu()->debug()->go_next_device();
 			return true;
 
 		case ID_RUN_VBLANK:
-			debug_cpu_get_visible_cpu(machine())->debug()->go_vblank();
+			machine().debugger().cpu().get_visible_cpu()->debug()->go_vblank();
 			return true;
 
 		case ID_RUN_IRQ:
-			debug_cpu_get_visible_cpu(machine())->debug()->go_interrupt();
+			machine().debugger().cpu().get_visible_cpu()->debug()->go_interrupt();
 			return true;
 
 		case ID_STEP:
-			debug_cpu_get_visible_cpu(machine())->debug()->single_step();
+			machine().debugger().cpu().get_visible_cpu()->debug()->single_step();
 			return true;
 
 		case ID_STEP_OVER:
-			debug_cpu_get_visible_cpu(machine())->debug()->single_step_over();
+			machine().debugger().cpu().get_visible_cpu()->debug()->single_step_over();
 			return true;
 
 		case ID_STEP_OUT:
-			debug_cpu_get_visible_cpu(machine())->debug()->single_step_out();
+			machine().debugger().cpu().get_visible_cpu()->debug()->single_step_out();
 			return true;
 
 		case ID_HARD_RESET:
@@ -329,7 +331,7 @@ bool debugwin_info::handle_command(WPARAM wparam, LPARAM lparam)
 
 		case ID_SOFT_RESET:
 			machine().schedule_soft_reset();
-			debug_cpu_get_visible_cpu(machine())->debug()->go();
+			machine().debugger().cpu().get_visible_cpu()->debug()->go();
 			return true;
 
 		case ID_EXIT:
@@ -488,7 +490,7 @@ LRESULT debugwin_info::window_proc(UINT message, WPARAM wparam, LPARAM lparam)
 		if (m_is_main_console)
 		{
 			debugger().hide_all();
-			debug_cpu_get_visible_cpu(machine())->debug()->go();
+			machine().debugger().cpu().get_visible_cpu()->debug()->go();
 		}
 		else
 		{
@@ -562,7 +564,7 @@ LRESULT CALLBACK debugwin_info::static_window_proc(HWND wnd, UINT message, WPARA
 		return 0;
 	}
 
-	debugwin_info *const info = (debugwin_info *)(FPTR)GetWindowLongPtr(wnd, GWLP_USERDATA);
+	debugwin_info *const info = (debugwin_info *)(uintptr_t)GetWindowLongPtr(wnd, GWLP_USERDATA);
 	if (info == nullptr)
 		return DefWindowProc(wnd, message, wparam, lparam);
 

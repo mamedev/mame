@@ -49,7 +49,7 @@ BE02 and BE03 - read data, write data
 #define TRKSIZE_SD      16*270
 
 #if 0
-static const UINT8 track_SD[][2] = {
+static const uint8_t track_SD[][2] = {
 	{ 1, 0xff},     /*  1 * FF (marker)                      */
 	{ 1, 0x00},     /*  1 byte, track number (00-4C)         */
 	{ 1, 0x01},     /*  1 byte, sector number (00-0F)        */
@@ -63,10 +63,10 @@ static const UINT8 track_SD[][2] = {
     MAME DEVICE INTERFACE
 ***************************************************************************/
 
-const device_type MICROPOLIS = &device_creator<micropolis_device>;
+DEFINE_DEVICE_TYPE(MICROPOLIS, micropolis_device, "micropolis", "Micropolis FDC")
 
-micropolis_device::micropolis_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, MICROPOLIS, "MICROPOLIS", tag, owner, clock, "micropolis", __FILE__),
+micropolis_device::micropolis_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, MICROPOLIS, tag, owner, clock),
 	m_read_dden(*this),
 	m_write_intrq(*this),
 	m_write_drq(*this),
@@ -82,11 +82,8 @@ micropolis_device::micropolis_device(const machine_config &mconfig, const char *
 	m_sector_length(0),
 	m_drive(nullptr)
 {
-	for (auto & elem : m_buffer)
-		elem = 0;
-
-	for (auto & elem : m_floppy_drive_tags)
-		elem = nullptr;
+	std::fill(std::begin(m_buffer), std::end(m_buffer), 0);
+	std::fill(std::begin(m_floppy_drive_tags), std::end(m_floppy_drive_tags), nullptr);
 }
 
 //-------------------------------------------------
@@ -163,7 +160,7 @@ void micropolis_device::write_sector()
 {
 #if 0
 	/* at this point, the disc is write enabled, and data
-	 * has been transfered into our buffer - now write it to
+	 * has been transferred into our buffer - now write it to
 	 * the disc image or to the real disc
 	 */
 
@@ -183,7 +180,7 @@ void micropolis_device::write_sector()
 ***************************************************************************/
 
 /* select a drive */
-void micropolis_device::set_drive(UINT8 drive)
+void micropolis_device::set_drive(uint8_t drive)
 {
 	if (VERBOSE)
 		logerror("micropolis_set_drive: $%02x\n", drive);
@@ -220,7 +217,7 @@ READ8_MEMBER( micropolis_device::status_r )
 READ8_MEMBER( micropolis_device::data_r )
 {
 	if (m_data_offset >= m_sector_length)
-		m_data_offset = 0;
+		return 0;
 
 	return m_buffer[m_data_offset++];
 }
@@ -254,7 +251,7 @@ Command (bits 5,6,7)      Options (bits 0,1,2,3,4)
 	case 3:
 		if (BIT(data, 0))
 		{
-			if (m_track < 77)
+			if (m_track < 76)
 			{
 				m_track++;
 				direction = 1;
@@ -276,17 +273,11 @@ Command (bits 5,6,7)      Options (bits 0,1,2,3,4)
 	}
 
 
-	m_status = STAT_RFC;
-
-	if (BIT(data, 5))
-		m_status |= STAT_READY;
-
-	m_drive->floppy_drive_set_ready_state(1,0);
-
-
-	if (!m_track)
+	m_status = STAT_RFC | STAT_READY;
+	if (m_track == 0)
 		m_status |= STAT_TRACK0;
 
+	m_drive->floppy_drive_set_ready_state(1,0);
 	m_drive->floppy_drive_seek(direction);
 }
 
@@ -319,7 +310,7 @@ WRITE8_MEMBER( micropolis_device::data_w )
 
 READ8_MEMBER( micropolis_device::read )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	switch (offset & 0x03)
 	{

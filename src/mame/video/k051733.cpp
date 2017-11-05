@@ -60,24 +60,15 @@ reads from 0x0006, and only uses bit 1.
 #include "konami_helper.h"
 
 #define VERBOSE 0
-#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
+#include "logmacro.h"
 
-const device_type K051733 = &device_creator<k051733_device>;
 
-k051733_device::k051733_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, K051733, "K051733 Protection", tag, owner, clock, "k051733", __FILE__),
+DEFINE_DEVICE_TYPE(K051733, k051733_device, "k051733", "K051733 Protection")
+
+k051733_device::k051733_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, K051733, tag, owner, clock),
 	//m_ram[0x20],
 	m_rng(0)
-{
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void k051733_device::device_config_complete()
 {
 }
 
@@ -117,10 +108,10 @@ WRITE8_MEMBER( k051733_device::write )
 }
 
 
-static int k051733_int_sqrt( UINT32 op )
+static int k051733_int_sqrt( uint32_t op )
 {
-	UINT32 i = 0x8000;
-	UINT32 step = 0x4000;
+	uint32_t i = 0x8000;
+	uint32_t step = 0x4000;
 
 	while (step)
 	{

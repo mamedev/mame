@@ -138,7 +138,7 @@ WRITE8_MEMBER(mw18w_state::mw18w_lamps_w)
 WRITE8_MEMBER(mw18w_state::mw18w_led_display_w)
 {
 	// d0-3: 7448 (BCD to LED segment)
-	const UINT8 _7448_map[16] =
+	const uint8_t _7448_map[16] =
 		{ 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x58,0x4c,0x62,0x69,0x78,0x00 };
 
 	// d4-7: 7442 (BCD to decimal) -> pick digit panel
@@ -265,7 +265,7 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( mw18w, mw18w_state )
+static MACHINE_CONFIG_START( mw18w )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_19_968MHz/8)
@@ -306,5 +306,5 @@ ROM_START( 18w2 )
 ROM_END
 
 
-GAMEL( 1979, 18w,  0,   mw18w, mw18w, driver_device, 0, ROT0, "Midway", "18 Wheeler (set 1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL, layout_18w )
-GAMEL( 1979, 18w2, 18w, mw18w, mw18w, driver_device, 0, ROT0, "Midway", "18 Wheeler (set 2)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL, layout_18w )
+GAMEL( 1979, 18w,  0,   mw18w, mw18w, mw18w_state, 0, ROT0, "Midway", "18 Wheeler (set 1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL, layout_18w )
+GAMEL( 1979, 18w2, 18w, mw18w, mw18w, mw18w_state, 0, ROT0, "Midway", "18 Wheeler (set 2)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL, layout_18w )

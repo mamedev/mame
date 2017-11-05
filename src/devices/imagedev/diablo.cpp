@@ -5,12 +5,13 @@
  **********************************************************/
 
 #include "emu.h"
-#include "emuopts.h"
-#include "harddisk.h"
 #include "diablo.h"
 
+#include "emuopts.h"
+#include "harddisk.h"
 
-static OPTION_GUIDE_START(dsk_option_guide)
+
+OPTION_GUIDE_START(dsk_option_guide)
 	OPTION_INT('C', "cylinders",        "Cylinders")
 	OPTION_INT('H', "heads",            "Heads")
 	OPTION_INT('S', "sectors",          "Sectors")
@@ -23,14 +24,14 @@ static const char *dsk_option_spec =
 
 
 // device type definition
-const device_type DIABLO = &device_creator<diablo_image_device>;
+DEFINE_DEVICE_TYPE(DIABLO, diablo_image_device, "diablo_image", "Diablo")
 
 //-------------------------------------------------
 //  diablo_image_device - constructor
 //-------------------------------------------------
 
-diablo_image_device::diablo_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, DIABLO, "Diablo", tag, owner, clock, "diablo_image", __FILE__),
+diablo_image_device::diablo_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, DIABLO, tag, owner, clock),
 		device_image_interface(mconfig, *this),
 		m_chd(nullptr),
 		m_hard_disk_handle(nullptr),
@@ -56,13 +57,10 @@ diablo_image_device::~diablo_image_device()
 
 void diablo_image_device::device_config_complete()
 {
-	m_formatlist.append(*global_alloc(image_device_format("chd", "CHD Hard drive", "chd,dsk", dsk_option_spec)));
-
-	// set brief and instance name
-	update_names();
+	add_format("chd", "CHD Hard drive", "chd,dsk", dsk_option_spec);
 }
 
-const option_guide *diablo_image_device::create_option_guide() const
+const util::option_guide &diablo_image_device::create_option_guide() const
 {
 	return dsk_option_guide;
 }
@@ -93,9 +91,9 @@ void diablo_image_device::device_stop()
 		hard_disk_close(m_hard_disk_handle);
 }
 
-bool diablo_image_device::call_load()
+image_init_result diablo_image_device::call_load()
 {
-	int our_result;
+	image_init_result our_result;
 
 	our_result = internal_load_dsk();
 	/* Check if there is an image_load callback defined */
@@ -108,23 +106,24 @@ bool diablo_image_device::call_load()
 
 }
 
-bool diablo_image_device::call_create(int create_format, option_resolution *create_args)
+image_init_result diablo_image_device::call_create(int create_format, util::option_resolution *create_args)
 {
 	int err;
-	UINT32 sectorsize, hunksize;
-	UINT32 cylinders, heads, sectors, totalsectors;
+	uint32_t sectorsize, hunksize;
+	uint32_t cylinders, heads, sectors, totalsectors;
 
-	cylinders   = option_resolution_lookup_int(create_args, 'C');
-	heads       = option_resolution_lookup_int(create_args, 'H');
-	sectors     = option_resolution_lookup_int(create_args, 'S');
-	sectorsize  = option_resolution_lookup_int(create_args, 'L') * sizeof(UINT16);
-	hunksize    = option_resolution_lookup_int(create_args, 'K');
+	assert_always(create_args != nullptr, "Expected create_args to not be nullptr");
+	cylinders   = create_args->lookup_int('C');
+	heads       = create_args->lookup_int('H');
+	sectors     = create_args->lookup_int('S');
+	sectorsize  = create_args->lookup_int('L') * sizeof(uint16_t);
+	hunksize    = create_args->lookup_int('K');
 
 	totalsectors = cylinders * heads * sectors;
 
 	/* create the CHD file */
 	chd_codec_type compression[4] = { CHD_CODEC_NONE };
-	err = m_origchd.create(image_core_file(), (UINT64)totalsectors * (UINT64)sectorsize, hunksize, sectorsize, compression);
+	err = m_origchd.create(image_core_file(), (uint64_t)totalsectors * (uint64_t)sectorsize, hunksize, sectorsize, compression);
 	if (err != CHDERR_NONE)
 		goto error;
 
@@ -138,7 +137,7 @@ bool diablo_image_device::call_create(int create_format, option_resolution *crea
 	return internal_load_dsk();
 
 error:
-	return IMAGE_INIT_FAIL;
+	return image_init_result::FAIL;
 }
 
 void diablo_image_device::call_unload()
@@ -203,7 +202,7 @@ static chd_error open_disk_diff(emu_options &options, const char *name, chd_file
 	return CHDERR_FILE_NOT_FOUND;
 }
 
-int diablo_image_device::internal_load_dsk()
+image_init_result diablo_image_device::internal_load_dsk()
 {
 	chd_error err = CHDERR_NONE;
 
@@ -213,7 +212,7 @@ int diablo_image_device::internal_load_dsk()
 		hard_disk_close(m_hard_disk_handle);
 
 	/* open the CHD file */
-	if (software_entry() != nullptr)
+	if (loaded_through_softlist())
 	{
 		m_chd = device().machine().rom_load().get_disk_handle(device().subtag("harddriv").c_str());
 	}
@@ -243,7 +242,7 @@ int diablo_image_device::internal_load_dsk()
 		/* open the hard disk file */
 		m_hard_disk_handle = hard_disk_open(m_chd);
 		if (m_hard_disk_handle != nullptr)
-			return IMAGE_INIT_PASS;
+			return image_init_result::PASS;
 	}
 
 	/* if we had an error, close out the CHD */
@@ -252,7 +251,7 @@ int diablo_image_device::internal_load_dsk()
 	m_chd = nullptr;
 	seterror(IMAGE_ERROR_UNSPECIFIED, chd_file::error_string(err));
 
-	return IMAGE_INIT_FAIL;
+	return image_init_result::FAIL;
 }
 
 /*************************************

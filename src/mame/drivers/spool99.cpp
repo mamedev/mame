@@ -93,8 +93,11 @@ Note
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "sound/okim6295.h"
 #include "machine/eepromser.h"
+#include "sound/okim6295.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 class spool99_state : public driver_device
 {
@@ -114,9 +117,9 @@ public:
 	required_device<okim6295_device> m_oki;
 	required_device<gfxdecode_device> m_gfxdecode;
 
-	required_shared_ptr<UINT8> m_main;
-	required_shared_ptr<UINT8> m_vram;
-	required_shared_ptr<UINT8> m_cram;
+	required_shared_ptr<uint8_t> m_main;
+	required_shared_ptr<uint8_t> m_vram;
+	required_shared_ptr<uint8_t> m_cram;
 
 	tilemap_t *m_sc0_tilemap;
 
@@ -131,7 +134,7 @@ public:
 	DECLARE_DRIVER_INIT(spool99);
 	virtual void video_start() override;
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 };
 
@@ -148,10 +151,10 @@ TILE_GET_INFO_MEMBER(spool99_state::get_tile_info)
 
 void spool99_state::video_start()
 {
-	m_sc0_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(spool99_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_sc0_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(spool99_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 }
 
-UINT32 spool99_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t spool99_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_sc0_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	return 0;
@@ -173,7 +176,7 @@ WRITE8_MEMBER(spool99_state::cram_w)
 
 READ8_MEMBER(spool99_state::spool99_io_r)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 //  if(!(io_switch))
 	{
@@ -240,7 +243,7 @@ ADDRESS_MAP_END
 
 READ8_MEMBER(spool99_state::vcarn_io_r)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 //  if(!(io_switch))
 	{
@@ -352,7 +355,7 @@ INPUT_PORTS_END
 
 
 
-static MACHINE_CONFIG_START( spool99, spool99_state )
+static MACHINE_CONFIG_START( spool99 )
 
 	MCFG_CPU_ADD("maincpu", Z80, 24000000/8)
 	MCFG_CPU_PROGRAM_MAP(spool99_map)
@@ -376,7 +379,7 @@ static MACHINE_CONFIG_START( spool99, spool99_state )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", 1000000, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.47)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.47)
 MACHINE_CONFIG_END
@@ -453,8 +456,8 @@ ROM_END
 
 DRIVER_INIT_MEMBER(spool99_state,spool99)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
-//  vram = std::make_unique<UINT8[]>(0x2000);
+	uint8_t *ROM = memregion("maincpu")->base();
+//  vram = std::make_unique<uint8_t[]>(0x2000);
 	memcpy(m_main, ROM, 0x100);
 }
 

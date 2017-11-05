@@ -149,25 +149,18 @@ static const int ENVCNT[0x20]
 #define SR( v )         (m_dsp_regs[((v) << 4) + 6] & 0x1f)       /* Returns SUSTAIN rate         */
 
 /* Handle endianness */
-#define LEtoME16( x ) LITTLE_ENDIANIZE_INT16(x)
-#define MEtoLE16( x ) LITTLE_ENDIANIZE_INT16(x)
+#define LEtoME16( x ) little_endianize_int16(x)
+#define MEtoLE16( x ) little_endianize_int16(x)
+
+ALLOW_SAVE_TYPE(snes_sound_device::env_state_t32);
 
 
-const device_type SNES = &device_creator<snes_sound_device>;
 
-snes_sound_device::snes_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-						: device_t(mconfig, SNES, "SNES Custom DSP (SPC700)", tag, owner, clock, "snes_sound", __FILE__),
-							device_sound_interface(mconfig, *this)
-{
-}
+DEFINE_DEVICE_TYPE(SNES, snes_sound_device, "snes_sound", "SNES Custom DSP (SPC700)")
 
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void snes_sound_device::device_config_complete()
+snes_sound_device::snes_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, SNES, tag, owner, clock)
+	, device_sound_interface(mconfig, *this)
 {
 }
 
@@ -179,7 +172,7 @@ void snes_sound_device::device_start()
 {
 	m_channel = machine().sound().stream_alloc(*this, 0, 2, 32000);
 
-	m_ram = make_unique_clear<UINT8[]>(SNES_SPCRAM_SIZE);
+	m_ram = make_unique_clear<uint8_t[]>(SNES_SPCRAM_SIZE);
 
 	/* put IPL image at the top of RAM */
 	memcpy(m_ipl_region, machine().root_device().memregion("sound_ipl")->base(), 64);
@@ -338,7 +331,7 @@ void snes_sound_device::dsp_update( short *sound_ptr )
 			m_keys       |= m;
 			m_keyed_on   |= m;
 			vl          = m_dsp_regs[(v << 4) + 4];
-			vp->samp_id = *( UINT32 * )&sd[vl];
+			vp->samp_id = *( uint32_t * )&sd[vl];
 			vp->mem_ptr = LEtoME16(sd[vl].vptr);
 
 #ifdef DBG_KEY
@@ -358,7 +351,7 @@ void snes_sound_device::dsp_update( short *sound_ptr )
 			unable to find any pattern.  I doubt it will matter though, so
 			we'll go ahead and do the full time for now. */
 			vp->envcnt   = CNT_INIT;
-			vp->envstate = ATTACK;
+			vp->envstate = env_state_t32::ATTACK;
 		}
 
 		if (m_dsp_regs[0x4c] & m & ~m_dsp_regs[0x5c])
@@ -375,7 +368,7 @@ void snes_sound_device::dsp_update( short *sound_ptr )
 		if (m_keys & m_dsp_regs[0x5c] & m)
 		{
 			/* Voice was keyed off */
-			vp->envstate = RELEASE;
+			vp->envstate = env_state_t32::RELEASE;
 			vp->on_cnt   = 0;
 
 #ifdef DBG_KEY
@@ -391,7 +384,7 @@ void snes_sound_device::dsp_update( short *sound_ptr )
 			continue;
 		}
 
-		vp->pitch = LEtoME16(*((UINT16 *)&m_dsp_regs[V + 2])) & 0x3fff;
+		vp->pitch = LEtoME16(*((uint16_t *)&m_dsp_regs[V + 2])) & 0x3fff;
 
 #ifndef NO_PMOD
 		/* Pitch mod uses OUTX from last voice for this one.  Luckily we haven't
@@ -454,7 +447,7 @@ void snes_sound_device::dsp_update( short *sound_ptr )
 					}
 
 					vp->header_cnt = 8;
-					vl = (UINT8)m_ram[vp->mem_ptr++];
+					vl = (uint8_t)m_ram[vp->mem_ptr++];
 					vp->range  = vl >> 4;
 					vp->end    = vl & 3;
 					vp->filter = (vl & 12) >> 2;
@@ -501,7 +494,7 @@ void snes_sound_device::dsp_update( short *sound_ptr )
 				}
 
 #ifdef DBG_BRR
-				logerror("V%d: shifted delta=%04X\n", v, (UINT16)outx);
+				logerror("V%d: shifted delta=%04X\n", v, (uint16_t)outx);
 #endif
 
 				switch (vp->filter)
@@ -533,7 +526,7 @@ void snes_sound_device::dsp_update( short *sound_ptr )
 				}
 
 #ifdef DBG_BRR
-				logerror("V%d: filter + delta=%04X\n", v, (UINT16)outx);
+				logerror("V%d: filter + delta=%04X\n", v, (uint16_t)outx);
 #endif
 
 				vp->smp2 = (signed short)vp->smp1;
@@ -626,8 +619,8 @@ void snes_sound_device::dsp_update( short *sound_ptr )
 #endif
 
 	echo_base = ((m_dsp_regs[0x6d] << 8) + m_echo_ptr) & 0xffff;
-	m_fir_lbuf[m_fir_ptr] = (signed short)LEtoME16(*(UINT16 *)&m_ram[echo_base]);
-	m_fir_rbuf[m_fir_ptr] = (signed short)LEtoME16(*(UINT16 *)&m_ram[echo_base + sizeof(short)]);
+	m_fir_lbuf[m_fir_ptr] = (signed short)LEtoME16(*(uint16_t *)&m_ram[echo_base]);
+	m_fir_rbuf[m_fir_ptr] = (signed short)LEtoME16(*(uint16_t *)&m_ram[echo_base + sizeof(short)]);
 
 	/* Now, evaluate the FIR filter, and add the results into the final output. */
 	vl = m_fir_lbuf[m_fir_ptr] * (signed char)m_dsp_regs[0x7f];
@@ -688,11 +681,11 @@ void snes_sound_device::dsp_update( short *sound_ptr )
 			echor = -32768;
 
 #ifdef DBG_ECHO
-		logerror("Echo: Writing %04X,%04X at location %04X\n", (UINT16)echol, (UINT16)echor, echo_base);
+		logerror("Echo: Writing %04X,%04X at location %04X\n", (uint16_t)echol, (uint16_t)echor, echo_base);
 #endif
 
-		*(UINT16 *)&m_ram[echo_base]                 = MEtoLE16((UINT16)echol);
-		*(UINT16 *)&m_ram[echo_base + sizeof(short)] = MEtoLE16((UINT16)echor);
+		*(uint16_t *)&m_ram[echo_base]                 = MEtoLE16((uint16_t)echol);
+		*(uint16_t *)&m_ram[echo_base + sizeof(short)] = MEtoLE16((uint16_t)echor);
 	}
 
 	m_echo_ptr += 2 * sizeof(short);
@@ -757,7 +750,7 @@ int snes_sound_device::advance_envelope( int v )
 
 	envx = m_voice_state[v].envx;
 
-	if (m_voice_state[v].envstate == RELEASE)
+	if (m_voice_state[v].envstate == env_state_t32::RELEASE)
 	{
 		/* Docs: "When in the state of "key off". the "click" sound is prevented
 		by the addition of the fixed value 1/256"  WTF???  Alright, I'm going
@@ -790,7 +783,7 @@ int snes_sound_device::advance_envelope( int v )
 	{
 		switch (m_voice_state[v].envstate)
 		{
-		case ATTACK:
+		case env_state_t32::ATTACK:
 			/* Docs are very confusing.  "AR is multiplied by the fixed value
 			1/64..."  I believe it means to add 1/64th to ENVX once every
 			time ATTACK is updated, and that's what I'm going to implement. */
@@ -818,7 +811,7 @@ int snes_sound_device::advance_envelope( int v )
 			if (envx > 0x7ff)
 			{
 				envx = 0x7ff;
-				m_voice_state[v].envstate = DECAY;
+				m_voice_state[v].envstate = env_state_t32::DECAY;
 			}
 
 #ifdef DBG_ENV
@@ -828,7 +821,7 @@ int snes_sound_device::advance_envelope( int v )
 			m_voice_state[v].envx = envx;
 			break;
 
-		case DECAY:
+		case env_state_t32::DECAY:
 			/* Docs: "DR... [is multiplied] by the fixed value 1-1/256."
 			Well, at least that makes some sense.  Multiplying ENVX by
 			255/256 every time DECAY is updated. */
@@ -842,7 +835,7 @@ int snes_sound_device::advance_envelope( int v )
 			}
 
 			if (envx <= 0x100 * (SL(v) + 1))
-				m_voice_state[v].envstate = SUSTAIN;
+				m_voice_state[v].envstate = env_state_t32::SUSTAIN;
 
 #ifdef DBG_ENV
 			logerror("ENV voice %d: envx=%03X, state=DECAY\n", v, envx);
@@ -850,7 +843,7 @@ int snes_sound_device::advance_envelope( int v )
 
 			break;
 
-		case SUSTAIN:
+		case env_state_t32::SUSTAIN:
 			/* Docs: "SR [is multiplied] by the fixed value 1-1/256."
 			Multiplying ENVX by 255/256 every time SUSTAIN is updated. */
 #ifdef DBG_ENV
@@ -874,7 +867,7 @@ int snes_sound_device::advance_envelope( int v )
 			/* Note: no way out of this state except by explicit KEY OFF (or switch to GAIN). */
 			break;
 
-		case RELEASE:   /* Handled earlier to prevent GAIN mode from stopping KEY OFF events */
+		case env_state_t32::RELEASE:   /* Handled earlier to prevent GAIN mode from stopping KEY OFF events */
 			break;
 		}
 	}
@@ -1086,7 +1079,7 @@ READ8_MEMBER( snes_sound_device::spc_io_r )
 		case 0xe:       /* Counter 1 */
 		case 0xf:       /* Counter 2 */
 		{
-			UINT8 value = m_ram[0xf0 + offset] & 0x0f;
+			uint8_t value = m_ram[0xf0 + offset] & 0x0f;
 			m_ram[0xf0 + offset] = 0;
 			return value;
 		}

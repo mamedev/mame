@@ -17,9 +17,9 @@ void bk_state::video_start()
 {
 }
 
-UINT32 bk_state::screen_update_bk0010(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t bk_state::screen_update_bk0010(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT16 code;
+	uint16_t code;
 	int y, x, b;
 	int nOfs;
 

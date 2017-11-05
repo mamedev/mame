@@ -1,4 +1,4 @@
-// license:LGPL-2.1+
+// license:BSD-3-Clause
 // copyright-holders:Tomasz Slanina
 /***************************************************************************
 
@@ -41,7 +41,7 @@ TILE_GET_INFO_MEMBER(fcombat_state::get_bg_tile_info)
 
 PALETTE_INIT_MEMBER(fcombat_state, fcombat)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 	/* create a lookup table for the palette */
@@ -77,7 +77,7 @@ PALETTE_INIT_MEMBER(fcombat_state, fcombat)
 	/* fg chars/sprites */
 	for (i = 0; i < 0x200; i++)
 	{
-		UINT8 ctabentry = (color_prom[(i & 0x1c0) | ((i & 3) << 4) | ((i >> 2) & 0x0f)] & 0x0f) | 0x10;
+		uint8_t ctabentry = (color_prom[(i & 0x1c0) | ((i & 3) << 4) | ((i >> 2) & 0x0f)] & 0x0f) | 0x10;
 		palette.set_pen_indirect(i, ctabentry);
 	}
 
@@ -85,7 +85,7 @@ PALETTE_INIT_MEMBER(fcombat_state, fcombat)
 	/* using another PROM */
 	for (i = 0x200; i < 0x300; i++)
 	{
-		UINT8 ctabentry = color_prom[i] & 0x0f;
+		uint8_t ctabentry = color_prom[i] & 0x0f;
 		palette.set_pen_indirect(i, ctabentry);
 	}
 }
@@ -100,7 +100,7 @@ PALETTE_INIT_MEMBER(fcombat_state, fcombat)
 
 void fcombat_state::video_start()
 {
-	m_bgmap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(fcombat_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32 * 8 * 2, 32);
+	m_bgmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(fcombat_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32 * 8 * 2, 32);
 }
 
 
@@ -131,7 +131,7 @@ WRITE8_MEMBER(fcombat_state::fcombat_videoreg_w)
 
 
 
-UINT32 fcombat_state::screen_update_fcombat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t fcombat_state::screen_update_fcombat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int sx, sy, offs, i;
 
@@ -176,18 +176,18 @@ UINT32 fcombat_state::screen_update_fcombat(screen_device &screen, bitmap_ind16 
 			else
 				code &= ~0x10, code2 |= 0x10;
 
-				gfx->transpen(bitmap,cliprect, code2, color, xflip, yflip, x, y + gfx->height(), 0);
+			gfx->transpen(bitmap,cliprect, code2, color, xflip, yflip, x, y + gfx->height(), 0);
 		}
 
 		if(flags&0x10)
 		{
-				gfx->transpen(bitmap,cliprect, code2 + 16, color, xflip, yflip, x, y + gfx->height(), 0);
-				gfx->transpen(bitmap,cliprect, code2 + 16 * 2, color, xflip, yflip, x, y + 2 * gfx->height(), 0);
-				gfx->transpen(bitmap,cliprect, code2 + 16 * 3, color, xflip, yflip, x, y + 3 * gfx->height(), 0);
+			gfx->transpen(bitmap,cliprect, code2 + 16, color, xflip, yflip, x, y + gfx->height(), 0);
+			gfx->transpen(bitmap,cliprect, code2 + 16 * 2, color, xflip, yflip, x, y + 2 * gfx->height(), 0);
+			gfx->transpen(bitmap,cliprect, code2 + 16 * 3, color, xflip, yflip, x, y + 3 * gfx->height(), 0);
 
 		}
 
-			gfx->transpen(bitmap,cliprect, code, color, xflip, yflip, x, y, 0);
+		gfx->transpen(bitmap,cliprect, code, color, xflip, yflip, x, y, 0);
 
 		if (doubled) i += 4;
 	}

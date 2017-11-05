@@ -119,7 +119,7 @@ static void ide_interrupt(device_t *device, int state)
  *
  *************************************/
 
-static MACHINE_CONFIG_START( su2000, su2000_state )
+static MACHINE_CONFIG_START( su2000 )
 	/* Basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I486, I486_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(pcat_map)
@@ -266,4 +266,4 @@ ROM_START( su2000 )
  *
  *************************************/
 
-GAME( 1993, su2000, 0, su2000, pc_keyboard, driver_device, 0, ROT0, "Virtuality", "SU2000", MACHINE_IS_BIOS_ROOT | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1993, su2000, 0, su2000, pc_keyboard, su2000_state, 0, ROT0, "Virtuality", "SU2000", MACHINE_IS_BIOS_ROOT | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

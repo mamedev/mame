@@ -8,8 +8,10 @@
 
 ***************************************************************************/
 
-#ifndef __DVBPOINTS_H__
-#define __DVBPOINTS_H__
+#ifndef MAME_EMU_DEBUG_DVBPOINTS_H
+#define MAME_EMU_DEBUG_DVBPOINTS_H
+
+#pragma once
 
 #include "debugvw.h"
 #include "debugcpu.h"
@@ -27,7 +29,6 @@
 // debug view for breakpoints
 class debug_view_breakpoints : public debug_view
 {
-	friend resource_pool_object<debug_view_breakpoints>::~resource_pool_object();
 	friend class debug_view_manager;
 
 	// construction/destruction
@@ -51,5 +52,4 @@ private:
 	std::vector<device_debug::breakpoint *> m_buffer;
 };
 
-
-#endif
+#endif // MAME_EMU_DEBUG_DVBPOINTS_H

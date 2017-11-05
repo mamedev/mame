@@ -87,27 +87,45 @@
       - When it says use 2,4,6,8 keys, you can use the keyboard arrow keys.
 
     Monitor Commands:
-      - TE - ?
+      - TE - return to terminal mode
       - DU - dump memory
       - EN - modify memory
       - EX - Go (execute)
-      - CU - ?
+      - CU - Insert or remove a custom command
       - SE - Set parameters (eg tape speed)
       - SA - Save
       - GE - Load
       - XE - Load and run
       - CA - List the files on a tape
 
+    How to use the music system:
+    1. Choose the "music" item from the software list
+    2. Type XEQ press Enter
+    3. When the program starts, press R, you are back in the monitor
+    4. Type GET press Enter
+    5. When this finishes loading, type EX 0 press Enter, there's no response
+    6. Press F, wait for numbers to appear
+    7. Press S, wait for numbers to appear
+    8. Press P, music will be heard (it isn't very loud)
+
 ****************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/i8085/i8085.h"
-#include "machine/keyboard.h"
-#include "sound/wave.h"
+//#include "bus/s100/s100.h"
 #include "imagedev/cassette.h"
 #include "machine/ay31015.h"
-#include "formats/sol_cas.h"
+#include "machine/keyboard.h"
+#include "sound/spkrdev.h"
+#include "sound/wave.h"
+
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
+#include "formats/sol_cas.h"
+
 
 struct cass_data_t {
 	struct {
@@ -121,8 +139,6 @@ struct cass_data_t {
 		int bit;        /* bit to output */
 	} output;
 };
-
-#define KEYBOARD_TAG "keyboard"
 
 class sol20_state : public driver_device
 {
@@ -141,6 +157,7 @@ public:
 		, m_uart(*this, "uart")
 		, m_uart_s(*this, "uart_s")
 		, m_p_videoram(*this, "videoram")
+		, m_p_chargen(*this, "chargen")
 		, m_iop_arrows(*this, "ARROWS")
 		, m_iop_config(*this, "CONFIG")
 		, m_iop_s1(*this, "S1")
@@ -163,22 +180,20 @@ public:
 	DECLARE_WRITE8_MEMBER( sol20_fb_w );
 	DECLARE_WRITE8_MEMBER( sol20_fd_w );
 	DECLARE_WRITE8_MEMBER( sol20_fe_w );
-	DECLARE_WRITE8_MEMBER( kbd_put );
+	void kbd_put(u8 data);
 	DECLARE_DRIVER_INIT(sol20);
 	TIMER_CALLBACK_MEMBER(sol20_cassette_tc);
 	TIMER_CALLBACK_MEMBER(sol20_boot);
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 private:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-	UINT8 m_sol20_fa;
+	uint8_t m_sol20_fa;
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
-	virtual void video_start() override;
-	UINT8 m_sol20_fc;
-	UINT8 m_sol20_fe;
-	const UINT8 *m_p_chargen;
-	UINT8 m_framecnt;
+	uint8_t m_sol20_fc;
+	uint8_t m_sol20_fe;
+	uint8_t m_framecnt;
 	cass_data_t m_cass_data;
 	emu_timer *m_cassette_timer;
 	cassette_image_device *cassette_device_image();
@@ -187,7 +202,8 @@ private:
 	required_device<cassette_image_device> m_cass2;
 	required_device<ay31015_device> m_uart;
 	required_device<ay31015_device> m_uart_s;
-	required_shared_ptr<UINT8> m_p_videoram;
+	required_shared_ptr<uint8_t> m_p_videoram;
+	required_region_ptr<u8> m_p_chargen;
 	required_ioport m_iop_arrows;
 	required_ioport m_iop_config;
 	required_ioport m_iop_s1;
@@ -222,7 +238,7 @@ void sol20_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 		sol20_boot(ptr, param);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in sol20_state::device_timer");
+		assert_always(false, "Unknown id in sol20_state::device_timer");
 	}
 }
 
@@ -230,7 +246,7 @@ void sol20_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 // identical to sorcerer
 TIMER_CALLBACK_MEMBER(sol20_state::sol20_cassette_tc)
 {
-	UINT8 cass_ws = 0;
+	uint8_t cass_ws = 0;
 	switch (m_sol20_fa & 0x20)
 	{
 		case 0x20:              /* Cassette 300 baud */
@@ -320,7 +336,7 @@ READ8_MEMBER( sol20_state::sol20_f8_r )
 {
 // d7 - TMBT; d6 - DAV; d5 - CTS; d4 - OE; d3 - PE; d2 - FE; d1 - DSR; d0 - CD
 	/* set unemulated bits (CTS/DSR/CD) high */
-	UINT8 data = 0x23;
+	uint8_t data = 0x23;
 
 	m_uart_s->set_input_pin(AY31015_SWE, 0);
 	data |= m_uart_s->get_output_pin(AY31015_TBMT) ? 0x80 : 0;
@@ -335,7 +351,7 @@ READ8_MEMBER( sol20_state::sol20_f8_r )
 
 READ8_MEMBER( sol20_state::sol20_f9_r)
 {
-	UINT8 data = m_uart_s->get_received_data();
+	uint8_t data = m_uart_s->get_received_data();
 	m_uart_s->set_input_pin(AY31015_RDAV, 0);
 	m_uart_s->set_input_pin(AY31015_RDAV, 1);
 	return data;
@@ -344,7 +360,7 @@ READ8_MEMBER( sol20_state::sol20_f9_r)
 READ8_MEMBER( sol20_state::sol20_fa_r )
 {
 	/* set unused bits high */
-	UINT8 data = 0x26;
+	uint8_t data = 0x26;
 
 	m_uart->set_input_pin(AY31015_SWE, 0);
 	data |= m_uart->get_output_pin(AY31015_TBMT) ? 0x80 : 0;
@@ -361,7 +377,7 @@ READ8_MEMBER( sol20_state::sol20_fa_r )
 
 READ8_MEMBER( sol20_state::sol20_fb_r)
 {
-	UINT8 data = m_uart->get_received_data();
+	uint8_t data = m_uart->get_received_data();
 	m_uart->set_input_pin(AY31015_RDAV, 0);
 	m_uart->set_input_pin(AY31015_RDAV, 1);
 	return data;
@@ -369,7 +385,7 @@ READ8_MEMBER( sol20_state::sol20_fb_r)
 
 READ8_MEMBER( sol20_state::sol20_fc_r )
 {
-	UINT8 data = m_iop_arrows->read();
+	uint8_t data = m_iop_arrows->read();
 	if (BIT(data, 0)) return 0x32;
 	if (BIT(data, 1)) return 0x34;
 	if (BIT(data, 2)) return 0x36;
@@ -435,11 +451,11 @@ WRITE8_MEMBER( sol20_state::sol20_fe_w )
 
 static ADDRESS_MAP_START( sol20_mem, AS_PROGRAM, 8, sol20_state)
 	AM_RANGE(0x0000, 0x07ff) AM_RAMBANK("boot")
-	AM_RANGE(0X0800, 0Xbfff) AM_RAM // optional s100 ram
+	AM_RANGE(0x0800, 0xbfff) AM_RAM // optional s100 ram
 	AM_RANGE(0xc000, 0xc7ff) AM_ROM
-	AM_RANGE(0Xc800, 0Xcbff) AM_RAM // system ram
-	AM_RANGE(0Xcc00, 0Xcfff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0Xd000, 0Xffff) AM_RAM // optional s100 ram
+	AM_RANGE(0xc800, 0xcbff) AM_RAM // system ram
+	AM_RANGE(0xcc00, 0xcfff) AM_RAM AM_SHARE("videoram")
+	AM_RANGE(0xd000, 0xffff) AM_RAM // optional s100 ram
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sol20_io, AS_IO, 8, sol20_state)
@@ -561,9 +577,9 @@ void sol20_state::machine_start()
 
 void sol20_state::machine_reset()
 {
-	UINT8 data = 0, s_count = 0;
+	uint8_t data = 0, s_count = 0;
 	int s_clock;
-	const UINT16 s_bauds[8]={ 75, 110, 180, 300, 600, 1200, 2400, 4800 };
+	const uint16_t s_bauds[8]={ 75, 110, 180, 300, 600, 1200, 2400, 4800 };
 	m_sol20_fe=0;
 	m_sol20_fa=1;
 
@@ -613,26 +629,21 @@ void sol20_state::machine_reset()
 
 DRIVER_INIT_MEMBER(sol20_state,sol20)
 {
-	UINT8 *RAM = memregion("maincpu")->base();
+	uint8_t *RAM = memregion("maincpu")->base();
 	membank("boot")->configure_entries(0, 2, &RAM[0x0000], 0xc000);
 }
 
-void sol20_state::video_start()
-{
-	m_p_chargen = memregion("chargen")->base();
-}
-
-UINT32 sol20_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t sol20_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 // Visible screen is 64 x 16, with start position controlled by scroll register.
 // Each character is 9 pixels wide (blank ones at the right) and 13 lines deep.
 // Note on blinking characters:
 // any character with bit 7 set will blink. With DPMON, do DA C000 C2FF to see what happens
-	UINT16 which = (m_iop_config->read() & 2) << 10;
-	UINT8 s1 = m_iop_s1->read();
-	UINT8 y,ra,chr,gfx;
-	UINT16 sy=0,ma,x,inv;
-	UINT8 polarity = (s1 & 8) ? 0xff : 0;
+	uint16_t which = (m_iop_config->read() & 2) << 10;
+	uint8_t s1 = m_iop_s1->read();
+	uint8_t y,ra,chr,gfx;
+	uint16_t sy=0,ma,x,inv;
+	uint8_t polarity = (s1 & 8) ? 0xff : 0;
 
 	bool cursor_inv = false;
 	if (((s1 & 0x30) == 0x20) || (((s1 & 0x30) == 0x10) && (m_framecnt & 0x08)))
@@ -646,7 +657,7 @@ UINT32 sol20_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	{
 		for (ra = 0; ra < 13; ra++)
 		{
-			UINT16 *p = &bitmap.pix16(sy++);
+			uint16_t *p = &bitmap.pix16(sy++);
 
 			for (x = ma; x < ma + 64; x++)
 			{
@@ -712,7 +723,7 @@ static GFXDECODE_START( sol20 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, sol20_charlayout, 0, 1 )
 GFXDECODE_END
 
-WRITE8_MEMBER( sol20_state::kbd_put )
+void sol20_state::kbd_put(u8 data)
 {
 	if (data)
 	{
@@ -721,11 +732,12 @@ WRITE8_MEMBER( sol20_state::kbd_put )
 	}
 }
 
-static MACHINE_CONFIG_START( sol20, sol20_state )
+static MACHINE_CONFIG_START( sol20 )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8080, XTAL_14_31818MHz/7)
+	MCFG_CPU_ADD("maincpu",I8080, XTAL_14_31818MHz / 7) // divider selectable as 5, 6 or 7 through jumpers
 	MCFG_CPU_PROGRAM_MAP(sol20_mem)
 	MCFG_CPU_IO_MAP(sol20_io)
+	MCFG_I8085A_INTE(DEVWRITELINE("speaker", speaker_sound_device, level_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -741,6 +753,8 @@ static MACHINE_CONFIG_START( sol20, sol20_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.00) // music board
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05) // cass1 speaker
 	MCFG_SOUND_WAVE_ADD(WAVE2_TAG, "cassette2")
@@ -763,8 +777,8 @@ static MACHINE_CONFIG_START( sol20, sol20_state )
 	MCFG_DEVICE_ADD("uart_s", AY31015, 0)
 	MCFG_AY31015_TX_CLOCK(4800.0)
 	MCFG_AY31015_RX_CLOCK(4800.0)
-	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(WRITE8(sol20_state, kbd_put))
+	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
+	MCFG_GENERIC_KEYBOARD_CB(PUT(sol20_state, kbd_put))
 
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "sol20_cass")
 MACHINE_CONFIG_END
@@ -792,5 +806,5 @@ ROM_START( sol20 )
 ROM_END
 
 /* Driver */
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT               COMPANY                 FULLNAME  FLAGS */
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT   COMPANY                             FULLNAME  FLAGS
 COMP( 1976, sol20,  0,      0,      sol20,   sol20, sol20_state, sol20, "Processor Technology Corporation", "SOL-20", 0 )

@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "exp.h"
 
 
@@ -13,7 +14,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type COMX_EXPANSION_SLOT = &device_creator<comx_expansion_slot_device>;
+DEFINE_DEVICE_TYPE(COMX_EXPANSION_SLOT, comx_expansion_slot_device, "comx_expansion_slot", "COMX-35 expansion slot")
 
 
 
@@ -42,8 +43,8 @@ device_comx_expansion_card_interface::device_comx_expansion_card_interface(const
 //  comx_expansion_slot_device - constructor
 //-------------------------------------------------
 
-comx_expansion_slot_device::comx_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, COMX_EXPANSION_SLOT, "COMX-35 expansion slot", tag, owner, clock, "comx_expansion_slot", __FILE__),
+comx_expansion_slot_device::comx_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, COMX_EXPANSION_SLOT, tag, owner, clock),
 	device_slot_interface(mconfig, *this),
 	m_write_irq(*this), m_card(nullptr)
 {
@@ -67,9 +68,9 @@ void comx_expansion_slot_device::device_start()
 //  mrd_r - memory read
 //-------------------------------------------------
 
-UINT8 comx_expansion_slot_device::mrd_r(address_space &space, offs_t offset, int *extrom)
+uint8_t comx_expansion_slot_device::mrd_r(address_space &space, offs_t offset, int *extrom)
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	if (m_card != nullptr)
 	{
@@ -84,7 +85,7 @@ UINT8 comx_expansion_slot_device::mrd_r(address_space &space, offs_t offset, int
 //  mwr_w - memory write
 //-------------------------------------------------
 
-void comx_expansion_slot_device::mwr_w(address_space &space, offs_t offset, UINT8 data)
+void comx_expansion_slot_device::mwr_w(address_space &space, offs_t offset, uint8_t data)
 {
 	if (m_card != nullptr)
 	{
@@ -97,9 +98,9 @@ void comx_expansion_slot_device::mwr_w(address_space &space, offs_t offset, UINT
 //  io_r - I/O read
 //-------------------------------------------------
 
-UINT8 comx_expansion_slot_device::io_r(address_space &space, offs_t offset)
+uint8_t comx_expansion_slot_device::io_r(address_space &space, offs_t offset)
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	if (m_card != nullptr)
 	{
@@ -114,7 +115,7 @@ UINT8 comx_expansion_slot_device::io_r(address_space &space, offs_t offset)
 //  sout_w - I/O write
 //-------------------------------------------------
 
-void comx_expansion_slot_device::io_w(address_space &space, offs_t offset, UINT8 data)
+void comx_expansion_slot_device::io_w(address_space &space, offs_t offset, uint8_t data)
 {
 	if (m_card != nullptr)
 	{

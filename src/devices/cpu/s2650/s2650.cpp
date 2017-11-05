@@ -17,42 +17,58 @@
 #include "s2650.h"
 #include "s2650cpu.h"
 
-#define S2650_SENSE_LINE INPUT_LINE_IRQ1
-
 /* define this to have some interrupt information logged */
-#define VERBOSE 0
-
-#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
+//#define VERBOSE 1
+#include "logmacro.h"
 
 /* define this to expand all EA calculations inline */
 #define INLINE_EA   1
 
 
-const device_type S2650 = &device_creator<s2650_device>;
+DEFINE_DEVICE_TYPE(S2650, s2650_device, "s2650", "S2650")
 
 
-s2650_device::s2650_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: cpu_device(mconfig, S2650, "S2650", tag, owner, clock, "s2650", __FILE__ )
+s2650_device::s2650_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: cpu_device(mconfig, S2650, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 15)
-	, m_io_config("io", ENDIANNESS_LITTLE, 8, 9)
+	, m_io_config("io", ENDIANNESS_LITTLE, 8, 8)
+	, m_data_config("data", ENDIANNESS_LITTLE, 8, 1)
+	, m_sense_handler(*this)
 	, m_flag_handler(*this), m_intack_handler(*this)
 	, m_ppc(0), m_page(0), m_iar(0), m_ea(0), m_psl(0), m_psu(0), m_r(0)
-	, m_halt(0), m_ir(0), m_irq_state(0), m_icount(0), m_program(nullptr), m_direct(nullptr), m_io(nullptr)
+	, m_halt(0), m_ir(0), m_irq_state(0), m_icount(0), m_direct(nullptr)
 	, m_debugger_temp(0)
 {
 	memset(m_reg, 0x00, sizeof(m_reg));
 }
 
 
-offs_t s2650_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t s2650_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( s2650 );
-	return CPU_DISASSEMBLE_NAME(s2650)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(s2650)(this, stream, pc, oprom, opram, options);
+}
+
+
+device_memory_interface::space_config_vector s2650_device::memory_space_config() const
+{
+	return space_config_vector {
+		// Memory-mapped: M/~IO=1
+		std::make_pair(AS_PROGRAM, &m_program_config),
+
+		// Non-extended I/O: M/~IO=0 ADR13(~NE)=0 ADR14=D/~C
+		// "The D/~C line can be used as a 1-bit device address in simple systems."
+		// -- Signetics 2650 Microprocessor databook, page 41
+		std::make_pair(AS_DATA,    &m_data_config),
+
+		// Extended I/O: M/~IO=0 ADR13(E)=1 ADR14=Don't Care
+		std::make_pair(AS_IO,      &m_io_config)
+	};
 }
 
 
 /* condition code changes for a byte */
-static const UINT8 ccc[0x200] = {
+static const uint8_t ccc[0x200] = {
 	0x00,0x40,0x40,0x40,0x40,0x40,0x40,0x40,
 	0x40,0x40,0x40,0x40,0x40,0x40,0x40,0x40,
 	0x40,0x40,0x40,0x40,0x40,0x40,0x40,0x40,
@@ -148,23 +164,36 @@ static const int S2650_relative[0x100] =
  * RDMEM
  * read memory byte from addr
  ***************************************************************/
-#define RDMEM(addr) m_program->read_byte(addr)
+#define RDMEM(addr) space(AS_PROGRAM).read_byte(addr)
 
-inline void s2650_device::set_psu(UINT8 new_val)
+inline void s2650_device::set_psu(uint8_t new_val)
 {
-	UINT8 old = m_psu;
+	uint8_t old = m_psu;
 
 	m_psu = new_val;
 	if ((new_val ^ old) & FO)
 		m_flag_handler((new_val & FO) ? 1 : 0);
 }
 
-inline UINT8 s2650_device::get_sp()
+inline uint8_t s2650_device::get_psu()
+{
+	if (!m_sense_handler.isnull())
+	{
+		if (m_sense_handler())
+			m_psu |= SI;
+		else
+			m_psu &= ~SI;
+	}
+
+	return m_psu;
+}
+
+inline uint8_t s2650_device::get_sp()
 {
 	return (m_psu & SP);
 }
 
-inline void s2650_device::set_sp(UINT8 new_sp)
+inline void s2650_device::set_sp(uint8_t new_sp)
 {
 	m_psu = (m_psu & ~SP) | (new_sp & SP);
 }
@@ -199,7 +228,7 @@ inline int s2650_device::check_irq_line()
 				if (!(++addr & PMSK)) addr -= PLEN;
 				m_ea = (m_ea + RDMEM(addr)) & AMSK;
 			}
-			LOG(("S2650 interrupt to $%04x\n", m_ea));
+			LOG("S2650 interrupt to $%04x\n", m_ea);
 			set_sp(get_sp() + 1);
 			set_psu(m_psu | II);
 			m_ras[get_sp()] = m_page + m_iar;
@@ -232,9 +261,9 @@ inline int s2650_device::check_irq_line()
  * ROP
  * read next opcode
  ***************************************************************/
-inline UINT8 s2650_device::ROP()
+inline uint8_t s2650_device::ROP()
 {
-	UINT8 result = m_direct->read_byte(m_page + m_iar);
+	uint8_t result = m_direct->read_byte(m_page + m_iar);
 	m_iar = (m_iar + 1) & PMSK;
 	return result;
 }
@@ -243,9 +272,9 @@ inline UINT8 s2650_device::ROP()
  * ARG
  * read next opcode argument
  ***************************************************************/
-inline UINT8 s2650_device::ARG()
+inline uint8_t s2650_device::ARG()
 {
-	UINT8 result = m_direct->read_byte(m_page + m_iar);
+	uint8_t result = m_direct->read_byte(m_page + m_iar);
 	m_iar = (m_iar + 1) & PMSK;
 	return result;
 }
@@ -256,7 +285,7 @@ inline UINT8 s2650_device::ARG()
  ***************************************************************/
 #define _REL_EA(page)                                           \
 {                                                               \
-	UINT8 hr = ARG(); /* get 'holding register' */            \
+	uint8_t hr = ARG(); /* get 'holding register' */            \
 	/* build effective address within current 8K page */        \
 	m_ea = page + ((m_iar + S2650_relative[hr]) & PMSK);        \
 	if (hr & 0x80) { /* indirect bit set ? */                   \
@@ -275,7 +304,7 @@ inline UINT8 s2650_device::ARG()
  ***************************************************************/
 #define _REL_ZERO(page)                                         \
 {                                                               \
-	UINT8 hr = ARG(); /* get 'holding register' */            \
+	uint8_t hr = ARG(); /* get 'holding register' */            \
 	/* build effective address from 0 */                        \
 	m_ea = (S2650_relative[hr] & PMSK);                           \
 	if (hr & 0x80) { /* indirect bit set ? */                   \
@@ -294,7 +323,7 @@ inline UINT8 s2650_device::ARG()
  ***************************************************************/
 #define _ABS_EA()                                               \
 {                                                               \
-	UINT8 hr, dr;                                               \
+	uint8_t hr, dr;                                               \
 	hr = ARG();   /* get 'holding register' */                \
 	dr = ARG();   /* get 'data bus register' */               \
 	/* build effective address within current 8K page */        \
@@ -336,7 +365,7 @@ inline UINT8 s2650_device::ARG()
  ***************************************************************/
 #define _BRA_EA()                                               \
 {                                                               \
-	UINT8 hr, dr;                                               \
+	uint8_t hr, dr;                                               \
 	hr = ARG();   /* get 'holding register' */                \
 	dr = ARG();   /* get 'data bus register' */               \
 	/* build address in 32K address space */                    \
@@ -359,7 +388,7 @@ inline UINT8 s2650_device::ARG()
  ***************************************************************/
 #define SWAP_REGS                                               \
 {                                                               \
-	UINT8 tmp;                                                  \
+	uint8_t tmp;                                                  \
 	tmp = m_reg[1];                                           \
 	m_reg[1] = m_reg[4];                                        \
 	m_reg[4] = tmp;                                           \
@@ -531,7 +560,7 @@ inline UINT8 s2650_device::ARG()
  * Store source register to memory addr (CC unchanged)
  ***************************************************************/
 #define M_STR(address,source)                                   \
-	m_program->write_byte(address, source)
+	space(AS_PROGRAM).write_byte(address, source)
 
 /***************************************************************
  * M_AND
@@ -570,10 +599,10 @@ inline UINT8 s2650_device::ARG()
  ***************************************************************/
 #define M_ADD(dest,_source)                                     \
 {                                                               \
-	UINT8 source = _source;                                     \
-	UINT8 before = dest;                                        \
+	uint8_t source = _source;                                     \
+	uint8_t before = dest;                                        \
 	/* add source; carry only if WC is set */                   \
-	UINT16 res = dest + source + ((m_psl >> 3) & m_psl & C);    \
+	uint16_t res = dest + source + ((m_psl >> 3) & m_psl & C);    \
 	m_psl &= ~(C | OVF | IDC);                                    \
 	if(res & 0x100) m_psl |= C;                               \
 	dest = res & 0xff;                                          \
@@ -588,10 +617,10 @@ inline UINT8 s2650_device::ARG()
  ***************************************************************/
 #define M_SUB(dest,_source)                                     \
 {                                                               \
-	UINT8 source = _source;                                     \
-	UINT8 before = dest;                                        \
+	uint8_t source = _source;                                     \
+	uint8_t before = dest;                                        \
 	/* subtract source; borrow only if WC is set */             \
-	UINT16 res = dest - source - ((m_psl >> 3) & (m_psl ^ C) & C);  \
+	uint16_t res = dest - source - ((m_psl >> 3) & (m_psl ^ C) & C);  \
 	m_psl &= ~(C | OVF | IDC);                                    \
 	if((res & 0x100)==0) m_psl |= C;                          \
 	dest = res & 0xff;                                          \
@@ -608,8 +637,8 @@ inline UINT8 s2650_device::ARG()
 {                                                               \
 	int d;                                                      \
 	m_psl &= ~CC;                                             \
-	if (m_psl & COM) d = (UINT8)reg - (UINT8)val;             \
-				else d = (INT8)reg - (INT8)val;                 \
+	if (m_psl & COM) d = (uint8_t)reg - (uint8_t)val;             \
+				else d = (int8_t)reg - (int8_t)val;                 \
 	if( d < 0 ) m_psl |= 0x80;                                    \
 	else                                                        \
 	if( d > 0 ) m_psl |= 0x40;                                    \
@@ -632,10 +661,10 @@ inline UINT8 s2650_device::ARG()
  ***************************************************************/
 #define M_RRL(dest)                                             \
 {                                                               \
-	UINT8 before = dest;                                        \
+	uint8_t before = dest;                                        \
 	if( m_psl & WC )                                          \
 	{                                                           \
-		UINT8 c = m_psl & C;                                  \
+		uint8_t c = m_psl & C;                                  \
 		m_psl &= ~(C + IDC);                                  \
 		dest = (before << 1) | c;                               \
 		m_psl |= (before >> 7) + (dest & IDC);                    \
@@ -655,10 +684,10 @@ inline UINT8 s2650_device::ARG()
  ***************************************************************/
 #define M_RRR(dest)                                             \
 {                                                               \
-	UINT8 before = dest;                                        \
+	uint8_t before = dest;                                        \
 	if (m_psl & WC)                                           \
 	{                                                           \
-		UINT8 c = m_psl & C;                                  \
+		uint8_t c = m_psl & C;                                  \
 		m_psl &= ~(C + IDC);                                  \
 		dest = (before >> 1) | (c << 7);                        \
 		m_psl |= (before & C) + (dest & IDC);                 \
@@ -676,7 +705,7 @@ inline UINT8 s2650_device::ARG()
  ***************************************************************/
 #define M_SPSU()                                                \
 {                                                               \
-	R0 = ((m_psu & ~PSU34) | (m_io->read_byte(S2650_SENSE_PORT) ? SI : 0)); \
+	R0 = get_psu() & ~PSU34;                                    \
 	SET_CC(R0);                                                 \
 }
 
@@ -696,7 +725,7 @@ inline UINT8 s2650_device::ARG()
  ***************************************************************/
 #define M_CPSU()                                                \
 {                                                               \
-	UINT8 cpsu = ARG();                                   \
+	uint8_t cpsu = ARG() & ~SI;                                 \
 	set_psu(m_psu & ~cpsu);                       \
 	m_icount -= check_irq_line();                   \
 }
@@ -707,7 +736,7 @@ inline UINT8 s2650_device::ARG()
  ***************************************************************/
 #define M_CPSL()                                                \
 {                                                               \
-	UINT8 cpsl = ARG();                                   \
+	uint8_t cpsl = ARG();                                   \
 	/* select other register set now ? */                       \
 	if( (cpsl & RS) && (m_psl & RS) )                     \
 		SWAP_REGS;                                              \
@@ -721,7 +750,7 @@ inline UINT8 s2650_device::ARG()
  ***************************************************************/
 #define M_PPSU()                                                \
 {                                                               \
-	UINT8 ppsu = (ARG() & ~PSU34) & ~SI;                  \
+	uint8_t ppsu = (ARG() & ~PSU34) & ~SI;                  \
 	set_psu(m_psu | ppsu);                        \
 }
 
@@ -731,7 +760,7 @@ inline UINT8 s2650_device::ARG()
  ***************************************************************/
 #define M_PPSL()                                                \
 {                                                               \
-	UINT8 ppsl = ARG();                                       \
+	uint8_t ppsl = ARG();                                       \
 	/* select 2nd register set now ? */                         \
 	if ((ppsl & RS) && !(m_psl & RS))                         \
 		SWAP_REGS;                                              \
@@ -744,8 +773,8 @@ inline UINT8 s2650_device::ARG()
  ***************************************************************/
 #define M_TPSU()                                                \
 {                                                               \
-	UINT8 tpsu = ARG();                                       \
-	UINT8 rpsu = (m_psu | (m_io->read_byte(S2650_SENSE_PORT) ? SI : 0)); \
+	uint8_t tpsu = ARG();                                       \
+	uint8_t rpsu = get_psu();                                   \
 	m_psl &= ~CC;                                             \
 	if( (rpsu & tpsu) != tpsu )                                 \
 		m_psl |= 0x80;                                            \
@@ -757,7 +786,7 @@ inline UINT8 s2650_device::ARG()
  ***************************************************************/
 #define M_TPSL()                                                \
 {                                                               \
-	UINT8 tpsl = ARG();                                       \
+	uint8_t tpsl = ARG();                                       \
 	if( (m_psl & tpsl) != tpsl )                              \
 		m_psl = (m_psl & ~CC) | 0x80;                           \
 	else                                                        \
@@ -770,7 +799,7 @@ inline UINT8 s2650_device::ARG()
  ***************************************************************/
 #define M_TMI(value)                                            \
 {                                                               \
-	UINT8 tmi = ARG();                                            \
+	uint8_t tmi = ARG();                                            \
 	m_psl &= ~CC;                                             \
 	if( (value & tmi) != tmi )                                  \
 		m_psl |= 0x80;                                            \
@@ -790,12 +819,11 @@ static void BRA_EA(void) _BRA_EA()
 
 void s2650_device::device_start()
 {
+	m_sense_handler.resolve();
 	m_flag_handler.resolve_safe();
 	m_intack_handler.resolve_safe();
 
-	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
-	m_io = &space(AS_IO);
+	m_direct = &space(AS_PROGRAM).direct();
 
 	save_item(NAME(m_ppc));
 	save_item(NAME(m_page));
@@ -824,6 +852,7 @@ void s2650_device::device_start()
 	state_add( S2650_FO,   "FO", m_debugger_temp).mask(0x01).callimport().callexport().formatstr("%01X");
 
 	state_add( STATE_GENPC, "GENPC", m_debugger_temp).callexport().noshow();
+	state_add( STATE_GENPCBASE, "CURPC", m_ppc).noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_debugger_temp).formatstr("%16s").noshow();
 
 	m_icountptr = &m_icount;
@@ -915,9 +944,6 @@ void s2650_device::device_reset()
 	memset(m_reg, 0, sizeof(m_reg));
 	memset(m_ras, 0, sizeof(m_ras));
 
-	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
-	m_io = &space(AS_IO);
 	m_psl = COM | WC;
 	/* force write */
 	m_psu = 0xff;
@@ -961,11 +987,6 @@ void s2650_device::s2650_set_sense(int state)
 		set_psu(m_psu | SI);
 	else
 		set_psu(m_psu & ~SI);
-}
-
-WRITE_LINE_MEMBER(s2650_device::write_sense)
-{
-	set_input_line(S2650_SENSE_LINE, state);
 }
 
 void s2650_device::execute_run()
@@ -1102,7 +1123,7 @@ void s2650_device::execute_run()
 			case 0x32:      /* REDC,2 */
 			case 0x33:      /* REDC,3 */
 				m_icount -= 6;
-				m_reg[m_r] = m_io->read_byte(S2650_CTRL_PORT);
+				m_reg[m_r] = space(AS_DATA).read_byte(S2650_CTRL_PORT);
 				SET_CC( m_reg[m_r] );
 				break;
 
@@ -1192,7 +1213,7 @@ void s2650_device::execute_run()
 			case 0x56:      /* REDE,2 v */
 			case 0x57:      /* REDE,3 v */
 				m_icount -= 9;
-				m_reg[m_r] = m_io->read_byte( ARG() );
+				m_reg[m_r] = space(AS_IO).read_byte(ARG());
 				SET_CC(m_reg[m_r]);
 				break;
 
@@ -1251,7 +1272,7 @@ void s2650_device::execute_run()
 			case 0x72:      /* REDD,2 */
 			case 0x73:      /* REDD,3 */
 				m_icount -= 6;
-				m_reg[m_r] = m_io->read_byte(S2650_DATA_PORT);
+				m_reg[m_r] = space(AS_DATA).read_byte(S2650_DATA_PORT);
 				SET_CC(m_reg[m_r]);
 				break;
 
@@ -1328,7 +1349,7 @@ void s2650_device::execute_run()
 				break;
 			case 0x92:      /* LPSU */
 				m_icount -= 6;
-				set_psu((R0 & ~PSU34) & ~SI);
+				set_psu((R0 & ~PSU34 & ~SI) | (m_psu & SI));
 				break;
 			case 0x93:      /* LPSL */
 				m_icount -= 6;
@@ -1407,7 +1428,7 @@ void s2650_device::execute_run()
 			case 0xb2:      /* WRTC,2 */
 			case 0xb3:      /* WRTC,3 */
 				m_icount -= 6;
-				m_io->write_byte(S2650_CTRL_PORT,m_reg[m_r]);
+				space(AS_DATA).write_byte(S2650_CTRL_PORT,m_reg[m_r]);
 				break;
 
 			case 0xb4:      /* TPSU */
@@ -1493,7 +1514,7 @@ void s2650_device::execute_run()
 			case 0xd6:      /* WRTE,2 v */
 			case 0xd7:      /* WRTE,3 v */
 				m_icount -= 9;
-				m_io->write_byte( ARG(), m_reg[m_r] );
+				space(AS_IO).write_byte( ARG(), m_reg[m_r] );
 				break;
 
 			case 0xd8:      /* BIRR,0 (*)a */
@@ -1551,7 +1572,7 @@ void s2650_device::execute_run()
 			case 0xf2:      /* WRTD,2 */
 			case 0xf3:      /* WRTD,3 */
 				m_icount -= 6;
-				m_io->write_byte(S2650_DATA_PORT, m_reg[m_r]);
+				space(AS_DATA).write_byte(S2650_DATA_PORT, m_reg[m_r]);
 				break;
 
 			case 0xf4:      /* TMI,0  v */

@@ -27,6 +27,7 @@ CPU is an Intel 80188
 
 #include "emu.h"
 #include "cpu/i86/i186.h"
+#include "screen.h"
 
 
 class timetrv_state : public driver_device
@@ -38,14 +39,14 @@ public:
 		m_led_vram_hi(*this, "led_vrahi"),
 		m_maincpu(*this, "maincpu") { }
 
-	required_shared_ptr<UINT8> m_led_vram_lo;
-	required_shared_ptr<UINT8> m_led_vram_hi;
+	required_shared_ptr<uint8_t> m_led_vram_lo;
+	required_shared_ptr<uint8_t> m_led_vram_hi;
 	DECLARE_READ8_MEMBER(test1_r);
 	DECLARE_READ8_MEMBER(test2_r);
 	DECLARE_READ8_MEMBER(in_r);
 	DECLARE_READ8_MEMBER(ld_r);
 	virtual void video_start() override;
-	UINT32 screen_update_timetrv(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_timetrv(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	INTERRUPT_GEN_MEMBER(ld_irq);
 	required_device<cpu_device> m_maincpu;
@@ -57,7 +58,7 @@ void timetrv_state::video_start()
 {
 }
 
-UINT32 timetrv_state::screen_update_timetrv(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t timetrv_state::screen_update_timetrv(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	popmessage("%s%s",reinterpret_cast<char *>(m_led_vram_lo.target()),reinterpret_cast<char *>(m_led_vram_hi.target()));
 	return 0;
@@ -149,7 +150,7 @@ INTERRUPT_GEN_MEMBER(timetrv_state::ld_irq)
 	device.execute().set_input_line_and_vector(0,HOLD_LINE,0x48/4); //ld irq
 }
 
-static MACHINE_CONFIG_START( timetrv, timetrv_state )
+static MACHINE_CONFIG_START( timetrv )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I80188,20000000) //???
@@ -185,4 +186,13 @@ ROM_START( timetrv )
 	DISK_IMAGE_READONLY( "timetrv", 0, NO_DUMP )
 ROM_END
 
-GAME( 1991, timetrv,  0,       timetrv,  timetrv, driver_device,  0, ROT0, "Virtual Image Productions (Sega license)", "Time Traveler", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+ROM_START( timetrv2 )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD( "epr-72491.u9",   0xc0000, 0x40000, CRC(c7998e2f) SHA1(26060653b2368f52c304e6433b4f447f99a36839) )
+
+	DISK_REGION( "laserdisc" )
+	DISK_IMAGE_READONLY( "timetrv", 0, NO_DUMP )
+ROM_END
+
+GAME( 1991, timetrv,  0,       timetrv,  timetrv, timetrv_state,  0, ROT0, "Virtual Image Productions (Sega license)", "Time Traveler (set 1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1991, timetrv2, timetrv, timetrv,  timetrv, timetrv_state,  0, ROT0, "Virtual Image Productions (Sega license)", "Time Traveler (set 2)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // Europe?

@@ -18,7 +18,7 @@ struct ScreenVertex
 	float m_x;
 	float m_y;
 	float m_z;
-	UINT32 m_rgba;
+	uint32_t m_rgba;
 	float m_u;
 	float m_v;
 

@@ -64,12 +64,15 @@
 */
 
 #include "emu.h"
+#include "includes/plygonet.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
-#include "sound/k054539.h"
 #include "machine/watchdog.h"
-#include "includes/plygonet.h"
+#include "sound/k054539.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 enum { BANK_GROUP_A, BANK_GROUP_B, INVALID_BANK_GROUP };
 
@@ -193,8 +196,8 @@ WRITE32_MEMBER(polygonet_state::sound_irq_w)
 /* DSP communications */
 READ32_MEMBER(polygonet_state::dsp_host_interface_r)
 {
-	UINT32 value;
-	UINT8 hi_addr = offset << 1;
+	uint32_t value;
+	uint8_t hi_addr = offset << 1;
 
 	if (mem_mask == 0x0000ff00) { hi_addr++; }  /* Low byte */
 	if (mem_mask == 0xff000000) {}              /* High byte */
@@ -236,13 +239,13 @@ WRITE32_MEMBER(polygonet_state::shared_ram_write)
 	}
 
 	/* write to the current dsp56k word */
-	if (mem_mask & 0xffff0000)
+	if (ACCESSING_BITS_16_31)
 	{
 		m_dsp56k_shared_ram_16[(offset<<1)] = (m_shared_ram[offset] & 0xffff0000) >> 16 ;
 	}
 
 	/* write to the next dsp56k word */
-	if (mem_mask & 0x0000ffff)
+	if (ACCESSING_BITS_0_15)
 	{
 		m_dsp56k_shared_ram_16[(offset<<1)+1] = (m_shared_ram[offset] & 0x0000ffff) ;
 	}
@@ -269,8 +272,8 @@ WRITE32_MEMBER(polygonet_state::dsp_w_lines)
 
 WRITE32_MEMBER(polygonet_state::dsp_host_interface_w)
 {
-	UINT8 hi_data = 0x00;
-	UINT8 hi_addr = offset << 1;
+	uint8_t hi_data = 0x00;
+	uint8_t hi_addr = offset << 1;
 
 	if (mem_mask == 0x0000ff00) { hi_addr++; }  /* Low byte */
 	if (mem_mask == 0xff000000) {}              /* High byte */
@@ -314,9 +317,9 @@ READ16_MEMBER(polygonet_state::dsp56k_bootload_r)
                                  bit 0002 turns on *just* before this happens.
 */
 
-static UINT8 dsp56k_bank_group(device_t* cpu)
+static uint8_t dsp56k_bank_group(device_t* cpu)
 {
-	UINT16 portC = ((dsp56k_device *)cpu)->get_peripheral_memory(0xffe3);
+	uint16_t portC = downcast<dsp56k_device *>(cpu)->get_peripheral_memory(0xffe3);
 
 	/* If bank group B is on, it overrides bank group A */
 	if (portC & 0x0002)
@@ -327,20 +330,20 @@ static UINT8 dsp56k_bank_group(device_t* cpu)
 	return INVALID_BANK_GROUP;
 }
 
-static UINT8 dsp56k_bank_num(device_t* cpu, UINT8 bank_group)
+static uint8_t dsp56k_bank_num(device_t* cpu, uint8_t bank_group)
 {
-	UINT16 portC = ((dsp56k_device *)cpu)->get_peripheral_memory(0xffe3);
+	uint16_t portC = downcast<dsp56k_device *>(cpu)->get_peripheral_memory(0xffe3);
 
 	if (bank_group == BANK_GROUP_A)
 	{
-		const UINT16 bit3   = (portC & 0x0010) >> 2;
-		const UINT16 bits21 = (portC & 0x000c) >> 2;
+		const uint16_t bit3   = (portC & 0x0010) >> 2;
+		const uint16_t bits21 = (portC & 0x000c) >> 2;
 		return (bit3 | bits21);
 	}
 	else if (bank_group == BANK_GROUP_B)
 	{
-		const UINT16 bits32 = (portC & 0x0180) >> 6;
-		const UINT16 bit1   = (portC & 0x0001) >> 0;
+		const uint16_t bits32 = (portC & 0x0180) >> 6;
+		const uint16_t bit1   = (portC & 0x0001) >> 0;
 		return (bits32 | bit1);
 	}
 	else if (bank_group == INVALID_BANK_GROUP)
@@ -355,18 +358,18 @@ static UINT8 dsp56k_bank_num(device_t* cpu, UINT8 bank_group)
 /* BANK HANDLERS */
 READ16_MEMBER(polygonet_state::dsp56k_ram_bank00_read)
 {
-	UINT8 en_group = dsp56k_bank_group(&space.device());
-	UINT8 bank_num = dsp56k_bank_num(&space.device(), en_group);
-	UINT32 driver_bank_offset = (en_group * dsp56k_bank00_size * 8) + (bank_num * dsp56k_bank00_size);
+	uint8_t en_group = dsp56k_bank_group(&space.device());
+	uint8_t bank_num = dsp56k_bank_num(&space.device(), en_group);
+	uint32_t driver_bank_offset = (en_group * dsp56k_bank00_size * 8) + (bank_num * dsp56k_bank00_size);
 
 	return m_dsp56k_bank00_ram[driver_bank_offset + offset];
 }
 
 WRITE16_MEMBER(polygonet_state::dsp56k_ram_bank00_write)
 {
-	UINT8 en_group = dsp56k_bank_group(&space.device());
-	UINT8 bank_num = dsp56k_bank_num(&space.device(), en_group);
-	UINT32 driver_bank_offset = (en_group * dsp56k_bank00_size * 8) + (bank_num * dsp56k_bank00_size);
+	uint8_t en_group = dsp56k_bank_group(&space.device());
+	uint8_t bank_num = dsp56k_bank_num(&space.device(), en_group);
+	uint32_t driver_bank_offset = (en_group * dsp56k_bank00_size * 8) + (bank_num * dsp56k_bank00_size);
 
 	COMBINE_DATA(&m_dsp56k_bank00_ram[driver_bank_offset + offset]);
 }
@@ -374,18 +377,18 @@ WRITE16_MEMBER(polygonet_state::dsp56k_ram_bank00_write)
 
 READ16_MEMBER(polygonet_state::dsp56k_ram_bank01_read)
 {
-	UINT8 en_group = dsp56k_bank_group(&space.device());
-	UINT8 bank_num = dsp56k_bank_num(&space.device(), en_group);
-	UINT32 driver_bank_offset = (en_group * dsp56k_bank01_size * 8) + (bank_num * dsp56k_bank01_size);
+	uint8_t en_group = dsp56k_bank_group(&space.device());
+	uint8_t bank_num = dsp56k_bank_num(&space.device(), en_group);
+	uint32_t driver_bank_offset = (en_group * dsp56k_bank01_size * 8) + (bank_num * dsp56k_bank01_size);
 
 	return m_dsp56k_bank01_ram[driver_bank_offset + offset];
 }
 
 WRITE16_MEMBER(polygonet_state::dsp56k_ram_bank01_write)
 {
-	UINT8 en_group = dsp56k_bank_group(&space.device());
-	UINT8 bank_num = dsp56k_bank_num(&space.device(), en_group);
-	UINT32 driver_bank_offset = (en_group * dsp56k_bank01_size * 8) + (bank_num * dsp56k_bank01_size);
+	uint8_t en_group = dsp56k_bank_group(&space.device());
+	uint8_t bank_num = dsp56k_bank_num(&space.device(), en_group);
+	uint32_t driver_bank_offset = (en_group * dsp56k_bank01_size * 8) + (bank_num * dsp56k_bank01_size);
 
 	COMBINE_DATA(&m_dsp56k_bank01_ram[driver_bank_offset + offset]);
 
@@ -396,18 +399,18 @@ WRITE16_MEMBER(polygonet_state::dsp56k_ram_bank01_write)
 
 READ16_MEMBER(polygonet_state::dsp56k_ram_bank02_read)
 {
-	UINT8 en_group = dsp56k_bank_group(&space.device());
-	UINT8 bank_num = dsp56k_bank_num(&space.device(), en_group);
-	UINT32 driver_bank_offset = (en_group * dsp56k_bank02_size * 8) + (bank_num * dsp56k_bank02_size);
+	uint8_t en_group = dsp56k_bank_group(&space.device());
+	uint8_t bank_num = dsp56k_bank_num(&space.device(), en_group);
+	uint32_t driver_bank_offset = (en_group * dsp56k_bank02_size * 8) + (bank_num * dsp56k_bank02_size);
 
 	return m_dsp56k_bank02_ram[driver_bank_offset + offset];
 }
 
 WRITE16_MEMBER(polygonet_state::dsp56k_ram_bank02_write)
 {
-	UINT8 en_group = dsp56k_bank_group(&space.device());
-	UINT8 bank_num = dsp56k_bank_num(&space.device(), en_group);
-	UINT32 driver_bank_offset = (en_group * dsp56k_bank02_size * 8) + (bank_num * dsp56k_bank02_size);
+	uint8_t en_group = dsp56k_bank_group(&space.device());
+	uint8_t bank_num = dsp56k_bank_num(&space.device(), en_group);
+	uint32_t driver_bank_offset = (en_group * dsp56k_bank02_size * 8) + (bank_num * dsp56k_bank02_size);
 
 	COMBINE_DATA(&m_dsp56k_bank02_ram[driver_bank_offset + offset]);
 }
@@ -415,18 +418,18 @@ WRITE16_MEMBER(polygonet_state::dsp56k_ram_bank02_write)
 
 READ16_MEMBER(polygonet_state::dsp56k_shared_ram_read)
 {
-	UINT8 en_group = dsp56k_bank_group(&space.device());
-	UINT8 bank_num = dsp56k_bank_num(&space.device(), en_group);
-	UINT32 driver_bank_offset = (en_group * dsp56k_shared_ram_16_size * 8) + (bank_num * dsp56k_shared_ram_16_size);
+	uint8_t en_group = dsp56k_bank_group(&space.device());
+	uint8_t bank_num = dsp56k_bank_num(&space.device(), en_group);
+	uint32_t driver_bank_offset = (en_group * dsp56k_shared_ram_16_size * 8) + (bank_num * dsp56k_shared_ram_16_size);
 
 	return m_dsp56k_shared_ram_16[driver_bank_offset + offset];
 }
 
 WRITE16_MEMBER(polygonet_state::dsp56k_shared_ram_write)
 {
-	UINT8 en_group = dsp56k_bank_group(&space.device());
-	UINT8 bank_num = dsp56k_bank_num(&space.device(), en_group);
-	UINT32 driver_bank_offset = (en_group * dsp56k_shared_ram_16_size * 8) + (bank_num * dsp56k_shared_ram_16_size);
+	uint8_t en_group = dsp56k_bank_group(&space.device());
+	uint8_t bank_num = dsp56k_bank_num(&space.device(), en_group);
+	uint32_t driver_bank_offset = (en_group * dsp56k_shared_ram_16_size * 8) + (bank_num * dsp56k_shared_ram_16_size);
 
 	COMBINE_DATA(&m_dsp56k_shared_ram_16[driver_bank_offset + offset]);
 
@@ -443,18 +446,18 @@ WRITE16_MEMBER(polygonet_state::dsp56k_shared_ram_write)
 
 READ16_MEMBER(polygonet_state::dsp56k_ram_bank04_read)
 {
-	UINT8 en_group = dsp56k_bank_group(&space.device());
-	UINT8 bank_num = dsp56k_bank_num(&space.device(), en_group);
-	UINT32 driver_bank_offset = (en_group * dsp56k_bank04_size * 8) + (bank_num * dsp56k_bank04_size);
+	uint8_t en_group = dsp56k_bank_group(&space.device());
+	uint8_t bank_num = dsp56k_bank_num(&space.device(), en_group);
+	uint32_t driver_bank_offset = (en_group * dsp56k_bank04_size * 8) + (bank_num * dsp56k_bank04_size);
 
 	return m_dsp56k_bank04_ram[driver_bank_offset + offset];
 }
 
 WRITE16_MEMBER(polygonet_state::dsp56k_ram_bank04_write)
 {
-	UINT8 en_group = dsp56k_bank_group(&space.device());
-	UINT8 bank_num = dsp56k_bank_num(&space.device(), en_group);
-	UINT32 driver_bank_offset = (en_group * dsp56k_bank04_size * 8) + (bank_num * dsp56k_bank04_size);
+	uint8_t en_group = dsp56k_bank_group(&space.device());
+	uint8_t bank_num = dsp56k_bank_num(&space.device(), en_group);
+	uint32_t driver_bank_offset = (en_group * dsp56k_bank04_size * 8) + (bank_num * dsp56k_bank04_size);
 
 	COMBINE_DATA(&m_dsp56k_bank04_ram[driver_bank_offset + offset]);
 }
@@ -600,7 +603,7 @@ WRITE_LINE_MEMBER(polygonet_state::k054539_nmi_gen)
 	m_sound_intck = state;
 }
 
-static MACHINE_CONFIG_START( plygonet, polygonet_state )
+static MACHINE_CONFIG_START( plygonet )
 
 	MCFG_CPU_ADD("maincpu", M68EC020, XTAL_32MHz/2)
 	MCFG_CPU_PROGRAM_MAP(main_map)
@@ -775,6 +778,6 @@ ROM_START( polynetw )
 	ROM_LOAD( "polynetw.nv", 0x0000, 0x0080, CRC(8f39d644) SHA1(8733e1a288ba20c4b04b3aedde52801d05cebdf9) )
 ROM_END
 
-/*          ROM       parent   machine   inp        init */
+//    YEAR  NAME      PARENT   MACHINE   INPUT      STATE            INIT
 GAME( 1993, plygonet, 0,       plygonet, polygonet, polygonet_state, polygonet, ROT90, "Konami", "Polygonet Commanders (ver UAA)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, polynetw, 0,       plygonet, polynetw, polygonet_state,  polygonet, ROT90, "Konami", "Poly-Net Warriors (ver JAA)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, polynetw, 0,       plygonet, polynetw,  polygonet_state, polygonet, ROT90, "Konami", "Poly-Net Warriors (ver JAA)",    MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

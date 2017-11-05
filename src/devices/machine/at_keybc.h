@@ -6,12 +6,11 @@
 
 ***************************************************************************/
 
+#ifndef MAME_MACHINE_AT_KEYBC_H
+#define MAME_MACHINE_AT_KEYBC_H
+
 #pragma once
 
-#ifndef __AT_KEYBC_H__
-#define __AT_KEYBC_H__
-
-#include "emu.h"
 #include "cpu/mcs48/mcs48.h"
 
 
@@ -47,21 +46,14 @@ class at_keyboard_controller_device : public device_t
 {
 public:
 	// construction/destruction
-	at_keyboard_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	at_keyboard_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &set_system_reset_callback(device_t &device, _Object object) { return downcast<at_keyboard_controller_device &>(device).m_system_reset_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_gate_a20_callback(device_t &device, _Object object) { return downcast<at_keyboard_controller_device &>(device).m_gate_a20_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_input_buffer_full_callback(device_t &device, _Object object) { return downcast<at_keyboard_controller_device &>(device).m_input_buffer_full_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_output_buffer_empty_callback(device_t &device, _Object object) { return downcast<at_keyboard_controller_device &>(device).m_output_buffer_empty_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_keyboard_clock_callback(device_t &device, _Object object) { return downcast<at_keyboard_controller_device &>(device).m_keyboard_clock_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_keyboard_data_callback(device_t &device, _Object object) { return downcast<at_keyboard_controller_device &>(device).m_keyboard_data_cb.set_callback(object); }
-
-	// internal 8042 interface
-	DECLARE_READ8_MEMBER( t0_r );
-	DECLARE_READ8_MEMBER( t1_r );
-	DECLARE_READ8_MEMBER( p1_r );
-	DECLARE_READ8_MEMBER( p2_r );
-	DECLARE_WRITE8_MEMBER( p2_w );
+	template <class Object> static devcb_base &set_system_reset_callback(device_t &device, Object &&cb) { return downcast<at_keyboard_controller_device &>(device).m_system_reset_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_gate_a20_callback(device_t &device, Object &&cb) { return downcast<at_keyboard_controller_device &>(device).m_gate_a20_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_input_buffer_full_callback(device_t &device, Object &&cb) { return downcast<at_keyboard_controller_device &>(device).m_input_buffer_full_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_output_buffer_empty_callback(device_t &device, Object &&cb) { return downcast<at_keyboard_controller_device &>(device).m_output_buffer_empty_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_keyboard_clock_callback(device_t &device, Object &&cb) { return downcast<at_keyboard_controller_device &>(device).m_keyboard_clock_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_keyboard_data_callback(device_t &device, Object &&cb) { return downcast<at_keyboard_controller_device &>(device).m_keyboard_data_cb.set_callback(std::forward<Object>(cb)); }
 
 	// interface to the host pc
 	DECLARE_READ8_MEMBER( data_r );
@@ -78,11 +70,18 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual ioport_constructor device_input_ports() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
+	// internal 8042 interface
+	DECLARE_READ_LINE_MEMBER( t0_r );
+	DECLARE_READ_LINE_MEMBER( t1_r );
+	DECLARE_READ8_MEMBER( p1_r );
+	DECLARE_READ8_MEMBER( p2_r );
+	DECLARE_WRITE8_MEMBER( p2_w );
+
 	// internal state
 	upi41_cpu_device *m_cpu;
 
@@ -96,13 +95,12 @@ private:
 	devcb_write_line    m_keyboard_clock_cb;
 	devcb_write_line    m_keyboard_data_cb;
 
-	UINT8 m_clock_signal;
-	UINT8 m_data_signal;
+	uint8_t m_clock_signal;
+	uint8_t m_data_signal;
 };
 
 
 // device type definition
-extern const device_type AT_KEYBOARD_CONTROLLER;
+DECLARE_DEVICE_TYPE(AT_KEYBOARD_CONTROLLER, at_keyboard_controller_device)
 
-
-#endif  /* __AT_KEYBC__ */
+#endif // MAME_MACHINE_AT_KEYBC_H

@@ -48,7 +48,7 @@ TILE_GET_INFO_MEMBER(suprslam_state::get_suprslam_bg_tile_info)
 }
 
 
-UINT32 suprslam_state::suprslam_tile_callback( UINT32 code )
+uint32_t suprslam_state::suprslam_tile_callback( uint32_t code )
 {
 	return m_sp_videoram[code];
 }
@@ -57,29 +57,35 @@ UINT32 suprslam_state::suprslam_tile_callback( UINT32 code )
 
 void suprslam_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(suprslam_state::get_suprslam_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
-	m_screen_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(suprslam_state::get_suprslam_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(suprslam_state::get_suprslam_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	m_screen_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(suprslam_state::get_suprslam_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
+	m_spr_ctrl = 0;
 	m_screen_tilemap->set_transparent_pen(15);
 }
 
-UINT32 suprslam_state::screen_update_suprslam(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+WRITE8_MEMBER(suprslam_state::spr_ctrl_w)
+{
+	m_spr_ctrl = data;
+}
+
+uint32_t suprslam_state::screen_update_suprslam(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_screen_tilemap->set_scrollx(0, m_screen_vregs[0x04/2] );
 
 	bitmap.fill(m_palette->black_pen(), cliprect);
 	m_k053936->zoom_draw(screen, bitmap, cliprect, m_bg_tilemap, 0, 0, 1);
-	if(!(m_spr_ctrl[0] & 8))
+	if(!(m_spr_ctrl & 8))
 		m_spr->draw_sprites(m_spriteram, m_spriteram.bytes(), screen, bitmap, cliprect);
 	m_screen_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	if(m_spr_ctrl[0] & 8)
+	if(m_spr_ctrl & 8)
 		m_spr->draw_sprites(m_spriteram, m_spriteram.bytes(), screen, bitmap, cliprect);
 	return 0;
 }
 
 WRITE16_MEMBER(suprslam_state::suprslam_bank_w)
 {
-	UINT16 old_screen_bank, old_bg_bank;
+	uint16_t old_screen_bank, old_bg_bank;
 	old_screen_bank = m_screen_bank;
 	old_bg_bank = m_bg_bank;
 

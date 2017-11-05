@@ -55,7 +55,7 @@ K051316_CB_MEMBER(_88games_state::zoom_callback)
 
 ***************************************************************************/
 
-UINT32 _88games_state::screen_update_88games(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t _88games_state::screen_update_88games(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_k052109->tilemap_update();
 

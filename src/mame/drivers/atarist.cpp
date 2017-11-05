@@ -1,10 +1,13 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder, Olivier Galibert
+#include "emu.h"
 #include "includes/atarist.h"
 #include "machine/clock.h"
 #include "bus/midi/midi.h"
 #include "video/atarist.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
 
 /*
 
@@ -65,7 +68,7 @@ void st_state::device_timer(emu_timer &timer, device_timer_id id, int param, voi
 		blitter_tick();
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in st_state::device_timer");
+		assert_always(false, "Unknown id in st_state::device_timer");
 	}
 }
 
@@ -98,7 +101,7 @@ void st_state::flush_dma_fifo()
 	if (m_fdc_dmabytes) {
 		address_space &program = m_maincpu->space(AS_PROGRAM);
 		for (int i = 0; i < 8; i++) {
-			UINT16 data = m_fdc_fifo[m_fdc_fifo_sel][i];
+			uint16_t data = m_fdc_fifo[m_fdc_fifo_sel][i];
 
 			if (LOG) logerror("Flushing DMA FIFO %u data %04x to address %06x\n", m_fdc_fifo_sel, data, m_dma_base);
 
@@ -129,7 +132,7 @@ void st_state::fill_dma_fifo()
 	if (m_fdc_dmabytes) {
 		address_space &program = m_maincpu->space(AS_PROGRAM);
 		for (int i = 0; i < 8; i++) {
-			UINT16 data = program.read_word(m_dma_base);
+			uint16_t data = program.read_word(m_dma_base);
 
 			if (LOG) logerror("Filling DMA FIFO %u with data %04x from memory address %06x\n", m_fdc_fifo_sel, data, m_dma_base);
 
@@ -158,7 +161,7 @@ void st_state::fdc_dma_transfer()
 {
 	if (m_fdc_mode & DMA_MODE_READ_WRITE)
 	{
-		UINT16 data = m_fdc_fifo[m_fdc_fifo_sel][m_fdc_fifo_index];
+		uint16_t data = m_fdc_fifo[m_fdc_fifo_sel][m_fdc_fifo_index];
 
 		if (m_fdc_fifo_msb)
 		{
@@ -196,7 +199,7 @@ void st_state::fdc_dma_transfer()
 	else
 	{
 		// read from controller to FIFO
-		UINT8 data = m_fdc->data_r();
+		uint8_t data = m_fdc->data_r();
 
 		m_fdc_fifo_empty[m_fdc_fifo_sel] = 0;
 
@@ -232,7 +235,7 @@ void st_state::fdc_dma_transfer()
 
 READ16_MEMBER( st_state::fdc_data_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	if (m_fdc_mode & DMA_MODE_SECTOR_COUNT)
 	{
@@ -306,7 +309,7 @@ WRITE16_MEMBER( st_state::fdc_data_w )
 
 READ16_MEMBER( st_state::dma_status_r )
 {
-	UINT16 data = 0;
+	uint16_t data = 0;
 
 	// DMA error
 	data |= m_dma_error;
@@ -350,7 +353,7 @@ WRITE16_MEMBER( st_state::dma_mode_w )
 
 READ8_MEMBER( st_state::dma_counter_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	switch (offset)
 	{
@@ -430,7 +433,7 @@ WRITE16_MEMBER( st_state::berr_w )
 
 READ16_MEMBER( st_state::berr_r )
 {
-	if(!space.debugger_access()) {
+	if(!machine().side_effect_disabled()) {
 		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
 		m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 	}
@@ -457,8 +460,8 @@ void st_state::mouse_tick()
 
 	*/
 
-	UINT8 x = m_mousex->read();
-	UINT8 y = m_mousey->read();
+	uint8_t x = m_mousex->read();
+	uint8_t y = m_mousey->read();
 
 	if (m_ikbd_mouse_pc == 0)
 	{
@@ -525,7 +528,7 @@ READ8_MEMBER( st_state::ikbd_port1_r )
 
 	*/
 
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	// keyboard data
 	if (!BIT(m_ikbd_keylatch, 1)) data &= m_p31->read();
@@ -566,7 +569,7 @@ READ8_MEMBER( st_state::ikbd_port2_r )
 
 	*/
 
-	UINT8 data = m_joy1 ? m_joy1->read() & 0x06 : 0x06;
+	uint8_t data = m_joy1.read_safe(0x06) & 0x06;
 
 	// serial receive
 	data |= m_ikbd_tx << 3;
@@ -653,7 +656,7 @@ READ8_MEMBER( st_state::ikbd_port4_r )
 
 	if (m_ikbd_joy) return 0xff;
 
-	UINT8 data = m_joy0 ? m_joy0->read() : 0xff;
+	uint8_t data = m_joy0.read_safe(0xff);
 
 	if ((m_config->read() & 0x01) == 0)
 	{
@@ -758,7 +761,7 @@ void ste_state::dmasound_tick()
 {
 	if (m_dmasnd_samples == 0)
 	{
-		UINT8 *RAM = m_ram->pointer();
+		uint8_t *RAM = m_ram->pointer();
 
 		for (auto & elem : m_dmasnd_fifo)
 		{
@@ -834,7 +837,7 @@ READ8_MEMBER( ste_state::sound_dma_control_r )
 
 READ8_MEMBER( ste_state::sound_dma_base_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	switch (offset)
 	{
@@ -861,7 +864,7 @@ READ8_MEMBER( ste_state::sound_dma_base_r )
 
 READ8_MEMBER( ste_state::sound_dma_counter_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	switch (offset)
 	{
@@ -888,7 +891,7 @@ READ8_MEMBER( ste_state::sound_dma_counter_r )
 
 READ8_MEMBER( ste_state::sound_dma_end_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	switch (offset)
 	{
@@ -1941,7 +1944,8 @@ void st_state::machine_start()
 		m_maincpu->space(AS_PROGRAM).install_read_handler(0xfa0000, 0xfbffff, read16_delegate(FUNC(generic_slot_device::read16_rom),(generic_slot_device*)m_cart));
 
 	// allocate timers
-	if(m_mousex) {
+	if (m_mousex.found())
+	{
 		m_mouse_timer = timer_alloc(TIMER_MOUSE_TICK);
 		m_mouse_timer->adjust(attotime::zero, 0, attotime::from_hz(500));
 	}
@@ -2072,7 +2076,7 @@ SLOT_INTERFACE_END
 //  MACHINE_CONFIG( st )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( st, st_state )
+static MACHINE_CONFIG_START( st )
 	// basic machine hardware
 	MCFG_CPU_ADD(M68000_TAG, M68000, Y2/4)
 	MCFG_CPU_PROGRAM_MAP(st_map)
@@ -2162,7 +2166,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( megast )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( megast, megast_state )
+static MACHINE_CONFIG_START( megast )
 	// basic machine hardware
 	MCFG_CPU_ADD(M68000_TAG, M68000, Y2/4)
 	MCFG_CPU_PROGRAM_MAP(megast_map)
@@ -2253,7 +2257,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( ste )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( ste, ste_state )
+static MACHINE_CONFIG_START( ste )
 	// basic machine hardware
 	MCFG_CPU_ADD(M68000_TAG, M68000, Y2/4)
 	MCFG_CPU_PROGRAM_MAP(ste_map)
@@ -2368,7 +2372,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( stbook )
 //-------------------------------------------------
 #if 0
-static MACHINE_CONFIG_START( stbook, stbook_state )
+static MACHINE_CONFIG_START( stbook )
 	// basic machine hardware
 	MCFG_CPU_ADD(M68000_TAG, M68000, U517/2)
 	MCFG_CPU_PROGRAM_MAP(stbook_map)
@@ -2577,7 +2581,7 @@ ROM_END
 
 ROM_START( st_es )
 	ROM_REGION16_BE( 0x30000, M68000_TAG, 0 )
-	ROM_DEFAULT_BIOS("tos100")
+	ROM_DEFAULT_BIOS("tos104")
 	ROM_SYSTEM_BIOS( 0, "tos104", "TOS 1.04 (Rainbow TOS)" )
 	ROMX_LOAD( "tos104es.bin", 0x00000, 0x30000, BAD_DUMP CRC(f4e8ecd2) SHA1(df63f8ac09125d0877b55d5ba1282779b7f99c16), ROM_BIOS(1) )
 
@@ -2592,7 +2596,7 @@ ROM_END
 
 ROM_START( st_nl )
 	ROM_REGION16_BE( 0x30000, M68000_TAG, 0 )
-	ROM_DEFAULT_BIOS("tos100")
+	ROM_DEFAULT_BIOS("tos104")
 	ROM_SYSTEM_BIOS( 0, "tos104", "TOS 1.04 (Rainbow TOS)" )
 	ROMX_LOAD( "tos104nl.bin", 0x00000, 0x30000, BAD_DUMP CRC(bb4370d4) SHA1(6de7c96b2d2e5c68778f4bce3eaf85a4e121f166), ROM_BIOS(1) )
 
@@ -2642,11 +2646,36 @@ ROM_END
 ROM_START( megast )
 	ROM_REGION16_BE( 0x30000, M68000_TAG, 0 )
 	ROM_DEFAULT_BIOS("tos104")
-	ROM_SYSTEM_BIOS( 0, "tos102", "TOS 1.02 (MEGA TOS)" )
+	ROM_SYSTEM_BIOS( 0, "tos102", "TOS 1.02 (MEGA TOS)" ) // came in both 6 rom and 2 rom formats; 6 roms are 27512, and 2 roms are non-jedec RP231024 (TC531000 equivalent) 28-pin roms with A16 instead of /OE on pin 22
 	ROMX_LOAD( "tos102.bin", 0x00000, 0x30000, BAD_DUMP CRC(d3c32283) SHA1(735793fdba07fe8d5295caa03484f6ef3de931f5), ROM_BIOS(1) )
-	ROM_SYSTEM_BIOS( 1, "tos104", "TOS 1.04 (Rainbow TOS)" )
+	//For a C100167-001 revision B Mega ST motherboard, jumpered for 2 roms:
+	//ROMX_LOAD( "c101629-001__(c)atari_1987__38__rp231024e__0564__8807_z07.rp231024.u9", 0x00000, 0x20000, NO_DUMP, ROM_BIOS(1)|ROM_SKIP(1) ) // in u9 HI-0 socket
+	//ROMX_LOAD( "c101630-002__(c)atari_1987__38__rp231024e__0563__8809_z10.rp231024.u10", 0x00001, 0x20000, NO_DUMP, ROM_BIOS(1)|ROM_SKIP(1) ) // in u10 LO-0 socket
+	//For a C100167-001 revision B Mega ST motherboard, jumpered for 6 roms:
+	//ROMX_LOAD( "unknownmarkings_hi-0.27512.u9", 0x00000, 0x10000, NO_DUMP, ROM_BIOS(1)|ROM_SKIP(1) )
+	//ROMX_LOAD( "unknownmarkings_lo-0.27512.u10", 0x00001, 0x10000, NO_DUMP, ROM_BIOS(1)|ROM_SKIP(1) )
+	//ROMX_LOAD( "unknownmarkings_hi-1.27512.u6", 0x10000, 0x10000, NO_DUMP, ROM_BIOS(1)|ROM_SKIP(1) )
+	//ROMX_LOAD( "unknownmarkings_lo-1.27512.u7", 0x10001, 0x10000, NO_DUMP, ROM_BIOS(1)|ROM_SKIP(1) )
+	//ROMX_LOAD( "unknownmarkings_hi-2.27512.u3", 0x20000, 0x10000, NO_DUMP, ROM_BIOS(1)|ROM_SKIP(1) )
+	//ROMX_LOAD( "unknownmarkings_lo-2.27512.u4", 0x20001, 0x10000, NO_DUMP, ROM_BIOS(1)|ROM_SKIP(1) )
+	ROM_SYSTEM_BIOS( 1, "tos104", "TOS 1.04 (Rainbow TOS)" )  // came in both 6 rom and 2 rom formats; 6 roms are 27512, and 2 roms are non-jedec RP231024 (TC531000 equivalent) 28-pin roms with A16 instead of /OE on pin 22
 	ROMX_LOAD( "tos104.bin", 0x00000, 0x30000, BAD_DUMP CRC(90f4fbff) SHA1(2487f330b0895e5d88d580d4ecb24061125e88ad), ROM_BIOS(2) )
-
+	/*For a C100167-001 revision B Mega ST motherboard, jumpered for 2 roms:
+	These came in an upgrade kit pouch with label:
+	RAINBOW (TOS 1.4)
+	CA400407 2CHIPSET
+	(C) ATARI CORP.
+	and an end-user pamphlet explaining the changes in 1.04 and a sheet giving installation instructions (jumper strapping to convert between 2/6 chip)
+	*/
+	//ROMX_LOAD( "rainbow_(tos_1.4)__c300683-002_h0__(c)atari_corp.rp231024e.u9", 0x00000, 0x20000, NO_DUMP, ROM_BIOS(2)|ROM_SKIP(1) )
+	//ROMX_LOAD( "rainbow_(tos_1.4)__c300684-002_l0__(c)atari_corp.rp231024e.u10", 0x00001, 0x20000, NO_DUMP, ROM_BIOS(2)|ROM_SKIP(1) )
+	//For a C100167-001 revision B Mega ST motherboard, jumpered for 6 roms:
+	//ROMX_LOAD( "rainbow_(tos_1.4)__c300789-002_h0__(c)atari_corp.27512.u9", 0x00000, 0x10000, NO_DUMP, ROM_BIOS(2)|ROM_SKIP(1) )
+	//ROMX_LOAD( "rainbow_(tos_1.4)__c300792-002_l0__(c)atari_corp.27512.u10", 0x00001, 0x10000, NO_DUMP, ROM_BIOS(2)|ROM_SKIP(1) )
+	//ROMX_LOAD( "rainbow_(tos_1.4)__c300788-002_h1__(c)atari_corp.27512.u6", 0x10000, 0x10000, NO_DUMP, ROM_BIOS(2)|ROM_SKIP(1) )
+	//ROMX_LOAD( "rainbow_(tos_1.4)__c300791-002_l1__(c)atari_corp.27512.u7", 0x10001, 0x10000, NO_DUMP, ROM_BIOS(2)|ROM_SKIP(1) )
+	//ROMX_LOAD( "rainbow_(tos_1.4)__c300787-002_h2__(c)atari_corp.27512.u3", 0x20000, 0x10000, NO_DUMP, ROM_BIOS(2)|ROM_SKIP(1) )
+	//ROMX_LOAD( "rainbow_(tos_1.4)__c300790-002_l2__(c)atari_corp.27512.u4", 0x20001, 0x10000, NO_DUMP, ROM_BIOS(2)|ROM_SKIP(1) )
 	ROM_REGION( 0x1000, HD6301V1_TAG, 0 )
 	ROM_LOAD( "keyboard.u1", 0x0000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
 ROM_END
@@ -3182,44 +3211,44 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT     COMPANY    FULLNAME                FLAGS
-COMP( 1985, st,         0,          0,      st,         st, driver_device,          0,      "Atari",    "ST (USA)",             MACHINE_NOT_WORKING )
-COMP( 1985, st_uk,      st,         0,      st,         st, driver_device,          0,      "Atari",    "ST (UK)",              MACHINE_NOT_WORKING )
-COMP( 1985, st_de,      st,         0,      st,         st, driver_device,          0,      "Atari",    "ST (Germany)",         MACHINE_NOT_WORKING )
-COMP( 1985, st_es,      st,         0,      st,         st, driver_device,          0,      "Atari",    "ST (Spain)",           MACHINE_NOT_WORKING )
-COMP( 1985, st_fr,      st,         0,      st,         st, driver_device,          0,      "Atari",    "ST (France)",          MACHINE_NOT_WORKING )
-COMP( 1985, st_nl,      st,         0,      st,         st, driver_device,          0,      "Atari",    "ST (Netherlands)",     MACHINE_NOT_WORKING )
-COMP( 1985, st_se,      st,         0,      st,         st, driver_device,          0,      "Atari",    "ST (Sweden)",          MACHINE_NOT_WORKING )
-COMP( 1985, st_sg,      st,         0,      st,         st, driver_device,          0,      "Atari",    "ST (Switzerland)",     MACHINE_NOT_WORKING )
-COMP( 1987, megast,     st,         0,      megast,     st, driver_device,          0,      "Atari",    "MEGA ST (USA)",        MACHINE_NOT_WORKING )
-COMP( 1987, megast_uk,  st,         0,      megast,     st, driver_device,          0,      "Atari",    "MEGA ST (UK)",         MACHINE_NOT_WORKING )
-COMP( 1987, megast_de,  st,         0,      megast,     st, driver_device,          0,      "Atari",    "MEGA ST (Germany)",    MACHINE_NOT_WORKING )
-COMP( 1987, megast_fr,  st,         0,      megast,     st, driver_device,          0,      "Atari",    "MEGA ST (France)",     MACHINE_NOT_WORKING )
-COMP( 1987, megast_se,  st,         0,      megast,     st, driver_device,          0,      "Atari",    "MEGA ST (Sweden)",     MACHINE_NOT_WORKING )
-COMP( 1987, megast_sg,  st,         0,      megast,     st, driver_device,          0,      "Atari",    "MEGA ST (Switzerland)",MACHINE_NOT_WORKING )
-COMP( 1989, ste,        0,          0,      ste,        ste, driver_device,     0,      "Atari",    "STE (USA)",            MACHINE_NOT_WORKING )
-COMP( 1989, ste_uk,     ste,        0,      ste,        ste, driver_device,     0,      "Atari",    "STE (UK)",             MACHINE_NOT_WORKING )
-COMP( 1989, ste_de,     ste,        0,      ste,        ste, driver_device,     0,      "Atari",    "STE (Germany)",        MACHINE_NOT_WORKING )
-COMP( 1989, ste_es,     ste,        0,      ste,        ste, driver_device,     0,      "Atari",    "STE (Spain)",          MACHINE_NOT_WORKING )
-COMP( 1989, ste_fr,     ste,        0,      ste,        ste, driver_device,     0,      "Atari",    "STE (France)",         MACHINE_NOT_WORKING )
-COMP( 1989, ste_it,     ste,        0,      ste,        ste, driver_device,     0,      "Atari",    "STE (Italy)",          MACHINE_NOT_WORKING )
-COMP( 1989, ste_se,     ste,        0,      ste,        ste, driver_device,     0,      "Atari",    "STE (Sweden)",         MACHINE_NOT_WORKING )
-COMP( 1989, ste_sg,     ste,        0,      ste,        ste, driver_device,     0,      "Atari",    "STE (Switzerland)",    MACHINE_NOT_WORKING )
-//COMP( 1990, stbook,       ste,        0,      stbook,     stbook, driver_device,     0,      "Atari",    "STBook",               MACHINE_NOT_WORKING )
-COMP( 1990, tt030,      0,          0,      tt030,      tt030, driver_device,       0,      "Atari",    "TT030 (USA)",          MACHINE_NOT_WORKING )
-COMP( 1990, tt030_uk,   tt030,      0,      tt030,      tt030, driver_device,       0,      "Atari",    "TT030 (UK)",           MACHINE_NOT_WORKING )
-COMP( 1990, tt030_de,   tt030,      0,      tt030,      tt030, driver_device,       0,      "Atari",    "TT030 (Germany)",      MACHINE_NOT_WORKING )
-COMP( 1990, tt030_fr,   tt030,      0,      tt030,      tt030, driver_device,       0,      "Atari",    "TT030 (France)",       MACHINE_NOT_WORKING )
-COMP( 1990, tt030_pl,   tt030,      0,      tt030,      tt030, driver_device,       0,      "Atari",    "TT030 (Poland)",       MACHINE_NOT_WORKING )
-COMP( 1991, megaste,    ste,        0,      megaste,    st, driver_device,          0,      "Atari",    "MEGA STE (USA)",       MACHINE_NOT_WORKING )
-COMP( 1991, megaste_uk, ste,        0,      megaste,    st, driver_device,          0,      "Atari",    "MEGA STE (UK)",        MACHINE_NOT_WORKING )
-COMP( 1991, megaste_de, ste,        0,      megaste,    st, driver_device,          0,      "Atari",    "MEGA STE (Germany)",   MACHINE_NOT_WORKING )
-COMP( 1991, megaste_es, ste,        0,      megaste,    st, driver_device,          0,      "Atari",    "MEGA STE (Spain)",     MACHINE_NOT_WORKING )
-COMP( 1991, megaste_fr, ste,        0,      megaste,    st, driver_device,          0,      "Atari",    "MEGA STE (France)",    MACHINE_NOT_WORKING )
-COMP( 1991, megaste_it, ste,        0,      megaste,    st, driver_device,          0,      "Atari",    "MEGA STE (Italy)",     MACHINE_NOT_WORKING )
-COMP( 1991, megaste_se, ste,        0,      megaste,    st, driver_device,          0,      "Atari",    "MEGA STE (Sweden)",    MACHINE_NOT_WORKING )
-COMP( 1992, falcon30,   0,          0,      falcon,     falcon, driver_device,      0,      "Atari",    "Falcon030",            MACHINE_NOT_WORKING )
-COMP( 1992, falcon40,   falcon30,   0,      falcon40,   falcon, driver_device,      0,      "Atari",    "Falcon040 (prototype)",MACHINE_NOT_WORKING )
-//COMP( 1989, stacy,    st,  0,      stacy,    stacy, driver_device,    0,     "Atari", "Stacy", MACHINE_NOT_WORKING )
-//COMP( 1991, stpad,    ste, 0,      stpad,    stpad, driver_device,    0,     "Atari", "STPad (prototype)", MACHINE_NOT_WORKING )
-//COMP( 1992, fx1,      0,        0,      falcon,   falcon, driver_device,   0,     "Atari", "FX-1 (prototype)", MACHINE_NOT_WORKING )
+//    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   STATE          INIT    COMPANY    FULLNAME                FLAGS
+COMP( 1985, st,         0,          0,      st,         st,     st_state,      0,      "Atari",    "ST (USA)",             MACHINE_NOT_WORKING )
+COMP( 1985, st_uk,      st,         0,      st,         st,     st_state,      0,      "Atari",    "ST (UK)",              MACHINE_NOT_WORKING )
+COMP( 1985, st_de,      st,         0,      st,         st,     st_state,      0,      "Atari",    "ST (Germany)",         MACHINE_NOT_WORKING )
+COMP( 1985, st_es,      st,         0,      st,         st,     st_state,      0,      "Atari",    "ST (Spain)",           MACHINE_NOT_WORKING )
+COMP( 1985, st_fr,      st,         0,      st,         st,     st_state,      0,      "Atari",    "ST (France)",          MACHINE_NOT_WORKING )
+COMP( 1985, st_nl,      st,         0,      st,         st,     st_state,      0,      "Atari",    "ST (Netherlands)",     MACHINE_NOT_WORKING )
+COMP( 1985, st_se,      st,         0,      st,         st,     st_state,      0,      "Atari",    "ST (Sweden)",          MACHINE_NOT_WORKING )
+COMP( 1985, st_sg,      st,         0,      st,         st,     st_state,      0,      "Atari",    "ST (Switzerland)",     MACHINE_NOT_WORKING )
+COMP( 1987, megast,     st,         0,      megast,     st,     megast_state,  0,      "Atari",    "MEGA ST (USA)",        MACHINE_NOT_WORKING )
+COMP( 1987, megast_uk,  st,         0,      megast,     st,     megast_state,  0,      "Atari",    "MEGA ST (UK)",         MACHINE_NOT_WORKING )
+COMP( 1987, megast_de,  st,         0,      megast,     st,     megast_state,  0,      "Atari",    "MEGA ST (Germany)",    MACHINE_NOT_WORKING )
+COMP( 1987, megast_fr,  st,         0,      megast,     st,     megast_state,  0,      "Atari",    "MEGA ST (France)",     MACHINE_NOT_WORKING )
+COMP( 1987, megast_se,  st,         0,      megast,     st,     megast_state,  0,      "Atari",    "MEGA ST (Sweden)",     MACHINE_NOT_WORKING )
+COMP( 1987, megast_sg,  st,         0,      megast,     st,     megast_state,  0,      "Atari",    "MEGA ST (Switzerland)",MACHINE_NOT_WORKING )
+COMP( 1989, ste,        0,          0,      ste,        ste,    ste_state,     0,      "Atari",    "STE (USA)",            MACHINE_NOT_WORKING )
+COMP( 1989, ste_uk,     ste,        0,      ste,        ste,    ste_state,     0,      "Atari",    "STE (UK)",             MACHINE_NOT_WORKING )
+COMP( 1989, ste_de,     ste,        0,      ste,        ste,    ste_state,     0,      "Atari",    "STE (Germany)",        MACHINE_NOT_WORKING )
+COMP( 1989, ste_es,     ste,        0,      ste,        ste,    ste_state,     0,      "Atari",    "STE (Spain)",          MACHINE_NOT_WORKING )
+COMP( 1989, ste_fr,     ste,        0,      ste,        ste,    ste_state,     0,      "Atari",    "STE (France)",         MACHINE_NOT_WORKING )
+COMP( 1989, ste_it,     ste,        0,      ste,        ste,    ste_state,     0,      "Atari",    "STE (Italy)",          MACHINE_NOT_WORKING )
+COMP( 1989, ste_se,     ste,        0,      ste,        ste,    ste_state,     0,      "Atari",    "STE (Sweden)",         MACHINE_NOT_WORKING )
+COMP( 1989, ste_sg,     ste,        0,      ste,        ste,    ste_state,     0,      "Atari",    "STE (Switzerland)",    MACHINE_NOT_WORKING )
+//COMP( 1990, stbook,     ste,        0,      stbook,     stbook, stbook_state,  0,      "Atari",    "STBook",               MACHINE_NOT_WORKING )
+COMP( 1990, tt030,      0,          0,      tt030,      tt030,  ste_state,     0,      "Atari",    "TT030 (USA)",          MACHINE_NOT_WORKING )
+COMP( 1990, tt030_uk,   tt030,      0,      tt030,      tt030,  ste_state,     0,      "Atari",    "TT030 (UK)",           MACHINE_NOT_WORKING )
+COMP( 1990, tt030_de,   tt030,      0,      tt030,      tt030,  ste_state,     0,      "Atari",    "TT030 (Germany)",      MACHINE_NOT_WORKING )
+COMP( 1990, tt030_fr,   tt030,      0,      tt030,      tt030,  ste_state,     0,      "Atari",    "TT030 (France)",       MACHINE_NOT_WORKING )
+COMP( 1990, tt030_pl,   tt030,      0,      tt030,      tt030,  ste_state,     0,      "Atari",    "TT030 (Poland)",       MACHINE_NOT_WORKING )
+COMP( 1991, megaste,    ste,        0,      megaste,    st,     megaste_state, 0,      "Atari",    "MEGA STE (USA)",       MACHINE_NOT_WORKING )
+COMP( 1991, megaste_uk, ste,        0,      megaste,    st,     megaste_state, 0,      "Atari",    "MEGA STE (UK)",        MACHINE_NOT_WORKING )
+COMP( 1991, megaste_de, ste,        0,      megaste,    st,     megaste_state, 0,      "Atari",    "MEGA STE (Germany)",   MACHINE_NOT_WORKING )
+COMP( 1991, megaste_es, ste,        0,      megaste,    st,     megaste_state, 0,      "Atari",    "MEGA STE (Spain)",     MACHINE_NOT_WORKING )
+COMP( 1991, megaste_fr, ste,        0,      megaste,    st,     megaste_state, 0,      "Atari",    "MEGA STE (France)",    MACHINE_NOT_WORKING )
+COMP( 1991, megaste_it, ste,        0,      megaste,    st,     megaste_state, 0,      "Atari",    "MEGA STE (Italy)",     MACHINE_NOT_WORKING )
+COMP( 1991, megaste_se, ste,        0,      megaste,    st,     megaste_state, 0,      "Atari",    "MEGA STE (Sweden)",    MACHINE_NOT_WORKING )
+COMP( 1992, falcon30,   0,          0,      falcon,     falcon, ste_state,     0,      "Atari",    "Falcon030",            MACHINE_NOT_WORKING )
+COMP( 1992, falcon40,   falcon30,   0,      falcon40,   falcon, ste_state,     0,      "Atari",    "Falcon040 (prototype)",MACHINE_NOT_WORKING )
+//COMP( 1989, stacy,      st,         0,      stacy,      stacy,  st_state,      0,     "Atari", "Stacy", MACHINE_NOT_WORKING )
+//COMP( 1991, stpad,      ste,        0,      stpad,      stpad,  st_state,      0,     "Atari", "STPad (prototype)", MACHINE_NOT_WORKING )
+//COMP( 1992, fx1,        0,          0,      falcon,     falcon, ste_state,     0,      "Atari", "FX-1 (prototype)", MACHINE_NOT_WORKING )

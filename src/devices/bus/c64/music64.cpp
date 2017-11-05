@@ -28,6 +28,7 @@
 170 RETURN
 */
 
+#include "emu.h"
 #include "music64.h"
 
 
@@ -36,27 +37,16 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_MUSIC64 = &device_creator<c64_music64_cartridge_device>;
+DEFINE_DEVICE_TYPE(C64_MUSIC64, c64_music64_cartridge_device, "c64_music64", "C64 Music 64 cartridge")
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( c64_music64 )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( c64_music64 )
+MACHINE_CONFIG_MEMBER( c64_music64_cartridge_device::device_add_mconfig )
 	MCFG_C64_PASSTHRU_EXPANSION_SLOT_ADD()
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor c64_music64_cartridge_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( c64_music64 );
-}
 
 
 //-------------------------------------------------
@@ -149,17 +139,11 @@ ioport_constructor c64_music64_cartridge_device::device_input_ports() const
 //  c64_music64_cartridge_device - constructor
 //-------------------------------------------------
 
-c64_music64_cartridge_device::c64_music64_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, C64_MUSIC64, "C64 Music 64 cartridge", tag, owner, clock, "c64_music64", __FILE__),
+c64_music64_cartridge_device::c64_music64_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, C64_MUSIC64, tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_exp(*this, C64_EXPANSION_SLOT_TAG),
-	m_kb0(*this, "KB0"),
-	m_kb1(*this, "KB1"),
-	m_kb2(*this, "KB2"),
-	m_kb3(*this, "KB3"),
-	m_kb4(*this, "KB4"),
-	m_kb5(*this, "KB5"),
-	m_kb6(*this, "KB6")
+	m_kb(*this, "KB%u", 0)
 {
 }
 
@@ -186,21 +170,17 @@ void c64_music64_cartridge_device::device_reset()
 //  c64_cd_r - cartridge data read
 //-------------------------------------------------
 
-UINT8 c64_music64_cartridge_device::c64_cd_r(address_space &space, offs_t offset, UINT8 data, int sphi2, int ba, int roml, int romh, int io1, int io2)
+uint8_t c64_music64_cartridge_device::c64_cd_r(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
 	data = m_exp->cd_r(space, offset, data, sphi2, ba, roml, romh, io1, io2);
 
 	if (!io2)
 	{
-		switch (offset & 0x07)
+		int kb = offset & 0x07;
+
+		if (kb < 7)
 		{
-		case 0x00: data = m_kb0->read(); break;
-		case 0x01: data = m_kb1->read(); break;
-		case 0x02: data = m_kb2->read(); break;
-		case 0x03: data = m_kb3->read(); break;
-		case 0x04: data = m_kb4->read(); break;
-		case 0x05: data = m_kb5->read(); break;
-		case 0x06: data = m_kb6->read(); break;
+			data = m_kb[kb]->read();
 		}
 	}
 
@@ -212,7 +192,7 @@ UINT8 c64_music64_cartridge_device::c64_cd_r(address_space &space, offs_t offset
 //  c64_cd_w - cartridge data write
 //-------------------------------------------------
 
-void c64_music64_cartridge_device::c64_cd_w(address_space &space, offs_t offset, UINT8 data, int sphi2, int ba, int roml, int romh, int io1, int io2)
+void c64_music64_cartridge_device::c64_cd_w(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
 	m_exp->cd_w(space, offset, data, sphi2, ba, roml, romh, io1, io2);
 }

@@ -4,6 +4,7 @@
 #include "machine/taitoio.h"
 #include "video/hd63484.h"
 #include "video/tc0180vcu.h"
+#include "screen.h"
 
 class taitob_state : public driver_device
 {
@@ -40,8 +41,8 @@ public:
 		m_palette(*this, "palette") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT16> m_spriteram;
-	optional_shared_ptr<UINT16> m_pixelram;
+	required_shared_ptr<uint16_t> m_spriteram;
+	optional_shared_ptr<uint16_t> m_pixelram;
 
 	/* video-related */
 	/* framebuffer is a raw bitmap, remapped as a last step */
@@ -49,16 +50,16 @@ public:
 	std::unique_ptr<bitmap_ind16> m_pixel_bitmap;
 	std::unique_ptr<bitmap_ind16> m_realpunc_bitmap;
 
-	UINT16        m_pixel_scroll[2];
+	uint16_t        m_pixel_scroll[3];
 
 	int           m_b_fg_color_base;
 	int           m_b_sp_color_base;
 
 	/* misc */
-	UINT16        m_eep_latch;
-	UINT16        m_coin_word;
+	uint16_t        m_eep_latch;
+	uint16_t        m_coin_word;
 
-	UINT16        m_realpunc_video_ctrl;
+	uint16_t        m_realpunc_video_ctrl;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -86,9 +87,9 @@ public:
 	DECLARE_WRITE16_MEMBER(gain_control_w);
 	DECLARE_READ16_MEMBER(eep_latch_r);
 	DECLARE_WRITE16_MEMBER(eeprom_w);
+	DECLARE_WRITE8_MEMBER(player_12_coin_ctrl_w);
 	DECLARE_READ16_MEMBER(player_34_coin_ctrl_r);
 	DECLARE_WRITE16_MEMBER(player_34_coin_ctrl_w);
-	DECLARE_READ16_MEMBER(pbobble_input_bypass_r);
 	DECLARE_WRITE16_MEMBER(spacedxo_tc0220ioc_w);
 	DECLARE_WRITE16_MEMBER(realpunc_output_w);
 	DECLARE_WRITE16_MEMBER(hitice_pixelram_w);
@@ -108,9 +109,9 @@ public:
 	DECLARE_VIDEO_RESET(hitice);
 	DECLARE_VIDEO_START(realpunc);
 	DECLARE_VIDEO_START(taitob_core);
-	UINT32 screen_update_taitob(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_realpunc(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void screen_eof_taitob(screen_device &screen, bool state);
+	uint32_t screen_update_taitob(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_realpunc(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_taitob);
 	INTERRUPT_GEN_MEMBER(rastansaga2_interrupt);
 	INTERRUPT_GEN_MEMBER(crimec_interrupt);
 	INTERRUPT_GEN_MEMBER(hitice_interrupt);
@@ -125,7 +126,6 @@ public:
 	void hitice_clear_pixel_bitmap(  );
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void draw_framebuffer( bitmap_ind16 &bitmap, const rectangle &cliprect, int priority );
-	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;

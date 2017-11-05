@@ -1,18 +1,55 @@
 <?xml version="1.0"?>
 <mamelayout version="2">
-	<element name="pcb">
-		<image file="mp68A.png" />
+	<element name="redled" defstate="0">
+		<disk state="0"><color red="0.3" green="0.0" blue="0.0" /></disk>
+		<disk state="1"><color red="1.0" green="0.0" blue="0.0" /></disk>
 	</element>
-	<element name="button" defstate="1"/>
+	<element name="button" defstate="1">
+		<rect state="0"><color red="0.3" green="0.3" blue="0.3" /></rect>
+		<rect state="1"><color red="0.6" green="0.6" blue="0.6" /></rect>
+	</element>
 	<element name="digit" defstate="1">
-		<led7seg>
-			<color red="0.75" green="0.0" blue="0.0" />
-		</led7seg>
+		<led7seg><color red="0.75" green="0.0" blue="0.0" /></led7seg>
 	</element>
+
+	<element name="text_shift"><text string="*"><color red="1.0" green="0.0" blue="0.0" /></text></element>
+	<element name="text_reset"><text string="RES"><color red="1.0" green="1.0" blue="0.0" /></text></element>
+	<element name="text_0">  <text string="0"><color red="1.0" green="1.0" blue="0.0" /></text></element>
+	<element name="text_ADR"><text string="ADR"><color red="1.0" green="0.0" blue="0.0" /></text></element>
+	<element name="text_1">  <text string="1"><color red="1.0" green="1.0" blue="0.0" /></text></element>
+	<element name="text_STA"><text string="STA"><color red="1.0" green="0.0" blue="0.0" /></text></element>
+	<element name="text_2">  <text string="2"><color red="1.0" green="1.0" blue="0.0" /></text></element>
+	<element name="text_EXF"><text string="EXF"><color red="1.0" green="0.0" blue="0.0" /></text></element>
+	<element name="text_3">  <text string="3"><color red="1.0" green="1.0" blue="0.0" /></text></element>
+	<element name="text_CLR"><text string="CLR"><color red="1.0" green="0.0" blue="0.0" /></text></element>
+	<element name="text_4">  <text string="4"><color red="1.0" green="1.0" blue="0.0" /></text></element>
+	<element name="text_RUN"><text string="RUN"><color red="1.0" green="0.0" blue="0.0" /></text></element>
+	<element name="text_5">  <text string="5"><color red="1.0" green="1.0" blue="0.0" /></text></element>
+	<element name="text_STO"><text string="STO"><color red="1.0" green="0.0" blue="0.0" /></text></element>
+	<element name="text_6">  <text string="6"><color red="1.0" green="1.0" blue="0.0" /></text></element>
+	<element name="text_EXB"><text string="EXB"><color red="1.0" green="0.0" blue="0.0" /></text></element>
+	<element name="text_7">  <text string="7"><color red="1.0" green="1.0" blue="0.0" /></text></element>
+	<element name="text_REL"> <text string="REL"><color red="1.0" green="0.0" blue="0.0" /></text></element>
+	<element name="text_8">  <text string="8"><color red="1.0" green="1.0" blue="0.0" /></text></element>
+	<element name="text_SST"> <text string="SST"><color red="1.0" green="0.0" blue="0.0" /></text></element>
+	<element name="text_9">  <text string="9"><color red="1.0" green="1.0" blue="0.0" /></text></element>
+	<element name="text_BPR"> <text string="BPR"><color red="1.0" green="0.0" blue="0.0" /></text></element>
+	<element name="text_A">  <text string="A"><color red="1.0" green="1.0" blue="0.0" /></text></element>
+	<element name="text_MOV"> <text string="MOV"><color red="1.0" green="0.0" blue="0.0" /></text></element>
+	<element name="text_B">  <text string="B"><color red="1.0" green="1.0" blue="0.0" /></text></element>
+	<element name="text_REC"> <text string="REC"><color red="1.0" green="0.0" blue="0.0" /></text></element>
+	<element name="text_C">  <text string="C"><color red="1.0" green="1.0" blue="0.0" /></text></element>
+	<element name="text_REG"> <text string="REG"><color red="1.0" green="0.0" blue="0.0" /></text></element>
+	<element name="text_D">  <text string="D"><color red="1.0" green="1.0" blue="0.0" /></text></element>
+	<element name="text_BPS"> <text string="BPS"><color red="1.0" green="0.0" blue="0.0" /></text></element>
+	<element name="text_E">  <text string="E"><color red="1.0" green="1.0" blue="0.0" /></text></element>
+	<element name="text_PRM"> <text string="PRM"><color red="1.0" green="0.0" blue="0.0" /></text></element>
+	<element name="text_F">  <text string="F"><color red="1.0" green="1.0" blue="0.0" /></text></element>
+	<element name="text_PLA"> <text string="PLA"><color red="1.0" green="0.0" blue="0.0" /></text></element>
+
 	<view name="Full Artwork">
-		<backdrop element="pcb">
-			<bounds left="0" top="0" right="840" bottom="1105" />
-		</backdrop>
+		<bounds left="0" top="0" right="840" bottom="1105" />
+
 		<bezel name="digit0" element="digit">
 			<bounds left="70" top="840" right="100" bottom="885" />
 		</bezel>
@@ -35,82 +72,117 @@
 		<!-- Buttons -->
 		<!-- Row 3 : C D E F -->
 		<bezel element="button" inputtag="LINE0" inputmask="0x10">
-			<bounds x="240" y="750" width="85" height="85"/>
+			<bounds x="240" y="750" width="80" height="80"/>
 		</bezel>
+		<bezel element="text_REG"><bounds x="255" y="760" width="50" height="30" /></bezel>
+		<bezel element="text_C"><bounds x="255" y="795" width="50" height="30" /></bezel>
 
 		<bezel element="button" inputtag="LINE0" inputmask="0x20">
-			<bounds x="325" y="750" width="85" height="85"/>
+			<bounds x="325" y="750" width="80" height="80"/>
 		</bezel>
+		<bezel element="text_BPS"><bounds x="340" y="760" width="50" height="30" /></bezel>
+		<bezel element="text_D"><bounds x="340" y="795" width="50" height="30" /></bezel>
 
 		<bezel element="button" inputtag="LINE0" inputmask="0x40">
-			<bounds x="410" y="750" width="85" height="85"/>
+			<bounds x="410" y="750" width="80" height="80"/>
 		</bezel>
+		<bezel element="text_PRM"><bounds x="425" y="760" width="50" height="30" /></bezel>
+		<bezel element="text_E"><bounds x="425" y="795" width="50" height="30" /></bezel>
 
 		<bezel element="button" inputtag="LINE0" inputmask="0x80">
-			<bounds x="495" y="750" width="85" height="85"/>
+			<bounds x="495" y="750" width="80" height="80"/>
 		</bezel>
+		<bezel element="text_PLA"><bounds x="510" y="760" width="50" height="30" /></bezel>
+		<bezel element="text_F"><bounds x="510" y="795" width="50" height="30" /></bezel>
 
 		<!-- Buttons -->
 		<!-- Row 2 : 8 9 A B -->
 		<bezel element="button" inputtag="LINE1" inputmask="0x01">
-			<bounds x="240" y="835" width="85" height="85"/>
+			<bounds x="240" y="835" width="80" height="80"/>
 		</bezel>
+		<bezel element="text_SST"><bounds x="255" y="845" width="50" height="30" /></bezel>
+		<bezel element="text_8"><bounds x="255" y="880" width="50" height="30" /></bezel>
 
 		<bezel element="button" inputtag="LINE1" inputmask="0x02">
-			<bounds x="325" y="835" width="85" height="85"/>
+			<bounds x="325" y="835" width="80" height="80"/>
 		</bezel>
+		<bezel element="text_BPR"><bounds x="340" y="845" width="50" height="30" /></bezel>
+		<bezel element="text_9"><bounds x="340" y="880" width="50" height="30" /></bezel>
 
 		<bezel element="button" inputtag="LINE1" inputmask="0x04">
-			<bounds x="410" y="835" width="85" height="85"/>
+			<bounds x="410" y="835" width="80" height="80"/>
 		</bezel>
+		<bezel element="text_MOV"><bounds x="425" y="845" width="50" height="30" /></bezel>
+		<bezel element="text_A"><bounds x="425" y="880" width="50" height="30" /></bezel>
 
 		<bezel element="button" inputtag="LINE1" inputmask="0x08">
-			<bounds x="495" y="835" width="85" height="85"/>
+			<bounds x="495" y="835" width="80" height="80"/>
 		</bezel>
+		<bezel element="text_REC"><bounds x="510" y="845" width="50" height="30" /></bezel>
+		<bezel element="text_B"><bounds x="510" y="880" width="50" height="30" /></bezel>
 
 		<!-- Buttons -->
 		<!-- Row 1 : SHIFT 4 5 6 7 -->
 		<bezel element="button" inputtag="LINE4" inputmask="0x08">
-			<bounds x="155" y="920" width="85" height="85"/>
+			<bounds x="155" y="920" width="80" height="80"/>
 		</bezel>
+		<bezel name="led1" element="redled"><bounds x="185" y="945" width="15" height="15" /></bezel>
+		<bezel element="text_shift"><bounds x="170" y="965" width="50" height="30" /></bezel>
 
 		<bezel element="button" inputtag="LINE2" inputmask="0x10">
-			<bounds x="240" y="920" width="85" height="85"/>
+			<bounds x="240" y="920" width="80" height="80"/>
 		</bezel>
+		<bezel element="text_RUN"><bounds x="255" y="930" width="50" height="30" /></bezel>
+		<bezel element="text_4"><bounds x="255" y="965" width="50" height="30" /></bezel>
 
 		<bezel element="button" inputtag="LINE2" inputmask="0x20">
-			<bounds x="325" y="920" width="85" height="85"/>
+			<bounds x="325" y="920" width="80" height="80"/>
 		</bezel>
+		<bezel element="text_STO"><bounds x="340" y="930" width="50" height="30" /></bezel>
+		<bezel element="text_5"><bounds x="340" y="965" width="50" height="30" /></bezel>
 
 		<bezel element="button" inputtag="LINE2" inputmask="0x40">
-			<bounds x="410" y="920" width="85" height="85"/>
+			<bounds x="410" y="920" width="80" height="80"/>
 		</bezel>
+		<bezel element="text_EXB"><bounds x="425" y="930" width="50" height="30" /></bezel>
+		<bezel element="text_6"><bounds x="425" y="965" width="50" height="30" /></bezel>
 
 		<bezel element="button" inputtag="LINE2" inputmask="0x80">
-			<bounds x="495" y="920" width="85" height="85"/>
+			<bounds x="495" y="920" width="80" height="80"/>
 		</bezel>
+		<bezel element="text_REL"><bounds x="510" y="930" width="50" height="30" /></bezel>
+		<bezel element="text_7"><bounds x="510" y="965" width="50" height="30" /></bezel>
 
 		<!-- Buttons -->
 		<!-- Row 0 : RESET 0 1 2 3 -->
 		<bezel element="button" inputtag="LINE4" inputmask="0x04">
-			<bounds x="155" y="1005" width="85" height="85"/>
+			<bounds x="155" y="1005" width="80" height="80"/>
 		</bezel>
+		<bezel element="text_reset"><bounds x="170" y="1050" width="50" height="30" /></bezel>
 
 		<bezel element="button" inputtag="LINE3" inputmask="0x01">
-			<bounds x="240" y="1005" width="85" height="85"/>
+			<bounds x="240" y="1005" width="80" height="80"/>
 		</bezel>
+		<bezel element="text_ADR"><bounds x="255" y="1015" width="50" height="30" /></bezel>
+		<bezel element="text_0"><bounds x="255" y="1050" width="50" height="30" /></bezel>
 
 		<bezel element="button" inputtag="LINE3" inputmask="0x02">
-			<bounds x="325" y="1005" width="85" height="85"/>
+			<bounds x="325" y="1005" width="80" height="80"/>
 		</bezel>
+		<bezel element="text_STA"><bounds x="340" y="1015" width="50" height="30" /></bezel>
+		<bezel element="text_1"><bounds x="340" y="1050" width="50" height="30" /></bezel>
 
 		<bezel element="button" inputtag="LINE3" inputmask="0x04">
-			<bounds x="410" y="1005" width="85" height="85"/>
+			<bounds x="410" y="1005" width="80" height="80"/>
 		</bezel>
+		<bezel element="text_EXF"><bounds x="425" y="1015" width="50" height="30" /></bezel>
+		<bezel element="text_2"><bounds x="425" y="1050" width="50" height="30" /></bezel>
 
 		<bezel element="button" inputtag="LINE3" inputmask="0x08">
-			<bounds x="495" y="1005" width="85" height="85"/>
+			<bounds x="495" y="1005" width="80" height="80"/>
 		</bezel>
+		<bezel element="text_CLR"><bounds x="510" y="1015" width="50" height="30" /></bezel>
+		<bezel element="text_3"><bounds x="510" y="1050" width="50" height="30" /></bezel>
 
 	</view>
 </mamelayout>

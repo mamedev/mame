@@ -20,6 +20,7 @@
 
 #include "emu.h"
 #include "machine/pcecommn.h"
+
 #include "video/huc6270.h"
 #include "video/huc6260.h"
 #include "video/huc6202.h"
@@ -27,16 +28,18 @@
 #include "sound/c6280.h"
 #include "sound/okim6295.h"
 #include "machine/msm6242.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class ggconnie_state : public pce_common_state
 {
 public:
 	ggconnie_state(const machine_config &mconfig, device_type type, const char *tag)
-		: pce_common_state(mconfig, type, tag),
-		m_rtc(*this, "rtc"),
-		m_oki(*this, "oki")
-		{ }
+		: pce_common_state(mconfig, type, tag)
+		, m_rtc(*this, "rtc")
+		, m_oki(*this, "oki")
+	{ }
 
 	required_device <msm6242_device> m_rtc;
 	required_device <okim6295_device> m_oki;
@@ -58,7 +61,7 @@ WRITE8_MEMBER(ggconnie_state::output_w)
 /* TODO: banking not understood (is the ROM dumped correctly btw?) */
 WRITE8_MEMBER(ggconnie_state::oki_bank_w)
 {
-	m_oki->set_bank_base((data) ? 0x40000 : 0x00000);
+	m_oki->set_rom_bank(data != 0);
 }
 
 
@@ -175,7 +178,7 @@ static INPUT_PORTS_START(ggconnie)
 	PORT_DIPSETTING(0x00, DEF_STR(On) )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( ggconnie, ggconnie_state )
+static MACHINE_CONFIG_START( ggconnie )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", H6280, PCE_MAIN_CLOCK/3)
 	MCFG_CPU_PROGRAM_MAP(sgx_mem)
@@ -183,7 +186,7 @@ static MACHINE_CONFIG_START( ggconnie, ggconnie_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PCE_MAIN_CLOCK/3, HUC6260_WPF, 64, 64 + 1024 + 64, HUC6260_LPF, 18, 18 + 242)
+	MCFG_SCREEN_RAW_PARAMS(PCE_MAIN_CLOCK/3, huc6260_device::WPF, 64, 64 + 1024 + 64, huc6260_device::LPF, 18, 18 + 242)
 	MCFG_SCREEN_UPDATE_DRIVER( ggconnie_state, screen_update )
 	MCFG_SCREEN_PALETTE("huc6260:palette")
 
@@ -194,10 +197,10 @@ static MACHINE_CONFIG_START( ggconnie, ggconnie_state )
 	MCFG_HUC6260_HSYNC_CHANGED_CB(DEVWRITELINE("huc6202", huc6202_device, hsync_changed))
 	MCFG_DEVICE_ADD( "huc6270_0", HUC6270, 0 )
 	MCFG_HUC6270_VRAM_SIZE(0x10000)
-	MCFG_HUC6270_IRQ_CHANGED_CB(WRITELINE(pce_common_state, pce_irq_changed))
+	MCFG_HUC6270_IRQ_CHANGED_CB(INPUTLINE("maincpu", 0))
 	MCFG_DEVICE_ADD( "huc6270_1", HUC6270, 0 )
 	MCFG_HUC6270_VRAM_SIZE(0x10000)
-	MCFG_HUC6270_IRQ_CHANGED_CB(WRITELINE(pce_common_state, pce_irq_changed))
+	MCFG_HUC6270_IRQ_CHANGED_CB(INPUTLINE("maincpu", 0))
 	MCFG_DEVICE_ADD( "huc6202", HUC6202, 0 )
 	MCFG_HUC6202_NEXT_PIXEL_0_CB(DEVREAD16("huc6270_0", huc6270_device, next_pixel))
 	MCFG_HUC6202_TIME_TIL_NEXT_EVENT_0_CB(DEVREAD16("huc6270_0", huc6270_device, time_until_next_event))
@@ -220,7 +223,7 @@ static MACHINE_CONFIG_START( ggconnie, ggconnie_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 
-	MCFG_OKIM6295_ADD("oki", PCE_MAIN_CLOCK/12, OKIM6295_PIN7_HIGH) /* unknown clock / pin 7 */
+	MCFG_OKIM6295_ADD("oki", PCE_MAIN_CLOCK/12, PIN7_HIGH) /* unknown clock / pin 7 */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.00)
 MACHINE_CONFIG_END
@@ -234,4 +237,4 @@ ROM_START(ggconnie)
 	ROM_LOAD( "adpcm_u31.bin", 0x00000, 0x80000, CRC(de514c2b) SHA1(da73aa825d73646f556f6d4dbb46f43acf7c3357) )
 ROM_END
 
-GAME( 1996, ggconnie, 0, ggconnie, ggconnie, pce_common_state, pce_common, ROT0, "Eighting", "Go! Go! Connie chan Jaka Jaka Janken", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1996, ggconnie, 0, ggconnie, ggconnie, ggconnie_state, pce_common, ROT0, "Eighting", "Go! Go! Connie chan Jaka Jaka Janken", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

@@ -16,11 +16,11 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	optional_shared_ptr<UINT8> m_fg_videoram;
-	required_shared_ptr<UINT8> m_bg_videoram;
-	optional_shared_ptr<UINT8> m_spriteram;
+	optional_shared_ptr<uint8_t> m_fg_videoram;
+	required_shared_ptr<uint8_t> m_bg_videoram;
+	optional_shared_ptr<uint8_t> m_spriteram;
 
-	UINT8 m_ninjakun_io_a002_ctrl;
+	uint8_t m_ninjakun_io_a002_ctrl;
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
 
@@ -56,10 +56,10 @@ public:
 	TILE_GET_INFO_MEMBER(raiders5_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(raiders5_get_fg_tile_info);
 
-	UINT32 screen_update_nova2001(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_ninjakun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_pkunwar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_raiders5(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_nova2001(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_ninjakun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_pkunwar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_raiders5(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void nova2001_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void pkunwar_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void lineswap_gfx_roms(const char *region, const int bit);

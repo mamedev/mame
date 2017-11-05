@@ -13,18 +13,10 @@
 
 **********************************************************************/
 
+#ifndef MAME_MACHINE_NMC9306_H
+#define MAME_MACHINE_NMC9306_H
+
 #pragma once
-
-#ifndef __NMC9306__
-#define __NMC9306__
-
-#include "emu.h"
-
-
-
-//**************************************************************************
-//  MACROS / CONSTANTS
-//**************************************************************************
 
 
 
@@ -33,8 +25,8 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_NMC9306_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, NMC9306, 0)
+#define MCFG_NMC9306_ADD(tag) \
+		MCFG_DEVICE_ADD((tag), NMC9306, 0)
 
 
 
@@ -50,7 +42,7 @@ class nmc9306_device :  public device_t,
 {
 public:
 	// construction/destruction
-	nmc9306_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nmc9306_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_WRITE_LINE_MEMBER( cs_w );
 	DECLARE_WRITE_LINE_MEMBER( sk_w );
@@ -67,17 +59,17 @@ protected:
 	virtual void nvram_write(emu_file &file) override;
 
 private:
-	inline UINT16 read(offs_t offset);
-	inline void write(offs_t offset, UINT16 data);
+	inline uint16_t read(offs_t offset);
+	inline void write(offs_t offset, uint16_t data);
 	inline void erase(offs_t offset);
 
-	UINT16 m_register[16];
+	uint16_t m_register[16];
 
 	int m_bits;
 	int m_state;
-	UINT8 m_command;
-	UINT8 m_address;
-	UINT16 m_data;
+	uint8_t m_command;
+	uint8_t m_address;
+	uint16_t m_data;
 	bool m_ewen;
 	int m_cs;
 	int m_sk;
@@ -87,7 +79,6 @@ private:
 
 
 // device type definition
-extern const device_type NMC9306;
+DECLARE_DEVICE_TYPE(NMC9306, nmc9306_device)
 
-
-#endif
+#endif // MAME_MACHINE_NMC9306_H

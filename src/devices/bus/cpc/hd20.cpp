@@ -8,26 +8,20 @@
 
 #include "emu.h"
 #include "hd20.h"
-#include "includes/amstrad.h"
-
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type CPC_HD20 = &device_creator<cpc_hd20_device>;
+DEFINE_DEVICE_TYPE(CPC_HD20, cpc_hd20_device, "cpc_hd20", "Dobbertin HD20")
 
-static MACHINE_CONFIG_FRAGMENT( cpc_hd20 )
+MACHINE_CONFIG_MEMBER( cpc_hd20_device::device_add_mconfig )
 	MCFG_DEVICE_ADD("hdc",ST11M_HDC,0)
-	MCFG_XTHDC_IRQ_HANDLER(WRITELINE(cpc_hd20_device,irq_w))
+	MCFG_XTHDC_IRQ_HANDLER(WRITELINE(cpc_hd20_device, irq_w))
 	MCFG_HARDDISK_ADD("hdc:primary")
 	// no pass-through (?)
 MACHINE_CONFIG_END
 
-machine_config_constructor cpc_hd20_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( cpc_hd20 );
-}
 
 ROM_START( cpc_hd20 )
 	ROM_REGION( 0x4000, "exp_rom", 0 )
@@ -39,7 +33,7 @@ ROM_START( cpc_hd20 )
 	ROMX_LOAD( "x-ddos20.rom",   0x0000, 0x4000, CRC(c2d9cc03) SHA1(8a20788be5f957e84e849c226aa97b55b2a3aab9), ROM_BIOS(2) )
 ROM_END
 
-const rom_entry *cpc_hd20_device::device_rom_region() const
+const tiny_rom_entry *cpc_hd20_device::device_rom_region() const
 {
 	return ROM_NAME( cpc_hd20 );
 }
@@ -48,8 +42,8 @@ const rom_entry *cpc_hd20_device::device_rom_region() const
 //  LIVE DEVICE
 //**************************************************************************
 
-cpc_hd20_device::cpc_hd20_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, CPC_HD20, "Dobbertin HD20", tag, owner, clock, "cpc_hd20", __FILE__),
+cpc_hd20_device::cpc_hd20_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, CPC_HD20, tag, owner, clock),
 	device_cpc_expansion_card_interface(mconfig, *this), m_slot(nullptr),
 	m_hdc(*this,"hdc")
 {
@@ -65,8 +59,8 @@ void cpc_hd20_device::device_start()
 	address_space& space = cpu->memory().space(AS_IO);
 	m_slot = dynamic_cast<cpc_expansion_slot_device *>(owner());
 
-	space.install_write_handler(0xfbe0,0xfbe4,0,0,write8_delegate(FUNC(cpc_hd20_device::hdc_w),this));
-	space.install_read_handler(0xfbe0,0xfbe4,0,0,read8_delegate(FUNC(cpc_hd20_device::hdc_r),this));
+	space.install_write_handler(0xfbe0,0xfbe4,write8_delegate(FUNC(cpc_hd20_device::hdc_w),this));
+	space.install_read_handler(0xfbe0,0xfbe4,read8_delegate(FUNC(cpc_hd20_device::hdc_r),this));
 }
 
 //-------------------------------------------------
@@ -80,7 +74,7 @@ void cpc_hd20_device::device_reset()
 
 READ8_MEMBER(cpc_hd20_device::hdc_r)
 {
-	UINT8 ret = 0x00;
+	uint8_t ret = 0x00;
 
 	switch(offset)
 	{

@@ -17,9 +17,11 @@
 */
 
 #include "emu.h"
-#include "cpu/i8085/i8085.h"
 #include "includes/hitme.h"
+
+#include "cpu/i8085/i8085.h"
 #include "sound/discrete.h"
+#include "speaker.h"
 
 #include "barricad.lh"
 
@@ -35,7 +37,7 @@
 TILE_GET_INFO_MEMBER(hitme_state::get_hitme_tile_info)
 {
 	/* the code is the low 6 bits */
-	UINT8 code = m_videoram[tile_index] & 0x3f;
+	uint8_t code = m_videoram[tile_index] & 0x3f;
 	SET_TILE_INFO_MEMBER(0, code, 0, 0);
 }
 
@@ -57,17 +59,17 @@ WRITE8_MEMBER(hitme_state::hitme_vidram_w)
 
 void hitme_state::video_start()
 {
-	m_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(hitme_state::get_hitme_tile_info),this), TILEMAP_SCAN_ROWS, 8, 10, 40, 19);
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(hitme_state::get_hitme_tile_info),this), TILEMAP_SCAN_ROWS, 8, 10, 40, 19);
 }
 
 
 VIDEO_START_MEMBER(hitme_state,barricad)
 {
-	m_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(hitme_state::get_hitme_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 24);
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(hitme_state::get_hitme_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 24);
 }
 
 
-UINT32 hitme_state::screen_update_hitme(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t hitme_state::screen_update_hitme(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* the card width resistor comes from an input port, scaled to the range 0-25 kOhms */
 	double width_resist = ioport("WIDTH")->read() * 25000 / 100;
@@ -96,7 +98,7 @@ UINT32 hitme_state::screen_update_hitme(screen_device &screen, bitmap_ind16 &bit
 			/* invert pixels until we run out */
 			for (xx = 0; xx < 8 && inv; xx++, inv--)
 			{
-				UINT16 *dest = &bitmap.pix16(y * 10, x * 8 + xx);
+				uint16_t *dest = &bitmap.pix16(y * 10, x * 8 + xx);
 				dest[0 * dy] ^= 1;
 				dest[1 * dy] ^= 1;
 				dest[2 * dy] ^= 1;
@@ -114,7 +116,7 @@ UINT32 hitme_state::screen_update_hitme(screen_device &screen, bitmap_ind16 &bit
 }
 
 
-UINT32 hitme_state::screen_update_barricad(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t hitme_state::screen_update_barricad(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
@@ -128,20 +130,20 @@ UINT32 hitme_state::screen_update_barricad(screen_device &screen, bitmap_ind16 &
  *
  *************************************/
 
-UINT8 hitme_state::read_port_and_t0( int port )
+uint8_t hitme_state::read_port_and_t0( int port )
 {
 	static const char *const portnames[] = { "IN0", "IN1", "IN2", "IN3" };
 
-	UINT8 val = ioport(portnames[port])->read();
+	uint8_t val = ioport(portnames[port])->read();
 	if (machine().time() > m_timeout_time)
 		val ^= 0x80;
 	return val;
 }
 
 
-UINT8 hitme_state::read_port_and_t0_and_hblank( int port )
+uint8_t hitme_state::read_port_and_t0_and_hblank( int port )
 {
-	UINT8 val = read_port_and_t0(port);
+	uint8_t val = read_port_and_t0(port);
 	if (m_screen->hpos() < (m_screen->width() * 9 / 10))
 		val ^= 0x04;
 	return val;
@@ -187,7 +189,7 @@ WRITE8_MEMBER(hitme_state::output_port_0_w)
 	    In fact, it is very important that our timing calculation timeout AFTER the sound
 	    system's equivalent computation, or else we will hang notes.
 	*/
-	UINT8 raw_game_speed = ioport("R3")->read();
+	uint8_t raw_game_speed = ioport("R3")->read();
 	double resistance = raw_game_speed * 25000 / 100;
 	attotime duration = attotime(0, ATTOSECONDS_PER_SECOND * 0.45 * 6.8e-6 * resistance * (data + 1));
 	m_timeout_time = machine().time() + duration;
@@ -309,7 +311,7 @@ void hitme_state::machine_reset()
 	m_timeout_time = attotime::zero;
 }
 
-static MACHINE_CONFIG_START( hitme, hitme_state )
+static MACHINE_CONFIG_START( hitme )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, MASTER_CLOCK/16)
@@ -688,9 +690,9 @@ ROM_END
  *
  *************************************/
 
-GAME( 1976, hitme,    0,        hitme,    hitme, driver_device,    0, ROT0, "Ramtek", "Hit Me (set 1)",  MACHINE_SUPPORTS_SAVE )   // 05/1976
-GAME( 1976, hitme1,   hitme,    hitme,    hitme, driver_device,    0, ROT0, "Ramtek", "Hit Me (set 2)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1976, m21,      hitme,    hitme,    hitme, driver_device,    0, ROT0, "Mirco Games", "21 (Mirco)", MACHINE_SUPPORTS_SAVE )   // 08/1976, licensed?
-GAME( 1978, super21,  0,        hitme,    super21, driver_device,  0, ROT0, "Mirco Games", "Super Twenty One", MACHINE_SUPPORTS_SAVE )
-GAMEL(1976, barricad, 0,        barricad, barricad, driver_device, 0, ROT0, "Ramtek", "Barricade",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_barricad )
-GAMEL(1976, brickyrd, barricad, barricad, barricad, driver_device, 0, ROT0, "Ramtek", "Brickyard",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_barricad )
+GAME( 1976, hitme,    0,        hitme,    hitme,    hitme_state, 0, ROT0, "Ramtek",      "Hit Me (set 1)",   MACHINE_SUPPORTS_SAVE )   // 05/1976
+GAME( 1976, hitme1,   hitme,    hitme,    hitme,    hitme_state, 0, ROT0, "Ramtek",      "Hit Me (set 2)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1976, m21,      hitme,    hitme,    hitme,    hitme_state, 0, ROT0, "Mirco Games", "21 (Mirco)",       MACHINE_SUPPORTS_SAVE )   // 08/1976, licensed?
+GAME( 1978, super21,  0,        hitme,    super21,  hitme_state, 0, ROT0, "Mirco Games", "Super Twenty One", MACHINE_SUPPORTS_SAVE )
+GAMEL(1976, barricad, 0,        barricad, barricad, hitme_state, 0, ROT0, "Ramtek",      "Barricade",        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_barricad )
+GAMEL(1976, brickyrd, barricad, barricad, barricad, hitme_state, 0, ROT0, "Ramtek",      "Brickyard",        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_barricad )

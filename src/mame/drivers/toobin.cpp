@@ -20,10 +20,12 @@
 
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
-#include "machine/watchdog.h"
-#include "machine/atarigen.h"
 #include "includes/toobin.h"
+
+#include "cpu/m68000/m68000.h"
+#include "machine/eeprompar.h"
+#include "machine/watchdog.h"
+#include "speaker.h"
 
 #define MASTER_CLOCK        XTAL_32MHz
 
@@ -86,22 +88,22 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, toobin_state )
 	AM_RANGE(0xc08000, 0xc097ff) AM_MIRROR(0x046000) AM_RAM_DEVWRITE("alpha", tilemap_device, write) AM_SHARE("alpha")
 	AM_RANGE(0xc09800, 0xc09fff) AM_MIRROR(0x046000) AM_RAM AM_SHARE("mob")
 	AM_RANGE(0xc10000, 0xc107ff) AM_MIRROR(0x047800) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0xff6000, 0xff6001) AM_READNOP     /* who knows? read at controls time */
-	AM_RANGE(0xff8000, 0xff8001) AM_MIRROR(0x4500fe) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
-	AM_RANGE(0xff8100, 0xff8101) AM_MIRROR(0x4500fe) AM_DEVWRITE8("jsa", atari_jsa_i_device, main_command_w, 0x00ff)
-	AM_RANGE(0xff8300, 0xff8301) AM_MIRROR(0x45003e) AM_WRITE(intensity_w)
-	AM_RANGE(0xff8340, 0xff8341) AM_MIRROR(0x45003e) AM_WRITE(interrupt_scan_w) AM_SHARE("interrupt_scan")
-	AM_RANGE(0xff8380, 0xff8381) AM_MIRROR(0x45003e) AM_RAM_WRITE(slip_w) AM_SHARE("mob:slip")
-	AM_RANGE(0xff83c0, 0xff83c1) AM_MIRROR(0x45003e) AM_WRITE(scanline_int_ack_w)
-	AM_RANGE(0xff8400, 0xff8401) AM_MIRROR(0x4500fe) AM_DEVWRITE("jsa", atari_jsa_i_device, sound_reset_w)
-	AM_RANGE(0xff8500, 0xff8501) AM_MIRROR(0x4500fe) AM_DEVWRITE("eeprom", atari_eeprom_device, unlock_write)
-	AM_RANGE(0xff8600, 0xff8601) AM_MIRROR(0x4500fe) AM_WRITE(xscroll_w) AM_SHARE("xscroll")
-	AM_RANGE(0xff8700, 0xff8701) AM_MIRROR(0x4500fe) AM_WRITE(yscroll_w) AM_SHARE("yscroll")
-	AM_RANGE(0xff8800, 0xff8801) AM_MIRROR(0x4507fe) AM_READ_PORT("FF8800")
-	AM_RANGE(0xff9000, 0xff9001) AM_MIRROR(0x4507fe) AM_READ_PORT("FF9000")
-	AM_RANGE(0xff9800, 0xff9801) AM_MIRROR(0x4507fe) AM_DEVREAD8("jsa", atari_jsa_i_device, main_response_r, 0x00ff)
-	AM_RANGE(0xffa000, 0xffafff) AM_MIRROR(0x451000) AM_DEVREADWRITE8("eeprom", atari_eeprom_device, read, write, 0x00ff)
-	AM_RANGE(0xffc000, 0xffffff) AM_MIRROR(0x450000) AM_RAM
+	AM_RANGE(0x826000, 0x826001) AM_MIRROR(0x4500fe) AM_READNOP     /* who knows? read at controls time */
+	AM_RANGE(0x828000, 0x828001) AM_MIRROR(0x4500fe) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
+	AM_RANGE(0x828100, 0x828101) AM_MIRROR(0x4500fe) AM_DEVWRITE8("jsa", atari_jsa_i_device, main_command_w, 0x00ff)
+	AM_RANGE(0x828300, 0x828301) AM_MIRROR(0x45003e) AM_WRITE(intensity_w)
+	AM_RANGE(0x828340, 0x828341) AM_MIRROR(0x45003e) AM_WRITE(interrupt_scan_w) AM_SHARE("interrupt_scan")
+	AM_RANGE(0x828380, 0x828381) AM_MIRROR(0x45003e) AM_RAM_WRITE(slip_w) AM_SHARE("mob:slip")
+	AM_RANGE(0x8283c0, 0x8283c1) AM_MIRROR(0x45003e) AM_WRITE(scanline_int_ack_w)
+	AM_RANGE(0x828400, 0x828401) AM_MIRROR(0x4500fe) AM_DEVWRITE("jsa", atari_jsa_i_device, sound_reset_w)
+	AM_RANGE(0x828500, 0x828501) AM_MIRROR(0x4500fe) AM_DEVWRITE("eeprom", eeprom_parallel_28xx_device, unlock_write)
+	AM_RANGE(0x828600, 0x828601) AM_MIRROR(0x4500fe) AM_WRITE(xscroll_w) AM_SHARE("xscroll")
+	AM_RANGE(0x828700, 0x828701) AM_MIRROR(0x4500fe) AM_WRITE(yscroll_w) AM_SHARE("yscroll")
+	AM_RANGE(0x828800, 0x828801) AM_MIRROR(0x4507fe) AM_READ_PORT("FF8800")
+	AM_RANGE(0x829000, 0x829001) AM_MIRROR(0x4507fe) AM_READ_PORT("FF9000")
+	AM_RANGE(0x829800, 0x829801) AM_MIRROR(0x4507fe) AM_DEVREAD8("jsa", atari_jsa_i_device, main_response_r, 0x00ff)
+	AM_RANGE(0x82a000, 0x82afff) AM_MIRROR(0x451000) AM_DEVREADWRITE8("eeprom", eeprom_parallel_28xx_device, read, write, 0x00ff)
+	AM_RANGE(0x82c000, 0x82ffff) AM_MIRROR(0x450000) AM_RAM
 ADDRESS_MAP_END
 
 
@@ -194,7 +196,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( toobin, toobin_state )
+static MACHINE_CONFIG_START( toobin )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68010, MASTER_CLOCK/4)
@@ -202,7 +204,8 @@ static MACHINE_CONFIG_START( toobin, toobin_state )
 
 	MCFG_MACHINE_RESET_OVERRIDE(toobin_state,toobin)
 
-	MCFG_ATARI_EEPROM_2804_ADD("eeprom")
+	MCFG_EEPROM_2804_ADD("eeprom")
+	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
@@ -577,9 +580,9 @@ ROM_END
  *
  *************************************/
 
-GAME( 1988, toobin,   0,      toobin, toobin, driver_device, 0, ROT270, "Atari Games", "Toobin' (rev 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, toobine,  toobin, toobin, toobin, driver_device, 0, ROT270, "Atari Games", "Toobin' (Europe, rev 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, toobing,  toobin, toobin, toobin, driver_device, 0, ROT270, "Atari Games", "Toobin' (German, rev 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, toobin2,  toobin, toobin, toobin, driver_device, 0, ROT270, "Atari Games", "Toobin' (rev 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, toobin2e, toobin, toobin, toobin, driver_device, 0, ROT270, "Atari Games", "Toobin' (Europe, rev 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, toobin1,  toobin, toobin, toobin, driver_device, 0, ROT270, "Atari Games", "Toobin' (rev 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, toobin,   0,      toobin, toobin, toobin_state, 0, ROT270, "Atari Games", "Toobin' (rev 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, toobine,  toobin, toobin, toobin, toobin_state, 0, ROT270, "Atari Games", "Toobin' (Europe, rev 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, toobing,  toobin, toobin, toobin, toobin_state, 0, ROT270, "Atari Games", "Toobin' (German, rev 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, toobin2,  toobin, toobin, toobin, toobin_state, 0, ROT270, "Atari Games", "Toobin' (rev 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, toobin2e, toobin, toobin, toobin, toobin_state, 0, ROT270, "Atari Games", "Toobin' (Europe, rev 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, toobin1,  toobin, toobin, toobin, toobin_state, 0, ROT270, "Atari Games", "Toobin' (rev 1)", MACHINE_SUPPORTS_SAVE )

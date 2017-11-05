@@ -24,12 +24,12 @@ public:
 
 	/* devices / memory pointers */
 	required_device<cpu_device> m_maincpu;
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_colorram;
-	required_shared_ptr<UINT8> m_scrollx;
-	required_shared_ptr<UINT8> m_scrolly;
-	required_shared_ptr<UINT8> m_bgscrollx;
-	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_colorram;
+	required_shared_ptr<uint8_t> m_scrollx;
+	required_shared_ptr<uint8_t> m_scrolly;
+	required_shared_ptr<uint8_t> m_bgscrollx;
+	required_shared_ptr<uint8_t> m_spriteram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
@@ -43,7 +43,7 @@ public:
 	int     m_bg2_on;
 
 	/* protection */
-	UINT8   m_prot_value;
+	uint8_t   m_prot_value;
 	DECLARE_WRITE8_MEMBER(c1943_protection_w);
 	DECLARE_READ8_MEMBER(c1943_protection_r);
 	DECLARE_READ8_MEMBER(_1943b_c007_r);
@@ -61,6 +61,6 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(1943);
-	UINT32 screen_update_1943(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_1943(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int priority );
 };

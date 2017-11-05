@@ -9,13 +9,16 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "cpu/m6809/konami.h" /* for the callback and the firq irq definition */
-#include "machine/watchdog.h"
-#include "sound/2151intf.h"
-#include "sound/k053260.h"
-#include "includes/konamipt.h"
 #include "includes/parodius.h"
+#include "includes/konamipt.h"
+
+#include "cpu/m6809/konami.h" /* for the callback and the firq irq definition */
+#include "cpu/z80/z80.h"
+#include "machine/watchdog.h"
+#include "sound/ym2151.h"
+#include "sound/k053260.h"
+#include "speaker.h"
+
 
 INTERRUPT_GEN_MEMBER(parodius_state::parodius_interrupt)
 {
@@ -77,7 +80,7 @@ void parodius_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in parodius_state::device_timer");
+		assert_always(false, "Unknown id in parodius_state::device_timer");
 	}
 }
 
@@ -127,7 +130,6 @@ static ADDRESS_MAP_START( parodius_sound_map, AS_PROGRAM, 8, parodius_state )
 	AM_RANGE(0xfc00, 0xfc2f) AM_DEVREADWRITE("k053260", k053260_device, read, write)
 ADDRESS_MAP_END
 
-
 /***************************************************************************
 
     Input Ports
@@ -154,7 +156,7 @@ static INPUT_PORTS_START( parodius )
 	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW2:4,5")
+	PORT_DIPNAME( 0x18, 0x10, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW2:4,5")
 	PORT_DIPSETTING(    0x18, "20000 80000" )
 	PORT_DIPSETTING(    0x10, "30000 100000" )
 	PORT_DIPSETTING(    0x08, "20000" )
@@ -222,7 +224,7 @@ WRITE8_MEMBER( parodius_state::banking_callback )
 	membank("bank1")->set_entry((data & 0x0f) ^ 0x0f);
 }
 
-static MACHINE_CONFIG_START( parodius, parodius_state )
+static MACHINE_CONFIG_START( parodius )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", KONAMI, 3000000)        /* 053248 */
@@ -377,7 +379,7 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 1990, parodius,  0,        parodius, parodius, driver_device, 0, ROT0, "Konami", "Parodius DA! (World, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, parodiuse, parodius, parodius, parodius, driver_device, 0, ROT0, "Konami", "Parodius DA! (World, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, parodiusj, parodius, parodius, parodius, driver_device, 0, ROT0, "Konami", "Parodius DA! (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, parodiusa, parodius, parodius, parodius, driver_device, 0, ROT0, "Konami", "Parodius DA! (Asia)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, parodius,  0,        parodius, parodius, parodius_state, 0, ROT0, "Konami", "Parodius DA! (World, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, parodiuse, parodius, parodius, parodius, parodius_state, 0, ROT0, "Konami", "Parodius DA! (World, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, parodiusj, parodius, parodius, parodius, parodius_state, 0, ROT0, "Konami", "Parodius DA! (Japan)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1990, parodiusa, parodius, parodius, parodius, parodius_state, 0, ROT0, "Konami", "Parodius DA! (Asia)",         MACHINE_SUPPORTS_SAVE )

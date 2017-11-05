@@ -5,7 +5,7 @@
 Harmony / Melody cart for the A2600
 
 The Harmony cart is a 'modern' A2600 cartridge, used for homebrew etc. It has
-an SD slot and can be connected to a PC, roms can be transfered to it with
+an SD slot and can be connected to a PC, roms can be transferred to it with
 software on the PC side.  It uses an ARM7TDMI-S LPC2103 @ 70 Mhz to emulate
 the mapper behavior of other cartridges.  It has an SD card slot for storing
 game data.
@@ -59,16 +59,13 @@ map:
 
 
 
-
-
 // cart device
 
-const device_type A26_ROM_HARMONY = &device_creator<a26_rom_harmony_device>;
+DEFINE_DEVICE_TYPE(A26_ROM_HARMONY, a26_rom_harmony_device, "a2600_harmony", "Atari 2600 ROM Cart HARMONY/MELODY")
 
 
-a26_rom_harmony_device::a26_rom_harmony_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-						: a26_rom_f8_device(mconfig, A26_ROM_HARMONY, "Atari 2600 ROM Cart HARMONY/MELODY", tag, owner, clock, "a2600_harmony", __FILE__),
-						m_cpu(*this, "arm")
+a26_rom_harmony_device::a26_rom_harmony_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: a26_rom_f8_device(mconfig, A26_ROM_HARMONY, tag, owner, clock), m_cpu(*this, "arm")
 {
 }
 
@@ -84,15 +81,10 @@ void a26_rom_harmony_device::device_start()
 static ADDRESS_MAP_START( harmony_arm7_map, AS_PROGRAM, 32, a26_rom_harmony_device )
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_FRAGMENT( a26_harmony )
+MACHINE_CONFIG_MEMBER( a26_rom_harmony_device::device_add_mconfig )
 	MCFG_CPU_ADD("arm", LPC2103, 70000000)
 	MCFG_CPU_PROGRAM_MAP(harmony_arm7_map)
 MACHINE_CONFIG_END
-
-machine_config_constructor a26_rom_harmony_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( a26_harmony );
-}
 
 // actually if the ARM code is doing this and providing every opcode to the main CPU based
 // on bus activity then we shouldn't be doing and of this here (if the ROM is actually
@@ -132,7 +124,7 @@ void a26_rom_harmony_device::check_bankswitch(offs_t offset)
 
 READ8_MEMBER(a26_rom_harmony_device::read_rom)
 {
-	UINT8 retvalue = read8_r(space, offset + 0xc00); // banks start at 0xc00
+	uint8_t retvalue = read8_r(space, offset + 0xc00); // banks start at 0xc00
 
 	check_bankswitch(offset);
 

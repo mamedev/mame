@@ -5,8 +5,12 @@
     tecmosys protection simulation
 
 ***************************************************************************/
+
 #include "machine/eepromser.h"
+#include "machine/gen_latch.h"
+#include "machine/input_merger.h"
 #include "machine/watchdog.h"
+#include "screen.h"
 
 class tecmosys_state : public driver_device
 {
@@ -20,6 +24,8 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch"),
+		m_soundnmi(*this, "soundnmi"),
 		m_spriteram(*this, "spriteram"),
 		m_tilemap_paletteram16(*this, "tmap_palette"),
 		m_bg2tilemap_ram(*this, "bg2tilemap_ram"),
@@ -42,21 +48,23 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
+	required_device<input_merger_device> m_soundnmi;
 
-	required_shared_ptr<UINT16> m_spriteram;
-	required_shared_ptr<UINT16> m_tilemap_paletteram16;
-	required_shared_ptr<UINT16> m_bg2tilemap_ram;
-	required_shared_ptr<UINT16> m_bg1tilemap_ram;
-	required_shared_ptr<UINT16> m_bg0tilemap_ram;
-	required_shared_ptr<UINT16> m_fgtilemap_ram;
-	required_shared_ptr<UINT16> m_bg0tilemap_lineram;
-	required_shared_ptr<UINT16> m_bg1tilemap_lineram;
-	required_shared_ptr<UINT16> m_bg2tilemap_lineram;
-	required_shared_ptr<UINT16> m_a80000regs;
-	required_shared_ptr<UINT16> m_b00000regs;
-	required_shared_ptr<UINT16> m_c00000regs;
-	required_shared_ptr<UINT16> m_c80000regs;
-	required_shared_ptr<UINT16> m_880000regs;
+	required_shared_ptr<uint16_t> m_spriteram;
+	required_shared_ptr<uint16_t> m_tilemap_paletteram16;
+	required_shared_ptr<uint16_t> m_bg2tilemap_ram;
+	required_shared_ptr<uint16_t> m_bg1tilemap_ram;
+	required_shared_ptr<uint16_t> m_bg0tilemap_ram;
+	required_shared_ptr<uint16_t> m_fgtilemap_ram;
+	required_shared_ptr<uint16_t> m_bg0tilemap_lineram;
+	required_shared_ptr<uint16_t> m_bg1tilemap_lineram;
+	required_shared_ptr<uint16_t> m_bg2tilemap_lineram;
+	required_shared_ptr<uint16_t> m_a80000regs;
+	required_shared_ptr<uint16_t> m_b00000regs;
+	required_shared_ptr<uint16_t> m_c00000regs;
+	required_shared_ptr<uint16_t> m_c80000regs;
+	required_shared_ptr<uint16_t> m_880000regs;
 
 	int m_spritelist;
 	bitmap_ind16 m_sprite_bitmap;
@@ -66,13 +74,13 @@ public:
 	tilemap_t *m_bg1tilemap;
 	tilemap_t *m_bg2tilemap;
 	tilemap_t *m_txt_tilemap;
-	UINT8 m_device_read_ptr;
-	UINT8 m_device_status;
+	uint8_t m_device_read_ptr;
+	uint8_t m_device_status;
 	const struct prot_data* m_device_data;
-	UINT8 m_device_value;
+	uint8_t m_device_value;
 
-	DECLARE_READ16_MEMBER(sound_r);
-	DECLARE_WRITE16_MEMBER(sound_w);
+	DECLARE_READ8_MEMBER(sound_command_pending_r);
+	DECLARE_WRITE8_MEMBER(sound_nmi_disable_w);
 	DECLARE_WRITE16_MEMBER(unk880000_w);
 	DECLARE_READ16_MEMBER(unk880000_r);
 	DECLARE_WRITE8_MEMBER(z80_bank_w);
@@ -91,7 +99,6 @@ public:
 	DECLARE_WRITE16_MEMBER(bg2_tilemap_lineram_w);
 	DECLARE_READ16_MEMBER(eeprom_r);
 	DECLARE_WRITE16_MEMBER(eeprom_w);
-	DECLARE_WRITE_LINE_MEMBER(sound_irq);
 
 	DECLARE_DRIVER_INIT(tkdensha);
 	DECLARE_DRIVER_INIT(deroon);
@@ -104,12 +111,12 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg2tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void prot_init(int which);
 	void prot_reset();
-	inline void set_color_555(pen_t color, int rshift, int gshift, int bshift, UINT16 data);
-	void render_sprites_to_bitmap(bitmap_rgb32 &bitmap, UINT16 extrax, UINT16 extray );
-	void tilemap_copy_to_compose(UINT16 pri);
+	inline void set_color_555(pen_t color, int rshift, int gshift, int bshift, uint16_t data);
+	void render_sprites_to_bitmap(bitmap_rgb32 &bitmap, uint16_t extrax, uint16_t extray );
+	void tilemap_copy_to_compose(uint16_t pri);
 	void do_final_mix(bitmap_rgb32 &bitmap);
 	void descramble();
 };

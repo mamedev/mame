@@ -21,7 +21,7 @@ WRITE16_MEMBER(aztarac_state::sound_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		data &= 0xff;
-		soundlatch_byte_w(space, offset, data);
+		m_soundlatch->write(space, offset, data);
 		m_sound_status ^= 0x21;
 		if (m_sound_status & 0x20)
 			m_audiocpu->set_input_line(0, HOLD_LINE);
@@ -32,7 +32,7 @@ READ8_MEMBER(aztarac_state::snd_command_r)
 {
 	m_sound_status |= 0x01;
 	m_sound_status &= ~0x20;
-	return soundlatch_byte_r(space,offset);
+	return m_soundlatch->read(space,offset);
 }
 
 READ8_MEMBER(aztarac_state::snd_status_r)

@@ -36,6 +36,7 @@
 #include "SDL_androidclipboard.h"
 #include "SDL_androidevents.h"
 #include "SDL_androidkeyboard.h"
+#include "SDL_androidmouse.h"
 #include "SDL_androidtouch.h"
 #include "SDL_androidwindow.h"
 
@@ -181,6 +182,8 @@ Android_VideoInit(_THIS)
 
     Android_InitTouch();
 
+    Android_InitMouse();
+
     /* We're done! */
     return 0;
 }
@@ -191,7 +194,6 @@ Android_VideoQuit(_THIS)
     Android_QuitTouch();
 }
 
-/* This function gets called before VideoInit() */
 void
 Android_SetScreenResolution(int width, int height, Uint32 format, float rate)
 {
@@ -200,8 +202,33 @@ Android_SetScreenResolution(int width, int height, Uint32 format, float rate)
     Android_ScreenFormat = format;
     Android_ScreenRate = rate;
 
+    /*
+      Update the resolution of the desktop mode, so that the window
+      can be properly resized. The screen resolution change can for
+      example happen when the Activity enters or exists immersive mode,
+      which can happen after VideoInit().
+    */
+    SDL_VideoDevice* device = SDL_GetVideoDevice();
+    if (device && device->num_displays > 0)
+    {
+        SDL_VideoDisplay* display = &device->displays[0];
+        display->desktop_mode.format = Android_ScreenFormat;
+        display->desktop_mode.w = Android_ScreenWidth;
+        display->desktop_mode.h = Android_ScreenHeight;
+        display->desktop_mode.refresh_rate  = Android_ScreenRate;
+    }
+
     if (Android_Window) {
         SDL_SendWindowEvent(Android_Window, SDL_WINDOWEVENT_RESIZED, width, height);
+
+        /* Force the current mode to match the resize otherwise the SDL_WINDOWEVENT_RESTORED event
+         * will fall back to the old mode */
+        SDL_VideoDisplay *display = SDL_GetDisplayForWindow(Android_Window);
+
+        display->current_mode.format = format;
+        display->current_mode.w = width;
+        display->current_mode.h = height;
+        display->current_mode.refresh_rate = rate;
     }
 }
 

@@ -23,8 +23,10 @@
 
 ***************************************************************************/
 
-#ifndef __Z80CTC_H__
-#define __Z80CTC_H__
+#ifndef MAME_MACHINE_Z80CTC_H
+#define MAME_MACHINE_Z80CTC_H
+
+#pragma once
 
 #include "cpu/z80/z80daisy.h"
 
@@ -58,12 +60,12 @@ class z80ctc_device :   public device_t,
 {
 public:
 	// construction/destruction
-	z80ctc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	z80ctc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &set_intr_callback(device_t &device, _Object object) { return downcast<z80ctc_device &>(device).m_intr_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_zc0_callback(device_t &device, _Object object) { return downcast<z80ctc_device &>(device).m_zc0_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_zc1_callback(device_t &device, _Object object) { return downcast<z80ctc_device &>(device).m_zc1_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_zc2_callback(device_t &device, _Object object) { return downcast<z80ctc_device &>(device).m_zc2_cb.set_callback(object); }
+	template <class Object> static devcb_base &set_intr_callback(device_t &device, Object &&cb) { return downcast<z80ctc_device &>(device).m_intr_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_zc0_callback(device_t &device, Object &&cb) { return downcast<z80ctc_device &>(device).m_zc0_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_zc1_callback(device_t &device, Object &&cb) { return downcast<z80ctc_device &>(device).m_zc1_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_zc2_callback(device_t &device, Object &&cb) { return downcast<z80ctc_device &>(device).m_zc2_cb.set_callback(std::forward<Object>(cb)); }
 
 	// read/write handlers
 	DECLARE_READ8_MEMBER( read );
@@ -73,7 +75,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( trg2 );
 	DECLARE_WRITE_LINE_MEMBER( trg3 );
 
-	UINT16 get_channel_constant(UINT8 channel) { return m_channel[channel].m_tconst; }
+	uint16_t get_channel_constant(uint8_t channel) { return m_channel[channel].m_tconst; }
 
 protected:
 	// device-level overrides
@@ -98,21 +100,21 @@ private:
 		void start(z80ctc_device *device, int index);
 		void reset();
 
-		UINT8 read();
-		void write(UINT8 data);
+		uint8_t read();
+		void write(uint8_t data);
 
 		attotime period() const;
-		void trigger(UINT8 data);
+		void trigger(uint8_t data);
 		TIMER_CALLBACK_MEMBER(timer_callback);
 
 		z80ctc_device * m_device;               // pointer back to our device
 		int             m_index;                // our channel index
-		UINT16          m_mode;                 // current mode
-		UINT16          m_tconst;               // time constant
-		UINT16          m_down;                 // down counter (clock mode only)
-		UINT8           m_extclk;               // current signal from the external clock
+		uint16_t          m_mode;                 // current mode
+		uint16_t          m_tconst;               // time constant
+		uint16_t          m_down;                 // down counter (clock mode only)
+		uint8_t           m_extclk;               // current signal from the external clock
 		emu_timer *     m_timer;                // array of active timers
-		UINT8           m_int_state;            // interrupt status (for daisy chain)
+		uint8_t           m_int_state;            // interrupt status (for daisy chain)
 	};
 
 	// internal state
@@ -122,15 +124,13 @@ private:
 	devcb_write_line   m_zc2_cb;               // channel 2 zero crossing callbacks
 	devcb_write_line   m_zc3_cb;               // channel 3 zero crossing callbacks = nullptr ?
 
-	UINT8               m_vector;               // interrupt vector
-	attotime            m_period16;             // 16/system clock
-	attotime            m_period256;            // 256/system clock
+	uint8_t               m_vector;               // interrupt vector
 	ctc_channel         m_channel[4];           // data for each channel
 };
 
 
 // device type definition
-extern const device_type Z80CTC;
+DECLARE_DEVICE_TYPE(Z80CTC, z80ctc_device)
 
 
-#endif
+#endif // MAME_MACHINE_Z80CTC_H

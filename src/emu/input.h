@@ -14,8 +14,8 @@
 #error Dont include this file directly; include emu.h instead.
 #endif
 
-#ifndef __INPUT_H__
-#define __INPUT_H__
+#ifndef MAME_EMU_INPUT_H
+#define MAME_EMU_INPUT_H
 
 
 //**************************************************************************
@@ -23,19 +23,19 @@
 //**************************************************************************
 
 // relative devices return ~512 units per onscreen pixel
-const INT32 INPUT_RELATIVE_PER_PIXEL = 512;
+constexpr s32 INPUT_RELATIVE_PER_PIXEL = 512;
 
 // absolute devices return values between -65536 and +65536
-const INT32 INPUT_ABSOLUTE_MIN = -65536;
-const INT32 INPUT_ABSOLUTE_MAX = 65536;
+constexpr s32 INPUT_ABSOLUTE_MIN = -65536;
+constexpr s32 INPUT_ABSOLUTE_MAX = 65536;
 
 // maximum number of axis/buttons/hats with ITEM_IDs for use by osd layer
-const int INPUT_MAX_AXIS = 8;
-const int INPUT_MAX_BUTTONS = 32;
-const int INPUT_MAX_HATS = 4;
-const int INPUT_MAX_ADD_SWITCH = 16;
-const int INPUT_MAX_ADD_ABSOLUTE = 16;
-const int INPUT_MAX_ADD_RELATIVE = 16;
+constexpr int INPUT_MAX_AXIS = 8;
+constexpr int INPUT_MAX_BUTTONS = 32;
+constexpr int INPUT_MAX_HATS = 4;
+constexpr int INPUT_MAX_ADD_SWITCH = 16;
+constexpr int INPUT_MAX_ADD_ABSOLUTE = 16;
+constexpr int INPUT_MAX_ADD_RELATIVE = 16;
 
 
 // device classes
@@ -51,11 +51,11 @@ enum input_device_class
 	DEVICE_CLASS_INTERNAL,
 	DEVICE_CLASS_MAXIMUM
 };
-DECLARE_ENUM_OPERATORS(input_device_class)
+DECLARE_ENUM_INCDEC_OPERATORS(input_device_class)
 
 
 // device index
-const int DEVICE_INDEX_MAXIMUM = 0xff;
+constexpr int DEVICE_INDEX_MAXIMUM = 0xff;
 
 
 // input item classes
@@ -141,6 +141,11 @@ enum input_item_id
 	ITEM_ID_F13,
 	ITEM_ID_F14,
 	ITEM_ID_F15,
+	ITEM_ID_F16,
+	ITEM_ID_F17,
+	ITEM_ID_F18,
+	ITEM_ID_F19,
+	ITEM_ID_F20,
 	ITEM_ID_ESC,
 	ITEM_ID_TILDE,
 	ITEM_ID_MINUS,
@@ -184,6 +189,10 @@ enum input_item_id
 	ITEM_ID_PLUS_PAD,
 	ITEM_ID_DEL_PAD,
 	ITEM_ID_ENTER_PAD,
+	ITEM_ID_BS_PAD,
+	ITEM_ID_TAB_PAD,
+	ITEM_ID_00_PAD,
+	ITEM_ID_000_PAD,
 	ITEM_ID_PRTSCR,
 	ITEM_ID_PAUSE,
 	ITEM_ID_LSHIFT,
@@ -329,7 +338,7 @@ enum input_item_id
 	// absolute maximum ID
 	ITEM_ID_ABSOLUTE_MAXIMUM = 0xfff
 };
-DECLARE_ENUM_OPERATORS(input_item_id)
+DECLARE_ENUM_INCDEC_OPERATORS(input_item_id)
 
 
 
@@ -337,62 +346,8 @@ DECLARE_ENUM_OPERATORS(input_item_id)
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// forward declarations
-class input_device_item;
-class input_device;
-class input_class;
-class input_manager;
-
-
-// callback for getting the value of an item on a device
-typedef INT32 (*item_get_state_func)(void *device_internal, void *item_internal);
-
-
-// ======================> joystick_map
-
-// a 9x9 joystick map
-class joystick_map
-{
-public:
-	// construction/destruction
-	joystick_map();
-	joystick_map(const joystick_map &src) { copy(src); }
-
-	// operators
-	joystick_map &operator=(const joystick_map &src) { if (this != &src) copy(src); return *this; }
-
-	// parse from a string
-	bool parse(const char *mapstring);
-
-	// create a friendly string
-	std::string to_string() const;
-
-	// update the state of a live map
-	UINT8 update(INT32 xaxisval, INT32 yaxisval);
-
-	// joystick mapping codes
-	static const UINT8 JOYSTICK_MAP_NEUTRAL = 0x00;
-	static const UINT8 JOYSTICK_MAP_LEFT    = 0x01;
-	static const UINT8 JOYSTICK_MAP_RIGHT   = 0x02;
-	static const UINT8 JOYSTICK_MAP_UP      = 0x04;
-	static const UINT8 JOYSTICK_MAP_DOWN    = 0x08;
-	static const UINT8 JOYSTICK_MAP_STICKY  = 0x0f;
-
-private:
-	// internal helpers
-	void copy(const joystick_map &src)
-	{
-		memcpy(m_map, src.m_map, sizeof(m_map));
-		m_lastmap = JOYSTICK_MAP_NEUTRAL;
-		m_origstring = src.m_origstring;
-	}
-
-	// internal state
-	UINT8                   m_map[9][9];            // 9x9 grid
-	UINT8                   m_lastmap;              // last value returned (for sticky tracking)
-	std::string             m_origstring;           // originally parsed string
-};
-
+// controller alias table typedef
+typedef std::map<std::string, std::string> devicemap_table_type;
 
 // ======================> input_code
 
@@ -412,7 +367,6 @@ public:
 	}
 	input_code(const input_code &src)
 		: m_internal(src.m_internal) { }
-	input_code(input_device &device, input_item_id itemid);
 
 	// operators
 	bool operator==(const input_code &rhs) const { return m_internal == rhs.m_internal; }
@@ -435,7 +389,7 @@ public:
 
 private:
 	// internal state
-	UINT32      m_internal;
+	u32 m_internal;
 };
 
 
@@ -484,148 +438,6 @@ private:
 };
 
 
-// ======================> input_device_item
-
-// a single item on an input device
-class input_device_item
-{
-protected:
-	// construction/destruction
-	input_device_item(input_device &device, const char *name, void *internal, input_item_id itemid, item_get_state_func getstate, input_item_class itemclass);
-
-public:
-	virtual ~input_device_item();
-
-	// getters
-	input_device &device() const { return m_device; }
-	input_manager &manager() const;
-	running_machine &machine() const;
-	const char *name() const { return m_name.c_str(); }
-	void *internal() const { return m_internal; }
-	input_item_id itemid() const { return m_itemid; }
-	input_item_class itemclass() const { return m_itemclass; }
-	const char *token() const { return m_token.c_str(); }
-	INT32 current() const { return m_current; }
-	INT32 memory() const { return m_memory; }
-
-	// helpers
-	INT32 update_value();
-	void set_memory(INT32 value) { m_memory = value; }
-
-	// readers
-	virtual INT32 read_as_switch(input_item_modifier modifier) = 0;
-	virtual INT32 read_as_relative(input_item_modifier modifier) = 0;
-	virtual INT32 read_as_absolute(input_item_modifier modifier) = 0;
-
-protected:
-	// internal state
-	input_device &          m_device;               // reference to our owning device
-	std::string             m_name;                 // string name of item
-	void *                  m_internal;             // internal callback pointer
-	input_item_id           m_itemid;               // originally specified item id
-	input_item_class        m_itemclass;            // class of the item
-	item_get_state_func     m_getstate;             // get state callback
-	std::string             m_token;                // tokenized name for non-standard items
-
-	// live state
-	INT32                   m_current;              // current raw value
-	INT32                   m_memory;               // "memory" value, to remember where we started during polling
-};
-
-
-// ======================> input_device
-
-// a logical device of a given class that can provide input
-class input_device
-{
-	friend class input_class;
-
-public:
-	// construction/destruction
-	input_device(input_class &_class, int _devindex, const char *_name, void *_internal);
-	// getters
-	input_class &device_class() const { return m_class; }
-	input_manager &manager() const;
-	running_machine &machine() const;
-	input_device_class devclass() const;
-	const char *name() const { return m_name.c_str(); }
-	int devindex() const { return m_devindex; }
-	input_device_item *item(input_item_id index) const { return m_item[index].get(); }
-	input_item_id maxitem() const { return m_maxitem; }
-	void *internal() const { return m_internal; }
-	joystick_map &joymap() { return m_joymap; }
-	bool steadykey_enabled() const { return m_steadykey_enabled; }
-	bool lightgun_reload_button() const { return m_lightgun_reload_button; }
-
-	// item management
-	input_item_id add_item(const char *name, input_item_id itemid, item_get_state_func getstate, void *internal = nullptr);
-	void set_joystick_map(const joystick_map &map) { m_joymap = map; }
-
-	// helpers
-	INT32 apply_deadzone_and_saturation(INT32 value) const;
-	void apply_steadykey() const;
-
-private:
-	// internal state
-	input_class &           m_class;                // reference to our class
-	std::string             m_name;                 // string name of device
-	int                     m_devindex;             // device index of this device
-	std::unique_ptr<input_device_item> m_item[ITEM_ID_ABSOLUTE_MAXIMUM+1]; // array of pointers to items
-	input_item_id           m_maxitem;              // maximum item index
-	void *                  m_internal;             // internal callback pointer
-
-	// joystick information
-	joystick_map            m_joymap;               // joystick map for this device
-	INT32                   m_joystick_deadzone;    // deadzone for joystick
-	INT32                   m_joystick_saturation;  // saturation position for joystick
-	bool                    m_steadykey_enabled;    // steadykey enabled for keyboards
-	bool                    m_lightgun_reload_button; // lightgun reload hack
-};
-
-
-// ======================> input_class
-
-// a class of device that provides input
-class input_class
-{
-public:
-	// construction/destruction
-	input_class(input_manager &manager, input_device_class devclass, bool enabled = false, bool multi = false);
-
-	// getters
-	input_manager &manager() const { return m_manager; }
-	running_machine &machine() const;
-	input_device *device(int index) const { return (index <= m_maxindex) ? m_device[index].get() : nullptr; }
-	input_device_class devclass() const { return m_devclass; }
-	int maxindex() const { return m_maxindex; }
-	bool enabled() const { return m_enabled; }
-	bool multi() const { return m_multi; }
-
-	// setters
-	void enable(bool state = true) { m_enabled = state; }
-	void set_multi(bool multi = true) { m_multi = multi; }
-
-	// device management
-	input_device *add_device(const char *name, void *internal = nullptr);
-	input_device *add_device(int devindex, const char *name, void *internal = nullptr);
-
-	// misc helpers
-	input_item_class standard_item_class(input_item_id itemid);
-
-private:
-	// internal helpers
-	void frame_callback();
-
-	// internal state
-	input_manager &         m_manager;              // reference to our manager
-	std::unique_ptr<input_device> m_device[DEVICE_INDEX_MAXIMUM]; // array of devices in this class
-	input_device_class      m_devclass;             // our device class
-	int                     m_maxindex;             // maximum populated index
-	bool                    m_enabled;              // is this class enabled?
-	bool                    m_multi;                // are multiple instances of this class allowed?
-};
-
-
 // ======================> input_manager
 
 // global machine-level information about devices
@@ -634,13 +446,14 @@ class input_manager
 public:
 	// construction/destruction
 	input_manager(running_machine &machine);
+	~input_manager();
 
 	// getters
 	running_machine &machine() const { return m_machine; }
-	input_class &device_class(input_device_class devclass) { assert(devclass < ARRAY_LENGTH(m_class)); assert(m_class[devclass] != nullptr); return *m_class[devclass]; }
+	input_class &device_class(input_device_class devclass) { assert(devclass >= DEVICE_CLASS_FIRST_VALID && devclass <= DEVICE_CLASS_LAST_VALID); return *m_class[devclass]; }
 
 	// input code readers
-	INT32 code_value(input_code code);
+	s32 code_value(input_code code);
 	bool code_pressed(input_code code) { return code_value(code) != 0; }
 	bool code_pressed_once(input_code code);
 
@@ -657,10 +470,11 @@ public:
 	std::string code_name(input_code code) const;
 	std::string code_to_token(input_code code) const;
 	input_code code_from_token(const char *_token);
+	const char *standard_token(input_item_id itemid) const;
 
 	// input sequence readers
 	bool seq_pressed(const input_seq &seq);
-	INT32 seq_axis_value(const input_seq &seq, input_item_class &itemclass);
+	s32 seq_axis_value(const input_seq &seq, input_item_class &itemclass);
 
 	// input sequence polling
 	void seq_poll_start(input_item_class itemclass, const input_seq *startseq = nullptr);
@@ -673,7 +487,7 @@ public:
 	void seq_from_tokens(input_seq &seq, const char *_token);
 
 	// misc
-	bool set_global_joystick_map(const char *mapstring);
+	bool map_device_to_controller(const devicemap_table_type *devicemap_table = nullptr);
 
 private:
 	// internal helpers
@@ -685,11 +499,7 @@ private:
 	input_code          m_switch_memory[64];
 
 	// classes
-	input_class         m_keyboard_class;
-	input_class         m_mouse_class;
-	input_class         m_joystick_class;
-	input_class         m_lightgun_class;
-	input_class *       m_class[DEVICE_CLASS_MAXIMUM];
+	std::array<std::unique_ptr<input_class>, DEVICE_CLASS_MAXIMUM> m_class;
 
 	// sequence polling state
 	input_seq           m_poll_seq;
@@ -758,6 +568,11 @@ private:
 #define KEYCODE_F13_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_F13)
 #define KEYCODE_F14_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_F14)
 #define KEYCODE_F15_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_F15)
+#define KEYCODE_F16_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_F16)
+#define KEYCODE_F17_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_F17)
+#define KEYCODE_F18_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_F18)
+#define KEYCODE_F19_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_F19)
+#define KEYCODE_F20_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_F20)
 #define KEYCODE_ESC_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_ESC)
 #define KEYCODE_TILDE_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_TILDE)
 #define KEYCODE_MINUS_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_MINUS)
@@ -801,6 +616,10 @@ private:
 #define KEYCODE_PLUS_PAD_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_PLUS_PAD)
 #define KEYCODE_DEL_PAD_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_DEL_PAD)
 #define KEYCODE_ENTER_PAD_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_ENTER_PAD)
+#define KEYCODE_BS_PAD_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_BS_PAD)
+#define KEYCODE_TAB_PAD_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_TAB_PAD)
+#define KEYCODE_00_PAD_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_00_PAD)
+#define KEYCODE_000_PAD_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_000_PAD)
 #define KEYCODE_PRTSCR_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_PRTSCR)
 #define KEYCODE_PAUSE_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_PAUSE)
 #define KEYCODE_LSHIFT_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_LSHIFT)
@@ -868,6 +687,11 @@ private:
 #define KEYCODE_F13 KEYCODE_F13_INDEXED(0)
 #define KEYCODE_F14 KEYCODE_F14_INDEXED(0)
 #define KEYCODE_F15 KEYCODE_F15_INDEXED(0)
+#define KEYCODE_F16 KEYCODE_F16_INDEXED(0)
+#define KEYCODE_F17 KEYCODE_F17_INDEXED(0)
+#define KEYCODE_F18 KEYCODE_F18_INDEXED(0)
+#define KEYCODE_F19 KEYCODE_F19_INDEXED(0)
+#define KEYCODE_F20 KEYCODE_F20_INDEXED(0)
 #define KEYCODE_ESC KEYCODE_ESC_INDEXED(0)
 #define KEYCODE_TILDE KEYCODE_TILDE_INDEXED(0)
 #define KEYCODE_MINUS KEYCODE_MINUS_INDEXED(0)
@@ -911,6 +735,10 @@ private:
 #define KEYCODE_PLUS_PAD KEYCODE_PLUS_PAD_INDEXED(0)
 #define KEYCODE_DEL_PAD KEYCODE_DEL_PAD_INDEXED(0)
 #define KEYCODE_ENTER_PAD KEYCODE_ENTER_PAD_INDEXED(0)
+#define KEYCODE_BS_PAD KEYCODE_BS_PAD_INDEXED(0)
+#define KEYCODE_TAB_PAD KEYCODE_TAB_PAD_INDEXED(0)
+#define KEYCODE_00_PAD KEYCODE_00_PAD_INDEXED(0)
+#define KEYCODE_000_PAD KEYCODE_000_PAD_INDEXED(0)
 #define KEYCODE_PRTSCR KEYCODE_PRTSCR_INDEXED(0)
 #define KEYCODE_PAUSE KEYCODE_PAUSE_INDEXED(0)
 #define KEYCODE_LSHIFT KEYCODE_LSHIFT_INDEXED(0)
@@ -1002,12 +830,14 @@ private:
 #define JOYCODE_Z_INDEXED(n) input_code(DEVICE_CLASS_JOYSTICK, n, ITEM_CLASS_ABSOLUTE, ITEM_MODIFIER_NONE, ITEM_ID_ZAXIS)
 #define JOYCODE_U_INDEXED(n) input_code(DEVICE_CLASS_JOYSTICK, n, ITEM_CLASS_ABSOLUTE, ITEM_MODIFIER_NONE, ITEM_ID_RXAXIS)
 #define JOYCODE_V_INDEXED(n) input_code(DEVICE_CLASS_JOYSTICK, n, ITEM_CLASS_ABSOLUTE, ITEM_MODIFIER_NONE, ITEM_ID_RYAXIS)
+#define JOYCODE_W_INDEXED(n) input_code(DEVICE_CLASS_JOYSTICK, n, ITEM_CLASS_ABSOLUTE, ITEM_MODIFIER_NONE, ITEM_ID_RZAXIS)
 
 #define JOYCODE_X JOYCODE_X_INDEXED(0)
 #define JOYCODE_Y JOYCODE_Y_INDEXED(0)
 #define JOYCODE_Z JOYCODE_Z_INDEXED(0)
 #define JOYCODE_U JOYCODE_U_INDEXED(0)
 #define JOYCODE_V JOYCODE_V_INDEXED(0)
+#define JOYCODE_W JOYCODE_W_INDEXED(0)
 
 // joystick axes as absolute half-axes
 #define JOYCODE_X_POS_ABSOLUTE_INDEXED(n) input_code(DEVICE_CLASS_JOYSTICK, n, ITEM_CLASS_ABSOLUTE, ITEM_MODIFIER_POS, ITEM_ID_XAXIS)
@@ -1020,6 +850,8 @@ private:
 #define JOYCODE_U_NEG_ABSOLUTE_INDEXED(n) input_code(DEVICE_CLASS_JOYSTICK, n, ITEM_CLASS_ABSOLUTE, ITEM_MODIFIER_NEG, ITEM_ID_RXAXIS)
 #define JOYCODE_V_POS_ABSOLUTE_INDEXED(n) input_code(DEVICE_CLASS_JOYSTICK, n, ITEM_CLASS_ABSOLUTE, ITEM_MODIFIER_POS, ITEM_ID_RYAXIS)
 #define JOYCODE_V_NEG_ABSOLUTE_INDEXED(n) input_code(DEVICE_CLASS_JOYSTICK, n, ITEM_CLASS_ABSOLUTE, ITEM_MODIFIER_NEG, ITEM_ID_RYAXIS)
+#define JOYCODE_W_POS_ABSOLUTE_INDEXED(n) input_code(DEVICE_CLASS_JOYSTICK, n, ITEM_CLASS_ABSOLUTE, ITEM_MODIFIER_POS, ITEM_ID_RZAXIS)
+#define JOYCODE_W_NEG_ABSOLUTE_INDEXED(n) input_code(DEVICE_CLASS_JOYSTICK, n, ITEM_CLASS_ABSOLUTE, ITEM_MODIFIER_NEG, ITEM_ID_RZAXIS)
 
 #define JOYCODE_X_POS_ABSOLUTE JOYCODE_X_POS_ABSOLUTE_INDEXED(0)
 #define JOYCODE_X_NEG_ABSOLUTE JOYCODE_X_NEG_ABSOLUTE_INDEXED(0)
@@ -1031,6 +863,8 @@ private:
 #define JOYCODE_U_NEG_ABSOLUTE JOYCODE_U_NEG_ABSOLUTE_INDEXED(0)
 #define JOYCODE_V_POS_ABSOLUTE JOYCODE_V_POS_ABSOLUTE_INDEXED(0)
 #define JOYCODE_V_NEG_ABSOLUTE JOYCODE_V_NEG_ABSOLUTE_INDEXED(0)
+#define JOYCODE_W_POS_ABSOLUTE JOYCODE_W_POS_ABSOLUTE_INDEXED(0)
+#define JOYCODE_W_NEG_ABSOLUTE JOYCODE_W_NEG_ABSOLUTE_INDEXED(0)
 
 // joystick axes as switches; X/Y are specially handled for left/right/up/down mapping
 #define JOYCODE_X_LEFT_SWITCH_INDEXED(n) input_code(DEVICE_CLASS_JOYSTICK, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_LEFT, ITEM_ID_XAXIS)
@@ -1043,6 +877,8 @@ private:
 #define JOYCODE_U_NEG_SWITCH_INDEXED(n) input_code(DEVICE_CLASS_JOYSTICK, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NEG, ITEM_ID_RXAXIS)
 #define JOYCODE_V_POS_SWITCH_INDEXED(n) input_code(DEVICE_CLASS_JOYSTICK, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_POS, ITEM_ID_RYAXIS)
 #define JOYCODE_V_NEG_SWITCH_INDEXED(n) input_code(DEVICE_CLASS_JOYSTICK, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NEG, ITEM_ID_RYAXIS)
+#define JOYCODE_W_POS_SWITCH_INDEXED(n) input_code(DEVICE_CLASS_JOYSTICK, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_POS, ITEM_ID_RZAXIS)
+#define JOYCODE_W_NEG_SWITCH_INDEXED(n) input_code(DEVICE_CLASS_JOYSTICK, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NEG, ITEM_ID_RZAXIS)
 
 #define JOYCODE_X_LEFT_SWITCH JOYCODE_X_LEFT_SWITCH_INDEXED(0)
 #define JOYCODE_X_RIGHT_SWITCH JOYCODE_X_RIGHT_SWITCH_INDEXED(0)
@@ -1054,6 +890,8 @@ private:
 #define JOYCODE_U_NEG_SWITCH JOYCODE_U_NEG_SWITCH_INDEXED(0)
 #define JOYCODE_V_POS_SWITCH JOYCODE_V_POS_SWITCH_INDEXED(0)
 #define JOYCODE_V_NEG_SWITCH JOYCODE_V_NEG_SWITCH_INDEXED(0)
+#define JOYCODE_W_POS_SWITCH JOYCODE_W_POS_SWITCH_INDEXED(0)
+#define JOYCODE_W_NEG_SWITCH JOYCODE_W_NEG_SWITCH_INDEXED(0)
 
 // joystick buttons
 #define JOYCODE_BUTTON1_INDEXED(n) input_code(DEVICE_CLASS_JOYSTICK, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_BUTTON1)
@@ -1128,32 +966,4 @@ private:
 
 
 
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-// joystick maps
-extern const char joystick_map_8way[];
-extern const char joystick_map_4way_diagonal[];
-
-
-//**************************************************************************
-//  INLINE FUNCTIONS
-//**************************************************************************
-
-// input_device_item helpers
-inline input_manager &input_device_item::manager() const { return m_device.manager(); }
-inline running_machine &input_device_item::machine() const { return m_device.machine(); }
-inline  INT32 input_device_item::update_value() { return m_current = (*m_getstate)(m_device.internal(), m_internal); }
-
-// input_device helpers
-inline input_manager &input_device::manager() const { return m_class.manager(); }
-inline running_machine &input_device::machine() const { return m_class.machine(); }
-inline input_device_class input_device::devclass() const { return m_class.devclass(); }
-
-// input_class helpers
-inline running_machine &input_class::machine() const { return m_manager.machine(); }
-
-
-
-#endif  // __INPUT_H__
+#endif  // MAME_EMU_INPUT_H

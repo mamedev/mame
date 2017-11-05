@@ -6,12 +6,11 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_IEEE488_C2040FDC_H
+#define MAME_BUS_IEEE488_C2040FDC_H
+
 #pragma once
 
-#ifndef __C2040_FLOPPY__
-#define __C2040_FLOPPY__
-
-#include "emu.h"
 #include "formats/c3040_dsk.h"
 #include "formats/c4040_dsk.h"
 #include "formats/d64_dsk.h"
@@ -25,13 +24,13 @@
 //**************************************************************************
 
 #define MCFG_C2040_SYNC_CALLBACK(_write) \
-	devcb = &c2040_fdc_t::set_sync_wr_callback(*device, DEVCB_##_write);
+	devcb = &c2040_fdc_device::set_sync_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_C2040_READY_CALLBACK(_write) \
-	devcb = &c2040_fdc_t::set_ready_wr_callback(*device, DEVCB_##_write);
+	devcb = &c2040_fdc_device::set_ready_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_C2040_ERROR_CALLBACK(_write) \
-	devcb = &c2040_fdc_t::set_error_wr_callback(*device, DEVCB_##_write);
+	devcb = &c2040_fdc_device::set_error_wr_callback(*device, DEVCB_##_write);
 
 
 
@@ -39,17 +38,17 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> c2040_fdc_t
+// ======================> c2040_fdc_device
 
-class c2040_fdc_t :  public device_t
+class c2040_fdc_device :  public device_t
 {
 public:
 	// construction/destruction
-	c2040_fdc_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	c2040_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &set_sync_wr_callback(device_t &device, _Object object) { return downcast<c2040_fdc_t &>(device).m_write_sync.set_callback(object); }
-	template<class _Object> static devcb_base &set_ready_wr_callback(device_t &device, _Object object) { return downcast<c2040_fdc_t &>(device).m_write_ready.set_callback(object); }
-	template<class _Object> static devcb_base &set_error_wr_callback(device_t &device, _Object object) { return downcast<c2040_fdc_t &>(device).m_write_error.set_callback(object); }
+	template <class Object> static devcb_base &set_sync_wr_callback(device_t &device, Object &&cb) { return downcast<c2040_fdc_device &>(device).m_write_sync.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_ready_wr_callback(device_t &device, Object &&cb) { return downcast<c2040_fdc_device &>(device).m_write_ready.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_error_wr_callback(device_t &device, Object &&cb) { return downcast<c2040_fdc_device &>(device).m_write_error.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -74,11 +73,12 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_clock_changed() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 
 	void stp_w(floppy_image_device *floppy, int mtr, int &old_stp, int stp);
 
@@ -101,15 +101,15 @@ protected:
 		int odd_hd;
 
 		attotime edge;
-		UINT16 shift_reg;
+		uint16_t shift_reg;
 		int cycle_counter;
 		int cell_counter;
 		int bit_counter;
-		UINT8 e;
+		uint8_t e;
 		offs_t i;
 
-		UINT8 pi;
-		UINT16 shift_reg_write;
+		uint8_t pi;
+		uint16_t shift_reg_write;
 		attotime write_start_time;
 		attotime write_buffer[32];
 		int write_position;
@@ -135,7 +135,7 @@ protected:
 	int m_mode_sel;
 	int m_rw_sel;
 	int m_odd_hd;
-	UINT8 m_pi;
+	uint8_t m_pi;
 
 	attotime m_period;
 
@@ -161,8 +161,6 @@ protected:
 
 
 // device type definition
-extern const device_type C2040_FDC;
+DECLARE_DEVICE_TYPE(C2040_FDC, c2040_fdc_device)
 
-
-
-#endif
+#endif // MAME_BUS_IEEE488_C2040FDC_H

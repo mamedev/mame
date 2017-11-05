@@ -1,15 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese
-/***************************************************************************
-
-Template for skeleton device
-
-***************************************************************************/
+#ifndef MAME_MACHINE_M6M80011AP_H
+#define MAME_MACHINE_M6M80011AP_H
 
 #pragma once
-
-#ifndef __M6M80011APDEV_H__
-#define __M6M80011APDEV_H__
 
 
 
@@ -25,17 +19,6 @@ Template for skeleton device
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-enum eeprom_cmd_t
-{
-	EEPROM_GET_CMD = 0,
-	EEPROM_READ,
-	EEPROM_WRITE,
-	EEPROM_WRITE_ENABLE,
-	EEPROM_WRITE_DISABLE,
-	EEPROM_STATUS_OUTPUT
-};
-
-
 // ======================> m6m80011ap_device
 
 class m6m80011ap_device :   public device_t,
@@ -43,7 +26,7 @@ class m6m80011ap_device :   public device_t,
 {
 public:
 	// construction/destruction
-	m6m80011ap_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	m6m80011ap_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// I/O operations
 	DECLARE_READ_LINE_MEMBER( read_bit );
@@ -63,29 +46,30 @@ protected:
 	virtual void nvram_write(emu_file &file) override;
 
 private:
-	UINT8 m_latch;
-	UINT8 m_reset_line;
-	UINT8 m_cmd_stream_pos;
-	UINT32 m_current_cmd;
-	UINT8 m_read_latch;
-	UINT8 m_current_addr;
-	UINT8 m_eeprom_we;
+	enum eeprom_cmd_t
+	{
+		EEPROM_GET_CMD = 0,
+		EEPROM_READ,
+		EEPROM_WRITE,
+		EEPROM_WRITE_ENABLE,
+		EEPROM_WRITE_DISABLE,
+		EEPROM_STATUS_OUTPUT
+	};
+
+	uint8_t m_latch;
+	uint8_t m_reset_line;
+	uint8_t m_cmd_stream_pos;
+	uint32_t m_current_cmd;
+	uint8_t m_read_latch;
+	uint8_t m_current_addr;
+	uint8_t m_eeprom_we;
 
 	eeprom_cmd_t m_eeprom_state;
-	UINT16 m_eeprom_data[0x80];
-
+	uint16_t m_eeprom_data[0x80];
 };
 
 
 // device type definition
-extern const device_type M6M80011AP;
+DECLARE_DEVICE_TYPE(M6M80011AP, m6m80011ap_device)
 
-
-
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-
-
-#endif
+#endif // MAME_MACHINE_M6M80011AP_H

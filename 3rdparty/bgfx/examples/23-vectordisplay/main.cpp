@@ -47,7 +47,7 @@ int _main_(int _argc, char** _argv)
 	bool originBottomLeft = bgfx::RendererType::OpenGL == renderer
 	                        || bgfx::RendererType::OpenGLES == renderer;
 	VectorDisplay vd(originBottomLeft, texelHalf);
-	vd.setup(width, height);
+	vd.setup(uint16_t(width), uint16_t(height) );
 
 	// Enable debug text.
 	bgfx::setDebug(debug);
@@ -71,18 +71,18 @@ int _main_(int _argc, char** _argv)
 		{
 			oldWidth  = width;
 			oldHeight = height;
-			vd.resize(width, height);
+			vd.resize(uint16_t(width), uint16_t(height) );
 		}
 
 		float view[16];
 		float proj[16];
 		bx::mtxLookAt(view, eye, at);
-		bx::mtxProj(proj, 60.0f, float(width) / float(height), 0.1f, 100.0f);
+		bx::mtxProj(proj, 60.0f, float(width) / float(height), 0.1f, 100.0f, bgfx::getCaps()->homogeneousDepth);
 		// Set view and projection matrix for view 0.
 		bgfx::setViewTransform(0, view, proj);
 
 		// Set view 0 default viewport.
-		bgfx::setViewRect(0, 0, 0, width, height);
+		bgfx::setViewRect(0, 0, 0, uint16_t(width), uint16_t(height) );
 
 		// This dummy draw call is here to make sure that view 0 is cleared
 		// if no other draw calls are submitted to view 0.
@@ -152,8 +152,8 @@ int _main_(int _argc, char** _argv)
 		// draw moving shape
 		static float counter = 0.0f;
 		counter += 0.01f;
-		float posX = width  / 2.0f + sinf(counter * 3.18378f) * (width / 2.0f);
-		float posY = height / 2.0f + cosf(counter) * (height / 2.0f);
+		float posX = width  / 2.0f + bx::fsin(counter * 3.18378f) * (width / 2.0f);
+		float posY = height / 2.0f + bx::fcos(counter) * (height / 2.0f);
 		vd.drawCircle(posX, posY, 5.0f, 10.0f);
 
 		vd.endFrame();

@@ -18,16 +18,19 @@ solarwar
 *************************************************************************/
 
 #include "emu.h"
+#include "includes/videopin.h"
+
 #include "cpu/m6502/m6502.h"
 #include "machine/watchdog.h"
-#include "includes/videopin.h"
-#include "videopin.lh"
 #include "sound/discrete.h"
+#include "speaker.h"
+
+#include "videopin.lh"
 
 
 void videopin_state::update_plunger()
 {
-	UINT8 val = ioport("IN2")->read();
+	uint8_t val = ioport("IN2")->read();
 
 	if (m_prev != val)
 	{
@@ -54,7 +57,7 @@ void videopin_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		interrupt_callback(ptr, param);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in videopin_state::device_timer");
+		assert_always(false, "Unknown id in videopin_state::device_timer");
 	}
 }
 
@@ -93,8 +96,8 @@ void videopin_state::machine_reset()
 
 	/* both output latches are cleared on reset */
 
-	out1_w(machine().driver_data()->generic_space(), 0, 0);
-	out2_w(machine().driver_data()->generic_space(), 0, 0);
+	out1_w(machine().dummy_space(), 0, 0);
+	out2_w(machine().dummy_space(), 0, 0);
 }
 
 
@@ -117,7 +120,7 @@ READ8_MEMBER(videopin_state::misc_r)
 	// signals received. This results in the MPU displaying the
 	// ball being shot onto the playfield at a certain speed.
 
-	UINT8 val = ioport("IN1")->read();
+	uint8_t val = ioport("IN1")->read();
 
 	if (plunger >= 0.000 && plunger <= 0.001)
 	{
@@ -355,7 +358,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( videopin, videopin_state )
+static MACHINE_CONFIG_START( videopin )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 12096000 / 16)
@@ -462,5 +465,5 @@ ROM_END
  *
  *************************************/
 
-GAMEL( 1979, videopin, 0, videopin, videopin, driver_device, 0, ROT270, "Atari", "Video Pinball", MACHINE_SUPPORTS_SAVE, layout_videopin )
-GAMEL( 1979, solarwar, 0, videopin, solarwar, driver_device, 0, ROT270, "Atari", "Solar War", MACHINE_SUPPORTS_SAVE, layout_videopin )
+GAMEL( 1979, videopin, 0, videopin, videopin, videopin_state, 0, ROT270, "Atari", "Video Pinball", MACHINE_SUPPORTS_SAVE, layout_videopin )
+GAMEL( 1979, solarwar, 0, videopin, solarwar, videopin_state, 0, ROT270, "Atari", "Solar War", MACHINE_SUPPORTS_SAVE, layout_videopin )

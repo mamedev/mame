@@ -1,45 +1,45 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont
-#ifndef ESQVFD_H
-#define ESQVFD_H
+#ifndef MAME_MACHINE_ESQVFD_H
+#define MAME_MACHINE_ESQVFD_H
 
-#include "emu.h"
 
-#define MCFG_ESQ1x22_ADD(_tag)  \
-	MCFG_DEVICE_ADD(_tag, ESQ1x22, 60)
+#define MCFG_ESQ1X22_ADD(_tag)  \
+	MCFG_DEVICE_ADD(_tag, ESQ1X22, 60)
 
 #define MCFG_ESQ1x22_REMOVE(_tag) \
 	MCFG_DEVICE_REMOVE(_tag)
 
-#define MCFG_ESQ2x40_ADD(_tag)  \
-	MCFG_DEVICE_ADD(_tag, ESQ2x40, 60)
+#define MCFG_ESQ2X40_ADD(_tag)  \
+	MCFG_DEVICE_ADD(_tag, ESQ2X40, 60)
 
-#define MCFG_ESQ2x40_REMOVE(_tag) \
+#define MCFG_ESQ2X40_REMOVE(_tag) \
 	MCFG_DEVICE_REMOVE(_tag)
 
-#define MCFG_ESQ2x40_SQ1_ADD(_tag)  \
-	MCFG_DEVICE_ADD(_tag, ESQ2x40_SQ1, 60)
+#define MCFG_ESQ2X40_SQ1_ADD(_tag)  \
+	MCFG_DEVICE_ADD(_tag, ESQ2X40_SQ1, 60)
 
-#define MCFG_ESQ2x40_SQ1_REMOVE(_tag) \
+#define MCFG_ESQ2X40_SQ1_REMOVE(_tag) \
 	MCFG_DEVICE_REMOVE(_tag)
 
-class esqvfd_t : public device_t {
+class esqvfd_device : public device_t {
 public:
-	esqvfd_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-
 	DECLARE_WRITE8_MEMBER( write ) { write_char(data); }
 
 	virtual void write_char(int data) = 0;
 	virtual void update_display();
+	virtual bool write_contents(std::ostream &o) { return false; }
 
-	UINT32 conv_segments(UINT16 segin);
+	uint32_t conv_segments(uint16_t segin);
 
 protected:
-	static const UINT8 AT_NORMAL      = 0x00;
-	static const UINT8 AT_BOLD        = 0x01;
-	static const UINT8 AT_UNDERLINE   = 0x02;
-	static const UINT8 AT_BLINK       = 0x04;
-	static const UINT8 AT_BLINKED     = 0x80;   // set when character should be blinked off
+	esqvfd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	static constexpr uint8_t AT_NORMAL      = 0x00;
+	static constexpr uint8_t AT_BOLD        = 0x01;
+	static constexpr uint8_t AT_UNDERLINE   = 0x02;
+	static constexpr uint8_t AT_BLINK       = 0x04;
+	static constexpr uint8_t AT_BLINKED     = 0x80;   // set when character should be blinked off
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -48,52 +48,51 @@ protected:
 	int m_cursx, m_cursy;
 	int m_savedx, m_savedy;
 	int m_rows, m_cols;
-	UINT8 m_curattr;
-	UINT8 m_lastchar;
-	UINT8 m_chars[2][40];
-	UINT8 m_attrs[2][40];
-	UINT8 m_dirty[2][40];
+	uint8_t m_curattr;
+	uint8_t m_lastchar;
+	uint8_t m_chars[2][40];
+	uint8_t m_attrs[2][40];
+	uint8_t m_dirty[2][40];
 };
 
-class esq1x22_t : public esqvfd_t {
+class esq1x22_device : public esqvfd_device {
 public:
-	esq1x22_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	esq1x22_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void write_char(int data) override;
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
 };
 
-class esq2x40_t : public esqvfd_t {
+class esq2x40_device : public esqvfd_device {
 public:
-	esq2x40_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	esq2x40_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void write_char(int data) override;
+	virtual bool write_contents(std::ostream &o) override;
+
+protected:
+	virtual void device_add_mconfig(machine_config &config) override;
+};
+
+class esq2x40_sq1_device : public esqvfd_device {
+public:
+	esq2x40_sq1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void write_char(int data) override;
 
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
+	bool m_wait87shift, m_wait88shift;
 };
 
-class esq2x40_sq1_t : public esqvfd_t {
-public:
-	esq2x40_sq1_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+DECLARE_DEVICE_TYPE(ESQ1X22,     esq1x22_device)
+DECLARE_DEVICE_TYPE(ESQ2X40,     esq2x40_device)
+DECLARE_DEVICE_TYPE(ESQ2X40_SQ1, esq2x40_sq1_device)
 
-	virtual void write_char(int data) override;
-
-protected:
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
-private:
-	bool m_Wait87Shift, m_Wait88Shift;
-};
-
-extern const device_type ESQ1x22;
-extern const device_type ESQ2x40;
-extern const device_type ESQ2x40_SQ1;
-
-#endif
+#endif // MAME_MACHINE_ESQVFD_H

@@ -41,7 +41,7 @@
 
 PALETTE_INIT_MEMBER(timeplt_state, timeplt)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	rgb_t palette_val[32];
 	int i;
 
@@ -124,7 +124,7 @@ TILE_GET_INFO_MEMBER(timeplt_state::get_chkun_tile_info)
 
 void timeplt_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(timeplt_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(timeplt_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_video_enable = 0;
 
 	save_item(NAME(m_video_enable));
@@ -138,7 +138,7 @@ VIDEO_START_MEMBER(timeplt_state,psurge)
 
 VIDEO_START_MEMBER(timeplt_state,chkun)
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(timeplt_state::get_chkun_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(timeplt_state::get_chkun_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_video_enable = 0;
 
 	save_item(NAME(m_video_enable));
@@ -166,14 +166,14 @@ WRITE8_MEMBER(timeplt_state::colorram_w)
 }
 
 
-WRITE8_MEMBER(timeplt_state::flipscreen_w)
+WRITE_LINE_MEMBER(timeplt_state::flipscreen_w)
 {
-	flip_screen_set(~data & 1);
+	flip_screen_set(!state);
 }
 
-WRITE8_MEMBER(timeplt_state::video_enable_w)
+WRITE_LINE_MEMBER(timeplt_state::video_enable_w)
 {
-	m_video_enable = data & 1;
+	m_video_enable = state;
 }
 
 READ8_MEMBER(timeplt_state::scanline_r)
@@ -217,7 +217,7 @@ void timeplt_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
  *
  *************************************/
 
-UINT32 timeplt_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t timeplt_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if (m_video_enable)
 	{

@@ -1,9 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:smf,Carl
+#include "emu.h"
 #include "null_modem.h"
 
-null_modem_device::null_modem_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, NULL_MODEM, "Null Modem", tag, owner, clock, "null_modem", __FILE__),
+null_modem_device::null_modem_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, NULL_MODEM, tag, owner, clock),
 	device_serial_interface(mconfig, *this),
 	device_rs232_port_interface(mconfig, *this),
 	m_stream(*this, "stream"),
@@ -13,20 +14,17 @@ null_modem_device::null_modem_device(const machine_config &mconfig, const char *
 	m_rs232_databits(*this, "RS232_DATABITS"),
 	m_rs232_parity(*this, "RS232_PARITY"),
 	m_rs232_stopbits(*this, "RS232_STOPBITS"),
+	m_flow(*this, "FLOW_CONTROL"),
 	m_input_count(0),
 	m_input_index(0),
-	m_timer_poll(nullptr)
+	m_timer_poll(nullptr),
+	m_rts(0)
 {
 }
 
-static MACHINE_CONFIG_FRAGMENT(null_modem)
+MACHINE_CONFIG_MEMBER(null_modem_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("stream", BITBANGER, 0)
 MACHINE_CONFIG_END
-
-machine_config_constructor null_modem_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME(null_modem);
-}
 
 static INPUT_PORTS_START(null_modem)
 	MCFG_RS232_BAUD("RS232_TXBAUD", RS232_BAUD_9600, "TX Baud", null_modem_device, update_serial)
@@ -35,6 +33,10 @@ static INPUT_PORTS_START(null_modem)
 	MCFG_RS232_DATABITS("RS232_DATABITS", RS232_DATABITS_8, "Data Bits", null_modem_device, update_serial)
 	MCFG_RS232_PARITY("RS232_PARITY", RS232_PARITY_NONE, "Parity", null_modem_device, update_serial)
 	MCFG_RS232_STOPBITS("RS232_STOPBITS", RS232_STOPBITS_1, "Stop Bits", null_modem_device, update_serial)
+	PORT_START("FLOW_CONTROL")
+	PORT_CONFNAME(0x01, 0x00, "Flow Control")
+	PORT_CONFSETTING(0x00, "Off")
+	PORT_CONFSETTING(0x01, "On")
 INPUT_PORTS_END
 
 ioport_constructor null_modem_device::device_input_ports() const
@@ -68,6 +70,8 @@ WRITE_LINE_MEMBER(null_modem_device::update_serial)
 	output_dcd(0);
 	output_dsr(0);
 	output_cts(0);
+
+	m_rts = 0;
 }
 
 void null_modem_device::device_reset()
@@ -85,7 +89,7 @@ void null_modem_device::device_timer(emu_timer &timer, device_timer_id id, int p
 		break;
 
 	default:
-		device_serial_interface::device_timer(timer, id, param, ptr);
+		break;
 	}
 }
 
@@ -99,7 +103,7 @@ void null_modem_device::queue()
 			m_input_count = m_stream->input(m_input_buffer, sizeof(m_input_buffer));
 		}
 
-		if (m_input_count != 0)
+		if (m_input_count != 0 && (m_rts == 0 || !m_flow->read()))
 		{
 			transmit_register_setup(m_input_buffer[m_input_index++]);
 
@@ -129,4 +133,4 @@ void null_modem_device::rcv_complete()
 	m_stream->output(get_received_char());
 }
 
-const device_type NULL_MODEM = &device_creator<null_modem_device>;
+DEFINE_DEVICE_TYPE(NULL_MODEM, null_modem_device, "null_modem", "RS232 Null Modem")

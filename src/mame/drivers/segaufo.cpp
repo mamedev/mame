@@ -45,8 +45,10 @@
 #include "cpu/z80/z80.h"
 #include "machine/pit8253.h"
 #include "machine/315_5296.h"
+#include "machine/timer.h"
 #include "sound/2612intf.h"
 #include "sound/upd7759.h"
+#include "speaker.h"
 
 // the layouts are very similar to eachother
 #include "newufo.lh"
@@ -90,21 +92,20 @@ public:
 	{
 		struct Motor
 		{
-			UINT8 running;
-			UINT8 direction;
+			uint8_t running;
+			uint8_t direction;
 			float position;
 			float speed;
 		} motor[4];
 	} m_player[2];
 
-	UINT8 m_stepper;
+	uint8_t m_stepper;
 
 	void motor_tick(int p, int m);
 
 	DECLARE_WRITE_LINE_MEMBER(pit_out0);
 	DECLARE_WRITE_LINE_MEMBER(pit_out1);
 	DECLARE_WRITE_LINE_MEMBER(pit_out2);
-	DECLARE_WRITE_LINE_MEMBER(ym3438_irq);
 	DECLARE_READ8_MEMBER(crane_limits_r);
 	DECLARE_WRITE8_MEMBER(stepper_w);
 	DECLARE_WRITE8_MEMBER(cp_lamps_w);
@@ -162,7 +163,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(ufo_state::update_info)
 	// 3 C: 000 = closed, 100 = open
 	for (int p = 0; p < 2; p++)
 		for (int m = 0; m < 4; m++)
-			output().set_indexed_value("counter", p*4 + m, (UINT8)(m_player[p].motor[m].position * 100));
+			output().set_indexed_value("counter", p*4 + m, (uint8_t)(m_player[p].motor[m].position * 100));
 
 #if 0
 	char msg1[0x100] = {0};
@@ -209,7 +210,7 @@ WRITE_LINE_MEMBER(ufo_state::pit_out2)
 READ8_MEMBER(ufo_state::crane_limits_r)
 {
 	int p = offset & 1;
-	UINT8 ret = 0x7f;
+	uint8_t ret = 0x7f;
 
 	// d0: left limit sw (right for p2)
 	// d1: right limit sw (left for p2)
@@ -243,12 +244,12 @@ WRITE8_MEMBER(ufo_state::stepper_w)
 		// controlled with 4 output bits connected to a Toshiba TB6560AHQ motor driver.
 		// I don't know which bits connect to which pins specifically.
 		// To run it, the game writes a continuous sequence of $5, $9, $a, $6, ..
-		static const UINT8 sequence[4] =
+		static const uint8_t sequence[4] =
 			{ 0x5, 0x9, 0xa, 0x6 };
 
 		// d0-d3: p1, d4-d7: p2
-		UINT8 cur = data >> (p*4) & 0xf;
-		UINT8 prev = m_stepper >> (p*4) & 0xf;
+		uint8_t cur = data >> (p*4) & 0xf;
+		uint8_t prev = m_stepper >> (p*4) & 0xf;
 
 		for (int i = 0; i < 4; i++)
 		{
@@ -279,7 +280,7 @@ WRITE8_MEMBER(ufo_state::cp_lamps_w)
 
 WRITE8_MEMBER(ufo_state::cp_digits_w)
 {
-	static const UINT8 lut_7448[0x10] =
+	static const uint8_t lut_7448[0x10] =
 		{ 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x58,0x4c,0x62,0x69,0x78,0x00 };
 
 	// d0-d3: cpanel digit
@@ -330,7 +331,7 @@ WRITE8_MEMBER(ufo_state::ufo_lamps_w)
 READ8_MEMBER(ufo_state::ex_crane_limits_r)
 {
 	int p = offset & 1;
-	UINT8 ret = 0xf0;
+	uint8_t ret = 0xf0;
 
 	// d0: left limit sw (invert)
 	// d1: right limit sw (invert)
@@ -353,7 +354,7 @@ READ8_MEMBER(ufo_state::ex_crane_limits_r)
 READ8_MEMBER(ufo_state::ex_crane_open_r)
 {
 	// d0-d3: p1, d4-d7: p2
-	UINT8 ret = 0xff;
+	uint8_t ret = 0xff;
 
 	for (int p = 0; p < 2; p++)
 	{
@@ -747,12 +748,7 @@ void ufo_state::machine_start()
 	save_item(NAME(m_stepper));
 }
 
-WRITE_LINE_MEMBER(ufo_state::ym3438_irq)
-{
-	m_maincpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
-static MACHINE_CONFIG_START( newufo, ufo_state )
+static MACHINE_CONFIG_START( newufo )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz/2)
@@ -795,7 +791,7 @@ static MACHINE_CONFIG_START( newufo, ufo_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ym", YM3438, XTAL_16MHz/2)
-	MCFG_YM2612_IRQ_HANDLER(WRITELINE(ufo_state, ym3438_irq))
+	MCFG_YM2612_IRQ_HANDLER(INPUTLINE("maincpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.40)
 	MCFG_SOUND_ROUTE(1, "mono", 0.40)
 MACHINE_CONFIG_END
@@ -904,10 +900,10 @@ ROM_START( ufo800 )
 ROM_END
 
 
-GAMEL( 1991, newufo,       0,      newufo,  newufo,  driver_device, 0, ROT0, "Sega", "New UFO Catcher (standard)", MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE, layout_newufo )
-GAMEL( 1991, newufo_sonic, newufo, newufo,  newufo,  driver_device, 0, ROT0, "Sega", "New UFO Catcher (Sonic The Hedgehog)", MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE, layout_newufo )
-GAMEL( 1991, newufo_nfl,   newufo, newufo,  newufo,  driver_device, 0, ROT0, "Sega", "New UFO Catcher (Team NFL)", MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE, layout_newufo )
-GAMEL( 1991, newufo_xmas,  newufo, newufo,  newufo,  driver_device, 0, ROT0, "Sega", "New UFO Catcher (Christmas season ROM kit)", MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE, layout_newufo )
-GAMEL( 1991, ufomini,      0,      ufomini, ufomini, driver_device, 0, ROT0, "Sega", "UFO Catcher Mini", MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE, layout_ufomini )
-GAMEL( 1996, ufo21,        0,      ufo21,   ufo21,   driver_device, 0, ROT0, "Sega", "UFO Catcher 21", MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE, layout_ufo21 )
-GAMEL( 1998, ufo800,       0,      ufo800,  ufo800,  driver_device, 0, ROT0, "Sega", "UFO Catcher 800", MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE, layout_ufo800 )
+GAMEL( 1991, newufo,       0,      newufo,  newufo,  ufo_state, 0, ROT0, "Sega", "New UFO Catcher (standard)", MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE, layout_newufo )
+GAMEL( 1991, newufo_sonic, newufo, newufo,  newufo,  ufo_state, 0, ROT0, "Sega", "New UFO Catcher (Sonic The Hedgehog)", MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE, layout_newufo )
+GAMEL( 1991, newufo_nfl,   newufo, newufo,  newufo,  ufo_state, 0, ROT0, "Sega", "New UFO Catcher (Team NFL)", MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE, layout_newufo )
+GAMEL( 1991, newufo_xmas,  newufo, newufo,  newufo,  ufo_state, 0, ROT0, "Sega", "New UFO Catcher (Christmas season ROM kit)", MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE, layout_newufo )
+GAMEL( 1991, ufomini,      0,      ufomini, ufomini, ufo_state, 0, ROT0, "Sega", "UFO Catcher Mini", MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE, layout_ufomini )
+GAMEL( 1996, ufo21,        0,      ufo21,   ufo21,   ufo_state, 0, ROT0, "Sega", "UFO Catcher 21", MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE, layout_ufo21 )
+GAMEL( 1998, ufo800,       0,      ufo800,  ufo800,  ufo_state, 0, ROT0, "Sega", "UFO Catcher 800", MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE, layout_ufo800 )

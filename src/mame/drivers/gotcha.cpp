@@ -14,7 +14,7 @@ TODO:
   gfx related but since everything seems fine I've no idea what it might do.
 - Unknown sound writes at C00F; also, there's an NMI handler that would
   read from C00F.
-- Sound samples were getting chopped; I fixed this by changing sound/adpcm.c to
+- Sound samples were getting chopped; I fixed this by changing sound/adpcm.cpp to
   disregard requests to play new samples until the previous one is finished*.
 
 Gotcha pcb: 97,7,29 PARA VER 3.0 but it is the same as ppchamp
@@ -60,44 +60,50 @@ Notes:
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "cpu/m68000/m68000.h"
-#include "sound/2151intf.h"
-#include "sound/okim6295.h"
 #include "includes/gotcha.h"
+
+#include "cpu/m68000/m68000.h"
+#include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
+#include "sound/okim6295.h"
+#include "sound/ym2151.h"
+
+#include "screen.h"
+#include "speaker.h"
+
+#include "gotcha.lh"
+
 
 WRITE16_MEMBER(gotcha_state::gotcha_lamps_w)
 {
-#if 0
-	popmessage("%c%c%c%c %c%c%c%c %c%c%c%c",
-			(data & 0x001) ? 'R' : '-',
-			(data & 0x002) ? 'G' : '-',
-			(data & 0x004) ? 'B' : '-',
-			(data & 0x008) ? 'S' : '-',
-			(data & 0x010) ? 'R' : '-',
-			(data & 0x020) ? 'G' : '-',
-			(data & 0x040) ? 'B' : '-',
-			(data & 0x080) ? 'S' : '-',
-			(data & 0x100) ? 'R' : '-',
-			(data & 0x200) ? 'G' : '-',
-			(data & 0x400) ? 'B' : '-',
-			(data & 0x800) ? 'S' : '-'
-			);
-#endif
+	machine().output().set_value("lamp_p1_r", BIT(data,  0));
+	machine().output().set_value("lamp_p1_g", BIT(data,  1));
+	machine().output().set_value("lamp_p1_b", BIT(data,  2));
+	machine().output().set_value("lamp_p1_s", BIT(data,  3));
+
+	machine().output().set_value("lamp_p2_r", BIT(data,  4));
+	machine().output().set_value("lamp_p2_g", BIT(data,  5));
+	machine().output().set_value("lamp_p2_b", BIT(data,  6));
+	machine().output().set_value("lamp_p2_s", BIT(data,  7));
+
+	machine().output().set_value("lamp_p3_r", BIT(data,  8));
+	machine().output().set_value("lamp_p3_g", BIT(data,  9));
+	machine().output().set_value("lamp_p3_b", BIT(data, 10));
+	machine().output().set_value("lamp_p3_s", BIT(data, 11));
 }
 
 WRITE16_MEMBER(gotcha_state::gotcha_oki_bank_w)
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		m_oki->set_bank_base((((~data & 0x0100) >> 8) * 0x40000));
+		m_oki->set_rom_bank((~data & 0x0100) >> 8);
 	}
 }
 
 
 static ADDRESS_MAP_START( gotcha_map, AS_PROGRAM, 16, gotcha_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x100000, 0x100001) AM_WRITE(soundlatch_word_w)
+	AM_RANGE(0x100000, 0x100001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0x100002, 0x100003) AM_WRITE(gotcha_lamps_w)
 	AM_RANGE(0x100004, 0x100005) AM_WRITE(gotcha_oki_bank_w)
 	AM_RANGE(0x120000, 0x12ffff) AM_RAM
@@ -119,7 +125,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, gotcha_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0xc002, 0xc002) AM_DEVREADWRITE("oki", okim6295_device, read, write) AM_MIRROR(1)
-	AM_RANGE(0xc006, 0xc006) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xc006, 0xc006) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM
 ADDRESS_MAP_END
 
@@ -256,7 +262,7 @@ void gotcha_state::machine_reset()
 	m_banksel = 0;
 }
 
-static MACHINE_CONFIG_START( gotcha, gotcha_state )
+static MACHINE_CONFIG_START( gotcha )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,14318180)    /* 14.31818 MHz */
@@ -291,12 +297,14 @@ static MACHINE_CONFIG_START( gotcha, gotcha_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_YM2151_ADD("ymsnd", 14318180/4)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.80)
 	MCFG_SOUND_ROUTE(1, "mono", 0.80)
 
-	MCFG_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", 1000000, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 
@@ -380,5 +388,5 @@ ROM_START( ppchamp )
 	ROM_LOAD( "uz11", 0x00000, 0x80000, CRC(3d96274c) SHA1(c7a670af86194c370bf8fb30afbe027ab78a0227) )
 ROM_END
 
-GAME( 1997, gotcha,  0,      gotcha, gotcha, driver_device, 0, ROT0, "Dongsung / Para", "Got-cha Mini Game Festival", MACHINE_SUPPORTS_SAVE )
-GAME( 1997, ppchamp, gotcha, gotcha, gotcha, driver_device, 0, ROT0, "Dongsung / Para", "Pasha Pasha Champ Mini Game Festival (Korea)", MACHINE_SUPPORTS_SAVE )
+GAMEL( 1997, gotcha,  0,      gotcha, gotcha, gotcha_state, 0, ROT0, "Dongsung / Para", "Got-cha Mini Game Festival",                   MACHINE_SUPPORTS_SAVE, layout_gotcha )
+GAMEL( 1997, ppchamp, gotcha, gotcha, gotcha, gotcha_state, 0, ROT0, "Dongsung / Para", "Pasha Pasha Champ Mini Game Festival (Korea)", MACHINE_SUPPORTS_SAVE, layout_gotcha )

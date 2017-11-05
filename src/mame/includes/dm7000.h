@@ -1,9 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Lukasz Markowski
-#ifndef DM7000_H_
-#define DM7000_H_
+#ifndef MAME_INCLUDES_DM7000_H
+#define MAME_INCLUDES_DM7000_H
 
-#include "emu.h"
+#pragma once
+
 #include "cpu/powerpc/ppc.h"
 #include "machine/terminal.h"
 
@@ -29,10 +30,10 @@ public:
 
 	DECLARE_WRITE8_MEMBER ( dm7000_scc0_w );
 	DECLARE_READ8_MEMBER ( dm7000_scc0_r );
-	DECLARE_WRITE8_MEMBER(kbd_put);
-	UINT8 m_scc0_lcr;
-	UINT8 m_scc0_lsr;
-	UINT8 m_term_data;
+	void kbd_put(u8 data);
+	uint8_t m_scc0_lcr;
+	uint8_t m_scc0_lsr;
+	uint8_t m_term_data;
 
 
 	DECLARE_WRITE8_MEMBER ( dm7000_gpio0_w );
@@ -48,12 +49,12 @@ public:
 	DECLARE_WRITE32_MEMBER( dcr_w );
 
 
-	UINT16          m_enet_regs[32];
+	uint16_t          m_enet_regs[32];
 
-	UINT32          dcr[1024];
+	uint32_t          dcr[1024];
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_dm7000(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_dm7000(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 /* */
@@ -91,4 +92,4 @@ public:
 #define DCRSTB045_DISP_MODE         0x154       /* Display Mode Register */
 #define DCRSTB045_FRAME_BUFR_BASE   0x179       /* Frame Buffers Base Address Register */
 
-#endif /* DM7000_H_ */
+#endif // MAME_INCLUDES_DM7000_H

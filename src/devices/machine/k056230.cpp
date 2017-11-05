@@ -15,16 +15,16 @@
 //**************************************************************************
 
 // device type definition
-const device_type K056230 = &device_creator<k056230_device>;
+DEFINE_DEVICE_TYPE(K056230, k056230_device, "k056230", "K056230 LANC")
 
 //-------------------------------------------------
 //  k056230_device - constructor
 //-------------------------------------------------
 
-k056230_device::k056230_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, K056230, "K056230 LANC", tag, owner, clock, "k056230", __FILE__),
-		m_is_thunderh(0),
-		m_cpu(*this)
+k056230_device::k056230_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, K056230, tag, owner, clock)
+	, m_is_thunderh(0)
+	, m_cpu(*this, finder_base::DUMMY_TAG)
 {
 }
 

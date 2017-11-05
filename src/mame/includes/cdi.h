@@ -8,6 +8,7 @@
 #include "machine/cdicdic.h"
 #include "sound/dmadac.h"
 #include "video/mcd212.h"
+#include "cpu/mcs51/mcs51.h"
 
 /*----------- driver state -----------*/
 
@@ -72,8 +73,8 @@ public:
 	};
 
 	required_device<cpu_device> m_maincpu;
-	required_shared_ptr<UINT16> m_planea;
-	required_shared_ptr<UINT16> m_planeb;
+	required_shared_ptr<uint16_t> m_planea;
+	required_shared_ptr<uint16_t> m_planeb;
 	optional_ioport m_input1;
 	optional_ioport m_input2;
 	required_ioport m_mousex;
@@ -91,10 +92,10 @@ public:
 
 	INTERRUPT_GEN_MEMBER( mcu_frame );
 
-	UINT8 m_servo_io_regs[0x20];
-	UINT8 m_slave_io_regs[0x20];
+	uint8_t m_servo_io_regs[0x20];
+	uint8_t m_slave_io_regs[0x20];
 
-	UINT8 m_timer_set;
+	uint8_t m_timer_set;
 	emu_timer *m_test_timer;
 
 	bitmap_rgb32 m_lcdbitmap;
@@ -106,23 +107,19 @@ public:
 
 	DECLARE_MACHINE_RESET(cdimono1);
 	DECLARE_MACHINE_RESET(cdimono2);
-	DECLARE_MACHINE_RESET(quizard12);
-	DECLARE_MACHINE_RESET(quizard17);
-	DECLARE_MACHINE_RESET(quizard18);
-	DECLARE_MACHINE_RESET(quizard22);
-	DECLARE_MACHINE_RESET(quizard23);
-	DECLARE_MACHINE_RESET(quizard32);
-	DECLARE_MACHINE_RESET(quizard34);
-	DECLARE_MACHINE_RESET(quizard4r40);
-	DECLARE_MACHINE_RESET(quizard4r41);
-	DECLARE_MACHINE_RESET(quizard4r42);
+	DECLARE_MACHINE_RESET(quizard1);
+	DECLARE_MACHINE_RESET(quizard2);
+	DECLARE_MACHINE_RESET(quizard3);
+	DECLARE_MACHINE_RESET(quizard4);
 	DECLARE_READ8_MEMBER(servo_io_r);
 	DECLARE_WRITE8_MEMBER(servo_io_w);
 	DECLARE_READ8_MEMBER(slave_io_r);
 	DECLARE_WRITE8_MEMBER(slave_io_w);
 
-	UINT32 screen_update_cdimono1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_cdimono1_lcd(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	DECLARE_READ8_MEMBER(quizard_mcu_p1_r);
+
+	uint32_t screen_update_cdimono1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_cdimono1_lcd(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 /*----------- debug defines -----------*/

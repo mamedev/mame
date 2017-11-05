@@ -6,12 +6,11 @@
 
 **********************************************************************/
 
+#ifndef MAME_MACHINE_VICTOR9K_FDC_H
+#define MAME_MACHINE_VICTOR9K_FDC_H
+
 #pragma once
 
-#ifndef __VICTOR_9000_FDC__
-#define __VICTOR_9000_FDC__
-
-#include "emu.h"
 #include "cpu/mcs48/mcs48.h"
 #include "formats/victor9k_dsk.h"
 #include "imagedev/floppy.h"
@@ -25,13 +24,13 @@
 //**************************************************************************
 
 #define MCFG_VICTOR_9000_FDC_IRQ_CB(_write) \
-	devcb = &victor_9000_fdc_t::set_irq_wr_callback(*device, DEVCB_##_write);
+	devcb = &victor_9000_fdc_device::set_irq_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_VICTOR_9000_FDC_SYN_CB(_write) \
-	devcb = &victor_9000_fdc_t::set_syn_wr_callback(*device, DEVCB_##_write);
+	devcb = &victor_9000_fdc_device::set_syn_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_VICTOR_9000_FDC_LBRDY_CB(_write) \
-	devcb = &victor_9000_fdc_t::set_lbrdy_wr_callback(*device, DEVCB_##_write);
+	devcb = &victor_9000_fdc_device::set_lbrdy_wr_callback(*device, DEVCB_##_write);
 
 
 
@@ -39,17 +38,17 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> victor_9000_fdc_t
+// ======================> victor_9000_fdc_device
 
-class victor_9000_fdc_t :  public device_t
+class victor_9000_fdc_device :  public device_t
 {
 public:
 	// construction/destruction
-	victor_9000_fdc_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	victor_9000_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<victor_9000_fdc_t &>(device).m_irq_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_syn_wr_callback(device_t &device, _Object object) { return downcast<victor_9000_fdc_t &>(device).m_syn_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_lbrdy_wr_callback(device_t &device, _Object object) { return downcast<victor_9000_fdc_t &>(device).m_lbrdy_cb.set_callback(object); }
+	template <class Object> static devcb_base &set_irq_wr_callback(device_t &device, Object &&cb) { return downcast<victor_9000_fdc_device &>(device).m_irq_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_syn_wr_callback(device_t &device, Object &&cb) { return downcast<victor_9000_fdc_device &>(device).m_syn_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_lbrdy_wr_callback(device_t &device, Object &&cb) { return downcast<victor_9000_fdc_device &>(device).m_lbrdy_cb.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER( cs5_r ) { return m_via4->read(space, offset); }
 	DECLARE_WRITE8_MEMBER( cs5_w ) { m_via4->write(space, offset, data); }
@@ -58,35 +57,6 @@ public:
 	DECLARE_READ8_MEMBER( cs7_r );
 	DECLARE_WRITE8_MEMBER( cs7_w );
 
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
-
-	DECLARE_READ8_MEMBER( floppy_p1_r );
-	DECLARE_WRITE8_MEMBER( floppy_p1_w );
-	DECLARE_READ8_MEMBER( floppy_p2_r );
-	DECLARE_WRITE8_MEMBER( floppy_p2_w );
-	DECLARE_READ8_MEMBER( tach0_r );
-	DECLARE_READ8_MEMBER( tach1_r );
-	DECLARE_WRITE8_MEMBER( da_w );
-
-	DECLARE_READ8_MEMBER( via4_pa_r );
-	DECLARE_WRITE8_MEMBER( via4_pa_w );
-	DECLARE_READ8_MEMBER( via4_pb_r );
-	DECLARE_WRITE8_MEMBER( via4_pb_w );
-	DECLARE_WRITE_LINE_MEMBER( wrsync_w );
-	DECLARE_WRITE_LINE_MEMBER( via4_irq_w );
-
-	DECLARE_READ8_MEMBER( via5_pa_r );
-	DECLARE_WRITE8_MEMBER( via5_pb_w );
-	DECLARE_WRITE_LINE_MEMBER( via5_irq_w );
-
-	DECLARE_READ8_MEMBER( via6_pa_r );
-	DECLARE_READ8_MEMBER( via6_pb_r );
-	DECLARE_WRITE8_MEMBER( via6_pa_w );
-	DECLARE_WRITE8_MEMBER( via6_pb_w );
-	DECLARE_WRITE_LINE_MEMBER( drw_w );
-	DECLARE_WRITE_LINE_MEMBER( erase_w );
-	DECLARE_WRITE_LINE_MEMBER( via6_irq_w );
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -94,8 +64,8 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
 	static const int rpm[0x100];
@@ -129,10 +99,10 @@ private:
 
 		// common
 		offs_t i;
-		UINT8 e;
+		uint8_t e;
 
 		// read
-		UINT16 shift_reg;
+		uint16_t shift_reg;
 		int bit_counter;
 		int sync_bit_counter;
 		int sync_byte_counter;
@@ -144,8 +114,8 @@ private:
 		int gcr_err;
 
 		// write
-		UINT16 shift_reg_write;
-		UINT8 wd;
+		uint16_t shift_reg_write;
+		uint8_t wd;
 		int wrsync;
 		int gcr_data;
 		int erase;
@@ -159,27 +129,27 @@ private:
 	required_device<via6522_device> m_via4;
 	required_device<via6522_device> m_via5;
 	required_device<via6522_device> m_via6;
-	required_device<floppy_image_device> m_floppy0;
-	required_device<floppy_image_device> m_floppy1;
+	required_device<floppy_connector> m_floppy0;
+	required_device<floppy_connector> m_floppy1;
 	required_memory_region m_gcr_rom;
 
 	void update_stepper_motor(floppy_image_device *floppy, int stp, int old_st, int st);
-	void update_spindle_motor(floppy_image_device *floppy, emu_timer *t_tach, bool start, bool stop, bool sel, UINT8 &da);
-	void set_rdy0(int state);
-	void set_rdy1(int state);
+	void update_spindle_motor(floppy_image_device *floppy, emu_timer *t_tach, bool start, bool stop, bool sel, uint8_t &da);
+	void update_rpm(floppy_image_device *floppy, emu_timer *t_tach, bool sel, uint8_t &da);
+	void update_rdy();
 
-	int load0_cb(floppy_image_device *device);
+	image_init_result load0_cb(floppy_image_device *device);
 	void unload0_cb(floppy_image_device *device);
 
-	int load1_cb(floppy_image_device *device);
+	image_init_result load1_cb(floppy_image_device *device);
 	void unload1_cb(floppy_image_device *device);
 
-	UINT8 m_p2;
+	uint8_t m_p2;
 
 	/* floppy state */
-	UINT8 m_da;
-	UINT8 m_da0;
-	UINT8 m_da1;
+	uint8_t m_da;
+	uint8_t m_da0;
+	uint8_t m_da1;
 	int m_start0;
 	int m_stop0;
 	int m_start1;
@@ -190,8 +160,14 @@ private:
 	int m_tach1;
 	int m_rdy0;
 	int m_rdy1;
-	UINT8 m_l0ms;
-	UINT8 m_l1ms;
+	int m_scp_rdy0;
+	int m_scp_rdy1;
+	int m_via_rdy0;
+	int m_via_rdy1;
+	uint8_t m_scp_l0ms;
+	uint8_t m_scp_l1ms;
+	uint8_t m_via_l0ms;
+	uint8_t m_via_l1ms;
 	int m_st0;
 	int m_st1;
 	int m_stp0;
@@ -200,7 +176,7 @@ private:
 	int m_side;
 	int m_drw;
 	int m_erase;
-	UINT8 m_wd;
+	uint8_t m_wd;
 	int m_wrsync;
 
 	int m_via4_irq;
@@ -229,13 +205,41 @@ private:
 	void live_sync();
 	void live_abort();
 	void live_run(const attotime &limit = attotime::never);
+
+	DECLARE_FLOPPY_FORMATS( floppy_formats );
+
+	DECLARE_READ8_MEMBER( floppy_p1_r );
+	DECLARE_WRITE8_MEMBER( floppy_p1_w );
+	DECLARE_READ8_MEMBER( floppy_p2_r );
+	DECLARE_WRITE8_MEMBER( floppy_p2_w );
+	DECLARE_READ_LINE_MEMBER( tach0_r );
+	DECLARE_READ_LINE_MEMBER( tach1_r );
+	DECLARE_WRITE8_MEMBER( da_w );
+
+	DECLARE_READ8_MEMBER( via4_pa_r );
+	DECLARE_WRITE8_MEMBER( via4_pa_w );
+	DECLARE_READ8_MEMBER( via4_pb_r );
+	DECLARE_WRITE8_MEMBER( via4_pb_w );
+	DECLARE_WRITE_LINE_MEMBER( wrsync_w );
+	DECLARE_WRITE_LINE_MEMBER( via4_irq_w );
+
+	DECLARE_READ8_MEMBER( via5_pa_r );
+	DECLARE_WRITE8_MEMBER( via5_pb_w );
+	DECLARE_WRITE_LINE_MEMBER( via5_irq_w );
+
+	DECLARE_READ8_MEMBER( via6_pa_r );
+	DECLARE_READ8_MEMBER( via6_pb_r );
+	DECLARE_WRITE8_MEMBER( via6_pa_w );
+	DECLARE_WRITE8_MEMBER( via6_pb_w );
+	DECLARE_WRITE_LINE_MEMBER( drw_w );
+	DECLARE_WRITE_LINE_MEMBER( erase_w );
+	DECLARE_WRITE_LINE_MEMBER( via6_irq_w );
 };
 
 
 
 // device type definition
-extern const device_type VICTOR_9000_FDC;
+DECLARE_DEVICE_TYPE(VICTOR_9000_FDC, victor_9000_fdc_device)
 
 
-
-#endif
+#endif // MAME_MACHINE_VICTOR9K_FDC_H

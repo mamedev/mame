@@ -1,4 +1,4 @@
-// license:LGPL-2.1+
+// license:BSD-3-Clause
 // copyright-holders:Tomasz Slanina
 /*
 BMC Bowling (c) 1994.05 BMC, Ltd
@@ -107,8 +107,10 @@ Main board:
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "sound/okim6295.h"
-#include "sound/2413intf.h"
+#include "sound/ym2413.h"
 #include "video/ramdac.h"
+#include "screen.h"
+#include "speaker.h"
 
 #define NVRAM_HACK
 
@@ -125,9 +127,9 @@ public:
 		m_palette(*this, "palette") { }
 
 	required_device<cpu_device> m_maincpu;
-	optional_shared_ptr<UINT8> m_stats_ram;
-	required_shared_ptr<UINT16> m_vid1;
-	required_shared_ptr<UINT16> m_vid2;
+	optional_shared_ptr<uint8_t> m_stats_ram;
+	required_shared_ptr<uint16_t> m_vid1;
+	required_shared_ptr<uint16_t> m_vid2;
 	required_device<palette_device> m_palette;
 	int m_bmc_input;
 	DECLARE_READ16_MEMBER(bmc_random_read);
@@ -142,8 +144,8 @@ public:
 	DECLARE_DRIVER_INIT(bmcbowl);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_bmcbowl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void init_stats(const UINT8 *table, int table_len, int address);
+	uint32_t screen_update_bmcbowl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void init_stats(const uint8_t *table, int table_len, int address);
 };
 
 
@@ -153,7 +155,7 @@ void bmcbowl_state::video_start()
 {
 }
 
-UINT32 bmcbowl_state::screen_update_bmcbowl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t bmcbowl_state::screen_update_bmcbowl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 /*
       280x230,4 bitmap layers, 8bpp,
@@ -254,7 +256,7 @@ WRITE_LINE_MEMBER(bmcbowl_state::via_ca2_out)
 // 'working' NVRAM
 
 #ifdef NVRAM_HACK
-static const UINT8 bmc_nv1[]=
+static const uint8_t bmc_nv1[]=
 {
 	0x00,0x00,0x55,0x55,0x00,0x00,0x55,0x55,0x00,0x00,0x55,0x55,0x00,0x00,0x55,0x55,0x13,0x88,0x46,0xDD,0x0F,0xA0,
 	0x5A,0xF5,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0x00,0x00,0x00,0x6E,0x55,
@@ -275,20 +277,20 @@ static const UINT8 bmc_nv1[]=
 	0x00,0x00,0xDC,0x00,0xFF,0xFF,0xFF,0xFF
 };
 
-static const UINT8 bmc_nv2[]=
+static const uint8_t bmc_nv2[]=
 {
 	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,
 	0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0x00,0x03,0x00,0x09,0x00,0x00,0x2B,0xF1,
 	0xFE,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF
 };
 
-static const UINT8 bmc_nv3[]=
+static const uint8_t bmc_nv3[]=
 {
 	0xFA,0xFF,0x01,0x02,0x04,0x0A,0x1E,0xC8,0x02,0x01,0xFF,0xFF,0xFF,0xFF,0xFF
 };
 
 
-void bmcbowl_state::init_stats(const UINT8 *table, int table_len, int address)
+void bmcbowl_state::init_stats(const uint8_t *table, int table_len, int address)
 {
 	for (int i = 0; i < table_len; i++)
 		m_stats_ram[address+2*i]=table[i];
@@ -444,11 +446,11 @@ WRITE8_MEMBER(bmcbowl_state::input_mux_w)
 	m_bmc_input=data;
 }
 
-static ADDRESS_MAP_START( ramdac_map, AS_0, 8, bmcbowl_state )
+static ADDRESS_MAP_START( ramdac_map, 0, 8, bmcbowl_state )
 	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( bmcbowl, bmcbowl_state )
+static MACHINE_CONFIG_START( bmcbowl )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_21_4772MHz / 2 )
 	MCFG_CPU_PROGRAM_MAP(bmcbowl_mem)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", bmcbowl_state, irq2_line_hold)
@@ -478,7 +480,7 @@ static MACHINE_CONFIG_START( bmcbowl, bmcbowl_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 
-	MCFG_OKIM6295_ADD("oki", 1122000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", 1122000, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 
@@ -488,7 +490,7 @@ static MACHINE_CONFIG_START( bmcbowl, bmcbowl_state )
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(bmcbowl_state, via_a_out))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(bmcbowl_state, via_b_out))
 	MCFG_VIA6522_CA2_HANDLER(WRITELINE(bmcbowl_state, via_ca2_out))
-	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("maincpu", m68000_device, write_irq4))
+	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("maincpu", M68K_IRQ_4))
 MACHINE_CONFIG_END
 
 ROM_START( bmcbowl )

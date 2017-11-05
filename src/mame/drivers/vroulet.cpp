@@ -39,8 +39,10 @@ Tomasz Slanina 20050225
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
-#include "sound/ay8910.h"
 #include "machine/nvram.h"
+#include "sound/ay8910.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class vroulet_state : public driver_device
@@ -59,11 +61,11 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	required_shared_ptr<UINT8> m_generic_paletteram_8;
+	required_shared_ptr<uint8_t> m_generic_paletteram_8;
 
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_colorram;
-	required_shared_ptr<UINT8> m_ball;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_colorram;
+	required_shared_ptr<uint8_t> m_ball;
 
 	tilemap_t *m_bg_tilemap;
 
@@ -78,7 +80,7 @@ public:
 
 	virtual void video_start() override;
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -128,11 +130,14 @@ TILE_GET_INFO_MEMBER(vroulet_state::get_bg_tile_info)
 
 void vroulet_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(vroulet_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,
-		8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(
+			*m_gfxdecode,
+			tilemap_get_info_delegate(FUNC(vroulet_state::get_bg_tile_info),this),
+			TILEMAP_SCAN_ROWS,
+			8, 8, 32, 32);
 }
 
-UINT32 vroulet_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t vroulet_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	m_gfxdecode->gfx(0)->transpen(bitmap,cliprect, 0x320, 1, 0, 0,
@@ -167,7 +172,7 @@ static INPUT_PORTS_START( vroulet )
 	PORT_START("IN0")
 	PORT_SERVICE( 0x01, IP_ACTIVE_LOW )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_TILT )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_F1) PORT_NAME("Memory Reset")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_NAME("Reset Machine")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -266,7 +271,7 @@ WRITE8_MEMBER(vroulet_state::ppi8255_c_w){}
 
 /* Machine Driver */
 
-static MACHINE_CONFIG_START( vroulet, vroulet_state )
+static MACHINE_CONFIG_START( vroulet )
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)   //???
 	MCFG_CPU_PROGRAM_MAP(vroulet_map)
@@ -321,4 +326,4 @@ ROM_END
 
 /* Game Driver */
 
-GAME( 1989, vroulet, 0, vroulet, vroulet, driver_device, 0, ROT90, "World Game", "Vegas Roulette", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, vroulet, 0, vroulet, vroulet, vroulet_state, 0, ROT90, "World Game", "Vegas Roulette", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )

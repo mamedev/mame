@@ -40,14 +40,14 @@ VIDEO_START_MEMBER(vsnes_state,vsdual )
 
 ***************************************************************************/
 
-UINT32 vsnes_state::screen_update_vsnes(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t vsnes_state::screen_update_vsnes(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* render the ppu */
 	m_ppu1->render(bitmap, 0, 0, 0, 0);
 	return 0;
 }
 
-UINT32 vsnes_state::screen_update_vsnes_bottom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t vsnes_state::screen_update_vsnes_bottom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_ppu2->render(bitmap, 0, 0, 0, 0);
 	return 0;

@@ -127,13 +127,15 @@ better notes (complete chip lists) for each board still needed
 */
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
 #include "includes/namcos2.h"
+#include "machine/namcoic.h"
+
+#include "cpu/m68000/m68000.h"
 #include "cpu/tms32025/tms32025.h"
-#include "includes/namcoic.h"
 #include "machine/nvram.h"
 #include "sound/c140.h"
 #include "rendlay.h"
+#include "speaker.h"
 
 
 class gal3_state : public namcos2_shared_state
@@ -144,13 +146,13 @@ public:
 		m_rso_shared_ram(*this, "rso_shared_ram"),
 		m_generic_paletteram_16(*this, "paletteram") { }
 
-	UINT32 *m_mpSharedRAM0;
-	//UINT32 *m_mpSharedRAM1;
-	UINT16 m_namcos21_video_enable;
-	required_shared_ptr<UINT16> m_rso_shared_ram;
-	optional_shared_ptr<UINT16> m_generic_paletteram_16;
-	UINT32 m_led_mst;
-	UINT32 m_led_slv;
+	uint32_t *m_mpSharedRAM0;
+	//uint32_t *m_mpSharedRAM1;
+	uint16_t m_namcos21_video_enable;
+	required_shared_ptr<uint16_t> m_rso_shared_ram;
+	optional_shared_ptr<uint16_t> m_generic_paletteram_16;
+	uint32_t m_led_mst;
+	uint32_t m_led_slv;
 	DECLARE_READ32_MEMBER(led_mst_r);
 	DECLARE_WRITE32_MEMBER(led_mst_w);
 	DECLARE_READ32_MEMBER(led_slv_r);
@@ -162,7 +164,7 @@ public:
 	DECLARE_READ32_MEMBER(rso_r);
 	DECLARE_WRITE32_MEMBER(rso_w);
 	DECLARE_VIDEO_START(gal3);
-	UINT32 screen_update_gal3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_gal3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void update_palette(  );
 };
 
@@ -186,7 +188,7 @@ VIDEO_START_MEMBER(gal3_state,gal3)
 void gal3_state::update_palette(  )
 {
 	int i;
-	INT16 data1,data2;
+	int16_t data1,data2;
 	int r,g,b;
 
 	for( i=0; i<NAMCOS21_NUM_COLORS; i++ )
@@ -202,7 +204,7 @@ void gal3_state::update_palette(  )
 	}
 } /* update_palette */
 
-UINT32 gal3_state::screen_update_gal3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t gal3_state::screen_update_gal3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int i;
 	char mst[18], slv[18];
@@ -287,7 +289,7 @@ READ32_MEMBER(gal3_state::paletteram32_r)
 
 WRITE32_MEMBER(gal3_state::paletteram32_w)
 {
-	UINT32 v;
+	uint32_t v;
 	offset *= 2;
 	v = (m_generic_paletteram_16[offset]<<16)|m_generic_paletteram_16[offset+1];
 	COMBINE_DATA( &v );
@@ -302,7 +304,7 @@ READ32_MEMBER(gal3_state::namcos21_video_enable_r)
 
 WRITE32_MEMBER(gal3_state::namcos21_video_enable_w)
 {
-	UINT32 v;
+	uint32_t v;
 	v = m_namcos21_video_enable<<16;
 	COMBINE_DATA( &v ); // 0xff53, instead of 0x40 in namcos21
 	m_namcos21_video_enable = v>>16;
@@ -320,7 +322,7 @@ READ32_MEMBER(gal3_state::rso_r)
 
 WRITE32_MEMBER(gal3_state::rso_w)
 {
-	UINT32 v;
+	uint32_t v;
 	offset *= 2;
 	v = (m_rso_shared_ram[offset]<<16)|m_rso_shared_ram[offset+1];
 	COMBINE_DATA( &v );
@@ -591,7 +593,7 @@ static GFXDECODE_START( namcos21 )
 	GFXDECODE_ENTRY( "obj_board1", 0x000000, tile_layout,  0x000, 0x20 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( gal3, gal3_state )
+static MACHINE_CONFIG_START( gal3 )
 	MCFG_CPU_ADD("maincpu", M68020, 49152000/2)
 	MCFG_CPU_PROGRAM_MAP(cpu_mst_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", gal3_state,  irq1_line_hold)
@@ -642,12 +644,12 @@ static MACHINE_CONFIG_START( gal3, gal3_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_C140_ADD("c140_16g", 8000000/374)
-	MCFG_C140_BANK_TYPE(C140_TYPE_SYSTEM21)    //to be verified
+	MCFG_C140_BANK_TYPE(SYSTEM21)    //to be verified
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
 	MCFG_C140_ADD("c140_16a", 8000000/374)
-	MCFG_C140_BANK_TYPE(C140_TYPE_SYSTEM21)
+	MCFG_C140_BANK_TYPE(SYSTEM21)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 MACHINE_CONFIG_END
@@ -864,6 +866,6 @@ ROM_START( gal3 )
 	DISK_IMAGE_READONLY( "gal3_ld2", 0, NO_DUMP )
 ROM_END
 
-/*    YEAR, NAME,     PARENT, MACHINE,  INPUT,  INIT, MONITOR,  COMPANY,   FULLNAME,                       FLAGS */
-GAMEL( 199?, gal3,    0,     gal3,    gal3, driver_device,    0,    ROT0,  "Namco", "Galaxian 3 - Theater 6 : Project Dragoon", MACHINE_NOT_WORKING | MACHINE_NO_SOUND, layout_dualhsxs )
+/*    YEAR,  NAME     PARENT, MACHINE, INPUT, STATE,      INIT, MONITOR, COMPANY, FULLNAME,                                   FLAGS */
+GAMEL( 199?, gal3,    0,      gal3,    gal3,  gal3_state, 0,    ROT0,    "Namco", "Galaxian 3 - Theater 6 : Project Dragoon", MACHINE_NOT_WORKING | MACHINE_NO_SOUND, layout_dualhsxs )
 //GAMEL( 199?, gal3zlgr,    0,        gal3,    gal3, driver_device,    0, ROT0,  "Namco", "Galaxian 3 - Theater 6 J2 : Attack of The Zolgear", MACHINE_NOT_WORKING | MACHINE_NO_SOUND, layout_dualhsxs )

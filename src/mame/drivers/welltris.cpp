@@ -4,11 +4,11 @@
  Welltris (c)1991 Video System
 
 ********************************************************************************
- hardware is similar to aerofgt.c but with slightly different sprites, sound,
+ hardware is similar to aerofgt.cpp but with slightly different sprites, sound,
  and an additional 'pixel' layer used for the backdrops
 
  Driver by David Haywood, with help from Steph from The Ultimate Patchers
- Thanks to the authors of aerofgt.c and fromance.c on which most of this is
+ Thanks to the authors of aerofgt.cpp and fromance.cpp on which most of this is
  based
 ********************************************************************************
 OW-13 CPU
@@ -51,7 +51,7 @@ V-SYSTEM VS8803 6082 9040 EBBB
 ********************************************************************************
 
  its impossible to know what some of the video registers do due to lack of
- evidence (bg palette has a selector, but i'm not sure which ... test mode
+ evidence (bg palette has a selector, but I'm not sure which ... test mode
  colours use different palette on rgb test
 
 ********************************************************************************
@@ -167,8 +167,8 @@ To select a player, press one of his 2 buttons ...
 
   - When it's OFF, only player 1 can play, the number of credits is decremented when
     you press the player buttons ... If you wait until timer reaches 0 without selecting
-    a player, 1 credit will be substracted, and you'll start a game with player 1 ...
-  - When it's ON, 1 credit will be automatically substracted, then the 4 players can
+    a player, 1 credit will be subtracted, and you'll start a game with player 1 ...
+  - When it's ON, 1 credit will be automatically subtracted, then the 4 players can
     play by pressing one of their buttons ... If you wait until timer reaches 0 without
     selecting a player, you'll start a game with player 1 ...
 
@@ -312,40 +312,23 @@ TODO:
 
 *******************************************************************************/
 
-#define WELLTRIS_4P_HACK 0
-
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "cpu/m68000/m68000.h"
-#include "sound/2610intf.h"
 #include "includes/welltris.h"
 
+#include "cpu/m68000/m68000.h"
+#include "cpu/z80/z80.h"
+#include "sound/2610intf.h"
+#include "video/vsystem_gga.h"
+#include "screen.h"
+#include "speaker.h"
+
+
+#define WELLTRIS_4P_HACK 0
 
 
 WRITE8_MEMBER(welltris_state::sound_bankswitch_w)
 {
 	membank("soundbank")->set_entry(data & 0x03);
-}
-
-
-WRITE16_MEMBER(welltris_state::sound_command_w)
-{
-	if (ACCESSING_BITS_0_7)
-	{
-		m_pending_command = 1;
-		soundlatch_byte_w(space, 0, data & 0xff);
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-	}
-}
-
-CUSTOM_INPUT_MEMBER(welltris_state::pending_sound_r)
-{
-	return m_pending_command ? 1 : 0;
-}
-
-WRITE8_MEMBER(welltris_state::pending_command_clear_w)
-{
-	m_pending_command = 0;
 }
 
 
@@ -365,12 +348,11 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, welltris_state )
 	AM_RANGE(0xfff004, 0xfff007) AM_WRITE(scrollreg_w)
 	AM_RANGE(0xfff006, 0xfff007) AM_READ_PORT("P4")                 /* Right Side Ctrls */
 	AM_RANGE(0xfff008, 0xfff009) AM_READ_PORT("SYSTEM")             /* Bit 5 Tested at start of irq 1 */
-	AM_RANGE(0xfff008, 0xfff009) AM_WRITE(sound_command_w)
+	AM_RANGE(0xfff008, 0xfff009) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0xfff00a, 0xfff00b) AM_READ_PORT("EXTRA")              /* P3+P4 Coin + Start Buttons */
 	AM_RANGE(0xfff00c, 0xfff00d) AM_READ_PORT("DSW1")
-	AM_RANGE(0xfff00c, 0xfff00d) AM_WRITENOP                    /* ?? */
 	AM_RANGE(0xfff00e, 0xfff00f) AM_READ_PORT("DSW2")
-	AM_RANGE(0xfff00e, 0xfff00f) AM_WRITENOP                    /* ?? */
+	AM_RANGE(0xfff00c, 0xfff00f) AM_DEVWRITE8("gga", vsystem_gga_device, write, 0x00ff)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, welltris_state )
@@ -383,8 +365,8 @@ static ADDRESS_MAP_START( sound_port_map, AS_IO, 8, welltris_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(sound_bankswitch_w)
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
-	AM_RANGE(0x10, 0x10) AM_READ(soundlatch_byte_r)
-	AM_RANGE(0x18, 0x18) AM_WRITE(pending_command_clear_w)
+	AM_RANGE(0x10, 0x10) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
+	AM_RANGE(0x18, 0x18) AM_DEVWRITE("soundlatch", generic_latch_8_device, acknowledge_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( welltris )
@@ -396,7 +378,7 @@ static INPUT_PORTS_START( welltris )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE2 )   /* Test (used to go through tests in service mode) */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_TILT )       /* Tested at start of irq 1 */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )   /* Service (adds a coin) */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, welltris_state,pending_sound_r, nullptr) /* pending sound command */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("soundlatch", generic_latch_8_device, pending_r) /* pending sound command */
 
 	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
@@ -670,19 +652,11 @@ static GFXDECODE_START( welltris )
 GFXDECODE_END
 
 
-
-WRITE_LINE_MEMBER(welltris_state::irqhandler)
-{
-	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
-
-
 DRIVER_INIT_MEMBER(welltris_state,welltris)
 {
 #if WELLTRIS_4P_HACK
 	/* A Hack which shows 4 player mode in code which is disabled */
-	UINT16 *RAM = (UINT16 *)memregion("maincpu")->base();
+	uint16_t *RAM = (uint16_t *)memregion("maincpu")->base();
 	RAM[0xB91C/2] = 0x4e71;
 	RAM[0xB91E/2] = 0x4e71;
 #endif
@@ -691,11 +665,9 @@ DRIVER_INIT_MEMBER(welltris_state,welltris)
 void welltris_state::machine_start()
 {
 	membank("soundbank")->configure_entries(0, 4, memregion("audiocpu")->base(), 0x8000);
-
-	save_item(NAME(m_pending_command));
 }
 
-static MACHINE_CONFIG_START( welltris, welltris_state )
+static MACHINE_CONFIG_START( welltris )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,20000000/2)  /* 10 MHz */
@@ -719,6 +691,8 @@ static MACHINE_CONFIG_START( welltris, welltris_state )
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
+	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, XTAL_14_31818MHz / 2) // divider not verified
+
 	MCFG_DEVICE_ADD("vsystem_spr_old", VSYSTEM_SPR2, 0)
 	MCFG_VSYSTEM_SPR2_SET_GFXREGION(1)
 	MCFG_VSYSTEM_SPR2_SET_PRITYPE(-1)
@@ -727,8 +701,12 @@ static MACHINE_CONFIG_START( welltris, welltris_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+
 	MCFG_SOUND_ADD("ymsnd", YM2610, 8000000)
-	MCFG_YM2610_IRQ_HANDLER(WRITELINE(welltris_state, irqhandler))
+	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 	MCFG_SOUND_ROUTE(1, "mono", 0.75)
 	MCFG_SOUND_ROUTE(2, "mono", 0.75)
@@ -829,6 +807,6 @@ ROM_END
 
 
 
-GAME( 1991, welltris, 0,        welltris, welltris, welltris_state, welltris, ROT0,   "Video System Co.", "Welltris (World?, 2 players)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, welltrisj,welltris, welltris, welltris, welltris_state, welltris, ROT0,   "Video System Co.", "Welltris (Japan, 2 players)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1992, quiz18k,  0,        quiz18k,  quiz18k,  driver_device,  0,        ROT0,   "EIM", "Miyasu Nonki no Quiz 18-Kin", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, welltris,  0,        welltris, welltris, welltris_state, welltris, ROT0,   "Video System Co.", "Welltris (World?, 2 players)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, welltrisj, welltris, welltris, welltris, welltris_state, welltris, ROT0,   "Video System Co.", "Welltris (Japan, 2 players)",  MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, quiz18k,   0,        quiz18k,  quiz18k,  welltris_state, 0,        ROT0,   "EIM",              "Miyasu Nonki no Quiz 18-Kin",  MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

@@ -2,6 +2,7 @@
 // copyright-holders:Nicola Salmoria
 #include "emu.h"
 #include "includes/m72.h"
+#include "cpu/nec/v25.h"
 
 /***************************************************************************
 
@@ -9,7 +10,7 @@
 
 ***************************************************************************/
 
-inline void m72_state::m72_m81_get_tile_info(tile_data &tileinfo,int tile_index,const UINT16 *vram,int gfxnum)
+inline void m72_state::m72_m81_get_tile_info(tile_data &tileinfo,int tile_index,const uint16_t *vram,int gfxnum)
 {
 	int code,attr,color,pri;
 
@@ -37,7 +38,7 @@ inline void m72_state::m72_m81_get_tile_info(tile_data &tileinfo,int tile_index,
 	tileinfo.group = pri;
 }
 
-inline void m72_state::m82_m84_get_tile_info(tile_data &tileinfo,int tile_index,const UINT16 *vram,int gfxnum)
+inline void m72_state::m82_m84_get_tile_info(tile_data &tileinfo,int tile_index,const uint16_t *vram,int gfxnum)
 {
 	int code,attr,color,pri;
 
@@ -111,10 +112,10 @@ void m72_state::register_savestate()
 
 VIDEO_START_MEMBER(m72_state,m72)
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(m72_state::get_bg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,64);
-	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(m72_state::get_fg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,64);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(m72_state::get_bg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,64);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(m72_state::get_fg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,64);
 
-	m_buffered_spriteram = std::make_unique<UINT16[]>(m_spriteram.bytes()/2);
+	m_buffered_spriteram = std::make_unique<uint16_t[]>(m_spriteram.bytes()/2);
 
 	m_fg_tilemap->set_transmask(0,0xffff,0x0001);
 	m_fg_tilemap->set_transmask(1,0x00ff,0xff01);
@@ -182,11 +183,11 @@ TILEMAP_MAPPER_MEMBER(m72_state::m82_scan_rows)
 
 VIDEO_START_MEMBER(m72_state,m82)
 {
-	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(m72_state::rtype2_get_fg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,64);
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(m72_state::rtype2_get_bg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,64);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(m72_state::rtype2_get_fg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,64);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(m72_state::rtype2_get_bg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,64);
 // The tilemap can be 256x64, but seems to be used at 128x64 (scroll wraparound).
 // The layout ramains 256x64, the right half is just not displayed.
-	m_bg_tilemap_large = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(m72_state::rtype2_get_bg_tile_info),this),tilemap_mapper_delegate(FUNC(m72_state::m82_scan_rows),this),8,8,128,64);
+	m_bg_tilemap_large = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(m72_state::rtype2_get_bg_tile_info),this),tilemap_mapper_delegate(FUNC(m72_state::m82_scan_rows),this),8,8,128,64);
 
 	m_fg_tilemap->set_transmask(0,0xffff,0x0001);
 	m_fg_tilemap->set_transmask(1,0x00ff,0xff01);
@@ -209,7 +210,7 @@ VIDEO_START_MEMBER(m72_state,m82)
 	m_bg_tilemap_large->set_scrolldx(4,0);
 	m_bg_tilemap_large->set_scrolldy(-128,-128);
 
-	m_buffered_spriteram = std::make_unique<UINT16[]>(m_spriteram.bytes()/2);
+	m_buffered_spriteram = std::make_unique<uint16_t[]>(m_spriteram.bytes()/2);
 	memset(m_buffered_spriteram.get(),0,m_spriteram.bytes());
 
 	register_savestate();
@@ -221,10 +222,10 @@ VIDEO_START_MEMBER(m72_state,m82)
 // M84
 VIDEO_START_MEMBER(m72_state,rtype2)
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(m72_state::rtype2_get_bg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,64);
-	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(m72_state::rtype2_get_fg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,64);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(m72_state::rtype2_get_bg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,64);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(m72_state::rtype2_get_fg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,64);
 
-	m_buffered_spriteram = std::make_unique<UINT16[]>(m_spriteram.bytes()/2);
+	m_buffered_spriteram = std::make_unique<uint16_t[]>(m_spriteram.bytes()/2);
 
 	m_fg_tilemap->set_transmask(0,0xffff,0x0001);
 	m_fg_tilemap->set_transmask(1,0x00ff,0xff01);
@@ -265,9 +266,6 @@ VIDEO_START_MEMBER(m72_state,poundfor)
 	m_bg_tilemap->set_scrolldx(6,0);
 	m_fg_tilemap->set_scrolldy(-128,-128);
 	m_bg_tilemap->set_scrolldy(-128,-128);
-
-	save_item(NAME(m_prev));
-	save_item(NAME(m_diff));
 }
 
 
@@ -344,8 +342,15 @@ WRITE16_MEMBER(m72_state::videoram2_w)
 
 WRITE16_MEMBER(m72_state::irq_line_w)
 {
-	COMBINE_DATA(&m_raster_irq_position);
+	// KNA70H015(11): ISET
+	m_raster_irq_position = data & 0x1ff;
 //  printf("m_raster_irq_position %04x\n", m_raster_irq_position);
+
+	// bchopper title screen jumps around, as does ingame at times, if this isn't done here
+	if (m_upd71059c.found())
+		m_upd71059c->ir2_w(0);
+	else
+		m_maincpu->set_input_line(NEC_INPUT_LINE_INTP2, CLEAR_LINE);
 }
 
 WRITE16_MEMBER(m72_state::scrollx1_w)
@@ -379,50 +384,55 @@ WRITE16_MEMBER(m72_state::dmaon_w)
 }
 
 
-WRITE16_MEMBER(m72_state::port02_w)
+WRITE8_MEMBER(m72_state::port02_w)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		if (data & 0xe0) logerror("write %02x to port 02\n",data);
+	if (data & 0xe0) logerror("write %02x to port 02\n",data);
 
-		/* bits 0/1 are coin counters */
-		machine().bookkeeping().coin_counter_w(0,data & 0x01);
-		machine().bookkeeping().coin_counter_w(1,data & 0x02);
+	/* bits 0/1 are coin counters */
+	machine().bookkeeping().coin_counter_w(0,data & 0x01);
+	machine().bookkeeping().coin_counter_w(1,data & 0x02);
 
-		/* bit 2 is flip screen (handled both by software and hardware) */
-		flip_screen_set(((data & 0x04) >> 2) ^ ((~ioport("DSW")->read() >> 8) & 1));
+	/* bit 2 is flip screen (handled both by software and hardware) */
+	flip_screen_set(((data & 0x04) >> 2) ^ ((~ioport("DSW")->read() >> 8) & 1));
 
-		/* bit 3 is display disable */
-		m_video_off = data & 0x08;
+	/* bit 3 is display disable */
+	m_video_off = data & 0x08;
 
-		/* bit 4 resets sound CPU (active low) */
-		if (data & 0x10)
-			m_soundcpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
-		else
-			m_soundcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	/* bit 4 resets sound CPU (active low) */
+	if (data & 0x10)
+		m_soundcpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+	else
+		m_soundcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
-		/* bit 5 = "bank"? */
-	}
+	/* bit 5 = "bank"? */
 }
 
-WRITE16_MEMBER(m72_state::rtype2_port02_w)
+WRITE8_MEMBER(m72_state::rtype2_port02_w)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		if (data & 0xe0) logerror("write %02x to port 02\n",data);
+	if (data & 0xe0) logerror("write %02x to port 02\n",data);
 
-		/* bits 0/1 are coin counters */
-		machine().bookkeeping().coin_counter_w(0,data & 0x01);
-		machine().bookkeeping().coin_counter_w(1,data & 0x02);
+	/* bits 0/1 are coin counters */
+	machine().bookkeeping().coin_counter_w(0,data & 0x01);
+	machine().bookkeeping().coin_counter_w(1,data & 0x02);
 
-		/* bit 2 is flip screen (handled both by software and hardware) */
-		flip_screen_set(((data & 0x04) >> 2) ^ ((~ioport("DSW")->read() >> 8) & 1));
+	/* bit 2 is flip screen (handled both by software and hardware) */
+	flip_screen_set(((data & 0x04) >> 2) ^ ((~ioport("DSW")->read() >> 8) & 1));
 
-		/* bit 3 is display disable */
-		m_video_off = data & 0x08;
+	/* bit 3 is display disable */
+	m_video_off = data & 0x08;
 
-		/* other bits unknown */
-	}
+	/* other bits unknown */
+}
+
+WRITE8_MEMBER(m72_state::poundfor_port02_w)
+{
+	// bit 5 resets both uPD4701A?
+	m_upd4701[0]->resetx_w(BIT(data, 5));
+	m_upd4701[0]->resety_w(BIT(data, 5));
+	m_upd4701[1]->resetx_w(BIT(data, 5));
+	m_upd4701[1]->resety_w(BIT(data, 5));
+
+	rtype2_port02_w(space, 0, data & 0xbf);
 }
 
 
@@ -454,7 +464,7 @@ WRITE16_MEMBER(m72_state::m82_tm_ctrl_w)
 
 void m72_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
-	UINT16 *spriteram = m_buffered_spriteram.get();
+	uint16_t *spriteram = m_buffered_spriteram.get();
 	int offs;
 
 	offs = 0;
@@ -507,7 +517,7 @@ void m72_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 
 void m72_state::majtitle_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
-	UINT16 *spriteram16_2 = m_spriteram2;
+	uint16_t *spriteram16_2 = m_spriteram2;
 	int offs;
 
 	for (offs = 0;offs < m_spriteram.bytes();offs += 4)
@@ -555,7 +565,7 @@ void m72_state::majtitle_draw_sprites(bitmap_ind16 &bitmap,const rectangle &clip
 	}
 }
 
-UINT32 m72_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t m72_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if (m_video_off)
 	{
@@ -577,7 +587,7 @@ UINT32 m72_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 	return 0;
 }
 
-UINT32 m72_state::screen_update_m81(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t m72_state::screen_update_m81(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// on M81 the FG data always comes from the Ax roms
 	// the source of the BG data however depends on Jumper J3
@@ -589,7 +599,7 @@ UINT32 m72_state::screen_update_m81(screen_device &screen, bitmap_ind16 &bitmap,
 }
 
 
-UINT32 m72_state::screen_update_m82(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t m72_state::screen_update_m82(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int i;
 

@@ -9,20 +9,25 @@
 ***************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/i86/i186.h"
-#include "machine/ram.h"
-#include "machine/nvram.h"
-#include "machine/mm58167.h"
-#include "machine/pic8259.h"
-#include "machine/i8255.h"
-#include "video/i82730.h"
-#include "sound/speaker.h"
-#include "sound/sn76496.h"
-#include "machine/keyboard.h"
-#include "bus/centronics/ctronics.h"
-#include "machine/wd_fdc.h"
 #include "imagedev/cassette.h"
+#include "machine/i8255.h"
+#include "machine/keyboard.h"
+#include "machine/mm58167.h"
+#include "machine/nvram.h"
+#include "machine/pic8259.h"
+#include "machine/ram.h"
+#include "machine/wd_fdc.h"
+#include "sound/sn76496.h"
+#include "sound/spkrdev.h"
+#include "video/i82730.h"
+
+#include "bus/centronics/ctronics.h"
 #include "bus/isbx/isbx.h"
+
+#include "screen.h"
+#include "speaker.h"
 
 
 //**************************************************************************
@@ -33,34 +38,34 @@ class rc759_state : public driver_device
 {
 public:
 	rc759_state(const machine_config &mconfig, device_type type, const char *tag) :
-	driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_pic(*this, "pic"),
-	m_nvram(*this, "nvram"),
-	m_ppi(*this, "ppi"),
-	m_txt(*this, "txt"),
-	m_cas(*this, "cas"),
-	m_isbx(*this, "isbx"),
-	m_speaker(*this, "speaker"),
-	m_snd(*this, "snd"),
-	m_rtc(*this, "rtc"),
-	m_centronics(*this, "centronics"),
-	m_fdc(*this, "fdc"),
-	m_floppy0(*this, "fdc:0"),
-	m_floppy1(*this, "fdc:1"),
-	m_vram(*this, "vram"),
-	m_config(*this, "config"),
-	m_cas_enabled(0), m_cas_data(0),
-	m_drq_source(0),
-	m_nvram_bank(0),
-	m_gfx_mode(0),
-	m_keyboard_enable(0), m_keyboard_key(0x00),
-	m_centronics_strobe(0), m_centronics_init(0), m_centronics_select_in(0), m_centronics_busy(0),
-	m_centronics_ack(0), m_centronics_fault(0), m_centronics_perror(0), m_centronics_select(0),
-	m_centronics_data(0xff)
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_pic(*this, "pic"),
+		m_nvram(*this, "nvram"),
+		m_ppi(*this, "ppi"),
+		m_txt(*this, "txt"),
+		m_cas(*this, "cas"),
+		m_isbx(*this, "isbx"),
+		m_speaker(*this, "speaker"),
+		m_snd(*this, "snd"),
+		m_rtc(*this, "rtc"),
+		m_centronics(*this, "centronics"),
+		m_fdc(*this, "fdc"),
+		m_floppy0(*this, "fdc:0"),
+		m_floppy1(*this, "fdc:1"),
+		m_vram(*this, "vram"),
+		m_config(*this, "config"),
+		m_cas_enabled(0), m_cas_data(0),
+		m_drq_source(0),
+		m_nvram_bank(0),
+		m_gfx_mode(0),
+		m_keyboard_enable(0), m_keyboard_key(0x00),
+		m_centronics_strobe(0), m_centronics_init(0), m_centronics_select_in(0), m_centronics_busy(0),
+		m_centronics_ack(0), m_centronics_fault(0), m_centronics_perror(0), m_centronics_select(0),
+		m_centronics_data(0xff)
 	{ }
 
-	DECLARE_WRITE8_MEMBER(keyb_put);
+	void keyb_put(u8 data);
 	DECLARE_READ8_MEMBER(keyboard_r);
 
 	DECLARE_WRITE8_MEMBER(floppy_control_w);
@@ -116,13 +121,13 @@ private:
 	required_device<sn76489a_device> m_snd;
 	required_device<mm58167_device> m_rtc;
 	required_device<centronics_device> m_centronics;
-	required_device<wd2797_t> m_fdc;
+	required_device<wd2797_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
-	required_shared_ptr<UINT16> m_vram;
+	required_shared_ptr<uint16_t> m_vram;
 	required_ioport m_config;
 
-	std::vector<UINT8> m_nvram_mem;
+	std::vector<uint8_t> m_nvram_mem;
 
 	int m_cas_enabled;
 	int m_cas_data;
@@ -130,7 +135,7 @@ private:
 	int m_nvram_bank;
 	int m_gfx_mode;
 	int m_keyboard_enable;
-	UINT8 m_keyboard_key;
+	uint8_t m_keyboard_key;
 
 	int m_centronics_strobe;
 	int m_centronics_init;
@@ -140,7 +145,7 @@ private:
 	int m_centronics_fault;
 	int m_centronics_perror;
 	int m_centronics_select;
-	UINT8 m_centronics_data;
+	uint8_t m_centronics_data;
 };
 
 
@@ -148,7 +153,7 @@ private:
 //  I/O
 //**************************************************************************
 
-WRITE8_MEMBER( rc759_state::keyb_put )
+void rc759_state::keyb_put(u8 data)
 {
 	m_keyboard_key = data;
 	m_pic->ir1_w(1);
@@ -168,7 +173,7 @@ READ8_MEMBER( rc759_state::keyboard_r )
 
 READ8_MEMBER( rc759_state::ppi_porta_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	data |= m_cas_enabled ? m_cas_data : (m_cas->input() > 0 ? 1 : 0);
 	data |= m_isbx->mpst_r() << 1;
@@ -184,7 +189,7 @@ READ8_MEMBER( rc759_state::ppi_porta_r )
 
 READ8_MEMBER( rc759_state::ppi_portb_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	data |= 1 << 0; // 0 = micronet controller installed
 	data |= 1 << 1; // rtc type, mm58167/cdp1879
@@ -257,7 +262,7 @@ WRITE8_MEMBER( rc759_state::centronics_data_w )
 
 READ8_MEMBER( rc759_state::centronics_control_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	data |= m_centronics_busy << 0;
 	data |= m_centronics_ack << 1;
@@ -331,7 +336,7 @@ I82730_UPDATE_ROW( rc759_state::txt_update_row )
 {
 	for (int i = 0; i < x_count; i++)
 	{
-		UINT16 gfx = m_vram[(data[i] & 0x3ff) << 4 | lc];
+		uint16_t gfx = m_vram[(data[i] & 0x3ff) << 4 | lc];
 
 		// pretty crude detection if char sizes have been initialized, need something better
 		if ((gfx & 0xff) == 0)
@@ -346,7 +351,7 @@ I82730_UPDATE_ROW( rc759_state::txt_update_row )
 		width = 15 - width;
 
 		for (int p = 0; p < width; p++)
-			bitmap.pix32(y, i * width + p) = BIT(gfx, 15 - p) ? rgb_t::white : rgb_t::black;
+			bitmap.pix32(y, i * width + p) = BIT(gfx, 15 - p) ? rgb_t::white() : rgb_t::black();
 	}
 }
 
@@ -461,8 +466,8 @@ void rc759_state::machine_reset()
 
 static ADDRESS_MAP_START( rc759_map, AS_PROGRAM, 16, rc759_state )
 	AM_RANGE(0x00000, 0x3ffff) AM_RAM
-	AM_RANGE(0xd8000, 0xdffff) AM_MIRROR(0x08000) AM_RAM AM_SHARE("vram")
-	AM_RANGE(0xf8000, 0xfffff) AM_MIRROR(0x10000) AM_ROM AM_REGION("bios", 0)
+	AM_RANGE(0xd0000, 0xd7fff) AM_MIRROR(0x08000) AM_RAM AM_SHARE("vram")
+	AM_RANGE(0xe8000, 0xeffff) AM_MIRROR(0x10000) AM_ROM AM_REGION("bios", 0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( rc759_io, AS_IO, 16, rc759_state )
@@ -481,7 +486,7 @@ static ADDRESS_MAP_START( rc759_io, AS_IO, 16, rc759_state )
 	AM_RANGE(0x240, 0x241) AM_WRITE(txt_ca_w)
 	AM_RANGE(0x250, 0x251) AM_READWRITE8(centronics_data_r, centronics_data_w, 0x00ff)
 	AM_RANGE(0x260, 0x261) AM_READWRITE8(centronics_control_r, centronics_control_w, 0x00ff)
-	AM_RANGE(0x280, 0x287) AM_DEVREADWRITE8("fdc", wd2797_t, read, write, 0x00ff)
+	AM_RANGE(0x280, 0x287) AM_DEVREADWRITE8("fdc", wd2797_device, read, write, 0x00ff)
 	AM_RANGE(0x288, 0x289) AM_WRITE8(floppy_control_w, 0x00ff)
 //  AM_RANGE(0x28a, 0x28b) external printer data
 //  AM_RANGE(0x28d, 0x28d) external printer control
@@ -519,7 +524,7 @@ static SLOT_INTERFACE_START( rc759_floppies )
 	SLOT_INTERFACE("hd", FLOPPY_525_HD)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( rc759, rc759_state )
+static MACHINE_CONFIG_START( rc759 )
 	MCFG_CPU_ADD("maincpu", I80186, 6000000)
 	MCFG_CPU_PROGRAM_MAP(rc759_map)
 	MCFG_CPU_IO_MAP(rc759_io)
@@ -528,7 +533,8 @@ static MACHINE_CONFIG_START( rc759, rc759_state )
 	MCFG_80186_TMROUT1_HANDLER(WRITELINE(rc759_state, i186_timer1_w))
 
 	// interrupt controller
-	MCFG_PIC8259_ADD("pic", DEVWRITELINE("maincpu", i80186_cpu_device, int0_w), VCC, NOOP)
+	MCFG_DEVICE_ADD("pic", PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(DEVWRITELINE("maincpu", i80186_cpu_device, int0_w))
 
 	// nvram
 	MCFG_NVRAM_ADD_CUSTOM_DRIVER("nvram", rc759_state, nvram_init)
@@ -555,7 +561,7 @@ static MACHINE_CONFIG_START( rc759, rc759_state )
 
 	// keyboard
 	MCFG_DEVICE_ADD("keyb", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(WRITE8(rc759_state, keyb_put))
+	MCFG_GENERIC_KEYBOARD_CB(PUT(rc759_state, keyb_put))
 
 	// cassette
 	MCFG_CASSETTE_ADD("cas")
@@ -614,4 +620,4 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-COMP( 1984, rc759, 0, 0, rc759, rc759, driver_device, 0, "Regnecentralen", "RC759 Piccoline", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1984, rc759, 0, 0, rc759, rc759, rc759_state, 0, "Regnecentralen", "RC759 Piccoline", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

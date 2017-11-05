@@ -14,7 +14,12 @@
 #endif
 
 #ifdef __linux__
+#ifndef __USE_LARGEFILE64
 #define __USE_LARGEFILE64
+#endif
+#ifndef __USE_BSD
+#define __USE_BSD
+#endif
 #endif
 
 #ifdef WIN32
@@ -34,9 +39,11 @@
 
 // MAME headers
 #include "posixfile.h"
+#include "unicode.h"
 
 #include <cassert>
 #include <cerrno>
+#include <cstdlib>
 #include <cstring>
 #include <memory>
 #include <type_traits>
@@ -60,7 +67,6 @@ constexpr char PATHSEPCH = '\\';
 constexpr char INVPATHSEPCH = '/';
 #else
 constexpr char PATHSEPCH = '/';
-constexpr char INVPATHSEPCH = '\\';
 #endif
 
 
@@ -158,7 +164,11 @@ private:
 
 bool is_path_separator(char c)
 {
+#if defined(WIN32)
 	return (c == PATHSEPCH) || (c == INVPATHSEPCH);
+#else
+	return c == PATHSEPCH;
+#endif
 }
 
 
@@ -170,7 +180,7 @@ osd_file::error create_path_recursive(std::string const &path)
 {
 	// if there's still a separator, and it's not the root, nuke it and recurse
 	auto const sep = path.rfind(PATHSEPCH);
-	if ((sep != std::string::npos) && (sep > 0) && (path[sep] != ':') && (path[sep - 1] != PATHSEPCH))
+	if ((sep != std::string::npos) && (sep > 0) && (path[sep - 1] != PATHSEPCH))
 	{
 		osd_file::error const err = create_path_recursive(path.substr(0, sep));
 		if (err != osd_file::error::NONE)
@@ -229,8 +239,10 @@ osd_file::error osd_file::open(std::string const &path, std::uint32_t openflags,
 
 	// convert the path into something compatible
 	dst = path;
+#if defined(WIN32)
 	for (auto it = dst.begin(); it != dst.end(); ++it)
 		*it = (INVPATHSEPCH == *it) ? PATHSEPCH : *it;
+#endif
 	osd_subst_env(dst, dst);
 
 	// attempt to open the file
@@ -264,7 +276,7 @@ osd_file::error osd_file::open(std::string const &path, std::uint32_t openflags,
 			}
 		}
 
-		// if we still failed, clean up and osd_free
+		// if we still failed, clean up and free
 		if (fd < 0)
 		{
 			return errno_to_file_error(errno);
@@ -327,9 +339,9 @@ osd_file::error osd_file::remove(std::string const &filename)
 //  osd_get_physical_drive_geometry
 //============================================================
 
-int osd_get_physical_drive_geometry(const char *filename, UINT32 *cylinders, UINT32 *heads, UINT32 *sectors, UINT32 *bps)
+bool osd_get_physical_drive_geometry(const char *filename, uint32_t *cylinders, uint32_t *heads, uint32_t *sectors, uint32_t *bps)
 {
-	return FALSE; // no, no way, huh-uh, forget it
+	return false; // no, no way, huh-uh, forget it
 }
 
 
@@ -337,7 +349,7 @@ int osd_get_physical_drive_geometry(const char *filename, UINT32 *cylinders, UIN
 //  osd_stat
 //============================================================
 
-osd_directory_entry *osd_stat(const std::string &path)
+std::unique_ptr<osd::directory::entry> osd_stat(const std::string &path)
 {
 #if defined(__APPLE__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__bsdi__) || defined(__DragonFly__) || defined(__HAIKU__) || defined(WIN32) || defined(SDLMAME_NO64BITIO) || defined(__ANDROID__)
 	struct stat st;
@@ -350,13 +362,18 @@ osd_directory_entry *osd_stat(const std::string &path)
 
 	// create an osd_directory_entry; be sure to make sure that the caller can
 	// free all resources by just freeing the resulting osd_directory_entry
-	osd_directory_entry *const result = reinterpret_cast<osd_directory_entry *>(osd_malloc_array(sizeof(osd_directory_entry) + path.length() + 1));
+	osd::directory::entry *result;
+	try { result = reinterpret_cast<osd::directory::entry *>(::operator new(sizeof(*result) + path.length() + 1)); }
+	catch (...) { return nullptr; }
+	new (result) osd::directory::entry;
+
 	std::strcpy(reinterpret_cast<char *>(result) + sizeof(*result), path.c_str());
 	result->name = reinterpret_cast<char *>(result) + sizeof(*result);
-	result->type = S_ISDIR(st.st_mode) ? ENTTYPE_DIR : ENTTYPE_FILE;
+	result->type = S_ISDIR(st.st_mode) ? osd::directory::entry::entry_type::DIR : osd::directory::entry::entry_type::FILE;
 	result->size = std::uint64_t(std::make_unsigned_t<decltype(st.st_size)>(st.st_size));
+	result->last_modified = std::chrono::system_clock::from_time_t(st.st_mtime);
 
-	return result;
+	return std::unique_ptr<osd::directory::entry>(result);
 }
 
 
@@ -380,6 +397,13 @@ osd_file::error osd_get_full_path(std::string &dst, std::string const &path)
 			return osd_file::error::FAILURE;
 		}
 #else
+		std::unique_ptr<char, void (*)(void *)> canonical(::realpath(path.c_str(), nullptr), &std::free);
+		if (canonical)
+		{
+			dst = canonical.get();
+			return osd_file::error::NONE;
+		}
+
 		std::vector<char> path_buffer(PATH_MAX);
 		if (::realpath(path.c_str(), &path_buffer[0]))
 		{
@@ -443,7 +467,48 @@ const char *osd_get_volume_name(int idx)
 		return "/";
 	else
 		return nullptr;
-	}
+}
+
+
+//============================================================
+//  osd_is_valid_filename_char
+//============================================================
+
+bool osd_is_valid_filename_char(char32_t uchar)
+{
+	// The only one that's actually invalid is the slash
+	// The other two are just problematic because they're the escape character and path separator
+	return osd_is_valid_filepath_char(uchar)
+#if defined(WIN32)
+		&& uchar != PATHSEPCH
+		&& uchar != INVPATHSEPCH
+#else
+		&& uchar != PATHSEPCH
+		&& uchar != '\\'
+#endif
+		&& uchar != ':';
+}
+
+
+//============================================================
+//  osd_is_valid_filepath_char
+//============================================================
+
+bool osd_is_valid_filepath_char(char32_t uchar)
+{
+	// One could argue that colon should be in here too because it functions as path separator
+	return uchar >= 0x20
+		&& !(uchar >= '\x7F' && uchar <= '\x9F')
+#if defined(WIN32)
+		&& uchar != '<'
+		&& uchar != '>'
+		&& uchar != '\"'
+		&& uchar != '|'
+		&& uchar != '?'
+		&& uchar != '*'
+#endif
+		&& uchar_isvalid(uchar);
+}
 
 
 //============================================================

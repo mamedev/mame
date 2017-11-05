@@ -16,7 +16,7 @@
 
 struct pc_disk_sizes
 {
-	UINT32 image_size;
+	uint32_t image_size;
 	int sectors;
 	int heads;
 };
@@ -43,7 +43,7 @@ static const struct pc_disk_sizes disk_sizes[] =
 static floperr_t pc_dsk_compute_geometry(floppy_image_legacy *floppy, struct basicdsk_geometry *geometry)
 {
 	int i;
-	UINT64 size;
+	uint64_t size;
 
 	memset(geometry, 0, sizeof(*geometry));
 	size = floppy_image_size(floppy);
@@ -67,12 +67,12 @@ static floperr_t pc_dsk_compute_geometry(floppy_image_legacy *floppy, struct bas
 		 * get info from boot sector.
 		 * not correct on all disks
 		 */
-		UINT8 scl, spt, heads;
+		uint8_t scl, spt, heads;
 		floppy_image_read(floppy, &scl, 0x0c, 1);
 		floppy_image_read(floppy, &spt, 0x18, 1);
 		floppy_image_read(floppy, &heads, 0x1A, 1);
 
-		if (size == ((UINT64) scl) * spt * heads * 0x200)
+		if (size == ((uint64_t) scl) * spt * heads * 0x200)
 		{
 			geometry->sectors = spt;
 			geometry->heads = heads;
@@ -112,9 +112,9 @@ static FLOPPY_CONSTRUCT(pc_dsk_construct)
 	{
 		/* create */
 		memset(&geometry, 0, sizeof(geometry));
-		geometry.heads = option_resolution_lookup_int(params, PARAM_HEADS);
-		geometry.tracks = option_resolution_lookup_int(params, PARAM_TRACKS);
-		geometry.sectors = option_resolution_lookup_int(params, PARAM_SECTORS);
+		geometry.heads = params->lookup_int(PARAM_HEADS);
+		geometry.tracks = params->lookup_int(PARAM_TRACKS);
+		geometry.sectors = params->lookup_int(PARAM_SECTORS);
 		geometry.first_sector_id = 1;
 		geometry.sector_length = 512;
 	}
@@ -159,6 +159,23 @@ const char *pc_format::extensions() const
 	return "dsk,ima,img,ufi,360";
 }
 
+int pc_format::identify(io_generic *io, uint32_t form_factor)
+{
+	uint64_t size = io_generic_size(io);
+
+	/* some 360K images have a 512-byte header */
+	if (size == 368640 + 0x200) {
+		file_header_skip_bytes = 0x200;
+	}
+
+	/* some 1.44MB images have a 1024-byte footer */
+	if (size == 1474560 + 0x400) {
+		file_footer_skip_bytes = 0x400;
+	}
+
+	return upd765_format::identify(io, form_factor);
+}
+
 const pc_format::format pc_format::formats[] = {
 	{   /*  160K 5 1/4 inch double density single sided */
 		floppy_image::FF_525, floppy_image::SSDD, floppy_image::MFM,
@@ -176,9 +193,13 @@ const pc_format::format pc_format::formats[] = {
 		floppy_image::FF_525, floppy_image::DSDD, floppy_image::MFM,
 		2000,  9, 40, 2, 512, {}, 1, {}, 80, 50, 22, 80
 	},
+	{   /*  360K 5 1/4 inch double density, 42 tracks */
+		floppy_image::FF_525, floppy_image::DSDD, floppy_image::MFM,
+		2000,  9, 42, 2, 512, {}, 1, {}, 80, 50, 22, 80
+	},
 	{   /*  400K 5 1/4 inch double density - gaps unverified */
 		floppy_image::FF_525, floppy_image::DSDD, floppy_image::MFM,
-		2000, 10, 40, 2, 512, {}, 1, {}, 80, 50, 22, 80
+		2000, 10, 40, 2, 512, {}, 1, {}, 80, 50, 22, 36
 	},
 	{   /*  720K 5 1/4 inch quad density - gaps unverified */
 		floppy_image::FF_525, floppy_image::DSQD, floppy_image::MFM,

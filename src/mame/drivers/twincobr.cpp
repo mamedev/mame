@@ -378,14 +378,16 @@ Shark   Zame
 
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "cpu/m68000/m68000.h"
-#include "cpu/tms32010/tms32010.h"
-#include "cpu/mcs48/mcs48.h"
-#include "includes/toaplipt.h"
 #include "includes/twincobr.h"
-#include "sound/3812intf.h"
+#include "includes/toaplipt.h"
 
+#include "cpu/m68000/m68000.h"
+#include "cpu/mcs48/mcs48.h"
+#include "cpu/tms32010/tms32010.h"
+#include "cpu/z80/z80.h"
+#include "machine/74259.h"
+#include "sound/3812intf.h"
+#include "speaker.h"
 
 
 
@@ -410,8 +412,8 @@ static ADDRESS_MAP_START( main_program_map, AS_PROGRAM, 16, twincobr_state )
 	AM_RANGE(0x078004, 0x078005) AM_READ_PORT("P1")
 	AM_RANGE(0x078006, 0x078007) AM_READ_PORT("P2")
 	AM_RANGE(0x078008, 0x078009) AM_READ_PORT("VBLANK")         /* V-Blank & FShark Coin/Start */
-	AM_RANGE(0x07800a, 0x07800b) AM_WRITE(fshark_coin_dsp_w)    /* Flying Shark DSP Comms & coin stuff */
-	AM_RANGE(0x07800c, 0x07800d) AM_WRITE(twincobr_control_w)   /* Twin Cobra DSP Comms & system control */
+	AM_RANGE(0x07800a, 0x07800b) AM_DEVWRITE8("coinlatch", ls259_device, write_nibble_d0, 0x00ff) /* Flying Shark DSP Comms & coin stuff */
+	AM_RANGE(0x07800c, 0x07800d) AM_DEVWRITE8("mainlatch", ls259_device, write_nibble_d0, 0x00ff) /* Twin Cobra DSP Comms & system control */
 	AM_RANGE(0x07a000, 0x07afff) AM_READWRITE(twincobr_sharedram_r, twincobr_sharedram_w)   /* 16-bit on 68000 side, 8-bit on Z80 side */
 	AM_RANGE(0x07e000, 0x07e001) AM_READWRITE(twincobr_txram_r, twincobr_txram_w)   /* data for text video RAM */
 	AM_RANGE(0x07e002, 0x07e003) AM_READWRITE(twincobr_bgram_r, twincobr_bgram_w)   /* data for bg video RAM */
@@ -430,7 +432,7 @@ static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, twincobr_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym3812_device, read, write)
 	AM_RANGE(0x10, 0x10) AM_READ_PORT("SYSTEM")         /* Twin Cobra - Coin/Start */
-	AM_RANGE(0x20, 0x20) AM_WRITE(twincobr_coin_w)      /* Twin Cobra coin count-lockout */
+	AM_RANGE(0x20, 0x20) AM_DEVWRITE("coinlatch", ls259_device, write_nibble_d0)      /* Twin Cobra coin count-lockout */
 	AM_RANGE(0x40, 0x40) AM_READ_PORT("DSWA")
 	AM_RANGE(0x50, 0x50) AM_READ_PORT("DSWB")
 ADDRESS_MAP_END
@@ -449,7 +451,6 @@ static ADDRESS_MAP_START( DSP_io_map, AS_IO, 16, twincobr_state )
 	AM_RANGE(1, 1) AM_READWRITE(twincobr_dsp_r, twincobr_dsp_w)
 	AM_RANGE(2, 2) AM_READWRITE(fsharkbt_dsp_r, fsharkbt_dsp_w)
 	AM_RANGE(3, 3) AM_WRITE(twincobr_dsp_bio_w)
-	AM_RANGE(TMS32010_BIO, TMS32010_BIO) AM_READ(twincobr_BIO_r)
 ADDRESS_MAP_END
 
 
@@ -654,7 +655,7 @@ static GFXDECODE_START( twincobr )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( twincobr, twincobr_state )
+static MACHINE_CONFIG_START( twincobr )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_28MHz/4)       /* 7MHz - Main board Crystal is 28MHz */
@@ -669,10 +670,25 @@ static MACHINE_CONFIG_START( twincobr, twincobr_state )
 	MCFG_CPU_PROGRAM_MAP(DSP_program_map)
 	/* Data Map is internal to the CPU */
 	MCFG_CPU_IO_MAP(DSP_io_map)
+	MCFG_TMS32010_BIO_IN_CB(READLINE(twincobr_state, twincobr_BIO_r))
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	MCFG_MACHINE_RESET_OVERRIDE(twincobr_state,twincobr)
+
+	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(twincobr_state, int_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(twincobr_state, flipscreen_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(twincobr_state, bg_ram_bank_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(twincobr_state, fg_rom_bank_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(twincobr_state, dsp_int_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(twincobr_state, display_on_w))
+
+	MCFG_DEVICE_ADD("coinlatch", LS259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(twincobr_state, coin_counter_1_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(twincobr_state, coin_counter_2_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(twincobr_state, coin_lockout_1_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(twincobr_state, coin_lockout_2_w))
 
 	/* video hardware */
 	MCFG_MC6845_ADD("crtc", HD6845, "screen", XTAL_28MHz/8) /* 3.5MHz measured on CLKin */
@@ -687,7 +703,7 @@ static MACHINE_CONFIG_START( twincobr, twincobr_state )
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_28MHz/4, 446, 0, 320, 286, 0, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(twincobr_state, screen_update_toaplan0)
-	MCFG_SCREEN_VBLANK_DEVICE("spriteram16", buffered_spriteram16_device, vblank_copy_rising)
+	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram16", buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", twincobr)
@@ -706,6 +722,12 @@ MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( fshark, twincobr )
+	MCFG_DEVICE_MODIFY("mainlatch")
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(NOOP)
+
+	MCFG_DEVICE_MODIFY("coinlatch")
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(twincobr_state, dsp_int_w))
+
 	MCFG_DEVICE_MODIFY("scu")
 	toaplan_scu_device::static_set_xoffsets(*device, 32, 14);
 MACHINE_CONFIG_END
@@ -732,11 +754,11 @@ ROM_START( twincobr )
 	ROM_REGION( 0x30000, "maincpu", 0 ) /* Main 68K code */
 	ROM_LOAD16_BYTE( "b30_01.7j", 0x00000, 0x10000, CRC(07f64d13) SHA1(864ce0f9369c40c3ae792fc4ab2444a168214749) )
 	ROM_LOAD16_BYTE( "b30_03.7h", 0x00001, 0x10000, CRC(41be6978) SHA1(4784804b738a332c7f24a43bcbb7a1e607365735) )
-	ROM_LOAD16_BYTE( "tc15",      0x20000, 0x08000, CRC(3a646618) SHA1(fc1ed8f3c491f5cf16a17e5ce08c5d8f3ce03683) )
-	ROM_LOAD16_BYTE( "tc13",      0x20001, 0x08000, CRC(d7d1e317) SHA1(57b8433b1677a390a7c7e00a1464bb8ed9cbfc73) )
+	ROM_LOAD16_BYTE( "b30_26_ii.8j",      0x20000, 0x08000, CRC(3a646618) SHA1(fc1ed8f3c491f5cf16a17e5ce08c5d8f3ce03683) )
+	ROM_LOAD16_BYTE( "b30_27_ii.8h",      0x20001, 0x08000, CRC(d7d1e317) SHA1(57b8433b1677a390a7c7e00a1464bb8ed9cbfc73) )
 
 	ROM_REGION( 0x8000, "audiocpu", 0 )    /* Sound Z80 code */
-	ROM_LOAD( "tc12", 0x0000, 0x8000, CRC(e37b3c44) SHA1(5fed10b29c14e27aee0cd92ecde5c5cb422273b1) )  /* slightly different from the other two sets */
+	ROM_LOAD( "b30_05_ii.4f", 0x0000, 0x8000, CRC(e37b3c44) SHA1(5fed10b29c14e27aee0cd92ecde5c5cb422273b1) )  /* slightly different from the other two sets */
 
 	ROM_REGION( 0x2000, "dsp", 0 )  /* Co-Processor TMS320C10 MCU code */
 	ROM_LOAD16_BYTE( "dsp_22.bin",  0x0001, 0x0800, CRC(79389a71) SHA1(14ec4c1c9b06702319e89a7a250d0038393437f4) )
@@ -782,8 +804,8 @@ ROM_START( twincobru )
 	ROM_REGION( 0x30000, "maincpu", 0 ) /* Main 68K code */
 	ROM_LOAD16_BYTE( "b30_01.7j",   0x00000, 0x10000, CRC(07f64d13) SHA1(864ce0f9369c40c3ae792fc4ab2444a168214749) )
 	ROM_LOAD16_BYTE( "b30_03.7h",   0x00001, 0x10000, CRC(41be6978) SHA1(4784804b738a332c7f24a43bcbb7a1e607365735) )
-	ROM_LOAD16_BYTE( "b30_26-1.8j", 0x20000, 0x08000, CRC(bdd00ba4) SHA1(b76b22f03eb4b821a8c555edd9fcee814f2e66a7) )
-	ROM_LOAD16_BYTE( "b30_27-1.8h", 0x20001, 0x08000, CRC(ed600907) SHA1(e5964db9eab2c334940795d71cb90f6679490227) )
+	ROM_LOAD16_BYTE( "b30_26_i.8j", 0x20000, 0x08000, CRC(bdd00ba4) SHA1(b76b22f03eb4b821a8c555edd9fcee814f2e66a7) )
+	ROM_LOAD16_BYTE( "b30_27_i.8h", 0x20001, 0x08000, CRC(ed600907) SHA1(e5964db9eab2c334940795d71cb90f6679490227) )
 
 	ROM_REGION( 0x8000, "audiocpu", 0 )    /* Sound Z80 code */
 	ROM_LOAD( "b30_05.4f", 0x0000, 0x8000, CRC(1a8f1e10) SHA1(0c37a7a50b2523506ad77ac03ae752eb94092ff6) )

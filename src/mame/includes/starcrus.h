@@ -65,7 +65,7 @@ public:
 
 	virtual void video_start() override;
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	int collision_check_s1s2();
 	int collision_check_p1p2();
 	int collision_check_s1p1p2();

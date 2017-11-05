@@ -97,12 +97,15 @@ Sound: VLM5030 at 7B
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/yiear.h"
+#include "includes/konamipt.h"
+#include "audio/trackfld.h"
+
 #include "cpu/m6809/m6809.h"
 #include "machine/watchdog.h"
 #include "sound/sn76496.h"
-#include "includes/konamipt.h"
-#include "audio/trackfld.h"
-#include "includes/yiear.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 
@@ -154,6 +157,12 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, yiear_state )
 	AM_RANGE(0x5800, 0x5fff) AM_WRITE(yiear_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x5000, 0x5fff) AM_RAM
 	AM_RANGE(0x8000, 0xffff) AM_ROM
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( vlm_map, 0, 8, yiear_state )
+	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
+	AM_RANGE(0x0000, 0x1fff) AM_ROM
 ADDRESS_MAP_END
 
 
@@ -269,7 +278,7 @@ void yiear_state::machine_reset()
 	m_yiear_nmi_enable = 0;
 }
 
-static MACHINE_CONFIG_START( yiear, yiear_state )
+static MACHINE_CONFIG_START( yiear )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809,XTAL_18_432MHz/12)   /* verified on pcb */
@@ -301,6 +310,7 @@ static MACHINE_CONFIG_START( yiear, yiear_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_SOUND_ADD("vlm", VLM5030, XTAL_3_579545MHz)   /* verified on pcb */
+	MCFG_DEVICE_ADDRESS_MAP(0, vlm_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -357,5 +367,5 @@ ROM_END
 
 
 
-GAME( 1985, yiear,  0,     yiear, yiear, driver_device, 0, ROT0, "Konami", "Yie Ar Kung-Fu (program code I)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, yiear2, yiear, yiear, yiear, driver_device, 0, ROT0, "Konami", "Yie Ar Kung-Fu (program code G)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, yiear,  0,     yiear, yiear, yiear_state, 0, ROT0, "Konami", "Yie Ar Kung-Fu (program code I)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, yiear2, yiear, yiear, yiear, yiear_state, 0, ROT0, "Konami", "Yie Ar Kung-Fu (program code G)", MACHINE_SUPPORTS_SAVE )

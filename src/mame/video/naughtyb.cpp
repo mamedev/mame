@@ -61,7 +61,7 @@ static const res_net_info naughtyb_net_info =
 
 PALETTE_INIT_MEMBER(naughtyb_state, naughtyb)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	static const int resistances[2] = { 270, 130 };
 	double weights[2];
 
@@ -186,7 +186,7 @@ WRITE8_MEMBER(naughtyb_state::popflame_videoreg_w)
 
 
 ***************************************************************************/
-UINT32 naughtyb_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t naughtyb_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	const rectangle scrollvisiblearea(2*8, 34*8-1, 0*8, 28*8-1);
 	const rectangle leftvisiblearea(0*8, 2*8-1, 0*8, 28*8-1);

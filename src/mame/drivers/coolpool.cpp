@@ -27,13 +27,15 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/tms32010/tms32010.h"
-#include "cpu/tms34010/tms34010.h"
-#include "cpu/tms32025/tms32025.h"
-#include "video/tlc34076.h"
-#include "sound/dac.h"
-#include "machine/nvram.h"
 #include "includes/coolpool.h"
+
+#include "cpu/tms32010/tms32010.h"
+#include "cpu/tms32025/tms32025.h"
+#include "machine/nvram.h"
+#include "sound/dac.h"
+#include "sound/volt_reg.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 
@@ -45,7 +47,7 @@
 
 
 
-static const UINT16 nvram_unlock_seq[] =
+static const uint16_t nvram_unlock_seq[] =
 {
 	0x3fb, 0x3fb, 0x3f8, 0x3fc, 0x3fa, 0x3fe, 0x3f9, 0x3fd, 0x3fb, 0x3ff
 };
@@ -59,8 +61,8 @@ static const UINT16 nvram_unlock_seq[] =
 
 TMS340X0_SCANLINE_RGB32_CB_MEMBER(coolpool_state::amerdart_scanline)
 {
-	UINT16 *vram = &m_vram_base[(params->rowaddr << 8) & 0xff00];
-	UINT32 *dest = &bitmap.pix32(scanline);
+	uint16_t *vram = &m_vram_base[(params->rowaddr << 8) & 0xff00];
+	uint32_t *dest = &bitmap.pix32(scanline);
 	rgb_t pens[16];
 	int coladdr = params->coladdr;
 	int x;
@@ -69,13 +71,13 @@ TMS340X0_SCANLINE_RGB32_CB_MEMBER(coolpool_state::amerdart_scanline)
 	if (scanline < 256)
 		for (x = 0; x < 16; x++)
 		{
-			UINT16 pal = m_vram_base[x];
+			uint16_t pal = m_vram_base[x];
 			pens[x] = rgb_t(pal4bit(pal >> 4), pal4bit(pal >> 8), pal4bit(pal >> 12));
 		}
 
 	for (x = params->heblnk; x < params->hsblnk; x += 4)
 	{
-		UINT16 pixels = vram[coladdr++ & 0xff];
+		uint16_t pixels = vram[coladdr++ & 0xff];
 		dest[x + 0] = pens[(pixels >> 0) & 15];
 		dest[x + 1] = pens[(pixels >> 4) & 15];
 		dest[x + 2] = pens[(pixels >> 8) & 15];
@@ -86,15 +88,15 @@ TMS340X0_SCANLINE_RGB32_CB_MEMBER(coolpool_state::amerdart_scanline)
 
 TMS340X0_SCANLINE_RGB32_CB_MEMBER(coolpool_state::coolpool_scanline)
 {
-	UINT16 *vram = &m_vram_base[(params->rowaddr << 8) & 0x1ff00];
-	UINT32 *dest = &bitmap.pix32(scanline);
+	uint16_t *vram = &m_vram_base[(params->rowaddr << 8) & 0x1ff00];
+	uint32_t *dest = &bitmap.pix32(scanline);
 	const rgb_t *pens = m_tlc34076->get_pens();
 	int coladdr = params->coladdr;
 	int x;
 
 	for (x = params->heblnk; x < params->hsblnk; x += 2)
 	{
-		UINT16 pixels = vram[coladdr++ & 0xff];
+		uint16_t pixels = vram[coladdr++ & 0xff];
 		dest[x + 0] = pens[pixels & 0xff];
 		dest[x + 1] = pens[pixels >> 8];
 	}
@@ -214,7 +216,7 @@ WRITE16_MEMBER(coolpool_state::amerdart_misc_w)
 	m_dsp->set_input_line(INPUT_LINE_RESET, (data & 0x0400) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-READ16_MEMBER(coolpool_state::amerdart_dsp_bio_line_r)
+READ_LINE_MEMBER(coolpool_state::amerdart_dsp_bio_line_r)
 {
 	/* Skip idle checking */
 	if (m_old_cmd == m_cmd_pending)
@@ -225,7 +227,7 @@ READ16_MEMBER(coolpool_state::amerdart_dsp_bio_line_r)
 	if (m_same_cmd_count >= 5)
 	{
 		m_same_cmd_count = 5;
-		space.device().execute().spin();
+		m_dsp->spin();
 	}
 	m_old_cmd = m_cmd_pending;
 
@@ -293,8 +295,8 @@ static int amerdart_trackball_dec(int data)
 
 int coolpool_state::amerdart_trackball_direction(int num, int data)
 {
-	UINT16 result_x = (data & 0x0c) >> 2;
-	UINT16 result_y = (data & 0x03) >> 0;
+	uint16_t result_x = (data & 0x0c) >> 2;
+	uint16_t result_y = (data & 0x03) >> 0;
 
 
 	if ((m_dx[num] == 0) && (m_dy[num] < 0)) {        /* Up */
@@ -390,10 +392,10 @@ READ16_MEMBER(coolpool_state::amerdart_trackball_r)
 	m_newx[2] = ioport("XAXIS2")->read();   /* Trackball 2  Left - Right */
 	m_newy[2] = ioport("YAXIS2")->read();   /* Trackball 2   Up  - Down  */
 
-	m_dx[1] = (INT8)(m_newx[1] - m_oldx[1]);
-	m_dy[1] = (INT8)(m_newy[1] - m_oldy[1]);
-	m_dx[2] = (INT8)(m_newx[2] - m_oldx[2]);
-	m_dy[2] = (INT8)(m_newy[2] - m_oldy[2]);
+	m_dx[1] = (int8_t)(m_newx[1] - m_oldx[1]);
+	m_dy[1] = (int8_t)(m_newy[1] - m_oldy[1]);
+	m_dx[2] = (int8_t)(m_newx[2] - m_oldx[2]);
+	m_dy[2] = (int8_t)(m_newy[2] - m_oldy[2]);
 
 	/* Determine Trackball 1 direction state */
 	m_result = (m_result & 0xf0ff) | (amerdart_trackball_direction(1, ((m_result >>  8) & 0xf)) <<  8);
@@ -507,7 +509,7 @@ READ16_MEMBER(coolpool_state::dsp_hold_line_r)
 
 READ16_MEMBER(coolpool_state::dsp_rom_r)
 {
-	UINT8 *rom = memregion("user2")->base();
+	uint8_t *rom = memregion("user2")->base();
 
 	return rom[m_iop_romaddr & (memregion("user2")->bytes() - 1)];
 }
@@ -528,12 +530,6 @@ WRITE16_MEMBER(coolpool_state::dsp_romaddr_w)
 }
 
 
-WRITE16_MEMBER(coolpool_state::dsp_dac_w)
-{
-	m_dac->write_signed16((INT16)(data << 4) + 0x8000);
-}
-
-
 
 /*************************************
  *
@@ -546,8 +542,8 @@ READ16_MEMBER(coolpool_state::coolpool_input_r)
 	m_result = (ioport("IN1")->read() & 0x00ff) | (m_lastresult & 0xff00);
 	m_newx[1] = ioport("XAXIS")->read();
 	m_newy[1] = ioport("YAXIS")->read();
-	m_dx[1] = (INT8)(m_newx[1] - m_oldx[1]);
-	m_dy[1] = (INT8)(m_newy[1] - m_oldy[1]);
+	m_dx[1] = (int8_t)(m_newx[1] - m_oldx[1]);
+	m_dy[1] = (int8_t)(m_newy[1] - m_oldy[1]);
 
 	if (m_dx[1] < 0)
 	{
@@ -659,12 +655,11 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( amerdart_dsp_io_map, AS_IO, 16, coolpool_state )
 	AM_RANGE(0x00, 0x01) AM_WRITE(dsp_romaddr_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(amerdart_dsp_answer_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE(dsp_dac_w)
+	AM_RANGE(0x03, 0x03) AM_DEVWRITE("dac", dac_word_interface, write)
 	AM_RANGE(0x04, 0x04) AM_READ(dsp_rom_r)
 	AM_RANGE(0x05, 0x05) AM_READ_PORT("IN0")
 	AM_RANGE(0x06, 0x06) AM_READ(amerdart_trackball_r)
 	AM_RANGE(0x07, 0x07) AM_READ(amerdart_dsp_cmd_r)
-	AM_RANGE(TMS32010_BIO, TMS32010_BIO) AM_READ(amerdart_dsp_bio_line_r)
 ADDRESS_MAP_END
 
 
@@ -677,13 +672,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( coolpool_dsp_io_map, AS_IO, 16, coolpool_state )
 	AM_RANGE(0x00, 0x01) AM_WRITE(dsp_romaddr_w)
 	AM_RANGE(0x02, 0x02) AM_READWRITE(dsp_cmd_r, dsp_answer_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE(dsp_dac_w)
+	AM_RANGE(0x03, 0x03) AM_DEVWRITE("dac", dac_word_interface, write)
 	AM_RANGE(0x04, 0x04) AM_READ(dsp_rom_r)
 	AM_RANGE(0x05, 0x05) AM_READ_PORT("IN0")
 	AM_RANGE(0x07, 0x07) AM_READ_PORT("IN1")
-	AM_RANGE(TMS32025_BIO, TMS32025_BIO) AM_READ(dsp_bio_line_r)
-	AM_RANGE(TMS32025_HOLD, TMS32025_HOLD) AM_READ(dsp_hold_line_r)
-//  AM_RANGE(TMS32025_HOLDA, TMS32025_HOLDA) AM_WRITE(dsp_HOLDA_signal_w)
 ADDRESS_MAP_END
 
 
@@ -786,12 +778,12 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( amerdart, coolpool_state )
+static MACHINE_CONFIG_START( amerdart )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS34010, XTAL_40MHz)
 	MCFG_CPU_PROGRAM_MAP(amerdart_map)
-	MCFG_TMS340X0_HALT_ON_RESET(FALSE) /* halt on reset */
+	MCFG_TMS340X0_HALT_ON_RESET(false) /* halt on reset */
 	MCFG_TMS340X0_PIXEL_CLOCK(XTAL_40MHz/12) /* pixel clock */
 	MCFG_TMS340X0_PIXELS_PER_CLOCK(2) /* pixels per clock */
 	MCFG_TMS340X0_SCANLINE_RGB32_CB(coolpool_state, amerdart_scanline) /* scanline callback (rgb32) */
@@ -802,6 +794,7 @@ static MACHINE_CONFIG_START( amerdart, coolpool_state )
 	MCFG_CPU_PROGRAM_MAP(amerdart_dsp_pgm_map)
 	/* Data Map is internal to the CPU */
 	MCFG_CPU_IO_MAP(amerdart_dsp_io_map)
+	MCFG_TMS32010_BIO_IN_CB(READLINE(coolpool_state, amerdart_dsp_bio_line_r))
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("audioint", coolpool_state, amerdart_audio_int_gen, "screen", 0, 1)
 
 	MCFG_MACHINE_RESET_OVERRIDE(coolpool_state,amerdart)
@@ -815,19 +808,19 @@ static MACHINE_CONFIG_START( amerdart, coolpool_state )
 	MCFG_SCREEN_UPDATE_DEVICE("maincpu", tms34010_device, tms340x0_rgb32)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("dac", DAC_12BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( coolpool, coolpool_state )
+static MACHINE_CONFIG_START( coolpool )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS34010, XTAL_40MHz)
 	MCFG_CPU_PROGRAM_MAP(coolpool_map)
-	MCFG_TMS340X0_HALT_ON_RESET(FALSE) /* halt on reset */
+	MCFG_TMS340X0_HALT_ON_RESET(false) /* halt on reset */
 	MCFG_TMS340X0_PIXEL_CLOCK(XTAL_40MHz/6) /* pixel clock */
 	MCFG_TMS340X0_PIXELS_PER_CLOCK(1) /* pixels per clock */
 	MCFG_TMS340X0_SCANLINE_RGB32_CB(coolpool_state, coolpool_scanline) /* scanline callback (rgb32) */
@@ -837,6 +830,9 @@ static MACHINE_CONFIG_START( coolpool, coolpool_state )
 	MCFG_CPU_ADD("dsp", TMS32026,XTAL_40MHz)
 	MCFG_CPU_PROGRAM_MAP(coolpool_dsp_pgm_map)
 	MCFG_CPU_IO_MAP(coolpool_dsp_io_map)
+	MCFG_TMS32025_BIO_IN_CB(READ16(coolpool_state, dsp_bio_line_r))
+	MCFG_TMS32025_HOLD_IN_CB(READ16(coolpool_state, dsp_hold_line_r))
+//  MCFG_TMS32025_HOLD_ACK_OUT_CB(WRITE16(coolpool_state, dsp_HOLDA_signal_w))
 
 	MCFG_MACHINE_RESET_OVERRIDE(coolpool_state,coolpool)
 	MCFG_NVRAM_ADD_0FILL("nvram")
@@ -851,10 +847,10 @@ static MACHINE_CONFIG_START( coolpool, coolpool_state )
 	MCFG_SCREEN_UPDATE_DEVICE("maincpu", tms34010_device, tms340x0_rgb32)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("dac", DAC_12BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -1137,10 +1133,10 @@ DRIVER_INIT_MEMBER(coolpool_state,coolpool)
 DRIVER_INIT_MEMBER(coolpool_state,9ballsht)
 {
 	int a, len;
-	UINT16 *rom;
+	uint16_t *rom;
 
 	/* decrypt the main program ROMs */
-	rom = (UINT16 *)memregion("user1")->base();
+	rom = (uint16_t *)memregion("user1")->base();
 	len = memregion("user1")->bytes();
 	for (a = 0;a < len/2;a++)
 	{
@@ -1164,12 +1160,12 @@ DRIVER_INIT_MEMBER(coolpool_state,9ballsht)
 	}
 
 	/* decrypt the sub data ROMs */
-	rom = (UINT16 *)memregion("user2")->base();
+	rom = (uint16_t *)memregion("user2")->base();
 	len = memregion("user2")->bytes();
 	for (a = 1;a < len/2;a+=4)
 	{
 		/* just swap bits 1 and 2 of the address */
-		UINT16 tmp = rom[a];
+		uint16_t tmp = rom[a];
 		rom[a] = rom[a+1];
 		rom[a+1] = tmp;
 	}
@@ -1185,11 +1181,11 @@ DRIVER_INIT_MEMBER(coolpool_state,9ballsht)
  *
  *************************************/
 
-GAME( 1989, amerdart,  0,        amerdart, amerdart, coolpool_state, amerdart, ROT0, "Ameri",    "AmeriDarts (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, amerdart2, amerdart, amerdart, amerdart, coolpool_state, amerdart, ROT0, "Ameri",    "AmeriDarts (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, amerdart3, amerdart, amerdart, amerdart, coolpool_state, amerdart, ROT0, "Ameri",    "AmeriDarts (set 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, coolpool,  0,        coolpool, coolpool, coolpool_state, coolpool, ROT0, "Catalina", "Cool Pool", 0 )
-GAME( 1993, 9ballsht,  0,        9ballsht, 9ballsht, coolpool_state, 9ballsht, ROT0, "E-Scape EnterMedia (Bundra license)", "9-Ball Shootout (set 1)", 0 )
-GAME( 1993, 9ballsht2, 9ballsht, 9ballsht, 9ballsht, coolpool_state, 9ballsht, ROT0, "E-Scape EnterMedia (Bundra license)", "9-Ball Shootout (set 2)", 0 )
-GAME( 1993, 9ballsht3, 9ballsht, 9ballsht, 9ballsht, coolpool_state, 9ballsht, ROT0, "E-Scape EnterMedia (Bundra license)", "9-Ball Shootout (set 3)", 0 )
+GAME( 1989, amerdart,  0,        amerdart, amerdart, coolpool_state, amerdart, ROT0, "Ameri",                               "AmeriDarts (set 1)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1989, amerdart2, amerdart, amerdart, amerdart, coolpool_state, amerdart, ROT0, "Ameri",                               "AmeriDarts (set 2)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1989, amerdart3, amerdart, amerdart, amerdart, coolpool_state, amerdart, ROT0, "Ameri",                               "AmeriDarts (set 3)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1992, coolpool,  0,        coolpool, coolpool, coolpool_state, coolpool, ROT0, "Catalina",                            "Cool Pool",                    0 )
+GAME( 1993, 9ballsht,  0,        9ballsht, 9ballsht, coolpool_state, 9ballsht, ROT0, "E-Scape EnterMedia (Bundra license)", "9-Ball Shootout (set 1)",      0 )
+GAME( 1993, 9ballsht2, 9ballsht, 9ballsht, 9ballsht, coolpool_state, 9ballsht, ROT0, "E-Scape EnterMedia (Bundra license)", "9-Ball Shootout (set 2)",      0 )
+GAME( 1993, 9ballsht3, 9ballsht, 9ballsht, 9ballsht, coolpool_state, 9ballsht, ROT0, "E-Scape EnterMedia (Bundra license)", "9-Ball Shootout (set 3)",      0 )
 GAME( 1993, 9ballshtc, 9ballsht, 9ballsht, 9ballsht, coolpool_state, 9ballsht, ROT0, "E-Scape EnterMedia (Bundra license)", "9-Ball Shootout Championship", 0 )

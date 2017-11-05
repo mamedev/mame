@@ -3,6 +3,8 @@
 
 #include <mutex>
 
+#include "modules/lib/osdlib.h"
+
 #define XINPUT_MAX_POV 4
 #define XINPUT_MAX_BUTTONS 10
 #define XINPUT_MAX_AXIS 4
@@ -60,12 +62,12 @@ static const char *const xinput_button_names[] = {
 	"B",
 	"X",
 	"Y",
-	"Left Shoulder",
-	"Right Shoulder",
+	"LB",
+	"RB",
 	"Start",
 	"Back",
-	"Left Thumb",
-	"Right Thumb"
+	"LS",
+	"RS"
 };
 
 struct gamepad_state
@@ -83,39 +85,42 @@ struct gamepad_state
 // state information for a gamepad; state must be first element
 struct xinput_api_state
 {
-	UINT32                  player_index;
+	uint32_t                player_index;
 	XINPUT_STATE            xstate;
 	XINPUT_CAPABILITIES     caps;
 };
 
-#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
-// Typedef for pointers to XInput Functions
-typedef lazy_loaded_function_p2<DWORD, DWORD, XINPUT_STATE*> xinput_get_state_fn;
-typedef lazy_loaded_function_p3<DWORD, DWORD, DWORD, XINPUT_CAPABILITIES*> xinput_get_caps_fn;
-#endif
+// Typedefs for dynamically loaded functions
+typedef DWORD (WINAPI *xinput_get_state_fn)(DWORD, XINPUT_STATE *);
+typedef DWORD (WINAPI *xinput_get_caps_fn)(DWORD, DWORD, XINPUT_CAPABILITIES *);
 
 class xinput_api_helper : public std::enable_shared_from_this<xinput_api_helper>
 {
-#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
-private:
-	const wchar_t* xinput_dll_names[2] = { L"xinput1_4.dll", L"xinput9_1_0.dll" };
-
 public:
-	xinput_get_state_fn   XInputGetState;
-	xinput_get_caps_fn    XInputGetCapabilities;
-#endif
-
-public:
-	xinput_api_helper();
+	xinput_api_helper()
+		: m_xinput_dll(nullptr),
+		  XInputGetState(nullptr),
+		  XInputGetCapabilities(nullptr)
+	{
+	}
 
 	int initialize();
 	xinput_joystick_device * create_xinput_device(running_machine &machine, UINT index, wininput_module &module);
 
-#if !WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
-	// Pass-through functions for Universal Windows
-	inline DWORD XInputGetState(DWORD dwUserindex, XINPUT_STATE *pState);
-	inline DWORD XInputGetCapabilities(DWORD dwUserindex, DWORD dwFlags, XINPUT_CAPABILITIES* pCapabilities);
-#endif
+	DWORD xinput_get_state(DWORD dwUserindex, XINPUT_STATE *pState) const
+	{
+		return (*XInputGetState)(dwUserindex, pState);
+	}
+
+	DWORD xinput_get_capabilities(DWORD dwUserindex, DWORD dwFlags, XINPUT_CAPABILITIES* pCapabilities) const
+	{
+		return (*XInputGetCapabilities)(dwUserindex, dwFlags, pCapabilities);
+	}
+
+private:
+	osd::dynamic_module::ptr m_xinput_dll;
+	xinput_get_state_fn      XInputGetState;
+	xinput_get_caps_fn       XInputGetCapabilities;
 };
 
 class xinput_joystick_device : public device_info
@@ -130,7 +135,7 @@ private:
 	bool                               m_configured;
 
 public:
-	xinput_joystick_device(running_machine &machine, const char *name, input_module &module, std::shared_ptr<xinput_api_helper> helper);
+	xinput_joystick_device(running_machine &machine, const char *name, const char *id, input_module &module, std::shared_ptr<xinput_api_helper> helper);
 
 	void poll() override;
 	void reset() override;

@@ -15,8 +15,9 @@
 
 #include "emu.h"
 #include "cpu/i86/i86.h"
-#include "video/mc6845.h"
 #include "machine/am9517a.h"
+#include "video/mc6845.h"
+#include "screen.h"
 
 
 
@@ -31,9 +32,9 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")  { }
 
-	UINT8 *m_char_rom;
-	required_shared_ptr<UINT16> m_vram;
-	UINT8 m_crtc_vreg[0x100],m_crtc_index;
+	uint8_t *m_char_rom;
+	required_shared_ptr<uint16_t> m_vram;
+	uint8_t m_crtc_vreg[0x100],m_crtc_index;
 
 	DECLARE_READ16_MEMBER(vblank_r);
 	DECLARE_WRITE8_MEMBER(b16_pcg_w);
@@ -45,7 +46,7 @@ public:
 	DECLARE_WRITE8_MEMBER(memory_write_byte);
 
 	virtual void video_start() override;
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	mc6845_device *m_mc6845;
 	required_device<am9517a_device> m_dma8237;
@@ -81,11 +82,11 @@ void b16_state::video_start()
 }
 
 
-UINT32 b16_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t b16_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x,y;
 	int xi,yi;
-	UINT8 *gfx_rom = memregion("pcg")->base();
+	uint8_t *gfx_rom = memregion("pcg")->base();
 
 	for(y=0;y<mc6845_v_display;y++)
 	{
@@ -268,7 +269,7 @@ WRITE8_MEMBER(b16_state::memory_write_byte)
 }
 
 
-static MACHINE_CONFIG_START( b16, b16_state )
+static MACHINE_CONFIG_START( b16 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8086, XTAL_14_31818MHz/2) //unknown xtal
 	MCFG_CPU_PROGRAM_MAP(b16_map)
@@ -308,5 +309,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE     INPUT    INIT    COMPANY           FULLNAME       FLAGS */
-COMP( 1983, b16,  0,      0,       b16,      b16, driver_device,   0,      "Hitachi",   "B16", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+/*    YEAR  NAME  PARENT  COMPAT   MACHINE   INPUT  STATE      INIT  COMPANY    FULLNAME  FLAGS */
+COMP( 1983, b16,  0,      0,       b16,      b16,   b16_state, 0,    "Hitachi", "B16",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

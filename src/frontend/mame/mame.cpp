@@ -16,14 +16,12 @@
 #include "osdepend.h"
 #include "validity.h"
 #include "clifront.h"
-#include "drivenum.h"
 #include "luaengine.h"
 #include <time.h>
 #include "ui/ui.h"
 #include "ui/selgame.h"
 #include "ui/simpleselgame.h"
 #include "cheat.h"
-#include "ui/datfile.h"
 #include "ui/inifile.h"
 #include "xmlfile.h"
 
@@ -126,33 +124,40 @@ void mame_machine_manager::start_luaengine()
 		std::vector<std::string> exclude = split(options().no_plugin(),',');
 		{
 			// parse the file
-			std::string error;
 			// attempt to open the output file
 			emu_file file(options().ini_path(), OPEN_FLAG_READ);
 			if (file.open("plugin.ini") == osd_file::error::NONE)
 			{
-				bool result = m_plugins->parse_ini_file((util::core_file&)file, OPTION_PRIORITY_MAME_INI, OPTION_PRIORITY_DRIVER_INI, error);
-				if (!result)
-					osd_printf_error("**Error loading plugin.ini**");
+				try
+				{
+					m_plugins->parse_ini_file((util::core_file&)file, OPTION_PRIORITY_MAME_INI, OPTION_PRIORITY_MAME_INI < OPTION_PRIORITY_DRIVER_INI, false);
+				}
+				catch (options_exception &)
+				{
+					osd_printf_error("**Error loading plugin.ini**\n");
+				}
 			}
 		}
-		for (auto &curentry : *m_plugins)
+		for (auto &curentry : m_plugins->entries())
 		{
-			if (!curentry.is_header())
+			if (curentry->type() != core_options::option_type::HEADER)
 			{
-				if (std::find(include.begin(), include.end(), curentry.name()) != include.end())
+				if (std::find(include.begin(), include.end(), curentry->name()) != include.end())
 				{
-					std::string error_string;
-					m_plugins->set_value(curentry.name(), "1", OPTION_PRIORITY_CMDLINE, error_string);
+					m_plugins->set_value(curentry->name(), "1", OPTION_PRIORITY_CMDLINE);
 				}
-				if (std::find(exclude.begin(), exclude.end(), curentry.name()) != exclude.end())
+				if (std::find(exclude.begin(), exclude.end(), curentry->name()) != exclude.end())
 				{
-					std::string error_string;
-					m_plugins->set_value(curentry.name(), "0", OPTION_PRIORITY_CMDLINE, error_string);
+					m_plugins->set_value(curentry->name(), "0", OPTION_PRIORITY_CMDLINE);
 				}
 			}
 		}
 	}
+	if (options().console())
+	{
+		m_plugins->set_value("console", "1", OPTION_PRIORITY_CMDLINE);
+	}
+
 	m_lua->initialize();
 
 	{
@@ -160,7 +165,9 @@ void mame_machine_manager::start_luaengine()
 		osd_file::error filerr = file.open("boot.lua");
 		if (filerr == osd_file::error::NONE)
 		{
-			m_lua->load_script(file.fullpath());
+			std::string exppath;
+			osd_subst_env(exppath, std::string(file.fullpath()));
+			m_lua->load_script(exppath.c_str());
 		}
 	}
 }
@@ -179,9 +186,6 @@ int mame_machine_manager::execute()
 	bool exit_pending = false;
 	int error = EMU_ERR_NONE;
 
-	if (m_options.console()) {
-		m_lua->start_console();
-	}
 	while (error == EMU_ERR_NONE && !exit_pending)
 	{
 		m_new_driver_pending = nullptr;
@@ -200,9 +204,8 @@ int mame_machine_manager::execute()
 		// parse any INI files as the first thing
 		if (m_options.read_config())
 		{
-			m_options.revert(OPTION_PRIORITY_INI);
-			std::string errors;
-			mame_options::parse_standard_inis(m_options,errors);
+			std::ostringstream errors;
+			mame_options::parse_standard_inis(m_options, errors);
 		}
 
 		// otherwise, perform validity checks before anything else
@@ -230,12 +233,13 @@ int mame_machine_manager::execute()
 		if (m_new_driver_pending)
 		{
 			// set up new system name and adjust device options accordingly
-			mame_options::set_system_name(m_options,m_new_driver_pending->name);
+			m_options.set_system_name(m_new_driver_pending->name);
 			m_firstrun = true;
 		}
 		else
 		{
-			if (machine.exit_pending()) mame_options::set_system_name(m_options,"");
+			if (machine.exit_pending())
+				m_options.set_system_name("");
 		}
 
 		if (machine.exit_pending() && (!started_empty || is_empty))
@@ -272,7 +276,7 @@ ui_manager* mame_machine_manager::create_ui(running_machine& machine)
 	m_ui = std::make_unique<mame_ui_manager>(machine);
 	m_ui->init();
 
-	machine.add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(FUNC(mame_machine_manager::reset), this));
+	machine.add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(&mame_machine_manager::reset, this));
 
 	m_ui->set_startup_text("Initializing...", true);
 
@@ -295,12 +299,12 @@ void mame_machine_manager::create_custom(running_machine& machine)
 	// allocate autoboot timer
 	m_autoboot_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(mame_machine_manager::autoboot_callback), this));
 
-	// start datfile manager
-	m_datfile = std::make_unique<datfile_manager>(machine, m_ui->options());
-
 	// start favorite manager
 	m_favorite = std::make_unique<favorite_manager>(machine, m_ui->options());
+}
 
+void mame_machine_manager::load_cheatfiles(running_machine& machine)
+{
 	// set up the cheat engine
 	m_cheat = std::make_unique<cheat_manager>(machine);
 }
@@ -312,27 +316,33 @@ void emulator_info::display_ui_chooser(running_machine& machine)
 {
 	// force the UI to show the game select screen
 	mame_ui_manager &mui = mame_machine_manager::instance()->ui();
-	render_container *container = &machine.render().ui_container();
+	render_container &container = machine.render().ui_container();
 	if (machine.options().ui() == emu_options::UI_SIMPLE)
 		ui::simple_menu_select_game::force_game_select(mui, container);
 	else
 		ui::menu_select_game::force_game_select(mui, container);
 }
 
-int emulator_info::start_frontend(emu_options &options, osd_interface &osd, int argc, char *argv[])
+int emulator_info::start_frontend(emu_options &options, osd_interface &osd, std::vector<std::string> &args)
 {
 	cli_frontend frontend(options, osd);
-	return frontend.execute(argc, argv);
+	return frontend.execute(args);
+}
+
+int emulator_info::start_frontend(emu_options &options, osd_interface &osd, int argc, char *argv[])
+{
+	std::vector<std::string> args(argv, argv + argc);
+	return start_frontend(options, osd, args);
 }
 
 void emulator_info::draw_user_interface(running_machine& machine)
 {
-	mame_machine_manager::instance()->ui().update_and_render(&machine.render().ui_container());
+	mame_machine_manager::instance()->ui().update_and_render(machine.render().ui_container());
 }
 
 void emulator_info::periodic_check()
 {
-	mame_machine_manager::instance()->lua()->periodic_check();
+	return mame_machine_manager::instance()->lua()->on_periodic();
 }
 
 bool emulator_info::frame_hook()
@@ -340,14 +350,14 @@ bool emulator_info::frame_hook()
 	return mame_machine_manager::instance()->lua()->frame_hook();
 }
 
-void emulator_info::layout_file_cb(xml_data_node &layout)
+void emulator_info::layout_file_cb(util::xml::data_node const &layout)
 {
-	xml_data_node *mamelayout = xml_get_sibling(layout.child, "mamelayout");
-	if(mamelayout)
+	util::xml::data_node const *const mamelayout = layout.get_child("mamelayout");
+	if (mamelayout)
 	{
-		xml_data_node *script = xml_get_sibling(mamelayout->child, "script");
-		if(script)
-			mame_machine_manager::instance()->lua()->call_plugin(script->value, "layout");
+		util::xml::data_node const *const script = mamelayout->get_child("script");
+		if (script)
+			mame_machine_manager::instance()->lua()->call_plugin_set("layout", script->get_value());
 	}
 }
 

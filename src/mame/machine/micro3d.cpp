@@ -7,11 +7,13 @@
 ****************************************************************************/
 
 #include "emu.h"
+#include "includes/micro3d.h"
+#include "audio/micro3d.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/tms34010/tms34010.h"
 #include "cpu/am29000/am29000.h"
 #include "cpu/mcs51/mcs51.h"
-#include "includes/micro3d.h"
 
 
 /*************************************
@@ -214,19 +216,19 @@ READ32_MEMBER(micro3d_state::micro3d_scc_r)
  *
  *************************************/
 
-static inline INT64 dot_product(micro3d_vtx *v1, micro3d_vtx *v2)
+static inline int64_t dot_product(micro3d_vtx *v1, micro3d_vtx *v2)
 {
-	INT64 result = ((INT64)v1->x * (INT64)v2->x) +
-					((INT64)v1->y * (INT64)v2->y) +
-					((INT64)v1->z * (INT64)v2->z);
+	int64_t result = ((int64_t)v1->x * (int64_t)v2->x) +
+					((int64_t)v1->y * (int64_t)v2->y) +
+					((int64_t)v1->z * (int64_t)v2->z);
 	return result;
 }
 
-static inline INT64 normalised_multiply(INT32 a, INT32 b)
+static inline int64_t normalised_multiply(int32_t a, int32_t b)
 {
-	INT64 result;
+	int64_t result;
 
-	result = (INT64)a * (INT64)b;
+	result = (int64_t)a * (int64_t)b;
 	return result >> 14;
 }
 
@@ -241,7 +243,7 @@ void micro3d_state::device_timer(emu_timer &timer, device_timer_id id, int param
 		adc_done_callback(ptr, param);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in micro3d_state::device_timer");
+		assert_always(false, "Unknown id in micro3d_state::device_timer");
 	}
 }
 
@@ -264,15 +266,15 @@ READ32_MEMBER(micro3d_state::micro3d_mac2_r)
 
 WRITE32_MEMBER(micro3d_state::micro3d_mac2_w)
 {
-	UINT32 cnt = data & 0xff;
-	UINT32 inst = (data >> 8) & 0x1f;
-	UINT32 mac_cycles = 1;
+	uint32_t cnt = data & 0xff;
+	uint32_t inst = (data >> 8) & 0x1f;
+	uint32_t mac_cycles = 1;
 
-	UINT32 mrab11;
-	UINT32 vtx_addr;
-	UINT32 sram_r_addr;
-	UINT32 sram_w_addr;
-	UINT32 *mac_sram;
+	uint32_t mrab11;
+	uint32_t vtx_addr;
+	uint32_t sram_r_addr;
+	uint32_t sram_w_addr;
+	uint32_t *mac_sram;
 
 	m_mac_stat = BIT(data, 13);
 	m_mac_inst = inst & 0x7;
@@ -299,11 +301,11 @@ WRITE32_MEMBER(micro3d_state::micro3d_mac2_w)
 		case 0x08:
 		{
 			int i;
-			const UINT16 *rom = (UINT16*)m_vertex->base();
+			const uint16_t *rom = (uint16_t*)m_vertex->base();
 
 			for (i = 0; i <= cnt; ++i)
 			{
-				INT64 acc;
+				int64_t acc;
 				micro3d_vtx v1;
 
 				v1.x = VTXROM_FMT(rom[vtx_addr]);   vtx_addr++;
@@ -338,11 +340,11 @@ WRITE32_MEMBER(micro3d_state::micro3d_mac2_w)
 		case 0x0c:
 		{
 			int i;
-			const UINT16 *rom = (UINT16*)m_vertex->base();
+			const uint16_t *rom = (uint16_t*)m_vertex->base();
 
 			for (i = 0; i <= cnt; ++i)
 			{
-				INT64 acc;
+				int64_t acc;
 				micro3d_vtx v1;
 
 				v1.x = VTXROM_FMT(rom[vtx_addr]);   vtx_addr++;
@@ -371,7 +373,7 @@ WRITE32_MEMBER(micro3d_state::micro3d_mac2_w)
 		case 0x0f:
 		{
 			int i;
-			const UINT16 *rom = (UINT16*)m_vertex->base();
+			const uint16_t *rom = (uint16_t*)m_vertex->base();
 
 			for (i = 0; i <= cnt; ++i, vtx_addr += 4)
 			{
@@ -398,7 +400,7 @@ WRITE32_MEMBER(micro3d_state::micro3d_mac2_w)
 			for (i = 0; i <= cnt; ++i)
 			{
 				micro3d_vtx v1;
-				INT64 dp;
+				int64_t dp;
 
 				v1.x = mac_sram[sram_r_addr++];
 				v1.y = mac_sram[sram_r_addr++];
@@ -424,7 +426,7 @@ WRITE32_MEMBER(micro3d_state::micro3d_mac2_w)
 			{
 				micro3d_vtx v1;
 				micro3d_vtx v2;
-				INT64 dp;
+				int64_t dp;
 
 				v1.x = mac_sram[sram_r_addr++];
 				v1.y = mac_sram[sram_r_addr++];
@@ -467,16 +469,16 @@ WRITE32_MEMBER(micro3d_state::micro3d_mac2_w)
 
 READ16_MEMBER(micro3d_state::micro3d_encoder_h_r)
 {
-	UINT16 x_encoder = m_joystick_x ? m_joystick_x->read() : 0;
-	UINT16 y_encoder = m_joystick_y ? m_joystick_y->read() : 0;
+	uint16_t x_encoder = m_joystick_x.read_safe(0);
+	uint16_t y_encoder = m_joystick_y.read_safe(0);
 
 	return (y_encoder & 0xf00) | ((x_encoder & 0xf00) >> 8);
 }
 
 READ16_MEMBER(micro3d_state::micro3d_encoder_l_r)
 {
-	UINT16 x_encoder = m_joystick_x ? m_joystick_x->read() : 0;
-	UINT16 y_encoder = m_joystick_y ? m_joystick_y->read() : 0;
+	uint16_t x_encoder = m_joystick_x.read_safe(0);
+	uint16_t y_encoder = m_joystick_y.read_safe(0);
 
 	return ((y_encoder & 0xff) << 8) | (x_encoder & 0xff);
 }
@@ -485,9 +487,9 @@ TIMER_CALLBACK_MEMBER(micro3d_state::adc_done_callback)
 {
 	switch (param)
 	{
-		case 0: m_adc_val = m_throttle ? m_throttle->read() : 0;
+		case 0: m_adc_val = m_throttle.read_safe(0);
 				break;
-		case 1: m_adc_val = (UINT8)((255.0/100.0) * m_volume->read() + 0.5);
+		case 1: m_adc_val = (uint8_t)((255.0/100.0) * m_volume->read() + 0.5);
 				break;
 		case 2: break;
 		case 3: break;
@@ -579,6 +581,74 @@ WRITE32_MEMBER(micro3d_state::drmath_intr2_ack)
 }
 
 
+/***************************************************************************
+
+    8031 port mappings:
+
+    Port 1                          Port 2
+    =======                         ======
+    0: S/H sel A     (O)            0:
+    1: S/H sel B     (O)            1:
+    2: S/H sel C     (O)            2: uPD bank select (O)
+    3: S/H en        (O)            3: /uPD busy       (I)
+    4: DS1267 data   (O)            4: /uPD reset      (O)
+    5: DS1267 clock  (O)            5: Watchdog reset  (O)
+    6: /DS1267 reset (O)            6:
+    7: Test SW       (I)            7:
+
+***************************************************************************/
+
+
+WRITE8_MEMBER(micro3d_state::micro3d_snd_dac_a)
+{
+	m_noise_1->dac_w(data);
+	m_noise_2->dac_w(data);
+}
+
+WRITE8_MEMBER(micro3d_state::micro3d_snd_dac_b)
+{
+	/* TODO: This controls upd7759 volume */
+}
+
+WRITE8_MEMBER(micro3d_state::micro3d_sound_io_w)
+{
+	m_sound_port_latch[offset] = data;
+
+	switch (offset)
+	{
+		case 0x01:
+		{
+			micro3d_sound_device *noise = (data & 4) ? m_noise_2 : m_noise_1;
+			noise->noise_sh_w(data);
+			break;
+		}
+		case 0x03:
+		{
+			m_upd7759->set_bank_base((data & 0x4) ? 0x20000 : 0);
+			m_upd7759->reset_w((data & 0x10) ? 0 : 1);
+			break;
+		}
+	}
+}
+
+READ8_MEMBER(micro3d_state::micro3d_sound_io_r)
+{
+	switch (offset)
+	{
+		case 0x01:  return (m_sound_port_latch[offset] & 0x7f) | m_sound_sw->read();
+		case 0x03:  return (m_sound_port_latch[offset] & 0xf7) | (m_upd7759->busy_r() ? 0x08 : 0);
+		default:    return 0;
+	}
+}
+
+WRITE8_MEMBER(micro3d_state::micro3d_upd7759_w)
+{
+	m_upd7759->port_w(space, 0, data);
+	m_upd7759->start_w(0);
+	m_upd7759->start_w(1);
+}
+
+
 /*************************************
  *
  *  Driver initialisation
@@ -588,9 +658,6 @@ WRITE32_MEMBER(micro3d_state::drmath_intr2_ack)
 DRIVER_INIT_MEMBER(micro3d_state,micro3d)
 {
 	address_space &space = m_drmath->space(AS_DATA);
-
-	m_audiocpu->i8051_set_serial_tx_callback(write8_delegate(FUNC(micro3d_state::data_from_i8031),this));
-	m_audiocpu->i8051_set_serial_rx_callback(read8_delegate(FUNC(micro3d_state::data_to_i8031),this));
 
 	/* The Am29000 program seems to rely on RAM from 0x00470000 onwards being
 	non-zero on a reset, otherwise the 3D object data doesn't get uploaded! */

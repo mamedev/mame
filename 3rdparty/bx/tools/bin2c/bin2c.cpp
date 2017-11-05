@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2016 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
@@ -95,7 +95,7 @@ void help(const char* _error = NULL)
 
 	fprintf(stderr
 		, "bin2c, binary to C\n"
-		  "Copyright 2011-2016 Branimir Karadzic. All rights reserved.\n"
+		  "Copyright 2011-2017 Branimir Karadzic. All rights reserved.\n"
 		  "License: https://github.com/bkaradzic/bx#license-bsd-2-clause\n\n"
 		);
 
@@ -145,12 +145,12 @@ int main(int _argc, const char* _argv[])
 	}
 
 	void* data = NULL;
-	size_t size = 0;
+	uint32_t size = 0;
 
 	bx::CrtFileReader fr;
 	if (bx::open(&fr, filePath) )
 	{
-		size = (size_t)bx::getSize(&fr);
+		size = uint32_t(bx::getSize(&fr) );
 		data = malloc(size);
 		bx::read(&fr, data, size);
 

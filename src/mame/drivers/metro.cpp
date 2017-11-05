@@ -84,8 +84,7 @@ To Do:
 -   Bang Bang Ball / Bubble Buster slow to a crawl when you press a
     button between levels, on a real PCB it speeds up instead (related
     to above?)
--   vmetal: ES8712 sound may not be quite right. Samples are currently looped, but
-    whether they should and how, is unknown. Where does the M6585 hook up to?
+-   vmetal: ES8712 actually controls a M6585 and an unknown logic selector chip.
 
 Notes:
 
@@ -95,24 +94,22 @@ Notes:
     to be the same on the original board
 -   vmetal: has Sega and Taito logos in the roms ?!
 
-
 driver modified by Hau
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/metro.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/upd7810/upd7810.h"
 #include "cpu/h8/h83006.h"
-#include "includes/metro.h"
-#include "machine/eepromser.h"
 #include "machine/watchdog.h"
-#include "sound/2151intf.h"
-#include "sound/2413intf.h"
+#include "sound/ym2413.h"
 #include "sound/2610intf.h"
-#include "sound/okim6295.h"
 #include "sound/ymf278b.h"
 
+#include "speaker.h"
 
 
 /***************************************************************************
@@ -138,7 +135,7 @@ READ16_MEMBER(metro_state::metro_irq_cause_r)
 
 	*/
 
-	UINT16 res = 0;
+	uint16_t res = 0;
 	for (int i = 0; i < 8; i++)
 		res |= (m_requested_int[i] << i);
 
@@ -152,12 +149,12 @@ void metro_state::update_irq_state()
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	/*  Get the pending IRQs (only the enabled ones, e.g. where irq_enable is *0*)  */
-	UINT16 irq = metro_irq_cause_r(space, 0, 0xffff) & ~*m_irq_enable;
+	uint16_t irq = metro_irq_cause_r(space, 0, 0xffff) & ~*m_irq_enable;
 
 	if (m_irq_line == -1)    /* mouja, gakusai, gakusai2, dokyusei, dokyusp */
 	{
 		/*  This is for games that supply an *IRQ Vector* on the data bus together with an IRQ level for each possible IRQ source */
-		UINT8 irq_level[8] = { 0 };
+		uint8_t irq_level[8] = { 0 };
 		int i;
 
 		for (i = 0; i < 8; i++)
@@ -216,7 +213,7 @@ void metro_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 		metro_blit_done(ptr, param);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in metro_state::device_timer");
+		assert_always(false, "Unknown id in metro_state::device_timer");
 	}
 }
 
@@ -238,7 +235,7 @@ INTERRUPT_GEN_MEMBER(metro_state::karatour_interrupt)
 	m_requested_int[m_vblank_bit] = 1;
 
 	/* write to scroll registers, the duration is a guess */
-	timer_set(attotime::from_usec(2500), TIMER_KARATOUR_IRQ);
+	m_karatour_irq_timer->adjust(attotime::from_usec(2500));
 	m_requested_int[5] = 1;
 
 	update_irq_state();
@@ -270,9 +267,9 @@ INTERRUPT_GEN_MEMBER(metro_state::puzzlet_interrupt)
 READ_LINE_MEMBER(metro_state::metro_rxd_r)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	UINT8 data = soundlatch_byte_r(space, 0);
+	uint8_t data = m_soundlatch->read(space, 0);
 
-	soundlatch_byte_w(space, 0, data >> 1);
+	m_soundlatch->write(space, 0, data >> 1);
 
 	return data & 1;
 
@@ -282,7 +279,7 @@ WRITE16_MEMBER(metro_state::metro_soundlatch_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		soundlatch_byte_w(space, 0, data & 0xff);
+		m_soundlatch->write(space, 0, data & 0xff);
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 		space.device().execute().spin_until_interrupt();
 		m_busy_sndcpu = 1;
@@ -310,7 +307,7 @@ WRITE16_MEMBER(metro_state::metro_soundstatus_w)
 WRITE8_MEMBER(metro_state::metro_sound_rombank_w)
 {
 	int bankaddress;
-	UINT8 *ROM = memregion("audiocpu")->base();
+	uint8_t *ROM = memregion("audiocpu")->base();
 
 	bankaddress = 0x10000-0x4000 + ((data >> 4) & 0x03) * 0x4000;
 	if (bankaddress < 0x10000) bankaddress = 0x0000;
@@ -321,7 +318,7 @@ WRITE8_MEMBER(metro_state::metro_sound_rombank_w)
 WRITE8_MEMBER(metro_state::daitorid_sound_rombank_w)
 {
 	int bankaddress;
-	UINT8 *ROM = memregion("audiocpu")->base();
+	uint8_t *ROM = memregion("audiocpu")->base();
 
 	bankaddress = 0x10000-0x4000 + ((data >> 4) & 0x07) * 0x4000;
 	if (bankaddress < 0x10000) bankaddress = 0x10000;
@@ -486,7 +483,7 @@ WRITE16_MEMBER(metro_state::metro_coin_lockout_4words_w)
 
 READ16_MEMBER(metro_state::metro_bankedrom_r)
 {
-	UINT8 *ROM = memregion("gfx1")->base();
+	uint8_t *ROM = memregion("gfx1")->base();
 	size_t len = memregion("gfx1")->bytes();
 
 	offset = offset * 2 + 0x10000 * (*m_rombank);
@@ -552,12 +549,12 @@ TIMER_CALLBACK_MEMBER(metro_state::metro_blit_done)
 	update_irq_state();
 }
 
-inline int metro_state::blt_read( const UINT8 *ROM, const int offs )
+inline int metro_state::blt_read( const uint8_t *ROM, const int offs )
 {
 	return ROM[offs];
 }
 
-void metro_state::blt_write( address_space &space, const int tmap, const offs_t offs, const UINT16 data, const UINT16 mask )
+void metro_state::blt_write( address_space &space, const int tmap, const offs_t offs, const uint16_t data, const uint16_t mask )
 {
 	switch(tmap)
 	{
@@ -575,15 +572,15 @@ WRITE16_MEMBER(metro_state::metro_blitter_w)
 
 	if (offset == 0x0c / 2)
 	{
-		UINT8 *src     = memregion("gfx1")->base();
+		uint8_t *src     = memregion("gfx1")->base();
 		size_t src_len = memregion("gfx1")->bytes();
 
-		UINT32 tmap     = (m_blitter_regs[0x00 / 2] << 16) + m_blitter_regs[0x02 / 2];
-		UINT32 src_offs = (m_blitter_regs[0x04 / 2] << 16) + m_blitter_regs[0x06 / 2];
-		UINT32 dst_offs = (m_blitter_regs[0x08 / 2] << 16) + m_blitter_regs[0x0a / 2];
+		uint32_t tmap     = (m_blitter_regs[0x00 / 2] << 16) + m_blitter_regs[0x02 / 2];
+		uint32_t src_offs = (m_blitter_regs[0x04 / 2] << 16) + m_blitter_regs[0x06 / 2];
+		uint32_t dst_offs = (m_blitter_regs[0x08 / 2] << 16) + m_blitter_regs[0x0a / 2];
 
 		int shift   = (dst_offs & 0x80) ? 0 : 8;
-		UINT16 mask = (dst_offs & 0x80) ? 0x00ff : 0xff00;
+		uint16_t mask = (dst_offs & 0x80) ? 0x00ff : 0xff00;
 
 //      logerror("CPU #0 PC %06X : Blitter regs %08X, %08X, %08X\n", space.device().safe_pc(), tmap, src_offs, dst_offs);
 
@@ -601,7 +598,7 @@ WRITE16_MEMBER(metro_state::metro_blitter_w)
 
 		while (1)
 		{
-			UINT16 b1, b2, count;
+			uint16_t b1, b2, count;
 
 			src_offs %= src_len;
 			b1 = blt_read(src, src_offs);
@@ -620,7 +617,7 @@ WRITE16_MEMBER(metro_state::metro_blitter_w)
 				       another blit. */
 				if (b1 == 0)
 				{
-					timer_set(attotime::from_usec(500), TIMER_METRO_BLIT_DONE);
+					m_blit_done_timer->adjust(attotime::from_usec(500));
 					return;
 				}
 
@@ -709,28 +706,12 @@ static ADDRESS_MAP_START( metro_sound_map, AS_PROGRAM, 8, metro_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM         /* External ROM */
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")    /* External ROM (Banked) */
 	AM_RANGE(0x8000, 0x87ff) AM_RAM         /* External RAM */
-	AM_RANGE(0xff00, 0xffff) AM_RAM         /* Internal RAM */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( metro_sound_io_map, AS_IO, 8, metro_state )
-	AM_RANGE(UPD7810_PORTA, UPD7810_PORTA) AM_READWRITE(metro_porta_r, metro_porta_w)
-	AM_RANGE(UPD7810_PORTB, UPD7810_PORTB) AM_WRITE(metro_portb_w)
-	AM_RANGE(UPD7810_PORTC, UPD7810_PORTC) AM_WRITE(metro_sound_rombank_w)
 ADDRESS_MAP_END
 
 /*****************/
 
 
-static ADDRESS_MAP_START( daitorid_sound_io_map, AS_IO, 8, metro_state )
-	AM_RANGE(UPD7810_PORTA, UPD7810_PORTA) AM_READWRITE(metro_porta_r, metro_porta_w)
-	AM_RANGE(UPD7810_PORTB, UPD7810_PORTB) AM_WRITE(daitorid_portb_w)
-	AM_RANGE(UPD7810_PORTC, UPD7810_PORTC) AM_WRITE(daitorid_sound_rombank_w)
-ADDRESS_MAP_END
-
-/*****************/
-
-
-static ADDRESS_MAP_START( ymf278_map, AS_0, 8, metro_state )
+static ADDRESS_MAP_START( ymf278_map, 0, 8, metro_state )
 	AM_RANGE(0x000000, 0x27ffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -742,9 +723,9 @@ ADDRESS_MAP_END
 /* Really weird way of mapping 3 DSWs */
 READ16_MEMBER(metro_state::balcube_dsw_r)
 {
-	UINT16 dsw1 = ioport("DSW0")->read() >> 0;
-	UINT16 dsw2 = ioport("DSW0")->read() >> 8;
-	UINT16 dsw3 = ioport("IN2")->read();
+	uint16_t dsw1 = ioport("DSW0")->read() >> 0;
+	uint16_t dsw2 = ioport("DSW0")->read() >> 8;
+	uint16_t dsw3 = ioport("IN2")->read();
 
 	switch (offset * 2)
 	{
@@ -1174,31 +1155,25 @@ ADDRESS_MAP_END
 void metro_state::gakusai_oki_bank_set()
 {
 	int bank = (m_gakusai_oki_bank_lo & 7) + (m_gakusai_oki_bank_hi & 1) * 8;
-	m_oki->set_bank_base(bank * 0x40000);
+	m_oki->set_rom_bank(bank);
 }
 
-WRITE16_MEMBER(metro_state::gakusai_oki_bank_hi_w)
+WRITE8_MEMBER(metro_state::gakusai_oki_bank_hi_w)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		m_gakusai_oki_bank_hi = data & 0xff;
-		gakusai_oki_bank_set();
-	}
+	m_gakusai_oki_bank_hi = data;
+	gakusai_oki_bank_set();
 }
 
-WRITE16_MEMBER(metro_state::gakusai_oki_bank_lo_w)
+WRITE8_MEMBER(metro_state::gakusai_oki_bank_lo_w)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		m_gakusai_oki_bank_lo = data & 0xff;
-		gakusai_oki_bank_set();
-	}
+	m_gakusai_oki_bank_lo = data;
+	gakusai_oki_bank_set();
 }
 
 
 READ16_MEMBER(metro_state::gakusai_input_r)
 {
-	UINT16 input_sel = (*m_input_sel) ^ 0x3e;
+	uint16_t input_sel = (*m_input_sel) ^ 0x3e;
 	// Bit 0 ??
 	if (input_sel & 0x0002) return ioport("KEY0")->read();
 	if (input_sel & 0x0004) return ioport("KEY1")->read();
@@ -1208,24 +1183,21 @@ READ16_MEMBER(metro_state::gakusai_input_r)
 	return 0xffff;
 }
 
-READ16_MEMBER(metro_state::gakusai_eeprom_r)
+READ8_MEMBER(metro_state::gakusai_eeprom_r)
 {
 	return m_eeprom->do_read() & 1;
 }
 
-WRITE16_MEMBER(metro_state::gakusai_eeprom_w)
+WRITE8_MEMBER(metro_state::gakusai_eeprom_w)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		// latch the bit
-		m_eeprom->di_write(BIT(data, 0));
+	// latch the bit
+	m_eeprom->di_write(BIT(data, 0));
 
-		// reset line asserted: reset.
-		m_eeprom->cs_write(BIT(data, 2) ? ASSERT_LINE : CLEAR_LINE );
+	// reset line asserted: reset.
+	m_eeprom->cs_write(BIT(data, 2) ? ASSERT_LINE : CLEAR_LINE );
 
-		// clock line asserted: write latch or select next bit to read
-		m_eeprom->clk_write(BIT(data, 1) ? ASSERT_LINE : CLEAR_LINE );
-	}
+	// clock line asserted: write latch or select next bit to read
+	m_eeprom->clk_write(BIT(data, 1) ? ASSERT_LINE : CLEAR_LINE );
 }
 
 static ADDRESS_MAP_START( gakusai_map, AS_PROGRAM, 16, metro_state )
@@ -1253,11 +1225,11 @@ static ADDRESS_MAP_START( gakusai_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x278888, 0x278889) AM_WRITEONLY AM_SHARE("input_sel")                 // Inputs
 	AM_RANGE(0x279700, 0x279713) AM_WRITEONLY AM_SHARE("videoregs")                 // Video Registers
 	AM_RANGE(0x400000, 0x400001) AM_WRITENOP                                        // ? 5
-	AM_RANGE(0x500000, 0x500001) AM_WRITE(gakusai_oki_bank_lo_w)                    // Sound
+	AM_RANGE(0x500000, 0x500001) AM_WRITE8(gakusai_oki_bank_lo_w, 0x00ff)           // Sound
 	AM_RANGE(0x600000, 0x600003) AM_DEVWRITE8("ymsnd", ym2413_device, write, 0x00ff)
 	AM_RANGE(0x700000, 0x700001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)  // Sound
-	AM_RANGE(0xc00000, 0xc00001) AM_READWRITE(gakusai_eeprom_r, gakusai_eeprom_w)   // EEPROM
-	AM_RANGE(0xd00000, 0xd00001) AM_WRITE(gakusai_oki_bank_hi_w)
+	AM_RANGE(0xc00000, 0xc00001) AM_READWRITE8(gakusai_eeprom_r, gakusai_eeprom_w, 0x00ff)      // EEPROM
+	AM_RANGE(0xd00000, 0xd00001) AM_WRITE8(gakusai_oki_bank_hi_w, 0x00ff)
 	AM_RANGE(0xf00000, 0xf0ffff) AM_RAM AM_MIRROR(0x0f0000)                         // RAM (mirrored)
 ADDRESS_MAP_END
 
@@ -1292,11 +1264,11 @@ static ADDRESS_MAP_START( gakusai2_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x678888, 0x678889) AM_WRITEONLY AM_SHARE("input_sel")                 // Inputs
 	AM_RANGE(0x679700, 0x679713) AM_WRITEONLY AM_SHARE("videoregs")                 // Video Registers
 	AM_RANGE(0x800000, 0x800001) AM_WRITENOP                                        // ? 5
-	AM_RANGE(0x900000, 0x900001) AM_WRITE(gakusai_oki_bank_lo_w)                    // Sound bank
-	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(gakusai_oki_bank_hi_w)                    //
+	AM_RANGE(0x900000, 0x900001) AM_WRITE8(gakusai_oki_bank_lo_w, 0x00ff)           // Sound bank
+	AM_RANGE(0xa00000, 0xa00001) AM_WRITE8(gakusai_oki_bank_hi_w, 0x00ff)           //
 	AM_RANGE(0xb00000, 0xb00001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)  // Sound
 	AM_RANGE(0xc00000, 0xc00003) AM_DEVWRITE8("ymsnd", ym2413_device, write, 0x00ff)
-	AM_RANGE(0xe00000, 0xe00001) AM_READWRITE(gakusai_eeprom_r,gakusai_eeprom_w)    // EEPROM
+	AM_RANGE(0xe00000, 0xe00001) AM_READWRITE8(gakusai_eeprom_r, gakusai_eeprom_w, 0x00ff)      // EEPROM
 	AM_RANGE(0xf00000, 0xf0ffff) AM_RAM AM_MIRROR(0x0f0000)                         // RAM (mirrored)
 ADDRESS_MAP_END
 
@@ -1305,7 +1277,7 @@ ADDRESS_MAP_END
                         Mahjong Doukyuusei Special
 ***************************************************************************/
 
-READ16_MEMBER(metro_state::dokyusp_eeprom_r)
+READ8_MEMBER(metro_state::dokyusp_eeprom_r)
 {
 	// clock line asserted: write latch or select next bit to read
 	m_eeprom->clk_write(CLEAR_LINE);
@@ -1314,26 +1286,20 @@ READ16_MEMBER(metro_state::dokyusp_eeprom_r)
 	return m_eeprom->do_read() & 1;
 }
 
-WRITE16_MEMBER(metro_state::dokyusp_eeprom_bit_w)
+WRITE8_MEMBER(metro_state::dokyusp_eeprom_bit_w)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		// latch the bit
-		m_eeprom->di_write(BIT(data, 0));
+	// latch the bit
+	m_eeprom->di_write(BIT(data, 0));
 
-		// clock line asserted: write latch or select next bit to read
-		m_eeprom->clk_write(CLEAR_LINE);
-		m_eeprom->clk_write(ASSERT_LINE);
-	}
+	// clock line asserted: write latch or select next bit to read
+	m_eeprom->clk_write(CLEAR_LINE);
+	m_eeprom->clk_write(ASSERT_LINE);
 }
 
-WRITE16_MEMBER(metro_state::dokyusp_eeprom_reset_w)
+WRITE8_MEMBER(metro_state::dokyusp_eeprom_reset_w)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		// reset line asserted: reset.
-		m_eeprom->cs_write(BIT(data, 0) ? ASSERT_LINE : CLEAR_LINE);
-	}
+	// reset line asserted: reset.
+	m_eeprom->cs_write(BIT(data, 0) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static ADDRESS_MAP_START( dokyusp_map, AS_PROGRAM, 16, metro_state )
@@ -1361,11 +1327,11 @@ static ADDRESS_MAP_START( dokyusp_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x278888, 0x278889) AM_WRITEONLY AM_SHARE("input_sel")                 //
 	AM_RANGE(0x279700, 0x279713) AM_WRITEONLY AM_SHARE("videoregs")                 // Video Registers
 	AM_RANGE(0x400000, 0x400001) AM_WRITENOP                                        // ? 5
-	AM_RANGE(0x500000, 0x500001) AM_WRITE(gakusai_oki_bank_lo_w)                    // Sound
+	AM_RANGE(0x500000, 0x500001) AM_WRITE8(gakusai_oki_bank_lo_w, 0x00ff)           // Sound
 	AM_RANGE(0x600000, 0x600003) AM_DEVWRITE8("ymsnd", ym2413_device, write, 0x00ff)
 	AM_RANGE(0x700000, 0x700001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)  // Sound
-	AM_RANGE(0xc00000, 0xc00001) AM_WRITE(dokyusp_eeprom_reset_w)                       // EEPROM
-	AM_RANGE(0xd00000, 0xd00001) AM_READWRITE(dokyusp_eeprom_r, dokyusp_eeprom_bit_w)   // EEPROM
+	AM_RANGE(0xc00000, 0xc00001) AM_WRITE8(dokyusp_eeprom_reset_w, 0x00ff)                      // EEPROM
+	AM_RANGE(0xd00000, 0xd00001) AM_READWRITE8(dokyusp_eeprom_r, dokyusp_eeprom_bit_w, 0x00ff)  // EEPROM
 	AM_RANGE(0xf00000, 0xf0ffff) AM_RAM AM_MIRROR(0x0f0000)                         // RAM (mirrored)
 ADDRESS_MAP_END
 
@@ -1402,9 +1368,9 @@ static ADDRESS_MAP_START( dokyusei_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x478886, 0x478887) AM_READ_PORT("DSW1")                               //
 	AM_RANGE(0x478888, 0x478889) AM_WRITEONLY AM_SHARE("input_sel")                 // Inputs
 	AM_RANGE(0x479700, 0x479713) AM_WRITEONLY AM_SHARE("videoregs")                 // Video Registers
-	AM_RANGE(0x800000, 0x800001) AM_WRITE(gakusai_oki_bank_hi_w)                    // Samples Bank?
+	AM_RANGE(0x800000, 0x800001) AM_WRITE8(gakusai_oki_bank_hi_w, 0x00ff)           // Samples Bank?
 	AM_RANGE(0x900000, 0x900001) AM_WRITENOP                                        // ? 4
-	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(gakusai_oki_bank_lo_w)                    // Samples Bank
+	AM_RANGE(0xa00000, 0xa00001) AM_WRITE8(gakusai_oki_bank_lo_w, 0x00ff)           // Samples Bank
 	AM_RANGE(0xc00000, 0xc00003) AM_DEVWRITE8("ymsnd", ym2413_device, write, 0x00ff)     //
 	AM_RANGE(0xd00000, 0xd00001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)  // Sound
 	AM_RANGE(0xf00000, 0xf0ffff) AM_RAM AM_MIRROR(0x0f0000)                         // RAM (mirrored)
@@ -1593,13 +1559,13 @@ ADDRESS_MAP_END
 
 WRITE16_MEMBER(metro_state::blzntrnd_sound_w)
 {
-	soundlatch_byte_w(space, offset, data >> 8);
+	m_soundlatch->write(space, offset, data >> 8);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 WRITE8_MEMBER(metro_state::blzntrnd_sh_bankswitch_w)
 {
-	UINT8 *RAM = memregion("audiocpu")->base();
+	uint8_t *RAM = memregion("audiocpu")->base();
 	int bankaddress;
 
 	bankaddress = 0x10000 + (data & 0x03) * 0x4000;
@@ -1615,7 +1581,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( blzntrnd_sound_io_map, AS_IO, 8, metro_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(blzntrnd_sh_bankswitch_w)
-	AM_RANGE(0x40, 0x40) AM_READ(soundlatch_byte_r) AM_WRITENOP
+	AM_RANGE(0x40, 0x40) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITENOP
 	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
 ADDRESS_MAP_END
 
@@ -1698,7 +1664,7 @@ static ADDRESS_MAP_START( mouja_map, AS_PROGRAM, 16, metro_state )
 #endif
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mouja_okimap, AS_0, 8, metro_state )
+static ADDRESS_MAP_START( mouja_okimap, 0, 8, metro_state )
 	AM_RANGE(0x00000, 0x1ffff) AM_ROM
 	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("okibank")
 ADDRESS_MAP_END
@@ -1716,12 +1682,12 @@ ADDRESS_MAP_END
 
 class puzzlet_io_device : public device_t {
 public:
-	puzzlet_io_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	puzzlet_io_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_WRITE_LINE_MEMBER( ce_w );
 	DECLARE_WRITE_LINE_MEMBER( clk_w );
 
-	template<class _Object> static devcb_base &set_data_cb(device_t &device, _Object object) { return downcast<puzzlet_io_device &>(device).data_cb.set_callback(object); }
+	template <class Object> static devcb_base &set_data_cb(device_t &device, Object &&cb) { return downcast<puzzlet_io_device &>(device).data_cb.set_callback(std::forward<Object>(cb)); }
 
 protected:
 	virtual void device_start() override;
@@ -1732,16 +1698,16 @@ private:
 	required_ioport port;
 	int ce, clk;
 	int cur_bit;
-	UINT8 value;
+	uint8_t value;
 };
 
-const device_type PUZZLET_IO = &device_creator<puzzlet_io_device>;
+DEFINE_DEVICE_TYPE(PUZZLET_IO, puzzlet_io_device, "puzzlet_io", "Puzzlet Coin/Start I/O")
 
 
-puzzlet_io_device::puzzlet_io_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, PUZZLET_IO, "Puzzlet Coin/Start I/O", tag, owner, clock, "puzzlet_io", __FILE__),
-		data_cb(*this),
-		port(*this, ":IN0")
+puzzlet_io_device::puzzlet_io_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, PUZZLET_IO, tag, owner, clock)
+	, data_cb(*this)
+	, port(*this, ":IN0")
 {
 }
 
@@ -1886,10 +1852,9 @@ WRITE8_MEMBER(metro_state::vmetal_control_w)
 //  machine().bookkeeping().coin_lockout_w(0, data & 0x01);  /* always on in game mode?? */
 	machine().bookkeeping().coin_lockout_w(1, data & 0x02);  /* never activated in game mode?? */
 
-	if ((data & 0x40) == 0)
-		m_essnd->reset();
-	else
-		m_essnd->play();
+	m_essnd_gate = BIT(data, 6);
+	if (!m_essnd_gate)
+		m_maincpu->set_input_line(3, CLEAR_LINE);
 
 	if (data & 0x10)
 		m_essnd->set_bank_base(0x100000);
@@ -1900,40 +1865,15 @@ WRITE8_MEMBER(metro_state::vmetal_control_w)
 		logerror("%s: Writing unknown bits %04x to $200000\n",machine().describe_context(),data);
 }
 
-WRITE8_MEMBER(metro_state::vmetal_es8712_w)
+WRITE8_MEMBER(metro_state::es8712_reset_w)
 {
-	/* Many samples in the ADPCM ROM are actually not used.
+	m_essnd->reset();
+}
 
-	Snd         Offset Writes                 Sample Range
-	     0000 0004 0002 0006 000a 0008 000c
-	--   ----------------------------------   -------------
-	00   006e 0001 00ab 003c 0002 003a 003a   01ab6e-023a3c
-	01   003d 0002 003a 001d 0002 007e 007e   023a3d-027e1d
-	02   00e2 0003 0005 002e 0003 00f3 00f3   0305e2-03f32e
-	03   000a 0005 001e 00f6 0005 00ec 00ec   051e0a-05ecf6
-	04   00f7 0005 00ec 008d 0006 0060 0060   05ecf7-06608d
-	05   0016 0008 002e 0014 0009 0019 0019   082e16-091914
-	06   0015 0009 0019 0094 000b 0015 0015   091915-0b1594
-	07   0010 000d 0012 00bf 000d 0035 0035   0d1210-0d35bf
-	08   00ce 000e 002f 0074 000f 0032 0032   0e2fce-0f3274
-	09   0000 0000 0000 003a 0000 007d 007d   000000-007d3a
-	0a   0077 0000 00fa 008d 0001 00b6 00b6   00fa77-01b68d
-	0b   008e 0001 00b6 00b3 0002 0021 0021   01b68e-0221b3
-	0c   0062 0002 00f7 0038 0003 00de 00de   02f762-03de38
-	0d   00b9 0005 00ab 00ef 0006 0016 0016   05abb9-0616ef
-	0e   00dd 0007 0058 00db 0008 001a 001a   0758dd-081adb
-	0f   00dc 0008 001a 002e 0008 008a 008a   081adc-088a2e
-	10   00db 0009 00d7 00ff 000a 0046 0046   09d7db-0a46ff
-	11   0077 000c 0003 006d 000c 0080 0080   0c0377-0c806d
-	12   006e 000c 0080 006c 000d 0002 0002   0c806e-0d026c
-	13   006d 000d 0002 002b 000d 0041 0041   0d026d-0d412b
-	14   002c 000d 0041 002a 000d 00be 00be   0d412c-0dbe2a
-	15   002b 000d 00be 0029 000e 0083 0083   0dbe2b-0e8329
-	16   002a 000e 0083 00ee 000f 0069 0069   0e832a-0f69ee
-	*/
-
-	m_essnd->es8712_w(space, offset, data);
-	logerror("%s: Writing %04x to ES8712 offset %02x\n", machine().describe_context(), data, offset);
+WRITE_LINE_MEMBER(metro_state::vmetal_es8712_irq)
+{
+	if (m_essnd_gate)
+		m_maincpu->set_input_line(3, state);
 }
 
 static ADDRESS_MAP_START( vmetal_map, AS_PROGRAM, 16, metro_state )
@@ -1961,7 +1901,8 @@ static ADDRESS_MAP_START( vmetal_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x300000, 0x31ffff) AM_READ(balcube_dsw_r)                             // DSW x 3
 	AM_RANGE(0x400000, 0x400001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff )
 	AM_RANGE(0x400002, 0x400003) AM_DEVWRITE8("oki", okim6295_device, write, 0x00ff)
-	AM_RANGE(0x500000, 0x50000d) AM_WRITE8(vmetal_es8712_w, 0x00ff)
+	AM_RANGE(0x500000, 0x500001) AM_WRITE8(es8712_reset_w, 0xff00)
+	AM_RANGE(0x500000, 0x50000d) AM_DEVWRITE8("essnd", es8712_device, write, 0x00ff)
 	AM_RANGE(0xf00000, 0xf0ffff) AM_RAM AM_MIRROR(0x0f0000)                         // RAM (mirrored)
 ADDRESS_MAP_END
 
@@ -3149,50 +3090,130 @@ static INPUT_PORTS_START( puzzlet )
 	PORT_START("IN1")       // IN1 - 7f8880.w
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)   // Next
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)   // Next
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)   // Rotate CW
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)   // Rotate CW
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)   // Push
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)   // Push
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN2")       // IN2 - port 7
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_PLAYER(1)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  ) PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW0")      // IN3 - dsw?
-	PORT_DIPUNKNOWN( 0x0001, 0x0001 )
-	PORT_DIPUNKNOWN( 0x0002, 0x0002 )
-	PORT_DIPUNKNOWN( 0x0004, 0x0004 )
+	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Flip_Screen ) )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPUNKNOWN( 0x0002, 0x0002 ) // possibly Demo_Sounds? Verify when sound works.
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Free_Play ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPUNKNOWN( 0x0008, 0x0008 )
-	PORT_DIPUNKNOWN( 0x0010, 0x0010 )
+	PORT_DIPNAME( 0x0010, 0x0010, "Nudity" )
+	PORT_DIPSETTING(      0x0010, "Topless" )
+	PORT_DIPSETTING(      0x0000, "Full" )
 	PORT_DIPUNKNOWN( 0x0020, 0x0020 )
-	PORT_DIPUNKNOWN( 0x0040, 0x0040 )
+	PORT_DIPUNKNOWN( 0x0040, 0x0040 ) // both 0x0040 and 0x0080 switch from 14 to 16 pieces to complete the puzzle. What's the difference between them?
 	PORT_DIPUNKNOWN( 0x0080, 0x0080 )
 
-	PORT_DIPUNKNOWN( 0x0100, 0x0100 )
-	PORT_DIPUNKNOWN( 0x0200, 0x0200 )
-	PORT_DIPUNKNOWN( 0x0400, 0x0400 )
-	PORT_DIPUNKNOWN( 0x0800, 0x0800 )
-	PORT_DIPUNKNOWN( 0x1000, 0x1000 )
-	PORT_DIPUNKNOWN( 0x2000, 0x2000 )
-	PORT_DIPUNKNOWN( 0x4000, 0x4000 )
-	PORT_DIPUNKNOWN( 0x8000, 0x8000 )
+	PORT_DIPNAME( 0xff00, 0xff00, DEF_STR( Coinage ) ) // all other settings redundant
+	PORT_DIPSETTING(      0xef00, DEF_STR( 9C_1C ) )
+	PORT_DIPSETTING(      0xe700, "9 Coins/2 Credits" )
+	PORT_DIPSETTING(      0xeb00, "9 Coins/3 Credits" )
+	PORT_DIPSETTING(      0xe300, "9 Coins/4 Credits" )
+	PORT_DIPSETTING(      0xed00, "9 Coins/5 Credits" )
+	PORT_DIPSETTING(      0xe500, "9 Coins/6 Credits" )
+	PORT_DIPSETTING(      0xe900, "9 Coins/7 Credits" )
+	PORT_DIPSETTING(      0xe100, "9 Coins/8 Credits" )
+	PORT_DIPSETTING(      0xee00, "9 Coins/9 Credits" )
+	PORT_DIPSETTING(      0x1f00, DEF_STR( 8C_1C ) )
+	PORT_DIPSETTING(      0x1700, "8 Coins/2 Credits" )
+	PORT_DIPSETTING(      0x1b00, "8 Coins/3 Credits" )
+	PORT_DIPSETTING(      0x1300, "8 Coins/4 Credits" )
+	PORT_DIPSETTING(      0x1d00, "8 Coins/5 Credits" )
+	PORT_DIPSETTING(      0x1500, "8 Coins/6 Credits" )
+	PORT_DIPSETTING(      0x1900, "8 Coins/7 Credits" )
+	PORT_DIPSETTING(      0x1100, "8 Coins/8 Credits" )
+	PORT_DIPSETTING(      0x1e00, "8 Coins/9 Credits" )
+	PORT_DIPSETTING(      0x9f00, DEF_STR( 7C_1C ) )
+	PORT_DIPSETTING(      0x9700, "7 Coins/2 Credits" )
+	PORT_DIPSETTING(      0x9b00, "7 Coins/3 Credits" )
+	PORT_DIPSETTING(      0x9300, "7 Coins/4 Credits" )
+	PORT_DIPSETTING(      0x9d00, "7 Coins/5 Credits" )
+	PORT_DIPSETTING(      0x9500, "7 Coins/6 Credits" )
+	PORT_DIPSETTING(      0x9900, "7 Coins/7 Credits" )
+	PORT_DIPSETTING(      0x9100, "7 Coins/8 Credits" )
+	PORT_DIPSETTING(      0x9e00, "7 Coins/9 Credits" )
+	PORT_DIPSETTING(      0x5f00, DEF_STR( 6C_1C ) )
+	PORT_DIPSETTING(      0x5700, "6 Coins/2 Credits" )
+	PORT_DIPSETTING(      0x5b00, "6 Coins/3 Credits" )
+	PORT_DIPSETTING(      0x5300, "6 Coins/4 Credits" )
+	PORT_DIPSETTING(      0x5d00, "6 Coins/5 Credits" )
+	PORT_DIPSETTING(      0x5500, "6 Coins/6 Credits" )
+	PORT_DIPSETTING(      0x5900, "6 Coins/7 Credits" )
+	PORT_DIPSETTING(      0x5100, "6 Coins/8 Credits" )
+	PORT_DIPSETTING(      0x5e00, "6 Coins/9 Credits" )
+	PORT_DIPSETTING(      0xdf00, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(      0xd700, "5 Coins/2 Credits" )
+	PORT_DIPSETTING(      0xdb00, DEF_STR( 5C_3C ) )
+	PORT_DIPSETTING(      0xd300, "5 Coins/4 Credits" )
+	PORT_DIPSETTING(      0xdd00, "5 Coins/5 Credits" )
+	PORT_DIPSETTING(      0xd500, "5 Coins/6 Credits" )
+	PORT_DIPSETTING(      0xd900, "5 Coins/7 Credits" )
+	PORT_DIPSETTING(      0xd100, "5 Coins/8 Credits" )
+	PORT_DIPSETTING(      0xde00, "5 Coins/9 Credits" )
+	PORT_DIPSETTING(      0x3f00, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(      0x3700, DEF_STR( 4C_2C ) )
+	PORT_DIPSETTING(      0x3b00, DEF_STR( 4C_3C ) )
+	PORT_DIPSETTING(      0x3300, DEF_STR( 4C_4C ) )
+	PORT_DIPSETTING(      0x3d00, DEF_STR( 4C_5C ) )
+	PORT_DIPSETTING(      0x3500, "4 Coins/6 Credits" )
+	PORT_DIPSETTING(      0x3900, DEF_STR( 4C_7C ) )
+	PORT_DIPSETTING(      0x3100, "4 Coins/8 Credits" )
+	PORT_DIPSETTING(      0x3e00, "4 Coins/9 Credits" )
+	PORT_DIPSETTING(      0xbf00, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(      0xb700, DEF_STR( 3C_2C ) )
+	PORT_DIPSETTING(      0xbb00, DEF_STR( 3C_3C ) )
+	PORT_DIPSETTING(      0xb300, DEF_STR( 3C_4C ) )
+	PORT_DIPSETTING(      0xbd00, "3 Coins/5 Credits" )
+	PORT_DIPSETTING(      0xb500, "3 Coins/6 Credits" )
+	PORT_DIPSETTING(      0xb900, "3 Coins/7 Credits" )
+	PORT_DIPSETTING(      0xb100, "3 Coins/8 Credits" )
+	PORT_DIPSETTING(      0xbe00, "3 Coins/9 Credits" )
+	PORT_DIPSETTING(      0x7f00, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(      0x7700, DEF_STR( 2C_2C ) )
+	PORT_DIPSETTING(      0x7b00, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(      0x7300, DEF_STR( 2C_4C ) )
+	PORT_DIPSETTING(      0x7d00, DEF_STR( 2C_5C ) )
+	PORT_DIPSETTING(      0x7500, DEF_STR( 2C_6C ) )
+	PORT_DIPSETTING(      0x7900, DEF_STR( 2C_7C ) )
+	PORT_DIPSETTING(      0x7100, DEF_STR( 2C_8C ) )
+	PORT_DIPSETTING(      0x7e00, "2 Coins/9 Credits" )
+	PORT_DIPSETTING(      0xff00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(      0xf700, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(      0xfb00, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(      0xf300, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(      0xfd00, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(      0xf500, DEF_STR( 1C_6C ) )
+	PORT_DIPSETTING(      0xf900, DEF_STR( 1C_7C ) )
+	PORT_DIPSETTING(      0xf100, DEF_STR( 1C_8C ) )
+	PORT_DIPSETTING(      0xfe00, DEF_STR( 1C_9C ) )
 INPUT_PORTS_END
 
 
@@ -3626,7 +3647,7 @@ void metro_state::machine_start()
 
 
 
-static MACHINE_CONFIG_START( msgogo, metro_state )
+static MACHINE_CONFIG_START( msgogo )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
@@ -3649,13 +3670,12 @@ static MACHINE_CONFIG_START( msgogo, metro_state )
 	MCFG_PALETTE_FORMAT(GGGGGRRRRRBBBBBx)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymf", YMF278B, YMF278B_STD_CLOCK)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, ymf278_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, ymf278_map)
 	MCFG_YMF278B_IRQ_HANDLER(INPUTLINE("maincpu", 2))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( balcube, msgogo )
@@ -3687,7 +3707,28 @@ static MACHINE_CONFIG_DERIVED( batlbubl, msgogo )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( daitorid, metro_state )
+static MACHINE_CONFIG_START( metro_upd7810_sound )
+	MCFG_CPU_ADD("audiocpu", UPD7810, XTAL_24MHz/2)
+	MCFG_UPD7810_RXD(READLINE(metro_state, metro_rxd_r))
+	MCFG_CPU_PROGRAM_MAP(metro_sound_map)
+	MCFG_UPD7810_PORTA_READ_CB(READ8(metro_state, metro_porta_r))
+	MCFG_UPD7810_PORTA_WRITE_CB(WRITE8(metro_state, metro_porta_w))
+	MCFG_UPD7810_PORTB_WRITE_CB(WRITE8(metro_state, metro_portb_w))
+	MCFG_UPD7810_PORTC_WRITE_CB(WRITE8(metro_state, metro_sound_rombank_w))
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_START( daitorid_upd7810_sound )
+	MCFG_CPU_ADD("audiocpu", UPD7810, XTAL_12MHz)
+	MCFG_UPD7810_RXD(READLINE(metro_state, metro_rxd_r))
+	MCFG_CPU_PROGRAM_MAP(metro_sound_map)
+	MCFG_UPD7810_PORTA_READ_CB(READ8(metro_state, metro_porta_r))
+	MCFG_UPD7810_PORTA_WRITE_CB(WRITE8(metro_state, metro_porta_w))
+	MCFG_UPD7810_PORTB_WRITE_CB(WRITE8(metro_state, daitorid_portb_w))
+	MCFG_UPD7810_PORTC_WRITE_CB(WRITE8(metro_state, daitorid_sound_rombank_w))
+MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_START( daitorid )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)
@@ -3695,10 +3736,7 @@ static MACHINE_CONFIG_START( daitorid, metro_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
 
-	MCFG_CPU_ADD("audiocpu", UPD7810, XTAL_12MHz)
-	MCFG_UPD7810_RXD(READLINE(metro_state,metro_rxd_r))
-	MCFG_CPU_PROGRAM_MAP(metro_sound_map)
-	MCFG_CPU_IO_MAP(daitorid_sound_io_map)
+	MCFG_FRAGMENT_ADD(daitorid_upd7810_sound)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3715,20 +3753,20 @@ static MACHINE_CONFIG_START( daitorid, metro_state )
 	MCFG_PALETTE_FORMAT(GGGGGRRRRRBBBBBx)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_YM2151_ADD("ymsnd", XTAL_3_579545MHz)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", UPD7810_INTF2))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_OKIM6295_ADD("oki", 1200000, OKIM6295_PIN7_HIGH) // sample rate =  M6295 clock / 132
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
+	MCFG_OKIM6295_ADD("oki", 1200000, PIN7_HIGH) // sample rate =  M6295 clock / 132
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( dharma, metro_state )
+static MACHINE_CONFIG_START( dharma )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)
@@ -3736,10 +3774,7 @@ static MACHINE_CONFIG_START( dharma, metro_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
 
-	MCFG_CPU_ADD("audiocpu", UPD7810, XTAL_24MHz/2)
-	MCFG_UPD7810_RXD(READLINE(metro_state,metro_rxd_r))
-	MCFG_CPU_PROGRAM_MAP(metro_sound_map)
-	MCFG_CPU_IO_MAP(metro_sound_io_map)
+	MCFG_FRAGMENT_ADD(metro_upd7810_sound)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3756,19 +3791,19 @@ static MACHINE_CONFIG_START( dharma, metro_state )
 	MCFG_PALETTE_FORMAT(GGGGGRRRRRBBBBBx)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_24MHz/20, OKIM6295_PIN7_HIGH) // sample rate =  M6295 clock / 132
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.10)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.10)
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
+	MCFG_OKIM6295_ADD("oki", XTAL_24MHz/20, PIN7_HIGH) // sample rate =  M6295 clock / 132
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
 	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.90)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( karatour, metro_state )
+static MACHINE_CONFIG_START( karatour )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)
@@ -3776,10 +3811,7 @@ static MACHINE_CONFIG_START( karatour, metro_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  karatour_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
 
-	MCFG_CPU_ADD("audiocpu", UPD7810, XTAL_24MHz/2)
-	MCFG_UPD7810_RXD(READLINE(metro_state,metro_rxd_r))
-	MCFG_CPU_PROGRAM_MAP(metro_sound_map)
-	MCFG_CPU_IO_MAP(metro_sound_io_map)
+	MCFG_FRAGMENT_ADD(metro_upd7810_sound)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3796,19 +3828,19 @@ static MACHINE_CONFIG_START( karatour, metro_state )
 	MCFG_PALETTE_FORMAT(GGGGGRRRRRBBBBBx)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_24MHz/20, OKIM6295_PIN7_HIGH) // was /128.. so pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.10)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.10)
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
+	MCFG_OKIM6295_ADD("oki", XTAL_24MHz/20, PIN7_HIGH) // was /128.. so pin 7 not verified
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
 	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.90)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( 3kokushi, metro_state )
+static MACHINE_CONFIG_START( 3kokushi )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)
@@ -3816,10 +3848,7 @@ static MACHINE_CONFIG_START( 3kokushi, metro_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  karatour_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
 
-	MCFG_CPU_ADD("audiocpu", UPD7810, XTAL_24MHz/2)
-	MCFG_UPD7810_RXD(READLINE(metro_state,metro_rxd_r))
-	MCFG_CPU_PROGRAM_MAP(metro_sound_map)
-	MCFG_CPU_IO_MAP(metro_sound_io_map)
+	MCFG_FRAGMENT_ADD(metro_upd7810_sound)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3836,19 +3865,19 @@ static MACHINE_CONFIG_START( 3kokushi, metro_state )
 	MCFG_PALETTE_FORMAT(GGGGGRRRRRBBBBBx)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_24MHz/20, OKIM6295_PIN7_HIGH) // was /128.. so pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.10)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.10)
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
+	MCFG_OKIM6295_ADD("oki", XTAL_24MHz/20, PIN7_HIGH) // was /128.. so pin 7 not verified
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
 	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.90)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( lastfort, metro_state )
+static MACHINE_CONFIG_START( lastfort )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)
@@ -3856,10 +3885,7 @@ static MACHINE_CONFIG_START( lastfort, metro_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
 
-	MCFG_CPU_ADD("audiocpu", UPD7810, XTAL_24MHz/2)
-	MCFG_UPD7810_RXD(READLINE(metro_state,metro_rxd_r))
-	MCFG_CPU_PROGRAM_MAP(metro_sound_map)
-	MCFG_CPU_IO_MAP(metro_sound_io_map)
+	MCFG_FRAGMENT_ADD(metro_upd7810_sound)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3876,18 +3902,18 @@ static MACHINE_CONFIG_START( lastfort, metro_state )
 	MCFG_PALETTE_FORMAT(GGGGGRRRRRBBBBBx)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_24MHz/20, OKIM6295_PIN7_LOW) // sample rate =  M6295 clock / 165
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.10)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.10)
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
+	MCFG_OKIM6295_ADD("oki", XTAL_24MHz/20, PIN7_LOW) // sample rate =  M6295 clock / 165
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
 	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.90)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( lastforg, metro_state )
+static MACHINE_CONFIG_START( lastforg )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)
@@ -3895,10 +3921,7 @@ static MACHINE_CONFIG_START( lastforg, metro_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  karatour_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
 
-	MCFG_CPU_ADD("audiocpu", UPD7810, XTAL_24MHz/2)
-	MCFG_UPD7810_RXD(READLINE(metro_state,metro_rxd_r))
-	MCFG_CPU_PROGRAM_MAP(metro_sound_map)
-	MCFG_CPU_IO_MAP(metro_sound_io_map)
+	MCFG_FRAGMENT_ADD(metro_upd7810_sound)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3915,18 +3938,18 @@ static MACHINE_CONFIG_START( lastforg, metro_state )
 	MCFG_PALETTE_FORMAT(GGGGGRRRRRBBBBBx)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_24MHz/20, OKIM6295_PIN7_HIGH) // was /128.. so pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.10)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.10)
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
+	MCFG_OKIM6295_ADD("oki", XTAL_24MHz/20, PIN7_HIGH) // was /128.. so pin 7 not verified
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
 	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.90)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( dokyusei, metro_state )
+static MACHINE_CONFIG_START( dokyusei )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
@@ -3949,18 +3972,16 @@ static MACHINE_CONFIG_START( dokyusei, metro_state )
 	MCFG_PALETTE_FORMAT(GGGGGRRRRRBBBBBx)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
+	MCFG_OKIM6295_ADD("oki", 1056000, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.90)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( dokyusp, metro_state )
+static MACHINE_CONFIG_START( dokyusp )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)
@@ -3987,19 +4008,17 @@ static MACHINE_CONFIG_START( dokyusp, metro_state )
 	MCFG_PALETTE_FORMAT(GGGGGRRRRRBBBBBx)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", 2112000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
+	MCFG_OKIM6295_ADD("oki", 2112000, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.90)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( gakusai, metro_state )
+static MACHINE_CONFIG_START( gakusai )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000) /* 26.6660MHz/2?, OSCs listed are 26.6660MHz & 3.579545MHz */
@@ -4026,19 +4045,17 @@ static MACHINE_CONFIG_START( gakusai, metro_state )
 	MCFG_PALETTE_FORMAT(GGGGGRRRRRBBBBBx)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", 2112000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
+	MCFG_OKIM6295_ADD("oki", 2112000, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.90)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.00)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( gakusai2, metro_state )
+static MACHINE_CONFIG_START( gakusai2 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000) /* 26.6660MHz/2?, OSCs listed are 26.6660MHz & 3.579545MHz */
@@ -4065,19 +4082,17 @@ static MACHINE_CONFIG_START( gakusai2, metro_state )
 	MCFG_PALETTE_FORMAT(GGGGGRRRRRBBBBBx)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", 2112000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
+	MCFG_OKIM6295_ADD("oki", 2112000, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.90)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.00)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( pangpoms, metro_state )
+static MACHINE_CONFIG_START( pangpoms )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)
@@ -4085,10 +4100,7 @@ static MACHINE_CONFIG_START( pangpoms, metro_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
 
-	MCFG_CPU_ADD("audiocpu", UPD7810, XTAL_24MHz/2)
-	MCFG_UPD7810_RXD(READLINE(metro_state,metro_rxd_r))
-	MCFG_CPU_PROGRAM_MAP(metro_sound_map)
-	MCFG_CPU_IO_MAP(metro_sound_io_map)
+	MCFG_FRAGMENT_ADD(metro_upd7810_sound)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -4105,19 +4117,19 @@ static MACHINE_CONFIG_START( pangpoms, metro_state )
 	MCFG_PALETTE_FORMAT(GGGGGRRRRRBBBBBx)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_24MHz/20, OKIM6295_PIN7_HIGH) // was /128.. so pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.10)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.10)
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
+	MCFG_OKIM6295_ADD("oki", XTAL_24MHz/20, PIN7_HIGH) // was /128.. so pin 7 not verified
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
 	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.90)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( poitto, metro_state )
+static MACHINE_CONFIG_START( poitto )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)
@@ -4125,10 +4137,7 @@ static MACHINE_CONFIG_START( poitto, metro_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
 
-	MCFG_CPU_ADD("audiocpu", UPD7810, XTAL_24MHz/2)
-	MCFG_UPD7810_RXD(READLINE(metro_state,metro_rxd_r))
-	MCFG_CPU_PROGRAM_MAP(metro_sound_map)
-	MCFG_CPU_IO_MAP(metro_sound_io_map)
+	MCFG_FRAGMENT_ADD(metro_upd7810_sound)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -4145,19 +4154,19 @@ static MACHINE_CONFIG_START( poitto, metro_state )
 	MCFG_PALETTE_FORMAT(GGGGGRRRRRBBBBBx)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_24MHz/20, OKIM6295_PIN7_HIGH) // was /128.. so pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.10)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.10)
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
+	MCFG_OKIM6295_ADD("oki", XTAL_24MHz/20, PIN7_HIGH) // was /128.. so pin 7 not verified
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
 	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.90)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( pururun, metro_state )
+static MACHINE_CONFIG_START( pururun )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)       /* Not confirmed */
@@ -4165,10 +4174,7 @@ static MACHINE_CONFIG_START( pururun, metro_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
 
-	MCFG_CPU_ADD("audiocpu", UPD7810, XTAL_24MHz/2)     /* Not confiremd */
-	MCFG_UPD7810_RXD(READLINE(metro_state,metro_rxd_r))
-	MCFG_CPU_PROGRAM_MAP(metro_sound_map)
-	MCFG_CPU_IO_MAP(daitorid_sound_io_map)
+	MCFG_FRAGMENT_ADD(daitorid_upd7810_sound)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -4185,20 +4191,20 @@ static MACHINE_CONFIG_START( pururun, metro_state )
 	MCFG_PALETTE_FORMAT(GGGGGRRRRRBBBBBx)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_YM2151_ADD("ymsnd", XTAL_3_579545MHz)  /* Confirmed match to reference video */
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", UPD7810_INTF2))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_3_579545MHz/3, OKIM6295_PIN7_HIGH) // sample rate =  M6295 clock / 132
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
+	MCFG_OKIM6295_ADD("oki", XTAL_3_579545MHz/3, PIN7_HIGH) // sample rate =  M6295 clock / 132
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( skyalert, metro_state )
+static MACHINE_CONFIG_START( skyalert )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)
@@ -4206,10 +4212,7 @@ static MACHINE_CONFIG_START( skyalert, metro_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
 
-	MCFG_CPU_ADD("audiocpu", UPD7810, XTAL_24MHz/2)
-	MCFG_UPD7810_RXD(READLINE(metro_state,metro_rxd_r))
-	MCFG_CPU_PROGRAM_MAP(metro_sound_map)
-	MCFG_CPU_IO_MAP(metro_sound_io_map)
+	MCFG_FRAGMENT_ADD(metro_upd7810_sound)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -4226,19 +4229,19 @@ static MACHINE_CONFIG_START( skyalert, metro_state )
 	MCFG_PALETTE_FORMAT(GGGGGRRRRRBBBBBx)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_24MHz/20, OKIM6295_PIN7_LOW) // sample rate =  M6295 clock / 165
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.10)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.10)
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
+	MCFG_OKIM6295_ADD("oki", XTAL_24MHz/20, PIN7_LOW) // sample rate =  M6295 clock / 165
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
 	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.90)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( toride2g, metro_state )
+static MACHINE_CONFIG_START( toride2g )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)
@@ -4246,10 +4249,7 @@ static MACHINE_CONFIG_START( toride2g, metro_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
 
-	MCFG_CPU_ADD("audiocpu", UPD7810, XTAL_24MHz/2)
-	MCFG_UPD7810_RXD(READLINE(metro_state,metro_rxd_r))
-	MCFG_CPU_PROGRAM_MAP(metro_sound_map)
-	MCFG_CPU_IO_MAP(metro_sound_io_map)
+	MCFG_FRAGMENT_ADD(metro_upd7810_sound)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -4266,19 +4266,19 @@ static MACHINE_CONFIG_START( toride2g, metro_state )
 	MCFG_PALETTE_FORMAT(GGGGGRRRRRBBBBBx)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_24MHz/20, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.10)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.10)
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
+	MCFG_OKIM6295_ADD("oki", XTAL_24MHz/20, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
 	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.90)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( mouja, metro_state )
+static MACHINE_CONFIG_START( mouja )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
@@ -4303,19 +4303,17 @@ static MACHINE_CONFIG_START( mouja, metro_state )
 	MCFG_PALETTE_FORMAT(GGGGGRRRRRBBBBBx)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_OKIM6295_ADD("oki", XTAL_16MHz/1024*132, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, mouja_okimap)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_OKIM6295_ADD("oki", XTAL_16MHz/1024*132, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADDRESS_MAP(0, mouja_okimap)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.00)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.00)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( vmetal, metro_state )
+static MACHINE_CONFIG_START( vmetal )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
@@ -4338,21 +4336,20 @@ static MACHINE_CONFIG_START( vmetal, metro_state )
 	MCFG_PALETTE_FORMAT(GGGGGRRRRRBBBBBx)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_1MHz, OKIM6295_PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.75)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.75)
+	MCFG_OKIM6295_ADD("oki", XTAL_1MHz, PIN7_HIGH)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_ES8712_ADD("essnd", 12000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
+	MCFG_ES8712_RESET_HANDLER(WRITELINE(metro_state, vmetal_es8712_irq))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	// OKI M6585 not hooked up...
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( blzntrnd, metro_state )
+static MACHINE_CONFIG_START( blzntrnd )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
@@ -4382,14 +4379,15 @@ static MACHINE_CONFIG_START( blzntrnd, metro_state )
 	MCFG_K053936_OFFSETS(-69, -21)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_16MHz/2)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
-	MCFG_SOUND_ROUTE(1, "lspeaker",  1.0)
-	MCFG_SOUND_ROUTE(2, "rspeaker", 1.0)
+	MCFG_SOUND_ROUTE(0, "mono", 0.25)
+	MCFG_SOUND_ROUTE(1, "mono", 1.0)
+	MCFG_SOUND_ROUTE(2, "mono", 1.0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( gstrik2, blzntrnd )
@@ -4401,7 +4399,7 @@ static MACHINE_CONFIG_DERIVED( gstrik2, blzntrnd )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( puzzlet, metro_state )
+static MACHINE_CONFIG_START( puzzlet )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", H83007, XTAL_20MHz) // H8/3007 - Hitachi HD6413007F20 CPU. Clock 20MHz
@@ -4431,15 +4429,13 @@ static MACHINE_CONFIG_START( puzzlet, metro_state )
 	MCFG_PALETTE_FORMAT(GGGGGRRRRRBBBBBx)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_20MHz/5, OKIM6295_PIN7_LOW)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
+	MCFG_OKIM6295_ADD("oki", XTAL_20MHz/5, PIN7_LOW)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_20MHz/5)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.90)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.90)
+	MCFG_SOUND_ROUTE(0, "mono", 0.90)
 MACHINE_CONFIG_END
 
 
@@ -4546,7 +4542,7 @@ PCB -
  REV: LM2D-Y
  SEL: 00-200-004
 
-Same basic componets as those listed for Bang Bang Ball, except
+Same basic components as those listed for Bang Bang Ball, except
 PCB uses a Xlinix XC9536 istead of the Altera EMP7032LC44 PLD.
 
 Did Limenko license this or bootleg it?  The board doesn't look like a
@@ -6130,7 +6126,7 @@ Notes:
       M6585   - Oki M6585 ADPCM Voice Synthesizer IC (DIP18). Clock 640kHz.
                 Sample rate = 16kHz (selection - pin 1 LOW, pin 2 HIGH = 16kHz)
                 This is a version-up to the previous M5205 with some additional
-                capabilies and improvements.
+                capabilities and improvements.
       MM1035  - Mitsumi Monolithic IC MM1035 System Reset and Watchdog Timer (DIP8)
       uPC3403 - NEC uPC3403 High Performance Quad Operational Amplifier (DIP14)
       62256   - 32k x8 SRAM (DIP28)
@@ -6202,6 +6198,8 @@ void metro_state::metro_common(  )
 	m_irq_line = 2;
 
 	*m_irq_enable = 0;
+
+	m_blit_done_timer = timer_alloc(TIMER_METRO_BLIT_DONE);
 }
 
 
@@ -6229,6 +6227,8 @@ DRIVER_INIT_MEMBER(metro_state,karatour)
 		m_vram_2[i] = machine().rand();
 	}
 
+	m_karatour_irq_timer = timer_alloc(TIMER_KARATOUR_IRQ);
+
 	DRIVER_INIT_CALL(metro);
 }
 
@@ -6248,7 +6248,7 @@ DRIVER_INIT_MEMBER(metro_state,daitorid)
 /* Unscramble the GFX ROMs */
 DRIVER_INIT_MEMBER(metro_state,balcube)
 {
-	UINT8 *ROM         = memregion("gfx1")->base();
+	uint8_t *ROM         = memregion("gfx1")->base();
 	const unsigned len = memregion("gfx1")->bytes();
 
 	for (unsigned i = 0; i < len; i+=2)
@@ -6263,12 +6263,12 @@ DRIVER_INIT_MEMBER(metro_state,balcube)
 
 DRIVER_INIT_MEMBER(metro_state,dharmak)
 {
-	UINT8 *src = memregion( "gfx1" )->base();
+	uint8_t *src = memregion( "gfx1" )->base();
 	int i;
 
 	for (i = 0; i < 0x200000; i += 4)
 	{
-		UINT8 dat;
+		uint8_t dat;
 		dat = src[i + 1];
 		dat = BITSWAP8(dat, 7,3,2,4, 5,6,1,0);
 		src[i + 1] = dat;
@@ -6285,6 +6285,16 @@ DRIVER_INIT_MEMBER(metro_state,blzntrnd)
 {
 	metro_common();
 	m_irq_line = 1;
+
+	m_karatour_irq_timer = timer_alloc(TIMER_KARATOUR_IRQ);
+}
+
+DRIVER_INIT_MEMBER(metro_state,vmetal)
+{
+	metro_common();
+	m_irq_line = 1;
+	m_essnd_gate = false;
+	save_item(NAME(m_essnd_gate));
 }
 
 DRIVER_INIT_MEMBER(metro_state,mouja)
@@ -6312,6 +6322,12 @@ DRIVER_INIT_MEMBER(metro_state,puzzlet)
 	m_blitter_bit = 3;
 }
 
+DRIVER_INIT_MEMBER(metro_state,lastfortg)
+{
+	DRIVER_INIT_CALL(metro);
+	m_karatour_irq_timer = timer_alloc(TIMER_KARATOUR_IRQ);
+}
+
 /***************************************************************************
 
 
@@ -6336,7 +6352,7 @@ GAME( 1994, lastfort,  0,        lastfort, lastfort, metro_state, metro,    ROT0
 GAME( 1994, lastforte, lastfort, lastfort, lastfero, metro_state, metro,    ROT0,   "Metro",                                           "Last Fortress - Toride (Erotic, Rev C)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, lastfortea,lastfort, lastfort, lastfero, metro_state, metro,    ROT0,   "Metro",                                           "Last Fortress - Toride (Erotic, Rev A)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, lastfortk, lastfort, lastfort, lastfero, metro_state, metro,    ROT0,   "Metro",                                           "Last Fortress - Toride (Korea)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1994, lastfortg, lastfort, lastforg, ladykill, metro_state, metro,    ROT0,   "Metro",                                           "Last Fortress - Toride (German)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1994, lastfortg, lastfort, lastforg, ladykill, metro_state, lastfortg,ROT0,   "Metro",                                           "Last Fortress - Toride (German)",        MACHINE_SUPPORTS_SAVE )
 GAME( 1994, toride2g,  0,        toride2g, toride2g, metro_state, metro,    ROT0,   "Metro",                                           "Toride II Adauchi Gaiden",               MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1994, toride2gg, toride2g, toride2g, toride2g, metro_state, metro,    ROT0,   "Metro",                                           "Toride II Adauchi Gaiden (German)",      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1994, toride2gk, toride2g, toride2g, toride2g, metro_state, metro,    ROT0,   "Metro",                                           "Toride II Bok Su Oi Jeon Adauchi Gaiden (Korea)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
@@ -6359,5 +6375,5 @@ GAME( 1996, mouja,     0,        mouja,    mouja,    metro_state, mouja,    ROT0
 GAME( 1997, gakusai,   0,        gakusai,  gakusai,  metro_state, gakusai,  ROT0,   "MakeSoft",                                        "Mahjong Gakuensai (Japan)",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1998, gakusai2,  0,        gakusai2, gakusai,  metro_state, gakusai,  ROT0,   "MakeSoft",                                        "Mahjong Gakuensai 2 (Japan)",            MACHINE_SUPPORTS_SAVE )
 GAME( 2000, puzzlet,   0,        puzzlet,  puzzlet,  metro_state, puzzlet,  ROT0,   "Unies Corporation",                               "Puzzlet (Japan)",                        MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, vmetal,    0,        vmetal,   vmetal,   metro_state, blzntrnd, ROT90,  "Excellent System",                                "Varia Metal",                            MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, vmetaln,   vmetal,   vmetal,   vmetal,   metro_state, blzntrnd, ROT90,  "Excellent System (New Ways Trading Co. license)", "Varia Metal (New Ways Trading Co.)",     MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, vmetal,    0,        vmetal,   vmetal,   metro_state, vmetal,   ROT90,  "Excellent System",                                "Varia Metal",                            MACHINE_SUPPORTS_SAVE )
+GAME( 1995, vmetaln,   vmetal,   vmetal,   vmetal,   metro_state, vmetal,   ROT90,  "Excellent System (New Ways Trading Co. license)", "Varia Metal (New Ways Trading Co.)",     MACHINE_SUPPORTS_SAVE )

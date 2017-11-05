@@ -86,6 +86,7 @@ static const help_item static_help_list[] =
 		"  printf <format>[,<item>[,...]] -- prints one or more <item>s to the console using <format>\n"
 		"  logerror <format>[,<item>[,...]] -- outputs one or more <item>s to the error.log\n"
 		"  tracelog <format>[,<item>[,...]] -- outputs one or more <item>s to the trace file using <format>\n"
+		"  tracesym <item>[,...]] -- outputs one or more <item>s to the trace file\n"
 		"  history [<cpu>,<length>] -- outputs a brief history of visited opcodes\n"
 		"  trackpc [<bool>,<cpu>,<bool>] -- visually track visited opcodes [boolean to turn on and off, for the given cpu, clear]\n"
 		"  trackmem [<bool>,<bool>] -- record which PC writes to each memory address [boolean to turn on and off, clear]\n"
@@ -115,9 +116,9 @@ static const help_item static_help_list[] =
 		"  save <filename>,<address>,<length>[,<cpu>] -- save binary program memory to the given file\n"
 		"  saved <filename>,<address>,<length>[,<cpu>] -- save binary data memory to the given file\n"
 		"  savei <filename>,<address>,<length>[,<cpu>] -- save binary I/O memory to the given file\n"
-		"  load <filename>,<address>,<length>[,<cpu>] -- load binary program memory from the given file\n"
-		"  loadd <filename>,<address>,<length>[,<cpu>] -- load binary data memory from the given file\n"
-		"  loadi <filename>,<address>,<length>[,<cpu>] -- load binary I/O memory from the given file\n"
+		"  load <filename>,<address>[,<length>,<cpu>] -- load binary program memory from the given file\n"
+		"  loadd <filename>,<address>[,<length>,<cpu>] -- load binary data memory from the given file\n"
+		"  loadi <filename>,<address>[,<length>,<cpu>] -- load binary I/O memory from the given file\n"
 		"  map <address> -- map logical program address to physical address and bank\n"
 		"  mapd <address> -- map logical data address to physical address and bank\n"
 		"  mapi <address> -- map logical I/O address to physical address and bank\n"
@@ -140,8 +141,8 @@ static const help_item static_help_list[] =
 		"  focus <cpu> -- focuses debugger only on <cpu>\n"
 		"  ignore [<cpu>[,<cpu>[,...]]] -- stops debugging on <cpu>\n"
 		"  observe [<cpu>[,<cpu>[,...]]] -- resumes debugging on <cpu>\n"
-		"  trace {<filename>|OFF}[,<cpu>[,<action>]] -- trace the given CPU to a file (defaults to active CPU)\n"
-		"  traceover {<filename>|OFF}[,<cpu>[,<action>]] -- trace the given CPU to a file, but skip subroutines (defaults to active CPU)\n"
+		"  trace {<filename>|OFF}[,<cpu>[,<detectloops>[,<action>]]] -- trace the given CPU to a file (defaults to active CPU)\n"
+		"  traceover {<filename>|OFF}[,<cpu>[,<detectloops>[,<action>]]] -- trace the given CPU to a file, but skip subroutines (defaults to active CPU)\n"
 		"  traceflush -- flushes all open trace files\n"
 	},
 	{
@@ -226,6 +227,8 @@ static const help_item static_help_list[] =
 		"  comadd[//] <address>,<comment> -- adds a comment to the disassembled code at given address\n"
 		"  comdelete <address> -- removes a comment from the given address\n"
 		"  comsave -- save the current comments to a file\n"
+		"  comlist -- print currently available comments from file\n"
+		"  commit[/*] <address>,<comment> -- gives a bulk comadd then comsave command\n"
 		"\n"
 	},
 	{
@@ -381,6 +384,22 @@ static const help_item static_help_list[] =
 		"\n"
 		"printf \"A=%d, B=%d\\nC=%d\",a,b,a+b\n"
 		"  Outputs A=<aval>, B=<bval> on one line, and C=<a+bval> on a second line.\n"
+	},
+	{
+		"tracesym",
+		"\n"
+		"  tracesym <item>[,...]\n"
+			"\n"
+			"The tracesym command prints the specified symbols and routes the output to the currently open trace "
+			"file (see the 'trace' command for details). If no file is currently open, tracesym does nothing. "
+			"\n"
+			"Examples:\n"
+			"\n"
+			"tracelog pc\n"
+			"  Outputs PC=<pcval> where <pcval> is displayed in the default format.\n"
+			"\n"
+			"printf a,b\n"
+			"  Outputs A=<aval>, B=<bval> on one line.\n"
 	},
 	{
 		"trackpc",
@@ -608,7 +627,7 @@ static const help_item static_help_list[] =
 	{
 		"load",
 		"\n"
-		"  load[{d|i}] <filename>,<address>,<length>[,<cpu>]\n"
+		"  load[{d|i}] <filename>,<address>[,<length>,<cpu>]\n"
 		"\n"
 		"The load/loadd/loadi commands load raw memory from the binary file specified in the <filename> "
 		"parameter. 'load' will load program space memory, while 'loadd' will load data space memory "
@@ -816,11 +835,15 @@ static const help_item static_help_list[] =
 	{
 		"trace",
 		"\n"
-		"  trace {<filename>|OFF}[,<cpu>[,<action>]]\n"
+		"  trace {<filename>|OFF}[,<cpu>[,[noloop|logerror][,<action>]]]\n"
 		"\n"
 		"Starts or stops tracing of the execution of the specified <cpu>. If <cpu> is omitted, "
 		"the currently active CPU is specified. When enabling tracing, specify the filename in the "
-		"<filename> parameter. To disable tracing, substitute the keyword 'off' for <filename>. If you "
+		"<filename> parameter. To disable tracing, substitute the keyword 'off' for <filename>. "
+		"<detectloops> should be either true or false. If 'noloop' is omitted, the trace "
+		"will have loops detected and condensed to a single line. If 'noloop' is specified, the trace "
+		"will contain every opcode as it is executed. If 'logerror' is specified, logerror output "
+		"will augment the trace.  If you "
 		"wish to log additional information on each trace, you can append an <action> parameter which "
 		"is a command that is executed before each trace is logged. Generally, this is used to include "
 		"a 'tracelog' command. Note that you may need to embed the action within braces { } in order "
@@ -829,11 +852,20 @@ static const help_item static_help_list[] =
 		"\n"
 		"Examples:\n"
 		"\n"
+		"trace joust.tr\n"
+		"  Begin tracing the currently active CPU, logging output to joust.tr.\n"
+		"\n"
 		"trace dribling.tr,0\n"
 		"  Begin tracing the execution of CPU #0, logging output to dribling.tr.\n"
 		"\n"
-		"trace joust.tr\n"
-		"  Begin tracing the currently active CPU, logging output to joust.tr.\n"
+		"trace starswep.tr,0,noloop\n"
+		"  Begin tracing the execution of CPU #0, logging output to starswep.tr, with loop detection disabled.\n"
+		"\n"
+		"trace starswep.tr,0,logerror\n"
+		"  Begin tracing the execution of CPU #0, logging output (along with logerror output) to starswep.tr.\n"
+		"\n"
+		"trace starswep.tr,0,logerror|noloop\n"
+		"  Begin tracing the execution of CPU #0, logging output (along with logerror output) to starswep.tr, with loop detection disabled.\n"
 		"\n"
 		"trace >>pigskin.tr\n"
 		"  Begin tracing the currently active CPU, appending log output to pigskin.tr.\n"
@@ -841,39 +873,44 @@ static const help_item static_help_list[] =
 		"trace off,0\n"
 		"  Turn off tracing on CPU #0.\n"
 		"\n"
-		"trace asteroid.tr,0,{tracelog \"A=%02X \",a}\n"
+		"trace asteroid.tr,0,,{tracelog \"A=%02X \",a}\n"
 		"  Begin tracing the execution of CPU #0, logging output to asteroid.tr. Before each line, "
 		"output A=<aval> to the tracelog.\n"
 	},
 	{
 		"traceover",
 		"\n"
-		"  traceover {<filename>|OFF}[,<cpu>[,<action>]]\n"
+		"  traceover {<filename>|OFF}[,<cpu>[,<detectloops>[,<action>]]]\n"
 		"\n"
 		"Starts or stops tracing of the execution of the specified <cpu>. When tracing reaches "
 		"a subroutine or call, tracing will skip over the subroutine. The same algorithm is used as is "
 		"used in the step over command. This means that traceover will not work properly when calls "
 		"are recusive or the return address is not immediately following the call instruction. If "
-		"<cpu> is omitted, the currently active CPU is specified. When enabling tracing, specify the "
-		"filename in the <filename> parameter. To disable tracing, substitute the keyword 'off' for "
-		"<filename>. If you wish to log additional information on each trace, you can append an <action> "
-		"parameter which is a command that is executed before each trace is logged. Generally, this is "
-		"used to include a 'tracelog' command. Note that you may need to embed the action within braces "
-		"{ } in order to prevent commas and semicolons from being interpreted as applying to the trace "
-		"command itself.\n"
+		"<detectloops> should be either true or false. If <detectloops> is true or omitted, the trace "
+		"will have loops detected and condensed to a single line. If it is false, the trace will contain "
+		"every opcode as it is executed. If <cpu> is omitted, the currently active CPU is specified. When "
+		"enabling tracing, specify the filename in the <filename> parameter. To disable tracing, substitute "
+		"the keyword 'off' for <filename>. If you wish to log additional information on each trace, you can "
+		"append an <action> parameter which is a command that is executed before each trace is logged. "
+		"Generally, this is used to include a 'tracelog' command. Note that you may need to embed the "
+		"action within braces { } in order to prevent commas and semicolons from being interpreted as "
+		"applying to the trace command itself.\n"
 		"\n"
 		"Examples:\n"
-		"\n"
-		"traceover dribling.tr,0\n"
-		"  Begin tracing the execution of CPU #0, logging output to dribling.tr.\n"
 		"\n"
 		"traceover joust.tr\n"
 		"  Begin tracing the currently active CPU, logging output to joust.tr.\n"
 		"\n"
+		"traceover dribling.tr,0\n"
+		"  Begin tracing the execution of CPU #0, logging output to dribling.tr.\n"
+		"\n"
+		"traceover starswep.tr,0,false\n"
+		"  Begin tracing the execution of CPU #0, logging output to starswep.tr, with loop detection disabled.\n"
+		"\n"
 		"traceover off,0\n"
 		"  Turn off tracing on CPU #0.\n"
 		"\n"
-		"traceover asteroid.tr,0,{tracelog \"A=%02X \",a}\n"
+		"traceover asteroid.tr,0,true,{tracelog \"A=%02X \",a}\n"
 		"  Begin tracing the execution of CPU #0, logging output to asteroid.tr. Before each line, "
 		"output A=<aval> to the tracelog.\n"
 	},
@@ -1223,6 +1260,18 @@ static const help_item static_help_list[] =
 		"  Dumps memory to memdump.log.\n"
 	},
 	{
+		"comlist",
+		"\n"
+		"  comlist\n"
+		"\n"
+		"Prints the currently available comment file in human readable form in debugger output window."
+		"\n"
+		"Examples:\n"
+		"\n"
+		"comlist\n"
+		"  Shows currently available comments.\n"
+	},
+	{
 		"comadd",
 		"\n"
 		"  comadd[//] <address>,<comment>\n"
@@ -1236,6 +1285,23 @@ static const help_item static_help_list[] =
 		"  Adds the comment 'hello world.' to the code at address 0x0\n"
 		"\n"
 		"// 10, undocumented opcode!\n"
+		"  Adds the comment 'undocumented opcode!' to the code at address 0x10\n"
+		"\n"
+	},
+	{
+		"commit",
+		"\n"
+		"  commit[/*] <address>,<comment>\n"
+		"\n"
+		"Adds a string <comment> to the disassembled code at <address> then saves to file. Basically same as comadd + comsave via a single line.\n"
+		"The shortcut for this command is simply '/*'\n"
+		"\n"
+		"Examples:\n"
+		"\n"
+		"commit 0, hello world.\n"
+		"  Adds the comment 'hello world.' to the code at address 0x0\n"
+		"\n"
+		"/* 10, undocumented opcode!\n"
 		"  Adds the comment 'undocumented opcode!' to the code at address 0x10\n"
 		"\n"
 	},
@@ -1476,7 +1542,7 @@ const char *debug_get_help(const char *tag)
 
 	/* make a lowercase copy of the tag */
 	for (i = 0; i <= taglen; i++)
-		tagcopy[i] = tolower((UINT8)tag[i]);
+		tagcopy[i] = tolower(u8(tag[i]));
 
 	/* find a match */
 	for (i = 0; i < ARRAY_LENGTH(static_help_list); i++)

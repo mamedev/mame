@@ -46,21 +46,18 @@
 
 
 #include "emu.h"
+#include "includes/mac.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/powerpc/ppc.h"
 #include "cpu/m6805/m6805.h"
-#include "machine/6522via.h"
 #include "machine/applefdc.h"
 #include "machine/swim.h"
 #include "machine/sonydriv.h"
 #include "formats/ap_dsk35.h"
-#include "machine/ram.h"
 #include "bus/scsi/scsi.h"
 #include "bus/scsi/scsihd.h"
 #include "bus/scsi/scsicd.h"
-#include "sound/asc.h"
-#include "sound/awacs.h"
-#include "sound/cdda.h"
+#include "sound/volt_reg.h"
 
 // NuBus and 030/040 PDS cards
 #include "bus/nubus/nubus_48gc.h"
@@ -83,9 +80,9 @@
 // 68000 PDS cards
 #include "bus/macpds/pds_tpdfpd.h"
 
-#include "includes/mac.h"
 #include "machine/macadb.h"
 #include "softlist.h"
+#include "speaker.h"
 #include "mac.lh"
 
 #define C7M (7833600)
@@ -136,7 +133,7 @@ WRITE32_MEMBER( mac_state::rbv_ramdac_w )
 			if (m_model != MODEL_MAC_CLASSIC_II)
 			{
 				// Color Classic has no MONTYPE so the default gets us 512x384, which is right
-				if ((m_montype ? m_montype->read() : 2) == 1)
+				if (m_montype.read_safe(2) == 1)
 				{
 					m_palette->set_pen_color(m_rbv_clutoffs, rgb_t(m_rbv_colors[2], m_rbv_colors[2], m_rbv_colors[2]));
 					m_rbv_palette[m_rbv_clutoffs] = rgb_t(m_rbv_colors[2], m_rbv_colors[2], m_rbv_colors[2]);
@@ -172,7 +169,7 @@ WRITE32_MEMBER( mac_state::ariel_ramdac_w ) // this is for the "Ariel" style RAM
 			if (m_model != MODEL_MAC_CLASSIC_II)
 			{
 				// Color Classic has no MONTYPE so the default gets us 512x384, which is right
-				if ((m_montype ? m_montype->read() : 2) == 1)
+				if (m_montype.read_safe(2) == 1)
 				{
 					m_palette->set_pen_color(m_rbv_clutoffs, rgb_t(m_rbv_colors[2], m_rbv_colors[2], m_rbv_colors[2]));
 					m_rbv_palette[m_rbv_clutoffs] = rgb_t(m_rbv_colors[2], m_rbv_colors[2], m_rbv_colors[2]);
@@ -204,7 +201,7 @@ READ8_MEMBER( mac_state::mac_sonora_vctl_r )
 	if (offset == 2)
 	{
 //        printf("Sonora: read monitor ID at PC=%x\n", m_maincpu->pc());
-		return ((m_montype ? m_montype->read() : 6)<<4);
+		return (m_montype.read_safe(6)<<4);
 	}
 
 	return m_sonora_vctl[offset];
@@ -219,7 +216,7 @@ WRITE8_MEMBER( mac_state::mac_sonora_vctl_w )
 void mac_state::rbv_recalc_irqs()
 {
 	// check slot interrupts and bubble them down to IFR
-	UINT8 slot_irqs = (~m_rbv_regs[2]) & 0x78;
+	uint8_t slot_irqs = (~m_rbv_regs[2]) & 0x78;
 	slot_irqs &= (m_rbv_regs[0x12] & 0x78);
 
 	if (slot_irqs)
@@ -231,7 +228,7 @@ void mac_state::rbv_recalc_irqs()
 		m_rbv_regs[3] &= ~2; // any slot
 	}
 
-	UINT8 ifr = (m_rbv_regs[3] & m_rbv_ier) & 0x1b; //m_rbv_regs[0x13]);
+	uint8_t ifr = (m_rbv_regs[3] & m_rbv_ier) & 0x1b; //m_rbv_regs[0x13]);
 
 //  printf("ifr = %02x (reg3 %02x reg13 %02x)\n", ifr, m_rbv_regs[3], m_rbv_regs[0x13]);
 	if (ifr != 0)
@@ -260,7 +257,7 @@ READ8_MEMBER ( mac_state::mac_rbv_r )
 		if (offset == 0x10)
 		{
 			data &= ~0x38;
-			data |= ((m_montype ? m_montype->read() : 2)<<3);
+			data |= (m_montype.read_safe(2)<<3);
 //            printf("rbv_r montype: %02x (PC %x)\n", data, space.cpu->safe_pc());
 		}
 
@@ -506,7 +503,7 @@ WRITE8_MEMBER(mac_state::amic_dma_w)
 // HMC has one register: a 35-bit shift register which is accessed one bit at a time (see pmac6100 code at 4030383c which makes this obvious)
 READ8_MEMBER(mac_state::hmc_r)
 {
-	UINT8 rv = (UINT8)(m_hmc_shiftout&1);
+	uint8_t rv = (uint8_t)(m_hmc_shiftout&1);
 	m_hmc_shiftout>>= 1;
 	return rv;
 }
@@ -520,7 +517,7 @@ WRITE8_MEMBER(mac_state::hmc_w)
 	}
 	else
 	{
-		UINT64 temp = (data & 1) ? U64(0x400000000) : U64(0x0);
+		uint64_t temp = (data & 1) ? 0x400000000U : 0x0U;
 		m_hmc_reg >>= 1;
 		m_hmc_reg |= temp;
 	}
@@ -566,6 +563,27 @@ WRITE8_MEMBER(mac_state::mac_5396_w)
 		m_539x_1->write(space, 2, data);
 	}
 }
+
+#define MAC_MAIN_SND_BUF_OFFSET 0x0300
+#define MAC_ALT_SND_BUF_OFFSET  0x5F00
+
+TIMER_DEVICE_CALLBACK_MEMBER(mac_state::mac_scanline)
+{
+	int scanline = param;
+	uint16_t *mac_snd_buf_ptr;
+
+	if (m_main_buffer)
+	{
+		mac_snd_buf_ptr = (uint16_t *)(m_ram->pointer() + m_ram->size() - MAC_MAIN_SND_BUF_OFFSET);
+	}
+	else
+	{
+		mac_snd_buf_ptr = (uint16_t *)(m_ram->pointer() + m_ram->size() - MAC_ALT_SND_BUF_OFFSET);
+	}
+
+	m_dac->write(mac_snd_buf_ptr[scanline] >> 8);
+}
+
 
 /***************************************************************************
     ADDRESS MAPS
@@ -799,7 +817,6 @@ static ADDRESS_MAP_START(quadra700_map, AS_PROGRAM, 32, mac_state )
 	AM_RANGE(0x50014000, 0x50015fff) AM_DEVREADWRITE8("asc", asc_device, read, write, 0xffffffff) AM_MIRROR(0x00fc0000)
 	AM_RANGE(0x5001e000, 0x5001ffff) AM_READWRITE16(mac_iwm_r, mac_iwm_w, 0xffffffff) AM_MIRROR(0x00fc0000)
 
-	AM_RANGE(0x50040000, 0x50041fff) AM_READWRITE16(mac_via_r, mac_via_w, 0xffffffff) AM_MIRROR(0x00fc0000)
 	// f9800000 = VDAC / DAFB
 	AM_RANGE(0xf9000000, 0xf91fffff) AM_RAM AM_SHARE("vram")
 	AM_RANGE(0xf9800000, 0xf98001ff) AM_READWRITE(dafb_r, dafb_w)
@@ -811,23 +828,23 @@ static ADDRESS_MAP_START(pwrmac_map, AS_PROGRAM, 64, mac_state )
 
 	AM_RANGE(0x40000000, 0x403fffff) AM_ROM AM_REGION("bootrom", 0) AM_MIRROR(0x0fc00000)
 
-	AM_RANGE(0x50000000, 0x50001fff) AM_READWRITE16(mac_via_r, mac_via_w, U64(0xffffffffffffffff)) AM_MIRROR(0x00f00000)
-	AM_RANGE(0x50004000, 0x50005fff) AM_READWRITE16(mac_scc_r, mac_scc_2_w, U64(0xffffffffffffffff)) AM_MIRROR(0x00f00000)
+	AM_RANGE(0x50000000, 0x50001fff) AM_READWRITE16(mac_via_r, mac_via_w, 0xffffffffffffffffU) AM_MIRROR(0x00f00000)
+	AM_RANGE(0x50004000, 0x50005fff) AM_READWRITE16(mac_scc_r, mac_scc_2_w, 0xffffffffffffffffU) AM_MIRROR(0x00f00000)
 	// 50008000 = ethernet ID PROM
 	// 5000a000 = MACE ethernet controller
-	AM_RANGE(0x50010000, 0x50011fff) AM_READWRITE16(macplus_scsi_r, macii_scsi_w, U64(0xffffffffffffffff)) AM_MIRROR(0x00f00000)
+	AM_RANGE(0x50010000, 0x50011fff) AM_READWRITE16(macplus_scsi_r, macii_scsi_w, 0xffffffffffffffffU) AM_MIRROR(0x00f00000)
 	// 50014000 = sound registers (AWACS)
-	AM_RANGE(0x50014000, 0x50015fff) AM_DEVREADWRITE8("awacs", awacs_device, read, write, U64(0xffffffffffffffff)) AM_MIRROR(0x01f00000)
-	AM_RANGE(0x50016000, 0x50017fff) AM_READWRITE16(mac_iwm_r, mac_iwm_w, U64(0xffffffffffffffff)) AM_MIRROR(0x00f00000)
-	AM_RANGE(0x50024000, 0x50025fff) AM_WRITE32( ariel_ramdac_w, U64(0xffffffffffffffff) ) AM_MIRROR(0x00f00000)
-	AM_RANGE(0x50026000, 0x50027fff) AM_READWRITE16(mac_via2_r, mac_via2_w, U64(0xffffffffffffffff)) AM_MIRROR(0x00f00000)
-	AM_RANGE(0x50028000, 0x50028007) AM_READWRITE8(mac_sonora_vctl_r, mac_sonora_vctl_w, U64(0xffffffffffffffff)) AM_MIRROR(0x00f00000)
+	AM_RANGE(0x50014000, 0x50015fff) AM_DEVREADWRITE8("awacs", awacs_device, read, write, 0xffffffffffffffffU) AM_MIRROR(0x01f00000)
+	AM_RANGE(0x50016000, 0x50017fff) AM_READWRITE16(mac_iwm_r, mac_iwm_w, 0xffffffffffffffffU) AM_MIRROR(0x00f00000)
+	AM_RANGE(0x50024000, 0x50025fff) AM_WRITE32( ariel_ramdac_w, 0xffffffffffffffffU ) AM_MIRROR(0x00f00000)
+	AM_RANGE(0x50026000, 0x50027fff) AM_READWRITE16(mac_via2_r, mac_via2_w, 0xffffffffffffffffU) AM_MIRROR(0x00f00000)
+	AM_RANGE(0x50028000, 0x50028007) AM_READWRITE8(mac_sonora_vctl_r, mac_sonora_vctl_w, 0xffffffffffffffffU) AM_MIRROR(0x00f00000)
 	// 5002a000 = interrupt controller
 	// 5002c000 = diagnostic registers
-	AM_RANGE(0x5002c000, 0x5002dfff) AM_READ8(pmac_diag_r, U64(0xffffffffffffffff)) AM_MIRROR(0x00f00000)
-	AM_RANGE(0x50031000, 0x50032fff) AM_READWRITE8(amic_dma_r, amic_dma_w, U64(0xffffffffffffffff)) AM_MIRROR(0x00f00000)
-	AM_RANGE(0x50040000, 0x5004000f) AM_READWRITE8(hmc_r, hmc_w, U64(0xffffffffffffffff)) AM_MIRROR(0x00f00000)
-	AM_RANGE(0x5ffffff8, 0x5fffffff) AM_READ32(mac_read_id, U64(0xffffffffffffffff))
+	AM_RANGE(0x5002c000, 0x5002dfff) AM_READ8(pmac_diag_r, 0xffffffffffffffffU) AM_MIRROR(0x00f00000)
+	AM_RANGE(0x50031000, 0x50032fff) AM_READWRITE8(amic_dma_r, amic_dma_w, 0xffffffffffffffffU) AM_MIRROR(0x00f00000)
+	AM_RANGE(0x50040000, 0x5004000f) AM_READWRITE8(hmc_r, hmc_w, 0xffffffffffffffffU) AM_MIRROR(0x00f00000)
+	AM_RANGE(0x5ffffff8, 0x5fffffff) AM_READ32(mac_read_id, 0xffffffffffffffffU)
 
 	AM_RANGE(0xffc00000, 0xffffffff) AM_ROM AM_REGION("bootrom", 0)
 ADDRESS_MAP_END
@@ -889,20 +906,17 @@ static const floppy_interface mac_floppy_interface =
 	"floppy_3_5"
 };
 
-static MACHINE_CONFIG_START( mac512ke, mac_state )
+static MACHINE_CONFIG_START( mac512ke )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, C7M)        /* 7.8336 MHz */
 	MCFG_CPU_PROGRAM_MAP(mac512ke_map)
+	MCFG_CPU_DISASSEMBLE_OVERRIDE(mac_state, mac_dasm_override)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD(MAC_SCREEN_NAME, RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60.15)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1260))
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_SIZE(MAC_H_TOTAL, MAC_V_TOTAL)
-	MCFG_SCREEN_VISIBLE_AREA(0, MAC_H_VIS-1, 0, MAC_V_VIS-1)
+	MCFG_SCREEN_RAW_PARAMS(C7M*2, MAC_H_TOTAL, 0, MAC_H_VIS, MAC_V_TOTAL, 0, MAC_V_VIS)
 	MCFG_SCREEN_UPDATE_DRIVER(mac_state, screen_update_mac)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -911,10 +925,13 @@ static MACHINE_CONFIG_START( mac512ke, mac_state )
 
 	MCFG_VIDEO_START_OVERRIDE(mac_state,mac)
 
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mac_state, mac_scanline, "screen", 0, 1)
+
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("custom", MAC_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("dac", DAC_8BIT_PWM, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // 2 x ls161
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 	/* devices */
 	MCFG_RTC3430042_ADD("rtc", XTAL_32_768kHz)
@@ -942,14 +959,6 @@ static MACHINE_CONFIG_START( mac512ke, mac_state )
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("512K")
 MACHINE_CONFIG_END
-
-static MACHINE_CONFIG_DERIVED( mac128k, mac512ke )
-
-	/* internal ram */
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
-MACHINE_CONFIG_END
-
 
 static MACHINE_CONFIG_DERIVED( macplus, mac512ke )
 	MCFG_CPU_MODIFY( "maincpu" )
@@ -1020,10 +1029,11 @@ static MACHINE_CONFIG_DERIVED( macclasc, macplus )
 	MCFG_MACKBD_REMOVE(MACKBD_TAG)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( macprtb, mac_state )
+static MACHINE_CONFIG_START( macprtb )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, C15M)
 	MCFG_CPU_PROGRAM_MAP(macprtb_map)
+	MCFG_CPU_DISASSEMBLE_OVERRIDE(mac_state, mac_dasm_override)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	/* video hardware */
@@ -1043,7 +1053,7 @@ static MACHINE_CONFIG_START( macprtb, mac_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_ASC_ADD("asc", C15M, ASC_TYPE_ASC, WRITELINE(mac_state, mac_asc_irq))
+	MCFG_ASC_ADD("asc", C15M, ASC, WRITELINE(mac_state, mac_asc_irq))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
@@ -1080,17 +1090,18 @@ static MACHINE_CONFIG_START( macprtb, mac_state )
 	MCFG_SOFTWARE_LIST_ADD("hdd_list", "mac_hdd")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( macii, mac_state )
+static MACHINE_CONFIG_START( macii )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68020PMMU, C15M)
 	MCFG_CPU_PROGRAM_MAP(macii_map)
+	MCFG_CPU_DISASSEMBLE_OVERRIDE(mac_state, mac_dasm_override)
 
 	MCFG_PALETTE_ADD("palette", 256)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_ASC_ADD("asc", C15M, ASC_TYPE_ASC, WRITELINE(mac_state, mac_asc_irq))
+	MCFG_ASC_ADD("asc", C15M, ASC, WRITELINE(mac_state, mac_asc_irq))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
@@ -1154,17 +1165,19 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( maciihmu, macii )
 	MCFG_CPU_REPLACE("maincpu", M68020HMMU, C15M)
 	MCFG_CPU_PROGRAM_MAP(macii_map)
+	MCFG_CPU_DISASSEMBLE_OVERRIDE(mac_state, mac_dasm_override)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( maciifx, mac_state )
+static MACHINE_CONFIG_START( maciifx )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68030, 40000000)
 	MCFG_CPU_PROGRAM_MAP(maciifx_map)
+	MCFG_CPU_DISASSEMBLE_OVERRIDE(mac_state, mac_dasm_override)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_ASC_ADD("asc", C15M, ASC_TYPE_ASC, WRITELINE(mac_state, mac_asc_irq))
+	MCFG_ASC_ADD("asc", C15M, ASC, WRITELINE(mac_state, mac_asc_irq))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
@@ -1222,6 +1235,7 @@ static MACHINE_CONFIG_DERIVED( maclc, macii )
 	MCFG_CPU_REPLACE("maincpu", M68020HMMU, C15M)
 	MCFG_CPU_PROGRAM_MAP(maclc_map)
 	MCFG_CPU_VBLANK_INT_DRIVER(MAC_SCREEN_NAME, mac_state,  mac_rbv_vbl)
+	MCFG_CPU_DISASSEMBLE_OVERRIDE(mac_state, mac_dasm_override)
 
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(256)
@@ -1261,7 +1275,7 @@ static MACHINE_CONFIG_DERIVED( maclc, macii )
 	MCFG_NUBUS_OUT_IRQE_CB(WRITELINE(mac_state, nubus_irq_e_w))
 	MCFG_NUBUS_SLOT_ADD("pds","lcpds", mac_lcpds_cards, nullptr)
 
-	MCFG_ASC_REPLACE("asc", C15M, ASC_TYPE_V8, WRITELINE(mac_state, mac_asc_irq))
+	MCFG_ASC_REPLACE("asc", C15M, V8, WRITELINE(mac_state, mac_asc_irq))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
@@ -1278,6 +1292,7 @@ static MACHINE_CONFIG_DERIVED( maclc2, maclc )
 	MCFG_CPU_REPLACE("maincpu", M68030, C15M)
 	MCFG_CPU_PROGRAM_MAP(maclc_map)
 	MCFG_CPU_VBLANK_INT_DRIVER(MAC_SCREEN_NAME, mac_state,  mac_rbv_vbl)
+	MCFG_CPU_DISASSEMBLE_OVERRIDE(mac_state, mac_dasm_override)
 
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("4M")
@@ -1302,6 +1317,7 @@ static MACHINE_CONFIG_DERIVED( maclc3, maclc )
 	MCFG_CPU_REPLACE("maincpu", M68030, 25000000)
 	MCFG_CPU_PROGRAM_MAP(maclc3_map)
 	MCFG_CPU_VBLANK_INT_DRIVER(MAC_SCREEN_NAME, mac_state,  mac_rbv_vbl)
+	MCFG_CPU_DISASSEMBLE_OVERRIDE(mac_state, mac_dasm_override)
 
 	MCFG_VIDEO_START_OVERRIDE(mac_state,macsonora)
 	MCFG_VIDEO_RESET_OVERRIDE(mac_state,macsonora)
@@ -1313,7 +1329,7 @@ static MACHINE_CONFIG_DERIVED( maclc3, maclc )
 	MCFG_RAM_DEFAULT_SIZE("4M")
 	MCFG_RAM_EXTRA_OPTIONS("8M,16M,32M,48M,64M,80M")
 
-	MCFG_ASC_REPLACE("asc", C15M, ASC_TYPE_SONORA, WRITELINE(mac_state, mac_asc_irq))
+	MCFG_ASC_REPLACE("asc", C15M, SONORA, WRITELINE(mac_state, mac_asc_irq))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
@@ -1342,6 +1358,7 @@ static MACHINE_CONFIG_DERIVED( maciivx, maclc )
 	MCFG_CPU_REPLACE("maincpu", M68030, C32M)
 	MCFG_CPU_PROGRAM_MAP(maclc3_map)
 	MCFG_CPU_VBLANK_INT_DRIVER(MAC_SCREEN_NAME, mac_state,  mac_rbv_vbl)
+	MCFG_CPU_DISASSEMBLE_OVERRIDE(mac_state, mac_dasm_override)
 
 	MCFG_VIDEO_START_OVERRIDE(mac_state,macv8)
 	MCFG_VIDEO_RESET_OVERRIDE(mac_state,macrbv)
@@ -1377,6 +1394,7 @@ static MACHINE_CONFIG_DERIVED( maciivi, maclc )
 	MCFG_CPU_REPLACE("maincpu", M68030, C15M)
 	MCFG_CPU_PROGRAM_MAP(maclc3_map)
 	MCFG_CPU_VBLANK_INT_DRIVER(MAC_SCREEN_NAME, mac_state,  mac_rbv_vbl)
+	MCFG_CPU_DISASSEMBLE_OVERRIDE(mac_state, mac_dasm_override)
 
 	MCFG_VIDEO_START_OVERRIDE(mac_state,macv8)
 	MCFG_VIDEO_RESET_OVERRIDE(mac_state,macrbv)
@@ -1411,6 +1429,7 @@ static MACHINE_CONFIG_DERIVED( maciix, macii )
 
 	MCFG_CPU_REPLACE("maincpu", M68030, C15M)
 	MCFG_CPU_PROGRAM_MAP(macii_map)
+	MCFG_CPU_DISASSEMBLE_OVERRIDE(mac_state, mac_dasm_override)
 
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("2M")
@@ -1423,10 +1442,11 @@ static MACHINE_CONFIG_DERIVED( maciicx, maciix )    // IIcx is a IIx with only s
 	MCFG_NUBUS_SLOT_REMOVE("nbe")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( macse30, mac_state )
+static MACHINE_CONFIG_START( macse30 )
 
 	MCFG_CPU_ADD("maincpu", M68030, C15M)
 	MCFG_CPU_PROGRAM_MAP(macse30_map)
+	MCFG_CPU_DISASSEMBLE_OVERRIDE(mac_state, mac_dasm_override)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD(MAC_SCREEN_NAME, RASTER)
@@ -1445,7 +1465,7 @@ static MACHINE_CONFIG_START( macse30, mac_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_ASC_ADD("asc", C15M, ASC_TYPE_ASC, WRITELINE(mac_state, mac_asc_irq))
+	MCFG_ASC_ADD("asc", C15M, ASC, WRITELINE(mac_state, mac_asc_irq))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
@@ -1460,7 +1480,7 @@ static MACHINE_CONFIG_START( macse30, mac_state )
 	MCFG_LEGACY_SCSI_PORT("scsi")
 	MCFG_NCR5380_IRQ_CB(WRITELINE(mac_state, mac_scsi_irq))
 
-	MCFG_DEVICE_ADD("pdss", NUBUS, 0)
+	MCFG_DEVICE_ADD("pds", NUBUS, 0)
 	MCFG_NUBUS_CPU("maincpu")
 	MCFG_NUBUS_OUT_IRQ9_CB(WRITELINE(mac_state, nubus_irq_9_w))
 	MCFG_NUBUS_OUT_IRQA_CB(WRITELINE(mac_state, nubus_irq_a_w))
@@ -1500,10 +1520,11 @@ static MACHINE_CONFIG_START( macse30, mac_state )
 	MCFG_SOFTWARE_LIST_ADD("hdd_list", "mac_hdd")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( macpb140, mac_state )
+static MACHINE_CONFIG_START( macpb140 )
 
 	MCFG_CPU_ADD("maincpu", M68030, C15M)
 	MCFG_CPU_PROGRAM_MAP(macpb140_map)
+	MCFG_CPU_DISASSEMBLE_OVERRIDE(mac_state, mac_dasm_override)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD(MAC_SCREEN_NAME, RASTER)
@@ -1522,7 +1543,7 @@ static MACHINE_CONFIG_START( macpb140, mac_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_ASC_ADD("asc", C15M, ASC_TYPE_ASC, WRITELINE(mac_state, mac_asc_irq))
+	MCFG_ASC_ADD("asc", C15M, ASC, WRITELINE(mac_state, mac_asc_irq))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
@@ -1569,6 +1590,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( macpb145, macpb140 )
 	MCFG_CPU_REPLACE("maincpu", M68030, 25000000)
 	MCFG_CPU_PROGRAM_MAP(macpb140_map)
+	MCFG_CPU_DISASSEMBLE_OVERRIDE(mac_state, mac_dasm_override)
 
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("4M")
@@ -1579,16 +1601,18 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( macpb170, macpb140 )
 	MCFG_CPU_REPLACE("maincpu", M68030, 25000000)
 	MCFG_CPU_PROGRAM_MAP(macpb140_map)
+	MCFG_CPU_DISASSEMBLE_OVERRIDE(mac_state, mac_dasm_override)
 
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("4M")
 	MCFG_RAM_EXTRA_OPTIONS("6M,8M")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( macpb160, mac_state )
+static MACHINE_CONFIG_START( macpb160 )
 
 	MCFG_CPU_ADD("maincpu", M68030, 25000000)
 	MCFG_CPU_PROGRAM_MAP(macpb160_map)
+	MCFG_CPU_DISASSEMBLE_OVERRIDE(mac_state, mac_dasm_override)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD(MAC_SCREEN_NAME, RASTER)
@@ -1607,7 +1631,7 @@ static MACHINE_CONFIG_START( macpb160, mac_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_ASC_ADD("asc", C15M, ASC_TYPE_ASC, WRITELINE(mac_state, mac_asc_irq))
+	MCFG_ASC_ADD("asc", C15M, ASC, WRITELINE(mac_state, mac_asc_irq))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
@@ -1653,6 +1677,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( macpb180, macpb160 )
 	MCFG_CPU_REPLACE("maincpu", M68030, 33000000)
 	MCFG_CPU_PROGRAM_MAP(macpb160_map)
+	MCFG_CPU_DISASSEMBLE_OVERRIDE(mac_state, mac_dasm_override)
 
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("4M")
@@ -1662,6 +1687,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( macpb180c, macpb160 )
 	MCFG_CPU_REPLACE("maincpu", M68030, 33000000)
 	MCFG_CPU_PROGRAM_MAP(macpb165c_map)
+	MCFG_CPU_DISASSEMBLE_OVERRIDE(mac_state, mac_dasm_override)
 
 	MCFG_SCREEN_MODIFY(MAC_SCREEN_NAME)
 	MCFG_SCREEN_SIZE(800, 525)
@@ -1677,6 +1703,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( macpd210, macpb160 )
 	MCFG_CPU_REPLACE("maincpu", M68030, 25000000)
 	MCFG_CPU_PROGRAM_MAP(macpd210_map)
+	MCFG_CPU_DISASSEMBLE_OVERRIDE(mac_state, mac_dasm_override)
 
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("4M")
@@ -1687,6 +1714,7 @@ static MACHINE_CONFIG_DERIVED( macclas2, maclc )
 	MCFG_CPU_REPLACE("maincpu", M68030, C15M)
 	MCFG_CPU_PROGRAM_MAP(maclc_map)
 	MCFG_CPU_VBLANK_INT_DRIVER(MAC_SCREEN_NAME, mac_state,  mac_rbv_vbl)
+	MCFG_CPU_DISASSEMBLE_OVERRIDE(mac_state, mac_dasm_override)
 
 	MCFG_VIDEO_START_OVERRIDE(mac_state,macv8)
 	MCFG_VIDEO_RESET_OVERRIDE(mac_state,maceagle)
@@ -1696,7 +1724,7 @@ static MACHINE_CONFIG_DERIVED( macclas2, maclc )
 	MCFG_SCREEN_VISIBLE_AREA(0, MAC_H_VIS-1, 0, MAC_V_VIS-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mac_state, screen_update_macrbv)
 
-	MCFG_ASC_REPLACE("asc", C15M, ASC_TYPE_EAGLE, WRITELINE(mac_state, mac_asc_irq))
+	MCFG_ASC_REPLACE("asc", C15M, EAGLE, WRITELINE(mac_state, mac_asc_irq))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
@@ -1716,6 +1744,7 @@ static MACHINE_CONFIG_DERIVED( maciici, macii )
 	MCFG_CPU_REPLACE("maincpu", M68030, 25000000)
 	MCFG_CPU_PROGRAM_MAP(maciici_map)
 	MCFG_CPU_VBLANK_INT_DRIVER(MAC_SCREEN_NAME, mac_state,  mac_rbv_vbl)
+	MCFG_CPU_DISASSEMBLE_OVERRIDE(mac_state, mac_dasm_override)
 
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(256)
@@ -1746,6 +1775,7 @@ static MACHINE_CONFIG_DERIVED( maciisi, macii )
 	MCFG_CPU_REPLACE("maincpu", M68030, 20000000)
 	MCFG_CPU_PROGRAM_MAP(maciici_map)
 	MCFG_CPU_VBLANK_INT_DRIVER(MAC_SCREEN_NAME, mac_state,  mac_rbv_vbl)
+	MCFG_CPU_DISASSEMBLE_OVERRIDE(mac_state, mac_dasm_override)
 
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(256)
@@ -1784,7 +1814,7 @@ static MACHINE_CONFIG_DERIVED( maciisi, macii )
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( pwrmac, mac_state )
+static MACHINE_CONFIG_START( pwrmac )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PPC601, 60000000)
@@ -1852,10 +1882,11 @@ static MACHINE_CONFIG_START( pwrmac, mac_state )
 	MCFG_CUDA_VIA_DATA_CALLBACK(DEVWRITELINE("via6522_0", via6522_device, write_cb2))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( macqd700, mac_state )
+static MACHINE_CONFIG_START( macqd700 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68040, 25000000)
 	MCFG_CPU_PROGRAM_MAP(quadra700_map)
+	MCFG_CPU_DISASSEMBLE_OVERRIDE(mac_state, mac_dasm_override)
 
 	MCFG_SCREEN_ADD(MAC_SCREEN_NAME, RASTER)
 	MCFG_SCREEN_REFRESH_RATE(75.08)
@@ -1871,7 +1902,7 @@ static MACHINE_CONFIG_START( macqd700, mac_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_ASC_ADD("asc", C15M, ASC_TYPE_EASC, WRITELINE(mac_state, mac_asc_irq))
+	MCFG_ASC_ADD("asc", C15M, EASC, WRITELINE(mac_state, mac_asc_irq))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
@@ -1927,136 +1958,6 @@ static MACHINE_CONFIG_START( macqd700, mac_state )
 	MCFG_SOFTWARE_LIST_ADD("flop35_list","mac_flop")
 	MCFG_SOFTWARE_LIST_ADD("hdd_list", "mac_hdd")
 MACHINE_CONFIG_END
-
-static INPUT_PORTS_START( macplus )
-	PORT_START("MOUSE0") /* Mouse - button */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Mouse Button") PORT_CODE(MOUSECODE_BUTTON1)
-
-	PORT_START("MOUSE1") /* Mouse - X AXIS */
-	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1)
-
-	PORT_START("MOUSE2") /* Mouse - Y AXIS */
-	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1)
-
-	/* R Nabet 000531 : pseudo-input ports with keyboard layout */
-	/* we only define US layout for keyboard - international layout is different! */
-	/* note : 16 bits at most per port! */
-
-	/* main keyboard pad */
-
-	PORT_START("KEY0")
-	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_A)             PORT_CHAR('a') PORT_CHAR('A')
-	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_S)             PORT_CHAR('s') PORT_CHAR('S')
-	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_D)             PORT_CHAR('d') PORT_CHAR('D')
-	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F)             PORT_CHAR('f') PORT_CHAR('F')
-	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_H)             PORT_CHAR('h') PORT_CHAR('H')
-	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_G)             PORT_CHAR('g') PORT_CHAR('G')
-	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Z)             PORT_CHAR('z') PORT_CHAR('Z')
-	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_X)             PORT_CHAR('x') PORT_CHAR('X')
-	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_C)             PORT_CHAR('c') PORT_CHAR('C')
-	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_V)             PORT_CHAR('v') PORT_CHAR('V')
-	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_UNUSED)    /* extra key on ISO : */
-	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_B)             PORT_CHAR('b') PORT_CHAR('B')
-	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Q)             PORT_CHAR('q') PORT_CHAR('Q')
-	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_W)             PORT_CHAR('w') PORT_CHAR('W')
-	PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_E)             PORT_CHAR('e') PORT_CHAR('E')
-	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_R)             PORT_CHAR('r') PORT_CHAR('R')
-
-	PORT_START("KEY1")
-	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Y)             PORT_CHAR('y') PORT_CHAR('Y')
-	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_T)             PORT_CHAR('t') PORT_CHAR('T')
-	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_1)             PORT_CHAR('1') PORT_CHAR('!')
-	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_2)             PORT_CHAR('2') PORT_CHAR('@')
-	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_3)             PORT_CHAR('3') PORT_CHAR('#')
-	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_4)             PORT_CHAR('4') PORT_CHAR('$')
-	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_6)             PORT_CHAR('6') PORT_CHAR('^')
-	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_5)             PORT_CHAR('5') PORT_CHAR('%')
-	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_EQUALS)        PORT_CHAR('=') PORT_CHAR('+')
-	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_9)             PORT_CHAR('9') PORT_CHAR('(')
-	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_7)             PORT_CHAR('7') PORT_CHAR('&')
-	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS)         PORT_CHAR('-') PORT_CHAR('_')
-	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_8)             PORT_CHAR('8') PORT_CHAR('*')
-	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_0)             PORT_CHAR('0') PORT_CHAR(')')
-	PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_CLOSEBRACE)    PORT_CHAR(']') PORT_CHAR('}')
-	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_O)             PORT_CHAR('o') PORT_CHAR('O')
-
-	PORT_START("KEY2")
-	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_U)             PORT_CHAR('u') PORT_CHAR('U')
-	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_OPENBRACE)     PORT_CHAR('[') PORT_CHAR('{')
-	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_I)             PORT_CHAR('i') PORT_CHAR('I')
-	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_P)             PORT_CHAR('p') PORT_CHAR('P')
-	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Return") PORT_CODE(KEYCODE_ENTER) PORT_CHAR('\r')
-	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_L)             PORT_CHAR('l') PORT_CHAR('L')
-	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_J)             PORT_CHAR('j') PORT_CHAR('J')
-	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_QUOTE)         PORT_CHAR('\'') PORT_CHAR('"')
-	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_K)             PORT_CHAR('k') PORT_CHAR('K')
-	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_COLON)         PORT_CHAR(';') PORT_CHAR(':')
-	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH)     PORT_CHAR('\\') PORT_CHAR('|')
-	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_COMMA)         PORT_CHAR(',') PORT_CHAR('<')
-	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH)         PORT_CHAR('/') PORT_CHAR('?')
-	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_N)             PORT_CHAR('n') PORT_CHAR('N')
-	PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_M)             PORT_CHAR('m') PORT_CHAR('M')
-	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP)          PORT_CHAR('.') PORT_CHAR('>')
-
-	PORT_START("KEY3")
-	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_TAB)           PORT_CHAR('\t')
-	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SPACE)         PORT_CHAR(' ')
-	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_TILDE)         PORT_CHAR('`') PORT_CHAR('~')
-	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSPACE)     PORT_CHAR(8)
-	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_UNUSED)    /* keyboard Enter : */
-	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_UNUSED)    /* escape: */
-	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_UNUSED)    /* ??? */
-	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Command") PORT_CODE(KEYCODE_LCONTROL)
-	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Shift") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
-	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Caps Lock") PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE
-	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Option") PORT_CODE(KEYCODE_LALT) PORT_CHAR(UCHAR_SHIFT_2)
-	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_UNUSED)    /* Control: */
-	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_UNUSED)    /* keypad pseudo-keycode */
-	PORT_BIT(0xE000, IP_ACTIVE_HIGH, IPT_UNUSED)    /* ??? */
-
-	/* keypad */
-	PORT_START("KEY4")
-	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_DEL_PAD)           PORT_CHAR(UCHAR_MAMEKEY(DEL_PAD))
-	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_ASTERISK)          PORT_CHAR(UCHAR_MAMEKEY(ASTERISK))
-	PORT_BIT(0x0038, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_PLUS_PAD)          PORT_CHAR(UCHAR_MAMEKEY(PLUS_PAD))
-	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Keypad Clear") PORT_CODE(/*KEYCODE_NUMLOCK*/KEYCODE_DEL) PORT_CHAR(UCHAR_MAMEKEY(DEL))
-	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Keypad =") PORT_CODE(/*CODE_OTHER*/KEYCODE_NUMLOCK) PORT_CHAR(UCHAR_MAMEKEY(NUMLOCK))
-	PORT_BIT(0x0E00, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER_PAD)         PORT_CHAR(UCHAR_MAMEKEY(ENTER_PAD))
-	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH_PAD)         PORT_CHAR(UCHAR_MAMEKEY(SLASH_PAD))
-	PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS_PAD)         PORT_CHAR(UCHAR_MAMEKEY(MINUS_PAD))
-	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_UNUSED)
-
-	PORT_START("KEY5")
-	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_0_PAD)             PORT_CHAR(UCHAR_MAMEKEY(0_PAD))
-	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_1_PAD)             PORT_CHAR(UCHAR_MAMEKEY(1_PAD))
-	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_2_PAD)             PORT_CHAR(UCHAR_MAMEKEY(2_PAD))
-	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_3_PAD)             PORT_CHAR(UCHAR_MAMEKEY(3_PAD))
-	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_4_PAD)             PORT_CHAR(UCHAR_MAMEKEY(4_PAD))
-	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_5_PAD)             PORT_CHAR(UCHAR_MAMEKEY(5_PAD))
-	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_6_PAD)             PORT_CHAR(UCHAR_MAMEKEY(6_PAD))
-	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_7_PAD)             PORT_CHAR(UCHAR_MAMEKEY(7_PAD))
-	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_8_PAD)             PORT_CHAR(UCHAR_MAMEKEY(8_PAD))
-	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_9_PAD)             PORT_CHAR(UCHAR_MAMEKEY(9_PAD))
-	PORT_BIT(0xE000, IP_ACTIVE_HIGH, IPT_UNUSED)
-
-	/* Arrow keys */
-	PORT_START("KEY6")
-	PORT_BIT(0x0003, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Right Arrow") PORT_CODE(KEYCODE_RIGHT)    PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
-	PORT_BIT(0x0038, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Left Arrow") PORT_CODE(KEYCODE_LEFT)      PORT_CHAR(UCHAR_MAMEKEY(LEFT))
-	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Down Arrow") PORT_CODE(KEYCODE_DOWN)      PORT_CHAR(UCHAR_MAMEKEY(DOWN))
-	PORT_BIT(0x1E00, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Up Arrow") PORT_CODE(KEYCODE_UP)          PORT_CHAR(UCHAR_MAMEKEY(UP))
-	PORT_BIT(0xC000, IP_ACTIVE_HIGH, IPT_UNUSED)
-INPUT_PORTS_END
 
 static INPUT_PORTS_START( macadb )
 	PORT_START("MOUSE0") /* Mouse - button */
@@ -2195,55 +2096,6 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-/*
-ROM_START( mactw )
-    ROM_REGION16_BE(0x20000, "bootrom", 0)
-    ROM_LOAD( "rom4.3t_07-04-83.bin", 0x0000, 0x10000, CRC(d2c42f18) SHA1(f868c09ca70383a69751c37a5a3110a9597462a4) )
-ROM_END
-*/
-
-ROM_START( mac128k )
-	ROM_REGION16_BE(0x20000, "bootrom", 0)
-	ROM_LOAD16_WORD( "mac128k.rom",  0x00000, 0x10000, CRC(6d0c8a28) SHA1(9d86c883aa09f7ef5f086d9e32330ef85f1bc93b) )
-ROM_END
-
-ROM_START( mac512k )
-	ROM_REGION16_BE(0x20000, "bootrom", 0)
-	ROM_LOAD16_WORD( "mac512k.rom",  0x00000, 0x10000, CRC(cf759e0d) SHA1(5b1ced181b74cecd3834c49c2a4aa1d7ffe944d7) )
-ROM_END
-
-ROM_START( unitron )
-	ROM_REGION16_BE(0x20000, "bootrom", 0)
-	ROM_LOAD16_WORD( "unitron_512.rom", 0x00000, 0x10000, CRC(1eabd37f) SHA1(a3d3696c08feac6805effb7ee07b68c2bf1a8dd7) )
-ROM_END
-
-ROM_START( utrn1024 )
-	ROM_REGION16_BE(0x20000, "bootrom", 0)
-	// CRCs match the original "Lonely Hearts" version 1 Mac Plus ROM
-	ROM_LOAD16_BYTE( "macplus_mem_h.e6", 0x000000, 0x010000, CRC(5095fe39) SHA1(be780580033d914b5035d60b5ebbd66bd1d28a9b) )
-	ROM_LOAD16_BYTE( "macplus_mem_l.e7", 0x000001, 0x010000, CRC(fb766270) SHA1(679f529fbfc05f9cc98924c53457d2996dfcb1a7) )
-ROM_END
-
-ROM_START( mac512ke )
-	ROM_REGION16_BE(0x20000, "bootrom", 0)
-	ROM_LOAD16_WORD( "macplus.rom",  0x00000, 0x20000, CRC(b2102e8e) SHA1(7d2f808a045aa3a1b242764f0e2c7d13e288bf1f))
-ROM_END
-
-
-ROM_START( macplus )
-	ROM_REGION16_BE(0x40000, "bootrom", 0)
-	ROM_SYSTEM_BIOS(0, "v3", "Loud Harmonicas")
-	ROMX_LOAD( "macplus.rom",  0x00000, 0x20000, CRC(b2102e8e) SHA1(7d2f808a045aa3a1b242764f0e2c7d13e288bf1f), ROM_GROUPWORD | ROM_BIOS(1) )
-	ROM_SYSTEM_BIOS(1, "v2", "Lonely Heifers")
-	ROMX_LOAD( "23512-1007__342-0342-a.rom-lo.u7d", 0x000000, 0x010000, CRC(5aaa4a2f) SHA1(5dfbfbe279ddadfae691c95f552fd9db41e3ed90), ROM_SKIP(1) | ROM_BIOS(2) )
-	ROMX_LOAD( "23512-1010__342-0341-b.rom-hi.u6d", 0x000001, 0x010000, CRC(65341487) SHA1(bf43fa4f5a3dcbbac20f1fe1deedee0895454379), ROM_SKIP(1) | ROM_BIOS(2) )
-	ROM_SYSTEM_BIOS(2, "v1", "Lonely Hearts")
-	ROMX_LOAD( "4d1eeee1 - macplus v1.rom", 0x000000, 0x020000, CRC(4fa5b399) SHA1(e0da7165b92dee90d8b1522429c033729fa73fd2), ROM_GROUPWORD | ROM_BIOS(3) )
-	ROM_SYSTEM_BIOS(3, "romdisk", "mac68k.info self-boot (1/1/2015)")
-	ROMX_LOAD( "modplus-harp2.bin", 0x000000, 0x028000, CRC(ba56078d) SHA1(debdf328ac73e1662d274a044d8750224f47edef), ROM_GROUPWORD | ROM_BIOS(4) )
-ROM_END
-
-
 ROM_START( macse )
 	ROM_REGION16_BE(0x40000, "bootrom", 0)
 	ROM_LOAD16_WORD( "macse.rom",  0x00000, 0x40000, CRC(0f7ff80c) SHA1(58532b7d0d49659fd5228ac334a1b094f0241968))
@@ -2255,8 +2107,9 @@ ROM_START( macsefd )
 ROM_END
 
 ROM_START( macclasc )
-	ROM_REGION16_BE(0x80000, "bootrom", 0)
-	ROM_LOAD( "a49f9914.rom", 0x000000, 0x080000, CRC(510d7d38) SHA1(ccd10904ddc0fb6a1d216b2e9effd5ec6cf5a83d) )
+	ROM_REGION16_BE(0x80000, "bootrom", 0) // a49f9914, second half of chip dump is the 6.0.3 XO rom disk
+	// this dump is big endian
+	ROM_LOAD( "341-0813__(c)1983-90_apple__japan__910d_d.27c4096_be.ue1", 0x000000, 0x080000, CRC(510d7d38) SHA1(ccd10904ddc0fb6a1d216b2e9effd5ec6cf5a83d) )
 ROM_END
 
 ROM_START( maclc )
@@ -2335,8 +2188,12 @@ ROM_START( maciivi )
 ROM_END
 
 ROM_START( macclas2 )
-	ROM_REGION32_BE(0x100000, "bootrom", 0)
-	ROM_LOAD( "3193670e.rom", 0x000000, 0x080000, CRC(96d2e1fd) SHA1(50df69c1b6e805e12a405dc610bc2a1471b2eac2) )
+	ROM_REGION32_BE(0x100000, "bootrom", 0) // 3193670e
+	//ROM_LOAD( "3193670e.rom", 0x000000, 0x080000, CRC(96d2e1fd) SHA1(50df69c1b6e805e12a405dc610bc2a1471b2eac2) )
+	ROM_LOAD32_BYTE( "341-0867__ba16__(c)apple_91.romhh.27c010.u25", 0x000000, 0x020000, CRC(88230887) SHA1(8f45f6d7eb6a8ec9242a46db4773af1d154409c6) )
+	ROM_LOAD32_BYTE( "341-0866__5be9__(c)apple_91.rommh.27c010.u24", 0x000001, 0x020000, CRC(eae68c36) SHA1(e6ce79647dfe7e66590a012836d0b6e985ff672b) )
+	ROM_LOAD32_BYTE( "341-0865__821e__(c)apple_91.romml.27c010.u23", 0x000002, 0x020000, CRC(cb306c01) SHA1(4d6e409995fd9a4aa9afda0fd790a5b09b1c2aca) )
+	ROM_LOAD32_BYTE( "341-0864__6fc6__(c)apple_91.romll.27c010.u22", 0x000003, 0x020000, CRC(21a51e72) SHA1(bb513c1a5b8a41c7534d66aeacaeea47f58dae92) )
 ROM_END
 
 ROM_START( maclc2 )
@@ -2452,43 +2309,37 @@ ROM_START( maclc520 )
 	ROM_LOAD( "ede66cbd.rom", 0x000000, 0x100000, CRC(a893cb0f) SHA1(c54ee2f45020a4adeb7451adce04cd6e5fb69790) )
 ROM_END
 
-/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT     COMPANY          FULLNAME */
-//COMP( 1983, mactw,    0,        0,  mac128k,  macplus, mac_state,  mac128k512k,  "Apple Computer", "Macintosh (4.3T Prototype)",  MACHINE_NOT_WORKING )
-COMP( 1984, mac128k,  0,        0,  mac128k,  macplus, mac_state,  mac128k512k,  "Apple Computer", "Macintosh 128k",  MACHINE_NOT_WORKING )
-COMP( 1984, mac512k,  mac128k,  0,  mac512ke, macplus, mac_state,  mac128k512k,  "Apple Computer", "Macintosh 512k",  MACHINE_NOT_WORKING )
-COMP( 1986, mac512ke, macplus,  0,  mac512ke, macplus, mac_state,  mac512ke,      "Apple Computer", "Macintosh 512ke", 0 )
-COMP( 1985, unitron,  macplus,  0,  mac512ke, macplus, mac_state,  mac512ke,     "bootleg (Unitron)", "Mac 512",  MACHINE_NOT_WORKING )
-COMP( 1985, utrn1024, macplus,  0,  macplus,  macplus, mac_state,  macplus,      "bootleg (Unitron)", "Unitron 1024",  0 )
-COMP( 1986, macplus,  0,        0,  macplus,  macplus, mac_state,  macplus,   "Apple Computer", "Macintosh Plus",  0 )
-COMP( 1987, macse,    0,        0,  macse,    macadb, mac_state,   macse,         "Apple Computer", "Macintosh SE",  0 )
-COMP( 1987, macsefd,  0,        0,  macse,    macadb, mac_state,   macse,         "Apple Computer", "Macintosh SE (FDHD)",  0 )
-COMP( 1987, macii,    0,        0,  macii,    macadb, mac_state,   macii,         "Apple Computer", "Macintosh II",  0 )
-COMP( 1987, maciihmu, macii,    0,  maciihmu, macadb, mac_state,   macii,         "Apple Computer", "Macintosh II (w/o 68851 MMU)", 0 )
-COMP( 1988, mac2fdhd, 0,        0,  macii,    macadb, mac_state,   maciifdhd,     "Apple Computer", "Macintosh II (FDHD)",  0 )
-COMP( 1988, maciix,   mac2fdhd, 0,  maciix,   macadb, mac_state,   maciix,        "Apple Computer", "Macintosh IIx",  0 )
-COMP( 1989, macprtb,  0,        0,  macprtb,  macadb, mac_state,   macprtb,   "Apple Computer", "Macintosh Portable", MACHINE_NOT_WORKING )
-COMP( 1989, macse30,  mac2fdhd, 0,  macse30,  macadb, mac_state,   macse30,   "Apple Computer", "Macintosh SE/30",  0 )
-COMP( 1989, maciicx,  mac2fdhd, 0,  maciicx,  macadb, mac_state,   maciicx,   "Apple Computer", "Macintosh IIcx",  0 )
-COMP( 1989, maciici,  0,        0,  maciici,  maciici, mac_state,  maciici,   "Apple Computer", "Macintosh IIci", 0 )
-COMP( 1990, maciifx,  0,        0,  maciifx,  macadb, mac_state,   maciifx,      "Apple Computer", "Macintosh IIfx",  MACHINE_NOT_WORKING )
-COMP( 1990, macclasc, 0,        0,  macclasc, macadb, mac_state,   macclassic,    "Apple Computer", "Macintosh Classic",  0 )
-COMP( 1990, maclc,    0,        0,  maclc,    maciici, mac_state,  maclc,         "Apple Computer", "Macintosh LC", MACHINE_IMPERFECT_SOUND )
-COMP( 1990, maciisi,  0,        0,  maciisi,  maciici, mac_state,  maciisi,   "Apple Computer", "Macintosh IIsi", 0 )
-COMP( 1991, macpb100, 0,        0,  macprtb,  macadb, mac_state,   macprtb,   "Apple Computer", "Macintosh PowerBook 100", MACHINE_NOT_WORKING )
-COMP( 1991, macpb140, 0,        0,  macpb140, macadb, mac_state,   macpb140,      "Apple Computer", "Macintosh PowerBook 140", MACHINE_NOT_WORKING )
-COMP( 1991, macpb170, macpb140, 0,  macpb170, macadb, mac_state,   macpb140,      "Apple Computer", "Macintosh PowerBook 170", MACHINE_NOT_WORKING )
-COMP( 1991, macqd700, macpb140, 0,  macqd700, macadb, mac_state,   macquadra700, "Apple Computer", "Macintosh Quadra 700", MACHINE_NOT_WORKING )
-COMP( 1991, macclas2, 0,        0,  macclas2, macadb, mac_state,   macclassic2,  "Apple Computer", "Macintosh Classic II", MACHINE_IMPERFECT_SOUND )
-COMP( 1991, maclc2,   0,        0,  maclc2,   maciici, mac_state,  maclc2,        "Apple Computer", "Macintosh LC II",  MACHINE_IMPERFECT_SOUND )
-COMP( 1992, macpb145, macpb140, 0,  macpb145, macadb, mac_state,   macpb140,      "Apple Computer", "Macintosh PowerBook 145", MACHINE_NOT_WORKING )
-COMP( 1992, macpb160, 0,        0,  macpb160, macadb, mac_state,   macpb160,      "Apple Computer", "Macintosh PowerBook 160", MACHINE_NOT_WORKING )
-COMP( 1992, macpb180, macpb160, 0,  macpb180, macadb, mac_state,   macpb160,      "Apple Computer", "Macintosh PowerBook 180", MACHINE_NOT_WORKING )
-COMP( 1992, macpb180c,macpb160, 0,  macpb180c,macadb, mac_state,   macpb160,     "Apple Computer", "Macintosh PowerBook 180c", MACHINE_NOT_WORKING )
-COMP( 1992, macpd210, 0,        0,  macpd210, macadb, mac_state,   macpd210,     "Apple Computer", "Macintosh PowerBook Duo 210", MACHINE_NOT_WORKING )
-COMP( 1993, maccclas, 0,        0,  maccclas, macadb, mac_state,   maclrcclassic,"Apple Computer", "Macintosh Color Classic", MACHINE_NOT_WORKING )
-COMP( 1992, macpb145b,macpb140, 0,  macpb170, macadb, mac_state,   macpb140,      "Apple Computer", "Macintosh PowerBook 145B", MACHINE_NOT_WORKING )
-COMP( 1993, maclc3,   0,        0,  maclc3,   maciici, mac_state,  maclc3,        "Apple Computer", "Macintosh LC III",  MACHINE_IMPERFECT_SOUND )
-COMP( 1993, maciivx,  0,        0,  maciivx,  maciici, mac_state,  maciivx,   "Apple Computer", "Macintosh IIvx", MACHINE_IMPERFECT_SOUND )
-COMP( 1993, maciivi,  maciivx,  0,  maciivi,  maciici, mac_state,  maciivx,   "Apple Computer", "Macintosh IIvi", MACHINE_IMPERFECT_SOUND )
-COMP( 1993, maclc520, 0,        0,  maclc520, maciici, mac_state,  maclc520,     "Apple Computer", "Macintosh LC 520",  MACHINE_NOT_WORKING )
-COMP( 1994, pmac6100, 0,        0,  pwrmac,   macadb, mac_state,   macpm6100,     "Apple Computer", "Power Macintosh 6100/60",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT    STATE       INIT           COMPANY          FULLNAME */
+//COMP( 1983, mactw,    0,        0,      mac128k,  macplus, mac_state,  mac128k512k,  "Apple Computer", "Macintosh (4.3T Prototype)",  MACHINE_NOT_WORKING )
+COMP( 1987, macse,    0,        0,      macse,    macadb,  mac_state,  macse,        "Apple Computer", "Macintosh SE",  0 )
+COMP( 1987, macsefd,  0,        0,      macse,    macadb,  mac_state,  macse,        "Apple Computer", "Macintosh SE (FDHD)",  0 )
+COMP( 1987, macii,    0,        0,      macii,    macadb,  mac_state,  macii,        "Apple Computer", "Macintosh II",  0 )
+COMP( 1987, maciihmu, macii,    0,      maciihmu, macadb,  mac_state,  macii,        "Apple Computer", "Macintosh II (w/o 68851 MMU)", 0 )
+COMP( 1988, mac2fdhd, 0,        0,      macii,    macadb,  mac_state,  maciifdhd,    "Apple Computer", "Macintosh II (FDHD)",  0 )
+COMP( 1988, maciix,   mac2fdhd, 0,      maciix,   macadb,  mac_state,  maciix,       "Apple Computer", "Macintosh IIx",  0 )
+COMP( 1989, macprtb,  0,        0,      macprtb,  macadb,  mac_state,  macprtb,      "Apple Computer", "Macintosh Portable", MACHINE_NOT_WORKING )
+COMP( 1989, macse30,  mac2fdhd, 0,      macse30,  macadb,  mac_state,  macse30,      "Apple Computer", "Macintosh SE/30",  0 )
+COMP( 1989, maciicx,  mac2fdhd, 0,      maciicx,  macadb,  mac_state,  maciicx,      "Apple Computer", "Macintosh IIcx",  0 )
+COMP( 1989, maciici,  0,        0,      maciici,  maciici, mac_state,  maciici,      "Apple Computer", "Macintosh IIci", 0 )
+COMP( 1990, maciifx,  0,        0,      maciifx,  macadb,  mac_state,  maciifx,      "Apple Computer", "Macintosh IIfx",  MACHINE_NOT_WORKING )
+COMP( 1990, macclasc, 0,        0,      macclasc, macadb,  mac_state,  macclassic,   "Apple Computer", "Macintosh Classic",  0 )
+COMP( 1990, maclc,    0,        0,      maclc,    maciici, mac_state,  maclc,        "Apple Computer", "Macintosh LC", MACHINE_IMPERFECT_SOUND )
+COMP( 1990, maciisi,  0,        0,      maciisi,  maciici, mac_state,  maciisi,      "Apple Computer", "Macintosh IIsi", 0 )
+COMP( 1991, macpb100, 0,        0,      macprtb,  macadb,  mac_state,  macprtb,      "Apple Computer", "Macintosh PowerBook 100", MACHINE_NOT_WORKING )
+COMP( 1991, macpb140, 0,        0,      macpb140, macadb,  mac_state,  macpb140,     "Apple Computer", "Macintosh PowerBook 140", MACHINE_NOT_WORKING )
+COMP( 1991, macpb170, macpb140, 0,      macpb170, macadb,  mac_state,  macpb140,     "Apple Computer", "Macintosh PowerBook 170", MACHINE_NOT_WORKING )
+COMP( 1991, macqd700, macpb140, 0,      macqd700, macadb,  mac_state,  macquadra700, "Apple Computer", "Macintosh Quadra 700", MACHINE_NOT_WORKING )
+COMP( 1991, macclas2, 0,        0,      macclas2, macadb,  mac_state,  macclassic2,  "Apple Computer", "Macintosh Classic II", MACHINE_IMPERFECT_SOUND )
+COMP( 1991, maclc2,   0,        0,      maclc2,   maciici, mac_state,  maclc2,       "Apple Computer", "Macintosh LC II",  MACHINE_IMPERFECT_SOUND )
+COMP( 1992, macpb145, macpb140, 0,      macpb145, macadb,  mac_state,  macpb140,     "Apple Computer", "Macintosh PowerBook 145", MACHINE_NOT_WORKING )
+COMP( 1992, macpb160, 0,        0,      macpb160, macadb,  mac_state,  macpb160,     "Apple Computer", "Macintosh PowerBook 160", MACHINE_NOT_WORKING )
+COMP( 1992, macpb180, macpb160, 0,      macpb180, macadb,  mac_state,  macpb160,     "Apple Computer", "Macintosh PowerBook 180", MACHINE_NOT_WORKING )
+COMP( 1992, macpb180c,macpb160, 0,      macpb180c,macadb,  mac_state,  macpb160,     "Apple Computer", "Macintosh PowerBook 180c", MACHINE_NOT_WORKING )
+COMP( 1992, macpd210, 0,        0,      macpd210, macadb,  mac_state,  macpd210,     "Apple Computer", "Macintosh PowerBook Duo 210", MACHINE_NOT_WORKING )
+COMP( 1993, maccclas, 0,        0,      maccclas, macadb,  mac_state,  maclrcclassic,"Apple Computer", "Macintosh Color Classic", MACHINE_NOT_WORKING )
+COMP( 1992, macpb145b,macpb140, 0,      macpb170, macadb,  mac_state,  macpb140,     "Apple Computer", "Macintosh PowerBook 145B", MACHINE_NOT_WORKING )
+COMP( 1993, maclc3,   0,        0,      maclc3,   maciici, mac_state,  maclc3,       "Apple Computer", "Macintosh LC III",  MACHINE_IMPERFECT_SOUND )
+COMP( 1993, maciivx,  0,        0,      maciivx,  maciici, mac_state,  maciivx,      "Apple Computer", "Macintosh IIvx", MACHINE_IMPERFECT_SOUND )
+COMP( 1993, maciivi,  maciivx,  0,      maciivi,  maciici, mac_state,  maciivx,      "Apple Computer", "Macintosh IIvi", MACHINE_IMPERFECT_SOUND )
+COMP( 1993, maclc520, 0,        0,      maclc520, maciici, mac_state,  maclc520,     "Apple Computer", "Macintosh LC 520",  MACHINE_NOT_WORKING )
+COMP( 1994, pmac6100, 0,        0,      pwrmac,   macadb,  mac_state,  macpm6100,    "Apple Computer", "Power Macintosh 6100/60",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

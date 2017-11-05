@@ -1,12 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:Couriersud
 #include "emu.h"
+#include "includes/dkong.h"
+
 #include "cpu/mcs48/mcs48.h"
 #include "sound/discrete.h"
-
 #include "sound/tms5110.h"
-
-#include "includes/dkong.h"
+#include "speaker.h"
 
 
 /****************************************************************
@@ -1207,12 +1207,6 @@ WRITE8_MEMBER(dkong_state::M58817_command_w)
 	/* FIXME 0x20 is CS */
 }
 
-READ8_MEMBER(dkong_state::M58817_status_r)
-{
-	m58817_device *m58817 = machine().device<m58817_device>("tms");
-	return m58817->status_r(space, offset, mem_mask);
-}
-
 
 /****************************************************************
  *
@@ -1239,7 +1233,7 @@ READ8_MEMBER(dkong_state::dkong_voice_status_r)
 READ8_MEMBER(dkong_state::dkong_tune_r)
 {
 	latch8_device *m_ls175_3d = machine().device<latch8_device>("ls175.3d");
-	UINT8 page = m_dev_vp2->read(space, 0) & 0x47;
+	uint8_t page = m_dev_vp2->read(space, 0) & 0x47;
 
 	if ( page & 0x40 )
 	{
@@ -1284,41 +1278,28 @@ static ADDRESS_MAP_START( dkong_sound_map, AS_PROGRAM, 8, dkong_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dkong_sound_io_map, AS_IO, 8, dkong_state )
-	AM_RANGE(0x00, 0xFF) AM_READWRITE(dkong_tune_r, dkong_voice_w)
-	AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS) AM_READWRITE(dkong_tune_r, dkong_voice_w)
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE(dkong_p1_w) /* only write to dac */
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_LATCH8_READWRITE("virtual_p2")
-	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_LATCH8_READBIT("ls259.6h", 5)
-	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_LATCH8_READBIT("ls259.6h", 4)
+	AM_RANGE(0x00, 0xff) AM_READWRITE(dkong_tune_r, dkong_voice_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dkongjr_sound_io_map, AS_IO, 8, dkong_state )
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff) AM_LATCH8_READ("ls174.3d")
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE(dkong_p1_w) /* only write to dac */
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_LATCH8_READWRITE("virtual_p2")
-	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_LATCH8_READBIT("ls259.6h", 5)
-	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_LATCH8_READBIT("ls259.6h", 4)
+	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff) AM_DEVREAD("ls174.3d", latch8_device, read)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( radarscp1_sound_io_map, AS_IO, 8, dkong_state )
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff) AM_DEVREAD("ls175.3d", latch8_device, read)
 	AM_RANGE(0x00, 0xff) AM_WRITE(dkong_p1_w) /* DAC here */
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_LATCH8_READ("virtual_p1") AM_WRITE(M58817_command_w)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_LATCH8_WRITE("virtual_p2")
-	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_LATCH8_READBIT("ls259.6h", 5)
-	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_LATCH8_READBIT("ls259.6h", 4)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dkong3_sound1_map, AS_PROGRAM, 8, dkong_state )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
-	AM_RANGE(0x4016, 0x4016) AM_LATCH8_READ("latch1")       /* overwrite default */
-	AM_RANGE(0x4017, 0x4017) AM_LATCH8_READ("latch2")
+	AM_RANGE(0x4016, 0x4016) AM_DEVREAD("latch1", latch8_device, read)       /* overwrite default */
+	AM_RANGE(0x4017, 0x4017) AM_DEVREAD("latch2", latch8_device, read)
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dkong3_sound2_map, AS_PROGRAM, 8, dkong_state )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
-	AM_RANGE(0x4016, 0x4016) AM_LATCH8_READ("latch3")       /* overwrite default */
+	AM_RANGE(0x4016, 0x4016) AM_DEVREAD("latch3", latch8_device, read)       /* overwrite default */
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -1328,7 +1309,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-MACHINE_CONFIG_FRAGMENT( dkong2b_audio )
+MACHINE_CONFIG_START( dkong2b_audio )
 
 	/* sound latches */
 	MCFG_LATCH8_ADD("ls175.3d") /* sound cmd latch */
@@ -1336,11 +1317,11 @@ MACHINE_CONFIG_FRAGMENT( dkong2b_audio )
 	MCFG_LATCH8_INVERT(0x0F)
 
 	MCFG_LATCH8_ADD("ls259.6h")
-	MCFG_LATCH8_WRITE_0(DEVWRITE8("discrete", discrete_device, write),DS_SOUND0_INP)
-	MCFG_LATCH8_WRITE_1(DEVWRITE8("discrete", discrete_device, write),DS_SOUND1_INP)
-	MCFG_LATCH8_WRITE_2(DEVWRITE8("discrete", discrete_device, write),DS_SOUND2_INP)
-	MCFG_LATCH8_WRITE_6(DEVWRITE8("discrete", discrete_device, write),DS_SOUND6_INP)
-	MCFG_LATCH8_WRITE_7(DEVWRITE8("discrete", discrete_device, write),DS_SOUND7_INP)
+	MCFG_LATCH8_WRITE_0(DEVWRITELINE("discrete", discrete_device, write_line<DS_SOUND0_INP>))
+	MCFG_LATCH8_WRITE_1(DEVWRITELINE("discrete", discrete_device, write_line<DS_SOUND1_INP>))
+	MCFG_LATCH8_WRITE_2(DEVWRITELINE("discrete", discrete_device, write_line<DS_SOUND2_INP>))
+	MCFG_LATCH8_WRITE_6(DEVWRITELINE("discrete", discrete_device, write_line<DS_SOUND6_INP>))
+	MCFG_LATCH8_WRITE_7(DEVWRITELINE("discrete", discrete_device, write_line<DS_SOUND7_INP>))
 
 	/*   If P2.Bit7 -> is apparently an external signal decay or other output control
 	 *   If P2.Bit6 -> activates the external compressed sample ROM (not radarscp1)
@@ -1351,12 +1332,19 @@ MACHINE_CONFIG_FRAGMENT( dkong2b_audio )
 
 	MCFG_LATCH8_ADD( "virtual_p2" ) /* virtual latch for port B */
 	MCFG_LATCH8_INVERT( 0x20 )      /* signal is inverted       */
-	MCFG_LATCH8_READ_5(DEVREAD8("ls259.6h", latch8_device, read), 3)
-	MCFG_LATCH8_WRITE_7(DEVWRITE8("discrete", discrete_device, write), DS_DISCHARGE_INV)
+	MCFG_LATCH8_READ_5(DEVREADLINE("ls259.6h", latch8_device, bit3_r))
+	MCFG_LATCH8_WRITE_7(DEVWRITELINE("discrete", discrete_device, write_line<DS_DISCHARGE_INV>))
 
 	MCFG_CPU_ADD("soundcpu", MB8884, I8035_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(dkong_sound_map)
 	MCFG_CPU_IO_MAP(dkong_sound_io_map)
+	MCFG_MCS48_PORT_BUS_IN_CB(READ8(dkong_state, dkong_tune_r))
+	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(dkong_state, dkong_voice_w))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(dkong_state, dkong_p1_w)) // only write to dac
+	MCFG_MCS48_PORT_P2_IN_CB(DEVREAD8("virtual_p2", latch8_device, read))
+	MCFG_MCS48_PORT_P2_OUT_CB(DEVWRITE8("virtual_p2", latch8_device, write))
+	MCFG_MCS48_PORT_T0_IN_CB(DEVREADLINE("ls259.6h", latch8_device, bit5_q_r))
+	MCFG_MCS48_PORT_T1_IN_CB(DEVREADLINE("ls259.6h", latch8_device, bit4_q_r))
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_DISCRETE_ADD("discrete", 0, dkong2b)
@@ -1374,12 +1362,15 @@ MACHINE_CONFIG_DERIVED( radarscp1_audio, radarscp_audio )
 
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_CPU_IO_MAP(radarscp1_sound_io_map)
+	MCFG_MCS48_PORT_P1_IN_CB(DEVREAD8("virtual_p1", latch8_device, read))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(dkong_state, M58817_command_w))
+	MCFG_MCS48_PORT_P2_IN_CB(NOOP)
 
 	/* virtual_p2 is not read -see memory map-, all bits are output bits */
 	MCFG_LATCH8_ADD( "virtual_p1" ) /* virtual latch for port A */
 	MCFG_LATCH8_INVERT( 0x80 )      /* signal is inverted       */
-	MCFG_LATCH8_READ_7(DEVREAD8("ls259.6h", latch8_device, read), 3)
-	MCFG_LATCH8_READ_6(READ8(dkong_state, M58817_status_r), 0)
+	MCFG_LATCH8_READ_7(DEVREADLINE("ls259.6h", latch8_device, bit3_r))
+	MCFG_LATCH8_READ_6(DEVREAD8("tms", m58817_device, status_r))
 
 	/* tms memory controller */
 	MCFG_DEVICE_ADD("m58819", M58819, 0)
@@ -1393,33 +1384,38 @@ MACHINE_CONFIG_DERIVED( radarscp1_audio, radarscp_audio )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_FRAGMENT( dkongjr_audio )
+MACHINE_CONFIG_START( dkongjr_audio )
 
 	/* sound latches */
 	MCFG_LATCH8_ADD("ls174.3d")
 	MCFG_LATCH8_MASKOUT(0xE0)
 
 	MCFG_LATCH8_ADD( "ls259.6h")
-	MCFG_LATCH8_WRITE_0(DEVWRITE8("discrete", discrete_device, write), DS_SOUND0_INP)
-	MCFG_LATCH8_WRITE_1(DEVWRITE8("discrete", discrete_device, write), DS_SOUND1_INP)
-	MCFG_LATCH8_WRITE_2(DEVWRITE8("discrete", discrete_device, write), DS_SOUND2_INP)
-	MCFG_LATCH8_WRITE_7(DEVWRITE8("discrete", discrete_device, write), DS_SOUND7_INP)
+	MCFG_LATCH8_WRITE_0(DEVWRITELINE("discrete", discrete_device, write_line<DS_SOUND0_INP>))
+	MCFG_LATCH8_WRITE_1(DEVWRITELINE("discrete", discrete_device, write_line<DS_SOUND1_INP>))
+	MCFG_LATCH8_WRITE_2(DEVWRITELINE("discrete", discrete_device, write_line<DS_SOUND2_INP>))
+	MCFG_LATCH8_WRITE_7(DEVWRITELINE("discrete", discrete_device, write_line<DS_SOUND7_INP>))
 
 	MCFG_LATCH8_ADD( "ls259.5h")
-	MCFG_LATCH8_WRITE_1(DEVWRITE8("discrete", discrete_device, write), DS_SOUND9_INP)
+	MCFG_LATCH8_WRITE_1(DEVWRITELINE("discrete", discrete_device, write_line<DS_SOUND9_INP>))
 
 	MCFG_LATCH8_ADD( "ls259.4h")
 
 	MCFG_LATCH8_ADD( "virtual_p2" ) /* virtual latch for port B */
 	MCFG_LATCH8_INVERT( 0x70 )      /* all signals are inverted */
-	MCFG_LATCH8_READ_6(DEVREAD8("ls259.4h", latch8_device, read), 1)
-	MCFG_LATCH8_READ_5(DEVREAD8("ls259.6h", latch8_device, read), 3)
-	MCFG_LATCH8_READ_4(DEVREAD8("ls259.6h", latch8_device, read), 6)
-	MCFG_LATCH8_WRITE_7(DEVWRITE8("discrete", discrete_device, write), DS_DISCHARGE_INV)
+	MCFG_LATCH8_READ_6(DEVREADLINE("ls259.4h", latch8_device, bit1_r))
+	MCFG_LATCH8_READ_5(DEVREADLINE("ls259.6h", latch8_device, bit3_r))
+	MCFG_LATCH8_READ_4(DEVREADLINE("ls259.6h", latch8_device, bit6_r))
+	MCFG_LATCH8_WRITE_7(DEVWRITELINE("discrete", discrete_device, write_line<DS_DISCHARGE_INV>))
 
 	MCFG_CPU_ADD("soundcpu", MB8884, I8035_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(dkong_sound_map)
 	MCFG_CPU_IO_MAP(dkongjr_sound_io_map)
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(dkong_state, dkong_p1_w)) // only write to dac
+	MCFG_MCS48_PORT_P2_IN_CB(DEVREAD8("virtual_p2", latch8_device, read))
+	MCFG_MCS48_PORT_P2_OUT_CB(DEVWRITE8("virtual_p2", latch8_device, write))
+	MCFG_MCS48_PORT_T0_IN_CB(DEVREADLINE("ls259.6h", latch8_device, bit5_q_r))
+	MCFG_MCS48_PORT_T1_IN_CB(DEVREADLINE("ls259.6h", latch8_device, bit4_q_r))
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
@@ -1427,13 +1423,13 @@ MACHINE_CONFIG_FRAGMENT( dkongjr_audio )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_FRAGMENT( dkong3_audio )
+MACHINE_CONFIG_START( dkong3_audio )
 
-	MCFG_CPU_ADD("n2a03a", N2A03,N2A03_DEFAULTCLOCK)
+	MCFG_CPU_ADD("n2a03a", N2A03, NTSC_APU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(dkong3_sound1_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", dkong_state, nmi_line_pulse)
 
-	MCFG_CPU_ADD("n2a03b", N2A03,N2A03_DEFAULTCLOCK)
+	MCFG_CPU_ADD("n2a03b", N2A03, NTSC_APU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(dkong3_sound2_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", dkong_state, nmi_line_pulse)
 

@@ -33,7 +33,7 @@ TILE_GET_INFO_MEMBER(crshrace_state::get_tile_info2)
 ***************************************************************************/
 
 
-UINT32 crshrace_state::crshrace_tile_callback( UINT32 code )
+uint32_t crshrace_state::crshrace_tile_callback( uint32_t code )
 {
 	return m_spriteram2->buffer()[code&0x7fff];
 }
@@ -41,8 +41,8 @@ UINT32 crshrace_state::crshrace_tile_callback( UINT32 code )
 
 void crshrace_state::video_start()
 {
-	m_tilemap1 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(crshrace_state::get_tile_info1),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
-	m_tilemap2 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(crshrace_state::get_tile_info2),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_tilemap1 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(crshrace_state::get_tile_info1),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	m_tilemap2 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(crshrace_state::get_tile_info2),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 
 	m_tilemap1->set_transparent_pen(0x0f);
 	m_tilemap2->set_transparent_pen(0xff);
@@ -109,7 +109,7 @@ void crshrace_state::draw_fg(screen_device &screen, bitmap_ind16 &bitmap, const 
 }
 
 
-UINT32 crshrace_state::screen_update_crshrace(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t crshrace_state::screen_update_crshrace(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if (m_gfxctrl & 0x04)   /* display disable? */
 	{
@@ -139,10 +139,4 @@ UINT32 crshrace_state::screen_update_crshrace(screen_device &screen, bitmap_ind1
 			break;
 	}
 	return 0;
-}
-
-void crshrace_state::screen_eof_crshrace(screen_device &screen, bool state)
-{
-	m_spriteram->vblank_copy_rising(screen, state);
-	m_spriteram2->vblank_copy_rising(screen, state);
 }

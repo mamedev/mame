@@ -88,11 +88,14 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/capbowl.h"
+
 #include "machine/ticket.h"
 #include "cpu/m6809/m6809.h"
-#include "includes/capbowl.h"
 #include "sound/2203intf.h"
 #include "sound/dac.h"
+#include "sound/volt_reg.h"
+#include "speaker.h"
 
 #define MASTER_CLOCK        XTAL_8MHz
 
@@ -127,7 +130,7 @@ void capbowl_state::device_timer(emu_timer &timer, device_timer_id id, int param
 		update(ptr, param);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in capbowl_state::device_timer");
+		assert_always(false, "Unknown id in capbowl_state::device_timer");
 	}
 }
 
@@ -243,7 +246,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, capbowl_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x1000, 0x1001) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
 	AM_RANGE(0x2000, 0x2000) AM_WRITENOP /* watchdog */
-	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE("dac", dac_device, write_unsigned8)
+	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE("dac", dac_byte_interface, write)
 	AM_RANGE(0x7000, 0x7000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -310,7 +313,7 @@ void capbowl_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( capbowl, capbowl_state )
+static MACHINE_CONFIG_START( capbowl )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809E, MASTER_CLOCK)
@@ -341,7 +344,7 @@ static MACHINE_CONFIG_START( capbowl, capbowl_state )
 	MCFG_TMS34061_INTERRUPT_CB(INPUTLINE("maincpu", M6809_FIRQ_LINE))      /* interrupt gen callback */
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -349,13 +352,14 @@ static MACHINE_CONFIG_START( capbowl, capbowl_state )
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", M6809_FIRQ_LINE))
 	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("ticket", ticket_dispenser_device, read))
 	MCFG_AY8910_PORT_B_WRITE_CB(DEVWRITE8("ticket", ticket_dispenser_device, write))  /* Also a status LED. See memory map above */
-	MCFG_SOUND_ROUTE(0, "mono", 0.07)
-	MCFG_SOUND_ROUTE(1, "mono", 0.07)
-	MCFG_SOUND_ROUTE(2, "mono", 0.07)
-	MCFG_SOUND_ROUTE(3, "mono", 0.75)
+	MCFG_SOUND_ROUTE(0, "speaker", 0.07)
+	MCFG_SOUND_ROUTE(1, "speaker", 0.07)
+	MCFG_SOUND_ROUTE(2, "speaker", 0.07)
+	MCFG_SOUND_ROUTE(3, "speaker", 0.75)
 
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("dac", DAC0832, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -460,7 +464,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(capbowl_state,capbowl)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	/* configure ROM banks in 0x0000-0x3fff */
 	membank("bank1")->configure_entries(0, 6, &ROM[0x10000], 0x4000);
@@ -478,4 +482,4 @@ GAME( 1988, capbowl2, capbowl, capbowl,  capbowl, capbowl_state, capbowl,  ROT27
 GAME( 1988, capbowl3, capbowl, capbowl,  capbowl, capbowl_state, capbowl,  ROT270, "Incredible Technologies / Capcom", "Capcom Bowling (set 3)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, capbowl4, capbowl, capbowl,  capbowl, capbowl_state, capbowl,  ROT270, "Incredible Technologies / Capcom", "Capcom Bowling (set 4)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, clbowl,   capbowl, capbowl,  capbowl, capbowl_state, capbowl,  ROT270, "Incredible Technologies / Capcom", "Coors Light Bowling",    MACHINE_SUPPORTS_SAVE )
-GAME( 1991, bowlrama, 0,       bowlrama, capbowl, driver_device, 0,        ROT270, "P&P Marketing",                    "Bowl-O-Rama Rev 1.0",    MACHINE_SUPPORTS_SAVE )
+GAME( 1991, bowlrama, 0,       bowlrama, capbowl, capbowl_state, 0,        ROT270, "P&P Marketing",                    "Bowl-O-Rama Rev 1.0",    MACHINE_SUPPORTS_SAVE )

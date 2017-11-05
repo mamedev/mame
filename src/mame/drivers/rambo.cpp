@@ -37,17 +37,17 @@ public:
 	{
 	}
 
-	UINT8 m_port_a;
-	UINT8 m_port_b;
-	UINT8 m_port_c;
-	UINT8 m_port_d;
-	UINT8 m_port_e;
-	UINT8 m_port_f;
-	UINT8 m_port_g;
-	UINT8 m_port_h;
-	UINT8 m_port_j;
-	UINT8 m_port_k;
-	UINT8 m_port_l;
+	uint8_t m_port_a;
+	uint8_t m_port_b;
+	uint8_t m_port_c;
+	uint8_t m_port_d;
+	uint8_t m_port_e;
+	uint8_t m_port_f;
+	uint8_t m_port_g;
+	uint8_t m_port_h;
+	uint8_t m_port_j;
+	uint8_t m_port_k;
+	uint8_t m_port_l;
 	required_device<avr8_device> m_maincpu;
 
 	DECLARE_READ8_MEMBER(port_r);
@@ -88,8 +88,8 @@ WRITE8_MEMBER(rambo_state::port_w)
 			if (data == m_port_a) break;
 
 #if LOG_PORTS
-			UINT8 old_port_a = m_port_a;
-			UINT8 changed = data ^ old_port_a;
+			uint8_t old_port_a = m_port_a;
+			uint8_t changed = data ^ old_port_a;
 #endif
 			m_port_a = data;
 			break;
@@ -138,7 +138,7 @@ void rambo_state::machine_reset()
 	m_port_l = 0;
 }
 
-static MACHINE_CONFIG_START( rambo, rambo_state )
+static MACHINE_CONFIG_START( rambo )
 
 	MCFG_CPU_ADD("maincpu", ATMEGA2560, MASTER_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(rambo_prg_map)
@@ -223,5 +223,5 @@ ROM_START( metamaq2 )
 	ROM_REGION( 0x1000, "eeprom", ROMREGION_ERASEFF )
 ROM_END
 
-/*   YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT   CLASS        INIT         COMPANY           FULLNAME */
-COMP(2012, metamaq2,      0,        0,   rambo,    0,      rambo_state, rambo,    "Metamaquina", "Metamaquina 2 desktop 3d printer", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//   YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT    COMPANY        FULLNAME                            FLAGS
+COMP(2012, metamaq2, 0,      0,      rambo,   0,     rambo_state, rambo,  "Metamaquina", "Metamaquina 2 desktop 3d printer", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

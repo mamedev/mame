@@ -14,6 +14,7 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "screen.h"
 
 
 class c10_state : public driver_device
@@ -25,19 +26,20 @@ public:
 	};
 
 	c10_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_p_videoram(*this, "p_videoram"){ }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_p_videoram(*this, "videoram")
+		, m_p_chargen(*this, "chargen")
+	{ }
 
-	required_device<cpu_device> m_maincpu;
-	const UINT8 *m_p_chargen;
-	required_shared_ptr<UINT8> m_p_videoram;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_DRIVER_INIT(c10);
 
-protected:
+private:
+	required_device<cpu_device> m_maincpu;
+	required_shared_ptr<uint8_t> m_p_videoram;
+	required_region_ptr<u8> m_p_chargen;
+	virtual void machine_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
@@ -49,7 +51,7 @@ static ADDRESS_MAP_START(c10_mem, AS_PROGRAM, 8, c10_state)
 	AM_RANGE(0x1000, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xf0a1) AM_RAM
-	AM_RANGE(0xf0a2, 0xffff) AM_RAM AM_SHARE("p_videoram")
+	AM_RANGE(0xf0a2, 0xffff) AM_RAM AM_SHARE("videoram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( c10_io, AS_IO, 8, c10_state)
@@ -69,7 +71,7 @@ void c10_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 		membank("boot")->set_entry(0);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in c10_state::device_timer");
+		assert_always(false, "Unknown id in c10_state::device_timer");
 	}
 }
 
@@ -79,18 +81,13 @@ void c10_state::machine_reset()
 	timer_set(attotime::from_usec(4), TIMER_RESET);
 }
 
-void c10_state::video_start()
-{
-	m_p_chargen = memregion("chargen")->base();
-}
-
 /* This system appears to have inline attribute bytes of unknown meaning.
     Currently they are ignored. The word at FAB5 looks like it might be cursor location. */
-UINT32 c10_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t c10_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	//static UINT8 framecnt=0;
-	UINT8 y,ra,chr,gfx;
-	UINT16 sy=0,ma=0,x,xx;
+	//static uint8_t framecnt=0;
+	uint8_t y,ra,chr,gfx;
+	uint16_t sy=0,ma=0,x,xx;
 
 	//framecnt++;
 
@@ -98,7 +95,7 @@ UINT32 c10_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 	{
 		for (ra = 0; ra < 10; ra++)
 		{
-			UINT16 *p = &bitmap.pix16(sy++);
+			uint16_t *p = &bitmap.pix16(sy++);
 
 			xx = ma;
 			for (x = ma; x < ma + 80; x++)
@@ -112,7 +109,7 @@ UINT32 c10_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 				//  if ((chr < 0x80) && (framecnt & 0x08))
 				//      chr |= 0x80;
 
-					if BIT(chr, 7)  // ignore attribute bytes
+					if (BIT(chr, 7)) // ignore attribute bytes
 						x--;
 					else
 						gfx = m_p_chargen[(chr<<4) | ra ];
@@ -152,7 +149,7 @@ static GFXDECODE_START( c10 )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( c10, c10_state )
+static MACHINE_CONFIG_START( c10 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(c10_mem)
@@ -172,7 +169,7 @@ MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER(c10_state,c10)
 {
-	UINT8 *RAM = memregion("maincpu")->base();
+	uint8_t *RAM = memregion("maincpu")->base();
 	membank("boot")->configure_entries(0, 2, &RAM[0x0000], 0x8000);
 }
 
@@ -187,5 +184,5 @@ ROM_END
 
 /* Driver */
 
-/*   YEAR   NAME    PARENT  COMPAT   MACHINE  INPUT  INIT        COMPANY   FULLNAME       FLAGS */
-COMP( 1982, c10,    0,      0,       c10,     c10, c10_state,    c10,     "Cromemco", "C-10", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+/*   YEAR   NAME    PARENT  COMPAT   MACHINE  INPUT  STATE        INIT    COMPANY     FULLNAME  FLAGS */
+COMP( 1982, c10,    0,      0,       c10,     c10,   c10_state,   c10,    "Cromemco", "C-10",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

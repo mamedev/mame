@@ -34,11 +34,11 @@ public:
 	optional_device<deco104_device> m_deco104;
 
 	/* memory pointers */
-	optional_shared_ptr<UINT16> m_pf1_rowscroll;
-	optional_shared_ptr<UINT16> m_pf2_rowscroll;
-	optional_shared_ptr<UINT16> m_spriteram;
-	optional_shared_ptr<UINT16> m_pktgaldb_fgram;
-	optional_shared_ptr<UINT16> m_pktgaldb_sprites;
+	optional_shared_ptr<uint16_t> m_pf1_rowscroll;
+	optional_shared_ptr<uint16_t> m_pf2_rowscroll;
+	optional_shared_ptr<uint16_t> m_spriteram;
+	optional_shared_ptr<uint16_t> m_pktgaldb_fgram;
+	optional_shared_ptr<uint16_t> m_pktgaldb_sprites;
 	optional_device<decospr_device> m_sprgen;
 
 	/* devices */
@@ -48,18 +48,20 @@ public:
 	optional_device<decocomn_device> m_decocomn;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	optional_shared_ptr<UINT16> m_decrypted_opcodes;
+	optional_shared_ptr<uint16_t> m_decrypted_opcodes;
 
 	DECLARE_READ16_MEMBER(pckgaldx_unknown_r);
 	DECLARE_READ16_MEMBER(pckgaldx_protection_r);
 	DECLARE_WRITE16_MEMBER(pktgaldx_oki_bank_w);
 	DECLARE_DRIVER_INIT(pktgaldx);
 	virtual void machine_start() override;
-	UINT32 screen_update_pktgaldx(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_pktgaldb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_pktgaldx(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_pktgaldb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	READ16_MEMBER( pktgaldx_protection_region_f_104_r );
 	WRITE16_MEMBER( pktgaldx_protection_region_f_104_w );
+	DECLARE_WRITE_LINE_MEMBER( vblank_w );
+	DECLARE_WRITE16_MEMBER( vblank_ack_w );
 
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
 };

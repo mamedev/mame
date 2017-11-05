@@ -12,13 +12,13 @@
 #if defined(OSD_WINDOWS)
 
 // standard windows headers
-#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+#include <tchar.h>
 #undef interface
 
 // MAME headers
 #include "emu.h"
-#include "osdepend.h"
+#include "strconv.h"
 
 // MAMEOS headers
 #include "winmain.h"
@@ -37,8 +37,8 @@ class win32_keyboard_device : public event_based_device<KeyPressEventArgs>
 public:
 	keyboard_state keyboard;
 
-	win32_keyboard_device(running_machine& machine, const char *name, input_module &module)
-		: event_based_device(machine, name, DEVICE_CLASS_KEYBOARD, module),
+	win32_keyboard_device(running_machine& machine, const char *name, const char *id, input_module &module)
+		: event_based_device(machine, name, id, DEVICE_CLASS_KEYBOARD, module),
 			keyboard({{0}})
 	{
 	}
@@ -72,7 +72,7 @@ public:
 	virtual void input_init(running_machine &machine) override
 	{
 		// Add a single win32 keyboard device that we'll monitor using Win32
-		win32_keyboard_device *devinfo = devicelist()->create_device<win32_keyboard_device>(machine, "Win32 Keyboard 1", *this);
+		win32_keyboard_device *devinfo = devicelist()->create_device<win32_keyboard_device>(machine, "Win32 Keyboard 1", "Win32 Keyboard 1", *this);
 
 		keyboard_trans_table &table = keyboard_trans_table::instance();
 
@@ -80,20 +80,22 @@ public:
 		for (int keynum = 0; keynum < MAX_KEYS; keynum++)
 		{
 			input_item_id itemid = table.map_di_scancode_to_itemid(keynum);
-			char name[20];
+			TCHAR keyname[100];
 
-			// generate/fetch the name
-			_snprintf(name, ARRAY_LENGTH(name), "Scan%03d", keynum);
+			// generate the name
+			if (GetKeyNameText(((keynum & 0x7f) << 16) | ((keynum & 0x80) << 17), keyname, ARRAY_LENGTH(keyname)) == 0)
+				_sntprintf(keyname, ARRAY_LENGTH(keyname), TEXT("Scan%03d"), keynum);
+			std::string name = osd::text::from_tstring(keyname);
 
 			// add the item to the device
-			devinfo->device()->add_item(name, itemid, generic_button_get_state, &devinfo->keyboard.state[keynum]);
+			devinfo->device()->add_item(name.c_str(), itemid, generic_button_get_state<std::uint8_t>, &devinfo->keyboard.state[keynum]);
 		}
 	}
 
 	bool handle_input_event(input_event eventid, void *eventdata) override
 	{
 		if (!input_enabled())
-			return FALSE;
+			return false;
 
 		KeyPressEventArgs *args;
 
@@ -102,13 +104,17 @@ public:
 			case INPUT_EVENT_KEYDOWN:
 			case INPUT_EVENT_KEYUP:
 				args = static_cast<KeyPressEventArgs*>(eventdata);
-				for (int i = 0; i < devicelist()->size(); i++)
-					downcast<win32_keyboard_device*>(devicelist()->at(i))->queue_events(args, 1);
+				devicelist()->for_each_device([args](auto device)
+				{
+					auto keyboard = dynamic_cast<win32_keyboard_device*>(device);
+					if (keyboard != nullptr)
+						keyboard->queue_events(args, 1);
+				});
 
-				return TRUE;
+				return true;
 
 			default:
-				return FALSE;
+				return false;
 		}
 	}
 };
@@ -128,8 +134,8 @@ public:
 	mouse_state         mouse;
 	win32_mouse_state   win32_mouse;
 
-	win32_mouse_device(running_machine& machine, const char *name, input_module &module)
-		: event_based_device(machine, name, DEVICE_CLASS_MOUSE, module),
+	win32_mouse_device(running_machine& machine, const char *name, const char *id, input_module &module)
+		: event_based_device(machine, name, id, DEVICE_CLASS_MOUSE, module),
 			mouse({0}),
 			win32_mouse({{0}})
 	{
@@ -152,7 +158,7 @@ public:
 			mouse.lY = (cursor_info.ptScreenPos.y - win32_mouse.last_point.y) * INPUT_RELATIVE_PER_PIXEL;
 
 			RECT window_pos = {0};
-			GetWindowRect(win_window_list.front()->platform_window<HWND>(), &window_pos);
+			GetWindowRect(std::static_pointer_cast<win_window_info>(osd_common_t::s_window_list.front())->platform_window(), &window_pos);
 
 			// We reset the cursor position to the middle of the window each frame
 			win32_mouse.last_point.x = window_pos.left + (window_pos.right - window_pos.left) / 2;
@@ -201,33 +207,45 @@ public:
 			return;
 
 		// allocate a device
-		devinfo = devicelist()->create_device<win32_mouse_device>(machine, "Win32 Mouse 1", *this);
+		devinfo = devicelist()->create_device<win32_mouse_device>(machine, "Win32 Mouse 1", "Win32 Mouse 1", *this);
 		if (devinfo == nullptr)
 			return;
 
 		// populate the axes
 		for (axisnum = 0; axisnum < 2; axisnum++)
 		{
-			devinfo->device()->add_item(default_axis_name[axisnum], (input_item_id)(ITEM_ID_XAXIS + axisnum), generic_axis_get_state, &devinfo->mouse.lX + axisnum);
+			devinfo->device()->add_item(
+				default_axis_name[axisnum],
+				static_cast<input_item_id>(ITEM_ID_XAXIS + axisnum),
+				generic_axis_get_state<LONG>,
+				&devinfo->mouse.lX + axisnum);
 		}
 
 		// populate the buttons
 		for (butnum = 0; butnum < 2; butnum++)
 		{
-			devinfo->device()->add_item(default_button_name(butnum), (input_item_id)(ITEM_ID_BUTTON1 + butnum), generic_button_get_state, &devinfo->mouse.rgbButtons[butnum]);
+			devinfo->device()->add_item(
+				default_button_name(butnum),
+				static_cast<input_item_id>(ITEM_ID_BUTTON1 + butnum),
+				generic_button_get_state<BYTE>,
+				&devinfo->mouse.rgbButtons[butnum]);
 		}
 	}
 
 	bool handle_input_event(input_event eventid, void *eventdata) override
 	{
 		if (!input_enabled() || !mouse_enabled() || eventid != INPUT_EVENT_MOUSE_BUTTON)
-			return FALSE;
+			return false;
 
 		auto args = static_cast<MouseButtonEventArgs*>(eventdata);
-		for (int i = 0; i < devicelist()->size(); i++)
-			downcast<win32_mouse_device*>(devicelist()->at(i))->queue_events(args, 1);
+		devicelist()->for_each_device([args](auto device)
+		{
+			auto mouse = dynamic_cast<win32_mouse_device*>(device);
+			if (mouse != nullptr)
+				mouse->queue_events(args, 1);
+		});
 
-		return TRUE;
+		return true;
 	}
 };
 
@@ -244,8 +262,8 @@ private:
 public:
 	mouse_state     mouse;
 
-	win32_lightgun_device(running_machine& machine, const char *name, input_module &module)
-		: event_based_device(machine, name, DEVICE_CLASS_LIGHTGUN, module),
+	win32_lightgun_device(running_machine& machine, const char *name, const char *id, input_module &module)
+		: event_based_device(machine, name, id, DEVICE_CLASS_LIGHTGUN, module),
 			m_lightgun_shared_axis_mode(FALSE),
 			m_gun_index(0),
 			mouse({0})
@@ -260,7 +278,7 @@ public:
 	{
 		event_based_device::poll();
 
-		INT32 xpos = 0, ypos = 0;
+		int32_t xpos = 0, ypos = 0;
 		POINT mousepos;
 
 		// if we are using the shared axis hack, the data is updated via Windows messages only
@@ -269,13 +287,14 @@ public:
 
 		// get the cursor position and transform into final results
 		GetCursorPos(&mousepos);
-		if (!win_window_list.empty())
+		if (!osd_common_t::s_window_list.empty())
 		{
 			RECT client_rect;
 
 			// get the position relative to the window
-			GetClientRect(win_window_list.front()->platform_window<HWND>(), &client_rect);
-			ScreenToClient(win_window_list.front()->platform_window<HWND>(), &mousepos);
+			HWND hwnd = std::static_pointer_cast<win_window_info>(osd_common_t::s_window_list.front())->platform_window();
+			GetClientRect(hwnd, &client_rect);
+			ScreenToClient(hwnd, &mousepos);
 
 			// convert to absolute coordinates
 			xpos = normalize_absolute_axis(mousepos.x, client_rect.left, client_rect.right);
@@ -335,10 +354,11 @@ private:
 			POINT mousepos;
 
 			// get the position relative to the window
-			GetClientRect(win_window_list.front()->platform_window<HWND>(), &client_rect);
+			HWND hwnd = std::static_pointer_cast<win_window_info>(osd_common_t::s_window_list.front())->platform_window();
+			GetClientRect(hwnd, &client_rect);
 			mousepos.x = args.xpos;
 			mousepos.y = args.ypos;
-			ScreenToClient(win_window_list.front()->platform_window<HWND>(), &mousepos);
+			ScreenToClient(hwnd, &mousepos);
 
 			// convert to absolute coordinates
 			mouse.lX = normalize_absolute_axis(mousepos.x, client_rect.left, client_rect.right);
@@ -376,20 +396,28 @@ public:
 			int axisnum, butnum;
 
 			// allocate a device
-			devinfo = devicelist()->create_device<win32_lightgun_device>(machine, gun_names[gunnum], *this);
+			devinfo = devicelist()->create_device<win32_lightgun_device>(machine, gun_names[gunnum], gun_names[gunnum], *this);
 			if (devinfo == nullptr)
 				break;
 
 			// populate the axes
 			for (axisnum = 0; axisnum < 2; axisnum++)
 			{
-				devinfo->device()->add_item(default_axis_name[axisnum], (input_item_id)(ITEM_ID_XAXIS + axisnum), generic_axis_get_state, &devinfo->mouse.lX + axisnum);
+				devinfo->device()->add_item(
+					default_axis_name[axisnum],
+					static_cast<input_item_id>(ITEM_ID_XAXIS + axisnum),
+					generic_axis_get_state<LONG>,
+					&devinfo->mouse.lX + axisnum);
 			}
 
 			// populate the buttons
 			for (butnum = 0; butnum < 2; butnum++)
 			{
-				devinfo->device()->add_item(default_button_name(butnum), (input_item_id)(ITEM_ID_BUTTON1 + butnum), generic_button_get_state, &devinfo->mouse.rgbButtons[butnum]);
+				devinfo->device()->add_item(
+					default_button_name(butnum),
+					static_cast<input_item_id>(ITEM_ID_BUTTON1 + butnum),
+					generic_button_get_state<BYTE>,
+					&devinfo->mouse.rgbButtons[butnum]);
 			}
 		}
 	}
@@ -399,8 +427,13 @@ public:
 		if (!input_enabled() || !lightgun_enabled() || eventid != INPUT_EVENT_MOUSE_BUTTON)
 			return false;
 
-		for (int i = 0; i < devicelist()->size(); i++)
-			downcast<win32_lightgun_device*>(devicelist()->at(i))->queue_events(static_cast<MouseButtonEventArgs*>(eventdata), 1);
+		auto args = static_cast<MouseButtonEventArgs*>(eventdata);
+		devicelist()->for_each_device([args](auto device)
+		{
+			auto lightgun = dynamic_cast<win32_lightgun_device*>(device);
+			if (lightgun != nullptr)
+				lightgun->queue_events(args, 1);
+		});
 
 		return true;
 	}

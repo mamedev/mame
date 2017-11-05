@@ -69,12 +69,12 @@ public:
 
 	DECLARE_WRITE8_MEMBER(out_w);
 	DECLARE_WRITE8_MEMBER(tty_w);
-	DECLARE_WRITE8_MEMBER(kbd_put);
+	void kbd_put(u8 data);
 	DECLARE_READ8_MEMBER(tty_r);
 	IRQ_CALLBACK_MEMBER(mod8_irq_callback);
 private:
-	UINT16 m_tty_data;
-	UINT8 m_tty_key_data;
+	uint16_t m_tty_data;
+	uint8_t m_tty_key_data;
 	int m_tty_cnt;
 	virtual void machine_reset() override;
 	required_device<teleprinter_device> m_teleprinter;
@@ -102,7 +102,7 @@ WRITE8_MEMBER( mod8_state::tty_w )
 
 READ8_MEMBER( mod8_state::tty_r )
 {
-	UINT8 d = m_tty_key_data & 1;
+	uint8_t d = m_tty_key_data & 1;
 	m_tty_key_data >>= 1;
 	return d;
 }
@@ -134,13 +134,13 @@ void mod8_state::machine_reset()
 {
 }
 
-WRITE8_MEMBER( mod8_state::kbd_put )
+void mod8_state::kbd_put(u8 data)
 {
 	m_tty_key_data = data ^ 0xff;
 	m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( mod8, mod8_state )
+static MACHINE_CONFIG_START( mod8 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8008, 800000)
 	MCFG_CPU_PROGRAM_MAP(mod8_mem)
@@ -149,7 +149,7 @@ static MACHINE_CONFIG_START( mod8, mod8_state )
 
 	/* video hardware */
 	MCFG_DEVICE_ADD(TELEPRINTER_TAG, TELEPRINTER, 0)
-	MCFG_GENERIC_TELEPRINTER_KEYBOARD_CB(WRITE8(mod8_state, kbd_put))
+	MCFG_GENERIC_TELEPRINTER_KEYBOARD_CB(PUT(mod8_state, kbd_put))
 MACHINE_CONFIG_END
 
 
@@ -167,5 +167,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   CLASS           INIT   COMPANY                       FULLNAME       FLAGS */
-COMP( 1974, mod8,   0,       0,      mod8,      mod8,   driver_device,   0, "Microsystems International Ltd", "MOD-8", MACHINE_NO_SOUND_HW)
+//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   CLASS         INIT  COMPANY                           FULLNAME  FLAGS
+COMP( 1974, mod8,   0,       0,      mod8,      mod8,   mod8_state,   0,    "Microsystems International Ltd", "MOD-8",  MACHINE_NO_SOUND_HW )

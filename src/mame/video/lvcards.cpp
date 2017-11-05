@@ -12,45 +12,9 @@
 #include "includes/lvcards.h"
 
 
-PALETTE_INIT_MEMBER(lvcards_state,ponttehk)
-{
-	const UINT8 *color_prom = memregion("proms")->base();
-	int i;
-
-	for ( i = 0; i < palette.entries(); i++ )
-	{
-		int bit0,bit1,bit2,bit3,r,g,b;
-
-		/* red component */
-		bit0 = (color_prom[0] >> 0) & 0x01;
-		bit1 = (color_prom[0] >> 1) & 0x01;
-		bit2 = (color_prom[0] >> 2) & 0x01;
-		bit3 = (color_prom[0] >> 3) & 0x01;
-		r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-
-		/* green component */
-		bit0 = (color_prom[palette.entries()] >> 0) & 0x01;
-		bit1 = (color_prom[palette.entries()] >> 1) & 0x01;
-		bit2 = (color_prom[palette.entries()] >> 2) & 0x01;
-		bit3 = (color_prom[palette.entries()] >> 3) & 0x01;
-		g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-
-		/* blue component */
-		bit0 = (color_prom[2*palette.entries()] >> 0) & 0x01;
-		bit1 = (color_prom[2*palette.entries()] >> 1) & 0x01;
-		bit2 = (color_prom[2*palette.entries()] >> 2) & 0x01;
-		bit3 = (color_prom[2*palette.entries()] >> 3) & 0x01;
-		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-
-		palette.set_pen_color(i,rgb_t(r,g,b));
-
-		color_prom++;
-	}
-}
-
 PALETTE_INIT_MEMBER(lvcards_state, lvcards)//Ever so slightly different, but different enough.
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 	for ( i = 0; i < palette.entries(); i++ )
@@ -108,11 +72,11 @@ TILE_GET_INFO_MEMBER(lvcards_state::get_bg_tile_info)
 
 void lvcards_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(lvcards_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(lvcards_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,
 			8, 8, 32, 32);
 }
 
-UINT32 lvcards_state::screen_update_lvcards(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t lvcards_state::screen_update_lvcards(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;

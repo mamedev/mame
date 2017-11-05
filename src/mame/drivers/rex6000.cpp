@@ -34,9 +34,13 @@
 #include "machine/bankdev.h"
 #include "machine/ram.h"
 #include "machine/intelfsh.h"
+#include "machine/timer.h"
 #include "imagedev/snapquik.h"
 #include "sound/beep.h"
 #include "rendlay.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 #define MAKE_BANK(lo, hi)       ((lo) | ((hi)<<8))
 
@@ -76,27 +80,27 @@ public:
 	required_device<address_map_bank_device> m_bankdev0;
 	required_device<address_map_bank_device> m_bankdev1;
 	optional_device<intelfsh8_device> m_flash0b;
-	required_shared_ptr<UINT8> m_nvram;
+	required_shared_ptr<uint8_t> m_nvram;
 	required_ioport m_battery;
 	optional_ioport m_pen_x;
 	optional_ioport m_pen_y;
 
-	UINT8 m_bank[4];
-	UINT8 m_beep_io[5];
-	UINT8 m_lcd_base[2];
-	UINT8 m_touchscreen[0x10];
-	UINT8 m_lcd_enabled;
-	UINT8 m_lcd_cmd;
+	uint8_t m_bank[4];
+	uint8_t m_beep_io[5];
+	uint8_t m_lcd_base[2];
+	uint8_t m_touchscreen[0x10];
+	uint8_t m_lcd_enabled;
+	uint8_t m_lcd_cmd;
 
-	UINT8 m_irq_mask;
-	UINT8 m_irq_flag;
-	UINT8 m_port6;
-	UINT8 m_beep_mode;
-	UINT8 m_power_on;
+	uint8_t m_irq_mask;
+	uint8_t m_irq_flag;
+	uint8_t m_port6;
+	uint8_t m_beep_mode;
+	uint8_t m_power_on;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER( bankswitch_r );
 	DECLARE_WRITE8_MEMBER( bankswitch_w );
@@ -126,9 +130,10 @@ class oz750_state : public rex6000_state
 {
 public:
 	oz750_state(const machine_config &mconfig, device_type type, const char *tag)
-		: rex6000_state(mconfig, type, tag),
-			m_keyboard(*this, "COL")
-		{ }
+		: rex6000_state(mconfig, type, tag)
+		, m_keyboard(*this, "COL.%u", 0)
+	{
+	}
 
 	optional_ioport_array<10> m_keyboard;
 
@@ -139,12 +144,12 @@ public:
 	DECLARE_QUICKLOAD_LOAD_MEMBER(oz750);
 
 	virtual void machine_reset() override;
-	UINT32 screen_update_oz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_oz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 private:
-	int oz_wzd_extract_tag(const dynamic_buffer &data, const char *tag, char *dest_buf);
+	int oz_wzd_extract_tag(const std::vector<uint8_t> &data, const char *tag, char *dest_buf);
 
-	UINT16 m_kb_mask;
+	uint16_t m_kb_mask;
 };
 
 
@@ -207,7 +212,7 @@ WRITE8_MEMBER( rex6000_state::beep_w )
 				// the beeper frequency is update only if the bit 1 is set
 				if (BIT(data, 1))
 				{
-					UINT16 div = ((m_beep_io[2] | m_beep_io[3]<<8) & 0x0fff) + 2;
+					uint16_t div = ((m_beep_io[2] | m_beep_io[3]<<8) & 0x0fff) + 2;
 					m_beep->set_clock(16384 / div);
 				}
 			}
@@ -299,14 +304,14 @@ WRITE8_MEMBER( rex6000_state::irq_w )
 
 READ8_MEMBER( rex6000_state::touchscreen_r )
 {
-	UINT16 x = m_pen_x->read();
-	UINT16 y = m_pen_y->read();
-	UINT16 battery = m_battery->read();
+	uint16_t x = m_pen_x->read();
+	uint16_t y = m_pen_y->read();
+	uint16_t battery = m_battery->read();
 
 	switch (offset)
 	{
 		case 0x08:
-			return ((ioport("INPUT")->read() & 0x40) ? 0x20 : 0x00) | 0X10;
+			return ((ioport("INPUT")->read() & 0x40) ? 0x20 : 0x00) | 0x10;
 		case 0x09:
 			if (m_touchscreen[4] & 0x80)
 				return (battery>>0) & 0xff;
@@ -333,7 +338,7 @@ WRITE8_MEMBER( rex6000_state::touchscreen_w )
 
 READ8_MEMBER( oz750_state::kb_status_r )
 {
-	UINT8 data = 0x6b;
+	uint8_t data = 0x6b;
 	if (m_battery->read() & 0x01)   data |= 0x80;
 
 	return data;
@@ -341,7 +346,7 @@ READ8_MEMBER( oz750_state::kb_status_r )
 
 READ8_MEMBER( oz750_state::kb_data_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 	for(int i=0; i<10; i++)
 	{
 		if (m_kb_mask & (1<<i))
@@ -393,7 +398,7 @@ static ADDRESS_MAP_START( rex6000_io, AS_IO, 8, rex6000_state)
 	AM_RANGE( 0x10, 0x10 ) AM_READ_PORT("INPUT")
 	AM_RANGE( 0x15, 0x19 ) AM_READWRITE(beep_r, beep_w)
 	AM_RANGE( 0x22, 0x23 ) AM_READWRITE(lcd_base_r, lcd_base_w)
-	AM_RANGE( 0x30, 0x3f ) AM_DEVREADWRITE(TC8521_TAG, rp5c01_device, read, write)
+	AM_RANGE( 0x30, 0x3f ) AM_DEVREADWRITE(TC8521_TAG, tc8521_device, read, write)
 	AM_RANGE( 0x40, 0x47 ) AM_MIRROR(0x08)  AM_DEVREADWRITE("ns16550", ns16550_device, ins8250_r, ins8250_w )
 	AM_RANGE( 0x50, 0x51 ) AM_READWRITE(lcd_io_r, lcd_io_w)
 	AM_RANGE( 0x60, 0x6f ) AM_READWRITE(touchscreen_r, touchscreen_w)
@@ -408,7 +413,7 @@ static ADDRESS_MAP_START( oz750_io, AS_IO, 8, oz750_state)
 	AM_RANGE( 0x11, 0x12 ) AM_READWRITE(kb_status_r, kb_mask_w)
 	AM_RANGE( 0x15, 0x19 ) AM_READWRITE(beep_r, beep_w)
 	AM_RANGE( 0x22, 0x23 ) AM_READWRITE(lcd_base_r, lcd_base_w)
-	AM_RANGE( 0x30, 0x3f ) AM_DEVREADWRITE(TC8521_TAG, rp5c01_device, read, write)
+	AM_RANGE( 0x30, 0x3f ) AM_DEVREADWRITE(TC8521_TAG, tc8521_device, read, write)
 	AM_RANGE( 0x40, 0x47 ) AM_MIRROR(0x08)  AM_DEVREADWRITE("ns16550", ns16550_device, ins8250_r, ins8250_w )
 ADDRESS_MAP_END
 
@@ -568,7 +573,7 @@ INPUT_PORTS_END
 
 void rex6000_state::machine_start()
 {
-	membank("ram")->set_base((UINT8*)m_nvram + 0x4000);
+	membank("ram")->set_base((uint8_t*)m_nvram + 0x4000);
 }
 
 void rex6000_state::machine_reset()
@@ -592,16 +597,16 @@ void oz750_state::machine_reset()
 	m_kb_mask = 0;
 }
 
-UINT32 rex6000_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t rex6000_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT16 lcd_bank = MAKE_BANK(m_lcd_base[0], m_lcd_base[1]);
+	uint16_t lcd_bank = MAKE_BANK(m_lcd_base[0], m_lcd_base[1]);
 
 	if (m_lcd_enabled)
 	{
 		for (int y=0; y<120; y++)
 			for (int x=0; x<30; x++)
 			{
-				UINT8 data = m_bankdev0->space(AS_PROGRAM).read_byte((lcd_bank << 13) + y*30 + x);
+				uint8_t data = m_bankdev0->space(AS_PROGRAM).read_byte((lcd_bank << 13) + y*30 + x);
 
 				for (int b=0; b<8; b++)
 				{
@@ -618,16 +623,16 @@ UINT32 rex6000_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	return 0;
 }
 
-UINT32 oz750_state::screen_update_oz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t oz750_state::screen_update_oz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT16 lcd_bank = MAKE_BANK(m_lcd_base[0], m_lcd_base[1]);
+	uint16_t lcd_bank = MAKE_BANK(m_lcd_base[0], m_lcd_base[1]);
 
 	if (m_lcd_enabled && m_power_on)
 	{
 		for (int y=0; y<=cliprect.max_y; y++)
 			for (int x=0; x<30; x++)
 			{
-				UINT8 data = m_bankdev0->space(AS_PROGRAM).read_byte((lcd_bank << 13) + y*30 + x);
+				uint8_t data = m_bankdev0->space(AS_PROGRAM).read_byte((lcd_bank << 13) + y*30 + x);
 
 				for (int b=0; b<8; b++)
 				{
@@ -702,28 +707,27 @@ PALETTE_INIT_MEMBER(rex6000_state, rex6000)
 QUICKLOAD_LOAD_MEMBER( rex6000_state,rex6000)
 {
 	static const char magic[] = "ApplicationName:Addin";
-	address_space& flash = m_flash0b->space(0);
-	UINT32 img_start = 0;
+	uint32_t img_start = 0;
 
-	dynamic_buffer data(image.length());
+	std::vector<uint8_t> data(image.length());
 	image.fread(&data[0], image.length());
 
 	if(strncmp((const char*)&data[0], magic, 21))
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 
 	img_start = strlen((const char*)&data[0]) + 5;
 	img_start += 0xa0;  //skip the icon (40x32 pixel)
 
-	for (UINT32 i=0; i<image.length() - img_start ;i++)
-		flash.write_byte(i, data[img_start + i]);
+	for (uint32_t i=0; i<image.length() - img_start ;i++)
+		m_flash0b->write_raw(i, data[img_start + i]);
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
-int oz750_state::oz_wzd_extract_tag(const dynamic_buffer &data, const char *tag, char *dest_buf)
+int oz750_state::oz_wzd_extract_tag(const std::vector<uint8_t> &data, const char *tag, char *dest_buf)
 {
 	int tag_len = strlen(tag);
-	UINT32 img_start = 0;
+	uint32_t img_start = 0;
 	for (img_start=0; img_start < data.size() - tag_len; img_start++)
 		if (data[img_start] && !memcmp(&data[img_start], tag, tag_len))
 			break;
@@ -742,7 +746,7 @@ int oz750_state::oz_wzd_extract_tag(const dynamic_buffer &data, const char *tag,
 
 	if (dest_buf)
 	{
-		UINT32 i;
+		uint32_t i;
 		for (i=0; data[img_start + i] != 0 && data[img_start + i] != '\n' && data[img_start + i] != '\r'; i++)
 			dest_buf[i] = data[img_start + i];
 
@@ -755,7 +759,7 @@ int oz750_state::oz_wzd_extract_tag(const dynamic_buffer &data, const char *tag,
 QUICKLOAD_LOAD_MEMBER(oz750_state,oz750)
 {
 	address_space* flash = &machine().device("flash0a")->memory().space(0);
-	dynamic_buffer data(image.length());
+	std::vector<uint8_t> data(image.length());
 	image.fread(&data[0], image.length());
 
 	const char *fs_type = "BSIC";
@@ -765,21 +769,21 @@ QUICKLOAD_LOAD_MEMBER(oz750_state,oz750)
 
 	oz_wzd_extract_tag(data, "<DATA TYPE>", data_type);
 	if (strcmp(data_type, "MY PROGRAMS"))
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 
 	oz_wzd_extract_tag(data, "<TITLE>", app_name);
 	oz_wzd_extract_tag(data, "<DATA>", file_name);
 	if (!strncmp(file_name, "PFILE:", 6))
 		strcpy(file_name, file_name + 6);
 
-	UINT32 img_start = oz_wzd_extract_tag(data, "<BIN>", nullptr);
+	uint32_t img_start = oz_wzd_extract_tag(data, "<BIN>", nullptr);
 
 	if (img_start == 0)
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 
-	UINT16 icon_size = data[img_start++];
+	uint16_t icon_size = data[img_start++];
 
-	UINT32 pos = 0xc0000;
+	uint32_t pos = 0xc0000;
 	flash->write_byte(pos++, 0x4f);
 
 	for (int i=0; fs_type[i]; i++)
@@ -808,14 +812,14 @@ QUICKLOAD_LOAD_MEMBER(oz750_state,oz750)
 	for (int i=0, slen = strlen(app_name); i <= slen; i++)
 		flash->write_byte(pos++, app_name[i]);                  // title
 
-	UINT16 size = (UINT16)image.length() - img_start;
+	uint16_t size = (uint16_t)image.length() - img_start;
 	flash->write_byte(pos++, size);                             // data size LSB
 	flash->write_byte(pos++, size >> 8);                        // data size MSB
 
 	for (int i=img_start; i<image.length(); i++)
 		flash->write_byte(pos++, data[i]);                      // data
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 
@@ -867,7 +871,7 @@ static GFXDECODE_START( rex6000 )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( rex6000, rex6000_state )
+static MACHINE_CONFIG_START( rex6000 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz) //Toshiba microprocessor Z80 compatible at 4.3MHz
 	MCFG_CPU_PROGRAM_MAP(rex6000_mem)
@@ -919,7 +923,7 @@ static MACHINE_CONFIG_START( rex6000, rex6000_state )
 	/* quickload */
 	MCFG_QUICKLOAD_ADD("quickload", rex6000_state, rex6000, "rex,ds2", 0)
 
-	MCFG_DEVICE_ADD(TC8521_TAG, RP5C01, XTAL_32_768kHz)
+	MCFG_DEVICE_ADD(TC8521_TAG, TC8521, XTAL_32_768kHz)
 	MCFG_RP5C01_OUT_ALARM_CB(WRITELINE(rex6000_state, alarm_irq))
 
 	/*
@@ -944,7 +948,7 @@ static MACHINE_CONFIG_START( rex6000, rex6000_state )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( oz750, oz750_state )
+static MACHINE_CONFIG_START( oz750 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_9_8304MHz) //Toshiba microprocessor Z80 compatible at 9.8MHz
 	MCFG_CPU_PROGRAM_MAP(rex6000_mem)
@@ -995,7 +999,7 @@ static MACHINE_CONFIG_START( oz750, oz750_state )
 	/* quickload */
 	MCFG_QUICKLOAD_ADD("quickload", oz750_state, oz750, "wzd", 0)
 
-	MCFG_DEVICE_ADD(TC8521_TAG, RP5C01, XTAL_32_768kHz)
+	MCFG_DEVICE_ADD(TC8521_TAG, TC8521, XTAL_32_768kHz)
 	MCFG_RP5C01_OUT_ALARM_CB(WRITELINE(rex6000_state, alarm_irq))
 
 	MCFG_SHARP_LH28F016S_ADD("flash0a")
@@ -1050,7 +1054,7 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY   FULLNAME       FLAGS */
-COMP( 199?, oz750,    0,       0,   oz750  ,    oz750,   driver_device,  0,   "Sharp",            "Wizard OZ-750",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 2000, rex6000,  0,       0,   rex6000,    rex6000, driver_device,  0,   "Xircom / Intel",   "REX 6000",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 2000, ds2,      rex6000, 0,   rex6000,    rex6000, driver_device,  0,   "Citizen",          "DataSlim 2",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT    STATE           INIT  COMPANY             FULLNAME          FLAGS */
+COMP( 199?, oz750,    0,       0,   oz750,      oz750,   oz750_state,    0,    "Sharp",            "Wizard OZ-750",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 2000, rex6000,  0,       0,   rex6000,    rex6000, rex6000_state,  0,    "Xircom / Intel",   "REX 6000",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 2000, ds2,      rex6000, 0,   rex6000,    rex6000, rex6000_state,  0,    "Citizen",          "DataSlim 2",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

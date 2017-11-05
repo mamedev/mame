@@ -4,10 +4,10 @@
 // /home/ms/source/sidplay/libsidplay/emu/RCS/enve_dl.h,v
 //
 
-#pragma once
+#ifndef MAME_SOUND_SIDE6581_H
+#define MAME_SOUND_SIDE6581_H
 
-#ifndef __SIDE6581_H__
-#define __SIDE6581_H__
+#pragma once
 
 
 //
@@ -15,7 +15,7 @@
 // C64 C PAL, MOS 6581R4 1686 S
 //
 
-static const UINT8 releaseTab[] =
+static const uint8_t releaseTab[] =
 {
 	255, 255, 254, 254, 253, 253, 252, 252, 251, 251, 250, 250, 249, 249, 248,
 	248, 247, 247, 246, 246, 245, 245, 244, 244, 243, 243, 242, 242, 241, 241,
@@ -125,4 +125,4 @@ static const UINT8 releaseTab[] =
 };
 
 
-#endif /* __SIDE6581_H__ */
+#endif // MAME_SOUND_SIDE6581_H

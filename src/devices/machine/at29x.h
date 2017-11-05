@@ -7,38 +7,25 @@
     August 2015
 */
 
-#ifndef __AT29X__
-#define __AT29X__
+#ifndef MAME_MACHINE_AT29X_H
+#define MAME_MACHINE_AT29X_H
 
-#include "emu.h"
+#pragma once
 
-extern const device_type AT29C020;
-extern const device_type AT29C040;
-extern const device_type AT29C040A;
 
-enum  s_cmd_t
-{
-	CMD_0 = 0,
-	CMD_1,
-	CMD_2
-};
-
-enum  s_pgm_t
-{
-	PGM_0 = 0,
-	PGM_1,
-	PGM_2,
-	PGM_3
-};
+DECLARE_DEVICE_TYPE(AT29C020,  at29c020_device)
+DECLARE_DEVICE_TYPE(AT29C040,  at29c040_device)
+DECLARE_DEVICE_TYPE(AT29C040A, at29c040a_device)
 
 class at29x_device : public device_t, public device_nvram_interface
 {
 public:
-	at29x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 
 protected:
+	at29x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int memory_size, int device_id, int sector_size);
+
 	virtual void device_start(void) override;
 	virtual void device_reset(void) override;
 	virtual void device_stop(void) override;
@@ -50,10 +37,10 @@ protected:
 
 	int        get_sector_number(offs_t address) { return address / m_sector_size; }
 
-	int        m_memory_size;   // bytes
+	const int  m_memory_size;   // bytes
 	int        m_word_width;
-	int        m_device_id;
-	int        m_sector_size;
+	const int  m_device_id;
+	const int  m_sector_size;
 	int        m_cycle_time;        // ms
 	int        m_boot_block_size;
 	int        m_version;
@@ -61,9 +48,24 @@ protected:
 	int        m_sector_mask;
 
 private:
+	enum s_cmd_t
+	{
+		CMD_0 = 0,
+		CMD_1,
+		CMD_2
+	};
+
+	enum s_pgm_t
+	{
+		PGM_0 = 0,
+		PGM_1,
+		PGM_2,
+		PGM_3
+	};
+
 	void        sync_flags(void);
 
-	std::unique_ptr<UINT8[]>      m_eememory;
+	std::unique_ptr<uint8_t[]>      m_eememory;
 
 	bool        m_lower_bbl;              // set when lower boot block lockout is enabled
 	bool        m_higher_bbl;             // set when upper boot block lockout is enabled
@@ -78,7 +80,7 @@ private:
 	bool        m_disabling_sdb;          // set when a sdp disable command is in progress
 	bool        m_toggle_bit;             // indicates flashing in progress (toggles for each query)
 
-	std::unique_ptr<UINT8[]>      m_programming_buffer;
+	std::unique_ptr<uint8_t[]>      m_programming_buffer;
 	int         m_programming_last_offset;
 	emu_timer*  m_programming_timer;
 };
@@ -89,19 +91,19 @@ private:
 class at29c020_device : public at29x_device
 {
 public:
-	at29c020_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	at29c020_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class at29c040_device : public at29x_device
 {
 public:
-	at29c040_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	at29c040_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class at29c040a_device : public at29x_device
 {
 public:
-	at29c040a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	at29c040a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 #define MCFG_AT29C020_ADD(_tag )    \
@@ -113,4 +115,4 @@ public:
 #define MCFG_AT29C040A_ADD(_tag )    \
 	MCFG_DEVICE_ADD(_tag, AT29C040A, 0)
 
-#endif
+#endif // MAME_MACHINE_AT29X_H

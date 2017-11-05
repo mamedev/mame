@@ -224,10 +224,10 @@ public:
 	WRITE8_MEMBER(mb8936_portb_w); // maybe molesb output? (6-bits?)
 	WRITE8_MEMBER(mb8936_portf_w); // maybe strobe output?
 
-	UINT8 m_to_68k_cmd_low;
-	UINT8 m_to_68k_cmd_d9;
-	UINT8 m_to_68k_cmd_req;
-	UINT8 m_to_68k_cmd_LVm;
+	uint8_t m_to_68k_cmd_low;
+	uint8_t m_to_68k_cmd_d9;
+	uint8_t m_to_68k_cmd_req;
+	uint8_t m_to_68k_cmd_LVm;
 
 
 	int m_from68k_ack;
@@ -242,7 +242,7 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(kenseim_cmd_req_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(kenseim_cmd_LVm_r);
 
-	void set_leds(UINT32 ledstates);
+	void set_leds(uint32_t ledstates);
 	int m_led_latch;
 	int m_led_serial_data;
 	int m_led_clock;
@@ -257,7 +257,7 @@ public:
   Misc System Functions
  ******************************/
 
-void kenseim_state::set_leds(UINT32 ledstates)
+void kenseim_state::set_leds(uint32_t ledstates)
 {
 	for (int i=0; i<20; i++)
 		output().set_lamp_value(i+1, ((ledstates & (1 << i)) != 0));
@@ -459,8 +459,7 @@ static ADDRESS_MAP_START( kenseim_map, AS_PROGRAM, 8, kenseim_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kenseim_io_map, AS_IO, 8, kenseim_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x20, 0x27) AM_DEVREADWRITE("mb89363b", mb89363b_device, read, write)
+	AM_RANGE(0x20, 0x27) AM_MIRROR(0xff00) AM_DEVREADWRITE("mb89363b", mb89363b_device, read, write)
 ADDRESS_MAP_END
 
 
@@ -471,7 +470,7 @@ static const z80_daisy_config daisy_chain_gamecpu[] =
 	{ nullptr }
 };
 
-static MACHINE_CONFIG_DERIVED_CLASS( kenseim, cps1_12MHz, kenseim_state )
+static MACHINE_CONFIG_DERIVED( kenseim, cps1_12MHz )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("gamecpu", TMPZ84C011, XTAL_16MHz/2) // tmpz84c011-8

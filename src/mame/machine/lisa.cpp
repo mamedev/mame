@@ -19,7 +19,7 @@
     * finalize sound support (involves adding new features to the 6522 VIA core)
     * fix warm-reset (I think I need to use a callback when 68k RESET
       instruction is called)
-    * write support for additionnal hardware (hard disk, etc...)
+    * write support for additional hardware (hard disk, etc...)
     * emulate LISA1 (?)
     * optimize MMU emulation !
 
@@ -38,7 +38,9 @@
     Raphael Nabet, 2000-2003
 */
 
+#include "emu.h"
 #include "includes/lisa.h"
+#include "screen.h"
 
 
 /*
@@ -200,7 +202,7 @@ void lisa_state::COPS_send_data_if_possible()
 	{
 //        printf("COPsim: sending %02x to VIA\n", m_fifo_data[m_fifo_head]);
 
-		UINT8 data = m_fifo_data[m_fifo_head];/* output data */
+		uint8_t data = m_fifo_data[m_fifo_head];/* output data */
 		m_via0->write_pa0((data>>0)&1);
 		m_via0->write_pa1((data>>1)&1);
 		m_via0->write_pa2((data>>2)&1);
@@ -220,7 +222,7 @@ void lisa_state::COPS_send_data_if_possible()
 }
 
 /* send data (queue it into the FIFO if needed) */
-void lisa_state::COPS_queue_data(const UINT8 *data, int len)
+void lisa_state::COPS_queue_data(const uint8_t *data, int len)
 {
 #if 0
 	if (m_fifo_size + len <= 8)
@@ -263,8 +265,8 @@ void lisa_state::COPS_queue_data(const UINT8 *data, int len)
 void lisa_state::scan_keyboard()
 {
 	int i, j;
-	UINT8 keycode;
-	UINT32 keybuf[8] = { m_io_line0->read(), m_io_line1->read(), m_io_line2->read(), m_io_line3->read(),
+	uint8_t keycode;
+	uint32_t keybuf[8] = { m_io_line0->read(), m_io_line1->read(), m_io_line2->read(), m_io_line3->read(),
 						m_io_line4->read(), m_io_line5->read(), m_io_line6->read(), m_io_line7->read() };
 
 	if (! m_COPS_force_unplug)
@@ -540,7 +542,7 @@ TIMER_CALLBACK_MEMBER(lisa_state::read_COPS_command)
 			{
 				/* format and send reply */
 
-				UINT8 reply[7];
+				uint8_t reply[7];
 
 				reply[0] = 0x80;
 				reply[1] = 0xE0 | m_clock_regs.years;
@@ -584,7 +586,7 @@ void lisa_state::reset_COPS()
 
 void lisa_state::unplug_keyboard()
 {
-	static const UINT8 cmd[2] =
+	static const uint8_t cmd[2] =
 	{
 		0x80,   /* RESET code */
 		0xFD    /* keyboard unplugged */
@@ -611,7 +613,7 @@ void lisa_state::plug_keyboard()
 	        unknown : spanish, US dvorak, italian & swedish
 	*/
 
-	static const UINT8 cmd[2] =
+	static const uint8_t cmd[2] =
 	{
 		0x80,   /* RESET code */
 		0x3f    /* keyboard ID - US for now */
@@ -742,15 +744,15 @@ void lisa_state::video_start()
 /*
     Video update
 */
-UINT32 lisa_state::screen_update_lisa(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t lisa_state::screen_update_lisa(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT16 *v;
+	uint16_t *v;
 	int x, y;
 	/* resolution is 720*364 on lisa, vs 608*431 on mac XL */
 	int resx = (m_features.has_mac_xl_video) ? 608 : 720;   /* width */
 	int resy = (m_features.has_mac_xl_video) ? 431 : 364;   /* height */
 
-	UINT8 line_buffer[720];
+	uint8_t line_buffer[720];
 
 	v = m_videoram_ptr;
 
@@ -871,7 +873,7 @@ void lisa_state::nvram_init(nvram_device &nvram, void *data, size_t size)
 		m_clock_regs.clock_write_ptr = -1;
 	}
 #if 0
-	UINT32 temp32;
+	uint32_t temp32;
 	SINT8 temp8;
 	temp32 = (m_clock_regs.alarm << 12) | (m_clock_regs.years << 8) | (m_clock_regs.days1 << 4)
 	| m_clock_regs.days2;
@@ -909,7 +911,7 @@ DRIVER_INIT_MEMBER(lisa_state,lisa2)
 	m_features.has_double_sided_floppy = 0;
 	m_features.has_mac_xl_video = 0;
 
-	m_bad_parity_table = std::make_unique<UINT8[]>(0x40000);  /* 1 bit per byte of CPU RAM */
+	m_bad_parity_table = std::make_unique<uint8_t[]>(0x40000);  /* 1 bit per byte of CPU RAM */
 }
 
 DRIVER_INIT_MEMBER(lisa_state,lisa210)
@@ -922,7 +924,7 @@ DRIVER_INIT_MEMBER(lisa_state,lisa210)
 	m_features.has_double_sided_floppy = 0;
 	m_features.has_mac_xl_video = 0;
 
-	m_bad_parity_table = std::make_unique<UINT8[]>(0x40000);  /* 1 bit per byte of CPU RAM */
+	m_bad_parity_table = std::make_unique<uint8_t[]>(0x40000);  /* 1 bit per byte of CPU RAM */
 }
 
 DRIVER_INIT_MEMBER(lisa_state,mac_xl)
@@ -935,7 +937,7 @@ DRIVER_INIT_MEMBER(lisa_state,mac_xl)
 	m_features.has_double_sided_floppy = 0;
 	m_features.has_mac_xl_video = 1;
 
-	m_bad_parity_table = std::make_unique<UINT8[]>(0x40000);  /* 1 bit per byte of CPU RAM */
+	m_bad_parity_table = std::make_unique<uint8_t[]>(0x40000);  /* 1 bit per byte of CPU RAM */
 }
 
 void lisa_state::machine_start()
@@ -943,7 +945,8 @@ void lisa_state::machine_start()
 	m_mouse_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(lisa_state::handle_mouse),this));
 
 	/* read command every ms (don't know the real value) */
-	machine().scheduler().timer_pulse(attotime::from_msec(1), timer_expired_delegate(FUNC(lisa_state::set_COPS_ready),this));
+	m_cops_ready_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(lisa_state::set_COPS_ready), this));
+	m_cops_ready_timer->adjust(attotime::from_msec(1), 0, attotime::from_msec(1));
 
 	m_nvram->set_base(m_fdc_ram, 1024);
 }
@@ -975,7 +978,7 @@ void lisa_state::machine_reset()
 	set_VTIR(0);
 
 	m_video_address_latch = 0;
-	m_videoram_ptr = (UINT16 *) m_ram_ptr;
+	m_videoram_ptr = (uint16_t *) m_ram_ptr;
 
 	m_FDIR = 0;
 	m_via0->write_pb4(m_FDIR);
@@ -1025,7 +1028,7 @@ INTERRUPT_GEN_MEMBER(lisa_state::lisa_interrupt)
 					if (m_clock_regs.alarm == 0)
 					{
 						/* generate reset (should cause a VIA interrupt...) */
-						static const UINT8 cmd[2] =
+						static const uint8_t cmd[2] =
 						{
 							0x80,   /* RESET code */
 							0xFC    /* timer time-out */
@@ -1221,66 +1224,6 @@ WRITE8_MEMBER(lisa_state::lisa_fdc_io_w)
 	}
 }
 
-READ8_MEMBER(lisa_state::lisa_fdc_r)
-{
-	if (! (offset & 0x1000))
-	{
-		if (! (offset & 0x0800))
-			if (! (offset & 0x0400))
-				return m_fdc_ram[offset & 0x03ff];
-			else
-				return lisa_fdc_io_r(space, offset & 0x03ff);
-		else
-			return 0;   /* ??? */
-	}
-	else
-		return m_fdc_rom[offset & 0x0fff];
-}
-
-READ8_MEMBER(lisa_state::lisa210_fdc_r)
-{
-	if (! (offset & 0x1000))
-	{
-		if (! (offset & 0x0400))
-			if (! (offset & 0x0800))
-				return m_fdc_ram[offset & 0x03ff];
-			else
-				return lisa_fdc_io_r(space, offset & 0x03ff);
-		else
-			return 0;   /* ??? */
-	}
-	else
-		return m_fdc_rom[offset & 0x0fff];
-}
-
-WRITE8_MEMBER(lisa_state::lisa_fdc_w)
-{
-	if (! (offset & 0x1000))
-	{
-		if (! (offset & 0x0800))
-		{
-			if (! (offset & 0x0400))
-				m_fdc_ram[offset & 0x03ff] = data;
-			else
-				lisa_fdc_io_w(space, offset & 0x03ff, data);
-		}
-	}
-}
-
-WRITE8_MEMBER(lisa_state::lisa210_fdc_w)
-{
-	if (! (offset & 0x1000))
-	{
-		if (! (offset & 0x0400))
-		{
-			if (! (offset & 0x0800))
-				m_fdc_ram[offset & 0x03ff] = data;
-			else
-				lisa_fdc_io_w(space, offset & 0x03ff, data);
-		}
-	}
-}
-
 READ16_MEMBER(lisa_state::lisa_r)
 {
 	int answer=0;
@@ -1317,7 +1260,7 @@ READ16_MEMBER(lisa_state::lisa_r)
 			}
 			else
 			{   /* system ROMs */
-				answer = ((UINT16*)m_rom_ptr)[(offset & 0x001fff)];
+				answer = ((uint16_t*)m_rom_ptr)[(offset & 0x001fff)];
 				/*logerror("dst address in ROM (setup mode)\n");*/
 			}
 
@@ -1348,7 +1291,7 @@ READ16_MEMBER(lisa_state::lisa_r)
 				/* out of segment limits : bus error */
 
 			}
-			answer = *(UINT16 *)(m_ram_ptr + address);
+			answer = *(uint16_t *)(m_ram_ptr + address);
 
 			if (m_bad_parity_count && m_test_parity
 					&& (m_bad_parity_table[address >> 3] & (0x3 << (address & 0x7))))
@@ -1366,7 +1309,7 @@ READ16_MEMBER(lisa_state::lisa_r)
 				/* out of segment limits : bus error */
 
 			}
-			answer = *(UINT16 *)(m_ram_ptr + address);
+			answer = *(uint16_t *)(m_ram_ptr + address);
 
 			if (m_bad_parity_count && m_test_parity
 					&& (m_bad_parity_table[address >> 3] & (0x3 << (address & 0x7))))
@@ -1391,7 +1334,7 @@ READ16_MEMBER(lisa_state::lisa_r)
 
 		case special_IO:
 			if (! (address & 0x008000))
-				answer = *(UINT16 *)(m_rom_ptr + (address & 0x003fff));
+				answer = *(uint16_t *)(m_rom_ptr + (address & 0x003fff));
 			else
 			{   /* read serial number from ROM */
 				/* this has to be be the least efficient way to read a ROM :-) */
@@ -1412,7 +1355,7 @@ READ16_MEMBER(lisa_state::lisa_r)
 
 				/* Something appears to be wrong with the timings, since we expect to read the
 				2nd half when v-syncing, i.e. for lines beyond the 431th or 364th one (provided
-				there are no additionnal margins).
+				there are no additional margins).
 				This is caused by the fact that 68k timings are wrong (memory accesses are
 				interlaced with the video hardware, which is not emulated). */
 				if (m_features.has_mac_xl_video)
@@ -1550,7 +1493,7 @@ WRITE16_MEMBER(lisa_state::lisa_w)
 				/* out of segment limits : bus error */
 
 			}
-			COMBINE_DATA((UINT16 *) (m_ram_ptr + address));
+			COMBINE_DATA((uint16_t *) (m_ram_ptr + address));
 			if (m_diag2)
 			{
 				if ((ACCESSING_BITS_0_7)
@@ -1589,7 +1532,7 @@ WRITE16_MEMBER(lisa_state::lisa_w)
 				/* out of segment limits : bus error */
 
 			}
-			COMBINE_DATA((UINT16 *) (m_ram_ptr + address));
+			COMBINE_DATA((uint16_t *) (m_ram_ptr + address));
 			if (m_diag2)
 			{
 				if ((ACCESSING_BITS_0_7)
@@ -1664,61 +1607,67 @@ WRITE16_MEMBER(lisa_state::lisa_w)
 
 void lisa_state::cpu_board_control_access(offs_t offset)
 {
-	switch ((offset & 0x03ff) << 1)
-	{
-	case 0x0002:    /* Set DIAG1 Latch */
-	case 0x0000:    /* Reset DIAG1 Latch */
-		break;
-	case 0x0006:    /* Set Diag2 Latch */
-		m_diag2 = 1;
-		break;
-	case 0x0004:    /* ReSet Diag2 Latch */
-		m_diag2 = 0;
-		break;
-	case 0x000A:    /* SEG1 Context Selection bit SET */
-		/*logerror("seg bit 0 set\n");*/
+	m_latch->write_bit(offset >> 1, offset & 1);
+}
+
+WRITE_LINE_MEMBER(lisa_state::diag1_w)
+{
+	// Set/reset DIAG1
+}
+
+WRITE_LINE_MEMBER(lisa_state::diag2_w)
+{
+	// Set/reset DIAG2
+	m_diag2 = state;
+}
+
+WRITE_LINE_MEMBER(lisa_state::seg1_w)
+{
+	// Set/reset SEG1 Context Selection bit
+	//logerror("seg bit 0 %s\n", state ? "set" : "clear");
+	if (state)
 		m_seg |= 1;
-		break;
-	case 0x0008:    /* SEG1 Context Selection bit RESET */
-		/*logerror("seg bit 0 clear\n");*/
+	else
 		m_seg &= ~1;
-		break;
-	case 0x000E:    /* SEG2 Context Selection bit SET */
-		/*logerror("seg bit 1 set\n");*/
+}
+
+WRITE_LINE_MEMBER(lisa_state::seg2_w)
+{
+	// Set/reset SEG2 Context Selection bit
+	//logerror("seg bit 1 %s\n", state ? "set" : "clear");
+	if (state)
 		m_seg |= 2;
-		break;
-	case 0x000C:    /* SEG2 Context Selection bit RESET */
-		/*logerror("seg bit 1 clear\n");*/
+	else
 		m_seg &= ~2;
-		break;
-	case 0x0010:    /* SETUP register SET */
-		logerror("setup SET %s\n", machine().describe_context());
-		m_setup = 1;
-		break;
-	case 0x0012:    /* SETUP register RESET */
-		logerror("setup UNSET %s\n", machine().describe_context());
-		m_setup = 0;
-		break;
-	case 0x001A:    /* Enable Vertical Retrace Interrupt */
-		logerror("enable retrace %s\n", machine().describe_context());
-		m_VTMSK = 1;
-		break;
-	case 0x0018:    /* Disable Vertical Retrace Interrupt */
-		logerror("disable retrace %s\n", machine().describe_context());
-		m_VTMSK = 0;
+}
+
+WRITE_LINE_MEMBER(lisa_state::setup_w)
+{
+	// Reset/set SETUP register
+	logerror("setup %s %s\n", state ? "UNSET" : "SET", machine().describe_context());
+	m_setup = !state;
+}
+
+WRITE_LINE_MEMBER(lisa_state::vtmsk_w)
+{
+	// Enable/disable Vertical Retrace Interrupt
+	logerror("%s retrace %s\n", state ? "enable" : "disable", machine().describe_context());
+	m_VTMSK = state;
+	if (!state)
 		set_VTIR(2);
-		break;
-	case 0x0016:    /* Enable Soft Error Detect. */
-	case 0x0014:    /* Disable Soft Error Detect. */
-		break;
-	case 0x001E:    /* Enable Hard Error Detect */
-		m_test_parity = 1;
-		break;
-	case 0x001C:    /* Disable Hard Error Detect */
-		m_test_parity = 0;
+}
+
+WRITE_LINE_MEMBER(lisa_state::sfmsk_w)
+{
+	// Enable/disable Soft Error Detect
+}
+
+WRITE_LINE_MEMBER(lisa_state::hdmsk_w)
+{
+	// Enable/disable Hard Error Detect
+	m_test_parity = state;
+	if (!state)
 		set_parity_error_pending(0);
-		break;
-	}
 }
 
 READ16_MEMBER(lisa_state::lisa_IO_r)
@@ -1917,7 +1866,7 @@ WRITE16_MEMBER(lisa_state::lisa_IO_w)
 		case 0x1:   /* Video Address Latch */
 			/*logerror("video address latch write offs=%X, data=%X\n", offset, data);*/
 			COMBINE_DATA(& m_video_address_latch);
-			m_videoram_ptr = ((UINT16 *)m_ram_ptr) + ((m_video_address_latch << 6) & 0xfc000);
+			m_videoram_ptr = ((uint16_t *)m_ram_ptr) + ((m_video_address_latch << 6) & 0xfc000);
 			/*logerror("video address latch %X -> base address %X\n", m_video_address_latch,
 			                (m_video_address_latch << 7) & 0x1f8000);*/
 			break;

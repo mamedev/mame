@@ -53,8 +53,6 @@ Taito: 2 * PC080SN, PC060HA, TC0040IOC, 2 * TC0060DCA, PC050CM
 TODO Lists
 ==========
 
-Replace TC0140SYT with PC060HA
-
 Minor black glitches on the road: these are all on the right
 hand edge of the tilemap making up the "left" half: this is
 the upper of the two road tilemaps so any gunk will be visible.
@@ -156,16 +154,20 @@ From JP manual
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/topspeed.h"
+#include "includes/taitoipt.h"
+#include "audio/taitosnd.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
-#include "machine/z80ctc.h"
 #include "machine/taitoio.h"
-#include "audio/taitosnd.h"
-#include "sound/2151intf.h"
-#include "sound/msm5205.h"
+#include "machine/z80ctc.h"
 #include "sound/flt_vol.h"
-#include "includes/taitoipt.h"
-#include "includes/topspeed.h"
+#include "sound/msm5205.h"
+#include "sound/ym2151.h"
+#include "screen.h"
+#include "speaker.h"
+
 #include "topspeed.lh"
 
 
@@ -188,8 +190,8 @@ WRITE16_MEMBER(topspeed_state::cpua_ctrl_w)
 READ8_MEMBER(topspeed_state::input_bypass_r)
 {
 	// Read port number
-	UINT8 port = m_tc0220ioc->port_r(space, 0);
-	UINT16 steer = 0xff80 + read_safe(ioport("STEER"), 0);
+	uint8_t port = m_tc0040ioc->port_r(space, 0);
+	uint16_t steer = 0xff80 + m_steer.read_safe(0);
 
 	switch (port)
 	{
@@ -200,15 +202,15 @@ READ8_MEMBER(topspeed_state::input_bypass_r)
 			return steer >> 8;
 
 		default:
-			return m_tc0220ioc->portreg_r(space, offset);
+			return m_tc0040ioc->portreg_r(space, offset);
 	}
 }
 
 CUSTOM_INPUT_MEMBER(topspeed_state::pedal_r)
 {
-	static const UINT8 retval[8] = { 0,1,3,2,6,7,5,4 };
-	const char *tag = (const char *)param;
-	return retval[read_safe(ioport(tag), 0) & 7];
+	static const uint8_t retval[8] = { 0,1,3,2,6,7,5,4 };
+	ioport_port *port = ioport((const char *)param);
+	return retval[port != nullptr ? port->read() & 7 : 0];
 }
 
 READ16_MEMBER(topspeed_state::motor_r)
@@ -245,6 +247,14 @@ WRITE16_MEMBER(topspeed_state::motor_w)
 	logerror("CPU #0 PC %06x: warning - write %04x to motor cpu %03x\n", space.device().safe_pc(), data, offset);
 }
 
+WRITE8_MEMBER(topspeed_state::coins_w)
+{
+	machine().bookkeeping().coin_lockout_w(0, ~data & 0x01);
+	machine().bookkeeping().coin_lockout_w(1, ~data & 0x02);
+	machine().bookkeeping().coin_counter_w(0, data & 0x04);
+	machine().bookkeeping().coin_counter_w(1, data & 0x08);
+}
+
 
 /*****************************************************
                         SOUND
@@ -260,7 +270,7 @@ void topspeed_state::msm5205_update(int chip)
 	if (m_msm_reset[chip])
 		return;
 
-	UINT8 data = m_msm_rom[chip][m_msm_pos[chip]];
+	uint8_t data = m_msm_rom[chip][m_msm_pos[chip]];
 	msm5205_device *msm = chip ? m_msm2 : m_msm1;
 
 	msm->data_w((m_msm_nibble[chip] ? data : data >> 4) & 0xf);
@@ -339,7 +349,7 @@ WRITE_LINE_MEMBER(topspeed_state::z80ctc_to0)
 		else
 		{
 			// Update on falling edge of /VCK
-			UINT16 oldpos = m_msm_pos[1];
+			uint16_t oldpos = m_msm_pos[1];
 
 			msm5205_update(1);
 
@@ -372,8 +382,8 @@ static ADDRESS_MAP_START( cpua_map, AS_PROGRAM, 16, topspeed_state )
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM AM_SHARE("sharedram")
 	AM_RANGE(0x500000, 0x503fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x600002, 0x600003) AM_WRITE(cpua_ctrl_w)
-	AM_RANGE(0x7e0000, 0x7e0001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0x00ff)
-	AM_RANGE(0x7e0002, 0x7e0003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0x00ff)
+	AM_RANGE(0x7e0000, 0x7e0001) AM_READNOP AM_DEVWRITE8("ciu", pc060ha_device, master_port_w, 0x00ff)
+	AM_RANGE(0x7e0002, 0x7e0003) AM_DEVREADWRITE8("ciu", pc060ha_device, master_comm_r, master_comm_w, 0x00ff)
 	AM_RANGE(0x800000, 0x8003ff) AM_RAM AM_SHARE("raster_ctrl")
 	AM_RANGE(0x800400, 0x80ffff) AM_RAM
 	AM_RANGE(0x880000, 0x880007) AM_WRITENOP // Lamps/outputs?
@@ -391,9 +401,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cpub_map, AS_PROGRAM, 16, topspeed_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
-	AM_RANGE(0x400000, 0X40ffff) AM_RAM AM_SHARE("sharedram")
-	AM_RANGE(0x880000, 0x880001) AM_READ8(input_bypass_r, 0x00ff) AM_DEVWRITE8("tc0220ioc", tc0220ioc_device, portreg_w, 0x00ff)
-	AM_RANGE(0x880002, 0x880003) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, port_r, port_w, 0x00ff)
+	AM_RANGE(0x400000, 0x40ffff) AM_RAM AM_SHARE("sharedram")
+	AM_RANGE(0x880000, 0x880001) AM_READ8(input_bypass_r, 0x00ff) AM_DEVWRITE8("tc0040ioc", tc0040ioc_device, portreg_w, 0x00ff)
+	AM_RANGE(0x880002, 0x880003) AM_DEVREADWRITE8("tc0040ioc", tc0040ioc_device, port_r, port_w, 0x00ff)
 	AM_RANGE(0x900000, 0x9003ff) AM_READWRITE(motor_r, motor_w)
 ADDRESS_MAP_END
 
@@ -405,8 +415,8 @@ static ADDRESS_MAP_START( z80_prg, AS_PROGRAM, 8, topspeed_state )
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("sndbank")
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("tc0140syt", tc0140syt_device, slave_port_w)
-	AM_RANGE(0xa001, 0xa001) AM_DEVREADWRITE("tc0140syt", tc0140syt_device, slave_comm_r, slave_comm_w)
+	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("ciu", pc060ha_device, slave_port_w)
+	AM_RANGE(0xa001, 0xa001) AM_DEVREADWRITE("ciu", pc060ha_device, slave_comm_r, slave_comm_w)
 	AM_RANGE(0xb000, 0xcfff) AM_WRITE(msm5205_command_w)
 	AM_RANGE(0xd000, 0xdfff) AM_WRITE(volume_w)
 ADDRESS_MAP_END
@@ -558,7 +568,7 @@ void topspeed_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( topspeed, topspeed_state )
+static MACHINE_CONFIG_START( topspeed )
 
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz / 2)
@@ -586,16 +596,17 @@ static MACHINE_CONFIG_START( topspeed, topspeed_state )
 	MCFG_PC080SN_OFFSETS(0, 8)
 	MCFG_PC080SN_GFXDECODE("gfxdecode")
 
-	MCFG_DEVICE_ADD("tc0140syt", TC0140SYT, 0)
-	MCFG_TC0140SYT_MASTER_CPU("maincpu")
-	MCFG_TC0140SYT_SLAVE_CPU("audiocpu")
+	MCFG_DEVICE_ADD("ciu", PC060HA, 0)
+	MCFG_PC060HA_MASTER_CPU("maincpu")
+	MCFG_PC060HA_SLAVE_CPU("audiocpu")
 
-	MCFG_DEVICE_ADD("tc0220ioc", TC0220IOC, 0)
-	MCFG_TC0220IOC_READ_0_CB(IOPORT("DSWA"))
-	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
-	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
-	MCFG_TC0220IOC_READ_3_CB(IOPORT("IN1"))
-	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
+	MCFG_DEVICE_ADD("tc0040ioc", TC0040IOC, 0)
+	MCFG_TC0040IOC_READ_0_CB(IOPORT("DSWA"))
+	MCFG_TC0040IOC_READ_1_CB(IOPORT("DSWB"))
+	MCFG_TC0040IOC_READ_2_CB(IOPORT("IN0"))
+	MCFG_TC0040IOC_READ_3_CB(IOPORT("IN1"))
+	MCFG_TC0040IOC_WRITE_4_CB(WRITE8(topspeed_state, coins_w))
+	MCFG_TC0040IOC_READ_7_CB(IOPORT("IN2"))
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -621,11 +632,11 @@ static MACHINE_CONFIG_START( topspeed, topspeed_state )
 
 	MCFG_SOUND_ADD("msm1", MSM5205, XTAL_384kHz)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(topspeed_state, msm5205_1_vck)) // VCK function
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      // 8 kHz, 4-bit
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      // 8 kHz, 4-bit
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "filter2", 1.0)
 
 	MCFG_SOUND_ADD("msm2", MSM5205, XTAL_384kHz)
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_SEX_4B)      // Slave mode, 4-bit
+	MCFG_MSM5205_PRESCALER_SELECTOR(SEX_4B)      // Slave mode, 4-bit
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "filter3", 1.0)
 
 	MCFG_FILTER_VOLUME_ADD("filter1l", 0)
@@ -774,6 +785,6 @@ ROM_START( fullthrl )
 ROM_END
 
 
-GAMEL( 1987, topspeed, 0,        topspeed, topspeed, driver_device, 0, ROT0, "Taito Corporation Japan",                     "Top Speed (World)",     MACHINE_SUPPORTS_SAVE, layout_topspeed )
-GAMEL( 1987, topspeedu,topspeed, topspeed, fullthrl, driver_device, 0, ROT0, "Taito America Corporation (Romstar license)", "Top Speed (US)",        MACHINE_SUPPORTS_SAVE, layout_topspeed )
-GAMEL( 1987, fullthrl, topspeed, topspeed, fullthrl, driver_device, 0, ROT0, "Taito Corporation",                           "Full Throttle (Japan)", MACHINE_SUPPORTS_SAVE, layout_topspeed )
+GAMEL( 1987, topspeed, 0,        topspeed, topspeed, topspeed_state, 0, ROT0, "Taito Corporation Japan",                     "Top Speed (World)",     MACHINE_SUPPORTS_SAVE, layout_topspeed )
+GAMEL( 1987, topspeedu,topspeed, topspeed, fullthrl, topspeed_state, 0, ROT0, "Taito America Corporation (Romstar license)", "Top Speed (US)",        MACHINE_SUPPORTS_SAVE, layout_topspeed )
+GAMEL( 1987, fullthrl, topspeed, topspeed, fullthrl, topspeed_state, 0, ROT0, "Taito Corporation",                           "Full Throttle (Japan)", MACHINE_SUPPORTS_SAVE, layout_topspeed )

@@ -31,7 +31,7 @@ void dai_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 		timer_set(attotime::from_hz(100), TIMER_TMS5501);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in dai_state::device_timer");
+		assert_always(false, "Unknown id in dai_state::device_timer");
 	}
 }
 
@@ -55,7 +55,7 @@ void dai_state::dai_update_memory(int dai_rom_bank)
 
 READ8_MEMBER(dai_state::dai_keyboard_r)
 {
-	UINT8 data = 0x00;
+	uint8_t data = 0x00;
 	static const char *const keynames[] = { "IN0", "IN1", "IN2", "IN3", "IN4", "IN5", "IN6", "IN7" };
 
 	for (int i = 0; i < 8; i++)
@@ -122,7 +122,7 @@ void dai_state::machine_reset()
 
 READ8_MEMBER(dai_state::dai_io_discrete_devices_r)
 {
-	UINT8 data = 0x00;
+	uint8_t data = 0x00;
 
 	switch(offset & 0x000f) {
 	case 0x00:

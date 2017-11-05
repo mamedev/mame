@@ -6,26 +6,29 @@
 
 ***************************************************************************/
 
+#include "emu.h"
+
 /* mingw-gcc defines this */
 #ifdef i386
 #undef i386
 #endif /* i386 */
 
-
-#include "emu.h"
-#include "cpu/i86/i286.h"
-#include "cpu/i386/i386.h"
-#include "machine/at.h"
-#include "machine/wd7600.h"
-#include "machine/cs8221.h"
-#include "machine/nvram.h"
-#include "machine/vt82c496.h"
+#include "bus/isa/isa_cards.h"
 #include "bus/lpci/pci.h"
 #include "bus/lpci/vt82c505.h"
-#include "machine/ds128x.h"
-#include "machine/ram.h"
-#include "bus/isa/isa_cards.h"
 #include "bus/pc_kbd/keyboards.h"
+#include "cpu/i386/i386.h"
+#include "cpu/i86/i286.h"
+#include "machine/at.h"
+#include "machine/cs8221.h"
+#include "machine/ds128x.h"
+#include "machine/idectrl.h"
+#include "machine/nvram.h"
+#include "machine/ram.h"
+#include "machine/vt82c496.h"
+#include "machine/wd7600.h"
+#include "softlist_dev.h"
+#include "speaker.h"
 
 class at_state : public driver_device
 {
@@ -35,7 +38,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_mb(*this, "mb"),
 		m_ram(*this, RAM_TAG)
-		{ }
+	{ }
 	required_device<cpu_device> m_maincpu;
 	required_device<at_mb_device> m_mb;
 	required_device<ram_device> m_ram;
@@ -48,7 +51,7 @@ public:
 	DECLARE_MACHINE_START(vrom_fix);
 
 	void init_at_common(int xmsbase);
-	UINT16 m_ps1_reg[2];
+	uint16_t m_ps1_reg[2];
 };
 
 class megapc_state : public driver_device
@@ -60,7 +63,7 @@ public:
 		m_wd7600(*this, "wd7600"),
 		m_isabus(*this, "isabus"),
 		m_speaker(*this, "speaker")
-		{ }
+	{ }
 
 public:
 	required_device<cpu_device> m_maincpu;
@@ -136,7 +139,7 @@ WRITE16_MEMBER( at_state::ps1_unk_w )
 
 READ8_MEMBER( at_state::ps1_portb_r )
 {
-	UINT8 data = m_mb->portb_r(space, offset);
+	uint8_t data = m_mb->portb_r(space, offset);
 	/* 0x10 is the dram refresh line bit, 15.085us. */
 	data = (data & ~0x10) | ((machine().time().as_ticks(66291) & 1) ? 0x10 : 0);
 
@@ -152,8 +155,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( neat_io, AS_IO, 16, at_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0022, 0x0023) AM_DEVWRITE8("cs8221", cs8221_device, address_w, 0x00ff)
-	AM_RANGE(0x0022, 0x0023) AM_DEVREADWRITE8("cs8221", cs8221_device, data_r, data_w, 0xff00)
+	AM_RANGE(0x0022, 0x0023) AM_DEVICE("cs8221", cs8221_device, map)
 	AM_RANGE(0x0000, 0x00ff) AM_DEVICE("mb", at_mb_device, map)
 ADDRESS_MAP_END
 
@@ -175,21 +177,21 @@ ADDRESS_MAP_END
 
 DRIVER_INIT_MEMBER(megapc_state, megapc)
 {
-	UINT8* ROM = memregion("bios")->base();
+	uint8_t* ROM = memregion("bios")->base();
 	ROM[0x19145] = 0x45;  // hack to fix keyboard.  To be removed when the keyboard controller from the MegaPC is dumped
 	ROM[0x1fea0] = 0x20;  // to correct checksum
 }
 
 DRIVER_INIT_MEMBER(megapc_state, megapcpl)
 {
-	UINT8* ROM = memregion("bios")->base();
+	uint8_t* ROM = memregion("bios")->base();
 	ROM[0x187b1] = 0x55;  // hack to fix keyboard.  To be removed when the keyboard controller from the MegaPC is dumped
 	ROM[0x1fea0] = 0x20;  // to correct checksum
 }
 
 DRIVER_INIT_MEMBER(at_state, megapcpla)
 {
-	UINT8* ROM = memregion("bios")->base();
+	uint8_t* ROM = memregion("bios")->base();
 
 	init_at_common(0xa0000);
 
@@ -282,7 +284,7 @@ static SLOT_INTERFACE_START( pci_devices )
 	SLOT_INTERFACE_INTERNAL("vt82c505", VT82C505)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( ibm5170, at_state )
+static MACHINE_CONFIG_START( ibm5170 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I80286, XTAL_12MHz/2 /*6000000*/)
 	MCFG_CPU_PROGRAM_MAP(at16_map)
@@ -349,6 +351,10 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( neat, atvga )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(neat_io)
+	MCFG_DEVICE_REMOVE("mb:rtc")  // TODO: move this into the cs8221
+	MCFG_DS12885_ADD("mb:rtc")
+	MCFG_MC146818_IRQ_HANDLER(DEVWRITELINE("pic8259_slave", pic8259_device, ir0_w)) // this is in :mb
+	MCFG_MC146818_CENTURY_INDEX(0x32)
 	MCFG_CS8221_ADD("cs8221", "maincpu", "mb:isa", "bios")
 MACHINE_CONFIG_END
 
@@ -366,7 +372,7 @@ static MACHINE_CONFIG_DERIVED( k286i, ibm5162 )
 	MCFG_ISA16_SLOT_ADD("mb:isabus","isa8", pc_isa16_cards, nullptr, false)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( at386, at_state )
+static MACHINE_CONFIG_START( at386 )
 	MCFG_CPU_ADD("maincpu", I386, 12000000)
 	MCFG_CPU_PROGRAM_MAP(at32_map)
 	MCFG_CPU_IO_MAP(at32_io)
@@ -426,7 +432,7 @@ static MACHINE_CONFIG_DERIVED( ct386sx, at386sx )
 	MCFG_CS8221_ADD("cs8221", "maincpu", "mb:isa", "maincpu")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( megapc, megapc_state )
+static MACHINE_CONFIG_START( megapc )
 	MCFG_CPU_ADD("maincpu", I386SX, XTAL_50MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(megapc_map)
 	MCFG_CPU_IO_MAP(megapc_io)
@@ -511,7 +517,7 @@ static MACHINE_CONFIG_DERIVED( megapcpl, megapc )
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("wd7600", wd7600_device, intack_cb)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( megapcpla, at_state )
+static MACHINE_CONFIG_START( megapcpla )
 	MCFG_CPU_ADD("maincpu", I486, 66000000 / 2)  // 486SLC
 	MCFG_CPU_PROGRAM_MAP(at32l_map)
 	MCFG_CPU_IO_MAP(at32_io)
@@ -545,7 +551,7 @@ static MACHINE_CONFIG_START( megapcpla, at_state )
 	MCFG_SOFTWARE_LIST_ADD("disk_list","megapc")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( ficpio2, at_state )
+static MACHINE_CONFIG_START( ficpio2 )
 	MCFG_CPU_ADD("maincpu", I486, 25000000)
 	MCFG_CPU_PROGRAM_MAP(ficpio_map)
 	MCFG_CPU_IO_MAP(ficpio_io)
@@ -691,9 +697,9 @@ ROM_START( at )
 	ROMX_LOAD("at110387.0", 0x10000, 0x8000, CRC(65ae1f97) SHA1(91a29c7deecf7a9afbba330e64e0eee9aafee4d1),ROM_SKIP(1) | ROM_BIOS(2) )
 	ROM_SYSTEM_BIOS(2, "ami206", "AMI C 206.1")  /*(Motherboard Manufacturer: Unknown.) (BIOS release date:: 15-10-1990)*/
 	ROMX_LOAD( "amic206.bin",    0x10000, 0x10000,CRC(25a67c34) SHA1(91e9d8cdc2f1b40a601a23ceaff2189fd1245f3b), ROM_BIOS(3) )
-	ROM_SYSTEM_BIOS(3, "amic21", "AMI C 21.1") /* bad dump, checksum off by 8 in the lsb*/
+	ROM_SYSTEM_BIOS(3, "amic21", "AMI C 21.1")
 	ROMX_LOAD( "amic21-2.bin",  0x10001, 0x8000, CRC(8ffe7752) SHA1(68215f07a170ee7bdcb3e52b370d470af1741f7e),ROM_SKIP(1) | ROM_BIOS(4) )
-	ROMX_LOAD( "amic21-1.bin",  0x10000, 0x8000, CRC(5644ed38) SHA1(963555ec77845defc3b42b433280908e1797076e),ROM_SKIP(1) | ROM_BIOS(4) )
+	ROMX_LOAD( "amic21-1.bin",  0x10000, 0x8000, CRC(a76497f6) SHA1(91b47d86967426945b2916cb40e76a8da2d31d54),ROM_SKIP(1) | ROM_BIOS(4) )
 	ROM_SYSTEM_BIOS(4, "ami101", "AMI HT 101.1") /* Quadtel Enhanced 286 Bios Version 3.04.02 */
 	ROMX_LOAD( "amiht-h.bin",   0x10001, 0x8000, CRC(8022545f) SHA1(42541d4392ad00b0e064b3a8ccf2786d875c7c19),ROM_SKIP(1) | ROM_BIOS(5) )
 	ROMX_LOAD( "amiht-l.bin",   0x10000, 0x8000, CRC(285f6b8f) SHA1(2fce4ec53b68c9a7580858e16c926dc907820872),ROM_SKIP(1) | ROM_BIOS(5) )
@@ -738,9 +744,9 @@ ROM_START( atvga )
 	ROMX_LOAD( "ami211.bin",     0x10000, 0x10000,CRC(a0b5d269) SHA1(44db8227d35a09e39b93ed944f85dcddb0dd0d39), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS(2, "ami206", "AMI C 206.1") /*(Motherboard Manufacturer: Unknown.) (BIOS release date:: 15-10-1990)*/
 	ROMX_LOAD( "amic206.bin",    0x10000, 0x10000,CRC(25a67c34) SHA1(91e9d8cdc2f1b40a601a23ceaff2189fd1245f3b), ROM_BIOS(3) )
-	ROM_SYSTEM_BIOS(3, "amic21", "AMI C 21.1") /* bad dump, checksum off by 8 in the lsb*/
+	ROM_SYSTEM_BIOS(3, "amic21", "AMI C 21.1")
 	ROMX_LOAD( "amic21-2.bin",  0x10001, 0x8000, CRC(8ffe7752) SHA1(68215f07a170ee7bdcb3e52b370d470af1741f7e),ROM_SKIP(1) | ROM_BIOS(4) )
-	ROMX_LOAD( "amic21-1.bin",  0x10000, 0x8000, CRC(5644ed38) SHA1(963555ec77845defc3b42b433280908e1797076e),ROM_SKIP(1) | ROM_BIOS(4) )
+	ROMX_LOAD( "amic21-1.bin",  0x10000, 0x8000, CRC(a76497f6) SHA1(91b47d86967426945b2916cb40e76a8da2d31d54),ROM_SKIP(1) | ROM_BIOS(4) )
 	ROM_SYSTEM_BIOS(4, "ami101", "AMI HT 101.1") /* Quadtel Enhanced 286 Bios Version 3.04.02 */
 	ROMX_LOAD( "amiht-h.bin",   0x10001, 0x8000, CRC(8022545f) SHA1(42541d4392ad00b0e064b3a8ccf2786d875c7c19),ROM_SKIP(1) | ROM_BIOS(5) )
 	ROMX_LOAD( "amiht-l.bin",   0x10000, 0x8000, CRC(285f6b8f) SHA1(2fce4ec53b68c9a7580858e16c926dc907820872),ROM_SKIP(1) | ROM_BIOS(5) )
@@ -766,6 +772,9 @@ ROM_START( atvga )
 	ROM_SYSTEM_BIOS(12, "at", "PC 286") /*(Motherboard Manufacturer: Unknown.) (BIOS release date:: 03-11-1987)*/
 	ROMX_LOAD("at110387.1", 0x10001, 0x8000, CRC(679296a7) SHA1(ae891314cac614dfece686d8e1d74f4763cf40e3),ROM_SKIP(1) | ROM_BIOS(13) )
 	ROMX_LOAD("at110387.0", 0x10000, 0x8000, CRC(65ae1f97) SHA1(91a29c7deecf7a9afbba330e64e0eee9aafee4d1),ROM_SKIP(1) | ROM_BIOS(13) )
+	ROM_SYSTEM_BIOS(13, "bravo", "AST Bravo/286") // fails with keyboard controller test, probably expects specific kbdc rom
+	ROMX_LOAD("107000-704.bin", 0x10000, 0x8000, CRC(94faf87e) SHA1(abaafa6c2ae9b9fba95b244dcbcc1c752ac6c0a0),ROM_SKIP(1) | ROM_BIOS(14) )
+	ROMX_LOAD("107000-705.bin", 0x10001, 0x8000, CRC(e1263c1e) SHA1(b564f1043ef45ecbdf4f06bb500150ad992c2931),ROM_SKIP(1) | ROM_BIOS(14) )
 ROM_END
 
 ROM_START( xb42639 )
@@ -800,12 +809,20 @@ ROM_START( xb42664a )
 	ROM_LOAD16_BYTE("10217.hi", 0x10001, 0x8000, CRC(111725cf) SHA1(f6018a45bda4476d40c5881fb0a506ff75ec1688))
 ROM_END
 
-
 ROM_START( neat )
 	ROM_REGION(0x20000,"bios", 0)
-	//ROM_SYSTEM_BIOS(0, "neat286", "NEAT 286")
-	ROM_LOAD16_BYTE("at030389.0", 0x10000, 0x8000, CRC(4c36e61d) SHA1(094e8d5e6819889163cb22a2cf559186de782582))
-	ROM_LOAD16_BYTE("at030389.1", 0x10001, 0x8000, CRC(4e90f294) SHA1(18c21fd8d7e959e2292a9afbbaf78310f9cad12f))
+	ROM_SYSTEM_BIOS(0, "neat286", "NEAT 286")
+	ROMX_LOAD("at030389.0", 0x10000, 0x8000, CRC(4c36e61d) SHA1(094e8d5e6819889163cb22a2cf559186de782582),ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("at030389.1", 0x10001, 0x8000, CRC(4e90f294) SHA1(18c21fd8d7e959e2292a9afbbaf78310f9cad12f),ROM_SKIP(1) | ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(1, "pb800", "Packard Bell PB800")
+	ROMX_LOAD( "3.10.12-1.bin", 0x10001, 0x8000, CRC(e6bb54c5) SHA1(fa5a376dd44696c78dcc8994e18938b5e1b3e45a),ROM_SKIP(1) | ROM_BIOS(2) )
+	ROMX_LOAD( "3.10.12-2.bin", 0x10000, 0x8000, CRC(bde46933) SHA1(c7221192f48d6f2f5b773c3c7d2a52b635cb473e),ROM_SKIP(1) | ROM_BIOS(2) )
+ROM_END
+
+ROM_START( at386sx )
+	ROM_REGION(0x20000,"bios", 0)
+	ROM_SYSTEM_BIOS(0, "mb386sx", "mb386sx-25spb") // VLSI SCAMPSX
+	ROMX_LOAD("386sx_bios_plus.bin", 0x10000, 0x10000, CRC(f71e5a8d) SHA1(e73fda2547d92bf578e93623d5f2349b97e22393), ROM_BIOS(1) )
 ROM_END
 
 ROM_START( ct386sx )
@@ -1099,7 +1116,7 @@ COMP ( 1987, at,       ibm5170, 0,       ibm5162,   0,    at_state,      at,    
 COMP ( 1987, atvga,    ibm5170, 0,       atvga,     0,    at_state,      at,      "<generic>",  "PC/AT (VGA, MF2 Keyboard)" , MACHINE_NOT_WORKING )
 COMP ( 1988, at386,    ibm5170, 0,       at386,     0,    at_state,      at,      "<generic>",  "PC/AT 386 (VGA, MF2 Keyboard)", MACHINE_NOT_WORKING )
 COMP ( 1988, ct386sx,  ibm5170, 0,       ct386sx,   0,    at_state,      at,      "<generic>",  "NEAT 386SX (VGA, MF2 Keyboard)", MACHINE_NOT_WORKING )
-//COMP ( 1988, at386sx,  ibm5170, 0,       ct386sx,   0,    at_state,      at,      "<generic>",  "PC/AT 386SX (VGA, MF2 Keyboard)", MACHINE_NOT_WORKING )
+COMP ( 1988, at386sx,  ibm5170, 0,       at386sx,   0,    at_state,      at,      "<generic>",  "PC/AT 386SX (VGA, MF2 Keyboard)", MACHINE_NOT_WORKING )
 COMP ( 1990, at486,    ibm5170, 0,       at486,     0,    at_state,      at,      "<generic>",  "PC/AT 486 (VGA, MF2 Keyboard)", MACHINE_NOT_WORKING )
 COMP ( 1989, neat,     ibm5170, 0,       neat,      0,    at_state,      at,      "<generic>",  "NEAT (VGA, MF2 Keyboard)", MACHINE_NOT_WORKING )
 COMP ( 1989, ec1842,   ibm5150, 0,       ec1842,    0,    at_state,      at,      "<unknown>",  "EC-1842", MACHINE_NOT_WORKING )

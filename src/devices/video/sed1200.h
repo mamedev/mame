@@ -12,8 +12,10 @@
 
 ***************************************************************************/
 
-#ifndef __SED1200_H__
-#define __SED1200_H__
+#ifndef MAME_VIDEO_SED1200_H
+#define MAME_VIDEO_SED1200_H
+
+#pragma once
 
 #define MCFG_SED1200D0A_ADD( _tag ) \
 	MCFG_DEVICE_ADD( _tag, SED1200D0A, 0 )
@@ -29,24 +31,24 @@
 
 class sed1200_device : public device_t {
 public:
-	sed1200_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	void control_w(uint8_t data);
+	uint8_t control_r();
+	void data_w(uint8_t data);
 
-	void control_w(UINT8 data);
-	UINT8 control_r();
-	void data_w(UINT8 data);
-
-	const UINT8 *render();
+	const uint8_t *render();
 
 protected:
+	sed1200_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	virtual void device_start() override;
 
 private:
-	UINT8 cgram[4*8];
-	UINT8 ddram[10*2];
-	UINT8 render_buf[20*8];
+	uint8_t cgram[4*8];
+	uint8_t ddram[10*2];
+	uint8_t render_buf[20*8];
 	bool cursor_direction, cursor_blinking, cursor_full, cursor_on, display_on;
-	UINT8 cursor_address, cgram_address;
-	const UINT8 *cgrom;
+	uint8_t cursor_address, cgram_address;
+	const uint8_t *cgrom;
 
 	void soft_reset();
 	void cursor_step();
@@ -54,39 +56,39 @@ private:
 
 class sed1200d0a_device : public sed1200_device {
 public:
-	sed1200d0a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sed1200d0a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 };
 
 class sed1200f0a_device : public sed1200_device {
 public:
-	sed1200f0a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sed1200f0a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 };
 
 class sed1200d0b_device : public sed1200_device {
 public:
-	sed1200d0b_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sed1200d0b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 };
 
 class sed1200f0b_device : public sed1200_device {
 public:
-	sed1200f0b_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sed1200f0b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 };
 
-extern const device_type SED1200D0A;
-extern const device_type SED1200F0A;
-extern const device_type SED1200D0B;
-extern const device_type SED1200F0B;
+DECLARE_DEVICE_TYPE(SED1200D0A, sed1200d0a_device)
+DECLARE_DEVICE_TYPE(SED1200F0A, sed1200f0a_device)
+DECLARE_DEVICE_TYPE(SED1200D0B, sed1200d0b_device)
+DECLARE_DEVICE_TYPE(SED1200F0B, sed1200f0b_device)
 
-#endif
+#endif // MAME_VIDEO_SED1200_H

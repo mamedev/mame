@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Barry Rodewald
 /*
- * symbfac2.c
+ * symbfac2.cpp
  *   SYMBiFACE II expansion device
  *    - IDE
  *    - RTC (Dallas DS1287A)
@@ -17,22 +17,16 @@
  *    - mouse controls still need some work
  */
 
+#include "emu.h"
 #include "symbfac2.h"
 
 
-const device_type CPC_SYMBIFACE2 = &device_creator<cpc_symbiface2_device>;
+DEFINE_DEVICE_TYPE(CPC_SYMBIFACE2, cpc_symbiface2_device, "cpc_symf2", "SYMBiFACE II")
 
 //**************************************************************************
 //  DEVICE CONFIG INTERFACE
 //**************************************************************************
 
-// device machine config
-static MACHINE_CONFIG_FRAGMENT( cpc_symbiface2 )
-	MCFG_ATA_INTERFACE_ADD("ide",ata_devices,"hdd",nullptr,false)
-	MCFG_DS12885_ADD("rtc")
-	MCFG_NVRAM_ADD_1FILL("nvram")
-	// no pass-through
-MACHINE_CONFIG_END
 
 static INPUT_PORTS_START(cpc_symbiface2)
 	PORT_START("sf2_mouse_x")
@@ -56,11 +50,13 @@ static INPUT_PORTS_START(cpc_symbiface2)
 //  PORT_PLAYER(1)
 INPUT_PORTS_END
 
-
-machine_config_constructor cpc_symbiface2_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( cpc_symbiface2 );
-}
+// device machine config
+MACHINE_CONFIG_MEMBER( cpc_symbiface2_device::device_add_mconfig )
+	MCFG_ATA_INTERFACE_ADD("ide", ata_devices, "hdd", nullptr, false)
+	MCFG_DS12885_ADD("rtc")
+	MCFG_NVRAM_ADD_1FILL("nvram")
+	// no pass-through
+MACHINE_CONFIG_END
 
 ioport_constructor cpc_symbiface2_device::device_input_ports() const
 {
@@ -71,15 +67,17 @@ ioport_constructor cpc_symbiface2_device::device_input_ports() const
 //  LIVE DEVICE
 //**************************************************************************
 
-cpc_symbiface2_device::cpc_symbiface2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, CPC_SYMBIFACE2, "SYMBiFACE II", tag, owner, clock, "cpc_symf2", __FILE__),
-	device_cpc_expansion_card_interface(mconfig, *this), m_slot(nullptr),
+cpc_symbiface2_device::cpc_symbiface2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, CPC_SYMBIFACE2, tag, owner, clock),
+	device_cpc_expansion_card_interface(mconfig, *this),
+	m_slot(nullptr),
 	m_ide(*this,"ide"),
 	m_rtc(*this,"rtc"),
 	m_nvram(*this,"nvram"),
 	m_mouse_x(*this,"sf2_mouse_x"),
 	m_mouse_y(*this,"sf2_mouse_y"),
-	m_mouse_buttons(*this,"sf2_mouse_buttons"), m_iohigh(false), m_ide_data(0), m_mouse_state(0), m_input_x(0), m_input_y(0), m_4xxx_ptr_r(nullptr), m_4xxx_ptr_w(nullptr), m_6xxx_ptr_r(nullptr), m_6xxx_ptr_w(nullptr)
+	m_mouse_buttons(*this,"sf2_mouse_buttons"),
+	m_iohigh(false), m_ide_data(0), m_mouse_state(0), m_input_x(0), m_input_y(0), m_4xxx_ptr_r(nullptr), m_4xxx_ptr_w(nullptr), m_6xxx_ptr_r(nullptr), m_6xxx_ptr_w(nullptr)
 {
 }
 
@@ -94,11 +92,11 @@ void cpc_symbiface2_device::device_start()
 
 	m_slot = dynamic_cast<cpc_expansion_slot_device *>(owner());
 
-	space.install_readwrite_handler(0xfd00,0xfd07,0,0,read8_delegate(FUNC(cpc_symbiface2_device::ide_cs1_r),this),write8_delegate(FUNC(cpc_symbiface2_device::ide_cs1_w),this));
-	space.install_readwrite_handler(0xfd08,0xfd0f,0,0,read8_delegate(FUNC(cpc_symbiface2_device::ide_cs0_r),this),write8_delegate(FUNC(cpc_symbiface2_device::ide_cs0_w),this));
-	space.install_read_handler(0xfd10,0xfd10,0,0,read8_delegate(FUNC(cpc_symbiface2_device::mouse_r),this));
-	space.install_readwrite_handler(0xfd14,0xfd15,0,0,read8_delegate(FUNC(cpc_symbiface2_device::rtc_r),this),write8_delegate(FUNC(cpc_symbiface2_device::rtc_w),this));
-	space.install_readwrite_handler(0xfd17,0xfd17,0,0,read8_delegate(FUNC(cpc_symbiface2_device::rom_rewrite_r),this),write8_delegate(FUNC(cpc_symbiface2_device::rom_rewrite_w),this));
+	space.install_readwrite_handler(0xfd00,0xfd07,read8_delegate(FUNC(cpc_symbiface2_device::ide_cs1_r),this),write8_delegate(FUNC(cpc_symbiface2_device::ide_cs1_w),this));
+	space.install_readwrite_handler(0xfd08,0xfd0f,read8_delegate(FUNC(cpc_symbiface2_device::ide_cs0_r),this),write8_delegate(FUNC(cpc_symbiface2_device::ide_cs0_w),this));
+	space.install_read_handler(0xfd10,0xfd10,read8_delegate(FUNC(cpc_symbiface2_device::mouse_r),this));
+	space.install_readwrite_handler(0xfd14,0xfd15,read8_delegate(FUNC(cpc_symbiface2_device::rtc_r),this),write8_delegate(FUNC(cpc_symbiface2_device::rtc_w),this));
+	space.install_readwrite_handler(0xfd17,0xfd17,read8_delegate(FUNC(cpc_symbiface2_device::rom_rewrite_r),this),write8_delegate(FUNC(cpc_symbiface2_device::rom_rewrite_w),this));
 
 	// set up ROM space (these can be writable, when mapped to &4000, or completely disabled, allowing the built-in ROMs to be visible)
 	// 32 banks of 16kB (512kB)
@@ -214,7 +212,7 @@ WRITE8_MEMBER(cpc_symbiface2_device::rtc_w)
  */
 READ8_MEMBER(cpc_symbiface2_device::mouse_r)
 {
-	UINT8 ret = 0;
+	uint8_t ret = 0;
 	int input;
 	int input_diff;
 
@@ -268,15 +266,15 @@ INPUT_CHANGED_MEMBER(cpc_symbiface2_device::mouse_change_buttons)
 // #FD17 (read) - map currently selected ROM to 0x4000 for read/write
 READ8_MEMBER(cpc_symbiface2_device::rom_rewrite_r)
 {
-	UINT8 bank = get_rom_bank();
+	uint8_t bank = get_rom_bank();
 
 	if(bank >= 32)
 		return 0xff;
 
-	m_4xxx_ptr_r = (UINT8*)machine().root_device().membank("bank3")->base();
-	m_4xxx_ptr_w = (UINT8*)machine().root_device().membank("bank11")->base();
-	m_6xxx_ptr_r = (UINT8*)machine().root_device().membank("bank4")->base();
-	m_6xxx_ptr_w = (UINT8*)machine().root_device().membank("bank12")->base();
+	m_4xxx_ptr_r = (uint8_t*)machine().root_device().membank("bank3")->base();
+	m_4xxx_ptr_w = (uint8_t*)machine().root_device().membank("bank11")->base();
+	m_6xxx_ptr_r = (uint8_t*)machine().root_device().membank("bank4")->base();
+	m_6xxx_ptr_w = (uint8_t*)machine().root_device().membank("bank12")->base();
 	machine().root_device().membank("bank3")->set_base(&m_rom_space[bank*16384]);
 	machine().root_device().membank("bank4")->set_base(&m_rom_space[bank*16384+8192]);
 	machine().root_device().membank("bank11")->set_base(&m_rom_space[bank*16384]);

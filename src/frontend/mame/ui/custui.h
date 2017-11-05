@@ -8,15 +8,14 @@
 
 ***************************************************************************/
 
-#pragma once
-
 #ifndef MAME_FRONTEND_UI_CUSTUI_H
 #define MAME_FRONTEND_UI_CUSTUI_H
+
+#pragma once
 
 #include "ui/menu.h"
 
 namespace ui {
-
 //-------------------------------------------------
 //  Custom UI menu
 //-------------------------------------------------
@@ -24,10 +23,10 @@ namespace ui {
 class menu_custom_ui : public menu
 {
 public:
-	menu_custom_ui(mame_ui_manager &mui, render_container *container);
+	menu_custom_ui(mame_ui_manager &mui, render_container &container);
 	virtual ~menu_custom_ui() override;
-	virtual void populate() override;
-	virtual void handle() override;
+
+protected:
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
 
 private:
@@ -38,9 +37,14 @@ private:
 		COLORS_MENU,
 		HIDE_MENU
 	};
-	static const char *const hide_status[];
-	std::vector<std::string> m_lang;
-	std::uint16_t m_currlang;
+
+	virtual void populate(float &customtop, float &custombottom) override;
+	virtual void handle() override;
+
+	static const char *const    HIDE_STATUS[];
+
+	std::vector<std::string>    m_lang;
+	std::uint16_t               m_currlang;
 };
 
 //-------------------------------------------------
@@ -50,10 +54,10 @@ private:
 class menu_font_ui : public menu
 {
 public:
-	menu_font_ui(mame_ui_manager &mui, render_container *container);
+	menu_font_ui(mame_ui_manager &mui, render_container &container);
 	virtual ~menu_font_ui() override;
-	virtual void populate() override;
-	virtual void handle() override;
+
+protected:
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
 
 private:
@@ -65,6 +69,9 @@ private:
 		MUI_BOLD,
 		MUI_ITALIC
 	};
+
+	virtual void populate(float &customtop, float &custombottom) override;
+	virtual void handle() override;
 
 	void list();
 
@@ -85,10 +92,10 @@ private:
 class menu_colors_ui : public menu
 {
 public:
-	menu_colors_ui(mame_ui_manager &mui, render_container *container);
+	menu_colors_ui(mame_ui_manager &mui, render_container &container);
 	virtual ~menu_colors_ui() override;
-	virtual void populate() override;
-	virtual void handle() override;
+
+protected:
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
 
 private:
@@ -119,6 +126,9 @@ private:
 		const char  *option;
 	};
 
+	virtual void populate(float &customtop, float &custombottom) override;
+	virtual void handle() override;
+
 	s_color_table m_color_table[MUI_RESTORE];
 	void restore_colors();
 };
@@ -130,19 +140,13 @@ private:
 class menu_rgb_ui : public menu
 {
 public:
-	menu_rgb_ui(mame_ui_manager &mui, render_container *container, rgb_t *_color, std::string _title);
+	menu_rgb_ui(mame_ui_manager &mui, render_container &container, rgb_t *_color, std::string _title);
 	virtual ~menu_rgb_ui() override;
-	virtual void populate() override;
-	virtual void handle() override;
+
+protected:
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
 
 private:
-	rgb_t           *m_color;
-	char            m_search[4];
-	bool            m_key_active;
-	int             m_lock_ref;
-	std::string     m_title;
-
 	enum
 	{
 		RGB_ALPHA = 1,
@@ -152,7 +156,16 @@ private:
 		PALETTE_CHOOSE
 	};
 
+	virtual void populate(float &customtop, float &custombottom) override;
+	virtual void handle() override;
+
 	void inkey_special(const event *menu_event);
+
+	rgb_t           *m_color;
+	std::string     m_search;
+	bool            m_key_active;
+	int             m_lock_ref;
+	std::string     m_title;
 };
 
 //-------------------------------------------------
@@ -162,20 +175,14 @@ private:
 class menu_palette_sel : public menu
 {
 public:
-	menu_palette_sel(mame_ui_manager &mui, render_container *container, rgb_t &_color);
+	menu_palette_sel(mame_ui_manager &mui, render_container &container, rgb_t &_color);
 	virtual ~menu_palette_sel() override;
-	virtual void populate() override;
-	virtual void handle() override;
-	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
 
 private:
-	struct palcolor
-	{
-		const char *name;
-		const char *argb;
-	};
+	virtual void populate(float &customtop, float &custombottom) override;
+	virtual void handle() override;
 
-	static palcolor m_palette[];
+	static std::pair<const char *, const char *> const s_palette[];
 	rgb_t &m_original;
 };
 

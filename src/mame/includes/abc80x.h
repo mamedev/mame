@@ -42,7 +42,7 @@
 #define ABC806_ATTR_RAM_SIZE    0x800
 #define ABC806_VIDEO_RAM_SIZE   0x20000
 
-#define ABC800_CHAR_WIDTH   12
+#define ABC800_CHAR_WIDTH   6
 #define ABC800_CCLK         ABC800_X01/ABC800_CHAR_WIDTH
 
 #define SCREEN_TAG          "screen"
@@ -97,8 +97,8 @@ public:
 	optional_device<cassette_image_device> m_cassette;
 	required_device<ram_device> m_ram;
 	required_memory_region m_rom;
-	optional_shared_ptr<UINT8> m_video_ram;
-	optional_shared_ptr<UINT8> m_char_ram;
+	optional_shared_ptr<uint8_t> m_video_ram;
+	optional_shared_ptr<uint8_t> m_char_ram;
 	required_ioport m_io_sb;
 
 	enum
@@ -134,7 +134,7 @@ public:
 	int m_pling;
 
 	// serial state
-	UINT8 m_sb;
+	uint8_t m_sb;
 	int m_ctc_z0;
 	int m_sio_txcb;
 	int m_sio_txdb;
@@ -144,8 +144,8 @@ public:
 	int m_tape_ctr;
 
 	// video state
-	UINT8 m_hrs;                    // HR picture start scanline
-	UINT8 m_fgctl;                  // HR foreground control
+	uint8_t m_hrs;                    // HR picture start scanline
+	uint8_t m_fgctl;                  // HR foreground control
 
 	// timers
 	emu_timer *m_ctc_timer;
@@ -171,13 +171,10 @@ public:
 	required_memory_region m_fgctl_prom;
 	required_memory_region m_char_rom;
 
-	DECLARE_DRIVER_INIT(driver_init);
-
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void hr_update(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_DIRECT_UPDATE_MEMBER( direct_update_handler );
 	MC6845_UPDATE_ROW( abc800m_update_row );
 };
 
@@ -198,15 +195,12 @@ public:
 	required_device<palette_device> m_palette;
 	required_memory_region m_fgctl_prom;
 
-	DECLARE_DRIVER_INIT(driver_init);
-
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	offs_t translate_trom_offset(offs_t offset);
 	void hr_update(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER( char_ram_r );
-	DECLARE_DIRECT_UPDATE_MEMBER( direct_update_handler );
 	DECLARE_PALETTE_INIT( abc800c );
 };
 
@@ -229,12 +223,11 @@ public:
 	required_memory_region m_char_rom;
 	required_ioport m_config;
 
-	DECLARE_DRIVER_INIT(driver_init);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	virtual void video_start() override;
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void bankswitch();
 
@@ -242,7 +235,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( lrs_w );
 	DECLARE_WRITE_LINE_MEMBER( mux80_40_w );
 	DECLARE_WRITE_LINE_MEMBER( vs_w );
-	DECLARE_DIRECT_UPDATE_MEMBER( direct_update_handler );
 	MC6845_UPDATE_ROW( abc802_update_row );
 
 	// cpu state
@@ -277,14 +269,13 @@ public:
 	required_memory_region m_rad_prom;
 	required_memory_region m_hru2_prom;
 	required_memory_region m_char_rom;
-	optional_shared_ptr<UINT8> m_attr_ram;
+	optional_shared_ptr<uint8_t> m_attr_ram;
 
-	DECLARE_DRIVER_INIT(driver_init);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	virtual void video_start() override;
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void bankswitch();
 	void hr_update(bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -304,26 +295,25 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( keydtr_w );
 	DECLARE_WRITE_LINE_MEMBER( hs_w );
 	DECLARE_WRITE_LINE_MEMBER( vs_w );
-	DECLARE_DIRECT_UPDATE_MEMBER( direct_update_handler );
 	DECLARE_PALETTE_INIT( abc806 );
 	MC6845_UPDATE_ROW( abc806_update_row );
 
 	// memory state
 	int m_keydtr;               // keyboard DTR
 	int m_eme;                  // extended memory enable
-	UINT8 m_map[16];            // memory page register
+	uint8_t m_map[16];            // memory page register
 
 	// video state
 	int m_txoff;                // text display enable
 	int m_40;                   // 40/80 column mode
 	int m_flshclk_ctr;          // flash clock counter
 	int m_flshclk;              // flash clock
-	UINT8 m_attr_data;          // attribute data latch
-	UINT8 m_hrc[16];            // HR palette
-	UINT8 m_sync;               // line synchronization delay
-	UINT8 m_v50_addr;           // vertical sync PROM address
+	uint8_t m_attr_data;          // attribute data latch
+	uint8_t m_hrc[16];            // HR palette
+	uint8_t m_sync;               // line synchronization delay
+	uint8_t m_v50_addr;           // vertical sync PROM address
 	int m_hru2_a8;              // HRU II PROM address line 8
-	UINT32 m_vsync_shift;       // vertical sync shift register
+	uint32_t m_vsync_shift;       // vertical sync shift register
 	int m_vsync;                // vertical sync
 	int m_d_vsync;              // delayed vertical sync
 };

@@ -14,37 +14,38 @@
  *
  ****************************************************************************/
 
-#ifndef CYBIKO_H_
-#define CYBIKO_H_
+#ifndef MAME_INCLUDES_CYBIKO_H
+#define MAME_INCLUDES_CYBIKO_H
 
-/* Core includes */
-#include "emu.h"
-#include "sound/speaker.h"
-
-/* Components */
-#include "cpu/h8/h8s2320.h"
 #include "cpu/h8/h8s2245.h"
-#include "video/hd66421.h"
-#include "machine/pcf8593.h"
+#include "cpu/h8/h8s2320.h"
+
+#include "imagedev/snapquik.h"
+
 #include "machine/at45dbxx.h"
 #include "machine/intelfsh.h"
-#include "machine/ram.h"
-#include "imagedev/snapquik.h"
 #include "machine/nvram.h"
+#include "machine/pcf8593.h"
+#include "machine/ram.h"
+
+#include "sound/spkrdev.h"
+
+#include "video/hd66421.h"
+
 
 class cybiko_state : public driver_device
 {
 public:
 	cybiko_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_crtc(*this, "hd66421"),
-		m_speaker(*this, "speaker"),
-		m_rtc(*this, "rtc"),
-		m_ram(*this, RAM_TAG),
-		m_flash1(*this, "flash1"),
-		m_nvram(*this, "nvram"),
-		m_input(*this, "A")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_crtc(*this, "hd66421")
+		, m_speaker(*this, "speaker")
+		, m_rtc(*this, "rtc")
+		, m_ram(*this, RAM_TAG)
+		, m_flash1(*this, "flash1")
+		, m_nvram(*this, "nvram")
+		, m_input(*this, "A.%u", 0)
 	{ }
 
 	DECLARE_WRITE16_MEMBER(serflash_w);
@@ -81,4 +82,4 @@ public:
 	DECLARE_QUICKLOAD_LOAD_MEMBER( cybikoxt );
 };
 
-#endif /* CYBIKO_H_ */
+#endif // MAME_INCLUDES_CYBIKO_H

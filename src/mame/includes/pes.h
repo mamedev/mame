@@ -32,21 +32,20 @@ public:
 	required_device<generic_terminal_device> m_terminal;
 	required_device<tms5220_device> m_speech;
 
-	UINT8 m_wsstate;            // /WS
-	UINT8 m_rsstate;            // /RS
-	UINT8 m_port3_state;        // Port3 state as last written
-	UINT8 m_infifo[32];         // input fifo
-	UINT8 m_infifo_tail_ptr;        // " tail
-	UINT8 m_infifo_head_ptr;        // " head
+	uint8_t m_wsstate;            // /WS
+	uint8_t m_rsstate;            // /RS
+	uint8_t m_port3_state;        // Port3 state as last written
+	uint8_t m_infifo[32];         // input fifo
+	uint8_t m_infifo_tail_ptr;        // " tail
+	uint8_t m_infifo_head_ptr;        // " head
 
 	virtual void machine_reset() override;
-	DECLARE_WRITE8_MEMBER(rsws_w);
+	DECLARE_WRITE8_MEMBER(rsq_wsq_w);
 	DECLARE_WRITE8_MEMBER(port1_w);
 	DECLARE_WRITE8_MEMBER(port3_w);
 	DECLARE_READ8_MEMBER(port1_r);
 	DECLARE_READ8_MEMBER(port3_r);
-	DECLARE_DRIVER_INIT(pes);
-	DECLARE_WRITE8_MEMBER(pes_kbd_input);
+	void pes_kbd_input(u8 data);
 	DECLARE_READ8_MEMBER(data_to_i8031);
 	DECLARE_WRITE8_MEMBER(data_from_i8031);
 };

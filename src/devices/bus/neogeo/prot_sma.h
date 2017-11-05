@@ -1,23 +1,23 @@
 // license:BSD-3-Clause
 // copyright-holders:S. Smith,David Haywood,Fabio Priuli
 
+#ifndef MAME_BUS_NEOGEO_PROT_SMA_H
+#define MAME_BUS_NEOGEO_PROT_SMA_H
 
 #pragma once
 
-#ifndef __SMA_PROT__
-#define __SMA_PROT__
 
-extern const device_type SMA_PROT;
+DECLARE_DEVICE_TYPE(NG_SMA_PROT, sma_prot_device)
 
 #define MCFG_SMA_PROT_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, SMA_PROT, 0)
+	MCFG_DEVICE_ADD(_tag, NG_SMA_PROT, 0)
 
 
-class sma_prot_device :  public device_t
+class sma_prot_device : public device_t
 {
 public:
 	// construction/destruction
-	sma_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sma_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	//DECLARE_WRITE16_MEMBER( kof99_bankswitch_w );
 	//DECLARE_WRITE16_MEMBER( garou_bankswitch_w );
@@ -26,24 +26,23 @@ public:
 	//DECLARE_WRITE16_MEMBER( kof2000_bankswitch_w );
 	DECLARE_READ16_MEMBER( prot_9a37_r );
 	DECLARE_READ16_MEMBER( random_r );
-	UINT32 kof99_bank_base(UINT16 sel);
-	UINT32 garou_bank_base(UINT16 sel);
-	UINT32 garouh_bank_base(UINT16 sel);
-	UINT32 mslug3_bank_base(UINT16 sel);
-	UINT32 kof2000_bank_base(UINT16 sel);
-	void sma_install_random_read_handler(cpu_device* maincpu, int addr1, int addr2 );
-	void kof99_decrypt_68k(UINT8* base);
-	void garou_decrypt_68k(UINT8* base);
-	void garouh_decrypt_68k(UINT8* base);
-	void mslug3_decrypt_68k(UINT8* base);
-	void kof2000_decrypt_68k(UINT8* base);
+	uint32_t kof99_bank_base(uint16_t sel);
+	uint32_t garou_bank_base(uint16_t sel);
+	uint32_t garouh_bank_base(uint16_t sel);
+	uint32_t mslug3_bank_base(uint16_t sel);
+	uint32_t kof2000_bank_base(uint16_t sel);
+	void kof99_decrypt_68k(uint8_t* base);
+	void garou_decrypt_68k(uint8_t* base);
+	void garouh_decrypt_68k(uint8_t* base);
+	void mslug3_decrypt_68k(uint8_t* base);
+	void kof2000_decrypt_68k(uint8_t* base);
 
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
 private:
-	UINT16     m_sma_rng;
+	uint16_t     m_sma_rng;
 };
 
-#endif
+#endif // MAME_BUS_NEOGEO_PROT_SMA_H

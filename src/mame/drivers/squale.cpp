@@ -55,15 +55,21 @@
 ****************************************************************************/
 
 #include "emu.h"
+
+#include "bus/generic/carts.h"
+#include "bus/generic/slot.h"
 #include "cpu/m6809/m6809.h"
-#include "video/ef9365.h"
 #include "machine/6821pia.h"
 #include "machine/6850acia.h"
-#include "sound/ay8910.h"
+#include "machine/timer.h"
 #include "machine/wd_fdc.h"
-#include "bus/generic/carts.h"
+#include "sound/ay8910.h"
+#include "video/ef9365.h"
 
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
 
 #define MAIN_CLOCK           XTAL_14MHz
 #define AY_CLOCK             MAIN_CLOCK / 8     /* 1.75 Mhz */
@@ -118,13 +124,13 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	UINT8 keyboard_line;
-	UINT8 fdc_sel0;
-	UINT8 fdc_sel1;
+	uint8_t keyboard_line;
+	uint8_t fdc_sel0;
+	uint8_t fdc_sel1;
 
-	UINT8  cart_addr_counter_inc_ck;
-	UINT8  cart_addr_counter_reset;
-	UINT16 cart_addr_counter;
+	uint8_t  cart_addr_counter_inc_ck;
+	uint8_t  cart_addr_counter_reset;
+	uint16_t cart_addr_counter;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(squale_scanline);
 
@@ -135,7 +141,7 @@ private:
 	required_device<pia6821_device> m_pia_u75;
 	required_device<ef9365_device> m_ef9365;
 	required_device<cpu_device> m_maincpu;
-	required_device<wd1770_t> m_fdc;
+	required_device<wd1770_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
 	floppy_image_device *m_floppy;
@@ -161,7 +167,7 @@ WRITE8_MEMBER( squale_state::ctrl_w )
 
 READ8_MEMBER( squale_state::video_ram_read_reg1 )
 {
-	UINT8 data;
+	uint8_t data;
 	int p;
 
 	//D7             D0
@@ -196,7 +202,7 @@ READ8_MEMBER( squale_state::video_ram_read_reg1 )
 
 READ8_MEMBER( squale_state::video_ram_read_reg2 )
 {
-	UINT8 data;
+	uint8_t data;
 	int p;
 
 	//D7             D0
@@ -292,7 +298,7 @@ WRITE8_MEMBER( squale_state::fdc_sel1_w )
 
 READ8_MEMBER( squale_state::fdc_sel0_r )
 {
-	UINT8 data;
+	uint8_t data;
 
 	data = fdc_sel0;
 
@@ -305,7 +311,7 @@ READ8_MEMBER( squale_state::fdc_sel0_r )
 
 READ8_MEMBER( squale_state::fdc_sel1_r )
 {
-	UINT8 data;
+	uint8_t data;
 
 	data = fdc_sel1;
 
@@ -333,7 +339,7 @@ WRITE8_MEMBER( squale_state::pia_u75_porta_w )
 READ8_MEMBER( squale_state::pia_u75_porta_r )
 {
 	// U75 PIA Port A : Keyboard rows output
-	UINT8 data;
+	uint8_t data;
 
 	#ifdef DBGMODE
 	printf("%s: read pia_u75_porta_r\n",machine().describe_context());
@@ -348,7 +354,7 @@ READ8_MEMBER( squale_state::pia_u75_portb_r )
 	// U75 PIA Port B : Keyboard column input
 	char kbdrow[3];
 	unsigned char kbdrow_state;
-	UINT8 data = 0xFF;
+	uint8_t data = 0xFF;
 
 	kbdrow[0] = 'X';
 	kbdrow[1] = '0';
@@ -404,7 +410,7 @@ READ8_MEMBER( squale_state::ay_portb_r )
 	// B1 : Joystick 2 - Left
 	// B0 : Joystick 2 - Right
 
-	UINT8 data;
+	uint8_t data;
 
 	data =  ( ioport("ay_keys")->read() ) & 0x70;
 	data |= ( ioport("ay_joy_2")->read() ) & 0x8F;
@@ -428,7 +434,7 @@ READ8_MEMBER( squale_state::ay_porta_r )
 	// B1 : Joystick 1 - Left
 	// B0 : Joystick 1 - Right
 
-	UINT8 data;
+	uint8_t data;
 
 	#ifdef DBGMODE
 	printf("%s: read ay_porta_r\n",machine().describe_context());
@@ -482,14 +488,14 @@ WRITE8_MEMBER( squale_state::ay_portb_w )
 READ8_MEMBER( squale_state::pia_u72_porta_r )
 {
 	// U72 PIA Port A : Cartridge data bus
-	UINT8 data;
+	uint8_t data;
 
 	#ifdef DBGMODE
 	printf("%s: read pia_u72_porta_r\n",machine().describe_context());
 	#endif
 
 	if( m_cart_rom && m_cart_rom->bytes() )
-		data = m_cart_rom->u8( cart_addr_counter % m_cart_rom->bytes() );
+		data = m_cart_rom->as_u8( cart_addr_counter % m_cart_rom->bytes() );
 	else
 		data = 0xFF;
 
@@ -559,7 +565,7 @@ READ8_MEMBER( squale_state::pia_u72_portb_r )
 {
 	// U72 PIA Port B : Printer data bus
 
-	UINT8 data = 0xFF;
+	uint8_t data = 0xFF;
 
 	#ifdef DBGMODE
 	printf("%s: read pia_u72_portb_r\n",machine().describe_context());
@@ -590,23 +596,23 @@ WRITE_LINE_MEMBER( squale_state::pia_u72_cb2_w )
 
 DEVICE_IMAGE_LOAD_MEMBER( squale_state, squale_cart )
 {
-	UINT32 size = m_cart->common_get_size("rom");
+	uint32_t size = m_cart->common_get_size("rom");
 
 	if ( ! size || size > 0x10000)
 	{
 		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 	}
 
 	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER( squale_state::squale_scanline )
 {
-	m_ef9365->update_scanline((UINT16)param);
+	m_ef9365->update_scanline((uint16_t)param);
 }
 
 static ADDRESS_MAP_START(squale_mem, AS_PROGRAM, 8, squale_state)
@@ -620,7 +626,7 @@ static ADDRESS_MAP_START(squale_mem, AS_PROGRAM, 8, squale_state)
 	AM_RANGE(0xf048,0xf04b) AM_DEVREADWRITE("pia_u72", pia6821_device, read, write)
 	AM_RANGE(0xf050,0xf05f) AM_DEVREADWRITE("ef6850", acia6850_device, data_r, data_w)
 	AM_RANGE(0xf060,0xf06f) AM_DEVREADWRITE("ay8910", ay8910_device, data_r, address_data_w)
-	AM_RANGE(0xf080,0xf083) AM_DEVREADWRITE("wd1770", wd1770_t, read, write)
+	AM_RANGE(0xf080,0xf083) AM_DEVREADWRITE("wd1770", wd1770_device, read, write)
 	AM_RANGE(0xf08a,0xf08a) AM_READWRITE( fdc_sel0_r, fdc_sel0_w )
 	AM_RANGE(0xf08b,0xf08b) AM_READWRITE( fdc_sel1_r, fdc_sel1_w )
 	AM_RANGE(0xf100,0xffff) AM_ROMBANK("rom_bank");
@@ -772,7 +778,7 @@ void squale_state::machine_reset()
 {
 }
 
-static MACHINE_CONFIG_START( squale, squale_state )
+static MACHINE_CONFIG_START( squale )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M6809E, CPU_CLOCK) // 12/2015 : Should be set to M6809 but it actually have the wrong clock divisor (1 instead of 4) and working 4 times too fast...
 	MCFG_CPU_PROGRAM_MAP(squale_mem)
@@ -819,7 +825,7 @@ static MACHINE_CONFIG_START( squale, squale_state )
 	MCFG_DEVICE_ADD("ef9365", EF9365, VIDEO_CLOCK)
 	MCFG_EF936X_PALETTE("palette")
 	MCFG_EF936X_BITPLANES_CNT(4);
-	MCFG_EF936X_DISPLAYMODE(EF936X_256x256_DISPLAY_MODE);
+	MCFG_EF936X_DISPLAYMODE(DISPLAY_MODE_256x256);
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("squale_sl", squale_state, squale_scanline, "screen", 0, 10)
 
 	/* Floppy */
@@ -844,12 +850,9 @@ ROM_START( squale )
 	ROMX_LOAD( "sqmon_2r1.bin", 0x0000, 0x2000, CRC(ed57c707) SHA1(c8bd33a6fb07fe7f881f2605ad867b7e82366bfc), ROM_BIOS(1) )
 
 	// place ROM v1.2 signature here.
-
-	ROM_REGION( 0x1E0, "ef9365", 0 )
-	ROM_LOAD( "charset_ef9365.rom", 0x0000, 0x01E0, CRC(8d3053be) SHA1(0f9a64d217a0f7f04ee0720d49c5b680ad0ae359) )
 ROM_END
 
 /* Driver */
 
-/*    YEAR   NAME   PARENT  COMPAT   MACHINE    INPUT  CLASS           INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1984, squale, 0,      0,       squale,    squale,driver_device,   0,     "Apollo 7", "Squale",    MACHINE_TYPE_COMPUTER )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT  COMPANY     FULLNAME  FLAGS
+COMP( 1984, squale, 0,      0,      squale,  squale, squale_state, 0,    "Apollo 7", "Squale", 0 )

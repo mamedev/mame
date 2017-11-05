@@ -179,15 +179,15 @@ READ8_MEMBER(subs_state::options_r)
 /***************************************************************************
 lamp1_w
 ***************************************************************************/
-WRITE8_MEMBER(subs_state::lamp1_w)
+WRITE_LINE_MEMBER(subs_state::lamp1_w)
 {
-	output().set_led_value(0,~offset & 1);
+	output().set_led_value(0, !state);
 }
 
 /***************************************************************************
 lamp2_w
 ***************************************************************************/
-WRITE8_MEMBER(subs_state::lamp2_w)
+WRITE_LINE_MEMBER(subs_state::lamp2_w)
 {
-	output().set_led_value(1,~offset & 1);
+	output().set_led_value(1, !state);
 }

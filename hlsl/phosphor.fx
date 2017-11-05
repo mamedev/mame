@@ -94,19 +94,23 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 //-----------------------------------------------------------------------------
 
 uniform float3 Phosphor = float3(0.0f, 0.0f, 0.0f);
+uniform float DeltaTime = 0.0f;
+static const float F = 30.0f;
 
 float4 ps_main(PS_INPUT Input) : COLOR
 {
 	float4 CurrPix = tex2D(DiffuseSampler, Input.TexCoord);
-	float3 PrevPix = tex2D(PreviousSampler, Input.PrevCoord).rgb * float3(Phosphor.r, Phosphor.g, Phosphor.b);
+	float3 PrevPix = tex2D(PreviousSampler, Input.PrevCoord).rgb;
 
+	PrevPix.r *= Phosphor.r == 0 ? 0 : pow(Phosphor.r, F * DeltaTime);
+	PrevPix.g *= Phosphor.g == 0 ? 0 : pow(Phosphor.g, F * DeltaTime);
+	PrevPix.b *= Phosphor.b == 0 ? 0 : pow(Phosphor.b, F * DeltaTime);
 	float RedMax = max(CurrPix.r, PrevPix.r);
 	float GreenMax = max(CurrPix.g, PrevPix.g);
 	float BlueMax = max(CurrPix.b, PrevPix.b);
 
-	return Passthrough
-		? CurrPix
-		: float4(RedMax, GreenMax, BlueMax, CurrPix.a);
+	return Passthrough ?
+	       CurrPix : float4(RedMax, GreenMax, BlueMax, CurrPix.a);
 }
 
 //-----------------------------------------------------------------------------

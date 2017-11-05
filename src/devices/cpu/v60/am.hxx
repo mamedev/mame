@@ -23,14 +23,14 @@
     amLength
 */
 
-UINT32 v60_device::ReadAM()
+uint32_t v60_device::ReadAM()
 {
 	m_modm = m_modm?1:0;
 	m_modval = OpRead8(m_modadd);
 	return (this->*s_AMTable1[m_modm][m_modval >> 5])();
 }
 
-UINT32 v60_device::BitReadAM()
+uint32_t v60_device::BitReadAM()
 {
 	m_modm = m_modm?1:0;
 	m_modval = OpRead8(m_modadd);
@@ -50,14 +50,14 @@ UINT32 v60_device::BitReadAM()
     amLength
 */
 
-UINT32 v60_device::ReadAMAddress()
+uint32_t v60_device::ReadAMAddress()
 {
 	m_modm = m_modm?1:0;
 	m_modval = OpRead8(m_modadd);
 	return (this->*s_AMTable2[m_modm][m_modval >> 5])();
 }
 
-UINT32 v60_device::BitReadAMAddress()
+uint32_t v60_device::BitReadAMAddress()
 {
 	m_modm = m_modm?1:0;
 	m_modval = OpRead8(m_modadd);
@@ -75,7 +75,7 @@ UINT32 v60_device::BitReadAMAddress()
     amLength
 */
 
-UINT32 v60_device::WriteAM()
+uint32_t v60_device::WriteAM()
 {
 	m_modm = m_modm?1:0;
 	m_modval = OpRead8(m_modadd);

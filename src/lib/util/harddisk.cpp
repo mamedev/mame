@@ -119,7 +119,7 @@ hard_disk_info *hard_disk_get_info(hard_disk_file *file)
 -------------------------------------------------*/
 
 /**
- * @fn  UINT32 hard_disk_read(hard_disk_file *file, UINT32 lbasector, void *buffer)
+ * @fn  uint32_t hard_disk_read(hard_disk_file *file, uint32_t lbasector, void *buffer)
  *
  * @brief   Hard disk read.
  *
@@ -127,10 +127,10 @@ hard_disk_info *hard_disk_get_info(hard_disk_file *file)
  * @param   lbasector       The lbasector.
  * @param [in,out]  buffer  If non-null, the buffer.
  *
- * @return  An UINT32.
+ * @return  An uint32_t.
  */
 
-UINT32 hard_disk_read(hard_disk_file *file, UINT32 lbasector, void *buffer)
+uint32_t hard_disk_read(hard_disk_file *file, uint32_t lbasector, void *buffer)
 {
 	chd_error err = file->chd->read_units(lbasector, buffer);
 	return (err == CHDERR_NONE);
@@ -143,7 +143,7 @@ UINT32 hard_disk_read(hard_disk_file *file, UINT32 lbasector, void *buffer)
 -------------------------------------------------*/
 
 /**
- * @fn  UINT32 hard_disk_write(hard_disk_file *file, UINT32 lbasector, const void *buffer)
+ * @fn  uint32_t hard_disk_write(hard_disk_file *file, uint32_t lbasector, const void *buffer)
  *
  * @brief   Hard disk write.
  *
@@ -151,10 +151,10 @@ UINT32 hard_disk_read(hard_disk_file *file, UINT32 lbasector, void *buffer)
  * @param   lbasector       The lbasector.
  * @param   buffer          The buffer.
  *
- * @return  An UINT32.
+ * @return  An uint32_t.
  */
 
-UINT32 hard_disk_write(hard_disk_file *file, UINT32 lbasector, const void *buffer)
+uint32_t hard_disk_write(hard_disk_file *file, uint32_t lbasector, const void *buffer)
 {
 	chd_error err = file->chd->write_units(lbasector, buffer);
 	return (err == CHDERR_NONE);

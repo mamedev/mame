@@ -18,7 +18,7 @@
 
 /* Graphics Instructions */
 
-void tms340x0_device::line(UINT16 op)
+void tms340x0_device::line(uint16_t op)
 {
 	if (!P_FLAG())
 	{
@@ -32,7 +32,7 @@ void tms340x0_device::line(UINT16 op)
 
 	if (COUNT() > 0)
 	{
-		INT16 x1,y1;
+		int16_t x1,y1;
 
 		COUNT()--;
 		if (WINDOW_CHECKING() != 3 ||
@@ -72,7 +72,7 @@ cases:
 * directions (left->right/right->left, top->bottom/bottom->top)
 */
 
-int tms340x0_device::apply_window(const char *inst_name,int srcbpp, UINT32 *srcaddr, XY *dst, int *dx, int *dy)
+int tms340x0_device::apply_window(const char *inst_name,int srcbpp, uint32_t *srcaddr, XY *dst, int *dx, int *dy)
 {
 	/* apply the window */
 	if (WINDOW_CHECKING() == 0)
@@ -205,34 +205,34 @@ int tms340x0_device::compute_pixblt_b_cycles(int left_partials, int right_partia
 
 
 /* Shift register handling */
-void tms340x0_device::memory_w(address_space &space, offs_t offset,UINT16 data)
+void tms340x0_device::memory_w(address_space &space, offs_t offset,uint16_t data)
 {
 	space.write_word(offset, data);
 }
 
-UINT16 tms340x0_device::memory_r(address_space &space, offs_t offset)
+uint16_t tms340x0_device::memory_r(address_space &space, offs_t offset)
 {
 	return space.read_word(offset);
 }
 
-void tms340x0_device::shiftreg_w(address_space &space, offs_t offset,UINT16 data)
+void tms340x0_device::shiftreg_w(address_space &space, offs_t offset,uint16_t data)
 {
 	if (!m_from_shiftreg_cb.isnull())
-		m_from_shiftreg_cb(space, (UINT32)(offset << 3) & ~15, &m_shiftreg[0]);
+		m_from_shiftreg_cb(space, (uint32_t)(offset << 3) & ~15, &m_shiftreg[0]);
 	else
 		logerror("From ShiftReg function not set. PC = %08X\n", m_pc);
 }
 
-UINT16 tms340x0_device::shiftreg_r(address_space &space, offs_t offset)
+uint16_t tms340x0_device::shiftreg_r(address_space &space, offs_t offset)
 {
 	if (!m_to_shiftreg_cb.isnull())
-		m_to_shiftreg_cb(space, (UINT32)(offset << 3) & ~15, &m_shiftreg[0]);
+		m_to_shiftreg_cb(space, (uint32_t)(offset << 3) & ~15, &m_shiftreg[0]);
 	else
 		logerror("To ShiftReg function not set. PC = %08X\n", m_pc);
 	return m_shiftreg[0];
 }
 
-UINT16 tms340x0_device::dummy_shiftreg_r(address_space &space, offs_t offset)
+uint16_t tms340x0_device::dummy_shiftreg_r(address_space &space, offs_t offset)
 {
 	return m_shiftreg[0];
 }
@@ -240,28 +240,28 @@ UINT16 tms340x0_device::dummy_shiftreg_r(address_space &space, offs_t offset)
 
 
 /* Pixel operations */
-UINT32 tms340x0_device::pixel_op00(UINT32 dstpix, UINT32 mask, UINT32 srcpix) { return srcpix; }
-UINT32 tms340x0_device::pixel_op01(UINT32 dstpix, UINT32 mask, UINT32 srcpix) { return srcpix & dstpix; }
-UINT32 tms340x0_device::pixel_op02(UINT32 dstpix, UINT32 mask, UINT32 srcpix) { return srcpix & ~dstpix; }
-UINT32 tms340x0_device::pixel_op03(UINT32 dstpix, UINT32 mask, UINT32 srcpix) { return 0; }
-UINT32 tms340x0_device::pixel_op04(UINT32 dstpix, UINT32 mask, UINT32 srcpix) { return (srcpix | ~dstpix) & mask; }
-UINT32 tms340x0_device::pixel_op05(UINT32 dstpix, UINT32 mask, UINT32 srcpix) { return ~(srcpix ^ dstpix) & mask; }
-UINT32 tms340x0_device::pixel_op06(UINT32 dstpix, UINT32 mask, UINT32 srcpix) { return ~dstpix & mask; }
-UINT32 tms340x0_device::pixel_op07(UINT32 dstpix, UINT32 mask, UINT32 srcpix) { return ~(srcpix | dstpix) & mask; }
-UINT32 tms340x0_device::pixel_op08(UINT32 dstpix, UINT32 mask, UINT32 srcpix) { return (srcpix | dstpix) & mask; }
-UINT32 tms340x0_device::pixel_op09(UINT32 dstpix, UINT32 mask, UINT32 srcpix) { return dstpix & mask; }
-UINT32 tms340x0_device::pixel_op10(UINT32 dstpix, UINT32 mask, UINT32 srcpix) { return (srcpix ^ dstpix) & mask; }
-UINT32 tms340x0_device::pixel_op11(UINT32 dstpix, UINT32 mask, UINT32 srcpix) { return (~srcpix & dstpix) & mask; }
-UINT32 tms340x0_device::pixel_op12(UINT32 dstpix, UINT32 mask, UINT32 srcpix) { return mask; }
-UINT32 tms340x0_device::pixel_op13(UINT32 dstpix, UINT32 mask, UINT32 srcpix) { return (~srcpix & dstpix) & mask; }
-UINT32 tms340x0_device::pixel_op14(UINT32 dstpix, UINT32 mask, UINT32 srcpix) { return ~(srcpix & dstpix) & mask; }
-UINT32 tms340x0_device::pixel_op15(UINT32 dstpix, UINT32 mask, UINT32 srcpix) { return srcpix ^ mask; }
-UINT32 tms340x0_device::pixel_op16(UINT32 dstpix, UINT32 mask, UINT32 srcpix) { return (srcpix + dstpix) & mask; }
-UINT32 tms340x0_device::pixel_op17(UINT32 dstpix, UINT32 mask, UINT32 srcpix) { INT32 tmp = srcpix + (dstpix & mask); return (tmp > mask) ? mask : tmp; }
-UINT32 tms340x0_device::pixel_op18(UINT32 dstpix, UINT32 mask, UINT32 srcpix) { return (dstpix - srcpix) & mask; }
-UINT32 tms340x0_device::pixel_op19(UINT32 dstpix, UINT32 mask, UINT32 srcpix) { INT32 tmp = srcpix - (dstpix & mask); return (tmp < 0) ? 0 : tmp; }
-UINT32 tms340x0_device::pixel_op20(UINT32 dstpix, UINT32 mask, UINT32 srcpix) { dstpix &= mask; return (srcpix > dstpix) ? srcpix : dstpix; }
-UINT32 tms340x0_device::pixel_op21(UINT32 dstpix, UINT32 mask, UINT32 srcpix) { dstpix &= mask; return (srcpix < dstpix) ? srcpix : dstpix; }
+uint32_t tms340x0_device::pixel_op00(uint32_t dstpix, uint32_t mask, uint32_t srcpix) { return srcpix; }
+uint32_t tms340x0_device::pixel_op01(uint32_t dstpix, uint32_t mask, uint32_t srcpix) { return srcpix & dstpix; }
+uint32_t tms340x0_device::pixel_op02(uint32_t dstpix, uint32_t mask, uint32_t srcpix) { return srcpix & ~dstpix; }
+uint32_t tms340x0_device::pixel_op03(uint32_t dstpix, uint32_t mask, uint32_t srcpix) { return 0; }
+uint32_t tms340x0_device::pixel_op04(uint32_t dstpix, uint32_t mask, uint32_t srcpix) { return (srcpix | ~dstpix) & mask; }
+uint32_t tms340x0_device::pixel_op05(uint32_t dstpix, uint32_t mask, uint32_t srcpix) { return ~(srcpix ^ dstpix) & mask; }
+uint32_t tms340x0_device::pixel_op06(uint32_t dstpix, uint32_t mask, uint32_t srcpix) { return ~dstpix & mask; }
+uint32_t tms340x0_device::pixel_op07(uint32_t dstpix, uint32_t mask, uint32_t srcpix) { return ~(srcpix | dstpix) & mask; }
+uint32_t tms340x0_device::pixel_op08(uint32_t dstpix, uint32_t mask, uint32_t srcpix) { return (srcpix | dstpix) & mask; }
+uint32_t tms340x0_device::pixel_op09(uint32_t dstpix, uint32_t mask, uint32_t srcpix) { return dstpix & mask; }
+uint32_t tms340x0_device::pixel_op10(uint32_t dstpix, uint32_t mask, uint32_t srcpix) { return (srcpix ^ dstpix) & mask; }
+uint32_t tms340x0_device::pixel_op11(uint32_t dstpix, uint32_t mask, uint32_t srcpix) { return (~srcpix & dstpix) & mask; }
+uint32_t tms340x0_device::pixel_op12(uint32_t dstpix, uint32_t mask, uint32_t srcpix) { return mask; }
+uint32_t tms340x0_device::pixel_op13(uint32_t dstpix, uint32_t mask, uint32_t srcpix) { return (~srcpix & dstpix) & mask; }
+uint32_t tms340x0_device::pixel_op14(uint32_t dstpix, uint32_t mask, uint32_t srcpix) { return ~(srcpix & dstpix) & mask; }
+uint32_t tms340x0_device::pixel_op15(uint32_t dstpix, uint32_t mask, uint32_t srcpix) { return srcpix ^ mask; }
+uint32_t tms340x0_device::pixel_op16(uint32_t dstpix, uint32_t mask, uint32_t srcpix) { return (srcpix + dstpix) & mask; }
+uint32_t tms340x0_device::pixel_op17(uint32_t dstpix, uint32_t mask, uint32_t srcpix) { int32_t tmp = srcpix + (dstpix & mask); return (tmp > mask) ? mask : tmp; }
+uint32_t tms340x0_device::pixel_op18(uint32_t dstpix, uint32_t mask, uint32_t srcpix) { return (dstpix - srcpix) & mask; }
+uint32_t tms340x0_device::pixel_op19(uint32_t dstpix, uint32_t mask, uint32_t srcpix) { int32_t tmp = srcpix - (dstpix & mask); return (tmp < 0) ? 0 : tmp; }
+uint32_t tms340x0_device::pixel_op20(uint32_t dstpix, uint32_t mask, uint32_t srcpix) { dstpix &= mask; return (srcpix > dstpix) ? srcpix : dstpix; }
+uint32_t tms340x0_device::pixel_op21(uint32_t dstpix, uint32_t mask, uint32_t srcpix) { dstpix &= mask; return (srcpix < dstpix) ? srcpix : dstpix; }
 
 const tms340x0_device::pixel_op_func tms340x0_device::s_pixel_op_table[32] =
 {
@@ -270,7 +270,7 @@ const tms340x0_device::pixel_op_func tms340x0_device::s_pixel_op_table[32] =
 	&tms340x0_device::pixel_op16, &tms340x0_device::pixel_op17, &tms340x0_device::pixel_op18, &tms340x0_device::pixel_op19, &tms340x0_device::pixel_op20, &tms340x0_device::pixel_op21, &tms340x0_device::pixel_op00, &tms340x0_device::pixel_op00,
 	&tms340x0_device::pixel_op00, &tms340x0_device::pixel_op00, &tms340x0_device::pixel_op00, &tms340x0_device::pixel_op00, &tms340x0_device::pixel_op00, &tms340x0_device::pixel_op00, &tms340x0_device::pixel_op00, &tms340x0_device::pixel_op00
 };
-const UINT8 tms340x0_device::s_pixel_op_timing_table[33] =
+const uint8_t tms340x0_device::s_pixel_op_timing_table[33] =
 {
 	2,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,5,5,6,5,5,2,2,2,2,2,2,2,2,2,2,2
 };
@@ -817,13 +817,13 @@ const tms340x0_device::pixblt_b_op_func tms340x0_device::s_fill_op_table[] =
 #undef PIXEL_OP_TIMING
 #undef PIXEL_OP
 
-static const UINT8 pixelsize_lookup[32] =
+static const uint8_t pixelsize_lookup[32] =
 {
 	0,0,1,1,2,2,2,2,3,3,3,3,3,3,3,3,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4
 };
 
 
-void tms340x0_device::pixblt_b_l(UINT16 op)
+void tms340x0_device::pixblt_b_l(uint16_t op)
 {
 	int psize = pixelsize_lookup[IOREG(REG_PSIZE) & 0x1f];
 	int trans = (IOREG(REG_CONTROL) & 0x20) >> 5;
@@ -835,7 +835,7 @@ void tms340x0_device::pixblt_b_l(UINT16 op)
 	(this->*s_pixblt_b_op_table[ix])(1);
 }
 
-void tms340x0_device::pixblt_b_xy(UINT16 op)
+void tms340x0_device::pixblt_b_xy(uint16_t op)
 {
 	int psize = pixelsize_lookup[IOREG(REG_PSIZE) & 0x1f];
 	int trans = (IOREG(REG_CONTROL) & 0x20) >> 5;
@@ -847,7 +847,7 @@ void tms340x0_device::pixblt_b_xy(UINT16 op)
 	(this->*s_pixblt_b_op_table[ix])(0);
 }
 
-void tms340x0_device::pixblt_l_l(UINT16 op)
+void tms340x0_device::pixblt_l_l(uint16_t op)
 {
 	int psize = pixelsize_lookup[IOREG(REG_PSIZE) & 0x1f];
 	int trans = (IOREG(REG_CONTROL) & 0x20) >> 5;
@@ -863,7 +863,7 @@ void tms340x0_device::pixblt_l_l(UINT16 op)
 		(this->*s_pixblt_r_op_table[ix])(1, 1);
 }
 
-void tms340x0_device::pixblt_l_xy(UINT16 op)
+void tms340x0_device::pixblt_l_xy(uint16_t op)
 {
 	int psize = pixelsize_lookup[IOREG(REG_PSIZE) & 0x1f];
 	int trans = (IOREG(REG_CONTROL) & 0x20) >> 5;
@@ -879,7 +879,7 @@ void tms340x0_device::pixblt_l_xy(UINT16 op)
 		(this->*s_pixblt_r_op_table[ix])(1, 0);
 }
 
-void tms340x0_device::pixblt_xy_l(UINT16 op)
+void tms340x0_device::pixblt_xy_l(uint16_t op)
 {
 	int psize = pixelsize_lookup[IOREG(REG_PSIZE) & 0x1f];
 	int trans = (IOREG(REG_CONTROL) & 0x20) >> 5;
@@ -895,7 +895,7 @@ void tms340x0_device::pixblt_xy_l(UINT16 op)
 		(this->*s_pixblt_r_op_table[ix])(0, 1);
 }
 
-void tms340x0_device::pixblt_xy_xy(UINT16 op)
+void tms340x0_device::pixblt_xy_xy(uint16_t op)
 {
 	int psize = pixelsize_lookup[IOREG(REG_PSIZE) & 0x1f];
 	int trans = (IOREG(REG_CONTROL) & 0x20) >> 5;
@@ -911,7 +911,7 @@ void tms340x0_device::pixblt_xy_xy(UINT16 op)
 		(this->*s_pixblt_r_op_table[ix])(0, 0);
 }
 
-void tms340x0_device::fill_l(UINT16 op)
+void tms340x0_device::fill_l(uint16_t op)
 {
 	int psize = pixelsize_lookup[IOREG(REG_PSIZE) & 0x1f];
 	int trans = (IOREG(REG_CONTROL) & 0x20) >> 5;
@@ -923,7 +923,7 @@ void tms340x0_device::fill_l(UINT16 op)
 	(this->*s_fill_op_table[ix])(1);
 }
 
-void tms340x0_device::fill_xy(UINT16 op)
+void tms340x0_device::fill_xy(uint16_t op)
 {
 	int psize = pixelsize_lookup[IOREG(REG_PSIZE) & 0x1f];
 	int trans = (IOREG(REG_CONTROL) & 0x20) >> 5;
@@ -953,8 +953,8 @@ void FUNCTION_NAME(tms340x0_device::pixblt)(int src_is_linear, int dst_is_linear
 		int dx, dy, x, y, /*words,*/ yreverse;
 		word_write_func word_write;
 		word_read_func word_read;
-		UINT32 readwrites = 0;
-		UINT32 saddr, daddr;
+		uint32_t readwrites = 0;
+		uint32_t saddr, daddr;
 		XY dstxy = { 0 };
 
 		/* determine read/write functions */
@@ -973,8 +973,8 @@ void FUNCTION_NAME(tms340x0_device::pixblt)(int src_is_linear, int dst_is_linear
 		saddr = src_is_linear ? SADDR() : SXYTOL(SADDR_XY());
 
 		/* compute the bounds of the operation */
-		dx = (INT16)DYDX_X();
-		dy = (INT16)DYDX_Y();
+		dx = (int16_t)DYDX_X();
+		dy = (int16_t)DYDX_Y();
 
 		/* apply the window for non-linear destinations */
 		m_gfxcycles = 7 + (src_is_linear ? 0 : 2);
@@ -1021,11 +1021,11 @@ void FUNCTION_NAME(tms340x0_device::pixblt)(int src_is_linear, int dst_is_linear
 		/* loop over rows */
 		for (y = 0; y < dy; y++)
 		{
-			UINT32 srcwordaddr = saddr >> 4;
-			UINT32 dstwordaddr = daddr >> 4;
-			UINT8 srcbit = saddr & 15;
-			UINT8 dstbit = daddr & 15;
-			UINT32 srcword, dstword = 0;
+			uint32_t srcwordaddr = saddr >> 4;
+			uint32_t dstwordaddr = daddr >> 4;
+			uint8_t srcbit = saddr & 15;
+			uint8_t dstbit = daddr & 15;
+			uint32_t srcword, dstword = 0;
 
 			/* fetch the initial source word */
 			srcword = (this->*word_read)(*m_program, srcwordaddr++ << 1);
@@ -1041,8 +1041,8 @@ void FUNCTION_NAME(tms340x0_device::pixblt)(int src_is_linear, int dst_is_linear
 			/* loop over pixels */
 			for (x = 0; x < dx; x++)
 			{
-				UINT32 dstmask;
-				UINT32 pixel;
+				uint32_t dstmask;
+				uint32_t pixel;
 
 				/* fetch more words if necessary */
 				if (srcbit + BITS_PER_PIXEL > 16)
@@ -1092,8 +1092,8 @@ void FUNCTION_NAME(tms340x0_device::pixblt)(int src_is_linear, int dst_is_linear
 				/* if we're right-partial, read and mask the remaining bits */
 				if (dstbit != 16)
 				{
-					UINT16 origdst = (this->*word_read)(*m_program, dstwordaddr << 1);
-					UINT16 mask = 0xffff << dstbit;
+					uint16_t origdst = (this->*word_read)(*m_program, dstwordaddr << 1);
+					uint16_t mask = 0xffff << dstbit;
 					dstword = (dstword & ~mask) | (origdst & mask);
 					readwrites++;
 				}
@@ -1106,8 +1106,8 @@ void FUNCTION_NAME(tms340x0_device::pixblt)(int src_is_linear, int dst_is_linear
 
 #if 0
 			int left_partials, right_partials, full_words, bitshift, bitshift_alt;
-			UINT16 srcword, srcmask, dstword, dstmask, pixel;
-			UINT32 swordaddr, dwordaddr;
+			uint16_t srcword, srcmask, dstword, dstmask, pixel;
+			uint32_t swordaddr, dwordaddr;
 
 			/* determine the bit shift to get from source to dest */
 			bitshift = ((daddr & 15) - (saddr & 15)) & 15;
@@ -1302,7 +1302,7 @@ void FUNCTION_NAME(tms340x0_device::pixblt_r)(int src_is_linear, int dst_is_line
 		int dx, dy, x, y, words, yreverse;
 		word_write_func word_write;
 		word_read_func word_read;
-		UINT32 saddr, daddr;
+		uint32_t saddr, daddr;
 		XY dstxy = { 0 };
 
 		/* determine read/write functions */
@@ -1323,8 +1323,8 @@ if ((saddr & (BITS_PER_PIXEL - 1)) != 0) osd_printf_debug("PIXBLT_R%d with odd s
 		saddr &= ~(BITS_PER_PIXEL - 1);
 
 		/* compute the bounds of the operation */
-		dx = (INT16)DYDX_X();
-		dy = (INT16)DYDX_Y();
+		dx = (int16_t)DYDX_X();
+		dy = (int16_t)DYDX_Y();
 
 		/* apply the window for non-linear destinations */
 		m_gfxcycles = 7 + (src_is_linear ? 0 : 2);
@@ -1375,8 +1375,8 @@ if ((daddr & (BITS_PER_PIXEL - 1)) != 0) osd_printf_debug("PIXBLT_R%d with odd d
 		for (y = 0; y < dy; y++)
 		{
 			int left_partials, right_partials, full_words, bitshift, bitshift_alt;
-			UINT16 srcword, srcmask, dstword, dstmask, pixel;
-			UINT32 swordaddr, dwordaddr;
+			uint16_t srcword, srcmask, dstword, dstmask, pixel;
+			uint32_t swordaddr, dwordaddr;
 
 			/* determine the bit shift to get from source to dest */
 			bitshift = ((daddr & 15) - (saddr & 15)) & 15;
@@ -1582,7 +1582,7 @@ void FUNCTION_NAME(tms340x0_device::pixblt_b)(int dst_is_linear)
 		int dx, dy, x, y, words, left_partials, right_partials, full_words;
 		word_write_func word_write;
 		word_read_func word_read;
-		UINT32 saddr, daddr;
+		uint32_t saddr, daddr;
 		XY dstxy = { 0 };
 
 		/* determine read/write functions */
@@ -1601,8 +1601,8 @@ void FUNCTION_NAME(tms340x0_device::pixblt_b)(int dst_is_linear)
 		saddr = SADDR();
 
 		/* compute the bounds of the operation */
-		dx = (INT16)DYDX_X();
-		dy = (INT16)DYDX_Y();
+		dx = (int16_t)DYDX_X();
+		dy = (int16_t)DYDX_Y();
 
 		/* apply the window for non-linear destinations */
 		m_gfxcycles = 4;
@@ -1649,8 +1649,8 @@ void FUNCTION_NAME(tms340x0_device::pixblt_b)(int dst_is_linear)
 		/* loop over rows */
 		for (y = 0; y < dy; y++)
 		{
-			UINT16 srcword, srcmask, dstword, dstmask, pixel;
-			UINT32 swordaddr, dwordaddr;
+			uint16_t srcword, srcmask, dstword, dstmask, pixel;
+			uint32_t swordaddr, dwordaddr;
 
 			/* use byte addresses each row */
 			swordaddr = saddr >> 4;
@@ -1796,7 +1796,7 @@ void FUNCTION_NAME(tms340x0_device::fill)(int dst_is_linear)
 		int dx, dy, x, y, words, left_partials, right_partials, full_words;
 		word_write_func word_write;
 		word_read_func word_read;
-		UINT32 daddr;
+		uint32_t daddr;
 		XY dstxy = { 0 };
 
 		/* determine read/write functions */
@@ -1812,8 +1812,8 @@ void FUNCTION_NAME(tms340x0_device::fill)(int dst_is_linear)
 		}
 
 		/* compute the bounds of the operation */
-		dx = (INT16)DYDX_X();
-		dy = (INT16)DYDX_Y();
+		dx = (int16_t)DYDX_X();
+		dy = (int16_t)DYDX_Y();
 
 		/* apply the window for non-linear destinations */
 		m_gfxcycles = 4;
@@ -1860,8 +1860,8 @@ void FUNCTION_NAME(tms340x0_device::fill)(int dst_is_linear)
 		/* loop over rows */
 		for (y = 0; y < dy; y++)
 		{
-			UINT16 dstword, dstmask, pixel;
-			UINT32 dwordaddr;
+			uint16_t dstword, dstmask, pixel;
+			uint32_t dwordaddr;
 
 			/* use byte addresses each row */
 			dwordaddr = daddr >> 4;

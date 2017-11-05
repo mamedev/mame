@@ -51,16 +51,18 @@
 /* Mapping for joystick see hec2hrp.c*/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "cpu/i8085/i8085.h"
-#include "imagedev/cassette.h"
-#include "formats/hect_tap.h"
-#include "imagedev/printer.h"
-#include "sound/wave.h"      /* for K7 sound*/
-#include "sound/discrete.h"  /* for 1 Bit sound*/
-#include "machine/upd765.h" /* for floppy disc controller */
-#include "softlist.h"
 #include "includes/hec2hrp.h"
+
+#include "cpu/i8085/i8085.h"
+#include "cpu/z80/z80.h"
+#include "formats/hect_tap.h"
+#include "imagedev/cassette.h"
+#include "imagedev/printer.h"
+#include "machine/upd765.h" /* for floppy disc controller */
+#include "sound/discrete.h"  /* for 1 Bit sound*/
+#include "sound/wave.h"      /* for K7 sound*/
+#include "screen.h"
+#include "softlist.h"
 
 
 class interact_state : public hec2hrp_state
@@ -70,10 +72,10 @@ public:
 		: hec2hrp_state(mconfig, type, tag),
 			m_videoram(*this, "videoram") { }
 
-	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<uint8_t> m_videoram;
 	DECLARE_MACHINE_START(interact);
 	DECLARE_MACHINE_RESET(interact);
-	UINT32 screen_update_interact(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_interact(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -110,15 +112,15 @@ MACHINE_START_MEMBER(interact_state,interact)
 	hector_init();
 }
 
-UINT32 interact_state::screen_update_interact(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t interact_state::screen_update_interact(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 *videoram = m_videoram;
+	uint8_t *videoram = m_videoram;
 	screen.set_visible_area(0, 113, 0, 75);
 	hector_hr(bitmap, videoram,  77, 32);
 	return 0;
 }
 
-static MACHINE_CONFIG_START( interact, interact_state )
+static MACHINE_CONFIG_START( interact )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, XTAL_2MHz)
@@ -155,7 +157,7 @@ static MACHINE_CONFIG_START( interact, interact_state )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( hector1, interact_state )
+static MACHINE_CONFIG_START( hector1 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_1_75MHz)
@@ -294,6 +296,6 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP(1979, interact, 0,         0,  interact,   interact, driver_device, 0,  "Interact",   "Interact Family Computer", MACHINE_IMPERFECT_SOUND)
-COMP(1983, hector1,  interact,  0,   hector1,   interact, driver_device, 0,  "Micronique", "Hector 1",  MACHINE_IMPERFECT_SOUND)
+/*   YEAR  NAME      PARENT     COMPA   MACHINE    INPUT     STATE           INIT  COMPANY       FULLNAME       FLAGS */
+COMP(1979, interact, 0,         0,      interact,  interact, interact_state, 0,    "Interact",   "Interact Family Computer", MACHINE_IMPERFECT_SOUND)
+COMP(1983, hector1,  interact,  0,      hector1,   interact, interact_state, 0,    "Micronique", "Hector 1",  MACHINE_IMPERFECT_SOUND)

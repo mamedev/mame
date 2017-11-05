@@ -5,14 +5,14 @@
 #ifndef __TMC600__
 #define __TMC600__
 
-
-#include "emu.h"
 #include "cpu/cosmac/cosmac.h"
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
 #include "bus/centronics/ctronics.h"
 #include "machine/ram.h"
+#include "machine/timer.h"
 #include "sound/cdp1869.h"
+#include "speaker.h"
 
 #define SCREEN_TAG      "screen"
 #define CDP1802_TAG     "cdp1802"
@@ -25,25 +25,18 @@
 class tmc600_state : public driver_device
 {
 public:
-	tmc600_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, CDP1802_TAG),
-			m_vis(*this, CDP1869_TAG),
-			m_cassette(*this, "cassette"),
-			m_centronics(*this, "centronics"),
-			m_ram(*this, RAM_TAG),
-			m_char_rom(*this, "chargen"),
-			m_page_ram(*this, "page_ram"),
-			m_color_ram(*this, "color_ram"),
-			m_run(*this, "RUN"),
-			m_y0(*this, "Y0"),
-			m_y1(*this, "Y1"),
-			m_y2(*this, "Y2"),
-			m_y3(*this, "Y3"),
-			m_y4(*this, "Y4"),
-			m_y5(*this, "Y5"),
-			m_y6(*this, "Y6"),
-			m_y7(*this, "Y7")
+	tmc600_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, CDP1802_TAG),
+		m_vis(*this, CDP1869_TAG),
+		m_cassette(*this, "cassette"),
+		m_centronics(*this, "centronics"),
+		m_ram(*this, RAM_TAG),
+		m_char_rom(*this, "chargen"),
+		m_page_ram(*this, "page_ram"),
+		m_color_ram(*this, "color_ram"),
+		m_run(*this, "RUN"),
+		m_key_row(*this, {"Y0", "Y1", "Y2", "Y3", "Y4", "Y5", "Y6", "Y7"})
 	{ }
 
 	required_device<cosmac_device> m_maincpu;
@@ -51,18 +44,11 @@ public:
 	required_device<cassette_image_device> m_cassette;
 	required_device<centronics_device> m_centronics;
 	required_device<ram_device> m_ram;
-	required_region_ptr<UINT8> m_char_rom;
-	required_shared_ptr<UINT8> m_page_ram;
-	optional_shared_ptr<UINT8> m_color_ram;
+	required_region_ptr<uint8_t> m_char_rom;
+	required_shared_ptr<uint8_t> m_page_ram;
+	optional_shared_ptr<uint8_t> m_color_ram;
 	required_ioport m_run;
-	required_ioport m_y0;
-	required_ioport m_y1;
-	required_ioport m_y2;
-	required_ioport m_y3;
-	required_ioport m_y4;
-	required_ioport m_y5;
-	required_ioport m_y6;
-	required_ioport m_y7;
+	required_ioport_array<8> m_key_row;
 
 	virtual void machine_start() override;
 
@@ -77,7 +63,7 @@ public:
 	DECLARE_READ_LINE_MEMBER( ef3_r );
 	DECLARE_WRITE_LINE_MEMBER( q_w );
 
-	UINT8 get_color(UINT16 pma);
+	uint8_t get_color(uint16_t pma);
 
 	// video state
 	int m_vismac_reg_latch;     // video register latch
@@ -86,7 +72,6 @@ public:
 	int m_blink;                // cursor blink
 
 	// keyboard state
-	ioport_port* m_key_row[8];
 	int m_keylatch;             // key latch
 
 	TIMER_DEVICE_CALLBACK_MEMBER(blink_tick);

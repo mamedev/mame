@@ -17,11 +17,17 @@
  **************************************************************************/
 
 #include "emu.h"
+#include "includes/gp32.h"
+
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
-#include "includes/gp32.h"
+#include "sound/volt_reg.h"
+
 #include "rendlay.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
 
 #define VERBOSE_LEVEL ( 0 )
 
@@ -43,7 +49,6 @@ static inline void ATTR_PRINTF(3,4) verboselog(device_t &device, int n_level, co
 #define MPLLCON  1
 #define UPLLCON  2
 
-#define BIT(x,n) (((x)>>(n))&1)
 #define BITS(x,m,n) (((x)>>(n))&((1<<((m)-(n)+1))-1))
 
 
@@ -56,9 +61,9 @@ static inline void ATTR_PRINTF(3,4) verboselog(device_t &device, int n_level, co
 #define BPPMODE_TFT_08  0x0B
 #define BPPMODE_TFT_16  0x0C
 
-inline rgb_t gp32_state::s3c240x_get_color_5551( UINT16 data)
+inline rgb_t gp32_state::s3c240x_get_color_5551( uint16_t data)
 {
-	UINT8 r, g, b, i;
+	uint8_t r, g, b, i;
 	r = BITS( data, 15, 11) << 3;
 	g = BITS( data, 10, 6) << 3;
 	b = BITS( data, 5, 1) << 3;
@@ -86,13 +91,13 @@ void gp32_state::s3c240x_lcd_dma_init()
 	m_s3c240x_lcd.hozval = BITS( m_s3c240x_lcd_regs[2], 18, 8);
 }
 
-UINT32 gp32_state::s3c240x_lcd_dma_read( )
+uint32_t gp32_state::s3c240x_lcd_dma_read( )
 {
-	UINT8 *vram, data[4];
+	uint8_t *vram, data[4];
 	int i;
 	for (i = 0; i < 2; i++)
 	{
-		vram = (UINT8 *)m_s3c240x_ram.target() + m_s3c240x_lcd.vramaddr_cur - 0x0C000000;
+		vram = (uint8_t *)m_s3c240x_ram.target() + m_s3c240x_lcd.vramaddr_cur - 0x0C000000;
 		data[i*2+0] = vram[0];
 		data[i*2+1] = vram[1];
 		m_s3c240x_lcd.vramaddr_cur += 2;
@@ -130,11 +135,11 @@ UINT32 gp32_state::s3c240x_lcd_dma_read( )
 void gp32_state::s3c240x_lcd_render_01( )
 {
 	bitmap_rgb32 &bitmap = m_bitmap;
-	UINT32 *scanline = &bitmap.pix32(m_s3c240x_lcd.vpos, m_s3c240x_lcd.hpos);
+	uint32_t *scanline = &bitmap.pix32(m_s3c240x_lcd.vpos, m_s3c240x_lcd.hpos);
 	int i, j;
 	for (i = 0; i < 4; i++)
 	{
-		UINT32 data = s3c240x_lcd_dma_read();
+		uint32_t data = s3c240x_lcd_dma_read();
 		for (j = 0; j < 32; j++)
 		{
 			*scanline++ = m_palette->pen_color((data >> 31) & 0x01);
@@ -153,11 +158,11 @@ void gp32_state::s3c240x_lcd_render_01( )
 void gp32_state::s3c240x_lcd_render_02( )
 {
 	bitmap_rgb32 &bitmap = m_bitmap;
-	UINT32 *scanline = &bitmap.pix32(m_s3c240x_lcd.vpos, m_s3c240x_lcd.hpos);
+	uint32_t *scanline = &bitmap.pix32(m_s3c240x_lcd.vpos, m_s3c240x_lcd.hpos);
 	int i, j;
 	for (i = 0; i < 4; i++)
 	{
-		UINT32 data = s3c240x_lcd_dma_read();
+		uint32_t data = s3c240x_lcd_dma_read();
 		for (j = 0; j < 16; j++)
 		{
 			*scanline++ = m_palette->pen_color((data >> 30) & 0x03);
@@ -176,11 +181,11 @@ void gp32_state::s3c240x_lcd_render_02( )
 void gp32_state::s3c240x_lcd_render_04( )
 {
 	bitmap_rgb32 &bitmap = m_bitmap;
-	UINT32 *scanline = &bitmap.pix32(m_s3c240x_lcd.vpos, m_s3c240x_lcd.hpos);
+	uint32_t *scanline = &bitmap.pix32(m_s3c240x_lcd.vpos, m_s3c240x_lcd.hpos);
 	int i, j;
 	for (i = 0; i < 4; i++)
 	{
-		UINT32 data = s3c240x_lcd_dma_read( );
+		uint32_t data = s3c240x_lcd_dma_read( );
 		for (j = 0; j < 8; j++)
 		{
 			*scanline++ = m_palette->pen_color((data >> 28) & 0x0F);
@@ -199,11 +204,11 @@ void gp32_state::s3c240x_lcd_render_04( )
 void gp32_state::s3c240x_lcd_render_08( )
 {
 	bitmap_rgb32 &bitmap = m_bitmap;
-	UINT32 *scanline = &bitmap.pix32(m_s3c240x_lcd.vpos, m_s3c240x_lcd.hpos);
+	uint32_t *scanline = &bitmap.pix32(m_s3c240x_lcd.vpos, m_s3c240x_lcd.hpos);
 	int i, j;
 	for (i = 0; i < 4; i++)
 	{
-		UINT32 data = s3c240x_lcd_dma_read();
+		uint32_t data = s3c240x_lcd_dma_read();
 		for (j = 0; j < 4; j++)
 		{
 			*scanline++ = m_palette->pen_color((data >> 24) & 0xFF);
@@ -222,11 +227,11 @@ void gp32_state::s3c240x_lcd_render_08( )
 void gp32_state::s3c240x_lcd_render_16( )
 {
 	bitmap_rgb32 &bitmap = m_bitmap;
-	UINT32 *scanline = &bitmap.pix32(m_s3c240x_lcd.vpos, m_s3c240x_lcd.hpos);
+	uint32_t *scanline = &bitmap.pix32(m_s3c240x_lcd.vpos, m_s3c240x_lcd.hpos);
 	int i, j;
 	for (i = 0; i < 4; i++)
 	{
-		UINT32 data = s3c240x_lcd_dma_read();
+		uint32_t data = s3c240x_lcd_dma_read();
 		for (j = 0; j < 2; j++)
 		{
 			*scanline++ = s3c240x_get_color_5551( (data >> 16) & 0xFFFF);
@@ -275,7 +280,7 @@ void gp32_state::video_start()
 	machine().first_screen()->register_screen_bitmap(m_bitmap);
 }
 
-UINT32 gp32_state::screen_update_gp32(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t gp32_state::screen_update_gp32(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
 	s3c240x_lcd_dma_init();
@@ -284,14 +289,14 @@ UINT32 gp32_state::screen_update_gp32(screen_device &screen, bitmap_rgb32 &bitma
 
 READ32_MEMBER(gp32_state::s3c240x_lcd_r)
 {
-	UINT32 data = m_s3c240x_lcd_regs[offset];
+	uint32_t data = m_s3c240x_lcd_regs[offset];
 	switch (offset)
 	{
 		// LCDCON1
 		case 0x00 / 4 :
 		{
 			// make sure line counter is going
-			UINT32 lineval = BITS( m_s3c240x_lcd_regs[1], 23, 14);
+			uint32_t lineval = BITS( m_s3c240x_lcd_regs[1], 23, 14);
 			data = (data & ~0xFFFC0000) | ((lineval - machine().first_screen()->vpos()) << 18);
 		}
 		break;
@@ -303,7 +308,7 @@ READ32_MEMBER(gp32_state::s3c240x_lcd_r)
 void gp32_state::s3c240x_lcd_configure()
 {
 	screen_device *screen = machine().first_screen();
-	UINT32 vspw, vbpd, lineval, vfpd, hspw, hbpd, hfpd, hozval, clkval, hclk;
+	uint32_t vspw, vbpd, lineval, vfpd, hspw, hbpd, hfpd, hozval, clkval, hclk;
 	double framerate, vclk;
 	rectangle visarea;
 	vspw = BITS( m_s3c240x_lcd_regs[1], 5, 0);
@@ -355,7 +360,7 @@ void gp32_state::s3c240x_lcd_recalc()
 
 WRITE32_MEMBER(gp32_state::s3c240x_lcd_w)
 {
-	UINT32 old_value = m_s3c240x_lcd_regs[offset];
+	uint32_t old_value = m_s3c240x_lcd_regs[offset];
 	verboselog(*this, 9, "(LCD) %08X <- %08X (PC %08X)\n", 0x14A00000 + (offset << 2), data, space.device().safe_pc( ));
 	COMBINE_DATA(&m_s3c240x_lcd_regs[offset]);
 	switch (offset)
@@ -377,7 +382,7 @@ WRITE32_MEMBER(gp32_state::s3c240x_lcd_w)
 
 READ32_MEMBER(gp32_state::s3c240x_lcd_palette_r)
 {
-	UINT32 data = m_s3c240x_lcd_palette[offset];
+	uint32_t data = m_s3c240x_lcd_palette[offset];
 	verboselog(*this, 9, "(LCD) %08X -> %08X (PC %08X)\n", 0x14A00400 + (offset << 2), data, space.device().safe_pc( ));
 	return data;
 }
@@ -396,17 +401,17 @@ WRITE32_MEMBER(gp32_state::s3c240x_lcd_palette_w)
 // CLOCK & POWER MANAGEMENT
 
 
-UINT32 gp32_state::s3c240x_get_fclk(int reg)
+uint32_t gp32_state::s3c240x_get_fclk(int reg)
 {
-	UINT32 data, mdiv, pdiv, sdiv;
+	uint32_t data, mdiv, pdiv, sdiv;
 	data = m_s3c240x_clkpow_regs[reg]; // MPLLCON or UPLLCON
 	mdiv = BITS( data, 19, 12);
 	pdiv = BITS( data, 9, 4);
 	sdiv = BITS( data, 1, 0);
-	return (UINT32)((double)((mdiv + 8) * 12000000) / (double)((pdiv + 2) * (1 << sdiv)));
+	return (uint32_t)((double)((mdiv + 8) * 12000000) / (double)((pdiv + 2) * (1 << sdiv)));
 }
 
-UINT32 gp32_state::s3c240x_get_hclk(int reg)
+uint32_t gp32_state::s3c240x_get_hclk(int reg)
 {
 	switch (m_s3c240x_clkpow_regs[5] & 0x3) // CLKDIVN
 	{
@@ -418,7 +423,7 @@ UINT32 gp32_state::s3c240x_get_hclk(int reg)
 	return 0;
 }
 
-UINT32 gp32_state::s3c240x_get_pclk(int reg)
+uint32_t gp32_state::s3c240x_get_pclk(int reg)
 {
 	switch (m_s3c240x_clkpow_regs[5] & 0x3) // CLKDIVN
 	{
@@ -432,7 +437,7 @@ UINT32 gp32_state::s3c240x_get_pclk(int reg)
 
 READ32_MEMBER(gp32_state::s3c240x_clkpow_r)
 {
-	UINT32 data = m_s3c240x_clkpow_regs[offset];
+	uint32_t data = m_s3c240x_clkpow_regs[offset];
 	verboselog(*this, 9, "(CLKPOW) %08X -> %08X (PC %08X)\n", 0x14800000 + (offset << 2), data, space.device().safe_pc( ));
 	return data;
 }
@@ -459,7 +464,7 @@ void gp32_state::s3c240x_check_pending_irq()
 {
 	if (m_s3c240x_irq_regs[0] != 0)
 	{
-		UINT32 int_type = 0, temp;
+		uint32_t int_type = 0, temp;
 		temp = m_s3c240x_irq_regs[0];
 		while (!(temp & 1))
 		{
@@ -476,7 +481,7 @@ void gp32_state::s3c240x_check_pending_irq()
 	}
 }
 
-void gp32_state::s3c240x_request_irq(UINT32 int_type)
+void gp32_state::s3c240x_request_irq(uint32_t int_type)
 {
 	verboselog(*this, 5, "request irq %d\n", int_type);
 	if (m_s3c240x_irq_regs[0] == 0)
@@ -496,14 +501,14 @@ void gp32_state::s3c240x_request_irq(UINT32 int_type)
 
 READ32_MEMBER(gp32_state::s3c240x_irq_r)
 {
-	UINT32 data = m_s3c240x_irq_regs[offset];
+	uint32_t data = m_s3c240x_irq_regs[offset];
 	verboselog(*this, 9, "(IRQ) %08X -> %08X (PC %08X)\n", 0x14400000 + (offset << 2), data, space.device().safe_pc( ));
 	return data;
 }
 
 WRITE32_MEMBER(gp32_state::s3c240x_irq_w)
 {
-	UINT32 old_value = m_s3c240x_irq_regs[offset];
+	uint32_t old_value = m_s3c240x_irq_regs[offset];
 	verboselog(*this, 9, "(IRQ) %08X <- %08X (PC %08X)\n", 0x14400000 + (offset << 2), data, space.device().safe_pc( ));
 	COMBINE_DATA(&m_s3c240x_irq_regs[offset]);
 	switch (offset)
@@ -553,7 +558,7 @@ static const char *const timer_reg_names[] =
 
 READ32_MEMBER(gp32_state::s3c240x_pwm_r)
 {
-	UINT32 data = m_s3c240x_pwm_regs[offset];
+	uint32_t data = m_s3c240x_pwm_regs[offset];
 	verboselog(*this, 9, "(PWM) %08X -> %08X (PC %08X)\n", 0x15100000 + (offset << 2), data, space.device().safe_pc( ));
 	return data;
 }
@@ -564,8 +569,8 @@ void gp32_state::s3c240x_pwm_start(int timer)
 	static const int prescaler_shift[] = { 0, 0, 8, 8, 8 };
 	static const int mux_shift[] = { 0, 4, 8, 12, 16 };
 	static const int tcon_shift[] = { 0, 8, 12, 16, 20 };
-	const UINT32 *regs = &m_s3c240x_pwm_regs[3+timer*3];
-	UINT32 prescaler, mux, cnt, cmp, auto_reload;
+	const uint32_t *regs = &m_s3c240x_pwm_regs[3+timer*3];
+	uint32_t prescaler, mux, cnt, cmp, auto_reload;
 	double freq, hz;
 	verboselog(*this, 1, "PWM %d start\n", timer);
 	prescaler = (m_s3c240x_pwm_regs[0] >> prescaler_shift[timer]) & 0xFF;
@@ -615,7 +620,7 @@ void gp32_state::s3c240x_pwm_recalc(int timer)
 
 WRITE32_MEMBER(gp32_state::s3c240x_pwm_w)
 {
-	UINT32 old_value = m_s3c240x_pwm_regs[offset];
+	uint32_t old_value = m_s3c240x_pwm_regs[offset];
 	verboselog(*this, 9, "(PWM) %08X <- %08X (PC %08X)\n", 0x15100000 + (offset << 2), data, space.device().safe_pc( ));
 	COMBINE_DATA(&m_s3c240x_pwm_regs[offset]);
 	switch (offset)
@@ -667,7 +672,7 @@ TIMER_CALLBACK_MEMBER(gp32_state::s3c240x_pwm_timer_exp)
 
 void gp32_state::s3c240x_dma_reload(int dma)
 {
-	UINT32 *regs = &m_s3c240x_dma_regs[dma<<3];
+	uint32_t *regs = &m_s3c240x_dma_regs[dma<<3];
 	regs[3] = (regs[3] & ~0x000FFFFF) | BITS( regs[2], 19, 0);
 	regs[4] = (regs[4] & ~0x1FFFFFFF) | BITS( regs[0], 28, 0);
 	regs[5] = (regs[5] & ~0x1FFFFFFF) | BITS( regs[1], 28, 0);
@@ -675,11 +680,11 @@ void gp32_state::s3c240x_dma_reload(int dma)
 
 void gp32_state::s3c240x_dma_trigger(int dma)
 {
-	UINT32 *regs = &m_s3c240x_dma_regs[dma<<3];
-	UINT32 curr_tc, curr_src, curr_dst;
+	uint32_t *regs = &m_s3c240x_dma_regs[dma<<3];
+	uint32_t curr_tc, curr_src, curr_dst;
 	address_space &space = m_maincpu->space( AS_PROGRAM);
 	int dsz, inc_src, inc_dst, servmode;
-	static const UINT32 ch_int[] = { INT_DMA0, INT_DMA1, INT_DMA2, INT_DMA3 };
+	static const uint32_t ch_int[] = { INT_DMA0, INT_DMA1, INT_DMA2, INT_DMA3 };
 	verboselog(*this, 5, "DMA %d trigger\n", dma);
 	curr_tc = BITS( regs[3], 19, 0);
 	curr_src = BITS( regs[4], 28, 0);
@@ -731,7 +736,7 @@ void gp32_state::s3c240x_dma_trigger(int dma)
 
 void gp32_state::s3c240x_dma_request_iis()
 {
-	UINT32 *regs = &m_s3c240x_dma_regs[2<<3];
+	uint32_t *regs = &m_s3c240x_dma_regs[2<<3];
 	verboselog(*this, 5, "s3c240x_dma_request_iis\n");
 	if ((BIT( regs[6], 1) != 0) && (BIT( regs[2], 23) != 0) && (BITS( regs[2], 25, 24) == 0))
 	{
@@ -747,7 +752,7 @@ void gp32_state::s3c240x_dma_request_pwm()
 	{
 		if (i != 1)
 		{
-			UINT32 *regs = &m_s3c240x_dma_regs[i<<3];
+			uint32_t *regs = &m_s3c240x_dma_regs[i<<3];
 			if ((BIT( regs[6], 1) != 0) && (BIT( regs[2], 23) != 0) && (BITS( regs[2], 25, 24) == 3))
 			{
 				s3c240x_dma_trigger(i);
@@ -758,9 +763,9 @@ void gp32_state::s3c240x_dma_request_pwm()
 
 void gp32_state::s3c240x_dma_start(int dma)
 {
-	UINT32 addr_src, addr_dst, tc;
-	UINT32 *regs = &m_s3c240x_dma_regs[dma<<3];
-	UINT32 dsz, tsz, reload;
+	uint32_t addr_src, addr_dst, tc;
+	uint32_t *regs = &m_s3c240x_dma_regs[dma<<3];
+	uint32_t dsz, tsz, reload;
 	int inc_src, inc_dst, _int, servmode, swhwsel, hwsrcsel;
 	verboselog(*this, 1, "DMA %d start\n", dma);
 	addr_src = BITS( regs[0], 28, 0);
@@ -803,14 +808,14 @@ void gp32_state::s3c240x_dma_recalc(int dma)
 
 READ32_MEMBER(gp32_state::s3c240x_dma_r)
 {
-	UINT32 data = m_s3c240x_dma_regs[offset];
+	uint32_t data = m_s3c240x_dma_regs[offset];
 	verboselog(*this, 9, "(DMA) %08X -> %08X (PC %08X)\n", 0x14600000 + (offset << 2), data, space.device().safe_pc( ));
 	return data;
 }
 
 WRITE32_MEMBER(gp32_state::s3c240x_dma_w)
 {
-	UINT32 old_value = m_s3c240x_dma_regs[offset];
+	uint32_t old_value = m_s3c240x_dma_regs[offset];
 	verboselog(*this, 9, "(DMA) %08X <- %08X (PC %08X)\n", 0x14600000 + (offset << 2), data, space.device().safe_pc( ));
 	COMBINE_DATA(&m_s3c240x_dma_regs[offset]);
 	switch (offset)
@@ -905,15 +910,15 @@ void gp32_state::smc_init()
 	smc_reset();
 }
 
-UINT8 gp32_state::smc_read()
+uint8_t gp32_state::smc_read()
 {
-	UINT8 data;
+	uint8_t data;
 	data = m_smartmedia->data_r();
 	verboselog(*this, 5, "smc_read %08X\n", data);
 	return data;
 }
 
-void gp32_state::smc_write(UINT8 data)
+void gp32_state::smc_write(uint8_t data)
 {
 	verboselog(*this, 5, "smc_write %08X\n", data);
 	if ((m_smc.chip) && (!m_smc.read))
@@ -1014,7 +1019,7 @@ void gp32_state::i2s_write(int line, int data)
 
 READ32_MEMBER(gp32_state::s3c240x_gpio_r)
 {
-	UINT32 data = m_s3c240x_gpio[offset];
+	uint32_t data = m_s3c240x_gpio[offset];
 	switch (offset)
 	{
 		// PBCON
@@ -1125,7 +1130,7 @@ WRITE32_MEMBER(gp32_state::s3c240x_gpio_w)
 
 READ32_MEMBER(gp32_state::s3c240x_memcon_r)
 {
-	UINT32 data = m_s3c240x_memcon_regs[offset];
+	uint32_t data = m_s3c240x_memcon_regs[offset];
 	verboselog(*this, 9, "(MEMCON) %08X -> %08X (PC %08X)\n", 0x14000000 + (offset << 2), data, space.device().safe_pc( ));
 	return data;
 }
@@ -1141,7 +1146,7 @@ WRITE32_MEMBER(gp32_state::s3c240x_memcon_w)
 
 READ32_MEMBER(gp32_state::s3c240x_usb_host_r)
 {
-	UINT32 data = m_s3c240x_usb_host_regs[offset];
+	uint32_t data = m_s3c240x_usb_host_regs[offset];
 	verboselog(*this, 9, "(USB H) %08X -> %08X (PC %08X)\n", 0x14200000 + (offset << 2), data, space.device().safe_pc( ));
 	return data;
 }
@@ -1157,7 +1162,7 @@ WRITE32_MEMBER(gp32_state::s3c240x_usb_host_w)
 
 READ32_MEMBER(gp32_state::s3c240x_uart_0_r)
 {
-	UINT32 data = m_s3c240x_uart_0_regs[offset];
+	uint32_t data = m_s3c240x_uart_0_regs[offset];
 	switch (offset)
 	{
 		// UTRSTAT0
@@ -1182,7 +1187,7 @@ WRITE32_MEMBER(gp32_state::s3c240x_uart_0_w)
 
 READ32_MEMBER(gp32_state::s3c240x_uart_1_r)
 {
-	UINT32 data = m_s3c240x_uart_1_regs[offset];
+	uint32_t data = m_s3c240x_uart_1_regs[offset];
 	switch (offset)
 	{
 		// UTRSTAT1
@@ -1207,7 +1212,7 @@ WRITE32_MEMBER(gp32_state::s3c240x_uart_1_w)
 
 READ32_MEMBER(gp32_state::s3c240x_usb_device_r)
 {
-	UINT32 data = m_s3c240x_usb_device_regs[offset];
+	uint32_t data = m_s3c240x_usb_device_regs[offset];
 	verboselog(*this, 9, "(USB D) %08X -> %08X (PC %08X)\n", 0x15200140 + (offset << 2), data, space.device().safe_pc( ));
 	return data;
 }
@@ -1223,7 +1228,7 @@ WRITE32_MEMBER(gp32_state::s3c240x_usb_device_w)
 
 READ32_MEMBER(gp32_state::s3c240x_watchdog_r)
 {
-	UINT32 data = m_s3c240x_watchdog_regs[offset];
+	uint32_t data = m_s3c240x_watchdog_regs[offset];
 	verboselog(*this, 9, "(WDOG) %08X -> %08X (PC %08X)\n", 0x15300000 + (offset << 2), data, space.device().safe_pc( ));
 	return data;
 }
@@ -1236,15 +1241,15 @@ WRITE32_MEMBER(gp32_state::s3c240x_watchdog_w)
 
 // EEPROM
 
-UINT8 gp32_state::eeprom_read(UINT16 address)
+uint8_t gp32_state::eeprom_read(uint16_t address)
 {
-	UINT8 data;
+	uint8_t data;
 	data = m_eeprom_data[address];
 	verboselog(*this, 5, "EEPROM %04X -> %02X\n", address, data);
 	return data;
 }
 
-void gp32_state::eeprom_write(UINT16 address, UINT8 data)
+void gp32_state::eeprom_write(uint16_t address, uint8_t data)
 {
 	verboselog(*this, 5, "EEPROM %04X <- %02X\n", address, data);
 	m_eeprom_data[address] = data;
@@ -1253,9 +1258,9 @@ void gp32_state::eeprom_write(UINT16 address, UINT8 data)
 // IIC
 
 #if 0
-UINT8 gp32_state::i2cmem_read_byte( int last)
+uint8_t gp32_state::i2cmem_read_byte( int last)
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 	int i;
 	i2cmem_write( machine, 0, I2CMEM_SDA, 1);
 	for (i = 0; i < 8; i++)
@@ -1272,7 +1277,7 @@ UINT8 gp32_state::i2cmem_read_byte( int last)
 #endif
 
 #if 0
-void gp32_state::i2cmem_write_byte( UINT8 data)
+void gp32_state::i2cmem_write_byte( uint8_t data)
 {
 	int i;
 	for (i = 0; i < 8; i++)
@@ -1329,7 +1334,7 @@ void gp32_state::iic_resume()
 
 READ32_MEMBER(gp32_state::s3c240x_iic_r)
 {
-	UINT32 data = m_s3c240x_iic_regs[offset];
+	uint32_t data = m_s3c240x_iic_regs[offset];
 	switch (offset)
 	{
 		// IICSTAT
@@ -1404,12 +1409,12 @@ TIMER_CALLBACK_MEMBER(gp32_state::s3c240x_iic_timer_exp)
 		{
 			if (m_s3c240x_iic.data_index == 0)
 			{
-				UINT8 data_shift = m_s3c240x_iic_regs[3] & 0xFF;
+				uint8_t data_shift = m_s3c240x_iic_regs[3] & 0xFF;
 				verboselog(*this, 5, "IIC write %02X\n", data_shift);
 			}
 			else
 			{
-				UINT8 data_shift = eeprom_read(m_s3c240x_iic.address);
+				uint8_t data_shift = eeprom_read(m_s3c240x_iic.address);
 				verboselog(*this, 5, "IIC read %02X\n", data_shift);
 				m_s3c240x_iic_regs[3] = (m_s3c240x_iic_regs[3] & ~0xFF) | data_shift;
 			}
@@ -1419,7 +1424,7 @@ TIMER_CALLBACK_MEMBER(gp32_state::s3c240x_iic_timer_exp)
 		// master transmit mode
 		case 3 :
 		{
-			UINT8 data_shift = m_s3c240x_iic_regs[3] & 0xFF;
+			uint8_t data_shift = m_s3c240x_iic_regs[3] & 0xFF;
 			verboselog(*this, 5, "IIC write %02X\n", data_shift);
 			m_s3c240x_iic.data[m_s3c240x_iic.data_index++] = data_shift;
 			if (m_s3c240x_iic.data_index == 3)
@@ -1444,7 +1449,7 @@ TIMER_CALLBACK_MEMBER(gp32_state::s3c240x_iic_timer_exp)
 
 void gp32_state::s3c240x_iis_start()
 {
-	static const UINT32 codeclk_table[] = { 256, 384 };
+	static const uint32_t codeclk_table[] = { 256, 384 };
 	double freq;
 	int prescaler_enable, prescaler_control_a, prescaler_control_b, codeclk;
 	verboselog(*this, 1, "IIS start\n");
@@ -1477,7 +1482,7 @@ void gp32_state::s3c240x_iis_recalc()
 
 READ32_MEMBER(gp32_state::s3c240x_iis_r)
 {
-	UINT32 data = m_s3c240x_iis_regs[offset];
+	uint32_t data = m_s3c240x_iis_regs[offset];
 #if 0
 	switch (offset)
 	{
@@ -1495,7 +1500,7 @@ READ32_MEMBER(gp32_state::s3c240x_iis_r)
 
 WRITE32_MEMBER(gp32_state::s3c240x_iis_w)
 {
-	UINT32 old_value = m_s3c240x_iis_regs[offset];
+	uint32_t old_value = m_s3c240x_iis_regs[offset];
 	verboselog(*this, 9, "(IIS) %08X <- %08X (PC %08X)\n", 0x15508000 + (offset << 2), data, space.device().safe_pc( ));
 	COMBINE_DATA(&m_s3c240x_iis_regs[offset]);
 	switch (offset)
@@ -1520,8 +1525,8 @@ WRITE32_MEMBER(gp32_state::s3c240x_iis_w)
 			if (m_s3c240x_iis.fifo_index == 2)
 			{
 				m_s3c240x_iis.fifo_index = 0;
-				m_dac1->write_signed16(m_s3c240x_iis.fifo[0] + 0x8000);
-				m_dac2->write_signed16(m_s3c240x_iis.fifo[1] + 0x8000);
+				m_ldac->write(m_s3c240x_iis.fifo[0]);
+				m_rdac->write(m_s3c240x_iis.fifo[1]);
 			}
 		}
 		break;
@@ -1539,7 +1544,7 @@ TIMER_CALLBACK_MEMBER(gp32_state::s3c240x_iis_timer_exp)
 
 READ32_MEMBER(gp32_state::s3c240x_rtc_r)
 {
-	UINT32 data = m_s3c240x_rtc_regs[offset];
+	uint32_t data = m_s3c240x_rtc_regs[offset];
 	verboselog(*this, 9, "(RTC) %08X -> %08X (PC %08X)\n", 0x15700040 + (offset << 2), data, space.device().safe_pc( ));
 	return data;
 }
@@ -1555,7 +1560,7 @@ WRITE32_MEMBER(gp32_state::s3c240x_rtc_w)
 
 READ32_MEMBER(gp32_state::s3c240x_adc_r)
 {
-	UINT32 data = m_s3c240x_adc_regs[offset];
+	uint32_t data = m_s3c240x_adc_regs[offset];
 	verboselog(*this, 9, "(ADC) %08X -> %08X (PC %08X)\n", 0x15800000 + (offset << 2), data, space.device().safe_pc( ));
 	return data;
 }
@@ -1571,7 +1576,7 @@ WRITE32_MEMBER(gp32_state::s3c240x_adc_w)
 
 READ32_MEMBER(gp32_state::s3c240x_spi_r)
 {
-	UINT32 data = m_s3c240x_spi_regs[offset];
+	uint32_t data = m_s3c240x_spi_regs[offset];
 	verboselog(*this, 9, "(SPI) %08X -> %08X (PC %08X)\n", 0x15900000 + (offset << 2), data, space.device().safe_pc( ));
 	return data;
 }
@@ -1587,7 +1592,7 @@ WRITE32_MEMBER(gp32_state::s3c240x_spi_w)
 
 READ32_MEMBER(gp32_state::s3c240x_mmc_r)
 {
-	UINT32 data = m_s3c240x_mmc_regs[offset];
+	uint32_t data = m_s3c240x_mmc_regs[offset];
 	verboselog(*this, 9, "(MMC) %08X -> %08X (PC %08X)\n", 0x15A00000 + (offset << 2), data, space.device().safe_pc( ));
 	return data;
 }
@@ -1602,19 +1607,19 @@ WRITE32_MEMBER(gp32_state::s3c240x_mmc_w)
 
 void gp32_state::s3c240x_machine_start()
 {
-	m_s3c240x_pwm_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gp32_state::s3c240x_pwm_timer_exp),this), (void *)(FPTR)0);
-	m_s3c240x_pwm_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gp32_state::s3c240x_pwm_timer_exp),this), (void *)(FPTR)1);
-	m_s3c240x_pwm_timer[2] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gp32_state::s3c240x_pwm_timer_exp),this), (void *)(FPTR)2);
-	m_s3c240x_pwm_timer[3] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gp32_state::s3c240x_pwm_timer_exp),this), (void *)(FPTR)3);
-	m_s3c240x_pwm_timer[4] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gp32_state::s3c240x_pwm_timer_exp),this), (void *)(FPTR)4);
-	m_s3c240x_dma_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gp32_state::s3c240x_dma_timer_exp),this), (void *)(FPTR)0);
-	m_s3c240x_dma_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gp32_state::s3c240x_dma_timer_exp),this), (void *)(FPTR)1);
-	m_s3c240x_dma_timer[2] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gp32_state::s3c240x_dma_timer_exp),this), (void *)(FPTR)2);
-	m_s3c240x_dma_timer[3] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gp32_state::s3c240x_dma_timer_exp),this), (void *)(FPTR)3);
-	m_s3c240x_iic_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gp32_state::s3c240x_iic_timer_exp),this), (void *)(FPTR)0);
-	m_s3c240x_iis_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gp32_state::s3c240x_iis_timer_exp),this), (void *)(FPTR)0);
-	m_s3c240x_lcd_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gp32_state::s3c240x_lcd_timer_exp),this), (void *)(FPTR)0);
-	m_eeprom_data = std::make_unique<UINT8[]>(0x2000);
+	m_s3c240x_pwm_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gp32_state::s3c240x_pwm_timer_exp),this), (void *)(uintptr_t)0);
+	m_s3c240x_pwm_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gp32_state::s3c240x_pwm_timer_exp),this), (void *)(uintptr_t)1);
+	m_s3c240x_pwm_timer[2] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gp32_state::s3c240x_pwm_timer_exp),this), (void *)(uintptr_t)2);
+	m_s3c240x_pwm_timer[3] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gp32_state::s3c240x_pwm_timer_exp),this), (void *)(uintptr_t)3);
+	m_s3c240x_pwm_timer[4] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gp32_state::s3c240x_pwm_timer_exp),this), (void *)(uintptr_t)4);
+	m_s3c240x_dma_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gp32_state::s3c240x_dma_timer_exp),this), (void *)(uintptr_t)0);
+	m_s3c240x_dma_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gp32_state::s3c240x_dma_timer_exp),this), (void *)(uintptr_t)1);
+	m_s3c240x_dma_timer[2] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gp32_state::s3c240x_dma_timer_exp),this), (void *)(uintptr_t)2);
+	m_s3c240x_dma_timer[3] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gp32_state::s3c240x_dma_timer_exp),this), (void *)(uintptr_t)3);
+	m_s3c240x_iic_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gp32_state::s3c240x_iic_timer_exp),this), (void *)(uintptr_t)0);
+	m_s3c240x_iis_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gp32_state::s3c240x_iis_timer_exp),this), (void *)(uintptr_t)0);
+	m_s3c240x_lcd_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gp32_state::s3c240x_lcd_timer_exp),this), (void *)(uintptr_t)0);
+	m_eeprom_data = std::make_unique<uint8_t[]>(0x2000);
 	m_nvram->set_base(m_eeprom_data.get(), 0x2000);
 	smc_init();
 	i2s_init();
@@ -1677,7 +1682,7 @@ void gp32_state::machine_reset()
 	s3c240x_machine_reset();
 }
 
-static MACHINE_CONFIG_START( gp32, gp32_state )
+static MACHINE_CONFIG_START( gp32 )
 	MCFG_CPU_ADD("maincpu", ARM9, 40000000)
 	MCFG_CPU_PROGRAM_MAP(gp32_map)
 
@@ -1694,10 +1699,11 @@ static MACHINE_CONFIG_START( gp32, gp32_state )
 	MCFG_DEFAULT_LAYOUT(layout_lcd_rot)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("dac1", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ADD("dac2", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("ldac", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0) // unknown DAC
+	MCFG_SOUND_ADD("rdac", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
@@ -1724,4 +1730,4 @@ ROM_START( gp32 )
 #endif
 ROM_END
 
-CONS(2001, gp32, 0, 0, gp32, gp32, driver_device, 0, "Game Park Holdings", "GP32", ROT270|MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+CONS(2001, gp32, 0, 0, gp32, gp32, gp32_state, 0, "Game Park Holdings", "GP32", ROT270|MACHINE_NOT_WORKING|MACHINE_NO_SOUND)

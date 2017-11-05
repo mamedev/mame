@@ -11,6 +11,8 @@
 
 #include "emu.h"
 #include "includes/lethal.h"
+#include "screen.h"
+
 
 K05324X_CB_MEMBER(lethal_state::sprite_callback)
 {
@@ -55,10 +57,10 @@ void lethal_state::video_start()
 	// the US and Japanese cabinets apparently use different mirror setups
 	if (!strcmp(machine().system().name, "lethalenj"))
 	{
-		m_k056832->set_layer_offs(0, -195, 0);
-		m_k056832->set_layer_offs(1, -193, 0);
-		m_k056832->set_layer_offs(2, -191, 0);
-		m_k056832->set_layer_offs(3, -189, 0);
+		m_k056832->set_layer_offs(0, 29, 0);
+		m_k056832->set_layer_offs(1, 31, 0);
+		m_k056832->set_layer_offs(2, 33, 0);
+		m_k056832->set_layer_offs(3, 35, 0);
 	}
 	else
 	{
@@ -94,7 +96,7 @@ WRITE8_MEMBER(lethal_state::lethalen_palette_control)
 	}
 }
 
-UINT32 lethal_state::screen_update_lethalen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t lethal_state::screen_update_lethalen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_back_colorbase, cliprect);
 	screen.priority().fill(0, cliprect);

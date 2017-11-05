@@ -1,7 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
 #include "emu.h"
-#include "sound/cdp1869.h"
 #include "includes/tmc600.h"
 
 WRITE8_MEMBER( tmc600_state::vismac_register_w )
@@ -11,7 +10,7 @@ WRITE8_MEMBER( tmc600_state::vismac_register_w )
 
 WRITE8_MEMBER( tmc600_state::vismac_data_w )
 {
-	UINT16 ma = m_maincpu->get_memory_address();
+	uint16_t ma = m_maincpu->get_memory_address();
 
 	switch (m_vismac_reg_latch)
 	{
@@ -50,10 +49,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(tmc600_state::blink_tick)
 	m_blink = !m_blink;
 }
 
-UINT8 tmc600_state::get_color(UINT16 pma)
+uint8_t tmc600_state::get_color(uint16_t pma)
 {
-	UINT16 pageaddr = pma & TMC600_PAGE_RAM_MASK;
-	UINT8 color = m_color_ram[pageaddr];
+	uint16_t pageaddr = pma & TMC600_PAGE_RAM_MASK;
+	uint8_t color = m_color_ram[pageaddr];
 
 	if (BIT(color, 3) && m_blink)
 	{
@@ -69,16 +68,16 @@ WRITE8_MEMBER( tmc600_state::page_ram_w )
 	m_color_ram[offset] = m_vismac_color_latch;
 }
 
-static ADDRESS_MAP_START( cdp1869_page_ram, AS_0, 8, tmc600_state )
+static ADDRESS_MAP_START( cdp1869_page_ram, 0, 8, tmc600_state )
 	AM_RANGE(0x000, 0x3ff) AM_MIRROR(0x400) AM_RAM AM_SHARE("page_ram") AM_WRITE(page_ram_w)
 ADDRESS_MAP_END
 
 CDP1869_CHAR_RAM_READ_MEMBER( tmc600_state::tmc600_char_ram_r )
 {
-	UINT16 pageaddr = pma & TMC600_PAGE_RAM_MASK;
-	UINT8 color = get_color(pageaddr);
-	UINT16 charaddr = ((cma & 0x08) << 8) | (pmd << 3) | (cma & 0x07);
-	UINT8 cdb = m_char_rom[charaddr] & 0x3f;
+	uint16_t pageaddr = pma & TMC600_PAGE_RAM_MASK;
+	uint8_t color = get_color(pageaddr);
+	uint16_t charaddr = ((cma & 0x08) << 8) | (pmd << 3) | (cma & 0x07);
+	uint8_t cdb = m_char_rom[charaddr] & 0x3f;
 
 	int ccb0 = BIT(color, 2);
 	int ccb1 = BIT(color, 1);
@@ -88,8 +87,8 @@ CDP1869_CHAR_RAM_READ_MEMBER( tmc600_state::tmc600_char_ram_r )
 
 CDP1869_PCB_READ_MEMBER( tmc600_state::tmc600_pcb_r )
 {
-	UINT16 pageaddr = pma & TMC600_PAGE_RAM_MASK;
-	UINT8 color = get_color(pageaddr);
+	uint16_t pageaddr = pma & TMC600_PAGE_RAM_MASK;
+	uint8_t color = get_color(pageaddr);
 
 	return BIT(color, 0);
 }
@@ -123,19 +122,20 @@ static GFXDECODE_START( tmc600 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, tmc600_charlayout, 0, 36 )
 GFXDECODE_END
 
-MACHINE_CONFIG_FRAGMENT( tmc600_video )
+MACHINE_CONFIG_START( tmc600_video )
 	// video hardware
-	MCFG_CDP1869_SCREEN_PAL_ADD(CDP1869_TAG, SCREEN_TAG, CDP1869_DOT_CLK_PAL)
+	MCFG_CDP1869_SCREEN_PAL_ADD(CDP1869_TAG, SCREEN_TAG, cdp1869_device::DOT_CLK_PAL)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("blink", tmc600_state, blink_tick, attotime::from_hz(2))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", CDP1869_TAG":palette", tmc600)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_CDP1869_ADD(CDP1869_TAG, CDP1869_DOT_CLK_PAL, cdp1869_page_ram)
-	MCFG_CDP1869_COLOR_CLOCK(CDP1869_COLOR_CLK_PAL)
+	MCFG_CDP1869_ADD(CDP1869_TAG, cdp1869_device::DOT_CLK_PAL, cdp1869_page_ram)
+	MCFG_CDP1869_COLOR_CLOCK(cdp1869_device::COLOR_CLK_PAL)
 	MCFG_CDP1869_CHAR_PCB_READ_OWNER(tmc600_state, tmc600_pcb_r)
 	MCFG_CDP1869_CHAR_RAM_READ_OWNER(tmc600_state, tmc600_char_ram_r)
 	MCFG_CDP1869_PAL_NTSC_CALLBACK(VCC)
+	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END

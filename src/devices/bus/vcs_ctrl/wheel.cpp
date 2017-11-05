@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "wheel.h"
 
 
@@ -14,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type VCS_WHEEL = &device_creator<vcs_wheel_device>;
+DEFINE_DEVICE_TYPE(VCS_WHEEL, vcs_wheel_device, "vcs_wheel", "Atari / CBM Driving Wheel")
 
 
 static INPUT_PORTS_START( vcs_wheel )
@@ -46,8 +47,8 @@ ioport_constructor vcs_wheel_device::device_input_ports() const
 //  vcs_wheel_device - constructor
 //-------------------------------------------------
 
-vcs_wheel_device::vcs_wheel_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, VCS_WHEEL, "Atari / CBM Driving Wheel", tag, owner, clock, "vcs_wheel", __FILE__),
+vcs_wheel_device::vcs_wheel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, VCS_WHEEL, tag, owner, clock),
 	device_vcs_control_port_interface(mconfig, *this),
 	m_joy(*this, "JOY"),
 	m_wheel(*this, "WHEEL")
@@ -68,9 +69,9 @@ void vcs_wheel_device::device_start()
 //  vcs_joy_r - joystick read
 //-------------------------------------------------
 
-UINT8 vcs_wheel_device::vcs_joy_r()
+uint8_t vcs_wheel_device::vcs_joy_r()
 {
-	static const UINT8 driving_lookup[4] = { 0x00, 0x02, 0x03, 0x01 };
+	static const uint8_t driving_lookup[4] = { 0x00, 0x02, 0x03, 0x01 };
 
 	return m_joy->read() | driving_lookup[ ( m_wheel->read() & 0x18 ) >> 3 ];
 }

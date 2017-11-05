@@ -74,55 +74,58 @@ Package: 132-pin PGA, 200-pin QFP
 */
 
 #include "emu.h"
-#include "debugger.h"
 #include "v60.h"
+#include "debugger.h"
 
-const device_type V60 = &device_creator<v60_device>;
-const device_type V70 = &device_creator<v70_device>;
+DEFINE_DEVICE_TYPE(V60, v60_device, "v60", "V60")
+DEFINE_DEVICE_TYPE(V70, v70_device, "v70", "V70")
 
 
-v60_device::v60_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: cpu_device(mconfig, V60, "V60", tag, owner, clock, "v60", __FILE__)
-	, m_program_config("program", ENDIANNESS_LITTLE, 16, 24, 0)
-	, m_io_config("io", ENDIANNESS_LITTLE, 16, 24, 0)
-	, m_fetch_xor(BYTE_XOR_LE(0))
-	, m_start_pc(0xfffff0)
+// Set m_PIR (Processor ID) for NEC m_ LSB is reserved to NEC,
+// so I don't know what it contains.
+v60_device::v60_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: v60_device(mconfig, V60, tag, owner, clock, 16, 24, 0x00006000)
 {
-	// Set m_PIR (Processor ID) for NEC m_ LSB is reserved to NEC,
-	// so I don't know what it contains.
-	m_reg[45] = 0x00006000;
 }
 
 
-v60_device::v60_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
-	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
-	, m_program_config("program", ENDIANNESS_LITTLE, 32, 32, 0)
+v60_device::v60_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int databits, int addrbits, uint32_t pir)
+	: cpu_device(mconfig, type, tag, owner, clock)
+	, m_program_config("program", ENDIANNESS_LITTLE, databits, addrbits, 0)
 	, m_io_config("io", ENDIANNESS_LITTLE, 16, 24, 0)
 	, m_fetch_xor(BYTE4_XOR_LE(0))
 	, m_start_pc(0xfffffff0)
 {
-	// Set m_PIR (Processor ID) for NEC v70. LSB is reserved to NEC,
-	// so I don't know what it contains.
-	m_reg[45] = 0x00007000;
+	m_reg[45] = pir;
 }
 
-v70_device::v70_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: v60_device(mconfig, V70, "V70", tag, owner, clock, "v70", __FILE__)
+// Set m_PIR (Processor ID) for NEC v70. LSB is reserved to NEC,
+// so I don't know what it contains.
+v70_device::v70_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: v60_device(mconfig, V70, tag, owner, clock, 32, 32, 0x00007000)
 {
 }
 
+device_memory_interface::space_config_vector v60_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config),
+		std::make_pair(AS_IO,      &m_io_config)
+	};
+}
 
-offs_t v60_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+
+offs_t v60_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( v60 );
-	return CPU_DISASSEMBLE_NAME(v60)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(v60)(this, stream, pc, oprom, opram, options);
 }
 
 
-offs_t v70_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t v70_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( v70 );
-	return CPU_DISASSEMBLE_NAME(v70)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(v70)(this, stream, pc, oprom, opram, options);
 }
 
 
@@ -158,14 +161,14 @@ offs_t v70_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *opro
 
 #define SetCFB(x)           {_CY = ((x) & 0x100) ? 1 : 0; }
 #define SetCFW(x)           {_CY = ((x) & 0x10000) ? 1 : 0; }
-#define SetCFL(x)           {_CY = ((x) & (((UINT64)1) << 32)) ? 1 : 0; }
+#define SetCFL(x)           {_CY = ((x) & (((uint64_t)1) << 32)) ? 1 : 0; }
 
 #define SetSF(x)            (_S = (x))
 #define SetZF(x)            (_Z = (x))
 
-#define SetSZPF_Byte(x)     {_Z = ((UINT8)(x) == 0);  _S = ((x)&0x80) ? 1 : 0; }
-#define SetSZPF_Word(x)     {_Z = ((UINT16)(x) == 0);  _S = ((x)&0x8000) ? 1 : 0; }
-#define SetSZPF_Long(x)     {_Z = ((UINT32)(x) == 0);  _S = ((x)&0x80000000) ? 1 : 0; }
+#define SetSZPF_Byte(x)     {_Z = ((uint8_t)(x) == 0);  _S = ((x)&0x80) ? 1 : 0; }
+#define SetSZPF_Word(x)     {_Z = ((uint16_t)(x) == 0);  _S = ((x)&0x8000) ? 1 : 0; }
+#define SetSZPF_Long(x)     {_Z = ((uint32_t)(x) == 0);  _S = ((x)&0x80000000) ? 1 : 0; }
 
 #define ORB(dst, src)       { (dst) |= (src); _CY = _OV = 0; SetSZPF_Byte(dst); }
 #define ORW(dst, src)       { (dst) |= (src); _CY = _OV = 0; SetSZPF_Word(dst); }
@@ -179,13 +182,13 @@ offs_t v70_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *opro
 #define XORW(dst, src)      { (dst) ^= (src); _CY = _OV = 0; SetSZPF_Word(dst); }
 #define XORL(dst, src)      { (dst) ^= (src); _CY = _OV = 0; SetSZPF_Long(dst); }
 
-#define SUBB(dst, src)      { unsigned res = (dst) - (src); SetCFB(res); SetOFB_Sub(res, src, dst); SetSZPF_Byte(res); dst = (UINT8)res; }
-#define SUBW(dst, src)      { unsigned res = (dst) - (src); SetCFW(res); SetOFW_Sub(res, src, dst); SetSZPF_Word(res); dst = (UINT16)res; }
-#define SUBL(dst, src)      { UINT64 res = (UINT64)(dst) - (INT64)(src); SetCFL(res); SetOFL_Sub(res, src, dst); SetSZPF_Long(res); dst = (UINT32)res; }
+#define SUBB(dst, src)      { unsigned res = (dst) - (src); SetCFB(res); SetOFB_Sub(res, src, dst); SetSZPF_Byte(res); dst = (uint8_t)res; }
+#define SUBW(dst, src)      { unsigned res = (dst) - (src); SetCFW(res); SetOFW_Sub(res, src, dst); SetSZPF_Word(res); dst = (uint16_t)res; }
+#define SUBL(dst, src)      { uint64_t res = (uint64_t)(dst) - (int64_t)(src); SetCFL(res); SetOFL_Sub(res, src, dst); SetSZPF_Long(res); dst = (uint32_t)res; }
 
-#define ADDB(dst, src)      { unsigned res = (dst) + (src); SetCFB(res); SetOFB_Add(res, src, dst); SetSZPF_Byte(res); dst = (UINT8)res; }
-#define ADDW(dst, src)      { unsigned res = (dst) + (src); SetCFW(res); SetOFW_Add(res, src, dst); SetSZPF_Word(res); dst = (UINT16)res; }
-#define ADDL(dst, src)      { UINT64 res = (UINT64)(dst) + (UINT64)(src); SetCFL(res); SetOFL_Add(res, src, dst); SetSZPF_Long(res); dst = (UINT32)res; }
+#define ADDB(dst, src)      { unsigned res = (dst) + (src); SetCFB(res); SetOFB_Add(res, src, dst); SetSZPF_Byte(res); dst = (uint8_t)res; }
+#define ADDW(dst, src)      { unsigned res = (dst) + (src); SetCFW(res); SetOFW_Add(res, src, dst); SetSZPF_Word(res); dst = (uint16_t)res; }
+#define ADDL(dst, src)      { uint64_t res = (uint64_t)(dst) + (uint64_t)(src); SetCFL(res); SetOFL_Add(res, src, dst); SetSZPF_Long(res); dst = (uint32_t)res; }
 
 #define SETREG8(a, b)       (a) = ((a) & ~0xff) | ((b) & 0xff)
 #define SETREG16(a, b)      (a) = ((a) & ~0xffff) | ((b) & 0xffff)
@@ -296,14 +299,14 @@ void v60_device::v60ReloadStack()
 		SP = m_reg[37 + ((PSW >> 24) & 3)];
 }
 
-UINT32 v60_device::v60ReadPSW()
+uint32_t v60_device::v60ReadPSW()
 {
 	PSW &= 0xfffffff0;
 	PSW |= (_Z?1:0) | (_S?2:0) | (_OV?4:0) | (_CY?8:0);
 	return PSW;
 }
 
-void v60_device::v60WritePSW(UINT32 newval)
+void v60_device::v60WritePSW(uint32_t newval)
 {
 	/* determine if we need to save / restore the stacks */
 	int updateStack = 0;
@@ -322,10 +325,10 @@ void v60_device::v60WritePSW(UINT32 newval)
 
 	/* set the new value and update the flags */
 	PSW = newval;
-	_Z =  (UINT8)(PSW & 1);
-	_S =  (UINT8)(PSW & 2);
-	_OV = (UINT8)(PSW & 4);
-	_CY = (UINT8)(PSW & 8);
+	_Z =  (uint8_t)(PSW & 1);
+	_S =  (uint8_t)(PSW & 2);
+	_OV = (uint8_t)(PSW & 4);
+	_CY = (uint8_t)(PSW & 8);
 
 	/* fetch the new stack value */
 	if (updateStack)
@@ -333,10 +336,10 @@ void v60_device::v60WritePSW(UINT32 newval)
 }
 
 
-UINT32 v60_device::v60_update_psw_for_exception(int is_interrupt, int target_level)
+uint32_t v60_device::v60_update_psw_for_exception(int is_interrupt, int target_level)
 {
-	UINT32 oldPSW = v60ReadPSW();
-	UINT32 newPSW = oldPSW;
+	uint32_t oldPSW = v60ReadPSW();
+	uint32_t newPSW = oldPSW;
 
 	// Change to interrupt context
 	newPSW &= ~(3 << 24);  // PSW.EL = 0
@@ -371,7 +374,7 @@ UINT32 v60_device::v60_update_psw_for_exception(int is_interrupt, int target_lev
 #include "op6.hxx"
 #include "op7a.hxx"
 
-UINT32 v60_device::opUNHANDLED()
+uint32_t v60_device::opUNHANDLED()
 {
 	fatalerror("Unhandled OpCode found : %02x at %08x\n", OpRead16(PC), PC);
 	//return 0; /* never reached, fatalerror won't return */
@@ -498,7 +501,7 @@ void v60_device::device_start()
 	state_add( V60_ADTMR1, "ADTMR1", ADTMR1).formatstr("%08X");
 
 	state_add( STATE_GENPC, "GENPC", PC).noshow();
-	state_add( STATE_GENPCBASE, "GENPCBASE", m_PPC ).noshow();
+	state_add( STATE_GENPCBASE, "CURPC", m_PPC ).noshow();
 	state_add( STATE_GENSP, "GENSP", SP ).noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_debugger_temp).noshow();
 
@@ -552,7 +555,7 @@ void v60_device::stall()
 
 void v60_device::v60_do_irq(int vector)
 {
-	UINT32 oldPSW = v60_update_psw_for_exception(1, 0);
+	uint32_t oldPSW = v60_update_psw_for_exception(1, 0);
 
 	// Push PC and PSW onto the stack
 	SP-=4;
@@ -608,7 +611,7 @@ void v60_device::execute_run()
 
 	while (m_icount > 0)
 	{
-		UINT32 inc;
+		uint32_t inc;
 		m_PPC = PC;
 		debugger_instruction_hook(this, PC);
 		m_icount -= 8;  /* fix me -- this is just an average */

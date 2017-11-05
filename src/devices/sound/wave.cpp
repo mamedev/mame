@@ -18,6 +18,9 @@
 #include "emu.h"
 #include "wave.h"
 
+#include "speaker.h"
+
+
 #define ALWAYS_PLAY_SOUND   0
 
 
@@ -28,22 +31,13 @@ void wave_device::static_set_cassette_tag(device_t &device, const char *cassette
 	wave.m_cassette_tag = cassette_tag;
 }
 
-const device_type WAVE = &device_creator<wave_device>;
+DEFINE_DEVICE_TYPE(WAVE, wave_device, "wave", "Wave")
 
-wave_device::wave_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, WAVE, "Wave", tag, owner, clock, "wave", __FILE__),
-		device_sound_interface(mconfig, *this), m_cass(nullptr)
-{
-	m_cassette_tag = nullptr;
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void wave_device::device_config_complete()
+wave_device::wave_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, WAVE, tag, owner, clock)
+	, device_sound_interface(mconfig, *this)
+	, m_cassette_tag(nullptr)
+	, m_cass(nullptr)
 {
 }
 
@@ -96,9 +90,9 @@ void wave_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 
 		for (i = samples - 1; i >= 0; i--)
 		{
-			left_buffer[i] = ((INT16 *) left_buffer)[i];
+			left_buffer[i] = ((int16_t *) left_buffer)[i];
 			if (speakers > 1)
-				right_buffer[i] = ((INT16 *) right_buffer)[i];
+				right_buffer[i] = ((int16_t *) right_buffer)[i];
 		}
 	}
 	else

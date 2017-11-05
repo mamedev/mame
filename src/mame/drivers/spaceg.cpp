@@ -164,9 +164,10 @@ Notes:
 **************************************************************************************/
 
 #include "emu.h"
+#include "includes/mw8080bw.h"
+
 #include "cpu/z80/z80.h"
-#include "sound/dac.h"
-#include "sound/sn76496.h"
+#include "speaker.h"
 
 
 /*************************************
@@ -185,19 +186,44 @@ public:
 		m_io9400(*this, "io9400"),
 		m_io9401(*this, "io9401"),
 		m_maincpu(*this, "maincpu"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_samples(*this, "samples"),
+		m_sn(*this, "snsnd"),
+		m_sound1(0),
+		m_sound2(0),
+		m_sound3(0)
+	{ }
 
-	required_shared_ptr<UINT8> m_colorram;
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_io9400;
-	required_shared_ptr<UINT8> m_io9401;
+	required_shared_ptr<uint8_t> m_colorram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_io9400;
+	required_shared_ptr<uint8_t> m_io9401;
 	DECLARE_WRITE8_MEMBER(zvideoram_w);
 	DECLARE_READ8_MEMBER(spaceg_colorram_r);
 	DECLARE_PALETTE_INIT(spaceg);
-	UINT32 screen_update_spaceg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_spaceg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
+	required_device<samples_device> m_samples;
+	required_device<sn76477_device> m_sn;
+
+	DECLARE_WRITE8_MEMBER(sound1_w);
+	DECLARE_WRITE8_MEMBER(sound2_w);
+	DECLARE_WRITE8_MEMBER(sound3_w);
+	uint8_t m_sound1;
+	uint8_t m_sound2;
+	uint8_t m_sound3;
+
+protected:
+	virtual void driver_start() override;
 };
+
+void spaceg_state::driver_start()
+{
+	save_item(NAME(m_sound1));
+	save_item(NAME(m_sound2));
+	save_item(NAME(m_sound3));
+}
 
 /*************************************
  *
@@ -236,9 +262,9 @@ WRITE8_MEMBER(spaceg_state::zvideoram_w)
 {
 	int col = m_colorram[0x400];
 	int xoff = *m_io9400 >> 5 & 7;
-	UINT16 offset2 = (offset + 0x100) & 0x1fff;
-	UINT16 sdata = data << (8 - xoff);
-	UINT16 vram_data = m_videoram[offset] << 8 | (m_videoram[offset2]);
+	uint16_t offset2 = (offset + 0x100) & 0x1fff;
+	uint16_t sdata = data << (8 - xoff);
+	uint16_t vram_data = m_videoram[offset] << 8 | (m_videoram[offset2]);
 
 	if (col > 0x0f) popmessage("color > 0x0f = %2d", col);
 	col &= 0x0f;
@@ -304,14 +330,14 @@ READ8_MEMBER(spaceg_state::spaceg_colorram_r)
 }
 
 
-UINT32 spaceg_state::screen_update_spaceg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t spaceg_state::screen_update_spaceg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	offs_t offs;
 
 	for (offs = 0; offs < 0x2000; offs++)
 	{
 		int i;
-		UINT8 data = m_videoram[offs];
+		uint8_t data = m_videoram[offs];
 		int y = offs & 0xff;
 		int x = (offs >> 8) << 3;
 
@@ -327,6 +353,62 @@ UINT32 spaceg_state::screen_update_spaceg(screen_device &screen, bitmap_ind16 &b
 	return 0;
 }
 
+static const char *const invaders_sample_names[] =
+{
+	"*invaders",
+	"1",        /* shot/missle */
+	"2",        /* base hit/explosion */
+	"3",        /* invader hit */
+	"4",        /* fleet move 1 */
+	"5",        /* fleet move 2 */
+	"6",        /* fleet move 3 */
+	"7",        /* fleet move 4 */
+	"8",        /* UFO/saucer hit */
+	"9",        /* bonus base */
+	nullptr
+};
+
+WRITE8_MEMBER(spaceg_state::sound1_w)
+{
+	if (!BIT(m_sound1, 1) && BIT(data, 1))
+		m_samples->start(1, 1); // Death
+
+	if (!BIT(m_sound1, 2) && BIT(data, 2))
+		m_samples->start(0, 0); // Shoot
+
+	m_sn->enable_w(!(data & 0x08)); // Boss
+
+	m_sound1 = data;
+
+	if (data & ~0x0e) logerror("spaceg sound3 unmapped %02x\n", data & ~0x0e);
+}
+
+WRITE8_MEMBER(spaceg_state::sound2_w)
+{
+	// game writes 0x01 at bootup & 0x11 when you start a game
+	m_sound2 = data;
+
+	if (data & ~0x11) logerror("spaceg sound2 unmapped %02x\n", data & ~0x11);
+}
+
+WRITE8_MEMBER(spaceg_state::sound3_w)
+{
+	if (!BIT(m_sound3, 0) && BIT(data, 0))
+		m_samples->start(4, 8); // Start of level
+
+	if (!BIT(m_sound3, 1) && BIT(data, 1))
+		m_samples->start(5, 8); // Rocket
+
+	if (!BIT(m_sound3, 2) && BIT(data, 2))
+		m_samples->start(2, 2); // Hit
+
+	if (!BIT(m_sound3, 3) && BIT(data, 3))
+		m_samples->start(3, 7); // Dive bomb
+
+	m_sound3 = data;
+
+	if (data & ~0x0f) logerror("spaceg sound3 unmapped %02x\n", data & ~0x0f);
+}
 
 /*************************************
  *
@@ -350,7 +432,10 @@ static ADDRESS_MAP_START( spaceg_map, AS_PROGRAM, 8, spaceg_state )
 	    bit 3 is probably a flip screen
 	    bit 7 - unknown - set to 1 during the gameplay (coinlock ?)
 	*/
-	AM_RANGE(0x9402, 0x9407) AM_RAM     /* surely wrong */
+	AM_RANGE(0x9402, 0x9402) AM_WRITENOP
+	AM_RANGE(0x9405, 0x9405) AM_WRITE(sound1_w)
+	AM_RANGE(0x9406, 0x9406) AM_WRITE(sound2_w)
+	AM_RANGE(0x9407, 0x9407) AM_WRITE(sound3_w)
 
 	AM_RANGE(0x9800, 0x9800) AM_READ_PORT("9800")
 	AM_RANGE(0x9801, 0x9801) AM_READ_PORT("9801")
@@ -412,7 +497,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( spaceg, spaceg_state )
+static MACHINE_CONFIG_START( spaceg )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,2500000)         /* 2.5 MHz */
@@ -432,19 +517,30 @@ static MACHINE_CONFIG_START( spaceg, spaceg_state )
 	MCFG_PALETTE_INIT_OWNER(spaceg_state, spaceg)
 
 	/* sound hardware */
-//  MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-//  MCFG_SOUND_ADD("sn1", SN76496, 15468480/4)
-//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	// HACK: SN76477 parameters copied from space invaders
+	MCFG_SOUND_ADD("snsnd", SN76477, 0)
+	MCFG_SN76477_NOISE_PARAMS(0, 0, 0)                  // noise + filter: N/C
+	MCFG_SN76477_DECAY_RES(0)                           // decay_res: N/C
+	MCFG_SN76477_ATTACK_PARAMS(0, RES_K(100))           // attack_decay_cap + attack_res
+	MCFG_SN76477_AMP_RES(RES_K(56))                     // amplitude_res
+	MCFG_SN76477_FEEDBACK_RES(RES_K(10))                // feedback_res
+	MCFG_SN76477_VCO_PARAMS(0, CAP_U(0.1), RES_K(8.2))  // VCO volt + cap + res
+	MCFG_SN76477_PITCH_VOLTAGE(5.0)                     // pitch_voltage
+	MCFG_SN76477_SLF_PARAMS(CAP_U(1.0), RES_K(120))     // slf caps + res
+	MCFG_SN76477_ONESHOT_PARAMS(0, 0)                   // oneshot caps + res: N/C
+	MCFG_SN76477_VCO_MODE(1)                            // VCO mode
+	MCFG_SN76477_MIXER_PARAMS(0, 0, 0)                  // mixer A, B, C
+	MCFG_SN76477_ENVELOPE_PARAMS(1, 0)                  // envelope 1, 2
+	MCFG_SN76477_ENABLE(1)                              // enable
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
-//  MCFG_SOUND_ADD("sn2", SN76496, 15468480/4)
-//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-
-//  MCFG_SOUND_ADD("sn3", SN76496, 15468480/4)
-//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-
-//  MCFG_DAC_ADD("dac")
-//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	// HACK: samples copied from space invaders
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(6)
+	MCFG_SAMPLES_NAMES(invaders_sample_names)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -481,4 +577,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1979, spaceg, 0, spaceg, spaceg, driver_device, 0, ROT270, "Omori Electric Co., Ltd.", "Space Guerrilla", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, spaceg, 0, spaceg, spaceg, spaceg_state, 0, ROT270, "Omori Electric Co., Ltd.", "Space Guerrilla", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

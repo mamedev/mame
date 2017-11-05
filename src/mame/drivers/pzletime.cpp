@@ -20,6 +20,9 @@
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
 #include "machine/eepromser.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 class pzletime_state : public driver_device
 {
@@ -40,12 +43,12 @@ public:
 		m_palette(*this, "palette") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT16> m_video_regs;
-	required_shared_ptr<UINT16> m_tilemap_regs;
-	required_shared_ptr<UINT16> m_bg_videoram;
-	required_shared_ptr<UINT16> m_mid_videoram;
-	required_shared_ptr<UINT16> m_txt_videoram;
-	required_shared_ptr<UINT16> m_spriteram;
+	required_shared_ptr<uint16_t> m_video_regs;
+	required_shared_ptr<uint16_t> m_tilemap_regs;
+	required_shared_ptr<uint16_t> m_bg_videoram;
+	required_shared_ptr<uint16_t> m_mid_videoram;
+	required_shared_ptr<uint16_t> m_txt_videoram;
+	required_shared_ptr<uint16_t> m_spriteram;
 
 	/* video-related */
 	tilemap_t      *m_mid_tilemap;
@@ -66,7 +69,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(pzletime);
-	UINT32 screen_update_pzletime(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_pzletime(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<okim6295_device> m_oki;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
@@ -97,14 +100,14 @@ TILE_GET_INFO_MEMBER(pzletime_state::get_txt_tile_info)
 
 void pzletime_state::video_start()
 {
-	m_mid_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(pzletime_state::get_mid_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 64, 16);
-	m_txt_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(pzletime_state::get_txt_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	m_mid_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(pzletime_state::get_mid_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 64, 16);
+	m_txt_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(pzletime_state::get_txt_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
 
 	m_mid_tilemap->set_transparent_pen(0);
 	m_txt_tilemap->set_transparent_pen(0);
 }
 
-UINT32 pzletime_state::screen_update_pzletime(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t pzletime_state::screen_update_pzletime(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int count;
 	int y, x;
@@ -136,7 +139,7 @@ UINT32 pzletime_state::screen_update_pzletime(screen_device &screen, bitmap_ind1
 	m_mid_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	{
-		UINT16 *spriteram = m_spriteram;
+		uint16_t *spriteram = m_spriteram;
 		int offs, spr_offs, colour, sx, sy;
 
 		for(offs = 0; offs < 0x2000 / 2; offs += 4)
@@ -220,7 +223,7 @@ WRITE16_MEMBER(pzletime_state::video_regs_w)
 
 WRITE16_MEMBER(pzletime_state::oki_bank_w)
 {
-	m_oki->set_bank_base(0x40000 * (data & 0x3));
+	m_oki->set_rom_bank(data & 0x3);
 }
 
 CUSTOM_INPUT_MEMBER(pzletime_state::ticket_status_r)
@@ -325,7 +328,7 @@ void pzletime_state::machine_reset()
 	m_ticket = 0;
 }
 
-static MACHINE_CONFIG_START( pzletime, pzletime_state )
+static MACHINE_CONFIG_START( pzletime )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000,10000000)
@@ -352,7 +355,7 @@ static MACHINE_CONFIG_START( pzletime, pzletime_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_OKIM6295_ADD("oki", 937500, OKIM6295_PIN7_HIGH) //freq & pin7 taken from stlforce
+	MCFG_OKIM6295_ADD("oki", 937500, PIN7_HIGH) //freq & pin7 taken from stlforce
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -399,4 +402,4 @@ ROM_START( pzletime )
 	ROM_LOAD( "pzletime.nv", 0x0000, 0x0080, CRC(e5ed3d40) SHA1(8c163a6e5839e5c82d52f046d3268202fdf9f4d1) )
 ROM_END
 
-GAME( 199?, pzletime, 0, pzletime,  pzletime, driver_device,  0, ROT0, "Elettronica Video-Games S.R.L.", "Puzzle Time (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 199?, pzletime, 0, pzletime,  pzletime, pzletime_state,  0, ROT0, "Elettronica Video-Games S.R.L.", "Puzzle Time (prototype)", MACHINE_SUPPORTS_SAVE )

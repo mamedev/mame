@@ -31,15 +31,22 @@ enum {
 };
 
 
-const device_type I860 = &device_creator<i860_cpu_device>;
+DEFINE_DEVICE_TYPE(I860, i860_cpu_device, "i860xr", "i860XR")
 
 
-i860_cpu_device::i860_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: cpu_device(mconfig, I860, "i860XR", tag, owner, clock, "i860xr", __FILE__)
-	, m_program_config("program", ENDIANNESS_LITTLE, 64, 32, 0), m_pc(0), m_merge(0), m_pin_bus_hold(0), m_pin_reset(0), m_exiting_readmem(0), m_exiting_ifetch(0), m_pc_updated(0), m_pending_trap(0), m_fir_gets_trap_addr(0), m_single_stepping(0), m_program(nullptr), m_icount(0)
+i860_cpu_device::i860_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: cpu_device(mconfig, I860, tag, owner, clock)
+	, m_program_config("program", ENDIANNESS_LITTLE, 64, 32, 0)
+	, m_pc(0), m_merge(0), m_pin_bus_hold(0), m_pin_reset(0), m_exiting_readmem(0), m_exiting_ifetch(0), m_pc_updated(0), m_pending_trap(0), m_fir_gets_trap_addr(0), m_single_stepping(0), m_program(nullptr), m_icount(0)
 {
 }
 
+device_memory_interface::space_config_vector i860_cpu_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config)
+	};
+}
 
 void i860_cpu_device::device_start()
 {
@@ -127,7 +134,8 @@ void i860_cpu_device::device_start()
 	state_add( I860_F30, "F30", m_freg[30]).callimport().callexport().formatstr("%08X");
 	state_add( I860_F31, "F31", m_freg[31]).callimport().callexport().formatstr("%08X");
 
-	state_add(STATE_GENPC, "curpc", m_pc).noshow();
+	state_add(STATE_GENPC, "GENPC", m_pc).noshow();
+	state_add(STATE_GENPCBASE, "CURPC", m_pc).noshow();
 
 	m_icountptr = &m_icount;
 }
@@ -224,10 +232,10 @@ void i860_cpu_device::device_reset()
 }
 
 
-offs_t i860_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t i860_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( i860 );
-	return CPU_DISASSEMBLE_NAME(i860)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(i860)(this, stream, pc, oprom, opram, options);
 }
 
 

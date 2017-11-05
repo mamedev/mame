@@ -8,38 +8,47 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_MACHINE_ATAPICDR_H
+#define MAME_MACHINE_ATAPICDR_H
 
-#ifndef __ATAPICDR_H__
-#define __ATAPICDR_H__
+#pragma once
 
 #include "atapihle.h"
 #include "t10mmc.h"
 
-class atapi_cdrom_device : public atapi_hle_device,
-	public t10mmc
+class atapi_cdrom_device : public atapi_hle_device, public t10mmc
 {
 public:
-	atapi_cdrom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	atapi_cdrom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock,const char *shortname, const char *source);
+	atapi_cdrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	UINT16 *identify_device_buffer() { return m_identify_buffer; }
+	uint16_t *identify_device_buffer() { return m_identify_buffer; }
 
 protected:
+	atapi_cdrom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	virtual void perform_diagnostic() override;
 	virtual void identify_packet_device() override;
 	virtual void process_buffer() override;
 	virtual void ExecCommand() override;
-private:
 	bool m_media_change;
 };
 
-// device type definition
-extern const device_type ATAPI_CDROM;
+class atapi_fixed_cdrom_device : public atapi_cdrom_device
+{
+public:
+	atapi_fixed_cdrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-#endif
+protected:
+	virtual void device_reset() override;
+};
+
+// device type definition
+DECLARE_DEVICE_TYPE(ATAPI_CDROM,       atapi_cdrom_device)
+DECLARE_DEVICE_TYPE(ATAPI_FIXED_CDROM, atapi_fixed_cdrom_device)
+
+#endif // MAME_MACHINE_ATAPICDR_H

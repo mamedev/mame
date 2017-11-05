@@ -13,8 +13,12 @@
 #include "machine/s3c44b0.h"
 #include "machine/smartmed.h"
 #include "sound/dac.h"
+#include "sound/volt_reg.h"
 #include "rendlay.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
 
 //#define JUICEBOX_ENTER_DEBUG_MENU
 //#define JUICEBOX_DISPLAY_ROM_ID
@@ -34,16 +38,14 @@ public:
 	juicebox_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
-			m_dac(*this, "dac"),
 			m_s3c44b0(*this, "s3c44b0"),
 			m_smartmedia(*this, "smartmedia")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<dac_device> m_dac;
 	required_device<s3c44b0_device> m_s3c44b0;
 	required_device<smartmedia_image_device> m_smartmedia;
-	UINT32 port[9];
+	uint32_t port[9];
 	jb_smc_t smc;
 
 	#if defined(JUICEBOX_ENTER_DEBUG_MENU) || defined(JUICEBOX_DISPLAY_ROM_ID)
@@ -58,8 +60,8 @@ public:
 	inline void verboselog(int n_level, const char *s_fmt, ...) ATTR_PRINTF(3,4);
 	void smc_reset( );
 	void smc_init( );
-	UINT8 smc_read( );
-	void smc_write( UINT8 data);
+	uint8_t smc_read( );
+	void smc_write( uint8_t data);
 	DECLARE_READ32_MEMBER(s3c44b0_gpio_port_r);
 	DECLARE_WRITE32_MEMBER(s3c44b0_gpio_port_w);
 	DECLARE_WRITE16_MEMBER(s3c44b0_i2s_data_w);
@@ -99,9 +101,9 @@ void juicebox_state::smc_init( )
 	smc_reset();
 }
 
-UINT8 juicebox_state::smc_read( )
+uint8_t juicebox_state::smc_read( )
 {
-	UINT8 data;
+	uint8_t data;
 	if (m_smartmedia->is_present())
 	{
 		data = m_smartmedia->data_r();
@@ -114,7 +116,7 @@ UINT8 juicebox_state::smc_read( )
 	return data;
 }
 
-void juicebox_state::smc_write( UINT8 data)
+void juicebox_state::smc_write( uint8_t data)
 {
 	verboselog(5, "smc_write %08X\n", data);
 	if (m_smartmedia->is_present())
@@ -139,7 +141,7 @@ void juicebox_state::smc_write( UINT8 data)
 
 READ32_MEMBER(juicebox_state::s3c44b0_gpio_port_r)
 {
-	UINT32 data = port[offset];
+	uint32_t data = port[offset];
 	switch (offset)
 	{
 		case S3C44B0_GPIO_PORT_A :
@@ -199,7 +201,7 @@ READ32_MEMBER(juicebox_state::s3c44b0_gpio_port_r)
 		}
 		break;
 	}
-//  data = ((rand() & 0xFF) << 24) | ((rand() & 0xFF) << 16) | ((rand() & 0xFF) << 8) | ((rand() & 0xFF) << 0);
+//  data = ((machine().rand() & 0xFF) << 24) | ((machine().rand() & 0xFF) << 16) | ((machine().rand() & 0xFF) << 8) | ((machine().rand() & 0xFF) << 0);
 	return data;
 }
 
@@ -222,11 +224,11 @@ WRITE32_MEMBER(juicebox_state::s3c44b0_gpio_port_w)
 
 READ32_MEMBER(juicebox_state::juicebox_nand_r)
 {
-	UINT32 data = 0;
-	if (mem_mask & 0x000000FF) data = data | (smc_read() <<  0);
-	if (mem_mask & 0x0000FF00) data = data | (smc_read() <<  8);
-	if (mem_mask & 0x00FF0000) data = data | (smc_read() << 16);
-	if (mem_mask & 0xFF000000) data = data | (smc_read() << 24);
+	uint32_t data = 0;
+	if (ACCESSING_BITS_0_7) data = data | (smc_read() <<  0);
+	if (ACCESSING_BITS_8_15) data = data | (smc_read() <<  8);
+	if (ACCESSING_BITS_16_23) data = data | (smc_read() << 16);
+	if (ACCESSING_BITS_24_31) data = data | (smc_read() << 24);
 	verboselog( 5, "juicebox_nand_r %08X %08X %08X\n", offset, mem_mask, data);
 	return data;
 }
@@ -234,24 +236,17 @@ READ32_MEMBER(juicebox_state::juicebox_nand_r)
 WRITE32_MEMBER(juicebox_state::juicebox_nand_w)
 {
 	verboselog( 5, "juicebox_nand_w %08X %08X %08X\n", offset, mem_mask, data);
-	if (mem_mask & 0x000000FF) smc_write((data >>  0) & 0xFF);
-	if (mem_mask & 0x0000FF00) smc_write((data >>  8) & 0xFF);
-	if (mem_mask & 0x00FF0000) smc_write((data >> 16) & 0xFF);
-	if (mem_mask & 0xFF000000) smc_write((data >> 24) & 0xFF);
-}
-
-// I2S
-
-WRITE16_MEMBER(juicebox_state::s3c44b0_i2s_data_w )
-{
-	m_dac->write_signed16(data ^ 0x8000);
+	if (ACCESSING_BITS_0_7) smc_write((data >>  0) & 0xFF);
+	if (ACCESSING_BITS_8_15) smc_write((data >>  8) & 0xFF);
+	if (ACCESSING_BITS_16_23) smc_write((data >> 16) & 0xFF);
+	if (ACCESSING_BITS_24_31) smc_write((data >> 24) & 0xFF);
 }
 
 // ...
 
 INPUT_CHANGED_MEMBER(juicebox_state::port_changed)
 {
-	m_s3c44b0->request_eint((FPTR)param);
+	m_s3c44b0->request_eint((uintptr_t)param);
 }
 
 // ...
@@ -262,23 +257,23 @@ void juicebox_state::machine_start()
 
 	smc_init();
 
-	space.install_readwrite_handler(0x01c00000, 0x01c0000b, 0, 0, read32_delegate(FUNC(s3c44b0_device::cpuwrap_r), &(*m_s3c44b0)),  write32_delegate(FUNC(s3c44b0_device::cpuwrap_w), &(*m_s3c44b0)));
-	space.install_readwrite_handler(0x01d00000, 0x01d0002b, 0, 0, read32_delegate(FUNC(s3c44b0_device::uart_0_r), &(*m_s3c44b0)),  write32_delegate(FUNC(s3c44b0_device::uart_0_w), &(*m_s3c44b0)));
-	space.install_readwrite_handler(0x01d04000, 0x01d0402b, 0, 0, read32_delegate(FUNC(s3c44b0_device::uart_1_r), &(*m_s3c44b0)),  write32_delegate(FUNC(s3c44b0_device::uart_1_w), &(*m_s3c44b0)));
-	space.install_readwrite_handler(0x01d14000, 0x01d14013, 0, 0, read32_delegate(FUNC(s3c44b0_device::sio_r), &(*m_s3c44b0)),  write32_delegate(FUNC(s3c44b0_device::sio_w), &(*m_s3c44b0)));
-	space.install_readwrite_handler(0x01d18000, 0x01d18013, 0, 0, read32_delegate(FUNC(s3c44b0_device::iis_r), &(*m_s3c44b0)),  write32_delegate(FUNC(s3c44b0_device::iis_w), &(*m_s3c44b0)));
-	space.install_readwrite_handler(0x01d20000, 0x01d20057, 0, 0, read32_delegate(FUNC(s3c44b0_device::gpio_r), &(*m_s3c44b0)),  write32_delegate(FUNC(s3c44b0_device::gpio_w), &(*m_s3c44b0)));
-	space.install_readwrite_handler(0x01d30000, 0x01d3000b, 0, 0, read32_delegate(FUNC(s3c44b0_device::wdt_r), &(*m_s3c44b0)),  write32_delegate(FUNC(s3c44b0_device::wdt_w), &(*m_s3c44b0)));
-	space.install_readwrite_handler(0x01d40000, 0x01d4000b, 0, 0, read32_delegate(FUNC(s3c44b0_device::adc_r), &(*m_s3c44b0)),  write32_delegate(FUNC(s3c44b0_device::adc_w), &(*m_s3c44b0)));
-	space.install_readwrite_handler(0x01d50000, 0x01d5004f, 0, 0, read32_delegate(FUNC(s3c44b0_device::pwm_r), &(*m_s3c44b0)),  write32_delegate(FUNC(s3c44b0_device::pwm_w), &(*m_s3c44b0)));
-	space.install_readwrite_handler(0x01d60000, 0x01d6000f, 0, 0, read32_delegate(FUNC(s3c44b0_device::iic_r), &(*m_s3c44b0)),  write32_delegate(FUNC(s3c44b0_device::iic_w), &(*m_s3c44b0)));
-	space.install_readwrite_handler(0x01d80000, 0x01d8000f, 0, 0, read32_delegate(FUNC(s3c44b0_device::clkpow_r), &(*m_s3c44b0)),  write32_delegate(FUNC(s3c44b0_device::clkpow_w), &(*m_s3c44b0)));
-	space.install_readwrite_handler(0x01e00000, 0x01e0003f, 0, 0, read32_delegate(FUNC(s3c44b0_device::irq_r), &(*m_s3c44b0)),  write32_delegate(FUNC(s3c44b0_device::irq_w), &(*m_s3c44b0)));
-	space.install_readwrite_handler(0x01e80000, 0x01e8001b, 0, 0, read32_delegate(FUNC(s3c44b0_device::zdma_0_r), &(*m_s3c44b0)),  write32_delegate(FUNC(s3c44b0_device::zdma_0_w), &(*m_s3c44b0)));
-	space.install_readwrite_handler(0x01e80020, 0x01e8003b, 0, 0, read32_delegate(FUNC(s3c44b0_device::zdma_1_r), &(*m_s3c44b0)),  write32_delegate(FUNC(s3c44b0_device::zdma_1_w), &(*m_s3c44b0)));
-	space.install_readwrite_handler(0x01f00000, 0x01f00047, 0, 0, read32_delegate(FUNC(s3c44b0_device::lcd_r), &(*m_s3c44b0)),  write32_delegate(FUNC(s3c44b0_device::lcd_w), &(*m_s3c44b0)));
-	space.install_readwrite_handler(0x01f80000, 0x01f8001b, 0, 0, read32_delegate(FUNC(s3c44b0_device::bdma_0_r), &(*m_s3c44b0)),  write32_delegate(FUNC(s3c44b0_device::bdma_0_w), &(*m_s3c44b0)));
-	space.install_readwrite_handler(0x01f80020, 0x01f8003b, 0, 0, read32_delegate(FUNC(s3c44b0_device::bdma_1_r), &(*m_s3c44b0)),  write32_delegate(FUNC(s3c44b0_device::bdma_1_w), &(*m_s3c44b0)));
+	space.install_readwrite_handler(0x01c00000, 0x01c0000b, read32_delegate(FUNC(s3c44b0_device::cpuwrap_r), &(*m_s3c44b0)),  write32_delegate(FUNC(s3c44b0_device::cpuwrap_w), &(*m_s3c44b0)));
+	space.install_readwrite_handler(0x01d00000, 0x01d0002b, read32_delegate(FUNC(s3c44b0_device::uart_0_r), &(*m_s3c44b0)),  write32_delegate(FUNC(s3c44b0_device::uart_0_w), &(*m_s3c44b0)));
+	space.install_readwrite_handler(0x01d04000, 0x01d0402b, read32_delegate(FUNC(s3c44b0_device::uart_1_r), &(*m_s3c44b0)),  write32_delegate(FUNC(s3c44b0_device::uart_1_w), &(*m_s3c44b0)));
+	space.install_readwrite_handler(0x01d14000, 0x01d14013, read32_delegate(FUNC(s3c44b0_device::sio_r), &(*m_s3c44b0)),  write32_delegate(FUNC(s3c44b0_device::sio_w), &(*m_s3c44b0)));
+	space.install_readwrite_handler(0x01d18000, 0x01d18013, read32_delegate(FUNC(s3c44b0_device::iis_r), &(*m_s3c44b0)),  write32_delegate(FUNC(s3c44b0_device::iis_w), &(*m_s3c44b0)));
+	space.install_readwrite_handler(0x01d20000, 0x01d20057, read32_delegate(FUNC(s3c44b0_device::gpio_r), &(*m_s3c44b0)),  write32_delegate(FUNC(s3c44b0_device::gpio_w), &(*m_s3c44b0)));
+	space.install_readwrite_handler(0x01d30000, 0x01d3000b, read32_delegate(FUNC(s3c44b0_device::wdt_r), &(*m_s3c44b0)),  write32_delegate(FUNC(s3c44b0_device::wdt_w), &(*m_s3c44b0)));
+	space.install_readwrite_handler(0x01d40000, 0x01d4000b, read32_delegate(FUNC(s3c44b0_device::adc_r), &(*m_s3c44b0)),  write32_delegate(FUNC(s3c44b0_device::adc_w), &(*m_s3c44b0)));
+	space.install_readwrite_handler(0x01d50000, 0x01d5004f, read32_delegate(FUNC(s3c44b0_device::pwm_r), &(*m_s3c44b0)),  write32_delegate(FUNC(s3c44b0_device::pwm_w), &(*m_s3c44b0)));
+	space.install_readwrite_handler(0x01d60000, 0x01d6000f, read32_delegate(FUNC(s3c44b0_device::iic_r), &(*m_s3c44b0)),  write32_delegate(FUNC(s3c44b0_device::iic_w), &(*m_s3c44b0)));
+	space.install_readwrite_handler(0x01d80000, 0x01d8000f, read32_delegate(FUNC(s3c44b0_device::clkpow_r), &(*m_s3c44b0)),  write32_delegate(FUNC(s3c44b0_device::clkpow_w), &(*m_s3c44b0)));
+	space.install_readwrite_handler(0x01e00000, 0x01e0003f, read32_delegate(FUNC(s3c44b0_device::irq_r), &(*m_s3c44b0)),  write32_delegate(FUNC(s3c44b0_device::irq_w), &(*m_s3c44b0)));
+	space.install_readwrite_handler(0x01e80000, 0x01e8001b, read32_delegate(FUNC(s3c44b0_device::zdma_0_r), &(*m_s3c44b0)),  write32_delegate(FUNC(s3c44b0_device::zdma_0_w), &(*m_s3c44b0)));
+	space.install_readwrite_handler(0x01e80020, 0x01e8003b, read32_delegate(FUNC(s3c44b0_device::zdma_1_r), &(*m_s3c44b0)),  write32_delegate(FUNC(s3c44b0_device::zdma_1_w), &(*m_s3c44b0)));
+	space.install_readwrite_handler(0x01f00000, 0x01f00047, read32_delegate(FUNC(s3c44b0_device::lcd_r), &(*m_s3c44b0)),  write32_delegate(FUNC(s3c44b0_device::lcd_w), &(*m_s3c44b0)));
+	space.install_readwrite_handler(0x01f80000, 0x01f8001b, read32_delegate(FUNC(s3c44b0_device::bdma_0_r), &(*m_s3c44b0)),  write32_delegate(FUNC(s3c44b0_device::bdma_0_w), &(*m_s3c44b0)));
+	space.install_readwrite_handler(0x01f80020, 0x01f8003b, read32_delegate(FUNC(s3c44b0_device::bdma_1_r), &(*m_s3c44b0)),  write32_delegate(FUNC(s3c44b0_device::bdma_1_w), &(*m_s3c44b0)));
 }
 
 void juicebox_state::machine_reset()
@@ -306,7 +301,7 @@ DRIVER_INIT_MEMBER(juicebox_state,juicebox)
 	// do nothing
 }
 
-static MACHINE_CONFIG_START( juicebox, juicebox_state )
+static MACHINE_CONFIG_START( juicebox )
 	MCFG_CPU_ADD("maincpu", ARM7, 66000000)
 	MCFG_CPU_PROGRAM_MAP(juicebox_map)
 
@@ -321,15 +316,15 @@ static MACHINE_CONFIG_START( juicebox, juicebox_state )
 
 	MCFG_SCREEN_UPDATE_DEVICE("s3c44b0", s3c44b0_device, video_update)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("dac", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("dac", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 	MCFG_DEVICE_ADD("s3c44b0", S3C44B0, 10000000)
 	MCFG_S3C44B0_GPIO_PORT_R_CB(READ32(juicebox_state, s3c44b0_gpio_port_r))
 	MCFG_S3C44B0_GPIO_PORT_W_CB(WRITE32(juicebox_state, s3c44b0_gpio_port_w))
-	MCFG_S3C44B0_I2S_DATA_W_CB(WRITE16(juicebox_state, s3c44b0_i2s_data_w))
+	MCFG_S3C44B0_I2S_DATA_W_CB(DEVWRITE16("dac", dac_word_interface, write))
 
 	MCFG_DEVICE_ADD("smartmedia", SMARTMEDIA, 0)
 

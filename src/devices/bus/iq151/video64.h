@@ -1,11 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Sandro Ronco
+#ifndef MAME_BUS_IQ151_VIDEO64_H
+#define MAME_BUS_IQ151_VIDEO64_H
+
 #pragma once
 
-#ifndef __IQ151_VIDEO64_H__
-#define __IQ151_VIDEO64_H__
-
-#include "emu.h"
 #include "iq151.h"
 
 //**************************************************************************
@@ -21,10 +20,10 @@ class iq151_video64_device :
 {
 public:
 	// construction/destruction
-	iq151_video64_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	iq151_video64_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 
 protected:
 	// device-level overrides
@@ -32,18 +31,18 @@ protected:
 	virtual void device_reset() override;
 
 	// iq151cart_interface overrides
-	virtual void read(offs_t offset, UINT8 &data) override;
-	virtual void write(offs_t offset, UINT8 data) override;
-	virtual void io_read(offs_t offset, UINT8 &data) override;
+	virtual void read(offs_t offset, uint8_t &data) override;
+	virtual void write(offs_t offset, uint8_t data) override;
+	virtual void io_read(offs_t offset, uint8_t &data) override;
 	virtual void video_update(bitmap_ind16 &bitmap, const rectangle &cliprect) override;
 
 private:
-	UINT8 *     m_videoram;
-	UINT8 *     m_chargen;
+	required_region_ptr<uint8_t> m_videoram;
+	required_region_ptr<uint8_t> m_chargen;
 };
 
 
 // device type definition
-extern const device_type IQ151_VIDEO64;
+DECLARE_DEVICE_TYPE(IQ151_VIDEO64, iq151_video64_device)
 
-#endif  /* __IQ151_VIDEO64_H__ */
+#endif // MAME_BUS_IQ151_VIDEO64_H

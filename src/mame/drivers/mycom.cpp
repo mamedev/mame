@@ -50,13 +50,16 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "video/mc6845.h"
-#include "machine/i8255.h"
-#include "sound/sn76496.h"
 #include "imagedev/cassette.h"
-#include "sound/wave.h"
+#include "machine/i8255.h"
 #include "machine/msm5832.h"
+#include "machine/timer.h"
 #include "machine/wd_fdc.h"
+#include "sound/sn76496.h"
+#include "sound/wave.h"
+#include "video/mc6845.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class mycom_state : public driver_device
@@ -69,14 +72,15 @@ public:
 		, m_ppi1(*this, "ppi8255_1")
 		, m_ppi2(*this, "ppi8255_2")
 		, m_cass(*this, "cassette")
-		, m_wave(*this, WAVE_TAG)
 		, m_crtc(*this, "crtc")
 		, m_fdc(*this, "fdc")
 		, m_floppy0(*this, "fdc:0")
 		, m_floppy1(*this, "fdc:1")
 		, m_audio(*this, "sn1")
-		, m_rtc(*this, "rtc"),
-		m_palette(*this, "palette")
+		, m_rtc(*this, "rtc")
+		, m_palette(*this, "palette")
+		, m_p_videoram(*this, "vram")
+		, m_p_chargen(*this, "chargen")
 	{ }
 
 	DECLARE_READ8_MEMBER(mycom_upper_r);
@@ -94,55 +98,47 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(mycom_kbd);
 	DECLARE_WRITE8_MEMBER(mycom_rtc_w);
 	MC6845_UPDATE_ROW(crtc_update_row);
-	UINT8 *m_p_videoram;
-	UINT8 *m_p_chargen;
-	UINT8 m_0a;
+
 private:
-	UINT16 m_i_videoram;
-	UINT8 m_keyb_press;
-	UINT8 m_keyb_press_flag;
-	UINT8 m_sn_we;
-	UINT32 m_upper_sw;
-	UINT8 *m_p_ram;
+	uint8_t m_0a;
+	uint16_t m_i_videoram;
+	uint8_t m_keyb_press;
+	uint8_t m_keyb_press_flag;
+	uint8_t m_sn_we;
+	uint32_t m_upper_sw;
+	uint8_t *m_p_ram;
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
-	virtual void video_start() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<i8255_device> m_ppi0;
 	required_device<i8255_device> m_ppi1;
 	required_device<i8255_device> m_ppi2;
 	required_device<cassette_image_device> m_cass;
-	required_device<wave_device> m_wave;
 	required_device<mc6845_device> m_crtc;
-	required_device<fd1771_t> m_fdc;
+	required_device<fd1771_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
 	required_device<sn76489_device> m_audio;
 	required_device<msm5832_device> m_rtc;
-public:
 	required_device<palette_device> m_palette;
+	required_region_ptr<u8> m_p_videoram;
+	required_region_ptr<u8> m_p_chargen;
 };
 
 
 
-void mycom_state::video_start()
-{
-	m_p_videoram = memregion("vram")->base();
-	m_p_chargen = memregion("chargen")->base();
-}
-
 MC6845_UPDATE_ROW( mycom_state::crtc_update_row )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	UINT8 chr,gfx=0,z;
-	UINT16 mem,x;
-	UINT32 *p = &bitmap.pix32(y);
+	uint8_t chr,gfx=0,z;
+	uint16_t mem,x;
+	uint32_t *p = &bitmap.pix32(y);
 
 	if (m_0a & 0x40)
 	{
 		for (x = 0; x < x_count; x++)                   // lores pixels
 		{
-			UINT8 dbit=1;
+			uint8_t dbit=1;
 			if (x == cursor_x) dbit=0;
 			mem = (ma + x) & 0x7ff;
 			chr = m_p_videoram[mem];
@@ -162,7 +158,7 @@ MC6845_UPDATE_ROW( mycom_state::crtc_update_row )
 	{
 		for (x = 0; x < x_count; x++)                   // text
 		{
-			UINT8 inv=0;
+			uint8_t inv=0;
 			if (x == cursor_x) inv=0xff;
 			mem = (ma + x) & 0x7ff;
 			if (ra > 7)
@@ -233,7 +229,7 @@ static ADDRESS_MAP_START(mycom_io, AS_IO, 8, mycom_state)
 	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
 	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write)
-	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("fdc", fd1771_t, read, write)
+	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("fdc", fd1771_device, read, write)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -358,7 +354,7 @@ READ8_MEMBER( mycom_state::mycom_08_r )
 	---- --x- keyboard shift
 	---- ---x keyboard strobe
 	*/
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	data = m_keyb_press_flag; //~m_keyb_press_flag & 1;
 
@@ -424,7 +420,7 @@ WRITE8_MEMBER(mycom_state::mycom_rtc_w)
 	m_rtc->cs_w(BIT(data, 7));
 }
 
-static const UINT8 mycom_keyval[] = { 0,
+static const uint8_t mycom_keyval[] = { 0,
 0x1b,0x1b,0x7c,0x7c,0x18,0x18,0x0f,0x0f,0x09,0x09,0x1c,0x1c,0x30,0x00,0x50,0x70,0x3b,0x2b,
 0x00,0x00,0x31,0x21,0x51,0x71,0x41,0x61,0x5a,0x7a,0x17,0x17,0x2d,0x3d,0x40,0x60,0x3a,0x2a,
 0x0b,0x0b,0x32,0x22,0x57,0x77,0x53,0x73,0x58,0x78,0x03,0x03,0x5e,0x7e,0x5b,0x7b,0x5d,0x7d,
@@ -438,11 +434,11 @@ static const UINT8 mycom_keyval[] = { 0,
 
 TIMER_DEVICE_CALLBACK_MEMBER(mycom_state::mycom_kbd)
 {
-	UINT8 x, y, scancode = 0;
-	UINT16 pressed[9];
+	uint8_t x, y, scancode = 0;
+	uint16_t pressed[9];
 	char kbdrow[3];
-	UINT8 modifiers = ioport("XX")->read();
-	UINT8 shift_pressed = (modifiers & 2) >> 1;
+	uint8_t modifiers = ioport("XX")->read();
+	uint8_t shift_pressed = (modifiers & 2) >> 1;
 	m_keyb_press_flag = 0;
 
 	/* see what is pressed */
@@ -497,11 +493,11 @@ void mycom_state::machine_reset()
 
 DRIVER_INIT_MEMBER(mycom_state,mycom)
 {
-	UINT8 *RAM = memregion("maincpu")->base();
+	uint8_t *RAM = memregion("maincpu")->base();
 	membank("boot")->configure_entries(0, 2, &RAM[0x0000], 0x10000);
 }
 
-static MACHINE_CONFIG_START( mycom, mycom_state )
+static MACHINE_CONFIG_START( mycom )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_10MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(mycom_map)
@@ -566,7 +562,7 @@ ROM_START( mycom )
 	ROM_SYSTEM_BIOS(0, "mycom", "40 column")
 	ROMX_LOAD( "bios0.rom", 0x10000, 0x3000, CRC(e6f50355) SHA1(5d3acea360c0a8ab547db03a43e1bae5125f9c2a), ROM_BIOS(1))
 	ROMX_LOAD( "basic0.rom",0x13000, 0x1000, CRC(3b077465) SHA1(777427182627f371542c5e0521ed3ca1466a90e1), ROM_BIOS(1))
-	ROM_SYSTEM_BIOS(1, "Takeda", "80 column")
+	ROM_SYSTEM_BIOS(1, "takeda", "80 column")
 	ROMX_LOAD( "bios1.rom", 0x10000, 0x3000, CRC(c51d7fcb) SHA1(31d39db43b77cca4d49ff9814d531e056924e716), ROM_BIOS(2))
 	ROMX_LOAD( "basic1.rom",0x13000, 0x1000, CRC(30a573f1) SHA1(e3fe2e73644e831b52e2789dc7c181989cc30b82), ROM_BIOS(2))
 	/* Takeda bios has no cursor. Use the next lines to turn on cursor, but you must comment out when done. */
@@ -581,5 +577,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT        COMPANY                   FULLNAME       FLAGS */
-COMP( 1981, mycom,  0,      0,       mycom,     mycom, mycom_state,   mycom, "Japan Electronics College", "MYCOMZ-80A", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE        INIT   COMPANY                      FULLNAME      FLAGS
+COMP( 1981, mycom,  0,      0,       mycom,     mycom, mycom_state, mycom, "Japan Electronics College", "MYCOMZ-80A", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

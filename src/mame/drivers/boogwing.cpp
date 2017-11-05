@@ -81,21 +81,25 @@
 */
 
 #include "emu.h"
+#include "includes/boogwing.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/h6280/h6280.h"
-#include "includes/boogwing.h"
 #include "machine/deco102.h"
 #include "machine/decocrpt.h"
 #include "machine/gen_latch.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 #include "sound/okim6295.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 READ16_MEMBER( boogwing_state::boogwing_protection_region_0_104_r )
 {
 	int real_address = 0 + (offset *2);
 	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
-	UINT8 cs = 0;
-	UINT16 data = m_deco104->read_data( deco146_addr, mem_mask, cs );
+	uint8_t cs = 0;
+	uint16_t data = m_deco104->read_data( deco146_addr, mem_mask, cs );
 	return data;
 }
 
@@ -103,7 +107,7 @@ WRITE16_MEMBER( boogwing_state::boogwing_protection_region_0_104_w )
 {
 	int real_address = 0 + (offset *2);
 	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
-	UINT8 cs = 0;
+	uint8_t cs = 0;
 	m_deco104->write_data( space, deco146_addr, data, mem_mask, cs );
 }
 
@@ -145,7 +149,7 @@ static ADDRESS_MAP_START( boogwing_map, AS_PROGRAM, 16, boogwing_state )
 	AM_RANGE(0x3c0000, 0x3c004f) AM_RAM // ?
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 16, boogwing_state )
+static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 16, boogwing_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM AM_SHARE("decrypted_opcodes")
 ADDRESS_MAP_END
 
@@ -155,7 +159,7 @@ static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, boogwing_state )
 	AM_RANGE(0x110000, 0x110001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x120000, 0x120001) AM_DEVREADWRITE("oki1", okim6295_device, read, write)
 	AM_RANGE(0x130000, 0x130001) AM_DEVREADWRITE("oki2", okim6295_device, read, write)
-	AM_RANGE(0x140000, 0x140001) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
+	AM_RANGE(0x140000, 0x140000) AM_DEVREAD("ioprot", deco104_device, soundlatch_r)
 	AM_RANGE(0x1f0000, 0x1f1fff) AM_RAMBANK("bank8")
 	AM_RANGE(0x1fec00, 0x1fec01) AM_DEVWRITE("audiocpu", h6280_device, timer_w)
 	AM_RANGE(0x1ff400, 0x1ff403) AM_DEVWRITE("audiocpu", h6280_device, irq_status_w)
@@ -298,8 +302,8 @@ GFXDECODE_END
 
 WRITE8_MEMBER(boogwing_state::sound_bankswitch_w)
 {
-	m_oki2->set_bank_base(((data & 2) >> 1) * 0x40000);
-	m_oki1->set_bank_base((data & 1) * 0x40000);
+	m_oki2->set_rom_bank((data & 2) >> 1);
+	m_oki1->set_rom_bank(data & 1);
 }
 
 
@@ -317,7 +321,7 @@ DECO16IC_BANK_CB_MEMBER(boogwing_state::bank_callback2)
 	return offset;
 }
 
-static MACHINE_CONFIG_START( boogwing, boogwing_state )
+static MACHINE_CONFIG_START( boogwing )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 14000000)   /* DE102 */
@@ -384,14 +388,16 @@ static MACHINE_CONFIG_START( boogwing, boogwing_state )
 	MCFG_DECO_SPRITE_GFX_REGION(4)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 
-	MCFG_DECO104_ADD("ioprot104")
+	MCFG_DECO104_ADD("ioprot")
+	MCFG_DECO146_IN_PORTA_CB(IOPORT("INPUTS"))
+	MCFG_DECO146_IN_PORTB_CB(IOPORT("SYSTEM"))
+	MCFG_DECO146_IN_PORTC_CB(IOPORT("DSW"))
+	MCFG_DECO146_SOUNDLATCH_IRQ_CB(INPUTLINE("audiocpu", 0))
 	MCFG_DECO146_SET_INTERFACE_SCRAMBLE_REVERSE
 	MCFG_DECO146_SET_USE_MAGIC_ADDRESS_XOR
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_YM2151_ADD("ymsnd", 32220000/9)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1)) /* IRQ2 */
@@ -399,11 +405,11 @@ static MACHINE_CONFIG_START( boogwing, boogwing_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
 
-	MCFG_OKIM6295_ADD("oki1", 32220000/32, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki1", 32220000/32, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.40)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.40)
 
-	MCFG_OKIM6295_ADD("oki2", 32220000/16, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki2", 32220000/16, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
 MACHINE_CONFIG_END
@@ -632,14 +638,14 @@ ROM_END
 
 DRIVER_INIT_MEMBER(boogwing_state,boogwing)
 {
-	const UINT8* src = memregion("gfx6")->base();
-	UINT8* dst = memregion("tiles2")->base() + 0x200000;
+	const uint8_t* src = memregion("gfx6")->base();
+	uint8_t* dst = memregion("tiles2")->base() + 0x200000;
 
 	deco56_decrypt_gfx(machine(), "tiles1");
 	deco56_decrypt_gfx(machine(), "tiles2");
 	deco56_decrypt_gfx(machine(), "tiles3");
 	deco56_remap_gfx(machine(), "gfx6");
-	deco102_decrypt_cpu((UINT16 *)memregion("maincpu")->base(), m_decrypted_opcodes, 0x100000, 0x42ba, 0x00, 0x18);
+	deco102_decrypt_cpu((uint16_t *)memregion("maincpu")->base(), m_decrypted_opcodes, 0x100000, 0x42ba, 0x00, 0x18);
 	memcpy(dst, src, 0x100000);
 }
 

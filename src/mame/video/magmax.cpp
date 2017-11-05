@@ -28,7 +28,7 @@ Additional tweaking by Jarek Burczynski
 ***************************************************************************/
 PALETTE_INIT_MEMBER(magmax_state, magmax)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 	/* create a lookup table for the palette */
@@ -51,7 +51,7 @@ PALETTE_INIT_MEMBER(magmax_state, magmax)
 	/*sprites use colors 0x10-0x1f, color 0x1f being transparent*/
 	for (i = 0x10; i < 0x110; i++)
 	{
-		UINT8 ctabentry = (color_prom[i - 0x10] & 0x0f) | 0x10;
+		uint8_t ctabentry = (color_prom[i - 0x10] & 0x0f) | 0x10;
 		palette.set_pen_indirect(i, ctabentry);
 	}
 
@@ -64,12 +64,12 @@ PALETTE_INIT_MEMBER(magmax_state, magmax)
 void magmax_state::video_start()
 {
 	int i,v;
-	UINT8 * prom14D = memregion("user2")->base();
+	uint8_t * prom14D = memregion("user2")->base();
 
 	/* Set up save state */
 	save_item(NAME(m_flipscreen));
 
-	m_prom_tab = std::make_unique<UINT32[]>(256);
+	m_prom_tab = std::make_unique<uint32_t[]>(256);
 
 	m_screen->register_screen_bitmap(m_bitmap);
 
@@ -83,10 +83,10 @@ void magmax_state::video_start()
 
 
 
-UINT32 magmax_state::screen_update_magmax(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t magmax_state::screen_update_magmax(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT16 *videoram = m_videoram;
-	UINT16 *spriteram16 = m_spriteram;
+	uint16_t *videoram = m_videoram;
+	uint16_t *spriteram16 = m_spriteram;
 	int offs;
 
 	/* bit 2 flip screen */
@@ -98,9 +98,9 @@ UINT32 magmax_state::screen_update_magmax(screen_device &screen, bitmap_ind16 &b
 	else
 	{
 		int v;
-		UINT8 * rom18B = memregion("user1")->base();
-		UINT32 scroll_h = (*m_scroll_x) & 0x3fff;
-		UINT32 scroll_v = (*m_scroll_y) & 0xff;
+		uint8_t * rom18B = memregion("user1")->base();
+		uint32_t scroll_h = (*m_scroll_x) & 0x3fff;
+		uint32_t scroll_v = (*m_scroll_y) & 0xff;
 
 		/*clear background-over-sprites bitmap*/
 		m_bitmap.fill(0);
@@ -108,21 +108,21 @@ UINT32 magmax_state::screen_update_magmax(screen_device &screen, bitmap_ind16 &b
 		for (v = 2*8; v < 30*8; v++) /*only for visible area*/
 		{
 			int h;
-			UINT16 line_data[256];
+			uint16_t line_data[256];
 
-			UINT32 map_v_scr_100 =   (scroll_v + v) & 0x100;
-			UINT32 rom18D_addr   =  ((scroll_v + v) & 0xf8)     + (map_v_scr_100<<5);
-			UINT32 rom15F_addr   = (((scroll_v + v) & 0x07)<<2) + (map_v_scr_100<<5);
-			UINT32 map_v_scr_1fe_6 =((scroll_v + v) & 0x1fe)<<6;
+			uint32_t map_v_scr_100 =   (scroll_v + v) & 0x100;
+			uint32_t rom18D_addr   =  ((scroll_v + v) & 0xf8)     + (map_v_scr_100<<5);
+			uint32_t rom15F_addr   = (((scroll_v + v) & 0x07)<<2) + (map_v_scr_100<<5);
+			uint32_t map_v_scr_1fe_6 =((scroll_v + v) & 0x1fe)<<6;
 
 			pen_t pen_base = 0x110 + 0x20 + (map_v_scr_100>>1);
 
 			for (h = 0; h < 0x100; h++)
 			{
-				UINT32 graph_data;
-				UINT32 graph_color;
-				UINT32 LS283;
-				UINT32 prom_data;
+				uint32_t graph_data;
+				uint32_t graph_color;
+				uint32_t LS283;
+				uint32_t prom_data;
 
 				LS283 = scroll_h + h;
 
@@ -160,7 +160,7 @@ UINT32 magmax_state::screen_update_magmax(screen_device &screen, bitmap_ind16 &b
 			if (m_flipscreen)
 			{
 				int i;
-				UINT16 line_data_flip_x[256];
+				uint16_t line_data_flip_x[256];
 				for (i=0; i<256; i++)
 					line_data_flip_x[i] = line_data[255-i];
 				draw_scanline16(bitmap, 0, 255-v, 256, line_data_flip_x, nullptr);

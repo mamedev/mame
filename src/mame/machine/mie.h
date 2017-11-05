@@ -1,12 +1,15 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
-#ifndef __MIE_H__
-#define __MIE_H__
+#ifndef MAME_MACHINE_MIE_H
+#define MAME_MACHINE_MIE_H
+
+#pragma once
+
+#include "machine/mapledev.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
 #include "machine/jvshost.h"
-#include "machine/mapledev.h"
 
 #define MCFG_MIE_ADD(_tag, _clock, _host_tag, _host_port, g0, g1, g2, g3, g4, g5, g6, g7) \
 	MCFG_MAPLE_DEVICE_ADD(_tag "_maple", MIE, _clock, _host_tag, _host_port) \
@@ -28,14 +31,10 @@ class mie_jvs_device;
 class mie_device : public maple_device
 {
 public:
-	mie_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mie_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	static void static_set_gpio_name(device_t &device, int entry, const char *name);
 	static void static_set_jvs_name(device_t &device, const char *name);
-
-	// optional information overrides
-	virtual const rom_entry *device_rom_region() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	DECLARE_READ8_MEMBER(control_r);
 	DECLARE_WRITE8_MEMBER(control_w);
@@ -69,9 +68,7 @@ public:
 	DECLARE_READ8_MEMBER(read_00);
 	DECLARE_READ8_MEMBER(read_78xx);
 
-	IRQ_CALLBACK_MEMBER(irq_callback);
-
-	void maple_w(const UINT32 *data, UINT32 in_size) override;
+	void maple_w(const uint32_t *data, uint32_t in_size) override;
 	virtual void maple_reset() override;
 
 protected:
@@ -83,6 +80,10 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
+	// optional information overrides
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
+
 private:
 	enum { TBUF_SIZE = 8 };
 
@@ -93,7 +94,7 @@ private:
 		CTRL_EMP  = 0x000100, // Empty flag
 		CTRL_PERR = 0x000200, // Parity error
 		CTRL_BFOV = 0x000800, // Set when overflow, cleared to 0 when starting send/receive
-		CTRL_RXB  = 0x001000, // Recieving
+		CTRL_RXB  = 0x001000, // Receiving
 		CTRL_RFB  = 0x002000, // Receive done
 		CTRL_TFB  = 0x004000, // Transmit done
 		CTRL_HRES = 0x008000  // Reset pattern received
@@ -105,15 +106,16 @@ private:
 	mie_jvs_device *jvs;
 	ioport_port *gpio_port[8];
 
-	UINT32 tbuf[TBUF_SIZE];
-	UINT32 control, lreg, jvs_rpos;
-	UINT8 gpiodir, gpio_val[8];
-	UINT8 irq_enable, irq_pending, maple_irqlevel;
-	UINT8 jvs_control, jvs_dest;
-	UINT8 jvs_lcr;
+	uint32_t tbuf[TBUF_SIZE];
+	uint32_t control, lreg, jvs_rpos;
+	uint8_t gpiodir, gpio_val[8];
+	uint8_t irq_enable, irq_pending, maple_irqlevel;
+	uint8_t jvs_control, jvs_dest;
+	uint8_t jvs_lcr;
 
 	void raise_irq(int level);
 	void recalc_irq();
+	IRQ_CALLBACK_MEMBER(irq_callback);
 };
 
 // Trampoline class, required for device discovery
@@ -123,11 +125,12 @@ public:
 	friend class mie_device;
 
 	// construction/destruction
-	mie_jvs_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mie_jvs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 
 // device type definition
-extern const device_type MIE, MIE_JVS;
+DECLARE_DEVICE_TYPE(MIE,     mie_device)
+DECLARE_DEVICE_TYPE(MIE_JVS, mie_jvs_device)
 
-#endif /* __MIE_H__ */
+#endif // MAME_MACHINE_MIE_H

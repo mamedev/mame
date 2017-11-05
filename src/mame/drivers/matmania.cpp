@@ -32,136 +32,15 @@ The driver has been updated accordingly.
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/m6502/m6502.h"
-#include "cpu/m6809/m6809.h"
-#include "cpu/m6805/m6805.h"
-#include "sound/ay8910.h"
-#include "sound/dac.h"
-#include "sound/3526intf.h"
 #include "includes/matmania.h"
 
-
-/*************************************
- *
- *  Mania Challenge 68705 protection interface
- *
- *  The following is ENTIRELY GUESSWORK!!!
- *
- *************************************/
-
-READ8_MEMBER(matmania_state::maniach_68705_port_a_r)
-{
-	//logerror("%04x: 68705 port A read %02x\n", space.device().safe_pc(), m_port_a_in);
-	return (m_port_a_out & m_ddr_a) | (m_port_a_in & ~m_ddr_a);
-}
-
-WRITE8_MEMBER(matmania_state::maniach_68705_port_a_w)
-{
-	//logerror("%04x: 68705 port A write %02x\n", space.device().safe_pc(), data);
-	m_port_a_out = data;
-}
-
-WRITE8_MEMBER(matmania_state::maniach_68705_ddr_a_w)
-{
-	m_ddr_a = data;
-}
-
-
-/*
- *  Port B connections:
- *
- *  all bits are logical 1 when read (+5V pullup)
- *
- *  1   W  when 1->0, enables latch which brings the command from main CPU (read from port A)
- *  2   W  when 0->1, copies port A to the latch for the main CPU
- */
-
-READ8_MEMBER(matmania_state::maniach_68705_port_b_r)
-{
-	return (m_port_b_out & m_ddr_b) | (m_port_b_in & ~m_ddr_b);
-}
-
-WRITE8_MEMBER(matmania_state::maniach_68705_port_b_w)
-{
-	//logerror("%04x: 68705 port B write %02x\n", space.device().safe_pc(), data);
-
-	if (BIT(m_ddr_b, 1) && BIT(~data, 1) && BIT(m_port_b_out, 1))
-	{
-		m_port_a_in = m_from_main;
-		m_main_sent = 0;
-		//logerror("read command %02x from main cpu\n", m_port_a_in);
-	}
-	if (BIT(m_ddr_b, 2) && BIT(data, 2) && BIT(~m_port_b_out, 2))
-	{
-		//logerror("send command %02x to main cpu\n", m_port_a_out);
-		m_from_mcu = m_port_a_out;
-		m_mcu_sent = 1;
-	}
-
-	m_port_b_out = data;
-}
-
-WRITE8_MEMBER(matmania_state::maniach_68705_ddr_b_w)
-{
-	m_ddr_b = data;
-}
-
-
-READ8_MEMBER(matmania_state::maniach_68705_port_c_r)
-{
-	m_port_c_in = 0;
-
-	if (m_main_sent)
-		m_port_c_in |= 0x01;
-
-	if (!m_mcu_sent)
-		m_port_c_in |= 0x02;
-
-	//logerror("%04x: 68705 port C read %02x\n",m_space->device().safe_pc(), m_port_c_in);
-
-	return (m_port_c_out & m_ddr_c) | (m_port_c_in & ~m_ddr_c);
-}
-
-WRITE8_MEMBER(matmania_state::maniach_68705_port_c_w)
-{
-	//logerror("%04x: 68705 port C write %02x\n", space.device().safe_pc(), data);
-	m_port_c_out = data;
-}
-
-WRITE8_MEMBER(matmania_state::maniach_68705_ddr_c_w)
-{
-	m_ddr_c = data;
-}
-
-
-WRITE8_MEMBER(matmania_state::maniach_mcu_w)
-{
-	//logerror("%04x: 3040_w %02x\n", space.device().safe_pc(), data);
-	m_from_main = data;
-	m_main_sent = 1;
-}
-
-READ8_MEMBER(matmania_state::maniach_mcu_r)
-{
-	//logerror("%04x: 3040_r %02x\n", space.device().safe_pc(), m_from_mcu);
-	m_mcu_sent = 0;
-	return m_from_mcu;
-}
-
-READ8_MEMBER(matmania_state::maniach_mcu_status_r)
-{
-	int res = 0;
-
-	/* bit 0 = when 0, mcu has sent data to the main cpu */
-	/* bit 1 = when 1, mcu is ready to receive data from main cpu */
-	//logerror("%04x: 3041_r\n", space.device().safe_pc());
-	if (!m_mcu_sent)
-		res |= 0x01;
-	if (!m_main_sent)
-		res |= 0x02;
-
-	return res;
-}
+#include "cpu/m6502/m6502.h"
+#include "cpu/m6809/m6809.h"
+#include "sound/3526intf.h"
+#include "sound/ay8910.h"
+#include "sound/dac.h"
+#include "sound/volt_reg.h"
+#include "speaker.h"
 
 
 /*************************************
@@ -170,15 +49,22 @@ READ8_MEMBER(matmania_state::maniach_mcu_status_r)
  *
  *************************************/
 
+READ8_MEMBER(matmania_state::maniach_mcu_status_r)
+{
+	return
+			((CLEAR_LINE == m_mcu->mcu_semaphore_r()) ? 0x01 : 0x00) |
+			((CLEAR_LINE == m_mcu->host_semaphore_r()) ? 0x02 : 0x00);
+}
+
 WRITE8_MEMBER(matmania_state::matmania_sh_command_w)
 {
-	soundlatch_byte_w(space, offset, data);
+	m_soundlatch->write(space, offset, data);
 	m_audiocpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
 }
 
 WRITE8_MEMBER(matmania_state::maniach_sh_command_w)
 {
-	soundlatch_byte_w(space, offset, data);
+	m_soundlatch->write(space, offset, data);
 	m_audiocpu->set_input_line(M6809_IRQ_LINE, HOLD_LINE);
 }
 
@@ -219,7 +105,7 @@ static ADDRESS_MAP_START( maniach_map, AS_PROGRAM, 8, matmania_state )
 	AM_RANGE(0x3010, 0x3010) AM_READ_PORT("IN1") AM_WRITE(maniach_sh_command_w)
 	AM_RANGE(0x3020, 0x3020) AM_READ_PORT("DSW2") AM_WRITEONLY AM_SHARE("scroll")
 	AM_RANGE(0x3030, 0x3030) AM_READ_PORT("DSW1") AM_WRITENOP   /* ?? */
-	AM_RANGE(0x3040, 0x3040) AM_READWRITE(maniach_mcu_r,maniach_mcu_w)
+	AM_RANGE(0x3040, 0x3040) AM_DEVREADWRITE("mcu", taito68705_mcu_device, data_r, data_w)
 	AM_RANGE(0x3041, 0x3041) AM_READ(maniach_mcu_status_r)
 	AM_RANGE(0x3050, 0x307f) AM_WRITE(matmania_paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0x4000, 0xffff) AM_ROM
@@ -230,30 +116,17 @@ static ADDRESS_MAP_START( matmania_sound_map, AS_PROGRAM, 8, matmania_state )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
 	AM_RANGE(0x2000, 0x2001) AM_DEVWRITE("ay1", ay8910_device, data_address_w)
 	AM_RANGE(0x2002, 0x2003) AM_DEVWRITE("ay2", ay8910_device, data_address_w)
-	AM_RANGE(0x2004, 0x2004) AM_DEVWRITE("dac", dac_device, write_signed8)
-	AM_RANGE(0x2007, 0x2007) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x2004, 0x2004) AM_DEVWRITE("dac", dac_byte_interface, write)
+	AM_RANGE(0x2007, 0x2007) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( maniach_sound_map, AS_PROGRAM, 8, matmania_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x2000, 0x2001) AM_DEVWRITE("ymsnd", ym3526_device, write)
-	AM_RANGE(0x2002, 0x2002) AM_DEVWRITE("dac", dac_device, write_signed8)
-	AM_RANGE(0x2004, 0x2004) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x2002, 0x2002) AM_DEVWRITE("dac", dac_byte_interface, write)
+	AM_RANGE(0x2004, 0x2004) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x4000, 0xffff) AM_ROM
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( maniach_mcu_map, AS_PROGRAM, 8, matmania_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
-	AM_RANGE(0x0000, 0x0000) AM_READWRITE(maniach_68705_port_a_r,maniach_68705_port_a_w)
-	AM_RANGE(0x0001, 0x0001) AM_READWRITE(maniach_68705_port_b_r,maniach_68705_port_b_w)
-	AM_RANGE(0x0002, 0x0002) AM_READWRITE(maniach_68705_port_c_r,maniach_68705_port_c_w)
-	AM_RANGE(0x0004, 0x0004) AM_WRITE(maniach_68705_ddr_a_w)
-	AM_RANGE(0x0005, 0x0005) AM_WRITE(maniach_68705_ddr_b_w)
-	AM_RANGE(0x0006, 0x0006) AM_WRITE(maniach_68705_ddr_c_w)
-	AM_RANGE(0x0010, 0x007f) AM_RAM
-	AM_RANGE(0x0080, 0x07ff) AM_ROM
 ADDRESS_MAP_END
 
 
@@ -422,7 +295,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( matmania, matmania_state )
+static MACHINE_CONFIG_START( matmania )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 1500000) /* 1.5 MHz ???? */
@@ -449,54 +322,23 @@ static MACHINE_CONFIG_START( matmania, matmania_state )
 	MCFG_PALETTE_INIT_OWNER(matmania_state, matmania)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ay1", AY8910, 1500000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
 
 	MCFG_SOUND_ADD("ay2", AY8910, 1500000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
 
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
-MACHINE_START_MEMBER(matmania_state,maniach)
-{
-	save_item(NAME(m_port_a_in));
-	save_item(NAME(m_port_a_out));
-	save_item(NAME(m_ddr_a));
-	save_item(NAME(m_port_b_in));
-	save_item(NAME(m_port_b_out));
-	save_item(NAME(m_ddr_b));
-	save_item(NAME(m_port_c_in));
-	save_item(NAME(m_port_c_out));
-	save_item(NAME(m_ddr_c));
-	save_item(NAME(m_mcu_sent));
-	save_item(NAME(m_main_sent));
-	save_item(NAME(m_from_main));
-	save_item(NAME(m_from_mcu));
-}
-
-MACHINE_RESET_MEMBER(matmania_state,maniach)
-{
-	m_port_a_in = 0;
-	m_port_a_out = 0;
-	m_ddr_a = 0;
-	m_port_b_in = 0;
-	m_port_b_out = 0;
-	m_ddr_b = 0;
-	m_port_c_in = 0;
-	m_port_c_out = 0;
-	m_ddr_c = 0;
-	m_mcu_sent = 0;
-	m_main_sent = 0;
-	m_from_main = 0;
-	m_from_mcu = 0;
-}
-
-static MACHINE_CONFIG_START( maniach, matmania_state )
+static MACHINE_CONFIG_START( maniach )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 1500000) /* 1.5 MHz ???? */
@@ -506,13 +348,9 @@ static MACHINE_CONFIG_START( maniach, matmania_state )
 	MCFG_CPU_ADD("audiocpu", M6809, 1500000)    /* 1.5 MHz ???? */
 	MCFG_CPU_PROGRAM_MAP(maniach_sound_map)
 
-	MCFG_CPU_ADD("mcu", M68705, 1500000*2)  /* (don't know really how fast, but it doesn't need to even be this fast) */
-	MCFG_CPU_PROGRAM_MAP(maniach_mcu_map)
+	MCFG_CPU_ADD("mcu", TAITO68705_MCU, 1500000*2)  /* (don't know really how fast, but it doesn't need to even be this fast) */
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* 100 CPU slice per frame - high interleaving to sync main and mcu */
-
-	MCFG_MACHINE_START_OVERRIDE(matmania_state,maniach)
-	MCFG_MACHINE_RESET_OVERRIDE(matmania_state,maniach)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -528,14 +366,17 @@ static MACHINE_CONFIG_START( maniach, matmania_state )
 	MCFG_PALETTE_INIT_OWNER(matmania_state, matmania)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ymsnd", YM3526, 3600000)
-	MCFG_YM3526_IRQ_HANDLER(DEVWRITELINE("audiocpu", m6809_device, firq_line))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_YM3526_IRQ_HANDLER(INPUTLINE("audiocpu", M6809_FIRQ_LINE))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -656,7 +497,7 @@ ROM_START( maniach )
 	ROM_LOAD( "mc-m40.bin",   0x8000, 0x4000, CRC(2a217ed0) SHA1(b06f7c9a2c96ffe78a7065e5edadfdbf985305a5) )
 	ROM_LOAD( "mc-m30.bin",   0xc000, 0x4000, CRC(95af1723) SHA1(691ca3f7400d10897e805ff691c904fb2d5bb53a) )
 
-	ROM_REGION( 0x0800, "mcu", 0 )  /* 8k for the microcontroller */
+	ROM_REGION( 0x0800, "mcu:mcu", 0 )  /* 2k for the microcontroller */
 	ROM_LOAD( "01",           0x0000, 0x0800, CRC(00c7f80c) SHA1(d2216f660eb8310b1530fa5dc844d26ba90c5e9c) )
 
 	ROM_REGION( 0x06000, "gfx1", 0 )
@@ -716,7 +557,7 @@ ROM_START( maniach2 )
 	ROM_LOAD( "mc-m40.bin",   0x8000, 0x4000, CRC(2a217ed0) SHA1(b06f7c9a2c96ffe78a7065e5edadfdbf985305a5) )
 	ROM_LOAD( "mc-m30.bin",   0xc000, 0x4000, CRC(95af1723) SHA1(691ca3f7400d10897e805ff691c904fb2d5bb53a) )
 
-	ROM_REGION( 0x0800, "mcu", 0 )  /* 8k for the microcontroller */
+	ROM_REGION( 0x0800, "mcu:mcu", 0 )  /* 2k for the microcontroller */
 	ROM_LOAD( "01",           0x0000, 0x0800, CRC(00c7f80c) SHA1(d2216f660eb8310b1530fa5dc844d26ba90c5e9c) )
 
 	ROM_REGION( 0x06000, "gfx1", 0 )
@@ -773,7 +614,7 @@ ROM_END
  *
  *************************************/
 
-GAME( 1985, matmania, 0,        matmania, matmania, driver_device, 0, ROT270, "Technos Japan (Taito America license)", "Mat Mania", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, excthour, matmania, matmania, maniach,  driver_device, 0, ROT270, "Technos Japan (Taito license)", "Exciting Hour", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, maniach,  0,        maniach,  maniach,  driver_device, 0, ROT270, "Technos Japan (Taito America license)", "Mania Challenge (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, maniach2, maniach,  maniach,  maniach,  driver_device, 0, ROT270, "Technos Japan (Taito America license)", "Mania Challenge (set 2)", MACHINE_SUPPORTS_SAVE ) /* earlier version? */
+GAME( 1985, matmania, 0,        matmania, matmania, matmania_state, 0, ROT270, "Technos Japan (Taito America license)", "Mat Mania",               MACHINE_SUPPORTS_SAVE )
+GAME( 1985, excthour, matmania, matmania, maniach,  matmania_state, 0, ROT270, "Technos Japan (Taito license)",         "Exciting Hour",           MACHINE_SUPPORTS_SAVE )
+GAME( 1986, maniach,  0,        maniach,  maniach,  matmania_state, 0, ROT270, "Technos Japan (Taito America license)", "Mania Challenge (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, maniach2, maniach,  maniach,  maniach,  matmania_state, 0, ROT270, "Technos Japan (Taito America license)", "Mania Challenge (set 2)", MACHINE_SUPPORTS_SAVE ) // earlier version?

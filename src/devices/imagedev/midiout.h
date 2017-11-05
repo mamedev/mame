@@ -8,8 +8,8 @@
 
 *********************************************************************/
 
-#ifndef __MIDIOUT_H__
-#define __MIDIOUT_H__
+#ifndef MAME_DEVICES_IMAGEDEV_MIDIOUT_H
+#define MAME_DEVICES_IMAGEDEV_MIDIOUT_H
 
 
 /***************************************************************************
@@ -31,10 +31,10 @@ class midiout_device :    public device_t,
 {
 public:
 	// construction/destruction
-	midiout_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	midiout_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// image-level overrides
-	virtual bool call_load() override;
+	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
 
 	// image device
@@ -45,18 +45,14 @@ public:
 	virtual bool must_be_loaded() const override { return 0; }
 	virtual bool is_reset_on_load() const override { return 0; }
 	virtual const char *file_extensions() const override { return "mid"; }
-	virtual bool core_opens_image_file() const override { return FALSE; }
-	virtual const option_guide *create_option_guide() const override { return nullptr; }
+	virtual bool core_opens_image_file() const override { return false; }
 
-	virtual void tx(UINT8 state) { rx_w(state); }
+	virtual void tx(uint8_t state) { rx_w(state); }
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-
-	virtual void device_config_complete() override;
 
 	// serial overrides
 	virtual void rcv_complete() override;    // Rx completed receiving byte
@@ -66,9 +62,9 @@ private:
 };
 
 // device type definition
-extern const device_type MIDIOUT;
+DECLARE_DEVICE_TYPE(MIDIOUT, midiout_device)
 
 // device iterator
-typedef device_type_iterator<&device_creator<midiout_device>, midiout_device> midiout_device_iterator;
+typedef device_type_iterator<midiout_device> midiout_device_iterator;
 
-#endif /* __MIDIOUT_H__ */
+#endif // MAME_DEVICES_IMAGEDEV_MIDIOUT_H

@@ -13,13 +13,17 @@ TODO:
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/asterix.h"
+#include "includes/konamipt.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 #include "sound/k053260.h"
-#include "includes/konamipt.h"
-#include "includes/asterix.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 #if 0
 READ16_MEMBER(asterix_state::control2_r)
@@ -40,6 +44,14 @@ WRITE16_MEMBER(asterix_state::control2_w)
 
 		/* bit 5 is select tile bank */
 		m_k056832->set_tile_bank((data & 0x20) >> 5);
+		// TODO: looks like 0xffff is used from time to time for chip selection/reset something, not unlike Jackal
+		if((data & 0xff) != 0xff)
+		{
+			machine().bookkeeping().coin_counter_w(0, data & 0x08);
+			machine().bookkeeping().coin_counter_w(1, data & 0x10);
+			machine().bookkeeping().coin_lockout_w(0, data & 0x40);
+			machine().bookkeeping().coin_lockout_w(1, data & 0x80);
+		}
 	}
 }
 
@@ -60,7 +72,7 @@ void asterix_state::device_timer(emu_timer &timer, device_timer_id id, int param
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in asterix_state::device_timer");
+		assert_always(false, "Unknown id in asterix_state::device_timer");
 	}
 }
 
@@ -85,13 +97,13 @@ WRITE16_MEMBER(asterix_state::protection_w)
 
 	if (offset == 1)
 	{
-		UINT32 cmd = (m_prot[0] << 16) | m_prot[1];
+		uint32_t cmd = (m_prot[0] << 16) | m_prot[1];
 		switch (cmd >> 24)
 		{
 		case 0x64:
 			{
-			UINT32 param1 = (read_word(cmd & 0xffffff) << 16) | read_word((cmd & 0xffffff) + 2);
-			UINT32 param2 = (read_word((cmd & 0xffffff) + 4) << 16) | read_word((cmd & 0xffffff) + 6);
+			uint32_t param1 = (read_word(cmd & 0xffffff) << 16) | read_word((cmd & 0xffffff) + 2);
+			uint32_t param2 = (read_word((cmd & 0xffffff) + 4) << 16) | read_word((cmd & 0xffffff) + 6);
 
 			switch (param1 >> 24)
 			{
@@ -123,14 +135,14 @@ WRITE16_MEMBER(asterix_state::protection_w)
 
 	if (offset == 1)
 	{
-		UINT32 cmd = (m_prot[0] << 16) | m_prot[1];
+		uint32_t cmd = (m_prot[0] << 16) | m_prot[1];
 		switch (cmd >> 24)
 		{
 		case 0x64:
 		{
-			UINT32 param1 = (space.read_word(cmd & 0xffffff) << 16)
+			uint32_t param1 = (space.read_word(cmd & 0xffffff) << 16)
 				| space.read_word((cmd & 0xffffff) + 2);
-			UINT32 param2 = (space.read_word((cmd & 0xffffff) + 4) << 16)
+			uint32_t param2 = (space.read_word((cmd & 0xffffff) + 4) << 16)
 				| space.read_word((cmd & 0xffffff) + 6);
 
 			switch (param1 >> 24)
@@ -245,7 +257,7 @@ void asterix_state::machine_reset()
 	}
 }
 
-static MACHINE_CONFIG_START( asterix, asterix_state )
+static MACHINE_CONFIG_START( asterix )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2) // 12MHz
@@ -316,7 +328,7 @@ ROM_START( asterix )
 	ROM_REGION( 0x200000, "k053260", 0 )
 	ROM_LOAD( "068a06.1e", 0x000000, 0x200000, CRC(6df9ec0e) SHA1(cee60312e9813bd6579f3ac7c3c2521a8e633eca) )
 
-	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_REGION( 0x80, "eeprom", 0 )
 	ROM_LOAD( "asterix.nv", 0x0000, 0x0080, CRC(490085c8) SHA1(2a79e7c79db4b4fb0e6a7249cfd6a57e74b170e3) )
 ROM_END
 
@@ -341,7 +353,7 @@ ROM_START( asterixeac )
 	ROM_REGION( 0x200000, "k053260", 0 )
 	ROM_LOAD( "068a06.1e", 0x000000, 0x200000, CRC(6df9ec0e) SHA1(cee60312e9813bd6579f3ac7c3c2521a8e633eca) )
 
-	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_REGION( 0x80, "eeprom", 0 )
 	ROM_LOAD( "asterixeac.nv", 0x0000, 0x0080, CRC(490085c8) SHA1(2a79e7c79db4b4fb0e6a7249cfd6a57e74b170e3) )
 ROM_END
 
@@ -366,7 +378,7 @@ ROM_START( asterixeaa )
 	ROM_REGION( 0x200000, "k053260", 0 )
 	ROM_LOAD( "068a06.1e", 0x000000, 0x200000, CRC(6df9ec0e) SHA1(cee60312e9813bd6579f3ac7c3c2521a8e633eca) )
 
-	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_REGION( 0x80, "eeprom", 0 )
 	ROM_LOAD( "asterixeaa.nv", 0x0000, 0x0080, CRC(30275de0) SHA1(4bbf90a4e5b20406153329e9e7c4c2bf72676f8d) )
 ROM_END
 
@@ -391,7 +403,7 @@ ROM_START( asterixaad )
 	ROM_REGION( 0x200000, "k053260", 0 )
 	ROM_LOAD( "068a06.1e", 0x000000, 0x200000, CRC(6df9ec0e) SHA1(cee60312e9813bd6579f3ac7c3c2521a8e633eca) )
 
-	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_REGION( 0x80, "eeprom", 0 )
 	ROM_LOAD( "asterixaad.nv", 0x0000, 0x0080, CRC(bcca86a7) SHA1(1191b0011749e2516df723c9d63da9c2304fa594) )
 ROM_END
 
@@ -416,7 +428,7 @@ ROM_START( asterixj )
 	ROM_REGION( 0x200000, "k053260", 0 )
 	ROM_LOAD( "068a06.1e", 0x000000, 0x200000, CRC(6df9ec0e) SHA1(cee60312e9813bd6579f3ac7c3c2521a8e633eca) )
 
-	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_REGION( 0x80, "eeprom", 0 )
 	ROM_LOAD( "asterixj.nv", 0x0000, 0x0080, CRC(84229f2c) SHA1(34c7491c731fbf741dfd53bfc559d91201ccfb03) )
 ROM_END
 
@@ -424,8 +436,8 @@ ROM_END
 DRIVER_INIT_MEMBER(asterix_state,asterix)
 {
 #if 0
-	*(UINT16 *)(memregion("maincpu")->base() + 0x07f34) = 0x602a;
-	*(UINT16 *)(memregion("maincpu")->base() + 0x00008) = 0x0400;
+	*(uint16_t *)(memregion("maincpu")->base() + 0x07f34) = 0x602a;
+	*(uint16_t *)(memregion("maincpu")->base() + 0x00008) = 0x0400;
 #endif
 }
 

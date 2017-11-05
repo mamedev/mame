@@ -26,6 +26,7 @@
 
 class running_machine;
 class osd_window;
+struct slider_state;
 class slider_dirty_notifier;
 class render_primitive;
 
@@ -84,7 +85,7 @@ private:
 
 	void update_screen_count(uint32_t screen_count);
 
-	virtual INT32 slider_changed(running_machine &machine, void *arg, int id, std::string *str, INT32 newval) override;
+	virtual int32_t slider_changed(running_machine &machine, void *arg, int id, std::string *str, int32_t newval) override;
 	void create_selection_slider(uint32_t screen_index);
 	bool needs_sliders();
 
@@ -103,6 +104,7 @@ private:
 	std::vector<bgfx_chain*>    m_screen_chains;
 	std::vector<std::string>    m_chain_names;
 	std::vector<ui::menu_item>  m_selection_sliders;
+	std::vector<std::unique_ptr<slider_state>> m_core_sliders;
 	std::vector<int32_t>        m_current_chain;
 
 	static const uint32_t       CHAIN_NONE;

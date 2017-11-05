@@ -3,7 +3,7 @@
 /***************************************************************************
 
 Skeleton driver for Dragon's Lair II: Time Warp
-by Leland
+by Leland Corporation
 
 Notes:
 - two irqs, timer (vector 0x20/4) and serial (vector 0x2c/4)
@@ -32,6 +32,8 @@ http://www.dragons-lair-project.com/tech/pages/dl2.asp
 
 #include "emu.h"
 #include "cpu/i86/i86.h"
+#include "screen.h"
+#include "speaker.h"
 
 #define MAIN_CLOCK XTAL_30MHz
 
@@ -46,7 +48,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 
 	// screen updates
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	INTERRUPT_GEN_MEMBER(dlair2_timer_irq);
 	DECLARE_PALETTE_INIT(dlair2);
@@ -63,7 +65,7 @@ void dlair2_state::video_start()
 {
 }
 
-UINT32 dlair2_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
+uint32_t dlair2_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	return 0;
 }
@@ -171,7 +173,7 @@ INTERRUPT_GEN_MEMBER(dlair2_state::dlair2_timer_irq)
 	device.execute().set_input_line_and_vector(0,HOLD_LINE,0x20/4);
 }
 
-static MACHINE_CONFIG_START( dlair2, dlair2_state )
+static MACHINE_CONFIG_START( dlair2 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8088 , MAIN_CLOCK/3)   /* Schematics show I8088 "max" CPU */
@@ -328,18 +330,19 @@ ROM_START( spacea91_13e )
 ROM_END
 
 
-GAME( 1991, dlair2,       0,        dlair2,  dlair2, driver_device,  0,       ROT0, "Leland",      "Dragon's Lair 2: Time Warp (US v3.19)", MACHINE_IS_SKELETON )
-GAME( 1991, dlair2_319e,  dlair2,   dlair2,  dlair2, driver_device,  0,       ROT0, "Leland",      "Dragon's Lair 2: Time Warp (Euro v3.19)", MACHINE_IS_SKELETON )
-GAME( 1991, dlair2_319s,  dlair2,   dlair2,  dlair2, driver_device,  0,       ROT0, "Leland",      "Dragon's Lair 2: Time Warp (Spanish v3.19)", MACHINE_IS_SKELETON )
-GAME( 1991, dlair2_318,   dlair2,   dlair2,  dlair2, driver_device,  0,       ROT0, "Leland",      "Dragon's Lair 2: Time Warp (US v3.18)", MACHINE_IS_SKELETON )
-GAME( 1991, dlair2_317e,  dlair2,   dlair2,  dlair2, driver_device,  0,       ROT0, "Leland",      "Dragon's Lair 2: Time Warp (Euro v3.17)", MACHINE_IS_SKELETON )
-GAME( 1991, dlair2_316e,  dlair2,   dlair2,  dlair2, driver_device,  0,       ROT0, "Leland",      "Dragon's Lair 2: Time Warp (Euro v3.16)", MACHINE_IS_SKELETON )
-GAME( 1991, dlair2_315,   dlair2,   dlair2,  dlair2, driver_device,  0,       ROT0, "Leland",      "Dragon's Lair 2: Time Warp (US v3.15)", MACHINE_IS_SKELETON )
-GAME( 1991, dlair2_315s,  dlair2,   dlair2,  dlair2, driver_device,  0,       ROT0, "Leland",      "Dragon's Lair 2: Time Warp (Spanish v3.15)", MACHINE_IS_SKELETON )
-GAME( 1991, dlair2_314,   dlair2,   dlair2,  dlair2, driver_device,  0,       ROT0, "Leland",      "Dragon's Lair 2: Time Warp (US v3.14)", MACHINE_IS_SKELETON )
-GAME( 1991, dlair2_312,   dlair2,   dlair2,  dlair2, driver_device,  0,       ROT0, "Leland",      "Dragon's Lair 2: Time Warp (Euro v3.12)", MACHINE_IS_SKELETON )
-GAME( 1991, dlair2_300,   dlair2,   dlair2,  dlair2, driver_device,  0,       ROT0, "Leland",      "Dragon's Lair 2: Time Warp (US v3.00)", MACHINE_IS_SKELETON )
-GAME( 1991, dlair2_211,   dlair2,   dlair2,  dlair2, driver_device,  0,       ROT0, "Leland",      "Dragon's Lair 2: Time Warp (US v2.11)", MACHINE_IS_SKELETON )
-GAME( 1991, dlair2_200,   dlair2,   dlair2,  dlair2, driver_device,  0,       ROT0, "Leland",      "Dragon's Lair 2: Time Warp (US v2.00, AMOA prototype)", MACHINE_IS_SKELETON )
-GAME( 1991, spacea91,     0,        dlair2,  dlair2, driver_device,  0,       ROT0, "Leland",      "Space Ace (DL2 Conversion) (US v1.3)", MACHINE_IS_SKELETON )
-GAME( 1991, spacea91_13e, spacea91, dlair2,  dlair2, driver_device,  0,       ROT0, "Leland",      "Space Ace (DL2 Conversion) (Euro v1.3)", MACHINE_IS_SKELETON )
+GAME( 1991, dlair2,       0,        dlair2,  dlair2, dlair2_state,  0, ROT0, "Leland Corporation", "Dragon's Lair 2: Time Warp (US v3.19)", MACHINE_IS_SKELETON )
+GAME( 1991, dlair2_319e,  dlair2,   dlair2,  dlair2, dlair2_state,  0, ROT0, "Leland Corporation", "Dragon's Lair 2: Time Warp (Euro v3.19)", MACHINE_IS_SKELETON )
+GAME( 1991, dlair2_319s,  dlair2,   dlair2,  dlair2, dlair2_state,  0, ROT0, "Leland Corporation", "Dragon's Lair 2: Time Warp (Spanish v3.19)", MACHINE_IS_SKELETON )
+GAME( 1991, dlair2_318,   dlair2,   dlair2,  dlair2, dlair2_state,  0, ROT0, "Leland Corporation", "Dragon's Lair 2: Time Warp (US v3.18)", MACHINE_IS_SKELETON )
+GAME( 1991, dlair2_317e,  dlair2,   dlair2,  dlair2, dlair2_state,  0, ROT0, "Leland Corporation", "Dragon's Lair 2: Time Warp (Euro v3.17)", MACHINE_IS_SKELETON )
+GAME( 1991, dlair2_316e,  dlair2,   dlair2,  dlair2, dlair2_state,  0, ROT0, "Leland Corporation", "Dragon's Lair 2: Time Warp (Euro v3.16)", MACHINE_IS_SKELETON )
+GAME( 1991, dlair2_315,   dlair2,   dlair2,  dlair2, dlair2_state,  0, ROT0, "Leland Corporation", "Dragon's Lair 2: Time Warp (US v3.15)", MACHINE_IS_SKELETON )
+GAME( 1991, dlair2_315s,  dlair2,   dlair2,  dlair2, dlair2_state,  0, ROT0, "Leland Corporation", "Dragon's Lair 2: Time Warp (Spanish v3.15)", MACHINE_IS_SKELETON )
+GAME( 1991, dlair2_314,   dlair2,   dlair2,  dlair2, dlair2_state,  0, ROT0, "Leland Corporation", "Dragon's Lair 2: Time Warp (US v3.14)", MACHINE_IS_SKELETON )
+GAME( 1991, dlair2_312,   dlair2,   dlair2,  dlair2, dlair2_state,  0, ROT0, "Leland Corporation", "Dragon's Lair 2: Time Warp (Euro v3.12)", MACHINE_IS_SKELETON )
+GAME( 1991, dlair2_300,   dlair2,   dlair2,  dlair2, dlair2_state,  0, ROT0, "Leland Corporation", "Dragon's Lair 2: Time Warp (US v3.00)", MACHINE_IS_SKELETON )
+GAME( 1991, dlair2_211,   dlair2,   dlair2,  dlair2, dlair2_state,  0, ROT0, "Leland Corporation", "Dragon's Lair 2: Time Warp (US v2.11)", MACHINE_IS_SKELETON )
+GAME( 1991, dlair2_200,   dlair2,   dlair2,  dlair2, dlair2_state,  0, ROT0, "Leland Corporation", "Dragon's Lair 2: Time Warp (US v2.00, AMOA prototype)", MACHINE_IS_SKELETON )
+
+GAME( 1991, spacea91,     spaceace, dlair2,  dlair2, dlair2_state,  0, ROT0, "Cinematronics (Leland Corporation license)", "Space Ace (DL2 Conversion) (US v1.3)", MACHINE_IS_SKELETON )
+GAME( 1991, spacea91_13e, spaceace, dlair2,  dlair2, dlair2_state,  0, ROT0, "Cinematronics (Leland Corporation license)", "Space Ace (DL2 Conversion) (Euro v1.3)", MACHINE_IS_SKELETON )

@@ -8,12 +8,15 @@
 
 ***************************************************************************/
 
+#ifndef MAME_FRONTEND_CHEAT_H
+#define MAME_FRONTEND_CHEAT_H
+
 #pragma once
 
-#ifndef __CHEAT_H__
-#define __CHEAT_H__
-
 #include "debug/express.h"
+#include "debug/debugcpu.h"
+#include "ui/text.h"
+#include "xmlfile.h"
 
 
 //**************************************************************************
@@ -28,7 +31,7 @@ enum script_state
 	SCRIPT_STATE_CHANGE,
 	SCRIPT_STATE_COUNT
 };
-DECLARE_ENUM_OPERATORS(script_state)
+DECLARE_ENUM_INCDEC_OPERATORS(script_state)
 
 
 
@@ -47,21 +50,31 @@ class number_and_format
 {
 public:
 	// construction/destruction
-	number_and_format(UINT64 value = 0, int format = 0)
-		: m_value(value),
-			m_format(format) { }
+	constexpr number_and_format(
+			uint64_t value = 0,
+			util::xml::data_node::int_format format = util::xml::data_node::int_format::DECIMAL)
+		: m_value(value)
+		, m_format(format)
+	{
+	}
+
+	// copyable/movable
+	constexpr number_and_format(number_and_format const &) = default;
+	number_and_format(number_and_format &&) = default;
+	number_and_format &operator=(number_and_format const &) = default;
+	number_and_format &operator=(number_and_format &&) = default;
 
 	// pass-through to look like a regular number
-	operator UINT64 &() { return m_value; }
-	operator const UINT64 &() const { return m_value; }
+	operator uint64_t &() { return m_value; }
+	operator const uint64_t &() const { return m_value; }
 
 	// format the number according to its format
 	std::string format() const;
 
 private:
 	// internal state
-	UINT64          m_value;
-	int             m_format;
+	uint64_t                            m_value;
+	util::xml::data_node::int_format    m_format;
 };
 
 
@@ -72,13 +85,17 @@ class cheat_parameter
 {
 public:
 	// construction/destruction
-	cheat_parameter(cheat_manager &manager, symbol_table &symbols, const char *filename, xml_data_node &paramnode);
+	cheat_parameter(
+			cheat_manager &manager,
+			symbol_table &symbols,
+			char const *filename,
+			util::xml::data_node const &paramnode);
 
 	// queries
-	const char *text();
-	bool has_itemlist() const { return (m_itemlist.count() != 0); }
-	bool is_minimum() const { return (m_value == ((m_itemlist.count() == 0) ? m_minval : m_itemlist.first()->value())); }
-	bool is_maximum() const { return (m_value == ((m_itemlist.count() == 0) ? m_maxval : m_itemlist.last()->value())); }
+	char const *text();
+	bool has_itemlist() const { return !m_itemlist.empty(); }
+	bool is_minimum() const { return (m_itemlist.empty() ? m_minval : m_itemlist.front().value()) == m_value; }
+	bool is_maximum() const { return (m_itemlist.empty() ? m_maxval : m_itemlist.back().value()) == m_value; }
 
 	// state setters
 	bool set_minimum_state();
@@ -92,34 +109,37 @@ private:
 	// a single item in a parameter item list
 	class item
 	{
-		friend class simple_list<item>;
-
 	public:
 		// construction/destruction
-		item(const char *text, UINT64 value, int valformat)
-			: m_next(nullptr),
-				m_text(text),
-				m_value(value, valformat) { }
+		item(const char *text, uint64_t value, util::xml::data_node::int_format valformat)
+			: m_text(text)
+			, m_value(value, valformat)
+		{
+		}
+
+		// copyable/movable
+		item(item const &) = default;
+		item(item &&) = default;
+		item &operator=(item const &) = default;
+		item &operator=(item &&) = default;
 
 		// getters
-		item *next() const { return m_next; }
-		const number_and_format &value() const { return m_value; }
-		const char *text() const { return m_text.c_str(); }
+		number_and_format const &value() const { return m_value; }
+		char const *text() const { return m_text.c_str(); }
 
 	private:
 		// internal state
-		item *              m_next;                         // next item in list
-		std::string         m_text;                         // name of the item
-		number_and_format   m_value;                        // value of the item
+		std::string         m_text;     // name of the item
+		number_and_format   m_value;    // value of the item
 	};
 
 	// internal state
-	number_and_format   m_minval;                       // minimum value
-	number_and_format   m_maxval;                       // maximum value
-	number_and_format   m_stepval;                      // step value
-	UINT64              m_value;                        // live value of the parameter
-	std::string         m_curtext;                      // holding for a value string
-	simple_list<item>   m_itemlist;                     // list of items
+	number_and_format   m_minval;       // minimum value
+	number_and_format   m_maxval;       // maximum value
+	number_and_format   m_stepval;      // step value
+	uint64_t            m_value;        // live value of the parameter
+	std::string         m_curtext;      // holding for a value string
+	std::vector<item>   m_itemlist;     // list of items
 };
 
 
@@ -128,80 +148,81 @@ private:
 // a script entry, specifying which state to execute under
 class cheat_script
 {
-	friend class simple_list<cheat_script>;
-
 public:
 	// construction/destruction
-	cheat_script(cheat_manager &manager, symbol_table &symbols, const char *filename, xml_data_node &scriptnode);
+	cheat_script(
+			cheat_manager &manager,
+			symbol_table &symbols,
+			char const *filename,
+			util::xml::data_node const &scriptnode);
 
 	// getters
 	script_state state() const { return m_state; }
 
 	// actions
-	void execute(cheat_manager &manager, UINT64 &argindex);
+	void execute(cheat_manager &manager, uint64_t &argindex);
 	void save(emu_file &cheatfile) const;
 
 private:
 	// an entry within the script
 	class script_entry
 	{
-		friend class simple_list<script_entry>;
-
 	public:
 		// construction/destruction
-		script_entry(cheat_manager &manager, symbol_table &symbols, const char *filename, xml_data_node &entrynode, bool isaction);
-
-		// getters
-		script_entry *next() const { return m_next; }
+		script_entry(
+				cheat_manager &manager,
+				symbol_table &symbols,
+				char const *filename,
+				util::xml::data_node const &entrynode,
+				bool isaction);
 
 		// actions
-		void execute(cheat_manager &manager, UINT64 &argindex);
+		void execute(cheat_manager &manager, uint64_t &argindex);
 		void save(emu_file &cheatfile) const;
 
 	private:
 		// an argument for output
 		class output_argument
 		{
-			friend class simple_list<output_argument>;
-
 		public:
 			// construction/destruction
-			output_argument(cheat_manager &manager, symbol_table &symbols, const char *filename, xml_data_node &argnode);
+			output_argument(
+					cheat_manager &manager,
+					symbol_table &symbols,
+					char const *filename,
+					util::xml::data_node const &argnode);
 
 			// getters
-			output_argument *next() const { return m_next; }
 			int count() const { return m_count; }
-			int values(UINT64 &argindex, UINT64 *result);
+			int values(uint64_t &argindex, uint64_t *result);
 
 			// actions
 			void save(emu_file &cheatfile) const;
 
 		private:
 			// internal state
-			output_argument *   m_next;                         // link to next argument
-			parsed_expression   m_expression;                   // expression for argument
-			UINT64              m_count;                        // number of repetitions
+			parsed_expression   m_expression;   // expression for argument
+			uint64_t            m_count;        // number of repetitions
 		};
 
 		// internal helpers
-		void validate_format(const char *filename, int line);
+		void validate_format(char const *filename, int line);
 
 		// internal state
-		script_entry *      m_next;                         // link to next entry
-		parsed_expression   m_condition;                    // condition under which this is executed
-		parsed_expression   m_expression;                   // expression to execute
-		std::string         m_format;                       // string format to print
-		simple_list<output_argument> m_arglist;             // list of arguments
-		INT8                m_line;                         // which line to print on
-		UINT8               m_justify;                      // justification when printing
+		parsed_expression                               m_condition;    // condition under which this is executed
+		parsed_expression                               m_expression;   // expression to execute
+		std::string                                     m_format;       // string format to print
+		std::vector<std::unique_ptr<output_argument>>   m_arglist;      // list of arguments
+		int8_t                                          m_line;         // which line to print on
+		ui::text_layout::text_justify                   m_justify;      // justification when printing
 
 		// constants
-		static const int MAX_ARGUMENTS = 32;
+		static constexpr int MAX_ARGUMENTS = 32;
 	};
 
 	// internal state
-	simple_list<script_entry> m_entrylist;              // list of actions to perform
-	script_state        m_state;                        // which state this script is for
+	std::vector<std::unique_ptr<script_entry>>  m_entrylist;    // list of actions to perform
+	script_state                                m_state;        // which state this script is for
 };
 
 
@@ -210,16 +231,13 @@ private:
 // a single cheat
 class cheat_entry
 {
-	friend class simple_list<cheat_entry>;
-
 public:
 	// construction/destruction
-	cheat_entry(cheat_manager &manager, symbol_table &globaltable, const char *filename, xml_data_node &cheatnode);
+	cheat_entry(cheat_manager &manager, symbol_table &globaltable, const char *filename, util::xml::data_node const &cheatnode);
 	~cheat_entry();
 
 	// getters
 	cheat_manager &manager() const { return m_manager; }
-	cheat_entry *next() const { return m_next; }
 	script_state state() const { return m_state; }
 	const char *description() const { return m_description.c_str(); }
 	const char *comment() const { return m_comment.c_str(); }
@@ -253,7 +271,7 @@ public:
 	void save(emu_file &cheatfile) const;
 
 	// UI helpers
-	void menu_text(std::string &description, std::string &state, UINT32 &flags);
+	void menu_text(std::string &description, std::string &state, uint32_t &flags);
 
 	// per-frame update
 	void frame_update() { if (m_state == SCRIPT_STATE_RUN) execute_run_script(); }
@@ -264,22 +282,21 @@ private:
 	std::unique_ptr<cheat_script> &script_for_state(script_state state);
 
 	// internal state
-	cheat_manager &     m_manager;                      // reference to our manager
-	cheat_entry *       m_next;                         // next cheat entry
-	std::string         m_description;                  // string description/menu title
-	std::string         m_comment;                      // comment data
-	std::unique_ptr<cheat_parameter> m_parameter;          // parameter
-	std::unique_ptr<cheat_script> m_on_script;             // script to run when turning on
-	std::unique_ptr<cheat_script> m_off_script;            // script to run when turning off
-	std::unique_ptr<cheat_script> m_change_script;         // script to run when value changes
-	std::unique_ptr<cheat_script> m_run_script;            // script to run each frame when on
-	symbol_table        m_symbols;                      // symbol table for this cheat
-	script_state        m_state;                        // current cheat state
-	UINT32              m_numtemp;                      // number of temporary variables
-	UINT64              m_argindex;                     // argument index variable
+	cheat_manager &                     m_manager;          // reference to our manager
+	std::string                         m_description;      // string description/menu title
+	std::string                         m_comment;          // comment data
+	std::unique_ptr<cheat_parameter>    m_parameter;        // parameter
+	std::unique_ptr<cheat_script>       m_on_script;        // script to run when turning on
+	std::unique_ptr<cheat_script>       m_off_script;       // script to run when turning off
+	std::unique_ptr<cheat_script>       m_change_script;    // script to run when value changes
+	std::unique_ptr<cheat_script>       m_run_script;       // script to run each frame when on
+	symbol_table                        m_symbols;          // symbol table for this cheat
+	script_state                        m_state;            // current cheat state
+	uint32_t                            m_numtemp;          // number of temporary variables
+	uint64_t                            m_argindex;         // argument index variable
 
 	// constants
-	static const int DEFAULT_TEMP_VARIABLES = 10;
+	static constexpr int DEFAULT_TEMP_VARIABLES = 10;
 };
 
 
@@ -295,10 +312,10 @@ public:
 	// getters
 	running_machine &machine() const { return m_machine; }
 	bool enabled() const { return !m_disabled; }
-	const simple_list<cheat_entry> &entries() const { return m_cheatlist; }
+	std::vector<std::unique_ptr<cheat_entry>> const &entries() const { return m_cheatlist; }
 
 	// setters
-	void set_enable(bool enable = true);
+	void set_enable(bool enable);
 
 	// actions
 	void reload();
@@ -306,32 +323,33 @@ public:
 	void render_text(mame_ui_manager &mui, render_container &container);
 
 	// output helpers
-	std::string &get_output_astring(int row, int justify);
+	std::string &get_output_string(int row, ui::text_layout::text_justify justify);
 
 	// global helpers
-	static std::string quote_expression(const parsed_expression &expression);
-	static UINT64 execute_frombcd(symbol_table &table, void *ref, int params, const UINT64 *param);
-	static UINT64 execute_tobcd(symbol_table &table, void *ref, int params, const UINT64 *param);
+	static std::string quote_expression(parsed_expression const &expression);
+	static uint64_t execute_frombcd(symbol_table &table, void *ref, int params, uint64_t const *param);
+	static uint64_t execute_tobcd(symbol_table &table, void *ref, int params, uint64_t const *param);
 
 private:
 	// internal helpers
 	void frame_update();
-	void load_cheats(const char *filename);
+	void load_cheats(char const *filename);
 
 	// internal state
-	running_machine &   m_machine;                          // reference to our machine
-	simple_list<cheat_entry> m_cheatlist;                   // cheat list
-	UINT64              m_framecount;                       // frame count
-	std::vector<std::string>  m_output;                     // array of output strings
-	std::vector<UINT8>        m_justify;                    // justification for each string
-	UINT8               m_numlines;                         // number of lines available for output
-	INT8                m_lastline;                         // last line used for output
-	bool                m_disabled;                         // true if the cheat engine is disabled
-	symbol_table        m_symtable;                         // global symbol table
+	running_machine &                           m_machine;      // reference to our machine
+	std::vector<std::unique_ptr<cheat_entry>>   m_cheatlist;    // cheat list
+	uint64_t                                    m_framecount;   // frame count
+	std::vector<std::string>                    m_output;       // array of output strings
+	std::vector<ui::text_layout::text_justify>  m_justify;      // justification for each string
+	uint8_t                                     m_numlines;     // number of lines available for output
+	int8_t                                      m_lastline;     // last line used for output
+	bool                                        m_disabled;     // true if the cheat engine is disabled
+	symbol_table                                m_symtable;     // global symbol table
+	std::unique_ptr<debugger_cpu>               m_cpu;          // debugger interface for cpus/memory
 
 	// constants
 	static constexpr int CHEAT_VERSION = 1;
 };
 
 
-#endif  /* __CHEAT_H__ */
+#endif  /* MAME_FRONTEND_CHEAT_H */

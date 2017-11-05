@@ -12,6 +12,7 @@
 #include "video/mc6845.h"
 #include "bus/rs232/rs232.h"
 #include "bus/rs232/keyboard.h"
+#include "screen.h"
 
 class peoplepc_state : public driver_device
 {
@@ -42,9 +43,9 @@ public:
 	required_device<floppy_connector> m_flop1;
 	required_device<i8257_device> m_dmac;
 	required_device<gfxdecode_device> m_gfxdecode;
-	required_shared_ptr<UINT16> m_gvram;
-	required_shared_ptr<UINT16> m_cvram;
-	dynamic_buffer m_charram;
+	required_shared_ptr<uint16_t> m_gvram;
+	required_shared_ptr<uint16_t> m_cvram;
+	std::vector<uint8_t> m_charram;
 
 	MC6845_UPDATE_ROW(update_row);
 	DECLARE_READ8_MEMBER(get_slave_ack);
@@ -57,10 +58,10 @@ public:
 	DECLARE_READ8_MEMBER(memory_read_byte);
 	DECLARE_WRITE8_MEMBER(memory_write_byte);
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
-	int floppy_load(floppy_image_device *dev);
+	image_init_result floppy_load(floppy_image_device *dev);
 	void floppy_unload(floppy_image_device *dev);
 
-	UINT8 m_dma0pg;
+	uint8_t m_dma0pg;
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -88,15 +89,15 @@ MC6845_UPDATE_ROW(peoplepc_state::update_row)
 	{
 		if(0)
 		{
-			UINT16 offset = ((ma | (ra << 1)) << 4) + i;
-			UINT8 data = m_gvram[offset] >> (offset & 1 ? 8 : 0);
+			uint16_t offset = ((ma | (ra << 1)) << 4) + i;
+			uint8_t data = m_gvram[offset] >> (offset & 1 ? 8 : 0);
 
 			for(j = 8; j >= 0; j--)
 				bitmap.pix32(y, (i * 8) + j) = palette[( data & 1 << j ) ? 1 : 0];
 		}
 		else
 		{
-			UINT8 data = m_charram[(m_cvram[(ma + i) & 0x3fff] & 0x7f) * 32 + ra];
+			uint8_t data = m_charram[(m_cvram[(ma + i) & 0x3fff] & 0x7f) * 32 + ra];
 			for(j = 0; j < 8; j++)
 				bitmap.pix32(y, (i * 8) + j) = palette[(data & (1 << j)) ? 1 : 0];
 		}
@@ -157,10 +158,10 @@ WRITE8_MEMBER(peoplepc_state::memory_write_byte)
 	prog_space.write_byte(offset | (m_dma0pg << 16), data);
 }
 
-int peoplepc_state::floppy_load(floppy_image_device *dev)
+image_init_result peoplepc_state::floppy_load(floppy_image_device *dev)
 {
 	dev->mon_w(0);
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 void peoplepc_state::floppy_unload(floppy_image_device *dev)
@@ -176,14 +177,14 @@ void peoplepc_state::machine_reset()
 
 void peoplepc_state::machine_start()
 {
-	m_gfxdecode->set_gfx(0, std::make_unique<gfx_element>(*m_palette, peoplepc_charlayout, &m_charram[0], 0, 1, 0));
+	m_gfxdecode->set_gfx(0, std::make_unique<gfx_element>(m_palette, peoplepc_charlayout, &m_charram[0], 0, 1, 0));
 	m_dma0pg = 0;
 
 	// FIXME: cheat as there no docs about how or obvious ports that set to control the motor
-	m_flop0->get_device()->setup_load_cb(floppy_image_device::load_cb(FUNC(peoplepc_state::floppy_load), this));
-	m_flop0->get_device()->setup_unload_cb(floppy_image_device::unload_cb(FUNC(peoplepc_state::floppy_unload), this));
-	m_flop1->get_device()->setup_load_cb(floppy_image_device::load_cb(FUNC(peoplepc_state::floppy_load), this));
-	m_flop1->get_device()->setup_unload_cb(floppy_image_device::unload_cb(FUNC(peoplepc_state::floppy_unload), this));
+	m_flop0->get_device()->setup_load_cb(floppy_image_device::load_cb(&peoplepc_state::floppy_load, this));
+	m_flop0->get_device()->setup_unload_cb(floppy_image_device::unload_cb(&peoplepc_state::floppy_unload, this));
+	m_flop1->get_device()->setup_load_cb(floppy_image_device::load_cb(&peoplepc_state::floppy_load, this));
+	m_flop1->get_device()->setup_unload_cb(floppy_image_device::unload_cb(&peoplepc_state::floppy_unload, this));
 }
 
 static ADDRESS_MAP_START( peoplepc_map, AS_PROGRAM, 16, peoplepc_state )
@@ -232,7 +233,7 @@ static DEVICE_INPUT_DEFAULTS_START(keyboard)
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
 DEVICE_INPUT_DEFAULTS_END
 
-static MACHINE_CONFIG_START( olypeopl, peoplepc_state)
+static MACHINE_CONFIG_START( olypeopl )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8086, XTAL_14_7456MHz/3)
 	MCFG_CPU_PROGRAM_MAP(peoplepc_map)
@@ -247,12 +248,18 @@ static MACHINE_CONFIG_START( olypeopl, peoplepc_state)
 	MCFG_PIT8253_CLK2(XTAL_14_7456MHz/6)
 	MCFG_PIT8253_OUT2_HANDLER(DEVWRITELINE("pic8259_0", pic8259_device, ir0_w))
 
-	MCFG_PIC8259_ADD("pic8259_0", INPUTLINE("maincpu", 0), VCC, READ8(peoplepc_state, get_slave_ack))
-	MCFG_PIC8259_ADD("pic8259_1", DEVWRITELINE("pic8259_0", pic8259_device, ir7_w), GND, NOOP)
+	MCFG_DEVICE_ADD("pic8259_0", PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
+	MCFG_PIC8259_IN_SP_CB(VCC)
+	MCFG_PIC8259_CASCADE_ACK_CB(READ8(peoplepc_state, get_slave_ack))
+
+	MCFG_DEVICE_ADD("pic8259_1", PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(DEVWRITELINE("pic8259_0", pic8259_device, ir7_w))
+	MCFG_PIC8259_IN_SP_CB(GND)
 
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
 
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green)
+	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
 	MCFG_SCREEN_RAW_PARAMS(XTAL_22MHz,640,0,640,475,0,475)
 	MCFG_SCREEN_UPDATE_DEVICE( "h46505", mc6845_device, screen_update )
 
@@ -299,4 +306,4 @@ ROM_START( olypeopl )
 	ROMX_LOAD( "u01277g3.bin", 0x00001, 0x1000, CRC(3295691c) SHA1(7d7ade62117d11656b8dd86cf0703127616d55bc), ROM_SKIP(1)|ROM_BIOS(2))
 ROM_END
 
-COMP( 198?, olypeopl,   0,    0,         olypeopl,      0, driver_device,      0,      "Olympia", "People PC", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+COMP( 198?, olypeopl,   0,    0,         olypeopl,      0, peoplepc_state,      0,      "Olympia", "People PC", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)

@@ -11,6 +11,9 @@
 #include "includes/neogeo.h"
 #include "video/resnet.h"
 
+#define VERBOSE     (0)
+
+
 #define NUM_PENS    (0x1000)
 
 /*************************************
@@ -71,16 +74,16 @@ void neogeo_state::set_pens()
 }
 
 
-void neogeo_state::set_screen_shadow(int data)
+WRITE_LINE_MEMBER(neogeo_state::set_screen_shadow)
 {
-	m_screen_shadow = data;
+	m_screen_shadow = state;
 	set_pens();
 }
 
 
-void neogeo_state::set_palette_bank(int data)
+WRITE_LINE_MEMBER(neogeo_state::set_palette_bank)
 {
-	m_palette_bank = data ? 0x1000 : 0;
+	m_palette_bank = state ? 0x1000 : 0;
 	set_pens();
 }
 
@@ -158,7 +161,7 @@ void neogeo_state::video_reset()
  *
  *************************************/
 
-UINT32 neogeo_state::screen_update_neogeo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t neogeo_state::screen_update_neogeo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	// fill with background color first
 	bitmap.fill(*m_bg_pen, cliprect);
@@ -178,10 +181,10 @@ UINT32 neogeo_state::screen_update_neogeo(screen_device &screen, bitmap_rgb32 &b
  *
  *************************************/
 
-UINT16 neogeo_state::get_video_control()
+uint16_t neogeo_state::get_video_control()
 {
-	UINT16 ret;
-	UINT16 v_counter;
+	uint16_t ret;
+	uint16_t v_counter;
 
 	/*
 	    The format of this very important location is:  AAAA AAAA A??? BCCC
@@ -218,7 +221,7 @@ UINT16 neogeo_state::get_video_control()
 }
 
 
-void neogeo_state::set_video_control(UINT16 data)
+void neogeo_state::set_video_control(uint16_t data)
 {
 	if (VERBOSE) logerror("%s: video control write %04x\n", machine().describe_context(), data);
 
@@ -231,7 +234,7 @@ void neogeo_state::set_video_control(UINT16 data)
 
 READ16_MEMBER(neogeo_state::video_register_r)
 {
-	UINT16 ret;
+	uint16_t ret;
 
 	/* accessing the LSB only is not mapped */
 	if (mem_mask == 0x00ff)

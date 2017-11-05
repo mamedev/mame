@@ -16,10 +16,15 @@ ToDo:
 *********************************************************************************************/
 
 
+#include "emu.h"
 #include "machine/genpin.h"
+
 #include "cpu/m6800/m6800.h"
 #include "machine/6821pia.h"
+#include "machine/timer.h"
 #include "sound/s14001a.h"
+#include "speaker.h"
+
 #include "st_mp200.lh"
 
 #define S14001_CLOCK                (25e5)
@@ -64,19 +69,19 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_x);
 	TIMER_DEVICE_CALLBACK_MEMBER(u11_timer);
 private:
-	UINT8 m_u10a;
-	UINT8 m_u10b;
-	UINT8 m_u11a;
-	UINT8 m_u11b;
+	uint8_t m_u10a;
+	uint8_t m_u10b;
+	uint8_t m_u11a;
+	uint8_t m_u11b;
 	bool m_u10_ca2;
 	bool m_u10_cb2;
 	bool m_u11_cb2;
 	bool m_timer_x;
 	bool m_u11_timer;
 	bool m_7d; // 7-digit display yes/no
-	UINT8 m_digit;
-	UINT8 m_counter;
-	UINT8 m_segment[5];
+	uint8_t m_digit;
+	uint8_t m_counter;
+	uint8_t m_segment[5];
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	required_device<m6800_cpu_device> m_maincpu;
@@ -335,19 +340,18 @@ WRITE_LINE_MEMBER( st_mp200_state::u11_ca2_w )
 
 	if (m_s14001a && state)
 	{
-		if BIT(m_u10a, 7)
+		if (BIT(m_u10a, 7))
 		{
 			m_s14001a->data_w(generic_space(), 0, m_u10a & 0x3f);
 			m_s14001a->start_w(1);
 			m_s14001a->start_w(0);
 		}
-		else
-		if BIT(m_u10a, 6)
+		else if (BIT(m_u10a, 6))
 		{
 			m_s14001a->force_update();
 			m_s14001a->set_output_gain(0, ((m_u10a >> 3 & 0xf) + 1) / 16.0);
 
-			UINT8 clock_divisor = 16 - (m_u10a & 0x07);
+			uint8_t clock_divisor = 16 - (m_u10a & 0x07);
 
 			m_s14001a->set_clock(S14001_CLOCK / clock_divisor / 8);
 		}
@@ -391,7 +395,7 @@ WRITE8_MEMBER( st_mp200_state::u10_a_w )
 
 READ8_MEMBER( st_mp200_state::u10_b_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	if (BIT(m_u10a, 0))
 		data |= m_io_x0->read();
@@ -440,37 +444,23 @@ WRITE8_MEMBER( st_mp200_state::u11_a_w )
 	if (!m_u10_ca2)
 	{
 		if (m_7d && BIT(data, 1))
-		{
 			m_digit = 6;
-		}
-		else if BIT(data, 2)
-		{
+		else if (BIT(data, 2))
 			m_digit = 5;
-		}
-		else if BIT(data, 3)
-		{
+		else if (BIT(data, 3))
 			m_digit = 4;
-		}
-		else if BIT(data, 4)
-		{
+		else if (BIT(data, 4))
 			m_digit = 3;
-		}
-		else if BIT(data, 5)
-		{
+		else if (BIT(data, 5))
 			m_digit = 2;
-		}
-		else if BIT(data, 6)
-		{
+		else if (BIT(data, 6))
 			m_digit = 1;
-		}
-		else if BIT(data, 7)
-		{
+		else if (BIT(data, 7))
 			m_digit = 0;
-		}
 
 		if (BIT(data, 0) && (m_counter > 8))
 		{
-			static const UINT8 patterns[16] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f,0,0,0,0,0,0 }; // MC14543
+			static const uint8_t patterns[16] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f,0,0,0,0,0,0 }; // MC14543
 			output().set_digit_value(m_digit, patterns[m_segment[0]]);
 			output().set_digit_value(10+m_digit, patterns[m_segment[1]]);
 			output().set_digit_value(20+m_digit, patterns[m_segment[2]]);
@@ -577,7 +567,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( st_mp200_state::u11_timer )
 	m_pia_u11->ca1_w(m_u11_timer);
 }
 
-static MACHINE_CONFIG_START( st_mp200, st_mp200_state )
+static MACHINE_CONFIG_START( st_mp200 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, 1000000) // no xtal, just 2 chips forming a random oscillator
 	MCFG_CPU_PROGRAM_MAP(st_mp200_map)
@@ -598,8 +588,8 @@ static MACHINE_CONFIG_START( st_mp200, st_mp200_state )
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(st_mp200_state, u10_b_w))
 	MCFG_PIA_CA2_HANDLER(WRITELINE(st_mp200_state, u10_ca2_w))
 	MCFG_PIA_CB2_HANDLER(WRITELINE(st_mp200_state, u10_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("maincpu", m6800_cpu_device, irq_line))
-	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("maincpu", m6800_cpu_device, irq_line))
+	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
+	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_x", st_mp200_state, timer_x, attotime::from_hz(120)) // mains freq*2
 
 	MCFG_DEVICE_ADD("pia_u11", PIA6821, 0)
@@ -608,8 +598,8 @@ static MACHINE_CONFIG_START( st_mp200, st_mp200_state )
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(st_mp200_state, u11_b_w))
 	MCFG_PIA_CA2_HANDLER(WRITELINE(st_mp200_state, u11_ca2_w))
 	MCFG_PIA_CB2_HANDLER(WRITELINE(st_mp200_state, u11_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("maincpu", m6800_cpu_device, irq_line))
-	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("maincpu", m6800_cpu_device, irq_line))
+	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
+	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_d", st_mp200_state, u11_timer, attotime::from_hz(634)) // 555 timer*2
 MACHINE_CONFIG_END
 
@@ -625,10 +615,19 @@ MACHINE_CONFIG_END
 /-------------------------------*/
 ROM_START(meteorp)
 	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD( "cpu_u1.716", 0x1000, 0x0800, CRC(e0fd8452) SHA1(a13215378a678e26a565742d81fdadd2e161ba7a))
-	ROM_LOAD( "cpu_u5.716", 0x1800, 0x0800, CRC(43a46997) SHA1(2c74ca10cf9091db10542960f499f39f3da277ee))
-	ROM_LOAD( "cpu_u2.716", 0x5000, 0x0800, CRC(fd396792) SHA1(b5d051a7ce7e7c2f9c4a0d900cef4f9ef2089476))
-	ROM_LOAD( "cpu_u6.716", 0x5800, 0x0800, CRC(03fa346c) SHA1(51c04123cb433e90920c241e2d1f89db4643427b))
+	ROM_LOAD( "25AROM_P21A.U1", 0x1000, 0x0800, CRC(9ee33909) SHA1(5f58e4e72af47047c8f060f98706ed9607720705))
+	ROM_LOAD( "25AROM_P23.U5",  0x1800, 0x0800, CRC(43a46997) SHA1(2c74ca10cf9091db10542960f499f39f3da277ee))
+	ROM_LOAD( "25AROM_P22.U2",  0x5000, 0x0800, CRC(fd396792) SHA1(b5d051a7ce7e7c2f9c4a0d900cef4f9ef2089476))
+	ROM_LOAD( "25AROM_P24.U6",  0x5800, 0x0800, CRC(03fa346c) SHA1(51c04123cb433e90920c241e2d1f89db4643427b))
+	ROM_RELOAD( 0xf800, 0x0800)
+ROM_END
+
+ROM_START(meteorpo)   // Original release has the bonus countdown bug when the thread engine gets overloaded with scoring
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD( "25AROM_P21.U1",  0x1000, 0x0800, CRC(e0fd8452) SHA1(a13215378a678e26a565742d81fdadd2e161ba7a))
+	ROM_LOAD( "25AROM_P23.U5",  0x1800, 0x0800, CRC(43a46997) SHA1(2c74ca10cf9091db10542960f499f39f3da277ee))
+	ROM_LOAD( "25AROM_P22.U2",  0x5000, 0x0800, CRC(fd396792) SHA1(b5d051a7ce7e7c2f9c4a0d900cef4f9ef2089476))
+	ROM_LOAD( "25AROM_P24.U6",  0x5800, 0x0800, CRC(03fa346c) SHA1(51c04123cb433e90920c241e2d1f89db4643427b))
 	ROM_RELOAD( 0xf800, 0x0800)
 ROM_END
 
@@ -648,11 +647,20 @@ ROM_END
 / Cheetah #116
 /-------------------------------*/
 ROM_START(cheetah)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD( "cpu_u1.716", 0x1000, 0x0800, CRC(6a845d94) SHA1(c272d5895edf2270f5f06fc33345bb4911abbee4))
-	ROM_LOAD( "cpu_u5.716", 0x1800, 0x0800, CRC(e7bdbe6c) SHA1(8b213c2271dbd5157e0d34a33672130b935d76be))
-	ROM_LOAD( "cpu_u2.716", 0x5000, 0x0800, CRC(a827a1a1) SHA1(723ebf193b5ce7b19df70e83caa9bb80f2e3fa66))
-	ROM_LOAD( "cpu_u6.716", 0x5800, 0x0800, CRC(ed33c227) SHA1(a96ba2814cef7663728bb5fdea2dc6ecfa219038))
+	ROM_REGION(0x10000, "maincpu", 0)   // Black cabinet version
+	ROM_LOAD( "CHEETAH__R_B20.U1", 0x1000, 0x0800, CRC(6a845d94) SHA1(c272d5895edf2270f5f06fc33345bb4911abbee4))   // 25A-E1B exists is there an E1A and/or E1 version?
+	ROM_LOAD( "CHEETAH__R_B20.U5", 0x1800, 0x0800, CRC(e7bdbe6c) SHA1(8b213c2271dbd5157e0d34a33672130b935d76be))   // 25A-E5
+	ROM_LOAD( "CHEETAH__R_B20.U2", 0x5000, 0x0800, CRC(a827a1a1) SHA1(723ebf193b5ce7b19df70e83caa9bb80f2e3fa66))   // 25A-E2
+	ROM_LOAD( "CHEETAH__R_B20.U6", 0x5800, 0x0800, CRC(ed33c227) SHA1(a96ba2814cef7663728bb5fdea2dc6ecfa219038))   // 25A-E6
+	ROM_RELOAD( 0xf800, 0x0800)
+ROM_END
+
+ROM_START(cheetahb)
+	ROM_REGION(0x10000, "maincpu", 0)   // Blue cabinet version - has different sound effects to the black cabinet version
+	ROM_LOAD( "CHEETAH__X_B16.U1", 0x1000, 0x0800, CRC(2f736A0A) SHA1(e0dc14215d90145881ac1b407fbe057770696122))
+	ROM_LOAD( "CHEETAH__X_B16.U5", 0x1800, 0x0800, CRC(168f0650) SHA1(5b3294bf64f06cc9d193bb14891b2acfbb5c06d4))
+	ROM_LOAD( "CHEETAH__X_B16.U2", 0x5000, 0x0800, CRC(f6bd41bc) SHA1(ac94f4ba17c31dfe10ab7efab63d98aa3401e4ae))
+	ROM_LOAD( "CHEETAH__X_B16.U6", 0x5800, 0x0800, CRC(c7eba210) SHA1(ced377e53f30b371e74c26527e5f8bebcc10ee59))
 	ROM_RELOAD( 0xf800, 0x0800)
 ROM_END
 
@@ -927,31 +935,33 @@ ROM_START(st_game)
 ROM_END
 
 // 6-digit
-GAME(1979,  meteorp,    0,          st_mp200,   mp200, st_mp200_state,   st_mp202,   ROT0, "Stern", "Meteor (Stern)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1980,  galaxypi,   0,          st_mp200,   mp200, st_mp200_state,   st_mp202,   ROT0, "Stern", "Galaxy", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1980,  ali,        0,          st_mp200,   mp200, st_mp200_state,   st_mp202,   ROT0, "Stern", "Ali", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1979,  meteorp,    0,          st_mp200,   mp200, st_mp200_state,   st_mp202,   ROT0, "Stern",     "Meteor (Bug fix release)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1979,  meteorpo,   meteorp,    st_mp200,   mp200, st_mp200_state,   st_mp202,   ROT0, "Stern",     "Meteor (First release)",   MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1980,  galaxypi,   0,          st_mp200,   mp200, st_mp200_state,   st_mp202,   ROT0, "Stern",     "Galaxy",                 MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1980,  ali,        0,          st_mp200,   mp200, st_mp200_state,   st_mp202,   ROT0, "Stern",     "Ali",                    MACHINE_IS_SKELETON_MECHANICAL)
 
 // 7-digit
-GAME(1980,  biggame,    0,          st_mp200,   mp200, st_mp200_state,   st_mp200,   ROT0, "Stern", "Big Game", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1980,  cheetah,    0,          st_mp200,   mp200, st_mp200_state,   st_mp200,   ROT0, "Stern", "Cheetah", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1980,  quicksil,   0,          st_mp200,   mp200, st_mp200_state,   st_mp200,   ROT0, "Stern", "Quicksilver", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1980,  seawitch,   0,          st_mp200,   mp200, st_mp200_state,   st_mp200,   ROT0, "Stern", "Seawitch", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1980,  nineball,   0,          st_mp200,   mp200, st_mp200_state,   st_mp200,   ROT0, "Stern", "Nine Ball", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1981,  lightnin,   0,          st_mp201,   mp200, st_mp200_state,   st_mp201,   ROT0, "Stern", "Lightning", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1980,  stargzr,    0,          st_mp200,   mp200, st_mp200_state,   st_mp200,   ROT0, "Stern", "Stargazer", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1981,  spltsecp,   0,          st_mp201,   mp200, st_mp200_state,   st_mp201,   ROT0, "Stern", "Split Second (Pinball)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1981,  catacomp,   0,          st_mp201,   mp200, st_mp200_state,   st_mp201,   ROT0, "Stern", "Catacomb (Pinball)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1982,  dragfist,   0,          st_mp200,   mp200, st_mp200_state,   st_mp200,   ROT0, "Stern", "Dragonfist", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1984,  lazrlord,   0,          st_mp200,   mp200, st_mp200_state,   st_mp200,   ROT0, "Stern", "Lazer Lord", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1980,  biggame,    0,          st_mp200,   mp200, st_mp200_state,   st_mp200,   ROT0, "Stern",     "Big Game",               MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1980,  cheetah,    0,          st_mp200,   mp200, st_mp200_state,   st_mp200,   ROT0, "Stern",     "Cheetah (Black Cabinet)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1980,  cheetahb,   cheetah,    st_mp200,   mp200, st_mp200_state,   st_mp202,   ROT0, "Stern",     "Cheetah (Blue Cabinet)",  MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1980,  quicksil,   0,          st_mp200,   mp200, st_mp200_state,   st_mp200,   ROT0, "Stern",     "Quicksilver",            MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1980,  seawitch,   0,          st_mp200,   mp200, st_mp200_state,   st_mp200,   ROT0, "Stern",     "Seawitch",               MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1980,  nineball,   0,          st_mp200,   mp200, st_mp200_state,   st_mp200,   ROT0, "Stern",     "Nine Ball",              MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1981,  lightnin,   0,          st_mp201,   mp200, st_mp200_state,   st_mp201,   ROT0, "Stern",     "Lightning",              MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1980,  stargzr,    0,          st_mp200,   mp200, st_mp200_state,   st_mp200,   ROT0, "Stern",     "Stargazer",              MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1981,  spltsecp,   0,          st_mp201,   mp200, st_mp200_state,   st_mp201,   ROT0, "Stern",     "Split Second (Pinball)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1981,  catacomp,   0,          st_mp201,   mp200, st_mp200_state,   st_mp201,   ROT0, "Stern",     "Catacomb (Pinball)",     MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1982,  dragfist,   0,          st_mp200,   mp200, st_mp200_state,   st_mp200,   ROT0, "Stern",     "Dragonfist",             MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1984,  lazrlord,   0,          st_mp200,   mp200, st_mp200_state,   st_mp200,   ROT0, "Stern",     "Lazer Lord",             MACHINE_IS_SKELETON_MECHANICAL)
 
 // hang after boot
-GAME(1980,  flight2k,   0,          st_mp201,   mp200, st_mp200_state,   st_mp201,   ROT0, "Stern", "Flight 2000", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1981,  freefall,   0,          st_mp201,   mp200, st_mp200_state,   st_mp201,   ROT0, "Stern", "Freefall", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1981,  viperp,     0,          st_mp200,   mp200, st_mp200_state,   st_mp200,   ROT0, "Stern", "Viper (Pinball)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1981,  ironmaid,   0,          st_mp200,   mp200, st_mp200_state,   st_mp200,   ROT0, "Stern", "Iron Maiden", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1982,  orbitor1,   0,          st_mp201,   mp200, st_mp200_state,   st_mp201,   ROT0, "Stern", "Orbitor 1", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1980,  flight2k,   0,          st_mp201,   mp200, st_mp200_state,   st_mp201,   ROT0, "Stern",     "Flight 2000",            MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1981,  freefall,   0,          st_mp201,   mp200, st_mp200_state,   st_mp201,   ROT0, "Stern",     "Freefall",               MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1981,  viperp,     0,          st_mp200,   mp200, st_mp200_state,   st_mp200,   ROT0, "Stern",     "Viper (Pinball)",        MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1981,  ironmaid,   0,          st_mp200,   mp200, st_mp200_state,   st_mp200,   ROT0, "Stern",     "Iron Maiden",            MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1982,  orbitor1,   0,          st_mp201,   mp200, st_mp200_state,   st_mp201,   ROT0, "Stern",     "Orbitor 1",              MACHINE_IS_SKELETON_MECHANICAL)
 
 // other manufacturer
-GAME(1985,  gamatron,   flight2k,   st_mp200,   mp200, st_mp200_state,   st_mp200,   ROT0, "Pinstar", "Gamatron", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1978,  blkshpsq,   0,          st_mp200,   mp200, st_mp200_state,   st_mp202,   ROT0, "Astro", "Black Sheep Squadron", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(198?,  st_game,    0,          st_mp200,   mp200, st_mp200_state,   st_mp200,   ROT0, "<unknown>", "unknown pinball game", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1985,  gamatron,   flight2k,   st_mp200,   mp200, st_mp200_state,   st_mp200,   ROT0, "Pinstar",   "Gamatron",               MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1978,  blkshpsq,   0,          st_mp200,   mp200, st_mp200_state,   st_mp202,   ROT0, "Astro",     "Black Sheep Squadron",   MACHINE_IS_SKELETON_MECHANICAL)
+GAME(198?,  st_game,    0,          st_mp200,   mp200, st_mp200_state,   st_mp200,   ROT0, "<unknown>", "unknown pinball game",   MACHINE_IS_SKELETON_MECHANICAL)

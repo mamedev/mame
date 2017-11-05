@@ -2,12 +2,13 @@
 // copyright-holders:Carl
 //TODO: determine when to switch modes and add single bit mode
 
+#include "emu.h"
 #include "pc_joy_sw.h"
 
-const device_type PC_MSSW_PAD = &device_creator<pc_mssw_pad_device>;
+DEFINE_DEVICE_TYPE(PC_MSSW_PAD, pc_mssw_pad_device, "mssw_pad", "Microsoft Sidewinder Pad")
 
-pc_mssw_pad_device::pc_mssw_pad_device(const machine_config& mconfig, const char* tag, device_t* owner, UINT32 clock) :
-	device_t(mconfig, PC_MSSW_PAD, "Microsoft Sidewinder Pad", tag, owner, clock, "mssw_pad", __FILE__),
+pc_mssw_pad_device::pc_mssw_pad_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
+	device_t(mconfig, PC_MSSW_PAD, tag, owner, clock),
 	device_pc_joy_interface(mconfig, *this),
 	m_btn1(*this, "btn1"),
 	m_btn2(*this, "btn2"),
@@ -36,7 +37,7 @@ void pc_mssw_pad_device::device_reset()
 
 void pc_mssw_pad_device::device_timer(emu_timer &timer, device_timer_id tid, int param, void *ptr)
 {
-	UINT16 pad_state = 0;
+	uint16_t pad_state = 0;
 	// only multibit mode for now
 	if(m_count == -1)
 	{
@@ -90,7 +91,7 @@ void pc_mssw_pad_device::device_timer(emu_timer &timer, device_timer_id tid, int
 			break;
 		case 4:
 		{
-			UINT8 parity = (pad_state >> 8) ^ pad_state;
+			uint8_t parity = (pad_state >> 8) ^ pad_state;
 			parity = (parity >> 4) ^ parity;
 			parity = (parity >> 2) ^ parity;
 			parity = (((parity >> 1) ^ parity) & 1);

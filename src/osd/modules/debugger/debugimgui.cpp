@@ -20,6 +20,8 @@
 #include "modules/lib/osdobj_common.h"
 #include "debug_module.h"
 #include "modules/osdmodule.h"
+#include "zippath.h"
+#include "imagedev/floppy.h"
 
 class debug_area
 {
@@ -31,13 +33,17 @@ public:
 			type(0),
 			ofs_x(0),
 			ofs_y(0),
-			exec_cmd(false)
+			is_collapsed(false),
+			exec_cmd(false),
+			scroll_end(false),
+			scroll_follow(false)
 		{
 		this->view = machine.debug_view().alloc_view(type, nullptr, this);
 		this->type = type;
 		this->m_machine = &machine;
 		this->width = 300;
 		this->height = 300;
+		this->console_prev.clear();
 
 		/* specials */
 		switch (type)
@@ -72,9 +78,14 @@ public:
 	float               view_width;
 	float               view_height;
 	bool                has_focus;
+	bool                is_collapsed;
 	bool                exec_cmd;  // console only
 	int                 src_sel;
+	bool                scroll_end;
+	bool                scroll_follow;  // set if view is to stay at the end of a scrollable area (like a log window)
 	char                console_input[512];
+	std::vector<std::string> console_history;
+	std::string         console_prev;
 };
 
 class debug_imgui : public osd_module, public debug_module
@@ -92,7 +103,16 @@ public:
 		font_size(0),
 		m_key_char(0),
 		m_hide(false),
-		m_win_count(0)
+		m_win_count(0),
+		m_has_images(false),
+		m_initialised(false),
+		m_dialog_image(nullptr),
+		m_filelist_refresh(false),
+		m_mount_open(false),
+		m_create_open(false),
+		m_create_confirm_wait(false),
+		m_selected_file(nullptr),
+		m_format_sel(0)
 	{
 	}
 
@@ -106,12 +126,34 @@ public:
 	virtual void debugger_update() override;
 
 private:
+	enum file_entry_type
+	{
+		DRIVE,
+		DIRECTORY,
+		FILE
+	};
+
+	struct file_entry
+	{
+		file_entry_type type;
+		std::string basename;
+		std::string fullpath;
+	};
+
+	struct image_type_entry
+	{
+		floppy_image_format_t* format;
+		std::string shortname;
+		std::string longname;
+	};
+
 	void handle_mouse();
 	void handle_mouse_views();
 	void handle_keys();
 	void handle_keys_views();
 	void handle_console(running_machine* machine);
 	void update();
+	void draw_images_menu();
 	void draw_console();
 	void add_disasm(int id);
 	void add_memory(int id);
@@ -123,12 +165,19 @@ private:
 	void draw_bpoints(debug_area* view_ptr, bool* opened);
 	void draw_log(debug_area* view_ptr, bool* opened);
 	void draw_view(debug_area* view_ptr, bool exp_change);
+	void draw_mount_dialog(const char* label);
+	void draw_create_dialog(const char* label);
+	void mount_image();
+	void create_image();
+	void refresh_filelist();
+	void refresh_typelist();
 	void update_cpu_view(device_t* device);
 	static bool get_view_source(void* data, int idx, const char** out_text);
+	static int history_set(ImGuiTextEditCallbackData* data);
 
 	running_machine* m_machine;
-	INT32            m_mouse_x;
-	INT32            m_mouse_y;
+	int32_t            m_mouse_x;
+	int32_t            m_mouse_y;
 	bool             m_mouse_button;
 	bool             m_prev_mouse_button;
 	bool             m_running;
@@ -136,9 +185,21 @@ private:
 	float            font_size;
 	ImVec2           m_text_size;  // size of character (assumes monospaced font is in use)
 	ImguiFontHandle  m_font;
-	UINT8            m_key_char;
+	uint8_t            m_key_char;
 	bool             m_hide;
 	int              m_win_count;  // number of active windows, does not decrease, used to ID individual windows
+	bool             m_has_images; // true if current system has any image devices
+	bool             m_initialised;  // true after initial views are created
+	device_image_interface* m_dialog_image;
+	bool             m_filelist_refresh;  // set to true to refresh mount/create dialog file lists
+	bool             m_mount_open;  // true when opening a mount dialog
+	bool             m_create_open;  // true when opening a create dialog
+	bool             m_create_confirm_wait;  // true if waiting for confirmation of the above
+	std::vector<file_entry> m_filelist;
+	std::vector<image_type_entry> m_typelist;
+	file_entry*      m_selected_file;
+	int              m_format_sel;
+	char             m_path[1024];  // path text field buffer
 };
 
 // globals
@@ -146,6 +207,7 @@ static std::vector<debug_area*> view_list;
 static debug_area* view_main_console = nullptr;
 static debug_area* view_main_disasm = nullptr;
 static debug_area* view_main_regs = nullptr;
+static int history_pos;
 
 static void view_list_add(debug_area* item)
 {
@@ -259,77 +321,17 @@ void debug_imgui::handle_keys()
 {
 	ImGuiIO& io = ImGui::GetIO();
 	ui_event event;
+	debug_area* focus_view = nullptr;
 
-	// global keys
-	if(m_machine->input().code_pressed_once(KEYCODE_F3))
-	{
-		if(m_machine->input().code_pressed(KEYCODE_LSHIFT))
-			m_machine->schedule_hard_reset();
-		else
-		{
-			m_machine->schedule_soft_reset();
-			debug_cpu_get_visible_cpu(*m_machine)->debug()->go();
-		}
-	}
+	// find view that has focus (should only be one at a time)
+	for(std::vector<debug_area*>::iterator view_ptr = view_list.begin();view_ptr != view_list.end();++view_ptr)
+		if((*view_ptr)->has_focus)
+			focus_view = *view_ptr;
 
-	if(m_machine->input().code_pressed_once(KEYCODE_F5))
-	{
-		debug_cpu_get_visible_cpu(*m_machine)->debug()->go();
-		m_running = true;
-	}
-	if(m_machine->input().code_pressed_once(KEYCODE_F6))
-	{
-		debug_cpu_get_visible_cpu(*m_machine)->debug()->go_next_device();
-		m_running = true;
-	}
-	if(m_machine->input().code_pressed_once(KEYCODE_F7))
-	{
-		debug_cpu_get_visible_cpu(*m_machine)->debug()->go_interrupt();
-		m_running = true;
-	}
-	if(m_machine->input().code_pressed_once(KEYCODE_F8))
-		debug_cpu_get_visible_cpu(*m_machine)->debug()->go_vblank();
-	if(m_machine->input().code_pressed_once(KEYCODE_F9))
-		debug_cpu_get_visible_cpu(*m_machine)->debug()->single_step_out();
-	if(m_machine->input().code_pressed_once(KEYCODE_F10))
-		debug_cpu_get_visible_cpu(*m_machine)->debug()->single_step_over();
-	if(m_machine->input().code_pressed_once(KEYCODE_F11))
-		debug_cpu_get_visible_cpu(*m_machine)->debug()->single_step();
-	if(m_machine->input().code_pressed_once(KEYCODE_F12))
-	{
-		debug_cpu_get_visible_cpu(*m_machine)->debug()->go();
-		m_hide = true;
-	}
+	// check views in main views also (only the disassembler view accepts inputs)
+	if(view_main_disasm->has_focus)
+		focus_view = view_main_disasm;
 
-/*  if(m_machine->input().code_pressed_once(KEYCODE_UP))
-        io.KeysDown[ImGuiKey_UpArrow] = true;
-    if(m_machine->input().code_pressed_once(KEYCODE_DOWN))
-        io.KeysDown[ImGuiKey_DownArrow] = true;
-    if(m_machine->input().code_pressed_once(KEYCODE_LEFT))
-        io.KeysDown[ImGuiKey_LeftArrow] = true;
-    if(m_machine->input().code_pressed_once(KEYCODE_RIGHT))
-        io.KeysDown[ImGuiKey_RightArrow] = true;
-
-    if(m_machine->input().code_pressed(KEYCODE_TAB))
-        io.KeysDown[ImGuiKey_Tab] = true;
-
-    if(m_machine->input().code_pressed_once(KEYCODE_PGUP))
-    {
-        io.KeysDown[ImGuiKey_PageUp] = true;
-    }
-    if(m_machine->input().code_pressed_once(KEYCODE_PGDN))
-    {
-        io.KeysDown[ImGuiKey_PageDown] = true;
-    }
-
-    if(m_machine->input().code_pressed_once(KEYCODE_HOME))
-    {
-        io.KeysDown[ImGuiKey_Home] = true;
-    }
-    if(m_machine->input().code_pressed_once(KEYCODE_END))
-    {
-        io.KeysDown[ImGuiKey_End] = true;
-    }*/
 	if(m_machine->input().code_pressed(KEYCODE_LCONTROL))
 		io.KeyCtrl = true;
 	else
@@ -356,23 +358,66 @@ void debug_imgui::handle_keys()
 	{
 		switch (event.event_type)
 		{
-		case UI_EVENT_CHAR:
+			case ui_event::IME_CHAR:
 			m_key_char = event.ch;
+			if(focus_view != nullptr)
+				focus_view->view->process_char(m_key_char);
 			return;
 		default:
 			break;
 		}
 	}
 
-	if(ImGui::IsKeyPressed(ITEM_ID_D) && ImGui::IsKeyDown(ITEM_ID_LCONTROL))
+	// global keys
+	if(ImGui::IsKeyPressed(ITEM_ID_F3,false))
+	{
+		if(ImGui::IsKeyDown(ITEM_ID_LSHIFT))
+			m_machine->schedule_hard_reset();
+		else
+		{
+			m_machine->schedule_soft_reset();
+			m_machine->debugger().cpu().get_visible_cpu()->debug()->go();
+		}
+	}
+
+	if(ImGui::IsKeyPressed(ITEM_ID_F5,false))
+	{
+		m_machine->debugger().cpu().get_visible_cpu()->debug()->go();
+		m_running = true;
+	}
+	if(ImGui::IsKeyPressed(ITEM_ID_F6,false))
+	{
+		m_machine->debugger().cpu().get_visible_cpu()->debug()->go_next_device();
+		m_running = true;
+	}
+	if(ImGui::IsKeyPressed(ITEM_ID_F7,false))
+	{
+		m_machine->debugger().cpu().get_visible_cpu()->debug()->go_interrupt();
+		m_running = true;
+	}
+	if(ImGui::IsKeyPressed(ITEM_ID_F8,false))
+		m_machine->debugger().cpu().get_visible_cpu()->debug()->go_vblank();
+	if(ImGui::IsKeyPressed(ITEM_ID_F9,false))
+		m_machine->debugger().cpu().get_visible_cpu()->debug()->single_step_out();
+	if(ImGui::IsKeyPressed(ITEM_ID_F10,false))
+		m_machine->debugger().cpu().get_visible_cpu()->debug()->single_step_over();
+	if(ImGui::IsKeyPressed(ITEM_ID_F11,false))
+		m_machine->debugger().cpu().get_visible_cpu()->debug()->single_step();
+	if(ImGui::IsKeyPressed(ITEM_ID_F12,false))
+	{
+		m_machine->debugger().cpu().get_visible_cpu()->debug()->go();
+		m_hide = true;
+	}
+
+	if(ImGui::IsKeyPressed(ITEM_ID_D,false) && ImGui::IsKeyDown(ITEM_ID_LCONTROL))
 		add_disasm(++m_win_count);
-	if(ImGui::IsKeyPressed(ITEM_ID_M) && ImGui::IsKeyDown(ITEM_ID_LCONTROL))
+	if(ImGui::IsKeyPressed(ITEM_ID_M,false) && ImGui::IsKeyDown(ITEM_ID_LCONTROL))
 		add_memory(++m_win_count);
-	if(ImGui::IsKeyPressed(ITEM_ID_B) && ImGui::IsKeyDown(ITEM_ID_LCONTROL))
+	if(ImGui::IsKeyPressed(ITEM_ID_B,false) && ImGui::IsKeyDown(ITEM_ID_LCONTROL))
 		add_bpoints(++m_win_count);
-	if(ImGui::IsKeyPressed(ITEM_ID_W) && ImGui::IsKeyDown(ITEM_ID_LCONTROL))
+	if(ImGui::IsKeyPressed(ITEM_ID_W,false) && ImGui::IsKeyDown(ITEM_ID_LCONTROL))
 		add_wpoints(++m_win_count);
-	if(ImGui::IsKeyPressed(ITEM_ID_L) && ImGui::IsKeyDown(ITEM_ID_LCONTROL))
+	if(ImGui::IsKeyPressed(ITEM_ID_L,false) && ImGui::IsKeyDown(ITEM_ID_LCONTROL))
 		add_log(++m_win_count);
 
 }
@@ -394,38 +439,38 @@ void debug_imgui::handle_keys_views()
 		return;
 
 	// pass keypresses to debug view with focus
-	if(m_machine->input().code_pressed_once(KEYCODE_UP))
+	if(ImGui::IsKeyPressed(ITEM_ID_UP))
 		focus_view->view->process_char(DCH_UP);
-	if(m_machine->input().code_pressed_once(KEYCODE_DOWN))
+	if(ImGui::IsKeyPressed(ITEM_ID_DOWN))
 		focus_view->view->process_char(DCH_DOWN);
-	if(m_machine->input().code_pressed_once(KEYCODE_LEFT))
+	if(ImGui::IsKeyPressed(ITEM_ID_LEFT))
 	{
-		if(m_machine->input().code_pressed(KEYCODE_LCONTROL))
+		if(ImGui::IsKeyDown(ITEM_ID_LCONTROL))
 			focus_view->view->process_char(DCH_CTRLLEFT);
 		else
 			focus_view->view->process_char(DCH_LEFT);
 	}
-	if(m_machine->input().code_pressed_once(KEYCODE_RIGHT))
+	if(ImGui::IsKeyPressed(ITEM_ID_RIGHT))
 	{
-		if(m_machine->input().code_pressed(KEYCODE_LCONTROL))
+		if(ImGui::IsKeyDown(ITEM_ID_LCONTROL))
 			focus_view->view->process_char(DCH_CTRLRIGHT);
 		else
 			focus_view->view->process_char(DCH_RIGHT);
 	}
-	if(m_machine->input().code_pressed_once(KEYCODE_PGUP))
+	if(ImGui::IsKeyPressed(ITEM_ID_PGUP))
 		focus_view->view->process_char(DCH_PUP);
-	if(m_machine->input().code_pressed_once(KEYCODE_PGDN))
+	if(ImGui::IsKeyPressed(ITEM_ID_PGDN))
 		focus_view->view->process_char(DCH_PDOWN);
-	if(m_machine->input().code_pressed_once(KEYCODE_HOME))
+	if(ImGui::IsKeyPressed(ITEM_ID_HOME))
 	{
-		if(m_machine->input().code_pressed(KEYCODE_LCONTROL))
+		if(ImGui::IsKeyDown(ITEM_ID_LCONTROL))
 			focus_view->view->process_char(DCH_CTRLHOME);
 		else
 			focus_view->view->process_char(DCH_HOME);
 	}
-	if(m_machine->input().code_pressed_once(KEYCODE_END))
+	if(ImGui::IsKeyPressed(ITEM_ID_END))
 	{
-		if(m_machine->input().code_pressed(KEYCODE_LCONTROL))
+		if(ImGui::IsKeyDown(ITEM_ID_LCONTROL))
 			focus_view->view->process_char(DCH_CTRLEND);
 		else
 			focus_view->view->process_char(DCH_END);
@@ -437,8 +482,15 @@ void debug_imgui::handle_console(running_machine* machine)
 {
 	if(view_main_console->exec_cmd && view_main_console->type == DVT_CONSOLE)
 	{
-		if(strlen(view_main_console->console_input) > 0)
-			debug_console_execute_command(*m_machine, view_main_console->console_input, 1);
+		// if console input is empty, then do a single step
+		if(strlen(view_main_console->console_input) == 0)
+		{
+			m_machine->debugger().cpu().get_visible_cpu()->debug()->single_step();
+			view_main_console->exec_cmd = false;
+			history_pos = view_main_console->console_history.size();
+			return;
+		}
+		m_machine->debugger().console().execute_command(view_main_console->console_input, true);
 		// check for commands that start execution (so that input fields can be disabled)
 		if(strcmp(view_main_console->console_input,"g") == 0)
 			m_running = true;
@@ -468,9 +520,42 @@ void debug_imgui::handle_console(running_machine* machine)
 			m_running = true;
 		if(strcmp(view_main_console->console_input,"next") == 0)
 			m_running = true;
+		// don't bother adding to history if the current command matches the previous one
+		if(view_main_console->console_prev != view_main_console->console_input)
+		{
+			view_main_console->console_history.push_back(std::string(view_main_console->console_input));
+			view_main_console->console_prev = view_main_console->console_input;
+		}
+		history_pos = view_main_console->console_history.size();
 		strcpy(view_main_console->console_input,"");
 		view_main_console->exec_cmd = false;
 	}
+}
+
+int debug_imgui::history_set(ImGuiTextEditCallbackData* data)
+{
+	if(view_main_console->console_history.size() == 0)
+		return 0;
+
+	switch(data->EventKey)
+	{
+		case ImGuiKey_UpArrow:
+			if(history_pos > 0)
+				history_pos--;
+			break;
+		case ImGuiKey_DownArrow:
+			if(history_pos < view_main_console->console_history.size())
+				history_pos++;
+			break;
+	}
+
+	if(history_pos == view_main_console->console_history.size())
+		data->CursorPos = data->BufTextLen = (int)snprintf(data->Buf, (size_t)data->BufSize, "%s", "");
+	else
+		data->CursorPos = data->BufTextLen = (int)snprintf(data->Buf, (size_t)data->BufSize, "%s", view_main_console->console_history[history_pos].c_str());
+
+	data->BufDirty = true;
+	return 0;
 }
 
 void debug_imgui::update_cpu_view(device_t* device)
@@ -499,9 +584,17 @@ void debug_imgui::draw_view(debug_area* view_ptr, bool exp_change)
 	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0,0));
 	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0,0));
 
-	// if the view has changed its expression (disasm, memory), then update scroll bar
+	// if the view has changed its expression (disasm, memory), then update scroll bar and view cursor
 	if(exp_change)
-		ImGui::SetScrollY(view_ptr->view->visible_position().y * fsize.y);
+	{
+		if(view_ptr->view->cursor_supported())
+		{
+			view_ptr->view->set_cursor_visible(true);
+			view_ptr->view->set_cursor_position(debug_view_xy(0,view_ptr->view->visible_position().y));
+		}
+		if(view_ptr->type != DVT_MEMORY)  // no scroll bars in memory views
+			ImGui::SetScrollY(view_ptr->view->visible_position().y * fsize.y);
+	}
 
 	// update view location, while the cursor is at 0,0.
 	view_ptr->ofs_x = ImGui::GetCursorScreenPos().x;
@@ -512,7 +605,8 @@ void debug_imgui::draw_view(debug_area* view_ptr, bool exp_change)
 	drawlist = ImGui::GetWindowDrawList();
 
 	// temporarily set cursor to the last line, this will set the scroll bar range
-	ImGui::SetCursorPosY((totalsize.y) * fsize.y);
+	if(view_ptr->type != DVT_MEMORY)  // no scroll bars in memory views
+		ImGui::SetCursorPosY((totalsize.y) * fsize.y);
 
 	// set the visible area to be displayed
 	vsize.x = view_ptr->view_width / fsize.x;
@@ -520,9 +614,12 @@ void debug_imgui::draw_view(debug_area* view_ptr, bool exp_change)
 	view_ptr->view->set_visible_size(vsize);
 
 	// set the visible position
-	pos.x = 0;
-	pos.y = ImGui::GetScrollY() / fsize.y;
-	view_ptr->view->set_visible_position(pos);
+	if(view_ptr->type != DVT_MEMORY)  // since ImGui cannot handle huge memory views, we'll just let the view control the displayed area
+	{
+		pos.x = 0;
+		pos.y = ImGui::GetScrollY() / fsize.y;
+		view_ptr->view->set_visible_position(pos);
+	}
 
 	viewdata = view_ptr->view->viewdata();
 
@@ -537,12 +634,12 @@ void debug_imgui::draw_view(debug_area* view_ptr, bool exp_change)
 		{
 			char str[2];
 			map_attr_to_fg_bg(viewdata->attrib,&fg,&bg);
-			ImU32 fg_col = ImGui::ColorConvertFloat4ToU32(ImVec4(fg.r()/255.0f,fg.g()/255.0f,fg.b()/255.0f,fg.a()/255.0f));
+			ImU32 fg_col = IM_COL32(fg.r(),fg.g(),fg.b(),fg.a());
 			str[0] = v = viewdata->byte;
 			str[1] = '\0';
 			if(bg != base)
 			{
-				ImU32 bg_col = ImGui::ColorConvertFloat4ToU32(ImVec4(bg.r()/255.0f,bg.g()/255.0f,bg.b()/255.0f,bg.a()/255.0f));
+				ImU32 bg_col = IM_COL32(bg.r(),bg.g(),bg.b(),bg.a());
 				xy1.x++; xy2.x++;
 				drawlist->AddRectFilled(xy1,xy2,bg_col);
 				xy1.x--; xy2.x--;
@@ -557,6 +654,24 @@ void debug_imgui::draw_view(debug_area* view_ptr, bool exp_change)
 		xy1.y += fsize.y;
 		xy2.y += fsize.y;
 	}
+
+	// draw a rect around a view if it has focus
+	if(view_ptr->has_focus)
+	{
+		ImU32 col = IM_COL32(127,127,127,76);
+		drawlist->AddRect(ImVec2(view_ptr->ofs_x,view_ptr->ofs_y + ImGui::GetScrollY()),
+			ImVec2(view_ptr->ofs_x + view_ptr->view_width,view_ptr->ofs_y + ImGui::GetScrollY() + view_ptr->view_height),col);
+	}
+
+	// if the vertical scroll bar is at the end, then force it to the maximum value in case of an update
+	if(view_ptr->scroll_end)
+		ImGui::SetScrollY(ImGui::GetScrollMaxY());
+	// and update the scroll end flag
+	view_ptr->scroll_end = false;
+	if(view_ptr->scroll_follow)
+		if(ImGui::GetScrollY() == ImGui::GetScrollMaxY() || ImGui::GetScrollMaxY() < 0)
+			view_ptr->scroll_end = true;
+
 	ImGui::PopStyleVar(2);
 }
 
@@ -565,12 +680,15 @@ void debug_imgui::draw_bpoints(debug_area* view_ptr, bool* opened)
 	ImGui::SetNextWindowSize(ImVec2(view_ptr->width,view_ptr->height + ImGui::GetTextLineHeight()),ImGuiSetCond_Once);
 	if(ImGui::Begin(view_ptr->title.c_str(),opened))
 	{
+		view_ptr->is_collapsed = false;
 		ImGui::BeginChild("##break_output", ImVec2(ImGui::GetWindowWidth() - 16,ImGui::GetWindowHeight() - ImGui::GetTextLineHeight() - ImGui::GetCursorPosY()));  // account for title bar and widgets already drawn
 		draw_view(view_ptr,false);
 		ImGui::EndChild();
 
 		ImGui::End();
 	}
+	else
+		view_ptr->is_collapsed = true;
 }
 
 void debug_imgui::add_bpoints(int id)
@@ -608,12 +726,15 @@ void debug_imgui::draw_log(debug_area* view_ptr, bool* opened)
 	ImGui::SetNextWindowSize(ImVec2(view_ptr->width,view_ptr->height + ImGui::GetTextLineHeight()),ImGuiSetCond_Once);
 	if(ImGui::Begin(view_ptr->title.c_str(),opened))
 	{
+		view_ptr->is_collapsed = false;
 		ImGui::BeginChild("##log_output", ImVec2(ImGui::GetWindowWidth() - 16,ImGui::GetWindowHeight() - ImGui::GetTextLineHeight() - ImGui::GetCursorPosY()));  // account for title bar and widgets already drawn
 		draw_view(view_ptr,false);
 		ImGui::EndChild();
 
 		ImGui::End();
 	}
+	else
+		view_ptr->is_collapsed = true;
 }
 
 void debug_imgui::add_log(int id)
@@ -628,6 +749,7 @@ void debug_imgui::add_log(int id)
 	new_view->height = 300;
 	new_view->ofs_x = 0;
 	new_view->ofs_y = 0;
+	new_view->scroll_follow = true;
 	view_list_add(new_view);
 }
 
@@ -642,6 +764,7 @@ void debug_imgui::draw_disasm(debug_area* view_ptr, bool* opened)
 		bool done = false;
 		bool exp_change = false;
 
+		view_ptr->is_collapsed = false;
 		if(ImGui::BeginMenuBar())
 		{
 			if(ImGui::BeginMenu("Options"))
@@ -663,7 +786,7 @@ void debug_imgui::draw_disasm(debug_area* view_ptr, bool* opened)
 			ImGui::EndMenuBar();
 		}
 
-		ImGuiInputTextFlags flags = ImGuiInputTextFlags_EnterReturnsTrue;
+		ImGuiInputTextFlags flags = ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_AutoSelectAll;
 		if(m_running)
 			flags |= ImGuiInputTextFlags_ReadOnly;
 		ImGui::Combo("##cpu",&view_ptr->src_sel,get_view_source,view_ptr->view,view_ptr->view->source_list().count());
@@ -696,6 +819,8 @@ void debug_imgui::draw_disasm(debug_area* view_ptr, bool* opened)
 
 		ImGui::End();
 	}
+	else
+		view_ptr->is_collapsed = true;
 }
 
 void debug_imgui::add_disasm(int id)
@@ -726,6 +851,7 @@ void debug_imgui::draw_memory(debug_area* view_ptr, bool* opened)
 		bool done = false;
 		bool exp_change = false;
 
+		view_ptr->is_collapsed = false;
 		if(ImGui::BeginMenuBar())
 		{
 			if(ImGui::BeginMenu("Options"))
@@ -734,7 +860,7 @@ void debug_imgui::draw_memory(debug_area* view_ptr, bool* opened)
 				bool physical = mem->physical();
 				bool rev = mem->reverse();
 				int format = mem->get_data_format();
-				UINT32 chunks = mem->chunks_per_row();
+				uint32_t chunks = mem->chunks_per_row();
 
 				if(ImGui::MenuItem("1-byte chunks", nullptr,(format == 1) ? true : false))
 					mem->set_data_format(1);
@@ -769,7 +895,7 @@ void debug_imgui::draw_memory(debug_area* view_ptr, bool* opened)
 			ImGui::EndMenuBar();
 		}
 
-		ImGuiInputTextFlags flags = ImGuiInputTextFlags_EnterReturnsTrue;
+		ImGuiInputTextFlags flags = ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_AutoSelectAll;
 		ImGui::PushItemWidth(100.0f);
 		if(m_running)
 			flags |= ImGuiInputTextFlags_ReadOnly;
@@ -804,6 +930,8 @@ void debug_imgui::draw_memory(debug_area* view_ptr, bool* opened)
 
 		ImGui::End();
 	}
+	else
+		view_ptr->is_collapsed = true;
 }
 
 void debug_imgui::add_memory(int id)
@@ -821,6 +949,290 @@ void debug_imgui::add_memory(int id)
 	new_view->src_sel = 0;
 	strcpy(new_view->console_input,"0");
 	view_list_add(new_view);
+}
+
+void debug_imgui::mount_image()
+{
+	if(m_selected_file != nullptr)
+	{
+		osd_file::error err;
+		switch(m_selected_file->type)
+		{
+			case file_entry_type::DRIVE:
+			case file_entry_type::DIRECTORY:
+				err = util::zippath_opendir(m_selected_file->fullpath.c_str(), nullptr);
+				if(err == osd_file::error::NONE)
+				{
+					m_filelist_refresh = true;
+					strcpy(m_path,m_selected_file->fullpath.c_str());
+				}
+				break;
+			case file_entry_type::FILE:
+				m_dialog_image->load(m_selected_file->fullpath.c_str());
+				ImGui::CloseCurrentPopup();
+				break;
+		}
+	}
+}
+
+void debug_imgui::create_image()
+{
+	image_init_result res;
+
+	if(m_dialog_image->image_type() == IO_FLOPPY)
+	{
+		floppy_image_device *fd = static_cast<floppy_image_device *>(m_dialog_image);
+		res = fd->create(m_path,nullptr,nullptr);
+		if(res == image_init_result::PASS)
+			fd->setup_write(m_typelist.at(m_format_sel).format);
+	}
+	else
+		res = m_dialog_image->create(m_path,nullptr,nullptr);
+	if(res == image_init_result::PASS)
+		ImGui::CloseCurrentPopup();
+	// TODO: add a messagebox to display on an error
+}
+
+void debug_imgui::refresh_filelist()
+{
+	int x;
+	osd_file::error err;
+	util::zippath_directory* dir = nullptr;
+	const char *volume_name;
+	const osd::directory::entry *dirent;
+	uint8_t first = 0;
+
+	// todo
+	m_filelist.clear();
+	m_filelist_refresh = false;
+
+	err = util::zippath_opendir(m_path,&dir);
+	if(err == osd_file::error::NONE)
+	{
+		x = 0;
+		// add drives
+		while((volume_name = osd_get_volume_name(x))!=nullptr)
+		{
+			file_entry temp;
+			temp.type = file_entry_type::DRIVE;
+			temp.basename = std::string(volume_name);
+			temp.fullpath = std::string(volume_name);
+			m_filelist.emplace_back(std::move(temp));
+			x++;
+		}
+		first = m_filelist.size();
+		while((dirent = util::zippath_readdir(dir)) != nullptr)
+		{
+			file_entry temp;
+			switch(dirent->type)
+			{
+				case osd::directory::entry::entry_type::FILE:
+					temp.type = file_entry_type::FILE;
+					break;
+				case osd::directory::entry::entry_type::DIR:
+					temp.type = file_entry_type::DIRECTORY;
+					break;
+				default:
+					break;
+			}
+			temp.basename = std::string(dirent->name);
+			temp.fullpath = util::zippath_combine(m_path,dirent->name);
+			m_filelist.emplace_back(std::move(temp));
+		}
+	}
+	if (dir != nullptr)
+		util::zippath_closedir(dir);
+
+	// sort file list, as it is not guaranteed to be in any particular order
+	std::sort(m_filelist.begin()+first,m_filelist.end(),[](file_entry x, file_entry y) { return x.basename < y.basename; } );
+}
+
+void debug_imgui::refresh_typelist()
+{
+	floppy_image_device *fd = static_cast<floppy_image_device *>(m_dialog_image);
+
+	m_typelist.clear();
+	if(m_dialog_image->formatlist().empty())
+		return;
+	if(fd == nullptr)
+		return;
+
+	floppy_image_format_t* format_list = fd->get_formats();
+	for(floppy_image_format_t* flist = format_list; flist; flist = flist->next)
+	{
+		if(flist->supports_save())
+		{
+			image_type_entry temp;
+			temp.format = flist;
+			temp.shortname = flist->name();
+			temp.longname = flist->description();
+			m_typelist.emplace_back(std::move(temp));
+		}
+	}
+}
+
+void debug_imgui::draw_images_menu()
+{
+	if(ImGui::BeginMenu("Images"))
+	{
+		int x = 0;
+		for (device_image_interface &img : image_interface_iterator(m_machine->root_device()))
+		{
+			x++;
+			std::string str = string_format(" %s : %s##%i",img.device().name(),img.exists() ? img.filename() : "[Empty slot]",x);
+			if(ImGui::BeginMenu(str.c_str()))
+			{
+				if(ImGui::MenuItem("Mount..."))
+				{
+					m_dialog_image = &img;
+					m_filelist_refresh = true;
+					m_mount_open = true;
+					m_selected_file = nullptr;  // start with no file selected
+					if (img.exists())  // use image path if one is already mounted
+						strcpy(m_path,util::zippath_parent(m_dialog_image->filename()).c_str());
+					else
+						strcpy(m_path,img.working_directory().c_str());
+				}
+				if(ImGui::MenuItem("Unmount"))
+					img.unload();
+				ImGui::Separator();
+				if(img.is_creatable())
+				{
+					if(ImGui::MenuItem("Create..."))
+					{
+						m_dialog_image = &img;
+						m_create_open = true;
+						m_create_confirm_wait = false;
+						refresh_typelist();
+						strcpy(m_path,img.working_directory().c_str());
+					}
+				}
+				// TODO: Cassette controls
+				ImGui::EndMenu();
+			}
+		}
+		ImGui::EndMenu();
+	}
+}
+
+void debug_imgui::draw_mount_dialog(const char* label)
+{
+	// render dialog
+	//ImGui::SetNextWindowContentWidth(200.0f);
+	if(ImGui::BeginPopupModal(label,NULL,ImGuiWindowFlags_AlwaysAutoResize))
+	{
+		if(m_filelist_refresh)
+			refresh_filelist();
+		if(ImGui::InputText("##mountpath",m_path,1024,ImGuiInputTextFlags_EnterReturnsTrue))
+			m_filelist_refresh = true;
+		ImGui::Separator();
+		{
+			ImGui::ListBoxHeader("##filelist",m_filelist.size(),15);
+			for(std::vector<file_entry>::iterator f = m_filelist.begin();f != m_filelist.end();++f)
+			{
+				std::string txt_name;
+				bool sel = false;
+				switch((*f).type)
+				{
+					case file_entry_type::DRIVE:
+						txt_name.assign("[DRIVE] ");
+						break;
+					case file_entry_type::DIRECTORY:
+						txt_name.assign("[DIR]   ");
+						break;
+					case file_entry_type::FILE:
+						txt_name.assign("[FILE]  ");
+						break;
+				}
+				txt_name.append((*f).basename);
+				if(m_selected_file == &(*f))
+					sel = true;
+				if(ImGui::Selectable(txt_name.c_str(),sel,ImGuiSelectableFlags_AllowDoubleClick))
+				{
+					m_selected_file = &(*f);
+					if(ImGui::IsMouseDoubleClicked(0))
+						mount_image();
+				}
+			}
+			ImGui::ListBoxFooter();
+		}
+		ImGui::Separator();
+		if(ImGui::Button("Cancel##mount"))
+			ImGui::CloseCurrentPopup();
+		ImGui::SameLine();
+		if(ImGui::Button("OK##mount"))
+			mount_image();
+		ImGui::EndPopup();
+	}
+}
+
+void debug_imgui::draw_create_dialog(const char* label)
+{
+	// render dialog
+	//ImGui::SetNextWindowContentWidth(200.0f);
+	if(ImGui::BeginPopupModal(label,NULL,ImGuiWindowFlags_AlwaysAutoResize))
+	{
+		ImGui::LabelText("##static1","Filename:");
+		ImGui::SameLine();
+		if(ImGui::InputText("##createfilename",m_path,1024,ImGuiInputTextFlags_EnterReturnsTrue))
+		{
+			auto entry = osd_stat(m_path);
+			auto file_type = (entry != nullptr) ? entry->type : osd::directory::entry::entry_type::NONE;
+			if(file_type == osd::directory::entry::entry_type::NONE)
+				create_image();
+			if(file_type == osd::directory::entry::entry_type::FILE)
+				m_create_confirm_wait = true;
+			// cannot overwrite a directory, so nothing will be none in that case.
+		}
+
+		// format combo box for floppy devices
+		if(m_dialog_image->image_type() == IO_FLOPPY)
+		{
+			std::string combo_str;
+			combo_str.clear();
+			for(std::vector<image_type_entry>::iterator f = m_typelist.begin();f != m_typelist.end();++f)
+			{
+				// TODO: perhaps do this at the time the format list is generated, rather than every frame
+				combo_str.append((*f).longname);
+				combo_str.append(1,'\0');
+			}
+			combo_str.append(1,'\0');
+			ImGui::Separator();
+			ImGui::LabelText("##static2","Format:");
+			ImGui::SameLine();
+			ImGui::Combo("##formatcombo",&m_format_sel,combo_str.c_str(),m_typelist.size());
+		}
+
+		if(m_create_confirm_wait)
+		{
+			ImGui::Separator();
+			ImGui::Text("File already exists.  Are you sure you wish to overwrite it?");
+			ImGui::Separator();
+			if(ImGui::Button("Cancel##mount"))
+				ImGui::CloseCurrentPopup();
+			ImGui::SameLine();
+			if(ImGui::Button("OK##mount"))
+				create_image();
+		}
+		else
+		{
+			ImGui::Separator();
+			if(ImGui::Button("Cancel##mount"))
+				ImGui::CloseCurrentPopup();
+			ImGui::SameLine();
+			if(ImGui::Button("OK##mount"))
+			{
+				auto entry = osd_stat(m_path);
+				auto file_type = (entry != nullptr) ? entry->type : osd::directory::entry::entry_type::NONE;
+				if(file_type == osd::directory::entry::entry_type::NONE)
+					create_image();
+				if(file_type == osd::directory::entry::entry_type::FILE)
+					m_create_confirm_wait = true;
+				// cannot overwrite a directory, so nothing will be none in that case.
+			}
+		}
+		ImGui::EndPopup();
+	}
 }
 
 void debug_imgui::draw_console()
@@ -851,33 +1263,33 @@ void debug_imgui::draw_console()
 				ImGui::Separator();
 				if(ImGui::MenuItem("Run", "F5"))
 				{
-					debug_cpu_get_visible_cpu(*m_machine)->debug()->go();
+					m_machine->debugger().cpu().get_visible_cpu()->debug()->go();
 					m_running = true;
 				}
 				if(ImGui::MenuItem("Go to next CPU", "F6"))
 				{
-					debug_cpu_get_visible_cpu(*m_machine)->debug()->go_next_device();
+					m_machine->debugger().cpu().get_visible_cpu()->debug()->go_next_device();
 					m_running = true;
 				}
 				if(ImGui::MenuItem("Run until next interrupt", "F7"))
 				{
-					debug_cpu_get_visible_cpu(*m_machine)->debug()->go_interrupt();
+					m_machine->debugger().cpu().get_visible_cpu()->debug()->go_interrupt();
 					m_running = true;
 				}
 				if(ImGui::MenuItem("Run until VBLANK", "F8"))
-					debug_cpu_get_visible_cpu(*m_machine)->debug()->go_vblank();
+					m_machine->debugger().cpu().get_visible_cpu()->debug()->go_vblank();
 				if(ImGui::MenuItem("Run and hide debugger", "F12"))
 				{
-					debug_cpu_get_visible_cpu(*m_machine)->debug()->go();
+					m_machine->debugger().cpu().get_visible_cpu()->debug()->go();
 					m_hide = true;
 				}
 				ImGui::Separator();
 				if(ImGui::MenuItem("Single step", "F11"))
-					debug_cpu_get_visible_cpu(*m_machine)->debug()->single_step();
+					m_machine->debugger().cpu().get_visible_cpu()->debug()->single_step();
 				if(ImGui::MenuItem("Step over", "F10"))
-					debug_cpu_get_visible_cpu(*m_machine)->debug()->single_step_over();
+					m_machine->debugger().cpu().get_visible_cpu()->debug()->single_step_over();
 				if(ImGui::MenuItem("Step out", "F9"))
-					debug_cpu_get_visible_cpu(*m_machine)->debug()->single_step_out();
+					m_machine->debugger().cpu().get_visible_cpu()->debug()->single_step_out();
 
 				ImGui::EndMenu();
 			}
@@ -890,25 +1302,18 @@ void debug_imgui::draw_console()
 				}
 				ImGui::Separator();
 				// list all extra windows, so we can un-collapse the windows if necessary
-				//debug_area* view_ptr;
 				for(std::vector<debug_area*>::iterator view_ptr = view_list.begin();view_ptr != view_list.end();++view_ptr)
 				{
-					bool collapsed;
-					if(ImGui::Begin((*view_ptr)->title.c_str()))
-					{
-						collapsed = false;
-						ImGui::End();
-					}
-					else
-					{
+					bool collapsed = false;
+					if((*view_ptr)->is_collapsed)
 						collapsed = true;
-						ImGui::End();
-					}
 					if(ImGui::MenuItem((*view_ptr)->title.c_str(), nullptr,!collapsed))
 						ImGui::SetWindowCollapsed((*view_ptr)->title.c_str(),false);
 				}
 				ImGui::EndMenu();
 			}
+			if(m_has_images)
+				draw_images_menu();
 			ImGui::EndMenuBar();
 		}
 
@@ -932,14 +1337,27 @@ void debug_imgui::draw_console()
 		draw_view(view_main_console,false);
 		ImGui::EndChild();
 		ImGui::Separator();
-		//if(ImGui::IsWindowFocused())
-		//  ImGui::SetKeyboardFocusHere();
-		ImGuiInputTextFlags flags = ImGuiInputTextFlags_EnterReturnsTrue;
+
+		ImGuiInputTextFlags flags = ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_CallbackHistory;
 		if(m_running)
 			flags |= ImGuiInputTextFlags_ReadOnly;
 		ImGui::PushItemWidth(-1.0f);
-		if(ImGui::InputText("##console_input",view_main_console->console_input,512,flags))
+		if(ImGui::InputText("##console_input",view_main_console->console_input,512,flags,history_set))
 			view_main_console->exec_cmd = true;
+		if ((ImGui::IsRootWindowOrAnyChildFocused() && !ImGui::IsAnyItemActive() && !ImGui::IsMouseClicked(0)))
+			ImGui::SetKeyboardFocusHere(-1); // Auto focus previous widget
+		if(m_mount_open)
+		{
+			ImGui::OpenPopup("Mount Image");
+			m_mount_open = false;
+		}
+		if(m_create_open)
+		{
+			ImGui::OpenPopup("Create Image");
+			m_create_open = false;
+		}
+		draw_mount_dialog("Mount Image");  // draw mount image dialog if open
+		draw_create_dialog("Create Image");  // draw create image dialog if open
 		ImGui::PopItemWidth();
 		ImGui::EndChild();
 		ImGui::End();
@@ -965,7 +1383,7 @@ void debug_imgui::update()
 	ImGui::PushStyleColor(ImGuiCol_ScrollbarGrabHovered,ImVec4(0.7f,0.7f,0.7f,0.8f));
 	ImGui::PushStyleColor(ImGuiCol_ScrollbarGrabActive,ImVec4(0.9f,0.9f,0.9f,0.8f));
 	ImGui::PushStyleColor(ImGuiCol_Border,ImVec4(0.7f,0.7f,0.7f,0.8f));
-
+	ImGui::PushStyleColor(ImGuiCol_ComboBg,ImVec4(0.4f,0.4f,0.4f,0.9f));
 	m_text_size = ImGui::CalcTextSize("A");  // hopefully you're using a monospaced font...
 	draw_console();  // We'll always have a console window
 
@@ -1006,17 +1424,24 @@ void debug_imgui::update()
 		view_list_remove(to_delete);
 		global_free(to_delete);
 	}
-	ImGui::PopStyleColor(12);
+
+	ImGui::PopStyleColor(13);
 }
 
 void debug_imgui::init_debugger(running_machine &machine)
 {
-		ImGuiIO& io = ImGui::GetIO();
+	ImGuiIO& io = ImGui::GetIO();
 	m_machine = &machine;
 	m_mouse_button = false;
 	if(strcmp(downcast<osd_options &>(m_machine->options()).video(),"bgfx") != 0)
 		fatalerror("Error: ImGui debugger requires the BGFX renderer.\n");
 
+	// check for any image devices (cassette, floppy, etc...)
+	image_interface_iterator iter(m_machine->root_device());
+	if (iter.first() != nullptr)
+		m_has_images = true;
+
+	// map keys to ImGui inputs
 	io.KeyMap[ImGuiKey_A] = ITEM_ID_A;
 	io.KeyMap[ImGuiKey_C] = ITEM_ID_C;
 	io.KeyMap[ImGuiKey_V] = ITEM_ID_V;
@@ -1033,6 +1458,14 @@ void debug_imgui::init_debugger(running_machine &machine)
 	io.KeyMap[ImGuiKey_End] = ITEM_ID_END;
 	io.KeyMap[ImGuiKey_Escape] = ITEM_ID_ESC;
 	io.KeyMap[ImGuiKey_Enter] = ITEM_ID_ENTER;
+	io.KeyMap[ImGuiKey_LeftArrow] = ITEM_ID_LEFT;
+	io.KeyMap[ImGuiKey_RightArrow] = ITEM_ID_RIGHT;
+	io.KeyMap[ImGuiKey_UpArrow] = ITEM_ID_UP;
+	io.KeyMap[ImGuiKey_DownArrow] = ITEM_ID_DOWN;
+
+	// set key delay and repeat rates
+	io.KeyRepeatDelay = 0.400f;
+	io.KeyRepeatRate = 0.050f;
 
 	font_name = (downcast<osd_options &>(m_machine->options()).debugger_font());
 	font_size = (downcast<osd_options &>(m_machine->options()).debugger_font_size());
@@ -1051,9 +1484,9 @@ void debug_imgui::init_debugger(running_machine &machine)
 
 void debug_imgui::wait_for_debugger(device_t &device, bool firststop)
 {
-	UINT32 width = m_machine->render().ui_target().width();
-	UINT32 height = m_machine->render().ui_target().height();
-	if(firststop && view_list.empty())
+	uint32_t width = m_machine->render().ui_target().width();
+	uint32_t height = m_machine->render().ui_target().height();
+	if(firststop && !m_initialised)
 	{
 		view_main_console = dview_alloc(device.machine(), DVT_CONSOLE);
 		view_main_console->title = "MAME Debugger";
@@ -1061,6 +1494,7 @@ void debug_imgui::wait_for_debugger(device_t &device, bool firststop)
 		view_main_console->height = 200;
 		view_main_console->ofs_x = 0;
 		view_main_console->ofs_y = 0;
+		view_main_console->scroll_follow = true;
 		view_main_disasm = dview_alloc(device.machine(), DVT_DISASSEMBLY);
 		view_main_disasm->title = "Main Disassembly";
 		view_main_disasm->width = 500;
@@ -1070,6 +1504,7 @@ void debug_imgui::wait_for_debugger(device_t &device, bool firststop)
 		view_main_regs->width = 180;
 		view_main_regs->height = 440;
 		strcpy(view_main_console->console_input,"");  // clear console input
+		m_initialised = true;
 	}
 	if(firststop)
 	{
@@ -1095,10 +1530,10 @@ void debug_imgui::wait_for_debugger(device_t &device, bool firststop)
 
 void debug_imgui::debugger_update()
 {
-	if ((m_machine != nullptr) && (!debug_cpu_is_stopped(*m_machine)) && (m_machine->phase() == MACHINE_PHASE_RUNNING) && !m_hide)
+	if (m_machine && (m_machine->phase() == machine_phase::RUNNING) && !m_machine->debugger().cpu().is_stopped() && !m_hide)
 	{
-		UINT32 width = m_machine->render().ui_target().width();
-		UINT32 height = m_machine->render().ui_target().height();
+		uint32_t width = m_machine->render().ui_target().width();
+		uint32_t height = m_machine->render().ui_target().height();
 		handle_mouse();
 		handle_keys();
 		imguiBeginFrame(m_mouse_x,m_mouse_y,m_mouse_button ? IMGUI_MBUT_LEFT : 0, 0, width, height, m_key_char);

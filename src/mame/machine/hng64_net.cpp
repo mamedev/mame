@@ -12,10 +12,11 @@
 
 */
 
+#include "emu.h"
 #include "includes/hng64.h"
 #include "cpu/z80/kl5c80a12.h"
 
-UINT8 hng64_state::read_comm_data(UINT32 offset)
+uint8_t hng64_state::read_comm_data(uint32_t offset)
 {
 	if((offset & 0x10000) == 0)
 		return m_comm_rom[offset & 0xffff];
@@ -27,7 +28,7 @@ UINT8 hng64_state::read_comm_data(UINT32 offset)
 	return 0xff;
 }
 
-void hng64_state::write_comm_data(UINT32 offset,UINT8 data)
+void hng64_state::write_comm_data(uint32_t offset,uint8_t data)
 {
 	if((offset & 0x10000) == 0)
 	{
@@ -139,7 +140,7 @@ void hng64_state::reset_net()
 	m_mmub[5] = 0; // rolls back to 0xffff
 }
 
-MACHINE_CONFIG_FRAGMENT( hng64_network )
+MACHINE_CONFIG_START( hng64_network )
 	MCFG_CPU_ADD("network", KL5C80A12, HNG64_MASTER_CLOCK / 4)        /* KL5C80A12CFP - binary compatible with Z80. */
 	MCFG_CPU_PROGRAM_MAP(hng_comm_map)
 	MCFG_CPU_IO_MAP(hng_comm_io_map)

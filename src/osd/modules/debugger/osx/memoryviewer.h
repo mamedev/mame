@@ -10,7 +10,6 @@
 
 #import "debugwindowhandler.h"
 
-#include "emu.h"
 
 #import <Cocoa/Cocoa.h>
 
@@ -29,5 +28,8 @@
 - (BOOL)selectSubviewForSpace:(address_space *)space;
 
 - (IBAction)changeSubview:(id)sender;
+
+- (void)saveConfigurationToNode:(util::xml::data_node *)node;
+- (void)restoreConfigurationFromNode:(util::xml::data_node const *)node;
 
 @end

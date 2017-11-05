@@ -3,7 +3,10 @@
 
 /* Williams WPC Fliptronics I */
 
+#include "emu.h"
 #include "includes/wpc_flip1.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 static ADDRESS_MAP_START( wpc_flip1_map, AS_PROGRAM, 8, wpc_flip1_state )
@@ -154,7 +157,7 @@ DRIVER_INIT_MEMBER(wpc_flip1_state,wpc_flip1)
 	wpc_dot_state::init_wpc_dot();
 }
 
-static MACHINE_CONFIG_START( wpc_flip1, wpc_flip1_state )
+static MACHINE_CONFIG_START( wpc_flip1 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, 2000000)
 	MCFG_CPU_PROGRAM_MAP(wpc_flip1_map)
@@ -167,8 +170,11 @@ static MACHINE_CONFIG_START( wpc_flip1, wpc_flip1_state )
 	MCFG_WPC_SOUND_DATA(READ8(wpc_dot_state,wpc_sound_data_r),WRITE8(wpc_dot_state,wpc_sound_data_w))
 	MCFG_WPC_DMDBANK(WRITE8(wpc_dot_state,wpc_dmdbank_w))
 
-	MCFG_WMS_WPC_SOUND_ADD("wpcsnd",":sound1")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("wpcsnd", WPCSND, 0)
+	MCFG_WPC_ROM_REGION(":sound1")
 	MCFG_WPC_SOUND_REPLY_CALLBACK(WRITELINE(wpc_dot_state,wpcsnd_reply_w))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 

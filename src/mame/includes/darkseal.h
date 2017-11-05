@@ -34,13 +34,13 @@ public:
 	required_device<buffered_spriteram16_device> m_spriteram;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	required_shared_ptr<UINT16> m_ram;
-	required_shared_ptr<UINT16> m_pf1_rowscroll;
-	//UINT16 *m_pf2_rowscroll;
-	required_shared_ptr<UINT16> m_pf3_rowscroll;
-	//UINT16 *m_pf4_rowscroll;
-	required_shared_ptr<UINT16> m_generic_paletteram_16;
-	required_shared_ptr<UINT16> m_generic_paletteram2_16;
+	required_shared_ptr<uint16_t> m_ram;
+	required_shared_ptr<uint16_t> m_pf1_rowscroll;
+	//uint16_t *m_pf2_rowscroll;
+	required_shared_ptr<uint16_t> m_pf3_rowscroll;
+	//uint16_t *m_pf4_rowscroll;
+	required_shared_ptr<uint16_t> m_generic_paletteram_16;
+	required_shared_ptr<uint16_t> m_generic_paletteram2_16;
 
 	DECLARE_WRITE16_MEMBER(control_w);
 	DECLARE_READ16_MEMBER(control_r);
@@ -50,6 +50,6 @@ public:
 	DECLARE_DRIVER_INIT(darkseal);
 	virtual void video_start() override;
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void update_24bitcol(int offset);
 };

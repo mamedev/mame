@@ -1,0 +1,312 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+
+<!-- define elements -->
+
+	<element name="static_white"><rect><color red="0.8" green="0.8" blue="0.8" /></rect></element>
+	<element name="static_yellow"><rect><color red="0.8" green="0.8" blue="0.35" /></rect></element>
+
+	<element name="maskd" defstate="0">
+		<text string=" ">
+			<bounds x="0.0" y="0.0" width="1.0" height="1.0" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
+		<disk state="1">
+			<bounds x="0.12" y="0.12" width="0.76" height="0.76" />
+			<color red="0" green="0" blue="0" />
+		</disk>
+	</element>
+
+	<element name="mask1" defstate="0">
+		<rect state="0"><color red="0" green="0" blue="0" /></rect>
+		<rect state="1"><color red="1.0" green="1.0" blue="1.0" /></rect>
+	</element>
+
+	<element name="mask2" defstate="0">
+		<rect state="0">
+			<color red="0" green="0" blue="0" />
+			<bounds x="0.94" y="0.0" width="0.06" height="1.0" />
+		</rect>
+		<rect state="0">
+			<color red="0" green="0" blue="0" />
+			<bounds x="0.0" y="0.94" width="1.0" height="0.06" />
+		</rect>
+	</element>
+
+	<element name="mask3" defstate="0">
+		<rect state="0">
+			<color red="0" green="0" blue="0" />
+			<bounds x="0.94" y="0.0" width="0.06" height="0.06" />
+		</rect>
+		<rect state="0">
+			<color red="0" green="0" blue="0" />
+			<bounds x="0.0" y="0.94" width="0.06" height="0.06" />
+		</rect>
+	</element>
+
+	<element name="mask4" defstate="0">
+		<rect state="1">
+			<color red="0" green="0" blue="0" />
+			<bounds x="0.0" y="0.0" width="0.06" height="1.0" />
+		</rect>
+		<rect state="1">
+			<color red="0" green="0" blue="0" />
+			<bounds x="0.0" y="0.0" width="1.0" height="0.06" />
+		</rect>
+	</element>
+
+	<element name="button1"><rect state="0"><color red="1.0" green="0.23" blue="0.25" /></rect></element>
+	<element name="button2"><rect state="0"><color red="0.9" green="0.9" blue="0.2" /></rect></element>
+	<element name="button3"><rect state="0"><color red="1.0" green="0.42" blue="0.2" /></rect></element>
+	<element name="button4"><rect state="0"><color red="0.1" green="0.7" blue="0.1" /></rect></element>
+	<element name="button5"><rect state="0"><color red="0.25" green="0.25" blue="1.0" /></rect></element>
+	<element name="button6"><rect state="0"><color red="0.2" green="0.9" blue="1.0" /></rect></element>
+	<element name="button7"><rect state="0"><color red="0.5" green="0.1" blue="1.0" /></rect></element>
+	<element name="button8"><rect state="0"><color red="0.53" green="1.0" blue="0.5" /></rect></element>
+	<element name="button9"><rect state="0"><color red="1.0" green="0.2" blue="0.8" /></rect></element>
+
+	<element name="text_1"><text string="1"><color red="0.94" green="0.94" blue="0.74" /></text></element>
+	<element name="text_2"><text string="2"><color red="0.94" green="0.94" blue="0.74" /></text></element>
+	<element name="text_3"><text string="3"><color red="0.94" green="0.94" blue="0.74" /></text></element>
+	<element name="text_4"><text string="4"><color red="0.94" green="0.94" blue="0.74" /></text></element>
+	<element name="text_5"><text string="5"><color red="0.94" green="0.94" blue="0.74" /></text></element>
+	<element name="text_6"><text string="6"><color red="0.94" green="0.94" blue="0.74" /></text></element>
+	<element name="text_7"><text string="7"><color red="0.94" green="0.94" blue="0.74" /></text></element>
+	<element name="text_8"><text string="8"><color red="0.94" green="0.94" blue="0.74" /></text></element>
+	<element name="text_9"><text string="9"><color red="0.94" green="0.94" blue="0.74" /></text></element>
+
+	<element name="text_u1"><text string="[1] ELECTRONIC ORGAN   [2] MUSIC MACHINE   [2A] WHAT'S THAT"><color red="0.84" green="0.84" blue="0.64" /></text></element>
+	<element name="text_u2"><text string="SONG?   [3] THE MEMORY GAME   [4] MINDBENDER   [5] SPACE ATTACK"><color red="0.84" green="0.84" blue="0.64" /></text></element>
+	<element name="text_u3"><text string="[6] SUBMARINE HUNT   [7] CATCH THE COMET   [8] BASEBALL   [9] ROULETTE"><color red="0.84" green="0.84" blue="0.64" /></text></element>
+
+	<element name="text_r1"><text string="REPEAT"><color red="0.94" green="0.94" blue="0.74" /></text></element>
+	<element name="text_r2"><text string="REST"><color red="0.94" green="0.94" blue="0.74" /></text></element>
+	<element name="text_r3"><text string="8TH NOTE"><color red="0.94" green="0.94" blue="0.74" /></text></element>
+
+	<element name="text_d1"><text string="START"><color red="0.94" green="0.94" blue="0.74" /></text></element>
+	<element name="text_d2"><text string="SELECT"><color red="0.94" green="0.94" blue="0.74" /></text></element>
+	<element name="text_d3"><text string="HIT"><color red="0.94" green="0.94" blue="0.74" /></text></element>
+
+
+<!-- build screen -->
+
+	<view name="Internal Layout">
+		<bounds left="1" right="50" top="2.5" bottom="63.4" />
+
+		<bezel element="text_u1"><bounds x="0" y="3.5" width="52" height="1.5" /></bezel>
+		<bezel element="text_u2"><bounds x="0" y="5.0" width="52" height="1.5" /></bezel>
+		<bezel element="text_u3"><bounds x="0" y="6.5" width="52" height="1.5" /></bezel>
+
+	<!-- misc buttons -->
+
+		<bezel element="static_yellow"><bounds x="43" y="16" width="5" height="5" /></bezel>
+		<bezel element="static_yellow"><bounds x="43" y="31" width="5" height="5" /></bezel>
+		<bezel element="static_yellow"><bounds x="43" y="46" width="5" height="5" /></bezel>
+
+		<bezel element="maskd" inputtag="IN.3" inputmask="0x08"><bounds x="43" y="16" width="5" height="5" /><color alpha="0.2" /></bezel>
+		<bezel element="maskd" inputtag="IN.2" inputmask="0x02"><bounds x="43" y="31" width="5" height="5" /><color alpha="0.2" /></bezel>
+		<bezel element="maskd" inputtag="IN.2" inputmask="0x04"><bounds x="43" y="46" width="5" height="5" /><color alpha="0.2" /></bezel>
+
+		<bezel element="text_r1"><bounds x="39" y="21.4" width="13" height="2" /></bezel>
+		<bezel element="text_r2"><bounds x="39" y="36.4" width="13" height="2" /></bezel>
+		<bezel element="text_r3"><bounds x="39" y="51.4" width="13" height="2" /></bezel>
+
+
+		<bezel element="static_white"><bounds x="18" y="55" width="5" height="5" /></bezel>
+		<bezel element="static_white"><bounds x="26" y="55" width="5" height="5" /></bezel>
+		<bezel element="static_white"><bounds x="34" y="55" width="5" height="5" /></bezel>
+
+		<bezel element="maskd" inputtag="IN.4" inputmask="0x01"><bounds x="18" y="55" width="5" height="5" /><color alpha="0.2" /></bezel>
+		<bezel element="maskd" inputtag="IN.3" inputmask="0x01"><bounds x="26" y="55" width="5" height="5" /><color alpha="0.2" /></bezel>
+		<bezel element="maskd" inputtag="IN.3" inputmask="0x04"><bounds x="34" y="55" width="5" height="5" /><color alpha="0.2" /></bezel>
+
+		<bezel element="text_d1"><bounds x="16" y="60.4" width="9" height="2" /></bezel>
+		<bezel element="text_d2"><bounds x="24" y="60.4" width="9" height="2" /></bezel>
+		<bezel element="text_d3"><bounds x="32" y="60.4" width="9" height="2" /></bezel>
+
+
+	<!-- coloured lighted buttons -->
+	<!-- row 1 2 3 -->
+
+		<bezel element="button1">
+			<bounds x="3" y="9" width="10" height="12" />
+		</bezel>
+		<bezel name="0.0" element="mask1">
+			<bounds x="3" y="9" width="10" height="12" />
+			<color alpha="0.4" />
+		</bezel>
+		<bezel element="mask2" inputtag="IN.0" inputmask="0x01">
+			<bounds x="3" y="9" width="10" height="12" />
+			<color alpha="0.4" />
+		</bezel>
+		<bezel element="mask3" inputtag="IN.0" inputmask="0x01">
+			<bounds x="3" y="9" width="10" height="12" />
+		</bezel>
+		<bezel element="mask4" inputtag="IN.0" inputmask="0x01">
+			<bounds x="3" y="9" width="10" height="12" />
+		</bezel>
+
+		<bezel element="button2">
+			<bounds x="16" y="9" width="10" height="12" />
+		</bezel>
+		<bezel name="0.1" element="mask1">
+			<bounds x="16" y="9" width="10" height="12" />
+			<color alpha="0.4" />
+		</bezel>
+		<bezel element="mask2" inputtag="IN.0" inputmask="0x02">
+			<bounds x="16" y="9" width="10" height="12" />
+			<color alpha="0.4" />
+		</bezel>
+		<bezel element="mask3" inputtag="IN.0" inputmask="0x02">
+			<bounds x="16" y="9" width="10" height="12" />
+		</bezel>
+		<bezel element="mask4" inputtag="IN.0" inputmask="0x02">
+			<bounds x="16" y="9" width="10" height="12" />
+		</bezel>
+
+		<bezel element="button3">
+			<bounds x="29" y="9" width="10" height="12" />
+		</bezel>
+		<bezel name="0.2" element="mask1">
+			<bounds x="29" y="9" width="10" height="12" />
+			<color alpha="0.4" />
+		</bezel>
+		<bezel element="mask2" inputtag="IN.0" inputmask="0x04">
+			<bounds x="29" y="9" width="10" height="12" />
+			<color alpha="0.4" />
+		</bezel>
+		<bezel element="mask3" inputtag="IN.0" inputmask="0x04">
+			<bounds x="29" y="9" width="10" height="12" />
+		</bezel>
+		<bezel element="mask4" inputtag="IN.0" inputmask="0x04">
+			<bounds x="29" y="9" width="10" height="12" />
+		</bezel>
+
+	<!-- row 8 9 4 -->
+
+		<bezel element="button8">
+			<bounds x="3" y="24" width="10" height="12" />
+		</bezel>
+		<bezel name="0.7" element="mask1">
+			<bounds x="3" y="24" width="10" height="12" />
+			<color alpha="0.4" />
+		</bezel>
+		<bezel element="mask2" inputtag="IN.1" inputmask="0x08">
+			<bounds x="3" y="24" width="10" height="12" />
+			<color alpha="0.4" />
+		</bezel>
+		<bezel element="mask3" inputtag="IN.1" inputmask="0x08">
+			<bounds x="3" y="24" width="10" height="12" />
+		</bezel>
+		<bezel element="mask4" inputtag="IN.1" inputmask="0x08">
+			<bounds x="3" y="24" width="10" height="12" />
+		</bezel>
+
+		<bezel element="button9">
+			<bounds x="16" y="24" width="10" height="12" />
+		</bezel>
+		<bezel name="0.8" element="mask1">
+			<bounds x="16" y="24" width="10" height="12" />
+			<color alpha="0.4" />
+		</bezel>
+		<bezel element="mask2" inputtag="IN.2" inputmask="0x01">
+			<bounds x="16" y="24" width="10" height="12" />
+			<color alpha="0.4" />
+		</bezel>
+		<bezel element="mask3" inputtag="IN.2" inputmask="0x01">
+			<bounds x="16" y="24" width="10" height="12" />
+		</bezel>
+		<bezel element="mask4" inputtag="IN.2" inputmask="0x01">
+			<bounds x="16" y="24" width="10" height="12" />
+		</bezel>
+
+		<bezel element="button4">
+			<bounds x="29" y="24" width="10" height="12" />
+		</bezel>
+		<bezel name="0.3" element="mask1">
+			<bounds x="29" y="24" width="10" height="12" />
+			<color alpha="0.4" />
+		</bezel>
+		<bezel element="mask2" inputtag="IN.0" inputmask="0x08">
+			<bounds x="29" y="24" width="10" height="12" />
+			<color alpha="0.4" />
+		</bezel>
+		<bezel element="mask3" inputtag="IN.0" inputmask="0x08">
+			<bounds x="29" y="24" width="10" height="12" />
+		</bezel>
+		<bezel element="mask4" inputtag="IN.0" inputmask="0x08">
+			<bounds x="29" y="24" width="10" height="12" />
+		</bezel>
+
+	<!-- row 7 6 5 -->
+
+		<bezel element="button7">
+			<bounds x="3" y="39" width="10" height="12" />
+		</bezel>
+		<bezel name="0.6" element="mask1">
+			<bounds x="3" y="39" width="10" height="12" />
+			<color alpha="0.4" />
+		</bezel>
+		<bezel element="mask2" inputtag="IN.1" inputmask="0x04">
+			<bounds x="3" y="39" width="10" height="12" />
+			<color alpha="0.4" />
+		</bezel>
+		<bezel element="mask3" inputtag="IN.1" inputmask="0x04">
+			<bounds x="3" y="39" width="10" height="12" />
+		</bezel>
+		<bezel element="mask4" inputtag="IN.1" inputmask="0x04">
+			<bounds x="3" y="39" width="10" height="12" />
+		</bezel>
+
+		<bezel element="button6">
+			<bounds x="16" y="39" width="10" height="12" />
+		</bezel>
+		<bezel name="0.5" element="mask1">
+			<bounds x="16" y="39" width="10" height="12" />
+			<color alpha="0.4" />
+		</bezel>
+		<bezel element="mask2" inputtag="IN.1" inputmask="0x02">
+			<bounds x="16" y="39" width="10" height="12" />
+			<color alpha="0.4" />
+		</bezel>
+		<bezel element="mask3" inputtag="IN.1" inputmask="0x02">
+			<bounds x="16" y="39" width="10" height="12" />
+		</bezel>
+		<bezel element="mask4" inputtag="IN.1" inputmask="0x02">
+			<bounds x="16" y="39" width="10" height="12" />
+		</bezel>
+
+		<bezel element="button5">
+			<bounds x="29" y="39" width="10" height="12" />
+		</bezel>
+		<bezel name="0.4" element="mask1">
+			<bounds x="29" y="39" width="10" height="12" />
+			<color alpha="0.4" />
+		</bezel>
+		<bezel element="mask2" inputtag="IN.1" inputmask="0x01">
+			<bounds x="29" y="39" width="10" height="12" />
+			<color alpha="0.4" />
+		</bezel>
+		<bezel element="mask3" inputtag="IN.1" inputmask="0x01">
+			<bounds x="29" y="39" width="10" height="12" />
+		</bezel>
+		<bezel element="mask4" inputtag="IN.1" inputmask="0x01">
+			<bounds x="29" y="39" width="10" height="12" />
+		</bezel>
+
+	<!-- number labels -->
+
+		<bezel element="text_1"><bounds x="3" y="21.4" width="9" height="2" /></bezel>
+		<bezel element="text_2"><bounds x="16" y="21.4" width="9" height="2" /></bezel>
+		<bezel element="text_3"><bounds x="29" y="21.4" width="9" height="2" /></bezel>
+
+		<bezel element="text_8"><bounds x="3" y="36.4" width="9" height="2" /></bezel>
+		<bezel element="text_9"><bounds x="16" y="36.4" width="9" height="2" /></bezel>
+		<bezel element="text_4"><bounds x="29" y="36.4" width="9" height="2" /></bezel>
+
+		<bezel element="text_7"><bounds x="3" y="51.4" width="9" height="2" /></bezel>
+		<bezel element="text_6"><bounds x="16" y="51.4" width="9" height="2" /></bezel>
+		<bezel element="text_5"><bounds x="29" y="51.4" width="9" height="2" /></bezel>
+
+	</view>
+</mamelayout>

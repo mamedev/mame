@@ -11,14 +11,37 @@
     Graphics ROM board: 86612-B-2
      Program ROM board: 86612-C-2
 
-      Main CPU: 68000CP10
-     Sound CPU: Z80A
-           MCU: Intel C8751H-88
+      Main CPU: 68000CP10        @ 24MHz / 2 = 12MHz
+     Sound CPU: Z80A             @ 14.31818 / 4 = 3.579545MHz
+           MCU: Intel C8751H-88  @ 24MHz / 4 = 6MHz
     Sound Chip: YM2151 & YM3012
            OSC: 24.000 MHz (on the 86612-B-2 PCB)
         Custom: CAPCOM DL-010D-103 (on the 86612-B-2 PCB)
 
+    Horizontal scan rate: 15.606kHz
+    Vertical scan rate: 60.024Hz
 
+    pixel clock:         6.000MHz, 166ns per pixel
+
+    htotal:             64.076us, 386 pixels
+    hsync:               5.312us,  32 pixels
+    back porch + sync:  15.106us,  91 pixels
+    active video:       42.662us, 257 pixels (it looks like the first pixel is repeated)
+    front porch:         6.308us,  38 pixels
+
+    vtotal:             16.660ms, 260 lines
+    vsync:             256.304us,   4 lines
+    back porch + sync:   1.282ms,  20 lines
+    active video:       14.353ms, 224 lines
+    front porch:         1.025ms,  16 lines
+
+    Clocks verified on 86612-A-2 and 86612-B-2 boards, serial no. 39646
+    ("Bionic Commando", US region) by scope measurement at clock pins.
+    Timings verified at SYNC pin and BLUE pin (jamma edge),
+    using an Agilent DSO9404A scope and two N2873A 500MHz probes
+
+    Note: Protection MCU is labelled "TS" without a number and without a coloured
+          stripe. Maybe its code is not region dependant.
     Note: Euro rom labels (IE: "TSE") had a blue stripe, while those labeled
           as USA (TSU) had an red stripe on the sticker.  The intermixing
           of TSE and TSU roms in the parent set is correct and verified.
@@ -41,7 +64,7 @@
         0xFFFFFD (player 2)
         0xFFFFFF (player 1)
 
-        This is probably done by the Intel C8751H MCU on the board (whose interal ROM
+        This is probably done by the Intel C8751H MCU on the board (whose internal ROM
         is not yet available).
 
         The MCU also takes care of the commands for the sound CPU, which are stored
@@ -58,10 +81,13 @@
 ******************************************************************************************/
 
 #include "emu.h"
+#include "includes/bionicc.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
-#include "sound/2151intf.h"
-#include "includes/bionicc.h"
+#include "sound/ym2151.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 /*************************************
@@ -82,7 +108,7 @@ READ16_MEMBER(bionicc_state::hacked_controls_r)
 	return m_inp[offset];
 }
 
-WRITE16_MEMBER(bionicc_state::bionicc_mpu_trigger_w)
+WRITE16_MEMBER(bionicc_state::mpu_trigger_w)
 {
 	data = ioport("SYSTEM")->read() >> 12;
 	m_inp[0] = data ^ 0x0f;
@@ -118,7 +144,7 @@ READ16_MEMBER(bionicc_state::hacked_soundcommand_r)
 
 ********************************************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(bionicc_state::bionicc_scanline)
+TIMER_DEVICE_CALLBACK_MEMBER(bionicc_state::scanline)
 {
 	int scanline = param;
 
@@ -141,14 +167,15 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, bionicc_state )
 	AM_RANGE(0xfe0000, 0xfe07ff) AM_RAM /* RAM? */
 	AM_RANGE(0xfe0800, 0xfe0cff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xfe0d00, 0xfe3fff) AM_RAM              /* RAM? */
-	AM_RANGE(0xfe4000, 0xfe4001) AM_WRITE(bionicc_gfxctrl_w)    /* + coin counters */
+	AM_RANGE(0xfe4000, 0xfe4001) AM_WRITE(gfxctrl_w)    /* + coin counters */
 	AM_RANGE(0xfe4000, 0xfe4001) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xfe4002, 0xfe4003) AM_READ_PORT("DSW")
-	AM_RANGE(0xfe8010, 0xfe8017) AM_WRITE(bionicc_scroll_w)
-	AM_RANGE(0xfe801a, 0xfe801b) AM_WRITE(bionicc_mpu_trigger_w)    /* ??? not sure, but looks like it */
-	AM_RANGE(0xfec000, 0xfecfff) AM_RAM_WRITE(bionicc_txvideoram_w) AM_SHARE("txvideoram")
-	AM_RANGE(0xff0000, 0xff3fff) AM_RAM_WRITE(bionicc_fgvideoram_w) AM_SHARE("fgvideoram")
-	AM_RANGE(0xff4000, 0xff7fff) AM_RAM_WRITE(bionicc_bgvideoram_w) AM_SHARE("bgvideoram")
+	AM_RANGE(0xfe8010, 0xfe8017) AM_WRITE(scroll_w)
+	AM_RANGE(0xfe8018, 0xfe8019) AM_WRITENOP // vblank irq ack?
+	AM_RANGE(0xfe801a, 0xfe801b) AM_WRITE(mpu_trigger_w)    /* ??? not sure, but looks like it */
+	AM_RANGE(0xfec000, 0xfecfff) AM_RAM_WRITE(txvideoram_w) AM_SHARE("txvideoram")
+	AM_RANGE(0xff0000, 0xff3fff) AM_RAM_WRITE(fgvideoram_w) AM_SHARE("fgvideoram")
+	AM_RANGE(0xff4000, 0xff7fff) AM_RAM_WRITE(bgvideoram_w) AM_SHARE("bgvideoram")
 	AM_RANGE(0xff8000, 0xff87ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xffc000, 0xfffff7) AM_RAM /* working RAM */
 	AM_RANGE(0xfffff8, 0xfffff9) AM_READWRITE(hacked_soundcommand_r, hacked_soundcommand_w)      /* hack */
@@ -342,12 +369,14 @@ void bionicc_state::machine_reset()
 	m_soundcommand = 0;
 }
 
-static MACHINE_CONFIG_START( bionicc, bionicc_state )
+static MACHINE_CONFIG_START( bionicc )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz / 2) /* 12 MHz - verified in schematics */
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", bionicc_state, bionicc_scanline, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", bionicc_state, scanline, "screen", 0, 1)
+
+	/* Protection MCU Intel C8751H-88 runs at 24MHz / 4 = 6MHz */
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_14_31818MHz / 4)   /* EXO3 C,B=GND, A=5V ==> Divisor 2^2 */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
@@ -360,12 +389,10 @@ static MACHINE_CONFIG_START( bionicc, bionicc_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(bionicc_state, screen_update_bionicc)
-	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram16_device, vblank_copy_rising)
+	/* FIXME: should be 257 visible horizontal pixels, first visible pixel should be repeated, back porch/front porch should be separated */
+	MCFG_SCREEN_RAW_PARAMS(XTAL_24MHz / 4, 386, 0, 256, 260, 16, 240)
+	MCFG_SCREEN_UPDATE_DRIVER(bionicc_state, screen_update)
+	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bionicc)
@@ -611,6 +638,49 @@ ROM_START( bioniccbl )
 	ROM_LOAD( "63s141.18f",   0x0000, 0x0100, CRC(b58d0023) SHA1(e8a4a2e2951bf73b3d9eed6957e9ee1e61c9c58a) )    /* priority (not used), Labeled "TSB" */
 ROM_END
 
+ROM_START( bioniccbl2 ) // only the 4 maincpu ROMs differ, they came from an original, not working, Capcom board, but the title screen is Bionic Commandos like a bootleg? The other ROMs match topsecrt
+	ROM_REGION( 0x40000, "maincpu", 0 )      /* 68000 code */
+	ROM_LOAD16_BYTE( "tsu_02.1a",   0x00000, 0x10000, CRC(c03d3424) SHA1(1d47185e10813c2792bda31c7dfbb40e88fd46ee) ) //sldc
+	ROM_LOAD16_BYTE( "tsu_04.1b",   0x00001, 0x10000, CRC(9f13eb9d) SHA1(b9c8cfc22a1d2adcc6a93e3e382b2126446c05aa) ) //sldc
+	ROM_LOAD16_BYTE( "3",   0x20000, 0x10000, CRC(a909ec2c) SHA1(7979480b5d82704f7d15546bda6af78316505f85) ) // the only ROM without an original sticker
+	ROM_LOAD16_BYTE( "tsu_05.1d",   0x20001, 0x10000, CRC(4e6b75ce) SHA1(44c3900b8dc9f375a7d6ed57c4025bc35771e29c) ) //sldc
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "ts_01.4e",    0x00000, 0x8000, CRC(8ea07917) SHA1(e9ace70d89482fc3669860450a41aacacbee9083) )
+
+	ROM_REGION( 0x1000, "mcu", 0 )  /* i8751 microcontroller */
+	ROM_LOAD( "c8751h-88",     0x0000, 0x1000, NO_DUMP )
+
+	ROM_REGION( 0x08000, "gfx1", 0 )
+	ROM_LOAD( "ts_08.8l",    0x00000, 0x8000, CRC(96ad379e) SHA1(accd3a560b259c186bc28cdc004ed8de0b12f9d5) )    /* VIDEORAM (text layer) tiles */
+
+	ROM_REGION( 0x10000, "gfx2", 0 )
+	ROM_LOAD( "ts_07.5l",    0x00000, 0x8000, CRC(25cdf8b2) SHA1(316f6acc46878682dabeab12722e6a64504d23bd) )    /* SCROLL2 Layer Tiles */
+	ROM_LOAD( "ts_06.4l",    0x08000, 0x8000, CRC(314fb12d) SHA1(dab0519a49b64fe7a837b3c6383f6147e1ab6ffd) )
+
+	ROM_REGION( 0x40000, "gfx3", 0 )
+	ROM_LOAD( "ts_12.17f",    0x00000, 0x8000, CRC(e4b4619e) SHA1(3bec8399ffb28fd50ce6ae88d90b091eadf8bda1) )   /* SCROLL1 Layer Tiles */
+	ROM_LOAD( "ts_11.15f",    0x08000, 0x8000, CRC(ab30237a) SHA1(ea6c07df992ba48f9eca7daa4ea775faa94358d2) )
+	ROM_LOAD( "ts_17.17g",    0x10000, 0x8000, CRC(deb657e4) SHA1(b36b468f9bbb7a4937286230d3f6caa14c61d4dd) )
+	ROM_LOAD( "ts_16.15g",    0x18000, 0x8000, CRC(d363b5f9) SHA1(1dd3991d99db2d6bcbdb12879ba50a01fef95004) )
+	ROM_LOAD( "ts_13.18f",    0x20000, 0x8000, CRC(a8f5a004) SHA1(36ab0cb8ec9ce0519876f7461ccc5020c9c5b597) )
+	ROM_LOAD( "ts_18.18g",    0x28000, 0x8000, CRC(3b36948c) SHA1(d85fcc0265ba1729c587b046cc5a7ba6f25363dd) )
+	ROM_LOAD( "ts_23.18j",    0x30000, 0x8000, CRC(bbfbe58a) SHA1(9b1d5672b6f3c5c0952f8dcd0da71acc68a97a5e) )
+	ROM_LOAD( "ts_24.18k",    0x38000, 0x8000, CRC(f156e564) SHA1(a6cad05bcc6d9ded6294f9b5aa856d05641aed02) )
+
+	ROM_REGION( 0x40000, "gfx4", 0 )
+	ROM_LOAD( "tse_10.13f",   0x00000, 0x8000, CRC(d28eeacc) SHA1(8b4a655a48da276b07f3464c65743b13cec52bcb) )   /* Sprites */
+	ROM_LOAD( "tsu_09.11f",   0x08000, 0x8000, CRC(6a049292) SHA1(525c862061f426d679b539b6926af4c9f14b47b5) )
+	ROM_LOAD( "tse_15.13g",   0x10000, 0x8000, CRC(9b5593c0) SHA1(73c0acbb01fe69c2bd29dea11b6a223c8efb54a0) )
+	ROM_LOAD( "tsu_14.11g",   0x18000, 0x8000, CRC(46b2ad83) SHA1(21ebd5691a544323fdfcf330b9a37bbe0428e3e3) )
+	ROM_LOAD( "tse_20.13j",   0x20000, 0x8000, CRC(b03db778) SHA1(f72a93e73196c800c1893fd3b523394d702547dd) )
+	ROM_LOAD( "tsu_19.11j",   0x28000, 0x8000, CRC(b5c82722) SHA1(969f9159f7d59e4e4c9ef9ddbdc27cbfa531eabf) )
+	ROM_LOAD( "tse_22.17j",   0x30000, 0x8000, CRC(d4dedeb3) SHA1(e121057bb541f3f5c755963ca22832c3fe2637c0) )
+	ROM_LOAD( "tsu_21.15j",   0x38000, 0x8000, CRC(98777006) SHA1(bcc2058b639e9b71d16af05f63df298bcce91fdc) )
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "63s141.18f",   0x0000, 0x0100, CRC(b58d0023) SHA1(e8a4a2e2951bf73b3d9eed6957e9ee1e61c9c58a) )    /* priority (not used), Labeled "TSB" */
+ROM_END
 
 
 /*************************************
@@ -619,10 +689,11 @@ ROM_END
  *
  *************************************/
 
-GAME( 1987, bionicc,  0,       bionicc, bionicc, driver_device, 0, ROT0, "Capcom", "Bionic Commando (Euro)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, bionicc1, bionicc, bionicc, bionicc, driver_device, 0, ROT0, "Capcom", "Bionic Commando (US set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, bionicc2, bionicc, bionicc, bionicc, driver_device, 0, ROT0, "Capcom", "Bionic Commando (US set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, topsecrt, bionicc, bionicc, bionicc, driver_device, 0, ROT0, "Capcom", "Top Secret (Japan, old revision)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, bioniccbl,bionicc, bionicc, bionicc, driver_device, 0, ROT0, "bootleg", "Bionic Commandos (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, bionicc,   0,       bionicc, bionicc, bionicc_state, 0, ROT0, "Capcom",  "Bionic Commando (Euro)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1987, bionicc1,  bionicc, bionicc, bionicc, bionicc_state, 0, ROT0, "Capcom",  "Bionic Commando (US set 1)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1987, bionicc2,  bionicc, bionicc, bionicc, bionicc_state, 0, ROT0, "Capcom",  "Bionic Commando (US set 2)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1987, topsecrt,  bionicc, bionicc, bionicc, bionicc_state, 0, ROT0, "Capcom",  "Top Secret (Japan, old revision)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1987, bioniccbl, bionicc, bionicc, bionicc, bionicc_state, 0, ROT0, "bootleg", "Bionic Commandos (bootleg, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, bioniccbl2,bionicc, bionicc, bionicc, bionicc_state, 0, ROT0, "bootleg", "Bionic Commandos (bootleg, set 2)", MACHINE_SUPPORTS_SAVE )
 
 // there's also an undumped JP new revision on which there are no extra lives after 1 million points, plus other bug-fixes / changes

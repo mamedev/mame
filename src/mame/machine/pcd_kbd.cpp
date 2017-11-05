@@ -1,8 +1,13 @@
 // license:BSD-3-Clause
 // copyright-holders:Carl
+#include "emu.h"
 #include "pcd_kbd.h"
 
-const device_type PCD_KEYBOARD = &device_creator<pcd_keyboard_device>;
+#include "cpu/mcs48/mcs48.h"
+#include "sound/spkrdev.h"
+#include "speaker.h"
+
+DEFINE_DEVICE_TYPE(PCD_KEYBOARD, pcd_keyboard_device, "pcd_kbd", "Siemens PC-D Keyboard")
 
 ROM_START( pcd_keyboard )
 	ROM_REGION(0x1000, "mcu", 0)
@@ -12,7 +17,7 @@ ROM_START( pcd_keyboard )
 ROM_END
 
 
-const rom_entry *pcd_keyboard_device::device_rom_region() const
+const tiny_rom_entry *pcd_keyboard_device::device_rom_region() const
 {
 	return ROM_NAME( pcd_keyboard );
 }
@@ -21,16 +26,13 @@ static ADDRESS_MAP_START( pcd_keyboard_map, AS_PROGRAM, 8, pcd_keyboard_device )
 	AM_RANGE(0x000, 0xfff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pcd_keyboard_io, AS_IO, 8, pcd_keyboard_device )
-	AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS) AM_READ(bus_r)
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READWRITE(p1_r, p1_w)
-	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ(t0_r)
-ADDRESS_MAP_END
-
-static MACHINE_CONFIG_FRAGMENT( pcd_keyboard )
+MACHINE_CONFIG_MEMBER( pcd_keyboard_device::device_add_mconfig )
 	MCFG_CPU_ADD("mcu", I8035, 5760000*2) // FIXME: the mc2661 baud rate calculation
 	MCFG_CPU_PROGRAM_MAP(pcd_keyboard_map)
-	MCFG_CPU_IO_MAP(pcd_keyboard_io)
+	MCFG_MCS48_PORT_BUS_IN_CB(READ8(pcd_keyboard_device, bus_r))
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(pcd_keyboard_device, p1_r))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(pcd_keyboard_device, p1_w))
+	MCFG_MCS48_PORT_T0_IN_CB(READLINE(pcd_keyboard_device, t0_r))
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -38,10 +40,6 @@ static MACHINE_CONFIG_FRAGMENT( pcd_keyboard )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-machine_config_constructor pcd_keyboard_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( pcd_keyboard );
-}
 
 INPUT_PORTS_START( pcd_keyboard )
 	PORT_START("ROW.0")
@@ -221,11 +219,11 @@ ioport_constructor pcd_keyboard_device::device_input_ports() const
 	return INPUT_PORTS_NAME( pcd_keyboard );
 }
 
-pcd_keyboard_device::pcd_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, PCD_KEYBOARD, "PC-D Keyboard", tag, owner, clock, "pcd_kbd", __FILE__),
-		m_rows(*this, "ROW"),
-		m_p1(0),
-		m_out_tx_handler(*this)
+pcd_keyboard_device::pcd_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, PCD_KEYBOARD, tag, owner, clock)
+	, m_rows(*this, "ROW.%u", 0)
+	, m_p1(0)
+	, m_out_tx_handler(*this)
 {
 }
 
@@ -253,7 +251,7 @@ WRITE8_MEMBER( pcd_keyboard_device::p1_w )
 	m_out_tx_handler(BIT(data, 5));
 }
 
-READ8_MEMBER( pcd_keyboard_device::t0_r )
+READ_LINE_MEMBER( pcd_keyboard_device::t0_r )
 {
 	return m_t0;
 }

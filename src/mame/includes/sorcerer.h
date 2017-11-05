@@ -9,12 +9,11 @@
 #ifndef SORCERER_H_
 #define SORCERER_H_
 
-#include "emu.h"
 #include "cpu/z80/z80.h"
-#include "sound/dac.h"
 #include "sound/wave.h"
 #include "machine/ay31015.h"
 #include "bus/centronics/ctronics.h"
+#include "bus/rs232/rs232.h"
 #include "machine/ram.h"
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
@@ -25,7 +24,8 @@
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 
-#define SORCERER_USING_RS232 0
+#define ES_CPU_CLOCK (12638000 / 6)
+#define ES_UART_CLOCK (ES_CPU_CLOCK / 440)
 
 struct cass_data_t {
 	struct {
@@ -59,12 +59,13 @@ public:
 		, m_wave1(*this, WAVE_TAG)
 		, m_wave2(*this, WAVE2_TAG)
 		, m_uart(*this, "uart")
+		, m_rs232(*this, "rs232")
 		, m_centronics(*this, "centronics")
 		, m_cart(*this, "cartslot")
 		, m_ram(*this, RAM_TAG)
 		, m_iop_config(*this, "CONFIG")
 		, m_iop_vs(*this, "VS")
-		, m_iop_x(*this, "X")
+		, m_iop_x(*this, "X.%u", 0)
 	{ }
 
 	DECLARE_READ8_MEMBER(sorcerer_fc_r);
@@ -77,14 +78,15 @@ public:
 	DECLARE_MACHINE_START(sorcererd);
 	DECLARE_DRIVER_INIT(sorcerer);
 	TIMER_CALLBACK_MEMBER(sorcerer_cassette_tc);
+	TIMER_CALLBACK_MEMBER(sorcerer_serial_tc);
 	TIMER_CALLBACK_MEMBER(sorcerer_reset);
 	DECLARE_SNAPSHOT_LOAD_MEMBER( sorcerer );
 	DECLARE_QUICKLOAD_LOAD_MEMBER( sorcerer);
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 private:
-	UINT8 m_fe;
-	UINT8 m_keyboard_line;
-	const UINT8 *m_p_videoram;
+	uint8_t m_fe;
+	uint8_t m_keyboard_line;
+	const uint8_t *m_p_videoram;
 	emu_timer *m_serial_timer;
 	emu_timer *m_cassette_timer;
 	cass_data_t m_cass_data;
@@ -98,6 +100,7 @@ private:
 	required_device<wave_device> m_wave1;
 	required_device<wave_device> m_wave2;
 	required_device<ay31015_device> m_uart;
+	required_device<rs232_port_device> m_rs232;
 	required_device<centronics_device> m_centronics;
 	required_device<generic_slot_device> m_cart;
 	required_device<ram_device> m_ram;

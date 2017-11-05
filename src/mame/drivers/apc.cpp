@@ -54,15 +54,17 @@
 
 #include "emu.h"
 #include "cpu/i86/i86.h"
-#include "sound/upd1771.h"
+#include "machine/am9517a.h"
+#include "machine/nvram.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
-#include "machine/am9517a.h"
-#include "machine/upd765.h"
 #include "machine/upd1990a.h"
-#include "machine/nvram.h"
+#include "machine/upd765.h"
+#include "sound/upd1771.h"
 #include "video/upd7220.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
 //#include "sound/ay8910.h"
 
 #define MAIN_CLOCK XTAL_5MHz
@@ -96,16 +98,16 @@ public:
 	required_device<upd765a_device> m_fdc;
 	required_device<am9517a_device> m_dmac;
 	required_device<pit8253_device> m_pit;
-	UINT8 *m_char_rom;
-	UINT8 *m_aux_pcg;
+	uint8_t *m_char_rom;
+	uint8_t *m_aux_pcg;
 
-	required_shared_ptr<UINT16> m_video_ram_1;
-	required_shared_ptr<UINT16> m_video_ram_2;
+	required_shared_ptr<uint16_t> m_video_ram_1;
+	required_shared_ptr<uint16_t> m_video_ram_2;
 
 	required_device<palette_device> m_palette;
 
 	// screen updates
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 
 	DECLARE_READ8_MEMBER(apc_port_28_r);
@@ -124,10 +126,10 @@ public:
 //  DECLARE_WRITE8_MEMBER(aux_pcg_w);
 
 	struct {
-		UINT8 status; //status
-		UINT8 data; //key data
-		UINT8 sig; //switch signal port
-		UINT8 sh; //shift switches
+		uint8_t status; //status
+		uint8_t data; //key data
+		uint8_t sig; //switch signal port
+		uint8_t sh; //shift switches
 	}m_keyb;
 	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
 
@@ -146,7 +148,7 @@ public:
 	DECLARE_DRIVER_INIT(apc);
 
 	int m_dack;
-	UINT8 m_dma_offset[4];
+	uint8_t m_dma_offset[4];
 
 	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
 	UPD7220_DRAW_TEXT_LINE_MEMBER( hgdc_draw_text );
@@ -166,7 +168,7 @@ void apc_state::video_start()
 	m_aux_pcg = memregion("aux_pcg")->base();
 }
 
-UINT32 apc_state::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect )
+uint32_t apc_state::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect )
 {
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
@@ -188,8 +190,8 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( apc_state::hgdc_draw_text )
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	int xi,yi,yi_trans;
 	int x;
-	UINT8 char_size;
-//  UINT8 interlace_on;
+	uint8_t char_size;
+//  uint8_t interlace_on;
 
 //  if(m_video_ff[DISPLAY_REG] == 0) //screen is off
 //      return;
@@ -199,12 +201,12 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( apc_state::hgdc_draw_text )
 
 	for(x=0;x<pitch;x++)
 	{
-		UINT8 tile_data;
-		UINT8 u_line, o_line, v_line, reverse, blink;
-		UINT8 color;
-		UINT8 tile,attr,pen;
-		UINT32 tile_addr;
-		UINT8 tile_sel;
+		uint8_t tile_data;
+		uint8_t u_line, o_line, v_line, reverse, blink;
+		uint8_t color;
+		uint8_t tile,attr,pen;
+		uint32_t tile_addr;
+		uint8_t tile_sel;
 
 //      tile_addr = addr+(x*(m_video_ff[WIDTH40_REG]+1));
 		tile_addr = addr+(x*(1));
@@ -283,7 +285,7 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( apc_state::hgdc_draw_text )
 
 READ8_MEMBER(apc_state::apc_port_28_r)
 {
-	UINT8 res;
+	uint8_t res;
 
 	if(offset & 1)
 		res = m_pit->read(space, (offset & 6) >> 1);
@@ -317,7 +319,7 @@ WRITE8_MEMBER(apc_state::apc_port_28_w)
 
 READ8_MEMBER(apc_state::apc_gdc_r)
 {
-	UINT8 res;
+	uint8_t res;
 
 	if(offset & 1)
 		res = m_hgdc2->read(space, (offset & 2) >> 1); // upd7220 bitmap port
@@ -337,7 +339,7 @@ WRITE8_MEMBER(apc_state::apc_gdc_w)
 
 READ8_MEMBER(apc_state::apc_kbd_r)
 {
-	UINT8 res = 0;
+	uint8_t res = 0;
 
 	switch(offset & 3)
 	{
@@ -500,7 +502,7 @@ INPUT_CHANGED_MEMBER(apc_state::key_stroke)
 {
 	if(newval && !oldval)
 	{
-		m_keyb.data = (UINT8)(FPTR)(param) & 0xff;
+		m_keyb.data = (uint8_t)(uintptr_t)(param) & 0xff;
 		//m_keyb.status &= ~1;
 		machine().device<pic8259_device>("pic8259_master")->ir4_w(1);
 	}
@@ -783,11 +785,11 @@ GFXDECODE_END
 
 
 
-static ADDRESS_MAP_START( upd7220_1_map, AS_0, 16, apc_state)
+static ADDRESS_MAP_START( upd7220_1_map, 0, 16, apc_state)
 	AM_RANGE(0x00000, 0x3ffff) AM_RAM AM_SHARE("video_ram_1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( upd7220_2_map, AS_0, 16, apc_state )
+static ADDRESS_MAP_START( upd7220_2_map, 0, 16, apc_state )
 	AM_RANGE(0x00000, 0x3ffff) AM_RAM AM_SHARE("video_ram_2")
 ADDRESS_MAP_END
 
@@ -907,7 +909,7 @@ static SLOT_INTERFACE_START( apc_floppies )
 	SLOT_INTERFACE( "8", FLOPPY_8_DSDD )
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( apc, apc_state )
+static MACHINE_CONFIG_START( apc )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8086,MAIN_CLOCK)
@@ -921,8 +923,15 @@ static MACHINE_CONFIG_START( apc, apc_state )
 	MCFG_PIT8253_CLK1(MAIN_CLOCK) /* Memory Refresh */
 	MCFG_PIT8253_CLK2(MAIN_CLOCK) /* RS-232c */
 
-	MCFG_PIC8259_ADD( "pic8259_master", INPUTLINE("maincpu", 0), VCC, READ8(apc_state,get_slave_ack) )
-	MCFG_PIC8259_ADD( "pic8259_slave", DEVWRITELINE("pic8259_master", pic8259_device, ir7_w), GND, NOOP) // TODO: check ir7_w
+	MCFG_DEVICE_ADD("pic8259_master", PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
+	MCFG_PIC8259_IN_SP_CB(VCC)
+	MCFG_PIC8259_CASCADE_ACK_CB(READ8(apc_state, get_slave_ack))
+
+	MCFG_DEVICE_ADD("pic8259_slave", PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(DEVWRITELINE("pic8259_master", pic8259_device, ir7_w)) // TODO: check ir7_w
+	MCFG_PIC8259_IN_SP_CB(GND)
+
 	MCFG_DEVICE_ADD("i8237", AM9517A, MAIN_CLOCK)
 	MCFG_I8237_OUT_HREQ_CB(WRITELINE(apc_state, apc_dma_hrq_changed))
 	MCFG_I8237_OUT_EOP_CB(WRITELINE(apc_state, apc_tc_w))
@@ -958,11 +967,11 @@ static MACHINE_CONFIG_START( apc, apc_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", apc)
 
 	MCFG_DEVICE_ADD("upd7220_chr", UPD7220, 3579545) // unk clock
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, upd7220_1_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, upd7220_1_map)
 	MCFG_UPD7220_DRAW_TEXT_CALLBACK_OWNER(apc_state, hgdc_draw_text)
 
 	MCFG_DEVICE_ADD("upd7220_btm", UPD7220, 3579545) // unk clock
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, upd7220_2_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, upd7220_2_map)
 	MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(apc_state, hgdc_display_pixels)
 
 	/* sound hardware */

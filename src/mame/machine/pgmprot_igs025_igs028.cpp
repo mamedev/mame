@@ -26,7 +26,7 @@
 
 // tables are xored by table at $1998dc
 // tables are the same as drgw3 and drgw2
-static const UINT8 m_olds_source_data[8][0xec] = // table addresses $2951CA
+static const uint8_t m_olds_source_data[8][0xec] = // table addresses $2951CA
 {
 	{ // region 0, unused...
 		0,
@@ -185,7 +185,7 @@ void pgm_028_025_state::igs025_to_igs028_callback( void )
 }
 
 
-MACHINE_CONFIG_START( pgm_028_025_ol, pgm_028_025_state )
+MACHINE_CONFIG_START( pgm_028_025_ol )
 	MCFG_FRAGMENT_ADD(pgmbase)
 
 	MCFG_CPU_MODIFY("maincpu")

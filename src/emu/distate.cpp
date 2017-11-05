@@ -15,28 +15,28 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const UINT64 device_state_entry::k_decimal_divisor[] =
+const u64 device_state_entry::k_decimal_divisor[] =
 {
-	1,
-	10,
-	100,
-	1000,
-	10000,
-	100000,
-	1000000,
-	10000000,
-	100000000,
-	1000000000,
-	U64(10000000000),
-	U64(100000000000),
-	U64(1000000000000),
-	U64(10000000000000),
-	U64(100000000000000),
-	U64(1000000000000000),
-	U64(10000000000000000),
-	U64(100000000000000000),
-	U64(1000000000000000000),
-	U64(10000000000000000000)
+	1U,
+	10U,
+	100U,
+	1000U,
+	10000U,
+	100000U,
+	1000000U,
+	10000000U,
+	100000000U,
+	1000000000U,
+	10000000000U,
+	100000000000U,
+	1000000000000U,
+	10000000000000U,
+	100000000000000U,
+	1000000000000000U,
+	10000000000000000U,
+	100000000000000000U,
+	1000000000000000000U,
+	10000000000000000000U
 };
 
 
@@ -49,38 +49,23 @@ const UINT64 device_state_entry::k_decimal_divisor[] =
 //  device_state_entry - constructor
 //-------------------------------------------------
 
-device_state_entry::device_state_entry(int index, const char *symbol, void *dataptr, UINT8 size, device_state_interface *dev)
+device_state_entry::device_state_entry(int index, const char *symbol, u8 size, u64 sizemask, u8 flags, device_state_interface *dev)
 	: m_device_state(dev),
-		m_next(nullptr),
 		m_index(index),
-		m_dataptr(dataptr),
-		m_datamask(0),
+		m_datamask(sizemask),
 		m_datasize(size),
-		m_flags(0),
+		m_flags(flags),
 		m_symbol(symbol),
 		m_default_format(true),
-		m_sizemask(0)
+		m_sizemask(sizemask)
 {
-	// convert the size to a mask
-	assert(size == 1 || size == 2 || size == 4 || size == 8);
-	if (size == 1)
-		m_sizemask = 0xff;
-	else if (size == 2)
-		m_sizemask = 0xffff;
-	else if (size == 4)
-		m_sizemask = 0xffffffff;
-	else
-		m_sizemask = ~U64(0);
+	assert(size == 1 || size == 2 || size == 4 || size == 8 || (flags & DSF_FLOATING_POINT) != 0);
 
-	// default the data mask to the same
-	m_datamask = m_sizemask;
 	format_from_mask();
 
 	// override well-known symbols
-	if (index == STATE_GENPC)
+	if (index == STATE_GENPCBASE)
 		m_symbol.assign("CURPC");
-	else if (index == STATE_GENPCBASE)
-		m_symbol.assign("CURPCBASE");
 	else if (index == STATE_GENSP)
 		m_symbol.assign("CURSP");
 	else if (index == STATE_GENFLAGS)
@@ -89,15 +74,22 @@ device_state_entry::device_state_entry(int index, const char *symbol, void *data
 
 device_state_entry::device_state_entry(int index, device_state_interface *dev)
 	: m_device_state(dev),
-		m_next(nullptr),
 		m_index(index),
-		m_dataptr(nullptr),
 		m_datamask(0),
 		m_datasize(0),
-		m_flags(DSF_DIVIDER),
+		m_flags(DSF_DIVIDER | DSF_READONLY),
 		m_symbol(),
 		m_default_format(true),
 		m_sizemask(0)
+{
+}
+
+
+//-------------------------------------------------
+//  device_state_entry - destructor
+//-------------------------------------------------
+
+device_state_entry::~device_state_entry()
 {
 }
 
@@ -130,31 +122,49 @@ void device_state_entry::format_from_mask()
 	if (!m_default_format)
 		return;
 
+	if (is_float())
+	{
+		m_format = "%12s";
+		return;
+	}
+
 	// make up a format based on the mask
 	int width = 0;
-	for (UINT64 tempmask = m_datamask; tempmask != 0; tempmask >>= 4)
+	for (u64 tempmask = m_datamask; tempmask != 0; tempmask >>= 4)
 		width++;
 	m_format = string_format("%%0%dX", width);
 }
 
 
 //-------------------------------------------------
-//  value - return the current value as a UINT64
+//  entry_baseptr - return a pointer to where the
+//  data lives (if applicable)
 //-------------------------------------------------
 
-UINT64 device_state_entry::value() const
+void *device_state_entry::entry_baseptr() const
 {
-	// pick up the value
-	UINT64 result;
-	switch (m_datasize)
-	{
-		default:
-		case 1: result = *m_dataptr.u8;     break;
-		case 2: result = *m_dataptr.u16;    break;
-		case 4: result = *m_dataptr.u32;    break;
-		case 8: result = *m_dataptr.u64;    break;
-	}
-	return result & m_datamask;
+	return nullptr;
+}
+
+
+//-------------------------------------------------
+//  entry_value - return the current value as a u64
+//-------------------------------------------------
+
+u64 device_state_entry::entry_value() const
+{
+	return 0;
+}
+
+
+//-------------------------------------------------
+//  entry_dvalue - return the current value as a
+//  double
+//-------------------------------------------------
+
+double device_state_entry::entry_dvalue() const
+{
+	return 0.0;
 }
 
 
@@ -166,7 +176,7 @@ UINT64 device_state_entry::value() const
 std::string device_state_entry::format(const char *string, bool maxout) const
 {
 	std::string dest;
-	UINT64 result = value();
+	u64 result = value();
 
 	// parse the format
 	bool leadzero = false;
@@ -348,11 +358,13 @@ std::string device_state_entry::format(const char *string, bool maxout) const
 
 
 //-------------------------------------------------
-//  set_value - set the value from a UINT64
+//  set_value - set the value from a u64
 //-------------------------------------------------
 
-void device_state_entry::set_value(UINT64 value) const
+void device_state_entry::set_value(u64 value) const
 {
+	assert((m_flags & DSF_READONLY) == 0);
+
 	// apply the mask
 	value &= m_datamask;
 
@@ -361,14 +373,39 @@ void device_state_entry::set_value(UINT64 value) const
 		value |= ~m_datamask;
 
 	// store the value
-	switch (m_datasize)
-	{
-		default:
-		case 1: *m_dataptr.u8 = value;      break;
-		case 2: *m_dataptr.u16 = value;     break;
-		case 4: *m_dataptr.u32 = value;     break;
-		case 8: *m_dataptr.u64 = value;     break;
-	}
+	entry_set_value(value);
+}
+
+
+//-------------------------------------------------
+//  set_dvalue - set the value from a double
+//-------------------------------------------------
+
+void device_state_entry::set_dvalue(double value) const
+{
+	assert((m_flags & DSF_READONLY) == 0);
+
+	// store the value
+	entry_set_dvalue(value);
+}
+
+
+//-------------------------------------------------
+//  entry_set_value - set the value from a u64
+//-------------------------------------------------
+
+void device_state_entry::entry_set_value(u64 value) const
+{
+}
+
+
+//-------------------------------------------------
+//  entry_set_dvalue - set the value from a double
+//-------------------------------------------------
+
+void device_state_entry::entry_set_dvalue(double value) const
+{
+	set_value(u64(value));
 }
 
 
@@ -412,10 +449,10 @@ device_state_interface::~device_state_interface()
 
 //-------------------------------------------------
 //  state_int - return the value of the given piece
-//  of indexed state as a UINT64
+//  of indexed state as a u64
 //-------------------------------------------------
 
-UINT64 device_state_interface::state_int(int index)
+u64 device_state_interface::state_int(int index)
 {
 	// nullptr or out-of-range entry returns 0
 	const device_state_entry *entry = state_find_entry(index);
@@ -447,6 +484,8 @@ std::string device_state_interface::state_string(int index) const
 	std::string custom;
 	if (entry->needs_custom_string())
 		state_string_export(*entry, custom);
+	else if (entry->is_float())
+		custom = string_format("%-12G", entry->dvalue());
 
 	// ask the entry to format itself
 	return entry->format(custom.c_str());
@@ -472,10 +511,10 @@ int device_state_interface::state_string_max_length(int index)
 
 //-------------------------------------------------
 //  set_state_int - set the value of the given
-//  piece of indexed state from a UINT64
+//  piece of indexed state from a u64
 //-------------------------------------------------
 
-void device_state_interface::set_state_int(int index, UINT64 value)
+void device_state_interface::set_state_int(int index, u64 value)
 {
 	// nullptr or out-of-range entry is a no-op
 	const device_state_entry *entry = state_find_entry(index);
@@ -513,44 +552,22 @@ void device_state_interface::set_state_string(int index, const char *string)
 
 
 //-------------------------------------------------
-//  state_add - return the value of the given
-//  pieces of indexed state as a UINT64
+//  state_add - add a new piece of indexed state
 //-------------------------------------------------
 
-device_state_entry &device_state_interface::state_add(int index, const char *symbol, void *data, UINT8 size)
+device_state_entry &device_state_interface::state_add(std::unique_ptr<device_state_entry> &&entry)
 {
-	// assert validity of incoming parameters
-	assert(size == 1 || size == 2 || size == 4 || size == 8);
-	assert(symbol != nullptr);
-
-	// allocate new entry
-	auto entry = global_alloc(device_state_entry(index, symbol, data, size, this));
-
 	// append to the end of the list
-	m_state_list.append(*entry);
+	m_state_list.push_back(std::move(entry));
+	device_state_entry &new_entry = *m_state_list.back();
 
 	// set the fast entry if applicable
-	if (index >= FAST_STATE_MIN && index <= FAST_STATE_MAX)
-		m_fast_state[index - FAST_STATE_MIN] = entry;
+	if (new_entry.index() >= FAST_STATE_MIN && new_entry.index() <= FAST_STATE_MAX && !new_entry.divider())
+		m_fast_state[new_entry.index() - FAST_STATE_MIN] = &new_entry;
 
-	return *entry;
+	return new_entry;
 }
 
-//-------------------------------------------------
-//  state_add_divider - add a simple divider
-//  entry
-//-------------------------------------------------
-
-device_state_entry &device_state_interface::state_add_divider(int index)
-{
-	// allocate new entry
-	auto entry = global_alloc(device_state_entry(index, this));
-
-	// append to the end of the list
-	m_state_list.append(*entry);
-
-	return *entry;
-}
 
 //-------------------------------------------------
 //  state_import - called after new state is
@@ -604,7 +621,7 @@ void device_state_interface::state_string_export(const device_state_entry &entry
 void device_state_interface::interface_post_start()
 {
 	// make sure we got something during startup
-	if (m_state_list.count() == 0)
+	if (m_state_list.size() == 0)
 		throw emu_fatalerror("No state registered for device '%s' that supports it!", m_device.tag());
 }
 
@@ -621,9 +638,9 @@ const device_state_entry *device_state_interface::state_find_entry(int index) co
 		return m_fast_state[index - FAST_STATE_MIN];
 
 	// otherwise, scan the first
-	for (const device_state_entry *entry = m_state_list.first(); entry != nullptr; entry = entry->m_next)
+	for (auto &entry : m_state_list)
 		if (entry->m_index == index)
-			return entry;
+			return entry.get();
 
 	// handle failure by returning nullptr
 	return nullptr;

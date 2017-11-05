@@ -39,18 +39,20 @@
 
 /* Core includes */
 #include "emu.h"
-#include "cpu/m6502/m6502.h"
 #include "includes/microtan.h"
 
 /* Components */
-#include "sound/ay8910.h"
-#include "sound/dac.h"
-#include "sound/wave.h"
+#include "cpu/m6502/m6502.h"
 #include "machine/6522via.h"
 #include "machine/mos6551.h"
+#include "sound/ay8910.h"
+#include "sound/wave.h"
 
 /* Devices */
 #include "imagedev/cassette.h"
+
+#include "screen.h"
+#include "speaker.h"
 
 
 static ADDRESS_MAP_START( microtan_map, AS_PROGRAM, 8, microtan_state )
@@ -207,7 +209,7 @@ static GFXDECODE_START( microtan )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( microtan, microtan_state )
+static MACHINE_CONFIG_START( microtan )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 750000)  // 750 kHz
 	MCFG_CPU_PROGRAM_MAP(microtan_map)
@@ -228,15 +230,13 @@ static MACHINE_CONFIG_START( microtan, microtan_state )
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("dac", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 	MCFG_SOUND_ADD("ay8910.1", AY8910, 1000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 	MCFG_SOUND_ADD("ay8910.2", AY8910, 1000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 
 	/* snapshot/quickload */
 	MCFG_SNAPSHOT_ADD("snapshot", microtan_state, microtan, "m65", 0.5)
@@ -284,5 +284,5 @@ ROM_START( microtan )
 ROM_END
 
 
-//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT      COMPANY      FULLNAME
-COMP( 1979, microtan, 0,        0,      microtan, microtan, microtan_state, microtan, "Tangerine", "Microtan 65" , 0)
+//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     STATE           INIT      COMPANY      FULLNAME        FLAGS
+COMP( 1979, microtan, 0,        0,      microtan, microtan, microtan_state, microtan, "Tangerine", "Microtan 65" , 0 )

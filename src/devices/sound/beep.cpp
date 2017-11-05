@@ -20,7 +20,7 @@
 
 
 // device type definition
-const device_type BEEP = &device_creator<beep_device>;
+DEFINE_DEVICE_TYPE(BEEP, beep_device, "beep", "Beep")
 
 
 //**************************************************************************
@@ -31,12 +31,12 @@ const device_type BEEP = &device_creator<beep_device>;
 //  beep_device - constructor
 //-------------------------------------------------
 
-beep_device::beep_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, BEEP, "Beep", tag, owner, clock, "beep", __FILE__),
-		device_sound_interface(mconfig, *this),
-		m_stream(nullptr),
-		m_enable(0),
-		m_frequency(clock)
+beep_device::beep_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, BEEP, tag, owner, clock)
+	, device_sound_interface(mconfig, *this)
+	, m_stream(nullptr)
+	, m_enable(0)
+	, m_frequency(clock)
 {
 }
 
@@ -66,7 +66,7 @@ void beep_device::device_start()
 void beep_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
 	stream_sample_t *buffer = outputs[0];
-	INT16 signal = m_signal;
+	int16_t signal = m_signal;
 	int clock = 0, rate = BEEP_RATE / 2;
 
 	/* get progress through wave */
@@ -124,7 +124,7 @@ WRITE_LINE_MEMBER(beep_device::set_state)
 //  setting new frequency starts from beginning
 //-------------------------------------------------
 
-void beep_device::set_clock(UINT32 frequency)
+void beep_device::set_clock(uint32_t frequency)
 {
 	if (m_frequency == frequency)
 		return;

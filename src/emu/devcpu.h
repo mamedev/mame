@@ -14,8 +14,8 @@
 #error Dont include this file directly; include emu.h instead.
 #endif
 
-#ifndef __DEVCPU_H__
-#define __DEVCPU_H__
+#ifndef MAME_EMU_DEVCPU_H
+#define MAME_EMU_DEVCPU_H
 
 //**************************************************************************
 //  CPU DEVICE CONFIGURATION MACROS
@@ -41,6 +41,8 @@
 #define MCFG_CPU_PERIODIC_INT_REMOVE MCFG_DEVICE_PERIODIC_INT_REMOVE
 #define MCFG_CPU_IRQ_ACKNOWLEDGE_REMOVE MCFG_DEVICE_IRQ_ACKNOWLEDGE_REMOVE
 
+#define MCFG_CPU_DISASSEMBLE_OVERRIDE MCFG_DEVICE_DISASSEMBLE_OVERRIDE
+
 // recompilation parameters
 #define MCFG_CPU_FORCE_NO_DRC() \
 	cpu_device::static_set_force_no_drc(*device, true);
@@ -52,8 +54,8 @@
 //**************************************************************************
 
 #define CPU_DISASSEMBLE_NAME(name)      cpu_disassemble_##name
-#define CPU_DISASSEMBLE(name)           offs_t CPU_DISASSEMBLE_NAME(name)(cpu_device *device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, int options)
-#define CPU_DISASSEMBLE_CALL(name)      CPU_DISASSEMBLE_NAME(name)(device, buffer, pc, oprom, opram, options)
+#define CPU_DISASSEMBLE(name)           offs_t CPU_DISASSEMBLE_NAME(name)(cpu_device *device, std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, int options)
+#define CPU_DISASSEMBLE_CALL(name)      CPU_DISASSEMBLE_NAME(name)(device, stream, pc, oprom, opram, options)
 
 
 //**************************************************************************
@@ -68,8 +70,6 @@ class cpu_device :  public device_t,
 					public device_state_interface,
 					public device_disasm_interface
 {
-	friend resource_pool_object<cpu_device>::~resource_pool_object();
-
 public:
 	// configuration helpers
 	static void static_set_force_no_drc(device_t &device, bool value);
@@ -77,7 +77,7 @@ public:
 
 protected:
 	// construction/destruction
-	cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 	virtual ~cpu_device();
 
 private:
@@ -86,7 +86,7 @@ private:
 };
 
 
-typedef offs_t (*cpu_disassemble_func)(cpu_device *device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, int options);
+typedef offs_t (*cpu_disassemble_func)(cpu_device *device, std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, int options);
 
 
-#endif  /* __CPUINTRF_H__ */
+#endif  /* MAME_EMU_DEVCPU_H */

@@ -1,9 +1,14 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail
+
+#include "machine/timer.h"
 #include "sound/flt_rc.h"
 #include "sound/k007232.h"
 #include "sound/k005289.h"
 #include "sound/vlm5030.h"
+
+#include "screen.h"
+
 
 class nemesis_state : public driver_device
 {
@@ -22,7 +27,6 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_paletteram(*this, "paletteram"),
 		m_gx400_shared_ram(*this, "gx400_shared"),
-		m_voiceram(*this, "voiceram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_filter1(*this, "filter1"),
@@ -37,19 +41,18 @@ public:
 		m_palette(*this, "palette") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT16> m_charram;
-	required_shared_ptr<UINT16> m_xscroll1;
-	required_shared_ptr<UINT16> m_xscroll2;
-	required_shared_ptr<UINT16> m_yscroll2;
-	required_shared_ptr<UINT16> m_yscroll1;
-	required_shared_ptr<UINT16> m_videoram1;
-	required_shared_ptr<UINT16> m_videoram2;
-	required_shared_ptr<UINT16> m_colorram1;
-	required_shared_ptr<UINT16> m_colorram2;
-	required_shared_ptr<UINT16> m_spriteram;
-	optional_shared_ptr<UINT16> m_paletteram;
-	optional_shared_ptr<UINT8> m_gx400_shared_ram;
-	optional_shared_ptr<UINT8> m_voiceram;
+	required_shared_ptr<uint16_t> m_charram;
+	required_shared_ptr<uint16_t> m_xscroll1;
+	required_shared_ptr<uint16_t> m_xscroll2;
+	required_shared_ptr<uint16_t> m_yscroll2;
+	required_shared_ptr<uint16_t> m_yscroll1;
+	required_shared_ptr<uint16_t> m_videoram1;
+	required_shared_ptr<uint16_t> m_videoram2;
+	required_shared_ptr<uint16_t> m_colorram1;
+	required_shared_ptr<uint16_t> m_colorram2;
+	required_shared_ptr<uint16_t> m_spriteram;
+	optional_shared_ptr<uint16_t> m_paletteram;
+	optional_shared_ptr<uint8_t> m_gx400_shared_ram;
 
 	/* video-related */
 	tilemap_t *m_background;
@@ -57,18 +60,18 @@ public:
 	int       m_spriteram_words;
 	int       m_tilemap_flip;
 	int       m_flipscreen;
-	UINT8     m_irq_port_last;
-	UINT8     m_blank_tile[8*8];
-	UINT8     m_palette_lookup[32];
+	uint8_t     m_irq_port_last;
+	uint8_t     m_blank_tile[8*8];
+	uint8_t     m_palette_lookup[32];
 
 	/* misc */
 	int       m_irq_on;
 	int       m_irq1_on;
 	int       m_irq2_on;
 	int       m_irq4_on;
-	UINT16    m_selected_ip; /* Copied from WEC Le Mans 24 driver, explicity needed for Hyper Crash */
+	uint16_t    m_selected_ip; /* Copied from WEC Le Mans 24 driver, explicity needed for Hyper Crash */
 	int       m_gx400_irq1_cnt;
-	UINT8     m_frame_counter;
+	uint8_t     m_frame_counter;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -84,20 +87,21 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
-	DECLARE_WRITE16_MEMBER(gx400_irq1_enable_word_w);
-	DECLARE_WRITE16_MEMBER(gx400_irq2_enable_word_w);
-	DECLARE_WRITE16_MEMBER(gx400_irq4_enable_word_w);
-	DECLARE_WRITE16_MEMBER(nemesis_irq_enable_word_w);
-	DECLARE_WRITE16_MEMBER(konamigt_irq_enable_word_w);
-	DECLARE_WRITE16_MEMBER(konamigt_irq2_enable_word_w);
+	DECLARE_WRITE_LINE_MEMBER(irq_enable_w);
+	DECLARE_WRITE_LINE_MEMBER(irq1_enable_w);
+	DECLARE_WRITE_LINE_MEMBER(irq2_enable_w);
+	DECLARE_WRITE_LINE_MEMBER(irq4_enable_w);
+	DECLARE_WRITE_LINE_MEMBER(coin1_lockout_w);
+	DECLARE_WRITE_LINE_MEMBER(coin2_lockout_w);
+	DECLARE_WRITE_LINE_MEMBER(sound_irq_w);
 	DECLARE_READ16_MEMBER(gx400_sharedram_word_r);
 	DECLARE_WRITE16_MEMBER(gx400_sharedram_word_w);
 	DECLARE_READ16_MEMBER(konamigt_input_word_r);
 	DECLARE_WRITE16_MEMBER(selected_ip_word_w);
 	DECLARE_READ16_MEMBER(selected_ip_word_r);
 	DECLARE_READ8_MEMBER(wd_r);
-	DECLARE_WRITE16_MEMBER(nemesis_gfx_flipx_word_w);
-	DECLARE_WRITE16_MEMBER(nemesis_gfx_flipy_word_w);
+	DECLARE_WRITE_LINE_MEMBER(gfx_flipx_w);
+	DECLARE_WRITE_LINE_MEMBER(gfx_flipy_w);
 	DECLARE_WRITE16_MEMBER(salamand_control_port_word_w);
 	DECLARE_WRITE16_MEMBER(nemesis_palette_word_w);
 	DECLARE_WRITE16_MEMBER(nemesis_videoram1_word_w);
@@ -115,7 +119,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_nemesis(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_nemesis(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(nemesis_interrupt);
 	INTERRUPT_GEN_MEMBER(blkpnthr_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(konamigt_interrupt);

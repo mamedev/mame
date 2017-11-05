@@ -6,27 +6,26 @@
 
 *******************************************************************************/
 
+#include "emu.h"
 #include "includes/sorcerer.h"
 #include "machine/z80bin.h"
 
-#if SORCERER_USING_RS232
-
-/* The serial code (which was never connected to the outside) is disabled for now. */
 
 /* timer for sorcerer serial chip transmit and receive */
 
 TIMER_CALLBACK_MEMBER(sorcerer_state::sorcerer_serial_tc)
 {
 	/* if rs232 is enabled, uart is connected to clock defined by bit6 of port fe.
-	Transmit and receive clocks are connected to the same clock */
+	Transmit and receive clocks are connected to the same clock. */
 
 	/* if rs232 is disabled, receive clock is linked to cassette hardware */
-	if (m_fe & 0x80)
+	if (BIT(m_fe, 7))
 	{
 		/* connect to rs232 */
+		m_rs232->write_txd(m_uart->get_output_pin(AY31015_SO));
+		m_uart->set_input_pin(AY31015_SI, m_rs232->rxd_r());
 	}
 }
-#endif
 
 
 void sorcerer_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
@@ -34,9 +33,7 @@ void sorcerer_state::device_timer(emu_timer &timer, device_timer_id id, int para
 	switch (id)
 	{
 	case TIMER_SERIAL:
-#if SORCERER_USING_RS232
 		sorcerer_serial_tc(ptr, param);
-#endif
 		break;
 	case TIMER_CASSETTE:
 		sorcerer_cassette_tc(ptr, param);
@@ -45,7 +42,7 @@ void sorcerer_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		sorcerer_reset(ptr, param);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in sorcerer_state::device_timer");
+		assert_always(false, "Unknown id in sorcerer_state::device_timer");
 	}
 }
 
@@ -54,7 +51,7 @@ void sorcerer_state::device_timer(emu_timer &timer, device_timer_id id, int para
 
 TIMER_CALLBACK_MEMBER(sorcerer_state::sorcerer_cassette_tc)
 {
-	UINT8 cass_ws = 0;
+	uint8_t cass_ws = 0;
 	switch (m_fe & 0xc0)        /*/ bit 7 low indicates cassette */
 	{
 		case 0x00:              /* Cassette 300 baud */
@@ -168,7 +165,7 @@ WRITE8_MEMBER(sorcerer_state::sorcerer_fd_w)
 
 WRITE8_MEMBER(sorcerer_state::sorcerer_fe_w)
 {
-	UINT8 changed_bits = (m_fe ^ data) & 0xf0;
+	uint8_t changed_bits = (m_fe ^ data) & 0xf0;
 	m_fe = data;
 
 	/* bits 0..3 */
@@ -181,9 +178,7 @@ WRITE8_MEMBER(sorcerer_state::sorcerer_fe_w)
 
 	if (!BIT(data, 7)) // cassette operations
 	{
-#if SORCERER_USING_RS232
 		m_serial_timer->adjust(attotime::zero);
-#endif
 
 		bool sound = BIT(m_iop_config->read(), 3);
 
@@ -202,23 +197,21 @@ WRITE8_MEMBER(sorcerer_state::sorcerer_fe_w)
 			(BIT(data,5)) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 
 		if (data & 0x30)
-			m_cassette_timer->adjust(attotime::zero, 0, attotime::from_hz(19200));
+			m_cassette_timer->adjust(attotime::zero, 0, attotime::from_hz(ES_UART_CLOCK*4));
 		else
 			m_cassette_timer->adjust(attotime::zero);
 	}
-#if SORCERER_USING_RS232
 	else
 	{
-		m_serial_timer->adjust(attotime::zero, 0, attotime::from_hz(19200));
+		m_serial_timer->adjust(attotime::zero, 0, attotime::from_hz(ES_UART_CLOCK*4));
 		m_cassette_timer->adjust(attotime::zero);
 	}
-#endif
 
 	// bit 6 baud rate */
 	if (BIT(changed_bits, 6))
 	{
-		m_uart->set_receiver_clock(BIT(data, 6) ? 19200.0 : 4800.0);
-		m_uart->set_transmitter_clock(BIT(data, 6) ? 19200.0 : 4800.0);
+		m_uart->set_receiver_clock(BIT(data, 6) ? ES_UART_CLOCK*4 : ES_UART_CLOCK);
+		m_uart->set_transmitter_clock(BIT(data, 6) ? ES_UART_CLOCK*4 : ES_UART_CLOCK);
 	}
 }
 
@@ -254,7 +247,7 @@ WRITE8_MEMBER(sorcerer_state::sorcerer_ff_w)
 
 READ8_MEMBER(sorcerer_state::sorcerer_fc_r)
 {
-	UINT8 data = m_uart->get_received_data();
+	uint8_t data = m_uart->get_received_data();
 	m_uart->set_input_pin(AY31015_RDAV, 0);
 	m_uart->set_input_pin(AY31015_RDAV, 1);
 	return data;
@@ -263,7 +256,7 @@ READ8_MEMBER(sorcerer_state::sorcerer_fc_r)
 READ8_MEMBER(sorcerer_state::sorcerer_fd_r)
 {
 	/* set unused bits high */
-	UINT8 data = 0xe0;
+	uint8_t data = 0xe0;
 
 	m_uart->set_input_pin(AY31015_SWE, 0);
 	data |= m_uart->get_output_pin(AY31015_TBMT) ? 0x01 : 0;
@@ -283,7 +276,7 @@ READ8_MEMBER(sorcerer_state::sorcerer_fe_r)
 	 - not emulated
 	 - tied high, allowing PARIN and PAROUT bios routines to run */
 
-	UINT8 data = 0xc0;
+	uint8_t data = 0xc0;
 
 	/* bit 5 - vsync */
 	data |= m_iop_vs->read();
@@ -300,9 +293,9 @@ READ8_MEMBER(sorcerer_state::sorcerer_fe_r)
 
 SNAPSHOT_LOAD_MEMBER( sorcerer_state,sorcerer)
 {
-	UINT8 *RAM = memregion(m_maincpu->tag())->base();
+	uint8_t *RAM = memregion(m_maincpu->tag())->base();
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	UINT8 header[28];
+	uint8_t header[28];
 	unsigned char s_byte;
 
 	/* check size */
@@ -310,7 +303,7 @@ SNAPSHOT_LOAD_MEMBER( sorcerer_state,sorcerer)
 	{
 		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Snapshot must be 65564 bytes");
 		image.message("Snapshot must be 65564 bytes");
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 	}
 
 	/* get the header */
@@ -343,17 +336,15 @@ SNAPSHOT_LOAD_MEMBER( sorcerer_state,sorcerer)
 	m_maincpu->set_state_int(Z80_IM, header[25]);
 	m_maincpu->set_pc(header[26] | (header[27] << 8));
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 void sorcerer_state::machine_start()
 {
 	m_cassette_timer = timer_alloc(TIMER_CASSETTE);
-#if SORCERER_USING_RS232
 	m_serial_timer = timer_alloc(TIMER_SERIAL);
-#endif
 
-	UINT16 endmem = 0xbfff;
+	uint16_t endmem = 0xbfff;
 
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	/* configure RAM */
@@ -379,11 +370,9 @@ void sorcerer_state::machine_start()
 MACHINE_START_MEMBER(sorcerer_state,sorcererd)
 {
 	m_cassette_timer = timer_alloc(TIMER_CASSETTE);
-#if SORCERER_USING_RS232
 	m_serial_timer = timer_alloc(TIMER_SERIAL);
-#endif
 
-	UINT16 endmem = 0xbbff;
+	uint16_t endmem = 0xbbff;
 
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	/* configure RAM */
@@ -430,13 +419,13 @@ void sorcerer_state::machine_reset()
 
 QUICKLOAD_LOAD_MEMBER( sorcerer_state, sorcerer )
 {
-	UINT16 execute_address, start_address, end_address;
+	uint16_t execute_address, start_address, end_address;
 	int autorun;
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	/* load the binary into memory */
-	if (z80bin_load_file(&image, space, file_type, &execute_address, &start_address, &end_address) == IMAGE_INIT_FAIL)
-		return IMAGE_INIT_FAIL;
+	if (z80bin_load_file(&image, space, file_type, &execute_address, &start_address, &end_address) != image_init_result::PASS)
+		return image_init_result::FAIL;
 
 	/* is this file executable? */
 	if (execute_address != 0xffff)
@@ -445,7 +434,7 @@ QUICKLOAD_LOAD_MEMBER( sorcerer_state, sorcerer )
 		autorun = m_iop_config->read() & 1;
 
 		if ((execute_address >= 0xc000) && (execute_address <= 0xdfff) && (space.read_byte(0xdffa) != 0xc3))
-			return IMAGE_INIT_FAIL;     /* can't run a program if the cartridge isn't in */
+			return image_init_result::FAIL;     /* can't run a program if the cartridge isn't in */
 
 		/* Since Exidy Basic is by Microsoft, it needs some preprocessing before it can be run.
 		1. A start address of 01D5 indicates a basic program which needs its pointers fixed up.
@@ -455,10 +444,10 @@ QUICKLOAD_LOAD_MEMBER( sorcerer_state, sorcerer )
 		    C858 = an autorun basic program will have this exec address on the tape
 		    C3DD = part of basic that displays READY and lets user enter input */
 
-		if ((start_address == 0x1d5) || (execute_address == 0xc858))
+		if (((start_address == 0x1d5) || (execute_address == 0xc858)) && (space.read_byte(0xdffa) == 0xc3))
 		{
-			UINT8 i;
-			static const UINT8 data[]={
+			uint8_t i;
+			static const uint8_t data[]={
 				0xcd, 0x26, 0xc4,   // CALL C426    ;set up other pointers
 				0x21, 0xd4, 1,      // LD HL,01D4   ;start of program address (used by C689)
 				0x36, 0,        // LD (HL),00   ;make sure dummy end-of-line is there
@@ -488,5 +477,5 @@ QUICKLOAD_LOAD_MEMBER( sorcerer_state, sorcerer )
 
 	}
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }

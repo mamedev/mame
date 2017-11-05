@@ -24,14 +24,15 @@
 
 
 #include "emu.h"
+#include "includes/prof180x.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/ram.h"
-#include "bus/centronics/ctronics.h"
 #include "machine/upd765.h"
-#include "includes/prof180x.h"
+#include "screen.h"
 #include "softlist.h"
 
-UINT32 prof180x_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t prof180x_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
@@ -39,7 +40,7 @@ UINT32 prof180x_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 
 READ8_MEMBER( prof180x_state::read )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	if (offset < 0x40000)
 	{
@@ -186,12 +187,12 @@ READ8_MEMBER( prof180x_state::status_r )
 /* Address Maps */
 
 static ADDRESS_MAP_START( prof180x_mem, AS_PROGRAM, 8, prof180x_state )
-	AM_RANGE(0x00000, 0x7ffff) AM_READWRITE(read, write)
+	AM_RANGE(0x0000, 0xffff) AM_READWRITE(read, write)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( prof180x_io , AS_IO, 8, prof180x_state )
 	AM_RANGE(0x08, 0x08) AM_MIRROR(0xff00) AM_WRITE(flr_w)
-	AM_RANGE(0x09, 0x09) AM_MASK(0xff00) AM_READ(status_r)
+	AM_RANGE(0x09, 0x09) AM_SELECT(0xff00) AM_READ(status_r)
 	AM_RANGE(0x0a, 0x0a) AM_MIRROR(0xff00) AM_DEVREADWRITE(FDC9268_TAG, upd765a_device, mdma_r, mdma_w)
 	AM_RANGE(0x0b, 0x0b) AM_MIRROR(0xff00) AM_DEVWRITE("cent_data_out", output_latch_device, write)
 	AM_RANGE(0x0c, 0x0d) AM_MIRROR(0xff00) AM_DEVICE(FDC9268_TAG, upd765a_device, map)
@@ -233,7 +234,7 @@ void prof180x_state::machine_reset()
 	}
 }
 
-static MACHINE_CONFIG_START( prof180x, prof180x_state )
+static MACHINE_CONFIG_START( prof180x )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(HD64180_TAG, Z80, XTAL_9_216MHz)
 	MCFG_CPU_PROGRAM_MAP(prof180x_mem)
@@ -325,6 +326,6 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1986, prof180x,  0,       0,  prof180x,   prof180x, driver_device,     0,  "Conitec Datensysteme",   "PROF-180X",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1992, prof181x,  prof180x,0,  prof180x,   prof180x, driver_device,     0,  "Conitec Datensysteme",   "PROF-181X",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    STATE            INIT  COMPANY                   FULLNAME       FLAGS */
+COMP( 1986, prof180x,  0,       0,  prof180x,   prof180x, prof180x_state, 0,    "Conitec Datensysteme",   "PROF-180X",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1992, prof181x,  prof180x,0,  prof180x,   prof180x, prof180x_state, 0,    "Conitec Datensysteme",   "PROF-181X",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

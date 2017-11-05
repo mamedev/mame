@@ -28,15 +28,15 @@ VIDEO_START_MEMBER(apple2gs_state,apple2gs)
 
 
 
-UINT32 apple2gs_state::screen_update_apple2gs(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t apple2gs_state::screen_update_apple2gs(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	const UINT8 *vram;
-	UINT32 *scanline;
-	UINT8 scb, b;
+	const uint8_t *vram;
+	uint32_t *scanline;
+	uint8_t scb, b;
 	int col, palette;
-	UINT32 last_pixel = 0, pixel;
+	uint32_t last_pixel = 0, pixel;
 	int beamy;
-	UINT16 *a2pixel;
+	uint16_t *a2pixel;
 
 	beamy = cliprect.min_y;
 

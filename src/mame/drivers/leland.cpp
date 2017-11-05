@@ -59,12 +59,13 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/i86/i186.h"
-#include "machine/eepromser.h"
-#include "machine/nvram.h"
-#include "cpu/z80/z80.h"
 #include "includes/leland.h"
-#include "sound/ay8910.h"
+#include "audio/leland.h"
+
+#include "cpu/z80/z80.h"
+#include "machine/nvram.h"
+#include "sound/volt_reg.h"
+#include "speaker.h"
 
 
 /* Master Clock2 is for Asylum, Ataxx, Brute Force, Danny Sullivan's Indy Heat, World Soccer Finals */
@@ -935,31 +936,11 @@ INPUT_PORTS_END
 
 /*************************************
  *
- *  Sound definitions
- *
- *************************************/
-
-/*
-   2 AY8910 chips - Actually, one of these is an 8912
-   (8910 with only 1 output port)
-
-   Port A of both chips is connected to a banking control
-   register.
-
-   All 6 (3*2) AY-3-8910/12 outputs are tied together
-   and put with 1000 Ohm to gnd.
-   The following is a approximation, since
-   it does not take cross-chip mixing effects into account.
-*/
-
-
-/*************************************
- *
  *  Machine driver
  *
  *************************************/
 
-static MACHINE_CONFIG_START( leland, leland_state )
+static MACHINE_CONFIG_START( leland )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("master", Z80, MASTER_CLOCK/2)
@@ -980,26 +961,28 @@ static MACHINE_CONFIG_START( leland, leland_state )
 	/* video hardware */
 	MCFG_FRAGMENT_ADD(leland_video)
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
-	MCFG_SOUND_ADD("ay8910.1", AY8910, 10000000/6)
+	// only one of the AY sockets is populated
+	MCFG_SOUND_ADD("ay8910", AY8910, 10000000/6)
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
 	MCFG_AY8910_RES_LOADS(1000, 0, 0)
 	MCFG_AY8910_PORT_A_READ_CB(READ8(leland_state, leland_sound_port_r))
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(leland_state, leland_sound_port_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 
-	MCFG_SOUND_ADD("ay8910.2", AY8910, 10000000/6)
-	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
-	MCFG_AY8910_RES_LOADS(1000, 0, 0)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(leland_state, leland_sound_port_r))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(leland_state, leland_sound_port_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+//  MCFG_SOUND_ADD("ay8912", AY8912, 10000000/6)
+//  MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
+//  MCFG_AY8910_RES_LOADS(1000, 0, 0)
+//  MCFG_AY8910_PORT_A_READ_CB(READ8(leland_state, leland_sound_port_r))
+//  MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(leland_state, leland_sound_port_w))
+//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 
-	MCFG_SOUND_ADD("dac0", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_SOUND_ADD("dac1", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("dac0", DAC_8BIT_BINARY_WEIGHTED, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.0625) // ls374.u79 + r17-r23 (24k,12k,6.2k,3k,1.5k,750,390,180)
+	MCFG_SOUND_ADD("dac1", DAC_8BIT_BINARY_WEIGHTED, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.0625) // ls374.u88 + r27-r34 (24k,12k,6.2k,3k,1.5k,750,390,180)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac0", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac0", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac1", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -1039,7 +1022,7 @@ static MACHINE_CONFIG_DERIVED( lelandi, quarterb )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( ataxx, leland_state )
+static MACHINE_CONFIG_START( ataxx )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("master", Z80, 6000000)
@@ -1223,50 +1206,109 @@ ROM_START( powrplay )
 ROM_END
 
 
+/*
+For World Series: The Season, the label format is:
+------------------------
+|(C)1985 Cinemtaronics | -> Copyright & Manufacturer
+|P/N 02-13411-00       | -> Part number with revision
+|WORLD SERIES    U103  | -> Game name & ROM PCB location
+------------------------
+*/
 ROM_START( wseries )
 	ROM_REGION( 0x28000, "master", 0 )
-	ROM_LOAD( "13409-01.101",   0x00000, 0x02000, CRC(b5eccf5c) SHA1(1ca781245292399d1b573e6be2edbb79daf9b5d6) )
-	ROM_LOAD( "13410-01.102",   0x10000, 0x02000, CRC(dd1ec091) SHA1(ef644c49bbe1cc30ecafab928a0715ea3461a1bd) )
-	ROM_CONTINUE(               0x1c000, 0x02000 )
-	ROM_LOAD( "13411-01.103",   0x12000, 0x02000, CRC(ec867a0e) SHA1(7b0e390e234056fcc8e6ae9605d633b6ed874e32) )
-	ROM_CONTINUE(               0x1e000, 0x02000 )
-	ROM_LOAD( "13412-01.104",   0x14000, 0x02000, CRC(2977956d) SHA1(24c8317f10710a5ae4d4e43bc1321a815e47c78f) )
-	ROM_CONTINUE(               0x20000, 0x02000 )
-	ROM_LOAD( "13413-01.105",   0x16000, 0x02000, CRC(569468a6) SHA1(311257c3b7575cbf442c3afbb42ae3603c03807a) )
-	ROM_CONTINUE(               0x22000, 0x02000 )
-	ROM_LOAD( "13414-01.106",   0x18000, 0x02000, CRC(b178632d) SHA1(c764e9e69bbd9fd9eb8e950abfd869b8bef71325) )
-	ROM_CONTINUE(               0x24000, 0x02000 )
-	ROM_LOAD( "13415-01.107",   0x1a000, 0x02000, CRC(20b92eff) SHA1(02156fb36cae6c47b6ae9afcbc27f8f5e9074bbe) )
-	ROM_CONTINUE(               0x26000, 0x02000 )
+	ROM_LOAD( "02-13409-01.101",   0x00000, 0x02000, CRC(b5eccf5c) SHA1(1ca781245292399d1b573e6be2edbb79daf9b5d6) )
+	ROM_LOAD( "02-13410-01.102",   0x10000, 0x02000, CRC(dd1ec091) SHA1(ef644c49bbe1cc30ecafab928a0715ea3461a1bd) )
+	ROM_CONTINUE(                  0x1c000, 0x02000 )
+	ROM_LOAD( "02-13411-01.103",   0x12000, 0x02000, CRC(ec867a0e) SHA1(7b0e390e234056fcc8e6ae9605d633b6ed874e32) )
+	ROM_CONTINUE(                  0x1e000, 0x02000 )
+	ROM_LOAD( "02-13412-01.104",   0x14000, 0x02000, CRC(2977956d) SHA1(24c8317f10710a5ae4d4e43bc1321a815e47c78f) )
+	ROM_CONTINUE(                  0x20000, 0x02000 )
+	ROM_LOAD( "02-13413-01.105",   0x16000, 0x02000, CRC(569468a6) SHA1(311257c3b7575cbf442c3afbb42ae3603c03807a) )
+	ROM_CONTINUE(                  0x22000, 0x02000 )
+	ROM_LOAD( "02-13414-01.106",   0x18000, 0x02000, CRC(b178632d) SHA1(c764e9e69bbd9fd9eb8e950abfd869b8bef71325) )
+	ROM_CONTINUE(                  0x24000, 0x02000 )
+	ROM_LOAD( "02-13415-01.107",   0x1a000, 0x02000, CRC(20b92eff) SHA1(02156fb36cae6c47b6ae9afcbc27f8f5e9074bbe) )
+	ROM_CONTINUE(                  0x26000, 0x02000 )
 
 	ROM_REGION( 0x28000, "slave", 0 )
-	ROM_LOAD( "13416-00.u3",  0x00000, 0x02000, CRC(37c960cf) SHA1(e18c72cdbd642e8dfa1184814b65770535a469cb) )
-	ROM_LOAD( "13417-00.u4",  0x10000, 0x02000, CRC(97f044b5) SHA1(289a9e19ce46dd039c7edc4d78bd07c355da6dad) )
-	ROM_CONTINUE(             0x1c000, 0x02000 )
-	ROM_LOAD( "13418-00.u5",  0x12000, 0x02000, CRC(0931cfc0) SHA1(13adb7caf6b1dcf3918277352545fe03e27da3c1) )
-	ROM_CONTINUE(             0x1e000, 0x02000 )
-	ROM_LOAD( "13419-00.u6",  0x14000, 0x02000, CRC(a7962b5a) SHA1(857c05395b8a1d4aeb3cbac394b673d3bc551b7f) )
-	ROM_CONTINUE(             0x20000, 0x02000 )
-	ROM_LOAD( "13420-00.u7",  0x16000, 0x02000, CRC(3c275262) SHA1(3a352c184ef3ab87bc7f926eb1af2bef7befcfb6) )
-	ROM_CONTINUE(             0x22000, 0x02000 )
-	ROM_LOAD( "13421-00.u8",  0x18000, 0x02000, CRC(86f57c80) SHA1(460fb2e1d432840797edafcf4643e23072006c2e) )
-	ROM_CONTINUE(             0x24000, 0x02000 )
-	ROM_LOAD( "13422-00.u9",  0x1a000, 0x02000, CRC(222e8405) SHA1(a1cc700e06df43847b635858d21ff2e45d8e00ab) )
-	ROM_CONTINUE(             0x26000, 0x02000 )
+	ROM_LOAD( "02-13416-00.u3",  0x00000, 0x02000, CRC(37c960cf) SHA1(e18c72cdbd642e8dfa1184814b65770535a469cb) )
+	ROM_LOAD( "02-13417-00.u4",  0x10000, 0x02000, CRC(97f044b5) SHA1(289a9e19ce46dd039c7edc4d78bd07c355da6dad) )
+	ROM_CONTINUE(                0x1c000, 0x02000 )
+	ROM_LOAD( "02-13418-00.u5",  0x12000, 0x02000, CRC(0931cfc0) SHA1(13adb7caf6b1dcf3918277352545fe03e27da3c1) )
+	ROM_CONTINUE(                0x1e000, 0x02000 )
+	ROM_LOAD( "02-13419-00.u6",  0x14000, 0x02000, CRC(a7962b5a) SHA1(857c05395b8a1d4aeb3cbac394b673d3bc551b7f) )
+	ROM_CONTINUE(                0x20000, 0x02000 )
+	ROM_LOAD( "02-13420-00.u7",  0x16000, 0x02000, CRC(3c275262) SHA1(3a352c184ef3ab87bc7f926eb1af2bef7befcfb6) )
+	ROM_CONTINUE(                0x22000, 0x02000 )
+	ROM_LOAD( "02-13421-00.u8",  0x18000, 0x02000, CRC(86f57c80) SHA1(460fb2e1d432840797edafcf4643e23072006c2e) )
+	ROM_CONTINUE(                0x24000, 0x02000 )
+	ROM_LOAD( "02-13422-00.u9",  0x1a000, 0x02000, CRC(222e8405) SHA1(a1cc700e06df43847b635858d21ff2e45d8e00ab) )
+	ROM_CONTINUE(                0x26000, 0x02000 )
 
 	ROM_REGION( 0x0c000, "gfx1", 0 )
-	ROM_LOAD( "13401-00.u93", 0x00000, 0x04000, CRC(4ea3e641) SHA1(7628fbf25b5e36d06818d2f9cdc66e2fb15cba4f) )
-	ROM_LOAD( "13402-00.u94", 0x04000, 0x04000, CRC(71a8a56c) SHA1(b793a9641dd5d4cd122fb8f5cf1eef5dc3fd475c) )
-	ROM_LOAD( "13403-00.u95", 0x08000, 0x04000, CRC(8077ae25) SHA1(15bb1f99e8aea67b9057ef5ef8570f33470a24a3) )
+	ROM_LOAD( "02-13401-00.u93", 0x00000, 0x04000, CRC(4ea3e641) SHA1(7628fbf25b5e36d06818d2f9cdc66e2fb15cba4f) )
+	ROM_LOAD( "02-13402-00.u94", 0x04000, 0x04000, CRC(71a8a56c) SHA1(b793a9641dd5d4cd122fb8f5cf1eef5dc3fd475c) )
+	ROM_LOAD( "02-13403-00.u95", 0x08000, 0x04000, CRC(8077ae25) SHA1(15bb1f99e8aea67b9057ef5ef8570f33470a24a3) )
 
 	ROM_REGION( 0x20000, "user1", 0 )   /* Ordering: 70/92/69/91/68/90/67/89 */
 	/* U70 = Empty */
-	ROM_LOAD( "13404-00.u92",  0x04000, 0x4000, CRC(22da40aa) SHA1(a0306f795f1300d9ab88356ab44117764f6f22a4) )
-	ROM_LOAD( "13405-00.u69",  0x08000, 0x4000, CRC(6f65b313) SHA1(2ae85686f679eaa8be15f0cd7d5af61af966c4bd) )
+	ROM_LOAD( "02-13404-00.u92",  0x04000, 0x4000, CRC(22da40aa) SHA1(a0306f795f1300d9ab88356ab44117764f6f22a4) )
+	ROM_LOAD( "02-13405-00.u69",  0x08000, 0x4000, CRC(6f65b313) SHA1(2ae85686f679eaa8be15f0cd7d5af61af966c4bd) )
 	/* U91 = Empty */
-	ROM_LOAD( "13406-00.u68",  0x12000, 0x2000, CRC(bb568693) SHA1(f7f3af505ba5caa330a36cde77b1c2c3cbf83398) )
-	ROM_LOAD( "13407-00.u90",  0x14000, 0x4000, CRC(e46ca57f) SHA1(771b43c4a2bcedc6a5bdde14a3c04701032b5713) )
-	ROM_LOAD( "13408-00.u67",  0x18000, 0x4000, CRC(be637305) SHA1(a13cbc1644dc06ec52faa0a18340b679c03dc902) )
+	ROM_LOAD( "02-13406-00.u68",  0x12000, 0x2000, CRC(bb568693) SHA1(f7f3af505ba5caa330a36cde77b1c2c3cbf83398) )
+	ROM_LOAD( "02-13407-00.u90",  0x14000, 0x4000, CRC(e46ca57f) SHA1(771b43c4a2bcedc6a5bdde14a3c04701032b5713) )
+	ROM_LOAD( "02-13408-00.u67",  0x18000, 0x4000, CRC(be637305) SHA1(a13cbc1644dc06ec52faa0a18340b679c03dc902) )
+	/* 89 = Empty */
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD16_WORD( "eeprom-wseries.bin", 0x0000, 0x0080, CRC(c9c45105) SHA1(8a27752663c4096174c22146092100fbae23a2f7) )
+ROM_END
+
+
+ROM_START( wseries0 )
+	ROM_REGION( 0x28000, "master", 0 )
+	ROM_LOAD( "02-13409-00.101",   0x00000, 0x02000, CRC(a0820663) SHA1(5875248f52990496abfba89b65f6f4b76e00d0ff) )
+	ROM_LOAD( "02-13410-00.102",   0x10000, 0x02000, CRC(b2d71d2d) SHA1(981876058b44c11406975f04e5aab246cb9bc175) )
+	ROM_CONTINUE(                  0x1c000, 0x02000 )
+	ROM_LOAD( "02-13411-00.103",   0x12000, 0x02000, CRC(50c29473) SHA1(c15c863a2e8c55c2989ab740f0aba96a4ae69585) )
+	ROM_CONTINUE(                  0x1e000, 0x02000 )
+	ROM_LOAD( "02-13412-00.104",   0x14000, 0x02000, CRC(2e9294e9) SHA1(76c603dd827040e800f9c2bcca46cfc170e0ad3f) )
+	ROM_CONTINUE(                  0x20000, 0x02000 )
+	ROM_LOAD( "02-13413-00.105",   0x16000, 0x02000, CRC(2d785d3b) SHA1(687a8c79829cfb2fd48335636e0e15e97ed30cd6) )
+	ROM_CONTINUE(                  0x22000, 0x02000 )
+	ROM_LOAD( "02-13414-00.106",   0x18000, 0x02000, CRC(e6684f39) SHA1(676f19fa6d9bb651b75b40149a8ce56588152f09) )
+	ROM_CONTINUE(                  0x24000, 0x02000 )
+	ROM_LOAD( "02-13415-00.107",   0x1a000, 0x02000, CRC(4c4db073) SHA1(3492d8920998c3bad3e9769d5731fc81ca3714a7) )
+	ROM_CONTINUE(                  0x26000, 0x02000 )
+
+	ROM_REGION( 0x28000, "slave", 0 )
+	ROM_LOAD( "02-13416-00.u3",  0x00000, 0x02000, CRC(37c960cf) SHA1(e18c72cdbd642e8dfa1184814b65770535a469cb) )
+	ROM_LOAD( "02-13417-00.u4",  0x10000, 0x02000, CRC(97f044b5) SHA1(289a9e19ce46dd039c7edc4d78bd07c355da6dad) )
+	ROM_CONTINUE(                0x1c000, 0x02000 )
+	ROM_LOAD( "02-13418-00.u5",  0x12000, 0x02000, CRC(0931cfc0) SHA1(13adb7caf6b1dcf3918277352545fe03e27da3c1) )
+	ROM_CONTINUE(                0x1e000, 0x02000 )
+	ROM_LOAD( "02-13419-00.u6",  0x14000, 0x02000, CRC(a7962b5a) SHA1(857c05395b8a1d4aeb3cbac394b673d3bc551b7f) )
+	ROM_CONTINUE(                0x20000, 0x02000 )
+	ROM_LOAD( "02-13420-00.u7",  0x16000, 0x02000, CRC(3c275262) SHA1(3a352c184ef3ab87bc7f926eb1af2bef7befcfb6) )
+	ROM_CONTINUE(                0x22000, 0x02000 )
+	ROM_LOAD( "02-13421-00.u8",  0x18000, 0x02000, CRC(86f57c80) SHA1(460fb2e1d432840797edafcf4643e23072006c2e) )
+	ROM_CONTINUE(                0x24000, 0x02000 )
+	ROM_LOAD( "02-13422-00.u9",  0x1a000, 0x02000, CRC(222e8405) SHA1(a1cc700e06df43847b635858d21ff2e45d8e00ab) )
+	ROM_CONTINUE(                0x26000, 0x02000 )
+
+	ROM_REGION( 0x0c000, "gfx1", 0 )
+	ROM_LOAD( "02-13401-00.u93", 0x00000, 0x04000, CRC(4ea3e641) SHA1(7628fbf25b5e36d06818d2f9cdc66e2fb15cba4f) )
+	ROM_LOAD( "02-13402-00.u94", 0x04000, 0x04000, CRC(71a8a56c) SHA1(b793a9641dd5d4cd122fb8f5cf1eef5dc3fd475c) )
+	ROM_LOAD( "02-13403-00.u95", 0x08000, 0x04000, CRC(8077ae25) SHA1(15bb1f99e8aea67b9057ef5ef8570f33470a24a3) )
+
+	ROM_REGION( 0x20000, "user1", 0 )   /* Ordering: 70/92/69/91/68/90/67/89 */
+	/* U70 = Empty */
+	ROM_LOAD( "02-13404-00.u92",  0x04000, 0x4000, CRC(22da40aa) SHA1(a0306f795f1300d9ab88356ab44117764f6f22a4) )
+	ROM_LOAD( "02-13405-00.u69",  0x08000, 0x4000, CRC(6f65b313) SHA1(2ae85686f679eaa8be15f0cd7d5af61af966c4bd) )
+	/* U91 = Empty */
+	ROM_LOAD( "02-13406-00.u68",  0x12000, 0x2000, CRC(bb568693) SHA1(f7f3af505ba5caa330a36cde77b1c2c3cbf83398) )
+	ROM_LOAD( "02-13407-00.u90",  0x14000, 0x4000, CRC(e46ca57f) SHA1(771b43c4a2bcedc6a5bdde14a3c04701032b5713) )
+	ROM_LOAD( "02-13408-00.u67",  0x18000, 0x4000, CRC(be637305) SHA1(a13cbc1644dc06ec52faa0a18340b679c03dc902) )
 	/* 89 = Empty */
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
@@ -2592,7 +2634,7 @@ ROM_END
  *
  *************************************/
 
-void leland_state::init_master_ports(UINT8 mvram_base, UINT8 io_base)
+void leland_state::init_master_ports(uint8_t mvram_base, uint8_t io_base)
 {
 	/* set up the master CPU VRAM I/O */
 	m_master->space(AS_IO).install_readwrite_handler(mvram_base, mvram_base + 0x1f, read8_delegate(FUNC(leland_state::leland_mvram_port_r),this), write8_delegate(FUNC(leland_state::leland_mvram_port_w),this));
@@ -2688,6 +2730,9 @@ DRIVER_INIT_MEMBER(leland_state,dangerz)
 	m_master->space(AS_IO).install_read_handler(0xf4, 0xf4, read8_delegate(FUNC(leland_state::dangerz_input_upper_r),this));
 	m_master->space(AS_IO).install_read_handler(0xf8, 0xf8, read8_delegate(FUNC(leland_state::dangerz_input_y_r),this));
 	m_master->space(AS_IO).install_read_handler(0xfc, 0xfc, read8_delegate(FUNC(leland_state::dangerz_input_x_r),this));
+
+	save_item(NAME(m_dangerz_x));
+	save_item(NAME(m_dangerz_y));
 }
 
 
@@ -2767,6 +2812,9 @@ DRIVER_INIT_MEMBER(leland_state,viper)
 	m_master->space(AS_IO).install_read_handler(0xa4, 0xa4, read8_delegate(FUNC(leland_state::dangerz_input_upper_r),this));
 	m_master->space(AS_IO).install_read_handler(0xb8, 0xb8, read8_delegate(FUNC(leland_state::dangerz_input_y_r),this));
 	m_master->space(AS_IO).install_read_handler(0xbc, 0xbc, read8_delegate(FUNC(leland_state::dangerz_input_x_r),this));
+
+	save_item(NAME(m_dangerz_x));
+	save_item(NAME(m_dangerz_y));
 }
 
 
@@ -2985,7 +3033,8 @@ DRIVER_INIT_MEMBER(leland_state,asylum)
 GAME( 1985, cerberus, 0,       leland,   cerberus, leland_state, cerberus, ROT0,   "Cinematronics", "Cerberus", 0 )
 GAME( 1985, mayhem,   0,       leland,   mayhem, leland_state,   mayhem,   ROT0,   "Cinematronics", "Mayhem 2002", 0 )
 GAME( 1985, powrplay, 0,       leland,   mayhem, leland_state,   powrplay, ROT0,   "Cinematronics", "Power Play", 0 )
-GAME( 1985, wseries,  0,       leland,   wseries, leland_state,  wseries,  ROT0,   "Cinematronics", "World Series: The Season", 0 )
+GAME( 1985, wseries,  0,       leland,   wseries, leland_state,  wseries,  ROT0,   "Cinematronics", "World Series: The Season (rev 1)", 0 )
+GAME( 1985, wseries0, wseries, leland,   wseries, leland_state,  wseries,  ROT0,   "Cinematronics", "World Series: The Season (rev 0)", 0 )
 GAME( 1986, alleymas, 0,       leland,   alleymas, leland_state, alleymas, ROT270, "Cinematronics", "Alley Master", 0 )
 GAME( 1987, upyoural, 0,       leland,   upyoural, leland_state, upyoural, ROT270, "Cinematronics", "Up Your Alley", 0 )
 
@@ -2994,37 +3043,36 @@ GAME( 1986, dangerz,  0,       leland,   dangerz, leland_state,  dangerz,  ROT0,
 
 /* small master banks + extra top board, small slave banks */
 GAME( 1987, basebal2, 0,       leland,   basebal2, leland_state, basebal2, ROT0,   "Cinematronics", "Baseball: The Season II", 0 )
-GAME( 1987, dblplay,  0,       leland,   basebal2, leland_state, dblplay,  ROT0,   "Leland Corp. / Tradewest", "Super Baseball Double Play Home Run Derby", 0 )
-GAME( 1988, strkzone, 0,       leland,   basebal2, leland_state, strkzone, ROT0,   "Leland Corp.", "Strike Zone Baseball", 0 )
+GAME( 1987, dblplay,  0,       leland,   basebal2, leland_state, dblplay,  ROT0,   "Leland Corporation / Tradewest", "Super Baseball Double Play Home Run Derby", 0 )
+GAME( 1988, strkzone, 0,       leland,   basebal2, leland_state, strkzone, ROT0,   "Leland Corporation", "Strike Zone Baseball", 0 )
 
 /* large master banks, small slave banks, 80186 sound */
 GAME( 1987, redlin2p, 0,       redline,  redline, leland_state,  redlin2p, ROT270, "Cinematronics (Tradewest license)", "Redline Racer (2 players)", 0 )
-GAME( 1987, quarterb, 0,       quarterb, quarterb, leland_state, quarterb, ROT270, "Leland Corp.", "Quarterback (set 1)", 0 )
-GAME( 1987, quarterba,quarterb,quarterb, quarterb, leland_state, quarterb, ROT270, "Leland Corp.", "Quarterback (set 2)", 0 )
+GAME( 1987, quarterb, 0,       quarterb, quarterb, leland_state, quarterb, ROT270, "Leland Corporation", "Quarterback (set 1)", 0 )
+GAME( 1987, quarterba,quarterb,quarterb, quarterb, leland_state, quarterb, ROT270, "Leland Corporation", "Quarterback (set 2)", 0 )
 
 /* large master banks, large slave banks, 80186 sound */
-GAME( 1988, viper,    0,       lelandi,  dangerz, leland_state,  viper,    ROT0,   "Leland Corp.", "Viper", 0 )
-GAME( 1988, teamqb,   0,       lelandi,  teamqb, leland_state,   teamqb,   ROT270, "Leland Corp.", "John Elway's Team Quarterback (set 1)", 0 )
-GAME( 1988, teamqb2,  teamqb,  lelandi,  teamqb, leland_state,   teamqb,   ROT270, "Leland Corp.", "John Elway's Team Quarterback (set 2)", 0 )
-GAME( 1989, aafb,     0,       lelandi,  teamqb, leland_state,   aafb,     ROT270, "Leland Corp.", "All American Football (rev E)", 0 )
-GAME( 1989, aafbd2p,  aafb,    lelandi,  aafb2p, leland_state,   aafbd2p,  ROT270, "Leland Corp.", "All American Football (rev D, 2 Players)", 0 )
-GAME( 1989, aafbc,    aafb,    lelandi,  teamqb, leland_state,   aafbb,    ROT270, "Leland Corp.", "All American Football (rev C)", 0 )
-GAME( 1989, aafbb,    aafb,    lelandi,  teamqb, leland_state,   aafbb,    ROT270, "Leland Corp.", "All American Football (rev B)", MACHINE_NOT_WORKING )
+GAME( 1988, viper,    0,       lelandi,  dangerz, leland_state,  viper,    ROT0,   "Leland Corporation", "Viper", 0 )
+GAME( 1988, teamqb,   0,       lelandi,  teamqb, leland_state,   teamqb,   ROT270, "Leland Corporation", "John Elway's Team Quarterback (set 1)", 0 )
+GAME( 1988, teamqb2,  teamqb,  lelandi,  teamqb, leland_state,   teamqb,   ROT270, "Leland Corporation", "John Elway's Team Quarterback (set 2)", 0 )
+GAME( 1989, aafb,     0,       lelandi,  teamqb, leland_state,   aafb,     ROT270, "Leland Corporation", "All American Football (rev E)", 0 )
+GAME( 1989, aafbd2p,  aafb,    lelandi,  aafb2p, leland_state,   aafbd2p,  ROT270, "Leland Corporation", "All American Football (rev D, 2 Players)", 0 )
+GAME( 1989, aafbc,    aafb,    lelandi,  teamqb, leland_state,   aafbb,    ROT270, "Leland Corporation", "All American Football (rev C)", 0 )
+GAME( 1989, aafbb,    aafb,    lelandi,  teamqb, leland_state,   aafbb,    ROT270, "Leland Corporation", "All American Football (rev B)", MACHINE_NOT_WORKING )
 
 /* huge master banks, large slave banks, 80186 sound */
-GAME( 1989, offroad,    0,       lelandi,  offroad, leland_state,    offroad,  ROT0,   "Leland Corp.", "Ironman Ivan Stewart's Super Off-Road", 0 )
-GAME( 1989, offroadt,   0,       lelandi,  offroad, leland_state,    offroadt, ROT0,   "Leland Corp.", "Ironman Ivan Stewart's Super Off-Road Track-Pak", 0 )
-GAME( 1989, offroadt2p, offroadt,lelandi,  offroadt2p, leland_state, offroadt, ROT0,   "Leland Corp.", "Ironman Ivan Stewart's Super Off-Road Track-Pak (2 Players)", 0 )
-GAME( 1990, pigout,     0,       lelandi,  pigout, leland_state,     pigout,   ROT0,   "Leland Corp.", "Pig Out: Dine Like a Swine! (set 1)", 0 )
-GAME( 1990, pigouta,    pigout,  lelandi,  pigout, leland_state,     pigout,   ROT0,   "Leland Corp.", "Pig Out: Dine Like a Swine! (set 2)", 0 )
+GAME( 1989, offroad,    0,       lelandi,  offroad, leland_state,    offroad,  ROT0,   "Leland Corporation", "Ironman Ivan Stewart's Super Off-Road", 0 )
+GAME( 1989, offroadt,   0,       lelandi,  offroad, leland_state,    offroadt, ROT0,   "Leland Corporation", "Ironman Ivan Stewart's Super Off-Road Track-Pak", 0 )
+GAME( 1989, offroadt2p, offroadt,lelandi,  offroadt2p, leland_state, offroadt, ROT0,   "Leland Corporation", "Ironman Ivan Stewart's Super Off-Road Track-Pak (2 Players)", 0 )
+GAME( 1990, pigout,     0,       lelandi,  pigout, leland_state,     pigout,   ROT0,   "Leland Corporation", "Pig Out: Dine Like a Swine! (set 1)", 0 )
+GAME( 1990, pigouta,    pigout,  lelandi,  pigout, leland_state,     pigout,   ROT0,   "Leland Corporation", "Pig Out: Dine Like a Swine! (set 2)", 0 )
 
 /* Ataxx-era PCB, 80186 sound */
-GAME( 1990, ataxx,    0,      ataxx,   ataxx,    leland_state, ataxx,    ROT0,   "Leland Corp.", "Ataxx (set 1)", 0 )
-GAME( 1990, ataxxa,   ataxx,  ataxx,   ataxx,    leland_state, ataxx,    ROT0,   "Leland Corp.", "Ataxx (set 2)", 0 )
-GAME( 1990, ataxxe,   ataxx,  ataxx,   ataxx,    leland_state, ataxx,    ROT0,   "Leland Corp.", "Ataxx (Europe)", 0 )
-GAME( 1990, ataxxj,   ataxx,  ataxx,   ataxx,    leland_state, ataxxj,   ROT0,   "Leland Corp. (Capcom license)", "Ataxx (Japan)", 0 )
-GAME( 1990, wsf,      0,      wsf,     wsf,      leland_state, wsf,      ROT0,   "Leland Corp.", "World Soccer Finals", 0 )
-GAME( 1991, indyheat, 0,      wsf,     indyheat, leland_state, indyheat, ROT0,   "Leland Corp.", "Danny Sullivan's Indy Heat", 0 )
-GAME( 1991, brutforc, 0,      wsf,     brutforc, leland_state, brutforc, ROT0,   "Leland Corp.", "Brute Force", 0 )
-GAME( 1991, asylum,   0,      wsf,     brutforc, leland_state, asylum,   ROT270, "Leland Corp.", "Asylum (prototype)", 0 )
-
+GAME( 1990, ataxx,    0,      ataxx,   ataxx,    leland_state, ataxx,    ROT0,   "Leland Corporation", "Ataxx (set 1)", 0 )
+GAME( 1990, ataxxa,   ataxx,  ataxx,   ataxx,    leland_state, ataxx,    ROT0,   "Leland Corporation", "Ataxx (set 2)", 0 )
+GAME( 1990, ataxxe,   ataxx,  ataxx,   ataxx,    leland_state, ataxx,    ROT0,   "Leland Corporation", "Ataxx (Europe)", 0 )
+GAME( 1990, ataxxj,   ataxx,  ataxx,   ataxx,    leland_state, ataxxj,   ROT0,   "Leland Corporation (Capcom license)", "Ataxx (Japan)", 0 )
+GAME( 1990, wsf,      0,      wsf,     wsf,      leland_state, wsf,      ROT0,   "Leland Corporation", "World Soccer Finals", 0 )
+GAME( 1991, indyheat, 0,      wsf,     indyheat, leland_state, indyheat, ROT0,   "Leland Corporation", "Danny Sullivan's Indy Heat", 0 )
+GAME( 1991, brutforc, 0,      wsf,     brutforc, leland_state, brutforc, ROT0,   "Leland Corporation", "Brute Force", 0 )
+GAME( 1991, asylum,   0,      wsf,     brutforc, leland_state, asylum,   ROT270, "Leland Corporation", "Asylum (prototype)", 0 )

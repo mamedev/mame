@@ -12,9 +12,10 @@
 #include "debugger.h"
 #include "mcs96.h"
 
-mcs96_device::mcs96_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, int data_width, const char *shortname, const char *source) :
-	cpu_device(mconfig, type, name, tag, owner, clock, shortname, source),
-	program_config("program", ENDIANNESS_LITTLE, data_width, 16), program(nullptr), direct(nullptr), icount(0), bcount(0), inst_state(0), cycles_scaling(0), pending_irq(0),
+mcs96_device::mcs96_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int data_width) :
+	cpu_device(mconfig, type, tag, owner, clock),
+	program_config("program", ENDIANNESS_LITTLE, data_width, 16),
+	program(nullptr), direct(nullptr), icount(0), bcount(0), inst_state(0), cycles_scaling(0), pending_irq(0),
 	PC(0), PPC(0), PSW(0), OP1(0), OP2(0), OP3(0), OPI(0), TMP(0), irq_requested(false)
 {
 }
@@ -26,7 +27,7 @@ void mcs96_device::device_start()
 	m_icountptr = &icount;
 
 	state_add(STATE_GENPC,     "GENPC",     PC).noshow();
-	state_add(STATE_GENPCBASE, "GENPCBASE", PPC).noshow();
+	state_add(STATE_GENPCBASE, "CURPC",     PPC).noshow();
 	state_add(STATE_GENSP,     "GENSP",     R[0]).noshow();
 	state_add(STATE_GENFLAGS,  "GENFLAGS",  PSW).formatstr("%16s").noshow();
 	state_add(MCS96_PC,        "PC",        PC);
@@ -51,22 +52,22 @@ void mcs96_device::device_reset()
 	inst_state = STATE_FETCH;
 }
 
-UINT32 mcs96_device::execute_min_cycles() const
+uint32_t mcs96_device::execute_min_cycles() const
 {
 	return 4;
 }
 
-UINT32 mcs96_device::execute_max_cycles() const
+uint32_t mcs96_device::execute_max_cycles() const
 {
 	return 33;
 }
 
-UINT32 mcs96_device::execute_input_lines() const
+uint32_t mcs96_device::execute_input_lines() const
 {
 	return 1;
 }
 
-void mcs96_device::recompute_bcount(UINT64 event_time)
+void mcs96_device::recompute_bcount(uint64_t event_time)
 {
 	if(!event_time || event_time >= total_cycles() + icount) {
 		bcount = 0;
@@ -115,9 +116,11 @@ void mcs96_device::execute_set_input(int inputnum, int state)
 	}
 }
 
-const address_space_config *mcs96_device::memory_space_config(address_spacenum spacenum) const
+device_memory_interface::space_config_vector mcs96_device::memory_space_config() const
 {
-	return (spacenum == AS_PROGRAM) ? &program_config : nullptr;
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &program_config)
+	};
 }
 
 void mcs96_device::state_import(const device_state_entry &entry)
@@ -153,7 +156,7 @@ void mcs96_device::state_string_export(const device_state_entry &entry, std::str
 	}
 }
 
-std::string mcs96_device::regname(UINT8 reg)
+std::string mcs96_device::regname(uint8_t reg)
 {
 	char res[32];
 	switch(reg) {
@@ -172,7 +175,7 @@ std::string mcs96_device::regname(UINT8 reg)
 	return res;
 }
 
-offs_t mcs96_device::disasm_generic(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options, const disasm_entry *entries)
+offs_t mcs96_device::disasm_generic(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options, const disasm_entry *entries)
 {
 	bool prefix_fe = false;
 	int off = 0;
@@ -183,8 +186,8 @@ offs_t mcs96_device::disasm_generic(char *buffer, offs_t pc, const UINT8 *oprom,
 		oprom++;
 	}
 	const disasm_entry &e = entries[oprom[0]];
-	UINT32 flags = e.flags | DASMFLAG_SUPPORTED;
-	buffer += sprintf(buffer, "%s", prefix_fe ? e.opcode_fe : e.opcode);
+	uint32_t flags = e.flags | DASMFLAG_SUPPORTED;
+	util::stream_format(stream, "%s", prefix_fe ? e.opcode_fe : e.opcode);
 
 	switch(e.mode) {
 	case DASM_none:
@@ -192,7 +195,7 @@ offs_t mcs96_device::disasm_generic(char *buffer, offs_t pc, const UINT8 *oprom,
 		break;
 
 	case DASM_nop_2:
-		sprintf(buffer, " %02x", oprom[1]);
+		util::stream_format(stream, " %02x", oprom[1]);
 		flags |= 2;
 		break;
 
@@ -200,7 +203,7 @@ offs_t mcs96_device::disasm_generic(char *buffer, offs_t pc, const UINT8 *oprom,
 		int delta = oprom[1];
 		if(delta & 0x80)
 			delta -= 0x100;
-		sprintf(buffer, " %04x", (pc+2+delta) & 0xffff);
+		util::stream_format(stream, " %04x", (pc+2+delta) & 0xffff);
 		flags |= 2;
 		break;
 	}
@@ -209,14 +212,14 @@ offs_t mcs96_device::disasm_generic(char *buffer, offs_t pc, const UINT8 *oprom,
 		int delta = ((oprom[0] << 8) | oprom[1]) & 0x7ff;
 		if(delta & 0x400)
 			delta -= 0x800;
-		sprintf(buffer, " %04x", (pc+2+delta) & 0xffff);
+		util::stream_format(stream, " %04x", (pc+2+delta) & 0xffff);
 		flags |= 2;
 		break;
 	}
 
 	case DASM_rel16: {
 		int delta = oprom[1] | (oprom[2] << 8);
-		sprintf(buffer, " %04x", (pc+3+delta) & 0xffff);
+		util::stream_format(stream, " %04x", (pc+3+delta) & 0xffff);
 		flags |= 3;
 		break;
 	}
@@ -225,7 +228,7 @@ offs_t mcs96_device::disasm_generic(char *buffer, offs_t pc, const UINT8 *oprom,
 		int delta = oprom[2];
 		if(delta & 0x80)
 			delta -= 0x100;
-		sprintf(buffer, " %s, %04x", regname(oprom[1]).c_str(), (pc+3+delta) & 0xffff);
+		util::stream_format(stream, " %s, %04x", regname(oprom[1]), (pc+3+delta) & 0xffff);
 		flags |= 3;
 		break;
 	}
@@ -234,95 +237,95 @@ offs_t mcs96_device::disasm_generic(char *buffer, offs_t pc, const UINT8 *oprom,
 		int delta = oprom[2];
 		if(delta & 0x80)
 			delta -= 0x100;
-		sprintf(buffer, " %d, %s, %04x", oprom[0] & 7, regname(oprom[1]).c_str(), (pc+3+delta) & 0xffff);
+		util::stream_format(stream, " %d, %s, %04x", oprom[0] & 7, regname(oprom[1]), (pc+3+delta) & 0xffff);
 		flags |= 3;
 		break;
 	}
 
 	case DASM_direct_1:
-		sprintf(buffer, " %s", regname(oprom[1]).c_str());
+		util::stream_format(stream, " %s", regname(oprom[1]));
 		flags |= 2;
 		break;
 
 	case DASM_direct_2:
-		sprintf(buffer, " %s, %s", regname(oprom[2]).c_str(), regname(oprom[1]).c_str());
+		util::stream_format(stream, " %s, %s", regname(oprom[2]), regname(oprom[1]));
 		flags |= 3;
 		break;
 
 	case DASM_direct_3:
-		sprintf(buffer, " %s, %s, %s", regname(oprom[3]).c_str(), regname(oprom[2]).c_str(), regname(oprom[1]).c_str());
+		util::stream_format(stream, " %s, %s, %s", regname(oprom[3]), regname(oprom[2]), regname(oprom[1]));
 		flags |= 4;
 		break;
 
 	case DASM_immed_1b:
-		sprintf(buffer, " #%02x", oprom[1]);
+		util::stream_format(stream, " #%02x", oprom[1]);
 		flags |= 2;
 		break;
 
 	case DASM_immed_2b:
-		sprintf(buffer, " %s, #%02x", regname(oprom[2]).c_str(), oprom[1]);
+		util::stream_format(stream, " %s, #%02x", regname(oprom[2]), oprom[1]);
 		flags |= 3;
 		break;
 
 	case DASM_immed_or_reg_2b:
 		if(oprom[1] >= 0x10)
-			sprintf(buffer, " %s, %s", regname(oprom[2]).c_str(), regname(oprom[1]).c_str());
+			util::stream_format(stream, " %s, %s", regname(oprom[2]), regname(oprom[1]));
 		else
-			sprintf(buffer, " %s, #%02x", regname(oprom[2]).c_str(), oprom[1]);
+			util::stream_format(stream, " %s, #%02x", regname(oprom[2]), oprom[1]);
 		flags |= 3;
 		break;
 
 	case DASM_immed_3b:
-		sprintf(buffer, " %s, %s, #%02x", regname(oprom[3]).c_str(), regname(oprom[2]).c_str(), oprom[1]);
+		util::stream_format(stream, " %s, %s, #%02x", regname(oprom[3]), regname(oprom[2]), oprom[1]);
 		flags |= 4;
 		break;
 
 	case DASM_immed_1w:
-		sprintf(buffer, " #%02x%02x", oprom[2], oprom[1]);
+		util::stream_format(stream, " #%02x%02x", oprom[2], oprom[1]);
 		flags |= 3;
 		break;
 
 	case DASM_immed_2w:
-		sprintf(buffer, " %s, #%02x%02x", regname(oprom[3]).c_str(), oprom[2], oprom[1]);
+		util::stream_format(stream, " %s, #%02x%02x", regname(oprom[3]), oprom[2], oprom[1]);
 		flags |= 4;
 		break;
 
 	case DASM_immed_3w:
-		sprintf(buffer, " %s, %s, #%02x%02x", regname(oprom[4]).c_str(), regname(oprom[3]).c_str(), oprom[2], oprom[1]);
+		util::stream_format(stream, " %s, %s, #%02x%02x", regname(oprom[4]), regname(oprom[3]), oprom[2], oprom[1]);
 		flags |= 5;
 		break;
 
 	case DASM_indirect_1n:
-		sprintf(buffer, " [%s]", regname(oprom[1]).c_str());
+		util::stream_format(stream, " [%s]", regname(oprom[1]));
 		flags |= 2;
 		break;
 
 	case DASM_indirect_1:
 		if(oprom[1] & 0x01) {
-			sprintf(buffer, " [%s]+", regname(oprom[1]-1).c_str());
+			util::stream_format(stream, " [%s]+", regname(oprom[1]-1));
 			flags |= 2;
 		} else {
-			sprintf(buffer, " [%s]", regname(oprom[1]).c_str());
+			util::stream_format(stream, " [%s]", regname(oprom[1]));
 			flags |= 2;
 		}
 		break;
 
 	case DASM_indirect_2:
 		if(oprom[1] & 0x01) {
-			sprintf(buffer, " %s, [%s]+", regname(oprom[2]).c_str(), regname(oprom[1]-1).c_str());
+			util::stream_format(stream, " %s, [%s]+", regname(oprom[2]), regname(oprom[1]-1));
 			flags |= 3;
 		} else {
-			sprintf(buffer, " %s, [%s]", regname(oprom[2]).c_str(), regname(oprom[1]).c_str());
+			util::stream_format(stream, " %s, [%s]", regname(oprom[2]), regname(oprom[1]));
 			flags |= 3;
 		}
 		break;
 
 	case DASM_indirect_3:
 		if(oprom[1] & 0x01) {
-			sprintf(buffer, " %s, %s, [%s]+", regname(oprom[3]).c_str(), regname(oprom[2]).c_str(), regname(oprom[1]-1).c_str());
+			util::stream_format(stream, " %s, %s, [%s]+", regname(oprom[3]), regname(oprom[2]), regname(oprom[1]-1));
 			flags |= 4;
 		} else {
-			sprintf(buffer, " %s, %s, [%s]", regname(oprom[3]).c_str(), regname(oprom[2]).c_str(), regname(oprom[1]).c_str());
+			util::stream_format(stream, " %s, %s, [%s]", regname(oprom[3]), regname(oprom[2]), regname(oprom[1]));
 			flags |= 4;
 		}
 		break;
@@ -330,9 +333,9 @@ offs_t mcs96_device::disasm_generic(char *buffer, offs_t pc, const UINT8 *oprom,
 	case DASM_indexed_1:
 		if(oprom[1] & 0x01) {
 			if(oprom[1] == 0x01)
-				sprintf(buffer, " %02x%02x", oprom[3], oprom[2]);
+				util::stream_format(stream, " %02x%02x", oprom[3], oprom[2]);
 			else
-				sprintf(buffer, " %02x%02x[%s]", oprom[3], oprom[2], regname(oprom[1]-1).c_str());
+				util::stream_format(stream, " %02x%02x[%s]", oprom[3], oprom[2], regname(oprom[1]-1));
 			flags |= 4;
 		} else {
 			int delta = oprom[2];
@@ -340,14 +343,14 @@ offs_t mcs96_device::disasm_generic(char *buffer, offs_t pc, const UINT8 *oprom,
 				delta -= 0x100;
 			if(oprom[1] == 0x00) {
 				if(delta < 0)
-					sprintf(buffer, " %04x", delta & 0xffff);
+					util::stream_format(stream, " %04x", delta & 0xffff);
 				else
-					sprintf(buffer, " %02x", delta);
+					util::stream_format(stream, " %02x", delta);
 			} else {
 				if(delta < 0)
-					sprintf(buffer, " -%02x[%s]", -delta, regname(oprom[1]).c_str());
+					util::stream_format(stream, " -%02x[%s]", -delta, regname(oprom[1]));
 				else
-					sprintf(buffer, " %02x[%s]", delta, regname(oprom[1]).c_str());
+					util::stream_format(stream, " %02x[%s]", delta, regname(oprom[1]));
 			}
 			flags |= 3;
 		}
@@ -356,9 +359,9 @@ offs_t mcs96_device::disasm_generic(char *buffer, offs_t pc, const UINT8 *oprom,
 	case DASM_indexed_2:
 		if(oprom[1] & 0x01) {
 			if(oprom[1] == 0x01)
-				sprintf(buffer, " %s, %02x%02x", regname(oprom[4]).c_str(), oprom[3], oprom[2]);
+				util::stream_format(stream, " %s, %02x%02x", regname(oprom[4]), oprom[3], oprom[2]);
 			else
-				sprintf(buffer, " %s, %02x%02x[%s]", regname(oprom[4]).c_str(), oprom[3], oprom[2], regname(oprom[1]-1).c_str());
+				util::stream_format(stream, " %s, %02x%02x[%s]", regname(oprom[4]), oprom[3], oprom[2], regname(oprom[1]-1));
 			flags |= 5;
 		} else {
 			int delta = oprom[2];
@@ -366,14 +369,14 @@ offs_t mcs96_device::disasm_generic(char *buffer, offs_t pc, const UINT8 *oprom,
 				delta -= 0x100;
 			if(oprom[1] == 0x00) {
 				if(delta < 0)
-					sprintf(buffer, " %s, %04x", regname(oprom[3]).c_str(), delta & 0xffff);
+					util::stream_format(stream, " %s, %04x", regname(oprom[3]), delta & 0xffff);
 				else
-					sprintf(buffer, " %s, %02x", regname(oprom[3]).c_str(), delta);
+					util::stream_format(stream, " %s, %02x", regname(oprom[3]), delta);
 			} else {
 				if(delta < 0)
-					sprintf(buffer, " %s, -%02x[%s]", regname(oprom[3]).c_str(), -delta, regname(oprom[1]).c_str());
+					util::stream_format(stream, " %s, -%02x[%s]", regname(oprom[3]), -delta, regname(oprom[1]));
 				else
-					sprintf(buffer, " %s, %02x[%s]", regname(oprom[3]).c_str(), delta, regname(oprom[1]).c_str());
+					util::stream_format(stream, " %s, %02x[%s]", regname(oprom[3]), delta, regname(oprom[1]));
 			}
 			flags |= 4;
 		}
@@ -382,9 +385,9 @@ offs_t mcs96_device::disasm_generic(char *buffer, offs_t pc, const UINT8 *oprom,
 	case DASM_indexed_3:
 		if(oprom[1] & 0x01) {
 			if(oprom[1] == 0x01)
-				sprintf(buffer, " %s, %s, %02x%02x", regname(oprom[5]).c_str(),  regname(oprom[4]).c_str(), oprom[3], oprom[2]);
+				util::stream_format(stream, " %s, %s, %02x%02x", regname(oprom[5]),  regname(oprom[4]), oprom[3], oprom[2]);
 			else
-				sprintf(buffer, " %s, %s, %02x%02x[%s]", regname(oprom[5]).c_str(), regname(oprom[4]).c_str(), oprom[3], oprom[2], regname(oprom[1]-1).c_str());
+				util::stream_format(stream, " %s, %s, %02x%02x[%s]", regname(oprom[5]), regname(oprom[4]), oprom[3], oprom[2], regname(oprom[1]-1));
 			flags |= 6;
 		} else {
 			int delta = oprom[2];
@@ -392,14 +395,14 @@ offs_t mcs96_device::disasm_generic(char *buffer, offs_t pc, const UINT8 *oprom,
 				delta -= 0x100;
 			if(oprom[1] == 0x00) {
 				if(delta < 0)
-					sprintf(buffer, " %s, %s, %04x", regname(oprom[4]).c_str(), regname(oprom[3]).c_str(), delta & 0xffff);
+					util::stream_format(stream, " %s, %s, %04x", regname(oprom[4]), regname(oprom[3]), delta & 0xffff);
 				else
-					sprintf(buffer, " %s, %s, %02x", regname(oprom[4]).c_str(), regname(oprom[3]).c_str(), delta);
+					util::stream_format(stream, " %s, %s, %02x", regname(oprom[4]), regname(oprom[3]), delta);
 			} else {
 				if(delta < 0)
-					sprintf(buffer, " %s, %s, -%02x[%s]", regname(oprom[4]).c_str(), regname(oprom[3]).c_str(), -delta, regname(oprom[1]).c_str());
+					util::stream_format(stream, " %s, %s, -%02x[%s]", regname(oprom[4]), regname(oprom[3]), -delta, regname(oprom[1]));
 				else
-					sprintf(buffer, " %s, %s, %02x[%s]", regname(oprom[4]).c_str(), regname(oprom[3]).c_str(), delta, regname(oprom[1]).c_str());
+					util::stream_format(stream, " %s, %s, %02x[%s]", regname(oprom[4]), regname(oprom[3]), delta, regname(oprom[1]));
 			}
 			flags |= 5;
 		}
@@ -413,17 +416,17 @@ offs_t mcs96_device::disasm_generic(char *buffer, offs_t pc, const UINT8 *oprom,
 	return flags+off;
 }
 
-UINT32 mcs96_device::disasm_min_opcode_bytes() const
+uint32_t mcs96_device::disasm_min_opcode_bytes() const
 {
 	return 1;
 }
 
-UINT32 mcs96_device::disasm_max_opcode_bytes() const
+uint32_t mcs96_device::disasm_max_opcode_bytes() const
 {
 	return 7;
 }
 
-void mcs96_device::io_w8(UINT8 adr, UINT8 data)
+void mcs96_device::io_w8(uint8_t adr, uint8_t data)
 {
 	switch(adr) {
 	case 0x02:
@@ -478,7 +481,7 @@ void mcs96_device::io_w8(UINT8 adr, UINT8 data)
 	return;
 }
 
-void mcs96_device::io_w16(UINT8 adr, UINT16 data)
+void mcs96_device::io_w16(uint8_t adr, uint16_t data)
 {
 	switch(adr) {
 	case 0:
@@ -494,7 +497,7 @@ void mcs96_device::io_w16(UINT8 adr, UINT16 data)
 	return;
 }
 
-UINT8 mcs96_device::io_r8(UINT8 adr)
+uint8_t mcs96_device::io_r8(uint8_t adr)
 {
 	switch(adr) {
 	case 0x00:
@@ -504,26 +507,26 @@ UINT8 mcs96_device::io_r8(UINT8 adr)
 	case 0x08:
 		return PSW;
 	}
-	UINT8 data = 0x00;
+	uint8_t data = 0x00;
 	logerror("%s: io_r8 %02x, %02x (%04x)\n", tag(), adr, data, PPC);
 	return data;
 }
 
-UINT16 mcs96_device::io_r16(UINT8 adr)
+uint16_t mcs96_device::io_r16(uint8_t adr)
 {
 	if(adr < 2)
 		return 0x0000;
-	UINT16 data = 0x0000;
+	uint16_t data = 0x0000;
 	logerror("%s: io_r16 %02x, %04x (%04x)\n", tag(), adr, data, PPC);
 	return data;
 }
 
-void mcs96_device::reg_w8(UINT8 adr, UINT8 data)
+void mcs96_device::reg_w8(uint8_t adr, uint8_t data)
 {
 	if(adr < 0x18)
 		io_w8(adr, data);
 	else {
-		UINT16 &r = R[(adr - 0x18) >> 1];
+		uint16_t &r = R[(adr - 0x18) >> 1];
 		if(adr & 0x01)
 			r = (r & 0x00ff) | (data << 8);
 		else
@@ -531,7 +534,7 @@ void mcs96_device::reg_w8(UINT8 adr, UINT8 data)
 	}
 }
 
-void mcs96_device::reg_w16(UINT8 adr, UINT16 data)
+void mcs96_device::reg_w16(uint8_t adr, uint16_t data)
 {
 	adr &= 0xfe;
 	if(adr < 0x18)
@@ -540,19 +543,19 @@ void mcs96_device::reg_w16(UINT8 adr, UINT16 data)
 		R[(adr-0x18) >> 1] = data;
 }
 
-UINT8 mcs96_device::reg_r8(UINT8 adr)
+uint8_t mcs96_device::reg_r8(uint8_t adr)
 {
 	if(adr < 0x18)
 		return io_r8(adr);
 
-	UINT16 data = R[(adr - 0x18) >> 1];
+	uint16_t data = R[(adr - 0x18) >> 1];
 	if(adr & 0x01)
 		return data >> 8;
 	else
 		return data;
 }
 
-UINT16 mcs96_device::reg_r16(UINT8 adr)
+uint16_t mcs96_device::reg_r16(uint8_t adr)
 {
 	adr &= 0xfe;
 	if(adr < 0x18)
@@ -561,12 +564,12 @@ UINT16 mcs96_device::reg_r16(UINT8 adr)
 	return R[(adr-0x18) >> 1];
 }
 
-void mcs96_device::any_w8(UINT16 adr, UINT8 data)
+void mcs96_device::any_w8(uint16_t adr, uint8_t data)
 {
 	if(adr < 0x18)
 		io_w8(adr, data);
 	else if(adr < 0x100) {
-		UINT16 &r = R[(adr - 0x18) >> 1];
+		uint16_t &r = R[(adr - 0x18) >> 1];
 		if(adr & 0x01)
 			r = (r & 0x00ff) | (data << 8);
 		else
@@ -575,7 +578,7 @@ void mcs96_device::any_w8(UINT16 adr, UINT8 data)
 		program->write_byte(adr, data);
 }
 
-void mcs96_device::any_w16(UINT16 adr, UINT16 data)
+void mcs96_device::any_w16(uint16_t adr, uint16_t data)
 {
 	adr &= 0xfffe;
 	if(adr < 0x18)
@@ -586,12 +589,12 @@ void mcs96_device::any_w16(UINT16 adr, UINT16 data)
 		program->write_word(adr, data);
 }
 
-UINT8 mcs96_device::any_r8(UINT16 adr)
+uint8_t mcs96_device::any_r8(uint16_t adr)
 {
 	if(adr < 0x18)
 		return io_r8(adr);
 	else if(adr < 0x100) {
-		UINT16 data = R[(adr - 0x18) >> 1];
+		uint16_t data = R[(adr - 0x18) >> 1];
 		if(adr & 0x01)
 			return data >> 8;
 		else
@@ -600,7 +603,7 @@ UINT8 mcs96_device::any_r8(UINT16 adr)
 		return program->read_byte(adr);
 }
 
-UINT16 mcs96_device::any_r16(UINT16 adr)
+uint16_t mcs96_device::any_r16(uint16_t adr)
 {
 	adr &= 0xfffe;
 	if(adr < 0x18)
@@ -611,13 +614,13 @@ UINT16 mcs96_device::any_r16(UINT16 adr)
 		return program->read_word(adr);
 }
 
-UINT8 mcs96_device::do_addb(UINT8 v1, UINT8 v2)
+uint8_t mcs96_device::do_addb(uint8_t v1, uint8_t v2)
 {
-	UINT16 sum = v1+v2;
+	uint16_t sum = v1+v2;
 	PSW &= ~(F_Z|F_N|F_C|F_V);
-	if(!UINT8(sum))
+	if(!uint8_t(sum))
 		PSW |= F_Z;
-	else if(INT8(sum) < 0)
+	else if(int8_t(sum) < 0)
 		PSW |= F_N;
 	if(~(v1^v2) & (v1^sum) & 0x80)
 		PSW |= F_V|F_VT;
@@ -626,13 +629,13 @@ UINT8 mcs96_device::do_addb(UINT8 v1, UINT8 v2)
 	return sum;
 }
 
-UINT16 mcs96_device::do_add(UINT16 v1, UINT16 v2)
+uint16_t mcs96_device::do_add(uint16_t v1, uint16_t v2)
 {
-	UINT32 sum = v1+v2;
+	uint32_t sum = v1+v2;
 	PSW &= ~(F_Z|F_N|F_C|F_V);
-	if(!UINT16(sum))
+	if(!uint16_t(sum))
 		PSW |= F_Z;
-	else if(INT16(sum) < 0)
+	else if(int16_t(sum) < 0)
 		PSW |= F_N;
 	if(~(v1^v2) & (v1^sum) & 0x8000)
 		PSW |= F_V|F_VT;
@@ -641,13 +644,13 @@ UINT16 mcs96_device::do_add(UINT16 v1, UINT16 v2)
 	return sum;
 }
 
-UINT8 mcs96_device::do_subb(UINT8 v1, UINT8 v2)
+uint8_t mcs96_device::do_subb(uint8_t v1, uint8_t v2)
 {
-	UINT16 diff = v1 - v2;
+	uint16_t diff = v1 - v2;
 	PSW &= ~(F_N|F_V|F_Z|F_C);
-	if(!UINT8(diff))
+	if(!uint8_t(diff))
 		PSW |= F_Z;
-	else if(INT8(diff) < 0)
+	else if(int8_t(diff) < 0)
 		PSW |= F_N;
 	if((v1^v2) & (v1^diff) & 0x80)
 		PSW |= F_V;
@@ -656,13 +659,13 @@ UINT8 mcs96_device::do_subb(UINT8 v1, UINT8 v2)
 	return diff;
 }
 
-UINT16 mcs96_device::do_sub(UINT16 v1, UINT16 v2)
+uint16_t mcs96_device::do_sub(uint16_t v1, uint16_t v2)
 {
-	UINT32 diff = v1 - v2;
+	uint32_t diff = v1 - v2;
 	PSW &= ~(F_N|F_V|F_Z|F_C);
-	if(!UINT16(diff))
+	if(!uint16_t(diff))
 		PSW |= F_Z;
-	else if(INT16(diff) < 0)
+	else if(int16_t(diff) < 0)
 		PSW |= F_N;
 	if((v1^v2) & (v1^diff) & 0x8000)
 		PSW |= F_V;
@@ -671,13 +674,13 @@ UINT16 mcs96_device::do_sub(UINT16 v1, UINT16 v2)
 	return diff;
 }
 
-UINT8 mcs96_device::do_addcb(UINT8 v1, UINT8 v2)
+uint8_t mcs96_device::do_addcb(uint8_t v1, uint8_t v2)
 {
-	UINT16 sum = v1+v2+(PSW & F_C ? 1 : 0);
+	uint16_t sum = v1+v2+(PSW & F_C ? 1 : 0);
 	PSW &= ~(F_Z|F_N|F_C|F_V);
-	if(!UINT8(sum))
+	if(!uint8_t(sum))
 		PSW |= F_Z;
-	else if(INT8(sum) < 0)
+	else if(int8_t(sum) < 0)
 		PSW |= F_N;
 	if(~(v1^v2) & (v1^sum) & 0x80)
 		PSW |= F_V|F_VT;
@@ -686,13 +689,13 @@ UINT8 mcs96_device::do_addcb(UINT8 v1, UINT8 v2)
 	return sum;
 }
 
-UINT16 mcs96_device::do_addc(UINT16 v1, UINT16 v2)
+uint16_t mcs96_device::do_addc(uint16_t v1, uint16_t v2)
 {
-	UINT32 sum = v1+v2+(PSW & F_C ? 1 : 0);
+	uint32_t sum = v1+v2+(PSW & F_C ? 1 : 0);
 	PSW &= ~(F_Z|F_N|F_C|F_V);
-	if(!UINT16(sum))
+	if(!uint16_t(sum))
 		PSW |= F_Z;
-	else if(INT16(sum) < 0)
+	else if(int16_t(sum) < 0)
 		PSW |= F_N;
 	if(~(v1^v2) & (v1^sum) & 0x8000)
 		PSW |= F_V|F_VT;
@@ -701,13 +704,13 @@ UINT16 mcs96_device::do_addc(UINT16 v1, UINT16 v2)
 	return sum;
 }
 
-UINT8 mcs96_device::do_subcb(UINT8 v1, UINT8 v2)
+uint8_t mcs96_device::do_subcb(uint8_t v1, uint8_t v2)
 {
-	UINT16 diff = v1 - v2 - (PSW & F_C ? 0 : 1);
+	uint16_t diff = v1 - v2 - (PSW & F_C ? 0 : 1);
 	PSW &= ~(F_N|F_V|F_Z|F_C);
-	if(!UINT8(diff))
+	if(!uint8_t(diff))
 		PSW |= F_Z;
-	else if(INT8(diff) < 0)
+	else if(int8_t(diff) < 0)
 		PSW |= F_N;
 	if((v1^v2) & (v1^diff) & 0x80)
 		PSW |= F_V;
@@ -716,13 +719,13 @@ UINT8 mcs96_device::do_subcb(UINT8 v1, UINT8 v2)
 	return diff;
 }
 
-UINT16 mcs96_device::do_subc(UINT16 v1, UINT16 v2)
+uint16_t mcs96_device::do_subc(uint16_t v1, uint16_t v2)
 {
-	UINT32 diff = v1 - v2 - (PSW & F_C ? 0 : 1);
+	uint32_t diff = v1 - v2 - (PSW & F_C ? 0 : 1);
 	PSW &= ~(F_N|F_V|F_Z|F_C);
-	if(!UINT16(diff))
+	if(!uint16_t(diff))
 		PSW |= F_Z;
-	else if(INT16(diff) < 0)
+	else if(int16_t(diff) < 0)
 		PSW |= F_N;
 	if((v1^v2) & (v1^diff) & 0x8000)
 		PSW |= F_V;
@@ -731,21 +734,21 @@ UINT16 mcs96_device::do_subc(UINT16 v1, UINT16 v2)
 	return diff;
 }
 
-void mcs96_device::set_nz8(UINT8 v)
+void mcs96_device::set_nz8(uint8_t v)
 {
 	PSW &= ~(F_N|F_V|F_Z|F_C);
 	if(!v)
 		PSW |= F_Z;
-	else if(INT8(v) < 0)
+	else if(int8_t(v) < 0)
 		PSW |= F_N;
 }
 
-void mcs96_device::set_nz16(UINT16 v)
+void mcs96_device::set_nz16(uint16_t v)
 {
 	PSW &= ~(F_N|F_V|F_Z|F_C);
 	if(!v)
 		PSW |= F_Z;
-	else if(INT16(v) < 0)
+	else if(int16_t(v) < 0)
 		PSW |= F_N;
 }
 

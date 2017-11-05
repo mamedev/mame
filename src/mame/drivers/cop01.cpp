@@ -54,10 +54,13 @@ Mighty Guy board layout:
 
 ***************************************************************************/
 #include "emu.h"
+#include "includes/cop01.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "sound/3526intf.h"
-#include "includes/cop01.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 #define MIGHTGUY_HACK    0
@@ -74,13 +77,13 @@ Mighty Guy board layout:
 
 WRITE8_MEMBER(cop01_state::cop01_sound_command_w)
 {
-	soundlatch_byte_w(space, offset, data);
+	m_soundlatch->write(space, offset, data);
 	m_audiocpu->set_input_line(0, ASSERT_LINE );
 }
 
 READ8_MEMBER(cop01_state::cop01_sound_command_r)
 {
-	int res = (soundlatch_byte_r(space, offset) & 0x7f) << 1;
+	int res = (m_soundlatch->read(space, offset) & 0x7f) << 1;
 
 	/* bit 0 seems to be a timer */
 	if ((m_audiocpu->total_cycles() / TIMER_RATE) & 1)
@@ -99,7 +102,7 @@ READ8_MEMBER(cop01_state::cop01_sound_command_r)
 
 CUSTOM_INPUT_MEMBER(cop01_state::mightguy_area_r)
 {
-	int bit_mask = (FPTR)param;
+	int bit_mask = (uintptr_t)param;
 	return (ioport("FAKE")->read() & bit_mask) ? 0x01 : 0x00;
 }
 
@@ -167,18 +170,81 @@ static ADDRESS_MAP_START( audio_io_map, AS_IO, 8, cop01_state )
 ADDRESS_MAP_END
 
 
+/*
+ * sound "protection" uses address/data to ports 2/3 (R/W)
+ * Register map:
+ * 0x32: always 5, rom read trigger?
+ * 0x33: - address 1 (source?)
+ * 0x34: /
+ * 0x35: - address 2 (adjust value in rom?)
+ * 0x36: /
+ * 0x37: R reused for ym3526 register set, read protection rom (same as amatelas)
+ *
+ * 0x40: counter set, always 1?
+ * 0x41: R bit 0 pulse timer? W oneshot timer?
+ * 0x42: counter set, always 3?
+ * 0x43: counter set, always 3?
+ *
+ * 0x92: data in/out (for dac?)
+ * 0x94: test register? (W 0xaa, checks if R 0xaa)
+ */
+
 /* this just gets some garbage out of the YM3526 */
-READ8_MEMBER(cop01_state::kludge)
+READ8_MEMBER(cop01_state::prot_data_r)
 {
-	return m_timer++;
+	if(m_prot_command == 0x41)
+		return (m_audiocpu->total_cycles() / 0x34) & 1; // wrong
+
+	if(m_prot_command == 0x37)
+	{
+		uint16_t prot_offset = (m_prot_reg[1]<<8)|(m_prot_reg[2]);
+		uint8_t *prot_rom = memregion("prot_data")->base();
+		// 0x37c are BGMs while 0x34e are SFXs?
+		uint8_t prot_adj = 0x82; //0xbd
+
+		//printf("%02x",(prot_rom[prot_offset] - 0x44) & 0xff);
+
+		return prot_rom[prot_offset & 0x1fff] - prot_adj; // minus value correct?
+	}
+
+	if(m_prot_command == 0x92) // affects coin SFX playback
+		return 1;
+
+	if(m_prot_command == 0x94)
+		return 0;
+
+	return 0;
+}
+
+WRITE8_MEMBER(cop01_state::prot_address_w)
+{
+	m_prot_command = data;
+}
+
+WRITE8_MEMBER(cop01_state::prot_data_w)
+{
+	if( m_prot_command>=0x32 && m_prot_command<=0x37 )
+	{
+		m_prot_reg[m_prot_command-0x32] = data;
+
+		#if 0
+		if(m_prot_command == 0x32)
+		{
+			for(int i=0;i<6;i++)
+				printf("%02x ",m_prot_reg[i]);
+
+			printf("\n");
+		}
+		#endif
+	}
 }
 
 static ADDRESS_MAP_START( mightguy_audio_io_map, AS_IO, 8, cop01_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ymsnd", ym3526_device, write)
-	AM_RANGE(0x02, 0x02) AM_WRITENOP    /* 1412M2? */
-	AM_RANGE(0x03, 0x03) AM_WRITENOP    /* 1412M2? */
-	AM_RANGE(0x03, 0x03) AM_READ(kludge)    /* 1412M2? */
+	AM_RANGE(0x02, 0x02) AM_WRITE(prot_address_w)    /* 1412M2 address? */
+	AM_RANGE(0x03, 0x03) AM_WRITE(prot_data_w)    /* 1412M2 data? */
+	AM_RANGE(0x03, 0x03) AM_READ(prot_data_r)    /* 1412M2? */
 	AM_RANGE(0x06, 0x06) AM_READ(cop01_sound_command_r)
 ADDRESS_MAP_END
 
@@ -316,9 +382,9 @@ static INPUT_PORTS_START( mightguy )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Bonus_Life ) )
 	PORT_DIPSETTING(    0x04, "Every 200k" )
 	PORT_DIPSETTING(    0x00, "500k only" )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Demo_Sounds ) ) // actually reversed compared to service mode
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Cocktail ) )
@@ -443,7 +509,7 @@ void cop01_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( cop01, cop01_state )
+static MACHINE_CONFIG_START( cop01 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MAINCPU_CLOCK/2)   /* unknown clock / divider */
@@ -473,6 +539,8 @@ static MACHINE_CONFIG_START( cop01, cop01_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ay1", AY8910, 1250000) /* unknown clock / divider, hand-tuned to match audio reference */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
@@ -483,7 +551,7 @@ static MACHINE_CONFIG_START( cop01, cop01_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( mightguy, cop01_state )
+static MACHINE_CONFIG_START( mightguy )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MAINCPU_CLOCK/2)   /* unknown divider */
@@ -512,6 +580,8 @@ static MACHINE_CONFIG_START( mightguy, cop01_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ymsnd", YM3526, AUDIOCPU_CLOCK/2) /* unknown divider */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -606,7 +676,7 @@ ROM_START( mightguy )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 code (sound cpu) */
 	ROM_LOAD( "11.15b",     0x0000, 0x4000, CRC(576183ea) SHA1(e3f28e8e8c34ab396d158da122584ed226729c99) )
 
-	ROM_REGION( 0x8000, "user1", 0 ) /* 1412M2 protection data, z80 encrypted code presumably */
+	ROM_REGION( 0x8000, "prot_data", 0 ) /* 1412M2 protection data, z80 encrypted code presumably */
 	ROM_LOAD( "10.ic2",     0x0000, 0x8000, CRC(1a5d2bb1) SHA1(0fd4636133a980ba9ffa076f9010474586d37635) )
 
 	ROM_REGION( 0x02000, "gfx1", 0 ) /* alpha */
@@ -643,7 +713,7 @@ DRIVER_INIT_MEMBER(cop01_state,mightguy)
 #if MIGHTGUY_HACK
 	/* This is a hack to fix the game code to get a fully working
 	   "Starting Area" fake Dip Switch */
-	UINT8 *RAM = (UINT8 *)memregion("maincpu")->base();
+	uint8_t *RAM = (uint8_t *)memregion("maincpu")->base();
 	RAM[0x00e4] = 0x07; // rlca
 	RAM[0x00e5] = 0x07; // rlca
 	RAM[0x00e6] = 0x07; // rlca
@@ -660,6 +730,6 @@ DRIVER_INIT_MEMBER(cop01_state,mightguy)
  *
  *************************************/
 
-GAME( 1985, cop01,    0,     cop01,    cop01, driver_device,    0,        ROT0,   "Nichibutsu", "Cop 01 (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, cop01a,   cop01, cop01,    cop01, driver_device,    0,        ROT0,   "Nichibutsu", "Cop 01 (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, mightguy, 0,     mightguy, mightguy, cop01_state, mightguy, ROT270, "Nichibutsu", "Mighty Guy", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, cop01,    0,     cop01,    cop01,    cop01_state, 0,        ROT0,   "Nichibutsu", "Cop 01 (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, cop01a,   cop01, cop01,    cop01,    cop01_state, 0,        ROT0,   "Nichibutsu", "Cop 01 (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, mightguy, 0,     mightguy, mightguy, cop01_state, mightguy, ROT270, "Nichibutsu", "Mighty Guy",     MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

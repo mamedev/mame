@@ -8,10 +8,11 @@
  *
  */
 
-#ifndef DOUBLER_H_
-#define DOUBLER_H_
+#ifndef MAME_BUS_CPC_DOUBLER_H
+#define MAME_BUS_CPC_DOUBLER_H
 
-#include "emu.h"
+#pragma once
+
 #include "cpcexp.h"
 #include "imagedev/cassette.h"
 #include "formats/tzx_cas.h"
@@ -21,10 +22,7 @@ class cpc_doubler_device  : public device_t,
 {
 public:
 	// construction/destruction
-	cpc_doubler_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	cpc_doubler_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_READ8_MEMBER(ext_tape_r);
 
@@ -33,6 +31,9 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+
 private:
 	cpc_expansion_slot_device *m_slot;
 
@@ -40,6 +41,6 @@ private:
 };
 
 // device type definition
-extern const device_type CPC_DOUBLER;
+DECLARE_DEVICE_TYPE(CPC_DOUBLER, cpc_doubler_device)
 
-#endif /* DOUBLER_H_ */
+#endif // MAME_BUS_CPC_DOUBLER_H

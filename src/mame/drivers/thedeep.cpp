@@ -27,11 +27,15 @@ Notes:
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
+#include "includes/thedeep.h"
+
 #include "cpu/m6502/m65c02.h"
 #include "cpu/mcs51/mcs51.h"
-#include "includes/thedeep.h"
+#include "cpu/z80/z80.h"
 #include "sound/2203intf.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 /***************************************************************************
 
@@ -43,12 +47,8 @@ Notes:
 WRITE8_MEMBER(thedeep_state::nmi_w)
 {
 	m_nmi_enable = data;
-}
-
-WRITE8_MEMBER(thedeep_state::sound_w)
-{
-	soundlatch_byte_w(space, 0, data);
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (!m_nmi_enable)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 void thedeep_state::machine_start()
@@ -157,7 +157,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, thedeep_state )
 	AM_RANGE(0xe009, 0xe009) AM_READ_PORT("e009")           // P2
 	AM_RANGE(0xe00a, 0xe00a) AM_READ_PORT("e00a")           // DSW1
 	AM_RANGE(0xe00b, 0xe00b) AM_READ_PORT("e00b")           // DSW2
-	AM_RANGE(0xe00c, 0xe00c) AM_WRITE(sound_w)  // To Sound CPU
+	AM_RANGE(0xe00c, 0xe00c) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)  // To Sound CPU
 	AM_RANGE(0xe100, 0xe100) AM_WRITE(e100_w)   // ?
 	AM_RANGE(0xe210, 0xe213) AM_WRITEONLY AM_SHARE("scroll")    // Scroll
 	AM_RANGE(0xe400, 0xe7ff) AM_RAM AM_SHARE("spriteram")   // Sprites
@@ -177,7 +177,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, thedeep_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x0800, 0x0801) AM_DEVWRITE("ymsnd", ym2203_device, write)  //
-	AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch_byte_r) // From Main CPU
+	AM_RANGE(0x3000, 0x3000) AM_DEVREAD("soundlatch", generic_latch_8_device, read) // From Main CPU
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -197,7 +197,7 @@ WRITE8_MEMBER(thedeep_state::p1_w)
 
 READ8_MEMBER(thedeep_state::from_main_r)
 {
-	static UINT8 res;
+	static uint8_t res;
 
 	res = 0x11;
 
@@ -230,7 +230,7 @@ WRITE8_MEMBER(thedeep_state::p3_w)
 
 READ8_MEMBER(thedeep_state::p0_r)
 {
-	UINT8 coin_mux;
+	uint8_t coin_mux;
 
 	coin_mux = ((ioport("COINS")->read() & 0x0e) == 0x0e); // bit 0 is hard-wired to ALL three coin latches
 
@@ -395,10 +395,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(thedeep_state::interrupt)
 	else if(scanline == 0)
 	{
 		if (m_nmi_enable)
-		{
 			m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-			m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-		}
 	}
 }
 
@@ -407,7 +404,7 @@ INTERRUPT_GEN_MEMBER(thedeep_state::mcu_irq)
 	m_mcu->set_input_line(MCS51_INT1_LINE, ASSERT_LINE);
 }
 
-static MACHINE_CONFIG_START( thedeep, thedeep_state )
+static MACHINE_CONFIG_START( thedeep )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)      /* verified on pcb */
@@ -445,6 +442,9 @@ static MACHINE_CONFIG_START( thedeep, thedeep_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/4)  /* verified on pcb */
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -542,5 +542,5 @@ ROM_START( rundeep )
 	ROM_LOAD( "fi-3", 0x400, 0x200, CRC(f61a9686) SHA1(24082f60b72268d240ceca6999bdf18872625cd2) )
 ROM_END
 
-GAME( 1987, thedeep, 0,      thedeep, thedeep, driver_device, 0, ROT270, "Wood Place Inc.", "The Deep (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, rundeep, thedeep,thedeep, thedeep, driver_device, 0, ROT270, "bootleg (Cream)", "Run Deep", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, thedeep, 0,       thedeep, thedeep, thedeep_state, 0, ROT270, "Wood Place Inc.", "The Deep (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, rundeep, thedeep, thedeep, thedeep, thedeep_state, 0, ROT270, "bootleg (Cream)", "Run Deep",         MACHINE_SUPPORTS_SAVE )

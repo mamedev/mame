@@ -6,8 +6,10 @@
 
 */
 
-#ifndef _TMS0970_H_
-#define _TMS0970_H_
+#ifndef MAME_CPU_TMS1000_TMS0970_H
+#define MAME_CPU_TMS1000_TMS0970_H
+
+#pragma once
 
 #include "tms1000.h"
 
@@ -15,15 +17,16 @@
 class tms0970_cpu_device : public tms1000_cpu_device
 {
 public:
-	tms0970_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	tms0970_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT8 o_pins, UINT8 r_pins, UINT8 pc_bits, UINT8 byte_bits, UINT8 x_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, const char *shortname, const char *source);
+	tms0970_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
+	tms0970_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 o_pins, u8 r_pins, u8 pc_bits, u8 byte_bits, u8 x_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data);
+
 	// overrides
 	virtual void device_reset() override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
-	virtual void write_o_output(UINT8 index) override;
+	virtual void write_o_output(u8 index) override;
 
 	virtual void op_setr() override;
 	virtual void op_tdo() override;
@@ -32,26 +35,26 @@ protected:
 class tms0950_cpu_device : public tms0970_cpu_device
 {
 public:
-	tms0950_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tms0950_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
 	// overrides
 	virtual void device_reset() override { tms1000_cpu_device::device_reset(); }
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
-	virtual void op_rstr() override { ; } // assume it has no RSTR or CLO
-	virtual void op_clo() override { ; } // "
+	virtual void op_rstr() override { } // assume it has no RSTR or CLO
+	virtual void op_clo() override { } // "
 };
 
 class tms1990_cpu_device : public tms0970_cpu_device
 {
 public:
-	tms1990_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tms1990_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
 
-extern const device_type TMS0950;
-extern const device_type TMS0970;
-extern const device_type TMS1990;
+DECLARE_DEVICE_TYPE(TMS0950, tms0950_cpu_device)
+DECLARE_DEVICE_TYPE(TMS0970, tms0970_cpu_device)
+DECLARE_DEVICE_TYPE(TMS1990, tms1990_cpu_device)
 
-#endif /* _TMS0970_H_ */
+#endif // MAME_CPU_TMS1000_TMS0970_H

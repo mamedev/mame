@@ -17,9 +17,9 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "bus/rs232/rs232.h"
 #include "includes/apple3.h"
 #include "includes/apple2.h"
+#include "sound/volt_reg.h"
 #include "formats/ap2_dsk.h"
 
 #include "bus/a2bus/a2cffa.h"
@@ -27,7 +27,11 @@
 #include "bus/a2bus/a2thunderclock.h"
 #include "bus/a2bus/mouse.h"
 
+#include "bus/rs232/rs232.h"
+
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
 
 static ADDRESS_MAP_START( apple3_map, AS_PROGRAM, 8, apple3_state )
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(apple3_memory_r, apple3_memory_w)
@@ -48,7 +52,7 @@ FLOPPY_FORMATS_MEMBER( apple3_state::floppy_formats )
 	FLOPPY_A216S_FORMAT, FLOPPY_RWTS18_FORMAT, FLOPPY_EDD_FORMAT
 FLOPPY_FORMATS_END
 
-static MACHINE_CONFIG_START( apple3, apple3_state )
+static MACHINE_CONFIG_START( apple3 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 2000000)        /* 2 MHz */
 	MCFG_M6502_SYNC_CALLBACK(WRITELINE(apple3_state, apple3_sync_w))
@@ -141,11 +145,13 @@ static MACHINE_CONFIG_START( apple3, apple3_state )
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(apple3_state, apple3_via_1_irq_func))
 
 	/* sound */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	MCFG_SOUND_ADD(DAC_TAG, DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("bell", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.99)
+	MCFG_SOUND_ADD("dac", DAC_6BIT_BINARY_WEIGHTED, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.125) // 6522.b5(pb0-pb5) + 320k,160k,80k,40k,20k,10k
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "bell", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("c040", apple3_state, apple3_c040_tick, attotime::from_hz(2000))
 
 	/* internal ram */
@@ -347,5 +353,5 @@ ROM_START(apple3)
 	ROM_LOAD( "apple3.rom", 0x0000, 0x1000, CRC(55e8eec9) SHA1(579ee4cd2b208d62915a0aa482ddc2744ff5e967))
 ROM_END
 
-/*     YEAR     NAME        PARENT  COMPAT  MACHINE    INPUT    INIT    COMPANY             FULLNAME */
-COMP( 1980, apple3,     0,      0,      apple3,    apple3, apple3_state,    apple3,     "Apple Computer",   "Apple ///", MACHINE_SUPPORTS_SAVE )
+/*    YEAR  NAME        PARENT  COMPAT  MACHINE    INPUT   STATE         INIT    COMPANY           FULLNAME */
+COMP( 1980, apple3,     0,      0,      apple3,    apple3, apple3_state, apple3, "Apple Computer", "Apple ///", MACHINE_SUPPORTS_SAVE )

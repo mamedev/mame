@@ -188,16 +188,20 @@
 
 **************************************************************************************/
 
+#include "emu.h"
+
+#include "cpu/m6502/m6502.h"
+#include "machine/netlist.h"
+#include "sound/ay8910.h"
+#include "screen.h"
+#include "speaker.h"
+
+#include "netlist/devices/net_lib.h"
+
 
 #define MASTER_CLOCK    XTAL_20MHz           /* confirmed */
 #define CPU_CLOCK       MASTER_CLOCK / 16    /* confirmed */
 #define SND_CLOCK       MASTER_CLOCK / 8     /* confirmed */
-
-#include "emu.h"
-#include "cpu/m6502/m6502.h"
-#include "sound/ay8910.h"
-#include "machine/netlist.h"
-#include "netlist/devices/net_lib.h"
 
 
 class cocoloco_state : public driver_device
@@ -211,8 +215,8 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
 
-	std::unique_ptr<UINT8[]> m_videoram;
-	UINT8 m_videobank;
+	std::unique_ptr<uint8_t[]> m_videoram;
+	uint8_t m_videobank;
 
 	DECLARE_READ8_MEMBER(vram_r);
 	DECLARE_WRITE8_MEMBER(vram_w);
@@ -227,7 +231,7 @@ public:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(cocoloco);
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 /***********************************
@@ -308,13 +312,13 @@ PALETTE_INIT_MEMBER(cocoloco_state, cocoloco)
 
 void cocoloco_state::video_start()
 {
-	m_videoram = std::make_unique<UINT8[]>(0x2000 * 8);
+	m_videoram = std::make_unique<uint8_t[]>(0x2000 * 8);
 
 	save_pointer(NAME(m_videoram.get()), 0x2000 * 8);
 	save_item(NAME(m_videobank));
 }
 
-UINT32 cocoloco_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t cocoloco_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x, y, count, xi;
 
@@ -515,7 +519,7 @@ INPUT_PORTS_END
 *         Machine Drivers          *
 ***********************************/
 
-static MACHINE_CONFIG_START( cocoloco, cocoloco_state )
+static MACHINE_CONFIG_START( cocoloco )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, CPU_CLOCK)   /* confirmed */
@@ -614,7 +618,7 @@ DRIVER_INIT_MEMBER(cocoloco_state, cocob)
 {
 //  Just for testing...
 
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 
 	rom[0xe18b] = rom[0xe18b] ^ 0x80; // with jsr $e337, the character doesn't turn and eat straight (maze included)
 
@@ -628,7 +632,7 @@ DRIVER_INIT_MEMBER(cocoloco_state, cocob)
 *           Game Drivers           *
 ***********************************/
 
-/*    YEAR  NAME       PARENT    MACHINE   INPUT      STATE           INIT   ROT     COMPANY         FULLNAME            FLAGS  */
-GAME( 198?, cocoloco,  0,        cocoloco, cocoloco,  driver_device,  0,     ROT90, "Petaco S.A.",  "Coco Loco (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 198?, cocolocoa, cocoloco, cocoloco, cocolocoa, driver_device,  0,     ROT90, "Recel S.A.",   "Coco Loco (set 2)", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME       PARENT    MACHINE   INPUT      STATE           INIT   ROT    COMPANY         FULLNAME             FLAGS
+GAME( 198?, cocoloco,  0,        cocoloco, cocoloco,  cocoloco_state, 0,     ROT90, "Petaco S.A.",  "Coco Loco (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 198?, cocolocoa, cocoloco, cocoloco, cocolocoa, cocoloco_state, 0,     ROT90, "Recel S.A.",   "Coco Loco (set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 198?, cocolocob, cocoloco, cocoloco, cocoloco,  cocoloco_state, cocob, ROT90, "Petaco S.A.",  "Coco Loco (set 3)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

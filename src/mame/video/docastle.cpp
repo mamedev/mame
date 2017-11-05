@@ -10,6 +10,7 @@
 
 #include "emu.h"
 #include "includes/docastle.h"
+#include "screen.h"
 
 /***************************************************************************
 
@@ -31,7 +32,7 @@
 
 PALETTE_INIT_MEMBER(docastle_state, docastle)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 	for (i = 0; i < 256; i++)
@@ -75,15 +76,22 @@ WRITE8_MEMBER(docastle_state::docastle_colorram_w)
 	m_do_tilemap->mark_tile_dirty(offset);
 }
 
-READ8_MEMBER(docastle_state::flipscreen_r)
+READ8_MEMBER(docastle_state::inputs_flipscreen_r)
 {
-	flip_screen_set(offset);
-	return (offset ? 1 : 0); // is this really needed?
+	// inputs pass through LS244 non-inverting buffer
+	uint8_t buf = (m_inp[1]->read_h(space, 0) << 4) | m_inp[0]->read_h(space, 0);
+
+	// LS273 latches address bits on rising edge of address decode
+	flip_screen_set(BIT(offset, 7));
+	m_inp[0]->write_s(space, 0, offset & 7);
+	m_inp[1]->write_s(space, 0, offset & 7);
+
+	return buf;
 }
 
 WRITE8_MEMBER(docastle_state::flipscreen_w)
 {
-	flip_screen_set(offset);
+	flip_screen_set(BIT(offset, 7));
 }
 
 TILE_GET_INFO_MEMBER(docastle_state::get_tile_info)
@@ -94,9 +102,9 @@ TILE_GET_INFO_MEMBER(docastle_state::get_tile_info)
 	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
-void docastle_state::video_start_common( UINT32 tile_transmask )
+void docastle_state::video_start_common( uint32_t tile_transmask )
 {
-	m_do_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(docastle_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_do_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(docastle_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_do_tilemap->set_scrolldy(-32, -32);
 	m_do_tilemap->set_transmask(0, tile_transmask, 0x0000);
 }
@@ -202,7 +210,7 @@ void docastle_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, 
 	}
 }
 
-UINT32 docastle_state::screen_update_docastle(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t docastle_state::screen_update_docastle(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_do_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 	draw_sprites(screen, bitmap, cliprect);

@@ -64,17 +64,47 @@ void mexico86_state::mcu_simulate(  )
 	if (m_mcu_initialised)
 	{
 		int i;
-		int coin_curr;
+		bool coin_curr;
+		u8 coin_in_read = ioport("IN0")->read() & 3;
 
-		coin_curr = ~ioport("IN0")->read() & 1;
-		if (coin_curr && !m_coin_last && m_protection_ram[0x01] < 9)
+		// TODO: still needs Coinage B into account
+		for(int coin_idx = 0; coin_idx < 2; coin_idx++)
 		{
-			m_protection_ram[0x01]++;    // increase credits counter
-			m_protection_ram[0x0a] = 0x01;   // set flag (coin inserted sound is not played otherwise)
-		}
-		m_coin_last = coin_curr;
+			coin_curr = (coin_in_read & (1 << coin_idx)) == 0;
+			if (coin_curr && m_coin_last[coin_idx] == false)
+			{
+				u8 coinage_setting = (ioport("DSW0")->read() >> (coin_idx*2 + 4)) & 3;
 
-		m_protection_ram[0x04] = 0x3c;   // coin inputs
+				// increase credits counter
+				switch(coinage_setting)
+				{
+					case 0: // 2c / 3c
+					case 1: // 2c / 1c
+						if(m_coin_fract == 1)
+						{
+							m_protection_ram[0x01]+= (coinage_setting == 0) ? 3 : 1;
+							m_coin_fract = 0;
+						}
+						else
+							m_coin_fract ++;
+
+						break;
+					case 2: // 1c / 2c
+					case 3: // 1c / 1c
+						m_protection_ram[0x01]+= (coinage_setting == 2) ? 2 : 1;
+						break;
+
+				}
+
+				m_protection_ram[0x0a] = 0x01;   // set flag (coin inserted sound is not played otherwise)
+			}
+			m_coin_last[coin_idx] = coin_curr;
+		}
+		// Purge any coin counter higher than 9 TODO: is this limit correct?
+		if(m_protection_ram[0x01] > 9)
+			m_protection_ram[0x01] = 9;
+
+		m_protection_ram[0x04] = 0x3c | (coin_in_read ^ 3);   // coin inputs
 
 		m_protection_ram[0x02] = BITSWAP8(ioport("IN1")->read(), 7,6,5,4,2,3,1,0); // player 1
 		m_protection_ram[0x03] = BITSWAP8(ioport("IN2")->read(), 7,6,5,4,2,3,1,0); // player 2
@@ -102,7 +132,7 @@ void mexico86_state::mcu_simulate(  )
 
 		if (m_protection_ram[0xe0] > 0 && m_protection_ram[0xe0] < 4)
 		{
-			static const UINT8 answers[3][16] =
+			static const u8 answers[3][16] =
 			{
 				{ 0x00,0x40,0x48,0x50,0x58,0x60,0x68,0x70,0x78,0x80,0x88,0x00,0x00,0x00,0x00,0x00 },
 				{ 0x00,0x04,0x08,0x0C,0x10,0x14,0x18,0x1C,0x20,0x31,0x2B,0x35,0x00,0x00,0x00,0x00 },
@@ -125,20 +155,20 @@ void mexico86_state::mcu_simulate(  )
 		// The following is missing from Knight Boy
 		// this should be equivalent to the obfuscated kiki_clogic() below
 		{
-			static const UINT8 db[16]={0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x08,0x00,0x10,0x18,0x00,0x00,0x00,0x00};
-			UINT16 sy = m_protection_ram[0xa0] + ((0x18) >> 1);
-			UINT16 sx = m_protection_ram[0xa1] + ((0x18) >> 1);
+			static const u8 db[16]={0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x08,0x00,0x10,0x18,0x00,0x00,0x00,0x00};
+			u16 sy = m_protection_ram[0xa0] + ((0x18) >> 1);
+			u16 sx = m_protection_ram[0xa1] + ((0x18) >> 1);
 
 			for (i = 0; i < 0x38; i += 8)
 			{
-				UINT8 hw = db[m_protection_ram[0x20 + i] & 0xf];
+				u8 hw = db[m_protection_ram[0x20 + i] & 0xf];
 
 				if (hw)
 				{
-					UINT16 xdiff = sx - ((UINT16)m_protection_ram[0x20 + i + 6] << 8 | m_protection_ram[0x20 + i + 7]);
+					u16 xdiff = sx - (u16(m_protection_ram[0x20 + i + 6]) << 8 | m_protection_ram[0x20 + i + 7]);
 					if (xdiff < hw)
 					{
-						UINT16 ydiff = sy - ((UINT16)m_protection_ram[0x20 + i + 4] << 8 | m_protection_ram[0x20 + i + 5]);
+						u16 ydiff = sy - (u16(m_protection_ram[0x20 + i + 4]) << 8 | m_protection_ram[0x20 + i + 5]);
 						if (ydiff < hw)
 							m_protection_ram[0xa2] = 1; // we have a collision
 					}
@@ -173,7 +203,7 @@ INTERRUPT_GEN_MEMBER(mexico86_state::kikikai_interrupt)
 
 void mexico86_state::kiki_clogic(int address, int latch)
 {
-	static const UINT8 db[16]={0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x08,0x00,0x10,0x18,0x00,0x00,0x00,0x00};
+	static const u8 db[16]={0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x08,0x00,0x10,0x18,0x00,0x00,0x00,0x00};
 	int sy, sx, hw, i, qptr, diff1, diff2;
 
 	if (address != KIKI_CL_TRIGGER) // m_queue latched data
@@ -216,25 +246,14 @@ void mexico86_state::kiki_clogic(int address, int latch)
 
 INTERRUPT_GEN_MEMBER(mexico86_state::mexico86_m68705_interrupt)
 {
-	device.execute().set_input_line(0, ASSERT_LINE);
+	device.execute().set_input_line(M68705_IRQ_LINE, ASSERT_LINE);
 }
 
-
-READ8_MEMBER(mexico86_state::mexico86_68705_port_a_r)
-{
-	//logerror("%04x: 68705 port A read %02x\n", space.device().safe_pc(), m_port_a_in);
-	return (m_port_a_out & m_ddr_a) | (m_port_a_in & ~m_ddr_a);
-}
 
 WRITE8_MEMBER(mexico86_state::mexico86_68705_port_a_w)
 {
 	//logerror("%04x: 68705 port A write %02x\n", space.device().safe_pc(), data);
 	m_port_a_out = data;
-}
-
-WRITE8_MEMBER(mexico86_state::mexico86_68705_ddr_a_w)
-{
-	m_ddr_a = data;
 }
 
 
@@ -255,31 +274,17 @@ WRITE8_MEMBER(mexico86_state::mexico86_68705_ddr_a_w)
  *  7   W  not used?
  */
 
-READ8_MEMBER(mexico86_state::mexico86_68705_port_b_r)
-{
-	return (m_port_b_out & m_ddr_b) | (m_port_b_in & ~m_ddr_b);
-}
-
 WRITE8_MEMBER(mexico86_state::mexico86_68705_port_b_w)
 {
 	//logerror("%04x: 68705 port B write %02x\n", space.device().safe_pc(), data);
 
-	if (BIT(m_ddr_b, 0) && BIT(~data, 0) && BIT(m_port_b_out, 0))
-	{
-		m_port_a_in = m_latch;
-	}
+	u8 const port_a_value(m_port_a_out & (BIT(m_port_b_out, 0) ? 0xff : m_latch));
 
-	if (BIT(m_ddr_b, 1) && BIT(data, 1) && BIT(~m_port_b_out, 1)) /* positive edge trigger */
+	if (BIT(mem_mask, 3) && !BIT(data, 3) && BIT(m_port_b_out, 3))
 	{
-		m_address = m_port_a_out;
-		//if (m_address >= 0x80) logerror("%04x: 68705 address %02x\n", space.device().safe_pc(), m_port_a_out);
-	}
-
-	if (BIT(m_ddr_b, 3) && BIT(~data, 3) && BIT(m_port_b_out, 3))
-	{
-		if (data & 0x10)    /* read */
+		if (BIT(m_port_b_out, 4)) // read
 		{
-			if (data & 0x04)
+			if (BIT(m_port_b_out, 2))
 			{
 				//logerror("%04x: 68705 read %02x from address %04x\n", space.device().safe_pc(), m_protection_ram[m_address], m_address);
 				m_latch = m_protection_ram[m_address];
@@ -287,37 +292,36 @@ WRITE8_MEMBER(mexico86_state::mexico86_68705_port_b_w)
 			else
 			{
 				//logerror("%04x: 68705 read input port %04x\n", space.device().safe_pc(), m_address);
-				m_latch = ioport((m_address & 1) ? "IN2" : "IN1")->read();
+				m_latch = ioport(BIT(m_address, 0) ? "IN2" : "IN1")->read();
 			}
 		}
-		else    /* write */
+		else // write
 		{
-				//logerror("%04x: 68705 write %02x to address %04x\n",space.device().safe_pc(), port_a_out, m_address);
-				m_protection_ram[m_address] = m_port_a_out;
+				//logerror("%04x: 68705 write %02x to address %04x\n",space.device().safe_pc(), port_a_value, m_address);
+				m_protection_ram[m_address] = port_a_value;
 		}
 	}
 
-	if (BIT(m_ddr_b, 5) && BIT(data, 5) && BIT(~m_port_b_out, 5))
+	m_mcu->pa_w(space, 0, (BIT(mem_mask, 0) && !BIT(data, 0)) ? m_latch : 0xff);
+
+	if (BIT(mem_mask, 1) && !BIT(data, 1) && BIT(m_port_b_out, 1))
+	{
+		m_address = port_a_value;
+		//if (m_address >= 0x80) logerror("%04x: 68705 address %02x\n", space.device().safe_pc(), port_a_value);
+	}
+
+	if (BIT(mem_mask, 5) && BIT(data, 5) && !BIT(m_port_b_out, 5))
 	{
 		m_maincpu->set_input_line_vector(0, m_protection_ram[0]);
-		m_maincpu->set_input_line(0, HOLD_LINE);        // HOLD_LINE works better in Z80 interrupt mode 1.
-		m_mcu->set_input_line(0, CLEAR_LINE);
+		m_maincpu->set_input_line(0, HOLD_LINE); // HOLD_LINE works better in Z80 interrupt mode 1.
+		m_mcu->set_input_line(M68705_IRQ_LINE, CLEAR_LINE);
 	}
 
-	if (BIT(m_ddr_b, 6) && BIT(~data, 6) && BIT(m_port_b_out, 6))
-	{
+	if (BIT(mem_mask, 6) && !BIT(data, 6) && BIT(m_port_b_out, 6))
 		logerror("%04x: 68705 unknown port B bit %02x\n", space.device().safe_pc(), data);
-	}
 
-	if (BIT(m_ddr_b, 7) && BIT(~data, 7) && BIT(m_port_b_out, 7))
-	{
+	if (BIT(mem_mask, 7) && !BIT(data, 7) && BIT(m_port_b_out, 7))
 		logerror("%04x: 68705 unknown port B bit %02x\n", space.device().safe_pc(), data);
-	}
 
 	m_port_b_out = data;
-}
-
-WRITE8_MEMBER(mexico86_state::mexico86_68705_ddr_b_w)
-{
-	m_ddr_b = data;
 }

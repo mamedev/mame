@@ -28,11 +28,7 @@ public:
 		m_i8155(*this, "i8155"),
 		m_i8155_cp3(*this, "i8155_cp3"),
 		m_cassette(*this, "cassette"),
-		m_io_line0(*this, "LINE0"),
-		m_io_line1(*this, "LINE1"),
-		m_io_line2(*this, "LINE2"),
-		m_io_line3(*this, "LINE3"),
-		m_io_line4(*this, "LINE4"),
+		m_io_lines(*this, {"LINE0", "LINE1", "LINE2", "LINE3", "LINE4"}),
 		m_io_config(*this, "CONFIG")
 	{ }
 
@@ -40,22 +36,14 @@ public:
 	required_device<i8155_device> m_i8155;
 	required_device<i8155_device> m_i8155_cp3;
 	required_device<cassette_image_device> m_cassette;
-	required_ioport m_io_line0;
-	required_ioport m_io_line1;
-	required_ioport m_io_line2;
-	required_ioport m_io_line3;
-	required_ioport m_io_line4;
+	required_ioport_array<5> m_io_lines;
 	required_ioport m_io_config;
 
 	virtual void machine_reset() override;
 	DECLARE_READ8_MEMBER(port1_r);
 	DECLARE_READ8_MEMBER(port2_r);
-	DECLARE_READ8_MEMBER(getbus);
-	DECLARE_READ8_MEMBER(t0_r);
-	DECLARE_READ8_MEMBER(t1_r);
 	DECLARE_WRITE8_MEMBER(port1_w);
 	DECLARE_WRITE8_MEMBER(port2_w);
-	DECLARE_WRITE8_MEMBER(putbus);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload);
 
 	DECLARE_READ8_MEMBER(i8155_read);
@@ -66,16 +54,16 @@ public:
 	DECLARE_WRITE8_MEMBER(i8155_portc_w);
 
 private:
-	UINT8   m_7seg;
-	UINT8   m_port2;
-	UINT8   m_matrix;
+	uint8_t   m_7seg;
+	uint8_t   m_port2;
+	uint8_t   m_matrix;
 };
 
 READ8_MEMBER(cp1_state::port1_r)
 {
 	logerror("Read from expansion port 1\n");
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	if (m_io_config->read() & 0x01)
 		data |= (m_cassette->input() > 0.03) ? 0x80 : 0x00;
@@ -99,12 +87,11 @@ READ8_MEMBER(cp1_state::port2_r)
 	// ---x ----   I8155 CE
 	// ---- xxxx   keyboard input
 
-	ioport_port* portnames[] = { m_io_line0, m_io_line1, m_io_line2, m_io_line3, m_io_line4 };
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	for(int i=0; i<5; i++)
 		if (!(m_matrix & (1<<i)))
-			data |= portnames[i]->read();
+			data |= m_io_lines[i]->read();
 
 	return (data & 0x0f) | (m_port2 & 0xf0);
 }
@@ -122,32 +109,9 @@ WRITE8_MEMBER(cp1_state::port2_w)
 	m_port2 = data;
 }
 
-READ8_MEMBER(cp1_state::t0_r)
-{
-	logerror("t0_r\n");
-	return 0;
-}
-
-READ8_MEMBER(cp1_state::t1_r)
-{
-	logerror("t1_r\n");
-	return 0;
-}
-
-READ8_MEMBER(cp1_state::getbus)
-{
-	logerror("getbus\n");
-	return 0;
-}
-
-WRITE8_MEMBER(cp1_state::putbus)
-{
-	logerror("putbus\n");
-}
-
 READ8_MEMBER(cp1_state::i8155_read)
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	if (!(m_port2 & 0x10))
 	{
@@ -218,11 +182,6 @@ WRITE8_MEMBER(cp1_state::i8155_portc_w)
 static ADDRESS_MAP_START( cp1_io , AS_IO, 8, cp1_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x00,             0xff )          AM_READWRITE( i8155_read, i8155_write)
-	AM_RANGE( MCS48_PORT_P1,    MCS48_PORT_P1)  AM_READWRITE( port1_r, port1_w )
-	AM_RANGE( MCS48_PORT_P2,    MCS48_PORT_P2)  AM_READWRITE( port2_r, port2_w )
-	AM_RANGE( MCS48_PORT_BUS,   MCS48_PORT_BUS) AM_READWRITE( getbus, putbus )
-	AM_RANGE( MCS48_PORT_T0,    MCS48_PORT_T0)  AM_READ( t0_r )
-	AM_RANGE( MCS48_PORT_T1,    MCS48_PORT_T1)  AM_READ( t1_r )
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -272,7 +231,7 @@ void cp1_state::machine_reset()
 
 QUICKLOAD_LOAD_MEMBER( cp1_state, quickload )
 {
-	UINT8 *dest = (UINT8*)m_i8155->space().get_read_ptr(0);
+	uint8_t *dest = (uint8_t*)m_i8155->space().get_read_ptr(0);
 	char line[0x10];
 	int addr = 0;
 	while (image.fgets(line, 10) && addr < 0x100)
@@ -285,17 +244,25 @@ QUICKLOAD_LOAD_MEMBER( cp1_state, quickload )
 		}
 		else
 		{
-			return IMAGE_INIT_FAIL;
+			return image_init_result::FAIL;
 		}
 	}
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
-static MACHINE_CONFIG_START( cp1, cp1_state )
+static MACHINE_CONFIG_START( cp1 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8049, XTAL_6MHz)
 	MCFG_CPU_IO_MAP(cp1_io)
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(cp1_state, port1_r))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(cp1_state, port1_w))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(cp1_state, port2_r))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(cp1_state, port2_w))
+	MCFG_MCS48_PORT_BUS_IN_CB(LOGGER("getbus"))
+	MCFG_MCS48_PORT_BUS_OUT_CB(LOGGER("putbus"))
+	MCFG_MCS48_PORT_T0_IN_CB(LOGGER("t0_r"))
+	MCFG_MCS48_PORT_T1_IN_CB(LOGGER("t1_r"))
 
 	MCFG_DEVICE_ADD("i8155", I8155, 0)
 	MCFG_I8155_OUT_PORTA_CB(WRITE8(cp1_state, i8155_porta_w))
@@ -330,5 +297,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY   FULLNAME       FLAGS */
-COMP( 1980, cp1,  0,       0,   cp1,    cp1, driver_device,  0,   "Kosmos",   "CP1 / Computer Praxis",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  STATE      INIT  COMPANY   FULLNAME                 FLAGS
+COMP( 1980, cp1,  0,      0,      cp1,     cp1,   cp1_state, 0,    "Kosmos", "CP1 / Computer Praxis", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

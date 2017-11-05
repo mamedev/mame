@@ -8,16 +8,10 @@
 
 *********************************************************************/
 
+#ifndef MAME_VIDEO_EF9364_H
+#define MAME_VIDEO_EF9364_H
+
 #pragma once
-
-#ifndef __EF9364_H__
-#define __EF9364_H__
-
-#define EF9364_NB_OF_COLUMNS 64
-#define EF9364_NB_OF_ROWS 16
-
-#define EF9364_TXTPLANE_MAX_SIZE ( EF9364_NB_OF_COLUMNS * EF9364_NB_OF_ROWS )
-#define EF9364_MAX_TXTPLANES  2
 
 #define MCFG_EF9364_PALETTE(_palette_tag) \
 	ef9364_device::static_set_palette_tag(*device, "^" _palette_tag);
@@ -39,21 +33,26 @@ class ef9364_device :   public device_t,
 						public device_video_interface
 {
 public:
+	static constexpr unsigned NB_OF_COLUMNS = 64;
+	static constexpr unsigned NB_OF_ROWS = 16;
+
+	static constexpr unsigned TXTPLANE_MAX_SIZE = NB_OF_COLUMNS * NB_OF_ROWS;
+	static constexpr unsigned MAX_TXTPLANES = 2;
+
 	// construction/destruction
-	ef9364_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ef9364_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration
 	static void static_set_palette_tag(device_t &device, const char *tag);
 	static void static_set_nb_of_pages(device_t &device, int nb_bitplanes );
 
 	// device interface
+	void update_scanline(uint16_t scanline);
+	void set_color_entry( int index, uint8_t r, uint8_t g, uint8_t b );
 
-	void update_scanline(UINT16 scanline);
-	void set_color_entry( int index, UINT8 r, UINT8 g, UINT8 b );
-
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void char_latch_w(UINT8 data);
-	void command_w(UINT8 cmd);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void char_latch_w(uint8_t data);
+	void command_w(uint8_t cmd);
 
 protected:
 	// device-level overrides
@@ -61,7 +60,7 @@ protected:
 	virtual void device_reset() override;
 
 	// device_config_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
+	virtual space_config_vector memory_space_config() const override;
 
 	// address space configurations
 	const address_space_config      m_space_config;
@@ -69,20 +68,19 @@ protected:
 	// inline helper
 
 private:
-	void screen_scanning( int force_clear );
 	void set_video_mode(void);
-	void draw_border(UINT16 line);
+	void draw_border(uint16_t line);
 
 	// internal state
 
-	required_region_ptr<UINT8> m_charset;
+	required_region_ptr<uint8_t> m_charset;
 	address_space *m_textram;
 
-	UINT8 x_curs_pos;
-	UINT8 y_curs_pos;
-	UINT8 char_latch;
+	uint8_t x_curs_pos;
+	uint8_t y_curs_pos;
+	uint8_t char_latch;
 
-	UINT8 m_border[80];                     //border color
+	uint8_t m_border[80];                     //border color
 
 	rgb_t palette[2];
 	int   nb_of_pages;
@@ -92,13 +90,13 @@ private:
 	int   cursor_cnt;
 	int   cursor_state;
 
-	UINT32 clock_freq;
+	uint32_t clock_freq;
 	bitmap_rgb32 m_screen_out;
 
 	required_device<palette_device> m_palette;
 };
 
 // device type definition
-extern const device_type EF9364;
+DECLARE_DEVICE_TYPE(EF9364, ef9364_device)
 
-#endif
+#endif // MAME_VIDEO_EF9364_H

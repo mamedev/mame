@@ -77,7 +77,7 @@ static Astable555Desc b2_555_desc(OHM(560.0), M_OHM(1.8), U_FARAD(0.1));
 static Mono555Desc c9_555_desc(OHM(47000.0), U_FARAD(1.0)); // R33, C21
 
 static CapacitorDesc c32_desc(U_FARAD(0.1));
-static CapacitorDesc c36_desc(N_FARAD(1.0));    //0.001uF = 1nF
+static CapacitorDesc c36_desc(N_FARAD(1.0*.7));    //0.001uF = 1nF - determines horizontal gap between bricks
 static CapacitorDesc c37_desc(P_FARAD(330.0));
 
 static Mono9602Desc n8_desc(K_OHM(33.0), U_FARAD(100.0), K_OHM(5.6), P_FARAD(0)); // No capacitor on 2nd 9602
@@ -90,14 +90,15 @@ CIRCUIT_LAYOUT( breakout )
 
 #if (SLOW_BUT_ACCURATE)
 	SOLVER(Solver, 48000)
-	PARAM(Solver.ACCURACY, 1e-8) // less accuracy and diode will not work
-	PARAM(Solver.GS_THRESHOLD, 6)
+	PARAM(Solver.ACCURACY, 1e-7) // less accuracy and diode will not work
+	PARAM(Solver.METHOD, "MAT_CR")
 #else
 	SOLVER(Solver, 48000)
 	PARAM(Solver.ACCURACY, 1e-6)
-	PARAM(Solver.GS_THRESHOLD, 6)
-	// FIXME: PARALLEL Doesn't work in breakout.
-	PARAM(Solver.PARALLEL, 0)
+	PARAM(Solver.DYNAMIC_TS, 0)
+	//PARAM(Solver.LTE, 1e-10)
+	PARAM(Solver.DYNAMIC_MIN_TIMESTEP, 1e-8)
+	PARAM(Solver.METHOD, "MAT_CR")
 #endif
 	PARAM(NETLIST.USE_DEACTIVATE, 1)
 
@@ -128,7 +129,7 @@ CIRCUIT_LAYOUT( breakout )
 	//----------------------------------------------------------------
 	// Clock circuit
 	//----------------------------------------------------------------
-#if 0 || (SLOW_BUT_ACCURATE)
+#if (SLOW_BUT_ACCURATE)
 	MAINCLOCK(Y1, 14318000.0)
 	CHIP("F1", 9316)
 	NET_C(Y1.Q, F1.2)
@@ -272,17 +273,21 @@ CIRCUIT_LAYOUT( breakout )
 	CHIP("H2", 7408)
 	CHIP("H3", 7427)
 	CHIP("H4", 7400)
-	CHIP("H5", 9312)
+	DM9312_DIP(H5)
 	CHIP("H6", 9310)
 	CHIP("H7", 7408)    //sometimes looks like N7 on schematic
+	//PARAM(H7.USE_DEACTIVATE, 0)
 	CHIP("H8", 7474)
 	CHIP("H9", 7474)
 
 	CHIP("J1", 74175)
 	CHIP("J2", 7404)
 	CHIP("J3", 7402)
-	CHIP("J4", 9312)
+	DM9312_DIP(J4)
 	CHIP("J5", 7448)
+#if USE_TRUTHTABLE_7448
+	PARAM(J5.USE_DEACTIVATE, 0) // only use this if compiled with 7448 as a truthtable
+#endif
 	CHIP("J6", 9310)
 	CHIP("J7", 7420)
 	CHIP("J8", 74279)
@@ -292,7 +297,7 @@ CIRCUIT_LAYOUT( breakout )
 	CHIP("K2", 7486)
 	CHIP("K3", 7430)
 	CHIP("K4", 7408)
-	CHIP("K5", 9312)
+	DM9312_DIP(K5)
 	CHIP("K6", 9310)
 	CHIP("K7", 7486)
 	CHIP("K8", 7474)    //TODO: one more than bom?
@@ -302,7 +307,7 @@ CIRCUIT_LAYOUT( breakout )
 	CHIP("L2", 7486)
 	CHIP("L3", 82S16)   //RAM
 	CHIP("L4", 7411)
-	CHIP("L5", 9312)
+	DM9312_DIP(L5)
 	CHIP("L6", 9310)
 	CHIP("L7", 7486)
 	CHIP("L8", 74193)
@@ -312,7 +317,7 @@ CIRCUIT_LAYOUT( breakout )
 	CHIP("M2", 7483)
 	CHIP("M3", 7486)
 	CHIP("M4", 7410)
-	CHIP("M5", 9312)
+	DM9312_DIP(M5)
 	CHIP("M6", 9310)
 	CHIP("M8", 7427)
 	CHIP("M9", 7404)
@@ -321,7 +326,7 @@ CIRCUIT_LAYOUT( breakout )
 	CHIP("N2", 7483)
 	CHIP("N3", 7486)
 	CHIP("N4", 7411)
-	CHIP("N5", 9312)
+	DM9312_DIP(N5)
 	CHIP("N6", 9310)
 	CHIP("N7", 7408)    //sometimes looks like H7 on schematic
 	CHIP_9602_Mono(N8, &n8_desc)
@@ -1696,6 +1701,36 @@ CIRCUIT_LAYOUT( breakout )
 	NET_C(ttlhigh, E1.9, E1.11)
 
 	NET_C(GND, D9.1, D9.2, D9.13, D9.3, D9.4, D9.5)
+
+	HINT(A3.1.sub, NO_DEACTIVATE)
+	HINT(B6.s3, NO_DEACTIVATE)
+	HINT(C4.s3, NO_DEACTIVATE)
+	HINT(C4.s4, NO_DEACTIVATE)
+	HINT(C5.s3, NO_DEACTIVATE)
+	HINT(C5.s4, NO_DEACTIVATE)
+	HINT(D3.2.sub, NO_DEACTIVATE)
+	HINT(E2.s2, NO_DEACTIVATE)
+	HINT(E3.s2, NO_DEACTIVATE)
+	HINT(E5.s4, NO_DEACTIVATE)
+	HINT(E8.2.sub, NO_DEACTIVATE)
+	HINT(E9.s6, NO_DEACTIVATE)
+	HINT(F5.2.sub, NO_DEACTIVATE)
+	HINT(H2.s1, NO_DEACTIVATE)
+	HINT(H3.s1, NO_DEACTIVATE)
+	HINT(H6.sub, NO_DEACTIVATE)
+	HINT(J3.s4, NO_DEACTIVATE)
+	HINT(J5, NO_DEACTIVATE)
+	HINT(J6.sub, NO_DEACTIVATE)
+	HINT(J8.1, NO_DEACTIVATE)
+	HINT(J8.3, NO_DEACTIVATE)
+	HINT(K4.s4, NO_DEACTIVATE)
+	HINT(M3.s2, NO_DEACTIVATE)
+	HINT(M3.s4, NO_DEACTIVATE)
+	HINT(M4.s2, NO_DEACTIVATE)
+	HINT(M6.sub, NO_DEACTIVATE)
+	HINT(M8.s1, NO_DEACTIVATE)
+	HINT(N6.sub, NO_DEACTIVATE)
+	HINT(N7.s3, NO_DEACTIVATE)
 
 CIRCUIT_LAYOUT_END
 

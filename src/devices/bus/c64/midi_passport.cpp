@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "midi_passport.h"
 #include "machine/clock.h"
 #include "bus/midi/midi.h"
@@ -25,7 +26,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_MIDI_PASSPORT = &device_creator<c64_passport_midi_cartridge_device>;
+DEFINE_DEVICE_TYPE(C64_MIDI_PASSPORT, c64_passport_midi_cartridge_device, "c64_midipp", "C64 Passport MIDI")
 
 
 //-------------------------------------------------
@@ -54,16 +55,15 @@ WRITE_LINE_MEMBER( c64_passport_midi_cartridge_device::write_acia_clock )
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( c64_passport_midi )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( c64_passport_midi )
+MACHINE_CONFIG_MEMBER( c64_passport_midi_cartridge_device::device_add_mconfig )
 	MCFG_DEVICE_ADD(MC6850_TAG, ACIA6850, 0)
 	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("mdout", midi_port_device, write_txd))
 	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(c64_passport_midi_cartridge_device, acia_irq_w))
 
-	MCFG_DEVICE_ADD(MC6840_TAG, PTM6840, 0)
-	MCFG_PTM6840_INTERNAL_CLOCK(1021800.0f)
+	MCFG_DEVICE_ADD(MC6840_TAG, PTM6840, 1021800)
 	MCFG_PTM6840_EXTERNAL_CLOCKS(1021800.0f, 1021800.0f, 1021800.0f)
 	MCFG_PTM6840_IRQ_CB(WRITELINE(c64_passport_midi_cartridge_device, ptm_irq_w))
 
@@ -77,17 +77,6 @@ static MACHINE_CONFIG_FRAGMENT( c64_passport_midi )
 MACHINE_CONFIG_END
 
 
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor c64_passport_midi_cartridge_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( c64_passport_midi );
-}
-
-
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -97,8 +86,8 @@ machine_config_constructor c64_passport_midi_cartridge_device::device_mconfig_ad
 //  c64_passport_midi_cartridge_device - constructor
 //-------------------------------------------------
 
-c64_passport_midi_cartridge_device::c64_passport_midi_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, C64_MIDI_PASSPORT, "C64 Passport MIDI", tag, owner, clock, "c64_midipp", __FILE__),
+c64_passport_midi_cartridge_device::c64_passport_midi_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, C64_MIDI_PASSPORT, tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_acia(*this, MC6850_TAG),
 	m_ptm(*this, MC6840_TAG),
@@ -135,7 +124,7 @@ void c64_passport_midi_cartridge_device::device_reset()
 //  c64_cd_r - cartridge data read
 //-------------------------------------------------
 
-UINT8 c64_passport_midi_cartridge_device::c64_cd_r(address_space &space, offs_t offset, UINT8 data, int sphi2, int ba, int roml, int romh, int io1, int io2)
+uint8_t c64_passport_midi_cartridge_device::c64_cd_r(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
 	if (!io1)
 	{
@@ -164,7 +153,7 @@ UINT8 c64_passport_midi_cartridge_device::c64_cd_r(address_space &space, offs_t 
 //  c64_cd_w - cartridge data write
 //-------------------------------------------------
 
-void c64_passport_midi_cartridge_device::c64_cd_w(address_space &space, offs_t offset, UINT8 data, int sphi2, int ba, int roml, int romh, int io1, int io2)
+void c64_passport_midi_cartridge_device::c64_cd_w(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
 	if (!io1)
 	{

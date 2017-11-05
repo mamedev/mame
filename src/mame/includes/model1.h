@@ -1,14 +1,26 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
-#include <functional>
+#ifndef MAME_INCLUDES_MODEL1_H
+#define MAME_INCLUDES_MODEL1_H
 
-#include <glm/glm/vec3.hpp>
+#pragma once
 
 #include "audio/dsbz80.h"
 #include "audio/segam1audio.h"
+
+#include "cpu/mb86233/mb86233.h"
 #include "cpu/v60/v60.h"
+#include "machine/i8251.h"
 #include "machine/m1comm.h"
+#include "machine/timer.h"
 #include "video/segaic24.h"
+
+#include "screen.h"
+
+#include <glm/glm/vec3.hpp>
+
+#include <functional>
+
 
 #define DECLARE_TGP_FUNCTION(name) void name()
 
@@ -22,10 +34,12 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_m1audio(*this, "m1audio")
+		, m_m1uart(*this, "m1uart")
 		, m_m1comm(*this, "m1comm")
 		, m_dsbz80(*this, DSBZ80_TAG)
 		, m_tgp(*this, "tgp")
 		, m_screen(*this, "screen")
+		, m_io_timer(*this, "iotimer")
 		, m_mr2(*this, "mr2")
 		, m_mr(*this, "mr")
 		, m_display_list0(*this, "display_list0")
@@ -34,8 +48,8 @@ public:
 		, m_paletteram16(*this, "palette")
 		, m_palette(*this, "palette")
 		, m_tiles(*this, "tile")
-		, m_analog_ports(*this, "AN")
-		, m_digital_ports(*this, "IN")
+		, m_analog_ports(*this, "AN.%u", 0)
+		, m_digital_ports(*this, "IN.%u", 0)
 	{
 	}
 
@@ -46,6 +60,7 @@ public:
 
 	DECLARE_READ16_MEMBER(network_ctl_r);
 	DECLARE_WRITE16_MEMBER(network_ctl_w);
+	TIMER_DEVICE_CALLBACK_MEMBER(io_command_acknowledge);
 
 	DECLARE_READ16_MEMBER(io_r);
 	DECLARE_WRITE16_MEMBER(io_w);
@@ -54,10 +69,6 @@ public:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(model1_interrupt);
 	IRQ_CALLBACK_MEMBER(irq_callback);
-
-	// Sound
-	DECLARE_READ16_MEMBER(snd_68k_ready_r);
-	DECLARE_WRITE16_MEMBER(snd_latch_to_68k_w);
 
 	// TGP
 	DECLARE_READ16_MEMBER(fifoin_status_r);
@@ -86,17 +97,22 @@ public:
 	DECLARE_READ32_MEMBER(copro_fifoin_pop);
 	DECLARE_WRITE32_MEMBER(copro_fifoout_push);
 
+	uint16_t m_r360_state;
+	DECLARE_DRIVER_INIT(wingwar360);
+	DECLARE_READ16_MEMBER(r360_r);
+	DECLARE_WRITE16_MEMBER(r360_w);
+
 	// Rendering
 	DECLARE_VIDEO_START(model1);
 	DECLARE_READ16_MEMBER(model1_listctl_r);
 	DECLARE_WRITE16_MEMBER(model1_listctl_w);
 
-	UINT32 screen_update_model1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void screen_eof_model1(screen_device &screen, bool state);
+	uint32_t screen_update_model1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_model1);
 
 	struct spoint_t
 	{
-		INT32 x, y;
+		int32_t x, y;
 	};
 
 	struct point_t
@@ -175,47 +191,49 @@ private:
 	bool m_dump;
 	bool m_swa;
 
+	uint8_t m_io_command;
+
 	// Devices
 	required_device<v60_device> m_maincpu;          // V60
 	required_device<segam1audio_device> m_m1audio;  // Model 1 standard sound board
+	required_device<i8251_device> m_m1uart;
 	optional_device<m1comm_device> m_m1comm;        // Model 1 communication board
 	optional_device<dsbz80_device> m_dsbz80;        // Digital Sound Board
 	optional_device<mb86233_cpu_device> m_tgp;
 	required_device<screen_device> m_screen;
+	required_device<timer_device> m_io_timer;
 
-	required_shared_ptr<UINT16> m_mr2;
-	required_shared_ptr<UINT16> m_mr;
-	required_shared_ptr<UINT16> m_display_list0;
-	required_shared_ptr<UINT16> m_display_list1;
-	required_shared_ptr<UINT16> m_color_xlat;
+	required_shared_ptr<uint16_t> m_mr2;
+	required_shared_ptr<uint16_t> m_mr;
+	required_shared_ptr<uint16_t> m_display_list0;
+	required_shared_ptr<uint16_t> m_display_list1;
+	required_shared_ptr<uint16_t> m_color_xlat;
 
 	// Sound
 	int m_sound_irq;
-	UINT8 m_last_snd_cmd;
-	int m_snd_cmd_state;
 
 	// TGP FIFO
-	UINT32  fifoout_pop();
-	void    fifoout_push(UINT32 data);
+	uint32_t  fifoout_pop();
+	void    fifoout_push(uint32_t data);
 	void    fifoout_push_f(float data);
-	UINT32  fifoin_pop();
-	void    fifoin_push(UINT32 data);
+	uint32_t  fifoin_pop();
+	void    fifoin_push(uint32_t data);
 	float   fifoin_pop_f();
-	UINT16  ram_get_i();
+	uint16_t  ram_get_i();
 	float   ram_get_f();
-	void    copro_fifoin_push(UINT32 data);
-	UINT32  copro_fifoout_pop();
+	void    copro_fifoin_push(uint32_t data);
+	uint32_t  copro_fifoout_pop();
 	void    next_fn();
 
-	UINT32  m_copro_r;
-	UINT32  m_copro_w;
+	uint32_t  m_copro_r;
+	uint32_t  m_copro_w;
 	int     m_copro_fifoout_rpos;
 	int     m_copro_fifoout_wpos;
-	UINT32  m_copro_fifoout_data[FIFO_SIZE];
+	uint32_t  m_copro_fifoout_data[FIFO_SIZE];
 	int     m_copro_fifoout_num;
 	int     m_copro_fifoin_rpos;
 	int     m_copro_fifoin_wpos;
-	UINT32  m_copro_fifoin_data[FIFO_SIZE];
+	uint32_t  m_copro_fifoin_data[FIFO_SIZE];
 	int     m_copro_fifoin_num;
 
 	// TGP
@@ -348,7 +366,7 @@ private:
 	offs_t      m_pushpc;
 	int         m_fifoin_rpos;
 	int         m_fifoin_wpos;
-	UINT32      m_fifoin_data[FIFO_SIZE];
+	uint32_t      m_fifoin_data[FIFO_SIZE];
 	int         m_fifoin_cbcount;
 	typedef void (model1_state::*tgp_func)();
 	tgp_func    m_fifoin_cb;
@@ -361,14 +379,14 @@ private:
 
 	static const struct function ftab_vf[];
 	static const struct function ftab_swa[];
-	INT32   m_fifoout_rpos;
-	INT32   m_fifoout_wpos;
-	UINT32  m_fifoout_data[FIFO_SIZE];
-	UINT32  m_list_length;
+	int32_t   m_fifoout_rpos;
+	int32_t   m_fifoout_wpos;
+	uint32_t  m_fifoout_data[FIFO_SIZE];
+	uint32_t  m_list_length;
 	float   m_cmat[12];
 	float   m_mat_stack[MAT_STACK_SIZE][12];
 	float   m_mat_vector[21][12];
-	INT32   m_mat_stack_pos;
+	int32_t   m_mat_stack_pos;
 	float   m_acc;
 	float   m_tgp_vf_xmin;
 	float   m_tgp_vf_xmax;
@@ -386,28 +404,28 @@ private:
 	float   m_tgp_int_px;
 	float   m_tgp_int_py;
 	float   m_tgp_int_pz;
-	UINT32  m_tgp_int_adr;
-	UINT16  m_ram_adr;
-	UINT16  m_ram_latch[2];
-	UINT16  m_ram_scanadr;
-	std::unique_ptr<UINT32[]> m_ram_data;
+	uint32_t  m_tgp_int_adr;
+	uint16_t  m_ram_adr;
+	uint16_t  m_ram_latch[2];
+	uint16_t  m_ram_scanadr;
+	std::unique_ptr<uint32_t[]> m_ram_data;
 	float   m_tgp_vr_base[4];
 	int     m_puuu;
 	int     m_ccount;
-	UINT32  m_vr_r;
-	UINT32  m_vr_w;
-	UINT16  m_listctl[2];
-	UINT16  *m_glist;
+	uint32_t  m_vr_r;
+	uint32_t  m_vr_w;
+	uint16_t  m_listctl[2];
+	uint16_t  *m_glist;
 	bool    m_render_done;
 
-	std::unique_ptr<UINT16[]> m_tgp_ram;
-	UINT32 *m_poly_rom;
-	std::unique_ptr<UINT32[]> m_poly_ram;
+	std::unique_ptr<uint16_t[]> m_tgp_ram;
+	uint32_t *m_poly_rom;
+	std::unique_ptr<uint32_t[]> m_poly_ram;
 
 	// Rendering helper functions
-	UINT32  readi(const UINT16 *adr) const;
-	INT16   readi16(const UINT16 *adr) const;
-	float   readf(const UINT16 *adr) const;
+	uint32_t  readi(int adr) const;
+	int16_t   readi16(int adr) const;
+	float   readf(int adr) const;
 	void    cross_product(point_t* o, const point_t* p, const point_t* q) const;
 	float   view_determinant(const point_t *p1, const point_t *p2, const point_t *p3) const;
 
@@ -430,8 +448,8 @@ private:
 	static void recompute_frustum(view_t *view);
 	static void draw_hline(bitmap_rgb32 &bitmap, int x1, int x2, int y, int color);
 	static void draw_hline_moired(bitmap_rgb32 &bitmap, int x1, int x2, int y, int color);
-	static void fill_slope(bitmap_rgb32 &bitmap, view_t *view, int color, INT32 x1, INT32 x2, INT32 sl1, INT32 sl2, INT32 y1, INT32 y2, INT32 *nx1, INT32 *nx2);
-	static void fill_line(bitmap_rgb32 &bitmap, view_t *view, int color, INT32 y, INT32 x1, INT32 x2);
+	static void fill_slope(bitmap_rgb32 &bitmap, view_t *view, int color, int32_t x1, int32_t x2, int32_t sl1, int32_t sl2, int32_t y1, int32_t y2, int32_t *nx1, int32_t *nx2);
+	static void fill_line(bitmap_rgb32 &bitmap, view_t *view, int color, int32_t y, int32_t x1, int32_t x2);
 	void        fill_quad(bitmap_rgb32 &bitmap, view_t *view, const quad_t& q) const;
 
 	void    fclip_push_quad_next(int level, quad_t& q, point_t *p1, point_t *p2, point_t *p3, point_t *p4);
@@ -441,29 +459,35 @@ private:
 	static float    max4f(float a, float b, float c, float d);
 	static float    compute_specular(glm::vec3& normal, glm::vec3& light, float diffuse,int lmode);
 
-	void    push_object(UINT32 tex_adr, UINT32 poly_adr, UINT32 size);
-	UINT16* push_direct(UINT16 *list);
-	UINT16* skip_direct(UINT16 *list) const;
+	int push_direct(int list_offset);
+	int draw_direct(bitmap_rgb32 &bitmap, const rectangle &cliprect, int list_offset);
+	int skip_direct(int list_offset) const;
+	void    push_object(uint32_t tex_adr, uint32_t poly_adr, uint32_t size);
 	void    draw_objects(bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	UINT16* draw_direct(bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT16 *list);
 
-	UINT16* get_list();
+	void set_current_render_list();
 	int     get_list_number();
 	void    end_frame();
 
 	clipper_t m_clipfn[4];
 
-	optional_shared_ptr<UINT16> m_paletteram16;
+	// run-time rendering
+	uint16_t* m_display_list_current;
+
+	optional_shared_ptr<uint16_t> m_paletteram16;
 	required_device<palette_device> m_palette;
-	required_device<segas24_tile> m_tiles;
+	required_device<segas24_tile_device> m_tiles;
 
 	// I/O related
-	UINT16  m_lamp_state;
+	uint16_t  m_lamp_state;
 	optional_ioport_array<8> m_analog_ports;
 	required_ioport_array<3> m_digital_ports;
+
 };
 
 
 /*----------- defined in machine/model1.c -----------*/
 
 ADDRESS_MAP_EXTERN( model1_vr_tgp_map, 32 );
+
+#endif // MAME_INCLUDES_MODEL1_H

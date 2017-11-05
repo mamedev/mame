@@ -33,8 +33,13 @@
 
 */
 
+#include "emu.h"
 #include "includes/cosmicos.h"
+
+#include "speaker.h"
+
 #include "cosmicos.lh"
+
 
 enum
 {
@@ -50,7 +55,7 @@ READ8_MEMBER( cosmicos_state::read )
 {
 	if (m_boot) offset |= 0xc0c0;
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	if (offset < 0xc000)
 	{
@@ -84,7 +89,7 @@ WRITE8_MEMBER( cosmicos_state::write )
 
 READ8_MEMBER( cosmicos_state::video_off_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	if (!m_q)
 	{
@@ -96,7 +101,7 @@ READ8_MEMBER( cosmicos_state::video_off_r )
 
 READ8_MEMBER( cosmicos_state::video_on_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	if (!m_q)
 	{
@@ -116,14 +121,14 @@ WRITE8_MEMBER( cosmicos_state::audio_latch_w )
 
 READ8_MEMBER( cosmicos_state::hex_keyboard_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 	int i;
 
 	for (i = 0; i < 4; i++)
 	{
 		if (BIT(m_keylatch, i))
 		{
-			UINT8 keydata = m_key_row[i]->read();
+			uint8_t keydata = m_key_row[i]->read();
 
 			if (BIT(keydata, 0)) data |= 0x01;
 			if (BIT(keydata, 1)) data |= 0x02;
@@ -193,7 +198,7 @@ ADDRESS_MAP_END
 
 INPUT_CHANGED_MEMBER( cosmicos_state::data )
 {
-	UINT8 data = m_io_data->read();
+	uint8_t data = m_io_data->read();
 	int i;
 
 	for (i = 0; i < 8; i++)
@@ -385,14 +390,14 @@ READ_LINE_MEMBER( cosmicos_state::clear_r )
 
 READ_LINE_MEMBER( cosmicos_state::ef1_r )
 {
-	UINT8 special = m_special->read();
+	uint8_t special = m_special->read();
 
 	return BIT(special, 0);
 }
 
 READ_LINE_MEMBER( cosmicos_state::ef2_r )
 {
-	UINT8 special = m_special->read();
+	uint8_t special = m_special->read();
 	int casin = (m_cassette)->input() < 0.0;
 
 	output().set_led_value(LED_CASSETTE, casin);
@@ -402,7 +407,7 @@ READ_LINE_MEMBER( cosmicos_state::ef2_r )
 
 READ_LINE_MEMBER( cosmicos_state::ef3_r )
 {
-	UINT8 special = m_special->read();
+	uint8_t special = m_special->read();
 
 	return BIT(special, 2) | BIT(special, 3);
 }
@@ -456,12 +461,6 @@ void cosmicos_state::machine_start()
 	/* initialize LED display */
 	m_led->rbi_w(1);
 
-	// find keyboard rows
-	m_key_row[0] = m_y1;
-	m_key_row[1] = m_y2;
-	m_key_row[2] = m_y3;
-	m_key_row[3] = m_y4;
-
 	/* register for state saving */
 	save_item(NAME(m_wait));
 	save_item(NAME(m_clear));
@@ -489,18 +488,18 @@ void cosmicos_state::machine_reset()
 
 QUICKLOAD_LOAD_MEMBER( cosmicos_state, cosmicos )
 {
-	UINT8 *ptr = m_rom->base();
+	uint8_t *ptr = m_rom->base();
 	int size = image.length();
 
 	/* load image to RAM */
 	image.fread(ptr, size);
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 /* Machine Driver */
 
-static MACHINE_CONFIG_START( cosmicos, cosmicos_state )
+static MACHINE_CONFIG_START( cosmicos )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, XTAL_1_75MHz)
 	MCFG_CPU_PROGRAM_MAP(cosmicos_mem)
@@ -559,5 +558,5 @@ ROM_END
 
 /* System Drivers */
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        COMPANY             FULLNAME    FLAGS */
-COMP( 1979, cosmicos,   0,      0,      cosmicos,   cosmicos, driver_device,   0,   "Radio Bulletin",   "Cosmicos", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+//    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT     STATE           INIT  COMPANY           FULLNAME    FLAGS
+COMP( 1979, cosmicos,   0,      0,      cosmicos,   cosmicos, cosmicos_state, 0,    "Radio Bulletin", "Cosmicos", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )

@@ -34,34 +34,28 @@ static const floppy_interface rx01_floppy_interface =
 };
 
 
-MACHINE_CONFIG_FRAGMENT( rx01 )
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(rx01_floppy_interface)
-MACHINE_CONFIG_END
-
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type RX01 = &device_creator<rx01_device>;
+DEFINE_DEVICE_TYPE(RX01, rx01_device, "rx01", "RX01")
 
 //-------------------------------------------------
 //  rx01_device - constructor
 //-------------------------------------------------
 
-rx01_device::rx01_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, RX01, "RX01", tag, owner, clock, "rx01", __FILE__)
+rx01_device::rx01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, RX01, tag, owner, clock)
 {
 }
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor rx01_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( rx01 );
-}
+MACHINE_CONFIG_MEMBER( rx01_device::device_add_mconfig )
+	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(rx01_floppy_interface)
+MACHINE_CONFIG_END
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -117,7 +111,7 @@ WRITE16_MEMBER( rx01_device::write )
 	}
 }
 
-void rx01_device::command_write(UINT16 data)
+void rx01_device::command_write(uint16_t data)
 {
 	printf("command_write %04x\n",data);
 	m_unit = BIT(data,4);
@@ -166,13 +160,13 @@ void rx01_device::command_write(UINT16 data)
 	machine().scheduler().timer_set(attotime::from_msec(100), timer_expired_delegate(FUNC(rx01_device::service_command),this));
 }
 
-UINT16 rx01_device::status_read()
+uint16_t rx01_device::status_read()
 {
 	//printf("status_read %04x\n",m_rxcs);
 	return m_rxcs;
 }
 
-void rx01_device::data_write(UINT16 data)
+void rx01_device::data_write(uint16_t data)
 {
 //  printf("data_write %04x\n",data);
 	// data can be written only if TR is set
@@ -180,7 +174,7 @@ void rx01_device::data_write(UINT16 data)
 	machine().scheduler().timer_set(attotime::from_msec(100), timer_expired_delegate(FUNC(rx01_device::service_command),this));
 }
 
-UINT16 rx01_device::data_read()
+uint16_t rx01_device::data_read()
 {
 	if (m_state==RX01_EMPTY && BIT(m_rxcs,7)) m_rxcs &= (1<<7); // clear TR bit;
 //  printf("data_read %04x\n",m_rxdb);

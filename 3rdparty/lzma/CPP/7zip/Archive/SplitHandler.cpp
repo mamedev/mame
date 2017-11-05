@@ -203,7 +203,7 @@ HRESULT CHandler::Open2(IInStream *stream, IArchiveOpenCallback *callback)
   _streams.Add(stream);
   
   {
-    UInt64 numFiles = _streams.Size();
+    const UInt64 numFiles = _streams.Size();
     RINOK(callback->SetCompleted(&numFiles, NULL));
   }
   
@@ -218,7 +218,7 @@ HRESULT CHandler::Open2(IInStream *stream, IArchiveOpenCallback *callback)
       break;
     if (result != S_OK)
       return result;
-    if (!stream)
+    if (!nextStream)
       break;
     {
       /*
@@ -228,14 +228,14 @@ HRESULT CHandler::Open2(IInStream *stream, IArchiveOpenCallback *callback)
         return E_INVALIDARG;
       size = prop.uhVal.QuadPart;
       */
-      RINOK(stream->Seek(0, STREAM_SEEK_END, &size));
-      RINOK(stream->Seek(0, STREAM_SEEK_SET, NULL));
+      RINOK(nextStream->Seek(0, STREAM_SEEK_END, &size));
+      RINOK(nextStream->Seek(0, STREAM_SEEK_SET, NULL));
     }
     _totalSize += size;
     _sizes.Add(size);
     _streams.Add(nextStream);
     {
-      UInt64 numFiles = _streams.Size();
+      const UInt64 numFiles = _streams.Size();
       RINOK(callback->SetCompleted(&numFiles, NULL));
     }
   }

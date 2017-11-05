@@ -35,21 +35,21 @@ typedef uintptr_t HashT;
 
 #define OSDWORK_CALLBACK(name)  void *name(void *param, ATTR_UNUSED int threadid)
 
-class sdl_window_info : public osd_window
+class sdl_window_info : public osd_window_t<SDL_Window*>
 {
 public:
-	sdl_window_info(running_machine &a_machine, int index, osd_monitor_info *a_monitor,
+	sdl_window_info(running_machine &a_machine, int index, std::shared_ptr<osd_monitor_info> a_monitor,
 			const osd_window_config *config);
 
 	~sdl_window_info();
 
 	int window_init();
 
-	void update();
+	void update() override;
 	void toggle_full_screen();
 	void modify_prescale(int dir);
-	void resize(INT32 width, INT32 height);
-	void destroy();
+	void resize(int32_t width, int32_t height);
+	void destroy() override;
 
 	void capture_pointer() override;
 	void release_pointer() override;
@@ -63,7 +63,7 @@ public:
 	int xy_to_render_target(int x, int y, int *xt, int *yt);
 
 	running_machine &machine() const override { return m_machine; }
-	osd_monitor_info *monitor() const override { return m_monitor; }
+	osd_monitor_info *monitor() const override { return m_monitor.get(); }
 	int fullscreen() const override { return m_fullscreen; }
 
 	render_target *target() override { return m_target; }
@@ -108,9 +108,12 @@ private:
 
 	// Pointer to machine
 	running_machine &   m_machine;
+
 	// monitor info
-	osd_monitor_info *  m_monitor;
-	int                 m_fullscreen;
+	std::shared_ptr<osd_monitor_info>  m_monitor;
+	int                                m_fullscreen;
+	bool                               m_mouse_captured;
+	bool                               m_mouse_hidden;
 
 	void measure_fps(int update);
 
@@ -120,13 +123,6 @@ struct osd_draw_callbacks
 {
 	osd_renderer *(*create)(osd_window *window);
 };
-
-//============================================================
-//  GLOBAL VARIABLES
-//============================================================
-
-// window - list
-extern std::list<std::shared_ptr<sdl_window_info>> sdl_window_list;
 
 //============================================================
 //  PROTOTYPES

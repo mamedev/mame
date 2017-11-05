@@ -14,6 +14,7 @@ ToDo:
 ***********************************************************************************/
 
 
+#include "emu.h"
 #include "machine/genpin.h"
 #include "cpu/m68000/m68000.h"
 #include "techno.lh"
@@ -25,8 +26,14 @@ public:
 	techno_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_switch(*this, "SWITCH")
+		, m_switch(*this, "SWITCH.%u", 0)
 	{ }
+
+	enum
+	{
+		IRQ_SET_TIMER,
+		IRQ_ADVANCE_TIMER
+	};
 
 	DECLARE_READ16_MEMBER(key_r);
 	DECLARE_READ16_MEMBER(rtrg_r);
@@ -39,15 +46,22 @@ public:
 	DECLARE_WRITE16_MEMBER(sol1_w);
 	DECLARE_WRITE16_MEMBER(sol2_w);
 	DECLARE_WRITE16_MEMBER(sound_w);
-	INTERRUPT_GEN_MEMBER(techno_intgen);
+
 private:
-	bool m_digwait;
-	UINT8 m_keyrow;
-	UINT16 m_digit;
-	UINT8 m_vector;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
+
 	required_device<cpu_device> m_maincpu;
 	required_ioport_array<8> m_switch;
+
+	emu_timer *m_irq_set_timer;
+	emu_timer *m_irq_advance_timer;
+
+	bool m_digwait;
+	uint8_t m_keyrow;
+	uint16_t m_digit;
+	uint8_t m_vector;
 };
 
 
@@ -227,28 +241,47 @@ static INPUT_PORTS_START( techno )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Fix top left target middle") PORT_CODE(KEYCODE_EQUALS)
 INPUT_PORTS_END
 
-INTERRUPT_GEN_MEMBER(techno_state::techno_intgen)
+void techno_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	// vectors change per int: 88-8F, 98-9F)
-	if ((m_vector & 7) == 7)
-		m_vector = (m_vector ^ 0x10) & 0x97;
-	m_vector++;
-	// core doesn't support clearing of irq via hardware
-	generic_pulse_irq_line_and_vector(device.execute(), 1, m_vector, 1);
+	if (id == IRQ_ADVANCE_TIMER)
+	{
+		// vectors change per int: 88-8F, 98-9F)
+		if ((m_vector & 7) == 7)
+			m_vector = (m_vector ^ 0x10) & 0x97;
+		m_vector++;
+
+		// schematics show a 74HC74 cleared only upon IRQ acknowledgment or reset, but this is clearly incorrect for xforce
+		m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
+	}
+	else if (id == IRQ_SET_TIMER)
+	{
+		m_maincpu->set_input_line_and_vector(M68K_IRQ_1, ASSERT_LINE, m_vector);
+		m_irq_advance_timer->adjust(attotime::from_hz(XTAL_8MHz / 32));
+	}
+}
+
+void techno_state::machine_start()
+{
+	m_irq_set_timer = timer_alloc(IRQ_SET_TIMER);
+	m_irq_advance_timer = timer_alloc(IRQ_ADVANCE_TIMER);
 }
 
 void techno_state::machine_reset()
 {
 	m_vector = 0x88;
 	m_digit = 0;
+
+	attotime freq = attotime::from_hz(XTAL_8MHz / 256); // 31250Hz
+	m_irq_set_timer->adjust(freq, 0, freq);
+	m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
 }
 
-static MACHINE_CONFIG_START( techno, techno_state )
+static MACHINE_CONFIG_START( techno )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_8MHz)
 	MCFG_CPU_PROGRAM_MAP(techno_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(techno_state, techno_intgen,  XTAL_8MHz/256) // 31250Hz
 	MCFG_NVRAM_ADD_0FILL("nvram")
+
 	//MCFG_CPU_ADD("cpu2", TMS7000, XTAL_4MHz)
 	//MCFG_CPU_PROGRAM_MAP(techno_sub_map)
 
@@ -261,8 +294,19 @@ ROM_START(xforce)
 	ROM_LOAD16_BYTE("ic15", 0x0001, 0x8000, CRC(fb8d2853) SHA1(0b0004abfe32edfd3ac15d66f90695d264c97eba))
 	ROM_LOAD16_BYTE("ic17", 0x0000, 0x8000, CRC(122ef649) SHA1(0b425f81869bc359841377a91c39f44395502bff))
 
-	//ROM_REGION(0x20000), "cpu2", 0)
+	//ROM_REGION(0x20000, "cpu2", 0)
 	// 5 x 27256 roms are undumped
 ROM_END
 
-GAME(1987,  xforce,  0,  techno,  techno, driver_device,  0,  ROT0,  "Tecnoplay", "X Force", MACHINE_IS_SKELETON_MECHANICAL)
+ROM_START(spcteam)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD16_BYTE("cpu_top.bin", 0x000001, 0x8000, CRC(b11dcf1f) SHA1(084eb98ee4c9f32d5518897a891ad1a601850d80))
+	ROM_LOAD16_BYTE("cpu_bot.bin", 0x000000, 0x8000, CRC(892a5592) SHA1(c30dce37a5aae2834459179787f6c99353aadabb))
+
+	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_LOAD("sound.bin", 0x8000, 0x8000, CRC(6a87370f) SHA1(51e055dcf23a30e337ff439bba3c40e5c51c490a))
+	ROM_RELOAD(0, 0x8000)
+ROM_END
+
+GAME(1987,  xforce,  0,  techno,  techno, techno_state,  0,  ROT0,  "Tecnoplay", "X Force",    MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1988,  spcteam, 0,  techno,  techno, techno_state,  0,  ROT0,  "Tecnoplay", "Space Team", MACHINE_IS_SKELETON_MECHANICAL) // needs correct layout

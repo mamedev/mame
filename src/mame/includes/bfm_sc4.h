@@ -2,6 +2,10 @@
 // copyright-holders:David Haywood
 /* Scorpion 4 + 5 driver related includes */
 /* mainly used for stuff which is currently shared between sc4 / 5 sets to avoid duplication */
+#ifndef MAME_INCLUDES_BFP_SC4_H
+#define MAME_INCLUDES_BFP_SC4_H
+
+#pragma once
 
 #include "machine/sec.h"
 #include "machine/steppers.h" // stepper motor
@@ -59,6 +63,26 @@
 
 #define SC45_BUTTON_MATRIX_20_0 IPT_SERVICE1 // green / test
 
+static const uint8_t SEGMENT_34_ENCODING_LOOKUP[16] =
+{
+	63, // 0
+	6,  // 1
+	91, // 2
+	79, // 3
+	102,// 4
+	109,// 5
+	125,// 6
+	7,  // 7
+	127,// 8
+	103,// 9
+	0,  // 10
+	121,// 11
+	121,// 12
+	121,// 13
+	121,// 14
+	121,// 15
+};
+
 // common base class for things shared between sc4 and sc5
 class bfm_sc45_state : public driver_device
 {
@@ -75,16 +99,20 @@ public:
 public:
 
 	required_device<mc68681_device> m_duart;
-	optional_device<bfm_bda_t> m_vfd0;
-	optional_device<bfmdm01_device> m_dm01;
+	optional_device<bfm_bda_device> m_vfd0;
+	optional_device<bfm_dm01_device> m_dm01;
 	required_device<ymz280b_device> m_ymz;
 
 	// serial vfd
 	int vfd_enabled;
 	bool vfd_old_clock;
 
-	UINT8 vfd_ser_value;
+	uint8_t vfd_ser_value;
 	int vfd_ser_count;
+
+	// 34 segment custom encoding used by some sc4/5 machines such as Box Clever, Break The Bank, The Big Deal, The Crazy Chair, The Perfect Game
+	bool m_segment_34_encoding;
+	uint8_t m_segment_34_cache[32];
 
 	DECLARE_WRITE8_MEMBER(mux_output_w);
 	DECLARE_WRITE8_MEMBER(mux_output2_w);
@@ -99,34 +127,23 @@ class sc4_state : public bfm_sc45_state
 {
 public:
 	sc4_state(const machine_config &mconfig, device_type type, const char *tag)
-		: bfm_sc45_state(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_cpuregion(*this, "maincpu"),
-			m_nvram(*this, "nvram"),
-			m_reel1(*this, "reel1"),
-			m_reel2(*this, "reel2"),
-			m_reel3(*this, "reel3"),
-			m_reel4(*this, "reel4"),
-			m_reel5(*this, "reel5"),
-			m_reel6(*this, "reel6"),
-			m_io1(*this, "IN-0"),
-			m_io2(*this, "IN-1"),
-			m_io3(*this, "IN-2"),
-			m_io4(*this, "IN-3"),
-			m_io5(*this, "IN-4"),
-			m_io6(*this, "IN-5"),
-			m_io7(*this, "IN-6"),
-			m_io8(*this, "IN-7"),
-			m_io9(*this, "IN-8"),
-			m_io10(*this, "IN-9"),
-			m_io11(*this, "IN-10"),
-			m_io12(*this, "IN-11")
+		: bfm_sc45_state(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_cpuregion(*this, "maincpu")
+		, m_nvram(*this, "nvram")
+		, m_reel1(*this, "reel1")
+		, m_reel2(*this, "reel2")
+		, m_reel3(*this, "reel3")
+		, m_reel4(*this, "reel4")
+		, m_reel5(*this, "reel5")
+		, m_reel6(*this, "reel6")
+		, m_io_ports(*this, "IN-%u", 0)
 	{
 		m_chk41addr = -1;
 		m_dochk41 = false;
 	}
 
-	required_device<m68307cpu_device> m_maincpu;
+	required_device<m68307_cpu_device> m_maincpu;
 	required_memory_region m_cpuregion;
 	// devices
 	required_device<nvram_device> m_nvram;
@@ -156,9 +173,9 @@ public:
 	int m_chk41addr;
 	bool m_dochk41;
 
-	UINT16 m_mainram[0x10000/2];
+	uint16_t m_mainram[0x10000/2];
 
-	UINT8 read_input_matrix(int row);
+	uint8_t read_input_matrix(int row);
 
 
 	DECLARE_WRITE_LINE_MEMBER(bfmdm01_busy);
@@ -595,29 +612,18 @@ public:
 	DECLARE_MACHINE_RESET(sc4);
 
 
-	void bfm_sc4_68307_porta_w(address_space &space, bool dedicated, UINT8 data, UINT8 line_mask);
+	void bfm_sc4_68307_porta_w(address_space &space, bool dedicated, uint8_t data, uint8_t line_mask);
 	DECLARE_WRITE8_MEMBER( bfm_sc4_reel3_w );
 	DECLARE_WRITE8_MEMBER( bfm_sc4_reel4_w );
-	void bfm_sc4_68307_portb_w(address_space &space, bool dedicated, UINT16 data, UINT16 line_mask);
-	UINT8 bfm_sc4_68307_porta_r(address_space &space, bool dedicated, UINT8 line_mask);
-	UINT16 bfm_sc4_68307_portb_r(address_space &space, bool dedicated, UINT16 line_mask);
+	void bfm_sc4_68307_portb_w(address_space &space, bool dedicated, uint16_t data, uint16_t line_mask);
+	uint8_t bfm_sc4_68307_porta_r(address_space &space, bool dedicated, uint8_t line_mask);
+	uint16_t bfm_sc4_68307_portb_r(address_space &space, bool dedicated, uint16_t line_mask);
 
-	void find_mbus(UINT16* rom);
+	void find_mbus(uint16_t* rom);
 
 
 protected:
-	required_ioport m_io1;
-	required_ioport m_io2;
-	required_ioport m_io3;
-	required_ioport m_io4;
-	required_ioport m_io5;
-	required_ioport m_io6;
-	required_ioport m_io7;
-	required_ioport m_io8;
-	required_ioport m_io9;
-	required_ioport m_io10;
-	required_ioport m_io11;
-	required_ioport m_io12;
+	optional_ioport_array<16> m_io_ports;
 };
 
 class sc4_adder4_state : public sc4_state
@@ -628,15 +634,15 @@ public:
 			m_adder4cpu(*this, "adder4")
 	{ }
 
-	UINT32* m_adder4cpuregion;
-	std::unique_ptr<UINT32[]> m_adder4ram;
+	uint32_t* m_adder4cpuregion;
+	std::unique_ptr<uint32_t[]> m_adder4ram;
 
 	DECLARE_READ32_MEMBER(adder4_mem_r);
 	DECLARE_WRITE32_MEMBER(adder4_mem_w);
 	DECLARE_MACHINE_START(adder4);
 
 	// devices
-	required_device<m68340cpu_device> m_adder4cpu;
+	required_device<m68340_cpu_device> m_adder4cpu;
 };
 
 
@@ -2456,7 +2462,7 @@ INPUT_PORTS_EXTERN( sc4_raw );
 	ROM_LOAD( "95004121.hi", 0x080000, 0x080000, CRC(239f389c) SHA1(75d6f9f500aab5f114f8b86c4ca1f8dce6ea2ca4) )
 
 #define sc_crcc_matrix \
-	ROM_REGION( 0x400000, "matrix", ROMREGION_ERASE00 ) \
+	ROM_REGION( 0x400000, "dm01:matrix", ROMREGION_ERASE00 ) \
 	ROM_LOAD( "95000611.p1", 0x0000, 0x010000, CRC(3f40a2c9) SHA1(f73731171c56add1329f3a9d2f84303311d87884) )
 
 
@@ -2545,7 +2551,7 @@ INPUT_PORTS_EXTERN( sc4_raw );
 	ROM_LOAD( "95004103.lo", 0x000000, 0x080000, CRC(9926f103) SHA1(f29a0d25eebd0a0990cd165116b425b795ed62e0) ) \
 	ROM_LOAD( "95004104.hi", 0x080000, 0x080000, CRC(bec75a23) SHA1(cdf895081ebf3afb52d5bfaab29f713800c85fc9) )
 #define sc_fcc_matrix \
-	ROM_REGION( 0x200000, "matrix", ROMREGION_ERASEFF )\
+	ROM_REGION( 0x200000, "dm01:matrix", ROMREGION_ERASEFF )\
 	ROM_LOAD( "club-firecracker_mtx_ass.bin", 0x0000, 0x010000, CRC(c23ffee9) SHA1(b4f2542e8ed0b282a439e523baa6cd43c5b2cb50) )
 #define sc_frsu_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
@@ -2739,7 +2745,7 @@ INPUT_PORTS_EXTERN( sc4_raw );
 	ROM_LOAD( "pub-en.s1", 0x000000, 0x080000, CRC(7e3f4295) SHA1(b7a2c538d79663a3d21f89311195619158fa7197) ) /* need testing */ \
 	ROM_LOAD( "pub-en.s2", 0x080000, 0x080000, CRC(637d3c0f) SHA1(193964efc28e56b05f39099a696dd3e9119b80dd) ) \
 	\
-	ROM_REGION( 0x400000, "matrix", 0 ) \
+	ROM_REGION( 0x400000, "dm01:matrix", 0 ) \
 	/* I don't think the SC4 version uses a DMD */ \
 	ROM_LOAD( "pbemydot", 0x0000, 0x010000, CRC(b056d3d4) SHA1(6c1dbc6fcb4761c25f9cc8123e9f0fe791488c19) ) /* DMD rom? Possibly SC2 DM01 */
 #define sc_oyf_others \
@@ -2900,7 +2906,7 @@ INPUT_PORTS_EXTERN( sc4_raw );
 	ROM_LOAD( "95004082.p1", 0x000000, 0x080000, CRC(b7caba0f) SHA1(777afdb6a2f78edad5f4df506eb4cd571f9f357b) ) \
 	ROM_LOAD( "95004083.p2", 0x080000, 0x080000, CRC(c0cc21b7) SHA1(d0b22db4c1faeef34b794ac4c31bc9fd386493ea) )
 #define sc_ticlb_matrix \
-	ROM_REGION( 0x400000, "matrix", 0 ) \
+	ROM_REGION( 0x400000, "dm01:matrix", 0 ) \
 	ROM_LOAD( "club-treasure-island_mtx_ass.bin", 0x0000, 0x010000, CRC(74f97b29) SHA1(9334bf1e4b4e2bcbbfaa5ae32201ceaab0641d83) ) /* DMD */
 #define sc_tri7_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) /* PR1328 TRIPLE 7S SOUNDS11 */ \
@@ -2985,7 +2991,7 @@ INPUT_PORTS_EXTERN( sc4_raw );
 
 
 #define sc_clbtm_matrix \
-	ROM_REGION( 0x400000, "matrix", ROMREGION_ERASE00 ) \
+	ROM_REGION( 0x400000, "dm01:matrix", ROMREGION_ERASE00 ) \
 	ROM_LOAD( "clubtempdot.bin", 0x0000, 0x010000, CRC(283d2d9c) SHA1(5b76a13ad674f8a40c270e5dbc61dac04d411d02) ) /* DM01 */ \
 	ROM_REGION( 0x400000, "matrixhex", ROMREGION_ERASE00 ) /* can probably be removed, need to verify it matches first tho */ \
 	ROM_LOAD( "club-temptation_mtx_(ihex)ss.hex", 0x0000, 0x01d0da, CRC(08ebee96) SHA1(2e87d734c966abab1d4a59c9481ebea161f77286) )
@@ -3371,3 +3377,5 @@ INPUT_PORTS_EXTERN( sc4_raw );
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
 	/* not for either of these games? */ \
 	ROM_LOAD( "casroysnd.bin", 0x00000, 0x80000, CRC(cf1d4b59) SHA1(1b2bc74c6fcc43197a6f295bc34554da01f7b517) )
+
+#endif // MAME_INCLUDES_BFP_SC4_H

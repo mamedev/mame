@@ -428,15 +428,15 @@ Rumoured or Unreleased files: - 3D Raceway, Centipede, Fun with Math, Galaga, Ho
 		</part>
 	</software>
 
-	<software name="football">
+	<software name="football"> <!-- Actually 2 x 4KB chips (D2732) inside = 8KB dump - esiting 6KB dump was stripped of FFs -->
 		<description>American Football</description>
 		<year>1982</year>
 		<publisher>UA Ltd.</publisher>
 		<info name="alt_title" value="Football Américain" />
 		<part name="cart" interface="arcadia_cart">
 			<feature name="slot" value="std" />
-			<dataarea name="rom" size="6144">
-				<rom name="football.bin" size="6144" crc="22624414" sha1="359e938391b72742643c81228713fac804ff8244" offset="0000" />
+			<dataarea name="rom" size="8192">
+				<rom name="American Football.bin" size="8192" crc="b10a08b5" sha1="2feb388ce4a6163fe7856c0d34fa42a0720dd66c" offset="0000" />
 			</dataarea>
 		</part>
 	</software>

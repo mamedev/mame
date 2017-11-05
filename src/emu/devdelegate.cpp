@@ -17,7 +17,7 @@
 //  fatal error if not found
 //-------------------------------------------------
 
-delegate_late_bind &device_delegate_helper::bound_object(device_t &search_root)
+delegate_late_bind &device_delegate_helper::bound_object(device_t &search_root) const
 {
 	device_t *device = search_root.subdevice(m_device_name);
 	if (device == nullptr)

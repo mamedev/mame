@@ -8,18 +8,18 @@
 #define DMA_PMODE_32_48             3
 #define DMA_PMODE_8_48              4
 
-void adsp21062_device::schedule_chained_dma_op(int channel, UINT32 dma_chain_ptr, int chained_direction)
+void adsp21062_device::schedule_chained_dma_op(int channel, uint32_t dma_chain_ptr, int chained_direction)
 {
-	UINT32 op_ptr = 0x20000 + dma_chain_ptr;
+	uint32_t op_ptr = 0x20000 + dma_chain_ptr;
 
-	UINT32 int_index        = dm_read32(op_ptr - 0);
-	UINT32 int_modifier     = dm_read32(op_ptr - 1);
-	UINT32 int_count        = dm_read32(op_ptr - 2);
-	UINT32 chain_ptr        = dm_read32(op_ptr - 3);
-	//UINT32 gen_purpose        = dm_read32(op_ptr - 4);
-	UINT32 ext_index        = dm_read32(op_ptr - 5);
-	UINT32 ext_modifier     = dm_read32(op_ptr - 6);
-	UINT32 ext_count        = dm_read32(op_ptr - 7);
+	uint32_t int_index        = dm_read32(op_ptr - 0);
+	uint32_t int_modifier     = dm_read32(op_ptr - 1);
+	uint32_t int_count        = dm_read32(op_ptr - 2);
+	uint32_t chain_ptr        = dm_read32(op_ptr - 3);
+	//uint32_t gen_purpose        = dm_read32(op_ptr - 4);
+	uint32_t ext_index        = dm_read32(op_ptr - 5);
+	uint32_t ext_modifier     = dm_read32(op_ptr - 6);
+	uint32_t ext_count        = dm_read32(op_ptr - 7);
 
 	if (m_core->dma_op[channel].active)
 	{
@@ -58,7 +58,7 @@ void adsp21062_device::schedule_chained_dma_op(int channel, UINT32 dma_chain_ptr
 	m_core->dma_status |= (1 << channel);
 }
 
-void adsp21062_device::schedule_dma_op(int channel, UINT32 src, UINT32 dst, int src_modifier, int dst_modifier, int src_count, int dst_count, int pmode)
+void adsp21062_device::schedule_dma_op(int channel, uint32_t src, uint32_t dst, int src_modifier, int dst_modifier, int src_count, int dst_count, int pmode)
 {
 	if (m_core->dma_op[channel].active)
 	{
@@ -86,8 +86,8 @@ void adsp21062_device::schedule_dma_op(int channel, UINT32 src, UINT32 dst, int 
 void adsp21062_device::dma_op(int channel)
 {
 	int i;
-	UINT32 src          = m_core->dma_op[channel].src;
-	UINT32 dst          = m_core->dma_op[channel].dst;
+	uint32_t src          = m_core->dma_op[channel].src;
+	uint32_t dst          = m_core->dma_op[channel].dst;
 	int src_modifier    = m_core->dma_op[channel].src_modifier;
 	int dst_modifier    = m_core->dma_op[channel].dst_modifier;
 	int src_count       = m_core->dma_op[channel].src_count;
@@ -102,7 +102,7 @@ void adsp21062_device::dma_op(int channel)
 		{
 			for (i=0; i < src_count; i++)
 			{
-				UINT32 data = dm_read32(src);
+				uint32_t data = dm_read32(src);
 				dm_write32(dst, data);
 				src += src_modifier;
 				dst += dst_modifier;
@@ -114,7 +114,7 @@ void adsp21062_device::dma_op(int channel)
 			int length = src_count/2;
 			for (i=0; i < length; i++)
 			{
-				UINT32 data = ((dm_read32(src+0) & 0xffff) << 16) | (dm_read32(src+1) & 0xffff);
+				uint32_t data = ((dm_read32(src+0) & 0xffff) << 16) | (dm_read32(src+1) & 0xffff);
 
 				dm_write32(dst, data);
 				src += src_modifier * 2;
@@ -127,12 +127,12 @@ void adsp21062_device::dma_op(int channel)
 			int length = src_count/6;
 			for (i=0; i < length; i++)
 			{
-				UINT64 data = ((UINT64)(dm_read32(src+0) & 0xff) <<  0) |
-								((UINT64)(dm_read32(src+1) & 0xff) <<  8) |
-								((UINT64)(dm_read32(src+2) & 0xff) << 16) |
-								((UINT64)(dm_read32(src+3) & 0xff) << 24) |
-								((UINT64)(dm_read32(src+4) & 0xff) << 32) |
-								((UINT64)(dm_read32(src+5) & 0xff) << 40);
+				uint64_t data = ((uint64_t)(dm_read32(src+0) & 0xff) <<  0) |
+								((uint64_t)(dm_read32(src+1) & 0xff) <<  8) |
+								((uint64_t)(dm_read32(src+2) & 0xff) << 16) |
+								((uint64_t)(dm_read32(src+3) & 0xff) << 24) |
+								((uint64_t)(dm_read32(src+4) & 0xff) << 32) |
+								((uint64_t)(dm_read32(src+5) & 0xff) << 40);
 
 				pm_write48(dst, data);
 				src += src_modifier * 6;
@@ -165,9 +165,9 @@ void adsp21062_device::dma_op(int channel)
 
 void adsp21062_device::sharc_dma_exec(int channel)
 {
-	UINT32 src, dst;
-	UINT32 src_count, dst_count;
-	UINT32 src_modifier, dst_modifier;
+	uint32_t src, dst;
+	uint32_t src_count, dst_count;
+	uint32_t src_modifier, dst_modifier;
 	int chen, tran, dtype, pmode, /*mswf, master,*/ ishake, intio/*, ext, flsh*/;
 
 	chen = (m_core->dma[channel].control >> 1) & 0x1;
@@ -189,7 +189,7 @@ void adsp21062_device::sharc_dma_exec(int channel)
 
 	if (chen)       // Chained DMA
 	{
-		UINT32 dma_chain_ptr = m_core->dma[channel].chain_ptr & 0x1ffff;
+		uint32_t dma_chain_ptr = m_core->dma[channel].chain_ptr & 0x1ffff;
 
 		schedule_chained_dma_op(channel, dma_chain_ptr, tran);
 	}

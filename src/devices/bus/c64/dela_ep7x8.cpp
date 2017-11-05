@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "dela_ep7x8.h"
 
 
@@ -14,14 +15,14 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_DELA_EP7X8 = &device_creator<c64_dela_ep7x8_cartridge_device>;
+DEFINE_DEVICE_TYPE(C64_DELA_EP7X8, c64_dela_ep7x8_cartridge_device, "c64_dela_ep7x8", "C64 Dela 7x8KB EPROM cartridge")
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( c64_dela_ep7x8 )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( c64_dela_ep7x8 )
+MACHINE_CONFIG_MEMBER( c64_dela_ep7x8_cartridge_device::device_add_mconfig )
 	MCFG_GENERIC_SOCKET_ADD("rom1", generic_linear_slot, nullptr)
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
 	MCFG_GENERIC_SOCKET_ADD("rom2", generic_linear_slot, nullptr)
@@ -39,17 +40,6 @@ static MACHINE_CONFIG_FRAGMENT( c64_dela_ep7x8 )
 MACHINE_CONFIG_END
 
 
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor c64_dela_ep7x8_cartridge_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( c64_dela_ep7x8 );
-}
-
-
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
@@ -58,8 +48,8 @@ machine_config_constructor c64_dela_ep7x8_cartridge_device::device_mconfig_addit
 //  c64_dela_ep7x8_cartridge_device - constructor
 //-------------------------------------------------
 
-c64_dela_ep7x8_cartridge_device::c64_dela_ep7x8_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, C64_DELA_EP7X8, "C64 Dela 7x8KB EPROM cartridge", tag, owner, clock, "ep7x8", __FILE__),
+c64_dela_ep7x8_cartridge_device::c64_dela_ep7x8_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, C64_DELA_EP7X8, tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_eprom1(*this, "rom1"),
 	m_eprom2(*this, "rom2"),
@@ -98,7 +88,7 @@ void c64_dela_ep7x8_cartridge_device::device_reset()
 //  c64_cd_r - cartridge data read
 //-------------------------------------------------
 
-UINT8 c64_dela_ep7x8_cartridge_device::c64_cd_r(address_space &space, offs_t offset, UINT8 data, int sphi2, int ba, int roml, int romh, int io1, int io2)
+uint8_t c64_dela_ep7x8_cartridge_device::c64_cd_r(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
 	if (!roml)
 	{
@@ -122,7 +112,7 @@ UINT8 c64_dela_ep7x8_cartridge_device::c64_cd_r(address_space &space, offs_t off
 //  c64_cd_w - cartridge data write
 //-------------------------------------------------
 
-void c64_dela_ep7x8_cartridge_device::c64_cd_w(address_space &space, offs_t offset, UINT8 data, int sphi2, int ba, int roml, int romh, int io1, int io2)
+void c64_dela_ep7x8_cartridge_device::c64_cd_w(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
 	if (!io1)
 	{

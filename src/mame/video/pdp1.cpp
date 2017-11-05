@@ -26,7 +26,7 @@
 
 
 
-inline void pdp1_state::pdp1_plot_pixel(bitmap_ind16 &bitmap, int x, int y, UINT32 color)
+inline void pdp1_state::pdp1_plot_pixel(bitmap_ind16 &bitmap, int x, int y, uint32_t color)
 {
 	bitmap.pix16(y, x) = color;
 }
@@ -50,7 +50,7 @@ void pdp1_state::video_start()
 }
 
 
-void pdp1_state::screen_eof_pdp1(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(pdp1_state::screen_vblank_pdp1)
 {
 	// rising edge
 	if (state)
@@ -74,7 +74,7 @@ void pdp1_state::pdp1_plot(int x, int y)
 /*
     video_update_pdp1: effectively redraw the screen
 */
-UINT32 pdp1_state::screen_update_pdp1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t pdp1_state::screen_update_pdp1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	pdp1_erase_lightpen(bitmap);
 	m_crt->update(bitmap);
@@ -354,7 +354,7 @@ enum
 
 void pdp1_state::pdp1_typewriter_linefeed()
 {
-	UINT8 buf[typewriter_window_width];
+	uint8_t buf[typewriter_window_width];
 	int y;
 
 	for (y=0; y<typewriter_window_height-typewriter_scroll_step; y++)

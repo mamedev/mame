@@ -10,7 +10,9 @@
 
 #include "emu.h"
 #include "cpu/e0c6200/e0c6s46.h"
-#include "sound/speaker.h"
+#include "sound/spkrdev.h"
+#include "screen.h"
+#include "speaker.h"
 
 #include "tama.lh"
 
@@ -21,17 +23,27 @@ public:
 	tamag1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_speaker(*this, "speaker")
+		m_speaker(*this, "speaker"),
+		m_out_x(*this, "%u.%u", 0U, 0U)
 	{ }
 
 	required_device<e0c6s46_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
+	output_finder<16, 40> m_out_x;
 
 	DECLARE_WRITE8_MEMBER(speaker_w);
-
 	DECLARE_PALETTE_INIT(tama);
 	DECLARE_INPUT_CHANGED_MEMBER(input_changed);
+	E0C6S46_PIXEL_UPDATE(pixel_update);
+
+protected:
+	virtual void machine_start() override;
 };
+
+void tamag1_state::machine_start()
+{
+	m_out_x.resolve();
+}
 
 
 /***************************************************************************
@@ -40,7 +52,7 @@ public:
 
 ***************************************************************************/
 
-static E0C6S46_PIXEL_UPDATE_CB(tama_pixel_update)
+E0C6S46_PIXEL_UPDATE(tamag1_state::pixel_update)
 {
 	// 16 COM(common) pins, 40 SEG(segment) pins from MCU,
 	// 32x16 LCD screen:
@@ -60,17 +72,10 @@ static E0C6S46_PIXEL_UPDATE_CB(tama_pixel_update)
 	// 2 rows of indicators:
 	// above screen: 0:meal, 1:lamp, 2:play, 3:medicine
 	// under screen: 4:bath, 5:scales, 6:shout, 7:attention
-
 	// they are on pin SEG8(x=35) + COM0-3, pin SEG28(x=36) + COM12-15
-	if (x == 35 && y < 4)
-		device.machine().output().set_lamp_value(y, state);
-	else if (x == 36 && y >= 12)
-		device.machine().output().set_lamp_value(y-8, state);
 
-	// output for svg2lay
-	char buf[0x10];
-	sprintf(buf, "%d.%d", y, x);
-	device.machine().output().set_value(buf, state);
+	// output to y.x
+	m_out_x[y][x] = state;
 }
 
 PALETTE_INIT_MEMBER(tamag1_state, tama)
@@ -105,7 +110,7 @@ INPUT_CHANGED_MEMBER(tamag1_state::input_changed)
 {
 	// inputs are hooked up backwards here, because MCU input
 	// ports are all tied to its interrupt controller
-	int line = (int)(FPTR)param;
+	int line = (int)(uintptr_t)param;
 	int state = newval ? ASSERT_LINE : CLEAR_LINE;
 	m_maincpu->set_input_line(line, state);
 }
@@ -126,11 +131,11 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( tama, tamag1_state )
+static MACHINE_CONFIG_START( tama )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", E0C6S46, XTAL_32_768kHz)
-	MCFG_E0C6S46_PIXEL_UPDATE_CB(tama_pixel_update)
+	MCFG_E0C6S46_PIXEL_UPDATE_CB(tamag1_state, pixel_update)
 	MCFG_E0C6S46_WRITE_R_CB(4, WRITE8(tamag1_state, speaker_w))
 
 	/* video hardware */
@@ -162,9 +167,12 @@ MACHINE_CONFIG_END
 
 ROM_START( tama )
 	ROM_REGION( 0x3000, "maincpu", 0 )
-	ROM_LOAD( "test.b", 0x0000, 0x3000, CRC(4372220e) SHA1(6e13d015113e16198c0059b9d0c38d7027ae7324) ) // this rom is on the die too, test pin enables it?
 	ROM_LOAD( "tama.b", 0x0000, 0x3000, CRC(5c864cb1) SHA1(4b4979cf92dc9d2fb6d7295a38f209f3da144f72) )
+
+	ROM_REGION( 0x3000, "maincpu:test", 0 )
+	ROM_LOAD( "test.b", 0x0000, 0x3000, CRC(4372220e) SHA1(6e13d015113e16198c0059b9d0c38d7027ae7324) ) // this rom is on the die too, test pin enables it?
 ROM_END
 
 
-CONS( 1997, tama, 0, 0, tama, tama, driver_device, 0, "Bandai", "Tamagotchi (USA)", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME  PARENT CMP MACHINE INPUT STATE      INIT  COMPANY, FULLNAME, FLAGS
+CONS( 1997, tama, 0,      0, tama,   tama, tamag1_state, 0, "Bandai", "Tamagotchi (USA)", MACHINE_SUPPORTS_SAVE )

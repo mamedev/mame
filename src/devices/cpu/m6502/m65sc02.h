@@ -8,14 +8,14 @@
 
 ***************************************************************************/
 
-#ifndef __M65SC02_H__
-#define __M65SC02_H__
+#ifndef MAME_CPU_M6502_M65SC02_H
+#define MAME_CPU_M6502_M65SC02_H
 
 #include "r65c02.h"
 
 class m65sc02_device : public r65c02_device {
 public:
-	m65sc02_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	m65sc02_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 enum {
@@ -24,6 +24,6 @@ enum {
 	M65SC02_SET_OVERFLOW = m6502_device::V_LINE
 };
 
-extern const device_type M65SC02;
+DECLARE_DEVICE_TYPE(M65SC02, m65sc02_device)
 
-#endif
+#endif // MAME_CPU_M6502_M65SC02_H

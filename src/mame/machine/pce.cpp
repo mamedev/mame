@@ -134,7 +134,7 @@ MACHINE_RESET_MEMBER(pce_state,mess_pce)
 WRITE8_MEMBER(pce_state::mess_pce_joystick_w)
 {
 	int joy_i;
-	UINT8 joy_type = m_joy_type->read();
+	uint8_t joy_type = m_joy_type->read();
 
 	m_maincpu->io_set_buffer(data);
 
@@ -162,8 +162,8 @@ WRITE8_MEMBER(pce_state::mess_pce_joystick_w)
 
 READ8_MEMBER(pce_state::mess_pce_joystick_r)
 {
-	UINT8 joy_type = m_joy_type->read();
-	UINT8 ret, data;
+	uint8_t joy_type = m_joy_type->read();
+	uint8_t ret, data;
 
 	if (m_joystick_port_select <= 4)
 	{

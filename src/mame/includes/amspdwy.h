@@ -6,7 +6,9 @@
 
 *************************************************************************/
 
-#include "sound/2151intf.h"
+#include "machine/gen_latch.h"
+#include "sound/ym2151.h"
+#include "screen.h"
 
 class amspdwy_state : public driver_device
 {
@@ -21,13 +23,14 @@ public:
 		m_ym2151(*this, "ymsnd"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch")
 	{ }
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_spriteram;
-	required_shared_ptr<UINT8> m_colorram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<uint8_t> m_colorram;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -36,18 +39,18 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
 
 	/* video-related */
 	tilemap_t *m_bg_tilemap;
 	int m_flipscreen;
 
 	/* misc */
-	UINT8 m_wheel_old[2];
-	UINT8 m_wheel_return[2];
+	uint8_t m_wheel_old[2];
+	uint8_t m_wheel_return[2];
 
 	DECLARE_READ8_MEMBER(amspdwy_wheel_0_r);
 	DECLARE_READ8_MEMBER(amspdwy_wheel_1_r);
-	DECLARE_WRITE8_MEMBER(amspdwy_sound_w);
 	DECLARE_WRITE8_MEMBER(amspdwy_flipscreen_w);
 	DECLARE_WRITE8_MEMBER(amspdwy_videoram_w);
 	DECLARE_WRITE8_MEMBER(amspdwy_colorram_w);
@@ -55,9 +58,9 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	TILEMAP_MAPPER_MEMBER(tilemap_scan_cols_back);
 
-	UINT32 screen_update_amspdwy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_amspdwy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
-	UINT8 amspdwy_wheel_r( int index );
+	uint8_t amspdwy_wheel_r( int index );
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

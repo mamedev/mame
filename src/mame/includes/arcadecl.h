@@ -21,7 +21,7 @@ public:
 
 	required_device<okim6295_device> m_oki;
 	optional_device<atari_motion_objects_device> m_mob;
-	required_shared_ptr<UINT16> m_bitmap;
+	required_shared_ptr<uint16_t> m_bitmap;
 
 	virtual void update_interrupts() override;
 	virtual void scanline_update(screen_device &screen, int scanline) override;
@@ -30,7 +30,7 @@ public:
 	DECLARE_MACHINE_START(arcadecl);
 	DECLARE_MACHINE_RESET(arcadecl);
 	DECLARE_VIDEO_START(arcadecl);
-	UINT32 screen_update_arcadecl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_arcadecl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void arcadecl_bitmap_render(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	static const atari_motion_objects_config s_mob_config;

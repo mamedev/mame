@@ -27,7 +27,7 @@ Bg 1,5kb (2114 x3)
 Sprites 1kb (2148 x2)
 color 320byte (27ls00 x10)
 
-Rom definiton:
+Rom definition:
 -top pcb-
 stuntair.a0,a1,a3,a4,a6 main program
 stuntair.e14 sound program
@@ -81,7 +81,14 @@ Bprom dump by f205v
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/74259.h"
+#include "machine/gen_latch.h"
+#include "machine/nvram.h"
+#include "machine/watchdog.h"
 #include "sound/ay8910.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 class stuntair_state : public driver_device
 {
@@ -95,25 +102,27 @@ public:
 		m_bgattrram(*this, "bgattrram"),
 		m_sprram(*this, "sprram"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
-	required_shared_ptr<UINT8> m_fgram;
-	required_shared_ptr<UINT8> m_bgram;
-	required_shared_ptr<UINT8> m_bgattrram;
-	required_shared_ptr<UINT8> m_sprram;
+	required_shared_ptr<uint8_t> m_fgram;
+	required_shared_ptr<uint8_t> m_bgram;
+	required_shared_ptr<uint8_t> m_bgattrram;
+	required_shared_ptr<uint8_t> m_sprram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
 
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_bg_tilemap;
 
-	UINT8 m_bg_xscroll;
-	UINT8 m_nmi_enable;
-	UINT8 m_spritebank0;
-	UINT8 m_spritebank1;
+	uint8_t m_bg_xscroll;
+	uint8_t m_nmi_enable;
+	uint8_t m_spritebank0;
+	uint8_t m_spritebank1;
 
 	TILE_GET_INFO_MEMBER(get_stuntair_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_stuntair_bg_tile_info);
@@ -121,9 +130,9 @@ public:
 	DECLARE_WRITE8_MEMBER(stuntair_bgram_w);
 	DECLARE_WRITE8_MEMBER(stuntair_bgattrram_w);
 	DECLARE_WRITE8_MEMBER(stuntair_bgxscroll_w);
-	DECLARE_WRITE8_MEMBER(stuntair_nmienable_w);
-	DECLARE_WRITE8_MEMBER(stuntair_spritebank0_w);
-	DECLARE_WRITE8_MEMBER(stuntair_spritebank1_w);
+	DECLARE_WRITE_LINE_MEMBER(nmi_enable_w);
+	DECLARE_WRITE_LINE_MEMBER(spritebank0_w);
+	DECLARE_WRITE_LINE_MEMBER(spritebank1_w);
 	DECLARE_WRITE8_MEMBER(stuntair_coin_w);
 	DECLARE_WRITE8_MEMBER(stuntair_sound_w);
 	DECLARE_WRITE8_MEMBER(ay8910_portb_w);
@@ -132,7 +141,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_stuntair(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_stuntair(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_PALETTE_INIT(stuntair);
 };
 
@@ -147,11 +156,11 @@ public:
 PALETTE_INIT_MEMBER(stuntair_state, stuntair)
 {
 	/* need resistor weights etc. */
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const uint8_t *color_prom = machine().root_device().memregion("proms")->base();
 
 	for (int i = 0; i < 0x100; i++)
 	{
-		UINT8 data = color_prom[i];
+		uint8_t data = color_prom[i];
 
 		int b = (data&0xc0)>>6;
 		int g = (data&0x38)>>3;
@@ -188,10 +197,10 @@ TILE_GET_INFO_MEMBER(stuntair_state::get_stuntair_bg_tile_info)
 
 void stuntair_state::video_start()
 {
-	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(stuntair_state::get_stuntair_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(stuntair_state::get_stuntair_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_fg_tilemap->set_transparent_pen(0);
 
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(stuntair_state::get_stuntair_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(stuntair_state::get_stuntair_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 
@@ -221,7 +230,7 @@ void stuntair_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 	}
 }
 
-UINT32 stuntair_state::screen_update_stuntair(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t stuntair_state::screen_update_stuntair(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->set_scrollx(0, m_bg_xscroll);
 
@@ -268,25 +277,22 @@ WRITE8_MEMBER( stuntair_state::stuntair_bgxscroll_w )
 }
 
 
-WRITE8_MEMBER(stuntair_state::stuntair_spritebank0_w)
+WRITE_LINE_MEMBER(stuntair_state::spritebank0_w)
 {
-	m_spritebank0 = data&0x01;
-	// other bits are unused
+	m_spritebank0 = state;
 }
 
-WRITE8_MEMBER(stuntair_state::stuntair_spritebank1_w)
+WRITE_LINE_MEMBER(stuntair_state::spritebank1_w)
 {
-	m_spritebank1 = data&0x01;
-	// other bits are unused
+	m_spritebank1 = state;
 }
 
 
-WRITE8_MEMBER(stuntair_state::stuntair_nmienable_w)
+WRITE_LINE_MEMBER(stuntair_state::nmi_enable_w)
 {
-	m_nmi_enable = data&0x01;
+	m_nmi_enable = state;
 	if (!m_nmi_enable)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-	// other bits are unused
 }
 
 WRITE8_MEMBER(stuntair_state::stuntair_coin_w)
@@ -303,27 +309,25 @@ WRITE8_MEMBER(stuntair_state::stuntair_coin_w)
 
 WRITE8_MEMBER(stuntair_state::stuntair_sound_w)
 {
-	soundlatch_byte_w(space, 0, data);
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	// each command is written three times: with bit 7 set, then with bit 7 clear, then with bit 7 set again
+	// the 3 highest bits are ignored by the sound program
+	m_soundlatch->write(space, 0, data);
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, BIT(data, 7) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 // main Z80
 static ADDRESS_MAP_START( stuntair_map, AS_PROGRAM, 8, stuntair_state )
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xc800, 0xcbff) AM_RAM_WRITE(stuntair_bgattrram_w) AM_SHARE("bgattrram")
 	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(stuntair_bgram_w) AM_SHARE("bgram")
 	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_SHARE("sprram")
 	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("DSWB") AM_WRITE(stuntair_coin_w)
 	AM_RANGE(0xe800, 0xe800) AM_READ_PORT("DSWA") AM_WRITE(stuntair_bgxscroll_w)
 	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("IN2")
-	AM_RANGE(0xf001, 0xf001) AM_WRITE(stuntair_nmienable_w)
 	AM_RANGE(0xf002, 0xf002) AM_READ_PORT("IN3")
-	AM_RANGE(0xf003, 0xf003) AM_READNOP AM_WRITE(stuntair_spritebank1_w)
-//  AM_RANGE(0xf004, 0xf004) AM_WRITENOP
-	AM_RANGE(0xf005, 0xf005) AM_WRITE(stuntair_spritebank0_w)
-//  AM_RANGE(0xf006, 0xf006) AM_WRITENOP
-//  AM_RANGE(0xf007, 0xf007) AM_WRITENOP
+	AM_RANGE(0xf003, 0xf003) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
+	AM_RANGE(0xf000, 0xf007) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
 	AM_RANGE(0xf800, 0xfbff) AM_RAM_WRITE(stuntair_fgram_w) AM_SHARE("fgram")
 	AM_RANGE(0xfc03, 0xfc03) AM_WRITE(stuntair_sound_w)
 ADDRESS_MAP_END
@@ -350,7 +354,7 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 static INPUT_PORTS_START( stuntair )
-	PORT_START("DSWB") // the bit order is scrambled, but this matches the text above
+	PORT_START("DSWB") // the bit order is scrambled (see table at 05B0), but this matches the text above
 	PORT_DIPNAME( 0x18, 0x00, DEF_STR( Coin_A ) )        PORT_DIPLOCATION("SWB:2,1")
 	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
@@ -372,7 +376,7 @@ static INPUT_PORTS_START( stuntair )
 	PORT_DIPSETTING(    0x01, "4" )
 	PORT_DIPSETTING(    0x81, "5" )
 
-	PORT_START("DSWA") // the bit order is scrambled, not sure if the dip locations are correct
+	PORT_START("DSWA") // the bit order is scrambled (table at 05B0 also used), not sure if the dip locations are correct
 	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SWA:1" ) // test related? $05c7
 	PORT_DIPNAME( 0x28, 0x08, DEF_STR( Difficulty ) )    PORT_DIPLOCATION("SWA:2,3") // $298f
 	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
@@ -502,7 +506,7 @@ void stuntair_state::machine_reset()
 {
 }
 
-static MACHINE_CONFIG_START( stuntair, stuntair_state )
+static MACHINE_CONFIG_START( stuntair )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,  XTAL_18_432MHz/6)         /* 3 MHz? */
@@ -513,6 +517,20 @@ static MACHINE_CONFIG_START( stuntair, stuntair_state )
 	MCFG_CPU_PROGRAM_MAP(stuntair_sound_map)
 	MCFG_CPU_IO_MAP(stuntair_sound_portmap)
 	MCFG_CPU_PERIODIC_INT_DRIVER(stuntair_state, irq0_line_hold, 420) // drives music tempo, timing is approximate based on PCB audio recording.. and where is irq ack?
+
+	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // type and location not verified
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(NOOP) // set but never cleared
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(stuntair_state, nmi_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(NOOP) // cleared at start
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(stuntair_state, spritebank1_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(NOOP) // cleared at start
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(stuntair_state, spritebank0_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(NOOP) // cleared at start
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(NOOP) // cleared at start
+
+	MCFG_NVRAM_ADD_0FILL("nvram")
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -531,8 +549,10 @@ static MACHINE_CONFIG_START( stuntair, stuntair_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono") // stereo?
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ay1", AY8910, XTAL_18_432MHz/12)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(driver_device, soundlatch_byte_r))
+	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(stuntair_state, ay8910_portb_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
@@ -577,4 +597,4 @@ ROM_START( stuntair )
 ROM_END
 
 
-GAME( 1983, stuntair,  0,    stuntair, stuntair, driver_device,  0, ROT90, "Nuova Videotron", "Stunt Air",  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1983, stuntair,  0,    stuntair, stuntair, stuntair_state,  0, ROT90, "Nuova Videotron", "Stunt Air",  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )

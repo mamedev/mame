@@ -89,7 +89,10 @@
      Michael Zapf, June 2012
 */
 
+#include "emu.h"
 #include "tms9995.h"
+
+#define NOPRG -1
 
 /* tms9995 ST register bits. */
 enum
@@ -175,30 +178,14 @@ enum
     Constructor
 ****************************************************************************/
 
-tms9995_device::tms9995_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: cpu_device(mconfig, TMS9995, "TMS9995", tag, owner, clock, "tms9995", __FILE__),
-		m_state_any(0),
-		PC(0),
-		PC_debug(0),
-		m_program_config("program", ENDIANNESS_BIG, 8, 16),
-		m_io_config("cru", ENDIANNESS_BIG, 8, 16),
-		m_prgspace(nullptr),
-		m_cru(nullptr),
-		m_external_operation(*this),
-		m_iaq_line(*this),
-		m_clock_out_line(*this),
-		m_holda_line(*this),
-		m_dbin_line(*this)
+tms9995_device::tms9995_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: tms9995_device(mconfig, TMS9995, tag, owner, clock)
 {
 	m_mp9537 = false;
-	m_check_overflow = false;
 }
 
-/*
-    Called from subclass.
-*/
-tms9995_device::tms9995_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
-		: cpu_device(mconfig, TMS9995, name, tag, owner, clock, shortname, source),
+tms9995_device::tms9995_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: cpu_device(mconfig, type, tag, owner, clock),
 		m_state_any(0),
 		PC(0),
 		PC_debug(0),
@@ -262,20 +249,84 @@ void tms9995_device::device_start()
 		// callexport = need to use the state_export method to read the state variable
 		state_add(i, s_statename[i], m_state_any).callimport().callexport().formatstr("%04X");
 	}
-	state_add(STATE_GENPC, "curpc", PC_debug).formatstr("%4s").noshow();
+	state_add(STATE_GENPC, "GENPC", PC_debug).formatstr("%4s").noshow();
+	state_add(STATE_GENPCBASE, "CURPC", PC_debug).formatstr("%4s").noshow();
 	state_add(STATE_GENFLAGS, "status", m_state_any).callimport().callexport().formatstr("%16s").noshow();
 
 	// Set up the lookup table for command decoding
 	build_command_lookup_table();
 
 	if (TRACE_CONFIG) logerror("%s: Variant = %s, Overflow int = %s\n", tag(), m_mp9537? "MP9537 (no on-chip RAM)" : "with on-chip RAM", m_check_overflow? "check" : "no check");
+
+	// Register persistable state variables
+	// save_item(NAME(m_state_any)); // only for debugger output
+	save_item(NAME(WP));
+	save_item(NAME(PC));
+	save_item(NAME(ST));
+	// save_item(NAME(PC_debug)); // only for debugger output
+	save_pointer(NAME(m_onchip_memory),256);
+	save_item(NAME(m_idle_state));
+	save_item(NAME(m_nmi_state));
+	save_item(NAME(m_hold_state));
+	save_item(NAME(m_hold_requested));
+	save_item(NAME(m_ready_bufd));
+	save_item(NAME(m_ready));
+	save_item(NAME(m_request_auto_wait_state));
+	save_item(NAME(m_auto_wait));
+	save_item(NAME(m_icount));
+	save_item(NAME(m_mem_phase));
+	save_item(NAME(m_check_ready));
+	save_item(NAME(m_check_hold));
+	save_item(NAME(m_pass));
+	save_item(NAME(m_get_destination));
+	save_item(NAME(m_word_access));
+	save_item(NAME(m_nmi_active));
+	save_item(NAME(m_int1_active));
+	save_item(NAME(m_int4_active));
+	save_item(NAME(m_int_decrementer));
+	save_item(NAME(m_int_overflow));
+	save_item(NAME(m_reset));
+	save_item(NAME(m_from_reset));
+	save_item(NAME(m_mid_flag));
+	save_item(NAME(m_mid_active));
+	save_item(NAME(m_decrementer_clkdiv));
+	save_item(NAME(m_servicing_interrupt));
+	save_item(NAME(m_int_pending));
+	save_item(NAME(m_check_overflow));
+	save_item(NAME(m_intmask));
+	save_item(NAME(m_address));
+	save_item(NAME(m_current_value));
+	save_item(NAME(m_source_value));
+	save_item(NAME(m_address_add));
+	save_item(NAME(m_address_saved));
+	save_item(NAME(m_address_copy));
+	save_item(NAME(m_value_copy));
+	save_item(NAME(m_regnumber));
+	save_item(NAME(m_count));
+	save_item(NAME(m_starting_count_storage_register));
+	save_item(NAME(m_decrementer_value));
+	save_item(NAME(m_cru_address));
+	save_item(NAME(m_cru_value));
+	save_item(NAME(m_cru_first_read));
+	save_item(NAME(m_cru_bits_left));
+	save_item(NAME(m_cru_read));
+	save_pointer(NAME(m_flag),16);
+	save_item(NAME(IR));
+	save_item(NAME(m_pre_IR));
+	save_item(NAME(m_command));
+	save_item(NAME(m_pre_command));
+	save_item(NAME(m_index));
+	save_item(NAME(m_pre_index));
+	save_item(NAME(m_byteop));
+	save_item(NAME(m_pre_byteop));
+	save_item(NAME(m_inst_state));
+	save_item(NAME(MPC));
+	save_item(NAME(m_caller_MPC));
+	// save_item(NAME(m_first_cycle)); // only for log output
 }
 
 void tms9995_device::device_stop()
 {
-	int k = 0;
-	if (TRACE_EMU) logerror("%s: Deleting lookup tables\n", tag());
-	while (m_lotables[k]!=nullptr) delete[] m_lotables[k++];
 }
 
 /*
@@ -319,21 +370,21 @@ void tms9995_device::state_import(const device_state_entry &entry)
 			// bits of the STATUS register
 			break;
 		case TMS9995_PC:
-			PC = (UINT16)m_state_any & 0xfffe;
+			PC = (uint16_t)m_state_any & 0xfffe;
 			break;
 		case TMS9995_WP:
-			WP = (UINT16)m_state_any & 0xfffe;
+			WP = (uint16_t)m_state_any & 0xfffe;
 			break;
 		case TMS9995_STATUS:
-			ST = (UINT16)m_state_any;
+			ST = (uint16_t)m_state_any;
 			break;
 		case TMS9995_IR:
-			m_instruction->IR = (UINT16)m_state_any;
+			IR = (uint16_t)m_state_any;
 			break;
 		default:
 			// Workspace registers
 			if (index <= TMS9995_R15)
-				write_workspace_register_debug(index-TMS9995_R0, (UINT16)m_state_any);
+				write_workspace_register_debug(index-TMS9995_R0, (uint16_t)m_state_any);
 			break;
 	}
 }
@@ -359,7 +410,7 @@ void tms9995_device::state_export(const device_state_entry &entry)
 			m_state_any = ST;
 			break;
 		case TMS9995_IR:
-			m_state_any = m_instruction->IR;
+			m_state_any = IR;
 			break;
 		default:
 			// Workspace registers
@@ -377,7 +428,7 @@ void tms9995_device::state_string_export(const device_state_entry &entry, std::s
 	static const char *statestr = "LAECOPX-----IIII";
 	char flags[17];
 	memset(flags, 0x00, ARRAY_LENGTH(flags));
-	UINT16 val = 0x8000;
+	uint16_t val = 0x8000;
 	if (entry.index()==STATE_GENFLAGS)
 	{
 		for (int i=0; i < 16; i++)
@@ -393,10 +444,10 @@ void tms9995_device::state_string_export(const device_state_entry &entry, std::s
     Provide access to the workspace registers via the debugger. We have to
     take care whether this is in onchip RAM or outside.
 */
-UINT16 tms9995_device::read_workspace_register_debug(int reg)
+uint16_t tms9995_device::read_workspace_register_debug(int reg)
 {
 	int temp = m_icount;
-	UINT16 value;
+	uint16_t value;
 
 	int addrb = (WP + (reg << 1)) & 0xfffe;
 
@@ -406,16 +457,15 @@ UINT16 tms9995_device::read_workspace_register_debug(int reg)
 	}
 	else
 	{
-		m_prgspace->set_debugger_access(true);
+		auto dis = machine().disable_side_effect();
 		value = (m_prgspace->read_byte(addrb) << 8) & 0xff00;
 		value |= m_prgspace->read_byte(addrb+1);
-		m_prgspace->set_debugger_access(false);
 	}
 	m_icount = temp;
 	return value;
 }
 
-void tms9995_device::write_workspace_register_debug(int reg, UINT16 data)
+void tms9995_device::write_workspace_register_debug(int reg, uint16_t data)
 {
 	int temp = m_icount;
 	int addrb = (WP + (reg << 1)) & 0xfffe;
@@ -427,27 +477,19 @@ void tms9995_device::write_workspace_register_debug(int reg, UINT16 data)
 	}
 	else
 	{
-		m_prgspace->set_debugger_access(true);
+		auto dis = machine().disable_side_effect();
 		m_prgspace->write_byte(addrb, (data >> 8) & 0xff);
 		m_prgspace->write_byte(addrb+1, data & 0xff);
-		m_prgspace->set_debugger_access(false);
 	}
 	m_icount = temp;
 }
 
-const address_space_config *tms9995_device::memory_space_config(address_spacenum spacenum) const
+device_memory_interface::space_config_vector tms9995_device::memory_space_config() const
 {
-	switch (spacenum)
-	{
-	case AS_PROGRAM:
-		return &m_program_config;
-
-	case AS_IO:
-		return &m_io_config;
-
-	default:
-		return nullptr;
-	}
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config),
+		std::make_pair(AS_IO,      &m_io_config)
+	};
 }
 
 /**************************************************************************
@@ -461,7 +503,7 @@ const address_space_config *tms9995_device::memory_space_config(address_spacenum
 
 /*
     Define the indices for the micro-operation table. This is done for the sake
-    of a simpler microprogram definition as an UINT8[].
+    of a simpler microprogram definition as an uint8_t[].
 */
 enum
 {
@@ -514,7 +556,7 @@ enum
 };
 
 #define MICROPROGRAM(_MP) \
-	static const UINT8 _MP[] =
+	static const uint8_t _MP[] =
 
 /*
     Cycles:
@@ -988,7 +1030,7 @@ enum
 	LIMI, LREX, LST, LWP, LWPI, MOV, MOVB, MPY, MPYS, NEG,
 	ORI, RSET, RTWP, S, SB, SBO, SBZ, SETO, SLA, SOC,
 	SOCB, SRA, SRC, SRL, STCR, STST, STWP, SWPB, SZC, SZCB,
-	TB, X, XOP, XOR, INTR
+	TB, X, XOP, XOR, INTR, OPAD
 };
 
 static const char opname[][5] =
@@ -999,7 +1041,7 @@ static const char opname[][5] =
 	"LIMI", "LREX", "LST ", "LWP ", "LWPI", "MOV ", "MOVB", "MPY ", "MPYS", "NEG ",
 	"ORI ", "RSET", "RTWP", "S   ", "SB  ", "SBO ", "SBZ ", "SETO", "SLA ", "SOC ",
 	"SOCB", "SRA ", "SRC ", "SRL ", "STCR", "STST", "STWP", "SWPB", "SZC ", "SZCB",
-	"TB  ", "X   ", "XOP ", "XOR ", "*int"
+	"TB  ", "X   ", "XOP ", "XOR ", "*int", "*oad"
 };
 
 /*
@@ -1116,7 +1158,11 @@ const tms9995_device::tms_instruction tms9995_device::s_command[] =
 	{ 0xc000, MOV, 1, mov_mp },
 	{ 0xd000, MOVB, 1, mov_mp },
 	{ 0xe000, SOC, 1, add_s_sxc_mp },
-	{ 0xf000, SOCB, 1, add_s_sxc_mp }
+	{ 0xf000, SOCB, 1, add_s_sxc_mp },
+
+// Special entries for interrupt and the address derivation subprogram; not in lookup table
+	{ 0x0000, INTR, 1, int_mp},
+	{ 0x0000, OPAD, 1, operand_address_derivation }
 };
 
 /*
@@ -1131,25 +1177,21 @@ void tms9995_device::build_command_lookup_table()
 	int cmdindex;
 	int bitcount;
 	const tms_instruction *inst;
-	UINT16 opcode;
-	int k = 0;
+	uint16_t opcode;
 
-	m_command_lookup_table = new lookup_entry[16];
-	// We use lotables as a list of allocated tables - to be able to delete them
-	// at the end.
-	m_lotables[k++] = m_command_lookup_table;
+	m_command_lookup_table = std::make_unique<lookup_entry[]>(16);
 
-	lookup_entry* table = m_command_lookup_table;
+	lookup_entry* table = m_command_lookup_table.get();
 	for (int j=0; j < 16; j++)
 	{
-		table[j].entry = nullptr;
 		table[j].next_digit = nullptr;
+		table[j].index = NOPRG;
 	}
 
 	do
 	{
 		inst = &s_command[i];
-		table = m_command_lookup_table;
+		table = m_command_lookup_table.get();
 		if (TRACE_EMU) logerror("=== opcode=%04x, len=%d\n", inst->opcode, format_mask_len[inst->format]);
 		bitcount = 4;
 		opcode = inst->opcode;
@@ -1161,12 +1203,11 @@ void tms9995_device::build_command_lookup_table()
 			if (table[cmdindex].next_digit == nullptr)
 			{
 				if (TRACE_EMU) logerror("create new table at bitcount=%d for index=%d\n", bitcount, cmdindex);
-				table[cmdindex].next_digit = new lookup_entry[16];
-				m_lotables[k++] = table[cmdindex].next_digit;
+				table[cmdindex].next_digit = std::make_unique<lookup_entry[]>(16);
 				for (int j=0; j < 16; j++)
 				{
 					table[cmdindex].next_digit[j].next_digit = nullptr;
-					table[cmdindex].next_digit[j].entry = nullptr;
+					table[cmdindex].next_digit[j].index = NOPRG;
 				}
 			}
 			else
@@ -1174,7 +1215,7 @@ void tms9995_device::build_command_lookup_table()
 				if (TRACE_EMU) logerror("found a table at bitcount=%d\n", bitcount);
 			}
 
-			table = table[cmdindex].next_digit;
+			table = table[cmdindex].next_digit.get();
 
 			bitcount = bitcount+4;
 			opcode <<= 4;
@@ -1190,14 +1231,15 @@ void tms9995_device::build_command_lookup_table()
 		for (int j=0; j < (1<<(bitcount-format_mask_len[inst->format])); j++)
 		{
 			if (TRACE_EMU) logerror("opcode=%04x at position %d\n", inst->opcode, cmdindex+j);
-			table[cmdindex+j].entry = inst;
+			table[cmdindex+j].index = i;
 		}
 
 		i++;
 	} while (inst->opcode != 0xf000);
 
-	m_lotables[k++] = nullptr;
-	if (TRACE_EMU) logerror("Allocated %d tables\n", k);
+	// Save the index to these two special microprograms
+	m_interrupt_mp_index = i++;
+	m_operand_address_derivation_index = i;
 }
 
 /*
@@ -1238,8 +1280,9 @@ void tms9995_device::execute_run()
 
 				m_check_ready = false;
 
-				if (TRACE_MICRO) logerror("main loop, operation %s, MPC = %d\n", opname[m_instruction->command], MPC);
-				(this->*s_microoperation[m_instruction->program[MPC]])();
+				if (TRACE_MICRO) logerror("main loop, operation %s, MPC = %d\n", opname[m_command], MPC);
+				uint8_t* program = (uint8_t*)s_command[m_index].prog;
+				(this->*s_microoperation[program[MPC]])();
 
 				// For multi-pass operations where the MPC should not advance
 				// or when we have put in a new microprogram
@@ -1402,45 +1445,44 @@ void tms9995_device::set_hold_state(bool state)
     Decode the instruction. This is done in parallel to other operations
     so we just do it together with the prefetch.
 */
-void tms9995_device::decode(UINT16 inst)
+void tms9995_device::decode(uint16_t inst)
 {
-	int index = 0;
-	lookup_entry* table = m_command_lookup_table;
-	UINT16 opcode = inst;
+	int ix = 0;
+	lookup_entry* table = m_command_lookup_table.get();
+	uint16_t opcode = inst;
 	bool complete = false;
-	const tms_instruction *decoded;
-
-	int dindex = (m_instindex==0)? 1:0;
 
 	m_mid_active = false;
 
 	while (!complete)
 	{
-		index = (opcode >> 12) & 0x000f;
-		if (TRACE_EMU) logerror("Check next hex digit of instruction %x\n", index);
-		if (table[index].next_digit != nullptr)
+		ix = (opcode >> 12) & 0x000f;
+		if (TRACE_EMU) logerror("Check next hex digit of instruction %x\n", ix);
+		if (table[ix].next_digit != nullptr)
 		{
-			table = table[index].next_digit;
+			table = table[ix].next_digit.get();
 			opcode = opcode << 4;
 		}
 		else complete = true;
 	}
-	decoded = table[index].entry;
-	if (decoded == nullptr)
+
+	int program_index = table[ix].index;
+	if (program_index == NOPRG)
 	{
 		// not found
 		logerror("Undefined opcode %04x at logical address %04x, will trigger MID\n", inst, PC);
-		m_decoded[dindex].IR = 0;
-		m_decoded[dindex].command = MID;
+		m_pre_IR = 0;
+		m_pre_command = MID;
 	}
 	else
 	{
-		m_decoded[dindex].IR = inst;
-		m_decoded[dindex].command = decoded->id;
-		m_decoded[dindex].program = decoded->prog;
-		m_decoded[dindex].byteop = ((decoded->format == 1) && ((inst & 0x1000)!=0));
-		m_decoded[dindex].state = 0;
-		if (TRACE_EMU) logerror("Command decoded as id %d, %s, base opcode %04x\n", decoded->id, opname[decoded->id], decoded->opcode);
+		const tms_instruction decoded = s_command[program_index];
+
+		m_pre_IR = inst;
+		m_pre_command = decoded.id;
+		m_pre_index = program_index;
+		m_pre_byteop = ((decoded.format == 1) && ((inst & 0x1000)!=0));
+		if (TRACE_EMU) logerror("Command decoded as id %d, %s, base opcode %04x\n", decoded.id, opname[decoded.id], decoded.opcode);
 		m_pass = 1;
 	}
 }
@@ -1453,7 +1495,6 @@ void tms9995_device::decode(UINT16 inst)
 */
 void tms9995_device::int_prefetch_and_decode()
 {
-	bool check_int = (m_instruction->command != XOP && m_instruction->command != BLWP);
 	int intmask = ST & 0x000f;
 
 	if (m_mem_phase == 1)
@@ -1470,8 +1511,8 @@ void tms9995_device::int_prefetch_and_decode()
 		else
 		{
 			m_int_pending = 0;
-
-			if (check_int)
+			// If the current command is XOP or BLWP, ignore the interrupt
+			if (m_command != XOP && m_command != BLWP)
 			{
 				if (m_int1_active && intmask >= 1) m_int_pending |= PENDING_LEVEL1;
 				if (m_int_overflow && intmask >= 2) m_int_pending |= PENDING_OVERFLOW;
@@ -1550,9 +1591,15 @@ void tms9995_device::prefetch_and_decode()
 */
 void tms9995_device::next_command()
 {
-	int next = (m_instindex==0)? 1:0;
+	// Copy the prefetched results
+	IR = m_pre_IR;
+	m_command = m_pre_command;
+	m_index = m_pre_index;
+	m_byteop = m_pre_byteop;
 
-	if (m_decoded[next].command == MID)
+	m_inst_state = 0;
+
+	if (m_command == MID)
 	{
 		m_mid_flag = true;
 		m_mid_active = true;
@@ -1560,13 +1607,11 @@ void tms9995_device::next_command()
 	}
 	else
 	{
-		m_instindex = next;
-		m_instruction = &m_decoded[m_instindex];
 		m_get_destination = false;
 		// This is a preset for opcodes which do not need an opcode address derivation
-		m_address = WP + ((m_instruction->IR & 0x000f)<<1);
+		m_address = WP + ((IR & 0x000f)<<1);
 		MPC = -1;
-		if (TRACE_OP) logerror("===== Next operation %04x (%s) at %04x =====\n", m_instruction->IR, opname[m_instruction->command], PC-2);
+		if (TRACE_OP) logerror("===== Next operation %04x (%s) at %04x =====\n", IR, opname[m_command], PC-2);
 
 		if (TRACE_EXEC)
 		{
@@ -1587,7 +1632,7 @@ void tms9995_device::command_completed()
 	// Pseudo state at the end of the current instruction cycle sequence
 	if (TRACE_CYCLES)
 	{
-		logerror("+++++ Instruction %04x (%s) completed", m_instruction->IR, opname[m_instruction->command]);
+		logerror("+++++ Instruction %04x (%s) completed", IR, opname[m_command]);
 		int cycles =  m_first_cycle - m_icount;
 		// Avoid nonsense values due to expired and resumed main loop
 		if (cycles > 0 && cycles < 10000) logerror(", consumed %d cycles", cycles);
@@ -1595,19 +1640,13 @@ void tms9995_device::command_completed()
 	}
 
 	if (m_int_pending != 0)
-	{
 		service_interrupt();
-	}
 	else
 	{
 		if ((ST & ST_OE)!=0 && (ST & ST_OV)!=0 && (ST & 0x000f)>2)
-		{
 			service_interrupt();
-		}
 		else
-		{
 			next_command();
-		}
 	}
 }
 
@@ -1634,8 +1673,6 @@ void tms9995_device::service_interrupt()
 		m_decrementer_clkdiv = 0;
 
 		m_pass = 0;
-		m_instindex = 0;
-		m_instruction = &m_decoded[m_instindex];
 
 		memset(m_flag, 0, sizeof(m_flag));
 
@@ -1718,16 +1755,18 @@ void tms9995_device::service_interrupt()
 
 	// The microinstructions will do the context switch
 	m_address = vectorpos;
-	m_instruction->program = int_mp;
-	m_instruction->state = 0;
-	m_instruction->byteop = false;
-	m_instruction->command = INTR;
+
+	m_index = m_interrupt_mp_index;
+	m_inst_state = 0;
+	m_byteop = false;
+	m_command = INTR;
+
 	m_pass = m_reset? 1 : 2;
 	m_from_reset = m_reset;
 
 	if (m_reset)
 	{
-		m_instruction->IR = 0x0000;
+		IR = 0x0000;
 		m_reset = false;
 	}
 	MPC = 0;
@@ -1764,7 +1803,7 @@ void tms9995_device::mem_read()
 		if (TRACE_DEC) logerror("read decrementer\n");
 		// Decrementer mapped into the address space
 		m_current_value = m_decrementer_value;
-		if (m_instruction->byteop)
+		if (m_byteop)
 		{
 			if ((m_address & 1)!=1) m_current_value <<= 8;
 			m_current_value &= 0xff00;
@@ -1778,7 +1817,7 @@ void tms9995_device::mem_read()
 		// If we have a word access, we have to align the address
 		// This is the case for word operations and for certain phases of
 		// byte operations (e.g. when retrieving the index register)
-		if (m_word_access || !m_instruction->byteop) m_address &= 0xfffe;
+		if (m_word_access || !m_byteop) m_address &= 0xfffe;
 
 		if (TRACE_MEM) logerror("read onchip memory (single pass, address %04x)\n", m_address);
 
@@ -1786,7 +1825,7 @@ void tms9995_device::mem_read()
 		m_check_ready = false;
 		// We put fffc-ffff back into the f000-f0ff area
 		m_current_value = m_onchip_memory[m_address & 0x00ff]<<8;
-		if (m_word_access || !m_instruction->byteop)
+		if (m_word_access || !m_byteop)
 		{
 			// We have a word operation; add the low byte right here (just 1 cycle)
 			m_current_value |= (m_onchip_memory[(m_address & 0x00ff)+1] & 0xff);
@@ -1797,8 +1836,8 @@ void tms9995_device::mem_read()
 	{
 		// This is an off-chip access
 		m_check_ready = true;
-		UINT8 value;
-		UINT16 address = m_address;
+		uint8_t value;
+		uint16_t address = m_address;
 
 		switch (m_mem_phase)
 		{
@@ -1806,7 +1845,7 @@ void tms9995_device::mem_read()
 			// Set address
 			// If this is a word access, 4 passes, else 2 passes
 			if (!m_dbin_line.isnull()) m_dbin_line(ASSERT_LINE);
-			if (m_word_access || !m_instruction->byteop)
+			if (m_word_access || !m_byteop)
 			{
 				m_pass = 4;
 				// For word accesses, we always start at the even address
@@ -1822,7 +1861,7 @@ void tms9995_device::mem_read()
 			break;
 		case 2:
 			// Sample the value on the data bus (high byte)
-			if (m_word_access || !m_instruction->byteop) address &= 0xfffe;
+			if (m_word_access || !m_byteop) address &= 0xfffe;
 			value = m_prgspace->read_byte(address);
 			if (TRACE_MEM) logerror("memory read byte %04x -> %02x\n", m_address & ~1, value);
 			m_current_value = (value << 8) & 0xff00;
@@ -1888,7 +1927,7 @@ void tms9995_device::mem_write()
 {
 	if ((m_address & 0xfffe)==0xfffa && !m_mp9537)
 	{
-		if (m_instruction->byteop)
+		if (m_byteop)
 		{
 			// According to [1], section 2.3.1.2.2:
 			// "The decrementer should always be accessed as a full word. [...]
@@ -1916,12 +1955,12 @@ void tms9995_device::mem_write()
 		// If we have a word access, we have to align the address
 		// This is the case for word operations and for certain phases of
 		// byte operations (e.g. when retrieving the index register)
-		if (m_word_access || !m_instruction->byteop) m_address &= 0xfffe;
+		if (m_word_access || !m_byteop) m_address &= 0xfffe;
 
 		if (TRACE_MEM) logerror("write to onchip memory (single pass, address %04x, value=%04x)\n", m_address, m_current_value);
 		m_check_ready = false;
 		m_onchip_memory[m_address & 0x00ff] = (m_current_value >> 8) & 0xff;
-		if (m_word_access || !m_instruction->byteop)
+		if (m_word_access || !m_byteop)
 		{
 			m_onchip_memory[(m_address & 0x00ff)+1] = m_current_value & 0xff;
 		}
@@ -1931,7 +1970,7 @@ void tms9995_device::mem_write()
 	{
 		// This is an off-chip access
 		m_check_ready = true;
-		UINT16 address = m_address;
+		uint16_t address = m_address;
 		switch (m_mem_phase)
 		{
 		case 1:
@@ -1939,7 +1978,7 @@ void tms9995_device::mem_write()
 			// If this is a word access, 4 passes, else 2 passes
 			if (!m_dbin_line.isnull()) m_dbin_line(CLEAR_LINE);
 
-			if (m_word_access || !m_instruction->byteop)
+			if (m_word_access || !m_byteop)
 			{
 				m_pass = 4;
 				address &= 0xfffe;
@@ -2000,7 +2039,7 @@ void tms9995_device::return_with_address()
 {
 	// Return from operand address derivation
 	// The result should be in m_address
-	m_instruction->program = m_caller;
+	m_index = m_caller_index;
 	MPC = m_caller_MPC; // will be increased on return
 	m_address = m_current_value + m_address_add;
 	if (TRACE_DETAIL) logerror("+++ return from operand address derivation +++\n");
@@ -2014,7 +2053,7 @@ void tms9995_device::return_with_address()
 void tms9995_device::return_with_address_copy()
 {
 	// Return from operand address derivation
-	m_instruction->program = m_caller;
+	m_index = m_caller_index;
 	MPC = m_caller_MPC; // will be increased on return
 	m_address = m_address_saved;
 	if (TRACE_DETAIL) logerror("+++ return from operand address derivation (auto inc) +++\n");
@@ -2111,8 +2150,8 @@ void tms9995_device::cru_output_operation()
 
 void tms9995_device::cru_input_operation()
 {
-	UINT16 crubit;
-	UINT8 crubyte;
+	uint16_t crubit;
+	uint8_t crubyte;
 
 	// Reading is different, since MESS uses 8 bit transfers
 	// We read 8 bits in one go, then iterate another min(n-1,7) times to allow
@@ -2138,7 +2177,6 @@ void tms9995_device::cru_input_operation()
 		{
 			m_cru_read >>= offset;
 			m_cru_bits_left -= offset;
-			m_parity = 0;
 			m_cru_value = 0;
 			m_cru_first_read = false;
 			m_pass = m_count;
@@ -2172,7 +2210,6 @@ void tms9995_device::cru_input_operation()
 	if (TRACE_CRU) logerror("CRU input operation, address %04x, value %d\n", m_cru_address, (crubit & 0x8000)>>15);
 
 	m_cru_value |= crubit;
-	if (crubit!=0) m_parity++;
 
 	m_cru_address = (m_cru_address + 2) & 0xfffe;
 	m_cru_bits_left--;
@@ -2219,7 +2256,7 @@ void tms9995_device::trigger_decrementer()
 
     input:
         m_get_destination
-        m_instruction
+        m_decoded[m_instindex]
         WP
         m_current_value
         m_address
@@ -2234,14 +2271,14 @@ void tms9995_device::trigger_decrementer()
     */
 void tms9995_device::operand_address_subprogram()
 {
-	UINT16 ircopy = m_instruction->IR;
+	uint16_t ircopy = IR;
 	if (m_get_destination) ircopy = ircopy >> 6;
 
 	// Save the return program and position
-	m_caller = m_instruction->program;
+	m_caller_index = m_index;
 	m_caller_MPC = MPC;
 
-	m_instruction->program = (UINT8*)operand_address_derivation;
+	m_index = m_operand_address_derivation_index;
 	MPC = (ircopy & 0x0030) >> 2;
 	m_regnumber = (ircopy & 0x000f);
 	m_address = (WP + (m_regnumber<<1)) & 0xffff;
@@ -2278,7 +2315,7 @@ void tms9995_device::operand_address_subprogram()
 void tms9995_device::increment_register()
 {
 	m_address_saved = m_current_value;  // need a special return so we do not lose the value
-	m_current_value += m_instruction->byteop? 1 : 2;
+	m_current_value += m_byteop? 1 : 2;
 	m_address = (WP + (m_regnumber<<1)) & 0xffff;
 	m_mem_phase = 1;
 	pulse_clock(1);
@@ -2301,7 +2338,7 @@ void tms9995_device::indexed_addressing()
 void tms9995_device::set_immediate()
 {
 	// Need to determine the register address
-	m_address_saved = WP + ((m_instruction->IR & 0x000f)<<1);
+	m_address_saved = WP + ((IR & 0x000f)<<1);
 	m_address = PC;
 	m_source_value = m_current_value;       // needed for AI, ANDI, ORI
 	PC = (PC + 2) & 0xfffe;
@@ -2319,7 +2356,7 @@ inline void tms9995_device::set_status_bit(int bit, bool state)
 	m_int_overflow = (m_check_overflow && bit == ST_OV  && ((ST & ST_OE)!=0) && state == true);
 }
 
-void tms9995_device::set_status_parity(UINT8 value)
+void tms9995_device::set_status_parity(uint8_t value)
 {
 	int count = 0;
 	for (int i=0; i < 8; i++)
@@ -2330,11 +2367,11 @@ void tms9995_device::set_status_parity(UINT8 value)
 	set_status_bit(ST_OP, (count & 1)!=0);
 }
 
-inline void tms9995_device::compare_and_set_lae(UINT16 value1, UINT16 value2)
+inline void tms9995_device::compare_and_set_lae(uint16_t value1, uint16_t value2)
 {
 	set_status_bit(ST_EQ, value1 == value2);
 	set_status_bit(ST_LH, value1 > value2);
-	set_status_bit(ST_AGT, (INT16)value1 > (INT16)value2);
+	set_status_bit(ST_AGT, (int16_t)value1 > (int16_t)value2);
 }
 
 /**************************************************************************
@@ -2362,9 +2399,9 @@ void tms9995_device::alu_add_s_sxc()
 	// The destination address is still in m_address
 	// Prefetch will not change m_current_value and m_address
 
-	UINT32 dest_new = 0;
+	uint32_t dest_new = 0;
 
-	switch (m_instruction->command)
+	switch (m_command)
 	{
 	case A:
 	case AB:
@@ -2403,12 +2440,12 @@ void tms9995_device::alu_add_s_sxc()
 		break;
 	}
 
-	m_current_value = (UINT16)(dest_new & 0xffff);
+	m_current_value = (uint16_t)(dest_new & 0xffff);
 
-	compare_and_set_lae((UINT16)(dest_new & 0xffff),0);
-	if (m_instruction->byteop)
+	compare_and_set_lae((uint16_t)(dest_new & 0xffff),0);
+	if (m_byteop)
 	{
-		set_status_parity((UINT8)(dest_new>>8));
+		set_status_parity((uint8_t)(dest_new>>8));
 	}
 	if (TRACE_STATUS) logerror("ST = %04x (val=%04x)\n", ST, m_current_value);
 	// No clock pulse (will be done by prefetch)
@@ -2433,7 +2470,7 @@ void tms9995_device::alu_b()
 void tms9995_device::alu_blwp()
 {
 	int n = 1;
-	switch (m_instruction->state)
+	switch (m_inst_state)
 	{
 	case 0:
 		// new WP in m_current_value
@@ -2460,7 +2497,7 @@ void tms9995_device::alu_blwp()
 		if (TRACE_OP) logerror("Context switch complete; WP=%04x, PC=%04x, ST=%04x\n", WP, PC, ST);
 		break;
 	}
-	m_instruction->state++;
+	m_inst_state++;
 	pulse_clock(n);
 }
 
@@ -2473,9 +2510,9 @@ void tms9995_device::alu_c()
 	// value in m_current_value
 	// The destination address is still in m_address
 	// Prefetch will not change m_current_value and m_address
-	if (m_instruction->byteop)
+	if (m_byteop)
 	{
-		set_status_parity((UINT8)(m_source_value>>8));
+		set_status_parity((uint8_t)(m_source_value>>8));
 	}
 	compare_and_set_lae(m_source_value, m_current_value);
 	if (TRACE_STATUS) logerror("ST = %04x (val1=%04x, val2=%04x)\n", ST, m_source_value, m_current_value);
@@ -2495,7 +2532,7 @@ void tms9995_device::alu_ci()
 void tms9995_device::alu_clr_seto()
 {
 	if (TRACE_OP) logerror("clr/seto: Setting values for address %04x\n", m_address);
-	switch (m_instruction->command)
+	switch (m_command)
 	{
 	case CLR:
 		m_current_value = 0;
@@ -2513,17 +2550,17 @@ void tms9995_device::alu_clr_seto()
 void tms9995_device::alu_divide()
 {
 	int n=1;
-	UINT32 uval32;
+	uint32_t uval32;
 
 	bool overflow = true;
-	UINT16 value1;
+	uint16_t value1;
 
-	switch (m_instruction->state)
+	switch (m_inst_state)
 	{
 	case 0:
 		m_source_value = m_current_value;
 		// Set address of register
-		m_address = WP + ((m_instruction->IR >> 5) & 0x001e);
+		m_address = WP + ((IR >> 5) & 0x001e);
 		m_address_copy = m_address;
 		break;
 	case 1:
@@ -2569,7 +2606,7 @@ void tms9995_device::alu_divide()
 		m_address = m_address + 2;
 		break;
 	}
-	m_instruction->state++;
+	m_inst_state++;
 	pulse_clock(n);
 }
 
@@ -2584,11 +2621,11 @@ void tms9995_device::alu_divide_signed()
 {
 	int n=1;
 	bool overflow;
-	UINT16 w1, w2, dwait;
-	INT16 divisor;
-	INT32 dividend;
+	uint16_t w1, w2, dwait;
+	int16_t divisor;
+	int32_t dividend;
 
-	switch (m_instruction->state)
+	switch (m_inst_state)
 	{
 	case 0:
 		// Got the source value (divisor)
@@ -2649,8 +2686,8 @@ void tms9995_device::alu_divide_signed()
 		// We are here because there was no overflow
 		dividend = m_value_copy << 16 | m_current_value;
 		// Do the calculation
-		m_current_value =  (UINT16)(dividend / (INT16)m_source_value);
-		m_value_copy = (UINT16)(dividend % (INT16)m_source_value);
+		m_current_value =  (uint16_t)(dividend / (int16_t)m_source_value);
+		m_value_copy = (uint16_t)(dividend % (int16_t)m_source_value);
 		m_address = WP;
 
 		// As we have not implemented the real division algorithm we must
@@ -2671,7 +2708,7 @@ void tms9995_device::alu_divide_signed()
 		n = 0;
 		break;
 	}
-	m_instruction->state++;
+	m_inst_state++;
 	pulse_clock(n);
 }
 
@@ -2701,19 +2738,20 @@ void tms9995_device::alu_external()
 	// external code on the data bus. A special line decoder could then trigger
 	// a reset from outside.
 
-	if (m_instruction->command == IDLE)
+	if (m_command == IDLE)
 	{
 		if (TRACE_OP) logerror("Entering IDLE state\n");
 		m_idle_state = true;
 	}
 
-	if (m_instruction->command == RSET)
+	if (m_command == RSET)
 	{
 		ST &= 0xfff0;
 		if (TRACE_OP) logerror("RSET, new ST = %04x\n", ST);
 	}
 
-	if (!m_external_operation.isnull()) m_external_operation((m_instruction->IR >> 5) & 0x07, 1, 0xff);
+	if (!m_external_operation.isnull())
+		m_external_operation((IR >> 5) & 0x07, 1, 0xff);
 }
 
 /*
@@ -2721,25 +2759,25 @@ void tms9995_device::alu_external()
 */
 void tms9995_device::alu_f3()
 {
-	switch (m_instruction->state)
+	switch (m_inst_state)
 	{
 	case 0:
 		// We have the contents of the source in m_current_value and its address
 		// in m_address
 		m_source_value = m_current_value;
 		// Get register address
-		m_address = WP + ((m_instruction->IR >> 5) & 0x001e);
+		m_address = WP + ((IR >> 5) & 0x001e);
 		break;
 	case 1:
 		// Register contents -> m_current_value
 		// Source contents -> m_source_value
-		if (m_instruction->command == COC)
+		if (m_command == COC)
 		{
 			set_status_bit(ST_EQ, (m_current_value & m_source_value) == m_source_value);
 		}
 		else
 		{
-			if (m_instruction->command == CZC)
+			if (m_command == CZC)
 			{
 				set_status_bit(ST_EQ, (~m_current_value & m_source_value) == m_source_value);
 			}
@@ -2754,7 +2792,7 @@ void tms9995_device::alu_f3()
 		if (TRACE_STATUS) logerror("ST = %04x\n", ST);
 		break;
 	}
-	m_instruction->state++;
+	m_inst_state++;
 }
 
 /*
@@ -2762,11 +2800,11 @@ void tms9995_device::alu_f3()
 */
 void tms9995_device::alu_imm_arithm()
 {
-	UINT32 dest_new = 0;
+	uint32_t dest_new = 0;
 
 	// We have the register value in m_source_value, the register address in m_address_saved
 	// and the immediate value in m_current_value
-	switch (m_instruction->command)
+	switch (m_command)
 	{
 	case AI:
 		dest_new = m_current_value + m_source_value;
@@ -2784,7 +2822,7 @@ void tms9995_device::alu_imm_arithm()
 		break;
 	}
 
-	m_current_value = (UINT16)(dest_new & 0xffff);
+	m_current_value = (uint16_t)(dest_new & 0xffff);
 	compare_and_set_lae(m_current_value, 0);
 	m_address = m_address_saved;
 	if (TRACE_STATUS) logerror("ST = %04x (val=%04x)\n", ST, m_current_value);
@@ -2796,9 +2834,9 @@ void tms9995_device::alu_imm_arithm()
 void tms9995_device::alu_jump()
 {
 	bool cond = false;
-	INT8 displacement = (m_instruction->IR & 0xff);
+	int8_t displacement = (IR & 0xff);
 
-	switch (m_instruction->command)
+	switch (m_command)
 	{
 	case JMP:
 		cond = true;
@@ -2857,21 +2895,24 @@ void tms9995_device::alu_jump()
 */
 void tms9995_device::alu_ldcr()
 {
-	switch (m_instruction->state)
+	switch (m_inst_state)
 	{
 	case 0:
-		m_count = (m_instruction->IR >> 6) & 0x000f;
+		m_count = (IR >> 6) & 0x000f;
 		if (m_count==0) m_count = 16;
-		m_instruction->byteop = (m_count<9);
+		m_byteop = (m_count<9);
 		break;
 	case 1:
 		// We have read the byte or word into m_current_value.
 		compare_and_set_lae(m_current_value, 0);
 		if (TRACE_STATUS) logerror("ST = %04x (val=%04x)\n", ST, m_current_value);
-		if (m_instruction->byteop)
+
+		// Parity is computed from the complete byte, even when less than
+		// 8 bits are transferred (see [1]).
+		if (m_byteop)
 		{
 			m_current_value = (m_current_value>>8) & 0xff;
-			set_status_parity((UINT8)m_current_value);
+			set_status_parity((uint8_t)m_current_value);
 		}
 		m_cru_value = m_current_value;
 		m_address = WP + 24;
@@ -2881,7 +2922,7 @@ void tms9995_device::alu_ldcr()
 		m_cru_address = m_current_value;
 		break;
 	}
-	m_instruction->state++;
+	m_inst_state++;
 	pulse_clock(1);
 }
 
@@ -2902,7 +2943,7 @@ void tms9995_device::alu_li()
 void tms9995_device::alu_limi_lwpi()
 {
 	// The immediate value is in m_current_value
-	if (m_instruction->command == LIMI)
+	if (m_command == LIMI)
 	{
 		ST = (ST & 0xfff0) | (m_current_value & 0x000f);
 		if (TRACE_OP) logerror("LIMI sets ST = %04x\n", ST);
@@ -2921,7 +2962,7 @@ void tms9995_device::alu_limi_lwpi()
 */
 void tms9995_device::alu_lst_lwp()
 {
-	if (m_instruction->command==LST)
+	if (m_command==LST)
 	{
 		ST = m_current_value;
 		if (TRACE_OP) logerror("new ST = %04x\n", ST);
@@ -2943,9 +2984,9 @@ void tms9995_device::alu_lst_lwp()
 void tms9995_device::alu_mov()
 {
 	m_current_value = m_source_value;
-	if (m_instruction->byteop)
+	if (m_byteop)
 	{
-		set_status_parity((UINT8)(m_current_value>>8));
+		set_status_parity((uint8_t)(m_current_value>>8));
 	}
 	compare_and_set_lae(m_current_value, 0);
 	if (TRACE_STATUS) logerror("ST = %04x (val=%04x)\n", ST, m_current_value);
@@ -2958,18 +2999,18 @@ void tms9995_device::alu_mov()
 void tms9995_device::alu_multiply()
 {
 	int n = 0;
-	UINT32 result;
-	INT32 results;
+	uint32_t result;
+	int32_t results;
 
-	if (m_instruction->command==MPY)
+	if (m_command==MPY)
 	{
-		switch (m_instruction->state)
+		switch (m_inst_state)
 		{
 		case 0:
 			// m_current_value <- multiplier (source)
 			m_source_value = m_current_value;
 			// m_address is the second multiplier (in a register)
-			m_address = ((m_instruction->IR >> 5) & 0x001e) + WP;
+			m_address = ((IR >> 5) & 0x001e) + WP;
 			n = 1;
 			break;
 		case 1:
@@ -2989,9 +3030,9 @@ void tms9995_device::alu_multiply()
 			break;
 		}
 	}
-	else
+	else    // MPYS
 	{
-		switch (m_instruction->state)
+		switch (m_inst_state)
 		{
 		case 0:
 			// m_current_value <- multiplier (source)
@@ -3002,7 +3043,7 @@ void tms9995_device::alu_multiply()
 			break;
 		case 1:
 			// m_current_value <- register content
-			results = ((INT16)m_source_value) * ((INT16)m_current_value);
+			results = ((int16_t)m_source_value) * ((int16_t)m_current_value);
 			m_current_value = (results >> 16) & 0xffff;
 			m_value_copy = results & 0xffff;
 			// m_address is still the register
@@ -3015,13 +3056,13 @@ void tms9995_device::alu_multiply()
 			break;
 		}
 	}
-	m_instruction->state++;
+	m_inst_state++;
 	pulse_clock(n);
 }
 
 void tms9995_device::alu_rtwp()
 {
-	switch (m_instruction->state)
+	switch (m_inst_state)
 	{
 	case 0:
 		m_address = WP + 30;        // R15
@@ -3044,25 +3085,25 @@ void tms9995_device::alu_rtwp()
 		if (TRACE_OP) logerror("RTWP restored old context (WP=%04x, PC=%04x, ST=%04x)\n", WP, PC, ST);
 		break;
 	}
-	m_instruction->state++;
+	m_inst_state++;
 }
 
 void tms9995_device::alu_sbo_sbz()
 {
-	INT8 displacement;
+	int8_t displacement;
 
-	if (m_instruction->state==0)
+	if (m_inst_state==0)
 	{
 		m_address = WP + 24;
 	}
 	else
 	{
-		m_cru_value = (m_instruction->command==SBO)? 1 : 0;
-		displacement = (INT8)(m_instruction->IR & 0xff);
+		m_cru_value = (m_command==SBO)? 1 : 0;
+		displacement = (int8_t)(IR & 0xff);
 		m_cru_address = m_current_value + (displacement<<1);
 		m_count = 1;
 	}
-	m_instruction->state++;
+	m_inst_state++;
 	pulse_clock(1);
 }
 
@@ -3073,11 +3114,11 @@ void tms9995_device::alu_shift()
 {
 	bool carry = false;
 	bool overflow = false;
-	UINT16 sign = 0;
-	UINT32 value;
+	uint16_t sign = 0;
+	uint32_t value;
 	int count;
 
-	switch (m_instruction->state)
+	switch (m_inst_state)
 	{
 	case 0:
 		// we have the value of the register in m_current_value
@@ -3086,7 +3127,7 @@ void tms9995_device::alu_shift()
 		m_address_saved = m_address;
 		m_address = WP;
 		// store this in m_current_value where the R0 value will be put
-		m_current_value = (m_instruction->IR >> 4)& 0x000f;
+		m_current_value = (IR >> 4)& 0x000f;
 		if (m_current_value != 0)
 		{
 			// skip the next read operation
@@ -3110,11 +3151,11 @@ void tms9995_device::alu_shift()
 		// the clock at each single shift anyway.
 		// Also, it is easier to implement the status bit setting.
 		// Note that count is never 0
-		if (m_instruction->command == SRA) sign = value & 0x8000;
+		if (m_command == SRA) sign = value & 0x8000;
 
 		for (int i=0; i < count; i++)
 		{
-			switch (m_instruction->command)
+			switch (m_command)
 			{
 			case SRL:
 			case SRA:
@@ -3142,7 +3183,7 @@ void tms9995_device::alu_shift()
 		if (TRACE_STATUS) logerror("ST = %04x (val=%04x)\n", ST, m_current_value);
 		break;
 	}
-	m_instruction->state++;
+	m_inst_state++;
 }
 
 /*
@@ -3150,12 +3191,12 @@ void tms9995_device::alu_shift()
 */
 void tms9995_device::alu_single_arithm()
 {
-	UINT32 dest_new = 0;
-	UINT32 src_val = m_current_value & 0x0000ffff;
-	UINT16 sign = 0;
+	uint32_t dest_new = 0;
+	uint32_t src_val = m_current_value & 0x0000ffff;
+	uint16_t sign = 0;
 	bool check_ov = true;
 
-	switch (m_instruction->command)
+	switch (m_command)
 	{
 	case ABS:
 		// LAECO (from original word!)
@@ -3245,12 +3286,12 @@ void tms9995_device::alu_single_arithm()
 void tms9995_device::alu_stcr()
 {
 	int n = 1;
-	switch (m_instruction->state)
+	switch (m_inst_state)
 	{
 	case 0:
-		m_count = (m_instruction->IR >> 6) & 0x000f;
+		m_count = (IR >> 6) & 0x000f;
 		if (m_count == 0) m_count = 16;
-		m_instruction->byteop = (m_count < 9);
+		m_byteop = (m_count < 9);
 		break;
 	case 1:
 		m_address_saved = m_address;
@@ -3267,16 +3308,16 @@ void tms9995_device::alu_stcr()
 		m_address = m_address_saved;
 		compare_and_set_lae(m_current_value, 0);
 		n = 13;
-		if (m_instruction->byteop)
+		if (m_byteop)
 		{
-			set_status_parity((UINT8)m_current_value);
+			set_status_parity((uint8_t)m_current_value);
 			m_current_value <<= 8;
 		}
 		else n += 8;
 		if (TRACE_STATUS) logerror("ST = %04x (val=%04x)\n", ST, m_current_value);
 		break;
 	}
-	m_instruction->state++;
+	m_inst_state++;
 	pulse_clock(n);
 }
 
@@ -3287,8 +3328,8 @@ void tms9995_device::alu_stcr()
 */
 void tms9995_device::alu_stst_stwp()
 {
-	m_address = WP + ((m_instruction->IR & 0x000f)<<1);
-	m_current_value = (m_instruction->command==STST)? ST : WP;
+	m_address = WP + ((IR & 0x000f)<<1);
+	m_current_value = (m_command==STST)? ST : WP;
 }
 
 /*
@@ -3296,16 +3337,16 @@ void tms9995_device::alu_stst_stwp()
 */
 void tms9995_device::alu_tb()
 {
-	INT8 displacement;
+	int8_t displacement;
 
-	switch (m_instruction->state)
+	switch (m_inst_state)
 	{
 	case 0:
 		m_address = WP + 24;
 		pulse_clock(1);
 		break;
 	case 1:
-		displacement = (INT8)(m_instruction->IR & 0xff);
+		displacement = (int8_t)(IR & 0xff);
 		m_cru_address = m_current_value + (displacement<<1);
 		m_cru_first_read = true;
 		m_count = 1;
@@ -3316,7 +3357,7 @@ void tms9995_device::alu_tb()
 		if (TRACE_STATUS) logerror("ST = %04x\n", ST);
 		break;
 	}
-	m_instruction->state++;
+	m_inst_state++;
 }
 
 /*
@@ -3339,13 +3380,13 @@ void tms9995_device::alu_x()
 */
 void tms9995_device::alu_xop()
 {
-	switch (m_instruction->state)
+	switch (m_inst_state)
 	{
 	case 0:
 		// we have the source address in m_address
 		m_address_saved = m_address;
 		// Format is xxxx xxnn nnxx xxxx
-		m_address = 0x0040 + ((m_instruction->IR & 0x03c0)>>4);
+		m_address = 0x0040 + ((IR & 0x03c0)>>4);
 		pulse_clock(1);
 		break;
 	case 1:
@@ -3372,7 +3413,7 @@ void tms9995_device::alu_xop()
 		pulse_clock(1);
 		break;
 	case 5:
-		m_address = 0x0042 + ((m_instruction->IR & 0x03c0)>>4);
+		m_address = 0x0042 + ((IR & 0x03c0)>>4);
 		pulse_clock(1);
 		break;
 	case 6:
@@ -3380,7 +3421,7 @@ void tms9995_device::alu_xop()
 		set_status_bit(ST_X, true);
 		break;
 	}
-	m_instruction->state++;
+	m_inst_state++;
 }
 
 /*
@@ -3391,7 +3432,7 @@ void tms9995_device::alu_int()
 {
 	int pulse = 1;
 
-	switch (m_instruction->state)
+	switch (m_inst_state)
 	{
 	case 0:
 		PC = (PC - 2) & 0xfffe;
@@ -3453,42 +3494,42 @@ void tms9995_device::alu_int()
 
 		// If next instruction is MID opcode we will detect this in command_completed
 	}
-	m_instruction->state++;
+	m_inst_state++;
 	pulse_clock(pulse);
 }
 
 /**************************************************************************/
-UINT32 tms9995_device::execute_min_cycles() const
+uint32_t tms9995_device::execute_min_cycles() const
 {
 	return 2;
 }
 
-UINT32 tms9995_device::execute_max_cycles() const
+uint32_t tms9995_device::execute_max_cycles() const
 {
 	return 44;
 }
 
-UINT32 tms9995_device::execute_input_lines() const
+uint32_t tms9995_device::execute_input_lines() const
 {
 	return 2;
 }
 
-UINT32 tms9995_device::disasm_min_opcode_bytes() const
+uint32_t tms9995_device::disasm_min_opcode_bytes() const
 {
 	return 2;
 }
 
-UINT32 tms9995_device::disasm_max_opcode_bytes() const
+uint32_t tms9995_device::disasm_max_opcode_bytes() const
 {
 	return 6;
 }
 
-offs_t tms9995_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t tms9995_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( tms9995 );
-	return CPU_DISASSEMBLE_NAME(tms9995)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(tms9995)(this, stream, pc, oprom, opram, options);
 }
 
 
-const device_type TMS9995 = &device_creator<tms9995_device>;
-const device_type TMS9995_MP9537 = &device_creator<tms9995_mp9537_device>;
+DEFINE_DEVICE_TYPE(TMS9995, tms9995_device, "tms9995", "TMS9995")
+DEFINE_DEVICE_TYPE(TMS9995_MP9537, tms9995_mp9537_device, "tms9995_mp9537", "TMS9995-MP9537")

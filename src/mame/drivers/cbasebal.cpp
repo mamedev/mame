@@ -15,12 +15,15 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/cbasebal.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/kabuki.h"  // needed for decoding functions only
-#include "includes/cbasebal.h"
 #include "machine/eepromser.h"
 #include "sound/okim6295.h"
-#include "sound/2413intf.h"
+#include "sound/ym2413.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 /*************************************
@@ -99,7 +102,7 @@ static ADDRESS_MAP_START( cbasebal_map, AS_PROGRAM, 8, cbasebal_state )
 	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_SHARE("spriteram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, cbasebal_state )
+static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 8, cbasebal_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK("bank0d")
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1d")
 ADDRESS_MAP_END
@@ -255,7 +258,7 @@ void cbasebal_state::machine_reset()
 	m_scroll_y[1] = 0;
 }
 
-static MACHINE_CONFIG_START( cbasebal, cbasebal_state )
+static MACHINE_CONFIG_START( cbasebal )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 6000000)   /* ??? */
@@ -284,7 +287,7 @@ static MACHINE_CONFIG_START( cbasebal, cbasebal_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", 1056000, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_SOUND_ADD("ymsnd", YM2413, 3579545)
@@ -335,9 +338,9 @@ ROM_END
 
 DRIVER_INIT_MEMBER(cbasebal_state,cbasebal)
 {
-	UINT8 *src = memregion("maincpu")->base();
+	uint8_t *src = memregion("maincpu")->base();
 	int size = memregion("maincpu")->bytes();
-	m_decoded = std::make_unique<UINT8[]>(size);
+	m_decoded = std::make_unique<uint8_t[]>(size);
 	pang_decode(src, m_decoded.get(), size);
 	membank("bank1")->configure_entries(0, 32, src + 0x10000, 0x4000);
 	membank("bank0d")->set_base(m_decoded.get());

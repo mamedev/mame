@@ -15,15 +15,17 @@
     IMPLEMENTATION
 ***************************************************************************/
 
-const device_type BITBANGER = &device_creator<bitbanger_device>;
+DEFINE_DEVICE_TYPE(BITBANGER, bitbanger_device, "bitbanger", "Bitbanger")
 
 /*-------------------------------------------------
     ctor
 -------------------------------------------------*/
 
-bitbanger_device::bitbanger_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, BITBANGER, "Bitbanger", tag, owner, clock, "bitbanger", __FILE__),
-	device_image_interface(mconfig, *this)
+bitbanger_device::bitbanger_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, BITBANGER, tag, owner, clock),
+	device_image_interface(mconfig, *this),
+	m_interface(nullptr),
+	m_is_readonly(false)
 {
 }
 
@@ -33,7 +35,7 @@ bitbanger_device::bitbanger_device(const machine_config &mconfig, const char *ta
     native_output - outputs data to a file
 -------------------------------------------------*/
 
-void bitbanger_device::output(UINT8 data)
+void bitbanger_device::output(uint8_t data)
 {
 	if (exists())
 	{
@@ -46,7 +48,7 @@ void bitbanger_device::output(UINT8 data)
     native_input - inputs data from a file
 -------------------------------------------------*/
 
-UINT32 bitbanger_device::input(void *buffer, UINT32 length)
+uint32_t bitbanger_device::input(void *buffer, uint32_t length)
 {
 	if (exists())
 	{
@@ -68,30 +70,19 @@ void bitbanger_device::device_start(void)
 
 
 /*-------------------------------------------------
-    device_config_complete
--------------------------------------------------*/
-
-void bitbanger_device::device_config_complete(void)
-{
-	update_names(BITBANGER, "bitbngr", "bitb");
-}
-
-
-
-/*-------------------------------------------------
     call_load
 -------------------------------------------------*/
 
-bool bitbanger_device::call_load(void)
+image_init_result bitbanger_device::call_load(void)
 {
 	/* we don't need to do anything special */
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
-bool bitbanger_device::call_create(int format_type, option_resolution *format_options)
+image_init_result bitbanger_device::call_create(int format_type, util::option_resolution *format_options)
 {
 	/* we don't need to do anything special */
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 /*-------------------------------------------------

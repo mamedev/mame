@@ -1,32 +1,32 @@
 // license:BSD-3-Clause
 // copyright-holders:Barry Rodewald
 /*
- * cpc_rom.c
+ * cpc_rom.cpp
  * Amstrad CPC mountable ROM image device
  *
  */
 
 #include "emu.h"
 #include "cpc_rom.h"
-#include "includes/amstrad.h"
 
-const device_type CPC_ROM = &device_creator<cpc_rom_device>;
+DEFINE_DEVICE_TYPE(CPC_ROM, cpc_rom_device, "cpc_rom", "CPC ROM Box")
 
+SLOT_INTERFACE_EXTERN(cpc_exp_cards);
 
 //**************************************************************************
 //  DEVICE CONFIG INTERFACE
 //**************************************************************************
 
 // device machine config
-static MACHINE_CONFIG_FRAGMENT( cpc_rom )
-	MCFG_ROMSLOT_ADD("rom1")
-	MCFG_ROMSLOT_ADD("rom2")
-	MCFG_ROMSLOT_ADD("rom3")
-	MCFG_ROMSLOT_ADD("rom4")
-	MCFG_ROMSLOT_ADD("rom5")
-	MCFG_ROMSLOT_ADD("rom6")
-	MCFG_ROMSLOT_ADD("rom7")
-	MCFG_ROMSLOT_ADD("rom8")
+MACHINE_CONFIG_MEMBER( cpc_rom_device::device_add_mconfig )
+	MCFG_CPC_ROMSLOT_ADD("rom1")
+	MCFG_CPC_ROMSLOT_ADD("rom2")
+	MCFG_CPC_ROMSLOT_ADD("rom3")
+	MCFG_CPC_ROMSLOT_ADD("rom4")
+	MCFG_CPC_ROMSLOT_ADD("rom5")
+	MCFG_CPC_ROMSLOT_ADD("rom6")
+	MCFG_CPC_ROMSLOT_ADD("rom7")
+	MCFG_CPC_ROMSLOT_ADD("rom8")
 
 	// pass-through
 	MCFG_DEVICE_ADD("exp", CPC_EXPANSION_SLOT, 0)
@@ -38,18 +38,14 @@ static MACHINE_CONFIG_FRAGMENT( cpc_rom )
 MACHINE_CONFIG_END
 
 
-machine_config_constructor cpc_rom_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( cpc_rom );
-}
-
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
 
-cpc_rom_device::cpc_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, CPC_ROM, "ROM Box", tag, owner, clock, "cpc_rom", __FILE__),
-	device_cpc_expansion_card_interface(mconfig, *this)
+cpc_rom_device::cpc_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, CPC_ROM, tag, owner, clock),
+	device_cpc_expansion_card_interface(mconfig, *this),
+	m_rom(*this, "rom%u", 1)
 {
 }
 
@@ -73,23 +69,24 @@ void cpc_rom_device::device_reset()
 /*** ROM image device ***/
 
 // device type definition
-const device_type ROMSLOT = &device_creator<rom_image_device>;
+DEFINE_DEVICE_TYPE(CPC_ROMSLOT, cpc_rom_image_device, "cpc_rom_image", "CPC ROM image")
 
 //-------------------------------------------------
-//  rom_image_device - constructor
+//  cpc_rom_image_device - constructor
 //-------------------------------------------------
 
-rom_image_device::rom_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, ROMSLOT, "ROM image", tag, owner, clock, "rom_image", __FILE__),
-		device_image_interface(mconfig, *this), m_base(nullptr)
+cpc_rom_image_device::cpc_rom_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, CPC_ROMSLOT, tag, owner, clock)
+	, device_image_interface(mconfig, *this)
+	, m_base(nullptr)
 {
 }
 
 //-------------------------------------------------
-//  rom_image_device - destructor
+//  cpc_rom_image_device - destructor
 //-------------------------------------------------
 
-rom_image_device::~rom_image_device()
+cpc_rom_image_device::~cpc_rom_image_device()
 {
 }
 
@@ -97,7 +94,7 @@ rom_image_device::~rom_image_device()
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void rom_image_device::device_start()
+void cpc_rom_image_device::device_start()
 {
 	m_base = nullptr;
 }
@@ -105,12 +102,12 @@ void rom_image_device::device_start()
 /*-------------------------------------------------
     DEVICE_IMAGE_LOAD( rom )
 -------------------------------------------------*/
-bool rom_image_device::call_load()
+image_init_result cpc_rom_image_device::call_load()
 {
 	device_image_interface* image = this;
-	UINT64 size = image->length();
+	uint64_t size = image->length();
 
-	m_base = std::make_unique<UINT8[]>(16384);
+	m_base = std::make_unique<uint8_t[]>(16384);
 	if(size <= 16384)
 	{
 		image->fread(m_base.get(),size);
@@ -121,14 +118,14 @@ bool rom_image_device::call_load()
 		image->fread(m_base.get(),16384);
 	}
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 
 /*-------------------------------------------------
     DEVICE_IMAGE_UNLOAD( rom )
 -------------------------------------------------*/
-void rom_image_device::call_unload()
+void cpc_rom_image_device::call_unload()
 {
 	m_base = nullptr;
 }

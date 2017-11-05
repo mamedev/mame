@@ -150,6 +150,7 @@ private:
 	virtual void osd_exit() override;
 
 	void extract_video_config();
+	void output_oslog(const char *buffer);
 
 	sdl_options &m_options;
 };

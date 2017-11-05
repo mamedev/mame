@@ -20,10 +20,14 @@ probably an original bug?
 */
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
 #include "includes/iremipt.h"
+
+#include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "sound/ay8910.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 class spartanxtec_state : public driver_device
 {
@@ -41,10 +45,10 @@ public:
 		m_soundlatch(*this, "soundlatch")
 	{ }
 
-	required_shared_ptr<UINT8> m_m62_tileram;
-	required_shared_ptr<UINT8> m_spriteram;
-	required_shared_ptr<UINT8> m_scroll_lo;
-	required_shared_ptr<UINT8> m_scroll_hi;
+	required_shared_ptr<uint8_t> m_m62_tileram;
+	required_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<uint8_t> m_scroll_lo;
+	required_shared_ptr<uint8_t> m_scroll_hi;
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<palette_device> m_palette;
@@ -55,13 +59,12 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_spartanxtec(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_spartanxtec(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_PALETTE_INIT(spartanxtec);
 
 	tilemap_t*             m_bg_tilemap;
 	DECLARE_WRITE8_MEMBER(kungfum_tileram_w);
 	TILE_GET_INFO_MEMBER(get_kungfum_bg_tile_info);
-	DECLARE_WRITE8_MEMBER(spartanxtec_soundlatch_w);
 	DECLARE_WRITE8_MEMBER(a801_w);
 	DECLARE_WRITE8_MEMBER(sound_irq_ack);
 	DECLARE_WRITE8_MEMBER(irq_ack);
@@ -100,7 +103,7 @@ TILE_GET_INFO_MEMBER(spartanxtec_state::get_kungfum_bg_tile_info)
 
 void spartanxtec_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(spartanxtec_state::get_kungfum_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(spartanxtec_state::get_kungfum_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	m_bg_tilemap->set_scroll_rows(32);
 }
 
@@ -129,7 +132,7 @@ void spartanxtec_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &clip
 }
 
 
-UINT32 spartanxtec_state::screen_update_spartanxtec(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t spartanxtec_state::screen_update_spartanxtec(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// there are 4 sets of scroll registers
 	// how to split them isn't clear, 4 groups of 8 rows would be logical
@@ -159,12 +162,6 @@ UINT32 spartanxtec_state::screen_update_spartanxtec(screen_device &screen, bitma
 
 
 
-WRITE8_MEMBER(spartanxtec_state::spartanxtec_soundlatch_w)
-{
-	m_soundlatch->write(space, 0, data);
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-}
-
 WRITE8_MEMBER(spartanxtec_state::a801_w)
 {
 	if (data != 0xf0) printf("a801_w %02x\n", data);
@@ -180,7 +177,7 @@ static ADDRESS_MAP_START( spartanxtec_map, AS_PROGRAM, 8, spartanxtec_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc400, 0xc7ff) AM_RAM AM_SHARE("spriteram")
 
-	AM_RANGE(0x8000, 0x8000) AM_WRITE(spartanxtec_soundlatch_w)
+	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 
 	AM_RANGE(0x8100, 0x8100) AM_READ_PORT("DSW1")
 	AM_RANGE(0x8101, 0x8101) AM_READ_PORT("DSW2")
@@ -220,14 +217,14 @@ static ADDRESS_MAP_START( spartanxtec_sound_io, AS_IO, 8, spartanxtec_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x0000, 0x0000) AM_WRITE( sound_irq_ack )
 
-	AM_RANGE(0x0012, 0x0013) AM_DEVWRITE("ay3", ay8910_device, address_data_w)
-	AM_RANGE(0x0012, 0x0012) AM_DEVREAD("ay3", ay8910_device, data_r)
+	AM_RANGE(0x0012, 0x0013) AM_DEVWRITE("ay3", ay8912_device, address_data_w)
+	AM_RANGE(0x0012, 0x0012) AM_DEVREAD("ay3", ay8912_device, data_r)
 
-	AM_RANGE(0x0014, 0x0015) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
-	AM_RANGE(0x0014, 0x0014) AM_DEVREAD("ay1", ay8910_device, data_r)
+	AM_RANGE(0x0014, 0x0015) AM_DEVWRITE("ay1", ay8912_device, address_data_w)
+	AM_RANGE(0x0014, 0x0014) AM_DEVREAD("ay1", ay8912_device, data_r)
 
-	AM_RANGE(0x0018, 0x0019) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
-	AM_RANGE(0x0018, 0x0018) AM_DEVREAD("ay2", ay8910_device, data_r)
+	AM_RANGE(0x0018, 0x0019) AM_DEVWRITE("ay2", ay8912_device, address_data_w)
+	AM_RANGE(0x0018, 0x0018) AM_DEVREAD("ay2", ay8912_device, data_r)
 ADDRESS_MAP_END
 
 
@@ -337,7 +334,7 @@ void spartanxtec_state::machine_reset()
 PALETTE_INIT_MEMBER(spartanxtec_state, spartanxtec)
 {
 	// todo, proper weights for this bootleg PCB
-	const UINT8 *color_prom = memregion("cprom")->base();
+	const uint8_t *color_prom = memregion("cprom")->base();
 	for (int i = 0; i < 0x200; i++)
 	{
 		int r, g, b;
@@ -352,7 +349,7 @@ PALETTE_INIT_MEMBER(spartanxtec_state, spartanxtec)
 
 
 
-static MACHINE_CONFIG_START( spartanxtec, spartanxtec_state )
+static MACHINE_CONFIG_START( spartanxtec )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,4000000)         /* ? MHz */
@@ -384,12 +381,13 @@ static MACHINE_CONFIG_START( spartanxtec, spartanxtec_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_SOUND_ADD("ay1", AY8910, 1000000)
+	MCFG_SOUND_ADD("ay1", AY8912, 1000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_SOUND_ADD("ay2", AY8910, 1000000)
+	MCFG_SOUND_ADD("ay2", AY8912, 1000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_SOUND_ADD("ay3", AY8910, 1000000)
+	MCFG_SOUND_ADD("ay3", AY8912, 1000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 MACHINE_CONFIG_END
@@ -439,4 +437,4 @@ ROM_END
 
 
 
-GAME( 1987, spartanxtec,  kungfum,    spartanxtec, spartanxtec, driver_device,  0, ROT0, "bootleg (Tecfri)", "Spartan X (Tecfri hardware bootleg)", 0 )
+GAME( 1987, spartanxtec,  kungfum,    spartanxtec, spartanxtec, spartanxtec_state,  0, ROT0, "bootleg (Tecfri)", "Spartan X (Tecfri hardware bootleg)", 0 )

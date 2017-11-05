@@ -29,7 +29,7 @@
 		-- os = "macosx",
 
 		-- Which kinds of targets this action supports; remove those you don't.
-		valid_kinds = { "ConsoleApp", "WindowedApp", "SharedLib", "StaticLib" },
+		valid_kinds = { "ConsoleApp", "WindowedApp", "StaticLib", "SharedLib", "Bundle" },
 
 		-- Which programming languages this actions supports; remove those you don't.
 		valid_languages = { "C", "C++", "C#" },

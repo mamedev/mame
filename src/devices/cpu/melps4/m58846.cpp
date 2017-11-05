@@ -6,10 +6,11 @@
 
 */
 
+#include "emu.h"
 #include "m58846.h"
 
 
-const device_type M58846 = &device_creator<m58846_device>;
+DEFINE_DEVICE_TYPE(M58846, m58846_device, "m58846", "M58846")
 
 
 // internal memory maps
@@ -24,16 +25,16 @@ ADDRESS_MAP_END
 
 
 // device definitions
-m58846_device::m58846_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: melps4_cpu_device(mconfig, M58846, "M58846", tag, owner, clock, 11, ADDRESS_MAP_NAME(program_2kx9), 7, ADDRESS_MAP_NAME(data_128x4), 12 /* number of D pins */, 2 /* subroutine page */, 1 /* interrupt page */, "m58846", __FILE__), m_timer(nullptr)
+m58846_device::m58846_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: melps4_cpu_device(mconfig, M58846, tag, owner, clock, 11, ADDRESS_MAP_NAME(program_2kx9), 7, ADDRESS_MAP_NAME(data_128x4), 12 /* number of D pins */, 2 /* subroutine page */, 1 /* interrupt page */), m_timer(nullptr)
 { }
 
 
 // disasm
-offs_t m58846_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t m58846_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE(m58846);
-	return CPU_DISASSEMBLE_NAME(m58846)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(m58846)(this, stream, pc, oprom, opram, options);
 }
 
 
@@ -99,7 +100,7 @@ void m58846_device::device_timer(emu_timer &timer, device_timer_id id, int param
 	reset_timer();
 }
 
-void m58846_device::write_v(UINT8 data)
+void m58846_device::write_v(uint8_t data)
 {
 	// d0: enable timer 1 irq
 	// d1: enable timer 2 irq? (TODO)

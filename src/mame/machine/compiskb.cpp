@@ -6,7 +6,12 @@
 
 *********************************************************************/
 
+#include "emu.h"
 #include "compiskb.h"
+
+#include "cpu/mcs48/mcs48.h"
+
+#include "speaker.h"
 
 
 
@@ -23,7 +28,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type COMPIS_KEYBOARD = &device_creator<compis_keyboard_device>;
+DEFINE_DEVICE_TYPE(COMPIS_KEYBOARD, compis_keyboard_device, "compiskb", "Compis Keyboard")
 
 
 //-------------------------------------------------
@@ -40,49 +45,30 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *compis_keyboard_device::device_rom_region() const
+const tiny_rom_entry *compis_keyboard_device::device_rom_region() const
 {
 	return ROM_NAME( compis_keyboard );
 }
 
 
 //-------------------------------------------------
-//  ADDRESS_MAP( compis_keyboard_io )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( compis_keyboard_io, AS_IO, 8, compis_keyboard_device )
-	AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS) AM_READWRITE(bus_r, bus_w)
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READ(p1_r) AM_WRITENOP
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READ(p2_r) AM_WRITENOP
-	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_NOP
-	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_NOP
-ADDRESS_MAP_END
-
-
-//-------------------------------------------------
-//  MACHINE_DRIVER( compis_keyboard )
-//-------------------------------------------------
-
-static MACHINE_CONFIG_FRAGMENT( compis_keyboard )
-	MCFG_CPU_ADD(I8748_TAG, I8748, XTAL_2MHz)
-	MCFG_CPU_IO_MAP(compis_keyboard_io)
+MACHINE_CONFIG_MEMBER( compis_keyboard_device::device_add_mconfig )
+	MCFG_CPU_ADD(I8748_TAG, I8748, 2016000) // XTAL_4_032MHz/2 ???
+	MCFG_MCS48_PORT_BUS_IN_CB(READ8(compis_keyboard_device, bus_r))
+	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(compis_keyboard_device, bus_w))
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(compis_keyboard_device, p1_r))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(compis_keyboard_device, p2_r))
+	MCFG_MCS48_PORT_T0_IN_CB(NOOP) // ???
+	MCFG_MCS48_PORT_T1_IN_CB(NOOP) // ???
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor compis_keyboard_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( compis_keyboard );
-}
 
 
 //-------------------------------------------------
@@ -109,8 +95,8 @@ INPUT_PORTS_START( compis_keyboard )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("COMPIS ?") PORT_CODE(KEYCODE_F4) PORT_CHAR(UCHAR_MAMEKEY(F4))
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("COMPIS |") PORT_CODE(KEYCODE_F5) PORT_CHAR(UCHAR_MAMEKEY(F5))
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0_PAD) PORT_CHAR(UCHAR_MAMEKEY(0_PAD))
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 000") PORT_CODE(KEYCODE_ASTERISK)
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 00") PORT_CODE(KEYCODE_SLASH_PAD)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ASTERISK) PORT_CHAR(UCHAR_MAMEKEY(000_PAD))
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_CHAR(UCHAR_MAMEKEY(00_PAD))
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNUSED ) // 49
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNUSED ) // 52
@@ -235,19 +221,11 @@ ioport_constructor compis_keyboard_device::device_input_ports() const
 //  compis_keyboard_device - constructor
 //-------------------------------------------------
 
-compis_keyboard_device::compis_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, COMPIS_KEYBOARD, "Compis Keyboard", tag, owner, clock, "compiskb", __FILE__),
+compis_keyboard_device::compis_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, COMPIS_KEYBOARD, tag, owner, clock),
 		m_maincpu(*this, I8748_TAG),
 		m_speaker(*this, SPEAKER_TAG),
-		m_y1(*this, "Y1"),
-		m_y2(*this, "Y2"),
-		m_y3(*this, "Y3"),
-		m_y4(*this, "Y4"),
-		m_y5(*this, "Y5"),
-		m_y6(*this, "Y6"),
-		m_y7(*this, "Y7"),
-		m_y8(*this, "Y8"),
-		m_y9(*this, "Y9"),
+		m_y(*this, "Y%u", 1),
 		m_special(*this, "SPECIAL"),
 		m_out_tx_handler(*this),
 		m_bus(0xff),
@@ -332,19 +310,19 @@ WRITE8_MEMBER( compis_keyboard_device::bus_w )
 
 READ8_MEMBER( compis_keyboard_device::p1_r )
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	switch (m_keylatch)
 	{
-	case 1: data &= m_y1->read(); break;
-	case 2: data &= m_y2->read(); break;
-	case 3: data &= m_y3->read(); break;
-	case 4: data &= m_y4->read(); break;
-	case 5: data &= m_y5->read(); break;
-	case 6: data &= m_y6->read(); break;
-	case 7: data &= m_y7->read(); break;
-	case 8: data &= m_y8->read(); break;
-	case 9: data &= m_y9->read(); break;
+	case 1: data &= m_y[0]->read(); break;
+	case 2: data &= m_y[1]->read(); break;
+	case 3: data &= m_y[2]->read(); break;
+	case 4: data &= m_y[3]->read(); break;
+	case 5: data &= m_y[4]->read(); break;
+	case 6: data &= m_y[5]->read(); break;
+	case 7: data &= m_y[6]->read(); break;
+	case 8: data &= m_y[7]->read(); break;
+	case 9: data &= m_y[8]->read(); break;
 	}
 
 	return data;
@@ -357,19 +335,19 @@ READ8_MEMBER( compis_keyboard_device::p1_r )
 
 READ8_MEMBER( compis_keyboard_device::p2_r )
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	switch (m_keylatch)
 	{
-	case 1: data &= m_y1->read() >> 8; break;
-	case 2: data &= m_y2->read() >> 8; break;
-	case 3: data &= m_y3->read() >> 8; break;
-	case 4: data &= m_y4->read() >> 8; break;
-	case 5: data &= m_y5->read() >> 8; break;
-	case 6: data &= m_y6->read() >> 8; break;
-	case 7: data &= m_y7->read() >> 8; break;
-	case 8: data &= m_y8->read() >> 8; break;
-	case 9: data &= m_y9->read() >> 8; break;
+	case 1: data &= m_y[0]->read() >> 8; break;
+	case 2: data &= m_y[1]->read() >> 8; break;
+	case 3: data &= m_y[2]->read() >> 8; break;
+	case 4: data &= m_y[3]->read() >> 8; break;
+	case 5: data &= m_y[4]->read() >> 8; break;
+	case 6: data &= m_y[5]->read() >> 8; break;
+	case 7: data &= m_y[6]->read() >> 8; break;
+	case 8: data &= m_y[7]->read() >> 8; break;
+	case 9: data &= m_y[8]->read() >> 8; break;
 	}
 
 	data &= m_special->read();

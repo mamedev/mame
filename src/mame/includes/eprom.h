@@ -28,7 +28,7 @@ public:
 	required_device<atari_jsa_base_device> m_jsa;
 	int             m_screen_intensity;
 	int             m_video_disable;
-	UINT16          m_sync_data;
+	uint16_t          m_sync_data;
 	int         m_last_offset;
 	virtual void update_interrupts() override;
 	virtual void scanline_update(screen_device &screen, int scanline) override;
@@ -47,8 +47,8 @@ public:
 	DECLARE_MACHINE_RESET(eprom);
 	DECLARE_VIDEO_START(eprom);
 	DECLARE_VIDEO_START(guts);
-	UINT32 screen_update_eprom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_guts(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_eprom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_guts(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void update_palette();
 	optional_device<cpu_device> m_extra;
 	required_device<palette_device> m_palette;

@@ -9,6 +9,10 @@
 #include "emu.h"
 #include "nmk004.h"
 
+#include "sound/2203intf.h"
+#include "sound/okim6295.h"
+
+
 WRITE8_MEMBER( nmk004_device::write )
 {
 	machine().scheduler().synchronize();
@@ -26,7 +30,7 @@ WRITE8_MEMBER(nmk004_device::nmk004_port4_w)
 	// bit 0x08 toggles frequently but is connected to nothing?
 
 	// bit 0x01 is set to reset the 68k
-	m_systemcpu->set_input_line(INPUT_LINE_RESET, (data & 1) ? ASSERT_LINE : CLEAR_LINE);
+	m_reset_cb(BIT(data, 0) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 WRITE8_MEMBER(nmk004_device::nmk004_oki0_bankswitch_w)
@@ -72,17 +76,6 @@ static ADDRESS_MAP_START( nmk004_sound_mem_map, AS_PROGRAM, 8, nmk004_device )
 	AM_RANGE(0xfc02, 0xfc02) AM_WRITE(nmk004_oki1_bankswitch_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( nmk004_sound_io_map, AS_IO, 8, nmk004_device )
-	AM_RANGE(0xFFC8, 0xFFC8) AM_WRITE(nmk004_port4_w)
-ADDRESS_MAP_END
-
-
-static MACHINE_CONFIG_FRAGMENT( nmk004 )
-	MCFG_CPU_ADD("mcu",TMP90840, DERIVED_CLOCK(1,1)) // Toshiba TMP90C840AF in QFP64 package with 8Kbyte internal ROM
-	MCFG_CPU_PROGRAM_MAP(nmk004_sound_mem_map)
-	MCFG_CPU_IO_MAP(nmk004_sound_io_map)
-MACHINE_CONFIG_END
-
 
 ROM_START( nmk004 )
 	ROM_REGION( 0x2000, "mcu", 0 )
@@ -90,12 +83,12 @@ ROM_START( nmk004 )
 ROM_END
 
 
-const device_type NMK004 = &device_creator<nmk004_device>;
+DEFINE_DEVICE_TYPE(NMK004, nmk004_device, "nmk004", "NMK004")
 
-nmk004_device::nmk004_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, NMK004, "NMK004", tag, owner, clock, "nmk004", __FILE__),
+nmk004_device::nmk004_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, NMK004, tag, owner, clock),
 	m_cpu(*this, "mcu"),
-	m_systemcpu(*this, ":maincpu"),
+	m_reset_cb(*this),
 	to_nmk004(0xff),
 	to_main(0xff)
 {
@@ -107,24 +100,26 @@ nmk004_device::nmk004_device(const machine_config &mconfig, const char *tag, dev
 //-------------------------------------------------
 void nmk004_device::device_start()
 {
+	m_reset_cb.resolve_safe();
+
 	membank(":okibank1")->configure_entries(0, 4, memregion(":oki1")->base() + 0x20000, 0x20000);
 	membank(":okibank2")->configure_entries(0, 4, memregion(":oki2")->base() + 0x20000, 0x20000);
 }
 
 //-------------------------------------------------
-//  device_mconfig_additions - return a pointer to
-//  the device's machine fragment
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
-machine_config_constructor nmk004_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( nmk004  );
-}
+MACHINE_CONFIG_MEMBER( nmk004_device::device_add_mconfig )
+	MCFG_CPU_ADD("mcu",TMP90840, DERIVED_CLOCK(1,1)) // Toshiba TMP90C840AF in QFP64 package with 8Kbyte internal ROM
+	MCFG_CPU_PROGRAM_MAP(nmk004_sound_mem_map)
+	MCFG_TLCS90_PORT_P4_WRITE_CB(WRITE8(nmk004_device, nmk004_port4_w))
+MACHINE_CONFIG_END
 
 //-------------------------------------------------
 //  device_rom_region - return a pointer to the
 //  the device's ROM definitions
 //-------------------------------------------------
-const rom_entry *nmk004_device::device_rom_region() const
+const tiny_rom_entry *nmk004_device::device_rom_region() const
 {
 	return ROM_NAME(nmk004 );
 }

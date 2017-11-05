@@ -63,14 +63,16 @@ zooming might be wrong
 
 ***************************************************************************/
 
-
-
 #include "emu.h"
+#include "includes/taotaido.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
+#include "machine/vs9209.h"
 #include "sound/2610intf.h"
-#include "video/vsystem_spr.h"
-#include "includes/taotaido.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 #define TAOTAIDO_SHOW_ALL_INPUTS    0
 
@@ -78,26 +80,22 @@ zooming might be wrong
 void taotaido_state::machine_start()
 {
 	membank("soundbank")->configure_entries(0, 4, memregion("audiocpu")->base(), 0x8000);
-
-	save_item(NAME(m_pending_command));
 }
 
 
 READ16_MEMBER(taotaido_state::pending_command_r)
 {
 	/* Only bit 0 is tested */
-	return m_pending_command;
+	return m_soundlatch->pending_r();
 }
 
-WRITE16_MEMBER(taotaido_state::sound_command_w)
+WRITE8_MEMBER(taotaido_state::unknown_output_w)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		m_pending_command = 1;
-		soundlatch_byte_w(space, offset, data & 0xff);
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-	}
+	m_watchdog->write_line_ck(BIT(data, 7));
+
+	// Bits 5, 4 also used?
 }
+
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, taotaido_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x800000, 0x803fff) AM_RAM_WRITE(bgvideoram_w) AM_SHARE("bgram")  // bg ram?
@@ -106,31 +104,18 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, taotaido_state )
 	AM_RANGE(0xfe0000, 0xfeffff) AM_RAM                                     // main ram
 	AM_RANGE(0xffc000, 0xffcfff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    // palette ram
 	AM_RANGE(0xffe000, 0xffe3ff) AM_RAM AM_SHARE("scrollram")       // rowscroll / rowselect / scroll ram
-	AM_RANGE(0xffff80, 0xffff81) AM_READ_PORT("P1")
-	AM_RANGE(0xffff82, 0xffff83) AM_READ_PORT("P2")
-	AM_RANGE(0xffff84, 0xffff85) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xffff86, 0xffff87) AM_READ_PORT("DSW1")
-	AM_RANGE(0xffff88, 0xffff89) AM_READ_PORT("DSW2")
-	AM_RANGE(0xffff8a, 0xffff8b) AM_READ_PORT("DSW3")
-	AM_RANGE(0xffff8c, 0xffff8d) AM_READONLY                        // unknown
-	AM_RANGE(0xffff8e, 0xffff8f) AM_READ_PORT("JP")
-	AM_RANGE(0xffffa0, 0xffffa1) AM_READ_PORT("P3")                     // used only by taotaida
-	AM_RANGE(0xffffa2, 0xffffa3) AM_READ_PORT("P4")                     // used only by taotaida
+	AM_RANGE(0xffff80, 0xffff9f) AM_DEVREADWRITE8("io1", vs9209_device, read, write, 0x00ff)
+	AM_RANGE(0xffffa0, 0xffffbf) AM_DEVREADWRITE8("io2", vs9209_device, read, write, 0x00ff)
 	AM_RANGE(0xffff00, 0xffff0f) AM_WRITE(tileregs_w)
 	AM_RANGE(0xffff10, 0xffff11) AM_WRITENOP                        // unknown
 	AM_RANGE(0xffff20, 0xffff21) AM_WRITENOP                        // unknown - flip screen related
 	AM_RANGE(0xffff40, 0xffff47) AM_WRITE(sprite_character_bank_select_w)
-	AM_RANGE(0xffffc0, 0xffffc1) AM_WRITE(sound_command_w)              // seems right
+	AM_RANGE(0xffffc0, 0xffffc1) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)        // seems right
 	AM_RANGE(0xffffe0, 0xffffe1) AM_READ(pending_command_r) // guess - seems to be needed for all the sounds to work
 ADDRESS_MAP_END
 
 /* sound cpu - same as aerofgt */
 
-
-WRITE8_MEMBER(taotaido_state::pending_command_clear_w)
-{
-	m_pending_command = 0;
-}
 
 WRITE8_MEMBER(taotaido_state::sh_bankswitch_w)
 {
@@ -147,8 +132,8 @@ static ADDRESS_MAP_START( sound_port_map, AS_IO, 8, taotaido_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
 	AM_RANGE(0x04, 0x04) AM_WRITE(sh_bankswitch_w)
-	AM_RANGE(0x08, 0x08) AM_WRITE(pending_command_clear_w)
-	AM_RANGE(0x0c, 0x0c) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x08, 0x08) AM_DEVWRITE("soundlatch", generic_latch_8_device, acknowledge_w)
+	AM_RANGE(0x0c, 0x0c) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
 
@@ -359,7 +344,7 @@ GFXDECODE_END
 
 
 
-static MACHINE_CONFIG_START( taotaido, taotaido_state )
+static MACHINE_CONFIG_START( taotaido )
 	MCFG_CPU_ADD("maincpu", M68000, 32000000/2)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", taotaido_state,  irq1_line_hold)
@@ -369,6 +354,22 @@ static MACHINE_CONFIG_START( taotaido, taotaido_state )
 	MCFG_CPU_IO_MAP(sound_port_map)
 								/* IRQs are triggered by the YM2610 */
 
+	MCFG_DEVICE_ADD("io1", VS9209, 0)
+	MCFG_VS9209_IN_PORTA_CB(IOPORT("P1"))
+	MCFG_VS9209_IN_PORTB_CB(IOPORT("P2"))
+	MCFG_VS9209_IN_PORTC_CB(IOPORT("SYSTEM"))
+	MCFG_VS9209_IN_PORTD_CB(IOPORT("DSW1"))
+	MCFG_VS9209_IN_PORTE_CB(IOPORT("DSW2"))
+	MCFG_VS9209_IN_PORTF_CB(IOPORT("DSW3"))
+	MCFG_VS9209_OUT_PORTG_CB(WRITE8(taotaido_state, unknown_output_w))
+	MCFG_VS9209_IN_PORTH_CB(IOPORT("JP"))
+
+	MCFG_DEVICE_ADD("io2", VS9209, 0)
+	MCFG_VS9209_IN_PORTA_CB(IOPORT("P3"))                   // used only by taotaida
+	MCFG_VS9209_IN_PORTB_CB(IOPORT("P4"))                   // used only by taotaida
+
+	MCFG_DEVICE_ADD("watchdog", MB3773, 0)
+
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", taotaido)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -377,7 +378,7 @@ static MACHINE_CONFIG_START( taotaido, taotaido_state )
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taotaido_state, screen_update)
-	MCFG_SCREEN_VBLANK_DRIVER(taotaido_state, screen_eof)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(taotaido_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 0x800)
@@ -390,6 +391,10 @@ static MACHINE_CONFIG_START( taotaido, taotaido_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, 8000000)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -469,6 +474,6 @@ ROM_START( taotaido3 )
 	ROM_LOAD( "u15.bin", 0x000000, 0x200000, CRC(e95823e9) SHA1(362583944ad4fdde4f9e29928cf34376c7ad931f) )
 ROM_END
 
-GAME( 1993, taotaido, 0,        taotaido, taotaido, driver_device, 0, ROT0, "Video System Co.", "Tao Taido (2 button version)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, taotaidoa,taotaido, taotaido, taotaido6,driver_device, 0, ROT0, "Video System Co.", "Tao Taido (6 button version)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE  ) // maybe a prototype? has various debug features
-GAME( 1993, taotaido3,taotaido, taotaido, taotaido3,driver_device, 0, ROT0, "Video System Co.", "Tao Taido (2/3 button version)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE  )
+GAME( 1993, taotaido,  0,        taotaido, taotaido,  taotaido_state, 0, ROT0, "Video System Co.", "Tao Taido (2 button version)",   MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, taotaidoa, taotaido, taotaido, taotaido6, taotaido_state, 0, ROT0, "Video System Co.", "Tao Taido (6 button version)",   MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // maybe a prototype? has various debug features
+GAME( 1993, taotaido3, taotaido, taotaido, taotaido3, taotaido_state, 0, ROT0, "Video System Co.", "Tao Taido (2/3 button version)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

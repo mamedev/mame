@@ -12,11 +12,14 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/ddribble.h"
+#include "includes/konamipt.h"
+
 #include "cpu/m6809/m6809.h"
 #include "machine/watchdog.h"
 #include "sound/2203intf.h"
-#include "includes/konamipt.h"
-#include "includes/ddribble.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 INTERRUPT_GEN_MEMBER(ddribble_state::ddribble_interrupt_0)
@@ -80,8 +83,6 @@ READ8_MEMBER(ddribble_state::ddribble_vlm5030_busy_r)
 
 WRITE8_MEMBER(ddribble_state::ddribble_vlm5030_ctrl_w)
 {
-	UINT8 *SPEECH_ROM = memregion("vlm")->base();
-
 	/* b7 : vlm data bus OE   */
 
 	/* b6 : VLM5030-RST       */
@@ -94,16 +95,16 @@ WRITE8_MEMBER(ddribble_state::ddribble_vlm5030_ctrl_w)
 	m_vlm->vcu(data & 0x10 ? 1 : 0);
 
 	/* b3 : ROM bank select   */
-	m_vlm->set_rom(&SPEECH_ROM[data & 0x08 ? 0x10000 : 0]);
+	membank("vlmbank")->set_entry(data & 0x08 ? 1 : 0);
 
 	/* b2 : SSG-C rc filter enable */
-	m_filter3->filter_rc_set_RC(FLT_RC_LOWPASS, 1000, 2200, 1000, data & 0x04 ? CAP_N(150) : 0); /* YM2203-SSG-C */
+	m_filter3->filter_rc_set_RC(filter_rc_device::LOWPASS, 1000, 2200, 1000, data & 0x04 ? CAP_N(150) : 0); /* YM2203-SSG-C */
 
 	/* b1 : SSG-B rc filter enable */
-	m_filter2->filter_rc_set_RC(FLT_RC_LOWPASS, 1000, 2200, 1000, data & 0x02 ? CAP_N(150) : 0); /* YM2203-SSG-B */
+	m_filter2->filter_rc_set_RC(filter_rc_device::LOWPASS, 1000, 2200, 1000, data & 0x02 ? CAP_N(150) : 0); /* YM2203-SSG-B */
 
 	/* b0 : SSG-A rc filter enable */
-	m_filter1->filter_rc_set_RC(FLT_RC_LOWPASS, 1000, 2200, 1000, data & 0x01 ? CAP_N(150) : 0); /* YM2203-SSG-A */
+	m_filter1->filter_rc_set_RC(filter_rc_device::LOWPASS, 1000, 2200, 1000, data & 0x01 ? CAP_N(150) : 0); /* YM2203-SSG-A */
 }
 
 
@@ -140,6 +141,10 @@ static ADDRESS_MAP_START( cpu2_map, AS_PROGRAM, 8, ddribble_state )
 	AM_RANGE(0x1000, 0x1001) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)    /* YM2203 */
 	AM_RANGE(0x3000, 0x3000) AM_DEVWRITE("vlm", vlm5030_device, data_w)          /* Speech data */
 	AM_RANGE(0x8000, 0xffff) AM_ROM                                     /* ROM */
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( vlm_map, 0, 8, ddribble_state )
+	AM_RANGE(0x0000, 0xffff) AM_ROMBANK("vlmbank")
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( ddribble )
@@ -226,6 +231,7 @@ GFXDECODE_END
 void ddribble_state::machine_start()
 {
 	membank("bank1")->configure_entries(0, 8, memregion("maincpu")->base(), 0x2000);
+	membank("vlmbank")->configure_entries(0, 2, memregion("vlm")->base(), 0x10000);
 
 	save_item(NAME(m_int_enable_0));
 	save_item(NAME(m_int_enable_1));
@@ -250,7 +256,7 @@ void ddribble_state::machine_reset()
 	m_charbank[1] = 0;
 }
 
-static MACHINE_CONFIG_START( ddribble, ddribble_state )
+static MACHINE_CONFIG_START( ddribble )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809,  XTAL_18_432MHz/12)  /* verified on pcb */
@@ -298,6 +304,7 @@ static MACHINE_CONFIG_START( ddribble, ddribble_state )
 
 	MCFG_SOUND_ADD("vlm", VLM5030, XTAL_3_579545MHz) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_DEVICE_ADDRESS_MAP(0, vlm_map)
 
 	MCFG_FILTER_RC_ADD("filter1", 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -372,5 +379,5 @@ ROM_START( ddribblep )
 	ROM_LOAD( "voice_10.d7", 0x10000, 0x10000, CRC(b4c97494) SHA1(93f7c3c93f6f790c3f480e183da0105b5ac3593b) )
 ROM_END
 
-GAME( 1986, ddribble,  0,        ddribble, ddribble, driver_device, 0, ROT0, "Konami", "Double Dribble", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, ddribblep, ddribble, ddribble, ddribble, driver_device, 0, ROT0, "Konami", "Double Dribble (prototype?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, ddribble,  0,        ddribble, ddribble, ddribble_state, 0, ROT0, "Konami", "Double Dribble", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, ddribblep, ddribble, ddribble, ddribble, ddribble_state, 0, ROT0, "Konami", "Double Dribble (prototype?)", MACHINE_SUPPORTS_SAVE )

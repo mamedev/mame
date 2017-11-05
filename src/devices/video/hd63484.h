@@ -7,16 +7,11 @@
 
 **************************************************************************/
 
+#ifndef MAME_VIDEO_HD63484_H
+#define MAME_VIDEO_HD63484_H
+
 #pragma once
 
-#ifndef __HD63484__
-#define __HD63484__
-
-
-#include "emu.h"
-
-
-typedef device_delegate<void (bitmap_ind16 &bitmap, const rectangle &cliprect, int y, int x, UINT16 data)> hd63484_display_delegate;
 
 
 /***************************************************************************
@@ -25,31 +20,33 @@ typedef device_delegate<void (bitmap_ind16 &bitmap, const rectangle &cliprect, i
 
 #define MCFG_HD63484_ADD(_tag, _clock, _map) \
 	MCFG_DEVICE_ADD(_tag, HD63484, _clock) \
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, _map)
+	MCFG_DEVICE_ADDRESS_MAP(0, _map)
 
 #define MCFG_HD63484_ADDRESS_MAP(_map) \
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, _map)
+	MCFG_DEVICE_ADDRESS_MAP(0, _map)
 
 #define MCFG_HD63484_DISPLAY_CALLBACK_OWNER(_class, _method) \
-	hd63484_device::static_set_display_callback(*device, hd63484_display_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	hd63484_device::static_set_display_callback(*device, hd63484_device::display_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
 
 #define MCFG_HD63484_AUTO_CONFIGURE_SCREEN(_val) \
 	hd63484_device::static_set_auto_configure_screen(*device, _val);
 
-#define HD63484_DISPLAY_PIXELS_MEMBER(_name) void _name(bitmap_ind16 &bitmap, const rectangle &cliprect, int y, int x, UINT16 data)
+#define HD63484_DISPLAY_PIXELS_MEMBER(_name) void _name(bitmap_ind16 &bitmap, const rectangle &cliprect, int y, int x, uint16_t data)
 
 
 // ======================> hd63484_device
 
-class hd63484_device :   public device_t,
+class hd63484_device :  public device_t,
 						public device_memory_interface,
 						public device_video_interface
 {
 public:
-	// construction/destruction
-	hd63484_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	typedef device_delegate<void (bitmap_ind16 &bitmap, const rectangle &cliprect, int y, int x, uint16_t data)> display_delegate;
 
-	static void static_set_display_callback(device_t &device, hd63484_display_delegate callback) { downcast<hd63484_device &>(device).m_display_cb = callback; }
+	// construction/destruction
+	hd63484_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	static void static_set_display_callback(device_t &device, display_delegate &&cb) { downcast<hd63484_device &>(device).m_display_cb = std::move(cb); }
 	static void static_set_auto_configure_screen(device_t &device, bool auto_configure_screen) { downcast<hd63484_device &>(device).m_auto_configure_screen = auto_configure_screen; }
 
 	DECLARE_WRITE16_MEMBER( address_w );
@@ -62,9 +59,9 @@ public:
 	DECLARE_READ8_MEMBER( status_r );
 	DECLARE_READ8_MEMBER( data_r );
 
-	UINT32 update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	virtual const rom_entry *device_rom_region() const override;
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
+	uint32_t update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual space_config_vector memory_space_config() const override;
 
 protected:
 	// device-level overrides
@@ -72,30 +69,30 @@ protected:
 	virtual void device_reset() override;
 	//virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
-	inline UINT16 readword(offs_t address);
-	inline void writeword(offs_t address, UINT16 data);
+	inline uint16_t readword(offs_t address);
+	inline void writeword(offs_t address, uint16_t data);
 
 private:
 	inline void inc_ar(int value);
 	inline void fifo_w_clear();
-	inline void queue_w(UINT8 data);
-	inline void dequeue_w(UINT8 *data);
+	inline void queue_w(uint8_t data);
+	inline void dequeue_w(uint8_t *data);
 	inline void fifo_r_clear();
-	inline void queue_r(UINT8 data);
-	inline void dequeue_r(UINT8 *data);
+	inline void queue_r(uint8_t data);
+	inline void dequeue_r(uint8_t *data);
 	inline void recompute_parameters();
 	inline void command_end_seq();
-	void calc_offset(INT16 x, INT16 y, UINT32 &offset, UINT8 &bit_pos);
+	void calc_offset(int16_t x, int16_t y, uint32_t &offset, uint8_t &bit_pos);
 	int get_bpp();
-	UINT16 get_dot(INT16 x, INT16 y);
-	bool set_dot(INT16 x, INT16 y, INT16 px, INT16 py);
-	bool set_dot(INT16 x, INT16 y, UINT16 color);
-	void draw_line(INT16 sx, INT16 sy, INT16 ex, INT16 ey);
-	void draw_ellipse(INT16 cx, INT16 cy, double dx, double dy, double s_angol, double e_angol, bool c);
-	void paint(INT16 sx, INT16 sy);
+	uint16_t get_dot(int16_t x, int16_t y);
+	bool set_dot(int16_t x, int16_t y, int16_t px, int16_t py);
+	bool set_dot(int16_t x, int16_t y, uint16_t color);
+	void draw_line(int16_t sx, int16_t sy, int16_t ex, int16_t ey);
+	void draw_ellipse(int16_t cx, int16_t cy, double dx, double dy, double s_angol, double e_angol, bool c);
+	void paint(int16_t sx, int16_t sy);
 
 	void command_wpr_exec();
-	UINT16 command_rpr_exec();
+	uint16_t command_rpr_exec();
 	void command_clr_exec();
 	void command_cpy_exec();
 	void command_rct_exec();
@@ -109,86 +106,86 @@ private:
 
 	void process_fifo();
 	void exec_abort_sequence();
-	UINT16 video_registers_r(int offset);
+	uint16_t video_registers_r(int offset);
 	void video_registers_w(int offset);
-	int translate_command(UINT16 data);
+	int translate_command(uint16_t data);
 	void draw_graphics_line(bitmap_ind16 &bitmap, const rectangle &cliprect, int vs, int y, int layer_n, bool active, bool ins_window);
 
 	void register_save_state();
 
-	hd63484_display_delegate  m_display_cb;
+	display_delegate  m_display_cb;
 	bool m_auto_configure_screen;
 
-	UINT8 m_ar;
-	UINT8 m_vreg[0x100];
-	UINT8 m_sr;
+	uint8_t m_ar;
+	uint8_t m_vreg[0x100];
+	uint8_t m_sr;
 
-	UINT8 m_fifo[16];                   /* FIFO W data queue */
+	uint8_t m_fifo[16];                   /* FIFO W data queue */
 	int m_fifo_ptr;                 /* FIFO W pointer */
 
-	UINT8 m_fifo_r[16];             /* FIFO R data queue */
+	uint8_t m_fifo_r[16];             /* FIFO R data queue */
 	int m_fifo_r_ptr;                   /* FIFO R pointer */
 
 
-	UINT16 m_cr;
-	UINT16 m_pr[0x100];                  /* parameter byte register */
+	uint16_t m_cr;
+	uint16_t m_pr[0x100];                  /* parameter byte register */
 	int m_param_ptr;                    /* parameter pointer */
 
-	UINT32 m_rwp[4];
-	UINT8 m_rwp_dn;
+	uint32_t m_rwp[4];
+	uint8_t m_rwp_dn;
 
-	UINT32 m_org_dpa;
-	UINT8 m_org_dn;
-	UINT8 m_org_dpd;
-	UINT16 m_cl0;
-	UINT16 m_cl1;
-	UINT16 m_ccmp;
-	UINT16 m_mask;
+	uint32_t m_org_dpa;
+	uint8_t m_org_dn;
+	uint8_t m_org_dpd;
+	uint16_t m_cl0;
+	uint16_t m_cl1;
+	uint16_t m_ccmp;
+	uint16_t m_mask;
 
-	INT16 m_cpx;
-	INT16 m_cpy;
+	int16_t m_cpx;
+	int16_t m_cpy;
 
-	UINT16 m_mwr[4];
-	UINT8  m_mwr_chr[4];
+	uint16_t m_mwr[4];
+	uint8_t  m_mwr_chr[4];
 
-	UINT32 m_sar[4];
-	UINT8 m_sda[4];
+	uint32_t m_sar[4];
+	uint8_t m_sda[4];
 
-	UINT16 m_pram[0x10];
-	UINT8 m_dn;
+	uint16_t m_pram[0x10];
+	uint8_t m_dn;
 
-	UINT16 m_ccr;
-	UINT16 m_omr;
-	UINT16 m_edg;
-	UINT16 m_dcr;
+	uint16_t m_ccr;
+	uint16_t m_omr;
+	uint16_t m_edg;
+	uint16_t m_dcr;
 
-	UINT16 m_hc, m_hds, m_hdw, m_hws, m_hww;
-	UINT16 m_sp[3];
-	UINT8 m_hsw;
+	uint16_t m_hc, m_hds, m_hdw, m_hws, m_hww;
+	uint16_t m_sp[3];
+	uint8_t m_hsw;
 
-	UINT16 m_vc, m_vws, m_vww, m_vds;
-	UINT8 m_vsw;
+	uint16_t m_vc, m_vws, m_vww, m_vds;
+	uint8_t m_vsw;
 
-	UINT16 m_ppy;
-	UINT16 m_pzcy;
-	UINT16 m_ppx;
-	UINT16 m_pzcx;
-	UINT16 m_psx;
-	UINT16 m_pex;
-	UINT16 m_pzx;
-	UINT16 m_psy;
-	UINT16 m_pzy;
-	UINT16 m_pey;
+	uint16_t m_ppy;
+	uint16_t m_pzcy;
+	uint16_t m_ppx;
+	uint16_t m_pzcx;
+	uint16_t m_psx;
+	uint16_t m_pex;
+	uint16_t m_pzx;
+	uint16_t m_psy;
+	uint16_t m_pzy;
+	uint16_t m_pey;
 
-	UINT16 m_xmin;
-	UINT16 m_ymin;
-	UINT16 m_xmax;
-	UINT16 m_ymax;
+	uint16_t m_xmin;
+	uint16_t m_ymin;
+	uint16_t m_xmax;
+	uint16_t m_ymax;
 
 	const address_space_config      m_space_config;
 };
 
 // device type definition
-extern const device_type HD63484;
+DECLARE_DEVICE_TYPE(HD63484, hd63484_device)
 
-#endif /* __HD63484_H__ */
+#endif // MAME_VIDEO_HD63484_H

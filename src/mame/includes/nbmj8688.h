@@ -42,8 +42,8 @@ public:
 	int m_flipscreen;
 	int m_screen_refresh;
 	std::unique_ptr<bitmap_ind16> m_tmpbitmap;
-	std::unique_ptr<UINT16[]> m_videoram;
-	std::unique_ptr<UINT8[]> m_clut;
+	std::unique_ptr<uint16_t[]> m_videoram;
+	std::unique_ptr<uint8_t[]> m_clut;
 	int m_flipscreen_old;
 	emu_timer *m_blitter_timer;
 
@@ -84,7 +84,7 @@ public:
 	DECLARE_VIDEO_START(mbmj8688_hybrid_12bit);
 	DECLARE_VIDEO_START(mbmj8688_pure_16bit);
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void vramflip();
 	void update_pixel(int x, int y);
 	void writeram_low(int x, int y, int color);

@@ -24,6 +24,7 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/timer.h"
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
 #include "cpu/z80/z80daisy.h"
@@ -35,47 +36,33 @@ class babbage_state : public driver_device
 {
 public:
 	babbage_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_pio_1(*this, "z80pio_1"),
-	m_pio_2(*this, "z80pio_2"),
-	m_ctc(*this, "z80ctc")
-	{ }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_pio_1(*this, "z80pio_1")
+		, m_pio_2(*this, "z80pio_2")
+		, m_ctc(*this, "z80ctc")
+		, m_keyboard(*this, "X%u", 0)
+		{ }
 
-	required_device<cpu_device> m_maincpu;
-	required_device<z80pio_device> m_pio_1;
-	required_device<z80pio_device> m_pio_2;
-	required_device<z80ctc_device> m_ctc;
 	DECLARE_READ8_MEMBER(pio2_a_r);
 	DECLARE_WRITE8_MEMBER(pio1_b_w);
 	DECLARE_WRITE8_MEMBER(pio2_b_w);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z0_w);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z1_w);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z2_w);
-	UINT8 m_segment;
-	UINT8 m_key;
-	UINT8 m_prev_key;
-	bool m_step;
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
 	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_callback);
+
+private:
+	uint8_t m_segment;
+	uint8_t m_key;
+	uint8_t m_prev_key;
+	bool m_step;
+	required_device<cpu_device> m_maincpu;
+	required_device<z80pio_device> m_pio_1;
+	required_device<z80pio_device> m_pio_2;
+	required_device<z80ctc_device> m_ctc;
+	required_ioport_array<4> m_keyboard;
 };
-
-
-
-/***************************************************************************
-
-    Machine
-
-***************************************************************************/
-
-void babbage_state::machine_start()
-{
-}
-
-void babbage_state::machine_reset()
-{
-}
 
 
 
@@ -195,16 +182,13 @@ static const z80_daisy_config babbage_daisy_chain[] =
 
 TIMER_DEVICE_CALLBACK_MEMBER(babbage_state::keyboard_callback)
 {
-	UINT8 i, j, inp;
-	char kbdrow[6];
-	UINT8 data = 0xff;
+	u8 inp, data = 0xff;
 
-	for (i = 0; i < 4; i++)
+	for (u8 i = 0; i < 4; i++)
 	{
-		sprintf(kbdrow,"X%X",i);
-		inp = ioport(kbdrow)->read();
+		inp = m_keyboard[i]->read();
 
-		for (j = 0; j < 5; j++)
+		for (u8 j = 0; j < 5; j++)
 			if (BIT(inp, j))
 				data = (j << 2) | i;
 	}
@@ -232,7 +216,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(babbage_state::keyboard_callback)
 
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( babbage, babbage_state )
+static MACHINE_CONFIG_START( babbage )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MAIN_CLOCK) //2.5MHz
 	MCFG_CPU_PROGRAM_MAP(babbage_map)
@@ -274,5 +258,5 @@ ROM_START(babbage)
 ROM_END
 
 
-/*    YEAR  NAME      PARENT  COMPAT  MACHINE     INPUT    INIT       COMPANY           FULLNAME */
-COMP( 1986, babbage,  0,      0,      babbage,    babbage, driver_device, 0,   "Mr Takafumi Aihara",  "Babbage-2nd" , MACHINE_NO_SOUND_HW )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE     INPUT    STATE          INIT  COMPANY               FULLNAME        FLAGS
+COMP( 1986, babbage,  0,      0,      babbage,    babbage, babbage_state, 0,    "Mr Takafumi Aihara", "Babbage-2nd" , MACHINE_NO_SOUND_HW )

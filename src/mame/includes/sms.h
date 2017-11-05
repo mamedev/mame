@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef SMS_H_
-#define SMS_H_
+#ifndef MAME_INCLUDES_SMS_H
+#define MAME_INCLUDES_SMS_H
 
 #define LOG_REG
 #define LOG_PAGING
@@ -21,10 +21,16 @@
 #define CONTROL1_TAG   "ctrl1"
 #define CONTROL2_TAG   "ctrl2"
 
-#include "bus/sega8/sega8_slot.h"
-#include "bus/sms_exp/smsexp.h"
-#include "bus/sms_ctrl/smsctrl.h"
 #include "bus/gamegear/ggext.h"
+#include "bus/sega8/sega8_slot.h"
+#include "bus/sg1000_exp/sg1000exp.h"
+#include "bus/sms_ctrl/smsctrl.h"
+#include "bus/sms_exp/smsexp.h"
+#include "sound/sn76496.h"
+#include "sound/ym2413.h"
+#include "video/315_5124.h"
+
+#include "screen.h"
 
 
 class sms_state : public driver_device
@@ -44,6 +50,7 @@ public:
 		m_port_gg_dc(*this, "GG_PORT_DC"),
 		m_port_pause(*this, "PAUSE"),
 		m_port_reset(*this, "RESET"),
+		m_port_rapid(*this, "RAPID"),
 		m_port_start(*this, "START"),
 		m_port_scope(*this, "SEGASCOPE"),
 		m_port_scope_binocular(*this, "SSCOPE_BINOCULAR"),
@@ -51,14 +58,13 @@ public:
 		m_region_maincpu(*this, "maincpu"),
 		m_mainram(nullptr),
 		m_is_gamegear(0),
-		m_is_gg_region_japan(0),
 		m_is_smsj(0),
 		m_is_mark_iii(0),
 		m_is_sdisp(0),
+		m_ioctrl_region_is_japan(0),
 		m_has_bios_0400(0),
 		m_has_bios_2000(0),
 		m_has_bios_full(0),
-		m_has_fm(0),
 		m_has_jpn_sms_cart_slot(0),
 		m_store_cart_selection_data(0) { }
 
@@ -76,6 +82,7 @@ public:
 	optional_ioport m_port_gg_dc;
 	optional_ioport m_port_pause;
 	optional_ioport m_port_reset;
+	optional_ioport m_port_rapid;
 	optional_ioport m_port_start;
 	optional_ioport m_port_scope;
 	optional_ioport m_port_scope_binocular;
@@ -83,8 +90,8 @@ public:
 
 	required_memory_region m_region_maincpu;
 	address_space *m_space;
-	std::unique_ptr<UINT8[]> m_mainram;
-	UINT8 *m_BIOS;
+	std::unique_ptr<uint8_t[]> m_mainram;
+	uint8_t *m_BIOS;
 
 	// for 3D glass binocular hack
 	device_t *m_left_lcd;
@@ -103,55 +110,62 @@ public:
 	std::unique_ptr<int[]> m_line_buffer;
 
 	// model identifiers
-	UINT8 m_is_gamegear;
-	UINT8 m_is_gg_region_japan;
-	UINT8 m_is_smsj;
-	UINT8 m_is_mark_iii;
-	UINT8 m_is_sdisp;
-	UINT8 m_has_bios_0400;
-	UINT8 m_has_bios_2000;
-	UINT8 m_has_bios_full;
-	UINT8 m_has_fm;
-	UINT8 m_has_jpn_sms_cart_slot;
+	uint8_t m_is_gamegear;
+	uint8_t m_is_smsj;
+	uint8_t m_is_mark_iii;
+	uint8_t m_is_sdisp;
+	uint8_t m_ioctrl_region_is_japan;
+	uint8_t m_has_bios_0400;
+	uint8_t m_has_bios_2000;
+	uint8_t m_has_bios_full;
+	uint8_t m_has_jpn_sms_cart_slot;
 
 	// [0] for 0x400-0x3fff, [1] for 0x4000-0x7fff, [2] for 0x8000-0xffff, [3] for 0x0000-0x0400
-	UINT8 m_bios_page[4];
+	uint8_t m_bios_page[4];
 
-	UINT8 m_bios_page_count;
-	UINT8 m_mapper[4];
-	UINT8 m_io_ctrl_reg;
-	UINT8 m_mem_ctrl_reg;
-	UINT8 m_mem_device_enabled;
-	UINT8 m_audio_control;
-	UINT8 m_port_dc_reg;
-	UINT8 m_port_dd_reg;
-	UINT8 m_gg_sio[5];
+	uint8_t m_bios_page_count;
+	uint8_t m_mapper[4];
+	uint8_t m_io_ctrl_reg;
+	uint8_t m_mem_ctrl_reg;
+	uint8_t m_mem_device_enabled;
+	uint8_t m_smsj_audio_control;
+	uint8_t m_port_dc_reg;
+	uint8_t m_port_dd_reg;
+	uint8_t m_gg_sio[5];
 	int m_paused;
 
-	UINT8 m_ctrl1_th_state;
-	UINT8 m_ctrl2_th_state;
-	UINT8 m_ctrl1_th_latch;
-	UINT8 m_ctrl2_th_latch;
+	uint8_t m_ctrl1_th_state;
+	uint8_t m_ctrl2_th_state;
+	uint8_t m_ctrl1_th_latch;
+	uint8_t m_ctrl2_th_latch;
 
 	// Data needed for Light Phaser
 	int m_lphaser_x_offs;   /* Needed to 'calibrate' lphaser; set at cart loading */
 
 	// Data needed for SegaScope (3D glasses)
-	UINT8 m_sscope_state;
-	UINT8 m_frame_sscope_state;
+	uint8_t m_sscope_state;
+	uint8_t m_frame_sscope_state;
+
+	// Data needed for Rapid button (smsj, sms1kr, sms1krfm)
+	uint16_t m_csync_counter;
+	uint8_t m_rapid_mode;
+	uint8_t m_rapid_read_state;
+	uint8_t m_rapid_last_dc;
+	uint8_t m_rapid_last_dd;
 
 	// slot devices
 	sega8_cart_slot_device *m_cartslot;
 	sega8_card_slot_device *m_cardslot;
-	sms_expansion_slot_device *m_expslot;
+	sms_expansion_slot_device *m_smsexpslot;
+	sg1000_expansion_slot_device *m_sgexpslot;
 
 	// these are only used by the Store Display unit, but we keep them here temporarily to avoid the need of separate start/reset
 	sega8_cart_slot_device *m_slots[16];
 	sega8_card_slot_device *m_cards[16];
-	UINT8 m_store_control;
-	UINT8 m_store_cart_selection_data;
+	uint8_t m_store_control;
+	uint8_t m_store_cart_selection_data;
 	void store_post_load();
-	void store_select_cart(UINT8 data);
+	void store_select_cart(uint8_t data);
 
 	DECLARE_READ8_MEMBER(read_0000);
 	DECLARE_READ8_MEMBER(read_4000);
@@ -168,20 +182,22 @@ public:
 	DECLARE_READ8_MEMBER(sms_input_port_dc_r);
 	DECLARE_READ8_MEMBER(sms_input_port_dd_r);
 	DECLARE_READ8_MEMBER(gg_input_port_00_r);
+	DECLARE_READ8_MEMBER(sg1000m3_peripheral_r);
+	DECLARE_WRITE8_MEMBER(sg1000m3_peripheral_w);
 	DECLARE_READ8_MEMBER(gg_sio_r);
 	DECLARE_WRITE8_MEMBER(gg_sio_w);
 	DECLARE_WRITE8_MEMBER(gg_psg_stereo_w);
 	DECLARE_WRITE8_MEMBER(gg_psg_w);
 	DECLARE_WRITE8_MEMBER(sms_psg_w);
-	DECLARE_READ8_MEMBER(sms_audio_control_r);
-	DECLARE_WRITE8_MEMBER(sms_audio_control_w);
-	DECLARE_WRITE8_MEMBER(sms_ym2413_register_port_w);
-	DECLARE_WRITE8_MEMBER(sms_ym2413_data_port_w);
+	DECLARE_READ8_MEMBER(smsj_audio_control_r);
+	DECLARE_WRITE8_MEMBER(smsj_audio_control_w);
+	DECLARE_WRITE8_MEMBER(smsj_ym2413_register_port_w);
+	DECLARE_WRITE8_MEMBER(smsj_ym2413_data_port_w);
 	DECLARE_READ8_MEMBER(sms_sscope_r);
 	DECLARE_WRITE8_MEMBER(sms_sscope_w);
 
-	DECLARE_WRITE_LINE_MEMBER(sms_int_callback);
 	DECLARE_WRITE_LINE_MEMBER(sms_pause_callback);
+	DECLARE_WRITE_LINE_MEMBER(sms_csync_callback);
 	DECLARE_WRITE_LINE_MEMBER(sms_ctrl1_th_input);
 	DECLARE_WRITE_LINE_MEMBER(sms_ctrl2_th_input);
 	DECLARE_WRITE_LINE_MEMBER(gg_ext_th_input);
@@ -195,6 +211,7 @@ public:
 	DECLARE_DRIVER_INIT(smskr);
 	DECLARE_DRIVER_INIT(smsj);
 	DECLARE_DRIVER_INIT(sms1);
+	DECLARE_DRIVER_INIT(sms);
 	DECLARE_MACHINE_START(sms);
 	DECLARE_MACHINE_RESET(sms);
 	DECLARE_VIDEO_START(gamegear);
@@ -202,19 +219,20 @@ public:
 	DECLARE_VIDEO_START(sms1);
 	DECLARE_VIDEO_RESET(sms1);
 
-	UINT32 screen_update_sms(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_sms1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_gamegear(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_sms(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_sms1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_gamegear(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void screen_gg_sms_mode_scaling(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void screen_vblank_sms1(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_sms1);
 
 protected:
-	UINT8 read_bus(address_space &space, unsigned int bank, UINT16 base_addr, UINT16 offset);
+	uint8_t read_bus(address_space &space, unsigned int bank, uint16_t base_addr, uint16_t offset);
 	void setup_bios();
 	void setup_media_slots();
 	void setup_enabled_slots();
 	void lphaser_hcount_latch();
 	void sms_get_inputs();
+	void smsj_set_audio_control(uint8_t data);
 };
 
 class smssdisp_state : public sms_state
@@ -247,4 +265,4 @@ public:
 #define IO_BIOS_ROM     (0x08)  /* BIOS ROM disabled (1= disabled, 0= enabled) */
 #define IO_CHIP         (0x04)  /* I/O chip disabled (1= disabled, 0= enabled) */
 
-#endif /* SMS_H_ */
+#endif // MAME_INCLUDES_SMS_H

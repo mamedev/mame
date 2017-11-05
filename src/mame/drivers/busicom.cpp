@@ -9,11 +9,12 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/i4004/i4004.h"
 #include "includes/busicom.h"
 
+#include "screen.h"
 
-UINT8 busicom_state::get_bit_selected(UINT32 val,int num)
+
+uint8_t busicom_state::get_bit_selected(uint32_t val,int num)
 {
 	int i;
 	for(i=0;i<num;i++) {
@@ -21,15 +22,15 @@ UINT8 busicom_state::get_bit_selected(UINT32 val,int num)
 	}
 	return 0;
 }
+
 READ8_MEMBER(busicom_state::keyboard_r)
 {
-	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7", "LINE8" , "LINE9"};
-	return ioport(keynames[get_bit_selected(m_keyboard_shifter & 0x3ff,10)])->read();
+	return m_input_lines[get_bit_selected(m_keyboard_shifter & 0x3ff, 10)]->read();
 }
 
 READ8_MEMBER(busicom_state::printer_r)
 {
-	UINT8 retVal = 0;
+	uint8_t retVal = 0;
 	if (m_drum_index==0) retVal |= 1;
 	retVal |= ioport("PAPERADV")->read() & 1 ? 8 : 0;
 	return retVal;
@@ -38,6 +39,7 @@ READ8_MEMBER(busicom_state::printer_r)
 
 WRITE8_MEMBER(busicom_state::shifter_w)
 {
+	// FIXME: detect edges, maybe make 4003 shifter a device
 	if (BIT(data,0)) {
 		m_keyboard_shifter <<= 1;
 		m_keyboard_shifter |= BIT(data,1);
@@ -86,9 +88,9 @@ WRITE8_MEMBER(busicom_state::printer_w)
 WRITE8_MEMBER(busicom_state::status_w)
 {
 #if 0
-	UINT8 mem_lamp = BIT(data,0);
-	UINT8 over_lamp = BIT(data,1);
-	UINT8 minus_lamp = BIT(data,2);
+	uint8_t mem_lamp = BIT(data,0);
+	uint8_t over_lamp = BIT(data,1);
+	uint8_t minus_lamp = BIT(data,2);
 #endif
 	//logerror("status %c %c %c\n",mem_lamp ? 'M':'x',over_lamp ? 'O':'x',minus_lamp ? '-':'x');
 }
@@ -97,23 +99,31 @@ WRITE8_MEMBER(busicom_state::printer_ctrl_w)
 {
 }
 
-static ADDRESS_MAP_START(busicom_rom, AS_PROGRAM, 8, busicom_state )
+static ADDRESS_MAP_START(busicom_rom, i4004_cpu_device::AS_ROM, 8, busicom_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x04FF) AM_ROM
+	AM_RANGE(0x0000, 0x04FF) AM_ROM AM_REGION("maincpu", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(busicom_mem, AS_DATA, 8, busicom_state )
+static ADDRESS_MAP_START(busicom_mem, i4004_cpu_device::AS_RAM_MEMORY, 8, busicom_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07F) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( busicom_io , AS_IO, 8, busicom_state )
+static ADDRESS_MAP_START(busicom_stat, i4004_cpu_device::AS_RAM_STATUS, 8, busicom_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00, 0x00) AM_WRITE(shifter_w) // ROM0 I/O
-	AM_RANGE(0x01, 0x01) AM_READWRITE(keyboard_r,printer_ctrl_w) // ROM1 I/O
-	AM_RANGE(0x02, 0x02) AM_READ(printer_r)  // ROM2 I/O
-	AM_RANGE(0x10, 0x10) AM_WRITE(printer_w) // RAM0 output
-	AM_RANGE(0x11, 0x11) AM_WRITE(status_w)  // RAM1 output
+	AM_RANGE(0x0000, 0x01F) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( busicom_rp, i4004_cpu_device::AS_ROM_PORTS, 8, busicom_state )
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0x000f) AM_MIRROR(0x0700) AM_WRITE(shifter_w) // ROM0 I/O
+	AM_RANGE(0x0010, 0x001f) AM_MIRROR(0x0700) AM_READWRITE(keyboard_r,printer_ctrl_w) // ROM1 I/O
+	AM_RANGE(0x0020, 0x002f) AM_MIRROR(0x0700) AM_READ(printer_r)  // ROM2 I/O
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( busicom_mp, i4004_cpu_device::AS_RAM_PORTS, 8, busicom_state )
+	AM_RANGE(0x00, 0x00) AM_WRITE(printer_w) // RAM0 output
+	AM_RANGE(0x01, 0x01) AM_WRITE(status_w)  // RAM1 output
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -181,11 +191,10 @@ INPUT_PORTS_END
 
 TIMER_DEVICE_CALLBACK_MEMBER(busicom_state::timer_callback)
 {
-	m_timer ^=1;
-	if (m_timer==1) m_drum_index++;
-	if (m_drum_index==13) m_drum_index=0;
-	m_maincpu->set_test(m_timer);
-
+	m_timer ^= 1;
+	if (m_timer == 1) m_drum_index++;
+	if (m_drum_index == 13) m_drum_index = 0;
+	m_maincpu->set_input_line(I4004_TEST_LINE, m_timer);
 }
 
 void busicom_state::machine_start()
@@ -210,13 +219,14 @@ void busicom_state::machine_reset()
 
 //static const char layout_busicom [] = "busicom";
 
-static MACHINE_CONFIG_START( busicom, busicom_state )
+static MACHINE_CONFIG_START( busicom )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I4004, 750000)
-	MCFG_CPU_PROGRAM_MAP(busicom_rom)
-	MCFG_CPU_DATA_MAP(busicom_mem)
-	MCFG_CPU_IO_MAP(busicom_io)
-
+	MCFG_CPU_ADD("maincpu", I4004, 750000)
+	MCFG_I4004_ROM_MAP(busicom_rom)
+	MCFG_I4004_RAM_MEMORY_MAP(busicom_mem)
+	MCFG_I4004_ROM_PORTS_MAP(busicom_rp)
+	MCFG_I4004_RAM_STATUS_MAP(busicom_stat)
+	MCFG_I4004_RAM_PORTS_MAP(busicom_mp)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -245,5 +255,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1974, busicom,  0,       0,   busicom,    busicom, driver_device,  0,  "Business Computer Corporation",   "Busicom 141-PF",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    STATE          INIT COMPANY                          FULLNAME          FLAGS
+COMP( 1974, busicom,  0,       0,   busicom,    busicom, busicom_state, 0,   "Business Computer Corporation", "Busicom 141-PF", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

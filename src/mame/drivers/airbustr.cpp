@@ -220,10 +220,13 @@ Code at 505: waits for bit 1 to go low, writes command, waits for bit
 */
 
 #include "emu.h"
+#include "includes/airbustr.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/2203intf.h"
 #include "sound/okim6295.h"
-#include "includes/airbustr.h"
+#include "speaker.h"
+
 
 /* Read/Write Handlers */
 READ8_MEMBER(airbustr_state::devram_r)
@@ -266,57 +269,34 @@ WRITE8_MEMBER(airbustr_state::master_nmi_trigger_w)
 
 WRITE8_MEMBER(airbustr_state::master_bankswitch_w)
 {
-	membank("bank1")->set_entry(data & 0x07);
+	membank("masterbank")->set_entry(data & 0x07);
 }
 
 WRITE8_MEMBER(airbustr_state::slave_bankswitch_w)
 {
-	membank("bank2")->set_entry(data & 0x07);
+	membank("slavebank")->set_entry(data & 0x07);
 
-	flip_screen_set(data & 0x10);
+	m_bg_tilemap->set_flip(BIT(data, 4) ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
+	m_fg_tilemap->set_flip(BIT(data, 4) ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
+	m_pandora->flip_screen_set(BIT(data, 4));
 
 	// used at the end of levels, after defeating the boss, to leave trails
-	m_pandora->set_clear_bitmap(data & 0x20);
+	m_pandora->set_clear_bitmap(BIT(data, 5));
 }
 
 WRITE8_MEMBER(airbustr_state::sound_bankswitch_w)
 {
-	membank("bank3")->set_entry(data & 0x07);
+	membank("audiobank")->set_entry(data & 0x07);
 }
 
 READ8_MEMBER(airbustr_state::soundcommand_status_r)
 {
 	// bits: 2 <-> ?    1 <-> soundlatch full   0 <-> soundlatch2 empty
-	return 4 + m_soundlatch_status * 2 + (1 - m_soundlatch2_status);
-}
-
-READ8_MEMBER(airbustr_state::soundcommand_r)
-{
-	m_soundlatch_status = 0;    // soundlatch has been read
-	return m_soundlatch->read(space, 0);
-}
-
-READ8_MEMBER(airbustr_state::soundcommand2_r)
-{
-	m_soundlatch2_status = 0;   // soundlatch2 has been read
-	return m_soundlatch2->read(space, 0);
-}
-
-WRITE8_MEMBER(airbustr_state::soundcommand_w)
-{
-	m_soundlatch->write(space, 0, data);
-	m_soundlatch_status = 1;    // soundlatch has been written
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE); // cause a nmi to sub cpu
-}
-
-WRITE8_MEMBER(airbustr_state::soundcommand2_w)
-{
-	m_soundlatch2->write(space, 0, data);
-	m_soundlatch2_status = 1;   // soundlatch2 has been written
+	return 4 | (m_soundlatch->pending_r() << 1) | !m_soundlatch2->pending_r();
 }
 
 
-WRITE8_MEMBER(airbustr_state::airbustr_coin_counter_w)
+WRITE8_MEMBER(airbustr_state::coin_counter_w)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 1);
 	machine().bookkeeping().coin_counter_w(1, data & 2);
@@ -327,7 +307,7 @@ WRITE8_MEMBER(airbustr_state::airbustr_coin_counter_w)
 /* Memory Maps */
 static ADDRESS_MAP_START( master_map, AS_PROGRAM, 8, airbustr_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("masterbank")
 	AM_RANGE(0xc000, 0xcfff) AM_DEVREADWRITE("pandora", kaneko_pandora_device, spriteram_r, spriteram_w)
 	AM_RANGE(0xd000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE("devram") // shared with protection device
@@ -343,11 +323,11 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( slave_map, AS_PROGRAM, 8, airbustr_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank2")
-	AM_RANGE(0xc000, 0xc3ff) AM_RAM_WRITE(airbustr_videoram2_w) AM_SHARE("videoram2")
-	AM_RANGE(0xc400, 0xc7ff) AM_RAM_WRITE(airbustr_colorram2_w) AM_SHARE("colorram2")
-	AM_RANGE(0xc800, 0xcbff) AM_RAM_WRITE(airbustr_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xcc00, 0xcfff) AM_RAM_WRITE(airbustr_colorram_w) AM_SHARE("colorram")
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("slavebank")
+	AM_RANGE(0xc000, 0xc3ff) AM_RAM_WRITE(videoram2_w) AM_SHARE("videoram2")
+	AM_RANGE(0xc400, 0xc7ff) AM_RAM_WRITE(colorram2_w) AM_SHARE("colorram2")
+	AM_RANGE(0xc800, 0xcbff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0xcc00, 0xcfff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0xd000, 0xd5ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xd600, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xefff) AM_RAM
@@ -357,19 +337,19 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( slave_io_map, AS_IO, 8, airbustr_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(slave_bankswitch_w)
-	AM_RANGE(0x02, 0x02) AM_READWRITE(soundcommand2_r, soundcommand_w)
-	AM_RANGE(0x04, 0x0c) AM_WRITE(airbustr_scrollregs_w)
+	AM_RANGE(0x02, 0x02) AM_DEVREAD("soundlatch2", generic_latch_8_device, read) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
+	AM_RANGE(0x04, 0x0c) AM_WRITE(scrollregs_w)
 	AM_RANGE(0x0e, 0x0e) AM_READ(soundcommand_status_r)
 	AM_RANGE(0x20, 0x20) AM_READ_PORT("P1")
 	AM_RANGE(0x22, 0x22) AM_READ_PORT("P2")
 	AM_RANGE(0x24, 0x24) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x28, 0x28) AM_WRITE(airbustr_coin_counter_w)
+	AM_RANGE(0x28, 0x28) AM_WRITE(coin_counter_w)
 	AM_RANGE(0x38, 0x38) AM_WRITENOP // irq ack / irq mask
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, airbustr_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank3")
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("audiobank")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 ADDRESS_MAP_END
 
@@ -378,7 +358,7 @@ static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, airbustr_state )
 	AM_RANGE(0x00, 0x00) AM_WRITE(sound_bankswitch_w)
 	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
 	AM_RANGE(0x04, 0x04) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0x06, 0x06) AM_READWRITE(soundcommand_r, soundcommand2_w)
+	AM_RANGE(0x06, 0x06) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_DEVWRITE("soundlatch2", generic_latch_8_device, write)
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -541,19 +521,10 @@ INTERRUPT_GEN_MEMBER(airbustr_state::slave_interrupt)
 
 void airbustr_state::machine_start()
 {
-	UINT8 *MASTER = memregion("master")->base();
-	UINT8 *SLAVE = memregion("slave")->base();
-	UINT8 *AUDIO = memregion("audiocpu")->base();
+	membank("masterbank")->configure_entries(0, 8, memregion("master")->base(), 0x4000);
+	membank("slavebank")->configure_entries(0, 8, memregion("slave")->base(), 0x4000);
+	membank("audiobank")->configure_entries(0, 8, memregion("audiocpu")->base(), 0x4000);
 
-	membank("bank1")->configure_entries(0, 3, &MASTER[0x00000], 0x4000);
-	membank("bank1")->configure_entries(3, 5, &MASTER[0x10000], 0x4000);
-	membank("bank2")->configure_entries(0, 3, &SLAVE[0x00000], 0x4000);
-	membank("bank2")->configure_entries(3, 5, &SLAVE[0x10000], 0x4000);
-	membank("bank3")->configure_entries(0, 3, &AUDIO[0x00000], 0x4000);
-	membank("bank3")->configure_entries(3, 5, &AUDIO[0x10000], 0x4000);
-
-	save_item(NAME(m_soundlatch_status));
-	save_item(NAME(m_soundlatch2_status));
 	save_item(NAME(m_bg_scrollx));
 	save_item(NAME(m_bg_scrolly));
 	save_item(NAME(m_fg_scrollx));
@@ -563,21 +534,16 @@ void airbustr_state::machine_start()
 
 void airbustr_state::machine_reset()
 {
-	m_soundlatch_status = m_soundlatch2_status = 0;
 	m_bg_scrollx = 0;
 	m_bg_scrolly = 0;
 	m_fg_scrollx = 0;
 	m_fg_scrolly = 0;
 	m_highbits = 0;
-
-	membank("bank1")->set_entry(0x02);
-	membank("bank2")->set_entry(0x02);
-	membank("bank3")->set_entry(0x02);
 }
 
 /* Machine Driver */
 
-static MACHINE_CONFIG_START( airbustr, airbustr_state )
+static MACHINE_CONFIG_START( airbustr )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("master", Z80, XTAL_12MHz/2)   /* verified on pcb */
@@ -607,8 +573,8 @@ static MACHINE_CONFIG_START( airbustr, airbustr_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(airbustr_state, screen_update_airbustr)
-	MCFG_SCREEN_VBLANK_DRIVER(airbustr_state, screen_eof_airbustr)
+	MCFG_SCREEN_UPDATE_DRIVER(airbustr_state, screen_update)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(airbustr_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", airbustr)
@@ -623,6 +589,8 @@ static MACHINE_CONFIG_START( airbustr, airbustr_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/4)   /* verified on pcb */
@@ -633,7 +601,7 @@ static MACHINE_CONFIG_START( airbustr, airbustr_state )
 	MCFG_SOUND_ROUTE(2, "mono", 0.25)
 	MCFG_SOUND_ROUTE(3, "mono", 0.50)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_12MHz/4, OKIM6295_PIN7_LOW)   /* verified on pcb */
+	MCFG_OKIM6295_ADD("oki", XTAL_12MHz/4, PIN7_LOW)   /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
@@ -646,17 +614,14 @@ MACHINE_CONFIG_END
 /* ROMs */
 
 ROM_START( airbustr )
-	ROM_REGION( 0x24000, "master", 0 )
-	ROM_LOAD( "pr12.h19",   0x00000, 0x0c000, CRC(91362eb2) SHA1(cd85acfa6542af68dd1cad46f9426a95cfc9432e) )
-	ROM_CONTINUE(           0x10000, 0x14000 )
+	ROM_REGION( 0x20000, "master", 0 )
+	ROM_LOAD( "pr12.h19",   0x00000, 0x20000, CRC(91362eb2) SHA1(cd85acfa6542af68dd1cad46f9426a95cfc9432e) )
 
-	ROM_REGION( 0x24000, "slave", 0 )
-	ROM_LOAD( "pr13.l15",   0x00000, 0x0c000, CRC(13b2257b) SHA1(325efa54e757a1f08caf81801930d61ea4e7b6d4) )
-	ROM_CONTINUE(           0x10000, 0x14000 )
+	ROM_REGION( 0x20000, "slave", 0 )
+	ROM_LOAD( "pr13.l15",   0x00000, 0x20000, CRC(13b2257b) SHA1(325efa54e757a1f08caf81801930d61ea4e7b6d4) )
 
-	ROM_REGION( 0x24000, "audiocpu", 0 )
-	ROM_LOAD( "pr-21.bin",  0x00000, 0x0c000, CRC(6e0a5df0) SHA1(616b7c7aaf52a9a55b63c60717c1866940635cd4) )
-	ROM_CONTINUE(           0x10000, 0x14000 )
+	ROM_REGION( 0x20000, "audiocpu", 0 )
+	ROM_LOAD( "pr-21.bin",  0x00000, 0x20000, CRC(6e0a5df0) SHA1(616b7c7aaf52a9a55b63c60717c1866940635cd4) )
 
 	ROM_REGION( 0x1000, "mcu", 0 ) //MCU is a 80c51 like DJ Boy / Heavy Unit?
 	ROM_LOAD( "i80c51", 0x0000, 0x1000, NO_DUMP )
@@ -673,17 +638,14 @@ ROM_START( airbustr )
 ROM_END
 
 ROM_START( airbustrj )
-	ROM_REGION( 0x24000, "master", 0 )
-	ROM_LOAD( "pr-14j.bin", 0x00000, 0x0c000, CRC(6b9805bd) SHA1(db6df33cf17316a4b81d7731dca9fe8bbf81f014) )
-	ROM_CONTINUE(           0x10000, 0x14000 )
+	ROM_REGION( 0x20000, "master", 0 )
+	ROM_LOAD( "pr-14j.bin", 0x00000, 0x20000, CRC(6b9805bd) SHA1(db6df33cf17316a4b81d7731dca9fe8bbf81f014) )
 
-	ROM_REGION( 0x24000, "slave", 0 )
-	ROM_LOAD( "pr-11j.bin", 0x00000, 0x0c000, CRC(85464124) SHA1(8cce8dfdede48032c40d5f155fd58061866668de) )
-	ROM_CONTINUE(           0x10000, 0x14000 )
+	ROM_REGION( 0x20000, "slave", 0 )
+	ROM_LOAD( "pr-11j.bin", 0x00000, 0x20000, CRC(85464124) SHA1(8cce8dfdede48032c40d5f155fd58061866668de) )
 
-	ROM_REGION( 0x24000, "audiocpu", 0 )
-	ROM_LOAD( "pr-21.bin",  0x00000, 0x0c000, CRC(6e0a5df0) SHA1(616b7c7aaf52a9a55b63c60717c1866940635cd4) )
-	ROM_CONTINUE(           0x10000, 0x14000 )
+	ROM_REGION( 0x20000, "audiocpu", 0 )
+	ROM_LOAD( "pr-21.bin",  0x00000, 0x20000, CRC(6e0a5df0) SHA1(616b7c7aaf52a9a55b63c60717c1866940635cd4) )
 
 	ROM_REGION( 0x1000, "mcu", 0 ) //MCU is a 80c51 like DJ Boy / Heavy Unit?
 	ROM_LOAD( "i80c51", 0x0000, 0x1000, NO_DUMP )
@@ -713,17 +675,14 @@ Rom 5 is on a piggyback daughterboard with a z80 and a PAL
 */
 
 ROM_START( airbustrb )
-	ROM_REGION( 0x24000, "master", 0 )
-	ROM_LOAD( "5.bin",   0x00000, 0x0c000, CRC(9e4216a2) SHA1(46572da4df5a67b10cc3ee21bdc0ec4bcecaaf93) )
-	ROM_CONTINUE(           0x10000, 0x14000 )
+	ROM_REGION( 0x20000, "master", 0 )
+	ROM_LOAD( "5.bin",   0x00000, 0x20000, CRC(9e4216a2) SHA1(46572da4df5a67b10cc3ee21bdc0ec4bcecaaf93) )
 
-	ROM_REGION( 0x24000, "slave", 0 )
-	ROM_LOAD( "1.bin",   0x00000, 0x0c000, CRC(85464124) SHA1(8cce8dfdede48032c40d5f155fd58061866668de) )
-	ROM_CONTINUE(           0x10000, 0x14000 )
+	ROM_REGION( 0x20000, "slave", 0 )
+	ROM_LOAD( "1.bin",   0x00000, 0x20000, CRC(85464124) SHA1(8cce8dfdede48032c40d5f155fd58061866668de) )
 
-	ROM_REGION( 0x24000, "audiocpu", 0 )
-	ROM_LOAD( "2.bin",  0x00000, 0x0c000, CRC(6e0a5df0) SHA1(616b7c7aaf52a9a55b63c60717c1866940635cd4) )
-	ROM_CONTINUE(           0x10000, 0x14000 )
+	ROM_REGION( 0x20000, "audiocpu", 0 )
+	ROM_LOAD( "2.bin",  0x00000, 0x20000, CRC(6e0a5df0) SHA1(616b7c7aaf52a9a55b63c60717c1866940635cd4) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
 	/* Same content as airbusj, pr-001.bin, different sized roms / interleave */
@@ -757,6 +716,6 @@ DRIVER_INIT_MEMBER(airbustr_state,airbustr)
 
 /* Game Drivers */
 
-GAME( 1990, airbustr,   0,        airbustr, airbustr, airbustr_state, airbustr, ROT0, "Kaneko (Namco license)", "Air Buster: Trouble Specialty Raid Unit (World)", MACHINE_SUPPORTS_SAVE ) // 891220
-GAME( 1990, airbustrj,  airbustr, airbustr, airbustrj, airbustr_state,airbustr, ROT0, "Kaneko (Namco license)", "Air Buster: Trouble Specialty Raid Unit (Japan)", MACHINE_SUPPORTS_SAVE)    // 891229
-GAME( 1990, airbustrb,  airbustr, airbustrb,airbustrj, driver_device,0,        ROT0, "bootleg", "Air Buster: Trouble Specialty Raid Unit (bootleg)", MACHINE_SUPPORTS_SAVE)    // based on Japan set (891229)
+GAME( 1990, airbustr,   0,        airbustr, airbustr,  airbustr_state, airbustr, ROT0, "Kaneko (Namco license)", "Air Buster: Trouble Specialty Raid Unit (World)",   MACHINE_SUPPORTS_SAVE ) // 891220
+GAME( 1990, airbustrj,  airbustr, airbustr, airbustrj, airbustr_state, airbustr, ROT0, "Kaneko (Namco license)", "Air Buster: Trouble Specialty Raid Unit (Japan)",   MACHINE_SUPPORTS_SAVE ) // 891229
+GAME( 1990, airbustrb,  airbustr, airbustrb,airbustrj, airbustr_state, 0,        ROT0, "bootleg",                "Air Buster: Trouble Specialty Raid Unit (bootleg)", MACHINE_SUPPORTS_SAVE ) // based on Japan set (891229)

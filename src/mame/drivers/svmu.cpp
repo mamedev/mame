@@ -16,9 +16,13 @@
 #include "cpu/lc8670/lc8670.h"
 #include "imagedev/snapquik.h"
 #include "machine/intelfsh.h"
-#include "sound/speaker.h"
+#include "sound/spkrdev.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
 #include "svmu.lh"
+
 
 #define     PIXEL_SIZE          7
 #define     PIXEL_DISTANCE      1
@@ -37,7 +41,7 @@ public:
 	required_device<lc8670_cpu_device> m_maincpu;
 	required_device<intelfsh8_device> m_flash;
 	required_device<speaker_sound_device> m_speaker;
-	required_region_ptr<UINT8> m_bios;
+	required_region_ptr<uint8_t> m_bios;
 
 	DECLARE_PALETTE_INIT(svmu);
 	virtual void machine_reset() override;
@@ -51,7 +55,7 @@ public:
 	DECLARE_QUICKLOAD_LOAD_MEMBER( svmu );
 
 private:
-	UINT8       m_page;
+	uint8_t       m_page;
 };
 
 
@@ -183,12 +187,12 @@ static LC8670_LCD_UPDATE( svmu_lcd_update )
 }
 
 
-inline void vmufat_write_byte(UINT8* flash, UINT8 block, offs_t offset, UINT8 data)
+inline void vmufat_write_byte(uint8_t* flash, uint8_t block, offs_t offset, uint8_t data)
 {
 	flash[(block * 512) + offset] = data;
 }
 
-inline void vmufat_write_word(UINT8* flash, UINT8 block, offs_t offset, UINT16 data)
+inline void vmufat_write_word(uint8_t* flash, uint8_t block, offs_t offset, uint16_t data)
 {
 	// 16-bit data are stored in little endian
 	flash[(block * 512) + offset + 0] = data & 0xff;
@@ -197,8 +201,8 @@ inline void vmufat_write_word(UINT8* flash, UINT8 block, offs_t offset, UINT16 d
 
 QUICKLOAD_LOAD_MEMBER( svmu_state, svmu )
 {
-	UINT32 size = image.length();
-	UINT8 *flash = (UINT8*)m_flash->space().get_read_ptr(0);
+	uint32_t size = image.length();
+	uint8_t *flash = m_flash->base();
 
 	image.fread(flash, size);
 
@@ -292,11 +296,11 @@ QUICKLOAD_LOAD_MEMBER( svmu_state, svmu )
 		vmufat_write_word(flash, 253, 0x1a, 0x0001);        // offset of header (in blocks) from file start
 	}
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 
-static MACHINE_CONFIG_START( svmu, svmu_state )
+static MACHINE_CONFIG_START( svmu )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", LC8670, XTAL_32_768kHz)
 	MCFG_CPU_PROGRAM_MAP(svmu_mem)
@@ -337,23 +341,46 @@ MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( svmu )
-	ROM_REGION( 0x10000, "bios", 0 )
-	ROM_DEFAULT_BIOS("jp1004")
-	// these ROMs come from the Sega Katana SDK and are scrambled, a simple way to restore it is to remove the first 4 bytes and xor the whole file for the xor key.
-	ROM_SYSTEM_BIOS(0, "jp1001", "VMS Japanese BIOS (v1.001)")
-	ROMX_LOAD("vmu1001.bin", 0x0000, 0x10000, CRC(e6339f4a) SHA1(688b2e1ff8c60bde6e8b07a2d2695cdacc07bd0c), ROM_BIOS(1))
-	ROM_SYSTEM_BIOS(1, "jp1002", "VMS Japanese BIOS (v1.002)")
-	ROMX_LOAD("vmu1002.bin", 0x0000, 0x10000, CRC(6c020d48) SHA1(9ee7c87d7b033235e0b315a0b421e70deb547c7a), ROM_BIOS(2))
-	ROM_SYSTEM_BIOS(2, "jp1004", "VMS Japanese BIOS (v1.004)")
-	ROMX_LOAD("vmu1004.bin", 0x0000, 0x10000, CRC(8e0f867a) SHA1(dc2fa2963138a1049a43f7f36439ad0a416ee8b4), ROM_BIOS(3))    // from Sega Katana SDK (original file: fbios.sbf, CRC: c7c77b3c, xor key: 0x37)
-	ROM_SYSTEM_BIOS(3, "jp1005", "VMS Japanese BIOS (v1.005)")
-	ROMX_LOAD("vmu1005.bin", 0x0000, 0x10000, CRC(47623324) SHA1(fca1aceff8a2f8c6826f3a865f4d5ef88dfd9ed1), ROM_BIOS(4))
-	ROM_SYSTEM_BIOS(4, "dev1004", "VMS Japanese Dev BIOS (v1.004)") // automatically boot the first game found in the flash
-	ROMX_LOAD( "vmsdev1004.bin", 0x0000, 0x10000, CRC(395e25f2) SHA1(37dea034322b5b80b35b2de784298d32c71ba7a3), ROM_BIOS(5))    // from Sega Katana SDK (original file: qbios.sbf, CRC: eed5524c, xor key: 0x43)
+	// some ROMs come from the Sega Katana SDK and are scrambled, a simple way to restore them is to remove the first 4 bytes and xor the whole file for the xor key.
+
+	ROM_REGION(0x10000, "bios", 0)
+	ROM_DEFAULT_BIOS("en1005b")
+
+	// Version 1.005,1999/04/28,315-6124-07,SEGA Visual Memory System BIOS Produced by Sue
+	ROM_SYSTEM_BIOS(0, "en1005a", "VMS English BIOS (1.005 1999/04/28)")
+	ROMX_LOAD("en1005-19990428-315-6124-07.bin", 0x0000, 0x10000, CRC(dfd77f4e) SHA1(4a7bfd1b8eb599d87883312df0bb48e0edd13034), ROM_BIOS(1)) // extracted with trojan
+
+	// Version 1.005,1999/10/26,315-6208-05,SEGA Visual Memory System BIOS Produced by Sue
+	ROM_SYSTEM_BIOS(1, "en1005b", "VMS English BIOS (1.005 1999/10/26)")
+	ROMX_LOAD("en1005-19991026-315-6208-05.bin", 0x0000, 0x10000, CRC(c825003a) SHA1(6242320d705c156f8369969d6caa8c737f01e4f3), ROM_BIOS(2)) // extracted with trojan
+
+	// Version 1.001,1998/05/28,315-6124-02,SEGA Visual Memory System BIOS Produced by Sue
+	ROM_SYSTEM_BIOS(2, "jp1001", "VMS Japanese BIOS (1.001 1998/05/28)")
+	ROMX_LOAD("jp1001-19980528-315-6124-02.bin", 0x0000, 0x10000, CRC(e6339f4a) SHA1(688b2e1ff8c60bde6e8b07a2d2695cdacc07bd0c), ROM_BIOS(3))
+
+	// Version 1.002,1998/06/04,315-6124-03,SEGA Visual Memory System BIOS Produced by Sue
+	ROM_SYSTEM_BIOS(3, "jp1002", "VMS Japanese BIOS (1.002 1998/06/04)")
+	ROMX_LOAD("jp1002-19980604-315-6124-03.bin", 0x0000, 0x10000, CRC(6c020d48) SHA1(9ee7c87d7b033235e0b315a0b421e70deb547c7a), ROM_BIOS(4))
+
+	// Version 1.004,1998/09/30,315-6208-01,SEGA Visual Memory System BIOS Produced by Sue
+	ROM_SYSTEM_BIOS(4, "jp1004", "VMS Japanese BIOS (1.004, 1998/09/30)")
+	ROMX_LOAD("jp1004-19980930-315-6208-01.bin", 0x0000, 0x10000, CRC(8e0f867a) SHA1(dc2fa2963138a1049a43f7f36439ad0a416ee8b4), ROM_BIOS(5)) // from Sega Katana SDK (original file: fbios.sbf, CRC: c7c77b3c, xor key: 0x37)
+
+	// Version 1.005,1998/12/09,315-6124-05,SEGA Visual Memory System BIOS Produced by Sue
+	ROM_SYSTEM_BIOS(5, "jp1005a", "VMS Japanese BIOS (1.005 1998/12/09)")
+	ROMX_LOAD("jp1005-19981209-315-6124-05.bin", 0x0000, 0x10000, CRC(47623324) SHA1(fca1aceff8a2f8c6826f3a865f4d5ef88dfd9ed1), ROM_BIOS(6))
+
+	// Version 1.005,1999/10/26,315-6028-04,SEGA Visual Memory System BIOS Produced by Sue
+	ROM_SYSTEM_BIOS(6, "jp1005b", "VMS Japanese BIOS (1.005 1999/10/26)")
+	ROMX_LOAD("jp1005-19991026-315-6028-04.bin", 0x0000, 0x10000, CRC(6cab02c2) SHA1(6cc2fbf4a67770988922117c300d006aa20899ac), ROM_BIOS(7)) // extracted with trojan
+
+	// Version 1.004,1998/09/30,315-6208-01,SEGA Visual Memory System BIOS Produced by Sue
+	ROM_SYSTEM_BIOS(7, "dev1004", "VMS Japanese Development BIOS (1.004 1998/09/30)") // automatically boot the first game found in the flash
+	ROMX_LOAD( "jp1004-19980930-315-6208-01-dev.bin", 0x0000, 0x10000, CRC(395e25f2) SHA1(37dea034322b5b80b35b2de784298d32c71ba7a3), ROM_BIOS(8)) // from Sega Katana SDK (original file: qbios.sbf, CRC: eed5524c, xor key: 0x43)
 ROM_END
 
 
 /* Driver */
 
-/*  YEAR  NAME  PARENT  COMPAT   MACHINE    INPUT   INIT    COMPANY   FULLNAME     FLAGS */
-COMP( 1998, svmu,   0,  0,  svmu ,  svmu , driver_device,   0, "Sega",   "Visual Memory Unit",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+/*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  STATE       INIT  COMPANY   FULLNAME               FLAGS */
+COMP( 1998, svmu, 0,      0,      svmu,    svmu,  svmu_state, 0,    "Sega",   "Visual Memory Unit",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

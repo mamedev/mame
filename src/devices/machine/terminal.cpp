@@ -1,6 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Miodrag Milanovic
+#include "emu.h"
 #include "machine/terminal.h"
+#include "screen.h"
+#include "speaker.h"
 
 #define KEYBOARD_TAG "keyboard"
 
@@ -8,7 +11,7 @@
     IMPLEMENTATION
 ***************************************************************************/
 
-static const UINT8 terminal_font[256*16] =
+static const uint8_t terminal_font[256*16] =
 {
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 	0x00, 0x10, 0x38, 0x7c, 0xfe, 0x7c, 0x38, 0x10, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -113,7 +116,7 @@ static const UINT8 terminal_font[256*16] =
 	0x00, 0x02, 0x02, 0x7a, 0x86, 0x82, 0x86, 0x7a, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x7c, 0x82, 0xfe, 0x80, 0x7c, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 	0x00, 0x1c, 0x22, 0x20, 0xf8, 0x20, 0x20, 0x20, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x7c, 0x84, 0x84, 0x7c, 0x04, 0x84, 0x78, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,//g
+	0x00, 0x00, 0x00, 0x7c, 0x84, 0x84, 0x7c, 0x04, 0x84, 0x78, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 	0x00, 0x80, 0x80, 0xbc, 0xc2, 0x82, 0x82, 0x82, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 	0x00, 0x10, 0x00, 0x30, 0x10, 0x10, 0x10, 0x7c, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 	0x00, 0x04, 0x00, 0x04, 0x04, 0x04, 0x04, 0x84, 0x84, 0x78, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -140,100 +143,106 @@ static const UINT8 terminal_font[256*16] =
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 };
 
-generic_terminal_device::generic_terminal_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		m_palette(*this, "palette"),
-		m_io_term_conf(*this, "TERM_CONF"),
-		m_x_pos(0),
-		m_framecnt(0),
-		m_y_pos(0),
-		m_keyboard_cb(*this)
+generic_terminal_device::generic_terminal_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, unsigned w, unsigned h)
+	: device_t(mconfig, type, tag, owner, clock)
+	, m_io_term_conf(*this, "TERM_CONF")
+	, m_width(w)
+	, m_height(h)
+	, m_buffer()
+	, m_x_pos(0)
+	, m_framecnt(0)
+	, m_y_pos(0)
+	, m_bell_timer(nullptr)
+	, m_beeper(*this, "beeper")
+	, m_keyboard_cb()
 {
 }
 
-generic_terminal_device::generic_terminal_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, GENERIC_TERMINAL, "Generic Terminal", tag, owner, clock, "generic_terminal", __FILE__),
-		m_palette(*this, "palette"),
-		m_io_term_conf(*this, "TERM_CONF"),
-		m_x_pos(0),
-		m_framecnt(0),
-		m_y_pos(0),
-		m_keyboard_cb(*this)
+generic_terminal_device::generic_terminal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: generic_terminal_device(mconfig, GENERIC_TERMINAL, tag, owner, clock, TERMINAL_WIDTH, TERMINAL_HEIGHT)
 {
 }
 
 void generic_terminal_device::scroll_line()
 {
-	memmove(m_buffer,m_buffer+TERMINAL_WIDTH,(TERMINAL_HEIGHT-1)*TERMINAL_WIDTH);
-	memset(m_buffer + TERMINAL_WIDTH*(TERMINAL_HEIGHT-1),0x20,TERMINAL_WIDTH);
+	memmove(m_buffer.get(), m_buffer.get() + m_width, (m_height - 1) * m_width);
+	memset(m_buffer.get() + (m_width * (m_height - 1)), 0x20, m_width);
 }
 
-void generic_terminal_device::write_char(UINT8 data)
+void generic_terminal_device::write_char(uint8_t data)
 {
-	m_buffer[m_y_pos*TERMINAL_WIDTH+m_x_pos] = data;
+	m_buffer[m_y_pos*m_width+m_x_pos] = data;
 	m_x_pos++;
-	if (m_x_pos >= TERMINAL_WIDTH)
+	if (m_x_pos >= m_width)
 	{
 		m_x_pos = 0;
 		m_y_pos++;
-		if (m_y_pos >= TERMINAL_HEIGHT)
+		if (m_y_pos >= m_height)
 		{
 			scroll_line();
-			m_y_pos = TERMINAL_HEIGHT-1;
+			m_y_pos = m_height-1;
 		}
 	}
 }
 
 void generic_terminal_device::clear()
 {
-	memset(m_buffer,0x20,TERMINAL_WIDTH*TERMINAL_HEIGHT);
+	std::fill_n(m_buffer.get(), m_width * m_height, 0x20);
 	m_x_pos = 0;
 	m_y_pos = 0;
 }
 
-void generic_terminal_device::term_write(UINT8 data)
+void generic_terminal_device::term_write(uint8_t data)
 {
 	if (data > 0x1f)
 	{
 		// printable char
-		if (data!=0x7f) write_char(data);
+		if (data != 0x7f) write_char(data);
 	}
 	else
 	{
+		const uint16_t options = m_io_term_conf->read();
 		switch(data)
 		{
-			case 0x07 : // bell
-					break;
+		case 0x07: // bell
+			m_beeper->set_state(1);
+			m_bell_timer->reset(attotime::from_msec(250));
+			break;
 
-			case 0x08:  if (m_x_pos) m_x_pos--;
-					break;
+		case 0x08: // backspace
+			if (m_x_pos) m_x_pos--;
+			break;
 
-			case 0x09:  m_x_pos = (m_x_pos & 0xf8) + 8;
-					if (m_x_pos >= TERMINAL_WIDTH)
-						m_x_pos = TERMINAL_WIDTH-1;
-					break;
+		case 0x09: // horizontal tab
+			m_x_pos = (std::min<uint8_t>)((m_x_pos & 0xf8) + 8, m_width - 1);
+			break;
 
-			case 0x0a:  m_y_pos++;
-					m_x_pos = 0;
-					if (m_y_pos >= TERMINAL_HEIGHT)
-					{
-						scroll_line();
-						m_y_pos = TERMINAL_HEIGHT-1;
-					}
-					break;
+		case 0x0d: // carriage return
+			m_x_pos = 0;
+			if (!(options & 0x080)) break;
 
-			case 0x0b:  if (m_y_pos) m_y_pos--;
-					break;
+		case 0x0a: // linefeed
+			m_y_pos++;
+			if (m_y_pos >= m_height)
+			{
+				scroll_line();
+				m_y_pos = m_height - 1;
+			}
+			if (options & 0x040) m_x_pos = 0;
+			break;
 
-			case 0x0c:  clear();
-					break;
+		case 0x0b: // vertical tab
+			if (m_y_pos) m_y_pos--;
+			break;
 
-			case 0x0d:  m_x_pos = 0;
-					break;
+		case 0x0c: // form feed
+			clear();
+			break;
 
-			case 0x1e:  m_x_pos = 0;
-					m_y_pos = 0;
-					break;
+		case 0x1e: // record separator
+			m_x_pos = 0;
+			m_y_pos = 0;
+			break;
 		}
 	}
 }
@@ -241,50 +250,49 @@ void generic_terminal_device::term_write(UINT8 data)
 /***************************************************************************
     VIDEO HARDWARE
 ***************************************************************************/
-UINT32 generic_terminal_device::update(screen_device &device, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t generic_terminal_device::update(screen_device &device, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	UINT8 options = m_io_term_conf->read();
-	UINT16 cursor = m_y_pos * TERMINAL_WIDTH + m_x_pos;
-	UINT8 y,ra,chr,gfx;
-	UINT16 sy=0,ma=0,x;
+	uint16_t const options = m_io_term_conf->read();
+	uint16_t const cursor = m_y_pos * m_width + m_x_pos;
+	uint16_t sy=0,ma=0;
 
-	switch (options & 0x30)
+	uint32_t font_color;
+	switch (options & 0x030)
 	{
-	case 0x10:
-		m_palette->set_pen_color(1, rgb_t(0xf7, 0xaa, 0x00));
+	case 0x010:
+		font_color = rgb_t(0xf7, 0xaa, 0x00);
 		break;
-	case 0x20:
-		m_palette->set_pen_color(1, rgb_t::white);
+	case 0x020:
+		font_color = rgb_t::white();
 		break;
 	default:
-		m_palette->set_pen_color(1, rgb_t(0x00, 0xff, 0x00));
+		font_color = rgb_t(0x00, 0xff, 0x00);
 		break;
 	}
-	pen_t font_color = m_palette->pen(1);
 
 	m_framecnt++;
 
-	for (y = 0; y < TERMINAL_HEIGHT; y++)
+	for (uint8_t y = 0; y < m_height; y++)
 	{
-		for (ra = 0; ra < 10; ra++)
+		for (uint8_t ra = 0; ra < 10; ra++)
 		{
-			UINT32  *p = &bitmap.pix32(sy++);
+			uint32_t *p = &bitmap.pix32(sy++);
 
-			for (x = ma; x < ma + TERMINAL_WIDTH; x++)
+			for (uint16_t x = ma; x < ma + m_width; x++)
 			{
-				chr = m_buffer[x];
-				gfx = terminal_font[(chr<<4) | ra ];
+				uint8_t const chr = m_buffer[x];
+				uint8_t gfx = terminal_font[(chr << 4) | ra];
 
-				if ((x == cursor) && (options & 1)) // at cursor position and want a cursor
+				if ((x == cursor) && (options & 0x001)) // at cursor position and want a cursor
 				{
 					if ((options & 2) || (ra == 9)) // block, or underline & at bottom line
 					{
-						if ((options & 4) && (m_framecnt & 8)) // want blink & time to blink
+						if ((options & 0x004) && (m_framecnt & 8)) // want blink & time to blink
 						{
 						}
 						else
 						{
-							if (options & 8)
+							if (options & 0x008)
 								gfx ^= 0xff; // invert
 							else
 								gfx |= 0xff; // overwrite
@@ -293,54 +301,53 @@ UINT32 generic_terminal_device::update(screen_device &device, bitmap_rgb32 &bitm
 				}
 
 				/* Display a scanline of a character */
-				*p++ = (BIT( gfx, 7 ))?font_color:0;
-				*p++ = (BIT( gfx, 6 ))?font_color:0;
-				*p++ = (BIT( gfx, 5 ))?font_color:0;
-				*p++ = (BIT( gfx, 4 ))?font_color:0;
-				*p++ = (BIT( gfx, 3 ))?font_color:0;
-				*p++ = (BIT( gfx, 2 ))?font_color:0;
-				*p++ = (BIT( gfx, 1 ))?font_color:0;
-				*p++ = (BIT( gfx, 0 ))?font_color:0;
+				*p++ = (BIT(gfx, 7)) ? font_color : 0;
+				*p++ = (BIT(gfx, 6)) ? font_color : 0;
+				*p++ = (BIT(gfx, 5)) ? font_color : 0;
+				*p++ = (BIT(gfx, 4)) ? font_color : 0;
+				*p++ = (BIT(gfx, 3)) ? font_color : 0;
+				*p++ = (BIT(gfx, 2)) ? font_color : 0;
+				*p++ = (BIT(gfx, 1)) ? font_color : 0;
+				*p++ = (BIT(gfx, 0)) ? font_color : 0;
 			}
 		}
-		ma+=TERMINAL_WIDTH;
+		ma += m_width;
 	}
 	return 0;
 }
 
-WRITE8_MEMBER( generic_terminal_device::kbd_put )
+void generic_terminal_device::kbd_put(u8 data)
 {
-	if (data)
-		send_key(data);
+	if (m_io_term_conf->read() & 0x100) term_write(data);
+	send_key(data);
 }
 
 /***************************************************************************
     VIDEO HARDWARE
 ***************************************************************************/
 
-static MACHINE_CONFIG_FRAGMENT( generic_terminal )
-	MCFG_SCREEN_ADD_MONOCHROME(TERMINAL_SCREEN_TAG, RASTER, rgb_t::green)
+MACHINE_CONFIG_MEMBER( generic_terminal_device::device_add_mconfig )
+	MCFG_SCREEN_ADD(TERMINAL_SCREEN_TAG, RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(TERMINAL_WIDTH*8, TERMINAL_HEIGHT*10)
-	MCFG_SCREEN_VISIBLE_AREA(0, TERMINAL_WIDTH*8-1, 0, TERMINAL_HEIGHT*10-1)
+	MCFG_SCREEN_SIZE(generic_terminal_device::TERMINAL_WIDTH*8, generic_terminal_device::TERMINAL_HEIGHT*10)
+	MCFG_SCREEN_VISIBLE_AREA(0, generic_terminal_device::TERMINAL_WIDTH*8-1, 0, generic_terminal_device::TERMINAL_HEIGHT*10-1)
 	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, generic_terminal_device, update)
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
-
 	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(WRITE8(generic_terminal_device, kbd_put))
-MACHINE_CONFIG_END
+	MCFG_GENERIC_KEYBOARD_CB(PUT(generic_terminal_device, kbd_put))
 
-machine_config_constructor generic_terminal_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME(generic_terminal);
-}
+	MCFG_SPEAKER_STANDARD_MONO("bell")
+	MCFG_SOUND_ADD("beeper", BEEP, 2'000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "bell", 0.25)
+MACHINE_CONFIG_END
 
 void generic_terminal_device::device_start()
 {
-	m_keyboard_cb.resolve_safe();
-	save_item(NAME(m_buffer));
+	m_buffer = std::make_unique<uint8_t []>(m_width * m_height);
+	m_bell_timer = timer_alloc(BELL_TIMER_ID);
+	m_keyboard_cb.bind_relative_to(*owner());
+	save_pointer(NAME(m_buffer.get()), m_width * m_height);
 	save_item(NAME(m_x_pos));
 	save_item(NAME(m_framecnt));
 	save_item(NAME(m_y_pos));
@@ -348,8 +355,19 @@ void generic_terminal_device::device_start()
 
 void generic_terminal_device::device_reset()
 {
+	m_beeper->set_state(0);
 	clear();
 	m_framecnt = 0;
+}
+
+void generic_terminal_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+	case BELL_TIMER_ID:
+		m_beeper->set_state(0);
+		break;
+	}
 }
 
 /*
@@ -391,22 +409,31 @@ Char  Dec  Oct  Hex | Char  Dec  Oct  Hex | Char  Dec  Oct  Hex | Char Dec  Oct 
 */
 INPUT_PORTS_START( generic_terminal )
 	PORT_START("TERM_CONF")
-	PORT_CONFNAME( 0x01, 0x01, "Cursor")
-	PORT_CONFSETTING(    0x00, DEF_STR(No))
-	PORT_CONFSETTING(    0x01, DEF_STR(Yes))
-	PORT_CONFNAME( 0x02, 0x02, "Type")
-	PORT_CONFSETTING(    0x00, "Underline")
-	PORT_CONFSETTING(    0x02, "Block")
-	PORT_CONFNAME( 0x04, 0x04, "Blinking")
-	PORT_CONFSETTING(    0x00, DEF_STR(No))
-	PORT_CONFSETTING(    0x04, DEF_STR(Yes))
-	PORT_CONFNAME( 0x08, 0x08, "Invert")
-	PORT_CONFSETTING(    0x00, DEF_STR(No))
-	PORT_CONFSETTING(    0x08, DEF_STR(Yes))
-	PORT_CONFNAME( 0x30, 0x00, "Color")
-	PORT_CONFSETTING(    0x00, "Green")
-	PORT_CONFSETTING(    0x10, "Amber")
-	PORT_CONFSETTING(    0x20, "White")
+	PORT_CONFNAME( 0x001, 0x001, "Cursor"        )
+	PORT_CONFSETTING(     0x000, DEF_STR(No)     )
+	PORT_CONFSETTING(     0x001, DEF_STR(Yes)    )
+	PORT_CONFNAME( 0x002, 0x002, "Type"          )
+	PORT_CONFSETTING(     0x000, "Underline"     )
+	PORT_CONFSETTING(     0x002, "Block"         )
+	PORT_CONFNAME( 0x004, 0x004, "Blinking"      )
+	PORT_CONFSETTING(     0x000, DEF_STR(No)     )
+	PORT_CONFSETTING(     0x004, DEF_STR(Yes)    )
+	PORT_CONFNAME( 0x008, 0x008, "Invert"        )
+	PORT_CONFSETTING(     0x000, DEF_STR(No)     )
+	PORT_CONFSETTING(     0x008, DEF_STR(Yes)    )
+	PORT_CONFNAME( 0x030, 0x000, "Color"         )
+	PORT_CONFSETTING(     0x000, "Green"         )
+	PORT_CONFSETTING(     0x010, "Amber"         )
+	PORT_CONFSETTING(     0x020, "White"         )
+	PORT_CONFNAME( 0x040, 0x040, "Auto CR on LF" )
+	PORT_CONFSETTING(     0x000, DEF_STR(No)     )
+	PORT_CONFSETTING(     0x040, DEF_STR(Yes)    )
+	PORT_CONFNAME( 0x080, 0x000, "Auto LF on CR" )
+	PORT_CONFSETTING(     0x000, DEF_STR(No)     )
+	PORT_CONFSETTING(     0x080, DEF_STR(Yes)    )
+	PORT_CONFNAME( 0x100, 0x000, "Local echo"    )
+	PORT_CONFSETTING(     0x000, DEF_STR(No)     )
+	PORT_CONFSETTING(     0x100, DEF_STR(Yes)    )
 INPUT_PORTS_END
 
 ioport_constructor generic_terminal_device::device_input_ports() const
@@ -414,4 +441,4 @@ ioport_constructor generic_terminal_device::device_input_ports() const
 	return INPUT_PORTS_NAME(generic_terminal);
 }
 
-const device_type GENERIC_TERMINAL = &device_creator<generic_terminal_device>;
+DEFINE_DEVICE_TYPE(GENERIC_TERMINAL, generic_terminal_device, "generic_terminal", "Generic Terminal")

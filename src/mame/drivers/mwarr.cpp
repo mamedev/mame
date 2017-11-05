@@ -43,6 +43,9 @@ Notes:
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 #define MASTER_CLOCK     XTAL_12MHz
 #define SOUND_CLOCK      XTAL_45MHz
@@ -69,16 +72,16 @@ public:
 		m_palette(*this, "palette") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT16> m_bg_videoram;
-	required_shared_ptr<UINT16> m_mlow_videoram;
-	required_shared_ptr<UINT16> m_mhigh_videoram;
-	required_shared_ptr<UINT16> m_tx_videoram;
-	required_shared_ptr<UINT16> m_bg_scrollram;
-	required_shared_ptr<UINT16> m_mlow_scrollram;
-	required_shared_ptr<UINT16> m_mhigh_scrollram;
-	required_shared_ptr<UINT16> m_vidattrram;
-	required_shared_ptr<UINT16> m_spriteram;
-	required_shared_ptr<UINT16> m_mwarr_ram;
+	required_shared_ptr<uint16_t> m_bg_videoram;
+	required_shared_ptr<uint16_t> m_mlow_videoram;
+	required_shared_ptr<uint16_t> m_mhigh_videoram;
+	required_shared_ptr<uint16_t> m_tx_videoram;
+	required_shared_ptr<uint16_t> m_bg_scrollram;
+	required_shared_ptr<uint16_t> m_mlow_scrollram;
+	required_shared_ptr<uint16_t> m_mhigh_scrollram;
+	required_shared_ptr<uint16_t> m_vidattrram;
+	required_shared_ptr<uint16_t> m_spriteram;
+	required_shared_ptr<uint16_t> m_mwarr_ram;
 
 	/* video-related */
 	tilemap_t *m_bg_tilemap;
@@ -89,7 +92,7 @@ public:
 	/* misc */
 	int m_which;
 
-	UINT16 m_sprites_buffer[0x800];
+	uint16_t m_sprites_buffer[0x800];
 	DECLARE_WRITE16_MEMBER(bg_videoram_w);
 	DECLARE_WRITE16_MEMBER(mlow_videoram_w);
 	DECLARE_WRITE16_MEMBER(mhigh_videoram_w);
@@ -104,7 +107,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_mwarr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_mwarr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
 	required_device<cpu_device> m_maincpu;
 	required_device<okim6295_device> m_oki2;
@@ -145,7 +148,7 @@ WRITE16_MEMBER(mwarr_state::tx_videoram_w)
 
 WRITE16_MEMBER(mwarr_state::oki1_bank_w)
 {
-	m_oki2->set_bank_base(0x40000 * (data & 3));
+	m_oki2->set_rom_bank(data & 3);
 }
 
 WRITE16_MEMBER(mwarr_state::sprites_commands_w)
@@ -397,10 +400,10 @@ TILE_GET_INFO_MEMBER(mwarr_state::get_tx_tile_info)
 
 void mwarr_state::video_start()
 {
-	m_bg_tilemap    = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(mwarr_state::get_bg_tile_info),this),    TILEMAP_SCAN_COLS, 16, 16, 64, 16);
-	m_mlow_tilemap  = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(mwarr_state::get_mlow_tile_info),this),  TILEMAP_SCAN_COLS, 16, 16, 64, 16);
-	m_mhigh_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(mwarr_state::get_mhigh_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 64, 16);
-	m_tx_tilemap    = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(mwarr_state::get_tx_tile_info),this),    TILEMAP_SCAN_ROWS,  8,  8, 64, 32);
+	m_bg_tilemap    = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(mwarr_state::get_bg_tile_info),this),    TILEMAP_SCAN_COLS, 16, 16, 64, 16);
+	m_mlow_tilemap  = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(mwarr_state::get_mlow_tile_info),this),  TILEMAP_SCAN_COLS, 16, 16, 64, 16);
+	m_mhigh_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(mwarr_state::get_mhigh_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 64, 16);
+	m_tx_tilemap    = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(mwarr_state::get_tx_tile_info),this),    TILEMAP_SCAN_ROWS,  8,  8, 64, 32);
 
 	m_mlow_tilemap->set_transparent_pen(0);
 	m_mhigh_tilemap->set_transparent_pen(0);
@@ -415,8 +418,8 @@ void mwarr_state::video_start()
 
 void mwarr_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	const UINT16 *source = m_sprites_buffer + 0x800 - 4;
-	const UINT16 *finish = m_sprites_buffer;
+	const uint16_t *source = m_sprites_buffer + 0x800 - 4;
+	const uint16_t *finish = m_sprites_buffer;
 	gfx_element *gfx = m_gfxdecode->gfx(0);
 	int x, y, color, flipx, dy, pri, pri_mask, i;
 
@@ -479,7 +482,7 @@ void mwarr_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, con
 	}
 }
 
-UINT32 mwarr_state::screen_update_mwarr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t mwarr_state::screen_update_mwarr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int i;
 
@@ -549,7 +552,7 @@ void mwarr_state::machine_reset()
 	m_which = 0;
 }
 
-static MACHINE_CONFIG_START( mwarr, mwarr_state )
+static MACHINE_CONFIG_START( mwarr )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK)
@@ -573,10 +576,10 @@ static MACHINE_CONFIG_START( mwarr, mwarr_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki1", SOUND_CLOCK/48 , OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki1", SOUND_CLOCK/48 , PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki2", SOUND_CLOCK/48 , OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki2", SOUND_CLOCK/48 , PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -653,4 +656,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 199?, mwarr, 0, mwarr, mwarr, driver_device, 0, ROT0,  "Elettronica Video-Games S.R.L.", "Mighty Warriors", MACHINE_SUPPORTS_SAVE )
+GAME( 199?, mwarr, 0, mwarr, mwarr, mwarr_state, 0, ROT0,  "Elettronica Video-Games S.R.L.", "Mighty Warriors", MACHINE_SUPPORTS_SAVE )

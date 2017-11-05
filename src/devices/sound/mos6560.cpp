@@ -155,23 +155,23 @@ static const rgb_t PALETTE_MOS[] =
     IMPLEMENTATION
 *****************************************************************************/
 
-inline UINT8 mos6560_device::read_videoram(offs_t offset)
+inline uint8_t mos6560_device::read_videoram(offs_t offset)
 {
-	m_last_data = space(AS_0).read_byte(offset & 0x3fff);
+	m_last_data = space(0).read_byte(offset & 0x3fff);
 
 	return m_last_data;
 }
 
-inline UINT8 mos6560_device::read_colorram(offs_t offset)
+inline uint8_t mos6560_device::read_colorram(offs_t offset)
 {
-	return space(AS_1).read_byte(offset & 0x3ff);
+	return space(1).read_byte(offset & 0x3ff);
 }
 
 /*-------------------------------------------------
  draw_character
 -------------------------------------------------*/
 
-void mos6560_device::draw_character( int ybegin, int yend, int ch, int yoff, int xoff, UINT16 *color )
+void mos6560_device::draw_character( int ybegin, int yend, int ch, int yoff, int xoff, uint16_t *color )
 {
 	int y, code;
 
@@ -195,7 +195,7 @@ void mos6560_device::draw_character( int ybegin, int yend, int ch, int yoff, int
  draw_character_multi
 -------------------------------------------------*/
 
-void mos6560_device::draw_character_multi( int ybegin, int yend, int ch, int yoff, int xoff, UINT16 *color )
+void mos6560_device::draw_character_multi( int ybegin, int yend, int ch, int yoff, int xoff, uint16_t *color )
 {
 	int y, code;
 
@@ -455,7 +455,7 @@ WRITE_LINE_MEMBER( mos6560_device::lp_w )
 	// TODO
 }
 
-UINT8 mos6560_device::bus_r()
+uint8_t mos6560_device::bus_r()
 {
 	return m_last_data;
 }
@@ -481,7 +481,7 @@ void mos6560_device::raster_interrupt_gen()
      main screen bitmap
 -------------------------------------------------*/
 
-UINT32 mos6560_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t mos6560_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
 
@@ -626,7 +626,7 @@ void mos6560_device::sound_start()
 
 	/* buffer for fastest played sample for 5 second so we have enough data for min 5 second */
 	m_noisesize = NOISE_FREQUENCY_MAX * NOISE_BUFFER_SIZE_SEC;
-	m_noise = std::make_unique<INT8[]>(m_noisesize);
+	m_noise = std::make_unique<int8_t[]>(m_noisesize);
 	{
 		int noiseshift = 0x7ffff8;
 		char data;
@@ -661,11 +661,11 @@ void mos6560_device::sound_start()
 
 	if (m_tonesize > 0)
 	{
-		m_tone = std::make_unique<INT16[]>(m_tonesize);
+		m_tone = std::make_unique<int16_t[]>(m_tonesize);
 
 		for (i = 0; i < m_tonesize; i++)
 		{
-			m_tone[i] = (INT16)(sin (2 * M_PI * i / m_tonesize) * 127 + 0.5);
+			m_tone[i] = (int16_t)(sin (2 * M_PI * i / m_tonesize) * 127 + 0.5);
 		}
 	}
 	else
@@ -675,21 +675,21 @@ void mos6560_device::sound_start()
 }
 
 
-const device_type MOS6560 = &device_creator<mos6560_device>;
-const device_type MOS6561 = &device_creator<mos6561_device>;
-const device_type MOS656X_ATTACK_UFO = &device_creator<mos656x_attack_ufo_device>;
+DEFINE_DEVICE_TYPE(MOS6560,            mos6560_device,            "mos6560",            "MOS 6560 VIC")
+DEFINE_DEVICE_TYPE(MOS6561,            mos6561_device,            "mos6561",            "MOS 6561 VIC")
+DEFINE_DEVICE_TYPE(MOS656X_ATTACK_UFO, mos656x_attack_ufo_device, "mos656x_attack_ufo", "MOS 656X VIC (Attack UFO)")
 
 // default address maps
-static ADDRESS_MAP_START( mos6560_videoram_map, AS_0, 8, mos6560_device )
+static ADDRESS_MAP_START( mos6560_videoram_map, 0, 8, mos6560_device )
 	AM_RANGE(0x0000, 0x3fff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mos6560_colorram_map, AS_1, 8, mos6560_device )
+static ADDRESS_MAP_START( mos6560_colorram_map, 1, 8, mos6560_device )
 	AM_RANGE(0x000, 0x3ff) AM_RAM
 ADDRESS_MAP_END
 
-mos6560_device::mos6560_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+mos6560_device::mos6560_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant)
+	: device_t(mconfig, type, tag, owner, clock),
 		device_memory_interface(mconfig, *this),
 		device_sound_interface(mconfig, *this),
 		device_video_interface(mconfig, *this),
@@ -701,24 +701,20 @@ mos6560_device::mos6560_device(const machine_config &mconfig, device_type type, 
 {
 }
 
-mos6560_device::mos6560_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, MOS6560, "MOS6560", tag, owner, clock, "mos6560", __FILE__),
-		device_memory_interface(mconfig, *this),
-		device_sound_interface(mconfig, *this),
-		device_video_interface(mconfig, *this),
-		m_variant(TYPE_6560),
-		m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 14, 0, nullptr, *ADDRESS_MAP_NAME(mos6560_videoram_map)),
-		m_colorram_space_config("colorram", ENDIANNESS_LITTLE, 8, 10, 0, nullptr, *ADDRESS_MAP_NAME(mos6560_colorram_map)),
-		m_read_potx(*this),
-		m_read_poty(*this)
+mos6560_device::mos6560_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: mos6560_device(mconfig, MOS6560, tag, owner, clock, TYPE_6560)
 {
 }
 
-mos6561_device::mos6561_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	:mos6560_device(mconfig, MOS6561, "MOS6561", tag, owner, clock, TYPE_6561, "mos6561", __FILE__) { }
+mos6561_device::mos6561_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: mos6560_device(mconfig, MOS6561, tag, owner, clock, TYPE_6561)
+{
+}
 
-mos656x_attack_ufo_device::mos656x_attack_ufo_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	:mos6560_device(mconfig, MOS656X_ATTACK_UFO, "MOS656X", tag, owner, clock, TYPE_ATTACK_UFO, "mos656x_attack_ufo", __FILE__) { }
+mos656x_attack_ufo_device::mos656x_attack_ufo_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: mos6560_device(mconfig, MOS656X_ATTACK_UFO, tag, owner, clock, TYPE_ATTACK_UFO)
+{
+}
 
 
 //-------------------------------------------------
@@ -726,14 +722,12 @@ mos656x_attack_ufo_device::mos656x_attack_ufo_device(const machine_config &mconf
 //  any address spaces owned by this device
 //-------------------------------------------------
 
-const address_space_config *mos6560_device::memory_space_config(address_spacenum spacenum) const
+device_memory_interface::space_config_vector mos6560_device::memory_space_config() const
 {
-	switch (spacenum)
-	{
-		case AS_0: return &m_videoram_space_config;
-		case AS_1: return &m_colorram_space_config;
-		default: return nullptr;
-	}
+	return space_config_vector {
+		std::make_pair(0, &m_videoram_space_config),
+		std::make_pair(1, &m_colorram_space_config)
+	};
 }
 
 

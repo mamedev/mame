@@ -11,10 +11,11 @@
 
 *********************************************************************/
 
-#ifndef __MC146818_H__
-#define __MC146818_H__
+#ifndef MAME_MACHINE_MC146818_H
+#define MAME_MACHINE_MC146818_H
 
-#include "emu.h"
+#pragma once
+
 
 //**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
@@ -57,11 +58,10 @@ class mc146818_device : public device_t,
 {
 public:
 	// construction/destruction
-	mc146818_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	mc146818_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	mc146818_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// callbacks
-	template<class _Object> static devcb_base &set_irq_callback(device_t &device, _Object object) { return downcast<mc146818_device &>(device).m_write_irq.set_callback(object); }
+	template <class Object> static devcb_base &set_irq_callback(device_t &device, Object &&cb) { return downcast<mc146818_device &>(device).m_write_irq.set_callback(std::forward<Object>(cb)); }
 	void set_century_index(int century_index) { m_century_index = century_index; }
 	void set_use_utc(bool use_utc) { m_use_utc = use_utc; }
 	void set_binary(bool binary) { m_binary = binary; }
@@ -74,6 +74,8 @@ public:
 	DECLARE_WRITE8_MEMBER( write );
 
 protected:
+	mc146818_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -84,12 +86,11 @@ protected:
 	virtual void nvram_read(emu_file &file) override;
 	virtual void nvram_write(emu_file &file) override;
 
-	static const unsigned char ALARM_DONTCARE = 0xc0;
-	static const unsigned char HOURS_PM = 0x80;
+	static constexpr unsigned char ALARM_DONTCARE = 0xc0;
+	static constexpr unsigned char HOURS_PM = 0x80;
 
 	virtual int data_size() { return 64; }
 
-private:
 	enum
 	{
 		REG_SECONDS = 0,
@@ -151,7 +152,7 @@ private:
 	void set_base_datetime();
 	void update_irq();
 	void update_timer();
-
+	virtual int get_timer_bypass();
 	int get_seconds();
 	void set_seconds(int seconds);
 	int get_minutes();
@@ -171,8 +172,8 @@ private:
 
 	// internal state
 
-	UINT8           m_index;
-	dynamic_buffer  m_data;
+	uint8_t           m_index;
+	std::vector<uint8_t>  m_data;
 
 	attotime        m_last_refresh;
 
@@ -189,7 +190,6 @@ private:
 
 
 // device type definition
-extern const device_type MC146818;
+DECLARE_DEVICE_TYPE(MC146818, mc146818_device)
 
-
-#endif /* __MC146818_H__ */
+#endif // MAME_MACHINE_MC146818_H

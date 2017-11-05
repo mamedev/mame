@@ -11,7 +11,7 @@
 
 TILE_GET_INFO_MEMBER(sf_state::get_bg_tile_info)
 {
-	UINT8 *base = memregion("gfx5")->base() + 2 * tile_index;
+	uint8_t *base = memregion("gfx5")->base() + 2 * tile_index;
 	int attr = base[0x10000];
 	int color = base[0];
 	int code = (base[0x10000 + 1] << 8) | base[1];
@@ -23,7 +23,7 @@ TILE_GET_INFO_MEMBER(sf_state::get_bg_tile_info)
 
 TILE_GET_INFO_MEMBER(sf_state::get_fg_tile_info)
 {
-	UINT8 *base = memregion("gfx5")->base() + 0x20000 + 2 * tile_index;
+	uint8_t *base = memregion("gfx5")->base() + 0x20000 + 2 * tile_index;
 	int attr = base[0x10000];
 	int color = base[0];
 	int code = (base[0x10000 + 1] << 8) | base[1];
@@ -52,9 +52,9 @@ TILE_GET_INFO_MEMBER(sf_state::get_tx_tile_info)
 
 void sf_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(sf_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 2048, 16);
-	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(sf_state::get_fg_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 2048, 16);
-	m_tx_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(sf_state::get_tx_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(sf_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 2048, 16);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(sf_state::get_fg_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 2048, 16);
+	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(sf_state::get_tx_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
 	m_fg_tilemap->set_transparent_pen(15);
 	m_tx_tilemap->set_transparent_pen(3);
@@ -209,7 +209,7 @@ void sf_state::draw_sprites( bitmap_ind16 &bitmap,const rectangle &cliprect )
 }
 
 
-UINT32 sf_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t sf_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if (m_active & 0x20)
 		m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);

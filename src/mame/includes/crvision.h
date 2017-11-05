@@ -5,7 +5,6 @@
 #define __CRVISION__
 
 
-#include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "imagedev/cassette.h"
 #include "machine/6821pia.h"
@@ -40,10 +39,10 @@ public:
 		m_cart(*this, "cartslot"),
 		m_cent_data_out(*this, "cent_data_out"),
 		m_ram(*this, RAM_TAG),
-		m_inp_pa0(*this, "PA0"),
-		m_inp_pa1(*this, "PA1"),
-		m_inp_pa2(*this, "PA2"),
-		m_inp_pa3(*this, "PA3")
+		m_inp_pa0(*this, "PA0.%u", 0),
+		m_inp_pa1(*this, "PA1.%u", 0),
+		m_inp_pa2(*this, "PA2.%u", 0),
+		m_inp_pa3(*this, "PA3.%u", 0)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -58,8 +57,8 @@ public:
 	optional_ioport_array<8> m_inp_pa2;
 	optional_ioport_array<8> m_inp_pa3;
 
-	UINT8 m_keylatch;
-	UINT8 read_keyboard(int pa);
+	uint8_t m_keylatch;
+	uint8_t read_keyboard(int pa);
 
 	DECLARE_WRITE8_MEMBER( pia_pa_w );
 	DECLARE_READ8_MEMBER( pia_pa_r );
@@ -82,17 +81,17 @@ class laser2001_state : public crvision_state
 {
 public:
 	laser2001_state(const machine_config &mconfig, device_type type, const char *tag)
-		: crvision_state(mconfig, type, tag),
-		m_centronics(*this, CENTRONICS_TAG),
-		m_inp_y(*this, "Y"),
-		m_inp_joy(*this, "JOY")
+		: crvision_state(mconfig, type, tag)
+		, m_centronics(*this, CENTRONICS_TAG)
+		, m_inp_y(*this, "Y.%u", 0)
+		, m_inp_joy(*this, "JOY.%u", 0)
 	{ }
 
 	required_device<centronics_device> m_centronics;
 	required_ioport_array<8> m_inp_y;
 	required_ioport_array<4> m_inp_joy;
 
-	UINT8 m_joylatch;
+	uint8_t m_joylatch;
 	int m_centronics_busy;
 	int m_psg_ready;
 

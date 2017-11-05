@@ -8,6 +8,8 @@
 //
 //============================================================
 
+// only for oslog callback
+#include <functional>
 
 #ifdef SDLMAME_UNIX
 #if (!defined(SDLMAME_MACOSX)) && (!defined(SDLMAME_EMSCRIPTEN)) && (!defined(SDLMAME_ANDROID))
@@ -27,7 +29,6 @@
 
 // only for strconv.h
 #if defined(SDLMAME_WIN32)
-#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #endif
 
@@ -162,6 +163,9 @@ const options_entry sdl_options::s_option_entries[] =
 sdl_options::sdl_options()
 : osd_options()
 {
+#if defined (SDLMAME_ANDROID)
+	chdir (SDL_AndroidGetExternalStoragePath());
+#endif
 	std::string ini_path(INI_PATH);
 	add_entries(sdl_options::s_option_entries);
 	strreplace(ini_path,"APP_NAME", emulator_info::get_appname_lower());
@@ -179,9 +183,9 @@ sdl_options::sdl_options()
 extern "C" DECLSPEC void SDLCALL SDL_SetModuleHandle(void *hInst);
 #endif
 
-// translated to utf8_main
-int main(int argc, char *argv[])
+int main(int argc, char** argv)
 {
+	std::vector<std::string> args = osd_get_command_line(argc, argv);
 	int res = 0;
 
 	// disable I/O buffering
@@ -209,7 +213,7 @@ int main(int argc, char *argv[])
 		sdl_options options;
 		sdl_osd_interface osd(options);
 		osd.register_options();
-		res = emulator_info::start_frontend(options, osd, argc, argv);
+		res = emulator_info::start_frontend(options, osd, args);
 	}
 
 #ifdef SDLMAME_UNIX
@@ -223,19 +227,6 @@ int main(int argc, char *argv[])
 
 	exit(res);
 }
-
-
-
-//============================================================
-//  output_oslog
-//============================================================
-
-static void output_oslog(const running_machine &machine, const char *buffer)
-{
-	fputs(buffer, stderr);
-}
-
-
 
 //============================================================
 //  constructor
@@ -383,15 +374,37 @@ static void osd_sdl_info(void)
 void sdl_osd_interface::video_register()
 {
 	video_options_add("soft", nullptr);
+#if USE_OPENGL
 	video_options_add("opengl", nullptr);
+#endif
 	video_options_add("bgfx", nullptr);
 	//video_options_add("auto", nullptr); // making d3d video default one
 }
 
+
+//============================================================
+//  output_oslog
+//============================================================
+
+void sdl_osd_interface::output_oslog(const char *buffer)
+{
+	fputs(buffer, stderr);
+}
+
+
+//============================================================
+//  osd_setup_osd_specific_emu_options
+//============================================================
+
+void osd_setup_osd_specific_emu_options(emu_options &opts)
+{
+	opts.add_entries(osd_options::s_option_entries);
+}
+
+
 //============================================================
 //  init
 //============================================================
-
 
 void sdl_osd_interface::init(running_machine &machine)
 {
@@ -402,14 +415,12 @@ void sdl_osd_interface::init(running_machine &machine)
 
 	// determine if we are benchmarking, and adjust options appropriately
 	int bench = options().bench();
-	std::string error_string;
 	if (bench > 0)
 	{
-		options().set_value(OPTION_THROTTLE, false, OPTION_PRIORITY_MAXIMUM, error_string);
-		options().set_value(OSDOPTION_SOUND, "none", OPTION_PRIORITY_MAXIMUM, error_string);
-		options().set_value(OSDOPTION_VIDEO, "none", OPTION_PRIORITY_MAXIMUM, error_string);
-		options().set_value(OPTION_SECONDS_TO_RUN, bench, OPTION_PRIORITY_MAXIMUM, error_string);
-		assert(error_string.c_str()[0] == 0);
+		options().set_value(OPTION_THROTTLE, false, OPTION_PRIORITY_MAXIMUM);
+		options().set_value(OSDOPTION_SOUND, "none", OPTION_PRIORITY_MAXIMUM);
+		options().set_value(OSDOPTION_VIDEO, "none", OPTION_PRIORITY_MAXIMUM);
+		options().set_value(OPTION_SECONDS_TO_RUN, bench, OPTION_PRIORITY_MAXIMUM);
 	}
 
 	// Some driver options - must be before audio init!
@@ -489,7 +500,10 @@ void sdl_osd_interface::init(running_machine &machine)
 	osd_common_t::init_subsystems();
 
 	if (options().oslog())
-		machine.add_logerror_callback(output_oslog);
+	{
+		using namespace std::placeholders;
+		machine.add_logerror_callback(std::bind(&sdl_osd_interface::output_oslog, this, _1));
+	}
 
 
 

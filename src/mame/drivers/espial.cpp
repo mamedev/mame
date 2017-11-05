@@ -17,7 +17,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
   - The games read both players controls for player 2 when "Cabinet" is set
     to "Upright" (code at 0x0321).
   - The games read both buttons status regardless of settings. They are
-    then comnbined if Dip Switch is set to "1" (code at 0x32a).
+    then combined if Dip Switch is set to "1" (code at 0x32a).
   - The "CRE." displayed at the bottom right of the screen is in fact
     not really the number of credits (especially when coinage isn't 1C_1C)
     as it relies on a transformation of real number of credits (stored at
@@ -40,10 +40,12 @@ Stephh's notes (based on the games Z80 code and some tests) :
 
 #include "emu.h"
 #include "includes/espial.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
-
+#include "screen.h"
+#include "speaker.h"
 
 
 
@@ -51,8 +53,8 @@ void espial_state::machine_reset()
 {
 	m_flipscreen = 0;
 
-	m_main_nmi_enabled = FALSE;
-	m_sound_nmi_enabled = FALSE;
+	m_main_nmi_enabled = false;
+	m_sound_nmi_enabled = false;
 }
 
 void espial_state::machine_start()
@@ -94,7 +96,7 @@ INTERRUPT_GEN_MEMBER(espial_state::espial_sound_nmi_gen)
 
 WRITE8_MEMBER(espial_state::espial_master_soundlatch_w)
 {
-	soundlatch_byte_w(space, offset, data);
+	m_soundlatch->write(space, offset, data);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
@@ -106,7 +108,7 @@ static ADDRESS_MAP_START( espial_map, AS_PROGRAM, 8, espial_state )
 	AM_RANGE(0x6082, 0x6082) AM_READ_PORT("DSW1")
 	AM_RANGE(0x6083, 0x6083) AM_READ_PORT("IN1")
 	AM_RANGE(0x6084, 0x6084) AM_READ_PORT("IN2")
-	AM_RANGE(0x6090, 0x6090) AM_READ(soundlatch2_byte_r) AM_WRITE(espial_master_soundlatch_w)
+	AM_RANGE(0x6090, 0x6090) AM_DEVREAD("soundlatch2", generic_latch_8_device, read) AM_WRITE(espial_master_soundlatch_w)
 	AM_RANGE(0x7000, 0x7000) AM_DEVREADWRITE("watchdog", watchdog_timer_device, reset_r, reset_w)
 	AM_RANGE(0x7100, 0x7100) AM_WRITE(espial_master_interrupt_mask_w)
 	AM_RANGE(0x7200, 0x7200) AM_WRITE(espial_flipscreen_w)
@@ -131,7 +133,7 @@ static ADDRESS_MAP_START( netwars_map, AS_PROGRAM, 8, espial_state )
 	AM_RANGE(0x6082, 0x6082) AM_READ_PORT("DSW1")
 	AM_RANGE(0x6083, 0x6083) AM_READ_PORT("IN1")
 	AM_RANGE(0x6084, 0x6084) AM_READ_PORT("IN2")
-	AM_RANGE(0x6090, 0x6090) AM_READ(soundlatch2_byte_r) AM_WRITE(espial_master_soundlatch_w)
+	AM_RANGE(0x6090, 0x6090) AM_DEVREAD("soundlatch2", generic_latch_8_device, read) AM_WRITE(espial_master_soundlatch_w)
 	AM_RANGE(0x7000, 0x7000) AM_DEVREADWRITE("watchdog", watchdog_timer_device, reset_r, reset_w)
 	AM_RANGE(0x7100, 0x7100) AM_WRITE(espial_master_interrupt_mask_w)
 	AM_RANGE(0x7200, 0x7200) AM_WRITE(espial_flipscreen_w)
@@ -149,7 +151,7 @@ static ADDRESS_MAP_START( espial_sound_map, AS_PROGRAM, 8, espial_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(espial_sound_nmi_mask_w)
-	AM_RANGE(0x6000, 0x6000) AM_READWRITE(soundlatch_byte_r, soundlatch2_byte_w)
+	AM_RANGE(0x6000, 0x6000) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_DEVWRITE("soundlatch2", generic_latch_8_device, write)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( espial_sound_io_map, AS_IO, 8, espial_state )
@@ -313,7 +315,7 @@ GFXDECODE_END
 
 
 
-static MACHINE_CONFIG_START( espial, espial_state )
+static MACHINE_CONFIG_START( espial )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 3072000)   /* 3.072 MHz */
@@ -342,6 +344,10 @@ static MACHINE_CONFIG_START( espial, espial_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+
 	MCFG_SOUND_ADD("aysnd", AY8910, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
@@ -440,6 +446,6 @@ ROM_END
 
 
 
-GAME( 1983, espial,  0,      espial,  espial, driver_device,  0, ROT0,  "Orca / Thunderbolt", "Espial (Europe)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, espialu, espial, espial,  espial, driver_device,  0, ROT0,  "Orca / Thunderbolt", "Espial (US?)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, netwars, 0,      netwars, netwars, driver_device, 0, ROT90, "Orca (Esco Trading Co license)", "Net Wars", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, espial,  0,      espial,  espial,  espial_state, 0, ROT0,  "Orca / Thunderbolt", "Espial (Europe)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, espialu, espial, espial,  espial,  espial_state, 0, ROT0,  "Orca / Thunderbolt", "Espial (US?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, netwars, 0,      netwars, netwars, espial_state, 0, ROT90, "Orca (Esco Trading Co license)", "Net Wars", MACHINE_SUPPORTS_SAVE )

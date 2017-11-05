@@ -43,6 +43,7 @@ SOUNDS["HC55516"] = true
 SOUNDS["YM3812"] = true
 SOUNDS["CEM3394"] = true
 SOUNDS["VOTRAX"] = true
+SOUNDS["VOLT_REG"] = true
 
 --------------------------------------------------
 -- specify available video cores
@@ -56,11 +57,14 @@ MACHINES["6821PIA"] = true
 MACHINES["TTL74148"] = true
 MACHINES["TTL74153"] = true
 MACHINES["TTL7474"] = true
+MACHINES["TTL74259"] = true
 MACHINES["RIOT6532"] = true
 MACHINES["PIT8253"] = true
 MACHINES["Z80CTC"] = true
+MACHINES["Z80PIO"] = true
 MACHINES["68681"] = true
 MACHINES["BANKDEV"] = true
+MACHINES["GEN_LATCH"] = true
 MACHINES["WATCHDOG"] = true
 
 
@@ -137,8 +141,6 @@ files{
 	MAME_DIR .. "src/mame/audio/williams.cpp",
 	MAME_DIR .. "src/mame/audio/williams.h",
 	MAME_DIR .. "src/mame/video/williams.cpp",
-	MAME_DIR .. "src/mame/audio/gorf.cpp",
-	MAME_DIR .. "src/mame/audio/wow.cpp",
 	MAME_DIR .. "src/mame/drivers/gaelco.cpp",
 	MAME_DIR .. "src/mame/includes/gaelco.h",
 	MAME_DIR .. "src/mame/video/gaelco.cpp",
@@ -147,6 +149,8 @@ files{
 	MAME_DIR .. "src/mame/includes/wrally.h",
 	MAME_DIR .. "src/mame/machine/wrally.cpp",
 	MAME_DIR .. "src/mame/video/wrally.cpp",
+	MAME_DIR .. "src/mame/machine/gaelco_ds5002fp.cpp",
+	MAME_DIR .. "src/mame/machine/gaelco_ds5002fp.h",
 	MAME_DIR .. "src/mame/drivers/looping.cpp",
 	MAME_DIR .. "src/mame/drivers/supertnk.cpp",
 }

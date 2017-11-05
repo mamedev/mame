@@ -1,10 +1,13 @@
-// license:LGPL-2.1+
+// license:BSD-3-Clause
 // copyright-holders:Tomasz Slanina
+
 /*************************************************************************
 
     Kusayakyuu
 
 *************************************************************************/
+
+#include "machine/gen_latch.h"
 
 class ksayakyu_state : public driver_device
 {
@@ -15,11 +18,12 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_spriteram;
 
 	/* video-related */
 	tilemap_t    *m_tilemap;
@@ -33,6 +37,7 @@ public:
 	DECLARE_WRITE8_MEMBER(latch_w);
 	DECLARE_READ8_MEMBER(sound_status_r);
 	DECLARE_WRITE8_MEMBER(tomaincpu_w);
+	DECLARE_READ8_MEMBER(int_ack_r);
 	DECLARE_WRITE8_MEMBER(ksayakyu_videoram_w);
 	DECLARE_WRITE8_MEMBER(ksayakyu_videoctrl_w);
 	DECLARE_WRITE8_MEMBER(dummy1_w);
@@ -44,9 +49,10 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(ksayakyu);
-	UINT32 screen_update_ksayakyu(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_ksayakyu(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
 };

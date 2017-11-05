@@ -7,9 +7,10 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/tx1.h"
+
 #include "sound/ay8910.h"
 #include "video/resnet.h"
-#include "includes/tx1.h"
 
 
 /*************************************
@@ -51,16 +52,15 @@ static const double tx1_engine_gains[16] =
 };
 
 
-const device_type TX1 = &device_creator<tx1_sound_device>;
+DEFINE_DEVICE_TYPE(TX1, tx1_sound_device, "tx1_sound", "TX-1 Audio Custom")
 
-tx1_sound_device::tx1_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, TX1, "TX-1 Audio Custom", tag, owner, clock, "tx1_sound", __FILE__),
-		device_sound_interface(mconfig, *this)
+tx1_sound_device::tx1_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: tx1_sound_device(mconfig, TX1, tag, owner, clock)
 {
 }
 
-tx1_sound_device::tx1_sound_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+tx1_sound_device::tx1_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
 		m_stream(nullptr),
 		m_freq_to_step(0),
@@ -80,15 +80,6 @@ tx1_sound_device::tx1_sound_device(const machine_config &mconfig, device_type ty
 		m_ym1_outputa(0),
 		m_ym2_outputa(0),
 		m_ym2_outputb(0)
-{
-}
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void tx1_sound_device::device_config_complete()
 {
 }
 
@@ -251,7 +242,7 @@ static inline void update_engine(int eng[4])
 
 void tx1_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
-	UINT32 step_0, step_1, step_2;
+	uint32_t step_0, step_1, step_2;
 	double /*gain_0, gain_1,*/ gain_2, gain_3;
 
 	stream_sample_t *fl = &outputs[0][0];
@@ -344,20 +335,10 @@ static const double bb_engine_gains[16] =
 	-1.0/(1.0/(BUGGYBOY_R1S + BUGGYBOY_R2S + BUGGYBOY_R3S + BUGGYBOY_R4S) + 1.0/100e3)/100e3,
 };
 
-const device_type BUGGYBOY = &device_creator<buggyboy_sound_device>;
+DEFINE_DEVICE_TYPE(BUGGYBOY, buggyboy_sound_device, "buggyboy_sound", "Buggy Boy Audio Custom")
 
-buggyboy_sound_device::buggyboy_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: tx1_sound_device(mconfig, BUGGYBOY, "Buggy Boy Audio Custom", tag, owner, clock, "buggyboy_sound", __FILE__)
-{
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void buggyboy_sound_device::device_config_complete()
+buggyboy_sound_device::buggyboy_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: tx1_sound_device(mconfig, BUGGYBOY, tag, owner, clock)
 {
 }
 
@@ -499,7 +480,7 @@ void buggyboy_sound_device::sound_stream_update(sound_stream &stream, stream_sam
 {
 	/* This is admittedly a bit of a hack job... */
 
-	UINT32 step_0, step_1;
+	uint32_t step_0, step_1;
 	int n1_en, n2_en;
 	double gain0, gain1_l, gain1_r;
 

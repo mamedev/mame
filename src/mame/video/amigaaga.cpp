@@ -36,7 +36,7 @@ To do:
  *
  *************************************/
 
-void amiga_aga_palette_write(running_machine &machine, int color_reg, UINT16 data)
+void amiga_aga_palette_write(running_machine &machine, int color_reg, uint16_t data)
 {
 	amiga_state *state = machine.driver_data<amiga_state>();
 	rgb_t *aga_palette = state->m_aga_palette;
@@ -217,7 +217,7 @@ static void update_sprite_dma(amiga_state *state, int scanline)
  *
  *************************************/
 
-static inline UINT32 interleave_sprite_data(UINT16 lobits, UINT16 hibits)
+static inline uint32_t interleave_sprite_data(uint16_t lobits, uint16_t hibits)
 {
 	return (amiga_expand_byte[lobits & 0xff] << 0) | (amiga_expand_byte[lobits >> 8] << 16) |
 			(amiga_expand_byte[hibits & 0xff] << 1) | (amiga_expand_byte[hibits >> 8] << 17);
@@ -268,12 +268,12 @@ static int get_sprite_pixel(amiga_state *state, int x)
 	/* if we have pixels, determine the actual color and get out */
 	if (pixels)
 	{
-		static const UINT16 ormask[16] =
+		static const uint16_t ormask[16] =
 		{
 			0x0000, 0x000c, 0x00c0, 0x00cc, 0x0c00, 0x0c0c, 0x0cc0, 0x0ccc,
 			0xc000, 0xc00c, 0xc0c0, 0xc0cc, 0xcc00, 0xcc0c, 0xccc0, 0xcccc
 		};
-		static const UINT16 spritecollide[16] =
+		static const uint16_t spritecollide[16] =
 		{
 			0x0000, 0x0000, 0x0000, 0x0200, 0x0000, 0x0400, 0x1000, 0x1600,
 			0x0000, 0x0800, 0x2000, 0x2a00, 0x4000, 0x4c00, 0x7000, 0x7e00
@@ -305,7 +305,7 @@ static int get_sprite_pixel(amiga_state *state, int x)
 				    sprite present bitmask in bits 8-9
 				    topmost sprite pair index in bits 12-13
 				*/
-				UINT32 result = (collide << 8) | (pair << 12);
+				uint32_t result = (collide << 8) | (pair << 12);
 
 				/* attached case */
 				if (CUSTOM_REG(REG_SPR1CTL + 8 * pair) & 0x0080)
@@ -332,10 +332,10 @@ static int get_sprite_pixel(amiga_state *state, int x)
  *
  *************************************/
 
-static inline UINT8 assemble_odd_bitplanes(amiga_state *state, int planes, int obitoffs)
+static inline uint8_t assemble_odd_bitplanes(amiga_state *state, int planes, int obitoffs)
 {
-	UINT64 *aga_bpldat = state->m_aga_bpldat;
-	UINT8 pix = (aga_bpldat[0] >> obitoffs) & 1;
+	uint64_t *aga_bpldat = state->m_aga_bpldat;
+	uint8_t pix = (aga_bpldat[0] >> obitoffs) & 1;
 	if (planes >= 3)
 	{
 		pix |= ((aga_bpldat[2] >> obitoffs) & 1) << 2;
@@ -350,12 +350,12 @@ static inline UINT8 assemble_odd_bitplanes(amiga_state *state, int planes, int o
 }
 
 
-static inline UINT8 assemble_even_bitplanes(amiga_state *state, int planes, int ebitoffs)
+static inline uint8_t assemble_even_bitplanes(amiga_state *state, int planes, int ebitoffs)
 {
-	UINT8 pix = 0;
+	uint8_t pix = 0;
 	if (planes >= 2)
 	{
-		UINT64 *aga_bpldat = state->m_aga_bpldat;
+		uint64_t *aga_bpldat = state->m_aga_bpldat;
 		pix |= ((aga_bpldat[1] >> ebitoffs) & 1) << 1;
 		if (planes >= 4)
 		{
@@ -373,29 +373,29 @@ static inline UINT8 assemble_even_bitplanes(amiga_state *state, int planes, int 
 
 static inline void fetch_bitplane_data(amiga_state *state, int plane)
 {
-	UINT64 *aga_bpldat = state->m_aga_bpldat;
+	uint64_t *aga_bpldat = state->m_aga_bpldat;
 
 	switch (CUSTOM_REG(REG_FMODE) & 0x03)
 	{
 		case 0:
-			aga_bpldat[plane] = (UINT64)state->chip_ram_r(CUSTOM_REG_LONG(REG_BPL1PTH + plane * 2));
+			aga_bpldat[plane] = (uint64_t)state->chip_ram_r(CUSTOM_REG_LONG(REG_BPL1PTH + plane * 2));
 			CUSTOM_REG_LONG(REG_BPL1PTH + plane * 2) += 2;
 			break;
 		case 1:
 		case 2:
-			aga_bpldat[plane] = (UINT64)state->chip_ram_r(CUSTOM_REG_LONG(REG_BPL1PTH + plane * 2)) << 16;
+			aga_bpldat[plane] = (uint64_t)state->chip_ram_r(CUSTOM_REG_LONG(REG_BPL1PTH + plane * 2)) << 16;
 			CUSTOM_REG_LONG(REG_BPL1PTH + plane * 2) += 2;
-			aga_bpldat[plane] |= ((UINT64)state->chip_ram_r(CUSTOM_REG_LONG(REG_BPL1PTH + plane * 2)));
+			aga_bpldat[plane] |= ((uint64_t)state->chip_ram_r(CUSTOM_REG_LONG(REG_BPL1PTH + plane * 2)));
 			CUSTOM_REG_LONG(REG_BPL1PTH + plane * 2) += 2;
 			break;
 		case 3:
-			aga_bpldat[plane] = (UINT64)state->chip_ram_r(CUSTOM_REG_LONG(REG_BPL1PTH + plane * 2)) << 48;
+			aga_bpldat[plane] = (uint64_t)state->chip_ram_r(CUSTOM_REG_LONG(REG_BPL1PTH + plane * 2)) << 48;
 			CUSTOM_REG_LONG(REG_BPL1PTH + plane * 2) += 2;
-			aga_bpldat[plane] |= ((UINT64)state->chip_ram_r(CUSTOM_REG_LONG(REG_BPL1PTH + plane * 2))) << 32;
+			aga_bpldat[plane] |= ((uint64_t)state->chip_ram_r(CUSTOM_REG_LONG(REG_BPL1PTH + plane * 2))) << 32;
 			CUSTOM_REG_LONG(REG_BPL1PTH + plane * 2) += 2;
-			aga_bpldat[plane] |= ((UINT64)state->chip_ram_r(CUSTOM_REG_LONG(REG_BPL1PTH + plane * 2))) << 16;
+			aga_bpldat[plane] |= ((uint64_t)state->chip_ram_r(CUSTOM_REG_LONG(REG_BPL1PTH + plane * 2))) << 16;
 			CUSTOM_REG_LONG(REG_BPL1PTH + plane * 2) += 2;
-			aga_bpldat[plane] |= (UINT64)state->chip_ram_r(CUSTOM_REG_LONG(REG_BPL1PTH + plane * 2));
+			aga_bpldat[plane] |= (uint64_t)state->chip_ram_r(CUSTOM_REG_LONG(REG_BPL1PTH + plane * 2));
 			CUSTOM_REG_LONG(REG_BPL1PTH + plane * 2) += 2;
 			break;
 	}
@@ -443,13 +443,13 @@ static inline rgb_t update_ham(amiga_state *state, int newpix)
 void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 {
 	amiga_state *state = this;
-	UINT16 save_color0 = CUSTOM_REG(REG_COLOR00);
+	uint16_t save_color0 = CUSTOM_REG(REG_COLOR00);
 	int ddf_start_pixel = 0, ddf_stop_pixel = 0;
 	int hires = 0, dualpf = 0, ham = 0;
 	int pf1pri = 0, pf2pri = 0;
 	int planes = 0;
 
-	UINT32 *dst = nullptr;
+	uint32_t *dst = nullptr;
 	int ebitoffs = 0, obitoffs = 0;
 	int ecolmask = 0, ocolmask = 0;
 	int edelay = 0, odelay = 0;
@@ -856,7 +856,7 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
  *
  *************************************/
 
-UINT32 amiga_state::screen_update_amiga_aga(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t amiga_state::screen_update_amiga_aga(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	if (cliprect.min_y != cliprect.max_y)
 		return 0;

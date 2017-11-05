@@ -25,15 +25,19 @@
 
 
 #include "emu.h"
+#include "includes/pc4.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/rp5c01.h"
+
 #include "rendlay.h"
-#include "includes/pc4.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 READ8_MEMBER( pc4_state::kb_r )
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	for (int line=0; line<8; line++)
 	{
@@ -185,7 +189,7 @@ GFXDECODE_END
 void pc4_state::machine_start()
 {
 	static const char *const bitnames[] = {"LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7"};
-	UINT8* rom_base = (UINT8 *)memregion("maincpu")->base();
+	uint8_t* rom_base = (uint8_t *)memregion("maincpu")->base();
 
 	m_rombank->configure_entries(0, 8, rom_base, 0x4000);
 	m_rombank->set_entry(0);
@@ -212,7 +216,7 @@ void pc4_state::machine_start()
 	m_blink = 0;
 }
 
-static MACHINE_CONFIG_START( pc4, pc4_state )
+static MACHINE_CONFIG_START( pc4 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(pc4_mem)
@@ -246,5 +250,5 @@ ROM_START( pc4 )
 	ROM_LOAD( "44780a00.bin",    0x0000, 0x0860,  BAD_DUMP CRC(3a89024c) SHA1(5a87b68422a916d1b37b5be1f7ad0b3fb3af5a8d))
 ROM_END
 
-/*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT      COMPANY                     FULLNAME                FLAGS */
-COMP( 1990, pc4,       0,          0,      pc4,  pc4, driver_device, 0,      "Laser Computer",   "Laser PC4",                       MACHINE_NOT_WORKING )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  STATE      INIT  COMPANY             FULLNAME     FLAGS
+COMP( 1990, pc4,   0,      0,      pc4,     pc4,   pc4_state, 0,    "Laser Computer",   "Laser PC4", MACHINE_NOT_WORKING )

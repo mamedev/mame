@@ -8,10 +8,12 @@
 
 *********************************************************************/
 
-#ifndef __PCF8593_H__
-#define __PCF8593_H__
+#ifndef MAME_MACHINE_PCF8593_H
+#define MAME_MACHINE_PCF8593_H
 
-#include "emu.h"
+#pragma once
+
+#include "dirtc.h"
 
 
 //**************************************************************************
@@ -32,7 +34,7 @@ class pcf8593_device :  public device_t,
 						public device_nvram_interface
 {
 public:
-	pcf8593_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pcf8593_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_WRITE_LINE_MEMBER(scl_w);
 	DECLARE_WRITE_LINE_MEMBER(sda_w);
@@ -45,7 +47,7 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// device_rtc_interface overrides
-	virtual bool rtc_feature_y2k() override { return true; }
+	virtual bool rtc_feature_y2k() const override { return true; }
 	virtual void rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second) override;
 
 	// device_nvram_interface overrides
@@ -59,21 +61,21 @@ private:
 	static const device_timer_id TIMER_UPDATE_COUNTER = 0;
 
 	// internal state
-	UINT8       m_data[16];
+	uint8_t       m_data[16];
 	int         m_pin_scl;
 	int         m_pin_sda;
 	int         m_inp;
 	int         m_active;
 	int         m_bits;
-	UINT8       m_data_recv_index;
-	UINT8       m_data_recv[50];
-	UINT8       m_mode;
-	UINT8       m_pos;
+	uint8_t       m_data_recv_index;
+	uint8_t       m_data_recv[50];
+	uint8_t       m_mode;
+	uint8_t       m_pos;
 	emu_timer * m_timer;
 	enum        { RTC_MODE_NONE, RTC_MODE_SEND, RTC_MODE_RECV };
 };
 
 // device type definition
-extern const device_type PCF8593;
+DECLARE_DEVICE_TYPE(PCF8593, pcf8593_device)
 
-#endif /* __PCF8593_H__ */
+#endif // MAME_MACHINE_PCF8593_H

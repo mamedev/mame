@@ -43,7 +43,7 @@ TILE_GET_INFO_MEMBER(usgames_state::get_tile_info)
 
 void usgames_state::video_start()
 {
-	m_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(usgames_state::get_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8,64,32);
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(usgames_state::get_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8,64,32);
 	m_gfxdecode->gfx(0)->set_source(m_charram);
 }
 
@@ -61,7 +61,7 @@ WRITE8_MEMBER(usgames_state::charram_w)
 }
 
 
-UINT32 usgames_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t usgames_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	return 0;

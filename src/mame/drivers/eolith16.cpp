@@ -12,11 +12,13 @@
 **********************************************************************/
 
 #include "emu.h"
+#include "includes/eolith.h"
+
 #include "cpu/e132xs/e132xs.h"
 #include "machine/eepromser.h"
-
 #include "sound/okim6295.h"
-#include "includes/eolith.h"
+
+#include "speaker.h"
 
 
 class eolith16_state : public eolith_state
@@ -25,7 +27,7 @@ public:
 	eolith16_state(const machine_config &mconfig, device_type type, const char *tag)
 		: eolith_state(mconfig, type, tag) { }
 
-	std::unique_ptr<UINT16[]> m_vram;
+	std::unique_ptr<uint16_t[]> m_vram;
 	int m_vbuffer;
 
 	DECLARE_WRITE16_MEMBER(eeprom_w);
@@ -37,7 +39,7 @@ public:
 	DECLARE_VIDEO_START(eolith16);
 	DECLARE_PALETTE_INIT(eolith16);
 
-	UINT32 screen_update_eolith16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_eolith16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -116,12 +118,12 @@ INPUT_PORTS_END
 
 VIDEO_START_MEMBER(eolith16_state,eolith16)
 {
-	m_vram = std::make_unique<UINT16[]>(0x10000);
+	m_vram = std::make_unique<uint16_t[]>(0x10000);
 	save_pointer(NAME(m_vram.get()), 0x10000);
 	save_item(NAME(m_vbuffer));
 }
 
-UINT32 eolith16_state::screen_update_eolith16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t eolith16_state::screen_update_eolith16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x,y,count;
 	int color;
@@ -170,7 +172,7 @@ PALETTE_INIT_MEMBER(eolith16_state,eolith16)
 
 
 
-static MACHINE_CONFIG_START( eolith16, eolith16_state )
+static MACHINE_CONFIG_START( eolith16 )
 	MCFG_CPU_ADD("maincpu", E116T, 60000000)        /* no internal multiplier */
 	MCFG_CPU_PROGRAM_MAP(eolith16_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", eolith16_state, eolith_speedup, "screen", 0, 1)
@@ -193,7 +195,7 @@ static MACHINE_CONFIG_START( eolith16, eolith16_state )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", 1000000, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END

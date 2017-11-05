@@ -39,9 +39,9 @@
 
 #include "emu.h"
 #include "egret.h"
+#include "includes/mac.h"
 #include "cpu/m6805/m6805.h"
 #include "sound/asc.h"
-#include "includes/mac.h"
 
 //**************************************************************************
 //  MACROS / CONSTANTS
@@ -53,7 +53,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type EGRET = &device_creator<egret_device>;
+DEFINE_DEVICE_TYPE(EGRET, egret_device, "egret", "Apple Egret")
 
 ROM_START( egret )
 	ROM_REGION(0x4400, EGRET_CPU_TAG, 0)
@@ -78,27 +78,17 @@ static ADDRESS_MAP_START( egret_map, AS_PROGRAM, 8, egret_device )
 	AM_RANGE(0x0f00, 0x1fff) AM_ROM AM_REGION(EGRET_CPU_TAG, 0)
 ADDRESS_MAP_END
 
+
 //-------------------------------------------------
-//  MACHINE_CONFIG
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( egret )
+MACHINE_CONFIG_MEMBER( egret_device::device_add_mconfig )
 	MCFG_CPU_ADD(EGRET_CPU_TAG, M68HC05EG, XTAL_32_768kHz*192)  // 32.768 kHz input clock, can be PLL'ed to x128 = 4.1 MHz under s/w control
 	MCFG_CPU_PROGRAM_MAP(egret_map)
 MACHINE_CONFIG_END
 
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor egret_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( egret );
-}
-
-const rom_entry *egret_device::device_rom_region() const
+const tiny_rom_entry *egret_device::device_rom_region() const
 {
 	return ROM_NAME( egret );
 }
@@ -107,7 +97,7 @@ const rom_entry *egret_device::device_rom_region() const
 //  LIVE DEVICE
 //**************************************************************************
 
-void egret_device::send_port(address_space &space, UINT8 offset, UINT8 data)
+void egret_device::send_port(address_space &space, uint8_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -162,7 +152,7 @@ void egret_device::send_port(address_space &space, UINT8 offset, UINT8 data)
 					printf("EG-> VIA_CLOCK: %d (PC=%x)\n", ((data>>4)&1)^1, m_maincpu->pc());
 					#endif
 					via_clock = (data>>4) & 1;
-					write_via_clock(via_clock^1);
+					write_via_clock(via_clock);
 				}
 			}
 			break;
@@ -208,7 +198,7 @@ WRITE8_MEMBER( egret_device::ddr_w )
 
 READ8_MEMBER( egret_device::ports_r )
 {
-	UINT8 incoming = 0;
+	uint8_t incoming = 0;
 
 	switch (offset)
 	{
@@ -333,8 +323,8 @@ WRITE8_MEMBER( egret_device::pram_w )
 //  egret_device - constructor
 //-------------------------------------------------
 
-egret_device::egret_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, EGRET, "Apple Egret", tag, owner, clock, "egret", __FILE__),
+egret_device::egret_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, EGRET, tag, owner, clock),
 	device_nvram_interface(mconfig, *this),
 	write_reset(*this),
 	write_linechange(*this),
@@ -389,7 +379,7 @@ void egret_device::device_start()
 	save_item(NAME(pram));
 	save_item(NAME(disk_pram));
 
-	UINT8 *rom = device().machine().root_device().memregion(device().subtag(EGRET_CPU_TAG).c_str())->base();
+	uint8_t *rom = device().machine().root_device().memregion(device().subtag(EGRET_CPU_TAG).c_str())->base();
 
 	if (rom)
 	{

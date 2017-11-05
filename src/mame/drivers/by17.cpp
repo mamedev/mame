@@ -18,9 +18,11 @@ ToDo:
 *********************************************************************************************/
 
 
+#include "emu.h"
 #include "machine/genpin.h"
 #include "cpu/m6800/m6800.h"
 #include "machine/6821pia.h"
+#include "machine/timer.h"
 #include "by17.lh"
 #include "by17_pwerplay.lh"
 #include "by17_matahari.lh"
@@ -78,22 +80,22 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(u11_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_d_pulse);
 private:
-	UINT8 m_u10a;
-	UINT8 m_u10b;
-	UINT8 m_u11a;
-	UINT8 m_u11b;
+	uint8_t m_u10a;
+	uint8_t m_u10b;
+	uint8_t m_u11a;
+	uint8_t m_u11b;
 	bool m_u10_ca2;
 	bool m_u10_cb1;
 	bool m_u10_cb2;
 	bool m_u11_ca1;
 	bool m_u11_cb2;
-	UINT8 m_digit;
-	UINT8 m_segment[6];
-	UINT8 m_lamp_decode;
-	UINT8 m_solenoid_features[20][4];
-	UINT8 m_io_hold_x[5];       // Used to hold switches closed (drop targets, balls in outholes/saucers etc). Solenoid activity release them.
+	uint8_t m_digit;
+	uint8_t m_segment[6];
+	uint8_t m_lamp_decode;
+	uint8_t m_solenoid_features[20][4];
+	uint8_t m_io_hold_x[5];       // Used to hold switches closed (drop targets, balls in outholes/saucers etc). Solenoid activity release them.
 	required_device<m6800_cpu_device> m_maincpu;
-	required_shared_ptr<UINT8> m_nvram;
+	required_shared_ptr<uint8_t> m_nvram;
 	required_device<pia6821_device> m_pia_u10;
 	required_device<pia6821_device> m_pia_u11;
 	required_ioport m_io_test;
@@ -431,8 +433,8 @@ INPUT_PORTS_END
 
 CUSTOM_INPUT_MEMBER( by17_state::outhole_x0 )
 {
-	int bit_shift = ((FPTR)param & 0x07);
-	int port = (((FPTR)param >> 4) & 0x07);
+	int bit_shift = ((uintptr_t)param & 0x07);
+	int port = (((uintptr_t)param >> 4) & 0x07);
 
 	/* Here we simulate the ball sitting in the Outhole so the Outhole Solenoid can release it */
 
@@ -444,8 +446,8 @@ CUSTOM_INPUT_MEMBER( by17_state::outhole_x0 )
 
 CUSTOM_INPUT_MEMBER( by17_state::saucer_x3 )
 {
-	int bit_shift = ((FPTR)param & 0x07);
-	int port = (((FPTR)param >> 4) & 0x07);
+	int bit_shift = ((uintptr_t)param & 0x07);
+	int port = (((uintptr_t)param >> 4) & 0x07);
 
 	/* Here we simulate the ball sitting in a Saucer so the Saucer Solenoid can release it */
 
@@ -460,8 +462,8 @@ CUSTOM_INPUT_MEMBER( by17_state::drop_target_x2 )
 {
 	/* Here we simulate fallen Drop Targets so the Drop Target Reset Solenoids can release the switches */
 
-	int bit_shift = ((FPTR)param & 0x07);
-	int port = (((FPTR)param >> 4) & 0x07);
+	int bit_shift = ((uintptr_t)param & 0x07);
+	int port = (((uintptr_t)param >> 4) & 0x07);
 
 	switch (bit_shift)
 	{
@@ -549,7 +551,7 @@ WRITE_LINE_MEMBER( by17_state::u10_cb2_w )
 {
 //  logerror("New U10 CB2 state %01x, was %01x.   PIA=%02x\n", state, m_u10_cb2, m_u10a);
 
-	if (state == TRUE)
+	if (state == true)
 		m_lamp_decode = m_u10a & 0x0f;
 
 	m_u10_cb2 = state;
@@ -605,10 +607,10 @@ WRITE8_MEMBER( by17_state::u10_a_w )
 	{
 		if ((m_lamp_decode & 0x0f) < 0x0f)
 		{
-			if (output().get_indexed_value("lamp", ((m_lamp_decode & 0x0f)+00) ) ==0 ) output().set_indexed_value("lamp", ((m_lamp_decode & 0x0f)+00), ((data & 0x10) ? FALSE : TRUE));
-			if (output().get_indexed_value("lamp", ((m_lamp_decode & 0x0f)+15) ) ==0 ) output().set_indexed_value("lamp", ((m_lamp_decode & 0x0f)+15), ((data & 0x20) ? FALSE : TRUE));
-			if (output().get_indexed_value("lamp", ((m_lamp_decode & 0x0f)+30) ) ==0 ) output().set_indexed_value("lamp", ((m_lamp_decode & 0x0f)+30), ((data & 0x40) ? FALSE : TRUE));
-			if (output().get_indexed_value("lamp", ((m_lamp_decode & 0x0f)+45) ) ==0 ) output().set_indexed_value("lamp", ((m_lamp_decode & 0x0f)+45), ((data & 0x80) ? FALSE : TRUE));
+			if (output().get_indexed_value("lamp", ((m_lamp_decode & 0x0f)+00) ) ==0 ) output().set_indexed_value("lamp", ((m_lamp_decode & 0x0f)+00), ((data & 0x10) ? false : true));
+			if (output().get_indexed_value("lamp", ((m_lamp_decode & 0x0f)+15) ) ==0 ) output().set_indexed_value("lamp", ((m_lamp_decode & 0x0f)+15), ((data & 0x20) ? false : true));
+			if (output().get_indexed_value("lamp", ((m_lamp_decode & 0x0f)+30) ) ==0 ) output().set_indexed_value("lamp", ((m_lamp_decode & 0x0f)+30), ((data & 0x40) ? false : true));
+			if (output().get_indexed_value("lamp", ((m_lamp_decode & 0x0f)+45) ) ==0 ) output().set_indexed_value("lamp", ((m_lamp_decode & 0x0f)+45), ((data & 0x80) ? false : true));
 		}
 		else
 		{
@@ -621,7 +623,7 @@ WRITE8_MEMBER( by17_state::u10_a_w )
 
 READ8_MEMBER( by17_state::u10_b_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	if (BIT(m_u10a, 0))
 		data |= m_io_x0->read();
@@ -673,30 +675,24 @@ WRITE8_MEMBER( by17_state::u11_a_w )
 
 	m_digit = 0;
 
-	if BIT(data, 7)
+	if (BIT(data, 7))
 		m_digit = 1;
-	else
-	if BIT(data, 6)
+	else if (BIT(data, 6))
 		m_digit = 2;
-	else
-	if BIT(data, 5)
+	else if (BIT(data, 5))
 		m_digit = 3;
-	else
-	if BIT(data, 4)
+	else if (BIT(data, 4))
 		m_digit = 4;
-	else
-	if BIT(data, 3)
+	else if (BIT(data, 3))
 		m_digit = 5;
-	else
-	if BIT(data, 2)
+	else if (BIT(data, 2))
 		m_digit = 6;
-	else
-	if (BIT(data, 2) && BIT(data, 3))   // Aftermarket 7th digit strobe for 6 digit games
+	else if (BIT(data, 2) && BIT(data, 3))   // Aftermarket 7th digit strobe for 6 digit games
 		m_digit = 7;
 
 	if ((m_u10_ca2==0) && m_digit)
 	{
-		static const UINT8 patterns[16] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f,0,0,0,0,0,0 }; // MC14543 - BCD to 7 Segment Display Decoder
+		static const uint8_t patterns[16] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f,0,0,0,0,0,0 }; // MC14543 - BCD to 7 Segment Display Decoder
 
 		output().set_digit_value(10+m_digit, patterns[m_segment[1]]);
 		output().set_digit_value(20+m_digit, patterns[m_segment[2]]);
@@ -715,7 +711,7 @@ WRITE8_MEMBER( by17_state::u11_b_w )
 	{
 		if ((data & 0x0f) < 0x0f)   // Momentary Solenoids
 		{
-			output().set_indexed_value( "solenoid", (data & 0x0f), TRUE);
+			output().set_indexed_value( "solenoid", (data & 0x0f), true);
 
 			if (m_solenoid_features[(data & 0x0f)][3])  // Reset/release relevant switch after firing Solenoid
 				m_io_hold_x[(m_solenoid_features[(data & 0x0f)][2])] &= (m_solenoid_features[(data & 0x0f)][3]);
@@ -727,7 +723,7 @@ WRITE8_MEMBER( by17_state::u11_b_w )
 		{
 			for (int i=0; i<15; i++)
 			{
-				output().set_indexed_value( "solenoid", i, FALSE);
+				output().set_indexed_value( "solenoid", i, false);
 			}
 		}
 	}
@@ -735,49 +731,49 @@ WRITE8_MEMBER( by17_state::u11_b_w )
 
 	if ((m_u11b & 0x10) && ((data & 0x10)==0))
 	{
-		output().set_value("solenoid16", TRUE);
+		output().set_value("solenoid16", true);
 		if (m_solenoid_features[16][0] != 0xff)
 			m_samples->start(m_solenoid_features[16][0], m_solenoid_features[16][1]);
 	}
 	else if ((data & 0x10) && ((m_u11b & 0x10)==0))
 	{
-		output().set_value("solenoid16", FALSE);
+		output().set_value("solenoid16", false);
 		if (m_solenoid_features[16][0] != 0xff)
 			m_samples->start(m_solenoid_features[16][0], m_solenoid_features[16][2]);
 	}
 	if ((m_u11b & 0x20) && ((data & 0x20)==0))
 	{
-		output().set_value("solenoid17", TRUE);                   // Coin Lockout Coil engage
+		output().set_value("solenoid17", true);                   // Coin Lockout Coil engage
 		if (m_solenoid_features[17][0] != 0xff)
 			m_samples->start(m_solenoid_features[17][0], m_solenoid_features[17][1]);
 	}
 	else if ((data & 0x20) && ((m_u11b & 0x20)==0))
 	{
-		output().set_value("solenoid17", FALSE);                  // Coin Lockout Coil release
+		output().set_value("solenoid17", false);                  // Coin Lockout Coil release
 		if (m_solenoid_features[17][0] != 0xff)
 			m_samples->start(m_solenoid_features[17][0], m_solenoid_features[17][2]);
 	}
 	if ((m_u11b & 0x40) && ((data & 0x40)==0))
 	{
-		output().set_value("solenoid18", TRUE);                   // Flipper Enable Relay engage
+		output().set_value("solenoid18", true);                   // Flipper Enable Relay engage
 		if (m_solenoid_features[18][0] != 0xff)
 			m_samples->start(m_solenoid_features[18][0], m_solenoid_features[18][1]);
 	}
 	else if ((data & 0x40) && ((m_u11b & 0x40)==0))
 	{
-		output().set_value("solenoid18", FALSE);                  // Flipper Enable Relay release
+		output().set_value("solenoid18", false);                  // Flipper Enable Relay release
 		if (m_solenoid_features[18][0] != 0xff)
 			m_samples->start(m_solenoid_features[18][0], m_solenoid_features[18][2]);
 	}
 	if ((m_u11b & 0x80) && ((data & 0x80)==0))
 	{
-		output().set_value("solenoid19", TRUE);
+		output().set_value("solenoid19", true);
 		if (m_solenoid_features[19][0] != 0xff)
 			m_samples->start(m_solenoid_features[19][0], m_solenoid_features[19][1]);
 	}
 	else if ((data & 0x80) && ((m_u11b & 0x80)==0))
 	{
-		output().set_value("solenoid19", FALSE);
+		output().set_value("solenoid19", false);
 		if (m_solenoid_features[19][0] != 0xff)
 			m_samples->start(m_solenoid_features[19][0], m_solenoid_features[19][2]);
 	}
@@ -849,7 +845,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( by17_state::timer_d_pulse )
 
 DRIVER_INIT_MEMBER( by17_state, by17 )
 {
-	static const UINT8 solenoid_features_default[20][4] =
+	static const uint8_t solenoid_features_default[20][4] =
 	{
 	// This table serves two functions and is configured on a per game basis:
 	// Assign a particular sound sample corresponding to a solenoid function, and
@@ -889,7 +885,7 @@ DRIVER_INIT_MEMBER( by17_state, by17 )
 
 DRIVER_INIT_MEMBER( by17_state, matahari )
 {
-	static const UINT8 solenoid_features_matahari[20][4] =
+	static const uint8_t solenoid_features_matahari[20][4] =
 	{
 	//  { Sound Channel, Sound Sample, Switch Strobe, Switch Return Mask }
 	/*00*/  { 0x02, 0x05,  0x03, 0x7f },        // Saucer
@@ -925,7 +921,7 @@ DRIVER_INIT_MEMBER( by17_state, matahari )
 
 DRIVER_INIT_MEMBER( by17_state, pwerplay )
 {
-	static const UINT8 solenoid_features_pwerplay[20][4] =
+	static const uint8_t solenoid_features_pwerplay[20][4] =
 	{
 	//  { Sound Channel, Sound Sample, Switch Strobe, Switch Return Mask }
 	/*00*/  { 0x00, 0x10,  0x00, 0x00 },        // Post Down
@@ -978,7 +974,7 @@ MACHINE_RESET_MEMBER( by17_state, by17 )
 
 
 
-static MACHINE_CONFIG_START( by17, by17_state )
+static MACHINE_CONFIG_START( by17 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, 530000)  // No xtal, just 2 chips forming a multivibrator oscillator around 530KHz
 	MCFG_CPU_PROGRAM_MAP(by17_map)
@@ -1003,8 +999,8 @@ static MACHINE_CONFIG_START( by17, by17_state )
 	MCFG_PIA_READCB1_HANDLER(READLINE(by17_state, u10_cb1_r))
 	MCFG_PIA_CA2_HANDLER(WRITELINE(by17_state, u10_ca2_w))
 	MCFG_PIA_CB2_HANDLER(WRITELINE(by17_state, u10_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("maincpu", m6800_cpu_device, irq_line))
-	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("maincpu", m6800_cpu_device, irq_line))
+	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
+	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_z_freq", by17_state, timer_z_freq, attotime::from_hz(100)) // Mains Line Frequency * 2
 	MCFG_TIMER_DRIVER_ADD("timer_z_pulse", by17_state, timer_z_pulse)                                // Active pulse length from Zero Crossing detector
 
@@ -1016,8 +1012,8 @@ static MACHINE_CONFIG_START( by17, by17_state )
 	MCFG_PIA_READCB1_HANDLER(READLINE(by17_state, u11_cb1_r))
 	MCFG_PIA_CA2_HANDLER(WRITELINE(by17_state, u11_ca2_w))
 	MCFG_PIA_CB2_HANDLER(WRITELINE(by17_state, u11_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("maincpu", m6800_cpu_device, irq_line))
-	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("maincpu", m6800_cpu_device, irq_line))
+	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
+	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_d_freq", by17_state, u11_timer, attotime::from_hz(317)) // 555 timer
 	MCFG_TIMER_DRIVER_ADD("timer_d_pulse", by17_state, timer_d_pulse)                             // 555 Active pulse length
 MACHINE_CONFIG_END
@@ -1094,10 +1090,16 @@ ROM_END
 /*--------------------------------
 / Eight Ball #1118
 /-------------------------------*/
-ROM_START(eightbll)
+ROM_START(eightbll)   // Fixes tilt exploit in previous version - if tilt is held closed, next ball will not be served until the tilt switch is released
 	ROM_REGION(0x1000, "roms", 0)
-	ROM_LOAD( "723-20_2.716", 0x0000, 0x0800, CRC(33559e7b) SHA1(49008db95c8f012e7e3b613e6eee811512207fa9))
-	ROM_LOAD( "720-20_6.716", 0x0800, 0x0800, CRC(0c17aa4d) SHA1(729e61a29691857112579efcdb96a35e8e5b1279))
+	ROM_LOAD( "E723-20.U2", 0x0000, 0x0800, CRC(33559e7b) SHA1(49008db95c8f012e7e3b613e6eee811512207fa9))
+	ROM_LOAD( "E720-20.U6", 0x0800, 0x0800, CRC(0c17aa4d) SHA1(729e61a29691857112579efcdb96a35e8e5b1279))
+ROM_END
+
+ROM_START(eightblo)   // Has an exploit if you tilt the ball in play and hold tilt active, after the ball enters the outhole the next ball will be served with tilt state flagged off and the tilt switch is ignored until it's released
+	ROM_REGION(0x1000, "roms", 0)
+	ROM_LOAD( "E723-17.U2", 0x0000, 0x0800, CRC(7e7554ae) SHA1(e03c47c4a7a7352293f246ae5bff970fb53fcd88))
+	ROM_LOAD( "E720-20.U6", 0x0800, 0x0800, CRC(0c17aa4d) SHA1(729e61a29691857112579efcdb96a35e8e5b1279))
 ROM_END
 
 /*--------------------------------
@@ -1124,12 +1126,13 @@ ROM_END
 
 
 GAME(  1976, bowarrow, 0,        by17, by17,     by17_state, by17,     ROT0, "Bally", "Bow & Arrow (Prototype)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(  1977, freedom,  0,        by17, by17,     by17_state, by17,     ROT0, "Bally", "Freedom", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(  1977, nightrdr, 0,        by17, by17,     by17_state, by17,     ROT0, "Bally", "Night Rider (rev. 21)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(  1977, nightr20, nightrdr, by17, by17,     by17_state, by17,     ROT0, "Bally", "Night Rider (rev. 20)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(  1978, blackjck, 0,        by17, by17,     by17_state, by17,     ROT0, "Bally", "Black Jack (Pinball)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(  1977, evelknie, 0,        by17, by17,     by17_state, by17,     ROT0, "Bally", "Evel Knievel", MACHINE_IS_SKELETON_MECHANICAL)
-GAMEL( 1978, matahari, 0,        by17, matahari, by17_state, matahari, ROT0, "Bally", "Mata Hari", MACHINE_MECHANICAL, layout_by17_matahari)
-GAME(  1977, eightbll, 0,        by17, by17,     by17_state, by17,     ROT0, "Bally", "Eight Ball", MACHINE_IS_SKELETON_MECHANICAL)
-GAMEL( 1978, pwerplay, 0,        by17, pwerplay, by17_state, pwerplay, ROT0, "Bally", "Power Play (Pinball)", MACHINE_MECHANICAL, layout_by17_pwerplay)
-GAME(  1978, stk_sprs, 0,        by17, by17,     by17_state, by17,     ROT0, "Bally", "Strikes and Spares", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(  1977, freedom,  0,        by17, by17,     by17_state, by17,     ROT0, "Bally", "Freedom",                 MACHINE_IS_SKELETON_MECHANICAL)
+GAME(  1977, nightrdr, 0,        by17, by17,     by17_state, by17,     ROT0, "Bally", "Night Rider (rev. 21)",   MACHINE_IS_SKELETON_MECHANICAL)
+GAME(  1977, nightr20, nightrdr, by17, by17,     by17_state, by17,     ROT0, "Bally", "Night Rider (rev. 20)",   MACHINE_IS_SKELETON_MECHANICAL)
+GAME(  1978, blackjck, 0,        by17, by17,     by17_state, by17,     ROT0, "Bally", "Black Jack (Pinball)",    MACHINE_IS_SKELETON_MECHANICAL)
+GAME(  1977, evelknie, 0,        by17, by17,     by17_state, by17,     ROT0, "Bally", "Evel Knievel",            MACHINE_IS_SKELETON_MECHANICAL)
+GAMEL( 1978, matahari, 0,        by17, matahari, by17_state, matahari, ROT0, "Bally", "Mata Hari",               MACHINE_MECHANICAL | MACHINE_NOT_WORKING, layout_by17_matahari)
+GAME(  1977, eightbll, 0,        by17, by17,     by17_state, by17,     ROT0, "Bally", "Eight Ball (rev. 20)",    MACHINE_IS_SKELETON_MECHANICAL)
+GAME(  1977, eightblo, eightbll, by17, by17,     by17_state, by17,     ROT0, "Bally", "Eight Ball (rev. 17)",    MACHINE_IS_SKELETON_MECHANICAL)
+GAMEL( 1978, pwerplay, 0,        by17, pwerplay, by17_state, pwerplay, ROT0, "Bally", "Power Play (Pinball)",    MACHINE_MECHANICAL | MACHINE_NOT_WORKING, layout_by17_pwerplay)
+GAME(  1978, stk_sprs, 0,        by17, by17,     by17_state, by17,     ROT0, "Bally", "Strikes and Spares",      MACHINE_IS_SKELETON_MECHANICAL)

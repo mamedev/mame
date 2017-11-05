@@ -3,7 +3,7 @@
 // thanks-to:Marco Cassili
 /*
 
-snk.c
+snk.cpp
 
 various SNK triple Z80 games
 
@@ -71,7 +71,7 @@ Notes:
   1988 fsoccer: use the service mode dip switch
   1988 fitegolf: use the service mode dip switch
 
-- in all games except jcross, credits are edded on the 0->1 transition of the
+- in all games except jcross, credits are added on the 0->1 transition of the
   coin inputs. However declaring the inputs as ACTIVE_HIGH makes ikarijp
   enter test mode on boot, therefore I have to assume that ACTIVE_LOW is the
   correct setting and the games just wait for the pulse to finish before
@@ -92,7 +92,7 @@ Notes:
   a bug. The service mode functionality is very limited anyway. To get past the
   failed ROM test and see the service mode, use this ROM patch:
 
-    UINT8 *mem = machine.root_device().memregion("maincpu")->base();
+    uint8_t *mem = machine.root_device().memregion("maincpu")->base();
     mem[0x3a5d] = mem[0x3a5e] = mem[0x3a5f] = 0;
 
 - The "SNK Wave" custom sound circuitry is only actually used by marvins and
@@ -116,7 +116,7 @@ Notes:
   multiple times to select the spin. The flyer also says that the game "includes
   the unique feature of 2 distinct styles of game play, selectable by dipswitch
   setting. For the avid golfer, a more challenging style of swing.".
-  This feature only exists when "Language" Dip Swicth is set to "English"
+  This feature only exists when "Language" Dip Switch is set to "English"
 
 - fitegolfu:  An "SNK Fighting Golf Program Update" notice published in a trade
   journal outlines 3 improvements which is supposed to allow game players a bit
@@ -255,7 +255,7 @@ TODO:
 
 - tdfever/fsoccer: the dots in the radar flicker. In fsoccer, this is greatly
   improved by forcing partial screen updates when the sprite RAM is changed (see
-  snk68.c for another game that needs this). tdfever dots still flicker a lot,
+  snk68.cpp for another game that needs this). tdfever dots still flicker a lot,
   however I'm not sure if this is an emulation bug or the real game behaviour.
 
 - psychos: the pcb has glitches (colored lines of length up to 16 pixels) during
@@ -270,13 +270,15 @@ TODO:
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
 #include "includes/snk.h"
+
+#include "cpu/z80/z80.h"
 #include "sound/snkwave.h"
 #include "sound/ay8910.h"
 #include "sound/3526intf.h"
 #include "sound/3812intf.h"
 #include "sound/8950intf.h"
+#include "speaker.h"
 
 
 /*********************************************************************/
@@ -284,7 +286,7 @@ TODO:
 
 READ8_MEMBER(snk_state::snk_cpuA_nmi_trigger_r)
 {
-	if(!space.debugger_access())
+	if(!machine().side_effect_disabled())
 	{
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 	}
@@ -298,7 +300,7 @@ WRITE8_MEMBER(snk_state::snk_cpuA_nmi_ack_w)
 
 READ8_MEMBER(snk_state::snk_cpuB_nmi_trigger_r)
 {
-	if(!space.debugger_access())
+	if(!machine().side_effect_disabled())
 	{
 		m_subcpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 	}
@@ -328,14 +330,14 @@ enum
 WRITE8_MEMBER(snk_state::marvins_soundlatch_w)
 {
 	m_marvins_sound_busy_flag = 1;
-	soundlatch_byte_w(space, offset, data);
+	m_soundlatch->write(space, offset, data);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
 READ8_MEMBER(snk_state::marvins_soundlatch_r)
 {
 	m_marvins_sound_busy_flag = 0;
-	return soundlatch_byte_r(space, 0);
+	return m_soundlatch->read(space, 0);
 }
 
 CUSTOM_INPUT_MEMBER(snk_state::marvins_sound_busy)
@@ -374,14 +376,14 @@ TIMER_CALLBACK_MEMBER(snk_state::sgladiat_sndirq_update_callback)
 
 WRITE8_MEMBER(snk_state::sgladiat_soundlatch_w)
 {
-	soundlatch_byte_w(space, offset, data);
+	m_soundlatch->write(space, offset, data);
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(snk_state::sgladiat_sndirq_update_callback),this), CMDIRQ_BUSY_ASSERT);
 }
 
 READ8_MEMBER(snk_state::sgladiat_soundlatch_r)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(snk_state::sgladiat_sndirq_update_callback),this), BUSY_CLEAR);
-	return soundlatch_byte_r(space,0);
+	return m_soundlatch->read(space,0);
 }
 
 READ8_MEMBER(snk_state::sgladiat_sound_nmi_ack_r)
@@ -474,7 +476,7 @@ WRITE_LINE_MEMBER(snk_state::ymirq_callback_2)
 
 WRITE8_MEMBER(snk_state::snk_soundlatch_w)
 {
-	soundlatch_byte_w(space, offset, data);
+	m_soundlatch->write(space, offset, data);
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(snk_state::sndirq_update_callback),this), CMDIRQ_BUSY_ASSERT);
 }
 
@@ -522,7 +524,7 @@ READ8_MEMBER(snk_state::tnk3_ymirq_ack_r)
 READ8_MEMBER(snk_state::tnk3_busy_clear_r)
 {
 	// it's uncertain whether the latch should be cleared here or when it's read
-	soundlatch_clear_byte_w(space, 0, 0);
+	m_soundlatch->clear_w(space, 0, 0);
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(snk_state::sndirq_update_callback),this), BUSY_CLEAR);
 	return 0xff;
 }
@@ -567,7 +569,7 @@ WRITE8_MEMBER(snk_state::hardflags_scroll_msb_w)
 
 int snk_state::hardflags_check(int num)
 {
-	const UINT8 *sr = &m_spriteram[0x800 + 4*num];
+	const uint8_t *sr = &m_spriteram[0x800 + 4*num];
 	int x = sr[2] + ((sr[3] & 0x80) << 1);
 	int y = sr[0] + ((sr[3] & 0x10) << 4);
 
@@ -659,7 +661,7 @@ WRITE8_MEMBER(snk_state::turbocheck_msb_w)
 
 int snk_state::turbofront_check(int small, int num)
 {
-	const UINT8 *sr = &m_spriteram[0x800*small + 4*num];
+	const uint8_t *sr = &m_spriteram[0x800*small + 4*num];
 	int x = sr[2] + ((sr[3] & 0x80) << 1);
 	int y = sr[0] + ((sr[3] & 0x10) << 4);
 
@@ -719,7 +721,7 @@ hand, always returning 0xf inbetween valid values confuses the game.
 CUSTOM_INPUT_MEMBER(snk_state::gwar_rotary)
 {
 	static const char *const ports[] = { "P1ROT", "P2ROT" };
-	int which = (int)(FPTR)param;
+	int which = (int)(uintptr_t)param;
 	int value = ioport(ports[which])->read();
 
 	if ((m_last_value[which] == 0x5 && value == 0x6) || (m_last_value[which] == 0x6 && value == 0x5))
@@ -795,7 +797,7 @@ CUSTOM_INPUT_MEMBER(snk_state::countryc_trackball_y)
 
 CUSTOM_INPUT_MEMBER(snk_state::snk_bonus_r)
 {
-	int bit_mask = (FPTR)param;
+	int bit_mask = (uintptr_t)param;
 
 	switch (bit_mask)
 	{
@@ -1410,7 +1412,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( tnk3_YM3526_sound_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0xc000, 0xc000) AM_READ(tnk3_busy_clear_r)
 	AM_RANGE(0xe000, 0xe001) AM_DEVREADWRITE("ym1", ym3526_device, read, write)
 	AM_RANGE(0xe004, 0xe004) AM_READ(tnk3_cmdirq_ack_r)
@@ -1420,7 +1422,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( aso_YM3526_sound_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xd000, 0xd000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xd000, 0xd000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0xe000, 0xe000) AM_READ(tnk3_busy_clear_r)
 	AM_RANGE(0xf000, 0xf001) AM_DEVREADWRITE("ym1", ym3526_device, read, write)
 //  AM_RANGE(0xf002, 0xf002) AM_READNOP unknown
@@ -1431,7 +1433,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( YM3526_YM3526_sound_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
-	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xe000, 0xe000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0xe800, 0xe800) AM_DEVREADWRITE("ym1", ym3526_device, status_port_r, control_port_w)
 	AM_RANGE(0xec00, 0xec00) AM_DEVWRITE("ym1", ym3526_device, write_port_w)
 	AM_RANGE(0xf000, 0xf000) AM_DEVREADWRITE("ym2", ym3526_device, status_port_r, control_port_w)
@@ -1442,7 +1444,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( YM3812_sound_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
-	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xe000, 0xe000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0xe800, 0xe800) AM_DEVREADWRITE("ym1", ym3812_device, status_port_r, control_port_w)
 	AM_RANGE(0xec00, 0xec00) AM_DEVWRITE("ym1", ym3812_device, write_port_w)
 	AM_RANGE(0xf800, 0xf800) AM_READWRITE(snk_sound_status_r, snk_sound_status_w)
@@ -1451,7 +1453,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( YM3526_Y8950_sound_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
-	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xe000, 0xe000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0xe800, 0xe800) AM_DEVREADWRITE("ym1", ym3526_device, status_port_r, control_port_w)
 	AM_RANGE(0xec00, 0xec00) AM_DEVWRITE("ym1", ym3526_device, write_port_w)
 	AM_RANGE(0xf000, 0xf000) AM_DEVREADWRITE("ym2", y8950_device, status_port_r, control_port_w)
@@ -1462,7 +1464,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( YM3812_Y8950_sound_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
-	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xe000, 0xe000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0xe800, 0xe800) AM_DEVREADWRITE("ym1", ym3812_device, status_port_r, control_port_w)
 	AM_RANGE(0xec00, 0xec00) AM_DEVWRITE("ym1", ym3812_device, write_port_w)
 	AM_RANGE(0xf000, 0xf000) AM_DEVREADWRITE("ym2", y8950_device, status_port_r, control_port_w)
@@ -1473,7 +1475,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( Y8950_sound_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
-	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xe000, 0xe000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0xf000, 0xf000) AM_DEVREADWRITE("ym2", y8950_device, status_port_r, control_port_w)
 	AM_RANGE(0xf400, 0xf400) AM_DEVWRITE("ym2", y8950_device, write_port_w)
 	AM_RANGE(0xf800, 0xf800) AM_READWRITE(snk_sound_status_r, snk_sound_status_w)
@@ -3606,7 +3608,7 @@ GFXDECODE_END
 
 /**********************************************************************/
 
-static MACHINE_CONFIG_START( marvins, snk_state )
+static MACHINE_CONFIG_START( marvins )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 3360000)   /* 3.36 MHz */
@@ -3643,6 +3645,8 @@ static MACHINE_CONFIG_START( marvins, snk_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ay1", AY8910, 2000000)  /* verified on schematics */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
 
@@ -3676,7 +3680,7 @@ static MACHINE_CONFIG_DERIVED( madcrush, marvins )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( jcross, snk_state )
+static MACHINE_CONFIG_START( jcross )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 3350000) /* NOT verified */
@@ -3712,6 +3716,8 @@ static MACHINE_CONFIG_START( jcross, snk_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ay1", AY8910, 2000000)  /* NOT verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
@@ -3757,7 +3763,7 @@ static MACHINE_CONFIG_DERIVED( hal21, jcross )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( tnk3, snk_state )
+static MACHINE_CONFIG_START( tnk3 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_13_4MHz/4) /* verified on pcb */
@@ -3791,6 +3797,8 @@ static MACHINE_CONFIG_START( tnk3, snk_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ym1", YM3526, XTAL_8MHz/2) /* verified on pcb */
 	MCFG_YM3526_IRQ_HANDLER(WRITELINE(snk_state, ymirq_callback_1))
@@ -3847,7 +3855,7 @@ static MACHINE_CONFIG_DERIVED( fitegolf2, fitegolf )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( ikari, snk_state )
+static MACHINE_CONFIG_START( ikari )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_13_4MHz/4) /* verified on pcb */
@@ -3873,13 +3881,15 @@ static MACHINE_CONFIG_START( ikari, snk_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ikari)
 
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", 0x400)
+	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 0x400)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 
 	MCFG_VIDEO_START_OVERRIDE(snk_state,ikari)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ym1", YM3526, XTAL_8MHz/2) /* verified on pcb */
 	MCFG_YM3526_IRQ_HANDLER(WRITELINE(snk_state, ymirq_callback_1))
@@ -3904,7 +3914,7 @@ static MACHINE_CONFIG_DERIVED( victroad, ikari )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( bermudat, snk_state )
+static MACHINE_CONFIG_START( bermudat )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_8MHz/2) /* verified on pcb */
@@ -3930,11 +3940,13 @@ static MACHINE_CONFIG_START( bermudat, snk_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gwar)
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", 0x400)
+	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 0x400)
 	MCFG_VIDEO_START_OVERRIDE(snk_state,gwar)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ym1", YM3526, XTAL_8MHz/2) /* verified on pcb */
 	MCFG_YM3526_IRQ_HANDLER(WRITELINE(snk_state, ymirq_callback_1))
@@ -4000,7 +4012,7 @@ static MACHINE_CONFIG_DERIVED( choppera, chopper1 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( tdfever, snk_state )
+static MACHINE_CONFIG_START( tdfever )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)
@@ -4026,13 +4038,15 @@ static MACHINE_CONFIG_START( tdfever, snk_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tdfever)
 
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", 0x400)
+	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 0x400)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 
 	MCFG_VIDEO_START_OVERRIDE(snk_state,tdfever)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ym1", YM3526, 4000000)
 	MCFG_YM3526_IRQ_HANDLER(WRITELINE(snk_state, ymirq_callback_1))
@@ -4147,8 +4161,8 @@ ROM_START( madcrush )
 	ROM_LOAD( "p9.bin",   0x8000, 0x2000, CRC(e3c8c2cb) SHA1(b3e39eacd2609ff0fa0f511bff0fc83e6b3970d4) ) /* Same as Mad Crasher, but different label */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound code */
-	ROM_LOAD( "p1.a6",   0x0000, 0x2000, CRC(2dcd036d) SHA1(4da42ab1e502fff57f5d5787df406289538fa484) ) /* Located on the A2003UP03-01 duaghtercard PCB */
-	ROM_LOAD( "p2.a8",   0x2000, 0x2000, CRC(cc30ae8b) SHA1(ffedc747b9e0b616a163ff8bb1def318e522585b) ) /* Located on the A2003UP03-01 duaghtercard PCB */
+	ROM_LOAD( "p1.a6",   0x0000, 0x2000, CRC(2dcd036d) SHA1(4da42ab1e502fff57f5d5787df406289538fa484) ) /* Located on the A2003UP03-01 daughtercard PCB */
+	ROM_LOAD( "p2.a8",   0x2000, 0x2000, CRC(cc30ae8b) SHA1(ffedc747b9e0b616a163ff8bb1def318e522585b) ) /* Located on the A2003UP03-01 daughtercard PCB */
 
 	ROM_REGION( 0x2000, "tx_tiles", 0 )
 	ROM_LOAD( "p13.e2",    0x0000, 0x2000, CRC(fcdd36ca) SHA1(bb9408e1feaa15949f11d797e3eb91d37c3e0add) ) /* Located on the A2003 UP01-04 PCB */
@@ -4244,6 +4258,42 @@ ROM_START( jcross )
 	ROM_LOAD( "jcrossp2.j7",  0x000, 0x400, CRC(b72a96a5) SHA1(20d40e4b6a2652e61dc3ad0c4afaec04e3c7cf74) )
 	ROM_LOAD( "jcrossp1.j8",  0x400, 0x400, CRC(35650448) SHA1(17e4a661ff304c093bb0253efceaf4e9b2498924) )
 	ROM_LOAD( "jcrossp0.j9",  0x800, 0x400, CRC(99f54d48) SHA1(9bd20eaa9706d28eaca9f5e195204d89e302272f) )
+ROM_END
+
+ROM_START( jcrossa )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "snk9.bin",      0x0000, 0x2000, CRC(3c93485d) SHA1(37e319cccd77d21d3ba49a5975eb8075f0f96843) )
+	ROM_LOAD( "snk8.bin",      0x2000, 0x2000, CRC(15a55781) SHA1(03fd131c2df7ebcc6741067e5bc2539697fd5f2a) )
+	ROM_LOAD( "snk7.bin",      0x4000, 0x2000, CRC(ac89e49c) SHA1(9b9a0eec8ad341ce7af58bffe55f10bec696af62) )
+	ROM_LOAD( "snk6.bin",      0x6000, 0x2000, CRC(4fd7848d) SHA1(870aea0b8e027616814df87afd24418fd140f736) )
+	ROM_LOAD( "snk5.bin",      0x8000, 0x2000, CRC(8500575d) SHA1(b8751b86508de484f2eb8a6702c63a47ec882036) )
+
+	ROM_REGION( 0x10000, "sub", 0 )
+	ROM_LOAD( "snk1.bin",      0x0000, 0x2000, CRC(77ed51e7) SHA1(56b457846f71f442da6f99889231d4b71d5fcb6c) )
+	ROM_LOAD( "snk2.bin",      0x2000, 0x2000, CRC(23cf0f70) SHA1(f258e899f332a026eeb0db92330fd60c478218af) )
+	ROM_LOAD( "snk3.bin",      0x4000, 0x2000, CRC(5bed3118) SHA1(f105ca55223a4bfbc8e2d61c365c76cf2153254c) )
+	ROM_LOAD( "snk4.bin",      0x6000, 0x2000, CRC(cd75dc95) SHA1(ef03d2b0f66f30fad5132e7b6aee9ec978650b53) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "jcrosss0.f1",   0x0000, 0x2000, CRC(9ae8ea93) SHA1(1d824302305a41bf5c354c36e2e11981d1aa5ea4) ) // not dumped, taken from parent
+	ROM_LOAD( "snk11.bin",     0x2000, 0x2000, CRC(83785601) SHA1(cd3d484ef5464090c4b543b1edbbedcc52b15071) )
+
+	ROM_REGION( 0x4000, "tx_tiles", 0 )
+	ROM_LOAD( "jcrossb4.10a",  0x0000, 0x2000, CRC(08ad93fe) SHA1(04baf2d9735b0d794b114abeced5a6b899958ce7) ) // not dumped, taken from parent
+	ROM_LOAD( "jcrosss.d2",    0x2000, 0x2000, CRC(3ebb5beb) SHA1(de0a1f0fdb5b08b76dab9fa64d9ae3047c4ff84b) ) // not dumped, taken from parent
+
+	ROM_REGION( 0x2000, "bg_tiles", 0 )
+	ROM_LOAD( "jcrossb1.a2",   0x0000, 0x2000, CRC(ea3dfbc9) SHA1(eee56acd1c9dbc6c3ecdee4ffe860273e65cc09b) ) // not dumped, taken from parent
+
+	ROM_REGION( 0x6000, "sp16_tiles", 0 )
+	ROM_LOAD( "snk12.bin",     0x0000, 0x2000, CRC(4532509b) SHA1(c99f87e2b06b94d815e6099bccb2aee0edf8c98d) )
+	ROM_LOAD( "snk13.bin",     0x2000, 0x2000, CRC(70d219bf) SHA1(9ff9f88221edd141e8204ac810434b4290db7cff) )
+	ROM_LOAD( "snk14.bin",     0x4000, 0x2000, CRC(42a12b9d) SHA1(9f2bdb1f84f444442282cf0fc1f7b3c7f9a9bf48) )
+
+	ROM_REGION( 0x0c00, "proms", 0 )
+	ROM_LOAD( "jcrossp2.j7",  0x000, 0x400, CRC(b72a96a5) SHA1(20d40e4b6a2652e61dc3ad0c4afaec04e3c7cf74) ) // not dumped, taken from parent
+	ROM_LOAD( "jcrossp1.j8",  0x400, 0x400, CRC(35650448) SHA1(17e4a661ff304c093bb0253efceaf4e9b2498924) ) // not dumped, taken from parent
+	ROM_LOAD( "jcrossp0.j9",  0x800, 0x400, CRC(99f54d48) SHA1(9bd20eaa9706d28eaca9f5e195204d89e302272f) ) // not dumped, taken from parent
 ROM_END
 
 /***********************************************************************/
@@ -4576,80 +4626,160 @@ ROM_START( athena )
 	ROM_LOAD( "up01_t2.rom",  0x10000, 0x8000, CRC(57b35c73) SHA1(6d15b94b50c3734f7d60bd9bd1c5e6c76591d829) )
 ROM_END
 
+// the following set is supposed to be a bootleg. The PCB set only has a "ferrocal" guarantee sticker
+// but main PCB is marked A6001 UP02-02 and the video A6001 UP01-02, which seem original (see fitegolf)
+
+ROM_START( athenab )
+	ROM_REGION( 0x10000, "maincpu", 0 ) // the two program ROMs differ quite a lot from the parent
+	ROM_LOAD( "p4.bin",  0x0000, 0x4000,  CRC(a341677e) SHA1(b78bf999054cfd82e8b7b7ee23d0999b3499e940) )
+	ROM_LOAD( "m4.bin",  0x4000, 0x8000,  CRC(26e2b14f) SHA1(d62694267635bfa21fb04a3d810dafba36f03da3) )
+
+	ROM_REGION( 0x10000 , "sub", 0 )
+	ROM_LOAD( "p8.bin",  0x0000, 0x4000, CRC(df50af7e) SHA1(2a69089aecf598cb11f4f1c9b42d81670f9bd68e) )
+	ROM_LOAD( "m8.bin",  0x4000, 0x8000, CRC(f3c933df) SHA1(70a0bf63230be53da9196fae4c3e604205275ddd) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "g6.bin",  0x0000, 0x4000, CRC(42dbe029) SHA1(9aa311860693bd3e73f2b72ca4b171cb95f069ee) )
+	ROM_LOAD( "k6.bin",  0x4000, 0x8000, CRC(596f1c8a) SHA1(8f1400c77473c845e57a14fa479cf4f7ac66a909) )
+
+	ROM_REGION( 0x0c00, "proms", 0 )
+	ROM_LOAD( "c2.bin",  0x000, 0x400, CRC(294279ae) SHA1(b3db5617b83845a6c1abca8f71fa4598758a2a56) )
+	ROM_LOAD( "b1.bin",  0x400, 0x400, CRC(d25c9099) SHA1(f3933075cce1255affc61dfefd9559b6e15ed29c) )
+	ROM_LOAD( "c1.bin",  0x800, 0x400, CRC(a4a4e7dc) SHA1(aa694c2d44dcabc6cfd46307c55c3759eff57236) )
+
+	ROM_REGION( 0x4000, "tx_tiles", 0 )
+	ROM_LOAD( "d2.bin",  0x0000, 0x4000,  CRC(18b4bcca) SHA1(2476aa6c8d55e117d840202a97fe2a65e252ad7f) )
+
+	ROM_REGION( 0x8000, "bg_tiles", 0 )
+	ROM_LOAD( "b2.bin",  0x0000, 0x8000,  CRC(f269c0eb) SHA1(a947c6e4d82e0aafa616d25395ef63c33d9beb06) )
+
+	ROM_REGION( 0x18000, "sp16_tiles", 0 )
+	ROM_LOAD( "p2.bin",  0x00000, 0x8000, CRC(c63a871f) SHA1(0ab8ebebd750fdcad283eed427179f2124b300ae) )
+	ROM_LOAD( "s2.bin",  0x08000, 0x8000, CRC(760568d8) SHA1(9dc447c446791c79322e21e3caef6ceae347e2fb) )
+	ROM_LOAD( "t2.bin",  0x10000, 0x8000, CRC(57b35c73) SHA1(6d15b94b50c3734f7d60bd9bd1c5e6c76591d829) )
+ROM_END
+
+ROM_START( sathena )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1.128", 0x0000, 0x4000, CRC(26eb2ce1) SHA1(fb60cfbc01d1e3446e0e98b9a6ba8854563bb418) )
+	ROM_LOAD( "2.256", 0x4000, 0x8000, CRC(925f60ce) SHA1(ba59f6a3e675341e2f79ce1fae05ae669bf1d0f9) )
+
+	ROM_REGION( 0x10000 , "sub", 0 )
+	ROM_LOAD( "3.128", 0x0000, 0x4000, CRC(d0853f62) SHA1(6945eaa7cd46a8d4af543e40a9f2774bfecb337e) )
+	ROM_LOAD( "4.256", 0x4000, 0x8000, CRC(8c697bca) SHA1(776254fed53ee5985f0f618f739e48e0b43bcebe) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "0.128", 0x0000, 0x4000, CRC(42dbe029) SHA1(9aa311860693bd3e73f2b72ca4b171cb95f069ee) )
+	ROM_LOAD( "5.256", 0x4000, 0x8000, CRC(596f1c8a) SHA1(8f1400c77473c845e57a14fa479cf4f7ac66a909) )
+
+	ROM_REGION( 0x0c00, "proms", 0 ) // not dumped from this set
+	ROM_LOAD( "up02_c2.rom", 0x000, 0x400, CRC(294279ae) SHA1(b3db5617b83845a6c1abca8f71fa4598758a2a56) BAD_DUMP )
+	ROM_LOAD( "up02_b1.rom", 0x400, 0x400, CRC(d25c9099) SHA1(f3933075cce1255affc61dfefd9559b6e15ed29c) BAD_DUMP )
+	ROM_LOAD( "up02_c1.rom", 0x800, 0x400, CRC(a4a4e7dc) SHA1(aa694c2d44dcabc6cfd46307c55c3759eff57236) BAD_DUMP )
+
+	ROM_REGION( 0x4000, "tx_tiles", 0 )
+	ROM_LOAD( "11.128", 0x0000, 0x4000, CRC(18b4bcca) SHA1(2476aa6c8d55e117d840202a97fe2a65e252ad7f) )
+
+	ROM_REGION( 0x8000, "bg_tiles", 0 )
+	ROM_LOAD( "10.256", 0x0000, 0x8000, CRC(f269c0eb) SHA1(a947c6e4d82e0aafa616d25395ef63c33d9beb06) )
+
+	ROM_REGION( 0x18000, "sp16_tiles", 0 )
+	ROM_LOAD( "7.256", 0x00000, 0x8000, CRC(c63a871f) SHA1(0ab8ebebd750fdcad283eed427179f2124b300ae) )
+	ROM_LOAD( "8.256", 0x08000, 0x8000, CRC(760568d8) SHA1(9dc447c446791c79322e21e3caef6ceae347e2fb) )
+	ROM_LOAD( "9.256", 0x10000, 0x8000, CRC(57b35c73) SHA1(6d15b94b50c3734f7d60bd9bd1c5e6c76591d829) )
+ROM_END
+
 /***********************************************************************/
+
+/*
+Fighting Golf
+SNK, 1988
+
+CPU/Sound Board: A6001 UP02-02
+Video Board:     A6001 UP01-02
+
+Pinouts very similar to JAMMA.
+
+Socket at H8 is intentionally empty.
+*/
 
 ROM_START( fitegolf )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "gu2",    0x0000, 0x4000, CRC(19be7ad6) SHA1(6f0faf606e44a3f8cc027699cc816aa3414a1b98) )
-	ROM_LOAD( "gu1",    0x4000, 0x8000, CRC(bc32568f) SHA1(35fec3dbdd773ec7f427ecdd81066fb8f1b74e05) )
+	ROM_LOAD( "gu2.4p",     0x00000, 0x04000, CRC(19be7ad6) SHA1(6f0faf606e44a3f8cc027699cc816aa3414a1b98) )
+	ROM_LOAD( "gu1.4m",     0x04000, 0x08000, CRC(bc32568f) SHA1(35fec3dbdd773ec7f427ecdd81066fb8f1b74e05) )
 
 	ROM_REGION( 0x10000, "sub", 0 )
-	ROM_LOAD( "gu6",    0x0000, 0x4000, CRC(2b9978c5) SHA1(5490e9f796697318650fc5f70c0e64d6785ad7fc) )
-	ROM_LOAD( "gu5",    0x4000, 0x8000, CRC(ea3d138c) SHA1(af0a0bfe2d266179946948cf42fe697505798a4f) )
+	ROM_LOAD( "gu6.8p",     0x00000, 0x04000, CRC(2b9978c5) SHA1(5490e9f796697318650fc5f70c0e64d6785ad7fc) )
+	ROM_LOAD( "gu5.8m",     0x04000, 0x08000, CRC(ea3d138c) SHA1(af0a0bfe2d266179946948cf42fe697505798a4f) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "gu3",    0x0000, 0x4000, CRC(811b87d7) SHA1(fb387f42085d6e0e5a88729ca0e50656411ce037) )
-	ROM_LOAD( "gu4",    0x4000, 0x8000, CRC(2d998e2b) SHA1(a471cfbb4dabc90fcc29c562620b9965eaff6861) )
+	ROM_LOAD( "gu3.6g",     0x00000, 0x04000, CRC(811b87d7) SHA1(fb387f42085d6e0e5a88729ca0e50656411ce037) )
+	ROM_LOAD( "gu4.6k",     0x04000, 0x08000, CRC(2d998e2b) SHA1(a471cfbb4dabc90fcc29c562620b9965eaff6861) )
 
 	ROM_REGION( 0x0c00, "proms", 0 )
-	ROM_LOAD( "82s137.2c",  0x00000, 0x00400, CRC(6e4c7836) SHA1(3ab3c498939fac992e2bf1c33983ee821a9b6a18) )
-	ROM_LOAD( "82s137.1b",  0x00400, 0x00400, CRC(29e7986f) SHA1(85ba8d3443458c27728f633745857a1315dd183f) )
-	ROM_LOAD( "82s137.1c",  0x00800, 0x00400, CRC(27ba9ff9) SHA1(f021d10460f40de4447560df5ac47fa53bb57ff9) )
+	ROM_LOAD( "3.2c",       0x00000, 0x00400, CRC(6e4c7836) SHA1(3ab3c498939fac992e2bf1c33983ee821a9b6a18) ) /* 82s137 */
+	ROM_LOAD( "1.1b",       0x00400, 0x00400, CRC(29e7986f) SHA1(85ba8d3443458c27728f633745857a1315dd183f) ) /* 82s137 */
+	ROM_LOAD( "2.1c",       0x00800, 0x00400, CRC(27ba9ff9) SHA1(f021d10460f40de4447560df5ac47fa53bb57ff9) ) /* 82s137 */
 
 	ROM_REGION( 0x4000, "tx_tiles", 0 )
-	ROM_LOAD( "gu8",   0x0000, 0x4000, CRC(f1628dcf) SHA1(efea343d3a9dd45ef74947c297e166e34afbb680) )
+	ROM_LOAD( "gu8.2d",     0x00000, 0x04000, CRC(f1628dcf) SHA1(efea343d3a9dd45ef74947c297e166e34afbb680) )
 
 	ROM_REGION( 0x8000, "bg_tiles", 0 )
-	ROM_LOAD( "gu7",  0x0000, 0x8000, CRC(4655f94e) SHA1(08526206d8e929bb01d61fff8de2ee99fd287c17) )
+	ROM_LOAD( "gu7.2b",     0x00000, 0x08000, CRC(4655f94e) SHA1(08526206d8e929bb01d61fff8de2ee99fd287c17) )
 
 	ROM_REGION( 0x18000, "sp16_tiles", 0 )
-	ROM_LOAD( "gu9",   0x00000, 0x8000, CRC(d4957ec5) SHA1(8ead7866ba5ac66ead6b707aa868bcae30c486e1) )
-	ROM_LOAD( "gu10",  0x08000, 0x8000, CRC(b3acdac2) SHA1(7377480d5e1b5ab2c49f5fee2927623ce8240e19) )
-	ROM_LOAD( "gu11",  0x10000, 0x8000, CRC(b99cf73b) SHA1(23989fc3914e77d364807a9eb96a4ddf75ad7cf1) )
+	ROM_LOAD( "gu9.2p",     0x00000, 0x08000, CRC(d4957ec5) SHA1(8ead7866ba5ac66ead6b707aa868bcae30c486e1) )
+	ROM_LOAD( "gu10.2rs",   0x08000, 0x08000, CRC(b3acdac2) SHA1(7377480d5e1b5ab2c49f5fee2927623ce8240e19) )
+	ROM_LOAD( "gu11.2t",    0x10000, 0x08000, CRC(b99cf73b) SHA1(23989fc3914e77d364807a9eb96a4ddf75ad7cf1) )
 
 	ROM_REGION( 0x0600, "plds", 0 )
-	ROM_LOAD( "pal16r6a.6c", 0x0000, 0x0104, CRC(de291f4e) SHA1(b50294d30cb8eacc7a9bb8b46695a7463ef45ff1) )
-	ROM_LOAD( "pal16l8a.3f", 0x0200, 0x0104, CRC(c5f1c1da) SHA1(e17293be0f77d302c59c1095fe1ec65e45557627) )
-	ROM_LOAD( "pal20l8a.6r", 0x0400, 0x0144, CRC(0f011673) SHA1(383e6f6e78daec9c874d5b48378111ca60f5ed64) )
+	ROM_LOAD( "a6001-1.6c", 0x00000, 0x00104, CRC(de291f4e) SHA1(b50294d30cb8eacc7a9bb8b46695a7463ef45ff1) ) /* PAL16R6A */
+	ROM_LOAD( "a6001-3.3f", 0x00200, 0x00104, CRC(c5f1c1da) SHA1(e17293be0f77d302c59c1095fe1ec65e45557627) ) /* PAL16L8A */
+	ROM_LOAD( "a6001-2.6r", 0x00400, 0x00144, CRC(0f011673) SHA1(383e6f6e78daec9c874d5b48378111ca60f5ed64) ) /* PAL20L8A */
 ROM_END
 
 ROM_START( fitegolfu )  /*  Later US version containing enhancements to make the game a little easier */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "np45.128", 0x0000, 0x4000, CRC(16e8e763) SHA1(0b5296f2a91a7f3176b7461ca4958865ce998241) )
-	ROM_LOAD( "mn45.256", 0x4000, 0x8000, CRC(a4fa09d5) SHA1(ae7f0cb47de06006ae71252c4201a93a01a26887) )
+	ROM_LOAD( "np45.4p",    0x00000, 0x04000, CRC(16e8e763) SHA1(0b5296f2a91a7f3176b7461ca4958865ce998241) )
+	ROM_LOAD( "mn45.4m",    0x04000, 0x08000, CRC(a4fa09d5) SHA1(ae7f0cb47de06006ae71252c4201a93a01a26887) )
 
 	ROM_REGION( 0x10000, "sub", 0 )
-	ROM_LOAD( "gu6",    0x0000, 0x4000, CRC(2b9978c5) SHA1(5490e9f796697318650fc5f70c0e64d6785ad7fc) )  // NP8.256
-	ROM_LOAD( "gu5",    0x4000, 0x8000, CRC(ea3d138c) SHA1(af0a0bfe2d266179946948cf42fe697505798a4f) )  // MN8.256
+	ROM_LOAD( "gu6.8p",     0x00000, 0x04000, CRC(2b9978c5) SHA1(5490e9f796697318650fc5f70c0e64d6785ad7fc) ) // NP8.256
+	ROM_LOAD( "gu5.8m",     0x04000, 0x08000, CRC(ea3d138c) SHA1(af0a0bfe2d266179946948cf42fe697505798a4f) ) // MN8.256
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "gu3",    0x0000, 0x4000, CRC(811b87d7) SHA1(fb387f42085d6e0e5a88729ca0e50656411ce037) )  // FG67.256
-	ROM_LOAD( "gu4",    0x4000, 0x8000, CRC(2d998e2b) SHA1(a471cfbb4dabc90fcc29c562620b9965eaff6861) )  // K67.256
+	ROM_LOAD( "gu3.6g",     0x00000, 0x04000, CRC(811b87d7) SHA1(fb387f42085d6e0e5a88729ca0e50656411ce037) ) // FG67.256
+	ROM_LOAD( "gu4.6k",     0x04000, 0x08000, CRC(2d998e2b) SHA1(a471cfbb4dabc90fcc29c562620b9965eaff6861) ) // K67.256
 
 	ROM_REGION( 0x0c00, "proms", 0 )
-	ROM_LOAD( "82s137.2c",  0x00000, 0x00400, CRC(6e4c7836) SHA1(3ab3c498939fac992e2bf1c33983ee821a9b6a18) )
-	ROM_LOAD( "82s137.1b",  0x00400, 0x00400, CRC(29e7986f) SHA1(85ba8d3443458c27728f633745857a1315dd183f) )
-	ROM_LOAD( "82s137.1c",  0x00800, 0x00400, CRC(27ba9ff9) SHA1(f021d10460f40de4447560df5ac47fa53bb57ff9) )
+	ROM_LOAD( "3.2c",       0x00000, 0x00400, CRC(6e4c7836) SHA1(3ab3c498939fac992e2bf1c33983ee821a9b6a18) ) /* 82s137 */
+	ROM_LOAD( "1.1b",       0x00400, 0x00400, CRC(29e7986f) SHA1(85ba8d3443458c27728f633745857a1315dd183f) ) /* 82s137 */
+	ROM_LOAD( "2.1c",       0x00800, 0x00400, CRC(27ba9ff9) SHA1(f021d10460f40de4447560df5ac47fa53bb57ff9) ) /* 82s137 */
 
 	ROM_REGION( 0x4000, "tx_tiles", 0 )
-	ROM_LOAD( "gu8",   0x0000, 0x4000, CRC(f1628dcf) SHA1(efea343d3a9dd45ef74947c297e166e34afbb680) )       // D2.128
+	ROM_LOAD( "gu8.2d",     0x00000, 0x04000, CRC(f1628dcf) SHA1(efea343d3a9dd45ef74947c297e166e34afbb680) ) // D2.128
 
 	ROM_REGION( 0x8000, "bg_tiles", 0 )
-	ROM_LOAD( "gu7",  0x0000, 0x8000, CRC(4655f94e) SHA1(08526206d8e929bb01d61fff8de2ee99fd287c17) )        // BC2.256
+	ROM_LOAD( "gu7.2b",     0x00000, 0x08000, CRC(4655f94e) SHA1(08526206d8e929bb01d61fff8de2ee99fd287c17) ) // BC2.256
 
 	ROM_REGION( 0x18000, "sp16_tiles", 0 )
-	ROM_LOAD( "gu9",   0x00000, 0x8000, CRC(d4957ec5) SHA1(8ead7866ba5ac66ead6b707aa868bcae30c486e1) )  // P2.256
-	ROM_LOAD( "gu10",  0x08000, 0x8000, CRC(b3acdac2) SHA1(7377480d5e1b5ab2c49f5fee2927623ce8240e19) )  // R2.256
-	ROM_LOAD( "gu11",  0x10000, 0x8000, CRC(b99cf73b) SHA1(23989fc3914e77d364807a9eb96a4ddf75ad7cf1) )  // S2.256
+	ROM_LOAD( "gu9.2p",     0x00000, 0x08000, CRC(d4957ec5) SHA1(8ead7866ba5ac66ead6b707aa868bcae30c486e1) ) // P2.256
+	ROM_LOAD( "gu10.2rs",   0x08000, 0x08000, CRC(b3acdac2) SHA1(7377480d5e1b5ab2c49f5fee2927623ce8240e19) ) // R2.256
+	ROM_LOAD( "gu11.2t",    0x10000, 0x08000, CRC(b99cf73b) SHA1(23989fc3914e77d364807a9eb96a4ddf75ad7cf1) ) // S2.256
 
 	ROM_REGION( 0x0600, "plds", 0 )
-	ROM_LOAD( "pal16r6a.6c", 0x0000, 0x0104, CRC(de291f4e) SHA1(b50294d30cb8eacc7a9bb8b46695a7463ef45ff1) )
-	ROM_LOAD( "pal16l8a.3f", 0x0200, 0x0104, CRC(c5f1c1da) SHA1(e17293be0f77d302c59c1095fe1ec65e45557627) )
-	ROM_LOAD( "pal20l8a.6r", 0x0400, 0x0144, CRC(0f011673) SHA1(383e6f6e78daec9c874d5b48378111ca60f5ed64) )
+	ROM_LOAD( "a6001-1.6c", 0x00000, 0x00104, CRC(de291f4e) SHA1(b50294d30cb8eacc7a9bb8b46695a7463ef45ff1) ) /* PAL16R6A */
+	ROM_LOAD( "a6001-3.3f", 0x00200, 0x00104, CRC(c5f1c1da) SHA1(e17293be0f77d302c59c1095fe1ec65e45557627) ) /* PAL16L8A */
+	ROM_LOAD( "a6001-2.6r", 0x00400, 0x00144, CRC(0f011673) SHA1(383e6f6e78daec9c874d5b48378111ca60f5ed64) ) /* PAL20L8A */
 ROM_END
 
+/*
+Fighting Golf
+SNK, 1988
 
-
+CPU/Sound Board: ?
+Video Board:     ?
+*/
 
 ROM_START( fitegolf2 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -4667,9 +4797,9 @@ ROM_START( fitegolf2 )
 	ROM_LOAD( "fg_1.2e",    0x4000, 0x8000, CRC(2d998e2b) SHA1(a471cfbb4dabc90fcc29c562620b9965eaff6861) )
 
 	ROM_REGION( 0x0c00, "proms", 0 )
-	ROM_LOAD( "gl1.5f",  0x00000, 0x00400, CRC(6e4c7836) SHA1(3ab3c498939fac992e2bf1c33983ee821a9b6a18) )
-	ROM_LOAD( "gl2.5g",  0x00400, 0x00400, CRC(29e7986f) SHA1(85ba8d3443458c27728f633745857a1315dd183f) )
-	ROM_LOAD( "gl3.5h",  0x00800, 0x00400, CRC(27ba9ff9) SHA1(f021d10460f40de4447560df5ac47fa53bb57ff9) )
+	ROM_LOAD( "gl1.5f",  0x00000, 0x00400, CRC(6e4c7836) SHA1(3ab3c498939fac992e2bf1c33983ee821a9b6a18) ) /* 82s137 */
+	ROM_LOAD( "gl2.5g",  0x00400, 0x00400, CRC(29e7986f) SHA1(85ba8d3443458c27728f633745857a1315dd183f) ) /* 82s137 */
+	ROM_LOAD( "gl3.5h",  0x00800, 0x00400, CRC(27ba9ff9) SHA1(f021d10460f40de4447560df5ac47fa53bb57ff9) ) /* 82s137 */
 
 	ROM_REGION( 0x4000, "tx_tiles", 0 )
 	ROM_LOAD( "fg_12.1e",   0x0000, 0x4000, CRC(f1628dcf) SHA1(efea343d3a9dd45ef74947c297e166e34afbb680) )
@@ -5076,6 +5206,12 @@ ROM_START( victroad )
 	ROM_REGION( 0x20000, "ym2", 0 )
 	ROM_LOAD( "p4.ef5", 0x00000, 0x10000, CRC(e10fb8cc) SHA1(591aa1f947216795252dc4d9ec2600ef63dada7d) )
 	ROM_LOAD( "p5.g5",  0x10000, 0x10000, CRC(93e5f110) SHA1(065a78805e50ce6a48cb7930f264bada236feb13) )
+
+	ROM_REGION( 0x800, "pals", 0 ) // not used by the emulation
+	ROM_LOAD( "a5004-1.d6", 0x000, 0x104, CRC(311e5ae6) SHA1(8a3799e1611ac4086dda2755c5ad44c0dc16ff5b) )
+	ROM_LOAD( "a5004-4.s8", 0x200, 0x104, CRC(fad4c493) SHA1(0aacc2d25434173366ba95eaac848812ea9f40c5) )
+	ROM_LOAD( "a6002-3.p2", 0x400, 0x104, CRC(036b1a16) SHA1(c688071c452066e5d4addf09212eb76d3078ec45) )
+	ROM_LOAD( "pal20l8",    0x600, 0x144, NO_DUMP ) // protected
 ROM_END
 
 ROM_START( dogosoke )
@@ -5786,6 +5922,53 @@ ROM_START( gwara )
 	ROM_LOAD( "gv1.g5", 0x00000, 0x10000, CRC(2255f8dd) SHA1(fac31b617762d0fa39cf82a658be250b91ab73ce) )
 ROM_END
 
+ROM_START( gwarab )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "gv3 ver 1.bin", 0x00000, 0x10000, CRC(abec5eeb) SHA1(6a6b7f588d6d72a6ee6828e20798fbcc11924e3d) ) // only different ROM from gwara, ver 1 hand-written on label
+
+	ROM_REGION( 0x10000, "sub", 0 )
+	ROM_LOAD( "gv4.p8", 0x00000, 0x10000, CRC(26335a55) SHA1(de3e7d9e204a969745367aa37326d7b3e28c7424) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "gv2.k7", 0x00000, 0x10000, CRC(896682dd) SHA1(dc2125c2378a01291197b2798a5eef6459cf5b99) )
+
+	ROM_REGION( 0x2400, "proms", 0 )
+	ROM_LOAD( "1.k1",        0x0000, 0x0400, CRC(090236a3) SHA1(40d066e34291492c6baf8c120657e3d547274b59) ) /* MB7122, red */
+	ROM_LOAD( "3.l2",        0x0400, 0x0400, CRC(9147de69) SHA1(e4b3b546e429c195e82f97322e2a295882e38a58) ) /* MB7122, green */
+	ROM_LOAD( "2.l1",        0x0800, 0x0400, CRC(7f9c839e) SHA1(2fa60fa335f76891d961c9bd0066fa7f82f76779) ) /* MB7122, blue */
+	ROM_LOAD( "horizon.j8",  0x0c00, 0x0400, CRC(c20b197b) SHA1(504cb28d652029fe87a5411d6239e78d93c83e91) ) /* MB7122E, h-decode */
+	ROM_LOAD( "vertical.k8", 0x1000, 0x0400, CRC(5d0c617f) SHA1(845e52173c33500227cabe1e21b34919d2856215) ) /* MB7122E, v-decode */
+	ROM_LOAD( "ls.bin",      0x1400, 0x1000, CRC(73df921d) SHA1(c0f765da3e0e80d104b0baaa7a83bdcc399254b3) ) /* ls-joystick encoder */
+
+	ROM_REGION( 0x8000, "tx_tiles", 0 )
+	ROM_LOAD( "gv5.a3", 0x0000, 0x08000, CRC(80f73e2e) SHA1(820824fb10f7dfec6247b46dde8ff7124bde3734) )
+
+	ROM_REGION( 0x40000, "bg_tiles", 0 )
+	ROM_LOAD( "gv13.ef1", 0x00000, 0x10000, CRC(f1dcdaef) SHA1(d9b65e7f4025787037628528d3bef699be2eb874) )
+	ROM_LOAD( "gv12.d1",  0x10000, 0x10000, CRC(326e4e5e) SHA1(6935429925d748bb43072429db0d3b08ffdbc95d) )
+	ROM_LOAD( "gv11.c1",  0x20000, 0x10000, CRC(0aa70967) SHA1(a6cbadbb960280b5e79660c0bbd43089ced39a44) )
+	ROM_LOAD( "gv10.a1",  0x30000, 0x10000, CRC(b7686336) SHA1(d654d282862ff00488be38fb9c1302c8bb6f7e7c) )
+
+	ROM_REGION( 0x40000, "sp16_tiles", 0 )
+	ROM_LOAD( "gv9.g3",  0x00000, 0x10000, CRC(58600f7d) SHA1(3dcd25d1ed07e6f74f3316ebe41768eb155f4c45) )
+	ROM_LOAD( "gv8.e3",  0x10000, 0x10000, CRC(a3f9b463) SHA1(ee83d18cf08972c792b05c277b1ca25d732e294d) )
+	ROM_LOAD( "gv7.cd3", 0x20000, 0x10000, CRC(092501be) SHA1(85d9a8922dde6824805a4b8e6c52b2a9ad092df9) )
+	ROM_LOAD( "gv6.b3",  0x30000, 0x10000, CRC(25801ea6) SHA1(1aa61716d6be399a1eee2ee5079f13da0f1bd4e8) )
+
+	ROM_REGION( 0x80000, "sp32_tiles", 0 )
+	ROM_LOAD( "gv14.f10",  0x00000, 0x10000, CRC(2b46edff) SHA1(db97e042621dcbedfeed71937ead6d715899d4f7) )
+	ROM_LOAD( "gv15.h10",  0x10000, 0x10000, CRC(be19888d) SHA1(bc7b1b6236d41685faacc2008d51ae2da9a82909) )
+	ROM_LOAD( "gv16.j10",  0x20000, 0x10000, CRC(2d653f0c) SHA1(99eb7883822b10f61b6e922c0d0519aacac83732) )
+	ROM_LOAD( "gv17.l10",  0x30000, 0x10000, CRC(ebbf3ba2) SHA1(bc3631c43058faf1ec6b21ed8017b744afee6f5d) )
+	ROM_LOAD( "gv18.m10",  0x40000, 0x10000, CRC(aeb3707f) SHA1(58d1a71cf83ab0f5f0dd67d441edbc8ece8c2ba5) )
+	ROM_LOAD( "gv19.pn10", 0x50000, 0x10000, CRC(0808f95f) SHA1(f67763cceb287a02e3b946ade52105a72161e540) )
+	ROM_LOAD( "gv20.r10",  0x60000, 0x10000, CRC(8dfc7b87) SHA1(e3d75020aa1b90f12633f6515a0386f87441b225) )
+	ROM_LOAD( "gv21.s10",  0x70000, 0x10000, CRC(06822aac) SHA1(630d438cbebe0b5af571948d0d3f4996f52aae1d) )
+
+	ROM_REGION( 0x10000, "ym2", 0 )
+	ROM_LOAD( "gv1.g5", 0x00000, 0x10000, CRC(2255f8dd) SHA1(fac31b617762d0fa39cf82a658be250b91ab73ce) )
+ROM_END
+
 ROM_START( gwarj )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "7y3047",  0x00000, 0x10000, CRC(7f8a880c) SHA1(1eb1c3eb45aa933118e5bd116eb3f81f39063ae3) )
@@ -6345,56 +6528,60 @@ DRIVER_INIT_MEMBER(snk_state,countryc)
 
 
 
-GAME( 1983, marvins,  0,        marvins,  marvins, driver_device,  0,        ROT270, "SNK", "Marvin's Maze", 0 )
-GAME( 1984, vangrd2,  0,        vangrd2,  vangrd2, driver_device,  0,        ROT270, "SNK", "Vanguard II", 0 )
-GAME( 1984, madcrash, 0,        vangrd2,  madcrash, driver_device, 0,        ROT0,   "SNK", "Mad Crasher", 0 )
-GAME( 1984, madcrush, madcrash, madcrush, madcrash, driver_device, 0,        ROT0,   "SNK", "Mad Crusher (Japan)", 0 )
+GAME( 1983, marvins,   0,        marvins,   marvins,   snk_state, 0,        ROT270, "SNK",     "Marvin's Maze", 0 )
+GAME( 1984, vangrd2,   0,        vangrd2,   vangrd2,   snk_state, 0,        ROT270, "SNK",     "Vanguard II", 0 )
+GAME( 1984, madcrash,  0,        vangrd2,   madcrash,  snk_state, 0,        ROT0,   "SNK",     "Mad Crasher", 0 )
+GAME( 1984, madcrush,  madcrash, madcrush,  madcrash,  snk_state, 0,        ROT0,   "SNK",     "Mad Crusher (Japan)", 0 )
 
-GAME( 1984, jcross,   0,        jcross,   jcross, driver_device,   0,        ROT270, "SNK", "Jumping Cross", 0 )
-GAME( 1984, sgladiat, 0,        sgladiat, sgladiat, driver_device, 0,        ROT0,   "SNK", "Gladiator 1984", 0 )
-GAME( 1985, hal21,    0,        hal21,    hal21, driver_device,    0,        ROT270, "SNK", "HAL21", 0 )
-GAME( 1985, hal21j,   hal21,    hal21,    hal21, driver_device,    0,        ROT270, "SNK", "HAL21 (Japan)", 0 )
+GAME( 1984, jcross,    0,        jcross,    jcross,    snk_state, 0,        ROT270, "SNK",     "Jumping Cross (set 1)", 0 )
+GAME( 1984, jcrossa,   jcross,   jcross,    jcross,    snk_state, 0,        ROT270, "SNK",     "Jumping Cross (set 2)", 0 )
+GAME( 1984, sgladiat,  0,        sgladiat,  sgladiat,  snk_state, 0,        ROT0,   "SNK",     "Gladiator 1984", 0 )
+GAME( 1985, hal21,     0,        hal21,     hal21,     snk_state, 0,        ROT270, "SNK",     "HAL21", 0 )
+GAME( 1985, hal21j,    hal21,    hal21,     hal21,     snk_state, 0,        ROT270, "SNK",     "HAL21 (Japan)", 0 )
 
-GAME( 1985, aso,      0,        aso,      aso, driver_device,      0,        ROT270, "SNK", "ASO - Armored Scrum Object", 0 )
-GAME( 1985, alphamis, aso,      aso,      alphamis, driver_device, 0,        ROT270, "SNK", "Alpha Mission", 0 )
-GAME( 1985, arian,    aso,      aso,      alphamis, driver_device, 0,        ROT270, "SNK", "Arian Mission", 0 )
-GAME( 1985, tnk3,     0,        tnk3,     tnk3, driver_device,     0,        ROT270, "SNK", "T.N.K III (US)", 0 )
-GAME( 1985, tnk3j,    tnk3,     tnk3,     tnk3, driver_device,     0,        ROT270, "SNK", "T.A.N.K (Japan)", 0 )
-GAME( 1986, athena,   0,        athena,   athena, driver_device,   0,        ROT0,   "SNK", "Athena", 0 )
-GAME( 1988, fitegolf, 0,        fitegolf, fitegolf, driver_device, 0,        ROT0,   "SNK", "Fighting Golf (World?)", 0 )
-GAME( 1988, fitegolfu,fitegolf, fitegolf, fitegolfu, driver_device,0,        ROT0,   "SNK", "Fighting Golf (US)", 0 )
-GAME( 1988, fitegolf2,fitegolf, fitegolf2,fitegolfu, driver_device,0,        ROT0,   "SNK", "Fighting Golf (US, Ver 2)", 0 )
-GAME( 1988, countryc, 0,        fitegolf, countryc, snk_state, countryc,     ROT0,   "SNK", "Country Club", 0 )
+GAME( 1985, aso,       0,        aso,       aso,       snk_state, 0,        ROT270, "SNK",     "ASO - Armored Scrum Object", 0 )
+GAME( 1985, alphamis,  aso,      aso,       alphamis,  snk_state, 0,        ROT270, "SNK",     "Alpha Mission", 0 )
+GAME( 1985, arian,     aso,      aso,       alphamis,  snk_state, 0,        ROT270, "SNK",     "Arian Mission", 0 )
+GAME( 1985, tnk3,      0,        tnk3,      tnk3,      snk_state, 0,        ROT270, "SNK",     "T.N.K III (US)", 0 )
+GAME( 1985, tnk3j,     tnk3,     tnk3,      tnk3,      snk_state, 0,        ROT270, "SNK",     "T.A.N.K (Japan)", 0 )
+GAME( 1986, athena,    0,        athena,    athena,    snk_state, 0,        ROT0,   "SNK",     "Athena", 0 )
+GAME( 1986, athenab,   athena,   athena,    athena,    snk_state, 0,        ROT0,   "SNK",     "Athena (bootleg)", 0 ) // is this really a bootleg?
+GAME( 1987, sathena,   athena,   athena,    athena,    snk_state, 0,        ROT0,   "bootleg", "Super Athena (bootleg)", 0 )
+GAME( 1988, fitegolf,  0,        fitegolf,  fitegolf,  snk_state, 0,        ROT0,   "SNK",     "Lee Trevino's Fighting Golf (World?)", 0 )
+GAME( 1988, fitegolfu, fitegolf, fitegolf,  fitegolfu, snk_state, 0,        ROT0,   "SNK",     "Lee Trevino's Fighting Golf (US)", 0 )
+GAME( 1988, fitegolf2, fitegolf, fitegolf2, fitegolfu, snk_state, 0,        ROT0,   "SNK",     "Lee Trevino's Fighting Golf (US, Ver 2)", 0 )
+GAME( 1988, countryc,  0,        fitegolf,  countryc,  snk_state, countryc, ROT0,   "SNK",     "Country Club", 0 )
 
-GAME( 1986, ikari,    0,        ikari,    ikari, driver_device,    0,        ROT270, "SNK", "Ikari Warriors (US JAMMA)", 0 ) // distributed by Tradewest(?)
-GAME( 1986, ikaria,   ikari,    ikari,    ikaria, driver_device,   0,        ROT270, "SNK", "Ikari Warriors (US)", 0 ) // distributed by Tradewest(?)
-GAME( 1986, ikarinc,  ikari,    ikari,    ikarinc, driver_device,  0,        ROT270, "SNK", "Ikari Warriors (US No Continues)", 0 ) // distributed by Tradewest(?)
-GAME( 1986, ikarijp,  ikari,    ikari,    ikarinc, driver_device,  0,        ROT270, "SNK", "Ikari (Japan No Continues)", 0 )
-GAME( 1986, ikarijpb, ikari,    ikari,    ikarijpb, driver_device, 0,        ROT270, "bootleg", "Ikari (Joystick hack bootleg)", 0 )
-GAME( 1986, ikariram, ikari,    ikari,    ikarijpb, driver_device, 0,        ROT270, "bootleg", "Rambo 3 (bootleg of Ikari, Joystick hack)", 0 )
-GAME( 1986, victroad, 0,        victroad, victroad, driver_device, 0,        ROT270, "SNK", "Victory Road", 0 )
-GAME( 1986, dogosoke, victroad, victroad, victroad, driver_device, 0,        ROT270, "SNK", "Dogou Souken", 0 )
-GAME( 1986, dogosokb, victroad, victroad, dogosokb, driver_device, 0,        ROT270, "bootleg", "Dogou Souken (Joystick hack bootleg)", 0 )
+GAME( 1986, ikari,     0,        ikari,     ikari,     snk_state, 0,        ROT270, "SNK",     "Ikari Warriors (US JAMMA)", 0 ) // distributed by Tradewest(?)
+GAME( 1986, ikaria,    ikari,    ikari,     ikaria,    snk_state, 0,        ROT270, "SNK",     "Ikari Warriors (US)", 0 ) // distributed by Tradewest(?)
+GAME( 1986, ikarinc,   ikari,    ikari,     ikarinc,   snk_state, 0,        ROT270, "SNK",     "Ikari Warriors (US No Continues)", 0 ) // distributed by Tradewest(?)
+GAME( 1986, ikarijp,   ikari,    ikari,     ikarinc,   snk_state, 0,        ROT270, "SNK",     "Ikari (Japan No Continues)", 0 )
+GAME( 1986, ikarijpb,  ikari,    ikari,     ikarijpb,  snk_state, 0,        ROT270, "bootleg", "Ikari (Joystick hack bootleg)", 0 )
+GAME( 1986, ikariram,  ikari,    ikari,     ikarijpb,  snk_state, 0,        ROT270, "bootleg", "Rambo 3 (bootleg of Ikari, Joystick hack)", 0 )
+GAME( 1986, victroad,  0,        victroad,  victroad,  snk_state, 0,        ROT270, "SNK",     "Victory Road", 0 )
+GAME( 1986, dogosoke,  victroad, victroad,  victroad,  snk_state, 0,        ROT270, "SNK",     "Dogou Souken", 0 )
+GAME( 1986, dogosokb,  victroad, victroad,  dogosokb,  snk_state, 0,        ROT270, "bootleg", "Dogou Souken (Joystick hack bootleg)", 0 )
 
-GAME( 1987, bermudat, 0,        bermudat, bermudat, driver_device, 0,        ROT270, "SNK", "Bermuda Triangle (World?)", 0 )
-GAME( 1987, bermudatj,bermudat, bermudat, bermudat, driver_device, 0,        ROT270, "SNK", "Bermuda Triangle (Japan)", 0 )
-GAME( 1987, worldwar, 0,        bermudat, worldwar, driver_device, 0,        ROT270, "SNK", "World Wars (World?)", 0 )
-GAME( 1987, bermudata,worldwar, bermudat, bermudaa, driver_device, 0,        ROT270, "SNK", "Bermuda Triangle (World Wars) (US)", 0 )
-GAME( 1987, psychos,  0,        psychos,  psychos, driver_device,  0,        ROT0,   "SNK", "Psycho Soldier (US)", 0 )
-GAME( 1987, psychosj, psychos,  psychos,  psychos, driver_device,  0,        ROT0,   "SNK", "Psycho Soldier (Japan)", 0 )
-GAME( 1987, gwar,     0,        gwar,     gwar, driver_device,     0,        ROT270, "SNK", "Guerrilla War (US)", 0 )
-GAME( 1987, gwarj,    gwar,     gwar,     gwar, driver_device,     0,        ROT270, "SNK", "Guevara (Japan)", 0 )
-GAME( 1987, gwara,    gwar,     gwara,    gwar, driver_device,     0,        ROT270, "SNK", "Guerrilla War (Version 1)", 0 )
-GAME( 1987, gwarb,    gwar,     gwar,     gwarb, driver_device,    0,        ROT270, "bootleg", "Guerrilla War (Joystick hack bootleg)", 0 )
-GAME( 1988, chopper,  0,        chopper1, chopper, driver_device,  0,        ROT270, "SNK", "Chopper I (US set 1)", 0 )
-GAME( 1988, choppera, chopper,  choppera, choppera, driver_device, 0,        ROT270, "SNK", "Chopper I (US set 2)", 0 )
-GAME( 1988, chopperb, chopper,  chopper1, chopper, driver_device,  0,        ROT270, "SNK", "Chopper I (US set 3)", 0 )
-GAME( 1988, legofair, chopper,  chopper1, chopper, driver_device,  0,        ROT270, "SNK", "Koukuu Kihei Monogatari - The Legend of Air Cavalry (Japan)", 0 )
+GAME( 1987, bermudat,  0,        bermudat,  bermudat,  snk_state, 0,        ROT270, "SNK",     "Bermuda Triangle (World?)", 0 )
+GAME( 1987, bermudatj, bermudat, bermudat,  bermudat,  snk_state, 0,        ROT270, "SNK",     "Bermuda Triangle (Japan)", 0 )
+GAME( 1987, worldwar,  0,        bermudat,  worldwar,  snk_state, 0,        ROT270, "SNK",     "World Wars (World?)", 0 )
+GAME( 1987, bermudata, worldwar, bermudat,  bermudaa,  snk_state, 0,        ROT270, "SNK",     "Bermuda Triangle (World Wars) (US)", 0 )
+GAME( 1987, psychos,   0,        psychos,   psychos,   snk_state, 0,        ROT0,   "SNK",     "Psycho Soldier (US)", 0 )
+GAME( 1987, psychosj,  psychos,  psychos,   psychos,   snk_state, 0,        ROT0,   "SNK",     "Psycho Soldier (Japan)", 0 )
+GAME( 1987, gwar,      0,        gwar,      gwar,      snk_state, 0,        ROT270, "SNK",     "Guerrilla War (US)", 0 )
+GAME( 1987, gwarj,     gwar,     gwar,      gwar,      snk_state, 0,        ROT270, "SNK",     "Guevara (Japan)", 0 )
+GAME( 1987, gwara,     gwar,     gwara,     gwar,      snk_state, 0,        ROT270, "SNK",     "Guerrilla War (Version 1, set 1)", 0 )
+GAME( 1987, gwarab,    gwar,     gwara,     gwar,      snk_state, 0,        ROT270, "SNK",     "Guerrilla War (Version 1, set 2)", 0 )
+GAME( 1987, gwarb,     gwar,     gwar,      gwarb,     snk_state, 0,        ROT270, "bootleg", "Guerrilla War (Joystick hack bootleg)", 0 )
+GAME( 1988, chopper,   0,        chopper1,  chopper,   snk_state, 0,        ROT270, "SNK",     "Chopper I (US set 1)", 0 )
+GAME( 1988, choppera,  chopper,  choppera,  choppera,  snk_state, 0,        ROT270, "SNK",     "Chopper I (US set 2)", 0 )
+GAME( 1988, chopperb,  chopper,  chopper1,  chopper,   snk_state, 0,        ROT270, "SNK",     "Chopper I (US set 3)", 0 )
+GAME( 1988, legofair,  chopper,  chopper1,  chopper,   snk_state, 0,        ROT270, "SNK",     "Koukuu Kihei Monogatari - The Legend of Air Cavalry (Japan)", 0 )
 
-GAME( 1987, tdfever,  0,        tdfever,  tdfever, driver_device,  0,        ROT90,  "SNK", "TouchDown Fever (US)", 0 )
-GAME( 1987, tdfeverj, tdfever,  tdfever,  tdfever, driver_device,  0,        ROT90,  "SNK", "TouchDown Fever (Japan)", 0 )
-GAME( 1988, tdfever2, tdfever,  tdfever2, tdfever, driver_device,  0,        ROT90,  "SNK", "TouchDown Fever 2", 0 ) /* upgrade kit for Touchdown Fever */
-GAME( 1988, fsoccer,  0,        tdfever2, fsoccer, driver_device,  0,        ROT0,   "SNK", "Fighting Soccer (version 4)", 0 )
-GAME( 1988, fsoccerj, fsoccer,  tdfever2, fsoccer, driver_device,  0,        ROT0,   "SNK", "Fighting Soccer (Japan)", 0 )
-GAME( 1988, fsoccerb, fsoccer,  tdfever2, fsoccerb, driver_device, 0,        ROT0,   "bootleg", "Fighting Soccer (Joystick hack bootleg)", 0 )
-GAME( 1988, fsoccerba,fsoccer,  tdfever2, fsoccerb, driver_device, 0,        ROT0,   "bootleg", "Fighting Soccer (Joystick hack bootleg, alt)", 0 )
+GAME( 1987, tdfever,   0,        tdfever,   tdfever,   snk_state, 0,        ROT90,  "SNK",     "TouchDown Fever (US)", 0 )
+GAME( 1987, tdfeverj,  tdfever,  tdfever,   tdfever,   snk_state, 0,        ROT90,  "SNK",     "TouchDown Fever (Japan)", 0 )
+GAME( 1988, tdfever2,  tdfever,  tdfever2,  tdfever,   snk_state, 0,        ROT90,  "SNK",     "TouchDown Fever 2", 0 ) /* upgrade kit for Touchdown Fever */
+GAME( 1988, fsoccer,   0,        tdfever2,  fsoccer,   snk_state, 0,        ROT0,   "SNK",     "Fighting Soccer (version 4)", 0 )
+GAME( 1988, fsoccerj,  fsoccer,  tdfever2,  fsoccer,   snk_state, 0,        ROT0,   "SNK",     "Fighting Soccer (Japan)", 0 )
+GAME( 1988, fsoccerb,  fsoccer,  tdfever2,  fsoccerb,  snk_state, 0,        ROT0,   "bootleg", "Fighting Soccer (Joystick hack bootleg)", 0 )
+GAME( 1988, fsoccerba, fsoccer,  tdfever2,  fsoccerb,  snk_state, 0,        ROT0,   "bootleg", "Fighting Soccer (Joystick hack bootleg, alt)", 0 )

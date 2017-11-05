@@ -12,11 +12,14 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/exedexes.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "sound/ay8910.h"
 #include "sound/sn76496.h"
-#include "includes/exedexes.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 TIMER_DEVICE_CALLBACK_MEMBER(exedexes_state::exedexes_scanline)
@@ -214,7 +217,7 @@ void exedexes_state::machine_reset()
 	m_sc2on = 0;
 }
 
-static MACHINE_CONFIG_START( exedexes, exedexes_state )
+static MACHINE_CONFIG_START( exedexes )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)   /* 4 MHz (?) */
@@ -235,7 +238,7 @@ static MACHINE_CONFIG_START( exedexes, exedexes_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(exedexes_state, screen_update_exedexes)
-	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram8_device, vblank_copy_rising)
+	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", exedexes)
@@ -347,5 +350,5 @@ ROM_END
 
 
 
-GAME( 1985, exedexes, 0,        exedexes, exedexes, driver_device, 0, ROT270, "Capcom", "Exed Exes", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, savgbees, exedexes, exedexes, exedexes, driver_device, 0, ROT270, "Capcom (Memetron license)", "Savage Bees", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, exedexes, 0,        exedexes, exedexes, exedexes_state, 0, ROT270, "Capcom", "Exed Exes", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, savgbees, exedexes, exedexes, exedexes, exedexes_state, 0, ROT270, "Capcom (Memetron license)", "Savage Bees", MACHINE_SUPPORTS_SAVE )

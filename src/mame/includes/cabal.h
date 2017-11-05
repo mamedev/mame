@@ -31,15 +31,14 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	required_shared_ptr<UINT16> m_spriteram;
-	required_shared_ptr<UINT16> m_colorram;
-	required_shared_ptr<UINT16> m_videoram;
+	required_shared_ptr<uint16_t> m_spriteram;
+	required_shared_ptr<uint16_t> m_colorram;
+	required_shared_ptr<uint16_t> m_videoram;
 
 	tilemap_t *m_background_layer;
 	tilemap_t *m_text_layer;
 	int m_sound_command1;
 	int m_sound_command2;
-	int m_last[4];
 
 	// common
 	DECLARE_WRITE16_MEMBER(flipscreen_w);
@@ -47,8 +46,6 @@ public:
 	DECLARE_WRITE16_MEMBER(text_videoram_w);
 
 	// cabal specific
-	DECLARE_WRITE16_MEMBER(track_reset_w);
-	DECLARE_READ16_MEMBER(track_r);
 	DECLARE_WRITE16_MEMBER(sound_irq_trigger_word_w);
 
 	// cabalbl specific
@@ -61,8 +58,6 @@ public:
 	DECLARE_WRITE8_MEMBER(cabalbl_2_adpcm_w);
 
 	DECLARE_DRIVER_INIT(cabal);
-	DECLARE_DRIVER_INIT(cabalbl2);
-	DECLARE_MACHINE_START(cabal);
 	DECLARE_MACHINE_START(cabalbl);
 	DECLARE_MACHINE_RESET(cabalbl);
 	virtual void video_start() override;
@@ -70,6 +65,6 @@ public:
 	TILE_GET_INFO_MEMBER(get_back_tile_info);
 	TILE_GET_INFO_MEMBER(get_text_tile_info);
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 };

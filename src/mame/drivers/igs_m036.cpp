@@ -61,6 +61,7 @@ check more info and photo from cjdh2.zip!!!
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
 #include "machine/igs036crypt.h"
+#include "screen.h"
 
 
 class igs_m036_state : public driver_device
@@ -70,7 +71,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu") { }
 
-	UINT32 screen_update_igs_m036(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_igs_m036(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_DRIVER_INIT(igs_m036);
 
 	DECLARE_DRIVER_INIT(cjdh2);
@@ -86,7 +87,7 @@ public:
 
 
 
-UINT32 igs_m036_state::screen_update_igs_m036(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t igs_m036_state::screen_update_igs_m036(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
@@ -208,7 +209,7 @@ ROM_END
 
 void igs_m036_state::pgm_create_dummy_internal_arm_region(void)
 {
-	UINT16 *temp16 = (UINT16 *)memregion("maincpu")->base();
+	uint16_t *temp16 = (uint16_t *)memregion("maincpu")->base();
 	int i;
 	for (i=0;i<0x4000/2;i+=2)
 	{
@@ -244,7 +245,7 @@ void igs_m036_state::pgm_create_dummy_internal_arm_region(void)
 
 #define IGS036_CPU ARM7
 
-static MACHINE_CONFIG_START( igs_m036, igs_m036_state )
+static MACHINE_CONFIG_START( igs_m036 )
 	MCFG_CPU_ADD("maincpu",IGS036_CPU, 20000000)
 
 	MCFG_CPU_PROGRAM_MAP(igs_m036_map)
@@ -263,7 +264,7 @@ static MACHINE_CONFIG_START( igs_m036, igs_m036_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( igs_m036_tt, igs_m036_state )
+static MACHINE_CONFIG_START( igs_m036_tt )
 	MCFG_CPU_ADD("maincpu",IGS036_CPU, 20000000)
 
 	MCFG_CPU_PROGRAM_MAP(igs_m036_map)
@@ -318,10 +319,10 @@ DRIVER_INIT_MEMBER(igs_m036_state, igsm312)
 
 ***************************************************************************/
 
-GAME( 200?,  cjdh2,      0,     igs_m036, igs_m036, igs_m036_state, cjdh2,        ROT0, "IGS", "Chao Ji Da Heng 2 (V311CN)", MACHINE_IS_SKELETON )
-GAME( 200?,  cjdh2a,     cjdh2, igs_m036, igs_m036, igs_m036_state, cjdh2,        ROT0, "IGS", "Chao Ji Da Heng 2 (V311CNA)", MACHINE_IS_SKELETON )
-GAME( 200?,  cjdh2b,     cjdh2, igs_m036, igs_m036, igs_m036_state, cjdh2,        ROT0, "IGS", "Chao Ji Da Heng 2 (V311CNB)", MACHINE_IS_SKELETON )
-GAME( 200?,  cjdh2c,     cjdh2, igs_m036, igs_m036, igs_m036_state, cjdh2,        ROT0, "IGS", "Chao Ji Da Heng 2 (V215CN)", MACHINE_IS_SKELETON )
+GAME( 200?,  cjdh2,      0,     igs_m036,    igs_m036, igs_m036_state, cjdh2,     ROT0, "IGS", "Chao Ji Da Heng 2 (V311CN)", MACHINE_IS_SKELETON )
+GAME( 200?,  cjdh2a,     cjdh2, igs_m036,    igs_m036, igs_m036_state, cjdh2,     ROT0, "IGS", "Chao Ji Da Heng 2 (V311CNA)", MACHINE_IS_SKELETON )
+GAME( 200?,  cjdh2b,     cjdh2, igs_m036,    igs_m036, igs_m036_state, cjdh2,     ROT0, "IGS", "Chao Ji Da Heng 2 (V311CNB)", MACHINE_IS_SKELETON )
+GAME( 200?,  cjdh2c,     cjdh2, igs_m036,    igs_m036, igs_m036_state, cjdh2,     ROT0, "IGS", "Chao Ji Da Heng 2 (V215CN)", MACHINE_IS_SKELETON )
 
 GAME( 200?,  cjddzsp,    0,     igs_m036_tt, igs_m036, igs_m036_state, cjddzsp,   ROT0, "IGS", "Super Dou Di Zhu Special (V122CN)", MACHINE_IS_SKELETON )
 

@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Howie Cohen, Yochizo
+// copyright-holders:Howie Cohen, Yochizo, Bryan McPhail, Nicola Salmoria
 // thanks-to:Richard Bush
 /***************************************************************************
 
@@ -23,7 +23,25 @@ Supported games:
   Last Striker            East Technology Corp. 1989
   Balloon Brothers        East Technology Corp. 199?
 
-Please tell me the games worked on this board.
+
+This file contains routines to interface with the Taito Controller Chip
+(or "Command Chip") version 1. It's currently used by Superman.
+
+Superman (revised SJ 060601)
+--------
+
+In Superman, the C-chip's main purpose is to handle player inputs and
+coins and pass commands along to the sound chip.
+
+The 68k queries the c-chip, which passes back $100 bytes of 68k code which
+are then executed in RAM. To get around this, we hack in our own code to
+communicate with the sound board, since we are familiar with the interface
+as it's used in Rastan and Super Space Invaders '91.
+
+It is believed that the NOPs in the 68k code are there to supply the
+necessary cycles to the cchip to switch banks.
+
+This code requires that the player & coin inputs be in input ports 2-4.
 
 
 Memory map:
@@ -241,7 +259,7 @@ Stephh's notes (based on the game M68000 code and some tests) :
       * 0x0002 (World) uses TAITO_COINAGE_WORLD
   - Notice screen only if region = 0x0001
   - I can't tell if it's an ingame bug or an emulation bug,
-    but boss are far much harder when "Difficulty" Dip Swicth
+    but boss are far much harder when "Difficulty" Dip Switch
     is set to "Easy" : put a watch on 0xf00a76.w for level 1 boss
     and you'll notice that MSB is set to 0x01 instead of 0x00
   - 'supermanu' has no Notice screen or FBI logo & statement
@@ -316,14 +334,124 @@ Stephh's notes (based on the game M68000 code and some tests) :
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "cpu/m68000/m68000.h"
+#include "includes/taito_x.h"
 #include "includes/taitoipt.h"
 #include "audio/taitosnd.h"
-#include "includes/taito_x.h"
-#include "machine/cchip.h"
+
+#include "cpu/m68000/m68000.h"
+#include "cpu/z80/z80.h"
 #include "sound/2610intf.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
+#include "screen.h"
+#include "speaker.h"
+
+
+/* This code for sound communication is a hack, it will not be
+   identical to the code derived from the real c-chip */
+
+static const uint8_t superman_code[40] =
+{
+	0x48, 0xe7, 0x80, 0x80,             /* MOVEM.L  D0/A0,-(A7)   ( Preserve Regs ) */
+	0x20, 0x6d, 0x1c, 0x40,             /* MOVEA.L  ($1C40,A5),A0 ( Load sound pointer in A0 ) */
+	0x30, 0x2f, 0x00, 0x0c,             /* MOVE.W   ($0C,A7),D0   ( Fetch sound number ) */
+	0x10, 0x80,                         /* MOVE.B   D0,(A0)       ( Store it on sound pointer ) */
+	0x52, 0x88,                         /* ADDQ.W   #1,A0         ( Increment sound pointer ) */
+	0x20, 0x3c, 0x00, 0xf0, 0x1c, 0x40, /* MOVE.L   #$F01C40,D0   ( Load top of buffer in D0 ) */
+	0xb1, 0xc0,                         /* CMPA.L   D0,A0         ( Are we there yet? ) */
+	0x66, 0x04,                         /* BNE.S    *+$6          ( No, we arent, skip next line ) */
+	0x41, 0xed, 0x1c, 0x20,             /* LEA      ($1C20,A5),A0 ( Point to the start of the buffer ) */
+	0x2b, 0x48, 0x1c, 0x40,             /* MOVE.L   A0,($1C40,A5) ( Store new sound pointer ) */
+	0x4c, 0xdf, 0x01, 0x01,             /* MOVEM.L  (A7)+, D0/A0  ( Restore Regs ) */
+	0x4e, 0x75                          /* RTS                    ( Return ) */
+};
+
+/*************************************
+ *
+ * Writes to C-Chip - Important Bits
+ *
+ *************************************/
+
+WRITE16_MEMBER( taitox_state::cchip1_ctrl_w )
+{
+	/* value 2 is written here */
+}
+
+WRITE16_MEMBER( taitox_state::cchip1_bank_w )
+{
+	m_current_bank = data & 7;
+}
+
+WRITE16_MEMBER( taitox_state::cchip1_ram_w )
+{
+	if (m_current_bank == 0 && offset == 0x03)
+	{
+		m_cc_port = data;
+
+		space.machine().bookkeeping().coin_lockout_w(1, data & 0x08);
+		space.machine().bookkeeping().coin_lockout_w(0, data & 0x04);
+		space.machine().bookkeeping().coin_counter_w(1, data & 0x02);
+		space.machine().bookkeeping().coin_counter_w(0, data & 0x01);
+	}
+	else
+	{
+		logerror("cchip1_w pc: %06x bank %02x offset %04x: %02x\n",space.device().safe_pc(),m_current_bank,offset,data);
+	}
+}
+
+
+/*************************************
+ *
+ * Reads from C-Chip
+ *
+ *************************************/
+
+READ16_MEMBER( taitox_state::cchip1_ctrl_r )
+{
+	/*
+	    Bit 2 = Error signal
+	    Bit 0 = Ready signal
+	*/
+	return 0x01; /* Return 0x05 for C-Chip error */
+}
+
+READ16_MEMBER( taitox_state::cchip1_ram_r )
+{
+	/* Check for input ports */
+	if (m_current_bank == 0)
+	{
+		switch (offset)
+		{
+		case 0x00: return space.machine().root_device().ioport("IN0")->read();    /* Player 1 controls + START1 */
+		case 0x01: return space.machine().root_device().ioport("IN1")->read();    /* Player 2 controls + START2 */
+		case 0x02: return space.machine().root_device().ioport("IN2")->read();    /* COINn + SERVICE1 + TILT */
+		case 0x03: return m_cc_port;
+		}
+	}
+
+	/* Other non-standard offsets */
+
+	if (m_current_bank == 1 && offset <= 0xff)
+	{
+		if (offset < 40)    /* our hack code is only 40 bytes long */
+			return superman_code[offset];
+		else    /* so pad with zeros */
+			return 0;
+	}
+
+	if (m_current_bank == 2)
+	{
+		switch (offset)
+		{
+			case 0x000: return 0x47;
+			case 0x001: return 0x57;
+			case 0x002: return 0x4b;
+		}
+	}
+
+	logerror("cchip1_r bank: %02x offset: %04x\n",m_current_bank,offset);
+	return 0;
+}
+
 
 READ16_MEMBER(taitox_state::superman_dsw_input_r)
 {
@@ -429,8 +557,8 @@ static ADDRESS_MAP_START( daisenpu_map, AS_PROGRAM, 16, taitox_state )
 //  AM_RANGE(0x400000, 0x400001) AM_WRITENOP    /* written each frame at $2ac, values change */
 	AM_RANGE(0x500000, 0x50000f) AM_READ(superman_dsw_input_r)
 //  AM_RANGE(0x600000, 0x600001) AM_WRITENOP    /* written each frame at $2a2, values change */
-	AM_RANGE(0x800000, 0x800001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0x00ff)
-	AM_RANGE(0x800002, 0x800003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0x00ff)
+	AM_RANGE(0x800000, 0x800001) AM_READNOP AM_DEVWRITE8("ciu", pc060ha_device, master_port_w, 0x00ff)
+	AM_RANGE(0x800002, 0x800003) AM_DEVREADWRITE8("ciu", pc060ha_device, master_comm_r, master_comm_w, 0x00ff)
 	AM_RANGE(0x900000, 0x90000f) AM_READWRITE(daisenpu_input_r, daisenpu_input_w)
 	AM_RANGE(0xb00000, 0xb00fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xd00000, 0xd005ff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spriteylow_r16, spriteylow_w16) // Sprites Y
@@ -491,8 +619,8 @@ static ADDRESS_MAP_START( daisenpu_sound_map, AS_PROGRAM, 8, taitox_state )
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("z80bank")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0xe200, 0xe200) AM_READNOP AM_DEVWRITE("tc0140syt", tc0140syt_device, slave_port_w)
-	AM_RANGE(0xe201, 0xe201) AM_DEVREADWRITE("tc0140syt", tc0140syt_device, slave_comm_r, slave_comm_w)
+	AM_RANGE(0xe200, 0xe200) AM_READNOP AM_DEVWRITE("ciu", pc060ha_device, slave_port_w)
+	AM_RANGE(0xe201, 0xe201) AM_DEVREADWRITE("ciu", pc060ha_device, slave_comm_r, slave_comm_w)
 	AM_RANGE(0xe400, 0xe403) AM_WRITENOP /* pan */
 	AM_RANGE(0xea00, 0xea00) AM_READNOP
 	AM_RANGE(0xee00, 0xee00) AM_WRITENOP /* ? */
@@ -769,11 +897,6 @@ GFXDECODE_END
 
 /**************************************************************************/
 
-/* handler called by the YM2610 emulator when the internal timers cause an IRQ */
-WRITE_LINE_MEMBER(taitox_state::irqhandler)
-{
-	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
-}
 
 MACHINE_START_MEMBER(taitox_state,taitox)
 {
@@ -794,7 +917,7 @@ MACHINE_START_MEMBER(taitox_state,superman)
 
 /**************************************************************************/
 
-static MACHINE_CONFIG_START( superman, taitox_state )
+static MACHINE_CONFIG_START( superman )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)   /* verified on pcb */
@@ -803,6 +926,8 @@ static MACHINE_CONFIG_START( superman, taitox_state )
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz/4) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
+
+	MCFG_TAITO_CCHIP_ADD("cchip", XTAL_12MHz/2) /* ? MHz */
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))   /* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 
@@ -830,7 +955,7 @@ static MACHINE_CONFIG_START( superman, taitox_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_16MHz/2)   /* verified on pcb */
-	MCFG_YM2610_IRQ_HANDLER(WRITELINE(taitox_state, irqhandler))
+	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
 	MCFG_SOUND_ROUTE(1, "lspeaker",  1.0)
@@ -841,7 +966,7 @@ static MACHINE_CONFIG_START( superman, taitox_state )
 	MCFG_TC0140SYT_SLAVE_CPU("audiocpu")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( daisenpu, taitox_state )
+static MACHINE_CONFIG_START( daisenpu )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)   /* verified on pcb */
@@ -881,12 +1006,12 @@ static MACHINE_CONFIG_START( daisenpu, taitox_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.45)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.45)
 
-	MCFG_DEVICE_ADD("tc0140syt", TC0140SYT, 0)
-	MCFG_TC0140SYT_MASTER_CPU("maincpu")
-	MCFG_TC0140SYT_SLAVE_CPU("audiocpu")
+	MCFG_DEVICE_ADD("ciu", PC060HA, 0)
+	MCFG_PC060HA_MASTER_CPU("maincpu")
+	MCFG_PC060HA_SLAVE_CPU("audiocpu")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( gigandes, taitox_state )
+static MACHINE_CONFIG_START( gigandes )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 8000000)    /* 8 MHz? */
@@ -922,7 +1047,7 @@ static MACHINE_CONFIG_START( gigandes, taitox_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, 8000000)
-	MCFG_YM2610_IRQ_HANDLER(WRITELINE(taitox_state, irqhandler))
+	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
 	MCFG_SOUND_ROUTE(1, "lspeaker",  1.0)
@@ -933,7 +1058,7 @@ static MACHINE_CONFIG_START( gigandes, taitox_state )
 	MCFG_TC0140SYT_SLAVE_CPU("audiocpu")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( ballbros, taitox_state )
+static MACHINE_CONFIG_START( ballbros )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 8000000)    /* 8 MHz? */
@@ -969,7 +1094,7 @@ static MACHINE_CONFIG_START( ballbros, taitox_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, 8000000)
-	MCFG_YM2610_IRQ_HANDLER(WRITELINE(taitox_state, irqhandler))
+	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
 	MCFG_SOUND_ROUTE(1, "lspeaker",  1.0)
@@ -1052,8 +1177,8 @@ ROM_START( superman )
 	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
 	ROM_LOAD( "b61-01.e18", 0x00000, 0x80000, CRC(3cf99786) SHA1(f6febf9bda87ca04f0a5890d0e8001c26dfa6c81) )
 
-	ROM_REGION( 0x10000, "cchip", 0 )     /* 64k for TC0030CMD (C-Chip protection, uPD78C11 with embedded 4K maskrom, 8k eprom, 8k RAM)  */
-	ROM_LOAD( "b61_11.m11", 0x00000, 0x10000, NO_DUMP )
+	ROM_REGION( 0x2000, "cchip:cchip_eprom", 0 )
+	ROM_LOAD( "b61_11.m11", 0x0000, 0x2000, NO_DUMP )
 ROM_END
 
 ROM_START( supermanu ) /* No US copyright notice or FBI logo - Just a coinage difference, see notes above */
@@ -1075,8 +1200,8 @@ ROM_START( supermanu ) /* No US copyright notice or FBI logo - Just a coinage di
 	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
 	ROM_LOAD( "b61-01.e18", 0x00000, 0x80000, CRC(3cf99786) SHA1(f6febf9bda87ca04f0a5890d0e8001c26dfa6c81) )
 
-	ROM_REGION( 0x10000, "cchip", 0 )     /* 64k for TC0030CMD (C-Chip protection, Z80 with embedded 64K rom + 64K RAM)  */
-	ROM_LOAD( "b61_11.m11", 0x00000, 0x10000, NO_DUMP )
+	ROM_REGION( 0x2000, "cchip:cchip_eprom", 0 )
+	ROM_LOAD( "b61_11.m11", 0x0000, 0x2000, NO_DUMP )
 ROM_END
 
 ROM_START( supermanj ) /* Shows a Japan copyright notice */
@@ -1098,8 +1223,8 @@ ROM_START( supermanj ) /* Shows a Japan copyright notice */
 	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
 	ROM_LOAD( "b61-01.e18", 0x00000, 0x80000, CRC(3cf99786) SHA1(f6febf9bda87ca04f0a5890d0e8001c26dfa6c81) )
 
-	ROM_REGION( 0x10000, "cchip", 0 )     /* 64k for TC0030CMD (C-Chip protection, Z80 with embedded 64K rom + 64K RAM)  */
-	ROM_LOAD( "b61_11.m11", 0x00000, 0x10000, NO_DUMP )
+	ROM_REGION( 0x2000, "cchip:cchip_eprom", 0 )
+	ROM_LOAD( "b61_11.m11", 0x0000, 0x2000, NO_DUMP )
 ROM_END
 
 /*
@@ -1252,13 +1377,13 @@ DRIVER_INIT_MEMBER(taitox_state,kyustrkr)
 }
 
 
-GAME( 1988, superman,  0,        superman, superman,  driver_device, 0,        ROT0,   "Taito Corporation",         "Superman (World)", 0 )
-GAME( 1988, supermanu, superman, superman, supermanu, driver_device, 0,        ROT0,   "Taito Corporation",         "Superman (US)", 0 )
-GAME( 1988, supermanj, superman, superman, supermanj, driver_device, 0,        ROT0,   "Taito Corporation",         "Superman (Japan)", 0 )
-GAME( 1989, twinhawk,  0,        daisenpu, twinhawk,  driver_device, 0,        ROT270, "Taito Corporation Japan",   "Twin Hawk (World)", 0 )
-GAME( 1989, twinhawku, twinhawk, daisenpu, twinhawku, driver_device, 0,        ROT270, "Taito America Corporation", "Twin Hawk (US)", 0 )
-GAME( 1989, daisenpu,  twinhawk, daisenpu, daisenpu,  driver_device, 0,        ROT270, "Taito Corporation",         "Daisenpu (Japan)", 0 )
-GAME( 1989, gigandes,  0,        gigandes, gigandes,  driver_device, 0,        ROT0,   "East Technology",           "Gigandes", 0 )
-GAME( 1989, gigandesa, gigandes, gigandes, gigandes,  driver_device, 0,        ROT0,   "East Technology",           "Gigandes (earlier)", 0 )
-GAME( 1989, kyustrkr,  0,        ballbros, kyustrkr,  taitox_state,  kyustrkr, ROT180, "East Technology",           "Last Striker / Kyuukyoku no Striker", 0 )
-GAME( 1992, ballbros,  0,        ballbros, ballbros,  driver_device, 0,        ROT0,   "East Technology",           "Balloon Brothers", 0 )
+GAME( 1988, superman,  0,        superman, superman,  taitox_state, 0,        ROT0,   "Taito Corporation",         "Superman (World)", 0 )
+GAME( 1988, supermanu, superman, superman, supermanu, taitox_state, 0,        ROT0,   "Taito Corporation",         "Superman (US)", 0 )
+GAME( 1988, supermanj, superman, superman, supermanj, taitox_state, 0,        ROT0,   "Taito Corporation",         "Superman (Japan)", 0 )
+GAME( 1989, twinhawk,  0,        daisenpu, twinhawk,  taitox_state, 0,        ROT270, "Taito Corporation Japan",   "Twin Hawk (World)", 0 )
+GAME( 1989, twinhawku, twinhawk, daisenpu, twinhawku, taitox_state, 0,        ROT270, "Taito America Corporation", "Twin Hawk (US)", 0 )
+GAME( 1989, daisenpu,  twinhawk, daisenpu, daisenpu,  taitox_state, 0,        ROT270, "Taito Corporation",         "Daisenpu (Japan)", 0 )
+GAME( 1989, gigandes,  0,        gigandes, gigandes,  taitox_state, 0,        ROT0,   "East Technology",           "Gigandes", 0 )
+GAME( 1989, gigandesa, gigandes, gigandes, gigandes,  taitox_state, 0,        ROT0,   "East Technology",           "Gigandes (earlier)", 0 )
+GAME( 1989, kyustrkr,  0,        ballbros, kyustrkr,  taitox_state, kyustrkr, ROT180, "East Technology",           "Last Striker / Kyuukyoku no Striker", 0 )
+GAME( 1992, ballbros,  0,        ballbros, ballbros,  taitox_state, 0,        ROT0,   "East Technology",           "Balloon Brothers", 0 )

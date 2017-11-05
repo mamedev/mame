@@ -25,16 +25,18 @@
 */
 
 #include "emu.h"
+#include "bus/centronics/ctronics.h"
 #include "cpu/i86/i86.h"
 #include "cpu/z80/z80daisy.h"
+#include "formats/apridisk.h"
 #include "imagedev/flopdrv.h"
 #include "machine/apricotkb.h"
 #include "machine/buffer.h"
-#include "bus/centronics/ctronics.h"
+#include "machine/input_merger.h"
 #include "machine/wd_fdc.h"
 #include "machine/z80ctc.h"
-#include "machine/z80dart.h"
-#include "formats/apridisk.h"
+#include "machine/z80sio.h"
+#include "screen.h"
 
 
 //**************************************************************************
@@ -68,8 +70,7 @@ public:
 			m_floppy1(*this, WD2797_TAG ":1"),
 			m_centronics(*this, CENTRONICS_TAG),
 			m_cent_data_out(*this, "cent_data_out"),
-			m_ctc_int(CLEAR_LINE),
-			m_sio_int(CLEAR_LINE),
+			m_irqs(*this, "irqs"),
 			m_p_scrollram(*this, "p_scrollram"),
 			m_p_paletteram(*this, "p_paletteram"),
 			m_palette(*this, "palette")
@@ -81,25 +82,22 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<z80ctc_device> m_ctc;
-	required_device<z80sio2_device> m_sio;
-	required_device<wd2797_t> m_fdc;
+	required_device<z80sio_device> m_sio;
+	required_device<wd2797_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
 	required_device<centronics_device> m_centronics;
 	required_device<output_latch_device> m_cent_data_out;
-	int m_ctc_int;
-	int m_sio_int;
-	required_shared_ptr<UINT16> m_p_scrollram;
-	required_shared_ptr<UINT16> m_p_paletteram;
+	required_device<input_merger_device> m_irqs;
+	required_shared_ptr<uint16_t> m_p_scrollram;
+	required_shared_ptr<uint16_t> m_p_paletteram;
 	required_device<palette_device> m_palette;
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ16_MEMBER( palette_r );
 	DECLARE_WRITE16_MEMBER( palette_w );
 	DECLARE_WRITE8_MEMBER( system_w );
-	DECLARE_WRITE_LINE_MEMBER( sio_int_w );
-	DECLARE_WRITE_LINE_MEMBER( ctc_int_w );
 	DECLARE_WRITE_LINE_MEMBER( ctc_z1_w );
 	DECLARE_WRITE_LINE_MEMBER( ctc_z2_w );
 
@@ -112,7 +110,7 @@ public:
 //  VIDEO
 //**************************************************************************
 
-UINT32 f1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t f1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	int lines = m_200_256 ? 200 : 256;
@@ -123,7 +121,7 @@ UINT32 f1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, cons
 
 		for (int sx = 0; sx < 80; sx++)
 		{
-			UINT16 data = program.read_word(addr);
+			uint16_t data = program.read_word(addr);
 
 			if (m_40_80)
 			{
@@ -163,7 +161,7 @@ READ16_MEMBER( f1_state::palette_r )
 
 WRITE16_MEMBER( f1_state::palette_w )
 {
-	UINT8 i,r,g,b;
+	uint8_t i,r,g,b;
 	COMBINE_DATA(&m_p_paletteram[offset]);
 
 	if(ACCESSING_BITS_0_7 && offset) //TODO: offset 0 looks bogus
@@ -268,9 +266,9 @@ static ADDRESS_MAP_START( act_f1_io, AS_IO, 16, f1_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x000f) AM_WRITE8(system_w, 0xffff)
 	AM_RANGE(0x0010, 0x0017) AM_DEVREADWRITE8(Z80CTC_TAG, z80ctc_device, read, write, 0x00ff)
-	AM_RANGE(0x0020, 0x0027) AM_DEVREADWRITE8(Z80SIO2_TAG, z80sio2_device, ba_cd_r, ba_cd_w, 0x00ff)
+	AM_RANGE(0x0020, 0x0027) AM_DEVREADWRITE8(Z80SIO2_TAG, z80sio_device, ba_cd_r, ba_cd_w, 0x00ff)
 //  AM_RANGE(0x0030, 0x0031) AM_WRITE8(ctc_ack_w, 0x00ff)
-	AM_RANGE(0x0040, 0x0047) AM_DEVREADWRITE8(WD2797_TAG, wd2797_t, read, write, 0x00ff)
+	AM_RANGE(0x0040, 0x0047) AM_DEVREADWRITE8(WD2797_TAG, wd2797_device, read, write, 0x00ff)
 //  AM_RANGE(0x01e0, 0x01ff) winchester
 ADDRESS_MAP_END
 
@@ -294,26 +292,8 @@ INPUT_PORTS_END
 //**************************************************************************
 
 //-------------------------------------------------
-//  Z80SIO
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER( f1_state::sio_int_w )
-{
-	m_sio_int = state;
-
-	m_maincpu->set_input_line(INPUT_LINE_IRQ0, m_ctc_int || m_sio_int);
-}
-
-//-------------------------------------------------
 //  Z80CTC
 //-------------------------------------------------
-
-WRITE_LINE_MEMBER( f1_state::ctc_int_w )
-{
-	m_ctc_int = state;
-
-	m_maincpu->set_input_line(INPUT_LINE_IRQ0, m_ctc_int | m_sio_int);
-}
 
 WRITE_LINE_MEMBER( f1_state::ctc_z1_w )
 {
@@ -349,11 +329,14 @@ SLOT_INTERFACE_END
 //  MACHINE_CONFIG( act_f1 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( act_f1, f1_state )
+static MACHINE_CONFIG_START( act_f1 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(I8086_TAG, I8086, XTAL_14MHz/4)
 	MCFG_CPU_PROGRAM_MAP(act_f1_mem)
 	MCFG_CPU_IO_MAP(act_f1_io)
+
+	MCFG_INPUT_MERGER_ANY_HIGH("irqs")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE(I8086_TAG, INPUT_LINE_IRQ0))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
@@ -370,16 +353,16 @@ static MACHINE_CONFIG_START( act_f1, f1_state )
 	/* Devices */
 	MCFG_DEVICE_ADD(APRICOT_KEYBOARD_TAG, APRICOT_KEYBOARD, 0)
 
-	MCFG_Z80SIO2_ADD(Z80SIO2_TAG, 2500000, 0, 0, 0, 0)
-	MCFG_Z80DART_OUT_INT_CB(WRITELINE(f1_state, sio_int_w))
+	MCFG_DEVICE_ADD(Z80SIO2_TAG, Z80SIO, 2500000)
+	MCFG_Z80SIO_OUT_INT_CB(DEVWRITELINE("irqs", input_merger_device, in_w<0>))
 
 	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, 2500000)
-	MCFG_Z80CTC_INTR_CB(WRITELINE(f1_state, ctc_int_w))
+	MCFG_Z80CTC_INTR_CB(DEVWRITELINE("irqs", input_merger_device, in_w<1>))
 	MCFG_Z80CTC_ZC1_CB(WRITELINE(f1_state, ctc_z1_w))
 	MCFG_Z80CTC_ZC2_CB(WRITELINE(f1_state, ctc_z2_w))
 
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE(Z80SIO2_TAG, z80dart_device, ctsa_w))
+	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE(Z80SIO2_TAG, z80sio_device, ctsa_w))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 
@@ -428,8 +411,8 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT     COMPANY             FULLNAME        FLAGS
-COMP( 1984, f1,    0,      0,      act_f1,    act, driver_device,    0,     "ACT",   "Apricot F1",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1984, f1e,   f1,     0,      act_f1,    act, driver_device,    0,     "ACT",   "Apricot F1e",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1984, f2,    f1,     0,      act_f1,    act, driver_device,    0,     "ACT",   "Apricot F2",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1985, f10,   f1,     0,      act_f1,    act, driver_device,    0,     "ACT",   "Apricot F10",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  STATE     INIT  COMPANY  FULLNAME        FLAGS
+COMP( 1984, f1,    0,      0,      act_f1,  act,   f1_state, 0,    "ACT",   "Apricot F1",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1984, f1e,   f1,     0,      act_f1,  act,   f1_state, 0,    "ACT",   "Apricot F1e",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1984, f2,    f1,     0,      act_f1,  act,   f1_state, 0,    "ACT",   "Apricot F2",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1985, f10,   f1,     0,      act_f1,  act,   f1_state, 0,    "ACT",   "Apricot F10",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

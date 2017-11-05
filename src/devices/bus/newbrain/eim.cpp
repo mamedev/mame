@@ -14,6 +14,7 @@
 
 */
 
+#include "emu.h"
 #include "eim.h"
 
 
@@ -36,7 +37,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type NEWBRAIN_EIM = &device_creator<newbrain_eim_t>;
+DEFINE_DEVICE_TYPE(NEWBRAIN_EIM, newbrain_eim_device, "newbrain_eim", "NewBrain EIM")
 
 
 //-------------------------------------------------
@@ -56,39 +57,39 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *newbrain_eim_t::device_rom_region() const
+const tiny_rom_entry *newbrain_eim_device::device_rom_region() const
 {
 	return ROM_NAME( newbrain_eim );
 }
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( newbrain_eim )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( newbrain_eim )
+MACHINE_CONFIG_MEMBER( newbrain_eim_device::device_add_mconfig )
 	// devices
 	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, XTAL_16MHz/8)
 	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE(MC6850_TAG, acia6850_device, write_rxc))
 	MCFG_Z80CTC_ZC1_CB(DEVWRITELINE(MC6850_TAG, acia6850_device, write_txc))
-	MCFG_Z80CTC_ZC2_CB(WRITELINE(newbrain_eim_t, ctc_z2_w))
+	MCFG_Z80CTC_ZC2_CB(WRITELINE(newbrain_eim_device, ctc_z2_w))
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("z80ctc_c2", newbrain_eim_t, ctc_c2_tick, attotime::from_hz(XTAL_16MHz/4/13))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("z80ctc_c2", newbrain_eim_device, ctc_c2_tick, attotime::from_hz(XTAL_16MHz/4/13))
 	MCFG_DEVICE_ADD(ADC0809_TAG, ADC0808, 500000)
-	MCFG_ADC0808_OUT_EOC_CB(WRITELINE(newbrain_eim_t, adc_eoc_w))
-	MCFG_ADC0808_IN_VREF_POS_CB(newbrain_eim_t, adc_vref_pos_r)
-	MCFG_ADC0808_IN_VREF_NEG_CB(newbrain_eim_t, adc_vref_neg_r)
-	MCFG_ADC0808_IN_IN_0_CB(newbrain_eim_t, adc_input_r)
-	MCFG_ADC0808_IN_IN_1_CB(newbrain_eim_t, adc_input_r)
-	MCFG_ADC0808_IN_IN_2_CB(newbrain_eim_t, adc_input_r)
-	MCFG_ADC0808_IN_IN_3_CB(newbrain_eim_t, adc_input_r)
-	MCFG_ADC0808_IN_IN_4_CB(newbrain_eim_t, adc_input_r)
-	MCFG_ADC0808_IN_IN_5_CB(newbrain_eim_t, adc_input_r)
-	MCFG_ADC0808_IN_IN_6_CB(newbrain_eim_t, adc_input_r)
-	MCFG_ADC0808_IN_IN_7_CB(newbrain_eim_t, adc_input_r)
+	MCFG_ADC0808_OUT_EOC_CB(WRITELINE(newbrain_eim_device, adc_eoc_w))
+	MCFG_ADC0808_IN_VREF_POS_CB(newbrain_eim_device, adc_vref_pos_r)
+	MCFG_ADC0808_IN_VREF_NEG_CB(newbrain_eim_device, adc_vref_neg_r)
+	MCFG_ADC0808_IN_IN_0_CB(newbrain_eim_device, adc_input_r)
+	MCFG_ADC0808_IN_IN_1_CB(newbrain_eim_device, adc_input_r)
+	MCFG_ADC0808_IN_IN_2_CB(newbrain_eim_device, adc_input_r)
+	MCFG_ADC0808_IN_IN_3_CB(newbrain_eim_device, adc_input_r)
+	MCFG_ADC0808_IN_IN_4_CB(newbrain_eim_device, adc_input_r)
+	MCFG_ADC0808_IN_IN_5_CB(newbrain_eim_device, adc_input_r)
+	MCFG_ADC0808_IN_IN_6_CB(newbrain_eim_device, adc_input_r)
+	MCFG_ADC0808_IN_IN_7_CB(newbrain_eim_device, adc_input_r)
 
 	MCFG_DEVICE_ADD(MC6850_TAG, ACIA6850, 0)
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(newbrain_eim_t, acia_interrupt))
+	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(newbrain_eim_device, acia_interrupt))
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, nullptr)
 
 	MCFG_NEWBRAIN_EXPANSION_SLOT_ADD(NEWBRAIN_EXPANSION_SLOT_TAG, XTAL_16MHz/8, newbrain_expansion_cards, "fdc")
@@ -99,28 +100,16 @@ static MACHINE_CONFIG_FRAGMENT( newbrain_eim )
 MACHINE_CONFIG_END
 
 
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor newbrain_eim_t::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( newbrain_eim );
-}
-
-
-
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
 
 //-------------------------------------------------
-//  newbrain_eim_t - constructor
+//  newbrain_eim_device - constructor
 //-------------------------------------------------
 
-newbrain_eim_t::newbrain_eim_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, NEWBRAIN_EIM, "Newbrain EIM", tag, owner, clock, "newbrain_eim", __FILE__),
+newbrain_eim_device::newbrain_eim_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, NEWBRAIN_EIM, tag, owner, clock),
 	device_newbrain_expansion_slot_interface(mconfig, *this),
 	m_ctc(*this, Z80CTC_TAG),
 	m_acia(*this, MC6850_TAG),
@@ -135,7 +124,7 @@ newbrain_eim_t::newbrain_eim_t(const machine_config &mconfig, const char *tag, d
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void newbrain_eim_t::device_start()
+void newbrain_eim_device::device_start()
 {
 	// state saving
 	save_item(NAME(m_aciaint));
@@ -147,7 +136,7 @@ void newbrain_eim_t::device_start()
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
-void newbrain_eim_t::device_reset()
+void newbrain_eim_device::device_reset()
 {
 }
 
@@ -156,7 +145,7 @@ void newbrain_eim_t::device_reset()
 //  mreq_r - memory request read
 //-------------------------------------------------
 
-UINT8 newbrain_eim_t::mreq_r(address_space &space, offs_t offset, UINT8 data, bool &romov, int &exrm, bool &raminh)
+uint8_t newbrain_eim_device::mreq_r(address_space &space, offs_t offset, uint8_t data, bool &romov, int &exrm, bool &raminh)
 {
 	return m_exp->mreq_r(space, offset, data, romov, exrm, raminh);
 }
@@ -166,7 +155,7 @@ UINT8 newbrain_eim_t::mreq_r(address_space &space, offs_t offset, UINT8 data, bo
 //  mreq_w - memory request write
 //-------------------------------------------------
 
-void newbrain_eim_t::mreq_w(address_space &space, offs_t offset, UINT8 data, bool &romov, int &exrm, bool &raminh)
+void newbrain_eim_device::mreq_w(address_space &space, offs_t offset, uint8_t data, bool &romov, int &exrm, bool &raminh)
 {
 	m_exp->mreq_w(space, offset, data, romov, exrm, raminh);
 }
@@ -176,7 +165,7 @@ void newbrain_eim_t::mreq_w(address_space &space, offs_t offset, UINT8 data, boo
 //  iorq_r - I/O request read
 //-------------------------------------------------
 
-UINT8 newbrain_eim_t::iorq_r(address_space &space, offs_t offset, UINT8 data, bool &prtov)
+uint8_t newbrain_eim_device::iorq_r(address_space &space, offs_t offset, uint8_t data, bool &prtov)
 {
 	return m_exp->iorq_r(space, offset, data, prtov);
 }
@@ -186,7 +175,7 @@ UINT8 newbrain_eim_t::iorq_r(address_space &space, offs_t offset, UINT8 data, bo
 //  iorq_w - I/O request write
 //-------------------------------------------------
 
-void newbrain_eim_t::iorq_w(address_space &space, offs_t offset, UINT8 data, bool &prtov)
+void newbrain_eim_device::iorq_w(address_space &space, offs_t offset, uint8_t data, bool &prtov)
 {
 	m_exp->iorq_w(space, offset, data, prtov);
 }
@@ -196,7 +185,7 @@ void newbrain_eim_t::iorq_w(address_space &space, offs_t offset, UINT8 data, boo
 //  anout_r -
 //-------------------------------------------------
 
-READ8_MEMBER( newbrain_eim_t::anout_r )
+READ8_MEMBER( newbrain_eim_device::anout_r )
 {
 	return 0xff;
 }
@@ -206,7 +195,7 @@ READ8_MEMBER( newbrain_eim_t::anout_r )
 //  anout_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( newbrain_eim_t::anout_w )
+WRITE8_MEMBER( newbrain_eim_device::anout_w )
 {
 }
 
@@ -215,7 +204,7 @@ WRITE8_MEMBER( newbrain_eim_t::anout_w )
 //  anin_r -
 //-------------------------------------------------
 
-READ8_MEMBER( newbrain_eim_t::anin_r )
+READ8_MEMBER( newbrain_eim_device::anin_r )
 {
 	return 0;
 }
@@ -225,7 +214,7 @@ READ8_MEMBER( newbrain_eim_t::anin_r )
 //  anio_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( newbrain_eim_t::anio_w )
+WRITE8_MEMBER( newbrain_eim_device::anio_w )
 {
 }
 
@@ -234,7 +223,7 @@ WRITE8_MEMBER( newbrain_eim_t::anio_w )
 //  adc_eoc_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( newbrain_eim_t::adc_eoc_w )
+WRITE_LINE_MEMBER( newbrain_eim_device::adc_eoc_w )
 {
 	m_anint = state;
 }
@@ -244,7 +233,7 @@ WRITE_LINE_MEMBER( newbrain_eim_t::adc_eoc_w )
 //  adc_vref_pos_r -
 //-------------------------------------------------
 
-ADC0808_ANALOG_READ_CB( newbrain_eim_t::adc_vref_pos_r )
+ADC0808_ANALOG_READ_CB( newbrain_eim_device::adc_vref_pos_r )
 {
 	return 5.0;
 }
@@ -254,7 +243,7 @@ ADC0808_ANALOG_READ_CB( newbrain_eim_t::adc_vref_pos_r )
 //  adc_vref_neg_r -
 //-------------------------------------------------
 
-ADC0808_ANALOG_READ_CB( newbrain_eim_t::adc_vref_neg_r )
+ADC0808_ANALOG_READ_CB( newbrain_eim_device::adc_vref_neg_r )
 {
 	return 0.0;
 }
@@ -264,7 +253,7 @@ ADC0808_ANALOG_READ_CB( newbrain_eim_t::adc_vref_neg_r )
 //  adc_input_r -
 //-------------------------------------------------
 
-ADC0808_ANALOG_READ_CB( newbrain_eim_t::adc_input_r )
+ADC0808_ANALOG_READ_CB( newbrain_eim_device::adc_input_r )
 {
 	return 0.0;
 }
@@ -274,7 +263,7 @@ ADC0808_ANALOG_READ_CB( newbrain_eim_t::adc_input_r )
 //  acia_interrupt -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( newbrain_eim_t::acia_interrupt )
+WRITE_LINE_MEMBER( newbrain_eim_device::acia_interrupt )
 {
 	m_aciaint = state;
 }
@@ -284,7 +273,7 @@ WRITE_LINE_MEMBER( newbrain_eim_t::acia_interrupt )
 //  ctc_z2_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( newbrain_eim_t::ctc_z2_w )
+WRITE_LINE_MEMBER( newbrain_eim_device::ctc_z2_w )
 {
 	// connected to CTC channel 0/1 clock inputs
 	m_ctc->trg0(state);
@@ -296,7 +285,7 @@ WRITE_LINE_MEMBER( newbrain_eim_t::ctc_z2_w )
 //  adc_input_r -
 //-------------------------------------------------
 
-TIMER_DEVICE_CALLBACK_MEMBER(newbrain_eim_t::ctc_c2_tick)
+TIMER_DEVICE_CALLBACK_MEMBER(newbrain_eim_device::ctc_c2_tick)
 {
 	m_ctc->trg2(1);
 	m_ctc->trg2(0);

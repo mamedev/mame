@@ -24,7 +24,7 @@ DRIVER_INIT_MEMBER(partner_state,partner)
 	m_tape_value = 0x80;
 }
 
-void partner_state::partner_window_1(UINT8 bank_num, UINT16 offset,UINT8 *rom)
+void partner_state::partner_window_1(uint8_t bank_num, uint16_t offset,uint8_t *rom)
 {
 	char bank[10];
 	sprintf(bank,"bank%d",bank_num);
@@ -41,7 +41,7 @@ void partner_state::partner_window_1(UINT8 bank_num, UINT16 offset,UINT8 *rom)
 	}
 }
 
-void partner_state::partner_window_2(UINT8 bank_num, UINT16 offset,UINT8 *rom)
+void partner_state::partner_window_2(uint8_t bank_num, uint16_t offset,uint8_t *rom)
 {
 	char bank[10];
 	sprintf(bank,"bank%d",bank_num);
@@ -99,7 +99,7 @@ WRITE8_MEMBER(partner_state::partner_floppy_w){
 	}
 }
 
-void partner_state::partner_iomap_bank(UINT8 *rom)
+void partner_state::partner_iomap_bank(uint8_t *rom)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	switch(m_win_mem_page) {
@@ -119,8 +119,8 @@ void partner_state::partner_iomap_bank(UINT8 *rom)
 void partner_state::partner_bank_switch()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	UINT8 *rom = memregion("maincpu")->base();
-	UINT8 *ram = m_ram->pointer();
+	uint8_t *rom = memregion("maincpu")->base();
+	uint8_t *ram = m_ram->pointer();
 
 	space.install_write_bank(0x0000, 0x07ff, "bank1");
 	space.install_write_bank(0x0800, 0x3fff, "bank2");
@@ -336,8 +336,8 @@ I8275_DRAW_CHARACTER_MEMBER(partner_state::display_pixels)
 {
 	int i;
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	const UINT8 *charmap = m_charmap + 0x400 * (gpa * 2 + hlgt);
-	UINT8 pixels = charmap[(linecount & 7) + (charcode << 3)] ^ 0xff;
+	const uint8_t *charmap = m_charmap + 0x400 * (gpa * 2 + hlgt);
+	uint8_t pixels = charmap[(linecount & 7) + (charcode << 3)] ^ 0xff;
 	if(linecount == 8)
 		pixels = 0;
 	if (vsp) {

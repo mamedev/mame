@@ -6,8 +6,10 @@
 
 ***************************************************************************/
 
-#ifndef __PC_LPT_H__
-#define __PC_LPT_H__
+#ifndef MAME_MACHINE_PC_LPT_H
+#define MAME_MACHINE_PC_LPT_H
+
+#pragma once
 
 #include "bus/centronics/ctronics.h"
 
@@ -21,10 +23,10 @@
 class pc_lpt_device : public device_t
 {
 public:
-	pc_lpt_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pc_lpt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration helpers
-	template<class _Object> static devcb_base &set_irq_handler(device_t &device, _Object object) { return downcast<pc_lpt_device &>(device).m_irq_handler.set_callback(object); }
+	template <class Object> static devcb_base &set_irq_handler(device_t &device, Object &&cb) { return downcast<pc_lpt_device &>(device).m_irq_handler.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -35,17 +37,16 @@ public:
 	DECLARE_READ8_MEMBER( control_r );
 	DECLARE_WRITE8_MEMBER( control_w );
 
-	DECLARE_WRITE_LINE_MEMBER( write_irq_enabled );
-	DECLARE_WRITE_LINE_MEMBER( write_centronics_ack );
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
 	void update_irq();
+	DECLARE_WRITE_LINE_MEMBER( write_irq_enabled );
+	DECLARE_WRITE_LINE_MEMBER( write_centronics_ack );
 
 	enum
 	{
@@ -69,8 +70,8 @@ private:
 	// internal state
 
 	int m_irq;
-	UINT8 m_data;
-	UINT8 m_control;
+	uint8_t m_data;
+	uint8_t m_control;
 	int m_irq_enabled;
 	int m_centronics_ack;
 
@@ -82,6 +83,6 @@ private:
 	required_device<output_latch_device> m_cent_ctrl_out;
 };
 
-extern const device_type PC_LPT;
+DECLARE_DEVICE_TYPE(PC_LPT, pc_lpt_device)
 
-#endif /* __PC_LPT__ */
+#endif // MAME_MACHINE_PC_LPT_H

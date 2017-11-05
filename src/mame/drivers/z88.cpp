@@ -10,6 +10,7 @@
 
         TODO:
         - speaker controlled by txd
+        - cartridges should be hot swappable
         - expansion interface
         - serial port
 
@@ -17,7 +18,11 @@
 
 *******************************************************************************/
 
+#include "emu.h"
 #include "includes/z88.h"
+
+#include "screen.h"
+#include "speaker.h"
 
 
 /* Assumption:
@@ -109,16 +114,16 @@ UPD65031_MEMORY_UPDATE(z88_state::bankswitch_update)
 			switch (bank)
 			{
 				case 0:
-					m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x0000, 0x3fff, 0, 0, read8_delegate(FUNC(z88_state::bank0_cart_r), this), write8_delegate(FUNC(z88_state::bank0_cart_w), this));
+					m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x0000, 0x3fff, read8_delegate(FUNC(z88_state::bank0_cart_r), this), write8_delegate(FUNC(z88_state::bank0_cart_w), this));
 					break;
 				case 1:
-					m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x4000, 0x7fff, 0, 0, read8_delegate(FUNC(z88_state::bank1_cart_r), this), write8_delegate(FUNC(z88_state::bank1_cart_w), this));
+					m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x4000, 0x7fff, read8_delegate(FUNC(z88_state::bank1_cart_r), this), write8_delegate(FUNC(z88_state::bank1_cart_w), this));
 					break;
 				case 2:
-					m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x8000, 0xbfff, 0, 0, read8_delegate(FUNC(z88_state::bank2_cart_r), this), write8_delegate(FUNC(z88_state::bank2_cart_w), this));
+					m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x8000, 0xbfff, read8_delegate(FUNC(z88_state::bank2_cart_r), this), write8_delegate(FUNC(z88_state::bank2_cart_w), this));
 					break;
 				case 3:
-					m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xc000, 0xffff, 0, 0, read8_delegate(FUNC(z88_state::bank3_cart_r), this), write8_delegate(FUNC(z88_state::bank3_cart_w), this));
+					m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xc000, 0xffff, read8_delegate(FUNC(z88_state::bank3_cart_r), this), write8_delegate(FUNC(z88_state::bank3_cart_w), this));
 					break;
 			}
 
@@ -259,7 +264,7 @@ static INPUT_PORTS_START( z88 )
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Caps Lock") PORT_CODE(KEYCODE_CAPSLOCK)      PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK))
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP)                             PORT_CHAR('.') PORT_CHAR('>')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH)                                PORT_CHAR('/') PORT_CHAR('?')
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH)                            PORT_CHAR('\xA3') PORT_CHAR('~')
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH)                            PORT_CHAR(0xA3) PORT_CHAR('~')
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( z88de )
@@ -549,8 +554,8 @@ INPUT_PORTS_END
 
 void z88_state::machine_start()
 {
-	m_bios = (UINT8*)memregion("bios")->base();
-	m_ram_base = (UINT8*)m_ram->pointer();
+	m_bios = (uint8_t*)memregion("bios")->base();
+	m_ram_base = (uint8_t*)m_ram->pointer();
 
 	// configure the memory banks
 	membank("bank1")->configure_entry(0, m_bios);
@@ -576,7 +581,7 @@ void z88_state::machine_reset()
 
 READ8_MEMBER(z88_state::kb_r)
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	if (!(offset & 0x80))
 		data &= ioport("LINE7")->read();
@@ -606,17 +611,17 @@ READ8_MEMBER(z88_state::kb_r)
 }
 
 static SLOT_INTERFACE_START(z88_cart)
-	SLOT_INTERFACE("32krom",  Z88_32K_ROM)          // 32KB ROM cart
-	SLOT_INTERFACE("128krom", Z88_128K_ROM)         // 128KB ROM cart
-	SLOT_INTERFACE("256krom", Z88_256K_ROM)         // 256KB ROM cart
-	SLOT_INTERFACE("32kram",  Z88_32K_RAM)          // 32KB RAM cart
-	SLOT_INTERFACE("128kram", Z88_128K_RAM)         // 128KB RAM cart
-	SLOT_INTERFACE("512kram", Z88_512K_RAM)         // 512KB RAM cart
-	SLOT_INTERFACE("1024kram",Z88_1024K_RAM)        // 1024KB RAM cart
-	SLOT_INTERFACE("1024kflash",Z88_1024K_FLASH)    // 1024KB Flash cart
+	SLOT_INTERFACE("32krom",     Z88_32K_ROM)        // 32KB ROM cart
+	SLOT_INTERFACE("128krom",    Z88_128K_ROM)       // 128KB ROM cart
+	SLOT_INTERFACE("256krom",    Z88_256K_ROM)       // 256KB ROM cart
+	SLOT_INTERFACE("32kram",     Z88_32K_RAM)        // 32KB RAM cart
+	SLOT_INTERFACE("128kram",    Z88_128K_RAM)       // 128KB RAM cart
+	SLOT_INTERFACE("512kram",    Z88_512K_RAM)       // 512KB RAM cart
+	SLOT_INTERFACE("1024kram",   Z88_1024K_RAM)      // 1024KB RAM cart
+	SLOT_INTERFACE("1024kflash", Z88_1024K_FLASH)    // 1024KB Flash cart
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( z88, z88_state )
+static MACHINE_CONFIG_START( z88 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_9_8304MHz/3)  // divided by 3 through the uPD65031
 	MCFG_CPU_PROGRAM_MAP(z88_mem)
@@ -649,12 +654,12 @@ static MACHINE_CONFIG_START( z88, z88_state )
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	// internal ram
+	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("128K")
 	MCFG_RAM_EXTRA_OPTIONS("32K,64K,256K,512k")
 
-	// cartridges
+	/* cartridges */
 	MCFG_DEVICE_ADD("slot1", Z88CART_SLOT, 0)
 	MCFG_DEVICE_SLOT_INTERFACE(z88_cart, nullptr, false)
 	MCFG_Z88CART_SLOT_OUT_FLP_CB(DEVWRITELINE("blink", upd65031_device, flp_w))
@@ -664,6 +669,9 @@ static MACHINE_CONFIG_START( z88, z88_state )
 	MCFG_DEVICE_ADD("slot3", Z88CART_SLOT, 0)
 	MCFG_DEVICE_SLOT_INTERFACE(z88_cart, nullptr, false)
 	MCFG_Z88CART_SLOT_OUT_FLP_CB(DEVWRITELINE("blink", upd65031_device, flp_w))
+
+	/* software lists */
+	MCFG_SOFTWARE_LIST_ADD("cart_list", "z88_cart")
 MACHINE_CONFIG_END
 
 
@@ -744,15 +752,15 @@ ROM_START(z88tr)
 	ROMX_LOAD("z88v317tk.rom", 0x00000, 0x20000, CRC(9468d677) SHA1(8d76e94f43846c736bf257d15d531c2df1e20fae), ROM_BIOS(1) )
 ROM_END
 
-/*    YEAR     NAME    PARENT  COMPAT  MACHINE     INPUT       INIT     COMPANY         FULLNAME */
-COMP( 1988,    z88  ,    0,      0,      z88,        z88  , driver_device,      0, "Cambridge Computers", "Z88"            , MACHINE_NOT_WORKING)
-COMP( 1988,    z88de,  z88,      0,      z88,        z88de, driver_device,      0, "Cambridge Computers", "Z88 (German)"   , MACHINE_NOT_WORKING)
-COMP( 1988,    z88es,  z88,      0,      z88,        z88es, driver_device,      0, "Cambridge Computers", "Z88 (Spanish)"  , MACHINE_NOT_WORKING)
-COMP( 1988,    z88fr,  z88,      0,      z88,        z88fr, driver_device,      0, "Cambridge Computers", "Z88 (French)"   , MACHINE_NOT_WORKING)
-COMP( 1988,    z88it,  z88,      0,      z88,        z88it, driver_device,      0, "Cambridge Computers", "Z88 (Italian)"  , MACHINE_NOT_WORKING)
-COMP( 1988,    z88se,  z88,      0,      z88,        z88se, driver_device,      0, "Cambridge Computers", "Z88 (Swedish)"  , MACHINE_NOT_WORKING)
-COMP( 1988,    z88fi,  z88,      0,      z88,        z88se, driver_device,      0, "Cambridge Computers", "Z88 (Finnish)"  , MACHINE_NOT_WORKING)
-COMP( 1988,    z88no,  z88,      0,      z88,        z88no, driver_device,      0, "Cambridge Computers", "Z88 (Norwegian)", MACHINE_NOT_WORKING)
-COMP( 1988,    z88dk,  z88,      0,      z88,        z88no, driver_device,      0, "Cambridge Computers", "Z88 (Danish)"   , MACHINE_NOT_WORKING)
-COMP( 1988,    z88ch,  z88,      0,      z88,        z88ch, driver_device,      0, "Cambridge Computers", "Z88 (Swiss)"    , MACHINE_NOT_WORKING)
-COMP( 1988,    z88tr,  z88,      0,      z88,        z88tr, driver_device,      0, "Cambridge Computers", "Z88 (Turkish)"  , MACHINE_NOT_WORKING)
+/*    YEAR     NAME    PARENT  COMPAT  MACHINE     INPUT  CLASS        INIT  COMPANY                FULLNAME           FLAGS */
+COMP( 1988,    z88  ,    0,    0,      z88,        z88  , z88_state,   0,    "Cambridge Computers", "Z88"            , MACHINE_NOT_WORKING)
+COMP( 1988,    z88de,  z88,    0,      z88,        z88de, z88_state,   0,    "Cambridge Computers", "Z88 (German)"   , MACHINE_NOT_WORKING)
+COMP( 1988,    z88es,  z88,    0,      z88,        z88es, z88_state,   0,    "Cambridge Computers", "Z88 (Spanish)"  , MACHINE_NOT_WORKING)
+COMP( 1988,    z88fr,  z88,    0,      z88,        z88fr, z88_state,   0,    "Cambridge Computers", "Z88 (French)"   , MACHINE_NOT_WORKING)
+COMP( 1988,    z88it,  z88,    0,      z88,        z88it, z88_state,   0,    "Cambridge Computers", "Z88 (Italian)"  , MACHINE_NOT_WORKING)
+COMP( 1988,    z88se,  z88,    0,      z88,        z88se, z88_state,   0,    "Cambridge Computers", "Z88 (Swedish)"  , MACHINE_NOT_WORKING)
+COMP( 1988,    z88fi,  z88,    0,      z88,        z88se, z88_state,   0,    "Cambridge Computers", "Z88 (Finnish)"  , MACHINE_NOT_WORKING)
+COMP( 1988,    z88no,  z88,    0,      z88,        z88no, z88_state,   0,    "Cambridge Computers", "Z88 (Norwegian)", MACHINE_NOT_WORKING)
+COMP( 1988,    z88dk,  z88,    0,      z88,        z88no, z88_state,   0,    "Cambridge Computers", "Z88 (Danish)"   , MACHINE_NOT_WORKING)
+COMP( 1988,    z88ch,  z88,    0,      z88,        z88ch, z88_state,   0,    "Cambridge Computers", "Z88 (Swiss)"    , MACHINE_NOT_WORKING)
+COMP( 1988,    z88tr,  z88,    0,      z88,        z88tr, z88_state,   0,    "Cambridge Computers", "Z88 (Turkish)"  , MACHINE_NOT_WORKING)

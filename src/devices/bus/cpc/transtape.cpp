@@ -8,21 +8,21 @@
  * Further info at - http://cpcwiki.eu/index.php/Transtape
  */
 
+#include "emu.h"
 #include "transtape.h"
-#include "includes/amstrad.h"
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type CPC_TRANSTAPE = &device_creator<cpc_transtape_device>;
+DEFINE_DEVICE_TYPE(CPC_TRANSTAPE, cpc_transtape_device, "cpc_transtape", "Hard Micro Transtape")
 
 ROM_START( cpc_transtape )
 	ROM_REGION( 0x4000, "tt_rom", 0 )
 	ROM_LOAD( "tta.rom",   0x0000, 0x4000, CRC(c568da76) SHA1(cc509d21216bf11d40f9a3e0791ef7f4ada03790) )
 ROM_END
 
-const rom_entry *cpc_transtape_device::device_rom_region() const
+const tiny_rom_entry *cpc_transtape_device::device_rom_region() const
 {
 	return ROM_NAME( cpc_transtape );
 }
@@ -42,9 +42,10 @@ ioport_constructor cpc_transtape_device::device_input_ports() const
 //  LIVE DEVICE
 //**************************************************************************
 
-cpc_transtape_device::cpc_transtape_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, CPC_TRANSTAPE, "HM Transtape", tag, owner, clock, "cpc_transtape", __FILE__),
-	device_cpc_expansion_card_interface(mconfig, *this), m_slot(nullptr), m_cpu(nullptr), m_space(nullptr), m_ram(nullptr),
+cpc_transtape_device::cpc_transtape_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, CPC_TRANSTAPE, tag, owner, clock),
+	device_cpc_expansion_card_interface(mconfig, *this),
+	m_slot(nullptr), m_cpu(nullptr), m_space(nullptr), m_ram(nullptr),
 	m_rom_active(false),
 	m_romen(true),
 	m_output(0)
@@ -61,10 +62,10 @@ void cpc_transtape_device::device_start()
 	m_cpu = static_cast<cpu_device*>(machine().device("maincpu"));
 	m_space = &m_cpu->space(AS_IO);
 
-	m_ram = make_unique_clear<UINT8[]>(0x2000);
+	m_ram = make_unique_clear<uint8_t[]>(0x2000);
 
-	m_space->install_write_handler(0xfbf0,0xfbf0,0,0,write8_delegate(FUNC(cpc_transtape_device::output_w),this));
-	m_space->install_read_handler(0xfbff,0xfbff,0,0,read8_delegate(FUNC(cpc_transtape_device::input_r),this));
+	m_space->install_write_handler(0xfbf0,0xfbf0,write8_delegate(FUNC(cpc_transtape_device::output_w),this));
+	m_space->install_read_handler(0xfbff,0xfbff,read8_delegate(FUNC(cpc_transtape_device::input_r),this));
 }
 
 //-------------------------------------------------
@@ -80,7 +81,7 @@ void cpc_transtape_device::device_reset()
 
 void cpc_transtape_device::map_enable()
 {
-	UINT8* ROM = memregion("tt_rom")->base();
+	uint8_t* ROM = memregion("tt_rom")->base();
 	if(m_output & 0x02)  // ROM enable
 	{
 		membank(":bank1")->set_base(ROM);
@@ -130,7 +131,7 @@ WRITE8_MEMBER(cpc_transtape_device::output_w)
 	m_slot->rom_select(space,0,get_rom_bank());  // trigger rethink
 }
 
-void cpc_transtape_device::set_mapping(UINT8 type)
+void cpc_transtape_device::set_mapping(uint8_t type)
 {
 	if(type != MAP_OTHER)
 		return;

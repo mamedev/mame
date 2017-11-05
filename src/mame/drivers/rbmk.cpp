@@ -1,4 +1,4 @@
-// license:LGPL-2.1+
+// license:BSD-3-Clause
 // copyright-holders:Tomasz Slanina, David Haywood
 /*
 Real Battle Mahjong King by 'Game Men System Co. Ltd.'
@@ -52,11 +52,15 @@ Notes:
 */
 
 #include "emu.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/mcs51/mcs51.h"
-#include "sound/okim6295.h"
-#include "sound/2151intf.h"
 #include "machine/eepromser.h"
+#include "sound/okim6295.h"
+#include "sound/ym2151.h"
+
+#include "screen.h"
+#include "speaker.h"
 
 
 class rbmk_state : public driver_device
@@ -72,10 +76,10 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")  { }
 
-	required_shared_ptr<UINT16> m_gms_vidram2;
-	required_shared_ptr<UINT16> m_gms_vidram;
-	UINT16 m_tilebank;
-	UINT8 m_mux_data;
+	required_shared_ptr<uint16_t> m_gms_vidram2;
+	required_shared_ptr<uint16_t> m_gms_vidram;
+	uint16_t m_tilebank;
+	uint8_t m_mux_data;
 	DECLARE_READ16_MEMBER(gms_read);
 	DECLARE_WRITE16_MEMBER(gms_write1);
 	DECLARE_WRITE16_MEMBER(gms_write2);
@@ -85,7 +89,7 @@ public:
 	DECLARE_WRITE8_MEMBER(mcu_io_mux_w);
 	DECLARE_WRITE16_MEMBER(eeprom_w);
 	virtual void video_start() override;
-	UINT32 screen_update_rbmk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_rbmk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(mcu_irq);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_mcu;
@@ -509,7 +513,7 @@ void rbmk_state::video_start()
 {
 }
 
-UINT32 rbmk_state::screen_update_rbmk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t rbmk_state::screen_update_rbmk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x,y;
 	int count = 0;
@@ -543,7 +547,7 @@ INTERRUPT_GEN_MEMBER(rbmk_state::mcu_irq)
 	m_mcu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static MACHINE_CONFIG_START( rbmk, rbmk_state )
+static MACHINE_CONFIG_START( rbmk )
 	MCFG_CPU_ADD("maincpu", M68000, 22000000 /2)
 	MCFG_CPU_PROGRAM_MAP(rbmk_mem)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", rbmk_state,  irq1_line_hold)
@@ -572,7 +576,7 @@ static MACHINE_CONFIG_START( rbmk, rbmk_state )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_OKIM6295_ADD("oki", 1122000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", 1122000, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.47)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.47)
 
@@ -605,4 +609,4 @@ ROM_START( rbmk )
 ROM_END
 
 
-GAME( 1998, rbmk, 0, rbmk, rbmk, driver_device,0, ROT0,  "GMS", "Real Battle Mahjong King", MACHINE_NOT_WORKING )
+GAME( 1998, rbmk, 0, rbmk, rbmk, rbmk_state, 0, ROT0,  "GMS", "Real Battle Mahjong King", MACHINE_NOT_WORKING )

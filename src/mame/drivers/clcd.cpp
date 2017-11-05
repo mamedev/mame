@@ -12,6 +12,7 @@
 ****************************************************************************/
 
 
+#include "emu.h"
 #include "bus/centronics/ctronics.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/m6502/m65c02.h"
@@ -21,8 +22,10 @@
 #include "machine/msm58321.h"
 #include "machine/ram.h"
 #include "machine/nvram.h"
-#include "sound/speaker.h"
+#include "sound/spkrdev.h"
 #include "rendlay.h"
+#include "screen.h"
+#include "speaker.h"
 
 class clcd_state : public driver_device
 {
@@ -106,7 +109,7 @@ public:
 		palette.set_pen_color(1, rgb_t(2,4,2));
 	}
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 	{
 		if (m_lcd_mode & LCD_MODE_GRAPH)
 		{
@@ -116,7 +119,7 @@ public:
 
 				for (int x = 0; x < 60; x++)
 				{
-					UINT8 bit = m_ram->pointer()[offset++];
+					uint8_t bit = m_ram->pointer()[offset++];
 
 					bitmap.pix16(y, (x * 8) + 0) = (bit >> 7) & 1;
 					bitmap.pix16(y, (x * 8) + 1) = (bit >> 6) & 1;
@@ -131,7 +134,7 @@ public:
 		}
 		else
 		{
-			UINT8 *font = m_lcd_char_rom->base();
+			uint8_t *font = m_lcd_char_rom->base();
 			if (m_lcd_mode & LCD_MODE_ALT)
 			{
 				font += 1024;
@@ -139,27 +142,20 @@ public:
 
 			int chrw = (m_lcd_size & LCD_SIZE_CHRW) ? 8 : 6;
 
-			for (int y = 0; y < 16; y++)
+			for (int y = 0; y < 128; y++)
 			{
-				int offset = (m_lcd_scrolly * 128) + (m_lcd_scrollx & 0x7f) + (y * 128);
+				int offset = (m_lcd_scrolly * 128) + (m_lcd_scrollx & 0x7f) + ((y / 8) * 128);
 
 				for (int x = 0; x < 480; x++)
 				{
-					UINT8 ch = m_ram->pointer()[offset + (x / chrw)];
-					UINT8 bit = font[((ch & 0x7f) * chrw) + (x % chrw)];
+					uint8_t ch = m_ram->pointer()[offset + (x / chrw)];
+					uint8_t bit = font[((ch & 0x7f) * 8) + (y % 8)];
 					if (ch & 0x80)
 					{
 						bit = ~bit;
 					}
 
-					bitmap.pix16((y * 8) + 0, x) = (bit >> 0) & 1;
-					bitmap.pix16((y * 8) + 1, x) = (bit >> 1) & 1;
-					bitmap.pix16((y * 8) + 2, x) = (bit >> 2) & 1;
-					bitmap.pix16((y * 8) + 3, x) = (bit >> 3) & 1;
-					bitmap.pix16((y * 8) + 4, x) = (bit >> 4) & 1;
-					bitmap.pix16((y * 8) + 5, x) = (bit >> 5) & 1;
-					bitmap.pix16((y * 8) + 6, x) = (bit >> 6) & 1;
-					bitmap.pix16((y * 8) + 7, x) = (bit >> 7) & 1;
+					bitmap.pix16(y, x) = (bit >> (7 - (x % chrw))) & 1;
 				}
 			}
 		}
@@ -206,7 +202,7 @@ public:
 
 	void update_irq()
 	{
-		m_maincpu->irq_line(m_irq_via0 | m_irq_via1 | m_irq_acia);
+		m_maincpu->set_input_line(M65C02_IRQ_LINE, m_irq_via0 | m_irq_via1 | m_irq_acia);
 	}
 
 	WRITE_LINE_MEMBER(write_irq_via0)
@@ -577,15 +573,15 @@ private:
 	int m_irq_acia;
 	int m_mmu_mode;
 	int m_mmu_saved_mode;
-	UINT8 m_mmu_offset1;
-	UINT8 m_mmu_offset2;
-	UINT8 m_mmu_offset3;
-	UINT8 m_mmu_offset4;
-	UINT8 m_mmu_offset5;
+	uint8_t m_mmu_offset1;
+	uint8_t m_mmu_offset2;
+	uint8_t m_mmu_offset3;
+	uint8_t m_mmu_offset4;
+	uint8_t m_mmu_offset5;
 	int m_key_clk;
 	int m_key_poll;
 	int m_key_column;
-	UINT16 m_key_shift;
+	uint16_t m_key_shift;
 	int m_key_force_format;
 	required_ioport m_col0;
 	required_ioport m_col1;
@@ -738,7 +734,7 @@ static INPUT_PORTS_START( clcd )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // clears screen and goes into infinite loop
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START(clcd, clcd_state)
+static MACHINE_CONFIG_START(clcd)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M65C02, 2000000)
 	MCFG_CPU_PROGRAM_MAP(clcd_mem)
@@ -838,10 +834,11 @@ ROM_START( clcd )
 	ROM_LOAD( "sizapr.u103",        0x10000, 0x8000, CRC(0aa91d9f) SHA1(f0842f370607f95d0a0ec6afafb81bc063c32745))
 	ROM_LOAD( "kizapr.u102",        0x18000, 0x8000, CRC(59103d52) SHA1(e49c20b237a78b54c2cb26b133d5903bb60bd8ef))
 
-	ROM_REGION( 0x20000, "lcd_char_rom", 0 )
-	ROM_LOAD( "lcd_char_rom",      0x000000, 0x000800, BAD_DUMP CRC(7db9d225) SHA1(0a8835fa182efa55d027828b42aa554608795274) )
+	ROM_REGION( 0x800, "lcd_char_rom", 0 )
+	ROM_LOAD( "lcd-char-rom.u16",   0x00000, 0x800, CRC(7b6d3867) SHA1(cb594801438849f933ddc3e64b03b56f42f59f09))
+	ROM_IGNORE(0x800)
 ROM_END
 
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY                         FULLNAME       FLAGS */
-COMP( 1985, clcd,   0,      0,       clcd,      clcd, driver_device,     0, "Commodore Business Machines", "LCD (Prototype)", 0 )
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE        INIT   COMPANY                        FULLNAME           FLAGS */
+COMP( 1985, clcd,   0,      0,       clcd,      clcd,  clcd_state,  0,     "Commodore Business Machines", "LCD (Prototype)", 0 )

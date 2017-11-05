@@ -7,7 +7,6 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "sound/2151intf.h"
 #include "machine/atarigen.h"
 #include "includes/cyberbal.h"
 
@@ -54,7 +53,7 @@ WRITE8_MEMBER(cyberbal_state::sound_bank_select_w)
 	machine().bookkeeping().coin_counter_w(1, (data >> 5) & 1);
 	machine().bookkeeping().coin_counter_w(0, (data >> 4) & 1);
 	m_daccpu->set_input_line(INPUT_LINE_RESET, (data & 0x08) ? CLEAR_LINE : ASSERT_LINE);
-	if (!(data & 0x01)) machine().device("ymsnd")->reset();
+	m_ymsnd->reset_w(BIT(data, 0));
 }
 
 
@@ -136,8 +135,15 @@ WRITE16_MEMBER(cyberbal_state::sound_68k_w)
 
 WRITE16_MEMBER(cyberbal_state::sound_68k_dac_w)
 {
-	dac_device *dac = (offset & 8) ? m_dac2 : m_dac1;
-	dac->write_unsigned16((((data >> 3) & 0x800) | ((data >> 2) & 0x7ff)) << 4);
+	//int clip = BIT(data, 15);
+	//int off0b = BIT(data, 13) | BIT(data, 14);
+	//int off4b = BIT(data, 13) & BIT(data, 14);
+	uint16 sample = ((data >> 3) & 0x800) | ((data >> 2) & 0x7ff);
+
+	if (offset & 8)
+		m_ldac->write(sample);
+	else
+		m_rdac->write(sample);
 
 	if (m_fast_68k_int)
 	{

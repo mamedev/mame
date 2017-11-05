@@ -57,12 +57,13 @@
       Any i/o read disables this extended bitmap ram.
     - I/O port $700 bit 7 of X1 Turbo is a sound (dip-)switch / jumper setting. I don't know yet what is for,
       but King's Knight needs it to be active otherwise it refuses to boot.
-    - ROM format is:
-      0x00 ROM id (must be 0x01)
-      0x01 - 0x0e ROM header
-      0xff16 - 0xff17 start-up vector
-      In theory, you can convert your tape / floppy games into ROM format easily, provided that you know what's the pinout of the
-      cartridge slot and it doesn't exceed 64k (0x10000) of size.
+    - ROM format header:
+      [0x00] ROM identifier, must be 0x01 / SOH
+      [0x01 to 0x0d] ROM header, i.e. title for the loader
+      [0x12 -  0x13] initial copy size
+      [0x14 -  0x15] destination address start address
+      [0x16 to 0x17] start boot jump vector
+      [0x1d to 0x1f] start boot data vector
     - Gruppe: shows a random bitmap graphic then returns "program load error" ... it wants that the floppy has write protection enabled (!) (btanb)
     - Maidum: you need to load BOTH disk with write protection disabled, otherwise it refuses to run. (btanb)
     - Marvelous: needs write protection disabled (btanb)
@@ -205,9 +206,15 @@
 
 ************************************************************************************************/
 
+#include "emu.h"
 #include "includes/x1.h"
-#include "formats/2d_dsk.h"
+
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
+#include "formats/2d_dsk.h"
+
 
 #define MAIN_CLOCK XTAL_16MHz
 #define VDP_CLOCK  XTAL_42_9545MHz
@@ -224,14 +231,14 @@
 
 VIDEO_START_MEMBER(x1_state,x1)
 {
-	m_avram = make_unique_clear<UINT8[]>(0x800);
-	m_tvram = make_unique_clear<UINT8[]>(0x800);
-	m_kvram = make_unique_clear<UINT8[]>(0x800);
-	m_gfx_bitmap_ram = make_unique_clear<UINT8[]>(0xc000*2);
-	m_pal_4096 = make_unique_clear<UINT8[]>(0x1000*3);
+	m_avram = make_unique_clear<uint8_t[]>(0x800);
+	m_tvram = make_unique_clear<uint8_t[]>(0x800);
+	m_kvram = make_unique_clear<uint8_t[]>(0x800);
+	m_gfx_bitmap_ram = make_unique_clear<uint8_t[]>(0xc000*2);
+	m_pal_4096 = make_unique_clear<uint8_t[]>(0x1000*3);
 }
 
-void x1_state::x1_draw_pixel(bitmap_rgb32 &bitmap,int y,int x,UINT16 pen,UINT8 width,UINT8 height)
+void x1_state::x1_draw_pixel(bitmap_rgb32 &bitmap,int y,int x,uint16_t pen,uint8_t width,uint8_t height)
 {
 	if(!machine().first_screen()->visible_area().contains(x, y))
 		return;
@@ -276,12 +283,12 @@ void x1_state::x1_draw_pixel(bitmap_rgb32 &bitmap,int y,int x,UINT16 pen,UINT8 w
 
 
 /* adjust tile index when we are under double height condition */
-UINT8 x1_state::check_prev_height(int x,int y,int x_size)
+uint8_t x1_state::check_prev_height(int x,int y,int x_size)
 {
-	UINT8 prev_tile = m_tvram[(x+((y-1)*x_size)+mc6845_start_addr) & 0x7ff];
-	UINT8 cur_tile = m_tvram[(x+(y*x_size)+mc6845_start_addr) & 0x7ff];
-	UINT8 prev_attr = m_avram[(x+((y-1)*x_size)+mc6845_start_addr) & 0x7ff];
-	UINT8 cur_attr = m_avram[(x+(y*x_size)+mc6845_start_addr) & 0x7ff];
+	uint8_t prev_tile = m_tvram[(x+((y-1)*x_size)+mc6845_start_addr) & 0x7ff];
+	uint8_t cur_tile = m_tvram[(x+(y*x_size)+mc6845_start_addr) & 0x7ff];
+	uint8_t prev_attr = m_avram[(x+((y-1)*x_size)+mc6845_start_addr) & 0x7ff];
+	uint8_t cur_attr = m_avram[(x+(y*x_size)+mc6845_start_addr) & 0x7ff];
 
 	if(prev_tile == cur_tile && prev_attr == cur_attr)
 		return 8;
@@ -290,9 +297,9 @@ UINT8 x1_state::check_prev_height(int x,int y,int x_size)
 }
 
 /* Exoa II - Warroid: if double height isn't enabled on the first tile of the line then double height is disabled on everything else. */
-UINT8 x1_state::check_line_valid_height(int y,int x_size,int height)
+uint8_t x1_state::check_line_valid_height(int y,int x_size,int height)
 {
-	UINT8 line_attr = m_avram[(0+(y*x_size)+mc6845_start_addr) & 0x7ff];
+	uint8_t line_attr = m_avram[(0+(y*x_size)+mc6845_start_addr) & 0x7ff];
 
 	if((line_attr & 0x40) == 0)
 		return 0;
@@ -319,8 +326,8 @@ void x1_state::draw_fgtilemap(bitmap_rgb32 &bitmap,const rectangle &cliprect)
 	*/
 
 	int y,x,res_x,res_y;
-	UINT32 tile_offset;
-	UINT8 x_size,y_size;
+	uint32_t tile_offset;
+	uint8_t x_size,y_size;
 
 	x_size = mc6845_h_display;
 	y_size = mc6845_v_display;
@@ -340,7 +347,7 @@ void x1_state::draw_fgtilemap(bitmap_rgb32 &bitmap,const rectangle &cliprect)
 			int width = BIT(m_avram[((x+y*x_size)+mc6845_start_addr) & 0x7ff], 7);
 			int height = BIT(m_avram[((x+y*x_size)+mc6845_start_addr) & 0x7ff], 6);
 			int pcg_bank = BIT(m_avram[((x+y*x_size)+mc6845_start_addr) & 0x7ff], 5);
-			UINT8 *gfx_data = pcg_bank ? m_pcg_ram.get() : m_cg_rom; //machine.root_device().memregion(pcg_bank ? "pcg" : "cgrom")->base();
+			uint8_t *gfx_data = pcg_bank ? m_pcg_ram.get() : m_cg_rom; //machine.root_device().memregion(pcg_bank ? "pcg" : "cgrom")->base();
 			int knj_enable = 0;
 			int knj_side = 0;
 			int knj_bank = 0;
@@ -493,7 +500,7 @@ void x1_state::draw_gfxbitmap(bitmap_rgb32 &bitmap,const rectangle &cliprect, in
 	int xi,yi,x,y;
 	int pen_r,pen_g,pen_b,color;
 	int pri_mask_val;
-	UINT8 x_size,y_size;
+	uint8_t x_size,y_size;
 	int gfx_offset;
 
 	x_size = mc6845_h_display;
@@ -539,7 +546,7 @@ void x1_state::draw_gfxbitmap(bitmap_rgb32 &bitmap,const rectangle &cliprect, in
 	}
 }
 
-UINT32 x1_state::screen_update_x1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t x1_state::screen_update_x1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(rgb_t(0xff,0x00,0x00,0x00), cliprect);
 
@@ -564,14 +571,70 @@ UINT32 x1_state::screen_update_x1(screen_device &screen, bitmap_rgb32 &bitmap, c
  *************************************/
 
 
-UINT16 x1_state::check_keyboard_press()
+uint16_t x1_state::check_keyboard_press()
 {
 	static const char *const portnames[3] = { "key1","key2","key3" };
 	int i,port_i,scancode;
-	UINT8 keymod = ioport("key_modifiers")->read() & 0x1f;
-	UINT32 pad = ioport("tenkey")->read();
-	UINT32 f_key = ioport("f_keys")->read();
+	uint8_t keymod = ioport("key_modifiers")->read() & 0x1f;
+	uint32_t pad = ioport("tenkey")->read();
+	uint32_t f_key = ioport("f_keys")->read();
 	scancode = 0;
+
+	static const uint8_t kanatable[52][3] = {
+		// normal, kana, kana + shift
+		{0x2c,0xc8,0xa4}, // , / ne / japanese comma
+		{0x2d,0xce,0x00}, // - / ho
+		{0x2e,0xd9,0xa1}, // . / ru / japanese period
+		{0x2f,0xd2,0xa5}, // / / me / nakaguro
+		{0x30,0xdc,0xa6}, // 0 / wa / wo
+		{0x31,0xc7,0x00}, // 1 / nu
+		{0x32,0xcc,0x00}, // 2 / fu
+		{0x33,0xb1,0xa7}, // 3 / a / small a
+		{0x34,0xb3,0xa9}, // 4 / u / small u
+		{0x35,0xb4,0xaa}, // 5 / e / small e
+		{0x36,0xb5,0xab}, // 6 / o / small o
+		{0x37,0xd4,0xac}, // 7 / ya / small ya
+		{0x38,0xd5,0xad}, // 8 / yu / small yu
+		{0x39,0xd6,0xae}, // 9 / yo / small yo
+		{0x3a,0xb9,0x00}, // : / ke
+		{0x3b,0xda,0x00}, // ; / re
+		{0x3c,0x00,0x00},
+		{0x3d,0x00,0x00},
+		{0x3e,0x00,0x00},
+		{0x3f,0x00,0x00},
+		{0x40,0xde,0x00}, // @ / dakuten
+		{0x41,0xc1,0x00}, // A / chi
+		{0x42,0xba,0x00}, // B / ko
+		{0x43,0xbf,0x00}, // C / so
+		{0x44,0xbc,0x00}, // D / shi
+		{0x45,0xb2,0xa8}, // E / i / small i
+		{0x46,0xca,0x00}, // F / ha
+		{0x47,0xb7,0x00}, // G / ki
+		{0x48,0xb8,0x00}, // H / ku
+		{0x49,0xc6,0x00}, // I / ni
+		{0x4a,0xcf,0x00}, // J / ma
+		{0x4b,0xc9,0x00}, // K / no
+		{0x4c,0xd8,0x00}, // L / ri
+		{0x4d,0xd3,0x00}, // M / mo
+		{0x4e,0xd0,0x00}, // N / mi
+		{0x4f,0xd7,0x00}, // O / ra
+		{0x50,0xbe,0x00}, // P / se
+		{0x51,0xc0,0x00}, // Q / ta
+		{0x52,0xbd,0x00}, // R / su
+		{0x53,0xc4,0x00}, // S / to
+		{0x54,0xb6,0x00}, // T / ka
+		{0x55,0xc5,0x00}, // U / na
+		{0x56,0xcb,0x00}, // V / hi
+		{0x57,0xc3,0x00}, // W / te
+		{0x58,0xbb,0x00}, // X / sa
+		{0x59,0xdd,0x00}, // Y / n
+		{0x5a,0xc2,0xaf}, // Z / tsu / small tsu
+		{0x5b,0xdf,0xa2}, // [ / handakuten / opening quotation mark
+		{0x5c,0xb0,0x00}, // yen symbol / long vowel mark
+		{0x5d,0xd1,0xa3}, // ] / mu / closing quotation mark
+		{0x5e,0xcd,0x00}, // ^ / he
+		{0x5f,0xdb,0x00}  // _ / ro
+	};
 
 	for(port_i=0;port_i<3;port_i++)
 	{
@@ -582,11 +645,26 @@ UINT16 x1_state::check_keyboard_press()
 				//key_flag = 1;
 				if(keymod & 0x02)  // shift not pressed
 				{
-					if(scancode >= 0x41 && scancode < 0x5a)
+					if ((keymod & 0x04) == 0) // kana on
+					{
+						if (scancode >= 0x2c && scancode <= 0x5f)
+							scancode = kanatable[scancode - 0x2c][1];
+					}
+
+					if (scancode >= 0x41 && scancode < 0x5a)
 						scancode += 0x20;  // lowercase
 				}
 				else
 				{
+					if ((keymod & 0x04) == 0) // kana on
+					{
+						if (scancode >= 0x2c && scancode <= 0x5f)
+						{
+							if (kanatable[scancode - 0x2c][2] != 0)
+								scancode = kanatable[scancode - 0x2c][2];
+						}
+					}
+
 					if(scancode >= 0x31 && scancode < 0x3a)
 						scancode -= 0x10;
 					if(scancode == 0x30)
@@ -594,6 +672,9 @@ UINT16 x1_state::check_keyboard_press()
 						scancode = 0x3d;
 					}
 				}
+
+
+
 				if((keymod & 0x10) == 0) // graph on
 					scancode |= 0x80;
 
@@ -628,9 +709,9 @@ UINT16 x1_state::check_keyboard_press()
 	return 0;
 }
 
-UINT8 x1_state::check_keyboard_shift()
+uint8_t x1_state::check_keyboard_shift()
 {
-	UINT8 val = 0xe0;
+	uint8_t val = 0xe0;
 	/*
 	all of those are active low
 	x--- ---- TEN: Numpad, Function key, special input key
@@ -654,7 +735,7 @@ UINT8 x1_state::check_keyboard_shift()
 	return val;
 }
 
-UINT8 x1_state::get_game_key(UINT8 port)
+uint8_t x1_state::get_game_key(uint8_t port)
 {
 	// key status returned by sub CPU function 0xE3.
 	// in order from bit 7 to 0:
@@ -662,11 +743,11 @@ UINT8 x1_state::get_game_key(UINT8 port)
 	// port 1: numpad 7,4,1,8,2,9,6,3
 	// port 2: ESC,1,[-],[+],[*],TAB,SPC,RET ([] = numpad)
 	// bits are active high
-	UINT8 ret = 0;
+	uint8_t ret = 0;
 
 	if (port == 0)
 	{
-		UINT32 key3 = ioport("key3")->read();
+		uint32_t key3 = ioport("key3")->read();
 		if(key3 & 0x00020000) ret |= 0x80;  // Q
 		if(key3 & 0x00800000) ret |= 0x40;  // W
 		if(key3 & 0x00000020) ret |= 0x20;  // E
@@ -679,7 +760,7 @@ UINT8 x1_state::get_game_key(UINT8 port)
 	else
 	if (port == 1)
 	{
-		UINT32 pad = ioport("tenkey")->read();
+		uint32_t pad = ioport("tenkey")->read();
 		if(pad & 0x00000080) ret |= 0x80;  // Tenkey 7
 		if(pad & 0x00000010) ret |= 0x40;  // Tenkey 4
 		if(pad & 0x00000002) ret |= 0x20;  // Tenkey 1
@@ -692,9 +773,9 @@ UINT8 x1_state::get_game_key(UINT8 port)
 	else
 	if (port == 2)
 	{
-		UINT32 key1 = ioport("key1")->read();
-		UINT32 key2 = ioport("key2")->read();
-		UINT32 pad = ioport("tenkey")->read();
+		uint32_t key1 = ioport("key1")->read();
+		uint32_t key2 = ioport("key2")->read();
+		uint32_t pad = ioport("tenkey")->read();
 		if(key1 & 0x08000000) ret |= 0x80;  // ESC
 		if(key2 & 0x00020000) ret |= 0x40;  // 1
 		if(pad & 0x00000400) ret |= 0x20;  // Tenkey -
@@ -710,7 +791,7 @@ UINT8 x1_state::get_game_key(UINT8 port)
 
 READ8_MEMBER( x1_state::x1_sub_io_r )
 {
-	UINT8 ret,bus_res;
+	uint8_t ret,bus_res;
 
 	/* Looks like that the HW retains the latest data putted on the bus here, behaviour confirmed by Rally-X */
 	if(m_sub_obf)
@@ -744,7 +825,7 @@ READ8_MEMBER( x1_state::x1_sub_io_r )
 	return ret;
 }
 
-void x1_state::cmt_command( UINT8 cmd )
+void x1_state::cmt_command( uint8_t cmd )
 {
 	// CMT deck control command (E9 xx)
 	// E9 00 - Eject
@@ -992,7 +1073,7 @@ WRITE8_MEMBER( x1_state::x1_rom_bank_1_w )
 
 READ8_MEMBER( x1_state::x1_fdc_r )
 {
-	//UINT8 ret = 0;
+	//uint8_t ret = 0;
 
 	switch(offset+0xff8)
 	{
@@ -1094,7 +1175,7 @@ WRITE_LINE_MEMBER(x1_state::hdl_w)
  *
  *************************************/
 
-UINT16 x1_state::check_pcg_addr()
+uint16_t x1_state::check_pcg_addr()
 {
 	if(m_avram[0x7ff] & 0x20) return 0x7ff;
 	if(m_avram[0x3ff] & 0x20) return 0x3ff;
@@ -1104,7 +1185,7 @@ UINT16 x1_state::check_pcg_addr()
 	return 0x3ff;
 }
 
-UINT16 x1_state::check_chr_addr()
+uint16_t x1_state::check_chr_addr()
 {
 	if(!(m_avram[0x7ff] & 0x20)) return 0x7ff;
 	if(!(m_avram[0x3ff] & 0x20)) return 0x3ff;
@@ -1114,11 +1195,11 @@ UINT16 x1_state::check_chr_addr()
 	return 0x3ff;
 }
 
-UINT16 x1_state::get_pcg_addr( UINT16 width, UINT8 y_char_size )
+uint16_t x1_state::get_pcg_addr( uint16_t width, uint8_t y_char_size )
 {
 	int hbeam = machine().first_screen()->hpos() >> 3;
 	int vbeam = machine().first_screen()->vpos() / y_char_size;
-	UINT16 pcg_offset = ((hbeam + vbeam*width) + (((m_crtc_vreg[0x0c]<<8) & 0x3f00) | (m_crtc_vreg[0x0d] & 0xff))) & 0x7ff;
+	uint16_t pcg_offset = ((hbeam + vbeam*width) + (((m_crtc_vreg[0x0c]<<8) & 0x3f00) | (m_crtc_vreg[0x0d] & 0xff))) & 0x7ff;
 
 	//printf("%08x %d %d %d %d\n",(hbeam+vbeam*width),hbeam,vbeam,machine.first_screen()->vpos() & 7,width);
 
@@ -1129,8 +1210,8 @@ READ8_MEMBER( x1_state::x1_pcg_r )
 {
 	int addr;
 	int pcg_offset;
-	UINT8 res;
-	UINT8 *gfx_data;
+	uint8_t res;
+	uint8_t *gfx_data;
 
 	addr = (offset & 0x300) >> 8;
 
@@ -1146,7 +1227,7 @@ READ8_MEMBER( x1_state::x1_pcg_r )
 	}
 	else
 	{
-		UINT8 y_char_size;
+		uint8_t y_char_size;
 
 		/* addr == 0 reads from the ANK rom */
 		gfx_data = addr == 0 ? m_cg_rom : m_pcg_ram.get();
@@ -1187,7 +1268,7 @@ WRITE8_MEMBER( x1_state::x1_pcg_w )
 		}
 		else // Compatible Mode
 		{
-			UINT8 y_char_size;
+			uint8_t y_char_size;
 
 			/* TODO: Brain Breaker doesn't work with this arrangement in high resolution mode, check out why */
 			y_char_size = (m_crtc_vreg[9]+1) > 8 ? (m_crtc_vreg[9]+1)-8 : m_crtc_vreg[9]+1;
@@ -1214,7 +1295,7 @@ WRITE8_MEMBER( x1_state::x1_pcg_w )
 /* for bitmap mode */
 void x1_state::set_current_palette()
 {
-	UINT8 addr,r,g,b;
+	uint8_t addr,r,g,b;
 
 	for(addr=0;addr<8;addr++)
 	{
@@ -1224,12 +1305,16 @@ void x1_state::set_current_palette()
 
 		m_palette->set_pen_color(addr|8, pal1bit(r), pal1bit(g), pal1bit(b));
 	}
+
+	// TODO: disabled for now, causes issues with Thunder Force. x1fdemo changes palette dynamically during initial logo.
+	//       Likely it needs a video rewrite in order to make this to work correctly.
+	//  machine().first_screen()->update_partial(machine().first_screen()->vpos());
 }
 
 WRITE8_MEMBER( x1_state::x1turboz_4096_palette_w )
 {
-	UINT32 pal_entry;
-	UINT8 r,g,b;
+	uint32_t pal_entry;
+	uint8_t r,g,b;
 
 	pal_entry = ((offset & 0xff) << 4) | ((data & 0xf0) >> 4);
 
@@ -1255,11 +1340,6 @@ WRITE8_MEMBER( x1_state::x1_pal_r_w )
 	{
 		m_x_r = data;
 		set_current_palette();
-		//if(m_old_vpos != machine().first_screen()->vpos())
-		//{
-		//  machine().first_screen()->update_partial(machine().first_screen()->vpos());
-		//  m_old_vpos = machine().first_screen()->vpos();
-		//}
 	}
 }
 
@@ -1274,11 +1354,6 @@ WRITE8_MEMBER( x1_state::x1_pal_g_w )
 	{
 		m_x_g = data;
 		set_current_palette();
-		//if(m_old_vpos != machine().first_screen()->vpos())
-		//{
-			machine().first_screen()->update_partial(machine().first_screen()->vpos());
-		//  m_old_vpos = machine().first_screen()->vpos();
-		//}
 	}
 }
 
@@ -1293,17 +1368,12 @@ WRITE8_MEMBER( x1_state::x1_pal_b_w )
 	{
 		m_x_b = data;
 		set_current_palette();
-		//if(m_old_vpos != machine().first_screen()->vpos())
-		//{
-		//  machine().first_screen()->update_partial(machine().first_screen()->vpos());
-		//  m_old_vpos = machine().first_screen()->vpos();
-		//}
 	}
 }
 
 WRITE8_MEMBER( x1_state::x1_ex_gfxram_w )
 {
-	UINT8 ex_mask;
+	uint8_t ex_mask;
 
 	if     (                    offset <= 0x3fff)   { ex_mask = 7; }
 	else if(offset >= 0x4000 && offset <= 0x7fff)   { ex_mask = 6; }
@@ -1441,7 +1511,7 @@ WRITE8_MEMBER( x1_state::x1turbo_gfxpal_w )
  *  FIXME: bit-wise this doesn't make any sense, I guess that it uses the lv 2 kanji roms
  *         Test cases for this port so far are Hyper Olympics '84 disk version and Might & Magic.
  */
-UINT16 x1_state::jis_convert(int kanji_addr)
+uint16_t x1_state::jis_convert(int kanji_addr)
 {
 	if(kanji_addr >= 0x0e00 && kanji_addr <= 0x0e9f) { kanji_addr -= 0x0e00; kanji_addr &= 0x0ff; return ((0x0e0) + (kanji_addr >> 3)) << 4; } // numbers
 	if(kanji_addr >= 0x0f00 && kanji_addr <= 0x109f) { kanji_addr -= 0x0f00; kanji_addr &= 0x1ff; return ((0x4c0) + (kanji_addr >> 3)) << 4; } // lower case chars
@@ -1458,7 +1528,7 @@ UINT16 x1_state::jis_convert(int kanji_addr)
 
 READ8_MEMBER( x1_state::x1_kanji_r )
 {
-	UINT8 res;
+	uint8_t res;
 
 	res = m_kanji_rom[jis_convert(m_kanji_addr & 0xfff0)+(offset*0x10)+(m_kanji_addr & 0xf)];
 
@@ -1500,7 +1570,7 @@ WRITE8_MEMBER( x1_state::x1_kanji_w )
 
 READ8_MEMBER( x1_state::x1_emm_r )
 {
-	UINT8 res;
+	uint8_t res;
 
 	if(offset & ~3)
 	{
@@ -1553,7 +1623,7 @@ READ8_MEMBER( x1_state::x1turbo_bank_r )
 
 WRITE8_MEMBER( x1_state::x1turbo_bank_w )
 {
-	//UINT8 *RAM = memregion("x1_cpu")->base();
+	//uint8_t *RAM = memregion("x1_cpu")->base();
 	/*
 	--x- ---- BML5: latch bit (doesn't have any real function)
 	---x ---- BMCS: select bank RAM, active low
@@ -1819,7 +1889,7 @@ READ8_MEMBER( x1_state::x1_portb_r )
 	---- --x- "cmt read"
 	---- ---x "cmt test" (active low) <- actually this is "Sub CPU detected BREAK"
 	*/
-	UINT8 res = 0;
+	uint8_t res = 0;
 	int vblank_line = m_crtc_vreg[6] * (m_crtc_vreg[9]+1);
 	int vsync_line = m_crtc_vreg[7] * (m_crtc_vreg[9]+1);
 	m_vdisp = (machine().first_screen()->vpos() < vblank_line) ? 0x80 : 0x00;
@@ -2036,10 +2106,10 @@ INPUT_PORTS_START( x1 )
 	PORT_BIT(0x00000200,IP_ACTIVE_HIGH,IPT_UNUSED) //0x29 )
 	PORT_BIT(0x00000400,IP_ACTIVE_HIGH,IPT_UNUSED) //0x2a *
 	PORT_BIT(0x00000800,IP_ACTIVE_HIGH,IPT_UNUSED) //0x2b +
-	PORT_BIT(0x00001000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x2c ,
+	PORT_BIT(0x00001000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME(",") PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',')
 	PORT_BIT(0x00002000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("-") PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-')
-	PORT_BIT(0x00004000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x2e .
-	PORT_BIT(0x00008000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x2f /
+	PORT_BIT(0x00004000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME(".") PORT_CODE(KEYCODE_STOP) PORT_CHAR('.')
+	PORT_BIT(0x00008000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("/") PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/')
 
 	PORT_BIT(0x00010000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("0") PORT_CODE(KEYCODE_0) PORT_CHAR('0')
 	PORT_BIT(0x00020000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("1") PORT_CODE(KEYCODE_1) PORT_CHAR('1')
@@ -2087,7 +2157,7 @@ INPUT_PORTS_START( x1 )
 	PORT_BIT(0x02000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Y") PORT_CODE(KEYCODE_Y) PORT_CHAR('Y')
 	PORT_BIT(0x04000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Z") PORT_CODE(KEYCODE_Z) PORT_CHAR('Z')
 	PORT_BIT(0x08000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("[") PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR('[')
-	PORT_BIT(0x10000000,IP_ACTIVE_HIGH,IPT_UNUSED)
+	PORT_BIT(0x10000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("\xc2\xa5") // yen
 	PORT_BIT(0x20000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("]") PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR(']')
 	PORT_BIT(0x40000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("^") PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('^')
 	PORT_BIT(0x80000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("_")
@@ -2118,9 +2188,9 @@ INPUT_PORTS_START( x1 )
 	PORT_START("key_modifiers")
 	PORT_BIT(0x00000001,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("CTRL") PORT_CODE(KEYCODE_LCONTROL)
 	PORT_BIT(0x00000002,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("SHIFT") PORT_CODE(KEYCODE_LSHIFT)
-	PORT_BIT(0x00000004,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("KANA") PORT_CODE(KEYCODE_RCONTROL)
+	PORT_BIT(0x00000004,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("KANA") PORT_CODE(KEYCODE_RCONTROL) PORT_TOGGLE
 	PORT_BIT(0x00000008,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("CAPS") PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE
-	PORT_BIT(0x00000010,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("GRPH") PORT_CODE(KEYCODE_LALT)
+	PORT_BIT(0x00000010,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("GRAPH") PORT_CODE(KEYCODE_LALT)
 
 #if 0
 	PORT_BIT(0x00020000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME(",") PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',')
@@ -2290,11 +2360,11 @@ IRQ_CALLBACK_MEMBER(x1_state::x1_irq_callback)
 TIMER_DEVICE_CALLBACK_MEMBER(x1_state::x1_keyboard_callback)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	UINT32 key1 = ioport("key1")->read();
-	UINT32 key2 = ioport("key2")->read();
-	UINT32 key3 = ioport("key3")->read();
-	UINT32 key4 = ioport("tenkey")->read();
-	UINT32 f_key = ioport("f_keys")->read();
+	uint32_t key1 = ioport("key1")->read();
+	uint32_t key2 = ioport("key2")->read();
+	uint32_t key3 = ioport("key3")->read();
+	uint32_t key4 = ioport("tenkey")->read();
+	uint32_t f_key = ioport("f_keys")->read();
 
 	if(m_key_irq_vector)
 	{
@@ -2319,7 +2389,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(x1_state::x1_keyboard_callback)
 
 TIMER_CALLBACK_MEMBER(x1_state::x1_rtc_increment)
 {
-	static const UINT8 dpm[12] = { 0x31, 0x28, 0x31, 0x30, 0x31, 0x30, 0x31, 0x31, 0x30, 0x31, 0x30, 0x31 };
+	static const uint8_t dpm[12] = { 0x31, 0x28, 0x31, 0x30, 0x31, 0x30, 0x31, 0x31, 0x30, 0x31, 0x30, 0x31 };
 
 	m_rtc.sec++;
 
@@ -2346,7 +2416,7 @@ TIMER_CALLBACK_MEMBER(x1_state::x1_rtc_increment)
 
 MACHINE_RESET_MEMBER(x1_state,x1)
 {
-	//UINT8 *ROM = memregion("x1_cpu")->base();
+	//uint8_t *ROM = memregion("x1_cpu")->base();
 	int i;
 
 	memset(m_gfx_bitmap_ram.get(),0x00,0xc000*2);
@@ -2427,9 +2497,9 @@ MACHINE_START_MEMBER(x1_state,x1)
 	}
 
 	m_ipl_rom = memregion("ipl")->base();
-	m_work_ram = make_unique_clear<UINT8[]>(0x10000*0x10);
-	m_emm_ram = make_unique_clear<UINT8[]>(0x1000000);
-	m_pcg_ram = make_unique_clear<UINT8[]>(0x1800);
+	m_work_ram = make_unique_clear<uint8_t[]>(0x10000*0x10);
+	m_emm_ram = make_unique_clear<uint8_t[]>(0x1000000);
+	m_pcg_ram = make_unique_clear<uint8_t[]>(0x1800);
 	m_cg_rom = memregion("cgrom")->base();
 	m_kanji_rom = memregion("kanji")->base();
 
@@ -2456,7 +2526,7 @@ static SLOT_INTERFACE_START( x1_floppies )
 	SLOT_INTERFACE("dd", FLOPPY_525_DD)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( x1, x1_state )
+static MACHINE_CONFIG_START( x1 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("x1_cpu", Z80, MAIN_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(x1_mem)
@@ -2546,7 +2616,7 @@ static MACHINE_CONFIG_DERIVED( x1turbo, x1 )
 	MCFG_Z80_DAISY_CHAIN(x1turbo_daisy)
 	MCFG_MACHINE_RESET_OVERRIDE(x1_state,x1turbo)
 
-	MCFG_Z80SIO0_ADD("sio", MAIN_CLOCK/4 , 0, 0, 0, 0)
+	MCFG_DEVICE_ADD("sio", Z80SIO0, MAIN_CLOCK/4)
 	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("x1_cpu", INPUT_LINE_IRQ0))
 
 	MCFG_DEVICE_ADD("dma", Z80DMA, MAIN_CLOCK/4)
@@ -2640,9 +2710,9 @@ ROM_END
 /* Convert the ROM interleaving into something usable by the write handlers */
 DRIVER_INIT_MEMBER(x1_state,x1_kanji)
 {
-	UINT32 i,j,k,l;
-	UINT8 *kanji = memregion("kanji")->base();
-	UINT8 *raw_kanji = memregion("raw_kanji")->base();
+	uint32_t i,j,k,l;
+	uint8_t *kanji = memregion("kanji")->base();
+	uint8_t *raw_kanji = memregion("raw_kanji")->base();
 
 	k = 0;
 	for(l=0;l<2;l++)
@@ -2660,9 +2730,9 @@ DRIVER_INIT_MEMBER(x1_state,x1_kanji)
 }
 
 
-/*    YEAR  NAME       PARENT  COMPAT   MACHINE  INPUT       INIT      COMPANY    FULLNAME      FLAGS */
-COMP( 1982, x1,        0,      0,       x1,      x1, driver_device,         0,        "Sharp", "X1 (CZ-800C)", 0 )
+//    YEAR  NAME       PARENT  COMPAT   MACHINE  INPUT    STATE        INIT      COMPANY  FULLNAME              FLAGS
+COMP( 1982, x1,        0,      0,       x1,      x1,      x1_state,    0,        "Sharp", "X1 (CZ-800C)",       0 )
 // x1twin in x1twin.c
 COMP( 1984, x1turbo,   x1,     0,       x1turbo, x1turbo, x1_state,    x1_kanji, "Sharp", "X1 Turbo (CZ-850C)", MACHINE_NOT_WORKING ) //model 10
 COMP( 1985, x1turbo40, x1,     0,       x1turbo, x1turbo, x1_state,    x1_kanji, "Sharp", "X1 Turbo (CZ-862C)", 0 ) //model 40
-//COMP( 1986, x1turboz, x1,     0,       x1turbo, x1turbo, x1_state,    x1_kanji, "Sharp", "X1 TurboZ", MACHINE_NOT_WORKING )
+//COMP( 1986, x1turboz,  x1,     0,       x1turbo, x1turbo, x1_state,    x1_kanji, "Sharp", "X1 TurboZ", MACHINE_NOT_WORKING )

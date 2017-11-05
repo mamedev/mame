@@ -1,6 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
+
+#include "machine/gen_latch.h"
 #include "sound/okim6295.h"
+#include "screen.h"
 
 class shangha3_state : public driver_device
 {
@@ -13,6 +16,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch"),
 		m_ram(*this, "ram") { }
 
 	required_device<cpu_device> m_maincpu;
@@ -21,15 +25,16 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	optional_device<generic_latch_8_device> m_soundlatch;
 
-	required_shared_ptr<UINT16> m_ram;
+	required_shared_ptr<uint16_t> m_ram;
 
 	// driver init configuration
 	int m_do_shadows;
-	UINT8 m_drawmode_table[16];
+	uint8_t m_drawmode_table[16];
 
 	int m_prot_count;
-	UINT16 m_gfxlist_addr;
+	uint16_t m_gfxlist_addr;
 	bitmap_ind16 m_rawbitmap;
 
 	// common
@@ -54,5 +59,5 @@ public:
 	DECLARE_DRIVER_INIT(heberpop);
 	virtual void video_start() override;
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };

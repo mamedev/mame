@@ -1,9 +1,9 @@
 // license:GPL-2.0+
 // copyright-holders:Felipe Sanches
-#pragma once
+#ifndef MAME_DEVICES_CPU_PATINHOFEIO_CPU_H
+#define MAME_DEVICES_CPU_PATINHOFEIO_CPU_H
 
-#ifndef __PATINHOFEIO_H__
-#define __PATINHOFEIO_H__
+#pragma once
 
 #define MCFG_PATINHO_RC_READ_CB(_devcb) \
 	devcb = &patinho_feio_cpu_device::set_rc_read_callback(*device, DEVCB_##_devcb);
@@ -35,38 +35,37 @@ enum
 #define REQUEST true
 #define NO_REQUEST false
 
-#define	BUTTON_NORMAL                (1 << 0)  /* normal CPU execution */
-#define	BUTTON_CICLO_UNICO           (1 << 1)  /* single-cycle step */
-#define	BUTTON_INSTRUCAO_UNICA       (1 << 2)  /* single-instruction step */
-#define	BUTTON_ENDERECAMENTO         (1 << 3)  /* addressing action */
-#define	BUTTON_ARMAZENAMENTO         (1 << 4)  /* storage action */
-#define	BUTTON_EXPOSICAO             (1 << 5)  /* memory viewing action */
-#define	BUTTON_ESPERA                (1 << 6)  /* wait */
-#define	BUTTON_INTERRUPCAO           (1 << 7)  /* interrupt */
-#define	BUTTON_PARTIDA               (1 << 8)  /* startup */
-#define	BUTTON_PREPARACAO            (1 << 9)  /* reset */
-#define	BUTTON_TIPO_DE_ENDERECAMENTO (1 << 10) /* Addressing mode (0: Fixed / 1: Sequential) */
-#define	BUTTON_PROTECAO_DE_MEMORIA   (1 << 11) /* Memory protection (in the address range 0xF80-0xFFF (1: write-only / 0: read-write) */
+#define BUTTON_NORMAL                (1 << 0)  /* normal CPU execution */
+#define BUTTON_CICLO_UNICO           (1 << 1)  /* single-cycle step */
+#define BUTTON_INSTRUCAO_UNICA       (1 << 2)  /* single-instruction step */
+#define BUTTON_ENDERECAMENTO         (1 << 3)  /* addressing action */
+#define BUTTON_ARMAZENAMENTO         (1 << 4)  /* storage action */
+#define BUTTON_EXPOSICAO             (1 << 5)  /* memory viewing action */
+#define BUTTON_ESPERA                (1 << 6)  /* wait */
+#define BUTTON_INTERRUPCAO           (1 << 7)  /* interrupt */
+#define BUTTON_PARTIDA               (1 << 8)  /* startup */
+#define BUTTON_PREPARACAO            (1 << 9)  /* reset */
+#define BUTTON_TIPO_DE_ENDERECAMENTO (1 << 10) /* Addressing mode (0: Fixed / 1: Sequential) */
+#define BUTTON_PROTECAO_DE_MEMORIA   (1 << 11) /* Memory protection (in the address range 0xF80-0xFFF (1: write-only / 0: read-write) */
 
 class patinho_feio_cpu_device : public cpu_device {
 public:
 	// construction/destruction
-	patinho_feio_cpu_device(const machine_config &mconfig, const char *_tag, device_t *_owner, UINT32 _clock);
+	patinho_feio_cpu_device(const machine_config &mconfig, const char *_tag, device_t *_owner, uint32_t _clock);
 
-	template<class _Object> static devcb_base &set_rc_read_callback(device_t &device, _Object object) { return downcast<patinho_feio_cpu_device &>(device).m_rc_read_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_buttons_read_callback(device_t &device, _Object object) { return downcast<patinho_feio_cpu_device &>(device).m_buttons_read_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_iodev_read_callback(device_t &device, int devnumber, _Object object) { return downcast<patinho_feio_cpu_device &>(device).m_iodev_read_cb[devnumber].set_callback(object); }
-	template<class _Object> static devcb_base &set_iodev_write_callback(device_t &device, int devnumber, _Object object) { return downcast<patinho_feio_cpu_device &>(device).m_iodev_write_cb[devnumber].set_callback(object); }
-	template<class _Object> static devcb_base &set_iodev_status_callback(device_t &device, int devnumber, _Object object) { return downcast<patinho_feio_cpu_device &>(device).m_iodev_status_cb[devnumber].set_callback(object); }
+	template <class Object> static devcb_base &set_rc_read_callback(device_t &device, Object &&cb) { return downcast<patinho_feio_cpu_device &>(device).m_rc_read_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_buttons_read_callback(device_t &device, Object &&cb) { return downcast<patinho_feio_cpu_device &>(device).m_buttons_read_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_iodev_read_callback(device_t &device, int devnumber, Object &&cb) { return downcast<patinho_feio_cpu_device &>(device).m_iodev_read_cb[devnumber].set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_iodev_write_callback(device_t &device, int devnumber, Object &&cb) { return downcast<patinho_feio_cpu_device &>(device).m_iodev_write_cb[devnumber].set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_iodev_status_callback(device_t &device, int devnumber, Object &&cb) { return downcast<patinho_feio_cpu_device &>(device).m_iodev_status_cb[devnumber].set_callback(std::forward<Object>(cb)); }
 
-	void transfer_byte_from_external_device(UINT8 channel, UINT8 data);
-	void set_iodev_status(UINT8 channel, bool status) {
-		m_iodev_status[channel] = status;
-	}
+	void transfer_byte_from_external_device(uint8_t channel, uint8_t data);
+	void set_iodev_status(uint8_t channel, bool status) { m_iodev_status[channel] = status; }
+
 protected:
 
 	virtual void execute_run() override;
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 	address_space_config m_program_config;
 
@@ -97,10 +96,10 @@ protected:
 	bool m_iodev_status[16];
 
 	/* 8-bit registers for receiving data from peripherals */
-	UINT8 m_iodev_incoming_byte[16];
+	uint8_t m_iodev_incoming_byte[16];
 
 	/* 8-bit registers for sending data to peripherals */
-	UINT8 m_iodev_outgoing_byte[16];
+	uint8_t m_iodev_outgoing_byte[16];
 
 	int m_flags;
 	// V = "Vai um" (Carry flag)
@@ -116,29 +115,29 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual UINT32 execute_min_cycles() const override { return 1; }
-	virtual UINT32 execute_max_cycles() const override { return 2; }
+	virtual uint32_t execute_min_cycles() const override { return 1; }
+	virtual uint32_t execute_max_cycles() const override { return 2; }
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : nullptr; }
+	virtual space_config_vector memory_space_config() const override;
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const override { return 1; }
-	virtual UINT32 disasm_max_opcode_bytes() const override { return 2; }
+	virtual uint32_t disasm_min_opcode_bytes() const override { return 1; }
+	virtual uint32_t disasm_max_opcode_bytes() const override { return 2; }
 
 private:
 	void execute_instruction();
 	void compute_effective_address(unsigned int addr);
-	void set_flag(UINT8 flag, bool state);
-	UINT16 read_panel_keys_register();
+	void set_flag(uint8_t flag, bool state);
+	uint16_t read_panel_keys_register();
 	devcb_read16 m_rc_read_cb;
 	devcb_read16 m_buttons_read_cb;
 	devcb_read8 m_iodev_read_cb[16];
 	devcb_write8 m_iodev_write_cb[16];
 	devcb_read8 m_iodev_status_cb[16];
-	UINT8 m_mode;
+	uint8_t m_mode;
 };
 
-extern const device_type PATINHO_FEIO;
+DECLARE_DEVICE_TYPE(PATO_FEIO_CPU, patinho_feio_cpu_device)
 
-#endif /* __PATINHOFEIO_H__ */
+#endif // MAME_DEVICES_CPU_PATINHOFEIO_CPU_H

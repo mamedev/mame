@@ -2,6 +2,7 @@
 // copyright-holders:David Haywood, R. Belmont
 #include "emu.h"
 #include "includes/silkroad.h"
+#include "screen.h"
 
 /* Sprites probably need to be delayed */
 /* Some scroll layers may need to be offset slightly? */
@@ -12,8 +13,8 @@
 void silkroad_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	gfx_element *gfx = m_gfxdecode->gfx(0);
-	UINT32 *source = m_sprram;
-	UINT32 *finish = source + 0x1000/4;
+	uint32_t *source = m_sprram;
+	uint32_t *finish = source + 0x1000/4;
 
 	while( source < finish )
 	{
@@ -118,16 +119,16 @@ WRITE32_MEMBER(silkroad_state::silkroad_fgram3_w)
 
 void silkroad_state::video_start()
 {
-	m_fg_tilemap  = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(silkroad_state::get_fg_tile_info),this),  TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
-	m_fg2_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(silkroad_state::get_fg2_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
-	m_fg3_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(silkroad_state::get_fg3_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	m_fg_tilemap  = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(silkroad_state::get_fg_tile_info),this),  TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	m_fg2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(silkroad_state::get_fg2_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	m_fg3_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(silkroad_state::get_fg3_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
 
 	m_fg_tilemap->set_transparent_pen(0);
 	m_fg2_tilemap->set_transparent_pen(0);
 	m_fg3_tilemap->set_transparent_pen(0);
 }
 
-UINT32 silkroad_state::screen_update_silkroad(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t silkroad_state::screen_update_silkroad(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	screen.priority().fill(0, cliprect);
 	bitmap.fill(0x7c0, cliprect);

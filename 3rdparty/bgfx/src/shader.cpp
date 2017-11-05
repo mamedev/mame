@@ -1,6 +1,6 @@
 /*
- * Copyright 2011-2016 Branimir Karadzic. All rights reserved.
- * License: http://www.opensource.org/licenses/BSD-2-Clause
+ * Copyright 2011-2017 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
 #include "bgfx_p.h"
@@ -15,7 +15,7 @@ namespace bgfx
 		bx::WriterI* writer = reinterpret_cast<bx::WriterI*>(_userData);
 		char temp[512];
 		toString(temp, sizeof(temp), _instruction);
-		bx::write(writer, temp, (int32_t)strlen(temp) );
+		bx::write(writer, temp, (int32_t)bx::strnlen(temp) );
 		return true;
 	}
 
@@ -24,7 +24,7 @@ namespace bgfx
 		bx::WriterI* writer = reinterpret_cast<bx::WriterI*>(_userData);
 		char temp[512];
 		toString(temp, sizeof(temp), _instruction);
-		bx::write(writer, temp, (int32_t)strlen(temp) );
+		bx::write(writer, temp, (int32_t)bx::strnlen(temp) );
 		return true;
 	}
 
@@ -33,7 +33,7 @@ namespace bgfx
 		bx::WriterI* writer = reinterpret_cast<bx::WriterI*>(_userData);
 		char temp[512];
 		toString(temp, sizeof(temp), _instruction);
-		bx::write(writer, temp, (int32_t)strlen(temp) );
+		bx::write(writer, temp, (int32_t)bx::strnlen(temp) );
 		return true;
 	}
 
@@ -85,7 +85,7 @@ namespace bgfx
 
 			for (uint32_t ii = 0; ii < count; ++ii)
 			{
-				uint8_t nameSize;
+				uint8_t nameSize = 0;
 				bx::read(_reader, nameSize, _err);
 
 				if (!_err->isOk() ) { return; }

@@ -1,6 +1,6 @@
 USING THE IJG JPEG LIBRARY
 
-Copyright (C) 1994-2010, Thomas G. Lane, Guido Vollbeding.
+Copyright (C) 1994-2013, Thomas G. Lane, Guido Vollbeding.
 This file is part of the Independent JPEG Group's software.
 For conditions of distribution and use, see the accompanying README file.
 
@@ -95,8 +95,8 @@ use.)  Unsupported ISO options include:
 	* Lossless JPEG
 	* DNL marker
 	* Nonintegral subsampling ratios
-We support both 8- and 12-bit data precision, but this is a compile-time
-choice rather than a run-time choice; hence it is difficult to use both
+We support 8-bit to 12-bit data precision, but this is a compile-time choice
+rather than a run-time choice; hence it is difficult to use different
 precisions in a single application.
 
 By itself, the library handles only interchange JPEG datastreams --- in
@@ -225,7 +225,7 @@ For best results, source data values should have the precision specified by
 BITS_IN_JSAMPLE (normally 8 bits).  For instance, if you choose to compress
 data that's only 6 bits/channel, you should left-justify each value in a
 byte before passing it to the compressor.  If you need to compress data
-that has more than 8 bits/channel, compile with BITS_IN_JSAMPLE = 12.
+that has more than 8 bits/channel, compile with BITS_IN_JSAMPLE = 9 to 12.
 (See "Library compile-time options", later.)
 
 
@@ -876,6 +876,10 @@ jpeg_simple_progression (j_compress_ptr cinfo)
 
 Compression parameters (cinfo fields) include:
 
+boolean arith_code
+	If TRUE, use arithmetic coding.
+	If FALSE, use Huffman coding.
+
 int block_size
 	Set DCT block size.  All N from 1 to 16 are possible.
 	Default is 8 (baseline format).
@@ -916,7 +920,16 @@ J_COLOR_SPACE jpeg_color_space
 int num_components
 	The JPEG color space and corresponding number of components; see
 	"Special color spaces", below, for more info.  We recommend using
-	jpeg_set_color_space() if you want to change these.
+	jpeg_set_colorspace() if you want to change these.
+
+J_COLOR_TRANSFORM color_transform
+	Internal color transform identifier, writes LSE marker if nonzero
+	(requires decoder with inverse color transform support, introduced
+	with IJG JPEG 9).
+	Two values are currently possible: JCT_NONE and JCT_SUBTRACT_GREEN.
+	Set this value for lossless RGB application *before* calling
+	jpeg_set_colorspace(), because entropy table assignment in
+	jpeg_set_colorspace() depends on color_transform.
 
 boolean optimize_coding
 	TRUE causes the compressor to compute optimal Huffman coding tables
@@ -1260,9 +1273,10 @@ Special color spaces
 The JPEG standard itself is "color blind" and doesn't specify any particular
 color space.  It is customary to convert color data to a luminance/chrominance
 color space before compressing, since this permits greater compression.  The
-existing de-facto JPEG file format standards specify YCbCr or grayscale data
-(JFIF), or grayscale, RGB, YCbCr, CMYK, or YCCK (Adobe).  For special
-applications such as multispectral images, other color spaces can be used,
+existing JPEG file interchange format standards specify YCbCr or GRAYSCALE
+data (JFIF version 1), GRAYSCALE, RGB, YCbCr, CMYK, or YCCK (Adobe), or BG_RGB
+or BG_YCC (big gamut color spaces, JFIF version 2).  For special applications
+such as multispectral images, other color spaces can be used,
 but it must be understood that such files will be unportable.
 
 The JPEG library can handle the most common colorspace conversions (namely
@@ -1279,22 +1293,25 @@ jpeg_set_colorspace().  Of course you must select a supported transformation.
 jccolor.c currently supports the following transformations:
 	RGB => YCbCr
 	RGB => GRAYSCALE
+	RGB => BG_YCC
 	YCbCr => GRAYSCALE
+	YCbCr => BG_YCC
 	CMYK => YCCK
 plus the null transforms: GRAYSCALE => GRAYSCALE, RGB => RGB,
-YCbCr => YCbCr, CMYK => CMYK, YCCK => YCCK, and UNKNOWN => UNKNOWN.
+BG_RGB => BG_RGB, YCbCr => YCbCr, BG_YCC => BG_YCC, CMYK => CMYK,
+YCCK => YCCK, and UNKNOWN => UNKNOWN.
 
-The de-facto file format standards (JFIF and Adobe) specify APPn markers that
-indicate the color space of the JPEG file.  It is important to ensure that
-these are written correctly, or omitted if the JPEG file's color space is not
-one of the ones supported by the de-facto standards.  jpeg_set_colorspace()
-will set the compression parameters to include or omit the APPn markers
-properly, so long as it is told the truth about the JPEG color space.
-For example, if you are writing some random 3-component color space without
-conversion, don't try to fake out the library by setting in_color_space and
-jpeg_color_space to JCS_YCbCr; use JCS_UNKNOWN.  You may want to write an
-APPn marker of your own devising to identify the colorspace --- see "Special
-markers", below.
+The file interchange format standards (JFIF and Adobe) specify APPn markers
+that indicate the color space of the JPEG file.  It is important to ensure
+that these are written correctly, or omitted if the JPEG file's color space
+is not one of the ones supported by the interchange standards.
+jpeg_set_colorspace() will set the compression parameters to include or omit
+the APPn markers properly, so long as it is told the truth about the JPEG
+color space.  For example, if you are writing some random 3-component color
+space without conversion, don't try to fake out the library by setting
+in_color_space and jpeg_color_space to JCS_YCbCr; use JCS_UNKNOWN.
+You may want to write an APPn marker of your own devising to identify
+the colorspace --- see "Special markers", below.
 
 When told that the color space is UNKNOWN, the library will default to using
 luminance-quality compression parameters for all color components.  You may
@@ -1310,8 +1327,11 @@ jpeg_read_header's guess by setting jpeg_color_space.  jpeg_read_header also
 selects a default output color space based on (its guess of) jpeg_color_space;
 set out_color_space to override this.  Again, you must select a supported
 transformation.  jdcolor.c currently supports
-	YCbCr => GRAYSCALE
 	YCbCr => RGB
+	YCbCr => GRAYSCALE
+	BG_YCC => RGB
+	BG_YCC => GRAYSCALE
+	RGB => GRAYSCALE
 	GRAYSCALE => RGB
 	YCCK => CMYK
 as well as the null transforms.  (Since GRAYSCALE=>RGB is provided, an
@@ -2571,10 +2591,10 @@ different sizes.  If the image dimensions are not a multiple of the MCU size,
 you must also pad the data correctly (usually, this is done by replicating
 the last column and/or row).  The data must be padded to a multiple of a DCT
 block in each component: that is, each downsampled row must contain a
-multiple of 8 valid samples, and there must be a multiple of 8 sample rows
-for each component.  (For applications such as conversion of digital TV
-images, the standard image size is usually a multiple of the DCT block size,
-so that no padding need actually be done.)
+multiple of block_size valid samples, and there must be a multiple of
+block_size sample rows for each component.  (For applications such as
+conversion of digital TV images, the standard image size is usually a
+multiple of the DCT block size, so that no padding need actually be done.)
 
 The procedure for compression of raw data is basically the same as normal
 compression, except that you call jpeg_write_raw_data() in place of
@@ -2600,22 +2620,22 @@ The scanlines count passed to and returned from jpeg_write_raw_data is
 measured in terms of the component with the largest v_samp_factor.
 
 jpeg_write_raw_data() processes one MCU row per call, which is to say
-v_samp_factor*DCTSIZE sample rows of each component.  The passed num_lines
-value must be at least max_v_samp_factor*DCTSIZE, and the return value will
-be exactly that amount (or possibly some multiple of that amount, in future
-library versions).  This is true even on the last call at the bottom of the
-image; don't forget to pad your data as necessary.
+v_samp_factor*block_size sample rows of each component.  The passed num_lines
+value must be at least max_v_samp_factor*block_size, and the return value
+will be exactly that amount (or possibly some multiple of that amount, in
+future library versions).  This is true even on the last call at the bottom
+of the image; don't forget to pad your data as necessary.
 
 The required dimensions of the supplied data can be computed for each
 component as
-	cinfo->comp_info[i].width_in_blocks*DCTSIZE  samples per row
-	cinfo->comp_info[i].height_in_blocks*DCTSIZE rows in image
+	cinfo->comp_info[i].width_in_blocks*block_size  samples per row
+	cinfo->comp_info[i].height_in_blocks*block_size rows in image
 after jpeg_start_compress() has initialized those fields.  If the valid data
 is smaller than this, it must be padded appropriately.  For some sampling
 factors and image sizes, additional dummy DCT blocks are inserted to make
 the image a multiple of the MCU dimensions.  The library creates such dummy
 blocks itself; it does not read them from your supplied data.  Therefore you
-need never pad by more than DCTSIZE samples.  An example may help here.
+need never pad by more than block_size samples.  An example may help here.
 Assume 2h2v downsampling of YCbCr data, that is
 	cinfo->comp_info[0].h_samp_factor = 2		for Y
 	cinfo->comp_info[0].v_samp_factor = 2
@@ -2657,8 +2677,8 @@ Then call jpeg_read_raw_data() in place of jpeg_read_scanlines().  The
 decompression process is otherwise the same as usual.
 
 jpeg_read_raw_data() returns one MCU row per call, and thus you must pass a
-buffer of at least max_v_samp_factor*DCTSIZE scanlines (scanline counting is
-the same as for raw-data compression).  The buffer you pass must be large
+buffer of at least max_v_samp_factor*block_size scanlines (scanline counting
+is the same as for raw-data compression).  The buffer you pass must be large
 enough to hold the actual data plus padding to DCT-block boundaries.  As with
 compression, any entirely dummy DCT blocks are not processed so you need not
 allocate space for them, but the total scanline count includes them.  The
@@ -2914,10 +2934,10 @@ This does not count any memory allocated by the application, such as a
 buffer to hold the final output image.
 
 The above figures are valid for 8-bit JPEG data precision and a machine with
-32-bit ints.  For 12-bit JPEG data, double the size of the strip buffers and
-quantization pixel buffer.  The "fixed-size" data will be somewhat smaller
-with 16-bit ints, larger with 64-bit ints.  Also, CMYK or other unusual
-color spaces will require different amounts of space.
+32-bit ints.  For 9-bit to 12-bit JPEG data, double the size of the strip
+buffers and quantization pixel buffer.  The "fixed-size" data will be
+somewhat smaller with 16-bit ints, larger with 64-bit ints.  Also, CMYK
+or other unusual color spaces will require different amounts of space.
 
 The full-image coefficient and pixel buffers, if needed at all, do not
 have to be fully RAM resident; you can have the library use temporary
@@ -2939,27 +2959,34 @@ Library compile-time options
 
 A number of compile-time options are available by modifying jmorecfg.h.
 
-The JPEG standard provides for both the baseline 8-bit DCT process and
-a 12-bit DCT process.  The IJG code supports 12-bit lossy JPEG if you define
-BITS_IN_JSAMPLE as 12 rather than 8.  Note that this causes JSAMPLE to be
-larger than a char, so it affects the surrounding application's image data.
-The sample applications cjpeg and djpeg can support 12-bit mode only for PPM
-and GIF file formats; you must disable the other file formats to compile a
-12-bit cjpeg or djpeg.  (install.txt has more information about that.)
-At present, a 12-bit library can handle *only* 12-bit images, not both
-precisions.  (If you need to include both 8- and 12-bit libraries in a single
-application, you could probably do it by defining NEED_SHORT_EXTERNAL_NAMES
-for just one of the copies.  You'd have to access the 8-bit and 12-bit copies
-from separate application source files.  This is untested ... if you try it,
-we'd like to hear whether it works!)
+The IJG code currently supports 8-bit to 12-bit sample data precision by
+defining BITS_IN_JSAMPLE as 8, 9, 10, 11, or 12.
+Note that a value larger than 8 causes JSAMPLE to be larger than a char,
+so it affects the surrounding application's image data.
+The sample applications cjpeg and djpeg can support deeper than 8-bit data
+only for PPM and GIF file formats; you must disable the other file formats
+to compile a 9-bit to 12-bit cjpeg or djpeg.  (install.txt has more
+information about that.)
+Run-time selection and conversion of data precision are currently not
+supported and may be added later.
+Exception:  The transcoding part (jpegtran) supports all settings in a
+single instance, since it operates on the level of DCT coefficients and
+not sample values.
+(If you need to include an 8-bit library and a 9-bit to 12-bit library for
+compression or decompression in a single application, you could probably do
+it by defining NEED_SHORT_EXTERNAL_NAMES for just one of the copies.  You'd
+have to access the 8-bit and the 9-bit to 12-bit copies from separate
+application source files.  This is untested ... if you try it, we'd like to
+hear whether it works!)
 
-Note that a 12-bit library always compresses in Huffman optimization mode,
-in order to generate valid Huffman tables.  This is necessary because our
-default Huffman tables only cover 8-bit data.  If you need to output 12-bit
-files in one pass, you'll have to supply suitable default Huffman tables.
-You may also want to supply your own DCT quantization tables; the existing
-quality-scaling code has been developed for 8-bit use, and probably doesn't
-generate especially good tables for 12-bit.
+Note that the standard Huffman tables are only valid for 8-bit data precision.
+If you selected more than 8-bit data precision, cjpeg uses arithmetic coding
+by default.  The Huffman encoder normally uses entropy optimization to
+compute usable tables for higher precision.  Otherwise, you'll have to
+supply different default Huffman tables.  You may also want to supply your
+own DCT quantization tables; the existing quality-scaling code has been
+developed for 8-bit use, and probably doesn't generate especially good tables
+for 9-bit to 12-bit.
 
 The maximum number of components (color channels) in the image is determined
 by MAX_COMPONENTS.  The JPEG standard allows up to 255 components, but we

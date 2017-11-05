@@ -13,13 +13,14 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "twintap.h"
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type SNES_TWINTAP = &device_creator<snes_twintap_device>;
+DEFINE_DEVICE_TYPE(SNES_TWINTAP, snes_twintap_device, "snes_twintap", "Yonezawa Twin Tap Controller")
 
 
 static INPUT_PORTS_START( snes_twintap )
@@ -49,10 +50,11 @@ ioport_constructor snes_twintap_device::device_input_ports() const
 //  snes_twintap_device - constructor
 //-------------------------------------------------
 
-snes_twintap_device::snes_twintap_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-					device_t(mconfig, SNES_TWINTAP, "Yonezawa Twin Tap Controller", tag, owner, clock, "snes_twintap", __FILE__),
-					device_snes_control_port_interface(mconfig, *this),
-					m_inputs(*this, "INPUTS"), m_strobe(0), m_latch(0)
+snes_twintap_device::snes_twintap_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, SNES_TWINTAP, tag, owner, clock),
+	device_snes_control_port_interface(mconfig, *this),
+	m_inputs(*this, "INPUTS"),
+	m_strobe(0), m_latch(0)
 {
 }
 
@@ -92,9 +94,9 @@ void snes_twintap_device::port_poll()
 //  read
 //-------------------------------------------------
 
-UINT8 snes_twintap_device::read_pin4()
+uint8_t snes_twintap_device::read_pin4()
 {
-	UINT8 ret = m_latch & 1;
+	uint8_t ret = m_latch & 1;
 	m_latch >>= 1;
 	return ret;
 }
@@ -103,7 +105,7 @@ UINT8 snes_twintap_device::read_pin4()
 //  write
 //-------------------------------------------------
 
-void snes_twintap_device::write_strobe(UINT8 data)
+void snes_twintap_device::write_strobe(uint8_t data)
 {
 	int old = m_strobe;
 	m_strobe = data & 0x01;

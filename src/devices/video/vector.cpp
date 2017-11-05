@@ -65,10 +65,10 @@ void vector_options::init(emu_options& options)
 }
 
 // device type definition
-const device_type VECTOR = &device_creator<vector_device>;
+DEFINE_DEVICE_TYPE(VECTOR, vector_device, "vector_device", "VECTOR")
 
-vector_device::vector_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, VECTOR, "VECTOR", tag, owner, clock, "vector_device", __FILE__),
+vector_device::vector_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, VECTOR, tag, owner, clock),
 		device_video_interface(mconfig, *this),
 		m_vector_list(nullptr),
 		m_min_intensity(255),
@@ -104,10 +104,10 @@ void vector_device::add_point(int x, int y, rgb_t color, int intensity)
 {
 	point *newpoint;
 
-	intensity = MAX(0, MIN(255, intensity));
+	intensity = std::max(0, std::min(255, intensity));
 
-	m_min_intensity = intensity > 0 ? MIN(m_min_intensity, intensity) : m_min_intensity;
-	m_max_intensity = intensity > 0 ? MAX(m_max_intensity, intensity) : m_max_intensity;
+	m_min_intensity = intensity > 0 ? std::min(m_min_intensity, intensity) : m_min_intensity;
+	m_max_intensity = intensity > 0 ? std::max(m_max_intensity, intensity) : m_max_intensity;
 
 	if (vector_options::s_flicker && (intensity > 0))
 	{
@@ -115,7 +115,7 @@ void vector_device::add_point(int x, int y, rgb_t color, int intensity)
 
 		intensity -= (int)(intensity * random * vector_options::s_flicker);
 
-		intensity = MAX(0, MIN(255, intensity));
+		intensity = std::max(0, std::min(255, intensity));
 	}
 
 	newpoint = &m_vector_list[m_vector_index];
@@ -143,9 +143,9 @@ void vector_device::clear_list(void)
 }
 
 
-UINT32 vector_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t vector_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	UINT32 flags = PRIMFLAG_ANTIALIAS(machine().options().antialias() ? 1 : 0) | PRIMFLAG_BLENDMODE(BLENDMODE_ADD) | PRIMFLAG_VECTOR(1);
+	uint32_t flags = PRIMFLAG_ANTIALIAS(1) | PRIMFLAG_BLENDMODE(BLENDMODE_ADD) | PRIMFLAG_VECTOR(1);
 	const rectangle &visarea = screen.visible_area();
 	float xscale = 1.0f / (65536 * visarea.width());
 	float yscale = 1.0f / (65536 * visarea.height());

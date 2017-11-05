@@ -24,7 +24,6 @@ public:
 	DECLARE_WRITE8_MEMBER(pia2c_pa_w);
 	DECLARE_WRITE8_MEMBER(pia2c_pb_w);
 	DECLARE_WRITE8_MEMBER(pia34_pa_w);
-	DECLARE_WRITE_LINE_MEMBER(pia40_ca2_w);
 
 	DECLARE_WRITE8_MEMBER(bg_speech_clock_w);
 	DECLARE_WRITE8_MEMBER(bg_speech_digit_w);

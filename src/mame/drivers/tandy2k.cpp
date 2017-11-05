@@ -22,9 +22,14 @@
 
 */
 
+#include "emu.h"
 #include "includes/tandy2k.h"
+
 #include "machine/pckeybrd.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
 
 #define LOG 1
 
@@ -79,7 +84,7 @@ READ8_MEMBER( tandy2k_state::videoram_r )
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 
 	offs_t addr = (m_vram_base << 15) | (offset << 1);
-	UINT16 data = program.read_word(addr);
+	uint16_t data = program.read_word(addr);
 
 	// character
 	m_drb0->write(space, 0, data & 0xff);
@@ -107,7 +112,7 @@ READ8_MEMBER( tandy2k_state::enable_r )
 
 	*/
 
-	UINT8 data = 0x80;
+	uint8_t data = 0x80;
 
 	data |= m_rs232->ri_r();
 	data |= m_rs232->dcd_r() << 1;
@@ -338,7 +343,7 @@ static ADDRESS_MAP_START( tandy2k_hd_io, AS_IO, 16, tandy2k_state )
 //  AM_RANGE(0x0026e, 0x0027f) AM_DEVREADWRITE8(WD1010_TAG, wd1010_device, wd1010_r, wd1010_w, 0x00ff)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( vpac_mem, AS_0, 8, tandy2k_state )
+static ADDRESS_MAP_START( vpac_mem, 0, 8, tandy2k_state )
 	AM_RANGE(0x0000, 0x3fff) AM_READ(videoram_r)
 ADDRESS_MAP_END
 
@@ -351,21 +356,21 @@ INPUT_PORTS_END
 
 // Video
 
-UINT32 tandy2k_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t tandy2k_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	const pen_t *pen = m_palette->pens();
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 
 	for (int y = 0; y < 400; y++)
 	{
-		UINT8 cgra = y % 16;
+		uint8_t cgra = y % 16;
 
 		for (int sx = 0; sx < 80; sx++)
 		{
 			offs_t addr = m_ram->size() - 0x1400 + (((y / 16) * 80) + sx) * 2;
-			UINT16 vidla = program.read_word(addr);
-			UINT8 attr = vidla >> 8;
-			UINT8 data = m_char_ram[((vidla & 0xff) << 4) | cgra];
+			uint16_t vidla = program.read_word(addr);
+			uint8_t attr = vidla >> 8;
+			uint8_t data = m_char_ram[((vidla & 0xff) << 4) | cgra];
 			if(attr & 0x80)
 				data = ~data;
 
@@ -492,7 +497,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( tandy2k_state::vidldsh_tick )
 		m_cgra |= m_sld << 3;
 	}
 
-	UINT8 vidd = m_char_ram[(m_vidla << 4) | m_cgra];
+	uint8_t vidd = m_char_ram[(m_vidla << 4) | m_cgra];
 	m_vac->write(vidd);
 
 	m_drb0->rclk_w(1);
@@ -583,7 +588,7 @@ READ8_MEMBER( tandy2k_state::ppi_pb_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	switch (m_pb_sel)
 	{
@@ -729,7 +734,7 @@ READ8_MEMBER( tandy2k_state::irq_callback )
 void tandy2k_state::machine_start()
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
-	UINT8 *ram = m_ram->pointer();
+	uint8_t *ram = m_ram->pointer();
 	int ram_size = m_ram->size();
 
 	program.install_ram(0x00000, ram_size - 1, ram);
@@ -759,7 +764,7 @@ void tandy2k_state::device_reset_after_children()
 
 // Machine Driver
 
-static MACHINE_CONFIG_START( tandy2k, tandy2k_state )
+static MACHINE_CONFIG_START( tandy2k )
 	// basic machine hardware
 	MCFG_CPU_ADD(I80186_TAG, I80186, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(tandy2k_mem)
@@ -767,23 +772,23 @@ static MACHINE_CONFIG_START( tandy2k, tandy2k_state )
 	MCFG_80186_IRQ_SLAVE_ACK(DEVREAD8(DEVICE_SELF, tandy2k_state, irq_callback))
 
 	// video hardware
-	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green)
+	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green())
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // not accurate
 	MCFG_SCREEN_SIZE(640, 400)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 400-1)
-	//MCFG_SCREEN_UPDATE_DEVICE(CRT9021B_TAG, crt9021_t, screen_update)
+	//MCFG_SCREEN_UPDATE_DEVICE(CRT9021B_TAG, crt9021_device, screen_update)
 	MCFG_SCREEN_UPDATE_DRIVER(tandy2k_state, screen_update)
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	MCFG_DEVICE_ADD(CRT9007_TAG, CRT9007, XTAL_16MHz*28/20/8)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, vpac_mem)
+	MCFG_DEVICE_ADDRESS_MAP(0, vpac_mem)
 	MCFG_CRT9007_CHARACTER_WIDTH(8)
 	MCFG_CRT9007_INT_CALLBACK(DEVWRITELINE(I8259A_1_TAG, pic8259_device, ir1_w))
-	MCFG_CRT9007_VS_CALLBACK(DEVWRITELINE(CRT9021B_TAG, crt9021_t, vsync_w))
+	MCFG_CRT9007_VS_CALLBACK(DEVWRITELINE(CRT9021B_TAG, crt9021_device, vsync_w))
 	MCFG_CRT9007_VLT_CALLBACK(WRITELINE(tandy2k_state, vpac_vlt_w))
-	MCFG_CRT9007_CURS_CALLBACK(DEVWRITELINE(CRT9021B_TAG, crt9021_t, cursor_w))
+	MCFG_CRT9007_CURS_CALLBACK(DEVWRITELINE(CRT9021B_TAG, crt9021_device, cursor_w))
 	MCFG_CRT9007_DRB_CALLBACK(WRITELINE(tandy2k_state, vpac_drb_w))
 	MCFG_CRT9007_WBEN_CALLBACK(WRITELINE(tandy2k_state, vpac_wben_w))
 	MCFG_CRT9007_CBLANK_CALLBACK(WRITELINE(tandy2k_state, vpac_cblank_w))
@@ -836,9 +841,11 @@ static MACHINE_CONFIG_START( tandy2k, tandy2k_state )
 	//MCFG_PIT8253_CLK2(XTAL_16MHz/8)
 	//MCFG_PIT8253_OUT2_HANDLER(WRITELINE(tandy2k_state, rfrqpulse_w))
 
-	MCFG_PIC8259_ADD(I8259A_0_TAG, DEVWRITELINE(I80186_TAG, i80186_cpu_device, int0_w), VCC, NOOP)
+	MCFG_DEVICE_ADD(I8259A_0_TAG, PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(DEVWRITELINE(I80186_TAG, i80186_cpu_device, int0_w))
 
-	MCFG_PIC8259_ADD(I8259A_1_TAG, DEVWRITELINE(I80186_TAG, i80186_cpu_device, int1_w), VCC, NOOP)
+	MCFG_DEVICE_ADD(I8259A_1_TAG, PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(DEVWRITELINE(I80186_TAG, i80186_cpu_device, int1_w))
 
 	MCFG_I8272A_ADD(I8272A_TAG, true)
 	downcast<i8272a_device *>(device)->set_select_lines_connected(true);
@@ -907,6 +914,6 @@ ROM_END
 
 // System Drivers
 
-//    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT    COMPANY                 FULLNAME        FLAGS
-COMP( 1983, tandy2k,    0,          0,      tandy2k,    tandy2k, driver_device, 0,      "Tandy Radio Shack",    "Tandy 2000",   MACHINE_NOT_WORKING )
-COMP( 1983, tandy2khd,  tandy2k,    0,      tandy2k_hd, tandy2k, driver_device, 0,      "Tandy Radio Shack",    "Tandy 2000HD", MACHINE_NOT_WORKING )
+//    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT    STATE          INIT  COMPANY              FULLNAME        FLAGS
+COMP( 1983, tandy2k,    0,          0,      tandy2k,    tandy2k, tandy2k_state, 0,    "Tandy Radio Shack", "Tandy 2000",   MACHINE_NOT_WORKING )
+COMP( 1983, tandy2khd,  tandy2k,    0,      tandy2k_hd, tandy2k, tandy2k_state, 0,    "Tandy Radio Shack", "Tandy 2000HD", MACHINE_NOT_WORKING )

@@ -73,13 +73,17 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/tms7000/tms7000.h"
-#include "video/hd44780.h"
-#include "sound/dac.h"
-#include "machine/nvram.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "cpu/tms7000/tms7000.h"
+#include "machine/nvram.h"
+#include "sound/dac.h"
+#include "sound/volt_reg.h"
+#include "video/hd44780.h"
+
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
 
 #include "cc40.lh"
 
@@ -90,9 +94,8 @@ public:
 	cc40_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_dac(*this, "dac"),
 		m_cart(*this, "cartslot"),
-		m_key_matrix(*this, "IN"),
+		m_key_matrix(*this, "IN.%u", 0),
 		m_battery_inp(*this, "BATTERY")
 	{
 		m_sysram[0] = nullptr;
@@ -100,7 +103,6 @@ public:
 	}
 
 	required_device<tms70c20_device> m_maincpu;
-	required_device<dac_device> m_dac;
 	required_device<generic_slot_device> m_cart;
 	required_ioport_array<8> m_key_matrix;
 	required_ioport m_battery_inp;
@@ -109,21 +111,21 @@ public:
 
 	memory_region *m_cart_rom;
 
-	UINT8 m_bus_control;
-	UINT8 m_power;
-	UINT8 m_banks;
-	UINT8 m_clock_control;
-	UINT8 m_clock_divider;
-	UINT8 m_key_select;
+	u8 m_bus_control;
+	u8 m_power;
+	u8 m_banks;
+	u8 m_clock_control;
+	u8 m_clock_divider;
+	u8 m_key_select;
 
-	std::unique_ptr<UINT8[]> m_sysram[2];
-	UINT16 m_sysram_size[2];
-	UINT16 m_sysram_end[2];
-	UINT16 m_sysram_mask[2];
+	std::unique_ptr<u8[]> m_sysram[2];
+	u16 m_sysram_size[2];
+	u16 m_sysram_end[2];
+	u16 m_sysram_mask[2];
 
 	void postload();
-	void init_sysram(int chip, UINT16 size);
-	void update_lcd_indicator(UINT8 y, UINT8 x, int state);
+	void init_sysram(int chip, u16 size);
+	void update_lcd_indicator(u8 y, u8 x, int state);
 	void update_clock_divider();
 
 	DECLARE_READ8_MEMBER(sysram_r);
@@ -131,7 +133,6 @@ public:
 	DECLARE_READ8_MEMBER(bus_control_r);
 	DECLARE_WRITE8_MEMBER(bus_control_w);
 	DECLARE_WRITE8_MEMBER(power_w);
-	DECLARE_WRITE8_MEMBER(sound_w);
 	DECLARE_READ8_MEMBER(battery_r);
 	DECLARE_READ8_MEMBER(bankswitch_r);
 	DECLARE_WRITE8_MEMBER(bankswitch_w);
@@ -158,19 +159,19 @@ public:
 
 DEVICE_IMAGE_LOAD_MEMBER(cc40_state, cc40_cartridge)
 {
-	UINT32 size = m_cart->common_get_size("rom");
+	u32 size = m_cart->common_get_size("rom");
 
 	// max size is 4*32KB
 	if (size > 0x20000)
 	{
 		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid file size");
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 	}
 
-	m_cart->rom_alloc(0x20000, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);  // allocate a larger ROM region to have 4x32K banks
+	m_cart->rom_alloc(0x20000, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE); // allocate a larger ROM region to have 4x32K banks
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 
@@ -188,7 +189,7 @@ PALETTE_INIT_MEMBER(cc40_state, cc40)
 	palette.set_pen_color(2, rgb_t(131, 136, 139)); // lcd pixel off
 }
 
-void cc40_state::update_lcd_indicator(UINT8 y, UINT8 x, int state)
+void cc40_state::update_lcd_indicator(u8 y, u8 x, int state)
 {
 	// reference _________________...
 	// output#  |10  11     12     13     14      0      1      2      3   4
@@ -289,12 +290,6 @@ WRITE8_MEMBER(cc40_state::power_w)
 		m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
-WRITE8_MEMBER(cc40_state::sound_w)
-{
-	// d0: piezo control
-	m_dac->write_signed8((data & 1) ? 0x7f : 0);
-}
-
 READ8_MEMBER(cc40_state::battery_r)
 {
 	// d0: low battery sense line (0 = low power)
@@ -308,6 +303,8 @@ READ8_MEMBER(cc40_state::bankswitch_r)
 
 WRITE8_MEMBER(cc40_state::bankswitch_w)
 {
+	data &= 0x0f;
+
 	// d0-d1: system rom bankswitch
 	membank("sysbank")->set_entry(data & 3);
 
@@ -315,7 +312,7 @@ WRITE8_MEMBER(cc40_state::bankswitch_w)
 	if (m_cart_rom)
 		membank("cartbank")->set_entry(data >> 2 & 3);
 
-	m_banks = data & 0x0f;
+	m_banks = data;
 }
 
 READ8_MEMBER(cc40_state::clock_control_r)
@@ -332,10 +329,12 @@ void cc40_state::update_clock_divider()
 
 WRITE8_MEMBER(cc40_state::clock_control_w)
 {
+	data &= 0x0f;
+
 	// d0-d2: clock divider
 	// d3: enable clock divider always
 	// other bits: unused?
-	if (m_clock_control != (data & 0x0f))
+	if (m_clock_control != data)
 	{
 		m_clock_control = data;
 		update_clock_divider();
@@ -344,7 +343,7 @@ WRITE8_MEMBER(cc40_state::clock_control_w)
 
 READ8_MEMBER(cc40_state::keyboard_r)
 {
-	UINT8 ret = 0;
+	u8 ret = 0;
 
 	// read selected keyboard rows
 	for (int i = 0; i < 8; i++)
@@ -370,7 +369,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, cc40_state )
 	AM_RANGE(0x0112, 0x0112) AM_NOP // d0-d3: Hexbus data
 	AM_RANGE(0x0113, 0x0113) AM_NOP // d0: Hexbus available
 	AM_RANGE(0x0114, 0x0114) AM_NOP // d0,d1: Hexbus handshake
-	AM_RANGE(0x0115, 0x0115) AM_WRITE(sound_w)
+	AM_RANGE(0x0115, 0x0115) AM_DEVWRITE("dac", dac_bit_interface, write) // d0: piezo control
 	AM_RANGE(0x0116, 0x0116) AM_READ(battery_r)
 	AM_RANGE(0x0119, 0x0119) AM_READWRITE(bankswitch_r, bankswitch_w)
 	AM_RANGE(0x011a, 0x011a) AM_READWRITE(clock_control_r, clock_control_w)
@@ -380,11 +379,6 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, cc40_state )
 	AM_RANGE(0x1000, 0x4fff) AM_READWRITE(sysram_r, sysram_w)
 	AM_RANGE(0x5000, 0xcfff) AM_ROMBANK("cartbank")
 	AM_RANGE(0xd000, 0xefff) AM_ROMBANK("sysbank")
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( main_io_map, AS_IO, 8, cc40_state )
-	AM_RANGE(TMS7000_PORTA, TMS7000_PORTA) AM_READ(keyboard_r)
-	AM_RANGE(TMS7000_PORTB, TMS7000_PORTB) AM_WRITE(keyboard_w)
 ADDRESS_MAP_END
 
 
@@ -397,7 +391,7 @@ ADDRESS_MAP_END
 
 INPUT_CHANGED_MEMBER(cc40_state::sysram_size_changed)
 {
-	init_sysram((int)(FPTR)param, newval << 11);
+	init_sysram((int)(uintptr_t)param, newval << 11);
 }
 
 static INPUT_PORTS_START( cc40 )
@@ -518,12 +512,12 @@ void cc40_state::machine_reset()
 	bankswitch_w(space, 0, 0);
 }
 
-void cc40_state::init_sysram(int chip, UINT16 size)
+void cc40_state::init_sysram(int chip, u16 size)
 {
 	if (m_sysram[chip] == nullptr)
 	{
 		// init to largest possible
-		m_sysram[chip] = std::make_unique<UINT8[]>(0x2000);
+		m_sysram[chip] = std::make_unique<u8[]>(0x2000);
 		save_pointer(NAME(m_sysram[chip].get()), 0x2000, chip);
 
 		save_item(NAME(m_sysram_size[chip]), chip);
@@ -580,12 +574,13 @@ void cc40_state::machine_start()
 	machine().save().register_postload(save_prepost_delegate(FUNC(cc40_state::postload), this));
 }
 
-static MACHINE_CONFIG_START( cc40, cc40_state )
+static MACHINE_CONFIG_START( cc40 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS70C20, XTAL_5MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_IO_MAP(main_io_map)
+	MCFG_TMS7000_IN_PORTA_CB(READ8(cc40_state, keyboard_r))
+	MCFG_TMS7000_OUT_PORTB_CB(WRITE8(cc40_state, keyboard_w))
 
 	MCFG_NVRAM_ADD_0FILL("sysram.0")
 	MCFG_NVRAM_ADD_0FILL("sysram.1")
@@ -609,10 +604,10 @@ static MACHINE_CONFIG_START( cc40, cc40_state )
 	MCFG_HD44780_PIXEL_UPDATE_CB(cc40_state, cc40_pixel_update)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "cc40_cart")
@@ -631,12 +626,13 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 ROM_START( cc40 )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "tms70c20.bin", 0xf800, 0x0800, CRC(a21bf6ab) SHA1(3da8435ecbee143e7fa149ee8e1c92949bade1d8) ) // internal cpu rom
+	ROM_REGION( 0x800, "maincpu", 0 )
+	ROM_LOAD( "tms70c20.bin", 0x000, 0x800, CRC(a21bf6ab) SHA1(3da8435ecbee143e7fa149ee8e1c92949bade1d8) ) // internal cpu rom
 
 	ROM_REGION( 0x8000, "system", 0 )
 	ROM_LOAD( "hn61256pc09.bin", 0x0000, 0x8000, CRC(f5322fab) SHA1(1b5c4052a53654363c458f75eac7a27f0752def6) ) // system rom, banked
 ROM_END
 
 
-COMP( 1983, cc40, 0, 0, cc40, cc40, driver_device, 0, "Texas Instruments", "Compact Computer 40", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME  PARENT CMP MACHINE INPUT STATE    INIT  COMPANY, FULLNAME, FLAGS
+COMP( 1983, cc40, 0,      0, cc40,   cc40, cc40_state, 0, "Texas Instruments", "Compact Computer 40", MACHINE_SUPPORTS_SAVE )

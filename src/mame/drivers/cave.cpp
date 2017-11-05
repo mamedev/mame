@@ -20,26 +20,28 @@ Other        :  93C46 EEPROM
 -----------------------------------------------------------------------------------------
 Year + Game           License       PCB         Tilemaps        Sprites         Other
 -----------------------------------------------------------------------------------------
-94 Mazinger Z         Banpresto     BP943A      038 9335EX706   013 9341E7009   Z80
-94 Power Instinct 2   Atlus         ATG02?      038 9429WX709   013 9341E7009   Z80 NMK 112
-95 Gogetsuji Legends  Atlus         AT047G2-B   038 9429WX709   013 9341E7009   Z80 NMK 112
-95 Metamoqester       Banpresto     BP947A      038 9437WX711   013 9346E7002   Z80
-95 Sailor Moon        Banpresto     BP945A      038 9437WX711   013 9346E7002   Z80
-95 Donpachi           Atlus         AT-C01DP-2  038 9429WX727   013 9347E7003   NMK 112
-96 Air Gallet         Banpresto     BP962A      038 9437WX711   013 9346E7002   Z80
-96 Hotdog Storm       Marble        ASTC9501    038 9341EX702   013             Z80
-96 Pac-Slot           Namco         A0442       038 9444WX010   013 9345E7006
-96 Poka Poka Satan    Kato's        PPS-MAIN    038 9444WX010   013 9607EX013
-97 Dodonpachi         Atlus         ATC03D2     038             013
-98 Dangun Feveron     Nihon System  CV01        038 9808WX003   013 9807EX004
-98 ESP Ra.De.         Atlus         ATC04       038 9841WX002   013 9838EX002
-98 Uo Poko            Jaleco        CV02        038 9749WX001   013 9749EX004
-99 Guwange            Atlus         ATC05       038 9919WX004   013
-99 Gaia Crusaders     Noise Factory ?           038 9838WX003   013 9918EX008
-99 Koro Koro Quest    Takumi        TUG-01B     038 9838WX004   013 9838EX004
-99 Crusher Makochan   Takumi        TUG-01B     038 9838WX004   013 9838EX004
-99 Tobikose! Jumpman  Namco         TJ0476      038 9919WX007   013 9934WX002
-01 Thunder Heroes     Primetek      ?           038 9838WX003   013 9918EX008
+94 Mazinger Z             Banpresto     BP943A      038 9335EX706   013 9341E7009   Z80
+94 Power Instinct 2       Atlus         ATG02?      038 9429WX709   013 9341E7009   Z80 NMK 112
+95 Gogetsuji Legends      Atlus         AT047G2-B   038 9429WX709   013 9341E7009   Z80 NMK 112
+95 Metamoqester           Banpresto     BP947A      038 9437WX711   013 9346E7002   Z80
+95 Sailor Moon            Banpresto     BP945A      038 9437WX711   013 9346E7002   Z80
+95 Donpachi               Atlus         AT-C01DP-2  038 9429WX727   013 9347E7003   NMK 112
+96 Air Gallet             Banpresto     BP962A      038 9437WX711   013 9346E7002   Z80
+96 Hotdog Storm           Marble        ASTC9501    038 9341EX702   013             Z80
+96 Pac-Slot               Namco         N-44 EM     038 9444WX010   013 9345E7006
+96 Poka Poka Satan        Kato's        PPS-MAIN    038 9444WX010   013 9607EX013
+97 Tekken Card World      Namco         EMG4        038 9701WX001   013 9651EX001
+97 Dodonpachi             Atlus         AT-C03 D2   038 9341E7010   013 9338EX701
+98 Dangun Feveron         Nihon System  CV01        038 9808WX003   013 9807EX004
+98 ESP Ra.De.             Atlus         ATC04       038 9841WX002   013 9838EX002
+98 Tekken Battle Scratch  Namco         EMG4        038 9748WX001   013
+98 Uo Poko                Jaleco        CV02        038 9749WX001   013 9749EX004
+99 Guwange                Atlus         ATC05       038 9919WX004   013
+99 Gaia Crusaders         Noise Factory ?           038 9838WX003   013 9918EX008
+99 Koro Koro Quest        Takumi        TUG-01B     038 9838WX004   013 9838EX004
+99 Crusher Makochan       Takumi        TUG-01B     038 9838WX004   013 9838EX004
+99 Tobikose! Jumpman      Namco         EMG4        038 9919WX007   013 9934WX002
+01 Thunder Heroes         Primetek      ?           038 9838WX003   013 9918EX008
 -----------------------------------------------------------------------------------------
 
 To Do:
@@ -75,18 +77,19 @@ Versions known to exist but not dumped:
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/cave.h"
+
 #include "cpu/m68000/m68000.h"
-#include "machine/eepromser.h"
+#include "cpu/z80/z80.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
-#include "cpu/z80/z80.h"
-#include "includes/cave.h"
 #include "sound/2203intf.h"
-#include "sound/2151intf.h"
-#include "sound/okim6295.h"
+#include "sound/ym2151.h"
 #include "sound/ymz280b.h"
+#include "speaker.h"
 
 #include "ppsatan.lh"
+
 
 /***************************************************************************
 
@@ -122,7 +125,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(cave_state::cave_vblank_start)
 	update_irq_state();
 	cave_get_sprite_info(0);
 	m_agallet_vblank_irq = 1;
-	machine().scheduler().timer_set(attotime::from_usec(2000), timer_expired_delegate(FUNC(cave_state::cave_vblank_end),this));
+	m_vblank_end_timer->adjust(attotime::from_usec(2000));
 }
 TIMER_DEVICE_CALLBACK_MEMBER(cave_state::cave_vblank_start_left)
 {
@@ -235,7 +238,7 @@ WRITE16_MEMBER(cave_state::sound_cmd_w)
 {
 //  m_sound_flag1 = 1;
 //  m_sound_flag2 = 1;
-	soundlatch_word_w(space, offset, data, mem_mask);
+	m_soundlatch->write(space, offset, data, mem_mask);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	space.device().execute().spin_until_time(attotime::from_usec(50));  // Allow the other cpu to reply
 }
@@ -244,14 +247,14 @@ WRITE16_MEMBER(cave_state::sound_cmd_w)
 READ8_MEMBER(cave_state::soundlatch_lo_r)
 {
 //  m_sound_flag1 = 0;
-	return soundlatch_word_r(space, offset, 0x00ff) & 0xff;
+	return m_soundlatch->read(space, offset, 0x00ff) & 0xff;
 }
 
 /* Sound CPU: read the high 8 bits of the 16 bit sound latch */
 READ8_MEMBER(cave_state::soundlatch_hi_r)
 {
 //  m_sound_flag2 = 0;
-	return soundlatch_word_r(space, offset, 0xff00) >> 8;
+	return m_soundlatch->read(space, offset, 0xff00) >> 8;
 }
 
 /* Main CPU: read the latch written by the sound CPU (acknowledge) */
@@ -259,7 +262,7 @@ READ16_MEMBER(cave_state::soundlatch_ack_r)
 {
 	if (m_soundbuf_len > 0)
 	{
-		UINT8 data = m_soundbuf_data[0];
+		uint8_t data = m_soundbuf_data[0];
 		memmove(m_soundbuf_data, m_soundbuf_data + 1, (32 - 1) * sizeof(m_soundbuf_data[0]));
 		m_soundbuf_len--;
 		return data;
@@ -792,12 +795,12 @@ WRITE16_MEMBER(cave_state::ppsatan_io_mux_w)
 	COMBINE_DATA(&m_ppsatan_io_mux);
 }
 
-UINT16 cave_state::ppsatan_touch_r(int player)
+uint16_t cave_state::ppsatan_touch_r(int player)
 {
-	UINT8 ret_x = 0, ret_y = 0;
+	uint8_t ret_x = 0, ret_y = 0;
 
-	UINT16 x = ioport(player ? "TOUCH2_X" : "TOUCH1_X")->read();
-	UINT16 y = ioport(player ? "TOUCH2_Y" : "TOUCH1_Y")->read();
+	uint16_t x = ioport(player ? "TOUCH2_X" : "TOUCH1_X")->read();
+	uint16_t y = ioport(player ? "TOUCH2_Y" : "TOUCH1_Y")->read();
 
 	if (x & 0x8000) // touching
 	{
@@ -858,7 +861,7 @@ WRITE16_MEMBER(cave_state::ppsatan_out_w)
 		output().set_led_value(6, data & 0x0400);    // not tested in service mode
 		output().set_led_value(7, data & 0x0800);    // not tested in service mode
 
-		m_oki->set_bank_base((data & 0x8000) ? 0x40000 : 0);
+		m_oki->set_rom_bank((data & 0x8000) >> 15);
 	}
 
 //  popmessage("OUT %04x", data);
@@ -915,9 +918,9 @@ READ16_MEMBER(cave_state::pwrinst2_eeprom_r)
 	return ~8 + ((m_eeprom->do_read() & 1) ? 8 : 0);
 }
 
-inline void cave_state::vctrl_w(address_space &space, offs_t offset, UINT16 data, UINT16 mem_mask, int GFX)
+inline void cave_state::vctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask, int GFX)
 {
-	UINT16 *VCTRL = m_vctrl[GFX];
+	uint16_t *VCTRL = m_vctrl[GFX];
 	if (offset == 4 / 2)
 	{
 		switch (data & 0x000f)
@@ -1003,6 +1006,52 @@ ADDRESS_MAP_END
 
 
 /***************************************************************************
+                            Tekken Card World
+***************************************************************************/
+
+static ADDRESS_MAP_START( tekkencw_map, AS_PROGRAM, 16, cave_state )
+	AM_RANGE(0x000000, 0x07ffff) AM_ROM                                                         // ROM
+	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_SHARE("nvram")                                       // RAM (battery)
+	AM_RANGE(0x200000, 0x207fff) AM_RAM AM_SHARE("spriteram.0")                                 // Sprites
+	AM_RANGE(0x208000, 0x20ffff) AM_RAM AM_SHARE("spriteram_2.0")                               // Sprite bank 2
+	AM_RANGE(0x300000, 0x307fff) AM_RAM_WRITE(cave_vram_0_w) AM_SHARE("vram.0")                 // Layer 0
+	AM_RANGE(0x400000, 0x400001) AM_READ_PORT("IN0")                                            // Inputs + EEPROM + Hopper
+	AM_RANGE(0x400002, 0x400003) AM_READ_PORT("IN1")                                            // Inputs
+	AM_RANGE(0x500000, 0x500005) AM_WRITEONLY AM_SHARE("vctrl.0")                               // Layer 0 Control
+	AM_RANGE(0x600000, 0x60ffff) AM_RAM AM_SHARE("paletteram.0")                                // Palette
+	AM_RANGE(0x700000, 0x700007) AM_READ(cave_irq_cause_r)                                      // IRQ Cause
+	AM_RANGE(0x700068, 0x700069) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)      // Watchdog
+	AM_RANGE(0x700000, 0x70007f) AM_WRITEONLY AM_SHARE("videoregs.0")                           // Video Regs
+	AM_RANGE(0x800000, 0x800001) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff) // M6295
+	AM_RANGE(0xc00000, 0xc00001) AM_WRITE(tjumpman_leds_w)                                      // Leds + Hopper
+	AM_RANGE(0xe00000, 0xe00001) AM_WRITE(tjumpman_eeprom_lsb_w)                                // EEPROM
+ADDRESS_MAP_END
+
+
+/***************************************************************************
+                          Tekken Battle Scratch
+***************************************************************************/
+
+static ADDRESS_MAP_START( tekkenbs_map, AS_PROGRAM, 16, cave_state )
+	AM_RANGE(0x000000, 0x07ffff) AM_ROM                                                         // ROM
+	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_SHARE("nvram")                                       // RAM (battery)
+	AM_RANGE(0x200000, 0x207fff) AM_RAM AM_SHARE("spriteram.0")                                 // Sprites
+	AM_RANGE(0x208000, 0x20ffff) AM_RAM AM_SHARE("spriteram_2.0")                               // Sprite bank 2
+	AM_RANGE(0x300000, 0x307fff) AM_RAM_WRITE(cave_vram_0_w) AM_SHARE("vram.0")                 // Layer 0
+	AM_RANGE(0x400000, 0x40ffff) AM_RAM AM_SHARE("paletteram.0")                                // Palette
+	AM_RANGE(0x500000, 0x500005) AM_WRITEONLY AM_SHARE("vctrl.0")                               // Layer 0 Control
+	AM_RANGE(0x600000, 0x600001) AM_READ_PORT("IN0")                                            // Inputs + EEPROM + Hopper
+	AM_RANGE(0x600002, 0x600003) AM_READ_PORT("IN1")                                            // Inputs
+	AM_RANGE(0x700000, 0x700007) AM_READ(cave_irq_cause_r)                                      // IRQ Cause
+	AM_RANGE(0x700068, 0x700069) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)      // Watchdog
+	AM_RANGE(0x700000, 0x70007f) AM_WRITEONLY AM_SHARE("videoregs.0")                           // Video Regs
+	AM_RANGE(0x800000, 0x800001) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff) // M6295
+	AM_RANGE(0xc00000, 0xc00001) AM_WRITE(tjumpman_leds_w)                                      // Leds + Hopper
+	AM_RANGE(0xe00000, 0xe00001) AM_WRITE(tjumpman_eeprom_lsb_w)                                // EEPROM
+ADDRESS_MAP_END
+
+
+/***************************************************************************
                             Tobikose! Jumpman
 ***************************************************************************/
 
@@ -1048,7 +1097,7 @@ CUSTOM_INPUT_MEMBER(cave_state::tjumpman_hopper_r)
 
 static ADDRESS_MAP_START( tjumpman_map, AS_PROGRAM, 16, cave_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM                                                                 // ROM
-	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_SHARE("nvram")                                               // RAM
+	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_SHARE("nvram")                                               // RAM (battery)
 	AM_RANGE(0x200000, 0x207fff) AM_RAM AM_SHARE("spriteram.0")       // Sprites
 	AM_RANGE(0x208000, 0x20ffff) AM_RAM AM_SHARE("spriteram_2.0")                         // Sprite bank 2
 	AM_RANGE(0x304000, 0x307fff) AM_WRITE(cave_vram_0_w)                                                // Layer 0 - 16x16 tiles mapped here
@@ -1088,7 +1137,7 @@ WRITE16_MEMBER(cave_state::pacslot_leds_w)
 
 static ADDRESS_MAP_START( pacslot_map, AS_PROGRAM, 16, cave_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM                                                                 // ROM
-	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_SHARE("nvram")                                               // RAM
+	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_SHARE("nvram")                                               // RAM (battery)
 	AM_RANGE(0x200000, 0x207fff) AM_RAM AM_SHARE("spriteram.0")       // Sprites
 	AM_RANGE(0x208000, 0x20ffff) AM_RAM AM_SHARE("spriteram_2.0")                         // Sprite bank 2
 	AM_RANGE(0x300000, 0x307fff) AM_RAM_WRITE(cave_vram_0_w) AM_SHARE("vram.0")         // Layer 0
@@ -1136,12 +1185,12 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 
-static ADDRESS_MAP_START( oki_map, AS_0, 8, cave_state )
+static ADDRESS_MAP_START( oki_map, 0, 8, cave_state )
 	AM_RANGE(0x00000, 0x1ffff) AM_ROMBANK("okibank1")
 	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("okibank2")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( oki2_map, AS_0, 8, cave_state )
+static ADDRESS_MAP_START( oki2_map, 0, 8, cave_state )
 	AM_RANGE(0x00000, 0x1ffff) AM_ROMBANK("oki2bank1")
 	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("oki2bank2")
 ADDRESS_MAP_END
@@ -1595,38 +1644,13 @@ static INPUT_PORTS_START( korokoro )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( tjumpman )
+static INPUT_PORTS_START( tekkencw )
 	PORT_START("IN0")
 	PORT_SERVICE_NO_TOGGLE( 0x01, IP_ACTIVE_LOW )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_COIN2 ) PORT_IMPULSE(10) // credits (impulse needed to coin up reliably)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_OTHER ) PORT_NAME( DEF_STR( Yes ) ) PORT_CODE(KEYCODE_Y)    // suru ("do")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_GAMBLE_PAYOUT )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_NAME( "1 Bet" )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, cave_state,tjumpman_hopper_r, nullptr)
-
-	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_CONFNAME( 0x08, 0x08, "Self Test" )
-	PORT_CONFSETTING(    0x08, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START2  ) PORT_NAME( DEF_STR( No ) ) PORT_CODE(KEYCODE_N)    // shinai ("not")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME( "Go" )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1   )                                                    // medal
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME( "3 Bet" )
-INPUT_PORTS_END
-
-
-static INPUT_PORTS_START( pacslot )
-	PORT_START("IN0")
-	PORT_SERVICE( 0x01, IP_ACTIVE_LOW )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_COIN2 ) // credits
-	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_OTHER ) PORT_NAME( "Pac-Man" ) PORT_CODE(KEYCODE_Y)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_GAMBLE_PAYOUT )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_NAME( "Bet" )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, cave_state,tjumpman_hopper_r, nullptr)
@@ -1638,9 +1662,84 @@ static INPUT_PORTS_START( pacslot )
 	PORT_CONFNAME( 0x08, 0x08, "Self Test" )
 	PORT_CONFSETTING(    0x08, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START2  ) PORT_NAME( "Ms. Pac-Man" ) PORT_CODE(KEYCODE_N)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START2  ) PORT_NAME( DEF_STR( No ) ) PORT_CODE(KEYCODE_N)    // shinai ("not")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME( "Action" )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1   ) PORT_IMPULSE(10)                                   // medal (impulse needed to coin up reliably)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( tekkenbs )
+	PORT_START("IN0")
+	PORT_SERVICE_NO_TOGGLE( 0x01, IP_ACTIVE_LOW )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_COIN2 ) PORT_IMPULSE(10) // credits (impulse needed to coin up reliably)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_GAMBLE_PAYOUT )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_NAME( "Bet" )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, cave_state,tjumpman_hopper_r, nullptr)
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_CONFNAME( 0x08, 0x08, "Self Test" )
+	PORT_CONFSETTING(    0x08, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME( "Start" )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1   ) PORT_IMPULSE(10) // medal (impulse needed to coin up reliably)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( tjumpman )
+	PORT_START("IN0")
+	PORT_SERVICE_NO_TOGGLE( 0x01, IP_ACTIVE_LOW )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_OTHER   ) PORT_NAME( DEF_STR( Yes ) ) PORT_CODE(KEYCODE_Y)    // suru ("do")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_GAMBLE_PAYOUT )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_NAME( "1 Bet" )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, cave_state,tjumpman_hopper_r, nullptr)
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_CONFNAME( 0x08, 0x08, "Self Test" )
+	PORT_CONFSETTING(    0x08, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER   ) PORT_NAME( DEF_STR( No ) ) PORT_CODE(KEYCODE_N)    // shinai ("not")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME( "Go" )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1   ) PORT_IMPULSE(10)                                   // medal (impulse needed to coin up reliably)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME( "3 Bet" )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( pacslot )
+	PORT_START("IN0")
+	PORT_SERVICE( 0x01, IP_ACTIVE_LOW ) // must stay on during service mode
+	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_COIN2 ) PORT_IMPULSE(10) // credits (impulse needed to coin up reliably)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_OTHER   ) PORT_NAME( "Pac-Man" ) PORT_CODE(KEYCODE_Y)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_GAMBLE_PAYOUT )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_NAME( "Bet" )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, cave_state,tjumpman_hopper_r, nullptr)
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_CONFNAME( 0x08, 0x08, "Self Test" )
+	PORT_CONFSETTING(    0x08, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER   ) PORT_NAME( "Ms. Pac-Man" ) PORT_CODE(KEYCODE_N)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1  )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1   ) // medal
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1   ) PORT_IMPULSE(10) // medal (impulse needed to coin up reliably)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
@@ -1938,6 +2037,8 @@ GFXDECODE_END
 
 MACHINE_START_MEMBER(cave_state,cave)
 {
+	m_vblank_end_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cave_state::cave_vblank_end), this));
+
 	save_item(NAME(m_soundbuf_len));
 	save_item(NAME(m_soundbuf_data));
 
@@ -1958,16 +2059,11 @@ MACHINE_RESET_MEMBER(cave_state,cave)
 	m_agallet_vblank_irq = 0;
 }
 
-WRITE_LINE_MEMBER(cave_state::irqhandler)
-{
-	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
 /***************************************************************************
                                 Dangun Feveron
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( dfeveron, cave_state )
+static MACHINE_CONFIG_START( dfeveron )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
@@ -2008,7 +2104,7 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 
-static MACHINE_CONFIG_START( ddonpach, cave_state )
+static MACHINE_CONFIG_START( ddonpach )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
@@ -2048,7 +2144,7 @@ MACHINE_CONFIG_END
                                     Donpachi
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( donpachi, cave_state )
+static MACHINE_CONFIG_START( donpachi )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
@@ -2078,10 +2174,10 @@ static MACHINE_CONFIG_START( donpachi, cave_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki1", XTAL_4_224MHz/4, OKIM6295_PIN7_HIGH) // pin 7 not verified
+	MCFG_OKIM6295_ADD("oki1", XTAL_4_224MHz/4, PIN7_HIGH) // pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.60)
 
-	MCFG_OKIM6295_ADD("oki2", XTAL_4_224MHz/2, OKIM6295_PIN7_HIGH) // pin 7 not verified
+	MCFG_OKIM6295_ADD("oki2", XTAL_4_224MHz/2, PIN7_HIGH) // pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_DEVICE_ADD("nmk112", NMK112, 0)
@@ -2095,7 +2191,7 @@ MACHINE_CONFIG_END
                                 Esprade
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( esprade, cave_state )
+static MACHINE_CONFIG_START( esprade )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
@@ -2135,7 +2231,7 @@ MACHINE_CONFIG_END
                                     Gaia Crusaders
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( gaia, cave_state )
+static MACHINE_CONFIG_START( gaia )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
@@ -2176,7 +2272,7 @@ MACHINE_CONFIG_END
                                     Guwange
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( guwange, cave_state )
+static MACHINE_CONFIG_START( guwange )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
@@ -2215,7 +2311,7 @@ MACHINE_CONFIG_END
                                 Hotdog Storm
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( hotdogst, cave_state )
+static MACHINE_CONFIG_START( hotdogst )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)
@@ -2249,16 +2345,18 @@ static MACHINE_CONFIG_START( hotdogst, cave_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_16_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_32MHz/8)
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(cave_state, irqhandler))
+	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.20)
 	MCFG_SOUND_ROUTE(1, "mono", 0.20)
 	MCFG_SOUND_ROUTE(2, "mono", 0.20)
 	MCFG_SOUND_ROUTE(3, "mono", 0.80)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_32MHz/16, OKIM6295_PIN7_HIGH) // pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL_32MHz/16, PIN7_HIGH) // pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, oki_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 MACHINE_CONFIG_END
 
 
@@ -2266,7 +2364,7 @@ MACHINE_CONFIG_END
                                Koro Koro Quest
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( korokoro, cave_state )
+static MACHINE_CONFIG_START( korokoro )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
@@ -2302,8 +2400,6 @@ static MACHINE_CONFIG_START( korokoro, cave_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( crusherm, korokoro )
-
-	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(crusherm_map)
 MACHINE_CONFIG_END
@@ -2313,7 +2409,7 @@ MACHINE_CONFIG_END
                                 Mazinger Z
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( mazinger, cave_state )
+static MACHINE_CONFIG_START( mazinger )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
@@ -2350,16 +2446,18 @@ static MACHINE_CONFIG_START( mazinger, cave_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_16_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_4MHz)
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(cave_state, irqhandler))
+	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.20)
 	MCFG_SOUND_ROUTE(1, "mono", 0.20)
 	MCFG_SOUND_ROUTE(2, "mono", 0.20)
 	MCFG_SOUND_ROUTE(3, "mono", 0.60)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_1_056MHz, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL_1_056MHz, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, oki_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 MACHINE_CONFIG_END
 
 
@@ -2367,7 +2465,7 @@ MACHINE_CONFIG_END
                                 Metamoqester
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( metmqstr, cave_state )
+static MACHINE_CONFIG_START( metmqstr )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz / 2)
@@ -2404,17 +2502,19 @@ static MACHINE_CONFIG_START( metmqstr, cave_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_16_ADD("soundlatch")
+
 	MCFG_YM2151_ADD("ymsnd", XTAL_16MHz / 4)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.6)
 
-	MCFG_OKIM6295_ADD("oki1", XTAL_32MHz / 16 , OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki1", XTAL_32MHz / 16 , PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, oki_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 
-	MCFG_OKIM6295_ADD("oki2", XTAL_32MHz / 16 , OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki2", XTAL_32MHz / 16 , PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, oki2_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, oki2_map)
 MACHINE_CONFIG_END
 
 
@@ -2422,7 +2522,7 @@ MACHINE_CONFIG_END
                                    Pac-Slot
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( pacslot, cave_state )
+static MACHINE_CONFIG_START( pacslot )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -2459,12 +2559,12 @@ static MACHINE_CONFIG_START( pacslot, cave_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_OKIM6295_ADD("oki1", XTAL_28MHz / 28, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki1", XTAL_28MHz / 28, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
 	// oki2 chip is present but its rom socket is unpopulated
-	MCFG_OKIM6295_ADD("oki2", XTAL_28MHz / 28, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki2", XTAL_28MHz / 28, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -2479,7 +2579,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( cave_state::timer_lev2_cb )
 	m_maincpu->set_input_line(M68K_IRQ_2, HOLD_LINE);   // ppsatan: read touch screens
 }
 
-static MACHINE_CONFIG_START( ppsatan, cave_state )
+static MACHINE_CONFIG_START( ppsatan )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
@@ -2530,7 +2630,7 @@ static MACHINE_CONFIG_START( ppsatan, cave_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_1_056MHz, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL_1_056MHz, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 2.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 2.0)
 MACHINE_CONFIG_END
@@ -2542,7 +2642,7 @@ MACHINE_CONFIG_END
 
 /*  X1 = 12 MHz, X2 = 28 MHz, X3 = 16 MHz. OKI: / 165 mode A ; / 132 mode B */
 
-static MACHINE_CONFIG_START( pwrinst2, cave_state )
+static MACHINE_CONFIG_START( pwrinst2 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz) /* 16 MHz */
@@ -2576,17 +2676,19 @@ static MACHINE_CONFIG_START( pwrinst2, cave_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_16_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_16MHz / 4)
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(cave_state, irqhandler))
+	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.40)
 	MCFG_SOUND_ROUTE(1, "mono", 0.40)
 	MCFG_SOUND_ROUTE(2, "mono", 0.40)
 	MCFG_SOUND_ROUTE(3, "mono", 0.80)
 
-	MCFG_OKIM6295_ADD("oki1", XTAL_3MHz , OKIM6295_PIN7_LOW)
+	MCFG_OKIM6295_ADD("oki1", XTAL_3MHz , PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_OKIM6295_ADD("oki2", XTAL_3MHz , OKIM6295_PIN7_LOW)
+	MCFG_OKIM6295_ADD("oki2", XTAL_3MHz , PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MCFG_DEVICE_ADD("nmk112", NMK112, 0)
@@ -2599,12 +2701,27 @@ MACHINE_CONFIG_END
                         Sailor Moon / Air Gallet
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( sailormn, cave_state )
+TIMER_DEVICE_CALLBACK_MEMBER( cave_state::sailormn_startup )
+{
+	m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+}
+
+MACHINE_RESET_MEMBER(cave_state,sailormn)
+{
+	timer_device *startup = machine().device<timer_device>("startup");
+	startup->adjust(attotime::from_usec(1000), 0, attotime::zero);
+	MACHINE_RESET_CALL_MEMBER(cave);
+}
+
+static MACHINE_CONFIG_START( sailormn )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(sailormn_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
+
+	// could be a wachdog, but if it is then our watchdog address is incorrect as there are periods where the game doesn't write it.
+	MCFG_TIMER_DRIVER_ADD("startup", cave_state, sailormn_startup)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz) // Bidirectional Communication
 	MCFG_CPU_PROGRAM_MAP(sailormn_sound_map)
@@ -2613,7 +2730,7 @@ static MACHINE_CONFIG_START( sailormn, cave_state )
 //  MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
-	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
+	MCFG_MACHINE_RESET_OVERRIDE(cave_state,sailormn)
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, cave_vblank_start)
@@ -2634,17 +2751,76 @@ static MACHINE_CONFIG_START( sailormn, cave_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_16_ADD("soundlatch")
+
 	MCFG_YM2151_ADD("ymsnd", XTAL_16MHz/4)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_OKIM6295_ADD("oki1", 2112000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki1", 2112000, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, oki_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 
-	MCFG_OKIM6295_ADD("oki2", 2112000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki2", 2112000, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, oki2_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, oki2_map)
+
+
+MACHINE_CONFIG_END
+
+
+/***************************************************************************
+                            Tekken Card World
+***************************************************************************/
+
+static MACHINE_CONFIG_START( tekkencw )
+
+	MCFG_NVRAM_ADD_0FILL("nvram")
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_28MHz / 2)
+	MCFG_CPU_PROGRAM_MAP(tekkencw_map)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
+
+	MCFG_WATCHDOG_ADD("watchdog")
+	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(3))  /* a guess, and certainly wrong */
+
+	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
+	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
+
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_EEPROM_SERIAL_ENABLE_STREAMING()
+
+	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, cave_vblank_start)
+
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(15625/271.5)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(0x200, 240)
+	MCFG_SCREEN_VISIBLE_AREA(0x80, 0x80 + 0x140-1, 0, 240-1)
+	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update_cave)
+
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tjumpman)
+	MCFG_PALETTE_ADD("palette", 0x8000)
+	MCFG_PALETTE_INIT_OWNER(cave_state,cave)
+
+	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_1_layer)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_OKIM6295_ADD("oki1", XTAL_28MHz / 28, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+
+	// oki2 chip spot and rom socket are both unpopulated
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( tekkenbs, tekkencw )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(tekkenbs_map)
 MACHINE_CONFIG_END
 
 
@@ -2652,7 +2828,7 @@ MACHINE_CONFIG_END
                             Tobikose! Jumpman
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( tjumpman, cave_state )
+static MACHINE_CONFIG_START( tjumpman )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -2689,7 +2865,7 @@ static MACHINE_CONFIG_START( tjumpman, cave_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_OKIM6295_ADD("oki1", XTAL_28MHz / 28, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki1", XTAL_28MHz / 28, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
@@ -2701,7 +2877,7 @@ MACHINE_CONFIG_END
                                 Uo Poko
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( uopoko, cave_state )
+static MACHINE_CONFIG_START( uopoko )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
@@ -2747,14 +2923,14 @@ MACHINE_CONFIG_END
 /* 4 bits -> 8 bits. Even and odd pixels are swapped */
 void cave_state::unpack_sprites(const char *region)
 {
-	const UINT32 len    =   memregion(region)->bytes();
-	UINT8 *rgn          =   memregion(region)->base();
-	UINT8 *src          =   rgn + len / 2 - 1;
-	UINT8 *dst          =   rgn + len - 1;
+	const uint32_t len    =   memregion(region)->bytes();
+	uint8_t *rgn          =   memregion(region)->base();
+	uint8_t *src          =   rgn + len / 2 - 1;
+	uint8_t *dst          =   rgn + len - 1;
 
 	while(dst > src)
 	{
-		UINT8 data = *src--;
+		uint8_t data = *src--;
 		/* swap even and odd pixels */
 		*dst-- = data >> 4;     *dst-- = data & 0xF;
 	}
@@ -2764,17 +2940,17 @@ void cave_state::unpack_sprites(const char *region)
 /* 4 bits -> 8 bits. Even and odd pixels and even and odd words, are swapped */
 void cave_state::ddonpach_unpack_sprites(const char *region)
 {
-	const UINT32 len    =   memregion(region)->bytes();
-	UINT8 *rgn          =   memregion(region)->base();
-	UINT8 *src          =   rgn + len / 2 - 1;
-	UINT8 *dst          =   rgn + len - 1;
+	const uint32_t len    =   memregion(region)->bytes();
+	uint8_t *rgn          =   memregion(region)->base();
+	uint8_t *src          =   rgn + len / 2 - 1;
+	uint8_t *dst          =   rgn + len - 1;
 
 	while(dst > src)
 	{
-		UINT8 data1 = *src--;
-		UINT8 data2 = *src--;
-		UINT8 data3 = *src--;
-		UINT8 data4 = *src--;
+		uint8_t data1 = *src--;
+		uint8_t data2 = *src--;
+		uint8_t data3 = *src--;
+		uint8_t data4 = *src--;
 
 		/* swap even and odd pixels, and even and odd words */
 		*dst-- = data2 & 0xF;       *dst-- = data2 >> 4;
@@ -2788,13 +2964,13 @@ void cave_state::ddonpach_unpack_sprites(const char *region)
 /* 2 pages of 4 bits -> 8 bits */
 void cave_state::esprade_unpack_sprites(const char *region)
 {
-	UINT8 *src      =   memregion(region)->base();
-	UINT8 *dst      =   src + memregion(region)->bytes();
+	uint8_t *src      =   memregion(region)->base();
+	uint8_t *dst      =   src + memregion(region)->bytes();
 
 	while(src < dst)
 	{
-		UINT8 data1 = src[0];
-		UINT8 data2 = src[1];
+		uint8_t data1 = src[0];
+		uint8_t data2 = src[1];
 
 		src[0] = ((data1 & 0x0f)<<4) + (data2 & 0x0f);
 		src[1] = (data1 & 0xf0) + ((data2 & 0xf0)>>4);
@@ -2845,12 +3021,7 @@ BP962A.U77  23C16000    GFX
 
 ***************************************************************************/
 
-
-
-#define ROMS_AGALLET \
-	ROM_REGION( 0x400000, "maincpu", 0 ) \
-	ROM_LOAD16_WORD_SWAP( "bp962a.u45", 0x000000, 0x080000, CRC(24815046) SHA1(f5eeae60b923ae850b335e7898a2760407631d8b) ) \
-	\
+#define ROMS_AGALLET_COMMON \
 	ROM_REGION( 0x80000, "audiocpu", 0 ) \
 	ROM_LOAD( "bp962a.u9",  0x00000, 0x80000, CRC(06caddbe) SHA1(6a3cc50558ba19a31b21b7f3ec6c6e2846244ff1) ) \
 	\
@@ -2877,6 +3048,14 @@ BP962A.U77  23C16000    GFX
 	\
 	ROM_REGION( 0x200000, "oki2", 0 )   \
 	ROM_LOAD( "bp962a.u47", 0x000000, 0x200000, CRC(6d4e9737) SHA1(81c7ecdfc2d38d0b35e26745866f6672f566f936) )
+
+
+// these roms were dumped from a board set to Taiwanese region.
+#define ROMS_AGALLET \
+	ROM_REGION( 0x400000, "maincpu", 0 ) \
+	ROM_LOAD16_WORD_SWAP( "bp962a.u45", 0x000000, 0x080000, CRC(24815046) SHA1(f5eeae60b923ae850b335e7898a2760407631d8b) ) \
+	ROMS_AGALLET_COMMON
+
 /* the regions differ only in the EEPROM, hence the macro above - all EEPROMs are Factory Defaulted */
 ROM_START( agallet )
 	ROMS_AGALLET
@@ -2915,6 +3094,55 @@ ROM_END
 
 ROM_START( agalleth )
 	ROMS_AGALLET
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD16_WORD( "agallet_hongkong.nv", 0x0000, 0x0080, CRC(998d1a74) SHA1(13e7e27a18417949d49e97d521781fc0feeef792) )
+ROM_END
+
+// these roms were dumped from a board set to the Japanese region.
+#define ROMS_AGALLETA \
+	ROM_REGION( 0x400000, "maincpu", 0 ) \
+	ROM_LOAD16_WORD_SWAP( "u45", 0x000000, 0x080000, CRC(2cab18b0) SHA1(5e779b74d8520cb482697b5efba4746854e7c9fe) ) \
+	ROMS_AGALLET_COMMON
+
+/* the regions differ only in the EEPROM, hence the macro above - all EEPROMs are Factory Defaulted */
+ROM_START( agalleta )
+	ROMS_AGALLETA
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD16_WORD( "agallet_europe.nv", 0x0000, 0x0080, CRC(ec38bf65) SHA1(cb8d9eacc0cf55a0c6b187e6673e3354554314b5) )
+ROM_END
+
+ROM_START( agalletau )
+	ROMS_AGALLETA
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD16_WORD( "agallet_usa.nv", 0x0000, 0x0080, CRC(72e65056) SHA1(abf1a86df01064d9d5d8c418e8367817319ec335) )
+ROM_END
+
+ROM_START( agalletaj ) // the dumped board was this region
+	ROMS_AGALLETA
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD16_WORD( "agallet_japan.nv", 0x0000, 0x0080, CRC(0753f547) SHA1(aabb987470406b8729894108bc4d050f7200917d) )
+ROM_END
+
+ROM_START( agalletak )
+	ROMS_AGALLETA
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD16_WORD( "agallet_korea.nv", 0x0000, 0x0080, CRC(7f41c253) SHA1(50793d4da0ad6eb590941d26a729a1cf4b3c25c2) )
+ROM_END
+
+ROM_START( agalletat )
+	ROMS_AGALLETA
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD16_WORD( "agallet_taiwan.nv", 0x0000, 0x0080, CRC(0af46742) SHA1(37b704c4c573b2aabd6f016e9e8dd458f95148f7) )
+ROM_END
+
+ROM_START( agalletah )
+	ROMS_AGALLETA
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD16_WORD( "agallet_hongkong.nv", 0x0000, 0x0080, CRC(998d1a74) SHA1(13e7e27a18417949d49e97d521781fc0feeef792) )
@@ -3819,8 +4047,6 @@ U55
 
 ***************************************************************************/
 
-
-
 #define ROMS_MAZINGER \
 	ROM_REGION( 0x80000, "maincpu", 0 ) \
 	ROM_LOAD16_WORD_SWAP( "mzp-0.u24", 0x00000, 0x80000, CRC(43a4279f) SHA1(2c17eb31040bb7f1554bc1c9a968eec5e72af097) ) \
@@ -3843,6 +4069,7 @@ U55
 	\
 	ROM_REGION( 0x080000, "oki", 0 ) \
 	ROM_LOAD( "bp943a-4.u64", 0x000000, 0x080000, CRC(3fc7f29a) SHA1(feb21b918243c0a03dfa4a80cc80b86be4f62680) )
+
 /* the regions differ only in the EEPROM, hence the macro above - all EEPROMs are Factory Defaulted */
 ROM_START( mazinger )
 	ROMS_MAZINGER
@@ -4552,6 +4779,86 @@ ROM_END
 
 /***************************************************************************
 
+  Tekken Card World by Namco, 1997
+  Namco EMG4 platform, PCB 8824960101 (sticker: D 0049)
+
+  TMP 68HC000P-16
+
+  013 9651EX001
+  038 9701WX001
+
+  OKI M6295 (the second OKI location is unpopulated)
+
+  3V Button Battery
+  93C46 EEPROM (at U24)
+
+  28MHz XTAL
+
+***************************************************************************/
+
+ROM_START( tekkencw )
+	ROM_REGION( 0x80000, "maincpu", 0 )        /* 68000 code */
+	ROM_LOAD16_WORD_SWAP( "mpr0.u41", 0x00000, 0x80000, CRC(5b8919f3) SHA1(580298b6dc36527ab69889c848acab97726a6cc6) ) // 27c240
+
+	ROM_REGION( 0x100000 * 2, "sprites0", 0 )        /* Sprites: * 2 */
+	ROM_LOAD16_BYTE( "obj0.u52", 0x00000, 0x80000, CRC(6d3c0c76) SHA1(92f9c9beae222a2c2a3242f812030e08036c9963) ) // 27c040
+	ROM_LOAD16_BYTE( "obj1.u53", 0x00001, 0x80000, CRC(8069b731) SHA1(9f0409c28466503092b74f635602962d9f127de8) ) // ""
+
+	ROM_REGION( 0x80000, "layer0", 0 )  /* Layer 0 */
+	ROM_LOAD( "cha0.u60", 0x00000, 0x40000, CRC(2a245ade) SHA1(7217017975c88c3edea613152ee6f2158f8777d7) ) // 27c020
+	ROM_LOAD( "cha1.u61", 0x40000, 0x40000, CRC(43f62cce) SHA1(aa12ed0ccb94115ff8f9acf17850e1186c68bcf9) ) // ""
+
+	ROM_REGION( 0x40000, "oki1", 0 )    /* OKIM6295 #1 Samples */
+	ROM_LOAD( "voi0.u27", 0x00000, 0x40000, CRC(3bcd9b7d) SHA1(7ecb47127733187f385a75b9db655e35c249de18) ) // 27c020
+
+	ROM_REGION( 0x117 * 2, "plds", 0 )
+	ROM_LOAD( "n44u1d.u1", 0x117*0, 0x117, NO_DUMP )   // GAL16V8D-15LP
+	ROM_LOAD( "n44u3a.u3", 0x117*1, 0x117, NO_DUMP )   // GAL16V8D-15LP
+ROM_END
+
+
+/***************************************************************************
+
+  Tekken Battle Scratch by Namco, 1998
+  Namco EMG4 platform, PCB 8824960101 (sticker: D 0880)
+
+  TMP 68HC000P-16
+
+  013 9????????
+  038 9748WX001
+
+  OKI M6295 (the second OKI location is unpopulated)
+
+  3V Button Battery
+  93C46 EEPROM (at U24)
+
+  28MHz XTAL
+
+***************************************************************************/
+
+ROM_START( tekkenbs )
+	ROM_REGION( 0x80000, "maincpu", 0 )        /* 68000 code */
+	ROM_LOAD16_WORD_SWAP( "tbs1_mpr-0a.u41", 0x00000, 0x80000, CRC(625487d3) SHA1(6bdc0f0f9877eeb1041f8f5b0d44e41b83ddcc76) ) // 27c4002
+
+	ROM_REGION( 0x100000 * 2, "sprites0", 0 )        /* Sprites: * 2 */
+	ROM_LOAD16_BYTE( "tbs1_obj-0a.u52", 0x00000, 0x80000, CRC(a870481b) SHA1(644370e10b197832ee828b22e43f114d40740432) ) // 27c4001
+	ROM_LOAD16_BYTE( "tbs1_obj-1a.u53", 0x00001, 0x80000, CRC(73d8f520) SHA1(70ab5abeeaf0b3f5a263a7ece21d000a27148994) ) // ""
+
+	ROM_REGION( 0x100000, "layer0", 0 )  /* Layer 0 */
+	ROM_LOAD( "tbs1_cha-0a.u60", 0x00000, 0x80000, CRC(73e5c069) SHA1(5e4e8a0bc1fdf57e4cdf7075704dc0b60d9629e3) ) // 27c4001
+	ROM_LOAD( "tbs1_cha-1a.u61", 0x80000, 0x80000, CRC(f41d3f2f) SHA1(d44f1506110fe9b7ef74ca05874146526ddaf020) ) // ""
+
+	ROM_REGION( 0x40000, "oki1", 0 )    /* OKIM6295 #1 Samples */
+	ROM_LOAD( "tbs1_voi-0a.u27", 0x00000, 0x40000, CRC(bdccb92e) SHA1(7efcce4028fe492891e6f47b266d68a22dbe4c63) ) // 27c2001
+
+	ROM_REGION( 0x117 * 2, "plds", 0 )
+	ROM_LOAD( "n44u1e.u1", 0x117*0, 0x117, NO_DUMP )   // GAL16V8D-15LP
+	ROM_LOAD( "n44u3e.u3", 0x117*1, 0x117, NO_DUMP )   // GAL16V8D-15LP
+ROM_END
+
+
+/***************************************************************************
+
   Tobikose! Jumpman by Namco, 1999
   Namco EMG4 platform, PCB TJ0476
 
@@ -4661,14 +4968,14 @@ ROM_END
    Expand the 2 bit part into a 4 bit layout, so we can decode it */
 void cave_state::sailormn_unpack_tiles( const char *region )
 {
-	const UINT32 len    =   memregion(region)->bytes();
-	UINT8 *rgn      =   memregion(region)->base();
-	UINT8 *src      =   rgn + (len/4)*3 - 1;
-	UINT8 *dst      =   rgn + (len/4)*4 - 2;
+	const uint32_t len    =   memregion(region)->bytes();
+	uint8_t *rgn      =   memregion(region)->base();
+	uint8_t *src      =   rgn + (len/4)*3 - 1;
+	uint8_t *dst      =   rgn + (len/4)*4 - 2;
 
 	while(src <= dst)
 	{
-		UINT8 data = src[0];
+		uint8_t data = src[0];
 
 		dst[0] = ((data & 0x03) << 4) + ((data & 0x0c) >> 2);
 		dst[1] = ((data & 0x30) >> 0) + ((data & 0xc0) >> 6);
@@ -4690,7 +4997,7 @@ void cave_state::init_cave()
 
 DRIVER_INIT_MEMBER(cave_state,agallet)
 {
-	UINT8 *ROM = memregion("audiocpu")->base();
+	uint8_t *ROM = memregion("audiocpu")->base();
 	init_cave();
 
 	membank("z80bank")->configure_entries(0, 0x20, &ROM[0x00000], 0x4000);
@@ -4752,7 +5059,7 @@ DRIVER_INIT_MEMBER(cave_state,esprade)
 
 #if 0       //ROM PATCH
 	{
-		UINT16 *rom = (UINT16 *)memregion("maincpu")->base();
+		uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 		rom[0x118A/2] = 0x4e71;         //palette fix   118A: 5548              SUBQ.W  #2,A0       --> NOP
 	}
 #endif
@@ -4779,7 +5086,7 @@ DRIVER_INIT_MEMBER(cave_state,guwange)
 
 DRIVER_INIT_MEMBER(cave_state,hotdogst)
 {
-	UINT8 *ROM = memregion("audiocpu")->base();
+	uint8_t *ROM = memregion("audiocpu")->base();
 
 	init_cave();
 
@@ -4796,8 +5103,8 @@ DRIVER_INIT_MEMBER(cave_state,hotdogst)
 
 DRIVER_INIT_MEMBER(cave_state,mazinger)
 {
-	UINT8 *ROM = memregion("audiocpu")->base();
-	UINT8 *src = memregion("sprites0")->base();
+	uint8_t *ROM = memregion("audiocpu")->base();
+	uint8_t *src = memregion("sprites0")->base();
 	int len = memregion("sprites0")->bytes();
 
 	init_cave();
@@ -4809,7 +5116,7 @@ DRIVER_INIT_MEMBER(cave_state,mazinger)
 	membank("okibank2")->configure_entries(0, 4, &ROM[0x00000], 0x20000);
 
 	/* decrypt sprites */
-	dynamic_buffer buffer(len);
+	std::vector<uint8_t> buffer(len);
 	{
 		int i;
 		for (i = 0; i < len; i++)
@@ -4825,7 +5132,7 @@ DRIVER_INIT_MEMBER(cave_state,mazinger)
 
 DRIVER_INIT_MEMBER(cave_state,metmqstr)
 {
-	UINT8 *ROM = memregion("audiocpu")->base();
+	uint8_t *ROM = memregion("audiocpu")->base();
 
 	init_cave();
 
@@ -4862,8 +5169,8 @@ DRIVER_INIT_MEMBER(cave_state,ppsatan)
 
 DRIVER_INIT_MEMBER(cave_state,pwrinst2j)
 {
-	UINT8 *ROM = memregion("audiocpu")->base();
-	UINT8 *src = memregion("sprites0")->base();
+	uint8_t *ROM = memregion("audiocpu")->base();
+	uint8_t *src = memregion("sprites0")->base();
 	int len = memregion("sprites0")->bytes();
 	int i, j;
 
@@ -4871,7 +5178,7 @@ DRIVER_INIT_MEMBER(cave_state,pwrinst2j)
 
 	membank("z80bank")->configure_entries(0, 8, &ROM[0x00000], 0x4000);
 
-	dynamic_buffer buffer(len);
+	std::vector<uint8_t> buffer(len);
 	{
 		for(i = 0; i < len/2; i++)
 		{
@@ -4898,7 +5205,7 @@ DRIVER_INIT_MEMBER(cave_state,pwrinst2)
 
 #if 1       //ROM PATCH
 	{
-		UINT16 *rom = (UINT16 *)memregion("maincpu")->base();
+		uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 		rom[0xd46c / 2] = 0xd482;           // kurara dash fix  0xd400 -> 0xd482
 	}
 #endif
@@ -4907,8 +5214,8 @@ DRIVER_INIT_MEMBER(cave_state,pwrinst2)
 
 DRIVER_INIT_MEMBER(cave_state,sailormn)
 {
-	UINT8 *ROM = memregion("audiocpu")->base();
-	UINT8 *src = memregion("sprites0")->base();
+	uint8_t *ROM = memregion("audiocpu")->base();
+	uint8_t *src = memregion("sprites0")->base();
 	int len = memregion("sprites0")->bytes();
 
 	init_cave();
@@ -4924,7 +5231,7 @@ DRIVER_INIT_MEMBER(cave_state,sailormn)
 	membank("oki2bank2")->configure_entries(0, 0x10, &ROM[0x00000], 0x20000);
 
 	/* decrypt sprites */
-	dynamic_buffer buffer(len);
+	std::vector<uint8_t> buffer(len);
 	{
 		int i;
 		for (i = 0; i < len; i++)
@@ -4989,77 +5296,87 @@ DRIVER_INIT_MEMBER(cave_state,korokoro)
 
 ***************************************************************************/
 
-GAME( 1994, pwrinst2,   0,        pwrinst2, metmqstr, cave_state, pwrinst2, ROT0,   "Atlus",                                  "Power Instinct 2 (US, Ver. 94/04/08)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1994, pwrinst2j,  pwrinst2, pwrinst2, metmqstr, cave_state, pwrinst2j,ROT0,   "Atlus",                                  "Gouketsuji Ichizoku 2 (Japan, Ver. 94/04/08)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, pwrinst2,    0,        pwrinst2, metmqstr, cave_state, pwrinst2,  ROT0,   "Atlus",                                  "Power Instinct 2 (US, Ver. 94/04/08)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1994, pwrinst2j,   pwrinst2, pwrinst2, metmqstr, cave_state, pwrinst2j, ROT0,   "Atlus",                                  "Gouketsuji Ichizoku 2 (Japan, Ver. 94/04/08)", MACHINE_SUPPORTS_SAVE )
 
 // The EEPROM determines the region, program roms are the same between sets
-GAME( 1994, mazinger,   0,        mazinger, cave, cave_state,     mazinger, ROT90,  "Banpresto / Dynamic Pl. Toei Animation", "Mazinger Z (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, mazingerj,  mazinger, mazinger, cave, cave_state,     mazinger, ROT90,  "Banpresto / Dynamic Pl. Toei Animation", "Mazinger Z (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, mazinger,    0,        mazinger, cave,     cave_state, mazinger,  ROT90,  "Banpresto / Dynamic Pl. Toei Animation", "Mazinger Z (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, mazingerj,   mazinger, mazinger, cave,     cave_state, mazinger,  ROT90,  "Banpresto / Dynamic Pl. Toei Animation", "Mazinger Z (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1995, donpachi,   0,        donpachi, cave, cave_state,     donpachi, ROT270, "Cave (Atlus license)",                   "DonPachi (US)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1995, donpachij,  donpachi, donpachi, cave, cave_state,     donpachi, ROT270, "Cave (Atlus license)",                   "DonPachi (Japan)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1995, donpachikr, donpachi, donpachi, cave, cave_state,     donpachi, ROT270, "Cave (Atlus license)",                   "DonPachi (Korea)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1995, donpachihk, donpachi, donpachi, cave, cave_state,     donpachi, ROT270, "Cave (Atlus license)",                   "DonPachi (Hong Kong)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, donpachi,    0,        donpachi, cave,     cave_state, donpachi,  ROT270, "Cave (Atlus license)",                   "DonPachi (US)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1995, donpachij,   donpachi, donpachi, cave,     cave_state, donpachi,  ROT270, "Cave (Atlus license)",                   "DonPachi (Japan)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1995, donpachikr,  donpachi, donpachi, cave,     cave_state, donpachi,  ROT270, "Cave (Atlus license)",                   "DonPachi (Korea)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1995, donpachihk,  donpachi, donpachi, cave,     cave_state, donpachi,  ROT270, "Cave (Atlus license)",                   "DonPachi (Hong Kong)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1995, metmqstr,   0,        metmqstr, metmqstr, cave_state, metmqstr, ROT0,   "Banpresto / Pandorabox",                 "Metamoqester (International)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1995, nmaster,    metmqstr, metmqstr, metmqstr, cave_state, metmqstr, ROT0,   "Banpresto / Pandorabox",                 "Oni - The Ninja Master (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, metmqstr,    0,        metmqstr, metmqstr, cave_state, metmqstr,  ROT0,   "Banpresto / Pandorabox",                 "Metamoqester (International)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1995, nmaster,     metmqstr, metmqstr, metmqstr, cave_state, metmqstr,  ROT0,   "Banpresto / Pandorabox",                 "Oni - The Ninja Master (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1995, plegends,   0,        pwrinst2, metmqstr, cave_state, pwrinst2j,ROT0,   "Atlus",                                  "Gogetsuji Legends (US, Ver. 95/06/20)",                       MACHINE_SUPPORTS_SAVE )
-GAME( 1995, plegendsj,  plegends, pwrinst2, metmqstr, cave_state, pwrinst2j,ROT0,   "Atlus",                                  "Gouketsuji Gaiden - Saikyou Densetsu (Japan, Ver. 95/06/20)", MACHINE_SUPPORTS_SAVE )
-
-// The EEPROM determines the region, program roms are the same between sets
-GAME( 1995, sailormn,   0,        sailormn, cave, cave_state,     sailormn, ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Ver. 95/03/22B, Europe)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1995, sailormnu,  sailormn, sailormn, cave, cave_state,     sailormn, ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Ver. 95/03/22B, USA)",       MACHINE_SUPPORTS_SAVE )
-GAME( 1995, sailormnj,  sailormn, sailormn, cave, cave_state,     sailormn, ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Ver. 95/03/22B, Japan)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1995, sailormnk,  sailormn, sailormn, cave, cave_state,     sailormn, ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Ver. 95/03/22B, Korea)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1995, sailormnt,  sailormn, sailormn, cave, cave_state,     sailormn, ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Ver. 95/03/22B, Taiwan)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1995, sailormnh,  sailormn, sailormn, cave, cave_state,     sailormn, ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Ver. 95/03/22B, Hong Kong)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, sailormno,  sailormn, sailormn, cave, cave_state,     sailormn, ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Ver. 95/03/22, Europe)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1995, sailormnou, sailormn, sailormn, cave, cave_state,     sailormn, ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Ver. 95/03/22, USA)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1995, sailormnoj, sailormn, sailormn, cave, cave_state,     sailormn, ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Ver. 95/03/22, Japan)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1995, sailormnok, sailormn, sailormn, cave, cave_state,     sailormn, ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Ver. 95/03/22, Korea)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1995, sailormnot, sailormn, sailormn, cave, cave_state,     sailormn, ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Ver. 95/03/22, Taiwan)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1995, sailormnoh, sailormn, sailormn, cave, cave_state,     sailormn, ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Ver. 95/03/22, Hong Kong)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1995, plegends,    0,        pwrinst2, metmqstr, cave_state, pwrinst2j, ROT0,   "Atlus",                                  "Gogetsuji Legends (US, Ver. 95/06/20)",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1995, plegendsj,   plegends, pwrinst2, metmqstr, cave_state, pwrinst2j, ROT0,   "Atlus",                                  "Gouketsuji Gaiden - Saikyou Densetsu (Japan, Ver. 95/06/20)", MACHINE_SUPPORTS_SAVE )
 
 // The EEPROM determines the region, program roms are the same between sets
-GAME( 1996, agallet,    0,        sailormn, cave, cave_state,     agallet,  ROT270, "Gazelle (Banpresto license)",            "Air Gallet (Europe)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1996, agalletu,   agallet,  sailormn, cave, cave_state,     agallet,  ROT270, "Gazelle (Banpresto license)",            "Air Gallet (USA)",       MACHINE_SUPPORTS_SAVE )
-GAME( 1996, agalletj,   agallet,  sailormn, cave, cave_state,     agallet,  ROT270, "Gazelle (Banpresto license)",            "Akuu Gallet (Japan)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1996, agalletk,   agallet,  sailormn, cave, cave_state,     agallet,  ROT270, "Gazelle (Banpresto license)",            "Air Gallet (Korea)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1996, agallett,   agallet,  sailormn, cave, cave_state,     agallet,  ROT270, "Gazelle (Banpresto license)",            "Air Gallet (Taiwan)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1996, agalleth,   agallet,  sailormn, cave, cave_state,     agallet,  ROT270, "Gazelle (Banpresto license)",            "Air Gallet (Hong Kong)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, sailormn,    0,        sailormn, cave,     cave_state, sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Ver. 95/03/22B, Europe)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1995, sailormnu,   sailormn, sailormn, cave,     cave_state, sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Ver. 95/03/22B, USA)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1995, sailormnj,   sailormn, sailormn, cave,     cave_state, sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Ver. 95/03/22B, Japan)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1995, sailormnk,   sailormn, sailormn, cave,     cave_state, sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Ver. 95/03/22B, Korea)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1995, sailormnt,   sailormn, sailormn, cave,     cave_state, sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Ver. 95/03/22B, Taiwan)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1995, sailormnh,   sailormn, sailormn, cave,     cave_state, sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Ver. 95/03/22B, Hong Kong)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, sailormno,   sailormn, sailormn, cave,     cave_state, sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Ver. 95/03/22, Europe)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1995, sailormnou,  sailormn, sailormn, cave,     cave_state, sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Ver. 95/03/22, USA)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1995, sailormnoj,  sailormn, sailormn, cave,     cave_state, sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Ver. 95/03/22, Japan)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1995, sailormnok,  sailormn, sailormn, cave,     cave_state, sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Ver. 95/03/22, Korea)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1995, sailormnot,  sailormn, sailormn, cave,     cave_state, sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Ver. 95/03/22, Taiwan)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1995, sailormnoh,  sailormn, sailormn, cave,     cave_state, sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Ver. 95/03/22, Hong Kong)",  MACHINE_SUPPORTS_SAVE )
 
-GAME( 1996, hotdogst,   0,        hotdogst, cave, cave_state,     hotdogst, ROT90,  "Marble",                                 "Hotdog Storm (International)", MACHINE_SUPPORTS_SAVE )
+// The EEPROM determines the region, program roms are the same between sets
+GAME( 1996, agallet,     0,        sailormn, cave,     cave_state, agallet,   ROT270, "Gazelle (Banpresto license)",            "Air Gallet (Europe)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1996, agalletu,    agallet,  sailormn, cave,     cave_state, agallet,   ROT270, "Gazelle (Banpresto license)",            "Air Gallet (USA)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1996, agalletj,    agallet,  sailormn, cave,     cave_state, agallet,   ROT270, "Gazelle (Banpresto license)",            "Akuu Gallet (Japan)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1996, agalletk,    agallet,  sailormn, cave,     cave_state, agallet,   ROT270, "Gazelle (Banpresto license)",            "Air Gallet (Korea)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1996, agallett,    agallet,  sailormn, cave,     cave_state, agallet,   ROT270, "Gazelle (Banpresto license)",            "Air Gallet (Taiwan)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1996, agalleth,    agallet,  sailormn, cave,     cave_state, agallet,   ROT270, "Gazelle (Banpresto license)",            "Air Gallet (Hong Kong)", MACHINE_SUPPORTS_SAVE )
+// this set appears to be older, there is some kind of reset circuit / watchdog circuit check on startup, the same check exists in the above set but the code skips over it so presumably it was removed
+// to avoid boards simply hanging on a black screen if the circuit didn't fire.
+GAME( 1996, agalleta,    agallet,  sailormn, cave,     cave_state, agallet,   ROT270, "Gazelle (Banpresto license)",            "Air Gallet (older, Europe)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1996, agalletau,   agallet,  sailormn, cave,     cave_state, agallet,   ROT270, "Gazelle (Banpresto license)",            "Air Gallet (older, USA)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1996, agalletaj,   agallet,  sailormn, cave,     cave_state, agallet,   ROT270, "Gazelle (Banpresto license)",            "Akuu Gallet (older, Japan)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1996, agalletak,   agallet,  sailormn, cave,     cave_state, agallet,   ROT270, "Gazelle (Banpresto license)",            "Air Gallet (older, Korea)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1996, agalletat,   agallet,  sailormn, cave,     cave_state, agallet,   ROT270, "Gazelle (Banpresto license)",            "Air Gallet (older, Taiwan)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1996, agalletah,   agallet,  sailormn, cave,     cave_state, agallet,   ROT270, "Gazelle (Banpresto license)",            "Air Gallet (older, Hong Kong)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1996, pacslot,    0,        pacslot,  pacslot, cave_state,  tjumpman, ROT0,   "Namco",                                  "Pac-Slot", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, hotdogst,    0,        hotdogst, cave,     cave_state, hotdogst,  ROT90,  "Marble",                                 "Hotdog Storm (International)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1996, ppsatan,    0,        ppsatan,  ppsatan, cave_state,  ppsatan,  ROT0,   "Kato Seisakujo Co., Ltd.",               "Poka Poka Satan (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, pacslot,     0,        pacslot,  pacslot,  cave_state, tjumpman,  ROT0,   "Namco",                                  "Pac-Slot", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1997, ddonpach,   0,        ddonpach, cave, cave_state,     ddonpach, ROT270, "Cave (Atlus license)",                   "DoDonPachi (International, Master Ver. 97/02/05)", MACHINE_SUPPORTS_SAVE )
-GAME( 1997, ddonpachj,  ddonpach, ddonpach, cave, cave_state,     ddonpach, ROT270, "Cave (Atlus license)",                   "DoDonPachi (Japan, Master Ver. 97/02/05)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1996, ppsatan,     0,        ppsatan,  ppsatan,  cave_state, ppsatan,   ROT0,   "Kato Seisakujo Co., Ltd.",               "Poka Poka Satan (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+
+GAME( 1997, tekkencw,    0,        tekkencw, tekkencw, cave_state, tjumpman,  ROT0,   "Namco",                                  "Tekken Card World",     MACHINE_SUPPORTS_SAVE )
+GAME( 1998, tekkenbs,    0,        tekkenbs, tekkenbs, cave_state, tjumpman,  ROT0,   "Namco",                                  "Tekken Battle Scratch", MACHINE_SUPPORTS_SAVE )
+
+GAME( 1997, ddonpach,    0,        ddonpach, cave,     cave_state, ddonpach,  ROT270, "Cave (Atlus license)",                   "DoDonPachi (International, Master Ver. 97/02/05)", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, ddonpachj,   ddonpach, ddonpach, cave,     cave_state, ddonpach,  ROT270, "Cave (Atlus license)",                   "DoDonPachi (Japan, Master Ver. 97/02/05)",         MACHINE_SUPPORTS_SAVE )
 // NOT an official CAVE release, but several PCBs have been converted to it and used on location.
-GAME( 2012, ddonpacha,  ddonpach, ddonpach, cave, cave_state,     ddonpach, ROT270, "hack (trap15)",                          "DoDonPachi (2012/02/12 Arrange Ver. 1.1) (hack)",     MACHINE_SUPPORTS_SAVE )
+GAME( 2012, ddonpacha,   ddonpach, ddonpach, cave,     cave_state, ddonpach,  ROT270, "hack (trap15)",                          "DoDonPachi (2012/02/12 Arrange Ver. 1.1) (hack)",  MACHINE_SUPPORTS_SAVE )
 
+GAME( 1998, dfeveron,    feversos, dfeveron, cave,     cave_state, dfeveron,  ROT270, "Cave (Nihon System license)",            "Dangun Feveron (Japan, Ver. 98/09/17)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1998, feversos,    0,        dfeveron, cave,     cave_state, feversos,  ROT270, "Cave (Nihon System license)",            "Fever SOS (International, Ver. 98/09/25)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1998, dfeveron,   feversos, dfeveron, cave, cave_state,     dfeveron, ROT270, "Cave (Nihon System license)",            "Dangun Feveron (Japan, Ver. 98/09/17)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1998, feversos,   0,        dfeveron, cave, cave_state,     feversos, ROT270, "Cave (Nihon System license)",            "Fever SOS (International, Ver. 98/09/25)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, esprade,     0,        esprade,  cave,     cave_state, esprade,   ROT270, "Cave (Atlus license)",                   "ESP Ra.De. (International, Ver. 98/04/22)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, espradej,    esprade,  esprade,  cave,     cave_state, esprade,   ROT270, "Cave (Atlus license)",                   "ESP Ra.De. (Japan, Ver. 98/04/21)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1998, espradejo,   esprade,  esprade,  cave,     cave_state, esprade,   ROT270, "Cave (Atlus license)",                   "ESP Ra.De. (Japan, Ver. 98/04/14)",         MACHINE_SUPPORTS_SAVE )
 
-GAME( 1998, esprade,    0,        esprade,  cave, cave_state,     esprade,  ROT270, "Cave (Atlus license)",                   "ESP Ra.De. (International, Ver. 98/04/22)", MACHINE_SUPPORTS_SAVE )
-GAME( 1998, espradej,   esprade,  esprade,  cave, cave_state,     esprade,  ROT270, "Cave (Atlus license)",                   "ESP Ra.De. (Japan, Ver. 98/04/21)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1998, espradejo,  esprade,  esprade,  cave, cave_state,     esprade,  ROT270, "Cave (Atlus license)",                   "ESP Ra.De. (Japan, Ver. 98/04/14)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1998, uopoko,      0,        uopoko,   cave,     cave_state, uopoko,    ROT0,   "Cave (Jaleco license)",                  "Puzzle Uo Poko (International)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, uopokoj,     uopoko,   uopoko,   cave,     cave_state, uopoko,    ROT0,   "Cave (Jaleco license)",                  "Puzzle Uo Poko (Japan)",         MACHINE_SUPPORTS_SAVE )
 
-GAME( 1998, uopoko,     0,        uopoko,   cave, cave_state,     uopoko,   ROT0,   "Cave (Jaleco license)",                  "Puzzle Uo Poko (International)", MACHINE_SUPPORTS_SAVE )
-GAME( 1998, uopokoj,    uopoko,   uopoko,   cave, cave_state,     uopoko,   ROT0,   "Cave (Jaleco license)",                  "Puzzle Uo Poko (Japan)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1999, guwange,     0,        guwange,  guwange,  cave_state, guwange,   ROT270, "Cave (Atlus license)",                   "Guwange (Japan, Master Ver. 99/06/24)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1999, guwanges,    guwange,  guwange,  guwange,  cave_state, guwange,   ROT270, "Cave (Atlus license)",                   "Guwange (Japan, Special Ver. 00/07/07)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1999, guwange,    0,        guwange,  guwange, cave_state,  guwange,  ROT270, "Cave (Atlus license)",                   "Guwange (Japan, Master Ver. 99/06/24)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1999, guwanges,   guwange,  guwange,  guwange, cave_state,  guwange,  ROT270, "Cave (Atlus license)",                   "Guwange (Japan, Special Ver. 00/07/07)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, gaia,        0,        gaia,     gaia,     cave_state, gaia,      ROT0,   "Noise Factory",                          "Gaia Crusaders", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) // cuts out occasionally
 
-GAME( 1999, gaia,       0,        gaia,     gaia, cave_state,     gaia,     ROT0,   "Noise Factory",                          "Gaia Crusaders", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) // cuts out occasionally
+GAME( 1999, korokoro,    0,        korokoro, korokoro, cave_state, korokoro,  ROT0,   "Takumi",                                 "Koro Koro Quest (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1999, korokoro,   0,        korokoro, korokoro, cave_state, korokoro, ROT0,   "Takumi",                                 "Koro Koro Quest (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, crusherm,    0,        crusherm, korokoro, cave_state, korokoro,  ROT0,   "Takumi",                                 "Crusher Makochan (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1999, crusherm,   0,        crusherm, korokoro, cave_state, korokoro, ROT0,   "Takumi",                                 "Crusher Makochan (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, tjumpman,    0,        tjumpman, tjumpman, cave_state, tjumpman,  ROT0,   "Namco",                                  "Tobikose! Jumpman", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1999, tjumpman,   0,        tjumpman, tjumpman, cave_state, tjumpman, ROT0,   "Namco",                                  "Tobikose! Jumpman", MACHINE_SUPPORTS_SAVE )
-
-GAME( 2001, theroes,    0,        gaia,     theroes, cave_state,  gaia,     ROT0,   "Primetek Investments",                   "Thunder Heroes", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) // cuts out occasionally
+GAME( 2001, theroes,     0,        gaia,     theroes,  cave_state, gaia,      ROT0,   "Primetek Investments",                   "Thunder Heroes", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) // cuts out occasionally

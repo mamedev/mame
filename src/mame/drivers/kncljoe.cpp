@@ -28,17 +28,18 @@ Updates:
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "cpu/m6800/m6800.h"
-#include "sound/ay8910.h"
-#include "sound/sn76496.h"
 #include "includes/kncljoe.h"
+
+#include "cpu/z80/z80.h"
+#include "cpu/m6800/m6801.h"
+#include "sound/sn76496.h"
+#include "speaker.h"
 
 
 WRITE8_MEMBER(kncljoe_state::sound_cmd_w)
 {
 	if ((data & 0x80) == 0)
-		soundlatch_byte_w(space, 0, data & 0x7f);
+		m_soundlatch->write(space, 0, data & 0x7f);
 	else
 		m_soundcpu->set_input_line(0, ASSERT_LINE);
 }
@@ -70,24 +71,20 @@ WRITE8_MEMBER(kncljoe_state::m6803_port1_w)
 
 WRITE8_MEMBER(kncljoe_state::m6803_port2_w)
 {
-	ay8910_device *ay8910 = machine().device<ay8910_device>("aysnd");
-
 	/* write latch */
 	if ((m_port2 & 0x01) && !(data & 0x01))
 	{
 		/* control or data port? */
 		if (m_port2 & 0x08)
-			ay8910->data_address_w(space, m_port2 >> 2, m_port1);
+			m_ay8910->data_address_w(space, m_port2 >> 2, m_port1);
 	}
 	m_port2 = data;
 }
 
 READ8_MEMBER(kncljoe_state::m6803_port1_r)
 {
-	ay8910_device *ay8910 = machine().device<ay8910_device>("aysnd");
-
 	if (m_port2 & 0x08)
-		return ay8910->data_r(space, 0);
+		return m_ay8910->data_r(space, 0);
 	return 0xff;
 }
 
@@ -255,7 +252,7 @@ void kncljoe_state::machine_reset()
 	m_flipscreen = 0;
 }
 
-static MACHINE_CONFIG_START( kncljoe, kncljoe_state )
+static MACHINE_CONFIG_START( kncljoe )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_6MHz)  /* verified on pcb */
@@ -286,8 +283,10 @@ static MACHINE_CONFIG_START( kncljoe, kncljoe_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_3_579545MHz/4) /* verified on pcb */
-	MCFG_AY8910_PORT_A_READ_CB(READ8(driver_device, soundlatch_byte_r))
+	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(kncljoe_state, unused_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
@@ -398,6 +397,6 @@ ROM_END
 
 
 
-GAME( 1985, kncljoe,  0,       kncljoe, kncljoe, driver_device, 0, ROT0, "Seibu Kaihatsu (Taito license)", "Knuckle Joe (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, kncljoea, kncljoe, kncljoe, kncljoe, driver_device, 0, ROT0, "Seibu Kaihatsu (Taito license)", "Knuckle Joe (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, bcrusher, kncljoe, kncljoe, kncljoe, driver_device, 0, ROT0, "bootleg",                        "Bone Crusher", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, kncljoe,  0,       kncljoe, kncljoe, kncljoe_state, 0, ROT0, "Seibu Kaihatsu (Taito license)", "Knuckle Joe (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, kncljoea, kncljoe, kncljoe, kncljoe, kncljoe_state, 0, ROT0, "Seibu Kaihatsu (Taito license)", "Knuckle Joe (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, bcrusher, kncljoe, kncljoe, kncljoe, kncljoe_state, 0, ROT0, "bootleg",                        "Bone Crusher", MACHINE_SUPPORTS_SAVE )

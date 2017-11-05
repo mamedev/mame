@@ -639,20 +639,24 @@
 
 ***********************************************************************************/
 
+#include "emu.h"
+#include "includes/calomega.h"
+
+#include "cpu/m6502/m6502.h"
+#include "cpu/m6502/m65c02.h"
+#include "machine/6821pia.h"
+#include "machine/nvram.h"
+#include "sound/ay8910.h"
+#include "video/mc6845.h"
+
+#include "screen.h"
+#include "speaker.h"
+
 
 #define MASTER_CLOCK    XTAL_10MHz
 #define CPU_CLOCK   (MASTER_CLOCK/16)
 #define UART_CLOCK  (MASTER_CLOCK/16)
 #define SND_CLOCK   (MASTER_CLOCK/8)
-
-#include "emu.h"
-#include "cpu/m6502/m6502.h"
-#include "cpu/m6502/m65c02.h"
-#include "video/mc6845.h"
-#include "machine/6821pia.h"
-#include "machine/nvram.h"
-#include "sound/ay8910.h"
-#include "includes/calomega.h"
 
 
 /**************************************************
@@ -661,7 +665,7 @@
 
 WRITE_LINE_MEMBER(calomega_state::update_aciabaud_scale)
 {
-	UINT8 dsw2 = m_sw2->read();
+	uint8_t dsw2 = m_sw2->read();
 
 	m_aciabaud->set_clock_scale((double)dsw2 / 128);
 }
@@ -843,7 +847,7 @@ static ADDRESS_MAP_START( s903mod_map, AS_PROGRAM, 8, calomega_state )
 	AM_RANGE(0x08c8, 0x08cb) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
 	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(calomega_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x1400, 0x17ff) AM_RAM_WRITE(calomega_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x1800, 0xffff) AM_ROM
+	AM_RANGE(0x1800, 0x3fff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sys905_map, AS_PROGRAM, 8, calomega_state )
@@ -856,7 +860,7 @@ static ADDRESS_MAP_START( sys905_map, AS_PROGRAM, 8, calomega_state )
 	AM_RANGE(0x10c8, 0x10cb) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
 	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE(calomega_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x2400, 0x27ff) AM_RAM_WRITE(calomega_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x2800, 0xffff) AM_ROM
+	AM_RANGE(0x2800, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sys906_map, AS_PROGRAM, 8, calomega_state )
@@ -2564,7 +2568,7 @@ WRITE_LINE_MEMBER(calomega_state::write_acia_clock)
 *                Machine Drivers                 *
 *************************************************/
 
-static MACHINE_CONFIG_START( sys903, calomega_state )
+static MACHINE_CONFIG_START( sys903 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, CPU_CLOCK)   /* confirmed */
 	MCFG_CPU_PROGRAM_MAP(sys903_map)
@@ -3665,7 +3669,7 @@ DRIVER_INIT_MEMBER(calomega_state,comg080)
 	   Start = $2042;  NMI = $26f8;
 	   Also a fake vector at $3ff8-$3ff9. The code checks these values to continue.
 	*/
-	UINT8 *PRGROM = memregion( "maincpu" )->base();
+	uint8_t *PRGROM = memregion( "maincpu" )->base();
 
 	PRGROM[0x3ff8] = 0x8e; /* checked by code */
 	PRGROM[0x3ff9] = 0x97; /* checked by code */
@@ -3716,7 +3720,7 @@ GAME( 1985, comg240,  0,        sys903,   gdrwpkrh, calomega_state, sys903,  ROT
 GAME( 1985, comg246,  0,        sys905,   stand905, calomega_state, sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 24.6 (Hotline)",                           MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1985, comg272a, 0,        sys903,   stand903, calomega_state, sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 27.2 (Keno, amusement)",                   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1985, comg272b, 0,        sys903,   stand903, calomega_state, sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 27.2 (Keno, gaming)",                      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 198?, comg5108, 0,        sys906,   stand906, driver_device,  0,       ROT0, "Cal Omega / Casino Electronics Inc.",   "Cal Omega - Game 51.08 (CEI Video Poker, Jacks or Better)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 198?, comg5108, 0,        sys906,   stand906, calomega_state, 0,       ROT0, "Cal Omega / Casino Electronics Inc.",   "Cal Omega - Game 51.08 (CEI Video Poker, Jacks or Better)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 
 /************ Diagnostic PROMs ************/
 GAME( 198?, comg903d, 0,        sys903,   stand903, calomega_state, sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - System 903 Diag.PROM",                          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

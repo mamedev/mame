@@ -124,9 +124,10 @@ to through the chip.
 #include "k052109.h"
 
 #define VERBOSE 0
-#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
+#include "logmacro.h"
 
-const device_type K052109 = &device_creator<k052109_device>;
+
+DEFINE_DEVICE_TYPE(K052109, k052109_device, "k052109", "K052109 Tilemap Generator")
 
 const gfx_layout k052109_device::charlayout =
 {
@@ -159,8 +160,8 @@ GFXDECODE_MEMBER( k052109_device::gfxinfo_ram )
 GFXDECODE_END
 
 
-k052109_device::k052109_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, K052109, "K052109 Tilemap Generator", tag, owner, clock, "k052109", __FILE__),
+k052109_device::k052109_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, K052109, tag, owner, clock),
 	device_gfx_interface(mconfig, *this, gfxinfo),
 	m_ram(nullptr),
 	m_videoram_F(nullptr),
@@ -179,7 +180,7 @@ k052109_device::k052109_device(const machine_config &mconfig, const char *tag, d
 	m_romsubbank(0),
 	m_scrollctrl(0),
 	m_char_rom(*this, DEVICE_SELF),
-	m_screen(*this),
+	m_screen(*this, finder_base::DUMMY_TAG),
 	m_irq_handler(*this),
 	m_firq_handler(*this),
 	m_nmi_handler(*this)
@@ -211,13 +212,13 @@ void k052109_device::device_start()
 			throw device_missing_dependencies();
 
 		// and register a callback for vblank state
-		m_screen->register_vblank_callback(vblank_state_delegate(FUNC(k052109_device::vblank_callback), this));
+		m_screen->register_vblank_callback(vblank_state_delegate(&k052109_device::vblank_callback, this));
 	}
 
 	decode_gfx();
 	gfx(0)->set_colors(palette().entries() / gfx(0)->depth());
 
-	m_ram = make_unique_clear<UINT8[]>(0x6000);
+	m_ram = make_unique_clear<uint8_t[]>(0x6000);
 
 	m_colorram_F = &m_ram[0x0000];
 	m_colorram_A = &m_ram[0x0800];
@@ -337,8 +338,8 @@ READ8_MEMBER( k052109_device::read )
 	else
 		m_k052109_cb(0, bank, &code, &color, &flags, &priority);
 
-		addr = (code << 5) + (offset & 0x1f);
-		addr &= m_char_rom.mask();
+	addr = (code << 5) + (offset & 0x1f);
+	addr &= m_char_rom.mask();
 
 //      logerror("%04x: off = %04x sub = %02x (bnk = %x) adr = %06x\n", space.device().safe_pc(), offset, m_romsubbank, bank, addr);
 
@@ -531,7 +532,7 @@ popmessage("%x %x %x %x",
 
 	if ((m_scrollctrl & 0x03) == 0x02)
 	{
-		UINT8 *scrollram = &m_ram[0x1a00];
+		uint8_t *scrollram = &m_ram[0x1a00];
 
 		m_tilemap[1]->set_scroll_rows(256);
 		m_tilemap[1]->set_scroll_cols(1);
@@ -546,7 +547,7 @@ popmessage("%x %x %x %x",
 	}
 	else if ((m_scrollctrl & 0x03) == 0x03)
 	{
-		UINT8 *scrollram = &m_ram[0x1a00];
+		uint8_t *scrollram = &m_ram[0x1a00];
 
 		m_tilemap[1]->set_scroll_rows(256);
 		m_tilemap[1]->set_scroll_cols(1);
@@ -561,7 +562,7 @@ popmessage("%x %x %x %x",
 	}
 	else if ((m_scrollctrl & 0x04) == 0x04)
 	{
-		UINT8 *scrollram = &m_ram[0x1800];
+		uint8_t *scrollram = &m_ram[0x1800];
 
 		m_tilemap[1]->set_scroll_rows(1);
 		m_tilemap[1]->set_scroll_cols(512);
@@ -576,7 +577,7 @@ popmessage("%x %x %x %x",
 	}
 	else
 	{
-		UINT8 *scrollram = &m_ram[0x1a00];
+		uint8_t *scrollram = &m_ram[0x1a00];
 
 		m_tilemap[1]->set_scroll_rows(1);
 		m_tilemap[1]->set_scroll_cols(1);
@@ -589,7 +590,7 @@ popmessage("%x %x %x %x",
 
 	if ((m_scrollctrl & 0x18) == 0x10)
 	{
-		UINT8 *scrollram = &m_ram[0x3a00];
+		uint8_t *scrollram = &m_ram[0x3a00];
 
 		m_tilemap[2]->set_scroll_rows(256);
 		m_tilemap[2]->set_scroll_cols(1);
@@ -604,7 +605,7 @@ popmessage("%x %x %x %x",
 	}
 	else if ((m_scrollctrl & 0x18) == 0x18)
 	{
-		UINT8 *scrollram = &m_ram[0x3a00];
+		uint8_t *scrollram = &m_ram[0x3a00];
 
 		m_tilemap[2]->set_scroll_rows(256);
 		m_tilemap[2]->set_scroll_cols(1);
@@ -619,7 +620,7 @@ popmessage("%x %x %x %x",
 	}
 	else if ((m_scrollctrl & 0x20) == 0x20)
 	{
-		UINT8 *scrollram = &m_ram[0x3800];
+		uint8_t *scrollram = &m_ram[0x3800];
 
 		m_tilemap[2]->set_scroll_rows(1);
 		m_tilemap[2]->set_scroll_cols(512);
@@ -634,7 +635,7 @@ popmessage("%x %x %x %x",
 	}
 	else
 	{
-		UINT8 *scrollram = &m_ram[0x3a00];
+		uint8_t *scrollram = &m_ram[0x3a00];
 
 		m_tilemap[2]->set_scroll_rows(1);
 		m_tilemap[2]->set_scroll_cols(1);
@@ -667,7 +668,7 @@ if (machine().input().code_pressed(KEYCODE_F))
 #endif
 }
 
-void k052109_device::tilemap_draw( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int tmap_num, UINT32 flags, UINT8 priority )
+void k052109_device::tilemap_draw( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int tmap_num, uint32_t flags, uint8_t priority )
 {
 	m_tilemap[tmap_num]->draw(screen, bitmap, cliprect, flags, priority);
 }
@@ -695,7 +696,7 @@ int k052109_device::is_irq_enabled( )
   color RAM    ------xx  depends on external connections (usually banking, flip)
 */
 
-void k052109_device::get_tile_info( tile_data &tileinfo, int tile_index, int layer, UINT8 *cram, UINT8 *vram1, UINT8 *vram2 )
+void k052109_device::get_tile_info( tile_data &tileinfo, int tile_index, int layer, uint8_t *cram, uint8_t *vram1, uint8_t *vram2 )
 {
 	int flipy = 0;
 	int code = vram1[tile_index] + 256 * vram2[tile_index];

@@ -70,26 +70,22 @@ Sega System Multi32 Comm PCB 837-8792-91
 #include "emuopts.h"
 #include "machine/s32comm.h"
 
-//#define __S32COMM_VERBOSE__
+#define VERBOSE 0
+#include "logmacro.h"
 
-MACHINE_CONFIG_FRAGMENT( s32comm )
-MACHINE_CONFIG_END
 
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type S32COMM = &device_creator<s32comm_device>;
+DEFINE_DEVICE_TYPE(S32COMM, s32comm_device, "s32comm", "System 32 Communication Board")
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor s32comm_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( s32comm );
-}
+MACHINE_CONFIG_MEMBER( s32comm_device::device_add_mconfig )
+MACHINE_CONFIG_END
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -99,8 +95,8 @@ machine_config_constructor s32comm_device::device_mconfig_additions() const
 //  s32comm_device - constructor
 //-------------------------------------------------
 
-s32comm_device::s32comm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, S32COMM, "SYSTEM32 COMMUNICATION BD", tag, owner, clock, "s32comm", __FILE__),
+s32comm_device::s32comm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, S32COMM, tag, owner, clock),
 	m_line_rx(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE ),
 	m_line_tx(OPEN_FLAG_READ)
 {
@@ -140,35 +136,27 @@ void s32comm_device::device_reset()
 
 READ8_MEMBER(s32comm_device::zfg_r)
 {
-	UINT8 result = m_zfg | 0xFE;
-#ifdef __S32COMM_VERBOSE__
-	printf("s32comm-zfg_r: read register %02x for value %02x\n", offset, result);
-#endif
+	uint8_t result = m_zfg | 0xFE;
+	LOG("s32comm-zfg_r: read register %02x for value %02x\n", offset, result);
 	return result;
 }
 
 WRITE8_MEMBER(s32comm_device::zfg_w)
 {
-#ifdef __S32COMM_VERBOSE__
-	printf("s32comm-zfg_w: %02x\n", data);
-#endif
+	LOG("s32comm-zfg_w: %02x\n", data);
 	m_zfg = data & 0x01;
 }
 
 READ8_MEMBER(s32comm_device::share_r)
 {
-	UINT8 result = m_shared[offset];
-#ifdef __S32COMM_VERBOSE__
-	printf("s32comm-share_r: read shared memory %02x for value %02x\n", offset, result);
-#endif
+	uint8_t result = m_shared[offset];
+	LOG("s32comm-share_r: read shared memory %02x for value %02x\n", offset, result);
 	return result;
 }
 
 WRITE8_MEMBER(s32comm_device::share_w)
 {
-#ifdef __S32COMM_VERBOSE__
-	printf("s32comm-share_w: %02x %02x\n", offset, data);
-#endif
+	LOG("s32comm-share_w: %02x %02x\n", offset, data);
 	m_shared[offset] = data;
 }
 
@@ -181,20 +169,20 @@ WRITE8_MEMBER(s32comm_device::cn_w)
 {
 	m_cn = data & 0x01;
 
-#ifndef __S32COMM_SIMULATION__
+#ifndef S32COMM_SIMULATION
 	if (!m_cn)
 		device_reset();
 #else
 	if (!m_cn)
 	{
 		// reset command
-		printf("S32COMM: board disabled\n");
+		osd_printf_verbose("S32COMM: board disabled\n");
 		m_linkenable = 0x00;
 	}
 	else
 	{
 		// init command
-		printf("S32COMM: board enabled\n");
+		osd_printf_verbose("S32COMM: board enabled\n");
 		m_linkenable = 0x01;
 		m_linkid = 0x00;
 		m_linkalive = 0x00;
@@ -221,14 +209,14 @@ WRITE8_MEMBER(s32comm_device::fg_w)
 
 void s32comm_device::check_vint_irq()
 {
-#ifndef __S32COMM_SIMULATION__
+#ifndef S32COMM_SIMULATION
 #else
 	comm_tick();
 #endif
 }
 
-#ifdef __S32COMM_SIMULATION__
-void s32comm_device::set_linktype(UINT16 linktype)
+#ifdef S32COMM_SIMULATION
+void s32comm_device::set_linktype(uint16_t linktype)
 {
 	m_linktype = linktype;
 
@@ -236,15 +224,15 @@ void s32comm_device::set_linktype(UINT16 linktype)
 	{
 		case 14084:
 			// Rad Rally
-			printf("S32COMM: set mode 'EPR-14084 - Rad Rally'\n");
+			osd_printf_verbose("S32COMM: set mode 'EPR-14084 - Rad Rally'\n");
 			break;
 		case 15033:
 			// Stadium Cross / OutRunners
-			printf("S32COMM: set mode 'EPR-15033 - Stadium Cross / OutRunners'\n");
+			osd_printf_verbose("S32COMM: set mode 'EPR-15033 - Stadium Cross / OutRunners'\n");
 			break;
 		case 15612:
 			// F1 Super Lap
-			printf("S32COMM: set mode 'EPR-15612 - F1 Super Lap'\n");
+			osd_printf_verbose("S32COMM: set mode 'EPR-15612 - F1 Super Lap'\n");
 			break;
 	}
 }
@@ -293,14 +281,14 @@ void s32comm_device::comm_tick_14084()
 			// check rx socket
 			if (!m_line_rx.is_open())
 			{
-				printf("S32COMM: listen on %s\n", m_localhost);
+				osd_printf_verbose("S32COMM: listen on %s\n", m_localhost);
 				m_line_rx.open(m_localhost);
 			}
 
 			// check tx socket
 			if (!m_line_tx.is_open())
 			{
-				printf("S32COMM: connect to %s\n", m_remotehost);
+				osd_printf_verbose("S32COMM: connect to %s\n", m_remotehost);
 				m_line_tx.open(m_remotehost);
 			}
 
@@ -353,7 +341,7 @@ void s32comm_device::comm_tick_14084()
 							}
 
 							// consider it done
-							printf("S32COMM: link established - id %02x of %02x\n", m_linkid, m_linkcount);
+							osd_printf_verbose("S32COMM: link established - id %02x of %02x\n", m_linkid, m_linkcount);
 							m_linkalive = 0x01;
 
 							// write to shared mem
@@ -371,7 +359,7 @@ void s32comm_device::comm_tick_14084()
 							recv = m_line_rx.read(m_buffer, togo);
 							togo -= recv;
 						}
-						printf("S32COMM: droped a message...\n");
+						osd_printf_verbose("S32COMM: dropped a message...\n");
 					}
 
 					if (m_linkalive == 0x00)
@@ -399,7 +387,7 @@ void s32comm_device::comm_tick_14084()
 						m_line_tx.write(m_buffer, dataSize);
 
 						// consider it done
-						printf("S32COMM: link established - id %02x of %02x\n", m_linkid, m_linkcount);
+						osd_printf_verbose("S32COMM: link established - id %02x of %02x\n", m_linkid, m_linkcount);
 						m_linkalive = 0x01;
 
 						// write to shared mem
@@ -468,7 +456,7 @@ void s32comm_device::comm_tick_14084()
 						recv = m_line_rx.read(m_buffer, togo);
 						togo -= recv;
 					}
-					printf("S32COMM: droped a message...\n");
+					osd_printf_verbose("S32COMM: dropped a message...\n");
 				}
 				recv = m_line_rx.read(m_buffer, dataSize);
 			}
@@ -546,14 +534,14 @@ void s32comm_device::comm_tick_15033()
 			// check rx socket
 			if (!m_line_rx.is_open())
 			{
-				printf("S32COMM: listen on %s\n", m_localhost);
+				osd_printf_verbose("S32COMM: listen on %s\n", m_localhost);
 				m_line_rx.open(m_localhost);
 			}
 
 			// check tx socket
 			if (!m_line_tx.is_open())
 			{
-				printf("S32COMM: connect to %s\n", m_remotehost);
+				osd_printf_verbose("S32COMM: connect to %s\n", m_remotehost);
 				m_line_tx.open(m_remotehost);
 			}
 
@@ -606,7 +594,7 @@ void s32comm_device::comm_tick_15033()
 							}
 
 							// consider it done
-							printf("S32COMM: link established - id %02x of %02x\n", m_linkid, m_linkcount);
+							osd_printf_verbose("S32COMM: link established - id %02x of %02x\n", m_linkid, m_linkcount);
 							m_linkalive = 0x01;
 
 							// write to shared mem
@@ -624,7 +612,7 @@ void s32comm_device::comm_tick_15033()
 							recv = m_line_rx.read(m_buffer, togo);
 							togo -= recv;
 						}
-						printf("S32COMM: droped a message...\n");
+						osd_printf_verbose("S32COMM: dropped a message...\n");
 					}
 
 					if (m_linkalive == 0x00)
@@ -652,7 +640,7 @@ void s32comm_device::comm_tick_15033()
 						m_line_tx.write(m_buffer, dataSize);
 
 						// consider it done
-						printf("S32COMM: link established - id %02x of %02x\n", m_linkid, m_linkcount);
+						osd_printf_verbose("S32COMM: link established - id %02x of %02x\n", m_linkid, m_linkcount);
 						m_linkalive = 0x01;
 
 						// write to shared mem
@@ -721,7 +709,7 @@ void s32comm_device::comm_tick_15033()
 						recv = m_line_rx.read(m_buffer, togo);
 						togo -= recv;
 					}
-					printf("S32COMM: droped a message...\n");
+					osd_printf_verbose("S32COMM: dropped a message...\n");
 				}
 				recv = m_line_rx.read(m_buffer, dataSize);
 			}
@@ -787,14 +775,14 @@ void s32comm_device::comm_tick_15612()
 			// check rx socket
 			if (!m_line_rx.is_open())
 			{
-				printf("S32COMM: listen on %s\n", m_localhost);
+				osd_printf_verbose("S32COMM: listen on %s\n", m_localhost);
 				m_line_rx.open(m_localhost);
 			}
 
 			// check tx socket
 			if (!m_line_tx.is_open())
 			{
-				printf("S32COMM: connect to %s\n", m_remotehost);
+				osd_printf_verbose("S32COMM: connect to %s\n", m_remotehost);
 				m_line_tx.open(m_remotehost);
 			}
 
@@ -847,7 +835,7 @@ void s32comm_device::comm_tick_15612()
 							}
 
 							// consider it done
-							printf("S32COMM: link established - id %02x of %02x\n", m_linkid, m_linkcount);
+							osd_printf_verbose("S32COMM: link established - id %02x of %02x\n", m_linkid, m_linkcount);
 							m_linkalive = 0x01;
 
 							// write to shared mem
@@ -865,7 +853,7 @@ void s32comm_device::comm_tick_15612()
 							recv = m_line_rx.read(m_buffer, togo);
 							togo -= recv;
 						}
-						printf("S32COMM: droped a message...\n");
+						osd_printf_verbose("S32COMM: dropped a message...\n");
 					}
 
 					if (m_linkalive == 0x00)
@@ -893,7 +881,7 @@ void s32comm_device::comm_tick_15612()
 						m_line_tx.write(m_buffer, dataSize);
 
 						// consider it done
-						printf("S32COMM: link established - id %02x of %02x\n", m_linkid, m_linkcount);
+						osd_printf_verbose("S32COMM: link established - id %02x of %02x\n", m_linkid, m_linkcount);
 						m_linkalive = 0x01;
 
 						// write to shared mem
@@ -962,7 +950,7 @@ void s32comm_device::comm_tick_15612()
 						recv = m_line_rx.read(m_buffer, togo);
 						togo -= recv;
 					}
-					printf("S32COMM: droped a message...\n");
+					osd_printf_verbose("S32COMM: dropped a message...\n");
 				}
 				recv = m_line_rx.read(m_buffer, dataSize);
 			}

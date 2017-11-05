@@ -20,6 +20,10 @@ indent_size  = 4
 indent_style = space
 indent_size  = 4
 
+[ocornut-imgui/*.inl]
+indent_style = space
+indent_size  = 4
+
 [pvrtc/*]
 indent_style = space
 indent_size  = 4
@@ -27,3 +31,7 @@ indent_size  = 4
 [remotery/*]
 indent_style = space
 indent_size  = 4
+
+[glsl-optimizer/*]
+indent_style = space
+indent_size  = 3

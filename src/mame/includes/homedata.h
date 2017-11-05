@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Phil Stroffolino, Nicola Salmoria
-#include "sound/dac.h"
+
+#include "machine/gen_latch.h"
 #include "sound/sn76496.h"
 #include "sound/2203intf.h"
 
@@ -13,27 +14,28 @@ public:
 		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_dac(*this, "dac"),
 		m_ymsnd(*this, "ymsnd"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch"),
+		m_sn(*this, "snsnd")
 	{
 	}
 
 	/* memory pointers */
-	optional_shared_ptr<UINT8> m_vreg;
-	required_shared_ptr<UINT8> m_videoram;
+	optional_shared_ptr<uint8_t> m_vreg;
+	required_shared_ptr<uint8_t> m_videoram;
 
 	/* video-related */
 	tilemap_t *m_bg_tilemap[2][4];
 	int      m_visible_page;
 	int      m_priority;
-	UINT8    m_reikaids_which;
+	uint8_t    m_reikaids_which;
 	int      m_flipscreen;
-	UINT8      m_gfx_bank[2];   // pteacher only uses the first one
-	UINT8      m_blitter_bank;
+	uint8_t      m_gfx_bank[2];   // pteacher only uses the first one
+	uint8_t      m_blitter_bank;
 	int      m_blitter_param_count;
-	UINT8      m_blitter_param[4];      /* buffers last 4 writes to 0x8006 */
+	uint8_t      m_blitter_param[4];      /* buffers last 4 writes to 0x8006 */
 
 
 	/* misc */
@@ -49,17 +51,17 @@ public:
 	/* device */
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
-	optional_device<dac_device> m_dac;
 	optional_device<ym2203_device> m_ymsnd;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	sn76489a_device *m_sn;
-	UINT8 m_prot_data;
+	optional_device<generic_latch_8_device> m_soundlatch; // mrokumei
+	optional_device<sn76489a_device> m_sn; // mrokumei and pteacher
+
+	uint8_t m_prot_data;
 	DECLARE_READ8_MEMBER(mrokumei_keyboard_r);
 	DECLARE_WRITE8_MEMBER(mrokumei_keyboard_select_w);
 	DECLARE_READ8_MEMBER(mrokumei_sound_io_r);
 	DECLARE_WRITE8_MEMBER(mrokumei_sound_bank_w);
-	DECLARE_WRITE8_MEMBER(mrokumei_sound_io_w);
 	DECLARE_WRITE8_MEMBER(mrokumei_sound_cmd_w);
 	DECLARE_READ8_MEMBER(reikaids_upd7807_porta_r);
 	DECLARE_WRITE8_MEMBER(reikaids_upd7807_porta_w);
@@ -133,11 +135,11 @@ public:
 	DECLARE_VIDEO_START(mirderby);
 	DECLARE_PALETTE_INIT(mirderby);
 	DECLARE_VIDEO_START(lemnangl);
-	UINT32 screen_update_mrokumei(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_reikaids(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_pteacher(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_mirderby(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof_homedata(screen_device &screen, bool state);
+	uint32_t screen_update_mrokumei(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_reikaids(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_pteacher(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_mirderby(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_homedata);
 	INTERRUPT_GEN_MEMBER(homedata_irq);
 	INTERRUPT_GEN_MEMBER(upd7807_irq);
 	void mrokumei_handleblit( address_space &space, int rom_base );

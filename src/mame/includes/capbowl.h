@@ -5,11 +5,16 @@
     Coors Light Bowling/Bowl-O-Rama hardware
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_CAPBOWL_H
+#define MAME_INCLUDES_CAPBOWL_H
+
+#pragma once
 
 #include "machine/gen_latch.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
 #include "video/tms34061.h"
+#include "screen.h"
 
 class capbowl_state : public driver_device
 {
@@ -38,13 +43,13 @@ public:
 	required_device<generic_latch_8_device> m_soundlatch;
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_rowaddress;
+	required_shared_ptr<uint8_t> m_rowaddress;
 
 	/* video-related */
 	offs_t m_blitter_addr;
 
 	/* input-related */
-	UINT8 m_last_trackball_val[2];
+	uint8_t m_last_trackball_val[2];
 
 	emu_timer *m_update_timer;
 
@@ -70,9 +75,11 @@ public:
 	INTERRUPT_GEN_MEMBER(interrupt);
 	TIMER_CALLBACK_MEMBER(update);
 
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	inline rgb_t pen_for_pixel( UINT8 *src, UINT8 pix );
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	inline rgb_t pen_for_pixel( uint8_t const *src, uint8_t pix );
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
+
+#endif // MAME_INCLUDES_CAPBOWL_H

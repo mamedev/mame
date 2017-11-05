@@ -13,7 +13,7 @@ board containing the video and sound cpus, and the video controller
 and the sound DAC and amp.
 
 Granny uses the MPU4 board, but it has a Vidiot Deluxe for the
-video, and a Cheep Squeek sound board. The manual incorrectly
+video, and a Cheap Squeek sound board. The manual incorrectly
 describes the babypac vidiot board, which is of little use.
 
 
@@ -38,13 +38,16 @@ ToDo (granny):
 
 
 #include "emu.h"
-#include "cpu/m6800/m6800.h"
+#include "cpu/m6800/m6801.h"
 #include "cpu/m6809/m6809.h"
-#include "video/tms9928a.h"
 #include "machine/6821pia.h"
-#include "sound/dac.h"
 #include "machine/nvram.h"
+#include "machine/timer.h"
 #include "sound/beep.h"
+#include "sound/dac.h"
+#include "sound/volt_reg.h"
+#include "video/tms9928a.h"
+#include "speaker.h"
 
 class by133_state : public driver_device
 {
@@ -102,17 +105,17 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(u10_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(u11_timer);
 	DECLARE_WRITE8_MEMBER(granny_crtc_w);
-	UINT32 screen_update_granny(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_granny(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 private:
-	UINT8 m_mpu_to_vid;
-	UINT8 m_vid_to_mpu;
-	UINT8 m_u7_a;
-	UINT8 m_u7_b;
-	UINT8 m_u10_a;
-	UINT8 m_u10_b;
+	uint8_t m_mpu_to_vid;
+	uint8_t m_vid_to_mpu;
+	uint8_t m_u7_a;
+	uint8_t m_u7_b;
+	uint8_t m_u10_a;
+	uint8_t m_u10_b;
 	bool m_u10_cb2;
-	UINT8 m_u11_a;
-	UINT8 m_u11_b;
+	uint8_t m_u11_a;
+	uint8_t m_u11_b;
 	bool m_u10_timer;
 	bool m_u11_timer;
 	virtual void machine_reset() override;
@@ -179,7 +182,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, by133_state ) // U27 Vidiot
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, by133_state )
-	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_DEVWRITE("dac", dac_device, write_unsigned8) // P10-P17
+	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_DEVWRITE("dac", dac_byte_interface, write) // P10-P17
 	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_READWRITE(m6803_port2_r, m6803_port2_w) // P20-P24 sound command in
 ADDRESS_MAP_END
 
@@ -643,7 +646,7 @@ READ8_MEMBER( by133_state::u10_b_r )
 	if (BIT(m_u11_a, 1) == 0)
 		return m_vid_to_mpu;
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	if (BIT(m_u10_a, 0))
 		data |= m_io_x0->read();
@@ -730,7 +733,7 @@ void by133_state::machine_reset()
 	m_beep->set_state(0);
 }
 
-UINT32 by133_state::screen_update_granny(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t by133_state::screen_update_granny(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	//bitmap.fill(0xff000000, cliprect);
 	copybitmap(bitmap, m_crtc->get_bitmap(), 0, 0, 0, 0, cliprect);
@@ -738,7 +741,7 @@ UINT32 by133_state::screen_update_granny(screen_device &screen, bitmap_rgb32 &bi
 	return 0;
 }
 
-static MACHINE_CONFIG_START( babypac, by133_state )
+static MACHINE_CONFIG_START( babypac )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, XTAL_3_579545MHz/4) // no xtal, just 2 chips
 	MCFG_CPU_PROGRAM_MAP(main_map)
@@ -759,8 +762,8 @@ static MACHINE_CONFIG_START( babypac, by133_state )
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(by133_state, u7_b_w))
 	MCFG_PIA_CA2_HANDLER(WRITELINE(by133_state, u7_ca2_w))
 	MCFG_PIA_CB2_HANDLER(WRITELINE(by133_state, u7_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("videocpu", m6809e_device, firq_line))
-	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("videocpu", m6809e_device, firq_line))
+	MCFG_PIA_IRQA_HANDLER(INPUTLINE("videocpu", M6809_FIRQ_LINE))
+	MCFG_PIA_IRQB_HANDLER(INPUTLINE("videocpu", M6809_FIRQ_LINE))
 
 	MCFG_DEVICE_ADD("pia_u10", PIA6821, 0)
 	MCFG_PIA_READPA_HANDLER(READ8(by133_state, u10_a_r))
@@ -769,8 +772,8 @@ static MACHINE_CONFIG_START( babypac, by133_state )
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(by133_state, u10_b_w))
 	MCFG_PIA_CA2_HANDLER(WRITELINE(by133_state, u10_ca2_w))
 	MCFG_PIA_CB2_HANDLER(WRITELINE(by133_state, u10_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("maincpu", m6800_cpu_device, irq_line))
-	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("maincpu", m6800_cpu_device, irq_line))
+	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
+	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("babypac1", by133_state, u10_timer, attotime::from_hz(120)) // mains freq*2
 
 	MCFG_DEVICE_ADD("pia_u11", PIA6821, 0)
@@ -780,21 +783,23 @@ static MACHINE_CONFIG_START( babypac, by133_state )
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(by133_state, u11_b_w))
 	MCFG_PIA_CA2_HANDLER(WRITELINE(by133_state, u11_ca2_w))
 	MCFG_PIA_CB2_HANDLER(WRITELINE(by133_state, u11_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("maincpu", m6800_cpu_device, irq_line))
-	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("maincpu", m6800_cpu_device, irq_line))
+	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
+	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("babypac2", by133_state, u11_timer, attotime::from_hz(634)) // 555 timer*2
 
 	/* video hardware */
 	MCFG_DEVICE_ADD( "crtc", TMS9928A, XTAL_10_738635MHz / 2 )
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(DEVWRITELINE("videocpu", m6809e_device, irq_line))
+	MCFG_TMS9928A_OUT_INT_LINE_CB(INPUTLINE("videocpu", M6809_IRQ_LINE))
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
 	MCFG_SCREEN_UPDATE_DEVICE( "crtc", tms9928a_device, screen_update )
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("dac", ZN429E, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // U32 (Vidiot) or U6 (Cheap Squeak)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+
 	MCFG_SPEAKER_STANDARD_MONO("beee")
 	MCFG_SOUND_ADD("beeper", BEEP, 600)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "beee", 0.10)
@@ -809,12 +814,12 @@ static MACHINE_CONFIG_DERIVED( granny, babypac )
 
 	MCFG_DEVICE_ADD( "crtc2", TMS9928A, XTAL_10_738635MHz / 2 )
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(DEVWRITELINE("videocpu", m6809e_device, irq_line))
+	MCFG_TMS9928A_OUT_INT_LINE_CB(INPUTLINE("videocpu", M6809_IRQ_LINE))
 	MCFG_VIDEO_SET_SCREEN("screen")
 
 	MCFG_SCREEN_ADD( "screen", RASTER )
-	MCFG_SCREEN_RAW_PARAMS( XTAL_10_738635MHz / 2, TMS9928A_TOTAL_HORZ, TMS9928A_HORZ_DISPLAY_START-12, TMS9928A_HORZ_DISPLAY_START + 256 + 12, \
-			TMS9928A_TOTAL_VERT_NTSC, TMS9928A_VERT_DISPLAY_START_NTSC - 12, TMS9928A_VERT_DISPLAY_START_NTSC + 192 + 12 )
+	MCFG_SCREEN_RAW_PARAMS( XTAL_10_738635MHz / 2, tms9928a_device::TOTAL_HORZ, tms9928a_device::HORZ_DISPLAY_START-12, tms9928a_device::HORZ_DISPLAY_START + 256 + 12, \
+			tms9928a_device::TOTAL_VERT_NTSC, tms9928a_device::VERT_DISPLAY_START_NTSC - 12, tms9928a_device::VERT_DISPLAY_START_NTSC + 192 + 12 )
 	MCFG_SCREEN_UPDATE_DRIVER(by133_state, screen_update_granny)
 MACHINE_CONFIG_END
 
@@ -873,6 +878,6 @@ ROM_START(granny)
 ROM_END
 
 
-GAME( 1982, babypac,  0,        babypac, babypac, driver_device,  0,  ROT90, "Dave Nutting Associates / Bally", "Baby Pac-Man (set 1)", MACHINE_MECHANICAL | MACHINE_NO_SOUND )
-GAME( 1982, babypac2, babypac,  babypac, babypac, driver_device,  0,  ROT90, "Dave Nutting Associates / Bally", "Baby Pac-Man (set 2)", MACHINE_MECHANICAL | MACHINE_NO_SOUND )
-GAME( 1984, granny,   0,        granny,  granny,  driver_device,  0,  ROT0,  "Bally", "Granny and the Gators", MACHINE_MECHANICAL | MACHINE_NO_SOUND )
+GAME( 1982, babypac,  0,        babypac, babypac, by133_state,  0,  ROT90, "Dave Nutting Associates / Bally", "Baby Pac-Man (set 1)",  MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1982, babypac2, babypac,  babypac, babypac, by133_state,  0,  ROT90, "Dave Nutting Associates / Bally", "Baby Pac-Man (set 2)",  MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1984, granny,   0,        granny,  granny,  by133_state,  0,  ROT0,  "Bally",                           "Granny and the Gators", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

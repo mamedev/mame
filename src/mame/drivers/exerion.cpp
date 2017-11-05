@@ -120,10 +120,12 @@ Stephh's notes (based on the games Z80 code and some tests) :
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
 #include "includes/exerion.h"
+
+#include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "sound/ay8910.h"
+#include "speaker.h"
 
 
 /*************************************
@@ -368,7 +370,7 @@ void exerion_state::machine_reset()
 		m_background_latches[i] = 0;
 }
 
-static MACHINE_CONFIG_START( exerion, exerion_state )
+static MACHINE_CONFIG_START( exerion )
 
 	MCFG_CPU_ADD("maincpu", Z80, EXERION_CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(main_map)
@@ -509,11 +511,11 @@ ROM_END
 
 DRIVER_INIT_MEMBER(exerion_state,exerion)
 {
-	UINT32 oldaddr, newaddr, length;
-	UINT8 *src, *dst;
+	uint32_t oldaddr, newaddr, length;
+	uint8_t *src, *dst;
 
 	/* allocate some temporary space */
-	dynamic_buffer temp(0x10000);
+	std::vector<uint8_t> temp(0x10000);
 
 	/* make a temporary copy of the character data */
 	src = &temp[0];
@@ -556,7 +558,7 @@ DRIVER_INIT_MEMBER(exerion_state,exerion)
 
 DRIVER_INIT_MEMBER(exerion_state,exerionb)
 {
-	UINT8 *ram = memregion("maincpu")->base();
+	uint8_t *ram = memregion("maincpu")->base();
 	int addr;
 
 	/* the program ROMs have data lines D1 and D2 swapped. Decode them. */

@@ -12,8 +12,10 @@
 
 ***************************************************************************/
 
-#ifndef __H8S2655_H__
-#define __H8S2655_H__
+#ifndef MAME_CPU_H8_H8S2655_H
+#define MAME_CPU_H8_H8S2655_H
+
+#pragma once
 
 #include "h8s2600.h"
 #include "h8_intc.h"
@@ -26,8 +28,7 @@
 
 class h8s2655_device : public h8s2600_device {
 public:
-	h8s2655_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	h8s2655_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	h8s2655_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_READ8_MEMBER(syscr_r);
 	DECLARE_WRITE8_MEMBER(syscr_w);
@@ -62,7 +63,9 @@ protected:
 	required_device<h8_sci_device> sci2;
 	required_device<h8_watchdog_device> watchdog;
 
-	UINT8 syscr;
+	uint8_t syscr;
+
+	h8s2655_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual bool exr_in_stack() const override;
 	virtual void update_irq_filter() override;
@@ -70,8 +73,8 @@ protected:
 	virtual int trace_setup() override;
 	virtual int trapa_setup() override;
 	virtual void irq_setup() override;
-	virtual void internal_update(UINT64 current_time) override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void internal_update(uint64_t current_time) override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	DECLARE_ADDRESS_MAP(map, 16);
 
 	virtual void device_start() override;
@@ -81,10 +84,10 @@ protected:
 
 class h8s2653_device : public h8s2655_device {
 public:
-	h8s2653_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	h8s2653_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
-extern const device_type H8S2655;
-extern const device_type H8S2653;
+DECLARE_DEVICE_TYPE(H8S2655, h8s2655_device)
+DECLARE_DEVICE_TYPE(H8S2653, h8s2653_device)
 
-#endif
+#endif // MAME_CPU_H8_H8S2655_H

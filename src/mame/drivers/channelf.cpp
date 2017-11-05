@@ -14,8 +14,11 @@
  *
  ******************************************************************/
 
+#include "emu.h"
 #include "includes/channelf.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
 
 #ifndef VERBOSE
 #define VERBOSE 0
@@ -45,7 +48,7 @@
  * ...so it stays here for now.
  */
 
-UINT8 channelf_state::port_read_with_latch(UINT8 ext, UINT8 latch_state)
+uint8_t channelf_state::port_read_with_latch(uint8_t ext, uint8_t latch_state)
 {
 	return (~ext | latch_state);
 }
@@ -57,7 +60,7 @@ READ8_MEMBER( channelf_state::port_0_r )
 
 READ8_MEMBER( channelf_state::port_1_r )
 {
-	UINT8 ext_value;
+	uint8_t ext_value;
 
 	if ((m_latch[0] & 0x40) == 0)
 		ext_value = ioport("RIGHT_C")->read();
@@ -69,7 +72,7 @@ READ8_MEMBER( channelf_state::port_1_r )
 
 READ8_MEMBER( channelf_state::port_4_r )
 {
-	UINT8 ext_value;
+	uint8_t ext_value;
 
 	if ((m_latch[0] & 0x40) == 0)
 		ext_value = ioport("LEFT_C")->read();
@@ -196,7 +199,7 @@ static SLOT_INTERFACE_START(cf_cart)
 SLOT_INTERFACE_END
 
 
-static MACHINE_CONFIG_FRAGMENT( channelf_cart )
+static MACHINE_CONFIG_START( channelf_cart )
 	/* cartridge */
 	MCFG_CHANNELF_CARTRIDGE_ADD("cartslot", cf_cart, nullptr)
 
@@ -204,7 +207,7 @@ static MACHINE_CONFIG_FRAGMENT( channelf_cart )
 	MCFG_SOFTWARE_LIST_ADD("cart_list","channelf")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( channelf, channelf_state )
+static MACHINE_CONFIG_START( channelf )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", F8, 3579545/2)        /* Colorburst/2 */
 	MCFG_CPU_PROGRAM_MAP(channelf_map)
@@ -231,7 +234,7 @@ static MACHINE_CONFIG_START( channelf, channelf_state )
 	MCFG_FRAGMENT_ADD( channelf_cart )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( sabavdpl, channelf_state )
+static MACHINE_CONFIG_START( sabavdpl )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", F8, MASTER_CLOCK_PAL)        /* PAL speed */
 	MCFG_CPU_PROGRAM_MAP(channelf_map)
@@ -259,7 +262,7 @@ static MACHINE_CONFIG_START( sabavdpl, channelf_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( channlf2, channelf_state )
+static MACHINE_CONFIG_START( channlf2 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", F8, 3579545/2)        /* Colorburst / 2 */
 	MCFG_CPU_PROGRAM_MAP(channelf_map)
@@ -287,7 +290,7 @@ static MACHINE_CONFIG_START( channlf2, channelf_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( sabavpl2, channelf_state )
+static MACHINE_CONFIG_START( sabavpl2 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", F8, MASTER_CLOCK_PAL)        /* PAL speed */
 	MCFG_CPU_PROGRAM_MAP(channelf_map)
@@ -339,12 +342,12 @@ ROM_END
 
 ***************************************************************************/
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT     INIT   COMPANY         FULLNAME        FLAGS */
-CONS( 1976, channelf,  0,        0,    channelf,  channelf, driver_device,   0,      "Fairchild",    "Channel F",                            0 )
-CONS( 1977, sabavdpl,  channelf, 0,    sabavdpl,  channelf, driver_device,   0,      "SABA",         "SABA Videoplay",                       0 )
-CONS( 197?, luxorves,  channelf, 0,    sabavdpl,  channelf, driver_device,   0,      "Luxor",        "Luxor Video Entertainment System",     0 )
-CONS( 1978, channlf2,  0, channelf,    channlf2,  channelf, driver_device,   0,      "Fairchild",    "Channel F II",                         0 )
-CONS( 1978, sabavpl2,  channlf2, 0,    sabavpl2,  channelf, driver_device,   0,      "SABA",         "SABA Videoplay 2",                     0 )
-CONS( 197?, luxorvec,  channlf2, 0,    sabavpl2,  channelf, driver_device,   0,      "Luxor",        "Luxor Video Entertainment Computer",   0 )
-CONS( 197?, itttelma,  channlf2, 0,    sabavpl2,  channelf, driver_device,   0,      "ITT",          "ITT Tele-Match Processor",             0 )
-CONS( 1978, ingtelma,  channlf2, 0,    sabavpl2,  channelf, driver_device,   0,      "Ingelen",      "Ingelen Tele-Match Processor",         0 )
+/*    YEAR  NAME       PARENT    COMPAT  MACHINE    INPUT     STATE            INIT   COMPANY         FULLNAME                                FLAGS */
+CONS( 1976, channelf,  0,        0,      channelf,  channelf, channelf_state,  0,     "Fairchild",    "Channel F",                            0 )
+CONS( 1977, sabavdpl,  channelf, 0,      sabavdpl,  channelf, channelf_state,  0,     "SABA",         "SABA Videoplay",                       0 )
+CONS( 197?, luxorves,  channelf, 0,      sabavdpl,  channelf, channelf_state,  0,     "Luxor",        "Luxor Video Entertainment System",     0 )
+CONS( 1978, channlf2,  0, channelf,      channlf2,  channelf, channelf_state,  0,     "Fairchild",    "Channel F II",                         0 )
+CONS( 1978, sabavpl2,  channlf2, 0,      sabavpl2,  channelf, channelf_state,  0,     "SABA",         "SABA Videoplay 2",                     0 )
+CONS( 197?, luxorvec,  channlf2, 0,      sabavpl2,  channelf, channelf_state,  0,     "Luxor",        "Luxor Video Entertainment Computer",   0 )
+CONS( 197?, itttelma,  channlf2, 0,      sabavpl2,  channelf, channelf_state,  0,     "ITT",          "ITT Tele-Match Processor",             0 )
+CONS( 1978, ingtelma,  channlf2, 0,      sabavpl2,  channelf, channelf_state,  0,     "Ingelen",      "Ingelen Tele-Match Processor",         0 )

@@ -163,8 +163,8 @@
     (4) = Coin 1, Coin 2, Coupon.
 
     Note: Each Common GND (A-B-C-D) are for their respective
-	multiplexed groups of inputs, since there are 4 groups
-	with 5 valid inputs each one.
+    multiplexed groups of inputs, since there are 4 groups
+    with 5 valid inputs each one.
 
 
     **** 10-Pins connector ****
@@ -440,14 +440,17 @@
 
 *******************************************************************************/
 
-
-#define MASTER_CLOCK    XTAL_10MHz
-
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
-#include "video/mc6845.h"
-#include "sound/dac.h"
 #include "machine/nvram.h"
+#include "sound/dac.h"
+#include "sound/volt_reg.h"
+#include "video/mc6845.h"
+#include "screen.h"
+#include "speaker.h"
+
+
+#define MASTER_CLOCK    XTAL_10MHz
 
 
 class magicfly_state : public driver_device
@@ -461,8 +464,8 @@ public:
 		m_dac(*this, "dac"),
 		m_gfxdecode(*this, "gfxdecode") { }
 
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_colorram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_colorram;
 	tilemap_t *m_bg_tilemap;
 	int m_input_selector;
 	DECLARE_WRITE8_MEMBER(magicfly_videoram_w);
@@ -475,9 +478,9 @@ public:
 	DECLARE_PALETTE_INIT(magicfly);
 	DECLARE_PALETTE_INIT(bchance);
 	DECLARE_VIDEO_START(7mezzo);
-	UINT32 screen_update_magicfly(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_magicfly(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
-	required_device<dac_device> m_dac;
+	required_device<dac_bit_interface> m_dac;
 	required_device<gfxdecode_device> m_gfxdecode;
 };
 
@@ -527,7 +530,7 @@ TILE_GET_INFO_MEMBER(magicfly_state::get_magicfly_tile_info)
 
 void magicfly_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(magicfly_state::get_magicfly_tile_info), this), TILEMAP_SCAN_ROWS, 8, 8, 32, 29);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(magicfly_state::get_magicfly_tile_info), this), TILEMAP_SCAN_ROWS, 8, 8, 32, 29);
 }
 
 
@@ -558,11 +561,11 @@ TILE_GET_INFO_MEMBER(magicfly_state::get_7mezzo_tile_info)
 
 VIDEO_START_MEMBER(magicfly_state, 7mezzo)
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(magicfly_state::get_7mezzo_tile_info), this), TILEMAP_SCAN_ROWS, 8, 8, 32, 29);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(magicfly_state::get_7mezzo_tile_info), this), TILEMAP_SCAN_ROWS, 8, 8, 32, 29);
 }
 
 
-UINT32 magicfly_state::screen_update_magicfly(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t magicfly_state::screen_update_magicfly(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
@@ -658,7 +661,7 @@ WRITE8_MEMBER(magicfly_state::mux_port_w)
 */
 	m_input_selector = data & 0x0f; /* Input Selector */
 
-	m_dac->write_unsigned8(data & 0x80);      /* Sound DAC */
+	m_dac->write(BIT(data, 7));      /* Sound DAC */
 
 	machine().bookkeeping().coin_counter_w(0, data & 0x40);  /* Coin1 */
 	machine().bookkeeping().coin_counter_w(1, data & 0x10);  /* Coin2 */
@@ -730,7 +733,7 @@ static INPUT_PORTS_START( magicfly )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("DSW0")    /* Only 4 phisical DIP switches (valid bits = 4, 6, 7) */
+	PORT_START("DSW0")    /* Only 4 physical DIP switches (valid bits = 4, 6, 7) */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -793,7 +796,7 @@ static INPUT_PORTS_START( 7mezzo )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("DSW0")    /* Only 4 phisical DIP switches (valid bits = 4, 6, 7) */
+	PORT_START("DSW0")    /* Only 4 physical DIP switches (valid bits = 4, 6, 7) */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -868,7 +871,7 @@ static INPUT_PORTS_START( bchance )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DSW0")
-/*  Only 4 phisical DIP switches
+/*  Only 4 physical DIP switches
     (valid bits = 4, 6, 7)
 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -929,7 +932,7 @@ GFXDECODE_END
 *              Machine Drivers               *
 *********************************************/
 
-static MACHINE_CONFIG_START( magicfly, magicfly_state )
+static MACHINE_CONFIG_START( magicfly )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK / 16) /* guess */
@@ -956,10 +959,10 @@ static MACHINE_CONFIG_START( magicfly, magicfly_state )
 	MCFG_MC6845_CHAR_WIDTH(8)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -1053,7 +1056,7 @@ ROM_END
 *                Game Drivers                *
 *********************************************/
 
-/*    YEAR  NAME      PARENT  MACHINE   INPUT     STATE          INIT   ROT    COMPANY      FULLNAME                         FLAGS... */
-GAME( 198?, magicfly, 0,      magicfly, magicfly, driver_device, 0,     ROT0, "P&A Games", "Magic Fly",                      0 )
-GAME( 198?, 7mezzo,   0,      7mezzo,   7mezzo,   driver_device, 0,     ROT0, "<unknown>", "7 e Mezzo",                      0 )
-GAME( 198?, bchance,  0,      bchance,  bchance,  driver_device, 0,     ROT0, "<unknown>", "Bonne Chance! (French/English)", MACHINE_IMPERFECT_GRAPHICS )
+//    YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT   ROT   COMPANY      FULLNAME                          FLAGS
+GAME( 198?, magicfly, 0,      magicfly, magicfly, magicfly_state, 0,     ROT0, "P&A Games", "Magic Fly",                      0 )
+GAME( 198?, 7mezzo,   0,      7mezzo,   7mezzo,   magicfly_state, 0,     ROT0, "<unknown>", "7 e Mezzo",                      0 )
+GAME( 198?, bchance,  0,      bchance,  bchance,  magicfly_state, 0,     ROT0, "<unknown>", "Bonne Chance! (French/English)", MACHINE_IMPERFECT_GRAPHICS )

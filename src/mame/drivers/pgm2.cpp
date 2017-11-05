@@ -4,22 +4,15 @@
 
     Motherboard is bare bones stuff, and does not contain any ROMs.
     The IGS036 used by the games is an ARM based CPU, like IGS027A used on PGM1 it has internal ROM.
-    Decryption should be correct in most cases, but the ARM mode code at the start of the external
-    ROMs is a bit weird, with many BNV instructions rather than jumps.  Maybe the ARM is customized,
-    the code has been 'NOPPED' out this way (BNV is Branch Never) or it's a different type of ARM?
-
-     - Some of the THUMB code looks like THUMB2 code
-      eg
-        f004 BL (HI) 00004000
-        e51f B #fffffa3e
-        0434 LSL R4, R6, 16
-        0000 LSL R0, R0, 0
-
-        should be a 32-bit branch instruction with the 2nd dword used as data.
-
+    Decryption should be correct in most cases.
+    The ARM appears to be ARMv5T, probably an ARM9.
 
     We need to determine where VRAM etc. map in order to attempt tests on the PCBs.
 
+    We will also need to try to attack the internal ROM, as there are many many calls made into it.
+    Chances are it'll be possible to get it to copy itself out, or black-box the behavior.
+    All calls to the IROM are done through small shims, so it should also be possible to hack around
+    the IROM if we can't get the dump out.
 
     PGM2 Motherboard Components:
 
@@ -60,6 +53,8 @@
 #include "cpu/arm7/arm7core.h"
 #include "sound/ymz770.h"
 #include "machine/igs036crypt.h"
+#include "screen.h"
+#include "speaker.h"
 
 class pgm2_state : public driver_device
 {
@@ -72,33 +67,40 @@ public:
 	DECLARE_DRIVER_INIT(orleg2);
 	DECLARE_DRIVER_INIT(ddpdojh);
 	DECLARE_DRIVER_INIT(kov3);
+	DECLARE_DRIVER_INIT(kov3_104);
+	DECLARE_DRIVER_INIT(kov3_102);
+	DECLARE_DRIVER_INIT(kov3_100);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_pgm2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof_pgm2(screen_device &screen, bool state);
+	uint32_t screen_update_pgm2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_pgm2);
 	required_device<cpu_device> m_maincpu;
-
-	void pgm_create_dummy_internal_arm_region(int addr);
+private:
+	void pgm_create_dummy_internal_arm_region();
+	void decrypt_kov3_module(uint32_t addrxor, uint16_t dataxor);
 };
 
 static ADDRESS_MAP_START( pgm2_map, AS_PROGRAM, 32, pgm2_state )
 	AM_RANGE(0x00000000, 0x00003fff) AM_ROM //AM_REGION("user1", 0x00000) // internal ROM
-	AM_RANGE(0x08000000, 0x087fffff) AM_ROM AM_REGION("user1", 0) // not 100% sure it maps here.
-	AM_RANGE(0xffff0000, 0xffffffff) AM_RAM
 
+	// these might be swapped
+	AM_RANGE(0x10000000, 0x107fffff) AM_ROM AM_MIRROR(0x0f800000) AM_REGION("user1", 0) // external ROM
+	AM_RANGE(0x20000000, 0x2007ffff) AM_RAM // main SRAM?
+	// This doesn't exist, it's just necessary because our stub IPL doesn't set SP
+	AM_RANGE(0xfff00000, 0xffffffff) AM_RAM
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( pgm2 )
 INPUT_PORTS_END
 
-UINT32 pgm2_state::screen_update_pgm2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t pgm2_state::screen_update_pgm2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
 
-void pgm2_state::screen_eof_pgm2(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(pgm2_state::screen_vblank_pgm2)
 {
 }
 
@@ -169,20 +171,23 @@ static GFXDECODE_START( pgm2 )
 GFXDECODE_END
 
 
-void pgm2_state::pgm_create_dummy_internal_arm_region(int addr)
+
+void pgm2_state::pgm_create_dummy_internal_arm_region()
 {
-	UINT16 *temp16 = (UINT16 *)memregion("maincpu")->base();
+	uint16_t *temp16 = (uint16_t *)memregion("maincpu")->base();
 	int i;
-	for (i=0;i<0x4000/2;i+=2)
+	for (i = 0;i < 0x4000 / 2;i += 2)
 	{
 		temp16[i] = 0xFFFE;
-		temp16[i+1] = 0xEAFF;
+		temp16[i + 1] = 0xEAFF;
 
 	}
 	int base = 0;
+	int addr = 0x10000000;
 
-	// just do a jump to 0x080003c9  because there is some valid thumb code there with the current hookup..
-	// i'd expect valid non-thumb code at 0x08000000 tho?
+	// just do a jump to 0x10000000 because that looks possibly correct.
+	// we probably should be setting up stack and other things too, but we
+	// don't really know that info yet.
 
 	temp16[(base) / 2] = 0x0004; base += 2;
 	temp16[(base) / 2] = 0xe59f; base += 2;
@@ -193,18 +198,67 @@ void pgm2_state::pgm_create_dummy_internal_arm_region(int addr)
 	temp16[(base) / 2] = 0x0010; base += 2;
 	temp16[(base) / 2] = 0x0000; base += 2;
 
-	temp16[(base) / 2] = addr&0xffff; base += 2;
-	temp16[(base) / 2] = (addr>>16)&0xffff; base += 2;
+	temp16[(base) / 2] = addr & 0xffff; base += 2;
+	temp16[(base) / 2] = (addr >> 16) & 0xffff; base += 2;
+
+	/* debug code to find jumps to the internal ROM and put jumps back to where we came from in the internal ROM space */
+
+	uint16_t *gamerom = (uint16_t *)memregion("user1")->base();
+	int gameromlen = memregion("user1")->bytes() / 2;
+
+	for (int i = 0;i < gameromlen - 3;i++)
+	{
+		uint16_t val1 = gamerom[i];
+		uint16_t val2 = gamerom[i + 1];
+
+		if ((val1 == 0xF004) && (val2 == 0xe51f))
+		{
+			uint16_t val3 = gamerom[i + 2];
+			uint16_t val4 = gamerom[i + 3];
+			uint32_t jump = (val4 << 16) | val3;
+
+			if (jump < 0x10000000) // jumps to internal ROM
+			{
+				logerror("internal ROM jump found at %08x (jump is %08x)", i * 2, jump);
+				if (jump & 1)
+				{
+					logerror(" (To THUMB)");
+					jump &= ~1;
+					// put a BX R14 there
+					temp16[(jump / 2)] = 0x4770;
+				}
+				else
+				{
+					// put a BX R14 there
+					temp16[(jump / 2)] = 0xFF1E;
+					temp16[(jump / 2) + 1] = 0xE12F;
+				}
+				logerror("\n");
+			}
+			else if (jump < 0x20000000) // jumps to RAM
+			{
+				logerror("RAM jump found at %08x (jump is %08x)", i * 2, jump);
+				if (jump & 1) logerror(" (To THUMB)");
+				logerror("\n");
+			}
+			else // anything else is to ROM
+			{
+				logerror("ROM jump found at %08x (jump is %08x)", i * 2, jump);
+				if (jump & 1) logerror(" (To THUMB)");
+				logerror("\n");
+			}
+
+		}
+	}
 }
 
 
 
-static MACHINE_CONFIG_START( pgm2, pgm2_state )
+static MACHINE_CONFIG_START( pgm2 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", ARM9, 20000000) // ?? ARM baesd CPU, has internal ROM.
 	MCFG_CPU_PROGRAM_MAP(pgm2_map)
-//  MCFG_DEVICE_DISABLE()
 
 
 
@@ -215,7 +269,7 @@ static MACHINE_CONFIG_START( pgm2, pgm2_state )
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 56*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(pgm2_state, screen_update_pgm2)
-	MCFG_SCREEN_VBLANK_DRIVER(pgm2_state, screen_eof_pgm2)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(pgm2_state, screen_vblank_pgm2))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pgm2)
@@ -410,18 +464,71 @@ ROM_START( ddpdojh )
 	ROM_LOAD16_WORD_SWAP( "ddpdoj_wave0.u12",        0x00000000, 0x1000000, CRC(2b71a324) SHA1(f69076cc561f40ca564d804bc7bd455066f8d77c) )
 ROM_END
 
+/*
+   The Kov3 Program rom is a module consisting of a NOR flash and a FPGA, this provides an extra layer of encryption on top of the usual
+   that is only unlocked when the correct sequence is recieved from the ARM MCU (IGS036)
+
+   Newer gambling games use the same modules.
+*/
 
 ROM_START( kov3 )
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	ROM_LOAD( "kov3_igs036.rom",         0x00000000, 0x0004000, NO_DUMP )
 
-	ROM_REGION( 0x800000, "user1", 0 ) /* custom ROM module instead of regular ROMs, this might be incorrect - same module is used on newer gambling boards */
+	ROM_REGION( 0x800000, "user1", 0 )
+	ROM_LOAD( "kov3_v104cn_raw.bin",         0x00000000, 0x0800000, CRC(1b5cbd24) SHA1(6471d4842a08f404420dea2bd1c8b88798c80fd5) )
 
-	// this was an attempt to read the ROM module directly and could be bad
-	ROM_LOAD( "kov3_v102cn_direct.bin",         0x00000000, 0x0800000, CRC(2568cca4) SHA1(3f0e949bc0ae5d7ec0109f2748b30024dcd19ac4) )
-	// this was read with a logic analyser after booting, you can't however replace the module directly with this because some kind of
-	// additional check / communication with the module is done on startup resulting in the internal ROM refusing to boot it
-	ROM_LOAD( "kov3_v102cn.bin",         0x00000000, 0x0800000, CRC(1fcedff3) SHA1(522538510c5f94e8b1f641250c25a2a58962ca42) )
+	ROM_REGION( 0x200000, "tiles", ROMREGION_ERASEFF )
+	ROM_LOAD( "kov3_text.u1",            0x00000000, 0x0200000, CRC(198b52d6) SHA1(e4502abe7ba01053d16c02114f0c88a3f52f6f40) )
+
+	ROM_REGION( 0x2000000, "bgtile", 0 )
+	ROM_LOAD32_WORD( "kov3_bgl.u6",      0x00000000, 0x1000000, CRC(49a4c5bc) SHA1(26b7da91067bda196252520e9b4893361c2fc675) )
+	ROM_LOAD32_WORD( "kov3_bgh.u7",      0x00000002, 0x1000000, CRC(adc1aff1) SHA1(b10490f0dbef9905cdb064168c529f0b5a2b28b8) )
+
+	ROM_REGION( 0x4000000, "spritesa", 0 ) // 1bpp sprite mask data
+	ROM_LOAD32_WORD( "kov3_mapl0.u15",   0x00000000, 0x2000000, CRC(9e569bf7) SHA1(03d26e000e9d8e744546be9649628d2130f2ec4c) )
+	ROM_LOAD32_WORD( "kov3_maph0.u16",   0x00000002, 0x2000000, CRC(6f200ad8) SHA1(cd12c136d4f5d424bd7daeeacd5c4127beb3d565) )
+
+	ROM_REGION( 0x8000000, "spritesb", 0 ) // sprite colour data
+	ROM_LOAD32_WORD( "kov3_spa0.u17",    0x00000000, 0x4000000, CRC(3a1e58a9) SHA1(6ba251407c69ee62f7ea0baae91bc133acc70c6f) )
+	ROM_LOAD32_WORD( "kov3_spb0.u10",    0x00000002, 0x4000000, CRC(90396065) SHA1(01bf9f69d77a792d5b39afbba70fbfa098e194f1) )
+
+	ROM_REGION( 0x4000000, "ymz770", ROMREGION_ERASEFF ) /* ymz770 */
+	ROM_LOAD16_WORD_SWAP( "kov3_wave0.u13",              0x00000000, 0x4000000, CRC(aa639152) SHA1(2314c6bd05524525a31a2a4668a36a938b924ba4) )
+ROM_END
+
+ROM_START( kov3_102 )
+	ROM_REGION( 0x04000, "maincpu", 0 )
+	ROM_LOAD( "kov3_igs036.rom",         0x00000000, 0x0004000, NO_DUMP )
+
+	ROM_REGION( 0x800000, "user1", 0 )
+	ROM_LOAD( "kov3_v102cn_raw.bin",         0x00000000, 0x0800000, CRC(61d0dabd) SHA1(959b22ef4e342ca39c2386549ac7274f9d580ab8) )
+
+	ROM_REGION( 0x200000, "tiles", ROMREGION_ERASEFF )
+	ROM_LOAD( "kov3_text.u1",            0x00000000, 0x0200000, CRC(198b52d6) SHA1(e4502abe7ba01053d16c02114f0c88a3f52f6f40) )
+
+	ROM_REGION( 0x2000000, "bgtile", 0 )
+	ROM_LOAD32_WORD( "kov3_bgl.u6",      0x00000000, 0x1000000, CRC(49a4c5bc) SHA1(26b7da91067bda196252520e9b4893361c2fc675) )
+	ROM_LOAD32_WORD( "kov3_bgh.u7",      0x00000002, 0x1000000, CRC(adc1aff1) SHA1(b10490f0dbef9905cdb064168c529f0b5a2b28b8) )
+
+	ROM_REGION( 0x4000000, "spritesa", 0 ) // 1bpp sprite mask data
+	ROM_LOAD32_WORD( "kov3_mapl0.u15",   0x00000000, 0x2000000, CRC(9e569bf7) SHA1(03d26e000e9d8e744546be9649628d2130f2ec4c) )
+	ROM_LOAD32_WORD( "kov3_maph0.u16",   0x00000002, 0x2000000, CRC(6f200ad8) SHA1(cd12c136d4f5d424bd7daeeacd5c4127beb3d565) )
+
+	ROM_REGION( 0x8000000, "spritesb", 0 ) // sprite colour data
+	ROM_LOAD32_WORD( "kov3_spa0.u17",    0x00000000, 0x4000000, CRC(3a1e58a9) SHA1(6ba251407c69ee62f7ea0baae91bc133acc70c6f) )
+	ROM_LOAD32_WORD( "kov3_spb0.u10",    0x00000002, 0x4000000, CRC(90396065) SHA1(01bf9f69d77a792d5b39afbba70fbfa098e194f1) )
+
+	ROM_REGION( 0x4000000, "ymz770", ROMREGION_ERASEFF ) /* ymz770 */
+	ROM_LOAD16_WORD_SWAP( "kov3_wave0.u13",              0x00000000, 0x4000000, CRC(aa639152) SHA1(2314c6bd05524525a31a2a4668a36a938b924ba4) )
+ROM_END
+
+ROM_START( kov3_100 )
+	ROM_REGION( 0x04000, "maincpu", 0 )
+	ROM_LOAD( "kov3_igs036.rom",         0x00000000, 0x0004000, NO_DUMP )
+
+	ROM_REGION( 0x800000, "user1", 0 )
+	ROM_LOAD( "kov3_v100cn_raw.bin",         0x00000000, 0x0800000, CRC(93bca924) SHA1(ecaf2c4676eb3d9f5e4fdbd9388be41e51afa0e4) )
 
 	ROM_REGION( 0x200000, "tiles", ROMREGION_ERASEFF )
 	ROM_LOAD( "kov3_text.u1",            0x00000000, 0x0200000, CRC(198b52d6) SHA1(e4502abe7ba01053d16c02114f0c88a3f52f6f40) )
@@ -443,13 +550,13 @@ ROM_START( kov3 )
 ROM_END
 
 
-static void iga_u16_decode(UINT16 *rom, int len, int ixor)
+static void iga_u16_decode(uint16_t *rom, int len, int ixor)
 {
 	int i;
 
 	for (i = 1; i < len / 2; i+=2)
 	{
-		UINT16 x = ixor;
+		uint16_t x = ixor;
 
 		if ( (i>>1) & 0x000001) x ^= 0x0010;
 		if ( (i>>1) & 0x000002) x ^= 0x2004;
@@ -468,13 +575,13 @@ static void iga_u16_decode(UINT16 *rom, int len, int ixor)
 	}
 }
 
-static void iga_u12_decode(UINT16* rom, int len, int ixor)
+static void iga_u12_decode(uint16_t* rom, int len, int ixor)
 {
 	int i;
 
 	for (i = 0; i < len / 2; i+=2)
 	{
-		UINT16 x = ixor;
+		uint16_t x = ixor;
 
 		if ( (i>>1) & 0x000001) x ^= 0x9004;
 		if ( (i>>1) & 0x000002) x ^= 0x0028;
@@ -495,7 +602,7 @@ static void iga_u12_decode(UINT16* rom, int len, int ixor)
 
 DRIVER_INIT_MEMBER(pgm2_state,orleg2)
 {
-	UINT16 *src = (UINT16 *)memregion("spritesa")->base();
+	uint16_t *src = (uint16_t *)memregion("spritesa")->base();
 
 	iga_u12_decode(src, 0x2000000, 0x4761);
 	iga_u16_decode(src, 0x2000000, 0xc79f);
@@ -503,12 +610,12 @@ DRIVER_INIT_MEMBER(pgm2_state,orleg2)
 	igs036_decryptor decrypter(orleg2_key);
 	decrypter.decrypter_rom(memregion("user1"));
 
-	pgm_create_dummy_internal_arm_region(0x80003c9);
+	pgm_create_dummy_internal_arm_region();
 }
 
 DRIVER_INIT_MEMBER(pgm2_state,kov2nl)
 {
-	UINT16 *src = (UINT16 *)memregion("spritesa")->base();
+	uint16_t *src = (uint16_t *)memregion("spritesa")->base();
 
 	iga_u12_decode(src, 0x2000000, 0xa193);
 	iga_u16_decode(src, 0x2000000, 0xb780);
@@ -516,12 +623,12 @@ DRIVER_INIT_MEMBER(pgm2_state,kov2nl)
 	igs036_decryptor decrypter(kov2_key);
 	decrypter.decrypter_rom(memregion("user1"));
 
-	pgm_create_dummy_internal_arm_region(0x8000069);
+	pgm_create_dummy_internal_arm_region();
 }
 
 DRIVER_INIT_MEMBER(pgm2_state,ddpdojh)
 {
-	UINT16 *src = (UINT16 *)memregion("spritesa")->base();
+	uint16_t *src = (uint16_t *)memregion("spritesa")->base();
 
 	iga_u12_decode(src, 0x800000, 0x1e96);
 	iga_u16_decode(src, 0x800000, 0x869c);
@@ -529,12 +636,12 @@ DRIVER_INIT_MEMBER(pgm2_state,ddpdojh)
 	igs036_decryptor decrypter(ddpdoj_key);
 	decrypter.decrypter_rom(memregion("user1"));
 
-	pgm_create_dummy_internal_arm_region(0x80003c9);
+	pgm_create_dummy_internal_arm_region();
 }
 
 DRIVER_INIT_MEMBER(pgm2_state,kov3)
 {
-	UINT16 *src = (UINT16 *)memregion("spritesa")->base();
+	uint16_t *src = (uint16_t *)memregion("spritesa")->base();
 
 	iga_u12_decode(src, 0x2000000, 0x956d);
 	iga_u16_decode(src, 0x2000000, 0x3d17);
@@ -542,7 +649,38 @@ DRIVER_INIT_MEMBER(pgm2_state,kov3)
 	igs036_decryptor decrypter(kov3_key);
 	decrypter.decrypter_rom(memregion("user1"));
 
-	pgm_create_dummy_internal_arm_region(0x80003c9);
+	pgm_create_dummy_internal_arm_region();
+}
+
+void pgm2_state::decrypt_kov3_module(uint32_t addrxor, uint16_t dataxor)
+{
+	uint16_t *src = (uint16_t *)memregion("user1")->base();
+	uint32_t size = memregion("user1")->bytes();
+
+	std::vector<uint16_t> buffer(size/2);
+
+	for (int i = 0; i < size/2; i++)
+		buffer[i] = src[i^addrxor]^dataxor;
+
+	memcpy(src, &buffer[0], size);
+}
+
+DRIVER_INIT_MEMBER(pgm2_state, kov3_104)
+{
+	decrypt_kov3_module(0x18ec71, 0xb89d);
+	DRIVER_INIT_CALL(kov3);
+}
+
+DRIVER_INIT_MEMBER(pgm2_state, kov3_102)
+{
+	decrypt_kov3_module(0x021d37, 0x81d0);
+	DRIVER_INIT_CALL(kov3);
+}
+
+DRIVER_INIT_MEMBER(pgm2_state, kov3_100)
+{
+	decrypt_kov3_module(0x3e8aa8, 0xc530);
+	DRIVER_INIT_CALL(kov3);
 }
 
 
@@ -550,18 +688,19 @@ DRIVER_INIT_MEMBER(pgm2_state,kov3)
 GAME( 2007, orleg2,       0,         pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V104, China)", MACHINE_IS_SKELETON )
 GAME( 2007, orleg2o,      orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V103, China)", MACHINE_IS_SKELETON )
 GAME( 2007, orleg2oa,     orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V101, China)", MACHINE_IS_SKELETON )
-// should be earlier verisons too.
+// should be a V100 too
 
 GAME( 2008, kov2nl,       0,         pgm2,    pgm2, pgm2_state,     kov2nl,       ROT0, "IGS", "Knights of Valour 2 New Legend (V302, China)", MACHINE_IS_SKELETON )
 GAME( 2008, kov2nlo,      kov2nl,    pgm2,    pgm2, pgm2_state,     kov2nl,       ROT0, "IGS", "Knights of Valour 2 New Legend (V301, China)", MACHINE_IS_SKELETON )
 GAME( 2008, kov2nloa,     kov2nl,    pgm2,    pgm2, pgm2_state,     kov2nl,       ROT0, "IGS", "Knights of Valour 2 New Legend (V300, Taiwan)", MACHINE_IS_SKELETON )
-// should be earlier verisons too.
 
 GAME( 2010, ddpdojh,      0,    pgm2,    pgm2, pgm2_state,     ddpdojh,    ROT270, "IGS", "Dodonpachi Daioujou Tamashii (V201, China)", MACHINE_IS_SKELETON )
-// should be earlier verisons too.
+// should be a V200 too
 
-GAME( 2011, kov3,         0,    pgm2,    pgm2, pgm2_state,     kov3,       ROT0, "IGS", "Knights of Valour 3 (V102, China)", MACHINE_IS_SKELETON )
-// should be earlier verisons too.
+GAME( 2011, kov3,         0,    pgm2,    pgm2, pgm2_state,     kov3_104,   ROT0, "IGS", "Knights of Valour 3 (V104, China)", MACHINE_IS_SKELETON )
+GAME( 2011, kov3_102,     kov3, pgm2,    pgm2, pgm2_state,     kov3_102,   ROT0, "IGS", "Knights of Valour 3 (V102, China)", MACHINE_IS_SKELETON )
+GAME( 2011, kov3_100,     kov3, pgm2,    pgm2, pgm2_state,     kov3_100,   ROT0, "IGS", "Knights of Valour 3 (V100, China)", MACHINE_IS_SKELETON )
+// should be V103 and V101 at least
 
 // The King of Fighters '98 - Ultimate Match - Hero
 // Jigsaw World Arena

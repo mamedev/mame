@@ -29,6 +29,8 @@
 #include "bus/rs232/rs232.h"
 #include "imagedev/cassette.h"
 #include "sound/wave.h"
+#include "speaker.h"
+
 #include "et3400.lh"
 
 
@@ -60,7 +62,7 @@ private:
 
 READ8_MEMBER( et3400_state::keypad_r )
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	if (~offset & 4)
 		data &= ioport("X2")->read();
@@ -76,10 +78,10 @@ WRITE8_MEMBER( et3400_state::display_w )
 {
 /* This computer sets each segment, one at a time. */
 
-	static const UINT8 segments[8]={0x40,0x20,0x10,0x08,0x04,0x02,0x01,0x80};
-	UINT8 digit = (offset >> 4) & 7;
-	UINT8 segment = segments[offset & 7];
-	UINT8 segdata = output().get_digit_value(digit);
+	static const uint8_t segments[8]={0x40,0x20,0x10,0x08,0x04,0x02,0x01,0x80};
+	uint8_t digit = (offset >> 4) & 7;
+	uint8_t segment = segments[offset & 7];
+	uint8_t segdata = output().get_digit_value(digit);
 
 	if (data & 1)
 		segdata |= segment;
@@ -175,7 +177,7 @@ static DEVICE_INPUT_DEFAULTS_START( terminal )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_2 )
 DEVICE_INPUT_DEFAULTS_END
 
-static MACHINE_CONFIG_START( et3400, et3400_state )
+static MACHINE_CONFIG_START( et3400 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, XTAL_4MHz / 4 ) // 1MHz with memory i/o accessory, or 500khz without it
 	MCFG_CPU_PROGRAM_MAP(et3400_mem)
@@ -211,4 +213,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   CLASS          INIT    COMPANY       FULLNAME       FLAGS */
-COMP( 1976, et3400,  0,     0,       et3400,    et3400, driver_device,  0,    "Heath Inc", "Heathkit ET-3400", 0 )
+COMP( 1976, et3400,  0,     0,       et3400,    et3400, et3400_state,  0,    "Heath Inc", "Heathkit ET-3400", 0 )

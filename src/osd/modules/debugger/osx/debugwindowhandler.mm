@@ -6,11 +6,16 @@
 //
 //============================================================
 
+#include "emu.h"
 #import "debugwindowhandler.h"
 
 #import "debugconsole.h"
 #import "debugcommandhistory.h"
 #import "debugview.h"
+
+#include "debugger.h"
+
+#include "util/xmlfile.h"
 
 
 //============================================================
@@ -20,6 +25,7 @@
 NSString *const MAMEHideDebuggerNotification = @"MAMEHideDebuggerNotification";
 NSString *const MAMEShowDebuggerNotification = @"MAMEShowDebuggerNotification";
 NSString *const MAMEAuxiliaryDebugWindowWillCloseNotification = @"MAMEAuxiliaryDebugWindowWillCloseNotification";
+NSString *const MAMESaveDebuggerConfigurationNotification = @"MAMESaveDebuggerConfigurationNotification";
 
 
 //============================================================
@@ -153,6 +159,10 @@ NSString *const MAMEAuxiliaryDebugWindowWillCloseNotification = @"MAMEAuxiliaryD
 	[window setContentMinSize:NSMakeSize(320, 240)];
 
 	[[NSNotificationCenter defaultCenter] addObserver:self
+											 selector:@selector(saveConfig:)
+												 name:MAMESaveDebuggerConfigurationNotification
+											   object:nil];
+	[[NSNotificationCenter defaultCenter] addObserver:self
 											 selector:@selector(showDebugger:)
 												 name:MAMEShowDebuggerNotification
 											   object:nil];
@@ -187,12 +197,12 @@ NSString *const MAMEAuxiliaryDebugWindowWillCloseNotification = @"MAMEAuxiliaryD
 
 - (IBAction)debugBreak:(id)sender {
 	if (machine->debug_flags & DEBUG_FLAG_ENABLED)
-		debug_cpu_get_visible_cpu(*machine)->debug()->halt_on_next_instruction("User-initiated break\n");
+		machine->debugger().cpu().get_visible_cpu()->debug()->halt_on_next_instruction("User-initiated break\n");
 }
 
 
 - (IBAction)debugRun:(id)sender {
-	debug_cpu_get_visible_cpu(*machine)->debug()->go();
+	machine->debugger().cpu().get_visible_cpu()->debug()->go();
 }
 
 
@@ -201,43 +211,43 @@ NSString *const MAMEAuxiliaryDebugWindowWillCloseNotification = @"MAMEAuxiliaryD
 														object:self
 													  userInfo:[NSDictionary dictionaryWithObject:[NSValue valueWithPointer:machine]
 																						   forKey:@"MAMEDebugMachine"]];
-	debug_cpu_get_visible_cpu(*machine)->debug()->go();
+	machine->debugger().cpu().get_visible_cpu()->debug()->go();
 }
 
 
 - (IBAction)debugRunToNextCPU:(id)sender {
-	debug_cpu_get_visible_cpu(*machine)->debug()->go_next_device();
+	machine->debugger().cpu().get_visible_cpu()->debug()->go_next_device();
 }
 
 
 - (IBAction)debugRunToNextInterrupt:(id)sender {
-	debug_cpu_get_visible_cpu(*machine)->debug()->go_interrupt();
+	machine->debugger().cpu().get_visible_cpu()->debug()->go_interrupt();
 }
 
 
 - (IBAction)debugRunToNextVBLANK:(id)sender {
-	debug_cpu_get_visible_cpu(*machine)->debug()->go_vblank();
+	machine->debugger().cpu().get_visible_cpu()->debug()->go_vblank();
 }
 
 
 - (IBAction)debugStepInto:(id)sender {
-	debug_cpu_get_visible_cpu(*machine)->debug()->single_step();
+	machine->debugger().cpu().get_visible_cpu()->debug()->single_step();
 }
 
 
 - (IBAction)debugStepOver:(id)sender {
-	debug_cpu_get_visible_cpu(*machine)->debug()->single_step_over();
+	machine->debugger().cpu().get_visible_cpu()->debug()->single_step_over();
 }
 
 
 - (IBAction)debugStepOut:(id)sender {
-	debug_cpu_get_visible_cpu(*machine)->debug()->single_step_out();
+	machine->debugger().cpu().get_visible_cpu()->debug()->single_step_out();
 }
 
 
 - (IBAction)debugSoftReset:(id)sender {
 	machine->schedule_soft_reset();
-	debug_cpu_get_visible_cpu(*machine)->debug()->go();
+	machine->debugger().cpu().get_visible_cpu()->debug()->go();
 }
 
 
@@ -265,6 +275,46 @@ NSString *const MAMEAuxiliaryDebugWindowWillCloseNotification = @"MAMEAuxiliaryD
 	running_machine *m = (running_machine *)[[[notification userInfo] objectForKey:@"MAMEDebugMachine"] pointerValue];
 	if (m == machine)
 		[window orderOut:self];
+}
+
+
+- (void)saveConfig:(NSNotification *)notification {
+	running_machine *m = (running_machine *)[[[notification userInfo] objectForKey:@"MAMEDebugMachine"] pointerValue];
+	if (m == machine)
+	{
+		util::xml::data_node *parentnode = (util::xml::data_node *)[[[notification userInfo] objectForKey:@"MAMEDebugParentNode"] pointerValue];
+		util::xml::data_node *node = parentnode->add_child("window", nullptr);
+		if (node)
+			[self saveConfigurationToNode:node];
+	}
+}
+
+
+- (void)saveConfigurationToNode:(util::xml::data_node *)node {
+	NSRect frame = [window frame];
+	node->set_attribute_float("position_x", frame.origin.x);
+	node->set_attribute_float("position_y", frame.origin.y);
+	node->set_attribute_float("size_x", frame.size.width);
+	node->set_attribute_float("size_y", frame.size.height);
+}
+
+
+- (void)restoreConfigurationFromNode:(util::xml::data_node const *)node {
+	NSRect frame = [window frame];
+	frame.origin.x = node->get_attribute_float("position_x", frame.origin.x);
+	frame.origin.y = node->get_attribute_float("position_y", frame.origin.y);
+	frame.size.width = node->get_attribute_float("size_x", frame.size.width);
+	frame.size.height = node->get_attribute_float("size_y", frame.size.height);
+
+	NSSize min = [window minSize];
+	frame.size.width = std::max(frame.size.width, min.width);
+	frame.size.height = std::max(frame.size.height, min.height);
+
+	NSSize max = [window maxSize];
+	frame.size.width = std::min(frame.size.width, max.width);
+	frame.size.height = std::min(frame.size.height, max.height);
+
+	[window setFrame:frame display:YES];
 }
 
 @end
@@ -340,16 +390,16 @@ NSString *const MAMEAuxiliaryDebugWindowWillCloseNotification = @"MAMEAuxiliaryD
 
 	// limit the size to the minimum size
 	NSSize const minimum = [window minSize];
-	windowFrame.size.width = MAX(windowFrame.size.width, minimum.width);
-	windowFrame.size.height = MAX(windowFrame.size.height, minimum.height);
+	windowFrame.size.width = std::max(windowFrame.size.width, minimum.width);
+	windowFrame.size.height = std::max(windowFrame.size.height, minimum.height);
 
 	// limit the size to the main screen size
 	NSRect const available = [[NSScreen mainScreen] visibleFrame];
-	windowFrame.size.width = MIN(windowFrame.size.width, available.size.width);
-	windowFrame.size.height = MIN(windowFrame.size.height, available.size.height);
+	windowFrame.size.width = std::min(windowFrame.size.width, available.size.width);
+	windowFrame.size.height = std::min(windowFrame.size.height, available.size.height);
 
 	// arbitrary additional height limit
-	windowFrame.size.height = MIN(windowFrame.size.height, 320);
+	windowFrame.size.height = std::min(windowFrame.size.height, CGFloat(320));
 
 	// place it in the bottom right corner and apply
 	windowFrame.origin.x = available.origin.x + available.size.width - windowFrame.size.width;
@@ -443,8 +493,22 @@ NSString *const MAMEAuxiliaryDebugWindowWillCloseNotification = @"MAMEAuxiliaryD
 			}
 			return YES;
 		}
-    }
+	}
 	return NO;
+}
+
+
+- (void)saveConfigurationToNode:(util::xml::data_node *)node {
+	[super saveConfigurationToNode:node];
+	node->add_child("expression", util::xml::normalize_string([[self expression] UTF8String]));
+}
+
+
+- (void)restoreConfigurationFromNode:(util::xml::data_node const *)node {
+	[super restoreConfigurationFromNode:node];
+	util::xml::data_node const *const expr = node->get_child("expression");
+	if (expr && expr->get_value())
+		[self setExpression:[NSString stringWithUTF8String:expr->get_value()]];
 }
 
 @end

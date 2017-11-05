@@ -25,8 +25,10 @@
 
 ***************************************************************************/
 
-#ifndef __PIT8253_H__
-#define __PIT8253_H__
+#ifndef MAME_MACHINE_PIT8253_H
+#define MAME_MACHINE_PIT8253_H
+
+#pragma once
 
 /***************************************************************************
     DEVICE CONFIGURATION MACROS
@@ -54,17 +56,15 @@
 class pit8253_device : public device_t
 {
 public:
-	pit8253_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	pit8253_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	~pit8253_device() {}
+	pit8253_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration helpers
 	static void set_clk0(device_t &device, double clk0) { downcast<pit8253_device &>(device).m_clk0 = clk0; }
 	static void set_clk1(device_t &device, double clk1) { downcast<pit8253_device &>(device).m_clk1 = clk1; }
 	static void set_clk2(device_t &device, double clk2) { downcast<pit8253_device &>(device).m_clk2 = clk2; }
-	template<class _Object> static devcb_base &set_out0_handler(device_t &device, _Object object) { return downcast<pit8253_device &>(device).m_out0_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_out1_handler(device_t &device, _Object object) { return downcast<pit8253_device &>(device).m_out1_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_out2_handler(device_t &device, _Object object) { return downcast<pit8253_device &>(device).m_out2_handler.set_callback(object); }
+	template <class Object> static devcb_base &set_out0_handler(device_t &device, Object &&cb) { return downcast<pit8253_device &>(device).m_out0_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out1_handler(device_t &device, Object &&cb) { return downcast<pit8253_device &>(device).m_out1_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out2_handler(device_t &device, Object &&cb) { return downcast<pit8253_device &>(device).m_out2_handler.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);
@@ -90,6 +90,8 @@ public:
 	void set_clockin(int timer, double new_clockin);
 
 protected:
+	pit8253_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int chip_type);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -106,12 +108,12 @@ protected:
 
 		emu_timer *updatetimer; /* MAME timer to process updates */
 
-		UINT16 value;           /* current counter value ("CE" in Intel docs) */
-		UINT16 latch;           /* latched counter value ("OL" in Intel docs) */
-		UINT16 count;           /* new counter value ("CR" in Intel docs) */
-		UINT8 control;          /* 6-bit control byte */
-		UINT8 status;           /* status byte - 8254 only */
-		UINT8 lowcount;         /* LSB of new counter value for 16-bit writes */
+		uint16_t value;           /* current counter value ("CE" in Intel docs) */
+		uint16_t latch;           /* latched counter value ("OL" in Intel docs) */
+		uint16_t count;           /* new counter value ("CR" in Intel docs) */
+		uint8_t control;          /* 6-bit control byte */
+		uint8_t status;           /* status byte - 8254 only */
+		uint8_t lowcount;         /* LSB of new counter value for 16-bit writes */
 		int rmsb;               /* 1 = Next read is MSB of 16-bit value */
 		int wmsb;               /* 1 = Next write is MSB of 16-bit value */
 		int output;             /* 0 = low, 1 = high */
@@ -124,8 +126,15 @@ protected:
 	};
 
 	void readback(pit8253_timer *timer, int command);
-	virtual void readback_command(UINT8 data);
+	virtual void readback_command(uint8_t data);
 	pit8253_timer *get_timer(int which);
+
+	enum
+	{
+		I8254,
+		I8253,
+		FE2010
+	};
 
 private:
 	double m_clk0;
@@ -142,31 +151,39 @@ private:
 
 	pit8253_timer m_timers[PIT8253_MAX_TIMER];
 
-	inline UINT32 adjusted_count(int bcd, UINT16 val);
-	void decrease_counter_value(pit8253_timer *timer, INT64 cycles);
+	inline uint32_t adjusted_count(int bcd, uint16_t val);
+	void decrease_counter_value(pit8253_timer *timer, int64_t cycles);
 	void load_counter_value(pit8253_timer *timer);
 	void set_output(pit8253_timer *timer, int output);
-	void simulate2(pit8253_timer *timer, INT64 elapsed_cycles);
-	void simulate(pit8253_timer *timer, INT64 elapsed_cycles);
+	void simulate2(pit8253_timer *timer, int64_t elapsed_cycles);
+	void simulate(pit8253_timer *timer, int64_t elapsed_cycles);
 	void update(pit8253_timer *timer);
-	UINT16 masked_value(pit8253_timer *timer);
-	void load_count(pit8253_timer *timer, UINT16 newcount);
+	uint16_t masked_value(pit8253_timer *timer);
+	void load_count(pit8253_timer *timer, uint16_t newcount);
 	void gate_w(int gate, int state);
 	void set_clock_signal(int timerno, int state);
+
+	int m_type;
 };
 
-extern const device_type PIT8253;
-
+DECLARE_DEVICE_TYPE(PIT8253, pit8253_device)
 
 class pit8254_device : public pit8253_device
 {
 public:
-	pit8254_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pit8254_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void readback_command(UINT8 data) override;
+	virtual void readback_command(uint8_t data) override;
 };
 
-extern const device_type PIT8254;
+DECLARE_DEVICE_TYPE(PIT8254, pit8254_device)
 
-#endif  /* __PIT8253_H__ */
+class fe2010_pit_device : public pit8253_device
+{
+public:
+	fe2010_pit_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+DECLARE_DEVICE_TYPE(FE2010_PIT, fe2010_pit_device)
+#endif // MAME_MACHINE_PIT8253_H

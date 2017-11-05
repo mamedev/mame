@@ -42,7 +42,7 @@ WRITE8_MEMBER( z80dev_state::display_w )
 {
 	// ---- xxxx digit
 	// xxxx ---- ???
-	static const UINT8 hex_7seg[] = {0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f, 0x77, 0x7c, 0x39, 0x5e, 0x79, 0x71};
+	static const uint8_t hex_7seg[] = {0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f, 0x77, 0x7c, 0x39, 0x5e, 0x79, 0x71};
 
 	output().set_digit_value(offset, hex_7seg[data&0x0f]);
 }
@@ -105,7 +105,7 @@ INPUT_PORTS_START( z80dev )
 		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("LD") PORT_CODE(KEYCODE_L)
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( z80dev, z80dev_state )
+static MACHINE_CONFIG_START( z80dev )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(z80dev_mem)
@@ -123,5 +123,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 198?, z80dev, 0,      0,       z80dev,    z80dev, driver_device,  0,    "<unknown>", "Z80 dev board", MACHINE_NO_SOUND_HW)
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   STATE          INIT  COMPANY      FULLNAME         FLAGS */
+COMP( 198?, z80dev, 0,      0,       z80dev,    z80dev, z80dev_state,  0,    "<unknown>", "Z80 dev board", MACHINE_NO_SOUND_HW)

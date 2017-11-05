@@ -8,10 +8,12 @@
  * 68B45 CRTC
  */
 
+#include "emu.h"
 #include "decodmd3.h"
 #include "rendlay.h"
+#include "screen.h"
 
-const device_type DECODMD3 = &device_creator<decodmd_type3_device>;
+DEFINE_DEVICE_TYPE(DECODMD3, decodmd_type3_device, "decodmd3", "Data East Pinball Dot Matrix Display Type 3")
 
 WRITE8_MEMBER( decodmd_type3_device::data_w )
 {
@@ -20,7 +22,7 @@ WRITE8_MEMBER( decodmd_type3_device::data_w )
 
 READ8_MEMBER( decodmd_type3_device::busy_r )
 {
-	UINT8 ret = 0x00;
+	uint8_t ret = 0x00;
 
 	ret = (m_status & 0x0f) << 3;
 
@@ -99,9 +101,9 @@ WRITE16_MEMBER( decodmd_type3_device::crtc_register_w )
 
 MC6845_UPDATE_ROW( decodmd_type3_device::crtc_update_row )
 {
-	UINT8 *RAM = m_ram->pointer();
-	UINT8 intensity;
-	UINT16 addr = ((ma & 0x7ff) << 2) | ((ra & 0x02) << 12);
+	uint8_t *RAM = m_ram->pointer();
+	uint8_t intensity;
+	uint16_t addr = ((ma & 0x7ff) << 2) | ((ra & 0x02) << 12);
 	addr += ((ra & 0x01) * 24);
 
 	for (int x = 0; x < 192; x += 16)
@@ -128,14 +130,14 @@ static ADDRESS_MAP_START( decodmd3_map, AS_PROGRAM, 16, decodmd_type3_device )
 	AM_RANGE(0x00c00020, 0x00c00021) AM_READWRITE(latch_r,status_w)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_FRAGMENT( decodmd3 )
+MACHINE_CONFIG_MEMBER( decodmd_type3_device::device_add_mconfig )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("dmdcpu", M68000, XTAL_12MHz)
 	MCFG_CPU_PROGRAM_MAP(decodmd3_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_timer",decodmd_type3_device,dmd_irq,attotime::from_hz(150))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_timer", decodmd_type3_device, dmd_irq, attotime::from_hz(150))
 
 	MCFG_MC6845_ADD("dmd6845", MC6845, nullptr, XTAL_12MHz / 4)  // TODO: confirm clock speed
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
@@ -147,20 +149,16 @@ static MACHINE_CONFIG_FRAGMENT( decodmd3 )
 	MCFG_SCREEN_ADD("dmd",RASTER)
 	MCFG_SCREEN_SIZE(192, 64)
 	MCFG_SCREEN_VISIBLE_AREA(0, 192-1, 0, 64-1)
-	MCFG_SCREEN_UPDATE_DEVICE("dmd6845",mc6845_device, screen_update)
+	MCFG_SCREEN_UPDATE_DEVICE("dmd6845", mc6845_device, screen_update)
 	MCFG_SCREEN_REFRESH_RATE(60)
 
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
 MACHINE_CONFIG_END
 
-machine_config_constructor decodmd_type3_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( decodmd3 );
-}
 
-decodmd_type3_device::decodmd_type3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, DECODMD3, "Data East Pinball Dot Matrix Display Type 3", tag, owner, clock, "decodmd3", __FILE__),
+decodmd_type3_device::decodmd_type3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, DECODMD3, tag, owner, clock),
 		m_cpu(*this,"dmdcpu"),
 		m_mc6845(*this,"dmd6845"),
 		m_ram(*this,RAM_TAG),
@@ -174,8 +172,8 @@ void decodmd_type3_device::device_start()
 
 void decodmd_type3_device::device_reset()
 {
-	UINT8* ROM;
-	UINT8* RAM = m_ram->pointer();
+	uint8_t* ROM;
+	uint8_t* RAM = m_ram->pointer();
 	m_rom = memregion(m_gfxtag);
 
 	ROM = m_rom->base();

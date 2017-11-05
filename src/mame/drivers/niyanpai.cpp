@@ -36,37 +36,25 @@ Memo:
 ******************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/tmpz84c011.h"
-#include "cpu/m68000/m68000.h"
-#include "machine/tmp68301.h"
-#include "includes/nb1413m3.h"
-#include "sound/dac.h"
-#include "sound/3812intf.h"
-#include "machine/nvram.h"
 #include "includes/niyanpai.h"
+#include "includes/nb1413m3.h"
 
+#include "cpu/m68000/m68000.h"
+#include "machine/nvram.h"
+#include "machine/tmp68301.h"
 
-WRITE8_MEMBER(niyanpai_state::soundbank_w)
-{
-	membank("soundbank")->set_entry(data & 0x03);
-}
-
-WRITE8_MEMBER(niyanpai_state::soundlatch_clear_w)
-{
-	if (!(data & 0x01)) soundlatch_clear_byte_w(space, 0, 0);
-}
 
 
 DRIVER_INIT_MEMBER(niyanpai_state,niyanpai)
 {
-	UINT8 *SNDROM = memregion("audiocpu")->base();
+	//uint8_t *SNDROM = memregion(":nichisnd:audiorom")->base();
 
 	// sound program patch
-	SNDROM[0x0213] = 0x00;          // DI -> NOP
+	//SNDROM[0x0213] = 0x00;          // DI -> NOP
 
 	// initialize sound rom bank
-	membank("soundbank")->configure_entries(0, 3, memregion("audiocpu")->base() + 0x8000, 0x8000);
-	membank("soundbank")->set_entry(0);
+	//membank("soundbank")->configure_entries(0, 3, memregion(":nichisnd:audiorom")->base() + 0x8000, 0x8000);
+	//membank("soundbank")->set_entry(0);
 
 	// initialize out coin flag (musobana)
 	m_musobana_outcoin_flag = 1;
@@ -75,8 +63,8 @@ DRIVER_INIT_MEMBER(niyanpai_state,niyanpai)
 
 READ16_MEMBER(niyanpai_state::dipsw_r)
 {
-	UINT8 dipsw_a = ioport("DSWA")->read();
-	UINT8 dipsw_b = ioport("DSWB")->read();
+	uint8_t dipsw_a = ioport("DSWA")->read();
+	uint8_t dipsw_b = ioport("DSWB")->read();
 
 	dipsw_a = BITSWAP8(dipsw_a,0,1,2,3,4,5,6,7);
 	dipsw_b = BITSWAP8(dipsw_b,0,1,2,3,4,5,6,7);
@@ -144,7 +132,7 @@ static ADDRESS_MAP_START( niyanpai_map, AS_PROGRAM, 16, niyanpai_state )
 
 	AM_RANGE(0x0bf800, 0x0bffff) AM_RAM
 
-	AM_RANGE(0x200000, 0x200001) AM_WRITE8(soundlatch_byte_w, 0xff00)
+	AM_RANGE(0x200000, 0x200001) AM_DEVWRITE8("nichisnd", nichisnd_device,sound_host_command_w,0xff00)
 
 	AM_RANGE(0x200200, 0x200201) AM_WRITENOP            // unknown
 	AM_RANGE(0x240000, 0x240009) AM_WRITENOP            // unknown
@@ -180,7 +168,7 @@ static ADDRESS_MAP_START( musobana_map, AS_PROGRAM, 16, niyanpai_state )
 	AM_RANGE(0x0a8000, 0x0a87ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x0bf800, 0x0bffff) AM_RAM
 
-	AM_RANGE(0x200000, 0x200001) AM_WRITE8(soundlatch_byte_w, 0xff00)
+	AM_RANGE(0x200000, 0x200001) AM_DEVWRITE8("nichisnd", nichisnd_device,sound_host_command_w,0xff00)
 
 	AM_RANGE(0x200200, 0x200201) AM_WRITE(musobana_inputport_w) // inputport select
 	AM_RANGE(0x240000, 0x240009) AM_WRITENOP            // unknown
@@ -219,7 +207,7 @@ static ADDRESS_MAP_START( mhhonban_map, AS_PROGRAM, 16, niyanpai_state )
 	AM_RANGE(0x0a8000, 0x0a87ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x0bf000, 0x0bffff) AM_RAM
 
-	AM_RANGE(0x200000, 0x200001) AM_WRITE8(soundlatch_byte_w, 0xff00)
+	AM_RANGE(0x200000, 0x200001) AM_DEVWRITE8("nichisnd", nichisnd_device,sound_host_command_w,0xff00)
 
 	AM_RANGE(0x200200, 0x200201) AM_WRITE(musobana_inputport_w) // inputport select
 	AM_RANGE(0x240000, 0x240009) AM_WRITENOP            // unknown
@@ -258,7 +246,7 @@ static ADDRESS_MAP_START( zokumahj_map, AS_PROGRAM, 16, niyanpai_state )
 	AM_RANGE(0x0a8000, 0x0a87ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x0c0000, 0x0cffff) AM_RAM
 
-	AM_RANGE(0x200000, 0x200001) AM_WRITE8(soundlatch_byte_w, 0xff00)
+	AM_RANGE(0x200000, 0x200001) AM_DEVWRITE8("nichisnd", nichisnd_device,sound_host_command_w,0xff00)
 
 	AM_RANGE(0x200200, 0x200201) AM_WRITE(musobana_inputport_w) // inputport select
 	AM_RANGE(0x240000, 0x240009) AM_WRITENOP            // unknown
@@ -285,18 +273,6 @@ static ADDRESS_MAP_START( zokumahj_map, AS_PROGRAM, 16, niyanpai_state )
 	AM_RANGE(0x280400, 0x280401) AM_READ_PORT("SYSTEM")
 
 	AM_RANGE(0xfffc00, 0xffffff) AM_DEVREADWRITE("tmp68301", tmp68301_device, regs_r, regs_w)  // TMP68301 Registers
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( niyanpai_sound_map, AS_PROGRAM, 8, niyanpai_state )
-	AM_RANGE(0x0000, 0x77ff) AM_ROM
-	AM_RANGE(0x7800, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("soundbank")
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( niyanpai_sound_io_map, AS_IO, 8, niyanpai_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x80, 0x81) AM_DEVWRITE("ymsnd", ym3812_device, write)
 ADDRESS_MAP_END
 
 
@@ -331,35 +307,35 @@ static INPUT_PORTS_START( niyanpai )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSWA")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("DSWA:1,2")
 	PORT_DIPSETTING(    0x03, "1" )
 	PORT_DIPSETTING(    0x02, "2" )
 	PORT_DIPSETTING(    0x01, "3" )
 	PORT_DIPSETTING(    0x00, "4" )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coinage ) )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coinage ) )      PORT_DIPLOCATION("DSWA:3,4")
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_3C ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("DSWA:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, "Game Sounds" )
+	PORT_DIPNAME( 0x20, 0x00, "Game Sounds" )       PORT_DIPLOCATION("DSWA:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("DSWA:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("DSWA:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
 
 	PORT_START("DSWB")
-	PORT_DIPNAME( 0x01, 0x00, "Nudity" )
+	PORT_DIPNAME( 0x01, 0x00, "Nudity" )            PORT_DIPLOCATION("DSWB:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x7e, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_DIPNAME( 0x80, 0x80, "Graphic ROM Test" )
+	PORT_DIPNAME( 0x80, 0x80, "Graphic ROM Test" )      PORT_DIPLOCATION("DSWB:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -458,50 +434,50 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( musobana )    // I don't have manual for this game.
 	PORT_START("DSWA")
-	PORT_DIPNAME( 0x03, 0x03, "Game Out" )
+	PORT_DIPNAME( 0x03, 0x03, "Game Out" )          PORT_DIPLOCATION("DSWA:1,2")
 	PORT_DIPSETTING(    0x03, "90% (Easy)" )
 	PORT_DIPSETTING(    0x02, "80%" )
 	PORT_DIPSETTING(    0x01, "70%" )
 	PORT_DIPSETTING(    0x00, "60% (Hard)" )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coinage ) )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coinage ) )      PORT_DIPLOCATION("DSWA:3,4")
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_3C ) )
-	PORT_DIPNAME( 0x10, 0x10, "DIPSW 1-5" )
+	PORT_DIPNAME( 0x10, 0x10, "DIPSW 1-5" )         PORT_DIPLOCATION("DSWA:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("DSWA:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "DIPSW 1-7" )
+	PORT_DIPNAME( 0x40, 0x40, "DIPSW 1-7" )         PORT_DIPLOCATION("DSWA:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, "Game Type" )
+	PORT_DIPNAME( 0x80, 0x00, "Game Type" )         PORT_DIPLOCATION("DSWA:8")
 	PORT_DIPSETTING(    0x80, "Medal Type" )
 	PORT_DIPSETTING(    0x00, "Credit Type" )
 
 	PORT_START("DSWB")
-	PORT_DIPNAME( 0x03, 0x03, "Bet Min" )
+	PORT_DIPNAME( 0x03, 0x03, "Bet Min" )           PORT_DIPLOCATION("DSWB:1,2")
 	PORT_DIPSETTING(    0x03, "1" )
 	PORT_DIPSETTING(    0x02, "2" )
 	PORT_DIPSETTING(    0x01, "3" )
 	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x0c, 0x00, "Bet Max" )
+	PORT_DIPNAME( 0x0c, 0x00, "Bet Max" )           PORT_DIPLOCATION("DSWB:3,4")
 	PORT_DIPSETTING(    0x0c, "1" )
 	PORT_DIPSETTING(    0x08, "5" )
 	PORT_DIPSETTING(    0x04, "10" )
 	PORT_DIPSETTING(    0x00, "20" )
-	PORT_DIPNAME( 0x10, 0x10, "DIPSW 2-5" )
+	PORT_DIPNAME( 0x10, 0x10, "DIPSW 2-5" )         PORT_DIPLOCATION("DSWB:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "Score Pool" )
+	PORT_DIPNAME( 0x20, 0x20, "Score Pool" )        PORT_DIPLOCATION("DSWB:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "DIPSW 2-7" )
+	PORT_DIPNAME( 0x40, 0x40, "DIPSW 2-7" )         PORT_DIPLOCATION("DSWB:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "DIPSW 2-8" )
+	PORT_DIPNAME( 0x80, 0x80, "DIPSW 2-8" )         PORT_DIPLOCATION("DSWB:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
@@ -509,7 +485,7 @@ static INPUT_PORTS_START( musobana )    // I don't have manual for this game.
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN1 )            // COIN1
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_COIN2 )            // COIN2
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_START3 )           // CREDIT CLEAR
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_SERVICE3 )         // MEMORY RESET
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_MEMORY_RESET )     // MEMORY RESET
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_SERVICE2 )         // ANALYZER
 	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, niyanpai_state,musobana_outcoin_flag_r, nullptr)   // OUT COIN
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -518,56 +494,44 @@ static INPUT_PORTS_START( musobana )    // I don't have manual for this game.
 	PORT_INCLUDE( nbmjctrl_16 )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( 4psimasy )    // I don't have manual for this game.
+static INPUT_PORTS_START( 4psimasy )
 	PORT_START("DSWA")
-	PORT_DIPNAME( 0x01, 0x01, "DIPSW 1-1" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "DIPSW 1-2" )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "DIPSW 1-3" )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, "Game Sounds" )
+	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Difficulty ) )       PORT_DIPLOCATION("DSWA:1,2,3")
+	PORT_DIPSETTING(    0x07, DEF_STR( Easiest ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x05, DEF_STR( Medium_Easy ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Medium ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( Medium_Hard ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Very_Hard ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0x08, 0x00, "Game Sounds" )               PORT_DIPLOCATION("DSWA:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Demo_Sounds ) )      PORT_DIPLOCATION("DSWA:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Flip_Screen ) )      PORT_DIPLOCATION("DSWA:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "DIPSW 1-7" )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "DIPSW 1-8" )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coinage ) )          PORT_DIPLOCATION("DSWA:7,8")
+	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 
+	/* this switch not mentioned by the manual */
 	PORT_START("DSWB")
-	PORT_DIPNAME( 0x01, 0x01, "DIPSW 2-1" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "DIPSW 2-2" )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "DIPSW 2-3" )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "DIPSW 2-4" )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "DIPSW 2-5" )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "DIPSW 2-6" )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Option Test" )
+	PORT_DIPUNUSED_DIPLOC( 0x01, IP_ACTIVE_LOW, "DSWB:1" )
+	PORT_DIPUNUSED_DIPLOC( 0x02, IP_ACTIVE_LOW, "DSWB:2" )
+	PORT_DIPUNUSED_DIPLOC( 0x04, IP_ACTIVE_LOW, "DSWB:3" )
+	PORT_DIPUNUSED_DIPLOC( 0x08, IP_ACTIVE_LOW, "DSWB:4" )
+	PORT_DIPUNUSED_DIPLOC( 0x10, IP_ACTIVE_LOW, "DSWB:5" )
+	PORT_DIPUNUSED_DIPLOC( 0x20, IP_ACTIVE_LOW, "DSWB:6" )
+	PORT_DIPNAME( 0x40, 0x40, "Option Test" )               PORT_DIPLOCATION("DSWB:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Graphic ROM Test" )
+	PORT_DIPNAME( 0x80, 0x80, "Graphic ROM Test" )          PORT_DIPLOCATION("DSWB:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
@@ -575,7 +539,7 @@ static INPUT_PORTS_START( 4psimasy )    // I don't have manual for this game.
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN1 )            // COIN1
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_COIN2 )            // COIN2
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_START3 )           // CREDIT CLEAR
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_SERVICE3 )         // MEMORY RESET
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_MEMORY_RESET )     // MEMORY RESET
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_SERVICE2 )         // ANALYZER
 	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, niyanpai_state,musobana_outcoin_flag_r, nullptr)   // OUT COIN
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -586,54 +550,54 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( mhhonban )    // I don't have manual for this game.
 	PORT_START("DSWA")
-	PORT_DIPNAME( 0x01, 0x01, "DIPSW 1-1" )
+	PORT_DIPNAME( 0x01, 0x01, "DIPSW 1-1" )         PORT_DIPLOCATION("DSWA:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "DIPSW 1-2" )
+	PORT_DIPNAME( 0x02, 0x02, "DIPSW 1-2" )         PORT_DIPLOCATION("DSWA:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "DIPSW 1-3" )
+	PORT_DIPNAME( 0x04, 0x04, "DIPSW 1-3" )         PORT_DIPLOCATION("DSWA:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Coinage ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Coinage ) )      PORT_DIPLOCATION("DSWA:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x10, 0x00, "DIPSW 1-5" )
+	PORT_DIPNAME( 0x10, 0x00, "DIPSW 1-5" )         PORT_DIPLOCATION("DSWA:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("DSWA:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "DIPSW 1-7" )
+	PORT_DIPNAME( 0x40, 0x40, "DIPSW 1-7" )         PORT_DIPLOCATION("DSWA:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "DIPSW 1-8" )
+	PORT_DIPNAME( 0x80, 0x80, "DIPSW 1-8" )         PORT_DIPLOCATION("DSWA:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSWB")
-	PORT_DIPNAME( 0x01, 0x01, "DIPSW 2-1" )
+	PORT_DIPNAME( 0x01, 0x01, "DIPSW 2-1" )         PORT_DIPLOCATION("DSWB:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "DIPSW 2-2" )
+	PORT_DIPNAME( 0x02, 0x02, "DIPSW 2-2" )         PORT_DIPLOCATION("DSWB:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "DIPSW 2-3" )
+	PORT_DIPNAME( 0x04, 0x04, "DIPSW 2-3" )         PORT_DIPLOCATION("DSWB:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "DIPSW 2-4" )
+	PORT_DIPNAME( 0x08, 0x08, "DIPSW 2-4" )         PORT_DIPLOCATION("DSWB:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "DIPSW 2-5" )
+	PORT_DIPNAME( 0x10, 0x10, "DIPSW 2-5" )         PORT_DIPLOCATION("DSWB:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "DIPSW 2-6" )
+	PORT_DIPNAME( 0x20, 0x20, "DIPSW 2-6" )         PORT_DIPLOCATION("DSWB:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "DIPSW 2-7" )
+	PORT_DIPNAME( 0x40, 0x40, "DIPSW 2-7" )         PORT_DIPLOCATION("DSWB:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Option Test" )
+	PORT_DIPNAME( 0x80, 0x80, "Option Test" )       PORT_DIPLOCATION("DSWB:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
@@ -641,7 +605,7 @@ static INPUT_PORTS_START( mhhonban )    // I don't have manual for this game.
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN1 )            // COIN1
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_COIN2 )            // COIN2
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_START3 )           // CREDIT CLEAR
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_SERVICE3 )         // MEMORY RESET
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_MEMORY_RESET )     // MEMORY RESET
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_SERVICE2 )         // ANALYZER
 	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, niyanpai_state,musobana_outcoin_flag_r, nullptr)   // OUT COIN
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -652,54 +616,54 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( zokumahj )    // I don't have manual for this game.
 	PORT_START("DSWA")
-	PORT_DIPNAME( 0x01, 0x01, "DIPSW 1-1" )
+	PORT_DIPNAME( 0x01, 0x01, "DIPSW 1-1" )         PORT_DIPLOCATION("DSWA:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "DIPSW 1-2" )
+	PORT_DIPNAME( 0x02, 0x02, "DIPSW 1-2" )         PORT_DIPLOCATION("DSWA:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "DIPSW 1-3" )
+	PORT_DIPNAME( 0x04, 0x04, "DIPSW 1-3" )         PORT_DIPLOCATION("DSWA:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Coinage ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Coinage ) )      PORT_DIPLOCATION("DSWA:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x10, 0x10, "DIPSW 1-5" )
+	PORT_DIPNAME( 0x10, 0x10, "DIPSW 1-5" )         PORT_DIPLOCATION("DSWA:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("DSWA:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "DIPSW 1-7" )
+	PORT_DIPNAME( 0x40, 0x40, "DIPSW 1-7" )         PORT_DIPLOCATION("DSWA:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "DIPSW 1-8" )
+	PORT_DIPNAME( 0x80, 0x80, "DIPSW 1-8" )         PORT_DIPLOCATION("DSWA:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSWB")
-	PORT_DIPNAME( 0x01, 0x01, "DIPSW 2-1" )
+	PORT_DIPNAME( 0x01, 0x01, "DIPSW 2-1" )         PORT_DIPLOCATION("DSWB:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "DIPSW 2-2" )
+	PORT_DIPNAME( 0x02, 0x02, "DIPSW 2-2" )         PORT_DIPLOCATION("DSWB:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "DIPSW 2-3" )
+	PORT_DIPNAME( 0x04, 0x04, "DIPSW 2-3" )         PORT_DIPLOCATION("DSWB:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "DIPSW 2-4" )
+	PORT_DIPNAME( 0x08, 0x08, "DIPSW 2-4" )         PORT_DIPLOCATION("DSWB:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "DIPSW 2-5" )
+	PORT_DIPNAME( 0x10, 0x10, "DIPSW 2-5" )         PORT_DIPLOCATION("DSWB:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "DIPSW 2-6" )
+	PORT_DIPNAME( 0x20, 0x20, "DIPSW 2-6" )         PORT_DIPLOCATION("DSWB:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "DIPSW 2-7" )
+	PORT_DIPNAME( 0x40, 0x40, "DIPSW 2-7" )         PORT_DIPLOCATION("DSWB:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Option Test" )
+	PORT_DIPNAME( 0x80, 0x80, "Option Test" )       PORT_DIPLOCATION("DSWB:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
@@ -707,7 +671,7 @@ static INPUT_PORTS_START( zokumahj )    // I don't have manual for this game.
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN1 )            // COIN1
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_COIN2 )            // COIN2
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_START3 )           // CREDIT CLEAR
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_SERVICE3 )         // MEMORY RESET
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_MEMORY_RESET )     // MEMORY RESET
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_SERVICE2 )         // ANALYZER
 	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, niyanpai_state,musobana_outcoin_flag_r, nullptr)   // OUT COIN
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -722,13 +686,8 @@ INTERRUPT_GEN_MEMBER(niyanpai_state::interrupt)
 	m_tmp68301->external_interrupt_0();
 }
 
-static const z80_daisy_config daisy_chain_sound[] =
-{
-	TMPZ84C011_DAISY_INTERNAL,
-	{ nullptr }
-};
 
-static MACHINE_CONFIG_START( niyanpai, niyanpai_state )
+static MACHINE_CONFIG_START( niyanpai )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12288000/2) /* TMP68301, 6.144 MHz */
@@ -739,16 +698,6 @@ static MACHINE_CONFIG_START( niyanpai, niyanpai_state )
 	MCFG_DEVICE_ADD("tmp68301", TMP68301, 0)
 	MCFG_TMP68301_OUT_PARALLEL_CB(WRITE16(niyanpai_state, tmp68301_parallel_port_w))
 
-	MCFG_CPU_ADD("audiocpu", TMPZ84C011, 8000000) /* TMPZ84C011, 8.00 MHz */
-	MCFG_Z80_DAISY_CHAIN(daisy_chain_sound)
-	MCFG_CPU_PROGRAM_MAP(niyanpai_sound_map)
-	MCFG_CPU_IO_MAP(niyanpai_sound_io_map)
-	MCFG_TMPZ84C011_PORTD_READ_CB(READ8(niyanpai_state, soundlatch_byte_r))
-	MCFG_TMPZ84C011_PORTA_WRITE_CB(WRITE8(niyanpai_state, soundbank_w))
-	MCFG_TMPZ84C011_PORTB_WRITE_CB(DEVWRITE8("dac1", dac_device, write_unsigned8))
-	MCFG_TMPZ84C011_PORTC_WRITE_CB(DEVWRITE8("dac2", dac_device, write_unsigned8))
-	MCFG_TMPZ84C011_PORTE_WRITE_CB(WRITE8(niyanpai_state, soundlatch_clear_w))
-	MCFG_TMPZ84C011_ZC0_CB(DEVWRITELINE("audiocpu", tmpz84c011_device, trg3))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -764,16 +713,7 @@ static MACHINE_CONFIG_START( niyanpai, niyanpai_state )
 	MCFG_PALETTE_ADD("palette", 256*3)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-
-	MCFG_SOUND_ADD("ymsnd", YM3812, 4000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-
-	MCFG_DAC_ADD("dac1")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
-
-	MCFG_DAC_ADD("dac2")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+	MCFG_NICHISND_ADD("nichisnd")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( musobana, niyanpai )
@@ -805,7 +745,7 @@ ROM_START( niyanpai )
 	ROM_LOAD16_BYTE( "npai_01.bin", 0x00000, 0x20000, CRC(a904e8a1) SHA1(77865d7b48cac96af1e3cac4a702f7de4b5ee82b) )
 	ROM_LOAD16_BYTE( "npai_02.bin", 0x00001, 0x20000, CRC(244f9d6f) SHA1(afde18f32c4879a66c0707671d783c21c54cffa4) )
 
-	ROM_REGION( 0x20000, "audiocpu", 0 ) /* TMPZ84C011 sound program */
+	ROM_REGION( 0x20000, ":nichisnd:audiorom", 0 ) /* TMPZ84C011 sound program */
 	ROM_LOAD( "npai_03.bin", 0x000000, 0x20000, CRC(d154306b) SHA1(3375568a6d387d850b8996b8bad3d0220de13993) )
 
 	ROM_REGION( 0x400000, "gfx1", 0 ) /* gfx */
@@ -824,7 +764,7 @@ ROM_START( musobana )
 	ROM_LOAD16_BYTE( "1.209", 0x00000, 0x20000, CRC(574929a1) SHA1(70ea96c3aa8a3512176b719de0928470541d85cb) )
 	ROM_LOAD16_BYTE( "2.208", 0x00001, 0x20000, CRC(12734fda) SHA1(46241efe4266ad6426eb31db757ae4852c70c25d) )
 
-	ROM_REGION( 0x20000, "audiocpu", 0 ) /* TMPZ84C011 sound program */
+	ROM_REGION( 0x20000, ":nichisnd:audiorom", 0 ) /* TMPZ84C011 sound program */
 	ROM_LOAD( "3.804",  0x000000, 0x20000, CRC(0be8f2ce) SHA1(c1ee8907c03f615fbc42654a3c37387714761560) )
 
 	ROM_REGION( 0x500000, "gfx1", 0 ) /* gfx */
@@ -845,7 +785,7 @@ ROM_START( 4psimasy )
 	ROM_LOAD16_BYTE( "1.209", 0x00000, 0x20000, CRC(28dda353) SHA1(3d4738189a7b8b8b0434b3e58550572c3ce74b42) )
 	ROM_LOAD16_BYTE( "2.208", 0x00001, 0x20000, CRC(3679c9fb) SHA1(74a940c3c95723680a63a281f194ef4bbe3dc58a) )
 
-	ROM_REGION( 0x20000, "audiocpu", 0 ) /* TMPZ84C011 sound program */
+	ROM_REGION( 0x20000, ":nichisnd:audiorom", 0 ) /* TMPZ84C011 sound program */
 	ROM_LOAD( "3.804",  0x000000, 0x20000, CRC(bd644726) SHA1(1f8e12a081657d6e1dd9c896056d1ffd977dfe95) )
 
 	ROM_REGION( 0x400000, "gfx1", 0 ) /* gfx */
@@ -864,7 +804,7 @@ ROM_START( mhhonban )
 	ROM_LOAD16_BYTE( "u209.bin", 0x00000, 0x20000, CRC(121c861f) SHA1(70a6b695998904dccb8791ea5d9acbf7484bd812) )
 	ROM_LOAD16_BYTE( "u208.bin", 0x00001, 0x20000, CRC(d6712d0b) SHA1(a384c8f508ec6885bccb989d150cfd7f36a6898d) )
 
-	ROM_REGION( 0x20000, "audiocpu", 0 ) /* TMPZ84C011 sound program */
+	ROM_REGION( 0x20000, ":nichisnd:audiorom", 0 ) /* TMPZ84C011 sound program */
 	ROM_LOAD( "u804.bin",  0x000000, 0x20000, CRC(48407507) SHA1(afd24d16d487fd2b6548d967e2f1ae122e2633a2) )
 
 	ROM_REGION( 0x300000, "gfx1", 0 ) /* gfx */
@@ -881,7 +821,7 @@ ROM_START( zokumahj )
 	ROM_LOAD16_BYTE( "1.bin", 0x00000, 0x20000, CRC(53ca34a9) SHA1(5a1e2660442665efd529ec6c98ffc994c6103419) )
 	ROM_LOAD16_BYTE( "2.bin", 0x00001, 0x20000, CRC(474f9303) SHA1(4b03e3b6b6ee864dfcce3978f19bf329e39b3fe7) )
 
-	ROM_REGION( 0x20000, "audiocpu", 0 ) /* TMPZ84C011 sound program */
+	ROM_REGION( 0x20000, ":nichisnd:audiorom", 0 ) /* TMPZ84C011 sound program */
 	ROM_LOAD( "3.bin",  0x000000, 0x20000, CRC(48407507) SHA1(afd24d16d487fd2b6548d967e2f1ae122e2633a2) )
 
 	ROM_REGION( 0x300000, "gfx1", 0 ) /* gfx */
@@ -897,5 +837,5 @@ ROM_END
 GAME( 1996, niyanpai, 0,        niyanpai, niyanpai, niyanpai_state, niyanpai, ROT0, "Nichibutsu", "Niyanpai (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1995, musobana, 0,        musobana, musobana, niyanpai_state, niyanpai, ROT0, "Nichibutsu / Yubis", "Musoubana (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, 4psimasy, 0,        musobana, 4psimasy, niyanpai_state, niyanpai, ROT0, "Sphinx / AV Japan", "Mahjong 4P Simasyo (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 199?, mhhonban, 0,        mhhonban, mhhonban, niyanpai_state, niyanpai, ROT0, "Nichibutsu?", "Mahjong Housoukyoku Honbanchuu (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, mhhonban, 0,        mhhonban, mhhonban, niyanpai_state, niyanpai, ROT0, "Nichibutsu", "Mahjong Housoukyoku Honbanchuu (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 199?, zokumahj, mhhonban, zokumahj, zokumahj, niyanpai_state, niyanpai, ROT0, "Nichibutsu?", "Zoku Mahjong Housoukyoku (Japan)", MACHINE_SUPPORTS_SAVE )

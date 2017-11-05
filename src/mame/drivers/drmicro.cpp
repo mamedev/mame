@@ -11,10 +11,13 @@ Quite similar to Appoooh
 *****************************************************************************/
 
 #include "emu.h"
+#include "includes/drmicro.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/msm5205.h"
 #include "sound/sn76496.h"
-#include "includes/drmicro.h"
+#include "screen.h"
+#include "speaker.h"
 
 #define MCLK 18432000
 
@@ -43,7 +46,7 @@ WRITE8_MEMBER(drmicro_state::nmi_enable_w)
 
 WRITE_LINE_MEMBER(drmicro_state::pcm_w)
 {
-	UINT8 *PCM = memregion("adpcm")->base();
+	uint8_t *PCM = memregion("adpcm")->base();
 
 	int data = PCM[m_pcm_adr / 2];
 
@@ -235,7 +238,7 @@ void drmicro_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( drmicro, drmicro_state )
+static MACHINE_CONFIG_START( drmicro )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,MCLK/6) /* 3.072MHz? */
@@ -274,7 +277,7 @@ static MACHINE_CONFIG_START( drmicro, drmicro_state )
 
 	MCFG_SOUND_ADD("msm", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(drmicro_state, pcm_w))          /* IRQ handler */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S64_4B)  /* 6 KHz */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S64_4B)  /* 6 KHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
 
@@ -319,4 +322,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, drmicro, 0, drmicro, drmicro, driver_device, 0, ROT270, "Sanritsu", "Dr. Micro", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, drmicro, 0, drmicro, drmicro, drmicro_state, 0, ROT270, "Sanritsu", "Dr. Micro", MACHINE_SUPPORTS_SAVE )

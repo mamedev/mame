@@ -8,10 +8,11 @@
 
 *********************************************************************/
 
-#ifndef __A2BUS_SWYFT__
-#define __A2BUS_SWYFT__
+#ifndef MAME_BUS_A2BUS_A2SWYFT_H
+#define MAME_BUS_A2BUS_A2SWYFT_H
 
-#include "emu.h"
+#pragma once
+
 #include "a2bus.h"
 
 //**************************************************************************
@@ -24,29 +25,30 @@ class a2bus_swyft_device:
 {
 public:
 	// construction/destruction
-	a2bus_swyft_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	a2bus_swyft_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	a2bus_swyft_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 
 protected:
+	a2bus_swyft_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	virtual UINT8 read_c0nx(address_space &space, UINT8 offset) override;
-	virtual void write_c0nx(address_space &space, UINT8 offset, UINT8 data) override;
-	virtual UINT8 read_inh_rom(address_space &space, UINT16 offset) override;
-	virtual UINT16 inh_start() override { return 0xd000; }
-	virtual UINT16 inh_end() override { return 0xffff; }
+	virtual uint8_t read_c0nx(address_space &space, uint8_t offset) override;
+	virtual void write_c0nx(address_space &space, uint8_t offset, uint8_t data) override;
+	virtual uint8_t read_inh_rom(address_space &space, uint16_t offset) override;
+	virtual uint16_t inh_start() override { return 0xd000; }
+	virtual uint16_t inh_end() override { return 0xffff; }
 	virtual int inh_type() override;
 
 private:
-	UINT8 *m_rom;
+	uint8_t *m_rom;
 	int m_rombank;
 	int m_inh_state;
 };
 
 // device type definition
-extern const device_type A2BUS_SWYFT;
+DECLARE_DEVICE_TYPE(A2BUS_SWYFT, a2bus_swyft_device)
 
-#endif  /* __A2BUS_SWYFT__ */
+#endif // MAME_BUS_A2BUS_A2SWYFT_H

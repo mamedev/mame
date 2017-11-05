@@ -5,8 +5,11 @@
     Brunword MK4 - Word processor ROM / expansion
 
 */
+#ifndef MAME_BUS_CPC_BRUNWORD4_H
+#define MAME_BUS_CPC_BRUNWORD4_H
 
-#include "emu.h"
+#pragma once
+
 #include "cpcexp.h"
 
 class cpc_brunword4_device  : public device_t,
@@ -14,13 +17,13 @@ class cpc_brunword4_device  : public device_t,
 {
 public:
 	// construction/destruction
-	cpc_brunword4_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	cpc_brunword4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 
 	DECLARE_WRITE8_MEMBER(rombank_w);
-	virtual void set_mapping(UINT8 type) override;
+	virtual void set_mapping(uint8_t type) override;
 
 protected:
 	// device-level overrides
@@ -31,8 +34,10 @@ private:
 	cpc_expansion_slot_device *m_slot;
 
 	bool m_rombank_active;
-	UINT8 m_bank_sel;
+	uint8_t m_bank_sel;
 };
 
 // device type definition
-extern const device_type CPC_BRUNWORD_MK4;
+DECLARE_DEVICE_TYPE(CPC_BRUNWORD_MK4, cpc_brunword4_device)
+
+#endif // MAME_BUS_CPC_BRUNWORD4_H

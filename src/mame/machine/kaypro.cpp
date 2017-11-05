@@ -2,6 +2,7 @@
 // copyright-holders:Robbbert
 
 
+#include "emu.h"
 #include "includes/kaypro.h"
 
 
@@ -22,7 +23,7 @@ WRITE_LINE_MEMBER( kaypro_state::write_centronics_busy )
 
 READ8_MEMBER( kaypro_state::pio_system_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	/* centronics busy */
 	data |= m_centronics_busy << 3;
@@ -89,7 +90,7 @@ WRITE8_MEMBER( kaypro_state::kaypro4_pio_system_w )
 
 READ8_MEMBER( kaypro_state::kaypro2x_system_port_r )
 {
-	UINT8 data = m_centronics_busy << 6;
+	uint8_t data = m_centronics_busy << 6;
 	return (m_system_port & 0xbf) | data;
 }
 
@@ -162,29 +163,9 @@ WRITE8_MEMBER( kaypro_state::kaypro2x_system_port_w )
     FFh    19200 */
 
 
-READ8_MEMBER(kaypro_state::kaypro_sio_r)
-{
-	if (offset == 1)
-		return kay_kbd_d_r();
-	else
-	if (offset == 3)
-		return kay_kbd_c_r();
-	else
-		return m_sio->cd_ba_r(space, offset);
-}
-
-WRITE8_MEMBER(kaypro_state::kaypro_sio_w)
-{
-	if (offset == 1)
-		kay_kbd_d_w(data);
-	else
-		m_sio->cd_ba_w(space, offset, data);
-}
-
-
 /*************************************************************************************
 
-    Floppy DIsk
+    Floppy Disk
 
     If DRQ or IRQ is set, and cpu is halted, the NMI goes low.
     Since the HALT occurs last (and has no callback mechanism), we need to set
@@ -220,7 +201,7 @@ void kaypro_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in kaypro_state::device_timer");
+		assert_always(false, "Unknown id in kaypro_state::device_timer");
 	}
 }
 
@@ -247,7 +228,6 @@ MACHINE_START_MEMBER( kaypro_state,kayproii )
 
 MACHINE_RESET_MEMBER( kaypro_state,kaypro )
 {
-	MACHINE_RESET_CALL_MEMBER(kay_kbd);
 	membank("bankr0")->set_entry(1); // point at rom
 	membank("bankw0")->set_entry(0); // always write to ram
 	membank("bank3")->set_entry(1); // point at video ram
@@ -271,14 +251,14 @@ MACHINE_RESET_MEMBER( kaypro_state,kaypro )
 
 QUICKLOAD_LOAD_MEMBER( kaypro_state, kaypro )
 {
-	UINT8 *RAM = memregion("rambank")->base();
-	UINT16 i;
-	UINT8 data;
+	uint8_t *RAM = memregion("rambank")->base();
+	uint16_t i;
+	uint8_t data;
 
 	/* Load image to the TPA (Transient Program Area) */
 	for (i = 0; i < quickload_size; i++)
 	{
-		if (image.fread( &data, 1) != 1) return IMAGE_INIT_FAIL;
+		if (image.fread( &data, 1) != 1) return image_init_result::FAIL;
 
 		RAM[i+0x100] = data;
 	}
@@ -288,5 +268,5 @@ QUICKLOAD_LOAD_MEMBER( kaypro_state, kaypro )
 	RAM[0x80]=0;                            // clear out command tail
 	RAM[0x81]=0;
 	m_maincpu->set_pc(0x100);                // start program
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }

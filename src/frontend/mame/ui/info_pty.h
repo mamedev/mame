@@ -8,21 +8,22 @@
 
 ***************************************************************************/
 
-#pragma once
-
 #ifndef MAME_FRONTEND_UI_INFO_PTY_H
 #define MAME_FRONTEND_UI_INFO_PTY_H
+
+#pragma once
 
 #include "ui/menu.h"
 
 namespace ui {
-
 class menu_pty_info : public menu
 {
 public:
-	menu_pty_info(mame_ui_manager &mui, render_container *container);
+	menu_pty_info(mame_ui_manager &mui, render_container &container);
 	virtual ~menu_pty_info() override;
-	virtual void populate() override;
+
+private:
+	virtual void populate(float &customtop, float &custombottom) override;
 	virtual void handle() override;
 };
 

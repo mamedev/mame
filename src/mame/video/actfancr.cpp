@@ -11,7 +11,7 @@
 
 /******************************************************************************/
 
-UINT32 actfancr_state::screen_update_actfancr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t actfancr_state::screen_update_actfancr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* Draw playfield */
 	flip_screen_set(m_tilegen2->get_flip_state());

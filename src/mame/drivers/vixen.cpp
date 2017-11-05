@@ -53,8 +53,12 @@ Notes:
 */
 
 
+#include "emu.h"
 #include "includes/vixen.h"
+
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
 
 
 //**************************************************************************
@@ -75,13 +79,15 @@ void vixen_state::update_interrupt()
 
 READ8_MEMBER( vixen_state::opram_r )
 {
-	membank("bank3")->set_entry(0); // read videoram
+	if (!machine().side_effect_disabled())
+		membank("bank3")->set_entry(0); // read videoram
 	return m_program->read_byte(offset);
 }
 
 READ8_MEMBER( vixen_state::oprom_r )
 {
-	membank("bank3")->set_entry(1); // read rom
+	if (!machine().side_effect_disabled())
+		membank("bank3")->set_entry(1); // read rom
 	return m_rom[offset];
 }
 
@@ -106,7 +112,7 @@ READ8_MEMBER( vixen_state::status_r )
 
 	*/
 
-	UINT8 data = 0xf8;
+	uint8_t data = 0xf8;
 
 	// vertical sync interrupt enable
 	data |= m_cmd_d0;
@@ -181,7 +187,7 @@ READ8_MEMBER( vixen_state::ieee488_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	/* attention */
 	data |= m_ieee488->atn_r();
@@ -232,7 +238,7 @@ READ8_MEMBER( vixen_state::port3_r )
 
 	*/
 
-	UINT8 data = 0xfc;
+	uint8_t data = 0xfc;
 
 	// ring indicator
 	data |= m_rs232->ri_r();
@@ -261,7 +267,7 @@ static ADDRESS_MAP_START( vixen_mem, AS_PROGRAM, 8, vixen_state )
 ADDRESS_MAP_END
 
 // when M1 is active: read opcodes
-static ADDRESS_MAP_START( bios_mem, AS_DECRYPTED_OPCODES, 8, vixen_state )
+static ADDRESS_MAP_START( bios_mem, AS_OPCODES, 8, vixen_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xefff) AM_READ(opram_r)
 	AM_RANGE(0xf000, 0xffff) AM_READ(oprom_r)
@@ -275,7 +281,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( vixen_io, AS_IO, 8, vixen_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE(FDC1797_TAG, fd1797_t, read, write)
+	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE(FDC1797_TAG, fd1797_device, read, write)
 	AM_RANGE(0x04, 0x04) AM_MIRROR(0x03) AM_READWRITE(status_r, cmd_w)
 	AM_RANGE(0x08, 0x08) AM_MIRROR(0x01) AM_DEVREADWRITE(P8155H_TAG, i8155_device, read, write)
 	AM_RANGE(0x0c, 0x0d) AM_DEVWRITE(P8155H_TAG, i8155_device, ale_w)
@@ -414,10 +420,10 @@ void vixen_state::video_start()
 //  SCREEN_UPDATE( vixen )
 //-------------------------------------------------
 
-UINT32 vixen_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t vixen_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	const pen_t *pen = m_palette->pens();
-	UINT8 x, y, chr, gfx, inv, ra;
+	uint8_t x, y, chr, gfx, inv, ra;
 
 	for (y = 0; y < 26; y++)
 	{
@@ -425,8 +431,8 @@ UINT32 vixen_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 		{
 			for (x = 0; x < 128; x++)
 			{
-				UINT16 sync_addr = ((y+1) << 7) + x + 1; // it's out by a row and a column
-				UINT8 sync_data = m_sync_rom[sync_addr & 0xfff];
+				uint16_t sync_addr = ((y+1) << 7) + x + 1; // it's out by a row and a column
+				uint8_t sync_data = m_sync_rom[sync_addr & 0xfff];
 				bool blank = BIT(sync_data, 4);
 				/*
 				int clrchadr = BIT(sync_data, 7);
@@ -495,7 +501,7 @@ DISCRETE_SOUND_END
 
 READ8_MEMBER( vixen_state::i8155_pa_r )
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	for (int i = 0; i < 8; i++)
 		if (!BIT(m_col, i)) data &= m_key[i]->read();
@@ -731,7 +737,7 @@ void vixen_state::machine_reset()
 //  MACHINE_CONFIG( vixen )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( vixen, vixen_state )
+static MACHINE_CONFIG_START( vixen )
 	// basic machine hardware
 	MCFG_CPU_ADD(Z8400A_TAG, Z80, XTAL_23_9616MHz/6)
 	MCFG_CPU_PROGRAM_MAP(vixen_mem)
@@ -740,7 +746,7 @@ static MACHINE_CONFIG_START( vixen, vixen_state )
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(vixen_state,vixen_int_ack)
 
 	// video hardware
-	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::amber)
+	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::amber())
 	MCFG_SCREEN_UPDATE_DRIVER(vixen_state, screen_update)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_23_9616MHz/2, 96*8, 0*8, 81*8, 27*10, 0*10, 26*10)
 
@@ -838,5 +844,5 @@ DRIVER_INIT_MEMBER(vixen_state,vixen)
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE    INPUT    CLASS         INIT    COMPANY      FULLNAME       FLAGS
+//    YEAR  NAME    PARENT  COMPAT  MACHINE    INPUT    CLASS         INIT    COMPANY      FULLNAME      FLAGS
 COMP( 1984, vixen,  0,       0,     vixen,     vixen,   vixen_state,  vixen,  "Osborne",   "Vixen",      0 )

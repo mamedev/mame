@@ -21,6 +21,7 @@
 #include "emu.h"
 #include "cpu/i86/i86.h"
 #include "video/mc6845.h"
+#include "screen.h"
 
 
 class fp6000_state : public driver_device
@@ -36,13 +37,13 @@ public:
 		m_palette(*this, "palette")
 	{ }
 
-	UINT8 *m_char_rom;
-	required_shared_ptr<UINT16> m_gvram;
-	required_shared_ptr<UINT16> m_vram;
-	UINT8 m_crtc_vreg[0x100],m_crtc_index;
+	uint8_t *m_char_rom;
+	required_shared_ptr<uint16_t> m_gvram;
+	required_shared_ptr<uint16_t> m_vram;
+	uint8_t m_crtc_vreg[0x100],m_crtc_index;
 
 	struct {
-		UINT16 cmd;
+		uint16_t cmd;
 	}m_key;
 	DECLARE_READ8_MEMBER(fp6000_pcg_r);
 	DECLARE_WRITE8_MEMBER(fp6000_pcg_w);
@@ -56,7 +57,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_fp6000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_fp6000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6845_device>m_crtc;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -85,12 +86,12 @@ void fp6000_state::video_start()
 #define mc6845_update_addr      (((m_crtc_vreg[0x12]<<8) & 0x3f00) | (m_crtc_vreg[0x13] & 0xff))
 
 
-UINT32 fp6000_state::screen_update_fp6000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t fp6000_state::screen_update_fp6000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x,y;
 	int xi,yi;
-	UINT8 *gfx_rom = memregion("pcg")->base();
-	UINT32 count;
+	uint8_t *gfx_rom = memregion("pcg")->base();
+	uint32_t count;
 
 	count = 0;
 
@@ -288,7 +289,7 @@ void fp6000_state::machine_reset()
 {
 }
 
-static MACHINE_CONFIG_START( fp6000, fp6000_state )
+static MACHINE_CONFIG_START( fp6000 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8086, 16000000/2)
 	MCFG_CPU_PROGRAM_MAP(fp6000_map)
@@ -326,5 +327,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY           FULLNAME       FLAGS */
-COMP( 1985, fp6000,  0,      0,       fp6000,     fp6000, driver_device,    0,     "Casio",   "FP-6000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    STATE            INIT   COMPANY    FULLNAME   FLAGS */
+COMP( 1985, fp6000, 0,      0,       fp6000,    fp6000,  fp6000_state,    0,     "Casio",   "FP-6000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

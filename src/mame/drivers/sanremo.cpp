@@ -90,19 +90,22 @@
 
 *******************************************************************************/
 
+#include "emu.h"
+#include "cpu/z80/z80.h"
+#include "machine/nvram.h"
+#include "sound/ay8910.h"
+#include "video/mc6845.h"
+#include "screen.h"
+#include "speaker.h"
+
+#include "sanremo.lh"
+
 
 #define MASTER_CLOCK    XTAL_18MHz
 
 #define CPU_CLOCK       MASTER_CLOCK/3
 #define SND_CLOCK       MASTER_CLOCK/12
 #define CRTC_CLOCK      MASTER_CLOCK/12
-
-#include "emu.h"
-#include "cpu/z80/z80.h"
-#include "video/mc6845.h"
-#include "sound/ay8910.h"
-#include "machine/nvram.h"
-#include "sanremo.lh"
 
 
 class sanremo_state : public driver_device
@@ -114,9 +117,9 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode") { }
 
-	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<uint8_t> m_videoram;
 
-	UINT8 m_attrram[0x800];
+	uint8_t m_attrram[0x800];
 	tilemap_t *m_bg_tilemap;
 	DECLARE_WRITE8_MEMBER(sanremo_videoram_w);
 	TILE_GET_INFO_MEMBER(get_sanremo_tile_info);
@@ -125,7 +128,7 @@ public:
 	int banksel;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(sanremo);
-	UINT32 screen_update_sanremo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_sanremo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 };
@@ -153,11 +156,11 @@ TILE_GET_INFO_MEMBER(sanremo_state::get_sanremo_tile_info)
 
 void sanremo_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(sanremo_state::get_sanremo_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 48, 40);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(sanremo_state::get_sanremo_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 48, 40);
 
 }
 
-UINT32 sanremo_state::screen_update_sanremo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t sanremo_state::screen_update_sanremo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
@@ -339,7 +342,7 @@ GFXDECODE_END
 *              Machine Drivers               *
 *********************************************/
 
-static MACHINE_CONFIG_START( sanremo, sanremo_state )
+static MACHINE_CONFIG_START( sanremo )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
@@ -406,5 +409,5 @@ ROM_END
 *                Game Drivers                *
 *********************************************/
 
-/*     YEAR  NAME     PARENT  MACHINE  INPUT    STATE          INIT   ROT    COMPANY           FULLNAME      FLAGS  LAYOUT  */
-GAMEL( 1996, number1, 0,      sanremo, number1, driver_device, 0,     ROT0, "San Remo Games", "Number One",  0,     layout_sanremo )
+//     YEAR  NAME     PARENT  MACHINE  INPUT    STATE          INIT   ROT   COMPANY           FULLNAME       FLAGS  LAYOUT
+GAMEL( 1996, number1, 0,      sanremo, number1, sanremo_state, 0,     ROT0, "San Remo Games", "Number One",  0,     layout_sanremo )

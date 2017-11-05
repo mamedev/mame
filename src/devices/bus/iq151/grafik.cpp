@@ -8,6 +8,7 @@
 
 #include "emu.h"
 #include "grafik.h"
+#include "screen.h"
 
 #define LOG 0
 
@@ -15,19 +16,12 @@
     IMPLEMENTATION
 ***************************************************************************/
 
-static MACHINE_CONFIG_FRAGMENT( iq151_grafik )
-	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(iq151_grafik_device, x_write))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(iq151_grafik_device, y_write))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(iq151_grafik_device, control_w))
-MACHINE_CONFIG_END
-
 
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type IQ151_GRAFIK = &device_creator<iq151_grafik_device>;
+DEFINE_DEVICE_TYPE(IQ151_GRAFIK, iq151_grafik_device, "iq151_grafik", "IQ151 grafik")
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -37,11 +31,11 @@ const device_type IQ151_GRAFIK = &device_creator<iq151_grafik_device>;
 //  iq151_grafik_device - constructor
 //-------------------------------------------------
 
-iq151_grafik_device::iq151_grafik_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-		: device_t(mconfig, IQ151_GRAFIK, "IQ151 grafik", tag, owner, clock, "iq151_grafik", __FILE__),
-		device_iq151cart_interface( mconfig, *this ),
-		m_ppi8255(*this, "ppi8255"), m_posx(0), m_posy(0), m_all(0), m_pen(0), m_fast(0), m_ev(0), m_ex(0), m_sel(0)
-	{
+iq151_grafik_device::iq151_grafik_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, IQ151_GRAFIK, tag, owner, clock)
+	, device_iq151cart_interface(mconfig, *this)
+	, m_ppi8255(*this, "ppi8255"), m_posx(0), m_posy(0), m_all(0), m_pen(0), m_fast(0), m_ev(0), m_ex(0), m_sel(0)
+{
 }
 
 //-------------------------------------------------
@@ -68,13 +62,15 @@ void iq151_grafik_device::device_reset()
 }
 
 //-------------------------------------------------
-//  device_mconfig_additions
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor iq151_grafik_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( iq151_grafik );
-}
+MACHINE_CONFIG_MEMBER( iq151_grafik_device::device_add_mconfig )
+	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(iq151_grafik_device, x_write))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(iq151_grafik_device, y_write))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(iq151_grafik_device, control_w))
+MACHINE_CONFIG_END
 
 //-------------------------------------------------
 //  I8255 port a
@@ -119,7 +115,7 @@ WRITE8_MEMBER(iq151_grafik_device::control_w)
 //  IO read
 //-------------------------------------------------
 
-void iq151_grafik_device::io_read(offs_t offset, UINT8 &data)
+void iq151_grafik_device::io_read(offs_t offset, uint8_t &data)
 {
 	if (offset >= 0xd0 && offset < 0xd4)
 	{
@@ -139,7 +135,7 @@ void iq151_grafik_device::io_read(offs_t offset, UINT8 &data)
 //  IO write
 //-------------------------------------------------
 
-void iq151_grafik_device::io_write(offs_t offset, UINT8 data)
+void iq151_grafik_device::io_write(offs_t offset, uint8_t data)
 {
 	if (offset >= 0xd0 && offset < 0xd4)
 	{

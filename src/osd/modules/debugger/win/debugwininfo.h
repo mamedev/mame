@@ -13,19 +13,15 @@
 
 #include "debugbaseinfo.h"
 
-#include "emu.h"
 
 
 class debugwin_info : protected debugbase_info
 {
 public:
-	template<class U> friend class simple_list;
-
 	debugwin_info(debugger_windows_interface &debugger, bool is_main_console, LPCSTR title, WNDPROC handler);
 	virtual ~debugwin_info();
 
 	bool is_valid() const { return m_wnd != nullptr; }
-	debugwin_info *next() const { return m_next; }
 
 	void set_ignore_char_lparam(LPARAM value) { m_ignore_char_lparam = value >> 16; }
 	bool check_ignore_char_lparam(LPARAM value)
@@ -106,10 +102,10 @@ protected:
 
 	bool is_main_console() const { return m_is_main_console; }
 	HWND window() const { return m_wnd; }
-	UINT32 minwidth() const { return m_minwidth; }
-	UINT32 maxwidth() const { return m_maxwidth; }
-	void set_minwidth(UINT32 value) { m_minwidth = value; }
-	void set_maxwidth(UINT32 value) { m_maxwidth = value; }
+	uint32_t minwidth() const { return m_minwidth; }
+	uint32_t maxwidth() const { return m_maxwidth; }
+	void set_minwidth(uint32_t value) { m_minwidth = value; }
+	void set_maxwidth(uint32_t value) { m_maxwidth = value; }
 
 	virtual void recompute_children();
 	virtual void update_menu() { }
@@ -131,14 +127,13 @@ private:
 
 	bool const      m_is_main_console;
 
-	debugwin_info   *m_next;
 	HWND            m_wnd;
 	WNDPROC const   m_handler;
 
-	UINT32          m_minwidth, m_maxwidth;
-	UINT32          m_minheight, m_maxheight;
+	uint32_t          m_minwidth, m_maxwidth;
+	uint32_t          m_minheight, m_maxheight;
 
-	UINT16          m_ignore_char_lparam;
+	uint16_t          m_ignore_char_lparam;
 
 	static bool     s_window_class_registered;
 };

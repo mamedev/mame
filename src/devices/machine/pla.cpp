@@ -6,26 +6,28 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "pla.h"
 #include "jedparse.h"
 #include "plaparse.h"
 
 
-const device_type PLA = &device_creator<pla_device>;
+DEFINE_DEVICE_TYPE(PLA, pla_device, "pla", "PLA")
 
 //-------------------------------------------------
 //  pla_device - constructor
 //-------------------------------------------------
 
-pla_device::pla_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, PLA, "PLA", tag, owner, clock, "pla", __FILE__),
-		m_region(*this, DEVICE_SELF),
-		m_format(PLA_FMT_JEDBIN),
-		m_inputs(0),
-		m_outputs(0),
-		m_terms(0),
-		m_input_mask(0),
-		m_xor(0), m_cache_size(0), m_cache2_ptr(0)
+pla_device::pla_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, PLA, tag, owner, clock)
+	, m_region(*this, DEVICE_SELF)
+	, m_format(FMT::JEDBIN)
+	, m_inputs(0)
+	, m_outputs(0)
+	, m_terms(0)
+	, m_input_mask(0)
+	, m_xor(0)
+	, m_cache_size(0), m_cache2_ptr(0)
 {
 }
 
@@ -40,8 +42,8 @@ void pla_device::device_start()
 	assert(m_inputs < 32 && m_outputs <= 32);
 
 	if (m_input_mask == 0)
-		m_input_mask = ((UINT64)1 << m_inputs) - 1;
-	m_input_mask = ((UINT64)m_input_mask << 32) | m_input_mask;
+		m_input_mask = ((uint64_t)1 << m_inputs) - 1;
+	m_input_mask = ((uint64_t)m_input_mask << 32) | m_input_mask;
 
 	// parse fusemap
 	parse_fusemap();
@@ -73,11 +75,11 @@ void pla_device::parse_fusemap()
 	// read pla file
 	switch (m_format)
 	{
-		case PLA_FMT_JEDBIN:
+		case FMT::JEDBIN:
 			result = jedbin_parse(m_region->base(), m_region->bytes(), &jed);
 			break;
 
-		case PLA_FMT_BERKELEY:
+		case FMT::BERKELEY:
 			result = pla_parse(m_region->base(), m_region->bytes(), &jed);
 			break;
 	}
@@ -95,7 +97,7 @@ void pla_device::parse_fusemap()
 	}
 
 	// parse it
-	UINT32 fusenum = 0;
+	uint32_t fusenum = 0;
 
 	for (int p = 0; p < m_terms; p++)
 	{
@@ -107,10 +109,10 @@ void pla_device::parse_fusemap()
 		for (int i = 0; i < m_inputs; i++)
 		{
 			// complement
-			term->and_mask |= (UINT64)jed_get_fuse(&jed, fusenum++) << (i + 32);
+			term->and_mask |= (uint64_t)jed_get_fuse(&jed, fusenum++) << (i + 32);
 
 			// true
-			term->and_mask |= (UINT64)jed_get_fuse(&jed, fusenum++) << i;
+			term->and_mask |= (uint64_t)jed_get_fuse(&jed, fusenum++) << i;
 		}
 
 		// OR mask
@@ -140,7 +142,7 @@ void pla_device::parse_fusemap()
 //  read -
 //-------------------------------------------------
 
-UINT32 pla_device::read(UINT32 input)
+uint32_t pla_device::read(uint32_t input)
 {
 	// try the cache first
 	if (input < m_cache_size)
@@ -148,7 +150,7 @@ UINT32 pla_device::read(UINT32 input)
 
 	for (auto cache2_entry : m_cache2)
 	{
-		if ((UINT32)cache2_entry == input)
+		if ((uint32_t)cache2_entry == input)
 		{
 			// cache2 hit
 			return cache2_entry >> 32;
@@ -156,8 +158,8 @@ UINT32 pla_device::read(UINT32 input)
 	}
 
 	// cache miss, process terms
-	UINT64 inputs = ((~(UINT64)input << 32) | input) & m_input_mask;
-	UINT64 s = 0;
+	uint64_t inputs = ((~(uint64_t)input << 32) | input) & m_input_mask;
+	uint64_t s = 0;
 
 	for (int i = 0; i < m_terms; ++i)
 	{

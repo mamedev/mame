@@ -140,11 +140,13 @@ lev 7 : 0x7c : 0000 11d0 - just rte
 */
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "cpu/m68000/m68000.h"
-#include "machine/watchdog.h"
-#include "sound/2151intf.h"
 #include "includes/shadfrce.h"
+
+#include "cpu/m68000/m68000.h"
+#include "cpu/z80/z80.h"
+#include "machine/watchdog.h"
+#include "sound/ym2151.h"
+#include "speaker.h"
 
 
 WRITE16_MEMBER(shadfrce_state::flip_screen)
@@ -234,7 +236,7 @@ WRITE16_MEMBER(shadfrce_state::flip_screen)
 
 READ16_MEMBER(shadfrce_state::input_ports_r)
 {
-	UINT16 data = 0xffff;
+	uint16_t data = 0xffff;
 
 	switch (offset)
 	{
@@ -256,21 +258,12 @@ READ16_MEMBER(shadfrce_state::input_ports_r)
 }
 
 
-WRITE16_MEMBER(shadfrce_state::sound_brt_w)
+WRITE8_MEMBER(shadfrce_state::screen_brt_w)
 {
-	if (ACCESSING_BITS_8_15)
-	{
-		soundlatch_byte_w(space, 1, data >> 8);
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE );
-	}
-	else
-	{
-		int i;
-		double brt = (data & 0xff) / 255.0;
+	double brt = (data & 0xff) / 255.0;
 
-		for (i = 0; i < 0x4000; i++)
-			m_palette->set_pen_contrast(i, brt);
-	}
+	for (int i = 0; i < 0x4000; i++)
+		m_palette->set_pen_contrast(i, brt);
 }
 
 WRITE16_MEMBER(shadfrce_state::irq_ack_w)
@@ -375,7 +368,8 @@ static ADDRESS_MAP_START( shadfrce_map, AS_PROGRAM, 16, shadfrce_state )
 	AM_RANGE(0x1d0000, 0x1d0005) AM_WRITE(irq_ack_w)
 	AM_RANGE(0x1d0006, 0x1d0007) AM_WRITE(irq_w)
 	AM_RANGE(0x1d0008, 0x1d0009) AM_WRITE(scanline_w)
-	AM_RANGE(0x1d000c, 0x1d000d) AM_READNOP AM_WRITE(sound_brt_w)  /* sound command + screen brightness */
+	AM_RANGE(0x1d000c, 0x1d000d) AM_READNOP AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0xff00)
+	AM_RANGE(0x1d000c, 0x1d000d) AM_WRITE8(screen_brt_w, 0x00ff)
 	AM_RANGE(0x1d0010, 0x1d0011) AM_WRITENOP /* ?? */
 	AM_RANGE(0x1d0012, 0x1d0013) AM_WRITENOP /* ?? */
 	AM_RANGE(0x1d0014, 0x1d0015) AM_WRITENOP /* ?? */
@@ -388,7 +382,7 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(shadfrce_state::oki_bankswitch_w)
 {
-	m_oki->set_bank_base((data & 1) * 0x40000);
+	m_oki->set_rom_bank(data & 1);
 }
 
 static ADDRESS_MAP_START( shadfrce_sound_map, AS_PROGRAM, 8, shadfrce_state )
@@ -396,7 +390,7 @@ static ADDRESS_MAP_START( shadfrce_sound_map, AS_PROGRAM, 8, shadfrce_state )
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xc801) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0xd800, 0xd800) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xe000, 0xe000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0xe800, 0xe800) AM_WRITE(oki_bankswitch_w)
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
@@ -538,7 +532,7 @@ GFXDECODE_END
 
 /* Machine Driver Bits */
 
-static MACHINE_CONFIG_START( shadfrce, shadfrce_state )
+static MACHINE_CONFIG_START( shadfrce )
 
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_28MHz / 2)          /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(shadfrce_map)
@@ -552,7 +546,7 @@ static MACHINE_CONFIG_START( shadfrce, shadfrce_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_28MHz / 4, 448, 0, 320, 272, 8, 248)   /* HTOTAL and VTOTAL are guessed */
 	MCFG_SCREEN_UPDATE_DRIVER(shadfrce_state, screen_update)
-	MCFG_SCREEN_VBLANK_DRIVER(shadfrce_state, screen_eof)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(shadfrce_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", shadfrce)
@@ -562,12 +556,15 @@ static MACHINE_CONFIG_START( shadfrce, shadfrce_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+
 	MCFG_YM2151_ADD("ymsnd", XTAL_3_579545MHz)      /* verified on pcb */
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_13_4952MHz/8, OKIM6295_PIN7_HIGH) /* verified on pcb */
+	MCFG_OKIM6295_ADD("oki", XTAL_13_4952MHz/8, PIN7_HIGH) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 MACHINE_CONFIG_END
@@ -663,6 +660,6 @@ ROM_START( shadfrcej )
 ROM_END
 
 
-GAME( 1993, shadfrce,   0,        shadfrce, shadfrce, driver_device, 0, ROT0, "Technos Japan", "Shadow Force (World, Version 3)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, shadfrceu,  shadfrce, shadfrce, shadfrce, driver_device, 0, ROT0, "Technos Japan", "Shadow Force (US, Version 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, shadfrcej,  shadfrce, shadfrce, shadfrce, driver_device, 0, ROT0, "Technos Japan", "Shadow Force (Japan, Version 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, shadfrce,   0,        shadfrce, shadfrce, shadfrce_state, 0, ROT0, "Technos Japan", "Shadow Force (World, Version 3)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, shadfrceu,  shadfrce, shadfrce, shadfrce, shadfrce_state, 0, ROT0, "Technos Japan", "Shadow Force (US, Version 2)",    MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, shadfrcej,  shadfrce, shadfrce, shadfrce, shadfrce_state, 0, ROT0, "Technos Japan", "Shadow Force (Japan, Version 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

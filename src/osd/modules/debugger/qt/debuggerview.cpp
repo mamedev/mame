@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Andrew Gardner
+#include "emu.h"
 #include <QtWidgets/QScrollBar>
 #include <QtWidgets/QApplication>
 #include <QtGui/QPainter>
@@ -49,7 +50,7 @@ void DebuggerView::paintEvent(QPaintEvent* event)
 	// Tell the MAME debug view how much real estate is available
 	QFontMetrics actualFont = fontMetrics();
 	const double fontWidth = actualFont.width(QString(100, '_')) / 100.;
-	const int fontHeight = MAX(1, actualFont.lineSpacing());
+	const int fontHeight = std::max(1, actualFont.lineSpacing());
 	m_view->set_visible_size(debug_view_xy(width()/fontWidth, height()/fontHeight));
 
 
@@ -240,7 +241,7 @@ void DebuggerView::mousePressEvent(QMouseEvent* event)
 	{
 		QFontMetrics actualFont = fontMetrics();
 		const double fontWidth = actualFont.width(QString(100, '_')) / 100.;
-		const int fontHeight = MAX(1, actualFont.height());
+		const int fontHeight = std::max(1, actualFont.height());
 
 		debug_view_xy topLeft = m_view->visible_position();
 		debug_view_xy clickViewPosition;

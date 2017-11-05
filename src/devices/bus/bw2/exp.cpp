@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "exp.h"
 
 
@@ -14,7 +15,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type BW2_EXPANSION_SLOT = &device_creator<bw2_expansion_slot_device>;
+DEFINE_DEVICE_TYPE(BW2_EXPANSION_SLOT, bw2_expansion_slot_device, "bw2_expansion_slot", "Bondwell 2 expansion port")
 
 
 
@@ -51,8 +52,8 @@ device_bw2_expansion_slot_interface::~device_bw2_expansion_slot_interface()
 //  bw2_expansion_slot_device - constructor
 //-------------------------------------------------
 
-bw2_expansion_slot_device::bw2_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, BW2_EXPANSION_SLOT, "Bondwell 2 expansion port", tag, owner, clock, "bw2_expansion_slot", __FILE__),
+bw2_expansion_slot_device::bw2_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, BW2_EXPANSION_SLOT, tag, owner, clock),
 	device_slot_interface(mconfig, *this), m_cart(nullptr)
 {
 }
@@ -94,7 +95,7 @@ void bw2_expansion_slot_device::device_reset()
 //  cd_r - cartridge data read
 //-------------------------------------------------
 
-UINT8 bw2_expansion_slot_device::cd_r(address_space &space, offs_t offset, UINT8 data, int ram2, int ram3, int ram4, int ram5, int ram6)
+uint8_t bw2_expansion_slot_device::cd_r(address_space &space, offs_t offset, uint8_t data, int ram2, int ram3, int ram4, int ram5, int ram6)
 {
 	if (m_cart != nullptr)
 	{
@@ -109,7 +110,7 @@ UINT8 bw2_expansion_slot_device::cd_r(address_space &space, offs_t offset, UINT8
 //  cd_w - cartridge data write
 //-------------------------------------------------
 
-void bw2_expansion_slot_device::cd_w(address_space &space, offs_t offset, UINT8 data, int ram2, int ram3, int ram4, int ram5, int ram6)
+void bw2_expansion_slot_device::cd_w(address_space &space, offs_t offset, uint8_t data, int ram2, int ram3, int ram4, int ram5, int ram6)
 {
 	if (m_cart != nullptr)
 	{
@@ -124,7 +125,7 @@ void bw2_expansion_slot_device::cd_w(address_space &space, offs_t offset, UINT8 
 
 READ8_MEMBER( bw2_expansion_slot_device::slot_r )
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	if (m_cart != nullptr)
 	{
@@ -154,7 +155,7 @@ WRITE8_MEMBER( bw2_expansion_slot_device::slot_w )
 
 READ8_MEMBER( bw2_expansion_slot_device::modsel_r )
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	if (m_cart != nullptr)
 	{

@@ -28,7 +28,7 @@
 
 PALETTE_INIT_MEMBER(cvs_state,cvs)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i, attr;
 
 	/* color mapping PROM */
@@ -36,7 +36,7 @@ PALETTE_INIT_MEMBER(cvs_state,cvs)
 	{
 		for (i = 0; i < 8; i++)
 		{
-			UINT8 ctabentry = color_prom[(i << 8) | attr] & 0x07;
+			uint8_t ctabentry = color_prom[(i << 8) | attr] & 0x07;
 
 			/* bits 0 and 2 are swapped */
 			ctabentry = BITSWAP8(ctabentry,7,6,5,4,3,0,1,2);
@@ -133,7 +133,7 @@ VIDEO_START_MEMBER(cvs_state,cvs)
 }
 
 
-UINT32 cvs_state::screen_update_cvs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t cvs_state::screen_update_cvs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	static const int ram_based_char_start_indices[] = { 0xe0, 0xc0, 0x100, 0x80 };
 	offs_t offs;
@@ -145,11 +145,11 @@ UINT32 cvs_state::screen_update_cvs(screen_device &screen, bitmap_ind16 &bitmap,
 	for (offs = 0; offs < 0x0400; offs++)
 	{
 		int collision_color = 0x100;
-		UINT8 code = m_video_ram[offs];
-		UINT8 color = m_color_ram[offs];
+		uint8_t code = m_video_ram[offs];
+		uint8_t color = m_color_ram[offs];
 
-		UINT8 x = offs << 3;
-		UINT8 y = offs >> 5 << 3;
+		uint8_t x = offs << 3;
+		uint8_t y = offs >> 5 << 3;
 
 		int gfxnum = (code < ram_based_char_start_indices[m_character_banking_mode]) ? 0 : 1;
 
@@ -317,8 +317,8 @@ void cvs_state::cvs_update_stars(bitmap_ind16 &bitmap, const rectangle &cliprect
 {
 	for (int offs = 0; offs < m_total_stars; offs++)
 	{
-		UINT8 x = (m_stars[offs].x + m_stars_scroll) >> 1;
-		UINT8 y = m_stars[offs].y + ((m_stars_scroll + m_stars[offs].x) >> 9);
+		uint8_t x = (m_stars[offs].x + m_stars_scroll) >> 1;
+		uint8_t y = m_stars[offs].y + ((m_stars_scroll + m_stars[offs].x) >> 9);
 
 		if ((y & 1) ^ ((x >> 4) & 1))
 		{

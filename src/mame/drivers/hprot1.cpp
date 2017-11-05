@@ -57,9 +57,11 @@ Infinite loop is reached at address 0x7699
 
 #include "emu.h"
 #include "cpu/mcs51/mcs51.h"
+#include "sound/spkrdev.h"
 #include "video/hd44780.h"
-#include "sound/speaker.h"
 #include "rendlay.h"
+#include "screen.h"
+#include "speaker.h"
 
 class hprot1_state : public driver_device
 {
@@ -91,8 +93,8 @@ ADDRESS_MAP_END
 DRIVER_INIT_MEMBER( hprot1_state, hprot1 )
 {
 	int i;
-	UINT8 *ROM = memregion("maincpu")->base();
-	UINT8 bitswapped_ROM[0x10000];
+	uint8_t *ROM = memregion("maincpu")->base();
+	uint8_t bitswapped_ROM[0x10000];
 
 	for(i=0x0000;i<0x10000;i++)
 		bitswapped_ROM[i] = ROM[i];
@@ -195,7 +197,7 @@ READ8_MEMBER(hprot1_state::henry_io_r)
 	{
 		case 0x01:
 		{
-			UINT8 value = ioport("inputs")->read();
+			uint8_t value = ioport("inputs")->read();
 #if LOG_IO_PORTS
 			printf("value:%02X\n", value);
 #endif
@@ -212,7 +214,7 @@ READ8_MEMBER(hprot1_state::henry_io_r)
 /*
 WRITE8_MEMBER(hprot1_state::henry_io_w)
 {
-    static UINT8 p0=0, p1=0, p2=0, p3=0;
+    static uint8_t p0=0, p1=0, p2=0, p3=0;
     switch (offset)
     {
         case 0x00:
@@ -298,7 +300,7 @@ HD44780_PIXEL_UPDATE(hprot1_state::hprot1_pixel_update)
 	}
 }
 
-static MACHINE_CONFIG_START( hprot1, hprot1_state )
+static MACHINE_CONFIG_START( hprot1 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I80C31, XTAL_10MHz)
 	MCFG_CPU_PROGRAM_MAP(i80c31_prg)
@@ -378,5 +380,5 @@ COMP( 2002, hprot1,   0,      0,      hprot1,     hprot1,   hprot1_state, hprot1
 COMP( 2006, hprotr8a, hprot1, 0,      hprotr8a,   hprotr8a, hprot1_state, hprot1, "HENRY", "Henry Prot CARD I (REV.08A)", MACHINE_NOT_WORKING)
 /* fw version: "V6.5QI I"   Release date: September 18th, 2006. */
 
-COMP( 2003, hprot2r6, hprot1, 0,      hprot2r6,   hprot2r6, hprot1_state, hprot1, "HENRY", "Henry Prot CARD II (REV.6)", MACHINE_NOT_WORKING)
+COMP( 2003, hprot2r6, hprot1, 0,      hprot2r6,   hprot2r6, hprot1_state, hprot1, "HENRY", "Henry Prot CARD II (REV.6)",  MACHINE_NOT_WORKING)
 /* fw version: "V5.8CF II"  Release date: June 23rd, 2003.      */

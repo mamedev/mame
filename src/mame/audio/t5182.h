@@ -1,14 +1,18 @@
 // license:BSD-3-Clause
 // copyright-holders:Jonathan Gevaryahu
-#include "sound/2151intf.h"
+#ifndef MAME_AUDIO_T5182_H
+#define MAME_AUDIO_T5182_H
+
+#pragma once
+
+#include "sound/ym2151.h"
 #include "cpu/z80/z80.h"
 
 class t5182_device : public device_t
 
 {
 public:
-	t5182_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	~t5182_device() {}
+	t5182_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	enum
 	{
@@ -42,14 +46,14 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual ioport_constructor device_input_ports() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
 	// internal state
 	required_device<cpu_device> m_ourcpu;
-	required_shared_ptr<UINT8> m_sharedram;
+	required_shared_ptr<uint8_t> m_sharedram;
 	int m_irqstate;
 	int m_semaphore_main;
 	int m_semaphore_snd;
@@ -57,4 +61,6 @@ private:
 	TIMER_CALLBACK_MEMBER( setirq_callback );
 };
 
-extern const device_type T5182;
+DECLARE_DEVICE_TYPE(T5182, t5182_device)
+
+#endif // MAME_AUDIO_T5182_H

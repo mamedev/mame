@@ -1,5 +1,5 @@
 /* LzmaDec.c -- LZMA Decoder
-2015-06-23 : Igor Pavlov : Public domain */
+2016-05-16 : Igor Pavlov : Public domain */
 
 #include "Precomp.h"
 
@@ -294,14 +294,14 @@ static int MY_FAST_CALL LzmaDec_DecodeReal(CLzmaDec *p, SizeT limit, const Byte 
       
       #ifdef _LZMA_SIZE_OPT
       {
-        unsigned limit, offset;
+        unsigned lim, offset;
         CLzmaProb *probLen = prob + LenChoice;
         IF_BIT_0(probLen)
         {
           UPDATE_0(probLen);
           probLen = prob + LenLow + (posState << kLenNumLowBits);
           offset = 0;
-          limit = (1 << kLenNumLowBits);
+          lim = (1 << kLenNumLowBits);
         }
         else
         {
@@ -312,17 +312,17 @@ static int MY_FAST_CALL LzmaDec_DecodeReal(CLzmaDec *p, SizeT limit, const Byte 
             UPDATE_0(probLen);
             probLen = prob + LenMid + (posState << kLenNumMidBits);
             offset = kLenNumLowSymbols;
-            limit = (1 << kLenNumMidBits);
+            lim = (1 << kLenNumMidBits);
           }
           else
           {
             UPDATE_1(probLen);
             probLen = prob + LenHigh;
             offset = kLenNumLowSymbols + kLenNumMidSymbols;
-            limit = (1 << kLenNumHighBits);
+            lim = (1 << kLenNumHighBits);
           }
         }
-        TREE_DECODE(probLen, limit, len);
+        TREE_DECODE(probLen, lim, len);
         len += offset;
       }
       #else

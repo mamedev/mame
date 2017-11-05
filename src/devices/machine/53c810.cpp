@@ -9,9 +9,9 @@
 #define DMA_MAX_ICOUNT  512     /* Maximum number of DMA Scripts opcodes to run */
 #define DASM_OPCODES 0
 
-UINT32 lsi53c810_device::FETCH()
+uint32_t lsi53c810_device::FETCH()
 {
-	UINT32 r = m_fetch_cb(dsp);
+	uint32_t r = m_fetch_cb(dsp);
 	dsp += 4;
 	return r;
 }
@@ -23,8 +23,8 @@ void lsi53c810_device::dmaop_invalid()
 
 void lsi53c810_device::dmaop_move_memory()
 {
-	UINT32 src = FETCH();
-	UINT32 dst = FETCH();
+	uint32_t src = FETCH();
+	uint32_t dst = FETCH();
 	int count;
 
 	count = dcmd & 0xffffff;
@@ -51,9 +51,9 @@ void lsi53c810_device::dmaop_interrupt()
 
 void lsi53c810_device::dmaop_block_move()
 {
-	UINT32 address;
-	UINT32 count;
-	INT32 dsps;
+	uint32_t address;
+	uint32_t count;
+	int32_t dsps;
 
 	address = FETCH();
 	count = dcmd & 0x00ffffff;
@@ -65,7 +65,7 @@ void lsi53c810_device::dmaop_block_move()
 	// table indirect
 	if (dcmd & 0x10000000)
 	{
-		dsps = (INT32)address&0xffffff;
+		dsps = (int32_t)address&0xffffff;
 		// sign extend
 		if (dsps & 0x00800000)
 		{
@@ -95,7 +95,7 @@ void lsi53c810_device::dmaop_block_move()
 
 void lsi53c810_device::dmaop_select()
 {
-//  UINT32 operand;
+//  uint32_t operand;
 
 //  operand = FETCH();
 
@@ -122,7 +122,7 @@ void lsi53c810_device::dmaop_select()
 
 void lsi53c810_device::dmaop_wait_disconnect()
 {
-//  UINT32 operand;
+//  uint32_t operand;
 
 //  operand = FETCH();
 
@@ -140,7 +140,7 @@ void lsi53c810_device::dmaop_wait_disconnect()
 
 void lsi53c810_device::dmaop_wait_reselect()
 {
-	//  UINT32 operand;
+	//  uint32_t operand;
 
 //  operand = FETCH();
 
@@ -158,7 +158,7 @@ void lsi53c810_device::dmaop_wait_reselect()
 
 void lsi53c810_device::dmaop_set()
 {
-//  UINT32 operand;
+//  uint32_t operand;
 
 //  operand = FETCH();
 
@@ -187,7 +187,7 @@ void lsi53c810_device::dmaop_set()
 
 void lsi53c810_device::dmaop_clear()
 {
-//  UINT32 operand;
+//  uint32_t operand;
 
 //  operand = FETCH();
 
@@ -289,10 +289,10 @@ int lsi53c810_device::scripts_compute_branch()
 	return passed;
 }
 
-UINT32 lsi53c810_device::scripts_get_jump_dest()
+uint32_t lsi53c810_device::scripts_get_jump_dest()
 {
-	INT32 dsps;
-	UINT32 dest;
+	int32_t dsps;
+	uint32_t dest;
 
 	dsps = FETCH();
 
@@ -309,7 +309,7 @@ UINT32 lsi53c810_device::scripts_get_jump_dest()
 		dsps += dsp;
 	}
 
-	dest = (UINT32)dsps;
+	dest = (uint32_t)dsps;
 
 	logerror("cur DSP %x, dest %x\n", dsp, dest);
 
@@ -394,7 +394,7 @@ void lsi53c810_device::dma_exec()
 	}
 }
 
-UINT8 lsi53c810_device::lsi53c810_reg_r( int offset )
+uint8_t lsi53c810_device::reg_r(int offset)
 {
 //  logerror("53c810: read reg %d:0x%x (PC=%x)\n", offset, offset, space.device().safe_pc());
 	switch(offset)
@@ -477,7 +477,7 @@ UINT8 lsi53c810_device::lsi53c810_reg_r( int offset )
 	//return 0;
 }
 
-void lsi53c810_device::lsi53c810_reg_w(int offset, UINT8 data)
+void lsi53c810_device::reg_w(int offset, uint8_t data)
 {
 //  logerror("53c810: %02x to reg %d:0x%x (PC=%x)\n", data, offset, offset, space.device().safe_pc());
 	switch(offset)
@@ -610,7 +610,7 @@ void lsi53c810_device::lsi53c810_reg_w(int offset, UINT8 data)
 	}
 }
 
-void lsi53c810_device::add_opcode(UINT8 op, UINT8 mask, opcode_handler_delegate handler)
+void lsi53c810_device::add_opcode(uint8_t op, uint8_t mask, opcode_handler_delegate handler)
 {
 	for (int i = 0; i < 256; i++)
 	{
@@ -621,8 +621,8 @@ void lsi53c810_device::add_opcode(UINT8 op, UINT8 mask, opcode_handler_delegate 
 	}
 }
 
-lsi53c810_device::lsi53c810_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: legacy_scsi_host_adapter(mconfig, LSI53C810, "53C810 SCSI", tag, owner, clock, "lsi53c810", __FILE__)
+lsi53c810_device::lsi53c810_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: legacy_scsi_host_adapter(mconfig, LSI53C810, tag, owner, clock)
 {
 }
 
@@ -636,25 +636,25 @@ void lsi53c810_device::device_start()
 
 	for (auto & elem : dma_opcode)
 	{
-		elem = opcode_handler_delegate(FUNC(lsi53c810_device::dmaop_invalid), this);
+		elem = opcode_handler_delegate(&lsi53c810_device::dmaop_invalid, this);
 	}
 
-	add_opcode(0x00, 0xc0, opcode_handler_delegate(FUNC( lsi53c810_device::dmaop_block_move ), this));
-	add_opcode(0x40, 0xf8, opcode_handler_delegate(FUNC( lsi53c810_device::dmaop_select ), this));
-	add_opcode(0x48, 0xf8, opcode_handler_delegate(FUNC( lsi53c810_device::dmaop_wait_disconnect ), this));
-	add_opcode(0x50, 0xf8, opcode_handler_delegate(FUNC( lsi53c810_device::dmaop_wait_reselect ), this));
-	add_opcode(0x58, 0xf8, opcode_handler_delegate(FUNC( lsi53c810_device::dmaop_set ), this));
-	add_opcode(0x60, 0xf8, opcode_handler_delegate(FUNC( lsi53c810_device::dmaop_clear ), this));
-	add_opcode(0x68, 0xf8, opcode_handler_delegate(FUNC( lsi53c810_device::dmaop_move_from_sfbr ), this));
-	add_opcode(0x70, 0xf8, opcode_handler_delegate(FUNC( lsi53c810_device::dmaop_move_to_sfbr ), this));
-	add_opcode(0x78, 0xf8, opcode_handler_delegate(FUNC( lsi53c810_device::dmaop_read_modify_write ), this));
-	add_opcode(0x80, 0xf8, opcode_handler_delegate(FUNC( lsi53c810_device::dmaop_jump ), this));
-	add_opcode(0x88, 0xf8, opcode_handler_delegate(FUNC( lsi53c810_device::dmaop_call ), this));
-	add_opcode(0x90, 0xf8, opcode_handler_delegate(FUNC( lsi53c810_device::dmaop_return ), this));
-	add_opcode(0x98, 0xf8, opcode_handler_delegate(FUNC( lsi53c810_device::dmaop_interrupt ), this));
-	add_opcode(0xc0, 0xfe, opcode_handler_delegate(FUNC( lsi53c810_device::dmaop_move_memory ), this));
-	add_opcode(0xe0, 0xed, opcode_handler_delegate(FUNC( lsi53c810_device::dmaop_store ), this));
-	add_opcode(0xe1, 0xed, opcode_handler_delegate(FUNC( lsi53c810_device::dmaop_load ), this));
+	add_opcode(0x00, 0xc0, opcode_handler_delegate(&lsi53c810_device::dmaop_block_move, this));
+	add_opcode(0x40, 0xf8, opcode_handler_delegate(&lsi53c810_device::dmaop_select, this));
+	add_opcode(0x48, 0xf8, opcode_handler_delegate(&lsi53c810_device::dmaop_wait_disconnect, this));
+	add_opcode(0x50, 0xf8, opcode_handler_delegate(&lsi53c810_device::dmaop_wait_reselect, this));
+	add_opcode(0x58, 0xf8, opcode_handler_delegate(&lsi53c810_device::dmaop_set, this));
+	add_opcode(0x60, 0xf8, opcode_handler_delegate(&lsi53c810_device::dmaop_clear, this));
+	add_opcode(0x68, 0xf8, opcode_handler_delegate(&lsi53c810_device::dmaop_move_from_sfbr, this));
+	add_opcode(0x70, 0xf8, opcode_handler_delegate(&lsi53c810_device::dmaop_move_to_sfbr, this));
+	add_opcode(0x78, 0xf8, opcode_handler_delegate(&lsi53c810_device::dmaop_read_modify_write, this));
+	add_opcode(0x80, 0xf8, opcode_handler_delegate(&lsi53c810_device::dmaop_jump, this));
+	add_opcode(0x88, 0xf8, opcode_handler_delegate(&lsi53c810_device::dmaop_call, this));
+	add_opcode(0x90, 0xf8, opcode_handler_delegate(&lsi53c810_device::dmaop_return, this));
+	add_opcode(0x98, 0xf8, opcode_handler_delegate(&lsi53c810_device::dmaop_interrupt, this));
+	add_opcode(0xc0, 0xfe, opcode_handler_delegate(&lsi53c810_device::dmaop_move_memory, this));
+	add_opcode(0xe0, 0xed, opcode_handler_delegate(&lsi53c810_device::dmaop_store, this));
+	add_opcode(0xe1, 0xed, opcode_handler_delegate(&lsi53c810_device::dmaop_load, this));
 }
 
 /*************************************
@@ -663,17 +663,17 @@ void lsi53c810_device::device_start()
  *
  *************************************/
 
-UINT32 lsi53c810_device::lsi53c810_dasm_fetch(UINT32 pc)
+uint32_t lsi53c810_device::lsi53c810_dasm_fetch(uint32_t pc)
 {
 	return m_fetch_cb(pc);
 }
 
-unsigned lsi53c810_device::lsi53c810_dasm(char *buf, UINT32 pc)
+unsigned lsi53c810_device::lsi53c810_dasm(char *buf, uint32_t pc)
 {
 	unsigned result = 0;
 	const char *op_mnemonic = nullptr;
-	UINT32 op = lsi53c810_dasm_fetch(pc);
-	UINT32 dest;
+	uint32_t op = lsi53c810_dasm_fetch(pc);
+	uint32_t dest;
 	int i;
 
 	static const char *const phases[] =
@@ -699,7 +699,7 @@ unsigned lsi53c810_device::lsi53c810_dasm(char *buf, UINT32 pc)
 	{
 		static const struct
 		{
-			UINT32 flag;
+			uint32_t flag;
 			const char *text;
 		} flags[] =
 		{
@@ -718,7 +718,7 @@ unsigned lsi53c810_device::lsi53c810_dasm(char *buf, UINT32 pc)
 		}
 
 		buf += sprintf(buf, "%s ", op_mnemonic);
-		need_cojunction = FALSE;
+		need_cojunction = false;
 
 		for (i = 0; i < ARRAY_LENGTH(flags); i++)
 		{
@@ -727,7 +727,7 @@ unsigned lsi53c810_device::lsi53c810_dasm(char *buf, UINT32 pc)
 				if (need_cojunction)
 					buf += sprintf(buf, " AND ");
 				else
-					need_cojunction = TRUE;
+					need_cojunction = true;
 				buf += sprintf(buf, "%s", flags[i].text);
 			}
 		}
@@ -813,4 +813,4 @@ unsigned lsi53c810_device::lsi53c810_dasm(char *buf, UINT32 pc)
 	return result;
 }
 
-const device_type LSI53C810 = &device_creator<lsi53c810_device>;
+DEFINE_DEVICE_TYPE(LSI53C810, lsi53c810_device, "lsi53c810", "LSI 53C810 SCSI")

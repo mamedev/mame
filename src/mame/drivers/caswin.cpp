@@ -71,6 +71,8 @@ TODO:
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "machine/nvram.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class caswin_state : public driver_device
@@ -83,8 +85,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode") { }
 
-	required_shared_ptr<UINT8> m_sc0_vram;
-	required_shared_ptr<UINT8> m_sc0_attr;
+	required_shared_ptr<uint8_t> m_sc0_vram;
+	required_shared_ptr<uint8_t> m_sc0_attr;
 	tilemap_t *m_sc0_tilemap;
 	DECLARE_WRITE8_MEMBER(sc0_vram_w);
 	DECLARE_WRITE8_MEMBER(sc0_attr_w);
@@ -96,7 +98,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_sc0_tile_info);
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(caswin);
-	UINT32 screen_update_vvillage(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_vvillage(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 };
@@ -116,10 +118,10 @@ TILE_GET_INFO_MEMBER(caswin_state::get_sc0_tile_info)
 
 void caswin_state::video_start()
 {
-	m_sc0_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(caswin_state::get_sc0_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
+	m_sc0_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(caswin_state::get_sc0_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
 }
 
-UINT32 caswin_state::screen_update_vvillage(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t caswin_state::screen_update_vvillage(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_sc0_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	return 0;
@@ -294,7 +296,7 @@ GFXDECODE_END
 
 PALETTE_INIT_MEMBER(caswin_state, caswin)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int bit0, bit1, bit2 , r, g, b;
 	int i;
 
@@ -319,7 +321,7 @@ PALETTE_INIT_MEMBER(caswin_state, caswin)
 }
 
 
-static MACHINE_CONFIG_START( vvillage, caswin_state )
+static MACHINE_CONFIG_START( vvillage )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,4000000)         /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(vvillage_mem)
@@ -414,7 +416,7 @@ ROM_START( rcasinoo )
 	ROM_LOAD( "prom1.e8",  0x0020, 0x0020, CRC(2b5c7826) SHA1(c0de392aebd6982e5846c12aeb2e871358be60d7) ) /* MB7051 */
 ROM_END
 
-GAME( 1984, rcasino,  0,       vvillage, vvillage, driver_device, 0, ROT270, "Dyna Electronics", "Royal Casino (D-2608208A1-2)",                MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1984, rcasino1, rcasino, vvillage, vvillage, driver_device, 0, ROT270, "Dyna Electronics", "Royal Casino (D-2608208A1-1, Larger Board)",  MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1984, rcasinoo, rcasino, vvillage, vvillage, driver_device, 0, ROT270, "Dyna Electronics", "Royal Casino (D-2608208A1-1, Smaller Board)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1985, caswin,   rcasino, vvillage, vvillage, driver_device, 0, ROT270, "Aristocrat",       "Casino Winner",                               MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1984, rcasino,  0,       vvillage, vvillage, caswin_state, 0, ROT270, "Dyna Electronics", "Royal Casino (D-2608208A1-2)",                MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1984, rcasino1, rcasino, vvillage, vvillage, caswin_state, 0, ROT270, "Dyna Electronics", "Royal Casino (D-2608208A1-1, Larger Board)",  MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1984, rcasinoo, rcasino, vvillage, vvillage, caswin_state, 0, ROT270, "Dyna Electronics", "Royal Casino (D-2608208A1-1, Smaller Board)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1985, caswin,   rcasino, vvillage, vvillage, caswin_state, 0, ROT270, "Aristocrat",       "Casino Winner",                               MACHINE_IMPERFECT_GRAPHICS )

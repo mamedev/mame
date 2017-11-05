@@ -1,12 +1,13 @@
 // license:BSD-3-Clause
 // copyright-holders:smf
+#include "emu.h"
 #include "pc9801_cd.h"
 
 // device type definition
-const device_type PC9801_CD = &device_creator<pc9801_cd_device>;
+DEFINE_DEVICE_TYPE(PC9801_CD, pc9801_cd_device, "pc9801_cd", "PC9801 CD-ROM Drive")
 
-pc9801_cd_device::pc9801_cd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	atapi_cdrom_device(mconfig, PC9801_CD, "PC9801 CD-ROM Drive", tag, owner, clock, "pc9801_cd", __FILE__)
+pc9801_cd_device::pc9801_cd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	atapi_cdrom_device(mconfig, PC9801_CD, tag, owner, clock)
 {
 }
 

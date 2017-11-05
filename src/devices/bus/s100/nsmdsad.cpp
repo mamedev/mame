@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "nsmdsad.h"
 
 
@@ -14,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type S100_MDS_AD = &device_creator<s100_mds_ad_device>;
+DEFINE_DEVICE_TYPE(S100_MDS_AD, s100_mds_ad_device, "s100_nsmdsad", "North Star MDS-A-D")
 
 
 //-------------------------------------------------
@@ -37,7 +38,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *s100_mds_ad_device::device_rom_region() const
+const tiny_rom_entry *s100_mds_ad_device::device_rom_region() const
 {
 	return ROM_NAME( mds_ad );
 }
@@ -53,24 +54,13 @@ SLOT_INTERFACE_END
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( mds_ad )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( mds_ad )
+MACHINE_CONFIG_MEMBER( s100_mds_ad_device::device_add_mconfig )
 	MCFG_FLOPPY_DRIVE_ADD("floppy0", mds_ad_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("floppy1", mds_ad_floppies, "525dd", floppy_image_device::default_floppy_formats)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor s100_mds_ad_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( mds_ad );
-}
 
 
 
@@ -82,8 +72,8 @@ machine_config_constructor s100_mds_ad_device::device_mconfig_additions() const
 //  s100_mds_ad_device - constructor
 //-------------------------------------------------
 
-s100_mds_ad_device::s100_mds_ad_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, S100_MDS_AD, "MDS-A-D", tag, owner, clock, "nsmdsad", __FILE__),
+s100_mds_ad_device::s100_mds_ad_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, S100_MDS_AD, tag, owner, clock),
 	device_s100_card_interface(mconfig, *this),
 	m_floppy0(*this, "floppy0"),
 	m_floppy1(*this, "floppy1"),
@@ -116,7 +106,7 @@ void s100_mds_ad_device::device_reset()
 //  s100_smemr_r - memory read
 //-------------------------------------------------
 
-UINT8 s100_mds_ad_device::s100_smemr_r(address_space &space, offs_t offset)
+uint8_t s100_mds_ad_device::s100_smemr_r(address_space &space, offs_t offset)
 {
 	return 0;
 }

@@ -14,6 +14,7 @@
 
 */
 
+#include "emu.h"
 #include "dj2db.h"
 
 
@@ -32,7 +33,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type S100_DJ2DB = &device_creator<s100_dj2db_device>;
+DEFINE_DEVICE_TYPE(S100_DJ2DB, s100_dj2db_device, "s100_sj2db", "Morrow Disk Jockey 2D/B")
 
 
 //-------------------------------------------------
@@ -53,7 +54,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *s100_dj2db_device::device_rom_region() const
+const tiny_rom_entry *s100_dj2db_device::device_rom_region() const
 {
 	return ROM_NAME( dj2db );
 }
@@ -97,10 +98,10 @@ WRITE_LINE_MEMBER( s100_dj2db_device::fdc_drq_w )
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( s100_dj2db )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( s100_dj2db )
+MACHINE_CONFIG_MEMBER( s100_dj2db_device::device_add_mconfig )
 	MCFG_DEVICE_ADD(BR1941_TAG, COM8116, XTAL_5_0688MHz)
 	MCFG_COM8116_FR_HANDLER(WRITELINE(s100_dj2db_device, fr_w))
 
@@ -113,17 +114,6 @@ static MACHINE_CONFIG_FRAGMENT( s100_dj2db )
 	MCFG_FLOPPY_DRIVE_ADD(MB8866_TAG":2", s100_dj2db_floppies, nullptr,    floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(MB8866_TAG":3", s100_dj2db_floppies, nullptr,    floppy_image_device::default_floppy_formats)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor s100_dj2db_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( s100_dj2db );
-}
 
 
 //-------------------------------------------------
@@ -250,8 +240,8 @@ ioport_constructor s100_dj2db_device::device_input_ports() const
 //  s100_dj2db_device - constructor
 //-------------------------------------------------
 
-s100_dj2db_device::s100_dj2db_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, S100_DJ2DB, "DJ2DB", tag, owner, clock, "dj2db", __FILE__),
+s100_dj2db_device::s100_dj2db_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, S100_DJ2DB, tag, owner, clock),
 	device_s100_card_interface(mconfig, *this),
 	m_fdc(*this, MB8866_TAG),
 	m_dbrg(*this, BR1941_TAG),
@@ -309,9 +299,9 @@ void s100_dj2db_device::device_reset()
 //  s100_smemr_r - memory read
 //-------------------------------------------------
 
-UINT8 s100_dj2db_device::s100_smemr_r(address_space &space, offs_t offset)
+uint8_t s100_dj2db_device::s100_smemr_r(address_space &space, offs_t offset)
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 //  if (!(m_board_enbl & m_phantom)) return 0;
 
@@ -388,7 +378,7 @@ UINT8 s100_dj2db_device::s100_smemr_r(address_space &space, offs_t offset)
 //  s100_mwrt_w - memory write
 //-------------------------------------------------
 
-void s100_dj2db_device::s100_mwrt_w(address_space &space, offs_t offset, UINT8 data)
+void s100_dj2db_device::s100_mwrt_w(address_space &space, offs_t offset, uint8_t data)
 {
 //  if (!(m_board_enbl & m_phantom)) return;
 
@@ -481,7 +471,7 @@ void s100_dj2db_device::s100_mwrt_w(address_space &space, offs_t offset, UINT8 d
 //  s100_sinp_r - I/O read
 //-------------------------------------------------
 
-UINT8 s100_dj2db_device::s100_sinp_r(address_space &space, offs_t offset)
+uint8_t s100_dj2db_device::s100_sinp_r(address_space &space, offs_t offset)
 {
 	return 0;
 }
@@ -491,7 +481,7 @@ UINT8 s100_dj2db_device::s100_sinp_r(address_space &space, offs_t offset)
 //  s100_sout_w - I/O write
 //-------------------------------------------------
 
-void s100_dj2db_device::s100_sout_w(address_space &space, offs_t offset, UINT8 data)
+void s100_dj2db_device::s100_sout_w(address_space &space, offs_t offset, uint8_t data)
 {
 	if (offset == 0x41)
 	{

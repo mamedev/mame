@@ -8,20 +8,36 @@
 
 #include "emu.h"
 #include "emuopts.h"
+#include "zippath.h"
+
+
+// -------------------------------------------------
+// ctor
+// -------------------------------------------------
 
 device_slot_interface::device_slot_interface(const machine_config &mconfig, device_t &device)
 	: device_interface(device, "slot"),
 	m_default_option(nullptr),
-	m_fixed(false)
+	m_fixed(false),
+	m_card_device(nullptr)
 {
 }
+
+
+// -------------------------------------------------
+// dtor
+// -------------------------------------------------
 
 device_slot_interface::~device_slot_interface()
 {
 }
 
+
+// -------------------------------------------------
+// device_slot_option ctor
+// -------------------------------------------------
+
 device_slot_option::device_slot_option(const char *name, const device_type &devtype):
-	m_next(nullptr),
 	m_name(name),
 	m_devtype(devtype),
 	m_selectable(true),
@@ -32,12 +48,22 @@ device_slot_option::device_slot_option(const char *name, const device_type &devt
 {
 }
 
+
+// -------------------------------------------------
+// static_option_reset
+// -------------------------------------------------
+
 void device_slot_interface::static_option_reset(device_t &device)
 {
 	device_slot_interface &intf = dynamic_cast<device_slot_interface &>(device);
 
-	intf.m_options.reset();
+	intf.m_options.clear();
 }
+
+
+// -------------------------------------------------
+// static_option_add
+// -------------------------------------------------
 
 void device_slot_interface::static_option_add(device_t &device, const char *name, const device_type &devtype)
 {
@@ -45,10 +71,15 @@ void device_slot_interface::static_option_add(device_t &device, const char *name
 	device_slot_option *option = intf.option(name);
 
 	if (option != nullptr)
-		throw emu_fatalerror("slot '%s' duplicate option '%s\n", device.tag(), name);
-
-	intf.m_options.append(name, *global_alloc(device_slot_option(name, devtype)));
+		throw emu_fatalerror("slot '%s' duplicate option '%s'\n", device.tag(), name);
+	if (intf.m_options.count(name) != 0) throw tag_add_exception(name);
+	intf.m_options.emplace(std::make_pair(name, std::make_unique<device_slot_option>(name, devtype)));
 }
+
+
+// -------------------------------------------------
+// static_option
+// -------------------------------------------------
 
 device_slot_option *device_slot_interface::static_option(device_t &device, const char *name)
 {
@@ -56,26 +87,42 @@ device_slot_option *device_slot_interface::static_option(device_t &device, const
 	device_slot_option *option = intf.option(name);
 
 	if (option == nullptr)
-		throw emu_fatalerror("slot '%s' has no option '%s\n", device.tag(), name);
+		throw emu_fatalerror("slot '%s' has no option '%s'\n", device.tag(), name);
 
 	return option;
 }
 
-device_t* device_slot_interface::get_card_device()
+
+// -------------------------------------------------
+// has_selectable_options
+// -------------------------------------------------
+
+bool device_slot_interface::has_selectable_options() const
 {
-	std::string subtag;
-	device_t *dev = nullptr;
-	if (device().mconfig().options().exists(device().tag()+1))
-		subtag = device().mconfig().options().main_value(device().tag()+1);
-	else if (m_default_option != nullptr)
-		subtag.assign(m_default_option);
-	if (!subtag.empty()) {
-		device_slot_card_interface *intf = nullptr;
-		dev = device().subdevice(subtag.c_str());
-		if (dev!=nullptr && !dev->interface(intf))
-			throw emu_fatalerror("get_card_device called for device '%s' with no slot card interface", dev->tag());
+	if (!fixed())
+	{
+		for (auto &option : option_list())
+			if (option.second->selectable())
+				return true;
 	}
-	return dev;
+	return false;
+}
+
+
+// -------------------------------------------------
+// option
+// -------------------------------------------------
+
+device_slot_option *device_slot_interface::option(const char *name) const
+{
+	device_slot_option *result = nullptr;
+	if (name)
+	{
+		auto search = m_options.find(name);
+		if (search != m_options.end())
+			result = search->second.get();
+	}
+	return result;
 }
 
 
@@ -86,4 +133,30 @@ device_slot_card_interface::device_slot_card_interface(const machine_config &mco
 
 device_slot_card_interface::~device_slot_card_interface()
 {
+}
+
+get_default_card_software_hook::get_default_card_software_hook(const std::string &path, std::function<bool(util::core_file &, std::string&)> &&get_hashfile_extrainfo)
+	: m_get_hashfile_extrainfo(std::move(get_hashfile_extrainfo))
+	, m_called_get_hashfile_extrainfo(false)
+	, m_has_hash_extrainfo(false)
+{
+	if (!path.empty())
+	{
+		std::string revised_path;
+		util::zippath_fopen(path, OPEN_FLAG_READ, m_image_file, revised_path);
+		if (m_image_file)
+			m_file_type = core_filename_extract_extension(revised_path, true);
+	}
+}
+
+bool get_default_card_software_hook::hashfile_extrainfo(std::string &extrainfo)
+{
+	if (!m_called_get_hashfile_extrainfo)
+	{
+		if (m_get_hashfile_extrainfo)
+			m_has_hash_extrainfo = m_get_hashfile_extrainfo(*image_file(), m_hash_extrainfo);
+		m_called_get_hashfile_extrainfo = true;
+	}
+	extrainfo = m_hash_extrainfo;
+	return m_has_hash_extrainfo;
 }

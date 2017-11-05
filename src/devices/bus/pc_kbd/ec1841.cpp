@@ -11,6 +11,7 @@
 
 *********************************************************************/
 
+#include "emu.h"
 #include "ec1841.h"
 
 #define VERBOSE_DBG 0       /* general debug messages */
@@ -38,7 +39,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type PC_KBD_EC_1841 = &device_creator<ec_1841_keyboard_device>;
+DEFINE_DEVICE_TYPE(PC_KBD_EC_1841, ec_1841_keyboard_device, "kb_ec1841", "EC-1841 Keyboard")
 
 
 //-------------------------------------------------
@@ -55,43 +56,24 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *ec_1841_keyboard_device::device_rom_region() const
+const tiny_rom_entry *ec_1841_keyboard_device::device_rom_region() const
 {
 	return ROM_NAME( ec_1841_keyboard );
 }
 
 
 //-------------------------------------------------
-//  ADDRESS_MAP( kb_io )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( ec_1841_keyboard_io, AS_IO, 8, ec_1841_keyboard_device )
-	AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS) AM_WRITE(bus_w)
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READWRITE(p1_r, p1_w)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(p2_w)
-	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(t1_r)
-ADDRESS_MAP_END
-
-
-//-------------------------------------------------
-//  MACHINE_DRIVER( ec_1841_keyboard )
-//-------------------------------------------------
-
-static MACHINE_CONFIG_FRAGMENT( ec_1841_keyboard )
+MACHINE_CONFIG_MEMBER( ec_1841_keyboard_device::device_add_mconfig )
 	MCFG_CPU_ADD(I8048_TAG, I8048, XTAL_5_46MHz)
-	MCFG_CPU_IO_MAP(ec_1841_keyboard_io)
+	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(ec_1841_keyboard_device, bus_w))
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(ec_1841_keyboard_device, p1_r))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(ec_1841_keyboard_device, p1_w))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(ec_1841_keyboard_device, p2_w))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(ec_1841_keyboard_device, t1_r))
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor ec_1841_keyboard_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( ec_1841_keyboard );
-}
 
 
 //-------------------------------------------------
@@ -280,26 +262,11 @@ ioport_constructor ec_1841_keyboard_device::device_input_ports() const
 //  ec_1841_keyboard_device - constructor
 //-------------------------------------------------
 
-ec_1841_keyboard_device::ec_1841_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, PC_KBD_EC_1841, "EC-1841 Keyboard", tag, owner, clock, "kb_ec1841", __FILE__),
+ec_1841_keyboard_device::ec_1841_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, PC_KBD_EC_1841, tag, owner, clock),
 		device_pc_kbd_interface(mconfig, *this),
 		m_maincpu(*this, I8048_TAG),
-		m_md00(*this, "MD00"),
-		m_md01(*this, "MD01"),
-		m_md02(*this, "MD02"),
-		m_md03(*this, "MD03"),
-		m_md04(*this, "MD04"),
-		m_md05(*this, "MD05"),
-		m_md06(*this, "MD06"),
-		m_md07(*this, "MD07"),
-		m_md08(*this, "MD08"),
-		m_md09(*this, "MD09"),
-		m_md10(*this, "MD10"),
-		m_md11(*this, "MD11"),
-		m_md12(*this, "MD12"),
-		m_md13(*this, "MD13"),
-		m_md14(*this, "MD14"),
-		m_md15(*this, "MD15"),
+		m_kbd(*this, "MD%02u", 0),
 		m_bus(0xff),
 		m_p1(0xff),
 		m_p2(0xff),
@@ -386,7 +353,7 @@ READ8_MEMBER( ec_1841_keyboard_device::p1_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	data |= clock_signal();
 	data |= data_signal() << 1;
@@ -452,31 +419,13 @@ WRITE8_MEMBER( ec_1841_keyboard_device::p2_w )
 //  t1_r -
 //-------------------------------------------------
 
-READ8_MEMBER( ec_1841_keyboard_device::t1_r )
+READ_LINE_MEMBER( ec_1841_keyboard_device::t1_r )
 {
 	if (BIT(m_p2,0)) {
 		m_q = 1;
 	} else {
-		UINT8 sense = 0xff;
-
-		switch(m_bus & 15) {
-			case 0: sense &= m_md00->read(); break;
-			case 1: sense &= m_md01->read(); break;
-			case 2: sense &= m_md02->read(); break;
-			case 3: sense &= m_md03->read(); break;
-			case 4: sense &= m_md04->read(); break;
-			case 5: sense &= m_md05->read(); break;
-			case 6: sense &= m_md06->read(); break;
-			case 7: sense &= m_md07->read(); break;
-			case 8: sense &= m_md08->read(); break;
-			case 9: sense &= m_md09->read(); break;
-			case 10: sense &= m_md10->read(); break;
-			case 11: sense &= m_md11->read(); break;
-			case 12: sense &= m_md12->read(); break;
-			case 13: sense &= m_md13->read(); break;
-			case 14: sense &= m_md14->read(); break;
-			case 15: sense &= m_md15->read(); break;
-		}
+		uint8_t sense = 0xff;
+		sense &= m_kbd[m_bus & 15]->read();
 		m_q = BIT(sense, (m_bus >> 4) & 7);
 	}
 

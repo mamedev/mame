@@ -6,20 +6,23 @@
 //
 //============================================================
 
+#include "emu.h"
 #import "pointsviewer.h"
 
 #import "breakpointsview.h"
 #import "watchpointsview.h"
 
+#include "util/xmlfile.h"
+
 
 @implementation MAMEPointsViewer
 
 - (id)initWithMachine:(running_machine &)m console:(MAMEDebugConsole *)c {
-	MAMEDebugView	*breakView, *watchView;
-	NSScrollView	*breakScroll, *watchScroll;
-	NSTabViewItem	*breakTab, *watchTab;
-	NSPopUpButton	*actionButton, *subviewButton;
-	NSRect			subviewFrame;
+	MAMEDebugView   *breakView, *watchView;
+	NSScrollView    *breakScroll, *watchScroll;
+	NSTabViewItem   *breakTab, *watchTab;
+	NSPopUpButton   *actionButton;
+	NSRect          subviewFrame;
 
 	if (!(self = [super initWithMachine:m title:@"(Break|Watch)points" console:c]))
 		return nil;
@@ -72,6 +75,7 @@
 	[breakScroll setHasVerticalScroller:YES];
 	[breakScroll setAutohidesScrollers:YES];
 	[breakScroll setBorderType:NSNoBorder];
+	[breakScroll setDrawsBackground:NO];
 	[breakScroll setDocumentView:breakView];
 	[breakView release];
 	breakTab = [[NSTabViewItem alloc] initWithIdentifier:@""];
@@ -87,6 +91,7 @@
 	[watchScroll setHasVerticalScroller:YES];
 	[watchScroll setAutohidesScrollers:YES];
 	[watchScroll setBorderType:NSNoBorder];
+	[watchScroll setDrawsBackground:NO];
 	[watchScroll setDocumentView:watchView];
 	[watchView release];
 	watchTab = [[NSTabViewItem alloc] initWithIdentifier:@""];
@@ -119,8 +124,8 @@
 												hasHorizontalScroller:YES
 												  hasVerticalScroller:YES
 														   borderType:[watchScroll borderType]];
-	NSSize const desired = NSMakeSize(MAX(breakDesired.width, watchDesired.width),
-									  MAX(breakDesired.height, watchDesired.height));
+	NSSize const desired = NSMakeSize(std::max(breakDesired.width, watchDesired.width),
+									  std::max(breakDesired.height, watchDesired.height));
 	[self cascadeWindowWithDesiredSize:desired forView:tabs];
 
 	// don't forget the result
@@ -136,6 +141,24 @@
 - (IBAction)changeSubview:(id)sender {
 	[tabs selectTabViewItemAtIndex:[[sender selectedItem] tag]];
 	[window setTitle:[[sender selectedItem] title]];
+}
+
+
+- (void)saveConfigurationToNode:(util::xml::data_node *)node {
+	[super saveConfigurationToNode:node];
+	node->set_attribute_int("type", MAME_DEBUGGER_WINDOW_TYPE_POINTS_VIEWER);
+	node->set_attribute_int("bwtype", [tabs indexOfTabViewItem:[tabs selectedTabViewItem]]);
+}
+
+
+- (void)restoreConfigurationFromNode:(util::xml::data_node const *)node {
+	[super restoreConfigurationFromNode:node];
+	int const tab = node->get_attribute_int("bwtype", [tabs indexOfTabViewItem:[tabs selectedTabViewItem]]);
+	if ((0 <= tab) && ([tabs numberOfTabViewItems] > tab))
+	{
+		[subviewButton selectItemAtIndex:tab];
+		[self changeSubview:subviewButton];
+	}
 }
 
 @end

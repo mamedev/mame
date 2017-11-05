@@ -35,6 +35,9 @@ the sound board should be fully discrete.
 #include "cpu/s2650/s2650.h"
 #include "machine/s2636.h"
 #include "video/dm9368.h"
+#include "screen.h"
+#include "speaker.h"
+
 #include "seabattl.lh"
 
 
@@ -63,9 +66,9 @@ public:
 	}
 
 	required_device<cpu_device> m_maincpu;
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_colorram;
-	required_shared_ptr<UINT8> m_objram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_colorram;
+	required_shared_ptr<uint8_t> m_objram;
 	required_device<dm9368_device> m_digit0;
 	required_device<dm9368_device> m_digit1;
 	required_device<dm9368_device> m_digit2;
@@ -96,9 +99,9 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(seabattl);
-	UINT32 screen_update_seabattl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_seabattl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	bool m_waveenable;
-	UINT8 m_collision;
+	uint8_t m_collision;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
@@ -122,12 +125,12 @@ PALETTE_INIT_MEMBER(seabattl_state, seabattl)
 	// scr
 	for (int i = 0; i < 8; i++)
 	{
-		palette.set_pen_color(8 + 2 * i + 0, rgb_t::black);
+		palette.set_pen_color(8 + 2 * i + 0, rgb_t::black());
 		palette.set_pen_color(8 + 2 * i + 1, rgb_t((i & 1) ? 0xff : 0x00, (i & 2) ? 0xff : 0x00, (i & 4) ? 0xff : 0x00));
 	}
 
 	// wave
-	palette.set_pen_color(24, rgb_t::black);
+	palette.set_pen_color(24, rgb_t::black());
 	palette.set_pen_color(25, rgb_t(0x00, 0xff, 0xff)); // cyan
 }
 
@@ -151,7 +154,7 @@ WRITE8_MEMBER(seabattl_state::seabattl_colorram_w)
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-UINT32 seabattl_state::screen_update_seabattl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t seabattl_state::screen_update_seabattl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x,y, offset;
 
@@ -234,7 +237,7 @@ UINT32 seabattl_state::screen_update_seabattl(screen_device &screen, bitmap_ind1
 void seabattl_state::video_start()
 {
 	m_screen->register_screen_bitmap(m_collision_bg);
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(seabattl_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(seabattl_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_bg_tilemap->set_transparent_pen(0);
 	m_bg_tilemap->set_scrolldx(-12, 0);
 }
@@ -264,10 +267,9 @@ static ADDRESS_MAP_START( seabattl_map, AS_PROGRAM, 8, seabattl_state )
 	AM_RANGE(0x1f00, 0x1fff) AM_MIRROR(0x2000) AM_DEVREADWRITE("s2636", s2636_device, read_data, write_data)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( seabattl_io_map, AS_IO, 8, seabattl_state )
+static ADDRESS_MAP_START( seabattl_data_map, AS_DATA, 8, seabattl_state )
 	AM_RANGE(S2650_CTRL_PORT, S2650_CTRL_PORT) AM_READWRITE( seabattl_collision_r, seabattl_control_w )
 	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READWRITE( seabattl_collision_clear_r, seabattl_collision_clear_w )
-	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("SENSE")
 ADDRESS_MAP_END
 
 READ8_MEMBER(seabattl_state::seabattl_collision_r)
@@ -420,9 +422,6 @@ static INPUT_PORTS_START( seabattl )
 	PORT_SERVICE_DIPLOC( 0x04, IP_ACTIVE_HIGH, "DS1:5")
 	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "DS1:8" )
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("SENSE")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 INPUT_PORTS_END
 
 
@@ -474,13 +473,14 @@ static GFXDECODE_START( seabattl )
 	GFXDECODE_ENTRY( "gfx3", 0, tiles8x8_layout, 24, 1 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( seabattl, seabattl_state )
+static MACHINE_CONFIG_START( seabattl )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", S2650, 14318180/4/2)
 	MCFG_CPU_PROGRAM_MAP(seabattl_map)
-	MCFG_CPU_IO_MAP(seabattl_io_map)
+	MCFG_CPU_DATA_MAP(seabattl_data_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", seabattl_state, seabattl_interrupt)
+	MCFG_S2650_SENSE_INPUT(DEVREADLINE("screen", screen_device, vblank))
 
 	MCFG_DEVICE_ADD("s2636", S2636, 0)
 	MCFG_S2636_OFFSETS(-13, -29)
@@ -565,5 +565,5 @@ ROM_START( seabattla ) // this was a very different looking PCB (bootleg called 
 ROM_END
 
 
-GAMEL(1980, seabattl,  0,        seabattl, seabattl, driver_device, 0, ROT0, "Zaccaria", "Sea Battle (set 1)", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND, layout_seabattl )
-GAMEL(1980, seabattla, seabattl, seabattl, seabattl, driver_device, 0, ROT0, "Zaccaria", "Sea Battle (set 2)", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_NOT_WORKING, layout_seabattl ) // incomplete dump
+GAMEL(1980, seabattl,  0,        seabattl, seabattl, seabattl_state, 0, ROT0, "Zaccaria", "Sea Battle (set 1)", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND, layout_seabattl )
+GAMEL(1980, seabattla, seabattl, seabattl, seabattl, seabattl_state, 0, ROT0, "Zaccaria", "Sea Battle (set 2)", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_NOT_WORKING, layout_seabattl ) // incomplete dump

@@ -11,19 +11,13 @@
 
 #include "emu.h"
 #include "pds30_mc30.h"
+#include "screen.h"
 
 #define XCEEDMC30_SCREEN_NAME "x30hr_screen"
 #define XCEEDMC30_ROM_REGION  "x30hr_rom"
 
 #define VRAM_SIZE   (0x200000)  // 16 42C4256 256Kx4 VRAMs on the board = 2MB
 
-MACHINE_CONFIG_FRAGMENT( xceedmc30 )
-	MCFG_SCREEN_ADD( XCEEDMC30_SCREEN_NAME, RASTER)
-	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, nubus_xceedmc30_device, screen_update)
-	MCFG_SCREEN_RAW_PARAMS(25175000, 800, 0, 640, 525, 0, 480)
-	MCFG_SCREEN_SIZE(1024,768)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-MACHINE_CONFIG_END
 
 ROM_START( xceedmc30 )
 	ROM_REGION(0x8000, XCEEDMC30_ROM_REGION, 0)
@@ -34,24 +28,26 @@ ROM_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type PDS030_XCEEDMC30 = &device_creator<nubus_xceedmc30_device>;
+DEFINE_DEVICE_TYPE(PDS030_XCEEDMC30, nubus_xceedmc30_device, "pd3_mclr", "Micron/XCEED Technology MacroColor 30")
 
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor nubus_xceedmc30_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( xceedmc30 );
-}
+MACHINE_CONFIG_MEMBER( nubus_xceedmc30_device::device_add_mconfig )
+	MCFG_SCREEN_ADD( XCEEDMC30_SCREEN_NAME, RASTER)
+	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, nubus_xceedmc30_device, screen_update)
+	MCFG_SCREEN_RAW_PARAMS(25175000, 800, 0, 640, 525, 0, 480)
+	MCFG_SCREEN_SIZE(1024,768)
+	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+MACHINE_CONFIG_END
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *nubus_xceedmc30_device::device_rom_region() const
+const tiny_rom_entry *nubus_xceedmc30_device::device_rom_region() const
 {
 	return ROM_NAME( xceedmc30 );
 }
@@ -64,21 +60,18 @@ const rom_entry *nubus_xceedmc30_device::device_rom_region() const
 //  nubus_xceedmc30_device - constructor
 //-------------------------------------------------
 
-nubus_xceedmc30_device::nubus_xceedmc30_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-		device_t(mconfig, PDS030_XCEEDMC30, "Micron/XCEED Technology MacroColor 30", tag, owner, clock, "pd3_mclr", __FILE__),
-		device_video_interface(mconfig, *this),
-		device_nubus_card_interface(mconfig, *this), m_vram32(nullptr), m_mode(0), m_vbl_disable(0), m_toggle(0), m_count(0), m_clutoffs(0), m_timer(nullptr)
+nubus_xceedmc30_device::nubus_xceedmc30_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	nubus_xceedmc30_device(mconfig, PDS030_XCEEDMC30, tag, owner, clock)
 {
-	m_assembled_tag = std::string(tag).append(":").append(XCEEDMC30_SCREEN_NAME);
-	m_screen_tag = m_assembled_tag.c_str();
 }
 
-nubus_xceedmc30_device::nubus_xceedmc30_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
-		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		device_video_interface(mconfig, *this),
-		device_nubus_card_interface(mconfig, *this), m_vram32(nullptr), m_mode(0), m_vbl_disable(0), m_toggle(0), m_count(0), m_clutoffs(0), m_timer(nullptr)
+nubus_xceedmc30_device::nubus_xceedmc30_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
+	device_video_interface(mconfig, *this),
+	device_nubus_card_interface(mconfig, *this),
+	m_vram32(nullptr), m_mode(0), m_vbl_disable(0), m_toggle(0), m_count(0), m_clutoffs(0), m_timer(nullptr),
+	m_assembled_tag(util::string_format("%s:%s", tag, XCEEDMC30_SCREEN_NAME))
 {
-	m_assembled_tag = std::string(tag).append(":").append(XCEEDMC30_SCREEN_NAME);
 	m_screen_tag = m_assembled_tag.c_str();
 }
 
@@ -88,7 +81,7 @@ nubus_xceedmc30_device::nubus_xceedmc30_device(const machine_config &mconfig, de
 
 void nubus_xceedmc30_device::device_start()
 {
-	UINT32 slotspace;
+	uint32_t slotspace;
 
 	// set_nubus_device makes m_slot valid
 	set_nubus_device();
@@ -99,7 +92,7 @@ void nubus_xceedmc30_device::device_start()
 //  printf("[xceedmc30 %p] slotspace = %x\n", this, slotspace);
 
 	m_vram.resize(VRAM_SIZE);
-	m_vram32 = (UINT32 *)&m_vram[0];
+	m_vram32 = (uint32_t *)&m_vram[0];
 
 	m_nubus->install_device(slotspace, slotspace+VRAM_SIZE-1, read32_delegate(FUNC(nubus_xceedmc30_device::vram_r), this), write32_delegate(FUNC(nubus_xceedmc30_device::vram_w), this));
 	m_nubus->install_device(slotspace+0x800000, slotspace+0xefffff, read32_delegate(FUNC(nubus_xceedmc30_device::xceedmc30_r), this), write32_delegate(FUNC(nubus_xceedmc30_device::xceedmc30_w), this));
@@ -142,11 +135,11 @@ void nubus_xceedmc30_device::device_timer(emu_timer &timer, device_timer_id tid,
 
 ***************************************************************************/
 
-UINT32 nubus_xceedmc30_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t nubus_xceedmc30_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	UINT32 *scanline;
+	uint32_t *scanline;
 	int x, y;
-	UINT8 pixels, *vram;
+	uint8_t pixels, *vram;
 
 	vram = &m_vram[4*1024];
 
@@ -218,8 +211,8 @@ UINT32 nubus_xceedmc30_device::screen_update(screen_device &screen, bitmap_rgb32
 
 		case 4: // 24 bpp
 			{
-				UINT32 *vram32 = (UINT32 *)vram;
-				UINT32 *base;
+				uint32_t *vram32 = (uint32_t *)vram;
+				uint32_t *base;
 
 				for (y = 0; y < 480; y++)
 				{

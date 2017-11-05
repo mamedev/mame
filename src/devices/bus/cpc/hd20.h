@@ -11,10 +11,11 @@
 
 */
 
-#ifndef HD20_H_
-#define HD20_H_
+#ifndef MAME_BUS_CPC_HD20_H
+#define MAME_BUS_CPC_HD20_H
 
-#include "emu.h"
+#pragma once
+
 #include "cpcexp.h"
 #include "bus/isa/hdc.h"
 
@@ -23,28 +24,29 @@ class cpc_hd20_device  : public device_t,
 {
 public:
 	// construction/destruction
-	cpc_hd20_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual const rom_entry *device_rom_region() const override;
+	cpc_hd20_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_READ8_MEMBER(hdc_r);
 	DECLARE_WRITE8_MEMBER(hdc_w);
-	DECLARE_WRITE_LINE_MEMBER(irq_w);
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
+
 private:
+	DECLARE_WRITE_LINE_MEMBER(irq_w);
+
 	cpc_expansion_slot_device *m_slot;
 
 	required_device<xt_hdc_device> m_hdc;
 };
 
 // device type definition
-extern const device_type CPC_HD20;
+DECLARE_DEVICE_TYPE(CPC_HD20, cpc_hd20_device)
 
-#endif /* HD20_H_ */
+#endif // MAME_BUS_CPC_HD20_H

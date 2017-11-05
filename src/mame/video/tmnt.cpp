@@ -5,7 +5,7 @@
 
 TILE_GET_INFO_MEMBER(tmnt_state::glfgreat_get_roz_tile_info)
 {
-	UINT8 *rom = memregion("user1")->base();
+	uint8_t *rom = memregion("user1")->base();
 	int code;
 
 	tile_index += 0x40000 * m_glfgreat_roz_rom_bank;
@@ -17,7 +17,7 @@ TILE_GET_INFO_MEMBER(tmnt_state::glfgreat_get_roz_tile_info)
 
 TILE_GET_INFO_MEMBER(tmnt_state::prmrsocr_get_roz_tile_info)
 {
-	UINT8 *rom = memregion("user1")->base();
+	uint8_t *rom = memregion("user1")->base();
 	int code = rom[tile_index + 0x20000] + 256 * rom[tile_index];
 
 	SET_TILE_INFO_MEMBER(0, code & 0x1fff, code >> 13, 0);
@@ -165,9 +165,9 @@ K05324X_CB_MEMBER(tmnt_state::lgtnfght_sprite_callback)
 K05324X_CB_MEMBER(tmnt_state::blswhstl_sprite_callback)
 {
 #if 0
-if (machine().input().code_pressed(KEYCODE_Q) && (*color & 0x20)) *color = rand();
-if (machine().input().code_pressed(KEYCODE_W) && (*color & 0x40)) *color = rand();
-if (machine().input().code_pressed(KEYCODE_E) && (*color & 0x80)) *color = rand();
+if (machine().input().code_pressed(KEYCODE_Q) && (*color & 0x20)) *color = machine().rand();
+if (machine().input().code_pressed(KEYCODE_W) && (*color & 0x40)) *color = machine().rand();
+if (machine().input().code_pressed(KEYCODE_E) && (*color & 0x80)) *color = machine().rand();
 #endif
 	int pri = 0x20 | ((*color & 0x60) >> 2);
 	if (pri <= m_layerpri[2])
@@ -252,7 +252,7 @@ VIDEO_START_MEMBER(tmnt_state,lgtnfght)/* also tmnt2, ssriders */
 
 VIDEO_START_MEMBER(tmnt_state,glfgreat)
 {
-	m_roz_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tmnt_state::glfgreat_get_roz_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 512, 512);
+	m_roz_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tmnt_state::glfgreat_get_roz_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 512, 512);
 	m_roz_tilemap->set_transparent_pen(0);
 
 	m_glfgreat_roz_rom_bank = 0;
@@ -265,7 +265,7 @@ VIDEO_START_MEMBER(tmnt_state,glfgreat)
 
 VIDEO_START_MEMBER(tmnt_state,prmrsocr)
 {
-	m_roz_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tmnt_state::prmrsocr_get_roz_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 512, 256);
+	m_roz_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tmnt_state::prmrsocr_get_roz_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 512, 256);
 	m_roz_tilemap->set_transparent_pen(0);
 
 	m_prmrsocr_sprite_bank = 0;
@@ -377,7 +377,7 @@ READ16_MEMBER(tmnt_state::glfgreat_rom_r)
 		return memregion("zoom")->base()[m_glfgreat_roz_char_bank * 0x80000 + offset];
 	else if (offset < 0x40000)
 	{
-		UINT8 *usr = memregion("user1")->base();
+		uint8_t *usr = memregion("user1")->base();
 		return usr[offset + 0x80000 + m_glfgreat_roz_rom_bank * 0x40000] + 256 * usr[offset + m_glfgreat_roz_rom_bank * 0x40000];
 	}
 	else
@@ -478,7 +478,7 @@ READ16_MEMBER(tmnt_state::prmrsocr_rom_r)
 		return memregion("zoom")->base()[offset];
 	else
 	{
-		UINT8 *usr = memregion("user1")->base();
+		uint8_t *usr = memregion("user1")->base();
 		return 256 * usr[offset] + usr[offset + 0x020000];
 	}
 }
@@ -517,7 +517,7 @@ WRITE16_MEMBER(tmnt_state::tmnt_priority_w)
 
 ***************************************************************************/
 
-UINT32 tmnt_state::screen_update_mia(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t tmnt_state::screen_update_mia(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_k052109->tilemap_update();
 
@@ -530,7 +530,7 @@ UINT32 tmnt_state::screen_update_mia(screen_device &screen, bitmap_ind16 &bitmap
 	return 0;
 }
 
-UINT32 tmnt_state::screen_update_tmnt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t tmnt_state::screen_update_tmnt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_k052109->tilemap_update();
 
@@ -544,21 +544,21 @@ UINT32 tmnt_state::screen_update_tmnt(screen_device &screen, bitmap_ind16 &bitma
 }
 
 
-UINT32 tmnt_state::screen_update_punkshot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t tmnt_state::screen_update_punkshot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_sprite_colorbase = m_k053251->get_palette_index(K053251_CI1);
-	m_layer_colorbase[0] = m_k053251->get_palette_index(K053251_CI2);
-	m_layer_colorbase[1] = m_k053251->get_palette_index(K053251_CI4);
-	m_layer_colorbase[2] = m_k053251->get_palette_index(K053251_CI3);
+	m_sprite_colorbase = m_k053251->get_palette_index(k053251_device::CI1);
+	m_layer_colorbase[0] = m_k053251->get_palette_index(k053251_device::CI2);
+	m_layer_colorbase[1] = m_k053251->get_palette_index(k053251_device::CI4);
+	m_layer_colorbase[2] = m_k053251->get_palette_index(k053251_device::CI3);
 
 	m_k052109->tilemap_update();
 
 	m_sorted_layer[0] = 0;
-	m_layerpri[0] = m_k053251->get_priority(K053251_CI2);
+	m_layerpri[0] = m_k053251->get_priority(k053251_device::CI2);
 	m_sorted_layer[1] = 1;
-	m_layerpri[1] = m_k053251->get_priority(K053251_CI4);
+	m_layerpri[1] = m_k053251->get_priority(k053251_device::CI4);
 	m_sorted_layer[2] = 2;
-	m_layerpri[2] = m_k053251->get_priority(K053251_CI3);
+	m_layerpri[2] = m_k053251->get_priority(k053251_device::CI3);
 
 	konami_sortlayers3(m_sorted_layer, m_layerpri);
 
@@ -572,24 +572,24 @@ UINT32 tmnt_state::screen_update_punkshot(screen_device &screen, bitmap_ind16 &b
 }
 
 
-UINT32 tmnt_state::screen_update_lgtnfght(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t tmnt_state::screen_update_lgtnfght(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int bg_colorbase;
 
-	bg_colorbase = m_k053251->get_palette_index(K053251_CI0);
-	m_sprite_colorbase = m_k053251->get_palette_index(K053251_CI1);
-	m_layer_colorbase[0] = m_k053251->get_palette_index(K053251_CI2);
-	m_layer_colorbase[1] = m_k053251->get_palette_index(K053251_CI4);
-	m_layer_colorbase[2] = m_k053251->get_palette_index(K053251_CI3);
+	bg_colorbase = m_k053251->get_palette_index(k053251_device::CI0);
+	m_sprite_colorbase = m_k053251->get_palette_index(k053251_device::CI1);
+	m_layer_colorbase[0] = m_k053251->get_palette_index(k053251_device::CI2);
+	m_layer_colorbase[1] = m_k053251->get_palette_index(k053251_device::CI4);
+	m_layer_colorbase[2] = m_k053251->get_palette_index(k053251_device::CI3);
 
 	m_k052109->tilemap_update();
 
 	m_sorted_layer[0] = 0;
-	m_layerpri[0] = m_k053251->get_priority(K053251_CI2);
+	m_layerpri[0] = m_k053251->get_priority(k053251_device::CI2);
 	m_sorted_layer[1] = 1;
-	m_layerpri[1] = m_k053251->get_priority(K053251_CI4);
+	m_layerpri[1] = m_k053251->get_priority(k053251_device::CI4);
 	m_sorted_layer[2] = 2;
-	m_layerpri[2] = m_k053251->get_priority(K053251_CI3);
+	m_layerpri[2] = m_k053251->get_priority(k053251_device::CI3);
 
 	konami_sortlayers3(m_sorted_layer, m_layerpri);
 
@@ -616,24 +616,24 @@ popmessage("%04x", m_glfgreat_pixel);
 		return m_glfgreat_pixel & 0xff;
 }
 
-UINT32 tmnt_state::screen_update_glfgreat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t tmnt_state::screen_update_glfgreat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int bg_colorbase;
 
-	bg_colorbase = m_k053251->get_palette_index(K053251_CI0);
-	m_sprite_colorbase  = m_k053251->get_palette_index(K053251_CI1);
-	m_layer_colorbase[0] = m_k053251->get_palette_index(K053251_CI2);
-	m_layer_colorbase[1] = m_k053251->get_palette_index(K053251_CI3) + 8;   /* weird... */
-	m_layer_colorbase[2] = m_k053251->get_palette_index(K053251_CI4);
+	bg_colorbase = m_k053251->get_palette_index(k053251_device::CI0);
+	m_sprite_colorbase  = m_k053251->get_palette_index(k053251_device::CI1);
+	m_layer_colorbase[0] = m_k053251->get_palette_index(k053251_device::CI2);
+	m_layer_colorbase[1] = m_k053251->get_palette_index(k053251_device::CI3) + 8;   /* weird... */
+	m_layer_colorbase[2] = m_k053251->get_palette_index(k053251_device::CI4);
 
 	m_k052109->tilemap_update();
 
 	m_sorted_layer[0] = 0;
-	m_layerpri[0] = m_k053251->get_priority(K053251_CI2);
+	m_layerpri[0] = m_k053251->get_priority(k053251_device::CI2);
 	m_sorted_layer[1] = 1;
-	m_layerpri[1] = m_k053251->get_priority(K053251_CI3);
+	m_layerpri[1] = m_k053251->get_priority(k053251_device::CI3);
 	m_sorted_layer[2] = 2;
-	m_layerpri[2] = m_k053251->get_priority(K053251_CI4);
+	m_layerpri[2] = m_k053251->get_priority(k053251_device::CI4);
 
 	konami_sortlayers3(m_sorted_layer, m_layerpri);
 
@@ -669,7 +669,7 @@ UINT32 tmnt_state::screen_update_glfgreat(screen_device &screen, bitmap_ind16 &b
 	return 0;
 }
 
-UINT32 tmnt_state::screen_update_tmnt2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t tmnt_state::screen_update_tmnt2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	double brt;
 	int i, newdim, newen, cb, ce;
@@ -721,24 +721,24 @@ UINT32 tmnt_state::screen_update_tmnt2(screen_device &screen, bitmap_ind16 &bitm
 }
 
 
-UINT32 tmnt_state::screen_update_thndrx2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t tmnt_state::screen_update_thndrx2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int bg_colorbase;
 
-	bg_colorbase = m_k053251->get_palette_index(K053251_CI0);
-	m_sprite_colorbase = m_k053251->get_palette_index(K053251_CI1);
-	m_layer_colorbase[0] = m_k053251->get_palette_index(K053251_CI2);
-	m_layer_colorbase[1] = m_k053251->get_palette_index(K053251_CI4);
-	m_layer_colorbase[2] = m_k053251->get_palette_index(K053251_CI3);
+	bg_colorbase = m_k053251->get_palette_index(k053251_device::CI0);
+	m_sprite_colorbase = m_k053251->get_palette_index(k053251_device::CI1);
+	m_layer_colorbase[0] = m_k053251->get_palette_index(k053251_device::CI2);
+	m_layer_colorbase[1] = m_k053251->get_palette_index(k053251_device::CI4);
+	m_layer_colorbase[2] = m_k053251->get_palette_index(k053251_device::CI3);
 
 	m_k052109->tilemap_update();
 
 	m_sorted_layer[0] = 0;
-	m_layerpri[0] = m_k053251->get_priority(K053251_CI2);
+	m_layerpri[0] = m_k053251->get_priority(k053251_device::CI2);
 	m_sorted_layer[1] = 1;
-	m_layerpri[1] = m_k053251->get_priority(K053251_CI4);
+	m_layerpri[1] = m_k053251->get_priority(k053251_device::CI4);
 	m_sorted_layer[2] = 2;
-	m_layerpri[2] = m_k053251->get_priority(K053251_CI3);
+	m_layerpri[2] = m_k053251->get_priority(k053251_device::CI3);
 
 	konami_sortlayers3(m_sorted_layer, m_layerpri);
 
@@ -760,7 +760,7 @@ UINT32 tmnt_state::screen_update_thndrx2(screen_device &screen, bitmap_ind16 &bi
 
 ***************************************************************************/
 
-void tmnt_state::screen_eof_blswhstl(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(tmnt_state::screen_vblank_blswhstl)
 {
 	// on rising edge
 	if (state)

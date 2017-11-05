@@ -12,8 +12,10 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "sound/okim6295.h"
 #include "machine/bankdev.h"
+#include "sound/okim6295.h"
+#include "screen.h"
+#include "speaker.h"
 
 #define MCLK 16000000
 
@@ -36,7 +38,7 @@ public:
 		m_bg1_regs_y(*this, "bg1_regs_y"),
 		m_bg2_regs_x(*this, "bg2_regs_x"),
 		m_bg2_regs_y(*this, "bg2_regs_y")
-		{ }
+	{ }
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -46,16 +48,16 @@ public:
 	required_memory_bank m_okibank;
 
 	/* memory pointers */
-	required_region_ptr<UINT16> m_bg1_rom;
-	required_region_ptr<UINT16> m_bg2_rom;
+	required_region_ptr<uint16_t> m_bg1_rom;
+	required_region_ptr<uint16_t> m_bg2_rom;
 
-	required_shared_ptr<UINT8> m_bg0_videoram;
-	required_shared_ptr<UINT8> m_bg0_regs_x;
-	required_shared_ptr<UINT8> m_bg0_regs_y;
-	required_shared_ptr<UINT8> m_bg1_regs_x;
-	required_shared_ptr<UINT8> m_bg1_regs_y;
-	required_shared_ptr<UINT8> m_bg2_regs_x;
-	required_shared_ptr<UINT8> m_bg2_regs_y;
+	required_shared_ptr<uint8_t> m_bg0_videoram;
+	required_shared_ptr<uint8_t> m_bg0_regs_x;
+	required_shared_ptr<uint8_t> m_bg0_regs_y;
+	required_shared_ptr<uint8_t> m_bg1_regs_x;
+	required_shared_ptr<uint8_t> m_bg1_regs_y;
+	required_shared_ptr<uint8_t> m_bg2_regs_x;
+	required_shared_ptr<uint8_t> m_bg2_regs_y;
 
 	/* video-related */
 	tilemap_t  *m_bg0_tilemap;
@@ -74,7 +76,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_cultures(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_cultures(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(cultures_interrupt);
 };
 
@@ -100,9 +102,9 @@ TILE_GET_INFO_MEMBER(cultures_state::get_bg0_tile_info)
 
 void cultures_state::video_start()
 {
-	m_bg0_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(cultures_state::get_bg0_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8, 64, 128);
-	m_bg1_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(cultures_state::get_bg1_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8, 512, 512);
-	m_bg2_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(cultures_state::get_bg2_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8, 512, 512);
+	m_bg0_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cultures_state::get_bg0_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8, 64, 128);
+	m_bg1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cultures_state::get_bg1_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8, 512, 512);
+	m_bg2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cultures_state::get_bg2_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8, 512, 512);
 
 	m_bg1_tilemap->set_transparent_pen(0);
 	m_bg0_tilemap->set_transparent_pen(0);
@@ -116,7 +118,7 @@ void cultures_state::video_start()
 	m_bg2_tilemap->set_scrolldy(255, -16);
 }
 
-UINT32 cultures_state::screen_update_cultures(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t cultures_state::screen_update_cultures(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int attr;
 
@@ -181,7 +183,7 @@ WRITE8_MEMBER(cultures_state::bg_bank_w)
 }
 
 
-static ADDRESS_MAP_START( oki_map, AS_0, 8, cultures_state )
+static ADDRESS_MAP_START( oki_map, 0, 8, cultures_state )
 	AM_RANGE(0x00000, 0x1ffff) AM_ROM
 	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("okibank")
 ADDRESS_MAP_END
@@ -392,7 +394,7 @@ void cultures_state::machine_reset()
 
 
 
-static MACHINE_CONFIG_START( cultures, cultures_state )
+static MACHINE_CONFIG_START( cultures )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MCLK/2) /* 8.000 MHz */
@@ -424,9 +426,9 @@ static MACHINE_CONFIG_START( cultures, cultures_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", MCLK/8, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", MCLK/8, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, oki_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 
 MACHINE_CONFIG_END
 
@@ -494,4 +496,4 @@ ROM_START( cultures )
 ROM_END
 
 
-GAME( 1994, cultures, 0, cultures, cultures, driver_device, 0, ROT0, "Face", "Jibun wo Migaku Culture School Mahjong Hen", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, cultures, 0, cultures, cultures, cultures_state, 0, ROT0, "Face", "Jibun wo Migaku Culture School Mahjong Hen", MACHINE_SUPPORTS_SAVE )

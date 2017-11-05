@@ -6,14 +6,13 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_NES_CTRL_HORI_H
+#define MAME_BUS_NES_CTRL_HORI_H
+
 #pragma once
 
-#ifndef __NES_HORI__
-#define __NES_HORI__
-
-
-#include "emu.h"
 #include "ctrl.h"
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -26,16 +25,16 @@ class nes_horitwin_device : public device_t,
 {
 public:
 	// construction/destruction
-	nes_horitwin_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	nes_horitwin_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	// device-level overrides
-	virtual void device_start() override {}
+	virtual void device_start() override { }
 
-	virtual UINT8 read_exp(offs_t offset) override;
-	virtual void write(UINT8 data) override;
+	virtual void device_add_mconfig(machine_config &config) override;
+
+	virtual uint8_t read_exp(offs_t offset) override;
+	virtual void write(uint8_t data) override;
 
 private:
 	required_device<nes_control_port_device> m_port1;
@@ -49,17 +48,17 @@ class nes_hori4p_device : public device_t,
 {
 public:
 	// construction/destruction
-	nes_hori4p_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-	virtual ioport_constructor device_input_ports() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	nes_hori4p_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	// device-level overrides
-	virtual void device_start() override {}
+	virtual void device_start() override { }
 
-	virtual UINT8 read_exp(offs_t offset) override;
-	virtual void write(UINT8 data) override;
+	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
+
+	virtual uint8_t read_exp(offs_t offset) override;
+	virtual void write(uint8_t data) override;
 
 private:
 	required_device<nes_control_port_device> m_port1;
@@ -71,8 +70,8 @@ private:
 
 
 // device type definition
-extern const device_type NES_HORITWIN;
-extern const device_type NES_HORI4P;
+DECLARE_DEVICE_TYPE(NES_HORITWIN, nes_horitwin_device)
+DECLARE_DEVICE_TYPE(NES_HORI4P,   nes_hori4p_device)
 
 
-#endif
+#endif // MAME_BUS_NES_CTRL_HORI_H

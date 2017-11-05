@@ -15,16 +15,16 @@
 #include "includes/mz700.h"
 
 
-UINT32 mz_state::screen_update_mz700(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t mz_state::screen_update_mz700(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 y,ra,gfx,col,bg=0,fg=0,oldcol=0x7e;
-	UINT16 sy=0,ma=0,x,chr;
+	uint8_t y,ra,gfx,col,bg=0,fg=0,oldcol=0x7e;
+	uint16_t sy=0,ma=0,x,chr;
 
 	for (y = 0; y < 25; y++)
 	{
 		for (ra = 0; ra < 8; ra++)
 		{
-			UINT16 *p = &bitmap.pix16(sy++);
+			uint16_t *p = &bitmap.pix16(sy++);
 
 			for (x = ma; x < ma + 40; x++)
 			{
@@ -61,7 +61,7 @@ UINT32 mz_state::screen_update_mz700(screen_device &screen, bitmap_ind16 &bitmap
     Not working.
 ***************************************************************************/
 
-UINT32 mz_state::screen_update_mz800(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t mz_state::screen_update_mz800(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if (m_mz700_mode)
 		return screen_update_mz700(screen, bitmap, cliprect);

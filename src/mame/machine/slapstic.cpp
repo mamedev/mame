@@ -181,14 +181,27 @@
 *************************************************************************/
 
 
+#include "emu.h"
 #include "includes/slapstic.h"
-#include "validity.h"
+
+#include "cpu/m6800/m6800.h"
+#include "cpu/m68000/m68000.h"
 
 
-extern const device_type SLAPSTIC = &device_creator<atari_slapstic_device>;
+/*************************************
+ *
+ *  Debugging
+ *
+ *************************************/
 
-atari_slapstic_device::atari_slapstic_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, SLAPSTIC, "Atari Slapstic", tag, owner, clock, "slapstic", __FILE__),
+#define LOG_SLAPSTIC    (0)
+
+
+
+DEFINE_DEVICE_TYPE(SLAPSTIC, atari_slapstic_device, "slapstic", "Atari Slapstic")
+
+atari_slapstic_device::atari_slapstic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, SLAPSTIC, tag, owner, clock),
 	state(0),
 	current_bank(0),
 	access_68k(-1),
@@ -822,12 +835,12 @@ int atari_slapstic_device::alt2_kludge(address_space &space, offs_t offset)
 		if (MATCHES_MASK_VALUE(space.device().safe_pc() >> 1, slapstic.alt1))
 		{
 			/* now look for a move.w (An),(An) or cmpm.w (An)+,(An)+ */
-			UINT16 opcode = space.direct().read_word(space.device().safe_pcbase() & 0xffffff);
+			uint16_t opcode = space.direct().read_word(space.device().safe_pcbase() & 0xffffff);
 			if ((opcode & 0xf1f8) == 0x3090 || (opcode & 0xf1f8) == 0xb148)
 			{
 				/* fetch the value of the register for the second operand, and see */
 				/* if it matches the third alternate */
-				UINT32 regval = space.device().state().state_int(M68K_A0 + ((opcode >> 9) & 7)) >> 1;
+				uint32_t regval = space.device().state().state_int(M68K_A0 + ((opcode >> 9) & 7)) >> 1;
 				if (MATCHES_MASK_VALUE(regval, slapstic.alt3))
 				{
 					alt_bank = (regval >> slapstic.altshift) & 3;
@@ -1092,7 +1105,7 @@ void atari_slapstic_device::slapstic_log(running_machine &machine, offs_t offset
 			fprintf(slapsticlog, "------------------------------------\n");
 		last_time = time;
 
-		fprintf(slapsticlog, "%s: %04X B=%d ", machine.describe_context(), offset, current_bank);
+		fprintf(slapsticlog, "%s: %04X B=%d ", machine.describe_context().c_str(), offset, current_bank);
 		switch (state)
 		{
 			case DISABLED:

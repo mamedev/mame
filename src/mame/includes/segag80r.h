@@ -5,10 +5,17 @@
     Sega G-80 raster hardware
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_SEGAG80R_H
+#define MAME_INCLUDES_SEGAG80R_H
+
+#pragma once
+
 #include "sound/samples.h"
 #include "machine/segag80.h"
 #include "sound/sn76496.h"
 #include "audio/segasnd.h"
+#include "machine/gen_latch.h"
+#include "screen.h"
 
 
 class sega005_sound_device;
@@ -36,10 +43,11 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch"),
 		m_decrypted_opcodes(*this, "decrypted_opcodes") { }
 
-	required_shared_ptr<UINT8> m_mainram;
-	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<uint8_t> m_mainram;
+	required_shared_ptr<uint8_t> m_videoram;
 
 	optional_device<sn76496_device> m_sn1;
 	optional_device<sn76496_device> m_sn2;
@@ -52,39 +60,44 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	optional_shared_ptr<UINT8> m_decrypted_opcodes;
+	optional_device<generic_latch_8_device> m_soundlatch;
+	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
 
-	std::vector<UINT8> m_paletteram;
+	std::vector<uint8_t> m_paletteram;
 
-	UINT8 m_sound_state[2];
-	UINT8 m_sound_rate;
-	UINT16 m_sound_addr;
-	UINT8 m_sound_data;
-	UINT8 m_square_state;
-	UINT8 m_square_count;
-	UINT8 m_n7751_command;
-	UINT8 m_n7751_busy;
+	offs_t m_scrambled_write_pc;
+
+	uint8_t m_sound_state[2];
+	uint8_t m_sound_rate;
+	uint16_t m_sound_addr;
+	uint8_t m_sound_data;
+	uint8_t m_square_state;
+	uint8_t m_square_count;
+	uint8_t m_n7751_command;
+	uint8_t m_n7751_busy;
 	segag80_decrypt_func m_decrypt;
-	UINT8 m_background_pcb;
+	uint8_t m_background_pcb;
 	double m_rweights[3];
 	double m_gweights[3];
 	double m_bweights[2];
-	UINT8 m_video_control;
-	UINT8 m_video_flip;
-	UINT8 m_vblank_latch;
+	uint8_t m_video_control;
+	uint8_t m_video_flip;
+	uint8_t m_vblank_latch;
 	tilemap_t *m_spaceod_bg_htilemap;
 	tilemap_t *m_spaceod_bg_vtilemap;
-	UINT16 m_spaceod_hcounter;
-	UINT16 m_spaceod_vcounter;
-	UINT8 m_spaceod_fixed_color;
-	UINT8 m_spaceod_bg_control;
-	UINT8 m_spaceod_bg_detect;
+	uint16_t m_spaceod_hcounter;
+	uint16_t m_spaceod_vcounter;
+	uint8_t m_spaceod_fixed_color;
+	uint8_t m_spaceod_bg_control;
+	uint8_t m_spaceod_bg_detect;
 	tilemap_t *m_bg_tilemap;
-	UINT8 m_bg_enable;
-	UINT8 m_bg_char_bank;
-	UINT16 m_bg_scrollx;
-	UINT16 m_bg_scrolly;
-	UINT8 m_pignewt_bg_color_offset;
+	uint8_t m_bg_enable;
+	uint8_t m_bg_char_bank;
+	uint16_t m_bg_scrollx;
+	uint16_t m_bg_scrolly;
+	uint8_t m_pignewt_bg_color_offset;
+
+	DECLARE_READ8_MEMBER(g80r_opcode_r);
 	DECLARE_WRITE8_MEMBER(mainram_w);
 	DECLARE_WRITE8_MEMBER(vidram_w);
 	DECLARE_WRITE8_MEMBER(monsterb_vidram_w);
@@ -110,7 +123,6 @@ public:
 	DECLARE_WRITE8_MEMBER(spaceod_sound_w);
 	DECLARE_READ8_MEMBER(n7751_rom_r);
 	DECLARE_READ8_MEMBER(n7751_command_r);
-	DECLARE_READ8_MEMBER(n7751_t1_r);
 	DECLARE_INPUT_CHANGED_MEMBER(service_switch);
 	DECLARE_WRITE8_MEMBER(usb_ram_w);
 	DECLARE_WRITE8_MEMBER(sindbadm_soundport_w);
@@ -129,8 +141,9 @@ public:
 	TILE_GET_INFO_MEMBER(bg_get_tile_info);
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	UINT32 screen_update_segag80r(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_segag80r(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(segag80r_vblank_start);
+	IRQ_CALLBACK_MEMBER(segag80r_irq_ack);
 	INTERRUPT_GEN_MEMBER(sindbadm_vblank_start);
 	DECLARE_WRITE8_MEMBER(sega005_sound_a_w);
 	DECLARE_WRITE8_MEMBER(sega005_sound_b_w);
@@ -142,18 +155,19 @@ public:
 	DECLARE_WRITE8_MEMBER(n7751_rom_control_w);
 	DECLARE_WRITE8_MEMBER(n7751_p2_w);
 	void vblank_latch_set();
-	void g80_set_palette_entry(int entry, UINT8 data);
+	void g80_set_palette_entry(int entry, uint8_t data);
 	void spaceod_bg_init_palette();
-	void draw_videoram(bitmap_ind16 &bitmap, const rectangle &cliprect, const UINT8 *transparent_pens);
+	void draw_videoram(bitmap_ind16 &bitmap, const rectangle &cliprect, const uint8_t *transparent_pens);
 	void draw_background_spaceod(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_background_page_scroll(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_background_full_scroll(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	offs_t decrypt_offset(address_space &space, offs_t offset);
-	inline UINT8 demangle(UINT8 d7d6, UINT8 d5d4, UINT8 d3d2, UINT8 d1d0);
+	inline uint8_t demangle(uint8_t d7d6, uint8_t d5d4, uint8_t d3d2, uint8_t d1d0);
 	void monsterb_expand_gfx(const char *region);
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	emu_timer *m_vblank_latch_clear_timer;
 };
 
 
@@ -164,14 +178,13 @@ class sega005_sound_device : public device_t,
 									public device_sound_interface
 {
 public:
-	sega005_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sega005_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	emu_timer *m_sega005_sound_timer;
 	sound_stream *m_sega005_stream;
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete() override;
 	virtual void device_start() override;
 
 	// sound stream update overrides
@@ -182,7 +195,7 @@ private:
 	TIMER_CALLBACK_MEMBER( sega005_auto_timer );
 };
 
-extern const device_type SEGA005;
+DECLARE_DEVICE_TYPE(SEGA005, sega005_sound_device)
 
 
 MACHINE_CONFIG_EXTERN( astrob_sound_board );
@@ -197,3 +210,5 @@ MACHINE_CONFIG_EXTERN( monsterb_sound_board );
 #define G80_BACKGROUND_MONSTERB     2
 #define G80_BACKGROUND_PIGNEWT      3
 #define G80_BACKGROUND_SINDBADM     4
+
+#endif // MAME_INCLUDES_SEGAG80R_H

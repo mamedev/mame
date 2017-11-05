@@ -11,7 +11,6 @@
 #include "emu.h"
 #include "includes/advision.h"
 #include "cpu/mcs48/mcs48.h"
-#include "sound/dac.h"
 
 /*
     8048 Ports:
@@ -87,7 +86,7 @@ WRITE8_MEMBER( advision_state::bankswitch_w )
 
 READ8_MEMBER( advision_state::ext_ram_r )
 {
-	UINT8 data = m_ext_ram[m_rambank + offset];
+	uint8_t data = m_ext_ram[m_rambank + offset];
 
 	if (!m_video_enable)
 	{
@@ -110,6 +109,11 @@ WRITE8_MEMBER( advision_state::ext_ram_w )
 
 /* Sound */
 
+TIMER_CALLBACK_MEMBER( advision_state::sound_cmd_sync )
+{
+	m_sound_cmd = param;
+}
+
 READ8_MEMBER( advision_state::sound_cmd_r )
 {
 	return m_sound_cmd;
@@ -117,12 +121,8 @@ READ8_MEMBER( advision_state::sound_cmd_r )
 
 void advision_state::update_dac()
 {
-	if (m_sound_g == 0 && m_sound_d == 0)
-		m_dac->write_unsigned8(0xff);
-	else if (m_sound_g == 1 && m_sound_d == 1)
-		m_dac->write_unsigned8(0x80);
-	else
-		m_dac->write_unsigned8(0x00);
+	int translate[] = { 2, 0, 0, 1 };
+	m_dac->write(translate[(m_sound_g << 1) | m_sound_d]);
 }
 
 WRITE8_MEMBER( advision_state::sound_g_w )
@@ -143,7 +143,7 @@ WRITE8_MEMBER( advision_state::sound_d_w )
 
 WRITE8_MEMBER( advision_state::av_control_w )
 {
-	m_sound_cmd = data >> 4;
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(advision_state::sound_cmd_sync), this), data >> 4);
 
 	if ((m_video_enable == 0x00) && (data & 0x10))
 	{
@@ -162,7 +162,7 @@ WRITE8_MEMBER( advision_state::av_control_w )
 	m_video_bank = (data & 0xe0) >> 5;
 }
 
-READ8_MEMBER( advision_state::vsync_r )
+READ_LINE_MEMBER( advision_state::vsync_r )
 {
 	if (m_frame_start)
 	{
@@ -181,8 +181,8 @@ READ8_MEMBER( advision_state::vsync_r )
 READ8_MEMBER( advision_state::controller_r )
 {
 	// Get joystick switches
-	UINT8 in = m_joy->read();
-	UINT8 data = in | 0x0f;
+	uint8_t in = m_joy->read();
+	uint8_t data = in | 0x0f;
 
 	// Get buttons
 	if (in & 0x02) data = data & 0xf7; /* Button 3 */

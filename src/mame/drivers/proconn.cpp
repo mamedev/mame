@@ -25,16 +25,20 @@
 
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
-#include "machine/z80pio.h"
+#include "machine/meters.h"
+#include "machine/roc10937.h"
 #include "machine/z80ctc.h"
-#include "machine/z80dart.h"
+#include "machine/z80sio.h"
+#include "machine/z80pio.h"
 #include "sound/ay8910.h"
 #include "video/awpvid.h"
-#include "machine/roc10937.h"
-#include "machine/meters.h"
+
+#include "speaker.h"
 
 #include "proconn.lh"
+
 
 class proconn_state : public driver_device
 {
@@ -178,7 +182,7 @@ public:
 protected:
 
 	// devices
-	optional_device<s16lf01_t> m_vfd;
+	optional_device<s16lf01_device> m_vfd;
 	required_device<cpu_device> m_maincpu;
 	required_device<z80pio_device> m_z80pio_1;
 	required_device<z80pio_device> m_z80pio_2;
@@ -186,7 +190,7 @@ protected:
 	required_device<z80pio_device> m_z80pio_4;
 	required_device<z80pio_device> m_z80pio_5;
 	required_device<z80ctc_device> m_z80ctc;
-	required_device<z80dart_device> m_z80sio;
+	required_device<z80sio_device> m_z80sio;
 	required_device<ay8910_device> m_ay;
 	required_device<meters_device> m_meters;
 
@@ -314,7 +318,7 @@ void proconn_state::machine_reset()
 	m_vfd->reset(); // reset display1
 }
 
-static MACHINE_CONFIG_START( proconn, proconn_state )
+static MACHINE_CONFIG_START( proconn )
 	MCFG_CPU_ADD("maincpu", Z80, 4000000) /* ?? Mhz */
 	MCFG_Z80_DAISY_CHAIN(z80_daisy_chain)
 	MCFG_CPU_PROGRAM_MAP(proconn_map)
@@ -369,7 +373,7 @@ static MACHINE_CONFIG_START( proconn, proconn_state )
 	MCFG_DEVICE_ADD("z80ctc", Z80CTC, 4000000)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
-	MCFG_Z80SIO0_ADD( "z80sio",   4000000, 0, 0, 0, 0 ) /* ?? Mhz */
+	MCFG_DEVICE_ADD("z80sio", Z80SIO, 4000000) /* ?? Mhz */
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

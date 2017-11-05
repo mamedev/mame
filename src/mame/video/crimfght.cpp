@@ -51,7 +51,7 @@ K051960_CB_MEMBER(crimfght_state::sprite_callback)
 
 ***************************************************************************/
 
-UINT32 crimfght_state::screen_update_crimfght(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t crimfght_state::screen_update_crimfght(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_k052109->tilemap_update();
 

@@ -127,12 +127,15 @@ out:
 
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "cpu/tms32010/tms32010.h"
-#include "sound/3812intf.h"
-#include "machine/bankdev.h"
-#include "includes/toaplipt.h"
 #include "includes/twincobr.h"
+#include "includes/toaplipt.h"
+
+#include "cpu/tms32010/tms32010.h"
+#include "cpu/z80/z80.h"
+#include "machine/74259.h"
+#include "machine/bankdev.h"
+#include "sound/3812intf.h"
+#include "speaker.h"
 
 
 class wardner_state : public twincobr_state
@@ -198,8 +201,8 @@ static ADDRESS_MAP_START( main_io_map, AS_IO, 8, wardner_state )
 	AM_RANGE(0x54, 0x54) AM_READ_PORT("P1")
 	AM_RANGE(0x56, 0x56) AM_READ_PORT("P2")
 	AM_RANGE(0x58, 0x58) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x5a, 0x5a) AM_WRITE(wardner_coin_dsp_w)       /* Machine system control */
-	AM_RANGE(0x5c, 0x5c) AM_WRITE(wardner_control_w)        /* Machine system control */
+	AM_RANGE(0x5a, 0x5a) AM_DEVWRITE("coinlatch", ls259_device, write_nibble_d0)
+	AM_RANGE(0x5c, 0x5c) AM_DEVWRITE("mainlatch", ls259_device, write_nibble_d0)
 	AM_RANGE(0x60, 0x65) AM_READWRITE(wardner_videoram_r, wardner_videoram_w)
 	AM_RANGE(0x70, 0x70) AM_WRITE(wardner_bank_w)
 ADDRESS_MAP_END
@@ -232,7 +235,6 @@ static ADDRESS_MAP_START( DSP_io_map, AS_IO, 16, wardner_state )
 	AM_RANGE(0x00, 0x00) AM_WRITE(wardner_dsp_addrsel_w)
 	AM_RANGE(0x01, 0x01) AM_READWRITE(wardner_dsp_r, wardner_dsp_w)
 	AM_RANGE(0x03, 0x03) AM_WRITE(twincobr_dsp_bio_w)
-	AM_RANGE(TMS32010_BIO, TMS32010_BIO) AM_READ(twincobr_BIO_r)
 ADDRESS_MAP_END
 
 
@@ -355,13 +357,10 @@ void wardner_state::machine_reset()
 {
 	MACHINE_RESET_CALL_MEMBER(twincobr);
 
-	m_toaplan_main_cpu = 1;     /* Z80 */
-	twincobr_display(1);
-
 	m_membank->set_bank(0);
 }
 
-static MACHINE_CONFIG_START( wardner, wardner_state )
+static MACHINE_CONFIG_START( wardner )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_24MHz/4)      /* 6MHz */
@@ -384,8 +383,23 @@ static MACHINE_CONFIG_START( wardner, wardner_state )
 	MCFG_CPU_PROGRAM_MAP(DSP_program_map)
 	/* Data Map is internal to the CPU */
 	MCFG_CPU_IO_MAP(DSP_io_map)
+	MCFG_TMS32010_BIO_IN_CB(READLINE(wardner_state, twincobr_BIO_r))
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))      /* 100 CPU slices per frame */
+
+	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(wardner_state, int_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(wardner_state, flipscreen_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(wardner_state, bg_ram_bank_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(wardner_state, fg_rom_bank_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(wardner_state, display_on_w))
+
+	MCFG_DEVICE_ADD("coinlatch", LS259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(wardner_state, dsp_int_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(wardner_state, coin_counter_1_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(wardner_state, coin_counter_2_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(wardner_state, coin_lockout_1_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(wardner_state, coin_lockout_2_w))
 
 	/* video hardware */
 	MCFG_MC6845_ADD("crtc", HD6845, "screen", XTAL_14MHz/4) /* 3.5MHz measured on CLKin */
@@ -400,7 +414,7 @@ static MACHINE_CONFIG_START( wardner, wardner_state )
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_14MHz/2, 446, 0, 320, 286, 0, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(wardner_state, screen_update_toaplan0)
-	MCFG_SCREEN_VBLANK_DEVICE("spriteram8", buffered_spriteram8_device, vblank_copy_rising)
+	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram8", buffered_spriteram8_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", wardner)
@@ -579,6 +593,6 @@ ROM_START( wardnerj )
 ROM_END
 
 
-GAME( 1987, wardner,  0,       wardner, wardner,  driver_device, 0, ROT0, "Toaplan / Taito Corporation Japan", "Wardner (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, pyros,    wardner, wardner, pyros,    driver_device, 0, ROT0, "Toaplan / Taito America Corporation", "Pyros (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, wardnerj, wardner, wardner, wardnerj, driver_device, 0, ROT0, "Toaplan / Taito Corporation", "Wardner no Mori (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, wardner,  0,       wardner, wardner,  wardner_state, 0, ROT0, "Toaplan / Taito Corporation Japan",   "Wardner (World)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1987, pyros,    wardner, wardner, pyros,    wardner_state, 0, ROT0, "Toaplan / Taito America Corporation", "Pyros (US)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1987, wardnerj, wardner, wardner, wardnerj, wardner_state, 0, ROT0, "Toaplan / Taito Corporation",         "Wardner no Mori (Japan)", MACHINE_SUPPORTS_SAVE )

@@ -6,12 +6,11 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_VIP_VP620_H
+#define MAME_BUS_VIP_VP620_H
+
 #pragma once
 
-#ifndef __VP620__
-#define __VP620__
-
-#include "emu.h"
 #include "byteio.h"
 #include "machine/keyboard.h"
 
@@ -28,30 +27,26 @@ class vp620_device : public device_t,
 {
 public:
 	// construction/destruction
-	vp620_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
-	// not really public
-	DECLARE_WRITE8_MEMBER( kb_w );
+	vp620_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	// device_vip_byteio_port_interface overrides
-	virtual UINT8 vip_in_r() override;
+	virtual uint8_t vip_in_r() override;
 	virtual int vip_ef4_r() override;
 
 private:
-	UINT8 m_keydata;
+	void kb_w(uint8_t data);
+
+	uint8_t m_keydata;
 	int m_keystb;
 };
 
 
 // device type definition
-extern const device_type VP620;
+DECLARE_DEVICE_TYPE(VP620, vp620_device)
 
-
-#endif
+#endif // MAME_BUS_VIP_VP620_H

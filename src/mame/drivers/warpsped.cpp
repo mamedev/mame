@@ -87,6 +87,7 @@ L10, L15, L18 and G18 all read the same
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "screen.h"
 
 class warpspeed_state : public driver_device
 {
@@ -101,12 +102,12 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_workram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_workram;
 
 	tilemap_t   *m_text_tilemap;
 	tilemap_t   *m_starfield_tilemap;
-	UINT8       m_regs[0x28];
+	uint8_t       m_regs[0x28];
 
 	DECLARE_WRITE8_MEMBER(hardware_w);
 	DECLARE_WRITE8_MEMBER(vidram_w);
@@ -117,7 +118,7 @@ public:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(warpspeed);
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_circles(bitmap_ind16 &bitmap);
 };
 
@@ -128,13 +129,13 @@ WRITE8_MEMBER(warpspeed_state::hardware_w)
 
 TILE_GET_INFO_MEMBER(warpspeed_state::get_text_tile_info)
 {
-	UINT8 code = m_videoram[tile_index] & 0x3f;
+	uint8_t code = m_videoram[tile_index] & 0x3f;
 	SET_TILE_INFO_MEMBER(0, code, 0, 0);
 }
 
 TILE_GET_INFO_MEMBER(warpspeed_state::get_starfield_tile_info)
 {
-	UINT8 code = 0x3f;
+	uint8_t code = 0x3f;
 	if ( tile_index & 1 )
 	{
 		code = memregion("starfield")->base()[tile_index >> 1] & 0x3f;
@@ -150,9 +151,9 @@ WRITE8_MEMBER(warpspeed_state::vidram_w)
 
 void warpspeed_state::video_start()
 {
-	m_text_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(warpspeed_state::get_text_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_text_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(warpspeed_state::get_text_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_text_tilemap->set_transparent_pen(0);
-	m_starfield_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(warpspeed_state::get_starfield_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_starfield_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(warpspeed_state::get_starfield_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_starfield_tilemap->mark_all_dirty();
 
 	save_item(NAME(m_regs));
@@ -162,7 +163,7 @@ static void draw_circle_line(bitmap_ind16 &bitmap, int x, int y, int l, int colo
 {
 	if (y >= 0 && y <= bitmap.height() - 1)
 	{
-		UINT16* pLine = &bitmap.pix16(y);
+		uint16_t* pLine = &bitmap.pix16(y);
 
 		int h1 = x - l;
 		int h2 = x + l;
@@ -177,7 +178,7 @@ static void draw_circle_line(bitmap_ind16 &bitmap, int x, int y, int l, int colo
 	}
 }
 
-static void draw_circle(bitmap_ind16 &bitmap, INT16 cx, INT16 cy, UINT16 radius, UINT8 color )
+static void draw_circle(bitmap_ind16 &bitmap, int16_t cx, int16_t cy, uint16_t radius, uint8_t color )
 {
 	/* Bresenham's circle algorithm */
 
@@ -206,12 +207,12 @@ void warpspeed_state::draw_circles(bitmap_ind16 &bitmap)
 {
 	for (int i = 0; i < 4; i++)
 	{
-		UINT16 radius = m_regs[i*8] + m_regs[i*8 + 1]*256;
+		uint16_t radius = m_regs[i*8] + m_regs[i*8 + 1]*256;
 		radius = 0xffff - radius;
 		radius = sqrt((float)radius);
-		INT16 midx = m_regs[i*8 + 2] + m_regs[i*8 + 3]*256;
+		int16_t midx = m_regs[i*8 + 2] + m_regs[i*8 + 3]*256;
 		midx -= 0xe70;
-		INT16 midy = m_regs[i*8 + 4] + m_regs[i*8 + 5]*256;
+		int16_t midy = m_regs[i*8 + 4] + m_regs[i*8 + 5]*256;
 		midy -= 0xe70;
 		if ( radius == 0 || radius == 0xffff )
 		{
@@ -221,7 +222,7 @@ void warpspeed_state::draw_circles(bitmap_ind16 &bitmap)
 	}
 }
 
-UINT32 warpspeed_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t warpspeed_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_starfield_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	draw_circles(bitmap);
@@ -304,8 +305,8 @@ GFXDECODE_END
 PALETTE_INIT_MEMBER(warpspeed_state, warpspeed)
 {
 	// tilemaps
-	palette.set_pen_color(0,rgb_t::black); /* black */
-	palette.set_pen_color(1,rgb_t::white); /* white */
+	palette.set_pen_color(0,rgb_t::black()); /* black */
+	palette.set_pen_color(1,rgb_t::white()); /* white */
 
 	// circles
 	for ( int i = 0; i < 8; i++ )
@@ -314,7 +315,7 @@ PALETTE_INIT_MEMBER(warpspeed_state, warpspeed)
 	}
 }
 
-static MACHINE_CONFIG_START( warpspeed, warpspeed_state )
+static MACHINE_CONFIG_START( warpspeed )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_5MHz/2)
@@ -372,4 +373,4 @@ ROM_START( warpsped )
 ROM_END
 
 
-GAME( 1979?, warpsped,  0,      warpspeed, warpspeed, driver_device, 0, ROT0, "Meadows Games, Inc.", "Warp Speed (prototype)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE ) // year not shown, 1979 is according to date stamps on PCB chips.
+GAME( 1979?, warpsped,  0,      warpspeed, warpspeed, warpspeed_state, 0, ROT0, "Meadows Games, Inc.", "Warp Speed (prototype)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE ) // year not shown, 1979 is according to date stamps on PCB chips.

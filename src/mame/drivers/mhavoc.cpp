@@ -186,6 +186,8 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/mhavoc.h"
+
 #include "cpu/m6502/m6502.h"
 #include "machine/atari_vg.h"
 #include "video/avgdvg.h"
@@ -194,7 +196,9 @@
 #include "sound/pokey.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
-#include "includes/mhavoc.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 /* Quad pokey hookup (based on schematics):
 Address: 543210
@@ -522,7 +526,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( mhavoc, mhavoc_state )
+static MACHINE_CONFIG_START( mhavoc )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("alpha", M6502, MHAVOC_CLOCK_2_5M)     /* 2.5 MHz */
@@ -698,6 +702,8 @@ ROM_START( mhavocrv )
 	ROM_LOAD( "136025.106",   0x18000, 0x4000, CRC(2ca83c76) SHA1(cc1adca32f70af30c4590e9fd6b056b051ccdb38) ) /* page 0+1 */
 	ROM_LOAD( "136025.907",   0x1c000, 0x4000, CRC(4deea2c9) SHA1(c4107581748a3f2d2084de2a4f120abd67a52189) ) /* page 2+3 */
 
+	/* the last 0x1000 is used for the 2 RAM pages */
+
 	/* Gamma Processor ROM */
 	ROM_REGION( 0x10000, "gamma", 0 )
 	ROM_LOAD( "136025.908",   0x08000, 0x4000, CRC(c52ec664) SHA1(08120a385f71b17ec02a3c2ef856ff835a91773e) ) /* mirrored to c000-ffff for reset+interrupt vectors */
@@ -799,9 +805,9 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, mhavoc,   0,      mhavoc,   mhavoc, driver_device,   0,        ROT0, "Atari",         "Major Havoc (rev 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, mhavoc2,  mhavoc, mhavoc,   mhavoc, driver_device,   0,        ROT0, "Atari",         "Major Havoc (rev 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, mhavocrv, mhavoc, mhavocrv, mhavocrv, mhavoc_state, mhavocrv, ROT0, "Atari / JMA",   "Major Havoc (Return to Vax)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, mhavocp,  mhavoc, mhavoc,   mhavocp, driver_device,  0,        ROT0, "Atari",         "Major Havoc (prototype)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, alphaone, mhavoc, alphaone, alphaone, driver_device, 0,        ROT0, "Atari",         "Alpha One (prototype, 3 lives)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, alphaonea,mhavoc, alphaone, alphaone, driver_device, 0,        ROT0, "Atari",         "Alpha One (prototype, 5 lives)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, mhavoc,   0,      mhavoc,   mhavoc,   mhavoc_state, 0,        ROT0, "Atari",         "Major Havoc (rev 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, mhavoc2,  mhavoc, mhavoc,   mhavoc,   mhavoc_state, 0,        ROT0, "Atari",         "Major Havoc (rev 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 2006, mhavocrv, mhavoc, mhavocrv, mhavocrv, mhavoc_state, mhavocrv, ROT0, "Atari / JMA (hack/homebrew)",   "Major Havoc (Return to Vax)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, mhavocp,  mhavoc, mhavoc,   mhavocp,  mhavoc_state, 0,        ROT0, "Atari",         "Major Havoc (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, alphaone, mhavoc, alphaone, alphaone, mhavoc_state, 0,        ROT0, "Atari",         "Alpha One (prototype, 3 lives)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, alphaonea,mhavoc, alphaone, alphaone, mhavoc_state, 0,        ROT0, "Atari",         "Alpha One (prototype, 5 lives)", MACHINE_SUPPORTS_SAVE )

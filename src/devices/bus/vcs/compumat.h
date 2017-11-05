@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Fabio Priuli
-#ifndef __VCS_COMPUMAT_H
-#define __VCS_COMPUMAT_H
+#ifndef MAME_BUS_VCS_COMPUMAT_H
+#define MAME_BUS_VCS_COMPUMAT_H
+
+#pragma once
 
 #include "rom.h"
 
@@ -15,7 +17,7 @@ class a26_rom_cm_device : public a26_rom_f6_device
 {
 public:
 	// construction/destruction
-	a26_rom_cm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	a26_rom_cm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -28,6 +30,6 @@ public:
 
 
 // device type definition
-extern const device_type A26_ROM_COMPUMATE;
+DECLARE_DEVICE_TYPE(A26_ROM_COMPUMATE, a26_rom_cm_device)
 
-#endif
+#endif // MAME_BUS_VCS_COMPUMAT_H

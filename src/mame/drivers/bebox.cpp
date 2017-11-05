@@ -21,6 +21,7 @@
 #include "machine/pckeybrd.h"
 #include "bus/lpci/mpc105.h"
 #include "bus/scsi/scsi.h"
+#include "speaker.h"
 
 /* Devices */
 #include "bus/scsi/scsicd.h"
@@ -38,33 +39,33 @@ static ADDRESS_MAP_START( bebox_mem, AS_PROGRAM, 64, bebox_state )
 	AM_RANGE(0x7FFFF3F0, 0x7FFFF3F7) AM_READWRITE(bebox_crossproc_interrupts_r, bebox_crossproc_interrupts_w )
 	AM_RANGE(0x7FFFF4F0, 0x7FFFF4F7) AM_WRITE(bebox_processor_resets_w )
 
-	AM_RANGE(0x80000000, 0x8000001F) AM_DEVREADWRITE8("dma8237_1", am9517a_device, read, write, U64(0xffffffffffffffff) )
-	AM_RANGE(0x80000020, 0x8000003F) AM_DEVREADWRITE8("pic8259_1", pic8259_device, read, write, U64(0xffffffffffffffff) )
-	AM_RANGE(0x80000040, 0x8000005f) AM_DEVREADWRITE8("pit8254", pit8254_device, read, write, U64(0xffffffffffffffff) )
-	AM_RANGE(0x80000060, 0x8000006F) AM_DEVREADWRITE8("kbdc", kbdc8042_device, data_r, data_w, U64(0xffffffffffffffff) )
-	AM_RANGE(0x80000070, 0x8000007F) AM_DEVREADWRITE8("rtc", mc146818_device, read, write , U64(0xffffffffffffffff) )
-	AM_RANGE(0x80000080, 0x8000009F) AM_READWRITE8(bebox_page_r, bebox_page_w, U64(0xffffffffffffffff) )
-	AM_RANGE(0x800000A0, 0x800000BF) AM_DEVREADWRITE8("pic8259_2", pic8259_device, read, write, U64(0xffffffffffffffff) )
-	AM_RANGE(0x800000C0, 0x800000DF) AM_READWRITE8(at_dma8237_1_r, at_dma8237_1_w, U64(0xffffffffffffffff))
-	AM_RANGE(0x800001F0, 0x800001F7) AM_DEVREADWRITE16("ide", ide_controller_device, read_cs0, write_cs0, U64(0xffffffffffffffff) )
-	AM_RANGE(0x800002F8, 0x800002FF) AM_DEVREADWRITE8( "ns16550_1", ns16550_device, ins8250_r, ins8250_w, U64(0xffffffffffffffff) )
-	AM_RANGE(0x80000380, 0x80000387) AM_DEVREADWRITE8( "ns16550_2", ns16550_device, ins8250_r, ins8250_w, U64(0xffffffffffffffff) )
-	AM_RANGE(0x80000388, 0x8000038F) AM_DEVREADWRITE8( "ns16550_3", ns16550_device, ins8250_r, ins8250_w, U64(0xffffffffffffffff) )
-	AM_RANGE(0x800003b0, 0x800003bf) AM_DEVREADWRITE8("vga", cirrus_gd5428_device, port_03b0_r, port_03b0_w, U64(0xffffffffffffffff))
-	AM_RANGE(0x800003c0, 0x800003cf) AM_DEVREADWRITE8("vga", cirrus_gd5428_device, port_03c0_r, port_03c0_w, U64(0xffffffffffffffff))
-	AM_RANGE(0x800003d0, 0x800003df) AM_DEVREADWRITE8("vga", cirrus_gd5428_device, port_03d0_r, port_03d0_w, U64(0xffffffffffffffff))
-	AM_RANGE(0x800003F0, 0x800003F7) AM_DEVREADWRITE16("ide", ide_controller_device, read_cs1, write_cs1, U64(0xffffffffffffffff) )
-	AM_RANGE(0x800003F0, 0x800003F7) AM_DEVICE8( "smc37c78", smc37c78_device, map, U64(0xffffffffffffffff) )
-	AM_RANGE(0x800003F8, 0x800003FF) AM_DEVREADWRITE8( "ns16550_0",ns16550_device,  ins8250_r, ins8250_w, U64(0xffffffffffffffff) )
-	AM_RANGE(0x80000480, 0x8000048F) AM_READWRITE8(bebox_80000480_r, bebox_80000480_w, U64(0xffffffffffffffff) )
+	AM_RANGE(0x80000000, 0x8000001F) AM_DEVREADWRITE8("dma8237_1", am9517a_device, read, write, 0xffffffffffffffffU )
+	AM_RANGE(0x80000020, 0x8000003F) AM_DEVREADWRITE8("pic8259_1", pic8259_device, read, write, 0xffffffffffffffffU )
+	AM_RANGE(0x80000040, 0x8000005f) AM_DEVREADWRITE8("pit8254", pit8254_device, read, write, 0xffffffffffffffffU )
+	AM_RANGE(0x80000060, 0x8000006F) AM_DEVREADWRITE8("kbdc", kbdc8042_device, data_r, data_w, 0xffffffffffffffffU )
+	AM_RANGE(0x80000070, 0x8000007F) AM_DEVREADWRITE8("rtc", mc146818_device, read, write , 0xffffffffffffffffU )
+	AM_RANGE(0x80000080, 0x8000009F) AM_READWRITE8(bebox_page_r, bebox_page_w, 0xffffffffffffffffU )
+	AM_RANGE(0x800000A0, 0x800000BF) AM_DEVREADWRITE8("pic8259_2", pic8259_device, read, write, 0xffffffffffffffffU )
+	AM_RANGE(0x800000C0, 0x800000DF) AM_READWRITE8(at_dma8237_1_r, at_dma8237_1_w, 0xffffffffffffffffU)
+	AM_RANGE(0x800001F0, 0x800001F7) AM_DEVREADWRITE16("ide", ide_controller_device, read_cs0, write_cs0, 0xffffffffffffffffU )
+	AM_RANGE(0x800002F8, 0x800002FF) AM_DEVREADWRITE8( "ns16550_1", ns16550_device, ins8250_r, ins8250_w, 0xffffffffffffffffU )
+	AM_RANGE(0x80000380, 0x80000387) AM_DEVREADWRITE8( "ns16550_2", ns16550_device, ins8250_r, ins8250_w, 0xffffffffffffffffU )
+	AM_RANGE(0x80000388, 0x8000038F) AM_DEVREADWRITE8( "ns16550_3", ns16550_device, ins8250_r, ins8250_w, 0xffffffffffffffffU )
+	AM_RANGE(0x800003b0, 0x800003bf) AM_DEVREADWRITE8("vga", cirrus_gd5428_device, port_03b0_r, port_03b0_w, 0xffffffffffffffffU)
+	AM_RANGE(0x800003c0, 0x800003cf) AM_DEVREADWRITE8("vga", cirrus_gd5428_device, port_03c0_r, port_03c0_w, 0xffffffffffffffffU)
+	AM_RANGE(0x800003d0, 0x800003df) AM_DEVREADWRITE8("vga", cirrus_gd5428_device, port_03d0_r, port_03d0_w, 0xffffffffffffffffU)
+	AM_RANGE(0x800003F0, 0x800003F7) AM_DEVREADWRITE16("ide", ide_controller_device, read_cs1, write_cs1, 0xffffffffffffffffU )
+	AM_RANGE(0x800003F0, 0x800003F7) AM_DEVICE8( "smc37c78", smc37c78_device, map, 0xffffffffffffffffU )
+	AM_RANGE(0x800003F8, 0x800003FF) AM_DEVREADWRITE8( "ns16550_0",ns16550_device,  ins8250_r, ins8250_w, 0xffffffffffffffffU )
+	AM_RANGE(0x80000480, 0x8000048F) AM_READWRITE8(bebox_80000480_r, bebox_80000480_w, 0xffffffffffffffffU )
 	AM_RANGE(0x80000CF8, 0x80000CFF) AM_DEVREADWRITE("pcibus", pci_bus_device, read_64be, write_64be )
-	//AM_RANGE(0x800042E8, 0x800042EF) AM_DEVWRITE8("cirrus", cirrus_device, cirrus_42E8_w, U64(0xffffffffffffffff) )
+	//AM_RANGE(0x800042E8, 0x800042EF) AM_DEVWRITE8("cirrus", cirrus_device, cirrus_42E8_w, 0xffffffffffffffffU )
 
 	AM_RANGE(0xBFFFFFF0, 0xBFFFFFFF) AM_READ(bebox_interrupt_ack_r )
-	AM_RANGE(0xC00A0000, 0XC00BFFFF) AM_DEVREADWRITE8("vga", cirrus_gd5428_device, mem_r, mem_w, U64(0xffffffffffffffff) )
-	AM_RANGE(0xC1000000, 0XC11FFFFF) AM_DEVREADWRITE8("vga", cirrus_gd5428_device, mem_linear_r, mem_linear_w, U64(0xffffffffffffffff) )
+	AM_RANGE(0xC00A0000, 0xC00BFFFF) AM_DEVREADWRITE8("vga", cirrus_gd5428_device, mem_r, mem_w, 0xffffffffffffffffU )
+	AM_RANGE(0xC1000000, 0xC11FFFFF) AM_DEVREADWRITE8("vga", cirrus_gd5428_device, mem_linear_r, mem_linear_w, 0xffffffffffffffffU )
 	AM_RANGE(0xFFF00000, 0xFFF03FFF) AM_ROMBANK("bank2")
-	AM_RANGE(0xFFF04000, 0xFFFFFFFF) AM_READWRITE8(bebox_flash_r, bebox_flash_w, U64(0xffffffffffffffff) )
+	AM_RANGE(0xFFF04000, 0xFFFFFFFF) AM_READWRITE8(bebox_flash_r, bebox_flash_w, 0xffffffffffffffffU )
 ADDRESS_MAP_END
 
 // The following is a gross hack to let the BeBox boot ROM identify the processors correctly.
@@ -94,7 +95,7 @@ ADDRESS_MAP_END
 
 LSI53C810_FETCH_CB(bebox_state::scsi_fetch)
 {
-	UINT32 result = m_ppc1->space(AS_PROGRAM).read_dword(dsp & 0x7FFFFFFF);
+	uint32_t result = m_ppc1->space(AS_PROGRAM).read_dword(dsp & 0x7FFFFFFF);
 	return BYTE_REVERSE32(result);
 }
 
@@ -117,7 +118,7 @@ static SLOT_INTERFACE_START( bebox_floppies )
 	SLOT_INTERFACE( "35hd", FLOPPY_35_HD )
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_FRAGMENT( mpc105_config )
+static MACHINE_CONFIG_START( mpc105_config )
 	MCFG_MPC105_CPU( "ppc1" )
 	MCFG_MPC105_BANK_BASE_DEFAULT( 0 )
 MACHINE_CONFIG_END
@@ -137,10 +138,10 @@ WRITE_LINE_MEMBER(bebox_state::bebox_keyboard_interrupt)
 
 static SLOT_INTERFACE_START( pci_devices )
 	SLOT_INTERFACE_INTERNAL("mpc105", MPC105)
-	SLOT_INTERFACE("cirrus", CIRRUS)
+	SLOT_INTERFACE("cirrus", PCI_CIRRUS_SVGA)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( bebox, bebox_state )
+static MACHINE_CONFIG_START( bebox )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("ppc1", PPC603, 66000000)  /* 66 MHz */
 	MCFG_CPU_PROGRAM_MAP(bebox_mem)
@@ -171,9 +172,14 @@ static MACHINE_CONFIG_START( bebox, bebox_state )
 
 	MCFG_DEVICE_ADD( "dma8237_2", AM9517A, XTAL_14_31818MHz/3 )
 
-	MCFG_PIC8259_ADD( "pic8259_1", WRITELINE(bebox_state,bebox_pic8259_master_set_int_line), VCC, READ8(bebox_state,get_slave_ack) )
+	MCFG_DEVICE_ADD("pic8259_1", PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(WRITELINE(bebox_state, bebox_pic8259_master_set_int_line))
+	MCFG_PIC8259_IN_SP_CB(VCC)
+	MCFG_PIC8259_CASCADE_ACK_CB(READ8(bebox_state, get_slave_ack))
 
-	MCFG_PIC8259_ADD( "pic8259_2", WRITELINE(bebox_state,bebox_pic8259_slave_set_int_line), GND, NOOP)
+	MCFG_DEVICE_ADD("pic8259_2", PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(WRITELINE(bebox_state, bebox_pic8259_slave_set_int_line))
+	MCFG_PIC8259_IN_SP_CB(GND)
 
 	MCFG_DEVICE_ADD( "ns16550_0", NS16550, 0 )   /* TODO: Verify model */
 	MCFG_DEVICE_ADD( "ns16550_1", NS16550, 0 )   /* TODO: Verify model */
@@ -256,6 +262,6 @@ ROM_START(bebox2)
 	ROM_LOAD( "bootnub.rom", 0x000000, 0x4000, CRC(5348d09a) SHA1(1b637a3d7a2b072aa128dd5c037bbb440d525c1a) )
 ROM_END
 
-/*     YEAR   NAME      PARENT  COMPAT  MACHINE   INPUT     INIT    COMPANY             FULLNAME */
-COMP( 1995,  bebox,    0,      0,      bebox,    bebox, bebox_state,    bebox,   "Be Inc",  "BeBox Dual603-66", MACHINE_NOT_WORKING )
-COMP( 1996,  bebox2,   bebox,  0,      bebox2,   bebox, bebox_state,    bebox,   "Be Inc",  "BeBox Dual603-133", MACHINE_NOT_WORKING )
+/*    YEAR   NAME      PARENT  COMPAT  MACHINE   INPUT   STATE           INIT     COMPANY    FULLNAME */
+COMP( 1995,  bebox,    0,      0,      bebox,    bebox,  bebox_state,    bebox,   "Be Inc",  "BeBox Dual603-66",  MACHINE_NOT_WORKING )
+COMP( 1996,  bebox2,   bebox,  0,      bebox2,   bebox,  bebox_state,    bebox,   "Be Inc",  "BeBox Dual603-133", MACHINE_NOT_WORKING )

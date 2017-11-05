@@ -6,14 +6,13 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_NES_CTRL_POWERPAD_H
+#define MAME_BUS_NES_CTRL_POWERPAD_H
+
 #pragma once
 
-#ifndef __NES_POWERPAD__
-#define __NES_POWERPAD__
-
-
-#include "emu.h"
 #include "ctrl.h"
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -26,7 +25,7 @@ class nes_powerpad_device : public device_t,
 {
 public:
 	// construction/destruction
-	nes_powerpad_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_powerpad_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual ioport_constructor device_input_ports() const override;
 
@@ -35,13 +34,13 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	virtual UINT8 read_bit34() override;
-	virtual void write(UINT8 data) override;
+	virtual uint8_t read_bit34() override;
+	virtual void write(uint8_t data) override;
 
 private:
 	required_ioport m_ipt1;
 	required_ioport m_ipt2;
-	UINT32 m_latch[2];
+	uint32_t m_latch[2];
 };
 
 
@@ -49,4 +48,4 @@ private:
 extern const device_type NES_POWERPAD;
 
 
-#endif
+#endif // MAME_BUS_NES_CTRL_POWERPAD_H

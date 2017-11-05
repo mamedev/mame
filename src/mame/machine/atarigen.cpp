@@ -49,14 +49,14 @@ inline const atarigen_screen_timer *get_screen_timer(screen_device &screen)
 //**************************************************************************
 
 // device type definition
-const device_type ATARI_SOUND_COMM = &device_creator<atari_sound_comm_device>;
+DEFINE_DEVICE_TYPE(ATARI_SOUND_COMM, atari_sound_comm_device, "atarscom", "Atari Sound Communications")
 
 //-------------------------------------------------
 //  atari_sound_comm_device - constructor
 //-------------------------------------------------
 
-atari_sound_comm_device::atari_sound_comm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, ATARI_SOUND_COMM, "Atari Sound Communications", tag, owner, clock, "atarscom", __FILE__),
+atari_sound_comm_device::atari_sound_comm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, ATARI_SOUND_COMM, tag, owner, clock),
 		m_sound_cpu_tag(nullptr),
 		m_main_int_cb(*this),
 		m_sound_cpu(nullptr),
@@ -342,14 +342,14 @@ void atari_sound_comm_device::delayed_6502_write(int data)
 //**************************************************************************
 
 // device type definition
-const device_type ATARI_VAD = &device_creator<atari_vad_device>;
+DEFINE_DEVICE_TYPE(ATARI_VAD, atari_vad_device, "atarivad", "Atari VAD")
 
 //-------------------------------------------------
 //  atari_vad_device - constructor
 //-------------------------------------------------
 
-atari_vad_device::atari_vad_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, ATARI_VAD, "Atari VAD", tag, owner, clock, "atarivad", __FILE__),
+atari_vad_device::atari_vad_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, ATARI_VAD, tag, owner, clock),
 		device_video_interface(mconfig, *this),
 		m_scanline_int_cb(*this),
 		m_alpha_tilemap(*this, "alpha"),
@@ -378,7 +378,7 @@ atari_vad_device::atari_vad_device(const machine_config &mconfig, const char *ta
 
 WRITE16_MEMBER(atari_vad_device::control_write)
 {
-	UINT16 newword = m_control[offset];
+	uint16_t newword = m_control[offset];
 	COMBINE_DATA(&newword);
 	internal_control_write(offset, newword);
 }
@@ -441,7 +441,7 @@ WRITE16_MEMBER(atari_vad_device::playfield_latched_lsb_w)
 {
 	m_playfield_tilemap->write(space, offset, data, mem_mask);
 	if ((m_control[0x0a] & 0x80) != 0)
-		m_playfield_tilemap->write_ext(space, offset, m_control[0x1d], UINT16(0x00ff));
+		m_playfield_tilemap->write_ext(space, offset, m_control[0x1d], uint16_t(0x00ff));
 }
 
 
@@ -455,7 +455,7 @@ WRITE16_MEMBER(atari_vad_device::playfield_latched_msb_w)
 {
 	m_playfield_tilemap->write(space, offset, data, mem_mask);
 	if ((m_control[0x0a] & 0x80) != 0)
-		m_playfield_tilemap->write_ext(space, offset, m_control[0x1c], UINT16(0xff00));
+		m_playfield_tilemap->write_ext(space, offset, m_control[0x1c], uint16_t(0xff00));
 }
 
 
@@ -469,7 +469,7 @@ WRITE16_MEMBER(atari_vad_device::playfield2_latched_msb_w)
 {
 	m_playfield2_tilemap->write(space, offset, data, mem_mask);
 	if ((m_control[0x0a] & 0x80) != 0)
-		m_playfield2_tilemap->write_ext(space, offset, m_control[0x1c], UINT16(0xff00));
+		m_playfield2_tilemap->write_ext(space, offset, m_control[0x1c], uint16_t(0xff00));
 }
 
 
@@ -557,10 +557,10 @@ void atari_vad_device::device_timer(emu_timer &timer, device_timer_id id, int pa
 //  control registers and EOF updates
 //-------------------------------------------------
 
-void atari_vad_device::internal_control_write(offs_t offset, UINT16 newword)
+void atari_vad_device::internal_control_write(offs_t offset, uint16_t newword)
 {
 	// switch off the offset
-	UINT16 oldword = m_control[offset];
+	uint16_t oldword = m_control[offset];
 	m_control[offset] = newword;
 	switch (offset)
 	{
@@ -697,7 +697,7 @@ inline void atari_vad_device::update_pf_xscrolls()
 //  direct control writes.
 //-------------------------------------------------
 
-void atari_vad_device::update_parameter(UINT16 newword)
+void atari_vad_device::update_parameter(uint16_t newword)
 {
 	switch (newword & 15)
 	{
@@ -810,132 +810,6 @@ void atari_vad_device::eof_update(emu_timer &timer)
 		}
 	}
 #endif
-}
-
-
-
-//**************************************************************************
-//  EEPROM INTERFACE DEVICE
-//**************************************************************************
-
-// device type definition
-const device_type ATARI_EEPROM_2804 = &device_creator<atari_eeprom_2804_device>;
-const device_type ATARI_EEPROM_2816 = &device_creator<atari_eeprom_2816_device>;
-
-//-------------------------------------------------
-//  atari_eeprom_device - constructor
-//-------------------------------------------------
-
-atari_eeprom_device::atari_eeprom_device(const machine_config &mconfig, device_type devtype, const char *name, const char *tag, device_t *owner, const char *shortname, const char *file)
-	: device_t(mconfig, devtype, name, tag, owner, 0, shortname, file),
-		m_eeprom(*this, "eeprom"),
-		m_unlocked(false)
-{
-}
-
-
-//-------------------------------------------------
-//  unlock_read/unlock_write - unlock read/write
-//  handlers
-//-------------------------------------------------
-
-READ8_MEMBER(atari_eeprom_device::unlock_read) { m_unlocked = true; return space.unmap(); }
-WRITE8_MEMBER(atari_eeprom_device::unlock_write) { m_unlocked = true; }
-READ16_MEMBER(atari_eeprom_device::unlock_read) { m_unlocked = true; return space.unmap(); }
-WRITE16_MEMBER(atari_eeprom_device::unlock_write) { m_unlocked = true; }
-READ32_MEMBER(atari_eeprom_device::unlock_read) { m_unlocked = true; return space.unmap(); }
-WRITE32_MEMBER(atari_eeprom_device::unlock_write) { m_unlocked = true; }
-
-
-//-------------------------------------------------
-//  read/write - data read/write handlers
-//-------------------------------------------------
-
-READ8_MEMBER(atari_eeprom_device::read)
-{
-	return m_eeprom->read(space, offset);
-}
-
-WRITE8_MEMBER(atari_eeprom_device::write)
-{
-	if (m_unlocked)
-		m_eeprom->write(space, offset, data, mem_mask);
-	else
-		logerror("%s: Attemptedt to write to EEPROM while not unlocked\n", machine().describe_context());
-	m_unlocked = false;
-}
-
-
-//-------------------------------------------------
-//  device_start: Start up the device
-//-------------------------------------------------
-
-void atari_eeprom_device::device_start()
-{
-	// register for save states
-	save_item(NAME(m_unlocked));
-}
-
-
-//-------------------------------------------------
-//  device_reset: Handle a device reset by
-//  clearing the interrupt lines and states
-//-------------------------------------------------
-
-void atari_eeprom_device::device_reset()
-{
-	// reset unlocked state
-	m_unlocked = false;
-}
-
-
-//-------------------------------------------------
-//  atari_eeprom_2804_device - constructor
-//-------------------------------------------------
-
-atari_eeprom_2804_device::atari_eeprom_2804_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: atari_eeprom_device(mconfig, ATARI_EEPROM_2804, "Atari EEPROM Interface (2804)", tag, owner, "atari2804", __FILE__)
-{
-}
-
-
-//-------------------------------------------------
-//  device_mconfig_additions - return machine
-//  config fragment
-//-------------------------------------------------
-
-MACHINE_CONFIG_FRAGMENT(atari_eeprom_2804_config)
-	MCFG_EEPROM_2804_ADD("eeprom")
-MACHINE_CONFIG_END
-
-machine_config_constructor atari_eeprom_2804_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME(atari_eeprom_2804_config);
-}
-
-
-//-------------------------------------------------
-//  atari_eeprom_2816_device - constructor
-//-------------------------------------------------
-
-atari_eeprom_2816_device::atari_eeprom_2816_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: atari_eeprom_device(mconfig, ATARI_EEPROM_2816, "Atari EEPROM Interface (2816)", tag, owner, "atari2816", __FILE__)
-{
-}
-
-
-//-------------------------------------------------
-//  device_mconfig_additions - return machine
-//  config fragment
-//-------------------------------------------------
-
-MACHINE_CONFIG_FRAGMENT(atari_eeprom_2816_config)
-	MCFG_EEPROM_2816_ADD("eeprom")
-MACHINE_CONFIG_END
-
-machine_config_constructor atari_eeprom_2816_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME(atari_eeprom_2816_config);
 }
 
 
@@ -1190,7 +1064,7 @@ void atarigen_state::device_post_load()
 //  slapstic and sets the chip number.
 //-------------------------------------------------
 
-void atarigen_state::slapstic_configure(cpu_device &device, offs_t base, offs_t mirror, UINT8 *mem)
+void atarigen_state::slapstic_configure(cpu_device &device, offs_t base, offs_t mirror, uint8_t *mem)
 {
 	if (!m_slapstic_device.found())
 		fatalerror("Slapstic device is missing\n");
@@ -1201,8 +1075,8 @@ void atarigen_state::slapstic_configure(cpu_device &device, offs_t base, offs_t 
 
 	// install the memory handlers
 	address_space &program = device.space(AS_PROGRAM);
-	program.install_readwrite_handler(base, base + 0x7fff, 0, mirror, read16_delegate(FUNC(atarigen_state::slapstic_r), this), write16_delegate(FUNC(atarigen_state::slapstic_w), this));
-	m_slapstic = (UINT16 *)mem;
+	program.install_readwrite_handler(base, base + 0x7fff, 0, mirror, 0, read16_delegate(FUNC(atarigen_state::slapstic_r), this), write16_delegate(FUNC(atarigen_state::slapstic_w), this));
+	m_slapstic = (uint16_t *)mem;
 
 	// allocate memory for a copy of bank 0
 	m_slapstic_bank0.resize(0x2000);
@@ -1331,24 +1205,24 @@ void atarigen_state::blend_gfx(int gfx0, int gfx1, int mask0, int mask1)
 {
 	gfx_element *gx0 = m_gfxdecode->gfx(gfx0);
 	gfx_element *gx1 = m_gfxdecode->gfx(gfx1);
-	UINT8 *srcdata, *dest;
+	uint8_t *srcdata, *dest;
 	int c, x, y;
 
 	// allocate memory for the assembled data
-	srcdata = auto_alloc_array(machine(), UINT8, gx0->elements() * gx0->width() * gx0->height());
+	srcdata = auto_alloc_array(machine(), uint8_t, gx0->elements() * gx0->width() * gx0->height());
 
 	// loop over elements
 	dest = srcdata;
 	for (c = 0; c < gx0->elements(); c++)
 	{
-		const UINT8 *c0base = gx0->get_data(c);
-		const UINT8 *c1base = gx1->get_data(c);
+		const uint8_t *c0base = gx0->get_data(c);
+		const uint8_t *c1base = gx1->get_data(c);
 
 		// loop over height
 		for (y = 0; y < gx0->height(); y++)
 		{
-			const UINT8 *c0 = c0base;
-			const UINT8 *c1 = c1base;
+			const uint8_t *c0 = c0base;
+			const uint8_t *c1 = c1base;
 
 			for (x = 0; x < gx0->width(); x++)
 				*dest++ = (*c0++ & mask0) | (*c1++ & mask1);

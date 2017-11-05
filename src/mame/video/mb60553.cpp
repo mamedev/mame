@@ -7,36 +7,40 @@
   interestingly the chip seems to require doubled up ROMs (2 copies of each ROM) to draw just the single layer.
 
 */
+/*
+    Tecmo World Cup '94 "service mode" has an item for testing zooming, this is:
+    0xffdf12 target zoom code
+    0xffdf16 current zoom code
+*/
 
 #include "emu.h"
 #include "mb60553.h"
+#include "screen.h"
 
 
-const device_type MB60553 = &device_creator<mb60553_zooming_tilemap_device>;
+DEFINE_DEVICE_TYPE(MB60553, mb60553_zooming_tilemap_device, "mb60553", "MB60553 Zooming Tilemap")
 
-mb60553_zooming_tilemap_device::mb60553_zooming_tilemap_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, MB60553, "MB60553 Zooming Tilemap", tag, owner, clock, "mb60553", __FILE__),
-	m_vram(nullptr),
-	m_pal_base(0),
-	m_lineram(nullptr),
-	m_gfx_region(0),
-	m_gfxdecode(*this)
+mb60553_zooming_tilemap_device::mb60553_zooming_tilemap_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, MB60553, tag, owner, clock)
+	, m_tmap(nullptr)
+	, m_vram()
+	, m_regs{ 0, 0, 0, 0, 0, 0, 0, 0 }
+	, m_bank{ 0, 0, 0, 0, 0, 0, 0, 0, }
+	, m_pal_base(0)
+	, m_lineram()
+	, m_gfx_region(0)
+	, m_gfxdecode(*this, finder_base::DUMMY_TAG)
 {
-	for (int i = 0; i < 8; i++)
-	{
-		m_regs[i] = 0;
-		m_bank[i] = 0;
-	}
 }
 
 
 void mb60553_zooming_tilemap_device::device_start()
 {
-	if(!m_gfxdecode->started())
+	if (!m_gfxdecode->started())
 		throw device_missing_dependencies();
 
-	m_lineram = make_unique_clear<UINT16[]>(0x1000/2);
-	m_vram = make_unique_clear<UINT16[]>(0x4000/2);
+	m_lineram = make_unique_clear<uint16_t[]>(0x1000/2);
+	m_vram = make_unique_clear<uint16_t[]>(0x4000/2);
 
 	save_pointer(NAME(m_lineram.get()), 0x1000/2);
 	save_pointer(NAME(m_vram.get()), 0x4000/2);
@@ -44,7 +48,7 @@ void mb60553_zooming_tilemap_device::device_start()
 	save_item(NAME(m_bank));
 	save_item(NAME(m_regs));
 
-	m_tmap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(mb60553_zooming_tilemap_device::get_tile_info),this),tilemap_mapper_delegate(FUNC(mb60553_zooming_tilemap_device::twc94_scan),this), 16,16,128,64);
+	m_tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(mb60553_zooming_tilemap_device::get_tile_info),this),tilemap_mapper_delegate(FUNC(mb60553_zooming_tilemap_device::twc94_scan),this), 16,16,128,64);
 	m_tmap->set_transparent_pen(0);
 }
 
@@ -178,17 +182,11 @@ void mb60553_zooming_tilemap_device::reg_written( int num_reg)
 TILEMAP_MAPPER_MEMBER(mb60553_zooming_tilemap_device::twc94_scan)
 {
 	/* logical (col,row) -> memory offset */
-	return (row*64) + (col&63) + ((col&64)<<6);
+	return (row << 6) + (col & 0x003f) + (BIT(col, 6) << 12);
 }
-
-void mb60553_zooming_tilemap_device::set_pal_base( int pal_base)
-{
-	m_pal_base = pal_base;
-}
-
 
 void mb60553_zooming_tilemap_device::draw_roz_core(screen_device &screen, bitmap_ind16 &destbitmap, const rectangle &cliprect,
-		UINT32 startx, UINT32 starty, int incxx, int incxy, int incyx, int incyy, bool wraparound)
+		uint32_t startx, uint32_t starty, int incxx, int incxy, int incyx, int incyy, bool wraparound)
 {
 	// pre-cache all the inner loop values
 	//const rgb_t *clut = m_palette->palette()->entry_list_adjusted();
@@ -196,8 +194,8 @@ void mb60553_zooming_tilemap_device::draw_roz_core(screen_device &screen, bitmap
 	const int ymask = m_tmap->pixmap().height() - 1;
 	const int widthshifted = m_tmap->pixmap().width() << 16;
 	const int heightshifted = m_tmap->pixmap().height() << 16;
-	UINT8 mask = 0x1f;// blit.mask;
-	UINT8 value = 0x10;// blit.value;
+	uint8_t mask = 0x1f;// blit.mask;
+	uint8_t value = 0x10;// blit.value;
 	bitmap_ind16 &srcbitmap = m_tmap->pixmap();
 	bitmap_ind8 &flagsbitmap = m_tmap->flagsmap();
 
@@ -212,7 +210,7 @@ void mb60553_zooming_tilemap_device::draw_roz_core(screen_device &screen, bitmap
 		int sx = cliprect.min_x;
 		int ex = cliprect.max_x;
 
-		UINT16 *dest = &destbitmap.pix(sy, sx);
+		uint16_t *dest = &destbitmap.pix(sy, sx);
 
 		// loop over columns
 		while (sx <= ex)
@@ -268,44 +266,45 @@ void mb60553_zooming_tilemap_device::draw( screen_device &screen, bitmap_ind16& 
 	clip.min_x = screen.visible_area().min_x;
 	clip.max_x = screen.visible_area().max_x;
 
-	for (line = 0; line < 224;line++)
+	for (line = screen.visible_area().min_y; line < screen.visible_area().max_y;line++)
 	{
 //      int scrollx;
 //      int scrolly;
+		uint32_t startx,starty;
+		int32_t incxx,incyy;
+		int32_t incxy,incyx;
+		float xoffset;
 
-		UINT32 startx,starty;
+		// confirmed on how ROZ is used
+		incyy = ((int16_t)m_lineram[(line)*8+0])<<4;
+		incxx = ((int16_t)m_lineram[(line)*8+3])<<4;
 
-		UINT32 incxx,incyy;
+		// startx has an offset based off current x zoom value
+		// This is confirmed by Tecmo World Cup '94 startx being 0xff40 (-192) when showing footballer pics on attract mode (incxx is 0x800)
+		// TODO: slightly offset?
+		xoffset = ((float)incyy/(float)0x10000) * 384.0;
 
-		startx = m_regs[0];
+		startx = m_regs[0] + (int32_t)xoffset;
 		starty = m_regs[1];
 
-		startx += (24<<4); // maybe not..
-
-		startx -=  m_lineram[(line)*8+7]/2;
-
-		incxx = m_lineram[(line)*8+0]<<4;
-		incyy = m_lineram[(line)*8+3]<<4;
+		// TODO: what's this? Used by Grand Striker playfield
+		incyx =  ((int16_t)m_lineram[(line)*8+7])<<4;
+		// V Goal Soccer rotation
+		incxy =  ((int16_t)m_lineram[(line)*8+4])<<4;
 
 		clip.min_y = clip.max_y = line;
 
 		draw_roz_core(screen, bitmap, clip, startx<<12,starty<<12,
-				incxx,0,0,incyy,
+				incxx,incxy,-incyx,incyy,
 				1
 				);
 
 	}
 }
 
-tilemap_t* mb60553_zooming_tilemap_device::get_tilemap()
-{
-	return m_tmap;
-}
-
-
 WRITE16_MEMBER(mb60553_zooming_tilemap_device::regs_w)
 {
-	UINT16 oldreg = m_regs[offset];
+	uint16_t oldreg = m_regs[offset];
 
 	COMBINE_DATA(&m_regs[offset]);
 

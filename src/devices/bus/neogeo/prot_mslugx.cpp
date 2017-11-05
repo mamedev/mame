@@ -4,14 +4,15 @@
 #include "emu.h"
 #include "prot_mslugx.h"
 
-extern const device_type MSLUGX_PROT = &device_creator<mslugx_prot_device>;
+DEFINE_DEVICE_TYPE(NG_MSLUGX_PROT, mslugx_prot_device, "ng_mslugx_prot", "Neo Geo Metal Slug X Protection")
 
 
-mslugx_prot_device::mslugx_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, MSLUGX_PROT, "Neo Geo Metal Slug X Protection", tag, owner, clock, "mslugx_prot", __FILE__),
+mslugx_prot_device::mslugx_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, NG_MSLUGX_PROT, tag, owner, clock),
 	m_counter(0),
 	m_command(0)
-{}
+{
+}
 
 
 void mslugx_prot_device::device_start()
@@ -61,7 +62,7 @@ WRITE16_MEMBER( mslugx_prot_device::protection_w )
 
 READ16_MEMBER( mslugx_prot_device::protection_r )
 {
-	UINT16 res = 0;
+	uint16_t res = 0;
 
 	switch (m_command)
 	{
@@ -72,7 +73,7 @@ READ16_MEMBER( mslugx_prot_device::protection_r )
 		break;
 
 		case 0x0fff: { // All other accesses (Register D2)
-			INT32 select = space.read_word(0x10f00a) - 1; // How should this be calculated?
+			int32_t select = space.read_word(0x10f00a) - 1; // How should this be calculated?
 			res = (space.read_byte(0xdedd2 + ((select >> 3) & 0x0fff)) >> (~select & 0x07)) & 1;
 		}
 		break;

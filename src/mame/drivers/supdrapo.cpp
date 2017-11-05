@@ -57,16 +57,18 @@
 
 ************************************************************************/
 
-
-#define MASTER_CLOCK    XTAL_12MHz
-#define CPU_CLOCK       MASTER_CLOCK/4  /* guess */
-#define SND_CLOCK       MASTER_CLOCK/8  /* guess */
-
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
+#include "screen.h"
+#include "speaker.h"
+
+
+#define MASTER_CLOCK    XTAL_12MHz
+#define CPU_CLOCK       MASTER_CLOCK/4  /* guess */
+#define SND_CLOCK       MASTER_CLOCK/8  /* guess */
 
 class supdrapo_state : public driver_device
 {
@@ -86,11 +88,11 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	required_shared_ptr<UINT8> m_col_line;
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_char_bank;
+	required_shared_ptr<uint8_t> m_col_line;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_char_bank;
 
-	UINT8 m_wdog;
+	uint8_t m_wdog;
 
 	DECLARE_READ8_MEMBER(rng_r);
 	DECLARE_WRITE8_MEMBER(wdog8000_w);
@@ -106,7 +108,7 @@ public:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(supdrapo);
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -119,7 +121,7 @@ void supdrapo_state::video_start()
 }
 
 
-UINT32 supdrapo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t supdrapo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x, y;
 	int count;
@@ -148,7 +150,7 @@ UINT32 supdrapo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 /*Maybe bit 2 & 3 of the second color prom are intensity bits? */
 PALETTE_INIT_MEMBER(supdrapo_state, supdrapo)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int bit0, bit1, bit2 , r, g, b;
 	int i;
 
@@ -447,7 +449,7 @@ WRITE8_MEMBER(supdrapo_state::ay8910_outputb_w)
                            Machine Driver
 **********************************************************************/
 
-static MACHINE_CONFIG_START( supdrapo, supdrapo_state )
+static MACHINE_CONFIG_START( supdrapo )
 
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK) /* guess */
 	MCFG_CPU_PROGRAM_MAP(sdpoker_mem)
@@ -608,7 +610,7 @@ ROM_END
                            Games Drivers
 **********************************************************************/
 
-/*    YEAR  NAME       PARENT    MACHINE   INPUT     STATE          INIT  ROT     COMPANY                                           FULLNAME                     FLAGS... */
-GAME( 1983, supdrapo,  0,        supdrapo, supdrapo, driver_device, 0,    ROT90, "Valadon Automation (Stern Electronics license)", "Super Draw Poker (set 1)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1983, supdrapoa, supdrapo, supdrapo, supdrapo, driver_device, 0,    ROT90, "Valadon Automation / Jeutel",                    "Super Draw Poker (set 2)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1983, supdrapob, supdrapo, supdrapo, supdrapo, driver_device, 0,    ROT90, "bootleg",                                        "Super Draw Poker (bootleg)", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT  ROT    COMPANY                                           FULLNAME                      FLAGS
+GAME( 1983, supdrapo,  0,        supdrapo, supdrapo, supdrapo_state, 0,    ROT90, "Valadon Automation (Stern Electronics license)", "Super Draw Poker (set 1)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1983, supdrapoa, supdrapo, supdrapo, supdrapo, supdrapo_state, 0,    ROT90, "Valadon Automation / Jeutel",                    "Super Draw Poker (set 2)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1983, supdrapob, supdrapo, supdrapo, supdrapo, supdrapo_state, 0,    ROT90, "bootleg",                                        "Super Draw Poker (bootleg)", MACHINE_SUPPORTS_SAVE )

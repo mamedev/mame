@@ -1,10 +1,14 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
+
 /*************************************************************************
 
     Macross Plus
 
 *************************************************************************/
+
+#include "machine/gen_latch.h"
+#include "screen.h"
 
 class macrossp_state : public driver_device
 {
@@ -33,27 +37,28 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_screen(*this, "screen"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch")
 	{
 	}
 
 	/* memory pointers */
-	required_shared_ptr<UINT32> m_spriteram;
-	required_shared_ptr<UINT32> m_scra_videoram;
-	required_shared_ptr<UINT32> m_scra_linezoom;
-	required_shared_ptr<UINT32> m_scra_videoregs;
-	required_shared_ptr<UINT32> m_scrb_videoram;
-	required_shared_ptr<UINT32> m_scrb_linezoom;
-	required_shared_ptr<UINT32> m_scrb_videoregs;
-	required_shared_ptr<UINT32> m_scrc_videoram;
-	required_shared_ptr<UINT32> m_scrc_linezoom;
-	required_shared_ptr<UINT32> m_scrc_videoregs;
-	required_shared_ptr<UINT32> m_text_videoram;
-	required_shared_ptr<UINT32> m_text_linezoom;
-	required_shared_ptr<UINT32> m_text_videoregs;
-	required_shared_ptr<UINT32> m_mainram;
-	std::unique_ptr<UINT32[]>         m_spriteram_old;
-	std::unique_ptr<UINT32[]>         m_spriteram_old2;
+	required_shared_ptr<uint32_t> m_spriteram;
+	required_shared_ptr<uint32_t> m_scra_videoram;
+	required_shared_ptr<uint32_t> m_scra_linezoom;
+	required_shared_ptr<uint32_t> m_scra_videoregs;
+	required_shared_ptr<uint32_t> m_scrb_videoram;
+	required_shared_ptr<uint32_t> m_scrb_linezoom;
+	required_shared_ptr<uint32_t> m_scrb_videoregs;
+	required_shared_ptr<uint32_t> m_scrc_videoram;
+	required_shared_ptr<uint32_t> m_scrc_linezoom;
+	required_shared_ptr<uint32_t> m_scrc_videoregs;
+	required_shared_ptr<uint32_t> m_text_videoram;
+	required_shared_ptr<uint32_t> m_text_linezoom;
+	required_shared_ptr<uint32_t> m_text_videoregs;
+	required_shared_ptr<uint32_t> m_mainram;
+	std::unique_ptr<uint32_t[]>         m_spriteram_old;
+	std::unique_ptr<uint32_t[]>         m_spriteram_old2;
 
 	/* video-related */
 	tilemap_t  *m_scra_tilemap;
@@ -71,6 +76,7 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<generic_latch_16_device> m_soundlatch;
 
 	DECLARE_READ32_MEMBER(macrossp_soundstatus_r);
 	DECLARE_WRITE32_MEMBER(macrossp_soundcmd_w);
@@ -90,8 +96,8 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_macrossp(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void screen_eof_macrossp(screen_device &screen, bool state);
+	uint32_t screen_update_macrossp(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_macrossp);
 	void draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_layer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer, int linem, int pri);
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);

@@ -1,4 +1,4 @@
-// license:LGPL-2.1+
+// license:BSD-3-Clause
 // copyright-holders:Tomasz Slanina
 /*
  Meijinsen (snk/alpha)
@@ -64,8 +64,11 @@ SOFT  PSG & VOICE  BY M.C & S.H
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/gen_latch.h"
+#include "machine/timer.h"
 #include "video/resnet.h"
 #include "sound/ay8910.h"
+#include "screen.h"
+#include "speaker.h"
 
 class meijinsn_state : public driver_device
 {
@@ -80,19 +83,19 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_latch_8_device> m_soundlatch;
 	/* memory pointers */
-	required_shared_ptr<UINT16> m_videoram;
-	required_shared_ptr<UINT16> m_shared_ram;
+	required_shared_ptr<uint16_t> m_videoram;
+	required_shared_ptr<uint16_t> m_shared_ram;
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
 	tilemap_t  *m_fg_tilemap;
-	UINT8    m_bg_bank;
+	uint8_t    m_bg_bank;
 
 	/* misc */
-	UINT8 m_deposits1;
-	UINT8 m_deposits2;
-	UINT8 m_credits;
-	UINT8 m_coinvalue;
+	uint8_t m_deposits1;
+	uint8_t m_deposits2;
+	uint8_t m_credits;
+	uint8_t m_coinvalue;
 	int m_mcu_latch;
 
 	DECLARE_WRITE16_MEMBER(sound_w);
@@ -101,7 +104,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(meijinsn);
-	UINT32 screen_update_meijinsn(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_meijinsn(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(meijinsn_interrupt);
 };
 
@@ -115,8 +118,8 @@ WRITE16_MEMBER(meijinsn_state::sound_w)
 
 READ16_MEMBER(meijinsn_state::alpha_mcu_r)
 {
-	static const UINT8 coinage1[2][2] = {{1,1}, {1,2}};
-	static const UINT8 coinage2[2][2] = {{1,5}, {2,1}};
+	static const uint8_t coinage1[2][2] = {{1,1}, {1,2}};
+	static const uint8_t coinage2[2][2] = {{1,5}, {2,1}};
 
 	int source = m_shared_ram[offset];
 
@@ -259,7 +262,7 @@ void meijinsn_state::video_start()
 
 PALETTE_INIT_MEMBER(meijinsn_state, meijinsn)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 	static const int resistances_b[2]  = { 470, 220 };
 	static const int resistances_rg[3] = { 1000, 470, 220 };
@@ -297,7 +300,7 @@ PALETTE_INIT_MEMBER(meijinsn_state, meijinsn)
 }
 
 
-UINT32 meijinsn_state::screen_update_meijinsn(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t meijinsn_state::screen_update_meijinsn(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int offs;
 
@@ -348,7 +351,7 @@ void meijinsn_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( meijinsn, meijinsn_state )
+static MACHINE_CONFIG_START( meijinsn )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 9000000 )
@@ -412,4 +415,4 @@ ROM_START( meijinsn )
 	ROM_LOAD( "clr", 0x00, 0x20, CRC(7b95b5a7) SHA1(c15be28bcd6f5ffdde659f2d352ae409f04b2557) )
 ROM_END
 
-GAME( 1986, meijinsn, 0, meijinsn, meijinsn, driver_device, 0, ROT0, "SNK", "Meijinsen", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, meijinsn, 0, meijinsn, meijinsn, meijinsn_state, 0, ROT0, "SNK", "Meijinsen", MACHINE_SUPPORTS_SAVE )

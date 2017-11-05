@@ -1,0 +1,64 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+
+<!-- define elements -->
+
+	<element name="static_yellow"><rect><color red="0.9" green="0.9" blue="0.4" /></rect></element>
+	<element name="disk_yellow"><disk><color red="0.9" green="0.9" blue="0.3" /></disk></element>
+	<element name="static_orange"><rect><color red="0.9" green="0.4" blue="0.05" /></rect></element>
+
+	<element name="ledr" defstate="0">
+		<disk state="0"><color red="0.2" green="0.04" blue="0.04" /></disk>
+		<disk state="1"><color red="1.0" green="0.2" blue="0.2" /></disk>
+	</element>
+	<element name="ledg" defstate="0">
+		<disk state="0"><color red="0.04" green="0.2" blue="0.04" /></disk>
+		<disk state="1"><color red="0.2" green="1.0" blue="0.2" /></disk>
+	</element>
+
+	<element name="text_l1">
+		<rect><color red="0.9" green="0.4" blue="0.05" /></rect>
+		<text string="YOU'RE" align="1"><color red="0.03" green="0.03" blue="0.03" /></text>
+	</element>
+	<element name="text_l2">
+		<rect><color red="0.9" green="0.4" blue="0.05" /></rect>
+		<text string="RIGHT" align="1"><color red="0.03" green="0.03" blue="0.03" /></text>
+	</element>
+	<element name="text_r1">
+		<rect><color red="0.9" green="0.4" blue="0.05" /></rect>
+		<text string="YOU'RE" align="2"><color red="0.03" green="0.03" blue="0.03" /></text>
+	</element>
+	<element name="text_r2">
+		<rect><color red="0.9" green="0.4" blue="0.05" /></rect>
+		<text string="WRONG" align="2"><color red="0.03" green="0.03" blue="0.03" /></text>
+	</element>
+
+	<element name="text_title">
+		<rect><color red="0.9" green="0.4" blue="0.05" /></rect>
+		<text string="Monkey See"><color red="0.45" green="0.2" blue="0.025" /></text>
+	</element>
+
+
+<!-- build screen -->
+
+	<view name="Internal Layout">
+		<bounds left="0.6" right="15.4" top="3.1" bottom="8.4" />
+
+		<bezel element="static_yellow"><bounds x="0" y="2.5" width="16" height="6.5" /></bezel>
+		<bezel element="static_orange"><bounds x="1" y="3.5" width="14" height="4.5" /></bezel>
+
+		<bezel element="text_l1"><bounds x="1.25" y="3.75" width="5" height="0.75" /></bezel>
+		<bezel element="text_l2"><bounds x="1.25" y="4.5" width="5" height="1" /></bezel>
+		<bezel element="text_r1"><bounds x="9.75" y="3.75" width="5" height="0.75" /></bezel>
+		<bezel element="text_r2"><bounds x="9.75" y="4.5" width="5" height="1" /></bezel>
+
+		<bezel element="text_title"><bounds x="3" y="5.5" width="10" height="1.75" /></bezel>
+
+		<bezel element="disk_yellow"><bounds x="1.75" y="5.75" width="1.5" height="1.5" /></bezel>
+		<bezel element="disk_yellow"><bounds x="12.75" y="5.75" width="1.5" height="1.5" /></bezel>
+
+		<bezel name="0.0" element="ledr"><bounds x="13" y="6" width="1" height="1" /></bezel>
+		<bezel name="0.1" element="ledg"><bounds x="2" y="6" width="1" height="1" /></bezel>
+
+	</view>
+</mamelayout>

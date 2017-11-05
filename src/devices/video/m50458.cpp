@@ -19,6 +19,7 @@
 #include "emu.h"
 #include "video/m50458.h"
 
+#include "screen.h"
 
 
 //**************************************************************************
@@ -26,9 +27,9 @@
 //**************************************************************************
 
 // device type definition
-const device_type M50458 = &device_creator<m50458_device>;
+DEFINE_DEVICE_TYPE(M50458, m50458_device, "m50458", "Mitsubishi M50458 OSD")
 
-static ADDRESS_MAP_START( m50458_vram, AS_0, 16, m50458_device )
+static ADDRESS_MAP_START( m50458_vram, 0, 16, m50458_device )
 	AM_RANGE(0x0000, 0x023f) AM_RAM // vram
 	AM_RANGE(0x0240, 0x0241) AM_WRITE(vreg_120_w)
 	AM_RANGE(0x0242, 0x0243) AM_WRITE(vreg_121_w)
@@ -126,7 +127,7 @@ WRITE16_MEMBER( m50458_device::vreg_127_w)
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *m50458_device::device_rom_region() const
+const tiny_rom_entry *m50458_device::device_rom_region() const
 {
 	return ROM_NAME( m50458 );
 }
@@ -136,9 +137,11 @@ const rom_entry *m50458_device::device_rom_region() const
 //  any address spaces owned by this device
 //-------------------------------------------------
 
-const address_space_config *m50458_device::memory_space_config(address_spacenum spacenum) const
+device_memory_interface::space_config_vector m50458_device::memory_space_config() const
 {
-	return (spacenum == AS_0) ? &m_space_config : nullptr;
+	return space_config_vector {
+		std::make_pair(0, &m_space_config)
+	};
 }
 
 //**************************************************************************
@@ -149,7 +152,7 @@ const address_space_config *m50458_device::memory_space_config(address_spacenum 
 //  read_word - read a word at the given address
 //-------------------------------------------------
 
-inline UINT16 m50458_device::read_word(offs_t address)
+inline uint16_t m50458_device::read_word(offs_t address)
 {
 	return space().read_word(address << 1);
 }
@@ -158,7 +161,7 @@ inline UINT16 m50458_device::read_word(offs_t address)
 //  write_word - write a word at the given address
 //-------------------------------------------------
 
-inline void m50458_device::write_word(offs_t address, UINT16 data)
+inline void m50458_device::write_word(offs_t address, uint16_t data)
 {
 	space().write_word(address << 1, data);
 }
@@ -172,11 +175,11 @@ inline void m50458_device::write_word(offs_t address, UINT16 data)
 //  m50458_device - constructor
 //-------------------------------------------------
 
-m50458_device::m50458_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, M50458, "M50458 OSD", tag, owner, clock, "m50458", __FILE__),
-		device_memory_interface(mconfig, *this),
-		device_video_interface(mconfig, *this),
-		m_space_config("videoram", ENDIANNESS_LITTLE, 16, 16, 0, nullptr, *ADDRESS_MAP_NAME(m50458_vram))
+m50458_device::m50458_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, M50458, tag, owner, clock)
+	, device_memory_interface(mconfig, *this)
+	, device_video_interface(mconfig, *this)
+	, m_space_config("videoram", ENDIANNESS_LITTLE, 16, 16, 0, nullptr, *ADDRESS_MAP_NAME(m50458_vram))
 {
 }
 
@@ -197,15 +200,15 @@ void m50458_device::device_validity_check(validity_checker &valid) const
 
 void m50458_device::device_start()
 {
-	UINT16 tmp;
-	UINT8 *pcg = memregion("m50458")->base();
+	uint16_t tmp;
+	uint8_t *pcg = memregion("m50458")->base();
 	int tile;
 	int yi;
-	UINT16 src,dst;
+	uint16_t src,dst;
 
 	/* Create an array for shadow gfx */
 	/* this will spread the source ROM into four directions (up-left, up-right, down-left, down-right) thus creating a working shadow copy */
-	m_shadow_gfx = make_unique_clear<UINT8[]>(0x1200);
+	m_shadow_gfx = make_unique_clear<uint8_t[]>(0x1200);
 
 	for(tile=0;tile<0x80;tile++)
 	{
@@ -320,11 +323,11 @@ WRITE_LINE_MEMBER( m50458_device::set_clock_line )
 //  update_screen -
 //-------------------------------------------------
 
-UINT32 m50458_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t m50458_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int x,y;
-	UINT8 *pcg = memregion("m50458")->base();
-	UINT8 bg_r,bg_g,bg_b;
+	uint8_t *pcg = memregion("m50458")->base();
+	uint8_t bg_r,bg_g,bg_b;
 
 	/* TODO: there's probably a way to control the brightness in this */
 	bg_r = m_phase & 1 ? 0xdf : 0;
@@ -337,7 +340,7 @@ UINT32 m50458_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 		for(x=0;x<24;x++)
 		{
 			int xi,yi;
-			UINT16 tile;
+			uint16_t tile;
 			int y_base = y;
 
 			if(y != 0 && m_scrr > 1) { y_base+=(m_scrr - 1); }
@@ -350,11 +353,11 @@ UINT32 m50458_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 			{
 				for(xi=4;xi<16;xi++) /* TODO: remove 4 / 16 / -4 offset once that the ROM is fixed */
 				{
-					UINT8 pix;
-					UINT8 color = (tile & 0x700) >> 8;
-					UINT16 offset = ((tile & 0x7f)*36+yi*2);
+					uint8_t pix;
+					uint8_t color = (tile & 0x700) >> 8;
+					uint16_t offset = ((tile & 0x7f)*36+yi*2);
 					int res_y,res_x;
-					UINT8 xh,yh;
+					uint8_t xh,yh;
 
 					if(xi>=8)
 						pix = ((pcg[offset+1] >> (7-(xi & 0x7))) & 1) << 1;
@@ -385,7 +388,7 @@ UINT32 m50458_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 
 					if(pix != 0)
 					{
-						UINT8 r,g,b;
+						uint8_t r,g,b;
 
 						if(pix & 2)
 						{

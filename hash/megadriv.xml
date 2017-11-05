@@ -3,33 +3,32 @@
 <!--
     UNDUMPED / TO BE REDUMPED LIST
 
-    ADVANCED DAISENRYAKU            JAPAN       we have Rev A, Rev 0 needed (does it exist?)
-    CAPTAIN PLANET              ASIA
-    DYNAMITE HEADDY SAMPLE          JAPAN
-    ECCO JR                 USA/PAL     graphic corruption on later revision
-    F-22 (JUNE 1992)                USA/PAL     needs proper dump
-    FATAL FURY 2                PAL     Australia-only PAL release
-    FERRARI GRAND PRIX CHALLENGE        PAL     we have Rev A, Rev 0 needed (does it exist?)
-    FIFA SOCCER                 JAPAN
-    FIRE SHARK                  PAL     dump check
-    GALAXY FORCE II             ALL     we have Rev B, Rev 0 and Rev A needed (does it exist?)
+    ADVANCED DAISENRYAKU                JAPAN       we have Rev A, Rev 0 needed (does it exist?)
+    CAPTAIN PLANET                      ASIA
+    DYNAMITE HEADDY SAMPLE              JAPAN
+    ECCO JR                             USA/PAL     graphic corruption on later revision
+    F-22 (JUNE 1992)                    USA/PAL     needs proper dump
+    FATAL FURY 2                        PAL         Australia-only PAL release
+    FERRARI GRAND PRIX CHALLENGE        PAL         we have Rev A, Rev 0 needed (does it exist?)
+    FIFA SOCCER                         JAPAN
+    FIRE SHARK                          PAL         dump check
+    GALAXY FORCE II                     ALL         we have Rev B, Rev 0 and Rev A needed (does it exist?)
     INTERNATIONAL SUPERSTAR SOCCER      BRAZIL
-    JEWEL MASTER                USA/PAL     we have Rev A, Rev 0 needed (does it match Japanese release?)
+    JEWEL MASTER                        USA/PAL     we have Rev A, Rev 0 needed (does it match Japanese release?)
     NBA PLAYOFFS - BULLS VS BLAZERS     JAPAN       (alt) version contain a checksum check which have been wiped out of the non-alt revision
-    NFL PRO FOOTBALL '94            JAPAN
-    OSAKA BANK MY LINE              JAPAN
-    OSAKA BANK MY LINE DEMO         JAPAN
-    OUTBACK JOEY - PERSONAL TRAINER     ???     http://www.guardiana.net/MDG-Database/Mega%20Drive/Outback%20Joey/#v3553
-    PGA TOUR GOLF               USA/PAL     we have v1.1 and v1.2, v1.0 needed (does it exist?)
-    ROAD RASH                   USA     needs proper dump
-    SIDE POCKET                 JAPAN/USA   conflict in current info
-    SMURFS                  PAL     we have Rev A, Rev 0 needed (does it exist?)
-    SUMISEI HOME TANMATSU           JAPAN
-    TOM & JERRY                 JAPAN
-    VALIS III                   JAPAN       we have v1.1 (Rev A?), v1.0 (Rev 0?) needed
-    WONDER MIDI                 JAPAN
-    WORLD CUP SOCCER                JAPAN/USA   we have v1.0 (Rev ?), v1.2 (Rev ?) and v1.3 (Rev B), v1.1 (Rev ?) needed
-    WORLD OF ILLUSION               JAPAN       we have v1.0 (Rev 0?), v1.1 (Rev A?) needed (confirmed by Xacrow)
+    NFL PRO FOOTBALL '94                JAPAN
+    OSAKA BANK MY LINE                  JAPAN
+    OSAKA BANK MY LINE DEMO             JAPAN
+    OUTBACK JOEY - PERSONAL TRAINER     ???         http://www.guardiana.net/MDG-Database/Mega%20Drive/Outback%20Joey/#v3553
+    PGA TOUR GOLF                       USA/PAL     we have v1.1 and v1.2, v1.0 needed (does it exist?)
+    ROAD RASH                           USA         needs proper dump
+    SIDE POCKET                         JAPAN/USA   conflict in current info
+    SMURFS                              PAL         we have Rev A, Rev 0 needed (does it exist?)
+    SUMISEI HOME TANMATSU               JAPAN
+    VALIS III                           JAPAN       we have v1.1 (Rev A?), v1.0 (Rev 0?) needed
+    WONDER MIDI                         JAPAN
+    WORLD CUP SOCCER                    JAPAN/USA   we have v1.0 (Rev ?), v1.2 (Rev ?) and v1.3 (Rev B), v1.1 (Rev ?) needed
+    WORLD OF ILLUSION                   JAPAN       we have v1.0 (Rev 0?), v1.1 (Rev A?) needed (confirmed by Xacrow)
 -->
 
 <!--
@@ -57,10 +56,9 @@ Known undumped protos
 Known undumped pirates
 
   * Tec Toy Mega Drive 3 (with 86 built in games)
-  * Chinese Checkers (by RealTec)
+  * Chinese Checkers (by RealTec) - 中國象棋 ?
   * Shizen Mahjong / Competition Mahjong (by Sachen, apparently dumped but hoarded)
   * Magic 7 Block - 百変七巧板
-  * Chinese Battle Chess (?) - 戦 棊
 
 NOTE
 
@@ -1682,6 +1680,25 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		</part>
 	</software>
 
+	<software name="coolspotp" cloneof="coolspot">
+		<description>Cool Spot (Euro, Prototype)</description>
+		<year>1993</year>
+		<publisher>Virgin Games</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-5694-01"/>
+			<feature name="ic1" value="IC1"/> <!-- EPROM1 -->
+			<feature name="ic2" value="IC2"/> <!-- EPROM2 -->
+			<feature name="ic3" value="IC3"/> <!-- EPROM3 -->
+			<feature name="ic4" value="IC4"/> <!-- EPROM4 -->
+			<feature name="ic5" value="IC5"/> <!-- 74HC139P -->
+			<dataarea name="rom" width="16" endianness="big" size="1048576">
+				<rom name="Cool Spot Sega Mega Drive EP ROM 0 of 4.ic1" size="262144" crc="eaa7a911" sha1="663b8394eee1d6b679db7ae45ee39df9e3aaabd6" offset="0x000000"/>
+				<rom name="Cool Spot Sega Mega Drive EP ROM 1 of 4.ic2" size="262144" crc="c7bc6cfb" sha1="e5d818993d162b5f2ed18b74848a514525cfd587" offset="0x040000"/>
+				<rom name="Cool Spot Sega Mega Drive EP ROM 2 of 4.ic3" size="262144" crc="3dff64f4" sha1="380c1e183769d8a32b9e52ce7465090ac3872580" offset="0x080000"/>
+				<rom name="Cool Spot Sega Mega Drive EP ROM 3 of 4.ic4" size="262144" crc="8fcce53a" sha1="cbe736a696319771b670c6c539f49d7d1956cd8e" offset="0x0c0000"/>
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="coolspotu" cloneof="coolspot">
 		<description>Cool Spot (USA)</description>
@@ -3124,8 +3141,8 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		</part>
 	</software>
 
-
-	<software name="gameto" supported="no"> <!-- It needs full EEPROM support -->
+	<!-- Moans about the Modem not hooked up -->
+	<software name="gameto" supported="no">
 		<description>Game Toshokan (Jpn, Rev. A)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
@@ -4797,11 +4814,12 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<description>Mega Games I (Euro)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
+		<info name="release" value="19921001"/>
 		<part name="cart" interface="megadriv_cart">
-			<feature name="pcb" value="171-5978BA"/>
+			<feature name="pcb" value="171-5978BA"/> <!-- Also found with 171-5978B -->
 			<feature name="u1" value="MPR-15009 W50"/> <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
-				<rom name="mpr-15009 w50.u1" size="1048576" crc="db753224" sha1="076df34a01094ce0893f32600e24323567e2a23b" offset="0x000000"/>
+				<rom name="MPR-15009 W50.u1" size="1048576" crc="db753224" sha1="076df34a01094ce0893f32600e24323567e2a23b" offset="0x000000"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5472,6 +5490,23 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 				<rom name="nba 97 b2.u1" size="2097152" crc="7024843a" sha1="1671451ab4ab6991e13db70671054c0f2c652a95" offset="0x000000"/>
 			</dataarea>
 			<dataarea name="sram" size="16384">
+			</dataarea>
+		</part>
+	</software>
+
+
+	<software name="bullvsblj" cloneof="bullvsbl">
+		<description>NBA Playoffs - Bulls Vs Blazers (Jpn)</description>
+		<year>1993</year>
+		<publisher>Electronic Arts Victor</publisher>
+		<info name="serial" value="EM20017"/>
+		<info name="release" value="19930730"/>
+		<info name="alt_title" value="NBAプレイオフ ブルズVSブレイザーズ"/>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="PWA P10001 REV G"/>
+			<feature name="u1" value="EM200017"/>
+			<dataarea name="rom" width="16" endianness="big" size="1048576">
+				<rom name="EM20017.bin" size="1048576" crc="eae8c000" sha1="66a25cf2d7ddf17dde137e29381202f48456d173" offset="0x000000"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7366,11 +7401,12 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<description>Sonic the Hedgehog (Euro, USA)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
+		<info name="release" value="19910623"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5703"/>
 			<feature name="ic1" value="MPR-13913-F, MPR-13913 W33"/>
 			<dataarea name="rom" width="16" endianness="big" size="524288">
-				<rom name="mpr-13913-f.ic1" size="524288" crc="f9394e97" sha1="6ddb7de1e17e7f6cdb88927bd906352030daa194" offset="0x000000"/>
+				<rom name="MPR-13913-F.ic1" size="524288" crc="f9394e97" sha1="6ddb7de1e17e7f6cdb88927bd906352030daa194" offset="0x000000"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9236,6 +9272,22 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 	</software>
 
 
+	<software name="worldillj" cloneof="worldill">
+		<description>World of Illusion - Fushigi na Magic Box (Jpn)</description>
+		<year>1992</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="G-4080"/>
+		<info name="release" value="19921218"/>
+		<info name="alt_title" value="ワールド オブ イリュージョン アイラブ ミッキー&amp;ドナルド - ふしぎなマジックボックス"/>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-5978BA"/>
+			<feature name="u1" value="MPR-15283-F"/>   <!-- location not really marked on PCB, using u1 for consistency -->
+			<dataarea name="rom" width="16" endianness="big" size="1048576">
+				<rom name="mpr-15283-f.u1" size="1048576" crc="cb9ee238" sha1="c79935fdeb680a1a2e76db1aef2c6897e6ee8e4d" offset="0x000000"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="wsb98">
 		<description>World Series Baseball '98 (USA)</description>
 		<year>1997</year>
@@ -9709,6 +9761,51 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		</part>
 	</software>
 
+<!--
+Confirmed dump but no pcb pic
+-->
+
+	<software name="shikinjo">
+		<description>Shikinjoh (Jpn)</description>
+		<year>1991</year>
+		<publisher>Sunsoft</publisher>
+		<info name="serial" value="T-15053"/>
+		<info name="release" value="19910427"/>
+		<info name="alt_title" value="紫禁城"/>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="524288">
+				<rom name="shikinjoh (jpn).bin" size="524288" crc="5ea0c97d" sha1="34add3f084636d671b48e77a771329f23f8083cd" offset="0x000000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tomjerryj" cloneof="tomjerry">
+		<description>Tom and Jerry - Frantic Antics (Jpn)</description>
+		<year>1993</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="T-166013"/>
+		<info name="release" value="19941216"/>
+		<info name="alt_title" value="トムとジェリー"/>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="1048576">
+				<rom name="tom and jerry - frantic antics (jpn).bin" size="1048576" crc="f800c814" sha1="736d015e29fa98980399dfaa8118b4baa5dff393" offset="0x000000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="valis3j" cloneof="valis3">
+		<description>Valis III (Jpn, Rev. A)</description>
+		<year>1991</year>
+		<publisher>Reno</publisher>
+		<info name="serial" value="T-49023"/>
+		<info name="release" value="19910322"/>
+		<info name="alt_title" value="ヴァリスIII"/>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="1048576">
+				<rom name="valis iii (jpn) (rev a).bin" size="1048576" crc="4d49a166" sha1="640c3d4f341c8a9b19e5deafae33e7742f109e2d" offset="0x000000"/>
+			</dataarea>
+		</part>
+	</software>
 
 <!--
 Old scrambled/interleaved dumps.
@@ -9717,10 +9814,10 @@ but dumps still have to be confirmed.
 -->
 
 	<software name="13mahjan">
-		<description>13 Ma Jiang - 98 Mei Shao Nu Pian (Chi)</description>
+		<description>13 Ma Jiang - 98 Mei Shao Nu (Chi)</description>
 		<year>1998</year>
 		<publisher>BBD</publisher>
-		<info name="alt_title" value="十三張麻將 98'美少女篇"/>
+		<info name="alt_title" value="十三張麻將 98'美少女"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="655360">
 				<rom name="13 mahjong 98 (unl).bin" size="655360" crc="68b372f6" sha1="af19eb952bff78178ae3d31ed48b3fc5c7010dea" offset="0x000000"/>
@@ -9750,13 +9847,28 @@ but dumps still have to be confirmed.
 		</part>
 	</software>
 
-	<software name="16zhan">
-		<description>16 Zhang Ma Jiang (Chi)</description>
+	<software name="16mj">
+		<description>Shi Liu Zhang Ma Jiang (Chi)</description>
 		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
+		<publisher>City Man</publisher>
+		<info name="alt_title" value="十六張麻將"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="16 zhang ma jiang (chi) (unl).bin" size="1048576" crc="36407c82" sha1="7857c797245b52641a3d1d4512089bccb0ed5359" offset="0x000000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="16mj2">
+		<description>Shi Liu Zhang Ma Jiang II</description>
+		<year>199?</year>
+		<publisher>City Man</publisher>
+		<info name="serial" value="GM-95003"/>
+		<info name="alt_title" value="十六張麻將II"/>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_16mj2"/>
+			<dataarea name="rom" width="16" endianness="big" size="1048576">
+				<rom name="16 tiles mahjong ii (unl).bin" size="1048576" crc="b4f4249f" sha1="c5278d513ac7b627319bdcb840af216d0fc60f4c" offset="0x000000"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10095,9 +10207,10 @@ but dumps still have to be confirmed.
 	</software>
 
 	<software name="adveboy">
-		<description>Adventurous Boy - Mao Xian Xiao Zi (Chi)</description>
+		<description>Adventurous Boy - Mao Xian Xiao Zi (Tw)</description>
 		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
+		<publisher>Gamtec</publisher>
+		<info name="alt_title" value="冒險小子"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="524288">
 				<rom name="adventurous boy - mao xian xiao zi (chi) (unl).bin" size="524288" crc="d4403913" sha1="f6e5bba7254f7f73a007f234f1001ddcb0b62484" offset="0x000000"/>
@@ -10449,10 +10562,11 @@ but dumps still have to be confirmed.
 		</part>
 	</software>
 
-	<software name="aqrenk">
-		<description>Aq Renkan Awa (Chi)</description>
+	<software name="aqlian">
+		<description>A Q Lian Huan Pao (Tw)</description>
 		<year>1995</year>
 		<publisher>C&amp;E</publisher>
+		<info name="alt_title" value="阿Q連環泡"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="aq renkan awa (chi) (unl).bin" size="1048576" crc="2c6cbd77" sha1="fcd1c7fcfb9027ae7baad9c67847ef5f1090991a" offset="0x000000"/>
@@ -11076,9 +11190,10 @@ but dumps still have to be confirmed.
 	</software>
 
 	<software name="barver">
-		<description>Barver Battle Saga - Tai Kong Zhan Shi (Chi)</description>
+		<description>Barver Battle Saga - Tai Kong Zhan Shi - Mo Fa Zhan Shi (Chi)</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
+		<info name="alt_title" value="太空戰士 魔法戰士"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -11205,6 +11320,18 @@ but dumps still have to be confirmed.
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="battletech - a game of armored combat (usa).bin" size="2097152" crc="409e5d14" sha1="ee22ae12053928b652f9b9f513499181b01c8429" offset="0x000000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="btlchess">
+		<description>Zhan Qi - Chinese Battle Chess (Tw)</description>
+		<year>199?</year>
+		<publisher>Creaton</publisher>
+		<info name="alt_title" value="戦棊 - Chinese Battle Chess"/>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="1048576">
+				<rom name="chinese battle chess.rom" size="1048576" crc="9d3dde48" sha1="bc256272419564c48e17c6824d734dc9e86c03b5" offset="0x000000"/>
 			</dataarea>
 		</part>
 	</software>
@@ -11616,7 +11743,7 @@ but dumps still have to be confirmed.
 	</software>
 
 	<software name="btomato">
-		<description>Bill's Tomato Adventure (Prototype)</description>
+		<description>Bill's Tomato Game (Prototype)</description>
 		<year>199?</year>
 		<publisher>Psygnosis</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -12284,6 +12411,7 @@ but dumps still have to be confirmed.
 		<description>Chao Ji Da Fu Weng (Chi)</description>
 		<year>199?</year>
 		<publisher>Gametec?</publisher>
+		<info name="alt_title" value="超級大富翁"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
@@ -12430,9 +12558,10 @@ but dumps still have to be confirmed.
 	</software>
 
 	<software name="chinesec">
-		<description>Chinese Chess</description>
+		<description>Zhong Guo Xiang Qi - Chinese Chess (Tw)</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
+		<info name="alt_title" value="中國象棋"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="524288">
 				<rom name="chinese chess (unl).bin" size="524288" crc="475215a0" sha1="3907bf058493e7b9db9720493030f0284797908c" offset="0x000000"/>
@@ -13786,7 +13915,7 @@ but dumps still have to be confirmed.
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="deathdlp" cloneof="deathdl">
 		<description>Death Duel (USA, Prototype 19920506)</description>
 		<year>1992</year>
@@ -13947,10 +14076,11 @@ but dumps still have to be confirmed.
 		</part>
 	</software>
 
-	<software name="dialqo">
-		<description>Dial Q o Mawase! (Jpn)</description>
+	<software name="dialq">
+		<description>Dial Q Mahjang Club (Jpn)</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
+		<info name="alt_title" value="ダイヤルQをまわせ ~ Dial Q o Mawase! / 究極麻雀 ~ Jiuji Maque (Box?)"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="dial q o mawase! (jpn) (unl).bin" size="1048576" crc="c632e5af" sha1="08967e04d992264f193ecdfd0e0457baaf25f4f2" offset="0x000000"/>
@@ -15400,7 +15530,8 @@ but dumps still have to be confirmed.
 	<software name="fengkuan">
 		<description>Feng Kuang Tao Hua Yuan (Chi)</description>
 		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
+		<publisher>Creaton</publisher>
+		<info name="alt_title" value="瘋狂桃花源"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_mjlov"/>
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
@@ -15412,7 +15543,8 @@ but dumps still have to be confirmed.
 	<software name="fengkuan1" cloneof="fengkuan">
 		<description>Feng Kuang Tao Hua Yuan (Chi, Unprotected)</description>
 		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
+		<publisher>Creaton</publisher>
+		<info name="alt_title" value="瘋狂桃花源"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="feng kuang tao hua yuan (chi) (unl).bin" size="1048576" crc="8d40d64f" sha1="0330611a5fcb1f3ca173fcb3387fd35b865f1131" offset="0x000000"/>
@@ -15424,6 +15556,7 @@ but dumps still have to be confirmed.
 		<description>Feng Shen Ying Jie Chuan (Chi)</description>
 		<year>1996</year>
 		<publisher>Chuanpu Technologies</publisher>
+		<info name="alt_title" value="封神英傑傳"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="feng shen ying jie chuan (chi) (unl).bin" size="2097152" crc="6a382b60" sha1="7a6e06846a94df2df2417d6509e398c29354dc68" offset="0x000000"/>
@@ -15435,6 +15568,7 @@ but dumps still have to be confirmed.
 		<description>Feng Shen Ying Jie Zhuan (Chi, Alt?)</description>
 		<year>1996</year>
 		<publisher>Chuanpu Technologies</publisher>
+		<info name="alt_title" value="封神英傑傳"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -16507,10 +16641,12 @@ but dumps still have to be confirmed.
 		</part>
 	</software>
 
-	<software name="heitao">
-		<description>Hei Tao 2 - Super Big 2 (Chi)</description>
+	<software name="heitao2">
+		<description>Hei Tao 2 - Super Big 2 (Tw)</description>
 		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
+		<publisher>King Tec</publisher>
+		<info name="serial" value="GM-95301"/>
+		<info name="alt_title" value="黑桃2 大老二 ~ Hei Tao 2 - Da Lao Er (Box)"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="hei tao 2 - super big 2 (chi) (unl).bin" size="1048576" crc="31449113" sha1="e1e4c439c5c22fa5cfcecaab421c55bf1746b5de" offset="0x000000"/>
@@ -16575,7 +16711,7 @@ but dumps still have to be confirmed.
 			</dataarea>
 		</part>
 	</software>
-	
+
 <!-- This is the same as the final, but without the padding up to 512Kb and with different checksum in the internal header -->
 	<software name="homea2p" cloneof="homea2">
 		<description>Home Alone 2 - Lost in New York (USA, Prototype 19930929)</description>
@@ -17611,7 +17747,7 @@ but dumps still have to be confirmed.
 		</part>
 	</software>
 
-	<software name="kingsbty">
+	<software name="kbounty">
 		<description>King's Bounty - The Conqueror's Quest (Euro, USA)</description>
 		<year>1991</year>
 		<publisher>Electronic Arts</publisher>
@@ -18167,6 +18303,7 @@ but dumps still have to be confirmed.
 		<description>Ma Qiao E Mo Ta - Devilish Mahjong Tower (Chi)</description>
 		<year>1994</year>
 		<publisher>C&amp;E</publisher>
+		<info name="alt_title" value="麻雀惡魔塔"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="ma qiao e mo ta - devilish mahjong tower (chi) (unl).bin" size="1048576" crc="12e35994" sha1="84e8bf546283c73396e40c4cfa05986ebeb123bb" offset="0x000000"/>
@@ -18816,7 +18953,9 @@ but dumps still have to be confirmed.
 	<software name="menghu">
 		<description>Meng Huan Shui Guo Pan - 777 Casino (Chi)</description>
 		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
+		<publisher>City Man</publisher>
+		<info name="serial" value="GM-95002"/>
+		<info name="alt_title" value="夢幻水果盤"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="meng huan shui guo pan - 777 casino (chi) (unl).bin" size="1048576" crc="42dc03e4" sha1="df20a28d03a2cd481af134ef7602062636c3cc79" offset="0x000000"/>
@@ -19573,7 +19712,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="f1heromd">
+	<software name="f1heromd" cloneof="ferrari">
 		<description>Nakajima Satoru Kanshuu F1 Hero MD (Jpn)</description>
 		<year>1992</year>
 		<publisher>Varie</publisher>
@@ -20077,20 +20216,6 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="nba live 98 (usa).bin" size="2097152" crc="23473a8a" sha1="89b98867c7393371a364de58ba6955e0798fa10f" offset="0x000000"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="bullvsblj" cloneof="bullvsbl">
-		<description>NBA Playoffs - Bulls Vs Blazers (Jpn)</description>
-		<year>1993</year>
-		<publisher>Electronic Arts Victor</publisher>
-		<info name="serial" value="EM20017"/>
-		<info name="release" value="19930730"/>
-		<info name="alt_title" value="NBAプレイオフ ブルズVSブレイザーズ"/>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" width="16" endianness="big" size="1048576">
-				<rom name="nba playoffs - bulls vs blazers (jpn).bin" size="1048576" crc="eae8c000" sha1="66a25cf2d7ddf17dde137e29381202f48456d173" offset="0x000000"/>
 			</dataarea>
 		</part>
 	</software>
@@ -21432,7 +21557,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="paperboyp" cloneof="paperboy">
 		<description>Paperboy (USA, Prototype 19911028)</description>
 		<year>1992</year>
@@ -21506,7 +21631,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-5525"/>
 		<info name="release" value="19931029"/>
-		<info name="alt_title" value="ペブルビーチの波濤"/>
+		<info name="alt_title" value="ペブルビーチの波涛"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="1572864">
@@ -22595,6 +22720,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<description>Queen of Poker Club (Tw)</description>
 		<year>199?</year>
 		<publisher>Sachen</publisher>
+		<info name="alt_title" value="撲克俱樂部 Poker 6 in 1 ~ Poker Club Poker 6 in 1 (Box)"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="poker club (sachen).bin" size="1048576" crc="ae28d9eb" sha1="600c9b234f2559b6d101a111f7033088bd701a5d" offset="0x000000"/>
@@ -22830,7 +22956,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<!-- This is the same as the final, but without the padding up to 1Mb and with no checksum in the internal header -->
 	<software name="renstimp" cloneof="renstim">
 		<description>Stimpy's Invention Starring Starring Ren Hoëk &amp; Stimpy (Euro, Prototype 19931209)</description>
@@ -23217,7 +23343,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="roadblstp" cloneof="roadblst">
 		<description>RoadBlasters (USA, Prototype 19910627)</description>
 		<year>1992</year>
@@ -23609,6 +23735,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<description>San Guo Zhi V (Chi)</description>
 		<year>199?</year>
 		<publisher>SKOB</publisher>
+		<info name="alt_title" value="三國志V"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="san guo zhi v (chi) (unl).bin" size="2097152" crc="cd7e53d0" sha1="1a3333983f40dd242ad86187e50d1abed68d5ae9" offset="0x000000"/>
@@ -23895,26 +24022,13 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="shijie">
-		<description>Shi Jie Zhi Bang Zheng Ba Zhan - World Pro Baseball 94 (Chi)</description>
+		<description>Jin Guan Jun Xiong Di Xiang - Shi Jie Zhi Bang Zheng Ba Zhan (Chi)</description>
 		<year>1994</year>
 		<publisher>C&amp;E</publisher>
+		<info name="alt_title" value="金冠軍兄弟象 世界职棒争霸战"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="shi jie zhi bang zheng ba zhan - world pro baseball 94 (chi) (unl).bin" size="2097152" crc="72dd884f" sha1="d05c770312feec38c45b910ad09204b87961c01a" offset="0x000000"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="shikinjo">
-		<description>Shikinjoh (Jpn)</description>
-		<year>1991</year>
-		<publisher>Sunsoft</publisher>
-		<info name="serial" value="T-15053"/>
-		<info name="release" value="19910427"/>
-		<info name="alt_title" value="紫禁城"/>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" width="16" endianness="big" size="524288">
-				<rom name="shikinjoh (jpn).bin" size="524288" crc="5ea0c97d" sha1="34add3f084636d671b48e77a771329f23f8083cd" offset="0x000000"/>
 			</dataarea>
 		</part>
 	</software>
@@ -24190,6 +24304,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<description>Shui Hu - Feng Yun Zhuan (Chi)</description>
 		<year>1999</year>
 		<publisher>Never Ending Soft Team</publisher>
+		<info name="alt_title" value="水滸 風雲傳"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="shui hu - feng yun zhuan (chi) (unl).bin" size="2097152" crc="3e9e010c" sha1="7ac1b7a9e36dde9a03b3d0861b473ac9e1324175" offset="0x000000"/>
@@ -24201,6 +24316,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<description>Shui Hu Zhuan (Chi)</description>
 		<year>1996</year>
 		<publisher>Chuanpu Technologies</publisher>
+		<info name="alt_title" value="水滸傳"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="shui hu zhuan (chi) (unl).bin" size="2097152" crc="61e458c3" sha1="f58c522bd0629833d3943ef4091c3c349c134879" offset="0x000000"/>
@@ -24492,46 +24608,54 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="skp10" cloneof="sk">
+	<software name="skp06" cloneof="sk">
 		<description>Sonic &amp; Knuckles (Prototype 0606, 19940606, 10.02)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" width="16" endianness="big" size="2097152">
+			<feature name="slot" value="rom_sk"/>
+			<dataarea name="rom" width="16" endianness="big" size="3407872">
 				<rom name="sonic &amp; knuckles (prototype 0606 - jun 06, 1994, 10.02).bin" size="2097152" crc="03a52f63" sha1="173524ffae78438b5ddd039ec8b8def786f28aee" offset="0x000000"/>
+				<rom name="sonic &amp; knuckles (s2k chip) (prototype 0606 - jun 05, 1994, 22.25).bin" size="262144" crc="bd619ea9" sha1="f557741d93f8d3e8a84099ab88f0331ced2875c8" offset="0x300000"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="skp08" cloneof="sk">
+	<software name="skp05" cloneof="sk">
 		<description>Sonic &amp; Knuckles (Prototype 0608, 19940608, 05.03)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" width="16" endianness="big" size="2097152">
+			<feature name="slot" value="rom_sk"/>
+			<dataarea name="rom" width="16" endianness="big" size="3407872">
 				<rom name="sonic &amp; knuckles (prototype 0608 - jun 08, 1994, 05.03).bin" size="2097152" crc="7a6c1317" sha1="a55b784590e602a82719d6721b2789f686564d2b" offset="0x000000"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="skp06" cloneof="sk">
-		<description>Sonic &amp; Knuckles (Prototype 0610, 19940610, 07.49)</description>
-		<year>1994</year>
-		<publisher>Sega</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" width="16" endianness="big" size="2097152">
-				<rom name="sonic &amp; knuckles (prototype 0610 - jun 10, 1994, 07.49).bin" size="2097152" crc="7092f368" sha1="bc67cb9edb8958a66723a8346c9d58d43d18ca80" offset="0x000000"/>
+				<rom name="sonic &amp; knuckles (s2k chip) (prototype 0608 - jun 08, 1994, 03.35).bin" size="262144" crc="6a5dcbe6" sha1="f27434f63ce45de92c361b0b3aabdfde80c237da" offset="0x300000"/>
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="skp04" cloneof="sk">
+		<description>Sonic &amp; Knuckles (Prototype 0610, 19940610, 07.49)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_sk"/>
+			<dataarea name="rom" width="16" endianness="big" size="3407872">
+				<rom name="sonic &amp; knuckles (prototype 0610 - jun 10, 1994, 07.49).bin" size="2097152" crc="7092f368" sha1="bc67cb9edb8958a66723a8346c9d58d43d18ca80" offset="0x000000"/>
+				<rom name="sonic &amp; knuckles (s2k chip) (prototype 0610 - jun 10, 1994, 03.11).bin" size="262144" crc="0f6ff22b" sha1="d2b4003a7110f258641b7b76d7716acbcb3b62ab" offset="0x300000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="skp03" cloneof="sk">
 		<description>Sonic &amp; Knuckles (Prototype 0612, 19940612, 18.27)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" width="16" endianness="big" size="2097152">
+			<feature name="slot" value="rom_sk"/>
+			<dataarea name="rom" width="16" endianness="big" size="3407872">
 				<rom name="sonic &amp; knuckles (prototype 0612 - jun 12, 1994, 18.27).bin" size="2097152" crc="b0a253e8" sha1="8585b617e6828bf0b255d4ef747384db7ff67826" offset="0x000000"/>
+				<rom name="sonic &amp; knuckles (s2k chip) (prototype 0612 - jun 12, 1994, 18.18).bin" size="262144" crc="9a5f8183" sha1="eb29700a161a1949ed3057a3580911c7932315a5" offset="0x300000"/>
 			</dataarea>
 		</part>
 	</software>
@@ -24541,8 +24665,10 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" width="16" endianness="big" size="2097152">
+			<feature name="slot" value="rom_sk"/>
+			<dataarea name="rom" width="16" endianness="big" size="3407872">
 				<rom name="sonic &amp; knuckles (prototype 0618 - jun 18, 1994, 09.15).bin" size="2097152" crc="2615f5dc" sha1="e365c42a2c754b9df98b5b74dbc3e7f94c1a84f4" offset="0x000000"/>
+				<rom name="sonic &amp; knuckles (s2k chip) (prototype 0618 - jun 18, 1994, 9.07).bin" size="262144" crc="4dcfd55c" sha1="70429f1d80503a0632f603bf762fe0bbaa881d22" offset="0x300000"/>
 			</dataarea>
 		</part>
 	</software>
@@ -24552,86 +24678,32 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" width="16" endianness="big" size="2097152">
+			<feature name="slot" value="rom_sk"/>
+			<dataarea name="rom" width="16" endianness="big" size="3407872">
 				<rom name="sonic &amp; knuckles (prototype 0619 - jun 19, 1994, 08.18).bin" size="2097152" crc="1ea5b9d1" sha1="b84d197e646ceece8681d35af3b4014c1bbeae35" offset="0x000000"/>
+				<rom name="sonic &amp; knuckles (s2k chip) (prototype 0618 - jun 18, 1994, 9.07).bin" size="262144" crc="4dcfd55c" sha1="70429f1d80503a0632f603bf762fe0bbaa881d22" offset="0x300000"/>
 			</dataarea>
 		</part>
 	</software>
 
-<!-- These are just dumps of the mpr-16911-s.ic2 lock-on chip. should be matched with the SK data above to get proper sets to be locked on Sonic 2... -->
-	<software name="skp11" cloneof="sk" supported="no">
-		<description>Sonic &amp; Knuckles (Prototype 0606, 19940605, 22.25, S2K chip)</description>
-		<year>1994</year>
-		<publisher>Sega</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" width="16" endianness="big" size="262144">
-				<rom name="sonic &amp; knuckles (s2k chip) (prototype 0606 - jun 05, 1994, 22.25).bin" size="262144" crc="bd619ea9" sha1="f557741d93f8d3e8a84099ab88f0331ced2875c8" offset="0x000000"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="skp09" cloneof="sk" supported="no">
-		<description>Sonic &amp; Knuckles (Prototype 0608, 19940608, 03.35, S2K chip)</description>
-		<year>1994</year>
-		<publisher>Sega</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" width="16" endianness="big" size="262144">
-				<rom name="sonic &amp; knuckles (s2k chip) (prototype 0608 - jun 08, 1994, 03.35).bin" size="262144" crc="6a5dcbe6" sha1="f27434f63ce45de92c361b0b3aabdfde80c237da" offset="0x000000"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="skp07" cloneof="sk" supported="no">
-		<description>Sonic &amp; Knuckles (Prototype 0610, 19940610, 03.11, S2K chip)</description>
-		<year>1994</year>
-		<publisher>Sega</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" width="16" endianness="big" size="262144">
-				<rom name="sonic &amp; knuckles (s2k chip) (prototype 0610 - jun 10, 1994, 03.11).bin" size="262144" crc="0f6ff22b" sha1="d2b4003a7110f258641b7b76d7716acbcb3b62ab" offset="0x000000"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="skp05" cloneof="sk" supported="no">
-		<description>Sonic &amp; Knuckles (Prototype 0612, 19940612, 18.18, S2K chip)</description>
-		<year>1994</year>
-		<publisher>Sega</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" width="16" endianness="big" size="262144">
-				<rom name="sonic &amp; knuckles (s2k chip) (prototype 0612 - jun 12, 1994, 18.18).bin" size="262144" crc="9a5f8183" sha1="eb29700a161a1949ed3057a3580911c7932315a5" offset="0x000000"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="skp03" cloneof="sk" supported="no">
-		<description>Sonic &amp; Knuckles (Prototype 0618, 19940618, 9.07, S2K chip)</description>
-		<year>1994</year>
-		<publisher>Sega</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" width="16" endianness="big" size="262144">
-				<rom name="sonic &amp; knuckles (s2k chip) (prototype 0618 - jun 18, 1994, 9.07).bin" size="262144" crc="4dcfd55c" sha1="70429f1d80503a0632f603bf762fe0bbaa881d22" offset="0x000000"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="knucklp">
-		<description>Knuckles in Sonic 2 (Prototype 0524, 19940527, 10.46)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" width="16" endianness="big" size="4194304">
-				<rom name="knuckles in sonic 2 (prototype 0524 - may 27, 1994, 10.46).bin" size="4194304" crc="8878c1a8" sha1="3a827d575f5a484c24e6c31417f32d6c5f0045de" offset="0x000000"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="skp12" cloneof="sk">
+	<software name="skp07" cloneof="sk">
 		<description>Sonic &amp; Knuckles (Prototype 0525, 19940525, 15.28)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="4194304">
 				<rom name="sonic &amp; knuckles (prototype 0525 - may 25, 1994, 15.28).bin" size="4194304" crc="8e8dadd0" sha1="5f2c4dc4e739d562e9f0525361ba83f3e0551e21" offset="0x000000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="knucklp">
+		<description>Knuckles in Sonic 2 (Prototype 0524, 19940527, 10.46)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="4194304">
+				<rom name="knuckles in sonic 2 (prototype 0524 - may 27, 1994, 10.46).bin" size="4194304" crc="8878c1a8" sha1="3a827d575f5a484c24e6c31417f32d6c5f0045de" offset="0x000000"/>
 			</dataarea>
 		</part>
 	</software>
@@ -25187,7 +25259,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="speedbl2up" cloneof="speedbl2">
 		<description>Speedball 2 - Brutal Deluxe (USA, Prototype 19910607)</description>
 		<year>1991</year>
@@ -26342,7 +26414,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="lasordap" cloneof="suprleag">
 		<description>Tommy Lasorda Baseball (USA, Prototype 19890430)</description>
 		<year>1989</year>
@@ -26723,6 +26795,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<description>Taiwan Daheng (Chi)</description>
 		<year>1994</year>
 		<publisher>C&amp;E</publisher>
+		<info name="alt_title" value="台灣大亨"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="taiwan daheng (chi) (unl).bin" size="1048576" crc="baf20f81" sha1="88726c11e5ed7927830bf5ae0b83d85dfff4a2a4" offset="0x000000"/>
@@ -27501,7 +27574,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<!-- This is the same as the final, but with "Sega_Channel" XORed at the end. -->
 	<software name="toejam2p2" cloneof="toejam2">
 		<description>Toe Jam &amp; Earl in Panic on Funkotron (Prototype 19930911)</description>
@@ -27828,9 +27901,10 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="tunshi">
-		<description>Tun Shi Tian Di III (China, Simple Chinese)</description>
+		<description>Tun Shi Tian Di III (Chi, Simple Chinese)</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
+		<info name="alt_title" value="吞食天地III"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="tun shi tian di iii (chi) (simple chinese) (unl).bin" size="2097152" crc="ea57b668" sha1="7040e96c053f29c75cf0524ddb168a83d0fb526f" offset="0x000000"/>
@@ -27842,6 +27916,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<description>Tun Shi Tian Di III (Chi)</description>
 		<year>199?</year>
 		<publisher>SKOB</publisher>
+		<info name="alt_title" value="吞食天地III"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="tun shi tian di iii (chi) (unl).bin" size="2097152" crc="b23c4166" sha1="534bf8f951ee30d47df18202246245b998c0eced" offset="0x000000"/>
@@ -28140,20 +28215,6 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="valis iii (usa).bin" size="1048576" crc="59a2a368" sha1="bb051779d6c4c68a8a4571177990f7d190696b4a" offset="0x000000"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="valis3j" cloneof="valis3">
-		<description>Valis III (Jpn, Rev. A)</description>
-		<year>1991</year>
-		<publisher>Reno</publisher>
-		<info name="serial" value="T-49023"/>
-		<info name="release" value="19910322"/>
-		<info name="alt_title" value="ヴァリスIII"/>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" width="16" endianness="big" size="1048576">
-				<rom name="valis iii (jpn) (rev a).bin" size="1048576" crc="4d49a166" sha1="640c3d4f341c8a9b19e5deafae33e7742f109e2d" offset="0x000000"/>
 			</dataarea>
 		</part>
 	</software>
@@ -28886,7 +28947,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_eeprom"/>
-			<dataarea name="rom" width="16" endianness="big" size="655360">
+			<dataarea name="rom" width="16" endianness="big" size="786432">
 				<rom name="wonder boy v - monster world iii (jul 25, 1991 prototype).bin" size="786432" crc="334035f8" sha1="1677039ede9a4cf51ac182cfe27d797c864290c8" offset="0x000000" />
 			</dataarea>
 		</part>
@@ -29401,20 +29462,6 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="world heroes (usa) (prototype - mar 30, 1994).bin" size="2097152" crc="50c797cb" sha1="8c4dc2b06e0734fc8e39997f8da6295d187e316e" offset="0x000000"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="worldillj" cloneof="worldill">
-		<description>World of Illusion - Fushigi na Magic Box (Jpn)</description>
-		<year>1992</year>
-		<publisher>Sega</publisher>
-		<info name="serial" value="G-4080"/>
-		<info name="release" value="19921218"/>
-		<info name="alt_title" value="ワールド オブ イリュージョン アイラブ ミッキー&amp;ドナルド - ふしぎなマジックボックス"/>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" width="16" endianness="big" size="1048576">
-				<rom name="world of illusion - fushigi na magic box (jpn).bin" size="1048576" crc="cb9ee238" sha1="c79935fdeb680a1a2e76db1aef2c6897e6ee8e4d" offset="0x000000"/>
 			</dataarea>
 		</part>
 	</software>
@@ -29980,6 +30027,8 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<description>Wu Kong Wai Zhuan (Chi)</description>
 		<year>1996</year>
 		<publisher>Ming</publisher>
+		<info name="serial" value="GM-95701"/>
+		<info name="alt_title" value="悟空外傳"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_yasech"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -29994,6 +30043,8 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<description>Wu Kong Wai Zhuan (Chi, Unprotected)</description>
 		<year>1996</year>
 		<publisher>Ming</publisher>
+		<info name="serial" value="GM-95701"/>
+		<info name="alt_title" value="悟空外傳"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -30301,9 +30352,10 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="xiaomo">
-		<description>Xiao Monv - Magic Girl (Chi)</description>
+		<description>Xiao Monv - Magic Girl (Tw)</description>
 		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
+		<publisher>Gamtec</publisher>
+		<info name="alt_title" value="小魔女"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="524288">
 				<rom name="xiao monv - magic girl (chi) (unl).bin" size="524288" crc="8e49a92e" sha1="22a48404e77cab473ee65e5d5167d17c28884a7a" offset="0x000000"/>
@@ -30323,22 +30375,11 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="xinqig1" cloneof="beggarp">
-		<description>Xin Qi Gai Wang Zi (Chi, Alt)</description>
-		<year>1996</year>
-		<publisher>C&amp;E</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<feature name="slot" value="rom_xinqig"/>
-			<dataarea name="rom" width="16" endianness="big" size="4194304">
-				<rom name="xin qi gai wang zi (chi) (alt) (unl).bin" size="4194304" crc="da5a4bfe" sha1="75f8003a6388814c1880347882b244549da62158" offset="0x000000"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="xinqig" cloneof="beggarp">
 		<description>Xin Qi Gai Wang Zi (Chi)</description>
 		<year>1996</year>
 		<publisher>C&amp;E</publisher>
+		<info name="alt_title" value="新乞丐王子"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_xinqig"/>
 			<dataarea name="rom" width="16" endianness="big" size="4194304">
@@ -30347,11 +30388,25 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
+	<software name="xinqig1" cloneof="beggarp">
+		<description>Xin Qi Gai Wang Zi (Chi, Alt)</description>
+		<year>1996</year>
+		<publisher>C&amp;E</publisher>
+		<info name="alt_title" value="新乞丐王子"/>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_xinqig"/>
+			<dataarea name="rom" width="16" endianness="big" size="4194304">
+				<rom name="xin qi gai wang zi (chi) (alt) (unl).bin" size="4194304" crc="da5a4bfe" sha1="75f8003a6388814c1880347882b244549da62158" offset="0x000000"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="yasech">
 		<description>Ya Se Chuan Shuo (Chi)</description>
 		<year>1995</year>
-		<publisher>Chuanpu Technologies</publisher>
-		<info name="alt_title" value="亚瑟传说"/>
+		<publisher>Ming</publisher>
+		<info name="serial" value="GM-95403"/>
+		<info name="alt_title" value="亚瑟传说 / 帝國王朝 (亞瑟傳說篇) ~ Di Guo Wang Chao (Ya Se Chuan Shuo Pian) [Box]"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_yasech"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -30361,9 +30416,10 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="yangji">
-		<description>Yang Jia Jiang - Yang Warrior Family (Chi)</description>
+		<description>Yi Men Ying Lie - Yang Jia Jiang (Chi)</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
+		<info name="alt_title" value="一門英烈 楊家將"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="yang jia jiang - yang warrior family (chi) (unl).bin" size="2097152" crc="6604a79e" sha1="6fcc3102fc22b42049e6eae9a1c30c8a7f022d14" offset="0x000000"/>
@@ -30523,7 +30579,8 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	<software name="zhuogu">
 		<description>Zhuo Gui Da Shi - Ghost Hunter (Chi)</description>
 		<year>1994</year>
-		<publisher>Shenchi Technology</publisher>
+		<publisher>Senchi Technology</publisher>
+		<info name="alt_title" value="抓鬼大師"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="524288">
 				<rom name="zhuo gui da shi - ghost hunter (chi) (unl).bin" size="524288" crc="76c62a8b" sha1="3424892e913c20754d2e340c6e79476a9eb6761b" offset="0x000000"/>
@@ -30728,18 +30785,6 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="16mj2">
-		<description>16 Tiles Mahjong II</description>
-		<year>199?</year>
-		<publisher>Gamtec</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<feature name="slot" value="rom_16mj2"/>
-			<dataarea name="rom" width="16" endianness="big" size="1048576">
-				<rom name="16 tiles mahjong ii (unl).bin" size="1048576" crc="b4f4249f" sha1="c5278d513ac7b627319bdcb840af216d0fc60f4c" offset="0x000000"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="bugslife">
 		<description>A Bug's Life</description>
 		<year>199?</year>
@@ -30764,9 +30809,10 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="chinf3">
-		<description>Chinese Fighter III (Chi)</description>
+		<description>Tenchi wo Kurau III - Sanguo Wai Chuan - Chinese Fighter (Chi)</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
+		<info name="alt_title" value="天地を喰らうⅢ三国外伝"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_chinf3"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -30827,7 +30873,9 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	<software name="huanle">
 		<description>Huan Le Tao Qi Shu - Smart Mouse (Chi)</description>
 		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
+		<publisher>Ming</publisher>
+		<info name="serial" value="GM-95401"/>
+		<info name="alt_title" value="歡樂淘氣鼠"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_smouse"/>
 			<dataarea name="rom" width="16" endianness="big" size="524288">
@@ -30874,9 +30922,11 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="supmagic">
-		<description>Linghuan Daoshi Super Magician (Chi)</description>
+		<description>Ling Huan Dao Shi - Super Magician (Chi)</description>
 		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
+		<publisher>Ming</publisher>
+		<info name="serial" value="GM-95402"/>
+		<info name="alt_title" value="靈幻道士"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_elfwor"/>
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
@@ -30911,10 +30961,11 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="majian">
-		<description>Ma Jiang Qing Ren - Ji Ma Jiang Zhi (Chi)</description>
+	<software name="majianqr">
+		<description>Ji Ma Jiang Zhi - Ma Jiang Qing Ren (Chi)</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
+		<info name="alt_title" value="姬麻將之 麻將情人"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_mjlov"/>
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
@@ -30923,10 +30974,11 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="majiana" cloneof="majian">
+	<software name="majianqra" cloneof="majianqr">
 		<description>Ma Jiang Qing Ren - Ji Ma Jiang Zhi (Chi, Alt)</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
+		<info name="alt_title" value="姬麻將之 麻將情人"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_mjlov"/>
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
@@ -31056,10 +31108,11 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="mjclub">
-		<description>Super Mahjong Club</description>
-		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
+	<software name="mhpoker">
+		<description>Du Shen Zhi Meng Huan Puke</description>
+		<year>1995</year>
+		<publisher>Creaton</publisher>
+		<info name="alt_title" value="赌神之梦幻扑克"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_mjlov"/>
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
@@ -31105,9 +31158,10 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="redcliff">
-		<description>The Battle of Red Cliffs - Romance of the Three Kingdoms</description>
+		<description>San Guo Yan Yi - Huo Shao Chi Bi (Tw)</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
+		<info name="alt_title" value="三國演義 火燒赤壁"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_redcl"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097158">
@@ -31117,9 +31171,10 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="redcliffa" cloneof="redcliff">
-		<description>The Battle of Red Cliffs - Romance of the Three Kingdoms (Hacked out Protection?)</description>
+		<description>San Guo Yan Yi - Huo Shao Chi Bi (Tw, Hacked out Protection?)</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
+		<info name="alt_title" value="三國演義 火燒赤壁"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="the battle of red cliffs (unl).bin" size="2097152" crc="63eca090" sha1="648c04365610084d76c9a2b1b0b07031ca84897d" offset="00000"/>
@@ -31143,10 +31198,11 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 
 <!-- Dump with CRC a2ef16de is hacked to bypass protection. If you found it on a real cart, please let us know. -->
 	<software name="tbolt2">
-		<description>Thunderbolt II (Unl)</description>
+		<description>Lei Dian II - Thunderbolt II (Unl)</description>
 		<year>199?</year>
 		<publisher>Sun Green</publisher>
-		<info name="alt_title" value="雷電伝説II"/>
+		<info name="serial" value="GM-95201"/>
+		<info name="alt_title" value="雷電伝説II ~ Lei Dian Chuan Shuo II (Box) / 雷電II"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_smouse"/>
 			<dataarea name="rom" width="16" endianness="big" size="524288">
@@ -31227,10 +31283,10 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="suppoker">
-		<description>Super Poker (Chi)</description>
+		<description>Chaoji Puke (Tw)</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
-		<info name="alt_title" value="Cha Oji Pu Ke"/>
+		<info name="alt_title" value="超級撲克 ~ Super Poker"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_smouse"/>
 			<dataarea name="rom" width="16" endianness="big" size="4194304">
@@ -31239,12 +31295,26 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
+	<software name="cjmjclub">
+		<description>Chaoji Majiang Club (Tw)</description>
+		<year>1995</year>
+		<publisher>Creaton</publisher>
+		<info name="alt_title" value="超級麻將 ~ Super Majong Club"/>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_cjmjclub"/>
+			<dataarea name="rom" width="16" endianness="big" size="1048576">
+				<rom name="supermajonclubvers0000.bin" size="1048576" crc="2b4b40e3" sha1="48017a7fd32593e6932756db20a4bab6228693e7" offset="0x000000"/>
+			</dataarea>
+		</part>
+	</software>
+
 <!-- Are these unprotected versions legit? or were they hacked to work with emus? -->
 
 	<software name="chinf3a" cloneof="chinf3">
-		<description>Chinese Fighter III (Chi, Unprotected?)</description>
+		<description>Tenchi wo Kurau III - Sanguo Wai Chuan - Chinese Fighter (Chi, Unprotected?)</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
+		<info name="alt_title" value="天地を喰らうⅢ三国外伝"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="chinese fighter iii (unl, alt).bin" size="2097152" crc="6f98247d" sha1="cc212b1564dc7c73ffdc55f9fde3269a83fee399" offset="0x000000"/>
@@ -31296,6 +31366,19 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="524288">
 				<rom name="bomboy (unl).bin" size="524288" crc="065d2019" sha1="206fff31bccbb9a973de95c9ae780acb462548dd" offset="0x000000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jujimj2">
+		<description>Ju Ji Ma Jiang II</description>
+		<year>199?</year>
+		<publisher>Sun Green</publisher>
+		<info name="serial" value="GM-95001"/>
+		<info name="alt_title" value="究極麻將II"/>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="1048576">
+				<rom name="pretty girl mahjongg (Ch).bin" size="1048576" crc="69f24500" sha1="0b4f63b8de2dcc4359a26c3ff21f910f206b6110" offset="0x000000"/>
 			</dataarea>
 		</part>
 	</software>
@@ -31374,6 +31457,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<description>Magic Bubble</description>
 		<year>1993</year>
 		<publisher>C&amp;E</publisher>
+		<info name="alt_title" value="魔法氣泡 ~ Mo Fa Qi Pao (Cart)"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="524288">
 				<rom name="magic_bubble.bin" size="524288" crc="3ec61dc1" sha1="134086c458e20eee1ab614e2df64083942311e8c" offset="0x000000"/>
@@ -31385,6 +31469,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<description>Magic Bubble (Alt)</description>
 		<year>1993</year>
 		<publisher>C&amp;E</publisher>
+		<info name="alt_title" value="魔法氣泡 ~ Mo Fa Qi Pao (Cart)"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="524288">
 				<rom name="magic bubble [a1].bin" size="524288" crc="503e0718" sha1="de8037a8cea321ca3f0c03b7a4c36b9fa3b67be2" offset="0x000000"/>

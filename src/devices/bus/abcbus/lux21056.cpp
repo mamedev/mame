@@ -71,6 +71,7 @@
 
 */
 
+#include "emu.h"
 #include "lux21056.h"
 #include "bus/scsi/s1410.h"
 
@@ -93,7 +94,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type LUXOR_55_21056 = &device_creator<luxor_55_21056_device>;
+DEFINE_DEVICE_TYPE(LUXOR_55_21056, luxor_55_21056_device, "lux21056", "Luxor 55 21056")
 
 
 //-------------------------------------------------
@@ -122,7 +123,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *luxor_55_21056_device::device_rom_region() const
+const tiny_rom_entry *luxor_55_21056_device::device_rom_region() const
 {
 	return ROM_NAME( luxor_55_21056 );
 }
@@ -239,11 +240,12 @@ WRITE_LINE_MEMBER( luxor_55_21056_device::write_sasi_msg )
 	m_sasi_msg = state;
 }
 
+
 //-------------------------------------------------
-//  MACHINE_DRIVER( luxor_55_21056 )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( luxor_55_21056 )
+MACHINE_CONFIG_MEMBER( luxor_55_21056_device::device_add_mconfig )
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_8MHz/2)
 	MCFG_CPU_PROGRAM_MAP(luxor_55_21056_mem)
 	MCFG_CPU_IO_MAP(luxor_55_21056_io)
@@ -269,17 +271,6 @@ static MACHINE_CONFIG_FRAGMENT( luxor_55_21056 )
 	MCFG_SCSI_OUTPUT_LATCH_ADD("sasi_data_out", SASIBUS_TAG)
 	MCFG_DEVICE_ADD("sasi_data_in", INPUT_BUFFER, 0)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor luxor_55_21056_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( luxor_55_21056 );
-}
 
 
 //-------------------------------------------------
@@ -337,8 +328,8 @@ ioport_constructor luxor_55_21056_device::device_input_ports() const
 //  luxor_55_21056_device - constructor
 //-------------------------------------------------
 
-luxor_55_21056_device::luxor_55_21056_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, LUXOR_55_21056, "Luxor 55 21056", tag, owner, clock, "lux21056", __FILE__),
+luxor_55_21056_device::luxor_55_21056_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, LUXOR_55_21056, tag, owner, clock),
 		device_abcbus_card_interface(mconfig, *this),
 		m_maincpu(*this, Z80_TAG),
 		m_dma(*this, Z80DMA_TAG),
@@ -405,7 +396,7 @@ void luxor_55_21056_device::device_reset()
 //  abcbus_cs -
 //-------------------------------------------------
 
-void luxor_55_21056_device::abcbus_cs(UINT8 data)
+void luxor_55_21056_device::abcbus_cs(uint8_t data)
 {
 	m_cs = (data == m_s1->read());
 }
@@ -415,9 +406,9 @@ void luxor_55_21056_device::abcbus_cs(UINT8 data)
 //  abcbus_stat -
 //-------------------------------------------------
 
-UINT8 luxor_55_21056_device::abcbus_stat()
+uint8_t luxor_55_21056_device::abcbus_stat()
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	if (m_cs)
 	{
@@ -433,9 +424,9 @@ UINT8 luxor_55_21056_device::abcbus_stat()
 //  abcbus_inp -
 //-------------------------------------------------
 
-UINT8 luxor_55_21056_device::abcbus_inp()
+uint8_t luxor_55_21056_device::abcbus_inp()
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	if (m_cs && !STAT_DIR)
 	{
@@ -452,7 +443,7 @@ UINT8 luxor_55_21056_device::abcbus_inp()
 //  abcbus_out -
 //-------------------------------------------------
 
-void luxor_55_21056_device::abcbus_out(UINT8 data)
+void luxor_55_21056_device::abcbus_out(uint8_t data)
 {
 	if (m_cs)
 	{
@@ -467,7 +458,7 @@ void luxor_55_21056_device::abcbus_out(UINT8 data)
 //  abcbus_c1 -
 //-------------------------------------------------
 
-void luxor_55_21056_device::abcbus_c1(UINT8 data)
+void luxor_55_21056_device::abcbus_c1(uint8_t data)
 {
 	if (m_cs)
 	{
@@ -481,7 +472,7 @@ void luxor_55_21056_device::abcbus_c1(UINT8 data)
 //  abcbus_c3 -
 //-------------------------------------------------
 
-void luxor_55_21056_device::abcbus_c3(UINT8 data)
+void luxor_55_21056_device::abcbus_c3(uint8_t data)
 {
 	if (m_cs)
 	{
@@ -511,7 +502,7 @@ READ8_MEMBER( luxor_55_21056_device::sasi_status_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	data |= m_rdy ^ STAT_DIR;
 
@@ -543,7 +534,7 @@ WRITE8_MEMBER( luxor_55_21056_device::stat_w )
 
 READ8_MEMBER( luxor_55_21056_device::out_r )
 {
-	UINT8 data = m_out;
+	uint8_t data = m_out;
 
 	if (STAT_DIR && m_rdy) set_rdy(!m_rdy);
 
@@ -569,7 +560,7 @@ WRITE8_MEMBER( luxor_55_21056_device::inp_w )
 
 READ8_MEMBER( luxor_55_21056_device::sasi_data_r )
 {
-	UINT8 data = m_sasi_data_in->read();
+	uint8_t data = m_sasi_data_in->read();
 
 	m_sasibus->write_ack(!m_sasi_req);
 

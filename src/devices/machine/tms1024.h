@@ -6,30 +6,21 @@
 
 */
 
-#ifndef _TMS1024_H_
-#define _TMS1024_H_
+#ifndef MAME_MACHINE_TMS1024_H
+#define MAME_MACHINE_TMS1024_H
 
-#include "emu.h"
+#pragma once
+
 
 
 // ports setup
 
 // 4-bit ports (3210 = DCBA)
 // valid ports: 4-7 for TMS1024, 1-7 for TMS1025
-#define MCFG_TMS1024_WRITE_PORT_CB(X, _devcb) \
-	tms1024_device::set_write_port##X##_callback(*device, DEVCB_##_devcb);
-
-enum
-{
-	TMS1024_PORT1 = 0,
-	TMS1024_PORT2,
-	TMS1024_PORT3,
-	TMS1024_PORT4,
-	TMS1024_PORT5,
-	TMS1024_PORT6,
-	TMS1024_PORT7
-};
-
+#define MCFG_TMS1025_READ_PORT_CB(X, cb) \
+		devcb = &tms1024_device::set_read_port_callback<(tms1024_device::X)>(*device, (DEVCB_##cb));
+#define MCFG_TMS1025_WRITE_PORT_CB(X, cb) \
+		devcb = &tms1024_device::set_write_port_callback<(tms1024_device::X)>(*device, (DEVCB_##cb));
 
 // pinout reference
 
@@ -53,8 +44,8 @@ enum
                                          A5 15 |           | 26 D6
                                          B5 16 |           | 25 C6
      CE: Chip Enable                     C5 17 |           | 24 B6
-     MS: Master S.?                      D5 18 |           | 23 A6
-    STD: STrobe Data?                    A2 19 |           | 22 D2
+     MS: Mode Select                     D5 18 |           | 23 A6
+    STD: STrobe Data                     A2 19 |           | 22 D2
       S: Select                          B2 20 |___________| 21 C2
       H: Hold?
 
@@ -64,47 +55,61 @@ enum
 class tms1024_device : public device_t
 {
 public:
-	tms1024_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	tms1024_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	enum
+	{
+		PORT1 = 0,
+		PORT2,
+		PORT3,
+		PORT4,
+		PORT5,
+		PORT6,
+		PORT7
+	};
+
+	tms1024_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// static configuration helpers
-	template<class _Object> static devcb_base &set_write_port1_callback(device_t &device, _Object object) { return downcast<tms1024_device &>(device).m_write_port1.set_callback(object); }
-	template<class _Object> static devcb_base &set_write_port2_callback(device_t &device, _Object object) { return downcast<tms1024_device &>(device).m_write_port2.set_callback(object); }
-	template<class _Object> static devcb_base &set_write_port3_callback(device_t &device, _Object object) { return downcast<tms1024_device &>(device).m_write_port3.set_callback(object); }
-	template<class _Object> static devcb_base &set_write_port4_callback(device_t &device, _Object object) { return downcast<tms1024_device &>(device).m_write_port4.set_callback(object); }
-	template<class _Object> static devcb_base &set_write_port5_callback(device_t &device, _Object object) { return downcast<tms1024_device &>(device).m_write_port5.set_callback(object); }
-	template<class _Object> static devcb_base &set_write_port6_callback(device_t &device, _Object object) { return downcast<tms1024_device &>(device).m_write_port6.set_callback(object); }
-	template<class _Object> static devcb_base &set_write_port7_callback(device_t &device, _Object object) { return downcast<tms1024_device &>(device).m_write_port7.set_callback(object); }
+	template <unsigned N, class Object> static devcb_base &set_read_port_callback(device_t &device, Object &&cb)
+	{
+		return downcast<tms1024_device &>(device).m_read_port[N].set_callback(std::forward<Object>(cb));
+	}
+	template <unsigned N, class Object> static devcb_base &set_write_port_callback(device_t &device, Object &&cb)
+	{
+		return downcast<tms1024_device &>(device).m_write_port[N].set_callback(std::forward<Object>(cb));
+	}
 
 	DECLARE_WRITE8_MEMBER(write_h);
+	DECLARE_READ8_MEMBER(read_h);
 	DECLARE_WRITE8_MEMBER(write_s);
 	DECLARE_WRITE_LINE_MEMBER(write_std);
+	DECLARE_WRITE_LINE_MEMBER(write_ms);
 
 protected:
+	tms1024_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_reset() override;
 
-	UINT8 m_h;      // 4-bit data latch
-	UINT8 m_s;      // 3-bit port select
-	UINT8 m_std;    // strobe pin
+	u8 m_h;      // 4-bit data latch
+	u8 m_s;      // 3-bit port select
+	u8 m_std;    // strobe pin
+	u8 m_ms;     // mode select pin, default to read mode
 
 	// callbacks
-	devcb_write8 m_write_port1, m_write_port2, m_write_port3, m_write_port4, m_write_port5, m_write_port6, m_write_port7;
-	devcb_write8 *m_write_port[7];
+	devcb_read8 m_read_port[7];
+	devcb_write8 m_write_port[7];
 };
 
 
 class tms1025_device : public tms1024_device
 {
 public:
-	tms1025_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tms1025_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
 
 
-extern const device_type TMS1024;
-extern const device_type TMS1025;
+DECLARE_DEVICE_TYPE(TMS1024, tms1024_device)
+DECLARE_DEVICE_TYPE(TMS1025, tms1025_device)
 
-
-#endif /* _TMS1024_H_ */
+#endif // MAME_MACHINE_TMS1024_H

@@ -14,8 +14,10 @@
 
 ***************************************************************************/
 
-#ifndef __MAME_UTIL_VECSTREAM_H__
-#define __MAME_UTIL_VECSTREAM_H__
+#ifndef MAME_UTIL_VECSTREAM_H
+#define MAME_UTIL_VECSTREAM_H
+
+#pragma once
 
 #include <algorithm>
 #include <cassert>
@@ -31,6 +33,7 @@
 #include <vector>
 
 namespace util {
+
 template <typename CharT, typename Traits = std::char_traits<CharT>, typename Allocator = std::allocator<CharT> >
 class basic_vectorbuf : public std::basic_streambuf<CharT, Traits>
 {
@@ -143,7 +146,7 @@ public:
 	}
 
 protected:
-	pos_type seekoff(off_type off, std::ios_base::seekdir dir, std::ios_base::openmode which = std::ios_base::in | std::ios_base::out) override
+	virtual pos_type seekoff(off_type off, std::ios_base::seekdir dir, std::ios_base::openmode which = std::ios_base::in | std::ios_base::out) override
 	{
 		bool const in(which & std::ios_base::in);
 		bool const out(which & std::ios_base::out);
@@ -393,6 +396,13 @@ void swap(basic_ovectorstream<CharT, Traits, Allocator> &a, basic_ovectorstream<
 template <typename CharT, typename Traits, typename Allocator>
 void swap(basic_vectorstream<CharT, Traits, Allocator> &a, basic_vectorstream<CharT, Traits, Allocator> &b) { a.swap(b); }
 
+extern template class basic_ivectorstream<char>;
+extern template class basic_ivectorstream<wchar_t>;
+extern template class basic_ovectorstream<char>;
+extern template class basic_ovectorstream<wchar_t>;
+extern template class basic_vectorstream<char>;
+extern template class basic_vectorstream<wchar_t>;
+
 } // namespace util
 
-#endif // __MAME_UTIL_VECSTREAM_H__
+#endif // MAME_UTIL_VECSTREAM_H

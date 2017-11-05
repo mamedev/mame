@@ -225,9 +225,9 @@ field:      X address   D           Function    Y address   D (part 2)
     n last bits of a word, leaving other bits in memory unaffected.
 
     The LSBits are transferred first, since this enables to perform bit-per-bit add and
-    substract.  Otherwise, the CPU would need an additionnal register to store the second
+    substract.  Otherwise, the CPU would need an additional register to store the second
     operand, and it would be probably slower, since the operation could only
-    take place after all the data has been transfered.
+    take place after all the data has been transferred.
 
     Memory operations are synchronous with 2 clocks found on the memory controller:
     * word clock: a pulse on each word boundary (3750rpm*32 -> 2kHz)
@@ -294,7 +294,7 @@ field:      X address   D           Function    Y address   D (part 2)
       although it appears that this delay is not applied when X is not read (cf cross-track
       B in Booth p. 49).
         However, and here comes the wacky part, analysis of Booth p. 55 shows that
-      no additionnal delay is caused by an X instruction having its X operand
+      no additional delay is caused by an X instruction having its X operand
       on another track.  Maybe, just maybe, this is related to the fact that X does not
       need to take the word count into account, any word in track is as good as any (yet,
       this leaves the question of why this optimization could not be applied to vector
@@ -326,19 +326,19 @@ field:      X address   D           Function    Y address   D (part 2)
 */
 
 #include "emu.h"
-#include "debugger.h"
 #include "apexc.h"
+#include "debugger.h"
 
 
-const device_type APEXC = &device_creator<apexc_cpu_device>;
+DEFINE_DEVICE_TYPE(APEXC, apexc_cpu_device, "apexc_cpu", "APEXC")
 
 
 /* decrement ICount by n */
 #define DELAY(n)    {m_icount -= (n); m_current_word = (m_current_word + (n)) & 0x1f;}
 
 
-apexc_cpu_device::apexc_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: cpu_device(mconfig, APEXC, "APEXC", tag, owner, clock, "apexc_cpu", __FILE__)
+apexc_cpu_device::apexc_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: cpu_device(mconfig, APEXC, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_BIG, 32, 15, 0)
 	, m_io_config("io", ENDIANNESS_BIG, 8, 1, 0)
 	, m_a(0)
@@ -348,8 +348,15 @@ apexc_cpu_device::apexc_cpu_device(const machine_config &mconfig, const char *ta
 	, m_working_store(1)
 	, m_running(0)
 	, m_pc(0)
-	, m_ml_full(0)
 {
+}
+
+device_memory_interface::space_config_vector apexc_cpu_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config),
+		std::make_pair(AS_IO,      &m_io_config)
+	};
 }
 
 
@@ -369,7 +376,7 @@ apexc_cpu_device::apexc_cpu_device(const machine_config &mconfig, const char *ta
 
 /* compute complete word address (i.e. translate a logical track address (expressed
 in current working store) to an absolute track address) */
-UINT32 apexc_cpu_device::effective_address(UINT32 address)
+uint32_t apexc_cpu_device::effective_address(uint32_t address)
 {
 	if (address & 0x200)
 	{
@@ -380,9 +387,9 @@ UINT32 apexc_cpu_device::effective_address(UINT32 address)
 }
 
 /* read word */
-UINT32 apexc_cpu_device::word_read(UINT32 address, UINT32 special)
+uint32_t apexc_cpu_device::word_read(uint32_t address, uint32_t special)
 {
-	UINT32 result;
+	uint32_t result;
 
 	/* compute absolute track address */
 	address = effective_address(address);
@@ -408,7 +415,7 @@ UINT32 apexc_cpu_device::word_read(UINT32 address, UINT32 special)
 }
 
 /* write word (or part of a word, according to mask) */
-void apexc_cpu_device::word_write(UINT32 address, UINT32 data, UINT32 mask)
+void apexc_cpu_device::word_write(uint32_t address, uint32_t data, uint32_t mask)
 {
 	/* compute absolute track address */
 	address = effective_address(address);
@@ -430,12 +437,12 @@ void apexc_cpu_device::word_write(UINT32 address, UINT32 data, UINT32 mask)
     no address is used, these functions just punch or read 5 bits
 */
 
-UINT8 apexc_cpu_device::papertape_read()
+uint8_t apexc_cpu_device::papertape_read()
 {
 	return m_io->read_byte(0) & 0x1f;
 }
 
-void apexc_cpu_device::papertape_punch(UINT8 data)
+void apexc_cpu_device::papertape_punch(uint8_t data)
 {
 	m_io->write_byte(0, data);
 }
@@ -447,11 +454,11 @@ void apexc_cpu_device::papertape_punch(UINT8 data)
 /*
     set the memory location (i.e. address) register, and compute the associated delay
 */
-UINT32 apexc_cpu_device::load_ml(UINT32 address, UINT32 vector)
+uint32_t apexc_cpu_device::load_ml(uint32_t address, uint32_t vector)
 {
 	int delay;
 
-	/* additionnal delay appears if we switch tracks */
+	/* additional delay appears if we switch tracks */
 	if (((m_ml & 0x3E0) != (address & 0x3E0)) /*|| vector*/)
 		delay = 6;  /* if tracks are different, delay to allow for track switching */
 	else
@@ -497,7 +504,6 @@ void apexc_cpu_device::execute()
 	function = (m_cr >> 7) & 0x1F;
 	c6 = (m_cr >> 1) & 0x3F;
 	vector = m_cr & 1;
-	m_pc = y<<2;
 
 	function &= 0x1E;   /* this is a mere guess - the LSBit is reserved for future additions */
 
@@ -524,7 +530,7 @@ void apexc_cpu_device::execute()
 		case 0:
 			/* stop */
 
-			m_running = FALSE;
+			m_running = false;
 
 			/* BTW, I don't know whether stop loads y into ml or not, and whether
 			subsequent fetch is done */
@@ -536,14 +542,14 @@ void apexc_cpu_device::execute()
 			the 5 bits must be cleared initially, an OR kind of makes sense */
 			m_r |= papertape_read() << 27;
 			delay2 = 32;    /* no idea whether this should be counted as an absolute delay
-                            or as a value in delay2 */
+			                or as a value in delay2 */
 			break;
 
 		case 4:
 			/* P */
 			papertape_punch((m_r >> 27) & 0x1f);
 			delay2 = 32;    /* no idea whether this should be counted as an absolute delay
-                            or as a value in delay2 */
+			                or as a value in delay2 */
 			break;
 
 		case 6:
@@ -553,7 +559,6 @@ void apexc_cpu_device::execute()
 			{
 				/* load ml with X */
 				delay1 = load_ml(x, vector);
-				m_pc = x<<2;
 				/* burn pre-fetch delay if needed */
 				if (delay1)
 				{
@@ -599,7 +604,7 @@ void apexc_cpu_device::execute()
 				m_r >>= 1;
 				if (m_a & 1)
 					m_r |= 0x80000000UL;
-				m_a = ((INT32) m_a) >> 1;
+				m_a = ((int32_t) m_a) >> 1;
 
 				c6 = (c6+1) & 0x3f;
 			}
@@ -648,7 +653,7 @@ void apexc_cpu_device::execute()
 					m_r >>= 1;
 					if (m_a & 1)
 						m_r |= 0x80000000UL;
-					m_a = ((INT32) m_a) >> 1;
+					m_a = ((int32_t) m_a) >> 1;
 				}
 			}
 
@@ -687,7 +692,7 @@ void apexc_cpu_device::execute()
 			/* R_(1-n)(x) & R_(n-32)(x) */
 
 			{
-				UINT32 mask;
+				uint32_t mask;
 
 				if (c6 & 0x20)
 					mask = 0xFFFFFFFFUL << (64 - c6);
@@ -706,7 +711,7 @@ void apexc_cpu_device::execute()
 			/* A_(1-n)(x) & A_(n-32)(x) */
 
 			{
-				UINT32 mask;
+				uint32_t mask;
 
 				if (c6 & 0x20)
 					mask = 0xFFFFFFFFUL << (64 - c6);
@@ -723,7 +728,7 @@ void apexc_cpu_device::execute()
 			/* S(x) */
 			m_working_store = (x >> 5) & 0xf;   /* or is it (x >> 6)? */
 			DELAY(32);  /* no idea what the value is...  All I know is that it takes much
-                        more time than track switching (which takes 6 cycles) */
+			            more time than track switching (which takes 6 cycles) */
 			break;
 		}
 		if (vector)
@@ -749,6 +754,8 @@ void apexc_cpu_device::execute()
 	in order not to load ml with Y) */
 special_fetch:
 
+	m_pc = effective_address(m_ml) << 2;
+
 	/* fetch current instruction into control register */
 	m_cr = word_read(m_ml, 0);
 }
@@ -771,55 +778,44 @@ void apexc_cpu_device::device_start()
 	state_add( APEXC_CR, "CR", m_cr ).formatstr("%08X");
 	state_add( APEXC_A, "A", m_a ).formatstr("%08X");
 	state_add( APEXC_R, "R", m_r ).formatstr("%08X");
-	state_add( APEXC_ML, "ML", m_ml ).mask(0xfff).formatstr("%03X");
-	state_add( APEXC_WS, "WS", m_working_store ).mask(0x01);
+	state_add( APEXC_ML, "ML", m_ml ).mask(0x3ff).callimport().formatstr("%03X");
+	state_add( APEXC_WS, "WS", m_working_store ).mask(0xf).callimport();
 	state_add( APEXC_STATE, "CPU state", m_running ).mask(0x01);
-	state_add( APEXC_PC, "PC", m_pc ).callimport().callexport().formatstr("%03X");
-	state_add( APEXC_ML_FULL, "ML_FULL", m_ml_full ).callimport().callexport().noshow();
+	state_add( STATE_GENPC, "PC", m_pc ).mask(0x7ffc).callimport().formatstr("%04X");
+	state_add( STATE_GENPCBASE, "CURPC", m_pc ).mask(0x7ffc).callimport().noshow();
 
 	m_icountptr = &m_icount;
 }
 
 
+//-------------------------------------------------
+//  state_import - import state into the device,
+//  after it has been set
+//-------------------------------------------------
+
 void apexc_cpu_device::state_import(const device_state_entry &entry)
 {
 	switch (entry.index())
 	{
-		case APEXC_PC:
+		case STATE_GENPC:
+		case STATE_GENPCBASE:
 			/* keep address 9 LSBits - 10th bit depends on whether we are accessing the permanent
 			track group or a switchable one */
-			m_ml = m_pc & 0x1ff;
-			if (m_pc & 0x1e00)
-			{   /* we are accessing a switchable track group */
+			m_ml = (m_pc >> 2) & 0x1ff;
+			if ((m_pc >> 2) & 0x1e00)
+			{
+				/* we are accessing a switchable track group */
 				m_ml |= 0x200;  /* set 10th bit */
-
-				if (((m_pc >> 9) & 0xf) != m_working_store)
-				{   /* we need to do a store switch */
-					m_working_store = ((m_pc >> 9) & 0xf);
-				}
+				m_working_store = (m_pc >> 11) & 0xf;
 			}
+
+			/* fetch current instruction into control register */
+			m_cr = m_program->read_dword(m_pc);
 			break;
-	}
-}
 
-
-void apexc_cpu_device::state_export(const device_state_entry &entry)
-{
-	switch (entry.index())
-	{
-		case APEXC_ML_FULL:
-			m_ml_full = effective_address(m_ml);
-			break;
-	}
-}
-
-
-void apexc_cpu_device::state_string_export(const device_state_entry &entry, std::string &str) const
-{
-	switch (entry.index())
-	{
-		case STATE_GENFLAGS:
-			str = string_format("%c", m_running ? 'R' : 'S');
+		case APEXC_ML:
+		case APEXC_WS:
+			m_pc = effective_address(m_ml) << 2;
 			break;
 	}
 }
@@ -834,8 +830,8 @@ void apexc_cpu_device::device_reset()
 
 	/* next two lines are just the product of my bold fantasy */
 	m_cr = 0;               /* first instruction executed will be a stop */
-	m_running = TRUE;       /* this causes the CPU to load the instruction at 0/0,
-                               which enables easy booting (just press run on the panel) */
+	m_running = true;       /* this causes the CPU to load the instruction at 0/0,
+	                           which enables easy booting (just press run on the panel) */
 	m_a = 0;
 	m_r = 0;
 	m_pc = 0;
@@ -859,8 +855,8 @@ void apexc_cpu_device::execute_run()
 }
 
 
-offs_t apexc_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t apexc_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( apexc );
-	return CPU_DISASSEMBLE_NAME(apexc)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(apexc)(this, stream, pc, oprom, opram, options);
 }

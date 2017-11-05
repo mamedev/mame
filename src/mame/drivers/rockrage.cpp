@@ -50,12 +50,15 @@ Notes:
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/rockrage.h"
+#include "includes/konamipt.h"
+
 #include "cpu/m6809/m6809.h"
 #include "cpu/m6809/hd6309.h"
 #include "machine/watchdog.h"
-#include "sound/2151intf.h"
-#include "includes/rockrage.h"
-#include "includes/konamipt.h"
+#include "sound/ym2151.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 INTERRUPT_GEN_MEMBER(rockrage_state::rockrage_interrupt)
@@ -122,6 +125,11 @@ static ADDRESS_MAP_START( rockrage_sound_map, AS_PROGRAM, 8, rockrage_state )
 	AM_RANGE(0x6000, 0x6001) AM_DEVREADWRITE("ymsnd", ym2151_device,read,write)         /* YM 2151 */
 	AM_RANGE(0x7000, 0x77ff) AM_RAM                                             /* RAM */
 	AM_RANGE(0x8000, 0xffff) AM_ROM                                             /* ROM */
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( rockrage_vlm_map, 0, 8, rockrage_state )
+	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -225,7 +233,7 @@ GFXDECODE_END
 
 void rockrage_state::machine_start()
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	m_rombank->configure_entries(0, 8, &ROM[0x10000], 0x2000);
 
@@ -237,7 +245,7 @@ void rockrage_state::machine_reset()
 	m_vreg = 0;
 }
 
-static MACHINE_CONFIG_START( rockrage, rockrage_state )
+static MACHINE_CONFIG_START( rockrage )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD6309, 3000000*4)      /* 24MHz/8 */
@@ -285,6 +293,7 @@ static MACHINE_CONFIG_START( rockrage, rockrage_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.60)
 
 	MCFG_SOUND_ADD("vlm", VLM5030, 3579545)
+	MCFG_DEVICE_ADDRESS_MAP(0, rockrage_vlm_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.60)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.60)
 MACHINE_CONFIG_END
@@ -382,6 +391,6 @@ ROM_END
 ***************************************************************************/
 
 //    YEAR, NAME,      PARENT,   MACHINE,  INPUT,    INIT,MONITOR,COMPANY,FULLNAME,FLAGS
-GAME( 1986, rockrage,  0,        rockrage, rockrage, driver_device, 0,   ROT0,   "Konami", "Rock'n Rage (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, rockragea, rockrage, rockrage, rockrage, driver_device, 0,   ROT0,   "Konami", "Rock'n Rage (prototype?)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, rockragej, rockrage, rockrage, rockrage, driver_device, 0,   ROT0,   "Konami", "Koi no Hotrock (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, rockrage,  0,        rockrage, rockrage, rockrage_state, 0,   ROT0,   "Konami", "Rock'n Rage (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, rockragea, rockrage, rockrage, rockrage, rockrage_state, 0,   ROT0,   "Konami", "Rock'n Rage (prototype?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, rockragej, rockrage, rockrage, rockrage, rockrage_state, 0,   ROT0,   "Konami", "Koi no Hotrock (Japan)", MACHINE_SUPPORTS_SAVE )

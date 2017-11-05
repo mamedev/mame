@@ -9,8 +9,10 @@
 
 ***************************************************************************/
 
-#ifndef __H8_ADC_H__
-#define __H8_ADC_H__
+#ifndef MAME_CPU_H8_H8_ADC_H
+#define MAME_CPU_H8_H8_ADC_H
+
+#pragma once
 
 #include "h8.h"
 #include "h8_intc.h"
@@ -39,8 +41,6 @@
 
 class h8_adc_device : public device_t {
 public:
-	h8_adc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-
 	void set_info(const char *intc_tag, int vect);
 
 	DECLARE_READ8_MEMBER(addr8_r);
@@ -52,9 +52,11 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(adtrg_w);
 
 	void set_suspend(bool suspend);
-	UINT64 internal_update(UINT64 current_time);
+	uint64_t internal_update(uint64_t current_time);
 
 protected:
+	h8_adc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	required_device<h8_device> cpu;
 	h8_intc_device *intc;
 	address_space *io;
@@ -85,24 +87,24 @@ protected:
 		COUNTED = 64
 	};
 
-	UINT16 addr[8], buf[2];
-	UINT8 adcsr, adcr;
+	uint16_t addr[8], buf[2];
+	uint8_t adcsr, adcr;
 	int register_mask;
 	int trigger, start_mode, start_channel, end_channel, start_count;
 	bool suspend_on_interrupt, analog_power_control;
 	int mode, channel, count;
 	bool analog_powered, adtrg;
-	UINT64 next_event;
+	uint64_t next_event;
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
 	void sampling();
 	void start_conversion();
-	void conversion_wait(bool first, bool poweron, UINT64 current_time = 0);
+	void conversion_wait(bool first, bool poweron, uint64_t current_time = 0);
 	void buffer_value(int port, int buffer = 0);
 	void commit_value(int reg, int buffer = 0);
-	void timeout(UINT64 current_time);
+	void timeout(uint64_t current_time);
 	void done();
 
 	virtual int conversion_time(bool first, bool poweron) = 0;
@@ -113,7 +115,7 @@ protected:
 
 class h8_adc_3337_device : public h8_adc_device {
 public:
-	h8_adc_3337_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	h8_adc_3337_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	virtual int conversion_time(bool first, bool poweron) override;
@@ -122,7 +124,7 @@ protected:
 
 class h8_adc_3006_device : public h8_adc_device {
 public:
-	h8_adc_3006_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	h8_adc_3006_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	virtual int conversion_time(bool first, bool poweron) override;
@@ -131,7 +133,7 @@ protected:
 
 class h8_adc_2245_device : public h8_adc_device {
 public:
-	h8_adc_2245_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	h8_adc_2245_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	virtual int conversion_time(bool first, bool poweron) override;
@@ -140,7 +142,7 @@ protected:
 
 class h8_adc_2320_device : public h8_adc_device {
 public:
-	h8_adc_2320_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	h8_adc_2320_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	virtual int conversion_time(bool first, bool poweron) override;
@@ -149,7 +151,7 @@ protected:
 
 class h8_adc_2357_device : public h8_adc_device {
 public:
-	h8_adc_2357_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	h8_adc_2357_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	virtual int conversion_time(bool first, bool poweron) override;
@@ -158,7 +160,7 @@ protected:
 
 class h8_adc_2655_device : public h8_adc_device {
 public:
-	h8_adc_2655_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	h8_adc_2655_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	virtual int conversion_time(bool first, bool poweron) override;
@@ -167,11 +169,11 @@ protected:
 	virtual int get_channel_index(int count) override;
 };
 
-extern const device_type H8_ADC_3337;
-extern const device_type H8_ADC_3006;
-extern const device_type H8_ADC_2245;
-extern const device_type H8_ADC_2320;
-extern const device_type H8_ADC_2357;
-extern const device_type H8_ADC_2655;
+DECLARE_DEVICE_TYPE(H8_ADC_3337, h8_adc_3337_device)
+DECLARE_DEVICE_TYPE(H8_ADC_3006, h8_adc_3006_device)
+DECLARE_DEVICE_TYPE(H8_ADC_2245, h8_adc_2245_device)
+DECLARE_DEVICE_TYPE(H8_ADC_2320, h8_adc_2320_device)
+DECLARE_DEVICE_TYPE(H8_ADC_2357, h8_adc_2357_device)
+DECLARE_DEVICE_TYPE(H8_ADC_2655, h8_adc_2655_device)
 
-#endif
+#endif // MAME_CPU_H8_H8_ADC_H

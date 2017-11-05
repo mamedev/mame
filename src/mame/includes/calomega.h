@@ -51,7 +51,7 @@ public:
 	DECLARE_DRIVER_INIT(s903mod);
 	DECLARE_DRIVER_INIT(sys905);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	UINT32 screen_update_calomega(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_calomega(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_PALETTE_INIT(calomega);
 
 protected:
@@ -64,8 +64,8 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_colorram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_colorram;
 
 	optional_ioport m_in0;
 	optional_ioport m_in0_0;
@@ -75,7 +75,7 @@ private:
 	optional_ioport m_frq;
 	optional_ioport m_sw2;
 
-	UINT8 m_tx_line;
+	uint8_t m_tx_line;
 	int m_s903_mux_data;
 	int m_s905_mux_data;
 	tilemap_t *m_bg_tilemap;

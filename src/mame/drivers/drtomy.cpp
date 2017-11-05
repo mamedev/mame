@@ -12,6 +12,8 @@ similar hardware.
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
+#include "screen.h"
+#include "speaker.h"
 
 class drtomy_state : public driver_device
 {
@@ -27,9 +29,9 @@ public:
 		m_palette(*this, "palette") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT16> m_videoram_fg;
-	required_shared_ptr<UINT16> m_videoram_bg;
-	required_shared_ptr<UINT16> m_spriteram;
+	required_shared_ptr<uint16_t> m_videoram_fg;
+	required_shared_ptr<uint16_t> m_videoram_bg;
+	required_shared_ptr<uint16_t> m_spriteram;
 
 	/* video-related */
 	tilemap_t   *m_tilemap_bg;
@@ -45,7 +47,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_drtomy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_drtomy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	required_device<cpu_device> m_maincpu;
 	required_device<okim6295_device> m_oki;
@@ -133,13 +135,13 @@ void drtomy_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect
 
 void drtomy_state::video_start()
 {
-	m_tilemap_bg = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(drtomy_state::get_tile_info_bg),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	m_tilemap_fg = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(drtomy_state::get_tile_info_fg),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_tilemap_bg = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(drtomy_state::get_tile_info_bg),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_tilemap_fg = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(drtomy_state::get_tile_info_fg),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
 	m_tilemap_fg->set_transparent_pen(0);
 }
 
-UINT32 drtomy_state::screen_update_drtomy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t drtomy_state::screen_update_drtomy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_tilemap_bg->draw(screen, bitmap, cliprect, 0, 0);
 	m_tilemap_fg->draw(screen, bitmap, cliprect, 0, 0);
@@ -164,7 +166,7 @@ WRITE16_MEMBER(drtomy_state::drtomy_okibank_w)
 	if (m_oki_bank != (data & 3))
 	{
 		m_oki_bank = data & 3;
-		m_oki->set_bank_base(m_oki_bank * 0x40000);
+		m_oki->set_rom_bank(m_oki_bank);
 	}
 
 	/* unknown bit 2 -> (data & 4) */
@@ -297,7 +299,7 @@ void drtomy_state::machine_reset()
 	m_oki_bank = 0;
 }
 
-static MACHINE_CONFIG_START( drtomy, drtomy_state )
+static MACHINE_CONFIG_START( drtomy )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,24000000/2)          /* ? MHz */
@@ -322,7 +324,7 @@ static MACHINE_CONFIG_START( drtomy, drtomy_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", 26000000/16, OKIM6295_PIN7_LOW)
+	MCFG_OKIM6295_ADD("oki", 26000000/16, PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.8)
 MACHINE_CONFIG_END
 
@@ -353,4 +355,4 @@ ROM_START( drtomy )
 ROM_END
 
 
-GAME( 1993, drtomy, 0, drtomy, drtomy, driver_device, 0, ROT0, "Playmark", "Dr. Tomy", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, drtomy, 0, drtomy, drtomy, drtomy_state, 0, ROT0, "Playmark", "Dr. Tomy", MACHINE_SUPPORTS_SAVE )

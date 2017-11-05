@@ -37,21 +37,26 @@ E I1     Vectored interrupt error
 
 
 #include "emu.h"
-#include "cpu/z8000/z8000.h"
+#include "machine/m20_8086.h"
+#include "machine/m20_kbd.h"
+
+#include "bus/rs232/rs232.h"
 #include "cpu/i86/i86.h"
-#include "video/mc6845.h"
-#include "machine/ram.h"
-#include "machine/wd_fdc.h"
+#include "cpu/z8000/z8000.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
-#include "machine/pit8253.h"
 #include "machine/pic8259.h"
+#include "machine/pit8253.h"
+#include "machine/ram.h"
+#include "machine/wd_fdc.h"
+#include "video/mc6845.h"
+
+#include "screen.h"
+#include "softlist.h"
+
 #include "formats/m20_dsk.h"
 #include "formats/pc_dsk.h"
-#include "machine/m20_kbd.h"
-#include "bus/rs232/rs232.h"
-#include "machine/m20_8086.h"
-#include "softlist.h"
+
 
 class m20_state : public driver_device
 {
@@ -68,7 +73,7 @@ public:
 		m_floppy0(*this, "fd1797:0:5dd"),
 		m_floppy1(*this, "fd1797:1:5dd"),
 		m_apb(*this, "apb"),
-		m_p_videoram(*this, "p_videoram"),
+		m_p_videoram(*this, "videoram"),
 		m_palette(*this, "palette")
 	{
 	}
@@ -79,12 +84,12 @@ public:
 	required_device<i8251_device> m_ttyi8251;
 	required_device<i8255_device> m_i8255;
 	required_device<pic8259_device> m_i8259;
-	required_device<fd1797_t> m_fd1797;
+	required_device<fd1797_device> m_fd1797;
 	required_device<floppy_image_device> m_floppy0;
 	required_device<floppy_image_device> m_floppy1;
 	optional_device<m20_8086_device> m_apb;
 
-	required_shared_ptr<UINT16> m_p_videoram;
+	required_shared_ptr<uint16_t> m_p_videoram;
 	required_device<palette_device> m_palette;
 
 	virtual void machine_start() override;
@@ -102,7 +107,7 @@ public:
 
 private:
 	offs_t m_memsize;
-	UINT8 m_port21;
+	uint8_t m_port21;
 	void install_memory();
 
 public:
@@ -117,14 +122,14 @@ public:
 
 MC6845_UPDATE_ROW( m20_state::update_row )
 {
-	UINT32  *p = &bitmap.pix32(y);
+	uint32_t  *p = &bitmap.pix32(y);
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	int i, j;
 
 	for ( i = 0; i < x_count; i++ )
 	{
-		UINT16 offset = ((ma | (ra << 1)) << 4) + i;
-		UINT16 data = m_p_videoram[ offset ];
+		uint16_t offset = ((ma | (ra << 1)) << 4) + i;
+		uint16_t data = m_p_videoram[ offset ];
 
 		for ( j = 15; j >= 0; j-- )
 		{
@@ -312,13 +317,13 @@ B/W, 128K cards, 3 cards => 512K of memory:
 
 static ADDRESS_MAP_START(m20_program_mem, AS_PROGRAM, 16, m20_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x30000, 0x33fff ) AM_RAM AM_SHARE("p_videoram")
+	AM_RANGE( 0x30000, 0x33fff ) AM_RAM AM_SHARE("videoram")
 	AM_RANGE( 0x40000, 0x41fff ) AM_ROM AM_REGION("maincpu", 0x00000)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(m20_data_mem, AS_DATA, 16, m20_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x30000, 0x33fff ) AM_RAM AM_SHARE("p_videoram")
+	AM_RANGE( 0x30000, 0x33fff ) AM_RAM AM_SHARE("videoram")
 	AM_RANGE( 0x40000, 0x41fff ) AM_ROM AM_REGION("maincpu", 0x00000)
 ADDRESS_MAP_END
 
@@ -326,82 +331,82 @@ ADDRESS_MAP_END
 void m20_state::install_memory()
 {
 	m_memsize = m_ram->size();
-	UINT8 *memptr = m_ram->pointer();
+	uint8_t *memptr = m_ram->pointer();
 	address_space& pspace = m_maincpu->space(AS_PROGRAM);
 	address_space& dspace = m_maincpu->space(AS_DATA);
 
 	/* install mainboard memory (aka DRAM0) */
 
 	/* <0>0000 */
-	pspace.install_readwrite_bank(0x0000, 0x3fff, 0x3fff, 0, "dram0_4000");
-	dspace.install_readwrite_bank(0x0000, 0x3fff, 0x3fff, 0, "dram0_4000");
+	pspace.install_readwrite_bank(0x0000, 0x3fff, 0, "dram0_4000");
+	dspace.install_readwrite_bank(0x0000, 0x3fff, 0, "dram0_4000");
 	/* <0>4000 */
-	pspace.install_readwrite_bank(0x4000, 0x7fff, 0x3fff, 0, "dram0_8000");
+	pspace.install_readwrite_bank(0x4000, 0x7fff, 0, "dram0_8000");
 	/* <0>8000 */
-	pspace.install_readwrite_bank(0x8000, 0xbfff, 0x3fff, 0, "dram0_c000");
+	pspace.install_readwrite_bank(0x8000, 0xbfff, 0, "dram0_c000");
 	/* <0>C000 */
-	pspace.install_readwrite_bank(0xc000, 0xcfff, 0x3fff, 0, "dram0_10000");
+	pspace.install_readwrite_bank(0xc000, 0xcfff, 0, "dram0_10000");
 	/* <1>0000 */
-	pspace.install_readwrite_bank(0x10000, 0x13fff, 0x3fff, 0, "dram0_8000");
-	dspace.install_readwrite_bank(0x10000, 0x13fff, 0x3fff, 0, "dram0_14000");
+	pspace.install_readwrite_bank(0x10000, 0x13fff, 0, "dram0_8000");
+	dspace.install_readwrite_bank(0x10000, 0x13fff, 0, "dram0_14000");
 	/* <1>4000 */
-	pspace.install_readwrite_bank(0x14000, 0x17fff, 0x3fff, 0, "dram0_c000");
-	dspace.install_readwrite_bank(0x14000, 0x17fff, 0x3fff, 0, "dram0_18000");
+	pspace.install_readwrite_bank(0x14000, 0x17fff, 0, "dram0_c000");
+	dspace.install_readwrite_bank(0x14000, 0x17fff, 0, "dram0_18000");
 	/* <1>8000 */
-	pspace.install_readwrite_bank(0x18000, 0x1bfff, 0x3fff, 0, "dram0_10000");
-	dspace.install_readwrite_bank(0x18000, 0x1bfff, 0x3fff, 0, "dram0_1c000");
+	pspace.install_readwrite_bank(0x18000, 0x1bfff, 0, "dram0_10000");
+	dspace.install_readwrite_bank(0x18000, 0x1bfff, 0, "dram0_1c000");
 	/* <1>c000 empty*/
 	/* <2>0000 */
-	pspace.install_readwrite_bank(0x20000, 0x23fff, 0x3fff, 0, "dram0_14000");
-	dspace.install_readwrite_bank(0x20000, 0x23fff, 0x3fff, 0, "dram0_14000");
+	pspace.install_readwrite_bank(0x20000, 0x23fff, 0, "dram0_14000");
+	dspace.install_readwrite_bank(0x20000, 0x23fff, 0, "dram0_14000");
 	/* <2>4000 */
-	pspace.install_readwrite_bank(0x24000, 0x27fff, 0x3fff, 0, "dram0_18000");
-	dspace.install_readwrite_bank(0x24000, 0x27fff, 0x3fff, 0, "dram0_18000");
+	pspace.install_readwrite_bank(0x24000, 0x27fff, 0, "dram0_18000");
+	dspace.install_readwrite_bank(0x24000, 0x27fff, 0, "dram0_18000");
 	/* <2>8000 */
-	pspace.install_readwrite_bank(0x28000, 0x2bfff, 0x3fff, 0, "dram0_1c000");
-	dspace.install_readwrite_bank(0x28000, 0x2bfff, 0x3fff, 0, "dram0_1c000");
+	pspace.install_readwrite_bank(0x28000, 0x2bfff, 0, "dram0_1c000");
+	dspace.install_readwrite_bank(0x28000, 0x2bfff, 0, "dram0_1c000");
 	/* <2>c000 empty*/
 	/* <3>0000 (video buffer)
-	pspace.install_readwrite_bank(0x30000, 0x33fff, 0x3fff, 0, "dram0_0000");
-	dspace.install_readwrite_bank(0x30000, 0x33fff, 0x3fff, 0, "dram0_0000");
+	pspace.install_readwrite_bank(0x30000, 0x33fff, 0, "dram0_0000");
+	dspace.install_readwrite_bank(0x30000, 0x33fff, 0, "dram0_0000");
 	*/
 
 	/* <5>0000 */
-	dspace.install_readwrite_bank(0x50000, 0x53fff, 0x3fff, 0, "dram0_8000");
+	dspace.install_readwrite_bank(0x50000, 0x53fff, 0, "dram0_8000");
 	/* <5>4000 */
-	dspace.install_readwrite_bank(0x54000, 0x57fff, 0x3fff, 0, "dram0_c000");
+	dspace.install_readwrite_bank(0x54000, 0x57fff, 0, "dram0_c000");
 	/* <5>8000 */
-	dspace.install_readwrite_bank(0x58000, 0x5bfff, 0x3fff, 0, "dram0_10000");
+	dspace.install_readwrite_bank(0x58000, 0x5bfff, 0, "dram0_10000");
 	/* <5>c000 expansion bus */
 	/* <6>0000 */
-	pspace.install_readwrite_bank(0x60000, 0x63fff, 0x3fff, 0, "dram0_8000");
-	dspace.install_readwrite_bank(0x60000, 0x63fff, 0x3fff, 0, "dram0_8000");
+	pspace.install_readwrite_bank(0x60000, 0x63fff, 0, "dram0_8000");
+	dspace.install_readwrite_bank(0x60000, 0x63fff, 0, "dram0_8000");
 	/* <6>4000 */
-	pspace.install_readwrite_bank(0x64000, 0x67fff, 0x3fff, 0, "dram0_c000");
-	dspace.install_readwrite_bank(0x64000, 0x67fff, 0x3fff, 0, "dram0_c000");
+	pspace.install_readwrite_bank(0x64000, 0x67fff, 0, "dram0_c000");
+	dspace.install_readwrite_bank(0x64000, 0x67fff, 0, "dram0_c000");
 	/* <6>8000 */
-	pspace.install_readwrite_bank(0x68000, 0x6bfff, 0x3fff, 0, "dram0_10000");
-	dspace.install_readwrite_bank(0x68000, 0x6bfff, 0x3fff, 0, "dram0_10000");
+	pspace.install_readwrite_bank(0x68000, 0x6bfff, 0, "dram0_10000");
+	dspace.install_readwrite_bank(0x68000, 0x6bfff, 0, "dram0_10000");
 	/* <6>c000 empty*/
 	/* segment <7> expansion ROM? */
 	/* <8>0000 */
-	pspace.install_readwrite_bank(0x80000, 0x83fff, 0x3fff, 0, "dram0_8000");
-	dspace.install_readwrite_bank(0x80000, 0x83fff, 0x3fff, 0, "dram0_18000");
+	pspace.install_readwrite_bank(0x80000, 0x83fff, 0, "dram0_8000");
+	dspace.install_readwrite_bank(0x80000, 0x83fff, 0, "dram0_18000");
 	/* <8>4000 */
-	pspace.install_readwrite_bank(0x84000, 0x87fff, 0x3fff, 0, "dram0_c000");
-	dspace.install_readwrite_bank(0x84000, 0x87fff, 0x3fff, 0, "dram0_1c000");
+	pspace.install_readwrite_bank(0x84000, 0x87fff, 0, "dram0_c000");
+	dspace.install_readwrite_bank(0x84000, 0x87fff, 0, "dram0_1c000");
 	/* <9>0000 */
-	pspace.install_readwrite_bank(0x90000, 0x93fff, 0x3fff, 0, "dram0_18000");
-	dspace.install_readwrite_bank(0x90000, 0x93fff, 0x3fff, 0, "dram0_18000");
+	pspace.install_readwrite_bank(0x90000, 0x93fff, 0, "dram0_18000");
+	dspace.install_readwrite_bank(0x90000, 0x93fff, 0, "dram0_18000");
 	/* <9>4000 */
-	pspace.install_readwrite_bank(0x94000, 0x97fff, 0x3fff, 0, "dram0_1c000");
-	dspace.install_readwrite_bank(0x94000, 0x97fff, 0x3fff, 0, "dram0_1c000");
+	pspace.install_readwrite_bank(0x94000, 0x97fff, 0, "dram0_1c000");
+	dspace.install_readwrite_bank(0x94000, 0x97fff, 0, "dram0_1c000");
 	/* <A>0000 */
-	pspace.install_readwrite_bank(0xa0000, 0xa3fff, 0x3fff, 0, "dram0_8000");
-	dspace.install_readwrite_bank(0xa0000, 0xa3fff, 0x3fff, 0, "dram0_8000");
+	pspace.install_readwrite_bank(0xa0000, 0xa3fff, 0, "dram0_8000");
+	dspace.install_readwrite_bank(0xa0000, 0xa3fff, 0, "dram0_8000");
 	/* <A>4000 */
-	pspace.install_readwrite_bank(0xa4000, 0xa7fff, 0x3fff, 0, "dram0_c000");
-	dspace.install_readwrite_bank(0xa4000, 0xa7fff, 0x3fff, 0, "dram0_c000");
+	pspace.install_readwrite_bank(0xa4000, 0xa7fff, 0, "dram0_c000");
+	dspace.install_readwrite_bank(0xa4000, 0xa7fff, 0, "dram0_c000");
 
 	//membank("dram0_0000")->set_base(memptr);
 	membank("dram0_4000")->set_base(memptr + 0x4000);
@@ -425,9 +430,9 @@ void m20_state::install_memory()
 			   AM_RANGE( 0x88000, 0x8bfff ) AM_RAM AM_SHARE("dram1_4000")
 			   AM_RANGE( 0xa8000, 0xabfff ) AM_RAM AM_SHARE("dram1_4000")
 			*/
-			pspace.install_readwrite_bank(0x2c000, 0x2ffff, 0x3fff, 0, "dram1_0000");
-			pspace.install_readwrite_bank(0x88000, 0x8bfff, 0x3fff, 0, "dram1_4000");
-			pspace.install_readwrite_bank(0xa8000, 0xabfff, 0x3fff, 0, "dram1_4000");
+			pspace.install_readwrite_bank(0x2c000, 0x2ffff, 0, "dram1_0000");
+			pspace.install_readwrite_bank(0x88000, 0x8bfff, 0, "dram1_4000");
+			pspace.install_readwrite_bank(0xa8000, 0xabfff, 0, "dram1_4000");
 
 			/*
 			  data
@@ -436,10 +441,10 @@ void m20_state::install_memory()
 			  AM_RANGE( 0x2c000, 0x2ffff ) AM_RAM AM_SHARE("dram1_0000")
 			  AM_RANGE( 0xa8000, 0xabfff ) AM_RAM AM_SHARE("dram1_4000")
 			*/
-			dspace.install_readwrite_bank(0x4000, 0x7fff, 0x3fff, 0, "dram1_4000");
-			dspace.install_readwrite_bank(0x1c000, 0x1ffff, 0x3fff, 0, "dram1_0000");
-			dspace.install_readwrite_bank(0x2c000, 0x2ffff, 0x3fff, 0, "dram1_0000");
-			dspace.install_readwrite_bank(0xa8000, 0xabfff, 0x3fff, 0, "dram1_4000");
+			dspace.install_readwrite_bank(0x4000, 0x7fff, 0, "dram1_4000");
+			dspace.install_readwrite_bank(0x1c000, 0x1ffff, 0, "dram1_0000");
+			dspace.install_readwrite_bank(0x2c000, 0x2ffff, 0, "dram1_0000");
+			dspace.install_readwrite_bank(0xa8000, 0xabfff, 0, "dram1_4000");
 
 			membank("dram1_0000")->set_base(memptr + 0x20000);
 			membank("dram1_4000")->set_base(memptr + 0x24000);
@@ -452,9 +457,9 @@ void m20_state::install_memory()
 				   AM_RANGE( 0x98000, 0x9bfff ) AM_RAM AM_SHARE("dram2_4000")
 				   AM_RANGE( 0xac000, 0xaffff ) AM_RAM AM_SHARE("dram2_0000")
 				*/
-				pspace.install_readwrite_bank(0x8c000, 0x8ffff, 0x3fff, 0, "dram2_0000");
-				pspace.install_readwrite_bank(0x98000, 0x9bfff, 0x3fff, 0, "dram2_4000");
-				pspace.install_readwrite_bank(0xac000, 0xaffff, 0x3fff, 0, "dram2_0000");
+				pspace.install_readwrite_bank(0x8c000, 0x8ffff, 0, "dram2_0000");
+				pspace.install_readwrite_bank(0x98000, 0x9bfff, 0, "dram2_4000");
+				pspace.install_readwrite_bank(0xac000, 0xaffff, 0, "dram2_0000");
 
 				/* data
 				   AM_RANGE( 0x08000, 0x0bfff ) AM_RAM AM_SHARE("dram2_0000")
@@ -463,11 +468,11 @@ void m20_state::install_memory()
 				   AM_RANGE( 0x98000, 0x9bfff ) AM_RAM AM_SHARE("dram2_4000")
 				   AM_RANGE( 0xac000, 0xaffff ) AM_RAM AM_SHARE("dram2_0000")
 				 */
-				dspace.install_readwrite_bank(0x8000, 0xbfff, 0x3fff, 0, "dram2_0000");
-				dspace.install_readwrite_bank(0xc000, 0xffff, 0x3fff, 0, "dram2_4000");
-				dspace.install_readwrite_bank(0x88000, 0x8bfff, 0x3fff, 0, "dram2_4000");
-				dspace.install_readwrite_bank(0x98000, 0x9bfff, 0x3fff, 0, "dram2_4000");
-				dspace.install_readwrite_bank(0xac000, 0xaffff, 0x3fff, 0, "dram2_0000");
+				dspace.install_readwrite_bank(0x8000, 0xbfff, 0, "dram2_0000");
+				dspace.install_readwrite_bank(0xc000, 0xffff, 0, "dram2_4000");
+				dspace.install_readwrite_bank(0x88000, 0x8bfff, 0, "dram2_4000");
+				dspace.install_readwrite_bank(0x98000, 0x9bfff, 0, "dram2_4000");
+				dspace.install_readwrite_bank(0xac000, 0xaffff, 0, "dram2_0000");
 
 				membank("dram2_0000")->set_base(memptr + 0x28000);
 				membank("dram2_4000")->set_base(memptr + 0x2c000);
@@ -479,8 +484,8 @@ void m20_state::install_memory()
 				   AM_RANGE( 0x9c000, 0x9ffff ) AM_RAM AM_SHARE("dram3_0000")
 				   AM_RANGE( 0xb0000, 0xb3fff ) AM_RAM AM_SHARE("dram3_4000")
 				*/
-				pspace.install_readwrite_bank(0x9c000, 0x9ffff, 0x3fff, 0, "dram3_0000");
-				pspace.install_readwrite_bank(0xb0000, 0xb3fff, 0x3fff, 0, "dram3_4000");
+				pspace.install_readwrite_bank(0x9c000, 0x9ffff, 0, "dram3_0000");
+				pspace.install_readwrite_bank(0xb0000, 0xb3fff, 0, "dram3_4000");
 
 				/* data
 				   AM_RANGE( 0x44000, 0x47fff ) AM_RAM AM_SHARE("dram3_0000")
@@ -490,12 +495,12 @@ void m20_state::install_memory()
 				   AM_RANGE( 0xb0000, 0xb3fff ) AM_RAM AM_SHARE("dram3_4000")
 				   AM_RANGE( 0xc0000, 0xc3fff ) AM_RAM AM_SHARE("dram3_4000")
 				 */
-				dspace.install_readwrite_bank(0x44000, 0x47fff, 0x3fff, 0, "dram3_0000");
-				dspace.install_readwrite_bank(0x48000, 0x4bfff, 0x3fff, 0, "dram3_4000");
-				dspace.install_readwrite_bank(0x8c000, 0x8ffff, 0x3fff, 0, "dram3_0000");
-				dspace.install_readwrite_bank(0x9c000, 0x9ffff, 0x3fff, 0, "dram3_0000");
-				dspace.install_readwrite_bank(0xb0000, 0xb3fff, 0x3fff, 0, "dram3_4000");
-				dspace.install_readwrite_bank(0xc0000, 0xc3fff, 0x3fff, 0, "dram3_4000");
+				dspace.install_readwrite_bank(0x44000, 0x47fff, 0, "dram3_0000");
+				dspace.install_readwrite_bank(0x48000, 0x4bfff, 0, "dram3_4000");
+				dspace.install_readwrite_bank(0x8c000, 0x8ffff, 0, "dram3_0000");
+				dspace.install_readwrite_bank(0x9c000, 0x9ffff, 0, "dram3_0000");
+				dspace.install_readwrite_bank(0xb0000, 0xb3fff, 0, "dram3_4000");
+				dspace.install_readwrite_bank(0xc0000, 0xc3fff, 0, "dram3_4000");
 
 				membank("dram3_0000")->set_base(memptr + 0x30000);
 				membank("dram3_4000")->set_base(memptr + 0x34000);
@@ -518,16 +523,16 @@ void m20_state::install_memory()
 			   AM_RANGE( 0xb4000, 0xb7fff ) AM_RAM AM_SHARE("dram1_18000")
 			   AM_RANGE( 0xb8000, 0xbbfff ) AM_RAM AM_SHARE("dram1_1c000")
 			*/
-			pspace.install_readwrite_bank(0x2c000, 0x2ffff, 0x3fff, 0, "dram1_0000");
-			pspace.install_readwrite_bank(0x88000, 0x8bfff, 0x3fff, 0, "dram1_4000");
-			pspace.install_readwrite_bank(0x8c000, 0x8ffff, 0x3fff, 0, "dram1_8000");
-			pspace.install_readwrite_bank(0x98000, 0x9bfff, 0x3fff, 0, "dram1_c000");
-			pspace.install_readwrite_bank(0x9c000, 0x9ffff, 0x3fff, 0, "dram1_10000");
-			pspace.install_readwrite_bank(0xa8000, 0xabfff, 0x3fff, 0, "dram1_4000");
-			pspace.install_readwrite_bank(0xac000, 0xaffff, 0x3fff, 0, "dram1_8000");
-			pspace.install_readwrite_bank(0xb0000, 0xb3fff, 0x3fff, 0, "dram1_14000");
-			pspace.install_readwrite_bank(0xb4000, 0xb7fff, 0x3fff, 0, "dram1_18000");
-			pspace.install_readwrite_bank(0xb8000, 0xbbfff, 0x3fff, 0, "dram1_1c000");
+			pspace.install_readwrite_bank(0x2c000, 0x2ffff, 0, "dram1_0000");
+			pspace.install_readwrite_bank(0x88000, 0x8bfff, 0, "dram1_4000");
+			pspace.install_readwrite_bank(0x8c000, 0x8ffff, 0, "dram1_8000");
+			pspace.install_readwrite_bank(0x98000, 0x9bfff, 0, "dram1_c000");
+			pspace.install_readwrite_bank(0x9c000, 0x9ffff, 0, "dram1_10000");
+			pspace.install_readwrite_bank(0xa8000, 0xabfff, 0, "dram1_4000");
+			pspace.install_readwrite_bank(0xac000, 0xaffff, 0, "dram1_8000");
+			pspace.install_readwrite_bank(0xb0000, 0xb3fff, 0, "dram1_14000");
+			pspace.install_readwrite_bank(0xb4000, 0xb7fff, 0, "dram1_18000");
+			pspace.install_readwrite_bank(0xb8000, 0xbbfff, 0, "dram1_1c000");
 
 			/* data
 			   AM_RANGE( 0x04000, 0x07fff ) AM_RAM AM_SHARE("dram1_4000")
@@ -543,18 +548,18 @@ void m20_state::install_memory()
 			   AM_RANGE( 0xb4000, 0xb7fff ) AM_RAM AM_SHARE("dram1_18000")
 			   AM_RANGE( 0xb8000, 0xbbfff ) AM_RAM AM_SHARE("dram1_1c000")
 			 */
-			dspace.install_readwrite_bank(0x4000, 0x7fff, 0x3fff, 0, "dram1_4000");
-			dspace.install_readwrite_bank(0x1c000, 0x1ffff, 0x3fff, 0, "dram1_0000");
-			dspace.install_readwrite_bank(0x2c000, 0x2ffff, 0x3fff, 0, "dram1_0000");
-			dspace.install_readwrite_bank(0x88000, 0x8bfff, 0x3fff, 0, "dram1_c000");
-			dspace.install_readwrite_bank(0x8c000, 0x8ffff, 0x3fff, 0, "dram1_10000");
-			dspace.install_readwrite_bank(0x98000, 0x9bfff, 0x3fff, 0, "dram1_c000");
-			dspace.install_readwrite_bank(0x9c000, 0x9ffff, 0x3fff, 0, "dram1_10000");
-			dspace.install_readwrite_bank(0xa8000, 0xabfff, 0x3fff, 0, "dram1_4000");
-			dspace.install_readwrite_bank(0xac000, 0xaffff, 0x3fff, 0, "dram1_8000");
-			dspace.install_readwrite_bank(0xb0000, 0xb3fff, 0x3fff, 0, "dram1_14000");
-			dspace.install_readwrite_bank(0xb4000, 0xb7fff, 0x3fff, 0, "dram1_18000");
-			dspace.install_readwrite_bank(0xb8000, 0xbbfff, 0x3fff, 0, "dram1_1c000");
+			dspace.install_readwrite_bank(0x4000, 0x7fff, 0, "dram1_4000");
+			dspace.install_readwrite_bank(0x1c000, 0x1ffff, 0, "dram1_0000");
+			dspace.install_readwrite_bank(0x2c000, 0x2ffff, 0, "dram1_0000");
+			dspace.install_readwrite_bank(0x88000, 0x8bfff, 0, "dram1_c000");
+			dspace.install_readwrite_bank(0x8c000, 0x8ffff, 0, "dram1_10000");
+			dspace.install_readwrite_bank(0x98000, 0x9bfff, 0, "dram1_c000");
+			dspace.install_readwrite_bank(0x9c000, 0x9ffff, 0, "dram1_10000");
+			dspace.install_readwrite_bank(0xa8000, 0xabfff, 0, "dram1_4000");
+			dspace.install_readwrite_bank(0xac000, 0xaffff, 0, "dram1_8000");
+			dspace.install_readwrite_bank(0xb0000, 0xb3fff, 0, "dram1_14000");
+			dspace.install_readwrite_bank(0xb4000, 0xb7fff, 0, "dram1_18000");
+			dspace.install_readwrite_bank(0xb8000, 0xbbfff, 0, "dram1_1c000");
 
 			membank("dram1_0000")->set_base(memptr + 0x20000);
 			membank("dram1_4000")->set_base(memptr + 0x24000);
@@ -580,14 +585,14 @@ void m20_state::install_memory()
 				   AM_RANGE( 0xd4000, 0xd7fff ) AM_RAM AM_SHARE("dram2_18000")
 				   AM_RANGE( 0xd8000, 0xdbfff ) AM_RAM AM_SHARE("dram2_1c000")
 				 */
-				pspace.install_readwrite_bank(0xbc000, 0xbffff, 0x3fff, 0, "dram2_0000");
-				pspace.install_readwrite_bank(0xc0000, 0xc3fff, 0x3fff, 0, "dram2_4000");
-				pspace.install_readwrite_bank(0xc4000, 0xc7fff, 0x3fff, 0, "dram2_8000");
-				pspace.install_readwrite_bank(0xc8000, 0xcbfff, 0x3fff, 0, "dram2_c000");
-				pspace.install_readwrite_bank(0xcc000, 0xcffff, 0x3fff, 0, "dram2_10000");
-				pspace.install_readwrite_bank(0xd0000, 0xd3fff, 0x3fff, 0, "dram2_14000");
-				pspace.install_readwrite_bank(0xd4000, 0xd7fff, 0x3fff, 0, "dram2_18000");
-				pspace.install_readwrite_bank(0xd8000, 0xdbfff, 0x3fff, 0, "dram2_1c000");
+				pspace.install_readwrite_bank(0xbc000, 0xbffff, 0, "dram2_0000");
+				pspace.install_readwrite_bank(0xc0000, 0xc3fff, 0, "dram2_4000");
+				pspace.install_readwrite_bank(0xc4000, 0xc7fff, 0, "dram2_8000");
+				pspace.install_readwrite_bank(0xc8000, 0xcbfff, 0, "dram2_c000");
+				pspace.install_readwrite_bank(0xcc000, 0xcffff, 0, "dram2_10000");
+				pspace.install_readwrite_bank(0xd0000, 0xd3fff, 0, "dram2_14000");
+				pspace.install_readwrite_bank(0xd4000, 0xd7fff, 0, "dram2_18000");
+				pspace.install_readwrite_bank(0xd8000, 0xdbfff, 0, "dram2_1c000");
 
 				/* data
 				   AM_RANGE( 0x08000, 0x0bfff ) AM_RAM AM_SHARE("dram2_0000")
@@ -604,16 +609,16 @@ void m20_state::install_memory()
 				   AM_RANGE( 0xd4000, 0xd7fff ) AM_RAM AM_SHARE("dram2_18000")
 				   AM_RANGE( 0xd8000, 0xdbfff ) AM_RAM AM_SHARE("dram2_1c000")
 				*/
-				dspace.install_readwrite_bank(0x8000, 0xbfff, 0x3fff, 0, "dram2_0000");
-				dspace.install_readwrite_bank(0xc000, 0xffff, 0x3fff, 0, "dram2_4000");
-				dspace.install_readwrite_bank(0xbc000, 0xbffff, 0x3fff, 0, "dram2_0000");
-				dspace.install_readwrite_bank(0xc0000, 0xc3fff, 0x3fff, 0, "dram2_4000");
-				dspace.install_readwrite_bank(0xc4000, 0xc7fff, 0x3fff, 0, "dram2_8000");
-				dspace.install_readwrite_bank(0xc8000, 0xcbfff, 0x3fff, 0, "dram2_c000");
-				dspace.install_readwrite_bank(0xcc000, 0xcffff, 0x3fff, 0, "dram2_10000");
-				dspace.install_readwrite_bank(0xd0000, 0xd3fff, 0x3fff, 0, "dram2_14000");
-				dspace.install_readwrite_bank(0xd4000, 0xd7fff, 0x3fff, 0, "dram2_18000");
-				dspace.install_readwrite_bank(0xd8000, 0xdbfff, 0x3fff, 0, "dram2_1c000");
+				dspace.install_readwrite_bank(0x8000, 0xbfff, 0, "dram2_0000");
+				dspace.install_readwrite_bank(0xc000, 0xffff, 0, "dram2_4000");
+				dspace.install_readwrite_bank(0xbc000, 0xbffff, 0, "dram2_0000");
+				dspace.install_readwrite_bank(0xc0000, 0xc3fff, 0, "dram2_4000");
+				dspace.install_readwrite_bank(0xc4000, 0xc7fff, 0, "dram2_8000");
+				dspace.install_readwrite_bank(0xc8000, 0xcbfff, 0, "dram2_c000");
+				dspace.install_readwrite_bank(0xcc000, 0xcffff, 0, "dram2_10000");
+				dspace.install_readwrite_bank(0xd0000, 0xd3fff, 0, "dram2_14000");
+				dspace.install_readwrite_bank(0xd4000, 0xd7fff, 0, "dram2_18000");
+				dspace.install_readwrite_bank(0xd8000, 0xdbfff, 0, "dram2_1c000");
 
 				membank("dram2_0000")->set_base(memptr + 0x40000);
 				membank("dram2_4000")->set_base(memptr + 0x44000);
@@ -640,15 +645,15 @@ void m20_state::install_memory()
 				   AM_RANGE( 0xf8000, 0xfbfff ) AM_RAM AM_SHARE("dram3_1c000")
 				   AM_RANGE( 0xfc000, 0xfffff ) AM_RAM AM_SHARE("dram3_0000")
 				*/
-				pspace.install_readwrite_bank(0xdc000, 0xdffff, 0x3fff, 0, "dram3_0000");
-				pspace.install_readwrite_bank(0xe0000, 0xe3fff, 0x3fff, 0, "dram3_4000");
-				pspace.install_readwrite_bank(0xe4000, 0xe7fff, 0x3fff, 0, "dram3_8000");
-				pspace.install_readwrite_bank(0xe8000, 0xebfff, 0x3fff, 0, "dram3_c000");
-				pspace.install_readwrite_bank(0xec000, 0xeffff, 0x3fff, 0, "dram3_10000");
-				pspace.install_readwrite_bank(0xf0000, 0xf3fff, 0x3fff, 0, "dram3_14000");
-				pspace.install_readwrite_bank(0xf4000, 0xf7fff, 0x3fff, 0, "dram3_18000");
-				pspace.install_readwrite_bank(0xf8000, 0xfbfff, 0x3fff, 0, "dram3_1c000");
-				pspace.install_readwrite_bank(0xfc000, 0xfffff, 0x3fff, 0, "dram3_0000");
+				pspace.install_readwrite_bank(0xdc000, 0xdffff, 0, "dram3_0000");
+				pspace.install_readwrite_bank(0xe0000, 0xe3fff, 0, "dram3_4000");
+				pspace.install_readwrite_bank(0xe4000, 0xe7fff, 0, "dram3_8000");
+				pspace.install_readwrite_bank(0xe8000, 0xebfff, 0, "dram3_c000");
+				pspace.install_readwrite_bank(0xec000, 0xeffff, 0, "dram3_10000");
+				pspace.install_readwrite_bank(0xf0000, 0xf3fff, 0, "dram3_14000");
+				pspace.install_readwrite_bank(0xf4000, 0xf7fff, 0, "dram3_18000");
+				pspace.install_readwrite_bank(0xf8000, 0xfbfff, 0, "dram3_1c000");
+				pspace.install_readwrite_bank(0xfc000, 0xfffff, 0, "dram3_0000");
 
 				/* data
 				   AM_RANGE( 0x44000, 0x47fff ) AM_RAM AM_SHARE("dram3_0000")
@@ -665,17 +670,17 @@ void m20_state::install_memory()
 				   AM_RANGE( 0xf8000, 0xfbfff ) AM_RAM AM_SHARE("dram3_1c000")
 				   AM_RANGE( 0xfc000, 0xfffff ) AM_RAM AM_SHARE("dram3_0000")
 				*/
-				dspace.install_readwrite_bank(0x44000, 0x47fff, 0x3fff, 0, "dram3_0000");
-				dspace.install_readwrite_bank(0x48000, 0x4bfff, 0x3fff, 0, "dram3_4000");
-				dspace.install_readwrite_bank(0xdc000, 0xdffff, 0x3fff, 0, "dram3_0000");
-				dspace.install_readwrite_bank(0xe0000, 0xe3fff, 0x3fff, 0, "dram3_4000");
-				dspace.install_readwrite_bank(0xe4000, 0xe7fff, 0x3fff, 0, "dram3_8000");
-				dspace.install_readwrite_bank(0xe8000, 0xebfff, 0x3fff, 0, "dram3_c000");
-				dspace.install_readwrite_bank(0xec000, 0xeffff, 0x3fff, 0, "dram3_10000");
-				dspace.install_readwrite_bank(0xf0000, 0xf3fff, 0x3fff, 0, "dram3_14000");
-				dspace.install_readwrite_bank(0xf4000, 0xf7fff, 0x3fff, 0, "dram3_18000");
-				dspace.install_readwrite_bank(0xf8000, 0xfbfff, 0x3fff, 0, "dram3_1c000");
-				dspace.install_readwrite_bank(0xfc000, 0xfffff, 0x3fff, 0, "dram3_0000");
+				dspace.install_readwrite_bank(0x44000, 0x47fff, 0, "dram3_0000");
+				dspace.install_readwrite_bank(0x48000, 0x4bfff, 0, "dram3_4000");
+				dspace.install_readwrite_bank(0xdc000, 0xdffff, 0, "dram3_0000");
+				dspace.install_readwrite_bank(0xe0000, 0xe3fff, 0, "dram3_4000");
+				dspace.install_readwrite_bank(0xe4000, 0xe7fff, 0, "dram3_8000");
+				dspace.install_readwrite_bank(0xe8000, 0xebfff, 0, "dram3_c000");
+				dspace.install_readwrite_bank(0xec000, 0xeffff, 0, "dram3_10000");
+				dspace.install_readwrite_bank(0xf0000, 0xf3fff, 0, "dram3_14000");
+				dspace.install_readwrite_bank(0xf4000, 0xf7fff, 0, "dram3_18000");
+				dspace.install_readwrite_bank(0xf8000, 0xfbfff, 0, "dram3_1c000");
+				dspace.install_readwrite_bank(0xfc000, 0xfffff, 0, "dram3_0000");
 
 				membank("dram3_0000")->set_base(memptr + 0x60000);
 				membank("dram3_4000")->set_base(memptr + 0x64000);
@@ -693,7 +698,7 @@ void m20_state::install_memory()
 static ADDRESS_MAP_START(m20_io, AS_IO, 16, m20_state)
 	ADDRESS_MAP_UNMAP_HIGH
 
-	AM_RANGE(0x00, 0x07) AM_DEVREADWRITE8("fd1797", fd1797_t, read, write, 0x00ff)
+	AM_RANGE(0x00, 0x07) AM_DEVREADWRITE8("fd1797", fd1797_device, read, write, 0x00ff)
 
 	AM_RANGE(0x20, 0x21) AM_READWRITE(port21_r, port21_w);
 
@@ -739,8 +744,8 @@ void m20_state::machine_start()
 
 void m20_state::machine_reset()
 {
-	UINT8 *ROM = memregion("maincpu")->base();
-	UINT8 *RAM = (UINT8 *)(m_ram->pointer() + 0x4000);
+	uint8_t *ROM = memregion("maincpu")->base();
+	uint8_t *RAM = (uint8_t *)(m_ram->pointer() + 0x4000);
 
 	if (m_memsize >= 256 * 1024)
 		m_port21 = 0xdf;
@@ -754,8 +759,9 @@ void m20_state::machine_reset()
 
 	memcpy(RAM, ROM, 8);  // we need only the reset vector
 	m_maincpu->reset();     // reset the CPU to ensure it picks up the new vector
-	if(m_apb)
-		m_apb->m_8086->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+	m_kbdi8251->write_cts(0);
+	if (m_apb)
+		m_apb->halt();
 }
 
 
@@ -772,7 +778,7 @@ static SLOT_INTERFACE_START(keyboard)
 	SLOT_INTERFACE("m20", M20_KEYBOARD)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( m20, m20_state )
+static MACHINE_CONFIG_START( m20 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z8001, MAIN_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(m20_program_mem)
@@ -824,7 +830,8 @@ static MACHINE_CONFIG_START( m20, m20_state )
 	MCFG_PIT8253_CLK2(1230782)
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(m20_state, timer_tick_w))
 
-	MCFG_PIC8259_ADD("i8259", WRITELINE(m20_state, int_w), VCC, NOOP)
+	MCFG_DEVICE_ADD("i8259", PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(WRITELINE(m20_state, int_w))
 
 	MCFG_RS232_PORT_ADD("kbd", keyboard, "m20")
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("i8251_1", i8251_device, write_rxd))
@@ -861,6 +868,6 @@ ROM_START(m40)
 	ROM_REGION(0x4000, "apb_bios", ROMREGION_ERASEFF) // Processor board with 8086
 ROM_END
 
-/*    YEAR  NAME   PARENT  COMPAT  MACHINE INPUT   INIT COMPANY     FULLNAME        FLAGS */
-COMP( 1981, m20,   0,      0,      m20,    0,   driver_device,    0, "Olivetti", "Olivetti L1 M20", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1981, m40,   m20,    0,      m20,    0,   driver_device,    0, "Olivetti", "Olivetti L1 M40", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME   PARENT  COMPAT  MACHINE INPUT STATE      INIT COMPANY     FULLNAME           FLAGS
+COMP( 1981, m20,   0,      0,      m20,    0,    m20_state, 0,   "Olivetti", "Olivetti L1 M20", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1981, m40,   m20,    0,      m20,    0,    m20_state, 0,   "Olivetti", "Olivetti L1 M40", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

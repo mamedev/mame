@@ -51,9 +51,11 @@ and 2764 eprom (swapped D3/D4 and D5/D6 data lines)
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "audio/irem.h"
 #include "includes/travrusa.h"
+#include "audio/irem.h"
+
+#include "cpu/z80/z80.h"
+#include "screen.h"
 
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, travrusa_state )
@@ -301,7 +303,7 @@ void travrusa_state::machine_reset()
 	m_scrollx[1] = 0;
 }
 
-static MACHINE_CONFIG_START( travrusa, travrusa_state )
+static MACHINE_CONFIG_START( travrusa )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)   /* 4 MHz (?) */
@@ -577,8 +579,8 @@ ROM_END
 DRIVER_INIT_MEMBER(travrusa_state,motorace)
 {
 	int A, j;
-	UINT8 *rom = memregion("maincpu")->base();
-	dynamic_buffer buffer(0x2000);
+	uint8_t *rom = memregion("maincpu")->base();
+	std::vector<uint8_t> buffer(0x2000);
 
 	memcpy(&buffer[0], rom, 0x2000);
 
@@ -593,7 +595,7 @@ DRIVER_INIT_MEMBER(travrusa_state,motorace)
 DRIVER_INIT_MEMBER(travrusa_state,shtridra)
 {
 	int A;
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 
 	/* D3/D4  and  D5/D6 swapped */
 	for (A = 0; A < 0x2000; A++)
@@ -610,15 +612,15 @@ READ8_MEMBER(travrusa_state::shtridrb_port11_r)
 
 DRIVER_INIT_MEMBER(travrusa_state, shtridrb)
 {
-	m_maincpu->space(AS_IO).install_read_handler(0x11, 0x11, 0x0000, 0xff00, read8_delegate(FUNC(travrusa_state::shtridrb_port11_r),this));
+	m_maincpu->space(AS_IO).install_read_handler(0x11, 0x11, 0, 0xff00, 0, read8_delegate(FUNC(travrusa_state::shtridrb_port11_r),this));
 }
 
 
-GAME( 1983, travrusa, 0,        travrusa, travrusa, driver_device, 0,         ROT270, "Irem",                    "Traverse USA / Zippy Race", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, travrusab,travrusa, travrusa, travrusa, driver_device, 0,         ROT270, "bootleg (I.P.)",          "Traverse USA (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, mototour, travrusa, travrusa, travrusa, driver_device, 0,         ROT270, "Irem (Tecfri license)",   "MotoTour / Zippy Race (Tecfri license)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, motorace, travrusa, travrusa, motorace, travrusa_state, motorace, ROT270, "Irem (Williams license)", "MotoRace USA", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, travrusa, 0,        travrusa, travrusa, travrusa_state, 0,        ROT270,                    "Irem",                           "Traverse USA / Zippy Race", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, travrusab,travrusa, travrusa, travrusa, travrusa_state, 0,        ROT270,                    "bootleg (I.P.)",                 "Traverse USA (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, mototour, travrusa, travrusa, travrusa, travrusa_state, 0,        ROT270,                    "Irem (Tecfri license)",          "MotoTour / Zippy Race (Tecfri license)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, motorace, travrusa, travrusa, motorace, travrusa_state, motorace, ROT270,                    "Irem (Williams license)",        "MotoRace USA", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1985, shtrider, 0,        shtrider, shtrider, driver_device, 0,         ROT270|ORIENTATION_FLIP_X, "Seibu Kaihatsu",                 "Shot Rider", MACHINE_SUPPORTS_SAVE ) // possible bootleg
+GAME( 1985, shtrider, 0,        shtrider, shtrider, travrusa_state, 0,        ROT270|ORIENTATION_FLIP_X, "Seibu Kaihatsu",                 "Shot Rider", MACHINE_SUPPORTS_SAVE ) // possible bootleg
 GAME( 1984, shtridera,shtrider, shtrider, shtrider, travrusa_state, shtridra, ROT270|ORIENTATION_FLIP_X, "Seibu Kaihatsu (Sigma license)", "Shot Rider (Sigma license)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, shtriderb,shtrider, shtriderb,shtrider, travrusa_state, shtridrb, ROT270|ORIENTATION_FLIP_X, "bootleg",                        "Shot Rider (bootleg)", MACHINE_SUPPORTS_SAVE ) // resets when you attempt to start a game?

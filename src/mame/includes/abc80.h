@@ -6,8 +6,10 @@
  *
  ****************************************************************************/
 
-#ifndef __ABC80__
-#define __ABC80__
+#ifndef MAME_INCLUDES_ABC80_H
+#define MAME_INCLUDES_ABC80_H
+
+#pragma once
 
 #include "bus/abcbus/abcbus.h"
 #include "bus/rs232/rs232.h"
@@ -25,11 +27,11 @@
 #include "sound/wave.h"
 
 #define ABC80_HTOTAL    384
-#define ABC80_HBEND     35
+#define ABC80_HBEND     30
 #define ABC80_HBSTART   384
-#define ABC80_VTOTAL    312
+#define ABC80_VTOTAL    313
 #define ABC80_VBEND     15
-#define ABC80_VBSTART   312
+#define ABC80_VBSTART   313
 
 #define ABC80_K5_HSYNC          0x01
 #define ABC80_K5_DH             0x02
@@ -69,13 +71,14 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, Z80_TAG),
 		m_pio(*this, Z80PIO_TAG),
-		m_psg(*this, SN76477_TAG),
+		m_csg(*this, SN76477_TAG),
 		m_cassette(*this, "cassette"),
 		m_bus(*this, ABCBUS_TAG),
 		m_kb(*this, ABC80_KEYBOARD_TAG),
 		m_ram(*this, RAM_TAG),
 		m_rs232(*this, RS232_TAG),
 		m_palette(*this, "palette"),
+		m_screen(*this, SCREEN_TAG),
 		m_rom(*this, Z80_TAG),
 		m_mmu_rom(*this, "mmu"),
 		m_char_rom(*this, "chargen"),
@@ -89,15 +92,18 @@ public:
 		m_tape_in_latch(1)
 	{ }
 
+	static constexpr feature_type imperfect_features() { return feature::KEYBOARD; }
+
 	required_device<cpu_device> m_maincpu;
 	required_device<z80pio_device> m_pio;
-	required_device<sn76477_device> m_psg;
+	required_device<sn76477_device> m_csg;
 	required_device<cassette_image_device> m_cassette;
-	required_device<abcbus_slot_t> m_bus;
+	required_device<abcbus_slot_device> m_bus;
 	required_device<abc80_keyboard_device> m_kb;
 	required_device<ram_device> m_ram;
 	required_device<rs232_port_device> m_rs232;
 	required_device<palette_device> m_palette;
+	required_device<screen_device> m_screen;
 	required_memory_region m_rom;
 	required_memory_region m_mmu_rom;
 	required_memory_region m_char_rom;
@@ -105,11 +111,11 @@ public:
 	required_memory_region m_vsync_prom;
 	required_memory_region m_line_prom;
 	required_memory_region m_attr_prom;
-	optional_shared_ptr<UINT8> m_video_ram;
+	optional_shared_ptr<uint8_t> m_video_ram;
 
 	enum
 	{
-		TIMER_ID_PIO,
+		TIMER_ID_SCANLINE,
 		TIMER_ID_CASSETTE,
 		TIMER_ID_BLINK,
 		TIMER_ID_VSYNC_ON,
@@ -129,9 +135,9 @@ public:
 	virtual void machine_start() override;
 
 	virtual void video_start() override;
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void update_screen(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void draw_scanline(bitmap_rgb32 &bitmap, int y);
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -143,7 +149,8 @@ public:
 	DECLARE_WRITE8_MEMBER( pio_pb_w );
 
 	DECLARE_WRITE_LINE_MEMBER( keydown_w );
-	DECLARE_WRITE8_MEMBER( kbd_w );
+	void kbd_w(u8 data);
+	DECLARE_WRITE8_MEMBER( csg_w );
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER( bac );
 
@@ -161,8 +168,12 @@ public:
 	int m_pio_astb;
 
 	// video state
-	UINT8 m_latch;
+	bitmap_rgb32 m_bitmap;
+	uint8_t m_latch;
 	int m_blink;
+	int m_c;
+	int m_r;
+	int m_mode;
 
 	// cassette state
 	bool m_motor;
@@ -170,7 +181,7 @@ public:
 	int m_tape_in_latch;
 
 	// timers
-	emu_timer *m_pio_timer;
+	emu_timer *m_scanline_timer;
 	emu_timer *m_cassette_timer;
 	emu_timer *m_blink_timer;
 	emu_timer *m_vsync_on_timer;
@@ -181,4 +192,4 @@ public:
 
 MACHINE_CONFIG_EXTERN( abc80_video );
 
-#endif
+#endif // MAME_INCLUDES_ABC80_H

@@ -8,19 +8,14 @@
 
 ***************************************************************************/
 
+#ifndef MAME_EMU_DIOUTPUT_H
+#define MAME_EMU_DIOUTPUT_H
+
 #pragma once
-
-#ifndef __EMU_H__
-#error Dont include this file directly; include emu.h instead.
-#endif
-
-#ifndef __DIOUTPUT_H__
-#define __DIOUTPUT_H__
-
 
 
 //**************************************************************************
-//  TYPE DEFINITIONS
+//  MACROS
 //**************************************************************************
 
 #define MCFG_OUTPUT_INDEX(_index) \
@@ -58,5 +53,4 @@ protected:
 };
 
 
-
-#endif  /* __DIOUTPUT_H__ */
+#endif // MAME_EMU_DIOUTPUT_H

@@ -52,6 +52,8 @@ modified by Hau
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "sound/samples.h"
+#include "screen.h"
+#include "speaker.h"
 
 class safarir_state : public driver_device
 {
@@ -67,17 +69,17 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<samples_device> m_samples;
-	required_shared_ptr<UINT8> m_ram;
-	required_shared_ptr<UINT8> m_bg_scroll;
+	required_shared_ptr<uint8_t> m_ram;
+	required_shared_ptr<uint8_t> m_bg_scroll;
 	required_device<gfxdecode_device> m_gfxdecode;
 
-	std::unique_ptr<UINT8[]> m_ram_1;
-	std::unique_ptr<UINT8[]> m_ram_2;
-	UINT8 m_ram_bank;
+	std::unique_ptr<uint8_t[]> m_ram_1;
+	std::unique_ptr<uint8_t[]> m_ram_2;
+	uint8_t m_ram_bank;
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
-	UINT8 m_port_last;
-	UINT8 m_port_last2;
+	uint8_t m_port_last;
+	uint8_t m_port_last2;
 
 	DECLARE_WRITE8_MEMBER(ram_w);
 	DECLARE_READ8_MEMBER(ram_r);
@@ -88,7 +90,7 @@ public:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(safarir);
-	UINT32 screen_update_safarir(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_safarir(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -154,7 +156,7 @@ PALETTE_INIT_MEMBER(safarir_state, safarir)
 
 	for (i = 0; i < palette.entries() / 2; i++)
 	{
-		palette.set_pen_color((i * 2) + 0, rgb_t::black);
+		palette.set_pen_color((i * 2) + 0, rgb_t::black());
 		palette.set_pen_color((i * 2) + 1, rgb_t(pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i >> 0)));
 	}
 }
@@ -163,7 +165,7 @@ TILE_GET_INFO_MEMBER(safarir_state::get_bg_tile_info)
 {
 	int color;
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	UINT8 code = ram_r(space,tile_index | 0x400);
+	uint8_t code = ram_r(space,tile_index | 0x400);
 
 	if (code & 0x80)
 		color = 6;  /* yellow */
@@ -185,7 +187,7 @@ TILE_GET_INFO_MEMBER(safarir_state::get_fg_tile_info)
 {
 	int color, flags;
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	UINT8 code = ram_r(space,tile_index);
+	uint8_t code = ram_r(space,tile_index);
 
 	if (code & 0x80)
 		color = 7;  /* white */
@@ -200,14 +202,14 @@ TILE_GET_INFO_MEMBER(safarir_state::get_fg_tile_info)
 
 void safarir_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(safarir_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(safarir_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(safarir_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(safarir_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_fg_tilemap->set_transparent_pen(0);
 }
 
 
-UINT32 safarir_state::screen_update_safarir(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t safarir_state::screen_update_safarir(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->set_scrollx(0, *m_bg_scroll);
 
@@ -245,7 +247,7 @@ UINT32 safarir_state::screen_update_safarir(screen_device &screen, bitmap_ind16 
 
 WRITE8_MEMBER(safarir_state::safarir_audio_w)
 {
-	UINT8 rising_bits = data & ~m_port_last;
+	uint8_t rising_bits = data & ~m_port_last;
 
 	if (rising_bits == 0x12) m_samples->start(CHANNEL_SOUND1, SAMPLE_SOUND1_1);
 	if (rising_bits == 0x02) m_samples->start(CHANNEL_SOUND1, SAMPLE_SOUND1_2);
@@ -298,7 +300,7 @@ static const char *const safarir_sample_names[] =
 };
 
 
-static MACHINE_CONFIG_FRAGMENT( safarir_audio )
+static MACHINE_CONFIG_START( safarir_audio )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("samples", SAMPLES, 0)
 	MCFG_SAMPLES_CHANNELS(6)
@@ -316,8 +318,8 @@ MACHINE_CONFIG_END
 
 void safarir_state::machine_start()
 {
-	m_ram_1 = std::make_unique<UINT8[]>(m_ram.bytes());
-	m_ram_2 = std::make_unique<UINT8[]>(m_ram.bytes());
+	m_ram_1 = std::make_unique<uint8_t[]>(m_ram.bytes());
+	m_ram_2 = std::make_unique<uint8_t[]>(m_ram.bytes());
 	m_port_last = 0;
 	m_port_last2 = 0;
 
@@ -341,11 +343,11 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, safarir_state )
 	AM_RANGE(0x0000, 0x17ff) AM_ROM
 	AM_RANGE(0x2000, 0x27ff) AM_READWRITE(ram_r, ram_w) AM_SHARE("ram")
 	AM_RANGE(0x2800, 0x2800) AM_MIRROR(0x03ff) AM_READNOP AM_WRITE(ram_bank_w)
-	AM_RANGE(0x2c00, 0x2cff) AM_MIRROR(0x03ff) AM_READNOP AM_WRITEONLY AM_SHARE("bg_scroll")
-	AM_RANGE(0x3000, 0x30ff) AM_MIRROR(0x03ff) AM_WRITE(safarir_audio_w)    /* goes to SN76477 */
+	AM_RANGE(0x2c00, 0x2c00) AM_MIRROR(0x03ff) AM_READNOP AM_WRITEONLY AM_SHARE("bg_scroll")
+	AM_RANGE(0x3000, 0x3000) AM_MIRROR(0x03ff) AM_WRITE(safarir_audio_w)    /* goes to SN76477 */
 	AM_RANGE(0x3400, 0x3400) AM_MIRROR(0x03ff) AM_WRITENOP  /* cleared at the beginning */
-	AM_RANGE(0x3800, 0x38ff) AM_MIRROR(0x03ff) AM_READ_PORT("INPUTS") AM_WRITENOP
-	AM_RANGE(0x3c00, 0x3cff) AM_MIRROR(0x03ff) AM_READ_PORT("DSW") AM_WRITENOP
+	AM_RANGE(0x3800, 0x3800) AM_MIRROR(0x03ff) AM_READ_PORT("INPUTS") AM_WRITENOP
+	AM_RANGE(0x3c00, 0x3c00) AM_MIRROR(0x03ff) AM_READ_PORT("DSW") AM_WRITENOP
 ADDRESS_MAP_END
 
 
@@ -397,7 +399,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( safarir, safarir_state )
+static MACHINE_CONFIG_START( safarir )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080A, XTAL_18MHz/12)  /* 1.5 MHz ? */
@@ -498,5 +500,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1979, safarir, 0,        safarir, safarir, driver_device, 0, ROT90, "SNK (Taito license)", "Safari Rally (World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1979, safarirj, safarir, safarir, safarir, driver_device, 0, ROT90, "SNK", "Safari Rally (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1979, safarir, 0,        safarir, safarir, safarir_state, 0, ROT90, "SNK (Taito license)", "Safari Rally (World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1979, safarirj, safarir, safarir, safarir, safarir_state, 0, ROT90, "SNK",                 "Safari Rally (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )

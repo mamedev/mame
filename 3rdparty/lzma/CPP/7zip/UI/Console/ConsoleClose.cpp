@@ -59,7 +59,10 @@ CCtrlHandlerSetter::~CCtrlHandlerSetter()
 {
   #if !defined(UNDER_CE) && defined(_WIN32)
   if (!SetConsoleCtrlHandler(HandlerRoutine, FALSE))
-    throw "SetConsoleCtrlHandler fails";
+  {
+    // warning for throw in destructor.
+    // throw "SetConsoleCtrlHandler fails";
+  }
   #endif
 }
 

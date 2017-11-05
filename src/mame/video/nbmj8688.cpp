@@ -228,7 +228,7 @@ WRITE8_MEMBER(nbmj8688_state::seiha_romsel_w)
 void nbmj8688_state::vramflip()
 {
 	int x, y;
-	UINT16 color1, color2;
+	uint16_t color1, color2;
 
 	if (m_flipscreen == m_flipscreen_old) return;
 
@@ -276,13 +276,13 @@ void nbmj8688_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		m_nb1413m3->m_busyflag = 1;
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in nbmj8688_state::device_timer");
+		assert_always(false, "Unknown id in nbmj8688_state::device_timer");
 	}
 }
 
 void nbmj8688_state::gfxdraw(int gfxtype)
 {
-	UINT8 *GFX = memregion("gfx1")->base();
+	uint8_t *GFX = memregion("gfx1")->base();
 
 	int x, y;
 	int dx1, dx2, dy;
@@ -291,7 +291,7 @@ void nbmj8688_state::gfxdraw(int gfxtype)
 	int skipx, skipy;
 	int ctrx, ctry;
 	int gfxaddr, gfxlen;
-	UINT16 color, color1, color2;
+	uint16_t color, color1, color2;
 
 	if (gfxtype == GFXTYPE_PURE_12BIT)
 	{
@@ -551,8 +551,8 @@ void nbmj8688_state::common_video_start()
 	m_blitter_timer = timer_alloc(TIMER_BLITTER);
 
 	m_tmpbitmap = std::make_unique<bitmap_ind16>(512, 256);
-	m_videoram = make_unique_clear<UINT16[]>(512 * 256);
-	m_clut = std::make_unique<UINT8[]>(0x20);
+	m_videoram = make_unique_clear<uint16_t[]>(512 * 256);
+	m_clut = std::make_unique<uint8_t[]>(0x20);
 
 	m_scrolly = 0;  // reset because crystalg/crystal2 don't write to this register
 	m_screen_refresh = 1;
@@ -638,7 +638,7 @@ WRITE8_MEMBER(nbmj8688_state::HD61830B_both_data_w)
 ******************************************************************************/
 
 
-UINT32 nbmj8688_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t nbmj8688_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x, y;
 

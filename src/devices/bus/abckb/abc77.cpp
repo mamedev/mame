@@ -41,7 +41,9 @@ Notes:
 
 */
 
+#include "emu.h"
 #include "abc77.h"
+#include "speaker.h"
 
 
 
@@ -58,8 +60,8 @@ Notes:
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type ABC77 = &device_creator<abc77_device>;
-const device_type ABC55 = &device_creator<abc55_device>;
+DEFINE_DEVICE_TYPE(ABC77, abc77_device, "abc77", "Luxor ABC 77")
+DEFINE_DEVICE_TYPE(ABC55, abc55_device, "abc55", "Luxor ABC 55")
 
 
 //-------------------------------------------------
@@ -77,7 +79,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *abc77_device::device_rom_region() const
+const tiny_rom_entry *abc77_device::device_rom_region() const
 {
 	return ROM_NAME( abc77 );
 }
@@ -99,10 +101,6 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( abc77_io, AS_IO, 8, abc77_device )
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff) AM_WRITE(j3_w)
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff) AM_READ_PORT("DSW")
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READ(p1_r)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(p2_w)
-	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(t1_r)
-	AM_RANGE(MCS48_PORT_PROG, MCS48_PORT_PROG) AM_WRITE(prog_w)
 ADDRESS_MAP_END
 
 
@@ -126,14 +124,18 @@ DISCRETE_SOUND_END
 
 
 //-------------------------------------------------
-//  MACHINE_DRIVER( abc77 )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( abc77 )
+MACHINE_CONFIG_MEMBER( abc77_device::device_add_mconfig )
 	// keyboard cpu
 	MCFG_CPU_ADD(I8035_TAG, I8035, XTAL_4_608MHz)
 	MCFG_CPU_PROGRAM_MAP(abc77_map)
 	MCFG_CPU_IO_MAP(abc77_io)
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(abc77_device, p1_r))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(abc77_device, p2_w))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(abc77_device, t1_r))
+	MCFG_MCS48_PORT_PROG_OUT_CB(WRITELINE(abc77_device, prog_w))
 
 	// watchdog
 	MCFG_WATCHDOG_ADD("watchdog")
@@ -145,17 +147,6 @@ static MACHINE_CONFIG_FRAGMENT( abc77 )
 	MCFG_DISCRETE_INTF(abc77)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor abc77_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( abc77 );
-}
 
 
 //-------------------------------------------------
@@ -422,24 +413,13 @@ inline void abc77_device::key_down(int state)
 //  abc77_device - constructor
 //-------------------------------------------------
 
-abc77_device::abc77_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, ABC77, "Luxor ABC 77", tag, owner, clock, "abc77", __FILE__),
+abc77_device::abc77_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
 	abc_keyboard_interface(mconfig, *this),
 	m_maincpu(*this, I8035_TAG),
 	m_watchdog(*this, "watchdog"),
 	m_discrete(*this, DISCRETE_TAG),
-	m_x0(*this, "X0"),
-	m_x1(*this, "X1"),
-	m_x2(*this, "X2"),
-	m_x3(*this, "X3"),
-	m_x4(*this, "X4"),
-	m_x5(*this, "X5"),
-	m_x6(*this, "X6"),
-	m_x7(*this, "X7"),
-	m_x8(*this, "X8"),
-	m_x9(*this, "X9"),
-	m_x10(*this, "X10"),
-	m_x11(*this, "X11"),
+	m_x(*this, "X%u", 0),
 	m_dsw(*this, "DSW"),
 	m_txd(1), m_keylatch(0),
 	m_keydown(1),
@@ -448,34 +428,11 @@ abc77_device::abc77_device(const machine_config &mconfig, const char *tag, devic
 {
 }
 
-abc77_device::abc77_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
-	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-	abc_keyboard_interface(mconfig, *this),
-	m_maincpu(*this, I8035_TAG),
-	m_watchdog(*this, "watchdog"),
-	m_discrete(*this, DISCRETE_TAG),
-	m_x0(*this, "X0"),
-	m_x1(*this, "X1"),
-	m_x2(*this, "X2"),
-	m_x3(*this, "X3"),
-	m_x4(*this, "X4"),
-	m_x5(*this, "X5"),
-	m_x6(*this, "X6"),
-	m_x7(*this, "X7"),
-	m_x8(*this, "X8"),
-	m_x9(*this, "X9"),
-	m_x10(*this, "X10"),
-	m_x11(*this, "X11"),
-	m_dsw(*this, "DSW"),
-	m_txd(1), m_keylatch(0),
-	m_keydown(1),
-	m_clock(0), m_hys(0), m_reset(0),
-	m_stb(1), m_j3(0), m_serial_timer(nullptr), m_reset_timer(nullptr)
-{
-}
+abc55_device::abc55_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	abc77_device(mconfig, ABC55, tag, owner, clock) { }
 
-abc55_device::abc55_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	abc77_device(mconfig, ABC55, "Luxor ABC 55", tag, owner, clock, "abc55", __FILE__) { }
+abc77_device::abc77_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	abc77_device(mconfig, ABC77, tag, owner, clock) { }
 
 
 //-------------------------------------------------
@@ -561,24 +518,13 @@ READ8_MEMBER( abc77_device::p1_r )
 
 	*/
 
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	if (m_stb)
 	{
-		switch (m_keylatch)
+		if (m_keylatch < 12)
 		{
-		case 0: data = m_x0->read(); break;
-		case 1: data = m_x1->read(); break;
-		case 2: data = m_x2->read(); break;
-		case 3: data = m_x3->read(); break;
-		case 4: data = m_x4->read(); break;
-		case 5: data = m_x5->read(); break;
-		case 6: data = m_x6->read(); break;
-		case 7: data = m_x7->read(); break;
-		case 8: data = m_x8->read(); break;
-		case 9: data = m_x9->read(); break;
-		case 10: data = m_x10->read(); break;
-		case 11: data = m_x11->read(); break;
+			data = m_x[m_keylatch]->read();
 		}
 	}
 
@@ -635,7 +581,7 @@ WRITE8_MEMBER( abc77_device::p2_w )
 //  t1_r -
 //-------------------------------------------------
 
-READ8_MEMBER( abc77_device::t1_r )
+READ_LINE_MEMBER( abc77_device::t1_r )
 {
 	return m_clock;
 }
@@ -645,9 +591,9 @@ READ8_MEMBER( abc77_device::t1_r )
 //  prog_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( abc77_device::prog_w )
+WRITE_LINE_MEMBER( abc77_device::prog_w )
 {
-	m_stb = BIT(data, 0);
+	m_stb = state;
 }
 
 

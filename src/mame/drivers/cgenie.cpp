@@ -22,7 +22,10 @@
 #include "bus/rs232/rs232.h"
 #include "bus/cgenie/expansion/expansion.h"
 #include "bus/cgenie/parallel/parallel.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -42,7 +45,7 @@ public:
 		m_char_rom(*this, "gfx1"),
 		m_color_ram(*this, "colorram"),
 		m_font_ram(*this, "fontram"),
-		m_keyboard(*this, "KEY"),
+		m_keyboard(*this, "KEY.%u", 0),
 		m_palette(nullptr),
 		m_control(0xff),
 		m_rs232_rx(1),
@@ -78,10 +81,10 @@ private:
 	required_device<ram_device> m_ram;
 	required_device<hd6845_device> m_crtc;
 	required_device<rs232_port_device> m_rs232;
-	required_device<expansion_slot_device> m_exp;
+	required_device<cg_exp_slot_device> m_exp;
 	required_memory_region m_char_rom;
-	required_shared_ptr<UINT8> m_color_ram;
-	required_shared_ptr<UINT8> m_font_ram;
+	required_shared_ptr<uint8_t> m_color_ram;
+	required_shared_ptr<uint8_t> m_font_ram;
 	required_ioport_array<8> m_keyboard;
 
 	static const rgb_t m_palette_bg[];
@@ -91,7 +94,7 @@ private:
 	const rgb_t *m_palette;
 	rgb_t m_background_color;
 
-	UINT8 m_control;
+	uint8_t m_control;
 
 	int m_rs232_rx;
 	int m_rs232_dcd;
@@ -219,7 +222,7 @@ INPUT_PORTS_END
 
 READ8_MEMBER( cgenie_state::keyboard_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	for (int i = 0; i < 8; i++)
 		if (BIT(offset, i))
@@ -260,7 +263,7 @@ WRITE8_MEMBER( cgenie_state::control_w )
 
 READ8_MEMBER( cgenie_state::control_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	data |= m_cassette->input() > 0 ? 1 : 0;
 	data |= m_rs232_rx << 1;
@@ -332,8 +335,8 @@ MC6845_UPDATE_ROW( cgenie_state::crtc_update_row )
 
 	for (int column = 0; column < x_count; column++)
 	{
-		UINT8 code = m_ram->pointer()[ma + column];
-		UINT8 color = m_color_ram[(ma & 0xbff) + column];
+		uint8_t code = m_ram->pointer()[ma + column];
+		uint8_t color = m_color_ram[(ma & 0xbff) + column];
 
 		// gfx mode?
 		if (BIT(m_control, 5))
@@ -347,7 +350,7 @@ MC6845_UPDATE_ROW( cgenie_state::crtc_update_row )
 		}
 		else
 		{
-			UINT8 gfx = 0;
+			uint8_t gfx = 0;
 
 			// cursor visible?
 			if (cursor_x == column)
@@ -376,7 +379,7 @@ MC6845_UPDATE_ROW( cgenie_state::crtc_update_row )
 // how accurate are these colors?
 const rgb_t cgenie_state::m_palette_bg[] =
 {
-	rgb_t::black,
+	rgb_t::black(),
 	rgb_t(0x70, 0x28, 0x20), // dark orange
 	rgb_t(0x28, 0x70, 0x20), // dark green
 	rgb_t(0x48, 0x48, 0x48), // dark gray
@@ -401,13 +404,13 @@ const rgb_t cgenie_state::m_palette_eu[] =
 	rgb_t(0x8c, 0x8c, 0x8c), // light gray
 	rgb_t(0x00, 0xfb, 0x8c), // turquoise
 	rgb_t(0xd2, 0x00, 0xff), // magenta
-	rgb_t::white             // bright white
+	rgb_t::white()           // bright white
 };
 
 // new zealand palette
 const rgb_t cgenie_state::m_palette_nz[] =
 {
-	rgb_t::white,
+	rgb_t::white(),
 	rgb_t(0x12, 0xff, 0xff),
 	rgb_t(0xff, 0x6f, 0xff),
 	rgb_t(0x31, 0x77, 0xff),
@@ -422,7 +425,7 @@ const rgb_t cgenie_state::m_palette_nz[] =
 	rgb_t(0xff, 0xf9, 0x00),
 	rgb_t(0x00, 0xda, 0x00),
 	rgb_t(0xff, 0x22, 0x00),
-	rgb_t::black
+	rgb_t::black()
 };
 
 
@@ -430,7 +433,7 @@ const rgb_t cgenie_state::m_palette_nz[] =
 //  MACHINE DEFINTIONS
 //**************************************************************************
 
-static MACHINE_CONFIG_START( cgenie, cgenie_state )
+static MACHINE_CONFIG_START( cgenie )
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_17_73447MHz / 8)  // 2.2168 MHz
 	MCFG_CPU_PROGRAM_MAP(cgenie_mem)
@@ -450,10 +453,10 @@ static MACHINE_CONFIG_START( cgenie, cgenie_state )
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("ay8910", AY8910, XTAL_17_73447MHz / 8)
-	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("par", parallel_slot_device, pa_r))
-	MCFG_AY8910_PORT_A_WRITE_CB(DEVWRITE8("par", parallel_slot_device, pa_w))
-	MCFG_AY8910_PORT_B_READ_CB(DEVREAD8("par", parallel_slot_device, pb_r))
-	MCFG_AY8910_PORT_B_WRITE_CB(DEVWRITE8("par", parallel_slot_device, pb_w))
+	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("par", cg_parallel_slot_device, pa_r))
+	MCFG_AY8910_PORT_A_WRITE_CB(DEVWRITE8("par", cg_parallel_slot_device, pa_w))
+	MCFG_AY8910_PORT_B_READ_CB(DEVREAD8("par", cg_parallel_slot_device, pb_r))
+	MCFG_AY8910_PORT_B_WRITE_CB(DEVWRITE8("par", cg_parallel_slot_device, pb_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
 	MCFG_CASSETTE_ADD("cassette")
@@ -469,11 +472,11 @@ static MACHINE_CONFIG_START( cgenie, cgenie_state )
 	MCFG_RS232_DCD_HANDLER(WRITELINE(cgenie_state, rs232_dcd_w))
 
 	// cartridge expansion slot
-	MCFG_EXPANSION_SLOT_ADD("exp")
-	MCFG_EXPANSION_SLOT_INT_HANDLER(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MCFG_CG_EXP_SLOT_ADD("exp")
+	MCFG_CG_EXP_SLOT_INT_HANDLER(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
 	// parallel slot
-	MCFG_PARALLEL_SLOT_ADD("par")
+	MCFG_CG_PARALLEL_SLOT_ADD("par")
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)

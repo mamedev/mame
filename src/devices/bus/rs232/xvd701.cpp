@@ -1,9 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:smf
+#include "emu.h"
 #include "xvd701.h"
 
-jvc_xvd701_device::jvc_xvd701_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, JVC_XVD701, "JVC XV-D701", tag, owner, clock, "xvd701", __FILE__),
+jvc_xvd701_device::jvc_xvd701_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, JVC_XVD701, tag, owner, clock),
 	device_serial_interface(mconfig, *this),
 	device_rs232_port_interface(mconfig, *this),
 	m_response_index(0),
@@ -11,13 +12,8 @@ jvc_xvd701_device::jvc_xvd701_device(const machine_config &mconfig, const char *
 {
 }
 
-static MACHINE_CONFIG_FRAGMENT(xvd701)
+MACHINE_CONFIG_MEMBER(jvc_xvd701_device::device_add_mconfig)
 MACHINE_CONFIG_END
-
-machine_config_constructor jvc_xvd701_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME(xvd701);
-}
 
 static INPUT_PORTS_START(xvd701)
 INPUT_PORTS_END
@@ -69,7 +65,7 @@ void jvc_xvd701_device::device_timer(emu_timer &timer, device_timer_id id, int p
 		break;
 
 	default:
-		device_serial_interface::device_timer(timer, id, param, ptr);
+		break;
 	}
 }
 
@@ -149,4 +145,4 @@ void jvc_xvd701_device::rcv_complete()
 	}
 }
 
-const device_type JVC_XVD701 = &device_creator<jvc_xvd701_device>;
+DEFINE_DEVICE_TYPE(JVC_XVD701, jvc_xvd701_device, "xvd701", "JVC XV-D701")

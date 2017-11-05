@@ -37,15 +37,15 @@ enum
 };
 
 // device type definition
-const device_type PCE220SERIAL = &device_creator<pce220_serial_device>;
+DEFINE_DEVICE_TYPE(PCE220SERIAL, pce220_serial_device, "pce220_serial", "Sharp PC-E220 serial")
 
 //-------------------------------------------------
 //  pce220_serial_device - constructor
 //-------------------------------------------------
 
-pce220_serial_device::pce220_serial_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, PCE220SERIAL, "Sharp PC-E220 serial", tag, owner, clock, "pce220_serial", __FILE__),
-		device_image_interface(mconfig, *this)
+pce220_serial_device::pce220_serial_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, PCE220SERIAL, tag, owner, clock)
+	, device_image_interface(mconfig, *this)
 {
 }
 
@@ -81,19 +81,6 @@ void pce220_serial_device::device_reset()
 	m_bytes_count = 0;
 	m_dout = m_busy = m_xout = 0;
 	m_din = m_xin = m_ack = 0;
-}
-
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void pce220_serial_device::device_config_complete()
-{
-	// set brief and instance name
-	update_names();
 }
 
 
@@ -144,7 +131,7 @@ void pce220_serial_device::device_timer(emu_timer &timer, device_timer_id id, in
 			{
 				//next byte
 				m_bytes_count++;
-				popmessage("Send %d/%d bytes\n", m_bytes_count , (UINT32)length());
+				popmessage("Send %d/%d bytes\n", m_bytes_count , (uint32_t)length());
 				m_state = SIO_WAIT;
 				if (m_bytes_count < length())
 					fread(&m_current_byte, 1);
@@ -224,7 +211,7 @@ void pce220_serial_device::device_timer(emu_timer &timer, device_timer_id id, in
     DEVICE_IMAGE_LOAD( pce220_serial )
 -------------------------------------------------*/
 
-bool pce220_serial_device::call_load()
+image_init_result pce220_serial_device::call_load()
 {
 	m_state = SIO_WAIT;
 	m_bytes_count = 0;
@@ -233,21 +220,21 @@ bool pce220_serial_device::call_load()
 	//read the first byte
 	fread(&m_current_byte, 1);
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 /*-------------------------------------------------
     DEVICE_IMAGE_CREATE( pce220_serial )
 -------------------------------------------------*/
 
-bool pce220_serial_device::call_create(int format_type, option_resolution *format_options)
+image_init_result pce220_serial_device::call_create(int format_type, util::option_resolution *format_options)
 {
 	m_state = SIO_WAIT;
 	m_bytes_count = 0;
 	m_current_byte = 0;
 	m_receive_timer->adjust(attotime::from_hz(SIO_BAUD_RATE), 0, attotime::from_hz(SIO_BAUD_RATE));
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 
@@ -269,9 +256,9 @@ void pce220_serial_device::call_unload()
     calculate the byte parity
 -------------------------------------------------*/
 
-int pce220_serial_device::calc_parity(UINT8 data)
+int pce220_serial_device::calc_parity(uint8_t data)
 {
-	UINT8 count = 0;
+	uint8_t count = 0;
 
 	while(data != 0)
 	{

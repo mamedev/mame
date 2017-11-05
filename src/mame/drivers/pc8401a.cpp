@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
+#include "emu.h"
 #include "includes/pc8401a.h"
 
 /*
@@ -44,7 +45,7 @@ void pc8401a_state::scan_keyboard()
 	/* scan keyboard */
 	for (int row = 0; row < 10; row++)
 	{
-		UINT8 data = m_io_y[row]->read();
+		uint8_t data = m_io_y[row]->read();
 
 		if (data != 0xff)
 		{
@@ -70,7 +71,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(pc8401a_state::pc8401a_keyboard_tick)
 
 /* Read/Write Handlers */
 
-void pc8401a_state::bankswitch(UINT8 data)
+void pc8401a_state::bankswitch(uint8_t data)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 
@@ -497,7 +498,7 @@ void pc8401a_state::machine_start()
 	/* allocate CRT video RAM */
 	m_crt_ram.allocate(PC8401A_CRT_VIDEORAM_SIZE);
 
-	UINT8 *ram = m_ram->pointer();
+	uint8_t *ram = m_ram->pointer();
 
 	/* set up A0/A1 memory banking */
 	membank("bank1")->configure_entries(0, 4, m_rom->base(), 0x8000);
@@ -567,7 +568,7 @@ WRITE8_MEMBER( pc8401a_state::ppi_pc_w )
 
 /* Machine Drivers */
 
-static MACHINE_CONFIG_START( pc8401a, pc8401a_state )
+static MACHINE_CONFIG_START( pc8401a )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(Z80_TAG, Z80, 4000000) // NEC uPD70008C
 	MCFG_CPU_PROGRAM_MAP(pc8401a_mem)
@@ -609,7 +610,7 @@ static MACHINE_CONFIG_START( pc8401a, pc8401a_state )
 	MCFG_RAM_EXTRA_OPTIONS("96K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( pc8500, pc8500_state )
+static MACHINE_CONFIG_START( pc8500 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(Z80_TAG, Z80, 4000000) // NEC uPD70008C
 	MCFG_CPU_PROGRAM_MAP(pc8401a_mem)
@@ -672,6 +673,6 @@ ROM_END
 /* System Drivers */
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT    COMPANY FULLNAME */
-COMP( 1984, pc8401a,    0,      0,      pc8401a,    pc8401a, driver_device, 0,      "Nippon Electronic Company",    "PC-8401A-LS", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-//COMP( 1984, pc8401bd,   pc8401a,0,      pc8401a,    pc8401a, driver_device, 0,      "Nippon Electronic Company",    "PC-8401BD", MACHINE_NOT_WORKING)
-COMP( 1985, pc8500,     0,      0,      pc8500,     pc8401a, driver_device, 0,      "Nippon Electronic Company",    "PC-8500", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1984, pc8401a,    0,      0,      pc8401a,    pc8401a, pc8401a_state, 0,      "NEC",    "PC-8401A-LS", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//COMP( 1984, pc8401bd,   pc8401a,0,      pc8401a,    pc8401a, pc8401a_state, 0,      "NEC",    "PC-8401BD", MACHINE_NOT_WORKING)
+COMP( 1985, pc8500,     0,      0,      pc8500,     pc8401a, pc8500_state,  0,      "NEC",    "PC-8500", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

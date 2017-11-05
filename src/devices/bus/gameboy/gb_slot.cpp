@@ -25,8 +25,8 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type GB_CART_SLOT = &device_creator<gb_cart_slot_device>;
-const device_type MEGADUCK_CART_SLOT = &device_creator<megaduck_cart_slot_device>;
+DEFINE_DEVICE_TYPE(GB_CART_SLOT,       gb_cart_slot_device,       "gb_cart_slot",       "Game Boy Cartridge Slot")
+DEFINE_DEVICE_TYPE(MEGADUCK_CART_SLOT, megaduck_cart_slot_device, "megaduck_cart_slot", "Megaduck Cartridge Slot")
 
 //**************************************************************************
 //    GB cartridges Interface
@@ -59,7 +59,7 @@ device_gb_cart_interface::~device_gb_cart_interface()
 //  rom_alloc - alloc the space for the cart
 //-------------------------------------------------
 
-void device_gb_cart_interface::rom_alloc(UINT32 size, const char *tag)
+void device_gb_cart_interface::rom_alloc(uint32_t size, const char *tag)
 {
 	if (m_rom == nullptr)
 	{
@@ -73,7 +73,7 @@ void device_gb_cart_interface::rom_alloc(UINT32 size, const char *tag)
 //  ram_alloc - alloc the space for the ram
 //-------------------------------------------------
 
-void device_gb_cart_interface::ram_alloc(UINT32 size)
+void device_gb_cart_interface::ram_alloc(uint32_t size)
 {
 	m_ram.resize(size);
 }
@@ -84,7 +84,7 @@ void device_gb_cart_interface::ram_alloc(UINT32 size)
 //  blocks, so to simplify ROM access
 //-------------------------------------------------
 
-void device_gb_cart_interface::rom_map_setup(UINT32 size)
+void device_gb_cart_interface::rom_map_setup(uint32_t size)
 {
 	int i;
 	// setup the rom_bank_map array to faster ROM read
@@ -117,7 +117,7 @@ void device_gb_cart_interface::rom_map_setup(UINT32 size)
 //  blocks, so to simplify ROM access
 //-------------------------------------------------
 
-void device_gb_cart_interface::ram_map_setup(UINT8 banks)
+void device_gb_cart_interface::ram_map_setup(uint8_t banks)
 {
 	int mask = banks - 1;
 
@@ -135,32 +135,32 @@ void device_gb_cart_interface::ram_map_setup(UINT8 banks)
 //**************************************************************************
 
 //-------------------------------------------------
-//  base_gb_cart_slot_device - constructor
+//  gb_cart_slot_device_base - constructor
 //-------------------------------------------------
-base_gb_cart_slot_device::base_gb_cart_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
-						device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-						device_image_interface(mconfig, *this),
-						device_slot_interface(mconfig, *this),
-						m_sgb_hack(0),
-						m_type(GB_MBC_UNKNOWN), m_cart(nullptr)
+gb_cart_slot_device_base::gb_cart_slot_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
+	device_image_interface(mconfig, *this),
+	device_slot_interface(mconfig, *this),
+	m_type(GB_MBC_UNKNOWN),
+	m_cart(nullptr)
 {
 }
 
-gb_cart_slot_device::gb_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-						base_gb_cart_slot_device(mconfig, GB_CART_SLOT, "Game Boy Cartridge Slot", tag, owner, clock, "gb_cart_slot", __FILE__)
+gb_cart_slot_device::gb_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	gb_cart_slot_device_base(mconfig, GB_CART_SLOT, tag, owner, clock)
 {
 }
 
-megaduck_cart_slot_device::megaduck_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-						base_gb_cart_slot_device(mconfig, MEGADUCK_CART_SLOT, "Megaduck Cartridge Slot", tag, owner, clock, "megaduck_cart_slot", __FILE__)
+megaduck_cart_slot_device::megaduck_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	gb_cart_slot_device_base(mconfig, MEGADUCK_CART_SLOT, tag, owner, clock)
 {
 }
 
 //-------------------------------------------------
-//  base_gb_cart_slot_device - destructor
+//  gb_cart_slot_device_base - destructor
 //-------------------------------------------------
 
-base_gb_cart_slot_device::~base_gb_cart_slot_device()
+gb_cart_slot_device_base::~gb_cart_slot_device_base()
 {
 }
 
@@ -168,21 +168,9 @@ base_gb_cart_slot_device::~base_gb_cart_slot_device()
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void base_gb_cart_slot_device::device_start()
+void gb_cart_slot_device_base::device_start()
 {
 	m_cart = dynamic_cast<device_gb_cart_interface *>(get_card_device());
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void base_gb_cart_slot_device::device_config_complete()
-{
-	// set brief and instance name
-	update_names();
 }
 
 
@@ -238,7 +226,7 @@ static int gb_get_pcb_id(const char *slot)
 			return elem.pcb_id;
 	}
 
-	return 0;
+	return GB_MBC_NONE;
 }
 
 static const char *gb_get_slot(int type)
@@ -258,17 +246,17 @@ static const char *gb_get_slot(int type)
  -------------------------------------------------*/
 
 
-bool base_gb_cart_slot_device::call_load()
+image_init_result gb_cart_slot_device_base::call_load()
 {
 	if (m_cart)
 	{
-		UINT32 offset;
-		UINT32 len = (software_entry() == nullptr) ? length() : get_software_region_length("rom");
-		UINT8 *ROM;
+		uint32_t offset;
+		uint32_t len = !loaded_through_softlist() ? length() : get_software_region_length("rom");
+		uint8_t *ROM;
 		int rambanks = 0;
 
 		// From fullpath, check for presence of a header and skip it + check filesize is valid
-		if (software_entry() == nullptr)
+		if (!loaded_through_softlist())
 		{
 			if ((len % 0x4000) == 512)
 			{
@@ -281,14 +269,14 @@ bool base_gb_cart_slot_device::call_load()
 			if ((len == 0) || ((len % 0x4000) != 0))
 			{
 				seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid rom file size\n");
-				return IMAGE_INIT_FAIL;
+				return image_init_result::FAIL;
 			}
 		}
 
 		m_cart->rom_alloc(len, tag());
 		ROM = m_cart->get_rom_base();
 
-		if (software_entry() == nullptr)
+		if (!loaded_through_softlist())
 			fread(ROM, len);
 		else
 			memcpy(ROM, get_software_region("rom"), len);
@@ -298,7 +286,7 @@ bool base_gb_cart_slot_device::call_load()
 		if (get_mmm01_candidate(ROM, len))
 			offset = len - 0x8000;
 
-		if (software_entry() != nullptr)
+		if (loaded_through_softlist())
 			m_type = gb_get_pcb_id(get_feature("slot") ? get_feature("slot") : "rom");
 		else
 			m_type = get_cart_type(ROM + offset, len - offset);
@@ -312,7 +300,7 @@ bool base_gb_cart_slot_device::call_load()
 			m_cart->set_additional_wirings(0x0f, -1);
 
 		// setup RAM/NVRAM/RTC/RUMBLE
-		if (software_entry() != nullptr)
+		if (loaded_through_softlist())
 		{
 			// from softlist we only rely on xml
 			if (get_software_region("ram"))
@@ -397,27 +385,21 @@ bool base_gb_cart_slot_device::call_load()
 
 		internal_header_logging(ROM + offset, len);
 
-		// Hack to support Donkey Kong Land 2 + 3 in SGB
-		// For some reason, these store the tile data differently. Hacks will go once it's been figured out
-		if (strncmp((const char*)(ROM + 0x134), "DONKEYKONGLAND 2", 16) == 0 ||
-			strncmp((const char*)(ROM + 0x134), "DONKEYKONGLAND 3", 16) == 0)
-			m_sgb_hack = 1;
-
-		return IMAGE_INIT_PASS;
+		return image_init_result::PASS;
 	}
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
-bool megaduck_cart_slot_device::call_load()
+image_init_result megaduck_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		UINT32 len = (software_entry() == nullptr) ? length() : get_software_region_length("rom");
+		uint32_t len = !loaded_through_softlist() ? length() : get_software_region_length("rom");
 
 		m_cart->rom_alloc(len, tag());
 
-		if (software_entry() == nullptr)
+		if (!loaded_through_softlist())
 			fread(m_cart->get_rom_base(), len);
 		else
 			memcpy(m_cart->get_rom_base(), get_software_region("rom"), len);
@@ -425,10 +407,10 @@ bool megaduck_cart_slot_device::call_load()
 		// setup rom bank map based on real length, not header value
 		m_cart->rom_map_setup(len);
 
-		return IMAGE_INIT_PASS;
+		return image_init_result::PASS;
 	}
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 
@@ -436,13 +418,13 @@ bool megaduck_cart_slot_device::call_load()
  call_unload
  -------------------------------------------------*/
 
-void base_gb_cart_slot_device::call_unload()
+void gb_cart_slot_device_base::call_unload()
 {
 	if (m_cart && m_cart->get_ram_base() && m_cart->get_ram_size() && m_cart->get_has_battery())
 		battery_save(m_cart->get_ram_base(), m_cart->get_ram_size());
 }
 
-void base_gb_cart_slot_device::setup_ram(UINT8 banks)
+void gb_cart_slot_device_base::setup_ram(uint8_t banks)
 {
 	m_cart->ram_alloc(banks * 0x2000);
 	memset(m_cart->get_ram_base(), 0xff, m_cart->get_ram_size());
@@ -451,23 +433,13 @@ void base_gb_cart_slot_device::setup_ram(UINT8 banks)
 
 
 
-/*-------------------------------------------------
- call softlist load
- -------------------------------------------------*/
-
-bool base_gb_cart_slot_device::call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry)
-{
-	machine().rom_load().load_software_part_region(*this, swlist, swname, start_entry);
-	return true;
-}
-
 // This fails to catch Mani 4-in-1 carts... even when they match this, then they have MBC1/3 in the internal header instead of MMM01...
-bool base_gb_cart_slot_device::get_mmm01_candidate(UINT8 *ROM, UINT32 len)
+bool gb_cart_slot_device_base::get_mmm01_candidate(const uint8_t *ROM, uint32_t len)
 {
 	if (len < 0x8147)
 		return false;
 
-	static const UINT8 nintendo_logo[0x18] = {
+	static const uint8_t nintendo_logo[0x18] = {
 		0xCE, 0xED, 0x66, 0x66, 0xCC, 0x0D, 0x00, 0x0B,
 		0x03, 0x73, 0x00, 0x83, 0x00, 0x0C, 0x00, 0x0D,
 		0x00, 0x08, 0x11, 0x1F, 0x88, 0x89, 0x00, 0x0E
@@ -485,7 +457,37 @@ bool base_gb_cart_slot_device::get_mmm01_candidate(UINT8 *ROM, UINT32 len)
 		return false;
 }
 
-int base_gb_cart_slot_device::get_cart_type(UINT8 *ROM, UINT32 len)
+bool gb_cart_slot_device_base::is_mbc1col_game(const uint8_t *ROM, uint32_t len)
+{
+	const uint8_t name_length = 0x10u;
+	static const uint8_t internal_names[][name_length + 1] = {
+		/* Bomberman Collection */
+		"BOMCOL\0\0\0\0\0\0\0\0\0\0",
+		/* Bomberman Selection */
+		"BOMSEL\0\0\0\0\0B2CK\xC0",
+		/* Genjin Collection */
+		"GENCOL\0\0\0\0\0\0\0\0\0\0",
+		/* Momotarou Collection */
+		"MOMOCOL\0\0\0\0\0\0\0\0\0",
+		/* Mortal Kombat I & II Japan */
+		"MORTALKOMBAT DUO",
+		/* Mortal Kombat I & II US */
+		"MORTALKOMBATI&II",
+		/* Super Chinese Land 1,2,3' */
+		"SUPERCHINESE 123"
+	};
+
+	const uint8_t rows = ARRAY_LENGTH(internal_names);
+
+	for (uint8_t i = 0x00; i < rows; ++i) {
+		if (0 == memcmp(&ROM[0x134], &internal_names[i][0], name_length))
+			return true;
+	}
+
+	return false;
+}
+
+int gb_cart_slot_device_base::get_cart_type(const uint8_t *ROM, uint32_t len)
 {
 	int type = GB_MBC_NONE;
 
@@ -545,6 +547,7 @@ int base_gb_cart_slot_device::get_cart_type(UINT8 *ROM, UINT32 len)
 
 	// Check for some unlicensed games
 	//if (type == GB_MBC_MBC5)
+	if (len >= 0x184 + 0x30)
 	{
 		int count = 0;
 		for (int i = 0x0184; i < 0x0184 + 0x30; i++)
@@ -568,31 +571,8 @@ int base_gb_cart_slot_device::get_cart_type(UINT8 *ROM, UINT32 len)
 	}
 
 	/* Check if we're dealing with the multigame variant of the MBC1 mapper */
-	if (type == GB_MBC_MBC1)
-	{   // bomberman collection korea
-		if (ROM[0x134] == 0x42 && ROM[0x135] == 0x4f && ROM[0x136] == 0x4d && ROM[0x137] == 0x53)
-			type = GB_MBC_MBC1_COL;
-//      if (ROM[0x13f] == 0x42 && ROM[0x140] == 0x32 && ROM[0x141] == 0x43 && ROM[0x142] == 0x4B)
-//          type = GB_MBC_MBC1_COL;
-		// genjin collection
-		if (ROM[0x134] == 0x47 && ROM[0x135] == 0x45 && ROM[0x136] == 0x4e && ROM[0x137] == 0x43)
-			type = GB_MBC_MBC1_COL;
-		// bomberman collection japan
-		if (ROM[0x134] == 0x42 && ROM[0x135] == 0x4f && ROM[0x136] == 0x4d && ROM[0x137] == 0x43)
-			type = GB_MBC_MBC1_COL;
-		// mortal kombat I & II US
-		if (ROM[0x140] == 0x49 && ROM[0x141] == 0x26 && ROM[0x142] == 0x49 && ROM[0x143] == 0x49)
-			type = GB_MBC_MBC1_COL;
-		// mortal kombat I & II japan
-		if (ROM[0x140] == 0x20 && ROM[0x141] == 0x44 && ROM[0x142] == 0x55 && ROM[0x143] == 0x4f)
-			type = GB_MBC_MBC1_COL;
-		// momotarou collection 1 japan
-		if (ROM[0x137] == 0x4f && ROM[0x138] == 0x43 && ROM[0x139] == 0x4f && ROM[0x13a] == 0x4c)
-			type = GB_MBC_MBC1_COL;
-		// super chinese 123 dash japan
-		if (ROM[0x142] == 0x32 && ROM[0x143] == 0x33 && ROM[0x144] == 0x42 && ROM[0x145] == 0x41)
-			type = GB_MBC_MBC1_COL;
-	}
+	if (type == GB_MBC_MBC1 && is_mbc1col_game(ROM, len))
+		type = GB_MBC_MBC1_COL;
 
 	return type;
 }
@@ -601,16 +581,16 @@ int base_gb_cart_slot_device::get_cart_type(UINT8 *ROM, UINT32 len)
  get default card software
  -------------------------------------------------*/
 
-std::string base_gb_cart_slot_device::get_default_card_software()
+std::string gb_cart_slot_device_base::get_default_card_software(get_default_card_software_hook &hook) const
 {
-	if (open_image_file(mconfig().options()))
+	if (hook.image_file())
 	{
 		const char *slot_string;
-		UINT32 len = m_file->size(), offset = 0;
-		dynamic_buffer rom(len);
+		uint32_t len = hook.image_file()->size(), offset = 0;
+		std::vector<uint8_t> rom(len);
 		int type;
 
-		m_file->read(&rom[0], len);
+		hook.image_file()->read(&rom[0], len);
 
 		if ((len % 0x4000) == 512)
 			offset = 512;
@@ -622,7 +602,6 @@ std::string base_gb_cart_slot_device::get_default_card_software()
 		slot_string = gb_get_slot(type);
 
 		//printf("type: %s\n", slot_string);
-		clear();
 
 		return std::string(slot_string);
 	}
@@ -631,9 +610,9 @@ std::string base_gb_cart_slot_device::get_default_card_software()
 }
 
 
-std::string megaduck_cart_slot_device::get_default_card_software()
+std::string megaduck_cart_slot_device::get_default_card_software(get_default_card_software_hook &hook) const
 {
-	if (open_image_file(mconfig().options()))
+	if (hook.image_file())
 		return std::string("rom");
 
 	return software_get_default_slot("rom");
@@ -645,7 +624,7 @@ std::string megaduck_cart_slot_device::get_default_card_software()
  read
  -------------------------------------------------*/
 
-READ8_MEMBER(base_gb_cart_slot_device::read_rom)
+READ8_MEMBER(gb_cart_slot_device_base::read_rom)
 {
 	if (m_cart)
 		return m_cart->read_rom(space, offset);
@@ -653,7 +632,7 @@ READ8_MEMBER(base_gb_cart_slot_device::read_rom)
 		return 0xff;
 }
 
-READ8_MEMBER(base_gb_cart_slot_device::read_ram)
+READ8_MEMBER(gb_cart_slot_device_base::read_ram)
 {
 	if (m_cart)
 		return m_cart->read_ram(space, offset);
@@ -666,13 +645,13 @@ READ8_MEMBER(base_gb_cart_slot_device::read_ram)
  write
  -------------------------------------------------*/
 
-WRITE8_MEMBER(base_gb_cart_slot_device::write_bank)
+WRITE8_MEMBER(gb_cart_slot_device_base::write_bank)
 {
 	if (m_cart)
 		m_cart->write_bank(space, offset, data);
 }
 
-WRITE8_MEMBER(base_gb_cart_slot_device::write_ram)
+WRITE8_MEMBER(gb_cart_slot_device_base::write_ram)
 {
 	if (m_cart)
 		m_cart->write_ram(space, offset, data);
@@ -683,7 +662,7 @@ WRITE8_MEMBER(base_gb_cart_slot_device::write_ram)
  Internal header logging
  -------------------------------------------------*/
 
-void base_gb_cart_slot_device::internal_header_logging(UINT8 *ROM, UINT32 len)
+void gb_cart_slot_device_base::internal_header_logging(uint8_t *ROM, uint32_t len)
 {
 	static const char *const cart_types[] =
 	{
@@ -705,7 +684,7 @@ void base_gb_cart_slot_device::internal_header_logging(UINT8 *ROM, UINT32 len)
 	// some company codes
 	static const struct
 	{
-		UINT16 code;
+		uint16_t code;
 		const char *name;
 	}
 	companies[] =
@@ -789,7 +768,7 @@ void base_gb_cart_slot_device::internal_header_logging(UINT8 *ROM, UINT32 len)
 	static const int ramsize[8] = { 0, 2, 8, 32, 128, 64, 0, 0 };
 
 	char soft[17];
-	UINT32 tmp;
+	uint32_t tmp;
 	int csum = 0, i = 0;
 	int rom_banks;
 

@@ -6,34 +6,26 @@
 #include "68340.h"
 
 
-READ32_MEMBER( m68340cpu_device::m68340_internal_dma_r )
+READ32_MEMBER( m68340_cpu_device::m68340_internal_dma_r )
 {
-	m68340cpu_device *m68k = this;
-	m68340_dma* dma = m68k->m68340DMA;
-	assert(dma != nullptr);
+	assert(m68340DMA);
+	//m68340_dma &dma = *m68340DMA;
 
-	if (dma)
-	{
-		int pc = space.device().safe_pc();
-		logerror("%08x m68340_internal_dma_r %08x, (%08x)\n", pc, offset*4,mem_mask);
-	}
+	int pc = space.device().safe_pc();
+	logerror("%08x m68340_internal_dma_r %08x, (%08x)\n", pc, offset*4,mem_mask);
 
 	return 0x00000000;
 }
 
-WRITE32_MEMBER( m68340cpu_device::m68340_internal_dma_w )
+WRITE32_MEMBER( m68340_cpu_device::m68340_internal_dma_w )
 {
-	m68340cpu_device *m68k = this;
-	m68340_dma* dma = m68k->m68340DMA;
-	assert(dma != nullptr);
+	assert(m68340DMA);
+	//m68340_dma &dma = *m68340DMA;
 
-	if (dma)
-	{
-		int pc = space.device().safe_pc();
-		logerror("%08x m68340_internal_dma_w %08x, %08x (%08x)\n", pc, offset*4,data,mem_mask);
-	}
+	int pc = space.device().safe_pc();
+	logerror("%08x m68340_internal_dma_w %08x, %08x (%08x)\n", pc, offset*4,data,mem_mask);
 }
 
-void m68340_dma::reset(void)
+void m68340_dma::reset()
 {
 }

@@ -1,5 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Philip Bennett
+#include "audio/cage.h"
+
 #include "cpu/adsp2100/adsp2100.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/tms34010/tms34010.h"
@@ -27,9 +29,9 @@ public:
 	required_device<dsp32c_device> m_dsp32c_2;
 	required_device<atari_cage_device> m_cage;
 
-	required_shared_ptr<UINT32> m_adsp_internal_program_ram;
-	required_shared_ptr<UINT16> m_gsp_dram;
-	required_shared_ptr<UINT16> m_gsp_vram;
+	required_shared_ptr<uint32_t> m_adsp_internal_program_ram;
+	required_shared_ptr<uint16_t> m_gsp_dram;
+	required_shared_ptr<uint16_t> m_gsp_vram;
 
 	DECLARE_READ32_MEMBER(unk_r);
 	DECLARE_READ32_MEMBER(watchdog_r);
@@ -51,8 +53,7 @@ public:
 	DECLARE_WRITE32_MEMBER(timer_w);
 	DECLARE_DRIVER_INIT(metalmx);
 	DECLARE_WRITE8_MEMBER(cage_irq_callback);
-	DECLARE_WRITE_LINE_MEMBER(tms_interrupt);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_metalmx(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_metalmx(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };

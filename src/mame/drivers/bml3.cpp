@@ -14,19 +14,25 @@
 **************************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/m6809/m6809.h"
-#include "video/mc6845.h"
+#include "imagedev/cassette.h"
 #include "machine/6821pia.h"
 #include "machine/6850acia.h"
 #include "machine/clock.h"
+#include "machine/timer.h"
 #include "sound/2203intf.h"
-#include "sound/speaker.h"
+#include "sound/spkrdev.h"
 #include "sound/wave.h"
-#include "imagedev/cassette.h"
+#include "video/mc6845.h"
+
 #include "bus/bml3/bml3bus.h"
 #include "bus/bml3/bml3mp1802.h"
 #include "bus/bml3/bml3mp1805.h"
 #include "bus/bml3/bml3kanji.h"
+
+#include "screen.h"
+#include "speaker.h"
 
 // System clock definitions, from the MB-6890 servce manual, p.48:
 
@@ -66,16 +72,18 @@
 class bml3_state : public driver_device
 {
 public:
-	bml3_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_bml3bus(*this, "bml3bus"),
-		m_crtc(*this, "crtc"),
-		m_cass(*this, "cassette"),
-		m_speaker(*this, "speaker"),
-		m_ym2203(*this, "ym2203"),
-		m_acia6850(*this, "acia6850"),
-		m_palette(*this, "palette")
+	bml3_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_p_videoram(*this, "vram")
+		, m_p_chargen(*this, "chargen")
+		, m_bml3bus(*this, "bml3bus")
+		, m_crtc(*this, "crtc")
+		, m_cass(*this, "cassette")
+		, m_speaker(*this, "speaker")
+		, m_ym2203(*this, "ym2203")
+		, m_acia(*this, "acia")
+		, m_palette(*this, "palette")
 	{
 	}
 
@@ -104,7 +112,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(bml3_acia_tx_w);
 	DECLARE_WRITE_LINE_MEMBER(bml3_acia_rts_w);
 	DECLARE_WRITE_LINE_MEMBER(bml3_acia_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
 
 	DECLARE_READ8_MEMBER(bml3_a000_r); DECLARE_WRITE8_MEMBER(bml3_a000_w);
 	DECLARE_READ8_MEMBER(bml3_c000_r); DECLARE_WRITE8_MEMBER(bml3_c000_w);
@@ -114,10 +121,6 @@ public:
 
 	MC6845_UPDATE_ROW(crtc_update_row);
 
-	UINT8 *m_p_videoram;
-	UINT8 *m_p_chargen;
-	UINT8 m_hres_reg;
-	UINT8 m_crtc_vreg[0x100];
 	// INTERRUPT_GEN_MEMBER(bml3_irq);
 	INTERRUPT_GEN_MEMBER(bml3_timer_firq);
 	TIMER_DEVICE_CALLBACK_MEMBER(bml3_c);
@@ -127,35 +130,38 @@ public:
 	DECLARE_WRITE8_MEMBER(bml3_ym2203_w);
 
 private:
-	UINT8 m_psg_latch;
-	UINT8 m_attr_latch;
-	UINT8 m_vres_reg;
+	u8 m_hres_reg;
+	u8 m_crtc_vreg[0x100];
+	u8 m_psg_latch;
+	u8 m_attr_latch;
+	u8 m_vres_reg;
 	bool m_keyb_interrupt_disabled;
 	bool m_keyb_nmi_disabled; // not used yet
 	bool m_keyb_counter_operation_disabled;
-	UINT8 m_keyb_empty_scan;
-	UINT8 m_keyb_scancode;
+	u8 m_keyb_empty_scan;
+	u8 m_keyb_scancode;
 	bool m_keyb_capslock_led_on;
 	bool m_keyb_hiragana_led_on;
 	bool m_keyb_katakana_led_on;
 	bool m_cassbit;
 	bool m_cassold;
-	UINT8 m_cass_data[4];
+	u8 m_cass_data[4];
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
-	void m6845_change_clock(UINT8 setting);
-	UINT8 m_crtc_index;
-	std::unique_ptr<UINT8[]> m_extram;
-	UINT8 m_firq_mask;
-	UINT8 m_firq_status;
+	void m6845_change_clock(u8 setting);
+	u8 m_crtc_index;
+	std::unique_ptr<u8[]> m_extram;
+	u8 m_firq_mask;
+	u8 m_firq_status;
 	required_device<cpu_device> m_maincpu;
+	required_region_ptr<u8> m_p_videoram;
+	required_region_ptr<u8> m_p_chargen;
 	required_device<bml3bus_device> m_bml3bus;
 	required_device<mc6845_device> m_crtc;
 	required_device<cassette_image_device> m_cass;
 	required_device<speaker_sound_device> m_speaker;
 	optional_device<ym2203_device> m_ym2203;
-	required_device<acia6850_device> m_acia6850;
-public:
+	required_device<acia6850_device> m_acia;
 	required_device<palette_device> m_palette;
 };
 
@@ -202,7 +208,7 @@ WRITE8_MEMBER( bml3_state::bml3_6845_w )
 
 READ8_MEMBER( bml3_state::bml3_keyboard_r )
 {
-	UINT8 ret = m_keyb_scancode;
+	u8 ret = m_keyb_scancode;
 	m_keyb_scancode &= 0x7f;
 	return ret;
 }
@@ -217,7 +223,7 @@ WRITE8_MEMBER( bml3_state::bml3_keyboard_w )
 	m_keyb_nmi_disabled = !BIT(data, 7);
 }
 
-void bml3_state::m6845_change_clock(UINT8 setting)
+void bml3_state::m6845_change_clock(u8 setting)
 {
 	int m6845_clock = CPU_CLOCK;    // CRTC and MPU are synchronous by default
 
@@ -289,14 +295,14 @@ WRITE8_MEMBER( bml3_state::bml3_psg_latch_w)
 
 READ8_MEMBER(bml3_state::bml3_ym2203_r)
 {
-	UINT8 dev_offs = ((m_psg_latch & 3) != 3);
+	u8 dev_offs = ((m_psg_latch & 3) != 3);
 
 	return m_ym2203->read(space, dev_offs);
 }
 
 WRITE8_MEMBER(bml3_state::bml3_ym2203_w)
 {
-	UINT8 dev_offs = ((m_psg_latch & 3) != 3);
+	u8 dev_offs = ((m_psg_latch & 3) != 3);
 
 	m_ym2203->write(space, dev_offs, data);
 }
@@ -366,7 +372,7 @@ WRITE8_MEMBER( bml3_state::bml3_firq_mask_w)
 
 READ8_MEMBER( bml3_state::bml3_firq_status_r )
 {
-	UINT8 res = m_firq_status << 7;
+	u8 res = m_firq_status << 7;
 	m_firq_status = 0;
 	m_maincpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE);
 	return res;
@@ -394,9 +400,9 @@ static ADDRESS_MAP_START(bml3_mem, AS_PROGRAM, 8, bml3_state)
 	AM_RANGE(0x0400, 0x43ff) AM_READWRITE(bml3_vram_r,bml3_vram_w)
 	AM_RANGE(0x4400, 0x9fff) AM_RAM
 	AM_RANGE(0xff40, 0xff46) AM_NOP // lots of unknown reads and writes
-	AM_RANGE(0xffc0, 0xffc3) AM_DEVREADWRITE("pia6821", pia6821_device, read, write)
-	AM_RANGE(0xffc4, 0xffc4) AM_DEVREADWRITE("acia6850", acia6850_device, status_r, control_w)
-	AM_RANGE(0xffc5, 0xffc5) AM_DEVREADWRITE("acia6850", acia6850_device, data_r, data_w)
+	AM_RANGE(0xffc0, 0xffc3) AM_DEVREADWRITE("pia", pia6821_device, read, write)
+	AM_RANGE(0xffc4, 0xffc4) AM_DEVREADWRITE("acia", acia6850_device, status_r, control_w)
+	AM_RANGE(0xffc5, 0xffc5) AM_DEVREADWRITE("acia", acia6850_device, data_r, data_w)
 	AM_RANGE(0xffc6, 0xffc7) AM_READWRITE(bml3_6845_r,bml3_6845_w)
 	// KBNMI - Keyboard "Break" key non-maskable interrupt
 	AM_RANGE(0xffc8, 0xffc8) AM_READ(bml3_keyb_nmi_r) // keyboard nmi
@@ -601,9 +607,9 @@ MC6845_UPDATE_ROW( bml3_state::crtc_update_row )
 	// 3: reverse/inverse video
 	// 4: graphic (not character)
 
-	UINT8 x=0,hf=0,xi=0,interlace=0,bgcolor=0,rawbits=0,dots[2],color=0,pen=0;
+	u8 x=0,hf=0,xi=0,interlace=0,bgcolor=0,rawbits=0,dots[2],color=0,pen=0;
 	bool reverse=0,graphic=0,lowres=0;
-	UINT16 mem=0;
+	u16 mem=0;
 
 	interlace = (m_crtc_vreg[8] & 3) ? 1 : 0;
 	lowres = BIT(m_hres_reg, 6);
@@ -684,7 +690,8 @@ MC6845_UPDATE_ROW( bml3_state::crtc_update_row )
 TIMER_DEVICE_CALLBACK_MEMBER(bml3_state::keyboard_callback)
 {
 	static const char *const portnames[3] = { "key1","key2","key3" };
-	int i,port_i,trigger = 0;
+	int i,port_i;
+	bool trigger = false;
 
 	if(!(m_keyb_scancode & 0x80))
 	{
@@ -699,7 +706,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(bml3_state::keyboard_callback)
 			if (m_keyb_empty_scan == 1)
 			{
 				// full scan completed with no keypress
-				trigger = !0;
+				trigger = true;
 			}
 			if (m_keyb_empty_scan > 0)
 				m_keyb_empty_scan--;
@@ -711,7 +718,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(bml3_state::keyboard_callback)
 			if((ioport(portnames[port_i])->read()>>i) & 1)
 			{
 				m_keyb_empty_scan = 2;
-				trigger = !0;
+				trigger = true;
 			}
 		}
 		if (trigger)
@@ -733,12 +740,12 @@ TIMER_DEVICE_CALLBACK_MEMBER( bml3_state::bml3_p )
 {
 	/* cassette - turn 1200/2400Hz to a bit */
 	m_cass_data[1]++;
-	UINT8 cass_ws = (m_cass->input() > +0.03) ? 1 : 0;
+	u8 cass_ws = (m_cass->input() > +0.03) ? 1 : 0;
 
 	if (cass_ws != m_cass_data[0])
 	{
 		m_cass_data[0] = cass_ws;
-		m_acia6850->write_rxd((m_cass_data[1] < 12) ? 1 : 0);
+		m_acia->write_rxd((m_cass_data[1] < 12) ? 1 : 0);
 		m_cass_data[1] = 0;
 	}
 }
@@ -762,9 +769,7 @@ INTERRUPT_GEN_MEMBER(bml3_state::bml3_timer_firq)
 
 void bml3_state::machine_start()
 {
-	m_extram = std::make_unique<UINT8[]>(0x10000);
-	m_p_chargen = memregion("chargen")->base();
-	m_p_videoram = memregion("vram")->base();
+	m_extram = std::make_unique<u8[]>(0x10000);
 	m_psg_latch = 0;
 	m_attr_latch = 0;
 	m_vres_reg = 0;
@@ -789,11 +794,11 @@ void bml3_state::machine_reset()
 	/* defaults */
 	mem.install_rom(0xa000, 0xfeff,memregion("maincpu")->base() + 0xa000);
 	mem.install_rom(0xfff0, 0xffff,memregion("maincpu")->base() + 0xfff0);
-	mem.install_write_handler(0xa000, 0xbfff, 0, 0,write8_delegate(FUNC(bml3_state::bml3_a000_w), this),0);
-	mem.install_write_handler(0xc000, 0xdfff, 0, 0,write8_delegate(FUNC(bml3_state::bml3_c000_w), this),0);
-	mem.install_write_handler(0xe000, 0xefff, 0, 0,write8_delegate(FUNC(bml3_state::bml3_e000_w), this),0);
-	mem.install_write_handler(0xf000, 0xfeff, 0, 0,write8_delegate(FUNC(bml3_state::bml3_f000_w), this),0);
-	mem.install_write_handler(0xfff0, 0xffff, 0, 0,write8_delegate(FUNC(bml3_state::bml3_fff0_w), this),0);
+	mem.install_write_handler(0xa000, 0xbfff, write8_delegate(FUNC(bml3_state::bml3_a000_w), this),0);
+	mem.install_write_handler(0xc000, 0xdfff, write8_delegate(FUNC(bml3_state::bml3_c000_w), this),0);
+	mem.install_write_handler(0xe000, 0xefff, write8_delegate(FUNC(bml3_state::bml3_e000_w), this),0);
+	mem.install_write_handler(0xf000, 0xfeff, write8_delegate(FUNC(bml3_state::bml3_f000_w), this),0);
+	mem.install_write_handler(0xfff0, 0xffff, write8_delegate(FUNC(bml3_state::bml3_fff0_w), this),0);
 
 	m_firq_mask = -1; // disable firq
 }
@@ -820,7 +825,7 @@ WRITE8_MEMBER(bml3_state::bml3_piaA_w)
 	{
 		if(data & 0x40)
 		{
-			mem.install_readwrite_handler(0xa000, 0xbfff, 0, 0,
+			mem.install_readwrite_handler(0xa000, 0xbfff,
 				read8_delegate(FUNC(bml3_state::bml3_a000_r), this),
 				write8_delegate(FUNC(bml3_state::bml3_a000_w), this), 0);
 		}
@@ -828,7 +833,7 @@ WRITE8_MEMBER(bml3_state::bml3_piaA_w)
 		{
 			mem.install_rom(0xa000, 0xbfff,
 				memregion("maincpu")->base() + 0xa000);
-			mem.install_write_handler(0xa000, 0xbfff, 0, 0,
+			mem.install_write_handler(0xa000, 0xbfff,
 				write8_delegate(FUNC(bml3_state::bml3_a000_w), this),
 				0);
 		}
@@ -838,7 +843,7 @@ WRITE8_MEMBER(bml3_state::bml3_piaA_w)
 	{
 		if(data & 0x40)
 		{
-			mem.install_readwrite_handler(0xc000, 0xdfff, 0, 0,
+			mem.install_readwrite_handler(0xc000, 0xdfff,
 				read8_delegate(FUNC(bml3_state::bml3_c000_r), this),
 				write8_delegate(FUNC(bml3_state::bml3_c000_w), this), 0);
 		}
@@ -846,7 +851,7 @@ WRITE8_MEMBER(bml3_state::bml3_piaA_w)
 		{
 			mem.install_rom(0xc000, 0xdfff,
 				memregion("maincpu")->base() + 0xc000);
-			mem.install_write_handler(0xc000, 0xdfff, 0, 0,
+			mem.install_write_handler(0xc000, 0xdfff,
 				write8_delegate(FUNC(bml3_state::bml3_c000_w), this),
 				0);
 		}
@@ -856,7 +861,7 @@ WRITE8_MEMBER(bml3_state::bml3_piaA_w)
 	{
 		if(data & 0x80)
 		{
-			mem.install_readwrite_handler(0xe000, 0xefff, 0, 0,
+			mem.install_readwrite_handler(0xe000, 0xefff,
 				read8_delegate(FUNC(bml3_state::bml3_e000_r), this),
 				write8_delegate(FUNC(bml3_state::bml3_e000_w), this), 0);
 		}
@@ -864,7 +869,7 @@ WRITE8_MEMBER(bml3_state::bml3_piaA_w)
 		{
 			mem.install_rom(0xe000, 0xefff,
 				memregion("maincpu")->base() + 0xe000);
-			mem.install_write_handler(0xe000, 0xefff, 0, 0,
+			mem.install_write_handler(0xe000, 0xefff,
 				write8_delegate(FUNC(bml3_state::bml3_e000_w), this),
 				0);
 		}
@@ -872,7 +877,7 @@ WRITE8_MEMBER(bml3_state::bml3_piaA_w)
 
 	if(data & 1)
 	{
-		mem.install_readwrite_handler(0xf000, 0xfeff, 0, 0,
+		mem.install_readwrite_handler(0xf000, 0xfeff,
 			read8_delegate(FUNC(bml3_state::bml3_f000_r), this),
 			write8_delegate(FUNC(bml3_state::bml3_f000_w), this), 0);
 	}
@@ -880,14 +885,14 @@ WRITE8_MEMBER(bml3_state::bml3_piaA_w)
 	{
 		mem.install_rom(0xf000, 0xfeff,
 			memregion("maincpu")->base() + 0xf000);
-		mem.install_write_handler(0xf000, 0xfeff, 0, 0,
+		mem.install_write_handler(0xf000, 0xfeff,
 			write8_delegate(FUNC(bml3_state::bml3_f000_w), this),
 			0);
 	}
 
 	if(data & 2)
 	{
-		mem.install_readwrite_handler(0xfff0, 0xffff, 0, 0,
+		mem.install_readwrite_handler(0xfff0, 0xffff,
 			read8_delegate(FUNC(bml3_state::bml3_fff0_r), this),
 			write8_delegate(FUNC(bml3_state::bml3_fff0_w), this), 0);
 	}
@@ -895,7 +900,7 @@ WRITE8_MEMBER(bml3_state::bml3_piaA_w)
 	{
 		mem.install_rom(0xfff0, 0xffff,
 			memregion("maincpu")->base() + 0xfff0);
-		mem.install_write_handler(0xfff0, 0xffff, 0, 0,
+		mem.install_write_handler(0xfff0, 0xffff,
 			write8_delegate(FUNC(bml3_state::bml3_fff0_w), this),
 			0);
 	}
@@ -916,12 +921,6 @@ WRITE_LINE_MEMBER( bml3_state::bml3_acia_rts_w )
 WRITE_LINE_MEMBER( bml3_state::bml3_acia_irq_w )
 {
 	logerror("%02x TAPE IRQ\n",state);
-}
-
-WRITE_LINE_MEMBER( bml3_state::write_acia_clock )
-{
-	m_acia6850->write_txc(state);
-	m_acia6850->write_rxc(state);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER( bml3_state::bml3_c )
@@ -959,7 +958,7 @@ static SLOT_INTERFACE_START(bml3_cards)
 SLOT_INTERFACE_END
 
 
-static MACHINE_CONFIG_START( bml3_common, bml3_state )
+static MACHINE_CONFIG_START( bml3_common )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M6809, CPU_CLOCK)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", bml3_state,  bml3_timer_firq)
@@ -989,16 +988,17 @@ static MACHINE_CONFIG_START( bml3_common, bml3_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("bml3_c", bml3_state, bml3_c, attotime::from_hz(4800))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("bml3_p", bml3_state, bml3_p, attotime::from_hz(40000))
 
-	MCFG_DEVICE_ADD("pia6821", PIA6821, 0)
+	MCFG_DEVICE_ADD("pia", PIA6821, 0)
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(bml3_state, bml3_piaA_w))
 
-	MCFG_DEVICE_ADD("acia6850", ACIA6850, 0)
+	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
 	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(bml3_state, bml3_acia_tx_w))
 	MCFG_ACIA6850_RTS_HANDLER(WRITELINE(bml3_state, bml3_acia_rts_w))
 	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(bml3_state, bml3_acia_irq_w))
 
 	MCFG_DEVICE_ADD("acia_clock", CLOCK, 9600) // 600 baud x 16(divider) = 9600
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(bml3_state, write_acia_clock))
+	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("acia", acia6850_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("acia", acia6850_device, write_rxc))
 
 	MCFG_CASSETTE_ADD( "cassette" )
 
@@ -1108,7 +1108,7 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT                      COMPANY    FULLNAME                        FLAGS */
-COMP( 1980, bml3,   0,      0,       bml3,      bml3,    driver_device,    0,      "Hitachi", "MB-6890 Basic Master Level 3", MACHINE_NOT_WORKING)
-COMP( 1982, bml3mk2,bml3,   0,       bml3mk2,   bml3,    driver_device,    0,      "Hitachi", "MB-6891 Basic Master Level 3 Mark 2", MACHINE_NOT_WORKING)
-COMP( 1983, bml3mk5,bml3,   0,       bml3mk5,   bml3,    driver_device,    0,      "Hitachi", "MB-6892 Basic Master Level 3 Mark 5", MACHINE_NOT_WORKING)
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE       INIT  COMPANY    FULLNAME                               FLAGS */
+COMP( 1980, bml3,   0,      0,       bml3,      bml3,  bml3_state, 0,    "Hitachi", "MB-6890 Basic Master Level 3",        MACHINE_NOT_WORKING)
+COMP( 1982, bml3mk2,bml3,   0,       bml3mk2,   bml3,  bml3_state, 0,    "Hitachi", "MB-6891 Basic Master Level 3 Mark 2", MACHINE_NOT_WORKING)
+COMP( 1983, bml3mk5,bml3,   0,       bml3mk5,   bml3,  bml3_state, 0,    "Hitachi", "MB-6892 Basic Master Level 3 Mark 5", MACHINE_NOT_WORKING)

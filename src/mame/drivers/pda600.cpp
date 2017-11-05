@@ -60,6 +60,7 @@
 #include "machine/nvram.h"
 #include "machine/hd64610.h"
 #include "rendlay.h"
+#include "screen.h"
 
 
 class pda600_state : public driver_device
@@ -74,9 +75,9 @@ public:
 
 	virtual void video_start() override;
 	virtual void machine_reset() override;
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	UINT8 *     m_video_ram;
+	uint8_t *     m_video_ram;
 };
 
 
@@ -114,12 +115,12 @@ void pda600_state::video_start()
 	m_video_ram = memregion("videoram")->base();
 }
 
-UINT32 pda600_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t pda600_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	for (int y=0; y<320; y++)
 		for (int x=0; x<30; x++)
 		{
-			UINT8 data = m_video_ram[y*30 + x];
+			uint8_t data = m_video_ram[y*30 + x];
 
 			for (int px=0; px<8; px++)
 			{
@@ -195,7 +196,7 @@ static GFXDECODE_START( pda600 )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( pda600, pda600_state )
+static MACHINE_CONFIG_START( pda600 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z180, XTAL_14_31818MHz)
 	MCFG_CPU_PROGRAM_MAP(pda600_mem)
@@ -234,5 +235,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY        FULLNAME       FLAGS */
-COMP( 1993, pda600,  0,       0,     pda600,    pda600, driver_device,   0,  "Amstrad plc", "PenPad PDA 600", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+/*    YEAR  NAME     PARENT  COMPAT  MACHINE    INPUT    STATE          INIT  COMPANY        FULLNAME          FLAGS */
+COMP( 1993, pda600,  0,      0,      pda600,    pda600,  pda600_state,  0,    "Amstrad plc", "PenPad PDA 600", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

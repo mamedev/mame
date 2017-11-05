@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "eprom.h"
 
 
@@ -20,7 +21,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type COMX_EPR = &device_creator<comx_epr_device>;
+DEFINE_DEVICE_TYPE(COMX_EPR, comx_epr_device, "comx_epr", "COMX-35 F&M EPROM Switchboard")
 
 
 //-------------------------------------------------
@@ -42,7 +43,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *comx_epr_device::device_rom_region() const
+const tiny_rom_entry *comx_epr_device::device_rom_region() const
 {
 	return ROM_NAME( comx_epr );
 }
@@ -56,8 +57,8 @@ const rom_entry *comx_epr_device::device_rom_region() const
 //  comx_epr_device - constructor
 //-------------------------------------------------
 
-comx_epr_device::comx_epr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, COMX_EPR, "COMX-35 F&M EPROM Switchboard", tag, owner, clock, "comx_epr", __FILE__),
+comx_epr_device::comx_epr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, COMX_EPR, tag, owner, clock),
 	device_comx_expansion_card_interface(mconfig, *this),
 	m_rom(*this, "f800"),
 	m_eprom(*this, "eprom"),
@@ -90,9 +91,9 @@ void comx_epr_device::device_reset()
 //  comx_mrd_r - memory read
 //-------------------------------------------------
 
-UINT8 comx_epr_device::comx_mrd_r(address_space &space, offs_t offset, int *extrom)
+uint8_t comx_epr_device::comx_mrd_r(address_space &space, offs_t offset, int *extrom)
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	if (offset >= 0xc000 && offset < 0xe000)
 	{
@@ -112,7 +113,7 @@ UINT8 comx_epr_device::comx_mrd_r(address_space &space, offs_t offset, int *extr
 //  comx_io_w - I/O write
 //-------------------------------------------------
 
-void comx_epr_device::comx_io_w(address_space &space, offs_t offset, UINT8 data)
+void comx_epr_device::comx_io_w(address_space &space, offs_t offset, uint8_t data)
 {
 	if (offset == 1)
 	{

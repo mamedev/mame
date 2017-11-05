@@ -8,8 +8,8 @@
 
 *********************************************************************/
 
+#include "emu.h"
 #include "a2memexp.h"
-#include "includes/apple2.h"
 
 
 /***************************************************************************
@@ -20,13 +20,10 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type A2BUS_MEMEXP = &device_creator<a2bus_memexpapple_device>;
-const device_type A2BUS_RAMFACTOR = &device_creator<a2bus_ramfactor_device>;
+DEFINE_DEVICE_TYPE(A2BUS_MEMEXP,    a2bus_memexpapple_device, "a2memexp", "Apple II Memory Expansion Card")
+DEFINE_DEVICE_TYPE(A2BUS_RAMFACTOR, a2bus_ramfactor_device,   "a2ramfac", "Applied Engineering RamFactor")
 
 #define MEMEXP_ROM_REGION  "memexp_rom"
-
-MACHINE_CONFIG_FRAGMENT( memexp )
-MACHINE_CONFIG_END
 
 ROM_START( memexp )
 	ROM_REGION(0x1000, MEMEXP_ROM_REGION, 0)
@@ -46,25 +43,22 @@ ROM_END
 ***************************************************************************/
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor a2bus_memexp_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( memexp );
-}
+MACHINE_CONFIG_MEMBER( a2bus_memexp_device::device_add_mconfig )
+MACHINE_CONFIG_END
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *a2bus_memexp_device::device_rom_region() const
+const tiny_rom_entry *a2bus_memexp_device::device_rom_region() const
 {
 	return ROM_NAME( memexp );
 }
 
-const rom_entry *a2bus_ramfactor_device::device_rom_region() const
+const tiny_rom_entry *a2bus_ramfactor_device::device_rom_region() const
 {
 	return ROM_NAME( ramfactor );
 }
@@ -73,22 +67,22 @@ const rom_entry *a2bus_ramfactor_device::device_rom_region() const
 //  LIVE DEVICE
 //**************************************************************************
 
-a2bus_memexp_device::a2bus_memexp_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
-	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+a2bus_memexp_device::a2bus_memexp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
 	device_a2bus_card_interface(mconfig, *this), m_isramfactor(false), m_bankhior(0), m_addrmask(0), m_rom(nullptr), m_wptr(0), m_liveptr(0)
 {
 }
 
-a2bus_memexpapple_device::a2bus_memexpapple_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	a2bus_memexp_device(mconfig, A2BUS_MEMEXP, "Apple II Memory Expansion Card", tag, owner, clock, "a2memexp", __FILE__)
+a2bus_memexpapple_device::a2bus_memexpapple_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	a2bus_memexp_device(mconfig, A2BUS_MEMEXP, tag, owner, clock)
 {
 	m_isramfactor = false;
 	m_bankhior = 0xf0;
 	m_addrmask = 0xfffff;
 }
 
-a2bus_ramfactor_device::a2bus_ramfactor_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	a2bus_memexp_device(mconfig, A2BUS_RAMFACTOR, "Applied Engineering RamFactor", tag, owner, clock, "a2ramfac", __FILE__)
+a2bus_ramfactor_device::a2bus_ramfactor_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	a2bus_memexp_device(mconfig, A2BUS_RAMFACTOR, tag, owner, clock)
 {
 	m_isramfactor = true;
 	m_bankhior = 0x00;
@@ -106,7 +100,7 @@ void a2bus_memexp_device::device_start()
 
 	m_rom = device().machine().root_device().memregion(this->subtag(MEMEXP_ROM_REGION).c_str())->base();
 
-	memset(m_ram, 0xff, 1024*1024*sizeof(UINT8));
+	memset(m_ram, 0xff, 1024*1024*sizeof(uint8_t));
 
 	save_item(NAME(m_regs));
 	save_item(NAME(m_ram));
@@ -116,7 +110,7 @@ void a2bus_memexp_device::device_start()
 
 void a2bus_memexp_device::device_reset()
 {
-	memset(m_regs, 0, sizeof(UINT8) * 0x10);
+	memset(m_regs, 0, sizeof(uint8_t) * 0x10);
 	m_wptr = m_liveptr = 0;
 }
 
@@ -125,9 +119,9 @@ void a2bus_memexp_device::device_reset()
     read_c0nx - called for reads from this card's c0nx space
 -------------------------------------------------*/
 
-UINT8 a2bus_memexp_device::read_c0nx(address_space &space, UINT8 offset)
+uint8_t a2bus_memexp_device::read_c0nx(address_space &space, uint8_t offset)
 {
-	UINT8 retval = m_regs[offset];
+	uint8_t retval = m_regs[offset];
 
 	if (offset == 3)
 	{
@@ -149,7 +143,7 @@ UINT8 a2bus_memexp_device::read_c0nx(address_space &space, UINT8 offset)
     write_c0nx - called for writes to this card's c0nx space
 -------------------------------------------------*/
 
-void a2bus_memexp_device::write_c0nx(address_space &space, UINT8 offset, UINT8 data)
+void a2bus_memexp_device::write_c0nx(address_space &space, uint8_t offset, uint8_t data)
 {
 //    printf("Write %02x to c0n%x (PC=%x)\n", data, offset, space.device().safe_pc());
 
@@ -201,7 +195,7 @@ void a2bus_memexp_device::write_c0nx(address_space &space, UINT8 offset, UINT8 d
     read_cnxx - called for reads from this card's cnxx space
 -------------------------------------------------*/
 
-UINT8 a2bus_memexp_device::read_cnxx(address_space &space, UINT8 offset)
+uint8_t a2bus_memexp_device::read_cnxx(address_space &space, uint8_t offset)
 {
 	int slotimg = m_slot * 0x100;
 
@@ -218,7 +212,7 @@ UINT8 a2bus_memexp_device::read_cnxx(address_space &space, UINT8 offset)
     read_c800 - called for reads from this card's c800 space
 -------------------------------------------------*/
 
-UINT8 a2bus_memexp_device::read_c800(address_space &space, UINT16 offset)
+uint8_t a2bus_memexp_device::read_c800(address_space &space, uint16_t offset)
 {
 	// c70a diags confirm: bit 1 of cn0F banks in the second half of the ROM
 	if ((m_isramfactor) && (m_regs[0xf] & 0x01))

@@ -82,12 +82,15 @@ There's a separate sound board also, but it wasn't available so is not documente
 **************************************************************************/
 
 #include "emu.h"
-#include "cpu/tms34010/tms34010.h"
-#include "cpu/adsp2100/adsp2100.h"
-#include "audio/dcs.h"
-#include "machine/nvram.h"
 #include "includes/midtunit.h"
 #include "includes/midxunit.h"
+#include "audio/dcs.h"
+
+#include "cpu/adsp2100/adsp2100.h"
+#include "cpu/tms34010/tms34010.h"
+#include "machine/nvram.h"
+
+#include "screen.h"
 
 
 #define PIXEL_CLOCK     (8000000)
@@ -114,7 +117,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, midxunit_state )
 	AM_RANGE(0xa0440000, 0xa047ffff) AM_READWRITE(midxunit_cmos_r, midxunit_cmos_w) AM_SHARE("nvram")
 	AM_RANGE(0xa0800000, 0xa08fffff) AM_READWRITE(midxunit_paletteram_r, midxunit_paletteram_w) AM_SHARE("palette")
 	AM_RANGE(0xc0000000, 0xc00003ff) AM_DEVREADWRITE("maincpu", tms34020_device, io_register_r, io_register_w)
-	AM_RANGE(0xc0c00000, 0xc0c000ff) AM_MIRROR(0x00400000) AM_READWRITE(midtunit_dma_r, midtunit_dma_w)
+	AM_RANGE(0xc0800000, 0xc08000ff) AM_MIRROR(0x00400000) AM_READWRITE(midtunit_dma_r, midtunit_dma_w)
 	AM_RANGE(0xf8000000, 0xfeffffff) AM_READ(midwunit_gfxrom_r)
 	AM_RANGE(0xff000000, 0xffffffff) AM_ROM AM_REGION("maincpu", 0)
 ADDRESS_MAP_END
@@ -238,12 +241,12 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( midxunit, midxunit_state )
+static MACHINE_CONFIG_START( midxunit )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS34020, 40000000)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_TMS340X0_HALT_ON_RESET(FALSE) /* halt on reset */
+	MCFG_TMS340X0_HALT_ON_RESET(false) /* halt on reset */
 	MCFG_TMS340X0_PIXEL_CLOCK(PIXEL_CLOCK) /* pixel clock */
 	MCFG_TMS340X0_PIXELS_PER_CLOCK(1) /* pixels per clock */
 	MCFG_TMS340X0_SCANLINE_IND16_CB(midxunit_state, scanline_update)       /* scanline updater (indexed16) */

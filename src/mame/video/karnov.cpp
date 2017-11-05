@@ -9,64 +9,6 @@
 #include "emu.h"
 #include "includes/karnov.h"
 
-/***************************************************************************
-
-  Convert the color PROMs into a more useable format.
-
-  Karnov has two 1024x8 palette PROM.
-  I don't know the exact values of the resistors between the RAM and the
-  RGB output. I assumed these values (the same as Commando)
-
-  bit 7 -- 220 ohm resistor  -- GREEN
-        -- 470 ohm resistor  -- GREEN
-        -- 1  kohm resistor  -- GREEN
-        -- 2.2kohm resistor  -- GREEN
-        -- 220 ohm resistor  -- RED
-        -- 470 ohm resistor  -- RED
-        -- 1  kohm resistor  -- RED
-  bit 0 -- 2.2kohm resistor  -- RED
-
-  bit 7 -- unused
-        -- unused
-        -- unused
-        -- unused
-        -- 220 ohm resistor  -- BLUE
-        -- 470 ohm resistor  -- BLUE
-        -- 1  kohm resistor  -- BLUE
-  bit 0 -- 2.2kohm resistor  -- BLUE
-
-***************************************************************************/
-
-PALETTE_INIT_MEMBER(karnov_state, karnov)
-{
-	const UINT8 *color_prom = memregion("proms")->base();
-	int i;
-
-	for (i = 0; i < palette.entries(); i++)
-	{
-		int bit0, bit1, bit2, bit3, r, g, b;
-
-		bit0 = (color_prom[0] >> 0) & 0x01;
-		bit1 = (color_prom[0] >> 1) & 0x01;
-		bit2 = (color_prom[0] >> 2) & 0x01;
-		bit3 = (color_prom[0] >> 3) & 0x01;
-		r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-		bit0 = (color_prom[0] >> 4) & 0x01;
-		bit1 = (color_prom[0] >> 5) & 0x01;
-		bit2 = (color_prom[0] >> 6) & 0x01;
-		bit3 = (color_prom[0] >> 7) & 0x01;
-		g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-		bit0 = (color_prom[palette.entries()] >> 0) & 0x01;
-		bit1 = (color_prom[palette.entries()] >> 1) & 0x01;
-		bit2 = (color_prom[palette.entries()] >> 2) & 0x01;
-		bit3 = (color_prom[palette.entries()] >> 3) & 0x01;
-		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-
-		palette.set_pen_color(i, rgb_t(r, g, b));
-		color_prom++;
-	}
-}
-
 void karnov_state::karnov_flipscreen_w( int data )
 {
 	m_flipscreen = data;
@@ -124,7 +66,7 @@ void karnov_state::draw_background( bitmap_ind16 &bitmap, const rectangle &clipr
 
 /******************************************************************************/
 
-UINT32 karnov_state::screen_update_karnov(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t karnov_state::screen_update_karnov(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	draw_background(bitmap, cliprect);
 	m_spritegen->draw_sprites(bitmap, cliprect, m_spriteram->buffer(), 0x800, 0);
@@ -161,7 +103,7 @@ VIDEO_START_MEMBER(karnov_state,karnov)
 {
 	/* Allocate bitmap & tilemap */
 	m_bitmap_f = std::make_unique<bitmap_ind16>(512, 512);
-	m_fix_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(karnov_state::get_fix_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_fix_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(karnov_state::get_fix_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	save_item(NAME(*m_bitmap_f));
 
@@ -172,7 +114,7 @@ VIDEO_START_MEMBER(karnov_state,wndrplnt)
 {
 	/* Allocate bitmap & tilemap */
 	m_bitmap_f = std::make_unique<bitmap_ind16>(512, 512);
-	m_fix_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(karnov_state::get_fix_tile_info),this), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
+	m_fix_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(karnov_state::get_fix_tile_info),this), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
 
 	save_item(NAME(*m_bitmap_f));
 

@@ -83,6 +83,7 @@ Notes:
 */
 
 
+#include "emu.h"
 #include "s1410.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/harddriv.h"
@@ -101,7 +102,7 @@ Notes:
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type S1410 = &device_creator<s1410_device>;
+DEFINE_DEVICE_TYPE(S1410, s1410_device, "s1410", "Xebec S1410")
 
 //-------------------------------------------------
 //  ROM( s1410 )
@@ -122,7 +123,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *s1410_device::device_rom_region() const
+const tiny_rom_entry *s1410_device::device_rom_region() const
 {
 	return ROM_NAME( s1410 );
 }
@@ -159,10 +160,10 @@ ADDRESS_MAP_END
 
 
 //-------------------------------------------------
-//  MACHINE_DRIVER( s1410 )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( s1410 )
+MACHINE_CONFIG_MEMBER( s1410_device::device_add_mconfig )
 	MCFG_CPU_ADD(Z8400A_TAG, Z80, XTAL_16MHz/4)
 	MCFG_CPU_PROGRAM_MAP(s1410_mem)
 	MCFG_CPU_IO_MAP(s1410_io)
@@ -170,17 +171,6 @@ static MACHINE_CONFIG_FRAGMENT( s1410 )
 
 	MCFG_HARDDISK_ADD("image")
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor s1410_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( s1410 );
-}
 
 
 
@@ -192,8 +182,8 @@ machine_config_constructor s1410_device::device_mconfig_additions() const
 //  s1410_device - constructor
 //-------------------------------------------------
 
-s1410_device::s1410_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: scsihd_device(mconfig, S1410, "Xebec S1410", tag, owner, clock, "s1410", __FILE__)
+s1410_device::s1410_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: scsihd_device(mconfig, S1410, tag, owner, clock)
 {
 }
 
@@ -256,7 +246,7 @@ void s1410_device::ExecCommand()
 
 		if ((m_disk) && (m_blocks))
 		{
-			dynamic_buffer data(m_sector_bytes);
+			std::vector<uint8_t> data(m_sector_bytes);
 			memset(&data[0], 0xc6, m_sector_bytes);
 
 			while (m_blocks > 0)
@@ -314,7 +304,7 @@ void s1410_device::ExecCommand()
 	}
 }
 
-void s1410_device::WriteData( UINT8 *data, int dataLength )
+void s1410_device::WriteData( uint8_t *data, int dataLength )
 {
 	switch( command[ 0 ] )
 	{
@@ -333,9 +323,9 @@ void s1410_device::WriteData( UINT8 *data, int dataLength )
 				break;
 			}
 
-			UINT16 tracks = ((data[0]<<8)+data[1]);
-			UINT8 heads = data[2];
-			UINT32 capacity = tracks * heads * sectorsPerTrack * m_sector_bytes;
+			uint16_t tracks = ((data[0]<<8)+data[1]);
+			uint8_t heads = data[2];
+			uint32_t capacity = tracks * heads * sectorsPerTrack * m_sector_bytes;
 
 			logerror("S1410_CMD_INIT_DRIVE_PARAMS Tracks=%d, Heads=%d, Capacity=%d\n",tracks,heads,capacity);
 		}
@@ -347,7 +337,7 @@ void s1410_device::WriteData( UINT8 *data, int dataLength )
 	}
 }
 
-void s1410_device::ReadData( UINT8 *data, int dataLength )
+void s1410_device::ReadData( uint8_t *data, int dataLength )
 {
 	switch( command[ 0 ] )
 	{

@@ -112,16 +112,18 @@
 
 */
 
-
 #include "emu.h"
 #include "includes/micronic.h"
 #include "rendlay.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 READ8_MEMBER( micronic_state::keypad_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
-	for (UINT8 bit = 0; bit < 8; bit++)
+	for (uint8_t bit = 0; bit < 8; bit++)
 	{
 		if (m_kp_matrix & (1 << bit))
 		{
@@ -153,7 +155,7 @@ WRITE8_MEMBER( micronic_state::kp_matrix_w )
 
 WRITE8_MEMBER( micronic_state::beep_w )
 {
-	UINT16 frequency[16] =
+	uint16_t frequency[16] =
 	{
 			0, 4000, 2000, 1333, 1000, 800, 667, 571,
 		500,  444,  400,  364,  333, 308, 286, 267
@@ -346,7 +348,7 @@ WRITE_LINE_MEMBER( micronic_state::mc146818_irq )
 }
 
 
-static MACHINE_CONFIG_START( micronic, micronic_state )
+static MACHINE_CONFIG_START( micronic )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_3_579545MHz)
 	MCFG_CPU_PROGRAM_MAP(micronic_mem)
@@ -395,5 +397,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 198?, micronic,  0,       0,  micronic,   micronic, driver_device,     0,  "Victor Micronic",   "Micronic 1000",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     STATE           INIT  COMPANY            FULLNAME         FLAGS
+COMP( 198?, micronic, 0,      0,      micronic, micronic, micronic_state, 0,    "Victor Micronic", "Micronic 1000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

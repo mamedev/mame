@@ -6,23 +6,18 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "im6402.h"
 
+//#define VERBOSE 1
+#include "logmacro.h"
 
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type IM6402 = &device_creator<im6402_device>;
-
-
-
-//**************************************************************************
-//  MACROS / CONSTANTS
-//**************************************************************************
-
-#define LOG 0
+DEFINE_DEVICE_TYPE(IM6402, im6402_device, "im6402", "Intersil IM6402 USART")
 
 
 
@@ -75,8 +70,8 @@ inline void im6402_device::set_tre(int state)
 //  im6402_device - constructor
 //-------------------------------------------------
 
-im6402_device::im6402_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, IM6402, "Intersil IM6402", tag, owner, clock, "im6402", __FILE__),
+im6402_device::im6402_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, IM6402, tag, owner, clock),
 	device_serial_interface(mconfig, *this),
 	m_write_tro(*this),
 	m_write_dr(*this),
@@ -157,16 +152,6 @@ void im6402_device::device_reset()
 
 
 //-------------------------------------------------
-//  device_timer - handler timer events
-//-------------------------------------------------
-
-void im6402_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	device_serial_interface::device_timer(timer, id, param, ptr);
-}
-
-
-//-------------------------------------------------
 //  tra_callback -
 //-------------------------------------------------
 
@@ -184,7 +169,7 @@ void im6402_device::tra_complete()
 {
 	if (!m_tbre)
 	{
-		if (LOG) logerror("IM6402 '%s' Transmit Data %02x\n", tag(), m_tbr);
+		LOG("IM6402 Transmit Data %02x\n", m_tbr);
 
 		transmit_register_setup(m_tbr);
 
@@ -212,7 +197,7 @@ void im6402_device::rcv_complete()
 	receive_register_extract();
 	m_rbr = get_received_char();
 
-	if (LOG) logerror("IM6402 '%s' Receive Data %02x\n", tag(), m_rbr);
+	LOG("IM6402 Receive Data %02x\n", m_rbr);
 
 	if (m_dr)
 	{
@@ -229,13 +214,13 @@ void im6402_device::rcv_complete()
 
 WRITE8_MEMBER( im6402_device::write )
 {
-	if (LOG) logerror("IM6402 '%s' Transmit Buffer Register %02x\n", tag(), data);
+	LOG("IM6402 Transmit Buffer Register %02x\n", data);
 
 	m_tbr = data;
 
 	if (is_transmit_register_empty())
 	{
-		if (LOG) logerror("IM6402 '%s' Transmit Data %02x\n", tag(), m_tbr);
+		LOG("IM6402 Transmit Data %02x\n", m_tbr);
 
 		transmit_register_setup(m_tbr);
 
@@ -329,7 +314,7 @@ WRITE_LINE_MEMBER( im6402_device::crl_w )
 {
 	if (state)
 	{
-		if (LOG) logerror("IM6402 '%s' Control Register Load\n", tag());
+		LOG("IM6402 Control Register Load\n");
 
 		int data_bit_count = 5 + ((m_cls2 << 1) | m_cls1);
 		stop_bits_t stop_bits = (m_sbs ? ((data_bit_count == 5) ? STOP_BITS_1_5 : STOP_BITS_2) : STOP_BITS_1);
@@ -340,6 +325,9 @@ WRITE_LINE_MEMBER( im6402_device::crl_w )
 		else parity = PARITY_ODD;
 
 		set_data_frame(1, data_bit_count, parity, stop_bits);
+
+		receive_register_reset();
+		transmit_register_reset();
 	}
 }
 
@@ -350,7 +338,7 @@ WRITE_LINE_MEMBER( im6402_device::crl_w )
 
 WRITE_LINE_MEMBER( im6402_device::pi_w )
 {
-	if (LOG) logerror("IM6402 '%s' Parity Inhibit %u\n", tag(), state);
+	LOG("IM6402 Parity Inhibit %u\n", state);
 
 	m_pi = state;
 }
@@ -362,7 +350,7 @@ WRITE_LINE_MEMBER( im6402_device::pi_w )
 
 WRITE_LINE_MEMBER( im6402_device::sbs_w )
 {
-	if (LOG) logerror("IM6402 '%s' Stop Bit Select %u\n", tag(), state);
+	LOG("IM6402 Stop Bit Select %u\n", state);
 
 	m_sbs = state;
 }
@@ -374,7 +362,7 @@ WRITE_LINE_MEMBER( im6402_device::sbs_w )
 
 WRITE_LINE_MEMBER( im6402_device::cls1_w )
 {
-	if (LOG) logerror("IM6402 '%s' Character Length Select 1 %u\n", tag(), state);
+	LOG("IM6402 Character Length Select 1 %u\n", state);
 
 	m_cls1 = state;
 }
@@ -386,7 +374,7 @@ WRITE_LINE_MEMBER( im6402_device::cls1_w )
 
 WRITE_LINE_MEMBER( im6402_device::cls2_w )
 {
-	if (LOG) logerror("IM6402 '%s' Character Length Select 2 %u\n", tag(), state);
+	LOG("IM6402 Character Length Select 2 %u\n", state);
 
 	m_cls2 = state;
 }
@@ -398,7 +386,7 @@ WRITE_LINE_MEMBER( im6402_device::cls2_w )
 
 WRITE_LINE_MEMBER( im6402_device::epe_w )
 {
-	if (LOG) logerror("IM6402 '%s' Even Parity Enable %u\n", tag(), state);
+	LOG("IM6402 Even Parity Enable %u\n", state);
 
 	m_epe = state;
 }

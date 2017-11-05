@@ -8,34 +8,35 @@
  *
  */
 
-#ifndef CPC_DDI1_H_
-#define CPC_DDI1_H_
+#ifndef MAME_BUS_CPC_DDI1_H
+#define MAME_BUS_CPC_DDI1_H
 
-#include "emu.h"
+#pragma once
+
 #include "cpcexp.h"
 #include "machine/upd765.h"
 
-class cpc_ddi1_device : public device_t,
-			public device_cpc_expansion_card_interface
+class cpc_ddi1_device : public device_t, public device_cpc_expansion_card_interface
 {
 public:
 	// construction/destruction
-	cpc_ddi1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-	// optional information overrides
-	virtual const rom_entry *device_rom_region() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual void set_mapping(UINT8 type) override;
-	virtual WRITE_LINE_MEMBER( romen_w ) override { m_romen = state; }
+	cpc_ddi1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_WRITE8_MEMBER(motor_w);
 	DECLARE_WRITE8_MEMBER(fdc_w);
 	DECLARE_READ8_MEMBER(fdc_r);
 	DECLARE_WRITE8_MEMBER(rombank_w);
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
+	// optional information overrides
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void set_mapping(uint8_t type) override;
+	virtual WRITE_LINE_MEMBER( romen_w ) override { m_romen = state; }
 
 private:
 	cpc_expansion_slot_device *m_slot;
@@ -49,5 +50,6 @@ private:
 
 // device type definition
 extern const device_type CPC_DDI1;
+DECLARE_DEVICE_TYPE(CPC_DDI1, cpc_ddi1_device)
 
-#endif /* CPC_DDI1_H_ */
+#endif // MAME_BUS_CPC_DDI1_H

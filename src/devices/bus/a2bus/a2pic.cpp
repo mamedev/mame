@@ -8,6 +8,7 @@
 
 *********************************************************************/
 
+#include "emu.h"
 #include "a2pic.h"
 
 /***************************************************************************
@@ -18,19 +19,10 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type A2BUS_PIC = &device_creator<a2bus_pic_device>;
+DEFINE_DEVICE_TYPE(A2BUS_PIC, a2bus_pic_device, "a2pic", "Apple Parallel Interface Card")
 
 #define PIC_ROM_REGION  "pic_rom"
 #define PIC_CENTRONICS_TAG "pic_ctx"
-
-MACHINE_CONFIG_FRAGMENT( pic )
-	MCFG_CENTRONICS_ADD(PIC_CENTRONICS_TAG, centronics_devices, "printer")
-	MCFG_CENTRONICS_DATA_INPUT_BUFFER("ctx_data_in")
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(a2bus_pic_device, ack_w))
-
-	MCFG_DEVICE_ADD("ctx_data_in", INPUT_BUFFER, 0)
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("ctx_data_out", PIC_CENTRONICS_TAG)
-MACHINE_CONFIG_END
 
 ROM_START( pic )
 	ROM_REGION(0x000200, PIC_ROM_REGION, 0)
@@ -76,20 +68,23 @@ ioport_constructor a2bus_pic_device::device_input_ports() const
 }
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor a2bus_pic_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( pic );
-}
+MACHINE_CONFIG_MEMBER( a2bus_pic_device::device_add_mconfig )
+	MCFG_CENTRONICS_ADD(PIC_CENTRONICS_TAG, centronics_devices, "printer")
+	MCFG_CENTRONICS_DATA_INPUT_BUFFER("ctx_data_in")
+	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(a2bus_pic_device, ack_w))
+
+	MCFG_DEVICE_ADD("ctx_data_in", INPUT_BUFFER, 0)
+	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("ctx_data_out", PIC_CENTRONICS_TAG)
+MACHINE_CONFIG_END
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *a2bus_pic_device::device_rom_region() const
+const tiny_rom_entry *a2bus_pic_device::device_rom_region() const
 {
 	return ROM_NAME( pic );
 }
@@ -98,19 +93,13 @@ const rom_entry *a2bus_pic_device::device_rom_region() const
 //  LIVE DEVICE
 //**************************************************************************
 
-a2bus_pic_device::a2bus_pic_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-		device_t(mconfig, A2BUS_PIC, "Apple Parallel Interface Card", tag, owner, clock, "a2pic", __FILE__),
-		device_a2bus_card_interface(mconfig, *this),
-		m_dsw1(*this, "DSW1"),
-		m_ctx(*this, PIC_CENTRONICS_TAG),
-		m_ctx_data_in(*this, "ctx_data_in"),
-		m_ctx_data_out(*this, "ctx_data_out"), m_rom(nullptr),
-		m_started(false), m_ack(0), m_irqenable(false), m_autostrobe(false), m_timer(nullptr)
+a2bus_pic_device::a2bus_pic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+		a2bus_pic_device(mconfig, A2BUS_PIC, tag, owner, clock)
 {
 }
 
-a2bus_pic_device::a2bus_pic_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
-		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+a2bus_pic_device::a2bus_pic_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+		device_t(mconfig, type, tag, owner, clock),
 		device_a2bus_card_interface(mconfig, *this),
 		m_dsw1(*this, "DSW1"),
 		m_ctx(*this, PIC_CENTRONICS_TAG),
@@ -163,7 +152,7 @@ void a2bus_pic_device::device_timer(emu_timer &timer, device_timer_id tid, int p
     read_cnxx - called for reads from this card's cnxx space
 -------------------------------------------------*/
 
-UINT8 a2bus_pic_device::read_cnxx(address_space &space, UINT8 offset)
+uint8_t a2bus_pic_device::read_cnxx(address_space &space, uint8_t offset)
 {
 	m_autostrobe = true;
 
@@ -179,9 +168,9 @@ UINT8 a2bus_pic_device::read_cnxx(address_space &space, UINT8 offset)
     read_c0nx - called for reads from this card's c0nx space
 -------------------------------------------------*/
 
-UINT8 a2bus_pic_device::read_c0nx(address_space &space, UINT8 offset)
+uint8_t a2bus_pic_device::read_c0nx(address_space &space, uint8_t offset)
 {
-	UINT8 rv = 0;
+	uint8_t rv = 0;
 
 	switch (offset)
 	{
@@ -222,7 +211,7 @@ UINT8 a2bus_pic_device::read_c0nx(address_space &space, UINT8 offset)
     write_c0nx - called for writes to this card's c0nx space
 -------------------------------------------------*/
 
-void a2bus_pic_device::write_c0nx(address_space &space, UINT8 offset, UINT8 data)
+void a2bus_pic_device::write_c0nx(address_space &space, uint8_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -255,7 +244,7 @@ WRITE_LINE_MEMBER( a2bus_pic_device::ack_w )
 {
 	if (m_started)
 	{
-		UINT8 dsw1 = m_dsw1->read();
+		uint8_t dsw1 = m_dsw1->read();
 
 		if (dsw1 & 0x10)    // negative polarity
 		{

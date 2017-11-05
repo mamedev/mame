@@ -5,51 +5,47 @@
  *
  */
 
-#include <cstdio>
-#include <cstring>
-#include <cstdlib>
-#include <algorithm>
-
 #include "pstream.h"
 #include "palloc.h"
 
-PLIB_NAMESPACE_START()
+#include <cstdio>
+#include <cstdlib>
+#include <algorithm>
+
+// VS2015 prefers _dup
+#ifdef _WIN32
+#include <io.h>
+#else
+#include <unistd.h>
+#endif
+
+namespace plib {
+
+pstream::~pstream()
+{
+}
 
 // -----------------------------------------------------------------------------
 // pistream: input stream
 // -----------------------------------------------------------------------------
 
-bool pistream::readline(pstring &line)
+pistream::~pistream()
 {
-	UINT8 c = 0;
-	pstringbuffer buf;
-	if (!this->read(c))
-	{
-		line = "";
-		return false;
-	}
-	while (true)
-	{
-		if (c == 10)
-			break;
-		else if (c != 13) /* ignore CR */
-			buf += c;
-		if (!this->read(c))
-			break;
-	}
-	line = buf;
-	return true;
 }
 
 // -----------------------------------------------------------------------------
 // postream: output stream
 // -----------------------------------------------------------------------------
 
+postream::~postream()
+{
+}
+
 void postream::write(pistream &strm)
 {
 	char buf[1024];
-	unsigned r;
-	while ( !bad() && ((r=strm.read(buf, 1024)) > 0))
+	pos_type r;
+	while ((r=strm.read(buf, 1024)) > 0)
 		write(buf, r);
 }
 
@@ -58,60 +54,52 @@ void postream::write(pistream &strm)
 // -----------------------------------------------------------------------------
 
 pifilestream::pifilestream(const pstring &fname)
-: pistream(0), m_pos(0), m_actually_close(true)
+: pistream(0)
+, m_file(fopen(fname.c_str(), "rb"))
+, m_pos(0)
+, m_actually_close(true)
+, m_filename(fname)
 {
-	init(fopen(fname.cstr(), "rb"));
-}
-
-pifilestream::pifilestream(void *file, const bool do_close)
-: pistream(0), m_pos(0), m_actually_close(do_close)
-{
-	init(file);
-}
-
-void pifilestream::init(void *file)
-{
-	m_file = file;
 	if (m_file == nullptr)
-	{
-		set_flag(FLAG_ERROR);
-		set_flag(FLAG_EOF);
-		set_flag(FLAG_CLOSED);
-	}
+		throw file_open_e(fname);
 	else
+		init();
+}
+
+pifilestream::pifilestream(void *file, const pstring &name, const bool do_close)
+: pistream(0), m_file(file), m_pos(0), m_actually_close(do_close), m_filename(name)
+{
+	if (m_file == nullptr)
+		throw null_argument_e(m_filename);
+	init();
+}
+
+void pifilestream::init()
+{
+	if (ftell(static_cast<FILE *>(m_file)) >= 0)
 	{
-		if (ftell((FILE *) m_file) >= 0)
-		{
-			if (fseek((FILE *) m_file, 0, SEEK_SET) >= 0)
-				set_flag(FLAG_SEEKABLE);
-		}
+		if (fseek(static_cast<FILE *>(m_file), 0, SEEK_SET) >= 0)
+			set_flag(FLAG_SEEKABLE);
 	}
 }
 
 pifilestream::~pifilestream()
 {
-	if (!closed())
-		close();
-}
-
-void pifilestream::close()
-{
 	if (m_actually_close)
 	{
-		fclose((FILE *) m_file);
-		set_flag(FLAG_CLOSED);
+		fclose(static_cast<FILE *>(m_file));
 	}
 }
 
-unsigned pifilestream::vread(void *buf, const unsigned n)
+pifilestream::pos_type pifilestream::vread(void *buf, const pos_type n)
 {
-	std::size_t r = fread(buf, 1, n, (FILE *) m_file);
+	pos_type r = fread(buf, 1, n, static_cast<FILE *>(m_file));
 	if (r < n)
 	{
-		if (feof((FILE *) m_file))
+		if (feof(static_cast<FILE *>(m_file)))
 			set_flag(FLAG_EOF);
-		if (ferror((FILE *) m_file))
-			set_flag(FLAG_ERROR);
+		if (ferror(static_cast<FILE *>(m_file)))
+			throw file_read_e(m_filename);
 	}
 	m_pos += r;
 	return r;
@@ -119,28 +107,27 @@ unsigned pifilestream::vread(void *buf, const unsigned n)
 
 void pifilestream::vseek(const pos_type n)
 {
-	check_seekable();
-	if (fseek((FILE *) m_file, SEEK_SET, n) < 0)
-		set_flag(FLAG_ERROR);
+	if (fseek(static_cast<FILE *>(m_file), static_cast<long>(n), SEEK_SET) < 0)
+		throw file_e("File seek failed: {}", m_filename);
 	else
 		m_pos = n;
-	if (feof((FILE *) m_file))
+	if (feof(static_cast<FILE *>(m_file)))
 		set_flag(FLAG_EOF);
 	else
 		clear_flag(FLAG_EOF);
-	if (ferror((FILE *) m_file))
-		set_flag(FLAG_ERROR);
+	if (ferror(static_cast<FILE *>(m_file)))
+		throw file_e("Generic file operation failed: {}", m_filename);
 }
 
 pifilestream::pos_type pifilestream::vtell()
 {
-	long ret = ftell((FILE *) m_file);
+	long ret = ftell(static_cast<FILE *>(m_file));
 	if (ret < 0)
 	{
 		return m_pos;
 	}
 	else
-		return ret;
+		return static_cast<pos_type>(ret);
 }
 
 // -----------------------------------------------------------------------------
@@ -148,9 +135,13 @@ pifilestream::pos_type pifilestream::vtell()
 // -----------------------------------------------------------------------------
 
 pstdin::pstdin()
-: pifilestream(stdin, false)
+: pifilestream(stdin, "<stdin>", false)
 {
 	/* nothing to do */
+}
+
+pstdin::~pstdin()
+{
 }
 
 // -----------------------------------------------------------------------------
@@ -158,91 +149,91 @@ pstdin::pstdin()
 // -----------------------------------------------------------------------------
 
 pofilestream::pofilestream(const pstring &fname)
-: postream(0), m_pos(0), m_actually_close(true)
+: postream(0), m_file(fopen(fname.c_str(), "wb")), m_pos(0), m_actually_close(true), m_filename(fname)
 {
-	init(fopen(fname.cstr(), "wb"));
-}
-
-pofilestream::pofilestream(void *file, const bool do_close)
-: postream(0), m_pos(0), m_actually_close(do_close)
-{
-	init(file);
-}
-
-void pofilestream::init(void *file)
-{
-	m_file = file;
 	if (m_file == nullptr)
-	{
-		set_flag(FLAG_ERROR);
-		set_flag(FLAG_CLOSED);
-	}
-	else
-	{
-		if (ftell((FILE *) m_file) >= 0)
-		{
-			if (fseek((FILE *) m_file, 0, SEEK_SET) >= 0)
-				set_flag(FLAG_SEEKABLE);
-		}
-	}
+		throw file_open_e(m_filename);
+	init();
+}
+
+pofilestream::pofilestream(void *file, const pstring &name, const bool do_close)
+: postream(0), m_file(file), m_pos(0), m_actually_close(do_close), m_filename(name)
+{
+	if (m_file == nullptr)
+		throw null_argument_e(m_filename);
+	init();
+}
+
+void pofilestream::init()
+{
+	if (ftell(static_cast<FILE *>(m_file)) >= 0)
+		if (fseek(static_cast<FILE *>(m_file), 0, SEEK_SET) >= 0)
+			set_flag(FLAG_SEEKABLE);
 }
 
 pofilestream::~pofilestream()
 {
-	if (!closed())
-		close();
-}
-
-void pofilestream::close()
-{
 	if (m_actually_close)
 	{
-		fclose((FILE *) m_file);
-		set_flag(FLAG_CLOSED);
+		fflush(static_cast<FILE *>(m_file));
+		fclose(static_cast<FILE *>(m_file));
 	}
 }
 
-void pofilestream::vwrite(const void *buf, const unsigned n)
+void pofilestream::vwrite(const void *buf, const pos_type n)
 {
-	std::size_t r = fwrite(buf, 1, n, (FILE *) m_file);
+	std::size_t r = fwrite(buf, 1, n, static_cast<FILE *>(m_file));
 	if (r < n)
 	{
-		if (ferror((FILE *) m_file))
-			set_flag(FLAG_ERROR);
+		//printf("%ld %ld %s\n", r, n, strerror(errno));
+		if (ferror(static_cast<FILE *>(m_file)))
+			throw file_write_e(m_filename);
 	}
 	m_pos += r;
 }
 
 void pofilestream::vseek(const pos_type n)
 {
-	check_seekable();
-	if (fseek((FILE *) m_file, SEEK_SET, n) < 0)
-		set_flag(FLAG_ERROR);
+	if (fseek(static_cast<FILE *>(m_file), static_cast<long>(n), SEEK_SET) < 0)
+		throw file_e("File seek failed: {}", m_filename);
 	else
 	{
 		m_pos = n;
-		if (ferror((FILE *) m_file))
-			set_flag(FLAG_ERROR);
+		if (ferror(static_cast<FILE *>(m_file)))
+			throw file_e("Generic file operation failed: {}", m_filename);
 	}
 }
 
 pstream::pos_type pofilestream::vtell()
 {
-	long ret = ftell((FILE *) m_file);
+	std::ptrdiff_t ret = ftell(static_cast<FILE *>(m_file));
 	if (ret < 0)
 	{
 		return m_pos;
 	}
 	else
-		return ret;
+		return static_cast<pos_type>(ret);
 }
+
+postringstream::~postringstream()
+{
+}
+
 
 // -----------------------------------------------------------------------------
 // pstderr: write to stderr
 // -----------------------------------------------------------------------------
 
 pstderr::pstderr()
-: pofilestream(stderr, false)
+#ifdef _WIN32
+: pofilestream(fdopen(_dup(fileno(stderr)), "wb"), "<stderr>", true)
+#else
+: pofilestream(fdopen(dup(fileno(stderr)), "wb"), "<stderr>", true)
+#endif
+{
+}
+
+pstderr::~pstderr()
 {
 }
 
@@ -251,7 +242,15 @@ pstderr::pstderr()
 // -----------------------------------------------------------------------------
 
 pstdout::pstdout()
-: pofilestream(stdout, false)
+#ifdef _WIN32
+: pofilestream(fdopen(_dup(fileno(stdout)), "wb"), "<stdout>", true)
+#else
+: pofilestream(fdopen(dup(fileno(stdout)), "wb"), "<stdout>", true)
+#endif
+{
+}
+
+pstdout::~pstdout()
 {
 }
 
@@ -260,12 +259,12 @@ pstdout::pstdout()
 // -----------------------------------------------------------------------------
 
 pimemstream::pimemstream(const void *mem, const pos_type len)
-	: pistream(FLAG_SEEKABLE), m_pos(0), m_len(len), m_mem((char *) mem)
+	: pistream(FLAG_SEEKABLE), m_pos(0), m_len(len), m_mem(static_cast<const pstring::mem_t *>(mem))
 {
 }
 
 pimemstream::pimemstream(const pomemstream &ostrm)
-: pistream(FLAG_SEEKABLE), m_pos(0), m_len(ostrm.size()), m_mem((char *) ostrm.memory())
+: pistream(FLAG_SEEKABLE), m_pos(0), m_len(ostrm.size()), m_mem(reinterpret_cast<pstring::mem_t *>(ostrm.memory()))
 {
 }
 
@@ -273,13 +272,13 @@ pimemstream::~pimemstream()
 {
 }
 
-unsigned pimemstream::vread(void *buf, const unsigned n)
+pimemstream::pos_type pimemstream::vread(void *buf, const pos_type n)
 {
-	unsigned ret = (m_pos + n <= m_len) ? n :  m_len - m_pos;
+	pos_type ret = (m_pos + n <= m_len) ? n :  m_len - m_pos;
 
 	if (ret > 0)
 	{
-		memcpy(buf, m_mem + m_pos, ret);
+		std::copy(m_mem + m_pos, m_mem + m_pos + ret, static_cast<char *>(buf));
 		m_pos += ret;
 	}
 
@@ -301,6 +300,10 @@ pimemstream::pos_type pimemstream::vtell()
 	return m_pos;
 }
 
+pistringstream::~pistringstream()
+{
+}
+
 // -----------------------------------------------------------------------------
 // Output memory stream
 // -----------------------------------------------------------------------------
@@ -316,7 +319,7 @@ pomemstream::~pomemstream()
 	pfree_array(m_mem);
 }
 
-void pomemstream::vwrite(const void *buf, const unsigned n)
+void pomemstream::vwrite(const void *buf, const pos_type n)
 {
 	if (m_pos + n >= m_capacity)
 	{
@@ -326,14 +329,13 @@ void pomemstream::vwrite(const void *buf, const unsigned n)
 		m_mem = palloc_array<char>(m_capacity);
 		if (m_mem == nullptr)
 		{
-			set_flag(FLAG_ERROR);
-			return;
+			throw out_of_mem_e("pomemstream::vwrite");
 		}
-		memcpy(m_mem, o, m_pos);
+		std::copy(o, o + m_pos, m_mem);
 		pfree_array(o);
 	}
 
-	memcpy(m_mem + m_pos, buf, n);
+	std::copy(static_cast<const char *>(buf), static_cast<const char *>(buf) + n, m_mem + m_pos);
 	m_pos += n;
 	m_size = std::max(m_pos, m_size);
 }
@@ -350,10 +352,9 @@ void pomemstream::vseek(const pos_type n)
 		m_mem = palloc_array<char>(m_capacity);
 		if (m_mem == nullptr)
 		{
-			set_flag(FLAG_ERROR);
-			return;
+			throw out_of_mem_e("pomemstream::vseek");
 		}
-		memcpy(m_mem, o, m_pos);
+		std::copy(o, o + m_pos, m_mem);
 		pfree_array(o);
 	}
 }
@@ -363,4 +364,43 @@ pstream::pos_type pomemstream::vtell()
 	return m_pos;
 }
 
-PLIB_NAMESPACE_END()
+bool putf8_reader::readline(pstring &line)
+{
+	pstring::code_t c = 0;
+	m_linebuf = "";
+	if (!this->readcode(c))
+	{
+		line = "";
+		return false;
+	}
+	while (true)
+	{
+		if (c == 10)
+			break;
+		else if (c != 13) /* ignore CR */
+			m_linebuf += pstring(c);
+		if (!this->readcode(c))
+			break;
+	}
+	line = m_linebuf;
+	return true;
+}
+
+putf8_fmt_writer::putf8_fmt_writer(postream &strm)
+: pfmt_writer_t()
+, putf8_writer(strm)
+{
+}
+
+putf8_fmt_writer::~putf8_fmt_writer()
+{
+}
+
+void putf8_fmt_writer::vdowrite(const pstring &ls) const
+{
+	write(ls);
+}
+
+
+
+}

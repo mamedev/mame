@@ -6,18 +6,18 @@
  *
  ****************************************************************************/
 
-#ifndef PK8020_H_
-#define PK8020_H_
+#ifndef MAME_INCLUDES_PK8020_H
+#define MAME_INCLUDES_PK8020_H
 
-#include "machine/i8255.h"
-#include "machine/pit8253.h"
-#include "machine/pic8259.h"
-#include "machine/i8251.h"
-#include "machine/wd_fdc.h"
 #include "imagedev/cassette.h"
-#include "sound/speaker.h"
-#include "sound/wave.h"
+#include "machine/i8251.h"
+#include "machine/i8255.h"
+#include "machine/pic8259.h"
+#include "machine/pit8253.h"
 #include "machine/ram.h"
+#include "machine/wd_fdc.h"
+#include "sound/spkrdev.h"
+#include "sound/wave.h"
 
 
 class pk8020_state : public driver_device
@@ -46,17 +46,17 @@ public:
 
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
-	UINT8 m_color;
-	UINT8 m_video_page;
-	UINT8 m_wide;
-	UINT8 m_font;
-	UINT8 m_attr;
-	UINT8 m_text_attr;
-	UINT8 m_takt;
-	UINT8 m_video_page_access;
-	UINT8 m_portc_data;
-	UINT8 m_sound_gate;
-	UINT8 m_sound_level;
+	uint8_t m_color;
+	uint8_t m_video_page;
+	uint8_t m_wide;
+	uint8_t m_font;
+	uint8_t m_attr;
+	uint8_t m_text_attr;
+	uint8_t m_takt;
+	uint8_t m_video_page_access;
+	uint8_t m_portc_data;
+	uint8_t m_sound_gate;
+	uint8_t m_sound_level;
 	DECLARE_READ8_MEMBER(keyboard_r);
 	DECLARE_READ8_MEMBER(sysreg_r);
 	DECLARE_WRITE8_MEMBER(sysreg_w);
@@ -70,7 +70,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(pk8020);
-	UINT32 screen_update_pk8020(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_pk8020(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(pk8020_interrupt);
 	DECLARE_READ8_MEMBER(pk8020_porta_r);
 	DECLARE_WRITE8_MEMBER(pk8020_portc_w);
@@ -88,7 +88,7 @@ protected:
 	required_device<i8251_device> m_rs232;
 	required_device<i8251_device> m_lan;
 	required_device<ram_device> m_ram;
-	required_device<fd1793_t> m_wd1793;
+	required_device<fd1793_device> m_wd1793;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
 	required_device<floppy_connector> m_floppy2;
@@ -100,7 +100,7 @@ protected:
 	required_memory_region m_region_gfx1;
 	ioport_port *m_io_port[16];
 	required_device<palette_device> m_palette;
-	void pk8020_set_bank(UINT8 data);
+	void pk8020_set_bank(uint8_t data);
 };
 
-#endif /* pk8020_H_ */
+#endif // MAME_INCLUDES_PK8020_H

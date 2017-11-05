@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Carl
+#include "emu.h"
 #include "i286.h"
 #include "debugger.h"
 #include "i86inline.h"
@@ -92,7 +93,7 @@
 
 /* these come from the 80286 timings in OPCODE.LST */
 /* many of these numbers are suspect TODO: add protmode insns*/
-const UINT8 i80286_cpu_device::m_i80286_timing[] =
+const uint8_t i80286_cpu_device::m_i80286_timing[] =
 {
 	23,17,          /* exception, IRET */
 		0, 2, 3, 1, /* INTs */
@@ -164,11 +165,12 @@ const UINT8 i80286_cpu_device::m_i80286_timing[] =
 	13,             /* (80186) BOUND */
 };
 
-const device_type I80286 = &device_creator<i80286_cpu_device>;
+DEFINE_DEVICE_TYPE(I80286, i80286_cpu_device, "i80286", "I80286")
 
-i80286_cpu_device::i80286_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: i8086_common_cpu_device(mconfig, I80286, "I80286", tag, owner, clock, "i80286", __FILE__)
+i80286_cpu_device::i80286_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: i8086_common_cpu_device(mconfig, I80286, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 16, 24, 0)
+	, m_opcodes_config("opcodes", ENDIANNESS_LITTLE, 16, 24, 0)
 	, m_io_config("io", ENDIANNESS_LITTLE, 16, 16, 0)
 	, m_out_shutdown_func(*this)
 {
@@ -242,52 +244,111 @@ void i80286_cpu_device::device_start()
 	save_item(NAME(m_amask));
 	save_item(NAME(m_shutdown));
 
-	state_add( I286_ES, "ES", m_sregs[ES] ).callimport().callexport().formatstr("%04X");
-	state_add( I286_ES_BASE, "ESBASE", m_base[ES]).callimport().callexport().formatstr("%06X");
-	state_add( I286_ES_LIMIT, "ESLIMIT", m_limit[ES]).callimport().callexport().formatstr("%04X");
-	state_add( I286_ES_FLAGS, "ESFLAGS", m_rights[ES]).callimport().callexport().formatstr("%02X");
-	state_add( I286_CS, "CS", m_sregs[CS] ).callimport().callexport().formatstr("%04X");
-	state_add( I286_CS_BASE, "CSBASE", m_base[CS]).callimport().callexport().formatstr("%06X");
-	state_add( I286_CS_LIMIT, "CSLIMIT", m_limit[CS]).callimport().callexport().formatstr("%04X");
-	state_add( I286_CS_FLAGS, "CSFLAGS", m_rights[CS]).callimport().callexport().formatstr("%02X");
-	state_add( I286_SS, "SS", m_sregs[SS] ).callimport().callexport().formatstr("%04X");
-	state_add( I286_SS_BASE, "SSBASE", m_base[SS]).callimport().callexport().formatstr("%06X");
-	state_add( I286_SS_LIMIT, "SSLIMIT", m_limit[SS]).callimport().callexport().formatstr("%04X");
-	state_add( I286_SS_FLAGS, "SSFLAGS", m_rights[SS]).callimport().callexport().formatstr("%02X");
-	state_add( I286_DS, "DS", m_sregs[DS] ).callimport().callexport().formatstr("%04X");
-	state_add( I286_DS_BASE, "DSBASE", m_base[DS]).callimport().callexport().formatstr("%06X");
-	state_add( I286_DS_LIMIT, "DSLIMIT", m_limit[DS]).callimport().callexport().formatstr("%04X");
-	state_add( I286_DS_FLAGS, "DSFLAGS", m_rights[DS]).callimport().callexport().formatstr("%02X");
-	state_add( I286_GDTR_BASE, "GDTRBASE", m_gdtr.base).callimport().callexport().formatstr("%06X");
-	state_add( I286_GDTR_LIMIT, "GDTRLIMIT", m_gdtr.limit).callimport().callexport().formatstr("%04X");
-	state_add( I286_IDTR_BASE, "IDTRBASE", m_idtr.base).callimport().callexport().formatstr("%06X");
-	state_add( I286_IDTR_LIMIT, "IDTRLIMIT", m_idtr.limit).callimport().callexport().formatstr("%04X");
-	state_add( I286_LDTR, "LDTR", m_ldtr.sel ).callimport().callexport().formatstr("%04X");
-	state_add( I286_LDTR_BASE, "LDTRBASE", m_ldtr.base).callimport().callexport().formatstr("%06X");
-	state_add( I286_LDTR_LIMIT, "LDTRLIMIT", m_ldtr.limit).callimport().callexport().formatstr("%04X");
-	state_add( I286_LDTR_FLAGS, "LDTRFLAGS", m_ldtr.rights).callimport().callexport().formatstr("%02X");
-	state_add( I286_TR, "TR", m_tr.sel ).callimport().callexport().formatstr("%04X");
-	state_add( I286_TR_BASE, "TRBASE", m_tr.base).callimport().callexport().formatstr("%06X");
-	state_add( I286_TR_LIMIT, "TRLIMIT", m_tr.limit).callimport().callexport().formatstr("%04X");
-	state_add( I286_TR_FLAGS, "TRFLAGS", m_tr.rights).callimport().callexport().formatstr("%02X");
-	state_add( I286_MSW, "MSW", m_msw ).callimport().callexport().formatstr("%04X");
-	state_add( I286_VECTOR, "V", m_int_vector).callimport().callexport().formatstr("%02X");
+	state_add( I286_ES, "ES", m_sregs[ES] ).formatstr("%04X");
+	state_add( I286_ES_BASE, "ESBASE", m_base[ES]).formatstr("%06X");
+	state_add( I286_ES_LIMIT, "ESLIMIT", m_limit[ES]).formatstr("%04X");
+	state_add( I286_ES_FLAGS, "ESFLAGS", m_rights[ES]).formatstr("%02X");
+	state_add( I286_CS, "CS", m_sregs[CS] ).callimport().formatstr("%04X");
+	state_add( I286_CS_BASE, "CSBASE", m_base[CS]).callimport().formatstr("%06X");
+	state_add( I286_CS_LIMIT, "CSLIMIT", m_limit[CS]).formatstr("%04X");
+	state_add( I286_CS_FLAGS, "CSFLAGS", m_rights[CS]).formatstr("%02X");
+	state_add( I286_SS, "SS", m_sregs[SS] ).formatstr("%04X");
+	state_add( I286_SS_BASE, "SSBASE", m_base[SS]).formatstr("%06X");
+	state_add( I286_SS_LIMIT, "SSLIMIT", m_limit[SS]).formatstr("%04X");
+	state_add( I286_SS_FLAGS, "SSFLAGS", m_rights[SS]).formatstr("%02X");
+	state_add( I286_DS, "DS", m_sregs[DS] ).formatstr("%04X");
+	state_add( I286_DS_BASE, "DSBASE", m_base[DS]).formatstr("%06X");
+	state_add( I286_DS_LIMIT, "DSLIMIT", m_limit[DS]).formatstr("%04X");
+	state_add( I286_DS_FLAGS, "DSFLAGS", m_rights[DS]).formatstr("%02X");
+	state_add( I286_GDTR_BASE, "GDTRBASE", m_gdtr.base).formatstr("%06X");
+	state_add( I286_GDTR_LIMIT, "GDTRLIMIT", m_gdtr.limit).formatstr("%04X");
+	state_add( I286_IDTR_BASE, "IDTRBASE", m_idtr.base).formatstr("%06X");
+	state_add( I286_IDTR_LIMIT, "IDTRLIMIT", m_idtr.limit).formatstr("%04X");
+	state_add( I286_LDTR, "LDTR", m_ldtr.sel ).formatstr("%04X");
+	state_add( I286_LDTR_BASE, "LDTRBASE", m_ldtr.base).formatstr("%06X");
+	state_add( I286_LDTR_LIMIT, "LDTRLIMIT", m_ldtr.limit).formatstr("%04X");
+	state_add( I286_LDTR_FLAGS, "LDTRFLAGS", m_ldtr.rights).formatstr("%02X");
+	state_add( I286_TR, "TR", m_tr.sel ).formatstr("%04X");
+	state_add( I286_TR_BASE, "TRBASE", m_tr.base).formatstr("%06X");
+	state_add( I286_TR_LIMIT, "TRLIMIT", m_tr.limit).formatstr("%04X");
+	state_add( I286_TR_FLAGS, "TRFLAGS", m_tr.rights).formatstr("%02X");
+	state_add( I286_MSW, "MSW", m_msw ).formatstr("%04X");
+	state_add( I286_VECTOR, "V", m_int_vector).formatstr("%02X");
 
-	state_add(STATE_GENPC, "curpc", m_pc).callimport().callexport().formatstr("%06X");
+	state_add( I286_PC, "PC", m_pc).callimport().formatstr("%06X");
+	state_add( STATE_GENPCBASE, "CURPC", m_pc ).callimport().formatstr("%06X").noshow();
+	state_add( I8086_HALT, "HALT", m_halt ).mask(1);
+
 	m_out_shutdown_func.resolve_safe();
 }
+
+device_memory_interface::space_config_vector i80286_cpu_device::memory_space_config() const
+{
+	if(has_configured_map(AS_OPCODES))
+		return space_config_vector {
+			std::make_pair(AS_PROGRAM, &m_program_config),
+			std::make_pair(AS_OPCODES, &m_opcodes_config),
+			std::make_pair(AS_IO,      &m_io_config)
+		};
+	else
+		return space_config_vector {
+			std::make_pair(AS_PROGRAM, &m_program_config),
+			std::make_pair(AS_IO,      &m_io_config)
+		};
+}
+
+
+//-------------------------------------------------
+//  state_import - import state into the device,
+//  after it has been set
+//-------------------------------------------------
+
+void i80286_cpu_device::state_import(const device_state_entry &entry)
+{
+	switch (entry.index())
+	{
+	case I286_IP:
+	case I286_CS_BASE:
+		m_pc = m_base[CS] + m_ip;
+		break;
+
+	case I286_CS:
+		// TODO: should this call data_descriptor to update the current segment?
+		break;
+
+	case STATE_GENPC:
+	case STATE_GENPCBASE:
+		if (m_pc - m_base[CS] > m_limit[CS])
+		{
+			// TODO: should this call data_descriptor instead of ignoring jumps outside the current segment?
+			if (PM)
+			{
+				m_pc = m_base[CS] + m_ip;
+			}
+			else
+			{
+				m_sregs[CS] = m_pc >> 4;
+				m_base[CS] = m_sregs[CS] << 4;
+			}
+		}
+		m_ip = m_pc - m_base[CS];
+		break;
+	}
+}
+
+
+//-------------------------------------------------
+//  state_string_export - export state as a string
+//  for the debugger
+//-------------------------------------------------
 
 void i80286_cpu_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	switch (entry.index())
 	{
-		case STATE_GENPC:
-			str = string_format("%08X", m_base[CS] + m_ip);
-			break;
-
 		case STATE_GENFLAGS:
 			{
-				UINT16 flags = CompressFlags();
+				uint16_t flags = CompressFlags();
 				str = string_format("%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
 					flags & 0x8000 ? '0':'.',
 					flags & 0x4000 ? 'N':'.',
@@ -310,12 +371,12 @@ void i80286_cpu_device::state_string_export(const device_state_entry &entry, std
 	}
 }
 
-bool i80286_cpu_device::memory_translate(address_spacenum spacenum, int intention, offs_t &address)
+bool i80286_cpu_device::memory_translate(int spacenum, int intention, offs_t &address)
 {
 	if(spacenum == AS_PROGRAM)
 		address &= m_amask;
 
-	return TRUE;
+	return true;
 }
 
 void i80286_cpu_device::execute_set_input(int inptnum, int state)
@@ -351,10 +412,10 @@ void i80286_cpu_device::execute_set_input(int inptnum, int state)
 // of the nvram.  if yes, after init, it sets the stack pointer to the value in 0040:0067
 // in the bios data segment then pops es and ds off that stack, does popa then a far ret.
 
-void i80286_cpu_device::trap(UINT32 error)
+void i80286_cpu_device::trap(uint32_t error)
 {
 	int error_code = error & 0xffff;
-	UINT16 number = error >> 16;
+	uint16_t number = error >> 16;
 	if(error_code == 0xffff)
 		error_code = -1;
 	m_ip = m_prev_ip;
@@ -381,7 +442,7 @@ void i80286_cpu_device::trap(UINT32 error)
 				interrupt_descriptor(number,1,-1);
 		}
 	}
-	catch(UINT32 e)
+	catch(uint32_t e)
 	{
 		trap(e);
 	}
@@ -393,10 +454,10 @@ void i80286_cpu_device::trap(UINT32 error)
 	m_trap_level = 0;
 }
 
-UINT32 i80286_cpu_device::selector_address(UINT16 sel)
+uint32_t i80286_cpu_device::selector_address(uint16_t sel)
 {
-	UINT32 base;
-	UINT16 limit;
+	uint32_t base;
+	uint16_t limit;
 	if(TBL(sel))
 	{
 		base = m_ldtr.base;
@@ -410,7 +471,7 @@ UINT32 i80286_cpu_device::selector_address(UINT16 sel)
 	return ((IDX(sel) >= limit) || !IDXTBL(sel) ? -1 : base + IDX(sel));
 }
 
-int i80286_cpu_device::verify(UINT16 selector, int operation, UINT8 rights, bool valid)
+int i80286_cpu_device::verify(uint16_t selector, int operation, uint8_t rights, bool valid)
 {
 	if(!IDXTBL(selector) && !valid)
 		return FAULT_GP;
@@ -437,7 +498,7 @@ int i80286_cpu_device::verify(UINT16 selector, int operation, UINT8 rights, bool
 
 void i80286_cpu_device::pop_seg(int reg)
 {
-	UINT16 sel;
+	uint16_t sel;
 	if(PM)
 		check_permission(SS, m_regs.w[SP], 2, I8086_READ);
 	sel = read_word(m_base[SS] + m_regs.w[SP]);
@@ -445,13 +506,13 @@ void i80286_cpu_device::pop_seg(int reg)
 	m_regs.w[SP] += 2;
 }
 
-void i80286_cpu_device::data_descriptor(int reg, UINT16 selector, int cpl, UINT32 trap, UINT16 offset, int size)
+void i80286_cpu_device::data_descriptor(int reg, uint16_t selector, int cpl, uint32_t trap, uint16_t offset, int size)
 {
 	if(PM)
 	{
-		UINT16 desc[3];
-		UINT8 r;
-		UINT32 addr;
+		uint16_t desc[3];
+		uint8_t r;
+		uint32_t addr;
 		if((reg != SS) && !IDXTBL(selector))
 		{
 			m_sregs[reg] = 0;
@@ -520,16 +581,16 @@ void i80286_cpu_device::data_descriptor(int reg, UINT16 selector, int cpl, UINT3
 	m_valid[reg] = 1;
 }
 
-void i80286_cpu_device::data_descriptor(int reg, UINT16 selector)
+void i80286_cpu_device::data_descriptor(int reg, uint16_t selector)
 {
 	data_descriptor(reg, selector, CPL, TRAP(FAULT_GP,IDXTBL(selector)));
 }
 
-void i80286_cpu_device::switch_task(UINT16 ntask, int type)
+void i80286_cpu_device::switch_task(uint16_t ntask, int type)
 {
-	UINT16 ndesc[3], desc[3], ntss[22], otss[22], flags;
-	UINT8 r, lr;
-	UINT32 naddr, oaddr, ldtaddr;
+	uint16_t ndesc[3], desc[3], ntss[22], otss[22], flags;
+	uint8_t r, lr;
+	uint32_t naddr, oaddr, ldtaddr;
 	int i;
 	logerror("i286: %06x This program uses TSSs, how rare. Please report this to the developers.\n", pc());
 
@@ -656,7 +717,7 @@ void i80286_cpu_device::switch_task(UINT16 ntask, int type)
 	{
 		code_descriptor(ntss[TSS_CS], ntss[TSS_IP], 0);
 	}
-	catch (UINT32 e)
+	catch (uint32_t e)
 	{
 		int error_code = e & 0xffff;
 		if(error_code == FAULT_GP)
@@ -668,13 +729,13 @@ void i80286_cpu_device::switch_task(UINT16 ntask, int type)
 	data_descriptor(DS, ntss[TSS_DS], CPL, TRAP(FAULT_TS, IDXTBL(ntss[TSS_DS])));
 }
 
-void i80286_cpu_device::code_descriptor(UINT16 selector, UINT16 offset, int gate)
+void i80286_cpu_device::code_descriptor(uint16_t selector, uint16_t offset, int gate)
 {
 	if(PM)
 	{
-		UINT16 desc[3];
-		UINT8 r;
-		UINT32 addr;
+		uint16_t desc[3];
+		uint8_t r;
+		uint32_t addr;
 		if((addr = selector_address(selector)) == -1)
 			throw TRAP(FAULT_GP, IDXTBL(selector));
 
@@ -713,7 +774,7 @@ void i80286_cpu_device::code_descriptor(UINT16 selector, UINT16 offset, int gate
 		}
 		else
 		{ // systemdescriptor
-			UINT16 gatesel = GATESEL(desc);
+			uint16_t gatesel = GATESEL(desc);
 
 			if(!gate)
 				throw TRAP(FAULT_GP, IDXTBL(selector)); // tss cs must be segment
@@ -726,7 +787,7 @@ void i80286_cpu_device::code_descriptor(UINT16 selector, UINT16 offset, int gate
 			{
 				case CALLGATE:
 				{
-					UINT16 gatedesc[3];
+					uint16_t gatedesc[3];
 					if((addr = selector_address(gatesel)) == -1)
 						throw TRAP(FAULT_GP, IDXTBL(gatesel));
 
@@ -748,8 +809,8 @@ void i80286_cpu_device::code_descriptor(UINT16 selector, UINT16 offset, int gate
 					if (!CONF(r) && (DPL(r) < CPL))
 					{
 						// inner call
-						UINT16 tss_ss, tss_sp, oldss, oldsp;
-						UINT32 oldstk;
+						uint16_t tss_ss, tss_sp, oldss, oldsp;
+						uint32_t oldstk;
 						int i;
 						if(gate == NT_JMP)
 							throw TRAP(FAULT_GP, IDXTBL(gatesel)); // can't jmp to inner
@@ -812,8 +873,8 @@ void i80286_cpu_device::code_descriptor(UINT16 selector, UINT16 offset, int gate
 
 void i80286_cpu_device::interrupt_descriptor(int number, int hwint, int error)
 {
-	UINT16 desc[3], gatesel, flags = CompressFlags();
-	UINT8 r;
+	uint16_t desc[3], gatesel, flags = CompressFlags();
+	uint8_t r;
 	hwint = hwint ? 1 : 0;
 
 	if(number == -1)
@@ -830,8 +891,8 @@ void i80286_cpu_device::interrupt_descriptor(int number, int hwint, int error)
 		PUSH(flags & ~0xf000);
 		m_TF = m_IF = 0;
 
-		UINT16 dest_off = read_word(number * 4 + 0);
-		UINT16 dest_seg = read_word(number * 4 + 2);
+		uint16_t dest_off = read_word(number * 4 + 0);
+		uint16_t dest_seg = read_word(number * 4 + 2);
 
 		PUSH(m_sregs[CS]);
 		PUSH(m_ip);
@@ -860,7 +921,7 @@ void i80286_cpu_device::interrupt_descriptor(int number, int hwint, int error)
 			{
 				switch_task(gatesel, NT_CALL);
 			}
-			catch (UINT32 e)
+			catch (uint32_t e)
 			{
 				throw e + hwint;
 			}
@@ -872,8 +933,8 @@ void i80286_cpu_device::interrupt_descriptor(int number, int hwint, int error)
 		case INTGATE:
 		case TRAPGATE:
 		{
-			UINT16 gatedesc[3];
-			UINT32 addr;
+			uint16_t gatedesc[3];
+			uint32_t addr;
 
 			if((addr = selector_address(gatesel)) == -1)
 				throw TRAP(FAULT_GP, (IDXTBL(gatesel) + hwint));
@@ -894,7 +955,7 @@ void i80286_cpu_device::interrupt_descriptor(int number, int hwint, int error)
 			if(!CONF(r) && (DPL(r) < CPL))
 			{
 				// inner call
-				UINT16 tss_ss, tss_sp, oldss, oldsp;
+				uint16_t tss_ss, tss_sp, oldss, oldsp;
 				tss_ss = read_word(m_tr.base + TSS_SS0 * 2 + (DPL(r) * 4));
 				tss_sp = read_word(m_tr.base + TSS_SP0 * 2 + (DPL(r) * 4));
 
@@ -931,57 +992,57 @@ void i80286_cpu_device::interrupt_descriptor(int number, int hwint, int error)
 	}
 }
 
-UINT8 i80286_cpu_device::read_port_byte(UINT16 port)
+uint8_t i80286_cpu_device::read_port_byte(uint16_t port)
 {
 	if(PM && (CPL > m_IOPL))
 		throw TRAP(FAULT_GP, 0);
 	return m_io->read_byte(port);
 }
 
-UINT16 i80286_cpu_device::read_port_word(UINT16 port)
+uint16_t i80286_cpu_device::read_port_word(uint16_t port)
 {
 	if(PM && (CPL > m_IOPL))
 		throw TRAP(FAULT_GP, 0);
 	return m_io->read_word_unaligned(port);
 }
 
-void i80286_cpu_device::write_port_byte(UINT16 port, UINT8 data)
+void i80286_cpu_device::write_port_byte(uint16_t port, uint8_t data)
 {
 	if(PM && (CPL > m_IOPL))
 		throw TRAP(FAULT_GP, 0);
 	m_io->write_byte(port, data);
 }
 
-void i80286_cpu_device::write_port_word(UINT16 port, UINT16 data)
+void i80286_cpu_device::write_port_word(uint16_t port, uint16_t data)
 {
 	if(PM && (CPL > m_IOPL))
 		throw TRAP(FAULT_GP, 0);
 	m_io->write_word_unaligned(port, data);
 }
 
-UINT8 i80286_cpu_device::fetch_op()
+uint8_t i80286_cpu_device::fetch_op()
 {
-	UINT8 data;
+	uint8_t data;
 	if(m_ip > m_limit[CS])
 		throw TRAP(FAULT_GP, 0);
 
-	data = m_direct->read_byte( pc() & m_amask, m_fetch_xor );
+	data = m_direct_opcodes->read_byte( pc() & m_amask, m_fetch_xor );
 	m_ip++;
 	return data;
 }
 
-UINT8 i80286_cpu_device::fetch()
+uint8_t i80286_cpu_device::fetch()
 {
-	UINT8 data;
+	uint8_t data;
 	if(m_ip > m_limit[CS])
 		throw TRAP(FAULT_GP, 0);
 
-	data = m_direct->read_byte( pc() & m_amask, m_fetch_xor );
+	data = m_direct_opcodes->read_byte( pc() & m_amask, m_fetch_xor );
 	m_ip++;
 	return data;
 }
 
-UINT32 i80286_cpu_device::calc_addr(int seg, UINT16 offset, int size, int op, bool override)
+uint32_t i80286_cpu_device::calc_addr(int seg, uint16_t offset, int size, int op, bool override)
 {
 	seg = (m_seg_prefix && (seg==DS || seg==SS) && override) ? m_prefix_seg : seg;
 	if(op != I8086_NONE)
@@ -1053,7 +1114,7 @@ void i80286_cpu_device::execute_run()
 
 			debugger_instruction_hook( this, pc() & m_amask );
 
-			UINT8 op = fetch_op();
+			uint8_t op = fetch_op();
 
 			switch(op)
 			{
@@ -1065,15 +1126,15 @@ void i80286_cpu_device::execute_run()
 				case 0x0f:
 				{
 					unsigned next = fetch_op();
-					UINT16 desc[3], tmp, msw, sel;
-					UINT8 r;
-					UINT32 addr;
+					uint16_t desc[3], tmp, msw, sel;
+					uint8_t r;
+					uint32_t addr;
 
 					switch (next)
 					{
 						case 0:
 							if(!PM)
-								throw TRAP(FAULT_UD, (UINT16)-1);
+								throw TRAP(FAULT_UD, (uint16_t)-1);
 							m_modrm = fetch();
 							switch (m_modrm & 0x38)
 							{
@@ -1166,15 +1227,15 @@ void i80286_cpu_device::execute_run()
 									break;
 
 								default:
-									throw TRAP(FAULT_UD, (UINT16)-1);
+									throw TRAP(FAULT_UD, (uint16_t)-1);
 							}
 							break;
 						case 1:
 						{
-							UINT32 ea;
+							uint32_t ea;
 							m_modrm = fetch();
 							if((m_modrm >= 0xc0) && (m_modrm < 0xe0))
-								throw TRAP(FAULT_UD, (UINT16)-1);
+								throw TRAP(FAULT_UD, (uint16_t)-1);
 							switch (m_modrm & 0x38)
 							{
 								case 0: /* sgdt */
@@ -1213,13 +1274,13 @@ void i80286_cpu_device::execute_run()
 									m_msw = (m_msw & 1) | msw;
 									break;
 								default:
-									throw TRAP(FAULT_UD, (UINT16)-1);
+									throw TRAP(FAULT_UD, (uint16_t)-1);
 							}
 							break;
 						}
 						case 2: /* LAR */
 							if(!PM)
-								throw TRAP(FAULT_UD, (UINT16)-1);
+								throw TRAP(FAULT_UD, (uint16_t)-1);
 							m_modrm = fetch_op();
 							tmp = GetRMWord();
 							if((addr = selector_address(tmp)) == -1)
@@ -1242,7 +1303,7 @@ void i80286_cpu_device::execute_run()
 							break;
 						case 3: /* LSL */
 							if(!PM)
-								throw TRAP(FAULT_UD, (UINT16)-1);
+								throw TRAP(FAULT_UD, (uint16_t)-1);
 							m_modrm = fetch_op();
 							tmp = GetRMWord();
 							if((addr = selector_address(tmp)) == -1)
@@ -1307,7 +1368,7 @@ reg.base = BASE(desc); (void)(r); reg.limit = LIMIT(desc); }
 							m_msw &= ~8;
 							break;
 						default:
-							throw TRAP(FAULT_UD, (UINT16)-1);
+							throw TRAP(FAULT_UD, (uint16_t)-1);
 					}
 					break;
 				}
@@ -1331,7 +1392,7 @@ reg.base = BASE(desc); (void)(r); reg.limit = LIMIT(desc); }
 				case 0x60: // i_pusha
 				{
 					check_permission(SS, m_regs.w[SP]-16, 16, I8086_WRITE);
-					UINT32 tmp = m_regs.w[SP];
+					uint32_t tmp = m_regs.w[SP];
 					PUSH(m_regs.w[AX]);
 					PUSH(m_regs.w[CX]);
 					PUSH(m_regs.w[DX]);
@@ -1359,7 +1420,7 @@ reg.base = BASE(desc); (void)(r); reg.limit = LIMIT(desc); }
 
 				case 0x62: // i_bound
 				{
-					UINT32 low,high,tmp;
+					uint32_t low,high,tmp;
 					m_modrm = fetch();
 					low = GetRMWord();
 					high = GetnextRMWord();
@@ -1367,14 +1428,14 @@ reg.base = BASE(desc); (void)(r); reg.limit = LIMIT(desc); }
 					if (tmp<low || tmp>high)
 						interrupt(5);
 					CLK(BOUND);
-					logerror("%s: %06x: bound %04x high %04x low %04x tmp\n", tag(), pc(), high, low, tmp);
+					logerror("%06x: bound %04x high %04x low %04x tmp\n", pc(), high, low, tmp);
 				}
 				break;
 
 				case 0x63: // arpl
 				{
-					UINT16 tmp, source;
-					if (!PM) throw TRAP(FAULT_UD,(UINT16)-1);
+					uint16_t tmp, source;
+					if (!PM) throw TRAP(FAULT_UD,(uint16_t)-1);
 
 					m_modrm=fetch_op();
 					tmp=GetRMWord();
@@ -1397,28 +1458,28 @@ reg.base = BASE(desc); (void)(r); reg.limit = LIMIT(desc); }
 
 				case 0x69: // i_imul_d16
 				{
-					UINT32 tmp;
+					uint32_t tmp;
 					DEF_r16w();
 					tmp = fetch_word();
-					m_dst = (INT32)((INT16)m_src)*(INT32)((INT16)tmp);
-					m_CarryVal = m_OverVal = (((INT32)m_dst) >> 15 != 0) && (((INT32)m_dst) >> 15 != -1);
+					m_dst = (int32_t)((int16_t)m_src)*(int32_t)((int16_t)tmp);
+					m_CarryVal = m_OverVal = (((int32_t)m_dst) >> 15 != 0) && (((int32_t)m_dst) >> 15 != -1);
 					RegWord(m_dst);
 					CLKM(IMUL_RRI16, IMUL_RMI16);
 				}
 				break;
 
 				case 0x6a: // i_push_d8
-					PUSH( (UINT16)((INT16)((INT8)fetch())) );
+					PUSH( (uint16_t)((int16_t)((int8_t)fetch())) );
 					CLK(PUSH_IMM);
 					break;
 
 				case 0x6b: // i_imul_d8
 				{
-					UINT32 src2;
+					uint32_t src2;
 					DEF_r16w();
-					src2= (UINT16)((INT16)((INT8)fetch()));
-					m_dst = (INT32)((INT16)m_src)*(INT32)((INT16)src2);
-					m_CarryVal = m_OverVal = (((INT32)m_dst) >> 15 != 0) && (((INT32)m_dst) >> 15 != -1);
+					src2= (uint16_t)((int16_t)((int8_t)fetch()));
+					m_dst = (int32_t)((int16_t)m_src)*(int32_t)((int16_t)src2);
+					m_CarryVal = m_OverVal = (((int32_t)m_dst) >> 15 != 0) && (((int32_t)m_dst) >> 15 != -1);
 					RegWord(m_dst);
 					CLKM(IMUL_RRI8, IMUL_RMI8);
 				}
@@ -1444,8 +1505,8 @@ reg.base = BASE(desc); (void)(r); reg.limit = LIMIT(desc); }
 					m_modrm = fetch();
 					if((m_modrm & 0x38) > 0x18)
 					{
-						logerror("%s: %06x: Mov Sreg - Invalid register\n", tag(), pc());
-						throw TRAP(FAULT_UD, (UINT16)-1);
+						logerror("%06x: Mov Sreg - Invalid register\n", pc());
+						throw TRAP(FAULT_UD, (uint16_t)-1);
 					}
 					PutRMWord(m_sregs[(m_modrm & 0x38) >> 3]);
 					CLKM(MOV_RS,MOV_MS);
@@ -1468,15 +1529,15 @@ reg.base = BASE(desc); (void)(r); reg.limit = LIMIT(desc); }
 							data_descriptor(DS, m_src);
 							break;
 						default:
-							logerror("%s: %06x: Mov Sreg - Invalid register\n", tag(), pc());
-							throw TRAP(FAULT_UD, (UINT16)-1);
+							logerror("%06x: Mov Sreg - Invalid register\n", pc());
+							throw TRAP(FAULT_UD, (uint16_t)-1);
 					}
 					break;
 
 				case 0x8f: // i_popw
 				{
 					m_modrm = fetch();
-					UINT16 tmp = read_word(calc_addr(SS, m_regs.w[SP], 2, I8086_READ, false));
+					uint16_t tmp = read_word(calc_addr(SS, m_regs.w[SP], 2, I8086_READ, false));
 					PutRMWord( tmp );
 					m_regs.w[SP] += 2;
 					CLKM(POP_R16,POP_M16);
@@ -1485,10 +1546,10 @@ reg.base = BASE(desc); (void)(r); reg.limit = LIMIT(desc); }
 
 				case 0x9a: // i_call_far
 				{
-					UINT16 cs = m_sregs[CS];
-					UINT16 tmp = fetch_word();
-					UINT16 tmp2 = fetch_word();
-					UINT16 ip = m_ip;
+					uint16_t cs = m_sregs[CS];
+					uint16_t tmp = fetch_word();
+					uint16_t tmp2 = fetch_word();
+					uint16_t ip = m_ip;
 					code_descriptor(tmp2, tmp, NT_CALL);
 					PUSH(cs);
 					PUSH(ip);
@@ -1498,13 +1559,13 @@ reg.base = BASE(desc); (void)(r); reg.limit = LIMIT(desc); }
 
 				case 0x9b: // i_wait
 					if((m_msw & 0x0a) == 0x0a)
-						throw TRAP(FAULT_NM, (UINT16)-1);
+						throw TRAP(FAULT_NM, (uint16_t)-1);
 					CLK(WAIT);
 					break;
 
 				case 0x9c: // pushf
 				{
-					UINT16 flags = CompressFlags();
+					uint16_t flags = CompressFlags();
 					if(!PM)
 						flags &= ~0xf000;
 					PUSH(flags);
@@ -1514,7 +1575,7 @@ reg.base = BASE(desc); (void)(r); reg.limit = LIMIT(desc); }
 
 				case 0x9d: // popf
 				{
-					UINT16 flags;
+					uint16_t flags;
 					flags = POP();
 					CLK(POPF);
 					load_flags(flags, CPL);
@@ -1523,7 +1584,7 @@ reg.base = BASE(desc); (void)(r); reg.limit = LIMIT(desc); }
 
 				case 0xc0: // i_rotshft_bd8
 				{
-					UINT8 c;
+					uint8_t c;
 					m_modrm = fetch();
 					m_src = GetRMByte();
 					m_dst = m_src;
@@ -1549,7 +1610,7 @@ reg.base = BASE(desc); (void)(r); reg.limit = LIMIT(desc); }
 
 				case 0xc1: // i_rotshft_wd8
 				{
-					UINT8 c;
+					uint8_t c;
 					m_modrm = fetch();
 					m_src = GetRMWord();
 					m_dst = m_src;
@@ -1577,8 +1638,8 @@ reg.base = BASE(desc); (void)(r); reg.limit = LIMIT(desc); }
 				{
 					m_modrm = fetch();
 					if(m_modrm >= 0xc0)
-						throw TRAP(FAULT_UD, (UINT16)-1);
-					UINT16 tmp = GetRMWord();
+						throw TRAP(FAULT_UD, (uint16_t)-1);
+					uint16_t tmp = GetRMWord();
 					data_descriptor(ES, GetnextRMWord());
 					RegWord(tmp);
 					CLK(LOAD_PTR);
@@ -1589,8 +1650,8 @@ reg.base = BASE(desc); (void)(r); reg.limit = LIMIT(desc); }
 				{
 					m_modrm = fetch();
 					if(m_modrm >= 0xc0)
-						throw TRAP(FAULT_UD, (UINT16)-1);
-					UINT16 tmp = GetRMWord();
+						throw TRAP(FAULT_UD, (uint16_t)-1);
+					uint16_t tmp = GetRMWord();
 					data_descriptor(DS, GetnextRMWord());
 					RegWord(tmp);
 					CLK(LOAD_PTR);
@@ -1599,8 +1660,8 @@ reg.base = BASE(desc); (void)(r); reg.limit = LIMIT(desc); }
 
 				case 0xc8: // i_enter
 				{
-					UINT16 nb = fetch();
-					UINT32 level;
+					uint16_t nb = fetch();
+					uint32_t level;
 
 					nb |= fetch() << 8;
 					level = fetch();
@@ -1642,7 +1703,7 @@ reg.base = BASE(desc); (void)(r); reg.limit = LIMIT(desc); }
 				case 0xcf: // iret
 				{
 					int oldcpl = (PM) ? CPL : 0;
-					UINT16 flags = far_return(1, 0);
+					uint16_t flags = far_return(1, 0);
 					CLK(IRET);
 					load_flags(flags, oldcpl);
 					break;
@@ -1650,7 +1711,7 @@ reg.base = BASE(desc); (void)(r); reg.limit = LIMIT(desc); }
 
 				case 0xd2: // i_rotshft_bcl
 				{
-					UINT8 c;
+					uint8_t c;
 
 					m_modrm = fetch();
 					m_src = GetRMByte();
@@ -1677,7 +1738,7 @@ reg.base = BASE(desc); (void)(r); reg.limit = LIMIT(desc); }
 
 				case 0xd3: // i_rotshft_wcl
 				{
-					UINT8 c;
+					uint8_t c;
 
 					m_modrm = fetch();
 					m_src = GetRMWord();
@@ -1711,7 +1772,7 @@ reg.base = BASE(desc); (void)(r); reg.limit = LIMIT(desc); }
 				case 0xde:
 				case 0xdf:
 					if((m_msw & 8) || (m_msw & 4))
-						throw TRAP(FAULT_NM, (UINT16)-1);
+						throw TRAP(FAULT_NM, (uint16_t)-1);
 					m_modrm = fetch();
 					GetRMByte();
 					CLK(NOP);
@@ -1721,8 +1782,8 @@ reg.base = BASE(desc); (void)(r); reg.limit = LIMIT(desc); }
 
 				case 0xea: // i_jmp_far
 				{
-					UINT16 tmp = fetch_word();
-					UINT16 tmp1 = fetch_word();
+					uint16_t tmp = fetch_word();
+					uint16_t tmp1 = fetch_word();
 					code_descriptor(tmp1, tmp, NT_JMP);
 					CLK(JMP_FAR);
 					break;
@@ -1731,13 +1792,13 @@ reg.base = BASE(desc); (void)(r); reg.limit = LIMIT(desc); }
 				case 0xf0: // i_lock
 					if(PM && (CPL > m_IOPL))
 						throw TRAP(FAULT_GP, 0);
-					logerror("%s: %06x: Warning - BUSLOCK\n", tag(), pc());
+					logerror("%06x: Warning - BUSLOCK\n", pc());
 					m_no_interrupt = 1;
 					CLK(NOP);
 					break;
 
 				case 0xf4: // i_hlt
-					if(PM && (CPL > m_IOPL))
+					if(PM && CPL)
 						throw TRAP(FAULT_GP, 0);
 					m_icount = 0;
 					m_halt = true;
@@ -1759,7 +1820,7 @@ reg.base = BASE(desc); (void)(r); reg.limit = LIMIT(desc); }
 
 				case 0xff: // i_ffpre
 					{
-						UINT32 tmp, tmp1;
+						uint32_t tmp, tmp1;
 						m_modrm = fetch();
 						tmp = GetRMWord();
 						switch ( m_modrm & 0x38 )
@@ -1787,7 +1848,7 @@ reg.base = BASE(desc); (void)(r); reg.limit = LIMIT(desc); }
 							break;
 						case 0x18:  /* CALL FAR */
 						{
-							UINT16 ip = m_ip;
+							uint16_t ip = m_ip;
 							tmp1 = m_sregs[CS];
 							code_descriptor(GetnextRMWord(), tmp, NT_CALL);
 							PUSH(tmp1);
@@ -1808,8 +1869,8 @@ reg.base = BASE(desc); (void)(r); reg.limit = LIMIT(desc); }
 							CLKM(PUSH_R16,PUSH_M16);
 							break;
 						default:
-							logerror("%s: %06x: FF Pre with unimplemented mod\n", tag(), pc());
-							throw TRAP(FAULT_UD,(UINT16)-1);
+							logerror("%06x: FF Pre with unimplemented mod\n", pc());
+							throw TRAP(FAULT_UD,(uint16_t)-1);
 						}
 					}
 					break;
@@ -1818,8 +1879,8 @@ reg.base = BASE(desc); (void)(r); reg.limit = LIMIT(desc); }
 				case 0xf3:
 				{
 					bool pass = false;
-					UINT8 next = repx_op();
-					UINT16 c = m_regs.w[CX];
+					uint8_t next = repx_op();
+					uint16_t c = m_regs.w[CX];
 
 					switch (next)
 					{
@@ -1844,14 +1905,14 @@ reg.base = BASE(desc); (void)(r); reg.limit = LIMIT(desc); }
 					if(!common_op(op))
 					{
 						m_icount -= 10; // UD fault timing?
-						logerror("%s: %06x: Invalid Opcode %02x\n", tag(), pc(), op);
+						logerror("%06x: Invalid Opcode %02x\n", pc(), op);
 						m_ip = m_prev_ip;
-						throw TRAP(FAULT_UD, (UINT16)-1);
+						throw TRAP(FAULT_UD, (uint16_t)-1);
 					}
 					break;
 			}
 		}
-		catch(UINT32 e)
+		catch(uint32_t e)
 		{
 			trap(e);
 		}
@@ -1859,13 +1920,13 @@ reg.base = BASE(desc); (void)(r); reg.limit = LIMIT(desc); }
 }
 
 
-void i80286_cpu_device::load_flags(UINT16 flags, int cpl)
+void i80286_cpu_device::load_flags(uint16_t flags, int cpl)
 {
-	UINT16 oldflags = CompressFlags();
+	uint16_t oldflags = CompressFlags();
 	flags &= ~0x8000;
 	if(PM && cpl)
 	{
-		UINT16 mask = 0x3000;
+		uint16_t mask = 0x3000;
 		if(cpl > m_IOPL)
 			mask |= 0x200;
 		flags &= ~mask;
@@ -1879,9 +1940,9 @@ void i80286_cpu_device::load_flags(UINT16 flags, int cpl)
 		m_fire_trap = 1;
 }
 
-UINT16 i80286_cpu_device::far_return(int iret, int bytes)
+uint16_t i80286_cpu_device::far_return(int iret, int bytes)
 {
-	UINT16 sel, off, flags = 0;
+	uint16_t sel, off, flags = 0;
 	int spaddr;
 
 	if(PM && m_NT && iret)
@@ -1902,7 +1963,7 @@ UINT16 i80286_cpu_device::far_return(int iret, int bytes)
 
 	if(PM)
 	{
-		UINT16 desc[3], newsp, newss;
+		uint16_t desc[3], newsp, newss;
 		int addr, r;
 
 		if((addr = selector_address(sel)) == -1)
@@ -1968,10 +2029,10 @@ UINT16 i80286_cpu_device::far_return(int iret, int bytes)
 	return flags;
 }
 
-void i80286_cpu_device::check_permission(UINT8 check_seg, UINT32 offset, UINT16 size, int operation)
+void i80286_cpu_device::check_permission(uint8_t check_seg, uint32_t offset, uint16_t size, int operation)
 {
 	int trap;
-	UINT8 rights;
+	uint8_t rights;
 	if(PM)
 	{
 		rights = m_rights[check_seg];

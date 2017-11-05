@@ -65,11 +65,13 @@
 */
 
 #include "emu.h"
+#include "includes/malzak.h"
+
 #include "cpu/s2650/s2650.h"
+#include "machine/nvram.h"
 #include "sound/sn76477.h"
 #include "video/saa5050.h"
-#include "machine/nvram.h"
-#include "includes/malzak.h"
+#include "speaker.h"
 
 
 READ8_MEMBER(malzak_state::fake_VRLE_r)
@@ -185,8 +187,10 @@ static ADDRESS_MAP_START( malzak_io_map, AS_IO, 8, malzak_state )
 	AM_RANGE(0x80, 0x80) AM_READ_PORT("IN0")  //controls
 	AM_RANGE(0xa0, 0xa0) AM_WRITENOP  // echoes I/O port read from port 0x80
 	AM_RANGE(0xc0, 0xc0) AM_WRITE(portc0_w)  // possibly playfield row selection for writing and/or collisions
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( malzak_data_map, AS_DATA, 8, malzak_state )
 	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READ(s2650_data_r)  // read upon death
-	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("SENSE")
 ADDRESS_MAP_END
 
 
@@ -207,9 +211,6 @@ static INPUT_PORTS_START( malzak )
 
 	PORT_START("POT")
 	/* No POT switch on Malzak as far as I know */
-
-	PORT_START("SENSE")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 INPUT_PORTS_END
 
@@ -234,9 +235,6 @@ static INPUT_PORTS_START( malzak2 )
 	PORT_DIPSETTING( 0x01, "2" )
 	PORT_DIPSETTING( 0x02, "3" )
 	PORT_DIPSETTING( 0x03, "4" )  // Change settings
-
-	PORT_START("SENSE")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 INPUT_PORTS_END
 
@@ -297,12 +295,14 @@ void malzak_state::machine_reset()
 	m_malzak_y = 0;
 }
 
-static MACHINE_CONFIG_START( malzak, malzak_state )
+static MACHINE_CONFIG_START( malzak )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", S2650, 3800000/4)
 	MCFG_CPU_PROGRAM_MAP(malzak_map)
 	MCFG_CPU_IO_MAP(malzak_io_map)
+	MCFG_CPU_DATA_MAP(malzak_data_map)
+	MCFG_S2650_SENSE_INPUT(DEVREADLINE("screen", screen_device, vblank))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -411,5 +411,5 @@ ROM_START( malzak2 )
 ROM_END
 
 
-GAME( 19??, malzak,   0,       malzak,  malzak, driver_device,  0,        ROT0, "Kitronix", "Malzak", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 19??, malzak2, malzak,   malzak2, malzak2, driver_device, 0,        ROT0, "Kitronix", "Malzak II", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 19??, malzak,   0,       malzak,  malzak,  malzak_state, 0,        ROT0, "Kitronix", "Malzak",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 19??, malzak2, malzak,   malzak2, malzak2, malzak_state, 0,        ROT0, "Kitronix", "Malzak II", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

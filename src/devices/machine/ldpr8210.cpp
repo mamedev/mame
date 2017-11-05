@@ -68,12 +68,12 @@
 //**************************************************************************
 
 // devices
-const device_type PIONEER_PR8210 = &device_creator<pioneer_pr8210_device>;
-const device_type SIMUTREK_SPECIAL = &device_creator<simutrek_special_device>;
+DEFINE_DEVICE_TYPE(PIONEER_PR8210,   pioneer_pr8210_device,   "pr8210",   "Pioneer PR-8210")
+DEFINE_DEVICE_TYPE(SIMUTREK_SPECIAL, simutrek_special_device, "simutrek", "Simutrek Modified PR-8210")
 
 
 // bitmaps for the characters
-static const UINT8 text_bitmap[0x40][7] =
+static const uint8_t text_bitmap[0x40][7] =
 {
 	{ 0 },                                  // @
 	{ 0x20,0x50,0x88,0x88,0xf8,0x88,0x88 }, // A
@@ -150,19 +150,7 @@ static const UINT8 text_bitmap[0x40][7] =
 
 static ADDRESS_MAP_START( pr8210_portmap, AS_IO, 8, pioneer_pr8210_device )
 	AM_RANGE(0x00, 0xff) AM_READWRITE(i8049_pia_r, i8049_pia_w)
-	AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS) AM_READ(i8049_bus_r)
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE(i8049_port1_w)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(i8049_port2_w)
-	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ(i8049_t0_r)
-	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(i8049_t1_r)
 ADDRESS_MAP_END
-
-
-static MACHINE_CONFIG_FRAGMENT( pr8210 )
-	MCFG_CPU_ADD("pr8210", I8049, XTAL_4_41MHz)
-	MCFG_CPU_IO_MAP(pr8210_portmap)
-MACHINE_CONFIG_END
-
 
 ROM_START( pr8210 )
 	ROM_REGION( 0x800, "pr8210", 0 )
@@ -179,24 +167,13 @@ ROM_END
 //  pioneer_pr8210_device - constructor
 //-------------------------------------------------
 
-pioneer_pr8210_device::pioneer_pr8210_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: laserdisc_device(mconfig, PIONEER_PR8210, "Pioneer PR-8210", tag, owner, clock, "pr8210", __FILE__),
-		m_control(0),
-		m_lastcommand(0),
-		m_accumulator(0),
-		m_lastcommandtime(attotime::zero),
-		m_lastbittime(attotime::zero),
-		m_firstbittime(attotime::zero),
-		m_i8049_cpu(*this, "pr8210"),
-		m_slowtrg(attotime::zero),
-		m_vsync(false),
-		m_i8049_port1(0),
-		m_i8049_port2(0)
+pioneer_pr8210_device::pioneer_pr8210_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: pioneer_pr8210_device(mconfig, PIONEER_PR8210, tag, owner, clock)
 {
 }
 
-pioneer_pr8210_device::pioneer_pr8210_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
-	: laserdisc_device(mconfig, type, name, tag, owner, clock, shortname, source),
+pioneer_pr8210_device::pioneer_pr8210_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: laserdisc_device(mconfig, type, tag, owner, clock),
 		m_control(0),
 		m_lastcommand(0),
 		m_accumulator(0),
@@ -217,10 +194,10 @@ pioneer_pr8210_device::pioneer_pr8210_device(const machine_config &mconfig, devi
 //  line is toggled
 //-------------------------------------------------
 
-void pioneer_pr8210_device::control_w(UINT8 data)
+void pioneer_pr8210_device::control_w(uint8_t data)
 {
 	// set the new value and remember the last
-	UINT8 prev = m_control;
+	uint8_t prev = m_control;
 	m_control = data;
 
 	// handle rising edge
@@ -258,7 +235,7 @@ void pioneer_pr8210_device::control_w(UINT8 data)
 		if ((m_accumulator & 0x383) == 0x80)
 		{
 			// data is stored to the PIA in bit-reverse order
-			UINT8 newcommand = (m_accumulator >> 2) & 0x1f;
+			uint8_t newcommand = (m_accumulator >> 2) & 0x1f;
 			m_pia.porta = BITSWAP8(newcommand, 0,1,2,3,4,5,6,7);
 
 			// the MCU logic requires a 0 to execute many commands; however, nobody
@@ -328,7 +305,7 @@ void pioneer_pr8210_device::device_timer(emu_timer &timer, device_timer_id id, i
 			// logging
 			if (LOG_VBLANK_VBI)
 			{
-				UINT32 line1718 = get_field_code(LASERDISC_CODE_LINE1718, FALSE);
+				uint32_t line1718 = get_field_code(LASERDISC_CODE_LINE1718, false);
 				if ((line1718 & VBI_MASK_CAV_PICTURE) == VBI_CODE_CAV_PICTURE)
 					printf("%3d:VBI(%05d)\n", screen().vpos(), VBI_CAV_PICTURE(line1718));
 				else
@@ -340,8 +317,8 @@ void pioneer_pr8210_device::device_timer(emu_timer &timer, device_timer_id id, i
 			m_pia.vbi2 = 0xff;
 			if (focus_on() && laser_on())
 			{
-				UINT32 line16 = get_field_code(LASERDISC_CODE_LINE16, FALSE);
-				UINT32 line1718 = get_field_code(LASERDISC_CODE_LINE1718, FALSE);
+				uint32_t line16 = get_field_code(LASERDISC_CODE_LINE16, false);
+				uint32_t line1718 = get_field_code(LASERDISC_CODE_LINE1718, false);
 				if (line1718 == VBI_CODE_LEADIN)
 					m_pia.vbi1 &= ~0x01;
 				if (line1718 == VBI_CODE_LEADOUT)
@@ -385,21 +362,25 @@ void pioneer_pr8210_device::device_timer(emu_timer &timer, device_timer_id id, i
 //  ROM region definitions
 //-------------------------------------------------
 
-const rom_entry *pioneer_pr8210_device::device_rom_region() const
+const tiny_rom_entry *pioneer_pr8210_device::device_rom_region() const
 {
 	return ROM_NAME(pr8210);
 }
 
 
 //-------------------------------------------------
-//  device_mconfig_additions - return a pointer to
-//  our machine config fragment
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor pioneer_pr8210_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME(pr8210);
-}
+MACHINE_CONFIG_MEMBER( pioneer_pr8210_device::device_add_mconfig )
+	MCFG_CPU_ADD("pr8210", I8049, XTAL_4_41MHz)
+	MCFG_CPU_IO_MAP(pr8210_portmap)
+	MCFG_MCS48_PORT_BUS_IN_CB(READ8(pioneer_pr8210_device, i8049_bus_r))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(pioneer_pr8210_device, i8049_port1_w))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(pioneer_pr8210_device, i8049_port2_w))
+	MCFG_MCS48_PORT_T0_IN_CB(READLINE(pioneer_pr8210_device, i8049_t0_r))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(pioneer_pr8210_device, i8049_t1_r))
+MACHINE_CONFIG_END
 
 
 //-------------------------------------------------
@@ -432,7 +413,7 @@ void pioneer_pr8210_device::player_vsync(const vbi_metadata &vbi, int fieldnum, 
 //  first visible line of the frame
 //-------------------------------------------------
 
-INT32 pioneer_pr8210_device::player_update(const vbi_metadata &vbi, int fieldnum, const attotime &curtime)
+int32_t pioneer_pr8210_device::player_update(const vbi_metadata &vbi, int fieldnum, const attotime &curtime)
 {
 	// logging
 	if (LOG_VBLANK_VBI)
@@ -481,7 +462,7 @@ void pioneer_pr8210_device::player_overlay(bitmap_yuy16 &bitmap)
 
 READ8_MEMBER( pioneer_pr8210_device::i8049_pia_r )
 {
-	UINT8 result = 0xff;
+	uint8_t result = 0xff;
 	switch (offset)
 	{
 		// (20-26) 7 characters for the chapter/frame
@@ -529,7 +510,7 @@ READ8_MEMBER( pioneer_pr8210_device::i8049_pia_r )
 
 WRITE8_MEMBER( pioneer_pr8210_device::i8049_pia_w )
 {
-	UINT8 value;
+	uint8_t value;
 	switch (offset)
 	{
 		// (20-30) 17 characters for the display
@@ -611,7 +592,7 @@ READ8_MEMBER( pioneer_pr8210_device::i8049_bus_r )
 	   $01 = (in) SLOW TIMER OUT
 	*/
 
-	UINT8 result = 0x00;
+	uint8_t result = 0x00;
 
 	// bus bit 6: slider position limit detector, inside and outside
 	slider_position sliderpos = get_slider_position();
@@ -656,7 +637,7 @@ WRITE8_MEMBER( pioneer_pr8210_device::i8049_port1_w )
 	*/
 
 	// set the new value
-	UINT8 prev = m_i8049_port1;
+	uint8_t prev = m_i8049_port1;
 	m_i8049_port1 = data;
 
 	// bit 7 selects the direction of slider movement for JUMP TRG and scanning
@@ -713,7 +694,7 @@ WRITE8_MEMBER( pioneer_pr8210_device::i8049_port2_w )
 	*/
 
 	// set the new value
-	UINT8 prev = m_i8049_port2;
+	uint8_t prev = m_i8049_port2;
 	m_i8049_port2 = data;
 
 	// on the falling edge of bit 5, start the slow timer
@@ -733,7 +714,7 @@ WRITE8_MEMBER( pioneer_pr8210_device::i8049_port2_w )
 //  T0 input (connected to VSYNC)
 //-------------------------------------------------
 
-READ8_MEMBER( pioneer_pr8210_device::i8049_t0_r )
+READ_LINE_MEMBER( pioneer_pr8210_device::i8049_t0_r )
 {
 	// returns VSYNC state
 	return !m_vsync;
@@ -745,7 +726,7 @@ READ8_MEMBER( pioneer_pr8210_device::i8049_t0_r )
 //  T1 input (pulled high)
 //-------------------------------------------------
 
-READ8_MEMBER( pioneer_pr8210_device::i8049_t1_r )
+READ_LINE_MEMBER( pioneer_pr8210_device::i8049_t1_r )
 {
 	return 1;
 }
@@ -756,7 +737,7 @@ READ8_MEMBER( pioneer_pr8210_device::i8049_t1_r )
 //  characters
 //-------------------------------------------------
 
-void pioneer_pr8210_device::overlay_draw_group(bitmap_yuy16 &bitmap, const UINT8 *text, int count, float xstart)
+void pioneer_pr8210_device::overlay_draw_group(bitmap_yuy16 &bitmap, const uint8_t *text, int count, float xstart)
 {
 	// rease the background
 	overlay_erase(bitmap, xstart, xstart + ((OVERLAY_X_PIXELS + 1) * count + 1) * OVERLAY_PIXEL_WIDTH);
@@ -779,19 +760,19 @@ void pioneer_pr8210_device::overlay_draw_group(bitmap_yuy16 &bitmap, const UINT8
 
 void pioneer_pr8210_device::overlay_erase(bitmap_yuy16 &bitmap, float xstart, float xend)
 {
-	UINT32 xmin = (UINT32)(xstart * 256.0f * float(bitmap.width()));
-	UINT32 xmax = (UINT32)(xend * 256.0f * float(bitmap.width()));
+	uint32_t xmin = (uint32_t)(xstart * 256.0f * float(bitmap.width()));
+	uint32_t xmax = (uint32_t)(xend * 256.0f * float(bitmap.width()));
 
-	for (UINT32 y = OVERLAY_Y; y < (OVERLAY_Y + (OVERLAY_Y_PIXELS + 2) * OVERLAY_PIXEL_HEIGHT); y++)
+	for (uint32_t y = OVERLAY_Y; y < (OVERLAY_Y + (OVERLAY_Y_PIXELS + 2) * OVERLAY_PIXEL_HEIGHT); y++)
 	{
-		UINT16 *dest = &bitmap.pix16(y, xmin >> 8);
-		UINT16 ymax = *dest >> 8;
-		UINT16 ymin = ymax * 3 / 8;
-		UINT16 yres = ymin + ((ymax - ymin) * (xmin & 0xff)) / 256;
+		uint16_t *dest = &bitmap.pix16(y, xmin >> 8);
+		uint16_t ymax = *dest >> 8;
+		uint16_t ymin = ymax * 3 / 8;
+		uint16_t yres = ymin + ((ymax - ymin) * (xmin & 0xff)) / 256;
 		*dest = (yres << 8) | (*dest & 0xff);
 		dest++;
 
-		for (UINT32 x = (xmin | 0xff) + 1; x < xmax; x += 0x100)
+		for (uint32_t x = (xmin | 0xff) + 1; x < xmax; x += 0x100)
 		{
 			yres = (*dest >> 8) * 3 / 8;
 			*dest = (yres << 8) | (*dest & 0xff);
@@ -812,32 +793,32 @@ void pioneer_pr8210_device::overlay_erase(bitmap_yuy16 &bitmap, float xstart, fl
 //  of the text overlay
 //-------------------------------------------------
 
-void pioneer_pr8210_device::overlay_draw_char(bitmap_yuy16 &bitmap, UINT8 ch, float xstart)
+void pioneer_pr8210_device::overlay_draw_char(bitmap_yuy16 &bitmap, uint8_t ch, float xstart)
 {
-	UINT32 xminbase = (UINT32)(xstart * 256.0f * float(bitmap.width()));
-	UINT32 xsize = (UINT32)(OVERLAY_PIXEL_WIDTH * 256.0f * float(bitmap.width()));
+	uint32_t xminbase = (uint32_t)(xstart * 256.0f * float(bitmap.width()));
+	uint32_t xsize = (uint32_t)(OVERLAY_PIXEL_WIDTH * 256.0f * float(bitmap.width()));
 
 	// iterate over pixels
-	const UINT8 *chdataptr = &text_bitmap[ch & 0x3f][0];
-	for (UINT32 y = 0; y < OVERLAY_Y_PIXELS; y++)
+	const uint8_t *chdataptr = &text_bitmap[ch & 0x3f][0];
+	for (uint32_t y = 0; y < OVERLAY_Y_PIXELS; y++)
 	{
-		UINT8 chdata = *chdataptr++;
+		uint8_t chdata = *chdataptr++;
 
-		for (UINT32 x = 0; x < OVERLAY_X_PIXELS; x++, chdata <<= 1)
+		for (uint32_t x = 0; x < OVERLAY_X_PIXELS; x++, chdata <<= 1)
 			if (chdata & 0x80)
 			{
-				UINT32 xmin = xminbase + x * xsize;
-				UINT32 xmax = xmin + xsize;
-				for (UINT32 yy = 0; yy < OVERLAY_PIXEL_HEIGHT; yy++)
+				uint32_t xmin = xminbase + x * xsize;
+				uint32_t xmax = xmin + xsize;
+				for (uint32_t yy = 0; yy < OVERLAY_PIXEL_HEIGHT; yy++)
 				{
-					UINT16 *dest = &bitmap.pix16(OVERLAY_Y + (y + 1) * OVERLAY_PIXEL_HEIGHT + yy, xmin >> 8);
-					UINT16 ymax = 0xff;
-					UINT16 ymin = *dest >> 8;
-					UINT16 yres = ymin + ((ymax - ymin) * (~xmin & 0xff)) / 256;
+					uint16_t *dest = &bitmap.pix16(OVERLAY_Y + (y + 1) * OVERLAY_PIXEL_HEIGHT + yy, xmin >> 8);
+					uint16_t ymax = 0xff;
+					uint16_t ymin = *dest >> 8;
+					uint16_t yres = ymin + ((ymax - ymin) * (~xmin & 0xff)) / 256;
 					*dest = (yres << 8) | (*dest & 0xff);
 					dest++;
 
-					for (UINT32 xx = (xmin | 0xff) + 1; xx < xmax; xx += 0x100)
+					for (uint32_t xx = (xmin | 0xff) + 1; xx < xmax; xx += 0x100)
 						*dest++ = 0xf080;
 
 					ymax = 0xff;
@@ -858,17 +839,7 @@ void pioneer_pr8210_device::overlay_draw_char(bitmap_yuy16 &bitmap, UINT8 ch, fl
 
 static ADDRESS_MAP_START( simutrek_portmap, AS_IO, 8, simutrek_special_device )
 	AM_RANGE(0x00, 0xff) AM_READ(i8748_data_r)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READWRITE(i8748_port2_r, i8748_port2_w)
-	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ(i8748_t0_r)
 ADDRESS_MAP_END
-
-
-static MACHINE_CONFIG_FRAGMENT( simutrek )
-	MCFG_CPU_ADD("simutrek", I8748, XTAL_6MHz)
-	MCFG_CPU_IO_MAP(simutrek_portmap)
-
-	MCFG_FRAGMENT_ADD(pr8210)
-MACHINE_CONFIG_END
 
 
 ROM_START( simutrek )
@@ -889,8 +860,8 @@ ROM_END
 // simutrek_special_device - constructor
 //-------------------------------------------------
 
-simutrek_special_device::simutrek_special_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: pioneer_pr8210_device(mconfig, SIMUTREK_SPECIAL, "Simutrek Modified PR-8210", tag, owner, clock, "simutrek", __FILE__),
+simutrek_special_device::simutrek_special_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: pioneer_pr8210_device(mconfig, SIMUTREK_SPECIAL, tag, owner, clock),
 		m_i8748_cpu(*this, "simutrek"),
 		m_audio_squelch(0),
 		m_data(0),
@@ -907,7 +878,7 @@ simutrek_special_device::simutrek_special_device(const machine_config &mconfig, 
 //  port is written to
 //-------------------------------------------------
 
-void simutrek_special_device::data_w(UINT8 data)
+void simutrek_special_device::data_w(uint8_t data)
 {
 	synchronize(TID_LATCH_DATA, data);
 	if (LOG_SIMUTREK)
@@ -1018,21 +989,25 @@ void simutrek_special_device::device_timer(emu_timer &timer, device_timer_id id,
 //  ROM region definitions
 //-------------------------------------------------
 
-const rom_entry *simutrek_special_device::device_rom_region() const
+const tiny_rom_entry *simutrek_special_device::device_rom_region() const
 {
 	return ROM_NAME(simutrek);
 }
 
 
 //-------------------------------------------------
-//  device_mconfig_additions - return a pointer to
-//  our machine config fragment
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor simutrek_special_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME(simutrek);
-}
+MACHINE_CONFIG_MEMBER( simutrek_special_device::device_add_mconfig )
+	MCFG_CPU_ADD("simutrek", I8748, XTAL_6MHz)
+	MCFG_CPU_IO_MAP(simutrek_portmap)
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(simutrek_special_device, i8748_port2_r))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(simutrek_special_device, i8748_port2_w))
+	MCFG_MCS48_PORT_T0_IN_CB(READLINE(simutrek_special_device, i8748_t0_r))
+
+	pioneer_pr8210_device::device_add_mconfig(config);
+MACHINE_CONFIG_END
 
 
 //-------------------------------------------------
@@ -1055,7 +1030,7 @@ READ8_MEMBER( simutrek_special_device::i8748_port2_r )
 WRITE8_MEMBER( simutrek_special_device::i8748_port2_w )
 {
 	// update stat
-	UINT8 prev = m_i8748_port2;
+	uint8_t prev = m_i8748_port2;
 	m_i8748_port2 = data;
 
 	// bit $20 goes to the serial line
@@ -1100,7 +1075,7 @@ READ8_MEMBER( simutrek_special_device::i8748_data_r )
 //  T0 input
 //-------------------------------------------------
 
-READ8_MEMBER( simutrek_special_device::i8748_t0_r )
+READ_LINE_MEMBER( simutrek_special_device::i8748_t0_r )
 {
 	// return 1 if data is waiting from main CPU
 	return m_data_ready;

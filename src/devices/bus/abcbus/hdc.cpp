@@ -6,6 +6,7 @@
 
 *********************************************************************/
 
+#include "emu.h"
 #include "hdc.h"
 
 
@@ -23,7 +24,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type ABC_HDC = &device_creator<abc_hdc_device>;
+DEFINE_DEVICE_TYPE(ABC_HDC, abc_hdc_device, "abc_hdc", "ABC HDC")
 
 
 //-------------------------------------------------
@@ -43,7 +44,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *abc_hdc_device::device_rom_region() const
+const tiny_rom_entry *abc_hdc_device::device_rom_region() const
 {
 	return ROM_NAME( abc_hdc );
 }
@@ -77,10 +78,10 @@ static const z80_daisy_config daisy_chain[] =
 
 
 //-------------------------------------------------
-//  MACHINE_DRIVER( abc_hdc )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( abc_hdc )
+MACHINE_CONFIG_MEMBER( abc_hdc_device::device_add_mconfig )
 	MCFG_CPU_ADD(Z80_TAG, Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(abc_hdc_mem)
 	MCFG_CPU_IO_MAP(abc_hdc_io)
@@ -91,18 +92,6 @@ static MACHINE_CONFIG_FRAGMENT( abc_hdc )
 MACHINE_CONFIG_END
 
 
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor abc_hdc_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( abc_hdc );
-}
-
-
-
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
@@ -111,10 +100,10 @@ machine_config_constructor abc_hdc_device::device_mconfig_additions() const
 //  abc_hdc_device - constructor
 //-------------------------------------------------
 
-abc_hdc_device::abc_hdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, ABC_HDC, "ABC HDC", tag, owner, clock, "abc_hdc", __FILE__),
-		device_abcbus_card_interface(mconfig, *this),
-		m_maincpu(*this, Z80_TAG)
+abc_hdc_device::abc_hdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, ABC_HDC, tag, owner, clock)
+	, device_abcbus_card_interface(mconfig, *this)
+	, m_maincpu(*this, Z80_TAG)
 {
 }
 
@@ -146,6 +135,6 @@ void abc_hdc_device::device_reset()
 //  abcbus_cs -
 //-------------------------------------------------
 
-void abc_hdc_device::abcbus_cs(UINT8 data)
+void abc_hdc_device::abcbus_cs(uint8_t data)
 {
 }

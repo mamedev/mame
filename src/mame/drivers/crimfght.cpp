@@ -14,12 +14,14 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/konamipt.h"
+#include "includes/crimfght.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/m6809/konami.h" /* for the callback and the firq irq definition */
 #include "machine/watchdog.h"
-#include "sound/2151intf.h"
-#include "includes/konamipt.h"
-#include "includes/crimfght.h"
+#include "sound/ym2151.h"
+#include "speaker.h"
 
 
 WRITE8_MEMBER(crimfght_state::crimfght_coin_w)
@@ -285,7 +287,7 @@ WRITE8_MEMBER( crimfght_state::banking_callback )
 
 CUSTOM_INPUT_MEMBER( crimfght_state::system_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	data |= 1 << 4; // VCC
 	data |= m_woco << 5;
@@ -295,7 +297,7 @@ CUSTOM_INPUT_MEMBER( crimfght_state::system_r )
 	return data >> 4;
 }
 
-static MACHINE_CONFIG_START( crimfght, crimfght_state )
+static MACHINE_CONFIG_START( crimfght )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", KONAMI, XTAL_24MHz/8)       /* 052001 (verified on pcb) */
@@ -433,6 +435,6 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 1989, crimfght,  0,        crimfght, crimfght, driver_device, 0, ROT0, "Konami", "Crime Fighters (World 2 players)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, crimfghtu, crimfght, crimfght, crimfghtu, driver_device,0, ROT0, "Konami", "Crime Fighters (US 4 Players)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, crimfghtj, crimfght, crimfght, crimfght, driver_device,0, ROT0, "Konami", "Crime Fighters (Japan 2 Players)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, crimfght,  0,        crimfght, crimfght,  crimfght_state, 0, ROT0, "Konami", "Crime Fighters (World 2 players)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, crimfghtu, crimfght, crimfght, crimfghtu, crimfght_state, 0, ROT0, "Konami", "Crime Fighters (US 4 Players)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1989, crimfghtj, crimfght, crimfght, crimfght,  crimfght_state, 0, ROT0, "Konami", "Crime Fighters (Japan 2 Players)", MACHINE_SUPPORTS_SAVE )

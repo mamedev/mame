@@ -6,6 +6,9 @@
      Release dates are between 1981 and 1987, but precise dates are unknown.
      Although each software is intended for certain computer variations, they may work on others.
      Meaning of codes: L1 = super80; L2 = super80d; L3 = V3.7 system; L4 = 8Rx system; J = arrow keys can be used; R1,2 = revision numbers
+     Meaning of numbers: 1-99 = for BASIC (32 columns); 100-119 = for BASIC (80 columns); 400-499 = Machine Language;
+                         150-299 = ported from Microbee; 300-329 = BASIC, ported from Exidy Sorcerer;
+                         500-529 = Machine Language, ported from Exidy Sorcerer. All porting done by Robbbert.
  -->
 <softwarelist name="super80_cass" description="Super-80 cassettes">
 <!--
@@ -1741,6 +1744,18 @@
 		<part name="cass" interface="super80_cass">
 			<dataarea name="cass" size="3993198">
 				<rom name="xcharp.wav" size="3993198" crc="32c9f241" sha1="7ecfdeb112c5399746c000a42672799ca06ca2ac" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="xkadath">
+		<description>Kadath</description>
+		<year>1986</year>
+		<publisher>unknown</publisher>
+		<info name="serial" value="313L3R4" />
+		<info name="usage" value="LOAD while in BASIC, then RUN" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="66466996">
+				<rom name="xkadath.wav" size="66466996" crc="2f7adf13" sha1="8dc2feac174e05b37c7b719a9610198e40b47736" offset="0" />
 			</dataarea>
 		</part>
 	</software>

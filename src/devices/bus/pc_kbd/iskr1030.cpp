@@ -6,6 +6,7 @@
 
 *********************************************************************/
 
+#include "emu.h"
 #include "iskr1030.h"
 
 #define VERBOSE_DBG 1       /* general debug messages */
@@ -33,7 +34,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type PC_KBD_ISKR_1030 = &device_creator<iskr_1030_keyboard_device>;
+DEFINE_DEVICE_TYPE(PC_KBD_ISKR_1030, iskr_1030_keyboard_device, "kb_iskr1030", "Iskra-1030 Keyboard")
 
 
 //-------------------------------------------------
@@ -50,7 +51,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *iskr_1030_keyboard_device::device_rom_region() const
+const tiny_rom_entry *iskr_1030_keyboard_device::device_rom_region() const
 {
 	return ROM_NAME( iskr_1030_keyboard );
 }
@@ -61,32 +62,22 @@ const rom_entry *iskr_1030_keyboard_device::device_rom_region() const
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( iskr_1030_keyboard_io, AS_IO, 8, iskr_1030_keyboard_device )
-	AM_RANGE(0x00, 0xFF) AM_READWRITE(ram_r, ram_w)
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READWRITE(p1_r, p1_w)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(p2_w)
-	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(t1_r)
+	AM_RANGE(0x00, 0xff) AM_READWRITE(ram_r, ram_w)
 ADDRESS_MAP_END
 
 
 //-------------------------------------------------
-//  MACHINE_DRIVER( iskr_1030_keyboard )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( iskr_1030_keyboard )
+MACHINE_CONFIG_MEMBER( iskr_1030_keyboard_device::device_add_mconfig )
 	MCFG_CPU_ADD(I8048_TAG, I8048, XTAL_5MHz)
 	MCFG_CPU_IO_MAP(iskr_1030_keyboard_io)
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(iskr_1030_keyboard_device, p1_r))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(iskr_1030_keyboard_device, p1_w))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(iskr_1030_keyboard_device, p2_w))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(iskr_1030_keyboard_device, t1_r))
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor iskr_1030_keyboard_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( iskr_1030_keyboard );
-}
 
 
 //-------------------------------------------------
@@ -259,8 +250,8 @@ ioport_constructor iskr_1030_keyboard_device::device_input_ports() const
 //  iskr_1030_keyboard_device - constructor
 //-------------------------------------------------
 
-iskr_1030_keyboard_device::iskr_1030_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, PC_KBD_ISKR_1030, "Iskra-1030 Keyboard", tag, owner, clock, "kb_iskr1030", __FILE__),
+iskr_1030_keyboard_device::iskr_1030_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, PC_KBD_ISKR_1030, tag, owner, clock),
 		device_pc_kbd_interface(mconfig, *this),
 		m_maincpu(*this, I8048_TAG),
 		m_md00(*this, "MD00"),
@@ -346,10 +337,10 @@ WRITE_LINE_MEMBER( iskr_1030_keyboard_device::data_write )
 //  t1_r -
 //-------------------------------------------------
 
-READ8_MEMBER( iskr_1030_keyboard_device::t1_r )
+READ_LINE_MEMBER( iskr_1030_keyboard_device::t1_r )
 {
-	UINT8 data = data_signal();
-	UINT8 bias = m_p1 & 15;
+	uint8_t data = data_signal();
+	uint8_t bias = m_p1 & 15;
 
 	if (!BIT(m_p1, 7)) {
 		DBG_LOG(2,0,( "%s: t1_r (l) %d\n", tag(), data));
@@ -440,7 +431,7 @@ READ8_MEMBER( iskr_1030_keyboard_device::p1_r )
 	    7
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	DBG_LOG(1,0,( "%s: p1_r %02x\n", tag(), data));
 

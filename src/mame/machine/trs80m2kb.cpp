@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "trs80m2kb.h"
 
 
@@ -22,7 +23,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type TRS80M2_KEYBOARD = &device_creator<trs80m2_keyboard_device>;
+DEFINE_DEVICE_TYPE(TRS80M2_KEYBOARD, trs80m2_keyboard_device, "trs80m2kb", "TRS-80 Model II Keyboard")
 
 
 
@@ -40,44 +41,24 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *trs80m2_keyboard_device::device_rom_region() const
+const tiny_rom_entry *trs80m2_keyboard_device::device_rom_region() const
 {
 	return ROM_NAME( trs80m2_keyboard );
 }
 
 
 //-------------------------------------------------
-//  ADDRESS_MAP( kb_io )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( trs80m2_keyboard_io, AS_IO, 8, trs80m2_keyboard_device )
-	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(kb_t1_r)
-	AM_RANGE(MCS48_PORT_P0, MCS48_PORT_P0) AM_READ(kb_p0_r)
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE(kb_p1_w)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(kb_p2_w)
-ADDRESS_MAP_END
-
-
-//-------------------------------------------------
-//  MACHINE_DRIVER( trs80m2_keyboard )
-//-------------------------------------------------
-
-static MACHINE_CONFIG_FRAGMENT( trs80m2_keyboard )
+MACHINE_CONFIG_MEMBER( trs80m2_keyboard_device::device_add_mconfig )
 	MCFG_CPU_ADD(I8021_TAG, I8021, 3000000) // 1000uH inductor connected across the XTAL inputs
-	MCFG_CPU_IO_MAP(trs80m2_keyboard_io)
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(trs80m2_keyboard_device, kb_t1_r))
+	MCFG_MCS48_PORT_BUS_IN_CB(READ8(trs80m2_keyboard_device, kb_p0_r))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(trs80m2_keyboard_device, kb_p1_w))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(trs80m2_keyboard_device, kb_p2_w))
 	MCFG_DEVICE_DISABLE() // TODO
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor trs80m2_keyboard_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( trs80m2_keyboard );
-}
 
 
 //-------------------------------------------------
@@ -185,7 +166,7 @@ INPUT_PORTS_START( trs80m2_keyboard )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("YA")
+	PORT_START("Y10")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COLON) PORT_CHAR(';') PORT_CHAR(':')
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('&')
@@ -195,7 +176,7 @@ INPUT_PORTS_START( trs80m2_keyboard )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("ESC") PORT_CODE(KEYCODE_ESC) PORT_CHAR(UCHAR_MAMEKEY(ESC))
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("YB")
+	PORT_START("Y11")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_P) PORT_CHAR('p') PORT_CHAR('P')
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_U) PORT_CHAR('u') PORT_CHAR('U')
@@ -226,25 +207,14 @@ ioport_constructor trs80m2_keyboard_device::device_input_ports() const
 //  trs80m2_keyboard_device - constructor
 //-------------------------------------------------
 
-trs80m2_keyboard_device::trs80m2_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, TRS80M2_KEYBOARD, "TRS-80 Model II Keyboard", tag, owner, clock, "trs80m2kb", __FILE__),
-		m_maincpu(*this, I8021_TAG),
-		m_y0(*this, "Y0"),
-		m_y1(*this, "Y1"),
-		m_y2(*this, "Y2"),
-		m_y3(*this, "Y3"),
-		m_y4(*this, "Y4"),
-		m_y5(*this, "Y5"),
-		m_y6(*this, "Y6"),
-		m_y7(*this, "Y7"),
-		m_y8(*this, "Y8"),
-		m_y9(*this, "Y9"),
-		m_ya(*this, "YA"),
-		m_yb(*this, "YB"),
-		m_write_clock(*this),
-		m_busy(1),
-		m_data(1),
-		m_clk(0)
+trs80m2_keyboard_device::trs80m2_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, TRS80M2_KEYBOARD, tag, owner, clock),
+	m_maincpu(*this, I8021_TAG),
+	m_y(*this, "Y%u", 0),
+	m_write_clock(*this),
+	m_busy(1),
+	m_data(1),
+	m_clk(0)
 {
 }
 
@@ -262,7 +232,7 @@ void trs80m2_keyboard_device::device_start()
 	save_item(NAME(m_busy));
 	save_item(NAME(m_data));
 	save_item(NAME(m_clk));
-	save_item(NAME(m_y));
+	save_item(NAME(m_keylatch));
 }
 
 
@@ -298,7 +268,7 @@ READ_LINE_MEMBER( trs80m2_keyboard_device::data_r )
 //  kb_t1_r -
 //-------------------------------------------------
 
-READ8_MEMBER( trs80m2_keyboard_device::kb_t1_r )
+READ_LINE_MEMBER( trs80m2_keyboard_device::kb_t1_r )
 {
 	return m_busy;
 }
@@ -310,22 +280,11 @@ READ8_MEMBER( trs80m2_keyboard_device::kb_t1_r )
 
 READ8_MEMBER( trs80m2_keyboard_device::kb_p0_r )
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
-	switch (m_y)
+	if (m_keylatch < 12)
 	{
-		case 0: data &= m_y0->read(); break;
-		case 1: data &= m_y1->read(); break;
-		case 2: data &= m_y2->read(); break;
-		case 3: data &= m_y3->read(); break;
-		case 4: data &= m_y4->read(); break;
-		case 5: data &= m_y5->read(); break;
-		case 6: data &= m_y6->read(); break;
-		case 7: data &= m_y7->read(); break;
-		case 8: data &= m_y8->read(); break;
-		case 9: data &= m_y9->read(); break;
-		case 0xa: data &= m_ya->read(); break;
-		case 0xb: data &= m_yb->read(); break;
+		data &= m_y[m_keylatch]->read();
 	}
 
 	return data;
@@ -388,5 +347,5 @@ WRITE8_MEMBER( trs80m2_keyboard_device::kb_p2_w )
 
 	*/
 
-	m_y = BITSWAP8(data, 7, 6, 5, 4, 0, 1, 2, 3) & 0x0f;
+	m_keylatch = BITSWAP8(data, 7, 6, 5, 4, 0, 1, 2, 3) & 0x0f;
 }

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Aaron Giles
-#ifndef NAMCO52_H
-#define NAMCO52_H
+#ifndef MAME_AUDIO_NAMCO52_H
+#define MAME_AUDIO_NAMCO52_H
 
 #include "sound/discrete.h"
 #include "cpu/mb88xx/mb88xx.h"
@@ -28,18 +28,18 @@
 class namco_52xx_device : public device_t
 {
 public:
-	namco_52xx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	namco_52xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	static void set_discrete(device_t &device, const char *tag) { downcast<namco_52xx_device &>(device).m_discrete.set_tag(tag); }
 	static void set_basenote(device_t &device, int node) { downcast<namco_52xx_device &>(device).m_basenode = node; }
 	static void set_extclock(device_t &device, attoseconds_t clk) { downcast<namco_52xx_device &>(device).m_extclock = clk; }
-	template<class _Object> static devcb_base &set_romread_callback(device_t &device, _Object object) { return downcast<namco_52xx_device &>(device).m_romread.set_callback(object); }
-	template<class _Object> static devcb_base &set_si_callback(device_t &device, _Object object) { return downcast<namco_52xx_device &>(device).m_si.set_callback(object); }
+	template <class Object> static devcb_base &set_romread_callback(device_t &device, Object &&cb) { return downcast<namco_52xx_device &>(device).m_romread.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_si_callback(device_t &device, Object &&cb) { return downcast<namco_52xx_device &>(device).m_si.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_WRITE8_MEMBER(write);
 
 	DECLARE_READ8_MEMBER( K_r );
-	DECLARE_READ8_MEMBER( SI_r );
+	DECLARE_READ_LINE_MEMBER( SI_r );
 	DECLARE_READ8_MEMBER( R0_r );
 	DECLARE_READ8_MEMBER( R1_r );
 	DECLARE_WRITE8_MEMBER( P_w );
@@ -50,8 +50,8 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual const rom_entry *device_rom_region() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	TIMER_CALLBACK_MEMBER( latch_callback );
 	TIMER_CALLBACK_MEMBER( irq_clear );
@@ -63,14 +63,15 @@ private:
 
 	int m_basenode;
 	attoseconds_t m_extclock;
+	emu_timer *m_extclock_pulse_timer;
 	devcb_read8 m_romread;
 	devcb_read8 m_si;
 
-	UINT8 m_latched_cmd;
-	UINT32 m_address;
+	uint8_t m_latched_cmd;
+	uint32_t m_address;
 };
 
-extern const device_type NAMCO_52XX;
+DECLARE_DEVICE_TYPE(NAMCO_52XX, namco_52xx_device)
 
 
 
@@ -78,4 +79,4 @@ extern const device_type NAMCO_52XX;
 #define NAMCO_52XX_P_DATA(base)     (base)
 
 
-#endif  /* NAMCO52_H */
+#endif  // MAME_AUDIO_NAMCO52_H

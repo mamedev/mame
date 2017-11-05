@@ -43,11 +43,15 @@
 ****************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/s2650/s2650.h"
-#include "imagedev/snapquik.h"
 #include "imagedev/cassette.h"
+#include "imagedev/snapquik.h"
 #include "sound/wave.h"
+#include "speaker.h"
+
 #include "instruct.lh"
+
 
 class instruct_state : public driver_device
 {
@@ -65,7 +69,7 @@ public:
 	DECLARE_READ8_MEMBER(portfc_r);
 	DECLARE_READ8_MEMBER(portfd_r);
 	DECLARE_READ8_MEMBER(portfe_r);
-	DECLARE_READ8_MEMBER(sense_r);
+	DECLARE_READ_LINE_MEMBER(sense_r);
 	DECLARE_WRITE_LINE_MEMBER(flag_w);
 	DECLARE_WRITE8_MEMBER(port_w);
 	DECLARE_WRITE8_MEMBER(portf8_w);
@@ -75,15 +79,15 @@ public:
 	INTERRUPT_GEN_MEMBER(t2l_int);
 private:
 	virtual void machine_reset() override;
-	UINT16 m_lar;
-	UINT8 m_digit;
+	uint16_t m_lar;
+	uint8_t m_digit;
 	bool m_valid_digit;
 	bool m_cassin;
 	bool m_irqstate;
 	required_device<cpu_device> m_maincpu;
-	required_shared_ptr<UINT8> m_p_ram;
-	required_shared_ptr<UINT8> m_p_smiram;
-	required_shared_ptr<UINT8> m_p_extram;
+	required_shared_ptr<uint8_t> m_p_ram;
+	required_shared_ptr<uint8_t> m_p_smiram;
+	required_shared_ptr<uint8_t> m_p_extram;
 	required_device<cassette_image_device> m_cass;
 };
 
@@ -107,7 +111,7 @@ WRITE8_MEMBER( instruct_state::port_w )
 // cassette port
 WRITE8_MEMBER( instruct_state::portf8_w )
 {
-	if BIT(data, 4)
+	if (BIT(data, 4))
 		m_cass->output(BIT(data, 3) ? -1.0 : +1.0);
 	else
 		m_cass->output(0.0);
@@ -151,7 +155,7 @@ READ8_MEMBER( instruct_state::portfd_r )
 // read keyboard
 READ8_MEMBER( instruct_state::portfe_r )
 {
-	for (UINT8 i = 0; i < 6; i++)
+	for (uint8_t i = 0; i < 6; i++)
 	{
 		if (BIT(m_digit, i))
 		{
@@ -166,7 +170,7 @@ READ8_MEMBER( instruct_state::portfe_r )
 
 
 // Read cassette and SENS key
-READ8_MEMBER( instruct_state::sense_r )
+READ_LINE_MEMBER( instruct_state::sense_r )
 {
 	if (m_cassin)
 		return (m_cass->input() > 0.03) ? 1 : 0;
@@ -176,30 +180,30 @@ READ8_MEMBER( instruct_state::sense_r )
 
 INTERRUPT_GEN_MEMBER( instruct_state::t2l_int )
 {
-	UINT8 hwkeys = ioport("HW")->read();
+	uint8_t hwkeys = ioport("HW")->read();
 
 	// check RST key
-	if BIT(hwkeys, 3)
+	if (BIT(hwkeys, 3))
 	{
 		m_maincpu->set_state_int(S2650_PC, 0);
 		return;
 	}
 	else
 	// check MON key
-	if BIT(hwkeys, 2)
+	if (BIT(hwkeys, 2))
 	{
 		m_maincpu->set_state_int(S2650_PC, 0x1800);
 		return;
 	}
 	else
 	{
-		UINT8 switches = ioport("SW")->read();
+		uint8_t switches = ioport("SW")->read();
 
 		// Set vector from INDIRECT sw
-		UINT8 vector = BIT(switches, 0) ? 0x87 : 0x07;
+		uint8_t vector = BIT(switches, 0) ? 0x87 : 0x07;
 
 		// Check INT sw & key
-		if BIT(switches, 1)
+		if (BIT(switches, 1))
 			device.execute().set_input_line_and_vector(0, BIT(hwkeys, 1) ? ASSERT_LINE : CLEAR_LINE, vector);
 		else
 		// process ac input
@@ -228,8 +232,11 @@ static ADDRESS_MAP_START( instruct_io, AS_IO, 8, instruct_state )
 	AM_RANGE(0xfc, 0xfc) AM_READ(portfc_r)
 	AM_RANGE(0xfd, 0xfd) AM_READ(portfd_r)
 	AM_RANGE(0xfe, 0xfe) AM_READ(portfe_r)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( instruct_data, AS_DATA, 8, instruct_state )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READWRITE(port_r,port_w)
-	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ(sense_r)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -322,8 +329,8 @@ void instruct_state::machine_reset()
 
 QUICKLOAD_LOAD_MEMBER( instruct_state, instruct )
 {
-	UINT16 i, exec_addr, quick_length, read_;
-	int result = IMAGE_INIT_FAIL;
+	uint16_t i, exec_addr, quick_length, read_;
+	image_init_result result = image_init_result::FAIL;
 
 	quick_length = image.length();
 	if (quick_length < 0x0100)
@@ -339,7 +346,7 @@ QUICKLOAD_LOAD_MEMBER( instruct_state, instruct )
 	}
 	else
 	{
-		dynamic_buffer quick_data(quick_length);
+		std::vector<uint8_t> quick_data(quick_length);
 		read_ = image.fread( &quick_data[0], quick_length);
 		if (read_ != quick_length)
 		{
@@ -393,7 +400,7 @@ QUICKLOAD_LOAD_MEMBER( instruct_state, instruct )
 				// Start the quickload - JP exec_addr
 				m_maincpu->set_state_int(S2650_PC, 0);
 
-				result = IMAGE_INIT_PASS;
+				result = image_init_result::PASS;
 			}
 		}
 	}
@@ -401,13 +408,15 @@ QUICKLOAD_LOAD_MEMBER( instruct_state, instruct )
 	return result;
 }
 
-static MACHINE_CONFIG_START( instruct, instruct_state )
+static MACHINE_CONFIG_START( instruct )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",S2650, XTAL_3_579545MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(instruct_mem)
 	MCFG_CPU_IO_MAP(instruct_io)
+	MCFG_CPU_DATA_MAP(instruct_data)
 	MCFG_CPU_PERIODIC_INT_DRIVER(instruct_state, t2l_int, 120)
-	MCFG_S2650_FLAG_HANDLER(WRITELINE(instruct_state, flag_w))
+	MCFG_S2650_SENSE_INPUT(READLINE(instruct_state, sense_r))
+	MCFG_S2650_FLAG_OUTPUT(WRITELINE(instruct_state, flag_w))
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_instruct)
@@ -434,5 +443,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME       PARENT   COMPAT   MACHINE    INPUT     INIT    COMPANY     FULLNAME                    FLAGS */
-COMP( 1978, instruct,  0,       0,       instruct,  instruct, driver_device, 0,    "Signetics", "Signetics Instructor 50", 0 )
+//    YEAR  NAME       PARENT   COMPAT   MACHINE    INPUT     STATE           INIT  COMPANY      FULLNAME                   FLAGS
+COMP( 1978, instruct,  0,       0,       instruct,  instruct, instruct_state, 0,    "Signetics", "Signetics Instructor 50", 0 )

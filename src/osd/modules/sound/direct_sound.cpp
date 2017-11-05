@@ -12,7 +12,6 @@
 #if defined(OSD_WINDOWS) || defined(SDLMAME_WIN32)
 
 // standard windows headers
-#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <mmsystem.h>
 
@@ -34,6 +33,7 @@
 #include "winmain.h"
 #include "window.h"
 #endif
+#include <utility>
 
 //============================================================
 //  DEBUGGING
@@ -66,7 +66,7 @@ public:
 	virtual void exit() override;
 
 	// sound_module
-	virtual void update_audio_stream(bool is_throttled, INT16 const *buffer, int samples_this_frame) override;
+	virtual void update_audio_stream(bool is_throttled, int16_t const *buffer, int samples_this_frame) override;
 	virtual void set_mastervolume(int attenuation) override;
 
 private:
@@ -163,11 +163,11 @@ private:
 
 			assert(m_bytes1);
 			assert((m_locked1 + m_locked2) >= bytes);
-			memcpy(m_bytes1, data, MIN(m_locked1, bytes));
+			memcpy(m_bytes1, data, std::min(m_locked1, bytes));
 			if (m_locked1 < bytes)
 			{
 				assert(m_bytes2);
-				memcpy(m_bytes2, (UINT8 const *)data + m_locked1, bytes - m_locked1);
+				memcpy(m_bytes2, (uint8_t const *)data + m_locked1, bytes - m_locked1);
 			}
 
 			unlock();
@@ -235,12 +235,12 @@ private:
 	LPDIRECTSOUND   m_dsound;
 
 	// descriptors and formats
-	UINT32          m_bytes_per_sample;
+	uint32_t          m_bytes_per_sample;
 
 	// sound buffers
 	primary_buffer  m_primary_buffer;
 	stream_buffer   m_stream_buffer;
-	UINT32          m_stream_buffer_in;
+	uint32_t          m_stream_buffer_in;
 
 	// buffer over/underflow counts
 	unsigned        m_buffer_underflows;
@@ -291,7 +291,7 @@ void sound_direct_sound::exit()
 
 void sound_direct_sound::update_audio_stream(
 		bool is_throttled,
-		INT16 const *buffer,
+		int16_t const *buffer,
 		int samples_this_frame)
 {
 	int const bytes_this_frame = samples_this_frame * m_bytes_per_sample;
@@ -359,7 +359,7 @@ void sound_direct_sound::update_audio_stream(
 void sound_direct_sound::set_mastervolume(int attenuation)
 {
 	// clamp the attenuation to 0-32 range
-	attenuation = MAX(MIN(attenuation, 0), -32);
+	attenuation = std::max(std::min(attenuation, 0), -32);
 
 	// set the master volume
 	if (m_stream_buffer)
@@ -404,10 +404,10 @@ HRESULT sound_direct_sound::dsound_init()
 #ifdef SDLMAME_WIN32
 		SDL_SysWMinfo wminfo;
 		SDL_VERSION(&wminfo.version);
-		SDL_GetWindowWMInfo(sdl_window_list.front()->platform_window<SDL_Window*>(), &wminfo);
+		SDL_GetWindowWMInfo(std::dynamic_pointer_cast<sdl_window_info>(osd_common_t::s_window_list.front())->platform_window(), &wminfo);
 		HWND const window = wminfo.info.win.window;
 #else // SDLMAME_WIN32
-		HWND const window = win_window_list.front()->platform_window<HWND>();
+		HWND const window = std::static_pointer_cast<win_window_info>(osd_common_t::s_window_list.front())->platform_window();
 #endif // SDLMAME_WIN32
 		result = m_dsound->SetCooperativeLevel(window, DSSCL_PRIORITY);
 	}
@@ -429,7 +429,7 @@ HRESULT sound_direct_sound::dsound_init()
 
 		// compute the buffer size based on the output sample rate
 		DWORD stream_buffer_size = stream_format.nSamplesPerSec * stream_format.nBlockAlign * m_audio_latency / 10;
-		stream_buffer_size = MAX(1024, (stream_buffer_size / 1024) * 1024);
+		stream_buffer_size = std::max(DWORD(1024), (stream_buffer_size / 1024) * 1024);
 
 		LOG(("stream_buffer_size = %u\n", (unsigned)stream_buffer_size));
 
@@ -445,7 +445,7 @@ HRESULT sound_direct_sound::dsound_init()
 	result = m_stream_buffer.play_looping();
 	if (result != DS_OK)
 	{
-		osd_printf_error("Error playing: %08x\n", (UINT32)result);
+		osd_printf_error("Error playing: %08x\n", (uint32_t)result);
 		goto error;
 	}
 	return DS_OK;

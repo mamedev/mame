@@ -9178,7 +9178,7 @@ If the program doesn't automatically start, start it with RUN
 		</part>
 	</software>
 
-	<software name="tvc-ass">
+	<software name="tvc_ass">
 		<description>TVC-Assembler v1.0</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>

@@ -53,7 +53,7 @@
 
 /* From Dragon Beta OS9 keyboard driver */
 #define KAny                0x04        /* Any key pressed mask PB2 */
-#define KOutClk             0x08        /* Ouput shift register clock */
+#define KOutClk             0x08        /* Output shift register clock */
 #define KInClk              0x10        /* Input shift register clock */
 #define KOutDat             KInClk      /* Also used for data into output shifter */
 #define KInDat              0x20        /* Keyboard data in from keyboard (serial stream) */
@@ -74,7 +74,7 @@ enum BETA_VID_MODES
 struct PageReg
 {
 	int     value;          /* Value of the page register */
-	UINT8   *memory;        /* The memory it actually points to */
+	uint8_t *memory;        /* The memory it actually points to */
 };
 
 
@@ -83,10 +83,14 @@ class dgn_beta_state : public driver_device
 public:
 	dgn_beta_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_mc6845(*this, "crtc"),
+		m_mc6845(*this, "crtc"),
 		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
+		m_dmacpu(*this, DMACPU_TAG),
 		m_ram(*this, RAM_TAG),
+		m_pia_0(*this, PIA_0_TAG),
+		m_pia_1(*this, PIA_1_TAG),
+		m_pia_2(*this, PIA_2_TAG),
 		m_fdc(*this, FDC_TAG),
 		m_floppy0(*this, FDC_TAG ":0"),
 		m_floppy1(*this, FDC_TAG ":1"),
@@ -97,9 +101,21 @@ public:
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
 	required_device<mc6845_device> m_mc6845;
-	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_dmacpu;
+	required_device<ram_device> m_ram;
+	required_device<pia6821_device> m_pia_0;
+	required_device<pia6821_device> m_pia_1;
+	required_device<pia6821_device> m_pia_2;
+	required_device<wd2797_device> m_fdc;
+	required_device<floppy_connector> m_floppy0;
+	required_device<floppy_connector> m_floppy1;
+	required_device<floppy_connector> m_floppy2;
+	required_device<floppy_connector> m_floppy3;
+	required_device<palette_device> m_palette;
 
-	UINT8 *m_system_rom;
+	uint8_t *m_system_rom;
 	int m_LogDatWrites;
 	int m_Keyboard[NoKeyrows];
 	int m_RowShifter;
@@ -201,7 +217,7 @@ public:
 	/*  WD2797 FDC */
 	DECLARE_READ8_MEMBER(dgnbeta_wd2797_r);
 	DECLARE_WRITE8_MEMBER(dgnbeta_wd2797_w);
-	required_device<cpu_device> m_maincpu;
+
 	void dgnbeta_vid_set_gctrl(int data);
 	void UpdateBanks(int first, int last);
 	void SetDefaultTask();
@@ -213,13 +229,12 @@ public:
 	void cpu1_recalc_firq(int state);
 	void ScanInKeyboard(void);
 	void dgn_beta_frame_interrupt (int data);
-	required_device<ram_device> m_ram;
-	required_device<wd2797_t> m_fdc;
-	required_device<floppy_connector> m_floppy0;
-	required_device<floppy_connector> m_floppy1;
-	required_device<floppy_connector> m_floppy2;
-	required_device<floppy_connector> m_floppy3;
-	required_device<palette_device> m_palette;
+
+	offs_t dgnbeta_dasm_override(device_t &device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options);
+
+private:
+	void execute_beta_key_dump(int ref, const std::vector<std::string> &params);
+	void execute_beta_dat_log(int ref, const std::vector<std::string> &params);
 };
 
 #endif /* DGN_BETA_H_ */

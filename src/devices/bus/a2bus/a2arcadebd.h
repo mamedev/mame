@@ -8,10 +8,11 @@
 
 *********************************************************************/
 
-#ifndef __A2BUS_ARCADEBOARD__
-#define __A2BUS_ARCADEBOARD__
+#ifndef MAME_BUS_A2BUS_A2ARCADEBD_H
+#define MAME_BUS_A2BUS_A2ARCADEBD_H
 
-#include "emu.h"
+#pragma once
+
 #include "a2bus.h"
 #include "video/tms9928a.h"
 #include "sound/ay8910.h"
@@ -26,27 +27,27 @@ class a2bus_arcboard_device:
 {
 public:
 	// construction/destruction
-	a2bus_arcboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	a2bus_arcboard_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-
-	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
-	DECLARE_WRITE_LINE_MEMBER( tms_irq_w );
+	a2bus_arcboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
+	a2bus_arcboard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	// overrides of standard a2bus slot functions
-	virtual UINT8 read_c0nx(address_space &space, UINT8 offset) override;
-	virtual void write_c0nx(address_space &space, UINT8 offset, UINT8 data) override;
+	virtual uint8_t read_c0nx(address_space &space, uint8_t offset) override;
+	virtual void write_c0nx(address_space &space, uint8_t offset, uint8_t data) override;
+
+private:
+	DECLARE_WRITE_LINE_MEMBER( tms_irq_w );
 
 	required_device<tms9918a_device> m_tms;
 	required_device<ay8910_device> m_ay;
 };
 
 // device type definition
-extern const device_type A2BUS_ARCADEBOARD;
+DECLARE_DEVICE_TYPE(A2BUS_ARCADEBOARD, a2bus_arcboard_device)
 
-#endif  /* __A2BUS_ARCADEBOARD__ */
+#endif  // MAME_BUS_A2BUS_A2ARCADEBD_H

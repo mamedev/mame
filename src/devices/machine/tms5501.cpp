@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "tms5501.h"
 
 
@@ -17,7 +18,7 @@
 #define LOG 0
 
 
-const UINT8 tms5501_device::rst_vector[] = { 0xc7, 0xcf, 0xd7, 0xdf, 0xe7, 0xef, 0xf7, 0xff };
+const uint8_t tms5501_device::rst_vector[] = { 0xc7, 0xcf, 0xd7, 0xdf, 0xe7, 0xef, 0xf7, 0xff };
 
 
 
@@ -26,7 +27,7 @@ const UINT8 tms5501_device::rst_vector[] = { 0xc7, 0xcf, 0xd7, 0xdf, 0xe7, 0xef,
 //**************************************************************************
 
 // device type definition
-const device_type TMS5501 = &device_creator<tms5501_device>;
+DEFINE_DEVICE_TYPE(TMS5501, tms5501_device, "tms5501", "TMS5501 Multifunction I/O")
 
 
 // I/O address map
@@ -53,8 +54,8 @@ ADDRESS_MAP_END
 //  tms5501_device - constructor
 //-------------------------------------------------
 
-tms5501_device::tms5501_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, TMS5501, "TMS5501", tag, owner, clock, "tms5501", __FILE__),
+tms5501_device::tms5501_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, TMS5501, tag, owner, clock),
 	device_serial_interface(mconfig, *this),
 	m_write_irq(*this),
 	m_write_xmt(*this),
@@ -151,7 +152,7 @@ void tms5501_device::device_timer(emu_timer &timer, device_timer_id id, int para
 		break;
 
 	default:
-		device_serial_interface::device_timer(timer, id, param, ptr);
+		break;
 	}
 }
 
@@ -234,7 +235,7 @@ READ8_MEMBER( tms5501_device::rb_r )
 
 READ8_MEMBER( tms5501_device::xi_r )
 {
-	UINT8 data = m_read_xi(0);
+	uint8_t data = m_read_xi(0);
 
 	if (m_cmd & CMD_XI7)
 	{
@@ -261,7 +262,7 @@ READ8_MEMBER( tms5501_device::rst_r )
 
 READ8_MEMBER( tms5501_device::sta_r )
 {
-	UINT8 data = m_sta;
+	uint8_t data = m_sta;
 
 	m_sta &= ~STA_OE;
 
@@ -463,7 +464,7 @@ WRITE_LINE_MEMBER( tms5501_device::sens_w )
 //  set_interrupt -
 //-------------------------------------------------
 
-void tms5501_device::set_interrupt(UINT8 mask)
+void tms5501_device::set_interrupt(uint8_t mask)
 {
 	m_irq |= mask;
 
@@ -507,9 +508,9 @@ void tms5501_device::check_interrupt()
 //  get_vector -
 //-------------------------------------------------
 
-UINT8 tms5501_device::get_vector()
+uint8_t tms5501_device::get_vector()
 {
-	UINT8 rst = 0;
+	uint8_t rst = 0;
 
 	for (int i = 0; i < 8; i++)
 	{

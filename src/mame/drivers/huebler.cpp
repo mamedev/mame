@@ -20,13 +20,15 @@
 
 */
 
+#include "emu.h"
 #include "includes/huebler.h"
+#include "screen.h"
 
 /* Keyboard */
 
 void amu880_state::scan_keyboard()
 {
-	UINT8 data = m_key_row[m_key_a8 ? m_key_d6 : m_key_d7]->read();
+	uint8_t data = m_key_row[m_key_a8 ? m_key_d6 : m_key_d7]->read();
 
 	int a8 = (data & 0x0f) == 0x0f;
 
@@ -68,13 +70,13 @@ READ8_MEMBER( amu880_state::keyboard_r )
 
 	*/
 
-	UINT8 special = m_special->read();
+	uint8_t special = m_special->read();
 
 	int ctrl = BIT(special, 0);
 	int shift = BIT(special, 2) & BIT(special, 1);
 	int ab0 = BIT(offset, 0);
 
-	UINT16 address = (ab0 << 9) | (m_key_a8 << 8) | (ctrl << 7) | (shift << 6) | (m_key_a5 << 5) | (m_key_a4 << 4) | m_key_d7;
+	uint16_t address = (ab0 << 9) | (m_key_a8 << 8) | (ctrl << 7) | (shift << 6) | (m_key_a5 << 5) | (m_key_a4 << 4) | m_key_d7;
 
 	return m_kb_rom->base()[address];
 }
@@ -209,7 +211,7 @@ INPUT_PORTS_END
 
 /* Video */
 
-UINT32 amu880_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t amu880_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int y, sx, x, line;
 	const pen_t *pen = m_palette->pens();
@@ -220,11 +222,11 @@ UINT32 amu880_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 
 		for (sx = 0; sx < 64; sx++)
 		{
-			UINT16 videoram_addr = ((y / 10) * 64) + sx;
-			UINT8 videoram_data = m_video_ram[videoram_addr & 0x7ff];
+			uint16_t videoram_addr = ((y / 10) * 64) + sx;
+			uint8_t videoram_data = m_video_ram[videoram_addr & 0x7ff];
 
-			UINT16 charrom_addr = ((videoram_data & 0x7f) << 3) | line;
-			UINT8 data = m_char_rom->base()[charrom_addr & 0x3ff];
+			uint16_t charrom_addr = ((videoram_data & 0x7f) << 3) | line;
+			uint8_t data = m_char_rom->base()[charrom_addr & 0x3ff];
 
 			for (x = 0; x < 6; x++)
 			{
@@ -278,24 +280,6 @@ static const z80_daisy_config amu880_daisy_chain[] =
 
 void amu880_state::machine_start()
 {
-	// find keyboard rows
-	m_key_row[0] = m_y0;
-	m_key_row[1] = m_y1;
-	m_key_row[2] = m_y2;
-	m_key_row[3] = m_y3;
-	m_key_row[4] = m_y4;
-	m_key_row[5] = m_y5;
-	m_key_row[6] = m_y6;
-	m_key_row[7] = m_y7;
-	m_key_row[8] = m_y8;
-	m_key_row[9] = m_y9;
-	m_key_row[10] = m_y10;
-	m_key_row[11] = m_y11;
-	m_key_row[12] = m_y12;
-	m_key_row[13] = m_y13;
-	m_key_row[14] = m_y14;
-	m_key_row[15] = m_y15;
-
 	/* register for state saving */
 	save_item(NAME(m_key_d6));
 	save_item(NAME(m_key_d7));
@@ -325,7 +309,7 @@ static GFXDECODE_START( amu880 )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( amu880, amu880_state )
+static MACHINE_CONFIG_START( amu880 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_10MHz/4) // U880D
 	MCFG_CPU_PROGRAM_MAP(amu880_mem)
@@ -355,7 +339,7 @@ static MACHINE_CONFIG_START( amu880, amu880_state )
 	MCFG_DEVICE_ADD(Z80PIO2_TAG, Z80PIO, XTAL_10MHz/4)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 
-	MCFG_Z80SIO0_ADD(Z80SIO_TAG, XTAL_10MHz/4, 0, 0, 0, 0) // U856
+	MCFG_DEVICE_ADD(Z80SIO_TAG, Z80SIO0, XTAL_10MHz/4) // U856
 	MCFG_Z80DART_OUT_TXDA_CB(WRITELINE(amu880_state, cassette_w))
 	MCFG_Z80DART_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 
@@ -394,5 +378,5 @@ ROM_END
 
 /* System Drivers */
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY                     FULLNAME                                        FLAGS */
-COMP( 1983, amu880, 0,      0,      amu880, amu880, driver_device,  0,      "Militaerverlag der DDR",   "Ausbaufaehiger Mikrocomputer mit dem U 880",   MACHINE_NO_SOUND )
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT           INIT  COMPANY                     FULLNAME                                        FLAGS */
+COMP( 1983, amu880, 0,      0,      amu880, amu880, amu880_state,  0,    "Militaerverlag der DDR",   "Ausbaufaehiger Mikrocomputer mit dem U 880",   MACHINE_NO_SOUND )

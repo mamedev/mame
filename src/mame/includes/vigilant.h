@@ -19,10 +19,10 @@ public:
 	required_device<m72_audio_device> m_audio;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	required_shared_ptr<UINT8> m_generic_paletteram_8;
+	required_shared_ptr<uint8_t> m_generic_paletteram_8;
 
-	required_shared_ptr<UINT8> m_spriteram;
-	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<uint8_t> m_videoram;
 
 	int m_horiz_scroll_low;
 	int m_horiz_scroll_high;
@@ -50,8 +50,8 @@ public:
 	virtual void video_start() override;
 	virtual void video_reset() override;
 
-	UINT32 screen_update_vigilant(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_kikcubic(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_vigilant(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_kikcubic(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void update_background();
 	void draw_foreground(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority, int opaque );
 	void draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect);

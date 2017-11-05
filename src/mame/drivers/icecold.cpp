@@ -10,8 +10,12 @@
 #include "cpu/m6809/m6809.h"
 #include "machine/6821pia.h"
 #include "machine/i8279.h"
+#include "machine/timer.h"
 #include "sound/ay8910.h"
+#include "speaker.h"
+
 #include "icecold.lh"
+
 
 class icecold_state : public driver_device
 {
@@ -46,10 +50,10 @@ public:
 	required_device<ay8910_device> m_ay8910_1;
 	required_device<pia6821_device> m_pia1;
 
-	UINT8   m_digit;            // scanlines from i8279
-	UINT8   m_sound_latch;      // sound bus latch
-	UINT8   m_ay_ctrl;          // ay controls line
-	UINT8   m_motors_ctrl;      // motors control
+	uint8_t   m_digit;            // scanlines from i8279
+	uint8_t   m_sound_latch;      // sound bus latch
+	uint8_t   m_ay_ctrl;          // ay controls line
+	uint8_t   m_motors_ctrl;      // motors control
 	int     m_sint;             // SINT line
 	int     m_motenbl;          // /MOTENBL line
 	int     m_ball_gate_sw;     // ball gate switch
@@ -66,8 +70,7 @@ static ADDRESS_MAP_START( icecold_map, AS_PROGRAM, 8, icecold_state )
 	AM_RANGE(0x4010, 0x4013) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
 	AM_RANGE(0x4020, 0x4023) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
 	AM_RANGE(0x4040, 0x4043) AM_DEVREADWRITE("pia2", pia6821_device, read, write)   // not used
-	AM_RANGE(0x4080, 0x4080) AM_DEVREADWRITE("i8279", i8279_device, data_r, data_w )
-	AM_RANGE(0x4081, 0x4081) AM_DEVREADWRITE("i8279", i8279_device, status_r, cmd_w)
+	AM_RANGE(0x4080, 0x4081) AM_DEVREADWRITE("i8279", i8279_device, read, write)
 	AM_RANGE(0x4100, 0x4100) AM_WRITE(motors_w)
 	AM_RANGE(0xa000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -174,7 +177,7 @@ void icecold_state::machine_reset()
 
 CUSTOM_INPUT_MEMBER( icecold_state::motors_limit_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	if (m_rmotor <= 1)      data |= 0x01;   // right down limit
 	if (m_lmotor <= 1)      data |= 0x04;   // left down limit
@@ -310,10 +313,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(icecold_state::icecold_motors_timer)
 			m_ball_gate_sw = 0;
 
 		// motors are keep in range 0-100
-		m_lmotor = MIN(m_lmotor, 100);
-		m_lmotor = MAX(m_lmotor, 0);
-		m_rmotor = MIN(m_rmotor, 100);
-		m_rmotor = MAX(m_rmotor, 0);
+		m_lmotor = std::min(m_lmotor, 100);
+		m_lmotor = std::max(m_lmotor, 0);
+		m_rmotor = std::min(m_rmotor, 100);
+		m_rmotor = std::max(m_rmotor, 0);
 
 		if (lmotor_dir != 0 || rmotor_dir != 0)
 		{
@@ -327,7 +330,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(icecold_state::icecold_motors_timer)
 	}
 }
 
-static MACHINE_CONFIG_START( icecold, icecold_state )
+static MACHINE_CONFIG_START( icecold )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, XTAL_6MHz/4)
@@ -336,19 +339,19 @@ static MACHINE_CONFIG_START( icecold, icecold_state )
 	MCFG_DEVICE_ADD( "pia0", PIA6821, 0)
 	MCFG_PIA_READPA_HANDLER(IOPORT("JOY"))
 	MCFG_PIA_READPB_HANDLER(IOPORT("DSW3"))
-	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("maincpu", m6809_device, irq_line))
-	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("maincpu", m6809_device, irq_line))
+	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
+	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
 
 	MCFG_DEVICE_ADD( "pia1", PIA6821, 0)
 	MCFG_PIA_READPA_HANDLER(READ8(icecold_state, ay_r))
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(icecold_state, ay_w))
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(icecold_state, snd_ctrl_w))
-	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("maincpu", m6809_device, firq_line))
-	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("maincpu", m6809_device, firq_line))
+	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6809_FIRQ_LINE))
+	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6809_FIRQ_LINE))
 
 	MCFG_DEVICE_ADD( "pia2", PIA6821, 0)
-	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("maincpu", m6809_device, irq_line))
-	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("maincpu", m6809_device, irq_line))
+	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
+	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
 
 	MCFG_DEVICE_ADD("i8279", I8279, XTAL_6MHz/4)
 	MCFG_I8279_OUT_IRQ_CB(DEVWRITELINE("pia0", pia6821_device, cb1_w)) // irq
@@ -397,5 +400,5 @@ ROM_START(zekepeak)
 ROM_END
 
 
-GAME(1983,  icecold,   0,        icecold,  icecold, driver_device,  0,  ROT0,  "Taito",    "Ice Cold Beer",      MACHINE_NOT_WORKING | MACHINE_MECHANICAL)
-GAME(1983,  zekepeak,  icecold,  icecold,  icecold, driver_device,  0,  ROT0,  "Taito",    "Zeke's Peak",        MACHINE_NOT_WORKING | MACHINE_MECHANICAL)
+GAME(1983,  icecold,   0,        icecold,  icecold, icecold_state,  0,  ROT0,  "Taito",    "Ice Cold Beer",      MACHINE_NOT_WORKING | MACHINE_MECHANICAL)
+GAME(1983,  zekepeak,  icecold,  icecold,  icecold, icecold_state,  0,  ROT0,  "Taito",    "Zeke's Peak",        MACHINE_NOT_WORKING | MACHINE_MECHANICAL)

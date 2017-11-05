@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2016 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
@@ -7,10 +7,8 @@
 
 #if ENTRY_CONFIG_USE_NATIVE && BX_PLATFORM_NACL
 
-#include <bgfx/bgfxplatform.h>
+#include <bgfx/platform.h>
 
-#include <stdio.h>
-#include <string.h>
 #include <pthread.h>
 #include <string>
 
@@ -29,7 +27,6 @@
 #include <ppapi/c/ppp_instance.h>
 #include <ppapi/gles2/gl2ext_ppapi.h>
 
-#include <bgfx/bgfxplatform.h>
 #include <bx/thread.h>
 
 #include "entry.h"
@@ -191,7 +188,7 @@ using namespace entry;
 
 PP_EXPORT const void* PPP_GetInterface(const char* _name)
 {
-	if (0 == strcmp(_name, PPP_INSTANCE_INTERFACE) )
+	if (0 == bx::strncmp(_name, PPP_INSTANCE_INTERFACE) )
 	{
 		static PPP_Instance instanceInterface =
 		{

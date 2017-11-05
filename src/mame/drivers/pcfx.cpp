@@ -13,13 +13,15 @@
 #include "cpu/v810/v810.h"
 #include "video/huc6261.h"
 #include "video/huc6270.h"
+#include "video/huc6271.h"
 #include "video/huc6272.h"
+#include "screen.h"
 
 struct pcfx_pad_t
 {
-	UINT8 ctrl[2];
-	UINT8 status[2];
-	UINT32 latch[2];
+	uint8_t ctrl[2];
+	uint8_t status[2];
+	uint32_t latch[2];
 };
 
 class pcfx_state : public driver_device
@@ -40,12 +42,12 @@ public:
 
 	virtual void machine_reset() override;
 
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	// Interrupt controller (component unknown)
-	UINT16 m_irq_mask;
-	UINT16 m_irq_pending;
-	UINT8 m_irq_priority[8];
+	uint16_t m_irq_mask;
+	uint16_t m_irq_pending;
+	uint8_t m_irq_priority[8];
 
 	pcfx_pad_t m_pad;
 
@@ -93,13 +95,13 @@ static ADDRESS_MAP_START( pcfx_mem, AS_PROGRAM, 32, pcfx_state )
 	AM_RANGE( 0xE0000000, 0xE7FFFFFF ) AM_NOP   /* BackUp RAM */
 	AM_RANGE( 0xE8000000, 0xE9FFFFFF ) AM_NOP   /* Extended BackUp RAM */
 	AM_RANGE( 0xF8000000, 0xF8000007 ) AM_NOP   /* PIO */
-	AM_RANGE( 0xFFF00000, 0xFFFFFFFF ) AM_ROMBANK("bank1")  /* ROM */
+	AM_RANGE( 0xFFF00000, 0xFFFFFFFF ) AM_ROM AM_REGION("ipl", 0)  /* ROM */
 ADDRESS_MAP_END
 
 READ16_MEMBER( pcfx_state::pad_r )
 {
-	UINT16 res;
-	UINT8 port_type = ((offset<<1) & 0x80) >> 7;
+	uint16_t res;
+	uint8_t port_type = ((offset<<1) & 0x80) >> 7;
 
 	if(((offset<<1) & 0x40) == 0)
 	{
@@ -135,7 +137,7 @@ void pcfx_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 		pad_func(ptr, param);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in pcfx_state::device_timer");
+		assert_always(false, "Unknown id in pcfx_state::device_timer");
 	}
 }
 
@@ -152,7 +154,7 @@ TIMER_CALLBACK_MEMBER(pcfx_state::pad_func)
 
 WRITE16_MEMBER( pcfx_state::pad_w )
 {
-	UINT8 port_type = ((offset<<1) & 0x80) >> 7;
+	uint8_t port_type = ((offset<<1) & 0x80) >> 7;
 
 	if(((offset<<1) & 0x40) == 0)
 	{
@@ -164,7 +166,7 @@ WRITE16_MEMBER( pcfx_state::pad_w )
 		*/
 		if(data & 1 && (!(m_pad.ctrl[port_type] & 1)))
 		{
-			timer_set(attotime::from_msec(1), TIMER_PAD_FUNC, port_type); // TODO: time
+			timer_set(attotime::from_usec(1000), TIMER_PAD_FUNC, port_type); // TODO: time
 		}
 
 		m_pad.ctrl[port_type] = data & 7;
@@ -181,7 +183,7 @@ WRITE16_MEMBER( pcfx_state::pad_w )
 static ADDRESS_MAP_START( pcfx_io, AS_IO, 32, pcfx_state )
 	AM_RANGE( 0x00000000, 0x000000FF ) AM_READWRITE16(pad_r, pad_w, 0xffffffff) /* PAD */
 	AM_RANGE( 0x00000100, 0x000001FF ) AM_NOP   /* HuC6230 */
-	AM_RANGE( 0x00000200, 0x000002FF ) AM_NOP   /* HuC6271 */
+	AM_RANGE( 0x00000200, 0x000002FF ) AM_DEVICE16( "huc6271", huc6271_device, regs, 0xffff )   /* HuC6271 */
 	AM_RANGE( 0x00000300, 0x000003FF ) AM_DEVREADWRITE16( "huc6261", huc6261_device, read, write, 0xffff )  /* HuC6261 */
 	AM_RANGE( 0x00000400, 0x000004FF ) AM_DEVREADWRITE8( "huc6270_a", huc6270_device, read, write, 0xffff ) /* HuC6270-A */
 	AM_RANGE( 0x00000500, 0x000005FF ) AM_DEVREADWRITE8( "huc6270_b", huc6270_device, read, write, 0xffff ) /* HuC6270-B */
@@ -197,102 +199,35 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( pcfx )
 	/*
-	xxxx ---- ---- ---- ID (0xf = 6 button pad, 0xe = tap, 0xd = ?)
+	xxxx ---- ---- ---- ID (0xf = 6 button pad, 0xe = multitap, 0xd = mouse, 0 = none)
 	*/
 	PORT_START("P1")
-	PORT_BIT( 0xf0000000, IP_ACTIVE_LOW, IPT_UNKNOWN ) // ID
-	PORT_DIPNAME( 0x01000000, 0x01000000, "1" )
-	PORT_DIPSETTING(    0x01000000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02000000, 0x02000000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02000000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04000000, 0x04000000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04000000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08000000, 0x08000000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08000000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x010000, 0x010000, "2" )
-	PORT_DIPSETTING(    0x010000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x020000, 0x020000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x020000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x040000, 0x040000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x040000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x080000, 0x080000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x080000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x100000, 0x100000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x100000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x200000, 0x200000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x200000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x400000, 0x400000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x400000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x800000, 0x800000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x800000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0100, 0x0100, "3" )
-	PORT_DIPSETTING(    0x0100, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) ) // *
-	PORT_DIPSETTING(    0x0200, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) ) // *
-	PORT_DIPSETTING(    0x0400, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x0800, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x1000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x2000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x4000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x8000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_START1 ) PORT_PLAYER(1) PORT_NAME("RUN button")
-	PORT_DIPNAME( 0x01, 0x01, "4" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0xf0000000, IP_ACTIVE_LOW, IPT_UNKNOWN ) // ID pad
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Button I")
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Button II")
+	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("P1 Button III")
+	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("P1 Button IV")
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1) PORT_NAME("P1 Button V")
+	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1) PORT_NAME("P1 Button VI")
+	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_SELECT ) PORT_PLAYER(1) PORT_NAME("P1 Select Button")
+	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_START1 ) PORT_PLAYER(1) PORT_NAME("P1 RUN Button")
+	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1) PORT_NAME("P1 Up")
+	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_NAME("P1 Right")
+	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1) PORT_NAME("P1 Down")
+	PORT_BIT( 0x00000800, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1) PORT_NAME("P1 Left")
+	PORT_BIT( 0x00001000, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER(1) PORT_NAME("P1 Switch 1")
+	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_PLAYER(1) PORT_NAME("P1 Switch 2")
+	PORT_BIT( 0x0fffa000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("P2")
-	PORT_BIT( 0xf0000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0xf0000000, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // ID unconnect
 	PORT_BIT( 0x0fffffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 
 READ16_MEMBER( pcfx_state::irq_read )
 {
-	UINT16 data = 0;
+	uint16_t data = 0;
 
 	switch( offset )
 	{
@@ -377,7 +312,7 @@ WRITE16_MEMBER( pcfx_state::irq_write )
 
 inline void pcfx_state::check_irqs()
 {
-	UINT16 active_irqs = m_irq_pending & ~m_irq_mask;
+	uint16_t active_irqs = m_irq_pending & ~m_irq_mask;
 	int highest_prio = -1;
 
 	for (auto & elem : m_irq_priority)
@@ -461,28 +396,26 @@ WRITE_LINE_MEMBER( pcfx_state::irq15_w )
 
 void pcfx_state::machine_reset()
 {
-	membank( "bank1" )->set_base( memregion("user1")->base() );
-
 	m_irq_mask = 0xFF;
 	m_irq_pending = 0;
 }
 
 
-UINT32 pcfx_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t pcfx_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	m_huc6261->video_update( bitmap, cliprect );
 	return 0;
 }
 
 
-static MACHINE_CONFIG_START( pcfx, pcfx_state )
+static MACHINE_CONFIG_START( pcfx )
 	MCFG_CPU_ADD( "maincpu", V810, XTAL_21_4772MHz )
 	MCFG_CPU_PROGRAM_MAP( pcfx_mem)
 	MCFG_CPU_IO_MAP( pcfx_io)
 
 	MCFG_SCREEN_ADD( "screen", RASTER )
 	MCFG_SCREEN_UPDATE_DRIVER(pcfx_state, screen_update)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_21_4772MHz, HUC6261_WPF, 64, 64 + 1024 + 64, HUC6261_LPF, 18, 18 + 242)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_21_4772MHz, huc6261_device::WPF, 64, 64 + 1024 + 64, huc6261_device::LPF, 18, 18 + 242)
 
 	MCFG_DEVICE_ADD( "huc6270_a", HUC6270, 0 )
 	MCFG_HUC6270_VRAM_SIZE(0x20000)
@@ -495,13 +428,18 @@ static MACHINE_CONFIG_START( pcfx, pcfx_state )
 	MCFG_DEVICE_ADD("huc6261", HUC6261, XTAL_21_4772MHz)
 	MCFG_HUC6261_VDC1("huc6270_a")
 	MCFG_HUC6261_VDC2("huc6270_b")
+	MCFG_HUC6261_KING("huc6272")
 
 	MCFG_HUC6272_ADD( "huc6272", XTAL_21_4772MHz )
+	MCFG_HUC6272_IRQ_CHANGED_CB(WRITELINE(pcfx_state, irq13_w))
+	MCFG_HUC6272_RAINBOW("huc6271")
+
+	MCFG_HUC6271_ADD( "huc6271", XTAL_21_4772MHz )
 MACHINE_CONFIG_END
 
 
 ROM_START( pcfx )
-	ROM_REGION( 0x100000, "user1", 0 )
+	ROM_REGION( 0x100000, "ipl", 0 )
 	ROM_SYSTEM_BIOS( 0, "v100", "BIOS v1.00 - 2 Sep 1994" )
 	ROMX_LOAD( "pcfxbios.bin", 0x000000, 0x100000, CRC(76ffb97a) SHA1(1a77fd83e337f906aecab27a1604db064cf10074), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "v101", "BIOS v1.01 - 5 Dec 1994" )
@@ -513,7 +451,7 @@ ROM_END
 
 
 ROM_START( pcfxga )
-	ROM_REGION( 0x100000, "user1", 0 )
+	ROM_REGION( 0x100000, "ipl", 0 )
 	ROM_LOAD( "pcfxga.rom", 0x000000, 0x100000, CRC(41c3776b) SHA1(a9372202a5db302064c994fcda9b24d29bb1b41c) )
 
 	ROM_REGION( 0x80000, "scsi_rom", ROMREGION_ERASEFF )
@@ -526,6 +464,6 @@ ROM_END
 
 ***************************************************************************/
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT      INIT    COMPANY                       FULLNAME                  FLAGS */
-CONS( 1994, pcfx,       0,      0,      pcfx,       pcfx, driver_device,      0,      "Nippon Electronic Company",  "PC-FX",                  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-CONS( 199?, pcfxga,     pcfx,   0,      pcfx,       pcfx, driver_device,      0,      "Nippon Electronic Company",  "PC-FX/GA (PC ISA Card)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT  STATE            INIT    COMPANY  FULLNAME                  FLAGS
+CONS( 1994, pcfx,       0,      0,      pcfx,       pcfx,  pcfx_state,      0,      "NEC",   "PC-FX",                  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+CONS( 199?, pcfxga,     pcfx,   0,      pcfx,       pcfx,  pcfx_state,      0,      "NEC",   "PC-FX/GA (PC ISA Card)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

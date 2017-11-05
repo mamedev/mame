@@ -124,13 +124,15 @@ Dumped by Chackn
 
 
 #include "emu.h"
+#include "includes/angelkds.h"
+
 #include "cpu/z80/z80.h"
+#include "machine/i8255.h"
 #include "machine/segacrp2_device.h"
 #include "sound/2203intf.h"
-#include "includes/angelkds.h"
-#include "machine/i8255.h"
 
-
+#include "screen.h"
+#include "speaker.h"
 
 
 
@@ -182,7 +184,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, angelkds_state )
 	AM_RANGE(0xf005, 0xf005) AM_WRITE(angelkds_layer_ctrl_write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, angelkds_state )
+static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 8, angelkds_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_SHARE("decrypted_opcodes")
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
@@ -438,11 +440,6 @@ READ8_MEMBER(angelkds_state::angelkds_sub_sound_r)
 }
 
 
-WRITE_LINE_MEMBER(angelkds_state::irqhandler)
-{
-	m_subcpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
 /*** Graphics Decoding
 
 all the 8x8 tiles are in one format, the 16x16 sprites in another
@@ -514,7 +511,7 @@ void angelkds_state::machine_reset()
 	m_bgtopbank = 0;
 }
 
-static MACHINE_CONFIG_START( angelkds, angelkds_state )
+static MACHINE_CONFIG_START( angelkds )
 
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_6MHz)
 	MCFG_CPU_PROGRAM_MAP(main_map)
@@ -555,7 +552,7 @@ static MACHINE_CONFIG_START( angelkds, angelkds_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ym1", YM2203, XTAL_4MHz)
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(angelkds_state, irqhandler))
+	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("sub", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.65)
 	MCFG_SOUND_ROUTE(1, "mono", 0.65)
 	MCFG_SOUND_ROUTE(2, "mono", 0.65)
@@ -679,7 +676,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(angelkds_state,angelkds)
 {
-	UINT8 *RAM = memregion("user1")->base();
+	uint8_t *RAM = memregion("user1")->base();
 	membank("bank1")->configure_entries(0, 16, &RAM[0x0000], 0x4000);
 }
 

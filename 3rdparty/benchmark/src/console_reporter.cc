@@ -13,7 +13,9 @@
 // limitations under the License.
 
 #include "benchmark/reporter.h"
+#include "complexity.h"
 
+#include <algorithm>
 #include <cstdint>
 #include <cstdio>
 #include <iostream>
@@ -23,63 +25,63 @@
 
 #include "check.h"
 #include "colorprint.h"
+#include "commandlineflags.h"
+#include "internal_macros.h"
 #include "string_util.h"
-#include "walltime.h"
+#include "timers.h"
 
 namespace benchmark {
 
 bool ConsoleReporter::ReportContext(const Context& context) {
   name_field_width_ = context.name_field_width;
 
-  std::cerr << "Run on (" << context.num_cpus << " X " << context.mhz_per_cpu
-            << " MHz CPU " << ((context.num_cpus > 1) ? "s" : "") << ")\n";
+  PrintBasicContext(&GetErrorStream(), context);
 
-  std::cerr << LocalDateTimeString() << "\n";
-
-  if (context.cpu_scaling_enabled) {
-    std::cerr << "***WARNING*** CPU scaling is enabled, the benchmark "
-                 "real time measurements may be noisy and will incur extra "
-                 "overhead.\n";
+#ifdef BENCHMARK_OS_WINDOWS
+  if (color_output_ && &std::cout != &GetOutputStream()) {
+      GetErrorStream() << "Color printing is only supported for stdout on windows."
+                          " Disabling color printing\n";
+      color_output_ = false;
   }
-
-#ifndef NDEBUG
-  std::cerr << "***WARNING*** Library was built as DEBUG. Timings may be "
-               "affected.\n";
 #endif
-
-  int output_width = fprintf(stdout, "%-*s %13s %13s %10s\n",
+  std::string str = FormatString("%-*s %13s %13s %10s\n",
                              static_cast<int>(name_field_width_), "Benchmark",
                              "Time", "CPU", "Iterations");
-  std::cout << std::string(output_width - 1, '-') << "\n";
+  GetOutputStream() << str << std::string(str.length() - 1, '-') << "\n";
 
   return true;
 }
 
 void ConsoleReporter::ReportRuns(const std::vector<Run>& reports) {
-  if (reports.empty()) {
-    return;
-  }
-
-  for (Run const& run : reports) {
-    CHECK_EQ(reports[0].benchmark_name, run.benchmark_name);
+  for (const auto& run : reports)
     PrintRunData(run);
-  }
+}
 
-  if (reports.size() < 2) {
-    // We don't report aggregated data if there was a single run.
-    return;
-  }
-
-  Run mean_data;
-  Run stddev_data;
-  BenchmarkReporter::ComputeStats(reports, &mean_data, &stddev_data);
-
-  // Output using PrintRun.
-  PrintRunData(mean_data);
-  PrintRunData(stddev_data);
+static void  IgnoreColorPrint(std::ostream& out, LogColor,
+                               const char* fmt, ...)
+{
+    va_list args;
+    va_start(args, fmt);
+    out << FormatString(fmt, args);
+    va_end(args);
 }
 
 void ConsoleReporter::PrintRunData(const Run& result) {
+  typedef void(PrinterFn)(std::ostream&, LogColor, const char*, ...);
+  auto& Out = GetOutputStream();
+  PrinterFn* printer = color_output_ ? (PrinterFn*)ColorPrintf
+                                     : IgnoreColorPrint;
+  auto name_color =
+      (result.report_big_o || result.report_rms) ? COLOR_BLUE : COLOR_GREEN;
+  printer(Out, name_color, "%-*s ", name_field_width_,
+              result.benchmark_name.c_str());
+
+  if (result.error_occurred) {
+    printer(Out, COLOR_RED, "ERROR OCCURRED: \'%s\'",
+                result.error_message.c_str());
+    printer(Out, COLOR_DEFAULT, "\n");
+    return;
+  }
   // Format bytes per second
   std::string rate;
   if (result.bytes_per_second > 0) {
@@ -91,46 +93,41 @@ void ConsoleReporter::PrintRunData(const Run& result) {
   if (result.items_per_second > 0) {
     items = StrCat(" ", HumanReadableNumber(result.items_per_second),
                    " items/s");
-  }
+ }
 
-  double multiplier;
-  const char* timeLabel;
-  std::tie(timeLabel, multiplier) = GetTimeUnitAndMultiplier(result.time_unit);
+  const double real_time = result.GetAdjustedRealTime();
+  const double cpu_time = result.GetAdjustedCPUTime();
 
-  ColorPrintf(COLOR_GREEN, "%-*s ",
-              name_field_width_, result.benchmark_name.c_str());
-
-  if (result.iterations == 0) {
-    ColorPrintf(COLOR_YELLOW, "%10.0f %s %10.0f %s ",
-                result.real_accumulated_time * multiplier,
-                timeLabel,
-                result.cpu_accumulated_time * multiplier,
-                timeLabel);
+  if (result.report_big_o) {
+    std::string big_o = GetBigOString(result.complexity);
+    printer(Out, COLOR_YELLOW, "%10.2f %s %10.2f %s ", real_time,
+                big_o.c_str(), cpu_time, big_o.c_str());
+  } else if (result.report_rms) {
+    printer(Out, COLOR_YELLOW, "%10.0f %% %10.0f %% ", real_time * 100,
+                cpu_time * 100);
   } else {
-    ColorPrintf(COLOR_YELLOW, "%10.0f %s %10.0f %s ",
-                (result.real_accumulated_time * multiplier) /
-                    (static_cast<double>(result.iterations)),
-                timeLabel,
-                (result.cpu_accumulated_time * multiplier) /
-                    (static_cast<double>(result.iterations)),
-                timeLabel);
+    const char* timeLabel = GetTimeUnitString(result.time_unit);
+    printer(Out, COLOR_YELLOW, "%10.0f %s %10.0f %s ", real_time, timeLabel,
+                cpu_time, timeLabel);
   }
 
-  ColorPrintf(COLOR_CYAN, "%10lld", result.iterations);
+  if (!result.report_big_o && !result.report_rms) {
+    printer(Out, COLOR_CYAN, "%10lld", result.iterations);
+  }
 
   if (!rate.empty()) {
-    ColorPrintf(COLOR_DEFAULT, " %*s", 13, rate.c_str());
+    printer(Out, COLOR_DEFAULT, " %*s", 13, rate.c_str());
   }
 
   if (!items.empty()) {
-    ColorPrintf(COLOR_DEFAULT, " %*s", 18, items.c_str());
+    printer(Out, COLOR_DEFAULT, " %*s", 18, items.c_str());
   }
 
   if (!result.report_label.empty()) {
-    ColorPrintf(COLOR_DEFAULT, " %s", result.report_label.c_str());
+    printer(Out, COLOR_DEFAULT, " %s", result.report_label.c_str());
   }
 
-  ColorPrintf(COLOR_DEFAULT, "\n");
+  printer(Out, COLOR_DEFAULT, "\n");
 }
 
 }  // end namespace benchmark

@@ -1,6 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
+#include "emu.h"
 #include "includes/mikromik.h"
+#include "screen.h"
 
 #define HORIZONTAL_CHARACTER_PIXELS 10
 
@@ -10,7 +12,7 @@
 
 I8275_DRAW_CHARACTER_MEMBER( mm1_state::crtc_display_pixels )
 {
-	UINT8 romdata = m_char_rom->base()[(charcode << 4) | linecount];
+	uint8_t romdata = m_char_rom->base()[(charcode << 4) | linecount];
 
 	int gpa0 = BIT(gpa, 0);     // general purpose attribute 0
 	int llen = m_llen;          // light enable
@@ -22,7 +24,7 @@ I8275_DRAW_CHARACTER_MEMBER( mm1_state::crtc_display_pixels )
 	int d7 = BIT(romdata, 7);   // save MSB (1 indicates that this is a Visual Attribute or Special Code instead of a normal display character)
 	int d6 = BIT(romdata, 6);   // save also first and last char bitmap bits before shifting out the MSB
 	int d0 = BIT(romdata, 0);
-	UINT8 data = (romdata << 1) | (d7 & d0); // get rid of MSB, duplicate LSB for special characters
+	uint8_t data = (romdata << 1) | (d7 & d0); // get rid of MSB, duplicate LSB for special characters
 
 	if (y < 360 || x >= HORIZONTAL_CHARACTER_PIXELS || compl_in == 0) // leftmost char on the 25th row is never displayed on actual MikroMikko 1 HW if it's inversed
 	{
@@ -57,7 +59,7 @@ I8275_DRAW_CHARACTER_MEMBER( mm1_state::crtc_display_pixels )
 //  ADDRESS_MAP( mm1_upd7220_map )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( mm1_upd7220_map, AS_0, 16, mm1_state )
+static ADDRESS_MAP_START( mm1_upd7220_map, 0, 16, mm1_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x7fff) AM_RAM AM_SHARE("video_ram")
 ADDRESS_MAP_END
@@ -69,7 +71,7 @@ ADDRESS_MAP_END
 
 UPD7220_DISPLAY_PIXELS_MEMBER( mm1_state::hgdc_display_pixels )
 {
-	UINT16 data = m_video_ram[address >> 1];
+	uint16_t data = m_video_ram[address >> 1];
 	for (int i = 0; i < 16; i++)
 	{
 		if (BIT(data, i)) bitmap.pix32(y, x + i) = m_palette->pen(2);
@@ -77,7 +79,7 @@ UPD7220_DISPLAY_PIXELS_MEMBER( mm1_state::hgdc_display_pixels )
 }
 
 
-UINT32 mm1_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t mm1_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	/* text */
 	m_crtc->screen_update(screen, bitmap, cliprect);
@@ -123,10 +125,10 @@ PALETTE_INIT_MEMBER( mm1_state, mm1 )
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( mm1m6_video )
+//  MACHINE_CONFIG_START( mm1m6_video )
 //-------------------------------------------------
 
-MACHINE_CONFIG_FRAGMENT( mm1m6_video )
+MACHINE_CONFIG_START( mm1m6_video )
 	MCFG_SCREEN_ADD( SCREEN_TAG, RASTER )
 	MCFG_SCREEN_REFRESH_RATE( 50 )
 	MCFG_SCREEN_UPDATE_DRIVER(mm1_state, screen_update)
@@ -146,7 +148,7 @@ MACHINE_CONFIG_FRAGMENT( mm1m6_video )
 	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
 
 	MCFG_DEVICE_ADD(UPD7220_TAG, UPD7220, XTAL_18_720MHz/8)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, mm1_upd7220_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, mm1_upd7220_map)
 	MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(mm1_state, hgdc_display_pixels)
 	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
 MACHINE_CONFIG_END

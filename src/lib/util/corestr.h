@@ -49,7 +49,7 @@ int core_strnicmp(const char *s1, const char *s2, size_t n);
 #define strncasecmp MUST_USE_CORE_STRNICMP_INSTEAD
 
 
-/* since strdup is not part of the standard, we use this instead - free with osd_free() */
+/* since strdup is not part of the standard, we use this instead - free with free() */
 char *core_strdup(const char *str);
 
 /* this macro prevents people from using strdup directly */
@@ -59,15 +59,17 @@ char *core_strdup(const char *str);
 
 /* additional string compare helper (up to 16 characters at the moment) */
 int core_strwildcmp(const char *sp1, const char *sp2);
+bool core_iswildstr(const char *sp);
 
 
 int strcatvprintf(std::string &str, const char *format, va_list args);
 
 void strdelchr(std::string& str, char chr);
 void strreplacechr(std::string& str, char ch, char newch);
-std::string strtrimspace(std::string& str);
-std::string strmakeupper(std::string& str);
-std::string strmakelower(std::string& str);
+std::string &strtrimspace(std::string& str);
+std::string &strtrimrightspace(std::string& str);
+std::string &strmakeupper(std::string& str);
+std::string &strmakelower(std::string& str);
 int strreplace(std::string &str, const std::string& search, const std::string& replace);
 
 #endif /* __CORESTR_H__ */

@@ -5,17 +5,51 @@
  *
  */
 
-#include "nld_r2r_dac.h"
+#include "../nl_base.h"
+#include "../nl_factory.h"
+#include "../analog/nlid_twoterm.h"
 
-NETLIB_NAMESPACE_DEVICES_START()
-
-NETLIB_UPDATE_PARAM(r2r_dac)
+namespace netlist
 {
-	update_dev();
+	namespace analog
+	{
+	NETLIB_OBJECT_DERIVED(r2r_dac, twoterm)
+	{
+		NETLIB_CONSTRUCTOR_DERIVED(r2r_dac, twoterm)
+		, m_VIN(*this, "VIN", 1.0)
+		, m_R(*this, "R", 1.0)
+		, m_num(*this, "N", 1)
+		, m_val(*this, "VAL", 1)
+		{
+			register_subalias("VOUT", m_P);
+			register_subalias("VGND", m_N);
+		}
 
-	nl_double V = m_VIN.Value() / (nl_double) (1 << m_num.Value()) * (nl_double) m_val.Value();
+		NETLIB_UPDATE_PARAMI();
+		//NETLIB_RESETI();
+		//NETLIB_UPDATEI();
 
-	this->set(1.0 / m_R.Value(), V, 0.0);
-}
+	protected:
+		param_double_t m_VIN;
+		param_double_t m_R;
+		param_int_t m_num;
+		param_int_t m_val;
+	};
 
-NETLIB_NAMESPACE_DEVICES_END()
+
+	NETLIB_UPDATE_PARAM(r2r_dac)
+	{
+		update_dev();
+
+		double V = m_VIN() / static_cast<double>(1 << m_num())
+				* static_cast<double>(m_val());
+
+		this->set(1.0 / m_R(), V, 0.0);
+	}
+	} //namespace analog
+
+	namespace devices {
+		NETLIB_DEVICE_IMPL_NS(analog, r2r_dac)
+	}
+
+} // namespace netlist

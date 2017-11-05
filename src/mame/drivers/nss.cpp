@@ -21,15 +21,16 @@
 ***************************************************************************
 
 Nintendo Super System Hardware Overview
-Nintendo, 1992
+Nintendo, 1991/1992
 
 This system is basically a Super Nintendo with a timer.
 The main board has 3 slots on it and can accept up to 3 plug-in carts. The player
 can choose to play any of the available games, although I'm not sure why anyone
-would have wanted to pay money to play these games when the home SNES was selling as well ;-)
-The control panel was also just some SNES pads mounted into the arcade machine control panel....
-not very usable as-is and very cheaply presented.
-
+would have wanted to pay money to play these games when the home SNES was selling
+well and most kids had one.... possibly one of the reasons it failed in the arcades.
+The control panel was also just some SNES pads mounted into the arcade machine
+control panel.... not very usable as-is, very cheaply presented and probably
+another reason why it failed in the arcades.
 
 PCB Layouts
 -----------
@@ -41,12 +42,12 @@ NSS-01-CPU MADE IN JAPAN
 |-|                CL1  SL1                          |
   |         |--------------|                         |
 |-|        14.31818MHz     |         SL5             |
-|           |              |                         |
-|   IR3P32A |         M50458          |-|  |-|  |-|  |
-|J          | VC1         21.47724MHz | |  | |  | |  |
+|           |    M50458    |                         |
+|   IR3P32A |              |          |-|  |-|  |-|  |
+|J          | VC1          |          | |  | |  | |  |
 |A          |              |          | |  | |  | |  |
-|M          |   CN6        |          | |  | |  | |  |
-|M          |--------------|          | |  | |  | |  |
+|M          |     CN6      |          | |  | |  | |  |
+|M          |-------------21.4772MHz  | |  | |  | |  |
 |A             |-------|   |-------|  | |  | |  | |  |
 |      84256   |S-PPU1 |   |S-CPU  |  | |  | |  | |  |
 |              |5C77-01|   |5A22-02|  | |  | |  | |  |
@@ -59,8 +60,8 @@ NSS-01-CPU MADE IN JAPAN
 |                                     | |  | |  | |  |
 |                                     | |  | |  | |  |
 |CN3                                  | |  | |  | |  |
-|                             4MHz    | |  | |  | |  |
-|                                     |-|  |-|  |-|  |
+|                                     | |  | |  | |  |
+|                             4MHz    |-|  |-|  |-|  |
 |                                    CN11 CN12  CN13 |
 |                             Z84C0006               |
 |CN5                                      LH5168     |
@@ -72,39 +73,47 @@ NSS-01-CPU MADE IN JAPAN
 |                               5.5V    NSS-C_IC14_02|
 |----------------------------------------------------|
 Notes:
-      (The main board has many surface mounted logic chips and transistors on the lower side of the PCB
-       which are not documented here. There's also a lot of custom Nintendo parts)
-      IR3P32A - Sharp IR3P32A Special Function TV Interface Circuit, Conversion of color diff sig. & lumin. to RGB (NDIP30)
-      M50458  - Mitsubishi M50458-001SP On-Screen Display (OSD) Chip (NDIP32)
-      HA13001 - Hitachi Dual 5.5W Power Amplifier IC
-      AN5836  - Matsushita AN5836 DC Volume and Tone Control IC (SIL12)
-      84256   - Fujitsu MB84256-10L 32k x8 SRAM (SOP28)
-      LH5168  - Sharp LH5168N-10L 8k x8 SRAM (SOP28)
-      Z84C0006- Zilog Z84C0006FEC Z80 CPU, clock input 4.000MHz (QFP44)
-      M6M80011- Mitsubishi M6M80011 64 x16 Serial EEPROM (DIP8). Pinout..... 1 CS, 2 CLK, 3 DATA IN, 4 DATA OUT, 5 VSS, 6 RESET, 7 RDY, 8 VCC
-      S-3520  - Seiko Epson S-3520 Real Time Clock (SOIC14)
-      5.5V    - 5.5 volt supercap
-      MM1026  - Mitsumi Monolithic IC MM1026BF System Reset with Battery Backup (SOIC8)
-      VSync   - 60Hz
-      HSync   - 15.57kHz
-      *       - This IC located underneath PCB
-      NSS-C_IC14_02 - 27C256 EPROM (DIP28)
+      The main board has many surface mounted logic chips and transistors on the solder side of the PCB
+      which are not documented here. The parts side comprises mainly RAM and custom Nintendo ICs
+
+      IR3P32A       - Sharp IR3P32A Special Function TV Interface Circuit, Conversion of color diff sig. & lumin. to RGB (NDIP30)
+      M50458        - Mitsubishi M50458-001SP On-Screen Display (OSD) Chip (NDIP32). Clock signal 14.31818MHz on pins 28 and 29
+      VC1           - Potentiometer connected to M50458. Turning the pot changes the horizontal width of the OSD menu towards the right
+                      side only. The left edge of the OSD menu does not move. So this is a right horizontal stretch adjustment pot.
+      HA13001       - Hitachi Dual 5.5W Power Amplifier IC
+      AN5836        - Matsushita AN5836 DC Volume and Tone Control IC (SIL12)
+      84256         - Fujitsu MB84256-10L 32k x8 SRAM (SOP28)
+      LH5168        - Sharp LH5168N-10L 8k x8 SRAM (SOP28)
+      Z84C0006      - Zilog Z84C0006FEC Z80 CPU, clock input 4.000MHz (QFP44)
+      M6M80011      - Mitsubishi M6M80011 64 x16 Serial EEPROM (DIP8). Pinout..... 1 CS, 2 CLK, 3 DATA IN, 4 DATA OUT, 5 VSS, 6 RESET, 7 RDY, 8 VCC
+      S-3520        - Seiko Epson S-3520 Real Time Clock (SOIC14)
+      5.5V          - 5.5 volt supercap
+      MM1026        - Mitsumi Monolithic MM1026BF System Reset IC with Battery Backup (SOIC8)
+                      * This IC is located on the solder side of the PCB
+      VSync         - 60.0980Hz
+      HSync         - 15.3844kHz
+      NSS-C_IC14_02 - 27C256 EPROM (BIOS, DIP28)
       CN11/12/13    - 50 pin connectors for game carts
       CN2           - 10 pin connector
       CN3           - 13 pin connector
       CN4           - 8 pin connector
       CN5           - 7 pin connector
       CN6           - 24 pin connector for plug in custom sound module
-      Custom IC's -
-                   S-CPU (QFP100)
-                   S-PPU1 (QFP100)
-                   S-PPU2 (QFP100)
-                   S-WRAM (SOP64)
+      Custom IC's   - S-CPU (QFP100)
+                      S-PPU1 (QFP100)
+                      S-PPU2 (QFP100)
+                      S-WRAM (SOP64)
+      SL* / CL*       - Jumper pads
+                      SL1 open
+                      SL2 open
+                      SL3 open
+                      SL4 open
+                      SL5 shorted
+                      CL1 shorted
+                      CL2 shorted
 
-
-Custom Sound Module (plugs in CN6)
-----------------------------------
-
+Custom Sound Module (plugs into CN6)
+------------------------------------
 Note - This board is encased in a metal shield which is soldered together.
 
 MITSUMI ELEC CO. LTD.
@@ -125,6 +134,9 @@ MITSUMI ELEC CO. LTD.
     |                       |
     |-----------------------|
 Notes:
+      Note: Without this PCB, the board will boot up and work, displaying the game
+      selection menu, but once the game tries to load attract mode, the PCB resets.
+
       JRC2904 - Japan Radio Co. JRC2904 Dual Low Power Op Amp (SOIC8)
       D6376   - NEC D6376 Audio 2-Channel 16-Bit D/A Converter (SOIC16)
       51832   - Toshiba TC51832FL-12 32k x8 SRAM (SOP28)
@@ -132,16 +144,13 @@ Notes:
       S-SMP   - Stamped 'Nintendo S-SMP (M) SONY (C) Nintendo '89' custom sound chip (QFP80)
       S-DSP   - Stamped 'Nintendo S-DSP (M) (C) SONY '89' custom sound DSP (QFP80)
 
-      Note - Without this PCB, the board will boot up and work, displaying the game
-             selection menu, but once the game tries to load attract mode, the PCB resets.
-
-
 Game Carts
 ----------
 There are 3 types of carts. The carts have only a few components on them, including some
 ROMs/sockets, a few logic chips/resistors/caps, a DIPSW8 block, one unknown DIP8 chip
 (with it's surface scratched) and some solder-jumper pads to config the ROM types.
-The unknown DIP8 chip is different per game also. There is a sticker on top with a 2-digit game code (I.E. MW/AT/L3 etc)
+The unknown DIP8 chip is different per game also. There is a sticker on top with a 2-digit
+game code (I.E. MW/AT/L3 etc). The unknown DIP8 chip is used for protection.
 
 NSS-01-ROM-A
 |-------------------------------------------------------|
@@ -169,7 +178,8 @@ Super Soccer         NSS-R__IC1__FS  TC574000    NSS-R_IC3_FS   27C256      CL1 
 -------------------------------------------------------------------------------------------------------
 Note - By setting the jumpers to 'Super Soccer', the other 2 games can use standard EPROMs if required.
 
-LH534J is a 4MBit x8 MaskROM with non-standard pinout. An adapter can be made easily to read them.
+LH534J is a 512k x 8-bit (4MBit) MaskROM with a non-standard pinout.
+An adapter can be made easily to read them as a 27C040.
 
   Sharp LH534J           Common 27C040
     +--\/--+               +--\/--+
@@ -190,7 +200,6 @@ A12 |4   29| A14       A12 |4   29| A14
  D2 |15  18| D4        D2  |15  18| D4
 GND |16  17| D3        GND |16  17| D3
     +------+               +------+
-
 
 NSS-01-ROM-B
 |-------------------------------------------------------|
@@ -217,7 +226,6 @@ Game Name            IC2             IC2 Type    IC7            IC7 Type    Jump
 F-Zero               NSS-FZ-0        LH534J      NSS-R_IC3_FZ   27C256      CL1 CL2 CL3 CL4 CL5 CL6 CL7 - Short
                                                                             SL1 SL2 SL3 SL4 SL5 SL6 SL7 - Open
 ---------------------------------------------------------------------------------------------------------------
-
 
 NSS-01-ROM-C
 |-------------------------------------------------------|
@@ -253,7 +261,6 @@ NCAA Basketball NSS-R_IC2_DU   TC574000   NSS-R_IC3_DU   TC574000    NSS-R_IC8_D
 Robocop 3       NSS-R_IC2_R3   TC574000   NSS-R_IC3_R3   TC574000    NSS-R_IC8_R3   27C256
 ---------------------------------------------------------------------------------------------------------------------------------------------------------
 
-
 NSS-01-ROM-C
 Sticker - NSS-X1-ROM-C (this is just a ROM-C board with a sticker over the top)
                        (the differences being the SRAM and battery are populated)
@@ -287,13 +294,15 @@ Contra III   CONTRA_III_1   TC574000   CONTRA_III_0   TC574000    GAME1_NSSU    
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/snes.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/m6m80011ap.h"
 #include "machine/s3520cf.h"
 #include "machine/rp5h01.h"
 #include "video/m50458.h"
-#include "includes/snes.h"
 #include "rendlay.h"
+#include "speaker.h"
 
 
 class nss_state : public snes_state
@@ -314,11 +323,11 @@ public:
 	required_device<screen_device> m_screen;
 	optional_device<palette_device> m_palette;
 
-	UINT8 m_wram_wp_flag;
-	std::unique_ptr<UINT8[]> m_wram;
-	UINT8 m_nmi_enable;
-	UINT8 m_cart_sel;
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint8_t m_wram_wp_flag;
+	std::unique_ptr<uint8_t[]> m_wram;
+	uint8_t m_nmi_enable;
+	uint8_t m_cart_sel;
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER(ram_wp_r);
 	DECLARE_WRITE8_MEMBER(ram_wp_w);
@@ -345,7 +354,7 @@ public:
 
 
 
-UINT32 nss_state::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect )
+uint32_t nss_state::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect )
 {
 	m_m50458->screen_update(screen,bitmap,cliprect);
 	return 0;
@@ -513,9 +522,10 @@ READ8_MEMBER(nss_state::port_00_r)
     ---- --x-   Button "Joypad Left"        (0=Released, 1=Pressed)
     ---- ---x   Button "Joypad Right"       (0=Released, 1=Pressed)
 */
-	UINT8 res;
+	uint8_t res;
 
 	res = (m_joy_flag) << 7;
+	// TODO: reads from SNES screen output, correct?
 	res|= (m_screen->vblank() & 1) << 6;
 	res|= (BIT(ioport("SERIAL1_DATA1")->read(), 15) << 5);
 	res|= (BIT(ioport("SERIAL1_DATA1")->read(),  7) << 4);
@@ -623,7 +633,7 @@ void nss_state::machine_start()
 	snes_state::machine_start();
 
 	m_is_nss = 1;
-	m_wram = make_unique_clear<UINT8[]>(0x1000);
+	m_wram = make_unique_clear<uint8_t[]>(0x1000);
 }
 
 
@@ -807,7 +817,7 @@ void nss_state::machine_reset()
 	m_joy_flag = 1;
 }
 
-static MACHINE_CONFIG_START( nss, nss_state )
+static MACHINE_CONFIG_START( nss )
 
 	/* base snes hardware */
 	MCFG_CPU_ADD("maincpu", _5A22, MCLK_NTSC)   /* 2.68Mhz, also 3.58Mhz */
@@ -852,8 +862,8 @@ static MACHINE_CONFIG_START( nss, nss_state )
 	MCFG_SCREEN_ADD("osd", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_SIZE(24*12+22, 12*18+22)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 24*12-1, 0*8, 12*18-1)
+	MCFG_SCREEN_SIZE(288+22, 216+22)
+	MCFG_SCREEN_VISIBLE_AREA(0, 288-1, 0, 216-1)
 	MCFG_SCREEN_UPDATE_DRIVER(nss_state,screen_update)
 MACHINE_CONFIG_END
 
@@ -1051,7 +1061,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(nss_state,nss)
 {
-	UINT8 *PROM = memregion("rp5h01")->base();
+	uint8_t *PROM = memregion("rp5h01")->base();
 
 	for (int i = 0; i < 0x10; i++)
 		PROM[i] = BITSWAP8(PROM[i],0,1,2,3,4,5,6,7) ^ 0xff;
@@ -1059,7 +1069,7 @@ DRIVER_INIT_MEMBER(nss_state,nss)
 	DRIVER_INIT_CALL(snes);
 }
 
-GAME( 199?, nss,       0,     nss,      snes, snes_state,    snes,    ROT0, "Nintendo",                    "Nintendo Super System BIOS", MACHINE_IS_BIOS_ROOT )
+GAME( 199?, nss,       0,     nss,      snes, nss_state,    snes,   ROT0, "Nintendo",                    "Nintendo Super System BIOS", MACHINE_IS_BIOS_ROOT )
 GAME( 1992, nss_actr,  nss,   nss,      snes, nss_state,    nss,    ROT0, "Enix",                        "Act Raiser (Nintendo Super System)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 GAME( 1992, nss_adam,  nss,   nss,      snes, nss_state,    nss,    ROT0, "Ocean",                       "The Addams Family (Nintendo Super System)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 GAME( 1992, nss_aten,  nss,   nss,      snes, nss_state,    nss,    ROT0, "Absolute Entertainment Inc.", "David Crane's Amazing Tennis (Nintendo Super System)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )

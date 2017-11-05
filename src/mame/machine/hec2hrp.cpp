@@ -28,7 +28,7 @@
                 => add the port mapping for keyboard
         28/09/2010 add the DISK II support by yo_fr      (jj.stac @ aliceadsl.fr)
                 => Note that actually the DISK II boot (loading CPM : OK) but do not run (don't run the CPM...).
-        20/11/2010 : synchronization between uPD765 and Z80 are now OK, CP/M runnig! JJStacino
+        20/11/2010 : synchronization between uPD765 and Z80 are now OK, CP/M running! JJStacino
         11/11/2011 : add the minidisque support -3 pouces 1/2 driver-  JJStacino  (jj.stac @ aliceadsl.fr)
         19/02/2012 : few adjustment for the hrp and hr machine - JJStacino
 
@@ -40,16 +40,20 @@
 */
 
 #include "emu.h"
+#include "includes/hec2hrp.h"
+
+#include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
 #include "imagedev/printer.h"
+#include "machine/upd765.h" /* for floppy disc controller */
 #include "sound/wave.h"      /* for K7 sound*/
 #include "sound/discrete.h"  /* for 1 Bit sound*/
-#include "machine/upd765.h" /* for floppy disc controller */
+
+#include "speaker.h"
 
 #include "formats/hect_tap.h"
-#include "includes/hec2hrp.h"
 #include "formats/hect_dsk.h"
-#include "cpu/z80/z80.h"
+
 
 #ifndef DEBUG_TRACE_COM_HECTOR
 //#define DEBUG_TRACE_COM_HECTOR  1
@@ -172,7 +176,7 @@ WRITE8_MEMBER(hec2hrp_state::hector_keyboard_w)
 
 READ8_MEMBER(hec2hrp_state::hector_keyboard_r)
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	if (offset ==7) /* Only when joy reading*/
 	{
@@ -251,7 +255,7 @@ WRITE8_MEMBER(hec2hrp_state::hector_sn_2800_w)
 READ8_MEMBER(hec2hrp_state::hector_cassette_r)
 {
 	double level;
-	UINT8 value=0;
+	uint8_t value=0;
 
 	if ((m_state3000 & 0x38) != 0x38 )   /* Selon Sb choix cassette ou timer (74153)*/
 	{
@@ -374,9 +378,9 @@ WRITE8_MEMBER(hec2hrp_state::hector_color_b_w)
 READ8_MEMBER(hec2hrp_state::hector_io_8255_r)
 {
 	/* 8255 in mode 0 */
-	UINT8 data =0;
-	UINT8 data_l=0;
-	UINT8 data_h=0;
+	uint8_t data =0;
+	uint8_t data_l=0;
+	uint8_t data_h=0;
 
 
 	if ((offset & 0x3) == 0x0) /* Port A */
@@ -710,7 +714,7 @@ void hec2hrp_state::Init_Value_SN76477_Hector()
 	m_ValMixer = 0;
 }
 
-void hec2hrp_state::Update_Sound(address_space &space, UINT8 data)
+void hec2hrp_state::Update_Sound(address_space &space, uint8_t data)
 {
 	/* keep device*/
 	/* MIXER*/
@@ -799,7 +803,7 @@ static DISCRETE_SOUND_START( hec2hrp )
 	DISCRETE_OUTPUT(NODE_01, 5000)
 DISCRETE_SOUND_END
 
-MACHINE_CONFIG_FRAGMENT( hector_audio )
+MACHINE_CONFIG_START( hector_audio )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)  /* Sound level for cassette, as it is in mono => output channel=0*/
@@ -832,7 +836,7 @@ MACHINE_CONFIG_END
     15/02/2010 : Start of the disc2 project! JJStacino
     26/09/2010 : first sending with bug2 (the first "dir" command finih with a crash of the Z80 disc II proc) JJStacino
     01/11/2010 : first time ending boot sequence, probleme on the CP/M lauch JJStacino
-    20/11/2010 : synchronization between uPD765 and Z80 are now OK, CP/M runnig! JJStacino
+    20/11/2010 : synchronization between uPD765 and Z80 are now OK, CP/M running! JJStacino
     28/11/2010 : Found at Bratislava that the disk writing with TRANS X: is NOT WORKING (the exchange Hector=>Disc2 ok)
 */
 

@@ -327,7 +327,7 @@ struct galaga_state::star galaga_state::m_star_seed_tab[252]=
 
 PALETTE_INIT_MEMBER(galaga_state,galaga)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 	/* core palette */
@@ -430,7 +430,7 @@ TILE_GET_INFO_MEMBER(galaga_state::get_tile_info)
 
 VIDEO_START_MEMBER(galaga_state,galaga)
 {
-	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(galaga_state::get_tile_info),this),tilemap_mapper_delegate(FUNC(galaga_state::tilemap_scan),this),8,8,36,28);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(galaga_state::get_tile_info),this),tilemap_mapper_delegate(FUNC(galaga_state::tilemap_scan),this),8,8,36,28);
 	m_fg_tilemap->configure_groups(*m_gfxdecode->gfx(0), 0x1f);
 
 	m_galaga_gfxbank = 0;
@@ -455,9 +455,9 @@ WRITE8_MEMBER(galaga_state::galaga_videoram_w)
 	m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_MEMBER(galaga_state::gatsbee_bank_w)
+WRITE_LINE_MEMBER(galaga_state::gatsbee_bank_w)
 {
-	m_galaga_gfxbank = data & 0x1;
+	m_galaga_gfxbank = state;
 	m_fg_tilemap->mark_all_dirty();
 }
 
@@ -471,9 +471,9 @@ WRITE8_MEMBER(galaga_state::gatsbee_bank_w)
 
 void galaga_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	UINT8 *spriteram = m_galaga_ram1 + 0x380;
-	UINT8 *spriteram_2 = m_galaga_ram2 + 0x380;
-	UINT8 *spriteram_3 = m_galaga_ram3 + 0x380;
+	uint8_t *spriteram = m_galaga_ram1 + 0x380;
+	uint8_t *spriteram_2 = m_galaga_ram2 + 0x380;
+	uint8_t *spriteram_3 = m_galaga_ram3 + 0x380;
 	int offs;
 
 
@@ -524,14 +524,14 @@ void galaga_state::draw_stars(bitmap_ind16 &bitmap, const rectangle &cliprect )
 	/* draw the stars */
 
 	/* $a005 controls the stars ON/OFF */
-	if ( (m_galaga_starcontrol[5] & 1) == 1 )
+	if ( m_videolatch->q5_r() == 1 )
 	{
 		int star_cntr;
 		int set_a, set_b;
 
 		/* two sets of stars controlled by these bits */
-		set_a = (m_galaga_starcontrol[3] & 1);
-		set_b = (m_galaga_starcontrol[4] & 1) | 2;
+		set_a = m_videolatch->q3_r();
+		set_b = m_videolatch->q4_r() | 2;
 
 		for (star_cntr = 0;star_cntr < MAX_STARS ;star_cntr++)
 		{
@@ -551,7 +551,7 @@ void galaga_state::draw_stars(bitmap_ind16 &bitmap, const rectangle &cliprect )
 	}
 }
 
-UINT32 galaga_state::screen_update_galaga(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t galaga_state::screen_update_galaga(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->black_pen(), cliprect);
 	draw_stars(bitmap,cliprect);
@@ -562,7 +562,7 @@ UINT32 galaga_state::screen_update_galaga(screen_device &screen, bitmap_ind16 &b
 
 
 
-void galaga_state::screen_eof_galaga(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(galaga_state::screen_vblank_galaga)
 {
 	// falling edge
 	if (!state)
@@ -571,9 +571,9 @@ void galaga_state::screen_eof_galaga(screen_device &screen, bool state)
 		int s0,s1,s2;
 		static const int speeds[8] = { -1, -2, -3, 0, 3, 2, 1, 0 };
 
-		s0 = (m_galaga_starcontrol[0] & 1);
-		s1 = (m_galaga_starcontrol[1] & 1);
-		s2 = (m_galaga_starcontrol[2] & 1);
+		s0 = m_videolatch->q0_r();
+		s1 = m_videolatch->q1_r();
+		s2 = m_videolatch->q2_r();
 
 		m_stars_scrollx += speeds[s0 + s1*2 + s2*4];
 	}

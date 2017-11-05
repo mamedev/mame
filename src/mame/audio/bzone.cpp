@@ -25,6 +25,9 @@ D0  explosion enable        gates a noise generator
 #include "sound/discrete.h"
 #include "sound/pokey.h"
 
+#include "speaker.h"
+
+
 /* This sets an amount of gain boost to apply to the final signal
  * that will drive it into clipping.  The slider is ajusted by the
  * reverse factor, so that the final result is not clipped.
@@ -394,7 +397,7 @@ WRITE8_MEMBER(bzone_state::bzone_sounds_w)
 }
 
 
-MACHINE_CONFIG_FRAGMENT( bzone_audio )
+MACHINE_CONFIG_START( bzone_audio )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

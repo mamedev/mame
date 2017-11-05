@@ -30,6 +30,7 @@
 
 #include "emu.h"
 #include "cpu/h8/h83008.h"
+#include "screen.h"
 
 #define HACK_ENABLED 0
 
@@ -41,14 +42,14 @@ public:
 			m_maincpu(*this, "maincpu")
 	{ }
 
-	UINT32 screen_update_bowltry(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_bowltry(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	int m_test_x;
 	int m_test_y;
 	int m_start_offs;
 #if HACK_ENABLED
 	DECLARE_READ16_MEMBER(hack_r);
 	DECLARE_WRITE16_MEMBER(hack_w);
-	UINT16 m_hack[2];
+	uint16_t m_hack[2];
 #endif
 
 protected:
@@ -86,14 +87,14 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( bowltry )
 INPUT_PORTS_END
 
-UINT32 bowltry_state::screen_update_bowltry(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t bowltry_state::screen_update_bowltry(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
 
 
 
-static MACHINE_CONFIG_START( bowltry, bowltry_state )
+static MACHINE_CONFIG_START( bowltry )
 	MCFG_CPU_ADD("maincpu", H83008, 16000000 )
 	MCFG_CPU_PROGRAM_MAP( bowltry_map )
 //  MCFG_CPU_VBLANK_INT_DRIVER("screen", bowltry_state,  irq0_line_hold) // uses vector $64, IMIAB according to the manual (timer/compare B, internal to the CPU)
@@ -125,4 +126,4 @@ ROM_START( bowltry )
 ROM_END
 
 
-GAME( 200?, bowltry,    0,          bowltry,  bowltry, driver_device,  0, ROT0, "Atlus",        "Bowling Try",MACHINE_IS_SKELETON )
+GAME( 200?, bowltry,    0,          bowltry,  bowltry, bowltry_state,  0, ROT0, "Atlus",        "Bowling Try",MACHINE_IS_SKELETON )

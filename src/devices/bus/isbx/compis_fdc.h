@@ -6,12 +6,11 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_ISBX_COMPIS_FDC_H
+#define MAME_BUS_ISBX_COMPIS_FDC_H
+
 #pragma once
 
-#ifndef __COMPIS_FDC__
-#define __COMPIS_FDC__
-
-#include "emu.h"
 #include "isbx.h"
 #include "formats/cpis_dsk.h"
 #include "machine/upd765.h"
@@ -29,29 +28,29 @@ class compis_fdc_device : public device_t,
 {
 public:
 	// construction/destruction
-	compis_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
-	DECLARE_WRITE_LINE_MEMBER( fdc_irq );
-	DECLARE_WRITE_LINE_MEMBER( fdc_drq );
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	compis_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+
 	// device_isbx_card_interface overrides
-	virtual UINT8 mcs0_r(address_space &space, offs_t offset) override;
-	virtual void mcs0_w(address_space &space, offs_t offset, UINT8 data) override;
-	virtual UINT8 mdack_r(address_space &space, offs_t offset) override;
-	virtual void mdack_w(address_space &space, offs_t offset, UINT8 data) override;
+	virtual uint8_t mcs0_r(address_space &space, offs_t offset) override;
+	virtual void mcs0_w(address_space &space, offs_t offset, uint8_t data) override;
+	virtual uint8_t mdack_r(address_space &space, offs_t offset) override;
+	virtual void mdack_w(address_space &space, offs_t offset, uint8_t data) override;
 	virtual void opt0_w(int state) override;
 	virtual void opt1_w(int state) override;
 
 private:
+	DECLARE_WRITE_LINE_MEMBER( fdc_irq );
+	DECLARE_WRITE_LINE_MEMBER( fdc_drq );
+	DECLARE_FLOPPY_FORMATS( floppy_formats );
+
 	required_device<i8272a_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
@@ -59,7 +58,7 @@ private:
 
 
 // device type definition
-extern const device_type COMPIS_FDC;
+DECLARE_DEVICE_TYPE(COMPIS_FDC, compis_fdc_device)
 
 
-#endif
+#endif // MAME_BUS_ISBX_COMPIS_FDC_H

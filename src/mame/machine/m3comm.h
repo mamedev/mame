@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:MetalliC
-#pragma once
+#ifndef MAME_MACHINE_M3COMM_H
+#define MAME_MACHINE_M3COMM_H
 
-#ifndef __M3COMM_H__
-#define __M3COMM_H__
+#pragma once
 
 #include "machine/ram.h"
 #include "cpu/m68000/m68000.h"
@@ -19,13 +19,7 @@ class m3comm_device : public device_t
 {
 public:
 	// construction/destruction
-	m3comm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
-	required_shared_ptr<UINT16> m68k_ram;
-	required_device<m68000_device> m_commcpu;
+	m3comm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_ADDRESS_MAP(m3_map, 32);
 
@@ -48,24 +42,24 @@ public:
 protected:
 	enum { TIMER_IRQ5 = 1 };
 
-	required_device<ram_device> m_ram;
-
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_reset_after_children() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-private:
-	UINT16 naomi_control;
-	UINT16 naomi_offset;
-	UINT16 m_status0;
-	UINT16 m_status1;
-	UINT16 m_commbank;
+	virtual void device_add_mconfig(machine_config &config) override;
 
-	UINT16 recv_offset;
-	UINT16 recv_size;
-	UINT16 send_offset;
-	UINT16 send_size;
+private:
+	uint16_t naomi_control;
+	uint16_t naomi_offset;
+	uint16_t m_status0;
+	uint16_t m_status1;
+	uint16_t m_commbank;
+
+	uint16_t recv_offset;
+	uint16_t recv_size;
+	uint16_t send_offset;
+	uint16_t send_size;
 
 
 	emu_file m_line_rx;    // rx line - can be either differential, simple serial or toslink
@@ -74,9 +68,13 @@ private:
 	char m_remotehost[256];
 
 	emu_timer *timer;
+
+	required_shared_ptr<uint16_t> m68k_ram;
+	required_device<m68000_device> m_commcpu;
+	required_device<ram_device> m_ram;
 };
 
 // device type definition
-extern const device_type M3COMM;
+DECLARE_DEVICE_TYPE(M3COMM, m3comm_device)
 
-#endif  /* __M3COMM_H__ */
+#endif  // MAME_MACHINE_M3COMM_H

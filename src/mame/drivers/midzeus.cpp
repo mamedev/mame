@@ -31,13 +31,13 @@ The Grid         v1.2   10/18/2000
 #include "cpu/adsp2100/adsp2100.h"
 #include "cpu/pic16c5x/pic16c5x.h"
 #include "includes/midzeus.h"
-#include "includes/midzeus2.h"
 #include "machine/midwayic.h"
 #include "audio/dcs.h"
 #include "machine/nvram.h"
 
 #include "crusnexo.lh"
 
+#define LOG_FW        (0)
 
 #define CPU_CLOCK       XTAL_60MHz
 
@@ -45,21 +45,39 @@ The Grid         v1.2   10/18/2000
 #define BEAM_DX         3
 #define BEAM_XOFFS      40      /* table in the code indicates an offset of 20 with a beam height of 7 */
 
-static UINT32           gun_control;
-static UINT8            gun_irq_state;
+static uint32_t           gun_control;
+static uint8_t            gun_irq_state;
 static emu_timer *      gun_timer[2];
-static INT32            gun_x[2], gun_y[2];
+static int32_t            gun_x[2], gun_y[2];
 
-static UINT8            crusnexo_leds_select;
-static UINT8            keypad_select;
-static UINT8            bitlatch[10];
+static uint8_t            crusnexo_leds_select;
+static uint8_t            keypad_select;
+static uint32_t           disk_asic[0x10];
+static uint32_t           disk_asic_jr[0x10];
 
-static UINT8 cmos_protected;
+static uint8_t cmos_protected;
 
 
 static emu_timer *timer[2];
 
 
+/*************************************************************************
+Driver for Midway Zeus2 games
+**************************************************************************/
+#include "video/zeus2.h"
+
+class midzeus2_state : public midzeus_state
+{
+public:
+	midzeus2_state(const machine_config &mconfig, device_type type, const char *tag)
+		: midzeus_state(mconfig, type, tag), m_zeus(*this, "zeus2") { }
+	required_device<zeus2_device> m_zeus;
+
+	DECLARE_WRITE_LINE_MEMBER(zeus_irq);
+	DECLARE_READ32_MEMBER(zeus2_timekeeper_r);
+	DECLARE_WRITE32_MEMBER(zeus2_timekeeper_w);
+private:
+};
 
 
 
@@ -71,11 +89,13 @@ static emu_timer *timer[2];
 
 MACHINE_START_MEMBER(midzeus_state,midzeus)
 {
-	timer[0] = machine().scheduler().timer_alloc(FUNC_NULL);
-	timer[1] = machine().scheduler().timer_alloc(FUNC_NULL);
+	timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate());
+	timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate());
 
-	gun_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(midzeus_state::invasn_gun_callback),this));
-	gun_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(midzeus_state::invasn_gun_callback),this));
+	gun_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(midzeus_state::invasn_gun_callback), this));
+	gun_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(midzeus_state::invasn_gun_callback), this));
+
+	m_display_irq_off_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(midzeus_state::display_irq_off), this));
 
 	save_item(NAME(gun_control));
 	save_item(NAME(gun_irq_state));
@@ -92,7 +112,10 @@ MACHINE_RESET_MEMBER(midzeus_state,midzeus)
 	*m_ram_base <<= 1;
 	m_maincpu->reset();
 
-	cmos_protected = TRUE;
+	cmos_protected = true;
+	memset(disk_asic_jr, 0x0, 0x10 * 4);
+	disk_asic_jr[6] = 0xa0; // Rev3 Athens
+	memset(disk_asic, 0x0, 0x10 * 4);
 }
 
 
@@ -111,9 +134,13 @@ TIMER_CALLBACK_MEMBER(midzeus_state::display_irq_off)
 INTERRUPT_GEN_MEMBER(midzeus_state::display_irq)
 {
 	device.execute().set_input_line(0, ASSERT_LINE);
-	machine().scheduler().timer_set(attotime::from_hz(30000000), timer_expired_delegate(FUNC(midzeus_state::display_irq_off),this));
+	m_display_irq_off_timer->adjust(attotime::from_hz(30000000));
 }
 
+WRITE_LINE_MEMBER(midzeus2_state::zeus_irq)
+{
+	m_maincpu->set_input_line(2, ASSERT_LINE);
+}
 
 
 /*************************************
@@ -124,11 +151,11 @@ INTERRUPT_GEN_MEMBER(midzeus_state::display_irq)
 
 WRITE32_MEMBER(midzeus_state::cmos_w)
 {
-	if (bitlatch[2] && !cmos_protected)
+	if (disk_asic_jr[2] && !cmos_protected)
 		COMBINE_DATA(&m_nvram[offset]);
 	else
-		logerror("%06X:timekeeper_w with bitlatch[2] = %d, cmos_protected = %d\n", space.device().safe_pc(), bitlatch[2], cmos_protected);
-	cmos_protected = TRUE;
+		logerror("%06X:timekeeper_w with disk_asic_jr[2] = %d, cmos_protected = %d\n", space.device().safe_pc(), disk_asic_jr[2], cmos_protected);
+	cmos_protected = true;
 }
 
 
@@ -140,7 +167,7 @@ READ32_MEMBER(midzeus_state::cmos_r)
 
 WRITE32_MEMBER(midzeus_state::cmos_protect_w)
 {
-	cmos_protected = FALSE;
+	cmos_protected = false;
 }
 
 
@@ -152,18 +179,18 @@ WRITE32_MEMBER(midzeus_state::cmos_protect_w)
  *
  *************************************/
 
-READ32_MEMBER(midzeus_state::zeus2_timekeeper_r)
+READ32_MEMBER(midzeus2_state::zeus2_timekeeper_r)
 {
 	return m_m48t35->read(space, offset, 0xff) | 0xffffff00;
 }
 
-WRITE32_MEMBER(midzeus_state::zeus2_timekeeper_w)
+WRITE32_MEMBER(midzeus2_state::zeus2_timekeeper_w)
 {
-	if (bitlatch[2] && !cmos_protected)
+	if (disk_asic_jr[2] && !cmos_protected)
 		m_m48t35->write(space, offset, data, 0xff);
 	else
-		logerror("%s:zeus2_timekeeper_w with bitlatch[2] = %d, cmos_protected = %d\n", machine().describe_context(), bitlatch[2], cmos_protected);
-	cmos_protected = TRUE;
+		logerror("%s:zeus2_timekeeper_w with disk_asic_jr[2] = %d, cmos_protected = %d\n", machine().describe_context(), disk_asic_jr[2], cmos_protected);
+	cmos_protected = true;
 }
 
 
@@ -175,114 +202,198 @@ READ32_MEMBER(midzeus_state::zpram_r)
 
 WRITE32_MEMBER(midzeus_state::zpram_w)
 {
-	if (bitlatch[2])
+	if (disk_asic_jr[2])
 		COMBINE_DATA(&m_nvram[offset]);
 	else
-		logerror("%06X:zpram_w with bitlatch[2] = %d\n", space.device().safe_pc(), bitlatch[2]);
+		logerror("%06X:zpram_w with disk_asic_jr[2] = %d\n", space.device().safe_pc(), disk_asic_jr[2]);
 }
 
 
 
 /*************************************
- *
- *  Miscellaneous bit latches
- *
- *************************************/
-
-READ32_MEMBER(midzeus_state::bitlatches_r)
+*
+*  Disk ASIC registers
+*
+*************************************/
+READ32_MEMBER(midzeus_state::disk_asic_r)
 {
+	uint32_t retVal = disk_asic[offset];
 	switch (offset)
 	{
-		/* unknown purpose; two bits are apparently used */
+		// Sys Control
+		// Bit 0: zeus reset
+		// Bit 3: io reset
+		// Bit 15:8 Version
+		case 0:
+			retVal = (retVal & 0xffff00ff) | 0x3300;
+			break;
+		// Interrupt Status / Control
+		// 0x004: IFIFO Interrupt
+		// 0x200: Firewire
 		case 1:
-			return bitlatch[offset] | ~3;
-
-		/* CMOS/ZPRAM extra enable latch; only low bit is used */
+			retVal = 0x0;
+			break;
+		// Test
 		case 2:
-			return bitlatch[offset] | ~1;
-
-		/* unknown purpose; mk4/invasn/thegrid read at startup; invasn freaks if it is 1 at startup */
-		/* only low bit is used */
+			break;
+		// Wait State Config
 		case 3:
-			return bitlatch[offset] | ~1;
-
-		/* ROM bank selection on Zeus 2; two bits are used */
+			break;
+		// IDE Config
+		case 4:
+			break;
+		// PSRAM Config
 		case 5:
-			return bitlatch[offset] | ~3;
-
-		/* unknown purpose; crusnexo reads at startup: if (val & 0xf0) == 0xa0 it affects */
-		/* how the Zeus is used (reg 0x5d is set to 0x54580006) */
-		/* thegrid does the same, writing either 0xD4580006 or 0xC4180006 depending */
-		/* this is the value reported as DISK JR ASIC version in thegrid startup test */
-		case 6:
-			return 0xa0 | ~0xff;
-
-		/* unknown purpose */
+			break;
+		// Unknown
 		default:
-			logerror("%06X:bitlatches_r(%X)\n", space.device().safe_pc(), offset);
+			logerror("%06X:disk_asic_r(%X) Unknown\n", space.device().safe_pc(), offset);
 			break;
 	}
-	return ~0;
+	return retVal;
 }
 
 
-WRITE32_MEMBER(midzeus_state::bitlatches_w)
+WRITE32_MEMBER(midzeus_state::disk_asic_w)
 {
-	UINT32 oldval = bitlatch[offset];
-	bitlatch[offset] = data;
+	disk_asic[offset] = data;
 
 	switch (offset)
 	{
+		// Sys Control
+		// Bit 0: zeus reset
+		// Bit 3: io reset
+		case 0:
+			break;
+		// Interrupt Status / Control
+		// 0x004: IFIFO Interrupt
+		// 0x200: Enable Firewire interrupt
+		case 1:
+			break;
+		// Test
+		case 2:
+			break;
+		// Wait State Config
+		case 3:
+			break;
+		// IDE Config
+		case 4:
+			break;
+		// PSRAM Config
+		case 5:
+			break;
+		// Unknown
+		default:
+			logerror("%06X:disk_asic_w(%X)=%08X Unknown\n", space.device().safe_pc(), offset, data);
+			break;
+	}
+}
+
+/*************************************
+ *
+ *  Disk ASIC JR registers
+ *
+ *************************************/
+READ32_MEMBER(midzeus_state::disk_asic_jr_r)
+{
+	uint32_t retVal = disk_asic_jr[offset];
+	switch (offset)
+	{
+		// miscelaneous hw wait states
+		case 1:
+			break;
+		/* CMOS/ZPRAM write enable; only low bit is used */
+		case 2:
+			break;
+			//  return disk_asic_jr[offset] | ~1;
+
+		/* reset status; bit 0 is watchdog reset; mk4/invasn/thegrid read at startup; invasn freaks if it is 1 at startup */
+		case 3:
+			break;
+		//  return disk_asic_jr[offset] | ~1;
+
+		/* ROM bank selection on Zeus 2; two bits are used */
+		case 5:
+		//  return disk_asic_jr[offset] | ~3;
+
+		/* disk asic jr id; crusnexo reads at startup: if (val & 0xf0) == 0xa0 it affects */
+		/* how the Zeus is used (reg 0x5d is set to 0x54580006) */
+		/* thegrid does the same, writing either 0xD4580006 or 0xC4180006 depending */
+		/* this is the value reported as DISK JR ASIC version in thegrid startup test */
+		// Set in reset
+		// a0 = Rev3 Athens
+		// 90 = Rev2 Athens
+		case 6:
+			break;
+
 		/* unknown purpose */
 		default:
-			if (oldval ^ data)
-				logerror("%06X:bitlatches_w(%X) = %X\n", space.device().safe_pc(), offset, data);
+			logerror("%06X:disk_asic_jr_r(%X)\n", space.device().safe_pc(), offset);
 			break;
+	}
+	return retVal;
+}
 
-		/* unknown purpose; crusnexo toggles this between 0 and 1 every 20 frames; thegrid writes 1 */
+
+WRITE32_MEMBER(midzeus_state::disk_asic_jr_w)
+{
+	//uint32_t oldval = disk_asic_jr[offset];
+	disk_asic_jr[offset] = data;
+
+	switch (offset)
+	{
+		/* disk asic jr led; crusnexo toggles this between 0 and 1 every 20 frames; thegrid writes 1 */
 		case 0:
 			if (data != 0 && data != 1)
-				logerror("%06X:bitlatches_w(%X) = %X (unexpected)\n", space.device().safe_pc(), offset, data);
+				logerror("%06X:disk_asic_jr_w(%X) = %X (unexpected)\n", space.device().safe_pc(), offset, data);
 			break;
 
-		/* unknown purpose; mk4/invasn write 1 here at initialization; crusnexo/thegrid write 3 */
+		/* miscellaneous hardware wait states; mk4/invasn write 1 here at initialization; crusnexo/thegrid write 3 */
 		case 1:
 			if (data != 1 && data != 3)
-				logerror("%06X:bitlatches_w(%X) = %X (unexpected)\n", space.device().safe_pc(), offset, data);
+				logerror("%06X:disk_asic_jr_w(%X) = %X (unexpected)\n", space.device().safe_pc(), offset, data);
 			break;
 
-		/* CMOS/ZPRAM extra enable latch; only low bit is used */
+		/* CMOS/ZPRAM write enable; only low bit is used */
 		case 2:
+			break;
+
+		/* reset status; bit 0 is watchdog reset; mk4/invasn/thegrid read at startup; invasn freaks if it is 1 at startup */
+		case 3:
 			break;
 
 		/* unknown purpose; invasn writes 2 here at startup */
 		case 4:
 			if (data != 2)
-				logerror("%06X:bitlatches_w(%X) = %X (unexpected)\n", space.device().safe_pc(), offset, data);
+				logerror("%06X:disk_asic_jr_w(%X) = %X (unexpected)\n", space.device().safe_pc(), offset, data);
 			break;
 
 		/* ROM bank selection on Zeus 2 */
 		case 5:
-			membank("bank1")->set_entry(bitlatch[offset] & 3);
+			membank("bank1")->set_entry(disk_asic_jr[offset] & 3);
 			break;
 
-		/* unknown purpose; crusnexo/thegrid write 1 at startup */
+		/* zeus2 ws; 0=zeus access 1 wait state, 2=unlock roms; crusnexo/thegrid write 1 at startup */
 		case 7:
-			if (data != 1)
-				logerror("%06X:bitlatches_w(%X) = %X (unexpected)\n", space.device().safe_pc(), offset, data);
 			break;
 
-		/* unknown purpose; crusnexo writes 4 at startup; thegrid writes 6 */
+		/* romsize; crusnexo writes 4 at startup; thegrid writes 6 */
 		case 8:
 			if (data != 4 && data != 6)
-				logerror("%06X:bitlatches_w(%X) = %X (unexpected)\n", space.device().safe_pc(), offset, data);
+				logerror("%06X:disk_asic_jr_w(%X) = %X (unexpected)\n", space.device().safe_pc(), offset, data);
 			break;
 
-		/* unknown purpose; thegrid writes 1 at startup */
+		/* trackball reset; thegrid writes 1 at startup */
 		case 9:
 			if (data != 1)
-				logerror("%06X:bitlatches_w(%X) = %X (unexpected)\n", space.device().safe_pc(), offset, data);
+				logerror("%06X:disk_asic_jr_w(%X) = %X (unexpected)\n", space.device().safe_pc(), offset, data);
 			break;
+		/* unknown purpose */
+		default:
+			//if (oldval ^ data)
+				logerror("%06X:disk_asic_jr_w(%X) = %X\n", space.device().safe_pc(), offset, data);
+			break;
+
 	}
 }
 
@@ -338,27 +449,75 @@ WRITE32_MEMBER(midzeus_state::crusnexo_leds_w)
 
 /*************************************
  *
- *  Link controller access (Zeus 2 only)
+ *  Firewwire access (Zeus 2 only)
  *
  *************************************/
-
-// read 8d0003, check bit 1, skip some stuff if 0
-// write junk to 9e0000
-
-READ32_MEMBER(midzeus_state::linkram_r)
+READ32_MEMBER(midzeus_state::firewire_r)
 {
-	logerror("%06X:unknown_8a000_r(%02X)\n", space.device().safe_pc(), offset);
-	if (offset == 0)
-		return 0x30313042;
-	else if (offset == 0x3c)
-		return 0xffffffff;
-	return m_linkram[offset];
+	uint32_t retVal = 0;
+	if (offset < 0x40)
+		retVal = m_firewire[offset / 4];
+
+	switch (offset) {
+	case 0:
+		// Version
+		retVal = 0x30313042;
+		break;
+	case 0x0c:
+		// Interrupt
+		retVal = 0xf4000000;// &m_firewire[0x10 / 4];
+		break;
+	case 0x30:
+		// Asynchronous Transmit FIFO Status
+		// 8:0 space available
+		retVal = 0x1ff;
+		break;
+	case 0x3c:
+		// General Rx FIFO Status
+		// 0x80000000 = Empty
+		// 0x40000000 = Control Data
+		// 0x20000000 = Packet Complete
+		retVal = 0x80000000;
+		break;
+	case 0xc0:
+		// General Rx FIFO
+		retVal = 0x0;
+		break;
+	}
+	if LOG_FW logerror("%06X:firewire_r(%02X)=%08X\n", space.device().safe_pc(), offset, retVal);
+	return retVal;
 }
 
-WRITE32_MEMBER(midzeus_state::linkram_w)
+WRITE32_MEMBER(midzeus_state::firewire_w)
 {
-	logerror("%06X:unknown_8a000_w(%02X) = %08X\n", space.device().safe_pc(),  offset, data);
-	COMBINE_DATA(&m_linkram[offset]);
+	// 0x08 // Control
+	// Bit 0: Flush bad packets from Rx FIFO
+	// Bit 6: IRP2En
+	// Bit 7: IRP1En
+	// Bit 8: TrgEn
+	// Bit 20: Reset Rx
+	// Bit 21: Reset Tx
+	// Bit 22: Enable Acknowledge
+	// Bit 23: Iso Rx Enable
+	// Bit 24: Iso Rx Enable
+	// Bit 25: Async Rx Enable
+	// Bit 26: Async Tx Enable
+	// Bit 30: Rx Self ID packets
+	// Bit 31: Rx Packets adddressed to phy
+	// 0x00200000 Reset Tx
+	// 0x00100000 Reset Rx
+	// 0x1c // FIFO Control
+	// Bit 0:8: ITF Size
+	// Bit 9:17: ATF Size
+	// Bit 18:26 Trigger Size
+	// Bit 29: Clear GRF
+	// Bit 32: Clear ATF
+	// 0x20 // Diagnostics
+	// Bit 31: Enable Snooping
+
+	if (offset < 0x40)
+		COMBINE_DATA(&m_firewire[offset / 4]);
+	if LOG_FW logerror("%06X:firewire_w(%02X) = %08X\n", space.device().safe_pc(),  offset, data);
 }
 
 
@@ -376,7 +535,7 @@ READ32_MEMBER(midzeus_state::tms32031_control_r)
 	{
 		/* timer is clocked at 100ns */
 		int which = (offset >> 4) & 1;
-		INT32 result = (timer[which]->elapsed() * 10000000).as_double();
+		int32_t result = (timer[which]->elapsed() * 10000000).as_double();
 		return result;
 	}
 
@@ -417,7 +576,7 @@ WRITE32_MEMBER(midzeus_state::tms32031_control_w)
 
 CUSTOM_INPUT_MEMBER(midzeus_state::custom_49way_r)
 {
-	static const UINT8 translate49[7] = { 0x8, 0xc, 0xe, 0xf, 0x3, 0x1, 0x0 };
+	static const uint8_t translate49[7] = { 0x8, 0xc, 0xe, 0xf, 0x3, 0x1, 0x0 };
 	const char *namex = (const char *)param;
 	const char *namey = namex + strlen(namex) + 1;
 	return (translate49[ioport(namey)->read() >> 4] << 4) | translate49[ioport(namex)->read() >> 4];
@@ -433,14 +592,28 @@ WRITE32_MEMBER(midzeus_state::keypad_select_w)
 
 CUSTOM_INPUT_MEMBER(midzeus_state::keypad_r)
 {
-	UINT32 bits = ioport((const char *)param)->read();
-	UINT8 select = keypad_select;
+	uint32_t bits = ioport((const char *)param)->read();
+	uint8_t select = keypad_select;
 	while ((select & 1) != 0)
 	{
 		select >>= 1;
 		bits >>= 4;
 	}
 	return bits;
+}
+
+READ32_MEMBER(midzeus_state::grid_keypad_r)
+{
+	uint32_t bits = (ioport("KEYPAD")->read() >> ((offset >> 1) << 2)) & 0xf;
+	return bits;
+}
+
+READ32_MEMBER(midzeus_state::trackball_r)
+{
+	if (offset==0)
+		return ioport("TRACKY1")->read();
+	else
+		return ioport("TRACKX1")->read();
 }
 
 
@@ -495,13 +668,13 @@ TIMER_CALLBACK_MEMBER(midzeus_state::invasn_gun_callback)
 	/* generate another interrupt on the next scanline while we are within the BEAM_DY */
 	beamy++;
 	if (beamy <= m_screen->visible_area().max_y && beamy <= gun_y[player] + BEAM_DY)
-		gun_timer[player]->adjust(m_screen->time_until_pos(beamy, MAX(0, gun_x[player] - BEAM_DX)), player);
+		gun_timer[player]->adjust(m_screen->time_until_pos(beamy, std::max(0, gun_x[player] - BEAM_DX)), player);
 }
 
 
 WRITE32_MEMBER(midzeus_state::invasn_gun_w)
 {
-	UINT32 old_control = gun_control;
+	uint32_t old_control = gun_control;
 	int player;
 
 	COMBINE_DATA(&gun_control);
@@ -513,7 +686,7 @@ WRITE32_MEMBER(midzeus_state::invasn_gun_w)
 
 	for (player = 0; player < 2; player++)
 	{
-		UINT8 pmask = 0x04 << player;
+		uint8_t pmask = 0x04 << player;
 		if (((old_control ^ gun_control) & pmask) != 0 && (gun_control & pmask) == 0)
 		{
 			const rectangle &visarea = m_screen->visible_area();
@@ -524,7 +697,7 @@ WRITE32_MEMBER(midzeus_state::invasn_gun_w)
 			};
 			gun_x[player] = ioport(names[player][0])->read() * visarea.width() / 255 + visarea.min_x + BEAM_XOFFS;
 			gun_y[player] = ioport(names[player][1])->read() * visarea.height() / 255 + visarea.min_y;
-			gun_timer[player]->adjust(m_screen->time_until_pos(MAX(0, gun_y[player] - BEAM_DY), MAX(0, gun_x[player] - BEAM_DX)), player);
+			gun_timer[player]->adjust(m_screen->time_until_pos(std::max(0, gun_y[player] - BEAM_DY), std::max(0, gun_x[player] - BEAM_DX)), player);
 		}
 	}
 }
@@ -534,7 +707,7 @@ READ32_MEMBER(midzeus_state::invasn_gun_r)
 {
 	int beamx = m_screen->hpos();
 	int beamy = m_screen->vpos();
-	UINT32 result = 0xffff;
+	uint32_t result = 0xffff;
 	int player;
 
 	for (player = 0; player < 2; player++)
@@ -561,7 +734,7 @@ static ADDRESS_MAP_START( zeus_map, AS_PROGRAM, 32, midzeus_state )
 	AM_RANGE(0x400000, 0x41ffff) AM_RAM
 	AM_RANGE(0x808000, 0x80807f) AM_READWRITE(tms32031_control_r, tms32031_control_w) AM_SHARE("tms32031_ctl")
 	AM_RANGE(0x880000, 0x8803ff) AM_READWRITE(zeus_r, zeus_w) AM_SHARE("zeusbase")
-	AM_RANGE(0x8d0000, 0x8d0004) AM_READWRITE(bitlatches_r, bitlatches_w)
+	AM_RANGE(0x8d0000, 0x8d0009) AM_READWRITE(disk_asic_jr_r, disk_asic_jr_w)
 	AM_RANGE(0x990000, 0x99000f) AM_DEVREADWRITE("ioasic", midway_ioasic_device, read, write)
 	AM_RANGE(0x9e0000, 0x9e0000) AM_WRITENOP        // watchdog?
 	AM_RANGE(0x9f0000, 0x9f7fff) AM_READWRITE(cmos_r, cmos_w) AM_SHARE("nvram")
@@ -575,12 +748,13 @@ static ADDRESS_MAP_START( zeus2_map, AS_PROGRAM, 32, midzeus2_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_RAM AM_SHARE("ram_base")
 	AM_RANGE(0x400000, 0x43ffff) AM_RAM
 	AM_RANGE(0x808000, 0x80807f) AM_READWRITE(tms32031_control_r, tms32031_control_w) AM_SHARE("tms32031_ctl")
-	AM_RANGE(0x880000, 0x88007f) AM_READWRITE(zeus2_r, zeus2_w) AM_SHARE("zeusbase")
-	AM_RANGE(0x8a0000, 0x8a003f) AM_READWRITE(linkram_r, linkram_w) AM_SHARE("linkram")
-	AM_RANGE(0x8d0000, 0x8d000a) AM_READWRITE(bitlatches_r, bitlatches_w)
+	AM_RANGE(0x880000, 0x88007f) AM_DEVREADWRITE("zeus2", zeus2_device, zeus2_r, zeus2_w)
+	AM_RANGE(0x8a0000, 0x8a00cf) AM_READWRITE(firewire_r, firewire_w) AM_SHARE("firewire")
+	AM_RANGE(0x8d0000, 0x8d0009) AM_READWRITE(disk_asic_jr_r, disk_asic_jr_w)
 	AM_RANGE(0x900000, 0x91ffff) AM_READWRITE(zpram_r, zpram_w) AM_SHARE("nvram") AM_MIRROR(0x020000)
 	AM_RANGE(0x990000, 0x99000f) AM_DEVREADWRITE("ioasic", midway_ioasic_device, read, write)
 	AM_RANGE(0x9c0000, 0x9c000f) AM_READWRITE(analog_r, analog_w)
+	AM_RANGE(0x9d0000, 0x9d000f) AM_READWRITE(disk_asic_r, disk_asic_w)
 	AM_RANGE(0x9e0000, 0x9e0000) AM_WRITENOP        // watchdog?
 	AM_RANGE(0x9f0000, 0x9f7fff) AM_READWRITE(zeus2_timekeeper_r, zeus2_timekeeper_w)
 	AM_RANGE(0x9f8000, 0x9f8000) AM_WRITE(cmos_protect_w)
@@ -710,27 +884,27 @@ static INPUT_PORTS_START( mk4 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  ) PORT_PLAYER(1) PORT_8WAY
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_PLAYER(1) PORT_8WAY
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_8WAY
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 High Punch")
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("P1 Block")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 High Kick")
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    ) PORT_PLAYER(2) PORT_8WAY
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  ) PORT_PLAYER(2) PORT_8WAY
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_PLAYER(2) PORT_8WAY
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2) PORT_8WAY
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 High Punch")
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("P2 Block")
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 High Kick")
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1) PORT_NAME("P1 Low Punch")
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("P1 Low Kick")
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1) PORT_NAME("P1 Run")
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2) PORT_NAME("P2 Low Punch")
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2) PORT_NAME("P2 Low Kick")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2) PORT_NAME("P2 Run")
 	PORT_BIT( 0xff80, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -959,72 +1133,52 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( thegrid )
 	PORT_START("DIPS")      /* DS1 */
-	PORT_DIPNAME( 0x0001, 0x0001, "Show Blood" )
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) ) /* Manual states that switches 2-7 are Unused */
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x0100, 0x0100, "Show Blood" )
+	PORT_DIPSETTING(      0x0100, "Show Blood" )
+	PORT_DIPSETTING(      0x0000, "Do not show blood" )
+	PORT_DIPUNUSED( 0xfe00, 0xfe00)
+	PORT_DIPNAME( 0x0001, 0x0001, "Coinage Source" )
+	PORT_DIPSETTING(      0x0001, "Dipswitch" )
+	PORT_DIPSETTING(      0x0000, "CMOS" )
+	PORT_DIPNAME( 0x003e, 0x003e, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(      0x003e, "USA-1" )
+	PORT_DIPSETTING(      0x0038, "USA-2" )
+	PORT_DIPSETTING(      0x003c, "USA-10" )
+	PORT_DIPSETTING(      0x003a, "USA-14" )
+	PORT_DIPSETTING(      0x0036, "USA-DC1" )
+	PORT_DIPSETTING(      0x0030, "USA-DC2" )
+	PORT_DIPSETTING(      0x0032, "USA-DC4" )
+	PORT_DIPSETTING(      0x0034, "USA-DC5" )
+	PORT_DIPSETTING(      0x002e, "French-ECA1" )
+	PORT_DIPSETTING(      0x002c, "French-ECA2" )
+	PORT_DIPSETTING(      0x002a, "French-ECA3" )
+	PORT_DIPSETTING(      0x0028, "French-ECA4" )
+	PORT_DIPSETTING(      0x0026, "French-ECA5" )
+	PORT_DIPSETTING(      0x0024, "French-ECA6" )
+	PORT_DIPSETTING(      0x0022, "French-ECA7" )
+	PORT_DIPSETTING(      0x0020, "French-ECA8" )
+	PORT_DIPSETTING(      0x001e, "German-1" )
+	PORT_DIPSETTING(      0x001c, "German-2" )
+	PORT_DIPSETTING(      0x001a, "German-3" )
+	PORT_DIPSETTING(      0x0018, "German-4" )
+	PORT_DIPSETTING(      0x0016, "German-5" )
+	PORT_DIPSETTING(      0x0014, "German-ECA1" )
+	PORT_DIPSETTING(      0x0012, "German-ECA2" )
+	PORT_DIPSETTING(      0x0010, "German-ECA3" )
+	PORT_DIPSETTING(      0x0008, "UK-4" )
+	PORT_DIPSETTING(      0x0006, "UK-5" )
+	PORT_DIPSETTING(      0x000e, "UK-1 ECA" )
+	PORT_DIPSETTING(      0x000c, "UK-2 ECA" )
+	PORT_DIPSETTING(      0x000a, "UK-3 ECA" )
+	PORT_DIPSETTING(      0x0004, "UK-6 ECA" )
+	PORT_DIPSETTING(      0x0002, "UK-7 ECA" )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )  /* Manual states switches 7 & 8 are Unused */
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0100, 0x0100, "Coinage Source" )
-	PORT_DIPSETTING(      0x0100, "Dipswitch" )
-	PORT_DIPSETTING(      0x0000, "CMOS" )
-	PORT_DIPNAME( 0x3e00, 0x3e00, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(      0x3e00, "USA-1" )
-	PORT_DIPSETTING(      0x3800, "USA-2" )
-	PORT_DIPSETTING(      0x3c00, "USA-10" )
-	PORT_DIPSETTING(      0x3a00, "USA-14" )
-	PORT_DIPSETTING(      0x3600, "USA-DC1" )
-	PORT_DIPSETTING(      0x3000, "USA-DC2" )
-	PORT_DIPSETTING(      0x3200, "USA-DC4" )
-	PORT_DIPSETTING(      0x3400, "USA-DC5" )
-	PORT_DIPSETTING(      0x2e00, "French-ECA1" )
-	PORT_DIPSETTING(      0x2c00, "French-ECA2" )
-	PORT_DIPSETTING(      0x2a00, "French-ECA3" )
-	PORT_DIPSETTING(      0x2800, "French-ECA4" )
-	PORT_DIPSETTING(      0x2600, "French-ECA5" )
-	PORT_DIPSETTING(      0x2400, "French-ECA6" )
-	PORT_DIPSETTING(      0x2200, "French-ECA7" )
-	PORT_DIPSETTING(      0x2000, "French-ECA8" )
-	PORT_DIPSETTING(      0x1e00, "German-1" )
-	PORT_DIPSETTING(      0x1c00, "German-2" )
-	PORT_DIPSETTING(      0x1a00, "German-3" )
-	PORT_DIPSETTING(      0x1800, "German-4" )
-	PORT_DIPSETTING(      0x1600, "German-5" )
-	PORT_DIPSETTING(      0x1400, "German-ECA1" )
-	PORT_DIPSETTING(      0x1200, "German-ECA2" )
-	PORT_DIPSETTING(      0x1000, "German-ECA3" )
-	PORT_DIPSETTING(      0x0800, "UK-4" )
-	PORT_DIPSETTING(      0x0600, "UK-5" )
-	PORT_DIPSETTING(      0x0e00, "UK-1 ECA" )
-	PORT_DIPSETTING(      0x0c00, "UK-2 ECA" )
-	PORT_DIPSETTING(      0x0a00, "UK-3 ECA" )
-	PORT_DIPSETTING(      0x0400, "UK-6 ECA" )
-	PORT_DIPSETTING(      0x0200, "UK-7 ECA" )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )  /* Manual states switches 7 & 8 are Unused */
-	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, "Game Mode" )
+	PORT_DIPSETTING(      0x0080, "Normal" )
+	PORT_DIPSETTING(      0x0000, "Test" )
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -1066,10 +1220,31 @@ static INPUT_PORTS_START( thegrid )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("49WAYX")
-	PORT_BIT( 0xff, 0x38, IPT_AD_STICK_X ) PORT_MINMAX(0x00,0x6f) PORT_SENSITIVITY(100) PORT_KEYDELTA(10)
+	PORT_BIT( 0xff, 0x38, IPT_AD_STICK_X ) PORT_MINMAX(0x00,0x6f) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_REVERSE
 
 	PORT_START("49WAYY")
-	PORT_BIT( 0xff, 0x38, IPT_AD_STICK_Y ) PORT_MINMAX(0x00,0x6f) PORT_SENSITIVITY(100) PORT_KEYDELTA(10)
+	PORT_BIT( 0xff, 0x38, IPT_AD_STICK_Y ) PORT_MINMAX(0x00,0x6f) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_REVERSE
+
+	PORT_START("KEYPAD")
+	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_NAME("Keypad 1") PORT_CODE(KEYCODE_1_PAD)     /* keypad 1 */
+	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_NAME("Keypad 4") PORT_CODE(KEYCODE_4_PAD)     /* keypad 4 */
+	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_NAME("Keypad 7") PORT_CODE(KEYCODE_7_PAD)     /* keypad 7 */
+	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_NAME("Keypad *") PORT_CODE(KEYCODE_ASTERISK)  /* keypad * */
+	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_NAME("Keypad 2") PORT_CODE(KEYCODE_2_PAD)     /* keypad 2 */
+	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_NAME("Keypad 5") PORT_CODE(KEYCODE_5_PAD)     /* keypad 5 */
+	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_NAME("Keypad 8") PORT_CODE(KEYCODE_8_PAD)     /* keypad 8 */
+	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_NAME("Keypad 0") PORT_CODE(KEYCODE_0_PAD)     /* keypad 0 */
+	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_NAME("Keypad 3") PORT_CODE(KEYCODE_3_PAD)     /* keypad 3 */
+	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_NAME("Keypad 6") PORT_CODE(KEYCODE_6_PAD)     /* keypad 6 */
+	PORT_BIT(0x400, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_NAME("Keypad 9") PORT_CODE(KEYCODE_9_PAD)     /* keypad 9 */
+	PORT_BIT(0x800, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_NAME("Keypad #") PORT_CODE(KEYCODE_PLUS_PAD)  /* keypad # */
+
+	PORT_START("TRACKX1")
+	PORT_BIT(0xff, 0x00, IPT_TRACKBALL_X) PORT_SENSITIVITY(1) PORT_KEYDELTA(1) PORT_PLAYER(1)
+
+	PORT_START("TRACKY1")
+	PORT_BIT(0xff, 0x00, IPT_TRACKBALL_Y) PORT_SENSITIVITY(1) PORT_KEYDELTA(1) PORT_REVERSE PORT_PLAYER(1)
+
 INPUT_PORTS_END
 
 
@@ -1080,12 +1255,12 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( midzeus, midzeus_state )
+static MACHINE_CONFIG_START( midzeus )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS32032, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(zeus_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", midzeus_state,  display_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", midzeus_state, display_irq)
 
 	MCFG_MACHINE_START_OVERRIDE(midzeus_state,midzeus)
 	MCFG_MACHINE_RESET_OVERRIDE(midzeus_state,midzeus)
@@ -1115,26 +1290,19 @@ static MACHINE_CONFIG_DERIVED( mk4, midzeus )
 	MCFG_MIDWAY_IOASIC_SHUFFLE_DEFAULT(1)
 MACHINE_CONFIG_END
 
-READ_LINE_MEMBER(midzeus_state::PIC16C5X_T0_clk_r)
-{
-	return 0;
-}
-
-
 static MACHINE_CONFIG_DERIVED( invasn, midzeus )
 	MCFG_CPU_ADD("pic", PIC16C57, 8000000)  /* ? */
-	MCFG_PIC16C5x_T0_CB(READLINE(midzeus_state, PIC16C5X_T0_clk_r))
 
 	MCFG_DEVICE_MODIFY("ioasic")
 	MCFG_MIDWAY_IOASIC_UPPER(468/* or 488 */)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( midzeus2, midzeus2_state )
+static MACHINE_CONFIG_START( midzeus2 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS32032, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(zeus2_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", midzeus2_state,  display_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", midzeus2_state, display_irq)
 
 	MCFG_MACHINE_START_OVERRIDE(midzeus2_state,midzeus)
 	MCFG_MACHINE_RESET_OVERRIDE(midzeus2_state,midzeus)
@@ -1143,9 +1311,10 @@ static MACHINE_CONFIG_START( midzeus2, midzeus2_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MIDZEUS_VIDEO_CLOCK/4, 666, 0, 512, 438, 0, 400)
-	MCFG_SCREEN_UPDATE_DRIVER(midzeus2_state, screen_update_midzeus2)
+	MCFG_SCREEN_UPDATE_DEVICE("zeus2", zeus2_device, screen_update)
 
-	MCFG_VIDEO_START_OVERRIDE(midzeus2_state,midzeus2)
+	MCFG_DEVICE_ADD("zeus2", ZEUS2, ZEUS2_VIDEO_CLOCK)
+	MCFG_ZEUS2_IRQ_CB(WRITELINE(midzeus2_state, zeus_irq))
 
 	/* sound hardware */
 	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2104, 0)
@@ -1511,6 +1680,8 @@ DRIVER_INIT_MEMBER(midzeus_state,crusnexo)
 DRIVER_INIT_MEMBER(midzeus_state,thegrid)
 {
 	membank("bank1")->configure_entries(0, 3, memregion("user2")->base(), 0x400000*4);
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x8c0000, 0x8c0001, read32_delegate(FUNC(midzeus_state::trackball_r), this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x9b0000, 0x9b0004, read32_delegate(FUNC(midzeus_state::grid_keypad_r), this));
 }
 
 
@@ -1521,16 +1692,16 @@ DRIVER_INIT_MEMBER(midzeus_state,thegrid)
  *
  *************************************/
 
-GAME(  1997, mk4,      0,        mk4,      mk4,      midzeus_state, mk4,      ROT0, "Midway", "Mortal Kombat 4 (version 3.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME(  1997, mk4a,     mk4,      mk4,      mk4,      midzeus_state, mk4,      ROT0, "Midway", "Mortal Kombat 4 (version 2.1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME(  1997, mk4b,     mk4,      mk4,      mk4,      midzeus_state, mk4,      ROT0, "Midway", "Mortal Kombat 4 (version 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME(  1999, invasnab, 0,        invasn,   invasn,   midzeus_state, invasn,   ROT0, "Midway", "Invasion - The Abductors (version 5.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME(  1999, invasnab4,invasnab, invasn,   invasn,   midzeus_state, invasn,   ROT0, "Midway", "Invasion - The Abductors (version 4.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME(  1999, invasnab3,invasnab, invasn,   invasn,   midzeus_state, invasn,   ROT0, "Midway", "Invasion - The Abductors (version 3.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAMEL( 1999, crusnexo, 0,        crusnexo, crusnexo, midzeus_state, crusnexo, ROT0, "Midway", "Cruis'n Exotica (version 2.4)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_crusnexo )
-GAMEL( 1999, crusnexoa,crusnexo, crusnexo, crusnexo, midzeus_state, crusnexo, ROT0, "Midway", "Cruis'n Exotica (version 2.0)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_crusnexo )
-GAMEL( 1999, crusnexob,crusnexo, crusnexo, crusnexo, midzeus_state, crusnexo, ROT0, "Midway", "Cruis'n Exotica (version 1.6)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_crusnexo )
-GAMEL( 1999, crusnexoc,crusnexo, crusnexo, crusnexo, midzeus_state, crusnexo, ROT0, "Midway", "Cruis'n Exotica (version 1.3)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_crusnexo )
-GAMEL( 1999, crusnexod,crusnexo, crusnexo, crusnexo, midzeus_state, crusnexo, ROT0, "Midway", "Cruis'n Exotica (version 1.0)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_crusnexo )
-GAME(  2001, thegrid,  0,        thegrid,  thegrid,  midzeus_state, thegrid,  ROT0, "Midway", "The Grid (version 1.2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME(  2001, thegrida, thegrid,  thegrid,  thegrid,  midzeus_state, thegrid,  ROT0, "Midway", "The Grid (version 1.1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME(  1997, mk4,      0,        mk4,      mk4,      midzeus_state,  mk4,      ROT0, "Midway", "Mortal Kombat 4 (version 3.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME(  1997, mk4a,     mk4,      mk4,      mk4,      midzeus_state,  mk4,      ROT0, "Midway", "Mortal Kombat 4 (version 2.1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME(  1997, mk4b,     mk4,      mk4,      mk4,      midzeus_state,  mk4,      ROT0, "Midway", "Mortal Kombat 4 (version 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME(  1999, invasnab, 0,        invasn,   invasn,   midzeus_state,  invasn,   ROT0, "Midway", "Invasion - The Abductors (version 5.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME(  1999, invasnab4,invasnab, invasn,   invasn,   midzeus_state,  invasn,   ROT0, "Midway", "Invasion - The Abductors (version 4.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME(  1999, invasnab3,invasnab, invasn,   invasn,   midzeus_state,  invasn,   ROT0, "Midway", "Invasion - The Abductors (version 3.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAMEL( 1999, crusnexo, 0,        crusnexo, crusnexo, midzeus2_state, crusnexo, ROT0, "Midway", "Cruis'n Exotica (version 2.4)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_crusnexo )
+GAMEL( 1999, crusnexoa,crusnexo, crusnexo, crusnexo, midzeus2_state, crusnexo, ROT0, "Midway", "Cruis'n Exotica (version 2.0)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_crusnexo )
+GAMEL( 1999, crusnexob,crusnexo, crusnexo, crusnexo, midzeus2_state, crusnexo, ROT0, "Midway", "Cruis'n Exotica (version 1.6)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_crusnexo )
+GAMEL( 1999, crusnexoc,crusnexo, crusnexo, crusnexo, midzeus2_state, crusnexo, ROT0, "Midway", "Cruis'n Exotica (version 1.3)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_crusnexo )
+GAMEL( 1999, crusnexod,crusnexo, crusnexo, crusnexo, midzeus2_state, crusnexo, ROT0, "Midway", "Cruis'n Exotica (version 1.0)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_crusnexo )
+GAME(  2001, thegrid,  0,        thegrid,  thegrid,  midzeus2_state, thegrid,  ROT0, "Midway", "The Grid (version 1.2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME(  2001, thegrida, thegrid,  thegrid,  thegrid,  midzeus2_state, thegrid,  ROT0, "Midway", "The Grid (version 1.1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

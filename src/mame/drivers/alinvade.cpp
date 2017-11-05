@@ -22,7 +22,11 @@
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/discrete.h"
+#include "screen.h"
+#include "speaker.h"
+
 #include "alinvade.lh"
+
 
 class alinvade_state : public driver_device
 {
@@ -39,15 +43,15 @@ public:
 	DECLARE_WRITE8_MEMBER(sound_w);
 	DECLARE_WRITE8_MEMBER(sounden_w);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 private:
-	UINT8 m_irqmask;
-	UINT8 m_irqff;
+	uint8_t m_irqmask;
+	uint8_t m_irqff;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
-	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<uint8_t> m_videoram;
 	required_device<discrete_device> m_discrete;
 };
 
@@ -166,7 +170,7 @@ void alinvade_state::machine_reset()
 	m_irqmask = 1;
 }
 
-UINT32 alinvade_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t alinvade_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	offs_t offs;
 
@@ -174,13 +178,13 @@ UINT32 alinvade_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 	{
 		int i;
 
-		UINT8 x = (offs << 3)&0x7f;
+		uint8_t x = (offs << 3)&0x7f;
 		int y = (offs >> 4)&0x7f;
-		UINT8 data = m_videoram[offs];
+		uint8_t data = m_videoram[offs];
 
 		for (i = 0; i < 8; i++)
 		{
-			pen_t pen = (data & 0x01) ? rgb_t::white : rgb_t::black;
+			pen_t pen = (data & 0x01) ? rgb_t::white() : rgb_t::black();
 			bitmap.pix32(y, x) = pen;
 
 			data = data >> 1;
@@ -198,7 +202,7 @@ INTERRUPT_GEN_MEMBER(alinvade_state::vblank_irq)
 		m_maincpu->set_input_line(0,HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( alinvade, alinvade_state )
+static MACHINE_CONFIG_START( alinvade )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502,2000000)         /* ? MHz */
@@ -237,4 +241,4 @@ ROM_START( alinvade )
 ROM_END
 
 
-GAMEL( 198?, alinvade,  0,    alinvade, alinvade, driver_device,  0, ROT90, "Forbes?", "Alien Invaders", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_alinvade )
+GAMEL( 198?, alinvade,  0,    alinvade, alinvade, alinvade_state,  0, ROT90, "Forbes?", "Alien Invaders", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_alinvade )

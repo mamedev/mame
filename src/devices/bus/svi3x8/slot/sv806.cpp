@@ -6,14 +6,17 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "sv806.h"
+
+#include "screen.h"
 
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type SV806 = &device_creator<sv806_device>;
+DEFINE_DEVICE_TYPE(SV806, sv806_device, "sv806", "SV-806 80 Column Cartridge")
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
@@ -27,18 +30,17 @@ ROM_START( sv806 )
 	ROMX_LOAD("sv806se.ic27", 0x0000, 0x1000, CRC(daea8956) SHA1(3f16d5513ad35692488ae7d864f660e76c6e8ed3), ROM_BIOS(2))
 ROM_END
 
-const rom_entry *sv806_device::device_rom_region() const
+const tiny_rom_entry *sv806_device::device_rom_region() const
 {
 	return ROM_NAME( sv806 );
 }
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( sv806 )
-	MCFG_SCREEN_ADD_MONOCHROME("80col", RASTER, rgb_t::green)
+MACHINE_CONFIG_MEMBER( sv806_device::device_add_mconfig )
+	MCFG_SCREEN_ADD_MONOCHROME("80col", RASTER, rgb_t::green())
 	MCFG_SCREEN_RAW_PARAMS((XTAL_12MHz / 6) * 8, 864, 0, 640, 317, 0, 192)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", hd6845_device, screen_update)
 
@@ -50,11 +52,6 @@ static MACHINE_CONFIG_FRAGMENT( sv806 )
 	MCFG_MC6845_UPDATE_ROW_CB(sv806_device, crtc_update_row)
 MACHINE_CONFIG_END
 
-machine_config_constructor sv806_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( sv806 );
-}
-
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -64,15 +61,15 @@ machine_config_constructor sv806_device::device_mconfig_additions() const
 //  sv806_device - constructor
 //-------------------------------------------------
 
-sv806_device::sv806_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, SV806, "SV-806 80 Column Cartridge", tag, owner, clock, "sv806", __FILE__),
+sv806_device::sv806_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, SV806, tag, owner, clock),
 	device_svi_slot_interface(mconfig, *this),
 	m_crtc(*this, "crtc"),
 	m_palette(*this, "palette"),
 	m_gfx(*this, "gfx"),
 	m_ram_enabled(0)
 {
-	m_ram = std::make_unique<UINT8[]>(0x800);
+	m_ram = std::make_unique<uint8_t[]>(0x800);
 	memset(m_ram.get(), 0xff, 0x800);
 }
 
@@ -98,7 +95,7 @@ MC6845_UPDATE_ROW( sv806_device::crtc_update_row )
 
 	for (int i = 0; i < x_count; i++)
 	{
-		UINT8 data = m_gfx->u8((m_ram[(ma + i) & 0x7ff] << 4) | ra);
+		uint8_t data = m_gfx->as_u8((m_ram[(ma + i) & 0x7ff] << 4) | ra);
 
 		if (i == cursor_x)
 			data = 0xff;

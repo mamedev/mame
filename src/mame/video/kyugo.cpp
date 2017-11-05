@@ -47,8 +47,8 @@ void kyugo_state::video_start()
 {
 	m_color_codes = memregion("proms")->base() + 0x300;
 
-	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(kyugo_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(kyugo_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(kyugo_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(kyugo_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
 	m_fg_tilemap->set_transparent_pen(0);
 
@@ -127,9 +127,9 @@ WRITE8_MEMBER(kyugo_state::kyugo_scroll_y_w)
 }
 
 
-WRITE8_MEMBER(kyugo_state::kyugo_flipscreen_w)
+WRITE_LINE_MEMBER(kyugo_state::flipscreen_w)
 {
-	flip_screen_set(data & 0x01);
+	flip_screen_set(state);
 }
 
 
@@ -143,9 +143,9 @@ void kyugo_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect 
 {
 	/* sprite information is scattered through memory */
 	/* and uses a portion of the text layer memory (outside the visible area) */
-	UINT8 *spriteram_area1 = &m_spriteram_1[0x28];
-	UINT8 *spriteram_area2 = &m_spriteram_2[0x28];
-	UINT8 *spriteram_area3 = &m_fgvideoram[0x28];
+	uint8_t *spriteram_area1 = &m_spriteram_1[0x28];
+	uint8_t *spriteram_area2 = &m_spriteram_2[0x28];
+	uint8_t *spriteram_area3 = &m_fgvideoram[0x28];
 
 	int flip = flip_screen();
 
@@ -197,7 +197,7 @@ void kyugo_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect 
 }
 
 
-UINT32 kyugo_state::screen_update_kyugo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t kyugo_state::screen_update_kyugo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if (flip_screen())
 		m_bg_tilemap->set_scrollx(0, -(m_scroll_x_lo + (m_scroll_x_hi * 256)));

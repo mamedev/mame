@@ -28,9 +28,11 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/dribling.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
-#include "includes/dribling.h"
+#include "screen.h"
 
 
 
@@ -264,7 +266,7 @@ void dribling_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( dribling, dribling_state )
+static MACHINE_CONFIG_START( dribling )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 5000000)
@@ -322,9 +324,9 @@ ROM_START( dribling )
 	ROM_LOAD( "3n.bin",  0x1000, 0x1000, CRC(356c9803) SHA1(8e2ce52f32b33886f4747dadf3aeb78148538173) )
 
 	ROM_REGION( 0x600, "proms", 0 )
-	ROM_LOAD( "prom_3c.bin", 0x0000, 0x0400, CRC(25f068de) SHA1(ea4c56c47fe8153069acb9df80df0b099f3b81f1) )
-	ROM_LOAD( "prom_3e.bin", 0x0400, 0x0100, CRC(73eba798) SHA1(7be0e253624df53092e26c28eb18afdcf71434aa) )
-	ROM_LOAD( "prom_2d.bin", 0x0500, 0x0100, CRC(5d8c57c6) SHA1(abfb54812d66a36e797be47653dadda4843e8a90) )
+	ROM_LOAD( "93453-d9.3c",  0x0000, 0x0400, CRC(b045d005) SHA1(7e3ac10a99aa37f6348b3a57a747116b7025103e) )
+	ROM_LOAD( "63s140-d8.3e", 0x0400, 0x0100, CRC(8f1a9908) SHA1(12c513c589757f1282e9979d3589f9b49d30ec0f) )
+	ROM_LOAD( "tbp24s10.2d",  0x0500, 0x0100, CRC(a17d6956) SHA1(81724daf2e2d319f55cc34cc881b6a9a4e64e7ac) )
 ROM_END
 
 
@@ -341,9 +343,9 @@ ROM_START( driblingo )
 	ROM_LOAD( "3n.bin",  0x1000, 0x1000, CRC(356c9803) SHA1(8e2ce52f32b33886f4747dadf3aeb78148538173) )
 
 	ROM_REGION( 0x600, "proms", 0 )
-	ROM_LOAD( "prom_3c.bin", 0x0000, 0x0400, CRC(25f068de) SHA1(ea4c56c47fe8153069acb9df80df0b099f3b81f1) )
-	ROM_LOAD( "prom_3e.bin", 0x0400, 0x0100, CRC(73eba798) SHA1(7be0e253624df53092e26c28eb18afdcf71434aa) )
-	ROM_LOAD( "prom_2d.bin", 0x0500, 0x0100, CRC(5d8c57c6) SHA1(abfb54812d66a36e797be47653dadda4843e8a90) )
+	ROM_LOAD( "93453-d9.3c",  0x0000, 0x0400, CRC(b045d005) SHA1(7e3ac10a99aa37f6348b3a57a747116b7025103e) )
+	ROM_LOAD( "63s140-d8.3e", 0x0400, 0x0100, CRC(8f1a9908) SHA1(12c513c589757f1282e9979d3589f9b49d30ec0f) )
+	ROM_LOAD( "tbp24s10.2d",  0x0500, 0x0100, CRC(a17d6956) SHA1(81724daf2e2d319f55cc34cc881b6a9a4e64e7ac) )
 ROM_END
 
 ROM_START( driblingbr )
@@ -359,9 +361,9 @@ ROM_START( driblingbr )
 	ROM_LOAD( "7",  0x1000, 0x1000, CRC(356c9803) SHA1(8e2ce52f32b33886f4747dadf3aeb78148538173) )
 
 	ROM_REGION( 0x600, "proms", 0 )
-	ROM_LOAD( "prom_3c.bin", 0x0000, 0x0400, CRC(25f068de) SHA1(ea4c56c47fe8153069acb9df80df0b099f3b81f1) )
-	ROM_LOAD( "prom_3e.bin", 0x0400, 0x0100, CRC(73eba798) SHA1(7be0e253624df53092e26c28eb18afdcf71434aa) )
-	ROM_LOAD( "prom_2d.bin", 0x0500, 0x0100, CRC(5d8c57c6) SHA1(abfb54812d66a36e797be47653dadda4843e8a90) )
+	ROM_LOAD( "93453-d9.3c",  0x0000, 0x0400, CRC(b045d005) SHA1(7e3ac10a99aa37f6348b3a57a747116b7025103e) )
+	ROM_LOAD( "63s140-d8.3e", 0x0400, 0x0100, CRC(8f1a9908) SHA1(12c513c589757f1282e9979d3589f9b49d30ec0f) )
+	ROM_LOAD( "tbp24s10.2d",  0x0500, 0x0100, CRC(a17d6956) SHA1(81724daf2e2d319f55cc34cc881b6a9a4e64e7ac) )
 ROM_END
 
 
@@ -371,6 +373,6 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, dribling,   0,        dribling, dribling, driver_device, 0, ROT0, "Model Racing", "Dribbling", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, driblingo,  dribling, dribling, dribling, driver_device, 0, ROT0, "Model Racing (Olympia license)", "Dribbling (Olympia)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, driblingbr, dribling, dribling, dribling, driver_device, 0, ROT0, "bootleg (Videomac)", "Dribbling (bootleg, Brazil)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, dribling,   0,        dribling, dribling, dribling_state, 0, ROT0, "Model Racing",                   "Dribbling",                   MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, driblingo,  dribling, dribling, dribling, dribling_state, 0, ROT0, "Model Racing (Olympia license)", "Dribbling (Olympia)",         MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, driblingbr, dribling, dribling, dribling, dribling_state, 0, ROT0, "bootleg (Videomac)",             "Dribbling (bootleg, Brazil)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

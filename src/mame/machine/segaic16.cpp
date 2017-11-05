@@ -27,10 +27,10 @@
 //**************************************************************************
 
 // device type definition
-const device_type SEGA_315_5195_MEM_MAPPER = &device_creator<sega_315_5195_mapper_device>;
-const device_type SEGA_315_5248_MULTIPLIER = &device_creator<sega_315_5248_multiplier_device>;
-const device_type SEGA_315_5249_DIVIDER = &device_creator<sega_315_5249_divider_device>;
-const device_type SEGA_315_5250_COMPARE_TIMER = &device_creator<sega_315_5250_compare_timer_device>;
+DEFINE_DEVICE_TYPE(SEGA_315_5195_MEM_MAPPER,    sega_315_5195_mapper_device,        "sega_315_5195", "Sega 315-5195 Memory Mapper")
+DEFINE_DEVICE_TYPE(SEGA_315_5248_MULTIPLIER,    sega_315_5248_multiplier_device,    "sega_315_5248", "Sega 315-5248 Multiplier")
+DEFINE_DEVICE_TYPE(SEGA_315_5249_DIVIDER,       sega_315_5249_divider_device,       "sega_315_5249", "Sega 315-5249 Divider")
+DEFINE_DEVICE_TYPE(SEGA_315_5250_COMPARE_TIMER, sega_315_5250_compare_timer_device, "sega_315_5250", "Sega 315-5250 Compare/Timer")
 
 
 
@@ -75,7 +75,7 @@ READ16_MEMBER( sega_16bit_common_base::open_bus_r )
 
 	// read original encrypted memory at that address
 	m_open_bus_recurse = true;
-	UINT16 result = space.read_word(space.device().safe_pc());
+	uint16_t result = space.read_word(space.device().safe_pc());
 	m_open_bus_recurse = false;
 	return result;
 }
@@ -147,7 +147,7 @@ WRITE16_MEMBER( sega_16bit_common_base::paletteram_w )
 		m_palette_entries = memshare("paletteram")->bytes() / 2;
 
 	// get the new value
-	UINT16 newval = m_paletteram[offset];
+	uint16_t newval = m_paletteram[offset];
 	COMBINE_DATA(&newval);
 	m_paletteram[offset] = newval;
 
@@ -171,7 +171,7 @@ WRITE16_MEMBER( sega_16bit_common_base::philko_paletteram_w )
 		m_palette_entries = memshare("paletteram")->bytes() / 2;
 
 	// get the new value
-	UINT16 newval = m_paletteram[offset];
+	uint16_t newval = m_paletteram[offset];
 	COMBINE_DATA(&newval);
 	m_paletteram[offset] = newval;
 
@@ -198,13 +198,13 @@ WRITE16_MEMBER( sega_16bit_common_base::philko_paletteram_w )
 //  sega_315_5195_mapper_device - constructor
 //-------------------------------------------------
 
-sega_315_5195_mapper_device::sega_315_5195_mapper_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, SEGA_315_5195_MEM_MAPPER, "Sega 315-5195 Memory Mapper", tag, owner, clock, "sega_315_5195", __FILE__),
-		m_cpu(*this),
-		m_cpuregion(*this),
-		m_space(nullptr),
-		m_decrypted_space(nullptr),
-		m_curregion(0)
+sega_315_5195_mapper_device::sega_315_5195_mapper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, SEGA_315_5195_MEM_MAPPER, tag, owner, clock)
+	, m_cpu(*this, finder_base::DUMMY_TAG)
+	, m_cpuregion(*this, finder_base::DUMMY_TAG)
+	, m_space(nullptr)
+	, m_decrypted_space(nullptr)
+	, m_curregion(0)
 {
 }
 
@@ -259,7 +259,7 @@ WRITE8_MEMBER( sega_315_5195_mapper_device::write )
 if (LOG_MEMORY_MAP) osd_printf_debug("(Write %02X = %02X)\n", offset, data);
 
 	// remember the previous value and swap in the new one
-	UINT8 oldval = m_regs[offset];
+	uint8_t oldval = m_regs[offset];
 	m_regs[offset] = data;
 
 	// switch off the offset
@@ -301,7 +301,7 @@ if (LOG_MEMORY_MAP) osd_printf_debug("(Write %02X = %02X)\n", offset, data);
 			else if (data == 0x02)
 			{
 				offs_t addr = (m_regs[0x07] << 17) | (m_regs[0x08] << 9) | (m_regs[0x09] << 1);
-				UINT16 result = m_space->read_word(addr);
+				uint16_t result = m_space->read_word(addr);
 				m_regs[0x00] = result >> 8;
 				m_regs[0x01] = result;
 			}
@@ -380,7 +380,7 @@ READ8_MEMBER( sega_315_5195_mapper_device::read )
 //  map_as_rom - map a region as ROM data
 //-------------------------------------------------
 
-void sega_315_5195_mapper_device::map_as_rom(UINT32 offset, UINT32 length, offs_t mirror, const char *bank_name, const char *decrypted_bank_name, offs_t rgnoffset, write16_delegate whandler)
+void sega_315_5195_mapper_device::map_as_rom(uint32_t offset, uint32_t length, offs_t mirror, const char *bank_name, const char *decrypted_bank_name, offs_t rgnoffset, write16_delegate whandler)
 {
 	// determine parameters
 	region_info info;
@@ -402,14 +402,14 @@ void sega_315_5195_mapper_device::map_as_rom(UINT32 offset, UINT32 length, offs_
 			romend = romsize - 1 - rgnoffset + info.start;
 
 		// map now
-		m_space->install_read_bank(info.start, romend, 0, info.mirror, bank_name);
+		m_space->install_read_bank(info.start, romend, info.mirror, bank_name);
 		if (m_decrypted_space)
-			m_decrypted_space->install_read_bank(info.start, romend, 0, info.mirror, decrypted_bank_name);
+			m_decrypted_space->install_read_bank(info.start, romend, info.mirror, decrypted_bank_name);
 
 		// configure the bank
 		memory_bank *bank = owner()->membank(bank_name);
 		memory_bank *decrypted_bank = owner()->membank(decrypted_bank_name);
-		UINT8 *memptr = m_cpuregion->base() + rgnoffset;
+		uint8_t *memptr = m_cpuregion->base() + rgnoffset;
 		bank->set_base(memptr);
 
 		// remember this bank, and decrypt if necessary
@@ -422,9 +422,9 @@ void sega_315_5195_mapper_device::map_as_rom(UINT32 offset, UINT32 length, offs_
 	// falling through to the memory-mapping registers and crashing the
 	// game during stage 2-4 (see PC:$18a98). Protection maybe?
 	if (!whandler.isnull())
-		m_space->install_write_handler(info.start, info.end, 0, info.mirror, whandler);
+		m_space->install_write_handler(info.start, info.end, 0, info.mirror, 0, whandler);
 	else
-		m_space->unmap_write(info.start, info.end, 0, info.mirror);
+		m_space->unmap_write(info.start, info.end | info.mirror);
 }
 
 
@@ -433,7 +433,7 @@ void sega_315_5195_mapper_device::map_as_rom(UINT32 offset, UINT32 length, offs_
 //  optional write handler
 //-------------------------------------------------
 
-void sega_315_5195_mapper_device::map_as_ram(UINT32 offset, UINT32 length, offs_t mirror, const char *bank_share_name, write16_delegate whandler)
+void sega_315_5195_mapper_device::map_as_ram(uint32_t offset, uint32_t length, offs_t mirror, const char *bank_share_name, write16_delegate whandler)
 {
 	// determine parameters
 	region_info info;
@@ -446,13 +446,13 @@ void sega_315_5195_mapper_device::map_as_ram(UINT32 offset, UINT32 length, offs_
 	}
 
 	// map now
-	m_space->install_read_bank(info.start, info.end, 0, info.mirror, bank_share_name);
+	m_space->install_read_bank(info.start, info.end, info.mirror, bank_share_name);
 
 	// either install a write handler or a write bank, as appropriate
 	if (!whandler.isnull())
-		m_space->install_write_handler(info.start, info.end, 0, info.mirror, whandler);
+		m_space->install_write_handler(info.start, info.end, 0, info.mirror, 0, whandler);
 	else
-		m_space->install_write_bank(info.start, info.end, 0, info.mirror, bank_share_name);
+		m_space->install_write_bank(info.start, info.end, info.mirror, bank_share_name);
 
 	// configure the bank
 	memory_bank *bank = owner()->membank(bank_share_name);
@@ -468,7 +468,7 @@ void sega_315_5195_mapper_device::map_as_ram(UINT32 offset, UINT32 length, offs_
 //  read write handlers
 //-------------------------------------------------
 
-void sega_315_5195_mapper_device::map_as_handler(UINT32 offset, UINT32 length, offs_t mirror, read16_delegate rhandler, write16_delegate whandler)
+void sega_315_5195_mapper_device::map_as_handler(uint32_t offset, uint32_t length, offs_t mirror, read16_delegate rhandler, write16_delegate whandler)
 {
 	// determine parameters
 	region_info info;
@@ -483,9 +483,9 @@ void sega_315_5195_mapper_device::map_as_handler(UINT32 offset, UINT32 length, o
 
 	// install read/write handlers
 	if (!rhandler.isnull())
-		m_space->install_read_handler(info.start, info.end, 0, info.mirror, rhandler);
+		m_space->install_read_handler(info.start, info.end, 0, info.mirror, 0, rhandler);
 	if (!whandler.isnull())
-		m_space->install_write_handler(info.start, info.end, 0, info.mirror, whandler);
+		m_space->install_write_handler(info.start, info.end, 0, info.mirror, 0, whandler);
 
 	// clear this rom bank reference
 	m_banks[m_curregion].clear();
@@ -497,7 +497,7 @@ void sega_315_5195_mapper_device::map_as_handler(UINT32 offset, UINT32 length, o
 //  memory map
 //-------------------------------------------------
 
-void sega_315_5195_mapper_device::configure_explicit(const UINT8 *map_data)
+void sega_315_5195_mapper_device::configure_explicit(const uint8_t *map_data)
 {
 	memcpy(&m_regs[0x10], map_data, 0x10);
 	update_mapping();
@@ -509,7 +509,7 @@ void sega_315_5195_mapper_device::configure_explicit(const UINT8 *map_data)
 //  of state changes
 //-------------------------------------------------
 
-void sega_315_5195_mapper_device::fd1094_state_change(UINT8 state)
+void sega_315_5195_mapper_device::fd1094_state_change(uint8_t state)
 {
 	// iterate over regions and set the decrypted address of any ROM banks
 	for (auto & elem : m_banks)
@@ -538,7 +538,7 @@ void sega_315_5195_mapper_device::device_start()
 	fd1094_device *fd1094 = dynamic_cast<fd1094_device *>(m_cpu.target());
 	if (fd1094 != nullptr)
 	{
-		fd1094->notify_state_change(fd1094_device::state_change_delegate(FUNC(sega_315_5195_mapper_device::fd1094_state_change), this));
+		fd1094->notify_state_change(fd1094_device::state_change_delegate(&sega_315_5195_mapper_device::fd1094_state_change, this));
 		for (auto & elem : m_banks)
 			elem.set_decrypt(fd1094);
 	}
@@ -548,7 +548,7 @@ void sega_315_5195_mapper_device::device_start()
 	if (m_space == nullptr)
 		throw emu_fatalerror("Unable to find program address space on device '%s'", m_cpu.finder_tag());
 
-	m_decrypted_space = m_cpu->has_space(AS_DECRYPTED_OPCODES) ? &m_cpu->space(AS_DECRYPTED_OPCODES) : nullptr;
+	m_decrypted_space = m_cpu->has_space(AS_OPCODES) ? &m_cpu->space(AS_OPCODES) : nullptr;
 
 	// register for saves
 	save_item(NAME(m_regs));
@@ -579,14 +579,14 @@ void sega_315_5195_mapper_device::device_reset()
 //  actual underlying bus connections
 //-------------------------------------------------
 
-void sega_315_5195_mapper_device::compute_region(region_info &info, UINT8 index, UINT32 length, UINT32 mirror, UINT32 offset)
+void sega_315_5195_mapper_device::compute_region(region_info &info, uint8_t index, uint32_t length, uint32_t mirror, uint32_t offset)
 {
 	static const offs_t region_size_map[4] = { 0x00ffff, 0x01ffff, 0x07ffff, 0x1fffff };
 	info.size_mask = region_size_map[m_regs[0x10 + 2 * index] & 3];
 	info.base = (m_regs[0x11 + 2 * index] << 16) & ~info.size_mask;
 	info.mirror = mirror & info.size_mask;
 	info.start = info.base + (offset & info.size_mask);
-	info.end = info.start + MIN(length - 1, info.size_mask);
+	info.end = info.start + std::min(length - 1, info.size_mask);
 }
 
 
@@ -674,7 +674,7 @@ void sega_315_5195_mapper_device::decrypt_bank::set_decrypt(fd1094_device *fd109
 //  a change
 //-------------------------------------------------
 
-void sega_315_5195_mapper_device::decrypt_bank::set(memory_bank *bank, memory_bank *decrypted_bank, offs_t start, offs_t end, offs_t rgnoffs, UINT8 *src)
+void sega_315_5195_mapper_device::decrypt_bank::set(memory_bank *bank, memory_bank *decrypted_bank, offs_t start, offs_t end, offs_t rgnoffs, uint8_t *src)
 {
 	// ignore if not encrypted
 	if (m_fd1089 == nullptr && m_fd1094_cache == nullptr)
@@ -719,7 +719,7 @@ void sega_315_5195_mapper_device::decrypt_bank::update()
 	if (m_fd1089 != nullptr)
 	{
 		m_fd1089_decrypted.resize((m_end + 1 - m_start) / 2);
-		m_fd1089->decrypt(m_start, m_end + 1 - m_start, m_rgnoffs, &m_fd1089_decrypted[0], reinterpret_cast<UINT16 *>(m_srcptr));
+		m_fd1089->decrypt(m_start, m_end + 1 - m_start, m_rgnoffs, &m_fd1089_decrypted[0], reinterpret_cast<uint16_t *>(m_srcptr));
 		m_decrypted_bank->set_base(&m_fd1089_decrypted[0]);
 	}
 
@@ -738,8 +738,8 @@ void sega_315_5195_mapper_device::decrypt_bank::update()
 //  sega_315_5248_multiplier_device - constructor
 //-------------------------------------------------
 
-sega_315_5248_multiplier_device::sega_315_5248_multiplier_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, SEGA_315_5248_MULTIPLIER, "Sega 315-5248 Multiplier", tag, owner, clock, "sega_315_5248", __FILE__)
+sega_315_5248_multiplier_device::sega_315_5248_multiplier_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, SEGA_315_5248_MULTIPLIER, tag, owner, clock)
 {
 }
 
@@ -757,8 +757,8 @@ READ16_MEMBER( sega_315_5248_multiplier_device::read )
 		case 1: return m_regs[1];
 
 		// if bit 1 is 1, return ther results
-		case 2: return (INT16(m_regs[0]) * INT16(m_regs[1])) >> 16;
-		case 3: return (INT16(m_regs[0]) * INT16(m_regs[1])) & 0xffff;
+		case 2: return (int16_t(m_regs[0]) * int16_t(m_regs[1])) >> 16;
+		case 3: return (int16_t(m_regs[0]) * int16_t(m_regs[1])) & 0xffff;
 	}
 
 	// should never get here
@@ -806,8 +806,8 @@ void sega_315_5248_multiplier_device::device_reset()
 //  sega_315_5249_divider_device - constructor
 //-------------------------------------------------
 
-sega_315_5249_divider_device::sega_315_5249_divider_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, SEGA_315_5248_MULTIPLIER, "Sega 315-5249 Divider", tag, owner, clock, "sega_315_5249", __FILE__)
+sega_315_5249_divider_device::sega_315_5249_divider_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, SEGA_315_5249_DIVIDER, tag, owner, clock)
 {
 }
 
@@ -888,14 +888,14 @@ void sega_315_5249_divider_device::execute(int mode)
 	if (mode == 0)
 	{
 		// perform signed divide
-		INT32 dividend = INT32((m_regs[0] << 16) | m_regs[1]);
-		INT32 divisor = INT16(m_regs[2]);
-		INT32 quotient;
+		int32_t dividend = int32_t((m_regs[0] << 16) | m_regs[1]);
+		int32_t divisor = int16_t(m_regs[2]);
+		int32_t quotient;
 
 		// check for divide by 0, signal if we did
 		if (divisor == 0)
 		{
-			quotient = dividend;//((INT32)(dividend ^ divisor) < 0) ? 0x8000 : 0x7fff;
+			quotient = dividend;//((int32_t)(dividend ^ divisor) < 0) ? 0x8000 : 0x7fff;
 			m_regs[6] |= 0x4000;
 		}
 		else
@@ -914,17 +914,17 @@ void sega_315_5249_divider_device::execute(int mode)
 		}
 
 		// store quotient and remainder
-		m_regs[4] = INT16(quotient);
-		m_regs[5] = INT16(dividend - quotient * divisor);
+		m_regs[4] = int16_t(quotient);
+		m_regs[5] = int16_t(dividend - quotient * divisor);
 	}
 
 	// mode 1: unsigned divide, 32-bit quotient only
 	else
 	{
 		// perform unsigned divide
-		UINT32 dividend = UINT32((m_regs[0] << 16) | m_regs[1]);
-		UINT32 divisor = UINT16(m_regs[2]);
-		UINT32 quotient;
+		uint32_t dividend = uint32_t((m_regs[0] << 16) | m_regs[1]);
+		uint32_t divisor = uint16_t(m_regs[2]);
+		uint32_t quotient;
 
 		// check for divide by 0, signal if we did
 		if (divisor == 0)
@@ -951,8 +951,8 @@ void sega_315_5249_divider_device::execute(int mode)
 //  constructor
 //-------------------------------------------------
 
-sega_315_5250_compare_timer_device::sega_315_5250_compare_timer_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, SEGA_315_5250_COMPARE_TIMER, "Sega 315-5250 Compare/Timer", tag, owner, clock, "sega_315_5250", __FILE__)
+sega_315_5250_compare_timer_device::sega_315_5250_compare_timer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, SEGA_315_5250_COMPARE_TIMER, tag, owner, clock)
 {
 }
 
@@ -1092,12 +1092,12 @@ void sega_315_5250_compare_timer_device::device_reset()
 
 void sega_315_5250_compare_timer_device::execute(bool update_history)
 {
-	INT16 bound1 = INT16(m_regs[0]);
-	INT16 bound2 = INT16(m_regs[1]);
-	INT16 value = INT16(m_regs[2]);
+	int16_t bound1 = int16_t(m_regs[0]);
+	int16_t bound2 = int16_t(m_regs[1]);
+	int16_t value = int16_t(m_regs[2]);
 
-	INT16 min = (bound1 < bound2) ? bound1 : bound2;
-	INT16 max = (bound1 > bound2) ? bound1 : bound2;
+	int16_t min = (bound1 < bound2) ? bound1 : bound2;
+	int16_t max = (bound1 > bound2) ? bound1 : bound2;
 
 	if (value < min)
 	{

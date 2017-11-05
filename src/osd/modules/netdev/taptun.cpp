@@ -43,15 +43,15 @@ public:
 	netdev_tap(const char *name, class device_network_interface *ifdev, int rate);
 	~netdev_tap();
 
-	int send(UINT8 *buf, int len);
+	int send(uint8_t *buf, int len);
 	void set_mac(const char *mac);
 protected:
-	int recv_dev(UINT8 **buf);
+	int recv_dev(uint8_t **buf);
 private:
 	int m_fd;
 	char m_ifname[10];
 	char m_mac[6];
-	UINT8 m_buf[2048];
+	uint8_t m_buf[2048];
 };
 
 netdev_tap::netdev_tap(const char *name, class device_network_interface *ifdev, int rate)
@@ -94,14 +94,14 @@ void netdev_tap::set_mac(const char *mac)
 	memcpy(m_mac, mac, 6);
 }
 
-int netdev_tap::send(UINT8 *buf, int len)
+int netdev_tap::send(uint8_t *buf, int len)
 {
 	if(m_fd == -1) return 0;
 	len = write(m_fd, buf, len);
 	return (len == -1)?0:len;
 }
 
-int netdev_tap::recv_dev(UINT8 **buf)
+int netdev_tap::recv_dev(uint8_t **buf)
 {
 	int len;
 	if(m_fd == -1) return 0;

@@ -50,8 +50,8 @@ void sc61860_device::sc61860_instruction()
 		case 41: sc61860_jump_rel_minus(!m_zero);m_icount-=4;break;
 		case 42: sc61860_jump_rel_plus(!m_carry);m_icount-=4;break;
 		case 43: sc61860_jump_rel_minus(!m_carry);m_icount-=4;break;
-		case 44: sc61860_jump_rel_plus(TRUE);m_icount-=4;break;
-		case 45: sc61860_jump_rel_minus(TRUE);m_icount-=4;break;
+		case 44: sc61860_jump_rel_plus(true);m_icount-=4;break;
+		case 45: sc61860_jump_rel_minus(true);m_icount-=4;break;
 		case 47: sc61860_loop();m_icount-=7;break;
 		case 48: sc61860_load_imm_p(READ_RAM(A));m_icount-=2;break;
 		case 49: sc61860_load_imm_q(READ_RAM(A));m_icount-=2;break;
@@ -78,7 +78,7 @@ void sc61860_device::sc61860_instruction()
 		case 76: sc61860_in_a();m_icount-=2;break;
 		case 77: /*nopw*/;m_icount-=2;break;
 		case 78: sc61860_wait();m_icount-=6;break;
-		case 79: sc61860_wait_x(FALSE);m_icount-=1;break;
+		case 79: sc61860_wait_x(false);m_icount-=1;break;
 		case 80: sc61860_inc_p();m_icount-=2;break;
 		case 81: sc61860_dec_p();m_icount-=2;break;
 		case 82: sc61860_store_ext(A);m_icount-=2;break;
@@ -103,7 +103,7 @@ void sc61860_device::sc61860_instruction()
 		case 103: sc61860_cmp(A, READ_OP());m_icount-=4;break;
 		case 105: sc61860_execute_table_call();m_icount-=3;break;
 		case 107: sc61860_test_special();m_icount-=4;break;
-		case 111: sc61860_wait_x(TRUE);m_icount-=1;break;
+		case 111: sc61860_wait_x(true);m_icount-=1;break;
 		case 112: sc61860_add(m_p, READ_OP());m_icount-=4;break;
 		case 113: sc61860_sub(m_p, READ_OP());m_icount-=4;break;
 		case 116: sc61860_add(A, READ_OP());m_icount-=4;break;

@@ -12,7 +12,6 @@
 
     TODO:
 
-    - Turtles music is monotonous
     - convert to discrete sound
     - screen pincushion distortion
 
@@ -20,10 +19,14 @@
 
 #include "emu.h"
 #include "includes/advision.h"
+
 #include "cpu/mcs48/mcs48.h"
 #include "cpu/cop400/cop400.h"
-#include "sound/dac.h"
+#include "sound/volt_reg.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
 
 /* Memory Maps */
 
@@ -40,9 +43,6 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_map, AS_IO, 8, advision_state )
 	AM_RANGE(0x00, 0xff) AM_READWRITE(ext_ram_r, ext_ram_w)
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READWRITE(controller_r, bankswitch_w)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(av_control_w)
-	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(vsync_r)
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -61,13 +61,17 @@ INPUT_PORTS_END
 
 /* Machine Driver */
 
-static MACHINE_CONFIG_START( advision, advision_state )
+static MACHINE_CONFIG_START( advision )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(I8048_TAG, I8048, XTAL_11MHz)
 	MCFG_CPU_PROGRAM_MAP(program_map)
 	MCFG_CPU_IO_MAP(io_map)
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(advision_state, controller_r))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(advision_state, bankswitch_w))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(advision_state, av_control_w))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(advision_state, vsync_r))
 
-	MCFG_CPU_ADD(COP411_TAG, COP411, 52631*16) // COP411L-KCN/N
+	MCFG_CPU_ADD(COP411_TAG, COP411, 52631*4) // COP411L-KCN/N, R11=82k, C8=56pF
 	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_4, COP400_CKO_RAM_POWER_SUPPLY, false)
 	MCFG_COP400_READ_L_CB(READ8(advision_state, sound_cmd_r))
 	MCFG_COP400_WRITE_G_CB(WRITE8(advision_state, sound_g_w))
@@ -85,10 +89,10 @@ static MACHINE_CONFIG_START( advision, advision_state )
 	MCFG_PALETTE_INIT_OWNER(advision_state, advision)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-
-	MCFG_SOUND_ADD("dac", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("dac", DAC_2BIT_BINARY_WEIGHTED, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "advision_cart")
@@ -110,5 +114,5 @@ ROM_END
 
 /* Game Driver */
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE   INPUT     INIT               COMPANY  FULLNAME            FLAGS */
-CONS( 1982, advision,   0,      0,      advision, advision, driver_device,  0, "Entex", "Adventure Vision", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+/*    YEAR  NAME        PARENT  COMPAT  MACHINE   INPUT     STATE            INIT  COMPANY  FULLNAME            FLAGS */
+CONS( 1982, advision,   0,      0,      advision, advision, advision_state,  0,    "Entex", "Adventure Vision", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

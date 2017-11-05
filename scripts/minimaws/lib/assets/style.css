@@ -1,0 +1,11 @@
+/* license:BSD-3-Clause
+ * copyright-holders:Vas Crabb
+ */
+
+th { text-align: left; background-color: #ddd; padding: 0.25em }
+td { padding-left: 0.25em; padding-right: 0.25em }
+
+table[class=sysinfo] th { text-align: right }
+
+dl[id=list-slot-options] dt { font-weight: bold; margin-top: 1em }
+dl[id=list-slot-options] dd table { margin-top: 0.5em; margin-bottom: 1em }

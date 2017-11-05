@@ -63,8 +63,11 @@ To Do:
 #include "cpu/z80/z80.h"
 #include "cpu/mcs51/mcs51.h"
 #include "machine/gen_latch.h"
+#include "machine/timer.h"
 #include "sound/2203intf.h"
 #include "video/kan_pand.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 
@@ -87,9 +90,11 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch"),
+		m_mermaidlatch(*this, "mermaidlatch"),
+		m_slavelatch(*this, "slavelatch"),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram")
-		{ }
+	{ }
 
 	/* Devices */
 	required_device<cpu_device> m_mastercpu;
@@ -100,27 +105,22 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
+	required_device<generic_latch_8_device> m_mermaidlatch;
+	required_device<generic_latch_8_device> m_slavelatch;
 
 	/* Video */
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_colorram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_colorram;
 	tilemap_t       *m_bg_tilemap;
-	UINT16          m_scrollx;
-	UINT16          m_scrolly;
-	UINT16          m_port0_data;
+	uint16_t          m_scrollx;
+	uint16_t          m_scrolly;
+	uint16_t          m_port0_data;
 
 	/* Mermaid */
-	UINT8           m_data_to_mermaid;
-	UINT8           m_data_to_z80;
-	UINT8           m_mermaid_to_z80_full;
-	UINT8           m_z80_to_mermaid_full;
-	UINT8           m_mermaid_int0_l;
-	UINT8           m_mermaid_p[4];
+	uint8_t           m_mermaid_p[4];
 
 	DECLARE_WRITE8_MEMBER(trigger_nmi_on_slave_cpu);
 	DECLARE_WRITE8_MEMBER(master_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(mermaid_data_w);
-	DECLARE_READ8_MEMBER(mermaid_data_r);
 	DECLARE_READ8_MEMBER(mermaid_status_r);
 	DECLARE_WRITE8_MEMBER(trigger_nmi_on_sound_cpu2);
 	DECLARE_WRITE8_MEMBER(hu_videoram_w);
@@ -145,8 +145,8 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof(screen_device &screen, bool state);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 };
@@ -164,19 +164,11 @@ void hvyunit_state::machine_start()
 	membank("slave_bank")->configure_entries(0, 4, memregion("slave")->base(), 0x4000);
 	membank("sound_bank")->configure_entries(0, 4, memregion("soundcpu")->base(), 0x4000);
 
-	save_item(NAME(m_data_to_mermaid));
-	save_item(NAME(m_data_to_z80));
-	save_item(NAME(m_mermaid_to_z80_full));
-	save_item(NAME(m_z80_to_mermaid_full));
-	save_item(NAME(m_mermaid_int0_l));
 	save_item(NAME(m_mermaid_p));
 }
 
 void hvyunit_state::machine_reset()
 {
-	m_mermaid_int0_l = 1;
-	m_mermaid_to_z80_full = 0;
-	m_z80_to_mermaid_full = 0;
 }
 
 
@@ -197,14 +189,14 @@ TILE_GET_INFO_MEMBER(hvyunit_state::get_bg_tile_info)
 
 void hvyunit_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(hvyunit_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(hvyunit_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
 	save_item(NAME(m_scrollx));
 	save_item(NAME(m_scrolly));
 	save_item(NAME(m_port0_data));
 }
 
-UINT32 hvyunit_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t hvyunit_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 #define SX_POS  96
 #define SY_POS  0
@@ -218,7 +210,7 @@ UINT32 hvyunit_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	return 0;
 }
 
-void hvyunit_state::screen_eof(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(hvyunit_state::screen_vblank)
 {
 	// rising edge
 	if (state)
@@ -244,23 +236,9 @@ WRITE8_MEMBER(hvyunit_state::master_bankswitch_w)
 	membank("master_bank")->set_entry(data & 7);
 }
 
-WRITE8_MEMBER(hvyunit_state::mermaid_data_w)
-{
-	m_data_to_mermaid = data;
-	m_z80_to_mermaid_full = 1;
-	m_mermaid_int0_l = 0;
-	m_mermaid->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
-}
-
-READ8_MEMBER(hvyunit_state::mermaid_data_r)
-{
-	m_mermaid_to_z80_full = 0;
-	return m_data_to_z80;
-}
-
 READ8_MEMBER(hvyunit_state::mermaid_status_r)
 {
-	return (!m_mermaid_to_z80_full << 2) | (m_z80_to_mermaid_full << 3);
+	return (!m_slavelatch->pending_r() << 2) | (m_mermaidlatch->pending_r() << 3);
 }
 
 
@@ -338,33 +316,21 @@ READ8_MEMBER(hvyunit_state::mermaid_p0_r)
 WRITE8_MEMBER(hvyunit_state::mermaid_p0_w)
 {
 	if (!BIT(m_mermaid_p[0], 1) && BIT(data, 1))
-	{
-		m_mermaid_to_z80_full = 1;
-		m_data_to_z80 = m_mermaid_p[1];
-	}
+		m_slavelatch->write(space, 0, m_mermaid_p[1]);
 
-	if (BIT(data, 0) == 1)
-		m_z80_to_mermaid_full = 0;
+	if (BIT(data, 0) == 0)
+		m_mermaid_p[1] = m_mermaidlatch->read(space, 0);
 
 	m_mermaid_p[0] = data;
 }
 
 READ8_MEMBER(hvyunit_state::mermaid_p1_r)
 {
-	if (BIT(m_mermaid_p[0], 0) == 0)
-		return m_data_to_mermaid;
-	else
-		return 0; // ?
+	return m_mermaid_p[1];
 }
 
 WRITE8_MEMBER(hvyunit_state::mermaid_p1_w)
 {
-	if (data == 0xff)
-	{
-		m_mermaid_int0_l = 1;
-		m_mermaid->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
-	}
-
 	m_mermaid_p[1] = data;
 }
 
@@ -386,9 +352,9 @@ WRITE8_MEMBER(hvyunit_state::mermaid_p2_w)
 
 READ8_MEMBER(hvyunit_state::mermaid_p3_r)
 {
-	UINT8 dsw = 0;
-	UINT8 dsw1 = ioport("DSW1")->read();
-	UINT8 dsw2 = ioport("DSW2")->read();
+	uint8_t dsw = 0;
+	uint8_t dsw1 = ioport("DSW1")->read();
+	uint8_t dsw2 = ioport("DSW2")->read();
 
 	switch ((m_mermaid_p[0] >> 5) & 3)
 	{
@@ -398,7 +364,7 @@ READ8_MEMBER(hvyunit_state::mermaid_p3_r)
 		case 3: dsw = (BIT(dsw2, 7) << 3) | (BIT(dsw2, 3) << 2) | (BIT(dsw1, 7) << 1) | BIT(dsw1, 3); break;
 	}
 
-	return (dsw << 4) | (m_mermaid_int0_l << 2) | (m_mermaid_to_z80_full << 3);
+	return (dsw << 4) | (m_slavelatch->pending_r() << 3) | (!m_mermaidlatch->pending_r() << 2);
 }
 
 WRITE8_MEMBER(hvyunit_state::mermaid_p3_w)
@@ -445,7 +411,8 @@ static ADDRESS_MAP_START( slave_io, AS_IO, 8, hvyunit_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(slave_bankswitch_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(trigger_nmi_on_sound_cpu2)
-	AM_RANGE(0x04, 0x04) AM_READWRITE(mermaid_data_r, mermaid_data_w)
+	AM_RANGE(0x04, 0x04) AM_DEVREAD("slavelatch", generic_latch_8_device, read)
+	AM_RANGE(0x04, 0x04) AM_DEVWRITE("mermaidlatch", generic_latch_8_device, write)
 	AM_RANGE(0x06, 0x06) AM_WRITE(hu_scrolly_w)
 	AM_RANGE(0x08, 0x08) AM_WRITE(hu_scrollx_w)
 	AM_RANGE(0x0c, 0x0c) AM_READ(mermaid_status_r)
@@ -642,7 +609,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(hvyunit_state::scanline)
  *
  *************************************/
 
-static MACHINE_CONFIG_START( hvyunit, hvyunit_state )
+static MACHINE_CONFIG_START( hvyunit )
 
 	MCFG_CPU_ADD("master", Z80, 6000000)
 	MCFG_CPU_PROGRAM_MAP(master_memory)
@@ -662,6 +629,11 @@ static MACHINE_CONFIG_START( hvyunit, hvyunit_state )
 	MCFG_CPU_ADD("mermaid", I80C51, 6000000)
 	MCFG_CPU_IO_MAP(mcu_io)
 
+	MCFG_GENERIC_LATCH_8_ADD("mermaidlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("mermaid", INPUT_LINE_IRQ0))
+
+	MCFG_GENERIC_LATCH_8_ADD("slavelatch")
+
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -670,7 +642,7 @@ static MACHINE_CONFIG_START( hvyunit, hvyunit_state )
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(hvyunit_state, screen_update)
-	MCFG_SCREEN_VBLANK_DRIVER(hvyunit_state, screen_eof)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(hvyunit_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hvyunit)
@@ -813,7 +785,7 @@ ROM_END
  *
  *************************************/
 
-GAME( 1988, hvyunit, 0,        hvyunit, hvyunit, driver_device,  0, ROT0, "Kaneko / Taito", "Heavy Unit (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1988, hvyunitj, hvyunit, hvyunit, hvyunitj, driver_device, 0, ROT0, "Kaneko / Taito", "Heavy Unit (Japan, Newer)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1988, hvyunitjo,hvyunit, hvyunit, hvyunitj, driver_device, 0, ROT0, "Kaneko / Taito", "Heavy Unit (Japan, Older)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1988, hvyunitu, hvyunit, hvyunit, hvyunitj, driver_device, 0, ROT0, "Kaneko / Taito", "Heavy Unit -U.S.A. Version- (US)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, hvyunit, 0,        hvyunit, hvyunit,  hvyunit_state, 0, ROT0, "Kaneko / Taito", "Heavy Unit (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, hvyunitj, hvyunit, hvyunit, hvyunitj, hvyunit_state, 0, ROT0, "Kaneko / Taito", "Heavy Unit (Japan, Newer)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, hvyunitjo,hvyunit, hvyunit, hvyunitj, hvyunit_state, 0, ROT0, "Kaneko / Taito", "Heavy Unit (Japan, Older)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, hvyunitu, hvyunit, hvyunit, hvyunitj, hvyunit_state, 0, ROT0, "Kaneko / Taito", "Heavy Unit -U.S.A. Version- (US)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

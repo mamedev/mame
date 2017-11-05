@@ -17,12 +17,12 @@
 
 **********************************************************************/
 
+#ifndef MAME_MACHINE_MCCS1850_H
+#define MAME_MACHINE_MCCS1850_H
+
 #pragma once
 
-#ifndef __MCCS1850__
-#define __MCCS1850__
-
-#include "emu.h"
+#include "dirtc.h"
 
 
 
@@ -53,11 +53,11 @@ class mccs1850_device : public device_t,
 {
 public:
 	// construction/destruction
-	mccs1850_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mccs1850_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &set_int_wr_callback(device_t &device, _Object object) { return downcast<mccs1850_device &>(device).int_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_pse_wr_callback(device_t &device, _Object object) { return downcast<mccs1850_device &>(device).pse_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_nuc_wr_callback(device_t &device, _Object object) { return downcast<mccs1850_device &>(device).nuc_cb.set_callback(object); }
+	template <class Object> static devcb_base &set_int_wr_callback(device_t &device, Object &&cb) { return downcast<mccs1850_device &>(device).int_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_pse_wr_callback(device_t &device, Object &&cb) { return downcast<mccs1850_device &>(device).pse_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_nuc_wr_callback(device_t &device, Object &&cb) { return downcast<mccs1850_device &>(device).nuc_cb.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_WRITE_LINE_MEMBER( ce_w );
 	DECLARE_WRITE_LINE_MEMBER( sck_w );
@@ -66,9 +66,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( pwrsw_w );
 	DECLARE_WRITE_LINE_MEMBER( por_w );
 	DECLARE_WRITE_LINE_MEMBER( test_w );
-
-	// For setting the time at startup
-	void set_counter(UINT32 value);
 
 protected:
 	// device-level overrides
@@ -81,24 +78,27 @@ protected:
 	virtual void nvram_read(emu_file &file) override;
 	virtual void nvram_write(emu_file &file) override;
 
+	// device_rtc_interface overrides
+	virtual void rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second) override;
+
 private:
 	inline void check_interrupt();
 	inline void set_pse_line(bool state);
-	inline UINT8 read_register(offs_t offset);
-	inline void write_register(offs_t offset, UINT8 data);
+	inline uint8_t read_register(offs_t offset);
+	inline void write_register(offs_t offset, uint8_t data);
 	inline void advance_seconds();
 
 	static const device_timer_id TIMER_CLOCK = 0;
 
 	devcb_write_line int_cb, pse_cb, nuc_cb;
 
-	UINT8 m_ram[0x80];          // RAM
+	uint8_t m_ram[0x80];          // RAM
 
 	// power supply
 	int m_pse;                  // power supply enable
 
 	// counter
-	UINT32 m_counter;           // seconds counter
+	uint32_t m_counter;           // seconds counter
 
 	// serial interface
 	int m_ce;                   // chip enable
@@ -106,9 +106,9 @@ private:
 	int m_sdo;                  // serial data out
 	int m_sdi;                  // serial data in
 	int m_state;                // serial interface state
-	UINT8 m_address;            // address counter
+	uint8_t m_address;            // address counter
 	int m_bits;                 // bit counter
-	UINT8 m_shift;              // shift register
+	uint8_t m_shift;              // shift register
 
 	// timers
 	emu_timer *m_clock_timer;
@@ -116,8 +116,6 @@ private:
 
 
 // device type definition
-extern const device_type MCCS1850;
+DECLARE_DEVICE_TYPE(MCCS1850, mccs1850_device)
 
-
-
-#endif
+#endif // MAME_MACHINE_MCCS1850_H

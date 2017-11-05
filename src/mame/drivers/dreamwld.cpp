@@ -99,6 +99,8 @@ Stephh's notes (based on the game M68EC020 code and some tests) :
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class dreamwld_state : public driver_device
@@ -116,13 +118,13 @@ public:
 		m_palette(*this, "palette")  { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT32> m_spriteram;
-	required_shared_ptr<UINT32> m_bg_videoram;
-	required_shared_ptr<UINT32> m_bg2_videoram;
-	required_shared_ptr<UINT32> m_vregs;
-	required_shared_ptr<UINT32> m_workram;
+	required_shared_ptr<uint32_t> m_spriteram;
+	required_shared_ptr<uint32_t> m_bg_videoram;
+	required_shared_ptr<uint32_t> m_bg2_videoram;
+	required_shared_ptr<uint32_t> m_vregs;
+	required_shared_ptr<uint32_t> m_workram;
 
-	std::unique_ptr<UINT16[]> m_lineram16;
+	std::unique_ptr<uint16_t[]> m_lineram16;
 
 	DECLARE_READ16_MEMBER(lineram16_r) { return m_lineram16[offset]; }
 	DECLARE_WRITE16_MEMBER(lineram16_w) { COMBINE_DATA(&m_lineram16[offset]); }
@@ -133,8 +135,8 @@ public:
 	int      m_tilebank[2];
 	int      m_tilebankold[2];
 
-	std::unique_ptr<UINT32[]> m_spritebuf1;
-	std::unique_ptr<UINT32[]> m_spritebuf2;
+	std::unique_ptr<uint32_t[]> m_spritebuf1;
+	std::unique_ptr<uint32_t[]> m_spritebuf2;
 
 	/* misc */
 	int      m_protindex;
@@ -148,8 +150,8 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_dreamwld(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof_dreamwld(screen_device &screen, bool state);
+	uint32_t screen_update_dreamwld(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_dreamwld);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -161,9 +163,9 @@ public:
 void dreamwld_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	gfx_element *gfx = m_gfxdecode->gfx(0);
-	UINT32 *source = m_spritebuf1.get();
-	UINT32 *finish = m_spritebuf1.get() + 0x1000 / 4;
-	UINT16 *redirect = (UINT16 *)memregion("spritelut")->base();
+	uint32_t *source = m_spritebuf1.get();
+	uint32_t *finish = m_spritebuf1.get() + 0x1000 / 4;
+	uint16_t *redirect = (uint16_t *)memregion("spritelut")->base();
 	int xoffset = 4;
 
 	while (source < finish)
@@ -252,7 +254,7 @@ WRITE32_MEMBER(dreamwld_state::dreamwld_bg2_videoram_w)
 
 TILE_GET_INFO_MEMBER(dreamwld_state::get_dreamwld_bg2_tile_info)
 {
-	UINT16 tileno, colour;
+	uint16_t tileno, colour;
 	tileno = (tile_index & 1) ? (m_bg2_videoram[tile_index >> 1] & 0xffff) : ((m_bg2_videoram[tile_index >> 1] >> 16) & 0xffff);
 	colour = tileno >> 13;
 	tileno &= 0x1fff;
@@ -261,8 +263,8 @@ TILE_GET_INFO_MEMBER(dreamwld_state::get_dreamwld_bg2_tile_info)
 
 void dreamwld_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dreamwld_state::get_dreamwld_bg_tile_info),this),TILEMAP_SCAN_ROWS, 16, 16, 64,64);
-	m_bg2_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dreamwld_state::get_dreamwld_bg2_tile_info),this),TILEMAP_SCAN_ROWS, 16, 16, 64,64);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(dreamwld_state::get_dreamwld_bg_tile_info),this),TILEMAP_SCAN_ROWS, 16, 16, 64,64);
+	m_bg2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(dreamwld_state::get_dreamwld_bg2_tile_info),this),TILEMAP_SCAN_ROWS, 16, 16, 64,64);
 	m_bg2_tilemap->set_transparent_pen(0);
 
 	m_bg_tilemap->set_scroll_rows(64*16); // line scrolling
@@ -271,15 +273,15 @@ void dreamwld_state::video_start()
 	m_bg2_tilemap->set_scroll_rows(64*16);    // line scrolling
 	m_bg2_tilemap->set_scroll_cols(1);
 
-	m_spritebuf1 = std::make_unique<UINT32[]>(0x2000 / 4);
-	m_spritebuf2 = std::make_unique<UINT32[]>(0x2000 / 4);
+	m_spritebuf1 = std::make_unique<uint32_t[]>(0x2000 / 4);
+	m_spritebuf2 = std::make_unique<uint32_t[]>(0x2000 / 4);
 
-	m_lineram16 = make_unique_clear<UINT16[]>(0x400 / 2);
+	m_lineram16 = make_unique_clear<uint16_t[]>(0x400 / 2);
 	save_pointer(NAME(m_lineram16.get()), 0x400/2);
 
 }
 
-void dreamwld_state::screen_eof_dreamwld(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(dreamwld_state::screen_vblank_dreamwld)
 {
 	// rising edge
 	if (state)
@@ -290,7 +292,7 @@ void dreamwld_state::screen_eof_dreamwld(screen_device &screen, bool state)
 }
 
 
-UINT32 dreamwld_state::screen_update_dreamwld(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t dreamwld_state::screen_update_dreamwld(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 //  int tm0size, tm1size;
 
@@ -305,8 +307,8 @@ UINT32 dreamwld_state::screen_update_dreamwld(screen_device &screen, bitmap_ind1
 	int layer0_scrollx = m_vregs[(0x004 / 4)] + 0;
 	int layer1_scrollx = m_vregs[(0x00c / 4)] + 2;
 
-	UINT32 layer0_ctrl = m_vregs[0x010 / 4];
-	UINT32 layer1_ctrl = m_vregs[0x014 / 4];
+	uint32_t layer0_ctrl = m_vregs[0x010 / 4];
+	uint32_t layer1_ctrl = m_vregs[0x014 / 4];
 
 	m_tilebank[0] = (layer0_ctrl >> 6) & 1;
 	m_tilebank[1] = (layer1_ctrl >> 6) & 1;
@@ -352,7 +354,7 @@ UINT32 dreamwld_state::screen_update_dreamwld(screen_device &screen, bitmap_ind1
 	{
 		int x0 = 0, x1 = 0;
 
-		UINT16* linebase;
+		uint16_t* linebase;
 
 
 
@@ -410,9 +412,9 @@ READ32_MEMBER(dreamwld_state::dreamwld_protdata_r)
 {
 	//static int count = 0;
 
-	UINT8 *protdata = memregion("user1")->base();
+	uint8_t *protdata = memregion("user1")->base();
 	size_t protsize = memregion("user1")->bytes();
-	UINT8 dat = protdata[(m_protindex++) % protsize];
+	uint8_t dat = protdata[(m_protindex++) % protsize];
 
 	//printf("protection read %04x %02x\n", count, dat);
 	//count++;
@@ -423,12 +425,12 @@ READ32_MEMBER(dreamwld_state::dreamwld_protdata_r)
 	return dat << 24;
 }
 
-static ADDRESS_MAP_START( oki1_map, AS_0, 8, dreamwld_state )
+static ADDRESS_MAP_START( oki1_map, 0, 8, dreamwld_state )
 	AM_RANGE(0x00000, 0x2ffff) AM_ROM
 	AM_RANGE(0x30000, 0x3ffff) AM_ROMBANK("oki1bank")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( oki2_map, AS_0, 8, dreamwld_state )
+static ADDRESS_MAP_START( oki2_map, 0, 8, dreamwld_state )
 	AM_RANGE(0x00000, 0x2ffff) AM_ROM
 	AM_RANGE(0x30000, 0x3ffff) AM_ROMBANK("oki2bank")
 ADDRESS_MAP_END
@@ -790,7 +792,7 @@ void dreamwld_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( baryon, dreamwld_state )
+static MACHINE_CONFIG_START( baryon )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68EC020, XTAL_32MHz/2) /* 16MHz verified */
@@ -804,7 +806,7 @@ static MACHINE_CONFIG_START( baryon, dreamwld_state )
 	MCFG_SCREEN_SIZE(512,256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 308-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(dreamwld_state, screen_update_dreamwld)
-	MCFG_SCREEN_VBLANK_DRIVER(dreamwld_state, screen_eof_dreamwld)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(dreamwld_state, screen_vblank_dreamwld))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 0x1000)
@@ -814,10 +816,10 @@ static MACHINE_CONFIG_START( baryon, dreamwld_state )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_OKIM6295_ADD("oki1", XTAL_32MHz/32, OKIM6295_PIN7_LOW) /* 1MHz verified */
+	MCFG_OKIM6295_ADD("oki1", XTAL_32MHz/32, PIN7_LOW) /* 1MHz verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, oki1_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, oki1_map)
 
 MACHINE_CONFIG_END
 
@@ -828,10 +830,10 @@ static MACHINE_CONFIG_DERIVED( dreamwld, baryon )
 	MCFG_CPU_PROGRAM_MAP(dreamwld_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", dreamwld_state,  irq4_line_hold)
 
-	MCFG_OKIM6295_ADD("oki2", XTAL_32MHz/32, OKIM6295_PIN7_LOW) /* 1MHz verified */
+	MCFG_OKIM6295_ADD("oki2", XTAL_32MHz/32, PIN7_LOW) /* 1MHz verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, oki2_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, oki2_map)
 
 MACHINE_CONFIG_END
 
@@ -1085,6 +1087,42 @@ ROM_START( rolcrush )
 	ROM_LOAD( "mx27c512.9.bin", 0x000000, 0x10000, CRC(0da8db45) SHA1(7d5bd71c5b0b28ff74c732edd7c662f46f2ab25b) )
 ROM_END
 
+
+ROM_START( rolcrusha )
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD32_BYTE( "4", 0x000000, 0x040000, CRC(b6afbc05) SHA1(543bd3d48d03df3500f2fa2c8ef8d9e98a8ebe1f) )
+	ROM_LOAD32_BYTE( "3", 0x000001, 0x040000, CRC(ecb2f9da) SHA1(6892601bd279f7968d46798db9cbbe575f63bff2) )
+	ROM_LOAD32_BYTE( "2", 0x000002, 0x040000, CRC(7b291ba9) SHA1(9629c71b00317c68394b836395c3a81bdd32273a) )
+	ROM_LOAD32_BYTE( "1", 0x000003, 0x040000, CRC(ef23ccf3) SHA1(14dcf8bfca991f6aa9b20236c879ae715a009ca2) )
+
+	ROM_REGION( 0x10000, "cpu1", 0 ) /* 87C52 MCU Code */
+	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped. */
+
+	ROM_REGION( 0x10000, "user1", ROMREGION_ERASE00 ) /* Protection data  */
+	ROM_LOAD( "protdata.bin", 0x000, 0x745, CRC(06b8a880) SHA1(b7d4bf26d34cb544825270c2c474bbd4c81a6c9e) )
+
+	ROM_REGION( 0x80000, "oki1", 0 ) /* OKI Samples - 1st chip*/
+	ROM_LOAD( "5", 0x000000, 0x80000, CRC(7afa6adb) SHA1(d4049e1068a5f7abf0e14d0b9fbbbc6dfb5d0170) )
+
+	ROM_REGION( 0x80000, "oki2", ROMREGION_ERASE00 ) /* OKI Samples - 2nd chip (neither OKI or rom is present, empty sockets) */
+	/* not populared */
+
+	ROM_REGION( 0x400000, "gfx1", 0 ) /* Sprite Tiles - decoded */
+	ROM_LOAD16_WORD_SWAP( "8", 0x000000, 0x200000, CRC(01446191) SHA1(b106ed6c085fad617552972db78866a3346e4553) )
+
+	ROM_REGION( 0x200000, "gfx2", 0 ) /* BG Tiles - decoded */
+	ROM_LOAD16_WORD_SWAP( "10",0x000000, 0x200000, CRC(8cb75392) SHA1(8b274cd13876e65fffc157d8459331032c3c16db) )
+
+	ROM_REGION( 0x040000, "spritelut", 0 ) /* Sprite Code Lookup ... */
+	ROM_LOAD16_BYTE( "7", 0x000000, 0x020000, CRC(23d641e4) SHA1(1df8afb5c0118e8588d301db64f6adeb9ae40a79) )
+	ROM_LOAD16_BYTE( "6", 0x000001, 0x020000, CRC(5934dac9) SHA1(2adc63746b9a921a15b8f8461af451ad82add721) )
+
+	ROM_REGION( 0x10000, "unknown", 0 ) /* ???? - not decoded seems to be in blocks of 0x41 bytes.. */
+	ROM_LOAD( "9", 0x000000, 0x10000, CRC(0da8db45) SHA1(7d5bd71c5b0b28ff74c732edd7c662f46f2ab25b) )
+ROM_END
+
+
+
 /*
 
 Dream World
@@ -1247,9 +1285,10 @@ ROM_START( gaialast )
 	ROM_LOAD( "9", 0x000000, 0x10000, CRC(0da8db45) SHA1(7d5bd71c5b0b28ff74c732edd7c662f46f2ab25b) )
 ROM_END
 
-GAME( 1997, baryon,   0,      baryon,   baryon,   driver_device, 0, ROT270, "SemiCom / Tirano",         "Baryon - Future Assault (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1997, baryona,  baryon, baryon,   baryon,   driver_device, 0, ROT270, "SemiCom / Tirano",         "Baryon - Future Assault (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1998, cutefght, 0,      dreamwld, cutefght, driver_device, 0, ROT0,   "SemiCom",                  "Cute Fighter", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, rolcrush, 0,      baryon,   rolcrush, driver_device, 0, ROT0,   "Trust / SemiCom",          "Rolling Crush (version 1.07.E - 1999/02/11)", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, gaialast, 0,      baryon,   gaialast, driver_device, 0, ROT0,   "SemiCom / XESS",           "Gaia - The Last Choice of Earth", MACHINE_SUPPORTS_SAVE )
-GAME( 2000, dreamwld, 0,      dreamwld, dreamwld, driver_device, 0, ROT0,   "SemiCom",                  "Dream World", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, baryon,   0,        baryon,   baryon,   dreamwld_state, 0, ROT270, "SemiCom / Tirano",               "Baryon - Future Assault (set 1)",                            MACHINE_SUPPORTS_SAVE )
+GAME( 1997, baryona,  baryon,   baryon,   baryon,   dreamwld_state, 0, ROT270, "SemiCom / Tirano",               "Baryon - Future Assault (set 2)",                            MACHINE_SUPPORTS_SAVE )
+GAME( 1998, cutefght, 0,        dreamwld, cutefght, dreamwld_state, 0, ROT0,   "SemiCom",                        "Cute Fighter",                                               MACHINE_SUPPORTS_SAVE )
+GAME( 1999, rolcrush, 0,        baryon,   rolcrush, dreamwld_state, 0, ROT0,   "SemiCom / Exit (Trust license)", "Rolling Crush (version 1.07.E - 1999/02/11, Trust license)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, rolcrusha,rolcrush, baryon,   rolcrush, dreamwld_state, 0, ROT0,   "SemiCom / Exit",                 "Rolling Crush (version 1.03.E - 1999/01/29)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1999, gaialast, 0,        baryon,   gaialast, dreamwld_state, 0, ROT0,   "SemiCom / XESS",                 "Gaia - The Last Choice of Earth",                            MACHINE_SUPPORTS_SAVE )
+GAME( 2000, dreamwld, 0,        dreamwld, dreamwld, dreamwld_state, 0, ROT0,   "SemiCom",                        "Dream World",                                                MACHINE_SUPPORTS_SAVE )

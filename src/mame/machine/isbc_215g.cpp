@@ -6,12 +6,13 @@
 
 // TODO: multibus
 
+#include "emu.h"
 #include "isbc_215g.h"
 
-const device_type ISBC_215G = &device_creator<isbc_215g_device>;
+DEFINE_DEVICE_TYPE(ISBC_215G, isbc_215g_device, "isbc_215g", "ISBC 215G Winchester Disk Controller")
 
-isbc_215g_device::isbc_215g_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, ISBC_215G, "ISBC 215G Winchester Disk Controller", tag, owner, clock, "isbc_215g", __FILE__),
+isbc_215g_device::isbc_215g_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, ISBC_215G, tag, owner, clock),
 	m_dmac(*this, "u84"),
 	m_hdd0(*this, "drive0"),
 	m_hdd1(*this, "drive1"),
@@ -30,8 +31,8 @@ void isbc_215g_device::find_sector()
 	// 1:     cyl low
 	// 2:     head
 	// 3:     sector
-	UINT16 cyl = ((m_idcompare[0] & 0xf) << 8) | m_idcompare[1];
-	UINT16 bps = 128 << ((m_idcompare[0] >> 4) & 3);
+	uint16_t cyl = ((m_idcompare[0] & 0xf) << 8) | m_idcompare[1];
+	uint16_t bps = 128 << ((m_idcompare[0] >> 4) & 3);
 
 	if(!m_geom[m_drive])
 		return;
@@ -57,9 +58,9 @@ void isbc_215g_device::find_sector()
 	return;
 }
 
-UINT16 isbc_215g_device::read_sector()
+uint16_t isbc_215g_device::read_sector()
 {
-	UINT16 wps = 64 << ((m_idcompare[0] >> 4) & 3);
+	uint16_t wps = 64 << ((m_idcompare[0] >> 4) & 3);
 	harddisk_image_device *drive = (m_drive ? m_hdd1 : m_hdd0);
 	if(!m_secoffset)
 		hard_disk_read(drive->get_hard_disk_file(), m_lba[m_drive], m_sector);
@@ -68,9 +69,9 @@ UINT16 isbc_215g_device::read_sector()
 	return m_sector[m_secoffset++];
 }
 
-bool isbc_215g_device::write_sector(UINT16 data)
+bool isbc_215g_device::write_sector(uint16_t data)
 {
-	UINT16 wps = 64 << ((m_idcompare[0] >> 4) & 3);
+	uint16_t wps = 64 << ((m_idcompare[0] >> 4) & 3);
 	harddisk_image_device *drive = (m_drive ? m_hdd1 : m_hdd0);
 	if(m_secoffset >= wps)
 		return true;
@@ -85,7 +86,7 @@ bool isbc_215g_device::write_sector(UINT16 data)
 
 READ16_MEMBER(isbc_215g_device::io_r)
 {
-	UINT16 data = 0;
+	uint16_t data = 0;
 	switch(offset)
 	{
 		case 0x00:
@@ -132,7 +133,7 @@ READ16_MEMBER(isbc_215g_device::io_r)
 			break;
 		case 0x0c:
 			// reset channel 2
-			if(space.debugger_access()) // reading this is bad
+			if(machine().side_effect_disabled()) // reading this is bad
 				break;
 			m_dmac->sel_w(1);
 			m_dmac->ca_w(1);
@@ -294,7 +295,7 @@ WRITE16_MEMBER(isbc_215g_device::io_w)
 READ16_MEMBER(isbc_215g_device::mem_r)
 {
 	// XXX: hack to permit debugger to disassemble rom
-	if(space.debugger_access() && (offset < 0x1fff))
+	if(machine().side_effect_disabled() && (offset < 0x1fff))
 		return m_dmac->space(AS_IO).read_word_unaligned(offset*2);
 
 	switch(offset)
@@ -349,7 +350,7 @@ WRITE_LINE_MEMBER(isbc_215g_device::isbx_irq_11_w)
 	m_isbx_irq[3] = state ? true : false;
 }
 
-static MACHINE_CONFIG_FRAGMENT( isbc_215g )
+MACHINE_CONFIG_MEMBER( isbc_215g_device::device_add_mconfig )
 	MCFG_CPU_ADD("u84", I8089, XTAL_15MHz / 3)
 	MCFG_CPU_PROGRAM_MAP(isbc_215g_mem)
 	MCFG_CPU_IO_MAP(isbc_215g_io)
@@ -366,10 +367,6 @@ static MACHINE_CONFIG_FRAGMENT( isbc_215g )
 	MCFG_ISBX_SLOT_MINTR1_CALLBACK(WRITELINE(isbc_215g_device, isbx_irq_11_w))
 MACHINE_CONFIG_END
 
-machine_config_constructor isbc_215g_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( isbc_215g );
-}
 
 ROM_START( isbc_215g )
 	ROM_REGION( 0x4000, "i8089", ROMREGION_ERASEFF )
@@ -377,7 +374,7 @@ ROM_START( isbc_215g )
 	ROM_LOAD16_BYTE( "174581.002.bin", 0x0001, 0x2000, CRC(6190fa67) SHA1(295dd4e75f699aaf93227cc4876cee8accae383a))
 ROM_END
 
-const rom_entry *isbc_215g_device::device_rom_region() const
+const tiny_rom_entry *isbc_215g_device::device_rom_region() const
 {
 	return ROM_NAME( isbc_215g );
 }

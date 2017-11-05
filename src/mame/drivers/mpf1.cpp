@@ -48,7 +48,10 @@
 
 */
 
+#include "emu.h"
 #include "includes/mpf1.h"
+#include "speaker.h"
+
 #include "mpf1.lh"
 #include "mpf1b.lh"
 #include "mpf1p.lh"
@@ -59,6 +62,10 @@ static ADDRESS_MAP_START( mpf1_map, AS_PROGRAM, 8, mpf1_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x1800, 0x1fff) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( mpf1_step, AS_OPCODES, 8, mpf1_state )
+	AM_RANGE(0x0000, 0xffff) AM_READ(step_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mpf1b_map, AS_PROGRAM, 8, mpf1_state )
@@ -247,7 +254,7 @@ TIMER_CALLBACK_MEMBER(mpf1_state::led_refresh)
 
 READ8_MEMBER( mpf1_state::ppi_pa_r )
 {
-	UINT8 data = 0x7f;
+	uint8_t data = 0x7f;
 
 	/* bit 0 to 5, keyboard rows 0 to 5 */
 	if (!BIT(m_lednum, 0)) data &= m_pc0->read();
@@ -269,7 +276,7 @@ READ8_MEMBER( mpf1_state::ppi_pa_r )
 WRITE8_MEMBER( mpf1_state::ppi_pb_w )
 {
 	/* swap bits around for the mame 7-segment emulation */
-	UINT8 led_data = BITSWAP8(data, 6, 1, 2, 0, 7, 5, 4, 3);
+	uint8_t led_data = BITSWAP8(data, 6, 1, 2, 0, 7, 5, 4, 3);
 
 	/* timer to update segments */
 	m_led_refresh_timer->adjust(attotime::from_usec(70), led_data);
@@ -296,6 +303,19 @@ WRITE8_MEMBER( mpf1_state::ppi_pc_w )
 	m_cassette->output( BIT(data, 7) ? 1.0 : -1.0);
 }
 
+READ8_MEMBER(mpf1_state::step_r)
+{
+	if (!m_break)
+	{
+		m_m1++;
+
+		if (m_m1 == 5)
+			m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	}
+
+	return m_program->read_byte(offset);
+}
+
 /* Z80 Daisy Chain */
 
 static const z80_daisy_config mpf1_daisy_chain[] =
@@ -311,7 +331,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(mpf1_state::check_halt_callback)
 {
 	// halt-LED; the red one, is turned on when the processor is halted
 	// TODO: processor seems to halt, but restarts(?) at 0x0000 after a while -> fix
-	INT64 led_halt = m_maincpu->state_int(Z80_HALT);
+	int64_t led_halt = m_maincpu->state_int(Z80_HALT);
 	output().set_led_value(1, led_halt);
 }
 
@@ -332,11 +352,12 @@ void mpf1_state::machine_reset()
 
 /* Machine Drivers */
 
-static MACHINE_CONFIG_START( mpf1, mpf1_state )
+static MACHINE_CONFIG_START( mpf1 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_3_579545MHz/2)
 	MCFG_CPU_PROGRAM_MAP(mpf1_map)
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(mpf1_step)
 	MCFG_CPU_IO_MAP(mpf1_io_map)
 	MCFG_Z80_DAISY_CHAIN(mpf1_daisy_chain)
 
@@ -366,10 +387,11 @@ static MACHINE_CONFIG_START( mpf1, mpf1_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("halt_timer", mpf1_state, check_halt_callback, attotime::from_hz(1))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( mpf1b, mpf1_state )
+static MACHINE_CONFIG_START( mpf1b )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_3_579545MHz/2)
 	MCFG_CPU_PROGRAM_MAP(mpf1b_map)
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(mpf1_step)
 	MCFG_CPU_IO_MAP(mpf1b_io_map)
 	MCFG_Z80_DAISY_CHAIN(mpf1_daisy_chain)
 
@@ -402,10 +424,11 @@ static MACHINE_CONFIG_START( mpf1b, mpf1_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("halt_timer", mpf1_state, check_halt_callback, attotime::from_hz(1))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( mpf1p, mpf1_state )
+static MACHINE_CONFIG_START( mpf1p )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(Z80_TAG, Z80, 2500000)
 	MCFG_CPU_PROGRAM_MAP(mpf1p_map)
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(mpf1_step)
 	MCFG_CPU_IO_MAP(mpf1p_io_map)
 	MCFG_Z80_DAISY_CHAIN(mpf1_daisy_chain)
 
@@ -458,26 +481,11 @@ ROM_END
 
 /* System Drivers */
 
-DIRECT_UPDATE_MEMBER(mpf1_state::mpf1_direct_update_handler)
-{
-	if (!m_break)
-	{
-		m_m1++;
-
-		if (m_m1 == 5)
-		{
-			m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-		}
-	}
-
-	return address;
-}
-
 DRIVER_INIT_MEMBER(mpf1_state,mpf1)
 {
-	m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(mpf1_state::mpf1_direct_update_handler), this));
+	m_program = &m_maincpu->space(AS_PROGRAM);
 }
 
-COMP( 1979, mpf1,  0,    0, mpf1, mpf1, mpf1_state,  mpf1, "Multitech", "Micro Professor 1", 0)
-COMP( 1979, mpf1b, mpf1, 0, mpf1b,mpf1b, mpf1_state, mpf1, "Multitech", "Micro Professor 1B", 0)
-COMP( 1982, mpf1p, mpf1, 0, mpf1p,mpf1b, mpf1_state, mpf1, "Multitech", "Micro Professor 1 Plus", MACHINE_NOT_WORKING)
+COMP( 1979, mpf1,  0,    0, mpf1, mpf1,  mpf1_state, mpf1, "Multitech", "Micro Professor 1",      0 )
+COMP( 1979, mpf1b, mpf1, 0, mpf1b,mpf1b, mpf1_state, mpf1, "Multitech", "Micro Professor 1B",     0 )
+COMP( 1982, mpf1p, mpf1, 0, mpf1p,mpf1b, mpf1_state, mpf1, "Multitech", "Micro Professor 1 Plus", MACHINE_NOT_WORKING )

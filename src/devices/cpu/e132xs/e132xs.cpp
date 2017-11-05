@@ -203,8 +203,8 @@
       after a branch
     - Changed hyperstone_movi to decrement PC by 2 when G0 (PC) is modified so that the
       next opcode isn't skipped after a branch
-    - Changed hyperstone_movi to default to a UINT32 being moved into the register
-      as opposed to a UINT8. This is wrong, the bit width is quite likely to be
+    - Changed hyperstone_movi to default to a uint32_t being moved into the register
+      as opposed to a uint8_t. This is wrong, the bit width is quite likely to be
       dependent on the n field in the Rimm instruction type. However, vamphalf uses
       MOVI G0,[FFFF]FBAC (n=$13) since there's apparently no absolute branch opcode.
       What kind of CPU is this that it doesn't have an absolute jump in its branch
@@ -214,42 +214,17 @@
 *********************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
 #include "e132xs.h"
+
+#include "debugger.h"
+
+#include "32xsdefs.h"
 
 #ifdef MAME_DEBUG
 #define DEBUG_PRINTF(x) do { osd_printf_debug x; } while (0)
 #else
 #define DEBUG_PRINTF(x) do { } while (0)
 #endif
-
-// set C in adds/addsi/subs/sums
-#define SETCARRYS 0
-#define MISSIONCRAFT_FLAGS 1
-
-/* Registers */
-
-/* Internal registers */
-
-#define SREG  (decode)->src_value
-#define SREGF (decode)->next_src_value
-#define DREG  (decode)->dst_value
-#define DREGF (decode)->next_dst_value
-#define EXTRA_U (decode)->extra.u
-#define EXTRA_S (decode)->extra.s
-
-#define SET_SREG( _data_ )  ((decode)->src_is_local ? set_local_register((decode)->src, (UINT32)_data_) : set_global_register((decode)->src, (UINT32)_data_))
-#define SET_SREGF( _data_ ) ((decode)->src_is_local ? set_local_register((decode)->src + 1, (UINT32)_data_) : set_global_register((decode)->src + 1, (UINT32)_data_))
-#define SET_DREG( _data_ )  ((decode)->dst_is_local ? set_local_register((decode)->dst, (UINT32)_data_) : set_global_register((decode)->dst, (UINT32)_data_))
-#define SET_DREGF( _data_ ) ((decode)->dst_is_local ? set_local_register((decode)->dst + 1, (UINT32)_data_) : set_global_register((decode)->dst + 1, (UINT32)_data_))
-
-#define SRC_IS_PC      (!(decode)->src_is_local && (decode)->src == PC_REGISTER)
-#define DST_IS_PC      (!(decode)->dst_is_local && (decode)->dst == PC_REGISTER)
-#define SRC_IS_SR      (!(decode)->src_is_local && (decode)->src == SR_REGISTER)
-#define DST_IS_SR      (!(decode)->dst_is_local && (decode)->dst == SR_REGISTER)
-#define SAME_SRC_DST   (decode)->same_src_dst
-#define SAME_SRC_DSTF  (decode)->same_src_dstf
-#define SAME_SRCF_DST  (decode)->same_srcf_dst
 
 //**************************************************************************
 //  INTERNAL ADDRESS MAP
@@ -292,9 +267,9 @@ ADDRESS_MAP_END
 //  hyperstone_device - constructor
 //-------------------------------------------------
 
-hyperstone_device::hyperstone_device(const machine_config &mconfig, const char *name, const char *tag, device_t *owner, UINT32 clock,
-										const device_type type, UINT32 prg_data_width, UINT32 io_data_width, address_map_constructor internal_map, const char *shortname, const char *source)
-	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source),
+hyperstone_device::hyperstone_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock,
+										const device_type type, uint32_t prg_data_width, uint32_t io_data_width, address_map_constructor internal_map)
+	: cpu_device(mconfig, type, tag, owner, clock),
 		m_program_config("program", ENDIANNESS_BIG, prg_data_width, 32, 0, internal_map),
 		m_io_config("io", ENDIANNESS_BIG, io_data_width, 15),
 		m_icount(0)
@@ -309,8 +284,8 @@ hyperstone_device::hyperstone_device(const machine_config &mconfig, const char *
 //  e116t_device - constructor
 //-------------------------------------------------
 
-e116t_device::e116t_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: hyperstone_device(mconfig, "E1-16T", tag, owner, clock, E116T, 16, 16, ADDRESS_MAP_NAME(e116_4k_iram_map), "e116t", __FILE__)
+e116t_device::e116t_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: hyperstone_device(mconfig, tag, owner, clock, E116T, 16, 16, ADDRESS_MAP_NAME(e116_4k_iram_map))
 {
 }
 
@@ -319,8 +294,8 @@ e116t_device::e116t_device(const machine_config &mconfig, const char *tag, devic
 //  e116xt_device - constructor
 //-------------------------------------------------
 
-e116xt_device::e116xt_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: hyperstone_device(mconfig, "E1-16XT", tag, owner, clock, E116XT, 16, 16, ADDRESS_MAP_NAME(e116_8k_iram_map), "e116xt", __FILE__)
+e116xt_device::e116xt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: hyperstone_device(mconfig, tag, owner, clock, E116XT, 16, 16, ADDRESS_MAP_NAME(e116_8k_iram_map))
 {
 }
 
@@ -329,8 +304,8 @@ e116xt_device::e116xt_device(const machine_config &mconfig, const char *tag, dev
 //  e116xs_device - constructor
 //-------------------------------------------------
 
-e116xs_device::e116xs_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: hyperstone_device(mconfig, "E1-16XS", tag, owner, clock, E116XS, 16, 16, ADDRESS_MAP_NAME(e116_16k_iram_map), "e116xs", __FILE__)
+e116xs_device::e116xs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: hyperstone_device(mconfig, tag, owner, clock, E116XS, 16, 16, ADDRESS_MAP_NAME(e116_16k_iram_map))
 {
 }
 
@@ -339,8 +314,8 @@ e116xs_device::e116xs_device(const machine_config &mconfig, const char *tag, dev
 //  e116xsr_device - constructor
 //-------------------------------------------------
 
-e116xsr_device::e116xsr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: hyperstone_device(mconfig, "E1-16XSR", tag, owner, clock, E116XT, 16, 16, ADDRESS_MAP_NAME(e116_16k_iram_map), "e116xsr", __FILE__)
+e116xsr_device::e116xsr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: hyperstone_device(mconfig, tag, owner, clock, E116XSR, 16, 16, ADDRESS_MAP_NAME(e116_16k_iram_map))
 {
 }
 
@@ -349,8 +324,8 @@ e116xsr_device::e116xsr_device(const machine_config &mconfig, const char *tag, d
 //  e132n_device - constructor
 //-------------------------------------------------
 
-e132n_device::e132n_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: hyperstone_device(mconfig, "E1-32N", tag, owner, clock, E132N, 32, 32, ADDRESS_MAP_NAME(e132_4k_iram_map), "e132n", __FILE__)
+e132n_device::e132n_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: hyperstone_device(mconfig, tag, owner, clock, E132N, 32, 32, ADDRESS_MAP_NAME(e132_4k_iram_map))
 {
 }
 
@@ -359,8 +334,8 @@ e132n_device::e132n_device(const machine_config &mconfig, const char *tag, devic
 //  e132t_device - constructor
 //-------------------------------------------------
 
-e132t_device::e132t_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: hyperstone_device(mconfig, "E1-32T", tag, owner, clock, E132T, 32, 32, ADDRESS_MAP_NAME(e132_4k_iram_map), "e132t", __FILE__)
+e132t_device::e132t_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: hyperstone_device(mconfig, tag, owner, clock, E132T, 32, 32, ADDRESS_MAP_NAME(e132_4k_iram_map))
 {
 }
 
@@ -369,8 +344,8 @@ e132t_device::e132t_device(const machine_config &mconfig, const char *tag, devic
 //  e132xn_device - constructor
 //-------------------------------------------------
 
-e132xn_device::e132xn_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: hyperstone_device(mconfig, "E1-32XN", tag, owner, clock, E132XN, 32, 32, ADDRESS_MAP_NAME(e132_8k_iram_map), "e132xn", __FILE__)
+e132xn_device::e132xn_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: hyperstone_device(mconfig, tag, owner, clock, E132XN, 32, 32, ADDRESS_MAP_NAME(e132_8k_iram_map))
 {
 }
 
@@ -379,8 +354,8 @@ e132xn_device::e132xn_device(const machine_config &mconfig, const char *tag, dev
 //  e132xt_device - constructor
 //-------------------------------------------------
 
-e132xt_device::e132xt_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: hyperstone_device(mconfig, "E1-32XT", tag, owner, clock, E132XT, 32, 32, ADDRESS_MAP_NAME(e132_8k_iram_map), "e132xt", __FILE__)
+e132xt_device::e132xt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: hyperstone_device(mconfig, tag, owner, clock, E132XT, 32, 32, ADDRESS_MAP_NAME(e132_8k_iram_map))
 {
 }
 
@@ -389,8 +364,8 @@ e132xt_device::e132xt_device(const machine_config &mconfig, const char *tag, dev
 //  e132xs_device - constructor
 //-------------------------------------------------
 
-e132xs_device::e132xs_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: hyperstone_device(mconfig, "E1-32XS", tag, owner, clock, E132XS, 32, 32, ADDRESS_MAP_NAME(e132_16k_iram_map), "e132xs", __FILE__)
+e132xs_device::e132xs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: hyperstone_device(mconfig, tag, owner, clock, E132XS, 32, 32, ADDRESS_MAP_NAME(e132_16k_iram_map))
 {
 }
 
@@ -399,8 +374,8 @@ e132xs_device::e132xs_device(const machine_config &mconfig, const char *tag, dev
 //  e132xsr_device - constructor
 //-------------------------------------------------
 
-e132xsr_device::e132xsr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: hyperstone_device(mconfig, "E1-32XSR", tag, owner, clock, E132XSR, 32, 32, ADDRESS_MAP_NAME(e132_16k_iram_map), "e132xsr", __FILE__)
+e132xsr_device::e132xsr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: hyperstone_device(mconfig, tag, owner, clock, E132XSR, 32, 32, ADDRESS_MAP_NAME(e132_16k_iram_map))
 {
 }
 
@@ -409,8 +384,8 @@ e132xsr_device::e132xsr_device(const machine_config &mconfig, const char *tag, d
 //  gms30c2116_device - constructor
 //-------------------------------------------------
 
-gms30c2116_device::gms30c2116_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: hyperstone_device(mconfig, "GMS30C2116", tag, owner, clock, GMS30C2116, 16, 16, ADDRESS_MAP_NAME(e116_4k_iram_map), "gms30c2116", __FILE__)
+gms30c2116_device::gms30c2116_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: hyperstone_device(mconfig, tag, owner, clock, GMS30C2116, 16, 16, ADDRESS_MAP_NAME(e116_4k_iram_map))
 {
 }
 
@@ -419,8 +394,8 @@ gms30c2116_device::gms30c2116_device(const machine_config &mconfig, const char *
 //  gms30c2132_device - constructor
 //-------------------------------------------------
 
-gms30c2132_device::gms30c2132_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: hyperstone_device(mconfig, "GMS30C2132", tag, owner, clock, GMS30C2132, 32, 32, ADDRESS_MAP_NAME(e132_4k_iram_map), "gms30c2132", __FILE__)
+gms30c2132_device::gms30c2132_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: hyperstone_device(mconfig, tag, owner, clock, GMS30C2132, 32, 32, ADDRESS_MAP_NAME(e132_4k_iram_map))
 {
 }
 
@@ -429,8 +404,8 @@ gms30c2132_device::gms30c2132_device(const machine_config &mconfig, const char *
 //  gms30c2216_device - constructor
 //-------------------------------------------------
 
-gms30c2216_device::gms30c2216_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: hyperstone_device(mconfig, "GMS30C2216", tag, owner, clock, GMS30C2216, 16, 16, ADDRESS_MAP_NAME(e116_8k_iram_map), "gms30c2216", __FILE__)
+gms30c2216_device::gms30c2216_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: hyperstone_device(mconfig, tag, owner, clock, GMS30C2216, 16, 16, ADDRESS_MAP_NAME(e116_8k_iram_map))
 {
 }
 
@@ -439,15 +414,15 @@ gms30c2216_device::gms30c2216_device(const machine_config &mconfig, const char *
 //  gms30c2232_device - constructor
 //-------------------------------------------------
 
-gms30c2232_device::gms30c2232_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: hyperstone_device(mconfig, "GMS30C2232", tag, owner, clock, GMS30C2232, 32, 32, ADDRESS_MAP_NAME(e132_8k_iram_map), "gms30c2232", __FILE__)
+gms30c2232_device::gms30c2232_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: hyperstone_device(mconfig, tag, owner, clock, GMS30C2232, 32, 32, ADDRESS_MAP_NAME(e132_8k_iram_map))
 {
 }
 
 /* Return the entry point for a determinated trap */
-UINT32 hyperstone_device::get_trap_addr(UINT8 trapno)
+uint32_t hyperstone_device::get_trap_addr(uint8_t trapno)
 {
-	UINT32 addr;
+	uint32_t addr;
 	if( m_trap_entry == 0xffffff00 ) /* @ MEM3 */
 	{
 		addr = trapno * 4;
@@ -462,9 +437,9 @@ UINT32 hyperstone_device::get_trap_addr(UINT8 trapno)
 }
 
 /* Return the entry point for a determinated emulated code (the one for "extend" opcode is reserved) */
-UINT32 hyperstone_device::get_emu_code_addr(UINT8 num) /* num is OP */
+uint32_t hyperstone_device::get_emu_code_addr(uint8_t num) /* num is OP */
 {
-	UINT32 addr;
+	uint32_t addr;
 	if( m_trap_entry == 0xffffff00 ) /* @ MEM3 */
 	{
 		addr = (m_trap_entry - 0x100) | ((num & 0xf) << 4);
@@ -506,92 +481,16 @@ void hyperstone_device::hyperstone_set_trap_entry(int which)
 	}
 }
 
-#define OP              m_op
-#define PPC             m_ppc //previous pc
-#define PC              m_global_regs[0] //Program Counter
-#define SR              m_global_regs[1] //Status Register
-#define FER             m_global_regs[2] //Floating-Point Exception Register
-// 03 - 15  General Purpose Registers
-// 16 - 17  Reserved
-#define SP              m_global_regs[18] //Stack Pointer
-#define UB              m_global_regs[19] //Upper Stack Bound
-#define BCR             m_global_regs[20] //Bus Control Register
-#define TPR             m_global_regs[21] //Timer Prescaler Register
-#define TCR             m_global_regs[22] //Timer Compare Register
-#define TR              compute_tr() //Timer Register
-#define WCR             m_global_regs[24] //Watchdog Compare Register
-#define ISR             m_global_regs[25] //Input Status Register
-#define FCR             m_global_regs[26] //Function Control Register
-#define MCR             m_global_regs[27] //Memory Control Register
-// 28 - 31  Reserved
-
-/* SR flags */
-#define GET_C                   ( SR & 0x00000001)      // bit 0 //CARRY
-#define GET_Z                   ((SR & 0x00000002)>>1)  // bit 1 //ZERO
-#define GET_N                   ((SR & 0x00000004)>>2)  // bit 2 //NEGATIVE
-#define GET_V                   ((SR & 0x00000008)>>3)  // bit 3 //OVERFLOW
-#define GET_M                   ((SR & 0x00000010)>>4)  // bit 4 //CACHE-MODE
-#define GET_H                   ((SR & 0x00000020)>>5)  // bit 5 //HIGHGLOBAL
-// bit 6 RESERVED (always 0)
-#define GET_I                   ((SR & 0x00000080)>>7)  // bit 7 //INTERRUPT-MODE
-#define GET_FTE                 ((SR & 0x00001f00)>>8)  // bits 12 - 8  //Floating-Point Trap Enable
-#define GET_FRM                 ((SR & 0x00006000)>>13) // bits 14 - 13 //Floating-Point Rounding Mode
-#define GET_L                   ((SR & 0x00008000)>>15) // bit 15 //INTERRUPT-LOCK
-#define GET_T                   ((SR & 0x00010000)>>16) // bit 16 //TRACE-MODE
-#define GET_P                   ((SR & 0x00020000)>>17) // bit 17 //TRACE PENDING
-#define GET_S                   ((SR & 0x00040000)>>18) // bit 18 //SUPERVISOR STATE
-#define GET_ILC                 ((SR & 0x00180000)>>19) // bits 20 - 19 //INSTRUCTION-LENGTH
-/* if FL is zero it is always interpreted as 16 */
-#define GET_FL                  ((SR & 0x01e00000) ? ((SR & 0x01e00000)>>21) : 16) // bits 24 - 21 //FRAME LENGTH
-#define GET_FP                  ((SR & 0xfe000000)>>25) // bits 31 - 25 //FRAME POINTER
-
-#define SET_C(val)              (SR = (SR & ~0x00000001) | (val))
-#define SET_Z(val)              (SR = (SR & ~0x00000002) | ((val) << 1))
-#define SET_N(val)              (SR = (SR & ~0x00000004) | ((val) << 2))
-#define SET_V(val)              (SR = (SR & ~0x00000008) | ((val) << 3))
-#define SET_M(val)              (SR = (SR & ~0x00000010) | ((val) << 4))
-#define SET_H(val)              (SR = (SR & ~0x00000020) | ((val) << 5))
-#define SET_I(val)              (SR = (SR & ~0x00000080) | ((val) << 7))
-#define SET_FTE(val)            (SR = (SR & ~0x00001f00) | ((val) << 8))
-#define SET_FRM(val)            (SR = (SR & ~0x00006000) | ((val) << 13))
-#define SET_L(val)              (SR = (SR & ~0x00008000) | ((val) << 15))
-#define SET_T(val)              (SR = (SR & ~0x00010000) | ((val) << 16))
-#define SET_P(val)              (SR = (SR & ~0x00020000) | ((val) << 17))
-#define SET_S(val)              (SR = (SR & ~0x00040000) | ((val) << 18))
-#define SET_ILC(val)            (SR = (SR & ~0x00180000) | ((val) << 19))
-#define SET_FL(val)             (SR = (SR & ~0x01e00000) | ((val) << 21))
-#define SET_FP(val)             (SR = (SR & ~0xfe000000) | ((val) << 25))
-
-#define SET_PC(val)             PC = ((val) & 0xfffffffe) //PC(0) = 0
-#define SET_SP(val)             SP = ((val) & 0xfffffffc) //SP(0) = SP(1) = 0
-#define SET_UB(val)             UB = ((val) & 0xfffffffc) //UB(0) = UB(1) = 0
-
-#define SET_LOW_SR(val)         (SR = (SR & 0xffff0000) | ((val) & 0x0000ffff)) // when SR is addressed, only low 16 bits can be changed
-
-
-#define CHECK_C(x)              (SR = (SR & ~0x00000001) | (((x) & (((UINT64)1) << 32)) ? 1 : 0 ))
-#define CHECK_VADD(x,y,z)       (SR = (SR & ~0x00000008) | ((((x) ^ (z)) & ((y) ^ (z)) & 0x80000000) ? 8: 0))
-#define CHECK_VADD3(x,y,w,z)    (SR = (SR & ~0x00000008) | ((((x) ^ (z)) & ((y) ^ (z)) & ((w) ^ (z)) & 0x80000000) ? 8: 0))
-#define CHECK_VSUB(x,y,z)       (SR = (SR & ~0x00000008) | ((((z) ^ (y)) & ((y) ^ (x)) & 0x80000000) ? 8: 0))
-
-
-/* FER flags */
-#define GET_ACCRUED             (FER & 0x0000001f) //bits  4 - 0 //Floating-Point Accrued Exceptions
-#define GET_ACTUAL              (FER & 0x00001f00) //bits 12 - 8 //Floating-Point Actual  Exceptions
-//other bits are reversed, in particular 7 - 5 for the operating system.
-//the user program can only changes the above 2 flags
-
-
-UINT32 hyperstone_device::compute_tr()
+uint32_t hyperstone_device::compute_tr()
 {
-	UINT64 cycles_since_base = total_cycles() - m_tr_base_cycles;
-	UINT64 clocks_since_base = cycles_since_base >> m_clck_scale;
+	uint64_t cycles_since_base = total_cycles() - m_tr_base_cycles;
+	uint64_t clocks_since_base = cycles_since_base >> m_clck_scale;
 	return m_tr_base_value + (clocks_since_base / m_tr_clocks_per_tick);
 }
 
 void hyperstone_device::update_timer_prescale()
 {
-	UINT32 prevtr = compute_tr();
+	uint32_t prevtr = compute_tr();
 	TPR &= ~0x80000000;
 	m_clck_scale = (TPR >> 26) & m_clock_scale_mask;
 	m_clock_cycles_1 = 1 << m_clck_scale;
@@ -605,26 +504,26 @@ void hyperstone_device::update_timer_prescale()
 
 void hyperstone_device::adjust_timer_interrupt()
 {
-	UINT64 cycles_since_base = total_cycles() - m_tr_base_cycles;
-	UINT64 clocks_since_base = cycles_since_base >> m_clck_scale;
-	UINT64 cycles_until_next_clock = cycles_since_base - (clocks_since_base << m_clck_scale);
+	uint64_t cycles_since_base = total_cycles() - m_tr_base_cycles;
+	uint64_t clocks_since_base = cycles_since_base >> m_clck_scale;
+	uint64_t cycles_until_next_clock = cycles_since_base - (clocks_since_base << m_clck_scale);
 
 	if (cycles_until_next_clock == 0)
-		cycles_until_next_clock = (UINT64)(1 << m_clck_scale);
+		cycles_until_next_clock = (uint64_t)(1 << m_clck_scale);
 
 	/* special case: if we have a change pending, set a timer to fire then */
 	if (TPR & 0x80000000)
 	{
-		UINT64 clocks_until_int = m_tr_clocks_per_tick - (clocks_since_base % m_tr_clocks_per_tick);
-		UINT64 cycles_until_int = (clocks_until_int << m_clck_scale) + cycles_until_next_clock;
+		uint64_t clocks_until_int = m_tr_clocks_per_tick - (clocks_since_base % m_tr_clocks_per_tick);
+		uint64_t cycles_until_int = (clocks_until_int << m_clck_scale) + cycles_until_next_clock;
 		m_timer->adjust(cycles_to_attotime(cycles_until_int + 1), 1);
 	}
 
 	/* else if the timer interrupt is enabled, configure it to fire at the appropriate time */
 	else if (!(FCR & 0x00800000))
 	{
-		UINT32 curtr = m_tr_base_value + (clocks_since_base / m_tr_clocks_per_tick);
-		UINT32 delta = TCR - curtr;
+		uint32_t curtr = m_tr_base_value + (clocks_since_base / m_tr_clocks_per_tick);
+		uint32_t delta = TCR - curtr;
 		if (delta > 0x80000000)
 		{
 			if (!m_timer_int_pending)
@@ -632,8 +531,8 @@ void hyperstone_device::adjust_timer_interrupt()
 		}
 		else
 		{
-			UINT64 clocks_until_int = mulu_32x32(delta, m_tr_clocks_per_tick);
-			UINT64 cycles_until_int = (clocks_until_int << m_clck_scale) + cycles_until_next_clock;
+			uint64_t clocks_until_int = mulu_32x32(delta, m_tr_clocks_per_tick);
+			uint64_t cycles_until_int = (clocks_until_int << m_clck_scale) + cycles_until_next_clock;
 			m_timer->adjust(cycles_to_attotime(cycles_until_int));
 		}
 	}
@@ -663,7 +562,7 @@ TIMER_CALLBACK_MEMBER( hyperstone_device::timer_callback )
 
 
 
-UINT32 hyperstone_device::get_global_register(UINT8 code)
+uint32_t hyperstone_device::get_global_register(uint8_t code)
 {
 /*
     if( code >= 16 )
@@ -707,14 +606,14 @@ UINT32 hyperstone_device::get_global_register(UINT8 code)
 	return m_global_regs[code];
 }
 
-void hyperstone_device::set_local_register(UINT8 code, UINT32 val)
+void hyperstone_device::set_local_register(uint8_t code, uint32_t val)
 {
-	UINT8 new_code = (code + GET_FP) % 64;
+	uint8_t new_code = (code + GET_FP) % 64;
 
 	m_local_regs[new_code] = val;
 }
 
-void hyperstone_device::set_global_register(UINT8 code, UINT32 val)
+void hyperstone_device::set_global_register(uint8_t code, uint32_t val)
 {
 	//TODO: add correct FER set instruction
 
@@ -731,7 +630,7 @@ void hyperstone_device::set_global_register(UINT8 code, UINT32 val)
 	}
 	else
 	{
-		UINT32 oldval = m_global_regs[code];
+		uint32_t oldval = m_global_regs[code];
 		if( code != ISR_REGISTER )
 			m_global_regs[code] = val;
 		else
@@ -831,150 +730,203 @@ void hyperstone_device::set_global_register(UINT8 code, UINT32 val)
 
 #define LOCAL  1
 
-static const INT32 immediate_values[32] =
+static const int32_t immediate_values[32] =
 {
 	0, 1, 2, 3, 4, 5, 6, 7,
 	8, 9, 10, 11, 12, 13, 14, 15,
-	16, 0, 0, 0, 32, 64, 128, static_cast<INT32>(0x80000000),
+	16, 0, 0, 0, 32, 64, 128, static_cast<int32_t>(0x80000000),
 	-8, -7, -6, -5, -4, -3, -2, -1
 };
 
 #define WRITE_ONLY_REGMASK  ((1 << BCR_REGISTER) | (1 << TPR_REGISTER) | (1 << FCR_REGISTER) | (1 << MCR_REGISTER))
 
-#define decode_source(decode, local, hflag)                                         \
+#define decode_source_local(decode)                                                 \
 do                                                                                  \
 {                                                                                   \
-	if(local)                                                                       \
+	decode.src_is_local = 1;                                                        \
+	uint8_t code = (decode.src + GET_FP) % 64;                                      \
+	SREG = m_local_regs[code];                                                      \
+	code = (decode.src + 1 + GET_FP) % 64;                                          \
+	SREGF = m_local_regs[code];                                                     \
+} while (0)
+
+#define decode_source_noh(decode)                                                   \
+do                                                                                  \
+{                                                                                   \
+	decode.src_is_local = 0;                                                        \
+																				    \
+	SREG = get_global_register(decode.src);                                         \
+																				    \
+	/* bound safe */                                                                \
+	if (decode.src != 15)                                                           \
+		SREGF = get_global_register(decode.src + 1);                                \
+	else                                                                            \
+		SREGF = 0;                                                                  \
+} while (0)
+
+#define decode_source(decode, hflag)                                                \
+do                                                                                  \
+{                                                                                   \
+	decode.src_is_local = 0;                                                        \
+																				    \
+	if (!hflag)                                                                     \
 	{                                                                               \
-		UINT8 code = (decode)->src;                                                 \
-		(decode)->src_is_local = 1;                                                 \
-		code = ((decode)->src + GET_FP) % 64; /* registers offset by frame pointer  */\
-		SREG = m_local_regs[code];                                                  \
-		code = ((decode)->src + 1 + GET_FP) % 64;                                   \
-		SREGF = m_local_regs[code];                                                 \
+		SREG = get_global_register(decode.src);                                     \
+																				    \
+		/* bound safe */                                                            \
+		if (decode.src != 15)                                                       \
+			SREGF = get_global_register(decode.src + 1);                            \
+		else                                                                        \
+			SREGF = 0;                                                              \
 	}                                                                               \
 	else                                                                            \
 	{                                                                               \
-		(decode)->src_is_local = 0;                                                 \
-																					\
-		if (!hflag)                                                                 \
-		{                                                                           \
-			SREG = get_global_register((decode)->src);                              \
-																					\
-			/* bound safe */                                                        \
-			if ((decode)->src != 15)                                                \
-				SREGF = get_global_register((decode)->src + 1);                     \
-		}                                                                           \
+		decode.src += 16;                                                           \
+																				    \
+		SREG = get_global_register(decode.src);                                     \
+		if ((WRITE_ONLY_REGMASK >> decode.src) & 1)                                 \
+			SREG = 0; /* write-only registers */                                    \
+		else if (decode.src == ISR_REGISTER)                                        \
+			DEBUG_PRINTF(("read src ISR. PC = %08X\n",PPC));                        \
+																				    \
+		/* bound safe */                                                            \
+		if (decode.src != 31)                                                       \
+			SREGF = get_global_register(decode.src + 1);                            \
 		else                                                                        \
-		{                                                                           \
-			(decode)->src += 16;                                                    \
-																					\
-			SREG = get_global_register((decode)->src);                              \
-			if ((WRITE_ONLY_REGMASK >> (decode)->src) & 1)                          \
-				SREG = 0; /* write-only registers */                                \
-			else if ((decode)->src == ISR_REGISTER)                                 \
-				DEBUG_PRINTF(("read src ISR. PC = %08X\n",PPC));                    \
-																					\
-			/* bound safe */                                                        \
-			if ((decode)->src != 31)                                                \
-				SREGF = get_global_register((decode)->src + 1);                     \
-		}                                                                           \
+			SREGF = 0;                                                              \
 	}                                                                               \
 } while (0)
 
-#define decode_dest(decode, local, hflag)                                           \
+#define decode_dest_noh(decode)                                                     \
 do                                                                                  \
 {                                                                                   \
-	if(local)                                                                       \
+	decode.dst_is_local = 0;                                                        \
+																				    \
+	DREG = get_global_register(decode.dst);                                     	\
+																					\
+	/* bound safe */                                                            	\
+	if (decode.dst != 15)                                                       	\
+		DREGF = get_global_register(decode.dst + 1);                            	\
+} while (0)
+
+
+#define decode_dest(decode, hflag)                                                  \
+do                                                                                  \
+{                                                                                   \
+	decode.dst_is_local = 0;                                                        \
+																				    \
+	if (!hflag)                                                                     \
 	{                                                                               \
-		UINT8 code = (decode)->dst;                                                 \
-		(decode)->dst_is_local = 1;                                                 \
-		code = ((decode)->dst + GET_FP) % 64; /* registers offset by frame pointer */\
-		DREG = m_local_regs[code];                                                  \
-		code = ((decode)->dst + 1 + GET_FP) % 64;                                   \
-		DREGF = m_local_regs[code];                                                 \
+		DREG = get_global_register(decode.dst);                                     \
+																				    \
+		/* bound safe */                                                            \
+		if (decode.dst != 15)                                                       \
+			DREGF = get_global_register(decode.dst + 1);                            \
 	}                                                                               \
 	else                                                                            \
 	{                                                                               \
-		(decode)->dst_is_local = 0;                                                 \
-																					\
-		if (!hflag)                                                                 \
-		{                                                                           \
-			DREG = get_global_register((decode)->dst);                              \
-																					\
-			/* bound safe */                                                        \
-			if ((decode)->dst != 15)                                                \
-				DREGF = get_global_register((decode)->dst + 1);                     \
-		}                                                                           \
-		else                                                                        \
-		{                                                                           \
-			(decode)->dst += 16;                                                    \
-																					\
-			DREG = get_global_register((decode)->dst);                              \
-			if( (decode)->dst == ISR_REGISTER )                                     \
-				DEBUG_PRINTF(("read dst ISR. PC = %08X\n",PPC));                    \
-																					\
-			/* bound safe */                                                        \
-			if ((decode)->dst != 31)                                                \
-				DREGF = get_global_register((decode)->dst + 1);                     \
-		}                                                                           \
+		decode.dst += 16;                                                           \
+																				    \
+		DREG = get_global_register(decode.dst);                                     \
+		if( decode.dst == ISR_REGISTER )                                            \
+			DEBUG_PRINTF(("read dst ISR. PC = %08X\n",PPC));                        \
+																				    \
+		/* bound safe */                                                            \
+		if (decode.dst != 31)                                                       \
+			DREGF = get_global_register(decode.dst + 1);                            \
 	}                                                                               \
 } while (0)
 
-#define decode_RR(decode, dlocal, slocal)                                           \
+#define decode_dest_local(decode)                                                   \
 do                                                                                  \
 {                                                                                   \
-	(decode)->src = SRC_CODE;                                                       \
-	(decode)->dst = DST_CODE;                                                       \
-	decode_source(decode, slocal, 0);                                               \
-	decode_dest(decode, dlocal, 0);                                                 \
+	uint8_t code = decode.dst;                                                      \
+	decode.dst_is_local = 1;                                                        \
+	code = (decode.dst + GET_FP) % 64; /* registers offset by frame pointer */      \
+	DREG = m_local_regs[code];                                                      \
+	code = (decode.dst + 1 + GET_FP) % 64;                                          \
+	DREGF = m_local_regs[code];                                                     \
+} while (0)
+
+#define decode_RR00(decode)                                                         \
+do                                                                                  \
+{                                                                                   \
+	decode.src = SRC_CODE;                                                          \
+	decode.dst = DST_CODE;                                                          \
+	decode_source_noh(decode);                                                      \
+	decode_dest_noh(decode);                                                        \
 																					\
-	if( (slocal) == (dlocal) && SRC_CODE == DST_CODE )                              \
-		SAME_SRC_DST = 1;                                                           \
+	SAME_SRC_DST = (SRC_CODE == DST_CODE);					                        \
+	SAME_SRC_DSTF = (SRC_CODE == (DST_CODE + 1));								    \
+	SAME_SRCF_DST = ((SRC_CODE + 1) == DST_CODE);								    \
+} while (0)
+
+#define decode_RR01(decode)                                                         \
+do                                                                                  \
+{                                                                                   \
+	decode.src = SRC_CODE;                                                          \
+	decode.dst = DST_CODE;                                                          \
+	decode_source_local(decode);                                                    \
+	decode_dest_noh(decode);                                                        \
 																					\
-	if( (slocal) == LOCAL && (dlocal) == LOCAL )                                    \
-	{                                                                               \
-		if( SRC_CODE == ((DST_CODE + 1) % 64) )                                     \
-			SAME_SRC_DSTF = 1;                                                      \
+	SAME_SRC_DST = 0;					                                            \
+	SAME_SRC_DSTF = 0;                                                              \
+	SAME_SRCF_DST = 0;															    \
+} while (0)
+
+#define decode_RR10(decode)                                                         \
+do                                                                                  \
+{                                                                                   \
+	decode.src = SRC_CODE;                                                          \
+	decode.dst = DST_CODE;                                                          \
+	decode_source_noh(decode);                                                      \
+	decode_dest_local(decode);                                                      \
 																					\
-		if( ((SRC_CODE + 1) % 64) == DST_CODE )                                     \
-			SAME_SRCF_DST = 1;                                                      \
-	}                                                                               \
-	else if( (slocal) == 0 && (dlocal) == 0 )                                       \
-	{                                                                               \
-		if( SRC_CODE == (DST_CODE + 1) )                                            \
-			SAME_SRC_DSTF = 1;                                                      \
+	SAME_SRC_DST = 0;					                                            \
+	SAME_SRC_DSTF = 0;                                                              \
+	SAME_SRCF_DST = 0;															    \
+} while (0)
+
+#define decode_RR11(decode)                                                         \
+do                                                                                  \
+{                                                                                   \
+	decode.src = SRC_CODE;                                                          \
+	decode.dst = DST_CODE;                                                          \
+	decode_source_local(decode);                                                    \
+	decode_dest_local(decode);                                                      \
 																					\
-		if( (SRC_CODE + 1) == DST_CODE )                                            \
-			SAME_SRCF_DST = 1;                                                      \
-	}                                                                               \
+	SAME_SRC_DST = (SRC_CODE == DST_CODE);					                        \
+	SAME_SRC_DSTF = (SRC_CODE == ((DST_CODE + 1) % 64));						    \
+	SAME_SRCF_DST = (((SRC_CODE + 1) % 64) == DST_CODE);						    \
 } while (0)
 
 #define decode_LL(decode)                                                           \
 do                                                                                  \
 {                                                                                   \
-	(decode)->src = SRC_CODE;                                                       \
-	(decode)->dst = DST_CODE;                                                       \
-	decode_source(decode, LOCAL, 0);                                                \
-	decode_dest(decode, LOCAL, 0);                                                  \
+	decode.src = SRC_CODE;                                                          \
+	decode.dst = DST_CODE;                                                          \
+	decode_source_local(decode);                                                    \
+	decode_dest_local(decode);                                                      \
 																					\
-	if( SRC_CODE == DST_CODE )                                                      \
-		SAME_SRC_DST = 1;                                                           \
-																					\
-	if( SRC_CODE == ((DST_CODE + 1) % 64) )                                         \
-		SAME_SRC_DSTF = 1;                                                          \
+	SAME_SRC_DST = (SRC_CODE == DST_CODE);											\
+	SAME_SRC_DSTF = (SRC_CODE == ((DST_CODE + 1) % 64));							\
+	SAME_SRCF_DST = 0;																\
 } while (0)
 
 #define decode_LR(decode, slocal)                                                   \
 do                                                                                  \
 {                                                                                   \
-	(decode)->src = SRC_CODE;                                                       \
-	(decode)->dst = DST_CODE;                                                       \
-	decode_source(decode, slocal, 0);                                               \
-	decode_dest(decode, LOCAL, 0);                                                  \
+	decode.src = SRC_CODE;                                                          \
+	decode.dst = DST_CODE;                                                          \
+	if (slocal)                                                                     \
+		decode_source_local(decode);                                                \
+	else                                                                            \
+		decode_source_noh(decode);                                                  \
+	decode_dest_local(decode);                                                      \
 																					\
-	if( ((SRC_CODE + 1) % 64) == DST_CODE && slocal == LOCAL )                      \
-		SAME_SRCF_DST = 1;                                                          \
+	SAME_SRC_DST = 0;																\
+	SAME_SRC_DSTF = 0;																\
+	SAME_SRCF_DST = (((SRC_CODE + 1) % 64) == DST_CODE && slocal == LOCAL);			\
 } while (0)
 
 #define check_delay_PC()                                                            \
@@ -988,52 +940,55 @@ do                                                                              
 	}                                                                               \
 } while (0)
 
-#define decode_immediate(decode, nbit)                                              \
+#define decode_immediate_u(decode)                                                  \
 do                                                                                  \
 {                                                                                   \
-	if (!nbit)                                                                      \
 		EXTRA_U = immediate_values[OP & 0x0f];                                      \
-	else                                                                            \
-		switch( OP & 0x0f )                                                         \
-		{                                                                           \
-			default:                                                                \
-				EXTRA_U = immediate_values[0x10 + (OP & 0x0f)];                     \
-				break;                                                              \
-																					\
-			case 1:                                                                 \
-				m_instruction_length = 3;                                           \
-				EXTRA_U = (READ_OP(PC) << 16) | READ_OP(PC + 2);                    \
-				PC += 4;                                                            \
-				break;                                                              \
-																					\
-			case 2:                                                                 \
-				m_instruction_length = 2;                                           \
-				EXTRA_U = READ_OP(PC);                                              \
-				PC += 2;                                                            \
-				break;                                                              \
-																					\
-			case 3:                                                                 \
-				m_instruction_length = 2;                                           \
-				EXTRA_U = 0xffff0000 | READ_OP(PC);                                 \
-				PC += 2;                                                            \
-				break;                                                              \
-		}                                                                           \
+} while (0)
+
+#define decode_immediate_s(decode)                                                  \
+do                                                                                  \
+{                                                                                   \
+	switch( OP & 0x0f )                                                             \
+	{                                                                               \
+		default:                                                                    \
+			EXTRA_U = immediate_values[0x10 + (OP & 0x0f)];                         \
+			break;                                                                  \
+																				    \
+		case 1:                                                                     \
+			m_instruction_length = (3<<19);                                         \
+			EXTRA_U = (READ_OP(PC) << 16) | READ_OP(PC + 2);                        \
+			PC += 4;                                                                \
+			break;                                                                  \
+																				    \
+		case 2:                                                                     \
+			m_instruction_length = (2<<19);                                         \
+			EXTRA_U = READ_OP(PC);                                                  \
+			PC += 2;                                                                \
+			break;                                                                  \
+																				    \
+		case 3:                                                                     \
+			m_instruction_length = (2<<19);                                         \
+			EXTRA_U = 0xffff0000 | READ_OP(PC);                                     \
+			PC += 2;                                                                \
+			break;                                                                  \
+	}                                                                               \
 } while (0)
 
 #define decode_const(decode)                                                        \
 do                                                                                  \
 {                                                                                   \
-	UINT16 imm_1 = READ_OP(PC);                                                     \
+	uint16_t imm_1 = READ_OP(PC);                                                   \
 																					\
 	PC += 2;                                                                        \
-	m_instruction_length = 2;                                                       \
+	m_instruction_length = (2<<19);                                                 \
 																					\
 	if( E_BIT(imm_1) )                                                              \
 	{                                                                               \
-		UINT16 imm_2 = READ_OP(PC);                                                 \
+		uint16_t imm_2 = READ_OP(PC);                                               \
 																					\
 		PC += 2;                                                                    \
-		m_instruction_length = 3;                                                   \
+		m_instruction_length = (3<<19);                                             \
 																					\
 		EXTRA_S = imm_2;                                                            \
 		EXTRA_S |= ((imm_1 & 0x3fff) << 16);                                        \
@@ -1059,10 +1014,10 @@ do                                                                              
 {                                                                                   \
 	if( OP & 0x80 )                                                                 \
 	{                                                                               \
-		UINT16 next = READ_OP(PC);                                                  \
+		uint16_t next = READ_OP(PC);                                                \
 																					\
 		PC += 2;                                                                    \
-		m_instruction_length = 2;                                                   \
+		m_instruction_length = (2<<19);                                             \
 																					\
 		EXTRA_S = (OP & 0x7f) << 16;                                                \
 		EXTRA_S |= (next & 0xfffe);                                                 \
@@ -1082,19 +1037,19 @@ do                                                                              
 #define decode_dis(decode)                                                          \
 do                                                                                  \
 {                                                                                   \
-	UINT16 next_1 = READ_OP(PC);                                                    \
+	uint16_t next_1 = READ_OP(PC);                                                  \
 																					\
 	PC += 2;                                                                        \
-	m_instruction_length = 2;                                                       \
+	m_instruction_length = (2<<19);                                                 \
 																					\
-	(decode)->sub_type = DD(next_1);                                                \
+	decode.sub_type = DD(next_1);                                                   \
 																					\
 	if( E_BIT(next_1) )                                                             \
 	{                                                                               \
-		UINT16 next_2 = READ_OP(PC);                                                \
+		uint16_t next_2 = READ_OP(PC);                                              \
 																					\
 		PC += 2;                                                                    \
-		m_instruction_length = 3;                                                   \
+		m_instruction_length = (3<<19);                                             \
 																					\
 		EXTRA_S = next_2;                                                           \
 		EXTRA_S |= ((next_1 & 0xfff) << 16);                                        \
@@ -1118,17 +1073,17 @@ do                                                                              
 #define decode_lim(decode)                                                          \
 do                                                                                  \
 {                                                                                   \
-	UINT32 next = READ_OP(PC);                                                      \
+	uint32_t next = READ_OP(PC);                                                    \
 	PC += 2;                                                                        \
-	m_instruction_length = 2;                                                       \
+	m_instruction_length = (2<<19);                                                 \
 																					\
-	(decode)->sub_type = X_CODE(next);                                              \
+	decode.sub_type = X_CODE(next);                                                 \
 																					\
 	if( E_BIT(next) )                                                               \
 	{                                                                               \
 		EXTRA_U = ((next & 0xfff) << 16) | READ_OP(PC);                             \
 		PC += 2;                                                                    \
-		m_instruction_length = 3;                                                   \
+		m_instruction_length = (3<<19);                                             \
 	}                                                                               \
 	else                                                                            \
 	{                                                                               \
@@ -1136,137 +1091,7 @@ do                                                                              
 	}                                                                               \
 } while (0)
 
-#define RRdecode(decode, dlocal, slocal)                                            \
-do                                                                                  \
-{                                                                                   \
-	check_delay_PC();                                                               \
-	decode_RR(decode, dlocal, slocal);                                              \
-} while (0)
-
-#define RRlimdecode(decode, dlocal, slocal)                                         \
-do                                                                                  \
-{                                                                                   \
-	decode_lim(decode);                                                             \
-	check_delay_PC();                                                               \
-	decode_RR(decode, dlocal, slocal);                                              \
-} while (0)
-
-#define RRconstdecode(decode, dlocal, slocal)                                       \
-do                                                                                  \
-{                                                                                   \
-	decode_const(decode);                                                           \
-	check_delay_PC();                                                               \
-	decode_RR(decode, dlocal, slocal);                                              \
-} while (0)
-
-#define RRdisdecode(decode, dlocal, slocal)                                         \
-do                                                                                  \
-{                                                                                   \
-	decode_dis(decode);                                                             \
-	check_delay_PC();                                                               \
-	decode_RR(decode, dlocal, slocal);                                              \
-} while (0)
-
-#define RRdecodewithHflag(decode, dlocal, slocal)                                   \
-do                                                                                  \
-{                                                                                   \
-	check_delay_PC();                                                               \
-	(decode)->src = SRC_CODE;                                                       \
-	(decode)->dst = DST_CODE;                                                       \
-	decode_source(decode, slocal, GET_H);                                           \
-	decode_dest(decode, dlocal, GET_H);                                             \
-																					\
-	if(GET_H)                                                                       \
-		if(slocal == 0 && dlocal == 0)                                              \
-			DEBUG_PRINTF(("MOV with hflag and 2 GRegs! PC = %08X\n",PPC));          \
-} while (0)
-
-#define Rimmdecode(decode, dlocal, nbit)                                            \
-do                                                                                  \
-{                                                                                   \
-	decode_immediate(decode, nbit);                                                 \
-	check_delay_PC();                                                               \
-	(decode)->dst = DST_CODE;                                                       \
-	decode_dest(decode, dlocal, 0);                                                 \
-} while (0)
-
-#define Rndecode(decode, dlocal)                                                    \
-do                                                                                  \
-{                                                                                   \
-	check_delay_PC();                                                               \
-	(decode)->dst = DST_CODE;                                                       \
-	decode_dest(decode, dlocal, 0);                                                 \
-} while (0)
-
-#define RimmdecodewithHflag(decode, dlocal, nbit)                                   \
-do                                                                                  \
-{                                                                                   \
-	decode_immediate(decode, nbit);                                                 \
-	check_delay_PC();                                                               \
-	(decode)->dst = DST_CODE;                                                       \
-	decode_dest(decode, dlocal, GET_H);                                             \
-} while (0)
-
-#define Lndecode(decode)                                                            \
-do                                                                                  \
-{                                                                                   \
-	check_delay_PC();                                                               \
-	(decode)->dst = DST_CODE;                                                       \
-	decode_dest(decode, LOCAL, 0);                                                  \
-} while (0)
-
-#define LLdecode(decode)                                                            \
-do                                                                                  \
-{                                                                                   \
-	check_delay_PC();                                                               \
-	decode_LL(decode);                                                              \
-} while (0)
-
-#define LLextdecode(decode)                                                         \
-do                                                                                  \
-{                                                                                   \
-	m_instruction_length = 2;                                                       \
-	EXTRA_U = READ_OP(PC);                                                          \
-	PC += 2;                                                                        \
-	check_delay_PC();                                                               \
-	decode_LL(decode);                                                              \
-} while (0)
-
-#define LRdecode(decode, slocal)                                                    \
-do                                                                                  \
-{                                                                                   \
-	check_delay_PC();                                                               \
-	decode_LR(decode, slocal);                                                      \
-} while (0)
-
-#define LRconstdecode(decode, slocal)                                               \
-do                                                                                  \
-{                                                                                   \
-	decode_const(decode);                                                           \
-	check_delay_PC();                                                               \
-	decode_LR(decode, slocal);                                                      \
-} while (0)
-
-#define PCreldecode(decode)                                                         \
-do                                                                                  \
-{                                                                                   \
-	decode_pcrel(decode);                                                           \
-	check_delay_PC();                                                               \
-} while (0)
-
-#define PCadrdecode(decode)                                                         \
-do                                                                                  \
-{                                                                                   \
-	check_delay_PC();                                                               \
-} while (0)
-
-#define no_decode(decode)                                                           \
-do                                                                                  \
-{                                                                                   \
-} while (0)
-
-
-void hyperstone_device::execute_br(struct hyperstone_device::regs_decode *decode)
+void hyperstone_device::execute_br(regs_decode &decode)
 {
 	PPC = PC;
 	PC += EXTRA_S;
@@ -1275,7 +1100,7 @@ void hyperstone_device::execute_br(struct hyperstone_device::regs_decode *decode
 	m_icount -= m_clock_cycles_2;
 }
 
-void hyperstone_device::execute_dbr(struct hyperstone_device::regs_decode *decode)
+void hyperstone_device::execute_dbr(regs_decode &decode)
 {
 	m_delay.delay_cmd = DELAY_EXECUTE;
 	m_delay.delay_pc  = PC + EXTRA_S;
@@ -1284,13 +1109,13 @@ void hyperstone_device::execute_dbr(struct hyperstone_device::regs_decode *decod
 }
 
 
-void hyperstone_device::execute_trap(UINT32 addr)
+void hyperstone_device::execute_trap(uint32_t addr)
 {
-	UINT8 reg;
-	UINT32 oldSR;
+	uint8_t reg;
+	uint32_t oldSR;
 	reg = GET_FP + GET_FL;
 
-	SET_ILC(m_instruction_length & 3);
+	SET_ILC(m_instruction_length);
 
 	oldSR = SR;
 
@@ -1312,13 +1137,13 @@ void hyperstone_device::execute_trap(UINT32 addr)
 }
 
 
-void hyperstone_device::execute_int(UINT32 addr)
+void hyperstone_device::execute_int(uint32_t addr)
 {
-	UINT8 reg;
-	UINT32 oldSR;
+	uint8_t reg;
+	uint32_t oldSR;
 	reg = GET_FP + GET_FL;
 
-	SET_ILC(m_instruction_length & 3);
+	SET_ILC(m_instruction_length);
 
 	oldSR = SR;
 
@@ -1341,13 +1166,13 @@ void hyperstone_device::execute_int(UINT32 addr)
 }
 
 /* TODO: mask Parity Error and Extended Overflow exceptions */
-void hyperstone_device::execute_exception(UINT32 addr)
+void hyperstone_device::execute_exception(uint32_t addr)
 {
-	UINT8 reg;
-	UINT32 oldSR;
+	uint8_t reg;
+	uint32_t oldSR;
 	reg = GET_FP + GET_FL;
 
-	SET_ILC(m_instruction_length & 3);
+	SET_ILC(m_instruction_length);
 
 	oldSR = SR;
 
@@ -1369,14 +1194,14 @@ void hyperstone_device::execute_exception(UINT32 addr)
 	m_icount -= m_clock_cycles_2;
 }
 
-void hyperstone_device::execute_software(struct hyperstone_device::regs_decode *decode)
+void hyperstone_device::execute_software(regs_decode &decode)
 {
-	UINT8 reg;
-	UINT32 oldSR;
-	UINT32 addr;
-	UINT32 stack_of_dst;
+	uint8_t reg;
+	uint32_t oldSR;
+	uint32_t addr;
+	uint32_t stack_of_dst;
 
-	SET_ILC(1);
+	SET_ILC(1<<19);
 
 	addr = get_emu_code_addr((OP & 0xff00) >> 8);
 	reg = GET_FP + GET_FL;
@@ -1384,7 +1209,7 @@ void hyperstone_device::execute_software(struct hyperstone_device::regs_decode *
 	//since it's sure the register is in the register part of the stack,
 	//set the stack address to a value above the highest address
 	//that can be set by a following frame instruction
-	stack_of_dst = (SP & ~0xff) + 64*4 + (((GET_FP + decode->dst) % 64) * 4); //converted to 32bits offset
+	stack_of_dst = (SP & ~0xff) + 64*4 + (((GET_FP + decode.dst) % 64) * 4); //converted to 32bits offset
 
 	oldSR = SR;
 
@@ -1532,8 +1357,8 @@ void hyperstone_device::device_start()
 
 void hyperstone_device::init(int scale_mask)
 {
-	memset(m_global_regs, 0, sizeof(UINT32) * 32);
-	memset(m_local_regs, 0, sizeof(UINT32) * 64);
+	memset(m_global_regs, 0, sizeof(uint32_t) * 32);
+	memset(m_local_regs, 0, sizeof(uint32_t) * 64);
 	m_ppc = 0;
 	m_op = 0;
 	m_trap_entry = 0;
@@ -1563,6 +1388,7 @@ void hyperstone_device::init(int scale_mask)
 
 	// register our state for the debugger
 	state_add(STATE_GENPC,    "GENPC",     m_global_regs[0]).noshow();
+	state_add(STATE_GENPCBASE, "CURPC",    m_global_regs[0]).noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS",  m_global_regs[1]).callimport().callexport().formatstr("%40s").noshow();
 	state_add(E132XS_PC,      "PC", m_global_regs[0]).mask(0xffffffff);
 	state_add(E132XS_SR,      "SR", m_global_regs[1]).mask(0xffffffff);
@@ -1825,21 +1651,15 @@ void hyperstone_device::device_stop()
 
 //-------------------------------------------------
 //  memory_space_config - return the configuration
-//  of the specified address space, or nullptr if
-//  the space doesn't exist
+//  of the address spaces
 //-------------------------------------------------
 
-const address_space_config *hyperstone_device::memory_space_config(address_spacenum spacenum) const
+device_memory_interface::space_config_vector hyperstone_device::memory_space_config() const
 {
-	if (spacenum == AS_PROGRAM)
-	{
-		return &m_program_config;
-	}
-	else if (spacenum == AS_IO)
-	{
-		return &m_io_config;
-	}
-	return nullptr;
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config),
+		std::make_pair(AS_IO,      &m_io_config)
+	};
 }
 
 
@@ -1881,7 +1701,7 @@ void hyperstone_device::state_string_export(const device_state_entry &entry, std
 //  of the shortest instruction, in bytes
 //-------------------------------------------------
 
-UINT32 hyperstone_device::disasm_min_opcode_bytes() const
+uint32_t hyperstone_device::disasm_min_opcode_bytes() const
 {
 	return 2;
 }
@@ -1892,7 +1712,7 @@ UINT32 hyperstone_device::disasm_min_opcode_bytes() const
 //  of the longest instruction, in bytes
 //-------------------------------------------------
 
-UINT32 hyperstone_device::disasm_max_opcode_bytes() const
+uint32_t hyperstone_device::disasm_max_opcode_bytes() const
 {
 	return 6;
 }
@@ -1903,17 +1723,17 @@ UINT32 hyperstone_device::disasm_max_opcode_bytes() const
 //  helper function
 //-------------------------------------------------
 
-offs_t hyperstone_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t hyperstone_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( hyperstone );
-	return dasm_hyperstone( buffer, pc, oprom, GET_H, GET_FP );
+	return dasm_hyperstone(stream, pc, oprom, GET_H, GET_FP);
 }
 
 /* Opcodes */
 
-void hyperstone_device::hyperstone_chk(struct hyperstone_device::regs_decode *decode)
+void hyperstone_device::hyperstone_chk(regs_decode &decode)
 {
-	UINT32 addr = get_trap_addr(TRAPNO_RANGE_ERROR);
+	uint32_t addr = get_trap_addr(TRAPNO_RANGE_ERROR);
 
 	if( SRC_IS_SR )
 	{
@@ -1937,14 +1757,14 @@ void hyperstone_device::hyperstone_chk(struct hyperstone_device::regs_decode *de
 	m_icount -= m_clock_cycles_1;
 }
 
-void hyperstone_device::hyperstone_movd(struct hyperstone_device::regs_decode *decode)
+void hyperstone_device::hyperstone_movd(regs_decode &decode)
 {
 	if( DST_IS_PC ) // Rd denotes PC
 	{
 		// RET instruction
 
-		UINT8 old_s, old_l;
-		INT8 difference; // really it's 7 bits
+		uint8_t old_s, old_l;
+		int8_t difference; // really it's 7 bits
 
 		if( SRC_IS_PC || SRC_IS_SR )
 		{
@@ -1965,7 +1785,7 @@ void hyperstone_device::hyperstone_movd(struct hyperstone_device::regs_decode *d
 
 			if( (!old_s && GET_S) || (!GET_S && !old_l && GET_L))
 			{
-				UINT32 addr = get_trap_addr(TRAPNO_PRIVILEGE_ERROR);
+				uint32_t addr = get_trap_addr(TRAPNO_PRIVILEGE_ERROR);
 				execute_exception(addr);
 			}
 
@@ -1973,7 +1793,7 @@ void hyperstone_device::hyperstone_movd(struct hyperstone_device::regs_decode *d
 
 			/* convert to 8 bits */
 			if(difference > 63)
-				difference = (INT8)(difference|0x80);
+				difference = (int8_t)(difference|0x80);
 			else if( difference < -64 )
 				difference = difference & 0x7f;
 
@@ -2003,12 +1823,12 @@ void hyperstone_device::hyperstone_movd(struct hyperstone_device::regs_decode *d
 	}
 	else // Rd doesn't denote PC and Rs doesn't denote SR
 	{
-		UINT64 tmp;
+		uint64_t tmp;
 
 		SET_DREG(SREG);
 		SET_DREGF(SREGF);
 
-		tmp = CONCAT_64(SREG, SREGF);
+		tmp = concat_64(SREG, SREGF);
 		SET_Z( tmp == 0 ? 1 : 0 );
 		SET_N( SIGN_BIT(SREG) );
 
@@ -2016,7 +1836,7 @@ void hyperstone_device::hyperstone_movd(struct hyperstone_device::regs_decode *d
 	}
 }
 
-void hyperstone_device::hyperstone_divu(struct hyperstone_device::regs_decode *decode)
+void hyperstone_device::hyperstone_divu(regs_decode &decode)
 {
 	if( SAME_SRC_DST || SAME_SRC_DSTF )
 	{
@@ -2030,23 +1850,23 @@ void hyperstone_device::hyperstone_divu(struct hyperstone_device::regs_decode *d
 		}
 		else
 		{
-			UINT64 dividend;
+			uint64_t dividend;
 
-			dividend = CONCAT_64(DREG, DREGF);
+			dividend = concat_64(DREG, DREGF);
 
 			if( SREG == 0 )
 			{
 				//Rd//Rdf -> undefined
 				//Z -> undefined
 				//N -> undefined
-				UINT32 addr;
+				uint32_t addr;
 				SET_V(1);
 				addr = get_trap_addr(TRAPNO_RANGE_ERROR);
 				execute_exception(addr);
 			}
 			else
 			{
-				UINT32 quotient, remainder;
+				uint32_t quotient, remainder;
 
 				/* TODO: add quotient overflow */
 				quotient = dividend / SREG;
@@ -2065,7 +1885,7 @@ void hyperstone_device::hyperstone_divu(struct hyperstone_device::regs_decode *d
 	m_icount -= 36 << m_clck_scale;
 }
 
-void hyperstone_device::hyperstone_divs(struct hyperstone_device::regs_decode *decode)
+void hyperstone_device::hyperstone_divs(regs_decode &decode)
 {
 	if( SAME_SRC_DST || SAME_SRC_DSTF )
 	{
@@ -2079,27 +1899,27 @@ void hyperstone_device::hyperstone_divs(struct hyperstone_device::regs_decode *d
 		}
 		else
 		{
-			INT64 dividend;
+			int64_t dividend;
 
-			dividend = (INT64) CONCAT_64(DREG, DREGF);
+			dividend = (int64_t) concat_64(DREG, DREGF);
 
 			if( SREG == 0 || (DREG & 0x80000000) )
 			{
 				//Rd//Rdf -> undefined
 				//Z -> undefined
 				//N -> undefined
-				UINT32 addr;
+				uint32_t addr;
 				SET_V(1);
 				addr = get_trap_addr(TRAPNO_RANGE_ERROR);
 				execute_exception(addr);
 			}
 			else
 			{
-				INT32 quotient, remainder;
+				int32_t quotient, remainder;
 
 				/* TODO: add quotient overflow */
-				quotient = dividend / ((INT32)(SREG));
-				remainder = dividend % ((INT32)(SREG));
+				quotient = dividend / ((int32_t)(SREG));
+				remainder = dividend % ((int32_t)(SREG));
 
 				SET_DREG(remainder);
 				SET_DREGF(quotient);
@@ -2114,7 +1934,7 @@ void hyperstone_device::hyperstone_divs(struct hyperstone_device::regs_decode *d
 	m_icount -= 36 << m_clck_scale;
 }
 
-void hyperstone_device::hyperstone_xm(struct hyperstone_device::regs_decode *decode)
+void hyperstone_device::hyperstone_xm(regs_decode &decode)
 {
 	if( SRC_IS_SR || DST_IS_SR || DST_IS_PC )
 	{
@@ -2122,7 +1942,7 @@ void hyperstone_device::hyperstone_xm(struct hyperstone_device::regs_decode *dec
 	}
 	else
 	{
-		switch( decode->sub_type ) // x_code
+		switch( decode.sub_type ) // x_code
 		{
 			case 0:
 			case 1:
@@ -2130,17 +1950,17 @@ void hyperstone_device::hyperstone_xm(struct hyperstone_device::regs_decode *dec
 			case 3:
 				if( !SRC_IS_PC && (SREG > EXTRA_U) )
 				{
-					UINT32 addr = get_trap_addr(TRAPNO_RANGE_ERROR);
+					uint32_t addr = get_trap_addr(TRAPNO_RANGE_ERROR);
 					execute_exception(addr);
 				}
 				else if( SRC_IS_PC && (SREG >= EXTRA_U) )
 				{
-					UINT32 addr = get_trap_addr(TRAPNO_RANGE_ERROR);
+					uint32_t addr = get_trap_addr(TRAPNO_RANGE_ERROR);
 					execute_exception(addr);
 				}
 				else
 				{
-					SREG <<= decode->sub_type;
+					SREG <<= decode.sub_type;
 				}
 
 				break;
@@ -2149,8 +1969,8 @@ void hyperstone_device::hyperstone_xm(struct hyperstone_device::regs_decode *dec
 			case 5:
 			case 6:
 			case 7:
-				decode->sub_type -= 4;
-				SREG <<= decode->sub_type;
+				decode.sub_type -= 4;
+				SREG <<= decode.sub_type;
 
 				break;
 		}
@@ -2161,7 +1981,7 @@ void hyperstone_device::hyperstone_xm(struct hyperstone_device::regs_decode *dec
 	m_icount -= m_clock_cycles_1;
 }
 
-void hyperstone_device::hyperstone_mask(struct hyperstone_device::regs_decode *decode)
+void hyperstone_device::hyperstone_mask(regs_decode &decode)
 {
 	DREG = SREG & EXTRA_U;
 
@@ -2171,14 +1991,14 @@ void hyperstone_device::hyperstone_mask(struct hyperstone_device::regs_decode *d
 	m_icount -= m_clock_cycles_1;
 }
 
-void hyperstone_device::hyperstone_sum(struct hyperstone_device::regs_decode *decode)
+void hyperstone_device::hyperstone_sum(regs_decode &decode)
 {
-	UINT64 tmp;
+	uint64_t tmp;
 
 	if( SRC_IS_SR )
 		SREG = GET_C;
 
-	tmp = (UINT64)(SREG) + (UINT64)(EXTRA_U);
+	tmp = (uint64_t)(SREG) + (uint64_t)(EXTRA_U);
 	CHECK_C(tmp);
 	CHECK_VADD(SREG,EXTRA_U,tmp);
 
@@ -2195,22 +2015,22 @@ void hyperstone_device::hyperstone_sum(struct hyperstone_device::regs_decode *de
 	m_icount -= m_clock_cycles_1;
 }
 
-void hyperstone_device::hyperstone_sums(struct hyperstone_device::regs_decode *decode)
+void hyperstone_device::hyperstone_sums(regs_decode &decode)
 {
-	INT32 res;
-	INT64 tmp;
+	int32_t res;
+	int64_t tmp;
 
 	if( SRC_IS_SR )
 		SREG = GET_C;
 
-	tmp = (INT64)((INT32)(SREG)) + (INT64)(EXTRA_S);
+	tmp = (int64_t)((int32_t)(SREG)) + (int64_t)(EXTRA_S);
 	CHECK_VADD(SREG,EXTRA_S,tmp);
 
 //#if SETCARRYS
 //  CHECK_C(tmp);
 //#endif
 
-	res = (INT32)(SREG) + EXTRA_S;
+	res = (int32_t)(SREG) + EXTRA_S;
 
 	SET_DREG(res);
 
@@ -2221,14 +2041,14 @@ void hyperstone_device::hyperstone_sums(struct hyperstone_device::regs_decode *d
 
 	if( GET_V && !SRC_IS_SR )
 	{
-		UINT32 addr = get_trap_addr(TRAPNO_RANGE_ERROR);
+		uint32_t addr = get_trap_addr(TRAPNO_RANGE_ERROR);
 		execute_exception(addr);
 	}
 }
 
-void hyperstone_device::hyperstone_cmp(struct hyperstone_device::regs_decode *decode)
+void hyperstone_device::hyperstone_cmp(regs_decode &decode)
 {
-	UINT64 tmp;
+	uint64_t tmp;
 
 	if( SRC_IS_SR )
 		SREG = GET_C;
@@ -2238,12 +2058,12 @@ void hyperstone_device::hyperstone_cmp(struct hyperstone_device::regs_decode *de
 	else
 		SET_Z(0);
 
-	if( (INT32) DREG < (INT32) SREG )
+	if( (int32_t) DREG < (int32_t) SREG )
 		SET_N(1);
 	else
 		SET_N(0);
 
-	tmp = (UINT64)(DREG) - (UINT64)(SREG);
+	tmp = (uint64_t)(DREG) - (uint64_t)(SREG);
 	CHECK_VSUB(SREG,DREG,tmp);
 
 	if( DREG < SREG )
@@ -2254,11 +2074,11 @@ void hyperstone_device::hyperstone_cmp(struct hyperstone_device::regs_decode *de
 	m_icount -= m_clock_cycles_1;
 }
 
-void hyperstone_device::hyperstone_mov(struct hyperstone_device::regs_decode *decode)
+void hyperstone_device::hyperstone_mov(regs_decode &decode)
 {
-	if( !GET_S && decode->dst >= 16 )
+	if( !GET_S && decode.dst >= 16 )
 	{
-		UINT32 addr = get_trap_addr(TRAPNO_PRIVILEGE_ERROR);
+		uint32_t addr = get_trap_addr(TRAPNO_PRIVILEGE_ERROR);
 		execute_exception(addr);
 	}
 
@@ -2274,14 +2094,14 @@ void hyperstone_device::hyperstone_mov(struct hyperstone_device::regs_decode *de
 }
 
 
-void hyperstone_device::hyperstone_add(struct hyperstone_device::regs_decode *decode)
+void hyperstone_device::hyperstone_add(regs_decode &decode)
 {
-	UINT64 tmp;
+	uint64_t tmp;
 
 	if( SRC_IS_SR )
 		SREG = GET_C;
 
-	tmp = (UINT64)(SREG) + (UINT64)(DREG);
+	tmp = (uint64_t)(SREG) + (uint64_t)(DREG);
 	CHECK_C(tmp);
 	CHECK_VADD(SREG,DREG,tmp);
 
@@ -2297,15 +2117,15 @@ void hyperstone_device::hyperstone_add(struct hyperstone_device::regs_decode *de
 	m_icount -= m_clock_cycles_1;
 }
 
-void hyperstone_device::hyperstone_adds(struct hyperstone_device::regs_decode *decode)
+void hyperstone_device::hyperstone_adds(regs_decode &decode)
 {
-	INT32 res;
-	INT64 tmp;
+	int32_t res;
+	int64_t tmp;
 
 	if( SRC_IS_SR )
 		SREG = GET_C;
 
-	tmp = (INT64)((INT32)(SREG)) + (INT64)((INT32)(DREG));
+	tmp = (int64_t)((int32_t)(SREG)) + (int64_t)((int32_t)(DREG));
 
 	CHECK_VADD(SREG,DREG,tmp);
 
@@ -2313,7 +2133,7 @@ void hyperstone_device::hyperstone_adds(struct hyperstone_device::regs_decode *d
 //  CHECK_C(tmp);
 //#endif
 
-	res = (INT32)(SREG) + (INT32)(DREG);
+	res = (int32_t)(SREG) + (int32_t)(DREG);
 
 	SET_DREG(res);
 	SET_Z( res == 0 ? 1 : 0 );
@@ -2323,19 +2143,19 @@ void hyperstone_device::hyperstone_adds(struct hyperstone_device::regs_decode *d
 
 	if( GET_V )
 	{
-		UINT32 addr = get_trap_addr(TRAPNO_RANGE_ERROR);
+		uint32_t addr = get_trap_addr(TRAPNO_RANGE_ERROR);
 		execute_exception(addr);
 	}
 }
 
-void hyperstone_device::hyperstone_cmpb(struct hyperstone_device::regs_decode *decode)
+void hyperstone_device::hyperstone_cmpb(regs_decode &decode)
 {
 	SET_Z( (DREG & SREG) == 0 ? 1 : 0 );
 
 	m_icount -= m_clock_cycles_1;
 }
 
-void hyperstone_device::hyperstone_andn(struct hyperstone_device::regs_decode *decode)
+void hyperstone_device::hyperstone_andn(regs_decode &decode)
 {
 	DREG = DREG & ~SREG;
 
@@ -2345,7 +2165,7 @@ void hyperstone_device::hyperstone_andn(struct hyperstone_device::regs_decode *d
 	m_icount -= m_clock_cycles_1;
 }
 
-void hyperstone_device::hyperstone_or(struct hyperstone_device::regs_decode *decode)
+void hyperstone_device::hyperstone_or(regs_decode &decode)
 {
 	DREG = DREG | SREG;
 
@@ -2355,7 +2175,7 @@ void hyperstone_device::hyperstone_or(struct hyperstone_device::regs_decode *dec
 	m_icount -= m_clock_cycles_1;
 }
 
-void hyperstone_device::hyperstone_xor(struct hyperstone_device::regs_decode *decode)
+void hyperstone_device::hyperstone_xor(regs_decode &decode)
 {
 	DREG = DREG ^ SREG;
 
@@ -2365,18 +2185,18 @@ void hyperstone_device::hyperstone_xor(struct hyperstone_device::regs_decode *de
 	m_icount -= m_clock_cycles_1;
 }
 
-void hyperstone_device::hyperstone_subc(struct hyperstone_device::regs_decode *decode)
+void hyperstone_device::hyperstone_subc(regs_decode &decode)
 {
-	UINT64 tmp;
+	uint64_t tmp;
 
 	if( SRC_IS_SR )
 	{
-		tmp = (UINT64)(DREG) - (UINT64)(GET_C);
+		tmp = (uint64_t)(DREG) - (uint64_t)(GET_C);
 		CHECK_VSUB(GET_C,DREG,tmp);
 	}
 	else
 	{
-		tmp = (UINT64)(DREG) - ((UINT64)(SREG) + (UINT64)(GET_C));
+		tmp = (uint64_t)(DREG) - ((uint64_t)(SREG) + (uint64_t)(GET_C));
 		//CHECK!
 		CHECK_VSUB(SREG + GET_C,DREG,tmp);
 	}
@@ -2401,7 +2221,7 @@ void hyperstone_device::hyperstone_subc(struct hyperstone_device::regs_decode *d
 	m_icount -= m_clock_cycles_1;
 }
 
-void hyperstone_device::hyperstone_not(struct hyperstone_device::regs_decode *decode)
+void hyperstone_device::hyperstone_not(regs_decode &decode)
 {
 	SET_DREG(~SREG);
 	SET_Z( ~SREG == 0 ? 1 : 0 );
@@ -2409,14 +2229,14 @@ void hyperstone_device::hyperstone_not(struct hyperstone_device::regs_decode *de
 	m_icount -= m_clock_cycles_1;
 }
 
-void hyperstone_device::hyperstone_sub(struct hyperstone_device::regs_decode *decode)
+void hyperstone_device::hyperstone_sub(regs_decode &decode)
 {
-	UINT64 tmp;
+	uint64_t tmp;
 
 	if( SRC_IS_SR )
 		SREG = GET_C;
 
-	tmp = (UINT64)(DREG) - (UINT64)(SREG);
+	tmp = (uint64_t)(DREG) - (uint64_t)(SREG);
 	CHECK_C(tmp);
 	CHECK_VSUB(SREG,DREG,tmp);
 
@@ -2432,15 +2252,15 @@ void hyperstone_device::hyperstone_sub(struct hyperstone_device::regs_decode *de
 	m_icount -= m_clock_cycles_1;
 }
 
-void hyperstone_device::hyperstone_subs(struct hyperstone_device::regs_decode *decode)
+void hyperstone_device::hyperstone_subs(regs_decode &decode)
 {
-	INT32 res;
-	INT64 tmp;
+	int32_t res;
+	int64_t tmp;
 
 	if( SRC_IS_SR )
 		SREG = GET_C;
 
-	tmp = (INT64)((INT32)(DREG)) - (INT64)((INT32)(SREG));
+	tmp = (int64_t)((int32_t)(DREG)) - (int64_t)((int32_t)(SREG));
 
 //#ifdef SETCARRYS
 //  CHECK_C(tmp);
@@ -2448,7 +2268,7 @@ void hyperstone_device::hyperstone_subs(struct hyperstone_device::regs_decode *d
 
 	CHECK_VSUB(SREG,DREG,tmp);
 
-	res = (INT32)(DREG) - (INT32)(SREG);
+	res = (int32_t)(DREG) - (int32_t)(SREG);
 
 	SET_DREG(res);
 
@@ -2459,23 +2279,23 @@ void hyperstone_device::hyperstone_subs(struct hyperstone_device::regs_decode *d
 
 	if( GET_V )
 	{
-		UINT32 addr = get_trap_addr(TRAPNO_RANGE_ERROR);
+		uint32_t addr = get_trap_addr(TRAPNO_RANGE_ERROR);
 		execute_exception(addr);
 	}
 }
 
-void hyperstone_device::hyperstone_addc(struct hyperstone_device::regs_decode *decode)
+void hyperstone_device::hyperstone_addc(regs_decode &decode)
 {
-	UINT64 tmp;
+	uint64_t tmp;
 
 	if( SRC_IS_SR )
 	{
-		tmp = (UINT64)(DREG) + (UINT64)(GET_C);
+		tmp = (uint64_t)(DREG) + (uint64_t)(GET_C);
 		CHECK_VADD(DREG,GET_C,tmp);
 	}
 	else
 	{
-		tmp = (UINT64)(SREG) + (UINT64)(DREG) + (UINT64)(GET_C);
+		tmp = (uint64_t)(SREG) + (uint64_t)(DREG) + (uint64_t)(GET_C);
 
 		//CHECK!
 		//CHECK_VADD1: V = (DREG == 0x7FFF) && (C == 1);
@@ -2505,7 +2325,7 @@ void hyperstone_device::hyperstone_addc(struct hyperstone_device::regs_decode *d
 	m_icount -= m_clock_cycles_1;
 }
 
-void hyperstone_device::hyperstone_and(struct hyperstone_device::regs_decode *decode)
+void hyperstone_device::hyperstone_and(regs_decode &decode)
 {
 	DREG = DREG & SREG;
 
@@ -2515,14 +2335,14 @@ void hyperstone_device::hyperstone_and(struct hyperstone_device::regs_decode *de
 	m_icount -= m_clock_cycles_1;
 }
 
-void hyperstone_device::hyperstone_neg(struct hyperstone_device::regs_decode *decode)
+void hyperstone_device::hyperstone_neg(regs_decode &decode)
 {
-	UINT64 tmp;
+	uint64_t tmp;
 
 	if( SRC_IS_SR )
 		SREG = GET_C;
 
-	tmp = -(UINT64)(SREG);
+	tmp = -(uint64_t)(SREG);
 	CHECK_C(tmp);
 	CHECK_VSUB(SREG,0,tmp);
 
@@ -2536,22 +2356,22 @@ void hyperstone_device::hyperstone_neg(struct hyperstone_device::regs_decode *de
 	m_icount -= m_clock_cycles_1;
 }
 
-void hyperstone_device::hyperstone_negs(struct hyperstone_device::regs_decode *decode)
+void hyperstone_device::hyperstone_negs(regs_decode &decode)
 {
-	INT32 res;
-	INT64 tmp;
+	int32_t res;
+	int64_t tmp;
 
 	if( SRC_IS_SR )
 		SREG = GET_C;
 
-	tmp = -(INT64)((INT32)(SREG));
+	tmp = -(int64_t)((int32_t)(SREG));
 	CHECK_VSUB(SREG,0,tmp);
 
 //#if SETCARRYS
 //  CHECK_C(tmp);
 //#endif
 
-	res = -(INT32)(SREG);
+	res = -(int32_t)(SREG);
 
 	SET_DREG(res);
 
@@ -2563,16 +2383,16 @@ void hyperstone_device::hyperstone_negs(struct hyperstone_device::regs_decode *d
 
 	if( GET_V && !SRC_IS_SR ) //trap doesn't occur when source is SR
 	{
-		UINT32 addr = get_trap_addr(TRAPNO_RANGE_ERROR);
+		uint32_t addr = get_trap_addr(TRAPNO_RANGE_ERROR);
 		execute_exception(addr);
 	}
 }
 
-void hyperstone_device::hyperstone_cmpi(struct hyperstone_device::regs_decode *decode)
+void hyperstone_device::hyperstone_cmpi(regs_decode &decode)
 {
-	UINT64 tmp;
+	uint64_t tmp;
 
-	tmp = (UINT64)(DREG) - (UINT64)(EXTRA_U);
+	tmp = (uint64_t)(DREG) - (uint64_t)(EXTRA_U);
 	CHECK_VSUB(EXTRA_U,DREG,tmp);
 
 	if( DREG == EXTRA_U )
@@ -2580,7 +2400,7 @@ void hyperstone_device::hyperstone_cmpi(struct hyperstone_device::regs_decode *d
 	else
 		SET_Z(0);
 
-	if( (INT32) DREG < (INT32) EXTRA_U )
+	if( (int32_t) DREG < (int32_t) EXTRA_U )
 		SET_N(1);
 	else
 		SET_N(0);
@@ -2593,11 +2413,11 @@ void hyperstone_device::hyperstone_cmpi(struct hyperstone_device::regs_decode *d
 	m_icount -= m_clock_cycles_1;
 }
 
-void hyperstone_device::hyperstone_movi(struct hyperstone_device::regs_decode *decode)
+void hyperstone_device::hyperstone_movi(regs_decode &decode)
 {
-	if( !GET_S && decode->dst >= 16 )
+	if( !GET_S && decode.dst >= 16 )
 	{
-		UINT32 addr = get_trap_addr(TRAPNO_PRIVILEGE_ERROR);
+		uint32_t addr = get_trap_addr(TRAPNO_PRIVILEGE_ERROR);
 		execute_exception(addr);
 	}
 
@@ -2616,10 +2436,10 @@ void hyperstone_device::hyperstone_movi(struct hyperstone_device::regs_decode *d
 	m_icount -= m_clock_cycles_1;
 }
 
-void hyperstone_device::hyperstone_addi(struct hyperstone_device::regs_decode *decode)
+void hyperstone_device::hyperstone_addi(regs_decode &decode)
 {
-	UINT32 imm;
-	UINT64 tmp;
+	uint32_t imm;
+	uint64_t tmp;
 
 	if( N_VALUE )
 		imm = EXTRA_U;
@@ -2627,7 +2447,7 @@ void hyperstone_device::hyperstone_addi(struct hyperstone_device::regs_decode *d
 		imm = GET_C & ((GET_Z == 0 ? 1 : 0) | (DREG & 0x01));
 
 
-	tmp = (UINT64)(imm) + (UINT64)(DREG);
+	tmp = (uint64_t)(imm) + (uint64_t)(DREG);
 	CHECK_C(tmp);
 	CHECK_VADD(imm,DREG,tmp);
 
@@ -2643,24 +2463,24 @@ void hyperstone_device::hyperstone_addi(struct hyperstone_device::regs_decode *d
 	m_icount -= m_clock_cycles_1;
 }
 
-void hyperstone_device::hyperstone_addsi(struct hyperstone_device::regs_decode *decode)
+void hyperstone_device::hyperstone_addsi(regs_decode &decode)
 {
-	INT32 imm, res;
-	INT64 tmp;
+	int32_t imm, res;
+	int64_t tmp;
 
 	if( N_VALUE )
 		imm = EXTRA_S;
 	else
 		imm = GET_C & ((GET_Z == 0 ? 1 : 0) | (DREG & 0x01));
 
-	tmp = (INT64)(imm) + (INT64)((INT32)(DREG));
+	tmp = (int64_t)(imm) + (int64_t)((int32_t)(DREG));
 	CHECK_VADD(imm,DREG,tmp);
 
 //#if SETCARRYS
 //  CHECK_C(tmp);
 //#endif
 
-	res = imm + (INT32)(DREG);
+	res = imm + (int32_t)(DREG);
 
 	SET_DREG(res);
 
@@ -2671,14 +2491,14 @@ void hyperstone_device::hyperstone_addsi(struct hyperstone_device::regs_decode *
 
 	if( GET_V )
 	{
-		UINT32 addr = get_trap_addr(TRAPNO_RANGE_ERROR);
+		uint32_t addr = get_trap_addr(TRAPNO_RANGE_ERROR);
 		execute_exception(addr);
 	}
 }
 
-void hyperstone_device::hyperstone_cmpbi(struct hyperstone_device::regs_decode *decode)
+void hyperstone_device::hyperstone_cmpbi(regs_decode &decode)
 {
-	UINT32 imm;
+	uint32_t imm;
 
 	if( N_VALUE )
 	{
@@ -2705,9 +2525,9 @@ void hyperstone_device::hyperstone_cmpbi(struct hyperstone_device::regs_decode *
 	m_icount -= m_clock_cycles_1;
 }
 
-void hyperstone_device::hyperstone_andni(struct hyperstone_device::regs_decode *decode)
+void hyperstone_device::hyperstone_andni(regs_decode &decode)
 {
-	UINT32 imm;
+	uint32_t imm;
 
 	if( N_VALUE == 31 )
 		imm = 0x7fffffff; // bit 31 = 0, others = 1
@@ -2722,7 +2542,7 @@ void hyperstone_device::hyperstone_andni(struct hyperstone_device::regs_decode *
 	m_icount -= m_clock_cycles_1;
 }
 
-void hyperstone_device::hyperstone_ori(struct hyperstone_device::regs_decode *decode)
+void hyperstone_device::hyperstone_ori(regs_decode &decode)
 {
 	DREG = DREG | EXTRA_U;
 
@@ -2732,7 +2552,7 @@ void hyperstone_device::hyperstone_ori(struct hyperstone_device::regs_decode *de
 	m_icount -= m_clock_cycles_1;
 }
 
-void hyperstone_device::hyperstone_xori(struct hyperstone_device::regs_decode *decode)
+void hyperstone_device::hyperstone_xori(regs_decode &decode)
 {
 	DREG = DREG ^ EXTRA_U;
 
@@ -2742,15 +2562,15 @@ void hyperstone_device::hyperstone_xori(struct hyperstone_device::regs_decode *d
 	m_icount -= m_clock_cycles_1;
 }
 
-void hyperstone_device::hyperstone_shrdi(struct hyperstone_device::regs_decode *decode)
+void hyperstone_device::hyperstone_shrdi(regs_decode &decode)
 {
-	UINT32 low_order, high_order;
-	UINT64 val;
+	uint32_t low_order, high_order;
+	uint64_t val;
 
 	high_order = DREG;
 	low_order  = DREGF;
 
-	val = CONCAT_64(high_order, low_order);
+	val = concat_64(high_order, low_order);
 
 	if( N_VALUE )
 		SET_C((val >> (N_VALUE - 1)) & 1);
@@ -2759,8 +2579,8 @@ void hyperstone_device::hyperstone_shrdi(struct hyperstone_device::regs_decode *
 
 	val >>= N_VALUE;
 
-	high_order = EXTRACT_64HI(val);
-	low_order  = EXTRACT_64LO(val);
+	high_order = extract_64hi(val);
+	low_order  = extract_64lo(val);
 
 	SET_DREG(high_order);
 	SET_DREGF(low_order);
@@ -2770,11 +2590,11 @@ void hyperstone_device::hyperstone_shrdi(struct hyperstone_device::regs_decode *
 	m_icount -= m_clock_cycles_2;
 }
 
-void hyperstone_device::hyperstone_shrd(struct hyperstone_device::regs_decode *decode)
+void hyperstone_device::hyperstone_shrd(regs_decode &decode)
 {
-	UINT32 low_order, high_order;
-	UINT64 val;
-	UINT8 n = SREG & 0x1f;
+	uint32_t low_order, high_order;
+	uint64_t val;
+	uint8_t n = SREG & 0x1f;
 
 	// result undefined if Ls denotes the same register as Ld or Ldf
 	if( SAME_SRC_DST || SAME_SRC_DSTF )
@@ -2786,7 +2606,7 @@ void hyperstone_device::hyperstone_shrd(struct hyperstone_device::regs_decode *d
 		high_order = DREG;
 		low_order  = DREGF;
 
-		val = CONCAT_64(high_order, low_order);
+		val = concat_64(high_order, low_order);
 
 		if( n )
 			SET_C((val >> (n - 1)) & 1);
@@ -2795,8 +2615,8 @@ void hyperstone_device::hyperstone_shrd(struct hyperstone_device::regs_decode *d
 
 		val >>= n;
 
-		high_order = EXTRACT_64HI(val);
-		low_order  = EXTRACT_64LO(val);
+		high_order = extract_64hi(val);
+		low_order  = extract_64lo(val);
 
 		SET_DREG(high_order);
 		SET_DREGF(low_order);
@@ -2808,10 +2628,10 @@ void hyperstone_device::hyperstone_shrd(struct hyperstone_device::regs_decode *d
 	m_icount -= m_clock_cycles_2;
 }
 
-void hyperstone_device::hyperstone_shr(struct hyperstone_device::regs_decode *decode)
+void hyperstone_device::hyperstone_shr(regs_decode &decode)
 {
-	UINT32 ret;
-	UINT8 n;
+	uint32_t ret;
+	uint8_t n;
 
 	n = SREG & 0x1f;
 	ret = DREG;
@@ -2830,16 +2650,16 @@ void hyperstone_device::hyperstone_shr(struct hyperstone_device::regs_decode *de
 	m_icount -= m_clock_cycles_1;
 }
 
-void hyperstone_device::hyperstone_sardi(struct hyperstone_device::regs_decode *decode)
+void hyperstone_device::hyperstone_sardi(regs_decode &decode)
 {
-	UINT32 low_order, high_order;
-	UINT64 val;
-	UINT8 sign_bit;
+	uint32_t low_order, high_order;
+	uint64_t val;
+	uint8_t sign_bit;
 
 	high_order = DREG;
 	low_order  = DREGF;
 
-	val = CONCAT_64(high_order, low_order);
+	val = concat_64(high_order, low_order);
 
 	if( N_VALUE )
 		SET_C((val >> (N_VALUE - 1)) & 1);
@@ -2854,7 +2674,7 @@ void hyperstone_device::hyperstone_sardi(struct hyperstone_device::regs_decode *
 		int i;
 		for( i = 0; i < N_VALUE; i++ )
 		{
-			val |= (U64(0x8000000000000000) >> i);
+			val |= (0x8000000000000000U >> i);
 		}
 	}
 
@@ -2870,11 +2690,11 @@ void hyperstone_device::hyperstone_sardi(struct hyperstone_device::regs_decode *
 	m_icount -= m_clock_cycles_2;
 }
 
-void hyperstone_device::hyperstone_sard(struct hyperstone_device::regs_decode *decode)
+void hyperstone_device::hyperstone_sard(regs_decode &decode)
 {
-	UINT32 low_order, high_order;
-	UINT64 val;
-	UINT8 n, sign_bit;
+	uint32_t low_order, high_order;
+	uint64_t val;
+	uint8_t n, sign_bit;
 
 	n = SREG & 0x1f;
 
@@ -2888,7 +2708,7 @@ void hyperstone_device::hyperstone_sard(struct hyperstone_device::regs_decode *d
 		high_order = DREG;
 		low_order  = DREGF;
 
-		val = CONCAT_64(high_order, low_order);
+		val = concat_64(high_order, low_order);
 
 		if( n )
 			SET_C((val >> (n - 1)) & 1);
@@ -2904,7 +2724,7 @@ void hyperstone_device::hyperstone_sard(struct hyperstone_device::regs_decode *d
 			int i;
 			for( i = 0; i < n; i++ )
 			{
-				val |= (U64(0x8000000000000000) >> i);
+				val |= (0x8000000000000000U >> i);
 			}
 		}
 
@@ -2920,10 +2740,10 @@ void hyperstone_device::hyperstone_sard(struct hyperstone_device::regs_decode *d
 	m_icount -= m_clock_cycles_2;
 }
 
-void hyperstone_device::hyperstone_sar(struct hyperstone_device::regs_decode *decode)
+void hyperstone_device::hyperstone_sar(regs_decode &decode)
 {
-	UINT32 ret;
-	UINT8 n, sign_bit;
+	uint32_t ret;
+	uint8_t n, sign_bit;
 
 	n = SREG & 0x1f;
 	ret = DREG;
@@ -2952,17 +2772,17 @@ void hyperstone_device::hyperstone_sar(struct hyperstone_device::regs_decode *de
 	m_icount -= m_clock_cycles_1;
 }
 
-void hyperstone_device::hyperstone_shldi(struct hyperstone_device::regs_decode *decode)
+void hyperstone_device::hyperstone_shldi(regs_decode &decode)
 {
-	UINT32 low_order, high_order, tmp;
-	UINT64 val, mask;
+	uint32_t low_order, high_order, tmp;
+	uint64_t val, mask;
 
 	high_order = DREG;
 	low_order  = DREGF;
 
-	val  = CONCAT_64(high_order, low_order);
-	SET_C( (N_VALUE)?(((val<<(N_VALUE-1))&U64(0x8000000000000000))?1:0):0);
-	mask = ((((UINT64)1) << (32 - N_VALUE)) - 1) ^ 0xffffffff;
+	val  = concat_64(high_order, low_order);
+	SET_C( (N_VALUE)?(((val<<(N_VALUE-1))&0x8000000000000000U)?1:0):0);
+	mask = ((((uint64_t)1) << (32 - N_VALUE)) - 1) ^ 0xffffffff;
 	tmp  = high_order << N_VALUE;
 
 	if( ((high_order & mask) && (!(tmp & 0x80000000))) ||
@@ -2973,8 +2793,8 @@ void hyperstone_device::hyperstone_shldi(struct hyperstone_device::regs_decode *
 
 	val <<= N_VALUE;
 
-	high_order = EXTRACT_64HI(val);
-	low_order  = EXTRACT_64LO(val);
+	high_order = extract_64hi(val);
+	low_order  = extract_64lo(val);
 
 	SET_DREG(high_order);
 	SET_DREGF(low_order);
@@ -2985,10 +2805,10 @@ void hyperstone_device::hyperstone_shldi(struct hyperstone_device::regs_decode *
 	m_icount -= m_clock_cycles_2;
 }
 
-void hyperstone_device::hyperstone_shld(struct hyperstone_device::regs_decode *decode)
+void hyperstone_device::hyperstone_shld(regs_decode &decode)
 {
-	UINT32 low_order, high_order, tmp, n;
-	UINT64 val, mask;
+	uint32_t low_order, high_order, tmp, n;
+	uint64_t val, mask;
 
 	n = SREG & 0x1f;
 
@@ -3002,10 +2822,10 @@ void hyperstone_device::hyperstone_shld(struct hyperstone_device::regs_decode *d
 		high_order = DREG;
 		low_order  = DREGF;
 
-		mask = ((((UINT64)1) << (32 - n)) - 1) ^ 0xffffffff;
+		mask = ((((uint64_t)1) << (32 - n)) - 1) ^ 0xffffffff;
 
-		val = CONCAT_64(high_order, low_order);
-		SET_C( (n)?(((val<<(n-1))&U64(0x8000000000000000))?1:0):0);
+		val = concat_64(high_order, low_order);
+		SET_C( (n)?(((val<<(n-1))&0x8000000000000000U)?1:0):0);
 		tmp = high_order << n;
 
 		if( ((high_order & mask) && (!(tmp & 0x80000000))) ||
@@ -3016,8 +2836,8 @@ void hyperstone_device::hyperstone_shld(struct hyperstone_device::regs_decode *d
 
 		val <<= n;
 
-		high_order = EXTRACT_64HI(val);
-		low_order  = EXTRACT_64LO(val);
+		high_order = extract_64hi(val);
+		low_order  = extract_64lo(val);
 
 		SET_DREG(high_order);
 		SET_DREGF(low_order);
@@ -3029,14 +2849,14 @@ void hyperstone_device::hyperstone_shld(struct hyperstone_device::regs_decode *d
 	m_icount -= m_clock_cycles_2;
 }
 
-void hyperstone_device::hyperstone_shl(struct hyperstone_device::regs_decode *decode)
+void hyperstone_device::hyperstone_shl(regs_decode &decode)
 {
-	UINT32 base, ret, n;
-	UINT64 mask;
+	uint32_t base, ret, n;
+	uint64_t mask;
 
 	n    = SREG & 0x1f;
 	base = DREG;
-	mask = ((((UINT64)1) << (32 - n)) - 1) ^ 0xffffffff;
+	mask = ((((uint64_t)1) << (32 - n)) - 1) ^ 0xffffffff;
 	SET_C( (n)?(((base<<(n-1))&0x80000000)?1:0):0);
 	ret  = base << n;
 
@@ -3053,15 +2873,10 @@ void hyperstone_device::hyperstone_shl(struct hyperstone_device::regs_decode *de
 	m_icount -= m_clock_cycles_1;
 }
 
-void hyperstone_device::reserved(struct hyperstone_device::regs_decode *decode)
+void hyperstone_device::hyperstone_testlz(regs_decode &decode)
 {
-	DEBUG_PRINTF(("Executed Reserved opcode. PC = %08X OP = %04X\n", PC, OP));
-}
-
-void hyperstone_device::hyperstone_testlz(struct hyperstone_device::regs_decode *decode)
-{
-	UINT8 zeros = 0;
-	UINT32 mask;
+	uint8_t zeros = 0;
+	uint32_t mask;
 
 	for( mask = 0x80000000; ; mask >>= 1 )
 	{
@@ -3079,17 +2894,17 @@ void hyperstone_device::hyperstone_testlz(struct hyperstone_device::regs_decode 
 	m_icount -= m_clock_cycles_2;
 }
 
-void hyperstone_device::hyperstone_rol(struct hyperstone_device::regs_decode *decode)
+void hyperstone_device::hyperstone_rol(regs_decode &decode)
 {
-	UINT32 val, base;
-	UINT8 n;
-	UINT64 mask;
+	uint32_t val, base;
+	uint8_t n;
+	uint64_t mask;
 
 	n = SREG & 0x1f;
 
 	val = base = DREG;
 
-	mask = ((((UINT64)1) << (32 - n)) - 1) ^ 0xffffffff;
+	mask = ((((uint64_t)1) << (32 - n)) - 1) ^ 0xffffffff;
 
 	while( n > 0 )
 	{
@@ -3116,13 +2931,13 @@ void hyperstone_device::hyperstone_rol(struct hyperstone_device::regs_decode *de
 }
 
 //TODO: add trap error
-void hyperstone_device::hyperstone_ldxx1(struct hyperstone_device::regs_decode *decode)
+void hyperstone_device::hyperstone_ldxx1(regs_decode &decode)
 {
-	UINT32 load;
+	uint32_t load;
 
 	if( DST_IS_SR )
 	{
-		switch( decode->sub_type )
+		switch( decode.sub_type )
 		{
 			case 0: // LDBS.A
 
@@ -3196,7 +3011,7 @@ void hyperstone_device::hyperstone_ldxx1(struct hyperstone_device::regs_decode *
 	}
 	else
 	{
-		switch( decode->sub_type )
+		switch( decode.sub_type )
 		{
 			case 0: // LDBS.D
 
@@ -3272,9 +3087,9 @@ void hyperstone_device::hyperstone_ldxx1(struct hyperstone_device::regs_decode *
 	m_icount -= m_clock_cycles_1;
 }
 
-void hyperstone_device::hyperstone_ldxx2(struct hyperstone_device::regs_decode *decode)
+void hyperstone_device::hyperstone_ldxx2(regs_decode &decode)
 {
-	UINT32 load;
+	uint32_t load;
 
 	if( DST_IS_PC || DST_IS_SR )
 	{
@@ -3282,7 +3097,7 @@ void hyperstone_device::hyperstone_ldxx2(struct hyperstone_device::regs_decode *
 	}
 	else
 	{
-		switch( decode->sub_type )
+		switch( decode.sub_type )
 		{
 			case 0: // LDBS.N
 
@@ -3393,14 +3208,14 @@ void hyperstone_device::hyperstone_ldxx2(struct hyperstone_device::regs_decode *
 }
 
 //TODO: add trap error
-void hyperstone_device::hyperstone_stxx1(struct hyperstone_device::regs_decode *decode)
+void hyperstone_device::hyperstone_stxx1(regs_decode &decode)
 {
 	if( SRC_IS_SR )
 		SREG = SREGF = 0;
 
 	if( DST_IS_SR )
 	{
-		switch( decode->sub_type )
+		switch( decode.sub_type )
 		{
 			case 0: // STBS.A
 
@@ -3462,7 +3277,7 @@ void hyperstone_device::hyperstone_stxx1(struct hyperstone_device::regs_decode *
 	}
 	else
 	{
-		switch( decode->sub_type )
+		switch( decode.sub_type )
 		{
 			case 0: // STBS.D
 
@@ -3526,7 +3341,7 @@ void hyperstone_device::hyperstone_stxx1(struct hyperstone_device::regs_decode *
 	m_icount -= m_clock_cycles_1;
 }
 
-void hyperstone_device::hyperstone_stxx2(struct hyperstone_device::regs_decode *decode)
+void hyperstone_device::hyperstone_stxx2(regs_decode &decode)
 {
 	if( SRC_IS_SR )
 		SREG = SREGF = 0;
@@ -3537,7 +3352,7 @@ void hyperstone_device::hyperstone_stxx2(struct hyperstone_device::regs_decode *
 	}
 	else
 	{
-		switch( decode->sub_type )
+		switch( decode.sub_type )
 		{
 			case 0: // STBS.N
 
@@ -3580,7 +3395,7 @@ void hyperstone_device::hyperstone_stxx2(struct hyperstone_device::regs_decode *
 						WRITE_W(DREG, SREG);
 					else
 					{
-						if(((DREG & 0xfc) >> 2) == ((decode->src + GET_FP) % 64) && S_BIT == LOCAL)
+						if(((DREG & 0xfc) >> 2) == ((decode.src + GET_FP) % 64) && S_BIT == LOCAL)
 							DEBUG_PRINTF(("STW.S denoted the same local register @ %08X\n",PPC));
 
 						SET_ABS_L_REG((DREG & 0xfc) >> 2,SREG);
@@ -3620,9 +3435,9 @@ void hyperstone_device::hyperstone_stxx2(struct hyperstone_device::regs_decode *
 	m_icount -= m_clock_cycles_1;
 }
 
-void hyperstone_device::hyperstone_shri(struct hyperstone_device::regs_decode *decode)
+void hyperstone_device::hyperstone_shri(regs_decode &decode)
 {
-	UINT32 val;
+	uint32_t val;
 
 	val = DREG;
 
@@ -3640,10 +3455,10 @@ void hyperstone_device::hyperstone_shri(struct hyperstone_device::regs_decode *d
 	m_icount -= m_clock_cycles_1;
 }
 
-void hyperstone_device::hyperstone_sari(struct hyperstone_device::regs_decode *decode)
+void hyperstone_device::hyperstone_sari(regs_decode &decode)
 {
-	UINT32 val;
-	UINT8 sign_bit;
+	uint32_t val;
+	uint8_t sign_bit;
 
 	val = DREG;
 	sign_bit = (val & 0x80000000) >> 31;
@@ -3671,14 +3486,14 @@ void hyperstone_device::hyperstone_sari(struct hyperstone_device::regs_decode *d
 	m_icount -= m_clock_cycles_1;
 }
 
-void hyperstone_device::hyperstone_shli(struct hyperstone_device::regs_decode *decode)
+void hyperstone_device::hyperstone_shli(regs_decode &decode)
 {
-	UINT32 val, val2;
-	UINT64 mask;
+	uint32_t val, val2;
+	uint64_t mask;
 
 	val  = DREG;
 	SET_C( (N_VALUE)?(((val<<(N_VALUE-1))&0x80000000)?1:0):0);
-	mask = ((((UINT64)1) << (32 - N_VALUE)) - 1) ^ 0xffffffff;
+	mask = ((((uint64_t)1) << (32 - N_VALUE)) - 1) ^ 0xffffffff;
 	val2 = val << N_VALUE;
 
 	if( ((val & mask) && (!(val2 & 0x80000000))) ||
@@ -3694,10 +3509,10 @@ void hyperstone_device::hyperstone_shli(struct hyperstone_device::regs_decode *d
 	m_icount -= m_clock_cycles_1;
 }
 
-void hyperstone_device::hyperstone_mulu(struct hyperstone_device::regs_decode *decode)
+void hyperstone_device::hyperstone_mulu(regs_decode &decode)
 {
-	UINT32 low_order, high_order;
-	UINT64 double_word;
+	uint32_t low_order, high_order;
+	uint64_t double_word;
 
 	// PC or SR aren't denoted, else result is undefined
 	if( SRC_IS_PC || SRC_IS_SR || DST_IS_PC || DST_IS_SR  )
@@ -3706,7 +3521,7 @@ void hyperstone_device::hyperstone_mulu(struct hyperstone_device::regs_decode *d
 	}
 	else
 	{
-		double_word = (UINT64)SREG *(UINT64)DREG;
+		double_word = (uint64_t)SREG *(uint64_t)DREG;
 
 		low_order = double_word & 0xffffffff;
 		high_order = double_word >> 32;
@@ -3724,10 +3539,10 @@ void hyperstone_device::hyperstone_mulu(struct hyperstone_device::regs_decode *d
 		m_icount -= m_clock_cycles_6;
 }
 
-void hyperstone_device::hyperstone_muls(struct hyperstone_device::regs_decode *decode)
+void hyperstone_device::hyperstone_muls(regs_decode &decode)
 {
-	UINT32 low_order, high_order;
-	INT64 double_word;
+	uint32_t low_order, high_order;
+	int64_t double_word;
 
 	// PC or SR aren't denoted, else result is undefined
 	if( SRC_IS_PC || SRC_IS_SR || DST_IS_PC || DST_IS_SR  )
@@ -3736,7 +3551,7 @@ void hyperstone_device::hyperstone_muls(struct hyperstone_device::regs_decode *d
 	}
 	else
 	{
-		double_word = (INT64)(INT32)(SREG) * (INT64)(INT32)(DREG);
+		double_word = (int64_t)(int32_t)(SREG) * (int64_t)(int32_t)(DREG);
 		low_order = double_word & 0xffffffff;
 		high_order = double_word >> 32;
 
@@ -3753,7 +3568,7 @@ void hyperstone_device::hyperstone_muls(struct hyperstone_device::regs_decode *d
 		m_icount -= m_clock_cycles_6;
 }
 
-void hyperstone_device::hyperstone_set(struct hyperstone_device::regs_decode *decode)
+void hyperstone_device::hyperstone_set(regs_decode &decode)
 {
 	int n = N_VALUE;
 
@@ -3775,7 +3590,7 @@ void hyperstone_device::hyperstone_set(struct hyperstone_device::regs_decode *de
 			// SETADR
 			case 0:
 			{
-				UINT32 val;
+				uint32_t val;
 				val =  (SP & 0xfffffe00) | (GET_FP << 2);
 
 				//plus carry into bit 9
@@ -4099,9 +3914,9 @@ void hyperstone_device::hyperstone_set(struct hyperstone_device::regs_decode *de
 	}
 }
 
-void hyperstone_device::hyperstone_mul(struct hyperstone_device::regs_decode *decode)
+void hyperstone_device::hyperstone_mul(regs_decode &decode)
 {
-	UINT32 single_word;
+	uint32_t single_word;
 
 	// PC or SR aren't denoted, else result is undefined
 	if( SRC_IS_PC || SRC_IS_SR || DST_IS_PC || DST_IS_SR  )
@@ -4124,94 +3939,94 @@ void hyperstone_device::hyperstone_mul(struct hyperstone_device::regs_decode *de
 		m_icount -= 5 << m_clck_scale;
 }
 
-void hyperstone_device::hyperstone_fadd(struct hyperstone_device::regs_decode *decode)
+void hyperstone_device::hyperstone_fadd(regs_decode &decode)
 {
 	execute_software(decode);
 	m_icount -= m_clock_cycles_6;
 }
 
-void hyperstone_device::hyperstone_faddd(struct hyperstone_device::regs_decode *decode)
+void hyperstone_device::hyperstone_faddd(regs_decode &decode)
 {
 	execute_software(decode);
 	m_icount -= m_clock_cycles_6;
 }
 
-void hyperstone_device::hyperstone_fsub(struct hyperstone_device::regs_decode *decode)
+void hyperstone_device::hyperstone_fsub(regs_decode &decode)
 {
 	execute_software(decode);
 	m_icount -= m_clock_cycles_6;
 }
 
-void hyperstone_device::hyperstone_fsubd(struct hyperstone_device::regs_decode *decode)
+void hyperstone_device::hyperstone_fsubd(regs_decode &decode)
 {
 	execute_software(decode);
 	m_icount -= m_clock_cycles_6;
 }
 
-void hyperstone_device::hyperstone_fmul(struct hyperstone_device::regs_decode *decode)
+void hyperstone_device::hyperstone_fmul(regs_decode &decode)
 {
 	execute_software(decode);
 	m_icount -= m_clock_cycles_6;
 }
 
-void hyperstone_device::hyperstone_fmuld(struct hyperstone_device::regs_decode *decode)
+void hyperstone_device::hyperstone_fmuld(regs_decode &decode)
 {
 	execute_software(decode);
 	m_icount -= m_clock_cycles_6;
 }
 
-void hyperstone_device::hyperstone_fdiv(struct hyperstone_device::regs_decode *decode)
+void hyperstone_device::hyperstone_fdiv(regs_decode &decode)
 {
 	execute_software(decode);
 	m_icount -= m_clock_cycles_6;
 }
 
-void hyperstone_device::hyperstone_fdivd(struct hyperstone_device::regs_decode *decode)
+void hyperstone_device::hyperstone_fdivd(regs_decode &decode)
 {
 	execute_software(decode);
 	m_icount -= m_clock_cycles_6;
 }
 
-void hyperstone_device::hyperstone_fcmp(struct hyperstone_device::regs_decode *decode)
+void hyperstone_device::hyperstone_fcmp(regs_decode &decode)
 {
 	execute_software(decode);
 	m_icount -= m_clock_cycles_6;
 }
 
-void hyperstone_device::hyperstone_fcmpd(struct hyperstone_device::regs_decode *decode)
+void hyperstone_device::hyperstone_fcmpd(regs_decode &decode)
 {
 	execute_software(decode);
 	m_icount -= m_clock_cycles_6;
 }
 
-void hyperstone_device::hyperstone_fcmpu(struct hyperstone_device::regs_decode *decode)
+void hyperstone_device::hyperstone_fcmpu(regs_decode &decode)
 {
 	execute_software(decode);
 	m_icount -= m_clock_cycles_6;
 }
 
-void hyperstone_device::hyperstone_fcmpud(struct hyperstone_device::regs_decode *decode)
+void hyperstone_device::hyperstone_fcmpud(regs_decode &decode)
 {
 	execute_software(decode);
 	m_icount -= m_clock_cycles_6;
 }
 
-void hyperstone_device::hyperstone_fcvt(struct hyperstone_device::regs_decode *decode)
+void hyperstone_device::hyperstone_fcvt(regs_decode &decode)
 {
 	execute_software(decode);
 	m_icount -= m_clock_cycles_6;
 }
 
-void hyperstone_device::hyperstone_fcvtd(struct hyperstone_device::regs_decode *decode)
+void hyperstone_device::hyperstone_fcvtd(regs_decode &decode)
 {
 	execute_software(decode);
 	m_icount -= m_clock_cycles_6;
 }
 
-void hyperstone_device::hyperstone_extend(struct hyperstone_device::regs_decode *decode)
+void hyperstone_device::hyperstone_extend(regs_decode &decode)
 {
 	//TODO: add locks, overflow error and other things
-	UINT32 vals, vald;
+	uint32_t vals, vald;
 
 	vals = SREG;
 	vald = DREG;
@@ -4222,7 +4037,7 @@ void hyperstone_device::hyperstone_extend(struct hyperstone_device::regs_decode 
 		case EMUL:
 		case 0x100: // used in "N" type cpu
 		{
-			UINT32 result;
+			uint32_t result;
 
 			result = vals * vald;
 			SET_G_REG(15, result);
@@ -4232,9 +4047,9 @@ void hyperstone_device::hyperstone_extend(struct hyperstone_device::regs_decode 
 		// unsigned multiplication, double word product
 		case EMULU:
 		{
-			UINT64 result;
+			uint64_t result;
 
-			result = (UINT64)vals * (UINT64)vald;
+			result = (uint64_t)vals * (uint64_t)vald;
 			vals = result >> 32;
 			vald = result & 0xffffffff;
 			SET_G_REG(14, vals);
@@ -4245,9 +4060,9 @@ void hyperstone_device::hyperstone_extend(struct hyperstone_device::regs_decode 
 		// signed multiplication, double word product
 		case EMULS:
 		{
-			INT64 result;
+			int64_t result;
 
-			result = (INT64)(INT32)(vals) * (INT64)(INT32)(vald);
+			result = (int64_t)(int32_t)(vals) * (int64_t)(int32_t)(vald);
 			vals = result >> 32;
 			vald = result & 0xffffffff;
 			SET_G_REG(14, vals);
@@ -4258,9 +4073,9 @@ void hyperstone_device::hyperstone_extend(struct hyperstone_device::regs_decode 
 		// signed multiply/add, single word product sum
 		case EMAC:
 		{
-			INT32 result;
+			int32_t result;
 
-			result = (INT32)GET_G_REG(15) + ((INT32)(vals) * (INT32)(vald));
+			result = (int32_t)GET_G_REG(15) + ((int32_t)(vals) * (int32_t)(vald));
 			SET_G_REG(15, result);
 
 			break;
@@ -4268,9 +4083,9 @@ void hyperstone_device::hyperstone_extend(struct hyperstone_device::regs_decode 
 		// signed multiply/add, double word product sum
 		case EMACD:
 		{
-			INT64 result;
+			int64_t result;
 
-			result = (INT64)CONCAT_64(GET_G_REG(14), GET_G_REG(15)) + (INT64)((INT64)(INT32)(vals) * (INT64)(INT32)(vald));
+			result = (int64_t)concat_64(GET_G_REG(14), GET_G_REG(15)) + (int64_t)((int64_t)(int32_t)(vals) * (int64_t)(int32_t)(vald));
 
 			vals = result >> 32;
 			vald = result & 0xffffffff;
@@ -4282,9 +4097,9 @@ void hyperstone_device::hyperstone_extend(struct hyperstone_device::regs_decode 
 		// signed multiply/substract, single word product difference
 		case EMSUB:
 		{
-			INT32 result;
+			int32_t result;
 
-			result = (INT32)GET_G_REG(15) - ((INT32)(vals) * (INT32)(vald));
+			result = (int32_t)GET_G_REG(15) - ((int32_t)(vals) * (int32_t)(vald));
 			SET_G_REG(15, result);
 
 			break;
@@ -4292,9 +4107,9 @@ void hyperstone_device::hyperstone_extend(struct hyperstone_device::regs_decode 
 		// signed multiply/substract, double word product difference
 		case EMSUBD:
 		{
-			INT64 result;
+			int64_t result;
 
-			result = (INT64)CONCAT_64(GET_G_REG(14), GET_G_REG(15)) - (INT64)((INT64)(INT32)(vals) * (INT64)(INT32)(vald));
+			result = (int64_t)concat_64(GET_G_REG(14), GET_G_REG(15)) - (int64_t)((int64_t)(int32_t)(vals) * (int64_t)(int32_t)(vald));
 
 			vals = result >> 32;
 			vald = result & 0xffffffff;
@@ -4306,9 +4121,9 @@ void hyperstone_device::hyperstone_extend(struct hyperstone_device::regs_decode 
 		// signed half-word multiply/add, single word product sum
 		case EHMAC:
 		{
-			INT32 result;
+			int32_t result;
 
-			result = (INT32)GET_G_REG(15) + ((INT32)((vald & 0xffff0000) >> 16) * (INT32)((vals & 0xffff0000) >> 16)) + ((INT32)(vald & 0xffff) * (INT32)(vals & 0xffff));
+			result = (int32_t)GET_G_REG(15) + ((int32_t)((vald & 0xffff0000) >> 16) * (int32_t)((vals & 0xffff0000) >> 16)) + ((int32_t)(vald & 0xffff) * (int32_t)(vals & 0xffff));
 			SET_G_REG(15, result);
 
 			break;
@@ -4316,9 +4131,9 @@ void hyperstone_device::hyperstone_extend(struct hyperstone_device::regs_decode 
 		// signed half-word multiply/add, double word product sum
 		case EHMACD:
 		{
-			INT64 result;
+			int64_t result;
 
-			result = (INT64)CONCAT_64(GET_G_REG(14), GET_G_REG(15)) + (INT64)((INT64)(INT32)((vald & 0xffff0000) >> 16) * (INT64)(INT32)((vals & 0xffff0000) >> 16)) + ((INT64)(INT32)(vald & 0xffff) * (INT64)(INT32)(vals & 0xffff));
+			result = (int64_t)concat_64(GET_G_REG(14), GET_G_REG(15)) + (int64_t)((int64_t)(int32_t)((vald & 0xffff0000) >> 16) * (int64_t)(int32_t)((vals & 0xffff0000) >> 16)) + ((int64_t)(int32_t)(vald & 0xffff) * (int64_t)(int32_t)(vals & 0xffff));
 
 			vals = result >> 32;
 			vald = result & 0xffffffff;
@@ -4330,7 +4145,7 @@ void hyperstone_device::hyperstone_extend(struct hyperstone_device::regs_decode 
 		// half-word complex multiply
 		case EHCMULD:
 		{
-			UINT32 result;
+			uint32_t result;
 
 			result = (((vald & 0xffff0000) >> 16) * ((vals & 0xffff0000) >> 16)) - ((vald & 0xffff) * (vals & 0xffff));
 			SET_G_REG(14, result);
@@ -4343,7 +4158,7 @@ void hyperstone_device::hyperstone_extend(struct hyperstone_device::regs_decode 
 		// half-word complex multiply/add
 		case EHCMACD:
 		{
-			UINT32 result;
+			uint32_t result;
 
 			result = GET_G_REG(14) + (((vald & 0xffff0000) >> 16) * ((vals & 0xffff0000) >> 16)) - ((vald & 0xffff) * (vals & 0xffff));
 			SET_G_REG(14, result);
@@ -4357,7 +4172,7 @@ void hyperstone_device::hyperstone_extend(struct hyperstone_device::regs_decode 
 		// Ls is not used and should denote the same register as Ld
 		case EHCSUMD:
 		{
-			UINT32 result;
+			uint32_t result;
 
 			result = ((((vals & 0xffff0000) >> 16) + GET_G_REG(14)) << 16) & 0xffff0000;
 			result |= ((vals & 0xffff) + GET_G_REG(15)) & 0xffff;
@@ -4373,7 +4188,7 @@ void hyperstone_device::hyperstone_extend(struct hyperstone_device::regs_decode 
 		// Ls is not used and should denote the same register as Ld
 		case EHCFFTD:
 		{
-			UINT32 result;
+			uint32_t result;
 
 			result = ((((vals & 0xffff0000) >> 16) + (GET_G_REG(14) >> 15)) << 16) & 0xffff0000;
 			result |= ((vals & 0xffff) + (GET_G_REG(15) >> 15)) & 0xffff;
@@ -4389,7 +4204,7 @@ void hyperstone_device::hyperstone_extend(struct hyperstone_device::regs_decode 
 		// Ls is not used and should denote the same register as Ld
 		case EHCFFTSD:
 		{
-			UINT32 result;
+			uint32_t result;
 
 			result = (((((vals & 0xffff0000) >> 16) + (GET_G_REG(14) >> 15)) >> 1) << 16) & 0xffff0000;
 			result |= ((((vals & 0xffff) + (GET_G_REG(15) >> 15)) >> 1) & 0xffff);
@@ -4409,19 +4224,19 @@ void hyperstone_device::hyperstone_extend(struct hyperstone_device::regs_decode 
 	m_icount -= m_clock_cycles_1; //TODO: with the latency it can change
 }
 
-void hyperstone_device::hyperstone_do(struct hyperstone_device::regs_decode *decode)
+void hyperstone_device::hyperstone_do(regs_decode &decode)
 {
 	fatalerror("Executed hyperstone_do instruction. PC = %08X\n", PPC);
 }
 
-void hyperstone_device::hyperstone_ldwr(struct hyperstone_device::regs_decode *decode)
+void hyperstone_device::hyperstone_ldwr(regs_decode &decode)
 {
 	SET_SREG(READ_W(DREG));
 
 	m_icount -= m_clock_cycles_1;
 }
 
-void hyperstone_device::hyperstone_lddr(struct hyperstone_device::regs_decode *decode)
+void hyperstone_device::hyperstone_lddr(regs_decode &decode)
 {
 	SET_SREG(READ_W(DREG));
 	SET_SREGF(READ_W(DREG + 4));
@@ -4429,26 +4244,26 @@ void hyperstone_device::hyperstone_lddr(struct hyperstone_device::regs_decode *d
 	m_icount -= m_clock_cycles_2;
 }
 
-void hyperstone_device::hyperstone_ldwp(struct hyperstone_device::regs_decode *decode)
+void hyperstone_device::hyperstone_ldwp(regs_decode &decode)
 {
 	SET_SREG(READ_W(DREG));
 
 	// post increment the destination register if it's different from the source one
 	// (needed by Hidden Catch)
-	if(!(decode->src == decode->dst && S_BIT == LOCAL))
+	if(!(decode.src == decode.dst && S_BIT == LOCAL))
 		SET_DREG(DREG + 4);
 
 	m_icount -= m_clock_cycles_1;
 }
 
-void hyperstone_device::hyperstone_lddp(struct hyperstone_device::regs_decode *decode)
+void hyperstone_device::hyperstone_lddp(regs_decode &decode)
 {
 	SET_SREG(READ_W(DREG));
 	SET_SREGF(READ_W(DREG + 4));
 
 	// post increment the destination register if it's different from the source one
 	// and from the "next source" one
-	if(!(decode->src == decode->dst && S_BIT == LOCAL) &&   !SAME_SRCF_DST )
+	if(!(decode.src == decode.dst && S_BIT == LOCAL) &&   !SAME_SRCF_DST )
 	{
 		SET_DREG(DREG + 8);
 	}
@@ -4460,7 +4275,7 @@ void hyperstone_device::hyperstone_lddp(struct hyperstone_device::regs_decode *d
 	m_icount -= m_clock_cycles_2;
 }
 
-void hyperstone_device::hyperstone_stwr(struct hyperstone_device::regs_decode *decode)
+void hyperstone_device::hyperstone_stwr(regs_decode &decode)
 {
 	if( SRC_IS_SR )
 		SREG = 0;
@@ -4470,7 +4285,7 @@ void hyperstone_device::hyperstone_stwr(struct hyperstone_device::regs_decode *d
 	m_icount -= m_clock_cycles_1;
 }
 
-void hyperstone_device::hyperstone_stdr(struct hyperstone_device::regs_decode *decode)
+void hyperstone_device::hyperstone_stdr(regs_decode &decode)
 {
 	if( SRC_IS_SR )
 		SREG = SREGF = 0;
@@ -4481,7 +4296,7 @@ void hyperstone_device::hyperstone_stdr(struct hyperstone_device::regs_decode *d
 	m_icount -= m_clock_cycles_2;
 }
 
-void hyperstone_device::hyperstone_stwp(struct hyperstone_device::regs_decode *decode)
+void hyperstone_device::hyperstone_stwp(regs_decode &decode)
 {
 	if( SRC_IS_SR )
 		SREG = 0;
@@ -4492,7 +4307,7 @@ void hyperstone_device::hyperstone_stwp(struct hyperstone_device::regs_decode *d
 	m_icount -= m_clock_cycles_1;
 }
 
-void hyperstone_device::hyperstone_stdp(struct hyperstone_device::regs_decode *decode)
+void hyperstone_device::hyperstone_stdp(regs_decode &decode)
 {
 	if( SRC_IS_SR )
 		SREG = SREGF = 0;
@@ -4508,7 +4323,7 @@ void hyperstone_device::hyperstone_stdp(struct hyperstone_device::regs_decode *d
 	m_icount -= m_clock_cycles_2;
 }
 
-void hyperstone_device::hyperstone_dbv(struct hyperstone_device::regs_decode *decode)
+void hyperstone_device::hyperstone_dbv(regs_decode &decode)
 {
 	if( GET_V )
 		execute_dbr(decode);
@@ -4516,7 +4331,7 @@ void hyperstone_device::hyperstone_dbv(struct hyperstone_device::regs_decode *de
 	m_icount -= m_clock_cycles_1;
 }
 
-void hyperstone_device::hyperstone_dbnv(struct hyperstone_device::regs_decode *decode)
+void hyperstone_device::hyperstone_dbnv(regs_decode &decode)
 {
 	if( !GET_V )
 		execute_dbr(decode);
@@ -4524,7 +4339,7 @@ void hyperstone_device::hyperstone_dbnv(struct hyperstone_device::regs_decode *d
 	m_icount -= m_clock_cycles_1;
 }
 
-void hyperstone_device::hyperstone_dbe(struct hyperstone_device::regs_decode *decode) //or DBZ
+void hyperstone_device::hyperstone_dbe(regs_decode &decode) //or DBZ
 {
 	if( GET_Z )
 		execute_dbr(decode);
@@ -4532,7 +4347,7 @@ void hyperstone_device::hyperstone_dbe(struct hyperstone_device::regs_decode *de
 	m_icount -= m_clock_cycles_1;
 }
 
-void hyperstone_device::hyperstone_dbne(struct hyperstone_device::regs_decode *decode) //or DBNZ
+void hyperstone_device::hyperstone_dbne(regs_decode &decode) //or DBNZ
 {
 	if( !GET_Z )
 		execute_dbr(decode);
@@ -4540,7 +4355,7 @@ void hyperstone_device::hyperstone_dbne(struct hyperstone_device::regs_decode *d
 	m_icount -= m_clock_cycles_1;
 }
 
-void hyperstone_device::hyperstone_dbc(struct hyperstone_device::regs_decode *decode) //or DBST
+void hyperstone_device::hyperstone_dbc(regs_decode &decode) //or DBST
 {
 	if( GET_C )
 		execute_dbr(decode);
@@ -4548,7 +4363,7 @@ void hyperstone_device::hyperstone_dbc(struct hyperstone_device::regs_decode *de
 	m_icount -= m_clock_cycles_1;
 }
 
-void hyperstone_device::hyperstone_dbnc(struct hyperstone_device::regs_decode *decode) //or DBHE
+void hyperstone_device::hyperstone_dbnc(regs_decode &decode) //or DBHE
 {
 	if( !GET_C )
 		execute_dbr(decode);
@@ -4556,7 +4371,7 @@ void hyperstone_device::hyperstone_dbnc(struct hyperstone_device::regs_decode *d
 	m_icount -= m_clock_cycles_1;
 }
 
-void hyperstone_device::hyperstone_dbse(struct hyperstone_device::regs_decode *decode)
+void hyperstone_device::hyperstone_dbse(regs_decode &decode)
 {
 	if( GET_C || GET_Z )
 		execute_dbr(decode);
@@ -4564,7 +4379,7 @@ void hyperstone_device::hyperstone_dbse(struct hyperstone_device::regs_decode *d
 	m_icount -= m_clock_cycles_1;
 }
 
-void hyperstone_device::hyperstone_dbht(struct hyperstone_device::regs_decode *decode)
+void hyperstone_device::hyperstone_dbht(regs_decode &decode)
 {
 	if( !GET_C && !GET_Z )
 		execute_dbr(decode);
@@ -4572,7 +4387,7 @@ void hyperstone_device::hyperstone_dbht(struct hyperstone_device::regs_decode *d
 	m_icount -= m_clock_cycles_1;
 }
 
-void hyperstone_device::hyperstone_dbn(struct hyperstone_device::regs_decode *decode) //or DBLT
+void hyperstone_device::hyperstone_dbn(regs_decode &decode) //or DBLT
 {
 	if( GET_N )
 		execute_dbr(decode);
@@ -4580,7 +4395,7 @@ void hyperstone_device::hyperstone_dbn(struct hyperstone_device::regs_decode *de
 	m_icount -= m_clock_cycles_1;
 }
 
-void hyperstone_device::hyperstone_dbnn(struct hyperstone_device::regs_decode *decode) //or DBGE
+void hyperstone_device::hyperstone_dbnn(regs_decode &decode) //or DBGE
 {
 	if( !GET_N )
 		execute_dbr(decode);
@@ -4588,7 +4403,7 @@ void hyperstone_device::hyperstone_dbnn(struct hyperstone_device::regs_decode *d
 	m_icount -= m_clock_cycles_1;
 }
 
-void hyperstone_device::hyperstone_dble(struct hyperstone_device::regs_decode *decode)
+void hyperstone_device::hyperstone_dble(regs_decode &decode)
 {
 	if( GET_N || GET_Z )
 		execute_dbr(decode);
@@ -4596,7 +4411,7 @@ void hyperstone_device::hyperstone_dble(struct hyperstone_device::regs_decode *d
 	m_icount -= m_clock_cycles_1;
 }
 
-void hyperstone_device::hyperstone_dbgt(struct hyperstone_device::regs_decode *decode)
+void hyperstone_device::hyperstone_dbgt(regs_decode &decode)
 {
 	if( !GET_N && !GET_Z )
 		execute_dbr(decode);
@@ -4604,15 +4419,15 @@ void hyperstone_device::hyperstone_dbgt(struct hyperstone_device::regs_decode *d
 	m_icount -= m_clock_cycles_1;
 }
 
-void hyperstone_device::hyperstone_dbr(struct hyperstone_device::regs_decode *decode)
+void hyperstone_device::hyperstone_dbr(regs_decode &decode)
 {
 	execute_dbr(decode);
 }
 
-void hyperstone_device::hyperstone_frame(struct hyperstone_device::regs_decode *decode)
+void hyperstone_device::hyperstone_frame(regs_decode &decode)
 {
-	INT8 difference; // really it's 7 bits
-	UINT8 realfp = GET_FP - SRC_CODE;
+	int8_t difference; // really it's 7 bits
+	uint8_t realfp = GET_FP - SRC_CODE;
 
 	SET_FP(realfp);
 	SET_FL(DST_CODE);
@@ -4622,13 +4437,13 @@ void hyperstone_device::hyperstone_frame(struct hyperstone_device::regs_decode *
 
 	/* convert to 8 bits */
 	if(difference > 63)
-		difference = (INT8)(difference|0x80);
+		difference = (int8_t)(difference|0x80);
 	else if( difference < -64 )
 		difference = difference & 0x7f;
 
 	if( difference < 0 ) // else it's finished
 	{
-		UINT8 tmp_flag;
+		uint8_t tmp_flag;
 
 		tmp_flag = ( SP >= UB ? 1 : 0 );
 
@@ -4642,7 +4457,7 @@ void hyperstone_device::hyperstone_frame(struct hyperstone_device::regs_decode *
 
 		if( tmp_flag )
 		{
-			UINT32 addr = get_trap_addr(TRAPNO_FRAME_ERROR);
+			uint32_t addr = get_trap_addr(TRAPNO_FRAME_ERROR);
 			execute_exception(addr);
 		}
 	}
@@ -4651,22 +4466,22 @@ void hyperstone_device::hyperstone_frame(struct hyperstone_device::regs_decode *
 	m_icount -= m_clock_cycles_1;
 }
 
-void hyperstone_device::hyperstone_call(struct hyperstone_device::regs_decode *decode)
+void hyperstone_device::hyperstone_call(regs_decode &decode)
 {
 	if( SRC_IS_SR )
 		SREG = 0;
 
 	if( !DST_CODE )
-		decode->dst = 16;
+		decode.dst = 16;
 
 	EXTRA_S = (EXTRA_S & ~1) + SREG;
 
-	SET_ILC(m_instruction_length & 3);
+	SET_ILC(m_instruction_length);
 
 	SET_DREG((PC & 0xfffffffe) | GET_S);
 	SET_DREGF(SR);
 
-	SET_FP(GET_FP + decode->dst);
+	SET_FP(GET_FP + decode.dst);
 
 	SET_FL(6); //default value for call
 	SET_M(0);
@@ -4682,7 +4497,7 @@ void hyperstone_device::hyperstone_call(struct hyperstone_device::regs_decode *d
 	m_icount -= m_clock_cycles_1;
 }
 
-void hyperstone_device::hyperstone_bv(struct hyperstone_device::regs_decode *decode)
+void hyperstone_device::hyperstone_bv(regs_decode &decode)
 {
 	if( GET_V )
 		execute_br(decode);
@@ -4690,7 +4505,7 @@ void hyperstone_device::hyperstone_bv(struct hyperstone_device::regs_decode *dec
 		m_icount -= m_clock_cycles_1;
 }
 
-void hyperstone_device::hyperstone_bnv(struct hyperstone_device::regs_decode *decode)
+void hyperstone_device::hyperstone_bnv(regs_decode &decode)
 {
 	if( !GET_V )
 		execute_br(decode);
@@ -4698,7 +4513,7 @@ void hyperstone_device::hyperstone_bnv(struct hyperstone_device::regs_decode *de
 		m_icount -= m_clock_cycles_1;
 }
 
-void hyperstone_device::hyperstone_be(struct hyperstone_device::regs_decode *decode) //or BZ
+void hyperstone_device::hyperstone_be(regs_decode &decode) //or BZ
 {
 	if( GET_Z )
 		execute_br(decode);
@@ -4706,7 +4521,7 @@ void hyperstone_device::hyperstone_be(struct hyperstone_device::regs_decode *dec
 		m_icount -= m_clock_cycles_1;
 }
 
-void hyperstone_device::hyperstone_bne(struct hyperstone_device::regs_decode *decode) //or BNZ
+void hyperstone_device::hyperstone_bne(regs_decode &decode) //or BNZ
 {
 	if( !GET_Z )
 		execute_br(decode);
@@ -4714,7 +4529,7 @@ void hyperstone_device::hyperstone_bne(struct hyperstone_device::regs_decode *de
 		m_icount -= m_clock_cycles_1;
 }
 
-void hyperstone_device::hyperstone_bc(struct hyperstone_device::regs_decode *decode) //or BST
+void hyperstone_device::hyperstone_bc(regs_decode &decode) //or BST
 {
 	if( GET_C )
 		execute_br(decode);
@@ -4722,7 +4537,7 @@ void hyperstone_device::hyperstone_bc(struct hyperstone_device::regs_decode *dec
 		m_icount -= m_clock_cycles_1;
 }
 
-void hyperstone_device::hyperstone_bnc(struct hyperstone_device::regs_decode *decode) //or BHE
+void hyperstone_device::hyperstone_bnc(regs_decode &decode) //or BHE
 {
 	if( !GET_C )
 		execute_br(decode);
@@ -4730,7 +4545,7 @@ void hyperstone_device::hyperstone_bnc(struct hyperstone_device::regs_decode *de
 		m_icount -= m_clock_cycles_1;
 }
 
-void hyperstone_device::hyperstone_bse(struct hyperstone_device::regs_decode *decode)
+void hyperstone_device::hyperstone_bse(regs_decode &decode)
 {
 	if( GET_C || GET_Z )
 		execute_br(decode);
@@ -4738,7 +4553,7 @@ void hyperstone_device::hyperstone_bse(struct hyperstone_device::regs_decode *de
 		m_icount -= m_clock_cycles_1;
 }
 
-void hyperstone_device::hyperstone_bht(struct hyperstone_device::regs_decode *decode)
+void hyperstone_device::hyperstone_bht(regs_decode &decode)
 {
 	if( !GET_C && !GET_Z )
 		execute_br(decode);
@@ -4746,7 +4561,7 @@ void hyperstone_device::hyperstone_bht(struct hyperstone_device::regs_decode *de
 		m_icount -= m_clock_cycles_1;
 }
 
-void hyperstone_device::hyperstone_bn(struct hyperstone_device::regs_decode *decode) //or BLT
+void hyperstone_device::hyperstone_bn(regs_decode &decode) //or BLT
 {
 	if( GET_N )
 		execute_br(decode);
@@ -4754,7 +4569,7 @@ void hyperstone_device::hyperstone_bn(struct hyperstone_device::regs_decode *dec
 		m_icount -= m_clock_cycles_1;
 }
 
-void hyperstone_device::hyperstone_bnn(struct hyperstone_device::regs_decode *decode) //or BGE
+void hyperstone_device::hyperstone_bnn(regs_decode &decode) //or BGE
 {
 	if( !GET_N )
 		execute_br(decode);
@@ -4762,7 +4577,7 @@ void hyperstone_device::hyperstone_bnn(struct hyperstone_device::regs_decode *de
 		m_icount -= m_clock_cycles_1;
 }
 
-void hyperstone_device::hyperstone_ble(struct hyperstone_device::regs_decode *decode)
+void hyperstone_device::hyperstone_ble(regs_decode &decode)
 {
 	if( GET_N || GET_Z )
 		execute_br(decode);
@@ -4770,7 +4585,7 @@ void hyperstone_device::hyperstone_ble(struct hyperstone_device::regs_decode *de
 		m_icount -= m_clock_cycles_1;
 }
 
-void hyperstone_device::hyperstone_bgt(struct hyperstone_device::regs_decode *decode)
+void hyperstone_device::hyperstone_bgt(regs_decode &decode)
 {
 	if( !GET_N && !GET_Z )
 		execute_br(decode);
@@ -4778,15 +4593,15 @@ void hyperstone_device::hyperstone_bgt(struct hyperstone_device::regs_decode *de
 		m_icount -= m_clock_cycles_1;
 }
 
-void hyperstone_device::hyperstone_br(struct hyperstone_device::regs_decode *decode)
+void hyperstone_device::hyperstone_br(regs_decode &decode)
 {
 	execute_br(decode);
 }
 
-void hyperstone_device::hyperstone_trap(struct hyperstone_device::regs_decode *decode)
+void hyperstone_device::hyperstone_trap(regs_decode &decode)
 {
-	UINT8 code, trapno;
-	UINT32 addr;
+	uint8_t code, trapno;
+	uint32_t addr;
 
 	trapno = (OP & 0xfc) >> 2;
 
@@ -4882,7 +4697,7 @@ void hyperstone_device::hyperstone_trap(struct hyperstone_device::regs_decode *d
 //  cycles it takes for one instruction to execute
 //-------------------------------------------------
 
-UINT32 hyperstone_device::execute_min_cycles() const
+uint32_t hyperstone_device::execute_min_cycles() const
 {
 	return 1;
 }
@@ -4893,7 +4708,7 @@ UINT32 hyperstone_device::execute_min_cycles() const
 //  cycles it takes for one instruction to execute
 //-------------------------------------------------
 
-UINT32 hyperstone_device::execute_max_cycles() const
+uint32_t hyperstone_device::execute_max_cycles() const
 {
 	return 36;
 }
@@ -4904,7 +4719,7 @@ UINT32 hyperstone_device::execute_max_cycles() const
 //  input/interrupt lines
 //-------------------------------------------------
 
-UINT32 hyperstone_device::execute_input_lines() const
+uint32_t hyperstone_device::execute_input_lines() const
 {
 	return 8;
 }
@@ -4933,7 +4748,7 @@ void hyperstone_device::execute_run()
 
 	do
 	{
-		UINT32 oldh = SR & 0x00000020;
+		uint32_t oldh = SR & 0x00000020;
 
 		PPC = PC;   /* copy PC to previous PC */
 		debugger_instruction_hook(this, PC);
@@ -4941,19 +4756,281 @@ void hyperstone_device::execute_run()
 		OP = READ_OP(PC);
 		PC += 2;
 
-		m_instruction_length = 1;
+		m_instruction_length = (1<<19);
 
+#if 1
 		/* execute opcode */
+		switch ((OP >> 8) & 0x00ff)
+		{
+			case 0x00: op00(); break;
+			case 0x01: op01(); break;
+			case 0x02: op02(); break;
+			case 0x03: op03(); break;
+			case 0x04: op04(); break;
+			case 0x05: op05(); break;
+			case 0x06: op06(); break;
+			case 0x07: op07(); break;
+			case 0x08: op08(); break;
+			case 0x09: op09(); break;
+			case 0x0a: op0a(); break;
+			case 0x0b: op0b(); break;
+			case 0x0c: op0c(); break;
+			case 0x0d: op0d(); break;
+			case 0x0e: op0e(); break;
+			case 0x0f: op0f(); break;
+			case 0x10: op10(); break;
+			case 0x11: op11(); break;
+			case 0x12: op12(); break;
+			case 0x13: op13(); break;
+			case 0x14: op14(); break;
+			case 0x15: op15(); break;
+			case 0x16: op16(); break;
+			case 0x17: op17(); break;
+			case 0x18: op18(); break;
+			case 0x19: op19(); break;
+			case 0x1a: op1a(); break;
+			case 0x1b: op1b(); break;
+			case 0x1c: op1c(); break;
+			case 0x1d: op1d(); break;
+			case 0x1e: op1e(); break;
+			case 0x1f: op1f(); break;
+			case 0x20: op20(); break;
+			case 0x21: op21(); break;
+			case 0x22: op22(); break;
+			case 0x23: op23(); break;
+			case 0x24: op24(); break;
+			case 0x25: op25(); break;
+			case 0x26: op26(); break;
+			case 0x27: op27(); break;
+			case 0x28: op28(); break;
+			case 0x29: op29(); break;
+			case 0x2a: op2a(); break;
+			case 0x2b: op2b(); break;
+			case 0x2c: op2c(); break;
+			case 0x2d: op2d(); break;
+			case 0x2e: op2e(); break;
+			case 0x2f: op2f(); break;
+			case 0x30: op30(); break;
+			case 0x31: op31(); break;
+			case 0x32: op32(); break;
+			case 0x33: op33(); break;
+			case 0x34: op34(); break;
+			case 0x35: op35(); break;
+			case 0x36: op36(); break;
+			case 0x37: op37(); break;
+			case 0x38: op38(); break;
+			case 0x39: op39(); break;
+			case 0x3a: op3a(); break;
+			case 0x3b: op3b(); break;
+			case 0x3c: op3c(); break;
+			case 0x3d: op3d(); break;
+			case 0x3e: op3e(); break;
+			case 0x3f: op3f(); break;
+			case 0x40: op40(); break;
+			case 0x41: op41(); break;
+			case 0x42: op42(); break;
+			case 0x43: op43(); break;
+			case 0x44: op44(); break;
+			case 0x45: op45(); break;
+			case 0x46: op46(); break;
+			case 0x47: op47(); break;
+			case 0x48: op48(); break;
+			case 0x49: op49(); break;
+			case 0x4a: op4a(); break;
+			case 0x4b: op4b(); break;
+			case 0x4c: op4c(); break;
+			case 0x4d: op4d(); break;
+			case 0x4e: op4e(); break;
+			case 0x4f: op4f(); break;
+			case 0x50: op50(); break;
+			case 0x51: op51(); break;
+			case 0x52: op52(); break;
+			case 0x53: op53(); break;
+			case 0x54: op54(); break;
+			case 0x55: op55(); break;
+			case 0x56: op56(); break;
+			case 0x57: op57(); break;
+			case 0x58: op58(); break;
+			case 0x59: op59(); break;
+			case 0x5a: op5a(); break;
+			case 0x5b: op5b(); break;
+			case 0x5c: op5c(); break;
+			case 0x5d: op5d(); break;
+			case 0x5e: op5e(); break;
+			case 0x5f: op5f(); break;
+			case 0x60: op60(); break;
+			case 0x61: op61(); break;
+			case 0x62: op62(); break;
+			case 0x63: op63(); break;
+			case 0x64: op64(); break;
+			case 0x65: op65(); break;
+			case 0x66: op66(); break;
+			case 0x67: op67(); break;
+			case 0x68: op68(); break;
+			case 0x69: op69(); break;
+			case 0x6a: op6a(); break;
+			case 0x6b: op6b(); break;
+			case 0x6c: op6c(); break;
+			case 0x6d: op6d(); break;
+			case 0x6e: op6e(); break;
+			case 0x6f: op6f(); break;
+			case 0x70: op70(); break;
+			case 0x71: op71(); break;
+			case 0x72: op72(); break;
+			case 0x73: op73(); break;
+			case 0x74: op74(); break;
+			case 0x75: op75(); break;
+			case 0x76: op76(); break;
+			case 0x77: op77(); break;
+			case 0x78: op78(); break;
+			case 0x79: op79(); break;
+			case 0x7a: op7a(); break;
+			case 0x7b: op7b(); break;
+			case 0x7c: op7c(); break;
+			case 0x7d: op7d(); break;
+			case 0x7e: op7e(); break;
+			case 0x7f: op7f(); break;
+			case 0x80: op80(); break;
+			case 0x81: op81(); break;
+			case 0x82: op82(); break;
+			case 0x83: op83(); break;
+			case 0x84: op84(); break;
+			case 0x85: op85(); break;
+			case 0x86: op86(); break;
+			case 0x87: op87(); break;
+			case 0x88: op88(); break;
+			case 0x89: op89(); break;
+			case 0x8a: op8a(); break;
+			case 0x8b: op8b(); break;
+			case 0x8c: op8c(); break;
+			case 0x8d: op8d(); break;
+			case 0x8e: op8e(); break;
+			case 0x8f: op8f(); break;
+			case 0x90: op90(); break;
+			case 0x91: op91(); break;
+			case 0x92: op92(); break;
+			case 0x93: op93(); break;
+			case 0x94: op94(); break;
+			case 0x95: op95(); break;
+			case 0x96: op96(); break;
+			case 0x97: op97(); break;
+			case 0x98: op98(); break;
+			case 0x99: op99(); break;
+			case 0x9a: op9a(); break;
+			case 0x9b: op9b(); break;
+			case 0x9c: op9c(); break;
+			case 0x9d: op9d(); break;
+			case 0x9e: op9e(); break;
+			case 0x9f: op9f(); break;
+			case 0xa0: opa0(); break;
+			case 0xa1: opa1(); break;
+			case 0xa2: opa2(); break;
+			case 0xa3: opa3(); break;
+			case 0xa4: opa4(); break;
+			case 0xa5: opa5(); break;
+			case 0xa6: opa6(); break;
+			case 0xa7: opa7(); break;
+			case 0xa8: opa8(); break;
+			case 0xa9: opa9(); break;
+			case 0xaa: opaa(); break;
+			case 0xab: opab(); break;
+			case 0xac: opac(); break;
+			case 0xad: opad(); break;
+			case 0xae: opae(); break;
+			case 0xaf: opaf(); break;
+			case 0xb0: opb0(); break;
+			case 0xb1: opb1(); break;
+			case 0xb2: opb2(); break;
+			case 0xb3: opb3(); break;
+			case 0xb4: opb4(); break;
+			case 0xb5: opb5(); break;
+			case 0xb6: opb6(); break;
+			case 0xb7: opb7(); break;
+			case 0xb8: opb8(); break;
+			case 0xb9: opb9(); break;
+			case 0xba: opba(); break;
+			case 0xbb: opbb(); break;
+			case 0xbc: opbc(); break;
+			case 0xbd: opbd(); break;
+			case 0xbe: opbe(); break;
+			case 0xbf: opbf(); break;
+			case 0xc0: opc0(); break;
+			case 0xc1: opc1(); break;
+			case 0xc2: opc2(); break;
+			case 0xc3: opc3(); break;
+			case 0xc4: opc4(); break;
+			case 0xc5: opc5(); break;
+			case 0xc6: opc6(); break;
+			case 0xc7: opc7(); break;
+			case 0xc8: opc8(); break;
+			case 0xc9: opc9(); break;
+			case 0xca: opca(); break;
+			case 0xcb: opcb(); break;
+			case 0xcc: opcc(); break;
+			case 0xcd: opcd(); break;
+			case 0xce: opce(); break;
+			case 0xcf: opcf(); break;
+			case 0xd0: opd0(); break;
+			case 0xd1: opd1(); break;
+			case 0xd2: opd2(); break;
+			case 0xd3: opd3(); break;
+			case 0xd4: opd4(); break;
+			case 0xd5: opd5(); break;
+			case 0xd6: opd6(); break;
+			case 0xd7: opd7(); break;
+			case 0xd8: opd8(); break;
+			case 0xd9: opd9(); break;
+			case 0xda: opda(); break;
+			case 0xdb: opdb(); break;
+			case 0xdc: opdc(); break;
+			case 0xdd: opdd(); break;
+			case 0xde: opde(); break;
+			case 0xdf: opdf(); break;
+			case 0xe0: ope0(); break;
+			case 0xe1: ope1(); break;
+			case 0xe2: ope2(); break;
+			case 0xe3: ope3(); break;
+			case 0xe4: ope4(); break;
+			case 0xe5: ope5(); break;
+			case 0xe6: ope6(); break;
+			case 0xe7: ope7(); break;
+			case 0xe8: ope8(); break;
+			case 0xe9: ope9(); break;
+			case 0xea: opea(); break;
+			case 0xeb: opeb(); break;
+			case 0xec: opec(); break;
+			case 0xed: oped(); break;
+			case 0xee: opee(); break;
+			case 0xef: opef(); break;
+			case 0xf0: opf0(); break;
+			case 0xf1: opf1(); break;
+			case 0xf2: opf2(); break;
+			case 0xf3: opf3(); break;
+			case 0xf4: opf4(); break;
+			case 0xf5: opf5(); break;
+			case 0xf6: opf6(); break;
+			case 0xf7: opf7(); break;
+			case 0xf8: opf8(); break;
+			case 0xf9: opf9(); break;
+			case 0xfa: opfa(); break;
+			case 0xfb: opfb(); break;
+			case 0xfc: opfc(); break;
+			case 0xfd: opfd(); break;
+			case 0xfe: opfe(); break;
+			case 0xff: opff(); break;
+		}
+#else
 		(this->*m_opcode[(OP & 0xff00) >> 8])();
+#endif
 
 		/* clear the H state if it was previously set */
 		SR ^= oldh;
 
-		SET_ILC(m_instruction_length & 3);
+		SET_ILC(m_instruction_length);
 
 		if( GET_T && GET_P && m_delay.delay_cmd == NO_DELAY ) /* Not in a Delayed Branch instructions */
 		{
-			UINT32 addr = get_trap_addr(TRAPNO_TRACE_EXCEPTION);
+			uint32_t addr = get_trap_addr(TRAPNO_TRACE_EXCEPTION);
 			execute_exception(addr);
 		}
 
@@ -4963,17 +5040,17 @@ void hyperstone_device::execute_run()
 	} while( m_icount > 0 );
 }
 
-const device_type E116T = &device_creator<e116t_device>;
-const device_type E116XT = &device_creator<e116xt_device>;
-const device_type E116XS = &device_creator<e116xs_device>;
-const device_type E116XSR = &device_creator<e116xsr_device>;
-const device_type E132N = &device_creator<e132n_device>;
-const device_type E132T = &device_creator<e132t_device>;
-const device_type E132XN = &device_creator<e132xn_device>;
-const device_type E132XT = &device_creator<e132xt_device>;
-const device_type E132XS = &device_creator<e132xs_device>;
-const device_type E132XSR = &device_creator<e132xsr_device>;
-const device_type GMS30C2116 = &device_creator<gms30c2116_device>;
-const device_type GMS30C2132 = &device_creator<gms30c2132_device>;
-const device_type GMS30C2216 = &device_creator<gms30c2216_device>;
-const device_type GMS30C2232 = &device_creator<gms30c2232_device>;
+DEFINE_DEVICE_TYPE(E116T,      e116t_device,      "e116t",      "E1-16T")
+DEFINE_DEVICE_TYPE(E116XT,     e116xt_device,     "e116xt",     "E1-16XT")
+DEFINE_DEVICE_TYPE(E116XS,     e116xs_device,     "e116xs",     "E1-16XS")
+DEFINE_DEVICE_TYPE(E116XSR,    e116xsr_device,    "e116xsr",    "E1-16XSR")
+DEFINE_DEVICE_TYPE(E132N,      e132n_device,      "e132n",      "E1-32N")
+DEFINE_DEVICE_TYPE(E132T,      e132t_device,      "e132t",      "E1-32T")
+DEFINE_DEVICE_TYPE(E132XN,     e132xn_device,     "e132xn",     "E1-32XN")
+DEFINE_DEVICE_TYPE(E132XT,     e132xt_device,     "e132xt",     "E1-32XT")
+DEFINE_DEVICE_TYPE(E132XS,     e132xs_device,     "e132xs",     "E1-32XS")
+DEFINE_DEVICE_TYPE(E132XSR,    e132xsr_device,    "e132xsr",    "E1-32XSR")
+DEFINE_DEVICE_TYPE(GMS30C2116, gms30c2116_device, "gms30c2116", "GMS30C2116")
+DEFINE_DEVICE_TYPE(GMS30C2132, gms30c2132_device, "gms30c2132", "GMS30C2132")
+DEFINE_DEVICE_TYPE(GMS30C2216, gms30c2216_device, "gms30c2216", "GMS30C2216")
+DEFINE_DEVICE_TYPE(GMS30C2232, gms30c2232_device, "gms30c2232", "GMS30C2232")

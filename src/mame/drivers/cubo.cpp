@@ -314,6 +314,7 @@ routines :
 #include "includes/amiga.h"
 #include "imagedev/chd_cd.h"
 #include "machine/microtch.h"
+#include "speaker.h"
 
 
 /* set to 0 to use control panel with only buttons (as in quiz games) - joy is default in dispenser setup */
@@ -326,15 +327,18 @@ class cubo_state : public amiga_state
 public:
 	cubo_state(const machine_config &mconfig, device_type type, const char *tag) :
 	amiga_state(mconfig, type, tag),
-	m_p1_port(*this, "P1"),
-	m_p2_port(*this, "P2"),
+	m_player_ports(*this, {"P1", "P2"}),
 	m_microtouch(*this, "microtouch"),
 	m_cdda(*this, "cdda")
 	{ }
 
+	void handle_joystick_cia(uint8_t pra, uint8_t dra);
+	uint16_t handle_joystick_potgor(uint16_t potgor);
+
 	DECLARE_CUSTOM_INPUT_MEMBER(cubo_input);
 	DECLARE_CUSTOM_INPUT_MEMBER(cd32_sel_mirror_input);
 
+	DECLARE_WRITE_LINE_MEMBER( akiko_int_w );
 	DECLARE_WRITE8_MEMBER( akiko_cia_0_port_a_write );
 
 	DECLARE_DRIVER_INIT(cubo);
@@ -347,16 +351,15 @@ public:
 	DECLARE_DRIVER_INIT(lasstixx);
 	DECLARE_DRIVER_INIT(lsrquiz);
 
-	optional_ioport m_p1_port;
-	optional_ioport m_p2_port;
+	optional_ioport_array<2> m_player_ports;
 
 	int m_oldstate[2];
 	int m_cd32_shifter[2];
-	UINT16 m_potgo_value;
+	uint16_t m_potgo_value;
 
 protected:
 	virtual void rs232_tx(int state) override;
-	virtual void potgo_w(UINT16 data) override;
+	virtual void potgo_w(uint16_t data) override;
 
 private:
 	required_device<microtouch_device> m_microtouch;
@@ -364,7 +367,7 @@ private:
 
 	typedef void (cubo_state::*input_hack_func)();
 	input_hack_func m_input_hack;
-	void chip_ram_w8_hack(offs_t byteoffs, UINT8 data);
+	void chip_ram_w8_hack(offs_t byteoffs, uint8_t data);
 	void cndypuzl_input_hack();
 	void haremchl_input_hack();
 	void lsrquiz_input_hack();
@@ -374,7 +377,11 @@ private:
 	void mgprem11_input_hack();
 };
 
-static void handle_cd32_joystick_cia(running_machine &machine, UINT8 pra, UINT8 dra);
+
+WRITE_LINE_MEMBER( cubo_state::akiko_int_w )
+{
+	set_interrupt(INTENA_SETCLR | INTENA_PORTS);
+}
 
 
 /*************************************
@@ -395,13 +402,13 @@ static void handle_cd32_joystick_cia(running_machine &machine, UINT8 pra, UINT8 
 
 WRITE8_MEMBER( cubo_state::akiko_cia_0_port_a_write )
 {
-	/* bit 1 = cd audio mute */
+	/* bit 0 = cd audio mute */
 	m_cdda->set_output_gain( 0, ( data & 1 ) ? 0.0 : 1.0 );
 
-	/* bit 2 = Power Led on Amiga */
+	/* bit 1 = Power Led on Amiga */
 	output().set_led_value(0, (data & 2) ? 0 : 1);
 
-	handle_cd32_joystick_cia(machine(), data, m_cia_0->read(space, 2));
+	handle_joystick_cia(data, m_cia_0->read(space, 2));
 }
 
 
@@ -437,7 +444,7 @@ void cubo_state::rs232_tx(int state)
 	m_microtouch->rx_w(state);
 }
 
-void cubo_state::potgo_w(UINT16 data)
+void cubo_state::potgo_w(uint16_t data)
 {
 	int i;
 
@@ -449,75 +456,68 @@ void cubo_state::potgo_w(UINT16 data)
 
 	for (i = 0; i < 8; i += 2)
 	{
-		UINT16 dir = 0x0200 << i;
+		uint16_t dir = 0x0200 << i;
 		if (data & dir)
 		{
-			UINT16 d = 0x0100 << i;
+			uint16_t d = 0x0100 << i;
 			m_potgo_value &= ~d;
 			m_potgo_value |= data & d;
 		}
 	}
 	for (i = 0; i < 2; i++)
 	{
-		UINT16 p5dir = 0x0200 << (i * 4); /* output enable P5 */
-		UINT16 p5dat = 0x0100 << (i * 4); /* data P5 */
+		uint16_t p5dir = 0x0200 << (i * 4); /* output enable P5 */
+		uint16_t p5dat = 0x0100 << (i * 4); /* data P5 */
 		if ((m_potgo_value & p5dir) && (m_potgo_value & p5dat))
 			m_cd32_shifter[i] = 8;
 	}
 }
 
-static void handle_cd32_joystick_cia(running_machine &machine, UINT8 pra, UINT8 dra)
+void cubo_state::handle_joystick_cia(uint8_t pra, uint8_t dra)
 {
-	cubo_state *state = machine.driver_data<cubo_state>();
-	int i;
-
-	for (i = 0; i < 2; i++)
+	for (int i = 0; i < 2; i++)
 	{
-		UINT8 but = 0x40 << i;
-		UINT16 p5dir = 0x0200 << (i * 4); /* output enable P5 */
-		UINT16 p5dat = 0x0100 << (i * 4); /* data P5 */
+		uint8_t but = 0x40 << i;
+		uint16_t p5dir = 0x0200 << (i * 4); /* output enable P5 */
+		uint16_t p5dat = 0x0100 << (i * 4); /* data P5 */
 
-		if (!(state->m_potgo_value & p5dir) || !(state->m_potgo_value & p5dat))
+		if (!(m_potgo_value & p5dir) || !(m_potgo_value & p5dat))
 		{
-			if ((dra & but) && (pra & but) != state->m_oldstate[i])
+			if ((dra & but) && (pra & but) != m_oldstate[i])
 			{
 				if (!(pra & but))
 				{
-					state->m_cd32_shifter[i]--;
-					if (state->m_cd32_shifter[i] < 0)
-						state->m_cd32_shifter[i] = 0;
+					m_cd32_shifter[i]--;
+					if (m_cd32_shifter[i] < 0)
+						m_cd32_shifter[i] = 0;
 				}
 			}
 		}
-		state->m_oldstate[i] = pra & but;
+		m_oldstate[i] = pra & but;
 	}
 }
 
-static UINT16 handle_joystick_potgor(running_machine &machine, UINT16 potgor)
+uint16_t cubo_state::handle_joystick_potgor(uint16_t potgor)
 {
-	cubo_state *state = machine.driver_data<cubo_state>();
-	ioport_port * player_portname[] = { state->m_p2_port, state->m_p1_port };
-	int i;
-
-	for (i = 0; i < 2; i++)
+	for (int i = 0; i < 2; i++)
 	{
-		UINT16 p9dir = 0x0800 << (i * 4); /* output enable P9 */
-		UINT16 p9dat = 0x0400 << (i * 4); /* data P9 */
-		UINT16 p5dir = 0x0200 << (i * 4); /* output enable P5 */
-		UINT16 p5dat = 0x0100 << (i * 4); /* data P5 */
+		uint16_t p9dir = 0x0800 << (i * 4); /* output enable P9 */
+		uint16_t p9dat = 0x0400 << (i * 4); /* data P9 */
+		uint16_t p5dir = 0x0200 << (i * 4); /* output enable P5 */
+		uint16_t p5dat = 0x0100 << (i * 4); /* data P5 */
 
 		/* p5 is floating in input-mode */
 		potgor &= ~p5dat;
-		potgor |= state->m_potgo_value & p5dat;
-		if (!(state->m_potgo_value & p9dir))
+		potgor |= m_potgo_value & p5dat;
+		if (!(m_potgo_value & p9dir))
 			potgor |= p9dat;
 		/* P5 output and 1 -> shift register is kept reset (Blue button) */
-		if ((state->m_potgo_value & p5dir) && (state->m_potgo_value & p5dat))
-			state->m_cd32_shifter[i] = 8;
+		if ((m_potgo_value & p5dir) && (m_potgo_value & p5dat))
+			m_cd32_shifter[i] = 8;
 		/* shift at 1 == return one, >1 = return button states */
-		if (state->m_cd32_shifter[i] == 0)
+		if (m_cd32_shifter[i] == 0)
 			potgor &= ~p9dat; /* shift at zero == return zero */
-		if (state->m_cd32_shifter[i] >= 2 && ((player_portname[i])->read() & (1 << (state->m_cd32_shifter[i] - 2))))
+		if (m_cd32_shifter[i] >= 2 && ((m_player_ports[1 - i])->read() & (1 << (m_cd32_shifter[i] - 2))))
 			potgor &= ~p9dat;
 	}
 	return potgor;
@@ -525,13 +525,12 @@ static UINT16 handle_joystick_potgor(running_machine &machine, UINT16 potgor)
 
 CUSTOM_INPUT_MEMBER( cubo_state::cubo_input )
 {
-	return handle_joystick_potgor(machine(), m_potgo_value) >> 8;
+	return handle_joystick_potgor(m_potgo_value) >> 8;
 }
 
 CUSTOM_INPUT_MEMBER( cubo_state::cd32_sel_mirror_input )
 {
-	ioport_port* ports[2]= { m_p1_port, m_p2_port };
-	UINT8 bits = ports[(int)(FPTR)param]->read();
+	uint8_t bits = m_player_ports[(int)(uintptr_t)param]->read();
 	return (bits & 0x20)>>5;
 }
 
@@ -1025,7 +1024,7 @@ static INPUT_PORTS_START( mgprem11 )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( cubo, cubo_state )
+static MACHINE_CONFIG_START( cubo )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68EC020, amiga_state::CLK_28M_PAL / 2)
@@ -1042,7 +1041,10 @@ static MACHINE_CONFIG_START( cubo, cubo_state )
 	MCFG_I2CMEM_PAGE_SIZE(16)
 	MCFG_I2CMEM_DATA_SIZE(1024)
 
-	MCFG_AKIKO_ADD("akiko", "maincpu")
+	MCFG_AKIKO_ADD("akiko")
+	MCFG_AKIKO_MEM_READ_CB(READ16(amiga_state, chip_ram_r))
+	MCFG_AKIKO_MEM_WRITE_CB(WRITE16(amiga_state, chip_ram_w))
+	MCFG_AKIKO_INT_CB(WRITELINE(cubo_state, akiko_int_w))
 	MCFG_AKIKO_SCL_HANDLER(DEVWRITELINE("i2cmem", i2cmem_device, write_scl))
 	MCFG_AKIKO_SDA_READ_HANDLER(DEVREADLINE("i2cmem", i2cmem_device, read_sda))
 	MCFG_AKIKO_SDA_WRITE_HANDLER(DEVWRITELINE("i2cmem", i2cmem_device, write_sda))
@@ -1058,11 +1060,13 @@ static MACHINE_CONFIG_START( cubo, cubo_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("amiga", AMIGA, amiga_state::CLK_C1_PAL)
+	MCFG_SOUND_ADD("amiga", PAULA_8364, amiga_state::CLK_C1_PAL)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.25)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.25)
 	MCFG_SOUND_ROUTE(2, "rspeaker", 0.25)
 	MCFG_SOUND_ROUTE(3, "lspeaker", 0.25)
+	MCFG_PAULA_MEM_READ_CB(READ16(amiga_state, chip_ram_r))
+	MCFG_PAULA_INT_CB(WRITELINE(amiga_state, paula_int_w))
 
 	MCFG_SOUND_ADD("cdda", CDDA, 0)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
@@ -1175,14 +1179,14 @@ ROM_END
  *
  *************************************/
 
-void cubo_state::chip_ram_w8_hack(offs_t byteoffs, UINT8 data)
+void cubo_state::chip_ram_w8_hack(offs_t byteoffs, uint8_t data)
 {
-	UINT16 word = chip_ram_r(byteoffs);
+	uint16_t word = chip_ram_r(byteoffs);
 
 	if (byteoffs & 1)
 		word = (word & 0xff00) | data;
 	else
-		word = (word & 0x00ff) | (((UINT16)data) << 8);
+		word = (word & 0x00ff) | (((uint16_t)data) << 8);
 
 	chip_ram_w(byteoffs, word);
 }
@@ -1191,7 +1195,7 @@ void cubo_state::cndypuzl_input_hack()
 {
 	if (m_maincpu->pc < m_chip_ram.bytes())
 	{
-		UINT32 r_A5 = m_maincpu->state_int(M68K_A5);
+		uint32_t r_A5 = m_maincpu->state_int(M68K_A5);
 		chip_ram_w(r_A5 - 0x7ebe, 0x0000);
 	}
 }
@@ -1206,8 +1210,8 @@ void cubo_state::haremchl_input_hack()
 {
 	if (m_maincpu->pc < m_chip_ram.bytes())
 	{
-		UINT32 r_A5 = m_maincpu->state_int(M68K_A5);
-		UINT32 r_A2 = (chip_ram_r(r_A5 - 0x7f00 + 0) << 16) | (chip_ram_r(r_A5 - 0x7f00 + 2));
+		uint32_t r_A5 = m_maincpu->state_int(M68K_A5);
+		uint32_t r_A2 = (chip_ram_r(r_A5 - 0x7f00 + 0) << 16) | (chip_ram_r(r_A5 - 0x7f00 + 2));
 		chip_ram_w8_hack(r_A2 + 0x1f, 0x00);
 	}
 }
@@ -1222,8 +1226,8 @@ void cubo_state::lsrquiz_input_hack()
 {
 	if (m_maincpu->pc < m_chip_ram.bytes())
 	{
-		UINT32 r_A5 = m_maincpu->state_int(M68K_A5);
-		UINT32 r_A2 = (chip_ram_r(r_A5 - 0x7fe0 + 0) << 16) | (chip_ram_r(r_A5 - 0x7fe0 + 2));
+		uint32_t r_A5 = m_maincpu->state_int(M68K_A5);
+		uint32_t r_A2 = (chip_ram_r(r_A5 - 0x7fe0 + 0) << 16) | (chip_ram_r(r_A5 - 0x7fe0 + 2));
 		chip_ram_w8_hack(r_A2 + 0x13, 0x00);
 	}
 }
@@ -1239,8 +1243,8 @@ void cubo_state::lsrquiz2_input_hack()
 {
 	if (m_maincpu->pc < m_chip_ram.bytes())
 	{
-		UINT32 r_A5 = m_maincpu->state_int(M68K_A5);
-		UINT32 r_A2 = (chip_ram_r(r_A5 - 0x7fdc + 0) << 16) | (chip_ram_r(r_A5 - 0x7fdc + 2));
+		uint32_t r_A5 = m_maincpu->state_int(M68K_A5);
+		uint32_t r_A2 = (chip_ram_r(r_A5 - 0x7fdc + 0) << 16) | (chip_ram_r(r_A5 - 0x7fdc + 2));
 		chip_ram_w8_hack(r_A2 + 0x17, 0x00);
 	}
 }
@@ -1255,8 +1259,8 @@ void cubo_state::lasstixx_input_hack()
 {
 	if (m_maincpu->pc < m_chip_ram.bytes())
 	{
-		UINT32 r_A5 = m_maincpu->state_int(M68K_A5);
-		UINT32 r_A2 = (chip_ram_r(r_A5 - 0x7fa2 + 0) << 16) | (chip_ram_r(r_A5 - 0x7fa2 + 2));
+		uint32_t r_A5 = m_maincpu->state_int(M68K_A5);
+		uint32_t r_A2 = (chip_ram_r(r_A5 - 0x7fa2 + 0) << 16) | (chip_ram_r(r_A5 - 0x7fa2 + 2));
 		chip_ram_w8_hack(r_A2 + 0x24, 0x00);
 	}
 }
@@ -1271,7 +1275,7 @@ void cubo_state::mgnumber_input_hack()
 {
 	if (m_maincpu->pc < m_chip_ram.bytes())
 	{
-		UINT32 r_A5 = m_maincpu->state_int(M68K_A5);
+		uint32_t r_A5 = m_maincpu->state_int(M68K_A5);
 		chip_ram_w(r_A5 - 0x7ed8, 0x0000);
 	}
 }
@@ -1286,7 +1290,7 @@ void cubo_state::mgprem11_input_hack()
 {
 	if (m_maincpu->pc < m_chip_ram.bytes())
 	{
-		UINT32 r_A5 = m_maincpu->state_int(M68K_A5);
+		uint32_t r_A5 = m_maincpu->state_int(M68K_A5);
 		chip_ram_w8_hack(r_A5 - 0x7eca, 0x00);
 	}
 }
@@ -1365,8 +1369,8 @@ INPUT_PORTS_END
 GAME( 1993, cubo,     0,    cubo, cubo,     cubo_state, cubo,     ROT0, "Commodore",  "Cubo BIOS",                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_IS_BIOS_ROOT )
 GAME( 1995, cndypuzl, cubo, cubo, cndypuzl, cubo_state, cndypuzl, ROT0, "CD Express", "Candy Puzzle (v1.0)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1995, haremchl, cubo, cubo, haremchl, cubo_state, haremchl, ROT0, "CD Express", "Harem Challenge",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1995, lsrquiz,  cubo, cubo, lsrquiz,  cubo_state, lsrquiz,  ROT0, "CD Express", "Laser Quiz Italy",          MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )  /* no player 2 inputs (ingame) */
-GAME( 1995, lsrquiz2, cubo, cubo, lsrquiz2, cubo_state, lsrquiz2, ROT0, "CD Express", "Laser Quiz 2 Italy (v1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1995, lsrquiz,  cubo, cubo, lsrquiz,  cubo_state, lsrquiz,  ROT0, "CD Express", "Laser Quiz Italy",          MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )  /* no player 2 inputs (ingame), wrong pitch for most gfxs */
+GAME( 1995, lsrquiz2, cubo, cubo, lsrquiz2, cubo_state, lsrquiz2, ROT0, "CD Express", "Laser Quiz 2 Italy (v1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* wrong pitch for some gfxs, crashes during gameplay */
 GAME( 1995, lasstixx, cubo, cubo, lasstixx, cubo_state, lasstixx, ROT0, "CD Express", "Laser Strixx 2",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1995, mgnumber, cubo, cubo, mgnumber, cubo_state, mgnumber, ROT0, "CD Express", "Magic Number",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1996, mgprem11, cubo, cubo, mgprem11, cubo_state, mgprem11, ROT0, "CD Express", "Magic Premium (v1.1)",      MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )

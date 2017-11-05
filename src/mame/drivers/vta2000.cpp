@@ -20,6 +20,7 @@ Note: port 0 bit 4 is NOT a speaker bit. See code at 027B.
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
+#include "screen.h"
 
 
 class vta2000_state : public driver_device
@@ -27,18 +28,19 @@ class vta2000_state : public driver_device
 public:
 	vta2000_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_p_videoram(*this, "videoram")
 		, m_maincpu(*this, "maincpu")
+		, m_p_videoram(*this, "videoram")
+		, m_p_chargen(*this, "chargen")
 	{ }
 
-	const UINT8 *m_p_chargen;
-	UINT32 screen_update_vta2000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	required_shared_ptr<UINT8> m_p_videoram;
+	uint32_t screen_update_vta2000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_PALETTE_INIT(vta2000);
+
 private:
 	virtual void machine_reset() override;
-	virtual void video_start() override;
 	required_device<cpu_device> m_maincpu;
+	required_shared_ptr<uint8_t> m_p_videoram;
+	required_region_ptr<u8> m_p_chargen;
 };
 
 static ADDRESS_MAP_START(vta2000_mem, AS_PROGRAM, 8, vta2000_state)
@@ -62,17 +64,12 @@ void vta2000_state::machine_reset()
 {
 }
 
-void vta2000_state::video_start()
-{
-	m_p_chargen = memregion("chargen")->base();
-}
-
-UINT32 vta2000_state::screen_update_vta2000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t vta2000_state::screen_update_vta2000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 /* Cursor is missing. */
 {
-	static UINT8 framecnt=0;
-	UINT8 y,ra,gfx,attr,fg,bg;
-	UINT16 sy=0,ma=0,x,xx=0,chr;
+	static uint8_t framecnt=0;
+	uint8_t y,ra,gfx,attr,fg,bg;
+	uint16_t sy=0,ma=0,x,xx=0,chr;
 
 	framecnt++;
 
@@ -80,7 +77,7 @@ UINT32 vta2000_state::screen_update_vta2000(screen_device &screen, bitmap_ind16 
 	{
 		for (ra = 0; ra < 12; ra++)
 		{
-			UINT16 *p = &bitmap.pix16(sy++);
+			uint16_t *p = &bitmap.pix16(sy++);
 
 			xx = ma << 1;
 			for (x = ma; x < ma + 80; x++)
@@ -152,12 +149,12 @@ GFXDECODE_END
 
 PALETTE_INIT_MEMBER(vta2000_state, vta2000)
 {
-	palette.set_pen_color(0, rgb_t::black); // black
+	palette.set_pen_color(0, rgb_t::black());
 	palette.set_pen_color(1, 0x00, 0xc0, 0x00); // green
 	palette.set_pen_color(2, 0x00, 0xff, 0x00); // highlight
 }
 
-static MACHINE_CONFIG_START( vta2000, vta2000_state )
+static MACHINE_CONFIG_START( vta2000 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8080, XTAL_4MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(vta2000_mem)
@@ -191,5 +188,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT    INIT   COMPANY     FULLNAME       FLAGS */
-COMP( 19??, vta2000,  0,      0,       vta2000,   vta2000, driver_device, 0,   "<unknown>", "VTA-2000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+/*    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT    STATE          INIT  COMPANY      FULLNAME    FLAGS */
+COMP( 19??, vta2000,  0,      0,       vta2000,   vta2000, vta2000_state, 0,    "<unknown>", "VTA-2000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

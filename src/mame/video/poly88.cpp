@@ -11,7 +11,7 @@
 #include "emu.h"
 #include "includes/poly88.h"
 
-static const UINT8 mcm6571a_shift[] =
+static const uint8_t mcm6571a_shift[] =
 {
 	0,1,1,0,0,0,1,0,0,0,0,1,0,0,0,0,
 	1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,
@@ -28,12 +28,12 @@ void poly88_state::video_start()
 	m_FNT = memregion("chargen")->base();
 }
 
-UINT32 poly88_state::screen_update_poly88(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t poly88_state::screen_update_poly88(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x,y,j,b;
-	UINT16 addr;
+	uint16_t addr;
 	int xpos;
-	UINT8 l,r;
+	uint8_t l,r;
 
 	for(y = 0; y < 16; y++ )
 	{
@@ -41,7 +41,7 @@ UINT32 poly88_state::screen_update_poly88(screen_device &screen, bitmap_ind16 &b
 		xpos = 0;
 		for(x = 0; x < 64; x++ )
 		{
-			UINT8 code = m_video_ram[addr + x];
+			uint8_t code = m_video_ram[addr + x];
 			if ((code & 0x80)==0)
 			{
 				for(j = 0; j < 15; j++ )

@@ -145,11 +145,13 @@ ZDIPSW      EQU 0FFH    ; Configuration dip switches
 
 #include "emu.h"
 #include "cpu/i86/i86.h"
-#include "video/mc6845.h"
-#include "machine/pic8259.h"
-#include "machine/6821pia.h"
-#include "machine/wd_fdc.h"
+//#include "bus/s100/s100.h"
 #include "imagedev/flopdrv.h"
+#include "machine/6821pia.h"
+#include "machine/pic8259.h"
+#include "machine/wd_fdc.h"
+#include "video/mc6845.h"
+#include "screen.h"
 
 class z100_state : public driver_device
 {
@@ -176,7 +178,7 @@ public:
 	required_device<pia6821_device> m_pia1;
 	required_device<pic8259_device> m_picm;
 	required_device<pic8259_device> m_pics;
-	required_device<fd1797_t> m_fdc;
+	required_device<fd1797_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
 	required_device<floppy_connector> m_floppy2;
@@ -198,15 +200,15 @@ public:
 	DECLARE_WRITE8_MEMBER(video_pia_B_w);
 	DECLARE_WRITE_LINE_MEMBER(video_pia_CA2_w);
 	DECLARE_WRITE_LINE_MEMBER(video_pia_CB2_w);
-	std::unique_ptr<UINT8[]> m_gvram;
-	UINT8 m_keyb_press,m_keyb_status;
-	UINT8 m_vram_enable;
-	UINT8 m_gbank;
-	UINT8 m_display_mask;
-	UINT8 m_flash;
-	UINT8 m_clr_val;
-	UINT8 m_crtc_vreg[0x100],m_crtc_index;
-	UINT16 m_start_addr;
+	std::unique_ptr<uint8_t[]> m_gvram;
+	uint8_t m_keyb_press,m_keyb_status;
+	uint8_t m_vram_enable;
+	uint8_t m_gbank;
+	uint8_t m_display_mask;
+	uint8_t m_flash;
+	uint8_t m_clr_val;
+	uint8_t m_crtc_vreg[0x100],m_crtc_index;
+	uint16_t m_start_addr;
 
 	floppy_image_device *m_floppy;
 
@@ -215,7 +217,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_z100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_z100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
 };
 
@@ -239,10 +241,10 @@ public:
 
 void z100_state::video_start()
 {
-	m_gvram = make_unique_clear<UINT8[]>(0x30000);
+	m_gvram = make_unique_clear<uint8_t[]>(0x30000);
 }
 
-UINT32 z100_state::screen_update_z100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t z100_state::screen_update_z100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x,y,xi,yi;
 	int dot;
@@ -254,7 +256,7 @@ UINT32 z100_state::screen_update_z100(screen_device &screen, bitmap_ind16 &bitma
 	{
 		for(x=0;x<mc6845_h_display;x++)
 		{
-			UINT32 base_offs;
+			uint32_t base_offs;
 
 			for(yi=0;yi<mc6845_tile_height;yi++)
 			{
@@ -318,7 +320,7 @@ READ8_MEMBER( z100_state::keyb_data_r )
 {
 	if(m_keyb_press)
 	{
-		UINT8 res;
+		uint8_t res;
 
 		res = m_keyb_press;
 
@@ -391,7 +393,7 @@ static ADDRESS_MAP_START(z100_io, AS_IO, 8, z100_state)
 //  AM_RANGE (0xa4, 0xa7) gateway (reserved)
 //  AM_RANGE (0xac, 0xad) Z-217 secondary disk controller (winchester)
 //  AM_RANGE (0xae, 0xaf) Z-217 primary disk controller (winchester)
-	AM_RANGE (0xb0, 0xb3) AM_DEVREADWRITE("z207_fdc", fd1797_t, read, write)
+	AM_RANGE (0xb0, 0xb3) AM_DEVREADWRITE("z207_fdc", fd1797_device, read, write)
 	AM_RANGE (0xb4, 0xb4) AM_WRITE(floppy_select_w)
 	AM_RANGE (0xb5, 0xb5) AM_WRITE(floppy_motor_w)
 //  z-207 secondary disk controller (wd1797)
@@ -422,7 +424,7 @@ INPUT_CHANGED_MEMBER(z100_state::key_stroke)
 	if(newval && !oldval)
 	{
 		/* TODO: table */
-		m_keyb_press = (UINT8)(FPTR)(param) & 0xff;
+		m_keyb_press = (uint8_t)(uintptr_t)(param) & 0xff;
 		//pic8259_ir6_w(m_picm, 1);
 		m_keyb_status = 1;
 	}
@@ -663,7 +665,7 @@ static SLOT_INTERFACE_START( z100_floppies )
 	SLOT_INTERFACE("dd", FLOPPY_525_DD)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( z100, z100_state )
+static MACHINE_CONFIG_START( z100 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8088, XTAL_14_31818MHz/3)
 	MCFG_CPU_PROGRAM_MAP(z100_mem)
@@ -686,8 +688,14 @@ static MACHINE_CONFIG_START( z100, z100_state )
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 
-	MCFG_PIC8259_ADD( "pic8259_master", INPUTLINE("maincpu", 0), VCC, READ8(z100_state, get_slave_ack) )
-	MCFG_PIC8259_ADD( "pic8259_slave", DEVWRITELINE("pic8259_master", pic8259_device, ir3_w), GND, NOOP)
+	MCFG_DEVICE_ADD("pic8259_master", PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
+	MCFG_PIC8259_IN_SP_CB(VCC)
+	MCFG_PIC8259_CASCADE_ACK_CB(READ8(z100_state, get_slave_ack))
+
+	MCFG_DEVICE_ADD("pic8259_slave", PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(DEVWRITELINE("pic8259_master", pic8259_device, ir3_w))
+	MCFG_PIC8259_IN_SP_CB(GND)
 
 	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(z100_state, video_pia_A_w))
@@ -716,7 +724,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(z100_state,z100)
 {
-	UINT8 *ROM = memregion("ipl")->base();
+	uint8_t *ROM = memregion("ipl")->base();
 
 	ROM[0xfc116 & 0x3fff] = 0x90; // patch parity IRQ check
 	ROM[0xfc117 & 0x3fff] = 0x90;
@@ -727,5 +735,5 @@ DRIVER_INIT_MEMBER(z100_state,z100)
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1982, z100,   0,      0,       z100,      z100, z100_state,    z100,  "Zenith", "Z-100", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  STATE       INIT  COMPANY   FULLNAME  FLAGS
+COMP( 1982, z100, 0,      0,      z100,    z100,  z100_state, z100, "Zenith", "Z-100",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

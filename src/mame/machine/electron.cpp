@@ -11,8 +11,21 @@
 
 #include "emu.h"
 #include "includes/electron.h"
-#include "sound/beep.h"
-#include "imagedev/cassette.h"
+#include "screen.h"
+
+
+void electron_state::waitforramsync()
+{
+	int cycles = 0;
+
+	if (!(m_ula.screen_mode & 4) && machine().first_screen()->hpos()<640)
+	{
+		cycles += (640 - machine().first_screen()->hpos()) / 8;
+	}
+	if (cycles & 1) cycles++;
+
+	m_maincpu->adjust_icount(-cycles);
+}
 
 
 void electron_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
@@ -29,7 +42,7 @@ void electron_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		electron_scanline_interrupt(ptr, param);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in electron_state::device_timer");
+		assert_always(false, "Unknown id in electron_state::device_timer");
 	}
 }
 
@@ -131,7 +144,7 @@ TIMER_CALLBACK_MEMBER(electron_state::electron_tape_timer_handler)
 
 READ8_MEMBER(electron_state::electron_read_keyboard)
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	//logerror( "PC=%04x: keyboard read from paged rom area, address: %04x", activecpu_get_pc(), offset );
 	for (int i = 0; i < 14; i++)
@@ -145,8 +158,21 @@ READ8_MEMBER(electron_state::electron_read_keyboard)
 	return data;
 }
 
+READ8_MEMBER(electron_state::electron_mem_r)
+{
+	//waitforramsync();
+	return m_ram->read(offset);
+}
+
+WRITE8_MEMBER(electron_state::electron_mem_w)
+{
+	//waitforramsync();
+	m_ram->write(offset, data);
+}
+
 READ8_MEMBER(electron_state::electron_fred_r)
 {
+	logerror("FRED: read fc%02x\n", offset);
 	return 0xff;
 }
 
@@ -156,6 +182,7 @@ WRITE8_MEMBER(electron_state::electron_fred_w)
 
 READ8_MEMBER(electron_state::electron_jim_r)
 {
+	logerror("JIM: read fd%02x\n", offset);
 	return 0xff;
 }
 
@@ -165,7 +192,7 @@ WRITE8_MEMBER(electron_state::electron_jim_w)
 
 READ8_MEMBER(electron_state::electron_sheila_r)
 {
-	UINT8 data = ((UINT8 *)memregion("user1")->base())[0x43E00 + offset];
+	uint8_t data = ((uint8_t *)memregion("user1")->base())[0x43E00 + offset];
 	switch ( offset & 0x0f )
 	{
 	case 0x00:  /* Interrupt status */
@@ -174,7 +201,7 @@ READ8_MEMBER(electron_state::electron_sheila_r)
 		break;
 	case 0x01:  /* Unknown */
 		break;
-	case 0x04:  /* Casette data shift register */
+	case 0x04:  /* Cassette data shift register */
 		electron_interrupt_handler(INT_CLEAR, INT_RECEIVE_FULL );
 		data = m_ula.tape_byte;
 		break;
@@ -184,7 +211,7 @@ READ8_MEMBER(electron_state::electron_sheila_r)
 }
 
 static const int electron_palette_offset[4] = { 0, 4, 5, 1 };
-static const UINT16 electron_screen_base[8] = { 0x3000, 0x3000, 0x3000, 0x4000, 0x5800, 0x5800, 0x6000, 0x5800 };
+static const uint16_t electron_screen_base[8] = { 0x3000, 0x3000, 0x3000, 0x4000, 0x5800, 0x5800, 0x6000, 0x5800 };
 
 WRITE8_MEMBER(electron_state::electron_sheila_w)
 {
@@ -201,7 +228,7 @@ WRITE8_MEMBER(electron_state::electron_sheila_w)
 		m_ula.screen_start = ( m_ula.screen_start & 0x7e00 ) | ( ( data & 0xe0 ) << 1 );
 		logerror( "screen_start changed to %04x\n", m_ula.screen_start );
 		break;
-	case 0x03:  /* Screen start addres #2 */
+	case 0x03:  /* Screen start address #2 */
 		m_ula.screen_start = ( m_ula.screen_start & 0x1c0 ) | ( ( data & 0x3f ) << 9 );
 		logerror( "screen_start changed to %04x\n", m_ula.screen_start );
 		break;
@@ -279,7 +306,7 @@ WRITE8_MEMBER(electron_state::electron_sheila_w)
 		m_ula.screen_mode = ( data >> 3 ) & 0x07;
 		m_ula.screen_base = electron_screen_base[ m_ula.screen_mode ];
 		m_ula.screen_size = 0x8000 - m_ula.screen_base;
-		m_ula.vram = (UINT8 *)space.get_read_ptr(m_ula.screen_base );
+		m_ula.vram = (uint8_t *)m_ram->pointer() + m_ula.screen_base;
 		logerror( "ULA: screen mode set to %d\n", m_ula.screen_mode );
 		m_ula.cassette_motor_mode = ( data >> 6 ) & 0x01;
 		m_cassette->change_state(m_ula.cassette_motor_mode ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MOTOR_DISABLED );
@@ -342,18 +369,17 @@ void electron_state::machine_reset()
 	m_ula.screen_mode = 0;
 	m_ula.cassette_motor_mode = 0;
 	m_ula.capslock_mode = 0;
-	m_ula.screen_mode = 0;
 	m_ula.screen_start = 0x3000;
 	m_ula.screen_base = 0x3000;
 	m_ula.screen_size = 0x8000 - 0x3000;
 	m_ula.screen_addr = 0;
 	m_ula.tape_running = 0;
-	m_ula.vram = (UINT8 *)m_maincpu->space(AS_PROGRAM).get_read_ptr(m_ula.screen_base);
+	m_ula.vram = (uint8_t *)m_ram->pointer() + m_ula.screen_base;
 }
 
 void electron_state::machine_start()
 {
-	UINT8 *lo_rom, *up_rom;
+	uint8_t *lo_rom, *up_rom;
 	std::string region_tag;
 	memory_region *cart_rom = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
 
@@ -366,10 +392,11 @@ void electron_state::machine_start()
 	else
 		lo_rom = memregion("user1")->base();
 
-	membank("bank2")->configure_entries(0,  1, lo_rom, 0x4000);
-	membank("bank2")->configure_entries(1, 11, memregion("user1")->base() + 0x04000, 0x4000);
-	membank("bank2")->configure_entries(12, 1, up_rom, 0x4000);
-	membank("bank2")->configure_entries(13, 3, memregion("user1")->base() + 0x34000, 0x4000);
+	membank("bank2")->configure_entries(0, 1, lo_rom, 0x4000);
+	membank("bank2")->configure_entries(1, 1, up_rom, 0x4000);
+
+	for (int page = 2; page < 16; page++)
+		membank("bank2")->configure_entries(page, 1, memregion("user1")->base() + page * 0x4000, 0x4000);
 
 	m_ula.interrupt_status = 0x82;
 	m_ula.interrupt_control = 0x00;
@@ -379,19 +406,19 @@ void electron_state::machine_start()
 
 DEVICE_IMAGE_LOAD_MEMBER( electron_state, electron_cart )
 {
-	if (image.software_entry() == nullptr)
+	if (!image.loaded_through_softlist())
 	{
-		UINT32 filesize = image.length();
+		uint32_t filesize = image.length();
 
 		if (filesize != 16384)
 		{
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid size: Only size 16384 is supported");
-			return IMAGE_INIT_FAIL;
+			return image_init_result::FAIL;
 		}
 
 		m_cart->rom_alloc(filesize, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 		image.fread(m_cart->get_rom_base(), filesize);
-		return IMAGE_INIT_PASS;
+		return image_init_result::PASS;
 	}
 	else
 	{
@@ -401,13 +428,13 @@ DEVICE_IMAGE_LOAD_MEMBER( electron_state, electron_cart )
 		if (upsize != 16384 && upsize != 0)
 		{
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid size for uprom");
-			return IMAGE_INIT_FAIL;
+			return image_init_result::FAIL;
 		}
 
 		if (losize != 16384 && losize != 0)
 		{
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid size for lorom");
-			return IMAGE_INIT_FAIL;
+			return image_init_result::FAIL;
 		}
 
 		m_cart->rom_alloc(upsize + losize, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
@@ -418,6 +445,6 @@ DEVICE_IMAGE_LOAD_MEMBER( electron_state, electron_cart )
 		if (losize)
 			memcpy(m_cart->get_rom_base() + upsize, image.get_software_region("lorom"), losize);
 
-		return IMAGE_INIT_PASS;
+		return image_init_result::PASS;
 	}
 }

@@ -7,11 +7,12 @@
 
 #include "emu.h"
 #include "includes/shootout.h"
+#include "screen.h"
 
 
 PALETTE_INIT_MEMBER(shootout_state, shootout)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 
@@ -79,20 +80,20 @@ WRITE8_MEMBER(shootout_state::textram_w)
 
 void shootout_state::video_start()
 {
-	m_background = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(shootout_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_foreground = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(shootout_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_background = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(shootout_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_foreground = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(shootout_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_foreground->set_transparent_pen(0 );
 
-	save_item(NAME(m_bFlicker));
+	save_item(NAME(m_ccnt_old_val));
 }
 
 void shootout_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int bank_bits )
 {
 	gfx_element *gfx = m_gfxdecode->gfx(1);
-	const UINT8 *source = m_spriteram+127*4;
+	const uint8_t *source = m_spriteram+127*4;
 	int count;
 
-	m_bFlicker = !m_bFlicker;
+	bool m_bFlicker = (screen.frame_number () & 1) != 0;
 
 	for( count=0; count<128; count++ )
 	{
@@ -164,7 +165,7 @@ void shootout_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 	}
 }
 
-UINT32 shootout_state::screen_update_shootout(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t shootout_state::screen_update_shootout(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	screen.priority().fill(0, cliprect);
 
@@ -174,7 +175,7 @@ UINT32 shootout_state::screen_update_shootout(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-UINT32 shootout_state::screen_update_shootouj(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t shootout_state::screen_update_shootouj(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	screen.priority().fill(0, cliprect);
 

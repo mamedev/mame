@@ -1,9 +1,7 @@
 /*
- * Copyright 2011-2016 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
-
-#include <string.h> // strlen
 
 #include "common.h"
 
@@ -14,6 +12,7 @@ namespace stl = tinystl;
 
 #include <bgfx/bgfx.h>
 #include <bx/commandline.h>
+#include <bx/endian.h>
 #include <bx/fpumath.h>
 #include <bx/readerwriter.h>
 #include <bx/string.h>
@@ -99,34 +98,28 @@ static bgfx::ShaderHandle loadShader(bx::FileReaderI* _reader, const char* _name
 {
 	char filePath[512];
 
-	const char* shaderPath = "shaders/dx9/";
+	const char* shaderPath = "???";
 
 	switch (bgfx::getRendererType() )
 	{
+	case bgfx::RendererType::Noop:
+	case bgfx::RendererType::Direct3D9:  shaderPath = "shaders/dx9/";   break;
 	case bgfx::RendererType::Direct3D11:
-	case bgfx::RendererType::Direct3D12:
-		shaderPath = "shaders/dx11/";
-		break;
+	case bgfx::RendererType::Direct3D12: shaderPath = "shaders/dx11/";  break;
+	case bgfx::RendererType::Gnm:        shaderPath = "shaders/pssl/";  break;
+	case bgfx::RendererType::Metal:      shaderPath = "shaders/metal/"; break;
+	case bgfx::RendererType::OpenGL:     shaderPath = "shaders/glsl/";  break;
+	case bgfx::RendererType::OpenGLES:   shaderPath = "shaders/essl/";  break;
+	case bgfx::RendererType::Vulkan:     shaderPath = "shaders/spirv/"; break;
 
-	case bgfx::RendererType::OpenGL:
-		shaderPath = "shaders/glsl/";
-		break;
-
-	case bgfx::RendererType::Metal:
-		shaderPath = "shaders/metal/";
-		break;
-
-	case bgfx::RendererType::OpenGLES:
-		shaderPath = "shaders/gles/";
-		break;
-
-	default:
+	case bgfx::RendererType::Count:
+		BX_CHECK(false, "You should not be here!");
 		break;
 	}
 
-	strcpy(filePath, shaderPath);
-	strcat(filePath, _name);
-	strcat(filePath, ".bin");
+	bx::strlncpy(filePath, BX_COUNTOF(filePath), shaderPath);
+	bx::strlncat(filePath, BX_COUNTOF(filePath), _name);
+	bx::strlncat(filePath, BX_COUNTOF(filePath), ".bin");
 
 	return bgfx::createShader(loadMem(_reader, filePath) );
 }
@@ -153,68 +146,72 @@ bgfx::ProgramHandle loadProgram(const char* _vsName, const char* _fsName)
 	return loadProgram(entry::getFileReader(), _vsName, _fsName);
 }
 
-typedef unsigned char stbi_uc;
-extern "C" stbi_uc *stbi_load_from_memory(stbi_uc const *buffer, int len, int *x, int *y, int *comp, int req_comp);
+static void imageReleaseCb(void* _ptr, void* _userData)
+{
+	BX_UNUSED(_ptr);
+	bgfx::ImageContainer* imageContainer = (bgfx::ImageContainer*)_userData;
+	bgfx::imageFree(imageContainer);
+}
 
 bgfx::TextureHandle loadTexture(bx::FileReaderI* _reader, const char* _filePath, uint32_t _flags, uint8_t _skip, bgfx::TextureInfo* _info)
 {
-	if (NULL != bx::stristr(_filePath, ".dds")
-	||  NULL != bx::stristr(_filePath, ".pvr")
-	||  NULL != bx::stristr(_filePath, ".ktx") )
-	{
-		const bgfx::Memory* mem = loadMem(_reader, _filePath);
-		if (NULL != mem)
-		{
-			return bgfx::createTexture(mem, _flags, _skip, _info);
-		}
-
-		bgfx::TextureHandle handle = BGFX_INVALID_HANDLE;
-		DBG("Failed to load %s.", _filePath);
-		return handle;
-	}
-
+	BX_UNUSED(_skip);
 	bgfx::TextureHandle handle = BGFX_INVALID_HANDLE;
-	bx::AllocatorI* allocator = entry::getAllocator();
 
-	uint32_t size = 0;
-	void* data = loadMem(_reader, allocator, _filePath, &size);
+	uint32_t size;
+	void* data = load(_reader, entry::getAllocator(), _filePath, &size);
 	if (NULL != data)
 	{
-		int width  = 0;
-		int height = 0;
-		int comp   = 0;
+		bgfx::ImageContainer* imageContainer = bgfx::imageParse(entry::getAllocator(), data, size);
 
-		uint8_t* img = NULL;
-		img = stbi_load_from_memory( (uint8_t*)data, size, &width, &height, &comp, 4);
-
-		BX_FREE(allocator, data);
-
-		if (NULL != img)
+		if (NULL != imageContainer)
 		{
-			handle = bgfx::createTexture2D(uint16_t(width), uint16_t(height), 1
-											, bgfx::TextureFormat::RGBA8
-											, _flags
-											, bgfx::copy(img, width*height*4)
-											);
+			const bgfx::Memory* mem = bgfx::makeRef(
+					  imageContainer->m_data
+					, imageContainer->m_size
+					, imageReleaseCb
+					, imageContainer
+					);
+			unload(data);
 
-			free(img);
+			if (imageContainer->m_cubeMap)
+			{
+				handle = bgfx::createTextureCube(
+					  uint16_t(imageContainer->m_width)
+					, 1 < imageContainer->m_numMips
+					, imageContainer->m_numLayers
+					, imageContainer->m_format
+					, _flags
+					, mem
+					);
+			}
+			else
+			{
+				handle = bgfx::createTexture2D(
+					  uint16_t(imageContainer->m_width)
+					, uint16_t(imageContainer->m_height)
+					, 1 < imageContainer->m_numMips
+					, imageContainer->m_numLayers
+					, imageContainer->m_format
+					, _flags
+					, mem
+					);
+			}
 
 			if (NULL != _info)
 			{
-				bgfx::calcTextureSize(*_info
-					, uint16_t(width)
-					, uint16_t(height)
+				bgfx::calcTextureSize(
+					  *_info
+					, uint16_t(imageContainer->m_width)
+					, uint16_t(imageContainer->m_height)
 					, 0
 					, false
+					, false
 					, 1
-					, bgfx::TextureFormat::RGBA8
+					, imageContainer->m_format
 					);
 			}
 		}
-	}
-	else
-	{
-		DBG("Failed to load %s.", _filePath);
 	}
 
 	return handle;
@@ -223,6 +220,14 @@ bgfx::TextureHandle loadTexture(bx::FileReaderI* _reader, const char* _filePath,
 bgfx::TextureHandle loadTexture(const char* _name, uint32_t _flags, uint8_t _skip, bgfx::TextureInfo* _info)
 {
 	return loadTexture(entry::getFileReader(), _name, _flags, _skip, _info);
+}
+
+bgfx::ImageContainer* imageLoad(const char* _filePath, bgfx::TextureFormat::Enum _dstFormat)
+{
+	uint32_t size = 0;
+	void* data = loadMem(entry::getFileReader(), entry::getAllocator(), _filePath, &size);
+
+	return bgfx::imageParse(entry::getAllocator(), data, size, _dstFormat);
 }
 
 void calcTangents(void* _vertices, uint16_t _numVertices, bgfx::VertexDecl _decl, const uint16_t* _indices, uint32_t _numIndices)
@@ -240,7 +245,7 @@ void calcTangents(void* _vertices, uint16_t _numVertices, bgfx::VertexDecl _decl
 	};
 
 	float* tangents = new float[6*_numVertices];
-	memset(tangents, 0, 6*_numVertices*sizeof(float) );
+	bx::memSet(tangents, 0, 6*_numVertices*sizeof(float) );
 
 	PosTexcoord v0;
 	PosTexcoord v1;
@@ -645,7 +650,7 @@ Args::Args(int _argc, char** _argv)
 	}
 	else if (cmdLine.hasArg("noop") )
 	{
-		m_type = bgfx::RendererType::Null;
+		m_type = bgfx::RendererType::Noop;
 	}
 	else if (BX_ENABLED(BX_PLATFORM_WINDOWS) )
 	{

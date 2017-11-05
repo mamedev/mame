@@ -20,11 +20,11 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")  { }
 
-	UINT8 m_key_row;
+	uint8_t m_key_row;
 	DECLARE_DRIVER_INIT(kramermc);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_kramermc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_kramermc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_READ8_MEMBER(kramermc_port_a_r);
 	DECLARE_READ8_MEMBER(kramermc_port_b_r);
 	DECLARE_WRITE8_MEMBER(kramermc_port_a_w);

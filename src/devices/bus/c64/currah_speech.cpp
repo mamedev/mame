@@ -67,7 +67,9 @@ Notes:
 
 */
 
+#include "emu.h"
 #include "currah_speech.h"
+#include "speaker.h"
 
 
 
@@ -83,7 +85,7 @@ Notes:
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_CURRAH_SPEECH = &device_creator<c64_currah_speech_cartridge_device>;
+DEFINE_DEVICE_TYPE(C64_CURRAH_SPEECH, c64_currah_speech_cartridge_device, "c64_cs", "C64 Currah Speech")
 
 
 //-------------------------------------------------
@@ -100,31 +102,21 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *c64_currah_speech_cartridge_device::device_rom_region() const
+const tiny_rom_entry *c64_currah_speech_cartridge_device::device_rom_region() const
 {
 	return ROM_NAME( c64_currah_speech );
 }
 
+
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( c64_currah_speech )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( c64_currah_speech )
+MACHINE_CONFIG_MEMBER( c64_currah_speech_cartridge_device::device_add_mconfig )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD(SP0256_TAG, SP0256, 4000000) // ???
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor c64_currah_speech_cartridge_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( c64_currah_speech );
-}
 
 
 
@@ -154,8 +146,8 @@ void c64_currah_speech_cartridge_device::set_osc1(int voice, int intonation)
 //  c64_currah_speech_cartridge_device - constructor
 //-------------------------------------------------
 
-c64_currah_speech_cartridge_device::c64_currah_speech_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, C64_CURRAH_SPEECH, "C64 Currah Speech", tag, owner, clock, "c64_cs", __FILE__),
+c64_currah_speech_cartridge_device::c64_currah_speech_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, C64_CURRAH_SPEECH, tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_nsp(*this, SP0256_TAG)
 {
@@ -186,7 +178,7 @@ void c64_currah_speech_cartridge_device::device_reset()
 //  c64_cd_r - cartridge data read
 //-------------------------------------------------
 
-UINT8 c64_currah_speech_cartridge_device::c64_cd_r(address_space &space, offs_t offset, UINT8 data, int sphi2, int ba, int roml, int romh, int io1, int io2)
+uint8_t c64_currah_speech_cartridge_device::c64_cd_r(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
 	if (!romh)
 	{
@@ -212,7 +204,7 @@ UINT8 c64_currah_speech_cartridge_device::c64_cd_r(address_space &space, offs_t 
 		data = m_nsp->sby_r() << 7;
 	}
 
-	if (!space.debugger_access() && (offset == 0xa7f0))
+	if (!machine().side_effect_disabled() && (offset == 0xa7f0))
 	{
 		m_game = !m_game;
 		m_exrom = !m_exrom;
@@ -226,7 +218,7 @@ UINT8 c64_currah_speech_cartridge_device::c64_cd_r(address_space &space, offs_t 
 //  c64_cd_w - cartridge data write
 //-------------------------------------------------
 
-void c64_currah_speech_cartridge_device::c64_cd_w(address_space &space, offs_t offset, UINT8 data, int sphi2, int ba, int roml, int romh, int io1, int io2)
+void c64_currah_speech_cartridge_device::c64_cd_w(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
 	if (!io1)
 	{

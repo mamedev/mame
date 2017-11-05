@@ -10,6 +10,7 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "sound/2610intf.h"
+#include "machine/gen_latch.h"
 #include "machine/upd1990a.h"
 #include "machine/ng_memcard.h"
 #include "video/neogeo_spr.h"
@@ -17,6 +18,8 @@
 #include "bus/neogeo/slot.h"
 #include "bus/neogeo/carts.h"
 #include "bus/neogeo_ctrl/ctrl.h"
+
+#include "screen.h"
 
 
 // On scanline 224, /VBLANK goes low 56 mclks (14 pixels) from the rising edge of /HSYNC.
@@ -38,6 +41,8 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_memcard(*this, "memcard"),
+		m_soundlatch(*this, "soundlatch"),
+		m_soundlatch2(*this, "soundlatch2"),
 		m_region_maincpu(*this, "maincpu"),
 		m_region_sprites(*this, "sprites"),
 		m_region_fixed(*this, "fixed"),
@@ -84,13 +89,15 @@ public:
 	TIMER_CALLBACK_MEMBER(vblank_interrupt_callback);
 
 	// MVS-specific
+	DECLARE_WRITE_LINE_MEMBER(set_save_ram_unlock);
 	DECLARE_WRITE16_MEMBER(save_ram_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(kizuna4p_start_r);
 
-	UINT32 screen_update_neogeo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_neogeo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_WRITE8_MEMBER(io_control_w);
-	DECLARE_WRITE8_MEMBER(system_control_w);
+	DECLARE_WRITE_LINE_MEMBER(set_use_cart_vectors);
+	DECLARE_WRITE_LINE_MEMBER(set_use_cart_audio);
 	DECLARE_READ16_MEMBER(banked_vectors_r);
 	DECLARE_WRITE16_MEMBER(write_banksel);
 	DECLARE_WRITE16_MEMBER(write_bankprot);
@@ -99,6 +106,9 @@ public:
 	DECLARE_WRITE16_MEMBER(write_bankprot_kf2k3bl);
 	DECLARE_WRITE16_MEMBER(write_bankprot_kof10th);
 	DECLARE_READ16_MEMBER(read_lorom_kof10th);
+
+	DECLARE_WRITE_LINE_MEMBER(set_screen_shadow);
+	DECLARE_WRITE_LINE_MEMBER(set_palette_bank);
 
 	DECLARE_DRIVER_INIT(neogeo);
 
@@ -120,11 +130,13 @@ protected:
 	optional_device<upd4990a_device> m_upd4990a;
 	optional_device<ym2610_device> m_ym;
 	required_device<neosprite_optimized_device> m_sprgen;
-	optional_shared_ptr<UINT16> m_save_ram;
+	optional_shared_ptr<uint16_t> m_save_ram;
 
 	required_device<screen_device> m_screen;
 	optional_device<palette_device> m_palette;
 	optional_device<ng_memcard_device> m_memcard;
+	required_device<generic_latch_8_device> m_soundlatch;
+	required_device<generic_latch_8_device> m_soundlatch2;
 
 	// memory
 	optional_memory_region m_region_maincpu;
@@ -154,8 +166,8 @@ protected:
 	virtual void video_reset() override;
 
 	const pen_t *m_bg_pen;
-	UINT8      m_vblank_level;
-	UINT8      m_raster_level;
+	uint8_t      m_vblank_level;
+	uint8_t      m_raster_level;
 
 	int m_use_cart_vectors;
 	int m_use_cart_audio;
@@ -168,7 +180,7 @@ protected:
 	void init_ym();
 	void init_sprites();
 	// temporary helper to restore memory banking while bankswitch is handled in the driver...
-	UINT32 m_bank_base;
+	uint32_t m_bank_base;
 
 	optional_device<neogeo_cart_slot_device> m_slot1;
 	optional_device<neogeo_cart_slot_device> m_slot2;
@@ -184,23 +196,20 @@ private:
 	void update_interrupts();
 	void create_interrupt_timers();
 	void start_interrupt_timers();
-	void acknowledge_interrupt(UINT16 data);
+	void acknowledge_interrupt(uint16_t data);
 
 	void adjust_display_position_interrupt_timer();
-	void set_display_position_interrupt_control(UINT16 data);
-	void set_display_counter_msb(UINT16 data);
-	void set_display_counter_lsb(UINT16 data);
-	void set_video_control(UINT16 data);
+	void set_display_position_interrupt_control(uint16_t data);
+	void set_display_counter_msb(uint16_t data);
+	void set_display_counter_lsb(uint16_t data);
+	void set_video_control(uint16_t data);
 
 	void create_rgb_lookups();
 	void set_pens();
-	void set_screen_shadow(int data);
-	void set_palette_bank(int data);
 
 	void audio_cpu_check_nmi();
-	void set_save_ram_unlock(UINT8 data);
-	void set_output_latch(UINT8 data);
-	void set_output_data(UINT8 data);
+	void set_output_latch(uint8_t data);
+	void set_output_data(uint8_t data);
 
 	// internal state
 	bool       m_recurse;
@@ -208,27 +217,27 @@ private:
 	bool       m_audio_cpu_nmi_pending;
 
 	// MVS-specific state
-	UINT8      m_save_ram_unlocked;
-	UINT8      m_output_data;
-	UINT8      m_output_latch;
-	UINT8      m_el_value;
-	UINT8      m_led1_value;
-	UINT8      m_led2_value;
+	uint8_t      m_save_ram_unlocked;
+	uint8_t      m_output_data;
+	uint8_t      m_output_latch;
+	uint8_t      m_el_value;
+	uint8_t      m_led1_value;
+	uint8_t      m_led2_value;
 
 	emu_timer  *m_display_position_interrupt_timer;
 	emu_timer  *m_display_position_vblank_timer;
 	emu_timer  *m_vblank_interrupt_timer;
-	UINT32     m_display_counter;
-	UINT8      m_vblank_interrupt_pending;
-	UINT8      m_display_position_interrupt_pending;
-	UINT8      m_irq3_pending;
-	UINT8      m_display_position_interrupt_control;
+	uint32_t     m_display_counter;
+	uint8_t      m_vblank_interrupt_pending;
+	uint8_t      m_display_position_interrupt_pending;
+	uint8_t      m_irq3_pending;
+	uint8_t      m_display_position_interrupt_control;
 
-	UINT16 get_video_control();
+	uint16_t get_video_control();
 
 	// color/palette related
-	std::vector<UINT16> m_paletteram;
-	UINT8        m_palette_lookup[32][4];
+	std::vector<uint16_t> m_paletteram;
+	uint8_t        m_palette_lookup[32][4];
 	int          m_screen_shadow;
 	int          m_palette_bank;
 };

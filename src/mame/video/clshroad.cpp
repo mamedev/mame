@@ -36,15 +36,15 @@
 #include "includes/clshroad.h"
 
 
-WRITE8_MEMBER(clshroad_state::flipscreen_w)
+WRITE_LINE_MEMBER(clshroad_state::flipscreen_w)
 {
-	flip_screen_set(data & 1 );
+	flip_screen_set(state);
 }
 
 
 PALETTE_INIT_MEMBER(clshroad_state,clshroad)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 	for (i = 0;i < 256;i++)
 		palette.set_pen_color(i,  pal4bit(color_prom[i + 256 * 0]),
@@ -54,7 +54,7 @@ PALETTE_INIT_MEMBER(clshroad_state,clshroad)
 
 PALETTE_INIT_MEMBER(clshroad_state,firebatl)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 	/* create a lookup table for the palette */
@@ -75,7 +75,7 @@ PALETTE_INIT_MEMBER(clshroad_state,firebatl)
 
 	for (i = 0x200; i < 0x300; i++)
 	{
-		UINT8 ctabentry = ((color_prom[(i - 0x200) + 0x000] & 0x0f) << 4) |
+		uint8_t ctabentry = ((color_prom[(i - 0x200) + 0x000] & 0x0f) << 4) |
 							(color_prom[(i - 0x200) + 0x100] & 0x0f);
 		palette.set_pen_indirect(i, ctabentry);
 	}
@@ -105,7 +105,7 @@ Offset:
 
 TILE_GET_INFO_MEMBER(clshroad_state::get_tile_info_0a)
 {
-	UINT8 code;
+	uint8_t code;
 	tile_index = (tile_index & 0x1f) + (tile_index & ~0x1f)*2;
 	code    =   m_vram_0[ tile_index * 2 + 0x40 ];
 //  color   =   m_vram_0[ tile_index * 2 + 0x41 ];
@@ -117,7 +117,7 @@ TILE_GET_INFO_MEMBER(clshroad_state::get_tile_info_0a)
 
 TILE_GET_INFO_MEMBER(clshroad_state::get_tile_info_0b)
 {
-	UINT8 code;
+	uint8_t code;
 	tile_index = (tile_index & 0x1f) + (tile_index & ~0x1f)*2;
 	code    =   m_vram_0[ tile_index * 2 + 0x00 ];
 //  color   =   m_vram_0[ tile_index * 2 + 0x01 ];
@@ -173,8 +173,8 @@ TILEMAP_MAPPER_MEMBER(clshroad_state::tilemap_scan_rows_extra)
 
 TILE_GET_INFO_MEMBER(clshroad_state::get_tile_info_fb1)
 {
-	UINT8 code  =   m_vram_1[ tile_index + 0x000 ];
-	UINT8 color =   m_vram_1[ tile_index + 0x400 ] & 0x3f;
+	uint8_t code  =   m_vram_1[ tile_index + 0x000 ];
+	uint8_t color =   m_vram_1[ tile_index + 0x400 ] & 0x3f;
 	tileinfo.group = color;
 	SET_TILE_INFO_MEMBER(2,
 			code,
@@ -184,8 +184,8 @@ TILE_GET_INFO_MEMBER(clshroad_state::get_tile_info_fb1)
 
 TILE_GET_INFO_MEMBER(clshroad_state::get_tile_info_1)
 {
-	UINT8 code  =   m_vram_1[ tile_index + 0x000 ];
-	UINT8 color =   m_vram_1[ tile_index + 0x400 ];
+	uint8_t code  =   m_vram_1[ tile_index + 0x000 ];
+	uint8_t color =   m_vram_1[ tile_index + 0x400 ];
 	SET_TILE_INFO_MEMBER(2,
 			code + ((color & 0xf0)<<4),
 			color & 0x0f,
@@ -202,47 +202,34 @@ WRITE8_MEMBER(clshroad_state::vram_1_w)
 VIDEO_START_MEMBER(clshroad_state,firebatl)
 {
 	/* These 2 use the graphics and scroll value */
-	m_tilemap_0a = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(clshroad_state::get_tile_info_0a),this),TILEMAP_SCAN_ROWS,16,16,0x20,0x10);
-	m_tilemap_0b = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(clshroad_state::get_tile_info_0b),this),TILEMAP_SCAN_ROWS,16,16,0x20,0x10);
+	m_tilemap_0a = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(clshroad_state::get_tile_info_0a),this),TILEMAP_SCAN_ROWS,16,16,0x20,0x10);
+	m_tilemap_0b = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(clshroad_state::get_tile_info_0b),this),TILEMAP_SCAN_ROWS,16,16,0x20,0x10);
 	/* Text (No scrolling) */
-	m_tilemap_1  = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(clshroad_state::get_tile_info_fb1),this),tilemap_mapper_delegate(FUNC(clshroad_state::tilemap_scan_rows_extra),this),8,8,0x24,0x20);
+	m_tilemap_1  = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(clshroad_state::get_tile_info_fb1),this),tilemap_mapper_delegate(FUNC(clshroad_state::tilemap_scan_rows_extra),this),8,8,0x24,0x20);
 
-	m_tilemap_0a->set_scroll_rows(1);
-	m_tilemap_0b->set_scroll_rows(1);
-	m_tilemap_1->set_scroll_rows(1);
+	m_tilemap_0a->set_scrolldx(-0x2a, -0xb3);
+	m_tilemap_0b->set_scrolldx(-0x2a, -0xb3);
 
-	m_tilemap_0a->set_scroll_cols(1);
-	m_tilemap_0b->set_scroll_cols(1);
-	m_tilemap_1->set_scroll_cols(1);
+	m_tilemap_0a->set_scrolldy(0, 1);
+	m_tilemap_0b->set_scrolldy(0, 1);
 
-	m_tilemap_0a->set_scrolldx(-0x30, -0xb5);
-	m_tilemap_0b->set_scrolldx(-0x30, -0xb5);
-
-	m_tilemap_0b->set_transparent_pen(0 );
+	m_tilemap_0b->set_transparent_pen(0);
 	m_tilemap_1->configure_groups(*m_gfxdecode->gfx(2), 0x0f);
 }
 
 VIDEO_START_MEMBER(clshroad_state,clshroad)
 {
 	/* These 2 use the graphics and scroll value */
-	m_tilemap_0a = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(clshroad_state::get_tile_info_0a),this),TILEMAP_SCAN_ROWS,16,16,0x20,0x10);
-	m_tilemap_0b = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(clshroad_state::get_tile_info_0b),this),TILEMAP_SCAN_ROWS,16,16,0x20,0x10);
+	m_tilemap_0a = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(clshroad_state::get_tile_info_0a),this),TILEMAP_SCAN_ROWS,16,16,0x20,0x10);
+	m_tilemap_0b = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(clshroad_state::get_tile_info_0b),this),TILEMAP_SCAN_ROWS,16,16,0x20,0x10);
 	/* Text (No scrolling) */
-	m_tilemap_1  = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(clshroad_state::get_tile_info_1),this),tilemap_mapper_delegate(FUNC(clshroad_state::tilemap_scan_rows_extra),this),8,8,0x24,0x20);
-
-	m_tilemap_0a->set_scroll_rows(1);
-	m_tilemap_0b->set_scroll_rows(1);
-	m_tilemap_1->set_scroll_rows(1);
-
-	m_tilemap_0a->set_scroll_cols(1);
-	m_tilemap_0b->set_scroll_cols(1);
-	m_tilemap_1->set_scroll_cols(1);
+	m_tilemap_1  = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(clshroad_state::get_tile_info_1),this),tilemap_mapper_delegate(FUNC(clshroad_state::tilemap_scan_rows_extra),this),8,8,0x24,0x20);
 
 	m_tilemap_0a->set_scrolldx(-0x30, -0xb5);
 	m_tilemap_0b->set_scrolldx(-0x30, -0xb5);
 
-	m_tilemap_0b->set_transparent_pen(0x0f );
-	m_tilemap_1->set_transparent_pen(0x0f );
+	m_tilemap_0b->set_transparent_pen(0x0f);
+	m_tilemap_1->set_transparent_pen(0x0f);
 }
 
 
@@ -312,7 +299,7 @@ void clshroad_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 ***************************************************************************/
 
-UINT32 clshroad_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t clshroad_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int scrollx  = m_vregs[ 0 ] + (m_vregs[ 1 ] << 8);
 //  int priority = m_vregs[ 2 ];

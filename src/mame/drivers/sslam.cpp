@@ -83,9 +83,12 @@ Notes:
 
 
 #include "emu.h"
+#include "includes/sslam.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/mcs51/mcs51.h"
-#include "includes/sslam.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 #define oki_time_base 0x08
@@ -102,7 +105,7 @@ Notes:
    The sequencing of the music tracks are handled in the second table below.
 */
 
-static const UINT8 sslam_snd_cmd[64] =
+static const uint8_t sslam_snd_cmd[64] =
 {
 /*00*/  0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
 /*08*/  0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x70, 0x71,
@@ -125,7 +128,7 @@ static const UINT8 sslam_snd_cmd[64] =
      If the last byte is 0xff, the track should loop by restarting at the first column sample
 */
 
-static const UINT8 sslam_snd_loop[8][19] =
+static const uint8_t sslam_snd_loop[8][19] =
 {
 /*NA*/  { 0x00, 0x00 }, /* Not a loop - just a parking position for stopping track playback */
 /*60*/  { 0x60, 0x60, 0x61, 0x61, 0x60, 0x60, 0x61, 0x62, 0xff },
@@ -317,13 +320,13 @@ WRITE8_MEMBER(sslam_state::sslam_snd_w)
 		else if (m_sound >= 0x70) {
 			/* These vocals are in bank 1, but a bug in the actual MCU doesn't set the bank */
 //          if (m_snd_bank != 1)
-//          m_oki->set_bank_base((1 * 0x40000));
+//          m_oki->set_rom_bank(1);
 //          sslam_snd_bank = 1;
 			sslam_play(0, m_sound);
 		}
 		else if (m_sound >= 0x69) {
 			if (m_snd_bank != 2)
-				m_oki->set_bank_base(2 * 0x40000);
+				m_oki->set_rom_bank(2);
 			m_snd_bank = 2;
 			switch (m_sound)
 			{
@@ -336,14 +339,14 @@ WRITE8_MEMBER(sslam_state::sslam_snd_w)
 		}
 		else if (m_sound >= 0x65) {
 			if (m_snd_bank != 1)
-				m_oki->set_bank_base(1 * 0x40000);
+				m_oki->set_rom_bank(1);
 			m_snd_bank = 1;
 			m_melody = 4;
 			sslam_play(m_melody, m_sound);
 		}
 		else if (m_sound >= 0x60) {
 			if (m_snd_bank != 0)
-				m_oki->set_bank_base(0 * 0x40000);
+				m_oki->set_rom_bank(0);
 			m_snd_bank = 0;
 			switch (m_sound)
 			{
@@ -364,7 +367,7 @@ WRITE8_MEMBER(sslam_state::sslam_snd_w)
 
 WRITE16_MEMBER(sslam_state::powerbls_sound_w)
 {
-	soundlatch_byte_w(space, 0, data & 0xff);
+	m_soundlatch->write(space, 0, data & 0xff);
 	m_audiocpu->set_input_line(MCS51_INT1_LINE, HOLD_LINE);
 }
 
@@ -420,10 +423,10 @@ ADDRESS_MAP_END
 
 READ8_MEMBER(sslam_state::playmark_snd_command_r)
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	if ((m_oki_control & 0x38) == 0x30) {
-		data = soundlatch_byte_r(space,0);
+		data = m_soundlatch->read(space,0);
 	}
 	else if ((m_oki_control & 0x38) == 0x28) {
 		data = (m_oki->read(space,0) & 0x0f);
@@ -446,7 +449,7 @@ WRITE8_MEMBER(sslam_state::playmark_snd_control_w)
 		if (m_oki_bank != ((data & 3) - 1))
 		{
 			m_oki_bank = (data & 3) - 1;
-			m_oki->set_bank_base(0x40000 * m_oki_bank);
+			m_oki->set_rom_bank(m_oki_bank);
 		}
 	}
 
@@ -691,7 +694,7 @@ GFXDECODE_END
 
 /* Machine Driver */
 
-static MACHINE_CONFIG_START( sslam, sslam_state )
+static MACHINE_CONFIG_START( sslam )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* 12 MHz */
@@ -719,11 +722,11 @@ static MACHINE_CONFIG_START( sslam, sslam_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", 1000000, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( powerbls, sslam_state )
+static MACHINE_CONFIG_START( powerbls )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* 12 MHz */
@@ -751,7 +754,9 @@ static MACHINE_CONFIG_START( powerbls, sslam_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH)   /* verified on original PCB */
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
+	MCFG_OKIM6295_ADD("oki", 1000000, PIN7_HIGH)   /* verified on original PCB */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
@@ -931,7 +936,7 @@ DRIVER_INIT_MEMBER(sslam_state,powerbls)
 }
 
 
-GAME( 1993, sslam,    0,        sslam,    sslam, sslam_state,    sslam,    ROT0, "Playmark", "Super Slam (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, sslama,   sslam,    sslam,    sslam, sslam_state,    sslam,    ROT0, "Playmark", "Super Slam (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, sslamb,   sslam,    sslam,    sslam, sslam_state,    sslam,    ROT0, "Playmark", "Super Slam (set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, sslam,    0,        sslam,    sslam,    sslam_state, sslam,    ROT0, "Playmark", "Super Slam (set 1)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1993, sslama,   sslam,    sslam,    sslam,    sslam_state, sslam,    ROT0, "Playmark", "Super Slam (set 2)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1993, sslamb,   sslam,    sslam,    sslam,    sslam_state, sslam,    ROT0, "Playmark", "Super Slam (set 3)",                  MACHINE_SUPPORTS_SAVE )
 GAME( 1994, powerbals,powerbal, powerbls, powerbls, sslam_state, powerbls, ROT0, "Playmark", "Power Balls (Super Slam conversion)", MACHINE_SUPPORTS_SAVE )

@@ -35,7 +35,7 @@ INSTRUCTION( asc )
 	if (A > 0xF)
 	{
 		C = 1;
-		m_skip = 1;
+		skip();
 		A &= 0xF;
 	}
 	else
@@ -80,13 +80,13 @@ INSTRUCTION( add )
 
 INSTRUCTION( aisc )
 {
-	UINT8 y = opcode & 0x0f;
+	uint8_t y = m_opcode & 0x0f;
 
 	A = A + y;
 
 	if (A > 0x0f)
 	{
-		m_skip = 1;
+		skip();
 		A &= 0xF;
 	}
 }
@@ -238,7 +238,7 @@ INSTRUCTION( casc )
 	if (A > 0xF)
 	{
 		C = 1;
-		m_skip = 1;
+		skip();
 		A &= 0xF;
 	}
 	else
@@ -266,8 +266,7 @@ INSTRUCTION( casc )
 
 INSTRUCTION( jid )
 {
-	UINT16 addr = (PC & 0x700) | (A << 4) | RAM_R(B);
-	PC = (PC & 0x700) | ROM(addr);
+	PC = (PC & 0x700) | operand;
 }
 
 /*
@@ -286,9 +285,7 @@ INSTRUCTION( jid )
 
 INSTRUCTION( jmp )
 {
-	UINT16 a = ((opcode & 0x07) << 8) | ROM(PC);
-
-	PC = a;
+	PC = ((m_opcode & 0x07) << 8) | operand;
 }
 
 /*
@@ -313,22 +310,22 @@ INSTRUCTION( jmp )
 
 INSTRUCTION( jp )
 {
-	UINT8 page = PC >> 6;
+	uint8_t page = PC >> 6;
 
 	if (page == 2 || page == 3)
 	{
-		UINT8 a = opcode & 0x7f;
+		uint8_t a = m_opcode & 0x7f;
 		PC = (PC & 0x780) | a;
 	}
-	else if ((opcode & 0xc0) == 0xc0)
+	else if ((m_opcode & 0xc0) == 0xc0)
 	{
-		UINT8 a = opcode & 0x3f;
+		uint8_t a = m_opcode & 0x3f;
 		PC = (PC & 0x7c0) | a;
 	}
 	else
 	{
 		// JSRP
-		UINT8 a = opcode & 0x3f;
+		uint8_t a = m_opcode & 0x3f;
 		PUSH(PC);
 		PC = 0x80 | a;
 	}
@@ -351,10 +348,8 @@ INSTRUCTION( jp )
 
 INSTRUCTION( jsr )
 {
-	UINT16 a = ((opcode & 0x07) << 8) | ROM(PC);
-
-	PUSH(PC + 1);
-	PC = a;
+	PUSH(PC);
+	PC = ((m_opcode & 0x07) << 8) | operand;
 }
 
 /*
@@ -414,7 +409,7 @@ INSTRUCTION( cop420_ret )
 INSTRUCTION( retsk )
 {
 	POP();
-	m_skip = 1;
+	skip();
 }
 
 /*
@@ -432,7 +427,7 @@ INSTRUCTION( retsk )
 
 INSTRUCTION( halt )
 {
-	m_halt = 1;
+	m_halt = true;
 }
 
 /*
@@ -448,8 +443,8 @@ INSTRUCTION( halt )
 
 INSTRUCTION( it )
 {
-	m_halt = 1;
-	m_idle = 1;
+	m_halt = true;
+	m_idle = true;
 }
 
 /***************************************************************************
@@ -503,7 +498,7 @@ INSTRUCTION( camq )
 
 	*/
 
-	UINT8 data = (A << 4) | RAM_R(B);
+	uint8_t data = (A << 4) | RAM_R(B);
 
 	WRITE_Q(data);
 
@@ -530,7 +525,7 @@ INSTRUCTION( camq )
 
 INSTRUCTION( ld )
 {
-	UINT8 r = opcode & 0x30;
+	uint8_t r = m_opcode & 0x30;
 
 	A = RAM_R(B);
 	B = B ^ r;
@@ -552,9 +547,7 @@ INSTRUCTION( ld )
 
 INSTRUCTION( lqid )
 {
-	PUSH(PC);
-	PC = (PC & 0x700) | (A << 4) | RAM_R(B);
-	WRITE_Q(ROM(PC));
+	WRITE_Q(operand);
 	POP();
 }
 
@@ -641,8 +634,8 @@ INSTRUCTION( smb3 ) { RAM_W(B, RAM_R(B) | 0x8); }
 
 INSTRUCTION( stii )
 {
-	UINT8 y = opcode & 0x0f;
-	UINT16 Bd;
+	uint8_t y = m_opcode & 0x0f;
+	uint16_t Bd;
 
 	RAM_W(B, y);
 
@@ -667,8 +660,8 @@ INSTRUCTION( stii )
 
 INSTRUCTION( x )
 {
-	UINT8 r = opcode & 0x30;
-	UINT8 t = RAM_R(B);
+	uint8_t r = m_opcode & 0x30;
+	uint8_t t = RAM_R(B);
 
 	RAM_W(B, A);
 
@@ -692,8 +685,8 @@ INSTRUCTION( x )
 
 INSTRUCTION( xad )
 {
-	UINT8 rd = opcode & 0x7f;
-	UINT8 t = A;
+	uint8_t rd = operand & 0x7f;
+	uint8_t t = A;
 
 	A = RAM_R(rd);
 
@@ -720,8 +713,8 @@ INSTRUCTION( xad )
 
 INSTRUCTION( xds )
 {
-	UINT8 t, Bd;
-	UINT8 r = opcode & 0x30;
+	uint8_t t, Bd;
+	uint8_t r = m_opcode & 0x30;
 
 	t = RAM_R(B);
 	RAM_W(B, A);
@@ -732,7 +725,8 @@ INSTRUCTION( xds )
 
 	B = B ^ r;
 
-	if (Bd == 0x0f) m_skip = 1;
+	if (Bd == 0x0f)
+		skip();
 }
 
 /*
@@ -755,8 +749,8 @@ INSTRUCTION( xds )
 
 INSTRUCTION( xis )
 {
-	UINT8 t, Bd;
-	UINT8 r = opcode & 0x30;
+	uint8_t t, Bd;
+	uint8_t r = m_opcode & 0x30;
 
 	t = RAM_R(B);
 	RAM_W(B, A);
@@ -767,7 +761,8 @@ INSTRUCTION( xis )
 
 	B = B ^ r;
 
-	if (Bd == 0x00) m_skip = 1;
+	if (Bd == 0x00)
+		skip();
 }
 
 /*
@@ -806,7 +801,7 @@ INSTRUCTION( cqma )
 
 INSTRUCTION( ldd )
 {
-	UINT8 rd = opcode & 0x7f;
+	uint8_t rd = operand & 0x7f;
 
 	A = RAM_R(rd);
 }
@@ -914,13 +909,13 @@ INSTRUCTION( lbi )
 	if (m_skip_lbi > 1) return;
 	m_skip_lbi++;
 
-	if (opcode & 0x80)
+	if (operand & 0x80)
 	{
-		B = opcode & 0x7f;
+		B = operand & 0x7f;
 	}
 	else
 	{
-		B = (opcode & 0x30) | (((opcode & 0x0f) + 1) & 0x0f);
+		B = (operand & 0x30) | (((operand & 0x0f) + 1) & 0x0f);
 	}
 }
 
@@ -940,14 +935,9 @@ INSTRUCTION( lbi )
 
 INSTRUCTION( lei )
 {
-	UINT8 y = opcode & 0x0f;
+	uint8_t y = operand & 0x0f;
 
-	EN = y;
-
-	if (BIT(EN, 2))
-	{
-		OUT_L(Q);
-	}
+	WRITE_EN(y);
 }
 
 /*
@@ -965,8 +955,8 @@ INSTRUCTION( lei )
 
 INSTRUCTION( xabr )
 {
-	UINT8 Br = A & 0x03;
-	UINT8 Bd = B & 0x0f;
+	uint8_t Br = A & 0x03;
+	uint8_t Bd = B & 0x0f;
 
 	A = B >> 4;
 	B = (Br << 4) + Bd;
@@ -974,7 +964,7 @@ INSTRUCTION( xabr )
 
 /*
 
-    Processor:          COP444
+    Processor:          COP444L
 
     Mnemonic:           XABR
 
@@ -987,10 +977,10 @@ INSTRUCTION( xabr )
 
 */
 
-INSTRUCTION( cop444_xabr )
+INSTRUCTION( cop444l_xabr )
 {
-	UINT8 Br = A & 0x07;
-	UINT8 Bd = B & 0x0f;
+	uint8_t Br = A & 0x07;
+	uint8_t Bd = B & 0x0f;
 
 	A = B >> 4;
 	B = (Br << 4) + Bd;
@@ -1015,7 +1005,8 @@ INSTRUCTION( cop444_xabr )
 
 INSTRUCTION( skc )
 {
-	if (C == 1) m_skip = 1;
+	if (C == 1)
+		skip();
 }
 
 /*
@@ -1033,7 +1024,8 @@ INSTRUCTION( skc )
 
 INSTRUCTION( ske )
 {
-	if (A == RAM_R(B)) m_skip = 1;
+	if (A == RAM_R(B))
+		skip();
 }
 
 /*
@@ -1051,7 +1043,8 @@ INSTRUCTION( ske )
 
 INSTRUCTION( skgz )
 {
-	if (IN_G() == 0) m_skip = 1;
+	if (IN_G() == 0)
+		skip();
 }
 
 /*
@@ -1076,7 +1069,8 @@ INSTRUCTION( skgz )
 
 void cop400_cpu_device::skgbz(int bit)
 {
-	if (!BIT(IN_G(), bit)) m_skip = 1;
+	if (!BIT(IN_G(), bit))
+		skip();
 }
 
 INSTRUCTION( skgbz0 ) { skgbz(0); }
@@ -1106,7 +1100,8 @@ INSTRUCTION( skgbz3 ) { skgbz(3); }
 
 void cop400_cpu_device::skmbz(int bit)
 {
-	if (!BIT(RAM_R(B), bit)) m_skip = 1;
+	if (!BIT(RAM_R(B), bit))
+		skip();
 }
 
 INSTRUCTION( skmbz0 ) { skmbz(0); }
@@ -1132,7 +1127,7 @@ INSTRUCTION( skt )
 	if (m_skt_latch)
 	{
 		m_skt_latch = 0;
-		m_skip = 1;
+		skip();
 	}
 }
 
@@ -1174,7 +1169,7 @@ INSTRUCTION( ing )
 
 INSTRUCTION( inl )
 {
-	UINT8 L = IN_L();
+	uint8_t L = IN_L();
 
 	RAM_W(B, L >> 4);
 	A = L & 0xF;
@@ -1232,11 +1227,15 @@ INSTRUCTION( omg )
 
 INSTRUCTION( xas )
 {
-	UINT8 t = SIO;
+	uint8_t t = SIO;
 	SIO = A;
 	A = t;
 
-	SKL = C;
+	if (SKL != C)
+	{
+		SKL = C;
+		sk_update();
+	}
 }
 
 /*
@@ -1313,7 +1312,7 @@ INSTRUCTION( inil )
 
 INSTRUCTION( ogi )
 {
-	UINT8 y = opcode & 0x0f;
+	uint8_t y = operand & 0x0f;
 
 	WRITE_G(y);
 }

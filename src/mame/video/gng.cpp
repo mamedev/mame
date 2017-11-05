@@ -20,7 +20,7 @@
 
 TILE_GET_INFO_MEMBER(gng_state::get_fg_tile_info)
 {
-	UINT8 attr = m_fgvideoram[tile_index + 0x400];
+	uint8_t attr = m_fgvideoram[tile_index + 0x400];
 	SET_TILE_INFO_MEMBER(0,
 			m_fgvideoram[tile_index] + ((attr & 0xc0) << 2),
 			attr & 0x0f,
@@ -29,7 +29,7 @@ TILE_GET_INFO_MEMBER(gng_state::get_fg_tile_info)
 
 TILE_GET_INFO_MEMBER(gng_state::get_bg_tile_info)
 {
-	UINT8 attr = m_bgvideoram[tile_index + 0x400];
+	uint8_t attr = m_bgvideoram[tile_index + 0x400];
 	SET_TILE_INFO_MEMBER(1,
 			m_bgvideoram[tile_index] + ((attr & 0xc0) << 2),
 			attr & 0x07,
@@ -47,8 +47,8 @@ TILE_GET_INFO_MEMBER(gng_state::get_bg_tile_info)
 
 void gng_state::video_start()
 {
-	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(gng_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(gng_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(gng_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(gng_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 32, 32);
 
 	m_fg_tilemap->set_transparent_pen(3);
 	m_bg_tilemap->set_transmask(0, 0xff, 0x00); /* split type 0 is totally transparent in front half */
@@ -88,9 +88,9 @@ WRITE8_MEMBER(gng_state::gng_bgscrolly_w)
 }
 
 
-WRITE8_MEMBER(gng_state::gng_flipscreen_w)
+WRITE_LINE_MEMBER(gng_state::flipscreen_w)
 {
-	flip_screen_set(~data & 1);
+	flip_screen_set(!state);
 }
 
 
@@ -103,14 +103,14 @@ WRITE8_MEMBER(gng_state::gng_flipscreen_w)
 
 void gng_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	UINT8 *buffered_spriteram = m_spriteram->buffer();
+	uint8_t *buffered_spriteram = m_spriteram->buffer();
 	gfx_element *gfx = m_gfxdecode->gfx(2);
 	int offs;
 
 
 	for (offs = m_spriteram->bytes() - 4; offs >= 0; offs -= 4)
 	{
-		UINT8 attributes = buffered_spriteram[offs + 1];
+		uint8_t attributes = buffered_spriteram[offs + 1];
 		int sx = buffered_spriteram[offs + 3] - 0x100 * (attributes & 0x01);
 		int sy = buffered_spriteram[offs + 2];
 		int flipx = attributes & 0x04;
@@ -132,7 +132,7 @@ void gng_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 	}
 }
 
-UINT32 gng_state::screen_update_gng(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t gng_state::screen_update_gng(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
 	draw_sprites(bitmap, cliprect);

@@ -6,7 +6,16 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "cards.h"
+
+#include "sv801.h"
+#include "sv802.h"
+#include "sv803.h"
+#include "sv805.h"
+#include "sv806.h"
+#include "sv807.h"
+
 
 SLOT_INTERFACE_START( svi_slot_cards )
 	SLOT_INTERFACE("sv801", SV801)

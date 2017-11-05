@@ -19,7 +19,7 @@
 #include "am29000.h"
 
 
-const device_type AM29000 = &device_creator<am29000_cpu_device>;
+DEFINE_DEVICE_TYPE(AM29000, am29000_cpu_device, "am29000", "AMC Am29000")
 
 
 /***************************************************************************
@@ -78,8 +78,8 @@ const device_type AM29000 = &device_creator<am29000_cpu_device>;
     STATE ACCESSORS
 ***************************************************************************/
 
-am29000_cpu_device::am29000_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: cpu_device(mconfig, AM29000, "AMD Am29000", tag, owner, clock, "am29000", __FILE__)
+am29000_cpu_device::am29000_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: cpu_device(mconfig, AM29000, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_BIG, 32, 32, 0)
 	, m_io_config("io", ENDIANNESS_BIG, 32, 32, 0)
 	, m_data_config("data", ENDIANNESS_BIG, 32, 32, 0)
@@ -118,6 +118,14 @@ am29000_cpu_device::am29000_cpu_device(const machine_config &mconfig, const char
 	m_next_pc = 0;
 }
 
+device_memory_interface::space_config_vector am29000_cpu_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config),
+		std::make_pair(AS_DATA,    &m_data_config),
+		std::make_pair(AS_IO,      &m_io_config)
+	};
+}
 
 void am29000_cpu_device::device_start()
 {
@@ -176,7 +184,7 @@ void am29000_cpu_device::device_start()
 	save_item(NAME(m_next_pc));
 
 	// Register state for debugger
-	state_add( AM29000_PC,   "PC",   m_pc     ).formatstr("%08X");
+	state_add( AM29000_PC,   "PC",   m_pc     ).callimport().formatstr("%08X");
 	state_add( AM29000_VAB,  "VAB",  m_vab    ).formatstr("%08X");
 	state_add( AM29000_OPS,  "OPS",  m_ops    ).formatstr("%08X");
 	state_add( AM29000_CPS,  "CPS",  m_cps    ).formatstr("%08X");
@@ -397,12 +405,34 @@ void am29000_cpu_device::device_start()
 	state_add( AM29000_R254, "R254", m_r[254] ).formatstr("%08X");
 	state_add( AM29000_R255, "R255", m_r[255] ).formatstr("%08X");
 
-	state_add(STATE_GENPC, "curpc", m_pc).formatstr("%08X").noshow();
-	state_add(STATE_GENFLAGS, "GENFLAGS", m_alu).formatstr("%13s").noshow();
+	state_add(STATE_GENPCBASE, "CURPC", m_pc).callimport().noshow();
+	state_add(STATE_GENFLAGS, "CURFLAGS", m_alu).formatstr("%13s").noshow();
 
 	m_icountptr = &m_icount;
 }
 
+
+//-------------------------------------------------
+//  state_import - import state into the device,
+//  after it has been set
+//-------------------------------------------------
+
+void am29000_cpu_device::state_import(const device_state_entry &entry)
+{
+	switch (entry.index())
+	{
+	case AM29000_PC:
+	case STATE_GENPCBASE:
+		m_next_pc = m_pc;
+		break;
+	}
+}
+
+
+//-------------------------------------------------
+//  state_string_export - export state as a string
+//  for the debugger
+//-------------------------------------------------
 
 void am29000_cpu_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
@@ -438,7 +468,7 @@ void am29000_cpu_device::device_reset()
 }
 
 
-void am29000_cpu_device::signal_exception(UINT32 type)
+void am29000_cpu_device::signal_exception(uint32_t type)
 {
 	m_exception_queue[m_exceptions++] = type;
 }
@@ -476,7 +506,7 @@ void am29000_cpu_device::external_irq_check()
 }
 
 
-UINT32 am29000_cpu_device::read_program_word(UINT32 address)
+uint32_t am29000_cpu_device::read_program_word(uint32_t address)
 {
 	/* TODO: ROM enable? */
 	if (m_cps & CPS_PI || m_cps & CPS_RE)
@@ -493,7 +523,7 @@ UINT32 am29000_cpu_device::read_program_word(UINT32 address)
     HELPER FUNCTIONS
 ***************************************************************************/
 
-UINT32 am29000_cpu_device::get_abs_reg(UINT8 r, UINT32 iptr)
+uint32_t am29000_cpu_device::get_abs_reg(uint8_t r, uint32_t iptr)
 {
 	if (r & 0x80)
 	{
@@ -527,8 +557,8 @@ UINT32 am29000_cpu_device::get_abs_reg(UINT8 r, UINT32 iptr)
 
 void am29000_cpu_device::fetch_decode()
 {
-	UINT32 inst;
-	UINT32 op_flags;
+	uint32_t inst;
+	uint32_t op_flags;
 
 	inst = read_program_word(m_pc);
 	m_next_ir = inst;
@@ -597,7 +627,7 @@ void am29000_cpu_device::fetch_decode()
 
 void am29000_cpu_device::execute_run()
 {
-	UINT32 call_debugger = (machine().debug_flags & DEBUG_FLAG_ENABLED) != 0;
+	uint32_t call_debugger = (machine().debug_flags & DEBUG_FLAG_ENABLED) != 0;
 
 	external_irq_check();
 
@@ -626,8 +656,8 @@ void am29000_cpu_device::execute_run()
 
 			if (m_cfg & CFG_VF)
 			{
-				UINT32 vaddr = m_vab | m_exception_queue[0] * 4;
-				UINT32 vect = m_datadirect->read_dword(vaddr);
+				uint32_t vaddr = m_vab | m_exception_queue[0] * 4;
+				uint32_t vect = m_datadirect->read_dword(vaddr);
 
 				m_pc = vect & ~3;
 				m_next_pc = m_pc;
@@ -673,8 +703,8 @@ void am29000_cpu_device::execute_set_input(int inputnum, int state)
 }
 
 
-offs_t am29000_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t am29000_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( am29000 );
-	return CPU_DISASSEMBLE_NAME(am29000)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(am29000)(this, stream, pc, oprom, opram, options);
 }

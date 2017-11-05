@@ -57,7 +57,7 @@ void instantm_state::machine_reset()
 
 // OSC1 = XTAL_3_579545MHz
 
-static MACHINE_CONFIG_START( instantm, instantm_state )
+static MACHINE_CONFIG_START( instantm )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,XTAL_3_579545MHz)
@@ -78,4 +78,4 @@ ROM_START( instantm )
 ROM_END
 
 
-GAME( 199?, instantm,  0,    instantm, instantm, driver_device,  0, ROT0, "Capcom / Polaroid", "Polaroid Instant Memories", MACHINE_IS_SKELETON )
+GAME( 199?, instantm,  0,    instantm, instantm, instantm_state,  0, ROT0, "Capcom / Polaroid", "Polaroid Instant Memories", MACHINE_IS_SKELETON )

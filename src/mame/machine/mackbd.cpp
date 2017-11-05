@@ -65,7 +65,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type MACKBD = &device_creator<mackbd_device>;
+DEFINE_DEVICE_TYPE(MACKBD, mackbd_device, "mackbd", "Macintosh Keyboard")
 
 ROM_START( mackbd )
 	ROM_REGION(0x800, MACKBD_CPU_TAG, 0)
@@ -84,22 +84,9 @@ static ADDRESS_MAP_START( mackbd_map, AS_PROGRAM, 8, mackbd_device )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mackbd_io_map, AS_IO, 8, mackbd_device )
-	AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS) AM_READ(p0_r)
 	AM_RANGE(0x2f, 0x36) AM_WRITE(p0_w)
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READWRITE(p1_r, p1_w)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READWRITE(p2_r, p2_w)
-	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(t1_r)
 ADDRESS_MAP_END
 
-//-------------------------------------------------
-//  MACHINE_CONFIG
-//-------------------------------------------------
-
-static MACHINE_CONFIG_FRAGMENT( mackbd )
-	MCFG_CPU_ADD(MACKBD_CPU_TAG, I8021, 3000000)    // "the approximate clock rate of the MPU is 3 MHz"
-	MCFG_CPU_PROGRAM_MAP(mackbd_map)
-	MCFG_CPU_IO_MAP(mackbd_io_map)
-MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( mackbd )
 	PORT_START("COL0")
@@ -182,16 +169,22 @@ static INPUT_PORTS_START( mackbd )
 INPUT_PORTS_END
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor mackbd_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( mackbd );
-}
+MACHINE_CONFIG_MEMBER( mackbd_device::device_add_mconfig )
+	MCFG_CPU_ADD(MACKBD_CPU_TAG, I8021, 3000000)    // "the approximate clock rate of the MPU is 3 MHz"
+	MCFG_CPU_PROGRAM_MAP(mackbd_map)
+	MCFG_CPU_IO_MAP(mackbd_io_map)
+	MCFG_MCS48_PORT_BUS_IN_CB(READ8(mackbd_device, p0_r))
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(mackbd_device, p1_r))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(mackbd_device, p1_w))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(mackbd_device, p2_r))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(mackbd_device, p2_w))
+	MCFG_MCS48_PORT_T1_IN_CB(IOPORT("MODS")) MCFG_DEVCB_RSHIFT(1) // option
+MACHINE_CONFIG_END
 
-const rom_entry *mackbd_device::device_rom_region() const
+const tiny_rom_entry *mackbd_device::device_rom_region() const
 {
 	return ROM_NAME( mackbd );
 }
@@ -209,8 +202,8 @@ ioport_constructor mackbd_device::device_input_ports() const
 //  mackbd_device - constructor
 //-------------------------------------------------
 
-mackbd_device::mackbd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, MACKBD, "Macintosh keyboard", tag, owner, clock, "mackbd", __FILE__),
+mackbd_device::mackbd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, MACKBD, tag, owner, clock),
 	m_maincpu(*this, MACKBD_CPU_TAG),
 	m_clkout_handler(*this),
 	m_dataout_handler(*this)
@@ -241,7 +234,7 @@ void mackbd_device::device_reset()
 void mackbd_device::scan_kbd_col(int col)
 {
 	char tempcol[8];
-	UINT16 keydata;
+	uint16_t keydata;
 
 	// read the selected col
 	sprintf(tempcol, "COL%d", col);
@@ -256,7 +249,7 @@ void mackbd_device::scan_kbd_col(int col)
 
 READ8_MEMBER(mackbd_device::p0_r)
 {
-	UINT8 ret = p0;
+	uint8_t ret = p0;
 
 	// capslock
 	if (ioport("MODS")->read() & 0x1)
@@ -316,11 +309,6 @@ WRITE8_MEMBER(mackbd_device::p2_w)
 		data_to_mac = data_from_mac = (data & 1);
 //      printf("data to/from mac = %d (PC=%x)\n", data_to_mac, m_maincpu->pc());
 	}
-}
-
-READ8_MEMBER(mackbd_device::t1_r)
-{
-	return (ioport("MODS")->read() & 0x2) ? 0xff : 0x00;
 }
 
 WRITE_LINE_MEMBER(mackbd_device::data_w)

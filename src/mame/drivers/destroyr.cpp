@@ -14,7 +14,9 @@ TODO:
 
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
+#include "machine/74259.h"
 #include "machine/watchdog.h"
+#include "screen.h"
 
 #include "destroyr.lh"
 
@@ -47,9 +49,9 @@ public:
 	required_device<palette_device> m_palette;
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_alpha_num_ram;
-	required_shared_ptr<UINT8> m_major_obj_ram;
-	required_shared_ptr<UINT8> m_minor_obj_ram;
+	required_shared_ptr<uint8_t> m_alpha_num_ram;
+	required_shared_ptr<uint8_t> m_major_obj_ram;
+	required_shared_ptr<uint8_t> m_minor_obj_ram;
 
 	/* video-related */
 	int            m_cursor;
@@ -67,7 +69,8 @@ public:
 	DECLARE_WRITE8_MEMBER(misc_w);
 	DECLARE_WRITE8_MEMBER(cursor_load_w);
 	DECLARE_WRITE8_MEMBER(interrupt_ack_w);
-	DECLARE_WRITE8_MEMBER(output_w);
+	DECLARE_WRITE_LINE_MEMBER(led0_w);
+	DECLARE_WRITE_LINE_MEMBER(led1_w);
 	DECLARE_READ8_MEMBER(input_r);
 	DECLARE_READ8_MEMBER(scanline_r);
 
@@ -75,7 +78,7 @@ public:
 	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(destroyr);
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	TIMER_CALLBACK_MEMBER(dial_callback);
 	TIMER_CALLBACK_MEMBER(frame_callback);
@@ -85,7 +88,7 @@ protected:
 };
 
 
-UINT32 destroyr_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t destroyr_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int i, j;
 
@@ -163,7 +166,7 @@ void destroyr_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		frame_callback(ptr, param);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in destroyr_state::device_timer");
+		assert_always(false, "Unknown id in destroyr_state::device_timer");
 	}
 }
 
@@ -201,7 +204,7 @@ TIMER_CALLBACK_MEMBER(destroyr_state::frame_callback)
 
 void destroyr_state::machine_reset()
 {
-	timer_set(m_screen->time_until_pos(0), TIMER_DESTROYR_FRAME);
+	m_frame_timer->adjust(m_screen->time_until_pos(0));
 
 	m_cursor = 0;
 	m_wavemod = 0;
@@ -243,37 +246,15 @@ WRITE8_MEMBER(destroyr_state::interrupt_ack_w)
 }
 
 
-WRITE8_MEMBER(destroyr_state::output_w)
+WRITE_LINE_MEMBER(destroyr_state::led0_w)
 {
-	if (offset & 8) misc_w(space, 8, data);
+	output().set_led_value(0, state);
+}
 
-	else switch (offset & 7)
-	{
-	case 0:
-		output().set_led_value(0, data & 1);
-		break;
-	case 1:
-		output().set_led_value(1, data & 1); /* no second LED present on cab */
-		break;
-	case 2:
-		/* bit 0 => songate */
-		break;
-	case 3:
-		/* bit 0 => launch */
-		break;
-	case 4:
-		/* bit 0 => explosion */
-		break;
-	case 5:
-		/* bit 0 => sonar */
-		break;
-	case 6:
-		/* bit 0 => high explosion */
-		break;
-	case 7:
-		/* bit 0 => low explosion */
-		break;
-	}
+
+WRITE_LINE_MEMBER(destroyr_state::led1_w)
+{
+	output().set_led_value(1, state); /* no second LED present on cab */
 }
 
 
@@ -286,7 +267,7 @@ READ8_MEMBER(destroyr_state::input_r)
 
 	else
 	{
-		UINT8 ret = ioport("IN0")->read();
+		uint8_t ret = ioport("IN0")->read();
 
 		if (m_potsense[0] && m_potmask[0])
 			ret |= 4;
@@ -307,14 +288,16 @@ READ8_MEMBER(destroyr_state::scanline_r)
 static ADDRESS_MAP_START( destroyr_map, AS_PROGRAM, 8, destroyr_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x00ff) AM_MIRROR(0xf00) AM_RAM
-	AM_RANGE(0x1000, 0x1fff) AM_READWRITE(input_r, output_w)
-	AM_RANGE(0x2000, 0x2fff) AM_READ_PORT("IN2")
+	AM_RANGE(0x1000, 0x1001) AM_MIRROR(0xffe) AM_READ(input_r)
+	AM_RANGE(0x1000, 0x1007) AM_MIRROR(0xff0) AM_DEVWRITE("outlatch", f9334_device, write_d0)
+	AM_RANGE(0x1008, 0x1008) AM_MIRROR(0xff7) AM_WRITE(misc_w)
+	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0xfff) AM_READ_PORT("IN2")
 	AM_RANGE(0x3000, 0x30ff) AM_MIRROR(0xf00) AM_WRITEONLY AM_SHARE("alpha_nuram")
 	AM_RANGE(0x4000, 0x401f) AM_MIRROR(0xfe0) AM_WRITEONLY AM_SHARE("major_obj_ram")
 	AM_RANGE(0x5000, 0x5000) AM_MIRROR(0xff8) AM_WRITE(cursor_load_w)
 	AM_RANGE(0x5001, 0x5001) AM_MIRROR(0xff8) AM_WRITE(interrupt_ack_w)
 	AM_RANGE(0x5002, 0x5007) AM_MIRROR(0xff8) AM_WRITEONLY AM_SHARE("minor_obj_ram")
-	AM_RANGE(0x6000, 0x6fff) AM_READ(scanline_r)
+	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0xfff) AM_READ(scanline_r)
 	AM_RANGE(0x7000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 
@@ -400,7 +383,7 @@ static const gfx_layout destroyr_minor_object_layout =
 	0x200     /* increment */
 };
 
-static const UINT32 destroyr_major_object_layout_xoffset[64] =
+static const uint32_t destroyr_major_object_layout_xoffset[64] =
 {
 	0x00, 0x02, 0x04, 0x06, 0x08, 0x0A, 0x0C, 0x0E,
 	0x10, 0x12, 0x14, 0x16, 0x18, 0x1A, 0x1C, 0x1E,
@@ -428,7 +411,7 @@ static const gfx_layout destroyr_major_object_layout =
 	nullptr
 };
 
-static const UINT32 destroyr_waves_layout_xoffset[64] =
+static const uint32_t destroyr_waves_layout_xoffset[64] =
 {
 	0x00, 0x01, 0x02, 0x03, 0x08, 0x09, 0x0A, 0x0B,
 	0x10, 0x11, 0x12, 0x13, 0x18, 0x19, 0x1A, 0x1B,
@@ -489,12 +472,22 @@ void destroyr_state::machine_start()
 	save_item(NAME(m_potsense));
 }
 
-static MACHINE_CONFIG_START( destroyr, destroyr_state )
+static MACHINE_CONFIG_START( destroyr )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, XTAL_12_096MHz / 16)
 	MCFG_CPU_PROGRAM_MAP(destroyr_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(destroyr_state, irq0_line_assert,  4*60)
+
+	MCFG_DEVICE_ADD("outlatch", F9334, 0) // F8
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(destroyr_state, led0_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(destroyr_state, led1_w))
+	// Q2 => songate
+	// Q3 => launch
+	// Q4 => explosion
+	// Q5 => sonar
+	// Q6 => high explosion
+	// Q7 => low explosion
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -564,5 +557,5 @@ ROM_START( destroyr1 )
 ROM_END
 
 
-GAMEL( 1977, destroyr,  0,        destroyr, destroyr, driver_device, 0, ORIENTATION_FLIP_X, "Atari", "Destroyer (version O2)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_destroyr )
-GAMEL( 1977, destroyr1, destroyr, destroyr, destroyr, driver_device, 0, ORIENTATION_FLIP_X, "Atari", "Destroyer (version O1)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_destroyr )
+GAMEL( 1977, destroyr,  0,        destroyr, destroyr, destroyr_state, 0, ORIENTATION_FLIP_X, "Atari", "Destroyer (version O2)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_destroyr )
+GAMEL( 1977, destroyr1, destroyr, destroyr, destroyr, destroyr_state, 0, ORIENTATION_FLIP_X, "Atari", "Destroyer (version O1)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_destroyr )

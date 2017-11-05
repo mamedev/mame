@@ -103,10 +103,14 @@ Vsync : 60.58hz
 
 
 #include "emu.h"
+#include "includes/vastar.h"
+
 #include "cpu/z80/z80.h"
+#include "machine/74259.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
-#include "includes/vastar.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 void vastar_state::machine_start()
@@ -116,9 +120,6 @@ void vastar_state::machine_start()
 
 void vastar_state::machine_reset()
 {
-	/* we must start with the second CPU halted */
-	m_subcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	m_nmi_mask = 0;
 	m_sprite_priority[0] = 0;
 
 	m_spriteram1 = m_fgvideoram + 0x000;
@@ -128,20 +129,14 @@ void vastar_state::machine_reset()
 	m_spriteram3 = m_fgvideoram + 0x800;
 }
 
-WRITE8_MEMBER(vastar_state::hold_cpu2_w)
+WRITE_LINE_MEMBER(vastar_state::flip_screen_w)
 {
-	/* I'm not sure that this works exactly like this */
-	m_subcpu->set_input_line(INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
+	flip_screen_set(state);
 }
 
-WRITE8_MEMBER(vastar_state::flip_screen_w)
+WRITE_LINE_MEMBER(vastar_state::nmi_mask_w)
 {
-	flip_screen_set(data);
-}
-
-WRITE8_MEMBER(vastar_state::nmi_mask_w)
-{
-	m_nmi_mask = data & 1;
+	m_nmi_mask = state;
 }
 
 
@@ -157,9 +152,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( main_port_map, AS_IO, 8, vastar_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x0f)
-	AM_RANGE(0x00, 0x00) AM_WRITE(nmi_mask_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(flip_screen_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(hold_cpu2_w)
+	AM_RANGE(0x00, 0x07) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
 ADDRESS_MAP_END
 
 
@@ -420,7 +413,7 @@ INTERRUPT_GEN_MEMBER(vastar_state::vblank_irq)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static MACHINE_CONFIG_START( vastar, vastar_state )
+static MACHINE_CONFIG_START( vastar )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6)
@@ -435,6 +428,11 @@ static MACHINE_CONFIG_START( vastar, vastar_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))   /* 10 CPU slices per frame - seems enough to ensure proper synchronization of the CPUs */
 
+	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(vastar_state, nmi_mask_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(vastar_state, flip_screen_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(INPUTLINE("sub", INPUT_LINE_RESET)) MCFG_DEVCB_INVERT
+
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
@@ -447,7 +445,7 @@ static MACHINE_CONFIG_START( vastar, vastar_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", vastar)
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", 256)
+	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -654,8 +652,8 @@ ROM_START( pprobe )
 ROM_END
 
 
-GAME( 1983, vastar,  0,      vastar, vastar, driver_device, 0, ROT90, "Orca (Sesame Japan license)", "Vastar (set 1)", MACHINE_SUPPORTS_SAVE ) // Sesame Japan was a brand of Fujikousan
-GAME( 1983, vastar2, vastar, vastar, vastar, driver_device, 0, ROT90, "Orca (Sesame Japan license)", "Vastar (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, vastar3, vastar, vastar, vastar, driver_device, 0, ROT90, "Orca (Sesame Japan license)", "Vastar (set 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, vastar4, vastar, vastar, vastar4,driver_device, 0, ROT90, "Orca (Sesame Japan license)", "Vastar (set 4)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, pprobe,  0,      vastar, pprobe, driver_device, 0, ROT90, "Crux / Kyugo?", "Planet Probe (prototype?)", MACHINE_SUPPORTS_SAVE ) // has no Copyright, probably because Crux didn't have a trading name at this point?
+GAME( 1983, vastar,  0,      vastar, vastar,  vastar_state, 0, ROT90, "Orca (Sesame Japan license)", "Vastar (set 1)",            MACHINE_SUPPORTS_SAVE ) // Sesame Japan was a brand of Fujikousan
+GAME( 1983, vastar2, vastar, vastar, vastar,  vastar_state, 0, ROT90, "Orca (Sesame Japan license)", "Vastar (set 2)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1983, vastar3, vastar, vastar, vastar,  vastar_state, 0, ROT90, "Orca (Sesame Japan license)", "Vastar (set 3)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1983, vastar4, vastar, vastar, vastar4, vastar_state, 0, ROT90, "Orca (Sesame Japan license)", "Vastar (set 4)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1985, pprobe,  0,      vastar, pprobe,  vastar_state, 0, ROT90, "Crux / Kyugo?",               "Planet Probe (prototype?)", MACHINE_SUPPORTS_SAVE ) // has no Copyright, probably because Crux didn't have a trading name at this point?

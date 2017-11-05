@@ -1,4 +1,4 @@
-// license:LGPL-2.1+
+// license:BSD-3-Clause
 // copyright-holders:Tomasz Slanina
 /****************************************************************************
     Time Attacker
@@ -10,18 +10,43 @@
     dipsw 8-position x2,
     volume pots x6,
     2114 ram x5,
-    ne555 + 7910CG
+    7910CQ + NE555P sound section,
+    SN74198N shifter
     no proms
 
     TODO:
     - colors
-    - sound
+    - sound (requires Epson 7910 Multi-Melody emulation)
     - game logic
+
+    Connector pinout from manual
+
+          Solder Side      Parts Side
+          -----------      ----------
+                  GND   1  GND
+                  GND   2  GND
+                  GND   3  GND
+              Speaker   4  Speaker
+                 +12V   5  +12V
+              Antenna   6  Antenna
+                        7
+                        8
+                  +5V   9  +5V
+                 VR a  10  VR b
+         2P VR Center  11  1P VR Center
+                 Coin  12  2P Serve
+           Coin Alarm  13  1P Start
+        Counter (Out)  14  2P Start
+              TV Sync  15  1P Serve
+      Counter (futei)  16  TV G
+         Counter (In)  17  TV B
+            Medal Out  18  TV R
 
 ****************************************************************************/
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "screen.h"
 
 
 class tattack_state : public driver_device
@@ -34,14 +59,14 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode") { }
 
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_colorram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_colorram;
 	tilemap_t *m_tmap;
 	DECLARE_DRIVER_INIT(tattack);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(tattack);
-	UINT32 screen_update_tattack(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_tattack(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 };
@@ -64,7 +89,7 @@ TILE_GET_INFO_MEMBER(tattack_state::get_tile_info)
 		0);
 }
 
-UINT32 tattack_state::screen_update_tattack(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t tattack_state::screen_update_tattack(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_tmap->mark_all_dirty();
 	m_tmap->draw(screen, bitmap, cliprect, 0,0);
@@ -73,7 +98,7 @@ UINT32 tattack_state::screen_update_tattack(screen_device &screen, bitmap_ind16 
 
 void tattack_state::video_start()
 {
-	m_tmap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tattack_state::get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32 );
+	m_tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tattack_state::get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32 );
 }
 
 static ADDRESS_MAP_START( mem, AS_PROGRAM, 8, tattack_state )
@@ -201,7 +226,7 @@ PALETTE_INIT_MEMBER(tattack_state, tattack)
 }
 
 
-static MACHINE_CONFIG_START( tattack, tattack_state )
+static MACHINE_CONFIG_START( tattack )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 8000000 / 2)   /* 4 MHz ? */
@@ -243,7 +268,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(tattack_state,tattack)
 {
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 
 	rom[0x1b4]=0;
 	rom[0x1b5]=0;

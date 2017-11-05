@@ -42,7 +42,7 @@ Other Chips:
             VS9210 4L06F1056 JAPAN 9525EAI  (176 Pin PQFP)
             VS920F 4L01F1435 JAPAN 9524EAI  (100 Pin PQFP)
             VS920E 4L06F1057 JAPAN 9533EAI  (176 pin PQFP)
-            VS9209 4L01F1429 JAPAN 9523EAI  (64 pin PQFP)
+            VS9209 4L01F1429 JAPAN 9523EAI  (80 pin PQFP)
             VS920D 4L04F1689 JAPAN 9524EAI  (160 pin PQFP)
             KONAMI KS10011-PF 053936 PSAC2 9522 Z02 (80 pin PQFP)
 
@@ -63,7 +63,7 @@ PALs: (4 total, not dumped, 2 located near 68000, 1 near Z80B, 1 near VS9210)
 
 DIPs: 8 position x 3 (ALL DIPs linked to VS9209)
 
-Info taken from sheet supplied with PCB, no info for SW3.
+Info taken from sheet supplied with PCB, no info for SW3 (which is never read?).
 
 ROMs: (on ALL ROMs is written only "EB26")
 
@@ -83,37 +83,17 @@ EB26IC73.BIN    27C240      /  Main Program
 ******************************************************************************/
 
 #include "emu.h"
+#include "includes/suprslam.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
-
+#include "machine/vs9209.h"
 #include "sound/2610intf.h"
-#include "video/vsystem_spr.h"
-#include "includes/suprslam.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 /*** SOUND *******************************************************************/
-
-WRITE16_MEMBER(suprslam_state::sound_command_w)
-{
-	if (ACCESSING_BITS_0_7)
-	{
-		m_pending_command = 1;
-		soundlatch_byte_w(space, offset, data & 0xff);
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-	}
-}
-
-#if 0
-READ16_MEMBER(suprslam_state::pending_command_r)
-{
-	return pending_command;
-}
-#endif
-
-WRITE8_MEMBER(suprslam_state::pending_command_clear_w)
-{
-	m_pending_command = 0;
-}
 
 WRITE8_MEMBER(suprslam_state::suprslam_sh_bankswitch_w)
 {
@@ -130,18 +110,13 @@ static ADDRESS_MAP_START( suprslam_map, AS_PROGRAM, 16, suprslam_state )
 	AM_RANGE(0xfe0000, 0xfe0fff) AM_RAM_WRITE(suprslam_screen_videoram_w) AM_SHARE("screen_videoram")
 	AM_RANGE(0xff0000, 0xff1fff) AM_RAM_WRITE(suprslam_bg_videoram_w) AM_SHARE("bg_videoram")
 	AM_RANGE(0xff2000, 0xff203f) AM_RAM AM_SHARE("screen_vregs")
-//  AM_RANGE(0xff3000, 0xff3001) AM_WRITENOP // sprite buffer trigger?
+	AM_RANGE(0xff3000, 0xff3001) AM_WRITENOP // sprite buffer trigger?
 	AM_RANGE(0xff8000, 0xff8fff) AM_DEVREADWRITE("k053936", k053936_device, linectrl_r, linectrl_w)
-	AM_RANGE(0xff9000, 0xff9001) AM_WRITE(sound_command_w)
+	AM_RANGE(0xff9000, 0xff9001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0xffa000, 0xffafff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xffd000, 0xffd01f) AM_DEVWRITE("k053936", k053936_device, ctrl_w)
 	AM_RANGE(0xffe000, 0xffe001) AM_WRITE(suprslam_bank_w)
-	AM_RANGE(0xfff000, 0xfff001) AM_READ_PORT("P1")
-	AM_RANGE(0xfff002, 0xfff003) AM_READ_PORT("P2")
-	AM_RANGE(0xfff004, 0xfff005) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xfff006, 0xfff007) AM_READ_PORT("DSW1")
-	AM_RANGE(0xfff008, 0xfff009) AM_READ_PORT("DSW2")
-	AM_RANGE(0xfff00c, 0xfff00d) AM_WRITEONLY AM_SHARE("spr_ctrl")
+	AM_RANGE(0xfff000, 0xfff01f) AM_DEVREADWRITE8("io", vs9209_device, read, write, 0x00ff)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, suprslam_state )
@@ -153,7 +128,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, suprslam_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(suprslam_sh_bankswitch_w)
-	AM_RANGE(0x04, 0x04) AM_READ(soundlatch_byte_r) AM_WRITE(pending_command_clear_w)
+	AM_RANGE(0x04, 0x04) AM_DEVREADWRITE("soundlatch", generic_latch_8_device, read, acknowledge_w)
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
 ADDRESS_MAP_END
 
@@ -161,82 +136,82 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( suprslam )
 	PORT_START("P1")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
 
 	PORT_START("P2")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN3 )                // Only in "test mode"
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SERVICE2 )             // "Test"
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_TILT )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 )                // Only in "test mode"
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE2 )             // "Test"
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_TILT )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x0001, 0x0001, "Coin Slots" )
-	PORT_DIPSETTING(      0x0001, "Common" )
-	PORT_DIPSETTING(      0x0000, "Separate" )
-	PORT_DIPNAME( 0x000e, 0x000e, DEF_STR( Coin_A ) )
-	PORT_DIPSETTING(      0x000a, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(      0x000c, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(      0x000e, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(      0x0006, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(      0x0002, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_6C ) )
-	PORT_DIPNAME( 0x0070, 0x0070, DEF_STR( Coin_B ) )
-	PORT_DIPSETTING(      0x0050, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(      0x0060, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(      0x0070, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(      0x0030, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_6C ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Free_Play ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x01, 0x01, "Coin Slots" )
+	PORT_DIPSETTING(    0x01, "Common" )
+	PORT_DIPSETTING(    0x00, "Separate" )
+	PORT_DIPNAME( 0x0e, 0x0e, DEF_STR( Coin_A ) )
+	PORT_DIPSETTING(    0x0a, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x0e, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_6C ) )
+	PORT_DIPNAME( 0x70, 0x70, DEF_STR( Coin_B ) )
+	PORT_DIPSETTING(    0x50, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x60, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x70, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_6C ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Free_Play ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(      0x0002, DEF_STR( Easy ) )
-	PORT_DIPSETTING(      0x0003, DEF_STR( Normal ) )
-	PORT_DIPSETTING(      0x0001, DEF_STR( Hard ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x000c, 0x000c, "Play Time" )
-	PORT_DIPSETTING(      0x0008, "2:00" )
-	PORT_DIPSETTING(      0x000c, "3:00" )
-	PORT_DIPSETTING(      0x0004, "4:00" )
-	PORT_DIPSETTING(      0x0000, "5:00" )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( On ) )
-	PORT_SERVICE( 0x0040, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x0080, 0x0000, "Country" )
-	PORT_DIPSETTING(      0x0080, DEF_STR( Japan ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( World ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0x0c, 0x0c, "Play Time" )
+	PORT_DIPSETTING(    0x08, "2:00" )
+	PORT_DIPSETTING(    0x0c, "3:00" )
+	PORT_DIPSETTING(    0x04, "4:00" )
+	PORT_DIPSETTING(    0x00, "5:00" )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Flip_Screen ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_SERVICE( 0x40, IP_ACTIVE_LOW )
+	PORT_DIPNAME( 0x80, 0x00, "Country" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Japan ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( World ) )
 INPUT_PORTS_END
 
 /*** GFX DECODE **************************************************************/
@@ -272,12 +247,6 @@ static GFXDECODE_START( suprslam )
 	GFXDECODE_ENTRY( "gfx3", 0, suprslam_16x16x4_layout, 0x100, 16 )
 GFXDECODE_END
 
-/*** MORE SOUND **************************************************************/
-
-WRITE_LINE_MEMBER(suprslam_state::irqhandler)
-{
-	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
-}
 
 /*** MACHINE DRIVER **********************************************************/
 
@@ -285,7 +254,7 @@ void suprslam_state::machine_start()
 {
 	save_item(NAME(m_screen_bank));
 	save_item(NAME(m_bg_bank));
-	save_item(NAME(m_pending_command));
+	save_item(NAME(m_spr_ctrl));
 
 	membank("bank1")->configure_entries(0, 4, memregion("audiocpu")->base() + 0x10000, 0x8000);
 }
@@ -294,10 +263,9 @@ void suprslam_state::machine_reset()
 {
 	m_screen_bank = 0;
 	m_bg_bank = 0;
-	m_pending_command = 0;
 }
 
-static MACHINE_CONFIG_START( suprslam, suprslam_state )
+static MACHINE_CONFIG_START( suprslam )
 
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)
 	MCFG_CPU_PROGRAM_MAP(suprslam_map)
@@ -307,6 +275,13 @@ static MACHINE_CONFIG_START( suprslam, suprslam_state )
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_io_map)
 
+	MCFG_DEVICE_ADD("io", VS9209, 0)
+	MCFG_VS9209_IN_PORTA_CB(IOPORT("P1"))
+	MCFG_VS9209_IN_PORTB_CB(IOPORT("P2"))
+	MCFG_VS9209_IN_PORTC_CB(IOPORT("SYSTEM"))
+	MCFG_VS9209_IN_PORTD_CB(IOPORT("DSW1"))
+	MCFG_VS9209_IN_PORTE_CB(IOPORT("DSW2"))
+	MCFG_VS9209_OUT_PORTG_CB(WRITE8(suprslam_state, spr_ctrl_w))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", suprslam)
 
@@ -333,8 +308,12 @@ static MACHINE_CONFIG_START( suprslam, suprslam_state )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+
 	MCFG_SOUND_ADD("ymsnd", YM2610, 8000000)
-	MCFG_YM2610_IRQ_HANDLER(WRITELINE(suprslam_state, irqhandler))
+	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
 	MCFG_SOUND_ROUTE(1, "lspeaker",  1.0)
@@ -374,4 +353,4 @@ ROM_END
 
 /*** GAME DRIVERS ************************************************************/
 
-GAME( 1995, suprslam, 0, suprslam, suprslam, driver_device, 0, ROT0, "Banpresto / Toei Animation", "From TV Animation Slam Dunk - Super Slams", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, suprslam, 0, suprslam, suprslam, suprslam_state, 0, ROT0, "Banpresto / Toei Animation", "From TV Animation Slam Dunk - Super Slams", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

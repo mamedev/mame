@@ -8,10 +8,11 @@
 
 *********************************************************************/
 
-#ifndef __BML3BUS_KANJI__
-#define __BML3BUS_KANJI__
+#ifndef MAME_BUS_BML3_BML3KANJI_H
+#define MAME_BUS_BML3_BML3KANJI_H
 
-#include "emu.h"
+#pragma once
+
 #include "bml3bus.h"
 
 //**************************************************************************
@@ -24,11 +25,7 @@ class bml3bus_kanji_device:
 {
 public:
 	// construction/destruction
-	bml3bus_kanji_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual const rom_entry *device_rom_region() const override;
+	bml3bus_kanji_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_READ8_MEMBER(bml3_kanji_r);
 	DECLARE_WRITE8_MEMBER(bml3_kanji_w);
@@ -37,13 +34,16 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	UINT16 m_kanji_addr;
+	// optional information overrides
+	virtual const tiny_rom_entry *device_rom_region() const override;
+
+	uint16_t m_kanji_addr;
 
 private:
-	UINT8 *m_rom;
+	uint8_t *m_rom;
 };
 
 // device type definition
-extern const device_type BML3BUS_KANJI;
+DECLARE_DEVICE_TYPE(BML3BUS_KANJI, bml3bus_kanji_device)
 
-#endif /* __BML3BUS_KANJI__ */
+#endif // MAME_BUS_BML3_BML3KANJI_H

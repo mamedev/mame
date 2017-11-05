@@ -92,6 +92,7 @@ table hr {
 .footer {
 	color: gray ;
 	font-size: x-small ;
+	text-transform: lowercase ;
 }
 
 input[type=text] {
@@ -156,4 +157,8 @@ table.book span {
 	text-align: left ;
 	display: block ;
 	margin-top: 0.25em ;
+}
+
+img {
+	background-color: white ;
 }

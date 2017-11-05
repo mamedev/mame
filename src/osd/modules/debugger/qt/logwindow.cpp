@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Andrew Gardner
+#include "emu.h"
 #include <QtWidgets/QVBoxLayout>
 
 #include "logwindow.h"
@@ -60,13 +61,13 @@ void LogWindowQtConfig::applyToQWidget(QWidget* widget)
 }
 
 
-void LogWindowQtConfig::addToXmlDataNode(xml_data_node* node) const
+void LogWindowQtConfig::addToXmlDataNode(util::xml::data_node &node) const
 {
 	WindowQtConfig::addToXmlDataNode(node);
 }
 
 
-void LogWindowQtConfig::recoverFromXmlNode(xml_data_node* node)
+void LogWindowQtConfig::recoverFromXmlNode(util::xml::data_node const &node)
 {
 	WindowQtConfig::recoverFromXmlNode(node);
 }

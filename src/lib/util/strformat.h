@@ -13,7 +13,7 @@
     object with an appropriate stream output operator can be used as
     a format argument with the %s conversion.
 
-    Since the funcitons are implemented using C++ iostream, some
+    Since the functions are implemented using C++ iostream, some
     behaviour more closely resembles iostream output operator behaviour
     than printf behaviour.  You are also exposed to bugs in your C++
     iostream implementation (e.g. hexadecimal scientific format doesn't
@@ -28,7 +28,7 @@
 
     Position specifiers for arguments (%123$), field width (*456$) and
     precision (.*789$) are supported.  Mixing explicit and implied
-    positions for arugments/widths/precisions is discouraged, although
+    positions for arguments/widths/precisions is discouraged, although
     it does produce deterministic behaviour.
 
     The following format flags are recognised:
@@ -79,13 +79,13 @@
     - d/i: signed decimal for integer/char/bool types
     - u:   unsigned decimal for integer/char/bool types
     - o:   unsigned octal for integer/char/bool types
-    - x/X: lower/upppercase unsigned hexadecimal for integer/char/bool
+    - x/X: lower/uppercase unsigned hexadecimal for integer/char/bool
            types or scientific hexadecimal for floating-point types
     - e/E: lower/uppercase scientific decimal for floating-point types
     - f/F: lower/uppercase fixed-point decimal for floating-point types
     - g/G: default stream output format for floating-point types (may
            differ from printf behaviour)
-    - a/A: lower/upppercase scientific hexadecimal for floating-point
+    - a/A: lower/uppercase scientific hexadecimal for floating-point
            types or hexadecimal for integer types
     - c/C: cast integer types to stream's character type, no automatic
            widening or narrowing
@@ -139,7 +139,7 @@
       versa.
     - Precision ignored for d/i/u/o/x/X conversions (should set minimum
       digits to print).
-    - Precisoin for s/S conversion is only honoured for string-like
+    - Precision for s/S conversion is only honoured for string-like
       types (output character pointer/array and std::basic_string).
     - If the output character type is not char, signed char or unsgined
       char, printing the a value of this type with d/i/u/o/x/X
@@ -166,10 +166,12 @@
 
 ***************************************************************************/
 
+#ifndef MAME_UTIL_STRFORMAT_H
+#define MAME_UTIL_STRFORMAT_H
+
 #pragma once
 
-#ifndef __MAME_UTIL_STRFORMAT_H__
-#define __MAME_UTIL_STRFORMAT_H__
+#include "vecstream.h"
 
 #include <algorithm>
 #include <array>
@@ -185,18 +187,18 @@
 #include <type_traits>
 #include <utility>
 
-#if defined(__GLIBCXX__) && (__GLIBCXX__ < 20150413)
-namespace std
-{
-template<class _Container>
-	inline constexpr auto
-	cbegin(const _Container& __cont) noexcept(noexcept(std::begin(__cont)))-> decltype(std::begin(__cont))
-	{ return std::begin(__cont); }
+#if defined(__GLIBCXX__)
+namespace std {
+namespace mame_cxx14_compat {
+template <typename T>
+inline constexpr auto cbegin(const T& cont) noexcept(noexcept(std::begin(cont))) -> decltype(std::begin(cont))
+{ return std::begin(cont); }
 
-template<class _Container>
-	inline constexpr auto
-	cend(const _Container& __cont) noexcept(noexcept(std::end(__cont)))-> decltype(std::end(__cont))
-	{ return std::end(__cont); }
+template <typename T>
+inline constexpr auto cend(const T& cont) noexcept(noexcept(std::end(cont))) -> decltype(std::end(cont))
+{ return std::end(cont); }
+}
+using namespace mame_cxx14_compat;
 }
 #endif
 
@@ -1746,4 +1748,86 @@ using detail::make_format_argument_pack;
 
 using util::string_format;
 
-#endif // __MAME_UTIL_STRFORMAT_H__
+
+//**************************************************************************
+//  EXTERNAL TEMPLATE INSTANTIATIONS
+//**************************************************************************
+
+namespace util {
+
+namespace detail {
+
+extern template class format_chars<char>;
+extern template class format_chars<wchar_t>;
+
+extern template void format_flags::apply(std::ostream &) const;
+extern template void format_flags::apply(std::wostream &) const;
+extern template void format_flags::apply(std::iostream &) const;
+extern template void format_flags::apply(std::wiostream &) const;
+extern template void format_flags::apply(std::ostringstream &) const;
+extern template void format_flags::apply(std::wostringstream &) const;
+extern template void format_flags::apply(std::stringstream &) const;
+extern template void format_flags::apply(std::wstringstream &) const;
+extern template void format_flags::apply(ovectorstream &) const;
+extern template void format_flags::apply(wovectorstream &) const;
+extern template void format_flags::apply(vectorstream &) const;
+extern template void format_flags::apply(wvectorstream &) const;
+
+extern template class format_argument<std::ostream>;
+extern template class format_argument<std::wostream>;
+extern template class format_argument<std::iostream>;
+extern template class format_argument<std::wiostream>;
+extern template class format_argument<std::ostringstream>;
+extern template class format_argument<std::wostringstream>;
+extern template class format_argument<std::stringstream>;
+extern template class format_argument<std::wstringstream>;
+extern template class format_argument<ovectorstream>;
+extern template class format_argument<wovectorstream>;
+extern template class format_argument<vectorstream>;
+extern template class format_argument<wvectorstream>;
+
+extern template class format_argument_pack<std::ostream>;
+extern template class format_argument_pack<std::wostream>;
+extern template class format_argument_pack<std::iostream>;
+extern template class format_argument_pack<std::wiostream>;
+extern template class format_argument_pack<std::ostringstream>;
+extern template class format_argument_pack<std::wostringstream>;
+extern template class format_argument_pack<std::stringstream>;
+extern template class format_argument_pack<std::wstringstream>;
+extern template class format_argument_pack<ovectorstream>;
+extern template class format_argument_pack<wovectorstream>;
+extern template class format_argument_pack<vectorstream>;
+extern template class format_argument_pack<wvectorstream>;
+
+extern template std::ostream::off_type stream_format(std::ostream &, format_argument_pack<std::ostream> const &);
+extern template std::wostream::off_type stream_format(std::wostream &, format_argument_pack<std::wostream> const &);
+extern template std::iostream::off_type stream_format(std::iostream &, format_argument_pack<std::ostream> const &);
+extern template std::iostream::off_type stream_format(std::iostream &, format_argument_pack<std::iostream> const &);
+extern template std::wiostream::off_type stream_format(std::wiostream &, format_argument_pack<std::wostream> const &);
+extern template std::wiostream::off_type stream_format(std::wiostream &, format_argument_pack<std::wiostream> const &);
+extern template std::ostringstream::off_type stream_format(std::ostringstream &, format_argument_pack<std::ostream> const &);
+extern template std::ostringstream::off_type stream_format(std::ostringstream &, format_argument_pack<std::ostringstream> const &);
+extern template std::wostringstream::off_type stream_format(std::wostringstream &, format_argument_pack<std::wostream> const &);
+extern template std::wostringstream::off_type stream_format(std::wostringstream &, format_argument_pack<std::wostringstream> const &);
+extern template std::stringstream::off_type stream_format(std::stringstream &, format_argument_pack<std::ostream> const &);
+extern template std::stringstream::off_type stream_format(std::stringstream &, format_argument_pack<std::iostream> const &);
+extern template std::stringstream::off_type stream_format(std::stringstream &, format_argument_pack<std::stringstream> const &);
+extern template std::wstringstream::off_type stream_format(std::wstringstream &, format_argument_pack<std::wostream> const &);
+extern template std::wstringstream::off_type stream_format(std::wstringstream &, format_argument_pack<std::wiostream> const &);
+extern template std::wstringstream::off_type stream_format(std::wstringstream &, format_argument_pack<std::wstringstream> const &);
+extern template ovectorstream::off_type stream_format(ovectorstream &, format_argument_pack<std::ostream> const &);
+extern template ovectorstream::off_type stream_format(ovectorstream &, format_argument_pack<ovectorstream> const &);
+extern template wovectorstream::off_type stream_format(wovectorstream &, format_argument_pack<std::wostream> const &);
+extern template wovectorstream::off_type stream_format(wovectorstream &, format_argument_pack<wovectorstream> const &);
+extern template vectorstream::off_type stream_format(vectorstream &, format_argument_pack<std::ostream> const &);
+extern template vectorstream::off_type stream_format(vectorstream &, format_argument_pack<std::iostream> const &);
+extern template vectorstream::off_type stream_format(vectorstream &, format_argument_pack<vectorstream> const &);
+extern template wvectorstream::off_type stream_format(wvectorstream &, format_argument_pack<std::wostream> const &);
+extern template wvectorstream::off_type stream_format(wvectorstream &, format_argument_pack<std::wiostream> const &);
+extern template wvectorstream::off_type stream_format(wvectorstream &, format_argument_pack<wvectorstream> const &);
+
+} // namespace detail
+
+} // namespace util
+
+#endif // MAME_UTIL_STRFORMAT_H

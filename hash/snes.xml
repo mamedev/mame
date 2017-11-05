@@ -1357,7 +1357,7 @@ Beyond that last category are the roms waiting to be classified.
 			<feature name="u1" value="U1 EPROM" />
 			<feature name="u2" value="U2 EPROM" />
 			<feature name="u3" value="U3 EPROM" />
-			<feature name="u4" value="U4 EPROM" />	<!-- empty socket -->
+			<feature name="u4" value="U4 EPROM" />  <!-- empty socket -->
 			<feature name="u5" value="U5 SRAM" />
 			<feature name="u6" value="U6 PLD" />
 			<feature name="u7" value="U7 74LS157" />
@@ -2879,6 +2879,31 @@ Beyond that last category are the roms waiting to be classified.
 			<feature name="slot" value="hirom" />
 			<dataarea name="rom" size="524288">
 				<rom name="sylvester and tweety (proto oct 11th 1993).sfc" size="524288" crc="cbe02df3" sha1="ebf556057c1951a70ed036f915e96aff7846321a" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="syvalionp" cloneof="syvalion">
+		<!-- TeamEurope -->
+		<description>Syvalion (Euro, Prototype)</description>
+		<year>1992</year>
+		<publisher>Toshiba EMI</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-2P3B-01" />
+			<feature name="u1" value="U1 EPROM(J)" />
+			<feature name="u2" value="U2 EPROM(J)" />
+			<feature name="u3" value="U3 SRAM" />
+			<feature name="u4" value="U4 74F139" />
+			<feature name="u5" value="U5 CIC" />
+			<feature name="lockout" value="D413 9208 C" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="1048576">
+				<rom name="SY PAL 0.u1" size="524288" crc="466f4e49" sha1="aed93ef5c31371b3278dcb59d8a116416f2994ed" offset="0x000000" />
+				<rom name="SY PAL 1.u2" size="524288" crc="c3e1dac2" sha1="750f1f3dd5d2863fcb128edccc4841faf24813cc" offset="0x080000" />
+			</dataarea>
+			<dataarea name="nvram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -9904,8 +9929,8 @@ more investigation needed...
 			<feature name="cart_back_label" value="920214" />
 			<feature name="slot" value="hirom" />
 			<dataarea name="rom" size="3145728">
-				<rom name="shvc-adkj-0 p0.u1" size="2097152" crc="5b606ef7" sha1="6b47084fba80ce07347010a7bb4af063f058936b" offset="0x000000" />
-				<rom name="shvc-adkj-0 p3.u2" size="1048576" crc="5b379b50" sha1="83b0507f1a84e686d76b5b869c1a5f2e22278097" offset="0x200000" />
+				<rom name="SHVC-ADKJ-0 P0.u1" size="2097152" crc="5b606ef7" sha1="6b47084fba80ce07347010a7bb4af063f058936b" offset="0x000000" />
+				<rom name="SHVC-ADKJ-0 P3.u2" size="1048576" crc="5b379b50" sha1="83b0507f1a84e686d76b5b869c1a5f2e22278097" offset="0x200000" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -10725,6 +10750,36 @@ more investigation needed...
 		</part>
 	</software>
 
+<!-- Pending
+
+    <software name="dkongc2s" cloneof="dkongc2">
+        <description>Donkey Kong Country 2 - Diddy's Kong Quest (Esp, Rev. A)</description>
+        <year>1995</year>
+        <publisher>Nintendo</publisher>
+        <info name="serial" value="SNSP-ADND-EUR" />
+        <sharedfeat name="compatibility" value="PAL"/>
+        <part name="cart" interface="snes_cart">
+            <feature name="pcb" value="SHVC-1J1M-20" />
+            <feature name="u1" value="U1 MASK ROM(N)" />
+            <feature name="u2" value="U2 16K SRAM" />
+            <feature name="u3" value="U3 MAD-1" />
+            <feature name="u4" value="U4 CIC" />
+            <feature name="lockout" value="D413B 9546 C" />
+            <feature name="battery" value="BATT CR2032" />
+            <feature name="cart_revision" value="A" />
+            <feature name="cart_model" value="SNSP-006" />
+            <feature name="cart_back_label" value="SNSP-ESP" />
+            <feature name="slot" value="hirom" />
+            <dataarea name="rom" size="4194304">
+                <rom name="spal-adnd-0.u1" size="4194304" crc="" sha1="" offset="0x000000" />
+            </dataarea>
+            <dataarea name="nvram" size="2048">
+            </dataarea>
+        </part>
+    </software>
+
+-->
+
 	<software name="dkongc2ua" cloneof="dkongc2">
 		<description>Donkey Kong Country 2 - Diddy's Kong Quest (USA)</description>
 		<year>1995</year>
@@ -11494,7 +11549,7 @@ more investigation needed...
 		</part>
 	</software>
 
-	<software name="dngmster">
+	<software name="dmaster">
 		<description>Dungeon Master (Euro)</description>
 		<year>1992</year>
 		<publisher>JVC</publisher>
@@ -11905,7 +11960,7 @@ more investigation needed...
 			<feature name="cart_back_label" value="901121" />
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1048576">
-				<rom name="shvc-eh-0.u1" size="1048576" crc="5cb9bc35" sha1="745ebf8164ca7be58829c6130c0e06f330cd0748" offset="0x000000" />
+				<rom name="SHVC-EH-0.u1" size="1048576" crc="5cb9bc35" sha1="745ebf8164ca7be58829c6130c0e06f330cd0748" offset="0x000000" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -12022,6 +12077,28 @@ more investigation needed...
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="524288">
 				<rom name="sns-fn-0.u1" size="524288" crc="04c716bb" sha1="3f20c2c8749ccee3a53732b41ae026bf3aaa2158" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fatfury">
+		<description>Fatal Fury (Euro)</description>
+		<year>1993</year>
+		<publisher>Takara</publisher>
+		<info name="serial" value="SNSP-GN-NOE" />
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-2A0N-10" />
+			<feature name="u1" value="U1 P0" />
+			<feature name="u2" value="U2 P1" />
+			<feature name="u3" value="U3 74LS00" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="lockout" value="D413A 9226 C" />
+			<feature name="cart_model" value="" />
+			<feature name="cart_back_label" value="" />
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="1572864">
+				<rom name="spal-gn-0 p0.u1" size="1048576" crc="b48cfd3d" sha1="fc4910aa8dc8945f3d2402b737eb9e999424908f" offset="0x000000" />
+				<rom name="spal-gn-0 p1.u2" size="524288"  crc="9df54331" sha1="36c5081a05353cc0b200b26b0d19f33057cb2ae7" offset="0x100000" />
 			</dataarea>
 		</part>
 	</software>
@@ -19293,17 +19370,17 @@ more investigation needed...
 		<description>Nintendo Scope 6 (Euro)</description>
 		<year>1992</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="SNSP-LR-FAH, SNSP-LR-FAH-1" />
+		<info name="serial" value="SNSP-LR-FAH, SNSP-LR-FAH-1, SNSP-LR-UKV" />
 		<part name="cart" interface="snes_cart">
 			<feature name="pcb" value="SHVC-1A0N-02" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 CIC" />
 			<feature name="lockout" value="" />
 			<feature name="cart_model" value="SNSP-006" />
-			<feature name="cart_back_label" value="SNSP-FAH" />
+			<feature name="cart_back_label" value="SNSP-FAH, SNSP-UKV" />
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1048576">
-				<rom name="spal-lr-0.u1" size="1048576" crc="b1859ca4" sha1="e5efb589e2dd783ef2d99f01caa866d8a3a04d16" offset="0x000000" />
+				<rom name="SPAL-LR-0.u1" size="1048576" crc="b1859ca4" sha1="e5efb589e2dd783ef2d99f01caa866d8a3a04d16" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -20148,7 +20225,7 @@ more investigation needed...
 		<description>Pilotwings (Euro)</description>
 		<year>1991</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="SNSP-PW-NOE" />
+		<info name="serial" value="SNSP-PW-NOE, SNSP-PW-ESP" />
 		<part name="cart" interface="snes_cart">
 			<feature name="enhancement" value="DSP1" />
 			<feature name="pcb" value="SHVC-1B0N-03" />
@@ -20157,9 +20234,9 @@ more investigation needed...
 			<feature name="u3" value="U3 74LS139" />
 			<feature name="u4" value="U4 74HCU04" />
 			<feature name="u5" value="U5 CIC" />
-			<feature name="lockout" value="" />
+			<feature name="lockout" value="D413A 9247 BA" />
 			<feature name="cart_model" value="SNSP-006" />
-			<feature name="cart_back_label" value="SNSP-NOE" />
+			<feature name="cart_back_label" value="SNSP-NOE, SNSP-ESP" />
 			<feature name="slot" value="lorom_dsp" />
 			<dataarea name="rom" size="524288">
 				<rom name="spal-pw-0.u1" size="524288" crc="def45776" sha1="d450d6d580d163fdfcc4f58d5bf8fafd7f510750" offset="0x000000" />
@@ -23564,12 +23641,12 @@ more investigation needed...
 			<feature name="pcb" value="SHVC-1A0N-20" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="lockout" value="" />
+			<feature name="lockout" value="D413A 9402 BA" />
 			<feature name="cart_model" value="SNSP-006(-01)" />
 			<feature name="cart_back_label" value="SNSP-EUR" />
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="2097152">
-				<rom name="spal-amcp-0.u1" size="2097152" crc="d2b0d5fe" sha1="cc83ec37d7669834047510d6bbde1e0eee4667c9" offset="0x000000" />
+				<rom name="spal-amcp-0.u1" size="2097152" crc="4c68c5cf" sha1="5b10fab4bbb58c57eaa40760d59c56bf775ad466" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -25196,7 +25273,7 @@ more investigation needed...
 			<feature name="cart_back_label" value="920214" />
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1048576">
-				<rom name="shvc-fc-0.u1" size="1048576" crc="7c94c86c" sha1="9d60d55b690c02413aa668ed9da196b4f1449e81" offset="0x000000" />
+				<rom name="SHVC-FC-0.u1" size="1048576" crc="7c94c86c" sha1="9d60d55b690c02413aa668ed9da196b4f1449e81" offset="0x000000" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -25823,7 +25900,7 @@ more investigation needed...
 			<feature name="led2" value="LED2" /> <!-- green, connected to CN2? -->
 			<feature name="cart_model" value="SHVC-042" />
 			<feature name="cart_back_label" value="SHVC-SGB2-JPN" />
-			<feature name="slot" value="lorom_sgb" />
+			<feature name="slot" value="lorom_sgb2" />
 			<dataarea name="rom" size="524288">
 				<rom name="sys-sgb2-10.u4" size="524288" crc="cb176e45" sha1="e5b2922ca137051059e4269b236d07a22c07bc84" offset="0x000000" />
 			</dataarea>
@@ -28100,7 +28177,7 @@ Alternate board (XL-1)
 			<feature name="cart_back_label" value="SNSP-EUR, SNSP-FAH" />
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="524288">
-				<rom name="spal-fs-0.u1" size="524288" crc="442c47cb" sha1="6eb6dd6da1e8eefad24c30b59ededbd671b9db2c" offset="0x000000" />
+				<rom name="SPAL-FS-0.u1" size="524288" crc="442c47cb" sha1="6eb6dd6da1e8eefad24c30b59ededbd671b9db2c" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -33240,6 +33317,26 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
+	<software name="lostvik">
+		<description>The Lost Vikings (Euro)</description>
+		<year>1993</year>
+		<publisher>Interplay</publisher>
+		<info name="serial" value="SNSP-LV-SCN" />
+		<info name="release" value="19931028" />
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A0N-20" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="lockout" value="" />
+			<feature name="cart_model" value="SNSP-006" />
+			<feature name="cart_back_label" value="SNSP-UKV" />
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="1048576">
+				<rom name="SPAL-LV-0.u1" size="1048576" crc="66989491" sha1="2bd4c2af6e5d7252d16342fd1a64454dca3ce557" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="turnburns" cloneof="turnburn">
 		<!-- single cartridge source: Zidanax -->
 		<description>Turn and Burn - No-Fly Zone (Spa)</description>
@@ -34238,7 +34335,7 @@ List of unclassified roms
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="arabianp" cloneof="arabian">
 		<description>Arabian Nights - Sabaku no Seirei Ou (Jpn, Prototype)</description>
 		<year>1996</year>
@@ -37664,7 +37761,7 @@ List of unclassified roms
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="downwrldd" cloneof="downwrld">
 		<description>Down the World - Mervil's Ambition (Jpn, Rolling Demo)</description>
 		<year>1994</year>
@@ -37847,9 +37944,18 @@ List of unclassified roms
 		<info name="alt_title" value="ドラゴンボールZ超悟空伝 覚醒 編" />
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A3M-30" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 64K SRAM" />
+			<feature name="u3" value="U3 MAD-1" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="lockout" value="D411B 9531 B" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="920214" />
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="2097152">
-				<rom name="dragon ball z - super gokuu den - kakusei hen (japan).sfc" size="2097152" crc="3172cd4f" sha1="3b7278a54f8d470dcb1bd92060d744380325f30b" offset="0x000000" />
+				<rom name="shvc-a2zj-0.u1" size="2097152" crc="3172cd4f" sha1="3b7278a54f8d470dcb1bd92060d744380325f30b" offset="0x000000" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -38147,7 +38253,7 @@ List of unclassified roms
 		</part>
 	</software>
 
-	<software name="dngmsterj" cloneof="dngmster">
+	<software name="dmasterj" cloneof="dmaster">
 		<description>Dungeon Master (Jpn, Rev. A)</description>
 		<year>1991</year>
 		<publisher>Victor Musical Industries</publisher>
@@ -38168,7 +38274,7 @@ List of unclassified roms
 		</part>
 	</software>
 
-	<software name="dngmsterj1" cloneof="dngmster">
+	<software name="dmasterj1" cloneof="dmaster">
 		<description>Dungeon Master (Jpn)</description>
 		<year>1991</year>
 		<publisher>Victor Musical Industries</publisher>
@@ -38189,7 +38295,7 @@ List of unclassified roms
 		</part>
 	</software>
 
-	<software name="dngmsteru" cloneof="dngmster">
+	<software name="dmasteru" cloneof="dmaster">
 		<description>Dungeon Master (USA)</description>
 		<year>1993</year>
 		<publisher>JVC</publisher>
@@ -38999,18 +39105,6 @@ List of unclassified roms
 				<rom name="farland story 2 (japan).sfc" size="3145728" crc="1cf58de9" sha1="fc2c596cc601e7d7dbb4abc7262bc91b97a5ceb7" offset="0x000000" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="fatfury">
-		<description>Fatal Fury (Euro)</description>
-		<year>1993</year>
-		<publisher>Takara</publisher>
-		<part name="cart" interface="snes_cart">
-			<feature name="slot" value="lorom" />
-			<dataarea name="rom" size="1572864">
-				<rom name="fatal fury (europe).sfc" size="1572864" crc="f93611c6" sha1="ebf3eb02a975c71332685cd85a88858de80bafb0" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -40283,7 +40377,7 @@ List of unclassified roms
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="ganpurup" cloneof="ganpuru">
 		<description>Ganpuru - Gunman's Proof (Jpn, Prototype)</description>
 		<year>1997</year>
@@ -46074,18 +46168,6 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1048576">
 				<rom name="lost vikings ii, the (usa).sfc" size="1048576" crc="3aa01dbd" sha1="7a461513fcea58e3c8c9dbaa431ab6635dbb3ffd" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="lostvik">
-		<description>The Lost Vikings (Euro)</description>
-		<year>1993</year>
-		<publisher>Interplay</publisher>
-		<part name="cart" interface="snes_cart">
-			<feature name="slot" value="lorom" />
-			<dataarea name="rom" size="1048576">
-				<rom name="lost vikings, the (europe).sfc" size="1048576" crc="66989491" sha1="2bd4c2af6e5d7252d16342fd1a64454dca3ce557" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -52260,6 +52342,35 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 			</dataarea>
 		</part>
 	</software>
+
+<!-- Pending
+
+    <software name="ranmab" cloneof="ranma">
+        <description>Ranma ½ (Euro, Rev. B)</description>
+        <year>1992</year>
+        <publisher>Ocean</publisher>
+        <info name="serial" value="SNSP-R2-UKV" />
+        <sharedfeat name="compatibility" value="PAL"/>
+        <part name="cart" interface="snes_cart">
+            <feature name="pcb" value="SHVC-2J0N-01" />
+            <feature name="u1" value="U1 P0" />
+            <feature name="u2" value="U2 P1" />
+            <feature name="u3" value="U3 74LS00" />
+            <feature name="u4" value="U4 CIC" />
+            <feature name="lockout" value="D413A 9344 CB" />
+            <feature name="cart_model" value="SNSP-006" />
+            <feature name="cart_back_label" value="SNSP-UKV" />
+            <feature name="slot" value="hirom" />
+            <dataarea name="rom" size="4194304">
+                <rom name="spal-r2-0 p0.u1" size="" crc="" sha1="" offset="0x000000" />
+                <rom name="spal-r2-0 p1.u1" size="" crc="" sha1="" offset="0x200000" />
+            </dataarea>
+            <dataarea name="nvram" size="2048">
+            </dataarea>
+        </part>
+    </software>
+
+-->
 
 	<software name="ranma">
 		<description>Ranma ½ (Euro)</description>
@@ -59485,18 +59596,6 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		</part>
 	</software>
 
-	<software name="syvalionp" cloneof="syvalion">
-		<description>Syvalion (Euro, Prototype)</description>
-		<year>1992</year>
-		<publisher>Toshiba EMI</publisher>
-		<part name="cart" interface="snes_cart">
-			<feature name="slot" value="lorom" />
-			<dataarea name="rom" size="1048576">
-				<rom name="syvalion (europe) (beta).sfc" size="1048576" crc="be122755" sha1="ddfa611f1177f371c1107dbd8e8ecdb19011a232" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="syvalion">
 		<description>Syvalion (Euro)</description>
 		<year>1992</year>
@@ -61015,7 +61114,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="tougedenp" cloneof="tougeden">
 		<description>Touge Densetsu - Saisoku Battle (Jpn, Prototype)</description>
 		<year>1996</year>
@@ -61911,7 +62010,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="umizurimp" cloneof="umizurim">
 		<description>Umizuri Meijin - Suzuki Hen (Jpn, Prototype)</description>
 		<year>1994</year>

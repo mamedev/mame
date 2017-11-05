@@ -77,7 +77,7 @@
 
 ****************************************************************************
 
-    See also sega.c for the Sega G-80 Vector games.
+    See also segag80v.cpp for the Sega G-80 Vector games.
 
     Many thanks go to Dave Fish for the fine detective work he did into the
     G-80 security chips (315-0064, 315-0070, 315-0076, 315-0082) which provided
@@ -107,14 +107,15 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/segag80r.h"
+#include "machine/segag80.h"
+
 #include "cpu/z80/z80.h"
-#include "sound/dac.h"
 #include "sound/sn76496.h"
 #include "sound/samples.h"
 #include "machine/i8255.h"
 #include "machine/segacrpt_device.h"
-#include "machine/segag80.h"
-#include "includes/segag80r.h"
+#include "speaker.h"
 
 
 /*************************************
@@ -155,7 +156,11 @@ INPUT_CHANGED_MEMBER(segag80r_state::service_switch)
 
 void segag80r_state::machine_start()
 {
+	m_vblank_latch_clear_timer = timer_alloc(TIMER_VBLANK_LATCH_CLEAR);
+	m_scrambled_write_pc = 0xffff;
+
 	/* register for save states */
+	save_item(NAME(m_scrambled_write_pc));
 }
 
 
@@ -166,15 +171,28 @@ void segag80r_state::machine_start()
  *
  *************************************/
 
+READ8_MEMBER(segag80r_state::g80r_opcode_r)
+{
+	// opcodes themselves are not scrambled
+	uint8_t op = m_maincpu->space(AS_PROGRAM).read_byte(offset);
+
+	// writes via opcode $32 (LD $(XXYY),A) get scrambled
+	if (!machine().side_effect_disabled())
+		m_scrambled_write_pc = (op == 0x32) ? offset : 0xffff;
+
+	return op;
+}
+
 offs_t segag80r_state::decrypt_offset(address_space &space, offs_t offset)
 {
-	/* ignore anything but accesses via opcode $32 (LD $(XXYY),A) */
-	offs_t pc = space.device().safe_pcbase();
-	if ((UINT16)pc == 0xffff || space.read_byte(pc) != 0x32)
+	if (m_scrambled_write_pc == 0xffff)
 		return offset;
 
-	/* fetch the low byte of the address and munge it */
-	return (offset & 0xff00) | (*m_decrypt)(pc, space.read_byte(pc + 1));
+	offs_t pc = m_scrambled_write_pc;
+	m_scrambled_write_pc = 0xffff;
+
+	/* munge the low byte of the address */
+	return (offset & 0xff00) | (*m_decrypt)(pc, offset & 0xff);
 }
 
 WRITE8_MEMBER(segag80r_state::mainram_w)
@@ -196,7 +214,7 @@ WRITE8_MEMBER(segag80r_state::usb_ram_w){ m_usbsnd->ram_w(space, decrypt_offset(
  *
  *************************************/
 
-inline UINT8 segag80r_state::demangle(UINT8 d7d6, UINT8 d5d4, UINT8 d3d2, UINT8 d1d0)
+inline uint8_t segag80r_state::demangle(uint8_t d7d6, uint8_t d5d4, uint8_t d3d2, uint8_t d1d0)
 {
 	return ((d7d6 << 7) & 0x80) | ((d7d6 << 2) & 0x40) |
 			((d5d4 << 5) & 0x20) | ((d5d4 << 0) & 0x10) |
@@ -212,10 +230,10 @@ READ8_MEMBER(segag80r_state::mangled_ports_r)
 	/* read as two bits from each of 4 ports. For this reason, the input   */
 	/* ports have been organized logically, and are demangled at runtime.  */
 	/* 4 input ports each provide 8 bits of information. */
-	UINT8 d7d6 = ioport("D7D6")->read();
-	UINT8 d5d4 = ioport("D5D4")->read();
-	UINT8 d3d2 = ioport("D3D2")->read();
-	UINT8 d1d0 = ioport("D1D0")->read();
+	uint8_t d7d6 = ioport("D7D6")->read();
+	uint8_t d5d4 = ioport("D5D4")->read();
+	uint8_t d3d2 = ioport("D3D2")->read();
+	uint8_t d1d0 = ioport("D1D0")->read();
 	int shift = offset & 3;
 	return demangle(d7d6 >> shift, d5d4 >> shift, d3d2 >> shift, d1d0 >> shift);
 }
@@ -227,17 +245,17 @@ READ8_MEMBER(segag80r_state::spaceod_mangled_ports_r)
 	/* versus cocktail cabinets; we fix this here. The input ports are */
 	/* coded for cocktail mode; for upright mode, we manually shuffle the */
 	/* bits around. */
-	UINT8 d7d6 = ioport("D7D6")->read();
-	UINT8 d5d4 = ioport("D5D4")->read();
-	UINT8 d3d2 = ioport("D3D2")->read();
-	UINT8 d1d0 = ioport("D1D0")->read();
+	uint8_t d7d6 = ioport("D7D6")->read();
+	uint8_t d5d4 = ioport("D5D4")->read();
+	uint8_t d3d2 = ioport("D3D2")->read();
+	uint8_t d1d0 = ioport("D1D0")->read();
 	int shift = offset & 3;
 
 	/* tweak bits for the upright case */
-	UINT8 upright = d3d2 & 0x04;
+	uint8_t upright = d3d2 & 0x04;
 	if (upright)
 	{
-		UINT8 fc = ioport("FC")->read();
+		uint8_t fc = ioport("FC")->read();
 		d7d6 |= 0x60;
 		d5d4 = (d5d4 & ~0x1c) |
 				((~fc & 0x20) >> 3) | /* IPT_BUTTON2 */
@@ -251,8 +269,8 @@ READ8_MEMBER(segag80r_state::spaceod_mangled_ports_r)
 
 READ8_MEMBER(segag80r_state::spaceod_port_fc_r)
 {
-	UINT8 upright = ioport("D3D2")->read() & 0x04;
-	UINT8 fc = ioport("FC")->read();
+	uint8_t upright = ioport("D3D2")->read() & 0x04;
+	uint8_t fc = ioport("FC")->read();
 
 	/* tweak bits for the upright case */
 	if (upright)
@@ -283,7 +301,7 @@ WRITE8_MEMBER(segag80r_state::coin_count_w)
 
 WRITE8_MEMBER(segag80r_state::sindbadm_soundport_w)
 {
-	soundlatch_byte_w(space, 0, data);
+	m_soundlatch->write(space, 0, data);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(50));
 }
@@ -322,7 +340,11 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, segag80r_state )
 	AM_RANGE(0xe000, 0xffff) AM_RAM_WRITE(vidram_w) AM_SHARE("videoram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, segag80r_state )
+static ADDRESS_MAP_START( g80r_opcodes_map, AS_OPCODES, 8, segag80r_state )
+	AM_RANGE(0x0000, 0xffff) AM_READ(g80r_opcode_r)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( sega_315_opcodes_map, AS_OPCODES, 8, segag80r_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_SHARE("decrypted_opcodes")
 	AM_RANGE(0x8000, 0xbfff) AM_ROM AM_REGION("maincpu", 0x8000)
 	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(mainram_w) AM_SHARE("mainram")
@@ -371,7 +393,7 @@ static ADDRESS_MAP_START( sindbadm_sound_map, AS_PROGRAM, 8, segag80r_state )
 	AM_RANGE(0x8000, 0x87ff) AM_MIRROR(0x1800) AM_RAM
 	AM_RANGE(0xa000, 0xa003) AM_MIRROR(0x1ffc) AM_WRITE(sindbadm_sn1_SN76496_w)
 	AM_RANGE(0xc000, 0xc003) AM_MIRROR(0x1ffc) AM_WRITE(sindbadm_sn2_SN76496_w)
-	AM_RANGE(0xe000, 0xe000) AM_MIRROR(0x1fff) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xe000, 0xe000) AM_MIRROR(0x1fff) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
 
@@ -807,14 +829,15 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( g80r_base, segag80r_state )
+static MACHINE_CONFIG_START( g80r_base )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, VIDEO_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", segag80r_state,  segag80r_vblank_start)
-
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(g80r_opcodes_map)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", segag80r_state, segag80r_vblank_start)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(segag80r_state, segag80r_irq_ack)
 
 	/* video hardware */
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", segag80r)
@@ -826,7 +849,7 @@ static MACHINE_CONFIG_START( g80r_base, segag80r_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 MACHINE_CONFIG_END
 
 
@@ -888,8 +911,9 @@ static MACHINE_CONFIG_DERIVED( monster2, monsterb )
 	MCFG_CPU_REPLACE("maincpu", SEGA_315_SPAT, VIDEO_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_ppi8255_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", segag80r_state,  segag80r_vblank_start)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", segag80r_state, segag80r_vblank_start)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(segag80r_state, segag80r_irq_ack)
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(sega_315_opcodes_map)
 	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 MACHINE_CONFIG_END
 
@@ -913,7 +937,7 @@ static MACHINE_CONFIG_DERIVED( sindbadm, g80r_base )
 	MCFG_CPU_REPLACE("maincpu", SEGA_315_5028, VIDEO_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(sindbadm_portmap)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(sega_315_opcodes_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", segag80r_state,  sindbadm_vblank_start)
 	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 
@@ -933,12 +957,14 @@ static MACHINE_CONFIG_DERIVED( sindbadm, g80r_base )
 	MCFG_CPU_PROGRAM_MAP(sindbadm_sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(segag80r_state, irq0_line_hold, 4*60)
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	/* sound hardware */
 	MCFG_SOUND_ADD("sn1", SN76496, SINDBADM_SOUND_CLOCK/4)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 	MCFG_SOUND_ADD("sn2", SN76496, SINDBADM_SOUND_CLOCK/2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -1403,13 +1429,13 @@ ROM_END
 
 void segag80r_state::monsterb_expand_gfx(const char *region)
 {
-	UINT8 *dest;
+	uint8_t *dest;
 	int i;
 
 	/* expand the background ROMs; A11/A12 of each ROM is independently controlled via */
 	/* banking */
 	dest = memregion(region)->base();
-	dynamic_buffer temp(0x4000);
+	std::vector<uint8_t> temp(0x4000);
 	memcpy(&temp[0], dest, 0x4000);
 
 	/* 16 effective total banks */
@@ -1587,21 +1613,21 @@ DRIVER_INIT_MEMBER(segag80r_state,sindbadm)
 
 //    YEAR, NAME,      PARENT,   MACHINE,  INPUT,    INIT,     MONITOR,COMPANY,FULLNAME,FLAGS
 /* basic G-80 system with: CPU board, PROM board, Video I board, custom sound boards */
-GAME( 1981, astrob,    0,        astrob,   astrob, segag80r_state,   astrob,   ROT270, "Sega", "Astro Blaster (version 3)", MACHINE_IMPERFECT_SOUND )
-GAME( 1981, astrob2,   astrob,   astrob,   astrob2, segag80r_state,  astrob,   ROT270, "Sega", "Astro Blaster (version 2)", MACHINE_IMPERFECT_SOUND )
-GAME( 1981, astrob2a,  astrob,   astrob,   astrob2, segag80r_state,  astrob,   ROT270, "Sega", "Astro Blaster (version 2a)", MACHINE_IMPERFECT_SOUND )
-GAME( 1981, astrob1,   astrob,   astrob,   astrob, segag80r_state,   astrob,   ROT270, "Sega", "Astro Blaster (version 1)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // instant death if you start game with 1 credit, protection?, bad dump?
-GAME( 1981, astrobg,   astrob,   astrob,   astrob, segag80r_state,   astrob,   ROT270, "Sega", "Astro Blaster (German)", MACHINE_IMPERFECT_SOUND )
-GAME( 1981, 005,       0,        005,      005, segag80r_state,      005,      ROT270, "Sega", "005", MACHINE_IMPERFECT_SOUND )
+GAME( 1981, astrob,    0,        astrob,   astrob,   segag80r_state, astrob,   ROT270, "Sega", "Astro Blaster (version 3)", MACHINE_IMPERFECT_SOUND )
+GAME( 1981, astrob2,   astrob,   astrob,   astrob2,  segag80r_state, astrob,   ROT270, "Sega", "Astro Blaster (version 2)", MACHINE_IMPERFECT_SOUND )
+GAME( 1981, astrob2a,  astrob,   astrob,   astrob2,  segag80r_state, astrob,   ROT270, "Sega", "Astro Blaster (version 2a)", MACHINE_IMPERFECT_SOUND )
+GAME( 1981, astrob1,   astrob,   astrob,   astrob,   segag80r_state, astrob,   ROT270, "Sega", "Astro Blaster (version 1)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // instant death if you start game with 1 credit, protection?, bad dump?
+GAME( 1981, astrobg,   astrob,   astrob,   astrob,   segag80r_state, astrob,   ROT270, "Sega", "Astro Blaster (German)", MACHINE_IMPERFECT_SOUND )
+GAME( 1981, 005,       0,        005,      005,      segag80r_state, 005,      ROT270, "Sega", "005", MACHINE_IMPERFECT_SOUND )
 
 
 /* basic G-80 system with individual background boards */
-GAME( 1981, spaceod,   0,        spaceod,  spaceod, segag80r_state,  spaceod,  ROT270, "Sega", "Space Odyssey (version 2)", MACHINE_IMPERFECT_SOUND )
-GAME( 1981, spaceod2,  spaceod,  spaceod,  spaceod, segag80r_state,  spaceod,  ROT270, "Sega", "Space Odyssey (version 1)", MACHINE_IMPERFECT_SOUND )
+GAME( 1981, spaceod,   0,        spaceod,  spaceod,  segag80r_state, spaceod,  ROT270, "Sega", "Space Odyssey (version 2)", MACHINE_IMPERFECT_SOUND )
+GAME( 1981, spaceod2,  spaceod,  spaceod,  spaceod,  segag80r_state, spaceod,  ROT270, "Sega", "Space Odyssey (version 1)", MACHINE_IMPERFECT_SOUND )
 GAME( 1982, monsterb,  0,        monsterb, monsterb, segag80r_state, monsterb, ROT270, "Sega", "Monster Bash", MACHINE_IMPERFECT_SOUND )
 
 /* 2-board G-80 system */
 GAME( 1982, monsterb2, monsterb, monster2, monsterb, segag80r_state, monster2, ROT270, "Sega", "Monster Bash (2 board version)", MACHINE_IMPERFECT_SOUND )
-GAME( 1983, pignewt,   0,        pignewt,  pignewt, segag80r_state,  pignewt,  ROT270, "Sega", "Pig Newton (version C)", MACHINE_IMPERFECT_SOUND )
+GAME( 1983, pignewt,   0,        pignewt,  pignewt,  segag80r_state, pignewt,  ROT270, "Sega", "Pig Newton (version C)", MACHINE_IMPERFECT_SOUND )
 GAME( 1983, pignewta,  pignewt,  pignewt,  pignewta, segag80r_state, pignewt,  ROT270, "Sega", "Pig Newton (version A)", MACHINE_IMPERFECT_SOUND )
 GAME( 1983, sindbadm,  0,        sindbadm, sindbadm, segag80r_state, sindbadm, ROT270, "Sega", "Sindbad Mystery", 0 )

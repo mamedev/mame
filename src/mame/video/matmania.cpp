@@ -46,7 +46,7 @@
 
 PALETTE_INIT_MEMBER(matmania_state, matmania)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 
 	for (int i = 0; i < 64; i++)
 	{
@@ -126,9 +126,9 @@ void matmania_state::video_start()
 
 
 
-UINT32 matmania_state::screen_update_matmania(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t matmania_state::screen_update_matmania(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 *spriteram = m_spriteram;
+	uint8_t *spriteram = m_spriteram;
 	int offs;
 
 
@@ -197,9 +197,9 @@ UINT32 matmania_state::screen_update_matmania(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-UINT32 matmania_state::screen_update_maniach(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t matmania_state::screen_update_maniach(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 *spriteram = m_spriteram;
+	uint8_t *spriteram = m_spriteram;
 	int offs;
 
 

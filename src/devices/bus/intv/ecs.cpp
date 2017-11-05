@@ -19,21 +19,22 @@
 
 #include "emu.h"
 #include "ecs.h"
+#include "speaker.h"
 
 
 //-------------------------------------------------
 //  intv_ecs_device - constructor
 //-------------------------------------------------
 
-const device_type INTV_ROM_ECS = &device_creator<intv_ecs_device>;
+DEFINE_DEVICE_TYPE(INTV_ROM_ECS, intv_ecs_device, "intv_ecs", "Intellivision ECS Expansion")
 
-intv_ecs_device::intv_ecs_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: intv_rom_device(mconfig, INTV_ROM_ECS, "Intellivision ECS Expansion", tag, owner, clock, "intv_ecs", __FILE__),
-					m_snd(*this, "ay8914"),
-					m_subslot(*this, "subslot"),
-					m_voice_enabled(false),
-					m_ramd0_enabled(false),
-					m_ram88_enabled(false)
+intv_ecs_device::intv_ecs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: intv_rom_device(mconfig, INTV_ROM_ECS, tag, owner, clock),
+	m_snd(*this, "ay8914"),
+	m_subslot(*this, "subslot"),
+	m_voice_enabled(false),
+	m_ramd0_enabled(false),
+	m_ram88_enabled(false)
 {
 }
 
@@ -89,11 +90,11 @@ void intv_ecs_device::late_subslot_setup()
 }
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( sub_slot )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
 
-static MACHINE_CONFIG_FRAGMENT( sub_slot )
+MACHINE_CONFIG_MEMBER( intv_ecs_device::device_add_mconfig )
 	MCFG_SPEAKER_STANDARD_MONO("mono_ecs")
 
 	MCFG_SOUND_ADD("ay8914", AY8914, XTAL_3_579545MHz/2)
@@ -107,12 +108,6 @@ static MACHINE_CONFIG_FRAGMENT( sub_slot )
 MACHINE_CONFIG_END
 
 
-machine_config_constructor intv_ecs_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( sub_slot );
-}
-
-
 ROM_START( ecs )
 	ROM_REGION( 0x20000, "ecs", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "ecs_rom.20", 0x04000, 0x2000, CRC(5f9d05e5) SHA1(083a3e7405b8f8b4b8a5003ca9c31b8d824b535c))
@@ -120,7 +115,7 @@ ROM_START( ecs )
 	ROM_LOAD16_WORD_SWAP( "ecs_rom.e0", 0x1c000, 0x2000, CRC(c2ebcd90) SHA1(b3c14955f56c57e6f0d8fbb695771946cfcf6582))
 ROM_END
 
-const rom_entry *intv_ecs_device::device_rom_region() const
+const tiny_rom_entry *intv_ecs_device::device_rom_region() const
 {
 	return ROM_NAME( ecs );
 }
@@ -184,4 +179,67 @@ WRITE16_MEMBER(intv_ecs_device::write_ay)
 {
 	if (ACCESSING_BITS_0_7)
 		return m_snd->write(space, offset, data, mem_mask);
+}
+
+
+READ16_MEMBER(intv_ecs_device::read_rom80)
+{
+	if (m_ram88_enabled && offset >= 0x800)
+		return m_subslot->read_ram(space, offset & 0x7ff, mem_mask);
+	else
+		return m_subslot->read_rom80(space, offset, mem_mask);
+}
+
+
+READ16_MEMBER(intv_ecs_device::read_romd0)
+{
+	if (m_ramd0_enabled && offset < 0x800)
+		return m_subslot->read_ram(space, offset, mem_mask);
+	else
+		return m_subslot->read_romd0(space, offset, mem_mask);
+}
+
+
+WRITE16_MEMBER(intv_ecs_device::write_rom20)
+{
+	if (offset == 0xfff)
+	{
+		if (data == 0x2a50)
+			m_bank_base[2] = 0;
+		else if (data == 0x2a51)
+			m_bank_base[2] = 1;
+	}
+}
+
+WRITE16_MEMBER(intv_ecs_device::write_rom70)
+{
+	if (offset == 0xfff)
+	{
+		if (data == 0x7a50)
+			m_bank_base[7] = 0;
+		else if (data == 0x7a51)
+			m_bank_base[7] = 1;
+	}
+}
+
+WRITE16_MEMBER(intv_ecs_device::write_rome0)
+{
+	if (offset == 0xfff)
+	{
+		if (data == 0xea50)
+			m_bank_base[14] = 0;
+		else if (data == 0xea51)
+			m_bank_base[14] = 1;
+	}
+}
+
+WRITE16_MEMBER(intv_ecs_device::write_romf0)
+{
+	if (offset == 0xfff)
+	{
+		if (data == 0xfa50)
+			m_bank_base[15] = 0;
+		else if (data == 0xfa51)
+			m_bank_base[15] = 1;
+	}
 }

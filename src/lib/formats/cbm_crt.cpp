@@ -130,7 +130,7 @@ std::string cbm_crt_get_card(util::core_file &file)
 
 	if (memcmp(header.signature, CRT_SIGNATURE, 16) == 0)
 	{
-		UINT16 hardware = pick_integer_be(header.hardware, 0, 2);
+		uint16_t hardware = pick_integer_be(header.hardware, 0, 2);
 
 		return std::string(CRT_C64_SLOT_NAMES[hardware]);
 	}
@@ -152,7 +152,7 @@ bool cbm_crt_read_header(util::core_file &file, size_t *roml_size, size_t *romh_
 	if (memcmp(header.signature, CRT_SIGNATURE, 16) != 0)
 		return false;
 
-	UINT16 hardware = pick_integer_be(header.hardware, 0, 2);
+	uint16_t hardware = pick_integer_be(header.hardware, 0, 2);
 	*exrom = header.exrom;
 	*game = header.game;
 
@@ -171,9 +171,9 @@ bool cbm_crt_read_header(util::core_file &file, size_t *roml_size, size_t *romh_
 		cbm_crt_chip chip;
 		file.read(&chip, CRT_CHIP_LENGTH);
 
-		UINT16 address = pick_integer_be(chip.start_address, 0, 2);
-		UINT16 size = pick_integer_be(chip.image_size, 0, 2);
-		UINT16 type = pick_integer_be(chip.chip_type, 0, 2);
+		uint16_t address = pick_integer_be(chip.start_address, 0, 2);
+		uint16_t size = pick_integer_be(chip.image_size, 0, 2);
+		uint16_t type = pick_integer_be(chip.chip_type, 0, 2);
 
 		if (LOG)
 		{
@@ -201,10 +201,10 @@ bool cbm_crt_read_header(util::core_file &file, size_t *roml_size, size_t *romh_
 //  cbm_crt_read_data - read cartridge data
 //-------------------------------------------------
 
-bool cbm_crt_read_data(util::core_file &file, UINT8 *roml, UINT8 *romh)
+bool cbm_crt_read_data(util::core_file &file, uint8_t *roml, uint8_t *romh)
 {
-	UINT32 roml_offset = 0;
-	UINT32 romh_offset = 0;
+	uint32_t roml_offset = 0;
+	uint32_t romh_offset = 0;
 
 	file.seek(CRT_HEADER_LENGTH, SEEK_SET);
 
@@ -213,8 +213,8 @@ bool cbm_crt_read_data(util::core_file &file, UINT8 *roml, UINT8 *romh)
 		cbm_crt_chip chip;
 		file.read(&chip, CRT_CHIP_LENGTH);
 
-		UINT16 address = pick_integer_be(chip.start_address, 0, 2);
-		UINT16 size = pick_integer_be(chip.image_size, 0, 2);
+		uint16_t address = pick_integer_be(chip.start_address, 0, 2);
+		uint16_t size = pick_integer_be(chip.image_size, 0, 2);
 
 		switch (address)
 		{

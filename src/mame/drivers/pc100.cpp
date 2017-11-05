@@ -53,15 +53,23 @@
 ****************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/i86/i86.h"
 #include "imagedev/flopdrv.h"
-#include "formats/mfi_dsk.h"
-#include "formats/d88_dsk.h"
+#include "machine/i8251.h"
 #include "machine/i8255.h"
-#include "machine/pic8259.h"
-#include "machine/upd765.h"
 #include "machine/msm58321.h"
+#include "machine/pic8259.h"
+#include "machine/timer.h"
+#include "machine/upd765.h"
 #include "sound/beep.h"
+
+#include "screen.h"
+#include "speaker.h"
+
+#include "formats/d88_dsk.h"
+#include "formats/mfi_dsk.h"
+
 
 class pc100_state : public driver_device
 {
@@ -71,6 +79,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_beeper(*this, "beeper"),
 		m_rtc(*this, "rtc"),
+		m_fdc(*this, "upd765"),
 		m_palette(*this, "palette"),
 		m_kanji_rom(*this, "kanji"),
 		m_vram(*this, "vram"),
@@ -81,9 +90,10 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<beep_device> m_beeper;
 	required_device<msm58321_device> m_rtc;
+	required_device<upd765a_device> m_fdc;
 	required_device<palette_device> m_palette;
-	required_region_ptr<UINT16> m_kanji_rom;
-	required_region_ptr<UINT16> m_vram;
+	required_region_ptr<uint16_t> m_kanji_rom;
+	required_region_ptr<uint16_t> m_vram;
 
 	DECLARE_READ16_MEMBER(pc100_vram_r);
 	DECLARE_WRITE16_MEMBER(pc100_vram_w);
@@ -104,22 +114,25 @@ public:
 	DECLARE_WRITE8_MEMBER(rtc_porta_w);
 	DECLARE_READ8_MEMBER(rtc_portc_r);
 	DECLARE_WRITE8_MEMBER(rtc_portc_w);
-	UINT16 m_kanji_addr;
-	UINT8 m_timer_mode;
+	DECLARE_WRITE_LINE_MEMBER(irqnmi_w);
+	DECLARE_WRITE_LINE_MEMBER(drqnmi_w);
+	uint16_t m_kanji_addr;
+	uint8_t m_timer_mode;
 
-	UINT8 m_bank_r,m_bank_w;
+	uint8_t m_bank_r,m_bank_w;
+	bool m_nmi_mask, m_irq_state, m_drq_state;
 
 	struct{
-		UINT8 shift;
-		UINT16 mask;
-		UINT16 vstart;
-		UINT8 addr;
-		UINT8 reg[8];
+		uint8_t shift;
+		uint16_t mask;
+		uint16_t vstart;
+		uint8_t addr;
+		uint8_t reg[8];
 	}m_crtc;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_pc100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_pc100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(pc100_vblank_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(pc100_600hz_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(pc100_100hz_irq);
@@ -131,14 +144,14 @@ public:
 	WRITE_LINE_MEMBER(rtc_portc_1_w) { m_rtc_portc = (m_rtc_portc & ~(1 << 1)) | ((state & 1) << 1); }
 	WRITE_LINE_MEMBER(rtc_portc_2_w) { m_rtc_portc = (m_rtc_portc & ~(1 << 2)) | ((state & 1) << 2); }
 	WRITE_LINE_MEMBER(rtc_portc_3_w) { m_rtc_portc = (m_rtc_portc & ~(1 << 3)) | ((state & 1) << 3); }
-	UINT8 m_rtc_portc;
+	uint8_t m_rtc_portc;
 };
 
 void pc100_state::video_start()
 {
 }
 
-UINT32 pc100_state::screen_update_pc100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t pc100_state::screen_update_pc100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x,y;
 	int count;
@@ -174,6 +187,20 @@ UINT32 pc100_state::screen_update_pc100(screen_device &screen, bitmap_ind16 &bit
 	return 0;
 }
 
+WRITE_LINE_MEMBER(pc100_state::irqnmi_w)
+{
+	if(!m_nmi_mask)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ((state == ASSERT_LINE) || m_drq_state) ? ASSERT_LINE : CLEAR_LINE);
+	m_irq_state = state == ASSERT_LINE;
+}
+
+WRITE_LINE_MEMBER(pc100_state::drqnmi_w)
+{
+	if(!m_nmi_mask)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ((state == ASSERT_LINE) || m_irq_state) ? ASSERT_LINE : CLEAR_LINE);
+	m_drq_state = state == ASSERT_LINE;
+}
+
 READ16_MEMBER( pc100_state::pc100_vram_r )
 {
 	return m_vram[offset+m_bank_r*0x10000];
@@ -181,7 +208,7 @@ READ16_MEMBER( pc100_state::pc100_vram_r )
 
 WRITE16_MEMBER( pc100_state::pc100_vram_w )
 {
-	UINT16 old_vram;
+	uint16_t old_vram;
 	int i;
 
 	for(i=0;i<4;i++)
@@ -292,7 +319,8 @@ static ADDRESS_MAP_START(pc100_io, AS_IO, 16, pc100_state)
 	AM_RANGE(0x20, 0x23) AM_READ8(pc100_key_r,0x00ff) //i/o, keyboard, mouse
 	AM_RANGE(0x22, 0x23) AM_WRITE8(pc100_output_w,0x00ff) //i/o, keyboard, mouse
 	AM_RANGE(0x24, 0x25) AM_WRITE8(pc100_tc_w,0x00ff) //i/o, keyboard, mouse
-//  AM_RANGE(0x28, 0x2b) i8251
+	AM_RANGE(0x28, 0x29) AM_DEVREADWRITE8("uart8251", i8251_device, data_r, data_w, 0x00ff)
+	AM_RANGE(0x2a, 0x2b) AM_DEVREADWRITE8("uart8251", i8251_device, status_r, control_w, 0x00ff)
 	AM_RANGE(0x30, 0x31) AM_READWRITE8(pc100_shift_r,pc100_shift_w,0x00ff) // crtc shift
 	AM_RANGE(0x38, 0x39) AM_WRITE8(pc100_crtc_addr_w,0x00ff) //crtc address reg
 	AM_RANGE(0x3a, 0x3b) AM_WRITE8(pc100_crtc_data_w,0x00ff) //crtc data reg
@@ -358,6 +386,7 @@ WRITE8_MEMBER( pc100_state::rtc_porta_w )
     ---- ---x write
 */
 
+	m_fdc->subdevice<floppy_connector>("0")->get_device()->mon_w(!(data & 0x20));
 	m_rtc->write_w((data >> 0) & 1);
 	m_rtc->read_w((data >> 1) & 1);
 	m_rtc->cs1_w((data >> 2) & 1);
@@ -388,12 +417,25 @@ WRITE8_MEMBER( pc100_state::upper_mask_w )
 
 WRITE8_MEMBER( pc100_state::crtc_bank_w )
 {
+	if(data & 0x80)
+	{
+		m_nmi_mask = false;
+		m_maincpu->set_input_line(INPUT_LINE_NMI, (m_irq_state || m_drq_state) ? ASSERT_LINE : CLEAR_LINE);
+	}
+	else
+	{
+		m_nmi_mask = true;
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+	}
 	m_bank_w = data & 0xf;
 	m_bank_r = (data & 0x30) >> 4;
 }
 
 void pc100_state::machine_start()
 {
+	m_nmi_mask = true;
+	m_irq_state = false;
+	m_drq_state = false;
 }
 
 void pc100_state::machine_reset()
@@ -444,12 +486,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(pc100_state::pc100_10hz_irq)
 }
 
 static SLOT_INTERFACE_START( pc100_floppies )
-	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
+	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
 SLOT_INTERFACE_END
 
 #define MASTER_CLOCK 6988800
 
-static MACHINE_CONFIG_START( pc100, pc100_state )
+static MACHINE_CONFIG_START( pc100 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8086, MASTER_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(pc100_map)
@@ -472,9 +514,19 @@ static MACHINE_CONFIG_START( pc100, pc100_state )
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(pc100_state, upper_mask_w))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(pc100_state, crtc_bank_w))
 
-	MCFG_PIC8259_ADD( "pic8259", INPUTLINE("maincpu", 0), GND, NOOP)
+	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
+	MCFG_PIC8259_IN_SP_CB(GND) // ???
+
+	MCFG_DEVICE_ADD("uart8251", I8251, 0)
+	//MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
+	//MCFG_I8251_DTR_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
+	//MCFG_I8251_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
+	MCFG_I8251_RXRDY_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir1_w))
 
 	MCFG_UPD765A_ADD("upd765", true, true)
+	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(pc100_state, irqnmi_w))
+	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(pc100_state, drqnmi_w))
 
 	MCFG_DEVICE_ADD("rtc", MSM58321, XTAL_32_768kHz)
 	MCFG_MSM58321_D0_HANDLER(WRITELINE(pc100_state, rtc_portc_0_w))
@@ -482,8 +534,8 @@ static MACHINE_CONFIG_START( pc100, pc100_state )
 	MCFG_MSM58321_D2_HANDLER(WRITELINE(pc100_state, rtc_portc_2_w))
 	MCFG_MSM58321_D3_HANDLER(WRITELINE(pc100_state, rtc_portc_3_w))
 
-	MCFG_FLOPPY_DRIVE_ADD("upd765:0", pc100_floppies, "525hd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd765:1", pc100_floppies, "525hd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:0", pc100_floppies, "525dd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:1", pc100_floppies, "525dd", floppy_image_device::default_floppy_formats)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -515,5 +567,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY  FULLNAME       FLAGS */
-COMP( 198?, pc100,  0,      0,       pc100,     pc100, driver_device,   0,      "NEC",   "PC-100", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE          INIT    COMPANY  FULLNAME  FLAGS
+COMP( 198?, pc100,  0,      0,       pc100,     pc100, pc100_state,   0,      "NEC",   "PC-100", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

@@ -15,18 +15,18 @@ public:
 		m_msm(*this, "msm"),
 		m_gfxdecode(*this, "gfxdecode") { }
 
-	UINT8 m_ym2149_portb;
-	UINT8 m_usart_8251;
-	UINT8 m_copro_sm7831;
+	uint8_t m_ym2149_portb;
+	uint8_t m_usart_8251;
+	uint8_t m_copro_sm7831;
 	int m_adpcm_pos;
 	int m_adpcm_end;
 	int m_adpcm_data;
-	UINT8 m_adpcm_reg[6];
-	UINT8 m_adpcm_busy_line;
-	required_shared_ptr<UINT8> m_fg_videoram;
-	required_shared_ptr<UINT8> m_fg_colorram;
-	required_shared_ptr<UINT8> m_bg_videoram;
-	required_shared_ptr<UINT8> m_bg_colorram;
+	uint8_t m_adpcm_reg[6];
+	uint8_t m_adpcm_busy_line;
+	required_shared_ptr<uint8_t> m_fg_videoram;
+	required_shared_ptr<uint8_t> m_fg_colorram;
+	required_shared_ptr<uint8_t> m_bg_videoram;
+	required_shared_ptr<uint8_t> m_bg_colorram;
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_bg_tilemap;
 	DECLARE_READ8_MEMBER(custom_09R81P_port_r);
@@ -48,7 +48,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void sound_start() override;
 	DECLARE_PALETTE_INIT(lucky74);
-	UINT32 screen_update_lucky74(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_lucky74(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(nmi_interrupt);
 	DECLARE_WRITE_LINE_MEMBER(lucky74_adpcm_int);
 	required_device<cpu_device> m_maincpu;

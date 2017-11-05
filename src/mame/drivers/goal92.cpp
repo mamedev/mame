@@ -10,18 +10,21 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/goal92.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/2203intf.h"
 #include "sound/okim6295.h"
-#include "sound/msm5205.h"
-#include "includes/goal92.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 WRITE16_MEMBER(goal92_state::goal92_sound_command_w)
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		soundlatch_byte_w(space, 0, (data >> 8) & 0xff);
+		m_soundlatch->write(space, 0, (data >> 8) & 0xff);
 		m_audiocpu->set_input_line(0, HOLD_LINE);
 	}
 }
@@ -89,7 +92,7 @@ static ADDRESS_MAP_START( sound_cpu, AS_PROGRAM, 8, goal92_state )
 	AM_RANGE(0xe800, 0xe801) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
 	AM_RANGE(0xec00, 0xec01) AM_DEVREADWRITE("ym2", ym2203_device, read, write)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xf800) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xf800, 0xf800) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( goal92 )
@@ -274,7 +277,7 @@ GFXDECODE_END
 
 void goal92_state::machine_start()
 {
-	UINT8 *ROM = memregion("audiocpu")->base();
+	uint8_t *ROM = memregion("audiocpu")->base();
 
 	membank("bank1")->configure_entries(0, 2, &ROM[0x10000], 0x4000);
 
@@ -291,7 +294,7 @@ void goal92_state::machine_reset()
 	m_adpcm_toggle = 0;
 }
 
-static MACHINE_CONFIG_START( goal92, goal92_state )
+static MACHINE_CONFIG_START( goal92 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,12000000)
@@ -310,7 +313,7 @@ static MACHINE_CONFIG_START( goal92, goal92_state )
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1) // black border at bottom is a game bug...
 	MCFG_SCREEN_UPDATE_DRIVER(goal92_state, screen_update_goal92)
-	MCFG_SCREEN_VBLANK_DRIVER(goal92_state, screen_eof_goal92)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(goal92_state, screen_vblank_goal92))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", goal92)
@@ -319,6 +322,8 @@ static MACHINE_CONFIG_START( goal92, goal92_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ym1", YM2203, 2500000/2)
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE(goal92_state, irqhandler))
@@ -329,7 +334,7 @@ static MACHINE_CONFIG_START( goal92, goal92_state )
 
 	MCFG_SOUND_ADD("msm", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(goal92_state, goal92_adpcm_int))   /* interrupt function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S96_4B)      /* 4KHz 4-bit */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)      /* 4KHz 4-bit */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 
@@ -385,7 +390,7 @@ ROM_START( goal92 )
 	ROM_LOAD( "6.bin",        0x000000, 0x040000, CRC(83cadc8f) SHA1(1d3309750347c5d6d661f5cf452235e5a83a7483) )
 	ROM_LOAD( "7.bin",        0x040000, 0x040000, CRC(067e10fc) SHA1(9831b8dc9b8efa6f7797b2946ee5be03fb36de7b) )
 	ROM_LOAD( "5.bin",        0x080000, 0x040000, CRC(9a390af2) SHA1(8bc46f8cc7823b8caf381866bea016ebfad9d5d3) )
-	ROM_LOAD( "4.bin",        0x0c0000, 0x040000, CRC(69b118d5) SHA1(80ab6f03e1254ba47c27299ce11559b244a024ad) )
+	ROM_LOAD( "4.bin",        0x0c0000, 0x040000, CRC(69b118d5) SHA1(80ab6f03e1254ba47c27299ce11559b244a024ad) )  // sldh
 
 	ROM_REGION( 0x200000, "gfx2", 0 )
 	ROM_LOAD( "11.bin",       0x000000, 0x080000, CRC(5701e626) SHA1(e6915714e9ca90be8fa8ab1bf7fd1f23a83fb82c) )
@@ -396,4 +401,4 @@ ROM_END
 
 
 
-GAME( 1992, goal92,   cupsoc, goal92,   goal92, driver_device, 0, ROT0, "bootleg", "Goal! '92", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, goal92,   cupsoc, goal92,   goal92, goal92_state, 0, ROT0, "bootleg", "Goal! '92", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

@@ -11,6 +11,7 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "floppy.h"
 #include "formats/cgenie_dsk.h"
 #include "bus/generic/carts.h"
@@ -27,14 +28,14 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type CGENIE_FDC = &device_creator<cgenie_fdc_device>;
+DEFINE_DEVICE_TYPE(CGENIE_FDC, cgenie_fdc_device, "cgenie_fdc", "Colour Genie FDC")
 
 DEVICE_ADDRESS_MAP_START( mmio, 8, cgenie_fdc_device )
 	AM_RANGE(0xe0, 0xe3) AM_MIRROR(0x10) AM_READWRITE(irq_r, select_w)
-	AM_RANGE(0xec, 0xec) AM_MIRROR(0x10) AM_DEVREAD("fd1793", fd1793_t, status_r) AM_WRITE(command_w)
-	AM_RANGE(0xed, 0xed) AM_MIRROR(0x10) AM_DEVREADWRITE("fd1793", fd1793_t, track_r, track_w)
-	AM_RANGE(0xee, 0xee) AM_MIRROR(0x10) AM_DEVREADWRITE("fd1793", fd1793_t, sector_r, sector_w)
-	AM_RANGE(0xef, 0xef) AM_MIRROR(0x10) AM_DEVREADWRITE("fd1793", fd1793_t, data_r, data_w)
+	AM_RANGE(0xec, 0xec) AM_MIRROR(0x10) AM_DEVREAD("fd1793", fd1793_device, status_r) AM_WRITE(command_w)
+	AM_RANGE(0xed, 0xed) AM_MIRROR(0x10) AM_DEVREADWRITE("fd1793", fd1793_device, track_r, track_w)
+	AM_RANGE(0xee, 0xee) AM_MIRROR(0x10) AM_DEVREADWRITE("fd1793", fd1793_device, sector_r, sector_w)
+	AM_RANGE(0xef, 0xef) AM_MIRROR(0x10) AM_DEVREADWRITE("fd1793", fd1793_device, data_r, data_w)
 ADDRESS_MAP_END
 
 FLOPPY_FORMATS_MEMBER( cgenie_fdc_device::floppy_formats )
@@ -59,17 +60,16 @@ ROM_START( cgenie_fdc )
 	ROM_LOAD("cgdos.rom", 0x0000, 0x2000, CRC(2a96cf74) SHA1(6dcac110f87897e1ee7521aefbb3d77a14815893))
 ROM_END
 
-const rom_entry *cgenie_fdc_device::device_rom_region() const
+const tiny_rom_entry *cgenie_fdc_device::device_rom_region() const
 {
 	return ROM_NAME( cgenie_fdc );
 }
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( cgenie_fdc )
+MACHINE_CONFIG_MEMBER( cgenie_fdc_device::device_add_mconfig )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer", cgenie_fdc_device, timer_callback, attotime::from_msec(25))
 
 	MCFG_FD1793_ADD("fd1793", XTAL_1MHz)
@@ -82,17 +82,12 @@ static MACHINE_CONFIG_FRAGMENT( cgenie_fdc )
 
 //  MCFG_SOFTWARE_LIST_ADD("floppy_list", "cgenie_flop")
 
-	MCFG_GENERIC_SOCKET_ADD("socket", generic_plain_slot, "cgenie_socket")
+	MCFG_GENERIC_SOCKET_ADD("socket", generic_plain_slot, "cgenie_flop_rom")
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
 	MCFG_GENERIC_LOAD(cgenie_fdc_device, socket_load)
 
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "cgenie_cart")
+	MCFG_SOFTWARE_LIST_ADD("rom_list", "cgenie_flop_rom")
 MACHINE_CONFIG_END
-
-machine_config_constructor cgenie_fdc_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( cgenie_fdc );
-}
 
 
 //**************************************************************************
@@ -103,9 +98,9 @@ machine_config_constructor cgenie_fdc_device::device_mconfig_additions() const
 //  cgenie_fdc_device - constructor
 //-------------------------------------------------
 
-cgenie_fdc_device::cgenie_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, CGENIE_FDC, "Floppy Disc Controller", tag, owner, clock, "cgenie_fdc", __FILE__),
-	device_expansion_interface(mconfig, *this),
+cgenie_fdc_device::cgenie_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, CGENIE_FDC, tag, owner, clock),
+	device_cg_exp_interface(mconfig, *this),
 	m_fdc(*this, "fd1793"),
 	m_floppy0(*this, "fd1793:0"),
 	m_floppy1(*this, "fd1793:1"),
@@ -151,7 +146,7 @@ void cgenie_fdc_device::device_reset()
 
 READ8_MEMBER( cgenie_fdc_device::irq_r )
 {
-	UINT8 data = m_irq_status;
+	uint8_t data = m_irq_status;
 
 	m_irq_status &= ~IRQ_TIMER;
 	m_slot->int_w(m_irq_status ? ASSERT_LINE : CLEAR_LINE);
@@ -167,18 +162,18 @@ TIMER_DEVICE_CALLBACK_MEMBER( cgenie_fdc_device::timer_callback )
 
 DEVICE_IMAGE_LOAD_MEMBER( cgenie_fdc_device, socket_load )
 {
-	UINT32 size = m_socket->common_get_size("rom");
+	uint32_t size = m_socket->common_get_size("rom");
 
 	if (size > 0x1000)
 	{
 		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported ROM size");
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 	}
 
 	m_socket->rom_alloc(0x1000, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	m_socket->common_load_rom(m_socket->get_rom_base(), size, "rom");
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 WRITE_LINE_MEMBER( cgenie_fdc_device::intrq_w )

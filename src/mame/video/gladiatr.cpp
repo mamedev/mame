@@ -16,9 +16,9 @@
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(gladiatr_state::bg_get_tile_info)
+TILE_GET_INFO_MEMBER(gladiatr_state_base::bg_get_tile_info)
 {
-	UINT8 attr = m_colorram[tile_index];
+	uint8_t attr = m_colorram[tile_index];
 
 	SET_TILE_INFO_MEMBER(1,
 			m_videoram[tile_index] + ((attr & 0x07) << 8) + (m_bg_tile_bank << 11),
@@ -26,7 +26,7 @@ TILE_GET_INFO_MEMBER(gladiatr_state::bg_get_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(gladiatr_state::fg_get_tile_info)
+TILE_GET_INFO_MEMBER(gladiatr_state_base::fg_get_tile_info)
 {
 	SET_TILE_INFO_MEMBER(0,
 			m_textram[tile_index] + (m_fg_tile_bank << 8),
@@ -42,10 +42,10 @@ TILE_GET_INFO_MEMBER(gladiatr_state::fg_get_tile_info)
 
 ***************************************************************************/
 
-VIDEO_START_MEMBER(gladiatr_state,ppking)
+VIDEO_START_MEMBER(ppking_state,ppking)
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(gladiatr_state::bg_get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,64);
-	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(gladiatr_state::fg_get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,64);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ppking_state::bg_get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,64);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ppking_state::fg_get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,64);
 
 	m_fg_tilemap->set_transparent_pen(0);
 
@@ -61,8 +61,8 @@ VIDEO_START_MEMBER(gladiatr_state,ppking)
 
 VIDEO_START_MEMBER(gladiatr_state,gladiatr)
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(gladiatr_state::bg_get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
-	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(gladiatr_state::fg_get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(gladiatr_state::bg_get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(gladiatr_state::fg_get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
 
 	m_fg_tilemap->set_transparent_pen(0);
 
@@ -90,55 +90,60 @@ VIDEO_START_MEMBER(gladiatr_state,gladiatr)
 
 ***************************************************************************/
 
-WRITE8_MEMBER(gladiatr_state::videoram_w)
+WRITE8_MEMBER(gladiatr_state_base::videoram_w)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(gladiatr_state::colorram_w)
+WRITE8_MEMBER(gladiatr_state_base::colorram_w)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(gladiatr_state::textram_w)
+WRITE8_MEMBER(gladiatr_state_base::textram_w)
 {
 	m_textram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(gladiatr_state::paletteram_w)
+WRITE8_MEMBER(gladiatr_state_base::paletteram_w)
 {
 	int r,g,b;
 
-	m_generic_paletteram_8[offset] = data;
+	m_paletteram[offset] = data;
 	offset &= 0x3ff;
 
-	r = (m_generic_paletteram_8[offset] >> 0) & 0x0f;
-	g = (m_generic_paletteram_8[offset] >> 4) & 0x0f;
-	b = (m_generic_paletteram_8[offset + 0x400] >> 0) & 0x0f;
+	r = (m_paletteram[offset] >> 0) & 0x0f;
+	g = (m_paletteram[offset] >> 4) & 0x0f;
+	b = (m_paletteram[offset + 0x400] >> 0) & 0x0f;
 
-	r = (r << 1) + ((m_generic_paletteram_8[offset + 0x400] >> 4) & 0x01);
-	g = (g << 1) + ((m_generic_paletteram_8[offset + 0x400] >> 5) & 0x01);
-	b = (b << 1) + ((m_generic_paletteram_8[offset + 0x400] >> 6) & 0x01);
+	r = (r << 1) + ((m_paletteram[offset + 0x400] >> 4) & 0x01);
+	g = (g << 1) + ((m_paletteram[offset + 0x400] >> 5) & 0x01);
+	b = (b << 1) + ((m_paletteram[offset + 0x400] >> 6) & 0x01);
 
-	m_palette->set_pen_color(offset,pal5bit(r),pal5bit(g),pal5bit(b));
+	m_palette->set_pen_color(offset, pal5bit(r), pal5bit(g), pal5bit(b));
 }
 
 
-WRITE8_MEMBER(gladiatr_state::spritebuffer_w)
+WRITE_LINE_MEMBER(gladiatr_state_base::spritebuffer_w)
 {
-	m_sprite_buffer = data & 1;
+	m_sprite_buffer = state;
 }
 
-WRITE8_MEMBER(gladiatr_state::gladiatr_spritebank_w)
+WRITE8_MEMBER(gladiatr_state_base::spritebuffer_w)
 {
-	m_sprite_bank = (data & 1) ? 4 : 2;
+	m_sprite_buffer = data & 0x01;
+}
+
+WRITE_LINE_MEMBER(gladiatr_state::spritebank_w)
+{
+	m_sprite_bank = state ? 4 : 2;
 }
 
 
-WRITE8_MEMBER(gladiatr_state::ppking_video_registers_w)
+WRITE8_MEMBER(ppking_state::ppking_video_registers_w)
 {
 	switch (offset & 0x300)
 	{
@@ -204,7 +209,7 @@ WRITE8_MEMBER(gladiatr_state::gladiatr_video_registers_w)
 
 ***************************************************************************/
 
-void gladiatr_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
+void gladiatr_state_base::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int offs;
 
@@ -215,7 +220,7 @@ void gladiatr_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 			{0x0,0x1},
 			{0x2,0x3},
 		};
-		UINT8 *src = &m_spriteram[offs + (m_sprite_buffer << 7)];
+		uint8_t *src = &m_spriteram[offs + (m_sprite_buffer << 7)];
 		int attributes = src[0x800];
 		int size = (attributes & 0x10) >> 4;
 		int bank = (attributes & 0x01) + ((attributes & 0x02) ? m_sprite_bank : 0);
@@ -254,7 +259,7 @@ void gladiatr_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 
 
-UINT32 gladiatr_state::screen_update_ppking(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t ppking_state::screen_update_ppking(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	draw_sprites(bitmap,cliprect);
@@ -272,7 +277,7 @@ UINT32 gladiatr_state::screen_update_ppking(screen_device &screen, bitmap_ind16 
 			int x = sx;
 			int y = (sy + m_fg_scrolly) & 0x1ff;
 
-			UINT16 *dest = &bitmap.pix16(sy, sx);
+			uint16_t *dest = &bitmap.pix16(sy, sx);
 			while( x <= cliprect.max_x )
 			{
 				if( flagsbitmap.pix8(y, x)&TILEMAP_PIXEL_LAYER0 )
@@ -288,7 +293,7 @@ UINT32 gladiatr_state::screen_update_ppking(screen_device &screen, bitmap_ind16 
 	return 0;
 }
 
-UINT32 gladiatr_state::screen_update_gladiatr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t gladiatr_state::screen_update_gladiatr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if (m_video_attributes & 0x20)
 	{

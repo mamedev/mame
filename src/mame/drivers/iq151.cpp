@@ -44,11 +44,13 @@ ToDo:
 ****************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/i8085/i8085.h"
-#include "machine/pic8259.h"
-#include "machine/i8255.h"
-#include "sound/speaker.h"
 #include "imagedev/cassette.h"
+#include "machine/i8255.h"
+#include "machine/pic8259.h"
+#include "machine/timer.h"
+#include "sound/spkrdev.h"
 
 // cartridge slot
 #include "bus/iq151/iq151.h"
@@ -61,7 +63,10 @@ ToDo:
 #include "bus/iq151/video32.h"
 #include "bus/iq151/video64.h"
 
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
 
 class iq151_state : public driver_device
 {
@@ -89,11 +94,11 @@ public:
 	DECLARE_READ8_MEMBER(cartslot_io_r);
 	DECLARE_WRITE8_MEMBER(cartslot_io_w);
 	virtual void machine_reset() override;
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	UINT8 m_vblank_irq_state;
-	UINT8 m_cassette_clk;
-	UINT8 m_cassette_data;
+	uint8_t m_vblank_irq_state;
+	uint8_t m_cassette_clk;
+	uint8_t m_cassette_data;
 	iq151cart_slot_device * m_carts[5];
 	DECLARE_DRIVER_INIT(iq151);
 	INTERRUPT_GEN_MEMBER(iq151_vblank_interrupt);
@@ -104,7 +109,7 @@ public:
 READ8_MEMBER(iq151_state::keyboard_row_r)
 {
 	char kbdrow[6];
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	for (int i = 0; i < 8; i++)
 	{
@@ -118,7 +123,7 @@ READ8_MEMBER(iq151_state::keyboard_row_r)
 READ8_MEMBER(iq151_state::keyboard_column_r)
 {
 	char kbdrow[6];
-	UINT8 data = 0x00;
+	uint8_t data = 0x00;
 
 	for (int i = 0; i < 8; i++)
 	{
@@ -132,7 +137,7 @@ READ8_MEMBER(iq151_state::keyboard_column_r)
 
 READ8_MEMBER(iq151_state::ppi_portc_r)
 {
-	UINT8 data = 0x00;
+	uint8_t data = 0x00;
 
 	if (m_cassette_data & 0x06)
 	{
@@ -168,7 +173,7 @@ WRITE8_MEMBER(iq151_state::boot_bank_w)
 
 READ8_MEMBER(iq151_state::cartslot_r)
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	for (auto & elem : m_carts)
 		elem->read(offset, data);
@@ -184,7 +189,7 @@ WRITE8_MEMBER(iq151_state::cartslot_w)
 
 READ8_MEMBER(iq151_state::cartslot_io_r)
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	for (auto & elem : m_carts)
 		elem->io_read(offset, data);
@@ -331,7 +336,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(iq151_state::cassette_timer)
 
 DRIVER_INIT_MEMBER(iq151_state,iq151)
 {
-	UINT8 *RAM = memregion("maincpu")->base();
+	uint8_t *RAM = memregion("maincpu")->base();
 	membank("boot")->configure_entry(0, RAM + 0xf800);
 	membank("boot")->configure_entry(1, RAM + 0x0000);
 
@@ -351,7 +356,7 @@ void iq151_state::machine_reset()
 }
 
 // this machine don't have a built-in video controller, but uses external cartridge
-UINT32 iq151_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t iq151_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
 
@@ -376,7 +381,7 @@ static SLOT_INTERFACE_START(iq151_cart)
 	SLOT_INTERFACE("amos3"  , IQ151_AMOS3)              // AMOS cart 3
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( iq151, iq151_state )
+static MACHINE_CONFIG_START( iq151 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8080, XTAL_2MHz)
 	MCFG_CPU_PROGRAM_MAP(iq151_mem)
@@ -385,7 +390,7 @@ static MACHINE_CONFIG_START( iq151, iq151_state )
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green)
+	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_UPDATE_DRIVER(iq151_state, screen_update)
@@ -400,7 +405,8 @@ static MACHINE_CONFIG_START( iq151, iq151_state )
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_PIC8259_ADD("pic8259", INPUTLINE("maincpu", 0), VCC, NOOP)
+	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
 
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
 	MCFG_I8255_IN_PORTA_CB(READ8(iq151_state, keyboard_row_r))
@@ -472,5 +478,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT   COMPANY   FULLNAME       FLAGS */
-COMP( 198?, iq151,  0,       0,      iq151,     iq151, iq151_state,   iq151, "ZPA Novy Bor", "IQ-151", 0 )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  STATE        INIT   COMPANY         FULLNAME  FLAGS
+COMP( 198?, iq151, 0,      0,      iq151,   iq151, iq151_state, iq151, "ZPA Novy Bor", "IQ-151", 0 )

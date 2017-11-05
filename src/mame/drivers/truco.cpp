@@ -201,17 +201,20 @@
 
 *******************************************************************************************************/
 
+#include "emu.h"
+#include "includes/truco.h"
+
+#include "cpu/m6809/m6809.h"
+#include "machine/6821pia.h"
+#include "sound/volt_reg.h"
+#include "video/mc6845.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 #define MASTER_CLOCK    XTAL_12MHz          /* confirmed */
 #define CPU_CLOCK       (MASTER_CLOCK/16)   /* guess */
 #define CRTC_CLOCK      (MASTER_CLOCK/8)    /* guess */
-
-#include "emu.h"
-#include "cpu/m6809/m6809.h"
-#include "video/mc6845.h"
-#include "machine/6821pia.h"
-#include "includes/truco.h"
-
 
 /*******************************************
 *           Read/Write Handlers            *
@@ -237,11 +240,9 @@ WRITE_LINE_MEMBER(truco_state::pia_ca2_w)
 
 WRITE8_MEMBER(truco_state::portb_w)
 {
-	if ((data & 0x80) | (data == 0))
-	{
-		m_dac->write_unsigned8(data & 0x80);  /* Isolated the bit for Delta-Sigma DAC */
-	}
-	else
+	m_dac->write(BIT(data, 7)); /* Isolated the bit for Delta-Sigma DAC */
+
+	if (data & 0x7f)
 		logerror("Port B writes: %2x\n", data);
 }
 
@@ -415,7 +416,7 @@ INTERRUPT_GEN_MEMBER(truco_state::interrupt)
 *              Machine Driver              *
 *******************************************/
 
-static MACHINE_CONFIG_START( truco, truco_state )
+static MACHINE_CONFIG_START( truco )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, CPU_CLOCK)
@@ -451,10 +452,10 @@ static MACHINE_CONFIG_START( truco, truco_state )
 	MCFG_MC6845_CHAR_WIDTH(4)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -470,5 +471,5 @@ ROM_START( truco )
 	ROM_LOAD( "truco.u2",   0x0c000, 0x4000, CRC(ff355750) SHA1(1538f20b1919928ffca439e4046a104ddfbc756c) )
 ROM_END
 
-/*    YEAR  NAME     PARENT  MACHINE  INPUT    STATE            INIT  ROT    COMPANY           FULLNAME     FLAGS  */
-GAME( 198?, truco,   0,      truco,   truco,   driver_device,   0,    ROT0, "Playtronic SRL", "Truco-Tron", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME     PARENT  MACHINE  INPUT    STATE          INIT  ROT   COMPANY           FULLNAME      FLAGS
+GAME( 198?, truco,   0,      truco,   truco,   truco_state,   0,    ROT0, "Playtronic SRL", "Truco-Tron", MACHINE_SUPPORTS_SAVE )

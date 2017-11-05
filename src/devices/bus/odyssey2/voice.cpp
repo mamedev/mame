@@ -14,20 +14,21 @@
 
 #include "emu.h"
 #include "voice.h"
+#include "speaker.h"
 
 
 //-------------------------------------------------
 //  o2_voice_device - constructor
 //-------------------------------------------------
 
-const device_type O2_ROM_VOICE = &device_creator<o2_voice_device>;
+DEFINE_DEVICE_TYPE(O2_ROM_VOICE, o2_voice_device, "o2_voice", "Odyssey 2 The Voice Passthrough Cart")
 
 
-o2_voice_device::o2_voice_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: o2_rom_device(mconfig, O2_ROM_VOICE, "Odyssey 2 The Voice Passthrough Cart", tag, owner, clock, "o2_voice", __FILE__),
-					m_speech(*this, "sp0256_speech"),
-					m_subslot(*this, "subslot"),
-					m_lrq_state(0)
+o2_voice_device::o2_voice_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: o2_rom_device(mconfig, O2_ROM_VOICE, tag, owner, clock)
+	, m_speech(*this, "sp0256_speech")
+	, m_subslot(*this, "subslot")
+	, m_lrq_state(0)
 {
 }
 
@@ -37,11 +38,12 @@ void o2_voice_device::device_start()
 	save_item(NAME(m_lrq_state));
 }
 
+
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( sub_slot )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( o2voice )
+MACHINE_CONFIG_MEMBER( o2_voice_device::device_add_mconfig )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("sp0256_speech", SP0256, 3120000)
@@ -51,17 +53,6 @@ static MACHINE_CONFIG_FRAGMENT( o2voice )
 
 	MCFG_O2_CARTRIDGE_ADD("subslot", o2_cart, nullptr)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor o2_voice_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( o2voice );
-}
 
 
 ROM_START( o2voice )
@@ -84,7 +75,7 @@ ROM_START( o2voice )
 	ROM_LOAD( "spr128-004.bin",   0x8000, 0x4000, CRC(e79dfb75) SHA1(37f33d79ffd1739d7c2f226b010a1eac28d74ca0) )
 ROM_END
 
-const rom_entry *o2_voice_device::device_rom_region() const
+const tiny_rom_entry *o2_voice_device::device_rom_region() const
 {
 	return ROM_NAME( o2voice );
 }

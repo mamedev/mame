@@ -173,26 +173,27 @@ void real_profiler_state::update_text(running_machine &machine)
 	};
 
 	// compute the total time for all bits, not including profiler or idle
-	UINT64 computed = 0;
+	u64 computed = 0;
 	profile_type curtype;
 	for (curtype = PROFILER_DEVICE_FIRST; curtype < PROFILER_PROFILER; ++curtype)
 		computed += m_data[curtype];
 
 	// save that result in normalize, and continue adding the rest
-	UINT64 normalize = computed;
+	u64 normalize = computed;
 	for ( ; curtype < PROFILER_TOTAL; ++curtype)
 		computed += m_data[curtype];
 
 	// this becomes the total; if we end up with 0 for anything, we were just started, so return empty
-	UINT64 total = computed;
-	m_text.clear();
+	u64 total = computed;
 	if (total == 0 || normalize == 0)
 	{
+		m_text.clear();
 		return;
 	}
 
 	// loop over all types and generate the string
 	device_iterator iter(machine.root_device());
+	std::ostringstream stream;
 	for (curtype = PROFILER_DEVICE_FIRST; curtype < PROFILER_TOTAL; ++curtype)
 	{
 		// determine the accumulated time for this type
@@ -202,28 +203,29 @@ void real_profiler_state::update_text(running_machine &machine)
 		if (computed != 0)
 		{
 			// start with the un-normalized percentage
-			m_text.append(string_format("%02d%% ", (int)((computed * 100 + total / 2) / total)));
+			util::stream_format(stream, "%02d%% ", (int)((computed * 100 + total / 2) / total));
 
 			// followed by the normalized percentage for everything but profiler and idle
 			if (curtype < PROFILER_PROFILER)
-				m_text.append(string_format("%02d%% ", (int)((computed * 100 + normalize / 2) / normalize)));
+				util::stream_format(stream, "%02d%% ", (int)((computed * 100 + normalize / 2) / normalize));
 
 			// and then the text
 			if (curtype >= PROFILER_DEVICE_FIRST && curtype <= PROFILER_DEVICE_MAX)
-				m_text.append(string_format("'%s'", iter.byindex(curtype - PROFILER_DEVICE_FIRST)->tag()));
+				util::stream_format(stream, "'%s'", iter.byindex(curtype - PROFILER_DEVICE_FIRST)->tag());
 			else
 				for (auto & name : names)
 					if (name.type == curtype)
 					{
-						m_text.append(name.string);
+						stream << name.string;
 						break;
 					}
 
 			// followed by a carriage return
-			m_text.append("\n");
+			stream << '\n';
 		}
 	}
 
 	// reset data set to 0
 	memset(m_data, 0, sizeof(m_data));
+	m_text = stream.str();
 }

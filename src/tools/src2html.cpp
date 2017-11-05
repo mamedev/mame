@@ -182,14 +182,14 @@ static const token_entry c_token_table[] =
 
 /*
     { "INLINE", CUSTOM_CLASS },
-    { "INT8", CUSTOM_CLASS },
-    { "UINT8", CUSTOM_CLASS },
-    { "INT16", CUSTOM_CLASS },
-    { "UINT16", CUSTOM_CLASS },
-    { "INT32", CUSTOM_CLASS },
-    { "UINT32", CUSTOM_CLASS },
-    { "INT64", CUSTOM_CLASS },
-    { "UINT64", CUSTOM_CLASS },
+    { "int8_t", CUSTOM_CLASS },
+    { "uint8_t", CUSTOM_CLASS },
+    { "int16_t", CUSTOM_CLASS },
+    { "uint16_t", CUSTOM_CLASS },
+    { "int32_t", CUSTOM_CLASS },
+    { "uint32_t", CUSTOM_CLASS },
+    { "int64_t", CUSTOM_CLASS },
+    { "uint64_t", CUSTOM_CLASS },
     { "ARRAY_LENGTH", CUSTOM_CLASS },
 */
 	{ nullptr, KEYWORD_CLASS }
@@ -277,12 +277,12 @@ int main(int argc, char *argv[])
 		usage(argv[0]);
 
 	// read the template file into an std::string
-	UINT32 bufsize;
+	uint32_t bufsize;
 	void *buffer;
 	if (util::core_file::load(tempfilename.c_str(), &buffer, bufsize) == osd_file::error::NONE)
 	{
 		tempheader.assign((const char *)buffer, bufsize);
-		osd_free(buffer);
+		free(buffer);
 	}
 
 	// verify the template
@@ -324,7 +324,7 @@ static int compare_list_entries(const void *p1, const void *p2)
 
 static int recurse_dir(int srcrootlen, int dstrootlen, std::string &srcdir, std::string &dstdir, std::string &tempheader, std::string &tempfooter)
 {
-	static const osd_dir_entry_type typelist[] = { ENTTYPE_DIR, ENTTYPE_FILE };
+	static const osd::directory::entry::entry_type typelist[] = { osd::directory::entry::entry_type::DIR, osd::directory::entry::entry_type::FILE };
 
 	// extract a normalized subpath
 	std::string srcdir_subpath;
@@ -344,10 +344,10 @@ static int recurse_dir(int srcrootlen, int dstrootlen, std::string &srcdir, std:
 	int result = 0;
 	for (int entindex = 0; entindex < ARRAY_LENGTH(typelist) && result == 0; entindex++)
 	{
-		osd_dir_entry_type entry_type = typelist[entindex];
+		auto entry_type = typelist[entindex];
 
 		// open the directory and iterate through it
-		osd_directory *dir = osd_opendir(srcdir.c_str());
+		auto dir = osd::directory::open(srcdir.c_str());
 		if (dir == nullptr)
 		{
 			result = 1;
@@ -355,10 +355,10 @@ static int recurse_dir(int srcrootlen, int dstrootlen, std::string &srcdir, std:
 		}
 
 		// build up the list of files
-		const osd_directory_entry *entry;
+		const osd::directory::entry *entry;
 		int found = 0;
 		list_entry *list = nullptr;
-		while ((entry = osd_readdir(dir)) != nullptr)
+		while ((entry = dir->read()) != nullptr)
 			if (entry->type == entry_type && entry->name[0] != '.')
 			{
 				auto lentry = new list_entry;
@@ -369,7 +369,7 @@ static int recurse_dir(int srcrootlen, int dstrootlen, std::string &srcdir, std:
 			}
 
 		// close the directory
-		osd_closedir(dir);
+		dir.reset();
 
 		// skip if nothing found
 		if (found == 0)
@@ -398,7 +398,7 @@ static int recurse_dir(int srcrootlen, int dstrootlen, std::string &srcdir, std:
 		{
 			// add a header
 			if (curlist == list)
-				indexfile->printf("\t<h2>%s</h2>\n\t<ul>\n", (entry_type == ENTTYPE_DIR) ? "Directories" : "Files");
+				indexfile->printf("\t<h2>%s</h2>\n\t<ul>\n", (entry_type == osd::directory::entry::entry_type::DIR) ? "Directories" : "Files");
 
 			// build the source filename
 			std::string srcfile;
@@ -406,12 +406,12 @@ static int recurse_dir(int srcrootlen, int dstrootlen, std::string &srcdir, std:
 
 			// if we have a file, output it
 			std::string dstfile;
-			if (entry_type == ENTTYPE_FILE)
+			if (entry_type == osd::directory::entry::entry_type::FILE)
 			{
 				// make sure we care, first
 				file_type type = FILE_TYPE_INVALID;
 				for (auto & elem : extension_lookup)
-					if (core_filename_ends_with(curlist->name.c_str(), elem.extension))
+					if (core_filename_ends_with(curlist->name, elem.extension))
 					{
 						type = elem.type;
 						break;
@@ -513,7 +513,7 @@ static int output_file(file_type type, int srcrootlen, int dstrootlen, std::stri
 	bool is_token[256];
 	memset(is_token, 0, sizeof(is_token));
 	for (int toknum = 0; token_chars[toknum] != 0; toknum++)
-		is_token[(UINT8)token_chars[toknum]] = true;
+		is_token[(uint8_t)token_chars[toknum]] = true;
 
 	// open the source file
 	util::core_file::ptr src;
@@ -557,11 +557,11 @@ static int output_file(file_type type, int srcrootlen, int dstrootlen, std::stri
 		bool last_token_was_include = false;
 		bool last_was_token = false;
 		bool quotes_are_linked = false;
-		UINT8 curquote = 0;
+		uint8_t curquote = 0;
 		int curcol = 0;
 		for (char *srcptr = srcline; *srcptr != 0; )
 		{
-			UINT8 ch = *srcptr++;
+			uint8_t ch = *srcptr++;
 
 			// track whether or not we are within an extended (C-style) comment
 			if (!in_quotes && !in_inline_comment)
@@ -602,7 +602,7 @@ static int output_file(file_type type, int srcrootlen, int dstrootlen, std::stri
 				int toklength;
 
 				// find the end of the token
-				while (*temp != 0 && is_token[(UINT8)*temp])
+				while (*temp != 0 && is_token[(uint8_t)*temp])
 					temp++;
 				toklength = temp - (srcptr - 1);
 

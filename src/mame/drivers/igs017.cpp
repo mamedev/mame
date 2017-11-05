@@ -21,8 +21,8 @@ Year + Game                     PCB        CPU    Sound         Custom          
 98  Mj Long Hu Zheng Ba 2       NO-0206    68000  M6295         IGS031 IGS025 IGS022* Battery
 98  Mj Shuang Long Qiang Zhu 2  NO-0207    68000  M6295         IGS031 IGS025 IGS022  Battery
 98  Mj Man Guan Cai Shen        NO-0192-1  68000  M6295         IGS017 IGS025 IGS029  Battery
-99? Tarzan (V107)?              NO-0248-1  Z180   M6295         IGS031 IGS025         Battery
-99? Tarzan (V109C)?             NO-0228?   Z180   M6295         IGS031 IGS025 IGS029  Battery
+99  Tarzan (V107)               NO-0228?   Z180   M6295         IGS031 IGS025 IGS029  Battery
+99  Tarzan (V109C)              NO-0248-1  Z180   M6295         IGS031 IGS025         Battery
 00? Super Tarzan (V100I)        NO-0230-1  Z180   M6295         IGS031 IGS025         Battery
 ??  Super Poker / Formosa       NO-0187    Z180   M6295 YM2413  IGS017 IGS025         Battery
 -------------------------------------------------------------------------------------------------------------
@@ -45,15 +45,21 @@ Notes:
 ************************************************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/z180/z180.h"
 #include "machine/i8255.h"
-#include "sound/2413intf.h"
+#include "sound/ym2413.h"
 #include "sound/okim6295.h"
 #include "machine/igs025.h"
 #include "machine/igs022.h"
 #include "machine/ticket.h"
+#include "machine/timer.h"
 #include "video/igs017_igs031.h"
+
+#include "screen.h"
+#include "speaker.h"
+
 
 class igs017_state : public driver_device
 {
@@ -81,7 +87,7 @@ public:
 	optional_device<igs022_device> m_igs022; // Mj Shuang Long Qiang Zhu 2
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	optional_shared_ptr<UINT8> m_decrypted_opcodes;
+	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
 	required_device<igs017_igs031_device> m_igs017_igs031;
 
 
@@ -89,23 +95,23 @@ public:
 
 
 
-	UINT8 m_input_select;
-	UINT8 m_hopper;
-	UINT16 m_igs_magic[2];
-	UINT8 m_scramble_data;
+	uint8_t m_input_select;
+	uint8_t m_hopper;
+	uint16_t m_igs_magic[2];
+	uint8_t m_scramble_data;
 
-	UINT8 m_dsw_select;
+	uint8_t m_dsw_select;
 
 	// lhzb2a protection:
-	UINT16 m_prot_regs[2], m_prot_val, m_prot_word, m_prot_m3, m_prot_mf;
-	UINT8 m_prot2;
+	uint16_t m_prot_regs[2], m_prot_val, m_prot_word, m_prot_m3, m_prot_mf;
+	uint8_t m_prot2;
 
 	// IGS029 protection (communication)
-	UINT8 m_igs029_send_data, m_igs029_recv_data;
-	UINT8 m_igs029_send_buf[256], m_igs029_recv_buf[256];
+	uint8_t m_igs029_send_data, m_igs029_recv_data;
+	uint8_t m_igs029_send_buf[256], m_igs029_recv_buf[256];
 	int m_igs029_send_len, m_igs029_recv_len;
 	// IGS029 protection (mgcs)
-	UINT32 m_igs029_mgcs_long;
+	uint32_t m_igs029_mgcs_long;
 
 
 	DECLARE_WRITE8_MEMBER(input_select_w);
@@ -113,10 +119,10 @@ public:
 	DECLARE_WRITE16_MEMBER(mgcs_magic_w);
 	DECLARE_READ16_MEMBER(mgcs_magic_r);
 
-	UINT16 mgcs_palette_bitswap(UINT16 bgr);
-	UINT16 lhzb2a_palette_bitswap(UINT16 bgr);
-	UINT16 tjsb_palette_bitswap(UINT16 bgr);
-	UINT16 slqz2_palette_bitswap(UINT16 bgr);
+	uint16_t mgcs_palette_bitswap(uint16_t bgr);
+	uint16_t lhzb2a_palette_bitswap(uint16_t bgr);
+	uint16_t tjsb_palette_bitswap(uint16_t bgr);
+	uint16_t slqz2_palette_bitswap(uint16_t bgr);
 
 	DECLARE_READ8_MEMBER(sdmg2_keys_r);
 	DECLARE_WRITE16_MEMBER(sdmg2_magic_w);
@@ -167,7 +173,7 @@ public:
 	DECLARE_MACHINE_RESET(iqblocka);
 	DECLARE_MACHINE_RESET(mgcs);
 	DECLARE_MACHINE_RESET(lhzb2a);
-	UINT32 screen_update_igs017(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_igs017(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(iqblocka_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(mgcs_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(mgdh_interrupt);
@@ -181,7 +187,10 @@ public:
 	void mgcs_flip_sprites();
 	void mgcs_patch_rom();
 	void mgcs_igs029_run();
-	void starzan_decrypt(UINT8 *ROM, int size, bool isOpcode);
+	void tarzan_decrypt_tiles();
+	void tarzan_decrypt_program_rom();
+	void tarzana_decrypt_program_rom();
+	void starzan_decrypt(uint8_t *ROM, int size, bool isOpcode);
 	void lhzb2_patch_rom();
 	void lhzb2_decrypt_tiles();
 	void lhzb2_decrypt_sprites();
@@ -205,33 +214,33 @@ void igs017_state::video_start()
 	m_igs017_igs031->video_start();
 }
 
-UINT32 igs017_state::screen_update_igs017(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t igs017_state::screen_update_igs017(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_igs017_igs031->screen_update_igs017(screen, bitmap, cliprect);
 	return 0;
 }
 
 // palette bitswap callbacks
-UINT16 igs017_state::mgcs_palette_bitswap(UINT16 bgr)
+uint16_t igs017_state::mgcs_palette_bitswap(uint16_t bgr)
 {
 	bgr = ((bgr & 0xff00) >> 8) | ((bgr & 0x00ff) << 8);
 
 	return BITSWAP16(bgr, 7, 8, 9, 2, 14, 3, 13, 15, 12, 11, 10, 0, 1, 4, 5, 6);
 }
 
-UINT16 igs017_state::lhzb2a_palette_bitswap(UINT16 bgr)
+uint16_t igs017_state::lhzb2a_palette_bitswap(uint16_t bgr)
 {
 //  bgr = ((bgr & 0xff00) >> 8) | ((bgr & 0x00ff) << 8);
 	return BITSWAP16(bgr, 15,9,13,12,11,5,4,8,7,6,0,14,3,2,1,10);
 }
 
-UINT16 igs017_state::tjsb_palette_bitswap(UINT16 bgr)
+uint16_t igs017_state::tjsb_palette_bitswap(uint16_t bgr)
 {
 	// bitswap
 	return BITSWAP16(bgr, 15,12,3,6,10,5,4,2,9,13,8,7,11,1,0,14);
 }
 
-UINT16 igs017_state::slqz2_palette_bitswap(UINT16 bgr)
+uint16_t igs017_state::slqz2_palette_bitswap(uint16_t bgr)
 {
 	return BITSWAP16(bgr, 15,14,9,4,11,10,12,3,7,6,5,8,13,2,1,0);
 }
@@ -246,8 +255,8 @@ UINT16 igs017_state::slqz2_palette_bitswap(UINT16 bgr)
 void igs017_state::decrypt_program_rom(int mask, int a7, int a6, int a5, int a4, int a3, int a2, int a1, int a0)
 {
 	int length = memregion("maincpu")->bytes();
-	UINT8 *rom = memregion("maincpu")->base();
-	std::unique_ptr<UINT8[]> tmp = std::make_unique<UINT8[]>(length);
+	uint8_t *rom = memregion("maincpu")->base();
+	std::unique_ptr<uint8_t[]> tmp = std::make_unique<uint8_t[]>(length);
 	int i;
 
 	// decrypt the program ROM
@@ -304,7 +313,7 @@ void igs017_state::decrypt_program_rom(int mask, int a7, int a6, int a5, int a4,
 
 void igs017_state::iqblocka_patch_rom()
 {
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 
 //  rom[0x7b64] = 0xc9;
 
@@ -346,8 +355,8 @@ DRIVER_INIT_MEMBER(igs017_state,iqblockf)
 void igs017_state::tjsb_decrypt_sprites()
 {
 	int length = memregion("sprites")->bytes();
-	UINT8 *rom = memregion("sprites")->base();
-	std::unique_ptr<UINT8[]> tmp = std::make_unique<UINT8[]>(length);
+	uint8_t *rom = memregion("sprites")->base();
+	std::unique_ptr<uint8_t[]> tmp = std::make_unique<uint8_t[]>(length);
 	int i, addr;
 
 	// address lines swap
@@ -361,7 +370,7 @@ void igs017_state::tjsb_decrypt_sprites()
 	// data lines swap
 	for (i = 0; i < length; i += 2)
 	{
-		UINT16 data = (rom[i+1] << 8) | rom[i+0];   // x-22222-11111-00000
+		uint16_t data = (rom[i+1] << 8) | rom[i+0];   // x-22222-11111-00000
 		data = BITSWAP16(data, 15, 14,13,12,11,10, 9,1,7,6,5, 4,3,2,8,0);
 		rom[i+0] = data;
 		rom[i+1] = data >> 8;
@@ -381,13 +390,13 @@ DRIVER_INIT_MEMBER(igs017_state,tjsb)
 void igs017_state::mgcs_decrypt_program_rom()
 {
 	int i;
-	UINT16 *src = (UINT16 *)memregion("maincpu")->base();
+	uint16_t *src = (uint16_t *)memregion("maincpu")->base();
 
 	int rom_size = 0x80000;
 
 	for (i=0; i<rom_size/2; i++)
 	{
-		UINT16 x = src[i];
+		uint16_t x = src[i];
 
 		/* bit 0 xor layer */
 
@@ -431,8 +440,8 @@ void igs017_state::mgcs_decrypt_program_rom()
 void igs017_state::mgcs_decrypt_tiles()
 {
 	int length = memregion("tilemaps")->bytes();
-	UINT8 *rom = memregion("tilemaps")->base();
-	dynamic_buffer tmp(length);
+	uint8_t *rom = memregion("tilemaps")->base();
+	std::vector<uint8_t> tmp(length);
 	int i;
 
 	memcpy(&tmp[0],rom,length);
@@ -446,12 +455,12 @@ void igs017_state::mgcs_decrypt_tiles()
 void igs017_state::mgcs_flip_sprites()
 {
 	int length = memregion("sprites")->bytes();
-	UINT8 *rom = memregion("sprites")->base();
+	uint8_t *rom = memregion("sprites")->base();
 	int i;
 
 	for (i = 0;i < length;i+=2)
 	{
-		UINT16 pixels = (rom[i+1] << 8) | rom[i+0];
+		uint16_t pixels = (rom[i+1] << 8) | rom[i+0];
 
 		// flip bits
 		pixels = BITSWAP16(pixels,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15);
@@ -466,7 +475,7 @@ void igs017_state::mgcs_flip_sprites()
 
 void igs017_state::mgcs_patch_rom()
 {
-//  UINT16 *rom = (UINT16 *)memregion("maincpu")->base();
+//  uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 
 //  rom[0x20666/2] = 0x601e;    // 020666: 671E    beq $20686 (rom check)
 
@@ -488,16 +497,31 @@ DRIVER_INIT_MEMBER(igs017_state,mgcs)
 
 // tarzan, tarzana
 
-// decryption is incomplete, the first part of code doesn't seem right.
-DRIVER_INIT_MEMBER(igs017_state,tarzan)
+void igs017_state::tarzan_decrypt_tiles()
 {
-	UINT16 *ROM = (UINT16 *)memregion("maincpu")->base();
+	int length = memregion("tilemaps")->bytes();
+	uint8_t *rom = memregion("tilemaps")->base();
+	std::vector<uint8_t> tmp(length);
+	int i;
+
+	memcpy(&tmp[0],rom,length);
+	for (i = 0;i < length;i++)
+	{
+		int addr = (i & ~0xffff) | BITSWAP16(i,15,14,13,12,11,7,8,6,10,9,5,4,3,2,1,0);
+		rom[i] = BITSWAP8(tmp[addr],0,1,2,3,4,5,6,7);
+	}
+}
+
+// decryption is incomplete, the first part of code doesn't seem right.
+void igs017_state::tarzan_decrypt_program_rom()
+{
+	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
 	int i;
 	int size = 0x40000;
 
 	for(i=0; i<size/2; i++)
 	{
-		UINT16 x = ROM[i];
+		uint16_t x = ROM[i];
 
 		if((i & 0x10c0) == 0x0000)
 			x ^= 0x0001;
@@ -515,15 +539,15 @@ DRIVER_INIT_MEMBER(igs017_state,tarzan)
 	}
 }
 // by iq_132
-DRIVER_INIT_MEMBER(igs017_state,tarzana)
+void igs017_state::tarzana_decrypt_program_rom()
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	int i;
 	int size = 0x80000;
 
 	for (i = 0; i < size; i++)
 	{
-		UINT8 x = 0;
+		uint8_t x = 0;
 		if ((i & 0x00011) == 0x00011) x ^= 0x01;
 		if ((i & 0x02180) == 0x00000) x ^= 0x01;
 		if ((i & 0x001a0) != 0x00020) x ^= 0x20;
@@ -533,17 +557,28 @@ DRIVER_INIT_MEMBER(igs017_state,tarzana)
 	}
 }
 
+DRIVER_INIT_MEMBER(igs017_state,tarzan)
+{
+	tarzan_decrypt_program_rom();
+	tarzan_decrypt_tiles();
+}
+
+DRIVER_INIT_MEMBER(igs017_state,tarzana)
+{
+	tarzana_decrypt_program_rom();
+//  tarzana_decrypt_tiles();    // to do
+}
 
 // starzan
 
 // decryption is incomplete: data decryption is correct but opcodes are encrypted differently.
 
-void igs017_state::starzan_decrypt(UINT8 *ROM, int size, bool isOpcode)
+void igs017_state::starzan_decrypt(uint8_t *ROM, int size, bool isOpcode)
 {
 	for(int i=0; i<size; i++)
 	{
 #if 1
-		UINT8 x = ROM[i];
+		uint8_t x = ROM[i];
 
 		// this seems ok for opcodes too
 		if ( (i & 0x10) && (i & 0x01) )
@@ -590,8 +625,8 @@ DRIVER_INIT_MEMBER(igs017_state,starzan)
 {
 	int size = 0x040000;
 
-	UINT8 *data = memregion("maincpu")->base();
-	UINT8 *code = m_decrypted_opcodes;
+	uint8_t *data = memregion("maincpu")->base();
+	uint8_t *code = m_decrypted_opcodes;
 	memcpy(code, data, size);
 
 	starzan_decrypt(data, size, false); // data
@@ -606,13 +641,13 @@ DRIVER_INIT_MEMBER(igs017_state,starzan)
 DRIVER_INIT_MEMBER(igs017_state,sdmg2)
 {
 	int i;
-	UINT16 *src = (UINT16 *)memregion("maincpu")->base();
+	uint16_t *src = (uint16_t *)memregion("maincpu")->base();
 
 	int rom_size = 0x80000;
 
 	for (i=0; i<rom_size/2; i++)
 	{
-		UINT16 x = src[i];
+		uint16_t x = src[i];
 
 		/* bit 0 xor layer */
 
@@ -663,13 +698,13 @@ DRIVER_INIT_MEMBER(igs017_state,sdmg2)
 DRIVER_INIT_MEMBER(igs017_state,mgdha)
 {
 	int i;
-	UINT16 *src = (UINT16 *)memregion("maincpu")->base();
+	uint16_t *src = (uint16_t *)memregion("maincpu")->base();
 
 	int rom_size = 0x80000;
 
 	for (i=0; i<rom_size/2; i++)
 	{
-		UINT16 x = src[i];
+		uint16_t x = src[i];
 
 		if( (i & 0x20/2) && (i & 0x02/2) )
 		{
@@ -698,7 +733,7 @@ DRIVER_INIT_MEMBER(igs017_state,mgdh)
 {
 	DRIVER_INIT_CALL(mgdha);
 
-	UINT16 *rom = (UINT16 *)memregion("maincpu")->base();
+	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 
 	// additional protection
 	rom[0x4ad50/2] = 0x4e71;
@@ -710,7 +745,7 @@ DRIVER_INIT_MEMBER(igs017_state,mgdh)
 
 void igs017_state::lhzb2_patch_rom()
 {
-	UINT16 *rom = (UINT16 *)memregion("maincpu")->base();
+	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 
 	// Prot. checks:
 	rom[0x14786/2] = 0x6044;    // 014786: 6744    beq $147cc
@@ -722,8 +757,8 @@ void igs017_state::lhzb2_patch_rom()
 void igs017_state::lhzb2_decrypt_tiles()
 {
 	int length = memregion("tilemaps")->bytes();
-	UINT8 *rom = memregion("tilemaps")->base();
-	dynamic_buffer tmp(length);
+	uint8_t *rom = memregion("tilemaps")->base();
+	std::vector<uint8_t> tmp(length);
 	int i;
 
 	int addr;
@@ -738,8 +773,8 @@ void igs017_state::lhzb2_decrypt_tiles()
 void igs017_state::lhzb2_decrypt_sprites()
 {
 	int length = memregion("sprites")->bytes();
-	UINT8 *rom = memregion("sprites")->base();
-	std::unique_ptr<UINT8[]> tmp = std::make_unique<UINT8[]>(length);
+	uint8_t *rom = memregion("sprites")->base();
+	std::unique_ptr<uint8_t[]> tmp = std::make_unique<uint8_t[]>(length);
 	int i, addr;
 
 	// address lines swap
@@ -753,7 +788,7 @@ void igs017_state::lhzb2_decrypt_sprites()
 	// data lines swap
 	for (i = 0;i < length;i+=2)
 	{
-		UINT16 data = (rom[i+1] << 8) | rom[i+0];   // x-22222-11111-00000
+		uint16_t data = (rom[i+1] << 8) | rom[i+0];   // x-22222-11111-00000
 		data = BITSWAP16(data, 15, 7,6,5,4,3, 2,1,0,14,13, 12,11,10,9,8);
 		rom[i+0] = data;
 		rom[i+1] = data >> 8;
@@ -770,13 +805,13 @@ void igs017_state::igs025_to_igs022_callback( void )
 DRIVER_INIT_MEMBER(igs017_state,lhzb2)
 {
 	int i;
-	UINT16 *src = (UINT16 *) (memregion("maincpu")->base());
+	uint16_t *src = (uint16_t *) (memregion("maincpu")->base());
 
 	int rom_size = 0x80000;
 
 	for (i=0; i<rom_size/2; i++)
 	{
-		UINT16 x = src[i];
+		uint16_t x = src[i];
 
 		/* bit 0 xor layer */
 
@@ -871,13 +906,13 @@ DRIVER_INIT_MEMBER(igs017_state,lhzb2)
 DRIVER_INIT_MEMBER(igs017_state,lhzb2a)
 {
 	int i;
-	UINT16 *src = (UINT16 *) (memregion("maincpu")->base());
+	uint16_t *src = (uint16_t *) (memregion("maincpu")->base());
 
 	int rom_size = 0x80000;
 
 	for (i=0; i<rom_size/2; i++)
 	{
-		UINT16 x = src[i];
+		uint16_t x = src[i];
 
 		/* bit 0 xor layer */
 
@@ -935,7 +970,7 @@ DRIVER_INIT_MEMBER(igs017_state,lhzb2a)
 
 void igs017_state::slqz2_patch_rom()
 {
-	UINT16 *rom = (UINT16 *)memregion("maincpu")->base();
+	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 
 	// Prot. checks:
 	rom[0x1489c/2] = 0x6044;    // 01489C: 6744    beq $148e2
@@ -947,8 +982,8 @@ void igs017_state::slqz2_patch_rom()
 void igs017_state::slqz2_decrypt_tiles()
 {
 	int length = memregion("tilemaps")->bytes();
-	UINT8 *rom = memregion("tilemaps")->base();
-	dynamic_buffer tmp(length);
+	uint8_t *rom = memregion("tilemaps")->base();
+	std::vector<uint8_t> tmp(length);
 	int i;
 
 	memcpy(&tmp[0],rom,length);
@@ -962,13 +997,13 @@ void igs017_state::slqz2_decrypt_tiles()
 DRIVER_INIT_MEMBER(igs017_state,slqz2)
 {
 	int i;
-	UINT16 *src = (UINT16 *) (memregion("maincpu")->base());
+	uint16_t *src = (uint16_t *) (memregion("maincpu")->base());
 
 	int rom_size = 0x80000;
 
 	for (i=0; i<rom_size/2; i++)
 	{
-		UINT16 x = src[i];
+		uint16_t x = src[i];
 
 		/* bit 0 xor layer */
 
@@ -1052,8 +1087,8 @@ DRIVER_INIT_MEMBER(igs017_state,slqz2)
 void igs017_state::spkrform_decrypt_sprites()
 {
 	int length = memregion("sprites")->bytes();
-	UINT8 *rom = memregion("sprites")->base();
-	std::unique_ptr<UINT8[]> tmp = std::make_unique<UINT8[]>(length);
+	uint8_t *rom = memregion("sprites")->base();
+	std::unique_ptr<uint8_t[]> tmp = std::make_unique<uint8_t[]>(length);
 	int i, addr;
 
 	// address lines swap
@@ -1091,7 +1126,7 @@ static ADDRESS_MAP_START( iqblocka_map, AS_PROGRAM, 8, igs017_state )
 	AM_RANGE( 0x10000, 0x3ffff ) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, igs017_state )
+static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 8, igs017_state )
 	AM_RANGE( 0x00000, 0x3ffff ) AM_ROM AM_SHARE("decrypted_opcodes")
 ADDRESS_MAP_END
 
@@ -1168,15 +1203,15 @@ void igs017_state::mgcs_igs029_run()
 
 	if (m_igs029_send_buf[0] == 0x05 && m_igs029_send_buf[1] == 0x5a)
 	{
-		UINT8 data = m_igs029_send_buf[2];
-		UINT8 port = m_igs029_send_buf[3];
+		uint8_t data = m_igs029_send_buf[2];
+		uint8_t port = m_igs029_send_buf[3];
 
 		logerror("PORT %02x = %02x\n", port, data);
 
 		switch (port)
 		{
 			case 0x01:
-				m_oki->set_bank_base((data & 0x10) ? 0x40000 : 0);
+				m_oki->set_rom_bank((data >> 4) & 1);
 				machine().bookkeeping().coin_counter_w(0, (~data) & 0x20);   // coin in
 				machine().bookkeeping().coin_counter_w(1, (~data) & 0x40);   // coin out
 
@@ -1210,7 +1245,7 @@ void igs017_state::mgcs_igs029_run()
 
 		// No inputs. Returns 1 long
 
-		UINT8 min_bets[4] = {1, 2, 3, 5};
+		uint8_t min_bets[4] = {1, 2, 3, 5};
 
 		m_igs029_recv_len = 0;
 		m_igs029_recv_buf[m_igs029_recv_len++] = 0x00;
@@ -1223,7 +1258,7 @@ void igs017_state::mgcs_igs029_run()
 	{
 		logerror("READ DSW\n");
 
-		UINT8 ret;
+		uint8_t ret;
 		if      (~m_dsw_select & 0x01)  ret = ioport("DSW1")->read();
 		else if (~m_dsw_select & 0x02)  ret = ioport("DSW2")->read();
 		else
@@ -1377,14 +1412,14 @@ READ16_MEMBER(igs017_state::mgcs_magic_r)
 
 		case 0x01:
 		{
-			UINT16 ret = BITSWAP8( (BITSWAP8(m_scramble_data, 0,1,2,3,4,5,6,7) + 1) & 3, 4,5,6,7, 0,1,2,3);
+			uint16_t ret = BITSWAP8( (BITSWAP8(m_scramble_data, 0,1,2,3,4,5,6,7) + 1) & 3, 4,5,6,7, 0,1,2,3);
 			logerror("%s: reading %02x from igs_magic = %02x\n", machine().describe_context(), ret, m_igs_magic[0]);
 			return ret;
 		}
 
 		case 0x02:
 		{
-			UINT8 ret = m_igs029_recv_data;
+			uint8_t ret = m_igs029_recv_data;
 			logerror("%s: reading %02x from igs_magic = %02x\n", machine().describe_context(), ret, m_igs_magic[0]);
 			return ret;
 		}
@@ -1465,7 +1500,7 @@ WRITE16_MEMBER(igs017_state::sdmg2_magic_w)
 		case 0x02:
 			if (ACCESSING_BITS_0_7)
 			{
-				m_oki->set_bank_base((data & 0x80) ? 0x40000 : 0);
+				m_oki->set_rom_bank((data >> 7) & 1);
 			}
 			break;
 
@@ -1480,7 +1515,7 @@ READ16_MEMBER(igs017_state::sdmg2_magic_r)
 	{
 		case 0x00:
 		{
-			UINT16 hopper_bit = (m_hopper && ((m_screen->frame_number()/10)&1)) ? 0x0000 : 0x0001;
+			uint16_t hopper_bit = (m_hopper && ((m_screen->frame_number()/10)&1)) ? 0x0000 : 0x0001;
 			return ioport("COINS")->read() | hopper_bit;
 		}
 
@@ -1561,7 +1596,7 @@ WRITE16_MEMBER(igs017_state::mgdha_magic_w)
 			if (ACCESSING_BITS_0_7)
 			{
 				// bit 7?
-				m_oki->set_bank_base((data & 0x40) ? 0x40000 : 0);
+				m_oki->set_rom_bank((data >> 6) & 1);
 			}
 			break;
 
@@ -1596,7 +1631,7 @@ READ16_MEMBER(igs017_state::mgdha_magic_r)
 
 		case 0x03:
 		{
-			UINT16 hopper_bit = (m_hopper && ((m_screen->frame_number()/10)&1)) ? 0x0000 : 0x0001;
+			uint16_t hopper_bit = (m_hopper && ((m_screen->frame_number()/10)&1)) ? 0x0000 : 0x0001;
 			return ioport("COINS")->read() | hopper_bit;
 		}
 
@@ -1640,7 +1675,7 @@ WRITE8_MEMBER(igs017_state::tjsb_output_w)
 			break;
 
 		case 0x02:
-			m_oki->set_bank_base((data & 0x10) ? 0x40000 : 0);   // oki bank (0x20/0x30)
+			m_oki->set_rom_bank((data >> 4) & 1);   // oki bank (0x20/0x30)
 			if (!(data & ~0x30))
 				return;
 			break;
@@ -1663,7 +1698,7 @@ READ8_MEMBER(igs017_state::tjsb_input_r)
 		case 0x02:  return ioport("COINS")->read();
 		case 0x03:
 		{
-			UINT8 hopper_bit = (m_hopper && ((m_screen->frame_number()/10)&1)) ? 0x00 : 0x20;
+			uint8_t hopper_bit = (m_hopper && ((m_screen->frame_number()/10)&1)) ? 0x00 : 0x20;
 			return ioport("HOPPER")->read() | hopper_bit;
 		}
 
@@ -1765,7 +1800,7 @@ WRITE16_MEMBER(igs017_state::lhzb2_magic_w)
 		case 0x01:
 			if (ACCESSING_BITS_0_7)
 			{
-				m_oki->set_bank_base((data & 0x80) ? 0x40000 : 0);
+				m_oki->set_rom_bank((data >> 7) & 1);
 
 				if ( data & 0x7f )
 					logerror("%s: warning, unknown bits written in oki bank = %04x\n", machine().describe_context(), data);
@@ -1936,10 +1971,10 @@ WRITE16_MEMBER(igs017_state::lhzb2a_prot_w)
 		case 0x86:
 		case 0x87:
 		{
-			UINT16 x  = m_prot_val;
-			UINT16 mf = m_prot_mf;
+			uint16_t x  = m_prot_val;
+			uint16_t mf = m_prot_mf;
 
-			UINT16 bit0 = 0;
+			uint16_t bit0 = 0;
 			switch (m_prot_m3)
 			{
 				case 0: bit0 = BIT(~x,12) ^ BIT(~x,15) ^ BIT( x, 8) ^ BIT(~x, 3);   break;
@@ -1948,7 +1983,7 @@ WRITE16_MEMBER(igs017_state::lhzb2a_prot_w)
 				case 3: bit0 = BIT(~x,15) ^ BIT(~x, 9) ^ BIT( x,12) ^ BIT(~x,11);   break;
 			}
 
-			UINT16 xor0 = BIT(m_prot_regs[1], m_prot_regs[0] - 0x80);
+			uint16_t xor0 = BIT(m_prot_regs[1], m_prot_regs[0] - 0x80);
 			bit0 ^= xor0;
 
 			m_prot_val  =   (    BIT( x,14)                 << 15   ) |
@@ -1990,8 +2025,8 @@ READ16_MEMBER(igs017_state::lhzb2a_prot_r)
 	{
 		case 0x03:  // result
 		{
-			UINT16 x = m_prot_val;
-			UINT16 res  =   (BIT(x, 5) << 7) |
+			uint16_t x = m_prot_val;
+			uint16_t res  =   (BIT(x, 5) << 7) |
 							(BIT(x, 2) << 6) |
 							(BIT(x, 9) << 5) |
 							(BIT(x, 7) << 4) |
@@ -2034,8 +2069,8 @@ WRITE16_MEMBER(igs017_state::lhzb2a_prot2_dec_w)
 
 READ16_MEMBER(igs017_state::lhzb2a_prot2_r)
 {
-	UINT8 x     =   m_prot2;
-	UINT8 res   =   (BIT(x, 0) << 7) |
+	uint8_t x     =   m_prot2;
+	uint8_t res   =   (BIT(x, 0) << 7) |
 					(BIT(x, 3) << 5) |
 					(BIT(x, 2) << 4) |
 					(BIT(x, 1) << 2) ;
@@ -2064,7 +2099,7 @@ READ16_MEMBER(igs017_state::lhzb2a_input_r)
 
 		case 0x02:
 		{
-			UINT16 hopper_bit = (m_hopper && ((m_screen->frame_number()/10)&1)) ? 0x0000 : 0x0002;
+			uint16_t hopper_bit = (m_hopper && ((m_screen->frame_number()/10)&1)) ? 0x0000 : 0x0002;
 			return (ioport("DSW1")->read() << 8) | ioport("COINS")->read() | hopper_bit;
 		}
 
@@ -2106,7 +2141,7 @@ WRITE16_MEMBER(igs017_state::lhzb2a_input_select_w)
 	}
 	if (ACCESSING_BITS_8_15)
 	{
-		m_oki->set_bank_base((data & 0x0100) ? 0x40000 : 0);
+		m_oki->set_rom_bank((data >> 8) & 1);
 
 		if ( data & 0x0fe00 )
 			logerror("%s: warning, unknown bits written in input_select = %04x\n", machine().describe_context(), data);
@@ -2147,7 +2182,7 @@ WRITE16_MEMBER(igs017_state::slqz2_magic_w)
 		case 0x00:
 			if (ACCESSING_BITS_0_7)
 			{
-				m_oki->set_bank_base((data & 0x01) ? 0x40000 : 0);
+				m_oki->set_rom_bank(data & 0x01);
 
 //              m_hopper            =           data & 0x20;    // hopper motor
 //              machine().bookkeeping().coin_counter_w(1,    data & 0x40);   // coin out counter
@@ -3215,7 +3250,7 @@ MACHINE_RESET_MEMBER(igs017_state,iqblocka)
 	m_input_select = 0;
 }
 
-static MACHINE_CONFIG_START( iqblocka, igs017_state )
+static MACHINE_CONFIG_START( iqblocka )
 	MCFG_CPU_ADD("maincpu", Z180, XTAL_16MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(iqblocka_map)
 	MCFG_CPU_IO_MAP(iqblocka_io)
@@ -3249,7 +3284,7 @@ static MACHINE_CONFIG_START( iqblocka, igs017_state )
 	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_16MHz / 16, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL_16MHz / 16, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
@@ -3280,7 +3315,7 @@ MACHINE_RESET_MEMBER(igs017_state,mgcs)
 	memset(m_igs_magic, 0, sizeof(m_igs_magic));
 }
 
-static MACHINE_CONFIG_START( mgcs, igs017_state )
+static MACHINE_CONFIG_START( mgcs )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_22MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(mgcs)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", igs017_state, mgcs_interrupt, "screen", 0, 1)
@@ -3311,7 +3346,7 @@ static MACHINE_CONFIG_START( mgcs, igs017_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_OKIM6295_ADD("oki", XTAL_8MHz / 8, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL_8MHz / 8, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
@@ -3319,7 +3354,7 @@ MACHINE_CONFIG_END
 
 // lhzb2
 
-static MACHINE_CONFIG_START( lhzb2, igs017_state )
+static MACHINE_CONFIG_START( lhzb2 )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_22MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(lhzb2)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", igs017_state, mgcs_interrupt, "screen", 0, 1)
@@ -3357,7 +3392,7 @@ static MACHINE_CONFIG_START( lhzb2, igs017_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_OKIM6295_ADD("oki", XTAL_8MHz / 8, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL_8MHz / 8, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
@@ -3371,7 +3406,7 @@ MACHINE_RESET_MEMBER(igs017_state,lhzb2a)
 	lhzb2a_input_addr_w(m_maincpu->space(AS_PROGRAM), 0, 0xf0);
 }
 
-static MACHINE_CONFIG_START( lhzb2a, igs017_state )
+static MACHINE_CONFIG_START( lhzb2a )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_22MHz/2)
 	MCFG_CPU_PROGRAM_MAP(lhzb2a)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", igs017_state, mgcs_interrupt, "screen", 0, 1)
@@ -3400,7 +3435,7 @@ static MACHINE_CONFIG_START( lhzb2a, igs017_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_OKIM6295_ADD("oki", XTAL_22MHz / 22, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL_22MHz / 22, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
@@ -3408,7 +3443,7 @@ MACHINE_CONFIG_END
 
 // slqz2
 
-static MACHINE_CONFIG_START( slqz2, igs017_state )
+static MACHINE_CONFIG_START( slqz2 )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_22MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(slqz2)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", igs017_state, mgcs_interrupt, "screen", 0, 1)
@@ -3444,7 +3479,7 @@ static MACHINE_CONFIG_START( slqz2, igs017_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_OKIM6295_ADD("oki", XTAL_8MHz / 8, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL_8MHz / 8, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
@@ -3452,7 +3487,7 @@ MACHINE_CONFIG_END
 
 // sdmg2
 
-static MACHINE_CONFIG_START( sdmg2, igs017_state )
+static MACHINE_CONFIG_START( sdmg2 )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_22MHz/2)
 	MCFG_CPU_PROGRAM_MAP(sdmg2)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", igs017_state, mgcs_interrupt, "screen", 0, 1)
@@ -3482,7 +3517,7 @@ static MACHINE_CONFIG_START( sdmg2, igs017_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_OKIM6295_ADD("oki", XTAL_22MHz / 22, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL_22MHz / 22, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
@@ -3500,7 +3535,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(igs017_state::mgdh_interrupt)
 		m_maincpu->set_input_line(3, HOLD_LINE); // lev 3 instead of 2
 }
 
-static MACHINE_CONFIG_START( mgdha, igs017_state )
+static MACHINE_CONFIG_START( mgdha )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_22MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(mgdha_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", igs017_state, mgdh_interrupt, "screen", 0, 1)
@@ -3529,14 +3564,14 @@ static MACHINE_CONFIG_START( mgdha, igs017_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_OKIM6295_ADD("oki", XTAL_22MHz / 22, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL_22MHz / 22, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
 
 // tjsb
 
-static MACHINE_CONFIG_START( tjsb, igs017_state )
+static MACHINE_CONFIG_START( tjsb )
 	MCFG_CPU_ADD("maincpu", Z180, XTAL_16MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(tjsb_map)
 	MCFG_CPU_IO_MAP(tjsb_io)
@@ -3572,14 +3607,14 @@ static MACHINE_CONFIG_START( tjsb, igs017_state )
 	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_16MHz / 16, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL_16MHz / 16, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
 
 // spkrform
 
-static MACHINE_CONFIG_START( spkrform, igs017_state )
+static MACHINE_CONFIG_START( spkrform )
 	MCFG_CPU_ADD("maincpu", Z180, XTAL_16MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(spkrform_map)
 	MCFG_CPU_IO_MAP(spkrform_io)
@@ -3613,7 +3648,7 @@ static MACHINE_CONFIG_START( spkrform, igs017_state )
 	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_16MHz / 16, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL_16MHz / 16, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
@@ -3923,10 +3958,10 @@ ROM_START( lhzb2 )
 	ROM_REGION( 0x10000, "igs022data", 0 )  // INTERNATIONAL GAMES SYSTEM CO.,LTD
 	ROM_LOAD( "m1104.u11",0x0000, 0x10000, CRC(794d0276) SHA1(ac903d2faa3fb315438dc8da22c5337611a8790d) )
 
-	ROM_REGION( 0x400000, "sprites", 0 )    // adddress scrambling
+	ROM_REGION( 0x400000, "sprites", 0 )    // address scrambling
 	ROM_LOAD16_WORD_SWAP( "m1101.u6", 0x000000, 0x400000, CRC(0114e9d1) SHA1(5b16170d3cd8b8e1662c949b7234fbdd2ca927f7) )    // FIXED BITS (0xxxxxxxxxxxxxxx)
 
-	ROM_REGION( 0x80000, "tilemaps", 0 )    // adddress scrambling
+	ROM_REGION( 0x80000, "tilemaps", 0 )    // address scrambling
 	ROM_LOAD16_WORD_SWAP( "m1103.u8", 0x00000, 0x80000, CRC(4d3776b4) SHA1(fa9b311b1a6ad56e136b66d090bc62ed5003b2f2) )
 
 	ROM_REGION( 0x80000, "oki", 0 )
@@ -3939,10 +3974,10 @@ ROM_START( lhzb2a )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "p-4096", 0x00000, 0x80000, CRC(41293f32) SHA1(df4e993f4a458729ade13981e58f32d8116c0082) )
 
-	ROM_REGION( 0x400000, "sprites", 0 )    // adddress scrambling
+	ROM_REGION( 0x400000, "sprites", 0 )    // address scrambling
 	ROM_LOAD16_WORD_SWAP( "m1101.u6", 0x000000, 0x400000, CRC(0114e9d1) SHA1(5b16170d3cd8b8e1662c949b7234fbdd2ca927f7) )    // FIXED BITS (0xxxxxxxxxxxxxxx)
 
-	ROM_REGION( 0x80000, "tilemaps", 0 )    // adddress scrambling
+	ROM_REGION( 0x80000, "tilemaps", 0 )    // address scrambling
 	ROM_LOAD16_WORD_SWAP( "m1103.u8", 0x00000, 0x80000, CRC(4d3776b4) SHA1(fa9b311b1a6ad56e136b66d090bc62ed5003b2f2) )
 
 	ROM_REGION( 0x80000, "oki", 0 )
@@ -3998,10 +4033,10 @@ ROM_START( slqz2 )
 	ROM_REGION( 0x10000, "igs022data", 0 )  // INTERNATIONAL GAMES SYSTEM CO.,LTD
 	ROM_LOAD( "m1103.u12", 0x00000, 0x10000, CRC(9f3b8d65) SHA1(5ee1ad025474399c2826f21d970e76f25d0fa1fd) )
 
-	ROM_REGION( 0x400000, "sprites", 0 )    // adddress scrambling
+	ROM_REGION( 0x400000, "sprites", 0 )    // address scrambling
 	ROM_LOAD16_WORD_SWAP( "m1101.u4", 0x000000, 0x400000, CRC(0114e9d1) SHA1(5b16170d3cd8b8e1662c949b7234fbdd2ca927f7) )    // FIXED BITS (0xxxxxxxxxxxxxxx)
 
-	ROM_REGION( 0x80000, "tilemaps", 0 )    // light adddress scrambling
+	ROM_REGION( 0x80000, "tilemaps", 0 )    // light address scrambling
 	ROM_LOAD( "text.u6", 0x00000, 0x80000, CRC(40d21adf) SHA1(18b202d6330ac89026bec2c9c8224b52540dd48d) )
 
 	ROM_REGION( 0x80000, "oki", 0 )
@@ -4089,17 +4124,75 @@ ROM_END
 
 /***************************************************************************
 
-Tarzan
+Taishan (Tarzan) Chuang Tian Guan
+IGS 1999
+
+PCB Layout
+----------
+
+IGS PCB NO-0248-1
+|------------------------------|
+|          J A M M A           |
+|1  22MHz  T2105.U5  A2104.U15 |
+|8                   DIP42     |
+|W                             |
+|A          IGS031     U19     |
+|Y    24257                    |
+|                              |
+|           IGS025      PAL.U20|
+|     DSW1                     |
+|                    Z180      |
+|     DSW2          16MHz      |
+|1                      PAL.U21|
+|0    DSW3                     |
+|W                        BATT |
+|A     VOL    LM7805     RES_SW|
+|Y UPC1242    M6295     U14    |
+|------------------------------|
+Notes:
+      IGS025 - custom IGS chip labelled 'TARZAN 1'
+      IGS031 - custom IGS chip
+      VSync  - 60.0060Hz
+      HSync  - 15.3002kHz
+      M6295  - Clock 1.000MHz [16/16], pin 7 high
+      Z180   - Clock 16.000MHz
+      DIP42  - Empty socket
+      U19    - 28F2000 Flash ROM (DIP32)
+      U14    - 23C4000 mask ROM (DIP32)
+      U5     - 23C2048 mask ROM (DIP40)
+      U15    - 23C3210 mask ROM (DIP42)
+      24257  - 32kx8 SRAM
 
 ***************************************************************************/
 
+// IGS PCB NO-0248-1
+ROM_START( tarzanc )
+	ROM_REGION( 0x40000, "maincpu", 0 ) // V109C TARZAN C (same as tarzan set)
+	ROM_LOAD( "u19", 0x00000, 0x40000, CRC(e6c552a5) SHA1(f156de9459833474c85a1f5b35917881b390d34c) )
+
+	ROM_REGION( 0x400000, "sprites", 0 )
+	ROM_LOAD( "igs_a2104_cg_v110.u15", 0x00000, 0x400000, CRC(dcbff16f) SHA1(2bf77ef4448c26124c8d8d18bb7ffe4105cfa940) ) // FIXED BITS (xxxxxxx0xxxxxxxx)
+
+	ROM_REGION( 0x80000, "tilemaps", 0 )
+	ROM_LOAD( "igs_t2105_cg_v110.u5", 0x00000, 0x80000, CRC(1d4be260) SHA1(6374c61735144b3ff54d5e490f26adac4a10b14d) ) // 27C4096 (27C2048 printed on the PCB)
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "igs_s2102_sp_v102.u14", 0x00000, 0x80000, CRC(90dda82d) SHA1(67fbc1e8d76b85e124136e2f1df09c8b6c5a8f97) )
+
+	ROM_REGION( 0x2dd * 2, "plds", 0 )
+	ROM_LOAD( "eg.u20", 0x000, 0x2dd, NO_DUMP )
+	ROM_LOAD( "eg.u21", 0x2dd, 0x2dd, NO_DUMP )
+ROM_END
+
+// sets below are guesswork, assembled from partial dumps...
+
 // IGS NO-0248-1? Mislabeled?
 ROM_START( tarzan )
-	ROM_REGION( 0x40000, "maincpu", 0 ) // V109C TARZAN C
+	ROM_REGION( 0x40000, "maincpu", 0 ) // V109C TARZAN C (same as tarzanc set)
 	ROM_LOAD( "0228-u16.bin", 0x00000, 0x40000, CRC(e6c552a5) SHA1(f156de9459833474c85a1f5b35917881b390d34c) )
 
 	ROM_REGION( 0x80000, "sprites", 0 )
-	ROM_LOAD( "a2104_cg_v110.u15", 0x00000, 0x80000, NO_DUMP )
+	ROM_LOAD( "sprites.u15", 0x00000, 0x80000, NO_DUMP )
 
 	ROM_REGION( 0x80000, "tilemaps", 0 )
 	ROM_LOAD( "0228-u6.bin", 0x00000, 0x80000, CRC(55e94832) SHA1(b15409f4f1264b6d1218d5dc51c5bd1de2e40284) )
@@ -4108,20 +4201,20 @@ ROM_START( tarzan )
 	ROM_LOAD( "sound.u14", 0x00000, 0x40000, NO_DUMP )
 
 	ROM_REGION( 0x2dd * 2, "plds", 0 )
-	ROM_LOAD( "eg.u20", 0x000, 0x2dd, NO_DUMP )
-	ROM_LOAD( "eg.u21", 0x2dd, 0x2dd, NO_DUMP )
+	ROM_LOAD( "pal1", 0x000, 0x2dd, NO_DUMP )
+	ROM_LOAD( "pal2", 0x2dd, 0x2dd, NO_DUMP )
 ROM_END
 
 // IGS NO-0228?
 ROM_START( tarzana )
 	ROM_REGION( 0x80000, "maincpu", 0 ) // V107 TAISAN
-	ROM_LOAD( "0228-u21.bin", 0x00000, 0x80000, CRC(80aaece4) SHA1(07cad92492c5de36c3915867ed4c6544b1a30c07) )
+	ROM_LOAD( "0228-u21.bin", 0x00000, 0x80000, CRC(80aaece4) SHA1(07cad92492c5de36c3915867ed4c6544b1a30c07) ) // 1ST AND 2ND HALF IDENTICAL
 
 	ROM_REGION( 0x80000, "sprites", 0 )
 	ROM_LOAD( "sprites.u17", 0x00000, 0x80000, NO_DUMP )
 
 	ROM_REGION( 0x80000, "tilemaps", 0 )
-	ROM_LOAD( "text.u6", 0x00000, 0x80000, NO_DUMP )
+	ROM_LOAD( "0228-u6.bin", 0x00000, 0x80000, CRC(55e94832) SHA1(b15409f4f1264b6d1218d5dc51c5bd1de2e40284) )
 
 	ROM_REGION( 0x40000, "oki", ROMREGION_ERASE )
 	ROM_LOAD( "sound.u16", 0x00000, 0x40000, NO_DUMP )
@@ -4232,19 +4325,20 @@ ROM_START( spkrform )
 ROM_END
 
 
-GAME( 1996,  iqblocka, iqblock,  iqblocka, iqblocka, igs017_state, iqblocka, ROT0, "IGS",              "Shu Zi Le Yuan (V127M)",                      MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1996,  iqblockf, iqblock,  iqblocka, iqblocka, igs017_state, iqblockf, ROT0, "IGS",              "Shu Zi Le Yuan (V113FR)",                     MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1997,  mgdh,     0,        mgdha,    mgdh,     igs017_state, mgdh,     ROT0, "IGS",              "Mahjong Man Guan Da Heng (Taiwan, V125T1)",   0 )
-GAME( 1997,  mgdha,    mgdh,     mgdha,    mgdh ,    igs017_state, mgdha,    ROT0, "IGS",              "Mahjong Man Guan Da Heng (Taiwan, V123T1)",   0 )
-GAME( 1997,  sdmg2,    0,        sdmg2,    sdmg2,    igs017_state, sdmg2,    ROT0, "IGS",              "Mahjong Super Da Man Guan II (China, V754C)", 0 )
-GAME( 1997,  tjsb,     0,        tjsb,     tjsb,     igs017_state, tjsb,     ROT0, "IGS",              "Mahjong Tian Jiang Shen Bing (V137C)",        MACHINE_UNEMULATED_PROTECTION )
-GAME( 1998,  mgcs,     0,        mgcs,     mgcs,     igs017_state, mgcs,     ROT0, "IGS",              "Mahjong Man Guan Cai Shen (V103CS)",          MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND )
-GAME( 1998,  lhzb2,    0,        lhzb2,    lhzb2,    igs017_state, lhzb2,    ROT0, "IGS",              "Mahjong Long Hu Zheng Ba 2 (set 1)",          MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1998,  lhzb2a,   lhzb2,    lhzb2a,   lhzb2a,   igs017_state, lhzb2a,   ROT0, "IGS",              "Mahjong Long Hu Zheng Ba 2 (VS221M)",         0 )
-GAME( 1998,  slqz2,    0,        slqz2,    slqz2,    igs017_state, slqz2,    ROT0, "IGS",              "Mahjong Shuang Long Qiang Zhu 2 (VS203J)",    MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1999?, tarzan,   0,        iqblocka, iqblocka, igs017_state, tarzan,   ROT0, "IGS",              "Tarzan (V109C)",                              MACHINE_NOT_WORKING )
-GAME( 1999?, tarzana,  tarzan,   iqblocka, iqblocka, igs017_state, tarzana,  ROT0, "IGS",              "Tarzan (V107)",                               MACHINE_NOT_WORKING )
-GAME( 2000?, starzan,  0,        starzan,  iqblocka, igs017_state, starzan,  ROT0, "IGS / G.F. Gioca", "Super Tarzan (Italy, V100I)",                 MACHINE_NOT_WORKING )
+GAME( 1996,  iqblocka, iqblock,  iqblocka, iqblocka, igs017_state, iqblocka, ROT0, "IGS",                      "Shu Zi Le Yuan (V127M)",                      MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1996,  iqblockf, iqblock,  iqblocka, iqblocka, igs017_state, iqblockf, ROT0, "IGS",                      "Shu Zi Le Yuan (V113FR)",                     MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1997,  mgdh,     0,        mgdha,    mgdh,     igs017_state, mgdh,     ROT0, "IGS",                      "Mahjong Man Guan Da Heng (Taiwan, V125T1)",   0 )
+GAME( 1997,  mgdha,    mgdh,     mgdha,    mgdh ,    igs017_state, mgdha,    ROT0, "IGS",                      "Mahjong Man Guan Da Heng (Taiwan, V123T1)",   0 )
+GAME( 1997,  sdmg2,    0,        sdmg2,    sdmg2,    igs017_state, sdmg2,    ROT0, "IGS",                      "Mahjong Super Da Man Guan II (China, V754C)", 0 )
+GAME( 1997,  tjsb,     0,        tjsb,     tjsb,     igs017_state, tjsb,     ROT0, "IGS",                      "Mahjong Tian Jiang Shen Bing (V137C)",        MACHINE_UNEMULATED_PROTECTION )
+GAME( 1998,  mgcs,     0,        mgcs,     mgcs,     igs017_state, mgcs,     ROT0, "IGS",                      "Mahjong Man Guan Cai Shen (V103CS)",          MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND )
+GAME( 1998,  lhzb2,    0,        lhzb2,    lhzb2,    igs017_state, lhzb2,    ROT0, "IGS",                      "Mahjong Long Hu Zheng Ba 2 (set 1)",          MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1998,  lhzb2a,   lhzb2,    lhzb2a,   lhzb2a,   igs017_state, lhzb2a,   ROT0, "IGS",                      "Mahjong Long Hu Zheng Ba 2 (VS221M)",         0 )
+GAME( 1998,  slqz2,    0,        slqz2,    slqz2,    igs017_state, slqz2,    ROT0, "IGS",                      "Mahjong Shuang Long Qiang Zhu 2 (VS203J)",    MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1999,  tarzanc,  0,        iqblocka, iqblocka, igs017_state, tarzan,   ROT0, "IGS",                      "Tarzan Chuang Tian Guan (V109C, set 1)",      MACHINE_NOT_WORKING )
+GAME( 1999,  tarzan,   tarzanc,  iqblocka, iqblocka, igs017_state, tarzan,   ROT0, "IGS",                      "Tarzan Chuang Tian Guan (V109C, set 2)",      MACHINE_NOT_WORKING )
+GAME( 1999,  tarzana,  tarzanc,  iqblocka, iqblocka, igs017_state, tarzana,  ROT0, "IGS",                      "Tarzan (V107)",                               MACHINE_NOT_WORKING )
+GAME( 2000?, starzan,  0,        starzan,  iqblocka, igs017_state, starzan,  ROT0, "IGS (G.F. Gioca license)", "Super Tarzan (Italy, V100I)",                 MACHINE_NOT_WORKING )
 
 /* Parent spk306us in driver spoker.cpp.  Move this set to that driver? */
 GAME( ????,  spkrform, spk306us, spkrform, spkrform, igs017_state, spkrform, ROT0, "IGS",              "Super Poker (v100xD03) / Formosa",            MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )

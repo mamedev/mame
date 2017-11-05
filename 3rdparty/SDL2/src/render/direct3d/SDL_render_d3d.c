@@ -512,7 +512,6 @@ D3D_CreateRenderer(SDL_Window * window, Uint32 flags)
     D3D_RenderData *data;
     SDL_SysWMinfo windowinfo;
     HRESULT result;
-    const char *hint;
     D3DPRESENT_PARAMETERS pparams;
     IDirect3DSwapChain9 *chain;
     D3DCAPS9 caps;
@@ -607,8 +606,7 @@ D3D_CreateRenderer(SDL_Window * window, Uint32 flags)
         device_flags |= D3DCREATE_SOFTWARE_VERTEXPROCESSING;
     }
 
-    hint = SDL_GetHint(SDL_HINT_RENDER_DIRECT3D_THREADSAFE);
-    if (hint && SDL_atoi(hint)) {
+    if (SDL_GetHintBoolean(SDL_HINT_RENDER_DIRECT3D_THREADSAFE, SDL_FALSE)) {
         device_flags |= D3DCREATE_MULTITHREADED;
     }
 
@@ -1004,6 +1002,10 @@ D3D_RecreateTexture(SDL_Renderer * renderer, SDL_Texture * texture)
     D3D_RenderData *data = (D3D_RenderData *)renderer->driverdata;
     D3D_TextureData *texturedata = (D3D_TextureData *)texture->driverdata;
 
+    if (!texturedata) {
+        return 0;
+    }
+
     if (D3D_RecreateTextureRep(data->device, &texturedata->texture, texture->format, texture->w, texture->h) < 0) {
         return -1;
     }
@@ -1307,6 +1309,10 @@ D3D_RenderClear(SDL_Renderer * renderer)
         BackBufferHeight = data->pparams.BackBufferHeight;
     }
 
+    if (renderer->clipping_enabled) {
+        IDirect3DDevice9_SetRenderState(data->device, D3DRS_SCISSORTESTENABLE, FALSE);
+    }
+
     /* Don't reset the viewport if we don't have to! */
     if (!renderer->viewport.x && !renderer->viewport.y &&
         renderer->viewport.w == BackBufferWidth &&
@@ -1334,6 +1340,10 @@ D3D_RenderClear(SDL_Renderer * renderer)
         viewport.MinZ = 0.0f;
         viewport.MaxZ = 1.0f;
         IDirect3DDevice9_SetViewport(data->device, &viewport);
+    }
+
+    if (renderer->clipping_enabled) {
+        IDirect3DDevice9_SetRenderState(data->device, D3DRS_SCISSORTESTENABLE, TRUE);
     }
 
     if (FAILED(result)) {

@@ -125,6 +125,20 @@ This test writes 00 to all the crtc registers and checks to be sure an rst7.5
 Not sure exactly what this tests, likely tries firing the vector generator
 state machine and sees if the GO bit ever finishes and goes back to 0
 */
+#include "emu.h"
+
+#include "bus/rs232/rs232.h"
+#include "cpu/i8085/i8085.h"
+#include "sound/beep.h"
+#include "video/mc6845.h"
+#include "machine/com8116.h"
+#include "machine/i8251.h"
+
+#include "screen.h"
+#include "speaker.h"
+
+#include "vk100.lh"
+
 
 // named timer IDs
 #define TID_I8251_RX 1
@@ -147,14 +161,6 @@ state machine and sees if the GO bit ever finishes and goes back to 0
 
 // debug state dump for the vector generator
 #undef DEBUG_VG_STATE
-
-#include "bus/rs232/rs232.h"
-#include "cpu/i8085/i8085.h"
-#include "sound/beep.h"
-#include "video/mc6845.h"
-#include "machine/com8116.h"
-#include "machine/i8251.h"
-#include "vk100.lh"
 
 #define RS232_TAG       "rs232"
 #define COM5016T_TAG    "com5016t"
@@ -195,34 +201,34 @@ public:
 	required_ioport m_capsshift;
 	required_ioport m_dipsw;
 
-	UINT8* m_vram;
-	UINT8* m_trans;
-	UINT8* m_pattern;
-	UINT8* m_dir;
-	UINT8* m_sync;
-	UINT8* m_vector;
-	UINT8* m_ras_erase;
-	UINT8 m_dir_a6; // latched a6 of dir rom
-	UINT8 m_cout; // carry out from vgERR adder
-	UINT8 m_vsync; // vsync pin of crtc
-	UINT16 m_vgX; // 12 bit X value for vector draw position
-	UINT16 m_vgY; // 12 bit Y value for vector draw position
-	UINT16 m_vgERR; // error register can cause carries which need to be caught
-	UINT8 m_vgSOPS;
-	UINT8 m_vgPAT;
-	UINT16 m_vgPAT_Mask; // current mask for PAT
-	UINT8 m_vgPMUL; // reload value for PMUL_Count
-	UINT8 m_vgPMUL_Count;
-	UINT8 m_vgDownCount; // down counter = number of pixels, loaded from vgDU on execute
+	uint8_t* m_vram;
+	uint8_t* m_trans;
+	uint8_t* m_pattern;
+	uint8_t* m_dir;
+	uint8_t* m_sync;
+	uint8_t* m_vector;
+	uint8_t* m_ras_erase;
+	uint8_t m_dir_a6; // latched a6 of dir rom
+	uint8_t m_cout; // carry out from vgERR adder
+	uint8_t m_vsync; // vsync pin of crtc
+	uint16_t m_vgX; // 12 bit X value for vector draw position
+	uint16_t m_vgY; // 12 bit Y value for vector draw position
+	uint16_t m_vgERR; // error register can cause carries which need to be caught
+	uint8_t m_vgSOPS;
+	uint8_t m_vgPAT;
+	uint16_t m_vgPAT_Mask; // current mask for PAT
+	uint8_t m_vgPMUL; // reload value for PMUL_Count
+	uint8_t m_vgPMUL_Count;
+	uint8_t m_vgDownCount; // down counter = number of pixels, loaded from vgDU on execute
 #define VG_DU m_vgRegFile[0]
 #define VG_DVM m_vgRegFile[1]
 #define VG_DIR m_vgRegFile[2]
 #define VG_WOPS m_vgRegFile[3]
-	UINT8 m_vgRegFile[4];
-	UINT8 m_VG_MODE; // 2 bits, latched on EXEC
-	UINT8 m_vgGO; // activated on next SYNC pulse after EXEC
-	UINT8 m_ACTS;
-	UINT8 m_ADSR;
+	uint8_t m_vgRegFile[4];
+	uint8_t m_VG_MODE; // 2 bits, latched on EXEC
+	uint8_t m_vgGO; // activated on next SYNC pulse after EXEC
+	uint8_t m_ACTS;
+	uint8_t m_ADSR;
 	ioport_port* m_col_array[16];
 
 	DECLARE_WRITE8_MEMBER(vgLD_X);
@@ -246,10 +252,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(i8251_rxrdy_int);
 	DECLARE_WRITE_LINE_MEMBER(i8251_txrdy_int);
 	DECLARE_WRITE_LINE_MEMBER(i8251_rts);
-	UINT8 vram_read();
-	UINT8 vram_attr_read();
+	uint8_t vram_read();
+	uint8_t vram_attr_read();
 	MC6845_UPDATE_ROW(crtc_update_row);
-	void vram_write(UINT8 data);
+	void vram_write(uint8_t data);
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -277,49 +283,49 @@ protected:
 	 */
 
 // returns one nybble from vram array based on X and Y regs
-UINT8 vk100_state::vram_read()
+uint8_t vk100_state::vram_read()
 {
 	// XFinal is (X'&0x3FC)|(X&0x3)
-	UINT16 XFinal = m_trans[(m_vgX&0x3FC)>>2]<<2|(m_vgX&0x3); // appears correct
+	uint16_t XFinal = m_trans[(m_vgX&0x3FC)>>2]<<2|(m_vgX&0x3); // appears correct
 	// EA is the effective ram address for a 16-bit block
-	UINT16 EA = ((m_vgY&0x1FE)<<5)|(XFinal>>4); // appears correct
+	uint16_t EA = ((m_vgY&0x1FE)<<5)|(XFinal>>4); // appears correct
 	// block is the 16 bit block directly (note EA has to be <<1 to correctly index a byte)
-	UINT16 block = m_vram[(EA<<1)+1] | (m_vram[(EA<<1)]<<8);
+	uint16_t block = m_vram[(EA<<1)+1] | (m_vram[(EA<<1)]<<8);
 	// nybbleNum is which of the four nybbles within the block to address. should NEVER be 3!
-	UINT8 nybbleNum = (XFinal&0xC)>>2;
+	uint8_t nybbleNum = (XFinal&0xC)>>2;
 	return (block>>(4*nybbleNum))&0xF;
 }
 
 // returns the attribute nybble for the current pixel based on X and Y regs
-UINT8 vk100_state::vram_attr_read()
+uint8_t vk100_state::vram_attr_read()
 {
 	// XFinal is (X'&0x3FC)|(X&0x3)
-	UINT16 XFinal = m_trans[(m_vgX&0x3FC)>>2]<<2|(m_vgX&0x3); // appears correct
+	uint16_t XFinal = m_trans[(m_vgX&0x3FC)>>2]<<2|(m_vgX&0x3); // appears correct
 	// EA is the effective ram address for a 16-bit block
-	UINT16 EA = ((m_vgY&0x1FE)<<5)|(XFinal>>4); // appears correct
+	uint16_t EA = ((m_vgY&0x1FE)<<5)|(XFinal>>4); // appears correct
 	// block is the 16 bit block directly (note EA has to be <<1 to correctly index a byte)
-	UINT16 block = m_vram[(EA<<1)+1] | (m_vram[(EA<<1)]<<8);
+	uint16_t block = m_vram[(EA<<1)+1] | (m_vram[(EA<<1)]<<8);
 	// nybbleNum is the attribute nybble, which in this case is always 3
-	UINT8 nybbleNum = 3;
+	uint8_t nybbleNum = 3;
 	return (block>>(4*nybbleNum))&0xF;
 }
 
 // writes one nybble to vram array based on X and Y regs, and updates the attrib ram if needed
-void vk100_state::vram_write(UINT8 data)
+void vk100_state::vram_write(uint8_t data)
 {
 	// XFinal is (X'&0x3FC)|(X&0x3)
-	UINT16 XFinal = m_trans[(m_vgX&0x3FC)>>2]<<2|(m_vgX&0x3); // appears correct
+	uint16_t XFinal = m_trans[(m_vgX&0x3FC)>>2]<<2|(m_vgX&0x3); // appears correct
 	// EA is the effective ram address for a 16-bit block
-	UINT16 EA = ((m_vgY&0x1FE)<<5)|(XFinal>>4); // appears correct
+	uint16_t EA = ((m_vgY&0x1FE)<<5)|(XFinal>>4); // appears correct
 	// block is the 16 bit block directly (note EA has to be <<1 to correctly index a byte)
-	UINT16 block = m_vram[(EA<<1)+1] | (m_vram[(EA<<1)]<<8);
+	uint16_t block = m_vram[(EA<<1)+1] | (m_vram[(EA<<1)]<<8);
 	// nybbleNum is which of the four nybbles within the block to address. should NEVER be 3!
-	UINT8 nybbleNum = (XFinal&0xC)>>2;
-	block &= ~((UINT16)0xF<<(nybbleNum*4)); // mask out the part we want to replace
+	uint8_t nybbleNum = (XFinal&0xC)>>2;
+	block &= ~((uint16_t)0xF<<(nybbleNum*4)); // mask out the part we want to replace
 	block |= data<<(nybbleNum*4); // write the new part
 	// NOTE: this next part may have to be made conditional on VG_MODE
 	// check if the attribute nybble is supposed to be modified, and if so do so
-	if (VG_WOPS&0x08) block = (block&0x0FFF)|(((UINT16)VG_WOPS&0xF0)<<8);
+	if (VG_WOPS&0x08) block = (block&0x0FFF)|(((uint16_t)VG_WOPS&0xF0)<<8);
 	m_vram[(EA<<1)+1] = block&0xFF; // write block back to vram
 	m_vram[(EA<<1)] = (block&0xFF00)>>8; // ''
 }
@@ -332,7 +338,7 @@ void vk100_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 		execute_vg(ptr, param);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in vk100_state::device_timer");
+		assert_always(false, "Unknown id in vk100_state::device_timer");
 	}
 }
 
@@ -363,7 +369,7 @@ void vk100_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 TIMER_CALLBACK_MEMBER(vk100_state::execute_vg)
 {
 	m_cout = 1; // hack for now
-	UINT8 dirbyte = m_dir[(m_dir_a6<<6)|((m_vgY&1)<<5)|(m_cout<<4)|VG_DIR];
+	uint8_t dirbyte = m_dir[(m_dir_a6<<6)|((m_vgY&1)<<5)|(m_cout<<4)|VG_DIR];
 #ifdef DEBUG_VG_STATE
 	static const char *const vg_functions[] = { "Move", "Dot", "Vector", "Erase" };
 	fprintf(stderr, "VGMODE: %s; DIR: A:%02x; D:%02x; X: %03X; Y: %03X; DownCount: %02X\n", vg_functions[m_VG_MODE], ((m_dir_a6<<6)|((m_vgY&1)<<5)|(m_cout<<4)|VG_DIR), dirbyte, m_vgX, m_vgY, m_vgDownCount);
@@ -380,9 +386,9 @@ TIMER_CALLBACK_MEMBER(vk100_state::execute_vg)
 		else m_vgY++;
 	}
 	if (dirbyte&0x10) m_vgDownCount--; // decrement the down counter
-	UINT8 thisNyb = vram_read(); // read in the nybble
+	uint8_t thisNyb = vram_read(); // read in the nybble
 	// pattern rom addressing is a complex mess. see the pattern rom def later in this file.
-	UINT8 newNyb = m_pattern[((m_vgPAT&m_vgPAT_Mask)?0x200:0)|((VG_WOPS&7)<<6)|((m_vgX&3)<<4)|thisNyb]; // calculate new nybble based on pattern rom
+	uint8_t newNyb = m_pattern[((m_vgPAT&m_vgPAT_Mask)?0x200:0)|((VG_WOPS&7)<<6)|((m_vgX&3)<<4)|thisNyb]; // calculate new nybble based on pattern rom
 	// finally write the block back to ram depending on the VG_MODE (sort of a hack until we get the vector and sync and dir roms all hooked up)
 	// but only do it if the direction rom said so!
 	switch (m_VG_MODE)
@@ -423,9 +429,9 @@ TIMER_CALLBACK_MEMBER(vk100_state::execute_vg)
 WRITE8_MEMBER(vk100_state::vgLD_X)
 {
 	m_vgX &= 0xFF << ((1-offset)*8);
-	m_vgX |= ((UINT16)data) << (offset*8);
+	m_vgX |= ((uint16_t)data) << (offset*8);
 #ifdef VG40_VERBOSE
-	logerror("VG: 0x%02X: X Reg loaded with %04X, new X value is %04X\n", 0x40+offset, ((UINT16)data) << (offset*8), m_vgX);
+	logerror("VG: 0x%02X: X Reg loaded with %04X, new X value is %04X\n", 0x40+offset, ((uint16_t)data) << (offset*8), m_vgX);
 #endif
 }
 
@@ -433,9 +439,9 @@ WRITE8_MEMBER(vk100_state::vgLD_X)
 WRITE8_MEMBER(vk100_state::vgLD_Y)
 {
 	m_vgY &= 0xFF << ((1-offset)*8);
-	m_vgY |= ((UINT16)data) << (offset*8);
+	m_vgY |= ((uint16_t)data) << (offset*8);
 #ifdef VG40_VERBOSE
-	logerror("VG: 0x%02X: Y Reg loaded with %04X, new Y value is %04X\n", 0x42+offset, ((UINT16)data) << (offset*8), m_vgY);
+	logerror("VG: 0x%02X: Y Reg loaded with %04X, new Y value is %04X\n", 0x42+offset, ((uint16_t)data) << (offset*8), m_vgY);
 #endif
 }
 
@@ -636,7 +642,7 @@ WRITE8_MEMBER(vk100_state::BAUD)
 */
 READ8_MEMBER(vk100_state::SYSTAT_A)
 {
-	UINT8 dipswitchLUT[8] = { 1,3,5,7,6,4,2,0 }; // the dipswitches map in a weird order to offsets
+	uint8_t dipswitchLUT[8] = { 1,3,5,7,6,4,2,0 }; // the dipswitches map in a weird order to offsets
 #ifdef SYSTAT_A_VERBOSE
 	if (m_maincpu->pc() != 0x31D) logerror("0x%04X: SYSTAT_A Read!\n", m_maincpu->pc());
 #endif
@@ -671,7 +677,7 @@ READ8_MEMBER(vk100_state::SYSTAT_B)
 
 READ8_MEMBER(vk100_state::vk100_keyboard_column_r)
 {
-	UINT8 code = m_col_array[offset&0xF]->read() | m_capsshift->read();
+	uint8_t code = m_col_array[offset&0xF]->read() | m_capsshift->read();
 #ifdef KBD_VERBOSE
 	logerror("Keyboard column %X read, returning %02X\n", offset&0xF, code);
 #endif
@@ -728,7 +734,7 @@ ADDRESS_MAP_END
 */
 static ADDRESS_MAP_START(vk100_io, AS_IO, 8, vk100_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0x7f) // guess, probably correct
+	ADDRESS_MAP_GLOBAL_MASK(0xff) // guess, probably correct
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0xBE) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0x01, 0x01) AM_MIRROR(0xBE) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
 	// Comments are from page 118 (5-14) of http://web.archive.org/web/20091015205827/http://www.computer.museum.uq.edu.au/pdf/EK-VK100-TM-001%20VK100%20Technical%20Manual.pdf
@@ -999,10 +1005,10 @@ void vk100_state::video_start()
 
 MC6845_UPDATE_ROW( vk100_state::crtc_update_row )
 {
-	static const UINT32 colorTable[16] = {
+	static const uint32_t colorTable[16] = {
 	0x000000, 0x0000FF, 0xFF0000, 0xFF00FF, 0x00FF00, 0x00FFFF, 0xFFFF00, 0xFFFFFF,
 	0x000000, 0x0000FF, 0xFF0000, 0xFF00FF, 0x00FF00, 0x00FFFF, 0xFFFF00, 0xFFFFFF };
-	static const UINT32 colorTable2[16] = {
+	static const uint32_t colorTable2[16] = {
 	0x000000, 0x0000FF, 0xFF0000, 0xFF00FF, 0x00FF00, 0x00FFFF, 0xFFFF00, 0xFFFFFF,
 	0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000 };
 	//printf("y=%d, ma=%04x, ra=%02x, x_count=%02x ", y, ma, ra, x_count);
@@ -1010,13 +1016,13 @@ MC6845_UPDATE_ROW( vk100_state::crtc_update_row )
 	 * real address to 16-bit chunk a13  a12  a11 a10 a9  a8  a7  a6  a5  a4  a3  a2  a1  a0
 	 * crtc input                  MA11 MA10 MA9 MA8 MA7 MA6 RA1 RA0 MA5 MA4 MA3 MA2 MA1 MA0
 	 */
-	UINT16 EA = ((ma&0xfc0)<<2)|((ra&0x3)<<6)|(ma&0x3F);
+	uint16_t EA = ((ma&0xfc0)<<2)|((ra&0x3)<<6)|(ma&0x3F);
 	// display the 64 different 12-bit-wide chunks
 	for (int i = 0; i < 64; i++)
 	{
-		UINT16 block = m_vram[(EA<<1)+(2*i)+1] | (m_vram[(EA<<1)+(2*i)]<<8);
-		UINT32 fgColor = (m_vgSOPS&0x08)?colorTable[(block&0xF000)>>12]:colorTable2[(block&0xF000)>>12];
-		UINT32 bgColor = (m_vgSOPS&0x08)?colorTable[(m_vgSOPS&0xF0)>>4]:colorTable2[(m_vgSOPS&0xF0)>>4];
+		uint16_t block = m_vram[(EA<<1)+(2*i)+1] | (m_vram[(EA<<1)+(2*i)]<<8);
+		uint32_t fgColor = (m_vgSOPS&0x08)?colorTable[(block&0xF000)>>12]:colorTable2[(block&0xF000)>>12];
+		uint32_t bgColor = (m_vgSOPS&0x08)?colorTable[(m_vgSOPS&0xF0)>>4]:colorTable2[(m_vgSOPS&0xF0)>>4];
 		// display a 12-bit wide chunk
 		for (int j = 0; j < 12; j++)
 		{
@@ -1026,7 +1032,7 @@ MC6845_UPDATE_ROW( vk100_state::crtc_update_row )
 }
 
 
-static MACHINE_CONFIG_START( vk100, vk100_state )
+static MACHINE_CONFIG_START( vk100 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8085A, XTAL_5_0688MHz)
 	MCFG_CPU_PROGRAM_MAP(vk100_mem)
@@ -1260,5 +1266,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY                       FULLNAME       FLAGS */
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE          INIT    COMPANY                          FULLNAME        FLAGS */
 COMP( 1980, vk100,  0,      0,       vk100,     vk100, vk100_state,   vk100,  "Digital Equipment Corporation", "VK100 'GIGI'", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)

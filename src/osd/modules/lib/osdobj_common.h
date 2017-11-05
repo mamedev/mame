@@ -23,6 +23,7 @@
 #include "modules/netdev/netdev_module.h"
 #include "modules/midi/midi_module.h"
 #include "modules/output/output_module.h"
+#include "modules/monitor/monitor_module.h"
 #include "emuopts.h"
 #include "../frontend/mame/ui/menuitem.h"
 
@@ -71,6 +72,10 @@
 
 #define OSDOPTION_SOUND                 "sound"
 #define OSDOPTION_AUDIO_LATENCY         "audio_latency"
+
+#define OSDOPTION_PA_API                "pa_api"
+#define OSDOPTION_PA_DEVICE             "pa_device"
+#define OSDOPTION_PA_LATENCY            "pa_latency"
 
 #define OSDOPTION_AUDIO_OUTPUT          "audio_output"
 #define OSDOPTION_AUDIO_EFFECT          "audio_effect"
@@ -159,11 +164,16 @@ public:
 	const char *bgfx_shadow_mask() const { return value(OSDOPTION_BGFX_SHADOW_MASK); }
 	const char *bgfx_avi_name() const { return value(OSDOPTION_BGFX_AVI_NAME); }
 
-private:
+	// PortAudio options
+	const char *pa_api() const { return value(OSDOPTION_PA_API); }
+	const char *pa_device() const { return value(OSDOPTION_PA_DEVICE); }
+	const float pa_latency() const { return float_value(OSDOPTION_PA_LATENCY); }
+
 	static const options_entry s_option_entries[];
 };
 
 // ======================> osd_interface
+class osd_window;
 
 // description of the currently-running machine
 class osd_common_t : public osd_interface, osd_output
@@ -185,7 +195,7 @@ public:
 	virtual void wait_for_debugger(device_t &device, bool firststop) override;
 
 	// audio overridables
-	virtual void update_audio_stream(const INT16 *buffer, int samples_this_frame) override;
+	virtual void update_audio_stream(const int16_t *buffer, int samples_this_frame) override;
 	virtual void set_mastervolume(int attenuation) override;
 	virtual bool no_sound() override;
 
@@ -193,7 +203,7 @@ public:
 	virtual void customize_input_type_list(simple_list<input_type_entry> &typelist) override;
 
 	// video overridables
-	virtual void add_audio_to_recording(const INT16 *buffer, int samples_this_frame) override;
+	virtual void add_audio_to_recording(const int16_t *buffer, int samples_this_frame) override;
 	virtual std::vector<ui::menu_item> get_slider_list() override;
 
 	// command option overrides
@@ -223,7 +233,6 @@ public:
 	virtual void exit_subsystems();
 	virtual void video_exit();
 	virtual void window_exit();
-	virtual void input_exit();
 
 	virtual void osd_exit();
 
@@ -236,7 +245,9 @@ public:
 	bool verbose() const { return m_print_verbose; }
 	void set_verbose(bool print_verbose) { m_print_verbose = print_verbose; }
 
-	void notify(const char *outname, INT32 value) const { m_output->notify(outname, value); }
+	void notify(const char *outname, int32_t value) const { m_output->notify(outname, value); }
+
+	static std::list<std::shared_ptr<osd_window>> s_window_list;
 protected:
 	virtual bool input_init();
 	virtual void input_pause();
@@ -254,11 +265,11 @@ private:
 	osd_module_manager m_mod_man;
 	font_module *m_font_module;
 
-	void update_option(const char * key, std::vector<const char *> &values);
+	void update_option(const char * key, std::vector<const char *> &values) const;
 	// FIXME: should be elsewhere
 	osd_module *select_module_options(const core_options &opts, const std::string &opt_name)
 	{
-		std::string opt_val = opts.value(opt_name.c_str());
+		std::string opt_val = opts.exists(opt_name) ? opts.value(opt_name.c_str()) : "";
 		if (opt_val.compare("auto")==0)
 			opt_val = "";
 		else if (!m_mod_man.type_has_name(opt_name.c_str(), opt_val.c_str()))
@@ -276,14 +287,15 @@ private:
 	}
 
 protected:
-	sound_module*  m_sound;
-	debug_module*  m_debugger;
-	midi_module*   m_midi;
-	input_module*  m_keyboard_input;
-	input_module*  m_mouse_input;
-	input_module*  m_lightgun_input;
-	input_module*  m_joystick_input;
-	output_module* m_output;
+	sound_module*   m_sound;
+	debug_module*   m_debugger;
+	midi_module*    m_midi;
+	input_module*   m_keyboard_input;
+	input_module*   m_mouse_input;
+	input_module*   m_lightgun_input;
+	input_module*   m_joystick_input;
+	output_module*  m_output;
+	monitor_module* m_monitor_module;
 	std::unique_ptr<osd_watchdog> m_watchdog;
 	std::vector<ui::menu_item> m_sliders;
 

@@ -12,6 +12,8 @@ Video Fruit Machine
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class buster_state : public driver_device
@@ -24,9 +26,9 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")  { }
 
-	required_shared_ptr<UINT8> m_vram;
+	required_shared_ptr<uint8_t> m_vram;
 	virtual void video_start() override;
-	UINT32 screen_update_buster(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_buster(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -37,7 +39,7 @@ void buster_state::video_start()
 {
 }
 
-UINT32 buster_state::screen_update_buster(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t buster_state::screen_update_buster(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	gfx_element *gfx = m_gfxdecode->gfx(0);
 	int count = 0x0000;
@@ -313,7 +315,7 @@ static GFXDECODE_START( buster )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( buster, buster_state )
+static MACHINE_CONFIG_START( buster )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,XTAL_3_579545MHz)        /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(mainmap)
@@ -357,4 +359,4 @@ ROM_START( buster )
 ROM_END
 
 
-GAME( 1982, buster,  0,    buster, buster, driver_device,  0, ROT0, "Marian Electronics Ltd.", "Buster", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
+GAME( 1982, buster,  0,    buster, buster, buster_state,  0, ROT0, "Marian Electronics Ltd.", "Buster", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )

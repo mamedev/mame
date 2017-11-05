@@ -3,9 +3,14 @@
 /* Mogura Desse */
 
 #include "emu.h"
+#include "includes/konamipt.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/dac.h"
-#include "includes/konamipt.h"
+#include "sound/volt_reg.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 class mogura_state : public driver_device
 {
@@ -13,18 +18,18 @@ public:
 	mogura_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_dac1(*this, "dac1"),
-		m_dac2(*this, "dac2"),
+		m_ldac(*this, "ldac"),
+		m_rdac(*this, "rdac"),
 		m_gfxram(*this, "gfxram"),
 		m_tileram(*this, "tileram"),
 		m_gfxdecode(*this, "gfxdecode")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<dac_device> m_dac1;
-	required_device<dac_device> m_dac2;
-	required_shared_ptr<UINT8> m_gfxram;
-	required_shared_ptr<UINT8> m_tileram;
+	required_device<dac_byte_interface> m_ldac;
+	required_device<dac_byte_interface> m_rdac;
+	required_shared_ptr<uint8_t> m_gfxram;
+	required_shared_ptr<uint8_t> m_tileram;
 	required_device<gfxdecode_device> m_gfxdecode;
 
 	tilemap_t *m_tilemap;
@@ -35,13 +40,13 @@ public:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(mogura);
-	UINT32 screen_update_mogura(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_mogura(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
 PALETTE_INIT_MEMBER(mogura_state, mogura)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i, j;
 
 	j = 0;
@@ -87,10 +92,10 @@ TILE_GET_INFO_MEMBER(mogura_state::get_mogura_tile_info)
 void mogura_state::video_start()
 {
 	m_gfxdecode->gfx(0)->set_source(m_gfxram);
-	m_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(mogura_state::get_mogura_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(mogura_state::get_mogura_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 }
 
-UINT32 mogura_state::screen_update_mogura(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t mogura_state::screen_update_mogura(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	const rectangle &visarea = screen.visible_area();
 
@@ -116,8 +121,8 @@ WRITE8_MEMBER(mogura_state::mogura_tileram_w)
 
 WRITE8_MEMBER(mogura_state::mogura_dac_w)
 {
-	m_dac1->write_unsigned8(data & 0xf0);   /* left */
-	m_dac2->write_unsigned8((data & 0x0f) << 4);    /* right */
+	m_ldac->write(data >> 4);
+	m_rdac->write(data & 15);
 }
 
 
@@ -197,7 +202,7 @@ void mogura_state::machine_start()
 {
 }
 
-static MACHINE_CONFIG_START( mogura, mogura_state )
+static MACHINE_CONFIG_START( mogura )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,3000000)         /* 3 MHz */
@@ -220,13 +225,12 @@ static MACHINE_CONFIG_START( mogura, mogura_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-
-	MCFG_DAC_ADD("dac1")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
-
-	MCFG_DAC_ADD("dac2")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
-MACHINE_CONFIG_END
+	MCFG_SOUND_ADD("ldac", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25) // unknown DAC
+	MCFG_SOUND_ADD("rdac", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
+	MACHINE_CONFIG_END
 
 
 ROM_START( mogura )
@@ -237,4 +241,4 @@ ROM_START( mogura )
 	ROM_LOAD( "gx141.7j", 0x00, 0x20,  CRC(b21c5d5f) SHA1(6913c840dd69a7d4687f4c4cbe3ff12300f62bc2) )
 ROM_END
 
-GAME( 1991, mogura, 0, mogura, mogura, driver_device, 0, ROT0, "Konami", "Mogura Desse (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, mogura, 0, mogura, mogura, mogura_state, 0, ROT0, "Konami", "Mogura Desse (Japan)", MACHINE_SUPPORTS_SAVE )

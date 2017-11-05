@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "compis_fdc.h"
 
 
@@ -21,7 +22,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type COMPIS_FDC = &device_creator<compis_fdc_device>;
+DEFINE_DEVICE_TYPE(COMPIS_FDC, compis_fdc_device, "compis_fdc", "Compis FDC")
 
 
 //-------------------------------------------------
@@ -44,31 +45,21 @@ FLOPPY_FORMATS_END
 
 static SLOT_INTERFACE_START( compis_floppies )
 	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
+	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
 SLOT_INTERFACE_END
 
 
 //-------------------------------------------------
-//  MACHINE_DRIVER( compis_fdc )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( compis_fdc )
+MACHINE_CONFIG_MEMBER( compis_fdc_device::device_add_mconfig )
 	MCFG_I8272A_ADD(I8272_TAG, true)
 	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(compis_fdc_device, fdc_irq))
 	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(compis_fdc_device, fdc_drq))
 	MCFG_FLOPPY_DRIVE_ADD(I8272_TAG":0", compis_floppies, "525qd", compis_fdc_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(I8272_TAG":1", compis_floppies, "525qd", compis_fdc_device::floppy_formats)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor compis_fdc_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( compis_fdc );
-}
 
 
 
@@ -80,8 +71,8 @@ machine_config_constructor compis_fdc_device::device_mconfig_additions() const
 //  compis_fdc_device - constructor
 //-------------------------------------------------
 
-compis_fdc_device::compis_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, COMPIS_FDC, "Compis FDC", tag, owner, clock, "compis_fdc", __FILE__),
+compis_fdc_device::compis_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, COMPIS_FDC, tag, owner, clock),
 	device_isbx_card_interface(mconfig, *this),
 	m_fdc(*this, I8272_TAG),
 	m_floppy0(*this, I8272_TAG":0"),
@@ -113,9 +104,9 @@ void compis_fdc_device::device_reset()
 //  mcs0_r - chip select 0 read
 //-------------------------------------------------
 
-UINT8 compis_fdc_device::mcs0_r(address_space &space, offs_t offset)
+uint8_t compis_fdc_device::mcs0_r(address_space &space, offs_t offset)
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	switch (BIT(offset, 0))
 	{
@@ -131,7 +122,7 @@ UINT8 compis_fdc_device::mcs0_r(address_space &space, offs_t offset)
 //  mcs0_w - chip select 0 write
 //-------------------------------------------------
 
-void compis_fdc_device::mcs0_w(address_space &space, offs_t offset, UINT8 data)
+void compis_fdc_device::mcs0_w(address_space &space, offs_t offset, uint8_t data)
 {
 	switch (BIT(offset, 0))
 	{
@@ -144,7 +135,7 @@ void compis_fdc_device::mcs0_w(address_space &space, offs_t offset, UINT8 data)
 //  mdack_r - DMA acknowledge read
 //-------------------------------------------------
 
-UINT8 compis_fdc_device::mdack_r(address_space &space, offs_t offset)
+uint8_t compis_fdc_device::mdack_r(address_space &space, offs_t offset)
 {
 	return m_fdc->dma_r();
 }
@@ -154,7 +145,7 @@ UINT8 compis_fdc_device::mdack_r(address_space &space, offs_t offset)
 //  mdack_w - DMA acknowledge write
 //-------------------------------------------------
 
-void compis_fdc_device::mdack_w(address_space &space, offs_t offset, UINT8 data)
+void compis_fdc_device::mdack_w(address_space &space, offs_t offset, uint8_t data)
 {
 	m_fdc->dma_w(data);
 }

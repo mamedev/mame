@@ -15,16 +15,16 @@ public:
 
 	optional_device<sn76477_device> m_sn;
 
-	required_shared_ptr<UINT8> m_sharedram;
-	required_shared_ptr<UINT8> m_videoram1;
-	required_shared_ptr<UINT8> m_videoram2;
+	required_shared_ptr<uint8_t> m_sharedram;
+	required_shared_ptr<uint8_t> m_videoram1;
+	required_shared_ptr<uint8_t> m_videoram2;
 	required_device<palette_device> m_palette;
 
-	UINT8 m_ttmahjng_port_select;
+	uint8_t m_ttmahjng_port_select;
 	int m_speakres_vrx;
-	UINT8 m_flipscreen;
-	UINT8 m_palette_1;
-	UINT8 m_palette_2;
+	uint8_t m_flipscreen;
+	uint8_t m_palette_1;
+	uint8_t m_palette_2;
 
 	DECLARE_WRITE8_MEMBER(out0_w);
 	DECLARE_WRITE8_MEMBER(out1_w);
@@ -43,6 +43,6 @@ public:
 	DECLARE_MACHINE_START(ttmahjng);
 	virtual void video_start() override;
 
-	UINT32 screen_update_route16(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_ttmahjng(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_route16(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_ttmahjng(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };

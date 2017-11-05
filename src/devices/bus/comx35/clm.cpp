@@ -44,7 +44,9 @@ Notes:
 
 */
 
+#include "emu.h"
 #include "clm.h"
+#include "screen.h"
 
 
 
@@ -62,7 +64,7 @@ Notes:
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type COMX_CLM = &device_creator<comx_clm_device>;
+DEFINE_DEVICE_TYPE(COMX_CLM, comx_clm_device, "comx_clm", "COMX 80 Column Card")
 
 
 //-------------------------------------------------
@@ -87,7 +89,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *comx_clm_device::device_rom_region() const
+const tiny_rom_entry *comx_clm_device::device_rom_region() const
 {
 	return ROM_NAME( comx_clm );
 }
@@ -101,9 +103,9 @@ MC6845_UPDATE_ROW( comx_clm_device::crtc_update_row )
 {
 	for (int column = 0; column < x_count; column++)
 	{
-		UINT8 code = m_video_ram[((ma + column) & 0x7ff)];
-		UINT16 addr = (code << 3) | (ra & 0x07);
-		UINT8 data = m_char_rom->base()[addr & 0x7ff];
+		uint8_t code = m_video_ram[((ma + column) & 0x7ff)];
+		uint16_t addr = (code << 3) | (ra & 0x07);
+		uint8_t data = m_char_rom->base()[addr & 0x7ff];
 
 		if (BIT(ra, 3) && column == cursor_x)
 		{
@@ -131,11 +133,11 @@ GFXDECODE_END
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( comx_clm )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( comx_clm )
-	MCFG_SCREEN_ADD_MONOCHROME(MC6845_SCREEN_TAG, RASTER, rgb_t::white)
+MACHINE_CONFIG_MEMBER( comx_clm_device::device_add_mconfig )
+	MCFG_SCREEN_ADD_MONOCHROME(MC6845_SCREEN_TAG, RASTER, rgb_t::white())
 	MCFG_SCREEN_UPDATE_DEVICE(MC6845_TAG, mc6845_device, screen_update)
 	MCFG_SCREEN_SIZE(80*8, 24*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 80*8-1, 0, 24*8-1)
@@ -152,18 +154,6 @@ static MACHINE_CONFIG_FRAGMENT( comx_clm )
 MACHINE_CONFIG_END
 
 
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor comx_clm_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( comx_clm );
-}
-
-
-
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
@@ -172,8 +162,8 @@ machine_config_constructor comx_clm_device::device_mconfig_additions() const
 //  comx_clm_device - constructor
 //-------------------------------------------------
 
-comx_clm_device::comx_clm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, COMX_CLM, "COMX 80 Column Card", tag, owner, clock, "comx_clm", __FILE__),
+comx_clm_device::comx_clm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, COMX_CLM, tag, owner, clock),
 	device_comx_expansion_card_interface(mconfig, *this),
 	device_gfx_interface(mconfig, *this, nullptr, "palette"),
 	m_crtc(*this, MC6845_TAG),
@@ -222,9 +212,9 @@ int comx_clm_device::comx_ef4_r()
 //  comx_mrd_r - memory read
 //-------------------------------------------------
 
-UINT8 comx_clm_device::comx_mrd_r(address_space &space, offs_t offset, int *extrom)
+uint8_t comx_clm_device::comx_mrd_r(address_space &space, offs_t offset, int *extrom)
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	if (offset >= 0xc000 && offset < 0xc800)
 	{
@@ -247,7 +237,7 @@ UINT8 comx_clm_device::comx_mrd_r(address_space &space, offs_t offset, int *extr
 //  comx_mwr_w - memory write
 //-------------------------------------------------
 
-void comx_clm_device::comx_mwr_w(address_space &space, offs_t offset, UINT8 data)
+void comx_clm_device::comx_mwr_w(address_space &space, offs_t offset, uint8_t data)
 {
 	if (offset >= 0xd000 && offset < 0xd800)
 	{

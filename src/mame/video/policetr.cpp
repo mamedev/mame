@@ -33,7 +33,7 @@ void policetr_state::video_start()
 	m_srcbitmap_height_mask = (memregion("gfx1")->bytes() / SRCBITMAP_WIDTH) - 1;
 
 	/* the destination bitmap is not directly accessible to the CPU */
-	m_dstbitmap = std::make_unique<UINT8[]>(DSTBITMAP_WIDTH * DSTBITMAP_HEIGHT);
+	m_dstbitmap = std::make_unique<uint8_t[]>(DSTBITMAP_WIDTH * DSTBITMAP_HEIGHT);
 }
 
 
@@ -52,18 +52,18 @@ void policetr_state::render_display_list(offs_t offset)
 	/* loop over all items */
 	while (offset != 0x1fffffff)
 	{
-		UINT32 *entry = &m_rambase[offset / 4];
-		UINT32 srcx = entry[0] & 0xfffffff;
-		UINT32 srcy = entry[1] & ((m_srcbitmap_height_mask << 16) | 0xffff);
-		UINT32 srcxstep = entry[2];
-		UINT32 srcystep = entry[3];
+		uint32_t *entry = &m_rambase[offset / 4];
+		uint32_t srcx = entry[0] & 0xfffffff;
+		uint32_t srcy = entry[1] & ((m_srcbitmap_height_mask << 16) | 0xffff);
+		uint32_t srcxstep = entry[2];
+		uint32_t srcystep = entry[3];
 		int dstw = (entry[4] & 0x1ff) + 1;
 		int dsth = ((entry[4] >> 12) & 0x1ff) + 1;
 		int dstx = entry[5] & 0x1ff;
 		int dsty = (entry[5] >> 12) & 0x1ff;
-		UINT8 mask = ~entry[6] >> 16;
-		UINT8 color = (entry[6] >> 24) & ~mask;
-		UINT32 curx, cury;
+		uint8_t mask = ~entry[6] >> 16;
+		uint8_t color = (entry[6] >> 24) & ~mask;
+		uint32_t curx, cury;
 		int x, y;
 
 		if (dstx > m_render_clip.max_x)
@@ -95,14 +95,14 @@ void policetr_state::render_display_list(offs_t offset)
 		if (srcxstep == 0 && srcystep == 0)
 		{
 			/* prefetch the pixel */
-			UINT8 pixel = m_srcbitmap[((srcy >> 16) * m_srcbitmap_height_mask) * SRCBITMAP_WIDTH + (srcx >> 16) % SRCBITMAP_WIDTH];
+			uint8_t pixel = m_srcbitmap[((srcy >> 16) * m_srcbitmap_height_mask) * SRCBITMAP_WIDTH + (srcx >> 16) % SRCBITMAP_WIDTH];
 			pixel = color | (pixel & mask);
 
 			/* loop over rows and columns */
 			if (dstw > 0)
 				for (y = 0; y < dsth; y++)
 				{
-					UINT8 *dst = &m_dstbitmap[(dsty + y) * DSTBITMAP_WIDTH + dstx];
+					uint8_t *dst = &m_dstbitmap[(dsty + y) * DSTBITMAP_WIDTH + dstx];
 					memset(dst, pixel, dstw);
 				}
 		}
@@ -113,13 +113,13 @@ void policetr_state::render_display_list(offs_t offset)
 			/* loop over rows */
 			for (y = 0, cury = srcy; y < dsth; y++, cury += srcystep)
 			{
-				UINT8 *src = &m_srcbitmap[((cury >> 16) & m_srcbitmap_height_mask) * SRCBITMAP_WIDTH];
-				UINT8 *dst = &m_dstbitmap[(dsty + y) * DSTBITMAP_WIDTH + dstx];
+				uint8_t *src = &m_srcbitmap[((cury >> 16) & m_srcbitmap_height_mask) * SRCBITMAP_WIDTH];
+				uint8_t *dst = &m_dstbitmap[(dsty + y) * DSTBITMAP_WIDTH + dstx];
 
 				/* loop over columns */
 				for (x = 0, curx = srcx; x < dstw; x++, curx += srcxstep)
 				{
-					UINT8 pixel = src[(curx >> 16) % SRCBITMAP_WIDTH];
+					uint8_t pixel = src[(curx >> 16) % SRCBITMAP_WIDTH];
 					if (pixel)
 						dst[x] = color | (pixel & mask);
 				}
@@ -344,7 +344,7 @@ WRITE32_MEMBER(policetr_state::policetr_palette_data_w)
  *
  *************************************/
 
-UINT32 policetr_state::screen_update_policetr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t policetr_state::screen_update_policetr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int width = cliprect.width();
 	int y;

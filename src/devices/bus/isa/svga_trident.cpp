@@ -10,6 +10,8 @@
 #include "svga_trident.h"
 #include "video/pc_vga.h"
 
+#include "screen.h"
+
 
 ROM_START( tgui9680 )
 	ROM_REGION( 0x8000, "tgui9680", 0 )
@@ -21,10 +23,14 @@ ROM_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type ISA16_SVGA_TGUI9680 = &device_creator<isa16_svga_tgui9680_device>;
+DEFINE_DEVICE_TYPE(ISA16_SVGA_TGUI9680, isa16_svga_tgui9680_device, "tgui9680", "Trident TGUI9680 Graphics Card (BIOS X5.5 (02) 02/13/96)")
 
 
-static MACHINE_CONFIG_FRAGMENT( vga_trident )
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+MACHINE_CONFIG_MEMBER( isa16_svga_tgui9680_device::device_add_mconfig )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_25_1748MHz,900,0,640,526,0,480)
 	MCFG_SCREEN_UPDATE_DEVICE("vga", trident_vga_device, screen_update)
@@ -35,20 +41,10 @@ static MACHINE_CONFIG_FRAGMENT( vga_trident )
 MACHINE_CONFIG_END
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor isa16_svga_tgui9680_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( vga_trident );
-}
-
-//-------------------------------------------------
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *isa16_svga_tgui9680_device::device_rom_region() const
+const tiny_rom_entry *isa16_svga_tgui9680_device::device_rom_region() const
 {
 	return ROM_NAME( tgui9680 );
 }
@@ -61,9 +57,10 @@ const rom_entry *isa16_svga_tgui9680_device::device_rom_region() const
 //  isa8_vga_device - constructor
 //-------------------------------------------------
 
-isa16_svga_tgui9680_device::isa16_svga_tgui9680_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-		device_t(mconfig, ISA16_SVGA_TGUI9680, "Trident TGUI9680 Graphics Card (BIOS X5.5 (02) 02/13/96)", tag, owner, clock, "tgui9680", __FILE__),
-		device_isa16_card_interface(mconfig, *this), m_vga(nullptr)
+isa16_svga_tgui9680_device::isa16_svga_tgui9680_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, ISA16_SVGA_TGUI9680, tag, owner, clock),
+	device_isa16_card_interface(mconfig, *this),
+	m_vga(nullptr)
 {
 }
 
@@ -78,24 +75,24 @@ void isa16_svga_tgui9680_device::device_start()
 
 	m_vga = subdevice<trident_vga_device>("vga");
 
-	m_isa->install_rom(this, 0xc0000, 0xc7fff, 0, 0, "tgui9680", "tgui9680");
+	m_isa->install_rom(this, 0xc0000, 0xc7fff, "tgui9680", "tgui9680");
 
-	m_isa->install_device(0x3b0, 0x3bf, 0, 0, read8_delegate(FUNC(trident_vga_device::port_03b0_r),m_vga), write8_delegate(FUNC(trident_vga_device::port_03b0_w),m_vga));
-	m_isa->install_device(0x3c0, 0x3cf, 0, 0, read8_delegate(FUNC(trident_vga_device::port_03c0_r),m_vga), write8_delegate(FUNC(trident_vga_device::port_03c0_w),m_vga));
-	m_isa->install_device(0x3d0, 0x3df, 0, 0, read8_delegate(FUNC(trident_vga_device::port_03d0_r),m_vga), write8_delegate(FUNC(trident_vga_device::port_03d0_w),m_vga));
-	m_isa->install_device(0x43c4, 0x43cb, 0, 0, read8_delegate(FUNC(trident_vga_device::port_43c6_r),m_vga), write8_delegate(FUNC(trident_vga_device::port_43c6_w),m_vga));
-	m_isa->install_device(0x83c4, 0x83cb, 0, 0, read8_delegate(FUNC(trident_vga_device::port_83c6_r),m_vga), write8_delegate(FUNC(trident_vga_device::port_83c6_w),m_vga));
+	m_isa->install_device(0x3b0, 0x3bf, read8_delegate(FUNC(trident_vga_device::port_03b0_r),m_vga), write8_delegate(FUNC(trident_vga_device::port_03b0_w),m_vga));
+	m_isa->install_device(0x3c0, 0x3cf, read8_delegate(FUNC(trident_vga_device::port_03c0_r),m_vga), write8_delegate(FUNC(trident_vga_device::port_03c0_w),m_vga));
+	m_isa->install_device(0x3d0, 0x3df, read8_delegate(FUNC(trident_vga_device::port_03d0_r),m_vga), write8_delegate(FUNC(trident_vga_device::port_03d0_w),m_vga));
+	m_isa->install_device(0x43c4, 0x43cb, read8_delegate(FUNC(trident_vga_device::port_43c6_r),m_vga), write8_delegate(FUNC(trident_vga_device::port_43c6_w),m_vga));
+	m_isa->install_device(0x83c4, 0x83cb, read8_delegate(FUNC(trident_vga_device::port_83c6_r),m_vga), write8_delegate(FUNC(trident_vga_device::port_83c6_w),m_vga));
 
-	m_isa->install_memory(0xa0000, 0xbffff, 0, 0, read8_delegate(FUNC(trident_vga_device::mem_r),m_vga), write8_delegate(FUNC(trident_vga_device::mem_w),m_vga));
+	m_isa->install_memory(0xa0000, 0xbffff, read8_delegate(FUNC(trident_vga_device::mem_r),m_vga), write8_delegate(FUNC(trident_vga_device::mem_w),m_vga));
 
 	// uncomment to test Windows 3.1 TGUI9440AGi driver
-//  m_isa->install_memory(0x4400000, 0x45fffff, 0, 0, read8_delegate(FUNC(trident_vga_device::vram_r),m_vga), write8_delegate(FUNC(trident_vga_device::vram_w),m_vga));
+//  m_isa->install_memory(0x4400000, 0x45fffff, read8_delegate(FUNC(trident_vga_device::vram_r),m_vga), write8_delegate(FUNC(trident_vga_device::vram_w),m_vga));
 
 	// win95 drivers
-//  m_isa->install_memory(0x4000000, 0x41fffff, 0, 0, read8_delegate(FUNC(trident_vga_device::vram_r),m_vga), write8_delegate(FUNC(trident_vga_device::vram_w),m_vga));
+//  m_isa->install_memory(0x4000000, 0x41fffff, read8_delegate(FUNC(trident_vga_device::vram_r),m_vga), write8_delegate(FUNC(trident_vga_device::vram_w),m_vga));
 
 	// acceleration ports
-	m_isa->install_device(0x2120, 0x21ff, 0, 0, read8_delegate(FUNC(trident_vga_device::accel_r),m_vga), write8_delegate(FUNC(trident_vga_device::accel_w),m_vga));
+	m_isa->install_device(0x2120, 0x21ff, read8_delegate(FUNC(trident_vga_device::accel_r),m_vga), write8_delegate(FUNC(trident_vga_device::accel_w),m_vga));
 }
 
 //-------------------------------------------------

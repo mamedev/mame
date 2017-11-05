@@ -12,26 +12,29 @@ There is RAM for 512 scroll values (line scroll). Video RAM is mirrored on multi
 One peculiarity is that video RAM access is split into high and low byte. The former is mapped
 in program space, the latter in I/O space.
 
---------------------------------------------------------------------------------------------------------------
-Year  Game              CPU         Sound            Custom                            Other
---------------------------------------------------------------------------------------------------------------
-1996  Magic Train       HD647180*   U6295            SS9601, SS9602                    HM86171 RAMDAC, Battery
-1996  Water-Nymph       HD647180*   U6295            SS9601, SS9602                    HM86171 RAMDAC, Battery
-1998  Express Card      AM188-EM    M6295            SS9601, SS9802, SS9803            HM86171 RAMDAC, Battery
-1998  Ying Hua Lian     AM188-EM    M6295 + YM3812?  SS9601, SS9602                    HM86171 RAMDAC, Battery
-1999  Bishou Jan        H8/3044**   SS9904?          SS9601, SS9802, SS9803            HM86171 RAMDAC, Battery
-1999  X-Train/P-Train   AM188-EM    M6295            SS9601, SS9802, SS9803            HM86171 RAMDAC, Battery
-2000  New 2001          H8/3044**   SS9904?          SS9601, SS9802, SS9803            HM86171 RAMDAC, Battery
-2006  X-Plan            AM188-EM    M6295            SS9601, SS9802, SS9803            HM86171 RAMDAC, Battery
---------------------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------------
+Year  Game                CPU         Sound            Custom                            Other
+----------------------------------------------------------------------------------------------------------------
+1996  Magic Train         HD647180*   U6295            SS9601, SS9602                    HM86171 RAMDAC, Battery
+1996  Water-Nymph         HD647180*   U6295            SS9601, SS9602                    HM86171 RAMDAC, Battery
+1998  Express Card        AM188-EM    M6295            SS9601, SS9802, SS9803            HM86171 RAMDAC, Battery
+1998  Ying Hua Lian       AM188-EM    M6295 + YM3812?  SS9601, SS9602                    HM86171 RAMDAC, Battery
+1999  Bishou Jan          H8/3044**   SS9904           SS9601, SS9802, SS9803            HM86171 RAMDAC, Battery
+1999  X-Train/P-Train     AM188-EM    M6295            SS9601, SS9802, SS9803            HM86171 RAMDAC, Battery
+2000  New 2001            H8/3044**   SS9904           SS9601, SS9802, SS9803            HM86171 RAMDAC, Battery
+2001  Humlan's Lyckohjul  H8/3044**   SS9804           SS9601, SS9802, SS9803            HM86171 RAMDAC, Battery
+2006  X-Plan              AM188-EM    M6295            SS9601, SS9802, SS9803            HM86171 RAMDAC, Battery
+----------------------------------------------------------------------------------------------------------------
 *SS9600   **SS9689
 
 To do:
 
 - Implement serial communication (used for protection).
+- Add sound to SS9804/SS9904 games.
+- ptrain: missing scroll in race screens.
+- humlan: empty reels when bonus image should scroll in via L0 scroll. The image (crown/fruits) is at y > 0x100 in the tilemap.
 - saklove, xplan: remove IRQ hacks (when an AM188-EM core will be available).
-- bishjan, saklove: game is sometimes too fast (can bishjan read the VBLANK state? saklove and xplan can).
-- bishjan: add sound (does it send sound commands to another device? SS9904?).
+- bishjan, new2001, humlan, saklove: game is sometimes too fast (can bishjan read the VBLANK state? saklove and xplan can).
 - xtrain: it runs faster than a video from the real thing. It doesn't use vblank irqs (but reads the vblank bit).
 - mtrain: implement hopper. Double up does not work?
 
@@ -41,11 +44,14 @@ To do:
 #include "cpu/h8/h83048.h"
 #include "cpu/i86/i186.h"
 #include "cpu/z180/z180.h"
-#include "sound/3812intf.h"
-#include "sound/okim6295.h"
 #include "machine/nvram.h"
 #include "machine/subsino.h"
 #include "machine/ticket.h"
+#include "sound/3812intf.h"
+#include "sound/okim6295.h"
+#include "video/ramdac.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 enum tilesize_t
@@ -65,9 +71,9 @@ enum vram_t
 // Layers
 struct layer_t
 {
-	std::unique_ptr<UINT8[]> videorams[2];
+	std::unique_ptr<uint8_t[]> videorams[2];
 
-	std::unique_ptr<UINT8[]> scrollrams[2];
+	std::unique_ptr<uint8_t[]> scrollrams[2];
 	int scroll_x;
 	int scroll_y;
 
@@ -89,21 +95,19 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette") { }
 
-	std::unique_ptr<UINT8[]> m_hm86171_colorram;
 	layer_t m_layers[2];
-	UINT8 m_ss9601_byte_lo;
-	UINT8 m_ss9601_byte_lo2;
-	std::unique_ptr<UINT8[]> m_ss9601_reelrams[2];
+	uint8_t m_ss9601_byte_lo;
+	uint8_t m_ss9601_byte_lo2;
+	std::unique_ptr<uint8_t[]> m_ss9601_reelrams[2];
 	std::unique_ptr<bitmap_ind16> m_reelbitmap;
-	UINT8 m_ss9601_scrollctrl;
-	UINT8 m_ss9601_tilesize;
-	UINT8 m_ss9601_disable;
-	int m_hm86171_offs;
-	UINT8 m_dsw_mask;
-	optional_shared_ptr<UINT16> m_outputs16;
-	optional_shared_ptr<UINT8> m_outputs;
-	UINT16 m_bishjan_sound;
-	UINT16 m_bishjan_input;
+	uint8_t m_ss9601_scrollctrl;
+	uint8_t m_ss9601_tilesize;
+	uint8_t m_ss9601_disable;
+	uint8_t m_dsw_mask;
+	optional_shared_ptr<uint16_t> m_outputs16;
+	optional_shared_ptr<uint8_t> m_outputs;
+	uint16_t m_bishjan_sound;
+	uint16_t m_bishjan_input;
 	DECLARE_WRITE8_MEMBER(ss9601_byte_lo_w);
 	DECLARE_WRITE8_MEMBER(ss9601_byte_lo2_w);
 	DECLARE_WRITE8_MEMBER(ss9601_videoram_0_hi_w);
@@ -135,7 +139,6 @@ public:
 	DECLARE_READ8_MEMBER(ss9601_scrollram_1_hi_r);
 	DECLARE_READ8_MEMBER(ss9601_scrollram_1_lo_r);
 	DECLARE_WRITE8_MEMBER(ss9601_disable_w);
-	DECLARE_WRITE8_MEMBER(hm86171_colorram_w);
 	DECLARE_WRITE8_MEMBER(dsw_mask_w);
 	DECLARE_READ8_MEMBER(dsw_r);
 	DECLARE_READ8_MEMBER(vblank_bit2_r);
@@ -146,6 +149,7 @@ public:
 	DECLARE_READ16_MEMBER(bishjan_input_r);
 	DECLARE_WRITE16_MEMBER(bishjan_outputs_w);
 	DECLARE_WRITE16_MEMBER(new2001_outputs_w);
+	DECLARE_WRITE16_MEMBER(humlan_outputs_w);
 	DECLARE_WRITE8_MEMBER(expcard_outputs_w);
 	DECLARE_WRITE8_MEMBER(mtrain_outputs_w);
 	DECLARE_WRITE8_MEMBER(mtrain_videoram_w);
@@ -158,6 +162,7 @@ public:
 	DECLARE_WRITE8_MEMBER(oki_bank_bit4_w);
 	DECLARE_DRIVER_INIT(bishjan);
 	DECLARE_DRIVER_INIT(new2001);
+	DECLARE_DRIVER_INIT(humlan);
 	DECLARE_DRIVER_INIT(xtrain);
 	DECLARE_DRIVER_INIT(expcard);
 	DECLARE_DRIVER_INIT(wtrnymph);
@@ -168,7 +173,7 @@ public:
 	TILE_GET_INFO_MEMBER(ss9601_get_tile_info_0);
 	TILE_GET_INFO_MEMBER(ss9601_get_tile_info_1);
 	DECLARE_VIDEO_START(subsino2);
-	UINT32 screen_update_subsino2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_subsino2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(am188em_int0_irq);
 	required_device<cpu_device> m_maincpu;
 	optional_device<okim6295_device> m_oki;
@@ -189,7 +194,7 @@ private:
 inline void subsino2_state::ss9601_get_tile_info(layer_t *l, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int addr;
-	UINT16 offs;
+	uint16_t offs;
 	switch (l->tilesize)
 	{
 		default:
@@ -223,7 +228,7 @@ WRITE8_MEMBER(subsino2_state::ss9601_byte_lo2_w)
 }
 
 
-static inline void ss9601_videoram_w(layer_t *l, vram_t vram, address_space &space, offs_t offset, UINT8 data)
+static inline void ss9601_videoram_w(layer_t *l, vram_t vram, address_space &space, offs_t offset, uint8_t data)
 {
 	l->videorams[vram][offset] = data;
 
@@ -598,8 +603,6 @@ WRITE8_MEMBER(subsino2_state::ss9601_disable_w)
 
 VIDEO_START_MEMBER(subsino2_state,subsino2)
 {
-	m_hm86171_colorram = std::make_unique<UINT8[]>(256*3);
-
 	// SS9601 Regs:
 
 	m_ss9601_tilesize       =   TILE_8x8;
@@ -612,7 +615,7 @@ VIDEO_START_MEMBER(subsino2_state,subsino2)
 	{
 		layer_t *l = &m_layers[i];
 
-		l->tmap = &machine().tilemap().create(m_gfxdecode, i ?
+		l->tmap = &machine().tilemap().create(*m_gfxdecode, i ?
 												tilemap_get_info_delegate(FUNC(subsino2_state::ss9601_get_tile_info_1),this) :
 												tilemap_get_info_delegate(FUNC(subsino2_state::ss9601_get_tile_info_0),this),
 												TILEMAP_SCAN_ROWS, 8,8, 0x80,0x40);
@@ -622,19 +625,19 @@ VIDEO_START_MEMBER(subsino2_state,subsino2)
 		// line scroll
 		l->tmap->set_scroll_rows(0x200);
 
-		l->videorams[VRAM_HI] = std::make_unique<UINT8[]>(0x80 * 0x40);
-		l->videorams[VRAM_LO] = std::make_unique<UINT8[]>(0x80 * 0x40);
+		l->videorams[VRAM_HI] = std::make_unique<uint8_t[]>(0x80 * 0x40);
+		l->videorams[VRAM_LO] = std::make_unique<uint8_t[]>(0x80 * 0x40);
 
-		l->scrollrams[VRAM_HI] = std::make_unique<UINT8[]>(0x200);
-		l->scrollrams[VRAM_LO] = std::make_unique<UINT8[]>(0x200);
+		l->scrollrams[VRAM_HI] = std::make_unique<uint8_t[]>(0x200);
+		l->scrollrams[VRAM_LO] = std::make_unique<uint8_t[]>(0x200);
 		memset(l->scrollrams[VRAM_HI].get(), 0, 0x200);
 		memset(l->scrollrams[VRAM_LO].get(), 0, 0x200);
 	}
 
 	// SS9601 Reels:
 
-	m_ss9601_reelrams[VRAM_HI] = std::make_unique<UINT8[]>(0x2000);
-	m_ss9601_reelrams[VRAM_LO] = std::make_unique<UINT8[]>(0x2000);
+	m_ss9601_reelrams[VRAM_HI] = std::make_unique<uint8_t[]>(0x2000);
+	m_ss9601_reelrams[VRAM_LO] = std::make_unique<uint8_t[]>(0x2000);
 	memset(m_ss9601_reelrams[VRAM_HI].get(), 0, 0x2000);
 	memset(m_ss9601_reelrams[VRAM_LO].get(), 0, 0x2000);
 	m_reelbitmap = std::make_unique<bitmap_ind16>(0x80*8, 0x40*8);
@@ -650,7 +653,7 @@ VIDEO_START_MEMBER(subsino2_state,subsino2)
 */
 }
 
-UINT32 subsino2_state::screen_update_subsino2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t subsino2_state::screen_update_subsino2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int layers_ctrl = ~m_ss9601_disable;
 	int y;
@@ -697,7 +700,7 @@ UINT32 subsino2_state::screen_update_subsino2(screen_device &screen, bitmap_ind1
 
 		// line scroll
 
-		UINT16 scroll_dx = 0;
+		uint16_t scroll_dx = 0;
 		for (y = 0; y < 0x200; y++)
 		{
 			if (mask_y[i])
@@ -729,7 +732,7 @@ UINT32 subsino2_state::screen_update_subsino2(screen_device &screen, bitmap_ind1
 					visible.max_y = 4 * 0x10 * (y+1) - 1;
 
 					int reeladdr = y * 0x80 * 4 + x;
-					UINT16 reelscroll = (m_ss9601_reelrams[VRAM_HI][reeladdr] << 8) + m_ss9601_reelrams[VRAM_LO][reeladdr];
+					uint16_t reelscroll = (m_ss9601_reelrams[VRAM_HI][reeladdr] << 8) + m_ss9601_reelrams[VRAM_LO][reeladdr];
 
 					l->tmap->set_scrollx(0, (reelscroll >> 9) * 8 - visible.min_x);
 
@@ -761,8 +764,8 @@ UINT32 subsino2_state::screen_update_subsino2(screen_device &screen, bitmap_ind1
 				}
 			}
 
-			INT32 sx = -l->scroll_x;
-			INT32 sy = -(l->scroll_y + 1);
+			int32_t sx = -l->scroll_x;
+			int32_t sy = -(l->scroll_y + 1);
 			copyscrollbitmap(bitmap, *m_reelbitmap, 1, &sx, 1, &sy, cliprect);
 		}
 		else
@@ -777,39 +780,6 @@ UINT32 subsino2_state::screen_update_subsino2(screen_device &screen, bitmap_ind1
 
 	return 0;
 }
-
-/***************************************************************************
-                Palette: HMC HM86171 VGA 256 colour RAMDAC
-***************************************************************************/
-
-
-WRITE8_MEMBER(subsino2_state::hm86171_colorram_w)
-{
-	switch (offset)
-	{
-		case 0:
-			m_hm86171_offs = data * 3;
-			break;
-
-		case 1:
-			m_hm86171_colorram[m_hm86171_offs] = data;
-			m_palette->set_pen_color(m_hm86171_offs/3,
-				pal6bit(m_hm86171_colorram[(m_hm86171_offs/3)*3+0]),
-				pal6bit(m_hm86171_colorram[(m_hm86171_offs/3)*3+1]),
-				pal6bit(m_hm86171_colorram[(m_hm86171_offs/3)*3+2])
-			);
-			m_hm86171_offs = (m_hm86171_offs+1) % (256*3);
-			break;
-
-		case 2:
-			// ff?
-			break;
-
-		case 3:
-			break;
-	}
-}
-
 
 /***************************************************************************
                                 Input / Output
@@ -841,13 +811,13 @@ READ8_MEMBER(subsino2_state::vblank_bit6_r)
 WRITE8_MEMBER(subsino2_state::oki_bank_bit0_w)
 {
 	// it writes 0x32 or 0x33
-	m_oki->set_bank_base((data & 1) * 0x40000);
+	m_oki->set_rom_bank(data & 1);
 }
 
 WRITE8_MEMBER(subsino2_state::oki_bank_bit4_w)
 {
 	// it writes 0x23 or 0x33
-	m_oki->set_bank_base(((data >> 4) & 1) * 0x40000);
+	m_oki->set_rom_bank((data >> 4) & 1);
 }
 
 INTERRUPT_GEN_MEMBER(subsino2_state::am188em_int0_irq)
@@ -880,7 +850,7 @@ READ16_MEMBER(subsino2_state::bishjan_serial_r)
 	return
 		(machine().rand() & 0x9800) |                     // bit 7 - serial communication
 		(((m_bishjan_sound == 0x12) ? 0x40:0x00) << 8) |  // bit 6 - sound communication
-//      (machine.rand() & 0xff);
+//      (machine().rand() & 0xff);
 //      (((m_screen->frame_number()%60)==0)?0x18:0x00);
 		0x18;
 }
@@ -894,7 +864,7 @@ WRITE16_MEMBER(subsino2_state::bishjan_input_w)
 READ16_MEMBER(subsino2_state::bishjan_input_r)
 {
 	int i;
-	UINT16 res = 0xff;
+	uint16_t res = 0xff;
 	static const char *const port[] = { "KEYB_0", "KEYB_1", "KEYB_2", "KEYB_3", "KEYB_4" };
 
 	for (i = 0; i < 5; i++)
@@ -960,7 +930,9 @@ static ADDRESS_MAP_START( bishjan_map, AS_PROGRAM, 16, subsino2_state )
 
 	AM_RANGE( 0x600000, 0x600001 ) AM_READNOP AM_WRITE(bishjan_sound_w )
 	AM_RANGE( 0x600040, 0x600041 ) AM_WRITE8(ss9601_scrollctrl_w, 0xff00 )
-	AM_RANGE( 0x600060, 0x600063 ) AM_WRITE8(hm86171_colorram_w, 0xffff )
+	AM_RANGE( 0x600060, 0x600061 ) AM_DEVWRITE8("ramdac", ramdac_device, index_w, 0xff00)
+	AM_RANGE( 0x600060, 0x600061 ) AM_DEVWRITE8("ramdac", ramdac_device, pal_w, 0x00ff)
+	AM_RANGE( 0x600062, 0x600063 ) AM_DEVWRITE8("ramdac", ramdac_device, mask_w, 0xff00)
 	AM_RANGE( 0x600080, 0x600081 ) AM_WRITE8(ss9601_tilesize_w, 0xff00 )
 	AM_RANGE( 0x6000a0, 0x6000a1 ) AM_WRITE8(ss9601_byte_lo_w, 0xff00 )
 
@@ -972,6 +944,10 @@ static ADDRESS_MAP_START( bishjan_map, AS_PROGRAM, 16, subsino2_state )
 	AM_RANGE( 0xc00004, 0xc00005 ) AM_READ(bishjan_input_r )                        // IN A & B
 	AM_RANGE( 0xc00006, 0xc00007 ) AM_READ(bishjan_serial_r )                       // IN D
 	AM_RANGE( 0xc00008, 0xc00009 ) AM_READ_PORT("RESET") AM_WRITE(bishjan_outputs_w ) AM_SHARE("outputs16")
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( ramdac_map, 0, 8, subsino2_state )
+	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac", ramdac_device, ramdac_pal_r, ramdac_rgb666_w)
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -1004,11 +980,12 @@ WRITE16_MEMBER(subsino2_state::new2001_outputs_w)
 			}
 			break;
 	}
+
 //  popmessage("0: %04x", m_outputs16[0]);
 }
 
 // Same as bishjan (except for i/o and lo2 usage like xplan)
-static ADDRESS_MAP_START( new2001_map, AS_PROGRAM, 16, subsino2_state )
+static ADDRESS_MAP_START( new2001_base_map, AS_PROGRAM, 16, subsino2_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xffffff)
 
 	AM_RANGE( 0x000000, 0x07ffff ) AM_ROM AM_REGION("maincpu", 0)
@@ -1046,7 +1023,9 @@ static ADDRESS_MAP_START( new2001_map, AS_PROGRAM, 16, subsino2_state )
 	AM_RANGE( 0x600000, 0x600001 ) AM_READNOP AM_WRITE(bishjan_sound_w )
 	AM_RANGE( 0x600020, 0x600021 ) AM_WRITE8(ss9601_byte_lo2_w, 0xff00 )
 	AM_RANGE( 0x600040, 0x600041 ) AM_WRITE8(ss9601_scrollctrl_w, 0xff00 )
-	AM_RANGE( 0x600060, 0x600063 ) AM_WRITE8(hm86171_colorram_w, 0xffff )
+	AM_RANGE( 0x600060, 0x600061 ) AM_DEVWRITE8("ramdac", ramdac_device, index_w, 0xff00)
+	AM_RANGE( 0x600060, 0x600061 ) AM_DEVWRITE8("ramdac", ramdac_device, pal_w, 0x00ff)
+	AM_RANGE( 0x600062, 0x600063 ) AM_DEVWRITE8("ramdac", ramdac_device, mask_w, 0xff00)
 	AM_RANGE( 0x600080, 0x600081 ) AM_WRITE8(ss9601_tilesize_w, 0xff00 )
 	AM_RANGE( 0x6000a0, 0x6000a1 ) AM_WRITE8(ss9601_byte_lo_w, 0xff00 )
 
@@ -1057,7 +1036,47 @@ static ADDRESS_MAP_START( new2001_map, AS_PROGRAM, 16, subsino2_state )
 	AM_RANGE( 0xc00002, 0xc00003 ) AM_READ_PORT("IN C")
 	AM_RANGE( 0xc00004, 0xc00005 ) AM_READ_PORT("IN A & B")
 	AM_RANGE( 0xc00006, 0xc00007 ) AM_READ(bishjan_serial_r )
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( new2001_map, AS_PROGRAM, 16, subsino2_state )
 	AM_RANGE( 0xc00008, 0xc00009 ) AM_WRITE(new2001_outputs_w ) AM_SHARE("outputs16")
+	AM_IMPORT_FROM(new2001_base_map)
+ADDRESS_MAP_END
+
+/***************************************************************************
+                             Humlan's Lyckohjul
+***************************************************************************/
+
+WRITE16_MEMBER(subsino2_state::humlan_outputs_w)
+{
+	COMBINE_DATA( &m_outputs16[offset] );
+
+	switch (offset)
+	{
+		case 0:
+			if (ACCESSING_BITS_8_15)
+			{
+				output().set_led_value(5, data & 0x2000); // big or small
+				output().set_led_value(4, data & 0x0400); // double
+				output().set_led_value(3, data & 0x0200); // big or small
+				output().set_led_value(2, data & 0x0100); // bet
+			}
+			if (ACCESSING_BITS_0_7)
+			{
+				output().set_led_value(1, data & 0x0080); // take
+				output().set_led_value(0, data & 0x0040); // start
+				machine().bookkeeping().coin_counter_w(1, data & 0x0004); // key in
+				machine().bookkeeping().coin_counter_w(0, data & 0x0002); // coin in
+			}
+			break;
+	}
+
+//  popmessage("0: %04x", m_outputs16[0]);
+}
+
+static ADDRESS_MAP_START( humlan_map, AS_PROGRAM, 16, subsino2_state )
+	AM_RANGE( 0xc00008, 0xc00009 ) AM_WRITE(humlan_outputs_w ) AM_SHARE("outputs16")
+	AM_IMPORT_FROM(new2001_base_map)
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -1213,7 +1232,9 @@ static ADDRESS_MAP_START( mtrain_map, AS_PROGRAM, 8, subsino2_state )
 
 	AM_RANGE( 0x09158, 0x0915e ) AM_READ(mtrain_prot_r )
 
-	AM_RANGE( 0x09160, 0x09163 ) AM_WRITE(hm86171_colorram_w )
+	AM_RANGE( 0x09160, 0x09160 ) AM_DEVWRITE("ramdac", ramdac_device, index_w)
+	AM_RANGE( 0x09161, 0x09161 ) AM_DEVWRITE("ramdac", ramdac_device, pal_w)
+	AM_RANGE( 0x09162, 0x09162 ) AM_DEVWRITE("ramdac", ramdac_device, mask_w)
 	AM_RANGE( 0x09164, 0x09164 ) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE( 0x09168, 0x09168 ) AM_WRITE(mtrain_tilesize_w )
 
@@ -1286,7 +1307,9 @@ static ADDRESS_MAP_START( saklove_io, AS_IO, 8, subsino2_state )
 	AM_RANGE(0x0020, 0x0020) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0x0040, 0x0041) AM_DEVWRITE("ymsnd", ym3812_device, write)
 
-	AM_RANGE(0x0060, 0x0063) AM_WRITE(hm86171_colorram_w )
+	AM_RANGE(0x0060, 0x0060) AM_DEVWRITE("ramdac", ramdac_device, index_w)
+	AM_RANGE(0x0061, 0x0061) AM_DEVWRITE("ramdac", ramdac_device, pal_w)
+	AM_RANGE(0x0062, 0x0062) AM_DEVWRITE("ramdac", ramdac_device, mask_w)
 
 	AM_RANGE(0x0080, 0x0080) AM_WRITE(ss9601_tilesize_w )
 	AM_RANGE(0x00a0, 0x00a0) AM_WRITE(ss9601_byte_lo_w )
@@ -1384,7 +1407,10 @@ static ADDRESS_MAP_START( xplan_io, AS_IO, 8, subsino2_state )
 
 	AM_RANGE(0x0040, 0x0040) AM_WRITE(ss9601_scrollctrl_w )
 
-	AM_RANGE(0x0060, 0x0063) AM_WRITE(hm86171_colorram_w )
+	AM_RANGE(0x0060, 0x0060) AM_DEVWRITE("ramdac", ramdac_device, index_w)
+	AM_RANGE(0x0061, 0x0061) AM_DEVWRITE("ramdac", ramdac_device, pal_w)
+	AM_RANGE(0x0062, 0x0062) AM_DEVWRITE("ramdac", ramdac_device, mask_w)
+
 	AM_RANGE(0x0080, 0x0080) AM_WRITE(ss9601_tilesize_w )
 	AM_RANGE(0x00a0, 0x00a0) AM_WRITE(ss9601_byte_lo_w )
 
@@ -1619,6 +1645,55 @@ static INPUT_PORTS_START( new2001 )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN  )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN       )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN       )
+INPUT_PORTS_END
+
+/***************************************************************************
+                             Humlan's Lyckohjul
+***************************************************************************/
+
+static INPUT_PORTS_START( humlan )
+	PORT_START("DSW") // c00000
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW1:1" ) // used
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW1:2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW1:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW1:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW1:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW1:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW1:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW1:8" )
+	// high byte related to sound communication
+
+	// JAMMA inputs:
+	PORT_START("IN C") // c00002
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN  )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_SERVICE       ) PORT_IMPULSE(1) // service mode (press twice for inputs)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN       ) // ?
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN       ) // ?
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN       )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN       )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_OTHER         ) PORT_NAME("Reset") PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN       )
+	// high byte not read
+
+	PORT_START("IN A & B") // c00004
+	// 1st-type panel
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN       )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN       )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN       )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN       )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_START1        ) PORT_NAME("Start")
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_POKER_HOLD3   ) PORT_NAME("Hold 3 / Small")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_GAMBLE_BET    )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_COIN1         ) PORT_IMPULSE(1)
+
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_POKER_HOLD1   ) PORT_NAME("Hold 1 / Take")
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP   ) PORT_NAME("Double Up / Help")
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN       )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN       )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_POKER_HOLD2   ) PORT_NAME("Hold 2 / Big")
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN       )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK   ) // stats (keep pressed during boot for service mode)
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN       ) // ?
 INPUT_PORTS_END
 
 /***************************************************************************
@@ -2255,7 +2330,7 @@ INPUT_PORTS_END
                                 Bishou Jan
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( bishjan, subsino2_state )
+static MACHINE_CONFIG_START( bishjan )
 	MCFG_CPU_ADD("maincpu", H83044, XTAL_44_1MHz / 3)
 	MCFG_CPU_PROGRAM_MAP( bishjan_map )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", subsino2_state, irq0_line_hold)
@@ -2274,10 +2349,12 @@ static MACHINE_CONFIG_START( bishjan, subsino2_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ss9601 )
 	MCFG_PALETTE_ADD( "palette", 256 )
 
+	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette") // HMC HM86171 VGA 256 colour RAMDAC
+
 	MCFG_VIDEO_START_OVERRIDE(subsino2_state, subsino2 )
 
 	// sound hardware
-	// SS9904?
+	// SS9904
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( new2001, bishjan )
@@ -2289,11 +2366,20 @@ static MACHINE_CONFIG_DERIVED( new2001, bishjan )
 	MCFG_SCREEN_VISIBLE_AREA( 0, 640-1, 0, 256-16-1 )
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( humlan, bishjan )
+	MCFG_CPU_REPLACE("maincpu", H83044, XTAL_48MHz / 3)
+	MCFG_CPU_PROGRAM_MAP( humlan_map )
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", subsino2_state, irq0_line_hold)
+
+	// sound hardware
+	// SS9804
+MACHINE_CONFIG_END
+
 /***************************************************************************
                                 Magic Train
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( mtrain, subsino2_state )
+static MACHINE_CONFIG_START( mtrain )
 	MCFG_CPU_ADD("maincpu", Z180, XTAL_12MHz / 8)   /* Unknown clock */
 	MCFG_CPU_PROGRAM_MAP( mtrain_map )
 	MCFG_CPU_IO_MAP( mtrain_io )
@@ -2312,12 +2398,14 @@ static MACHINE_CONFIG_START( mtrain, subsino2_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ss9601 )
 	MCFG_PALETTE_ADD( "palette", 256 )
 
+	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette") // HMC HM86171 VGA 256 colour RAMDAC
+
 	MCFG_VIDEO_START_OVERRIDE(subsino2_state, subsino2 )
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_8_4672MHz / 8, OKIM6295_PIN7_HIGH)    // probably
+	MCFG_OKIM6295_ADD("oki", XTAL_8_4672MHz / 8, PIN7_HIGH)    // probably
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -2325,7 +2413,7 @@ MACHINE_CONFIG_END
                           Sakura Love - Ying Hua Lian
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( saklove, subsino2_state )
+static MACHINE_CONFIG_START( saklove )
 	MCFG_CPU_ADD("maincpu", I80188, XTAL_20MHz*2 )    // !! AMD AM188-EM !!
 	MCFG_CPU_PROGRAM_MAP( saklove_map )
 	MCFG_CPU_IO_MAP( saklove_io )
@@ -2344,12 +2432,14 @@ static MACHINE_CONFIG_START( saklove, subsino2_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ss9601 )
 	MCFG_PALETTE_ADD( "palette", 256 )
 
+	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette") // HMC HM86171 VGA 256 colour RAMDAC
+
 	MCFG_VIDEO_START_OVERRIDE(subsino2_state, subsino2 )
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_8_4672MHz / 8, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL_8_4672MHz / 8, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_12MHz / 4) // ? chip and clock unknown
@@ -2360,7 +2450,7 @@ MACHINE_CONFIG_END
                                 X-Plan
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( xplan, subsino2_state )
+static MACHINE_CONFIG_START( xplan )
 	MCFG_CPU_ADD("maincpu", I80188, XTAL_20MHz*2 )    // !! AMD AM188-EM !!
 	MCFG_CPU_PROGRAM_MAP( xplan_map )
 	MCFG_CPU_IO_MAP( xplan_io )
@@ -2380,12 +2470,14 @@ static MACHINE_CONFIG_START( xplan, subsino2_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ss9601 )
 	MCFG_PALETTE_ADD( "palette", 256 )
 
+	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette") // HMC HM86171 VGA 256 colour RAMDAC
+
 	MCFG_VIDEO_START_OVERRIDE(subsino2_state, subsino2 )
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_8_4672MHz / 8, OKIM6295_PIN7_HIGH)    // probably
+	MCFG_OKIM6295_ADD("oki", XTAL_8_4672MHz / 8, PIN7_HIGH)    // probably
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -2460,25 +2552,25 @@ ROM_START( bishjan )
 	ROM_LOAD32_BYTE( "5-v201.u27", 0x000002, 0x100000, CRC(85067d40) SHA1(3ecf7851311a77a0dfca90775fcbf6faabe9c2ab) )
 	ROM_LOAD32_BYTE( "6-v201.u28", 0x000003, 0x100000, CRC(430bd9d7) SHA1(dadf5a7eb90cf2dc20f97dbf20a4b6c8e7734fb1) )
 
-	ROM_REGION( 0x100000, "samples", 0 )    // SS9904?
+	ROM_REGION( 0x100000, "samples", 0 )    // SS9904
 	ROM_LOAD( "2-v201.u9", 0x000000, 0x100000, CRC(ea42764d) SHA1(13fe1cd30e474f4b092949c440068e9ddca79976) )
 ROM_END
 
 DRIVER_INIT_MEMBER(subsino2_state,bishjan)
 {
-	UINT16 *rom = (UINT16*)memregion("maincpu")->base();
+	uint16_t *rom = (uint16_t*)memregion("maincpu")->base();
 
 	// patch serial protection test (it always enters test mode on boot otherwise)
 	rom[0x042EA/2] = 0x4008;
 
 	// rts -> rte
-	rom[0x33386/2] = 0x5670;
-	rom[0x0CC5C/2] = 0x5670;
+	rom[0x33386/2] = 0x5670; // IRQ 0
+	rom[0x0CC5C/2] = 0x5670; // IRQ 8
 }
 
 /***************************************************************************
 
-New 2001 (Italy, V2.00N)
+New 2001 (Italy, V200N)
 (C)2000 Subsino
 
 CPU:
@@ -2530,20 +2622,60 @@ ROM_START( new2001 )
 	ROM_LOAD32_BYTE( "new_2001_italy_5_v200.2.u27", 0x00002, 0x40000, CRC(d028696b) SHA1(ebb047e7cafaefbdeb479c3877aea4fce0c47ad2) )
 	ROM_LOAD32_BYTE( "new_2001_italy_6_v200.3.u28", 0x00003, 0x40000, CRC(085599e3) SHA1(afd4bed369a96ba12037e6b8cf3a4cab84d12b21) )
 
-	ROM_REGION( 0x80000, "samples", 0 )    // SS9904?
+	ROM_REGION( 0x80000, "samples", 0 )    // SS9904
 	ROM_LOAD( "new_2001_italy_2_v200.u9", 0x00000, 0x80000, CRC(9d522d04) SHA1(68f314b077a62598f3de8ef753bdedc93d6eca71) )
 ROM_END
 
 DRIVER_INIT_MEMBER(subsino2_state,new2001)
 {
-	UINT16 *rom = (UINT16*)memregion("maincpu")->base();
+	uint16_t *rom = (uint16_t*)memregion("maincpu")->base();
 
 	// patch serial protection test (ERROR 041920 otherwise)
 	rom[0x19A2/2] = 0x4066;
 
 	// rts -> rte
-	rom[0x45E8/2] = 0x5670;
-	rom[0x471C/2] = 0x5670;
+	rom[0x45E8/2] = 0x5670; // IRQ 8
+	rom[0x471C/2] = 0x5670; // IRQ 0
+}
+
+/***************************************************************************
+
+Humlan's Lyckohjul (Sweden, V402)
+(c) 2001 Subsino & Truemax
+
+Swedish version of Queen Bee.
+
+The PCB is similar to bishjan and new2001, but with a 48MHz crystal
+and a 9804 (instead of 9904) for sound.
+
+***************************************************************************/
+
+ROM_START( humlan )
+	ROM_REGION( 0x80000, "maincpu", 0 )    // H8/3044
+	ROM_LOAD( "hlj__truemax_1_v402.u21", 0x00000, 0x40000, CRC(5b4a7113) SHA1(9a9511aa79a6e90e8ac1b267e058c8696d13d84f) )
+	ROM_FILL(                            0x40000, 0x40000, 0xff )
+
+	ROM_REGION( 0x200000, "tilemap", 0 )
+	ROM_LOAD32_BYTE( "hlj__truemax_3_v402.u25", 0x000000, 0x80000, CRC(dfc8d795) SHA1(93e0fe271c7390596f73092720befe11d8354838) )
+	ROM_LOAD32_BYTE( "hlj__truemax_4_v402.u26", 0x000001, 0x80000, CRC(31c774d6) SHA1(13fcdb42f5fd7d0cadd3fd7030037c21b7585f0f) )
+	ROM_LOAD32_BYTE( "hlj__truemax_5_v402.u27", 0x000002, 0x80000, CRC(28e14be8) SHA1(778906427175ca50ad5b0a7c5978c36ed29ef994) )
+	ROM_LOAD32_BYTE( "hlj__truemax_6_v402.u28", 0x000003, 0x80000, CRC(d1c7ae17) SHA1(3ddb8ad38eeb5ab0a944d7d26cfb890a4327ef2e) )
+
+	ROM_REGION( 0x40000, "samples", 0 )    // SS9804
+	// clearly samples, might be different from the SS9904 case
+	ROM_LOAD( "subsino__qb-v1.u9", 0x000000, 0x40000, CRC(c5dfed44) SHA1(3f5effb85de10c0804efee9bce769d916268bfc9) )
+ROM_END
+
+DRIVER_INIT_MEMBER(subsino2_state,humlan)
+{
+	uint16_t *rom = (uint16_t*)memregion("maincpu")->base();
+
+	// patch serial protection test (ERROR 093099 otherwise)
+	rom[0x170A/2] = 0x4066;
+
+	// rts -> rte
+	rom[0x38B4/2] = 0x5670; // IRQ 8
+	rom[0x3A08/2] = 0x5670; // IRQ 0
 }
 
 /***************************************************************************
@@ -2600,7 +2732,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(subsino2_state,expcard)
 {
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 
 	// patch protection test (it always enters test mode on boot otherwise)
 	rom[0xed4dc-0xc0000] = 0xeb;
@@ -2698,7 +2830,7 @@ DRIVER_INIT_MEMBER(subsino2_state,mtrain)
 	subsino_decrypt(machine(), crsbingo_bitswaps, crsbingo_xors, 0x8000);
 
 	// patch serial protection test (it always enters test mode on boot otherwise)
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 	rom[0x0cec] = 0x18;
 	rom[0xb037] = 0x18;
 
@@ -2752,7 +2884,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(subsino2_state,saklove)
 {
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 
 	// patch serial protection test (it always enters test mode on boot otherwise)
 	rom[0x0e029] = 0xeb;
@@ -2812,7 +2944,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(subsino2_state,xplan)
 {
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 
 	// patch protection test (it always enters test mode on boot otherwise)
 	rom[0xeded9-0xc0000] = 0xeb;
@@ -2872,7 +3004,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(subsino2_state,xtrain)
 {
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 
 	// patch protection test (it always enters test mode on boot otherwise)
 	rom[0xe190f-0xc0000] = 0xeb;
@@ -2935,7 +3067,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(subsino2_state,ptrain)
 {
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 
 	// patch protection test (it always enters test mode on boot otherwise)
 	rom[0xe1b08-0xc0000] = 0xeb;
@@ -2980,19 +3112,20 @@ DRIVER_INIT_MEMBER(subsino2_state,wtrnymph)
 	subsino_decrypt(machine(), victor5_bitswaps, victor5_xors, 0x8000);
 
 	// patch serial protection test (it always enters test mode on boot otherwise)
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 	rom[0x0d79] = 0x18;
 	rom[0xc1cf] = 0x18;
 	rom[0xc2a9] = 0x18;
 	rom[0xc2d7] = 0x18;
 }
 
-GAME( 1996, mtrain,   0,        mtrain,   mtrain,   subsino2_state, mtrain,   ROT0, "Subsino",        "Magic Train (Ver. 1.31)",              0 )
-GAME( 1996, wtrnymph, 0,        mtrain,   wtrnymph, subsino2_state, wtrnymph, ROT0, "Subsino",        "Water-Nymph (Ver. 1.4)",               0 )
-GAME( 1998, expcard,  0,        expcard,  expcard,  subsino2_state, expcard,  ROT0, "American Alpha", "Express Card / Top Card (Ver. 1.5)",   0 )
-GAME( 1998, saklove,  0,        saklove,  saklove,  subsino2_state, saklove,  ROT0, "Subsino",        "Ying Hua Lian 2.0 (China, Ver. 1.02)", 0 )
-GAME( 1999, xtrain,   0,        xtrain,   xtrain,   subsino2_state, xtrain,   ROT0, "Subsino",        "X-Train (Ver. 1.3)",                   0 )
-GAME( 1999, ptrain,   0,        xtrain,   xtrain,   subsino2_state, ptrain,   ROT0, "Subsino",        "Panda Train (Novamatic 1.7)",          MACHINE_IMPERFECT_GRAPHICS ) // missing scroll in race screens
-GAME( 1999, bishjan,  0,        bishjan,  bishjan,  subsino2_state, bishjan,  ROT0, "Subsino",        "Bishou Jan (Japan, Ver. 2.03)",        MACHINE_NO_SOUND )
-GAME( 2000, new2001,  0,        new2001,  new2001,  subsino2_state, new2001,  ROT0, "Subsino",        "New 2001 (Italy, Ver. 2.00N)",         MACHINE_NO_SOUND )
-GAME( 2006, xplan,    0,        xplan,    xplan,    subsino2_state, xplan,    ROT0, "Subsino",        "X-Plan (Ver. 1.01)",                   0 )
+GAME( 1996, mtrain,   0,        mtrain,   mtrain,   subsino2_state, mtrain,   ROT0, "Subsino",                   "Magic Train (Ver. 1.31)",               0 )
+GAME( 1996, wtrnymph, 0,        mtrain,   wtrnymph, subsino2_state, wtrnymph, ROT0, "Subsino",                   "Water-Nymph (Ver. 1.4)",                0 )
+GAME( 1998, expcard,  0,        expcard,  expcard,  subsino2_state, expcard,  ROT0, "American Alpha",            "Express Card / Top Card (Ver. 1.5)",    0 )
+GAME( 1998, saklove,  0,        saklove,  saklove,  subsino2_state, saklove,  ROT0, "Subsino",                   "Ying Hua Lian 2.0 (China, Ver. 1.02)",  0 )
+GAME( 1999, xtrain,   0,        xtrain,   xtrain,   subsino2_state, xtrain,   ROT0, "Subsino",                   "X-Train (Ver. 1.3)",                    0 )
+GAME( 1999, ptrain,   0,        xtrain,   xtrain,   subsino2_state, ptrain,   ROT0, "Subsino",                   "Panda Train (Novamatic 1.7)",           MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, bishjan,  0,        bishjan,  bishjan,  subsino2_state, bishjan,  ROT0, "Subsino",                   "Bishou Jan (Japan, Ver. 203)",          MACHINE_NO_SOUND )
+GAME( 2000, new2001,  0,        new2001,  new2001,  subsino2_state, new2001,  ROT0, "Subsino",                   "New 2001 (Italy, Ver. 200N)",           MACHINE_NO_SOUND )
+GAME( 2006, xplan,    0,        xplan,    xplan,    subsino2_state, xplan,    ROT0, "Subsino",                   "X-Plan (Ver. 101)",                     0 )
+GAME( 2001, humlan,   0,        humlan,   humlan,   subsino2_state, humlan,   ROT0, "Subsino (Truemax license)", "Humlan's Lyckohjul (Sweden, Ver. 402)", MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )

@@ -15,21 +15,25 @@
 *******************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "sound/ay8910.h"
 #include "includes/mouser.h"
+
+#include "cpu/z80/z80.h"
+#include "machine/74259.h"
+#include "sound/ay8910.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 /* Mouser has external masking circuitry around
  * the NMI input on the main CPU */
-WRITE8_MEMBER(mouser_state::mouser_nmi_enable_w)
+WRITE_LINE_MEMBER(mouser_state::nmi_enable_w)
 {
-	//logerror("nmi_enable %02x\n", data);
-	m_nmi_enable = data;
+	m_nmi_enable = state;
 }
 
 INTERRUPT_GEN_MEMBER(mouser_state::mouser_nmi_interrupt)
 {
-	if (BIT(m_nmi_enable, 0))
+	if (m_nmi_enable)
 		nmi_line_pulse(device);
 }
 
@@ -56,7 +60,7 @@ WRITE8_MEMBER(mouser_state::mouser_sound_nmi_clear_w)
 
 INTERRUPT_GEN_MEMBER(mouser_state::mouser_sound_nmi_assert)
 {
-	if (BIT(m_nmi_enable, 0))
+	if (m_nmi_enable)
 		device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
@@ -67,15 +71,14 @@ static ADDRESS_MAP_START( mouser_map, AS_PROGRAM, 8, mouser_state )
 	AM_RANGE(0x9000, 0x93ff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x9800, 0x9cff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x9c00, 0x9fff) AM_RAM AM_SHARE("colorram")
-	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P1") AM_WRITE(mouser_nmi_enable_w) /* bit 0 = NMI Enable */
-	AM_RANGE(0xa001, 0xa001) AM_WRITE(mouser_flip_screen_x_w)
-	AM_RANGE(0xa002, 0xa002) AM_WRITE(mouser_flip_screen_y_w)
+	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P1")
+	AM_RANGE(0xa000, 0xa007) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW")
 	AM_RANGE(0xb800, 0xb800) AM_READ_PORT("P2") AM_WRITE(mouser_sound_interrupt_w) /* byte to sound cpu */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, mouser_state )
+static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 8, mouser_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM AM_SHARE("decrypted_opcodes")
 ADDRESS_MAP_END
 
@@ -194,10 +197,9 @@ void mouser_state::machine_start()
 void mouser_state::machine_reset()
 {
 	m_sound_byte = 0;
-	m_nmi_enable = 0;
 }
 
-static MACHINE_CONFIG_START( mouser, mouser_state )
+static MACHINE_CONFIG_START( mouser )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)   /* 4 MHz ? */
@@ -210,6 +212,10 @@ static MACHINE_CONFIG_START( mouser, mouser_state )
 	MCFG_CPU_IO_MAP(mouser_sound_io_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(mouser_state, mouser_sound_nmi_assert,  4*60) /* ??? This controls the sound tempo */
 
+	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // type unconfirmed
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(mouser_state, nmi_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(mouser_state, flip_screen_x_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(mouser_state, flip_screen_y_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -288,8 +294,8 @@ DRIVER_INIT_MEMBER(mouser_state,mouser)
 	/* Decode the opcodes */
 
 	offs_t i;
-	UINT8 *rom = memregion("maincpu")->base();
-	UINT8 *table = memregion("user1")->base();
+	uint8_t *rom = memregion("maincpu")->base();
+	uint8_t *table = memregion("user1")->base();
 
 	for (i = 0; i < 0x6000; i++)
 	{
@@ -298,5 +304,5 @@ DRIVER_INIT_MEMBER(mouser_state,mouser)
 }
 
 
-GAME( 1983, mouser,   0,      mouser, mouser, mouser_state, mouser, ROT90, "UPL", "Mouser", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, mouser,   0,      mouser, mouser, mouser_state, mouser, ROT90, "UPL",                  "Mouser",          MACHINE_SUPPORTS_SAVE )
 GAME( 1983, mouserc,  mouser, mouser, mouser, mouser_state, mouser, ROT90, "UPL (Cosmos license)", "Mouser (Cosmos)", MACHINE_SUPPORTS_SAVE )

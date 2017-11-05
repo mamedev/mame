@@ -7,8 +7,10 @@
  *  Created on: 18/12/2013
  */
 
-#ifndef _8X300_H_
-#define _8X300_H_
+#ifndef MAME_CPU_8X300_8X300_H
+#define MAME_CPU_8X300_8X300_H
+
+#pragma once
 
 // Register enumeration
 enum
@@ -41,96 +43,89 @@ class n8x300_cpu_device : public cpu_device
 {
 public:
 	// construction/destruction
-	n8x300_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	n8x300_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
+	// device_state_interface overrides
+	virtual void state_import(const device_state_entry &entry) override;
+
 	// device_execute_interface overrides
-	virtual UINT32 execute_min_cycles() const override { return 1; }
-	virtual UINT32 execute_max_cycles() const override { return 1; }
-	virtual UINT32 execute_input_lines() const override { return 0; }
+	virtual uint32_t execute_min_cycles() const override { return 1; }
+	virtual uint32_t execute_max_cycles() const override { return 1; }
+	virtual uint32_t execute_input_lines() const override { return 0; }
 	virtual void execute_run() override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override
-	{
-		switch (spacenum)
-		{
-			case AS_PROGRAM: return &m_program_config;
-			case AS_IO:      return &m_io_config;
-			default:         return nullptr;
-		}
-	}
-
-	// device_state_interface overrides
-	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
+	virtual space_config_vector memory_space_config() const override;
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const override { return 2; }
-	virtual UINT32 disasm_max_opcode_bytes() const override { return 2; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	virtual uint32_t disasm_min_opcode_bytes() const override { return 2; }
+	virtual uint32_t disasm_max_opcode_bytes() const override { return 2; }
+	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, u32 options) override;
 
 	address_space_config m_program_config;
 	address_space_config m_io_config;
 
 	int m_icount;
+	bool m_increment_pc;
 
 	address_space *m_program;
 	direct_read_data *m_direct;
 	address_space *m_io;
 
-	UINT16 m_PC;  // Program Counter
-	UINT16 m_AR;  // Address Register
-	UINT16 m_IR;  // Instruction Register
-	UINT8 m_AUX;  // Auxiliary Register (second operand for AND, ADD, XOR)
-	UINT8 m_R1;
-	UINT8 m_R2;
-	UINT8 m_R3;
-	UINT8 m_R4;
-	UINT8 m_R5;
-	UINT8 m_R6;
-	UINT8 m_R11;
-	UINT8 m_IVL;  // Interface vector (I/O) left bank  (write-only)
-	UINT8 m_IVR;  // Interface vector (I/O) right bank (write-only)
-	UINT8 m_OVF;  // Overflow register (read-only)
-	UINT16 m_genPC;
+	uint16_t m_PC;  // Program Counter
+	uint16_t m_AR;  // Address Register
+	uint16_t m_IR;  // Instruction Register
+	uint8_t m_AUX;  // Auxiliary Register (second operand for AND, ADD, XOR)
+	uint8_t m_R1;
+	uint8_t m_R2;
+	uint8_t m_R3;
+	uint8_t m_R4;
+	uint8_t m_R5;
+	uint8_t m_R6;
+	uint8_t m_R11;
+	uint8_t m_IVL;  // Interface vector (I/O) left bank  (write-only)
+	uint8_t m_IVR;  // Interface vector (I/O) right bank (write-only)
+	uint8_t m_OVF;  // Overflow register (read-only)
+	uint16_t m_genPC;
 
-	UINT8 m_left_IV;  // IV bank contents, these are latched when IVL or IVR are set
-	UINT8 m_right_IV;
+	uint8_t m_left_IV;  // IV bank contents, these are latched when IVL or IVR are set
+	uint8_t m_right_IV;
 
 private:
-	inline bool is_rot(UINT16 opcode)
+	inline bool is_rot(uint16_t opcode)
 	{
 		if((opcode & 0x1000) || (opcode & 0x0010))
 			return false;
 		else
 			return true;
 	}
-	inline bool is_src_reg(UINT16 opcode)
+	inline bool is_src_reg(uint16_t opcode)
 	{
 		if((opcode & 0x1000))
 			return false;
 		else
 			return true;
 	}
-	inline bool is_dst_reg(UINT16 opcode)
+	inline bool is_dst_reg(uint16_t opcode)
 	{
 		if((opcode & 0x0010))
 			return false;
 		else
 			return true;
 	}
-	inline UINT8 rotate(UINT8 s, UINT8 n)  // right rotate
+	inline uint8_t rotate(uint8_t s, uint8_t n)  // right rotate
 	{
-		return ((s & ((UINT8)0xff << n)) >> n) | ((s & ((UINT8)0xff >> (8-n))) << (8-n));
+		return ((s & ((uint8_t)0xff << n)) >> n) | ((s & ((uint8_t)0xff >> (8-n))) << (8-n));
 	}
-	void set_reg(UINT8 reg,UINT8 val);
-	UINT8 get_reg(UINT8 reg);
+	void set_reg(uint8_t reg,uint8_t val);
+	uint8_t get_reg(uint8_t reg);
 };
 
-extern const device_type N8X300;
+DECLARE_DEVICE_TYPE(N8X300, n8x300_cpu_device)
 
-#endif /* 8X300_H_ */
+#endif // MAME_CPU_8X300_8X300_H

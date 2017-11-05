@@ -26,7 +26,7 @@
 
 PALETTE_INIT_MEMBER(digdug_state,digdug)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 	for (i = 0;i < 32;i++)
@@ -91,7 +91,7 @@ TILEMAP_MAPPER_MEMBER(digdug_state::tilemap_scan)
 
 TILE_GET_INFO_MEMBER(digdug_state::bg_get_tile_info)
 {
-	UINT8 *rom = memregion("gfx4")->base();
+	uint8_t *rom = memregion("gfx4")->base();
 
 	int code = rom[tile_index | (m_bg_select << 10)];
 	/* when the background is "disabled", it is actually still drawn, but using
@@ -108,7 +108,7 @@ TILE_GET_INFO_MEMBER(digdug_state::bg_get_tile_info)
 
 TILE_GET_INFO_MEMBER(digdug_state::tx_get_tile_info)
 {
-	UINT8 code = m_videoram[tile_index];
+	uint8_t code = m_videoram[tile_index];
 	int color;
 
 	/* the hardware has two ways to pick the color, either straight from the
@@ -142,8 +142,13 @@ TILE_GET_INFO_MEMBER(digdug_state::tx_get_tile_info)
 
 VIDEO_START_MEMBER(digdug_state,digdug)
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(digdug_state::bg_get_tile_info),this),tilemap_mapper_delegate(FUNC(digdug_state::tilemap_scan),this),8,8,36,28);
-	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(digdug_state::tx_get_tile_info),this),tilemap_mapper_delegate(FUNC(digdug_state::tilemap_scan),this),8,8,36,28);
+	m_bg_select = 0;
+	m_tx_color_mode = 0;
+	m_bg_disable = 0;
+	m_bg_color_bank = 0;
+
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(digdug_state::bg_get_tile_info),this),tilemap_mapper_delegate(FUNC(digdug_state::tilemap_scan),this),8,8,36,28);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(digdug_state::tx_get_tile_info),this),tilemap_mapper_delegate(FUNC(digdug_state::tilemap_scan),this),8,8,36,28);
 
 	m_fg_tilemap->set_transparent_pen(0);
 
@@ -167,61 +172,35 @@ WRITE8_MEMBER( digdug_state::digdug_videoram_w )
 	m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_MEMBER( digdug_state::digdug_PORT_w )
+WRITE8_MEMBER(digdug_state::bg_select_w)
 {
-	switch (offset)
+	// select background picture
+	if (m_bg_select != (data & 0x03))
 	{
-		case 0: /* select background picture */
-		case 1:
-			{
-				int shift = offset;
-				int mask = 1 << shift;
-
-				if ((m_bg_select & mask) != ((data & 1) << shift))
-				{
-					m_bg_select = (m_bg_select & ~mask) | ((data & 1) << shift);
-					m_bg_tilemap->mark_all_dirty();
-				}
-			}
-			break;
-
-		case 2: /* select alpha layer color mode (see tx_get_tile_info) */
-			if (m_tx_color_mode != (data & 1))
-			{
-				m_tx_color_mode = data & 1;
-				m_fg_tilemap->mark_all_dirty();
-			}
-			break;
-
-		case 3: /* "disable" background (see bg_get_tile_info) */
-			if (m_bg_disable != (data & 1))
-			{
-				m_bg_disable = data & 1;
-				m_bg_tilemap->mark_all_dirty();
-			}
-			break;
-
-		case 4: /* background color bank */
-		case 5:
-			{
-				int shift = offset;
-				int mask = 1 << shift;
-
-				if ((m_bg_color_bank & mask) != ((data & 1) << shift))
-				{
-					m_bg_color_bank = (m_bg_color_bank & ~mask) | ((data & 1) << shift);
-					m_bg_tilemap->mark_all_dirty();
-				}
-			}
-			break;
-
-		case 6: /* n.c. */
-			break;
-
-		case 7: /* FLIP */
-			flip_screen_set(data & 1);
-			break;
+		m_bg_select = data & 0x03;
+		m_bg_tilemap->mark_all_dirty();
 	}
+
+	// background color bank
+	if (m_bg_color_bank != (data & 0x30))
+	{
+		m_bg_color_bank = data & 0x30;
+		m_bg_tilemap->mark_all_dirty();
+	}
+}
+
+WRITE_LINE_MEMBER(digdug_state::tx_color_mode_w)
+{
+	// select alpha layer color mode (see tx_get_tile_info)
+	m_tx_color_mode = state;
+	m_fg_tilemap->mark_all_dirty();
+}
+
+WRITE_LINE_MEMBER(digdug_state::bg_disable_w)
+{
+	// "disable" background (see bg_get_tile_info)
+	m_bg_disable = state;
+	m_bg_tilemap->mark_all_dirty();
 }
 
 
@@ -234,9 +213,9 @@ WRITE8_MEMBER( digdug_state::digdug_PORT_w )
 
 void digdug_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	UINT8 *spriteram = m_digdug_objram + 0x380;
-	UINT8 *spriteram_2 = m_digdug_posram + 0x380;
-	UINT8 *spriteram_3 = m_digdug_flpram + 0x380;
+	uint8_t *spriteram = m_digdug_objram + 0x380;
+	uint8_t *spriteram_2 = m_digdug_posram + 0x380;
+	uint8_t *spriteram_3 = m_digdug_flpram + 0x380;
 	int offs;
 
 	// mask upper and lower columns
@@ -276,7 +255,7 @@ void digdug_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect 
 		{
 			for (x = 0;x <= size;x++)
 			{
-				UINT32 transmask =  m_palette->transpen_mask(*m_gfxdecode->gfx(1), color, 0x1f);
+				uint32_t transmask =  m_palette->transpen_mask(*m_gfxdecode->gfx(1), color, 0x1f);
 				m_gfxdecode->gfx(1)->transmask(bitmap,visarea,
 					sprite + gfx_offs[y ^ (size * flipy)][x ^ (size * flipx)],
 					color,
@@ -294,7 +273,7 @@ void digdug_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect 
 }
 
 
-UINT32 digdug_state::screen_update_digdug(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t digdug_state::screen_update_digdug(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0,0);

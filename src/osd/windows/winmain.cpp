@@ -6,8 +6,10 @@
 //
 //============================================================
 
+// only for oslog callback
+#include <functional>
+
 // standard windows headers
-#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <commctrl.h>
 #include <mmsystem.h>
@@ -21,6 +23,7 @@
 // MAME headers
 #include "emu.h"
 #include "emuopts.h"
+#include "strconv.h"
 
 // MAMEOS headers
 #include "winmain.h"
@@ -29,8 +32,12 @@
 #include "winutil.h"
 #include "winfile.h"
 #include "modules/diagnostics/diagnostics_module.h"
+#include "modules/monitor/monitor_common.h"
 
 #if !WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
+#include <wrl/client.h>
+using namespace Windows::Storage;
+using namespace Platform;
 using namespace Windows::ApplicationModel;
 using namespace Windows::ApplicationModel::Core;
 using namespace Windows::UI::Popups;
@@ -68,11 +75,11 @@ public:
 			char buffer[1024];
 
 			// if we are in fullscreen mode, go to windowed mode
-			if ((video_config.windowed == 0) && !win_window_list.empty())
+			if ((video_config.windowed == 0) && !osd_common_t::s_window_list.empty())
 				winwindow_toggle_full_screen();
 
 			vsnprintf(buffer, ARRAY_LENGTH(buffer), msg, args);
-			win_message_box_utf8(!win_window_list.empty() ? win_window_list.front()->platform_window<HWND>() : nullptr, buffer, emulator_info::get_appname(), MB_OK);
+			win_message_box_utf8(!osd_common_t::s_window_list.empty() ? std::static_pointer_cast<win_window_info>(osd_common_t::s_window_list.front())->platform_window() : nullptr, buffer, emulator_info::get_appname(), MB_OK);
 		}
 		else
 			chain_output(channel, msg, args);
@@ -90,16 +97,25 @@ class winuniversal_output_error : public osd_output
 public:
 	virtual void output_callback(osd_output_channel channel, const char *msg, va_list args) override
 	{
+		char buffer[2048];
 		if (channel == OSD_OUTPUT_CHANNEL_ERROR)
 		{
-			char buffer[1024];
 			vsnprintf(buffer, ARRAY_LENGTH(buffer), msg, args);
 
-			osd_unique_wstr wcbuffer(wstring_from_utf8(buffer));
-			osd_unique_wstr wcappname(wstring_from_utf8(emulator_info::get_appname()));
+			std::wstring wcbuffer(osd::text::to_wstring(buffer));
+			std::wstring wcappname(osd::text::to_wstring(emulator_info::get_appname()));
 
-			auto dlg = ref new MessageDialog(ref new Platform::String(wcbuffer.get()), ref new Platform::String(wcappname.get()));
+			auto dlg = ref new MessageDialog(ref new Platform::String(wcbuffer.data()), ref new Platform::String(wcbuffer.data()));
 			dlg->ShowAsync();
+		}
+		else if (channel == OSD_OUTPUT_CHANNEL_VERBOSE)
+		{
+			vsnprintf(buffer, ARRAY_LENGTH(buffer), msg, args);
+			std::wstring wcbuffer = osd::text::to_wstring(buffer);
+			OutputDebugString(wcbuffer.c_str());
+
+			// Chain to next anyway
+			chain_output(channel, msg, args);
 		}
 		else
 			chain_output(channel, msg, args);
@@ -157,7 +173,7 @@ const options_entry windows_options::s_option_entries[] =
 	{ WINOPTION_HLSLPATH,                                       "hlsl",              OPTION_STRING,     "path to hlsl files" },
 	{ WINOPTION_HLSL_ENABLE";hlsl",                             "0",                 OPTION_BOOLEAN,    "enables HLSL post-processing (PS3.0 required)" },
 	{ WINOPTION_HLSL_OVERSAMPLING,                              "0",                 OPTION_BOOLEAN,    "enables HLSL oversampling" },
-	{ WINOPTION_HLSL_WRITE,                                     nullptr,             OPTION_STRING,     "enables HLSL AVI writing (huge disk bandwidth suggested)" },
+	{ WINOPTION_HLSL_WRITE,                                     OSDOPTVAL_AUTO,      OPTION_STRING,     "enables HLSL AVI writing (huge disk bandwidth suggested)" },
 	{ WINOPTION_HLSL_SNAP_WIDTH,                                "2048",              OPTION_STRING,     "HLSL upscaled-snapshot width" },
 	{ WINOPTION_HLSL_SNAP_HEIGHT,                               "1536",              OPTION_STRING,     "HLSL upscaled-snapshot height" },
 	{ WINOPTION_SHADOW_MASK_TILE_MODE,                          "0",                 OPTION_INTEGER,    "shadow mask tile mode (0 for screen based, 1 for source based)" },
@@ -214,9 +230,10 @@ const options_entry windows_options::s_option_entries[] =
 	{ WINOPTION_YIQ_IVALUE";yiqi",                              "1.2",               OPTION_FLOAT,      "I filter cutoff frequency for NTSC signal processing" },
 	{ WINOPTION_YIQ_QVALUE";yiqq",                              "0.6",               OPTION_FLOAT,      "Q filter cutoff frequency for NTSC signal processing" },
 	{ WINOPTION_YIQ_SCAN_TIME";yiqsc",                          "52.6",              OPTION_FLOAT,      "Horizontal scanline duration for NTSC signal processing (in usec)" },
-	{ WINOPTION_YIQ_PHASE_COUNT";yiqp",                         "2",                 OPTION_INTEGER,    "Phase Count value for NTSC signal processing" },
+	{ WINOPTION_YIQ_PHASE_COUNT";yiqpc",                        "2",                 OPTION_INTEGER,    "Phase Count value for NTSC signal processing" },
 	/* Vector simulation below this line */
 	{ nullptr,                                                  nullptr,             OPTION_HEADER,     "VECTOR POST-PROCESSING OPTIONS" },
+	{ WINOPTION_VECTOR_BEAM_SMOOTH";vecsmooth",                 "0.0",               OPTION_FLOAT,      "The vector beam smoothness" },
 	{ WINOPTION_VECTOR_LENGTH_SCALE";vecscale",                 "0.5",               OPTION_FLOAT,      "The maximum vector attenuation" },
 	{ WINOPTION_VECTOR_LENGTH_RATIO";vecratio",                 "0.5",               OPTION_FLOAT,      "The minimum vector length (vector length to screen size ratio) that is affected by the attenuation" },
 	/* Bloom below this line */
@@ -243,7 +260,7 @@ const options_entry windows_options::s_option_entries[] =
 
 	// input options
 	{ nullptr,                                        nullptr,    OPTION_HEADER,     "INPUT DEVICE OPTIONS" },
-	{ WINOPTION_GLOBAL_INPUTS ";global_inputs",       "0",        OPTION_BOOLEAN,    "enables global inputs" },
+	{ WINOPTION_GLOBAL_INPUTS,                        "0",        OPTION_BOOLEAN,    "enables global inputs" },
 	{ WINOPTION_DUAL_LIGHTGUN ";dual",                "0",        OPTION_BOOLEAN,    "enables dual lightgun input" },
 
 	{ nullptr }
@@ -256,11 +273,13 @@ const options_entry windows_options::s_option_entries[] =
 #if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
 
 //============================================================
-//  utf8_main
+//  main
 //============================================================
 
 int main(int argc, char *argv[])
 {
+	std::vector<std::string> args = osd_get_command_line(argc, argv);
+
 	// use small output buffers on non-TTYs (i.e. pipes)
 	if (!isatty(fileno(stdout)))
 		setvbuf(stdout, (char *) nullptr, _IOFBF, 64);
@@ -285,7 +304,7 @@ int main(int argc, char *argv[])
 		// Initialize this after the osd interface so that we are first in the
 		// output order
 		winui_output_error winerror;
-		if (win_is_gui_application() || is_double_click_start(argc))
+		if (win_is_gui_application() || is_double_click_start(args.size()))
 		{
 			// if we are a GUI app, output errors to message boxes
 			osd_output::push(&winerror);
@@ -293,7 +312,7 @@ int main(int argc, char *argv[])
 			FreeConsole();
 		}
 		osd.register_options();
-		result = emulator_info::start_frontend(options, osd, argc, argv);
+		result = emulator_info::start_frontend(options, osd, args);
 		osd_output::pop(&winerror);
 	}
 
@@ -338,8 +357,19 @@ static BOOL WINAPI control_handler(DWORD type)
 
 #else
 
+// The main function is only used to initialize our IFrameworkView class.
+[Platform::MTAThread]
+int main(Platform::Array<Platform::String^>^ args)
+{
+	auto direct3DApplicationSource = ref new MameViewSource();
+	CoreApplication::Run(direct3DApplicationSource);
+	return 0;
+}
+
 MameMainApp::MameMainApp()
 {
+	// Turn off application view scaling so XBOX gets full screen
+	Windows::UI::ViewManagement::ApplicationViewScaling::TrySetDisableLayoutScaling(true);
 }
 
 void MameMainApp::Initialize(Windows::ApplicationModel::Core::CoreApplicationView^ applicationView)
@@ -368,7 +398,7 @@ void MameMainApp::Run()
 
 	// parse config and cmdline options
 	m_options = std::make_unique<windows_options>();
-	m_osd = std::make_unique<windows_osd_interface>(m_options);
+	m_osd = std::make_unique<windows_osd_interface>(*m_options.get());
 
 	// Since we're a GUI app, out errors to message boxes
 	// Initialize this after the osd interface so that we are first in the
@@ -381,7 +411,7 @@ void MameMainApp::Run()
 	// To satisfy the latter things, pass in the module path name
 	char exe_path[MAX_PATH];
 	GetModuleFileNameA(nullptr, exe_path, MAX_PATH);
-	char* args[2] = { exe_path, (char*)"-verbose" };
+	char* args[3] = { exe_path, (char*)"-verbose", (char*)"-mouse" };
 
 	DWORD result = emulator_info::start_frontend(*m_options.get(), *m_osd.get(), ARRAY_LENGTH(args), args);
 	osd_output::pop(&winerror);
@@ -410,6 +440,20 @@ windows_options::windows_options()
 : osd_options()
 {
 	add_entries(s_option_entries);
+#if !WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
+	String^ path = ApplicationData::Current->LocalFolder->Path + L"\\";
+	set_default_value(OPTION_INIPATH, (osd::text::from_wstring((LPCWSTR)path->Data()) + ";" + ini_path()).c_str());
+	set_default_value(OPTION_CFG_DIRECTORY, (osd::text::from_wstring((LPCWSTR)path->Data()) +  cfg_directory()).c_str());
+	set_default_value(OPTION_NVRAM_DIRECTORY, (osd::text::from_wstring((LPCWSTR)path->Data()) + nvram_directory()).c_str());
+	set_default_value(OPTION_INPUT_DIRECTORY, (osd::text::from_wstring((LPCWSTR)path->Data()) + input_directory()).c_str());
+	set_default_value(OPTION_STATE_DIRECTORY, (osd::text::from_wstring((LPCWSTR)path->Data()) + state_directory()).c_str());
+	set_default_value(OPTION_SNAPSHOT_DIRECTORY, (osd::text::from_wstring((LPCWSTR)path->Data()) + snapshot_directory()).c_str());
+	set_default_value(OPTION_DIFF_DIRECTORY, (osd::text::from_wstring((LPCWSTR)path->Data()) + diff_directory()).c_str());
+	set_default_value(OPTION_COMMENT_DIRECTORY, (osd::text::from_wstring((LPCWSTR)path->Data()) + comment_directory()).c_str());
+
+	set_default_value(OPTION_HOMEPATH, osd::text::from_wstring((LPCWSTR)path->Data()).c_str());
+	set_default_value(OPTION_MEDIAPATH, (osd::text::from_wstring((LPCWSTR)path->Data()) + media_path()).c_str());
+#endif
 }
 
 
@@ -417,7 +461,7 @@ windows_options::windows_options()
 //  output_oslog
 //============================================================
 
-static void output_oslog(const running_machine &machine, const char *buffer)
+void windows_osd_interface::output_oslog(const char *buffer)
 {
 	if (IsDebuggerPresent())
 		win_output_debug_string_utf8(buffer);
@@ -452,6 +496,9 @@ void windows_osd_interface::video_register()
 {
 	video_options_add("gdi", nullptr);
 	video_options_add("d3d", nullptr);
+#if USE_OPENGL
+	video_options_add("opengl", nullptr);
+#endif
 	video_options_add("bgfx", nullptr);
 	//video_options_add("auto", nullptr); // making d3d video default one
 }
@@ -470,23 +517,20 @@ void windows_osd_interface::init(running_machine &machine)
 
 	// determine if we are benchmarking, and adjust options appropriately
 	int bench = options.bench();
-	std::string error_string;
 	if (bench > 0)
 	{
-		options.set_value(OPTION_THROTTLE, false, OPTION_PRIORITY_MAXIMUM, error_string);
-		options.set_value(OSDOPTION_SOUND, "none", OPTION_PRIORITY_MAXIMUM, error_string);
-		options.set_value(OSDOPTION_VIDEO, "none", OPTION_PRIORITY_MAXIMUM, error_string);
-		options.set_value(OPTION_SECONDS_TO_RUN, bench, OPTION_PRIORITY_MAXIMUM, error_string);
-		assert(error_string.empty());
+		options.set_value(OPTION_THROTTLE, false, OPTION_PRIORITY_MAXIMUM);
+		options.set_value(OSDOPTION_SOUND, "none", OPTION_PRIORITY_MAXIMUM);
+		options.set_value(OSDOPTION_VIDEO, "none", OPTION_PRIORITY_MAXIMUM);
+		options.set_value(OPTION_SECONDS_TO_RUN, bench, OPTION_PRIORITY_MAXIMUM);
 	}
 
 	// determine if we are profiling, and adjust options appropriately
 	int profile = options.profile();
 	if (profile > 0)
 	{
-		options.set_value(OPTION_THROTTLE, false, OPTION_PRIORITY_MAXIMUM, error_string);
-		options.set_value(OSDOPTION_NUMPROCESSORS, 1, OPTION_PRIORITY_MAXIMUM, error_string);
-		assert(error_string.empty());
+		options.set_value(OPTION_THROTTLE, false, OPTION_PRIORITY_MAXIMUM);
+		options.set_value(OSDOPTION_NUMPROCESSORS, 1, OPTION_PRIORITY_MAXIMUM);
 	}
 
 	// thread priority
@@ -512,14 +556,17 @@ void windows_osd_interface::init(running_machine &machine)
 	osd_common_t::init_subsystems();
 
 	// notify listeners of screen configuration
-	for (auto info : win_window_list)
+	for (auto info : osd_common_t::s_window_list)
 	{
-		machine.output().set_value(string_format("Orientation(%s)", info->m_monitor->devicename()).c_str(), info->m_targetorient);
+		machine.output().set_value(string_format("Orientation(%s)", info->monitor()->devicename()).c_str(), std::static_pointer_cast<win_window_info>(info)->m_targetorient);
 	}
 
 	// hook up the debugger log
 	if (options.oslog())
-		machine.add_logerror_callback(output_oslog);
+	{
+		using namespace std::placeholders;
+		machine.add_logerror_callback(std::bind(&windows_osd_interface::output_oslog, this, _1));
+	}
 
 #if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
 	// crank up the multimedia timer resolution to its max
@@ -568,7 +615,18 @@ void windows_osd_interface::osd_exit()
 #endif
 
 	// one last pass at events
-	winwindow_process_events(machine(), 0, 0);
+	winwindow_process_events(machine(), false, false);
+}
+
+
+//============================================================
+//  osd_setup_osd_specific_emu_options
+//============================================================
+
+void osd_setup_osd_specific_emu_options(emu_options &opts)
+{
+	opts.add_entries(osd_options::s_option_entries);
+	opts.add_entries(windows_options::s_option_entries);
 }
 
 
@@ -590,3 +648,4 @@ static int is_double_click_start(int argc)
 }
 
 #endif // WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
+

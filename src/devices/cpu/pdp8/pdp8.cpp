@@ -44,14 +44,14 @@ CPU_DISASSEMBLE( pdp8 );
 #define OPR_GROUP1_VAL  0000
 #define OPR_GROUP2_VAL  0400
 
-const device_type PDP8CPU = &device_creator<pdp8_device>;
+DEFINE_DEVICE_TYPE(PDP8, pdp8_device, "pdp8_cpu", "PDP8")
 
 //-------------------------------------------------
 //  pdp8_device - constructor
 //-------------------------------------------------
 
-pdp8_device::pdp8_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: cpu_device(mconfig, PDP8CPU, "PDP8CPU", tag, owner, clock, "pdp8_cpu", __FILE__),
+pdp8_device::pdp8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: cpu_device(mconfig, PDP8, tag, owner, clock),
 		m_program_config("program", ENDIANNESS_BIG, 12, 12),
 		m_pc(0),
 		m_ac(0),
@@ -73,6 +73,7 @@ void pdp8_device::device_start()
 
 	// register our state for the debugger
 	state_add(STATE_GENPC,     "GENPC",     m_pc).noshow();
+	state_add(STATE_GENPCBASE, "CURPC",     m_pc).noshow();
 	state_add(STATE_GENFLAGS,  "GENFLAGS",  m_l).callimport().callexport().formatstr("%1s").noshow();
 	state_add(PDP8_PC,         "PC",        m_pc).mask(0xfff);
 	state_add(PDP8_AC,         "AC",        m_ac).mask(0xfff);
@@ -120,7 +121,7 @@ void pdp8_device::device_reset()
 //  the space doesn't exist
 //-------------------------------------------------
 
-const address_space_config *pdp8_device::memory_space_config(address_spacenum spacenum) const
+const address_space_config *pdp8_device::memory_space_config(int spacenum) const
 {
 	if (spacenum == AS_PROGRAM)
 	{
@@ -151,7 +152,7 @@ void pdp8_device::state_string_export(const device_state_entry &entry, std::stri
 //  of the shortest instruction, in bytes
 //-------------------------------------------------
 
-UINT32 pdp8_device::disasm_min_opcode_bytes() const
+uint32_t pdp8_device::disasm_min_opcode_bytes() const
 {
 	return 2;
 }
@@ -162,7 +163,7 @@ UINT32 pdp8_device::disasm_min_opcode_bytes() const
 //  of the longest instruction, in bytes
 //-------------------------------------------------
 
-UINT32 pdp8_device::disasm_max_opcode_bytes() const
+uint32_t pdp8_device::disasm_max_opcode_bytes() const
 {
 	return 2;
 }
@@ -173,10 +174,10 @@ UINT32 pdp8_device::disasm_max_opcode_bytes() const
 //  helper function
 //-------------------------------------------------
 
-offs_t pdp8_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t pdp8_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( pdp8 );
-	return CPU_DISASSEMBLE_NAME(pdp8)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(pdp8)(this, stream, pc, oprom, opram, options);
 }
 
 
@@ -189,7 +190,7 @@ offs_t pdp8_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *opr
 //  cycles it takes for one instruction to execute
 //-------------------------------------------------
 
-UINT32 pdp8_device::execute_min_cycles() const
+uint32_t pdp8_device::execute_min_cycles() const
 {
 	return 1; // TODO
 }
@@ -200,7 +201,7 @@ UINT32 pdp8_device::execute_min_cycles() const
 //  cycles it takes for one instruction to execute
 //-------------------------------------------------
 
-UINT32 pdp8_device::execute_max_cycles() const
+uint32_t pdp8_device::execute_max_cycles() const
 {
 	return 3; // TODO
 }
@@ -211,7 +212,7 @@ UINT32 pdp8_device::execute_max_cycles() const
 //  input/interrupt lines
 //-------------------------------------------------
 
-UINT32 pdp8_device::execute_input_lines() const
+uint32_t pdp8_device::execute_input_lines() const
 {
 	return 0; // TODO
 }
@@ -241,7 +242,7 @@ void pdp8_device::execute_run()
 
 		debugger_instruction_hook(this, m_pc);
 
-		UINT16 op = m_program->read_word(m_pc);
+		uint16_t op = m_program->read_word(m_pc);
 
 		--m_icount;
 	}

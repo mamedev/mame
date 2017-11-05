@@ -175,6 +175,7 @@
 *********************************************************************/
 
 
+#include "emu.h"
 #include "machine/8042kbdc.h"
 
 
@@ -190,14 +191,14 @@
 #define LOG_KEYBOARD    0
 #define LOG_ACCESSES    0
 
-const device_type KBDC8042 = &device_creator<kbdc8042_device>;
+DEFINE_DEVICE_TYPE(KBDC8042, kbdc8042_device, "kbdc8042", "8042 Keyboard Controller")
 
 //-------------------------------------------------
 //  kbdc8042_device - constructor
 //-------------------------------------------------
 
-kbdc8042_device::kbdc8042_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, KBDC8042, "8042 Keyboard Controller", tag, owner, clock, "kbdc8042", __FILE__)
+kbdc8042_device::kbdc8042_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, KBDC8042, tag, owner, clock)
 	, m_keyboard_dev(*this, "at_keyboard")
 	, m_system_reset_cb(*this)
 	, m_gate_a20_cb(*this)
@@ -207,14 +208,10 @@ kbdc8042_device::kbdc8042_device(const machine_config &mconfig, const char *tag,
 {
 }
 
-static MACHINE_CONFIG_FRAGMENT( keyboard )
+MACHINE_CONFIG_MEMBER( kbdc8042_device::device_add_mconfig )
 	MCFG_AT_KEYB_ADD("at_keyboard", 1, WRITELINE(kbdc8042_device, keyboard_w))
 MACHINE_CONFIG_END
 
-machine_config_constructor kbdc8042_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( keyboard );
-}
 
 /*-------------------------------------------------
     device_start - device-specific startup
@@ -249,9 +246,9 @@ void kbdc8042_device::device_reset()
 	at_8042_set_outport(0xfe, 1);
 }
 
-void kbdc8042_device::at_8042_set_outport(UINT8 data, int initial)
+void kbdc8042_device::at_8042_set_outport(uint8_t data, int initial)
 {
-	UINT8 change;
+	uint8_t change;
 	change = initial ? 0xFF : (m_outport ^ data);
 	m_outport = data;
 	if (change & 0x02)
@@ -267,28 +264,18 @@ WRITE_LINE_MEMBER( kbdc8042_device::keyboard_w )
 		at_8042_check_keyboard();
 }
 
-TIMER_CALLBACK_MEMBER( kbdc8042_device::kbdc8042_clr_int )
-{
-	/* Lets 8952's timers do their job before clear the interrupt line, */
-	/* else Keyboard interrupt never happens. */
-	m_input_buffer_full_cb(0);
-}
-
-void kbdc8042_device::at_8042_receive(UINT8 data)
+void kbdc8042_device::at_8042_receive(uint8_t data)
 {
 	if (LOG_KEYBOARD)
 		logerror("at_8042_receive Received 0x%02x\n", data);
 
 	m_data = data;
-	m_keyboard.received = 1;
-
-	if (!m_input_buffer_full_cb.isnull())
+	if(!(m_speaker & 0x80))
 	{
-		m_input_buffer_full_cb(1);
-		/* Lets 8952's timers do their job before clear the interrupt line, */
-		/* else Keyboard interrupt never happens. */
-		/* Why was this done?  It dies when an extended scan code is received */
-		//machine().scheduler().timer_set(attotime::from_usec(2), timer_expired_delegate(FUNC(kbdc8042_device::kbdc8042_clr_int),this));
+		m_keyboard.received = 1;
+
+		if (!m_input_buffer_full_cb.isnull())
+			m_input_buffer_full_cb(1);
 	}
 }
 
@@ -298,7 +285,7 @@ void kbdc8042_device::at_8042_check_keyboard()
 
 	if (!m_keyboard.received && !m_mouse.received)
 	{
-		if((data = m_keyboard_dev->read(machine().driver_data()->generic_space(), 0)))
+		if((data = m_keyboard_dev->read(machine().dummy_space(), 0)))
 			at_8042_receive(data);
 	}
 }
@@ -312,6 +299,7 @@ void kbdc8042_device::at_8042_clear_keyboard_received()
 			logerror("kbdc8042_8_r(): Clearing m_keyboard.received\n");
 	}
 
+	m_input_buffer_full_cb(0);
 	m_keyboard.received = 0;
 	m_mouse.received = 0;
 }
@@ -343,33 +331,18 @@ void kbdc8042_device::at_8042_clear_keyboard_received()
 
 READ8_MEMBER(kbdc8042_device::data_r)
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	switch (offset) {
 	case 0:
 		data = m_data;
-		m_input_buffer_full_cb(0);
-		if ((m_status_read_mode != 3) || (data != 0xfa))
-		{
-			if (m_keybtype != KBDC8042_AT386 || (data != 0x55))
-			{
-				/* at386 self test doesn't like this */
-				at_8042_clear_keyboard_received();
-			}
-			at_8042_check_keyboard();
-		}
-		else
-		{
-			m_status_read_mode = 4;
-		}
+		at_8042_clear_keyboard_received();
+		at_8042_check_keyboard();
 		break;
 
 	case 1:
 		data = m_speaker;
 		data &= ~0xc0; /* AT BIOS don't likes this being set */
-
-		/* needed for AMI BIOS, maybe only some keyboard controller revisions! */
-		at_8042_clear_keyboard_received();
 
 		/* polled for changes in ibmat bios */
 		if (--m_poll_delay < 0)
@@ -420,10 +393,6 @@ READ8_MEMBER(kbdc8042_device::data_r)
 		case 2:
 			data |= m_inport<<4;
 			break;
-		case 4:
-			at_8042_receive(0xaa);
-			m_status_read_mode = 0;
-			break;
 		}
 		break;
 	}
@@ -443,19 +412,6 @@ WRITE8_MEMBER(kbdc8042_device::data_w)
 		m_status_read_mode = 0;
 		switch (m_operation_write_state) {
 		case 0:
-			if ((data == 0xf4) || (data == 0xff)) /* keyboard enable or keyboard reset */
-			{
-				at_8042_receive(0xfa); /* ACK, delivered a bit differently */
-
-				if (data == 0xff)
-				{
-					m_status_read_mode = 3; /* keyboard buffer to be written again after next read */
-				}
-
-				break;
-			}
-
-			/* normal case */
 			m_data = data;
 			m_sending=1;
 			m_keyboard_dev->write(space, 0, data);
@@ -477,9 +433,7 @@ WRITE8_MEMBER(kbdc8042_device::data_w)
 
 		case 2:
 			/* preceded by writing 0xD2 to port 60h */
-			m_data = data;
-			m_sending=1;
-			m_keyboard_dev->write(space, 0, data);
+			at_8042_receive(data);
 			break;
 
 		case 3:
@@ -502,13 +456,19 @@ WRITE8_MEMBER(kbdc8042_device::data_w)
 
 	case 1:
 		m_speaker = data;
+		if (data & 0x80)
+		{
+			at_8042_check_keyboard();
+			at_8042_clear_keyboard_received();
+		}
+		m_speaker &= ~0x80;
 		if (!m_speaker_cb.isnull())
 					m_speaker_cb((offs_t)0, m_speaker);
 
 		break;
 
 	case 4:
-		m_last_write_to_control=0;
+		m_last_write_to_control=1;
 
 		/* switch based on the command */
 		switch(data) {
@@ -557,6 +517,9 @@ WRITE8_MEMBER(kbdc8042_device::data_w)
 			break;
 		case 0xc2:  /* read input port 7..4 until write to 0x60 */
 			m_status_read_mode = 2;
+			break;
+		case 0xca: /* unknown used by savquest (read controller mode AT=0/PS2=1 ?) */
+			at_8042_receive(1);
 			break;
 		case 0xd0:  /* read output port */
 			at_8042_receive(m_outport);

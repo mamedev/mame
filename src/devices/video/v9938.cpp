@@ -33,13 +33,14 @@ todo:
 - vdp engine -- make run at correct speed
 - vr/hr/fh flags: double-check all of that
 - make vdp engine work in exp. ram
+- fix save state support
 */
 
 #include "emu.h"
 #include "v9938.h"
 
-#define VERBOSE 0
-#define LOG(x)  do { if (VERBOSE) logerror x; } while (0)
+//#define VERBOSE 1
+#include "logmacro.h"
 
 enum
 {
@@ -84,16 +85,17 @@ ADDRESS_MAP_END
 
 
 // devices
-const device_type V9938 = &device_creator<v9938_device>;
-const device_type V9958 = &device_creator<v9958_device>;
+DEFINE_DEVICE_TYPE(V9938, v9938_device, "v9938", "Yamaha V9938 VDP")
+DEFINE_DEVICE_TYPE(V9958, v9958_device, "v9958", "Yamaha V9958 VDP")
 
 
-v99x8_device::v99x8_device(const machine_config &mconfig, device_type type, const char *name, const char *shortname, const char *tag, device_t *owner, UINT32 clock)
-:   device_t(mconfig, type, name, tag, owner, clock, shortname, __FILE__),
+v99x8_device::v99x8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int model)
+:   device_t(mconfig, type, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
+	device_palette_interface(mconfig, *this),
 	device_video_interface(mconfig, *this),
 	m_space_config("vram", ENDIANNESS_BIG, 8, 18),
-	m_model(0),
+	m_model(model),
 	m_offset_x(0),
 	m_offset_y(0),
 	m_visible_y(0),
@@ -116,22 +118,26 @@ v99x8_device::v99x8_device(const machine_config &mconfig, device_type type, cons
 	m_button_state(0),
 	m_vdp_ops_count(0),
 	m_vdp_engine(nullptr),
-	m_palette(*this, "palette"),
 	m_pal_ntsc(0)
 {
 	static_set_addrmap(*this, AS_DATA, ADDRESS_MAP_NAME(memmap));
 }
 
-v9938_device::v9938_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-: v99x8_device(mconfig, V9938, "V9938 VDP", "v9938", tag, owner, clock)
+v9938_device::v9938_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+: v99x8_device(mconfig, V9938, tag, owner, clock, MODEL_V9938)
 {
-	m_model = MODEL_V9938;
 }
 
-v9958_device::v9958_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-: v99x8_device(mconfig, V9938, "V9958 VDP", "v9958", tag, owner, clock)
+v9958_device::v9958_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+: v99x8_device(mconfig, V9958, tag, owner, clock, MODEL_V9958)
 {
-	m_model = MODEL_V9958;
+}
+
+device_memory_interface::space_config_vector v99x8_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_DATA, &m_space_config)
+	};
 }
 
 
@@ -156,7 +162,7 @@ void v99x8_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 		(((scanline + m_cont_reg[23]) & 255) == m_cont_reg[19]) )
 	{
 		m_stat_reg[1] |= 1;
-		LOG(("V9938: scanline interrupt (%d)\n", scanline));
+		LOG("V9938: scanline interrupt (%d)\n", scanline);
 	}
 	else if (!(m_cont_reg[0] & 0x10))
 	{
@@ -301,13 +307,13 @@ b0 is set if b2 and b1 are set (remember, color bus is 3 bits)
 
 */
 
-PALETTE_INIT_MEMBER(v9938_device, v9938)
+void v9938_device::palette_init()
 {
 	int i;
 
 	// create the full 512 colour palette
 	for (i=0;i<512;i++)
-		palette.set_pen_color(i, pal3bit(i >> 6), pal3bit(i >> 3), pal3bit(i >> 0));
+		set_pen_color(i, pal3bit(i >> 6), pal3bit(i >> 3), pal3bit(i >> 0));
 }
 
 /*
@@ -321,23 +327,22 @@ to emulate this. Also it keeps the palette a reasonable size. :)
 
 */
 
-UINT16 v99x8_device::s_pal_indYJK[0x20000];
+uint16_t v99x8_device::s_pal_indYJK[0x20000];
 
-PALETTE_INIT_MEMBER(v9958_device, v9958)
+void v9958_device::palette_init()
 {
 	int r,g,b,y,j,k,i,k0,j0,n;
-	UINT8 pal[19268*3];
+	uint8_t pal[19268*3];
 
 	// init v9938 512-color palette
 	for (i=0;i<512;i++)
-		palette.set_pen_color(i, pal3bit(i >> 6), pal3bit(i >> 3), pal3bit(i >> 0));
+		set_pen_color(i, pal3bit(i >> 6), pal3bit(i >> 3), pal3bit(i >> 0));
 
-
-	if(palette.entries() != 19780)
+	if (entries() != 19780)
 		fatalerror("V9958: not enough palette, must be 19780");
 
 	// set up YJK table
-	LOG(("Building YJK table for V9958 screens, may take a while ... \n"));
+	LOG("Building YJK table for V9958 screens, may take a while ... \n");
 	i = 0;
 	for (y=0;y<32;y++) for (k=0;k<64;k++) for (j=0;j<64;j++)
 	{
@@ -372,17 +377,17 @@ PALETTE_INIT_MEMBER(v9958_device, v9958)
 			pal[i*3+0] = r;
 			pal[i*3+1] = g;
 			pal[i*3+2] = b;
-			palette.set_pen_color(i+512, rgb_t(pal5bit(r), pal5bit(g), pal5bit(b)));
+			set_pen_color(i+512, rgb_t(pal5bit(r), pal5bit(g), pal5bit(b)));
 			v99x8_device::s_pal_indYJK[y | j << 5 | k << (5 + 6)] = i + 512;
 			i++;
 		}
 	}
 
 	if (i != 19268)
-		LOG( ("Table creation failed - %d colours out of 19286 created\n", i));
+		LOG("Table creation failed - %d colours out of 19286 created\n", i);
 }
 
-UINT32 v99x8_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t v99x8_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
 	return 0;
@@ -409,9 +414,9 @@ WRITE8_MEMBER( v99x8_device::write )
 	}
 }
 
-UINT8 v99x8_device::vram_r()
+uint8_t v99x8_device::vram_r()
 {
-	UINT8 ret;
+	uint8_t ret;
 	int address;
 
 	address = ((int)m_cont_reg[14] << 14) | m_address_latch;
@@ -444,10 +449,10 @@ UINT8 v99x8_device::vram_r()
 	return ret;
 }
 
-UINT8 v99x8_device::status_r()
+uint8_t v99x8_device::status_r()
 {
 	int reg;
-	UINT8 ret;
+	uint8_t ret;
 
 	m_cmd_write_first = 0;
 
@@ -464,9 +469,9 @@ UINT8 v99x8_device::status_r()
 	case 1:
 		ret = m_stat_reg[1];
 		m_stat_reg[1] &= 0xfe;
+		// mouse mode: add button state
 		if ((m_cont_reg[8] & 0xc0) == 0x80)
-			// mouse mode: add button state
-		ret |= m_button_state & 0xc0;
+			ret |= m_button_state & 0xc0;
 		break;
 	case 2:
 		/*update_command ();*/
@@ -509,13 +514,13 @@ UINT8 v99x8_device::status_r()
 		break;
 	}
 
-	LOG(("V9938: Read %02x from S#%d\n", ret, reg));
+	LOG("V9938: Read %02x from S#%d\n", ret, reg);
 	check_int ();
 
 	return ret;
 }
 
-void v99x8_device::palette_w(UINT8 data)
+void v99x8_device::palette_w(uint8_t data)
 {
 	int indexp;
 
@@ -540,7 +545,7 @@ void v99x8_device::palette_w(UINT8 data)
 	}
 }
 
-void v99x8_device::vram_w(UINT8 data)
+void v99x8_device::vram_w(uint8_t data)
 {
 	int address;
 
@@ -569,7 +574,7 @@ void v99x8_device::vram_w(UINT8 data)
 	}
 }
 
-void v99x8_device::command_w(UINT8 data)
+void v99x8_device::command_w(uint8_t data)
 {
 	if (m_cmd_write_first)
 	{
@@ -581,7 +586,7 @@ void v99x8_device::command_w(UINT8 data)
 		else
 		{
 			m_address_latch =
-			(((UINT16)data << 8) | m_cmd_write) & 0x3fff;
+			(((uint16_t)data << 8) | m_cmd_write) & 0x3fff;
 			if ( !(data & 0x40) ) vram_r (); // read ahead!
 		}
 
@@ -594,7 +599,7 @@ void v99x8_device::command_w(UINT8 data)
 	}
 }
 
-void v99x8_device::register_w(UINT8 data)
+void v99x8_device::register_w(uint8_t data)
 {
 	int reg;
 
@@ -606,7 +611,7 @@ void v99x8_device::register_w(UINT8 data)
 		m_cont_reg[17] = (m_cont_reg[17] + 1) & 0x3f;
 }
 
-void v99x8_device::static_set_vram_size(device_t &device, UINT32 vram_size)
+void v99x8_device::static_set_vram_size(device_t &device, uint32_t vram_size)
 {
 	downcast<v99x8_device &>(device).m_vram_size = vram_size;
 }
@@ -638,6 +643,8 @@ void v99x8_device::device_start()
 	}
 
 	m_line_timer = timer_alloc(TIMER_LINE);
+
+	palette_init();
 
 	save_item(NAME(m_offset_x));
 	save_item(NAME(m_offset_y));
@@ -730,7 +737,7 @@ void v99x8_device::device_reset()
 void v99x8_device::reset_palette()
 {
 	// taken from V9938 Technical Data book, page 148. it's in G-R-B format
-	static const UINT8 pal16[16*3] = {
+	static const uint8_t pal16[16*3] = {
 		0, 0, 0, // 0: black/transparent
 		0, 0, 0, // 1: black
 		6, 1, 1, // 2: medium green
@@ -804,7 +811,7 @@ int v99x8_device::vram_read(int offset)
 
 void v99x8_device::check_int()
 {
-	UINT8 n;
+	uint8_t n;
 
 	n = ( (m_cont_reg[1] & 0x20) && (m_stat_reg[0] & 0x80) /*&& m_vblank_int*/) ||
 	( (m_stat_reg[1] & 0x01) && (m_cont_reg[0] & 0x10) );
@@ -819,7 +826,7 @@ void v99x8_device::check_int()
 	if (n != m_int_state)
 	{
 		m_int_state = n;
-		LOG(("V9938: IRQ line %s\n", n ? "up" : "down"));
+		LOG("V9938: IRQ line %s\n", n ? "up" : "down");
 	}
 
 	/*
@@ -838,7 +845,7 @@ void v99x8_device::check_int()
 
 void v99x8_device::register_write (int reg, int data)
 {
-	static UINT8 const reg_mask[] =
+	static uint8_t const reg_mask[] =
 	{
 		0x7e, 0x7b, 0x7f, 0xff, 0x3f, 0xff, 0x3f, 0xff,
 		0xfb, 0xbf, 0x07, 0x03, 0xff, 0xff, 0x07, 0x0f,
@@ -855,7 +862,7 @@ void v99x8_device::register_write (int reg, int data)
 
 	if (reg > 46)
 	{
-		LOG(("V9938: Attempted to write to non-existant R#%d\n", reg));
+		LOG("V9938: Attempted to write to non-existant R#%d\n", reg);
 		return;
 	}
 
@@ -868,7 +875,7 @@ void v99x8_device::register_write (int reg, int data)
 		m_cont_reg[reg] = data;
 		set_mode();
 		check_int();
-		LOG(("v9938: mode = %s\n", v9938_modes[m_mode]));
+		LOG("v9938: mode = %s\n", v9938_modes[m_mode]);
 		break;
 
 	case 18:
@@ -887,14 +894,14 @@ void v99x8_device::register_write (int reg, int data)
 	case 20:
 	case 21:
 	case 22:
-		LOG(("v9938: Write %02xh to R#%d; color burst not emulated\n", data, reg));
+		LOG("v9938: Write %02xh to R#%d; color burst not emulated\n", data, reg);
 		break;
 	case 25:
 	case 26:
 	case 27:
 		if (m_model != MODEL_V9958)
 		{
-			LOG(("v9938: Attempting to write %02xh to V9958 R#%d\n", data, reg));
+			LOG("v9938: Attempting to write %02xh to V9958 R#%d\n", data, reg);
 			data = 0;
 		}
 		else
@@ -914,7 +921,7 @@ void v99x8_device::register_write (int reg, int data)
 	}
 
 	if (reg != 15)
-		LOG(("v9938: Write %02x to R#%d\n", data, reg));
+		LOG("v9938: Write %02x to R#%d\n", data, reg);
 
 	m_cont_reg[reg] = data;
 }
@@ -931,53 +938,53 @@ inline bool v99x8_device::v9938_second_field()
 }
 
 
-void v99x8_device::default_border(const pen_t *pens, UINT16 *ln)
+void v99x8_device::default_border(uint16_t *ln)
 {
-	UINT16 pen;
+	pen_t pen;
 	int i;
 
-	pen = pens[m_pal_ind16[(m_cont_reg[7]&0x0f)]];
+	pen = this->pen(m_pal_ind16[m_cont_reg[7] & 0x0f]);
 	i = LONG_WIDTH;
 	while (i--) *ln++ = pen;
 }
 
-void v99x8_device::graphic7_border(const pen_t *pens, UINT16 *ln)
+void v99x8_device::graphic7_border(uint16_t *ln)
 {
-	UINT16 pen;
+	pen_t pen;
 	int i;
 
-	pen = pens[m_pal_ind256[m_cont_reg[7]]];
+	pen = this->pen(m_pal_ind256[m_cont_reg[7]]);
 	i = LONG_WIDTH;
 	while (i--) *ln++ = pen;
 }
 
-void v99x8_device::graphic5_border(const pen_t *pens, UINT16 *ln)
+void v99x8_device::graphic5_border(uint16_t *ln)
 {
 	int i;
-	UINT16 pen0;
-	UINT16 pen1;
+	pen_t pen0;
+	pen_t pen1;
 
-	pen1 = pens[m_pal_ind16[(m_cont_reg[7]&0x03)]];
-	pen0 = pens[m_pal_ind16[((m_cont_reg[7]>>2)&0x03)]];
+	pen1 = pen(m_pal_ind16[m_cont_reg[7] & 0x03]);
+	pen0 = pen(m_pal_ind16[(m_cont_reg[7] >> 2) & 0x03]);
 	i = LONG_WIDTH / 2;
 	while (i--) { *ln++ = pen0; *ln++ = pen1; }
 }
 
-void v99x8_device::mode_text1(const pen_t *pens, UINT16 *ln, int line)
+void v99x8_device::mode_text1(uint16_t *ln, int line)
 {
 	int pattern, x, xx, name, xxx;
-	UINT16 fg, bg, pen;
+	pen_t fg, bg, pen;
 	int nametbl_addr, patterntbl_addr;
 
 	patterntbl_addr = m_cont_reg[4] << 11;
 	nametbl_addr = m_cont_reg[2] << 10;
 
-	fg = pens[m_pal_ind16[m_cont_reg[7] >> 4]];
-	bg = pens[m_pal_ind16[m_cont_reg[7] & 15]];
+	fg = this->pen(m_pal_ind16[m_cont_reg[7] >> 4]);
+	bg = this->pen(m_pal_ind16[m_cont_reg[7] & 15]);
 
 	name = (line/8)*40;
 
-	pen = pens[m_pal_ind16[(m_cont_reg[7]&0x0f)]];
+	pen = this->pen(m_pal_ind16[m_cont_reg[7] & 0x0f]);
 
 	xxx = (m_offset_x + 8) * 2;
 	while (xxx--) *ln++ = pen;
@@ -1000,10 +1007,10 @@ void v99x8_device::mode_text1(const pen_t *pens, UINT16 *ln, int line)
 	while (xxx--) *ln++ = pen;
 }
 
-void v99x8_device::mode_text2(const pen_t *pens, UINT16 *ln, int line)
+void v99x8_device::mode_text2(uint16_t *ln, int line)
 {
 	int pattern, x, charcode, name, xxx, patternmask, colourmask;
-	UINT16 fg, bg, fg0, bg0, pen;
+	pen_t fg, bg, fg0, bg0, pen;
 	int nametbl_addr, patterntbl_addr, colourtbl_addr;
 
 	patterntbl_addr = m_cont_reg[4] << 11;
@@ -1016,15 +1023,15 @@ void v99x8_device::mode_text2(const pen_t *pens, UINT16 *ln, int line)
 	nametbl_addr = ((m_cont_reg[2] & 0xfc) << 10);
 	patternmask = ((m_cont_reg[2] & 3) << 10) | 0x3ff; /* seems correct */
 
-	fg = pens[m_pal_ind16[m_cont_reg[7] >> 4]];
-	bg = pens[m_pal_ind16[m_cont_reg[7] & 15]];
-	fg0 = pens[m_pal_ind16[m_cont_reg[12] >> 4]];
-	bg0 = pens[m_pal_ind16[m_cont_reg[12] & 15]];
+	fg = this->pen(m_pal_ind16[m_cont_reg[7] >> 4]);
+	bg = this->pen(m_pal_ind16[m_cont_reg[7] & 15]);
+	fg0 = this->pen(m_pal_ind16[m_cont_reg[12] >> 4]);
+	bg0 = this->pen(m_pal_ind16[m_cont_reg[12] & 15]);
 
 	name = (line/8)*80;
 
 	xxx = (m_offset_x + 8) * 2;
-	pen = pens[m_pal_ind16[(m_cont_reg[7]&0x0f)]];
+	pen = this->pen(m_pal_ind16[m_cont_reg[7] & 0x0f]);
 	while (xxx--) *ln++ = pen;
 
 	for (x=0;x<80;x++)
@@ -1067,11 +1074,11 @@ void v99x8_device::mode_text2(const pen_t *pens, UINT16 *ln, int line)
 	while (xxx--) *ln++ = pen;
 }
 
-void v99x8_device::mode_multi(const pen_t *pens, UINT16 *ln, int line)
+void v99x8_device::mode_multi(uint16_t *ln, int line)
 {
 	int nametbl_addr, patterntbl_addr, colour;
 	int name, line2, x, xx;
-	UINT16 pen, pen_bg;
+	pen_t pen, pen_bg;
 
 	nametbl_addr = (m_cont_reg[2] << 10);
 	patterntbl_addr = (m_cont_reg[4] << 11);
@@ -1079,14 +1086,14 @@ void v99x8_device::mode_multi(const pen_t *pens, UINT16 *ln, int line)
 	line2 = (line - m_cont_reg[23]) & 255;
 	name = (line2/8)*32;
 
-	pen_bg = pens[m_pal_ind16[(m_cont_reg[7]&0x0f)]];
+	pen_bg = this->pen(m_pal_ind16[m_cont_reg[7] & 0x0f]);
 	xx = m_offset_x * 2;
 	while (xx--) *ln++ = pen_bg;
 
 	for (x=0;x<32;x++)
 	{
 		colour = m_vram_space->read_byte(patterntbl_addr + (m_vram_space->read_byte(nametbl_addr + name) * 8) + ((line2/4)&7));
-		pen = pens[m_pal_ind16[colour>>4]];
+		pen = this->pen(m_pal_ind16[colour >> 4]);
 		/* eight pixels */
 		*ln++ = pen;
 		*ln++ = pen;
@@ -1096,7 +1103,7 @@ void v99x8_device::mode_multi(const pen_t *pens, UINT16 *ln, int line)
 		*ln++ = pen;
 		*ln++ = pen;
 		*ln++ = pen;
-		pen = pens[m_pal_ind16[colour&15]];
+		pen = this->pen(m_pal_ind16[colour & 15]);
 		/* eight pixels */
 		*ln++ = pen;
 		*ln++ = pen;
@@ -1113,9 +1120,9 @@ void v99x8_device::mode_multi(const pen_t *pens, UINT16 *ln, int line)
 	while (xx--) *ln++ = pen_bg;
 }
 
-void v99x8_device::mode_graphic1(const pen_t *pens, UINT16 *ln, int line)
+void v99x8_device::mode_graphic1(uint16_t *ln, int line)
 {
-	UINT16 fg, bg, pen;
+	pen_t fg, bg, pen;
 	int nametbl_addr, patterntbl_addr, colourtbl_addr;
 	int pattern, x, xx, line2, name, charcode, colour, xxx;
 
@@ -1127,7 +1134,7 @@ void v99x8_device::mode_graphic1(const pen_t *pens, UINT16 *ln, int line)
 
 	name = (line2/8)*32;
 
-	pen = pens[m_pal_ind16[(m_cont_reg[7]&0x0f)]];
+	pen = this->pen(m_pal_ind16[m_cont_reg[7] & 0x0f]);
 	xxx = m_offset_x * 2;
 	while (xxx--) *ln++ = pen;
 
@@ -1135,8 +1142,8 @@ void v99x8_device::mode_graphic1(const pen_t *pens, UINT16 *ln, int line)
 	{
 		charcode = m_vram_space->read_byte(nametbl_addr + name);
 		colour = m_vram_space->read_byte(colourtbl_addr + charcode/8);
-		fg = pens[m_pal_ind16[colour>>4]];
-		bg = pens[m_pal_ind16[colour&15]];
+		fg = this->pen(m_pal_ind16[colour >> 4]);
+		bg = this->pen(m_pal_ind16[colour & 15]);
 		pattern = m_vram_space->read_byte(patterntbl_addr + (charcode * 8 + (line2 & 7)));
 
 		for (xx=0;xx<8;xx++)
@@ -1152,9 +1159,9 @@ void v99x8_device::mode_graphic1(const pen_t *pens, UINT16 *ln, int line)
 	while (xx--) *ln++ = pen;
 }
 
-void v99x8_device::mode_graphic23(const pen_t *pens, UINT16 *ln, int line)
+void v99x8_device::mode_graphic23(uint16_t *ln, int line)
 {
-	UINT16 fg, bg, pen;
+	pen_t fg, bg, pen;
 	int nametbl_addr, patterntbl_addr, colourtbl_addr;
 	int pattern, x, xx, line2, name, charcode,
 	colour, colourmask, patternmask, xxx;
@@ -1169,7 +1176,7 @@ void v99x8_device::mode_graphic23(const pen_t *pens, UINT16 *ln, int line)
 	line2 = (line + m_cont_reg[23]) & 255;
 	name = (line2/8)*32;
 
-	pen = pens[m_pal_ind16[(m_cont_reg[7]&0x0f)]];
+	pen = this->pen(m_pal_ind16[m_cont_reg[7] & 0x0f]);
 	xxx = m_offset_x * 2;
 	while (xxx--) *ln++ = pen;
 
@@ -1178,8 +1185,8 @@ void v99x8_device::mode_graphic23(const pen_t *pens, UINT16 *ln, int line)
 		charcode = m_vram_space->read_byte(nametbl_addr + name) + (line2&0xc0)*4;
 		colour = m_vram_space->read_byte(colourtbl_addr + ((charcode&colourmask)*8+(line2&7)));
 		pattern = m_vram_space->read_byte(patterntbl_addr + ((charcode&patternmask)*8+(line2&7)));
-		fg = pens[m_pal_ind16[colour>>4]];
-		bg = pens[m_pal_ind16[colour&15]];
+		fg = this->pen(m_pal_ind16[colour >> 4]);
+		bg = this->pen(m_pal_ind16[colour & 15]);
 		for (xx=0;xx<8;xx++)
 		{
 			*ln++ = (pattern & 0x80) ? fg : bg;
@@ -1193,11 +1200,11 @@ void v99x8_device::mode_graphic23(const pen_t *pens, UINT16 *ln, int line)
 	while (xx--) *ln++ = pen;
 }
 
-void v99x8_device::mode_graphic4(const pen_t *pens, UINT16 *ln, int line)
+void v99x8_device::mode_graphic4(uint16_t *ln, int line)
 {
 	int nametbl_addr, colour;
 	int line2, linemask, x, xx;
-	UINT16 pen, pen_bg;
+	pen_t pen, pen_bg;
 
 	linemask = ((m_cont_reg[2] & 0x1f) << 3) | 7;
 
@@ -1207,17 +1214,17 @@ void v99x8_device::mode_graphic4(const pen_t *pens, UINT16 *ln, int line)
 	if ( (m_cont_reg[2] & 0x20) && v9938_second_field() )
 		nametbl_addr += 0x8000;
 
-	pen_bg = pens[m_pal_ind16[(m_cont_reg[7]&0x0f)]];
+	pen_bg = this->pen(m_pal_ind16[m_cont_reg[7] & 0x0f]);
 	xx = m_offset_x * 2;
 	while (xx--) *ln++ = pen_bg;
 
 	for (x=0;x<128;x++)
 	{
 		colour = m_vram_space->read_byte(nametbl_addr++);
-		pen = pens[m_pal_ind16[colour>>4]];
+		pen = this->pen(m_pal_ind16[colour >> 4]);
 		*ln++ = pen;
 		*ln++ = pen;
-		pen = pens[m_pal_ind16[colour&15]];
+		pen = this->pen(m_pal_ind16[colour & 15]);
 		*ln++ = pen;
 		*ln++ = pen;
 	}
@@ -1226,12 +1233,12 @@ void v99x8_device::mode_graphic4(const pen_t *pens, UINT16 *ln, int line)
 	while (xx--) *ln++ = pen_bg;
 }
 
-void v99x8_device::mode_graphic5(const pen_t *pens, UINT16 *ln, int line)
+void v99x8_device::mode_graphic5(uint16_t *ln, int line)
 {
 	int nametbl_addr, colour;
 	int line2, linemask, x, xx;
-	UINT16 pen_bg0[4];
-	UINT16 pen_bg1[4];
+	pen_t pen_bg0[4];
+	pen_t pen_bg1[4];
 
 	linemask = ((m_cont_reg[2] & 0x1f) << 3) | 7;
 
@@ -1241,8 +1248,8 @@ void v99x8_device::mode_graphic5(const pen_t *pens, UINT16 *ln, int line)
 	if ( (m_cont_reg[2] & 0x20) && v9938_second_field() )
 		nametbl_addr += 0x8000;
 
-	pen_bg1[0] = pens[m_pal_ind16[(m_cont_reg[7]&0x03)]];
-	pen_bg0[0] = pens[m_pal_ind16[((m_cont_reg[7]>>2)&0x03)]];
+	pen_bg1[0] = this->pen(m_pal_ind16[m_cont_reg[7] & 0x03]);
+	pen_bg0[0] = this->pen(m_pal_ind16[(m_cont_reg[7] >> 2) & 0x03]);
 
 	xx = m_offset_x;
 	while (xx--) { *ln++ = pen_bg0[0]; *ln++ = pen_bg1[0]; }
@@ -1251,8 +1258,8 @@ void v99x8_device::mode_graphic5(const pen_t *pens, UINT16 *ln, int line)
 
 	for (;x<4;x++)
 	{
-		pen_bg0[x] = pens[m_pal_ind16[x]];
-		pen_bg1[x] = pens[m_pal_ind16[x]];
+		pen_bg0[x] = this->pen(m_pal_ind16[x]);
+		pen_bg1[x] = this->pen(m_pal_ind16[x]);
 	}
 
 	for (x=0;x<128;x++)
@@ -1265,18 +1272,18 @@ void v99x8_device::mode_graphic5(const pen_t *pens, UINT16 *ln, int line)
 		*ln++ = pen_bg1[(colour&3)];
 	}
 
-	pen_bg1[0] = pens[m_pal_ind16[(m_cont_reg[7]&0x03)]];
-	pen_bg0[0] = pens[m_pal_ind16[((m_cont_reg[7]>>2)&0x03)]];
+	pen_bg1[0] = this->pen(m_pal_ind16[m_cont_reg[7] & 0x03]);
+	pen_bg0[0] = this->pen(m_pal_ind16[(m_cont_reg[7] >> 2) & 0x03]);
 	xx = 16 - m_offset_x;
 	while (xx--) { *ln++ = pen_bg0[0]; *ln++ = pen_bg1[0]; }
 }
 
-void v99x8_device::mode_graphic6(const pen_t *pens, UINT16 *ln, int line)
+void v99x8_device::mode_graphic6(uint16_t *ln, int line)
 {
-	UINT8 colour;
+	uint8_t colour;
 	int line2, linemask, x, xx, nametbl_addr;
-	UINT16 pen_bg, fg0;
-	UINT16 fg1;
+	pen_t pen_bg, fg0;
+	pen_t fg1;
 
 	linemask = ((m_cont_reg[2] & 0x1f) << 3) | 7;
 
@@ -1286,7 +1293,7 @@ void v99x8_device::mode_graphic6(const pen_t *pens, UINT16 *ln, int line)
 	if ( (m_cont_reg[2] & 0x20) && v9938_second_field() )
 		nametbl_addr += 0x10000;
 
-	pen_bg = pens[m_pal_ind16[(m_cont_reg[7]&0x0f)]];
+	pen_bg = pen(m_pal_ind16[m_cont_reg[7] & 0x0f]);
 	xx = m_offset_x * 2;
 	while (xx--) *ln++ = pen_bg;
 
@@ -1296,8 +1303,8 @@ void v99x8_device::mode_graphic6(const pen_t *pens, UINT16 *ln, int line)
 		{
 			nametbl_addr++;
 			colour = m_vram_space->read_byte(((nametbl_addr&1) << 16) | (nametbl_addr>>1));
-			fg0 = pens[m_pal_ind16[colour>>4]];
-			fg1 = pens[m_pal_ind16[colour&15]];
+			fg0 = pen(m_pal_ind16[colour >> 4]);
+			fg1 = pen(m_pal_ind16[colour & 15]);
 			*ln++ = fg0; *ln++ = fg1; *ln++ = fg0; *ln++ = fg1;
 			*ln++ = fg0; *ln++ = fg1; *ln++ = fg0; *ln++ = fg1;
 			*ln++ = fg0; *ln++ = fg1; *ln++ = fg0; *ln++ = fg1;
@@ -1310,8 +1317,8 @@ void v99x8_device::mode_graphic6(const pen_t *pens, UINT16 *ln, int line)
 		for (x=0;x<256;x++)
 		{
 			colour = m_vram_space->read_byte(((nametbl_addr&1) << 16) | (nametbl_addr>>1));
-			*ln++ = pens[m_pal_ind16[colour>>4]];
-			*ln++ = pens[m_pal_ind16[colour&15]];
+			*ln++ = pen(m_pal_ind16[colour >> 4]);
+			*ln++ = pen(m_pal_ind16[colour & 15]);
 			nametbl_addr++;
 		}
 	}
@@ -1320,11 +1327,11 @@ void v99x8_device::mode_graphic6(const pen_t *pens, UINT16 *ln, int line)
 	while (xx--) *ln++ = pen_bg;
 }
 
-void v99x8_device::mode_graphic7(const pen_t *pens, UINT16 *ln, int line)
+void v99x8_device::mode_graphic7(uint16_t *ln, int line)
 {
-	UINT8 colour;
+	uint8_t colour;
 	int line2, linemask, x, xx, nametbl_addr;
-	UINT16 pen, pen_bg;
+	pen_t pen, pen_bg;
 
 	linemask = ((m_cont_reg[2] & 0x1f) << 3) | 7;
 
@@ -1334,7 +1341,7 @@ void v99x8_device::mode_graphic7(const pen_t *pens, UINT16 *ln, int line)
 	if ( (m_cont_reg[2] & 0x20) && v9938_second_field() )
 		nametbl_addr += 0x10000;
 
-	pen_bg = pens[m_pal_ind256[m_cont_reg[7]]];
+	pen_bg = this->pen(m_pal_ind256[m_cont_reg[7]]);
 	xx = m_offset_x * 2;
 	while (xx--) *ln++ = pen_bg;
 
@@ -1410,7 +1417,7 @@ void v99x8_device::mode_graphic7(const pen_t *pens, UINT16 *ln, int line)
 		{
 			nametbl_addr++;
 			colour = m_vram_space->read_byte(((nametbl_addr&1) << 16) | (nametbl_addr>>1));
-			pen = pens[m_pal_ind256[colour]];
+			pen = this->pen(m_pal_ind256[colour]);
 			*ln++ = pen; *ln++ = pen;
 			*ln++ = pen; *ln++ = pen;
 			*ln++ = pen; *ln++ = pen;
@@ -1427,7 +1434,7 @@ void v99x8_device::mode_graphic7(const pen_t *pens, UINT16 *ln, int line)
 		for (x=0;x<256;x++)
 		{
 			colour = m_vram_space->read_byte(((nametbl_addr&1) << 16) | (nametbl_addr>>1));
-			pen = pens[m_pal_ind256[colour]];
+			pen = this->pen(m_pal_ind256[colour]);
 			*ln++ = pen;
 			*ln++ = pen;
 			nametbl_addr++;
@@ -1438,13 +1445,13 @@ void v99x8_device::mode_graphic7(const pen_t *pens, UINT16 *ln, int line)
 	while (xx--) *ln++ = pen_bg;
 }
 
-void v99x8_device::mode_unknown(const pen_t *pens, UINT16 *ln, int line)
+void v99x8_device::mode_unknown(uint16_t *ln, int line)
 {
-	UINT16 fg, bg;
+	pen_t fg, bg;
 	int x;
 
-	fg = pens[m_pal_ind16[m_cont_reg[7] >> 4]];
-	bg = pens[m_pal_ind16[m_cont_reg[7] & 15]];
+	fg = pen(m_pal_ind16[m_cont_reg[7] >> 4]);
+	bg = pen(m_pal_ind16[m_cont_reg[7] & 15]);
 
 	x = m_offset_x * 2;
 	while (x--) *ln++ = bg;
@@ -1456,7 +1463,7 @@ void v99x8_device::mode_unknown(const pen_t *pens, UINT16 *ln, int line)
 	while (x--) *ln++ = bg;
 }
 
-void v99x8_device::default_draw_sprite(const pen_t *pens, UINT16 *ln, UINT8 *col)
+void v99x8_device::default_draw_sprite(uint16_t *ln, uint8_t *col)
 {
 	int i;
 	ln += m_offset_x * 2;
@@ -1465,8 +1472,8 @@ void v99x8_device::default_draw_sprite(const pen_t *pens, UINT16 *ln, UINT8 *col
 	{
 		if (col[i] & 0x80)
 		{
-			*ln++ = pens[m_pal_ind16[col[i]&0x0f]];
-			*ln++ = pens[m_pal_ind16[col[i]&0x0f]];
+			*ln++ = pen(m_pal_ind16[col[i] & 0x0f]);
+			*ln++ = pen(m_pal_ind16[col[i] & 0x0f]);
 		}
 		else
 		{
@@ -1475,7 +1482,7 @@ void v99x8_device::default_draw_sprite(const pen_t *pens, UINT16 *ln, UINT8 *col
 	}
 }
 
-void v99x8_device::graphic5_draw_sprite(const pen_t *pens, UINT16 *ln, UINT8 *col)
+void v99x8_device::graphic5_draw_sprite(uint16_t *ln, uint8_t *col)
 {
 	int i;
 	ln += m_offset_x * 2;
@@ -1484,8 +1491,8 @@ void v99x8_device::graphic5_draw_sprite(const pen_t *pens, UINT16 *ln, UINT8 *co
 	{
 		if (col[i] & 0x80)
 		{
-			*ln++ = pens[m_pal_ind16[(col[i]>>2)&0x03]];
-			*ln++ = pens[m_pal_ind16[col[i]&0x03]];
+			*ln++ = pen(m_pal_ind16[(col[i] >> 2) & 0x03]);
+			*ln++ = pen(m_pal_ind16[col[i] & 0x03]);
 		}
 		else
 		{
@@ -1495,9 +1502,9 @@ void v99x8_device::graphic5_draw_sprite(const pen_t *pens, UINT16 *ln, UINT8 *co
 }
 
 
-void v99x8_device::graphic7_draw_sprite(const pen_t *pens, UINT16 *ln, UINT8 *col)
+void v99x8_device::graphic7_draw_sprite(uint16_t *ln, uint8_t *col)
 {
-	static const UINT16 g7_ind16[16] = {
+	static const uint16_t g7_ind16[16] = {
 		0, 2, 192, 194, 48, 50, 240, 242,
 	482, 7, 448, 455, 56, 63, 504, 511  };
 	int i;
@@ -1508,8 +1515,8 @@ void v99x8_device::graphic7_draw_sprite(const pen_t *pens, UINT16 *ln, UINT8 *co
 	{
 		if (col[i] & 0x80)
 		{
-			*ln++ = pens[g7_ind16[col[i]&0x0f]];
-			*ln++ = pens[g7_ind16[col[i]&0x0f]];
+			*ln++ = pen(g7_ind16[col[i] & 0x0f]);
+			*ln++ = pen(g7_ind16[col[i] & 0x0f]);
 		}
 		else
 		{
@@ -1519,7 +1526,7 @@ void v99x8_device::graphic7_draw_sprite(const pen_t *pens, UINT16 *ln, UINT8 *co
 }
 
 
-void v99x8_device::sprite_mode1 (int line, UINT8 *col)
+void v99x8_device::sprite_mode1 (int line, uint8_t *col)
 {
 	int attrtbl_addr, patterntbl_addr, pattern_addr;
 	int x, y, p, height, c, p2, i, n, pattern;
@@ -1640,7 +1647,7 @@ void v99x8_device::sprite_mode1 (int line, UINT8 *col)
 		m_stat_reg[0] = (m_stat_reg[0] & 0xa0) | p;
 }
 
-void v99x8_device::sprite_mode2 (int line, UINT8 *col)
+void v99x8_device::sprite_mode2 (int line, uint8_t *col)
 {
 	int attrtbl_addr, patterntbl_addr, pattern_addr, colourtbl_addr;
 	int x, i, y, p, height, c, p2, n, pattern, colourmask, first_cc_seen;
@@ -1853,10 +1860,9 @@ void v99x8_device::set_mode()
 
 void v99x8_device::refresh_16(int line)
 {
-	const pen_t *pens = m_palette->pens();
 	bool double_lines = false;
-	UINT8 col[256];
-	UINT16 *ln, *ln2 = nullptr;
+	uint8_t col[256];
+	uint16_t *ln, *ln2 = nullptr;
 
 	if (m_cont_reg[9] & 0x08)
 	{
@@ -1871,15 +1877,15 @@ void v99x8_device::refresh_16(int line)
 
 	if ( !(m_cont_reg[1] & 0x40) || (m_stat_reg[2] & 0x40) )
 	{
-		(this->*s_modes[m_mode].border_16)(pens, ln);
+		(this->*s_modes[m_mode].border_16)(ln);
 	}
 	else
 	{
-		(this->*s_modes[m_mode].visible_16)(pens, ln, line);
+		(this->*s_modes[m_mode].visible_16)(ln, line);
 		if (s_modes[m_mode].sprites)
 		{
 			(this->*s_modes[m_mode].sprites)(line, col);
-			(this->*s_modes[m_mode].draw_sprite_16)(pens, ln, col);
+			(this->*s_modes[m_mode].draw_sprite_16)(ln, col);
 		}
 	}
 
@@ -2145,7 +2151,7 @@ post_loop
 /*************************************************************/
 /** Variables visible only in this module                   **/
 /*************************************************************/
-static const UINT8 Mask[4] = { 0x0F,0x03,0x0F,0xFF };
+static const uint8_t Mask[4] = { 0x0F,0x03,0x0F,0xFF };
 static const int  PPB[4]  = { 2,4,2,1 };
 static const int  PPL[4]  = { 256,512,512,256 };
 
@@ -2183,7 +2189,7 @@ static const int lmmm_timing[8]={
 /** VDPVRMP() **********************************************/
 /** Calculate addr of a pixel in vram                       **/
 /*************************************************************/
-inline int v99x8_device::VDPVRMP(UINT8 M,int MX,int X,int Y)
+inline int v99x8_device::VDPVRMP(uint8_t M,int MX,int X,int Y)
 {
 	switch(M)
 	{
@@ -2199,7 +2205,7 @@ inline int v99x8_device::VDPVRMP(UINT8 M,int MX,int X,int Y)
 /** VDPpoint5() ***********************************************/
 /** Get a pixel on screen 5                                 **/
 /*************************************************************/
-inline UINT8 v99x8_device::VDPpoint5(int MXS, int SX, int SY)
+inline uint8_t v99x8_device::VDPpoint5(int MXS, int SX, int SY)
 {
 	return (m_vram_space->read_byte(VDP_VRMP5(MXS, SX, SY)) >>
 		(((~SX)&1)<<2)
@@ -2209,7 +2215,7 @@ inline UINT8 v99x8_device::VDPpoint5(int MXS, int SX, int SY)
 /** VDPpoint6() ***********************************************/
 /** Get a pixel on screen 6                                 **/
 /*************************************************************/
-inline UINT8 v99x8_device::VDPpoint6(int MXS, int SX, int SY)
+inline uint8_t v99x8_device::VDPpoint6(int MXS, int SX, int SY)
 {
 	return (m_vram_space->read_byte(VDP_VRMP6(MXS, SX, SY)) >>
 		(((~SX)&3)<<1)
@@ -2219,7 +2225,7 @@ inline UINT8 v99x8_device::VDPpoint6(int MXS, int SX, int SY)
 /** VDPpoint7() ***********************************************/
 /** Get a pixel on screen 7                                 **/
 /*************************************************************/
-inline UINT8 v99x8_device::VDPpoint7(int MXS, int SX, int SY)
+inline uint8_t v99x8_device::VDPpoint7(int MXS, int SX, int SY)
 {
 	return (m_vram_space->read_byte(VDP_VRMP7(MXS, SX, SY)) >>
 		(((~SX)&1)<<2)
@@ -2229,7 +2235,7 @@ inline UINT8 v99x8_device::VDPpoint7(int MXS, int SX, int SY)
 /** VDPpoint8() ***********************************************/
 /** Get a pixel on screen 8                                 **/
 /*************************************************************/
-inline UINT8 v99x8_device::VDPpoint8(int MXS, int SX, int SY)
+inline uint8_t v99x8_device::VDPpoint8(int MXS, int SX, int SY)
 {
 	return m_vram_space->read_byte(VDP_VRMP8(MXS, SX, SY));
 }
@@ -2237,7 +2243,7 @@ inline UINT8 v99x8_device::VDPpoint8(int MXS, int SX, int SY)
 /** VDPpoint() ************************************************/
 /** Get a pixel on a screen                                 **/
 /*************************************************************/
-inline UINT8 v99x8_device::VDPpoint(UINT8 SM, int MXS, int SX, int SY)
+inline uint8_t v99x8_device::VDPpoint(uint8_t SM, int MXS, int SX, int SY)
 {
 	switch(SM)
 	{
@@ -2254,11 +2260,11 @@ inline UINT8 v99x8_device::VDPpoint(UINT8 SM, int MXS, int SX, int SY)
 /** Low level function to set a pixel on a screen           **/
 /** Make it inline to make it fast                          **/
 /*************************************************************/
-inline void v99x8_device::VDPpsetlowlevel(int addr, UINT8 CL, UINT8 M, UINT8 OP)
+inline void v99x8_device::VDPpsetlowlevel(int addr, uint8_t CL, uint8_t M, uint8_t OP)
 {
 	// If this turns out to be too slow, get a pointer to the address space
 	// and work directly on it.
-	UINT8 val = m_vram_space->read_byte(addr);
+	uint8_t val = m_vram_space->read_byte(addr);
 	switch (OP)
 	{
 	case 0: val = (val & M) | CL; break;
@@ -2272,7 +2278,7 @@ inline void v99x8_device::VDPpsetlowlevel(int addr, UINT8 CL, UINT8 M, UINT8 OP)
 	case 11:  if (CL) val ^= CL; break;
 	case 12:  if (CL) val = (val & M) | ~(CL|M); break;
 	default:
-		LOG(("v9938: invalid operation %d in pset\n", OP));
+		LOG("v9938: invalid operation %d in pset\n", OP);
 	}
 
 	m_vram_space->write_byte(addr, val);
@@ -2281,18 +2287,18 @@ inline void v99x8_device::VDPpsetlowlevel(int addr, UINT8 CL, UINT8 M, UINT8 OP)
 /** VDPpset5() ***********************************************/
 /** Set a pixel on screen 5                                 **/
 /*************************************************************/
-inline void v99x8_device::VDPpset5(int MXD, int DX, int DY, UINT8 CL, UINT8 OP)
+inline void v99x8_device::VDPpset5(int MXD, int DX, int DY, uint8_t CL, uint8_t OP)
 {
-	UINT8 SH = ((~DX)&1)<<2;
+	uint8_t SH = ((~DX)&1)<<2;
 	VDPpsetlowlevel(VDP_VRMP5(MXD, DX, DY), CL << SH, ~(15<<SH), OP);
 }
 
 /** VDPpset6() ***********************************************/
 /** Set a pixel on screen 6                                 **/
 /*************************************************************/
-inline void v99x8_device::VDPpset6(int MXD, int DX, int DY, UINT8 CL, UINT8 OP)
+inline void v99x8_device::VDPpset6(int MXD, int DX, int DY, uint8_t CL, uint8_t OP)
 {
-	UINT8 SH = ((~DX)&3)<<1;
+	uint8_t SH = ((~DX)&3)<<1;
 
 	VDPpsetlowlevel(VDP_VRMP6(MXD, DX, DY), CL << SH, ~(3<<SH), OP);
 }
@@ -2300,9 +2306,9 @@ inline void v99x8_device::VDPpset6(int MXD, int DX, int DY, UINT8 CL, UINT8 OP)
 /** VDPpset7() ***********************************************/
 /** Set a pixel on screen 7                                 **/
 /*************************************************************/
-inline void v99x8_device::VDPpset7(int MXD, int DX, int DY, UINT8 CL, UINT8 OP)
+inline void v99x8_device::VDPpset7(int MXD, int DX, int DY, uint8_t CL, uint8_t OP)
 {
-	UINT8 SH = ((~DX)&1)<<2;
+	uint8_t SH = ((~DX)&1)<<2;
 
 	VDPpsetlowlevel(VDP_VRMP7(MXD, DX, DY), CL << SH, ~(15<<SH), OP);
 }
@@ -2310,7 +2316,7 @@ inline void v99x8_device::VDPpset7(int MXD, int DX, int DY, UINT8 CL, UINT8 OP)
 /** VDPpset8() ***********************************************/
 /** Set a pixel on screen 8                                 **/
 /*************************************************************/
-inline void v99x8_device::VDPpset8(int MXD, int DX, int DY, UINT8 CL, UINT8 OP)
+inline void v99x8_device::VDPpset8(int MXD, int DX, int DY, uint8_t CL, uint8_t OP)
 {
 	VDPpsetlowlevel(VDP_VRMP8(MXD, DX, DY), CL, 0, OP);
 }
@@ -2318,7 +2324,7 @@ inline void v99x8_device::VDPpset8(int MXD, int DX, int DY, UINT8 CL, UINT8 OP)
 /** VDPpset() ************************************************/
 /** Set a pixel on a screen                                 **/
 /*************************************************************/
-inline void v99x8_device::VDPpset(UINT8 SM, int MXD, int DX, int DY, UINT8 CL, UINT8 OP)
+inline void v99x8_device::VDPpset(uint8_t SM, int MXD, int DX, int DY, uint8_t CL, uint8_t OP)
 {
 	switch (SM) {
 	case 0: VDPpset5(MXD, DX, DY, CL, OP); break;
@@ -2345,7 +2351,7 @@ void v99x8_device::srch_engine()
 	int SY=m_mmc.SY;
 	int TX=m_mmc.TX;
 	int ANX=m_mmc.ANX;
-	UINT8 CL=m_mmc.CL;
+	uint8_t CL=m_mmc.CL;
 	int MXD = m_mmc.MXD;
 	int cnt;
 	int delta;
@@ -2394,8 +2400,8 @@ void v99x8_device::line_engine()
 	int NY=m_mmc.NY;
 	int ASX=m_mmc.ASX;
 	int ADX=m_mmc.ADX;
-	UINT8 CL=m_mmc.CL;
-	UINT8 LO=m_mmc.LO;
+	uint8_t CL=m_mmc.CL;
+	uint8_t LO=m_mmc.LO;
 	int MXD = m_mmc.MXD;
 	int cnt;
 	int delta;
@@ -2480,8 +2486,8 @@ void v99x8_device::lmmv_engine()
 	int NY=m_mmc.NY;
 	int ADX=m_mmc.ADX;
 	int ANX=m_mmc.ANX;
-	UINT8 CL=m_mmc.CL;
-	UINT8 LO=m_mmc.LO;
+	uint8_t CL=m_mmc.CL;
+	uint8_t LO=m_mmc.LO;
 	int MXD = m_mmc.MXD;
 	int cnt;
 	int delta;
@@ -2536,7 +2542,7 @@ void v99x8_device::lmmm_engine()
 	int ASX=m_mmc.ASX;
 	int ADX=m_mmc.ADX;
 	int ANX=m_mmc.ANX;
-	UINT8 LO=m_mmc.LO;
+	uint8_t LO=m_mmc.LO;
 	int MXS = m_mmc.MXS;
 	int MXD = m_mmc.MXD;
 	int cnt;
@@ -2620,7 +2626,7 @@ void v99x8_device::lmcm_engine()
 void v99x8_device::lmmc_engine()
 {
 	if ((m_stat_reg[2]&0x80)!=0x80) {
-		UINT8 SM=((m_mode >= 5) && (m_mode <= 8)) ? (m_mode-5) : 0;
+		uint8_t SM=((m_mode >= 5) && (m_mode <= 8)) ? (m_mode-5) : 0;
 
 		m_stat_reg[7]=m_cont_reg[44]&=Mask[SM];
 		VDP_PSET(SM, m_mmc.MXD, m_mmc.ADX, m_mmc.DY, m_cont_reg[44], m_mmc.LO);
@@ -2659,7 +2665,7 @@ void v99x8_device::hmmv_engine()
 	int NY=m_mmc.NY;
 	int ADX=m_mmc.ADX;
 	int ANX=m_mmc.ANX;
-	UINT8 CL=m_mmc.CL;
+	uint8_t CL=m_mmc.CL;
 	int MXD = m_mmc.MXD;
 	int cnt;
 	int delta;
@@ -2852,7 +2858,7 @@ void v99x8_device::hmmc_engine()
 /** VDPWrite() ***********************************************/
 /** Use this function to transfer pixel(s) from CPU to m_ **/
 /*************************************************************/
-void v99x8_device::cpu_to_vdp(UINT8 V)
+void v99x8_device::cpu_to_vdp(uint8_t V)
 {
 	m_stat_reg[2]&=0x7F;
 	m_stat_reg[7]=m_cont_reg[44]=V;
@@ -2862,7 +2868,7 @@ void v99x8_device::cpu_to_vdp(UINT8 V)
 /** VDPRead() ************************************************/
 /** Use this function to transfer pixel(s) from VDP to CPU. **/
 /*************************************************************/
-UINT8 v99x8_device::vdp_to_cpu()
+uint8_t v99x8_device::vdp_to_cpu()
 {
 	m_stat_reg[2]&=0x7F;
 	if(m_vdp_engine&&(m_vdp_ops_count>0)) (this->*m_vdp_engine)();
@@ -2872,7 +2878,7 @@ UINT8 v99x8_device::vdp_to_cpu()
 /** report_vdp_command() ***************************************/
 /** Report VDP Command to be executed                       **/
 /*************************************************************/
-void v99x8_device::report_vdp_command(UINT8 Op)
+void v99x8_device::report_vdp_command(uint8_t Op)
 {
 	static const char *const Ops[16] =
 	{
@@ -2885,7 +2891,7 @@ void v99x8_device::report_vdp_command(UINT8 Op)
 		" LMMV"," LMMM"," LMCM"," LMMC"," HMMV"," HMMM"," YMMM"," HMMC"
 	};
 
-	UINT8 CL, CM, LO;
+	uint8_t CL, CM, LO;
 	int SX,SY, DX,DY, NX,NY;
 
 	// Fetch arguments
@@ -2899,18 +2905,18 @@ void v99x8_device::report_vdp_command(UINT8 Op)
 	CM = Op>>4;
 	LO = Op&0x0F;
 
-	LOG(("V9938: Opcode %02Xh %s-%s (%d,%d)->(%d,%d),%d [%d,%d]%s\n",
+	LOG("V9938: Opcode %02Xh %s-%s (%d,%d)->(%d,%d),%d [%d,%d]%s\n",
 		Op, Commands[CM], Ops[LO],
 		SX,SY, DX,DY, CL, m_cont_reg[45]&0x04? -NX:NX,
 		m_cont_reg[45]&0x08? -NY:NY,
 		m_cont_reg[45]&0x70? " on ExtVRAM":""
-		));
+		);
 }
 
 /** VDPDraw() ************************************************/
 /** Perform a given V9938 operation Op.                     **/
 /*************************************************************/
-UINT8 v99x8_device::command_unit_w(UINT8 Op)
+uint8_t v99x8_device::command_unit_w(uint8_t Op)
 {
 	int SM;
 
@@ -2981,7 +2987,7 @@ UINT8 v99x8_device::command_unit_w(UINT8 Op)
 		m_vdp_engine=&v99x8_device::hmmc_engine;
 		break;
 	default:
-		LOG(("V9938: Unrecognized opcode %02Xh\n",Op));
+		LOG("V9938: Unrecognized opcode %02Xh\n",Op);
 		return(0);
 	}
 
@@ -2998,7 +3004,7 @@ UINT8 v99x8_device::command_unit_w(UINT8 Op)
 	m_mmc.MXS = (m_cont_reg[45] & 0x10) != 0;
 	m_mmc.MXD = (m_cont_reg[45] & 0x20) != 0;
 
-	// Argument depends on UINT8 or dot operation
+	// Argument depends on uint8_t or dot operation
 	if ((m_mmc.CM & 0x0C) == 0x0C) {
 		m_mmc.TX = m_cont_reg[45]&0x04? -PPB[SM]:PPB[SM];
 		m_mmc.NX = ((m_cont_reg[40]+((int)m_cont_reg[41]<<8)) & 1023)/PPB[SM];
@@ -3049,34 +3055,4 @@ void v99x8_device::update_command()
 		m_vdp_ops_count=13662;
 		if(m_vdp_engine) (this->*m_vdp_engine)();
 	}
-}
-
-static MACHINE_CONFIG_FRAGMENT( v9938 )
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_INIT_OWNER(v9938_device, v9938)
-MACHINE_CONFIG_END
-
-//-------------------------------------------------
-//  machine_config_additions - return a pointer to
-//  the device's machine fragment
-//-------------------------------------------------
-
-machine_config_constructor v9938_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( v9938 );
-}
-
-static MACHINE_CONFIG_FRAGMENT( v9958 )
-	MCFG_PALETTE_ADD("palette", 19780)
-	MCFG_PALETTE_INIT_OWNER(v9958_device, v9958)
-MACHINE_CONFIG_END
-
-//-------------------------------------------------
-//  machine_config_additions - return a pointer to
-//  the device's machine fragment
-//-------------------------------------------------
-
-machine_config_constructor v9958_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( v9958 );
 }

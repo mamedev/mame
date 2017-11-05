@@ -6,14 +6,13 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_NES_CTRL_JOYPAD_H
+#define MAME_BUS_NES_CTRL_JOYPAD_H
+
 #pragma once
 
-#ifndef __NES_JOYPAD__
-#define __NES_JOYPAD__
-
-
-#include "emu.h"
 #include "ctrl.h"
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -26,21 +25,22 @@ class nes_joypad_device : public device_t,
 {
 public:
 	// construction/destruction
-	nes_joypad_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	nes_joypad_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_joypad_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual ioport_constructor device_input_ports() const override;
 
 protected:
+	nes_joypad_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	virtual UINT8 read_bit0() override;
-	virtual void write(UINT8 data) override;
+	virtual uint8_t read_bit0() override;
+	virtual void write(uint8_t data) override;
 
 	required_ioport m_joypad;
-	UINT32 m_latch;
+	uint32_t m_latch;
 };
 
 // ======================> nes_fcpad2_device
@@ -49,13 +49,13 @@ class nes_fcpad2_device : public nes_joypad_device
 {
 public:
 	// construction/destruction
-	nes_fcpad2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_fcpad2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual ioport_constructor device_input_ports() const override;
 
 protected:
-	virtual UINT8 read_exp(offs_t offset) override;
-	virtual void write(UINT8 data) override;
+	virtual uint8_t read_exp(offs_t offset) override;
+	virtual void write(uint8_t data) override;
 };
 
 // ======================> nes_ccpadl_device
@@ -64,7 +64,7 @@ class nes_ccpadl_device : public nes_joypad_device
 {
 public:
 	// construction/destruction
-	nes_ccpadl_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_ccpadl_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual ioport_constructor device_input_ports() const override;
 };
@@ -75,7 +75,7 @@ class nes_ccpadr_device : public nes_joypad_device
 {
 public:
 	// construction/destruction
-	nes_ccpadr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_ccpadr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual ioport_constructor device_input_ports() const override;
 };
@@ -86,15 +86,15 @@ class nes_arcstick_device : public nes_joypad_device
 {
 public:
 	// construction/destruction
-	nes_arcstick_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-	virtual ioport_constructor device_input_ports() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	nes_arcstick_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual UINT8 read_bit0() override { return 0; }
-	virtual UINT8 read_exp(offs_t offset) override;
-	virtual void write(UINT8 data) override;
+	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
+
+	virtual uint8_t read_bit0() override { return 0; }
+	virtual uint8_t read_exp(offs_t offset) override;
+	virtual void write(uint8_t data) override;
 
 	required_device<nes_control_port_device> m_daisychain;
 	required_ioport m_cfg;
@@ -102,10 +102,10 @@ protected:
 
 
 // device type definition
-extern const device_type NES_JOYPAD;
-extern const device_type NES_FCPAD_P2;
-extern const device_type NES_CCPAD_LEFT;
-extern const device_type NES_CCPAD_RIGHT;
-extern const device_type NES_ARCSTICK;
+DECLARE_DEVICE_TYPE(NES_JOYPAD,      nes_joypad_device)
+DECLARE_DEVICE_TYPE(NES_FCPAD_P2,    nes_fcpad2_device)
+DECLARE_DEVICE_TYPE(NES_CCPAD_LEFT,  nes_ccpadl_device)
+DECLARE_DEVICE_TYPE(NES_CCPAD_RIGHT, nes_ccpadr_device)
+DECLARE_DEVICE_TYPE(NES_ARCSTICK,    nes_arcstick_device)
 
-#endif
+#endif // MAME_BUS_NES_CTRL_JOYPAD_H

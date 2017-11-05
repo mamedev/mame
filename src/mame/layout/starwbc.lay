@@ -126,25 +126,25 @@
 
 		<bezel element="static_white"><bounds x="17" y="17" width="83" height="83" /></bezel>
 
-		<bezel name="lamp20" element="lamp"><bounds x="20" y="20" width="17" height="17" /></bezel>
-		<bezel name="lamp21" element="lamp"><bounds x="40" y="20" width="17" height="17" /></bezel>
-		<bezel name="lamp22" element="lamp"><bounds x="60" y="20" width="17" height="17" /></bezel>
-		<bezel name="lamp23" element="lamp"><bounds x="80" y="20" width="17" height="17" /></bezel>
+		<bezel name="2.0" element="lamp"><bounds x="20" y="20" width="17" height="17" /></bezel>
+		<bezel name="2.1" element="lamp"><bounds x="40" y="20" width="17" height="17" /></bezel>
+		<bezel name="2.2" element="lamp"><bounds x="60" y="20" width="17" height="17" /></bezel>
+		<bezel name="2.3" element="lamp"><bounds x="80" y="20" width="17" height="17" /></bezel>
 
-		<bezel name="lamp24" element="lamp"><bounds x="20" y="40" width="17" height="17" /></bezel>
-		<bezel name="lamp25" element="lamp"><bounds x="40" y="40" width="17" height="17" /></bezel>
-		<bezel name="lamp26" element="lamp"><bounds x="60" y="40" width="17" height="17" /></bezel>
-		<bezel name="lamp27" element="lamp"><bounds x="80" y="40" width="17" height="17" /></bezel>
+		<bezel name="2.4" element="lamp"><bounds x="20" y="40" width="17" height="17" /></bezel>
+		<bezel name="2.5" element="lamp"><bounds x="40" y="40" width="17" height="17" /></bezel>
+		<bezel name="2.6" element="lamp"><bounds x="60" y="40" width="17" height="17" /></bezel>
+		<bezel name="2.7" element="lamp"><bounds x="80" y="40" width="17" height="17" /></bezel>
 
-		<bezel name="lamp40" element="lamp"><bounds x="20" y="60" width="17" height="17" /></bezel>
-		<bezel name="lamp41" element="lamp"><bounds x="40" y="60" width="17" height="17" /></bezel>
-		<bezel name="lamp42" element="lamp"><bounds x="60" y="60" width="17" height="17" /></bezel>
-		<bezel name="lamp43" element="lamp"><bounds x="80" y="60" width="17" height="17" /></bezel>
+		<bezel name="4.0" element="lamp"><bounds x="20" y="60" width="17" height="17" /></bezel>
+		<bezel name="4.1" element="lamp"><bounds x="40" y="60" width="17" height="17" /></bezel>
+		<bezel name="4.2" element="lamp"><bounds x="60" y="60" width="17" height="17" /></bezel>
+		<bezel name="4.3" element="lamp"><bounds x="80" y="60" width="17" height="17" /></bezel>
 
-		<bezel name="lamp44" element="lamp"><bounds x="20" y="80" width="17" height="17" /></bezel>
-		<bezel name="lamp45" element="lamp"><bounds x="40" y="80" width="17" height="17" /></bezel>
-		<bezel name="lamp46" element="lamp"><bounds x="60" y="80" width="17" height="17" /></bezel>
-		<bezel name="lamp47" element="lamp"><bounds x="80" y="80" width="17" height="17" /></bezel>
+		<bezel name="4.4" element="lamp"><bounds x="20" y="80" width="17" height="17" /></bezel>
+		<bezel name="4.5" element="lamp"><bounds x="40" y="80" width="17" height="17" /></bezel>
+		<bezel name="4.6" element="lamp"><bounds x="60" y="80" width="17" height="17" /></bezel>
+		<bezel name="4.7" element="lamp"><bounds x="80" y="80" width="17" height="17" /></bezel>
 
 	<!-- right side -->
 
@@ -152,13 +152,13 @@
 		<bezel element="static_black"><bounds x="106" y="18" width="53" height="21" /></bezel>
 		<bezel element="text_alert"><bounds x="106" y="18.5" width="53" height="8" /></bezel>
 
-		<bezel name="lamp5" element="nlamp"><bounds x="130.8" y="30.5" width="3.4" height="3.4" /></bezel>
+		<bezel name="0.5" element="nlamp"><bounds x="130.8" y="30.5" width="3.4" height="3.4" /></bezel>
 
 		<bezel element="static_white"><bounds x="105" y="43" width="55" height="23" /></bezel>
 		<bezel element="static_black"><bounds x="106" y="44" width="53" height="21" /></bezel>
 		<bezel element="text_combat"><bounds x="106" y="45" width="53" height="7" /></bezel>
 
-		<bezel name="lamp4" element="nlamp"><bounds x="130.8" y="56.5" width="3.4" height="3.4" /></bezel>
+		<bezel name="0.4" element="nlamp"><bounds x="130.8" y="56.5" width="3.4" height="3.4" /></bezel>
 
 		<bezel element="static_white"><bounds x="105" y="69" width="55" height="31" /></bezel>
 		<bezel element="static_black"><bounds x="106" y="70" width="53" height="29" /></bezel>

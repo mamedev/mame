@@ -9,23 +9,23 @@ driver by Nicola Salmoria, qwijibo
 deviations from schematics verified on set 2 pcb:
 
   main pcb:
-	- U33.3 connected to /IRQ line via inverter U67.9,
-	  providing timer IRQ for input polling.
+    - U33.3 connected to /IRQ line via inverter U67.9,
+      providing timer IRQ for input polling.
 
-	- U43 removed from timer circuit, U52.9 wired directly to
-	  U32.5, increasing timer frequency to 250 Hz.
+    - U43 removed from timer circuit, U52.9 wired directly to
+      U32.5, increasing timer frequency to 250 Hz.
 
   audio pcb:
-	- U6.10 wired to U14.21, cut from R14/16
-	- R16 wired to R1 in series, R1 cut from GND
-	- R14 wired to GND instead of U6.10
+    - U6.10 wired to U14.21, cut from R14/16
+    - R16 wired to R1 in series, R1 cut from GND
+    - R14 wired to GND instead of U6.10
 
-	- U5.10 wired to U15.21, cut from R13/15
-	- R15 wired to R2 in series, R2 cut from GND
-	- R13 wired to GND instead of U5.10
+    - U5.10 wired to U15.21, cut from R13/15
+    - R15 wired to R2 in series, R2 cut from GND
+    - R13 wired to GND instead of U5.10
 
-	- EXT VCO DACs (U11, U12) and surrounding logic not placed
-	- Numerous changes to SN74677 timing component R & C values
+    - EXT VCO DACs (U11, U12) and surrounding logic not placed
+    - Numerous changes to SN74677 timing component R & C values
 
 TODO:
 - The game reads some unmapped memory addresses, missing ROMs? There's an empty
@@ -46,6 +46,8 @@ TODO:
 #include "cpu/m6800/m6800.h"
 #include "machine/6821pia.h"
 #include "sound/sn76477.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class toratora_state : public driver_device
@@ -62,11 +64,11 @@ public:
 		m_pia_u3(*this, "pia_u3") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<uint8_t> m_videoram;
 
 	/* video-related */
 	int        m_timer;
-	UINT8      m_clear_tv;
+	uint8_t      m_clear_tv;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -89,7 +91,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(sn2_ca2_u2_w);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	UINT32 screen_update_toratora(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_toratora(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(toratora_timer);
 };
 
@@ -113,7 +115,7 @@ WRITE_LINE_MEMBER(toratora_state::cb2_u2_w)
  *
  *************************************/
 
-UINT32 toratora_state::screen_update_toratora(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t toratora_state::screen_update_toratora(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	offs_t offs;
 
@@ -121,13 +123,13 @@ UINT32 toratora_state::screen_update_toratora(screen_device &screen, bitmap_rgb3
 	{
 		int i;
 
-		UINT8 y = offs >> 5;
-		UINT8 x = offs << 3;
-		UINT8 data = m_videoram[offs];
+		uint8_t y = offs >> 5;
+		uint8_t x = offs << 3;
+		uint8_t data = m_videoram[offs];
 
 		for (i = 0; i < 8; i++)
 		{
-			pen_t pen = (data & 0x80) ? rgb_t::white : rgb_t::black;
+			pen_t pen = (data & 0x80) ? rgb_t::white() : rgb_t::black();
 			bitmap.pix32(y, x) = pen;
 
 			data = data << 1;
@@ -254,7 +256,7 @@ WRITE8_MEMBER(toratora_state::sn1_port_b_u3_w)
 	 * However, shot audio is muted if V < 1.0, as mixer state
 	 * is set to SLF & VCO. Should SLF FF state be inverted?
 	 */
-	m_sn1->slf_cap_voltage_w((data >> 5) == 0x7 ? 2.5 : SN76477_EXTERNAL_VOLTAGE_DISCONNECT);
+	m_sn1->slf_cap_voltage_w((data >> 5) == 0x7 ? 2.5 : sn76477_device::EXTERNAL_VOLTAGE_DISCONNECT);
 }
 
 
@@ -290,7 +292,7 @@ WRITE8_MEMBER(toratora_state::sn2_port_b_u2_w)
 	m_sn2->envelope_1_w   ((data >> 3) & 0x01);
 	m_sn2->envelope_2_w   ((data >> 4) & 0x01);
 	m_sn2->slf_res_w(resistances[(data >> 5)]);
-	m_sn2->slf_cap_voltage_w((data >> 5) == 0x7 ? 2.5 : SN76477_EXTERNAL_VOLTAGE_DISCONNECT);
+	m_sn2->slf_cap_voltage_w((data >> 5) == 0x7 ? 2.5 : sn76477_device::EXTERNAL_VOLTAGE_DISCONNECT);
 
 	/* Seems like the output should be muted in this case, but unsure of exact mechanism */
 	m_sn2->amplitude_res_w((data >> 5) == 0x0 ? RES_INF : RES_K(47));
@@ -388,7 +390,7 @@ void toratora_state::machine_reset()
 	m_clear_tv = 0;
 }
 
-static MACHINE_CONFIG_START( toratora, toratora_state )
+static MACHINE_CONFIG_START( toratora )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, 5185000 / 8) /* 5.185 MHz XTAL divided by 8 (@ U94.12) */
@@ -520,5 +522,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1980, toratora, 0,        toratora, toratora, driver_device, 0, ROT90, "Game Plan", "Tora Tora (prototype?)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, toratorab,toratora, toratora, toratora, driver_device, 0, ROT90, "Game Plan", "Tora Tora (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, toratora, 0,        toratora, toratora, toratora_state, 0, ROT90, "Game Plan", "Tora Tora (prototype?)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, toratorab,toratora, toratora, toratora, toratora_state, 0, ROT90, "Game Plan", "Tora Tora (set 2)",      MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

@@ -274,13 +274,14 @@ Notes:
 */
 
 #include "emu.h"
+#include "includes/psikyosh.h"
 
-#include "cpu/sh2/sh2.h"
+#include "cpu/sh/sh2.h"
 #include "machine/eepromser.h"
 #include "machine/watchdog.h"
 #include "sound/ymf278b.h"
+#include "speaker.h"
 
-#include "includes/psikyosh.h"
 
 static const gfx_layout layout_16x16x4 =
 {
@@ -415,8 +416,8 @@ P1KEY11  29|30  P2KEY11
     GND  55|56  GND
 */
 
-	UINT32 controls = ioport("CONTROLLER")->read();
-	UINT32 value = ioport("INPUTS")->read();
+	uint32_t controls = ioport("CONTROLLER")->read();
+	uint32_t value = ioport("INPUTS")->read();
 
 	if(controls) {
 		// Clearly has ghosting, game will only recognise one key depressed at once, and keyboard can only represent keys with distinct rows and columns
@@ -438,7 +439,7 @@ P1KEY11  29|30  P2KEY11
 			KEY11 = 0x0800  // JAMMA P1 Button 1
 		}; // Mahjong->JAMMA mapping specific to this game pcb
 
-		UINT16 key_codes[] = { // treated as IP_ACTIVE_LOW, game inverts them upon reading
+		uint16_t key_codes[] = { // treated as IP_ACTIVE_LOW, game inverts them upon reading
 //          ROW (distinct pins for P1 or P2) | COLUMN (shared for P1+P2)
 			KEY4 | KEY3,  // A
 			KEY4 | KEY2,  // B
@@ -461,8 +462,8 @@ P1KEY11  29|30  P2KEY11
 			KEY11 | KEY6, // Ron
 			KEY1 | KEY3   // Start
 		}; // generic Mahjong keyboard encoder, corresponds to ordering in input port
-		UINT32 keys = ioport("MAHJONG")->read();
-		UINT32 which_key = 0x1;
+		uint32_t keys = ioport("MAHJONG")->read();
+		uint32_t which_key = 0x1;
 		int count = 0;
 
 		// HACK: read IPT_START1 from "INPUTS" to avoid listing it twice or having two independent STARTs listed
@@ -473,7 +474,7 @@ P1KEY11  29|30  P2KEY11
 		do {
 			// since we can't handle multiple keys, just return the first one depressed
 			if((keys & which_key) && (count < ARRAY_LENGTH(key_codes))) {
-				value &= ~((UINT32)(key_codes[count]) << 16); // mask in selected word as IP_ACTIVE_LOW
+				value &= ~((uint32_t)(key_codes[count]) << 16); // mask in selected word as IP_ACTIVE_LOW
 				break;
 			}
 			which_key <<= 1;
@@ -595,6 +596,16 @@ static INPUT_PORTS_START( soldivid )
 	PORT_DIPNAME( 0x01000000, 0x01000000, DEF_STR( Region ) )
 	PORT_DIPSETTING(          0x00000000, DEF_STR( Japan ) )
 	PORT_DIPSETTING(          0x01000000, DEF_STR( World ) )
+	PORT_BIT( 0x10000000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( soldividk )
+	PORT_INCLUDE( common )
+
+	PORT_START("JP4")   /* jumper pads on the PCB */
+//  PORT_DIPNAME( 0x01000000, 0x01000000, DEF_STR( Region ) ) /* Game is hard coded to Korea */
+//  PORT_DIPSETTING(          0x00000000, DEF_STR( Japan ) )
+//  PORT_DIPSETTING(          0x01000000, DEF_STR( World ) )
 	PORT_BIT( 0x10000000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 INPUT_PORTS_END
 
@@ -764,7 +775,7 @@ void psikyosh_state::machine_start()
 }
 
 
-static MACHINE_CONFIG_START( psikyo3v1, psikyosh_state )
+static MACHINE_CONFIG_START( psikyo3v1 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SH2, MASTER_CLOCK/2)
@@ -784,7 +795,7 @@ static MACHINE_CONFIG_START( psikyo3v1, psikyosh_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 40*8-1, 0, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(psikyosh_state, screen_update_psikyosh)
-	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram32_device, vblank_copy_rising)
+	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram32_device, vblank_copy_rising))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", psikyosh)
 	MCFG_PALETTE_ADD("palette", 0x5000/4)
@@ -792,12 +803,11 @@ static MACHINE_CONFIG_START( psikyo3v1, psikyosh_state )
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymf", YMF278B, MASTER_CLOCK/2)
 	MCFG_YMF278B_IRQ_HANDLER(INPUTLINE("maincpu", 12))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( psikyo5, psikyo3v1 )
@@ -828,6 +838,24 @@ ROM_START( soldivid )
 	ROM_REGION( 0x200000, "maincpu", 0)
 	ROM_LOAD32_WORD_SWAP( "2-prog_l.u18", 0x000002, 0x080000, CRC(cf179b04) SHA1(343f00a81cffd44334a4db81b6b828b7cf73c1e8) )
 	ROM_LOAD32_WORD_SWAP( "1-prog_h.u17", 0x000000, 0x080000, CRC(f467d1c4) SHA1(a011e6f310a54f09efa0bf4597783cd78c05ad6f) )
+
+	ROM_REGION( 0x3800000, "gfx1", 0 )
+	/* This Space Empty! */
+	ROM_LOAD32_WORD_SWAP( "4l.u10", 0x2000000, 0x400000, CRC(9eb9f269) SHA1(4a4d90eefe62b5462f5ed5e062eea7b6b4900f85) )
+	ROM_LOAD32_WORD_SWAP( "4h.u31", 0x2000002, 0x400000, CRC(7c76cfe7) SHA1(14e291e840a4afe3802fe1847615c5e806d7492a) )
+	ROM_LOAD32_WORD_SWAP( "5l.u9",  0x2800000, 0x400000, CRC(c59c6858) SHA1(bd580b57e432ef42295060c5a84c8129d9b995f7) )
+	ROM_LOAD32_WORD_SWAP( "5h.u30", 0x2800002, 0x400000, CRC(73bc66d0) SHA1(7988ce81ff43235a3b30ddd8fd9419530a07b6ba) )
+	ROM_LOAD32_WORD_SWAP( "6l.u8",  0x3000000, 0x400000, CRC(f01b816e) SHA1(2a0d86c1c106eef539028aa9ebe49d13216a6b9c) )
+	ROM_LOAD32_WORD_SWAP( "6h.u37", 0x3000002, 0x400000, CRC(fdd57361) SHA1(f58d91acde1f4e6d4f0e8dcd1b23aa5092d89916) )
+
+	ROM_REGION( 0x400000, "ymf", 0 )
+	ROM_LOAD( "sound.bin", 0x000000, 0x400000, CRC(e98f8d45) SHA1(7791c0f31d08f37c6ec65e7cecf8ef54ca73b1fd) )
+ROM_END
+
+ROM_START( soldividk )
+	ROM_REGION( 0x200000, "maincpu", 0)
+	ROM_LOAD32_WORD_SWAP( "9-prog_lk.u18", 0x000002, 0x080000, CRC(b534029d) SHA1(a96ca55e6694c5537d489d40bc890c376bbce933) )
+	ROM_LOAD32_WORD_SWAP( "8-prog_hk.u17", 0x000000, 0x080000, CRC(a48e3206) SHA1(d560286972de2a0baa5369672a0190b7bd421843) )
 
 	ROM_REGION( 0x3800000, "gfx1", 0 )
 	/* This Space Empty! */
@@ -944,11 +972,49 @@ ROM_END
 
 /* PS5 */
 
-ROM_START( gunbird2 )
+ROM_START( gunbird2 ) /* Internal date string shows Oct 07 16:05 */
 	ROM_REGION( 0x180000, "maincpu", 0)
 	ROM_LOAD32_WORD_SWAP( "2_prog_l.u16", 0x000002, 0x080000, CRC(76f934f0) SHA1(cf197796d66f15639a6b3d5311c18da33cefd06b) )
 	ROM_LOAD32_WORD_SWAP( "1_prog_h.u17", 0x000000, 0x080000, CRC(7328d8bf) SHA1(c640de1ab5b32400b2d77e0dc6e3ee0f78ab7803) )
 	ROM_LOAD16_WORD_SWAP( "3_pdata.u1",   0x100000, 0x080000, CRC(a5b697e6) SHA1(947f124fa585c2cf77c6571af7559bd652897b89) )
+
+	ROM_REGION( 0x3800000, "gfx1", 0 )
+	ROM_LOAD32_WORD( "0l.u3",  0x0000000, 0x800000, CRC(5c826bc8) SHA1(74fb6b242b4c5fe5365cfcc3029ed6da4cf3a621) )
+	ROM_LOAD32_WORD( "0h.u10", 0x0000002, 0x800000, CRC(3df0cb6c) SHA1(271d276fa0f63d84e458223316a9517865fc2255) )
+	ROM_LOAD32_WORD( "1l.u4",  0x1000000, 0x800000, CRC(1558358d) SHA1(e3b9c3da4e9b29ffa9568b57d14fe2b600aead68) )
+	ROM_LOAD32_WORD( "1h.u11", 0x1000002, 0x800000, CRC(4ee0103b) SHA1(29bbe0162dda39919fcd188ea4a6b7b5f20366ff) )
+	ROM_LOAD32_WORD( "2l.u5",  0x2000000, 0x800000, CRC(e1c7a7b8) SHA1(b5f6e5d53e21928197773df7dde0e7c83f4082af) )
+	ROM_LOAD32_WORD( "2h.u12", 0x2000002, 0x800000, CRC(bc8a41df) SHA1(90460b11eea778f17cf8be67430e2ab149680686) )
+	ROM_LOAD32_WORD( "3l.u6",  0x3000000, 0x400000, CRC(0229d37f) SHA1(f9d98d1d2dda2d552b2a46c76b4c7fc84b1aa4c6) )
+	ROM_LOAD32_WORD( "3h.u13", 0x3000002, 0x400000, CRC(f41bbf2b) SHA1(b705274e392541e2f513a4ae4bae543c03be0913) )
+
+	ROM_REGION( 0x400000, "ymf", 0 ) /* Samples */
+	ROM_LOAD( "sound.u9", 0x000000, 0x400000, CRC(f19796ab) SHA1(b978f0550ebd675e8ce9d9edcfcc3f6214e49e8b) )
+
+	ROM_REGION( 0x100, "eeprom", 0 )
+	ROM_LOAD( "eeprom-gunbird2.bin", 0x0000, 0x0100, CRC(7ac38846) SHA1(c5f4b05a94211f3c96b8c472adbe634f2e77d753) )
+ROM_END
+
+/*
+This Program & Data ROM set came from a PCB in Korea.
+
+Notable differences:
+ On initial bootup, no sound of "Marion...."
+ On inserting coins, no "Gunbird 2" wave, just a tone pattern
+ On selecting a character to play, no character name wave, just a simple tone
+ On capturing a power-up there's no "Power Up" in character voice, just a simple tone
+
+Seems to have minimal changes, probably just the sound table.  Internal date string
+shows Oct 08 17:02, while the above parent set shows Oct 07 16:05
+
+This set can still be set Japan, International Ver A. or International Ver B. via jumper pads
+*/
+
+ROM_START( gunbird2a ) /* Internal date string shows Oct 08 17:02 - No specific Korean copyright / message, but made for the Korean market? */
+	ROM_REGION( 0x180000, "maincpu", 0)
+	ROM_LOAD32_WORD_SWAP( "prog_l.u16", 0x000002, 0x080000, CRC(974f85ba) SHA1(4e19b12bd5f268088317ea231bbe7f9d2d694b2b) ) /* these roms had no labels */
+	ROM_LOAD32_WORD_SWAP( "prog_h.u17", 0x000000, 0x080000, CRC(cb0cb826) SHA1(8827e9ebfedbc63dbf41c6a5c994a691a6d63fdb) )
+	ROM_LOAD16_WORD_SWAP( "pdata.u1",   0x100000, 0x080000, CRC(23751839) SHA1(4762685d1f6843e8e53eae6c014e66b98fa15eb7) )
 
 	ROM_REGION( 0x3800000, "gfx1", 0 )
 	ROM_LOAD32_WORD( "0l.u3",  0x0000000, 0x800000, CRC(5c826bc8) SHA1(74fb6b242b4c5fe5365cfcc3029ed6da4cf3a621) )
@@ -1190,22 +1256,24 @@ DRIVER_INIT_MEMBER(psikyosh_state,mjgtaste)
 }
 
 
-/*     YEAR  NAME      PARENT    MACHINE    INPUT     INIT      MONITOR COMPANY   FULLNAME FLAGS */
+//    YEAR  NAME       PARENT    MACHINE      INPUT     STATE           INIT      MONITOR COMPANY   FULLNAME FLAGS */
 
 /* ps3-v1 */
-GAME( 1997, soldivid, 0,        psikyo3v1,   soldivid, psikyosh_state, ps3, ROT0,   "Psikyo", "Sol Divide - The Sword Of Darkness", MACHINE_SUPPORTS_SAVE )
-GAME( 1997, s1945ii,  0,        psikyo3v1,   s1945ii,  psikyosh_state, ps3, ROT270, "Psikyo", "Strikers 1945 II", MACHINE_SUPPORTS_SAVE )
-GAME( 1998, daraku,   0,        psikyo3v1,   daraku,   psikyosh_state, ps3, ROT0,   "Psikyo", "Daraku Tenshi - The Fallen Angels", MACHINE_SUPPORTS_SAVE )
-GAME( 1998, sbomber,  0,        psikyo3v1,   sbomberb, psikyosh_state, ps3, ROT270, "Psikyo", "Space Bomber (ver. B)", MACHINE_SUPPORTS_SAVE )
-GAME( 1998, sbombera, sbomber,  psikyo3v1,   sbomberb, psikyosh_state, ps3, ROT270, "Psikyo", "Space Bomber", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, soldivid,  0,        psikyo3v1,   soldivid, psikyosh_state, ps3,      ROT0,   "Psikyo", "Sol Divide - The Sword Of Darkness", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, soldividk, soldivid, psikyo3v1,   soldividk,psikyosh_state, ps3,      ROT0,   "Psikyo", "Sol Divide - The Sword Of Darkness (Korea)", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, s1945ii,   0,        psikyo3v1,   s1945ii,  psikyosh_state, ps3,      ROT270, "Psikyo", "Strikers 1945 II", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, daraku,    0,        psikyo3v1,   daraku,   psikyosh_state, ps3,      ROT0,   "Psikyo", "Daraku Tenshi - The Fallen Angels", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, sbomber,   0,        psikyo3v1,   sbomberb, psikyosh_state, ps3,      ROT270, "Psikyo", "Space Bomber (ver. B)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, sbombera,  sbomber,  psikyo3v1,   sbomberb, psikyosh_state, ps3,      ROT270, "Psikyo", "Space Bomber", MACHINE_SUPPORTS_SAVE )
 
 /* ps5 */
-GAME( 1998, gunbird2, 0,        psikyo5,     gunbird2, psikyosh_state, ps5, ROT270, "Psikyo", "Gunbird 2", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, s1945iii, 0,        psikyo5,     s1945iii, psikyosh_state, ps5, ROT270, "Psikyo", "Strikers 1945 III (World) / Strikers 1999 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, gunbird2,  0,        psikyo5,     gunbird2, psikyosh_state, ps5,      ROT270, "Psikyo", "Gunbird 2 (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, gunbird2a, gunbird2, psikyo5,     gunbird2, psikyosh_state, ps5,      ROT270, "Psikyo", "Gunbird 2 (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, s1945iii,  0,        psikyo5,     s1945iii, psikyosh_state, ps5,      ROT270, "Psikyo", "Strikers 1945 III (World) / Strikers 1999 (Japan)", MACHINE_SUPPORTS_SAVE )
 
 /* ps5v2 */
-GAME( 2000, dragnblz, 0,        psikyo5,     dragnblz, psikyosh_state, ps5,      ROT270, "Psikyo", "Dragon Blaze", MACHINE_SUPPORTS_SAVE )
-GAME( 2000, tgm2,     0,        psikyo5_240, tgm2,     psikyosh_state, ps5,      ROT0,   "Arika",  "Tetris the Absolute The Grand Master 2", MACHINE_SUPPORTS_SAVE )
-GAME( 2000, tgm2p,    tgm2,     psikyo5_240, tgm2,     psikyosh_state, ps5,      ROT0,   "Arika",  "Tetris the Absolute The Grand Master 2 Plus", MACHINE_SUPPORTS_SAVE )
-GAME( 2001, gnbarich, 0,        psikyo5,     gnbarich, psikyosh_state, ps5,      ROT270, "Psikyo", "Gunbarich", MACHINE_SUPPORTS_SAVE )
-GAME( 2002, mjgtaste, 0,        psikyo5,     mjgtaste, psikyosh_state, mjgtaste, ROT0,   "Psikyo", "Mahjong G-Taste", MACHINE_SUPPORTS_SAVE )
+GAME( 2000, dragnblz,  0,        psikyo5,     dragnblz, psikyosh_state, ps5,      ROT270, "Psikyo", "Dragon Blaze", MACHINE_SUPPORTS_SAVE )
+GAME( 2000, tgm2,      0,        psikyo5_240, tgm2,     psikyosh_state, ps5,      ROT0,   "Arika",  "Tetris the Absolute The Grand Master 2", MACHINE_SUPPORTS_SAVE )
+GAME( 2000, tgm2p,     tgm2,     psikyo5_240, tgm2,     psikyosh_state, ps5,      ROT0,   "Arika",  "Tetris the Absolute The Grand Master 2 Plus", MACHINE_SUPPORTS_SAVE )
+GAME( 2001, gnbarich,  0,        psikyo5,     gnbarich, psikyosh_state, ps5,      ROT270, "Psikyo", "Gunbarich", MACHINE_SUPPORTS_SAVE )
+GAME( 2002, mjgtaste,  0,        psikyo5,     mjgtaste, psikyosh_state, mjgtaste, ROT0,   "Psikyo", "Mahjong G-Taste", MACHINE_SUPPORTS_SAVE )

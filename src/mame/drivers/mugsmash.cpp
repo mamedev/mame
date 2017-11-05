@@ -42,11 +42,15 @@ behavior we use .
 */
 
 #include "emu.h"
+#include "includes/mugsmash.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 #include "sound/okim6295.h"
-#include "includes/mugsmash.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 WRITE16_MEMBER(mugsmash_state::mugsmash_reg2_w)
 {
@@ -57,7 +61,6 @@ WRITE16_MEMBER(mugsmash_state::mugsmash_reg2_w)
 	{
 	case 1:
 		m_soundlatch->write(space, 1, data & 0xff);
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE );
 		break;
 
 	default:
@@ -150,7 +153,7 @@ WRITE16_MEMBER(mugsmash_state::mugsmash_reg2_w)
 #if USE_FAKE_INPUT_PORTS
 READ16_MEMBER(mugsmash_state::mugsmash_input_ports_r)
 {
-	UINT16 data = 0xffff;
+	uint16_t data = 0xffff;
 
 	switch (offset)
 	{
@@ -393,7 +396,7 @@ void mugsmash_state::machine_start()
 {
 }
 
-static MACHINE_CONFIG_START( mugsmash, mugsmash_state )
+static MACHINE_CONFIG_START( mugsmash )
 
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)
 	MCFG_CPU_PROGRAM_MAP(mugsmash_map)
@@ -420,13 +423,14 @@ static MACHINE_CONFIG_START( mugsmash, mugsmash_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
 	MCFG_YM2151_ADD("ymsnd", 3579545)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)   /* music */
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 
-	MCFG_OKIM6295_ADD("oki", 1122000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", 1122000, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50) /* sound fx */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 MACHINE_CONFIG_END
@@ -458,4 +462,4 @@ ROM_START( mugsmash )
 	ROM_LOAD( "mugs_15.bin", 0x180000, 0x080000, CRC(82e8187c) SHA1(c7a0e1b3d90dbbe2588886a27a07a9c336447ae3) )
 ROM_END
 
-GAME( 1990?, mugsmash, 0, mugsmash, mugsmash, driver_device, 0, ROT0, "Electronic Devices Italy / 3D Games England", "Mug Smashers", MACHINE_SUPPORTS_SAVE )
+GAME( 1990?, mugsmash, 0, mugsmash, mugsmash, mugsmash_state, 0, ROT0, "Electronic Devices Italy / 3D Games England", "Mug Smashers", MACHINE_SUPPORTS_SAVE )

@@ -1,4 +1,4 @@
-// license:LGPL-2.1+
+// license:BSD-3-Clause
 // copyright-holders:Tomasz Slanina, Pierpaolo Prazzoli
 class pitnrun_state : public driver_device
 {
@@ -14,21 +14,21 @@ public:
 		m_spriteram(*this, "spriteram") { }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_mcu;
+	optional_device<cpu_device> m_mcu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_videoram2;
-	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_videoram2;
+	required_shared_ptr<uint8_t> m_spriteram;
 
 	int m_nmi;
-	UINT8 m_fromz80;
-	UINT8 m_toz80;
+	uint8_t m_fromz80;
+	uint8_t m_toz80;
 	int m_zaccept;
 	int m_zready;
-	UINT8 m_portA_in;
-	UINT8 m_portA_out;
+	uint8_t m_portA_in;
+	uint8_t m_portA_out;
 	int m_address;
 	int m_h_heed;
 	int m_v_heed;
@@ -40,9 +40,9 @@ public:
 	tilemap_t *m_bg;
 	tilemap_t *m_fg;
 
-	DECLARE_WRITE8_MEMBER(nmi_enable_w);
-	DECLARE_WRITE8_MEMBER(hflip_w);
-	DECLARE_WRITE8_MEMBER(vflip_w);
+	DECLARE_WRITE_LINE_MEMBER(nmi_enable_w);
+	DECLARE_WRITE_LINE_MEMBER(hflip_w);
+	DECLARE_WRITE_LINE_MEMBER(vflip_w);
 	DECLARE_READ8_MEMBER(mcu_data_r);
 	DECLARE_WRITE8_MEMBER(mcu_data_w);
 	DECLARE_READ8_MEMBER(mcu_status_r);
@@ -53,12 +53,13 @@ public:
 	DECLARE_READ8_MEMBER(m68705_portC_r);
 	DECLARE_WRITE8_MEMBER(videoram_w);
 	DECLARE_WRITE8_MEMBER(videoram2_w);
-	DECLARE_WRITE8_MEMBER(char_bank_select);
+	DECLARE_WRITE_LINE_MEMBER(char_bank_select_w);
 	DECLARE_WRITE8_MEMBER(scroll_w);
+	DECLARE_WRITE8_MEMBER(scroll_y_w);
 	DECLARE_WRITE8_MEMBER(ha_w);
 	DECLARE_WRITE8_MEMBER(h_heed_w);
 	DECLARE_WRITE8_MEMBER(v_heed_w);
-	DECLARE_WRITE8_MEMBER(color_select_w);
+	DECLARE_WRITE_LINE_MEMBER(color_select_w);
 
 	TILE_GET_INFO_MEMBER(get_tile_info1);
 	TILE_GET_INFO_MEMBER(get_tile_info2);
@@ -74,7 +75,7 @@ public:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(pitnrun);
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void spotlights();
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
 };

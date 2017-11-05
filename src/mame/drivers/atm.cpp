@@ -6,22 +6,15 @@ MicroART ATM (clone of Spectrum)
 
 Not working because of banking issues.
 
-The direct_update_handler needs rewriting, because removing it allows the
-computer to boot up (with keyboard problems).
-
 *******************************************************************************************/
 
 #include "emu.h"
 #include "includes/spectrum.h"
 #include "includes/spec128.h"
 #include "includes/specpls3.h"
-#include "imagedev/snapquik.h"
-#include "imagedev/cassette.h"
+
 #include "sound/ay8910.h"
-#include "sound/speaker.h"
 #include "machine/beta.h"
-#include "machine/ram.h"
-#include "machine/spec_snqk.h"
 
 
 class atm_state : public spectrum_state
@@ -37,7 +30,9 @@ public:
 	{ }
 
 	DECLARE_WRITE8_MEMBER(atm_port_7ffd_w);
-	DIRECT_UPDATE_MEMBER(atm_direct);
+	DECLARE_READ8_MEMBER(beta_neutral_r);
+	DECLARE_READ8_MEMBER(beta_enable_r);
+	DECLARE_READ8_MEMBER(beta_disable_r);
 	DECLARE_MACHINE_RESET(atm);
 
 protected:
@@ -48,51 +43,14 @@ protected:
 	required_device<beta_disk_device> m_beta;
 
 private:
-	UINT8 *m_p_ram;
+	address_space *m_program;
+	uint8_t *m_p_ram;
 	void atm_update_memory();
 };
 
-
-DIRECT_UPDATE_MEMBER(atm_state::atm_direct)
-{
-	UINT16 pc = m_maincpu->state_int(STATE_GENPCBASE);
-
-	if (m_beta->started() && m_beta->is_active())
-	{
-		if (pc >= 0x4000)
-		{
-			m_ROMSelection = BIT(m_port_7ffd_data, 4);
-			m_beta->disable();
-			m_bank1->set_base(&m_p_ram[0x10000 + (m_ROMSelection<<14)]);
-		}
-	}
-	else if (((pc & 0xff00) == 0x3d00) && (m_ROMSelection==1))
-	{
-		m_ROMSelection = 3;
-		if (m_beta->started())
-			m_beta->enable();
-
-	}
-	if(address<=0x3fff)
-	{
-		if (m_ROMSelection == 3)
-		{
-			direct.explicit_configure(0x0000, 0x3fff, 0x3fff, &m_p_ram[0x18000]);
-			m_bank1->set_base(&m_p_ram[0x18000]);
-		}
-		else
-		{
-			direct.explicit_configure(0x0000, 0x3fff, 0x3fff, &m_p_ram[0x10000 + (m_ROMSelection<<14)]);
-			m_bank1->set_base(&m_p_ram[0x10000 + (m_ROMSelection<<14)]);
-		}
-		return ~0;
-	}
-	return address;
-}
-
 void atm_state::atm_update_memory()
 {
-	UINT8 *messram = m_ram->pointer();
+	uint8_t *messram = m_ram->pointer();
 
 	m_screen_location = messram + ((m_port_7ffd_data & 8) ? (7<<14) : (5<<14));
 
@@ -121,33 +79,67 @@ WRITE8_MEMBER(atm_state::atm_port_7ffd_w)
 	atm_update_memory();
 }
 
+READ8_MEMBER(atm_state::beta_neutral_r)
+{
+	return m_program->read_byte(offset);
+}
+
+READ8_MEMBER(atm_state::beta_enable_r)
+{
+	if(m_ROMSelection == 1) {
+		m_ROMSelection = 3;
+		if (m_beta->started()) {
+			m_beta->enable();
+			m_bank1->set_base(&m_p_ram[0x18000]);
+		}
+	}
+	return m_program->read_byte(offset + 0x3d00);
+}
+
+READ8_MEMBER(atm_state::beta_disable_r)
+{
+	if (m_beta->started() && m_beta->is_active()) {
+		m_ROMSelection = BIT(m_port_7ffd_data, 4);
+		m_beta->disable();
+		m_bank1->set_base(&m_p_ram[0x10000 + (m_ROMSelection<<14)]);
+	}
+	return m_program->read_byte(offset + 0x4000);
+}
+
+static ADDRESS_MAP_START(atm_mem, AS_PROGRAM, 8, atm_state)
+	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK("bank1")
+	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK("bank2")
+	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK("bank3")
+	AM_RANGE(0xc000, 0xffff) AM_RAMBANK("bank4")
+ADDRESS_MAP_END
+
 static ADDRESS_MAP_START (atm_io, AS_IO, 8, atm_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x001f, 0x001f) AM_DEVREADWRITE(BETA_DISK_TAG, beta_disk_device, status_r, command_w) AM_MIRROR(0xff00)
 	AM_RANGE(0x003f, 0x003f) AM_DEVREADWRITE(BETA_DISK_TAG, beta_disk_device, track_r, track_w) AM_MIRROR(0xff00)
 	AM_RANGE(0x005f, 0x005f) AM_DEVREADWRITE(BETA_DISK_TAG, beta_disk_device, sector_r, sector_w) AM_MIRROR(0xff00)
 	AM_RANGE(0x007f, 0x007f) AM_DEVREADWRITE(BETA_DISK_TAG, beta_disk_device, data_r, data_w) AM_MIRROR(0xff00)
-	AM_RANGE(0x00fe, 0x00fe) AM_READWRITE(spectrum_port_fe_r,spectrum_port_fe_w) AM_MIRROR(0xff00) AM_MASK(0xffff)
+	AM_RANGE(0x00fe, 0x00fe) AM_READWRITE(spectrum_port_fe_r,spectrum_port_fe_w) AM_SELECT(0xff00)
 	AM_RANGE(0x00ff, 0x00ff) AM_DEVREADWRITE(BETA_DISK_TAG, beta_disk_device, state_r, param_w) AM_MIRROR(0xff00)
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(atm_port_7ffd_w)  AM_MIRROR(0x3ffd)
 	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("ay8912", ay8910_device, data_w) AM_MIRROR(0x3ffd)
 	AM_RANGE(0xc000, 0xc000) AM_DEVREADWRITE("ay8912", ay8910_device, data_r, address_w) AM_MIRROR(0x3ffd)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START (atm_switch, AS_OPCODES, 8, atm_state)
+	AM_RANGE(0x3d00, 0x3dff) AM_READ(beta_enable_r)
+	AM_RANGE(0x0000, 0x3fff) AM_READ(beta_neutral_r) // Overlap with previous because we want real addresses on the 3e00-3fff range
+	AM_RANGE(0x4000, 0xffff) AM_READ(beta_disable_r)
+ADDRESS_MAP_END
+
 MACHINE_RESET_MEMBER(atm_state,atm)
 {
-	UINT8 *messram = m_ram->pointer();
-	address_space &space = m_maincpu->space(AS_PROGRAM);
+	uint8_t *messram = m_ram->pointer();
+	m_program = &m_maincpu->space(AS_PROGRAM);
 	m_p_ram = memregion("maincpu")->base();
 
-	space.install_read_bank(0x0000, 0x3fff, "bank1");
-	space.unmap_write(0x0000, 0x3fff);
-
 	if (m_beta->started())
-	{
 		m_beta->enable();
-	}
-	space.set_direct_update_handler(direct_update_delegate(FUNC(atm_state::atm_direct), this));
 
 	memset(messram,0,128*1024);
 
@@ -186,14 +178,18 @@ static GFXDECODE_START( atmtb2 )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_DERIVED_CLASS( atm, spectrum_128, atm_state )
+static MACHINE_CONFIG_DERIVED( atm, spectrum_128 )
 	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(atm_mem)
 	MCFG_CPU_IO_MAP(atm_io)
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(atm_switch)
 	MCFG_MACHINE_RESET_OVERRIDE(atm_state, atm )
 
 	MCFG_BETA_DISK_ADD(BETA_DISK_TAG)
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", atm)
+
+	MCFG_DEVICE_REMOVE("exp")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( atmtb2, atm )
@@ -244,8 +240,8 @@ ROM_START( atmtb2 )
 	ROM_LOAD( "sgen.rom", 0x0000, 0x0800, CRC(1f4387d6) SHA1(93b3774dc8a486643a1bdd48c606b0c84fa0e22b))
 ROM_END
 
-/*    YEAR  NAME    PARENT   COMPAT  MACHINE INPUT      CLASS          INIT    COMPANY     FULLNAME */
-COMP( 1991, atm,    spec128, 0,      atm,    spec_plus, driver_device, 0,    "MicroART", "ATM", MACHINE_NOT_WORKING)
-//COMP( 1991, atmtb1, spec128, 0,      atm,    spec_plus, driver_device, 0,    "MicroART", "ATM-turbo1", MACHINE_NOT_WORKING)
-COMP( 1993, atmtb2, spec128, 0,      atmtb2, spec_plus, driver_device, 0,    "MicroART", "ATM-turbo2", MACHINE_NOT_WORKING)
-//COMP( 1994, turbo2, spec128, 0,      atm,    spec_plus, driver_device, 0,    "MicroART", "TURBO 2+", MACHINE_NOT_WORKING)
+/*    YEAR  NAME    PARENT   COMPAT  MACHINE INPUT      CLASS      INIT  COMPANY     FULLNAME */
+COMP( 1991, atm,    spec128, 0,      atm,    spec_plus, atm_state, 0,    "MicroART", "ATM", MACHINE_NOT_WORKING)
+//COMP( 1991, atmtb1, spec128, 0,      atm,    spec_plus, atm_state, 0,    "MicroART", "ATM-turbo1", MACHINE_NOT_WORKING)
+COMP( 1993, atmtb2, spec128, 0,      atmtb2, spec_plus, atm_state, 0,    "MicroART", "ATM-turbo2", MACHINE_NOT_WORKING)
+//COMP( 1994, turbo2, spec128, 0,      atm,    spec_plus, atm_state, 0,    "MicroART", "TURBO 2+", MACHINE_NOT_WORKING)

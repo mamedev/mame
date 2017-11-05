@@ -39,11 +39,11 @@ enum
 static const int div_tab[4] = { 1, 4, 8, 16 };
 
 
-const device_type MC68HC11 = &device_creator<mc68hc11_cpu_device>;
+DEFINE_DEVICE_TYPE(MC68HC11, mc68hc11_cpu_device, "mc68hc11", "MC68HC11")
 
 
-mc68hc11_cpu_device::mc68hc11_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: cpu_device(mconfig, MC68HC11, "MC68HC11", tag, owner, clock, "mc68hc11", __FILE__)
+mc68hc11_cpu_device::mc68hc11_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: cpu_device(mconfig, MC68HC11, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0 )
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, 8, 0)
 	/* defaults it to the HC11M0 version for now (I might strip this down on a later date) */
@@ -53,11 +53,18 @@ mc68hc11_cpu_device::mc68hc11_cpu_device(const machine_config &mconfig, const ch
 {
 }
 
+device_memory_interface::space_config_vector mc68hc11_cpu_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config),
+		std::make_pair(AS_IO,      &m_io_config)
+	};
+}
 
-offs_t mc68hc11_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t mc68hc11_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( hc11 );
-	return CPU_DISASSEMBLE_NAME(hc11)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(hc11)(this, stream, pc, oprom, opram, options);
 }
 
 
@@ -66,7 +73,7 @@ offs_t mc68hc11_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UI
 /*****************************************************************************/
 /* Internal registers */
 
-UINT8 mc68hc11_cpu_device::hc11_regs_r(UINT32 address)
+uint8_t mc68hc11_cpu_device::hc11_regs_r(uint32_t address)
 {
 	int reg = address & 0xff;
 
@@ -180,7 +187,7 @@ UINT8 mc68hc11_cpu_device::hc11_regs_r(UINT32 address)
 	return 0; // Dummy
 }
 
-void mc68hc11_cpu_device::hc11_regs_w(UINT32 address, UINT8 value)
+void mc68hc11_cpu_device::hc11_regs_w(uint32_t address, uint8_t value)
 {
 	int reg = address & 0xff;
 
@@ -298,20 +305,20 @@ void mc68hc11_cpu_device::hc11_regs_w(UINT32 address, UINT8 value)
 
 /*****************************************************************************/
 
-UINT8 mc68hc11_cpu_device::FETCH()
+uint8_t mc68hc11_cpu_device::FETCH()
 {
 	return m_direct->read_byte(m_pc++);
 }
 
-UINT16 mc68hc11_cpu_device::FETCH16()
+uint16_t mc68hc11_cpu_device::FETCH16()
 {
-	UINT16 w;
+	uint16_t w;
 	w = (m_direct->read_byte(m_pc) << 8) | (m_direct->read_byte(m_pc+1));
 	m_pc += 2;
 	return w;
 }
 
-UINT8 mc68hc11_cpu_device::READ8(UINT32 address)
+uint8_t mc68hc11_cpu_device::READ8(uint32_t address)
 {
 	if(address >= m_reg_position && address < m_reg_position+(m_has_extended_io ? 0x100 : 0x40))
 	{
@@ -324,7 +331,7 @@ UINT8 mc68hc11_cpu_device::READ8(UINT32 address)
 	return m_program->read_byte(address);
 }
 
-void mc68hc11_cpu_device::WRITE8(UINT32 address, UINT8 value)
+void mc68hc11_cpu_device::WRITE8(uint32_t address, uint8_t value)
 {
 	if(address >= m_reg_position && address < m_reg_position+(m_has_extended_io ? 0x100 : 0x40))
 	{
@@ -339,12 +346,12 @@ void mc68hc11_cpu_device::WRITE8(UINT32 address, UINT8 value)
 	m_program->write_byte(address, value);
 }
 
-UINT16 mc68hc11_cpu_device::READ16(UINT32 address)
+uint16_t mc68hc11_cpu_device::READ16(uint32_t address)
 {
 	return (READ8(address) << 8) | (READ8(address+1));
 }
 
-void mc68hc11_cpu_device::WRITE16(UINT32 address, UINT16 value)
+void mc68hc11_cpu_device::WRITE16(uint32_t address, uint16_t value)
 {
 	WRITE8(address+0, (value >> 8) & 0xff);
 	WRITE8(address+1, (value >> 0) & 0xff);
@@ -442,6 +449,7 @@ void mc68hc11_cpu_device::device_start()
 	state_add( HC11_IY, "IY", m_iy).formatstr("%04X");
 
 	state_add( STATE_GENPC, "GENPC", m_pc).noshow();
+	state_add( STATE_GENPCBASE, "CURPC", m_pc).noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_ccr).formatstr("%8s").noshow();
 
 	m_icountptr = &m_icount;
@@ -510,7 +518,7 @@ void mc68hc11_cpu_device::check_irq_lines()
 {
 	if( m_irq_state[MC68HC11_IRQ_LINE]!=CLEAR_LINE && (!(m_ccr & CC_I)) )
 	{
-		UINT16 pc_vector;
+		uint16_t pc_vector;
 
 		if(m_wait_state == 0)
 		{
@@ -532,12 +540,12 @@ void mc68hc11_cpu_device::check_irq_lines()
 	/* check timers here */
 	{
 		int divider = div_tab[m_pr & 3];
-		UINT64 cur_time = total_cycles();
-		UINT32 add = (cur_time - m_frc_base) / divider;
+		uint64_t cur_time = total_cycles();
+		uint32_t add = (cur_time - m_frc_base) / divider;
 
 		if (add > 0)
 		{
-			for(UINT32 i=0;i<add;i++)
+			for(uint32_t i=0;i<add;i++)
 			{
 				m_tcnt++;
 				if(m_tcnt == m_toc1)
@@ -553,7 +561,7 @@ void mc68hc11_cpu_device::check_irq_lines()
 
 	if( m_irq_state[MC68HC11_TOC1_LINE]!=CLEAR_LINE && (!(m_ccr & CC_I)) && m_tmsk1 & 0x80)
 	{
-		UINT16 pc_vector;
+		uint16_t pc_vector;
 
 		if(m_wait_state == 0)
 		{
@@ -586,7 +594,7 @@ void mc68hc11_cpu_device::execute_run()
 {
 	while(m_icount > 0)
 	{
-		UINT8 op;
+		uint8_t op;
 
 		check_irq_lines();
 

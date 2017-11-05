@@ -46,6 +46,7 @@
   -------------------------------------------------------------------
 */
 
+#include "emu.h"
 #include "qubide.h"
 
 
@@ -54,7 +55,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type QUBIDE = &device_creator<qubide_t>;
+DEFINE_DEVICE_TYPE(QUBIDE, qubide_device, "ql_qubide", "QubIDE")
 
 
 //-------------------------------------------------
@@ -81,30 +82,20 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *qubide_t::device_rom_region() const
+const tiny_rom_entry *qubide_device::device_rom_region() const
 {
 	return ROM_NAME( qubide );
 }
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( qubide )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( qubide )
+MACHINE_CONFIG_MEMBER( qubide_device::device_add_mconfig )
 	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, false)
 MACHINE_CONFIG_END
 
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor qubide_t::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( qubide );
-}
 
 
 //-------------------------------------------------
@@ -153,7 +144,7 @@ INPUT_PORTS_END
 //  input_ports - device-specific input ports
 //-------------------------------------------------
 
-ioport_constructor qubide_t::device_input_ports() const
+ioport_constructor qubide_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME( qubide );
 }
@@ -165,11 +156,11 @@ ioport_constructor qubide_t::device_input_ports() const
 //**************************************************************************
 
 //-------------------------------------------------
-//  qubide_t - constructor
+//  qubide_device - constructor
 //-------------------------------------------------
 
-qubide_t::qubide_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, QUBIDE, "QubIDE", tag, owner, clock, "ql_qubide", __FILE__),
+qubide_device::qubide_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, QUBIDE, tag, owner, clock),
 	device_ql_expansion_card_interface(mconfig, *this),
 	m_ata(*this, "ata"),
 	m_rom(*this, "rom"),
@@ -184,7 +175,7 @@ qubide_t::qubide_t(const machine_config &mconfig, const char *tag, device_t *own
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void qubide_t::device_start()
+void qubide_device::device_start()
 {
 }
 
@@ -193,7 +184,7 @@ void qubide_t::device_start()
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
-void qubide_t::device_reset()
+void qubide_device::device_reset()
 {
 	int j1_j5 = m_j1_j5->read();
 
@@ -210,7 +201,7 @@ void qubide_t::device_reset()
 //  read -
 //-------------------------------------------------
 
-UINT8 qubide_t::read(address_space &space, offs_t offset, UINT8 data)
+uint8_t qubide_device::read(address_space &space, offs_t offset, uint8_t data)
 {
 	if ((offset & 0xfc000) == m_base)
 	{
@@ -255,7 +246,7 @@ UINT8 qubide_t::read(address_space &space, offs_t offset, UINT8 data)
 //  write -
 //-------------------------------------------------
 
-void qubide_t::write(address_space &space, offs_t offset, UINT8 data)
+void qubide_device::write(address_space &space, offs_t offset, uint8_t data)
 {
 	if ((offset & 0xfc000) == m_base)
 	{

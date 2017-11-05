@@ -10,6 +10,7 @@
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
 #include "machine/prof80mmu.h"
+#include "machine/74259.h"
 #include "machine/ram.h"
 #include "machine/rescap.h"
 #include "machine/upd1990a.h"
@@ -21,6 +22,8 @@
 #define UPD1990A_TAG    "z43"
 #define RS232_A_TAG     "rs232a"
 #define RS232_B_TAG     "rs232b"
+#define FLR_A_TAG       "z44"
+#define FLR_B_TAG       "z45"
 
 // ------------------------------------------------------------------------
 
@@ -45,6 +48,8 @@ public:
 			m_ecb(*this, ECBBUS_TAG),
 			m_rs232a(*this, RS232_A_TAG),
 			m_rs232b(*this, RS232_B_TAG),
+			m_flra(*this, FLR_A_TAG),
+			m_flrb(*this, FLR_B_TAG),
 			m_rom(*this, Z80_TAG),
 			m_j4(*this, "J4"),
 			m_j5(*this, "J5")
@@ -60,30 +65,33 @@ public:
 	required_device<ecbbus_device> m_ecb;
 	required_device<rs232_port_device> m_rs232a;
 	required_device<rs232_port_device> m_rs232b;
+	required_device<ls259_device> m_flra;
+	required_device<ls259_device> m_flrb;
 	required_memory_region m_rom;
 	required_ioport m_j4;
 	required_ioport m_j5;
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual void machine_start() override;
-	virtual void machine_reset() override;
 
 	enum
 	{
 		TIMER_ID_MOTOR
 	};
 
-	DECLARE_WRITE8_MEMBER( flr_w );
-	DECLARE_READ8_MEMBER( status_r );
-	DECLARE_READ8_MEMBER( status2_r );
+	DECLARE_WRITE8_MEMBER(flr_w);
+	DECLARE_READ8_MEMBER(status_r);
+	DECLARE_READ8_MEMBER(status2_r);
 
-	void ls259_w(int fa, int sa, int fb, int sb);
 	void motor(int mon);
 
-	// RTC state
-	int m_c0;
-	int m_c1;
-	int m_c2;
+	DECLARE_WRITE_LINE_MEMBER(ready_w);
+	DECLARE_WRITE_LINE_MEMBER(inuse_w);
+	DECLARE_WRITE_LINE_MEMBER(motor_w);
+	DECLARE_WRITE_LINE_MEMBER(select_w);
+	DECLARE_WRITE_LINE_MEMBER(resf_w);
+	DECLARE_WRITE_LINE_MEMBER(mini_w);
+	DECLARE_WRITE_LINE_MEMBER(mstop_w);
 
 	// floppy state
 	int m_motor;

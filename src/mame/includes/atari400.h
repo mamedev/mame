@@ -24,14 +24,14 @@ class atari_common_state : public driver_device
 {
 public:
 	atari_common_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_gtia(*this, "gtia"),
-		m_antic(*this, "antic"),
-		m_keyboard(*this, "keyboard"),
-		m_keypad(*this, "keypad"),
-		m_djoy_b(*this, "djoy_b"),
-		m_fake(*this, "fake")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_gtia(*this, "gtia")
+		, m_antic(*this, "antic")
+		, m_keyboard(*this, "keyboard.%u", 0)
+		, m_keypad(*this, "keypad.%u", 0)
+		, m_djoy_b(*this, "djoy_b")
+		, m_fake(*this, "fake")
 		{ }
 
 	virtual void video_start() override;

@@ -5,10 +5,14 @@
  *  Implementation of ASIC65
  *
  *************************************/
+#ifndef MAME_MACHINE_ASIC65_H
+#define MAME_MACHINE_ASIC65_H
 
-	#include "cpu/tms32010/tms32010.h"
+#pragma once
 
-	enum {
+#include "cpu/tms32010/tms32010.h"
+
+enum {
 	ASIC65_STANDARD,
 	ASIC65_STEELTAL,
 	ASIC65_GUARDIANS,
@@ -18,7 +22,7 @@
 class asic65_device : public device_t
 {
 public:
-	asic65_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	asic65_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// (static) configuration helpers
 	static void set_type(device_t &device, int type) { downcast<asic65_device &>(device).m_asic65_type = type; }
@@ -28,11 +32,10 @@ public:
 	DECLARE_READ16_MEMBER( read );
 	DECLARE_READ16_MEMBER( io_r );
 
-	WRITE16_MEMBER( m68k_w );
-	READ16_MEMBER( m68k_r );
-	WRITE16_MEMBER( stat_w );
-	READ16_MEMBER( stat_r );
-	READ16_MEMBER( get_bio );
+	DECLARE_WRITE16_MEMBER( m68k_w );
+	DECLARE_READ16_MEMBER( m68k_r );
+	DECLARE_WRITE16_MEMBER( stat_w );
+	DECLARE_READ16_MEMBER( stat_r );
 
 	enum
 	{
@@ -41,36 +44,39 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
-	UINT8   m_asic65_type;
+	uint8_t   m_asic65_type;
 	int     m_command;
-	UINT16  m_param[32];
-	UINT16  m_yorigin;
-	UINT8   m_param_index;
-	UINT8   m_result_index;
-	UINT8   m_reset_state;
-	UINT8   m_last_bank;
+	uint16_t  m_param[32];
+	uint16_t  m_yorigin;
+	uint8_t   m_param_index;
+	uint8_t   m_result_index;
+	uint8_t   m_reset_state;
+	uint8_t   m_last_bank;
 
 	/* ROM-based interface states */
 	required_device<cpu_device> m_ourcpu;
-	UINT8   m_tfull;
-	UINT8   m_68full;
-	UINT8   m_cmd;
-	UINT8   m_xflg;
-	UINT16  m_68data;
-	UINT16  m_tdata;
+	uint8_t   m_tfull;
+	uint8_t   m_68full;
+	uint8_t   m_cmd;
+	uint8_t   m_xflg;
+	uint16_t  m_68data;
+	uint16_t  m_tdata;
 
 	FILE * m_log;
+
+	DECLARE_READ_LINE_MEMBER( get_bio );
 };
 
-extern const device_type ASIC65;
+DECLARE_DEVICE_TYPE(ASIC65, asic65_device)
 
 #define MCFG_ASIC65_ADD(_tag, _type) \
 	MCFG_DEVICE_ADD(_tag, ASIC65, 0) \
 	asic65_device::set_type(*device, _type);
+
+#endif // MAME_MACHINE_ASIC65_H

@@ -15,7 +15,6 @@
 #include "rendutil.h"
 
 namespace ui {
-
 /*-------------------------------------------------
     menu_video_targets - handle the video targets
     menu
@@ -26,7 +25,7 @@ void menu_video_targets::handle()
 	/* process the menu */
 	const event *menu_event = process(0);
 	if (menu_event != nullptr && menu_event->iptkey == IPT_UI_SELECT)
-		menu::stack_push<menu_video_options>(ui(), container, static_cast<render_target *>(menu_event->itemref));
+		menu::stack_push<menu_video_options>(ui(), container(), static_cast<render_target *>(menu_event->itemref));
 }
 
 
@@ -35,11 +34,11 @@ void menu_video_targets::handle()
     video targets menu
 -------------------------------------------------*/
 
-menu_video_targets::menu_video_targets(mame_ui_manager &mui, render_container *container) : menu(mui, container)
+menu_video_targets::menu_video_targets(mame_ui_manager &mui, render_container &container) : menu(mui, container)
 {
 }
 
-void menu_video_targets::populate()
+void menu_video_targets::populate(float &customtop, float &custombottom)
 {
 	int targetnum;
 
@@ -55,7 +54,7 @@ void menu_video_targets::populate()
 
 		/* add a menu item */
 		sprintf(buffer, _("Screen #%d"), targetnum);
-		item_append(buffer, nullptr, 0, target);
+		item_append(buffer, "", 0, target);
 	}
 }
 
@@ -76,7 +75,7 @@ void menu_video_options::handle()
 	const event *menu_event = process(0);
 	if (menu_event != nullptr && menu_event->itemref != nullptr)
 	{
-		switch ((FPTR)menu_event->itemref)
+		switch ((uintptr_t)menu_event->itemref)
 		{
 			/* rotate adds rotation depending on the direction */
 			case VIDEO_ITEM_ROTATE:
@@ -87,9 +86,9 @@ void menu_video_options::handle()
 					if (target->is_ui_target())
 					{
 						render_container::user_settings settings;
-						container->get_user_settings(settings);
+						container().get_user_settings(settings);
 						settings.m_orientation = orientation_add(delta ^ ROT180, settings.m_orientation);
-						container->set_user_settings(settings);
+						container().set_user_settings(settings);
 					}
 					changed = true;
 				}
@@ -146,9 +145,9 @@ void menu_video_options::handle()
 
 			/* anything else is a view item */
 			default:
-				if (menu_event->iptkey == IPT_UI_SELECT && (int)(FPTR)menu_event->itemref >= VIDEO_ITEM_VIEW)
+				if (menu_event->iptkey == IPT_UI_SELECT && (int)(uintptr_t)menu_event->itemref >= VIDEO_ITEM_VIEW)
 				{
-					target->set_view((FPTR)menu_event->itemref - VIDEO_ITEM_VIEW);
+					target->set_view((uintptr_t)menu_event->itemref - VIDEO_ITEM_VIEW);
 					changed = true;
 				}
 				break;
@@ -166,12 +165,12 @@ void menu_video_options::handle()
     video options menu
 -------------------------------------------------*/
 
-menu_video_options::menu_video_options(mame_ui_manager &mui, render_container *container, render_target *_target) : menu(mui, container)
+menu_video_options::menu_video_options(mame_ui_manager &mui, render_container &container, render_target *_target) : menu(mui, container)
 {
 	target = _target;
 }
 
-void menu_video_options::populate()
+void menu_video_options::populate(float &customtop, float &custombottom)
 {
 	const char *subtext = "";
 	std::string tempstring;
@@ -188,7 +187,7 @@ void menu_video_options::populate()
 		/* create a string for the item, replacing underscores with spaces */
 		tempstring.assign(name);
 		strreplace(tempstring, "_", " ");
-		item_append(tempstring.c_str(), nullptr, 0, (void *)(FPTR)(VIDEO_ITEM_VIEW + viewnum));
+		item_append(tempstring, "", 0, (void *)(uintptr_t)(VIDEO_ITEM_VIEW + viewnum));
 	}
 
 	/* add a separator */

@@ -24,12 +24,17 @@
 
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
-#include "video/tms9928a.h"
 #include "sound/ay8910.h"
+#include "video/tms9928a.h"
+
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+
 #include "softlist.h"
+#include "speaker.h"
+
 
 class myvision_state : public driver_device
 {
@@ -44,7 +49,6 @@ public:
 		, m_io_row3(*this, "ROW3")
 	{ }
 
-	DECLARE_WRITE_LINE_MEMBER( vdp_interrupt );
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( cart );
 	DECLARE_READ8_MEMBER( ay_port_a_r );
 	DECLARE_READ8_MEMBER( ay_port_b_r );
@@ -56,7 +60,7 @@ private:
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_slot_device> m_cart;
-	UINT8 m_column;
+	uint8_t m_column;
 	required_ioport m_io_row0;
 	required_ioport m_io_row1;
 	required_ioport m_io_row2;
@@ -143,29 +147,24 @@ void myvision_state::machine_reset()
 
 DEVICE_IMAGE_LOAD_MEMBER( myvision_state, cart )
 {
-	UINT32 size = m_cart->common_get_size("rom");
+	uint32_t size = m_cart->common_get_size("rom");
 
 	if (size != 0x4000 && size != 0x6000)
 	{
 		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 	}
 
 	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
-
-WRITE_LINE_MEMBER(myvision_state::vdp_interrupt)
-{
-	m_maincpu->set_input_line(INPUT_LINE_IRQ0, state);
-}
 
 READ8_MEMBER( myvision_state::ay_port_a_r )
 {
-	UINT8 data = 0xFF;
+	uint8_t data = 0xFF;
 
 	if ( ! ( m_column & 0x80 ) )
 	{
@@ -208,7 +207,7 @@ WRITE8_MEMBER( myvision_state::ay_port_b_w )
 	m_column = data;
 }
 
-static MACHINE_CONFIG_START( myvision, myvision_state )
+static MACHINE_CONFIG_START( myvision )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_10_738635MHz/3)  /* Not verified */
 	MCFG_CPU_PROGRAM_MAP(myvision_mem)
@@ -217,7 +216,7 @@ static MACHINE_CONFIG_START( myvision, myvision_state )
 	/* video hardware */
 	MCFG_DEVICE_ADD( "tms9918", TMS9918A, XTAL_10_738635MHz / 2 )  /* Exact model not verified */
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)  /* Not verified */
-	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(myvision_state, vdp_interrupt))
+	MCFG_TMS9928A_OUT_INT_LINE_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
 	MCFG_SCREEN_UPDATE_DEVICE( "tms9918", tms9918a_device, screen_update )
 
@@ -246,5 +245,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT     INIT                  COMPANY        FULLNAME              FLAGS */
-CONS( 1983, myvision, 0,      0,       myvision,  myvision, driver_device,   0,   "Nichibutsu", "My Vision (KH-1000)", 0 )
+//    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT     STATE           INIT  COMPANY       FULLN AME              FLAGS
+CONS( 1983, myvision, 0,      0,       myvision,  myvision, myvision_state, 0,    "Nichibutsu", "My Vision (KH-1000)", 0 )

@@ -16,9 +16,9 @@
 
 FLOPPY_IDENTIFY(dim_dsk_identify)
 {
-	UINT8 dim_header[16];
+	uint8_t dim_header[16];
 
-	floppy_image_read(floppy, (UINT8*)dim_header,0xab,16);
+	floppy_image_read(floppy, (uint8_t*)dim_header,0xab,16);
 
 	if(strncmp((const char*)dim_header,"DIFC HEADER",11) == 0)
 		*vote = 100;
@@ -36,9 +36,9 @@ FLOPPY_CONSTRUCT(dim_dsk_construct)
 	int sectors = 8;  // per track
 	int sectorlen = 1024;
 	int firstsector = 0x01;
-	UINT8 format_tmp;
+	uint8_t format_tmp;
 	int x;
-	UINT16 temp;
+	uint16_t temp;
 
 	if(params)
 	{
@@ -132,9 +132,9 @@ const char *dim_format::extensions() const
 	return "dim";
 }
 
-int dim_format::identify(io_generic *io, UINT32 form_factor)
+int dim_format::identify(io_generic *io, uint32_t form_factor)
 {
-	UINT8 h[16];
+	uint8_t h[16];
 
 	io_generic_read(io, h, 0xab, 16);
 
@@ -144,11 +144,11 @@ int dim_format::identify(io_generic *io, UINT32 form_factor)
 	return 0;
 }
 
-bool dim_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
+bool dim_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 {
 	int offset = 0x100;
-	UINT8 h;
-	UINT8 track_total = 77;
+	uint8_t h;
+	uint8_t track_total = 77;
 	int cell_count = form_factor == floppy_image::FF_35 ? 200000 : 166666;
 
 	io_generic_read(io, &h, 0, 1);
@@ -192,7 +192,7 @@ bool dim_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 	for(int track=0; track < track_total; track++)
 		for(int head=0; head < 2; head++) {
 			desc_pc_sector sects[30];
-			UINT8 sect_data[10000];
+			uint8_t sect_data[10000];
 			int sdatapos = 0;
 			for(int i=0; i<spt; i++) {
 				sects[i].track       = track;

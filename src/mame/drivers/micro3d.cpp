@@ -24,14 +24,19 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
+#include "includes/micro3d.h"
+#include "audio/micro3d.h"
+
 #include "cpu/am29000/am29000.h"
+#include "cpu/m68000/m68000.h"
 #include "cpu/mcs51/mcs51.h"
 #include "machine/mc68681.h"
 #include "machine/mc68901.h"
-#include "sound/2151intf.h"
 #include "machine/nvram.h"
-#include "includes/micro3d.h"
+#include "sound/ym2151.h"
+
+#include "screen.h"
+#include "speaker.h"
 
 
 /*************************************
@@ -288,7 +293,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( micro3d, micro3d_state )
+static MACHINE_CONFIG_START( micro3d )
 
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(hostmem)
@@ -296,7 +301,7 @@ static MACHINE_CONFIG_START( micro3d, micro3d_state )
 
 	MCFG_CPU_ADD("vgb", TMS34010, XTAL_40MHz)
 	MCFG_CPU_PROGRAM_MAP(vgbmem)
-	MCFG_TMS340X0_HALT_ON_RESET(FALSE) /* halt on reset */
+	MCFG_TMS340X0_HALT_ON_RESET(false) /* halt on reset */
 	MCFG_TMS340X0_PIXEL_CLOCK(XTAL_40MHz / 8) /* pixel clock */
 	MCFG_TMS340X0_PIXELS_PER_CLOCK(4) /* pixels per clock */
 	MCFG_TMS340X0_SCANLINE_IND16_CB(micro3d_state, scanline_update)        /* scanline updater (indexed16) */
@@ -309,6 +314,8 @@ static MACHINE_CONFIG_START( micro3d, micro3d_state )
 	MCFG_CPU_ADD("audiocpu", I8051, XTAL_11_0592MHz)
 	MCFG_CPU_PROGRAM_MAP(soundmem_prg)
 	MCFG_CPU_IO_MAP(soundmem_io)
+	MCFG_MCS51_SERIAL_TX_CB(WRITE8(micro3d_state, data_from_i8031))
+	MCFG_MCS51_SERIAL_RX_CB(READ8(micro3d_state, data_to_i8031))
 
 	MCFG_MC68681_ADD("duart68681", XTAL_3_6864MHz)
 	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(micro3d_state, duart_irq_handler))
@@ -638,8 +645,8 @@ ROM_END
  *
  *************************************/
 
-GAME( 1991, f15se,    0,     micro3d, f15se, micro3d_state,    micro3d, ROT0, "Microprose Games Inc.", "F-15 Strike Eagle (rev. 2.2 02/25/91)", MACHINE_IMPERFECT_SOUND )
-GAME( 1991, f15se21,  f15se, micro3d, f15se, micro3d_state,    micro3d, ROT0, "Microprose Games Inc.", "F-15 Strike Eagle (rev. 2.1 02/04/91)", MACHINE_IMPERFECT_SOUND )
-GAME( 1992, botss,    0,     micro3d, botss, micro3d_state,    botss,   ROT0, "Microprose Games Inc.", "Battle of the Solar System (rev. 1.1a 7/23/92)", MACHINE_IMPERFECT_SOUND )
-GAME( 1992, botss11,  botss, micro3d, botss11, micro3d_state,  micro3d, ROT0, "Microprose Games Inc.", "Battle of the Solar System (rev. 1.1 3/24/92)", MACHINE_IMPERFECT_SOUND )
-GAME( 1992, tankbatl, 0,     micro3d, tankbatl, micro3d_state, micro3d, ROT0, "Microprose Games Inc.", "Tank Battle (prototype rev. 4/21/92)",  MACHINE_IMPERFECT_SOUND )
+GAME( 1991, f15se,    0,     micro3d, f15se,    micro3d_state, micro3d, ROT0, "Microprose Games Inc.", "F-15 Strike Eagle (rev. 2.2 02/25/91)",          MACHINE_IMPERFECT_SOUND )
+GAME( 1991, f15se21,  f15se, micro3d, f15se,    micro3d_state, micro3d, ROT0, "Microprose Games Inc.", "F-15 Strike Eagle (rev. 2.1 02/04/91)",          MACHINE_IMPERFECT_SOUND )
+GAME( 1992, botss,    0,     micro3d, botss,    micro3d_state, botss,   ROT0, "Microprose Games Inc.", "Battle of the Solar System (rev. 1.1a 7/23/92)", MACHINE_IMPERFECT_SOUND )
+GAME( 1992, botss11,  botss, micro3d, botss11,  micro3d_state, micro3d, ROT0, "Microprose Games Inc.", "Battle of the Solar System (rev. 1.1 3/24/92)",  MACHINE_IMPERFECT_SOUND )
+GAME( 1992, tankbatl, 0,     micro3d, tankbatl, micro3d_state, micro3d, ROT0, "Microprose Games Inc.", "Tank Battle (prototype rev. 4/21/92)",           MACHINE_IMPERFECT_SOUND )

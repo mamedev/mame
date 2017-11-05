@@ -208,7 +208,7 @@ static void InitDasm32010(void)
 			fatalerror("not enough bits in encoding '%s %s' %d\n",
 				ops[0],ops[1],bit);
 		}
-		while (isspace((UINT8)*p)) p++;
+		while (isspace((uint8_t)*p)) p++;
 		if (*p) Op[i].extcode = *p;
 		Op[i].bits = bits;
 		Op[i].mask = mask;
@@ -222,9 +222,9 @@ static void InitDasm32010(void)
 	OpInizialized = 1;
 }
 
-CPU_DISASSEMBLE( tms32010 )
+CPU_DISASSEMBLE(tms32010)
 {
-	UINT32 flags = 0;
+	uint32_t flags = 0;
 	int a, b, d, k, m, n, p, r, s, w;   /* these can all be filled in by parsing an instruction */
 	int i;
 	int op;
@@ -252,7 +252,7 @@ CPU_DISASSEMBLE( tms32010 )
 	}
 	if (op == -1)
 	{
-		sprintf(buffer, "dw   %04Xh *(invalid op)", code);
+		util::stream_format(stream, "dw   %04Xh *(invalid op)", code);
 		return cnt | DASMFLAG_SUPPORTED;
 	}
 	//buffertmp = buffer;
@@ -306,7 +306,7 @@ CPU_DISASSEMBLE( tms32010 )
 	{
 		if (*cp == '%')
 		{
-			char num[20], *q;
+			char num[20];
 			cp++;
 			switch (*cp++)
 			{
@@ -323,13 +323,11 @@ CPU_DISASSEMBLE( tms32010 )
 				default:
 					fatalerror("illegal escape character in format '%s'\n",Op[op].fmt);
 			}
-			q = num; while (*q) *buffer++ = *q++;
-			*buffer = '\0';
+			stream << num;
 		}
 		else
 		{
-			*buffer++ = *cp++;
-			*buffer = '\0';
+			stream << *cp++;
 		}
 	}
 	return cnt | flags | DASMFLAG_SUPPORTED;

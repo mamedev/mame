@@ -1,18 +1,153 @@
 // license:BSD-3-Clause
 // copyright-holders: Aaron Giles, Ted Green
+#include "emu.h"
 #include "gt64xxx.h"
+
+#define LOG_GENERAL         (1U << 0)
+#define LOG_GALILEO         (1U << 1)
+#define LOG_TIMERS          (1U << 2)
+#define LOG_DMA             (1U << 3)
+#define LOG_PCI             (1U << 4)
+
+//#define VERBOSE (LOG_GENERAL | LOG_GALILEO | LOG_TIMERS | LOG_DMA | LOG_PCI)
+#include "logmacro.h"
+
+#define LOGGALILEO(...)     LOGMASKED(LOG_GALILEO, __VA_ARGS__)
+#define LOGTIMERS(...)      LOGMASKED(LOG_TIMERS, __VA_ARGS__)
+#define LOGDMA(...)         LOGMASKED(LOG_DMA, __VA_ARGS__)
+#define LOGPCI(...)         LOGMASKED(LOG_PCI, __VA_ARGS__)
+
 
 /*************************************
  *
- *  Debugging constants
+ *  Galileo constants
  *
  *************************************/
-#define LOG_GALILEO         (0)
-#define LOG_TIMERS          (0)
-#define LOG_DMA             (0)
-#define LOG_PCI             (0)
 
-const device_type GT64XXX      = &device_creator<gt64xxx_device>;
+#define TIMER_PERIOD        attotime::from_hz(m_clock)
+#define PCI_BUS_CLOCK       33000000
+// Number of dma words to transfer at a time, real hardware configurable between 8-32
+#define DMA_BURST_SIZE      32
+#define DMA_TIMER_PERIOD    attotime::from_hz(PCI_BUS_CLOCK / 48)
+
+/* Galileo registers - 0x000-0x3ff */
+#define GREG_CPU_CONFIG     (0x000/4)
+#define GREG_R1_0_LO     (0x008/4)
+#define GREG_R1_0_HI     (0x010/4)
+#define GREG_R3_2_LO     (0x018/4)
+#define GREG_R3_2_HI     (0x020/4)
+#define GREG_CS_2_0_LO      (0x028/4)
+#define GREG_CS_2_0_HI      (0x030/4)
+#define GREG_CS_3_BOOT_LO   (0x038/4)
+#define GREG_CS_3_BOOT_HI   (0x040/4)
+#define GREG_PCI_IO_LO      (0x048/4)
+#define GREG_PCI_IO_HI      (0x050/4)
+#define GREG_PCI_MEM0_LO    (0x058/4)
+#define GREG_PCI_MEM0_HI    (0x060/4)
+#define GREG_INTERNAL_SPACE (0x068/4)
+#define GREG_BUSERR_LO      (0x070/4)
+#define GREG_BUSERR_HI      (0x078/4)
+// GT-64111 only
+#define GREG_PCI_MEM1_LO    (0x080/4)
+#define GREG_PCI_MEM1_HI    (0x088/4)
+
+/* Galileo registers - 0x400-0x7ff */
+#define GREG_RAS0_LO        (0x400/4)
+#define GREG_RAS0_HI        (0x404/4)
+#define GREG_RAS1_LO        (0x408/4)
+#define GREG_RAS1_HI        (0x40c/4)
+#define GREG_RAS2_LO        (0x410/4)
+#define GREG_RAS2_HI        (0x414/4)
+#define GREG_RAS3_LO        (0x418/4)
+#define GREG_RAS3_HI        (0x41c/4)
+#define GREG_CS0_LO         (0x420/4)
+#define GREG_CS0_HI         (0x424/4)
+#define GREG_CS1_LO         (0x428/4)
+#define GREG_CS1_HI         (0x42c/4)
+#define GREG_CS2_LO         (0x430/4)
+#define GREG_CS2_HI         (0x434/4)
+#define GREG_CS3_LO         (0x438/4)
+#define GREG_CS3_HI         (0x43c/4)
+#define GREG_CSBOOT_LO      (0x440/4)
+#define GREG_CSBOOT_HI      (0x444/4)
+#define GREG_DRAM_CONFIG    (0x448/4)
+#define GREG_DRAM_BANK0     (0x44c/4)
+#define GREG_DRAM_BANK1     (0x450/4)
+#define GREG_DRAM_BANK2     (0x454/4)
+#define GREG_DRAM_BANK3     (0x458/4)
+#define GREG_DEVICE_BANK0   (0x45c/4)
+#define GREG_DEVICE_BANK1   (0x460/4)
+#define GREG_DEVICE_BANK2   (0x464/4)
+#define GREG_DEVICE_BANK3   (0x468/4)
+#define GREG_DEVICE_BOOT    (0x46c/4)
+#define GREG_ADDRESS_ERROR  (0x470/4)
+
+/* Galileo registers - 0x800-0xbff */
+#define GREG_DMA0_COUNT     (0x800/4)
+#define GREG_DMA1_COUNT     (0x804/4)
+#define GREG_DMA2_COUNT     (0x808/4)
+#define GREG_DMA3_COUNT     (0x80c/4)
+#define GREG_DMA0_SOURCE    (0x810/4)
+#define GREG_DMA1_SOURCE    (0x814/4)
+#define GREG_DMA2_SOURCE    (0x818/4)
+#define GREG_DMA3_SOURCE    (0x81c/4)
+#define GREG_DMA0_DEST      (0x820/4)
+#define GREG_DMA1_DEST      (0x824/4)
+#define GREG_DMA2_DEST      (0x828/4)
+#define GREG_DMA3_DEST      (0x82c/4)
+#define GREG_DMA0_NEXT      (0x830/4)
+#define GREG_DMA1_NEXT      (0x834/4)
+#define GREG_DMA2_NEXT      (0x838/4)
+#define GREG_DMA3_NEXT      (0x83c/4)
+#define GREG_DMA0_CONTROL   (0x840/4)
+#define GREG_DMA1_CONTROL   (0x844/4)
+#define GREG_DMA2_CONTROL   (0x848/4)
+#define GREG_DMA3_CONTROL   (0x84c/4)
+#define GREG_TIMER0_COUNT   (0x850/4)
+#define GREG_TIMER1_COUNT   (0x854/4)
+#define GREG_TIMER2_COUNT   (0x858/4)
+#define GREG_TIMER3_COUNT   (0x85c/4)
+#define GREG_DMA_ARBITER    (0x860/4)
+#define GREG_TIMER_CONTROL  (0x864/4)
+
+/* Galileo registers - 0xc00-0xfff */
+#define GREG_PCI_COMMAND    (0xc00/4)
+#define GREG_PCI_TIMEOUT    (0xc04/4)
+#define GREG_PCI_R1_0    (0xc08/4)
+#define GREG_PCI_R3_2    (0xc0c/4)
+#define GREG_PCI_CS_2_0     (0xc10/4)
+#define GREG_PCI_CS_3_BOOT  (0xc14/4)
+#define GREG_INT_STATE      (0xc18/4)
+#define GREG_INT_MASK       (0xc1c/4)
+#define GREG_PCI_INT_MASK   (0xc24/4)
+#define GREG_CONFIG_ADDRESS (0xcf8/4)
+#define GREG_CONFIG_DATA    (0xcfc/4)
+
+/* Galileo interrupts */
+#define GINT_SUMMARY_SHIFT  (0)
+#define GINT_MEMOUT_SHIFT   (1)
+#define GINT_DMAOUT_SHIFT   (2)
+#define GINT_CPUOUT_SHIFT   (3)
+#define GINT_DMA0COMP_SHIFT (4)
+#define GINT_DMA1COMP_SHIFT (5)
+#define GINT_DMA2COMP_SHIFT (6)
+#define GINT_DMA3COMP_SHIFT (7)
+#define GINT_T0EXP_SHIFT    (8)
+#define GINT_T1EXP_SHIFT    (9)
+#define GINT_T2EXP_SHIFT    (10)
+#define GINT_T3EXP_SHIFT    (11)
+#define GINT_MASRDERR_SHIFT (12)
+#define GINT_SLVWRERR_SHIFT (13)
+#define GINT_MASWRERR_SHIFT (14)
+#define GINT_SLVRDERR_SHIFT (15)
+#define GINT_ADDRERR_SHIFT  (16)
+#define GINT_MEMERR_SHIFT   (17)
+#define GINT_MASABORT_SHIFT (18)
+#define GINT_TARABORT_SHIFT (19)
+#define GINT_RETRYCTR_SHIFT (20)
+
+
+DEFINE_DEVICE_TYPE(GT64XXX, gt64xxx_device, "gt64xxx", "Galileo GT-64XXX System Controller")
 
 DEVICE_ADDRESS_MAP_START(config_map, 32, gt64xxx_device)
 	AM_INHERIT_FROM(pci_device::config_map)
@@ -23,36 +158,44 @@ DEVICE_ADDRESS_MAP_START(cpu_map, 32, gt64xxx_device)
 	AM_RANGE(0x00000000, 0x00000cff) AM_READWRITE(    cpu_if_r,          cpu_if_w)
 ADDRESS_MAP_END
 
-gt64xxx_device::gt64xxx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: pci_host_device(mconfig, GT64XXX, "Galileo GT-64XXX System Controller", tag, owner, clock, "gt64xxx", __FILE__),
+DEVICE_ADDRESS_MAP_START(empty, 32, gt64xxx_device)
+ADDRESS_MAP_END
+
+gt64xxx_device::gt64xxx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: pci_host_device(mconfig, GT64XXX, tag, owner, clock),
 		m_be(0), m_autoconfig(0), m_irq_num(-1),
 		m_mem_config("memory_space", ENDIANNESS_LITTLE, 32, 32),
 		m_io_config("io_space", ENDIANNESS_LITTLE, 32, 32),
 		m_romRegion(*this, "rom"),
 		m_updateRegion(*this, "update")
 {
+	for (int csIndex = 0; csIndex < 4; csIndex++) {
+		m_cs_devices[csIndex] = nullptr;
+		m_simm_size[csIndex] = 0;
+	}
 }
 
-void gt64xxx_device::set_cs_map(int id, address_map_constructor map, const char *name, device_t *device)
+void gt64xxx_device::set_map(int id, const address_map_delegate &map, device_t *device)
 {
-	m_cs_map[id].enable = true;
-	m_cs_map[id].name = name;
-	m_cs_map[id].device = device;
-	m_cs_map[id].map = map;
+	m_cs_maps[id] = map;
+	m_cs_devices[id] = device;
 }
 
-const address_space_config *gt64xxx_device::memory_space_config(address_spacenum spacenum) const
+device_memory_interface::space_config_vector gt64xxx_device::memory_space_config() const
 {
-	return (spacenum == AS_PROGRAM) ? pci_bridge_device::memory_space_config(spacenum) : (spacenum == AS_DATA) ? &m_mem_config : (spacenum == AS_IO) ? &m_io_config : nullptr;
+	auto r = pci_bridge_device::memory_space_config();
+	r.emplace_back(std::make_pair(AS_PCI_MEM, &m_mem_config));
+	r.emplace_back(std::make_pair(AS_PCI_IO, &m_io_config));
+	return r;
 }
 
 void gt64xxx_device::device_start()
 {
 	pci_host_device::device_start();
 	m_cpu = machine().device<mips3_device>(cpu_tag);
-	m_cpu_space = &m_cpu->space(AS_PROGRAM);
-	memory_space = &space(AS_DATA);
-	io_space = &space(AS_IO);
+	m_cpu_space = &m_cpu->space(AS_PCI_CONFIG);
+	memory_space = &space(AS_PCI_MEM);
+	io_space = &space(AS_PCI_IO);
 
 	memory_window_start = 0;
 	memory_window_end   = 0xffffffff;
@@ -67,20 +210,22 @@ void gt64xxx_device::device_start()
 	// Leave the timer disabled.
 	m_dma_timer->adjust(attotime::never, 0, DMA_TIMER_PERIOD);
 
+	// Reserve RAM
+	for (int i=0; i<4; i++)
+		m_ram[i].resize(m_simm_size[i] / 4);
+
 	// ROM
-	UINT32 romSize = m_romRegion->bytes();
+	uint32_t romSize = m_romRegion->bytes();
 	m_cpu_space->install_rom   (0x1fc00000, 0x1fc00000 + romSize - 1, m_romRegion->base());
 	// ROM MIPS DRC
-	m_cpu->add_fastram(0x1fc00000, 0x1fc00000 + romSize - 1, TRUE, m_romRegion->base());
-	if (LOG_GALILEO)
-		logerror("%s: gt64xxx_device::device_start ROM Mapped size: 0x%08X start: 0x1fc00000 end: %08X\n", tag(), romSize, 0x1fc00000 + romSize - 1);
+	m_cpu->add_fastram(0x1fc00000, 0x1fc00000 + romSize - 1, true, m_romRegion->base());
+	LOGGALILEO("gt64xxx_device::device_start ROM Mapped size: 0x%08X start: 0x1fc00000 end: %08X\n", romSize, 0x1fc00000 + romSize - 1);
 
 	// Update region address is based on seattle driver
 	if (m_updateRegion) {
 		romSize = m_updateRegion->bytes();
 		m_cpu_space->install_rom(0x1fd00000, 0x1fd00000 + romSize - 1, m_updateRegion->base());
-		if (LOG_GALILEO)
-			logerror("%s: gt64xxx_device::device_start UPDATE Mapped size: 0x%08X start: 0x1fd00000 end: %08X\n", tag(), romSize, 0x1fd00000 + romSize - 1);
+		LOGGALILEO("gt64xxx_device::device_start UPDATE Mapped size: 0x%08X start: 0x1fd00000 end: %08X\n", romSize, 0x1fd00000 + romSize - 1);
 	}
 
 	/* allocate timers for the galileo */
@@ -88,6 +233,35 @@ void gt64xxx_device::device_start()
 	m_timer[1].timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gt64xxx_device::timer_callback), this));
 	m_timer[2].timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gt64xxx_device::timer_callback), this));
 	m_timer[3].timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gt64xxx_device::timer_callback), this));
+
+	// Save states
+	save_item(NAME(m_pci_stall_state));
+	save_item(NAME(m_retry_count));
+	save_item(NAME(m_pci_cpu_stalled));
+	save_item(NAME(m_stall_windex));
+	save_item(NAME(m_cpu_stalled_offset));
+	save_item(NAME(m_cpu_stalled_data));
+	save_item(NAME(m_cpu_stalled_mem_mask));
+	save_item(NAME(m_prev_addr));
+	save_item(NAME(m_reg));
+	for (int i = 0; i < ARRAY_LENGTH(m_timer); i++) {
+		save_item(NAME(m_timer[i].active), i);
+		save_item(NAME(m_timer[i].count), i);
+	}
+	save_item(NAME(m_dma_active));
+	// m_ram[4]
+	save_pointer(NAME(m_ram[0].data()), m_simm_size[0] / 4);
+	save_pointer(NAME(m_ram[1].data()), m_simm_size[1] / 4);
+	save_pointer(NAME(m_ram[2].data()), m_simm_size[2] / 4);
+	save_pointer(NAME(m_ram[3].data()), m_simm_size[3] / 4);
+	save_item(NAME(m_last_dma));
+	machine().save().register_postload(save_prepost_delegate(FUNC(gt64xxx_device::map_cpu_space), this));
+}
+
+void gt64xxx_device::postload()
+{
+	map_cpu_space();
+	remap_cb();
 }
 
 void gt64xxx_device::device_reset()
@@ -96,10 +270,10 @@ void gt64xxx_device::device_reset()
 
 	// Configuration register defaults
 	m_reg[GREG_CPU_CONFIG] = m_be ? 0 : (1<<12);
-	m_reg[GREG_RAS_1_0_LO] = 0x0;
-	m_reg[GREG_RAS_1_0_HI] = 0x7;
-	m_reg[GREG_RAS_3_2_LO] = 0x8;
-	m_reg[GREG_RAS_3_2_HI] = 0xf;
+	m_reg[GREG_R1_0_LO] = 0x0;
+	m_reg[GREG_R1_0_HI] = 0x7;
+	m_reg[GREG_R3_2_LO] = 0x8;
+	m_reg[GREG_R3_2_HI] = 0xf;
 	m_reg[GREG_CS_2_0_LO] = 0xe0;
 	m_reg[GREG_CS_2_0_HI] = 0x70;
 	m_reg[GREG_CS_3_BOOT_LO] = 0xf8;
@@ -139,9 +313,7 @@ void gt64xxx_device::device_reset()
 	m_pci_stall_state = 0;
 	m_retry_count = 0;
 	m_pci_cpu_stalled = 0;
-	m_cpu_stalled_offset = 0;
-	m_cpu_stalled_data = 0;
-	m_cpu_stalled_mem_mask = 0;
+	m_stall_windex = 0;
 
 	m_dma_active = 0;
 	m_dma_timer->adjust(attotime::never);
@@ -152,7 +324,7 @@ void gt64xxx_device::device_reset()
 
 void gt64xxx_device::map_cpu_space()
 {
-	UINT32 winStart, winEnd;
+	uint32_t winStart, winEnd;
 
 	// ROM region starts at 0x1fc00000
 	m_cpu_space->unmap_readwrite(0x00000000, 0x1fbfffff);
@@ -165,74 +337,62 @@ void gt64xxx_device::map_cpu_space()
 	winStart = m_reg[GREG_INTERNAL_SPACE]<<21;
 	winEnd = winStart + sizeof(m_reg) - 1;
 	m_cpu_space->install_device(winStart, winEnd, *static_cast<gt64xxx_device *>(this), &gt64xxx_device::cpu_map);
-	if (LOG_GALILEO)
-		logerror("%s: map_cpu_space cpu_reg start: %08X end: %08X\n", tag(), winStart, winEnd);
+	logerror("map_cpu_space cpu_reg start: %08X end: %08X\n", winStart, winEnd);
 
 	// RAS[0:3]
 	for (int ramIndex = 0; ramIndex < 4; ++ramIndex)
 	{
-		winStart = (m_reg[GREG_RAS_1_0_LO + 0x10 / 4 * (ramIndex/2)] << 21) | (m_reg[GREG_RAS0_LO + 0x8 / 4 * ramIndex] << 20);
-		winEnd = (m_reg[GREG_RAS_1_0_LO + 0x10 / 4 * (ramIndex / 2)] << 21) | (m_reg[GREG_RAS0_HI + 0x8 / 4 * ramIndex] << 20) | 0xfffff;
-		m_ram[ramIndex].resize((winEnd + 1 - winStart) / 4);
-		m_cpu_space->install_ram(winStart, winEnd, m_ram[ramIndex].data());
-		//m_cpu->add_fastram(winStart, m_ram[ramIndex].size() * sizeof(m_ram[ramIndex][0]), FALSE, &m_ram[ramIndex][0]);
-		//m_cpu->add_fastram(winStart, m_ram[ramIndex].size() * sizeof(UINT32), FALSE, m_ram[ramIndex].data());
-		if (LOG_GALILEO)
-			logerror("%s: map_cpu_space ras[%i] start: %08X end: %08X\n", tag(), ramIndex, winStart, winEnd);
+		winStart = (m_reg[GREG_R1_0_LO + 0x10 / 4 * (ramIndex/2)] << 21) | (m_reg[GREG_RAS0_LO + 0x8 / 4 * ramIndex] << 20);
+		winEnd = (m_reg[GREG_R1_0_LO + 0x10 / 4 * (ramIndex / 2)] << 21) | (m_reg[GREG_RAS0_HI + 0x8 / 4 * ramIndex] << 20) | 0xfffff;
+		// Cap window end at physical memory bounds
+		uint32_t winSize = winEnd - winStart + 1;
+		if (winSize > m_ram[ramIndex].size() * 4)
+			winEnd = winStart + m_ram[ramIndex].size() * 4 - 1;
+		//m_ram[ramIndex].resize((winEnd + 1 - winStart) / 4);
+		if (m_ram[ramIndex].size()>0)
+			m_cpu_space->install_ram(winStart, winEnd, m_ram[ramIndex].data());
+		//m_cpu->add_fastram(winStart, m_ram[ramIndex].size() * sizeof(m_ram[ramIndex][0]), false, &m_ram[ramIndex][0]);
+		//m_cpu->add_fastram(winStart, m_ram[ramIndex].size() * sizeof(uint32_t), false, m_ram[ramIndex].data());
+		logerror("map_cpu_space ras[%i] start: %08X end: %08X\n", ramIndex, winStart, winEnd);
+		//printf("%s: map_cpu_space ras[%i] start: %08X end: %08X size: %08X\n", tag(), ramIndex, winStart, winEnd, winEnd-winStart+1);
 	}
 
 	// CS[0:3]
-	//m_cpu_space->install_device_delegate(0x16000000, 0x17ffffff, machine().root_device(), m_cs_map[3].map);
-	typedef void (gt64xxx_device::*tramp_t)(::address_map &, device_t &);
-	static const tramp_t trampolines[4] = {
-		&gt64xxx_device::map_trampoline<0>,
-		&gt64xxx_device::map_trampoline<1>,
-		&gt64xxx_device::map_trampoline<2>,
-		&gt64xxx_device::map_trampoline<3>
-	};
-	for (int ramIndex = 0; ramIndex < 4; ++ramIndex)
+	for (int csIndex = 0; csIndex < 4; ++csIndex)
 	{
-		if (m_cs_map[ramIndex].enable)
-		{
-			winStart = (m_reg[GREG_CS_2_0_LO + 0x10 / 4 * (ramIndex / 3)] << 21) | (m_reg[GREG_CS0_LO + 0x8 / 4 * ramIndex] << 20);
-			winEnd = (m_reg[GREG_CS_2_0_LO + 0x10 / 4 * (ramIndex / 3)] << 21) | (m_reg[GREG_CS0_HI + 0x8 / 4 * ramIndex] << 20) | 0xfffff;
-			install_cs_map(winStart, winEnd, trampolines[ramIndex], m_cs_map[ramIndex].name);
-			if (LOG_GALILEO)
-				logerror("%s: map_cpu_space cs[%i] start: %08X end: %08X\n", tag(), ramIndex, winStart, winEnd);
-		}
+		winStart = (m_reg[GREG_CS_2_0_LO + 0x10 / 4 * (csIndex / 3)] << 21) | (m_reg[GREG_CS0_LO + 0x8 / 4 * csIndex] << 20);
+		winEnd = (m_reg[GREG_CS_2_0_LO + 0x10 / 4 * (csIndex / 3)] << 21) | (m_reg[GREG_CS0_HI + 0x8 / 4 * csIndex] << 20) | 0xfffff;
+		m_cpu_space->install_device_delegate(winStart, winEnd, *m_cs_devices[csIndex], m_cs_maps[csIndex]);
+		logerror("map_cpu_space cs[%i] start: %08X end: %08X\n", csIndex, winStart, winEnd);
 	}
-
 
 	// PCI IO Window
 	winStart = m_reg[GREG_PCI_IO_LO]<<21;
 	winEnd =   (m_reg[GREG_PCI_IO_LO]<<21) | (m_reg[GREG_PCI_IO_HI]<<21) | 0x1fffff;
-	m_cpu_space->install_read_handler(winStart, winEnd, 0, 0, read32_delegate(FUNC(gt64xxx_device::master_io_r), this));
-	m_cpu_space->install_write_handler(winStart, winEnd, 0, 0, write32_delegate(FUNC(gt64xxx_device::master_io_w), this));
-	if (LOG_GALILEO)
-		logerror("%s: map_cpu_space pci_io start: %08X end: %08X\n", tag(), winStart, winEnd);
+	m_cpu_space->install_read_handler(winStart, winEnd, read32_delegate(FUNC(gt64xxx_device::master_io_r), this));
+	m_cpu_space->install_write_handler(winStart, winEnd, write32_delegate(FUNC(gt64xxx_device::master_io_w), this));
+	logerror("map_cpu_space pci_io start: %08X end: %08X\n", winStart, winEnd);
 
 	// PCI MEM0 Window
 	winStart = m_reg[GREG_PCI_MEM0_LO]<<21;
 	winEnd =   (m_reg[GREG_PCI_MEM0_LO]<<21) | (m_reg[GREG_PCI_MEM0_HI]<<21) | 0x1fffff;
-	m_cpu_space->install_read_handler(winStart, winEnd, 0, 0, read32_delegate(FUNC(gt64xxx_device::master_mem0_r), this));
-	m_cpu_space->install_write_handler(winStart, winEnd, 0, 0, write32_delegate(FUNC(gt64xxx_device::master_mem0_w), this));
-	if (LOG_GALILEO)
-		logerror("%s: map_cpu_space pci_mem0 start: %08X end: %08X\n", tag(), winStart, winEnd);
+	m_cpu_space->install_read_handler(winStart, winEnd, read32_delegate(FUNC(gt64xxx_device::master_mem0_r), this));
+	m_cpu_space->install_write_handler(winStart, winEnd, write32_delegate(FUNC(gt64xxx_device::master_mem0_w), this));
+	logerror("map_cpu_space pci_mem0 start: %08X end: %08X\n", winStart, winEnd);
 
 	// PCI MEM1 Window
 	winStart = m_reg[GREG_PCI_MEM1_LO]<<21;
 	winEnd =   (m_reg[GREG_PCI_MEM1_LO]<<21) | (m_reg[GREG_PCI_MEM1_HI]<<21) | 0x1fffff;
-	m_cpu_space->install_read_handler(winStart, winEnd, 0, 0, read32_delegate(FUNC(gt64xxx_device::master_mem1_r), this));
-	m_cpu_space->install_write_handler(winStart, winEnd, 0, 0, write32_delegate(FUNC(gt64xxx_device::master_mem1_w), this));
-	if (LOG_GALILEO)
-		logerror("%s: map_cpu_space pci_mem1 start: %08X end: %08X\n", tag(), winStart, winEnd);
+	m_cpu_space->install_read_handler(winStart, winEnd, read32_delegate(FUNC(gt64xxx_device::master_mem1_r), this));
+	m_cpu_space->install_write_handler(winStart, winEnd, write32_delegate(FUNC(gt64xxx_device::master_mem1_w), this));
+	logerror("map_cpu_space pci_mem1 start: %08X end: %08X\n", winStart, winEnd);
 
 	// Setup the address mapping table for DMA lookups
 	for (size_t index = 0; index < proc_addr_bank::ADDR_NUM; ++index)
 	{
 		if (index < proc_addr_bank::ADDR_PCI_MEM1) {
-			dma_addr_map[index].low_addr = (m_reg[GREG_RAS_1_0_LO + 0x10 / 4 * index] << 21);
-			dma_addr_map[index].high_addr = (dma_addr_map[index].low_addr & 0xf0000000) | (m_reg[GREG_RAS_1_0_HI + 0x10 / 4 * index] << 21) | 0x1fffff;
+			dma_addr_map[index].low_addr = (m_reg[GREG_R1_0_LO + 0x10 / 4 * index] << 21);
+			dma_addr_map[index].high_addr = (dma_addr_map[index].low_addr & 0xf0000000) | (m_reg[GREG_R1_0_HI + 0x10 / 4 * index] << 21) | 0x1fffff;
 		}
 		else {
 			dma_addr_map[index].low_addr = (m_reg[GREG_PCI_MEM1_LO] << 21);
@@ -241,11 +401,11 @@ void gt64xxx_device::map_cpu_space()
 
 	switch (index) {
 		case proc_addr_bank::ADDR_PCI_IO:
-			dma_addr_map[index].space = &this->space(AS_IO);
+			dma_addr_map[index].space = &this->space(AS_PCI_IO);
 			break;
 		case proc_addr_bank::ADDR_PCI_MEM0:
 		case proc_addr_bank::ADDR_PCI_MEM1:
-			dma_addr_map[index].space = &this->space(AS_DATA);
+			dma_addr_map[index].space = &this->space(AS_PCI_MEM);
 			break;
 		default:
 			dma_addr_map[index].space = m_cpu_space;
@@ -254,52 +414,48 @@ void gt64xxx_device::map_cpu_space()
 	}
 }
 
-void gt64xxx_device::map_extra(UINT64 memory_window_start, UINT64 memory_window_end, UINT64 memory_offset, address_space *memory_space,
-									UINT64 io_window_start, UINT64 io_window_end, UINT64 io_offset, address_space *io_space)
+void gt64xxx_device::map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
+									uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space)
 {
 	int ramIndex;
-	UINT32 winStart, winEnd, winSize;
+	uint32_t winStart, winEnd, winSize;
 
-	// Not sure if GREG_RAS_1_0_LO should be added on PCI address map side.
+	// Not sure if GREG_R1_0_LO should be added on PCI address map side.
 	// RAS0
 	ramIndex = 0;
-	winStart = (m_reg[GREG_RAS_1_0_LO + 0x10 / 4 * (ramIndex / 2)] << 21) | (m_reg[GREG_RAS0_LO + 0x8 / 4 * ramIndex] << 20);
-	winEnd = (m_reg[GREG_RAS_1_0_LO + 0x10 / 4 * (ramIndex / 2)] << 21) | (m_reg[GREG_RAS0_HI + 0x8 / 4 * ramIndex] << 20) | 0xfffff;
+	winStart = (m_reg[GREG_R1_0_LO + 0x10 / 4 * (ramIndex / 2)] << 21) | (m_reg[GREG_RAS0_LO + 0x8 / 4 * ramIndex] << 20);
+	winEnd = (m_reg[GREG_R1_0_LO + 0x10 / 4 * (ramIndex / 2)] << 21) | (m_reg[GREG_RAS0_HI + 0x8 / 4 * ramIndex] << 20) | 0xfffff;
 	winSize = winEnd - winStart + 1;
-	memory_space->install_read_handler(winStart, winEnd, 0, 0, read32_delegate(FUNC(gt64xxx_device::ras_0_r), this));
-	memory_space->install_write_handler(winStart, winEnd, 0, 0, write32_delegate(FUNC(gt64xxx_device::ras_0_w), this));
-	if (LOG_GALILEO)
-		logerror("%s: map_extra RAS0 start=%08X end=%08X size=%08X\n", tag(), winStart, winEnd, winSize);
+	memory_space->install_read_handler(winStart, winEnd, read32_delegate(FUNC(gt64xxx_device::ras_0_r), this));
+	memory_space->install_write_handler(winStart, winEnd, write32_delegate(FUNC(gt64xxx_device::ras_0_w), this));
+	LOGGALILEO("map_extra RAS0 start=%08X end=%08X size=%08X\n", winStart, winEnd, winSize);
 
 	// RAS1
 	ramIndex = 1;
-	winStart = (m_reg[GREG_RAS_1_0_LO + 0x10 / 4 * (ramIndex / 2)] << 21) | (m_reg[GREG_RAS0_LO + 0x8 / 4 * ramIndex] << 20);
-	winEnd = (m_reg[GREG_RAS_1_0_LO + 0x10 / 4 * (ramIndex / 2)] << 21) | (m_reg[GREG_RAS0_HI + 0x8 / 4 * ramIndex] << 20) | 0xfffff;
+	winStart = (m_reg[GREG_R1_0_LO + 0x10 / 4 * (ramIndex / 2)] << 21) | (m_reg[GREG_RAS0_LO + 0x8 / 4 * ramIndex] << 20);
+	winEnd = (m_reg[GREG_R1_0_LO + 0x10 / 4 * (ramIndex / 2)] << 21) | (m_reg[GREG_RAS0_HI + 0x8 / 4 * ramIndex] << 20) | 0xfffff;
 	winSize = winEnd - winStart + 1;
-	memory_space->install_read_handler(winStart, winEnd, 0, 0, read32_delegate(FUNC(gt64xxx_device::ras_1_r), this));
-	memory_space->install_write_handler(winStart, winEnd, 0, 0, write32_delegate(FUNC(gt64xxx_device::ras_1_w), this));
-	if (LOG_GALILEO)
-		logerror("%s: map_extra RAS1 start=%08X end=%08X size=%08X\n", tag(), winStart, winEnd, winSize);
+	memory_space->install_read_handler(winStart, winEnd, read32_delegate(FUNC(gt64xxx_device::ras_1_r), this));
+	memory_space->install_write_handler(winStart, winEnd, write32_delegate(FUNC(gt64xxx_device::ras_1_w), this));
+	LOGGALILEO("map_extra RAS1 start=%08X end=%08X size=%08X\n", winStart, winEnd, winSize);
 
 	// RAS2
 	ramIndex = 2;
-	winStart = (m_reg[GREG_RAS_1_0_LO + 0x10 / 4 * (ramIndex / 2)] << 21) | (m_reg[GREG_RAS0_LO + 0x8 / 4 * ramIndex] << 20);
-	winEnd = (m_reg[GREG_RAS_1_0_LO + 0x10 / 4 * (ramIndex / 2)] << 21) | (m_reg[GREG_RAS0_HI + 0x8 / 4 * ramIndex] << 20) | 0xfffff;
+	winStart = (m_reg[GREG_R1_0_LO + 0x10 / 4 * (ramIndex / 2)] << 21) | (m_reg[GREG_RAS0_LO + 0x8 / 4 * ramIndex] << 20);
+	winEnd = (m_reg[GREG_R1_0_LO + 0x10 / 4 * (ramIndex / 2)] << 21) | (m_reg[GREG_RAS0_HI + 0x8 / 4 * ramIndex] << 20) | 0xfffff;
 	winSize = winEnd - winStart + 1;
-	memory_space->install_read_handler(winStart, winEnd, 0, 0, read32_delegate(FUNC(gt64xxx_device::ras_2_r), this));
-	memory_space->install_write_handler(winStart, winEnd, 0, 0, write32_delegate(FUNC(gt64xxx_device::ras_2_w), this));
-	if (LOG_GALILEO)
-		logerror("%s: map_extra RAS2 start=%08X end=%08X size=%08X\n", tag(), winStart, winEnd, winSize);
+	memory_space->install_read_handler(winStart, winEnd, read32_delegate(FUNC(gt64xxx_device::ras_2_r), this));
+	memory_space->install_write_handler(winStart, winEnd, write32_delegate(FUNC(gt64xxx_device::ras_2_w), this));
+	LOGGALILEO("map_extra RAS2 start=%08X end=%08X size=%08X\n", winStart, winEnd, winSize);
 
 	// RAS3
 	ramIndex = 3;
-	winStart = (m_reg[GREG_RAS_1_0_LO + 0x10 / 4 * (ramIndex / 2)] << 21) | (m_reg[GREG_RAS0_LO + 0x8 / 4 * ramIndex] << 20);
-	winEnd = (m_reg[GREG_RAS_1_0_LO + 0x10 / 4 * (ramIndex / 2)] << 21) | (m_reg[GREG_RAS0_HI + 0x8 / 4 * ramIndex] << 20) | 0xfffff;
+	winStart = (m_reg[GREG_R1_0_LO + 0x10 / 4 * (ramIndex / 2)] << 21) | (m_reg[GREG_RAS0_LO + 0x8 / 4 * ramIndex] << 20);
+	winEnd = (m_reg[GREG_R1_0_LO + 0x10 / 4 * (ramIndex / 2)] << 21) | (m_reg[GREG_RAS0_HI + 0x8 / 4 * ramIndex] << 20) | 0xfffff;
 	winSize = winEnd - winStart + 1;
-	memory_space->install_read_handler(winStart, winEnd, 0, 0, read32_delegate(FUNC(gt64xxx_device::ras_3_r), this));
-	memory_space->install_write_handler(winStart, winEnd, 0, 0, write32_delegate(FUNC(gt64xxx_device::ras_3_w), this));
-	if (LOG_GALILEO)
-		logerror("%s: map_extra RAS3 start=%08X end=%08X size=%08X\n", tag(), winStart, winEnd, winSize);
+	memory_space->install_read_handler(winStart, winEnd, read32_delegate(FUNC(gt64xxx_device::ras_3_r), this));
+	memory_space->install_write_handler(winStart, winEnd, write32_delegate(FUNC(gt64xxx_device::ras_3_w), this));
+	LOGGALILEO("map_extra RAS3 start=%08X end=%08X size=%08X\n", winStart, winEnd, winSize);
 }
 
 void gt64xxx_device::reset_all_mappings()
@@ -316,12 +472,20 @@ WRITE_LINE_MEMBER(gt64xxx_device::pci_stall)
 		// Check if it is a stalled cpu access and re-issue
 		if (m_pci_cpu_stalled) {
 			m_pci_cpu_stalled = 0;
-			// master_mem0_w -- Should actually be checking for master_mem1_w as well
-			this->space(AS_DATA).write_dword((m_reg[GREG_PCI_MEM0_LO] << 21) | (m_cpu_stalled_offset * 4), m_cpu_stalled_data, m_cpu_stalled_mem_mask);
+			int index = 0;
+			// Should actually check for a stall after each write...
+			while (m_stall_windex > 0) {
+				// master_mem0_w -- Should actually be checking for master_mem1_w as well
+				this->space(AS_PCI_MEM).write_dword((m_reg[GREG_PCI_MEM0_LO] << 21) | (m_cpu_stalled_offset[index] * 4),
+					m_cpu_stalled_data[index], m_cpu_stalled_mem_mask[index]);
+				LOGGALILEO("pci_stall: Writing index: %d offset: %08x data: %08x mask: %08x\n",
+					index, m_cpu_stalled_offset[index] * 4, m_cpu_stalled_data[index], m_cpu_stalled_mem_mask[index]);
+				m_stall_windex--;
+				index++;
+			}
 			/* resume CPU execution */
 			machine().scheduler().trigger(45678);
-			if (LOG_GALILEO)
-				logerror("Resuming CPU on PCI Stall offset=0x%08X data=0x%08X\n", m_cpu_stalled_offset * 4, m_cpu_stalled_data);
+			LOGGALILEO("Resuming CPU on PCI Stall\n");
 		}
 	}
 
@@ -332,142 +496,134 @@ WRITE_LINE_MEMBER(gt64xxx_device::pci_stall)
 // PCI bus control
 READ32_MEMBER (gt64xxx_device::pci_config_r)
 {
-	UINT32 result = 0;
-	if (LOG_GALILEO)
-		logerror("%06X:galileo pci_config_r from offset %02X = %08X & %08X\n", space.device().safe_pc(), offset*4, result, mem_mask);
+	uint32_t result = 0;
+	LOGGALILEO("%06X:galileo pci_config_r from offset %02X = %08X & %08X\n", space.device().safe_pc(), offset*4, result, mem_mask);
 	return result;
 }
 WRITE32_MEMBER (gt64xxx_device::pci_config_w)
 {
-	if (LOG_GALILEO)
-		logerror("%06X:galileo pci_config_w to offset %02X = %08X & %08X\n", space.device().safe_pc(), offset*4, data, mem_mask);
+	LOGGALILEO("%06X:galileo pci_config_w to offset %02X = %08X & %08X\n", space.device().safe_pc(), offset*4, data, mem_mask);
 }
 // PCI Master Window 0
 READ32_MEMBER (gt64xxx_device::master_mem0_r)
 {
-	UINT32 result = this->space(AS_DATA).read_dword((m_reg[GREG_PCI_MEM0_LO]<<21) | (offset*4), mem_mask);
-	if (LOG_PCI)
-		logerror("%06X:galileo pci mem0 read from offset %08X = %08X & %08X\n", space.device().safe_pc(), (m_reg[GREG_PCI_MEM0_LO]<<21) | (offset*4), result, mem_mask);
+	uint32_t result = this->space(AS_PCI_MEM).read_dword((m_reg[GREG_PCI_MEM0_LO]<<21) | (offset*4), mem_mask);
+	LOGPCI("%06X:galileo pci mem0 read from offset %08X = %08X & %08X\n", space.device().safe_pc(), (m_reg[GREG_PCI_MEM0_LO]<<21) | (offset*4), result, mem_mask);
 	return result;
 }
 WRITE32_MEMBER (gt64xxx_device::master_mem0_w)
 {
 	if (m_pci_stall_state) {
-		// Save the write data and stall the cpu
-		m_pci_cpu_stalled = 1;
-		m_cpu_stalled_offset = offset;
-		m_cpu_stalled_data = data;
-		m_cpu_stalled_mem_mask = mem_mask;
-		// Stall cpu until trigger
-		m_cpu_space->device().execute().spin_until_trigger(45678);
-		if (LOG_GALILEO || LOG_PCI)
-			logerror("%08X:Stalling CPU on PCI Stall\n", m_cpu_space->device().safe_pc());
+		if (m_stall_windex < 2) {
+			// Save the write data and stall the cpu
+			// For some reason sometimes two writes get through before the cpu is stalled (calspeed) so need to store multiple accesses.
+			m_pci_cpu_stalled = 1;
+			m_cpu_stalled_offset[m_stall_windex] = offset;
+			m_cpu_stalled_data[m_stall_windex] = data;
+			m_cpu_stalled_mem_mask[m_stall_windex] = mem_mask;
+			m_stall_windex++;
+			// Stall cpu until trigger
+			m_cpu_space->device().execute().spin_until_trigger(45678);
+			LOGMASKED(LOG_GALILEO | LOG_PCI, "%08X:Stalling CPU on PCI Stall\n", m_cpu_space->device().safe_pc());
+		}
+		else {
+			fatalerror("master_mem0_w: m_stall_windex full\n");
+		}
 		return;
 	}
-	this->space(AS_DATA).write_dword((m_reg[GREG_PCI_MEM0_LO]<<21) | (offset*4), data, mem_mask);
-	if (LOG_PCI)
-		logerror("%06X:galileo pci mem0 write to offset %08X = %08X & %08X\n", space.device().safe_pc(), (m_reg[GREG_PCI_MEM0_LO]<<21) | (offset*4), data, mem_mask);
+	this->space(AS_PCI_MEM).write_dword((m_reg[GREG_PCI_MEM0_LO]<<21) | (offset*4), data, mem_mask);
+	LOGPCI("%06X:galileo pci mem0 write to offset %08X = %08X & %08X\n", space.device().safe_pc(), (m_reg[GREG_PCI_MEM0_LO]<<21) | (offset*4), data, mem_mask);
 }
 
 // PCI Master Window 1
 READ32_MEMBER (gt64xxx_device::master_mem1_r)
 {
-	UINT32 result = this->space(AS_DATA).read_dword((m_reg[GREG_PCI_MEM1_LO]<<21) | (offset*4), mem_mask);
-	if (LOG_PCI)
-		logerror("%06X:galileo pci mem1 read from offset %08X = %08X & %08X\n", space.device().safe_pc(), (m_reg[GREG_PCI_MEM1_LO]<<21) | (offset*4), result, mem_mask);
+	uint32_t result = this->space(AS_PCI_MEM).read_dword((m_reg[GREG_PCI_MEM1_LO]<<21) | (offset*4), mem_mask);
+	LOGPCI("%06X:galileo pci mem1 read from offset %08X = %08X & %08X\n", space.device().safe_pc(), (m_reg[GREG_PCI_MEM1_LO]<<21) | (offset*4), result, mem_mask);
 	return result;
 }
 WRITE32_MEMBER (gt64xxx_device::master_mem1_w)
 {
-	this->space(AS_DATA).write_dword((m_reg[GREG_PCI_MEM1_LO]<<21) | (offset*4), data, mem_mask);
-	if (LOG_PCI)
-		logerror("%06X:galileo pci mem1 write to offset %08X = %08X & %08X\n", space.device().safe_pc(), (m_reg[GREG_PCI_MEM1_LO]<<21) | (offset*4), data, mem_mask);
+	this->space(AS_PCI_MEM).write_dword((m_reg[GREG_PCI_MEM1_LO]<<21) | (offset*4), data, mem_mask);
+	LOGPCI("%06X:galileo pci mem1 write to offset %08X = %08X & %08X\n", space.device().safe_pc(), (m_reg[GREG_PCI_MEM1_LO]<<21) | (offset*4), data, mem_mask);
 }
 
 // PCI Master IO
 READ32_MEMBER (gt64xxx_device::master_io_r)
 {
-	UINT32 result = this->space(AS_IO).read_dword((m_reg[GREG_PCI_IO_LO]<<21) | (offset*4), mem_mask);
-	if (LOG_PCI && m_prev_addr != offset) {
+	uint32_t result = this->space(AS_PCI_IO).read_dword((m_reg[GREG_PCI_IO_LO] << 21) | (offset * 4), mem_mask);
+	if (m_prev_addr != offset) {
 		m_prev_addr = offset;
-		logerror("%06X:galileo pci io read from offset %08X = %08X & %08X\n", space.device().safe_pc(), (m_reg[GREG_PCI_IO_LO] << 21) | (offset * 4), result, mem_mask);
+		LOGPCI("%06X:galileo pci io read from offset %08X = %08X & %08X\n", space.device().safe_pc(), (m_reg[GREG_PCI_IO_LO] << 21) | (offset * 4), result, mem_mask);
 	}
 	return result;
 }
 WRITE32_MEMBER (gt64xxx_device::master_io_w)
 {
-	this->space(AS_IO).write_dword((m_reg[GREG_PCI_IO_LO]<<21) | (offset*4), data, mem_mask);
-	if (LOG_PCI && m_prev_addr != offset) {
+	this->space(AS_PCI_IO).write_dword((m_reg[GREG_PCI_IO_LO] << 21) | (offset * 4), data, mem_mask);
+	if (m_prev_addr != offset) {
 		m_prev_addr = offset;
-		logerror("%06X:galileo pciio write to offset %08X = %08X & %08X\n", space.device().safe_pc(), (m_reg[GREG_PCI_IO_LO] << 21) | (offset * 4), data, mem_mask);
+		LOGPCI("%06X:galileo pci io write to offset %08X = %08X & %08X\n", space.device().safe_pc(), (m_reg[GREG_PCI_IO_LO] << 21) | (offset * 4), data, mem_mask);
 	}
 }
 
 READ32_MEMBER(gt64xxx_device::ras_0_r)
 {
-	UINT32 result = m_ram[0][offset];
-	if (LOG_PCI)
-		logerror("%06X:galileo ras_0 read from offset %08X = %08X & %08X\n", space.device().safe_pc(), offset * 4, result, mem_mask);
+	uint32_t result = m_ram[0][offset];
+	LOGPCI("%06X:galileo ras_0 read from offset %08X = %08X & %08X\n", space.device().safe_pc(), offset * 4, result, mem_mask);
 	return result;
 }
 
 WRITE32_MEMBER(gt64xxx_device::ras_0_w)
 {
 	COMBINE_DATA(&m_ram[0][offset]);
-	if (LOG_PCI)
-		logerror("%06X:galileo ras_0 write to offset %08X = %08X & %08X\n", space.device().safe_pc(), offset * 4, data, mem_mask);
+	LOGPCI("%06X:galileo ras_0 write to offset %08X = %08X & %08X\n", space.device().safe_pc(), offset * 4, data, mem_mask);
 }
 
 READ32_MEMBER(gt64xxx_device::ras_1_r)
 {
-	UINT32 result = m_ram[1][offset];
-	if (LOG_PCI)
-		logerror("%06X:galileo ras_0 read from offset %08X = %08X & %08X\n", space.device().safe_pc(), offset * 4, result, mem_mask);
+	uint32_t result = m_ram[1][offset];
+	LOGPCI("%06X:galileo ras_0 read from offset %08X = %08X & %08X\n", space.device().safe_pc(), offset * 4, result, mem_mask);
 	return result;
 }
 
 WRITE32_MEMBER(gt64xxx_device::ras_1_w)
 {
 	COMBINE_DATA(&m_ram[1][offset]);
-	if (LOG_PCI)
-		logerror("%06X:galileo ras_0 write to offset %08X = %08X & %08X\n", space.device().safe_pc(), offset * 4, data, mem_mask);
+	LOGPCI("%06X:galileo ras_0 write to offset %08X = %08X & %08X\n", space.device().safe_pc(), offset * 4, data, mem_mask);
 }
 
 READ32_MEMBER(gt64xxx_device::ras_2_r)
 {
-	UINT32 result = m_ram[2][offset];
-	if (LOG_PCI)
-		logerror("%06X:galileo ras_0 read from offset %08X = %08X & %08X\n", space.device().safe_pc(), offset * 4, result, mem_mask);
+	uint32_t result = m_ram[2][offset];
+	LOGPCI("%06X:galileo ras_0 read from offset %08X = %08X & %08X\n", space.device().safe_pc(), offset * 4, result, mem_mask);
 	return result;
 }
 
 WRITE32_MEMBER(gt64xxx_device::ras_2_w)
 {
 	COMBINE_DATA(&m_ram[2][offset]);
-	if (LOG_PCI)
-		logerror("%06X:galileo ras_0 write to offset %08X = %08X & %08X\n", space.device().safe_pc(), offset * 4, data, mem_mask);
+	LOGPCI("%06X:galileo ras_0 write to offset %08X = %08X & %08X\n", space.device().safe_pc(), offset * 4, data, mem_mask);
 }
 
 READ32_MEMBER(gt64xxx_device::ras_3_r)
 {
-	UINT32 result = m_ram[3][offset];
-	if (LOG_PCI)
-		logerror("%06X:galileo ras_0 read from offset %08X = %08X & %08X\n", space.device().safe_pc(), offset * 4, result, mem_mask);
+	uint32_t result = m_ram[3][offset];
+	LOGPCI("%06X:galileo ras_0 read from offset %08X = %08X & %08X\n", space.device().safe_pc(), offset * 4, result, mem_mask);
 	return result;
 }
 
 WRITE32_MEMBER(gt64xxx_device::ras_3_w)
 {
 	COMBINE_DATA(&m_ram[3][offset]);
-	if (LOG_PCI)
-		logerror("%06X:galileo ras_0 write to offset %08X = %08X & %08X\n", space.device().safe_pc(), offset * 4, data, mem_mask);
+	LOGPCI("%06X:galileo ras_0 write to offset %08X = %08X & %08X\n", space.device().safe_pc(), offset * 4, data, mem_mask);
 }
 
 
 // CPU I/F
 READ32_MEMBER (gt64xxx_device::cpu_if_r)
 {
-	UINT32 result = m_reg[offset];
+	uint32_t result = m_reg[offset];
 
 	/* switch off the offset for special cases */
 	switch (offset)
@@ -483,15 +639,14 @@ READ32_MEMBER (gt64xxx_device::cpu_if_r)
 			result = timer->count;
 			if (timer->active)
 			{
-				UINT32 elapsed = (timer->timer->elapsed() * m_clock).as_double();
+				uint32_t elapsed = (timer->timer->elapsed() * m_clock).as_double();
 				result = (result > elapsed) ? (result - elapsed) : 0;
 			}
 
 			/* eat some time for those which poll this register */
 			//space.device().execute().eat_cycles(100);
 
-			if (LOG_TIMERS)
-				logerror("%08X:hires_timer_r = %08X\n", space.device().safe_pc(), result);
+			LOGTIMERS("%08X:hires_timer_r = %08X\n", space.device().safe_pc(), result);
 			break;
 		}
 
@@ -505,8 +660,7 @@ READ32_MEMBER (gt64xxx_device::cpu_if_r)
 
 		case GREG_CONFIG_DATA:
 			result = config_data_r(space, offset);
-			if (LOG_GALILEO)
-				logerror("%08X:Galileo GREG_CONFIG_DATA read from offset %03X = %08X\n", space.device().safe_pc(), offset*4, result);
+			LOGGALILEO("%08X:Galileo GREG_CONFIG_DATA read from offset %03X = %08X\n", space.device().safe_pc(), offset*4, result);
 			break;
 
 		case GREG_CONFIG_ADDRESS:
@@ -516,17 +670,15 @@ READ32_MEMBER (gt64xxx_device::cpu_if_r)
 		case GREG_INT_STATE:
 		case GREG_INT_MASK:
 		case GREG_TIMER_CONTROL:
-//          if (LOG_GALILEO)
-//              logerror("%08X:Galileo read from offset %03X = %08X\n", space.device().safe_pc(), offset*4, result);
+//          LOGGALILEO("%08X:Galileo read from offset %03X = %08X\n", space.device().safe_pc(), offset*4, result);
 			break;
 
 		default:
-			if (LOG_GALILEO)
-				logerror("%08X:Galileo read from offset %03X = %08X\n", space.device().safe_pc(), offset*4, result);
+			LOGGALILEO("%08X:Galileo read from offset %03X = %08X\n", space.device().safe_pc(), offset*4, result);
 			break;
 	}
 
-	if (m_be) result =  FLIPENDIAN_INT32(result);
+	if (m_be) result =  flipendian_int32(result);
 
 	return result;
 }
@@ -534,20 +686,20 @@ READ32_MEMBER (gt64xxx_device::cpu_if_r)
 WRITE32_MEMBER(gt64xxx_device::cpu_if_w)
 {
 	if (m_be) {
-		data = FLIPENDIAN_INT32(data);
-		mem_mask = FLIPENDIAN_INT32(mem_mask);
+		data = flipendian_int32(data);
+		mem_mask = flipendian_int32(mem_mask);
 	}
 
-	UINT32 oldata = m_reg[offset];
+	uint32_t oldata = m_reg[offset];
 	COMBINE_DATA(&m_reg[offset]);
 
 	/* switch off the offset for special cases */
 	switch (offset)
 	{
-		case GREG_RAS_1_0_LO:
-		case GREG_RAS_1_0_HI:
-		case GREG_RAS_3_2_LO:
-		case GREG_RAS_3_2_HI:
+		case GREG_R1_0_LO:
+		case GREG_R1_0_HI:
+		case GREG_R3_2_LO:
+		case GREG_R3_2_HI:
 		case GREG_CS_2_0_LO:
 		case GREG_CS_2_0_HI:
 		case GREG_CS_3_BOOT_LO:
@@ -562,8 +714,7 @@ WRITE32_MEMBER(gt64xxx_device::cpu_if_w)
 		case GREG_CS3_HI:
 			map_cpu_space();
 			remap_cb();
-			if (LOG_GALILEO)
-				logerror("%08X:Galileo Memory Map data write to offset %03X = %08X & %08X\n", space.device().safe_pc(), offset*4, data, mem_mask);
+			LOGGALILEO("%08X:Galileo Memory Map data write to offset %03X = %08X & %08X\n", space.device().safe_pc(), offset*4, data, mem_mask);
 			break;
 
 		case GREG_DMA0_CONTROL:
@@ -590,11 +741,9 @@ WRITE32_MEMBER(gt64xxx_device::cpu_if_w)
 					m_dma_timer->adjust(attotime::zero, 0, DMA_TIMER_PERIOD);
 				m_dma_active |= (1<< which);
 				//perform_dma(space, which);
-				if (LOG_DMA)
-					logerror("%08X:Galileo starting DMA Chan %i\n", space.device().safe_pc(), which);
+				LOGDMA("%08X:Galileo starting DMA Chan %i\n", space.device().safe_pc(), which);
 			}
-			if (LOG_GALILEO)
-				logerror("%08X:Galileo write to offset %03X = %08X & %08X\n", space.device().safe_pc(), offset * 4, data, mem_mask);
+			LOGGALILEO("%08X:Galileo write to offset %03X = %08X & %08X\n", space.device().safe_pc(), offset * 4, data, mem_mask);
 			break;
 		}
 
@@ -610,8 +759,7 @@ WRITE32_MEMBER(gt64xxx_device::cpu_if_w)
 				data &= 0xffffff;
 			if (!timer->active)
 				timer->count = data;
-			if (LOG_TIMERS)
-				logerror("%08X:timer/counter %d count = %08X [start=%08X]\n", space.device().safe_pc(), offset % 4, data, timer->count);
+			LOGTIMERS("%08X:timer/counter %d count = %08X [start=%08X]\n", space.device().safe_pc(), offset % 4, data, timer->count);
 			break;
 		}
 
@@ -619,8 +767,7 @@ WRITE32_MEMBER(gt64xxx_device::cpu_if_w)
 		{
 			int which, mask;
 
-			if (LOG_TIMERS)
-				logerror("%08X:timer/counter control = %08X\n", space.device().safe_pc(), data);
+			LOGTIMERS("%08X:timer/counter control = %08X\n", space.device().safe_pc(), data);
 			for (which = 0, mask = 0x01; which < 4; which++, mask <<= 2)
 			{
 				galileo_timer *timer = &m_timer[which];
@@ -634,39 +781,35 @@ WRITE32_MEMBER(gt64xxx_device::cpu_if_w)
 							timer->count &= 0xffffff;
 					}
 					timer->timer->adjust(TIMER_PERIOD * timer->count, which);
-					if (LOG_TIMERS)
-						logerror("Adjusted timer to fire in %f secs\n", (TIMER_PERIOD * timer->count).as_double());
+					LOGTIMERS("Adjusted timer to fire in %f secs\n", (TIMER_PERIOD * timer->count).as_double());
 				}
 				else if (timer->active && !(data & mask))
 				{
-					UINT32 elapsed = (timer->timer->elapsed() * m_clock).as_double();
+					uint32_t elapsed = (timer->timer->elapsed() * m_clock).as_double();
 					timer->active = 0;
 					timer->count = (timer->count > elapsed) ? (timer->count - elapsed) : 0;
 					timer->timer->adjust(attotime::never, which);
-					if (LOG_TIMERS)
-						logerror("Disabled timer\n");
+					LOGTIMERS("Disabled timer\n");
 				}
 			}
 			break;
 		}
 
 		case GREG_INT_STATE:
-			if (LOG_GALILEO)
-				logerror("%08X:Galileo write to IRQ clear = %08X & %08X\n", offset*4, data, mem_mask);
+			LOGGALILEO("%08X:Galileo write to IRQ clear = %08X & %08X\n", offset*4, data, mem_mask);
 			m_reg[offset] = oldata & data;
 			update_irqs();
 			break;
 
 		case GREG_CONFIG_DATA:
 			pci_host_device::config_data_w(space, offset, data);
-			if (LOG_GALILEO)
-				logerror("%08X:Galileo PCI config data write to offset %03X = %08X & %08X\n", space.device().safe_pc(), offset*4, data, mem_mask);
+			LOGGALILEO("%08X:Galileo PCI config data write to offset %03X = %08X & %08X\n", space.device().safe_pc(), offset*4, data, mem_mask);
 			break;
 
 		case GREG_CONFIG_ADDRESS:
 			// Type 0 config transactions signalled by Bus Num = 0 and Device Num != 0
 			// Bits 15:11 get mapped into device number for configuration
-			UINT32 modData;
+			uint32_t modData;
 			if (0 && (data & 0xff0000) == 0x0 && (data & 0xf800)) {
 				// Type 0 transaction
 				modData = 0;
@@ -686,8 +829,7 @@ WRITE32_MEMBER(gt64xxx_device::cpu_if_w)
 				modData = data;
 			}
 			pci_host_device::config_address_w(space, offset, modData);
-			if (LOG_GALILEO)
-				logerror("%08X:Galileo PCI config address write to offset %03X = %08X & %08X origData = %08X\n", space.device().safe_pc(), offset*4, modData, mem_mask, data);
+			LOGGALILEO("%08X:Galileo PCI config address write to offset %03X = %08X & %08X origData = %08X\n", space.device().safe_pc(), offset*4, modData, mem_mask, data);
 			break;
 
 		case GREG_DMA0_COUNT:   case GREG_DMA1_COUNT:   case GREG_DMA2_COUNT:   case GREG_DMA3_COUNT:
@@ -695,13 +837,11 @@ WRITE32_MEMBER(gt64xxx_device::cpu_if_w)
 		case GREG_DMA0_DEST:    case GREG_DMA1_DEST:    case GREG_DMA2_DEST:    case GREG_DMA3_DEST:
 		case GREG_DMA0_NEXT:    case GREG_DMA1_NEXT:    case GREG_DMA2_NEXT:    case GREG_DMA3_NEXT:
 		case GREG_INT_MASK:
-			if (LOG_GALILEO)
-				logerror("%08X:Galileo write to offset %03X = %08X & %08X\n", space.device().safe_pc(), offset*4, data, mem_mask);
+			LOGGALILEO("%08X:Galileo write to offset %03X = %08X & %08X\n", space.device().safe_pc(), offset*4, data, mem_mask);
 			break;
 
 		default:
-			if (LOG_GALILEO)
-				logerror("%08X:Galileo write to offset %03X = %08X & %08X\n", space.device().safe_pc(), offset*4, data, mem_mask);
+			LOGGALILEO("%08X:Galileo write to offset %03X = %08X & %08X\n", space.device().safe_pc(), offset*4, data, mem_mask);
 			break;
 	}
 }
@@ -722,8 +862,7 @@ void gt64xxx_device::update_irqs()
 	if (m_irq_num != -1)
 		m_cpu->set_input_line(m_irq_num, state);
 
-	if (1 && LOG_GALILEO)
-		logerror("Galileo IRQ %s irqNum: %i state = %08X mask = %08X\n", (state == ASSERT_LINE) ? "asserted" : "cleared", m_irq_num, m_reg[GREG_INT_STATE], m_reg[GREG_INT_MASK]);
+	LOGGALILEO("Galileo IRQ %s irqNum: %i state = %08X mask = %08X\n", (state == ASSERT_LINE) ? "asserted" : "cleared", m_irq_num, m_reg[GREG_INT_STATE], m_reg[GREG_INT_MASK]);
 }
 
 
@@ -732,8 +871,7 @@ TIMER_CALLBACK_MEMBER(gt64xxx_device::timer_callback)
 	int which = param;
 	galileo_timer *timer = &m_timer[which];
 
-	if (LOG_TIMERS)
-		logerror("timer %d fired\n", which);
+	LOGTIMERS("timer %d fired\n", which);
 
 	/* copy the start value from the registers */
 	timer->count = m_reg[GREG_TIMER0_COUNT + which];
@@ -756,7 +894,7 @@ TIMER_CALLBACK_MEMBER(gt64xxx_device::timer_callback)
  *  Galileo DMA handler
  *
  *************************************/
-address_space* gt64xxx_device::dma_decode_address(UINT32 &addr)
+address_space* gt64xxx_device::dma_decode_address(uint32_t &addr)
 {
 	for (size_t index = 0; index < proc_addr_bank::ADDR_NUM; ++index)
 	{
@@ -769,7 +907,7 @@ address_space* gt64xxx_device::dma_decode_address(UINT32 &addr)
 int gt64xxx_device::dma_fetch_next(address_space &space, int which)
 {
 	offs_t address = 0;
-	UINT32 data;
+	uint32_t data;
 
 	/* no-op for unchained mode */
 	if (!(m_reg[GREG_DMA0_CONTROL + which] & 0x200))
@@ -827,7 +965,7 @@ TIMER_CALLBACK_MEMBER (gt64xxx_device::perform_dma)
 	{
 		offs_t srcaddr = m_reg[GREG_DMA0_SOURCE + which];
 		offs_t dstaddr = m_reg[GREG_DMA0_DEST + which];
-		UINT32 bytesleft = m_reg[GREG_DMA0_COUNT + which] & 0xffff;
+		uint32_t bytesleft = m_reg[GREG_DMA0_COUNT + which] & 0xffff;
 		address_space* srcSpace = dma_decode_address(srcaddr);
 		address_space* dstSpace = dma_decode_address(dstaddr);
 
@@ -851,31 +989,32 @@ TIMER_CALLBACK_MEMBER (gt64xxx_device::perform_dma)
 			case 2:     dstinc = 0;     break;
 		}
 
-		if (LOG_DMA)
-			logerror("Performing DMA%d: src=%08X dst=%08X bytes=%04X sinc=%d dinc=%d\n", which, srcaddr, dstaddr, bytesleft, srcinc, dstinc);
+		LOGDMA("Performing DMA%d: src=%08X dst=%08X bytes=%04X sinc=%d dinc=%d\n", which, srcaddr, dstaddr, bytesleft, srcinc, dstinc);
 
 		int burstCount = 0;
 		/* standard transfer */
 		while (bytesleft > 0 && burstCount < DMA_BURST_SIZE)
 		{
-			if (m_pci_stall_state) {
-				if (LOG_DMA && m_retry_count<4)
-					logerror("%08X:Stalling DMA on voodoo retry_count: %i\n", m_cpu_space->device().safe_pc(), m_retry_count);
+			if (m_pci_stall_state)
+			{
+				if (m_retry_count<4) LOGDMA("%08X:Stalling DMA on voodoo retry_count: %i\n", m_cpu_space->device().safe_pc(), m_retry_count);
 				// Save info
 				m_reg[GREG_DMA0_SOURCE + which] = srcaddr;
 				m_reg[GREG_DMA0_DEST + which] = dstaddr;
 				m_reg[GREG_DMA0_COUNT + which] = (m_reg[GREG_DMA0_COUNT + which] & ~0xffff) | bytesleft;
 
 				m_retry_count++;
-				UINT32 configRetryCount = (m_reg[GREG_PCI_TIMEOUT] >> 16) & 0xff;
-				if (m_retry_count >= configRetryCount && configRetryCount > 0) {
+				uint32_t configRetryCount = (m_reg[GREG_PCI_TIMEOUT] >> 16) & 0xff;
+				if (m_retry_count >= configRetryCount && configRetryCount > 0)
+				{
 					logerror("gt64xxx_device::perform_dma Error! Too many PCI retries. DMA%d: src=%08X dst=%08X bytes=%04X sinc=%d dinc=%d\n", which, srcaddr, dstaddr, bytesleft, srcinc, dstinc);
 					// Signal error and abort DMA
 					m_dma_active &= ~(1 << which);
 					m_retry_count = 0;
 					return;
 				}
-				else {
+				else
+				{
 					// Come back later
 					return;
 				}

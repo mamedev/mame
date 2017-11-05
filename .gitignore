@@ -1,8 +1,10 @@
 *~
 .*.sw?
 *.mo
+*.orig
 *.pyc
 *.pyo
+*.rej
 .DS_Store
 
 /*
@@ -19,6 +21,7 @@
 !/language/
 !/nl_examples/
 !/plugins/
+!/projects/
 !/regtests/
 !/samples/
 !/scripts/
@@ -37,6 +40,7 @@
 !/*.bdf
 !/LICENSE
 /.idea
+docs/build
 regtests/chdman/temp
 regtests/jedutil/output
 /CMakeLists.txt
@@ -45,3 +49,4 @@ regtests/jedutil/output
 /src/devices/cpu/m68000/m68kmake.*
 /src/devices/cpu/m68000/m68kmake
 !/src/devices/cpu/m68000/m68kmake.cpp
+/samples

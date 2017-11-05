@@ -14,7 +14,10 @@
 
 */
 
+#include "emu.h"
 #include "tig.h"
+
+#include "screen.h"
 
 
 
@@ -52,7 +55,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type WANGPC_TIG = &device_creator<wangpc_tig_device>;
+DEFINE_DEVICE_TYPE(WANGPC_TIG, wangpc_tig_device, "wangpc_tig", "Want PC Text/Image/Graphics Controller")
 
 
 //-------------------------------------------------
@@ -70,7 +73,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *wangpc_tig_device::device_rom_region() const
+const tiny_rom_entry *wangpc_tig_device::device_rom_region() const
 {
 	return ROM_NAME( wangpc_tig );
 }
@@ -80,7 +83,7 @@ const rom_entry *wangpc_tig_device::device_rom_region() const
 //  UPD7220_INTERFACE( hgdc0_intf )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( upd7220_0_map, AS_0, 16, wangpc_tig_device )
+static ADDRESS_MAP_START( upd7220_0_map, 0, 16, wangpc_tig_device )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x0fff) AM_MIRROR(0x1000) AM_RAM // frame buffer
 	AM_RANGE(0x4000, 0x7fff) AM_RAM // font memory
@@ -95,7 +98,7 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( wangpc_tig_device::hgdc_draw_text )
 //  UPD7220_INTERFACE( hgdc1_intf )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( upd7220_1_map, AS_0, 16, wangpc_tig_device )
+static ADDRESS_MAP_START( upd7220_1_map, 0, 16, wangpc_tig_device )
 	ADDRESS_MAP_GLOBAL_MASK(0xffff)
 	AM_RANGE(0x0000, 0xffff) AM_RAM // graphics memory
 ADDRESS_MAP_END
@@ -106,11 +109,11 @@ UPD7220_DISPLAY_PIXELS_MEMBER( wangpc_tig_device::hgdc_display_pixels )
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( wangpc_tig )
+//  MACHINE_CONFIG_START( wangpc_tig )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( wangpc_tig )
-	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green)
+MACHINE_CONFIG_MEMBER( wangpc_tig_device::device_add_mconfig )
+	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green())
 	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, wangpc_tig_device, screen_update)
 	MCFG_SCREEN_SIZE(80*10, 25*12)
 	MCFG_SCREEN_VISIBLE_AREA(0, 80*10-1, 0, 25*12-1)
@@ -120,26 +123,15 @@ static MACHINE_CONFIG_FRAGMENT( wangpc_tig )
 	MCFG_PALETTE_ADD_MONOCHROME_HIGHLIGHT("palette")
 
 	MCFG_DEVICE_ADD(UPD7720_0_TAG, UPD7220, XTAL_52_832MHz/28)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, upd7220_0_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, upd7220_0_map)
 	MCFG_UPD7220_DRAW_TEXT_CALLBACK_OWNER(wangpc_tig_device, hgdc_draw_text)
 	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
 
 	MCFG_DEVICE_ADD(UPD7720_1_TAG, UPD7220, XTAL_52_832MHz/28)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, upd7220_1_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, upd7220_1_map)
 	MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(wangpc_tig_device, hgdc_display_pixels)
 	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor wangpc_tig_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( wangpc_tig );
-}
 
 
 //**************************************************************************
@@ -150,8 +142,8 @@ machine_config_constructor wangpc_tig_device::device_mconfig_additions() const
 //  wangpc_tig_device - constructor
 //-------------------------------------------------
 
-wangpc_tig_device::wangpc_tig_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, WANGPC_TIG, "Wang PC TIG Controller", tag, owner, clock, "wangpc_tig", __FILE__),
+wangpc_tig_device::wangpc_tig_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, WANGPC_TIG, tag, owner, clock),
 	device_wangpcbus_card_interface(mconfig, *this),
 	m_hgdc0(*this, UPD7720_0_TAG),
 	m_hgdc1(*this, UPD7720_1_TAG),
@@ -188,7 +180,7 @@ void wangpc_tig_device::device_reset()
 //  screen_update -
 //-------------------------------------------------
 
-UINT32 wangpc_tig_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t wangpc_tig_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	m_hgdc0->screen_update(screen, bitmap, cliprect);
 	m_hgdc1->screen_update(screen, bitmap, cliprect);
@@ -201,9 +193,9 @@ UINT32 wangpc_tig_device::screen_update(screen_device &screen, bitmap_rgb32 &bit
 //  wangpcbus_iorc_r - I/O read
 //-------------------------------------------------
 
-UINT16 wangpc_tig_device::wangpcbus_iorc_r(address_space &space, offs_t offset, UINT16 mem_mask)
+uint16_t wangpc_tig_device::wangpcbus_iorc_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
-	UINT16 data = 0xffff;
+	uint16_t data = 0xffff;
 
 	if (sad(offset))
 	{
@@ -233,7 +225,7 @@ UINT16 wangpc_tig_device::wangpcbus_iorc_r(address_space &space, offs_t offset, 
 //  wangpcbus_aiowc_w - I/O write
 //-------------------------------------------------
 
-void wangpc_tig_device::wangpcbus_aiowc_w(address_space &space, offs_t offset, UINT16 mem_mask, UINT16 data)
+void wangpc_tig_device::wangpcbus_aiowc_w(address_space &space, offs_t offset, uint16_t mem_mask, uint16_t data)
 {
 	if (sad(offset) && ACCESSING_BITS_0_7)
 	{
@@ -280,9 +272,9 @@ void wangpc_tig_device::wangpcbus_aiowc_w(address_space &space, offs_t offset, U
 //  wangpcbus_dack_r - DMA read
 //-------------------------------------------------
 
-UINT8 wangpc_tig_device::wangpcbus_dack_r(address_space &space, int line)
+uint8_t wangpc_tig_device::wangpcbus_dack_r(address_space &space, int line)
 {
-	UINT8 data;
+	uint8_t data;
 
 	if (DMA_GRAPHICS)
 	{
@@ -301,7 +293,7 @@ UINT8 wangpc_tig_device::wangpcbus_dack_r(address_space &space, int line)
 //  wangpcbus_dack_w - DMA write
 //-------------------------------------------------
 
-void wangpc_tig_device::wangpcbus_dack_w(address_space &space, int line, UINT8 data)
+void wangpc_tig_device::wangpcbus_dack_w(address_space &space, int line, uint8_t data)
 {
 	if (DMA_GRAPHICS)
 	{

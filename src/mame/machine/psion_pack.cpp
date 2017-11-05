@@ -40,7 +40,7 @@
 #define OPK_HEAD_SIZE           6
 
 
-static OPTION_GUIDE_START( datapack_option_guide )
+OPTION_GUIDE_START( datapack_option_guide )
 	OPTION_INT('S', "size", "Datapack size" )
 	OPTION_INT('R', "ram", "RAM/EPROM" )
 	OPTION_INT('P', "paged", "Paged" )
@@ -54,15 +54,15 @@ static const char *datapack_option_spec =
 
 
 // device type definition
-const device_type PSION_DATAPACK = &device_creator<datapack_device>;
+DEFINE_DEVICE_TYPE(PSION_DATAPACK, datapack_device, "datapack", "Psion Datapack")
 
 //-------------------------------------------------
 //  datapack_device - constructor
 //-------------------------------------------------
 
-datapack_device::datapack_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, PSION_DATAPACK, "Psion Datapack", tag, owner, clock, "datapack", __FILE__),
-		device_image_interface(mconfig, *this)
+datapack_device::datapack_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, PSION_DATAPACK, tag, owner, clock)
+	, device_image_interface(mconfig, *this)
 {
 }
 
@@ -94,10 +94,7 @@ void datapack_device::device_start()
 
 void datapack_device::device_config_complete()
 {
-	m_formatlist.append(*global_alloc(image_device_format("opk", "Psion Datapack image", "opk", datapack_option_spec)));
-
-	// set brief and instance name
-	update_names();
+	add_format("opk", "Psion Datapack image", "opk", datapack_option_spec);
 }
 
 
@@ -105,7 +102,7 @@ void datapack_device::device_config_complete()
 //  option_guide for create new image
 //-------------------------------------------------
 
-const option_guide *datapack_device::create_option_guide() const
+const util::option_guide &datapack_device::create_option_guide() const
 {
 	return datapack_option_guide;
 }
@@ -117,7 +114,7 @@ const option_guide *datapack_device::create_option_guide() const
 
 void datapack_device::update()
 {
-	UINT32 pack_addr = m_counter + ((m_id & DP_ID_PAGED) ? (m_page << 8) : 0);
+	uint32_t pack_addr = m_counter + ((m_id & DP_ID_PAGED) ? (m_page << 8) : 0);
 
 	// if the datapack is 128k or more is treated as segmented
 	if (m_size >= 0x10)
@@ -128,7 +125,7 @@ void datapack_device::update()
 		if ((m_control & DP_LINE_OUTPUT_ENABLE) && !(m_control & DP_LINE_RESET))
 		{
 			// write data
-			if (software_entry() == nullptr && (m_id & DP_ID_WRITE))
+			if (!loaded_through_softlist() && (m_id & DP_ID_WRITE))
 			{
 				fseek(pack_addr + OPK_HEAD_SIZE, SEEK_SET);
 				fwrite(&m_data, 1);
@@ -164,7 +161,7 @@ void datapack_device::update()
 		else if (!(m_control & DP_LINE_OUTPUT_ENABLE) && (m_control & DP_LINE_RESET))
 		{
 			// read datapack ID
-			if ((m_id & DP_ID_EPROM) || software_entry() != nullptr)
+			if ((m_id & DP_ID_EPROM) || loaded_through_softlist())
 				m_data = m_id;
 			else
 				m_data = 0x01;      // for identify RAM pack
@@ -177,7 +174,7 @@ void datapack_device::update()
     read datapack data lines
 -------------------------------------------------*/
 
-UINT8 datapack_device::data_r()
+uint8_t datapack_device::data_r()
 {
 	return (!(m_control & DP_LINE_SLOT_SELECT)) ? m_data : 0;
 }
@@ -187,7 +184,7 @@ UINT8 datapack_device::data_r()
     write datapack data lines
 -------------------------------------------------*/
 
-void  datapack_device::data_w(UINT8 data)
+void  datapack_device::data_w(uint8_t data)
 {
 	if (is_loaded())
 	{
@@ -204,7 +201,7 @@ void  datapack_device::data_w(UINT8 data)
     read datapack control lines
 -------------------------------------------------*/
 
-UINT8 datapack_device::control_r()
+uint8_t datapack_device::control_r()
 {
 	return m_control;
 }
@@ -214,7 +211,7 @@ UINT8 datapack_device::control_r()
     write datapack control lines
 -------------------------------------------------*/
 
-void datapack_device::control_w(UINT8 data)
+void datapack_device::control_w(uint8_t data)
 {
 	if (is_loaded())
 	{
@@ -256,21 +253,21 @@ void datapack_device::control_w(UINT8 data)
     DEVICE_IMAGE_LOAD( datapack )
 -------------------------------------------------*/
 
-bool datapack_device::call_load()
+image_init_result datapack_device::call_load()
 {
-	UINT8 data[0x10];
+	uint8_t data[0x10];
 
 	fread(data, 0x10);
 
 	// check the OPK head
 	if(strncmp((const char*)data, "OPK", 3))
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 
 	// get datapack ID and size
 	m_id   = data[OPK_HEAD_SIZE + 0];
 	m_size = data[OPK_HEAD_SIZE + 1];
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 
@@ -278,19 +275,19 @@ bool datapack_device::call_load()
     DEVICE_IMAGE_CREATE( datapack )
 -------------------------------------------------*/
 
-bool datapack_device::call_create(int format_type, option_resolution *create_args)
+image_init_result datapack_device::call_create(int format_type, util::option_resolution *create_args)
 {
-	static const UINT8 opk_head[6] = {'O', 'P', 'K', 0x00, 0x00, 0x00};
+	static const uint8_t opk_head[6] = {'O', 'P', 'K', 0x00, 0x00, 0x00};
 
 	if (create_args != nullptr)
 	{
 		m_id = 0x40;
-		m_id |= (option_resolution_lookup_int(create_args, 'R')) ? 0x00 : 0x02;
-		m_id |= (option_resolution_lookup_int(create_args, 'P')) ? 0x04 : 0x00;
-		m_id |= (option_resolution_lookup_int(create_args, 'W')) ? 0x00 : 0x08;
-		m_id |= (option_resolution_lookup_int(create_args, 'B')) ? 0x00 : 0x10;
-		m_id |= (option_resolution_lookup_int(create_args, 'C')) ? 0x20 : 0x00;
-		m_size = option_resolution_lookup_int(create_args, 'S');
+		m_id |= (create_args->lookup_int('R')) ? 0x00 : 0x02;
+		m_id |= (create_args->lookup_int('P')) ? 0x04 : 0x00;
+		m_id |= (create_args->lookup_int('W')) ? 0x00 : 0x08;
+		m_id |= (create_args->lookup_int('B')) ? 0x00 : 0x10;
+		m_id |= (create_args->lookup_int('C')) ? 0x20 : 0x00;
+		m_size = create_args->lookup_int('S');
 	}
 	else
 	{
@@ -303,7 +300,7 @@ bool datapack_device::call_create(int format_type, option_resolution *create_arg
 	fwrite(&m_id, 1);
 	fwrite(&m_size, 1);
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 

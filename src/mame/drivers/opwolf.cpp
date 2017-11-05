@@ -234,7 +234,7 @@ Stephh's notes (based on the game M68000 code and some tests) :
   - Sets :
       * 'opwolfa' : region = 0x0003
   - There is only ONE byte of difference at 0x03fff5.b with 'opwolf'
-    but its effect is unknown as this address doesn't seem to be read !
+    it changes behaviour in the 'continue game' screen
 
 3) 'opwolfb'
 
@@ -246,7 +246,7 @@ Stephh's notes (based on the game M68000 code and some tests) :
       * all reference to TAITO and "Operation Wolf" have been changed or "blanked"
       * "(c) 1988 BEAR CORPORATION KOREA" / "ALL RIGHTS RESERVED"
       * ROM check test "noped" (code at 0x00bb72)
-  - Notes on bootleg c-chip (similar to what is in machine/opwolf.c) :
+  - Notes on bootleg c-chip (similar to what is in machine/opwolf.cpp) :
       * always Engish language (thus the Dip Switch change to "Unused")
       * round 4 in "demo mode" instead of round 5
       * "service" button doesn't add credits (it works in the "test mode" though)
@@ -255,10 +255,6 @@ Stephh's notes (based on the game M68000 code and some tests) :
 
 TODO
 ====
-
-Need to verify Opwolf against original board: various reports
-claim there are discrepancies (perhaps limitations of the fake
-Z80 c-chip substitute to blame?).
 
 There are a few unmapped writes for the sound Z80 in the log.
 
@@ -278,13 +274,17 @@ register. So what is controlling priority.
 #define SOUND_CPU_CLOCK     (XTAL_8MHz / 2)     /* clock for Z80 sound CPU */
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "cpu/m68000/m68000.h"
-#include "includes/taitoipt.h"
-#include "audio/taitosnd.h"
-#include "sound/2151intf.h"
-#include "sound/msm5205.h"
 #include "includes/opwolf.h"
+#include "audio/taitosnd.h"
+
+#include "cpu/m68000/m68000.h"
+#include "cpu/z80/z80.h"
+#include "includes/taitoipt.h"
+#include "sound/msm5205.h"
+#include "sound/ym2151.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 READ16_MEMBER(opwolf_state::cchip_r)
 {
@@ -359,8 +359,8 @@ static ADDRESS_MAP_START( opwolf_map, AS_PROGRAM, 16, opwolf_state )
 	AM_RANGE(0x380000, 0x380003) AM_WRITE(opwolf_spritectrl_w)  // usually 0x4, changes when you fire
 	AM_RANGE(0x3a0000, 0x3a0003) AM_READ(opwolf_lightgun_r)     /* lightgun, read at $11e0/6 */
 	AM_RANGE(0x3c0000, 0x3c0001) AM_WRITENOP                    /* watchdog ?? */
-	AM_RANGE(0x3e0000, 0x3e0001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0xff00)
-	AM_RANGE(0x3e0002, 0x3e0003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0xff00)
+	AM_RANGE(0x3e0000, 0x3e0001) AM_READNOP AM_DEVWRITE8("ciu", pc060ha_device, master_port_w, 0xff00)
+	AM_RANGE(0x3e0002, 0x3e0003) AM_DEVREADWRITE8("ciu", pc060ha_device, master_comm_r, master_comm_w, 0xff00)
 	AM_RANGE(0xc00000, 0xc0ffff) AM_DEVREADWRITE("pc080sn", pc080sn_device, word_r, word_w)
 	AM_RANGE(0xc10000, 0xc1ffff) AM_WRITEONLY                   /* error in init code (?) */
 	AM_RANGE(0xc20000, 0xc20003) AM_DEVWRITE("pc080sn", pc080sn_device, yscroll_word_w)
@@ -380,8 +380,8 @@ static ADDRESS_MAP_START( opwolfb_map, AS_PROGRAM, 16, opwolf_state )
 	AM_RANGE(0x380000, 0x380003) AM_WRITE(opwolf_spritectrl_w)  // usually 0x4, changes when you fire
 	AM_RANGE(0x3a0000, 0x3a0003) AM_READ(opwolf_lightgun_r)     /* lightgun, read at $11e0/6 */
 	AM_RANGE(0x3c0000, 0x3c0001) AM_WRITENOP                    /* watchdog ?? */
-	AM_RANGE(0x3e0000, 0x3e0001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0xff00)
-	AM_RANGE(0x3e0002, 0x3e0003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0xff00)
+	AM_RANGE(0x3e0000, 0x3e0001) AM_READNOP AM_DEVWRITE8("ciu", pc060ha_device, master_port_w, 0xff00)
+	AM_RANGE(0x3e0002, 0x3e0003) AM_DEVREADWRITE8("ciu", pc060ha_device, master_comm_r, master_comm_w, 0xff00)
 	AM_RANGE(0xc00000, 0xc0ffff) AM_DEVREADWRITE("pc080sn", pc080sn_device, word_r, word_w)
 	AM_RANGE(0xc10000, 0xc1ffff) AM_WRITEONLY                   /* error in init code (?) */
 	AM_RANGE(0xc20000, 0xc20003) AM_DEVWRITE("pc080sn", pc080sn_device, yscroll_word_w)
@@ -399,8 +399,8 @@ static ADDRESS_MAP_START( opwolfp_map, AS_PROGRAM, 16, opwolf_state )
 	AM_RANGE(0x380000, 0x380003) AM_WRITE(opwolf_spritectrl_w)  // usually 0x4, changes when you fire
 	AM_RANGE(0x3a0000, 0x3a0003) AM_READ(opwolf_lightgun_r)     /* lightgun, read at $11e0/6 (AND INPUTS) */
 	AM_RANGE(0x3c0000, 0x3c0001) AM_WRITENOP                    /* watchdog ?? */
-	AM_RANGE(0x3e0000, 0x3e0001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0xff00)
-	AM_RANGE(0x3e0002, 0x3e0003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0xff00)
+	AM_RANGE(0x3e0000, 0x3e0001) AM_READNOP AM_DEVWRITE8("ciu", pc060ha_device, master_port_w, 0xff00)
+	AM_RANGE(0x3e0002, 0x3e0003) AM_DEVREADWRITE8("ciu", pc060ha_device, master_comm_r, master_comm_w, 0xff00)
 	AM_RANGE(0xc00000, 0xc0ffff) AM_DEVREADWRITE("pc080sn", pc080sn_device, word_r, word_w)
 	AM_RANGE(0xc10000, 0xc1ffff) AM_WRITEONLY                   /* error in init code (?) */
 	AM_RANGE(0xc20000, 0xc20003) AM_DEVWRITE("pc080sn", pc080sn_device, yscroll_word_w)
@@ -427,7 +427,7 @@ ADDRESS_MAP_END
 /***************************************************************************/
 
 
-//static UINT8 adpcm_d[0x08];
+//static uint8_t adpcm_d[0x08];
 //0 - start ROM offset LSB
 //1 - start ROM offset MSB
 //2 - end ROM offset LSB
@@ -439,6 +439,8 @@ ADDRESS_MAP_END
 
 void opwolf_state::machine_start()
 {
+	m_opwolf_timer = timer_alloc(TIMER_OPWOLF);
+
 	save_item(NAME(m_sprite_ctrl));
 	save_item(NAME(m_sprites_flipscreen));
 
@@ -470,7 +472,10 @@ void opwolf_state::opwolf_msm5205_vck(msm5205_device *device,int chip)
 		device->data_w(m_adpcm_data[chip] & 0x0f);
 		m_adpcm_data[chip] = -1;
 		if (m_adpcm_pos[chip] == m_adpcm_end[chip])
+		{
 			device->reset_w(1);
+			//logerror("reset device %d\n", chip);
+		}
 	}
 	else
 	{
@@ -504,6 +509,7 @@ WRITE8_MEMBER(opwolf_state::opwolf_adpcm_b_w)
 		m_adpcm_pos[0] = start;
 		m_adpcm_end[0] = end;
 		m_msm1->reset_w(0);
+		//logerror("TRIGGER MSM1\n");
 	}
 
 //  logerror("CPU #1     b00%i-data=%2x   pc=%4x\n",offset,data,space.device().safe_pc() );
@@ -526,6 +532,8 @@ WRITE8_MEMBER(opwolf_state::opwolf_adpcm_c_w)
 		m_adpcm_pos[1] = start;
 		m_adpcm_end[1] = end;
 		m_msm2->reset_w(0);
+
+		//logerror("TRIGGER MSM2\n");
 	}
 
 //  logerror("CPU #1     c00%i-data=%2x   pc=%4x\n",offset,data,space.device().safe_pc() );
@@ -548,8 +556,8 @@ static ADDRESS_MAP_START( opwolf_sound_z80_map, AS_PROGRAM, 8, opwolf_state )
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE("ymsnd", ym2151_device,read,write)
 	AM_RANGE(0x9002, 0x9100) AM_READNOP
-	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("tc0140syt", tc0140syt_device, slave_port_w)
-	AM_RANGE(0xa001, 0xa001) AM_DEVREADWRITE("tc0140syt", tc0140syt_device, slave_comm_r, slave_comm_w)
+	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("ciu", pc060ha_device, slave_port_w)
+	AM_RANGE(0xa001, 0xa001) AM_DEVREADWRITE("ciu", pc060ha_device, slave_comm_r, slave_comm_w)
 	AM_RANGE(0xb000, 0xb006) AM_WRITE(opwolf_adpcm_b_w)
 	AM_RANGE(0xc000, 0xc006) AM_WRITE(opwolf_adpcm_c_w)
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(opwolf_adpcm_d_w)
@@ -766,7 +774,7 @@ GFXDECODE_END
                  MACHINE DRIVERS
 ***********************************************************/
 
-static MACHINE_CONFIG_START( opwolf, opwolf_state )
+static MACHINE_CONFIG_START( opwolf )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, CPU_CLOCK ) /* 8 MHz */
@@ -775,6 +783,8 @@ static MACHINE_CONFIG_START( opwolf, opwolf_state )
 
 	MCFG_CPU_ADD("audiocpu", Z80, SOUND_CPU_CLOCK ) /* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(opwolf_sound_z80_map)
+
+	MCFG_TAITO_CCHIP_ADD("cchip", XTAL_12MHz / 2) /* ? MHz */
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))   /* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 
@@ -812,19 +822,19 @@ static MACHINE_CONFIG_START( opwolf, opwolf_state )
 
 	MCFG_SOUND_ADD("msm1", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(opwolf_state, opwolf_msm5205_vck_1)) /* VCK function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 8 kHz */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8 kHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.60)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.60)
 
 	MCFG_SOUND_ADD("msm2", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(opwolf_state, opwolf_msm5205_vck_2)) /* VCK function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 8 kHz */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8 kHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.60)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.60)
 
-	MCFG_DEVICE_ADD("tc0140syt", TC0140SYT, 0)
-	MCFG_TC0140SYT_MASTER_CPU("maincpu")
-	MCFG_TC0140SYT_SLAVE_CPU("audiocpu")
+	MCFG_DEVICE_ADD("ciu", PC060HA, 0)
+	MCFG_PC060HA_MASTER_CPU("maincpu")
+	MCFG_PC060HA_SLAVE_CPU("audiocpu")
 MACHINE_CONFIG_END
 
 
@@ -833,11 +843,13 @@ static MACHINE_CONFIG_DERIVED( opwolfp, opwolf )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu") /* 8 MHz */
 	MCFG_CPU_PROGRAM_MAP(opwolfp_map)
+
+	MCFG_DEVICE_REMOVE("cchip")
 MACHINE_CONFIG_END
 
 
 
-static MACHINE_CONFIG_START( opwolfb, opwolf_state ) /* OSC clocks unknown for the bootleg, but changed to match original sets */
+static MACHINE_CONFIG_START( opwolfb ) /* OSC clocks unknown for the bootleg, but changed to match original sets */
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, CPU_CLOCK ) /* 8 MHz ??? */
@@ -886,25 +898,50 @@ static MACHINE_CONFIG_START( opwolfb, opwolf_state ) /* OSC clocks unknown for t
 
 	MCFG_SOUND_ADD("msm1", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(opwolf_state, opwolf_msm5205_vck_1)) /* VCK function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 8 kHz */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8 kHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.60)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.60)
 
 	MCFG_SOUND_ADD("msm2", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(opwolf_state, opwolf_msm5205_vck_2)) /* VCK function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 8 kHz */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8 kHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.60)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.60)
 
-	MCFG_DEVICE_ADD("tc0140syt", TC0140SYT, 0)
-	MCFG_TC0140SYT_MASTER_CPU("maincpu")
-	MCFG_TC0140SYT_SLAVE_CPU("audiocpu")
+	MCFG_DEVICE_ADD("ciu", PC060HA, 0)
+	MCFG_PC060HA_MASTER_CPU("maincpu")
+	MCFG_PC060HA_SLAVE_CPU("audiocpu")
 MACHINE_CONFIG_END
 
 
 /***************************************************************************
                     DRIVERS
 ***************************************************************************/
+
+/*
+
+Note about current c-chip eprom dump
+
+the current dump is bad because data with address bit 0x200 set is missing (always read out as 0xff)
+
+you can however locate some of the tables used by the current simulation code in the rom
+
+for example
+
+Offset(h) 00 01 02 03 04 05 06 07 08 09 0A 0B
+00001128                 07 80 02 09 03 00 4C
+00001134  01 00 04 00 10 07 80 02 09 03 00 4C
+00001140  01 40 04 00 20
+
+is the following data from machine/opwolf.cpp
+
+static const uint16_t level_data_04[] = {
+  0x0780, 0x0209, 0x0300,   0x4c01, 0x0004, 0x0010,
+  0x0780, 0x0209, 0x0300,   0x4c01, 0x4004, 0x0020,
+
+however without the correct dump of the cchip eprom we can't run the actual cchip code
+
+*/
 
 ROM_START( opwolf )
 	ROM_REGION( 0x40000, "maincpu", 0 )     /* 256k for 68000 code */
@@ -915,6 +952,9 @@ ROM_START( opwolf )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )      /* sound cpu */
 	ROM_LOAD( "b20-07.10",  0x00000, 0x10000, CRC(45c7ace3) SHA1(06f7393f6b973b7735c27e8380cb4148650cfc16) )
+
+	ROM_REGION( 0x2000, "cchip:cchip_eprom", 0 )
+	ROM_LOAD( "cchip_b20-18", 0x0000, 0x2000, BAD_DUMP CRC(57165ffb) SHA1(e47e1bf309eb4285fede3a35b98e2fdeab2d7345) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
 	ROM_LOAD( "b20-13.13",  0x00000, 0x80000, CRC(f6acdab1) SHA1(716b94ab3fa330ecf22df576f6a9f47a49c7554a) )    /* SCR tiles (8 x 8) */
@@ -941,6 +981,9 @@ ROM_START( opwolfa )
 	ROM_REGION( 0x10000, "audiocpu", 0 )      /* sound cpu */
 	ROM_LOAD( "b20-07.10",  0x00000, 0x10000, CRC(45c7ace3) SHA1(06f7393f6b973b7735c27e8380cb4148650cfc16) )
 
+	ROM_REGION( 0x2000, "cchip:cchip_eprom", 0 )
+	ROM_LOAD( "cchip_b20-18", 0x0000, 0x2000, BAD_DUMP CRC(57165ffb) SHA1(e47e1bf309eb4285fede3a35b98e2fdeab2d7345) )
+
 	ROM_REGION( 0x80000, "gfx1", 0 )
 	ROM_LOAD( "b20-13.13",  0x00000, 0x80000, CRC(f6acdab1) SHA1(716b94ab3fa330ecf22df576f6a9f47a49c7554a) )    /* SCR tiles (8 x 8) */
 
@@ -956,10 +999,36 @@ ROM_START( opwolfj )
 	ROM_LOAD16_BYTE( "b20-05-02.40",  0x00000, 0x10000, CRC(3ffbfe3a) SHA1(e41257e6af18bab4e36267a0c25a6aaa742972d2) )
 	ROM_LOAD16_BYTE( "b20-03-02.30",  0x00001, 0x10000, CRC(fdabd8a5) SHA1(866ec6168489024b8d157f2d5b1553d7f6e3d9b7) )
 	ROM_LOAD16_BYTE( "b20-04.39",     0x20000, 0x10000, CRC(216b4838) SHA1(2851cae00bb3e32e20f35fdab8ed6f149e658363) )
-	ROM_LOAD16_BYTE( "b20-18.29",     0x20001, 0x10000, CRC(fd202470) SHA1(3108c14953d2f50d861946e9f646813b7050b58a) )
+	ROM_LOAD16_BYTE( "b20-18.29",     0x20001, 0x10000, CRC(fd202470) SHA1(3108c14953d2f50d861946e9f646813b7050b58a) ) // is this correct? clashes with c-chip part number
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )      /* sound cpu */
 	ROM_LOAD( "b20-07.10",  0x00000, 0x10000, CRC(45c7ace3) SHA1(06f7393f6b973b7735c27e8380cb4148650cfc16) )
+
+	ROM_REGION( 0x2000, "cchip:cchip_eprom", 0 )
+	ROM_LOAD( "cchip_b20-18", 0x0000, 0x2000, BAD_DUMP CRC(57165ffb) SHA1(e47e1bf309eb4285fede3a35b98e2fdeab2d7345) )
+
+	ROM_REGION( 0x80000, "gfx1", 0 )
+	ROM_LOAD( "b20-13.13",  0x00000, 0x80000, CRC(f6acdab1) SHA1(716b94ab3fa330ecf22df576f6a9f47a49c7554a) )    /* SCR tiles (8 x 8) */
+
+	ROM_REGION( 0x80000, "gfx2", 0 )
+	ROM_LOAD( "b20-14.72",  0x00000, 0x80000, CRC(89f889e5) SHA1(1592f6ce4fbb75e33d6ab957e5b90242a7a7a8c4) )    /* Sprites (16 x 16) */
+
+	ROM_REGION( 0x80000, "adpcm", 0 )   /* ADPCM samples */
+	ROM_LOAD( "b20-08.21",  0x00000, 0x80000, CRC(f3e19c64) SHA1(39d48645f776c9c2ade537d959ecc6f9dc6dfa1b) )
+ROM_END
+
+ROM_START( opwolfjsc )
+	ROM_REGION( 0x40000, "maincpu", 0 )     /* 256k for 68000 code */
+	ROM_LOAD16_BYTE( "b20_27.ic40.27512", 0x000000, 0x010000, CRC(6bd02046) SHA1(3d3047b7665635e890337f1f46351427e307bfe7) )
+	ROM_LOAD16_BYTE( "b20_26.ic30.27512", 0x000001, 0x010000, CRC(644dd415) SHA1(0cdc1152cb16fb872387f8cab3d9ee4b6286b965) )
+	ROM_LOAD16_BYTE( "b20-04.39",     0x20000, 0x10000, CRC(216b4838) SHA1(2851cae00bb3e32e20f35fdab8ed6f149e658363) )
+	ROM_LOAD16_BYTE( "b20-18.29",     0x20001, 0x10000, CRC(fd202470) SHA1(3108c14953d2f50d861946e9f646813b7050b58a) ) // is this correct? clashes with c-chip part number
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )      /* sound cpu */
+	ROM_LOAD( "b20-07.10",  0x00000, 0x10000, CRC(45c7ace3) SHA1(06f7393f6b973b7735c27e8380cb4148650cfc16) )
+
+	ROM_REGION( 0x2000, "cchip:cchip_eprom", 0 )
+	ROM_LOAD( "cchip_b20-18", 0x0000, 0x2000, BAD_DUMP CRC(57165ffb) SHA1(e47e1bf309eb4285fede3a35b98e2fdeab2d7345) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
 	ROM_LOAD( "b20-13.13",  0x00000, 0x80000, CRC(f6acdab1) SHA1(716b94ab3fa330ecf22df576f6a9f47a49c7554a) )    /* SCR tiles (8 x 8) */
@@ -980,6 +1049,9 @@ ROM_START( opwolfu ) /* Taito TC0030 C-Chip labeled B20-18 (yes, it has a specif
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )      /* sound cpu */
 	ROM_LOAD( "b20-07.10",  0x00000, 0x10000, CRC(45c7ace3) SHA1(06f7393f6b973b7735c27e8380cb4148650cfc16) )
+
+	ROM_REGION( 0x2000, "cchip:cchip_eprom", 0 )
+	ROM_LOAD( "cchip_b20-18", 0x0000, 0x2000, BAD_DUMP CRC(57165ffb) SHA1(e47e1bf309eb4285fede3a35b98e2fdeab2d7345) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
 	ROM_LOAD( "b20-13.13",  0x00000, 0x80000, CRC(f6acdab1) SHA1(716b94ab3fa330ecf22df576f6a9f47a49c7554a) )    /* SCR tiles (8 x 8) */
@@ -1065,7 +1137,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(opwolf_state,opwolf)
 {
-	UINT16* rom = (UINT16*)memregion("maincpu")->base();
+	uint16_t* rom = (uint16_t*)memregion("maincpu")->base();
 
 	m_opwolf_region = rom[0x03fffe / 2] & 0xff;
 
@@ -1081,7 +1153,7 @@ DRIVER_INIT_MEMBER(opwolf_state,opwolf)
 
 DRIVER_INIT_MEMBER(opwolf_state,opwolfb)
 {
-	UINT16* rom = (UINT16*)memregion("maincpu")->base();
+	uint16_t* rom = (uint16_t*)memregion("maincpu")->base();
 
 	m_opwolf_region = rom[0x03fffe / 2] & 0xff;
 
@@ -1094,7 +1166,7 @@ DRIVER_INIT_MEMBER(opwolf_state,opwolfb)
 
 DRIVER_INIT_MEMBER(opwolf_state,opwolfp)
 {
-	UINT16* rom = (UINT16*)memregion("maincpu")->base();
+	uint16_t* rom = (uint16_t*)memregion("maincpu")->base();
 
 	m_opwolf_region = rom[0x03fffe / 2] & 0xff;
 
@@ -1104,12 +1176,16 @@ DRIVER_INIT_MEMBER(opwolf_state,opwolfp)
 	membank("z80bank")->configure_entries(0, 4, memregion("audiocpu")->base(), 0x4000);
 }
 
+// Prototype rom set includes the string - 'T KATO 10/6/87'
+// Regular rom set includes the string '11 Sep 1987'
 
+// MACHINE_IMPERFECT_SOUND is present because the credit sound appears to double trigger.  All other sounds seem correct.
 
-/*    year  rom       parent    machine   inp       init */
-GAME( 1987, opwolf,   0,        opwolf,   opwolf,  opwolf_state,  opwolf,   ROT0, "Taito Corporation Japan", "Operation Wolf (World, set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, opwolfa,  opwolf,   opwolf,   opwolf,  opwolf_state,  opwolf,   ROT0, "Taito Corporation Japan", "Operation Wolf (World, set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, opwolfj,  opwolf,   opwolf,   opwolfu, opwolf_state,  opwolf,   ROT0, "Taito Corporation", "Operation Wolf (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, opwolfu,  opwolf,   opwolf,   opwolfu, opwolf_state,  opwolf,   ROT0, "Taito America Corporation", "Operation Wolf (US)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+//    year  rom       parent    machine   inp      state          init
+GAME( 1987, opwolf,   0,        opwolf,   opwolf,  opwolf_state,  opwolf,   ROT0, "Taito Corporation Japan",          "Operation Wolf (World, set 1)",              MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, opwolfa,  opwolf,   opwolf,   opwolf,  opwolf_state,  opwolf,   ROT0, "Taito Corporation Japan",          "Operation Wolf (World, set 2)",              MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, opwolfj,  opwolf,   opwolf,   opwolfu, opwolf_state,  opwolf,   ROT0, "Taito Corporation",                "Operation Wolf (Japan)",                     MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, opwolfjsc,opwolf,   opwolf,   opwolfu, opwolf_state,  opwolf,   ROT0, "Taito Corporation",                "Operation Wolf (Japan, SC)",                 MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, opwolfu,  opwolf,   opwolf,   opwolfu, opwolf_state,  opwolf,   ROT0, "Taito America Corporation",        "Operation Wolf (US)",                        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1987, opwolfb,  opwolf,   opwolfb,  opwolfb, opwolf_state,  opwolfb,  ROT0, "bootleg (Bear Corporation Korea)", "Operation Bear (bootleg of Operation Wolf)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, opwolfp,  opwolf,   opwolfp,  opwolfp, opwolf_state,  opwolfp,  ROT0, "Taito Corporation", "Operation Wolf (Japan, prototype)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // unprotected
+GAME( 1987, opwolfp,  opwolf,   opwolfp,  opwolfp, opwolf_state,  opwolfp,  ROT0, "Taito Corporation",                "Operation Wolf (Japan, prototype)",          MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // unprotected

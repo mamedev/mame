@@ -266,7 +266,7 @@ void vigilant_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect
 	}
 }
 
-UINT32 vigilant_state::screen_update_kikcubic(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t vigilant_state::screen_update_kikcubic(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	for (int offs = 0; offs < 0x1000; offs += 2)
 	{
@@ -287,7 +287,7 @@ UINT32 vigilant_state::screen_update_kikcubic(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-UINT32 vigilant_state::screen_update_vigilant(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t vigilant_state::screen_update_vigilant(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* copy the background palette */
 	for (int i = 0;i < 16;i++)

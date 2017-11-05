@@ -50,6 +50,9 @@ F2=DOS.SYS
 Select operating system:
 
 If you choose F1 then DOS Plus and GEM will be booted, or if you press F2 then MS-DOS will be booted.
+
+PC1512-HD10: ?
+PC1512-HD20: Tandon TM-262 [-chs 615,4,17 -ss 512]
 */
 
 /*
@@ -67,7 +70,7 @@ This is done in the following way:
 4. Answer YES to the screen prompt.
 5. When HDFORMAT is completed remove disc four and replace with disc one.
 6. Type CD\ and press return.
-7. Type FDISC and press return.
+7. Type FDISK and press return.
 8. Press return key every time you are asked a question.
 9. With disc one still in drive A: type FORMAT C:/S and press return.
 10. When formatting is finished replace disc one with disc four.
@@ -84,12 +87,17 @@ The system is now installed and should be tested by rebooting the machine.
 It should be noted that if the hard disc is ok but the software has been corrupted or deleted you can
 reinstall the software without reformatting.
 This is done by following steps 11 and 12.
+
+PC1640-HD20: Amstrad 40095 (Alps DRMD20A12A), Tandon TM-262 [-chs 615,4,17 -ss 512]
+PC1640-HD30: Western Digital 95038 [-chs 615,6,17 -ss 512]
 */
 
+#include "emu.h"
 #include "includes/pc1512.h"
 #include "bus/rs232/rs232.h"
 #include "bus/isa/ega.h"
 #include "softlist.h"
+#include "speaker.h"
 
 
 //**************************************************************************
@@ -102,7 +110,7 @@ This is done by following steps 11 and 12.
 
 READ8_MEMBER( pc1512_state::system_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	switch (offset)
 	{
@@ -200,6 +208,13 @@ WRITE8_MEMBER( pc1512_state::system_w )
 		update_speaker();
 
 		m_kb->clock_w(BIT(data, 6));
+
+		if (BIT(data, 7))
+		{
+			m_kb_bits = 0;
+			m_kb->data_w(1);
+			m_pic->ir1_w(CLEAR_LINE);
+		}
 		break;
 
 	case 4:
@@ -261,7 +276,7 @@ WRITE8_MEMBER( pc1512_state::system_w )
 
 READ8_MEMBER( pc1512_state::mouse_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	switch (offset)
 	{
@@ -366,7 +381,7 @@ WRITE8_MEMBER( pc1512_state::nmi_mask_w )
 
 READ8_MEMBER( pc1512_state::printer_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	switch (offset)
 	{
@@ -429,7 +444,7 @@ READ8_MEMBER( pc1512_state::printer_r )
 
 READ8_MEMBER( pc1640_state::printer_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	switch (offset)
 	{
@@ -539,7 +554,7 @@ WRITE8_MEMBER( pc1512_state::printer_w )
 
 READ8_MEMBER( pc1640_state::io_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 	offs_t addr = offset & 0x3ff;
 	bool decoded = false;
 
@@ -565,7 +580,7 @@ READ8_MEMBER( pc1640_state::io_r )
 	}
 	else if (!BIT(offset, 7))
 	{
-		UINT16 sw = m_sw->read();
+		uint16_t sw = m_sw->read();
 
 		if (!BIT(offset, 14))
 		{
@@ -604,7 +619,11 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( pc1512_io, AS_IO, 16, pc1512_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x3ff)
+	// [RH] 29 Aug 2016: I can find no evidence to indicate that Amstrad had only 10 I/O lines, as the
+	// schematic calls for a stock 8086 and the I/O and data lines are multiplexed onto the same bus,
+	// plus address lines 20-10 are towards the middle of a standard ISA slot. If it turns out that this
+	// is not in fact accurate to hardware, please add this back in.
+	// ADDRESS_MAP_GLOBAL_MASK(0x3ff)
 	AM_RANGE(0x000, 0x00f) AM_DEVREADWRITE8(I8237A5_TAG, am9517a_device, read, write, 0xffff)
 	AM_RANGE(0x020, 0x021) AM_DEVREADWRITE8(I8259A2_TAG, pic8259_device, read, write, 0xffff)
 	AM_RANGE(0x040, 0x043) AM_DEVREADWRITE8(I8253_TAG, pit8253_device, read, write, 0xffff)
@@ -658,75 +677,10 @@ ADDRESS_MAP_END
 //**************************************************************************
 
 //-------------------------------------------------
-//  INPUT_CHANGED_MEMBER( mouse_button_1_changed )
-//-------------------------------------------------
-
-INPUT_CHANGED_MEMBER( pc1512_state::mouse_button_1_changed )
-{
-	m_kb->m1_w(newval);
-}
-
-
-//-------------------------------------------------
-//  INPUT_CHANGED_MEMBER( mouse_button_2_changed )
-//-------------------------------------------------
-
-INPUT_CHANGED_MEMBER( pc1512_state::mouse_button_2_changed )
-{
-	m_kb->m2_w(newval);
-}
-
-
-//-------------------------------------------------
-//  INPUT_CHANGED_MEMBER( mouse_x_changed )
-//-------------------------------------------------
-
-INPUT_CHANGED_MEMBER( pc1512_state::mouse_x_changed )
-{
-	if (newval > oldval)
-		m_mouse_x++;
-	else
-		m_mouse_x--;
-}
-
-
-//-------------------------------------------------
-//  INPUT_CHANGED_MEMBER( mouse_y_changed )
-//-------------------------------------------------
-
-INPUT_CHANGED_MEMBER( pc1512_state::mouse_y_changed )
-{
-	if (newval > oldval)
-		m_mouse_y--;
-	else
-		m_mouse_y++;
-}
-
-
-//-------------------------------------------------
-//  INPUT_PORTS( mouse )
-//-------------------------------------------------
-
-static INPUT_PORTS_START( mouse )
-	PORT_START("MOUSEB")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_NAME("Left Mouse Button") PORT_CODE(MOUSECODE_BUTTON1) PORT_CHANGED_MEMBER(DEVICE_SELF, pc1512_state, mouse_button_1_changed, 0)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_NAME("Right Mouse Button") PORT_CODE(MOUSECODE_BUTTON2) PORT_CHANGED_MEMBER(DEVICE_SELF, pc1512_state, mouse_button_2_changed, 0)
-
-	PORT_START("MOUSEX")
-	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(5) PORT_MINMAX(0, 255) PORT_PLAYER(1) PORT_CHANGED_MEMBER(DEVICE_SELF, pc1512_state, mouse_x_changed, 0)
-
-	PORT_START("MOUSEY")
-	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(5) PORT_MINMAX(0, 255) PORT_PLAYER(1) PORT_CHANGED_MEMBER(DEVICE_SELF, pc1512_state, mouse_y_changed, 0)
-INPUT_PORTS_END
-
-
-//-------------------------------------------------
 //  INPUT_PORTS( pc1512 )
 //-------------------------------------------------
 
 static INPUT_PORTS_START( pc1512 )
-	PORT_INCLUDE( mouse )
-
 	PORT_START("LK")
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Language ) )
 	PORT_DIPSETTING(    0x07, DEF_STR( English ) )
@@ -759,8 +713,6 @@ INPUT_PORTS_END
 //-------------------------------------------------
 
 static INPUT_PORTS_START( pc1640 )
-	PORT_INCLUDE( mouse )
-
 	PORT_START("LK")
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Language ) )
 	PORT_DIPSETTING(    0x07, DEF_STR( English ) )
@@ -843,6 +795,25 @@ WRITE_LINE_MEMBER( pc1512_state::kbclk_w )
 	m_kbclk = state;
 }
 
+WRITE8_MEMBER( pc1512_state::mouse_x_w )
+{
+	if (data > m_mouse_x_old)
+		m_mouse_x+=3;
+	else
+		m_mouse_x-=3;
+
+	m_mouse_x_old = data;
+}
+
+WRITE8_MEMBER( pc1512_state::mouse_y_w )
+{
+	if (data > m_mouse_y_old)
+		m_mouse_y-=3;
+	else
+		m_mouse_y+=3;
+
+	m_mouse_y_old = data;
+}
 
 //-------------------------------------------------
 //  I8237_INTERFACE( dmac_intf )
@@ -1097,6 +1068,8 @@ void pc1512_state::machine_start()
 	save_item(NAME(m_kbdata));
 	save_item(NAME(m_mouse_x));
 	save_item(NAME(m_mouse_y));
+	save_item(NAME(m_mouse_x_old));
+	save_item(NAME(m_mouse_y_old));
 	save_item(NAME(m_dma_page));
 	save_item(NAME(m_dma_channel));
 	save_item(NAME(m_dreq0));
@@ -1130,7 +1103,6 @@ void pc1512_state::machine_reset()
 {
 	m_nmi_enable = 0;
 	m_toggle = 0;
-	m_kb_bits = 0;
 	m_pit2 = 1;
 
 	m_lpen = 0;
@@ -1143,7 +1115,9 @@ void pc1512_state::machine_reset()
 	m_vdu_plane = 0x0f;
 	m_vdu_border = 0;
 
-	m_kb->clock_w(0);
+	m_kb_bits = 0;
+	m_kb->data_w(1);
+	m_pic->ir1_w(CLEAR_LINE);
 }
 
 
@@ -1166,6 +1140,8 @@ void pc1640_state::machine_start()
 	save_item(NAME(m_kbdata));
 	save_item(NAME(m_mouse_x));
 	save_item(NAME(m_mouse_y));
+	save_item(NAME(m_mouse_x_old));
+	save_item(NAME(m_mouse_y_old));
 	save_item(NAME(m_dma_page));
 	save_item(NAME(m_dma_channel));
 	save_item(NAME(m_dreq0));
@@ -1189,8 +1165,10 @@ void pc1640_state::machine_start()
 void pc1640_state::machine_reset()
 {
 	m_nmi_enable = 0;
+
 	m_kb_bits = 0;
-	m_kb->clock_w(0);
+	m_kb->data_w(1);
+	m_pic->ir1_w(CLEAR_LINE);
 }
 
 
@@ -1203,7 +1181,7 @@ void pc1640_state::machine_reset()
 //  MACHINE_CONFIG( pc1512 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( pc1512, pc1512_state )
+static MACHINE_CONFIG_START( pc1512 )
 	MCFG_CPU_ADD(I8086_TAG, I8086, XTAL_24MHz/3)
 	MCFG_CPU_PROGRAM_MAP(pc1512_mem)
 	MCFG_CPU_IO_MAP(pc1512_io)
@@ -1221,6 +1199,13 @@ static MACHINE_CONFIG_START( pc1512, pc1512_state )
 	MCFG_DEVICE_ADD(PC1512_KEYBOARD_TAG, PC1512_KEYBOARD, 0)
 	MCFG_PC1512_KEYBOARD_CLOCK_CALLBACK(WRITELINE(pc1512_state, kbclk_w))
 	MCFG_PC1512_KEYBOARD_DATA_CALLBACK(WRITELINE(pc1512_state, kbdata_w))
+
+	MCFG_PC1512_MOUSE_PORT_ADD(PC1512_MOUSE_PORT_TAG, pc1512_mouse_port_devices, "mouse")
+	MCFG_PC1512_MOUSE_PORT_X_CB(WRITE8(pc1512_state, mouse_x_w))
+	MCFG_PC1512_MOUSE_PORT_Y_CB(WRITE8(pc1512_state, mouse_y_w))
+	MCFG_PC1512_MOUSE_PORT_M1_CB(DEVWRITELINE(PC1512_KEYBOARD_TAG, pc1512_keyboard_device, m1_w))
+	MCFG_PC1512_MOUSE_PORT_M2_CB(DEVWRITELINE(PC1512_KEYBOARD_TAG, pc1512_keyboard_device, m2_w))
+
 	MCFG_DEVICE_ADD(I8237A5_TAG, AM9517A, XTAL_24MHz/6)
 	MCFG_I8237_OUT_HREQ_CB(WRITELINE(pc1512_state, hrq_w))
 	MCFG_I8237_OUT_EOP_CB(WRITELINE(pc1512_state, eop_w))
@@ -1237,7 +1222,9 @@ static MACHINE_CONFIG_START( pc1512, pc1512_state )
 	MCFG_I8237_OUT_DACK_1_CB(WRITELINE(pc1512_state, dack1_w))
 	MCFG_I8237_OUT_DACK_2_CB(WRITELINE(pc1512_state, dack2_w))
 	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(pc1512_state, dack3_w))
-	MCFG_PIC8259_ADD(I8259A2_TAG, INPUTLINE(I8086_TAG, INPUT_LINE_IRQ0), VCC, NOOP)
+
+	MCFG_DEVICE_ADD(I8259A2_TAG, PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(INPUTLINE(I8086_TAG, INPUT_LINE_IRQ0))
 
 	MCFG_DEVICE_ADD(I8253_TAG, PIT8253, 0)
 	MCFG_PIT8253_CLK0(XTAL_28_63636MHz/24)
@@ -1249,11 +1236,13 @@ static MACHINE_CONFIG_START( pc1512, pc1512_state )
 
 	MCFG_MC146818_ADD(MC146818_TAG, XTAL_32_768kHz)
 	MCFG_MC146818_IRQ_HANDLER(DEVWRITELINE(I8259A2_TAG, pic8259_device, ir2_w))
+
 	MCFG_PC_FDC_XT_ADD(PC_FDC_XT_TAG)
 	MCFG_PC_FDC_INTRQ_CALLBACK(WRITELINE(pc1512_state, fdc_int_w))
 	MCFG_PC_FDC_DRQ_CALLBACK(WRITELINE(pc1512_state, fdc_drq_w))
 	MCFG_FLOPPY_DRIVE_ADD(PC_FDC_XT_TAG ":0", pc1512_floppies, "525dd", pc1512_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(PC_FDC_XT_TAG ":1", pc1512_floppies, nullptr,    pc1512_state::floppy_formats)
+
 	MCFG_DEVICE_ADD(INS8250_TAG, INS8250, XTAL_1_8432MHz)
 	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE(RS232_TAG, rs232_port_device, write_txd))
 	MCFG_INS8250_OUT_DTR_CB(DEVWRITELINE(RS232_TAG, rs232_port_device, write_dtr))
@@ -1266,7 +1255,6 @@ static MACHINE_CONFIG_START( pc1512, pc1512_state )
 	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(pc1512_state, write_centronics_perror))
 	MCFG_CENTRONICS_SELECT_HANDLER(WRITELINE(pc1512_state, write_centronics_select))
 	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(pc1512_state, write_centronics_fault))
-
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, nullptr)
@@ -1298,7 +1286,8 @@ static MACHINE_CONFIG_START( pc1512, pc1512_state )
 	MCFG_RAM_EXTRA_OPTIONS("544K,576K,608K,640K")
 
 	// software list
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "pc1512")
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "pc1512_flop")
+	MCFG_SOFTWARE_LIST_ADD("hdd_list", "pc1512_hdd")
 MACHINE_CONFIG_END
 
 
@@ -1318,7 +1307,8 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pc1512hd, pc1512 )
 	MCFG_DEVICE_MODIFY("isa1")
-	MCFG_SLOT_DEFAULT_OPTION("wdxt_gen")
+	//MCFG_SLOT_DEFAULT_OPTION("wdxt_gen")
+	MCFG_SLOT_DEFAULT_OPTION("hdc")
 MACHINE_CONFIG_END
 
 
@@ -1326,7 +1316,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( pc1640 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( pc1640, pc1640_state )
+static MACHINE_CONFIG_START( pc1640 )
 	MCFG_CPU_ADD(I8086_TAG, I8086, XTAL_24MHz/3)
 	MCFG_CPU_PROGRAM_MAP(pc1640_mem)
 	MCFG_CPU_IO_MAP(pc1640_io)
@@ -1341,6 +1331,13 @@ static MACHINE_CONFIG_START( pc1640, pc1640_state )
 	MCFG_DEVICE_ADD(PC1512_KEYBOARD_TAG, PC1512_KEYBOARD, 0)
 	MCFG_PC1512_KEYBOARD_CLOCK_CALLBACK(WRITELINE(pc1512_state, kbclk_w))
 	MCFG_PC1512_KEYBOARD_DATA_CALLBACK(WRITELINE(pc1512_state, kbdata_w))
+
+	MCFG_PC1512_MOUSE_PORT_ADD(PC1512_MOUSE_PORT_TAG, pc1512_mouse_port_devices, "mouse")
+	MCFG_PC1512_MOUSE_PORT_X_CB(WRITE8(pc1512_state, mouse_x_w))
+	MCFG_PC1512_MOUSE_PORT_Y_CB(WRITE8(pc1512_state, mouse_y_w))
+	MCFG_PC1512_MOUSE_PORT_M1_CB(DEVWRITELINE(PC1512_KEYBOARD_TAG, pc1512_keyboard_device, m1_w))
+	MCFG_PC1512_MOUSE_PORT_M2_CB(DEVWRITELINE(PC1512_KEYBOARD_TAG, pc1512_keyboard_device, m2_w))
+
 	MCFG_DEVICE_ADD(I8237A5_TAG, AM9517A, XTAL_24MHz/6)
 	MCFG_I8237_OUT_HREQ_CB(WRITELINE(pc1512_state, hrq_w))
 	MCFG_I8237_OUT_EOP_CB(WRITELINE(pc1512_state, eop_w))
@@ -1357,7 +1354,9 @@ static MACHINE_CONFIG_START( pc1640, pc1640_state )
 	MCFG_I8237_OUT_DACK_1_CB(WRITELINE(pc1512_state, dack1_w))
 	MCFG_I8237_OUT_DACK_2_CB(WRITELINE(pc1512_state, dack2_w))
 	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(pc1512_state, dack3_w))
-	MCFG_PIC8259_ADD(I8259A2_TAG, INPUTLINE(I8086_TAG, INPUT_LINE_IRQ0), VCC, NOOP)
+
+	MCFG_DEVICE_ADD(I8259A2_TAG, PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(INPUTLINE(I8086_TAG, INPUT_LINE_IRQ0))
 
 	MCFG_DEVICE_ADD(I8253_TAG, PIT8253, 0)
 	MCFG_PIT8253_CLK0(XTAL_28_63636MHz/24)
@@ -1369,17 +1368,18 @@ static MACHINE_CONFIG_START( pc1640, pc1640_state )
 
 	MCFG_MC146818_ADD(MC146818_TAG, XTAL_32_768kHz)
 	MCFG_MC146818_IRQ_HANDLER(DEVWRITELINE(I8259A2_TAG, pic8259_device, ir2_w))
+
 	MCFG_PC_FDC_XT_ADD(PC_FDC_XT_TAG)
 	MCFG_PC_FDC_INTRQ_CALLBACK(WRITELINE(pc1512_state, fdc_int_w))
 	MCFG_PC_FDC_DRQ_CALLBACK(WRITELINE(pc1512_state, fdc_drq_w))
 	MCFG_FLOPPY_DRIVE_ADD(PC_FDC_XT_TAG ":0", pc1512_floppies, "525dd", pc1512_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(PC_FDC_XT_TAG ":1", pc1512_floppies, nullptr,    pc1512_state::floppy_formats)
+
 	MCFG_DEVICE_ADD(INS8250_TAG, INS8250, XTAL_1_8432MHz)
 	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE(RS232_TAG, rs232_port_device, write_txd))
 	MCFG_INS8250_OUT_DTR_CB(DEVWRITELINE(RS232_TAG, rs232_port_device, write_dtr))
 	MCFG_INS8250_OUT_RTS_CB(DEVWRITELINE(RS232_TAG, rs232_port_device, write_rts))
 	MCFG_INS8250_OUT_INT_CB(DEVWRITELINE(I8259A2_TAG, pic8259_device, ir4_w))
-
 
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(pc1512_state, write_centronics_ack))
@@ -1387,7 +1387,6 @@ static MACHINE_CONFIG_START( pc1640, pc1640_state )
 	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(pc1512_state, write_centronics_perror))
 	MCFG_CENTRONICS_SELECT_HANDLER(WRITELINE(pc1512_state, write_centronics_select))
 	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(pc1512_state, write_centronics_fault))
-
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, nullptr)
@@ -1420,7 +1419,8 @@ static MACHINE_CONFIG_START( pc1640, pc1640_state )
 	MCFG_RAM_DEFAULT_SIZE("640K")
 
 	// software list
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "pc1640")
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "pc1640_flop")
+	MCFG_SOFTWARE_LIST_ADD("hdd_list", "pc1640_hdd")
 MACHINE_CONFIG_END
 
 
@@ -1440,7 +1440,8 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pc1640hd, pc1640 )
 	MCFG_DEVICE_MODIFY("isa1")
-	MCFG_SLOT_DEFAULT_OPTION("wdxt_gen")
+	//MCFG_SLOT_DEFAULT_OPTION("wdxt_gen")
+	MCFG_SLOT_DEFAULT_OPTION("hdc")
 MACHINE_CONFIG_END
 
 
@@ -1503,12 +1504,12 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT    COMPANY         FULLNAME        FLAGS
-COMP( 1986, pc1512,     0,          0,      pc1512,     pc1512, driver_device,      0,      "Amstrad plc",  "PC1512 SD",    MACHINE_SUPPORTS_SAVE )
-COMP( 1986, pc1512dd,   pc1512,     0,      pc1512dd,   pc1512, driver_device,      0,      "Amstrad plc",  "PC1512 DD",    MACHINE_SUPPORTS_SAVE )
-COMP( 1986, pc1512hd10, pc1512,     0,      pc1512hd,   pc1512, driver_device,      0,      "Amstrad plc",  "PC1512 HD10",  MACHINE_SUPPORTS_SAVE )
-COMP( 1986, pc1512hd20, pc1512,     0,      pc1512hd,   pc1512, driver_device,      0,      "Amstrad plc",  "PC1512 HD20",  MACHINE_SUPPORTS_SAVE )
-COMP( 1987, pc1640,     0,          0,      pc1640,     pc1640, driver_device,      0,      "Amstrad plc",  "PC1640 SD",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-COMP( 1987, pc1640dd,   pc1640,     0,      pc1640dd,   pc1640, driver_device,      0,      "Amstrad plc",  "PC1640 DD",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-COMP( 1987, pc1640hd20, pc1640,     0,      pc1640hd,   pc1640, driver_device,      0,      "Amstrad plc",  "PC1640 HD20",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-COMP( 1987, pc1640hd30, pc1640,     0,      pc1640hd,   pc1640, driver_device,      0,      "Amstrad plc",  "PC1640 HD30",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   STATE          INIT    COMPANY         FULLNAME        FLAGS
+COMP( 1986, pc1512,     0,          0,      pc1512,     pc1512, pc1512_state,  0,      "Amstrad plc",  "PC1512 SD",    MACHINE_SUPPORTS_SAVE )
+COMP( 1986, pc1512dd,   pc1512,     0,      pc1512dd,   pc1512, pc1512_state,  0,      "Amstrad plc",  "PC1512 DD",    MACHINE_SUPPORTS_SAVE )
+COMP( 1986, pc1512hd10, pc1512,     0,      pc1512hd,   pc1512, pc1512_state,  0,      "Amstrad plc",  "PC1512 HD10",  MACHINE_SUPPORTS_SAVE )
+COMP( 1986, pc1512hd20, pc1512,     0,      pc1512hd,   pc1512, pc1512_state,  0,      "Amstrad plc",  "PC1512 HD20",  MACHINE_SUPPORTS_SAVE )
+COMP( 1987, pc1640,     0,          0,      pc1640,     pc1640, pc1640_state,  0,      "Amstrad plc",  "PC1640 SD",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+COMP( 1987, pc1640dd,   pc1640,     0,      pc1640dd,   pc1640, pc1640_state,  0,      "Amstrad plc",  "PC1640 DD",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+COMP( 1987, pc1640hd20, pc1640,     0,      pc1640hd,   pc1640, pc1640_state,  0,      "Amstrad plc",  "PC1640 HD20",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+COMP( 1987, pc1640hd30, pc1640,     0,      pc1640hd,   pc1640, pc1640_state,  0,      "Amstrad plc",  "PC1640 HD30",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

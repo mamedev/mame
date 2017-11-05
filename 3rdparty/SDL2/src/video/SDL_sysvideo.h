@@ -86,6 +86,8 @@ struct SDL_Window
 
     SDL_DisplayMode fullscreen_mode;
 
+    float opacity;
+
     float brightness;
     Uint16 *gamma;
     Uint16 *saved_gamma;        /* (just offset into gamma) */
@@ -95,6 +97,7 @@ struct SDL_Window
 
     SDL_bool is_hiding;
     SDL_bool is_destroying;
+    SDL_bool is_dropping;       /* drag/drop in progress, expecting SDL_SendDropComplete(). */
 
     SDL_WindowShaper *shaper;
 
@@ -176,6 +179,11 @@ struct SDL_VideoDevice
     int (*GetDisplayDPI) (_THIS, SDL_VideoDisplay * display, float * ddpi, float * hdpi, float * vdpi);
 
     /*
+     * Get the usable bounds of a display (bounds minus menubar or whatever)
+     */
+    int (*GetDisplayUsableBounds) (_THIS, SDL_VideoDisplay * display, SDL_Rect * rect);
+
+    /*
      * Get a list of the available display modes for a display.
      */
     void (*GetDisplayModes) (_THIS, SDL_VideoDisplay * display);
@@ -200,6 +208,10 @@ struct SDL_VideoDevice
     void (*SetWindowSize) (_THIS, SDL_Window * window);
     void (*SetWindowMinimumSize) (_THIS, SDL_Window * window);
     void (*SetWindowMaximumSize) (_THIS, SDL_Window * window);
+    int (*GetWindowBordersSize) (_THIS, SDL_Window * window, int *top, int *left, int *bottom, int *right);
+    int (*SetWindowOpacity) (_THIS, SDL_Window * window, float opacity);
+    int (*SetWindowModalFor) (_THIS, SDL_Window * modal_window, SDL_Window * parent_window);
+    int (*SetWindowInputFocus) (_THIS, SDL_Window * window);
     void (*ShowWindow) (_THIS, SDL_Window * window);
     void (*HideWindow) (_THIS, SDL_Window * window);
     void (*RaiseWindow) (_THIS, SDL_Window * window);
@@ -207,6 +219,7 @@ struct SDL_VideoDevice
     void (*MinimizeWindow) (_THIS, SDL_Window * window);
     void (*RestoreWindow) (_THIS, SDL_Window * window);
     void (*SetWindowBordered) (_THIS, SDL_Window * window, SDL_bool bordered);
+    void (*SetWindowResizable) (_THIS, SDL_Window * window, SDL_bool resizable);
     void (*SetWindowFullscreen) (_THIS, SDL_Window * window, SDL_VideoDisplay * display, SDL_bool fullscreen);
     int (*SetWindowGammaRamp) (_THIS, SDL_Window * window, const Uint16 * ramp);
     int (*GetWindowGammaRamp) (_THIS, SDL_Window * window, Uint16 * ramp);

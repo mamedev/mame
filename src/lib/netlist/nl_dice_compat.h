@@ -3,7 +3,7 @@
 /*
  * nl_dice_compat.h
  *
- * The follwoing script will convert a circuit using dice syntax into netlist
+ * The following script will convert a circuit using dice syntax into netlist
  * syntax. It's not fail proof, but eases the manual work involved significantly.
 
 sed -e 's/#define \(.*\)"\(.*\)"[ \t]*,[ \t]*\(.*\)/NET_ALIAS(\1,\2.\3)/' src/mame/drivers/nl_breakout.c   \
@@ -27,7 +27,10 @@ sed -e 's/#define \(.*\)"\(.*\)"[ \t]*,[ \t]*\(.*\)/NET_ALIAS(\1,\2.\3)/' src/ma
 #ifndef NL_CONVERT_CPP
 #include "devices/net_lib.h"
 #include "analog/nld_twoterm.h"
+
+#include <cmath>
 #endif
+
 
 /* --------------------------------------------------------------------
  * Compatibility macros for DICE netlists ...
@@ -105,7 +108,7 @@ public:
 };
 
 #else
-#define CHIP(n, t) TTL_ ## t ## DIP(n)
+#define CHIP(n, t) TTL_ ## t ## _DIP(n)
 
 #define OHM(x) x
 #define K_OHM(x) RES_K(X)
@@ -200,8 +203,8 @@ inline int CAPACITOR_tc_hl(const double c, const double r)
 	 * Vt = (VH-VL)*exp(-t/RC)
 	 * ln(Vt/(VH-VL))*RC = -t
 	 */
-	static const double TIME_CONSTANT = -nl_math::log(2.0 / (3.7-0.3));
-	int ret = (int) (TIME_CONSTANT * (130.0 + r) * c * 1e9);
+	static const double TIME_CONSTANT = -std::log(0.8 / (4.0-0.1));
+	int ret = (int) (TIME_CONSTANT * (1.0 + r) * c * 1e9);
 	return ret;
 }
 
@@ -211,14 +214,30 @@ inline int CAPACITOR_tc_lh(const double c, const double r)
 	 * Vt = (VH-VL)*(1-exp(-t/RC))
 	 * -t=ln(1-Vt/(VH-VL))*RC
 	 */
-	static const double TIME_CONSTANT = -nl_math::log(1.0 - 0.8 / (3.7-0.3));
-	int ret = (int) (TIME_CONSTANT * (1.0 + r) * c * 1e9);
+	static const double TIME_CONSTANT = -std::log(1.0 - 2.0 / (4.0-0.1));
+	int ret = (int) (TIME_CONSTANT * (130.0 + r) * c * 1e9);
 	return ret;
 }
 
+#if 1
 #define CHIP_CAPACITOR(name, pdesc) \
 	NETDEV_DELAY(name) \
 	NETDEV_PARAMI(name, L_TO_H, CAPACITOR_tc_lh((pdesc)->c, (pdesc)->r)) \
 	NETDEV_PARAMI(name, H_TO_L, CAPACITOR_tc_hl((pdesc)->c, (pdesc)->r))
+#elif 1
+// slow, very slow
+#define CHIP_CAPACITOR(name, pdesc) \
+	CAP(name ## _C, (pdesc)->c) \
+	ALIAS(name.1, name ## _C.1 ) \
+	ALIAS(name.2, name ## _C.1) \
+	NET_C(GND, name ## _C.2)
+#else
+// fast, might work
+#define CHIP_CAPACITOR(name, pdesc) \
+	RES(name ## _C, RES_K(1000)) \
+	ALIAS(name.1, name ## _C.1 ) \
+	ALIAS(name.2, name ## _C.1) \
+	NET_C(GND, name ## _C.2)
+#endif
 
 #endif /* NL_DICE_COMPAT_H_ */

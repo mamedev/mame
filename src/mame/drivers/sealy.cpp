@@ -27,12 +27,14 @@ Notes:
 
 ***************************************************************************/
 
-// 13.0 MHz? PCB is labeled with 13.5M
-#define MAIN_CLOCK  13000000
-
 #include "emu.h"
 #include "cpu/h8/h83048.h"
 #include "sound/okim6295.h"
+#include "screen.h"
+#include "speaker.h"
+
+// 13.0 MHz? PCB is labeled with 13.5M
+#define MAIN_CLOCK  13000000
 
 class sealy_state : public driver_device
 {
@@ -49,7 +51,7 @@ public:
 
 	// screen updates
 	DECLARE_PALETTE_INIT(sealy);
-	UINT32 screen_update_sealy(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_sealy(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -59,7 +61,7 @@ PALETTE_INIT_MEMBER(sealy_state,sealy)
 //      palette.set_pen_color(i,pal5bit(i >> 5),pal5bit(i >> 10),pal5bit(i >> 0));
 }
 
-UINT32 sealy_state::screen_update_sealy(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t sealy_state::screen_update_sealy(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->black_pen(), cliprect);
 	return 0;
@@ -67,7 +69,6 @@ UINT32 sealy_state::screen_update_sealy(screen_device &screen, bitmap_rgb32 &bit
 
 
 static ADDRESS_MAP_START( sealy_map, AS_PROGRAM, 16, sealy_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x3ffff)
 	AM_RANGE(0x00000, 0x3ffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -94,7 +95,7 @@ static GFXDECODE_START( sealy )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( sealy, sealy_state )
+static MACHINE_CONFIG_START( sealy )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", H83044, MAIN_CLOCK) /* wrong CPU, but we have not a M16C core ATM */
@@ -114,7 +115,7 @@ static MACHINE_CONFIG_START( sealy, sealy_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_OKIM6295_ADD("oki", MAIN_CLOCK/13, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", MAIN_CLOCK/13, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -135,4 +136,4 @@ ROM_START( crzyddz )
 ROM_END
 
 
-GAME( 2004?, crzyddz,  0, sealy, sealy, driver_device, 0, ROT0, "Sealy", "Crazy Dou Di Zhu", MACHINE_IS_SKELETON )
+GAME( 2004?, crzyddz,  0, sealy, sealy, sealy_state, 0, ROT0, "Sealy", "Crazy Dou Di Zhu", MACHINE_IS_SKELETON )

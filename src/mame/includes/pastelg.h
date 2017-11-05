@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Takahiro Nogi
 #include "includes/nb1413m3.h"
+#include "screen.h"
 
 class pastelg_state : public driver_device
 {
@@ -20,9 +21,9 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<nb1413m3_device> m_nb1413m3;
 	required_device<screen_device> m_screen;
-	required_shared_ptr<UINT8> m_clut;
+	required_shared_ptr<uint8_t> m_clut;
 
-	UINT8 m_mux_data;
+	uint8_t m_mux_data;
 	int m_blitter_destx;
 	int m_blitter_desty;
 	int m_blitter_sizex;
@@ -34,8 +35,9 @@ public:
 	int m_blitter_direction_x;
 	int m_blitter_direction_y;
 	int m_palbank;
-	std::unique_ptr<UINT8[]> m_videoram;
+	std::unique_ptr<uint8_t[]> m_videoram;
 	int m_flipscreen_old;
+	emu_timer *m_blitter_timer;
 
 	DECLARE_READ8_MEMBER(pastelg_sndrom_r);
 	DECLARE_READ8_MEMBER(pastelg_irq_ack_r);
@@ -55,7 +57,7 @@ public:
 	virtual void video_start() override;
 
 	DECLARE_PALETTE_INIT(pastelg);
-	UINT32 screen_update_pastelg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_pastelg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	int pastelg_blitter_src_addr_r();
 	void pastelg_vramflip();
 	void pastelg_gfxdraw();

@@ -299,8 +299,11 @@ Mark Gordon
 
 */
 
+#include "emu.h"
 #include "includes/adam.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
 
 
 //**************************************************************************
@@ -348,7 +351,7 @@ READ8_MEMBER( adam_state::mreq_r )
 {
 	int bmreq = 0, biorq = 1, eos_enable = 1, boot_rom_cs = 1, aux_decode_1 = 1, aux_rom_cs = 1, cas1 = 1, cas2 = 1, cs1 = 1, cs2 = 1, cs3 = 1, cs4 = 1;
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	if (offset < 0x8000)
 	{
@@ -527,7 +530,7 @@ READ8_MEMBER( adam_state::iorq_r )
 {
 	int bmreq = 1, biorq = 0, aux_rom_cs = 1, cas1 = 1, cas2 = 1;
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	switch ((offset >> 5) & 0x07)
 	{
@@ -749,7 +752,7 @@ READ8_MEMBER( adam_state::m6801_p2_r )
 
 	*/
 
-	UINT8 data = M6801_MODE_7;
+	uint8_t data = M6801_MODE_7;
 
 	// NET RXD
 	data |= m_adamnet->rxd_r() << 3;
@@ -1044,7 +1047,7 @@ DEVICE_INPUT_DEFAULTS_END
 //  MACHINE_CONFIG( adam )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( adam, adam_state )
+static MACHINE_CONFIG_START( adam )
 	// basic machine hardware
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_7_15909MHz/2)
 	MCFG_CPU_PROGRAM_MAP(adam_mem)
@@ -1143,5 +1146,5 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT                    COMPANY         FULLNAME            FLAGS
-COMP( 1982, adam,       0,          coleco, adam,       adam,       driver_device,  0,      "Coleco",       "Adam",             MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       STATE        INIT    COMPANY         FULLNAME            FLAGS
+COMP( 1982, adam,       0,          coleco, adam,       adam,       adam_state,  0,      "Coleco",       "Adam",             MACHINE_SUPPORTS_SAVE )

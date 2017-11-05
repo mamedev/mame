@@ -453,7 +453,7 @@ WRITE_LINE_MEMBER(n8080_state::n8080_inte_callback)
 
 WRITE8_MEMBER(n8080_state::n8080_status_callback)
 {
-	if (data & I8085_STATUS_INTA)
+	if (data & i8080_cpu_device::STATUS_INTA)
 	{
 		/* interrupt acknowledge */
 		m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
@@ -500,7 +500,7 @@ MACHINE_RESET_MEMBER(n8080_state,helifire)
 }
 
 
-static MACHINE_CONFIG_START( spacefev, n8080_state )
+static MACHINE_CONFIG_START( spacefev )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, MASTER_CLOCK / 10)
@@ -531,7 +531,7 @@ static MACHINE_CONFIG_START( spacefev, n8080_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( sheriff, n8080_state )
+static MACHINE_CONFIG_START( sheriff )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, MASTER_CLOCK / 10)
@@ -574,7 +574,7 @@ static MACHINE_CONFIG_DERIVED( westgun2, sheriff )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( helifire, n8080_state )
+static MACHINE_CONFIG_START( helifire )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, MASTER_CLOCK / 10)
@@ -591,7 +591,7 @@ static MACHINE_CONFIG_START( helifire, n8080_state )
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 16, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(n8080_state, screen_update_helifire)
-	MCFG_SCREEN_VBLANK_DRIVER(n8080_state, screen_eof_helifire)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(n8080_state, screen_vblank_helifire))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 8 + 0x400)
@@ -899,19 +899,19 @@ ROM_END
 
 ROM_START( helifire )
 	ROM_REGION( 0x8000, "maincpu", 0 )
-	ROM_LOAD( "hf.f1",    0x0000, 0x0400, CRC(032f89ca) SHA1(63b0310875ed78a6385e44eea781ddcc4a63557c) )
-	ROM_LOAD( "hf.f2",    0x0400, 0x0400, CRC(2774e70f) SHA1(98d845e80db61799493dbebe8db801567277432c) )
-	ROM_LOAD( "hf.g1",    0x0800, 0x0400, CRC(b5ad6e8a) SHA1(1eb4931e85bd6a559e85a2b978d383216d3988a7) )
-	ROM_LOAD( "hf.g2",    0x0c00, 0x0400, CRC(5e015bf4) SHA1(60f5a9707c8655e54a8381afd764856fb25c29f1) )
-	ROM_LOAD( "hf.h1",    0x1000, 0x0400, CRC(23bb4e5a) SHA1(b59bc0adff3635aca1def2b1997f7edc6ca7e8ee) )
-	ROM_LOAD( "hf.h2",    0x1400, 0x0400, CRC(358227c6) SHA1(d7bd678ef1737edc6aa609e43e3ae96a8d61dc15) )
-	ROM_LOAD( "hf.i1",    0x1800, 0x0400, CRC(0c679f44) SHA1(cbe31dbe5f2c5f11a637cb3bde4e059c310d0e76) )
-	ROM_LOAD( "hf.i2",    0x1c00, 0x0400, CRC(d8b7a398) SHA1(3ddfeac39147d5df6096f525f7ef67abef32a28b) )
-	ROM_LOAD( "hf.j1",    0x2000, 0x0400, CRC(98ef24db) SHA1(70ad8dd6e1e8f4bf4ce431737ca1856eecc03d53) )
-	ROM_LOAD( "hf.j2",    0x2400, 0x0400, CRC(5e2b5877) SHA1(f7c747e8a1d9fe2dda71ee6304636cf3cdf727a7) )
+	ROM_LOAD( "tub_f1_b",  0x0000, 0x0400, CRC(032f89ca) SHA1(63b0310875ed78a6385e44eea781ddcc4a63557c) )
+	ROM_LOAD( "tub_f2_b",  0x0400, 0x0400, CRC(2774e70f) SHA1(98d845e80db61799493dbebe8db801567277432c) )
+	ROM_LOAD( "tub_g1_b",  0x0800, 0x0400, CRC(b5ad6e8a) SHA1(1eb4931e85bd6a559e85a2b978d383216d3988a7) )
+	ROM_LOAD( "tub_g2_b",  0x0c00, 0x0400, CRC(5e015bf4) SHA1(60f5a9707c8655e54a8381afd764856fb25c29f1) )
+	ROM_LOAD( "tub_h1_b",  0x1000, 0x0400, CRC(23bb4e5a) SHA1(b59bc0adff3635aca1def2b1997f7edc6ca7e8ee) )
+	ROM_LOAD( "tub_h2_b",  0x1400, 0x0400, CRC(358227c6) SHA1(d7bd678ef1737edc6aa609e43e3ae96a8d61dc15) )
+	ROM_LOAD( "tub_i1_b",  0x1800, 0x0400, CRC(0c679f44) SHA1(cbe31dbe5f2c5f11a637cb3bde4e059c310d0e76) )
+	ROM_LOAD( "tub_i2_b",  0x1c00, 0x0400, CRC(d8b7a398) SHA1(3ddfeac39147d5df6096f525f7ef67abef32a28b) )
+	ROM_LOAD( "tub_j1_b",  0x2000, 0x0400, CRC(98ef24db) SHA1(70ad8dd6e1e8f4bf4ce431737ca1856eecc03d53) )
+	ROM_LOAD( "tub_j2_b",  0x2400, 0x0400, CRC(5e2b5877) SHA1(f7c747e8a1d9fe2dda71ee6304636cf3cdf727a7) )
 
 	ROM_REGION( 0x0400, "audiocpu", 0 )
-	ROM_LOAD( "hf.snd",   0x0000, 0x0400, CRC(9d77a31f) SHA1(36db9b5087b6661de88042854874bc247c92d985) )
+	ROM_LOAD( "tub-e_ic5-a", 0x0000, 0x0400, CRC(9d77a31f) SHA1(36db9b5087b6661de88042854874bc247c92d985) )
 ROM_END
 
 ROM_START( helifirea )
@@ -932,15 +932,15 @@ ROM_START( helifirea )
 ROM_END
 
 
-GAME( 1979, spacefev,   0,        spacefev, spacefev, driver_device, 0, ROT270, "Nintendo", "Space Fever (New Ver.)", MACHINE_SUPPORTS_SAVE )
-GAME( 1979, spacefevo,  spacefev, spacefev, spacefev, driver_device, 0, ROT270, "Nintendo", "Space Fever (Old Ver.)", MACHINE_SUPPORTS_SAVE )
-GAME( 1979, spacefevo2, spacefev, spacefev, spacefev, driver_device, 0, ROT270, "Nintendo", "Space Fever (Older Ver.)", MACHINE_SUPPORTS_SAVE )
-GAME( 1979, highsplt,   0,        spacefev, highsplt, driver_device, 0, ROT270, "Nintendo", "Space Fever High Splitter (set 1)", MACHINE_SUPPORTS_SAVE ) // known as "SF-Hisplitter" on its flyer
-GAME( 1979, highsplta,  highsplt, spacefev, highsplt, driver_device, 0, ROT270, "Nintendo", "Space Fever High Splitter (set 2)", MACHINE_SUPPORTS_SAVE ) // known as "SF-Hisplitter" on its flyer
-GAME( 1979, highspltb,  highsplt, spacefev, highsplt, driver_device, 0, ROT270, "Nintendo", "Space Fever High Splitter (alt Sound)", MACHINE_SUPPORTS_SAVE ) // known as "SF-Hisplitter" on its flyer
-GAME( 1979, spacelnc,   0,        spacefev, spacelnc, driver_device, 0, ROT270, "Nintendo", "Space Launcher", MACHINE_SUPPORTS_SAVE )
-GAME( 1979, sheriff,    0,        sheriff,  sheriff, driver_device,  0, ROT270, "Nintendo", "Sheriff", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, bandido,    sheriff,  sheriff,  bandido, driver_device,  0, ROT270, "Nintendo (Exidy license)", "Bandido", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, westgun2,   sheriff,  westgun2, westgun2, driver_device, 0, ROT270, "Nintendo (Taito Corporation license)", "Western Gun Part II", MACHINE_SUPPORTS_SAVE ) // official Taito PCBs, but title/copyright not shown
-GAME( 1980, helifire,   0,        helifire, helifire, driver_device, 0, ROT270, "Nintendo", "HeliFire (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, helifirea,  helifire, helifire, helifire, driver_device, 0, ROT270, "Nintendo", "HeliFire (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, spacefev,   0,        spacefev, spacefev, n8080_state, 0, ROT270, "Nintendo", "Space Fever (New Ver.)", MACHINE_SUPPORTS_SAVE )
+GAME( 1979, spacefevo,  spacefev, spacefev, spacefev, n8080_state, 0, ROT270, "Nintendo", "Space Fever (Old Ver.)", MACHINE_SUPPORTS_SAVE )
+GAME( 1979, spacefevo2, spacefev, spacefev, spacefev, n8080_state, 0, ROT270, "Nintendo", "Space Fever (Older Ver.)", MACHINE_SUPPORTS_SAVE )
+GAME( 1979, highsplt,   0,        spacefev, highsplt, n8080_state, 0, ROT270, "Nintendo", "Space Fever High Splitter (set 1)", MACHINE_SUPPORTS_SAVE ) // known as "SF-Hisplitter" on its flyer
+GAME( 1979, highsplta,  highsplt, spacefev, highsplt, n8080_state, 0, ROT270, "Nintendo", "Space Fever High Splitter (set 2)", MACHINE_SUPPORTS_SAVE ) // known as "SF-Hisplitter" on its flyer
+GAME( 1979, highspltb,  highsplt, spacefev, highsplt, n8080_state, 0, ROT270, "Nintendo", "Space Fever High Splitter (alt Sound)", MACHINE_SUPPORTS_SAVE ) // known as "SF-Hisplitter" on its flyer
+GAME( 1979, spacelnc,   0,        spacefev, spacelnc, n8080_state, 0, ROT270, "Nintendo", "Space Launcher", MACHINE_SUPPORTS_SAVE )
+GAME( 1979, sheriff,    0,        sheriff,  sheriff,  n8080_state, 0, ROT270, "Nintendo", "Sheriff", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, bandido,    sheriff,  sheriff,  bandido,  n8080_state, 0, ROT270, "Nintendo (Exidy license)", "Bandido", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, westgun2,   sheriff,  westgun2, westgun2, n8080_state, 0, ROT270, "Nintendo (Taito Corporation license)", "Western Gun Part II", MACHINE_SUPPORTS_SAVE ) // official Taito PCBs, but title/copyright not shown
+GAME( 1980, helifire,   0,        helifire, helifire, n8080_state, 0, ROT270, "Nintendo", "HeliFire (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, helifirea,  helifire, helifire, helifire, n8080_state, 0, ROT270, "Nintendo", "HeliFire (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

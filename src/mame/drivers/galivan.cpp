@@ -2,17 +2,6 @@
 // copyright-holders:Luca Elia, Olivier Galibert
 /***************************************************************************
 
-TODO:
-- Find out how layers are enabled\disabled
-- dangar input ports - parent set requires F2 be held for Service Mode
-- wrong title screen in ninjemak
-- bit 3 of ninjemak_gfxbank_w, there currently is a kludge to clear text RAM
-  but it should really copy stuff from the extra ROM.
-- Likely missing MCU emulation/simulation for displaying text layer for Ninja Emaki.
-  There is no text displayed when you enter Service Mode when there should be.
-  Examine $3000+ in file loaded for "gfx5".
-
-
 Galivan
 (C) 1985 Nihon Bussan
 driver by
@@ -27,23 +16,42 @@ Youma Ninpou Chou (Japan)
 Driver by
 Takahiro Nogi (nogi@kt.rim.or.jp) 1999/12/17 -
 
+TODO
+- Find out how layers are enabled\disabled
+- dangar input ports - parent set requires F2 be held for Service Mode
+- wrong title screen in ninjemak
+- bit 3 of ninjemak_gfxbank_w, there currently is a kludge to clear text RAM
+  but it should really copy stuff from the extra ROM.
+- Ninja Emaki has minor protection issues, see NB1414M4 simulation for more info.
+- dangarj has unemulated protection at I/Os 0x80-1 for missing sprites.
+  [0x80] W is data
+  [0x81] W --11 xxxx address
+  [0x80] R result
+  The protection is used for a code snippet at 0xf9c0, that of course is the
+  sprite handling. The code snippet is sum8 with 0x27 at 0x9d74 so no, the
+  later dangar US version snippet doesn't work ...
+
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "sound/dac.h"
-#include "sound/3526intf.h"
 #include "includes/galivan.h"
+
+#include "cpu/z80/z80.h"
+#include "sound/3526intf.h"
+#include "sound/dac.h"
+#include "sound/volt_reg.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 WRITE8_MEMBER(galivan_state::galivan_sound_command_w)
 {
-	soundlatch_byte_w(space,0,((data & 0x7f) << 1) | 1);
+	m_soundlatch->write(space,0,((data & 0x7f) << 1) | 1);
 }
 
 READ8_MEMBER(galivan_state::soundlatch_clear_r)
 {
-	soundlatch_clear_byte_w(space, 0, 0);
+	m_soundlatch->clear_w(space, 0, 0);
 	return 0;
 }
 
@@ -85,8 +93,8 @@ static ADDRESS_MAP_START( io_map, AS_IO, 8, galivan_state )
 	AM_RANGE(0x41, 0x42) AM_WRITE(galivan_scrollx_w)
 	AM_RANGE(0x43, 0x44) AM_WRITE(galivan_scrolly_w)
 	AM_RANGE(0x45, 0x45) AM_WRITE(galivan_sound_command_w)
-/*  AM_RANGE(0x46, 0x46) AM_WRITENOP */
-/*  AM_RANGE(0x47, 0x47) AM_WRITENOP */
+//  AM_RANGE(0x46, 0x46) AM_WRITENOP
+//  AM_RANGE(0x47, 0x47) AM_WRITENOP
 	AM_RANGE(0xc0, 0xc0) AM_READ(IO_port_c0_r) /* dangar needs to return 0x58 */
 ADDRESS_MAP_END
 
@@ -115,10 +123,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, galivan_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ymsnd", ym3526_device, write)
-	AM_RANGE(0x02, 0x02) AM_DEVWRITE("dac1", dac_device, write_unsigned8)
-	AM_RANGE(0x03, 0x03) AM_DEVWRITE("dac2", dac_device, write_unsigned8)
+	AM_RANGE(0x02, 0x02) AM_DEVWRITE("dac1", dac_byte_interface, write)
+	AM_RANGE(0x03, 0x03) AM_DEVWRITE("dac2", dac_byte_interface, write)
 	AM_RANGE(0x04, 0x04) AM_READ(soundlatch_clear_r)
-	AM_RANGE(0x06, 0x06) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x06, 0x06) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
 
@@ -366,7 +374,7 @@ GFXDECODE_END
 MACHINE_START_MEMBER(galivan_state,galivan)
 {
 	/* configure ROM banking */
-	UINT8 *rombase = memregion("maincpu")->base();
+	uint8_t *rombase = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 2, &rombase[0x10000], 0x2000);
 	membank("bank1")->set_entry(0);
 
@@ -380,7 +388,7 @@ MACHINE_START_MEMBER(galivan_state,galivan)
 MACHINE_START_MEMBER(galivan_state,ninjemak)
 {
 	/* configure ROM banking */
-	UINT8 *rombase = memregion("maincpu")->base();
+	uint8_t *rombase = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 4, &rombase[0x10000], 0x2000);
 	membank("bank1")->set_entry(0);
 
@@ -410,7 +418,7 @@ MACHINE_RESET_MEMBER(galivan_state,ninjemak)
 	m_ninjemak_dispdisable = 0;
 }
 
-static MACHINE_CONFIG_START( galivan, galivan_state )
+static MACHINE_CONFIG_START( galivan )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)      /* 6 MHz? */
@@ -435,7 +443,7 @@ static MACHINE_CONFIG_START( galivan, galivan_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(galivan_state, screen_update_galivan)
-	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram8_device, vblank_copy_rising)
+	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", galivan)
@@ -446,19 +454,21 @@ static MACHINE_CONFIG_START( galivan, galivan_state )
 	MCFG_VIDEO_START_OVERRIDE(galivan_state,galivan)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ymsnd", YM3526, XTAL_8MHz/2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
-	MCFG_DAC_ADD("dac1")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-
-	MCFG_DAC_ADD("dac2")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("dac1", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
+	MCFG_SOUND_ADD("dac2", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac1", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( ninjemak, galivan_state )
+static MACHINE_CONFIG_START( ninjemak )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)      /* 6 MHz? */
@@ -485,7 +495,7 @@ static MACHINE_CONFIG_START( ninjemak, galivan_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(galivan_state, screen_update_ninjemak)
-	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram8_device, vblank_copy_rising)
+	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", galivan)
@@ -496,15 +506,18 @@ static MACHINE_CONFIG_START( ninjemak, galivan_state )
 	MCFG_VIDEO_START_OVERRIDE(galivan_state,ninjemak)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ymsnd", YM3526, XTAL_8MHz/2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
-	MCFG_DAC_ADD("dac1")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-
-	MCFG_DAC_ADD("dac2")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("dac1", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
+	MCFG_SOUND_ADD("dac2", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac1", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -629,32 +642,32 @@ ROM_START( galivan3 )
 	ROM_LOAD( "mb7114e.7f",   0x0000, 0x0100, CRC(06538736) SHA1(a2fb2ecb768686839f3087e691102e2dc2eb65b5) )    /* sprite palette bank */
 ROM_END
 
-ROM_START( dangar )
+ROM_START( dangar ) /* all rom labels are simply numbers, with the owl logo and "Nichibutsu" printed at the bottom */
 	ROM_REGION( 0x14000, "maincpu", 0 )     /* main cpu code */
-	ROM_LOAD( "dangar08.1b",  0x00000, 0x8000, CRC(e52638f2) SHA1(6dd3ccb4574a410abf1ac35b4f9518ee21ecac91) )
-	ROM_LOAD( "dangar09.3b",  0x08000, 0x4000, CRC(809d280f) SHA1(931f811f1fe3c71ba82fc44f69ef461bdd9cd2d8) )
-	ROM_LOAD( "dangar10.5b",  0x10000, 0x4000, CRC(99a3591b) SHA1(45011043ff5620524d79076542bd8c602fe90cf4) )
+	ROM_LOAD( "8.1b",  0x00000, 0x8000, CRC(fe4a3fd6) SHA1(b471b2b1dea23bd1444880ceb8112d7998950dd4) ) /* APRIL 09 1987 - Same rom label, different data */
+	ROM_LOAD( "9.3b",  0x08000, 0x4000, CRC(809d280f) SHA1(931f811f1fe3c71ba82fc44f69ef461bdd9cd2d8) )
+	ROM_LOAD( "10.4b", 0x10000, 0x4000, CRC(99a3591b) SHA1(45011043ff5620524d79076542bd8c602fe90cf4) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )        /* sound cpu code */
-	ROM_LOAD( "dangar13.b14", 0x0000, 0x4000, CRC(3e041873) SHA1(8f9e1ec64509c8a7e9e45add9efc95f98f35fcfc) )
-	ROM_LOAD( "dangar14.b15", 0x4000, 0x8000, CRC(488e3463) SHA1(73ff7ab061be54162f3a548f6bd9ef55b9dec5d9) )
+	ROM_LOAD( "13.b14", 0x0000, 0x4000, CRC(3e041873) SHA1(8f9e1ec64509c8a7e9e45add9efc95f98f35fcfc) )
+	ROM_LOAD( "14.b15", 0x4000, 0x8000, CRC(488e3463) SHA1(73ff7ab061be54162f3a548f6bd9ef55b9dec5d9) )
 
 	ROM_REGION( 0x04000, "gfx1", 0 )
-	ROM_LOAD( "dangar05.13d", 0x00000, 0x4000, CRC(40cb378a) SHA1(764596f6845fc0b787b653a87a1778a56ce4f3f8) )   /* chars */
+	ROM_LOAD( "5.13d", 0x00000, 0x4000, CRC(40cb378a) SHA1(764596f6845fc0b787b653a87a1778a56ce4f3f8) )   /* chars */
 
 	ROM_REGION( 0x20000, "gfx2", 0 )
-	ROM_LOAD( "dangar01.14f", 0x00000, 0x8000, CRC(d59ed1f1) SHA1(e55314b5a078145ad7a5e95cb792b4fd32cfb05d) )  /* tiles */
-	ROM_LOAD( "dangar02.15f", 0x08000, 0x8000, CRC(dfdb931c) SHA1(33563160239f221f24ca0cb652d14550e9941afe) )
-	ROM_LOAD( "dangar03.17f", 0x10000, 0x8000, CRC(6954e8c3) SHA1(077bcbe9f80df011c9110d8cf6e08b53d035d1c8) )
-	ROM_LOAD( "dangar04.19f", 0x18000, 0x8000, CRC(4af6a8bf) SHA1(d004b10b9b8559d1d6d26af35999df2857d87c53) )
+	ROM_LOAD( "1.14f", 0x00000, 0x8000, CRC(d59ed1f1) SHA1(e55314b5a078145ad7a5e95cb792b4fd32cfb05d) )  /* tiles */
+	ROM_LOAD( "2.15f", 0x08000, 0x8000, CRC(dfdb931c) SHA1(33563160239f221f24ca0cb652d14550e9941afe) )
+	ROM_LOAD( "3.17f", 0x10000, 0x8000, CRC(6954e8c3) SHA1(077bcbe9f80df011c9110d8cf6e08b53d035d1c8) )
+	ROM_LOAD( "4.19f", 0x18000, 0x8000, CRC(4af6a8bf) SHA1(d004b10b9b8559d1d6d26af35999df2857d87c53) )
 
 	ROM_REGION( 0x10000, "gfx3", 0 )
-	ROM_LOAD( "dangarxx.f4",  0x00000, 0x8000, CRC(55711884) SHA1(2682ebc8d88d0d6c430b7df34ed362bc81047072) )  /* sprites */
-	ROM_LOAD( "dangarxx.f1",  0x08000, 0x8000, CRC(8cf11419) SHA1(79e7a3046878724fde248100ad55a305a427cd46) )
+	ROM_LOAD( "12.f4",  0x00000, 0x8000, CRC(55711884) SHA1(2682ebc8d88d0d6c430b7df34ed362bc81047072) )  /* sprites */
+	ROM_LOAD( "11.f1",  0x08000, 0x8000, CRC(8cf11419) SHA1(79e7a3046878724fde248100ad55a305a427cd46) )
 
 	ROM_REGION( 0x8000, "gfx4", 0 ) /* background tilemaps */
-	ROM_LOAD( "dangar07.19d", 0x0000, 0x4000, CRC(6dba32cf) SHA1(e6433f291364202c1291b137d6ee1840ecf7d72d) )
-	ROM_LOAD( "dangar06.17d", 0x4000, 0x4000, CRC(6c899071) SHA1(9a776aae897d57e66ebdbcf79f3c673da8b78b05) )
+	ROM_LOAD( "7.19d", 0x0000, 0x4000, CRC(6dba32cf) SHA1(e6433f291364202c1291b137d6ee1840ecf7d72d) )
+	ROM_LOAD( "6.17d", 0x4000, 0x4000, CRC(6c899071) SHA1(9a776aae897d57e66ebdbcf79f3c673da8b78b05) )
 
 	ROM_REGION( 0x0400, "proms", 0 )
 	ROM_LOAD( "82s129.9f",    0x0000, 0x0100, CRC(b29f6a07) SHA1(17c82f439f314c212470bafd917b3f7e12462d16) )    /* red */
@@ -666,32 +679,32 @@ ROM_START( dangar )
 	ROM_LOAD( "82s129.7f",    0x0000, 0x0100, CRC(29bc6216) SHA1(1d7864ad06ad0cd5e3d1905fc6066bee1cd90995) )    /* sprite palette bank */
 ROM_END
 
-ROM_START( dangar2 )
+ROM_START( dangara ) /* all rom labels are simply numbers, with the owl logo and "Nichibutsu" printed at the bottom */
 	ROM_REGION( 0x14000, "maincpu", 0 )     /* main cpu code */
-	ROM_LOAD( "dangar2.016",  0x00000, 0x8000, CRC(743fa2d4) SHA1(55539796967532b57279801374b2f0cf82cfe1ae) )
-	ROM_LOAD( "dangar2.017",  0x08000, 0x4000, CRC(1cdc60a5) SHA1(65f776d14c9461f1a6939ad512eacf6a1a9da2c6) )
-	ROM_LOAD( "dangar2.018",  0x10000, 0x4000, CRC(db7f6613) SHA1(c55d1f2fdb86e2b9fbdfad0b156d4d084677b750) )
+	ROM_LOAD( "8.1b",  0x00000, 0x8000, CRC(e52638f2) SHA1(6dd3ccb4574a410abf1ac35b4f9518ee21ecac91) ) /* DEC. 1 1986 - Same rom label, different data */
+	ROM_LOAD( "9.3b",  0x08000, 0x4000, CRC(809d280f) SHA1(931f811f1fe3c71ba82fc44f69ef461bdd9cd2d8) )
+	ROM_LOAD( "10.4b", 0x10000, 0x4000, CRC(99a3591b) SHA1(45011043ff5620524d79076542bd8c602fe90cf4) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )        /* sound cpu code */
-	ROM_LOAD( "dangar13.b14", 0x0000, 0x4000, CRC(3e041873) SHA1(8f9e1ec64509c8a7e9e45add9efc95f98f35fcfc) )
-	ROM_LOAD( "dangar14.b15", 0x4000, 0x8000, CRC(488e3463) SHA1(73ff7ab061be54162f3a548f6bd9ef55b9dec5d9) )
+	ROM_LOAD( "13.14b", 0x0000, 0x4000, CRC(3e041873) SHA1(8f9e1ec64509c8a7e9e45add9efc95f98f35fcfc) )
+	ROM_LOAD( "14.15b", 0x4000, 0x8000, CRC(488e3463) SHA1(73ff7ab061be54162f3a548f6bd9ef55b9dec5d9) )
 
 	ROM_REGION( 0x04000, "gfx1", 0 )
-	ROM_LOAD( "dangar2.011",  0x00000, 0x4000, CRC(e804ffe1) SHA1(22f16c23b9a82f104dda24bc8fccc08f3f69cf97) )   /* chars */
+	ROM_LOAD( "5.13d", 0x00000, 0x4000, CRC(40cb378a) SHA1(764596f6845fc0b787b653a87a1778a56ce4f3f8) )   /* chars */
 
 	ROM_REGION( 0x20000, "gfx2", 0 )
-	ROM_LOAD( "dangar01.14f", 0x00000, 0x8000, CRC(d59ed1f1) SHA1(e55314b5a078145ad7a5e95cb792b4fd32cfb05d) )  /* tiles */
-	ROM_LOAD( "dangar02.15f", 0x08000, 0x8000, CRC(dfdb931c) SHA1(33563160239f221f24ca0cb652d14550e9941afe) )
-	ROM_LOAD( "dangar03.17f", 0x10000, 0x8000, CRC(6954e8c3) SHA1(077bcbe9f80df011c9110d8cf6e08b53d035d1c8) )
-	ROM_LOAD( "dangar04.19f", 0x18000, 0x8000, CRC(4af6a8bf) SHA1(d004b10b9b8559d1d6d26af35999df2857d87c53) )
+	ROM_LOAD( "1.14f", 0x00000, 0x8000, CRC(d59ed1f1) SHA1(e55314b5a078145ad7a5e95cb792b4fd32cfb05d) )  /* tiles */
+	ROM_LOAD( "2.15f", 0x08000, 0x8000, CRC(dfdb931c) SHA1(33563160239f221f24ca0cb652d14550e9941afe) )
+	ROM_LOAD( "3.17f", 0x10000, 0x8000, CRC(6954e8c3) SHA1(077bcbe9f80df011c9110d8cf6e08b53d035d1c8) )
+	ROM_LOAD( "4.19f", 0x18000, 0x8000, CRC(4af6a8bf) SHA1(d004b10b9b8559d1d6d26af35999df2857d87c53) )
 
 	ROM_REGION( 0x10000, "gfx3", 0 )
-	ROM_LOAD( "dangarxx.f4",  0x00000, 0x8000, CRC(55711884) SHA1(2682ebc8d88d0d6c430b7df34ed362bc81047072) )  /* sprites */
-	ROM_LOAD( "dangarxx.f1",  0x08000, 0x8000, CRC(8cf11419) SHA1(79e7a3046878724fde248100ad55a305a427cd46) )
+	ROM_LOAD( "12.4f",  0x00000, 0x8000, CRC(55711884) SHA1(2682ebc8d88d0d6c430b7df34ed362bc81047072) )  /* sprites */
+	ROM_LOAD( "11.1f",  0x08000, 0x8000, CRC(8cf11419) SHA1(79e7a3046878724fde248100ad55a305a427cd46) )
 
 	ROM_REGION( 0x8000, "gfx4", 0 ) /* background tilemaps */
-	ROM_LOAD( "dangar07.19d", 0x0000, 0x4000, CRC(6dba32cf) SHA1(e6433f291364202c1291b137d6ee1840ecf7d72d) )
-	ROM_LOAD( "dangar06.17d", 0x4000, 0x4000, CRC(6c899071) SHA1(9a776aae897d57e66ebdbcf79f3c673da8b78b05) )
+	ROM_LOAD( "7.19d", 0x0000, 0x4000, CRC(6dba32cf) SHA1(e6433f291364202c1291b137d6ee1840ecf7d72d) )
+	ROM_LOAD( "6.17d", 0x4000, 0x4000, CRC(6c899071) SHA1(9a776aae897d57e66ebdbcf79f3c673da8b78b05) )
 
 	ROM_REGION( 0x0400, "proms", 0 )
 	ROM_LOAD( "82s129.9f",    0x0000, 0x0100, CRC(b29f6a07) SHA1(17c82f439f314c212470bafd917b3f7e12462d16) )    /* red */
@@ -703,7 +716,84 @@ ROM_START( dangar2 )
 	ROM_LOAD( "82s129.7f",    0x0000, 0x0100, CRC(29bc6216) SHA1(1d7864ad06ad0cd5e3d1905fc6066bee1cd90995) )    /* sprite palette bank */
 ROM_END
 
-ROM_START( dangarb )
+ROM_START( dangarb ) /* all rom labels are simply numbers, with the owl logo and "Nichibutsu" printed at the bottom */
+	ROM_REGION( 0x14000, "maincpu", 0 )     /* main cpu code */
+	ROM_LOAD( "16.1b",  0x00000, 0x8000, CRC(743fa2d4) SHA1(55539796967532b57279801374b2f0cf82cfe1ae) ) /* SEPT. 26 1986 */
+	ROM_LOAD( "17.3b",  0x08000, 0x4000, CRC(1cdc60a5) SHA1(65f776d14c9461f1a6939ad512eacf6a1a9da2c6) ) /* SEPT. 26 1986 */
+	ROM_LOAD( "18.4b",  0x10000, 0x4000, CRC(db7f6613) SHA1(c55d1f2fdb86e2b9fbdfad0b156d4d084677b750) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )        /* sound cpu code */
+	ROM_LOAD( "13.14b", 0x0000, 0x4000, CRC(3e041873) SHA1(8f9e1ec64509c8a7e9e45add9efc95f98f35fcfc) )
+	ROM_LOAD( "14.15b", 0x4000, 0x8000, CRC(488e3463) SHA1(73ff7ab061be54162f3a548f6bd9ef55b9dec5d9) )
+
+	ROM_REGION( 0x04000, "gfx1", 0 )
+	ROM_LOAD( "11.13d",  0x00000, 0x4000, CRC(e804ffe1) SHA1(22f16c23b9a82f104dda24bc8fccc08f3f69cf97) )   /* chars */
+
+	ROM_REGION( 0x20000, "gfx2", 0 )
+	ROM_LOAD( "1.14f", 0x00000, 0x8000, CRC(d59ed1f1) SHA1(e55314b5a078145ad7a5e95cb792b4fd32cfb05d) )  /* tiles */
+	ROM_LOAD( "2.15f", 0x08000, 0x8000, CRC(dfdb931c) SHA1(33563160239f221f24ca0cb652d14550e9941afe) )
+	ROM_LOAD( "3.17f", 0x10000, 0x8000, CRC(6954e8c3) SHA1(077bcbe9f80df011c9110d8cf6e08b53d035d1c8) )
+	ROM_LOAD( "4.19f", 0x18000, 0x8000, CRC(4af6a8bf) SHA1(d004b10b9b8559d1d6d26af35999df2857d87c53) )
+
+	ROM_REGION( 0x10000, "gfx3", 0 )
+	ROM_LOAD( "12.4f",  0x00000, 0x8000, CRC(55711884) SHA1(2682ebc8d88d0d6c430b7df34ed362bc81047072) )  /* sprites */
+	ROM_LOAD( "11.1f",  0x08000, 0x8000, CRC(8cf11419) SHA1(79e7a3046878724fde248100ad55a305a427cd46) )
+
+	ROM_REGION( 0x8000, "gfx4", 0 ) /* background tilemaps */
+	ROM_LOAD( "7.19d", 0x0000, 0x4000, CRC(6dba32cf) SHA1(e6433f291364202c1291b137d6ee1840ecf7d72d) )
+	ROM_LOAD( "6.17d", 0x4000, 0x4000, CRC(6c899071) SHA1(9a776aae897d57e66ebdbcf79f3c673da8b78b05) )
+
+	ROM_REGION( 0x0400, "proms", 0 )
+	ROM_LOAD( "82s129.9f",    0x0000, 0x0100, CRC(b29f6a07) SHA1(17c82f439f314c212470bafd917b3f7e12462d16) )    /* red */
+	ROM_LOAD( "82s129.10f",   0x0100, 0x0100, CRC(c6de5ecb) SHA1(d5b6cb784b5df16332c5e2b19b763c8858a0b6a7) )    /* green */
+	ROM_LOAD( "82s129.11f",   0x0200, 0x0100, CRC(a5bbd6dc) SHA1(5587844900a24d833500d204f049c05493c4a25a) )    /* blue */
+	ROM_LOAD( "82s129.2d",    0x0300, 0x0100, CRC(a4ac95a5) SHA1(3b31cd3fd6caedd89d1bedc606a978081fc5431f) )    /* sprite lookup table */
+
+	ROM_REGION( 0x0100, "user1", 0 )
+	ROM_LOAD( "82s129.7f",    0x0000, 0x0100, CRC(29bc6216) SHA1(1d7864ad06ad0cd5e3d1905fc6066bee1cd90995) )    /* sprite palette bank */
+ROM_END
+
+ROM_START( dangarj ) /* all rom labels are simply numbers, with the owl logo and "Nichibutsu" printed at the bottom */
+	ROM_REGION( 0x14000, "maincpu", 0 )     /* main cpu code */
+	ROM_LOAD( "16.1b",  0x00000, 0x8000, CRC(1e14b0b4) SHA1(dcb7fe79ca17afe51ba3c1554183c773af13142f) )
+	ROM_LOAD( "17.3b",  0x08000, 0x4000, CRC(9ba92111) SHA1(0050cd83f4e7a17601493d7d44af4501e52aad20) )
+	ROM_LOAD( "18.4b",  0x10000, 0x4000, CRC(db7f6613) SHA1(c55d1f2fdb86e2b9fbdfad0b156d4d084677b750) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )        /* sound cpu code */
+	ROM_LOAD( "21.14b", 0x0000, 0x4000, CRC(3e041873) SHA1(8f9e1ec64509c8a7e9e45add9efc95f98f35fcfc) )
+	ROM_LOAD( "22.15b", 0x4000, 0x4000, CRC(1d484f68) SHA1(7de13d6c6850280fed011c1d1b211cdc5ea9f935) )
+
+	ROM_REGION( 0x04000, "gfx1", 0 )
+	ROM_LOAD( "11.13d",  0x00000, 0x4000, CRC(e804ffe1) SHA1(22f16c23b9a82f104dda24bc8fccc08f3f69cf97) )   /* chars */
+
+	ROM_REGION( 0x20000, "gfx2", 0 )
+	ROM_LOAD( "7.14f",  0x00000, 0x8000, CRC(d59ed1f1) SHA1(e55314b5a078145ad7a5e95cb792b4fd32cfb05d) )  /* tiles */
+	ROM_LOAD( "8.15f",  0x08000, 0x8000, CRC(dfdb931c) SHA1(33563160239f221f24ca0cb652d14550e9941afe) )
+	ROM_LOAD( "9.17f",  0x10000, 0x8000, CRC(6954e8c3) SHA1(077bcbe9f80df011c9110d8cf6e08b53d035d1c8) ) /* different label for these 4, same data */
+	ROM_LOAD( "10.19f", 0x18000, 0x8000, CRC(4af6a8bf) SHA1(d004b10b9b8559d1d6d26af35999df2857d87c53) )
+
+	ROM_REGION( 0x10000, "gfx3", 0 )
+	ROM_LOAD( "20.4f",  0x00000, 0x8000, CRC(55711884) SHA1(2682ebc8d88d0d6c430b7df34ed362bc81047072) )  /* sprites */
+	ROM_LOAD( "19.1f",  0x08000, 0x8000, CRC(8cf11419) SHA1(79e7a3046878724fde248100ad55a305a427cd46) )
+
+	ROM_REGION( 0x8000, "gfx4", 0 ) /* background tilemaps */
+	ROM_LOAD( "15.19d", 0x0000, 0x4000, CRC(6dba32cf) SHA1(e6433f291364202c1291b137d6ee1840ecf7d72d) ) /* different label same data */
+	ROM_LOAD( "12.17d", 0x4000, 0x4000, CRC(6c899071) SHA1(9a776aae897d57e66ebdbcf79f3c673da8b78b05) )
+
+	ROM_REGION( 0x0400, "proms", 0 )
+	ROM_LOAD( "82s129.9f",    0x0000, 0x0100, CRC(b29f6a07) SHA1(17c82f439f314c212470bafd917b3f7e12462d16) )    /* red */
+	ROM_LOAD( "82s129.10f",   0x0100, 0x0100, CRC(c6de5ecb) SHA1(d5b6cb784b5df16332c5e2b19b763c8858a0b6a7) )    /* green */
+	ROM_LOAD( "82s129.11f",   0x0200, 0x0100, CRC(a5bbd6dc) SHA1(5587844900a24d833500d204f049c05493c4a25a) )    /* blue */
+	ROM_LOAD( "82s129.2d",    0x0300, 0x0100, CRC(a4ac95a5) SHA1(3b31cd3fd6caedd89d1bedc606a978081fc5431f) )    /* sprite lookup table */
+
+	ROM_REGION( 0x0100, "user1", 0 )
+	ROM_LOAD( "82s129.7f",    0x0000, 0x0100, CRC(29bc6216) SHA1(1d7864ad06ad0cd5e3d1905fc6066bee1cd90995) )    /* sprite palette bank */
+
+	ROM_REGION( 0x2000, "user2", 0 ) /* located on a daughter card DG-3 with an additional 8.00MHz OSC & Nichibutsu 1412M2 XBA (unknown MCU?) */
+	ROM_LOAD( "dg-3.ic7.2764",    0x0000, 0x2000, CRC(84a56d26) SHA1(6a1cdac7b9e04ccbcc29491f37f7554d09ea6d34) )
+ROM_END
+
+ROM_START( dangarbt )
 	ROM_REGION( 0x14000, "maincpu", 0 )     /* main cpu code */
 	ROM_LOAD( "8",            0x00000, 0x8000, CRC(8136fd10) SHA1(5f2ca08fab0d9431af38ef66922fdb6bd9a132e2) )
 	ROM_LOAD( "9",            0x08000, 0x4000, CRC(3ce5ec11) SHA1(bcc0df6167d0b84b9f260435c1999b9d3605fcd4) )
@@ -1090,14 +1180,16 @@ DRIVER_INIT_MEMBER(galivan_state,youmab)
 
 }
 
-GAME( 1985, galivan,  0,        galivan,  galivan, driver_device,  0, ROT270, "Nichibutsu",   "Cosmo Police Galivan (12/26/1985)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, galivan2, galivan,  galivan,  galivan, driver_device,  0, ROT270, "Nichibutsu",   "Cosmo Police Galivan (12/16/1985)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, galivan3, galivan,  galivan,  galivan, driver_device,  0, ROT270, "Nichibutsu",   "Cosmo Police Galivan (12/11/1985)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, dangar,   0,        galivan,  dangar, driver_device,   0, ROT270, "Nichibutsu",   "Ufo Robo Dangar (12/1/1986)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, dangar2,  dangar,   galivan,  dangar2, driver_device,  0, ROT270, "Nichibutsu",   "Ufo Robo Dangar (9/26/1986)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, dangarb,  dangar,   galivan,  dangarb, driver_device,  0, ROT270, "bootleg",      "Ufo Robo Dangar (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, ninjemak, 0,        ninjemak, ninjemak, driver_device, 0, ROT270, "Nichibutsu",   "Ninja Emaki (US)", MACHINE_SUPPORTS_SAVE|MACHINE_UNEMULATED_PROTECTION )
-GAME( 1986, youma,    ninjemak, ninjemak, ninjemak, driver_device, 0, ROT270, "Nichibutsu",   "Youma Ninpou Chou (Japan)", MACHINE_SUPPORTS_SAVE|MACHINE_UNEMULATED_PROTECTION )
-GAME( 1986, youma2,   ninjemak, ninjemak, ninjemak, driver_device, 0, ROT270, "Nichibutsu",   "Youma Ninpou Chou (Japan, alt)", MACHINE_SUPPORTS_SAVE|MACHINE_UNEMULATED_PROTECTION )
-GAME( 1986, youmab,   ninjemak, youmab,   ninjemak, galivan_state, youmab, ROT270, "bootleg", "Youma Ninpou Chou (Game Electronics bootleg, set 1)", MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE|MACHINE_UNEMULATED_PROTECTION ) // player is invincible
-GAME( 1986, youmab2,  ninjemak, youmab,   ninjemak, galivan_state, youmab, ROT270, "bootleg", "Youma Ninpou Chou (Game Electronics bootleg, set 2)", MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE|MACHINE_UNEMULATED_PROTECTION ) // ""
+GAME( 1985, galivan,  0,        galivan,  galivan,  galivan_state, 0,      ROT270, "Nichibutsu",   "Cosmo Police Galivan (12/26/1985)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, galivan2, galivan,  galivan,  galivan,  galivan_state, 0,      ROT270, "Nichibutsu",   "Cosmo Police Galivan (12/16/1985)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, galivan3, galivan,  galivan,  galivan,  galivan_state, 0,      ROT270, "Nichibutsu",   "Cosmo Police Galivan (12/11/1985)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, dangar,   0,        galivan,  dangar,   galivan_state, 0,      ROT270, "Nichibutsu",   "Ufo Robo Dangar (4/07/1987)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, dangara,  dangar,   galivan,  dangar2,  galivan_state, 0,      ROT270, "Nichibutsu",   "Ufo Robo Dangar (12/1/1986)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, dangarb,  dangar,   galivan,  dangar2,  galivan_state, 0,      ROT270, "Nichibutsu",   "Ufo Robo Dangar (9/26/1986)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, dangarj,  dangar,   galivan,  dangar2,  galivan_state, 0,      ROT270, "Nichibutsu",   "Ufo Robo Dangar (9/26/1986, Japan)", MACHINE_SUPPORTS_SAVE|MACHINE_NOT_WORKING ) // no sprites visable
+GAME( 1986, dangarbt, dangar,   galivan,  dangarb,  galivan_state, 0,      ROT270, "bootleg",      "Ufo Robo Dangar (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, ninjemak, 0,        ninjemak, ninjemak, galivan_state, 0,      ROT270, "Nichibutsu",   "Ninja Emaki (US)", MACHINE_SUPPORTS_SAVE|MACHINE_UNEMULATED_PROTECTION )
+GAME( 1986, youma,    ninjemak, ninjemak, ninjemak, galivan_state, 0,      ROT270, "Nichibutsu",   "Youma Ninpou Chou (Japan)", MACHINE_SUPPORTS_SAVE|MACHINE_UNEMULATED_PROTECTION )
+GAME( 1986, youma2,   ninjemak, ninjemak, ninjemak, galivan_state, 0,      ROT270, "Nichibutsu",   "Youma Ninpou Chou (Japan, alt)", MACHINE_SUPPORTS_SAVE|MACHINE_UNEMULATED_PROTECTION )
+GAME( 1986, youmab,   ninjemak, youmab,   ninjemak, galivan_state, youmab, ROT270, "bootleg",      "Youma Ninpou Chou (Game Electronics bootleg, set 1)", MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE|MACHINE_UNEMULATED_PROTECTION ) // player is invincible
+GAME( 1986, youmab2,  ninjemak, youmab,   ninjemak, galivan_state, youmab, ROT270, "bootleg",      "Youma Ninpou Chou (Game Electronics bootleg, set 2)", MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE|MACHINE_UNEMULATED_PROTECTION ) // ""

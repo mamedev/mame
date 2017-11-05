@@ -9,7 +9,7 @@
 
     TODO:
     - Find out cpu clock speed
-    - Find out what UART type is used
+    - Find out what UART type is used (init byte = 94)
 
     Memory allocation
     - 0000 to 0FFF - standard roms
@@ -36,26 +36,24 @@
 #include "cpu/z80/z80.h"
 #include "machine/terminal.h"
 
-#define TERMINAL_TAG "terminal"
 
 class mcb216_state : public driver_device
 {
 public:
 	mcb216_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_terminal(*this, TERMINAL_TAG)
-	{
-	}
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_terminal(*this, "terminal")
+	{ }
 
-	DECLARE_WRITE8_MEMBER(kbd_put);
+	void kbd_put(u8 data);
 	DECLARE_READ8_MEMBER(keyin_r);
 	DECLARE_READ8_MEMBER(status_r);
 	DECLARE_MACHINE_RESET(mcb216);
 	DECLARE_MACHINE_RESET(cb308);
 
 private:
-	UINT8 m_term_data;
+	uint8_t m_term_data;
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
 };
@@ -70,7 +68,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(mcb216_io, AS_IO, 8, mcb216_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(status_r)
-	AM_RANGE(0x01, 0x01) AM_READ(keyin_r) AM_DEVWRITE(TERMINAL_TAG, generic_terminal_device, write)
+	AM_RANGE(0x01, 0x01) AM_READ(keyin_r) AM_DEVWRITE("terminal", generic_terminal_device, write)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(cb308_mem, AS_PROGRAM, 8, mcb216_state)
@@ -87,7 +85,7 @@ INPUT_PORTS_END
 
 READ8_MEMBER( mcb216_state::keyin_r )
 {
-	UINT8 ret = m_term_data;
+	uint8_t ret = m_term_data;
 	m_term_data = 0;
 	return ret;
 }
@@ -99,7 +97,7 @@ READ8_MEMBER( mcb216_state::status_r )
 	return (m_term_data) ? 0xc0 : 0x80;
 }
 
-WRITE8_MEMBER( mcb216_state::kbd_put )
+void mcb216_state::kbd_put(u8 data)
 {
 	m_term_data = data;
 }
@@ -115,7 +113,7 @@ MACHINE_RESET_MEMBER( mcb216_state, cb308 )
 	m_maincpu->set_state_int(Z80_PC, 0xe000);
 }
 
-static MACHINE_CONFIG_START( mcb216, mcb216_state )
+static MACHINE_CONFIG_START( mcb216 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(mcb216_mem)
@@ -123,11 +121,11 @@ static MACHINE_CONFIG_START( mcb216, mcb216_state )
 	MCFG_MACHINE_RESET_OVERRIDE(mcb216_state, mcb216)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(mcb216_state, kbd_put))
+	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
+	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(mcb216_state, kbd_put))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( cb308, mcb216_state )
+static MACHINE_CONFIG_START( cb308 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(cb308_mem)
@@ -135,8 +133,8 @@ static MACHINE_CONFIG_START( cb308, mcb216_state )
 	MCFG_MACHINE_RESET_OVERRIDE(mcb216_state, cb308)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(mcb216_state, kbd_put))
+	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
+	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(mcb216_state, kbd_put))
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -156,6 +154,6 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   CLASS         INIT    COMPANY    FULLNAME       FLAGS */
-COMP( 1979, mcb216, 0,      0,       mcb216,    mcb216, driver_device,  0,  "Cromemco", "MCB-216", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
-COMP( 1977, cb308,  mcb216, 0,       cb308,     mcb216, driver_device,  0,  "Cromemco", "CB-308",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   CLASS          INIT  COMPANY      FULLNAME  FLAGS */
+COMP( 1979, mcb216, 0,      0,       mcb216,    mcb216, mcb216_state,  0,    "Cromemco", "MCB-216", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1977, cb308,  mcb216, 0,       cb308,     mcb216, mcb216_state,  0,    "Cromemco", "CB-308",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

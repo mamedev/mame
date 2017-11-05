@@ -15,8 +15,11 @@
 #include "emu.h"
 #include "tms34061.h"
 
+#include "screen.h"
 
-#define VERBOSE     (0)
+//#define VERBOSE 1
+#include "logmacro.h"
+
 
 
 //**************************************************************************
@@ -27,10 +30,10 @@
 //  tms34061_device - constructor
 //-------------------------------------------------
 
-const device_type TMS34061 = &device_creator<tms34061_device>;
+DEFINE_DEVICE_TYPE(TMS34061, tms34061_device, "tms34061", "TI TMS34061 VSC")
 
-tms34061_device::tms34061_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, TMS34061, "TMS34061 VSC", tag, owner, clock, "tms34061", __FILE__),
+tms34061_device::tms34061_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, TMS34061, tag, owner, clock),
 	device_video_interface(mconfig, *this),
 	m_rowshift(0),
 	m_vramsize(0),
@@ -61,10 +64,10 @@ void tms34061_device::device_start()
 	m_vrammask = m_vramsize - 1;
 
 	/* allocate memory for VRAM */
-	m_vram = auto_alloc_array_clear(machine(), UINT8, m_vramsize + 256 * 2);
+	m_vram = auto_alloc_array_clear(machine(), uint8_t, m_vramsize + 256 * 2);
 
 	/* allocate memory for latch RAM */
-	m_latchram = auto_alloc_array_clear(machine(), UINT8, m_vramsize + 256 * 2);
+	m_latchram = auto_alloc_array_clear(machine(), uint8_t, m_vramsize + 256 * 2);
 
 	/* add some buffer space for VRAM and latch RAM */
 	m_vram += 256;
@@ -168,7 +171,7 @@ TIMER_CALLBACK_MEMBER( tms34061_device::interrupt )
  *
  *************************************/
 
-void tms34061_device::register_w(address_space &space, offs_t offset, UINT8 data)
+void tms34061_device::register_w(address_space &space, offs_t offset, uint8_t data)
 {
 	int scanline;
 	int regnum = offset >> 2;
@@ -188,7 +191,7 @@ void tms34061_device::register_w(address_space &space, offs_t offset, UINT8 data
 	}
 
 	/* log it */
-	if (VERBOSE) logerror("%s:tms34061 %s = %04x\n", space.machine().describe_context(), regnames[regnum], m_regs[regnum]);
+	LOG("%s:tms34061 %s = %04x\n", space.machine().describe_context(), regnames[regnum], m_regs[regnum]);
 
 	/* update the state of things */
 	switch (regnum)
@@ -239,10 +242,10 @@ void tms34061_device::register_w(address_space &space, offs_t offset, UINT8 data
  *
  *************************************/
 
-UINT8 tms34061_device::register_r(address_space &space, offs_t offset)
+uint8_t tms34061_device::register_r(address_space &space, offs_t offset)
 {
 	int regnum = offset >> 2;
-	UINT16 result;
+	uint16_t result;
 
 	/* extract the correct portion of the register */
 	if (regnum < ARRAY_LENGTH(m_regs))
@@ -266,7 +269,7 @@ UINT8 tms34061_device::register_r(address_space &space, offs_t offset)
 	}
 
 	/* log it */
-	if (VERBOSE) logerror("%s:tms34061 %s read = %04X\n", space.machine().describe_context(), regnames[regnum], result);
+	LOG("%s:tms34061 %s read = %04X\n", space.machine().describe_context(), regnames[regnum], result);
 	return (offset & 0x02) ? (result >> 8) : result;
 }
 
@@ -361,7 +364,7 @@ void tms34061_device::adjust_xyaddress(int offset)
 }
 
 
-void tms34061_device::xypixel_w(address_space &space, int offset, UINT8 data)
+void tms34061_device::xypixel_w(address_space &space, int offset, uint8_t data)
 {
 	/* determine the offset, then adjust it */
 	offs_t pixeloffs = m_regs[TMS34061_XYADDRESS];
@@ -373,7 +376,7 @@ void tms34061_device::xypixel_w(address_space &space, int offset, UINT8 data)
 
 	/* mask to the VRAM size */
 	pixeloffs &= m_vrammask;
-	if (VERBOSE) logerror("%s:tms34061 xy (%04x) = %02x/%02x\n", space.machine().describe_context(), pixeloffs, data, m_latchdata);
+	LOG("%s:tms34061 xy (%04x) = %02x/%02x\n", space.machine().describe_context(), pixeloffs, data, m_latchdata);
 
 	/* set the pixel data */
 	m_vram[pixeloffs] = data;
@@ -381,7 +384,7 @@ void tms34061_device::xypixel_w(address_space &space, int offset, UINT8 data)
 }
 
 
-UINT8 tms34061_device::xypixel_r(address_space &space, int offset)
+uint8_t tms34061_device::xypixel_r(address_space &space, int offset)
 {
 	/* determine the offset, then adjust it */
 	offs_t pixeloffs = m_regs[TMS34061_XYADDRESS];
@@ -406,7 +409,7 @@ UINT8 tms34061_device::xypixel_r(address_space &space, int offset)
  *
  *************************************/
 
-void tms34061_device::write(address_space &space, int col, int row, int func, UINT8 data)
+void tms34061_device::write(address_space &space, int col, int row, int func, uint8_t data)
 {
 	offs_t offs;
 
@@ -429,7 +432,7 @@ void tms34061_device::write(address_space &space, int col, int row, int func, UI
 			offs = ((row << m_rowshift) | col) & m_vrammask;
 			if (m_regs[TMS34061_CONTROL2] & 0x0040)
 				offs |= (m_regs[TMS34061_CONTROL2] & 3) << 16;
-			if (VERBOSE) logerror("%s:tms34061 direct (%04x) = %02x/%02x\n", space.machine().describe_context(), offs, data, m_latchdata);
+			LOG("%s:tms34061 direct (%04x) = %02x/%02x\n", space.machine().describe_context(), offs, data, m_latchdata);
 			if (m_vram[offs] != data || m_latchram[offs] != m_latchdata)
 			{
 				m_vram[offs] = data;
@@ -443,7 +446,7 @@ void tms34061_device::write(address_space &space, int col, int row, int func, UI
 			if (m_regs[TMS34061_CONTROL2] & 0x0040)
 				offs |= (m_regs[TMS34061_CONTROL2] & 3) << 16;
 			offs &= m_vrammask;
-			if (VERBOSE) logerror("%s:tms34061 shiftreg write (%04x)\n", space.machine().describe_context(), offs);
+			LOG("%s:tms34061 shiftreg write (%04x)\n", space.machine().describe_context(), offs);
 
 			memcpy(&m_vram[offs], m_shiftreg, (size_t)1 << m_rowshift);
 			memset(&m_latchram[offs], m_latchdata, (size_t)1 << m_rowshift);
@@ -455,7 +458,7 @@ void tms34061_device::write(address_space &space, int col, int row, int func, UI
 			if (m_regs[TMS34061_CONTROL2] & 0x0040)
 				offs |= (m_regs[TMS34061_CONTROL2] & 3) << 16;
 			offs &= m_vrammask;
-			if (VERBOSE) logerror("%s:tms34061 shiftreg read (%04x)\n", space.machine().describe_context(), offs);
+			LOG("%s:tms34061 shiftreg read (%04x)\n", space.machine().describe_context(), offs);
 
 			m_shiftreg = &m_vram[offs];
 			break;
@@ -468,7 +471,7 @@ void tms34061_device::write(address_space &space, int col, int row, int func, UI
 }
 
 
-UINT8 tms34061_device::read(address_space &space, int col, int row, int func)
+uint8_t tms34061_device::read(address_space &space, int col, int row, int func)
 {
 	int result = 0;
 	offs_t offs;
@@ -487,7 +490,7 @@ UINT8 tms34061_device::read(address_space &space, int col, int row, int func)
 			result = xypixel_r(space, col);
 			break;
 
-		/* funtion 3 maps to direct access */
+		/* function 3 maps to direct access */
 		case 3:
 			offs = ((row << m_rowshift) | col) & m_vrammask;
 			result = m_vram[offs];
@@ -540,7 +543,7 @@ READ8_MEMBER( tms34061_device::latch_r )
 
 WRITE8_MEMBER( tms34061_device::latch_w )
 {
-	if (VERBOSE) logerror("tms34061_latch = %02X\n", data);
+	LOG("tms34061_latch = %02X\n", data);
 	m_latchdata = data;
 }
 

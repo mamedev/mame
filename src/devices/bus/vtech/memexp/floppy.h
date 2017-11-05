@@ -9,12 +9,11 @@
 
 ***************************************************************************/
 
+#ifndef MAME_BUS_VTECH_MEMEXP_FLOPPY_H
+#define MAME_BUS_VTECH_MEMEXP_FLOPPY_H
+
 #pragma once
 
-#ifndef __VTECH_MEMEXP_FLOPPY_H__
-#define __VTECH_MEMEXP_FLOPPY_H__
-
-#include "emu.h"
 #include "memexp.h"
 #include "imagedev/floppy.h"
 
@@ -23,14 +22,21 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> floppy_controller_device
+// ======================> vtech_floppy_controller_device
 
-class floppy_controller_device : public device_t, public device_memexp_interface
+class vtech_floppy_controller_device : public device_t, public device_vtech_memexp_interface
 {
 public:
 	// construction/destruction
-	floppy_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	vtech_floppy_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+protected:
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+private:
 	DECLARE_ADDRESS_MAP(map, 8);
 
 	DECLARE_WRITE8_MEMBER(latch_w);
@@ -38,29 +44,23 @@ public:
 	DECLARE_READ8_MEMBER(rd_r);
 	DECLARE_READ8_MEMBER(wpt_r);
 
-protected:
-	virtual const rom_entry *device_rom_region() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	void index_callback(floppy_image_device *floppy, int state);
+	void update_latching_inverter();
+	void flush_writes(bool keep_margin = false);
 
-	required_device<memexp_slot_device> m_memexp;
+	required_device<vtech_memexp_slot_device> m_memexp;
 	required_device<floppy_connector> m_floppy0, m_floppy1;
 	floppy_image_device *m_floppy;
 
-	UINT8 m_latch, m_shifter;
+	uint8_t m_latch, m_shifter;
 	bool m_latching_inverter;
 	int m_current_cyl;
 	attotime m_last_latching_inverter_update_time;
 	attotime m_write_start_time, m_write_buffer[32];
 	int m_write_position;
-
-	void index_callback(floppy_image_device *floppy, int state);
-	void update_latching_inverter();
-	void flush_writes(bool keep_margin = false);
 };
 
 // device type definition
-extern const device_type FLOPPY_CONTROLLER;
+DECLARE_DEVICE_TYPE(VTECH_FLOPPY_CONTROLLER, vtech_floppy_controller_device)
 
-#endif // __VTECH_MEMEXP_FLOPPY_H__
+#endif // MAME_BUS_VTECH_MEMEXP_FLOPPY_H

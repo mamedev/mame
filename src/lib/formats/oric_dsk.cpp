@@ -35,9 +35,9 @@ bool oric_dsk_format::supports_save() const
 	return true;
 }
 
-int oric_dsk_format::identify(io_generic *io, UINT32 form_factor)
+int oric_dsk_format::identify(io_generic *io, uint32_t form_factor)
 {
-	UINT8 h[256];
+	uint8_t h[256];
 	io_generic_read(io, h, 0, 256);
 
 	if(memcmp(h, "MFM_DISK", 8))
@@ -54,10 +54,10 @@ int oric_dsk_format::identify(io_generic *io, UINT32 form_factor)
 	return 100;
 }
 
-bool oric_dsk_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
+bool oric_dsk_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 {
-	UINT8 h[256];
-	UINT8 t[6250+3];
+	uint8_t h[256];
+	uint8_t t[6250+3];
 
 	t[6250] = t[6251] = t[6252] = 0;
 	io_generic_read(io, h, 0, 256);
@@ -68,7 +68,7 @@ bool oric_dsk_format::load(io_generic *io, UINT32 form_factor, floppy_image *ima
 	for(int side=0; side<sides; side++)
 		for(int track=0; track<tracks; track++) {
 			io_generic_read(io, t, 256+6400*(tracks*side + track), 6250);
-			std::vector<UINT32> stream;
+			std::vector<uint32_t> stream;
 			int sector_size = 128;
 			for(int i=0; i<6250; i++) {
 				if(t[i] == 0xc2 && t[i+1] == 0xc2 && t[i+2] == 0xc2) {

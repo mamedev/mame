@@ -10,6 +10,7 @@
 
 #include "emu.h"
 #include "includes/atari400.h"
+#include "screen.h"
 
 #define VERBOSE 0
 
@@ -23,7 +24,7 @@
 
 void atari_common_state::video_start()
 {
-	palette_device &palette = machine().first_screen()->palette();
+	device_palette_interface &palette = machine().first_screen()->palette();
 
 	for (int i = 0; i < 256; i++)
 		m_gtia->set_color_lookup(i, (palette.pen(0) << 8) + palette.pen(0));
@@ -36,7 +37,7 @@ void atari_common_state::video_start()
  *
  **************************************************************/
 
-static const UINT8 atari_palette[256*3] =
+static const uint8_t atari_palette[256*3] =
 {
 	/* Grey */
 	0x00,0x00,0x00, 0x25,0x25,0x25, 0x34,0x34,0x34, 0x4e,0x4e,0x4e,

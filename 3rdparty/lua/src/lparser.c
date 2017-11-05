@@ -1,5 +1,5 @@
 /*
-** $Id: lparser.c,v 2.149 2015/11/02 16:09:30 roberto Exp $
+** $Id: lparser.c,v 2.155 2016/08/01 19:51:24 roberto Exp $
 ** Lua Parser
 ** See Copyright Notice in lua.h
 */
@@ -164,7 +164,8 @@ static int registerlocalvar (LexState *ls, TString *varname) {
   int oldsize = f->sizelocvars;
   luaM_growvector(ls->L, f->locvars, fs->nlocvars, f->sizelocvars,
                   LocVar, SHRT_MAX, "local variables");
-  while (oldsize < f->sizelocvars) f->locvars[oldsize++].varname = NULL;
+  while (oldsize < f->sizelocvars)
+    f->locvars[oldsize++].varname = NULL;
   f->locvars[fs->nlocvars].varname = varname;
   luaC_objbarrier(ls->L, f, varname);
   return fs->nlocvars++;
@@ -230,7 +231,8 @@ static int newupvalue (FuncState *fs, TString *name, expdesc *v) {
   checklimit(fs, fs->nups + 1, MAXUPVAL, "upvalues");
   luaM_growvector(fs->ls->L, f->upvalues, fs->nups, f->sizeupvalues,
                   Upvaldesc, MAXUPVAL, "upvalues");
-  while (oldsize < f->sizeupvalues) f->upvalues[oldsize++].name = NULL;
+  while (oldsize < f->sizeupvalues)
+    f->upvalues[oldsize++].name = NULL;
   f->upvalues[fs->nups].instack = (v->k == VLOCAL);
   f->upvalues[fs->nups].idx = cast_byte(v->u.info);
   f->upvalues[fs->nups].name = name;
@@ -255,7 +257,8 @@ static int searchvar (FuncState *fs, TString *n) {
 */
 static void markupval (FuncState *fs, int level) {
   BlockCnt *bl = fs->bl;
-  while (bl->nactvar > level) bl = bl->previous;
+  while (bl->nactvar > level)
+    bl = bl->previous;
   bl->upval = 1;
 }
 
@@ -264,27 +267,26 @@ static void markupval (FuncState *fs, int level) {
   Find variable with given name 'n'. If it is an upvalue, add this
   upvalue into all intermediate functions.
 */
-static int singlevaraux (FuncState *fs, TString *n, expdesc *var, int base) {
+static void singlevaraux (FuncState *fs, TString *n, expdesc *var, int base) {
   if (fs == NULL)  /* no more levels? */
-    return VVOID;  /* default is global */
+    init_exp(var, VVOID, 0);  /* default is global */
   else {
     int v = searchvar(fs, n);  /* look up locals at current level */
     if (v >= 0) {  /* found? */
       init_exp(var, VLOCAL, v);  /* variable is local */
       if (!base)
         markupval(fs, v);  /* local will be used as an upval */
-      return VLOCAL;
     }
     else {  /* not found as local at current level; try upvalues */
       int idx = searchupvalue(fs, n);  /* try existing upvalues */
       if (idx < 0) {  /* not found? */
-        if (singlevaraux(fs->prev, n, var, 0) == VVOID) /* try upper levels */
-          return VVOID;  /* not found; is a global */
+        singlevaraux(fs->prev, n, var, 0);  /* try upper levels */
+        if (var->k == VVOID)  /* not found? */
+          return;  /* it is a global */
         /* else was LOCAL or UPVAL */
         idx  = newupvalue(fs, n, var);  /* will be a new upvalue */
       }
-      init_exp(var, VUPVAL, idx);
-      return VUPVAL;
+      init_exp(var, VUPVAL, idx);  /* new or old upvalue */
     }
   }
 }
@@ -293,10 +295,11 @@ static int singlevaraux (FuncState *fs, TString *n, expdesc *var, int base) {
 static void singlevar (LexState *ls, expdesc *var) {
   TString *varname = str_checkname(ls);
   FuncState *fs = ls->fs;
-  if (singlevaraux(fs, varname, var, 1) == VVOID) {  /* global name? */
+  singlevaraux(fs, varname, var, 1);
+  if (var->k == VVOID) {  /* global name? */
     expdesc key;
     singlevaraux(fs, ls->envn, var, 1);  /* get environment variable */
-    lua_assert(var->k == VLOCAL || var->k == VUPVAL);
+    lua_assert(var->k != VVOID);  /* this one must exist */
     codestring(ls, &key, varname);  /* key is variable name */
     luaK_indexed(fs, var, &key);  /* env[varname] */
   }
@@ -320,6 +323,8 @@ static void adjust_assign (LexState *ls, int nvars, int nexps, expdesc *e) {
       luaK_nil(fs, reg, extra);
     }
   }
+  if (nexps > nvars)
+    ls->fs->freereg -= nexps - nvars;  /* remove extra values */
 }
 
 
@@ -499,7 +504,8 @@ static Proto *addprototype (LexState *ls) {
   if (fs->np >= f->sizep) {
     int oldsize = f->sizep;
     luaM_growvector(L, f->p, fs->np, f->sizep, Proto *, MAXARG_Bx, "functions");
-    while (oldsize < f->sizep) f->p[oldsize++] = NULL;
+    while (oldsize < f->sizep)
+      f->p[oldsize++] = NULL;
   }
   f->p[fs->np++] = clp = luaF_newproto(L);
   luaC_objbarrier(L, f, clp);
@@ -760,7 +766,7 @@ static void parlist (LexState *ls) {
         }
         case TK_DOTS: {  /* param -> '...' */
           luaX_next(ls);
-          f->is_vararg = 2;  /* declared vararg */
+          f->is_vararg = 1;  /* declared vararg */
           break;
         }
         default: luaX_syntaxerror(ls, "<name> or '...' expected");
@@ -956,7 +962,6 @@ static void simpleexp (LexState *ls, expdesc *v) {
       FuncState *fs = ls->fs;
       check_condition(ls, fs->f->is_vararg,
                       "cannot use '...' outside a vararg function");
-      fs->f->is_vararg = 1;  /* function actually uses vararg */
       init_exp(v, VVARARG, luaK_codeABC(fs, OP_VARARG, 0, 1, 0));
       break;
     }
@@ -1156,11 +1161,8 @@ static void assignment (LexState *ls, struct LHS_assign *lh, int nvars) {
     int nexps;
     checknext(ls, '=');
     nexps = explist(ls, &e);
-    if (nexps != nvars) {
+    if (nexps != nvars)
       adjust_assign(ls, nvars, nexps, &e);
-      if (nexps > nvars)
-        ls->fs->freereg -= nexps - nvars;  /* remove extra values */
-    }
     else {
       luaK_setoneret(ls->fs, &e);  /* close last expression */
       luaK_storevar(ls->fs, &lh->v, &e);
@@ -1226,7 +1228,7 @@ static void labelstat (LexState *ls, TString *label, int line) {
   checkrepeated(fs, ll, label);  /* check for repeated labels */
   checknext(ls, TK_DBCOLON);  /* skip double colon */
   /* create new entry for this label */
-  l = newlabelentry(ls, ll, label, line, fs->pc);
+  l = newlabelentry(ls, ll, label, line, luaK_getlabel(fs));
   skipnoopstat(ls);  /* skip other no-op statements */
   if (block_follow(ls, 0)) {  /* label is last no-op statement in the block? */
     /* assume that locals are already out of scope */
@@ -1494,7 +1496,7 @@ static void exprstat (LexState *ls) {
   }
   else {  /* stat -> func */
     check_condition(ls, v.v.k == VCALL, "syntax error");
-    SETARG_C(getcode(fs, &v.v), 1);  /* call statement uses no results */
+    SETARG_C(getinstruction(fs, &v.v), 1);  /* call statement uses no results */
   }
 }
 
@@ -1511,8 +1513,8 @@ static void retstat (LexState *ls) {
     if (hasmultret(e.k)) {
       luaK_setmultret(fs, &e);
       if (e.k == VCALL && nret == 1) {  /* tail call? */
-        SET_OPCODE(getcode(fs,&e), OP_TAILCALL);
-        lua_assert(GETARG_A(getcode(fs,&e)) == fs->nactvar);
+        SET_OPCODE(getinstruction(fs,&e), OP_TAILCALL);
+        lua_assert(GETARG_A(getinstruction(fs,&e)) == fs->nactvar);
       }
       first = fs->nactvar;
       nret = LUA_MULTRET;  /* return all values */
@@ -1611,7 +1613,7 @@ static void mainfunc (LexState *ls, FuncState *fs) {
   BlockCnt bl;
   expdesc v;
   open_func(ls, fs, &bl);
-  fs->f->is_vararg = 2;  /* main function is always declared vararg */
+  fs->f->is_vararg = 1;  /* main function is always declared vararg */
   init_exp(&v, VLOCAL, 0);  /* create and... */
   newupvalue(fs, ls->envn, &v);  /* ...set environment upvalue */
   luaX_next(ls);  /* read first token */

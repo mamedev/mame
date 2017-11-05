@@ -41,6 +41,7 @@
           0x28 China
           0x80 Europe / Germany
           0x82 Austria
+          0x8c Great Britain
           0x90 Holland
           0x92 Italy
           0x9c Switzerland
@@ -580,6 +581,34 @@ Raiden Fighters Jet    (All Mask ROMs stamped 'RAIDEN-FJET')
 
 
 
+Mahjong Adapter Layout
+----------------------
+
+(C)SXX2C MAHJANG IF SEIBU KAIHATSU INC.
+|------------|  |---------------------------------------------|  |------------|
+|            |--|                  J A M M A                  |--|            |
+|   E  E                                                               E  E   |
+|   X  X                                                               X  X   |
+|   C  C     74LS393   16.9344MHz    jumpers        74LS174  74LS174   C  C   |
+|   N  N                                                               N  N   |
+|   4  3     74LS393       *                        74LS174  74LS174   2  1   |
+|                                                                             |
+|   74LS138   74LS04       **           ***         74LS174  74LS174          |
+|                                                                             |
+|   74LS161   SN7406            resistor package     ****    74LS148          |
+|                                                                             |
+|          |---|                   5 6 P M J                    |---|         |
+|----------|   |------------------------------------------------|   |---------|
+Notes:
+*     : Unpopulated location for ULN2003
+**    : Unpopulated location for 16V8-25 GAL
+***   : Unpopulated location for 74LS161
+****  : Unpopulated location for 74LS148
+
+This board is used by E Jong High School to encode the mahjong inputs onto the
+SPI motherboard's JAMMA connector.
+
+
 There were some single PCBs made that run just one game. These are shown below.
 
 
@@ -845,18 +874,23 @@ Notes:
 */
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
+#include "includes/seibuspi.h"
+
 #include "cpu/i386/i386.h"
+#include "cpu/z80/z80.h"
+#include "machine/7200fifo.h"
 #include "machine/ds2404.h"
 #include "machine/eepromser.h"
 #include "machine/intelfsh.h"
-#include "machine/7200fifo.h"
+#include "machine/seibuspi.h"
 #include "sound/okim6295.h"
 #include "sound/ymf271.h"
 #include "sound/ymz280b.h"
-#include "machine/seibuspi.h"
-#include "machine/spisprit.h"
-#include "includes/seibuspi.h"
+#include "video/seibu_crtc.h"
+
+#include "screen.h"
+#include "speaker.h"
+
 
 // default values written to CRTC (note: SYS386F does not have this chip)
 #define PIXEL_CLOCK  (XTAL_28_63636MHz/4)
@@ -915,7 +949,7 @@ WRITE8_MEMBER(seibuspi_state::spi_layerbanks_eeprom_w)
 
 WRITE8_MEMBER(seibuspi_state::oki_bank_w)
 {
-	m_oki2->set_bank_base((data & 0x04) ? 0x40000 : 0);
+	m_oki2->set_rom_bank((data >> 2) & 1);
 }
 
 WRITE8_MEMBER(seibuspi_state::z80_prg_transfer_w)
@@ -937,7 +971,7 @@ WRITE8_MEMBER(seibuspi_state::z80_enable_w)
 
 READ8_MEMBER(seibuspi_state::sb_coin_r)
 {
-	UINT8 ret = m_sb_coin_latch;
+	uint8_t ret = m_sb_coin_latch;
 
 	m_sb_coin_latch = 0;
 	return ret;
@@ -945,21 +979,15 @@ READ8_MEMBER(seibuspi_state::sb_coin_r)
 
 READ32_MEMBER(seibuspi_state::ejsakura_keyboard_r)
 {
-	switch (m_ejsakura_input_port)
-	{
-		case 0x01:
-			return ioport("INPUT01")->read();
-		case 0x02:
-			return ioport("INPUT02")->read();
-		case 0x04:
-			return ioport("INPUT04")->read();
-		case 0x08:
-			return ioport("INPUT08")->read();
-		case 0x10:
-			return ioport("INPUT10")->read();
-		default:
-			return ioport("SYSTEM")->read();
-	}
+	// coins/eeprom data
+	uint32_t ret = m_special->read();
+
+	// multiplexed inputs
+	for (int i = 0; i < 5; i++)
+		if (m_ejsakura_input_port >> i & 1)
+			ret &= m_key[i]->read();
+
+	return ret;
 }
 
 WRITE32_MEMBER(seibuspi_state::ejsakura_input_select_w)
@@ -969,33 +997,57 @@ WRITE32_MEMBER(seibuspi_state::ejsakura_input_select_w)
 
 
 static ADDRESS_MAP_START( base_map, AS_PROGRAM, 32, seibuspi_state )
-	AM_RANGE(0x00000414, 0x00000417) AM_WRITENOP // bg gfx decryption key, see machine/seibuspi.c
-	AM_RANGE(0x00000418, 0x0000041b) AM_READWRITE(spi_layer_bank_r, spi_layer_bank_w)
-	AM_RANGE(0x0000041c, 0x0000041f) AM_WRITE(spi_layer_enable_w) // seibu crtc
-	AM_RANGE(0x00000420, 0x0000042b) AM_RAM AM_SHARE("scrollram") // seibu crtc
+	AM_RANGE(0x00000400, 0x0000043f) AM_DEVREADWRITE16("crtc", seibu_crtc_device, read, write, 0xffffffff)
 	AM_RANGE(0x00000480, 0x00000483) AM_WRITE(tilemap_dma_start_w)
 	AM_RANGE(0x00000484, 0x00000487) AM_WRITE(palette_dma_start_w)
 	AM_RANGE(0x00000490, 0x00000493) AM_WRITE(video_dma_length_w)
 	AM_RANGE(0x00000494, 0x00000497) AM_WRITE(video_dma_address_w)
 	AM_RANGE(0x00000498, 0x0000049b) AM_WRITENOP // ? dma address high bits? (always writes 0)
-	AM_RANGE(0x0000050c, 0x0000050f) AM_WRITE16(sprite_dma_start_w, 0xffff0000)
-	AM_RANGE(0x00000524, 0x00000527) AM_WRITENOP // SEI252 sprite decryption key, see machine/spisprit.c
-	AM_RANGE(0x00000528, 0x0000052b) AM_WRITENOP // SEI252 sprite decryption unknown
-	AM_RANGE(0x00000530, 0x00000533) AM_WRITENOP // SEI252 sprite decryption table key, see machine/spisprit.c
-	AM_RANGE(0x00000534, 0x00000537) AM_WRITENOP // SEI252 sprite decryption unknown
-	AM_RANGE(0x0000053c, 0x0000053f) AM_WRITENOP // SEI252 sprite decryption table index, see machine/spisprit.c
-	AM_RANGE(0x0000054c, 0x0000054f) AM_WRITENOP // RISE10/11 sprite decryption key, see machine/seibuspi.c
-	AM_RANGE(0x00000560, 0x00000563) AM_WRITE16(sprite_dma_start_w, 0xffff0000)
 	AM_RANGE(0x00000600, 0x00000603) AM_READ8(spi_status_r, 0x000000ff)
 	AM_RANGE(0x00000604, 0x00000607) AM_READ_PORT("INPUTS")
-	AM_RANGE(0x00000608, 0x0000060b) AM_READ_PORT("UNKNOWN")
+	AM_RANGE(0x00000608, 0x0000060b) AM_READ_PORT("EXCH")
 	AM_RANGE(0x0000060c, 0x0000060f) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x00000000, 0x0003ffff) AM_RAM AM_SHARE("mainram")
 	AM_RANGE(0x00200000, 0x003fffff) AM_ROM AM_SHARE("share1")
 	AM_RANGE(0xffe00000, 0xffffffff) AM_ROM AM_REGION("maincpu", 0) AM_SHARE("share1") // ROM location in real-mode
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( sei252_map, AS_PROGRAM, 32, seibuspi_state )
+	//AM_RANGE(0x00000500, 0x0000057f) AM_DEVREADWRITE16("obj", sei252_device, read_xor, write_xor, 0xffffffff)
+	AM_RANGE(0x0000050c, 0x0000050f) AM_WRITE16(sprite_dma_start_w, 0xffff0000)
+	AM_RANGE(0x00000524, 0x00000527) AM_WRITENOP // SEI252 sprite decryption key, see machine/spisprit.c
+	AM_RANGE(0x00000528, 0x0000052b) AM_WRITENOP // SEI252 sprite decryption unknown
+	AM_RANGE(0x00000530, 0x00000533) AM_WRITENOP // SEI252 sprite decryption table key, see machine/spisprit.c
+	AM_RANGE(0x00000534, 0x00000537) AM_WRITENOP // SEI252 sprite decryption unknown
+	AM_RANGE(0x0000053c, 0x0000053f) AM_WRITENOP // SEI252 sprite decryption table index, see machine/spisprit.c
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( rise_map, AS_PROGRAM, 32, seibuspi_state )
+	//AM_RANGE(0x00000500, 0x0000057f) AM_DEVREADWRITE16("obj", seibu_encrypted_sprite_device, read, write, 0xffffffff)
+	AM_RANGE(0x0000054c, 0x0000054f) AM_WRITENOP // RISE10/11 sprite decryption key, see machine/seibuspi.c
+	AM_RANGE(0x00000560, 0x00000563) AM_WRITE16(sprite_dma_start_w, 0xffff0000)
+ADDRESS_MAP_END
+
 static ADDRESS_MAP_START( spi_map, AS_PROGRAM, 32, seibuspi_state )
+	AM_IMPORT_FROM( sei252_map )
+	AM_RANGE(0x00000600, 0x00000603) AM_WRITENOP // ?
+	AM_RANGE(0x00000680, 0x00000683) AM_DEVREAD8("soundfifo2", fifo7200_device, data_byte_r, 0x000000ff)
+	AM_RANGE(0x00000680, 0x00000683) AM_DEVWRITE8("soundfifo1", fifo7200_device, data_byte_w, 0x000000ff)
+	AM_RANGE(0x00000684, 0x00000687) AM_READ8(sound_fifo_status_r, 0x000000ff)
+	AM_RANGE(0x00000688, 0x0000068b) AM_WRITE8(z80_prg_transfer_w, 0x000000ff)
+	AM_RANGE(0x0000068c, 0x0000068f) AM_WRITE8(z80_enable_w, 0x000000ff)
+	AM_RANGE(0x0000068c, 0x0000068f) AM_WRITE8(rf2_layer_bank_w, 0x00ff0000)
+	AM_RANGE(0x000006d0, 0x000006d3) AM_DEVWRITE8("ds2404", ds2404_device, ds2404_1w_reset_w, 0x000000ff)
+	AM_RANGE(0x000006d4, 0x000006d7) AM_DEVWRITE8("ds2404", ds2404_device, ds2404_data_w, 0x000000ff)
+	AM_RANGE(0x000006d8, 0x000006db) AM_DEVWRITE8("ds2404", ds2404_device, ds2404_clk_w, 0x000000ff)
+	AM_RANGE(0x000006dc, 0x000006df) AM_DEVREAD8("ds2404", ds2404_device, ds2404_data_r, 0x000000ff)
+	AM_RANGE(0x000006dc, 0x000006df) AM_READ8(spi_ds2404_unknown_r, 0x0000ff00)
+	AM_RANGE(0x00a00000, 0x013fffff) AM_ROM AM_REGION("sound01", 0)
+	AM_IMPORT_FROM( base_map )
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( rdft2_map, AS_PROGRAM, 32, seibuspi_state )
+	AM_IMPORT_FROM( rise_map )
 	AM_RANGE(0x00000600, 0x00000603) AM_WRITENOP // ?
 	AM_RANGE(0x00000680, 0x00000683) AM_DEVREAD8("soundfifo2", fifo7200_device, data_byte_r, 0x000000ff)
 	AM_RANGE(0x00000680, 0x00000683) AM_DEVWRITE8("soundfifo1", fifo7200_device, data_byte_w, 0x000000ff)
@@ -1013,6 +1065,7 @@ static ADDRESS_MAP_START( spi_map, AS_PROGRAM, 32, seibuspi_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sxx2e_map, AS_PROGRAM, 32, seibuspi_state )
+	AM_IMPORT_FROM( sei252_map )
 	AM_RANGE(0x00000680, 0x00000683) AM_READ8(sb_coin_r, 0x000000ff)
 	AM_RANGE(0x00000680, 0x00000683) AM_DEVWRITE8("soundfifo1", fifo7200_device, data_byte_w, 0x000000ff)
 	AM_RANGE(0x00000684, 0x00000687) AM_READ8(sound_fifo_status_r, 0x000000ff)
@@ -1027,6 +1080,7 @@ static ADDRESS_MAP_START( sxx2e_map, AS_PROGRAM, 32, seibuspi_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sxx2f_map, AS_PROGRAM, 32, seibuspi_state )
+	AM_IMPORT_FROM( rise_map )
 	AM_RANGE(0x00000680, 0x00000683) AM_READ8(sb_coin_r, 0x000000ff)
 	AM_RANGE(0x00000680, 0x00000683) AM_DEVWRITE8("soundfifo1", fifo7200_device, data_byte_w, 0x000000ff)
 	AM_RANGE(0x00000684, 0x00000687) AM_READ8(sound_fifo_status_r, 0x000000ff)
@@ -1037,6 +1091,7 @@ static ADDRESS_MAP_START( sxx2f_map, AS_PROGRAM, 32, seibuspi_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sys386i_map, AS_PROGRAM, 32, seibuspi_state )
+	AM_IMPORT_FROM( rise_map )
 	AM_RANGE(0x0000068c, 0x0000068f) AM_WRITE8(spi_layerbanks_eeprom_w, 0x00ff0000)
 	AM_RANGE(0x0000068c, 0x0000068f) AM_WRITE8(oki_bank_w, 0xff000000)
 	AM_RANGE(0x01200000, 0x01200003) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x000000ff)
@@ -1045,12 +1100,19 @@ static ADDRESS_MAP_START( sys386i_map, AS_PROGRAM, 32, seibuspi_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sys386f_map, AS_PROGRAM, 32, seibuspi_state )
-	AM_RANGE(0x00000400, 0x00000403) AM_WRITE(ejsakura_input_select_w)
+	AM_IMPORT_FROM( rise_map )
+	AM_RANGE(0x00000010, 0x00000013) AM_READ8(spi_status_r, 0x000000ff)
+	AM_RANGE(0x00000400, 0x00000403) AM_READ_PORT("SYSTEM") AM_WRITE(ejsakura_input_select_w)
 	AM_RANGE(0x00000404, 0x00000407) AM_WRITE8(eeprom_w, 0x000000ff)
 	AM_RANGE(0x00000408, 0x0000040f) AM_DEVWRITE8("ymz", ymz280b_device, write, 0x000000ff)
+	AM_RANGE(0x00000484, 0x00000487) AM_WRITE(palette_dma_start_w)
+	AM_RANGE(0x00000490, 0x00000493) AM_WRITE(video_dma_length_w)
+	AM_RANGE(0x00000494, 0x00000497) AM_WRITE(video_dma_address_w)
 	AM_RANGE(0x00000600, 0x00000607) AM_DEVREAD8("ymz", ymz280b_device, read, 0x000000ff)
 	AM_RANGE(0x0000060c, 0x0000060f) AM_READ(ejsakura_keyboard_r)
-	AM_IMPORT_FROM( base_map )
+	AM_RANGE(0x00000000, 0x0003ffff) AM_RAM AM_SHARE("mainram")
+	AM_RANGE(0x00200000, 0x003fffff) AM_ROM AM_SHARE("share1")
+	AM_RANGE(0xffe00000, 0xffffffff) AM_ROM AM_REGION("maincpu", 0) AM_SHARE("share1") // ROM location in real-mode
 ADDRESS_MAP_END
 
 
@@ -1110,7 +1172,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( spi_soundmap, AS_PROGRAM, 8, seibuspi_state )
 	AM_RANGE(0x4008, 0x4008) AM_DEVWRITE("soundfifo2", fifo7200_device, data_byte_w)
-	AM_RANGE(0x400a, 0x400a) AM_READ_PORT("JP1") // is JP1 physically really here?
+	AM_RANGE(0x400a, 0x400a) AM_READ_PORT("JUMPERS") // TO DO: get these to actually work
 	AM_IMPORT_FROM( sxx2e_soundmap )
 ADDRESS_MAP_END
 
@@ -1146,30 +1208,30 @@ WRITE_LINE_MEMBER(seibuspi_state::ymf_irqhandler)
 CUSTOM_INPUT_MEMBER(seibuspi_state::ejanhs_encode)
 {
 	/* E-Jan Highschool has a keyboard with the following keys
-	The keys are encoded with 6 bits
-	A     - 000010 port 0
-	B     - 010000 port 0
-	C     - 000010 port 1
-	D     - 010000 port 1
-	E     - 000011 port 0
-	F     - 011000 port 0
-	G     - 000011 port 1
-	H     - 011000 port 1
-	I     - 000100 port 0
-	J     - 100000 port 0
-	K     - 000100 port 1
-	L     - 100000 port 1
-	M     - 000101 port 0
-	N     - 101000 port 0
-	CHI   - 000101 port 1
-	PON   - 101000 port 1
-	KAN   - 000110 port 0
-	REACH - 110000 port 0
-	RON   - 000110 port 1
-	Start - 000111 port 0
+	The keys are encoded with 3 bits for each input port
+	A     - 010 port A
+	B     - 010 port B
+	C     - 010 port C
+	D     - 010 port D
+	E     - 011 port A
+	F     - 011 port B
+	G     - 011 port C
+	H     - 011 port D
+	I     - 100 port A
+	J     - 100 port B
+	K     - 100 port C
+	L     - 100 port D
+	M     - 101 port A
+	N     - 101 port B
+	CHI   - 101 port C
+	PON   - 101 port D
+	KAN   - 110 port A
+	REACH - 110 port B
+	RON   - 110 port C
+	Start - 111 port A
 	*/
-	static const UINT8 encoding[] = { 0x02, 0x10, 0x03, 0x18, 0x04, 0x20, 0x05, 0x28, 0x06, 0x30, 0x07 };
-	ioport_value state = ioport((const char *)param)->read();
+	static const uint8_t encoding[] = { 6, 5, 4, 3, 2, 7 };
+	ioport_value state = ~m_key[(uintptr_t)param]->read();
 
 	for (int bit = 0; bit < ARRAY_LENGTH(encoding); bit++)
 		if (state & (1 << bit))
@@ -1197,7 +1259,7 @@ static INPUT_PORTS_START( sxx2e )
 	PORT_BIT( 0x00001000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x00002000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
-	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_SPECIAL_ONOFF_DIPLOC( 0x00008000, 0x00000000, Flip_Screen, "SW1:1" )
 	PORT_BIT( 0xffff0000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("SYSTEM")
@@ -1211,7 +1273,8 @@ static INPUT_PORTS_START( sxx2e )
 	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0xffffff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("UNKNOWN")
+	// Some sets still read unused 3P and 4P inputs from here as in Zero Team
+	PORT_START("EXCH")
 	PORT_BIT( 0xffffffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("COIN")
@@ -1224,11 +1287,11 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( spi_3button )
 	PORT_INCLUDE( sxx2e )
 
-	PORT_START("JP1")
-	PORT_CONFNAME( 0x03, 0x03, "JP1" )
-	PORT_CONFSETTING(    0x03, "Update" )
-	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+	PORT_START("JUMPERS")
+	PORT_DIPNAME( 0x03, 0x03, "JP1" )
+	PORT_DIPSETTING(    0x03, "Update" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -1257,6 +1320,9 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( sys386i )
 	PORT_INCLUDE( sxx2f )
 
+	PORT_MODIFY("INPUTS")
+	PORT_BIT( 0x00008000, IP_ACTIVE_HIGH, IPT_UNUSED )
+
 	PORT_MODIFY("SYSTEM")
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -1266,61 +1332,8 @@ static INPUT_PORTS_START( sys386i )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( spi_ejanhs )
-	PORT_START("INPUTS")
-	PORT_BIT( 0x0000003f, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, seibuspi_state,ejanhs_encode, "IN0BITS")
-	PORT_BIT( 0x00003f00, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, seibuspi_state,ejanhs_encode, "IN1BITS")
-	PORT_BIT( 0xffff0000, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("SYSTEM")
-	PORT_SERVICE_NO_TOGGLE( 0x00000004, IP_ACTIVE_LOW )
-	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x000000f3, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0xffffff00, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("UNKNOWN")
-	PORT_BIT( 0xffffffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("JP1")
-	PORT_CONFNAME( 0x03, 0x03, "JP1" )
-	PORT_CONFSETTING(    0x03, "Update" )
-	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("COIN")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("IN0BITS")
-	PORT_BIT( 0x001, IP_ACTIVE_HIGH, IPT_MAHJONG_A )
-	PORT_BIT( 0x002, IP_ACTIVE_HIGH, IPT_MAHJONG_B )
-	PORT_BIT( 0x004, IP_ACTIVE_HIGH, IPT_MAHJONG_E )
-	PORT_BIT( 0x008, IP_ACTIVE_HIGH, IPT_MAHJONG_F )
-	PORT_BIT( 0x010, IP_ACTIVE_HIGH, IPT_MAHJONG_I )
-	PORT_BIT( 0x020, IP_ACTIVE_HIGH, IPT_MAHJONG_J )
-	PORT_BIT( 0x040, IP_ACTIVE_HIGH, IPT_MAHJONG_M )
-	PORT_BIT( 0x080, IP_ACTIVE_HIGH, IPT_MAHJONG_N )
-	PORT_BIT( 0x100, IP_ACTIVE_HIGH, IPT_MAHJONG_KAN )
-	PORT_BIT( 0x200, IP_ACTIVE_HIGH, IPT_MAHJONG_REACH )
-	PORT_BIT( 0x400, IP_ACTIVE_HIGH, IPT_START1 )
-
-	PORT_START("IN1BITS")
-	PORT_BIT( 0x001, IP_ACTIVE_HIGH, IPT_MAHJONG_C )
-	PORT_BIT( 0x002, IP_ACTIVE_HIGH, IPT_MAHJONG_D )
-	PORT_BIT( 0x004, IP_ACTIVE_HIGH, IPT_MAHJONG_G )
-	PORT_BIT( 0x008, IP_ACTIVE_HIGH, IPT_MAHJONG_H )
-	PORT_BIT( 0x010, IP_ACTIVE_HIGH, IPT_MAHJONG_K )
-	PORT_BIT( 0x020, IP_ACTIVE_HIGH, IPT_MAHJONG_L )
-	PORT_BIT( 0x040, IP_ACTIVE_HIGH, IPT_MAHJONG_CHI )
-	PORT_BIT( 0x080, IP_ACTIVE_HIGH, IPT_MAHJONG_PON )
-	PORT_BIT( 0x100, IP_ACTIVE_HIGH, IPT_MAHJONG_RON )
-INPUT_PORTS_END
-
-
-static INPUT_PORTS_START( sys386f )
-	PORT_START("INPUT01")
+static INPUT_PORTS_START( spi_mahjong_keyboard )
+	PORT_START("KEY.0")
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_MAHJONG_PON )
 	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_MAHJONG_L )
@@ -1328,7 +1341,7 @@ static INPUT_PORTS_START( sys386f )
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_MAHJONG_D )
 	PORT_BIT( 0xffffffe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("INPUT02")
+	PORT_START("KEY.1")
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_MAHJONG_BIG )
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP )
 	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP )
@@ -1337,7 +1350,7 @@ static INPUT_PORTS_START( sys386f )
 	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL )
 	PORT_BIT( 0xffffffc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("INPUT04")
+	PORT_START("KEY.2")
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_MAHJONG_RON )
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_MAHJONG_CHI )
 	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_MAHJONG_K )
@@ -1345,7 +1358,7 @@ static INPUT_PORTS_START( sys386f )
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_MAHJONG_C )
 	PORT_BIT( 0xffffffe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("INPUT08")
+	PORT_START("KEY.3")
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_MAHJONG_KAN )
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_MAHJONG_M )
 	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_MAHJONG_I )
@@ -1354,28 +1367,75 @@ static INPUT_PORTS_START( sys386f )
 	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0xffffffc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("INPUT10")
+	PORT_START("KEY.4")
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_MAHJONG_REACH )
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_MAHJONG_N )
 	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_MAHJONG_J )
 	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_MAHJONG_F )
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_MAHJONG_B )
 	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_MAHJONG_BET )
+	PORT_BIT( 0xffffffc0, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( spi_ejanhs )
+	PORT_INCLUDE( spi_mahjong_keyboard )
+
+	PORT_START("INPUTS")
+	PORT_BIT( 0x00000007, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, seibuspi_state,ejanhs_encode, (uintptr_t)3)
+	PORT_BIT( 0x00000038, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, seibuspi_state,ejanhs_encode, (uintptr_t)4)
+	PORT_BIT( 0x00000700, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, seibuspi_state,ejanhs_encode, (uintptr_t)2)
+	PORT_BIT( 0x00003800, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, seibuspi_state,ejanhs_encode, (uintptr_t)0)
+	PORT_SPECIAL_ONOFF_DIPLOC( 0x00008000, 0x00000000, Flip_Screen, "SW1:1" )
+	PORT_BIT( 0xffff4000, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("SYSTEM")
+	// These need a noncontiguous encoding, but are nonfunctional in any case
+	//PORT_BIT( 0x00000013, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, seibuspi_state,ejanhs_encode, (uintptr_t)1)
+	PORT_SERVICE_NO_TOGGLE( 0x00000004, IP_ACTIVE_LOW )
+	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x000000f3, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0xffffff00, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("KEY.1")
+	PORT_BIT( 0x0000003f, IP_ACTIVE_LOW, IPT_UNUSED ) // Decoded but not recognized
+
+	PORT_MODIFY("KEY.4")
+	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_UNUSED ) // Decoded but not recognized
+
+	PORT_START("EXCH") // Another set of mahjong inputs is decoded from here but not used
+	PORT_BIT( 0xffffffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("JUMPERS")
+	PORT_DIPNAME( 0x03, 0x03, "JP1" )
+	PORT_DIPSETTING(    0x03, "Update" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("COIN")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( ejsakura )
+	PORT_INCLUDE( spi_mahjong_keyboard )
+
+	PORT_MODIFY("KEY.4")
 	PORT_SERVICE_NO_TOGGLE( 0x00000200, IP_ACTIVE_LOW)
 	PORT_BIT( 0x00000800, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Payout") PORT_CODE(KEYCODE_Q)
 	PORT_BIT( 0xfffff5c0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("SYSTEM")
+	PORT_START("SPECIAL")
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x00004000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 	PORT_BIT( 0xffffbf3f, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("INPUTS")
+	PORT_START("SYSTEM")
 	PORT_BIT( 0xffffffff, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("UNKNOWN")
-	PORT_BIT( 0xffffffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 
@@ -1744,7 +1804,7 @@ static const gfx_layout sys386f_spritelayout =
 	16*32
 };
 
-static GFXDECODE_START( sys386f)
+static GFXDECODE_START( sys386f )
 	GFXDECODE_ENTRY( "gfx1", 0, spi_charlayout,          5632, 16 ) // Not used
 	GFXDECODE_ENTRY( "gfx2", 0, spi_tilelayout,          4096, 24 ) // Not used
 	GFXDECODE_ENTRY( "gfx3", 0, sys386f_spritelayout,       0, 96 )
@@ -1774,25 +1834,9 @@ void seibuspi_state::init_spi_common()
 
 void seibuspi_state::init_sei252()
 {
-	seibuspi_text_decrypt(memregion("gfx1")->base());
-	seibuspi_bg_decrypt(memregion("gfx2")->base(), memregion("gfx2")->bytes());
+	text_decrypt(memregion("gfx1")->base());
+	bg_decrypt(memregion("gfx2")->base(), memregion("gfx2")->bytes());
 	seibuspi_sprite_decrypt(memregion("gfx3")->base(), 0x400000);
-	init_spi_common();
-}
-
-void seibuspi_state::init_rise10()
-{
-	seibuspi_rise10_text_decrypt(memregion("gfx1")->base());
-	seibuspi_rise10_bg_decrypt(memregion("gfx2")->base(), memregion("gfx2")->bytes());
-	seibuspi_rise10_sprite_decrypt(memregion("gfx3")->base(), 0x600000);
-	init_spi_common();
-}
-
-void seibuspi_state::init_rise11()
-{
-	seibuspi_rise11_text_decrypt(memregion("gfx1")->base());
-	seibuspi_rise11_bg_decrypt(memregion("gfx2")->base(), memregion("gfx2")->bytes());
-	seibuspi_rise11_sprite_decrypt_rfjet(memregion("gfx3")->base(), 0x800000);
 	init_spi_common();
 }
 
@@ -1819,7 +1863,7 @@ MACHINE_RESET_MEMBER(seibuspi_state,spi)
 	m_z80_prg_transfer_pos = 0;
 }
 
-static MACHINE_CONFIG_START( spi, seibuspi_state )
+static MACHINE_CONFIG_START( spi )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I386, XTAL_50MHz/2) // AMD or Intel 386DX, 25MHz
@@ -1851,6 +1895,12 @@ static MACHINE_CONFIG_START( spi, seibuspi_state )
 
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 6144)
 
+	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
+	MCFG_SEIBU_CRTC_DECRYPT_KEY_CB(WRITE16(seibuspi_state, tile_decrypt_key_w))
+	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(seibuspi_state, spi_layer_enable_w))
+	MCFG_SEIBU_CRTC_REG_1A_CB(WRITE16(seibuspi_state, spi_layer_bank_w))
+	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(seibuspi_state, scroll_w))
+
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -1867,6 +1917,11 @@ static MACHINE_CONFIG_DERIVED( ejanhs, spi )
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(seibuspi_state, ejanhs)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( rdft2, spi )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(rdft2_map)
 MACHINE_CONFIG_END
 
 
@@ -1937,7 +1992,7 @@ MACHINE_CONFIG_END
 
 /* SYS386I */
 
-static MACHINE_CONFIG_START( sys386i, seibuspi_state )
+static MACHINE_CONFIG_START( sys386i )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I386, XTAL_40MHz) // AMD 386DX, 40MHz
@@ -1956,13 +2011,19 @@ static MACHINE_CONFIG_START( sys386i, seibuspi_state )
 
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 6144)
 
+	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
+	MCFG_SEIBU_CRTC_DECRYPT_KEY_CB(WRITE16(seibuspi_state, tile_decrypt_key_w))
+	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(seibuspi_state, spi_layer_enable_w))
+	MCFG_SEIBU_CRTC_REG_1A_CB(WRITE16(seibuspi_state, spi_layer_bank_w))
+	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(seibuspi_state, scroll_w))
+
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki1", XTAL_28_63636MHz/20, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki1", XTAL_28_63636MHz/20, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_OKIM6295_ADD("oki2", XTAL_28_63636MHz/20, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki2", XTAL_28_63636MHz/20, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -1972,8 +2033,8 @@ MACHINE_CONFIG_END
 DRIVER_INIT_MEMBER(seibuspi_state,sys386f)
 {
 	int i, j;
-	UINT16 *src = (UINT16 *)memregion("gfx3")->base();
-	UINT16 tmp[0x40 / 2], offset;
+	uint16_t *src = (uint16_t *)memregion("gfx3")->base();
+	uint16_t tmp[0x40 / 2], offset;
 
 	// sprite_reorder() only
 	for (i = 0; i < memregion("gfx3")->bytes() / 0x40; i++)
@@ -1988,7 +2049,7 @@ DRIVER_INIT_MEMBER(seibuspi_state,sys386f)
 	}
 }
 
-static MACHINE_CONFIG_START( sys386f, seibuspi_state )
+static MACHINE_CONFIG_START( sys386f )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I386, XTAL_50MHz/2) // Intel i386DX, 25MHz
@@ -2069,13 +2130,21 @@ DRIVER_INIT_MEMBER(seibuspi_state,rdft)
 DRIVER_INIT_MEMBER(seibuspi_state,rdft2)
 {
 	if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x00282ac, 0x00282af, read32_delegate(FUNC(seibuspi_state::rf2_speedup_r),this));
-	init_rise10();
+
+	rdft2_text_decrypt(memregion("gfx1")->base());
+	rdft2_bg_decrypt(memregion("gfx2")->base(), memregion("gfx2")->bytes());
+	seibuspi_rise10_sprite_decrypt(memregion("gfx3")->base(), 0x600000);
+	init_spi_common();
 }
 
 DRIVER_INIT_MEMBER(seibuspi_state,rfjet)
 {
 	if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x002894c, 0x002894f, read32_delegate(FUNC(seibuspi_state::rfjet_speedup_r),this));
-	init_rise11();
+
+	rfjet_text_decrypt(memregion("gfx1")->base());
+	rfjet_bg_decrypt(memregion("gfx2")->base(), memregion("gfx2")->bytes());
+	seibuspi_rise11_sprite_decrypt_rfjet(memregion("gfx3")->base(), 0x800000);
+	init_spi_common();
 }
 
 
@@ -2195,7 +2264,7 @@ READ32_MEMBER(seibuspi_state::rfjet_speedup_r)
 	/* rfjetus */
 	if (space.device().safe_pc()==0x0205b39)
 	{
-		UINT32 r;
+		uint32_t r;
 		space.device().execute().spin_until_interrupt(); // idle
 		// Hack to enter test mode
 		r = m_mainram[0x002894c/4] & (~0x400);
@@ -3065,6 +3134,40 @@ ROM_START( rdfta )
 	ROM_LOAD("flash0_blank_region82.u1053", 0x000000, 0x100000, CRC(4f463a87) SHA1(0e27904745da61a3ba7c48c5b4c7d45989bbd05b) )
 ROM_END
 
+ROM_START( rdftgb )
+	ROM_REGION32_LE( 0x200000, "maincpu", 0 ) /* i386 program */
+	ROM_LOAD32_BYTE("rf_1.u0211", 0x000000, 0x80000, CRC(2403035f) SHA1(9763cca3864d6127050e1507b572efa68f664b3c) )
+	ROM_LOAD32_BYTE("rf_2.u0212", 0x000001, 0x80000, CRC(58ccb10c) SHA1(0cce4057bfada78121d9586574b98d46cdd7dd46) )
+	ROM_LOAD32_BYTE("rf_3.u0210", 0x000002, 0x80000, CRC(47fc3c96) SHA1(7378f8caa847f89f235b5be6779118721076873b) )
+	ROM_LOAD32_BYTE("rf_4.u029",  0x000003, 0x80000, CRC(271bdd4b) SHA1(0a805568cbd6a9c18bdb755a41972ff6bba9e6eb) )
+
+	ROM_REGION( 0x40000, "audiocpu", ROMREGION_ERASE00 ) /* 256K RAM, ROM from Z80 point-of-view */
+
+	ROM_REGION( 0x30000, "gfx1", ROMREGION_ERASEFF ) /* text layer roms */
+	ROM_LOAD24_BYTE("rf_5.u0423", 0x000000, 0x10000, CRC(8f8d4e14) SHA1(06c803975767ae98f40ba7ac5764a5bc8baa3a30) )
+	ROM_LOAD24_BYTE("rf_6.u0424", 0x000001, 0x10000, CRC(6ac64968) SHA1(ec395205c24c4f864a1f805bb0d4641562d4faa9) )
+	ROM_LOAD24_BYTE("rf_7.u048",  0x000002, 0x10000, CRC(4d87e1ea) SHA1(3230e9b643fad773e61ab8ce09c0cd7d4d0558e3) )
+
+	ROM_REGION( 0x600000, "gfx2", ROMREGION_ERASEFF ) /* background layer roms */
+	ROM_LOAD24_WORD("gd_bg1-d.415", 0x000000, 0x200000, CRC(6a68054c) SHA1(5cbfc4ac90045f1401c2dda7a51936558c9de07e) )
+	ROM_LOAD24_BYTE("gd_bg1-p.410", 0x000002, 0x100000, CRC(3400794a) SHA1(719808f7442bac612cefd7b7fffcd665e6337ad0) )
+	ROM_LOAD24_WORD("gd_bg2-d.416", 0x300000, 0x200000, CRC(61cd2991) SHA1(bb608e3948bf9ea35b5e1615d2ba6858d029dcbe) )
+	ROM_LOAD24_BYTE("gd_bg2-p.49",  0x300002, 0x100000, CRC(502d5799) SHA1(c3a0e1a4f5a7b35572ae1ff31315da4ed08aa2fe) )
+
+	ROM_REGION( 0xc00000, "gfx3", 0 ) /* sprites */
+	ROM_LOAD("gd_obj-1.322", 0x000000, 0x400000, CRC(59d86c99) SHA1(d3c9241e7b51fe21f8351051b063f91dc69bf905) )
+	ROM_LOAD("gd_obj-2.324", 0x400000, 0x400000, CRC(1ceb0b6f) SHA1(97225a9b3e7be18080aa52f6570af2cce8f25c06) )
+	ROM_LOAD("gd_obj-3.323", 0x800000, 0x400000, CRC(36e93234) SHA1(51917a80b7da5c32a9434a1076fc2916d62e6a3e) )
+
+	ROM_REGION32_LE( 0xa00000, "sound01", ROMREGION_ERASE00 ) /* sound roms */
+	ROM_LOAD32_WORD("gd_pcm.217", 0x000000, 0x100000, CRC(31253ad7) SHA1(c81c8d50f8f287f5cbfaec77b30d969b01ce11a9) )
+	ROM_CONTINUE(                 0x400000, 0x100000 )
+	ROM_LOAD32_BYTE("rf_8.u0216",   0x800000, 0x080000, CRC(f88cb6e4) SHA1(fb35b41307b490d5d08e4b8a70f8ff4ce2ca8105) )
+
+	ROM_REGION( 0x100000, "soundflash1", 0 ) /* on SPI motherboard */
+	ROM_LOAD("flash0_blank_region8c.u1053", 0x000000, 0x100000, CRC(b836dc5b) SHA1(80400429970f8997978ee723d3067a39ebc0e126) )
+ROM_END
+
 ROM_START( rdftadi ) // Dream Island license - SXX2C ROM SUB4 cart
 	ROM_REGION32_LE( 0x200000, "maincpu", 0 ) /* i386 program */
 	ROM_LOAD32_BYTE("seibu__1.u0211",       0x000000, 0x080000, CRC(fc0e2885) SHA1(79621155d992d504e993bd3ee0d6ff3903bd5415) ) // socket is silkscreened on pcb PRG0
@@ -3278,6 +3381,42 @@ ROM_START( rdft2ja ) /* SPI Cart, Japan */
 	ROM_LOAD("flash0_blank_region01.u1053", 0x000000, 0x100000, CRC(7ae7ab76) SHA1(a2b196f470bf64af94002fc4e2640fadad00418f) )
 ROM_END
 
+ROM_START( rdft2jb ) /* SPI Cart, Japan */
+	ROM_REGION32_LE( 0x200000, "maincpu", 0 ) /* i386 program */
+	ROM_LOAD32_BYTE("prg0.rom", 0x000000, 0x80000, CRC(fc42cab8) SHA1(2e33fc8d77fdc4ee58e93fc191d12f2fe9cc3c65) )
+	ROM_LOAD32_BYTE("prg1.rom", 0x000001, 0x80000, CRC(a0f09dc5) SHA1(e8ad20be1f04752b0884571384d4490813ed82d9) )
+	ROM_LOAD32_BYTE("prg2.rom", 0x000002, 0x80000, CRC(368580e0) SHA1(184036a0cbddbf79b62e388b93cb93b885faee88) )
+	ROM_LOAD32_BYTE("prg3.rom", 0x000003, 0x80000, CRC(7ad45c01) SHA1(d782057658dd000c1cf0a4726a6ed821e6f2be67) )
+
+	ROM_REGION( 0x40000, "audiocpu", ROMREGION_ERASE00 ) /* 256K RAM, ROM from Z80 point-of-view */
+
+	ROM_REGION( 0x30000, "gfx1", ROMREGION_ERASEFF ) /* text layer roms */
+	ROM_LOAD24_BYTE("rf2_5.bin", 0x000001, 0x10000, CRC(377cac2f) SHA1(f7c9323d79b77f6c8c02ba2c6cdca127d6e5cb5c) )
+	ROM_LOAD24_BYTE("rf2_6.bin", 0x000000, 0x10000, CRC(42bd5372) SHA1(c38df85b25070db9640eac541f71c0511bab0c98) )
+	ROM_LOAD24_BYTE("rf2_7.bin", 0x000002, 0x10000, CRC(1efaac7e) SHA1(8252af56dcb7a6306dc3422070176778e3c511c2) )
+
+	ROM_REGION( 0xc00000, "gfx2", ROMREGION_ERASEFF ) /* background layer roms */
+	ROM_LOAD24_WORD("bg-1d.u0535", 0x000000, 0x400000, CRC(6143f576) SHA1(c034923d0663d9ef24357a03098b8cb81dbab9f8) )
+	ROM_LOAD24_BYTE("bg-1p.u0537", 0x000002, 0x200000, CRC(55e64ef7) SHA1(aae991268948d07342ee8ba1b3761bd180aab8ec) )
+	ROM_LOAD24_WORD("bg-2d.u0536", 0x600000, 0x400000, CRC(c607a444) SHA1(dc1aa96a42e9394ca6036359670a4ec6f830c96d) )
+	ROM_LOAD24_BYTE("bg-2p.u0538", 0x600002, 0x200000, CRC(f0830248) SHA1(6075df96b49e70d2243fef691e096119e7a4d044) )
+
+	ROM_REGION( 0x1200000, "gfx3", 0 ) /* sprites */
+	ROM_LOAD("obj3.u0434",  0x0000000, 0x400000, CRC(e08f42dc) SHA1(5188d71d4355eaf43ea8893b4cfc4fe80cc24f41) )
+	ROM_LOAD("obj3b.u0433", 0x0400000, 0x200000, CRC(1b6a523c) SHA1(99a420dbc8e22e7832ccda7cec9fa661a2a2687a) )
+	ROM_LOAD("obj2.u0431",  0x0600000, 0x400000, CRC(7aeadd8e) SHA1(47103c0579240c5b1add4d0b164eaf76f5fa97f0) )
+	ROM_LOAD("obj2b.u0432", 0x0a00000, 0x200000, CRC(5d790a5d) SHA1(1ed5d4ad4c9a7e505ce35dcc90d184c26ce891dc) )
+	ROM_LOAD("obj1.u0429",  0x0c00000, 0x400000, CRC(c2c50f02) SHA1(b81397b5800c6d49f58b7ac7ff6eac56da3c5257) )
+	ROM_LOAD("obj1b.u0430", 0x1000000, 0x200000, CRC(5259321f) SHA1(3c70c1147e49f81371d0f60f7108d9718d56faf4) )
+
+	ROM_REGION32_LE( 0xa00000, "sound01", ROMREGION_ERASE00 ) /* sound roms */
+	ROM_LOAD32_WORD("pcm.u0217",    0x000000, 0x100000, CRC(2edc30b5) SHA1(c25d690d633657fc3687636b9070f36bd305ae06) )
+	ROM_CONTINUE(                   0x400000, 0x100000 )
+	ROM_LOAD32_BYTE("sound1.u0222", 0x800000, 0x080000, CRC(b7bd3703) SHA1(6427a7e6de10d6743d6e64b984a1d1c647f5643a) )
+
+	ROM_REGION( 0x100000, "soundflash1", 0 ) /* on SPI motherboard */
+	ROM_LOAD("flash0_blank_region01.u1053", 0x000000, 0x100000, CRC(7ae7ab76) SHA1(a2b196f470bf64af94002fc4e2640fadad00418f) )
+ROM_END
 
 ROM_START( rdft2it ) /* SPI Cart, Italy */
 	ROM_REGION32_LE( 0x200000, "maincpu", 0 ) /* i386 program */
@@ -3873,7 +4012,7 @@ GAME( 1995, viprp1ot,   viprp1,   spi,     spi_3button, seibuspi_state, viprp1, 
 GAME( 1995, viprp1oj,   viprp1,   spi,     spi_3button, seibuspi_state, viprp1o,  ROT270, "Seibu Kaihatsu",                         "Viper Phase 1 (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1995, viprp1hk,   viprp1,   spi,     spi_3button, seibuspi_state, viprp1,   ROT270, "Seibu Kaihatsu (Metrotainment license)", "Viper Phase 1 (Hong Kong)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) /* "=HONG KONG=" seems part of title */
 
-GAME( 1996, ejanhs,     0,        ejanhs,  spi_ejanhs,  seibuspi_state, ejanhs,   ROT0,   "Seibu Kaihatsu",                         "E-Jan High School (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1996, ejanhs,     0,        ejanhs,  spi_ejanhs,  seibuspi_state, ejanhs,   ROT0,   "Seibu Kaihatsu",                         "E Jong High School (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 
 GAME( 1996, rdft,       0,        spi,     spi_3button, seibuspi_state, rdft,     ROT270, "Seibu Kaihatsu (Tuning license)",        "Raiden Fighters (Germany)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1996, rdftj,      rdft,     spi,     spi_3button, seibuspi_state, rdft,     ROT270, "Seibu Kaihatsu",                         "Raiden Fighters (Japan set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
@@ -3886,27 +4025,26 @@ GAME( 1996, rdftau,     rdft,     spi,     spi_3button, seibuspi_state, rdft,   
 GAME( 1996, rdftauge,   rdft,     spi,     spi_3button, seibuspi_state, rdft,     ROT270, "Seibu Kaihatsu (Tuning license)",        "Raiden Fighters (Evaluation Software For Show, Germany)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1996, rdftit,     rdft,     spi,     spi_3button, seibuspi_state, rdft,     ROT270, "Seibu Kaihatsu",                         "Raiden Fighters (Italy)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1996, rdfta,      rdft,     spi,     spi_3button, seibuspi_state, rdft,     ROT270, "Seibu Kaihatsu",                         "Raiden Fighters (Austria)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1996, rdftgb,     rdft,     spi,     spi_3button, seibuspi_state, rdft,     ROT270, "Seibu Kaihatsu",                         "Raiden Fighters (Great Britain)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // this is one revision
-GAME( 1997, rdft2,      0,        spi,     spi_2button, seibuspi_state, rdft2,    ROT270, "Seibu Kaihatsu (Tuning license)",        "Raiden Fighters 2 - Operation Hell Dive (Germany)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1997, rdft2j,     rdft2,    spi,     spi_2button, seibuspi_state, rdft2,    ROT270, "Seibu Kaihatsu",                         "Raiden Fighters 2 - Operation Hell Dive (Japan set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1997, rdft2a,     rdft2,    spi,     spi_2button, seibuspi_state, rdft2,    ROT270, "Seibu Kaihatsu (Metrotainment license)", "Raiden Fighters 2 - Operation Hell Dive (Hong Kong)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1997, rdft2,      0,        rdft2,   spi_2button, seibuspi_state, rdft2,    ROT270, "Seibu Kaihatsu (Tuning license)",        "Raiden Fighters 2 - Operation Hell Dive (Germany)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1997, rdft2j,     rdft2,    rdft2,   spi_2button, seibuspi_state, rdft2,    ROT270, "Seibu Kaihatsu",                         "Raiden Fighters 2 - Operation Hell Dive (Japan set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1997, rdft2a,     rdft2,    rdft2,   spi_2button, seibuspi_state, rdft2,    ROT270, "Seibu Kaihatsu (Metrotainment license)", "Raiden Fighters 2 - Operation Hell Dive (Hong Kong)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 // this is another
-GAME( 1997, rdft2ja,    rdft2,    spi,     spi_2button, seibuspi_state, rdft2,    ROT270, "Seibu Kaihatsu",                         "Raiden Fighters 2 - Operation Hell Dive (Japan set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1997, rdft2aa,    rdft2,    spi,     spi_2button, seibuspi_state, rdft2,    ROT270, "Seibu Kaihatsu (Dream Island license)",  "Raiden Fighters 2 - Operation Hell Dive (Korea)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1997, rdft2it,    rdft2,    spi,     spi_2button, seibuspi_state, rdft2,    ROT270, "Seibu Kaihatsu",                         "Raiden Fighters 2 - Operation Hell Dive (Italy)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-// these 2 are both unique
-GAME( 1997, rdft2t,     rdft2,    spi,     spi_2button, seibuspi_state, rdft2,    ROT270, "Seibu Kaihatsu",                         "Raiden Fighters 2 - Operation Hell Dive (Taiwan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1997, rdft2u,     rdft2,    spi,     spi_2button, seibuspi_state, rdft2,    ROT270, "Seibu Kaihatsu (Fabtek license)",        "Raiden Fighters 2 - Operation Hell Dive (US)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1997, rdft2ja,    rdft2,    rdft2,   spi_2button, seibuspi_state, rdft2,    ROT270, "Seibu Kaihatsu",                         "Raiden Fighters 2 - Operation Hell Dive (Japan set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1997, rdft2aa,    rdft2,    rdft2,   spi_2button, seibuspi_state, rdft2,    ROT270, "Seibu Kaihatsu (Dream Island license)",  "Raiden Fighters 2 - Operation Hell Dive (Korea)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1997, rdft2it,    rdft2,    rdft2,   spi_2button, seibuspi_state, rdft2,    ROT270, "Seibu Kaihatsu",                         "Raiden Fighters 2 - Operation Hell Dive (Italy)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+// these are unique
+GAME( 1997, rdft2jb,    rdft2,    rdft2,   spi_2button, seibuspi_state, rdft2,    ROT270, "Seibu Kaihatsu",                         "Raiden Fighters 2 - Operation Hell Dive (Japan set 3)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1997, rdft2t,     rdft2,    rdft2,   spi_2button, seibuspi_state, rdft2,    ROT270, "Seibu Kaihatsu",                         "Raiden Fighters 2 - Operation Hell Dive (Taiwan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1997, rdft2u,     rdft2,    rdft2,   spi_2button, seibuspi_state, rdft2,    ROT270, "Seibu Kaihatsu (Fabtek license)",        "Raiden Fighters 2 - Operation Hell Dive (US)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
-
-
-
-GAME( 1998, rfjet,      0,        spi,     spi_2button, seibuspi_state, rfjet,    ROT270, "Seibu Kaihatsu (Tuning license)",        "Raiden Fighters Jet (Germany)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1998, rfjetu,     rfjet,    spi,     spi_2button, seibuspi_state, rfjet,    ROT270, "Seibu Kaihatsu (Fabtek license)",        "Raiden Fighters Jet (US)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1998, rfjetj,     rfjet,    spi,     spi_2button, seibuspi_state, rfjet,    ROT270, "Seibu Kaihatsu",                         "Raiden Fighters Jet (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1998, rfjeta,     rfjet,    spi,     spi_2button, seibuspi_state, rfjet,    ROT270, "Seibu Kaihatsu (Dream Island license)",  "Raiden Fighters Jet (Korea)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1998, rfjett,     rfjet,    spi,     spi_2button, seibuspi_state, rfjet,    ROT270, "Seibu Kaihatsu",                         "Raiden Fighters Jet (Taiwan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, rfjet,      0,        rdft2,   spi_2button, seibuspi_state, rfjet,    ROT270, "Seibu Kaihatsu (Tuning license)",        "Raiden Fighters Jet (Germany)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, rfjetu,     rfjet,    rdft2,   spi_2button, seibuspi_state, rfjet,    ROT270, "Seibu Kaihatsu (Fabtek license)",        "Raiden Fighters Jet (US)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, rfjetj,     rfjet,    rdft2,   spi_2button, seibuspi_state, rfjet,    ROT270, "Seibu Kaihatsu",                         "Raiden Fighters Jet (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, rfjeta,     rfjet,    rdft2,   spi_2button, seibuspi_state, rfjet,    ROT270, "Seibu Kaihatsu (Dream Island license)",  "Raiden Fighters Jet (Korea)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, rfjett,     rfjet,    rdft2,   spi_2button, seibuspi_state, rfjet,    ROT270, "Seibu Kaihatsu",                         "Raiden Fighters Jet (Taiwan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 /* SXX2E */
 GAME( 1996, rdfts,      rdft,     sxx2e,   sxx2e,       seibuspi_state, rdft,     ROT270, "Seibu Kaihatsu (Explorer System Corp. license)", "Raiden Fighters (Taiwan, single board)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
@@ -3923,5 +4061,5 @@ GAME( 2000, rdft22kc,   rdft2,    sys386i, sys386i,     seibuspi_state, rdft2,  
 GAME( 2000, rfjet2kc,   rfjet,    sys386i, sys386i,     seibuspi_state, rfjet,    ROT270, "Seibu Kaihatsu", "Raiden Fighters Jet 2000 (China, SYS386I)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
 
 /* SYS386F */
-GAME( 1999, ejsakura,   0,        sys386f, sys386f,     seibuspi_state, sys386f,  ROT0,   "Seibu Kaihatsu", "E-Jan Sakurasou (Japan, SYS386F V2.0)", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, ejsakura12, ejsakura, sys386f, sys386f,     seibuspi_state, sys386f,  ROT0,   "Seibu Kaihatsu", "E-Jan Sakurasou (Japan, SYS386F V1.2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, ejsakura,   0,        sys386f, ejsakura,    seibuspi_state, sys386f,  ROT0,   "Seibu Kaihatsu", "E-Jan Sakurasou (Japan, SYS386F V2.0)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, ejsakura12, ejsakura, sys386f, ejsakura,    seibuspi_state, sys386f,  ROT0,   "Seibu Kaihatsu", "E-Jan Sakurasou (Japan, SYS386F V1.2)", MACHINE_SUPPORTS_SAVE )

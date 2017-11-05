@@ -6,14 +6,13 @@
 
 *********************************************************************/
 
+#ifndef MAME_BUS_PC_KBD_ISKR1030_H
+#define MAME_BUS_PC_KBD_ISKR1030_H
+
 #pragma once
 
-#ifndef __PC_KBD_ISKR_1030__
-#define __PC_KBD_ISKR_1030__
-
-#include "emu.h"
-#include "cpu/mcs48/mcs48.h"
 #include "pc_kbdc.h"
+#include "cpu/mcs48/mcs48.h"
 #include "machine/rescap.h"
 
 
@@ -24,35 +23,35 @@
 
 // ======================> iskr_1030_keyboard_device
 
-class iskr_1030_keyboard_device :  public device_t,
-										public device_pc_kbd_interface
+class iskr_1030_keyboard_device : public device_t, public device_pc_kbd_interface
 {
 public:
 	// construction/destruction
-	iskr_1030_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-	// optional information overrides
-	virtual const rom_entry *device_rom_region() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual ioport_constructor device_input_ports() const override;
+	iskr_1030_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_READ8_MEMBER( ram_r );
 	DECLARE_WRITE8_MEMBER( ram_w );
-	DECLARE_READ8_MEMBER( p1_r );
-	DECLARE_WRITE8_MEMBER( p1_w );
-	DECLARE_WRITE8_MEMBER( p2_w );
-	DECLARE_READ8_MEMBER( t1_r );
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
+	// optional information overrides
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override;
+
 	// device_pc_kbd_interface overrides
 	virtual DECLARE_WRITE_LINE_MEMBER( clock_write ) override;
 	virtual DECLARE_WRITE_LINE_MEMBER( data_write ) override;
 
 private:
+	DECLARE_READ8_MEMBER( p1_r );
+	DECLARE_WRITE8_MEMBER( p1_w );
+	DECLARE_WRITE8_MEMBER( p2_w );
+	DECLARE_READ_LINE_MEMBER( t1_r );
+
 	required_device<cpu_device> m_maincpu;
 	required_ioport m_md00;
 	required_ioport m_md01;
@@ -79,15 +78,15 @@ private:
 	required_ioport m_md22;
 	required_ioport m_md23;
 
-	dynamic_buffer m_ram;
-	UINT8 m_bus;
-	UINT8 m_p1;
-	UINT8 m_p2;
+	std::vector<uint8_t> m_ram;
+	uint8_t m_bus;
+	uint8_t m_p1;
+	uint8_t m_p2;
 	int m_q;
 };
 
 
 // device type definition
-extern const device_type PC_KBD_ISKR_1030;
+DECLARE_DEVICE_TYPE(PC_KBD_ISKR_1030, iskr_1030_keyboard_device)
 
-#endif
+#endif // MAME_BUS_PC_KBD_ISKR1030_H

@@ -7,10 +7,20 @@
 # define __has_feature(x) 0
 #endif
 
+#if defined(__clang__)
+# define COMPILER_CLANG
+#elif defined(_MSC_VER)
+# define COMPILER_MSVC
+#elif defined(__GNUC__)
+# define COMPILER_GCC
+#endif
+
 #if __has_feature(cxx_attributes)
 # define BENCHMARK_NORETURN [[noreturn]]
 #elif defined(__GNUC__)
 # define BENCHMARK_NORETURN __attribute__((noreturn))
+#elif defined(COMPILER_MSVC)
+# define BENCHMARK_NORETURN __declspec(noreturn)
 #else
 # define BENCHMARK_NORETURN
 #endif
@@ -29,12 +39,5 @@
 # define BENCHMARK_OS_LINUX 1
 #endif
 
-#if defined(__clang__)
-# define COMPILER_CLANG
-#elif defined(_MSC_VER)
-# define COMPILER_MSVC
-#elif defined(__GNUC__)
-# define COMPILER_GCC
-#endif
 
 #endif // BENCHMARK_INTERNAL_MACROS_H_

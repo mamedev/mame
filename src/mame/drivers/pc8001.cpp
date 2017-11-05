@@ -23,7 +23,10 @@
 
 */
 
+#include "emu.h"
 #include "includes/pc8001.h"
+#include "screen.h"
+#include "speaker.h"
 
 /* Read/Write Handlers */
 
@@ -126,7 +129,7 @@ READ8_MEMBER( pc8001_state::port40_r )
 
 	*/
 
-	UINT8 data = 0x08;
+	uint8_t data = 0x08;
 
 	data |= m_centronics_busy;
 	data |= m_centronics_ack << 1;
@@ -158,7 +161,7 @@ WRITE8_MEMBER( pc8001_state::port40_w )
 	m_rtc->clk_w(BIT(data, 2));
 	m_rtc->stb_w(BIT(data, 1));
 
-	m_speaker->level_w(BIT(data, 5));
+	m_beep->set_state(BIT(data, 5));
 }
 
 /* Memory Maps */
@@ -302,7 +305,7 @@ static INPUT_PORTS_START( pc8001 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Y)          PORT_CHAR('y') PORT_CHAR('Y')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Z)          PORT_CHAR('z') PORT_CHAR('Z')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR('[') PORT_CHAR('{')
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH2) PORT_CHAR('\xA5') PORT_CHAR('|')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH2) PORT_CHAR(0xA5) PORT_CHAR('|')
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH)  PORT_CHAR(']') PORT_CHAR('}')
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_EQUALS)     PORT_CHAR('^')
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS)      PORT_CHAR('-') PORT_CHAR('=')
@@ -354,19 +357,19 @@ INPUT_PORTS_END
 
 static const rgb_t PALETTE_PC8001[] =
 {
-	rgb_t::black,
+	rgb_t::black(),
 	rgb_t(0x00, 0x00, 0xff),
 	rgb_t(0xff, 0x00, 0x00),
 	rgb_t(0xff, 0x00, 0xff),
 	rgb_t(0x00, 0xff, 0x00),
 	rgb_t(0x00, 0xff, 0xff),
 	rgb_t(0xff, 0xff, 0x00),
-	rgb_t::white
+	rgb_t::white()
 };
 
 UPD3301_DRAW_CHARACTER_MEMBER( pc8001_state::pc8001_display_pixels )
 {
-	UINT8 data = m_char_rom->base()[(cc << 3) | lc];
+	uint8_t data = m_char_rom->base()[(cc << 3) | lc];
 	int i;
 
 	if (lc >= 8) return;
@@ -431,7 +434,7 @@ void pc8001_state::machine_start()
 	m_dma->ready_w(1);
 
 	/* setup memory banking */
-	UINT8 *ram = m_ram->pointer();
+	uint8_t *ram = m_ram->pointer();
 
 	membank("bank1")->configure_entry(1, m_rom->base());
 	program.install_read_bank(0x0000, 0x5fff, "bank1");
@@ -473,9 +476,9 @@ void pc8001_state::machine_start()
 
 /* Machine Drivers */
 
-static MACHINE_CONFIG_START( pc8001, pc8001_state )
+static MACHINE_CONFIG_START( pc8001 )
 	/* basic machine hardware */
-	MCFG_CPU_ADD(Z80_TAG, Z80, 4000000)
+	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(pc8001_mem)
 	MCFG_CPU_IO_MAP(pc8001_io)
 
@@ -488,7 +491,7 @@ static MACHINE_CONFIG_START( pc8001, pc8001_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 2000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */
@@ -496,17 +499,18 @@ static MACHINE_CONFIG_START( pc8001, pc8001_state )
 
 	MCFG_DEVICE_ADD(I8255A_TAG, I8255A, 0)
 
-	MCFG_DEVICE_ADD(I8257_TAG, I8257, 4000000)
+	MCFG_DEVICE_ADD(I8257_TAG, I8257, XTAL_4MHz)
 	MCFG_I8257_OUT_HRQ_CB(WRITELINE(pc8001_state, hrq_w))
 	MCFG_I8257_IN_MEMR_CB(READ8(pc8001_state, dma_mem_r))
 	MCFG_I8257_OUT_IOW_2_CB(DEVWRITE8(UPD3301_TAG, upd3301_device, dack_w))
 
 	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, NOOP, NOOP)
 
-	MCFG_DEVICE_ADD(UPD3301_TAG, UPD3301, 14318180)
+	MCFG_DEVICE_ADD(UPD3301_TAG, UPD3301, XTAL_14_31818MHz)
 	MCFG_UPD3301_CHARACTER_WIDTH(8)
 	MCFG_UPD3301_DRAW_CHARACTER_CALLBACK_OWNER(pc8001_state, pc8001_display_pixels)
 	MCFG_UPD3301_VRTC_CALLBACK(DEVWRITELINE(I8257_TAG, i8257_device, dreq2_w))
+	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
 
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(pc8001_state, write_centronics_ack))
@@ -522,9 +526,9 @@ static MACHINE_CONFIG_START( pc8001, pc8001_state )
 	MCFG_RAM_EXTRA_OPTIONS("32K,64K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( pc8001mk2, pc8001mk2_state )
+static MACHINE_CONFIG_START( pc8001mk2 )
 	/* basic machine hardware */
-	MCFG_CPU_ADD(Z80_TAG, Z80, 4000000)
+	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(pc8001mk2_mem)
 	MCFG_CPU_IO_MAP(pc8001mk2_io)
 
@@ -537,7 +541,7 @@ static MACHINE_CONFIG_START( pc8001mk2, pc8001mk2_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 2000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */
@@ -545,17 +549,18 @@ static MACHINE_CONFIG_START( pc8001mk2, pc8001mk2_state )
 
 	MCFG_DEVICE_ADD(I8255A_TAG, I8255A, 0)
 
-	MCFG_DEVICE_ADD(I8257_TAG, I8257, 4000000)
+	MCFG_DEVICE_ADD(I8257_TAG, I8257, XTAL_4MHz)
 	MCFG_I8257_OUT_HRQ_CB(WRITELINE(pc8001_state, hrq_w))
 	MCFG_I8257_IN_MEMR_CB(READ8(pc8001_state, dma_mem_r))
 	MCFG_I8257_OUT_IOW_2_CB(DEVWRITE8(UPD3301_TAG, upd3301_device, dack_w))
 
 	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, NOOP, NOOP)
 
-	MCFG_DEVICE_ADD(UPD3301_TAG, UPD3301, 14318180)
+	MCFG_DEVICE_ADD(UPD3301_TAG, UPD3301, XTAL_14_31818MHz)
 	MCFG_UPD3301_CHARACTER_WIDTH(8)
 	MCFG_UPD3301_DRAW_CHARACTER_CALLBACK_OWNER(pc8001_state, pc8001_display_pixels)
 	MCFG_UPD3301_VRTC_CALLBACK(DEVWRITELINE(I8257_TAG, i8257_device, dreq2_w))
+	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
 
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
 
@@ -596,6 +601,6 @@ ROM_END
 
 /* System Drivers */
 
-/*    YEAR  NAME            PARENT      COMPAT      MACHINE     INPUT       INIT        COMPANY FULLNAME        FLAGS */
-COMP( 1979, pc8001,         0,          0,          pc8001,     pc8001, driver_device,      0,          "Nippon Electronic Company",    "PC-8001",      MACHINE_NOT_WORKING )
-COMP( 1983, pc8001mk2,      pc8001,     0,          pc8001mk2,  pc8001, driver_device,      0,          "Nippon Electronic Company",    "PC-8001mkII",  MACHINE_NOT_WORKING )
+//    YEAR  NAME            PARENT      COMPAT      MACHINE     INPUT   STATE              INIT        COMPANY  FULLNAME        FLAGS
+COMP( 1979, pc8001,         0,          0,          pc8001,     pc8001, pc8001_state,      0,          "NEC",   "PC-8001",      MACHINE_NOT_WORKING )
+COMP( 1983, pc8001mk2,      pc8001,     0,          pc8001mk2,  pc8001, pc8001mk2_state,   0,          "NEC",   "PC-8001mkII",  MACHINE_NOT_WORKING )

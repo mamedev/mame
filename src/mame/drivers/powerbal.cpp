@@ -16,17 +16,22 @@ Magic Sticks:
 */
 
 #include "emu.h"
+#include "includes/playmark.h"
+
 #include "cpu/m68000/m68000.h"
 #include "machine/eepromser.h"
 #include "sound/okim6295.h"
-#include "includes/playmark.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 class powerbal_state : public playmark_state
 {
 public:
 	powerbal_state(const machine_config &mconfig, device_type type, const char *tag)
-		: playmark_state(mconfig, type, tag),
-			m_eeprom(*this, "eeprom") { }
+		: playmark_state(mconfig, type, tag)
+		, m_eeprom(*this, "eeprom")
+	{ }
 
 	/* powerbal-specific */
 	int         m_tilebank;
@@ -40,7 +45,7 @@ public:
 	DECLARE_MACHINE_START(powerbal);
 	DECLARE_MACHINE_RESET(powerbal);
 	DECLARE_VIDEO_START(powerbal);
-	UINT32 screen_update_powerbal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_powerbal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites_powerbal( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	DECLARE_WRITE16_MEMBER(magicstk_coin_eeprom_w);
 	DECLARE_WRITE16_MEMBER(magicstk_bgvideoram_w);
@@ -78,13 +83,8 @@ WRITE16_MEMBER(powerbal_state::tile_banking_w)
 
 WRITE16_MEMBER(powerbal_state::oki_banking)
 {
-	if (data & 3)
-	{
-		int addr = 0x40000 * ((data & 3) - 1);
-
-		if (addr < memregion("oki")->bytes())
-			m_oki->set_bank_base(addr);
-	}
+	int bank = data & 3;
+	m_okibank->set_entry(bank & (m_oki_numbanks - 1));
 }
 
 static ADDRESS_MAP_START( magicstk_main_map, AS_PROGRAM, 16, powerbal_state )
@@ -128,6 +128,10 @@ static ADDRESS_MAP_START( powerbal_main_map, AS_PROGRAM, 16, powerbal_state )
 	AM_RANGE(0x103000, 0x103fff) AM_RAM
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( oki_map, 0, 8, powerbal_state )
+	AM_RANGE(0x00000, 0x1ffff) AM_ROM
+	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("okibank")
+ADDRESS_MAP_END
 
 static INPUT_PORTS_START( powerbal )
 	PORT_START("IN0")
@@ -193,7 +197,7 @@ static INPUT_PORTS_START( powerbal )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unused ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unused ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unused ) ) /* Manual shows this as "Weapon"  Off for Yes and On for No - Meaning is unknown */
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Language ) )
@@ -401,7 +405,7 @@ TILE_GET_INFO_MEMBER(powerbal_state::powerbal_get_bg_tile_info)
 
 void powerbal_state::draw_sprites_powerbal(bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	UINT16 *spriteram = m_spriteram;
+	uint16_t *spriteram = m_spriteram;
 	int offs;
 	int height = m_gfxdecode->gfx(0)->height();
 
@@ -429,14 +433,14 @@ void powerbal_state::draw_sprites_powerbal(bitmap_ind16 &bitmap, const rectangle
 
 VIDEO_START_MEMBER(powerbal_state,powerbal)
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(powerbal_state::powerbal_get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(powerbal_state::powerbal_get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
 	m_xoffset = -20;
 
 	m_bg_tilemap->set_scrolly(0, m_bg_yoffset);
 }
 
-UINT32 powerbal_state::screen_update_powerbal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t powerbal_state::screen_update_powerbal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	draw_sprites_powerbal(bitmap, cliprect);
@@ -484,9 +488,10 @@ MACHINE_START_MEMBER(powerbal_state,powerbal)
 MACHINE_RESET_MEMBER(powerbal_state,powerbal)
 {
 	m_tilebank = 0;
+	configure_oki_banks();
 }
 
-static MACHINE_CONFIG_START( powerbal, powerbal_state )
+static MACHINE_CONFIG_START( powerbal )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* 12 MHz */
@@ -514,11 +519,12 @@ static MACHINE_CONFIG_START( powerbal, powerbal_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", 1000000, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( magicstk, powerbal_state )
+static MACHINE_CONFIG_START( magicstk )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* 12 MHz */
@@ -549,8 +555,9 @@ static MACHINE_CONFIG_START( magicstk, powerbal_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", 1000000, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 MACHINE_CONFIG_END
 
 
@@ -622,12 +629,8 @@ ROM_START( powerbal )
 
 	/* $00000-$20000 stays the same in all sound banks, */
 	/* the second half of the bank is the area that gets switched */
-	ROM_REGION( 0xc0000, "oki", 0 ) /* OKI Samples */
-	ROM_LOAD( "1.u16",        0x00000, 0x40000, CRC(12776dbc) SHA1(9ab9930fd581296642834d2cb4ba65264a588af3) )
-	ROM_CONTINUE(             0x60000, 0x20000 )
-	ROM_CONTINUE(             0xa0000, 0x20000 )
-	ROM_COPY( "oki",  0x000000, 0x40000, 0x20000)
-	ROM_COPY( "oki",  0x000000, 0x80000, 0x20000)
+	ROM_REGION( 0x80000, "oki", 0 ) /* OKI Samples */
+	ROM_LOAD( "1.u16",        0x00000, 0x80000, CRC(12776dbc) SHA1(9ab9930fd581296642834d2cb4ba65264a588af3) )
 
 	ROM_REGION( 0x1200, "plds", 0 )
 	ROM_LOAD( "palce16v8h.u102",  0x0000, 0x0117, NO_DUMP ) /* PAL is read protected */
@@ -701,7 +704,7 @@ DRIVER_INIT_MEMBER(powerbal_state,magicstk)
 *      Game Drivers      *
 *************************/
 
-/*    YEAR  NAME      PARENT   MACHINE   INPUT     INIT      ROT    COMPANY     FULLNAME                      FLAGS */
+//    YEAR  NAME      PARENT   MACHINE   INPUT     STATE           INIT      ROT   COMPANY     FULLNAME                       FLAGS
 GAME( 1994, powerbal, 0,       powerbal, powerbal, powerbal_state, powerbal, ROT0, "Playmark", "Power Balls",                 MACHINE_SUPPORTS_SAVE )
 GAME( 1995, magicstk, 0,       magicstk, magicstk, powerbal_state, magicstk, ROT0, "Playmark", "Magic Sticks",                MACHINE_SUPPORTS_SAVE )
 GAME( 1995, hotminda, hotmind, magicstk, hotminda, powerbal_state, magicstk, ROT0, "Playmark", "Hot Mind (adjustable prize)", MACHINE_SUPPORTS_SAVE )

@@ -53,10 +53,7 @@ void SDL_WAYLAND_UnloadSymbols(void);
     extern SDL_DYNWAYLANDFN_##fn WAYLAND_##fn;
 #define SDL_WAYLAND_INTERFACE(iface) extern const struct wl_interface *WAYLAND_##iface;
 #include "SDL_waylandsym.h"
-#undef SDL_WAYLAND_MODULE
-#undef SDL_WAYLAND_SYM
-#undef SDL_WAYLAND_INTERFACE
- 
+
 
 #ifdef __cplusplus
 }
@@ -79,6 +76,7 @@ void SDL_WAYLAND_UnloadSymbols(void);
 #define wl_proxy_get_user_data (*WAYLAND_wl_proxy_get_user_data)
 #define wl_proxy_add_listener (*WAYLAND_wl_proxy_add_listener)
 #define wl_proxy_marshal_constructor (*WAYLAND_wl_proxy_marshal_constructor)
+#define wl_proxy_marshal_constructor_versioned (*WAYLAND_wl_proxy_marshal_constructor_versioned)
 
 #define wl_seat_interface (*WAYLAND_wl_seat_interface)
 #define wl_surface_interface (*WAYLAND_wl_surface_interface)
@@ -96,7 +94,8 @@ void SDL_WAYLAND_UnloadSymbols(void);
 
 #endif /* SDL_VIDEO_DRIVER_WAYLAND_DYNAMIC */
 
-#include "wayland-client.h"
+#include "wayland-client-core.h"
+#include "wayland-client-protocol.h"
 #include "wayland-egl.h"
 
 #endif /* !defined _SDL_waylanddyn_h */

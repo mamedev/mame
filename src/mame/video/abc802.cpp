@@ -6,7 +6,9 @@
  *
  ****************************************************************************/
 
+#include "emu.h"
 #include "includes/abc80x.h"
+#include "screen.h"
 
 
 
@@ -63,10 +65,10 @@ MC6845_UPDATE_ROW( abc802_state::abc802_update_row )
 
 	for (int column = 0; column < x_count; column++)
 	{
-		UINT8 code = m_char_ram[(ma + column) & 0x7ff];
-		UINT16 address = code << 4;
-		UINT8 ra_latch = ra;
-		UINT8 data;
+		uint8_t code = m_char_ram[(ma + column) & 0x7ff];
+		uint16_t address = code << 4;
+		uint8_t ra_latch = ra;
+		uint8_t data;
 
 		int ri = (code & ABC802_INV) ? 1 : 0;
 
@@ -188,7 +190,7 @@ void abc802_state::video_start()
 //  SCREEN_UPDATE( abc802 )
 //-------------------------------------------------
 
-UINT32 abc802_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t abc802_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	// draw text
 	m_crtc->screen_update(screen, bitmap, cliprect);
@@ -198,23 +200,19 @@ UINT32 abc802_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( abc802_video )
+//  MACHINE_CONFIG_START( abc802_video )
 //-------------------------------------------------
 
-MACHINE_CONFIG_FRAGMENT( abc802_video )
+MACHINE_CONFIG_START( abc802_video )
 	MCFG_MC6845_ADD(MC6845_TAG, MC6845, SCREEN_TAG, ABC800_CCLK)
 	MCFG_MC6845_SHOW_BORDER_AREA(true)
 	MCFG_MC6845_CHAR_WIDTH(ABC800_CHAR_WIDTH)
 	MCFG_MC6845_UPDATE_ROW_CB(abc802_state, abc802_update_row)
 	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(abc802_state, vs_w))
 
-	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::amber)
+	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::amber())
 	MCFG_SCREEN_UPDATE_DRIVER(abc802_state, screen_update)
-
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_SIZE(768, 312)
-	MCFG_SCREEN_VISIBLE_AREA(0,768-1, 0, 312-1)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_12MHz, 0x300, 0, 0x1e0, 0x13a, 0, 0xf0)
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 MACHINE_CONFIG_END

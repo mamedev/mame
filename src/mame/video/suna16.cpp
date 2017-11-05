@@ -93,7 +93,7 @@ WRITE16_MEMBER(suna16_state::bestbest_flipscreen_w)
 
 void suna16_state::video_start()
 {
-	m_paletteram = std::make_unique<UINT16[]>(m_palette->entries());
+	m_paletteram = std::make_unique<uint16_t[]>(m_palette->entries());
 
 	save_item(NAME(m_color_bank));
 }
@@ -119,7 +119,7 @@ WRITE16_MEMBER(suna16_state::paletteram_w)
 
 ***************************************************************************/
 
-void suna16_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16 *sprites, int gfx)
+void suna16_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint16_t *sprites, int gfx)
 {
 	int max_x = m_screen->width() - 8;
 	int max_y = m_screen->height() - 8;
@@ -216,7 +216,7 @@ void suna16_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect,
 
 ***************************************************************************/
 
-UINT32 suna16_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t suna16_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* Suna Quiz indicates the background is the last pen */
 	bitmap.fill(0xff, cliprect);
@@ -224,7 +224,7 @@ UINT32 suna16_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 	return 0;
 }
 
-UINT32 suna16_state::screen_update_bestbest(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t suna16_state::screen_update_bestbest(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int layers_ctrl = -1;
 

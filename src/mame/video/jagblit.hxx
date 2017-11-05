@@ -35,43 +35,43 @@
 
 #ifndef PIXEL_SHIFT_1
 #define PIXEL_SHIFT_1(a)      ((~a##_x >> 16) & 7)
-#define PIXEL_OFFSET_1(a)     BYTE4_XOR_BE(((UINT32)a##_y >> 16) * a##_width / 8 + (((UINT32)a##_x >> 19) & ~7) * (1 + a##_pitch) + (((UINT32)a##_x >> 19) & 7))
+#define PIXEL_OFFSET_1(a)     BYTE4_XOR_BE(((uint32_t)a##_y >> 16) * a##_width / 8 + (((uint32_t)a##_x >> 19) & ~7) * (1 + a##_pitch) + (((uint32_t)a##_x >> 19) & 7))
 #define ZDATA_OFFSET_1(a)     0 /* huh? */
-#define READ_RDATA_1(r,a,p)   ((p) ? (((((UINT8 *)&m_blitter_regs[r])[BYTE4_XOR_BE(((UINT32)a##_x >> 19) & 7)]) >> PIXEL_SHIFT_1(a)) & 0x01) : (m_blitter_regs[r] & 0x01))
-#define READ_PIXEL_1(a)       (((((UINT8 *)a##_base_mem)[PIXEL_OFFSET_1(a)]) >> PIXEL_SHIFT_1(a)) & 0x01)
+#define READ_RDATA_1(r,a,p)   ((p) ? (((((uint8_t *)&m_blitter_regs[r])[BYTE4_XOR_BE(((uint32_t)a##_x >> 19) & 7)]) >> PIXEL_SHIFT_1(a)) & 0x01) : (m_blitter_regs[r] & 0x01))
+#define READ_PIXEL_1(a)       (((((uint8_t *)a##_base_mem)[PIXEL_OFFSET_1(a)]) >> PIXEL_SHIFT_1(a)) & 0x01)
 #define READ_ZDATA_1(a)       0 /* huh? */
 
 #define PIXEL_SHIFT_2(a)      ((~a##_x >> 15) & 6)
-#define PIXEL_OFFSET_2(a)     BYTE4_XOR_BE(((UINT32)a##_y >> 16) * a##_width / 4 + (((UINT32)a##_x >> 18) & ~7) * (1 + a##_pitch) + (((UINT32)a##_x >> 18) & 7))
+#define PIXEL_OFFSET_2(a)     BYTE4_XOR_BE(((uint32_t)a##_y >> 16) * a##_width / 4 + (((uint32_t)a##_x >> 18) & ~7) * (1 + a##_pitch) + (((uint32_t)a##_x >> 18) & 7))
 #define ZDATA_OFFSET_2(a)     0 /* huh? */
-#define READ_RDATA_2(r,a,p)   ((p) ? (((((UINT8 *)&m_blitter_regs[r])[BYTE4_XOR_BE(((UINT32)a##_x >> 18) & 7)]) >> PIXEL_SHIFT_2(a)) & 0x03) : (m_blitter_regs[r] & 0x03))
-#define READ_PIXEL_2(a)       (((((UINT8 *)a##_base_mem)[PIXEL_OFFSET_2(a)]) >> PIXEL_SHIFT_2(a)) & 0x03)
+#define READ_RDATA_2(r,a,p)   ((p) ? (((((uint8_t *)&m_blitter_regs[r])[BYTE4_XOR_BE(((uint32_t)a##_x >> 18) & 7)]) >> PIXEL_SHIFT_2(a)) & 0x03) : (m_blitter_regs[r] & 0x03))
+#define READ_PIXEL_2(a)       (((((uint8_t *)a##_base_mem)[PIXEL_OFFSET_2(a)]) >> PIXEL_SHIFT_2(a)) & 0x03)
 #define READ_ZDATA_2(a)       0 /* huh? */
 
 #define PIXEL_SHIFT_4(a)      ((~a##_x >> 14) & 4)
-#define PIXEL_OFFSET_4(a)     BYTE4_XOR_BE(((UINT32)a##_y >> 16) * a##_width / 2 + (((UINT32)a##_x >> 17) & ~7) * (1 + a##_pitch) + (((UINT32)a##_x >> 17) & 7))
+#define PIXEL_OFFSET_4(a)     BYTE4_XOR_BE(((uint32_t)a##_y >> 16) * a##_width / 2 + (((uint32_t)a##_x >> 17) & ~7) * (1 + a##_pitch) + (((uint32_t)a##_x >> 17) & 7))
 #define ZDATA_OFFSET_4(a)     0 /* huh? */
-#define READ_RDATA_4(r,a,p)   ((p) ? (((((UINT8 *)&m_blitter_regs[r])[BYTE4_XOR_BE(((UINT32)a##_x >> 17) & 7)]) >> PIXEL_SHIFT_4(a)) & 0x0f) : (m_blitter_regs[r] & 0x0f))
-#define READ_PIXEL_4(a)       (((((UINT8 *)a##_base_mem)[PIXEL_OFFSET_4(a)]) >> PIXEL_SHIFT_4(a)) & 0x0f)
+#define READ_RDATA_4(r,a,p)   ((p) ? (((((uint8_t *)&m_blitter_regs[r])[BYTE4_XOR_BE(((uint32_t)a##_x >> 17) & 7)]) >> PIXEL_SHIFT_4(a)) & 0x0f) : (m_blitter_regs[r] & 0x0f))
+#define READ_PIXEL_4(a)       (((((uint8_t *)a##_base_mem)[PIXEL_OFFSET_4(a)]) >> PIXEL_SHIFT_4(a)) & 0x0f)
 #define READ_ZDATA_4(a)       0 /* huh? */
 
-#define PIXEL_OFFSET_8(a)     BYTE4_XOR_BE(((UINT32)a##_y >> 16) * a##_width + (((UINT32)a##_x >> 16) & ~7) * (1 + a##_pitch) + (((UINT32)a##_x >> 16) & 7))
+#define PIXEL_OFFSET_8(a)     BYTE4_XOR_BE(((uint32_t)a##_y >> 16) * a##_width + (((uint32_t)a##_x >> 16) & ~7) * (1 + a##_pitch) + (((uint32_t)a##_x >> 16) & 7))
 #define ZDATA_OFFSET_8(a)     (PIXEL_OFFSET_8(a) + a##_zoffs * 8)
-#define READ_RDATA_8(r,a,p)   ((p) ? (((UINT8 *)&m_blitter_regs[r])[BYTE4_XOR_BE(((UINT32)a##_x >> 16) & 7)]) : (m_blitter_regs[r] & 0xff))
-#define READ_PIXEL_8(a)       (((UINT8 *)a##_base_mem)[PIXEL_OFFSET_8(a)])
-#define READ_ZDATA_8(a)       (((UINT8 *)a##_base_mem)[ZDATA_OFFSET_8(a)])
+#define READ_RDATA_8(r,a,p)   ((p) ? (((uint8_t *)&m_blitter_regs[r])[BYTE4_XOR_BE(((uint32_t)a##_x >> 16) & 7)]) : (m_blitter_regs[r] & 0xff))
+#define READ_PIXEL_8(a)       (((uint8_t *)a##_base_mem)[PIXEL_OFFSET_8(a)])
+#define READ_ZDATA_8(a)       (((uint8_t *)a##_base_mem)[ZDATA_OFFSET_8(a)])
 
-#define PIXEL_OFFSET_16(a)    BYTE_XOR_BE(((UINT32)a##_y >> 16) * a##_width + (((UINT32)a##_x >> 16) & ~3) * (1 + a##_pitch) + (((UINT32)a##_x >> 16) & 3))
+#define PIXEL_OFFSET_16(a)    BYTE_XOR_BE(((uint32_t)a##_y >> 16) * a##_width + (((uint32_t)a##_x >> 16) & ~3) * (1 + a##_pitch) + (((uint32_t)a##_x >> 16) & 3))
 #define ZDATA_OFFSET_16(a)    (PIXEL_OFFSET_16(a) + a##_zoffs * 4)
-#define READ_RDATA_16(r,a,p)  ((p) ? (((UINT16 *)&m_blitter_regs[r])[BYTE_XOR_BE(((UINT32)a##_x >> 16) & 3)]) : (m_blitter_regs[r] & 0xffff))
-#define READ_PIXEL_16(a)      (((UINT16 *)a##_base_mem)[PIXEL_OFFSET_16(a)])
-#define READ_ZDATA_16(a)      (((UINT16 *)a##_base_mem)[ZDATA_OFFSET_16(a)])
+#define READ_RDATA_16(r,a,p)  ((p) ? (((uint16_t *)&m_blitter_regs[r])[BYTE_XOR_BE(((uint32_t)a##_x >> 16) & 3)]) : (m_blitter_regs[r] & 0xffff))
+#define READ_PIXEL_16(a)      (((uint16_t *)a##_base_mem)[PIXEL_OFFSET_16(a)])
+#define READ_ZDATA_16(a)      (((uint16_t *)a##_base_mem)[ZDATA_OFFSET_16(a)])
 
-#define PIXEL_OFFSET_32(a)    (((UINT32)a##_y >> 16) * a##_width + (((UINT32)a##_x >> 16) & ~1) * (1 + a##_pitch) + (((UINT32)a##_x >> 16) & 1))
+#define PIXEL_OFFSET_32(a)    (((uint32_t)a##_y >> 16) * a##_width + (((uint32_t)a##_x >> 16) & ~1) * (1 + a##_pitch) + (((uint32_t)a##_x >> 16) & 1))
 #define ZDATA_OFFSET_32(a)    (PIXEL_OFFSET_32(a) + a##_zoffs * 2)
-#define READ_RDATA_32(r,a,p)  ((p) ? (m_blitter_regs[r + (((UINT32)a##_x >> 16) & 1)]) : m_blitter_regs[r])
-#define READ_PIXEL_32(a)      (((UINT32 *)a##_base_mem)[PIXEL_OFFSET_32(a)])
-#define READ_ZDATA_32(a)      (((UINT32 *)a##_base_mem)[ZDATA_OFFSET_32(a)])
+#define READ_RDATA_32(r,a,p)  ((p) ? (m_blitter_regs[r + (((uint32_t)a##_x >> 16) & 1)]) : m_blitter_regs[r])
+#define READ_PIXEL_32(a)      (((uint32_t *)a##_base_mem)[PIXEL_OFFSET_32(a)])
+#define READ_ZDATA_32(a)      (((uint32_t *)a##_base_mem)[ZDATA_OFFSET_32(a)])
 
 #define READ_RDATA(r,a,f,p) \
 	((((f) & 0x38) == (0 << 3)) ? (READ_RDATA_1(r,a,p)) : \
@@ -101,12 +101,12 @@
 #define PIXEL_SHIFT_WRITE_2      ((~adest_x >> 15) & 6)
 #define PIXEL_SHIFT_WRITE_4      ((~adest_x >> 14) & 4)
 
-#define PIXEL_OFFSET_WRITE_1     (((UINT32)adest_y >> 16) * adest_width / 8 + (((UINT32)adest_x >> 19) & ~7) * (1 + adest_pitch) + (((UINT32)adest_x >> 19) & 7))
-#define PIXEL_OFFSET_WRITE_2     (((UINT32)adest_y >> 16) * adest_width / 4 + (((UINT32)adest_x >> 18) & ~7) * (1 + adest_pitch) + (((UINT32)adest_x >> 18) & 7))
-#define PIXEL_OFFSET_WRITE_4     (((UINT32)adest_y >> 16) * adest_width / 2 + (((UINT32)adest_x >> 17) & ~7) * (1 + adest_pitch) + (((UINT32)adest_x >> 17) & 7))
-#define PIXEL_OFFSET_WRITE_8     (((UINT32)adest_y >> 16) * adest_width + (((UINT32)adest_x >> 16) & ~7) * (1 + adest_pitch) + (((UINT32)adest_x >> 16) & 7))
-#define PIXEL_OFFSET_WRITE_16    (((UINT32)adest_y >> 16) * adest_width + (((UINT32)adest_x >> 16) & ~3) * (1 + adest_pitch) + (((UINT32)adest_x >> 16) & 3))
-#define PIXEL_OFFSET_WRITE_32    (((UINT32)adest_y >> 16) * adest_width + (((UINT32)adest_x >> 16) & ~1) * (1 + adest_pitch) + (((UINT32)adest_x >> 16) & 1))
+#define PIXEL_OFFSET_WRITE_1     (((uint32_t)adest_y >> 16) * adest_width / 8 + (((uint32_t)adest_x >> 19) & ~7) * (1 + adest_pitch) + (((uint32_t)adest_x >> 19) & 7))
+#define PIXEL_OFFSET_WRITE_2     (((uint32_t)adest_y >> 16) * adest_width / 4 + (((uint32_t)adest_x >> 18) & ~7) * (1 + adest_pitch) + (((uint32_t)adest_x >> 18) & 7))
+#define PIXEL_OFFSET_WRITE_4     (((uint32_t)adest_y >> 16) * adest_width / 2 + (((uint32_t)adest_x >> 17) & ~7) * (1 + adest_pitch) + (((uint32_t)adest_x >> 17) & 7))
+#define PIXEL_OFFSET_WRITE_8     (((uint32_t)adest_y >> 16) * adest_width + (((uint32_t)adest_x >> 16) & ~7) * (1 + adest_pitch) + (((uint32_t)adest_x >> 16) & 7))
+#define PIXEL_OFFSET_WRITE_16    (((uint32_t)adest_y >> 16) * adest_width + (((uint32_t)adest_x >> 16) & ~3) * (1 + adest_pitch) + (((uint32_t)adest_x >> 16) & 3))
+#define PIXEL_OFFSET_WRITE_32    (((uint32_t)adest_y >> 16) * adest_width + (((uint32_t)adest_x >> 16) & ~1) * (1 + adest_pitch) + (((uint32_t)adest_x >> 16) & 1))
 
 #define ZDATA_OFFSET_WRITE_1     0 /* huh? */
 #define ZDATA_OFFSET_WRITE_2     0 /* huh? */
@@ -116,11 +116,11 @@
 #define ZDATA_OFFSET_WRITE_32    (PIXEL_OFFSET_WRITE_32 + adest_zoffs * 2)
 
 
-#define WRITE_PIXEL_1(d)    do { int writeoffs = PIXEL_OFFSET_WRITE_1; int shift = PIXEL_SHIFT_WRITE_1; UINT8 pix = m_gpu->space(AS_PROGRAM).read_byte(adest_base + (writeoffs)); pix = (pix & ~(0x01 << shift)) | ((d) << shift); m_gpu->space(AS_PROGRAM).write_byte(adest_base + (writeoffs), pix); } while (0)
+#define WRITE_PIXEL_1(d)    do { int writeoffs = PIXEL_OFFSET_WRITE_1; int shift = PIXEL_SHIFT_WRITE_1; uint8_t pix = m_gpu->space(AS_PROGRAM).read_byte(adest_base + (writeoffs)); pix = (pix & ~(0x01 << shift)) | ((d) << shift); m_gpu->space(AS_PROGRAM).write_byte(adest_base + (writeoffs), pix); } while (0)
 #define WRITE_ZDATA_1(d)    /* huh? */
-#define WRITE_PIXEL_2(d)    do { int writeoffs = PIXEL_OFFSET_WRITE_2; int shift = PIXEL_SHIFT_WRITE_2; UINT8 pix = m_gpu->space(AS_PROGRAM).read_byte(adest_base + (writeoffs)); pix = (pix & ~(0x03 << shift)) | ((d) << shift); m_gpu->space(AS_PROGRAM).write_byte(adest_base + (writeoffs), pix); } while (0)
+#define WRITE_PIXEL_2(d)    do { int writeoffs = PIXEL_OFFSET_WRITE_2; int shift = PIXEL_SHIFT_WRITE_2; uint8_t pix = m_gpu->space(AS_PROGRAM).read_byte(adest_base + (writeoffs)); pix = (pix & ~(0x03 << shift)) | ((d) << shift); m_gpu->space(AS_PROGRAM).write_byte(adest_base + (writeoffs), pix); } while (0)
 #define WRITE_ZDATA_2(d)    /* huh? */
-#define WRITE_PIXEL_4(d)    do { int writeoffs = PIXEL_OFFSET_WRITE_4; int shift = PIXEL_SHIFT_WRITE_4; UINT8 pix = m_gpu->space(AS_PROGRAM).read_byte(adest_base + (writeoffs)); pix = (pix & ~(0x0f << shift)) | ((d) << shift); m_gpu->space(AS_PROGRAM).write_byte(adest_base + (writeoffs), pix); } while (0)
+#define WRITE_PIXEL_4(d)    do { int writeoffs = PIXEL_OFFSET_WRITE_4; int shift = PIXEL_SHIFT_WRITE_4; uint8_t pix = m_gpu->space(AS_PROGRAM).read_byte(adest_base + (writeoffs)); pix = (pix & ~(0x0f << shift)) | ((d) << shift); m_gpu->space(AS_PROGRAM).write_byte(adest_base + (writeoffs), pix); } while (0)
 #define WRITE_ZDATA_4(d)    /* huh? */
 #define WRITE_PIXEL_8(d)    do { int writeoffs = PIXEL_OFFSET_WRITE_8;  m_gpu->space(AS_PROGRAM).write_byte(adest_base + (writeoffs), (d)); } while (0)
 #define WRITE_ZDATA_8(d)    do { int writeoffs = ZDATA_OFFSET_WRITE_8;  m_gpu->space(AS_PROGRAM).write_byte(adest_base + (writeoffs), (d)); } while (0)
@@ -154,66 +154,66 @@
 	} while (0)
 #endif
 
-void jaguar_state::FUNCNAME(UINT32 command, UINT32 a1flags, UINT32 a2flags)
+void jaguar_state::FUNCNAME(uint32_t command, uint32_t a1flags, uint32_t a2flags)
 {
-	UINT32 a1_base = m_blitter_regs[A1_BASE] & ~0x7;
-	INT32 a1_pitch = (A1FIXED & 3) ^ ((A1FIXED & 2) >> 1);
-	INT32 a1_zoffs = (A1FIXED >> 6) & 7;
-	INT32 a1_width = ((4 | ((a1flags >> 9) & 3)) << ((a1flags >> 11) & 15)) >> 2;
-	INT32 a1_xadd = (A1FIXED >> 16) & 0x03;
-	INT32 a1_yadd = (A1FIXED >> 18) & 0x01;
-	INT32 a1_x = (m_blitter_regs[A1_PIXEL] << 16) | (m_blitter_regs[A1_FPIXEL] & 0xffff);
-	INT32 a1_y = (m_blitter_regs[A1_PIXEL] & 0xffff0000) | (m_blitter_regs[A1_FPIXEL] >> 16);
-	INT32 a1_xstep = 0;
-	INT32 a1_ystep = 0;
-	UINT32 a1_xmask = 0xffffffff;
-	UINT32 a1_ymask = 0xffffffff;
+	uint32_t a1_base = m_blitter_regs[A1_BASE] & ~0x7;
+	int32_t a1_pitch = (A1FIXED & 3) ^ ((A1FIXED & 2) >> 1);
+	int32_t a1_zoffs = (A1FIXED >> 6) & 7;
+	int32_t a1_width = ((4 | ((a1flags >> 9) & 3)) << ((a1flags >> 11) & 15)) >> 2;
+	int32_t a1_xadd = (A1FIXED >> 16) & 0x03;
+	int32_t a1_yadd = (A1FIXED >> 18) & 0x01;
+	int32_t a1_x = (m_blitter_regs[A1_PIXEL] << 16) | (m_blitter_regs[A1_FPIXEL] & 0xffff);
+	int32_t a1_y = (m_blitter_regs[A1_PIXEL] & 0xffff0000) | (m_blitter_regs[A1_FPIXEL] >> 16);
+	int32_t a1_xstep = 0;
+	int32_t a1_ystep = 0;
+	uint32_t a1_xmask = 0xffffffff;
+	uint32_t a1_ymask = 0xffffffff;
 
-	UINT32 a2_base = m_blitter_regs[A2_BASE] & ~0x7;
-	INT32 a2_pitch = (A2FIXED & 3) ^ ((A2FIXED & 2) >> 1);
-	INT32 a2_zoffs = (A2FIXED >> 6) & 7;
-	INT32 a2_width = ((4 | ((a2flags >> 9) & 3)) << ((a2flags >> 11) & 15)) >> 2;
-	INT32 a2_xadd = (A2FIXED >> 16) & 0x03;
-	INT32 a2_yadd = (A1FIXED >> 18) & 0x01;     // From Jaguar HW errata: "If the A1 Y add control bit is set it will affect both address generators."
-	INT32 a2_x = (m_blitter_regs[A2_PIXEL] << 16);
-	INT32 a2_y = (m_blitter_regs[A2_PIXEL] & 0xffff0000);
-	INT32 a2_xstep = 0;
-	INT32 a2_ystep = 0;
-	UINT32 a2_xmask = 0xffffffff;
-	UINT32 a2_ymask = 0xffffffff;
+	uint32_t a2_base = m_blitter_regs[A2_BASE] & ~0x7;
+	int32_t a2_pitch = (A2FIXED & 3) ^ ((A2FIXED & 2) >> 1);
+	int32_t a2_zoffs = (A2FIXED >> 6) & 7;
+	int32_t a2_width = ((4 | ((a2flags >> 9) & 3)) << ((a2flags >> 11) & 15)) >> 2;
+	int32_t a2_xadd = (A2FIXED >> 16) & 0x03;
+	int32_t a2_yadd = (A1FIXED >> 18) & 0x01;     // From Jaguar HW errata: "If the A1 Y add control bit is set it will affect both address generators."
+	int32_t a2_x = (m_blitter_regs[A2_PIXEL] << 16);
+	int32_t a2_y = (m_blitter_regs[A2_PIXEL] & 0xffff0000);
+	int32_t a2_xstep = 0;
+	int32_t a2_ystep = 0;
+	uint32_t a2_xmask = 0xffffffff;
+	uint32_t a2_ymask = 0xffffffff;
 
 	int inner_count = m_blitter_regs[B_COUNT] & 0xffff;
 	int outer_count = m_blitter_regs[B_COUNT] >> 16;
 	int inner, outer;
 
-	UINT8 a1_phrase_mode = 0;
-	UINT8 a2_phrase_mode = 0;
+	uint8_t a1_phrase_mode = 0;
+	uint8_t a2_phrase_mode = 0;
 
 	void *a1_base_mem = memory_base(a1_base);
 	void *a2_base_mem = memory_base(a2_base);
 
 	void *asrc_base_mem =   (COMMAND & 0x00000800) ? a1_base_mem : a2_base_mem;
 	void *adest_base_mem =  (COMMAND & 0x00000800) ? a2_base_mem : a1_base_mem;
-	UINT32 asrcflags =      (COMMAND & 0x00000800) ? A1FIXED : A2FIXED;
-	INT32 asrc_x =          (COMMAND & 0x00000800) ? a1_x : a2_x;
-	INT32 asrc_y =          (COMMAND & 0x00000800) ? a1_y : a2_y;
-	INT32 asrc_width =      (COMMAND & 0x00000800) ? a1_width : a2_width;
-	INT32 asrc_pitch =      (COMMAND & 0x00000800) ? a1_pitch : a2_pitch;
-	INT32 asrc_zoffs =      (COMMAND & 0x00000800) ? a1_zoffs : a2_zoffs;
-	UINT8 asrc_phrase_mode;
-	INT32 asrc_xadd, asrc_xstep, asrc_yadd, asrc_ystep;
-	UINT32 asrc_xmask, asrc_ymask;
+	uint32_t asrcflags =      (COMMAND & 0x00000800) ? A1FIXED : A2FIXED;
+	int32_t asrc_x =          (COMMAND & 0x00000800) ? a1_x : a2_x;
+	int32_t asrc_y =          (COMMAND & 0x00000800) ? a1_y : a2_y;
+	int32_t asrc_width =      (COMMAND & 0x00000800) ? a1_width : a2_width;
+	int32_t asrc_pitch =      (COMMAND & 0x00000800) ? a1_pitch : a2_pitch;
+	int32_t asrc_zoffs =      (COMMAND & 0x00000800) ? a1_zoffs : a2_zoffs;
+	uint8_t asrc_phrase_mode;
+	int32_t asrc_xadd, asrc_xstep, asrc_yadd, asrc_ystep;
+	uint32_t asrc_xmask, asrc_ymask;
 
-	UINT32 adest_base =  (COMMAND & 0x00000800) ? a2_base : a1_base;
-	UINT32 adestflags =     (COMMAND & 0x00000800) ? A2FIXED : A1FIXED;
-	INT32 adest_x =         (COMMAND & 0x00000800) ? a2_x : a1_x;
-	INT32 adest_y =         (COMMAND & 0x00000800) ? a2_y : a1_y;
-	INT32 adest_width =     (COMMAND & 0x00000800) ? a2_width : a1_width;
-	INT32 adest_pitch =     (COMMAND & 0x00000800) ? a2_pitch : a1_pitch;
-	INT32 adest_zoffs =     (COMMAND & 0x00000800) ? a2_zoffs : a1_zoffs;
-	UINT8 adest_phrase_mode;
-	INT32 adest_xadd, adest_xstep, adest_yadd, adest_ystep;
-	UINT32 adest_xmask, adest_ymask;
+	uint32_t adest_base =  (COMMAND & 0x00000800) ? a2_base : a1_base;
+	uint32_t adestflags =     (COMMAND & 0x00000800) ? A2FIXED : A1FIXED;
+	int32_t adest_x =         (COMMAND & 0x00000800) ? a2_x : a1_x;
+	int32_t adest_y =         (COMMAND & 0x00000800) ? a2_y : a1_y;
+	int32_t adest_width =     (COMMAND & 0x00000800) ? a2_width : a1_width;
+	int32_t adest_pitch =     (COMMAND & 0x00000800) ? a2_pitch : a1_pitch;
+	int32_t adest_zoffs =     (COMMAND & 0x00000800) ? a2_zoffs : a1_zoffs;
+	uint8_t adest_phrase_mode;
+	int32_t adest_xadd, adest_xstep, adest_yadd, adest_ystep;
+	uint32_t adest_xmask, adest_ymask;
 
 	/* don't blit if pointer bad */
 	if (!a1_base_mem || !a2_base_mem)
@@ -355,11 +355,11 @@ void jaguar_state::FUNCNAME(UINT32 command, UINT32 a1flags, UINT32 a2flags)
 		inner = inner_count;
 		while (inner--)
 		{
-			UINT32 srcdata;
-			UINT32 srczdata = 0;
-			UINT32 dstdata;
-			UINT32 dstzdata = 0;
-			UINT32 writedata = 0;
+			uint32_t srcdata;
+			uint32_t srczdata = 0;
+			uint32_t dstdata;
+			uint32_t dstzdata = 0;
+			uint32_t writedata = 0;
 			int inhibit = 0;
 
 				/* load src data and Z */
@@ -458,7 +458,7 @@ void jaguar_state::FUNCNAME(UINT32 command, UINT32 a1flags, UINT32 a2flags)
 					if (COMMAND & 0x40000000)
 					{
 						int intensity = srcdata & 0x00ff;
-						intensity += (INT8) (m_blitter_regs[B_IINC] >> 16);
+						intensity += (int8_t) (m_blitter_regs[B_IINC] >> 16);
 						if (intensity < 0)
 							intensity = 0;
 						else if (intensity > 0xff)

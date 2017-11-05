@@ -9,8 +9,8 @@
 
 *********************************************************************/
 
-#ifndef __SWIM_H__
-#define __SWIM_H__
+#ifndef MAME_MACHINE_SWIM_H
+#define MAME_MACHINE_SWIM_H
 
 #include "machine/applefdc.h"
 
@@ -19,16 +19,16 @@
     DEVICE
 ***************************************************************************/
 
-extern const device_type SWIM;
+DECLARE_DEVICE_TYPE(SWIM, swim_device)
 
 class swim_device : public applefdc_base_device
 {
 public:
-	swim_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	swim_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// read/write
-	virtual UINT8 read(UINT8 offset) override;
-	virtual void write(UINT8 offset, UINT8 data) override;
+	virtual uint8_t read(uint8_t offset) override;
+	virtual void write(uint8_t offset, uint8_t data) override;
 
 protected:
 	// device-level overrides
@@ -36,14 +36,14 @@ protected:
 	virtual void device_reset() override;
 
 	// other overrides
-	virtual void iwm_modereg_w(UINT8 data) override;
+	virtual void iwm_modereg_w(uint8_t data) override;
 
 private:
-	UINT8       m_swim_mode;
-	UINT8       m_swim_magic_state;
-	UINT8       m_parm_offset;
-	UINT8       m_ism_regs[8];
-	UINT8       m_parms[16];
+	uint8_t       m_swim_mode;
+	uint8_t       m_swim_magic_state;
+	uint8_t       m_parm_offset;
+	uint8_t       m_ism_regs[8];
+	uint8_t       m_parms[16];
 };
 
 
@@ -60,4 +60,4 @@ private:
 	MCFG_DEVICE_MODIFY(_tag)          \
 	MCFG_APPLEFDC_CONFIG(_intrf)
 
-#endif // __SWIM_H__
+#endif // MAME_MACHINE_SWIM_H

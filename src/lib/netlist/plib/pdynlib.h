@@ -1,20 +1,15 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
 /*
- * pstring.h
+ * pdynlib.h
  */
 
 #ifndef PDYNLIB_H_
 #define PDYNLIB_H_
 
-#include <cstdarg>
-#include <cstddef>
-
-#include "pconfig.h"
 #include "pstring.h"
 
-PLIB_NAMESPACE_START()
-
+namespace plib {
 // ----------------------------------------------------------------------------------------
 // pdynlib: dynamic loading of libraries  ...
 // ----------------------------------------------------------------------------------------
@@ -22,7 +17,7 @@ PLIB_NAMESPACE_START()
 class dynlib
 {
 public:
-	dynlib(const pstring libname);
+	explicit dynlib(const pstring libname);
 	dynlib(const pstring path, const pstring libname);
 	~dynlib();
 
@@ -40,6 +35,35 @@ private:
 	void *m_lib;
 };
 
-PLIB_NAMESPACE_END()
+template <typename R, typename... Args>
+class dynproc
+{
+public:
+	using calltype = R(*) (Args... args);
+
+	dynproc() : m_sym(nullptr) { }
+
+	dynproc(dynlib &dl, const pstring &name)
+	{
+		m_sym = dl.getsym<calltype>(name);
+	}
+
+	void load(dynlib &dl, const pstring &name)
+	{
+		m_sym = dl.getsym<calltype>(name);
+	}
+
+	R operator ()(Args&&... args) const
+	{
+		return m_sym(std::forward<Args>(args)...);
+		//return m_sym(args...);
+	}
+
+	bool resolved() { return m_sym != nullptr; }
+private:
+	calltype m_sym;
+};
+
+}
 
 #endif /* PSTRING_H_ */

@@ -5,6 +5,7 @@
  * aga.c
  *
  ****************************************************************************/
+#include "emu.h"
 #include "aga.h"
 #include "video/cgapal.h"
 
@@ -50,49 +51,36 @@ INPUT_PORTS_END
 #define CGA_MONITOR     (m_cga_config->read()&0x1C)
 #define CGA_MONITOR_COMPOSITE   0x08    /* Colour composite */
 
-const device_type ISA8_AGA = &device_creator<isa8_aga_device>;
+DEFINE_DEVICE_TYPE(ISA8_AGA, isa8_aga_device, "aga", "AGA")
 
 //-------------------------------------------------
 //  isa8_aga_device - constructor
 //-------------------------------------------------
 
-isa8_aga_device::isa8_aga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-		device_t( mconfig, ISA8_AGA, "AGA", tag, owner, clock, "aga", __FILE__),
-		device_isa8_card_interface(mconfig, *this),
-		m_palette(*this, "palette"),
-		m_mc6845(*this, AGA_MC6845_NAME),
-		m_cga_config(*this, "cga_config"),
-		m_update_row_type(-1),
-		m_mode(),
-		m_mda_mode_control(0),
-		m_mda_status(0),
-		m_mda_chr_gen(nullptr),
-		m_cga_mode_control(0),
-		m_cga_color_select(0),
-		m_cga_status(0),
-		m_cga_chr_gen(nullptr),
-		m_framecnt(0),
-		m_vsync(0),
-		m_hsync(0),
-		m_videoram(nullptr)
+isa8_aga_device::isa8_aga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	isa8_aga_device(mconfig, ISA8_AGA, tag, owner, clock)
 {
 }
 
-isa8_aga_device::isa8_aga_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
-		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		device_isa8_card_interface(mconfig, *this),
-		m_palette(*this, "palette"),
-		m_mc6845(*this, AGA_MC6845_NAME),
-		m_cga_config(*this, "cga_config"),
-		m_update_row_type(-1), m_mode(),
-		m_mda_mode_control(0),
-		m_mda_status(0), m_mda_chr_gen(nullptr),
-		m_cga_mode_control(0),
-		m_cga_color_select(0),
-		m_cga_status(0), m_cga_chr_gen(nullptr),
-		m_framecnt(0),
-		m_vsync(0),
-		m_hsync(0), m_videoram(nullptr)
+isa8_aga_device::isa8_aga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
+	device_isa8_card_interface(mconfig, *this),
+	m_palette(*this, "palette"),
+	m_mc6845(*this, AGA_MC6845_NAME),
+	m_cga_config(*this, "cga_config"),
+	m_update_row_type(-1),
+	m_mode(),
+	m_mda_mode_control(0),
+	m_mda_status(0),
+	m_mda_chr_gen(nullptr),
+	m_cga_mode_control(0),
+	m_cga_color_select(0),
+	m_cga_status(0),
+	m_cga_chr_gen(nullptr),
+	m_framecnt(0),
+	m_vsync(0),
+	m_hsync(0),
+	m_videoram(nullptr)
 {
 }
 //-------------------------------------------------
@@ -107,12 +95,12 @@ void isa8_aga_device::device_start()
 	m_mode = AGA_COLOR;
 	m_mda_chr_gen = memregion("gfx1")->base() + 0x1000;
 	m_cga_chr_gen = memregion("gfx1")->base();
-	m_videoram = std::make_unique<UINT8[]>(0x10000);
+	m_videoram = std::make_unique<uint8_t[]>(0x10000);
 
 	set_isa_device();
-	m_isa->install_memory(0xb0000, 0xbffff, 0, 0, read8_delegate(FUNC(isa8_aga_device::pc_aga_videoram_r),this), write8_delegate(FUNC(isa8_aga_device::pc_aga_videoram_w),this));
-	m_isa->install_device(0x3b0, 0x3bf, 0, 0, read8_delegate( FUNC(isa8_aga_device::pc_aga_mda_r), this ), write8_delegate( FUNC(isa8_aga_device::pc_aga_mda_w), this ) );
-	m_isa->install_device(0x3d0, 0x3df, 0, 0, read8_delegate( FUNC(isa8_aga_device::pc_aga_cga_r), this ), write8_delegate( FUNC(isa8_aga_device::pc_aga_cga_w), this ) );
+	m_isa->install_memory(0xb0000, 0xbffff, read8_delegate(FUNC(isa8_aga_device::pc_aga_videoram_r),this), write8_delegate(FUNC(isa8_aga_device::pc_aga_videoram_w),this));
+	m_isa->install_device(0x3b0, 0x3bf, read8_delegate( FUNC(isa8_aga_device::pc_aga_mda_r), this ), write8_delegate( FUNC(isa8_aga_device::pc_aga_mda_w), this ) );
+	m_isa->install_device(0x3d0, 0x3df, read8_delegate( FUNC(isa8_aga_device::pc_aga_cga_r), this ), write8_delegate( FUNC(isa8_aga_device::pc_aga_cga_w), this ) );
 
 	/* Initialise the cga palette */
 	int i;
@@ -135,7 +123,7 @@ void isa8_aga_device::device_start()
 		}
 	}
 
-	UINT8 *gfx = &memregion("gfx1")->base()[0x8000];
+	uint8_t *gfx = &memregion("gfx1")->base()[0x8000];
 	/* just a plain bit pattern for graphics data generation */
 	for (i = 0; i < 256; i++)
 		gfx[i] = i;
@@ -146,7 +134,7 @@ ROM_START( aga )
 	ROM_LOAD("50146 char d1.0 euro.u16", 0x00000, 0x02000, CRC(1305dcf5) SHA1(aca488a16ae4ff05a1f4d14574379ff49cd48343)) //D1.0
 ROM_END
 
-const rom_entry *isa8_aga_device::device_rom_region() const
+const tiny_rom_entry *isa8_aga_device::device_rom_region() const
 {
 	return ROM_NAME( aga );
 }
@@ -158,17 +146,17 @@ ioport_constructor isa8_aga_device::device_input_ports() const
 
 
 
-const device_type ISA8_AGA_PC200 = &device_creator<isa8_aga_pc200_device>;
+DEFINE_DEVICE_TYPE(ISA8_AGA_PC200, isa8_aga_pc200_device, "aga_pc200", "AGA PC200")
 
 //-------------------------------------------------
 //  isa8_aga_pc200_device - constructor
 //-------------------------------------------------
 
-isa8_aga_pc200_device::isa8_aga_pc200_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-		isa8_aga_device( mconfig, ISA8_AGA_PC200, "AGA PC200", tag, owner, clock, "aga_pc200", __FILE__),
-		m_port8(0),
-		m_portd(0),
-		m_porte(0)
+isa8_aga_pc200_device::isa8_aga_pc200_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	isa8_aga_device(mconfig, ISA8_AGA_PC200, tag, owner, clock),
+	m_port8(0),
+	m_portd(0),
+	m_porte(0)
 {
 }
 
@@ -177,7 +165,7 @@ ROM_START( aga_pc200 )
 	ROM_LOAD("40109.ic159",     0x00000, 0x08000, CRC(a8b67639) SHA1(99663bfb61798526e092205575370c2ad34249a1))
 ROM_END
 
-const rom_entry *isa8_aga_pc200_device::device_rom_region() const
+const tiny_rom_entry *isa8_aga_pc200_device::device_rom_region() const
 {
 	return ROM_NAME( aga_pc200 );
 }
@@ -194,12 +182,12 @@ void isa8_aga_pc200_device::device_start()
 	m_mode = AGA_COLOR;
 	m_mda_chr_gen = memregion("gfx1")->base();
 	m_cga_chr_gen = memregion("gfx1")->base() + 0x1000;
-	m_videoram = std::make_unique<UINT8[]>(0x10000);
+	m_videoram = std::make_unique<uint8_t[]>(0x10000);
 
 	set_isa_device();
-	m_isa->install_memory(0xb0000, 0xbffff, 0, 0, read8_delegate(FUNC(isa8_aga_pc200_device::pc200_videoram_r),this), write8_delegate(FUNC(isa8_aga_pc200_device::pc200_videoram_w),this));
-	m_isa->install_device(0x3b0, 0x3bf, 0, 0, read8_delegate( FUNC(isa8_aga_device::pc_aga_mda_r), this ), write8_delegate( FUNC(isa8_aga_device::pc_aga_mda_w), this ) );
-	m_isa->install_device(0x3d0, 0x3df, 0, 0, read8_delegate( FUNC(isa8_aga_pc200_device::pc200_cga_r), this ), write8_delegate( FUNC(isa8_aga_pc200_device::pc200_cga_w), this ) );
+	m_isa->install_memory(0xb0000, 0xbffff, read8_delegate(FUNC(isa8_aga_pc200_device::pc200_videoram_r),this), write8_delegate(FUNC(isa8_aga_pc200_device::pc200_videoram_w),this));
+	m_isa->install_device(0x3b0, 0x3bf, read8_delegate( FUNC(isa8_aga_device::pc_aga_mda_r), this ), write8_delegate( FUNC(isa8_aga_device::pc_aga_mda_w), this ) );
+	m_isa->install_device(0x3d0, 0x3df, read8_delegate( FUNC(isa8_aga_pc200_device::pc200_cga_r), this ), write8_delegate( FUNC(isa8_aga_pc200_device::pc200_cga_w), this ) );
 
 	/* Initialise the cga palette */
 	int i;
@@ -222,7 +210,7 @@ void isa8_aga_pc200_device::device_start()
 		}
 	}
 
-	UINT8 *gfx = &memregion("gfx1")->base()[0x8000];
+	uint8_t *gfx = &memregion("gfx1")->base()[0x8000];
 	/* just a plain bit pattern for graphics data generation */
 	for (i = 0; i < 256; i++)
 		gfx[i] = i;
@@ -285,7 +273,7 @@ MC6845_UPDATE_ROW( isa8_aga_device::aga_update_row )
 }
 
 
-MACHINE_CONFIG_FRAGMENT( pcvideo_aga )
+MACHINE_CONFIG_MEMBER( isa8_aga_device::device_add_mconfig )
 	MCFG_SCREEN_ADD( AGA_SCREEN_NAME, RASTER )
 	MCFG_SCREEN_RAW_PARAMS( XTAL_14_31818MHz,912,0,640,262,0,200 )
 	MCFG_SCREEN_UPDATE_DEVICE( AGA_MC6845_NAME, mc6845_device, screen_update )
@@ -300,10 +288,6 @@ MACHINE_CONFIG_FRAGMENT( pcvideo_aga )
 	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(isa8_aga_device, vsync_changed))
 MACHINE_CONFIG_END
 
-machine_config_constructor isa8_aga_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( pcvideo_aga );
-}
 
 /*************************************
  *
@@ -315,19 +299,19 @@ machine_config_constructor isa8_aga_device::device_mconfig_additions() const
 MC6845_UPDATE_ROW( isa8_aga_device::mda_text_inten_update_row )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	UINT8 *videoram = m_videoram.get();
-	UINT32  *p = &bitmap.pix32(y);
-	UINT16  chr_base = ( ra & 0x08 ) ? 0x800 | ( ra & 0x07 ) : ra;
+	uint8_t *videoram = m_videoram.get();
+	uint32_t  *p = &bitmap.pix32(y);
+	uint16_t  chr_base = ( ra & 0x08 ) ? 0x800 | ( ra & 0x07 ) : ra;
 	int i;
 
 	if ( y == 0 ) logerror("mda_text_inten_update_row\n");
 	for ( i = 0; i < x_count; i++ ) {
-		UINT16 offset = ( ( ma + i ) << 1 ) & 0x0FFF;
-		UINT8 chr = videoram[ offset ];
-		UINT8 attr = videoram[ offset + 1 ];
-		UINT8 data = m_mda_chr_gen[ chr_base + chr * 8 ];
-		UINT8 fg = ( attr & 0x08 ) ? 3 : 2;
-		UINT8 bg = 0;
+		uint16_t offset = ( ( ma + i ) << 1 ) & 0x0FFF;
+		uint8_t chr = videoram[ offset ];
+		uint8_t attr = videoram[ offset + 1 ];
+		uint8_t data = m_mda_chr_gen[ chr_base + chr * 8 ];
+		uint8_t fg = ( attr & 0x08 ) ? 3 : 2;
+		uint8_t bg = 0;
 
 		if ( ( attr & ~0x88 ) == 0 ) {
 			data = 0x00;
@@ -375,20 +359,20 @@ MC6845_UPDATE_ROW( isa8_aga_device::mda_text_inten_update_row )
 
 MC6845_UPDATE_ROW( isa8_aga_device::mda_text_blink_update_row )
 {
-	UINT8 *videoram = m_videoram.get();
+	uint8_t *videoram = m_videoram.get();
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	UINT32  *p = &bitmap.pix32(y);
-	UINT16  chr_base = ( ra & 0x08 ) ? 0x800 | ( ra & 0x07 ) : ra;
+	uint32_t  *p = &bitmap.pix32(y);
+	uint16_t  chr_base = ( ra & 0x08 ) ? 0x800 | ( ra & 0x07 ) : ra;
 	int i;
 
 	if ( y == 0 ) logerror("mda_text_blink_update_row\n");
 	for ( i = 0; i < x_count; i++ ) {
-		UINT16 offset = ( ( ma + i ) << 1 ) & 0x0FFF;
-		UINT8 chr = videoram[ offset ];
-		UINT8 attr = videoram[ offset + 1 ];
-		UINT8 data = m_mda_chr_gen[ chr_base + chr * 8 ];
-		UINT8 fg = ( attr & 0x08 ) ? 3 : 2;
-		UINT8 bg = 0;
+		uint16_t offset = ( ( ma + i ) << 1 ) & 0x0FFF;
+		uint8_t chr = videoram[ offset ];
+		uint8_t attr = videoram[ offset + 1 ];
+		uint8_t data = m_mda_chr_gen[ chr_base + chr * 8 ];
+		uint8_t fg = ( attr & 0x08 ) ? 3 : 2;
+		uint8_t bg = 0;
 
 		if ( ( attr & ~0x88 ) == 0 ) {
 			data = 0x00;
@@ -437,19 +421,19 @@ MC6845_UPDATE_ROW( isa8_aga_device::mda_text_blink_update_row )
 
 MC6845_UPDATE_ROW( isa8_aga_device::cga_text_inten_update_row )
 {
-	UINT8 *videoram = m_videoram.get();
+	uint8_t *videoram = m_videoram.get();
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	UINT32  *p = &bitmap.pix32(y);
+	uint32_t  *p = &bitmap.pix32(y);
 	int i;
 
 	if ( y == 0 ) logerror("cga_text_inten_update_row\n");
 	for ( i = 0; i < x_count; i++ ) {
-		UINT16 offset = ( ( ma + i ) << 1 ) & 0x3fff;
-		UINT8 chr = videoram[ offset ];
-		UINT8 attr = videoram[ offset +1 ];
-		UINT8 data = m_cga_chr_gen[ chr * 16 + ra ];
-		UINT16 fg = attr & 0x0F;
-		UINT16 bg = ( attr >> 4 ) & 0x07;
+		uint16_t offset = ( ( ma + i ) << 1 ) & 0x3fff;
+		uint8_t chr = videoram[ offset ];
+		uint8_t attr = videoram[ offset +1 ];
+		uint8_t data = m_cga_chr_gen[ chr * 16 + ra ];
+		uint16_t fg = attr & 0x0F;
+		uint16_t bg = ( attr >> 4 ) & 0x07;
 
 		if ( i == cursor_x ) {
 			data = 0xFF;
@@ -469,17 +453,17 @@ MC6845_UPDATE_ROW( isa8_aga_device::cga_text_inten_update_row )
 MC6845_UPDATE_ROW( isa8_aga_device::cga_text_inten_alt_update_row )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	UINT8 *videoram = m_videoram.get();
-	UINT32  *p = &bitmap.pix32(y);
+	uint8_t *videoram = m_videoram.get();
+	uint32_t  *p = &bitmap.pix32(y);
 	int i;
 
 	if ( y == 0 ) logerror("cga_text_inten_alt_update_row\n");
 	for ( i = 0; i < x_count; i++ ) {
-		UINT16 offset = ( ( ma + i ) << 1 ) & 0x3fff;
-		UINT8 chr = videoram[ offset ];
-		UINT8 attr = videoram[ offset +1 ];
-		UINT8 data = m_cga_chr_gen[ chr * 16 + ra ];
-		UINT16 fg = attr & 0x0F;
+		uint16_t offset = ( ( ma + i ) << 1 ) & 0x3fff;
+		uint8_t chr = videoram[ offset ];
+		uint8_t attr = videoram[ offset +1 ];
+		uint8_t data = m_cga_chr_gen[ chr * 16 + ra ];
+		uint16_t fg = attr & 0x0F;
 
 		if ( i == cursor_x ) {
 			data = 0xFF;
@@ -499,17 +483,17 @@ MC6845_UPDATE_ROW( isa8_aga_device::cga_text_inten_alt_update_row )
 MC6845_UPDATE_ROW( isa8_aga_device::cga_text_blink_update_row )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	UINT8 *videoram = m_videoram.get();
-	UINT32  *p = &bitmap.pix32(y);
+	uint8_t *videoram = m_videoram.get();
+	uint32_t  *p = &bitmap.pix32(y);
 	int i;
 
 	for ( i = 0; i < x_count; i++ ) {
-		UINT16 offset = ( ( ma + i ) << 1 ) & 0x3fff;
-		UINT8 chr = videoram[ offset ];
-		UINT8 attr = videoram[ offset +1 ];
-		UINT8 data = m_cga_chr_gen[ chr * 16 + ra ];
-		UINT16 fg = attr & 0x0F;
-		UINT16 bg = (attr >> 4) & 0x07;
+		uint16_t offset = ( ( ma + i ) << 1 ) & 0x3fff;
+		uint8_t chr = videoram[ offset ];
+		uint8_t attr = videoram[ offset +1 ];
+		uint8_t data = m_cga_chr_gen[ chr * 16 + ra ];
+		uint16_t fg = attr & 0x0F;
+		uint16_t bg = (attr >> 4) & 0x07;
 
 		if ( i == cursor_x ) {
 			data = 0xFF;
@@ -533,18 +517,18 @@ MC6845_UPDATE_ROW( isa8_aga_device::cga_text_blink_update_row )
 MC6845_UPDATE_ROW( isa8_aga_device::cga_text_blink_alt_update_row )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	UINT8 *videoram = m_videoram.get();
-	UINT32  *p = &bitmap.pix32(y);
+	uint8_t *videoram = m_videoram.get();
+	uint32_t  *p = &bitmap.pix32(y);
 	int i;
 
 	if ( y == 0 ) logerror("cga_text_blink_alt_update_row\n");
 	for ( i = 0; i < x_count; i++ ) {
-		UINT16 offset = ( ( ma + i ) << 1 ) & 0x3fff;
-		UINT8 chr = videoram[ offset ];
-		UINT8 attr = videoram[ offset +1 ];
-		UINT8 data = m_cga_chr_gen[ chr * 16 + ra ];
-		UINT16 fg = attr & 0x07;
-		UINT16 bg = 0;
+		uint16_t offset = ( ( ma + i ) << 1 ) & 0x3fff;
+		uint8_t chr = videoram[ offset ];
+		uint8_t attr = videoram[ offset +1 ];
+		uint8_t data = m_cga_chr_gen[ chr * 16 + ra ];
+		uint16_t fg = attr & 0x07;
+		uint16_t bg = 0;
 
 		if ( i == cursor_x ) {
 			data = 0xFF;
@@ -569,14 +553,14 @@ MC6845_UPDATE_ROW( isa8_aga_device::cga_text_blink_alt_update_row )
 MC6845_UPDATE_ROW( isa8_aga_device::cga_gfx_4bppl_update_row )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	UINT8 *videoram = m_videoram.get();
-	UINT32  *p = &bitmap.pix32(y);
+	uint8_t *videoram = m_videoram.get();
+	uint32_t  *p = &bitmap.pix32(y);
 	int i;
 
 	if ( y == 0 ) logerror("cga_gfx_4bppl_update_row\n");
 	for ( i = 0; i < x_count; i++ ) {
-		UINT16 offset = ( ( ( ma + i ) << 1 ) & 0x1fff ) | ( ( y & 1 ) << 13 );
-		UINT8 data = videoram[ offset ];
+		uint16_t offset = ( ( ( ma + i ) << 1 ) & 0x1fff ) | ( ( y & 1 ) << 13 );
+		uint8_t data = videoram[ offset ];
 
 		*p = palette[data >> 4]; p++;
 		*p = palette[data >> 4]; p++;
@@ -594,15 +578,15 @@ MC6845_UPDATE_ROW( isa8_aga_device::cga_gfx_4bppl_update_row )
 
 MC6845_UPDATE_ROW( isa8_aga_device::cga_gfx_4bpph_update_row )
 {
-	UINT8 *videoram = m_videoram.get();
+	uint8_t *videoram = m_videoram.get();
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	UINT32  *p = &bitmap.pix32(y);
+	uint32_t  *p = &bitmap.pix32(y);
 	int i;
 
 	if ( y == 0 ) logerror("cga_gfx_4bpph_update_row\n");
 	for ( i = 0; i < x_count; i++ ) {
-		UINT16 offset = ( ( ( ma + i ) << 1 ) & 0x1fff ) | ( ( y & 1 ) << 13 );
-		UINT8 data = videoram[ offset ];
+		uint16_t offset = ( ( ( ma + i ) << 1 ) & 0x1fff ) | ( ( y & 1 ) << 13 );
+		uint8_t data = videoram[ offset ];
 
 		*p = palette[data >> 4]; p++;
 		*p = palette[data >> 4]; p++;
@@ -628,15 +612,15 @@ MC6845_UPDATE_ROW( isa8_aga_device::cga_gfx_4bpph_update_row )
 
 MC6845_UPDATE_ROW( isa8_aga_device::cga_gfx_2bpp_update_row )
 {
-	UINT8 *videoram = m_videoram.get();
+	uint8_t *videoram = m_videoram.get();
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	UINT32  *p = &bitmap.pix32(y);
+	uint32_t  *p = &bitmap.pix32(y);
 	int i;
 
 //  if ( y == 0 ) logerror("cga_gfx_2bpp_update_row\n");
 	for ( i = 0; i < x_count; i++ ) {
-		UINT16 offset = ( ( ( ma + i ) << 1 ) & 0x1fff ) | ( ( y & 1 ) << 13 );
-		UINT8 data = videoram[ offset ];
+		uint16_t offset = ( ( ( ma + i ) << 1 ) & 0x1fff ) | ( ( y & 1 ) << 13 );
+		uint8_t data = videoram[ offset ];
 
 		*p = palette[m_cga_palette_lut_2bpp[ ( data >> 6 ) & 0x03 ]]; p++;
 		*p = palette[m_cga_palette_lut_2bpp[ ( data >> 4 ) & 0x03 ]]; p++;
@@ -654,16 +638,16 @@ MC6845_UPDATE_ROW( isa8_aga_device::cga_gfx_2bpp_update_row )
 
 MC6845_UPDATE_ROW( isa8_aga_device::cga_gfx_1bpp_update_row )
 {
-	UINT8 *videoram = m_videoram.get();
+	uint8_t *videoram = m_videoram.get();
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	UINT32  *p = &bitmap.pix32(y);
-	UINT8   fg = m_cga_color_select & 0x0F;
+	uint32_t  *p = &bitmap.pix32(y);
+	uint8_t   fg = m_cga_color_select & 0x0F;
 	int i;
 
 	if ( y == 0 ) logerror("cga_gfx_1bpp_update_row\n");
 	for ( i = 0; i < x_count; i++ ) {
-		UINT16 offset = ( ( ( ma + i ) << 1 ) & 0x1fff ) | ( ( ra & 1 ) << 13 );
-		UINT8 data = videoram[ offset ];
+		uint16_t offset = ( ( ( ma + i ) << 1 ) & 0x1fff ) | ( ( ra & 1 ) << 13 );
+		uint8_t data = videoram[ offset ];
 
 		*p = palette[( data & 0x80 ) ? fg : 0]; p++;
 		*p = palette[( data & 0x40 ) ? fg : 0]; p++;
@@ -695,7 +679,7 @@ MC6845_UPDATE_ROW( isa8_aga_device::cga_gfx_1bpp_update_row )
 
 READ8_MEMBER ( isa8_aga_device::pc_aga_mda_r )
 {
-	UINT8 data = 0xFF;
+	uint8_t data = 0xFF;
 
 	if ( m_mode == AGA_MONO ) {
 		switch( offset )
@@ -747,7 +731,7 @@ WRITE8_MEMBER ( isa8_aga_device::pc_aga_mda_w )
 
 READ8_MEMBER ( isa8_aga_device::pc_aga_cga_r )
 {
-	UINT8 data = 0xFF;
+	uint8_t data = 0xFF;
 
 	if ( m_mode == AGA_COLOR ) {
 		switch( offset ) {
@@ -985,7 +969,7 @@ WRITE8_MEMBER( isa8_aga_pc200_device::pc200_cga_w )
 
 READ8_MEMBER ( isa8_aga_pc200_device::pc200_cga_r )
 {
-	UINT8 result;
+	uint8_t result;
 
 	switch(offset) {
 	case 8:

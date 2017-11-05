@@ -46,6 +46,7 @@ Notes:
 
 */
 
+#include "emu.h"
 #include "expbox.h"
 
 
@@ -65,7 +66,7 @@ Notes:
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type COMX_EB = &device_creator<comx_eb_device>;
+DEFINE_DEVICE_TYPE(COMX_EB, comx_eb_device, "comx_eb", "COMX-35E Expansion Box")
 
 
 //-------------------------------------------------
@@ -87,17 +88,17 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *comx_eb_device::device_rom_region() const
+const tiny_rom_entry *comx_eb_device::device_rom_region() const
 {
 	return ROM_NAME( comx_eb );
 }
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( comx_eb )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( comx_eb )
+MACHINE_CONFIG_MEMBER( comx_eb_device::device_add_mconfig )
 	MCFG_COMX_EXPANSION_SLOT_ADD(SLOT1_TAG, comx_expansion_cards, "fd")
 	MCFG_COMX_EXPANSION_SLOT_IRQ_CALLBACK(WRITELINE(comx_eb_device, slot1_irq_w))
 	MCFG_COMX_EXPANSION_SLOT_ADD(SLOT2_TAG, comx_expansion_cards, "clm")
@@ -109,17 +110,6 @@ static MACHINE_CONFIG_FRAGMENT( comx_eb )
 MACHINE_CONFIG_END
 
 
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor comx_eb_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( comx_eb );
-}
-
-
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -129,8 +119,8 @@ machine_config_constructor comx_eb_device::device_mconfig_additions() const
 //  comx_eb_device - constructor
 //-------------------------------------------------
 
-comx_eb_device::comx_eb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, COMX_EB, "COMX-35E Expansion Box", tag, owner, clock, "comx_eb", __FILE__),
+comx_eb_device::comx_eb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, COMX_EB, tag, owner, clock),
 	device_comx_expansion_card_interface(mconfig, *this),
 	m_rom(*this, "e000"),
 	m_select(0)
@@ -213,9 +203,9 @@ void comx_eb_device::comx_q_w(int state)
 //  comx_mrd_r - memory read
 //-------------------------------------------------
 
-UINT8 comx_eb_device::comx_mrd_r(address_space &space, offs_t offset, int *extrom)
+uint8_t comx_eb_device::comx_mrd_r(address_space &space, offs_t offset, int *extrom)
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	if (offset >= 0x1000 && offset < 0x1800)
 	{
@@ -245,7 +235,7 @@ UINT8 comx_eb_device::comx_mrd_r(address_space &space, offs_t offset, int *extro
 //  comx_mwr_w - memory write
 //-------------------------------------------------
 
-void comx_eb_device::comx_mwr_w(address_space &space, offs_t offset, UINT8 data)
+void comx_eb_device::comx_mwr_w(address_space &space, offs_t offset, uint8_t data)
 {
 	for (int slot = 0; slot < MAX_EB_SLOTS; slot++)
 	{
@@ -261,9 +251,9 @@ void comx_eb_device::comx_mwr_w(address_space &space, offs_t offset, UINT8 data)
 //  comx_io_r - I/O read
 //-------------------------------------------------
 
-UINT8 comx_eb_device::comx_io_r(address_space &space, offs_t offset)
+uint8_t comx_eb_device::comx_io_r(address_space &space, offs_t offset)
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	for (int slot = 0; slot < MAX_EB_SLOTS; slot++)
 	{
@@ -281,7 +271,7 @@ UINT8 comx_eb_device::comx_io_r(address_space &space, offs_t offset)
 //  comx_io_w - I/O write
 //-------------------------------------------------
 
-void comx_eb_device::comx_io_w(address_space &space, offs_t offset, UINT8 data)
+void comx_eb_device::comx_io_w(address_space &space, offs_t offset, uint8_t data)
 {
 	if (offset == 1 && !(BIT(data, 0)))
 	{

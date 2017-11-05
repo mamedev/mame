@@ -6,6 +6,7 @@
 //
 //============================================================
 
+#include "emu.h"
 #include "disasmbasewininfo.h"
 
 #include "debugviewinfo.h"
@@ -39,7 +40,7 @@ disasmbasewin_info::disasmbasewin_info(debugger_windows_interface &debugger, boo
 	AppendMenu(optionsmenu, MF_DISABLED | MF_SEPARATOR, 0, TEXT(""));
 	AppendMenu(optionsmenu, MF_ENABLED, ID_SHOW_RAW, TEXT("Raw opcodes\tCtrl+R"));
 	AppendMenu(optionsmenu, MF_ENABLED, ID_SHOW_ENCRYPTED, TEXT("Encrypted opcodes\tCtrl+E"));
-	AppendMenu(optionsmenu, MF_ENABLED, ID_SHOW_COMMENTS, TEXT("Comments\tCtrl+M"));
+	AppendMenu(optionsmenu, MF_ENABLED, ID_SHOW_COMMENTS, TEXT("Comments\tCtrl+N"));
 	AppendMenu(GetMenu(window()), MF_ENABLED | MF_POPUP, (UINT_PTR)optionsmenu, TEXT("Options"));
 
 	// set up the view to track the initial expression
@@ -165,7 +166,7 @@ bool disasmbasewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 			{
 				offs_t const address = dasmview->selected_address();
 				device_debug *const debug = dasmview->source_device()->debug();
-				INT32 bpindex = -1;
+				int32_t bpindex = -1;
 
 				// first find an existing breakpoint at this address
 				for (device_debug::breakpoint *bp = debug->breakpoint_first(); bp != nullptr; bp = bp->next())
@@ -183,12 +184,12 @@ bool disasmbasewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 					if (bpindex == -1)
 					{
 						bpindex = debug->breakpoint_set(address, nullptr, nullptr);
-						debug_console_printf(machine(), "Breakpoint %X set\n", bpindex);
+						machine().debugger().console().printf("Breakpoint %X set\n", bpindex);
 					}
 					else
 					{
 						debug->breakpoint_clear(bpindex);
-						debug_console_printf(machine(), "Breakpoint %X cleared\n", bpindex);
+						machine().debugger().console().printf("Breakpoint %X cleared\n", bpindex);
 					}
 					machine().debug_view().update_all();
 					machine().debugger().refresh_display();
@@ -200,7 +201,7 @@ bool disasmbasewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 						command = string_format("bpset 0x%X", address);
 					else
 						command = string_format("bpclear 0x%X", bpindex);
-					debug_console_execute_command(machine(), command.c_str(), 1);
+					machine().debugger().console().execute_command(command.c_str(), true);
 				}
 			}
 			return true;
@@ -222,15 +223,15 @@ bool disasmbasewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 					if (!is_main_console())
 					{
 						debug->breakpoint_enable(bp->index(), !bp->enabled());
-						debug_console_printf(machine(), "Breakpoint %X %s\n", (UINT32)bp->index(), bp->enabled() ? "enabled" : "disabled");
+						machine().debugger().console().printf("Breakpoint %X %s\n", (uint32_t)bp->index(), bp->enabled() ? "enabled" : "disabled");
 						machine().debug_view().update_all();
 						machine().debugger().refresh_display();
 					}
 					else if (dasmview->source_is_visible_cpu())
 					{
 						std::string command;
-						command = string_format(bp->enabled() ? "bpdisable 0x%X" : "bpenable 0x%X", (UINT32)bp->index());
-						debug_console_execute_command(machine(), command.c_str(), 1);
+						command = string_format(bp->enabled() ? "bpdisable 0x%X" : "bpenable 0x%X", (uint32_t)bp->index());
+						machine().debugger().console().execute_command(command.c_str(), true);
 					}
 				}
 			}
@@ -244,7 +245,7 @@ bool disasmbasewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 				{
 					std::string command;
 					command = string_format("go 0x%X", address);
-					debug_console_execute_command(machine(), command.c_str(), 1);
+					machine().debugger().console().execute_command(command.c_str(), true);
 				}
 				else
 				{

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2016 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
@@ -9,7 +9,7 @@
 
 #import <Cocoa/Cocoa.h>
 
-#include <bgfx/bgfxplatform.h>
+#include <bgfx/platform.h>
 
 #include <bx/uint32_t.h>
 #include <bx/thread.h>
@@ -46,7 +46,19 @@
 
 namespace entry
 {
-	static WindowHandle s_defaultWindow = { 0 };	// TODO: Add support for more windows
+	///
+	inline void osxSetNSWindow(void* _window, void* _nsgl = NULL)
+	{
+		bgfx::PlatformData pd;
+		pd.ndt          = NULL;
+		pd.nwh          = _window;
+		pd.context      = _nsgl;
+		pd.backBuffer   = NULL;
+		pd.backBufferDS = NULL;
+		bgfx::setPlatformData(pd);
+	}
+
+	static WindowHandle s_defaultWindow = { 0 };
 	static uint8_t s_translateKey[256];
 
 	struct MainThreadEntry
@@ -271,7 +283,6 @@ namespace entry
 
 					case NSLeftMouseDown:
 					{
-						// TODO: remove!
 						// Command + Left Mouse Button acts as middle! This just a temporary solution!
 						// This is because the average OSX user doesn't have middle mouse click.
 						MouseButton::Enum mb = ([event modifierFlags] & NSCommandKeyMask) ? MouseButton::Middle : MouseButton::Left;
@@ -460,7 +471,7 @@ namespace entry
 			m_window[0] = window;
 			m_windowFrame = [window frame];
 
-			bgfx::osxSetNSWindow(window);
+			osxSetNSWindow(window);
 
 			MainThreadEntry mte;
 			mte.m_argc = _argc;
@@ -474,9 +485,12 @@ namespace entry
 
 			while (!(m_exit = [dg applicationHasTerminated]) )
 			{
-				if (bgfx::RenderFrame::Exiting == bgfx::renderFrame() )
+				@autoreleasepool
 				{
-					break;
+					if (bgfx::RenderFrame::Exiting == bgfx::renderFrame() )
+					{
+						break;
+					}
 				}
 
 				while (dispatchEvent(peekEvent() ) )

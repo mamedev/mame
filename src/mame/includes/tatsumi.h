@@ -1,7 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail
+
 #include "sound/okim6295.h"
 #include "cpu/m68000/m68000.h"
+#include "machine/cxd1095.h"
+#include "machine/gen_latch.h"
 
 class tatsumi_state : public driver_device
 {
@@ -15,6 +18,8 @@ public:
 		m_oki(*this, "oki"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch"),
+		m_io(*this, {"io1", "io2"}),
 		m_videoram(*this, "videoram"),
 		m_cyclwarr_cpua_ram(*this, "cw_cpua_ram"),
 		m_cyclwarr_cpub_ram(*this, "cw_cpub_ram"),
@@ -41,37 +46,39 @@ public:
 	required_device<okim6295_device> m_oki;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	optional_device<generic_latch_8_device> m_soundlatch;
+	optional_device_array<cxd1095_device, 2> m_io;
 
-	optional_shared_ptr<UINT16> m_videoram;
-	optional_shared_ptr<UINT16> m_cyclwarr_cpua_ram;
-	optional_shared_ptr<UINT16> m_cyclwarr_cpub_ram;
-	optional_shared_ptr<UINT16> m_apache3_g_ram;
-	optional_shared_ptr<UINT16> m_roundup5_d0000_ram;
-	optional_shared_ptr<UINT16> m_roundup5_e0000_ram;
-	optional_shared_ptr<UINT16> m_roundup5_unknown0;
-	optional_shared_ptr<UINT16> m_roundup5_unknown1;
-	optional_shared_ptr<UINT16> m_roundup5_unknown2;
-	optional_shared_ptr<UINT16> m_68k_ram;
-	optional_shared_ptr<UINT8> m_apache3_z80_ram;
-	required_shared_ptr<UINT16> m_sprite_control_ram;
-	optional_shared_ptr<UINT16> m_cyclwarr_videoram0;
-	optional_shared_ptr<UINT16> m_cyclwarr_videoram1;
-	optional_shared_ptr<UINT16> m_roundup_r_ram;
-	optional_shared_ptr<UINT16> m_roundup_p_ram;
-	optional_shared_ptr<UINT16> m_roundup_l_ram;
-	required_shared_ptr<UINT16> m_spriteram;
+	optional_shared_ptr<uint16_t> m_videoram;
+	optional_shared_ptr<uint16_t> m_cyclwarr_cpua_ram;
+	optional_shared_ptr<uint16_t> m_cyclwarr_cpub_ram;
+	optional_shared_ptr<uint16_t> m_apache3_g_ram;
+	optional_shared_ptr<uint16_t> m_roundup5_d0000_ram;
+	optional_shared_ptr<uint16_t> m_roundup5_e0000_ram;
+	optional_shared_ptr<uint16_t> m_roundup5_unknown0;
+	optional_shared_ptr<uint16_t> m_roundup5_unknown1;
+	optional_shared_ptr<uint16_t> m_roundup5_unknown2;
+	optional_shared_ptr<uint16_t> m_68k_ram;
+	optional_shared_ptr<uint8_t> m_apache3_z80_ram;
+	required_shared_ptr<uint16_t> m_sprite_control_ram;
+	optional_shared_ptr<uint16_t> m_cyclwarr_videoram0;
+	optional_shared_ptr<uint16_t> m_cyclwarr_videoram1;
+	optional_shared_ptr<uint16_t> m_roundup_r_ram;
+	optional_shared_ptr<uint16_t> m_roundup_p_ram;
+	optional_shared_ptr<uint16_t> m_roundup_l_ram;
+	required_shared_ptr<uint16_t> m_spriteram;
 
-	UINT16 m_bigfight_a20000[8];
-	UINT16 m_bigfight_a60000[2];
-	UINT16 m_bigfight_a40000[2];
-	UINT8 *m_rom_sprite_lookup1;
-	UINT8 *m_rom_sprite_lookup2;
-	UINT8 *m_rom_clut0;
-	UINT8 *m_rom_clut1;
-	UINT16 m_control_word;
-	UINT16 m_apache3_rotate_ctrl[12];
-	UINT16 m_last_control;
-	UINT8 m_apache3_adc;
+	uint16_t m_bigfight_a20000[8];
+	uint16_t m_bigfight_a60000[2];
+	uint16_t m_bigfight_a40000[2];
+	uint8_t *m_rom_sprite_lookup1;
+	uint8_t *m_rom_sprite_lookup2;
+	uint8_t *m_rom_clut0;
+	uint8_t *m_rom_clut1;
+	uint16_t m_control_word;
+	uint16_t m_apache3_rotate_ctrl[12];
+	uint8_t m_last_control;
+	uint8_t m_apache3_adc;
 	int m_apache3_rot_idx;
 	tilemap_t *m_tx_layer;
 	tilemap_t *m_layer0;
@@ -79,19 +86,21 @@ public:
 	tilemap_t *m_layer2;
 	tilemap_t *m_layer3;
 	bitmap_rgb32 m_temp_bitmap;
-	std::unique_ptr<UINT8[]> m_apache3_road_x_ram;
-	UINT8 m_apache3_road_z;
-	std::unique_ptr<UINT16[]> m_roundup5_vram;
-	UINT16 m_bigfight_bank;
-	UINT16 m_bigfight_last_bank;
-	UINT8 m_roundupt_crt_selected_reg;
-	UINT8 m_roundupt_crt_reg[64];
-	std::unique_ptr<UINT8[]> m_shadow_pen_array;
+	std::unique_ptr<uint8_t[]> m_apache3_road_x_ram;
+	uint8_t m_apache3_road_z;
+	std::unique_ptr<uint16_t[]> m_roundup5_vram;
+	uint16_t m_bigfight_bank;
+	uint16_t m_bigfight_last_bank;
+	uint8_t m_roundupt_crt_selected_reg;
+	uint8_t m_roundupt_crt_reg[64];
+	std::unique_ptr<uint8_t[]> m_shadow_pen_array;
 	DECLARE_READ16_MEMBER(cyclwarr_sprite_r);
 	DECLARE_WRITE16_MEMBER(cyclwarr_sprite_w);
 	DECLARE_WRITE16_MEMBER(bigfight_a20000_w);
 	DECLARE_WRITE16_MEMBER(bigfight_a40000_w);
 	DECLARE_WRITE16_MEMBER(bigfight_a60000_w);
+	DECLARE_WRITE16_MEMBER(io1_byte_smear_w);
+	DECLARE_WRITE16_MEMBER(io2_byte_smear_w);
 	DECLARE_WRITE16_MEMBER(cyclwarr_sound_w);
 	DECLARE_READ16_MEMBER(apache3_bank_r);
 	DECLARE_WRITE16_MEMBER(apache3_bank_w);
@@ -108,8 +117,7 @@ public:
 	DECLARE_WRITE16_MEMBER(roundup5_control_w);
 	DECLARE_WRITE16_MEMBER(roundup5_d0000_w);
 	DECLARE_WRITE16_MEMBER(roundup5_e0000_w);
-	DECLARE_READ16_MEMBER(cyclwarr_control_r);
-	DECLARE_WRITE16_MEMBER(cyclwarr_control_w);
+	DECLARE_WRITE8_MEMBER(cyclwarr_control_w);
 	DECLARE_READ16_MEMBER(tatsumi_v30_68000_r);
 	DECLARE_WRITE16_MEMBER(tatsumi_v30_68000_w);
 	DECLARE_WRITE16_MEMBER(tatsumi_sprite_control_w);
@@ -134,10 +142,10 @@ public:
 	DECLARE_VIDEO_START(roundup5);
 	DECLARE_VIDEO_START(cyclwarr);
 	DECLARE_VIDEO_START(bigfight);
-	UINT32 screen_update_apache3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_roundup5(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_cyclwarr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_bigfight(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_apache3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_roundup5(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_cyclwarr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_bigfight(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(roundup5_interrupt);
 	DECLARE_READ8_MEMBER(tatsumi_hack_ym2151_r);
 	DECLARE_READ8_MEMBER(tatsumi_hack_oki_r);

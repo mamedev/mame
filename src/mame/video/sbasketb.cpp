@@ -30,7 +30,7 @@
 
 PALETTE_INIT_MEMBER(sbasketb_state, sbasketb)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	static const int resistances[4] = { 2000, 1000, 470, 220 };
 	double rweights[4], gweights[4], bweights[4];
 	int i;
@@ -77,7 +77,7 @@ PALETTE_INIT_MEMBER(sbasketb_state, sbasketb)
 	/* characters use colors 0xf0-0xff */
 	for (i = 0; i < 0x100; i++)
 	{
-		UINT8 ctabentry = (color_prom[i] & 0x0f) | 0xf0;
+		uint8_t ctabentry = (color_prom[i] & 0x0f) | 0xf0;
 		palette.set_pen_indirect(i, ctabentry);
 	}
 
@@ -88,7 +88,7 @@ PALETTE_INIT_MEMBER(sbasketb_state, sbasketb)
 
 		for (j = 0; j < 0x10; j++)
 		{
-			UINT8 ctabentry = (j << 4) | (color_prom[i + 0x100] & 0x0f);
+			uint8_t ctabentry = (j << 4) | (color_prom[i + 0x100] & 0x0f);
 			palette.set_pen_indirect(0x100 + ((j << 8) | i), ctabentry);
 		}
 	}
@@ -106,13 +106,15 @@ WRITE8_MEMBER(sbasketb_state::sbasketb_colorram_w)
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(sbasketb_state::sbasketb_flipscreen_w)
+WRITE_LINE_MEMBER(sbasketb_state::flipscreen_w)
 {
-	if (flip_screen() != data)
-	{
-		flip_screen_set(data);
-		machine().tilemap().mark_all_dirty();
-	}
+	flip_screen_set(state);
+	machine().tilemap().mark_all_dirty();
+}
+
+WRITE_LINE_MEMBER(sbasketb_state::spriteram_select_w)
+{
+	m_spriteram_select = state;
 }
 
 TILE_GET_INFO_MEMBER(sbasketb_state::get_bg_tile_info)
@@ -126,14 +128,16 @@ TILE_GET_INFO_MEMBER(sbasketb_state::get_bg_tile_info)
 
 void sbasketb_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(sbasketb_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(sbasketb_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_bg_tilemap->set_scroll_cols(32);
+
+	save_item(NAME(m_spriteram_select));
 }
 
 void sbasketb_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	UINT8 *spriteram = m_spriteram;
-	int offs = (*m_spriteram_select & 0x01) * 0x100;
+	uint8_t *spriteram = m_spriteram;
+	int offs = m_spriteram_select ? 0x100 : 0;
 	int i;
 
 	for (i = 0; i < 64; i++, offs += 4)
@@ -165,7 +169,7 @@ void sbasketb_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 	}
 }
 
-UINT32 sbasketb_state::screen_update_sbasketb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t sbasketb_state::screen_update_sbasketb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int col;
 

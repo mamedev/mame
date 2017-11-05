@@ -20,7 +20,7 @@
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(superqix_state::pb_get_bg_tile_info)
+TILE_GET_INFO_MEMBER(hotsmash_state::pb_get_bg_tile_info)
 {
 	int attr = m_videoram[tile_index + 0x400];
 	int code = m_videoram[tile_index] + 256 * (attr & 0x7);
@@ -28,7 +28,7 @@ TILE_GET_INFO_MEMBER(superqix_state::pb_get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
-TILE_GET_INFO_MEMBER(superqix_state::sqix_get_bg_tile_info)
+TILE_GET_INFO_MEMBER(superqix_state_base::sqix_get_bg_tile_info)
 {
 	int attr = m_videoram[tile_index + 0x400];
 	int bank = (attr & 0x04) ? 0 : 1;
@@ -49,32 +49,30 @@ TILE_GET_INFO_MEMBER(superqix_state::sqix_get_bg_tile_info)
 
 ***************************************************************************/
 
-VIDEO_START_MEMBER(superqix_state,pbillian)
+VIDEO_START_MEMBER(hotsmash_state, pbillian)
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(superqix_state::pb_get_bg_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8,32,32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(hotsmash_state::pb_get_bg_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8,32,32);
 }
 
-VIDEO_START_MEMBER(superqix_state,superqix)
+VIDEO_START_MEMBER(superqix_state_base, superqix)
 {
 	m_fg_bitmap[0] = std::make_unique<bitmap_ind16>(256, 256);
 	m_fg_bitmap[1] = std::make_unique<bitmap_ind16>(256, 256);
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(superqix_state::sqix_get_bg_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(superqix_state_base::sqix_get_bg_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
 
 	m_bg_tilemap->set_transmask(0,0xffff,0x0000); /* split type 0 is totally transparent in front half */
 	m_bg_tilemap->set_transmask(1,0x0001,0xfffe); /* split type 1 has pen 0 transparent in front half */
 
-	save_item(NAME(m_gfxbank));
-	save_item(NAME(m_show_bitmap));
 	save_item(NAME(*m_fg_bitmap[0]));
 	save_item(NAME(*m_fg_bitmap[1]));
 }
 
-PALETTE_DECODER_MEMBER( superqix_state, BBGGRRII )
+PALETTE_DECODER_MEMBER( superqix_state_base, BBGGRRII )
 {
-	UINT8 i = raw & 3;
-	UINT8 r = (raw >> 0) & 0x0c;
-	UINT8 g = (raw >> 2) & 0x0c;
-	UINT8 b = (raw >> 4) & 0x0c;
+	uint8_t i = raw & 3;
+	uint8_t r = (raw >> 0) & 0x0c;
+	uint8_t g = (raw >> 2) & 0x0c;
+	uint8_t b = (raw >> 4) & 0x0c;
 
 	return rgb_t(pal4bit(r | i), pal4bit(g | i), pal4bit(b | i));
 }
@@ -86,13 +84,13 @@ PALETTE_DECODER_MEMBER( superqix_state, BBGGRRII )
 
 ***************************************************************************/
 
-WRITE8_MEMBER(superqix_state::superqix_videoram_w)
+WRITE8_MEMBER(superqix_state_base::superqix_videoram_w)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_MEMBER(superqix_state::superqix_bitmapram_w)
+WRITE8_MEMBER(superqix_state_base::superqix_bitmapram_w)
 {
 	if (m_bitmapram[offset] != data)
 	{
@@ -106,7 +104,7 @@ WRITE8_MEMBER(superqix_state::superqix_bitmapram_w)
 	}
 }
 
-WRITE8_MEMBER(superqix_state::superqix_bitmapram2_w)
+WRITE8_MEMBER(superqix_state_base::superqix_bitmapram2_w)
 {
 	if (data != m_bitmapram2[offset])
 	{
@@ -120,7 +118,7 @@ WRITE8_MEMBER(superqix_state::superqix_bitmapram2_w)
 	}
 }
 
-WRITE8_MEMBER(superqix_state::pbillian_0410_w)
+WRITE8_MEMBER(hotsmash_state::pbillian_0410_w)
 {
 	/*
 	 -------0  ? [not used]
@@ -131,17 +129,26 @@ WRITE8_MEMBER(superqix_state::pbillian_0410_w)
 	 --5-----  flip screen
 	*/
 
-	machine().bookkeeping().coin_counter_w(0,data & 0x02);
-	machine().bookkeeping().coin_counter_w(1,data & 0x04);
+	if (data&0xc1) logerror("%04x: pbillian_0410_w with invalid bits: %02x\n",space.device().safe_pc(),data);
+	machine().bookkeeping().coin_counter_w(0,BIT(data,1));
+	machine().bookkeeping().coin_counter_w(1,BIT(data,2));
 
-	membank("bank1")->set_entry((data & 0x08) >> 3);
+	membank("bank1")->set_entry(BIT(data,3));
 
-	m_nmi_mask = data & 0x10;
-	flip_screen_set(data & 0x20);
+	m_nmi_mask = BIT(data,4);
+	if (!(m_nmi_mask)) m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+	flip_screen_set(BIT(data,5));
 }
 
-WRITE8_MEMBER(superqix_state::superqix_0410_w)
+WRITE8_MEMBER(superqix_state_base::superqix_0410_w)
 {
+	/*
+	 ------10  tile bank
+	 -----2--  bitmap page select
+	 ----3---  nmi enable/disable
+	 --54----  rom bank
+	*/
+	if (data&0xc0) logerror("%04x: superqix_0410_w with invalid high bits: %02x\n",space.device().safe_pc(),data);
 	/* bits 0-1 select the tile bank */
 	if (m_gfxbank != (data & 0x03))
 	{
@@ -150,10 +157,11 @@ WRITE8_MEMBER(superqix_state::superqix_0410_w)
 	}
 
 	/* bit 2 selects which of the two bitmaps to display (for 2 players game) */
-	m_show_bitmap = (data & 0x04) >> 2;
+	m_show_bitmap = BIT(data,2);
 
 	/* bit 3 enables NMI */
-	m_nmi_mask = data & 0x08;
+	m_nmi_mask = BIT(data,3);
+	//if (!(m_nmi_mask)) m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE); // test for later, could this explain the need for 4 NMIs per frame instead of one? Is the game manually retriggering NMI using the mask register, several times during the vblank period?
 
 	/* bits 4-5 control ROM bank */
 	membank("bank1")->set_entry((data & 0x30) >> 4);
@@ -167,9 +175,9 @@ WRITE8_MEMBER(superqix_state::superqix_0410_w)
 
 ***************************************************************************/
 
-void superqix_state::pbillian_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect )
+void hotsmash_state::pbillian_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	UINT8 *spriteram = m_spriteram;
+	uint8_t *spriteram = m_spriteram;
 	int offs;
 
 	for (offs = 0; offs < m_spriteram.bytes(); offs += 4)
@@ -194,9 +202,9 @@ void superqix_state::pbillian_draw_sprites(bitmap_ind16 &bitmap, const rectangle
 	}
 }
 
-void superqix_state::superqix_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
+void superqix_state_base::superqix_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
-	UINT8 *spriteram = m_spriteram;
+	uint8_t *spriteram = m_spriteram;
 	int offs;
 
 	for (offs = 0; offs < m_spriteram.bytes(); offs += 4)
@@ -225,7 +233,7 @@ void superqix_state::superqix_draw_sprites(bitmap_ind16 &bitmap,const rectangle 
 	}
 }
 
-UINT32 superqix_state::screen_update_pbillian(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t hotsmash_state::screen_update_pbillian(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	pbillian_draw_sprites(bitmap,cliprect);
@@ -233,7 +241,7 @@ UINT32 superqix_state::screen_update_pbillian(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-UINT32 superqix_state::screen_update_superqix(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t superqix_state_base::screen_update_superqix(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
 	copybitmap_trans(bitmap,*m_fg_bitmap[m_show_bitmap],flip_screen(),flip_screen(),0,0,cliprect,0);

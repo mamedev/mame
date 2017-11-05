@@ -9,9 +9,11 @@ To Do: add filters
 ***************************************************************************/
 
 #include "emu.h"
-#include "sound/discrete.h"
-#include "machine/6821pia.h"
 #include "includes/spiders.h"
+
+#include "machine/6821pia.h"
+#include "sound/discrete.h"
+#include "speaker.h"
 
 
 /* Discrete Sound Input Nodes */
@@ -203,7 +205,7 @@ WRITE8_MEMBER(spiders_state::spiders_audio_ctrl_w)
 }
 
 
-MACHINE_CONFIG_FRAGMENT( spiders_audio )
+MACHINE_CONFIG_START( spiders_audio )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("discrete", DISCRETE, 0)

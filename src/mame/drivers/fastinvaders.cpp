@@ -11,12 +11,14 @@ http://www.citylan.it/wiki/index.php/Fast_Invaders_%288275_version%29
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/i8085/i8085.h"
 
+#include "cpu/i8085/i8085.h"
+#include "machine/i8257.h"
+#include "machine/pic8259.h"
+#include "machine/timer.h"
 #include "video/i8275.h"
 #include "video/mc6845.h"
-#include "machine/pic8259.h"
-#include "machine/i8257.h"
+#include "screen.h"
 
 
 class fastinvaders_state : public driver_device
@@ -35,38 +37,38 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
-	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<uint8_t> m_videoram;
 
 	optional_device<i8275_device> m_crtc8275;
 	optional_device<mc6845_device> m_crtc6845;
 	required_device<pic8259_device> m_pic8259;
 	required_device<i8257_device> m_dma8257;
 
-	UINT8 m_rest55;
-	UINT8 m_rest65;
-	UINT8 m_trap;
-	UINT8 m_ar;
-	UINT8 m_av;
-	UINT8 m_prom[256];
-	UINT8 m_riga_sup;
-	UINT8 m_scudi;
-	UINT8 m_cannone;
-	UINT8 m_riga_inf;
+	uint8_t m_rest55;
+	uint8_t m_rest65;
+	uint8_t m_trap;
+	uint8_t m_ar;
+	uint8_t m_av;
+	uint8_t m_prom[256];
+	uint8_t m_riga_sup;
+	uint8_t m_scudi;
+	uint8_t m_cannone;
+	uint8_t m_riga_inf;
 
-	UINT8 m_irq0;
-	UINT8 m_irq1;
-	UINT8 m_irq2;
-	UINT8 m_irq3;
-	UINT8 m_irq4;
-	UINT8 m_irq5;
-	UINT8 m_irq6;
-	UINT8 m_irq7;
+	uint8_t m_irq0;
+	uint8_t m_irq1;
+	uint8_t m_irq2;
+	uint8_t m_irq3;
+	uint8_t m_irq4;
+	uint8_t m_irq5;
+	uint8_t m_irq6;
+	uint8_t m_irq7;
 
 
-	UINT8 m_start2_value;
-	UINT8 m_dma1;
-	UINT8 m_io_40;
-	UINT8 m_hsync;
+	uint8_t m_start2_value;
+	uint8_t m_dma1;
+	uint8_t m_io_40;
+	uint8_t m_hsync;
 
 	DECLARE_WRITE8_MEMBER(io_40_w);
 
@@ -106,7 +108,7 @@ public:
 	DECLARE_WRITE8_MEMBER(memory_write_byte);
 	DECLARE_WRITE8_MEMBER(dark_1_clr);
 	DECLARE_WRITE8_MEMBER(dark_2_clr);
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 
 	DECLARE_DRIVER_INIT(fi6845);
@@ -205,7 +207,7 @@ void fastinvaders_state::video_start()
 {
 }
 
-UINT32 fastinvaders_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t fastinvaders_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	gfx_element *gfx = m_gfxdecode->gfx(0);
 
@@ -217,7 +219,7 @@ UINT32 fastinvaders_state::screen_update(screen_device &screen, bitmap_ind16 &bi
 	{
 		for (int x = 0;x < 40;x++)
 		{
-			UINT8 tile = m_videoram[count];
+			uint8_t tile = m_videoram[count];
 
 
 			gfx->transpen(
@@ -253,7 +255,7 @@ logerror("Audio write &02X\n",data);
 
 READ8_MEMBER(fastinvaders_state::io_60_r)
 {
-	UINT8 tmp=0;
+	uint8_t tmp=0;
 	//0x60 ds6 input bit 0 DX or SX
 	//               bit 1 DX or SX
 //               bit 2-7 dip switch
@@ -351,7 +353,7 @@ WRITE8_MEMBER(fastinvaders_state::io_f0_w)
 
 READ_LINE_MEMBER(fastinvaders_state::sid_read)
 {
-	UINT8 tmp= m_start2_value ? ASSERT_LINE : CLEAR_LINE;
+	uint8_t tmp= m_start2_value ? ASSERT_LINE : CLEAR_LINE;
 	m_start2_value=0;
 	return tmp;
 }
@@ -629,7 +631,7 @@ static GFXDECODE_START( fastinvaders )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 1 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( fastinvaders, fastinvaders_state )
+static MACHINE_CONFIG_START( fastinvaders )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8085A, 6144100/2 ) // 6144100 Xtal /2 internaly
@@ -640,7 +642,8 @@ static MACHINE_CONFIG_START( fastinvaders, fastinvaders_state )
 MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
 MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", fastinvaders_state, scanline_timer, "screen", 0, 1)
 
-	MCFG_PIC8259_ADD( "pic8259", INPUTLINE("maincpu", 0), VCC, NOOP)
+	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
 
 	MCFG_DEVICE_ADD("dma8257", I8257, 6144100)
 	MCFG_I8257_IN_MEMR_CB(READ8(fastinvaders_state, memory_read_byte))
@@ -693,7 +696,7 @@ MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER(fastinvaders_state, fi6845)
 {
-const UINT8 *prom = memregion("prom")->base();
+const uint8_t *prom = memregion("prom")->base();
 	int i;
 	for (i=0;i<256;i++){
 		m_prom[i]=prom[i];
@@ -776,6 +779,6 @@ ROM_START( fi6845 )
 	ROM_LOAD( "93427.bin",     0x0000, 0x0100, CRC(f59c8573) SHA1(5aed4866abe1690fd0f088af1cfd99b3c85afe9a) )
 ROM_END
 
-/*   YEAR  NAME    PARENT   MACHINE             INPUT       STATE          INIT    ROT     COMPANY              FULLNAME                                    FLAGS*/
+//   YEAR   NAME    PARENT  MACHINE            INPUT         STATE               INIT    ROT     COMPANY       FULLNAME                        FLAGS
 GAME( 1979, fi6845, 0,      fastinvaders_6845, fastinvaders, fastinvaders_state, fi6845, ROT270, "Fiberglass", "Fast Invaders (6845 version)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 1979, fi8275, fi6845, fastinvaders_8275, fastinvaders, fastinvaders_state,fi6845,     ROT270, "Fiberglass", "Fast Invaders (8275 version)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1979, fi8275, fi6845, fastinvaders_8275, fastinvaders, fastinvaders_state, fi6845, ROT270, "Fiberglass", "Fast Invaders (8275 version)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

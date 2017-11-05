@@ -17,12 +17,12 @@
 
 **********************************************************************/
 
+#ifndef MAME_MACHINE_E0516_H
+#define MAME_MACHINE_E0516_H
+
 #pragma once
 
-#ifndef __E0516__
-#define __E0516__
-
-#include "emu.h"
+#include "dirtc.h"
 
 
 
@@ -41,12 +41,11 @@
 
 // ======================> e0516_device
 
-class e0516_device :  public device_t,
-						public device_rtc_interface
+class e0516_device : public device_t, public device_rtc_interface
 {
 public:
 	// construction/destruction
-	e0516_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	e0516_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_WRITE_LINE_MEMBER( cs_w );
 	DECLARE_WRITE_LINE_MEMBER( clk_w );
@@ -56,8 +55,10 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+	// device_rtc_interface overrides
+	virtual void rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second) override;
 
 private:
 	int m_cs;                       // chip select
@@ -75,8 +76,6 @@ private:
 
 
 // device type definition
-extern const device_type E0516;
+DECLARE_DEVICE_TYPE(E0516, e0516_device)
 
-
-
-#endif
+#endif // MAME_MACHINE_E0516_H

@@ -8,6 +8,7 @@ Namco System 86 Video Hardware
 
 #include "emu.h"
 #include "includes/namcos86.h"
+#include "screen.h"
 
 
 /***************************************************************************
@@ -36,7 +37,7 @@ Namco System 86 Video Hardware
 
 PALETTE_INIT_MEMBER(namcos86_state, namcos86)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 	rgb_t palette_val[512];
 
@@ -89,7 +90,7 @@ PALETTE_INIT_MEMBER(namcos86_state, namcos86)
 
 ***************************************************************************/
 
-inline void namcos86_state::get_tile_info(tile_data &tileinfo,int tile_index,int layer,UINT8 *vram)
+inline void namcos86_state::get_tile_info(tile_data &tileinfo,int tile_index,int layer,uint8_t *vram)
 {
 	int attr = vram[2*tile_index + 1];
 	int tile_offs;
@@ -133,10 +134,10 @@ TILE_GET_INFO_MEMBER(namcos86_state::get_tile_info3)
 
 void namcos86_state::video_start()
 {
-	m_bg_tilemap[0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos86_state::get_tile_info0),this),TILEMAP_SCAN_ROWS,8,8,64,32);
-	m_bg_tilemap[1] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos86_state::get_tile_info1),this),TILEMAP_SCAN_ROWS,8,8,64,32);
-	m_bg_tilemap[2] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos86_state::get_tile_info2),this),TILEMAP_SCAN_ROWS,8,8,64,32);
-	m_bg_tilemap[3] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos86_state::get_tile_info3),this),TILEMAP_SCAN_ROWS,8,8,64,32);
+	m_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos86_state::get_tile_info0),this),TILEMAP_SCAN_ROWS,8,8,64,32);
+	m_bg_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos86_state::get_tile_info1),this),TILEMAP_SCAN_ROWS,8,8,64,32);
+	m_bg_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos86_state::get_tile_info2),this),TILEMAP_SCAN_ROWS,8,8,64,32);
+	m_bg_tilemap[3] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos86_state::get_tile_info3),this),TILEMAP_SCAN_ROWS,8,8,64,32);
 
 	for (int i = 0; i < 4; i++)
 	{
@@ -264,8 +265,8 @@ sprite format:
 
 void namcos86_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	const UINT8 *source = &m_spriteram[0x0800-0x20]; /* the last is NOT a sprite */
-	const UINT8 *finish = &m_spriteram[0];
+	const uint8_t *source = &m_spriteram[0x0800-0x20]; /* the last is NOT a sprite */
+	const uint8_t *finish = &m_spriteram[0];
 	gfx_element *gfx = m_gfxdecode->gfx(2);
 
 	int sprite_xoffs = m_spriteram[0x07f5] + ((m_spriteram[0x07f4] & 1) << 8);
@@ -337,7 +338,7 @@ void namcos86_state::set_scroll(int layer)
 }
 
 
-UINT32 namcos86_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t namcos86_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* flip screen is embedded in the sprite control registers */
 	flip_screen_set(m_spriteram[0x07f6] & 1);
@@ -364,7 +365,7 @@ UINT32 namcos86_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 }
 
 
-void namcos86_state::screen_eof(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(namcos86_state::screen_vblank)
 {
 	// rising edge
 	if (state)

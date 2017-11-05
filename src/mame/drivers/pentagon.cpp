@@ -3,15 +3,16 @@
 #include "emu.h"
 #include "includes/spectrum.h"
 #include "includes/spec128.h"
-#include "imagedev/snapquik.h"
-#include "imagedev/cassette.h"
-#include "sound/ay8910.h"
-#include "sound/speaker.h"
-#include "formats/tzx_cas.h"
+
 #include "machine/beta.h"
-#include "machine/ram.h"
+#include "sound/ay8910.h"
+
+#include "screen.h"
 #include "softlist.h"
-#include "machine/spec_snqk.h"
+#include "speaker.h"
+
+#include "formats/tzx_cas.h"
+
 
 class pentagon_state : public spectrum_state
 {
@@ -30,10 +31,12 @@ public:
 		, m_beta(*this, BETA_DISK_TAG)
 	{ }
 
-	DECLARE_DIRECT_UPDATE_MEMBER(pentagon_direct);
 	DECLARE_WRITE8_MEMBER(pentagon_port_7ffd_w);
 	DECLARE_WRITE8_MEMBER(pentagon_scr_w);
 	DECLARE_WRITE8_MEMBER(pentagon_scr2_w);
+	DECLARE_READ8_MEMBER(beta_neutral_r);
+	DECLARE_READ8_MEMBER(beta_enable_r);
+	DECLARE_READ8_MEMBER(beta_disable_r);
 	DECLARE_MACHINE_RESET(pentagon);
 	INTERRUPT_GEN_MEMBER(pentagon_interrupt);
 	TIMER_CALLBACK_MEMBER(irq_on);
@@ -46,52 +49,14 @@ protected:
 	required_device<beta_disk_device> m_beta;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 private:
-	UINT8 *m_p_ram;
+	address_space *m_program;
+	uint8_t *m_p_ram;
 	void pentagon_update_memory();
 };
 
-DIRECT_UPDATE_MEMBER(pentagon_state::pentagon_direct)
-{
-	UINT16 pc = m_maincpu->pcbase();
-
-	if (m_beta->started() && m_beta->is_active() && (pc >= 0x4000))
-	{
-		m_ROMSelection = BIT(m_port_7ffd_data, 4);
-		m_beta->disable();
-		m_bank1->set_base(&m_p_ram[0x10000 + (m_ROMSelection<<14)]);
-	}
-	else
-	if (((pc & 0xff00) == 0x3d00) && (m_ROMSelection==1))
-	{
-		m_ROMSelection = 3;
-		if (m_beta->started())
-			m_beta->enable();
-	}
-
-	if (address<=0x3fff)
-	{
-		if (m_ROMSelection == 3)
-		{
-			if (m_beta->started())
-			{
-				direct.explicit_configure(0x0000, 0x3fff, 0x3fff, memregion("beta:beta")->base());
-				m_bank1->set_base(memregion("beta:beta")->base());
-			}
-		}
-		else
-		{
-			direct.explicit_configure(0x0000, 0x3fff, 0x3fff, &m_p_ram[0x10000 + (m_ROMSelection<<14)]);
-			m_bank1->set_base(&m_p_ram[0x10000 + (m_ROMSelection<<14)]);
-		}
-		return ~0;
-	}
-
-	return address;
-}
-
 void pentagon_state::pentagon_update_memory()
 {
-	UINT8 *messram = m_ram->pointer();
+	uint8_t *messram = m_ram->pointer();
 
 	m_screen_location = messram + ((m_port_7ffd_data & 8) ? (7<<14) : (5<<14));
 
@@ -141,7 +106,7 @@ WRITE8_MEMBER(pentagon_state::pentagon_scr_w)
 {
 	spectrum_UpdateScreenBitmap();
 
-	*((UINT8*)m_bank2->base() + offset) = data;
+	*((uint8_t*)m_bank2->base() + offset) = data;
 }
 
 WRITE8_MEMBER(pentagon_state::pentagon_scr2_w)
@@ -149,7 +114,7 @@ WRITE8_MEMBER(pentagon_state::pentagon_scr2_w)
 	if ((m_port_7ffd_data & 0x0f) == 0x0f || (m_port_7ffd_data & 0x0f) == 5)
 		spectrum_UpdateScreenBitmap();
 
-	*((UINT8*)m_bank4->base() + offset) = data;
+	*((uint8_t*)m_bank4->base() + offset) = data;
 }
 
 void pentagon_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
@@ -163,7 +128,7 @@ void pentagon_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		irq_off(ptr, param);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in pentagon_state::device_timer");
+		assert_always(false, "Unknown id in pentagon_state::device_timer");
 	}
 }
 
@@ -182,6 +147,41 @@ INTERRUPT_GEN_MEMBER(pentagon_state::pentagon_interrupt)
 {
 	timer_set(attotime::from_ticks(179, XTAL_14MHz / 4), TIMER_IRQ_ON, 0);
 }
+
+READ8_MEMBER(pentagon_state::beta_neutral_r)
+{
+	return m_program->read_byte(offset);
+}
+
+READ8_MEMBER(pentagon_state::beta_enable_r)
+{
+	if(m_ROMSelection == 1) {
+		m_ROMSelection = 3;
+		if (m_beta->started()) {
+			m_beta->enable();
+			m_bank1->set_base(memregion("beta:beta")->base());
+		}
+	}
+	return m_program->read_byte(offset + 0x3d00);
+}
+
+READ8_MEMBER(pentagon_state::beta_disable_r)
+{
+	if (m_beta->started() && m_beta->is_active()) {
+		m_ROMSelection = BIT(m_port_7ffd_data, 4);
+		m_beta->disable();
+		m_bank1->set_base(&m_p_ram[0x10000 + (m_ROMSelection<<14)]);
+	}
+	return m_program->read_byte(offset + 0x4000);
+}
+
+static ADDRESS_MAP_START(pentagon_mem, AS_PROGRAM, 8, pentagon_state)
+	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK("bank1")
+	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK("bank2")
+	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK("bank3")
+	AM_RANGE(0xc000, 0xffff) AM_RAMBANK("bank4")
+ADDRESS_MAP_END
+
 static ADDRESS_MAP_START (pentagon_io, AS_IO, 8, pentagon_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0000) AM_WRITE(pentagon_port_7ffd_w)  AM_MIRROR(0x7ffd)  // (A15 | A1) == 0
@@ -189,31 +189,32 @@ static ADDRESS_MAP_START (pentagon_io, AS_IO, 8, pentagon_state )
 	AM_RANGE(0x003f, 0x003f) AM_DEVREADWRITE(BETA_DISK_TAG, beta_disk_device, track_r, track_w) AM_MIRROR(0xff00)
 	AM_RANGE(0x005f, 0x005f) AM_DEVREADWRITE(BETA_DISK_TAG, beta_disk_device, sector_r, sector_w) AM_MIRROR(0xff00)
 	AM_RANGE(0x007f, 0x007f) AM_DEVREADWRITE(BETA_DISK_TAG, beta_disk_device, data_r, data_w) AM_MIRROR(0xff00)
-	AM_RANGE(0x00fe, 0x00fe) AM_READWRITE(spectrum_port_fe_r,spectrum_port_fe_w) AM_MIRROR(0xff00) AM_MASK(0xffff)
+	AM_RANGE(0x00fe, 0x00fe) AM_READWRITE(spectrum_port_fe_r,spectrum_port_fe_w) AM_SELECT(0xff00)
 	AM_RANGE(0x00ff, 0x00ff) AM_DEVREADWRITE(BETA_DISK_TAG, beta_disk_device, state_r, param_w) AM_MIRROR(0xff00)
 	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("ay8912", ay8910_device, data_w) AM_MIRROR(0x3ffd)
 	AM_RANGE(0xc000, 0xc000) AM_DEVREADWRITE("ay8912", ay8910_device, data_r, address_w) AM_MIRROR(0x3ffd)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START (pentagon_switch, AS_OPCODES, 8, pentagon_state)
+	AM_RANGE(0x3d00, 0x3dff) AM_READ(beta_enable_r)
+	AM_RANGE(0x0000, 0x3fff) AM_READ(beta_neutral_r) // Overlap with previous because we want real addresses on the 3e00-3fff range
+	AM_RANGE(0x4000, 0xffff) AM_READ(beta_disable_r)
+ADDRESS_MAP_END
+
 MACHINE_RESET_MEMBER(pentagon_state,pentagon)
 {
-	UINT8 *messram = m_ram->pointer();
-	address_space &space = m_maincpu->space(AS_PROGRAM);
+	uint8_t *messram = m_ram->pointer();
+	m_program = &m_maincpu->space(AS_PROGRAM);
 	m_p_ram = memregion("maincpu")->base();
 
-	space.install_read_bank(0x0000, 0x3fff, "bank1");
-	space.unmap_write(0x0000, 0x3fff);
-
-	space.install_write_handler(0x4000, 0x5aff, write8_delegate(FUNC(pentagon_state::pentagon_scr_w), this));
-	space.install_write_handler(0xc000, 0xdaff, write8_delegate(FUNC(pentagon_state::pentagon_scr2_w), this));
+	m_program->install_write_handler(0x4000, 0x5aff, write8_delegate(FUNC(pentagon_state::pentagon_scr_w), this));
+	m_program->install_write_handler(0xc000, 0xdaff, write8_delegate(FUNC(pentagon_state::pentagon_scr2_w), this));
 
 	if (m_beta->started())
 	{
 		if (strcmp(machine().system().name, "pent1024")==0)
 			m_beta->enable();
 	}
-	space.set_direct_update_handler(direct_update_delegate(FUNC(pentagon_state::pentagon_direct), this));
-
 	memset(messram,0,128*1024);
 
 	/* Bank 5 is always in 0x4000 - 0x7fff */
@@ -247,10 +248,12 @@ GFXDECODE_END
 
 
 
-static MACHINE_CONFIG_DERIVED_CLASS( pentagon, spectrum_128, pentagon_state )
+static MACHINE_CONFIG_DERIVED( pentagon, spectrum_128 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(XTAL_14MHz / 4)
+	MCFG_CPU_PROGRAM_MAP(pentagon_mem)
 	MCFG_CPU_IO_MAP(pentagon_io)
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(pentagon_switch)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pentagon_state,  pentagon_interrupt)
 	MCFG_MACHINE_RESET_OVERRIDE(pentagon_state, pentagon )
 
@@ -268,6 +271,8 @@ static MACHINE_CONFIG_DERIVED_CLASS( pentagon, spectrum_128, pentagon_state )
 	MCFG_SOUND_ROUTE(1, "lspeaker", 0.25)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.25)
 	MCFG_SOUND_ROUTE(2, "rspeaker", 0.50)
+
+	MCFG_DEVICE_REMOVE("exp")
 
 	MCFG_SOFTWARE_LIST_ADD("cass_list_pen","pentagon_cass")
 MACHINE_CONFIG_END
@@ -352,6 +357,6 @@ ROM_START(pent1024)
 	ROMX_LOAD( "gluk51.rom",   0x018000, 0x4000, CRC(ea8c760b) SHA1(adaab28066ca46fbcdcf084c3b53d5a1b82d94a9), ROM_BIOS(9))
 ROM_END
 
-/*    YEAR  NAME      PARENT    COMPAT  MACHINE     INPUT       INIT    COMPANY     FULLNAME */
-COMP( 1989, pentagon, spec128,  0,      pentagon,   spec_plus, driver_device,   0,      "<unknown>",        "Pentagon", 0)
-COMP( 19??, pent1024, spec128,  0,      pent1024,   spec_plus, driver_device,   0,      "<unknown>",        "Pentagon 1024", 0)
+//    YEAR  NAME      PARENT    COMPAT  MACHINE     INPUT      STATE            INIT    COMPANY       FULLNAME         FLAGS
+COMP( 1989, pentagon, spec128,  0,      pentagon,   spec_plus, pentagon_state,  0,      "<unknown>",  "Pentagon",      0 )
+COMP( 19??, pent1024, spec128,  0,      pent1024,   spec_plus, pentagon_state,  0,      "<unknown>",  "Pentagon 1024", 0 )

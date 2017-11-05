@@ -16,13 +16,14 @@
 #include "ui/menu.h"
 
 namespace ui {
-
 class menu_cheat : public menu
 {
 public:
-	menu_cheat(mame_ui_manager &mui, render_container *container);
+	menu_cheat(mame_ui_manager &mui, render_container &container);
 	virtual ~menu_cheat() override;
-	virtual void populate() override;
+
+private:
+	virtual void populate(float &customtop, float &custombottom) override;
 	virtual void handle() override;
 };
 
@@ -30,12 +31,13 @@ public:
 class menu_autofire : public menu
 {
 public:
-	menu_autofire(mame_ui_manager &mui, render_container *container);
+	menu_autofire(mame_ui_manager &mui, render_container &container);
 	virtual ~menu_autofire() override;
-	virtual void populate() override;
-	virtual void handle() override;
 
 private:
+	virtual void populate(float &customtop, float &custombottom) override;
+	virtual void handle() override;
+
 	float refresh;
 	bool last_toggle;
 };

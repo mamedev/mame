@@ -3,11 +3,11 @@
 #define IRQ_ADDRESS 0xf
 
 #define saturn_assert(x) \
-	do { if (!(x)) logerror("SATURN '%s' assertion failed: %s at %s:%i, pc=%05x\n", tag(), #x, __FILE__, __LINE__, m_pc); } while (0)
+	do { if (!(x)) logerror("SATURN assertion failed: %s at %s:%i, pc=%05x\n", #x, __FILE__, __LINE__, m_pc); } while (0)
 
 int saturn_device::READ_OP()
 {
-	UINT8 data;
+	uint8_t data;
 	m_icount-=3;
 		data=m_direct->read_byte(m_pc);
 	saturn_assert(data<0x10);
@@ -17,7 +17,7 @@ int saturn_device::READ_OP()
 
 int saturn_device::READ_OP_ARG()
 {
-	UINT8 data;
+	uint8_t data;
 	m_icount-=3;
 		data=m_direct->read_byte(m_pc);
 	saturn_assert(data<0x10);
@@ -32,9 +32,9 @@ int saturn_device::READ_OP_ARG8()
 	return n0|(n1<<4);
 }
 
-INT8 saturn_device::READ_OP_DIS8()
+int8_t saturn_device::READ_OP_DIS8()
 {
-	return (INT8)READ_OP_ARG8();
+	return (int8_t)READ_OP_ARG8();
 }
 
 int saturn_device::READ_OP_ARG12()
@@ -61,9 +61,9 @@ int saturn_device::READ_OP_ARG16()
 	return n0|(n1<<4)|(n2<<8)|(n3<<12);
 }
 
-INT16 saturn_device::READ_OP_DIS16()
+int16_t saturn_device::READ_OP_DIS16()
 {
-	return (INT16)READ_OP_ARG16();
+	return (int16_t)READ_OP_ARG16();
 }
 
 int saturn_device::READ_OP_ARG20()
@@ -76,9 +76,9 @@ int saturn_device::READ_OP_ARG20()
 	return n0|(n1<<4)|(n2<<8)|(n3<<12)|(n4<<16);
 }
 
-int saturn_device::READ_NIBBLE(UINT32 adr)
+int saturn_device::READ_NIBBLE(uint32_t adr)
 {
-	UINT8 data;
+	uint8_t data;
 	m_icount-=3;
 	data=m_program->read_byte(adr&0xfffff);
 	saturn_assert(data<0x10);
@@ -86,14 +86,14 @@ int saturn_device::READ_NIBBLE(UINT32 adr)
 	return data;
 }
 
-int saturn_device::READ_8(UINT32 adr)
+int saturn_device::READ_8(uint32_t adr)
 {
 	int n0=READ_NIBBLE(adr);
 	int n1=READ_NIBBLE(adr+1);
 	return n0|(n1<<4);
 }
 
-int saturn_device::READ_12(UINT32 adr)
+int saturn_device::READ_12(uint32_t adr)
 {
 	int n0=READ_NIBBLE(adr);
 	int n1=READ_NIBBLE(adr+1);
@@ -101,7 +101,7 @@ int saturn_device::READ_12(UINT32 adr)
 	return n0|(n1<<4)|(n2<<8);
 }
 
-int saturn_device::READ_16(UINT32 adr)
+int saturn_device::READ_16(uint32_t adr)
 {
 	int n0=READ_NIBBLE(adr);
 	int n1=READ_NIBBLE(adr+1);
@@ -110,7 +110,7 @@ int saturn_device::READ_16(UINT32 adr)
 	return n0|(n1<<4)|(n2<<8)|(n3<<12);
 }
 
-int saturn_device::READ_20(UINT32 adr)
+int saturn_device::READ_20(uint32_t adr)
 {
 	int n0=READ_NIBBLE(adr);
 	int n1=READ_NIBBLE(adr+1);
@@ -120,7 +120,7 @@ int saturn_device::READ_20(UINT32 adr)
 	return n0|(n1<<4)|(n2<<8)|(n3<<12)|(n4<<16);
 }
 
-void saturn_device::WRITE_NIBBLE(UINT32 adr, UINT8 nib)
+void saturn_device::WRITE_NIBBLE(uint32_t adr, uint8_t nib)
 {
 	m_icount-=3;
 	saturn_assert(nib<0x10);
@@ -186,15 +186,15 @@ void saturn_device::S64_WRITE_A(int r, int v)
 
 
 
-UINT32 saturn_device::saturn_pop()
+uint32_t saturn_device::saturn_pop()
 {
-	UINT32 temp=m_rstk[0];
+	uint32_t temp=m_rstk[0];
 	memmove(m_rstk, m_rstk+1, sizeof(m_rstk)-sizeof(m_rstk[0]));
 	m_rstk[7]=0;
 	return temp;
 }
 
-void saturn_device::saturn_push(UINT32 adr)
+void saturn_device::saturn_push(uint32_t adr)
 {
 	memmove(m_rstk+1, m_rstk, sizeof(m_rstk)-sizeof(m_rstk[0]));
 	m_rstk[0]=adr;
@@ -202,24 +202,24 @@ void saturn_device::saturn_push(UINT32 adr)
 
 void saturn_device::saturn_interrupt_on()
 {
-	LOG(( "SATURN '%s' at %05x: INTON\n", tag(), m_pc-4 ));
+	LOG("SATURN at %05x: INTON\n", m_pc-4);
 	m_irq_enable=1;
 	if (m_irq_state)
 	{
-		LOG(( "SATURN '%s' set_irq_line(ASSERT)\n", tag()));
+		LOG("SATURN set_irq_line(ASSERT)\n");
 		m_pending_irq=1;
 	}
 }
 
 void saturn_device::saturn_interrupt_off()
 {
-	LOG(( "SATURN '%s' at %05x: INTOFF\n", tag(), m_pc-4 ));
+	LOG("SATURN at %05x: INTOFF\n", m_pc-4);
 	m_irq_enable=0;
 }
 
 void saturn_device::saturn_reset_interrupt()
 {
-	LOG(( "SATURN '%s' at %05x: RSI\n", tag(), m_pc-5 ));
+	LOG("SATURN at %05x: RSI\n", m_pc-5);
 	m_rsi_func(ASSERT_LINE);
 }
 
@@ -250,7 +250,7 @@ void saturn_device::saturn_shutdown()
 {
 	m_sleeping=1;
 	m_irq_enable=1;
-	LOG(( "SATURN '%s' at %05x: SHUTDN\n", tag(), m_pc-3 ));
+	LOG("SATURN at %05x: SHUTDN\n", m_pc-3);
 }
 
 void saturn_device::saturn_bus_command_b()
@@ -473,7 +473,7 @@ void saturn_device::saturn_return_carry_clear()
 
 void saturn_device::saturn_return_interrupt()
 {
-	LOG(( "SATURN '%s' at %05x: RTI\n", tag(), m_pc-2 ));
+	LOG("SATURN at %05x: RTI\n", tag(), m_pc-2);
 	m_in_irq=0; /* set to 1 when an IRQ is taken */
 	m_pc=saturn_pop();
 //  m_icount-=10;
@@ -506,7 +506,7 @@ void saturn_device::saturn_equals_zero(int reg, int begin, int count)
 {
 	int i, t;
 	saturn_assert(reg>=0 && reg<9);
-	saturn_assert(begin>=0 && count>0 && begin+count<=16);
+	saturn_assert(begin>=0 && begin<16 && count>0 && begin+count<=16);
 	m_carry=1;
 	for (i=0; i<count; i++) {
 		t=m_reg[reg][begin+i];
@@ -806,7 +806,7 @@ void saturn_device::saturn_clear(int reg, int begin, int count)
 void saturn_device::saturn_exchange(int left, int begin, int count, int right)
 {
 	int i;
-	UINT8 temp;
+	uint8_t temp;
 	saturn_assert(left>=0 && left<9);
 	saturn_assert(right>=0 && right<9);
 	saturn_assert(begin>=0 && count>0 && begin+count<=16);
@@ -859,7 +859,7 @@ void saturn_device::saturn_add(int reg, int begin, int count, int right)
 	}
 }
 
-void saturn_device::saturn_add_const(int reg, int begin, int count, UINT8 right)
+void saturn_device::saturn_add_const(int reg, int begin, int count, uint8_t right)
 {
 	int i, t;
 	int base=m_decimal?10:16;

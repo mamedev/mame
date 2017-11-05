@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2016 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
@@ -107,7 +107,7 @@ typedef uint64_t GLuint64;
 #endif // BGFX_CONFIG_RENDERER_OPENGL
 
 #include "renderer.h"
-#include "hmd_ovr.h"
+#include "hmd.h"
 #include "hmd_openvr.h"
 #include "debug_renderdoc.h"
 
@@ -624,6 +624,14 @@ typedef uint64_t GLuint64;
 #	define GL_UNSIGNED_INT_SAMPLER_2D 0x8DD2
 #endif // GL_UNSIGNED_INT_SAMPLER_2D
 
+#ifndef GL_INT_SAMPLER_2D_ARRAY
+#	define GL_INT_SAMPLER_2D_ARRAY 0x8DCF
+#endif // GL_INT_SAMPLER_2D_ARRAY
+
+#ifndef GL_UNSIGNED_INT_SAMPLER_2D_ARRAY
+#	define GL_UNSIGNED_INT_SAMPLER_2D_ARRAY 0x8DD7
+#endif // GL_UNSIGNED_INT_SAMPLER_2D_ARRAY
+
 #ifndef GL_INT_SAMPLER_3D
 #	define GL_INT_SAMPLER_3D 0x8DCB
 #endif // GL_INT_SAMPLER_3D
@@ -655,6 +663,14 @@ typedef uint64_t GLuint64;
 #ifndef GL_SAMPLER_2D_SHADOW
 #	define GL_SAMPLER_2D_SHADOW 0x8B62
 #endif // GL_SAMPLER_2D_SHADOW
+
+#ifndef GL_SAMPLER_2D_ARRAY
+#	define GL_SAMPLER_2D_ARRAY 0x8DC1
+#endif // GL_SAMPLER_2D_ARRAY
+
+#ifndef GL_SAMPLER_2D_ARRAY_SHADOW
+#	define GL_SAMPLER_2D_ARRAY_SHADOW 0x8DC4
+#endif // GL_SAMPLER_2D_ARRAY_SHADOW
 
 #ifndef GL_TEXTURE_MAX_LEVEL
 #	define GL_TEXTURE_MAX_LEVEL 0x813D
@@ -703,6 +719,10 @@ typedef uint64_t GLuint64;
 #ifndef GL_IMAGE_2D
 #	define GL_IMAGE_2D 0x904D
 #endif // GL_IMAGE_2D
+
+#ifndef GL_IMAGE_2D_ARRAY
+#	define GL_IMAGE_2D_ARRAY 0x9053
+#endif // GL_IMAGE_2D_ARRAY
 
 #ifndef GL_IMAGE_3D
 #	define GL_IMAGE_3D 0x904E
@@ -863,6 +883,18 @@ typedef uint64_t GLuint64;
 #	define GL_CLAMP_TO_BORDER 0x812D
 #endif // GL_CLAMP_TO_BORDER
 
+#ifndef GL_TEXTURE_2D_ARRAY
+#	define GL_TEXTURE_2D_ARRAY 0x8C1A
+#endif // GL_TEXTURE_2D_ARRAY
+
+#ifndef GL_TEXTURE_2D_MULTISAMPLE_ARRAY
+#	define GL_TEXTURE_2D_MULTISAMPLE_ARRAY 0x9102
+#endif // GL_TEXTURE_2D_MULTISAMPLE_ARRAY
+
+#ifndef GL_TEXTURE_CUBE_MAP_ARRAY
+#	define GL_TEXTURE_CUBE_MAP_ARRAY 0x9009
+#endif // GL_TEXTURE_CUBE_MAP_ARRAY
+
 #ifndef GL_TEXTURE_CUBE_MAP_SEAMLESS
 #	define GL_TEXTURE_CUBE_MAP_SEAMLESS 0x884F
 #endif // GL_TEXTURE_CUBE_MAP_SEAMLESS
@@ -882,6 +914,26 @@ typedef uint64_t GLuint64;
 #ifndef GL_MAX_NAME_LENGTH
 #	define GL_MAX_NAME_LENGTH 0x92F6
 #endif // GL_MAX_NAME_LENGTH
+
+#ifndef GL_DEBUG_SEVERITY_NOTIFICATION
+#	define GL_DEBUG_SEVERITY_NOTIFICATION 0x826b
+#endif // GL_DEBUG_SEVERITY_NOTIFICATION
+
+#ifndef GL_LINE
+#	define GL_LINE 0x1B01
+#endif // GL_LINE
+
+#ifndef GL_FILL
+#	define GL_FILL 0x1B02
+#endif // GL_FILL
+
+#ifndef GL_MULTISAMPLE
+#	define GL_MULTISAMPLE 0x809D
+#endif // GL_MULTISAMPLE
+
+#ifndef GL_LINE_SMOOTH
+#	define GL_LINE_SMOOTH 0x0B20
+#endif // GL_LINE_SMOOTH
 
 #if BX_PLATFORM_NACL
 #	include "glcontext_ppapi.h"
@@ -918,32 +970,6 @@ namespace bgfx
 
 namespace bgfx { namespace gl
 {
-#if BGFX_CONFIG_USE_OVR
-	struct OVRBufferGL : public OVRBufferI
-	{
-		virtual void create(const ovrSession& _session, int _eyeIdx, int _msaaSamples) BX_OVERRIDE;
-		virtual void destroy(const ovrSession& _session) BX_OVERRIDE;
-		virtual void render(const ovrSession& _session) BX_OVERRIDE;
-		virtual void postRender(const ovrSession& _sesion) BX_OVERRIDE;
-
-		GLuint m_eyeFbo;
-		GLuint m_eyeTexId;
-		GLuint m_depthBuffer;
-		GLuint m_msaaEyeFbo;
-		GLuint m_msaaEyeTexId;
-		GLuint m_msaaDepthBuffer;
-	};
-
-	struct OVRMirrorGL : public OVRMirrorI
-	{
-		virtual void create(const ovrSession& _session, int _width, int _height) BX_OVERRIDE;
-		virtual void destroy(const ovrSession& _session) BX_OVERRIDE;
-		virtual void blit(const ovrSession& _session) BX_OVERRIDE;
-
-		GLuint m_mirrorFBO;
-	};
-#endif // BGFX_CONFIG_USE_OVR
-
 	void dumpExtensions(const char* _extensions);
 
 	const char* glEnumName(GLenum _enum);
@@ -1234,6 +1260,15 @@ namespace bgfx { namespace gl
 		void update(uint8_t _side, uint8_t _mip, const Rect& _rect, uint16_t _z, uint16_t _depth, uint16_t _pitch, const Memory* _mem);
 		void setSamplerState(uint32_t _flags, const float _rgba[4]);
 		void commit(uint32_t _stage, uint32_t _flags, const float _palette[][4]);
+		void resolve() const;
+
+		bool isCubeMap() const
+		{
+			return 0
+				|| GL_TEXTURE_CUBE_MAP       == m_target
+				|| GL_TEXTURE_CUBE_MAP_ARRAY == m_target
+				;
+		}
 
 		GLuint m_id;
 		GLuint m_rbo;
@@ -1273,8 +1308,9 @@ namespace bgfx { namespace gl
 			: m_swapChain(NULL)
 			, m_denseIdx(UINT16_MAX)
 			, m_num(0)
+			, m_needPresent(false)
 		{
-			memset(m_fbo, 0, sizeof(m_fbo) );
+			bx::memSet(m_fbo, 0, sizeof(m_fbo) );
 		}
 
 		void create(uint8_t _num, const Attachment* _attachment);
@@ -1291,6 +1327,7 @@ namespace bgfx { namespace gl
 		uint16_t m_denseIdx;
 		uint8_t  m_num;
 		uint8_t  m_numTh;
+		bool     m_needPresent;
 		Attachment m_attachment[BGFX_CONFIG_MAX_FRAME_BUFFER_ATTACHMENTS];
 	};
 
@@ -1306,8 +1343,27 @@ namespace bgfx { namespace gl
 		void create(const ShaderGL& _vsh, const ShaderGL& _fsh);
 		void destroy();
 		void init();
-		void bindAttributes(const VertexDecl& _vertexDecl, uint32_t _baseVertex = 0) const;
 		void bindInstanceData(uint32_t _stride, uint32_t _baseVertex = 0) const;
+
+		void bindAttributesBegin()
+		{
+			bx::memCopy(m_unboundUsedAttrib, m_used, sizeof(m_unboundUsedAttrib) );
+		}
+
+		void bindAttributes(const VertexDecl& _vertexDecl, uint32_t _baseVertex = 0);
+
+		void bindAttributesEnd()
+		{
+			for (uint32_t ii = 0, iiEnd = m_usedCount; ii < iiEnd; ++ii)
+			{
+				if (Attrib::Count != m_unboundUsedAttrib[ii])
+				{
+					Attrib::Enum attr = Attrib::Enum(m_unboundUsedAttrib[ii]);
+					GLint loc = m_attributes[attr];
+					GL_CHECK(glDisableVertexAttribArray(loc) );
+				}
+			}
+		}
 
 		void add(uint32_t _hash)
 		{
@@ -1316,8 +1372,10 @@ namespace bgfx { namespace gl
 
 		GLuint m_id;
 
-		uint8_t m_used[Attrib::Count+1]; // dense
-		GLint m_attributes[Attrib::Count]; // sparse
+		uint8_t m_unboundUsedAttrib[Attrib::Count]; // For tracking unbound used attributes between begin()/end().
+		uint8_t m_usedCount;
+		uint8_t m_used[Attrib::Count]; // Dense.
+		GLint m_attributes[Attrib::Count]; // Sparse.
 		GLint m_instanceData[BGFX_CONFIG_MAX_INSTANCE_DATA_COUNT+1];
 
 		GLint m_sampler[BGFX_CONFIG_MAX_TEXTURE_SAMPLERS];
@@ -1447,6 +1505,7 @@ namespace bgfx { namespace gl
 		void begin(Frame* _render, OcclusionQueryHandle _handle);
 		void end();
 		void resolve(Frame* _render, bool _wait = false);
+		void invalidate(OcclusionQueryHandle _handle);
 
 		struct Query
 		{
@@ -1454,7 +1513,7 @@ namespace bgfx { namespace gl
 			OcclusionQueryHandle m_handle;
 		};
 
-		Query m_query[BGFX_CONFIG_MAX_OCCUSION_QUERIES];
+		Query m_query[BGFX_CONFIG_MAX_OCCLUSION_QUERIES];
 		bx::RingBufferControl m_control;
 	};
 

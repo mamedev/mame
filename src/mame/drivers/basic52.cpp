@@ -37,26 +37,22 @@ to discover the special features of this Basic.
 #include "machine/i8255.h"
 #include "machine/terminal.h"
 
-#define TERMINAL_TAG "terminal"
 
 class basic52_state : public driver_device
 {
 public:
 	basic52_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_terminal(*this, TERMINAL_TAG)
-	{
-	}
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+	{ }
 
-	DECLARE_WRITE8_MEMBER(kbd_put);
+	void kbd_put(u8 data);
 	DECLARE_READ8_MEMBER(unk_r);
-	UINT8 m_term_data;
-	required_device<mcs51_cpu_device> m_maincpu;
-	required_device<generic_terminal_device> m_terminal;
-	virtual void machine_reset() override;
-	DECLARE_WRITE8_MEMBER(to_term);
 	DECLARE_READ8_MEMBER(from_term);
+
+private:
+	uint8_t m_term_data;
+	required_device<mcs51_cpu_device> m_maincpu;
 };
 
 
@@ -83,11 +79,6 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( basic52 )
 INPUT_PORTS_END
 
-// won't compile unless these are static
-WRITE8_MEMBER( basic52_state::to_term)
-{
-	m_terminal->write(space, 0, data);
-}
 
 READ8_MEMBER(basic52_state::from_term)
 {
@@ -99,29 +90,25 @@ READ8_MEMBER( basic52_state::unk_r)
 	return m_term_data; // won't boot without this
 }
 
-void basic52_state::machine_reset()
-{
-	m_maincpu->i8051_set_serial_tx_callback(write8_delegate(FUNC(basic52_state::to_term),this));
-	m_maincpu->i8051_set_serial_rx_callback(read8_delegate(FUNC(basic52_state::from_term),this));
-}
 
-WRITE8_MEMBER( basic52_state::kbd_put )
+void basic52_state::kbd_put(u8 data)
 {
 	m_maincpu->set_input_line(MCS51_RX_LINE, ASSERT_LINE);
 	m_maincpu->set_input_line(MCS51_RX_LINE, CLEAR_LINE);
 	m_term_data = data;
 }
 
-static MACHINE_CONFIG_START( basic31, basic52_state )
+static MACHINE_CONFIG_START( basic31 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8031, XTAL_11_0592MHz)
 	MCFG_CPU_PROGRAM_MAP(basic52_mem)
 	MCFG_CPU_IO_MAP(basic52_io)
-
+	MCFG_MCS51_SERIAL_TX_CB(DEVWRITE8("terminal", generic_terminal_device, write))
+	MCFG_MCS51_SERIAL_RX_CB(READ8(basic52_state, from_term))
 
 	/* video hardware */
-	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(basic52_state, kbd_put))
+	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
+	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(basic52_state, kbd_put))
 
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
 MACHINE_CONFIG_END
@@ -131,6 +118,8 @@ static MACHINE_CONFIG_DERIVED( basic52, basic31 )
 	MCFG_CPU_REPLACE("maincpu", I8052, XTAL_11_0592MHz)
 	MCFG_CPU_PROGRAM_MAP(basic52_mem)
 	MCFG_CPU_IO_MAP(basic52_io)
+	MCFG_MCS51_SERIAL_TX_CB(DEVWRITE8("terminal", generic_terminal_device, write))
+	MCFG_MCS51_SERIAL_RX_CB(READ8(basic52_state, from_term))
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -153,6 +142,6 @@ ROM_START( basic31 )
 ROM_END
 
 /* Driver */
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    CLASS          INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1985, basic52,  0,       0,    basic52,   basic52, driver_device,  0,    "Intel", "MCS BASIC 52", MACHINE_NO_SOUND_HW)
-COMP( 1985, basic31,  basic52, 0,    basic31,   basic52, driver_device,  0,    "Intel", "MCS BASIC 31", MACHINE_NO_SOUND_HW)
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    CLASS           INIT  COMPANY  FULLNAME        FLAGS */
+COMP( 1985, basic52,  0,       0,    basic52,   basic52, basic52_state,  0,    "Intel", "MCS BASIC 52", MACHINE_NO_SOUND_HW)
+COMP( 1985, basic31,  basic52, 0,    basic31,   basic52, basic52_state,  0,    "Intel", "MCS BASIC 31", MACHINE_NO_SOUND_HW)

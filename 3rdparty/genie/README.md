@@ -9,8 +9,11 @@ generates project from Lua script, making applying the same settings for
 multiple projects easy.
 
 Supported project generators:
- * Visual Studio 2008, 2010, 2012, 2013, 2015, 15
+ * FASTBuild (experimental)
  * GNU Makefile
+ * Ninja (experimental)
+ * Qbs / QtCreator (experimental)
+ * Visual Studio 2008, 2010, 2012, 2013, 2015, 2017
  * XCode
 
 Download (stable)
@@ -18,7 +21,7 @@ Download (stable)
 
 [![Build Status](https://travis-ci.org/bkaradzic/GENie.svg?branch=master)](https://travis-ci.org/bkaradzic/GENie)
 
-	version 445 (commit 6798f93ba8ee029b629cfc340e90c653e780d8b1)
+	version 807 (commit 83efdca3c3c63cb47bd1b4daa8b73d526841f900)
 
 Linux:  
 https://github.com/bkaradzic/bx/raw/master/tools/bin/linux/genie
@@ -39,26 +42,8 @@ Building (dev)
 Documentation
 -------------
 
-[Scripting Reference](https://github.com/bkaradzic/genie/blob/master/docs/scripting-reference.md#scripting-reference)
-
-Who is using it?
-----------------
-
-https://github.com/bkaradzic/bgfx bgfx - Cross-platform, graphics API
-agnostic, "Bring Your Own Engine/Framework" style rendering library.
-
-https://github.com/Psybrus/Psybrus Psybrus Engine & Toolchain
-
-https://github.com/dariomanesku/cmftstudio cmftStudio - cubemap filtering tool
-
-https://github.com/mamedev/mame MAME - Multiple Arcade Machine Emulator
-
-http://sol.gfxile.net/soloud SoLoud is an easy to use, free, 
-portable c/c++ audio engine for games.
-
-https://github.com/andr3wmac/Torque6 Torque 6 is an MIT licensed 3D engine
-loosely based on Torque2D. Being neither Torque2D or Torque3D it is the 6th
-derivative of the original Torque Engine.
+[Scripting Reference](https://github.com/bkaradzic/genie/blob/master/docs/scripting-reference.md#scripting-reference)  
+[Introduction to GENie - CppCon 2016](https://onedrive.live.com/view.aspx?cid=171ee76e679935c8&page=view&resid=171EE76E679935C8!139573&parId=171EE76E679935C8!18835&authkey=!AKv_SGrgJwxDGDg&app=PowerPoint)
 
 History
 -------
@@ -96,7 +81,8 @@ intention to keep it compatible with it.
  - Added `msgcompile`, `msgresource`, `msglinking` and `msgarchiving` as
    overrides for make messages.
  - Added `messageskip` list to disable some of compiler messages.
- - Added `buildoptions_c`, `buildoptions_cpp`, `buildoptions_objc` for
+ - Added `buildoptions_c`, `buildoptions_cpp`, `buildoptions_objc`,
+   `buildoptions_objcpp`, `buildoptions_asm`, `buildoptions_swift` for
    configuring language specific build options.
  - Split functionality of `excludes` in `removefiles` and `excludes`. With VS
    `excludes` will exclude files from build but files will be added to project
@@ -106,11 +92,86 @@ intention to keep it compatible with it.
  - Added Green Hills Software compiler support.
  - Added edit & continue support for 64-bit builds in VS2013 upwards.
  - Added `windowstargetplatformversion` to specify VS Windows target version.
- - Added vs15 support.
  - Added `NoWinRT` flag to disable WinRT CX builds.
  - Added `NoBufferSecurityCheck` flag to disable security checks in VS.
  - Added `nopch` file list to exclude files from using PCH.
  - Added `EnableAVX` and `EnableAVX2` flags to enable enhanced instruction set.
+ - Added FASTBuild (.bff) project generator.
+ - Added Vala language support.
+ - Added MASM support for Visual Studio projects.
+ - Added `userincludedirs` for include header with angle brackets and quotes
+   search path control.
+ - Detect when generated project files are not changing, and skip writing over
+   existing project files.
+ - Added Ninja project generator.
+ - Added ability to specify MSVC "Old Style" debug info format with
+   `C7DebugInfo`.
+ - Added some support for per-configuration `files` lists.
+ - Removed `clean` action.
+ - Added support for QtCreator via Qbs build tool.
+ - Added .natvis file type support for Visual Studio.
+ - Added Swift language support for make and ninja build generators.
+ - Removed CodeBlocks and CodeLite support.
+ - Added vs2017 support.
+ - Removed vs2008 support.
+ - Added `removeplatforms` that removes VS build target platforms.
+
+Debugging GENie scripts
+-----------------------
+
+It is possible to debug build scripts using [ZeroBrane Studio][zbs]. You must
+compile GENie in debug mode
+
+    $ make config=debug
+
+This ensures the core lua scripts are loaded from disk rather than compiled
+into the GENie binary. Create a file named `debug.lua` as a sibling to your
+main `genie.lua` script with the following content:
+
+    local zb_path = <path to ZeroBraneStudio>
+    local cpaths = {
+        string.format("%s/bin/lib?.dylib;%s/bin/clibs53/?.dylib;", zb_path, zb_path),
+        package.cpath,
+    }
+    package.cpath = table.concat(cpaths, ';')
+
+    local paths = {
+        string.format('%s/lualibs/?.lua;%s/lualibs/?/?.lua', zb_path, zb_path),
+        string.format('%s/lualibs/?/init.lua;%s/lualibs/?/?/?.lua', zb_path, zb_path),
+        string.format('%s/lualibs/?/?/init.lua', zb),
+        package.path,
+    }
+    package.path = table.concat(paths, ';')
+
+    require('mobdebug').start()
+
+**NOTE:** update `zb_path` to refer to the root of your ZeroBrane Studio
+install. For reference, you should find `lualibs` in you `zb_path` folder
+
+To debug, make sure ZBS is listening for debug connections and add
+`dofile("debug.lua")` to `genie.lua`
+
+Who is using it?
+----------------
+
+https://github.com/bkaradzic/bgfx bgfx - Cross-platform, graphics API
+agnostic, "Bring Your Own Engine/Framework" style rendering library.
+
+https://github.com/Psybrus/Psybrus Psybrus Engine & Toolchain
+
+https://github.com/dariomanesku/cmftstudio cmftStudio - cubemap filtering tool
+
+https://github.com/mamedev/mame MAME - Multiple Arcade Machine Emulator
+
+http://sol.gfxile.net/soloud SoLoud is an easy to use, free, 
+portable c/c++ audio engine for games.
+
+https://github.com/andr3wmac/Torque6 Torque 6 is an MIT licensed 3D engine
+loosely based on Torque2D. Being neither Torque2D or Torque3D it is the 6th
+derivative of the original Torque Engine.
+
+http://mtuner.net/ is a memory profiler and memory leak finder for Windows, PS4,
+PS3.
 
 [License](https://github.com/bkaradzic/genie/blob/master/LICENSE)
 -----------------------------------------------------------------
@@ -118,7 +179,9 @@ intention to keep it compatible with it.
 	GENie
 	Copyright (c) 2014-2016 Branimir Karadžić, Neil Richardson, Mike Popoloski,
 	Drew Solomon, Ted de Munnik, Miodrag Milanović, Brett Vickers, Bill Freist,
-	Terry Hendrix II, Ryan Juckett, Andrew Johnson, Johan Sköld, Alastair Murray
+	Terry Hendrix II, Ryan Juckett, Andrew Johnson, Johan Sköld,
+	Alastair Murray, Patrick Munns, Jan-Eric Duden, Phil Stevens, Stuart Carnie,
+	Nikolay Aleksiev, Jon Olson.
 	All rights reserved.
 
 	https://github.com/bkaradzic/genie
@@ -147,3 +210,5 @@ intention to keep it compatible with it.
 	CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 	OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 	OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+  [zbs]: https://studio.zerobrane.com

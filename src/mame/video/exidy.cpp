@@ -17,7 +17,7 @@
  *
  *************************************/
 
-void exidy_state::exidy_video_config(UINT8 _collision_mask, UINT8 _collision_invert, int _is_2bpp)
+void exidy_state::exidy_video_config(uint8_t _collision_mask, uint8_t _collision_invert, int _is_2bpp)
 {
 	m_collision_mask   = _collision_mask;
 	m_collision_invert = _collision_invert;
@@ -134,11 +134,11 @@ void exidy_state::draw_background()
 
 	for (offs = 0; offs < 0x400; offs++)
 	{
-		UINT8 cy;
+		uint8_t cy;
 		pen_t on_pen_1, on_pen_2;
 
-		UINT8 y = offs >> 5 << 3;
-		UINT8 code = m_videoram[offs];
+		uint8_t y = offs >> 5 << 3;
+		uint8_t code = m_videoram[offs];
 
 		if (m_is_2bpp)
 		{
@@ -154,12 +154,12 @@ void exidy_state::draw_background()
 		for (cy = 0; cy < 8; cy++)
 		{
 			int i;
-			UINT8 x = offs << 3;
+			uint8_t x = offs << 3;
 
 			if (m_is_2bpp)
 			{
-				UINT8 data1 = m_characterram[0x000 | (code << 3) | cy];
-				UINT8 data2 = m_characterram[0x800 | (code << 3) | cy];
+				uint8_t data1 = m_characterram[0x000 | (code << 3) | cy];
+				uint8_t data2 = m_characterram[0x800 | (code << 3) | cy];
 
 				for (i = 0; i < 8; i++)
 				{
@@ -176,7 +176,7 @@ void exidy_state::draw_background()
 			/* 1bpp */
 			else
 			{
-				UINT8 data = m_characterram[(code << 3) | cy];
+				uint8_t data = m_characterram[(code << 3) | cy];
 
 				for (i = 0; i < 8; i++)
 				{
@@ -270,15 +270,15 @@ void exidy_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in exidy_state::device_timer");
+		assert_always(false, "Unknown id in exidy_state::device_timer");
 	}
 }
 
 
 void exidy_state::check_collision()
 {
-	UINT8 sprite_set_1 = ((*m_sprite_enable & 0x20) != 0);
-	UINT8 sprite_set_2 = ((*m_sprite_enable & 0x40) != 0);
+	uint8_t sprite_set_1 = ((*m_sprite_enable & 0x20) != 0);
+	uint8_t sprite_set_2 = ((*m_sprite_enable & 0x40) != 0);
 	const rectangle clip(0, 15, 0, 15);
 	int org_1_x = 0, org_1_y = 0;
 	int org_2_x = 0, org_2_y = 0;
@@ -325,7 +325,7 @@ void exidy_state::check_collision()
 		{
 			if (m_motion_object_1_vid.pix16(sy, sx) != 0xff)
 			{
-				UINT8 current_collision_mask = 0;
+				uint8_t current_collision_mask = 0;
 
 				/* check for background collision (M1CHAR) */
 				if (m_background_bitmap.pix16(org_1_y + sy, org_1_x + sx) != 0)
@@ -358,7 +358,7 @@ void exidy_state::check_collision()
  *
  *************************************/
 
-UINT32 exidy_state::screen_update_exidy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t exidy_state::screen_update_exidy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* refresh the colors from the palette (static or dynamic) */
 	set_colors();

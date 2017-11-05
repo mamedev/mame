@@ -122,6 +122,8 @@ as well as Up Right, Cocktail or Flip Screen from the service menu.
 #include "cpu/h8/h8s2357.h"
 #include "sound/okim9810.h"
 #include "machine/eepromser.h"
+#include "screen.h"
+#include "speaker.h"
 
 class invqix_state : public driver_device
 {
@@ -133,7 +135,7 @@ public:
 		m_vram(*this, "vram")
 	{ }
 
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ16_MEMBER(port3_r);
 	DECLARE_WRITE16_MEMBER(port3_w);
@@ -150,13 +152,13 @@ protected:
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
-	required_shared_ptr<UINT16> m_vram;
+	required_shared_ptr<uint16_t> m_vram;
 
 	// driver_device overrides
 	virtual void video_start() override;
 
 private:
-	UINT16 m_vctl;      // 0000 for normal, 0001 for flip, 0100 when going to change (blank?)
+	uint16_t m_vctl;      // 0000 for normal, 0001 for flip, 0100 when going to change (blank?)
 };
 
 
@@ -165,7 +167,7 @@ void invqix_state::video_start()
 	save_item(NAME(m_vctl));
 }
 
-UINT32 invqix_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t invqix_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int x,y;
 
@@ -181,7 +183,7 @@ UINT32 invqix_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 		{
 			for(x=0;x<256;x++)
 			{
-				UINT8 r,g,b;
+				uint8_t r,g,b;
 				int pen_data;
 
 				pen_data = (m_vram[(x+y*256)]);
@@ -203,7 +205,7 @@ UINT32 invqix_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 		{
 			for(x=0;x<256;x++)
 			{
-				UINT8 r,g,b;
+				uint8_t r,g,b;
 				int pen_data;
 
 				pen_data = (m_vram[(256-x)+((256-y)*256)]);
@@ -275,7 +277,7 @@ WRITE16_MEMBER(invqix_state::vctl_w)
 static ADDRESS_MAP_START(invqix_prg_map, AS_PROGRAM, 16, invqix_state)
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM AM_REGION("program", 0)
 	AM_RANGE(0x200000, 0x21ffff) AM_RAM
-	AM_RANGE(0x400000, 0x400001) AM_DEVWRITE8("oki", okim9810_device, write_TMP_register, 0x00ff)
+	AM_RANGE(0x400000, 0x400001) AM_DEVWRITE8("oki", okim9810_device, write_tmp_register, 0x00ff)
 	AM_RANGE(0x400000, 0x400001) AM_DEVWRITE8("oki", okim9810_device, write, 0xff00)
 	AM_RANGE(0x400002, 0x400003) AM_DEVREAD8("oki", okim9810_device, read, 0xff00)
 	AM_RANGE(0x600000, 0x61ffff) AM_RAM AM_SHARE("vram")
@@ -325,7 +327,7 @@ static INPUT_PORTS_START( invqix )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNUSED )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( invqix, invqix_state )
+static MACHINE_CONFIG_START( invqix )
 	MCFG_CPU_ADD("maincpu", H8S2394, XTAL_20MHz)
 	MCFG_CPU_PROGRAM_MAP(invqix_prg_map)
 	MCFG_CPU_IO_MAP(invqix_io_map)
@@ -358,8 +360,8 @@ ROM_START( invqix )
 	ROM_REGION(0x1000000, "oki", 0)
 	ROM_LOAD( "f34-01.ic13",  0x000000, 0x200000, CRC(7b055722) SHA1(8152bf04a58de15aefc4244e40733275e21818e1) ) /* Can also be labeled F34-03 based on ROM chip type */
 
-	ROM_REGION(0x80, "eeprom", 0)
+	ROM_REGION16_BE(0x80, "eeprom", 0)
 	ROM_LOAD16_WORD_SWAP( "93c46.ic6", 0x000000, 0x000080, CRC(564b744e) SHA1(4d9ea7dc253797c513258d07a936dfb63d8ed18c) )
 ROM_END
 
-GAME( 2003, invqix, 0, invqix, invqix, driver_device, 0, ROT270, "Taito / Namco", "Space Invaders / Qix Silver Anniversary Edition (Ver. 2.03)", MACHINE_SUPPORTS_SAVE )
+GAME( 2003, invqix, 0, invqix, invqix, invqix_state, 0, ROT270, "Taito / Namco", "Space Invaders / Qix Silver Anniversary Edition (Ver. 2.03)", MACHINE_SUPPORTS_SAVE )

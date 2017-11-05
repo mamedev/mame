@@ -675,14 +675,16 @@ STDMETHODIMP CHandler::UpdateItems(ISequentialOutStream *outStream, UInt32 numIt
 static HRESULT ParseBond(UString &srcString, UInt32 &coder, UInt32 &stream)
 {
   stream = 0;
-  int index = ParseStringToUInt32(srcString, coder);
-  if (index == 0)
-    return E_INVALIDARG;
-  srcString.DeleteFrontal(index);
+  {
+    unsigned index = ParseStringToUInt32(srcString, coder);
+    if (index == 0)
+      return E_INVALIDARG;
+    srcString.DeleteFrontal(index);
+  }
   if (srcString[0] == 's')
   {
     srcString.Delete(0);
-    int index = ParseStringToUInt32(srcString, stream);
+    unsigned index = ParseStringToUInt32(srcString, stream);
     if (index == 0)
       return E_INVALIDARG;
     srcString.DeleteFrontal(index);

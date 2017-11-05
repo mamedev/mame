@@ -20,7 +20,7 @@
 
 TILE_GET_INFO_MEMBER(gundealr_state::get_bg_tile_info)
 {
-	UINT8 attr = m_bg_videoram[2 * tile_index + 1];
+	uint8_t attr = m_bg_videoram[2 * tile_index + 1];
 	SET_TILE_INFO_MEMBER(0,
 			m_bg_videoram[2 * tile_index] + ((attr & 0x07) << 8),
 			(attr & 0xf0) >> 4,
@@ -35,7 +35,7 @@ TILEMAP_MAPPER_MEMBER(gundealr_state::gundealr_scan)
 
 TILE_GET_INFO_MEMBER(gundealr_state::get_fg_tile_info)
 {
-	UINT8 attr = m_fg_videoram[2 * tile_index + 1];
+	uint8_t attr = m_fg_videoram[2 * tile_index + 1];
 	SET_TILE_INFO_MEMBER(1,
 			m_fg_videoram[2 * tile_index] + ((attr & 0x03) << 8),
 			(attr & 0xf0) >> 4,
@@ -52,8 +52,8 @@ TILE_GET_INFO_MEMBER(gundealr_state::get_fg_tile_info)
 
 void gundealr_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(gundealr_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
-	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(gundealr_state::get_fg_tile_info),this), tilemap_mapper_delegate(FUNC(gundealr_state::gundealr_scan),this), 16, 16, 64, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(gundealr_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(gundealr_state::get_fg_tile_info),this), tilemap_mapper_delegate(FUNC(gundealr_state::gundealr_scan),this), 16, 16, 64, 32);
 
 	m_fg_tilemap->set_transparent_pen(15);
 }
@@ -111,8 +111,12 @@ WRITE8_MEMBER(gundealr_state::yamyam_fg_scroll_w)
 
 WRITE8_MEMBER(gundealr_state::gundealr_flipscreen_w)
 {
-	m_flipscreen = data;
-	machine().tilemap().set_flip_all(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	machine().tilemap().set_flip_all(BIT(data, 0) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+}
+
+WRITE8_MEMBER(gundealr_state::yamyam_flipscreen_w)
+{
+	machine().tilemap().set_flip_all(BIT(data, 7) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 }
 
 
@@ -123,7 +127,7 @@ WRITE8_MEMBER(gundealr_state::gundealr_flipscreen_w)
 
 ***************************************************************************/
 
-UINT32 gundealr_state::screen_update_gundealr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t gundealr_state::screen_update_gundealr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);

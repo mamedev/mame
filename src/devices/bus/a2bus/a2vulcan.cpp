@@ -53,8 +53,8 @@
 
 *********************************************************************/
 
+#include "emu.h"
 #include "a2vulcan.h"
-#include "includes/apple2.h"
 #include "machine/ataintf.h"
 #include "imagedev/harddriv.h"
 
@@ -62,15 +62,11 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type A2BUS_VULCAN = &device_creator<a2bus_vulcan_device>;
-const device_type A2BUS_VULCANGOLD = &device_creator<a2bus_vulcangold_device>;
+DEFINE_DEVICE_TYPE(A2BUS_VULCAN,     a2bus_vulcan_device,     "a2vulcan", "Applied Engineering Vulcan IDE controller")
+DEFINE_DEVICE_TYPE(A2BUS_VULCANGOLD, a2bus_vulcangold_device, "a2vulgld", "Applied Engineering Vulcan Gold IDE controller")
 
 #define VULCAN_ROM_REGION  "vulcan_rom"
 #define VULCAN_ATA_TAG     "vulcan_ata"
-
-static MACHINE_CONFIG_FRAGMENT( vulcan )
-	MCFG_ATA_INTERFACE_ADD(VULCAN_ATA_TAG, ata_devices, "hdd", nullptr, false)
-MACHINE_CONFIG_END
 
 ROM_START( vulcan )
 	ROM_REGION(0x4000, VULCAN_ROM_REGION, 0)
@@ -87,25 +83,23 @@ ROM_END
 ***************************************************************************/
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor a2bus_vulcanbase_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( vulcan );
-}
+MACHINE_CONFIG_MEMBER( a2bus_vulcanbase_device::device_add_mconfig )
+	MCFG_ATA_INTERFACE_ADD(VULCAN_ATA_TAG, ata_devices, "hdd", nullptr, false)
+MACHINE_CONFIG_END
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *a2bus_vulcan_device::device_rom_region() const
+const tiny_rom_entry *a2bus_vulcan_device::device_rom_region() const
 {
 	return ROM_NAME( vulcan );
 }
 
-const rom_entry *a2bus_vulcangold_device::device_rom_region() const
+const tiny_rom_entry *a2bus_vulcangold_device::device_rom_region() const
 {
 	return ROM_NAME( vulcangold );
 }
@@ -114,20 +108,20 @@ const rom_entry *a2bus_vulcangold_device::device_rom_region() const
 //  LIVE DEVICE
 //**************************************************************************
 
-a2bus_vulcanbase_device::a2bus_vulcanbase_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
-	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+a2bus_vulcanbase_device::a2bus_vulcanbase_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
 	device_a2bus_card_interface(mconfig, *this),
 	m_ata(*this, VULCAN_ATA_TAG), m_rom(nullptr), m_lastdata(0), m_rombank(0), m_rambank(0), m_last_read_was_0(false)
 {
 }
 
-a2bus_vulcan_device::a2bus_vulcan_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	a2bus_vulcanbase_device(mconfig, A2BUS_VULCAN, "Applied Engineering Vulcan IDE controller", tag, owner, clock, "a2vulcan", __FILE__)
+a2bus_vulcan_device::a2bus_vulcan_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	a2bus_vulcanbase_device(mconfig, A2BUS_VULCAN, tag, owner, clock)
 {
 }
 
-a2bus_vulcangold_device::a2bus_vulcangold_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	a2bus_vulcanbase_device(mconfig, A2BUS_VULCAN, "Applied Engineering Vulcan Gold IDE controller", tag, owner, clock, "a2vulgld", __FILE__)
+a2bus_vulcangold_device::a2bus_vulcangold_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	a2bus_vulcanbase_device(mconfig, A2BUS_VULCANGOLD, tag, owner, clock)
 {
 }
 
@@ -169,7 +163,7 @@ void a2bus_vulcanbase_device::device_reset()
     read_c0nx - called for reads from this card's c0nx space
 -------------------------------------------------*/
 
-UINT8 a2bus_vulcanbase_device::read_c0nx(address_space &space, UINT8 offset)
+uint8_t a2bus_vulcanbase_device::read_c0nx(address_space &space, uint8_t offset)
 {
 	switch (offset)
 	{
@@ -212,7 +206,7 @@ UINT8 a2bus_vulcanbase_device::read_c0nx(address_space &space, UINT8 offset)
     write_c0nx - called for writes to this card's c0nx space
 -------------------------------------------------*/
 
-void a2bus_vulcanbase_device::write_c0nx(address_space &space, UINT8 offset, UINT8 data)
+void a2bus_vulcanbase_device::write_c0nx(address_space &space, uint8_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -266,7 +260,7 @@ void a2bus_vulcanbase_device::write_c0nx(address_space &space, UINT8 offset, UIN
     read_cnxx - called for reads from this card's cnxx space
 -------------------------------------------------*/
 
-UINT8 a2bus_vulcanbase_device::read_cnxx(address_space &space, UINT8 offset)
+uint8_t a2bus_vulcanbase_device::read_cnxx(address_space &space, uint8_t offset)
 {
 	int slotimg = m_slot * 0x100;
 
@@ -278,7 +272,7 @@ UINT8 a2bus_vulcanbase_device::read_cnxx(address_space &space, UINT8 offset)
     read_c800 - called for reads from this card's c800 space
 -------------------------------------------------*/
 
-UINT8 a2bus_vulcanbase_device::read_c800(address_space &space, UINT16 offset)
+uint8_t a2bus_vulcanbase_device::read_c800(address_space &space, uint16_t offset)
 {
 	offset &= 0x7ff;
 	if (offset < 0x400) // c800-cbff is banked RAM window, cc00-cfff is banked ROM window
@@ -291,7 +285,7 @@ UINT8 a2bus_vulcanbase_device::read_c800(address_space &space, UINT16 offset)
 	return m_rom[offset+m_rombank];
 }
 
-void a2bus_vulcanbase_device::write_c800(address_space &space, UINT16 offset, UINT8 data)
+void a2bus_vulcanbase_device::write_c800(address_space &space, uint16_t offset, uint8_t data)
 {
 	offset &= 0x7ff;
 	if (offset < 0x400)

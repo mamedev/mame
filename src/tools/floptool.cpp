@@ -42,9 +42,13 @@
 #include "formats/ap_dsk35.h"
 #include "formats/ap2_dsk.h"
 
+#include "formats/acorn_dsk.h"
+
 #include "formats/oric_dsk.h"
 
 #include "formats/applix_dsk.h"
+
+#include "formats/hpi_dsk.h"
 
 static floppy_format_type floppy_formats[] = {
 	FLOPPY_MFI_FORMAT,
@@ -72,9 +76,17 @@ static floppy_format_type floppy_formats[] = {
 	FLOPPY_RWTS18_FORMAT,
 	FLOPPY_EDD_FORMAT,
 
+	FLOPPY_ACORN_SSD_FORMAT,
+	FLOPPY_ACORN_DSD_FORMAT,
+	FLOPPY_ACORN_DOS_FORMAT,
+	FLOPPY_ACORN_ADFS_OLD_FORMAT,
+	FLOPPY_ACORN_ADFS_NEW_FORMAT,
+
 	FLOPPY_ORIC_DSK_FORMAT,
 
 	FLOPPY_APPLIX_FORMAT,
+
+	FLOPPY_HPI_FORMAT
 };
 
 void CLIB_DECL ATTR_PRINTF(1,2) logerror(const char *format, ...)
@@ -139,7 +151,7 @@ static void display_formats()
 static void display_full_usage()
 {
 	/* Usage */
-	fprintf(stderr, "floptool - Generic floppy image manipulation tool for use with MESS\n\n");
+	fprintf(stderr, "floptool - Generic floppy image manipulation tool for use with MAME\n\n");
 	display_usage();
 	fprintf(stderr, "\n");
 	display_formats();

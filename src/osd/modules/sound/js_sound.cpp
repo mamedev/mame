@@ -30,7 +30,7 @@ public:
 
 	// sound_module
 
-	virtual void update_audio_stream(bool is_throttled, const INT16 *buffer, int samples_this_frame)
+	virtual void update_audio_stream(bool is_throttled, const int16_t *buffer, int samples_this_frame)
 	{
 		EM_ASM_ARGS({
 		// Forward audio stream update on to JS backend implementation.

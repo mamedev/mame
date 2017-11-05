@@ -54,12 +54,6 @@
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
 
-// default address map
-static ADDRESS_MAP_START( ymf278b, AS_0, 8, ymf278b_device )
-		AM_RANGE(0x000000, 0x3fffff) AM_ROM
-ADDRESS_MAP_END
-
-
 /**************************************************************************/
 
 int ymf278b_device::compute_rate(YMF278BSlot *slot, int val)
@@ -88,10 +82,10 @@ int ymf278b_device::compute_rate(YMF278BSlot *slot, int val)
 	return res;
 }
 
-UINT32 ymf278b_device::compute_decay_env_vol_step(YMF278BSlot *slot, int val)
+uint32_t ymf278b_device::compute_decay_env_vol_step(YMF278BSlot *slot, int val)
 {
 	int rate;
-	UINT32 res;
+	uint32_t res;
 
 	// rate override with damping/pseudo reverb
 	if (slot->DAMP)
@@ -115,7 +109,7 @@ UINT32 ymf278b_device::compute_decay_env_vol_step(YMF278BSlot *slot, int val)
 
 void ymf278b_device::compute_freq_step(YMF278BSlot *slot)
 {
-	UINT32 step;
+	uint32_t step;
 	int oct;
 
 	oct = slot->octave;
@@ -221,9 +215,9 @@ void ymf278b_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 {
 	int i, j;
 	YMF278BSlot *slot;
-	INT16 sample = 0;
-	INT32 *mixp;
-	INT32 vl, vr;
+	int16_t sample = 0;
+	int32_t *mixp;
+	int32_t vl, vr;
 
 	if (&stream == m_stream_ymf262)
 	{
@@ -255,23 +249,23 @@ void ymf278b_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 				{
 					// 8 bit
 					case 0:
-						sample = m_direct->read_byte(slot->startaddr + (slot->stepptr>>16))<<8;
+						sample = read_byte(slot->startaddr + (slot->stepptr>>16))<<8;
 						break;
 
 					// 12 bit
 					case 1:
 						if (slot->stepptr & 0x10000)
-							sample = m_direct->read_byte(slot->startaddr + (slot->stepptr>>17)*3+2)<<8 |
-								(m_direct->read_byte(slot->startaddr + (slot->stepptr>>17)*3+1) << 4 & 0xf0);
+							sample = read_byte(slot->startaddr + (slot->stepptr>>17)*3+2)<<8 |
+								(read_byte(slot->startaddr + (slot->stepptr>>17)*3+1) << 4 & 0xf0);
 						else
-							sample = m_direct->read_byte(slot->startaddr + (slot->stepptr>>17)*3)<<8 |
-								(m_direct->read_byte(slot->startaddr + (slot->stepptr>>17)*3+1) & 0xf0);
+							sample = read_byte(slot->startaddr + (slot->stepptr>>17)*3)<<8 |
+								(read_byte(slot->startaddr + (slot->stepptr>>17)*3+1) & 0xf0);
 						break;
 
 					// 16 bit
 					case 2:
-						sample = m_direct->read_byte(slot->startaddr + ((slot->stepptr>>16)*2))<<8 |
-							m_direct->read_byte(slot->startaddr + ((slot->stepptr>>16)*2)+1);
+						sample = read_byte(slot->startaddr + ((slot->stepptr>>16)*2))<<8 |
+							read_byte(slot->startaddr + ((slot->stepptr>>16)*2)+1);
 						break;
 
 					// ?? bit, effect is unknown, datasheet says it's prohibited
@@ -288,7 +282,7 @@ void ymf278b_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 
 				// update envelope
 				slot->env_vol += slot->env_vol_step;
-				if (((INT32)(slot->env_vol - slot->env_vol_lim)) >= 0)
+				if (((int32_t)(slot->env_vol - slot->env_vol_lim)) >= 0)
 				{
 					slot->env_step++;
 					compute_envelope(slot);
@@ -358,7 +352,7 @@ void ymf278b_device::device_timer(emu_timer &timer, device_timer_id id, int para
 
 /**************************************************************************/
 
-void ymf278b_device::A_w(UINT8 reg, UINT8 data)
+void ymf278b_device::A_w(uint8_t reg, uint8_t data)
 {
 	// FM register array 0 (compatible with YMF262)
 	switch(reg)
@@ -422,7 +416,7 @@ void ymf278b_device::A_w(UINT8 reg, UINT8 data)
 	}
 }
 
-void ymf278b_device::B_w(UINT8 reg, UINT8 data)
+void ymf278b_device::B_w(uint8_t reg, uint8_t data)
 {
 	// FM register array 1 (compatible with YMF262)
 	switch(reg)
@@ -458,7 +452,7 @@ void ymf278b_device::retrigger_note(YMF278BSlot *slot)
 	compute_envelope(slot);
 }
 
-void ymf278b_device::C_w(UINT8 reg, UINT8 data)
+void ymf278b_device::C_w(uint8_t reg, uint8_t data)
 {
 	// Handle slot registers specifically
 	if (reg >= 0x08 && reg <= 0xf7)
@@ -472,8 +466,8 @@ void ymf278b_device::C_w(UINT8 reg, UINT8 data)
 			case 0:
 			{
 				attotime period;
-				UINT32 offset;
-				UINT8 p[12];
+				uint32_t offset;
+				uint8_t p[12];
 				int i;
 
 				slot->wave &= 0x100;
@@ -485,7 +479,7 @@ void ymf278b_device::C_w(UINT8 reg, UINT8 data)
 				else
 					offset = m_wavetblhdr*0x80000 + (slot->wave - 384) * 12;
 				for (i = 0; i < 12; i++)
-					p[i] = m_direct->read_byte(offset+i);
+					p[i] = read_byte(offset+i);
 
 				slot->bits = (p[0]&0xc0)>>6;
 				slot->startaddr = (p[2] | (p[1]<<8) | ((p[0]&0x3f)<<16));
@@ -646,7 +640,7 @@ void ymf278b_device::C_w(UINT8 reg, UINT8 data)
 
 			case 0x06:
 				// memory data
-				space(AS_0).write_byte(m_memadr, data);
+				space(0).write_byte(m_memadr, data);
 				m_memadr = (m_memadr + 1) & 0x3fffff;
 				break;
 
@@ -725,7 +719,7 @@ WRITE8_MEMBER( ymf278b_device::write )
 
 READ8_MEMBER( ymf278b_device::read )
 {
-	UINT8 ret = 0;
+	uint8_t ret = 0;
 
 	switch (offset)
 	{
@@ -733,7 +727,7 @@ READ8_MEMBER( ymf278b_device::read )
 		case 0:
 		{
 			// bits 0 and 1 are only valid if NEW2 is set
-			UINT8 newbits = 0;
+			uint8_t newbits = 0;
 			if (m_exp & 2)
 				newbits = (m_status_ld << 1) | m_status_busy;
 
@@ -762,7 +756,7 @@ READ8_MEMBER( ymf278b_device::read )
 					ret = (m_pcmregs[m_port_C] & 0x1f) | 0x20; // device ID in upper bits
 					break;
 				case 6:
-					ret = m_direct->read_byte(m_memadr);
+					ret = read_byte(m_memadr);
 					m_memadr = (m_memadr + 1) & 0x3fffff;
 					break;
 
@@ -845,6 +839,11 @@ void ymf278b_device::device_stop()
 {
 	ymf262_shutdown(m_ymf262);
 	m_ymf262 = nullptr;
+}
+
+void ymf278b_device::rom_bank_updated()
+{
+	m_stream->update();
 }
 
 void ymf278b_device::precompute_rate_tables()
@@ -943,33 +942,10 @@ void ymf278b_device::register_save_state()
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-static void ymf278b_ymf262_irq_handler(void *param,int irq)
-{
-}
-
-
-static void ymf278b_ymf262_timer_handler(void *param, int c, const attotime &period)
-{
-}
-
-static void ymf278b_ymf262_update_request(void *param, int interval)
-{
-	ymf278b_device *ymf278b = (ymf278b_device *) param;
-	ymf278b->ymf262_update_request();
-}
-
-
-void ymf278b_device::ymf262_update_request()
-{
-	m_stream_ymf262->update();
-}
-
-
 void ymf278b_device::device_start()
 {
 	int i;
 
-	m_direct = &space().direct();
 	m_clock = clock();
 	m_irq_handler.resolve();
 
@@ -985,7 +961,7 @@ void ymf278b_device::device_start()
 	}
 
 	m_stream = machine().sound().stream_alloc(*this, 0, 2, clock()/768);
-	m_mix_buffer = std::make_unique<INT32[]>(44100*2);
+	m_mix_buffer = std::make_unique<int32_t[]>(44100*2);
 
 	// rate tables
 	precompute_rate_tables();
@@ -1021,31 +997,19 @@ void ymf278b_device::device_start()
 	m_stream_ymf262 = machine().sound().stream_alloc(*this, 0, 4, ymf262_clock / 288);
 
 	/* YMF262 setup */
-	ymf262_set_timer_handler (m_ymf262, ymf278b_ymf262_timer_handler, this);
-	ymf262_set_irq_handler   (m_ymf262, ymf278b_ymf262_irq_handler, this);
-	ymf262_set_update_handler(m_ymf262, ymf278b_ymf262_update_request, this);
+	ymf262_set_timer_handler (m_ymf262, ymf278b_device::static_timer_handler, this);
+	ymf262_set_irq_handler   (m_ymf262, ymf278b_device::static_irq_handler, this);
+	ymf262_set_update_handler(m_ymf262, ymf278b_device::static_update_request, this);
 }
 
 
-const device_type YMF278B = &device_creator<ymf278b_device>;
+DEFINE_DEVICE_TYPE(YMF278B, ymf278b_device, "ymf278b", "Yamaha YMF278B OPL4")
 
-ymf278b_device::ymf278b_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, YMF278B, "YMF278B", tag, owner, clock, "ymf278b", __FILE__),
-		device_sound_interface(mconfig, *this),
-		device_memory_interface(mconfig, *this),
-		m_space_config("samples", ENDIANNESS_BIG, 8, 22, 0, nullptr),
-		m_irq_handler(*this),
-		m_last_fm_data(0)
-{
-	m_address_map[0] = *ADDRESS_MAP_NAME(ymf278b);
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void ymf278b_device::device_config_complete()
+ymf278b_device::ymf278b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, YMF278B, tag, owner, clock)
+	, device_sound_interface(mconfig, *this)
+	, device_rom_interface(mconfig, *this, 22)
+	, m_irq_handler(*this)
+	, m_last_fm_data(0)
 {
 }

@@ -45,17 +45,20 @@ This info came from http://www.ne.jp/asahi/cc-sakura/akkun/old/fryski.html
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
+#include "includes/seicross.h"
+
 #include "cpu/m6800/m6800.h"
+#include "cpu/z80/z80.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
-#include "sound/dac.h"
-#include "includes/seicross.h"
+#include "sound/volt_reg.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 void seicross_state::nvram_init(nvram_device &nvram, void *data, size_t size)
 {
-	static const UINT8 init[32] = {
+	static const uint8_t init[32] = {
 		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1,
 		0, 1, 0, 1, 0, 1, 0, 3, 0, 1, 0, 0, 0, 0, 0, 0, };
 
@@ -79,7 +82,7 @@ void seicross_state::machine_reset()
 
 READ8_MEMBER(seicross_state::portB_r)
 {
-	return (m_portb & 0x9f) | (read_safe(ioport("DEBUG"), 0) & 0x60);
+	return (m_portb & 0x9f) | (m_debug_port.read_safe(0) & 0x60);
 }
 
 WRITE8_MEMBER(seicross_state::portB_w)
@@ -102,6 +105,10 @@ WRITE8_MEMBER(seicross_state::portB_w)
 	m_portb = data;
 }
 
+WRITE8_MEMBER(seicross_state::dac_w)
+{
+	m_dac->write(data >> 4);
+}
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, seicross_state )
 	AM_RANGE(0x0000, 0x77ff) AM_ROM
@@ -127,7 +134,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( mcu_nvram_map, AS_PROGRAM, 8, seicross_state )
 	AM_RANGE(0x0000, 0x007f) AM_RAM
 	AM_RANGE(0x1000, 0x10ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x2000, 0x2000) AM_DEVWRITE("dac", dac_device, write_unsigned8)
+	AM_RANGE(0x2000, 0x2000) AM_WRITE(dac_w)
 	AM_RANGE(0x8000, 0xf7ff) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("share1")
 ADDRESS_MAP_END
@@ -137,12 +144,12 @@ static ADDRESS_MAP_START( mcu_no_nvram_map, AS_PROGRAM, 8, seicross_state )
 	AM_RANGE(0x1003, 0x1003) AM_READ_PORT("DSW1")       /* DSW1 */
 	AM_RANGE(0x1005, 0x1005) AM_READ_PORT("DSW2")       /* DSW2 */
 	AM_RANGE(0x1006, 0x1006) AM_READ_PORT("DSW3")       /* DSW3 */
-	AM_RANGE(0x2000, 0x2000) AM_DEVWRITE("dac", dac_device, write_unsigned8)
+	AM_RANGE(0x2000, 0x2000) AM_WRITE(dac_w)
 	AM_RANGE(0x8000, 0xf7ff) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("share1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, seicross_state )
+static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 8, seicross_state )
 	AM_RANGE(0x8000, 0xf7ff) AM_ROM AM_SHARE("decrypted_opcodes")
 	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("share1")
 ADDRESS_MAP_END
@@ -383,15 +390,15 @@ INTERRUPT_GEN_MEMBER(seicross_state::vblank_irq)
 }
 
 
-static MACHINE_CONFIG_START( no_nvram, seicross_state )
+static MACHINE_CONFIG_START( no_nvram )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 3072000)   /* 3.072 MHz? */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz / 6)   /* D780C, 3.072 MHz? */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_portmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", seicross_state,  vblank_irq)
 
-	MCFG_CPU_ADD("mcu", NSC8105, 3072000)   /* ??? */
+	MCFG_CPU_ADD("mcu", NSC8105, XTAL_18_432MHz / 6)   /* ??? */
 	MCFG_CPU_PROGRAM_MAP(mcu_no_nvram_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(1200))  /* 20 CPU slices per frame - an high value to ensure proper */
@@ -413,15 +420,16 @@ static MACHINE_CONFIG_START( no_nvram, seicross_state )
 	MCFG_PALETTE_INIT_OWNER(seicross_state, seicross)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 1536000)
+	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_18_432MHz / 12)
 	MCFG_AY8910_PORT_B_READ_CB(READ8(seicross_state, portB_r))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(seicross_state, portB_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("dac", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.12) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -538,6 +546,32 @@ ROM_START( radrad )
 	ROM_LOAD( "pal16h2.2b", 0x0000, 0x0044, CRC(a356803a) SHA1(a324d3cbe2de5bf54be9aa07c984054149ac3eb0) )
 ROM_END
 
+ROM_START( radradj ) // Top and bottom PCBs have Nihon Bussan etched and the top PCB has a Nichibutsu sticker
+	ROM_REGION( 0x7800, "maincpu", 0 )
+	ROM_LOAD( "1.3a",         0x0000, 0x1000, CRC(b1e958ca) SHA1(3ab5fc3314f202ba527470eacbb76d52fe969bca) ) // 2732
+	ROM_LOAD( "2.3b",         0x1000, 0x1000, CRC(30ba76b3) SHA1(e6af1fc35fdc71d5436f0d29e5722cbcb4409196) ) // 2732
+	ROM_LOAD( "3.3d",         0x2000, 0x1000, CRC(1c9f397b) SHA1(7f556c5bef5309d5048c3b9671b88ad646a8b648) ) // 2732
+	ROM_LOAD( "4.3d",         0x3000, 0x1000, CRC(453966a3) SHA1(dd1bfeb8956c4670a5d4a5e981413b47701f6233) ) // 2732
+	ROM_LOAD( "5.3f",         0x4000, 0x1000, CRC(c337c4bd) SHA1(a5d29e9ba629d23f8c084fdb0ce4a83513648e82) ) // 2732
+	ROM_LOAD( "6.3h",         0x5000, 0x1000, CRC(06e15b59) SHA1(0c7748abba29362c92724e601d90ad1711b23f86) ) // 2732
+	ROM_LOAD( "7.3i",         0x6000, 0x1000, CRC(02b1f9c9) SHA1(6b857ae477d3c92a58494140ffa3337dba8e77cc) ) // 2732
+	ROM_LOAD( "8.3j",         0x7000, 0x0800, CRC(bc9c7fae) SHA1(85177d438058a329189b38b89d17616bba9eed3d) ) // 2732
+	ROM_CONTINUE(0x7000, 0x0800) // 1ST AND 2ND HALF IDENTICAL (the half matches the ROM in radrad)
+
+	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_LOAD( "11.7k",        0x0000, 0x1000, CRC(c75b96da) SHA1(93692f7ae10ec812f641687509624eb7682e3eeb) ) // 2732
+	ROM_LOAD( "12.7m",        0x1000, 0x1000, CRC(83f35c05) SHA1(4645eb9995b54d8a0d98d2b2a8c477047aed4519) ) // 2732
+	ROM_LOAD( "9.7h",         0x2000, 0x1000, CRC(f2da3954) SHA1(157ab1fdd289c1132650b5d395219337a6c1f26b) ) // 2732
+	ROM_LOAD( "10.7j",        0x3000, 0x1000, CRC(79237913) SHA1(b07dd531d06ef01f756169e87a8cccda35ed38d3) ) // 2732
+
+	ROM_REGION( 0x0040, "proms", 0 ) // not dumped for this set
+	ROM_LOAD( "clr.9c",       0x0000, 0x0020, CRC(c9d88422) SHA1(626216bac1a6317a32f2a51b89375043f58b5503) )
+	ROM_LOAD( "clr.9b",       0x0020, 0x0020, CRC(ee81af16) SHA1(e1bab9738d37dea0473a7184a4303234b75e6cc6) )
+
+	ROM_REGION( 0x0100, "plds", 0 )  // not dumped for this set
+	ROM_LOAD( "pal16h2.2b", 0x0000, 0x0044, CRC(a356803a) SHA1(a324d3cbe2de5bf54be9aa07c984054149ac3eb0) )
+ROM_END
+
 ROM_START( seicross )
 	ROM_REGION( 0x7800, "maincpu", 0 )
 	ROM_LOAD( "smc1",         0x0000, 0x1000, CRC(f6c3aeca) SHA1(d57019e80f7e3d47ca74f54604e92d40ba9819fc) )
@@ -590,7 +624,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(seicross_state,friskytb)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	// this code is in ROM 6.3h, maps to MCU at dxxx
 	for (int i = 0; i < 0x7800; i++)
 	{
@@ -599,9 +633,10 @@ DRIVER_INIT_MEMBER(seicross_state,friskytb)
 }
 
 
-GAME( 1981, friskyt,  0,        nvram,    friskyt, driver_device,  0,        ROT0,  "Nichibutsu", "Frisky Tom (set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, friskyta, friskyt,  nvram,    friskyt, driver_device,  0,        ROT0,  "Nichibutsu", "Frisky Tom (set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, friskytb, friskyt,  friskytb, friskyt, seicross_state, friskytb, ROT0,  "Nichibutsu", "Frisky Tom (set 3, encrypted)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // protection mcu runs encrypted opcodes
-GAME( 1982, radrad,   0,        no_nvram, radrad, driver_device,   0,        ROT0,  "Nichibutsu USA", "Radical Radial", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, seicross, 0,        no_nvram, seicross, driver_device, 0,        ROT90, "Nichibutsu / Alice", "Seicross", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, sectrzon, seicross, no_nvram, seicross, driver_device, 0,        ROT90, "Nichibutsu / Alice", "Sector Zone", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, friskyt,  0,        nvram,    friskyt,  seicross_state, 0,        ROT0,  "Nichibutsu", "Frisky Tom (set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, friskyta, friskyt,  nvram,    friskyt,  seicross_state, 0,        ROT0,  "Nichibutsu", "Frisky Tom (set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, friskytb, friskyt,  friskytb, friskyt,  seicross_state, friskytb, ROT0,  "Nichibutsu", "Frisky Tom (set 3, encrypted)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // protection mcu runs encrypted opcodes
+GAME( 1982, radrad,   0,        no_nvram, radrad,   seicross_state, 0,        ROT0,  "Nichibutsu USA", "Radical Radial (US)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, radradj,  radrad,   no_nvram, radrad,   seicross_state, 0,        ROT0,  "Logitec Corp.", "Radical Radial (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, seicross, 0,        no_nvram, seicross, seicross_state, 0,        ROT90, "Nichibutsu / Alice", "Seicross", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, sectrzon, seicross, no_nvram, seicross, seicross_state, 0,        ROT90, "Nichibutsu / Alice", "Sector Zone", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

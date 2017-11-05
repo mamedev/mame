@@ -6,11 +6,12 @@ This is for common pinball machine coding.
 
 **********************************************************************************/
 
-
-
+#include "emu.h"
 #include "genpin.h"
+#include "speaker.h"
 
-MACHINE_CONFIG_FRAGMENT( genpin_audio )
+
+MACHINE_CONFIG_START( genpin_audio )
 	MCFG_SPEAKER_STANDARD_MONO("mechvol")
 	MCFG_SOUND_ADD("samples", SAMPLES, 0)
 	MCFG_SAMPLES_CHANNELS(6)

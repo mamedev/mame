@@ -8,8 +8,10 @@
 
 *********************************************************************/
 
-#ifndef __I8251_H__
-#define __I8251_H__
+#ifndef MAME_MACHINE_I8251_H
+#define MAME_MACHINE_I8251_H
+
+#pragma once
 
 
 //**************************************************************************
@@ -42,24 +44,21 @@ class i8251_device :  public device_t,
 {
 public:
 	// construction/destruction
-	i8251_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname);
-	i8251_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	i8251_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration helpers
-	template<class _Object> static devcb_base &set_txd_handler(device_t &device, _Object object) { return downcast<i8251_device &>(device).m_txd_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_dtr_handler(device_t &device, _Object object) { return downcast<i8251_device &>(device).m_dtr_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_rts_handler(device_t &device, _Object object) { return downcast<i8251_device &>(device).m_rts_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_rxrdy_handler(device_t &device, _Object object) { return downcast<i8251_device &>(device).m_rxrdy_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_txrdy_handler(device_t &device, _Object object) { return downcast<i8251_device &>(device).m_txrdy_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_txempty_handler(device_t &device, _Object object) { return downcast<i8251_device &>(device).m_txempty_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_syndet_handler(device_t &device, _Object object) { return downcast<i8251_device &>(device).m_syndet_handler.set_callback(object); }
+	template <class Object> static devcb_base &set_txd_handler(device_t &device, Object &&cb) { return downcast<i8251_device &>(device).m_txd_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_dtr_handler(device_t &device, Object &&cb) { return downcast<i8251_device &>(device).m_dtr_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_rts_handler(device_t &device, Object &&cb) { return downcast<i8251_device &>(device).m_rts_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_rxrdy_handler(device_t &device, Object &&cb) { return downcast<i8251_device &>(device).m_rxrdy_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_txrdy_handler(device_t &device, Object &&cb) { return downcast<i8251_device &>(device).m_txrdy_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_txempty_handler(device_t &device, Object &&cb) { return downcast<i8251_device &>(device).m_txempty_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_syndet_handler(device_t &device, Object &&cb) { return downcast<i8251_device &>(device).m_syndet_handler.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER(data_r);
 	DECLARE_WRITE8_MEMBER(data_w);
 	DECLARE_READ8_MEMBER(status_r);
 	DECLARE_WRITE8_MEMBER(control_w);
-	DECLARE_WRITE8_MEMBER(command_w);
-	DECLARE_WRITE8_MEMBER(mode_w);
 
 	DECLARE_WRITE_LINE_MEMBER( write_rxd );
 	DECLARE_WRITE_LINE_MEMBER( write_cts );
@@ -68,7 +67,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( write_rxc );
 
 	/// TODO: REMOVE THIS
-	void receive_character(UINT8 ch);
+	void receive_character(uint8_t ch);
 
 	/// TODO: this shouldn't be public
 	enum
@@ -82,19 +81,28 @@ public:
 	};
 
 protected:
+	i8251_device(
+			const machine_config &mconfig,
+			device_type type,
+			const char *tag,
+			device_t *owner,
+			uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+	void command_w(uint8_t data);
+	void mode_w(uint8_t data);
 
 	void update_rx_ready();
 	void update_tx_ready();
 	void update_tx_empty();
 	void transmit_clock();
 	void receive_clock();
-		bool is_tx_enabled(void) const;
-		void check_for_tx_start(void);
-		void start_tx(void);
+	bool is_tx_enabled() const;
+	void check_for_tx_start();
+	void start_tx();
 
 
 	enum
@@ -114,18 +122,18 @@ private:
 	devcb_write_line m_syndet_handler;
 
 	/* flags controlling how i8251_control_w operates */
-	UINT8 m_flags;
+	uint8_t m_flags;
 	/* offset into sync_bytes used during sync byte transfer */
-	UINT8 m_sync_byte_offset;
+	uint8_t m_sync_byte_offset;
 	/* number of sync bytes written so far */
-	UINT8 m_sync_byte_count;
+	uint8_t m_sync_byte_count;
 	/* the sync bytes written */
-	UINT8 m_sync_bytes[2];
+	uint8_t m_sync_bytes[2];
 	/* status of i8251 */
-	UINT8 m_status;
-	UINT8 m_command;
+	uint8_t m_status;
+	uint8_t m_command;
 	/* mode byte - bit definitions depend on mode - e.g. synchronous, asynchronous */
-	UINT8 m_mode_byte;
+	uint8_t m_mode_byte;
 
 	int m_cts;
 	int m_dsr;
@@ -137,23 +145,25 @@ private:
 	int m_br_factor;
 
 	/* data being received */
-	UINT8 m_rx_data;
+	uint8_t m_rx_data;
 		/* tx buffer */
-	UINT8 m_tx_data;
+	uint8_t m_tx_data;
 };
 
 class v53_scu_device :  public i8251_device
 {
 public:
 	// construction/destruction
-	v53_scu_device(const machine_config &mconfig,  const char *tag, device_t *owner, UINT32 clock);
+	v53_scu_device(const machine_config &mconfig,  const char *tag, device_t *owner, uint32_t clock);
+
+	DECLARE_WRITE8_MEMBER(command_w);
+	DECLARE_WRITE8_MEMBER(mode_w);
 };
 
 
 
 // device type definition
-extern const device_type I8251;
-extern const device_type V53_SCU;
+DECLARE_DEVICE_TYPE(I8251,   i8251_device)
+DECLARE_DEVICE_TYPE(V53_SCU, v53_scu_device)
 
-
-#endif /* __I8251_H__ */
+#endif // MAME_MACHINE_I8251_H

@@ -93,10 +93,12 @@ E000-FFFF  | R | D D D D D D D D | 8K ROM
 ***************************************************************************/
 
 #include "emu.h"
+#include "video/bfm_adr2.h"
+
 #include "cpu/m6809/m6809.h"
 #include "machine/bfm_bd1.h"  // vfd
-#include "video/bfm_adr2.h"
 #include "rendlay.h"
+#include "screen.h"
 
 #ifdef MAME_DEBUG
 #define VERBOSE 1
@@ -135,12 +137,12 @@ static GFXDECODE_START( adder2 )
 	GFXDECODE_ENTRY( ":gfx1",  0, charlayout, 0, 16 )
 GFXDECODE_END
 
-const device_type BFM_ADDER2 = &device_creator<bfm_adder2_device>;
+DEFINE_DEVICE_TYPE(BFM_ADDER2, bfm_adder2_device, "bfm_adder2", "BFM ADDER2")
 
-bfm_adder2_device::bfm_adder2_device( const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock )
-	: device_t(mconfig, BFM_ADDER2, "BFM ADDER2", tag, owner, clock, "bfm_adder2", __FILE__),
-		device_gfx_interface(mconfig, *this, GFXDECODE_NAME(adder2), "palette"),
-		m_cpu(*this, "adder2")
+bfm_adder2_device::bfm_adder2_device( const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock )
+	: device_t(mconfig, BFM_ADDER2, tag, owner, clock)
+	, device_gfx_interface(mconfig, *this, GFXDECODE_NAME(adder2), "palette")
+	, m_cpu(*this, "adder2")
 {
 }
 
@@ -203,7 +205,7 @@ void bfm_adder2_device::device_reset()
 	m_adder2_data_to_sc2       = 0;
 
 	{
-		UINT8 *rom = machine().root_device().memregion("adder2")->base();
+		uint8_t *rom = machine().root_device().memregion("adder2")->base();
 
 		membank("bank2")->configure_entries(0, 4, &rom[0x00000], 0x08000);
 
@@ -213,7 +215,7 @@ void bfm_adder2_device::device_reset()
 
 void bfm_adder2_device::device_start()
 {
-	if (!palette().started())
+	if (!palette().device().started())
 		throw device_missing_dependencies();
 
 	adder2_decode_char_roms();
@@ -253,7 +255,7 @@ void bfm_adder2_device::device_start()
 }
 
 // video update ///////////////////////////////////////////////////////////
-UINT32 bfm_adder2_device::update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t bfm_adder2_device::update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	const rectangle visible1(0, 400-1,  0,  280-1);  //minx,maxx, miny,maxy
 
@@ -290,7 +292,7 @@ WRITE8_MEMBER( bfm_adder2_device::screen_ram_w )
 	if ( offset > 102 && offset < 102+1+16 )
 	{ // format xxxrrggb ////////////////////////////////////////////////////
 		int pal;
-		UINT8 r,g,b;
+		uint8_t r,g,b;
 
 		pal = offset-102-1;
 
@@ -449,7 +451,7 @@ WRITE8_MEMBER(bfm_adder2_device::vid_uart_ctrl_w)
 
 READ8_MEMBER(bfm_adder2_device::vid_uart_rx_r)
 {
-	UINT8 data = m_adder2_data;
+	uint8_t data = m_adder2_data;
 	m_adder2_data_to_sc2 = 0;   // clr flag, data from adder available
 
 	//LOG_SERIAL(("radder:  %02X(%c)\n",data, data ));
@@ -478,11 +480,11 @@ READ8_MEMBER(bfm_adder2_device::vid_uart_ctrl_r)
 
 void bfm_adder2_device::adder2_decode_char_roms()
 {
-	UINT8 *p = machine().root_device().memregion("gfx1")->base();
+	uint8_t *p = machine().root_device().memregion("gfx1")->base();
 
 	if ( p )
 	{
-		dynamic_buffer s( 0x40000 );
+		std::vector<uint8_t> s( 0x40000 );
 		{
 			int x, y;
 
@@ -495,7 +497,7 @@ void bfm_adder2_device::adder2_decode_char_roms()
 				x = 0;
 				while ( x < 64 )
 				{
-					UINT8 *src = &s[(y*256*8)+(x*4)];
+					uint8_t *src = &s[(y*256*8)+(x*4)];
 
 					*p++ = src[0*256+0];*p++ = src[0*256+1];*p++ = src[0*256+2];*p++ = src[0*256+3];
 					*p++ = src[1*256+0];*p++ = src[1*256+1];*p++ = src[1*256+2];*p++ = src[1*256+3];
@@ -538,9 +540,12 @@ static ADDRESS_MAP_START( adder2_memmap, AS_PROGRAM, 8, bfm_adder2_device )
 	AM_RANGE(0xE000, 0xFFFF) AM_ROM  AM_REGION(":adder2", 0xE000)                         // 8k  ROM
 ADDRESS_MAP_END
 
-///////////////////////////////////////////////////////////////////////////
 
-static MACHINE_CONFIG_FRAGMENT( adder2 )
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+MACHINE_CONFIG_MEMBER( bfm_adder2_device::device_add_mconfig )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_SIZE( 400, 280)
 	MCFG_SCREEN_VISIBLE_AREA(  0, 400-1, 0, 280-1)
@@ -554,13 +559,3 @@ static MACHINE_CONFIG_FRAGMENT( adder2 )
 	MCFG_CPU_PROGRAM_MAP(adder2_memmap)             // setup adder2 board memorymap
 	MCFG_DEVICE_VBLANK_INT_DEVICE("screen", DEVICE_SELF, bfm_adder2_device, adder2_vbl)        // board has a VBL IRQ
 MACHINE_CONFIG_END
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor bfm_adder2_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( adder2 );
-}

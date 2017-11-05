@@ -6,12 +6,11 @@
 
 *********************************************************************/
 
+#ifndef MAME_BUS_CBMIEC_INTERPOD_H
+#define MAME_BUS_CBMIEC_INTERPOD_H
+
 #pragma once
 
-#ifndef __INTERPOD__
-#define __INTERPOD__
-
-#include "emu.h"
 #include "cbmiec.h"
 #include "bus/ieee488/ieee488.h"
 #include "cpu/m6502/m6502.h"
@@ -44,33 +43,31 @@
 
 // ======================> interpod_device
 
-class interpod_device :  public device_t,
-							public device_cbm_iec_interface
+class interpod_device : public device_t, public device_cbm_iec_interface
 {
 public:
 	// construction/destruction
-	interpod_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-	// optional information overrides
-	virtual const rom_entry *device_rom_region() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	interpod_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
+	// optional information overrides
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
+
 	required_device<cpu_device> m_maincpu;
 	required_device<via6522_device> m_via;
-	required_device<mos6532_t> m_riot;
+	required_device<mos6532_new_device> m_riot;
 	required_device<acia6850_device> m_acia;
 	required_device<ieee488_device> m_ieee;
 };
 
 
 // device type definition
-extern const device_type INTERPOD;
+DECLARE_DEVICE_TYPE(INTERPOD, interpod_device)
 
 
-
-#endif
+#endif // MAME_BUS_CBMIEC_INTERPOD_H

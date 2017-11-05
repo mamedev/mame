@@ -26,6 +26,7 @@ TODO:
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
 #include "machine/nvram.h"
+#include "screen.h"
 
 #include "lbeach.lh"
 
@@ -50,11 +51,11 @@ public:
 
 	/* devices / memory pointers */
 	required_device<cpu_device> m_maincpu;
-	required_shared_ptr<UINT8> m_bg_vram;
-	required_shared_ptr<UINT8> m_fg_vram;
-	required_shared_ptr<UINT8> m_scroll_y;
-	required_shared_ptr<UINT8> m_sprite_x;
-	required_shared_ptr<UINT8> m_sprite_code;
+	required_shared_ptr<uint8_t> m_bg_vram;
+	required_shared_ptr<uint8_t> m_fg_vram;
+	required_shared_ptr<uint8_t> m_scroll_y;
+	required_shared_ptr<uint8_t> m_sprite_x;
+	required_shared_ptr<uint8_t> m_sprite_code;
 
 	int m_collision_bg_car;
 	int m_collision_fg_car;
@@ -77,7 +78,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(lbeach);
-	UINT32 screen_update_lbeach(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_lbeach(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -118,30 +119,30 @@ TILE_GET_INFO_MEMBER(lbeach_state::get_bg_tile_info)
 	// d0-d4: code
 	// d5: unused?
 	// d6,d7: color
-	UINT8 code = m_bg_vram[tile_index];
+	uint8_t code = m_bg_vram[tile_index];
 
 	SET_TILE_INFO_MEMBER(1, code & 0x1f, code >> 6 & 3, 0);
 }
 
 TILE_GET_INFO_MEMBER(lbeach_state::get_fg_tile_info)
 {
-	UINT8 code = m_fg_vram[tile_index];
+	uint8_t code = m_fg_vram[tile_index];
 
 	SET_TILE_INFO_MEMBER(0, code, 0, 0);
 }
 
 void lbeach_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(lbeach_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 16);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(lbeach_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 16);
 
-	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(lbeach_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 8, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(lbeach_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 8, 32, 32);
 	m_fg_tilemap->set_transparent_pen(0);
 
 	m_screen->register_screen_bitmap(m_colmap_car);
 }
 
 
-UINT32 lbeach_state::screen_update_lbeach(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t lbeach_state::screen_update_lbeach(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// draw bg layer (road)
 	m_bg_tilemap->set_scrolly(0, *m_scroll_y);
@@ -207,8 +208,8 @@ READ8_MEMBER(lbeach_state::lbeach_in1_r)
 READ8_MEMBER(lbeach_state::lbeach_in2_r)
 {
 	// d6 and d7 are for collision detection
-	UINT8 d6 = m_collision_fg_car ? 0x40 : 0;
-	UINT8 d7 = m_collision_bg_car ? 0x80 : 0;
+	uint8_t d6 = m_collision_fg_car ? 0x40 : 0;
+	uint8_t d7 = m_collision_bg_car ? 0x80 : 0;
 
 	return (ioport("IN2")->read() & 0x3f) | d6 | d7;
 }
@@ -323,7 +324,7 @@ void lbeach_state::machine_reset()
 {
 }
 
-static MACHINE_CONFIG_START( lbeach, lbeach_state )
+static MACHINE_CONFIG_START( lbeach )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, XTAL_16MHz / 32) // Motorola MC6800P, 500kHz
@@ -375,4 +376,4 @@ ROM_START( lbeach )
 ROM_END
 
 
-GAMEL(1979, lbeach, 0, lbeach, lbeach, driver_device, 0, ROT0, "Olympia / Seletron", "Long Beach", MACHINE_IMPERFECT_COLORS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_lbeach )
+GAMEL(1979, lbeach, 0, lbeach, lbeach, lbeach_state, 0, ROT0, "Olympia / Seletron", "Long Beach", MACHINE_IMPERFECT_COLORS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_lbeach )

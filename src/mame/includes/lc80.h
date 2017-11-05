@@ -1,17 +1,17 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
-#ifndef __LC80__
-#define __LC80__
+#ifndef MAME_INCLUDES_LC80_H
+#define MAME_INCLUDES_LC80_H
 
+#pragma once
 
-#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
 #include "imagedev/cassette.h"
 #include "machine/ram.h"
 #include "machine/z80pio.h"
 #include "machine/z80ctc.h"
-#include "sound/speaker.h"
+#include "sound/spkrdev.h"
 
 #define SCREEN_TAG      "screen"
 #define Z80_TAG         "d201"
@@ -61,8 +61,8 @@ public:
 	void update_display();
 
 	// display state
-	UINT8 m_digit;
-	UINT8 m_segment;
+	uint8_t m_digit;
+	uint8_t m_segment;
 };
 
-#endif
+#endif // MAME_INCLUDES_LC80_H

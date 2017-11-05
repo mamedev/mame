@@ -14,7 +14,7 @@ Driver started on 10/01/2012
 Memory map:
 
 000000-00ffff - system rom
-428000-428fff - keyboard
+428000-428fff - keyboard 8042 host status / data ports (8042 undumped)
 510000-51ffff - videoram
 530000-53ffff - graphic memory
 5f0000-5f3fff - system PROM
@@ -42,6 +42,7 @@ TODO: boot tests fail
 #include "video/mc6845.h"
 #include "machine/terminal.h"
 //#include "machine/ins8250.h"
+#include "screen.h"
 
 #define HP9816_CHDIMX 8
 #define HP9816_CHDIMY 16
@@ -50,7 +51,7 @@ TODO: boot tests fail
 
 //
 
-static UINT8 prom16a[256] = {
+static uint8_t prom16a[256] = {
 	0x00,0x00,      // checksum
 	0x00,           // 256 bytes idprom
 		'2', '0', '1', '0', 'A', '0', '0', '0', '0', '0', '0',      // serial in ascii DDDDCSSSSSS date code, country, serial number
@@ -72,7 +73,7 @@ static UINT8 prom16a[256] = {
 	0xff,
 	0xff,
 	0xff,
-	0xff,0xfe,0x00,0x00,            // bottom minimun address for ram size
+	0xff,0xfe,0x00,0x00,            // bottom minimum address for ram size
 	0xff,0xff,                      // 16 required IO cards here not used
 	0xff,0xff,
 	0xff,0xff,
@@ -116,8 +117,8 @@ private:
 	int crtc_addrStartHi;
 	int crtc_addrStartLow;
 
-	void calc_prom_crc(UINT8* prom);
-	void putChar(UINT8 thec,int x,int y,bitmap_ind16 &bitmap);
+	void calc_prom_crc(uint8_t* prom);
+	void putChar(uint8_t thec,int x,int y,bitmap_ind16 &bitmap);
 
 public:
 	hp9k_state(const machine_config &mconfig, device_type type, const char *tag)
@@ -134,14 +135,14 @@ public:
 		calc_prom_crc(prom16a);
 	}
 
-	UINT8 kbdBit;
+	uint8_t kbdBit;
 
 	required_device<cpu_device> m_maincpu;
 	//required_device<> m_terminal;
 	required_device<mc6845_device> m_6845;
 
-	UINT8 m_videoram[0x4000];
-	UINT8 m_screenram[0x800];
+	uint8_t m_videoram[0x4000];
+	uint8_t m_screenram[0x800];
 
 	DECLARE_DRIVER_INIT(hp9k);
 
@@ -162,14 +163,14 @@ public:
 
 	DECLARE_WRITE8_MEMBER(kbd_put);
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 //
 
-void hp9k_state::calc_prom_crc(UINT8* prom)
+void hp9k_state::calc_prom_crc(uint8_t* prom)
 {
 	int chksum;
 	int i;
@@ -187,8 +188,8 @@ void hp9k_state::calc_prom_crc(UINT8* prom)
 	if (chksum!=0)
 	{
 		chksum=(0x10000-chksum);
-		prom[0]=(UINT8)(chksum>>8);
-		prom[1]=(UINT8)(chksum&0xff);
+		prom[0]=(uint8_t)(chksum>>8);
+		prom[1]=(uint8_t)(chksum&0xff);
 	}
 }
 
@@ -279,7 +280,7 @@ WRITE16_MEMBER( hp9k_state::hp9k_videoram_w )
 				m_screenram[offset&0x7ff]=data>>8;
 				m_videoram[offset&0x3fff]=data>>8;
 
-				//UINT8 *rom = machine().region("bootrom")->base();
+				//uint8_t *rom = machine().region("bootrom")->base();
 				//rom[0x90B]=0x00;
 			}
 			else
@@ -348,23 +349,23 @@ static GFXDECODE_START( hp9k )
 	GFXDECODE_ENTRY( "bootrom", 0x2000, hp9k_charlayout, 0, 1 )
 GFXDECODE_END
 
-void hp9k_state::putChar(UINT8 thec,int x,int y,bitmap_ind16 &bitmap)
+void hp9k_state::putChar(uint8_t thec,int x,int y,bitmap_ind16 &bitmap)
 {
-	const UINT8* pchar=m_gfxdecode->gfx(0)->get_data(thec);
+	const uint8_t* pchar=m_gfxdecode->gfx(0)->get_data(thec);
 
 	for (int py=0;py<HP9816_CHDIMY;py++)
 	{
 		for (int px=0;px<HP9816_CHDIMX;px++)
 		{
-			UINT16 *dest=&bitmap.pix16((y*(HP9816_CHDIMY))+py,(x*(HP9816_CHDIMX))+px);
+			uint16_t *dest=&bitmap.pix16((y*(HP9816_CHDIMY))+py,(x*(HP9816_CHDIMX))+px);
 			*dest=pchar[px+(py*8)];
 		}
 	}
 }
 
-UINT32 hp9k_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t hp9k_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	//UINT8* pvram=&m_screenram[1];
+	//uint8_t* pvram=&m_screenram[1];
 
 	int startAddr=((crtc_addrStartLow&0xff)|((crtc_addrStartHi<<8)))&0x3fff;
 	int chStart=startAddr&0x1fff;
@@ -373,9 +374,9 @@ UINT32 hp9k_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 	{
 		for (int c=0;c<HP9816_ROWX;c++)
 		{
-			//UINT8 thec=pvram[((c+(r*80))+160+47)&0x7ff];
-			//UINT8 thec=m_videoram[((c+(r*80))+startAddr)];
-			UINT8 thec=m_screenram[chStart&0x7ff];
+			//uint8_t thec=pvram[((c+(r*80))+160+47)&0x7ff];
+			//uint8_t thec=m_videoram[((c+(r*80))+startAddr)];
+			uint8_t thec=m_screenram[chStart&0x7ff];
 			putChar(thec,c,r,bitmap);
 			chStart++;
 		}
@@ -391,7 +392,7 @@ WRITE8_MEMBER( hp9k_state::kbd_put )
 }
 
 
-static MACHINE_CONFIG_START( hp9k, hp9k_state )
+static MACHINE_CONFIG_START( hp9k )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000, XTAL_8MHz)
 	MCFG_CPU_PROGRAM_MAP(hp9k_mem)
@@ -428,5 +429,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1982, hp9816, 0,      0,      hp9k,   hp9k, hp9k_state,       hp9k,   "Hewlett Packard",  "HP 9816" ,  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  STATE       INIT    COMPANY            FULLNAME     FLAGS */
+COMP( 1982, hp9816, 0,      0,      hp9k,    hp9k,  hp9k_state, hp9k,  "Hewlett Packard",  "HP 9816" ,  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

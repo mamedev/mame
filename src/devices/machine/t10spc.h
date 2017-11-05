@@ -6,10 +6,11 @@ t10spc.h
 
 ***************************************************************************/
 
-#ifndef _T10SPC_H_
-#define _T10SPC_H_
+#ifndef MAME_MACHINE_T10SPC_H
+#define MAME_MACHINE_T10SPC_H
 
-#include "emu.h"
+#pragma once
+
 
 class t10spc
 {
@@ -18,14 +19,14 @@ public:
 	{
 	}
 
-	virtual ~t10spc() {};
+	virtual ~t10spc() { }
 	virtual void SetDevice( void *device ) = 0;
 	virtual void GetDevice( void **device ) = 0;
 
-	virtual void SetCommand( UINT8 *command, int commandLength );
+	virtual void SetCommand( uint8_t *command, int commandLength );
 	virtual void ExecCommand();
-	virtual void WriteData( UINT8 *data, int dataLength );
-	virtual void ReadData( UINT8 *data, int dataLength );
+	virtual void WriteData( uint8_t *data, int dataLength );
+	virtual void ReadData( uint8_t *data, int dataLength );
 	void GetLength( int *transferLength ) { *transferLength = m_transfer_length; }
 	virtual void GetPhase( int *phase ) { *phase = m_phase; }
 
@@ -33,8 +34,8 @@ protected:
 	virtual void t10_start(device_t &device);
 	virtual void t10_reset();
 
-	int SCSILengthFromUINT8( UINT8 *length ) { if( *length == 0 ) { return 256; } return *length; }
-	int SCSILengthFromUINT16( UINT8 *length ) { return ( *(length) << 8 ) | *(length + 1 ); }
+	int SCSILengthFromUINT8( uint8_t *length ) { if( *length == 0 ) { return 256; } return *length; }
+	int SCSILengthFromUINT16( uint8_t *length ) { return ( *(length) << 8 ) | *(length + 1 ); }
 
 	enum sense_key_t
 	{
@@ -117,15 +118,15 @@ protected:
 
 	void set_sense(sense_key_t key, sense_asc_ascq_t asc_ascq);
 
-	UINT8 command[ 32 ];
+	uint8_t command[ 32 ];
 	int commandLength;
 	int m_transfer_length;
 	int m_phase;
 	status_code_t m_status_code;
-	UINT8 m_sense_key;
-	UINT8 m_sense_asc;
-	UINT8 m_sense_ascq;
-	UINT32 m_sense_information;
+	uint8_t m_sense_key;
+	uint8_t m_sense_asc;
+	uint8_t m_sense_ascq;
+	uint32_t m_sense_information;
 	int m_sector_bytes;
 	device_t *m_device;
 };
@@ -139,4 +140,4 @@ protected:
 #define SCSI_PHASE_BUS_FREE ( 8 )
 #define SCSI_PHASE_SELECT ( 9 )
 
-#endif
+#endif // MAME_MACHINE_T10SPC_H

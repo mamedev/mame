@@ -35,7 +35,7 @@ PALETTE_INIT_MEMBER(sprint2_state, sprint2)
 
 TILE_GET_INFO_MEMBER(sprint2_state::get_tile_info)
 {
-	UINT8 code = m_video_ram[tile_index];
+	uint8_t code = m_video_ram[tile_index];
 
 	SET_TILE_INFO_MEMBER(0, code & 0x3f, code >> 7, 0);
 }
@@ -45,7 +45,7 @@ void sprint2_state::video_start()
 {
 	m_screen->register_screen_bitmap(m_helper);
 
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(sprint2_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 16, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(sprint2_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 16, 8, 32, 32);
 }
 
 
@@ -76,9 +76,9 @@ WRITE8_MEMBER(sprint2_state::sprint2_video_ram_w)
 }
 
 
-UINT8 sprint2_state::collision_check(rectangle& rect)
+uint8_t sprint2_state::collision_check(rectangle& rect)
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	int x;
 	int y;
@@ -86,7 +86,7 @@ UINT8 sprint2_state::collision_check(rectangle& rect)
 	for (y = rect.min_y; y <= rect.max_y; y++)
 		for (x = rect.min_x; x <= rect.max_x; x++)
 		{
-			UINT16 a = m_palette->pen_indirect(m_helper.pix16(y, x));
+			uint16_t a = m_palette->pen_indirect(m_helper.pix16(y, x));
 
 			if (a == 0)
 				data |= 0x40;
@@ -99,26 +99,26 @@ UINT8 sprint2_state::collision_check(rectangle& rect)
 }
 
 
-inline int sprint2_state::get_sprite_code(UINT8 *video_ram, int n)
+inline int sprint2_state::get_sprite_code(uint8_t *video_ram, int n)
 {
 	return video_ram[0x398 + 2 * n + 1] >> 3;
 }
-inline int sprint2_state::get_sprite_x(UINT8 *video_ram, int n)
+inline int sprint2_state::get_sprite_x(uint8_t *video_ram, int n)
 {
 	return 2 * (248 - video_ram[0x390 + 1 * n]);
 }
-inline int sprint2_state::get_sprite_y(UINT8 *video_ram, int n)
+inline int sprint2_state::get_sprite_y(uint8_t *video_ram, int n)
 {
 	return 1 * (248 - video_ram[0x398 + 2 * n]);
 }
 
 
-UINT32 sprint2_state::screen_update_sprint2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t sprint2_state::screen_update_sprint2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 *video_ram = m_video_ram;
+	uint8_t *video_ram = m_video_ram;
 	int i;
 
-	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(*m_screen, bitmap, cliprect, 0, 0);
 
 	/* draw the sprites */
 
@@ -135,12 +135,12 @@ UINT32 sprint2_state::screen_update_sprint2(screen_device &screen, bitmap_ind16 
 }
 
 
-void sprint2_state::screen_eof_sprint2(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(sprint2_state::screen_vblank_sprint2)
 {
 	// rising edge
 	if (state)
 	{
-		UINT8 *video_ram = m_video_ram;
+		uint8_t *video_ram = m_video_ram;
 		int i;
 		int j;
 		const rectangle &visarea = m_screen->visible_area();
@@ -166,7 +166,7 @@ void sprint2_state::screen_eof_sprint2(screen_device &screen, bool state)
 
 			/* check for sprite-tilemap collisions */
 
-			m_bg_tilemap->draw(screen, m_helper, rect, 0, 0);
+			m_bg_tilemap->draw(*m_screen, m_helper, rect, 0, 0);
 
 			m_gfxdecode->gfx(1)->transpen(m_helper,rect,
 				get_sprite_code(video_ram, i),

@@ -25,14 +25,19 @@
 ****************************************************************************/
 
 
+#include "emu.h"
 #include "includes/next.h"
-#include "formats/pc_dsk.h"
-#include "formats/mfi_dsk.h"
+
 #include "machine/nscsi_cd.h"
 #include "machine/nscsi_hd.h"
+#include "screen.h"
 #include "softlist.h"
 
-UINT32 next_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+#include "formats/mfi_dsk.h"
+#include "formats/pc_dsk.h"
+
+
+uint32_t next_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	// We don't handle partial updates, but we don't generate them either :-)
 	if(cliprect.min_x || cliprect.min_y || cliprect.max_x+1 != screen_sx || cliprect.max_y+1 != screen_sy)
@@ -43,29 +48,29 @@ UINT32 next_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 	// 1120x832 (8)
 	// 832x624 (5c,9c)
 	if(screen_color) {
-		const UINT32 *vr = vram;
+		const uint32_t *vr = vram;
 		for(int y=0; y<screen_sy; y++) {
-			UINT32 *pix = reinterpret_cast<UINT32 *>(bitmap.raw_pixptr(y));
+			uint32_t *pix = reinterpret_cast<uint32_t *>(bitmap.raw_pixptr(y));
 			for(int x=0; x<screen_sx; x+=2) {
-				UINT32 v = *vr++;
+				uint32_t v = *vr++;
 				for(int xi=0; xi<2; xi++) {
-					UINT16 pen = (v >> (16-(xi*16))) & 0xffff;
-					UINT32 r = (pen & 0xf000) >> 12;
-					UINT32 g = (pen & 0x0f00) >> 8;
-					UINT32 b = (pen & 0x00f0) >> 4;
-					UINT32 col = (r << 20) | (r << 16) | (g << 12) | (g << 8) | (b << 4) | b;
+					uint16_t pen = (v >> (16-(xi*16))) & 0xffff;
+					uint32_t r = (pen & 0xf000) >> 12;
+					uint32_t g = (pen & 0x0f00) >> 8;
+					uint32_t b = (pen & 0x00f0) >> 4;
+					uint32_t col = (r << 20) | (r << 16) | (g << 12) | (g << 8) | (b << 4) | b;
 					*pix++ = col;
 				}
 			}
 			vr += screen_skip;
 		}
 	} else {
-		static UINT32 colors[4] = { 0xffffff, 0xaaaaaa, 0x555555, 0x000000 };
-		const UINT32 *vr = vram;
+		static uint32_t colors[4] = { 0xffffff, 0xaaaaaa, 0x555555, 0x000000 };
+		const uint32_t *vr = vram;
 		for(int y=0; y<screen_sy; y++) {
-			UINT32 *pix = reinterpret_cast<UINT32 *>(bitmap.raw_pixptr(y));
+			uint32_t *pix = reinterpret_cast<uint32_t *>(bitmap.raw_pixptr(y));
 			for(int x=0; x<screen_sx; x+=16) {
-				UINT32 v = *vr++;
+				uint32_t v = *vr++;
 				for(int xi=0; xi<16; xi++)
 					*pix++ = colors[(v >> (30-(xi*2))) & 0x3];
 			}
@@ -79,7 +84,7 @@ UINT32 next_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 /* Dummy catcher for any unknown r/w */
 READ8_MEMBER( next_state::io_r )
 {
-	if(!space.debugger_access())
+	if(!machine().side_effect_disabled())
 		printf("io_r %08x (%08x)\n",offset+0x02000000, space.device().safe_pc());
 
 	if(offset == 0xc0)
@@ -90,21 +95,21 @@ READ8_MEMBER( next_state::io_r )
 
 WRITE8_MEMBER( next_state::io_w )
 {
-	if(!space.debugger_access())
+	if(!machine().side_effect_disabled())
 		printf("io_w %08x, %02x (%08x)\n",offset+0x02000000,data, space.device().safe_pc());
 }
 
 /* map ROM at 0x01000000-0x0101ffff? */
 READ32_MEMBER( next_state::rom_map_r )
 {
-	if(0 && !space.debugger_access())
+	if(0 && !machine().side_effect_disabled())
 		printf("%08x ROM MAP?\n",space.device().safe_pc());
 	return 0x01000000;
 }
 
 READ32_MEMBER( next_state::scr2_r )
 {
-	if(0 && !space.debugger_access())
+	if(0 && !machine().side_effect_disabled())
 		printf("%08x\n",space.device().safe_pc());
 	/*
 	x--- ---- ---- ---- ---- ---- ---- ---- dsp reset
@@ -132,7 +137,7 @@ READ32_MEMBER( next_state::scr2_r )
 
 	*/
 
-	UINT32 data = scr2 & 0xfffffbff;
+	uint32_t data = scr2 & 0xfffffbff;
 
 	data |= rtc->sdo_r() << 10;
 
@@ -141,7 +146,7 @@ READ32_MEMBER( next_state::scr2_r )
 
 WRITE32_MEMBER( next_state::scr2_w )
 {
-	if(0 && !space.debugger_access())
+	if(0 && !machine().side_effect_disabled())
 		printf("scr2_w %08x (%08x)\n", data, space.device().safe_pc());
 	COMBINE_DATA(&scr2);
 
@@ -219,8 +224,8 @@ READ32_MEMBER( next_state::scr1_r )
 
 void next_state::irq_set(int id, bool raise)
 {
-	UINT32 mask = 1U << id;
-	UINT32 old_status = irq_status;
+	uint32_t mask = 1U << id;
+	uint32_t old_status = irq_status;
 	if(raise)
 		irq_status |= mask;
 	else
@@ -248,7 +253,7 @@ WRITE32_MEMBER( next_state::irq_mask_w )
 
 void next_state::irq_check()
 {
-	UINT32 act = irq_status & (irq_mask | 0x80000000);
+	uint32_t act = irq_status & (irq_mask | 0x80000000);
 	int bit;
 	for(bit=31; bit >= 0 && !(act & (1U << bit)); bit--);
 
@@ -309,7 +314,7 @@ void next_state::dma_drq_w(int slot, bool state)
 		if(ds.state & DMA_READ) {
 			while(ds.drq) {
 				dma_check_update(slot);
-				UINT8 val;
+				uint8_t val;
 				bool eof;
 				bool err;
 				dma_read(slot, val, eof, err);
@@ -326,7 +331,7 @@ void next_state::dma_drq_w(int slot, bool state)
 		} else {
 			while(ds.drq) {
 				dma_check_update(slot);
-				UINT8 val = space.read_byte(ds.current++);
+				uint8_t val = space.read_byte(ds.current++);
 				bool eof = ds.current == (ds.limit & 0x7fffffff) && (ds.limit & 0x80000000);
 				bool err;
 				dma_write(slot, val, eof, err);
@@ -343,7 +348,7 @@ void next_state::dma_drq_w(int slot, bool state)
 	}
 }
 
-void next_state::dma_read(int slot, UINT8 &val, bool &eof, bool &err)
+void next_state::dma_read(int slot, uint8_t &val, bool &eof, bool &err)
 {
 	err = false;
 	eof = false;
@@ -375,7 +380,7 @@ void next_state::dma_read(int slot, UINT8 &val, bool &eof, bool &err)
 	}
 }
 
-void next_state::dma_write(int slot, UINT8 data, bool eof, bool &err)
+void next_state::dma_write(int slot, uint8_t data, bool eof, bool &err)
 {
 	err = false;
 	switch(slot) {
@@ -452,7 +457,7 @@ READ32_MEMBER( next_state::dma_regs_r)
 	int slot = offset >> 2;
 	int reg = offset & 3;
 
-	UINT32 res;
+	uint32_t res;
 
 	switch(reg) {
 	case 0:
@@ -527,7 +532,7 @@ WRITE32_MEMBER( next_state::dma_ctrl_w)
 	}
 }
 
-void next_state::dma_do_ctrl_w(int slot, UINT8 data)
+void next_state::dma_do_ctrl_w(int slot, uint8_t data)
 {
 	const char *name = dma_name(slot);
 #if 0
@@ -574,7 +579,7 @@ const int next_state::scsi_clocks[4] = { 10000000, 12000000, 20000000, 16000000 
 
 READ32_MEMBER( next_state::scsictrl_r )
 {
-	UINT32 res = (scsictrl << 24) | (scsistat << 16);
+	uint32_t res = (scsictrl << 24) | (scsistat << 16);
 	logerror("scsictrl_read %08x @ %08x (%08x)\n", res, mem_mask, space.device().safe_pc());
 	return res;
 }
@@ -640,7 +645,7 @@ READ32_MEMBER( next_state::fdc_control_r )
 	if(fdc) {
 		floppy_image_device *fdev = machine().device<floppy_connector>(":fdc:0")->get_device();
 		if(fdev->exists()) {
-			UINT32 variant = fdev->get_variant();
+			uint32_t variant = fdev->get_variant();
 			switch(variant) {
 			case floppy_image::SSSD:
 			case floppy_image::SSDD:
@@ -835,7 +840,7 @@ WRITE8_MEMBER(next_state::ramdac_w)
 	}
 }
 
-void next_state::setup(UINT32 _scr1, int size_x, int size_y, int skip, bool color)
+void next_state::setup(uint32_t _scr1, int size_x, int size_y, int skip, bool color)
 {
 	scr1 = _scr1;
 	screen_sx = size_x;
@@ -874,10 +879,6 @@ void next_state::machine_start()
 	}
 
 	timer_tm = timer_alloc(0);
-
-	system_time systime;
-	machine().base_datetime(systime);
-	rtc->set_counter(systime.time);
 }
 
 void next_state::machine_reset()
@@ -899,13 +900,13 @@ void next_state::machine_reset()
 	dma_drq_w(4, true); // soundout
 }
 
-void next_state::vblank_w(screen_device &screen, bool vblank_state)
+WRITE_LINE_MEMBER(next_state::vblank_w)
 {
 	if(vbl_enabled) {
 		if(screen_color)
-			irq_set(13, vblank_state);
+			irq_set(13, state);
 		else
-			irq_set(5, vblank_state);
+			irq_set(5, state);
 	}
 }
 
@@ -1007,13 +1008,13 @@ static SLOT_INTERFACE_START( next_scsi_devices )
 	SLOT_INTERFACE_INTERNAL("ncr5390", NCR5390)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_FRAGMENT( ncr5390 )
+static MACHINE_CONFIG_START( ncr5390 )
 	MCFG_DEVICE_CLOCK(10000000)
 	MCFG_NCR5390_IRQ_HANDLER(DEVWRITELINE(":", next_state, scsi_irq))
 	MCFG_NCR5390_DRQ_HANDLER(DEVWRITELINE(":", next_state, scsi_drq))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( next_base, next_state )
+static MACHINE_CONFIG_START( next_base )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1022,7 +1023,7 @@ static MACHINE_CONFIG_START( next_base, next_state )
 	MCFG_SCREEN_UPDATE_DRIVER(next_state, screen_update)
 	MCFG_SCREEN_SIZE(1120, 900)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1120-1, 0, 832-1)
-	MCFG_SCREEN_VBLANK_DRIVER(next_state, vblank_w)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(next_state, vblank_w))
 
 	// devices
 	MCFG_NSCSI_BUS_ADD("scsibus")
@@ -1215,12 +1216,12 @@ DRIVER_INIT_MEMBER(next_state,nextctc)
 
 /* Driver */
 
-/*    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY                 FULLNAME                      FLAGS */
-COMP( 1987, next,    0,      0,       next,      next, next_state,    next,    "Next Software Inc",   "NeXT Cube",                  MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1990, nexts,   0,      0,       nexts,     next, next_state,    nexts,   "Next Software Inc",   "NeXTstation",                MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1990, nexts2,  nexts,  0,       nexts2,    next, next_state,    nexts2,  "Next Software Inc",   "NeXTstation (X15 variant)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1990, nextsc,  nexts,  0,       nextsc,    next, next_state,    nextsc,  "Next Software Inc",   "NeXTstation color",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1990, nextst,  0,      0,       nextst,    next, next_state,    nextst,  "Next Software Inc",   "NeXTstation turbo",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1990, nextstc, nextst, 0,       nextstc,   next, next_state,    nextstc, "Next Software Inc",   "NeXTstation turbo color",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( ????, nextct,  nextst, 0,       nextct,    next, next_state,    nextct,  "Next Software Inc",   "NeXT Cube turbo",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( ????, nextctc, nextst, 0,       nextctc,   next, next_state,    nextctc, "Next Software Inc",   "NeXT Cube turbo color",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT STATE         INIT     COMPANY                FULLNAME                      FLAGS
+COMP( 1987, next,    0,      0,       next,      next, next_state,   next,    "Next Software Inc",   "NeXT Cube",                  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1990, nexts,   0,      0,       nexts,     next, next_state,   nexts,   "Next Software Inc",   "NeXTstation",                MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1990, nexts2,  nexts,  0,       nexts2,    next, next_state,   nexts2,  "Next Software Inc",   "NeXTstation (X15 variant)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1990, nextsc,  nexts,  0,       nextsc,    next, next_state,   nextsc,  "Next Software Inc",   "NeXTstation color",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1990, nextst,  0,      0,       nextst,    next, next_state,   nextst,  "Next Software Inc",   "NeXTstation turbo",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1990, nextstc, nextst, 0,       nextstc,   next, next_state,   nextstc, "Next Software Inc",   "NeXTstation turbo color",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( ????, nextct,  nextst, 0,       nextct,    next, next_state,   nextct,  "Next Software Inc",   "NeXT Cube turbo",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( ????, nextctc, nextst, 0,       nextctc,   next, next_state,   nextctc, "Next Software Inc",   "NeXT Cube turbo color",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

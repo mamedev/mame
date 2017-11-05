@@ -53,12 +53,16 @@ f5d6    print 7 digit BCD number: d0.l to (a1)+ color $3000
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/ginganin.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6809/m6809.h"
+#include "machine/6840ptm.h"
 #include "sound/ay8910.h"
 #include "sound/8950intf.h"
-#include "includes/ginganin.h"
-#include "machine/6840ptm.h"
+
+#include "screen.h"
+#include "speaker.h"
 
 
 #define MAIN_CLOCK XTAL_6MHz
@@ -97,7 +101,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, ginganin_state )
 	AM_RANGE(0x0800, 0x0807) AM_DEVREADWRITE("6840ptm", ptm6840_device, read, write)
 	AM_RANGE(0x1800, 0x1800) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x2000, 0x2001) AM_DEVWRITE("ymsnd", y8950_device, write)
-	AM_RANGE(0x2800, 0x2801) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
+	AM_RANGE(0x2800, 0x2801) AM_DEVWRITE("psg", ym2149_device, address_data_w)
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -233,13 +237,13 @@ void ginganin_state::machine_reset()
 	m_flipscreen = 0;
 }
 
-WRITE8_MEMBER(ginganin_state::ptm_irq)
+WRITE_LINE_MEMBER(ginganin_state::ptm_irq)
 {
-	m_audiocpu->set_input_line(0, (data & 1) ? ASSERT_LINE : CLEAR_LINE);
+	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
-static MACHINE_CONFIG_START( ginganin, ginganin_state )
+static MACHINE_CONFIG_START( ginganin )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, MAIN_CLOCK)
@@ -250,10 +254,9 @@ static MACHINE_CONFIG_START( ginganin, ginganin_state )
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 
-	MCFG_DEVICE_ADD("6840ptm", PTM6840, 0)
-	MCFG_PTM6840_INTERNAL_CLOCK(SOUND_CLOCK/2)
+	MCFG_DEVICE_ADD("6840ptm", PTM6840, SOUND_CLOCK/2)
 	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
-	MCFG_PTM6840_OUT0_CB(WRITE8(ginganin_state, ptm_irq))
+	MCFG_PTM6840_OUT0_CB(WRITELINE(ginganin_state, ptm_irq))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -273,7 +276,7 @@ static MACHINE_CONFIG_START( ginganin, ginganin_state )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, SOUND_CLOCK / 2)
+	MCFG_SOUND_ADD("psg", YM2149, SOUND_CLOCK / 2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
 	MCFG_SOUND_ADD("ymsnd", Y8950, SOUND_CLOCK) /* The Y8950 is basically a YM3526 with ADPCM built in */
@@ -361,10 +364,10 @@ ROM_END
 
 DRIVER_INIT_MEMBER(ginganin_state,ginganin)
 {
-	UINT16 *rom;
+	uint16_t *rom;
 
 	/* main cpu patches */
-	rom = (UINT16 *)memregion("maincpu")->base();
+	rom = (uint16_t *)memregion("maincpu")->base();
 	/* avoid writes to rom getting to the log */
 	rom[0x408 / 2] = 0x6000;
 	rom[0x40a / 2] = 0x001c;

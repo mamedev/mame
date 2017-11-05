@@ -9,8 +9,10 @@
 
 ***************************************************************************/
 
-#ifndef __H8_TIMER8_H__
-#define __H8_TIMER8_H__
+#ifndef MAME_CPU_H8_H8_TIMER8_H
+#define MAME_CPU_H8_H8_TIMER8_H
+
+#pragma once
 
 #include "h8.h"
 #include "h8_intc.h"
@@ -35,8 +37,7 @@ public:
 		DIV
 	};
 
-	h8_timer8_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	h8_timer8_channel_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	h8_timer8_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void set_info(const char *intc, int irq_ca, int irq_cb, int irq_v, int div1, int div2, int div3, int div4, int div5, int div6);
 
@@ -49,7 +50,7 @@ public:
 	DECLARE_READ8_MEMBER(tcnt_r);
 	DECLARE_WRITE8_MEMBER(tcnt_w);
 
-	UINT64 internal_update(UINT64 current_time);
+	uint64_t internal_update(uint64_t current_time);
 	void set_extra_clock_bit(bool bit);
 
 	void chained_timer_overflow();
@@ -83,17 +84,19 @@ protected:
 	const char *chain_tag, *intc_tag;
 	int irq_ca, irq_cb, irq_v, chain_type;
 	int div_tab[6];
-	UINT8 tcor[2];
-	UINT8 tcr, tcsr, tcnt;
+	uint8_t tcor[2];
+	uint8_t tcr, tcsr, tcnt;
 	bool extra_clock_bit, has_adte, has_ice;
 	int clock_type, clock_divider, clear_type, counter_cycle;
-	UINT64 last_clock_update, event_time;
+	uint64_t last_clock_update, event_time;
+
+	h8_timer8_channel_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	void update_counter(UINT64 cur_time = 0);
-	void recalc_event(UINT64 cur_time = 0);
+	void update_counter(uint64_t cur_time = 0);
+	void recalc_event(uint64_t cur_time = 0);
 
 	void timer_tick();
 	void update_tcr();
@@ -101,13 +104,13 @@ protected:
 
 class h8h_timer8_channel_device : public h8_timer8_channel_device {
 public:
-	h8h_timer8_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	h8h_timer8_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~h8h_timer8_channel_device();
 
 	void set_info(const char *intc, int irq_ca, int irq_cb, int irq_v, const char *chain_tag, int chain_type, bool has_adte, bool has_ice);
 };
 
-extern const device_type H8_TIMER8_CHANNEL;
-extern const device_type H8H_TIMER8_CHANNEL;
+DECLARE_DEVICE_TYPE(H8_TIMER8_CHANNEL,  h8_timer8_channel_device)
+DECLARE_DEVICE_TYPE(H8H_TIMER8_CHANNEL, h8h_timer8_channel_device)
 
-#endif
+#endif // MAME_CPU_H8_H8_TIMER8_H

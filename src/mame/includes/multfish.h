@@ -3,11 +3,12 @@
 /* Multifish */
 
 
-#include "emu.h"
 #include "sound/ay8910.h"
 #include "cpu/z80/z80.h"
 #include "machine/timekpr.h"
 #include "machine/watchdog.h"
+#include "machine/ticket.h"
+#include "screen.h"
 
 #define igrosoft_gamble_ROM_SIZE 0x80000
 #define igrosoft_gamble_VIDRAM_SIZE (0x2000*0x04)
@@ -21,7 +22,8 @@ public:
 		m_m48t35(*this, "m48t35" ),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_hopper(*this, "hopper")
 	{
 	}
 
@@ -36,12 +38,9 @@ public:
 
 	/* Misc related */
 
-	UINT8 m_rambk;
+	uint8_t m_rambk;
 
-	UINT8 m_hopper_motor;
-	UINT8 m_hopper;
-
-	UINT8 m_vid[igrosoft_gamble_VIDRAM_SIZE];
+	uint8_t m_vid[igrosoft_gamble_VIDRAM_SIZE];
 	DECLARE_WRITE8_MEMBER(igrosoft_gamble_vid_w);
 	DECLARE_WRITE8_MEMBER(igrosoft_gamble_bank_w);
 	DECLARE_READ8_MEMBER(bankedram_r);
@@ -56,7 +55,6 @@ public:
 	DECLARE_WRITE8_MEMBER(igrosoft_gamble_counters_w);
 	DECLARE_WRITE8_MEMBER(igrosoft_gamble_f3_w);
 	DECLARE_WRITE8_MEMBER(igrosoft_gamble_dispenable_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(igrosoft_gamble_hopper_r);
 	DECLARE_READ8_MEMBER(igrosoft_gamble_timekeeper_r);
 	DECLARE_WRITE8_MEMBER(igrosoft_gamble_timekeeper_w);
 	DECLARE_DRIVER_INIT(customl);
@@ -86,12 +84,13 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_igrosoft_gamble(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_igrosoft_gamble(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<timekeeper_device> m_m48t35;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	required_device<ticket_dispenser_device> m_hopper;
 };
 
 

@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "prof80mmu.h"
 
 
@@ -14,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type PROF80_MMU = &device_creator<prof80_mmu_device>;
+DEFINE_DEVICE_TYPE(PROF80_MMU, prof80_mmu_device, "prof80_mmu", "PROF80 MMU")
 
 
 DEVICE_ADDRESS_MAP_START( z80_program_map, 8, prof80_mmu_device )
@@ -34,10 +35,10 @@ ADDRESS_MAP_END
 //  prof80_mmu_device - constructor
 //-------------------------------------------------
 
-prof80_mmu_device::prof80_mmu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, PROF80_MMU, "PROF80_MMU", tag, owner, clock, "prof80_mmu", __FILE__),
-		device_memory_interface(mconfig, *this),
-		m_program_space_config("program", ENDIANNESS_LITTLE, 8, 20, 0, *ADDRESS_MAP_NAME(program_map))
+prof80_mmu_device::prof80_mmu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, PROF80_MMU, tag, owner, clock)
+	, device_memory_interface(mconfig, *this)
+	, m_program_space_config("program", ENDIANNESS_LITTLE, 8, 20, 0, *ADDRESS_MAP_NAME(program_map))
 {
 }
 
@@ -59,11 +60,12 @@ void prof80_mmu_device::device_start()
 //  any address spaces owned by this device
 //-------------------------------------------------
 
-const address_space_config *prof80_mmu_device::memory_space_config(address_spacenum spacenum) const
+device_memory_interface::space_config_vector prof80_mmu_device::memory_space_config() const
 {
-	return (spacenum == AS_PROGRAM) ? &m_program_space_config : nullptr;
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_space_config)
+	};
 }
-
 
 //-------------------------------------------------
 //  par_w -

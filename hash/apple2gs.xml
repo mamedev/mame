@@ -46,18 +46,20 @@
 	</software>
 
 	<software name="4thinchs">
-		<description>4th &amp; Inches</description>
-		<year>1988</year>
+		<description>4th &amp; Inches (clean crack)</description>
+		<!-- The Team Construction Set was sold seperatly, but only works with 4th & Inches so it's included as "Disk 2" -->
+		<!-- The Team Construction Set disk doesn't check itself for being an original, but runs a nibble count on the 4th & Inches disk -->
+		<year>1987</year>
 		<publisher>Accolade</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
-				<rom name="4th &amp; inches (1988)(accolade)(disk 1 of 2).2mg" size="819264" crc="36fe7e66" sha1="f8652ef569be48d63b5e8122853cd05a0927c818" offset="0x0000" />
+				<rom name="4th &amp; inches (1987-88)(accolade)(trex crack).2mg" size="819264" crc="63566084" sha1="2f2780317b64acfee335f14df333f2e6d275632a" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
-				<rom name="4th &amp; inches (1988)(accolade)(disk 2 of 2).2mg" size="819264" crc="7cb5a5a4" sha1="77cd9331dd0e44cb41c8bfad3d7a7f93b902dfb4" offset="0x0000" />
+				<rom name="4th &amp; inches team construction disk (1988)(accolade)(trex crack).2mg" size="819264" crc="85a18133" sha1="3a45fb29a5b0b4ecebd99c396a6c1d2859087e50" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -330,25 +332,25 @@
 	</software>
 
 	<software name="arkanoid">
-		<description>Arkanoid</description>
+		<description>Arkanoid (clean crack)</description>
 		<year>1988</year>
 		<publisher>Taito</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="819272">
-				<rom name="arkanoid (1988)(taito)(us).2mg" size="819272" crc="47a1f89e" sha1="c470e02678154f2f502b9cfaa7ec21dab0038155" offset="0x0000" />
+			<dataarea name="flop" size="819264">
+				<rom name="arkanoid (1988)(taito)(trex crack).2mg" size="819264" crc="15aef159" sha1="3691ef5908d48fadab3c9602a2becfc8160dd7ad" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="arknoid2">
-		<description>Arkanoid II: Revenge of Doh</description>
-		<year>1989</year>
+		<description>Arkanoid II: Revenge of Doh (clean crack)</description>
+		<year>1988</year>
 		<publisher>Taito</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="819275">
-				<rom name="arkanoid ii - revenge of doh (1989)(taito)(us).2mg" size="819275" crc="803bc367" sha1="6c314fc3ce0be8017ad4f82770fb920c5c714a42" offset="0x0000" />
+			<dataarea name="flop" size="819264">
+				<rom name="arkanoid ii - revenge of doh (1988)(taito)(trex crack).2mg" size="819264" crc="21e92966" sha1="ff1143ee948490666b02c09f6bb532b077cff130" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -584,13 +586,13 @@
 	</software>
 
 	<software name="brdtale">
-		<description>The Bard's Tale - Tales of the Unknown</description>
+		<description>The Bard's Tale - Tales of the Unknown (clean crack)</description>
 		<year>1987</year>
 		<publisher>Electronic Arts / Interplay</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="819274">
-				<rom name="bard's tale - tales of the unknown, the (1987)(electronic arts)(disk 1 of 2).2mg" size="819274" crc="eff4bb27" sha1="8c797fe25e7617b99a5678f93a7e80536d323d83" offset="0x0000" />
+			<dataarea name="flop" size="819264">
+				<rom name="bard's tale - tales of the unknown, the (1987)(electronic arts)(disk 1 of 2)(trex crack).2mg" size="819264" crc="9294901d" sha1="bd9ca1ca5a0dbb24c0890831336416403a871b44" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
@@ -613,13 +615,13 @@
 	</software>
 
 	<software name="btlchess">
-		<description>Battle Chess</description>
-		<year>1989</year>
+		<description>Battle Chess (clean crack)</description>
+		<year>1988</year>
 		<publisher>Interplay</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="819274">
-				<rom name="battle chess (1989)(interplay).2mg" size="819274" crc="8a659aa7" sha1="db067a26ede56abdace7fde0bad3020c2b3d35a2" offset="0x0000" />
+			<dataarea name="flop" size="819264">
+				<rom name="battle chess (1988-89)(interplay)(trex crack).2mg" size="819264" crc="f3b3de94" sha1="bc28e66e75ef41af5194a65dfe217cfff9abfc2b" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -755,13 +757,13 @@
 	</software>
 
 	<software name="cavcobra">
-		<description>Cavern Cobra</description>
+		<description>Cavern Cobra (clean crack)</description>
 		<year>1987</year>
 		<publisher>PBI Software</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
-				<rom name="cavern cobra (1987)(pbi software).2mg" size="819264" crc="8c0301f1" sha1="155b88575aaeabc0071f58b44a1a36d4cf914459" offset="0x0000" />
+				<rom name="cavern cobra (1987)(pbi software)(trex crack).2mg" size="819264" crc="e710752f" sha1="617bf342e94baa32677c80acd6be1c0589e2afcb" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -779,18 +781,19 @@
 	</software>
 
 	<software name="chsm2100">
-		<description>The Chessmaster 2100</description>
+		<description>The Chessmaster 2100 v1.1 (clean crack)</description>
+		<!-- Version 1.01 known to exist, currently not archived -->
 		<year>1988</year>
 		<publisher>The Software Toolworks</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
-				<rom name="fidelity - chessmaster 2100, the (1988)(the software toolworks)(disk 1 of 2).2mg" size="819264" crc="4dfaeaf7" sha1="d2b68d4d1bb3adef2ce0fef546fdf807f332a3ad" offset="0x0000" />
+				<rom name="fidelity - the chessmaster 2100 v1.1 disk 1 of 2 (1988)(the software toolworks)(trex crack).2mg" size="819264" crc="8aaa178d" sha1="73b7962ca9ebf7361b1736277c131a4a11cdfaee" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
-				<rom name="fidelity - chessmaster 2100, the (1988)(the software toolworks)(disk 2 of 2).2mg" size="819264" crc="6a25ea51" sha1="0855102a363af5fc00298a23c28b381419ac6503" offset="0x0000" />
+				<rom name="fidelity - the chessmaster 2100 v1.1 disk 2 of 2 (1988)(the software toolworks)(trex crack).2mg" size="819264" crc="d1f47c57" sha1="49f8910fc9acf0c49d7db379bfa9fe8446a0d99e" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -945,6 +948,19 @@
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
 				<rom name="cosmocade - the arcade of tomorrow (1990)(pangea software)(sw)(disk 2 of 2).2mg" size="819264" crc="54e59b5c" sha1="233a8455dd9cd421a8f2c1175c20c79a9184a98c" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cribgin">
+		<description>Cribbage King / Gin king v1.01 (no OS, not self booting) (clean crack)</description>
+		<!-- Original release - Did NOT come with OS and was NOT self bootable. You must launch from ProDOS 16 or GS/OS -->
+		<year>1989</year>
+		<publisher>The Software Toolworks</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819264">
+				<rom name="cribbage king - gin king (1989)(the software toolworks)(trex crack).2mg" size="819264" crc="740f8636" sha1="e74d5758f9708ef99e51902012ddb8f5c51a72a8" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3012,13 +3028,13 @@
 	</software>
 
 	<software name="lstninja">
-		<description>The Last Ninja [cracked]</description>
-		<year>1988</year>
+		<description>The Last Ninja (clean crack)</description>
+		<year>1987</year>
 		<publisher>Activision</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="819278">
-				<rom name="last ninja, the (1988)(activision)[cr].2mg" size="819278" crc="d3d36ae7" sha1="8d2bc34a4d1325c958adf05962f55a050e556d64" offset="0x0000" />
+			<dataarea name="flop" size="819264">
+				<rom name="last ninja, the (1987-88)(activision)(trex crack).2mg" size="819264" crc="40d81298" sha1="1735192463be1457feea28b1a1be118cf99f8e55" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4036,13 +4052,13 @@
 	</software>
 
 	<software name="pipedrm">
-		<description>Pipe Dream</description>
+		<description>Pipe Dream (clean crack)</description>
 		<year>1990</year>
 		<publisher>Lucasfilm Games</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
-				<rom name="pipe dream (1990)(lucasfilm games).2mg" size="819264" crc="48c26e20" sha1="a9921e0c7b5edb8bb54fdfc9900bba238e587de3" offset="0x0000" />
+				<rom name="pipe dream (1990)(lucasfilm games)(trex crack).2mg" size="819264" crc="5399376a" sha1="21668c597b3f1659ad7ef64d035c50fd59d46849" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -5366,13 +5382,13 @@
 	</software>
 
 	<software name="sshockey">
-		<description>Superstar Ice Hockey [cr Digital Gang]</description>
+		<description>Superstar Ice Hockey (clean crack)</description>
 		<year>1988</year>
 		<publisher>Mindscape</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
-				<rom name="superstar ice hockey (1988)(mindscape)[cr].2mg" size="819264" crc="1236d5d9" sha1="ca78ef889957bf6b53d5ed4dbe25dd78d0b0849b" offset="0x0000" />
+				<rom name="superstar ice hockey (1988)(mindscape)(trex crack).2mg" size="819264" crc="0b15cb9d" sha1="055a121ac1d588558e00a2442110e2c1afd0cc46" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -6355,7 +6371,7 @@
 		</part>
 	</software>
 
-	<software name="themgr12">
+	<software name="themgr12" cloneof="themgr15">
 		<description>The Manager v1.2</description>
 		<year>1990</year>
 		<publisher>Seven Hills Software</publisher>
@@ -6380,13 +6396,28 @@
 	</software>
 
 	<software name="thexder">
-		<description>Thexder</description>
+		<description>Thexder v2.7 (clean crack)</description>
+		<!-- Self bootable and had Joystick control set as default -->
 		<year>1987</year>
 		<publisher>Sierra</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="819271">
-				<rom name="thexder (1987)(sierra).2mg" size="819271" crc="8d763708" sha1="5be96ee3322aa90cda523a087cae2b158e7578d5" offset="0x0000" />
+			<dataarea name="flop" size="819264">
+				<rom name="thexder v2.7 (1987)(sierra on-line in)(trex crack).2mg" size="819264" crc="15862391" sha1="9588be8429081de1ce7b0df88c273b0fedfcdbf3" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="thexdero" cloneof="thexder">
+		<description>Thexder v1 (no OS, not self booting) (clean crack)</description>
+		<!-- Original release by Sierra On-Line - Did NOT come with OS and was NOT self bootable -->
+		<!-- The file "othexder" had been undeleted (and cracked) and is closer to v2.7 in how it's demo sounds fade -->
+		<year>1987</year>
+		<publisher>Sierra</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819264">
+				<rom name="thexder v1 (1987)(sierra on-line in)(trex crack).2mg" size="819264" crc="5a105720" sha1="31061b4561c967d824936c94ce882f2efcb017da" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -6529,7 +6560,7 @@
 	</software>
 
 	<software name="triango">
-		<description>Triango</description>
+		<description>TrianGO</description>
 		<year>1988</year>
 		<publisher>California Dreams</publisher>
 
@@ -6657,6 +6688,32 @@
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
 				<rom name="ugly duckling, the (1989)(byte works)(disk 2 of 2).2mg" size="819264" crc="f4f53fab" sha1="870cb6c6cd0d14bbbb41036a14fd11509bb215a6" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="unidos33p">
+		<description>UniDOS 3.3 Plus v2.0.1</description>
+		<!-- Each 800K disk is two 400K DOS partions, Drive1 = D1 and D3 (even if no Drive2), Drive2 = D2 and D4 -->
+		<year>1986</year>
+		<publisher>Microsparc, Inc.</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819264">
+				<rom name="unidos 3.3 plus v2.0.1 (1986)(microsparc).2mg" size="819264" crc="f9fab5b6" sha1="a9f178545af6cd48b9c16d1db248a33b9ad7f6e9" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="unidosplus">
+		<description>UniDOS Plus v2.1</description>
+		<!-- Each 800K disk is two 400K DOS partions, Drive1 = D1 and D3 (even if no Drive2), Drive2 = D2 and D4 -->
+		<year>1986</year>
+		<publisher>Microsparc, Inc.</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819264">
+				<rom name="unidos plus v2.1 (1986)(microsparc).2mg" size="819264" crc="9328f3cb" sha1="90219aafc3ccba331b8d8d7c4682aecc8c85559b" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>

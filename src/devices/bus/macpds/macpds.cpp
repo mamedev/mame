@@ -16,7 +16,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type MACPDS_SLOT = &device_creator<macpds_slot_device>;
+DEFINE_DEVICE_TYPE(MACPDS_SLOT, macpds_slot_device, "macpds_slot", "Mac 68000 Processor-Direct Slot")
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -25,17 +25,16 @@ const device_type MACPDS_SLOT = &device_creator<macpds_slot_device>;
 //-------------------------------------------------
 //  macpds_slot_device - constructor
 //-------------------------------------------------
-macpds_slot_device::macpds_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-		device_t(mconfig, MACPDS_SLOT, "Mac 68000 Processor-Direct Slot", tag, owner, clock, "macpds_slot", __FILE__),
-		device_slot_interface(mconfig, *this),
-	m_macpds_tag(nullptr),
-	m_macpds_slottag(nullptr)
+macpds_slot_device::macpds_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	macpds_slot_device(mconfig, MACPDS_SLOT, tag, owner, clock)
 {
 }
 
-macpds_slot_device::macpds_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
-		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		device_slot_interface(mconfig, *this), m_macpds_tag(nullptr), m_macpds_slottag(nullptr)
+macpds_slot_device::macpds_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
+	device_slot_interface(mconfig, *this),
+	m_macpds_tag(nullptr),
+	m_macpds_slottag(nullptr)
 {
 }
 
@@ -61,7 +60,7 @@ void macpds_slot_device::device_start()
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type MACPDS = &device_creator<macpds_device>;
+DEFINE_DEVICE_TYPE(MACPDS, macpds_device, "macpds", "Mac 68000 Processor-Direct Bus")
 
 void macpds_device::static_set_cputag(device_t &device, const char *tag)
 {
@@ -77,13 +76,15 @@ void macpds_device::static_set_cputag(device_t &device, const char *tag)
 //  macpds_device - constructor
 //-------------------------------------------------
 
-macpds_device::macpds_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-		device_t(mconfig, MACPDS, "MACPDS", tag, owner, clock, "macpds", __FILE__), m_maincpu(nullptr), m_cputag(nullptr)
+macpds_device::macpds_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	macpds_device(mconfig, MACPDS, tag, owner, clock)
 {
 }
 
-macpds_device::macpds_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
-		device_t(mconfig, type, name, tag, owner, clock, shortname, source), m_maincpu(nullptr), m_cputag(nullptr)
+macpds_device::macpds_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
+	m_maincpu(nullptr),
+	m_cputag(nullptr)
 {
 }
 //-------------------------------------------------
@@ -108,24 +109,24 @@ void macpds_device::add_macpds_card(device_macpds_card_interface *card)
 	m_device_list.append(*card);
 }
 
-void macpds_device::install_device(offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler, UINT32 mask)
+void macpds_device::install_device(offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler, uint32_t mask)
 {
 	m_maincpu = machine().device<cpu_device>(m_cputag);
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(start, end, rhandler, whandler, mask);
 }
 
-void macpds_device::install_device(offs_t start, offs_t end, read16_delegate rhandler, write16_delegate whandler, UINT32 mask)
+void macpds_device::install_device(offs_t start, offs_t end, read16_delegate rhandler, write16_delegate whandler, uint32_t mask)
 {
 	m_maincpu = machine().device<cpu_device>(m_cputag);
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(start, end, rhandler, whandler, mask);
 }
 
-void macpds_device::install_bank(offs_t start, offs_t end, offs_t mask, offs_t mirror, const char *tag, UINT8 *data)
+void macpds_device::install_bank(offs_t start, offs_t end, const char *tag, uint8_t *data)
 {
-//  printf("install_bank: %s @ %x->%x mask %x mirror %x\n", tag, start, end, mask, mirror);
+//  printf("install_bank: %s @ %x->%x\n", tag, start, end);
 	m_maincpu = machine().device<cpu_device>(m_cputag);
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	space.install_readwrite_bank(start, end, mask, mirror, tag );
+	space.install_readwrite_bank(start, end, 0, tag );
 	machine().root_device().membank(siblingtag(tag).c_str())->set_base(data);
 }
 
@@ -176,7 +177,7 @@ void device_macpds_card_interface::set_macpds_device()
 	m_macpds->add_macpds_card(this);
 }
 
-void device_macpds_card_interface::install_bank(offs_t start, offs_t end, offs_t mask, offs_t mirror, const char *tag, UINT8 *data)
+void device_macpds_card_interface::install_bank(offs_t start, offs_t end, const char *tag, uint8_t *data)
 {
 	char bank[256];
 
@@ -185,15 +186,15 @@ void device_macpds_card_interface::install_bank(offs_t start, offs_t end, offs_t
 	strcat(bank, "_");
 	strcat(bank, m_macpds_slottag);
 
-	m_macpds->install_bank(start, end, mask, mirror, bank, data);
+	m_macpds->install_bank(start, end, bank, data);
 }
 
-void device_macpds_card_interface::install_rom(device_t *dev, const char *romregion, UINT32 addr)
+void device_macpds_card_interface::install_rom(device_t *dev, const char *romregion, uint32_t addr)
 {
-	UINT8 *rom = device().machine().root_device().memregion(dev->subtag(romregion).c_str())->base();
-	UINT32 romlen = device().machine().root_device().memregion(dev->subtag(romregion).c_str())->bytes();
+	uint8_t *rom = device().machine().root_device().memregion(dev->subtag(romregion).c_str())->base();
+	uint32_t romlen = device().machine().root_device().memregion(dev->subtag(romregion).c_str())->bytes();
 	char bankname[128];
 	sprintf(bankname, "rom_%x", addr);
 
-	m_macpds->install_bank(addr, addr+romlen-1, 0, 0, bankname, rom);
+	m_macpds->install_bank(addr, addr+romlen-1, bankname, rom);
 }

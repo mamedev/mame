@@ -57,8 +57,10 @@ Added Dip locations according to manual.
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/m6502/m6502.h"
 #include "includes/copsnrob.h"
+
+#include "cpu/m6502/m6502.h"
+
 #include "copsnrob.lh"
 
 
@@ -91,7 +93,7 @@ WRITE8_MEMBER(copsnrob_state::copsnrob_misc2_w)
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, copsnrob_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
-	AM_RANGE(0x0500, 0x0507) AM_WRITE(copsnrob_misc_w)
+	AM_RANGE(0x0500, 0x0507) AM_DEVWRITE("latch", f9334_device, write_d0)
 	AM_RANGE(0x0600, 0x0600) AM_WRITEONLY AM_SHARE("trucky")
 	AM_RANGE(0x0700, 0x07ff) AM_WRITEONLY AM_SHARE("truckram")
 	AM_RANGE(0x0800, 0x08ff) AM_RAM AM_SHARE("bulletsram")
@@ -244,7 +246,7 @@ void copsnrob_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( copsnrob, copsnrob_state )
+static MACHINE_CONFIG_START( copsnrob )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502,14318180/16)      /* 894886.25 kHz */
@@ -262,13 +264,7 @@ static MACHINE_CONFIG_START( copsnrob, copsnrob_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", copsnrob)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
-	MCFG_DISCRETE_INTF(copsnrob)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_FRAGMENT_ADD(copsnrob_audio)
 MACHINE_CONFIG_END
 
 
@@ -317,4 +313,4 @@ ROM_END
  *
  *************************************/
 
-GAMEL( 1976, copsnrob, 0, copsnrob, copsnrob, driver_device, 0, ROT0, "Atari", "Cops'n Robbers", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_copsnrob )
+GAMEL( 1976, copsnrob, 0, copsnrob, copsnrob, copsnrob_state, 0, ROT0, "Atari", "Cops'n Robbers", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_copsnrob )

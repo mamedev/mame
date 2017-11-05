@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+
+<!-- define elements -->
+
+	<element name="text_l" defstate="0">
+		<text state="0" string="L"><color red="0.2" green="0.2" blue="0.2" /></text>
+		<text state="1" string="L"><color red="1.0" green="1.0" blue="1.0" /></text>
+	</element>
+	<element name="text_r" defstate="0">
+		<text state="0" string="R"><color red="0.2" green="0.2" blue="0.2" /></text>
+		<text state="1" string="R"><color red="1.0" green="1.0" blue="1.0" /></text>
+	</element>
+	<element name="text_drv" defstate="0">
+		<text state="0" string="DRV"><color red="0.2" green="0.2" blue="0.2" /></text>
+		<text state="1" string="DRV"><color red="1.0" green="1.0" blue="1.0" /></text>
+	</element>
+
+	<element name="text_m1"><text string="motor 1:"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_m2"><text string="motor 2:"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+
+
+<!-- build screen -->
+
+	<view name="Internal Layout">
+		<bounds left="0" right="6.3" top="0" bottom="2.5" />
+
+		<bezel element="text_m2"><bounds x="0" y="0" width="4" height="1" /></bezel>
+		<bezel name="motor2_left" element="text_l"><bounds x="4" y="0" width="1" height="1" /></bezel>
+		<bezel name="motor2_right" element="text_r"><bounds x="5" y="0" width="1" height="1" /></bezel>
+
+		<bezel element="text_m1"><bounds x="0" y="1.3" width="4" height="1" /></bezel>
+		<bezel name="motor1" element="text_drv"><bounds x="4" y="1.3" width="2" height="1" /></bezel>
+
+	</view>
+</mamelayout>

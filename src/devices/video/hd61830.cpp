@@ -6,7 +6,13 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "hd61830.h"
+
+#include "screen.h"
+
+//#define VERBOSE 1
+#include "logmacro.h"
 
 
 
@@ -14,12 +20,12 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type HD61830 = &device_creator<hd61830_device>;
-const device_type HD61830B = &device_creator<hd61830_device>;
+DEFINE_DEVICE_TYPE(HD61830, hd61830_device, "hd61830", "Hitachi HD61830B LCD Controller")
+const device_type HD61830B = HD61830;
 
 
 // default address map
-static ADDRESS_MAP_START( hd61830, AS_0, 8, hd61830_device )
+static ADDRESS_MAP_START( hd61830, 0, 8, hd61830_device )
 	AM_RANGE(0x0000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -35,7 +41,7 @@ ROM_END
 //  device_rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *hd61830_device::device_rom_region() const
+const tiny_rom_entry *hd61830_device::device_rom_region() const
 {
 	return ROM_NAME(hd61830);
 }
@@ -46,44 +52,17 @@ const rom_entry *hd61830_device::device_rom_region() const
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define LOG 0
-
-static const int CYCLES[] =
+static constexpr int CYCLES[] =
 {
 	4, 4, 4, 4, 4, -1, -1, -1, 4, 4, 4, 4, 6, 6, 36, 36
 };
 
-const int MODE_EXTERNAL_CG      = 0x01;
-const int MODE_GRAPHIC          = 0x02;
-const int MODE_CURSOR           = 0x04;
-const int MODE_BLINK            = 0x08;
-const int MODE_MASTER           = 0x10;
-const int MODE_DISPLAY_ON       = 0x20;
-
-
-
-//**************************************************************************
-//  INLINE HELPERS
-//**************************************************************************
-
-//-------------------------------------------------
-//  readbyte - read a byte at the given address
-//-------------------------------------------------
-
-inline UINT8 hd61830_device::readbyte(offs_t address)
-{
-	return space().read_byte(address);
-}
-
-
-//-------------------------------------------------
-//  writebyte - write a byte at the given address
-//-------------------------------------------------
-
-inline void hd61830_device::writebyte(offs_t address, UINT8 data)
-{
-	space().write_byte(address, data);
-}
+static constexpr int MODE_EXTERNAL_CG      = 0x01;
+static constexpr int MODE_GRAPHIC          = 0x02;
+static constexpr int MODE_CURSOR           = 0x04;
+static constexpr int MODE_BLINK            = 0x08;
+static constexpr int MODE_MASTER           = 0x10;
+static constexpr int MODE_DISPLAY_ON       = 0x20;
 
 
 
@@ -95,8 +74,8 @@ inline void hd61830_device::writebyte(offs_t address, UINT8 data)
 //  hd61830_device - constructor
 //-------------------------------------------------
 
-hd61830_device::hd61830_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, HD61830, "HD61830 LCDC", tag, owner, clock, "hd61830", __FILE__),
+hd61830_device::hd61830_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, HD61830, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
 	device_video_interface(mconfig, *this),
 	m_read_rd(*this),
@@ -169,9 +148,11 @@ void hd61830_device::device_timer(emu_timer &timer, device_timer_id id, int para
 //  any address spaces owned by this device
 //-------------------------------------------------
 
-const address_space_config *hd61830_device::memory_space_config(address_spacenum spacenum) const
+device_memory_interface::space_config_vector hd61830_device::memory_space_config() const
 {
-	return (spacenum == AS_0) ? &m_space_config : nullptr;
+	return space_config_vector {
+		std::make_pair(0, &m_space_config)
+	};
 }
 
 
@@ -196,7 +177,7 @@ void hd61830_device::set_busy_flag()
 
 READ8_MEMBER( hd61830_device::status_r )
 {
-	if (LOG) logerror("HD61830 '%s' Status Read: %s\n", tag(), m_bf ? "busy" : "ready");
+	LOG("HD61830 Status Read: %s\n", m_bf ? "busy" : "ready");
 
 	return m_bf ? 0x80 : 0;
 }
@@ -218,9 +199,9 @@ WRITE8_MEMBER( hd61830_device::control_w )
 
 READ8_MEMBER( hd61830_device::data_r )
 {
-	UINT8 data = m_dor;
+	uint8_t data = m_dor;
 
-	if (LOG) logerror("HD61830 '%s' Display Data Read %02x\n", tag(), m_dor);
+	LOG("HD61830 Display Data Read %02x\n", m_dor);
 
 	m_dor = readbyte(m_cac);
 
@@ -238,7 +219,7 @@ WRITE8_MEMBER( hd61830_device::data_w )
 {
 	if (m_bf)
 	{
-		logerror("HD61830 '%s' Ignoring data write %02x due to business\n", tag(), data);
+		logerror("HD61830 Ignoring data write %02x due to business\n", data);
 		return;
 	}
 
@@ -247,53 +228,50 @@ WRITE8_MEMBER( hd61830_device::data_w )
 	case INSTRUCTION_MODE_CONTROL:
 		m_mcr = data;
 
-		if (LOG)
-		{
-			logerror("HD61830 '%s' %s CG\n", tag(), (data & MODE_EXTERNAL_CG) ? "External" : "Internal");
-			logerror("HD61830 '%s' %s Display Mode\n", tag(), (data & MODE_GRAPHIC) ? "Graphic" : "Character");
-			logerror("HD61830 '%s' %s Mode\n", tag(), (data & MODE_MASTER) ? "Master" : "Slave");
-			logerror("HD61830 '%s' Cursor %s\n", tag(), (data & MODE_CURSOR) ? "On" : "Off");
-			logerror("HD61830 '%s' Blink %s\n", tag(), (data & MODE_BLINK) ? "On" : "Off");
-			logerror("HD61830 '%s' Display %s\n", tag(), (data & MODE_DISPLAY_ON) ? "On" : "Off");
-		}
+		LOG("HD61830 %s CG\n", (data & MODE_EXTERNAL_CG) ? "External" : "Internal");
+		LOG("HD61830 %s Display Mode\n", (data & MODE_GRAPHIC) ? "Graphic" : "Character");
+		LOG("HD61830 %s Mode\n", (data & MODE_MASTER) ? "Master" : "Slave");
+		LOG("HD61830 Cursor %s\n", (data & MODE_CURSOR) ? "On" : "Off");
+		LOG("HD61830 Blink %s\n", (data & MODE_BLINK) ? "On" : "Off");
+		LOG("HD61830 Display %s\n", (data & MODE_DISPLAY_ON) ? "On" : "Off");
 		break;
 
 	case INSTRUCTION_CHARACTER_PITCH:
 		m_hp = (data & 0x07) + 1;
 		m_vp = (data >> 4) + 1;
 
-		if (LOG) logerror("HD61830 '%s' Horizontal Character Pitch: %u\n", tag(), m_hp);
-		if (LOG) logerror("HD61830 '%s' Vertical Character Pitch: %u\n", tag(), m_vp);
+		LOG("HD61830 Horizontal Character Pitch: %u\n", m_hp);
+		LOG("HD61830 Vertical Character Pitch: %u\n", m_vp);
 		break;
 
 	case INSTRUCTION_NUMBER_OF_CHARACTERS:
 		m_hn = (data & 0x7f) + 1;
 
-		if (LOG) logerror("HD61830 '%s' Number of Characters: %u\n", tag(), m_hn);
+		LOG("HD61830 Number of Characters: %u\n", m_hn);
 		break;
 
 	case INSTRUCTION_NUMBER_OF_TIME_DIVISIONS:
 		m_nx = (data & 0x7f) + 1;
 
-		if (LOG) logerror("HD61830 '%s' Number of Time Divisions: %u\n", tag(), m_nx);
+		LOG("HD61830 Number of Time Divisions: %u\n", m_nx);
 		break;
 
 	case INSTRUCTION_CURSOR_POSITION:
 		m_cp = (data & 0x7f) + 1;
 
-		if (LOG) logerror("HD61830 '%s' Cursor Position: %u\n", tag(), m_cp);
+		LOG("HD61830 Cursor Position: %u\n", m_cp);
 		break;
 
 	case INSTRUCTION_DISPLAY_START_LOW:
 		m_dsa = (m_dsa & 0xff00) | data;
 
-		if (LOG) logerror("HD61830 '%s' Display Start Address Low %04x\n", tag(), m_dsa);
+		LOG("HD61830 Display Start Address Low %04x\n", m_dsa);
 		break;
 
 	case INSTRUCTION_DISPLAY_START_HIGH:
 		m_dsa = (data << 8) | (m_dsa & 0xff);
 
-		if (LOG) logerror("HD61830 '%s' Display Start Address High %04x\n", tag(), m_dsa);
+		LOG("HD61830 Display Start Address High %04x\n", m_dsa);
 		break;
 
 	case INSTRUCTION_CURSOR_ADDRESS_LOW:
@@ -306,19 +284,19 @@ WRITE8_MEMBER( hd61830_device::data_w )
 			m_cac = (m_cac & 0xff00) | data;
 		}
 
-		if (LOG) logerror("HD61830 '%s' Cursor Address Low %02x: %04x\n", tag(), data, m_cac);
+		LOG("HD61830 Cursor Address Low %02x: %04x\n", data, m_cac);
 		break;
 
 	case INSTRUCTION_CURSOR_ADDRESS_HIGH:
 		m_cac = (data << 8) | (m_cac & 0xff);
 
-		if (LOG) logerror("HD61830 '%s' Cursor Address High %02x: %04x\n", tag(), data, m_cac);
+		LOG("HD61830 Cursor Address High %02x: %04x\n", data, m_cac);
 		break;
 
 	case INSTRUCTION_DISPLAY_DATA_WRITE:
 		writebyte(m_cac, data);
 
-		if (LOG) logerror("HD61830 '%s' Display Data Write %02x -> %04x row %u col %u\n", tag(), data, m_cac, m_cac / 40, m_cac % 40);
+		LOG("HD61830 Display Data Write %02x -> %04x row %u col %u\n", data, m_cac, m_cac / 40, m_cac % 40);
 
 		m_cac++;
 		break;
@@ -326,11 +304,11 @@ WRITE8_MEMBER( hd61830_device::data_w )
 	case INSTRUCTION_CLEAR_BIT:
 		{
 		int bit = data & 0x07;
-		UINT8 md = readbyte(m_cac);
+		uint8_t md = readbyte(m_cac);
 
 		md &= ~(1 << bit);
 
-		if (LOG) logerror("HD61830 '%s' Clear Bit %u at %04x\n", tag(), bit + 1, m_cac);
+		LOG("HD61830 Clear Bit %u at %04x\n", bit + 1, m_cac);
 
 		writebyte(m_cac, md);
 
@@ -341,11 +319,11 @@ WRITE8_MEMBER( hd61830_device::data_w )
 	case INSTRUCTION_SET_BIT:
 		{
 		int bit = data & 0x07;
-		UINT8 md = readbyte(m_cac);
+		uint8_t md = readbyte(m_cac);
 
 		md |= 1 << bit;
 
-		if (LOG) logerror("HD61830 '%s' Set Bit %u at %04x\n", tag(), bit + 1, m_cac);
+		LOG("HD61830 Set Bit %u at %04x\n", bit + 1, m_cac);
 
 		writebyte(m_cac, md);
 
@@ -354,7 +332,7 @@ WRITE8_MEMBER( hd61830_device::data_w )
 		break;
 
 	default:
-		logerror("HD61830 '%s' Illegal Instruction %02x!\n", tag(), m_ir);
+		logerror("HD61830 Illegal Instruction %02x!\n", m_ir);
 		return;
 	}
 
@@ -367,12 +345,12 @@ WRITE8_MEMBER( hd61830_device::data_w )
 //  draw_scanline - draw one graphics scanline
 //-------------------------------------------------
 
-UINT16 hd61830_device::draw_scanline(bitmap_ind16 &bitmap, const rectangle &cliprect, int y, UINT16 ra)
+uint16_t hd61830_device::draw_scanline(bitmap_ind16 &bitmap, const rectangle &cliprect, int y, uint16_t ra)
 {
 	for (int sx = 0; sx < m_hn; sx+=2)
 	{
-		UINT8 data1 = readbyte(ra++);
-		UINT8 data2 = readbyte(ra++);
+		uint8_t data1 = readbyte(ra++);
+		uint8_t data2 = readbyte(ra++);
 
 		for (int x = 0; x < m_hp; x++)
 		{
@@ -395,8 +373,8 @@ UINT16 hd61830_device::draw_scanline(bitmap_ind16 &bitmap, const rectangle &clip
 
 void hd61830_device::update_graphics(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT16 rac1 = m_dsa;
-	UINT16 rac2 = rac1 + (m_nx * m_hn);
+	uint16_t rac1 = m_dsa;
+	uint16_t rac2 = rac1 + (m_nx * m_hn);
 	for (int y = 0; y < m_nx; y++)
 	{
 		/* draw upper half scanline */
@@ -412,7 +390,7 @@ void hd61830_device::update_graphics(bitmap_ind16 &bitmap, const rectangle &clip
 //  draw_char - draw a char
 //-------------------------------------------------
 
-void hd61830_device::draw_char(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16 ma, int x, int y, UINT8 md)
+void hd61830_device::draw_char(bitmap_ind16 &bitmap, const rectangle &cliprect, uint16_t ma, int x, int y, uint8_t md)
 {
 	for (int cl = 0; cl < m_vp; cl++)
 	{
@@ -420,7 +398,7 @@ void hd61830_device::draw_char(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 		{
 			int sy = y * m_vp + cl;
 			int sx = x * m_hp + cr;
-			UINT8 data;
+			uint8_t data;
 
 			if (m_mcr & MODE_EXTERNAL_CG)
 			{
@@ -428,7 +406,7 @@ void hd61830_device::draw_char(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 			}
 			else
 			{
-				UINT16 addr = 0;
+				uint16_t addr = 0;
 
 				if (md >= 0x20 && md < 0x80 && cl < 7)
 				{
@@ -485,13 +463,13 @@ void hd61830_device::draw_char(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 
 void hd61830_device::update_text(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT16 ma = 0;
+	uint16_t ma = 0;
 	for (int y = 0; y < (m_nx / m_vp); y++)
 	{
 		for (int x = 0; x < m_hn; x+=2)
 		{
-			UINT8 md1 = readbyte(ma);
-			UINT8 md2 = readbyte(ma+1);
+			uint8_t md1 = readbyte(ma);
+			uint8_t md2 = readbyte(ma+1);
 
 			draw_char(bitmap, cliprect, ma, x, y, md1);
 			draw_char(bitmap, cliprect, ma+1, x+1, y, md2);
@@ -506,7 +484,7 @@ void hd61830_device::update_text(bitmap_ind16 &bitmap, const rectangle &cliprect
 //  update_screen - update screen
 //-------------------------------------------------
 
-UINT32 hd61830_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t hd61830_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if (m_mcr & MODE_DISPLAY_ON)
 	{

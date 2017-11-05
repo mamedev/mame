@@ -1,16 +1,17 @@
 // license:BSD-3-Clause
 // copyright-holders:Fabio Priuli,Acho A. Tang, R. Belmont
+#ifndef MAME_VIDEO_K007420_H
+#define MAME_VIDEO_K007420_H
+
 #pragma once
-#ifndef __K007420_H__
-#define __K007420_H__
+
 
 typedef device_delegate<void (int *code, int *color)> k007420_delegate;
 
 class k007420_device : public device_t
 {
 public:
-	k007420_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	~k007420_device() {}
+	k007420_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	static void static_set_palette_tag(device_t &device, const char *tag);
 	static void static_set_bank_limit(device_t &device, int limit) { downcast<k007420_device &>(device).m_banklimit = limit; }
@@ -26,16 +27,16 @@ protected:
 	virtual void device_reset() override;
 private:
 	// internal state
-	std::unique_ptr<UINT8[]>        m_ram;
+	std::unique_ptr<uint8_t[]>        m_ram;
 
 	int          m_flipscreen;    // current code uses the 7342 flipscreen!!
-	UINT8        m_regs[8];   // current code uses the 7342 regs!! (only [2])
+	uint8_t        m_regs[8];   // current code uses the 7342 regs!! (only [2])
 	required_device<palette_device> m_palette;
 	int                m_banklimit;
 	k007420_delegate m_callback;
 };
 
-extern const device_type K007420;
+DECLARE_DEVICE_TYPE(K007420, k007420_device)
 
 #define MCFG_K007420_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, K007420, 0)
@@ -53,4 +54,4 @@ extern const device_type K007420;
 #define K007420_CALLBACK_MEMBER(_name)     void _name(int *code, int *color)
 
 
-#endif
+#endif // MAME_VIDEO_K007420_H

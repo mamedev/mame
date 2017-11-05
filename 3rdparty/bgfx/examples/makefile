@@ -1,6 +1,6 @@
 #
-# Copyright 2011-2016 Branimir Karadzic. All rights reserved.
-# License: http://www.opensource.org/licenses/BSD-2-Clause
+# Copyright 2011-2017 Branimir Karadzic. All rights reserved.
+# License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
 #
 
 rebuild:
@@ -31,6 +31,10 @@ rebuild:
 #	@make -s --no-print-directory rebuild -C 26-occlusion
 	@make -s --no-print-directory rebuild -C 27-terrain
 	@make -s --no-print-directory rebuild -C 28-wireframe
+	@make -s --no-print-directory rebuild -C 30-picking
+	@make -s --no-print-directory rebuild -C 31-rsm
+	@make -s --no-print-directory rebuild -C common/debugdraw
 	@make -s --no-print-directory rebuild -C common/font
 	@make -s --no-print-directory rebuild -C common/imgui
 	@make -s --no-print-directory rebuild -C common/nanovg
+	@make -s --no-print-directory rebuild -C common/ps

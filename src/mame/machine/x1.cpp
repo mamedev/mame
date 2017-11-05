@@ -1,6 +1,7 @@
 // license:LGPL-2.1+
 // copyright-holders:Angelo Salese, Barry Rodewald
 
+#include "emu.h"
 #include "includes/x1.h"
 
 
@@ -8,15 +9,15 @@
 //  LIVE DEVICE
 //**************************************************************************
 
-const device_type X1_KEYBOARD = &device_creator<x1_keyboard_device>;
+DEFINE_DEVICE_TYPE(X1_KEYBOARD, x1_keyboard_device, "x1_keyboard", "Sharp X1 Keyboard")
 
 //-------------------------------------------------
 //  z80ctc_device - constructor
 //-------------------------------------------------
 
-x1_keyboard_device::x1_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, X1_KEYBOARD, "X1 Keyboard", tag, owner, clock, "x1_keyboard", __FILE__),
-		device_z80daisy_interface(mconfig, *this)
+x1_keyboard_device::x1_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, X1_KEYBOARD, tag, owner, clock)
+	, device_z80daisy_interface(mconfig, *this)
 {
 }
 

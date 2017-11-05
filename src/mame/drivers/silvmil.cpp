@@ -28,8 +28,10 @@ Very likely to be 'whatever crystals we had on hand which were close enough for 
 #include "cpu/m68000/m68000.h"
 #include "machine/gen_latch.h"
 #include "sound/okim6295.h"
+#include "sound/ym2151.h"
 #include "video/decospr.h"
-#include "sound/2151intf.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class silvmil_state : public driver_device
@@ -53,9 +55,9 @@ public:
 	required_device<generic_latch_8_device> m_soundlatch;
 
 	/* memory pointers */
-	required_shared_ptr<UINT16> m_bg_videoram;
-	required_shared_ptr<UINT16> m_fg_videoram;
-	required_shared_ptr<UINT16> m_spriteram;
+	required_shared_ptr<uint16_t> m_bg_videoram;
+	required_shared_ptr<uint16_t> m_fg_videoram;
+	required_shared_ptr<uint16_t> m_spriteram;
 
 	/* video-related */
 	tilemap_t   *m_bg_layer;
@@ -128,7 +130,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_silvmil(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_silvmil(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void tumblepb_gfx1_rearrange();
 };
 
@@ -161,13 +163,13 @@ TILEMAP_MAPPER_MEMBER(silvmil_state::deco16_scan_rows)
 
 void silvmil_state::video_start()
 {
-	m_bg_layer = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(silvmil_state::get_bg_tile_info),this), tilemap_mapper_delegate(FUNC(silvmil_state::deco16_scan_rows),this), 16, 16, 64, 32);
-	m_fg_layer = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(silvmil_state::get_fg_tile_info),this), tilemap_mapper_delegate(FUNC(silvmil_state::deco16_scan_rows),this), 16, 16, 64, 32);
+	m_bg_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(silvmil_state::get_bg_tile_info),this), tilemap_mapper_delegate(FUNC(silvmil_state::deco16_scan_rows),this), 16, 16, 64, 32);
+	m_fg_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(silvmil_state::get_fg_tile_info),this), tilemap_mapper_delegate(FUNC(silvmil_state::deco16_scan_rows),this), 16, 16, 64, 32);
 
 	m_fg_layer->set_transparent_pen(0);
 }
 
-UINT32 silvmil_state::screen_update_silvmil(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t silvmil_state::screen_update_silvmil(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_layer->draw(screen, bitmap, cliprect, 0, 0);
 	m_fg_layer->draw(screen, bitmap, cliprect, 0, 0);
@@ -264,7 +266,7 @@ static INPUT_PORTS_START( silvmil )
 	PORT_DIPSETTING(      0x1000, DEF_STR( 3C_2C ) ) /* Works like 2C/1C then 1C/1C repeat */
 	PORT_DIPSETTING(      0x2000, DEF_STR( 2C_2C ) ) /* Works the same as 1C/1C */
 	PORT_DIPSETTING(      0x3800, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0x4000, 0x4000, "Coin Box" )          PORT_DIPLOCATION("SW2:7") /* Funtionally reversed?? */
+	PORT_DIPNAME( 0x4000, 0x4000, "Coin Box" )          PORT_DIPLOCATION("SW2:7") /* Functionally reversed?? */
 	PORT_DIPSETTING(      0x4000, "1" ) /* Credits from Coin1 or Coin2 */
 	PORT_DIPSETTING(      0x0000, "2" ) /* Doesn't credit up from Coin2 */
 	PORT_SERVICE_DIPLOC(  0x8000, IP_ACTIVE_LOW, "SW2:8" ) /* Verified */
@@ -393,7 +395,7 @@ static ADDRESS_MAP_START( silvmil_sound_map, AS_PROGRAM, 8, silvmil_state )
 ADDRESS_MAP_END
 
 
-static MACHINE_CONFIG_START( silvmil, silvmil_state )
+static MACHINE_CONFIG_START( silvmil )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz) /* Verified */
@@ -432,7 +434,7 @@ static MACHINE_CONFIG_START( silvmil, silvmil_state )
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_4_096MHz/4, OKIM6295_PIN7_HIGH) /* Verified */
+	MCFG_OKIM6295_ADD("oki", XTAL_4_096MHz/4, PIN7_HIGH) /* Verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -445,7 +447,7 @@ static MACHINE_CONFIG_DERIVED( puzzlove, silvmil )
 	MCFG_DECO_SPRITE_BOOTLEG_TYPE(1)
 
 	MCFG_DEVICE_REMOVE("oki")
-	MCFG_OKIM6295_ADD("oki", XTAL_4MHz/4, OKIM6295_PIN7_HIGH) /* Verified */
+	MCFG_OKIM6295_ADD("oki", XTAL_4MHz/4, PIN7_HIGH) /* Verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -567,7 +569,7 @@ ROM_END
 
 void silvmil_state::tumblepb_gfx1_rearrange()
 {
-	UINT8 *rom = memregion("gfx1")->base();
+	uint8_t *rom = memregion("gfx1")->base();
 	int len = memregion("gfx1")->bytes();
 	int i;
 

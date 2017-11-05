@@ -40,11 +40,12 @@
  *
  */
 
-#ifndef CPC_SSA1_H_
-#define CPC_SSA1_H_
+#ifndef MAME_BUS_CPC_CPC_SSA1_H
+#define MAME_BUS_CPC_CPC_SSA1_H
+
+#pragma once
 
 
-#include "emu.h"
 #include "cpcexp.h"
 #include "sound/sp0256.h"
 
@@ -53,33 +54,34 @@ class cpc_ssa1_device : public device_t,
 {
 public:
 	// construction/destruction
-	cpc_ssa1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	cpc_ssa1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// optional information overrides
-	virtual const rom_entry *device_rom_region() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
-	void set_lrq(UINT8 state) { m_lrq = state; }
-	UINT8 get_lrq() { return m_lrq; }
-	void set_sby(UINT8 state) { m_sby = state; }
-	UINT8 get_sby() { return m_sby; }
+	void set_lrq(uint8_t state) { m_lrq = state; }
+	uint8_t get_lrq() { return m_lrq; }
+	void set_sby(uint8_t state) { m_sby = state; }
+	uint8_t get_sby() { return m_sby; }
 
 	DECLARE_READ8_MEMBER(ssa1_r);
 	DECLARE_WRITE8_MEMBER(ssa1_w);
-	DECLARE_WRITE_LINE_MEMBER(lrq_cb);
-	DECLARE_WRITE_LINE_MEMBER(sby_cb);
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
+	// optional information overrides
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
+
 private:
+	DECLARE_WRITE_LINE_MEMBER(lrq_cb);
+	DECLARE_WRITE_LINE_MEMBER(sby_cb);
+
 	cpc_expansion_slot_device *m_slot;
 
-	UINT8 *m_rom;
-	UINT8 m_lrq;
-	UINT8 m_sby;
+	uint8_t *m_rom;
+	uint8_t m_lrq;
+	uint8_t m_sby;
 
 	required_device<sp0256_device> m_sp0256_device;
 };
@@ -89,40 +91,41 @@ class cpc_dkspeech_device : public device_t,
 {
 public:
 	// construction/destruction
-	cpc_dkspeech_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	cpc_dkspeech_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// optional information overrides
-	virtual const rom_entry *device_rom_region() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
-	void set_lrq(UINT8 state) { m_lrq = state; }
-	UINT8 get_lrq() { return m_lrq; }
-	void set_sby(UINT8 state) { m_sby = state; }
-	UINT8 get_sby() { return m_sby; }
+	void set_lrq(uint8_t state) { m_lrq = state; }
+	uint8_t get_lrq() { return m_lrq; }
+	void set_sby(uint8_t state) { m_sby = state; }
+	uint8_t get_sby() { return m_sby; }
 
 	DECLARE_READ8_MEMBER(dkspeech_r);
 	DECLARE_WRITE8_MEMBER(dkspeech_w);
-	DECLARE_WRITE_LINE_MEMBER(lrq_cb);
-	DECLARE_WRITE_LINE_MEMBER(sby_cb);
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
+	// optional information overrides
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
+
 private:
+	DECLARE_WRITE_LINE_MEMBER(lrq_cb);
+	DECLARE_WRITE_LINE_MEMBER(sby_cb);
+
 	cpc_expansion_slot_device *m_slot;
 
-	UINT8 *m_rom;
-	UINT8 m_lrq;
-	UINT8 m_sby;
+	uint8_t *m_rom;
+	uint8_t m_lrq;
+	uint8_t m_sby;
 
 	required_device<sp0256_device> m_sp0256_device;
 };
 
 // device type definition
-extern const device_type CPC_SSA1;
-extern const device_type CPC_DKSPEECH;
+DECLARE_DEVICE_TYPE(CPC_SSA1,     cpc_ssa1_device)
+DECLARE_DEVICE_TYPE(CPC_DKSPEECH, cpc_dkspeech_device)
 
 
-#endif /* CPC_SSA1_H_ */
+#endif // MAME_BUS_CPC_CPC_SSA1_H

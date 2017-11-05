@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "serialbox.h"
 
 
@@ -31,7 +32,7 @@ enum
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type SERIAL_BOX = &device_creator<serial_box_device>;
+DEFINE_DEVICE_TYPE(SERIAL_BOX, serial_box_device, "serbox", "Serial Box")
 
 
 //-------------------------------------------------
@@ -48,7 +49,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *serial_box_device::device_rom_region() const
+const tiny_rom_entry *serial_box_device::device_rom_region() const
 {
 	return ROM_NAME( serial_box );
 }
@@ -64,24 +65,13 @@ ADDRESS_MAP_END
 
 
 //-------------------------------------------------
-//  MACHINE_DRIVER( serial_box )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( serial_box )
+MACHINE_CONFIG_MEMBER( serial_box_device::device_add_mconfig )
 	MCFG_CPU_ADD(M6502_TAG, M65C02, XTAL_4MHz/4)
 	MCFG_CPU_PROGRAM_MAP(serial_box_mem)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor serial_box_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( serial_box );
-}
 
 
 
@@ -93,8 +83,8 @@ machine_config_constructor serial_box_device::device_mconfig_additions() const
 //  serial_box_device - constructor
 //-------------------------------------------------
 
-serial_box_device::serial_box_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, SERIAL_BOX, "Serial Box", tag, owner, clock, "serbox", __FILE__),
+serial_box_device::serial_box_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, SERIAL_BOX, tag, owner, clock),
 		device_cbm_iec_interface(mconfig, *this),
 		m_maincpu(*this, M6502_TAG)
 {

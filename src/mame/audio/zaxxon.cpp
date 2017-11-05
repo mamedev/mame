@@ -92,11 +92,11 @@ static const char *const zaxxon_sample_names[] =
 };
 
 
-MACHINE_CONFIG_FRAGMENT( zaxxon_samples )
+MACHINE_CONFIG_START( zaxxon_samples )
 	MCFG_SOUND_ADD("samples", SAMPLES, 0)
 	MCFG_SAMPLES_CHANNELS(12)
 	MCFG_SAMPLES_NAMES(zaxxon_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 MACHINE_CONFIG_END
 
 
@@ -109,7 +109,7 @@ MACHINE_CONFIG_END
 
 WRITE8_MEMBER(zaxxon_state::zaxxon_sound_a_w)
 {
-	UINT8 diff = data ^ m_sound_state[0];
+	uint8_t diff = data ^ m_sound_state[0];
 	m_sound_state[0] = data;
 
 	/* PLAYER SHIP A/B: volume */
@@ -143,7 +143,7 @@ WRITE8_MEMBER(zaxxon_state::zaxxon_sound_a_w)
 
 WRITE8_MEMBER(zaxxon_state::zaxxon_sound_b_w)
 {
-	UINT8 diff = data ^ m_sound_state[1];
+	uint8_t diff = data ^ m_sound_state[1];
 	m_sound_state[1] = data;
 
 	/* S-EXP: channel 4 */
@@ -159,7 +159,7 @@ WRITE8_MEMBER(zaxxon_state::zaxxon_sound_b_w)
 
 WRITE8_MEMBER(zaxxon_state::zaxxon_sound_c_w)
 {
-	UINT8 diff = data ^ m_sound_state[2];
+	uint8_t diff = data ^ m_sound_state[2];
 	m_sound_state[2] = data;
 
 	/* SHOT: channel 7 */
@@ -192,11 +192,11 @@ static const char *const congo_sample_names[] =
 };
 
 
-MACHINE_CONFIG_FRAGMENT( congo_samples )
+MACHINE_CONFIG_START( congo_samples )
 	MCFG_SOUND_ADD("samples", SAMPLES, 0)
 	MCFG_SAMPLES_CHANNELS(5)
 	MCFG_SAMPLES_NAMES(congo_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 MACHINE_CONFIG_END
 
 
@@ -209,7 +209,7 @@ MACHINE_CONFIG_END
 
 WRITE8_MEMBER(zaxxon_state::congo_sound_b_w)
 {
-	UINT8 diff = data ^ m_sound_state[1];
+	uint8_t diff = data ^ m_sound_state[1];
 	m_sound_state[1] = data;
 
 	/* bit 7 = mute */
@@ -221,7 +221,7 @@ WRITE8_MEMBER(zaxxon_state::congo_sound_b_w)
 
 WRITE8_MEMBER(zaxxon_state::congo_sound_c_w)
 {
-	UINT8 diff = data ^ m_sound_state[2];
+	uint8_t diff = data ^ m_sound_state[2];
 	m_sound_state[2] = data;
 
 	/* BASS DRUM: channel 1 */

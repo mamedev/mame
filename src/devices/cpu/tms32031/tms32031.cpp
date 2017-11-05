@@ -9,8 +9,8 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
 #include "tms32031.h"
+#include "debugger.h"
 
 
 //**************************************************************************
@@ -87,8 +87,8 @@ const int GIEFLAG   = 0x2000;
 //**************************************************************************
 
 // device type definition
-const device_type TMS32031 = &device_creator<tms32031_device>;
-const device_type TMS32032 = &device_creator<tms32032_device>;
+DEFINE_DEVICE_TYPE(TMS32031, tms32031_device, "tms32031", "TMS32031")
+DEFINE_DEVICE_TYPE(TMS32032, tms32032_device, "tms32032", "TMS32032")
 
 
 // internal memory maps
@@ -144,7 +144,7 @@ float tms3203x_device::tmsreg::as_float() const
 	else
 	{
 		int exp = (exponent() + 127) << 23;
-		INT32 man = -mantissa();
+		int32_t man = -mantissa();
 		id.i[0] = 0x80000000 + exp + ((man >> 8) & 0x00ffffff);
 	}
 
@@ -179,7 +179,7 @@ double tms3203x_device::tmsreg::as_double() const
 	else
 	{
 		int exp = (exponent() + 1023) << 20;
-		INT32 man = -mantissa();
+		int32_t man = -mantissa();
 		id.i[BYTE_XOR_BE(0)] = 0x80000000 + exp + ((man >> 11) & 0x001fffff);
 		id.i[BYTE_XOR_BE(1)] = (man << 21) & 0xffe00000;
 	}
@@ -199,8 +199,8 @@ void tms3203x_device::tmsreg::from_double(double val)
 	// extract mantissa and exponent from the IEEE input
 	int_double id;
 	id.d = val;
-	INT32 mantissa = ((id.i[BYTE_XOR_BE(0)] & 0x000fffff) << 11) | ((id.i[BYTE_XOR_BE(1)] & 0xffe00000) >> 21);
-	INT32 exponent = ((id.i[BYTE_XOR_BE(0)] & 0x7ff00000) >> 20) - 1023;
+	int32_t mantissa = ((id.i[BYTE_XOR_BE(0)] & 0x000fffff) << 11) | ((id.i[BYTE_XOR_BE(1)] & 0xffe00000) >> 21);
+	int32_t exponent = ((id.i[BYTE_XOR_BE(0)] & 0x7ff00000) >> 20) - 1023;
 
 	// if we're too small, map to 0
 	if (exponent < -128)
@@ -212,7 +212,7 @@ void tms3203x_device::tmsreg::from_double(double val)
 	// if we're too large, map to the maximum value
 	else if (exponent > 127)
 	{
-		if ((INT32)id.i[BYTE_XOR_BE(0)] >= 0)
+		if ((int32_t)id.i[BYTE_XOR_BE(0)] >= 0)
 			set_mantissa(0x7fffffff);
 		else
 			set_mantissa(0x80000001);
@@ -220,7 +220,7 @@ void tms3203x_device::tmsreg::from_double(double val)
 	}
 
 	// if we're positive, map directly
-	else if ((INT32)id.i[BYTE_XOR_BE(0)] >= 0)
+	else if ((int32_t)id.i[BYTE_XOR_BE(0)] >= 0)
 	{
 		set_mantissa(mantissa);
 		set_exponent(exponent);
@@ -251,8 +251,8 @@ void tms3203x_device::tmsreg::from_double(double val)
 //  tms3203x_device - constructor
 //-------------------------------------------------
 
-tms3203x_device::tms3203x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 chiptype, address_map_constructor internal_map, const char *shortname, const char *source)
-	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source),
+tms3203x_device::tms3203x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t chiptype, address_map_constructor internal_map)
+	: cpu_device(mconfig, type, tag, owner, clock),
 		m_program_config("program", ENDIANNESS_LITTLE, 32, 24, -2, internal_map),
 		m_chip_type(chiptype),
 		m_pc(0),
@@ -280,29 +280,15 @@ tms3203x_device::tms3203x_device(const machine_config &mconfig, device_type type
 #endif
 }
 
-tms32031_device::tms32031_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: tms3203x_device(mconfig, TMS32031, "TMS32031", tag, owner, clock, CHIP_TYPE_TMS32031, ADDRESS_MAP_NAME(internal_32031), "tms32031", __FILE__)
+tms32031_device::tms32031_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: tms3203x_device(mconfig, TMS32031, tag, owner, clock, CHIP_TYPE_TMS32031, ADDRESS_MAP_NAME(internal_32031))
 {
 }
 
-tms32032_device::tms32032_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: tms3203x_device(mconfig, TMS32032, "TMS32032", tag, owner, clock, CHIP_TYPE_TMS32032, ADDRESS_MAP_NAME(internal_32032), "tms32032", __FILE__)
+tms32032_device::tms32032_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: tms3203x_device(mconfig, TMS32032, tag, owner, clock, CHIP_TYPE_TMS32032, ADDRESS_MAP_NAME(internal_32032))
 {
 }
-
-
-DIRECT_UPDATE_MEMBER( tms3203x_device::direct_handler )
-{
-	// internal boot loader ROM
-	if (m_mcbl_mode && address < (0x1000 << 2))
-	{
-		direct.explicit_configure(0x000000, 0x003fff, 0x003fff, m_bootrom);
-		return (offs_t)-1;
-	}
-
-	return address;
-}
-
 
 //-------------------------------------------------
 //  ~tms3203x_device - destructor
@@ -323,7 +309,7 @@ tms3203x_device::~tms3203x_device()
 //  internal ROM region
 //-------------------------------------------------
 
-const rom_entry *tms3203x_device::device_rom_region() const
+const tiny_rom_entry *tms3203x_device::device_rom_region() const
 {
 	switch (m_chip_type)
 	{
@@ -337,8 +323,11 @@ const rom_entry *tms3203x_device::device_rom_region() const
 //  ROPCODE - fetch an opcode
 //-------------------------------------------------
 
-inline UINT32 tms3203x_device::ROPCODE(offs_t pc)
+inline uint32_t tms3203x_device::ROPCODE(offs_t pc)
 {
+	if (m_mcbl_mode && pc < 0x1000)
+		return m_bootrom[pc];
+
 	return m_direct->read_dword(pc << 2);
 }
 
@@ -347,7 +336,7 @@ inline UINT32 tms3203x_device::ROPCODE(offs_t pc)
 //  RMEM - read memory
 //-------------------------------------------------
 
-inline UINT32 tms3203x_device::RMEM(offs_t addr)
+inline uint32_t tms3203x_device::RMEM(offs_t addr)
 {
 	if (m_mcbl_mode && addr < 0x1000)
 		return m_bootrom[addr];
@@ -360,7 +349,7 @@ inline UINT32 tms3203x_device::RMEM(offs_t addr)
 //  WMEM - write memory
 //-------------------------------------------------
 
-inline void tms3203x_device::WMEM(offs_t addr, UINT32 data)
+inline void tms3203x_device::WMEM(offs_t addr, uint32_t data)
 {
 	m_program->write_dword(addr << 2, data);
 }
@@ -382,8 +371,7 @@ void tms3203x_device::device_start()
 	m_iack_cb.resolve_safe();
 
 	// set up the internal boot loader ROM
-	m_bootrom = reinterpret_cast<UINT32*>(memregion(shortname())->base());
-	m_direct->set_direct_update(direct_update_delegate(FUNC(tms3203x_device::direct_handler), this));
+	m_bootrom = reinterpret_cast<uint32_t*>(memregion(shortname())->base());
 
 	// save state
 	save_item(NAME(m_pc));
@@ -394,10 +382,12 @@ void tms3203x_device::device_start()
 	save_item(NAME(m_delayed));
 	save_item(NAME(m_irq_pending));
 	save_item(NAME(m_is_idling));
+	save_item(NAME(m_mcbl_mode));
 
 	// register our state for the debugger
 	state_add(TMS3203X_PC,      "PC",        m_pc);
 	state_add(STATE_GENPC,      "GENPC",     m_pc).noshow();
+	state_add(STATE_GENPCBASE,  "CURPC",     m_pc).noshow();
 	state_add(STATE_GENFLAGS,   "GENFLAGS",  m_r[TMR_ST].i32[0]).mask(0xff).noshow().formatstr("%8s");
 	state_add(TMS3203X_R0,      "R0",        m_r[TMR_R0].i32[0]);
 	state_add(TMS3203X_R1,      "R1",        m_r[TMR_R1].i32[0]);
@@ -466,9 +456,11 @@ void tms3203x_device::device_reset()
 //  the space doesn't exist
 //-------------------------------------------------
 
-const address_space_config *tms3203x_device::memory_space_config(address_spacenum spacenum) const
+device_memory_interface::space_config_vector tms3203x_device::memory_space_config() const
 {
-	return (spacenum == AS_PROGRAM) ? &m_program_config : nullptr;
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config)
+	};
 }
 
 
@@ -545,7 +537,7 @@ void tms3203x_device::state_string_export(const device_state_entry &entry, std::
 			break;
 
 		case STATE_GENFLAGS:
-			UINT32 temp = m_r[TMR_ST].i32[0];
+			uint32_t temp = m_r[TMR_ST].i32[0];
 			str = string_format("%c%c%c%c%c%c%c%c",
 				(temp & 0x80) ? 'O':'.',
 				(temp & 0x40) ? 'U':'.',
@@ -565,7 +557,7 @@ void tms3203x_device::state_string_export(const device_state_entry &entry, std::
 //  of the shortest instruction, in bytes
 //-------------------------------------------------
 
-UINT32 tms3203x_device::disasm_min_opcode_bytes() const
+uint32_t tms3203x_device::disasm_min_opcode_bytes() const
 {
 	return 4;
 }
@@ -576,7 +568,7 @@ UINT32 tms3203x_device::disasm_min_opcode_bytes() const
 //  of the longest instruction, in bytes
 //-------------------------------------------------
 
-UINT32 tms3203x_device::disasm_max_opcode_bytes() const
+uint32_t tms3203x_device::disasm_max_opcode_bytes() const
 {
 	return 4;
 }
@@ -587,10 +579,10 @@ UINT32 tms3203x_device::disasm_max_opcode_bytes() const
 //  helper function
 //-------------------------------------------------
 
-offs_t tms3203x_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t tms3203x_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( tms3203x );
-	return CPU_DISASSEMBLE_NAME(tms3203x)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(tms3203x)(this, stream, pc, oprom, opram, options);
 }
 
 
@@ -604,9 +596,9 @@ offs_t tms3203x_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 
 //  floating-point format a 32-bit IEEE float
 //-------------------------------------------------
 
-float tms3203x_device::fp_to_float(UINT32 floatdata)
+float tms3203x_device::fp_to_float(uint32_t floatdata)
 {
-	tmsreg gen(floatdata << 8, (INT32)floatdata >> 24);
+	tmsreg gen(floatdata << 8, (int32_t)floatdata >> 24);
 	return gen.as_float();
 }
 
@@ -616,9 +608,9 @@ float tms3203x_device::fp_to_float(UINT32 floatdata)
 //  floating-point format a 64-bit IEEE double
 //-------------------------------------------------
 
-double tms3203x_device::fp_to_double(UINT32 floatdata)
+double tms3203x_device::fp_to_double(uint32_t floatdata)
 {
-	tmsreg gen(floatdata << 8, (INT32)floatdata >> 24);
+	tmsreg gen(floatdata << 8, (int32_t)floatdata >> 24);
 	return gen.as_double();
 }
 
@@ -628,10 +620,10 @@ double tms3203x_device::fp_to_double(UINT32 floatdata)
 //  a 32-bit DSP floating-point value
 //-------------------------------------------------
 
-UINT32 tms3203x_device::float_to_fp(float fval)
+uint32_t tms3203x_device::float_to_fp(float fval)
 {
 	tmsreg gen(fval);
-	return (gen.exponent() << 24) | ((UINT32)gen.mantissa() >> 8);
+	return (gen.exponent() << 24) | ((uint32_t)gen.mantissa() >> 8);
 }
 
 
@@ -640,10 +632,10 @@ UINT32 tms3203x_device::float_to_fp(float fval)
 //  a 32-bit DSP floating-point value
 //-------------------------------------------------
 
-UINT32 tms3203x_device::double_to_fp(double dval)
+uint32_t tms3203x_device::double_to_fp(double dval)
 {
 	tmsreg gen(dval);
-	return (gen.exponent() << 24) | ((UINT32)gen.mantissa() >> 8);
+	return (gen.exponent() << 24) | ((uint32_t)gen.mantissa() >> 8);
 }
 
 
@@ -660,7 +652,7 @@ UINT32 tms3203x_device::double_to_fp(double dval)
 void tms3203x_device::check_irqs()
 {
 	// determine if we have any live interrupts
-	UINT16 validints = IREG(TMR_IF) & IREG(TMR_IE) & 0x0fff;
+	uint16_t validints = IREG(TMR_IF) & IREG(TMR_IE) & 0x0fff;
 	if (validints == 0 || (IREG(TMR_ST) & GIEFLAG) == 0)
 		return;
 
@@ -677,7 +669,7 @@ void tms3203x_device::check_irqs()
 	m_is_idling = false;
 	if (!m_delayed)
 	{
-		UINT16 intmask = 1 << (whichtrap - 1);
+		uint16_t intmask = 1 << (whichtrap - 1);
 
 		// bit in IF is cleared when interrupt is taken
 		IREG(TMR_IF) &= ~intmask;
@@ -698,7 +690,7 @@ void tms3203x_device::check_irqs()
 //  cycles it takes for one instruction to execute
 //-------------------------------------------------
 
-UINT32 tms3203x_device::execute_min_cycles() const
+uint32_t tms3203x_device::execute_min_cycles() const
 {
 	return 1;
 }
@@ -709,7 +701,7 @@ UINT32 tms3203x_device::execute_min_cycles() const
 //  cycles it takes for one instruction to execute
 //-------------------------------------------------
 
-UINT32 tms3203x_device::execute_max_cycles() const
+uint32_t tms3203x_device::execute_max_cycles() const
 {
 	return 4;
 }
@@ -720,7 +712,7 @@ UINT32 tms3203x_device::execute_max_cycles() const
 //  input/interrupt lines
 //-------------------------------------------------
 
-UINT32 tms3203x_device::execute_input_lines() const
+uint32_t tms3203x_device::execute_input_lines() const
 {
 	return (m_chip_type == CHIP_TYPE_TMS32032) ? 13 : 12;
 }
@@ -745,7 +737,7 @@ void tms3203x_device::execute_set_input(int inputnum, int state)
 	}
 
 	// update the external state
-	UINT16 intmask = 1 << inputnum;
+	uint16_t intmask = 1 << inputnum;
 	if (state == ASSERT_LINE)
 	{
 		m_irq_state |= intmask;
@@ -785,7 +777,7 @@ void tms3203x_device::execute_run()
 		{
 			if ((IREG(TMR_ST) & RMFLAG) && m_pc == IREG(TMR_RE) + 1)
 			{
-				if ((INT32)--IREG(TMR_RC) >= 0)
+				if ((int32_t)--IREG(TMR_RC) >= 0)
 					m_pc = IREG(TMR_RS);
 				else
 				{
@@ -814,10 +806,10 @@ void tms3203x_device::execute_run()
 		{
 			// watch for out-of-range stack pointers
 			if (IREG(TMR_SP) & 0xff000000)
-				debugger_break(machine());
+				machine().debug_break();
 			if ((IREG(TMR_ST) & RMFLAG) && m_pc == IREG(TMR_RE) + 1)
 			{
-				if ((INT32)--IREG(TMR_RC) >= 0)
+				if ((int32_t)--IREG(TMR_RC) >= 0)
 					m_pc = IREG(TMR_RS);
 				else
 				{

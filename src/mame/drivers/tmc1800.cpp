@@ -113,8 +113,12 @@ Notes:
 
 */
 
+#include "emu.h"
 #include "includes/tmc1800.h"
+
 #include "sound/beep.h"
+#include "speaker.h"
+
 
 /* Read/Write Handlers */
 
@@ -171,13 +175,13 @@ WRITE8_MEMBER( nano_state::keylatch_w )
 void tmc2000_state::bankswitch()
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
-	UINT8 *ram = m_ram->pointer();
-	UINT8 *rom = m_rom->base();
+	uint8_t *ram = m_ram->pointer();
+	uint8_t *rom = m_rom->base();
 
 	if (m_roc)
 	{
 		// monitor ROM
-		program.install_rom(0x0000, 0x01ff, 0, 0x7e00, rom);
+		program.install_rom(0x0000, 0x01ff, 0x7e00, rom);
 	}
 	else
 	{
@@ -185,11 +189,11 @@ void tmc2000_state::bankswitch()
 		switch (m_ram->size())
 		{
 		case 4 * 1024:
-			program.install_ram(0x0000, 0x0fff, 0, 0x7000, ram);
+			program.install_ram(0x0000, 0x0fff, 0x7000, ram);
 			break;
 
 		case 16 * 1024:
-			program.install_ram(0x0000, 0x3fff, 0, 0x4000, ram);
+			program.install_ram(0x0000, 0x3fff, 0x4000, ram);
 			break;
 
 		case 32 * 1024:
@@ -201,13 +205,13 @@ void tmc2000_state::bankswitch()
 	if (m_rac)
 	{
 		// color RAM
-		program.install_ram(0x8000, 0x81ff, 0, 0x7e00, m_colorram);
-		program.unmap_read(0x8000, 0x81ff, 0, 0x7e00);
+		program.install_ram(0x8000, 0x81ff, 0x7e00, m_colorram);
+		program.unmap_read(0x8000, 0xffff);
 	}
 	else
 	{
 		// monitor ROM
-		program.install_rom(0x8000, 0x81ff, 0, 0x7e00, rom);
+		program.install_rom(0x8000, 0x81ff, 0x7e00, rom);
 	}
 }
 
@@ -224,8 +228,8 @@ WRITE8_MEMBER( nano_state::bankswitch_w )
 {
 	/* enable RAM */
 	address_space &program = m_maincpu->space(AS_PROGRAM);
-	UINT8 *ram = m_ram->pointer();
-	program.install_ram(0x0000, 0x0fff, 0, 0x7000, ram);
+	uint8_t *ram = m_ram->pointer();
+	program.install_ram(0x0000, 0x0fff, 0x7000, ram);
 
 	/* write to CDP1864 tone latch */
 	m_cti->tone_latch_w(space, 0, data);
@@ -530,7 +534,7 @@ READ_LINE_MEMBER( tmc2000_state::ef2_r )
 
 READ_LINE_MEMBER( tmc2000_state::ef3_r )
 {
-	UINT8 data = ~m_key_row[m_keylatch / 8]->read();
+	uint8_t data = ~m_key_row[m_keylatch / 8]->read();
 
 	return BIT(data, m_keylatch % 8);
 }
@@ -572,7 +576,7 @@ READ_LINE_MEMBER( nano_state::ef2_r )
 
 READ_LINE_MEMBER( nano_state::ef3_r )
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	if (!BIT(m_keylatch, 3)) data &= m_ny0->read();
 	if (!BIT(m_keylatch, 4)) data &= m_ny1->read();
@@ -624,7 +628,7 @@ void osc1000b_state::machine_reset()
 
 void tmc2000_state::machine_start()
 {
-	UINT16 addr;
+	uint16_t addr;
 
 	m_colorram.allocate(TMC2000_COLORRAM_SIZE);
 
@@ -633,16 +637,6 @@ void tmc2000_state::machine_start()
 	{
 		m_colorram[addr] = machine().rand() & 0xff;
 	}
-
-	// find keyboard rows
-	m_key_row[0] = m_y0;
-	m_key_row[1] = m_y1;
-	m_key_row[2] = m_y2;
-	m_key_row[3] = m_y3;
-	m_key_row[4] = m_y4;
-	m_key_row[5] = m_y5;
-	m_key_row[6] = m_y6;
-	m_key_row[7] = m_y7;
 
 	// state saving
 	save_item(NAME(m_keylatch));
@@ -689,28 +683,28 @@ void nano_state::machine_reset()
 
 	/* enable ROM */
 	address_space &program = m_maincpu->space(AS_PROGRAM);
-	UINT8 *rom = m_rom->base();
-	program.install_rom(0x0000, 0x01ff, 0, 0x7e00, rom);
+	uint8_t *rom = m_rom->base();
+	program.install_rom(0x0000, 0x01ff, 0x7e00, rom);
 }
 
 /* Machine Drivers */
 
 QUICKLOAD_LOAD_MEMBER( tmc1800_base_state, tmc1800 )
 {
-	UINT8 *ptr = m_rom->base();
+	uint8_t *ptr = m_rom->base();
 	int size = image.length();
 
 	if (size > m_ram->size())
 	{
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 	}
 
 	image.fread( ptr, size);
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
-static MACHINE_CONFIG_START( tmc1800, tmc1800_state )
+static MACHINE_CONFIG_START( tmc1800 )
 	// basic system hardware
 	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, XTAL_1_75MHz)
 	MCFG_CPU_PROGRAM_MAP(tmc1800_map)
@@ -742,7 +736,7 @@ static MACHINE_CONFIG_START( tmc1800, tmc1800_state )
 	MCFG_RAM_EXTRA_OPTIONS("4K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( osc1000b, osc1000b_state )
+static MACHINE_CONFIG_START( osc1000b )
 	// basic system hardware
 	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, XTAL_1_75MHz)
 	MCFG_CPU_PROGRAM_MAP(osc1000b_map)
@@ -773,7 +767,7 @@ static MACHINE_CONFIG_START( osc1000b, osc1000b_state )
 	MCFG_RAM_EXTRA_OPTIONS("4K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( tmc2000, tmc2000_state )
+static MACHINE_CONFIG_START( tmc2000 )
 	// basic system hardware
 	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, XTAL_1_75MHz)
 	MCFG_CPU_PROGRAM_MAP(tmc2000_map)
@@ -799,7 +793,7 @@ static MACHINE_CONFIG_START( tmc2000, tmc2000_state )
 	MCFG_RAM_EXTRA_OPTIONS("16K,32K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( nano, nano_state )
+static MACHINE_CONFIG_START( nano )
 	// basic system hardware
 	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, XTAL_1_75MHz)
 	MCFG_CPU_PROGRAM_MAP(nano_map)
@@ -866,7 +860,7 @@ void tmc1800_state::device_timer(emu_timer &timer, device_timer_id id, int param
 		m_beeper->set_clock(0);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in tmc1800_state::device_timer");
+		assert_always(false, "Unknown id in tmc1800_state::device_timer");
 	}
 }
 
@@ -877,8 +871,8 @@ DRIVER_INIT_MEMBER(tmc1800_state,tmc1800)
 
 /* System Drivers */
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        COMPANY         FULLNAME        FLAGS */
-COMP( 1977, tmc1800,    0,      0,      tmc1800,    tmc1800, tmc1800_state,    tmc1800, "Telercas Oy",  "Telmac 1800",  MACHINE_NOT_WORKING )
-COMP( 1977, osc1000b,   tmc1800,0,      osc1000b,   tmc1800, driver_device,    0,       "OSCOM Oy",     "OSCOM 1000B",  MACHINE_NOT_WORKING )
-COMP( 1980, tmc2000,    0,      0,      tmc2000,    tmc2000, driver_device,    0,       "Telercas Oy",  "Telmac 2000",  MACHINE_SUPPORTS_SAVE )
-COMP( 1980, nano,       tmc2000,0,      nano,       nano,    driver_device,    0,       "OSCOM Oy",     "OSCOM Nano",   MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME        PARENT   COMPAT  MACHINE     INPUT    STATE           INIT     COMPANY        FULLNAME       FLAGS
+COMP( 1977, tmc1800,    0,       0,      tmc1800,    tmc1800, tmc1800_state,  tmc1800, "Telercas Oy", "Telmac 1800", MACHINE_NOT_WORKING )
+COMP( 1977, osc1000b,   tmc1800, 0,      osc1000b,   tmc1800, osc1000b_state, 0,       "OSCOM Oy",    "OSCOM 1000B", MACHINE_NOT_WORKING )
+COMP( 1980, tmc2000,    0,       0,      tmc2000,    tmc2000, tmc2000_state,  0,       "Telercas Oy", "Telmac 2000", MACHINE_SUPPORTS_SAVE )
+COMP( 1980, nano,       tmc2000, 0,      nano,       nano,    nano_state,     0,       "OSCOM Oy",    "OSCOM Nano",  MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )

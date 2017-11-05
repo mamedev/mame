@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2016 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
@@ -7,8 +7,8 @@
 #define ENTRY_H_HEADER_GUARD
 
 #include "dbg.h"
-#include <string.h> // memset
 #include <bx/bx.h>
+#include <bx/string.h>
 
 namespace bx { struct FileReaderI; struct FileWriterI; struct AllocatorI; }
 
@@ -226,7 +226,7 @@ namespace entry
 	{
 		GamepadState()
 		{
-			memset(m_axis, 0, sizeof(m_axis) );
+			bx::memSet(m_axis, 0, sizeof(m_axis) );
 		}
 
 		int32_t m_axis[entry::GamepadAxis::Count];
@@ -246,6 +246,7 @@ namespace entry
 	void toggleWindowFrame(WindowHandle _handle);
 	void toggleFullscreen(WindowHandle _handle);
 	void setMouseLock(WindowHandle _handle, bool _lock);
+	void setCurrentDir(const char* _dir);
 
 	struct WindowState
 	{
@@ -278,6 +279,32 @@ namespace entry
 	{
 	}
 
+	class App : public AppI
+	{
+	public:
+		App(const char* _name);
+
+		virtual ~App();
+
+		const char* getName() const
+		{
+			return m_name;
+		}
+
+		AppI* getNext()
+		{
+			return m_next;
+		}
+
+	private:
+		const char* m_name;
+		App* m_next;
+	};
+
+	///
+	App* getFirstApp();
+
+	///
 	int runApp(AppI* _app, int _argc, char** _argv);
 
 } // namespace entry

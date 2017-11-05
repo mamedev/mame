@@ -125,17 +125,22 @@ irq vector 0x26:                                                                
 *******************************************************************************************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
-#include "machine/i8255.h"
+#include "imagedev/cassette.h"
 #include "machine/i8251.h"
-#include "video/mc6847.h"
+#include "machine/i8255.h"
+#include "machine/timer.h"
 #include "sound/ay8910.h"
 #include "sound/upd7752.h"
 #include "sound/wave.h"
+#include "video/mc6847.h"
 
-#include "imagedev/cassette.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+
+#include "speaker.h"
+
 #include "formats/p6001_cas.h"
 
 
@@ -155,9 +160,7 @@ public:
 		m_io_mode4_dsw(*this, "MODE4_DSW"),
 		m_io_p1(*this, "P1"),
 		m_io_p2(*this, "P2"),
-		m_io_key1(*this, "key1"),
-		m_io_key2(*this, "key2"),
-		m_io_key3(*this, "key3"),
+		m_io_keys(*this, {"key1", "key2", "key3"}),
 		m_io_key_modifiers(*this, "key_modifiers"),
 		m_bank1(*this, "bank1"),
 		m_bank2(*this, "bank2"),
@@ -171,38 +174,38 @@ public:
 
 	required_device<i8255_device> m_ppi;
 
-	optional_shared_ptr<UINT8> m_ram;
-	UINT8 *m_video_ram;
-	UINT8 m_irq_vector;
-	UINT8 m_cas_switch;
-	UINT8 m_sys_latch;
-	UINT8 m_timer_irq_mask;
-	UINT32 m_cas_offset;
-	UINT32 m_cas_maxsize;
+	optional_shared_ptr<uint8_t> m_ram;
+	uint8_t *m_video_ram;
+	uint8_t m_irq_vector;
+	uint8_t m_cas_switch;
+	uint8_t m_sys_latch;
+	uint8_t m_timer_irq_mask;
+	uint32_t m_cas_offset;
+	uint32_t m_cas_maxsize;
 	emu_timer *m_timer_irq_timer;
-	UINT16 m_timer_hz_div;
-	UINT8 m_ex_vram_bank;
-	UINT8 m_bgcol_bank;
-	UINT8 m_exgfx_text_mode;
-	UINT8 m_exgfx_bitmap_mode;
-	UINT8 m_exgfx_2bpp_mode;
-	UINT8 m_bank_r0;
-	UINT8 m_bank_r1;
-	UINT8 m_gfx_bank_on;
-	UINT8 m_bank_w;
-	UINT8 m_bank_opt;
-	UINT8 m_timer_irq_mask2;
-	UINT8 m_timer_irq_vector;
-	UINT32 m_cgrom_bank_addr;
-	UINT8 m_sr_video_mode;
-	UINT8 m_port_c_8255;
-	UINT8 m_cur_keycode;
-	UINT8 m_sr_bank_r[8];
-	UINT8 m_sr_bank_w[8];
-	UINT8 m_kludge;
-	UINT32 m_old_key1;
-	UINT32 m_old_key2;
-	UINT32 m_old_key3;
+	uint16_t m_timer_hz_div;
+	uint8_t m_ex_vram_bank;
+	uint8_t m_bgcol_bank;
+	uint8_t m_exgfx_text_mode;
+	uint8_t m_exgfx_bitmap_mode;
+	uint8_t m_exgfx_2bpp_mode;
+	uint8_t m_bank_r0;
+	uint8_t m_bank_r1;
+	uint8_t m_gfx_bank_on;
+	uint8_t m_bank_w;
+	uint8_t m_bank_opt;
+	uint8_t m_timer_irq_mask2;
+	uint8_t m_timer_irq_vector;
+	uint32_t m_cgrom_bank_addr;
+	uint8_t m_sr_video_mode;
+	uint8_t m_port_c_8255;
+	uint8_t m_cur_keycode;
+	uint8_t m_sr_bank_r[8];
+	uint8_t m_sr_bank_w[8];
+	uint8_t m_kludge;
+	uint32_t m_old_key1;
+	uint32_t m_old_key2;
+	uint32_t m_old_key3;
 	DECLARE_WRITE8_MEMBER(pc6001_system_latch_w);
 	DECLARE_READ8_MEMBER(nec_ppi8255_r);
 	DECLARE_WRITE8_MEMBER(nec_ppi8255_w);
@@ -253,9 +256,9 @@ public:
 	DECLARE_MACHINE_RESET(pc6001m2);
 	DECLARE_PALETTE_INIT(pc6001m2);
 	DECLARE_MACHINE_RESET(pc6001sr);
-	UINT32 screen_update_pc6001(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_pc6001m2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_pc6001sr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_pc6001(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_pc6001m2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_pc6001sr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(pc6001_interrupt);
 	INTERRUPT_GEN_MEMBER(pc6001sr_interrupt);
 	TIMER_CALLBACK_MEMBER(audio_callback);
@@ -278,9 +281,7 @@ protected:
 	required_ioport m_io_mode4_dsw;
 	required_ioport m_io_p1;
 	required_ioport m_io_p2;
-	required_ioport m_io_key1;
-	required_ioport m_io_key2;
-	required_ioport m_io_key3;
+	required_ioport_array<3> m_io_keys;
 	required_ioport m_io_key_modifiers;
 	required_memory_bank m_bank1;
 	optional_memory_bank m_bank2;
@@ -300,9 +301,9 @@ protected:
 	void draw_tile_text(bitmap_ind16 &bitmap,const rectangle &cliprect,int x,int y,int tile,int attr,int has_mc6847);
 	void draw_border(bitmap_ind16 &bitmap,const rectangle &cliprect,int attr,int has_mc6847);
 	void pc6001_screen_draw(bitmap_ind16 &bitmap,const rectangle &cliprect, int has_mc6847);
-	UINT8 check_joy_press();
-	UINT8 check_keyboard_press();
-	void vram_bank_change(UINT8 vram_bank);
+	uint8_t check_joy_press();
+	uint8_t check_keyboard_press();
+	void vram_bank_change(uint8_t vram_bank);
 };
 
 
@@ -323,7 +324,7 @@ void pc6001_state::video_start()
 	cfg.get_char_rom = pc6001_get_char_rom;
 	m6847_init(machine(), &cfg);
 	#endif
-	m_video_ram = auto_alloc_array(machine(), UINT8, 0x4000);
+	m_video_ram = auto_alloc_array(machine(), uint8_t, 0x4000);
 }
 
 /* this is known as gfx mode 4 */
@@ -332,13 +333,13 @@ void pc6001_state::draw_gfx_mode4(bitmap_ind16 &bitmap,const rectangle &cliprect
 	int x,y,xi;
 	int fgcol,color;
 	int col_setting;
-	static const UINT8 pen_gattr[4][4] = {
+	static const uint8_t pen_gattr[4][4] = {
 		{ 0, 1, 6, 2 }, //Red / Blue
 		{ 0, 6, 1, 2 }, //Blue / Red
 		{ 0, 5, 2, 2 }, //Pink / Green
 		{ 0, 2, 5, 2 }, //Green / Pink
 	};
-	static const UINT8 pen_wattr[4][4] = {
+	static const uint8_t pen_wattr[4][4] = {
 		{ 0, 1, 6, 7 }, //Red / Blue
 		{ 0, 6, 1, 7 }, //Blue / Red
 		{ 0, 5, 2, 7 }, //Pink / Green
@@ -476,7 +477,7 @@ void pc6001_state::draw_tile_3bpp(bitmap_ind16 &bitmap,const rectangle &cliprect
 void pc6001_state::draw_tile_text(bitmap_ind16 &bitmap,const rectangle &cliprect,int x,int y,int tile,int attr,int has_mc6847)
 {
 	int xi,yi,pen,fgcol,color;
-	UINT8 *gfx_data = m_region_gfx1->base();
+	uint8_t *gfx_data = m_region_gfx1->base();
 
 	for(yi=0;yi<12;yi++)
 	{
@@ -573,14 +574,14 @@ void pc6001_state::pc6001_screen_draw(bitmap_ind16 &bitmap,const rectangle &clip
 	}
 }
 
-UINT32 pc6001_state::screen_update_pc6001(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t pc6001_state::screen_update_pc6001(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	pc6001_screen_draw(bitmap,cliprect,1);
 
 	return 0;
 }
 
-UINT32 pc6001_state::screen_update_pc6001m2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t pc6001_state::screen_update_pc6001m2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x,y,tile,attr;
 
@@ -600,7 +601,7 @@ UINT32 pc6001_state::screen_update_pc6001m2(screen_device &screen, bitmap_ind16 
 					int pen[2];
 #if 0
 					/* palette reference: */
-					static const UINT8 pal_num[] = { 0x00, 0x04, 0x01, 0x05,
+					static const uint8_t pal_num[] = { 0x00, 0x04, 0x01, 0x05,
 						0x02, 0x06, 0x03, 0x07,
 						0x08, 0x0c, 0x09, 0x0d,
 						0x0a, 0x0e, 0x0b, 0x0f };
@@ -642,7 +643,7 @@ UINT32 pc6001_state::screen_update_pc6001m2(screen_device &screen, bitmap_ind16 
 					int pen[2];
 #if 0
 					/* palette reference: */
-					static const UINT8 pal_num[] = { 0x00, 0x04, 0x01, 0x05 };
+					static const uint8_t pal_num[] = { 0x00, 0x04, 0x01, 0x05 };
 
 					color |= pal_num[(pen[0] & 1) | ((pen[1] & 1) << 1)];
 #endif
@@ -677,7 +678,7 @@ UINT32 pc6001_state::screen_update_pc6001m2(screen_device &screen, bitmap_ind16 
 	else if(m_exgfx_text_mode)
 	{
 		int xi,yi,pen,fgcol,bgcol,color;
-		UINT8 *gfx_data = m_region_gfx1->base();
+		uint8_t *gfx_data = m_region_gfx1->base();
 
 		for(y=0;y<20;y++)
 		{
@@ -721,11 +722,11 @@ UINT32 pc6001_state::screen_update_pc6001m2(screen_device &screen, bitmap_ind16 
 	return 0;
 }
 
-UINT32 pc6001_state::screen_update_pc6001sr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t pc6001_state::screen_update_pc6001sr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x,y,tile,attr;
 	int xi,yi,pen,fgcol,bgcol,color;
-	UINT8 *gfx_data = m_region_gfx1->base();
+	uint8_t *gfx_data = m_region_gfx1->base();
 
 
 	if(m_sr_video_mode & 8) // text mode
@@ -817,7 +818,7 @@ UINT32 pc6001_state::screen_update_pc6001sr(screen_device &screen, bitmap_ind16 
 
 WRITE8_MEMBER(pc6001_state::pc6001_system_latch_w)
 {
-	static const UINT16 startaddr[] = {0xC000, 0xE000, 0x8000, 0xA000 };
+	static const uint16_t startaddr[] = {0xC000, 0xE000, 0x8000, 0xA000 };
 
 	m_video_ram =  m_ram + startaddr[(data >> 1) & 0x03] - 0x8000;
 
@@ -842,10 +843,10 @@ WRITE8_MEMBER(pc6001_state::pc6001_system_latch_w)
 }
 
 #if 0
-ATTR_CONST pc6001_state::UINT8 pc6001_get_attributes(UINT8 c,int scanline, int pos)
+ATTR_CONST pc6001_state::uint8_t pc6001_get_attributes(uint8_t c,int scanline, int pos)
 {
-	UINT8 result = 0x00;
-	UINT8 val = m_video_ram [(scanline / 12) * 0x20 + pos];
+	uint8_t result = 0x00;
+	uint8_t val = m_video_ram [(scanline / 12) * 0x20 + pos];
 
 	if (val & 0x01) {
 		result |= M6847_INV;
@@ -857,14 +858,14 @@ ATTR_CONST pc6001_state::UINT8 pc6001_get_attributes(UINT8 c,int scanline, int p
 	return result;
 }
 
-const pc6001_state::UINT8 *pc6001_get_video_ram(int scanline)
+const pc6001_state::uint8_t *pc6001_get_video_ram(int scanline)
 {
 	return m_video_ram +0x0200+ (scanline / 12) * 0x20;
 }
 
-UINT8 pc6001_state::pc6001_get_char_rom(UINT8 ch, int line)
+uint8_t pc6001_state::pc6001_get_char_rom(uint8_t ch, int line)
 {
-	UINT8 *gfx = m_region_gfx1->base();
+	uint8_t *gfx = m_region_gfx1->base();
 	return gfx[ch*16+line];
 }
 #endif
@@ -876,7 +877,7 @@ READ8_MEMBER(pc6001_state::nec_ppi8255_r)
 		return m_port_c_8255;
 	else if(offset==0)
 	{
-		UINT8 res;
+		uint8_t res;
 		res = m_cur_keycode;
 		//m_cur_keycode = 0;
 		return res;
@@ -964,7 +965,7 @@ ADDRESS_MAP_END
 #define INVALID(_v_) \
 	0x4c000+0x2000*_v_
 /* FIXME: some comments aren't right */
-static const UINT32 banksw_table_r0[0x10*4][4] = {
+static const uint32_t banksw_table_r0[0x10*4][4] = {
 	/* 0 */
 	{ INVALID(0),   INVALID(0),     INVALID(0),     INVALID(0)  },  //0x00: <invalid setting>
 	{ BASICROM(0),  BASICROM(1),    BASICROM(2),    BASICROM(3) },  //0x01: basic rom 0 & 1 / basic rom 2 & 3
@@ -1035,7 +1036,7 @@ static const UINT32 banksw_table_r0[0x10*4][4] = {
 	{ INVALID(0),   INVALID(0),     INVALID(0),     INVALID(0)  }   //0x0f: <invalid setting>
 };
 
-static const UINT32 banksw_table_r1[0x10*4][4] = {
+static const uint32_t banksw_table_r1[0x10*4][4] = {
 	/* 0 */
 	{ INVALID(0),   INVALID(0),     INVALID(0),     INVALID(0)  },  //0x00: <invalid setting>
 	{ BASICROM(0),  BASICROM(1),    BASICROM(2),    BASICROM(3) },  //0x01: basic rom 0 & 1 / basic rom 2 & 3
@@ -1108,8 +1109,8 @@ static const UINT32 banksw_table_r1[0x10*4][4] = {
 
 WRITE8_MEMBER(pc6001_state::pc6001m2_bank_r0_w)
 {
-	UINT8 *ROM = m_region_maincpu->base();
-	UINT8 *gfx_data = m_region_gfx1->base();
+	uint8_t *ROM = m_region_maincpu->base();
+	uint8_t *gfx_data = m_region_gfx1->base();
 
 //  bankaddress = 0x10000 + (0x4000 * ((data & 0x40)>>6));
 //  membank(1)->set_base(&ROM[bankaddress]);
@@ -1128,7 +1129,7 @@ WRITE8_MEMBER(pc6001_state::pc6001m2_bank_r0_w)
 
 WRITE8_MEMBER(pc6001_state::pc6001m2_bank_r1_w)
 {
-	UINT8 *ROM = m_region_maincpu->base();
+	uint8_t *ROM = m_region_maincpu->base();
 
 //  bankaddress = 0x10000 + (0x4000 * ((data & 0x40)>>6));
 //  membank(1)->set_base(&ROM[bankaddress]);
@@ -1149,8 +1150,8 @@ WRITE8_MEMBER(pc6001_state::pc6001m2_bank_w0_w)
 
 WRITE8_MEMBER(pc6001_state::pc6001m2_opt_bank_w)
 {
-	UINT8 *ROM = m_region_maincpu->base();
-	UINT8 *gfx_data = m_region_gfx1->base();
+	uint8_t *ROM = m_region_maincpu->base();
+	uint8_t *gfx_data = m_region_gfx1->base();
 
 	/*
 	0 - TVROM / VOICE ROM
@@ -1177,49 +1178,49 @@ WRITE8_MEMBER(pc6001_state::pc6001m2_opt_bank_w)
 
 WRITE8_MEMBER(pc6001_state::work_ram0_w)
 {
-	UINT8 *ROM = m_region_maincpu->base();
+	uint8_t *ROM = m_region_maincpu->base();
 	ROM[offset+((m_bank_w & 0x01) ? WRAM(0) : EXWRAM(0))] = data;
 }
 
 WRITE8_MEMBER(pc6001_state::work_ram1_w)
 {
-	UINT8 *ROM = m_region_maincpu->base();
+	uint8_t *ROM = m_region_maincpu->base();
 	ROM[offset+((m_bank_w & 0x01) ? WRAM(1) : EXWRAM(1))] = data;
 }
 
 WRITE8_MEMBER(pc6001_state::work_ram2_w)
 {
-	UINT8 *ROM = m_region_maincpu->base();
+	uint8_t *ROM = m_region_maincpu->base();
 	ROM[offset+((m_bank_w & 0x04) ? WRAM(2) : EXWRAM(2))] = data;
 }
 
 WRITE8_MEMBER(pc6001_state::work_ram3_w)
 {
-	UINT8 *ROM = m_region_maincpu->base();
+	uint8_t *ROM = m_region_maincpu->base();
 	ROM[offset+((m_bank_w & 0x04) ? WRAM(3) : EXWRAM(3))] = data;
 }
 
 WRITE8_MEMBER(pc6001_state::work_ram4_w)
 {
-	UINT8 *ROM = m_region_maincpu->base();
+	uint8_t *ROM = m_region_maincpu->base();
 	ROM[offset+((m_bank_w & 0x10) ? WRAM(4) : EXWRAM(4))] = data;
 }
 
 WRITE8_MEMBER(pc6001_state::work_ram5_w)
 {
-	UINT8 *ROM = m_region_maincpu->base();
+	uint8_t *ROM = m_region_maincpu->base();
 	ROM[offset+((m_bank_w & 0x10) ? WRAM(5) : EXWRAM(5))] = data;
 }
 
 WRITE8_MEMBER(pc6001_state::work_ram6_w)
 {
-	UINT8 *ROM = m_region_maincpu->base();
+	uint8_t *ROM = m_region_maincpu->base();
 	ROM[offset+((m_bank_w & 0x40) ? WRAM(6) : EXWRAM(6))] = data;
 }
 
 WRITE8_MEMBER(pc6001_state::work_ram7_w)
 {
-	UINT8 *ROM = m_region_maincpu->base();
+	uint8_t *ROM = m_region_maincpu->base();
 	ROM[offset+((m_bank_w & 0x40) ? WRAM(7) : EXWRAM(7))] = data;
 }
 
@@ -1244,8 +1245,8 @@ WRITE8_MEMBER(pc6001_state::necmk2_ppi8255_w)
 		m_port_c_8255 |= 0xa8;
 
 		{
-			UINT8 *ROM = m_region_maincpu->base();
-			UINT8 *gfx_data = m_region_gfx1->base();
+			uint8_t *ROM = m_region_maincpu->base();
+			uint8_t *gfx_data = m_region_gfx1->base();
 
 			//printf("%02x\n",data);
 
@@ -1264,9 +1265,9 @@ WRITE8_MEMBER(pc6001_state::necmk2_ppi8255_w)
 	m_ppi->write(space,offset,data);
 }
 
-void pc6001_state::vram_bank_change(UINT8 vram_bank)
+void pc6001_state::vram_bank_change(uint8_t vram_bank)
 {
-	UINT8 *work_ram = m_region_maincpu->base();
+	uint8_t *work_ram = m_region_maincpu->base();
 
 //  popmessage("%02x",vram_bank);
 
@@ -1319,7 +1320,7 @@ WRITE8_MEMBER(pc6001_state::pc6001m2_system_latch_w)
 
 WRITE8_MEMBER(pc6001_state::pc6001m2_vram_bank_w)
 {
-	//static const UINT32 startaddr[] = {WRAM(6), WRAM(6), WRAM(0), WRAM(4) };
+	//static const uint32_t startaddr[] = {WRAM(6), WRAM(6), WRAM(0), WRAM(4) };
 
 	m_ex_vram_bank = data;
 	vram_bank_change((m_ex_vram_bank & 0x06) | ((m_sys_latch & 0x06) << 4));
@@ -1526,8 +1527,8 @@ READ8_MEMBER(pc6001_state::pc6001sr_bank_rn_r)
 WRITE8_MEMBER(pc6001_state::pc6001sr_bank_rn_w)
 {
 	memory_bank *bank[8] = { m_bank1, m_bank2, m_bank3, m_bank4, m_bank5, m_bank6, m_bank7, m_bank8 };
-	UINT8 *ROM = m_region_maincpu->base();
-	UINT8 bank_num;
+	uint8_t *ROM = m_region_maincpu->base();
+	uint8_t bank_num;
 
 	m_sr_bank_r[offset] = data;
 	bank_num = data & 0x0f;
@@ -1557,8 +1558,8 @@ WRITE8_MEMBER(pc6001_state::pc6001sr_bank_wn_w)
 
 #define SR_WRAM_BANK_W(_v_) \
 { \
-	UINT8 *ROM = m_region_maincpu->base(); \
-	UINT8 bank_num; \
+	uint8_t *ROM = m_region_maincpu->base(); \
+	uint8_t bank_num; \
 	bank_num = m_sr_bank_w[_v_] & 0x0f; \
 	if((m_sr_bank_w[_v_] & 0xf0) != 0x20) \
 		ROM[offset+(SR_WRAM0(bank_num))] = data; \
@@ -1584,7 +1585,7 @@ WRITE8_MEMBER(pc6001_state::pc6001sr_mode_w)
 
 WRITE8_MEMBER(pc6001_state::pc6001sr_vram_bank_w)
 {
-	UINT8 *work_ram = m_region_maincpu->base();
+	uint8_t *work_ram = m_region_maincpu->base();
 
 	m_video_ram = work_ram + 0x70000 + ((data & 0x0f)*0x1000);
 }
@@ -1901,11 +1902,10 @@ READ8_MEMBER(pc6001_state::pc6001_8255_portc_r)
 	return 0x88;
 }
 
-UINT8 pc6001_state::check_keyboard_press()
+uint8_t pc6001_state::check_keyboard_press()
 {
-	ioport_port *ports[3] = { m_io_key1, m_io_key2, m_io_key3 };
 	int i,port_i,scancode;
-	UINT8 shift_pressed,caps_lock;
+	uint8_t shift_pressed,caps_lock;
 	scancode = 0;
 
 	shift_pressed = (m_io_key_modifiers->read() & 2)>>1;
@@ -1915,7 +1915,7 @@ UINT8 pc6001_state::check_keyboard_press()
 	{
 		for(i=0;i<32;i++)
 		{
-			if((ports[port_i]->read()>>i) & 1)
+			if((m_io_keys[port_i]->read()>>i) & 1)
 			{
 				if((shift_pressed != caps_lock) && scancode >= 0x41 && scancode <= 0x5f)
 					scancode+=0x20;
@@ -1944,12 +1944,12 @@ UINT8 pc6001_state::check_keyboard_press()
 	return 0;
 }
 
-UINT8 pc6001_state::check_joy_press()
+uint8_t pc6001_state::check_joy_press()
 {
-	UINT8 p1_key = m_io_p1->read() ^ 0xff;
-	UINT8 shift_key = m_io_key_modifiers->read() & 0x02;
-	UINT8 space_key = m_io_key2->read() & 0x01;
-	UINT8 joy_press;
+	uint8_t p1_key = m_io_p1->read() ^ 0xff;
+	uint8_t shift_key = m_io_key_modifiers->read() & 0x02;
+	uint8_t space_key = m_io_keys[1]->read() & 0x01;
+	uint8_t joy_press;
 
 		/*
 		    PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
@@ -1987,7 +1987,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(pc6001_state::cassette_callback)
 	if(m_cas_switch == 1)
 	{
 		#if 0
-			static UINT8 cas_data_i = 0x80,cas_data_poll;
+			static uint8_t cas_data_i = 0x80,cas_data_poll;
 			//m_cur_keycode = gfx_data[m_cas_offset++];
 			if(m_cassette->input() > 0.03)
 				cas_data_poll|= cas_data_i;
@@ -2027,10 +2027,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(pc6001_state::cassette_callback)
 
 TIMER_DEVICE_CALLBACK_MEMBER(pc6001_state::keyboard_callback)
 {
-	UINT32 key1 = m_io_key1->read();
-	UINT32 key2 = m_io_key2->read();
-	UINT32 key3 = m_io_key3->read();
-//  UINT8 p1_key = m_io_p1->read();
+	uint32_t key1 = m_io_keys[0]->read();
+	uint32_t key2 = m_io_keys[1]->read();
+	uint32_t key3 = m_io_keys[2]->read();
+//  uint8_t p1_key = m_io_p1->read();
 
 	if(m_cas_switch == 0)
 	{
@@ -2107,7 +2107,7 @@ MACHINE_RESET_MEMBER(pc6001_state,pc6001m2)
 
 	/* set default bankswitch */
 	{
-		UINT8 *ROM = m_region_maincpu->base();
+		uint8_t *ROM = m_region_maincpu->base();
 		m_bank_r0 = 0x71;
 		m_bank1->set_base(&ROM[BASICROM(0)]);
 		m_bank2->set_base(&ROM[BASICROM(1)]);
@@ -2144,7 +2144,7 @@ MACHINE_RESET_MEMBER(pc6001_state,pc6001sr)
 
 	/* set default bankswitch */
 	{
-		UINT8 *ROM = m_region_maincpu->base();
+		uint8_t *ROM = m_region_maincpu->base();
 		m_sr_bank_r[0] = 0xf8; m_bank1->set_base(&ROM[SR_SYSROM_1(0x08)]);
 		m_sr_bank_r[1] = 0xfa; m_bank2->set_base(&ROM[SR_SYSROM_1(0x0a)]);
 		m_sr_bank_r[2] = 0xb0; m_bank3->set_base(&ROM[SR_EXROM1(0x00)]);
@@ -2271,7 +2271,7 @@ GFXDECODE_END
 
 #define PC6001_MAIN_CLOCK 7987200
 
-static MACHINE_CONFIG_START( pc6001, pc6001_state )
+static MACHINE_CONFIG_START( pc6001 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, PC6001_MAIN_CLOCK / 2) // ~4 Mhz
 	MCFG_CPU_PROGRAM_MAP(pc6001_map)
@@ -2465,9 +2465,9 @@ ROM_START( pc6001sr )
 	ROM_COPY( "maincpu", 0x28000, 0x00000, 0x8000 )
 ROM_END
 
-/*    YEAR  NAME      PARENT   COMPAT MACHINE   INPUT     INIT    COMPANY  FULLNAME          FLAGS */
-COMP( 1981, pc6001,   0,       0,     pc6001,   pc6001, driver_device,   0,      "Nippon Electronic Company",   "PC-6001 (Japan)",    MACHINE_NOT_WORKING )
-COMP( 1981, pc6001a,  pc6001,  0,     pc6001,   pc6001, driver_device,   0,      "Nippon Electronic Company",   "PC-6001A (US)",      MACHINE_NOT_WORKING ) // This version is also known as the NEC Trek
-COMP( 1983, pc6001mk2,pc6001,  0,     pc6001m2, pc6001, driver_device,   0,      "Nippon Electronic Company",   "PC-6001mkII (Japan)",   MACHINE_NOT_WORKING )
-COMP( 1983, pc6601,   pc6001,  0,     pc6601,   pc6001, driver_device,   0,      "Nippon Electronic Company",   "PC-6601 (Japan)",       MACHINE_NOT_WORKING )
-COMP( 1984, pc6001sr, pc6001,  0,     pc6001sr, pc6001, driver_device,   0,      "Nippon Electronic Company",   "PC-6001mkIISR (Japan)", MACHINE_NOT_WORKING )
+//    YEAR  NAME      PARENT   COMPAT MACHINE   INPUT   STATE           INIT    COMPANY  FULLNAME                 FLAGS
+COMP( 1981, pc6001,   0,       0,     pc6001,   pc6001, pc6001_state,   0,      "NEC",   "PC-6001 (Japan)",       MACHINE_NOT_WORKING )
+COMP( 1981, pc6001a,  pc6001,  0,     pc6001,   pc6001, pc6001_state,   0,      "NEC",   "PC-6001A (US)",         MACHINE_NOT_WORKING ) // This version is also known as the NEC Trek
+COMP( 1983, pc6001mk2,pc6001,  0,     pc6001m2, pc6001, pc6001_state,   0,      "NEC",   "PC-6001mkII (Japan)",   MACHINE_NOT_WORKING )
+COMP( 1983, pc6601,   pc6001,  0,     pc6601,   pc6001, pc6001_state,   0,      "NEC",   "PC-6601 (Japan)",       MACHINE_NOT_WORKING )
+COMP( 1984, pc6001sr, pc6001,  0,     pc6001sr, pc6001, pc6001_state,   0,      "NEC",   "PC-6001mkIISR (Japan)", MACHINE_NOT_WORKING )

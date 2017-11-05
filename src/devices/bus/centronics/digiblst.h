@@ -12,8 +12,8 @@
  *  Created on: 23/08/2014
  */
 
-#ifndef DIGIBLST_H_
-#define DIGIBLST_H_
+#ifndef MAME_BUS_CENTRONICS_DIGIBLST_H
+#define MAME_BUS_CENTRONICS_DIGIBLST_H
 
 #pragma once
 
@@ -27,14 +27,14 @@ class centronics_digiblaster_device : public device_t,
 {
 public:
 	// construction/destruction
-	centronics_digiblaster_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	centronics_digiblaster_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	virtual DECLARE_WRITE_LINE_MEMBER( input_data0 ) override { if (state) m_data |= 0x01; else m_data &= ~0x01; update_dac(); }
 	virtual DECLARE_WRITE_LINE_MEMBER( input_data1 ) override { if (state) m_data |= 0x02; else m_data &= ~0x02; update_dac(); }
@@ -46,15 +46,15 @@ protected:
 	virtual DECLARE_WRITE_LINE_MEMBER( input_strobe ) override { if (state) m_data &= ~0x80; else m_data |= 0x80; update_dac(); }
 
 private:
-	required_device<dac_device> m_dac;
+	required_device<dac_byte_interface> m_dac;
 
 	void update_dac();
 
-	UINT8 m_data;
+	uint8_t m_data;
 };
 
 // device type definition
-extern const device_type CENTRONICS_DIGIBLASTER;
+DECLARE_DEVICE_TYPE(CENTRONICS_DIGIBLASTER, centronics_digiblaster_device)
 
 
-#endif /* DIGIBLST_H_ */
+#endif // MAME_BUS_CENTRONICS_DIGIBLST_H

@@ -8,46 +8,6 @@
 #include "includes/40love.h"
 
 
-/*
-*   color prom decoding
-*/
-
-PALETTE_INIT_MEMBER(fortyl_state, fortyl)
-{
-	const UINT8 *color_prom = memregion("proms")->base();
-	int i;
-
-	for (i = 0; i < palette.entries(); i++)
-	{
-		int bit0, bit1, bit2, bit3, r, g, b;
-
-		/* red component */
-		bit0 = (color_prom[0] >> 0) & 0x01;
-		bit1 = (color_prom[0] >> 1) & 0x01;
-		bit2 = (color_prom[0] >> 2) & 0x01;
-		bit3 = (color_prom[0] >> 3) & 0x01;
-		r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-
-		/* green component */
-		bit0 = (color_prom[palette.entries()] >> 0) & 0x01;
-		bit1 = (color_prom[palette.entries()] >> 1) & 0x01;
-		bit2 = (color_prom[palette.entries()] >> 2) & 0x01;
-		bit3 = (color_prom[palette.entries()] >> 3) & 0x01;
-		g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-
-		/* blue component */
-		bit0 = (color_prom[2*palette.entries()] >> 0) & 0x01;
-		bit1 = (color_prom[2*palette.entries()] >> 1) & 0x01;
-		bit2 = (color_prom[2*palette.entries()] >> 2) & 0x01;
-		bit3 = (color_prom[2*palette.entries()] >> 3) & 0x01;
-		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-
-		palette.set_pen_color(i, rgb_t(r,g,b));
-
-		color_prom++;
-	}
-}
-
 /***************************************************************************
 
   Callbacks for the TileMap code
@@ -103,13 +63,13 @@ void fortyl_state::redraw_pixels()
 
 void fortyl_state::video_start()
 {
-	m_pixram1 = make_unique_clear<UINT8[]>(0x4000);
-	m_pixram2 = make_unique_clear<UINT8[]>(0x4000);
+	m_pixram1 = make_unique_clear<uint8_t[]>(0x4000);
+	m_pixram2 = make_unique_clear<uint8_t[]>(0x4000);
 
 	m_tmp_bitmap1 = std::make_unique<bitmap_ind16>(256, 256);
 	m_tmp_bitmap2 = std::make_unique<bitmap_ind16>(256, 256);
 
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(fortyl_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(fortyl_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
 	m_xoffset = 128;    // this never changes
 
@@ -285,8 +245,8 @@ spriteram format (4 bytes per sprite):
 
 void fortyl_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	UINT8 *spriteram = m_spriteram;
-	UINT8 *spriteram_2 = m_spriteram2;
+	uint8_t *spriteram = m_spriteram;
+	uint8_t *spriteram_2 = m_spriteram2;
 	int offs;
 
 	/* spriteram #1 */
@@ -365,7 +325,7 @@ void fortyl_state::draw_pixram( bitmap_ind16 &bitmap, const rectangle &cliprect 
 		copybitmap(bitmap, *m_tmp_bitmap2, f, f, m_xoffset, 0, cliprect);
 }
 
-UINT32 fortyl_state::screen_update_fortyl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t fortyl_state::screen_update_fortyl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if(m_screen_disable == true)
 	{

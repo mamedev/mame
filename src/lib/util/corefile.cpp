@@ -18,6 +18,8 @@
 #include <algorithm>
 #include <cassert>
 #include <cstring>
+#include <iterator>
+
 #include <ctype.h>
 
 
@@ -408,8 +410,8 @@ int core_text_file::getc()
 		}
 
 		// fetch the next character
-		utf16_char utf16_buffer[UTF16_CHAR_MAX];
-		unicode_char uchar = unicode_char(~0);
+		char16_t utf16_buffer[UTF16_CHAR_MAX];
+		char32_t uchar = char32_t(~0);
 		switch (m_text_type)
 		{
 		default:
@@ -461,12 +463,12 @@ int core_text_file::getc()
 
 		case text_file_type::UTF32BE:
 			if (read(&uchar, sizeof(uchar)) == sizeof(uchar))
-				uchar = BIG_ENDIANIZE_INT32(uchar);
+				uchar = big_endianize_int32(uchar);
 			break;
 
 		case text_file_type::UTF32LE:
 			if (read(&uchar, sizeof(uchar)) == sizeof(uchar))
-				uchar = LITTLE_ENDIANIZE_INT32(uchar);
+				uchar = little_endianize_int32(uchar);
 			break;
 		}
 
@@ -1205,7 +1207,7 @@ osd_file::error core_file::load(std::string const &filename, void **data, std::u
 		return osd_file::error::OUT_OF_MEMORY;
 
 	// allocate memory
-	*data = osd_malloc(size);
+	*data = malloc(size);
 	length = std::uint32_t(size);
 
 	// read the data
@@ -1219,7 +1221,7 @@ osd_file::error core_file::load(std::string const &filename, void **data, std::u
 	return osd_file::error::NONE;
 }
 
-osd_file::error core_file::load(std::string const &filename, dynamic_buffer &data)
+osd_file::error core_file::load(std::string const &filename, std::vector<uint8_t> &data)
 {
 	ptr file;
 
@@ -1264,47 +1266,63 @@ core_file::core_file()
     FILENAME UTILITIES
 ***************************************************************************/
 
-/*-------------------------------------------------
-    core_filename_extract_base - extract the base
-    name from a filename; note that this makes
-    assumptions about path separators
--------------------------------------------------*/
+// -------------------------------------------------
+// core_filename_extract_base - extract the base
+// name from a filename; note that this makes
+// assumptions about path separators
+// -------------------------------------------------
 
-std::string core_filename_extract_base(const char *name, bool strip_extension)
+std::string core_filename_extract_base(const std::string &name, bool strip_extension)
 {
-	/* find the start of the name */
-	const char *start = name + strlen(name);
-	while (start > name && !util::is_directory_separator(start[-1]))
-		start--;
+	// find the start of the basename
+	auto const start = std::find_if(name.rbegin(), name.rend(), [](char c) { return util::is_directory_separator(c); });
 
-	/* copy the rest into an astring */
-	std::string result(start);
+	// find the end of the basename
+	auto const chop_position = strip_extension
+		? std::find(name.rbegin(), start, '.')
+		: start;
+	auto const end = ((chop_position != start) && (std::next(chop_position) != start))
+		? std::next(chop_position)
+		: name.rbegin();
 
-	/* chop the extension if present */
-	if (strip_extension)
-		result = result.substr(0, result.find_last_of('.'));
+	// copy the result into an string
+	return std::string(start.base(), end.base());
+}
+
+
+// -------------------------------------------------
+// core_filename_extract_extension
+// -------------------------------------------------
+
+std::string core_filename_extract_extension(const std::string &filename, bool strip_period)
+{
+	auto loc = filename.find_last_of('.');
+	std::string result = loc != std::string::npos
+		? filename.substr(loc + (strip_period ? 1 : 0))
+		: "";
 	return result;
 }
 
 
-/*-------------------------------------------------
-    core_filename_ends_with - does the given
-    filename end with the specified extension?
--------------------------------------------------*/
+// -------------------------------------------------
+// core_filename_ends_with - does the given
+// filename end with the specified extension?
+// -------------------------------------------------
 
-int core_filename_ends_with(const char *filename, const char *extension)
+bool core_filename_ends_with(const std::string &filename, const std::string &extension)
 {
-	int namelen = strlen(filename);
-	int extlen = strlen(extension);
-	int matches = TRUE;
+	auto namelen = filename.length();
+	auto extlen = extension.length();
 
-	/* work backwards checking for a match */
-	while (extlen > 0)
-		if (tolower((UINT8)filename[--namelen]) != tolower((UINT8)extension[--extlen]))
-		{
-			matches = FALSE;
-			break;
-		}
+	// first if the extension is bigger than the name, we definitely don't match
+	bool matches = namelen >= extlen;
+
+	// work backwards checking for a match
+	while (matches && extlen > 0 && namelen > 0)
+	{
+		if (tolower((uint8_t)filename[--namelen]) != tolower((uint8_t)extension[--extlen]))
+			matches = false;
+	}
 
 	return matches;
 }

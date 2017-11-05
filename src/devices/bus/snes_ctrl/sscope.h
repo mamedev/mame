@@ -6,13 +6,12 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_SNES_CTRL_SUPERSCOPE_H
+#define MAME_BUS_SNES_CTRL_SUPERSCOPE_H
+
 #pragma once
 
-#ifndef __SNES_SUPERSCOPE__
-#define __SNES_SUPERSCOPE__
 
-
-#include "emu.h"
 #include "ctrl.h"
 
 //**************************************************************************
@@ -26,7 +25,7 @@ class snes_sscope_device : public device_t,
 {
 public:
 	// construction/destruction
-	snes_sscope_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	snes_sscope_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual ioport_constructor device_input_ports() const override;
@@ -37,8 +36,8 @@ protected:
 	virtual void device_reset() override;
 
 	// device_snes_control_port_interface overrides
-	virtual UINT8 read_pin4() override;
-	virtual void write_strobe(UINT8 data) override;
+	virtual uint8_t read_pin4() override;
+	virtual void write_strobe(uint8_t data) override;
 	virtual void port_poll() override;
 
 private:
@@ -46,15 +45,14 @@ private:
 	required_ioport m_xaxis;
 	required_ioport m_yaxis;
 	int m_strobe, m_idx;
-	UINT32 m_latch;
+	uint32_t m_latch;
 
-	INT16 m_x, m_y;
+	int16_t m_x, m_y;
 	int m_turbo_lock, m_pause_lock, m_fire_lock;
 };
 
 
 // device type definition
-extern const device_type SNES_SUPERSCOPE;
+DECLARE_DEVICE_TYPE(SNES_SUPERSCOPE, snes_sscope_device)
 
-
-#endif
+#endif // MAME_BUS_SNES_CTRL_SUPERSCOPE_H

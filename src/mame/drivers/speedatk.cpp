@@ -76,10 +76,14 @@ PS / PD :  key matrix
 *****************************************************************************************/
 
 #include "emu.h"
+#include "includes/speedatk.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
-#include "includes/speedatk.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 #define MASTER_CLOCK XTAL_12MHz
 
@@ -91,7 +95,7 @@ void speedatk_state::machine_start()
 	save_item(NAME(m_coin_impulse));
 }
 
-UINT8 speedatk_state::iox_key_matrix_calc(UINT8 p_side)
+uint8_t speedatk_state::iox_key_matrix_calc(uint8_t p_side)
 {
 	static const char *const keynames[] = { "P1_ROW0", "P1_ROW1", "P2_ROW0", "P2_ROW1" };
 
@@ -134,8 +138,8 @@ READ8_MEMBER(speedatk_state::key_matrix_r)
 	/* both side checks */
 	if(m_mux_data == 1)
 	{
-		UINT8 p1_side = iox_key_matrix_calc(0);
-		UINT8 p2_side = iox_key_matrix_calc(2);
+		uint8_t p1_side = iox_key_matrix_calc(0);
+		uint8_t p2_side = iox_key_matrix_calc(2);
 
 		if(p1_side != 0)
 			return p1_side;
@@ -300,7 +304,7 @@ WRITE8_MEMBER(speedatk_state::output_w)
 		logerror("%02x\n",data);
 }
 
-static MACHINE_CONFIG_START( speedatk, speedatk_state )
+static MACHINE_CONFIG_START( speedatk )
 
 	MCFG_CPU_ADD("maincpu", Z80,MASTER_CLOCK/2) //divider is unknown
 	MCFG_CPU_PROGRAM_MAP(speedatk_mem)
@@ -358,4 +362,4 @@ ROM_START( speedatk )
 	ROM_LOAD( "cb2.bpr",      0x0020, 0x0100, CRC(a604cf96) SHA1(a4ef6e77dcd3abe4c27e8e636222a5ee711a51f5) ) /* lookup table */
 ROM_END
 
-GAME( 1984, speedatk, 0, speedatk, speedatk, driver_device, 0, ROT0, "Seta Kikaku Corp.", "Speed Attack! (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, speedatk, 0, speedatk, speedatk, speedatk_state, 0, ROT0, "Seta Kikaku Corp.", "Speed Attack! (Japan)", MACHINE_SUPPORTS_SAVE )

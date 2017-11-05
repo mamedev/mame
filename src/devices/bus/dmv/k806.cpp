@@ -19,19 +19,6 @@ ROM_START( dmv_k806 )
 	ROM_LOAD( "dmv_mouse_8741a.bin", 0x0000, 0x0400, CRC(2163737a) SHA1(b82c14dba6c25cb1f60cf623989ca8c0c1ee4cc3))
 ROM_END
 
-static ADDRESS_MAP_START( k806_io, AS_IO, 8, dmv_k806_device )
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READ(port1_r)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(port2_w)
-	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(portt1_r)
-ADDRESS_MAP_END
-
-static MACHINE_CONFIG_FRAGMENT( dmv_k806 )
-	MCFG_CPU_ADD("mcu", I8741, XTAL_6MHz)
-	MCFG_CPU_IO_MAP(k806_io)
-
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("mouse_timer", dmv_k806_device, mouse_timer, attotime::from_hz(1000))
-MACHINE_CONFIG_END
-
 static INPUT_PORTS_START( dmv_k806 )
 	PORT_START("JUMPERS")
 	PORT_DIPNAME( 0x7f, 0x24, "K806 IFSEL" )  PORT_DIPLOCATION("J:!1,J:!2,J:!3,J:!4,J:!5,J:!6,J:!7")
@@ -65,7 +52,7 @@ INPUT_PORTS_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type DMV_K806 = &device_creator<dmv_k806_device>;
+DEFINE_DEVICE_TYPE(DMV_K806, dmv_k806_device, "dmv_k806", "K806 mouse")
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -75,15 +62,16 @@ const device_type DMV_K806 = &device_creator<dmv_k806_device>;
 //  dmv_k806_device - constructor
 //-------------------------------------------------
 
-dmv_k806_device::dmv_k806_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-		: device_t(mconfig, DMV_K806, "K806 mouse", tag, owner, clock, "dmv_k806", __FILE__),
-		device_dmvslot_interface( mconfig, *this ),
-		m_mcu(*this, "mcu"),
-		m_jumpers(*this, "JUMPERS"),
-		m_mouse_buttons(*this, "MOUSE"),
-		m_mouse_x(*this, "MOUSEX"),
-		m_mouse_y(*this, "MOUSEY"), m_bus(nullptr)
-	{
+dmv_k806_device::dmv_k806_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, DMV_K806, tag, owner, clock)
+	, device_dmvslot_interface( mconfig, *this )
+	, m_mcu(*this, "mcu")
+	, m_jumpers(*this, "JUMPERS")
+	, m_mouse_buttons(*this, "MOUSE")
+	, m_mouse_x(*this, "MOUSEX")
+	, m_mouse_y(*this, "MOUSEY")
+	, m_bus(nullptr)
+{
 }
 
 //-------------------------------------------------
@@ -109,14 +97,17 @@ void dmv_k806_device::device_reset()
 }
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor dmv_k806_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( dmv_k806 );
-}
+MACHINE_CONFIG_MEMBER( dmv_k806_device::device_add_mconfig )
+	MCFG_CPU_ADD("mcu", I8741, XTAL_6MHz)
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(dmv_k806_device, port1_r))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(dmv_k806_device, port2_w))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(dmv_k806_device, portt1_r))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("mouse_timer", dmv_k806_device, mouse_timer, attotime::from_hz(1000))
+MACHINE_CONFIG_END
 
 //-------------------------------------------------
 //  input_ports - device-specific input ports
@@ -131,21 +122,21 @@ ioport_constructor dmv_k806_device::device_input_ports() const
 //  device_rom_region
 //-------------------------------------------------
 
-const rom_entry *dmv_k806_device::device_rom_region() const
+const tiny_rom_entry *dmv_k806_device::device_rom_region() const
 {
 	return ROM_NAME( dmv_k806 );
 }
 
-void dmv_k806_device::io_read(address_space &space, int ifsel, offs_t offset, UINT8 &data)
+void dmv_k806_device::io_read(address_space &space, int ifsel, offs_t offset, uint8_t &data)
 {
-	UINT8 jumpers = m_jumpers->read();
+	uint8_t jumpers = m_jumpers->read();
 	if (BIT(jumpers, ifsel) && ((!BIT(offset, 3) && BIT(jumpers, 5)) || (BIT(offset, 3) && BIT(jumpers, 6))))
 		data = m_mcu->upi41_master_r(space, offset & 1);
 }
 
-void dmv_k806_device::io_write(address_space &space, int ifsel, offs_t offset, UINT8 data)
+void dmv_k806_device::io_write(address_space &space, int ifsel, offs_t offset, uint8_t data)
 {
-	UINT8 jumpers = m_jumpers->read();
+	uint8_t jumpers = m_jumpers->read();
 	if (BIT(jumpers, ifsel) && ((!BIT(offset, 3) && BIT(jumpers, 5)) || (BIT(offset, 3) && BIT(jumpers, 6))))
 	{
 		m_mcu->upi41_master_w(space, offset & 1, data);
@@ -164,7 +155,7 @@ READ8_MEMBER( dmv_k806_device::port1_r )
 	// -x-- ----   YB / X1
 	// x--- ----   not used
 
-	UINT8 data = m_mouse_buttons->read() & 0x07;
+	uint8_t data = m_mouse_buttons->read() & 0x07;
 
 	data |= (m_mouse.xa != CLEAR_LINE ? 0 : 0x08);
 	data |= (m_mouse.xb != CLEAR_LINE ? 0 : 0x10);
@@ -174,7 +165,7 @@ READ8_MEMBER( dmv_k806_device::port1_r )
 	return data;
 }
 
-READ8_MEMBER( dmv_k806_device::portt1_r )
+READ_LINE_MEMBER( dmv_k806_device::portt1_r )
 {
 	return BIT(m_jumpers->read(), 7) ? 0 : 1;
 }

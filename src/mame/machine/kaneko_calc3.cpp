@@ -27,10 +27,13 @@
 #include "kaneko_calc3.h"
 #include "machine/eepromser.h"
 
-const device_type KANEKO_CALC3 = &device_creator<kaneko_calc3_device>;
+#define VERBOSE_OUTPUT 0
 
-kaneko_calc3_device::kaneko_calc3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, KANEKO_CALC3, "Kaneko CALC3 MCU", tag, owner, clock, "kaneko_calc3", __FILE__),
+
+DEFINE_DEVICE_TYPE(KANEKO_CALC3, kaneko_calc3_device, "kaneko_calc3", "Kaneko CALC3 MCU")
+
+kaneko_calc3_device::kaneko_calc3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, KANEKO_CALC3, tag, owner, clock),
 		m_mcuram(*this, ":mcuram"),
 		m_mcu_status(0),
 		m_mcu_command_offset(0),
@@ -99,7 +102,7 @@ void kaneko_calc3_device::device_timer(emu_timer &timer, device_timer_id id, int
 		reset_run_timer();
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in kaneko_calc3_device::device_timer");
+		assert_always(false, "Unknown id in kaneko_calc3_device::device_timer");
 	}
 }
 
@@ -129,7 +132,7 @@ void kaneko_calc3_device::mcu_init()
 	m_mcu_command_offset = 0;
 }
 
-void kaneko_calc3_device::mcu_com_w(offs_t offset, UINT16 data, UINT16 mem_mask, int _n_)
+void kaneko_calc3_device::mcu_com_w(offs_t offset, uint16_t data, uint16_t mem_mask, int _n_)
 {
 	logerror("calc3w %d %04x %04x\n", _n_, data, mem_mask);
 	m_mcu_status |= (1 << _n_);
@@ -190,7 +193,7 @@ where games specify the same decryption key the table used is the same, I don't 
    part of the table to be 0
 */
 
-static const INT16 keydata[0x40*0x100] = {
+static const int16_t keydata[0x40*0x100] = {
 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
@@ -1217,7 +1220,7 @@ static const INT16 keydata[0x40*0x100] = {
 	-1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,
 };
 
-UINT8 kaneko_calc3_device::shift_bits(UINT8 dat, int bits)
+uint8_t kaneko_calc3_device::shift_bits(uint8_t dat, int bits)
 {
 	bits &=0x7;
 
@@ -1233,13 +1236,13 @@ UINT8 kaneko_calc3_device::shift_bits(UINT8 dat, int bits)
 	return dat;
 }
 
-int kaneko_calc3_device::decompress_table(int tabnum, UINT8* dstram, int dstoffset)
+int kaneko_calc3_device::decompress_table(int tabnum, uint8_t* dstram, int dstoffset)
 {
 	address_space &space = machine().device(":maincpu")->memory().space(AS_PROGRAM);
-	UINT8* datarom = memregion(":calc3_rom")->base();
+	uint8_t* datarom = memregion(":calc3_rom")->base();
 
-	UINT8 numregions;
-	UINT16 length;
+	uint8_t numregions;
+	uint16_t length;
 	int local_counter=0;
 	int x;
 	int offset = 0;
@@ -1257,7 +1260,7 @@ int kaneko_calc3_device::decompress_table(int tabnum, UINT8* dstram, int dstoffs
 	// scan through the linked list to find the start of the requested table info
 	for (x=0;x<tabnum;x++)
 	{
-		UINT8 blocksize_offset = datarom[offset+0]; // location of the 'block length'
+		uint8_t blocksize_offset = datarom[offset+0]; // location of the 'block length'
 		offset+= blocksize_offset+1;
 		length = datarom[offset+0] | (datarom[offset+1]<<8);
 		offset+=length+2;
@@ -1265,8 +1268,8 @@ int kaneko_calc3_device::decompress_table(int tabnum, UINT8* dstram, int dstoffs
 
 	// we're at the start of the block, get the info about it
 	{
-		UINT16 inline_table_base = 0;
-		UINT16 inline_table_size = 0;
+		uint16_t inline_table_base = 0;
+		uint16_t inline_table_size = 0;
 		m_database = offset;
 		m_blocksize_offset =    datarom[offset+0]; // location of the 'block length'
 		m_mode =                datarom[offset+1];
@@ -1336,11 +1339,11 @@ int kaneko_calc3_device::decompress_table(int tabnum, UINT8* dstram, int dstoffs
 					//printf("save to eeprom\n");
 
 					{
-						address_space &eeprom_space = space.machine().device<eeprom_serial_93cxx_device>(":eeprom")->space();
+						eeprom_serial_93cxx_device *eeprom = space.machine().device<eeprom_serial_93cxx_device>(":eeprom");
 
-						for (i=0;i<0x80;i++)
+						for (i=0;i<0x40;i++)
 						{
-							eeprom_space.write_byte(i, space.read_byte(m_eeprom_addr+0x200000+i));
+							eeprom->internal_write(i, space.read_word(m_eeprom_addr+0x200000+2*i));
 						}
 
 					}
@@ -1357,19 +1360,19 @@ int kaneko_calc3_device::decompress_table(int tabnum, UINT8* dstram, int dstoffs
 			if (inline_table_size)
 			{
 			// these should be derived from the inline table somehow, probably just a +/- swap like the normal stuff.. maybe
-				UINT8 extra[]  = { 0x14,0xf0,0xf8,0xd2,0xbe,0xfc,0xac,0x86,0x64,0x08,0x0c,0x74,0xd6,0x6a,0x24,0x12,0x1a,0x72,0xba,0x48,0x76,0x66,0x4a,0x7c,0x5c,0x82,0x0a,0x86,0x82,0x02,0xe6 };
-				UINT8 extra2[] = { 0x2f,0x04,0xd1,0x69,0xad,0xeb,0x10,0x95,0xb0,0x2f,0x0a,0x83,0x7d,0x4e,0x2a,0x07,0x89,0x52,0xca,0x41,0xf1,0x4f,0xaf,0x1c,0x01,0xe9,0x89,0xd2,0xaf,0xcd };
+				uint8_t extra[]  = { 0x14,0xf0,0xf8,0xd2,0xbe,0xfc,0xac,0x86,0x64,0x08,0x0c,0x74,0xd6,0x6a,0x24,0x12,0x1a,0x72,0xba,0x48,0x76,0x66,0x4a,0x7c,0x5c,0x82,0x0a,0x86,0x82,0x02,0xe6 };
+				uint8_t extra2[] = { 0x2f,0x04,0xd1,0x69,0xad,0xeb,0x10,0x95,0xb0,0x2f,0x0a,0x83,0x7d,0x4e,0x2a,0x07,0x89,0x52,0xca,0x41,0xf1,0x4f,0xaf,0x1c,0x01,0xe9,0x89,0xd2,0xaf,0xcd };
 
 
 				for (i=0;i<length;i++)
 				{
-					UINT8 dat=0;
+					uint8_t dat=0;
 
 
 					/* special case for Shogun Warriors table 0x40 */
 					if (m_subtracttype==3 && m_alternateswaps ==0)
 					{
-						UINT8 inlinet = datarom[inline_table_base + (i%inline_table_size)];
+						uint8_t inlinet = datarom[inline_table_base + (i%inline_table_size)];
 						dat = datarom[offset+i];
 
 						dat -= inlinet;
@@ -1385,14 +1388,14 @@ int kaneko_calc3_device::decompress_table(int tabnum, UINT8* dstram, int dstoffs
 						{
 							if (((i%inline_table_size)&1)==1)
 							{
-								UINT8 inlinet = datarom[inline_table_base + (i%inline_table_size)];
+								uint8_t inlinet = datarom[inline_table_base + (i%inline_table_size)];
 								dat = datarom[offset+i];
 								dat -= inlinet;
 								dat = shift_bits(dat, m_shift);
 							}
 							else
 							{
-								UINT8 inlinet = datarom[inline_table_base + (i%inline_table_size)];
+								uint8_t inlinet = datarom[inline_table_base + (i%inline_table_size)];
 								dat = datarom[offset+i];
 
 								if (m_subtracttype!=0x02)
@@ -1413,7 +1416,7 @@ int kaneko_calc3_device::decompress_table(int tabnum, UINT8* dstram, int dstoffs
 						{
 							if (((i%inline_table_size)&1)==0)
 							{
-								UINT8 inlinet = datarom[inline_table_base + (i%inline_table_size)];
+								uint8_t inlinet = datarom[inline_table_base + (i%inline_table_size)];
 								dat = datarom[offset+i];
 								dat -= inlinet;
 								dat = shift_bits(dat, m_shift);
@@ -1453,7 +1456,7 @@ int kaneko_calc3_device::decompress_table(int tabnum, UINT8* dstram, int dstoffs
 			}
 			else
 			{
-				const INT16* key = keydata+(m_decryption_key_byte*0x40);
+				const int16_t* key = keydata+(m_decryption_key_byte*0x40);
 
 				if (key[0] == -1)
 				{
@@ -1462,8 +1465,8 @@ int kaneko_calc3_device::decompress_table(int tabnum, UINT8* dstram, int dstoffs
 
 				for (i=0;i<length;i++)
 				{
-					UINT8 dat = datarom[offset+i];
-					UINT8 keydat = (UINT8)key[i&0x3f];
+					uint8_t dat = datarom[offset+i];
+					uint8_t keydat = (uint8_t)key[i&0x3f];
 
 					{
 						if (m_subtracttype==0)
@@ -1537,8 +1540,8 @@ int kaneko_calc3_device::decompress_table(int tabnum, UINT8* dstram, int dstoffs
 
 void kaneko_calc3_device::initial_scan_tables()
 {
-	UINT8 numregions;
-	UINT8* datarom = memregion(":calc3_rom")->base();
+	uint8_t numregions;
+	uint8_t* datarom = memregion(":calc3_rom")->base();
 
 	int x;
 
@@ -1552,7 +1555,7 @@ void kaneko_calc3_device::initial_scan_tables()
 
 	for (x=0;x<numregions;x++)
 	{
-		dynamic_buffer tmpdstram(0x2000);
+		std::vector<uint8_t> tmpdstram(0x2000);
 #if VERBOSE_OUTPUT
 		int length;
 #endif
@@ -1615,7 +1618,7 @@ void kaneko_calc3_device::initial_scan_tables()
 
 void kaneko_calc3_device::mcu_run()
 {
-	UINT16 mcu_command;
+	uint16_t mcu_command;
 	int i;
 	address_space &space = machine().device(":maincpu")->memory().space(AS_PROGRAM);
 
@@ -1672,11 +1675,11 @@ void kaneko_calc3_device::mcu_run()
 			}
 #endif
 			{
-				address_space &eeprom_space = space.machine().device<eeprom_serial_93cxx_device>(":eeprom")->space();
+				eeprom_serial_93cxx_device *eeprom = space.machine().device<eeprom_serial_93cxx_device>(":eeprom");
 
-				for (i=0;i<0x80;i++)
+				for (i=0;i<0x40;i++)
 				{
-					space.write_byte(m_eeprom_addr+0x200000+i, eeprom_space.read_byte(i));
+					space.write_word(m_eeprom_addr+0x200000+2*i, eeprom->internal_read(i));
 				}
 
 			}
@@ -1697,9 +1700,9 @@ void kaneko_calc3_device::mcu_run()
 			{
 				int param1 = m_mcuram[(m_mcu_command_offset>>1) + 1 + (2*i)];
 				int param2 = m_mcuram[(m_mcu_command_offset>>1) + 2 + (2*i)];
-				UINT8  commandtabl = (param1&0xff00) >> 8;
-				UINT16 commandaddr =param2;// (param1&0x00ff) | (param2&0xff00);
-				UINT8  commandunk =  (param1&0x00ff); // brap boys sets.. seems to cause further writebasck address displacement?? (when tested on hw it looked like a simple +, but that doesn't work for brapboys...)
+				uint8_t  commandtabl = (param1&0xff00) >> 8;
+				uint16_t commandaddr =param2;// (param1&0x00ff) | (param2&0xff00);
+				uint8_t  commandunk =  (param1&0x00ff); // brap boys sets.. seems to cause further writebasck address displacement?? (when tested on hw it looked like a simple +, but that doesn't work for brapboys...)
 #if VERBOSE_OUTPUT
 				printf("transfer %d table %02x writeback address %04x unknown %02x\n", i, commandtabl, commandaddr, commandunk);
 #endif

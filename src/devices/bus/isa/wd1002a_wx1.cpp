@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "wd1002a_wx1.h"
 
 
@@ -14,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type ISA8_WD1002A_WX1 = &device_creator<isa8_wd1002a_wx1_device>;
+DEFINE_DEVICE_TYPE(ISA8_WD1002A_WX1, isa8_wd1002a_wx1_device, "wd1002a_wx1", "WD1002A-WX1")
 
 
 //-------------------------------------------------
@@ -31,7 +32,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *isa8_wd1002a_wx1_device::device_rom_region() const
+const tiny_rom_entry *isa8_wd1002a_wx1_device::device_rom_region() const
 {
 	return ROM_NAME( wd1002a_wx1 );
 }
@@ -45,9 +46,9 @@ const rom_entry *isa8_wd1002a_wx1_device::device_rom_region() const
 //  isa8_wd1002a_wx1_device - constructor
 //-------------------------------------------------
 
-isa8_wd1002a_wx1_device::isa8_wd1002a_wx1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, ISA8_WD1002A_WX1, "WD1002A-WX1", tag, owner, clock, "wd1002a_wx1", __FILE__),
-		device_isa8_card_interface( mconfig, *this )
+isa8_wd1002a_wx1_device::isa8_wd1002a_wx1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, ISA8_WD1002A_WX1, tag, owner, clock)
+	, device_isa8_card_interface(mconfig, *this)
 {
 }
 

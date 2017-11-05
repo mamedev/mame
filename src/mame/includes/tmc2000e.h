@@ -6,7 +6,6 @@
 #define __TMC2000E__
 
 
-#include "emu.h"
 #include "cpu/cosmac/cosmac.h"
 #include "imagedev/cassette.h"
 #include "machine/ram.h"
@@ -28,29 +27,15 @@ public:
 			m_cti(*this, CDP1864_TAG),
 			m_cassette(*this, "cassette"),
 			m_colorram(*this, "colorram"),
-			m_y0(*this, "Y0"),
-			m_y1(*this, "Y1"),
-			m_y2(*this, "Y2"),
-			m_y3(*this, "Y3"),
-			m_y4(*this, "Y4"),
-			m_y5(*this, "Y5"),
-			m_y6(*this, "Y6"),
-			m_y7(*this, "Y7"),
+			m_key_row(*this, {"Y0", "Y1", "Y2", "Y3", "Y4", "Y5", "Y6", "Y7"}),
 			m_run(*this, "RUN")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cdp1864_device> m_cti;
 	required_device<cassette_image_device> m_cassette;
-	required_shared_ptr<UINT8> m_colorram;
-	required_ioport m_y0;
-	required_ioport m_y1;
-	required_ioport m_y2;
-	required_ioport m_y3;
-	required_ioport m_y4;
-	required_ioport m_y5;
-	required_ioport m_y6;
-	required_ioport m_y7;
+	required_shared_ptr<uint8_t> m_colorram;
+	required_ioport_array<8> m_key_row;
 	required_ioport m_run;
 
 	virtual void machine_start() override;
@@ -76,10 +61,9 @@ public:
 
 	/* video state */
 	int m_cdp1864_efx;      /* EFx */
-	UINT8 m_color;
+	uint8_t m_color;
 
 	/* keyboard state */
-	ioport_port* m_key_row[8];
 	int m_keylatch;         /* key latch */
 	int m_reset;            /* reset activated */
 };

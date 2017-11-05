@@ -37,11 +37,11 @@ these four paragraphs for those parts of this code that are retained.
 
 // 128-bit PI fraction
 #ifdef BETTER_THAN_PENTIUM
-#define FLOAT_PI_HI (U64(0xc90fdaa22168c234))
-#define FLOAT_PI_LO (U64(0xc4c6628b80dc1cd1))
+#define FLOAT_PI_HI (0xc90fdaa22168c234U)
+#define FLOAT_PI_LO (0xc4c6628b80dc1cd1U)
 #else
-#define FLOAT_PI_HI (U64(0xc90fdaa22168c234))
-#define FLOAT_PI_LO (U64(0xC000000000000000))
+#define FLOAT_PI_HI (0xc90fdaa22168c234U)
+#define FLOAT_PI_LO (0xC000000000000000U)
 #endif
 
 #define FLOATX80_PI2_EXP  (0x3FFF)
@@ -55,11 +55,11 @@ these four paragraphs for those parts of this code that are retained.
 
 // 128-bit 3PI/4 fraction
 #ifdef BETTER_THAN_PENTIUM
-#define FLOAT_3PI4_HI (U64(0x96cbe3f9990e91a7))
-#define FLOAT_3PI4_LO (U64(0x9394c9e8a0a5159c))
+#define FLOAT_3PI4_HI (0x96cbe3f9990e91a7U)
+#define FLOAT_3PI4_LO (0x9394c9e8a0a5159cU)
 #else
-#define FLOAT_3PI4_HI (U64(0x96cbe3f9990e91a7))
-#define FLOAT_3PI4_LO (U64(0x9000000000000000))
+#define FLOAT_3PI4_HI (0x96cbe3f9990e91a7U)
+#define FLOAT_3PI4_LO (0x9000000000000000U)
 #endif
 
 //////////////////////////////
@@ -70,11 +70,11 @@ these four paragraphs for those parts of this code that are retained.
 
 // 128-bit 1/LN2 fraction
 #ifdef BETTER_THAN_PENTIUM
-#define FLOAT_LN2INV_HI (U64(0xb8aa3b295c17f0bb))
-#define FLOAT_LN2INV_LO (U64(0xbe87fed0691d3e89))
+#define FLOAT_LN2INV_HI (0xb8aa3b295c17f0bbU)
+#define FLOAT_LN2INV_LO (0xbe87fed0691d3e89U)
 #else
-#define FLOAT_LN2INV_HI (U64(0xb8aa3b295c17f0bb))
-#define FLOAT_LN2INV_LO (U64(0xC000000000000000))
+#define FLOAT_LN2INV_HI (0xb8aa3b295c17f0bbU)
+#define FLOAT_LN2INV_LO (0xC000000000000000U)
 #endif
 
 #endif

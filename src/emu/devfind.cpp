@@ -12,17 +12,96 @@
 
 
 //**************************************************************************
+//  EXPLICIT TEMPLATE INSTANTIATIONS
+//**************************************************************************
+
+template class object_finder_base<memory_region, false>;
+template class object_finder_base<memory_region, true>;
+template class object_finder_base<memory_bank, false>;
+template class object_finder_base<memory_bank, true>;
+template class object_finder_base<ioport_port, false>;
+template class object_finder_base<ioport_port, true>;
+
+template class object_finder_base<u8, false>;
+template class object_finder_base<u8, true>;
+template class object_finder_base<u16, false>;
+template class object_finder_base<u16, true>;
+template class object_finder_base<u32, false>;
+template class object_finder_base<u32, true>;
+template class object_finder_base<u64, false>;
+template class object_finder_base<u64, true>;
+
+template class object_finder_base<s8, false>;
+template class object_finder_base<s8, true>;
+template class object_finder_base<s16, false>;
+template class object_finder_base<s16, true>;
+template class object_finder_base<s32, false>;
+template class object_finder_base<s32, true>;
+template class object_finder_base<s64, false>;
+template class object_finder_base<s64, true>;
+
+template class memory_region_finder<false>;
+template class memory_region_finder<true>;
+
+template class memory_bank_finder<false>;
+template class memory_bank_finder<true>;
+
+template class ioport_finder<false>;
+template class ioport_finder<true>;
+
+template class region_ptr_finder<u8, false>;
+template class region_ptr_finder<u8, true>;
+template class region_ptr_finder<u16, false>;
+template class region_ptr_finder<u16, true>;
+template class region_ptr_finder<u32, false>;
+template class region_ptr_finder<u32, true>;
+template class region_ptr_finder<u64, false>;
+template class region_ptr_finder<u64, true>;
+
+template class region_ptr_finder<s8, false>;
+template class region_ptr_finder<s8, true>;
+template class region_ptr_finder<s16, false>;
+template class region_ptr_finder<s16, true>;
+template class region_ptr_finder<s32, false>;
+template class region_ptr_finder<s32, true>;
+template class region_ptr_finder<s64, false>;
+template class region_ptr_finder<s64, true>;
+
+template class shared_ptr_finder<u8, false>;
+template class shared_ptr_finder<u8, true>;
+template class shared_ptr_finder<u16, false>;
+template class shared_ptr_finder<u16, true>;
+template class shared_ptr_finder<u32, false>;
+template class shared_ptr_finder<u32, true>;
+template class shared_ptr_finder<u64, false>;
+template class shared_ptr_finder<u64, true>;
+
+template class shared_ptr_finder<s8, false>;
+template class shared_ptr_finder<s8, true>;
+template class shared_ptr_finder<s16, false>;
+template class shared_ptr_finder<s16, true>;
+template class shared_ptr_finder<s32, false>;
+template class shared_ptr_finder<s32, true>;
+template class shared_ptr_finder<s64, false>;
+template class shared_ptr_finder<s64, true>;
+
+
+
+//**************************************************************************
 //  BASE FINDER CLASS
 //**************************************************************************
+
+constexpr char finder_base::DUMMY_TAG[];
+
 
 //-------------------------------------------------
 //  finder_base - constructor
 //-------------------------------------------------
 
 finder_base::finder_base(device_t &base, const char *tag)
-	: m_next(base.register_auto_finder(*this)),
-		m_base(base),
-		m_tag(tag)
+	: m_next(base.register_auto_finder(*this))
+	, m_base(base)
+	, m_tag(tag)
 {
 }
 
@@ -40,10 +119,10 @@ finder_base::~finder_base()
 //  find_memregion - find memory region
 //-------------------------------------------------
 
-void *finder_base::find_memregion(UINT8 width, size_t &length, bool required) const
+void *finder_base::find_memregion(u8 width, size_t &length, bool required) const
 {
 	// look up the region and return nullptr if not found
-	memory_region *region = m_base.memregion(m_tag);
+	memory_region *const region = m_base.memregion(m_tag);
 	if (region == nullptr)
 	{
 		length = 0;
@@ -60,11 +139,11 @@ void *finder_base::find_memregion(UINT8 width, size_t &length, bool required) co
 	}
 
 	// check the length and warn if other than specified
-	size_t length_found = region->bytes() / width;
+	size_t const length_found = region->bytes() / width;
 	if (length != 0 && length != length_found)
 	{
 		if (required)
-			osd_printf_warning("Region '%s' found but has %d bytes, not %d as requested\n", m_tag, region->bytes(), (int)length*width);
+			osd_printf_warning("Region '%s' found but has %d bytes, not %ld as requested\n", m_tag, region->bytes(), long(length*width));
 		length = 0;
 		return nullptr;
 	}
@@ -86,13 +165,13 @@ bool finder_base::validate_memregion(size_t bytes, bool required) const
 	std::string region_fulltag = m_base.subtag(m_tag);
 
 	// look for the region
-	for (device_t &dev : device_iterator(m_base.mconfig().root_device()))
+	for (device_t const &dev : device_iterator(m_base.mconfig().root_device()))
 	{
-		for (const rom_entry *romp = rom_first_region(dev); romp != nullptr; romp = rom_next_region(romp))
+		for (romload::region const &region : romload::entries(dev.rom_region()).get_regions())
 		{
-			if (rom_region_name(dev, romp) == region_fulltag)
+			if (dev.subtag(region.get_tag()) == region_fulltag)
 			{
-				bytes_found = ROMREGION_GETLENGTH(romp);
+				bytes_found = region.get_length();
 				break;
 			}
 		}
@@ -100,15 +179,13 @@ bool finder_base::validate_memregion(size_t bytes, bool required) const
 			break;
 	}
 
-	if (bytes_found != 0)
+	// check the length and warn if other than specified
+	if ((bytes_found != 0) && (bytes != 0) && (bytes != bytes_found))
 	{
-		// check the length and warn if other than specified
-		if (bytes != 0 && bytes != bytes_found)
-		{
-			osd_printf_warning("Region '%s' found but has %d bytes, not %d as requested\n", m_tag, (int)bytes_found, (int)bytes);
-			bytes_found = 0;
-		}
+		osd_printf_warning("Region '%s' found but has %ld bytes, not %ld as requested\n", m_tag, long(bytes_found), long(bytes));
+		bytes_found = 0;
 	}
+
 	return report_missing(bytes_found != 0, "memory region", required);
 }
 
@@ -117,7 +194,7 @@ bool finder_base::validate_memregion(size_t bytes, bool required) const
 //  find_memshare - find memory share
 //-------------------------------------------------
 
-void *finder_base::find_memshare(UINT8 width, size_t &bytes, bool required) const
+void *finder_base::find_memshare(u8 width, size_t &bytes, bool required) const
 {
 	// look up the share and return nullptr if not found
 	memory_share *share = m_base.memshare(m_tag);
@@ -145,9 +222,9 @@ void *finder_base::find_memshare(UINT8 width, size_t &bytes, bool required) cons
 
 bool finder_base::report_missing(bool found, const char *objname, bool required) const
 {
-	if (required && strcmp(m_tag, FINDER_DUMMY_TAG)==0)
+	if (required && (strcmp(m_tag, DUMMY_TAG) == 0))
 	{
-		osd_printf_error("Tag not defined for required device\n");
+		osd_printf_error("Tag not defined for required %s\n", objname);
 		return false;
 	}
 
@@ -156,10 +233,11 @@ bool finder_base::report_missing(bool found, const char *objname, bool required)
 		return true;
 
 	// otherwise, report
+	std::string const region_fulltag = m_base.subtag(m_tag);
 	if (required)
-		osd_printf_error("Required %s '%s' not found\n", objname, m_tag);
+		osd_printf_error("Required %s '%s' not found\n", objname, region_fulltag.c_str());
 	else
-		osd_printf_verbose("Optional %s '%s' not found\n", objname, m_tag);
+		osd_printf_verbose("Optional %s '%s' not found\n", objname, region_fulltag.c_str());
 	return !required;
 }
 

@@ -36,11 +36,13 @@ HSync - 15.510kHz
 
 ***************************************************************************/
 
-
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
-#include "sound/2413intf.h"
+#include "sound/ym2413.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 #define MAIN_CLOCK XTAL_18_432MHz
 
@@ -48,8 +50,8 @@ class ichibanjyan_state : public driver_device
 {
 public:
 	ichibanjyan_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
 	{ }
 
 	// devices
@@ -60,14 +62,14 @@ public:
 	virtual void machine_reset() override;
 
 	virtual void video_start() override;
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 void ichibanjyan_state::video_start()
 {
 }
 
-UINT32 ichibanjyan_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
+uint32_t ichibanjyan_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	return 0;
 }
@@ -103,7 +105,7 @@ GFXDECODE_END
 
 void ichibanjyan_state::machine_start()
 {
-	UINT8 *ROM = memregion("code")->base();
+	uint8_t *ROM = memregion("code")->base();
 
 	membank("bank1")->configure_entries(0, 4, ROM, 0x8000);
 }
@@ -113,7 +115,7 @@ void ichibanjyan_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( ichibanjyan, ichibanjyan_state )
+static MACHINE_CONFIG_START( ichibanjyan )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80,MAIN_CLOCK/3)
@@ -131,7 +133,7 @@ static MACHINE_CONFIG_START( ichibanjyan, ichibanjyan_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ichibanjyan)
 
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", 512)
+	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 512)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -165,4 +167,4 @@ ROM_START( ichiban )
 	ROM_LOAD( "mjb.u38", 0x400, 0x200, CRC(0ef881cb) SHA1(44b61a443d683f5cb2d1b1a4f74d8a8f41021de5) )
 ROM_END
 
-GAME( 199?, ichiban,  0,   ichibanjyan,  ichibanjyan, driver_device,  0,       ROT0, "Excel",      "Ichi Ban Jyan", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 199?, ichiban,  0,   ichibanjyan,  ichibanjyan, ichibanjyan_state,  0,       ROT0, "Excel",      "Ichi Ban Jyan", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

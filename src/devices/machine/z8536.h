@@ -29,12 +29,11 @@
 
 **********************************************************************/
 
+#ifndef MAME_MACHINE_Z8536_H
+#define MAME_MACHINE_Z8536_H
+
 #pragma once
 
-#ifndef __Z8536__
-#define __Z8536__
-
-#include "emu.h"
 #include "cpu/z80/z80daisy.h"
 
 
@@ -77,15 +76,15 @@ class z8536_device :  public device_t,
 {
 public:
 	// construction/destruction
-	z8536_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	z8536_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<z8536_device &>(device).m_write_irq.set_callback(object); }
-	template<class _Object> static devcb_base &set_pa_rd_callback(device_t &device, _Object object) { return downcast<z8536_device &>(device).m_read_pa.set_callback(object); }
-	template<class _Object> static devcb_base &set_pa_wr_callback(device_t &device, _Object object) { return downcast<z8536_device &>(device).m_write_pa.set_callback(object); }
-	template<class _Object> static devcb_base &set_pb_rd_callback(device_t &device, _Object object) { return downcast<z8536_device &>(device).m_read_pb.set_callback(object); }
-	template<class _Object> static devcb_base &set_pb_wr_callback(device_t &device, _Object object) { return downcast<z8536_device &>(device).m_write_pb.set_callback(object); }
-	template<class _Object> static devcb_base &set_pc_rd_callback(device_t &device, _Object object) { return downcast<z8536_device &>(device).m_read_pc.set_callback(object); }
-	template<class _Object> static devcb_base &set_pc_wr_callback(device_t &device, _Object object) { return downcast<z8536_device &>(device).m_write_pc.set_callback(object); }
+	template <class Object> static devcb_base &set_irq_wr_callback(device_t &device, Object &&cb) { return downcast<z8536_device &>(device).m_write_irq.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_pa_rd_callback(device_t &device, Object &&cb) { return downcast<z8536_device &>(device).m_read_pa.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_pa_wr_callback(device_t &device, Object &&cb) { return downcast<z8536_device &>(device).m_write_pa.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_pb_rd_callback(device_t &device, Object &&cb) { return downcast<z8536_device &>(device).m_read_pb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_pb_wr_callback(device_t &device, Object &&cb) { return downcast<z8536_device &>(device).m_write_pb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_pc_rd_callback(device_t &device, Object &&cb) { return downcast<z8536_device &>(device).m_read_pc.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_pc_wr_callback(device_t &device, Object &&cb) { return downcast<z8536_device &>(device).m_write_pc.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -146,9 +145,9 @@ private:
 	// ports
 	enum
 	{
-		PORT_C = 0,
+		PORT_A = 0,
 		PORT_B,
-		PORT_A,
+		PORT_C,
 		CONTROL
 	};
 
@@ -297,10 +296,10 @@ private:
 	void get_interrupt_vector();
 	void check_interrupt();
 
-	UINT8 read_register(offs_t offset);
-	UINT8 read_register(offs_t offset, UINT8 mask);
-	void write_register(offs_t offset, UINT8 data);
-	void write_register(offs_t offset, UINT8 data, UINT8 mask);
+	uint8_t read_register(offs_t offset);
+	uint8_t read_register(offs_t offset, uint8_t mask);
+	void write_register(offs_t offset, uint8_t data);
+	void write_register(offs_t offset, uint8_t data, uint8_t mask);
 
 	bool counter_enabled(device_timer_id id);
 	bool counter_external_output(device_timer_id id);
@@ -330,24 +329,22 @@ private:
 
 	// register state
 	int m_state;
-	UINT8 m_register[48];
-	UINT8 m_pointer;
+	uint8_t m_register[48];
+	uint8_t m_pointer;
 
 	// input/output port state
-	UINT8 m_input[3];
-	UINT8 m_output[3];
-	UINT8 m_buffer[3];
-	UINT8 m_match[3];
+	uint8_t m_input[3];
+	uint8_t m_output[3];
+	uint8_t m_buffer[3];
+	uint8_t m_match[3];
 
 	// timers
 	emu_timer *m_timer;
-	UINT16 m_counter[3];
+	uint16_t m_counter[3];
 };
 
 
 // device type definition
-extern const device_type Z8536;
+DECLARE_DEVICE_TYPE(Z8536, z8536_device)
 
-
-
-#endif
+#endif // MAME_MACHINE_Z8536_H

@@ -25,6 +25,7 @@ Known Non-Issues (confirmed on Real Genesis)
 
 #include "emu.h"
 #include "includes/megadriv.h"
+#include "speaker.h"
 
 
 MACHINE_CONFIG_EXTERN( megadriv );
@@ -42,7 +43,7 @@ void megadriv_z80_clear(running_machine &machine)
 	state->m_z80snd->set_input_line(0, CLEAR_LINE);
 }
 
-void md_base_state::megadriv_z80_bank_w(UINT16 data)
+void md_base_state::megadriv_z80_bank_w(uint16_t data)
 {
 	m_genz80.z80_bank_addr = ((m_genz80.z80_bank_addr >> 1) | (data << 23)) & 0xff8000;
 }
@@ -93,7 +94,7 @@ WRITE8_MEMBER(md_base_state::megadriv_68k_YM2612_write)
 // this is used by 6 button pads and gets installed in machine_start for drivers requiring it
 TIMER_CALLBACK_MEMBER(md_base_state::io_timeout_timer_callback)
 {
-	m_io_stage[(int)(FPTR)ptr] = -1;
+	m_io_stage[(int)(uintptr_t)ptr] = -1;
 }
 
 
@@ -206,7 +207,7 @@ void md_base_state::megadrive_reset_io()
 READ8_MEMBER(md_base_state::megadrive_io_read_data_port_6button)
 {
 	int portnum = offset;
-	UINT8 retdata, helper = (m_megadrive_io_ctrl_regs[portnum] & 0x3f) | 0xc0; // bits 6 & 7 always come from m_megadrive_io_data_regs
+	uint8_t retdata, helper = (m_megadrive_io_ctrl_regs[portnum] & 0x3f) | 0xc0; // bits 6 & 7 always come from m_megadrive_io_data_regs
 
 	if (m_megadrive_io_data_regs[portnum] & 0x40)
 	{
@@ -257,7 +258,7 @@ READ8_MEMBER(md_base_state::megadrive_io_read_data_port_6button)
 READ8_MEMBER(md_base_state::megadrive_io_read_data_port_3button)
 {
 	int portnum = offset;
-	UINT8 retdata, helper = (m_megadrive_io_ctrl_regs[portnum] & 0x7f) | 0x80; // bit 7 always comes from m_megadrive_io_data_regs
+	uint8_t retdata, helper = (m_megadrive_io_ctrl_regs[portnum] & 0x7f) | 0x80; // bit 7 always comes from m_megadrive_io_data_regs
 
 	if (m_megadrive_io_data_regs[portnum] & 0x40)
 	{
@@ -276,28 +277,28 @@ READ8_MEMBER(md_base_state::megadrive_io_read_data_port_3button)
 	return retdata;
 }
 
-UINT8 md_base_state::megadrive_io_read_ctrl_port(int portnum)
+uint8_t md_base_state::megadrive_io_read_ctrl_port(int portnum)
 {
-	UINT8 retdata;
+	uint8_t retdata;
 	retdata = m_megadrive_io_ctrl_regs[portnum];
 	//osd_printf_debug("read io ctrl port %d %02x\n",portnum,retdata);
 
 	return retdata | (retdata << 8);
 }
 
-UINT8 md_base_state::megadrive_io_read_tx_port(int portnum)
+uint8_t md_base_state::megadrive_io_read_tx_port(int portnum)
 {
-	UINT8 retdata;
+	uint8_t retdata;
 	retdata = m_megadrive_io_tx_regs[portnum];
 	return retdata | (retdata << 8);
 }
 
-UINT8 md_base_state::megadrive_io_read_rx_port(int portnum)
+uint8_t md_base_state::megadrive_io_read_rx_port(int portnum)
 {
 	return 0x00;
 }
 
-UINT8 md_base_state::megadrive_io_read_sctrl_port(int portnum)
+uint8_t md_base_state::megadrive_io_read_sctrl_port(int portnum)
 {
 	return 0x00;
 }
@@ -305,7 +306,7 @@ UINT8 md_base_state::megadrive_io_read_sctrl_port(int portnum)
 
 READ16_MEMBER(md_base_state::megadriv_68k_io_read )
 {
-	UINT8 retdata;
+	uint8_t retdata;
 
 	retdata = 0;
 		/* Charles MacDonald ( http://cgfm2.emuviews.com/ )
@@ -394,22 +395,22 @@ WRITE16_MEMBER(md_base_state::megadrive_io_write_data_port_6button)
 
 /*************************** 3 buttons version ****************************/
 
-void md_base_state::megadrive_io_write_ctrl_port(int portnum, UINT16 data)
+void md_base_state::megadrive_io_write_ctrl_port(int portnum, uint16_t data)
 {
 	m_megadrive_io_ctrl_regs[portnum] = data;
 //  osd_printf_debug("Setting IO Control Register #%d data %04x\n",portnum,data);
 }
 
-void md_base_state::megadrive_io_write_tx_port(int portnum, UINT16 data)
+void md_base_state::megadrive_io_write_tx_port(int portnum, uint16_t data)
 {
 	m_megadrive_io_tx_regs[portnum] = data;
 }
 
-void md_base_state::megadrive_io_write_rx_port(int portnum, UINT16 data)
+void md_base_state::megadrive_io_write_rx_port(int portnum, uint16_t data)
 {
 }
 
-void md_base_state::megadrive_io_write_sctrl_port(int portnum, UINT16 data)
+void md_base_state::megadrive_io_write_sctrl_port(int portnum, uint16_t data)
 {
 }
 
@@ -473,16 +474,17 @@ static ADDRESS_MAP_START( megadriv_map, AS_PROGRAM, 16, md_base_state )
 	AM_RANGE(0xa11100, 0xa11101) AM_READWRITE(megadriv_68k_check_z80_bus,megadriv_68k_req_z80_bus)
 	AM_RANGE(0xa11200, 0xa11201) AM_WRITE(megadriv_68k_req_z80_reset)
 
-	/* these are fake - remove allocs in video_start to use these to view ram instead */
-//  AM_RANGE(0xb00000, 0xb0ffff) AM_RAM AM_SHARE("megadrive_vdp_vram")
-//  AM_RANGE(0xb10000, 0xb1007f) AM_RAM AM_SHARE("megadrive_vdp_vsram")
-//  AM_RANGE(0xb10100, 0xb1017f) AM_RAM AM_SHARE("megadrive_vdp_cram")
-
 	AM_RANGE(0xc00000, 0xc0001f) AM_DEVREADWRITE("gen_vdp", sega315_5313_device, vdp_r, vdp_w)
 	AM_RANGE(0xd00000, 0xd0001f) AM_DEVREADWRITE("gen_vdp", sega315_5313_device, vdp_r, vdp_w) // the earth defend
 	AM_RANGE(0xe00000, 0xe0ffff) AM_RAM AM_MIRROR(0x1f0000) AM_SHARE("megadrive_ram")
 //  AM_RANGE(0xff0000, 0xffffff) AM_READONLY
 	/*       0xe00000 - 0xffffff) == MAIN RAM (64kb, Mirrored, most games use ff0000 - ffffff) */
+ADDRESS_MAP_END
+
+
+ADDRESS_MAP_START( dcat16_megadriv_map, AS_PROGRAM, 16, md_base_state )
+	AM_RANGE(0x000000, 0x7fffff) AM_ROM
+	AM_IMPORT_FROM(megadriv_map)
 ADDRESS_MAP_END
 
 
@@ -532,7 +534,7 @@ WRITE16_MEMBER(md_base_state::megadriv_68k_write_z80_ram )
 
 READ16_MEMBER(md_base_state::megadriv_68k_check_z80_bus )
 {
-	UINT16 retvalue;
+	uint16_t retvalue;
 
 	/* Double Dragon, Shadow of the Beast, Super Off Road, and Time Killers have buggy
 	   sound programs.  They request the bus, then have a loop which waits for the bus
@@ -541,7 +543,7 @@ READ16_MEMBER(md_base_state::megadriv_68k_check_z80_bus )
 	   the value is never zero.  Time Killers is the most fussy, and doesn't like the
 	   read_next_instruction function from system16, so I just return a random value
 	   in the unused bits */
-	UINT16 nextvalue = space.machine().rand();//read_next_instruction(space)&0xff00;
+	uint16_t nextvalue = space.machine().rand();//read_next_instruction(space)&0xff00;
 
 
 	/* Check if the 68k has the z80 bus */
@@ -694,7 +696,7 @@ WRITE16_MEMBER(md_base_state::megadriv_68k_req_z80_reset )
 READ8_MEMBER(md_base_state::z80_read_68k_banked_data )
 {
 	address_space &space68k = m_maincpu->space();
-	UINT8 ret = space68k.read_byte(m_genz80.z80_bank_addr+offset);
+	uint8_t ret = space68k.read_byte(m_genz80.z80_bank_addr+offset);
 	return ret;
 }
 
@@ -755,13 +757,13 @@ static ADDRESS_MAP_START( megadriv_z80_io_map, AS_IO, 8, md_base_state )
 	AM_RANGE(0x0000, 0xff) AM_NOP
 ADDRESS_MAP_END
 
-UINT32 md_base_state::screen_update_megadriv(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t md_base_state::screen_update_megadriv(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	/* Copy our screen buffer here */
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		UINT32* desty = &bitmap.pix32(y, 0);
-		UINT16* srcy;
+		uint32_t* desty = &bitmap.pix32(y, 0);
+		uint16_t* srcy;
 
 		if (!m_vdp->m_use_alt_timing)
 			srcy = &m_vdp->m_render_bitmap->pix(y, 0);
@@ -770,7 +772,7 @@ UINT32 md_base_state::screen_update_megadriv(screen_device &screen, bitmap_rgb32
 
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
-			UINT16 src = srcy[x];
+			uint16_t src = srcy[x];
 			desty[x] = rgb_t(pal5bit(src >> 10), pal5bit(src >> 5), pal5bit(src >> 0));
 		}
 	}
@@ -788,7 +790,6 @@ VIDEO_START_MEMBER(md_base_state,megadriv)
 
 MACHINE_START_MEMBER(md_base_state,megadriv)
 {
-	m_io_reset = ioport("RESET");
 	m_io_pad_3b[0] = ioport("PAD1");
 	m_io_pad_3b[1] = ioport("PAD2");
 	m_io_pad_3b[2] = ioport("IN0");
@@ -886,12 +887,12 @@ IRQ_CALLBACK_MEMBER(md_base_state::genesis_int_callback)
 	return (0x60+irqline*4)/4; // vector address
 }
 
-MACHINE_CONFIG_FRAGMENT( megadriv_timers )
+MACHINE_CONFIG_START( megadriv_timers )
 	MCFG_TIMER_DEVICE_ADD("md_scan_timer", "gen_vdp", sega315_5313_device, megadriv_scanline_timer_callback)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_FRAGMENT( md_ntsc )
+MACHINE_CONFIG_START( md_ntsc )
 	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK_NTSC / 7) /* 7.67 MHz */
 	MCFG_CPU_PROGRAM_MAP(megadriv_map)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(md_base_state,genesis_int_callback)
@@ -921,7 +922,7 @@ MACHINE_CONFIG_FRAGMENT( md_ntsc )
 	MCFG_SCREEN_SIZE(64*8, 620)
 	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 0, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(md_base_state, screen_update_megadriv) /* Copies a bitmap */
-	MCFG_SCREEN_VBLANK_DRIVER(md_base_state, screen_eof_megadriv) /* Used to Sync the timing */
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(md_base_state, screen_vblank_megadriv)) /* Used to Sync the timing */
 
 	MCFG_VIDEO_START_OVERRIDE(md_base_state, megadriv)
 
@@ -938,9 +939,17 @@ MACHINE_CONFIG_FRAGMENT( md_ntsc )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker",0.25) /* 3.58 MHz */
 MACHINE_CONFIG_END
 
+MACHINE_CONFIG_START( dcat16_megadriv_base )
+	MCFG_FRAGMENT_ADD( md_ntsc )
+
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(dcat16_megadriv_map)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(md_base_state,genesis_int_callback)
+MACHINE_CONFIG_END
+
 /************ PAL hardware has a different master clock *************/
 
-MACHINE_CONFIG_FRAGMENT( md_pal )
+MACHINE_CONFIG_START( md_pal )
 	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK_PAL / 7) /* 7.67 MHz */
 	MCFG_CPU_PROGRAM_MAP(megadriv_map)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(md_base_state,genesis_int_callback)
@@ -969,7 +978,7 @@ MACHINE_CONFIG_FRAGMENT( md_pal )
 	MCFG_SCREEN_SIZE(64*8, 620)
 	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 0, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(md_base_state, screen_update_megadriv) /* Copies a bitmap */
-	MCFG_SCREEN_VBLANK_DRIVER(md_base_state, screen_eof_megadriv) /* Used to Sync the timing */
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(md_base_state, screen_vblank_megadriv)) /* Used to Sync the timing */
 
 	MCFG_VIDEO_START_OVERRIDE(md_base_state, megadriv)
 
@@ -998,7 +1007,7 @@ void md_base_state::megadriv_init_common()
 	if (m_z80snd)
 	{
 		//printf("GENESIS Sound Z80 cpu found '%s'\n", machine().device("genesis_snd_z80")->tag());
-		m_genz80.z80_prgram = std::make_unique<UINT8[]>(0x2000);
+		m_genz80.z80_prgram = std::make_unique<uint8_t[]>(0x2000);
 		membank("bank1")->set_base(m_genz80.z80_prgram.get());
 		save_item(NAME(m_genz80.z80_is_reset));
 		save_item(NAME(m_genz80.z80_has_bus));
@@ -1017,7 +1026,7 @@ DRIVER_INIT_MEMBER(md_base_state,megadriv_c2)
 	megadriv_init_common();
 
 	m_vdp->set_use_cram(0); // C2 uses its own palette ram
-	m_vdp->set_vdp_pal(FALSE);
+	m_vdp->set_vdp_pal(false);
 	m_vdp->set_framerate(60);
 	m_vdp->set_total_scanlines(262);
 
@@ -1032,7 +1041,7 @@ DRIVER_INIT_MEMBER(md_base_state, megadriv)
 
 	// todo: move this to the device interface?
 	m_vdp->set_use_cram(1);
-	m_vdp->set_vdp_pal(FALSE);
+	m_vdp->set_vdp_pal(false);
 	m_vdp->set_framerate(60);
 	m_vdp->set_total_scanlines(262);
 
@@ -1045,7 +1054,7 @@ DRIVER_INIT_MEMBER(md_base_state, megadrij)
 
 	// todo: move this to the device interface?
 	m_vdp->set_use_cram(1);
-	m_vdp->set_vdp_pal(FALSE);
+	m_vdp->set_vdp_pal(false);
 	m_vdp->set_framerate(60);
 	m_vdp->set_total_scanlines(262);
 
@@ -1058,16 +1067,16 @@ DRIVER_INIT_MEMBER(md_base_state, megadrie)
 
 	// todo: move this to the device interface?
 	m_vdp->set_use_cram(1);
-	m_vdp->set_vdp_pal(TRUE);
+	m_vdp->set_vdp_pal(true);
 	m_vdp->set_framerate(50);
 	m_vdp->set_total_scanlines(313);
 
 	m_version_hi_nibble = 0xe0; // Export PAL no-SCD
 }
 
-void md_base_state::screen_eof_megadriv(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(md_base_state::screen_vblank_megadriv)
 {
-	if (m_io_reset && m_io_reset->read() & 0x01)
+	if (m_io_reset.read_safe(0) & 0x01)
 		m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 
 	// rising edge

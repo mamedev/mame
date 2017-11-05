@@ -7,7 +7,7 @@
 // 2 = everything
 const int V = 0;
 
-const device_type H8_DTC         = &device_creator<h8_dtc_device>;
+DEFINE_DEVICE_TYPE(H8_DTC, h8_dtc_device, "h8_dtc", "H8 DTC controller")
 
 const int h8_dtc_device::vector_to_enable[92] = {
 	-1, -1, -1, -1, -1, -1, -1, -1, // NMI at 7
@@ -24,8 +24,8 @@ const int h8_dtc_device::vector_to_enable[92] = {
 	-1, 40, 41, -1                  // ERI2, RXI2, TXI2, TEI2
 };
 
-h8_dtc_device::h8_dtc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, H8_DTC, "H8 DTC controller", tag, owner, clock, "h8_dtc", __FILE__),
+h8_dtc_device::h8_dtc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, H8_DTC, tag, owner, clock),
 	cpu(*this, DEVICE_SELF_OWNER)
 {
 }
@@ -45,7 +45,7 @@ void h8_dtc_device::device_reset()
 {
 	memset(dtcer, 0x00, sizeof(dtcer));
 	memset(states, 0, sizeof(states));
-	for(UINT8 i=0; i<sizeof(states)/sizeof(states[0]); i++)
+	for(uint8_t i=0; i<sizeof(states)/sizeof(states[0]); i++)
 		states[i].id = i;
 	dtvecr = 0x00;
 	cur_active_vector = -1;
@@ -77,10 +77,10 @@ WRITE8_MEMBER(h8_dtc_device::dtvecr_w)
 
 void h8_dtc_device::edge(int vector)
 {
-	for(std::list<int>::const_iterator i = waiting_vector.begin(); i != waiting_vector.end(); i++)
+	for(std::list<int>::const_iterator i = waiting_vector.begin(); i != waiting_vector.end(); ++i)
 		if(*i == vector)
 			return;
-	for(std::list<int>::const_iterator i = waiting_writeback.begin(); i != waiting_writeback.end(); i++)
+	for(std::list<int>::const_iterator i = waiting_writeback.begin(); i != waiting_writeback.end(); ++i)
 		if(*i == vector)
 			return;
 	if(waiting_vector.empty() && waiting_writeback.empty())
@@ -120,16 +120,16 @@ void h8_dtc_device::queue(int vector)
 void h8_dtc_device::vector_done(int vector)
 {
 	std::list<int>::iterator wi;
-	for(wi = waiting_vector.begin(); wi != waiting_vector.end() && *wi != vector && *wi != vector + DTC_CHAINED; wi++);
+	for(wi = waiting_vector.begin(); wi != waiting_vector.end() && *wi != vector && *wi != vector + DTC_CHAINED; ++wi) {};
 	assert(wi != waiting_vector.end());
 	waiting_vector.erase(wi);
 
 	h8_dtc_state *state = states + vector;
-	UINT32 sra = state->sra;
-	UINT32 dar = state->dar;
-	UINT32 cr = state->cr;
+	uint32_t sra = state->sra;
+	uint32_t dar = state->dar;
+	uint32_t cr = state->cr;
 
-	UINT32 mode = sra & 0x0c000000;
+	uint32_t mode = sra & 0x0c000000;
 	if(V>=1) logerror("regs at %08x sra=%08x dar=%08x cr=%08x %s mode\n", state->base, sra, dar, cr,
 						mode == 0x00000000 || mode == 0x0c000000 ? "normal" : mode == 0x04000000 ? "repeat" : "block");
 	state->incs = sra & 0x80000000 ?
@@ -167,7 +167,7 @@ void h8_dtc_device::vector_done(int vector)
 void h8_dtc_device::writeback_done(int vector)
 {
 	std::list<int>::iterator wi;
-	for(wi = waiting_writeback.begin(); wi != waiting_writeback.end() && *wi != vector; wi++);
+	for(wi = waiting_writeback.begin(); wi != waiting_writeback.end() && *wi != vector; ++wi) {};
 	assert(wi != waiting_writeback.end());
 	waiting_writeback.erase(wi);
 

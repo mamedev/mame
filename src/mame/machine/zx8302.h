@@ -29,12 +29,11 @@
 
 **********************************************************************/
 
+#ifndef MAME_MACHINE_ZX8302_H
+#define MAME_MACHINE_ZX8302_H
+
 #pragma once
 
-#ifndef __ZX8302__
-#define __ZX8302__
-
-#include "emu.h"
 
 
 ///*************************************************************************
@@ -98,23 +97,23 @@ class zx8302_device :  public device_t,
 {
 public:
 	// construction/destruction
-	zx8302_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	zx8302_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	static void set_rtc_clock(device_t &device, int rtc_clock) { downcast<zx8302_device &>(device).m_rtc_clock = rtc_clock; }
-	template<class _Object> static devcb_base &set_out_ipl1l_callback(device_t &device, _Object object) { return downcast<zx8302_device &>(device).m_out_ipl1l_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_baudx4_callback(device_t &device, _Object object) { return downcast<zx8302_device &>(device).m_out_baudx4_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_comdata_callback(device_t &device, _Object object) { return downcast<zx8302_device &>(device).m_out_comdata_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_txd1_callback(device_t &device, _Object object) { return downcast<zx8302_device &>(device).m_out_txd1_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_txd2_callback(device_t &device, _Object object) { return downcast<zx8302_device &>(device).m_out_txd2_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_netout_callback(device_t &device, _Object object) { return downcast<zx8302_device &>(device).m_out_netout_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_mdselck_callback(device_t &device, _Object object) { return downcast<zx8302_device &>(device).m_out_mdselck_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_mdseld_callback(device_t &device, _Object object) { return downcast<zx8302_device &>(device).m_out_mdseld_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_mdrdw_callback(device_t &device, _Object object) { return downcast<zx8302_device &>(device).m_out_mdrdw_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_erase_callback(device_t &device, _Object object) { return downcast<zx8302_device &>(device).m_out_erase_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_raw1_callback(device_t &device, _Object object) { return downcast<zx8302_device &>(device).m_out_raw1_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_in_raw1_callback(device_t &device, _Object object) { return downcast<zx8302_device &>(device).m_in_raw1_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_raw2_callback(device_t &device, _Object object) { return downcast<zx8302_device &>(device).m_out_raw2_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_in_raw2_callback(device_t &device, _Object object) { return downcast<zx8302_device &>(device).m_in_raw2_cb.set_callback(object); }
+	template <class Object> static devcb_base &set_out_ipl1l_callback(device_t &device, Object &&cb) { return downcast<zx8302_device &>(device).m_out_ipl1l_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_baudx4_callback(device_t &device, Object &&cb) { return downcast<zx8302_device &>(device).m_out_baudx4_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_comdata_callback(device_t &device, Object &&cb) { return downcast<zx8302_device &>(device).m_out_comdata_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_txd1_callback(device_t &device, Object &&cb) { return downcast<zx8302_device &>(device).m_out_txd1_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_txd2_callback(device_t &device, Object &&cb) { return downcast<zx8302_device &>(device).m_out_txd2_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_netout_callback(device_t &device, Object &&cb) { return downcast<zx8302_device &>(device).m_out_netout_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_mdselck_callback(device_t &device, Object &&cb) { return downcast<zx8302_device &>(device).m_out_mdselck_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_mdseld_callback(device_t &device, Object &&cb) { return downcast<zx8302_device &>(device).m_out_mdseld_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_mdrdw_callback(device_t &device, Object &&cb) { return downcast<zx8302_device &>(device).m_out_mdrdw_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_erase_callback(device_t &device, Object &&cb) { return downcast<zx8302_device &>(device).m_out_erase_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_raw1_callback(device_t &device, Object &&cb) { return downcast<zx8302_device &>(device).m_out_raw1_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_in_raw1_callback(device_t &device, Object &&cb) { return downcast<zx8302_device &>(device).m_in_raw1_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_raw2_callback(device_t &device, Object &&cb) { return downcast<zx8302_device &>(device).m_out_raw2_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_in_raw2_callback(device_t &device, Object &&cb) { return downcast<zx8302_device &>(device).m_in_raw2_cb.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER( rtc_r );
 	DECLARE_WRITE8_MEMBER( rtc_w );
@@ -146,7 +145,7 @@ protected:
 	virtual void rcv_callback() override;
 	virtual void rcv_complete() override;
 
-	inline void trigger_interrupt(UINT8 line);
+	inline void trigger_interrupt(uint8_t line);
 	inline void transmit_ipc_data();
 
 private:
@@ -228,12 +227,12 @@ private:
 	int m_cts2;
 
 	// registers
-	UINT8 m_idr;                    // IPC data register
-	UINT8 m_tcr;                    // transfer control register
-	UINT8 m_tdr;                    // transfer data register
-	UINT8 m_irq;                    // interrupt register
-	UINT32 m_ctr;                   // counter register
-	UINT8 m_status;                 // status register
+	uint8_t m_idr;                    // IPC data register
+	uint8_t m_tcr;                    // transfer control register
+	uint8_t m_tdr;                    // transfer data register
+	uint8_t m_irq;                    // interrupt register
+	uint32_t m_ctr;                   // counter register
+	uint8_t m_status;                 // status register
 
 	// IPC communication state
 	int m_comdata_from_ipc;         // pending data from IPC->68000
@@ -245,7 +244,7 @@ private:
 	int m_baudx4;                   // IPC baud x4
 
 	// microdrive state
-	UINT8 m_mdv_data[2];            // track data register
+	uint8_t m_mdv_data[2];            // track data register
 	int m_track;                    // current track
 
 	// timers
@@ -260,4 +259,4 @@ extern const device_type ZX8302;
 
 
 
-#endif
+#endif // MAME_MACHINE_ZX8302_H

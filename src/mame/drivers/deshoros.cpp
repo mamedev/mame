@@ -32,6 +32,9 @@ TODO:
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/beep.h"
+#include "rendlay.h"
+#include "screen.h"
+#include "speaker.h"
 
 class destiny_state : public driver_device
 {
@@ -64,7 +67,7 @@ protected:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 public:
-	UINT32 screen_update_destiny(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_destiny(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -72,13 +75,13 @@ public:
 
 void destiny_state::video_start()
 {
-	UINT8 i;
+	uint8_t i;
 	for(i=0;i<20;i++)
 		m_led_array[i] = 0x20;
 	m_led_array[20] = 0;
 }
 
-UINT32 destiny_state::screen_update_destiny(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t destiny_state::screen_update_destiny(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	popmessage("%s",m_led_array);
 	return 0;
@@ -155,7 +158,7 @@ INPUT_CHANGED_MEMBER(destiny_state::coin_inserted)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 
 	// coincounter on coin insert
-	if (((int)(FPTR)param) == 0)
+	if (((int)(uintptr_t)param) == 0)
 		machine().bookkeeping().coin_counter_w(0, newval);
 }
 
@@ -258,23 +261,24 @@ void destiny_state::machine_reset()
 	bank_select_w(m_maincpu->space(AS_PROGRAM), 0, 0);
 }
 
-static MACHINE_CONFIG_START( destiny, destiny_state )
+static MACHINE_CONFIG_START( destiny )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, XTAL_4MHz/2)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(destiny_state, irq0_line_hold, 60) // timer irq controls update speed, frequency needs to be determined yet (2MHz through three 74LS390)
+	MCFG_CPU_PERIODIC_INT_DRIVER(destiny_state, irq0_line_hold, 50) // timer irq controls update speed, frequency needs to be determined yet (2MHz through three 74LS390)
 
 	/* video hardware (dummy) */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(48*8, 16*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 0*8, 16*8-1)
+	MCFG_SCREEN_ADD("screen", LCD)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_SIZE(6*16, 9*2)
+	MCFG_SCREEN_VISIBLE_AREA(0, 6*16-1, 0, 9*2-1)
+	MCFG_DEFAULT_LAYOUT(layout_lcd)
 	MCFG_SCREEN_UPDATE_DRIVER(destiny_state, screen_update_destiny)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 16)
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -310,4 +314,4 @@ ROM_START( destiny )
 	ROM_LOAD( "ag11.18a",  0x16000, 0x2000, CRC(5f7bf9f9) SHA1(281f89c0bccfcc2bdc1d4d0a5b9cc9a8ab2e7869) )
 ROM_END
 
-GAME( 1983, destiny,  0,       destiny,  destiny, driver_device,  0, ROT0, "Data East Corporation", "Destiny - The Fortuneteller (USA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+GAME( 1983, destiny,  0,       destiny,  destiny, destiny_state,  0, ROT0, "Data East Corporation", "Destiny - The Fortuneteller (USA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS|MACHINE_NODEVICE_PRINTER )

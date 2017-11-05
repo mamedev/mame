@@ -5020,4 +5020,21 @@
 		</part>
 	</software>
 
+<!-- Softlist entry for TI-CALC. -->
+	<software name="ticalc">
+		<description>TI-CALC</description>
+		<year>1983</year>
+		<publisher>Texas Instruments</publisher>
+		<info name="serial" value="PHM 3213"/>
+		<part name="cart" interface="ti99_cart">
+			<feature name="pcb" value="paged7" />
+			<dataarea name="grom" size="0x2000">
+				<rom name="phm3213_g3.bin" size="0x1800" crc="d68df037" sha1="fce2fb8928018492d30256588d3040ef5c654faa" offset="0x0000" />
+			</dataarea>
+			<dataarea name="rom" size="0x4000">
+				<rom name="phm3213_r1.bin" size="0x2000" crc="0451b0f9" sha1="fce0f47d07cdda537ae5c9b9c831978423da854f" offset="0x0000" />
+				<rom name="phm3213_r2.bin" size="0x2000" crc="80749ad6" sha1="018b9c847645dd682cad1113e3d7a4c9f231f685" offset="0x2000" />
+			</dataarea>
+		</part>
+	</software>
 </softwarelist>

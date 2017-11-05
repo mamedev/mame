@@ -37,7 +37,11 @@ RUN
 
 *****************************************************************************/
 
+#include "emu.h"
 #include "includes/phc25.h"
+
+#include "speaker.h"
+
 
 /* Read/Write Handlers */
 
@@ -58,7 +62,7 @@ READ8_MEMBER( phc25_state::port40_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	/* vertical sync */
 	data |= !m_vdg->fs_r() << 4;
@@ -262,7 +266,7 @@ INPUT_PORTS_END
 
 READ8_MEMBER( phc25_state::video_ram_r )
 {
-	if BIT(m_port40, 7) // graphics
+	if (BIT(m_port40, 7)) // graphics
 	{
 		return m_video_ram[offset];
 	}
@@ -302,7 +306,7 @@ void phc25_state::video_start()
 
 /* Machine Driver */
 
-static MACHINE_CONFIG_START( phc25, phc25_state )
+static MACHINE_CONFIG_START( phc25 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(phc25_mem)
@@ -321,6 +325,7 @@ static MACHINE_CONFIG_START( phc25, phc25_state )
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_FORMATS(phc25_cassette_formats)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
+	MCFG_CASSETTE_INTERFACE("phc25_cass")
 
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(phc25_state, write_centronics_busy))
@@ -330,6 +335,9 @@ static MACHINE_CONFIG_START( phc25, phc25_state )
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("16K")
+
+	/* software lists */
+	MCFG_SOFTWARE_LIST_ADD("cass_list", "phc25_cass")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pal, phc25 )
@@ -340,7 +348,7 @@ static MACHINE_CONFIG_DERIVED( pal, phc25 )
 	MCFG_MC6847_FSYNC_CALLBACK(WRITELINE(phc25_state, irq_w))
 	MCFG_MC6847_INPUT_CALLBACK(READ8(phc25_state, video_ram_r))
 	MCFG_MC6847_CHARROM_CALLBACK(phc25_state, pal_char_rom_r)
-	MCFG_MC6847_FIXED_MODE(MC6847_MODE_GM2 | MC6847_MODE_GM1 | MC6847_MODE_INTEXT)
+	MCFG_MC6847_FIXED_MODE(mc6847_pal_device::MODE_GM2 | mc6847_pal_device::MODE_GM1 | mc6847_pal_device::MODE_INTEXT)
 	// other lines not connected
 MACHINE_CONFIG_END
 
@@ -352,7 +360,7 @@ static MACHINE_CONFIG_DERIVED( ntsc, phc25 )
 	MCFG_MC6847_FSYNC_CALLBACK(WRITELINE(phc25_state, irq_w))
 	MCFG_MC6847_INPUT_CALLBACK(READ8(phc25_state, video_ram_r))
 	MCFG_MC6847_CHARROM_CALLBACK(phc25_state, ntsc_char_rom_r)
-	MCFG_MC6847_FIXED_MODE(MC6847_MODE_GM2 | MC6847_MODE_GM1 | MC6847_MODE_INTEXT)
+	MCFG_MC6847_FIXED_MODE(mc6847_ntsc_device::MODE_GM2 | mc6847_ntsc_device::MODE_GM1 | mc6847_ntsc_device::MODE_INTEXT)
 	// other lines not connected
 MACHINE_CONFIG_END
 
@@ -360,9 +368,11 @@ MACHINE_CONFIG_END
 
 ROM_START( phc25 )
 	ROM_REGION( 0x6000, Z80_TAG, 0 )
-	ROM_LOAD( "phc25rom.0", 0x0000, 0x2000, CRC(fa28336b) SHA1(582376bee455e124de24ba4ac02326c8a592fa5a))
-	ROM_LOAD( "phc25rom.1", 0x2000, 0x2000, CRC(38fd578b) SHA1(dc3db78c0cdc89f1605200d39535be65a4091705))
-	ROM_LOAD( "phc25rom.2", 0x4000, 0x2000, CRC(54392b27) SHA1(1587827fe9438780b50164727ce3fdea1b98078a))
+	ROM_LOAD( "phc25rom.0", 0x0000, 0x2000, CRC(fa28336b) SHA1(582376bee455e124de24ba4ac02326c8a592fa5a)) // 031_00aa.ic13 ?
+	ROM_LOAD( "phc25rom.1", 0x2000, 0x2000, CRC(38fd578b) SHA1(dc3db78c0cdc89f1605200d39535be65a4091705)) // 031_01a.ic14 ?
+	ROM_LOAD( "phc25rom.2", 0x4000, 0x2000, CRC(54392b27) SHA1(1587827fe9438780b50164727ce3fdea1b98078a)) // 031_02a.ic15 ?
+	ROM_REGION( 0x1000, "chargen", 0 )
+	ROM_LOAD( "031_04a.ic6", 0x0000, 0x1000, CRC(e56fb8c5) SHA1(6fc388c17fb43debfbc1464f767d0ce1375ce27b))
 ROM_END
 
 ROM_START( phc25j )
@@ -379,6 +389,6 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   CLASS          INIT    COMPANY     FULLNAME            FLAGS */
-COMP( 1983, phc25,  0,      0,      pal,    phc25,  driver_device,  0,     "Sanyo",  "PHC-25 (Europe)",  MACHINE_NO_SOUND )
-COMP( 1983, phc25j, phc25,  0,      ntsc,   phc25j, driver_device,  0,     "Sanyo",  "PHC-25 (Japan)",   MACHINE_NO_SOUND )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT  COMPANY   FULLNAME            FLAGS
+COMP( 1983, phc25,  0,      0,      pal,     phc25,  phc25_state,  0,    "Sanyo",  "PHC-25 (Europe)",  MACHINE_NO_SOUND )
+COMP( 1983, phc25j, phc25,  0,      ntsc,    phc25j, phc25_state,  0,    "Sanyo",  "PHC-25 (Japan)",   MACHINE_NO_SOUND )

@@ -71,7 +71,7 @@
  Other notes
 
  Has some optocouplers, high voltage drivers, and what looks like additional
- I/O conenctors.
+ I/O connectors.
 
  Reset switch cuts power supply going to Video/Work RAM.
 
@@ -82,8 +82,11 @@
 #include "emu.h"
 #include "cpu/z180/z180.h"
 #include "video/mc6845.h"
-#include "luckgrln.lh"
+#include "screen.h"
+#include "speaker.h"
 
+#include "luckgrln.lh"
+#include "7smash.lh"
 
 class luckgrln_state : public driver_device
 {
@@ -109,29 +112,29 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")  { }
 
-	UINT8 m_nmi_enable;
+	uint8_t m_nmi_enable;
 	tilemap_t *m_reel1_tilemap;
 	tilemap_t *m_reel2_tilemap;
 	tilemap_t *m_reel3_tilemap;
 	tilemap_t *m_reel4_tilemap;
-	required_shared_ptr<UINT8> m_reel1_ram;
-	required_shared_ptr<UINT8> m_reel1_attr;
-	required_shared_ptr<UINT8> m_reel1_scroll;
-	required_shared_ptr<UINT8> m_reel2_ram;
-	required_shared_ptr<UINT8> m_reel2_attr;
-	required_shared_ptr<UINT8> m_reel2_scroll;
-	required_shared_ptr<UINT8> m_reel3_ram;
-	required_shared_ptr<UINT8> m_reel3_attr;
-	required_shared_ptr<UINT8> m_reel3_scroll;
-	required_shared_ptr<UINT8> m_reel4_ram;
-	required_shared_ptr<UINT8> m_reel4_attr;
-	required_shared_ptr<UINT8> m_reel4_scroll;
-	required_shared_ptr<UINT8> m_luck_vram1;
-	required_shared_ptr<UINT8> m_luck_vram2;
-	required_shared_ptr<UINT8> m_luck_vram3;
+	required_shared_ptr<uint8_t> m_reel1_ram;
+	required_shared_ptr<uint8_t> m_reel1_attr;
+	required_shared_ptr<uint8_t> m_reel1_scroll;
+	required_shared_ptr<uint8_t> m_reel2_ram;
+	required_shared_ptr<uint8_t> m_reel2_attr;
+	required_shared_ptr<uint8_t> m_reel2_scroll;
+	required_shared_ptr<uint8_t> m_reel3_ram;
+	required_shared_ptr<uint8_t> m_reel3_attr;
+	required_shared_ptr<uint8_t> m_reel3_scroll;
+	required_shared_ptr<uint8_t> m_reel4_ram;
+	required_shared_ptr<uint8_t> m_reel4_attr;
+	required_shared_ptr<uint8_t> m_reel4_scroll;
+	required_shared_ptr<uint8_t> m_luck_vram1;
+	required_shared_ptr<uint8_t> m_luck_vram2;
+	required_shared_ptr<uint8_t> m_luck_vram3;
 
 	int m_palette_count;
-	UINT8 m_palette_ram[0x10000];
+	uint8_t m_palette_ram[0x10000];
 	DECLARE_WRITE8_MEMBER(luckgrln_reel1_ram_w);
 	DECLARE_WRITE8_MEMBER(luckgrln_reel1_attr_w);
 	DECLARE_WRITE8_MEMBER(luckgrln_reel2_ram_w);
@@ -155,7 +158,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_luckgrln_reel3_tile_info);
 	TILE_GET_INFO_MEMBER(get_luckgrln_reel4_tile_info);
 	virtual void video_start() override;
-	UINT32 screen_update_luckgrln(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_luckgrln(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(luckgrln_irq);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -277,10 +280,10 @@ TILE_GET_INFO_MEMBER(luckgrln_state::get_luckgrln_reel4_tile_info)
 
 void luckgrln_state::video_start()
 {
-	m_reel1_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(luckgrln_state::get_luckgrln_reel1_tile_info),this),TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
-	m_reel2_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(luckgrln_state::get_luckgrln_reel2_tile_info),this),TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
-	m_reel3_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(luckgrln_state::get_luckgrln_reel3_tile_info),this),TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
-	m_reel4_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(luckgrln_state::get_luckgrln_reel4_tile_info),this),TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+	m_reel1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(luckgrln_state::get_luckgrln_reel1_tile_info),this),TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+	m_reel2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(luckgrln_state::get_luckgrln_reel2_tile_info),this),TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+	m_reel3_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(luckgrln_state::get_luckgrln_reel3_tile_info),this),TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+	m_reel4_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(luckgrln_state::get_luckgrln_reel4_tile_info),this),TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
 
 	m_reel1_tilemap->set_scroll_cols(64);
 	m_reel2_tilemap->set_scroll_cols(64);
@@ -293,7 +296,7 @@ void luckgrln_state::video_start()
 	m_reel4_tilemap->set_transparent_pen(0 );
 }
 
-UINT32 luckgrln_state::screen_update_luckgrln(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t luckgrln_state::screen_update_luckgrln(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int y,x;
 	int count = 0;
@@ -323,12 +326,12 @@ UINT32 luckgrln_state::screen_update_luckgrln(screen_device &screen, bitmap_ind1
 
 		for (x=0;x<64;x++)
 		{
-			UINT16 tile = (m_luck_vram1[count] & 0xff);
-			UINT16 tile_high = (m_luck_vram2[count]);
-			UINT16 tileattr = (m_luck_vram3[count]);
-			UINT8 col = 0;
-			UINT8 region = 0;
-			UINT8 bgenable;
+			uint16_t tile = (m_luck_vram1[count] & 0xff);
+			uint16_t tile_high = (m_luck_vram2[count]);
+			uint16_t tileattr = (m_luck_vram3[count]);
+			uint8_t col = 0;
+			uint8_t region = 0;
+			uint8_t bgenable;
 
 			clip.min_x = x*8;
 			clip.max_x = x*8+8;
@@ -462,7 +465,7 @@ WRITE8_MEMBER(luckgrln_state::palette_w)
 	{
 		int r,g,b;
 		int offs;
-		UINT16 dat;
+		uint16_t dat;
 		offs = m_palette_count&~0x1;
 		dat = m_palette_ram[offs] | m_palette_ram[offs+1]<<8;
 
@@ -754,23 +757,23 @@ static INPUT_PORTS_START( luckgrln )
 
 	PORT_START("DSW3")
 	PORT_DIPNAME( 0x07, 0x04, "Key In" )
-	PORT_DIPSETTING(    0x07, "1 Pulse / 5 Credits" )
-	PORT_DIPSETTING(    0x06, "1 Pulse / 10 Credits" )
-	PORT_DIPSETTING(    0x05, "1 Pulse / 50 Credits" )
-	PORT_DIPSETTING(    0x04, "1 Pulse / 100 Credits" )
-	PORT_DIPSETTING(    0x03, "1 Pulse / 200 Credits" )
-	PORT_DIPSETTING(    0x02, "1 Pulse / 300 Credits" )
-	PORT_DIPSETTING(    0x01, "1 Pulse / 500 Credits" )
-	PORT_DIPSETTING(    0x00, "1 Pulse / 1000 Credits" )
+	PORT_DIPSETTING(    0x07, "1 Pulse/5 Credits" )
+	PORT_DIPSETTING(    0x06, "1 Pulse/10 Credits" )
+	PORT_DIPSETTING(    0x05, "1 Pulse/50 Credits" )
+	PORT_DIPSETTING(    0x04, "1 Pulse/100 Credits" )
+	PORT_DIPSETTING(    0x03, "1 Pulse/200 Credits" )
+	PORT_DIPSETTING(    0x02, "1 Pulse/300 Credits" )
+	PORT_DIPSETTING(    0x01, "1 Pulse/500 Credits" )
+	PORT_DIPSETTING(    0x00, "1 Pulse/1000 Credits" )
 	PORT_DIPNAME( 0x38, 0x10, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x38, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x30, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x28, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0x18, DEF_STR( 1C_6C ) )
-	PORT_DIPSETTING(    0x10, "1 Coin / 10 Credits" )
-	PORT_DIPSETTING(    0x08, "1 Coin / 25 Credits" )
-	PORT_DIPSETTING(    0x00, "1 Coin / 50 Credits" )
+	PORT_DIPSETTING(    0x10, "1 Coin/10 Credits" )
+	PORT_DIPSETTING(    0x08, "1 Coin/25 Credits" )
+	PORT_DIPSETTING(    0x00, "1 Coin/50 Credits" )
 	PORT_DIPNAME( 0x40, 0x40, "DSW3-40" )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -780,9 +783,9 @@ static INPUT_PORTS_START( luckgrln )
 
 	PORT_START("DSW4")
 	PORT_DIPNAME( 0x0f, 0x04, "Coin C" )
-	PORT_DIPSETTING(    0x0f, "10 Coins / 1 Credit" )
+	PORT_DIPSETTING(    0x0f, "10 Coins/1 Credit" )
 	PORT_DIPSETTING(    0x0e, DEF_STR( 5C_1C ) )
-	PORT_DIPSETTING(    0x0d, "5 Coins / 2 Credits" )
+	PORT_DIPSETTING(    0x0d, "5 Coins/2 Credits" )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x0b, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x0a, DEF_STR( 2C_1C ) )
@@ -791,20 +794,20 @@ static INPUT_PORTS_START( luckgrln )
 	PORT_DIPSETTING(    0x07, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0x04, "1 Coin / 10 Credits" )
-	PORT_DIPSETTING(    0x03, "1 Coin / 20 Credits" )
-	PORT_DIPSETTING(    0x02, "1 Coin / 25 Credits" )
-	PORT_DIPSETTING(    0x01, "1 Coin / 50 Credits" )
-	PORT_DIPSETTING(    0x00, "1 Coin / 100 Credits" )
+	PORT_DIPSETTING(    0x04, "1 Coin/10 Credits" )
+	PORT_DIPSETTING(    0x03, "1 Coin/20 Credits" )
+	PORT_DIPSETTING(    0x02, "1 Coin/25 Credits" )
+	PORT_DIPSETTING(    0x01, "1 Coin/50 Credits" )
+	PORT_DIPSETTING(    0x00, "1 Coin/100 Credits" )
 	PORT_DIPNAME( 0x70, 0x10, DEF_STR( Coin_B ) )
-	PORT_DIPSETTING(    0x70, "10 Coins / 1 Credit" )
+	PORT_DIPSETTING(    0x70, "10 Coins/1 Credit" )
 	PORT_DIPSETTING(    0x60, DEF_STR( 9C_1C ) )
 	PORT_DIPSETTING(    0x50, DEF_STR( 6C_1C ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x30, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x00, "1 Coin / 200 Credits" )
+	PORT_DIPSETTING(    0x00, "1 Coin/200 Credits" )
 	PORT_DIPNAME( 0x80, 0x80, "DSW4-80" )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -835,96 +838,96 @@ static INPUT_PORTS_START( luckgrln )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
+
 static INPUT_PORTS_START( _7smash )
 	PORT_START("DSW1")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW,  IPT_UNUSED )
+	PORT_DIPNAME( 0x01, 0x01, "Reel Speed" )
+	PORT_DIPSETTING(    0x01, DEF_STR( High ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Low ) )
+	PORT_DIPNAME( 0x02, 0x02, "Renchan Pattern" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
+	PORT_DIPNAME( 0x0c, 0x0c, "Key In Value" )
+	PORT_DIPSETTING(    0x00, "200" )
+	PORT_DIPSETTING(    0x04, "100" )
+	PORT_DIPSETTING(    0x08, "50" )
+	PORT_DIPSETTING(    0x0c, "10" )
+	PORT_DIPNAME( 0x70, 0x60, "Percentage" )
+	PORT_DIPSETTING(    0x00, "-- (Invalid 1)" )
+	PORT_DIPSETTING(    0x10, "-- (Invalid 2)" )
+	PORT_DIPSETTING(    0x20, "-- (Invalid 3)" )
+	PORT_DIPSETTING(    0x30, "80%" )
+	PORT_DIPSETTING(    0x40, "85%" )
+	PORT_DIPSETTING(    0x50, "90%" )
+	PORT_DIPSETTING(    0x60, "95%" )
+	PORT_DIPSETTING(    0x70, "105%" )
+	PORT_DIPNAME( 0x80, 0x80, "Reset Mode" )
+	PORT_DIPSETTING(    0x80, "Auto" )
+	PORT_DIPSETTING(    0x00, "Manual" )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x01, "DSW2" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x03, 0x03, "Payout Mode" )
+	PORT_DIPSETTING(    0x00, "0" )
+	PORT_DIPSETTING(    0x01, "1" )
+	PORT_DIPSETTING(    0x02, "2" )
+	PORT_DIPSETTING(    0x03, "3" )
+	PORT_DIPNAME( 0x04, 0x04, "Coin Sw Active" )
+	PORT_DIPSETTING(    0x04, DEF_STR( Low ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( High ) )
+	PORT_DIPNAME( 0x18, 0x00, "Hopper Limit" )
+	PORT_DIPSETTING(    0x00, "Unlimited" )
+	PORT_DIPSETTING(    0x08, "1000" )
+	PORT_DIPSETTING(    0x10, "500" )
+	PORT_DIPSETTING(    0x18, "300" )
+	PORT_DIPNAME( 0x60, 0x60, "Panel Type" )
+	PORT_DIPSETTING(    0x00, "D" )
+	PORT_DIPSETTING(    0x20, "C" )
+	PORT_DIPSETTING(    0x40, "B" )
+	PORT_DIPSETTING(    0x60, "A" ) // inputs and layout are for this Panel Type only, ToDo: expand with conditional inputs
+	PORT_DIPNAME( 0x80, 0x80, "Alt. Test" )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW3")
-	PORT_DIPNAME( 0x01, 0x01, "DSW3" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x00, "1 Coin/10 Credits" )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) )
+	PORT_DIPSETTING(    0x0c, "10 Coins/1 Credit" )
+	PORT_DIPSETTING(    0x08, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPNAME( 0xf0, 0x00, "Coin C" )
+	PORT_DIPSETTING(    0x00, "1 Coin/200 Credits" )
+	PORT_DIPSETTING(    0x10, "1 Coin/100 Credits" )
+	PORT_DIPSETTING(    0x20, "1 Coin/50 Credits" )
+	PORT_DIPSETTING(    0x30, "1 Coin/25 Credits" )
+	PORT_DIPSETTING(    0x40, "1 Coin/20 Credits" )
+	PORT_DIPSETTING(    0x50, "1 Coin/10 Credits" )
+	PORT_DIPSETTING(    0x60, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x70, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x90, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0xa0, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0xb0, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0xd0, "5 Coins/2 Credits" )
+	PORT_DIPSETTING(    0xe0, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(    0xf0, "10 Coins/1 Credit" )
 
 	PORT_START("DSW4")
-	PORT_DIPNAME( 0x01, 0x01, "DSW4" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0xff, IP_ACTIVE_LOW,  IPT_UNUSED  )
 
 	PORT_START("DSW5")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW,  IPT_UNUSED  )
 
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_START1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_SLOT_STOP3 ) PORT_NAME("Slot 3 / Odds")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_SLOT_STOP2 ) PORT_NAME("Slot 2 / Bet")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_SLOT_STOP1 ) PORT_NAME("Slot 1")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_SLOT_STOP3 ) PORT_NAME("Stop 3 / Odds")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_SLOT_STOP2 ) PORT_NAME("Stop 2 / Bet")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_SLOT_STOP1 ) PORT_NAME("Stop 1")
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW,  IPT_UNUSED  )
 
 	PORT_START("IN1")
@@ -983,7 +986,7 @@ INTERRUPT_GEN_MEMBER(luckgrln_state::luckgrln_irq)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static MACHINE_CONFIG_START( luckgrln, luckgrln_state )
+static MACHINE_CONFIG_START( luckgrln )
 	MCFG_CPU_ADD("maincpu", Z180,8000000)
 	MCFG_CPU_PROGRAM_MAP(mainmap)
 	MCFG_CPU_IO_MAP(portmap)
@@ -1017,8 +1020,8 @@ MACHINE_CONFIG_END
 DRIVER_INIT_MEMBER(luckgrln_state,luckgrln)
 {
 	int i;
-	UINT8 x,v;
-	UINT8* rom = memregion("rom_data")->base();
+	uint8_t x,v;
+	uint8_t* rom = memregion("rom_data")->base();
 
 	for (i=0;i<0x20000;i++)
 	{
@@ -1089,8 +1092,8 @@ ROM_END
 
 /*********************************************
 *                Game Drivers                *
-**********************************************
+**********************************************/
 
-       YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT      ROT    COMPANY           FULLNAME                                 FLAGS                                                       LAYOUT  */
-GAMEL( 1991, luckgrln, 0,      luckgrln, luckgrln, luckgrln_state, luckgrln, ROT0, "Wing Co., Ltd.", "Lucky Girl (newer Z180 based hardware)", MACHINE_NO_SOUND,                                              layout_luckgrln )
-GAMEL( 1993, 7smash,   0,      _7smash,  _7smash,  driver_device,  0,        ROT0, "Sovic",          "7 Smash",                                MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_NO_SOUND, layout_luckgrln )
+//     YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT      ROT   COMPANY           FULL NAME                                 FLAGS             LAYOUT
+GAMEL( 1991, luckgrln, 0,      luckgrln, luckgrln, luckgrln_state, luckgrln, ROT0, "Wing Co., Ltd.", "Lucky Girl (newer Z180 based hardware)", MACHINE_NO_SOUND, layout_luckgrln )
+GAMEL( 1993, 7smash,   0,      _7smash,  _7smash,  luckgrln_state, 0,        ROT0, "Sovic",          "7 Smash",                                MACHINE_NO_SOUND, layout_7smash )

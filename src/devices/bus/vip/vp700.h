@@ -6,12 +6,11 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_VIP_VP700_H
+#define MAME_BUS_VIP_VP700_H
+
 #pragma once
 
-#ifndef __VP700__
-#define __VP700__
-
-#include "emu.h"
 #include "exp.h"
 #include "sound/cdp1863.h"
 
@@ -28,17 +27,17 @@ class vp700_device : public device_t,
 {
 public:
 	// construction/destruction
-	vp700_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	vp700_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 
 	// device_vip_expansion_card_interface overrides
-	virtual UINT8 vip_program_r(address_space &space, offs_t offset, int cs, int cdef, int *minh) override;
+	virtual uint8_t vip_program_r(address_space &space, offs_t offset, int cs, int cdef, int *minh) override;
 
 private:
 	required_memory_region m_rom;
@@ -46,7 +45,6 @@ private:
 
 
 // device type definition
-extern const device_type VP700;
+DECLARE_DEVICE_TYPE(VP700, vp700_device)
 
-
-#endif
+#endif // MAME_BUS_VIP_VP700_H

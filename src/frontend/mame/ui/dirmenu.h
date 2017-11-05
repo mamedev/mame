@@ -19,7 +19,6 @@
 #include <vector>
 
 namespace ui {
-
 //-------------------------------------------------
 //  class directory menu
 //-------------------------------------------------
@@ -27,11 +26,15 @@ namespace ui {
 class menu_directory : public menu
 {
 public:
-	menu_directory(mame_ui_manager &mui, render_container *container);
+	menu_directory(mame_ui_manager &mui, render_container &container);
 	virtual ~menu_directory() override;
-	virtual void populate() override;
-	virtual void handle() override;
+
+protected:
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
+
+private:
+	virtual void populate(float &customtop, float &custombottom) override;
+	virtual void handle() override;
 };
 
 //-------------------------------------------------
@@ -41,22 +44,25 @@ public:
 class menu_display_actual : public menu
 {
 public:
-	menu_display_actual(mame_ui_manager &mui, render_container *container, int selectedref);
+	menu_display_actual(mame_ui_manager &mui, render_container &container, int selectedref);
 	virtual ~menu_display_actual() override;
-	virtual void populate() override;
-	virtual void handle() override;
+
+protected:
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
 
 private:
-	std::string              m_tempbuf, m_searchpath;
-	std::vector<std::string> m_folders;
-	int                      m_ref;
-
 	enum
 	{
 		ADD_CHANGE = 1,
 		REMOVE,
 	};
+
+	virtual void populate(float &customtop, float &custombottom) override;
+	virtual void handle() override;
+
+	std::string              m_heading[1], m_searchpath;
+	std::vector<std::string> m_folders;
+	int                      m_ref;
 };
 
 //-------------------------------------------------
@@ -66,13 +72,16 @@ private:
 class menu_remove_folder : public menu
 {
 public:
-	menu_remove_folder(mame_ui_manager &mui, render_container *container, int ref);
+	menu_remove_folder(mame_ui_manager &mui, render_container &container, int ref);
 	virtual ~menu_remove_folder() override;
-	virtual void populate() override;
-	virtual void handle() override;
+
+protected:
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
 
 private:
+	virtual void populate(float &customtop, float &custombottom) override;
+	virtual void handle() override;
+
 	std::string  m_searchpath;
 	int          m_ref;
 	std::vector<std::string> m_folders;
@@ -85,22 +94,25 @@ private:
 class menu_add_change_folder : public menu
 {
 public:
-	menu_add_change_folder(mame_ui_manager &mui, render_container *container, int ref);
+	menu_add_change_folder(mame_ui_manager &mui, render_container &container, int ref);
 	virtual ~menu_add_change_folder() override;
-	virtual void populate() override;
-	virtual void handle() override;
+
+protected:
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
 
-	virtual bool menu_has_search_active() override { return (m_search[0] != 0); }
+	virtual bool menu_has_search_active() override { return !m_search.empty(); }
 
 private:
+	virtual void populate(float &customtop, float &custombottom) override;
+	virtual void handle() override;
+
 	int          m_ref;
 	std::string  m_current_path;
-	char         m_search[40];
+	std::string  m_search;
 	bool         m_change;
 	std::vector<std::string> m_folders;
 };
 
-} // namesapce ui
+} // namespace ui
 
 #endif /* MAME_FRONTEND_UI_DIRMENU_H */

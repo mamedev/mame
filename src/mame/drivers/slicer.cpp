@@ -17,16 +17,18 @@ class slicer_state : public driver_device
 {
 public:
 	slicer_state(const machine_config &mconfig, device_type type, const char *tag) :
-	driver_device(mconfig, type, tag),
-	m_fdc(*this, "fdc"),
-	m_sasi(*this, "sasi")
-	{}
-
-	required_device<fd1797_t> m_fdc;
-	required_device<SCSI_PORT_DEVICE> m_sasi;
+		driver_device(mconfig, type, tag),
+		m_fdc(*this, "fdc"),
+		m_sasi(*this, "sasi")
+	{
+	}
 
 	DECLARE_WRITE8_MEMBER(sio_out_w);
 	DECLARE_WRITE8_MEMBER(drive_sel_w);
+
+protected:
+	required_device<fd1797_device> m_fdc;
+	required_device<scsi_port_device> m_sasi;
 };
 
 WRITE8_MEMBER(slicer_state::sio_out_w)
@@ -49,17 +51,17 @@ WRITE8_MEMBER(slicer_state::drive_sel_w)
 	data &= 1;
 	switch(offset)
 	{
-		case 0:
-			m_sasi->write_sel(data);
-			break;
-		case 1:
-			m_sasi->write_rst(data);
-			break;
-		case 7:
-			m_fdc->dden_w(data);
-			break;
+	case 0:
+		m_sasi->write_sel(data);
+		break;
+	case 1:
+		m_sasi->write_rst(data);
+		break;
+	case 7:
+		m_fdc->dden_w(data);
+		break;
 
-		default:
+	default:
 		{
 			floppy_image_device *floppy;
 			char devname[8];
@@ -82,7 +84,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( slicer_io, AS_IO, 16, slicer_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x007f) AM_DEVREADWRITE8("fdc", fd1797_t, read, write, 0x00ff) //PCS0
+	AM_RANGE(0x0000, 0x007f) AM_DEVREADWRITE8("fdc", fd1797_device, read, write, 0x00ff) //PCS0
 	AM_RANGE(0x0080, 0x00ff) AM_DEVREADWRITE8("sc2681", mc68681_device, read, write, 0x00ff) //PCS1
 	AM_RANGE(0x0100, 0x017f) AM_WRITE8(drive_sel_w, 0x00ff) //PCS2
 	// TODO: 0x180 sets ack
@@ -97,7 +99,7 @@ static SLOT_INTERFACE_START( slicer_floppies )
 	SLOT_INTERFACE("8dsdd", FLOPPY_8_DSDD)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( slicer, slicer_state )
+static MACHINE_CONFIG_START( slicer )
 	MCFG_CPU_ADD("maincpu", I80186, XTAL_16MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(slicer_map)
 	MCFG_CPU_IO_MAP(slicer_io)
@@ -138,6 +140,18 @@ ROM_START( slicer )
 	ROM_REGION(0x8001, "bios", 0)
 	// built from sources, reset.asm adds an extra byte
 	ROM_LOAD("epbios.bin", 0x0000, 0x8001, CRC(96fe9dd4) SHA1(5fc43454fe7d51f2ae97aef822155dcd28eb7f23))
+
+	ROM_REGION(0x10000, "user1", 0)
+	//slicer_h.bin : main slicer board, high byte
+	//slicer_l.bin : main slicer board, low byte
+	//slvid_cg.bin : slicer video/keyboard expansion board, character generator
+	//slvid_e.bin : slicer video/keyboard expansion board, even byte
+	//slvid_o.bin : slicer video/keyboard expansion board, odd byte
+	ROM_LOAD( "slicer_h.bin", 0x000000, 0x004000, CRC(1f9a79b7) SHA1(2070c6818d39fe7ec4370fc2304469793a126731) )
+	ROM_LOAD( "slicer_l.bin", 0x000000, 0x004000, CRC(6feef94b) SHA1(174488591b727a4130166bcb2e83c0e74323d43b) )
+	ROM_LOAD( "slvid_cg.bin", 0x000000, 0x001000, CRC(d4d9ac2f) SHA1(866c760320b224ba8670501ea905de32193acedc) )
+	ROM_LOAD( "slvid_o.bin",  0x000000, 0x001000, CRC(c62dda77) SHA1(1d0b9abc53412b0725072d4c33c478fb5358ab5c) )
+	ROM_LOAD( "slvid_e.bin",  0x000000, 0x001000, CRC(8694274f) SHA1(8373baaea8d689bf52699b587942a57f26baf740) )
 ROM_END
 
-COMP( 1983, slicer, 0, 0, slicer, 0, driver_device, 0, "Slicer Computers", "Slicer", MACHINE_NO_SOUND)
+COMP( 1983, slicer, 0, 0, slicer, 0, slicer_state, 0, "Slicer Computers", "Slicer", MACHINE_NO_SOUND )

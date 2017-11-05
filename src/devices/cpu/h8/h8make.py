@@ -57,7 +57,7 @@ def save_full_one(f, t, name, source):
             print(line, file=f)
             substate += 1
         elif has_eat(line):
-            print("\tif(icount) icount = bcount; inst_substate = %d; return;" % substate, file=f)
+            print("\tif(icount) { icount = bcount; } inst_substate = %d; return;" % substate, file=f)
             substate += 1
         else:
             print(line, file=f)
@@ -77,7 +77,7 @@ def save_partial_one(f, t, name, source):
             print(line, file=f)
             substate += 1
         elif has_eat(line):
-            print("\tif(icount) icount = bcount; inst_substate = %d; return;" % substate, file=f)
+            print("\tif(icount) { icount = bcount; } inst_substate = %d; return;" % substate, file=f)
             print("case %d:;" % substate, file=f)
             substate += 1
         else:

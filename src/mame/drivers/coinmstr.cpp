@@ -127,16 +127,19 @@
 
 ==================================================================================*/
 
-#define MASTER_CLOCK    XTAL_14MHz
-#define CPU_CLOCK      (MASTER_CLOCK/4)
-#define SND_CLOCK      (MASTER_CLOCK/8)
-
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/6821pia.h"
 #include "video/mc6845.h"
 #include "sound/ay8910.h"
 #include "machine/nvram.h"
+#include "screen.h"
+#include "speaker.h"
+
+
+#define MASTER_CLOCK    XTAL_14MHz
+#define CPU_CLOCK      (MASTER_CLOCK/4)
+#define SND_CLOCK      (MASTER_CLOCK/8)
 
 
 class coinmstr_state : public driver_device
@@ -152,12 +155,12 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")  { }
 
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_attr_ram1;
-	required_shared_ptr<UINT8> m_attr_ram2;
-	required_shared_ptr<UINT8> m_attr_ram3;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_attr_ram1;
+	required_shared_ptr<uint8_t> m_attr_ram2;
+	required_shared_ptr<uint8_t> m_attr_ram3;
 	tilemap_t *m_bg_tilemap;
-	UINT8 m_question_adr[4];
+	uint8_t m_question_adr[4];
 	DECLARE_WRITE8_MEMBER(quizmstr_bg_w);
 	DECLARE_WRITE8_MEMBER(quizmstr_attr1_w);
 	DECLARE_WRITE8_MEMBER(quizmstr_attr2_w);
@@ -168,7 +171,7 @@ public:
 	DECLARE_DRIVER_INIT(coinmstr);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void video_start() override;
-	UINT32 screen_update_coinmstr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_coinmstr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -177,7 +180,7 @@ public:
 
 WRITE8_MEMBER(coinmstr_state::quizmstr_bg_w)
 {
-	UINT8 *videoram = m_videoram;
+	uint8_t *videoram = m_videoram;
 	videoram[offset] = data;
 
 	if(offset >= 0x0240)
@@ -185,7 +188,7 @@ WRITE8_MEMBER(coinmstr_state::quizmstr_bg_w)
 }
 
 
-static void coinmstr_set_pal(palette_device &palette, UINT32 paldat, int col)
+static void coinmstr_set_pal(palette_device &palette, uint32_t paldat, int col)
 {
 	col = col *4;
 
@@ -225,10 +228,10 @@ WRITE8_MEMBER(coinmstr_state::quizmstr_attr1_w)
 	if(offset >= 0x0240)
 	{
 		// the later games also use attr3 for something..
-		UINT32  paldata = (m_attr_ram1[offset] & 0x7f) | ((m_attr_ram2[offset] & 0x7f) << 7);
+		uint32_t  paldata = (m_attr_ram1[offset] & 0x7f) | ((m_attr_ram2[offset] & 0x7f) << 7);
 		m_bg_tilemap->mark_tile_dirty(offset - 0x0240);
 
-		coinmstr_set_pal(m_palette, paldata, offset - 0x240);
+		coinmstr_set_pal(*m_palette, paldata, offset - 0x240);
 
 	}
 }
@@ -240,10 +243,10 @@ WRITE8_MEMBER(coinmstr_state::quizmstr_attr2_w)
 	if(offset >= 0x0240)
 	{
 		// the later games also use attr3 for something..
-		UINT32  paldata = (m_attr_ram1[offset] & 0x7f) | ((m_attr_ram2[offset] & 0x7f) << 7);
+		uint32_t  paldata = (m_attr_ram1[offset] & 0x7f) | ((m_attr_ram2[offset] & 0x7f) << 7);
 		m_bg_tilemap->mark_tile_dirty(offset - 0x0240);
 
-		coinmstr_set_pal(m_palette, paldata, offset - 0x240);
+		coinmstr_set_pal(*m_palette, paldata, offset - 0x240);
 
 	}
 }
@@ -261,7 +264,7 @@ WRITE8_MEMBER(coinmstr_state::quizmstr_attr3_w)
 READ8_MEMBER(coinmstr_state::question_r)
 {
 	int address;
-	UINT8 *questions = memregion("user1")->base();
+	uint8_t *questions = memregion("user1")->base();
 
 	switch(m_question_adr[2])
 	{
@@ -1207,7 +1210,7 @@ GFXDECODE_END
 
 TILE_GET_INFO_MEMBER(coinmstr_state::get_bg_tile_info)
 {
-	UINT8 *videoram = m_videoram;
+	uint8_t *videoram = m_videoram;
 	int tile = videoram[tile_index + 0x0240];
 	int color = tile_index;
 
@@ -1221,17 +1224,17 @@ TILE_GET_INFO_MEMBER(coinmstr_state::get_bg_tile_info)
 
 void coinmstr_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(coinmstr_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 46, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(coinmstr_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 46, 32);
 }
 
-UINT32 coinmstr_state::screen_update_coinmstr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t coinmstr_state::screen_update_coinmstr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
 
 
-static MACHINE_CONFIG_START( coinmstr, coinmstr_state )
+static MACHINE_CONFIG_START( coinmstr )
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK) // 7 MHz.
 	MCFG_CPU_PROGRAM_MAP(coinmstr_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", coinmstr_state,  irq0_line_hold)
@@ -1528,9 +1531,9 @@ ROM_END
 
 DRIVER_INIT_MEMBER(coinmstr_state,coinmstr)
 {
-	UINT8 *rom = memregion("user1")->base();
+	uint8_t *rom = memregion("user1")->base();
 	int length = memregion("user1")->bytes();
-	dynamic_buffer buf(length);
+	std::vector<uint8_t> buf(length);
 	int i;
 
 	memcpy(&buf[0],rom,length);
@@ -1547,10 +1550,10 @@ DRIVER_INIT_MEMBER(coinmstr_state,coinmstr)
 *      Game Drivers      *
 *************************/
 
-/*    YEAR  NAME      PARENT    MACHINE   INPUT     STATE           INIT      ROT    COMPANY                  FULLNAME                                   FLAGS   */
+//    YEAR  NAME      PARENT    MACHINE   INPUT     STATE           INIT      ROT   COMPANY                  FULLNAME                                    FLAGS
 GAME( 1985, quizmstr, 0,        quizmstr, quizmstr, coinmstr_state, coinmstr, ROT0, "Loewen Spielautomaten", "Quizmaster (German)",                      MACHINE_UNEMULATED_PROTECTION )
 GAME( 1987, trailblz, 0,        trailblz, trailblz, coinmstr_state, coinmstr, ROT0, "Coinmaster",            "Trail Blazer",                             MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // or Trail Blazer 2 ?
 GAME( 1989, supnudg2, 0,        supnudg2, supnudg2, coinmstr_state, coinmstr, ROT0, "Coinmaster",            "Super Nudger II - P173 (Version 5.21)",    MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
-GAME( 1990, pokeroul, 0,        pokeroul, pokeroul, driver_device,  0,        ROT0, "Coinmaster",            "Poker Roulette (Version 8.22)",            MACHINE_NOT_WORKING )
-GAME( 1985, jpcoin,   0,        jpcoin,   jpcoin,   driver_device,  0,        ROT0, "Coinmaster",            "Joker Poker (Coinmaster set 1)", 0 )
-GAME( 1990, jpcoin2,  0,        jpcoin,   jpcoin,   driver_device,  0,        ROT0, "Coinmaster",            "Joker Poker (Coinmaster, Amusement Only)", 0 )
+GAME( 1990, pokeroul, 0,        pokeroul, pokeroul, coinmstr_state, 0,        ROT0, "Coinmaster",            "Poker Roulette (Version 8.22)",            MACHINE_NOT_WORKING )
+GAME( 1985, jpcoin,   0,        jpcoin,   jpcoin,   coinmstr_state, 0,        ROT0, "Coinmaster",            "Joker Poker (Coinmaster set 1)",           0 )
+GAME( 1990, jpcoin2,  0,        jpcoin,   jpcoin,   coinmstr_state, 0,        ROT0, "Coinmaster",            "Joker Poker (Coinmaster, Amusement Only)", 0 )

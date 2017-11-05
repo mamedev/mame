@@ -101,7 +101,7 @@ static const unsigned short ti85_palette[32][7] =
 
 PALETTE_INIT_MEMBER(ti85_state, ti85)
 {
-	UINT8 i, j, r, g, b;
+	uint8_t i, j, r, g, b;
 
 	for ( i = 0; i < 224; i++ )
 	{
@@ -140,14 +140,14 @@ PALETTE_INIT_MEMBER(ti85_state, ti85)
 		return;
 	}
 
-	m_frames = make_unique_clear<UINT8[]>(m_ti_number_of_frames*m_ti_video_memory_size);
+	m_frames = make_unique_clear<uint8_t[]>(m_ti_number_of_frames*m_ti_video_memory_size);
 }
 
 void ti85_state::video_start()
 {
 }
 
-UINT32 ti85_state::screen_update_ti85(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t ti85_state::screen_update_ti85(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	int x,y,b;
@@ -165,7 +165,7 @@ UINT32 ti85_state::screen_update_ti85(screen_device &screen, bitmap_ind16 &bitma
 
 	lcdmem =  ((m_LCD_memory_base & 0x3F) + 0xc0) << 0x08;
 
-	memcpy (m_frames.get(), m_frames.get()+m_ti_video_memory_size, sizeof (UINT8) * (m_ti_number_of_frames-1) * m_ti_video_memory_size);
+	memcpy (m_frames.get(), m_frames.get()+m_ti_video_memory_size, sizeof (uint8_t) * (m_ti_number_of_frames-1) * m_ti_video_memory_size);
 
 		for (y=0; y<m_ti_screen_y_size; y++)
 		for (x=0; x<m_ti_screen_x_size; x++)

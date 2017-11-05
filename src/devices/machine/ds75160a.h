@@ -19,12 +19,11 @@
 
 **********************************************************************/
 
+#ifndef MAME_MACHINE_DS75160A_H
+#define MAME_MACHINE_DS75160A_H
+
 #pragma once
 
-#ifndef __DS75160A__
-#define __DS75160A__
-
-#include "emu.h"
 
 
 
@@ -48,11 +47,11 @@ class ds75160a_device : public device_t
 {
 public:
 	// construction/destruction
-	ds75160a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ds75160a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _read, class _write> void set_callbacks(_read rd, _write wr) {
-		m_read.set_callback(rd);
-		m_write.set_callback(wr);
+	template <class Read, class Write> void set_callbacks(Read &&rd, Write &&wr) {
+		m_read.set_callback(std::forward<Read>(rd));
+		m_write.set_callback(std::forward<Write>(wr));
 	}
 
 	DECLARE_READ8_MEMBER( read );
@@ -69,7 +68,7 @@ private:
 	devcb_read8  m_read;
 	devcb_write8 m_write;
 
-	UINT8 m_data;
+	uint8_t m_data;
 
 	int m_te;
 	int m_pe;
@@ -77,8 +76,6 @@ private:
 
 
 // device type definition
-extern const device_type DS75160A;
+DECLARE_DEVICE_TYPE(DS75160A, ds75160a_device)
 
-
-
-#endif
+#endif // MAME_MACHINE_DS75160A_H

@@ -33,10 +33,10 @@ PALETTE_INIT_MEMBER(truco_state, truco)
 	}
 }
 
-UINT32 truco_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t truco_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 *videoram = m_videoram;
-	UINT8       *vid = videoram;
+	uint8_t *videoram = m_videoram;
+	uint8_t       *vid = videoram;
 	int x, y;
 
 	for( y = 0; y < 192; y++ )

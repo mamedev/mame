@@ -1,9 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Nathan Woods
-#ifndef _DWSOCK_H_
-#define _DWSOCK_H_
+#ifndef MAME_BUS_COCO_COCO_DWSOCKH_H
+#define MAME_BUS_COCO_COCO_DWSOCKH_H
 
-#include "emu.h"
 #include "osdcore.h"
 
 //**************************************************************************
@@ -25,7 +24,7 @@
 class beckerport_device : public device_t
 {
 public:
-	beckerport_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	beckerport_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~beckerport_device();
 
 	// optional information overrides
@@ -65,9 +64,9 @@ private:
 };
 
 // device type definition
-extern const device_type COCO_DWSOCK;
+DECLARE_DEVICE_TYPE(COCO_DWSOCK, beckerport_device)
 
 // device iterator
-typedef device_type_iterator<&device_creator<beckerport_device>, beckerport_device> beckerport_device_iterator;
+typedef device_type_iterator<beckerport_device> beckerport_device_iterator;
 
-#endif /* _DWSOCK_H_ */
+#endif // MAME_BUS_COCO_COCO_DWSOCKH_H

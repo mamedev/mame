@@ -5,6 +5,7 @@
  *   Xerox AltoII ethernet task
  *
  *****************************************************************************/
+#include "emu.h"
 #include "alto2cpu.h"
 #include "a2roms.h"
 
@@ -58,7 +59,7 @@ static const prom_load_t pl_enet_a41 =
 	/* shift */ 0,
 	/* dmap */  DMAP_DEFAULT,
 	/* dand */  ZERO,
-	/* type */  sizeof(UINT8)
+	/* type */  sizeof(uint8_t)
 };
 
 static const prom_load_t pl_enet_a42 =
@@ -75,7 +76,7 @@ static const prom_load_t pl_enet_a42 =
 	/* shift */ 0,
 	/* dmap */  DMAP_DEFAULT,
 	/* dand */  ZERO,
-	/* type */  sizeof(UINT8)
+	/* type */  sizeof(uint8_t)
 };
 
 /**
@@ -117,7 +118,7 @@ static const prom_load_t pl_enet_a49 =
 	/* shift */ 0,
 	/* dmap */  DMAP_DEFAULT,
 	/* dand */  ZERO,
-	/* type */  sizeof(UINT8)
+	/* type */  sizeof(uint8_t)
 };
 
 #define GET_ETH_WLF(st)         X_BIT(st,16,4)              //!< hardware status: write latch full/filled (? set by EODFCT)
@@ -164,7 +165,7 @@ static const prom_load_t pl_enet_a49 =
 #define BREATHLEN   ALTO2_ETHER_PACKET_SIZE //!< ethernet packet length
 #define BREATHADDR  (0377<<8)               //!< destination (0377) and source (0000)
 #define BREATHTYPE  0602                    //!< ethernet packet type
-static const UINT16 breath_of_life_data[BREATHLEN] =
+static const uint16_t breath_of_life_data[BREATHLEN] =
 {
 	BREATHADDR,     /* 3MB destination and source */
 	BREATHTYPE,     /* ether packet type  */
@@ -207,7 +208,7 @@ static const UINT16 breath_of_life_data[BREATHLEN] =
 };
 
 #if DEBUG_PACKETS
-static void dump_ascii(device_t *device, const UINT16 *src, size_t size)
+static void dump_ascii(device_t *device, const uint16_t *src, size_t size)
 {
 	device->logerror(" [");
 	for (size_t offs = 0; offs < size; offs++) {
@@ -219,11 +220,11 @@ static void dump_ascii(device_t *device, const UINT16 *src, size_t size)
 	device->logerror("]\n");
 }
 
-static void dump_packet(device_t *device, const char* name, const UINT16 *src, size_t addr, size_t size)
+static void dump_packet(device_t *device, const char* name, const uint16_t *src, size_t addr, size_t size)
 {
 	size_t offs;
 	for (offs = 0; offs < size; offs++) {
-		UINT16 word = src[offs];
+		uint16_t word = src[offs];
 		if (offs % 8) {
 			device->logerror(" %06o", word);
 		} else {
@@ -247,7 +248,7 @@ void alto2_cpu_device::eth_wakeup()
 {
 	int st = m_eth.status;
 	LOG((this,LOG_ETH,0,"IBUSY=%d OBUSY=%d ", GET_ETH_IBUSY(st), GET_ETH_OBUSY(st)));
-	UINT8 busy = GET_ETH_IBUSY(st) | GET_ETH_OBUSY(st);
+	uint8_t busy = GET_ETH_IBUSY(st) | GET_ETH_OBUSY(st);
 	if (0 == busy) {
 		// if not busy, reset the FIFO read and write counters
 		m_eth.fifo_rd = 0;
@@ -312,11 +313,11 @@ void alto2_cpu_device::eth_wakeup()
 	 *
 	 ************************************************************
 	 */
-	UINT8 a49 = m_ether_a49[16 * m_eth.fifo_wr + m_eth.fifo_rd];
-	UINT8 ETAC = m_task == task_ether ? 0 : 1;
-	UINT8 i1 = ~(BNE(a49) & ETAC);
-	UINT8 i2 = ~(~BNNE(a49) & i1);
-	UINT8 IDR = ~(GET_ETH_IBUSY(st) & i2);
+	uint8_t a49 = m_ether_a49[16 * m_eth.fifo_wr + m_eth.fifo_rd];
+	uint8_t ETAC = m_task == task_ether ? 0 : 1;
+	uint8_t i1 = ~(BNE(a49) & ETAC);
+	uint8_t i2 = ~(~BNNE(a49) & i1);
+	uint8_t IDR = ~(GET_ETH_IBUSY(st) & i2);
 	if (0 == IDR) {
 		m_task_wakeup |= 1 << task_ether;
 		LOG((this,LOG_ETH,0,"IDR (input data ready)\n"));
@@ -346,8 +347,8 @@ void alto2_cpu_device::eth_wakeup()
 	 *
 	 ************************************************************
 	 */
-	UINT8 o1 = ~(~GET_ETH_WLF(st) & BF(a49));
-	UINT8 ODR = ~(GET_ETH_OBUSY(st) & ~GET_ETH_OEOT(st) & o1);
+	uint8_t o1 = ~(~GET_ETH_WLF(st) & BF(a49));
+	uint8_t ODR = ~(GET_ETH_OBUSY(st) & ~GET_ETH_OEOT(st) & o1);
 	if (0 == ODR) {
 		m_task_wakeup |= 1 << task_ether;
 		LOG((this,LOG_ETH,0,"ODR (output data ready)\n"));
@@ -467,9 +468,9 @@ void alto2_cpu_device::eth_wakeup()
  * @param data 16 bit data
  * @return new CRC value after 16 bits
  */
-UINT32 f9401_7(UINT32 crc, UINT32 data)
+uint32_t f9401_7(uint32_t crc, uint32_t data)
 {
-	static const UINT32 XOR = (1 << 10) | (1 << 3) | (1 << 0);
+	static const uint32_t XOR = (1 << 10) | (1 << 3) | (1 << 0);
 	crc ^= data;
 	for (int i = 0; i < 16; i++)
 		crc = (crc >> 1) ^ ((crc & 1) ? XOR : 0);
@@ -482,9 +483,9 @@ UINT32 f9401_7(UINT32 crc, UINT32 data)
  * This is probably lacking the updates to one or more of
  * the status flip flops.
  */
-void alto2_cpu_device::rx_breath_of_life(void* ptr, INT32 arg)
+void alto2_cpu_device::rx_breath_of_life(void* ptr, int32_t arg)
 {
-	UINT32 data;
+	uint32_t data;
 
 	if (arg == 0) {
 		// on the first word set the IBUSY flip flop
@@ -506,7 +507,7 @@ void alto2_cpu_device::rx_breath_of_life(void* ptr, INT32 arg)
 
 	PUT_ETH_IT(m_eth.status, 1);    // set IT (input shift register full ...)?
 
-	UINT8 a49 = m_ether_a49[16 * m_eth.fifo_wr + m_eth.fifo_rd];
+	uint8_t a49 = m_ether_a49[16 * m_eth.fifo_wr + m_eth.fifo_rd];
 	if (0 == BF(a49))
 		PUT_ETH_IDL(m_eth.status, 1);   // fifo is overrun: set input data late flip flop
 
@@ -532,9 +533,9 @@ void alto2_cpu_device::rx_breath_of_life(void* ptr, INT32 arg)
  * @param ptr unused pointer
  * @param arg word count if >= 0, -1 if CRC is to be transmitted (last word)
  */
-void alto2_cpu_device::tx_packet(void* ptr, INT32 arg)
+void alto2_cpu_device::tx_packet(void* ptr, int32_t arg)
 {
-	UINT32 data;
+	uint32_t data;
 
 	// the last word sent is the CRC
 	if (-1 == arg) {
@@ -551,7 +552,7 @@ void alto2_cpu_device::tx_packet(void* ptr, INT32 arg)
 	m_eth.tx_crc = f9401_7(m_eth.tx_crc, data);
 	m_eth.fifo_rd = (m_eth.fifo_rd + 1) % ALTO2_ETHER_FIFO_SIZE;
 
-	UINT8 a49 = m_ether_a49[16 * m_eth.fifo_wr + m_eth.fifo_rd];
+	uint8_t a49 = m_ether_a49[16 * m_eth.fifo_wr + m_eth.fifo_rd];
 	if (0 == BE(a49)) {
 		// the FIFO is empty now: clear the OBUSY and WLF flip flops
 		PUT_ETH_OBUSY(m_eth.status, 0);
@@ -590,7 +591,7 @@ void alto2_cpu_device::eth_startf()
  */
 void alto2_cpu_device::bs_early_eidfct()
 {
-	UINT16 r = m_eth.fifo[m_eth.fifo_rd];
+	uint16_t r = m_eth.fifo[m_eth.fifo_rd];
 	LOG((this,LOG_ETH,3, "   <-EIDFCT; pull %06o from FIFO[%02o]\n", r, m_eth.fifo_rd));
 	m_eth.fifo_rd = (m_eth.fifo_rd + 1) % ALTO2_ETHER_FIFO_SIZE;
 	m_bus &= r;
@@ -624,7 +625,7 @@ void alto2_cpu_device::f1_early_eth_block()
  */
 void alto2_cpu_device::f1_early_eilfct()
 {
-	UINT16 r = m_eth.fifo[m_eth.fifo_rd];
+	uint16_t r = m_eth.fifo[m_eth.fifo_rd];
 	LOG((this,LOG_ETH,3, "   <-EILFCT; %06o at FIFO[%02o]\n", r, m_eth.fifo_rd));
 	m_bus &= r;
 }
@@ -645,8 +646,8 @@ void alto2_cpu_device::f1_early_eilfct()
  */
 void alto2_cpu_device::f1_early_epfct()
 {
-	UINT16 r = 0177777;
-	UINT16 st = m_eth.status;
+	uint16_t r = 0177777;
+	uint16_t st = m_eth.status;
 	m_eth.status = 0;
 	m_eth.tx_count = 0;
 
@@ -718,7 +719,7 @@ void alto2_cpu_device::f2_late_eodfct()
 	PUT_ETH_OBUSY(m_eth.status, 1);         // set OBUSY (output busy)
 	eth_wakeup();
 	// if the FIFO is full, stop wakeup and kick off the timer
-	UINT8 a49 = m_ether_a49[16 * m_eth.fifo_wr + m_eth.fifo_rd];
+	uint8_t a49 = m_ether_a49[16 * m_eth.fifo_wr + m_eth.fifo_rd];
 	if (0 == BF(a49)) {
 		m_task_wakeup &= ~(1 << task_ether);
 		m_eth.tx_timer->adjust(attotime::from_usec(5.44), 0);
@@ -753,7 +754,7 @@ void alto2_cpu_device::f2_late_eosfct()
  */
 void alto2_cpu_device::f2_late_erbfct()
 {
-	UINT16 r = 0;
+	uint16_t r = 0;
 	X_WRBITS(r,10,6,6,GET_ETH_ICMD(m_eth.status));
 	X_WRBITS(r,10,7,7,GET_ETH_OCMD(m_eth.status));
 	LOG((this,LOG_ETH,3, "   ERBFCT; NEXT[6-7] = ICMD,OCMD (%#o | %#o)\n", m_next2, r));
@@ -789,7 +790,7 @@ void alto2_cpu_device::f2_late_eefct()
  */
 void alto2_cpu_device::f2_late_ebfct()
 {
-	UINT16 r = 0;
+	uint16_t r = 0;
 	X_WRBITS(r,10,6,6, GET_ETH_COLL(m_eth.status));
 	X_WRBITS(r,10,7,7,
 				GET_ETH_IDL(m_eth.status) |
@@ -809,8 +810,8 @@ void alto2_cpu_device::f2_late_ebfct()
  */
 void alto2_cpu_device::f2_late_ecbfct()
 {
-	UINT16 r = 0;
-	UINT8 a49 = m_ether_a49[16 * m_eth.fifo_wr + m_eth.fifo_rd];
+	uint16_t r = 0;
+	uint8_t a49 = m_ether_a49[16 * m_eth.fifo_wr + m_eth.fifo_rd];
 	X_WRBITS(r,10,7,7,~BE(a49));
 	LOG((this,LOG_ETH,3, "   ECBFCT; NEXT[7] = FIFO %sempty (%#o | %#o)\n", r ? "not " : "is ", m_next2, r));
 	m_next2 |= r;
@@ -846,7 +847,7 @@ void alto2_cpu_device::activate_eth()
  */
 void alto2_cpu_device::update_sysclk(int sysclk)
 {
-	UINT8 s0, s1;
+	uint8_t s0, s1;
 
 	/*
 	 * JK flip-flop 35a (SIO' and SYSCLK clocked)
@@ -863,7 +864,7 @@ void alto2_cpu_device::update_sysclk(int sysclk)
 	 * Q'   OCMD'
 	 */
 	s0 = m_eth.ff_35a;
-	s1 = (m_d_f1 == f1_emu_startf && sysclk) ? JKFF_CLK : JKFF_0;
+	s1 = (f1() == f1_emu_startf && sysclk) ? JKFF_CLK : JKFF_0;
 	if (X_BIT(m_bus,16,15))
 		s1 |= JKFF_J;
 	s1 |= JKFF_K;
@@ -885,7 +886,7 @@ void alto2_cpu_device::update_sysclk(int sysclk)
 	 * Q'   ICMD'
 	 */
 	s0 = m_eth.ff_35b;
-	s1 = (m_d_f1 == f1_emu_startf && sysclk) ? JKFF_CLK : JKFF_0;
+	s1 = (f1() == f1_emu_startf && sysclk) ? JKFF_CLK : JKFF_0;
 	if (X_BIT(m_bus,16,14))
 		s1 |= JKFF_J;
 	s1 |= JKFF_K;
@@ -905,7 +906,7 @@ void alto2_cpu_device::update_sysclk(int sysclk)
 	 */
 	s0 = m_eth.ff_10a;
 	s1 = sysclk ? JKFF_CLK : JKFF_0;
-	if (m_d_f2 != f2_ether_eisfct)
+	if (f2() != f2_ether_eisfct)
 		s1 |= JKFF_K;
 	s1 |= JKFF_C;
 	m_eth.ff_10a = update_jkff(s0, s1, "10a IBUSY    ");
@@ -926,20 +927,20 @@ void alto2_cpu_device::update_sysclk(int sysclk)
 	 * 3Y   RR
 	 * 4Y   WLL'
 	 */
-	UINT8 WLLOAD;
-	UINT8 RDCNT0;
-	UINT8 RR;
-	UINT8 WLL0;
+	uint8_t WLLOAD;
+	uint8_t RDCNT0;
+	uint8_t RR;
+	uint8_t WLL0;
 	if (m_eth.ff_10a & JKFF_Q) {
-		WLLOAD = ~(sysclk & (m_d_f2 == f2_ether_eodfct)) & 1;
+		WLLOAD = ~(sysclk & (f2() == f2_ether_eodfct)) & 1;
 		RDCNT0 = m_eth.ff_52b & JKFF_Q ? 1 : 0;
 		RR     = m_eth.ff_52b & JKFF_Q0 ? 1 : 0;
-		WLL0   = ~(sysclk & (m_d_f2 == f2_ether_eodfct)) & 1;
+		WLL0   = ~(sysclk & (f2() == f2_ether_eodfct)) & 1;
 	} else {
 		// ISRFULL
 		WLLOAD = (m_eth.serin >> 1) & 1;
-		RDCNT0 = ~(sysclk & (m_d_bs == bs_ether_eidfct)) & 1;
-		RR     = m_d_bs == bs_ether_eidfct || m_d_f1 == f1_ether_eilfct;
+		RDCNT0 = ~(sysclk & (bs() == bs_ether_eidfct)) & 1;
+		RR     = bs() == bs_ether_eidfct || f1() == f1_ether_eilfct;
 		WLL0   = m_eth.ff_77b & JKFF_Q0 ? 1 : 0;
 	}
 	// TODO: use the signals
@@ -960,7 +961,7 @@ void alto2_cpu_device::update_sysclk(int sysclk)
 	 */
 	s0 = m_eth.ff_10b;
 	s1 = sysclk ? JKFF_CLK : JKFF_0;
-	if (m_d_f2 != f2_ether_eosfct)
+	if (f2() != f2_ether_eosfct)
 		s1 |= JKFF_K;
 	m_eth.ff_10b = update_jkff(s0, s1, "10b OBUSY    ");
 
@@ -1167,7 +1168,7 @@ void alto2_cpu_device::update_sysclk(int sysclk)
  */
 void alto2_cpu_device::update_rclk(int rclk)
 {
-	UINT8 s0, s1;
+	uint8_t s0, s1;
 
 	/*
 	 * JK flip-flop 70a IMID (Sheet 14)
@@ -1221,7 +1222,7 @@ void alto2_cpu_device::update_rclk(int rclk)
  */
 void alto2_cpu_device::update_tclk(int tclk)
 {
-	UINT8 s0, s1;
+	uint8_t s0, s1;
 
 	/*
 	 * JK flip-flop 52b OSLOAD (Sheet 17)
@@ -1321,25 +1322,8 @@ void alto2_cpu_device::init_ether(int task)
 	m_ether_a42 = prom_load(machine(), &pl_enet_a42, memregion("ether_a42")->base());
 	m_ether_a49 = prom_load(machine(), &pl_enet_a49, memregion("ether_a49")->base());
 
-	set_bs(task, bs_ether_eidfct,   &alto2_cpu_device::bs_early_eidfct, 0);
-
-	set_f1(task, f1_block,          &alto2_cpu_device::f1_early_eth_block, 0);
-	set_f1(task, f1_ether_eilfct,   &alto2_cpu_device::f1_early_eilfct, 0);
-	set_f1(task, f1_ether_epfct,    &alto2_cpu_device::f1_early_epfct, 0);
-	set_f1(task, f1_ether_ewfct,    0, &alto2_cpu_device::f1_late_ewfct);
-
-	set_f2(task, f2_ether_eodfct,   0, &alto2_cpu_device::f2_late_eodfct);
-	set_f2(task, f2_ether_eosfct,   0, &alto2_cpu_device::f2_late_eosfct);
-	set_f2(task, f2_ether_erbfct,   0, &alto2_cpu_device::f2_late_erbfct);
-	set_f2(task, f2_ether_eefct,    0, &alto2_cpu_device::f2_late_eefct);
-	set_f2(task, f2_ether_ebfct,    0, &alto2_cpu_device::f2_late_ebfct);
-	set_f2(task, f2_ether_ecbfct,   0, &alto2_cpu_device::f2_late_ecbfct);
-	set_f2(task, f2_ether_eisfct,   0, &alto2_cpu_device::f2_late_eisfct);
-
-	m_active_callback[task] = &alto2_cpu_device::activate_eth;
-
-	m_eth.rx_packet = std::make_unique<UINT16[]>(sizeof(UINT16)*ALTO2_ETHER_PACKET_SIZE);
-	m_eth.tx_packet = std::make_unique<UINT16[]>(sizeof(UINT16)*ALTO2_ETHER_PACKET_SIZE);
+	m_eth.rx_packet = std::make_unique<uint16_t[]>(sizeof(uint16_t)*ALTO2_ETHER_PACKET_SIZE);
+	m_eth.tx_packet = std::make_unique<uint16_t[]>(sizeof(uint16_t)*ALTO2_ETHER_PACKET_SIZE);
 
 	m_eth.tx_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(alto2_cpu_device::tx_packet),this));
 	m_eth.tx_timer->reset();

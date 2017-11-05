@@ -53,7 +53,6 @@ static const float Epsilon = 1.0e-7f;
 
 uniform float2 ScreenDims;
 uniform float2 TargetDims;
-uniform float2 QuadDims;
 
 VS_OUTPUT vs_screen_main(VS_INPUT Input)
 {

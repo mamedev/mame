@@ -81,6 +81,9 @@ ________________________|___________________________
 #include "machine/i8255.h"
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 #define MASTER_CLOCK    XTAL_16MHz
 #define VIDEO_CLOCK     XTAL_6MHz
@@ -109,16 +112,16 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	required_device<hd6845_device> m_crtc;
 
-	required_shared_ptr<UINT8> m_fbram;
-	required_shared_ptr<UINT8> m_vram;
-	required_shared_ptr<UINT8> m_cram;
+	required_shared_ptr<uint8_t> m_fbram;
+	required_shared_ptr<uint8_t> m_vram;
+	required_shared_ptr<uint8_t> m_cram;
 
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	UINT8 m_soundlatch;
-	UINT8 m_bank;
-	UINT8 m_layer;
+	uint8_t m_soundlatch;
+	uint8_t m_bank;
+	uint8_t m_layer;
 
 	DECLARE_WRITE8_MEMBER(flipjack_sound_nmi_ack_w);
 	DECLARE_WRITE8_MEMBER(flipjack_soundlatch_w);
@@ -129,7 +132,7 @@ public:
 	DECLARE_WRITE8_MEMBER(flipjack_portc_w);
 	virtual void machine_start() override;
 	DECLARE_PALETTE_INIT(flipjack);
-	UINT32 screen_update_flipjack(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_flipjack(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -142,7 +145,7 @@ public:
 PALETTE_INIT_MEMBER(flipjack_state, flipjack)
 {
 	// from prom
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	for (int i = 0; i < 0x40; i++)
 	{
 		palette.set_pen_color(2*i+1, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
@@ -155,7 +158,7 @@ PALETTE_INIT_MEMBER(flipjack_state, flipjack)
 }
 
 
-UINT32 flipjack_state::screen_update_flipjack(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t flipjack_state::screen_update_flipjack(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int x,y,count;
 
@@ -164,7 +167,7 @@ UINT32 flipjack_state::screen_update_flipjack(screen_device &screen, bitmap_rgb3
 	// draw playfield
 	if (m_layer & 2)
 	{
-		const UINT8 *blit_data = memregion("gfx2")->base();
+		const uint8_t *blit_data = memregion("gfx2")->base();
 
 		count = 0;
 
@@ -172,7 +175,7 @@ UINT32 flipjack_state::screen_update_flipjack(screen_device &screen, bitmap_rgb3
 		{
 			for(x=0;x<256;x+=8)
 			{
-				UINT32 pen_r,pen_g,pen_b,color;
+				uint32_t pen_r,pen_g,pen_b,color;
 				int xi;
 
 				pen_r = (blit_data[count] & 0xff)>>0;
@@ -217,7 +220,7 @@ UINT32 flipjack_state::screen_update_flipjack(screen_device &screen, bitmap_rgb3
 		{
 			for(x=0;x<256;x+=8)
 			{
-				UINT32 pen,color;
+				uint32_t pen,color;
 				int xi;
 
 				pen = (m_fbram[count] & 0xff)>>0;
@@ -422,7 +425,7 @@ GFXDECODE_END
 
 void flipjack_state::machine_start()
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 2, &ROM[0x10000], 0x2000);
 	membank("bank1")->set_entry(0);
 
@@ -432,7 +435,7 @@ void flipjack_state::machine_start()
 }
 
 
-static MACHINE_CONFIG_START( flipjack, flipjack_state )
+static MACHINE_CONFIG_START( flipjack )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/4)
@@ -500,4 +503,4 @@ ROM_START( flipjack )
 ROM_END
 
 
-GAME( 1983?, flipjack,   0,      flipjack, flipjack, driver_device, 0, ROT90, "Jackson Co., Ltd.", "Flipper Jack", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // copyright not shown, datecodes on pcb suggests mid-1983
+GAME( 1983?, flipjack,   0,      flipjack, flipjack, flipjack_state, 0, ROT90, "Jackson Co., Ltd.", "Flipper Jack", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // copyright not shown, datecodes on pcb suggests mid-1983

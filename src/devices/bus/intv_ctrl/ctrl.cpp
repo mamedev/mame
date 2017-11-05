@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "ctrl.h"
 // slot devices
 #include "handctrl.h"
@@ -15,7 +16,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type INTV_CONTROL_PORT = &device_creator<intv_control_port_device>;
+DEFINE_DEVICE_TYPE(INTV_CONTROL_PORT, intv_control_port_device, "intv_control_port", "Mattel Intellivision control port")
 
 
 //**************************************************************************
@@ -50,9 +51,10 @@ device_intv_control_port_interface::~device_intv_control_port_interface()
 //  intv_control_port_device - constructor
 //-------------------------------------------------
 
-intv_control_port_device::intv_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-						device_t(mconfig, INTV_CONTROL_PORT, "Mattel Intellivision control port", tag, owner, clock, "intv_control_port", __FILE__),
-						device_slot_interface(mconfig, *this), m_device(nullptr)
+intv_control_port_device::intv_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, INTV_CONTROL_PORT, tag, owner, clock),
+	device_slot_interface(mconfig, *this),
+	m_device(nullptr)
 {
 }
 
@@ -76,9 +78,9 @@ void intv_control_port_device::device_start()
 }
 
 
-UINT8 intv_control_port_device::read_ctrl()
+uint8_t intv_control_port_device::read_ctrl()
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 	if (m_device)
 		data |= m_device->read_ctrl();
 	return data;

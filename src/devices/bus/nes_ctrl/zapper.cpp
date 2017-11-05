@@ -6,13 +6,14 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "zapper.h"
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type NES_ZAPPER = &device_creator<nes_zapper_device>;
+DEFINE_DEVICE_TYPE(NES_ZAPPER, nes_zapper_device, "nes_zapper", "Nintendo Zapper Lightgun")
 
 
 static INPUT_PORTS_START( nes_zapper )
@@ -44,12 +45,12 @@ ioport_constructor nes_zapper_device::device_input_ports() const
 //  nes_zapper_device - constructor
 //-------------------------------------------------
 
-nes_zapper_device::nes_zapper_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-					device_t(mconfig, NES_ZAPPER, "Nintendo Zapper Lightgun", tag, owner, clock, "nes_zapper", __FILE__),
-					device_nes_control_port_interface(mconfig, *this),
-					m_lightx(*this, "ZAPPER_X"),
-					m_lighty(*this, "ZAPPER_Y"),
-					m_trigger(*this, "ZAPPER_T")
+nes_zapper_device::nes_zapper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, NES_ZAPPER, tag, owner, clock),
+	device_nes_control_port_interface(mconfig, *this),
+	m_lightx(*this, "ZAPPER_X"),
+	m_lighty(*this, "ZAPPER_Y"),
+	m_trigger(*this, "ZAPPER_T")
 {
 }
 
@@ -76,9 +77,9 @@ void nes_zapper_device::device_reset()
 //  read
 //-------------------------------------------------
 
-UINT8 nes_zapper_device::read_bit34()
+uint8_t nes_zapper_device::read_bit34()
 {
-	UINT8 ret = m_trigger->read();
+	uint8_t ret = m_trigger->read();
 	if (!m_port->m_brightpixel_cb.isnull() &&
 		m_port->m_brightpixel_cb(m_lightx->read(), m_lighty->read()))
 		ret &= ~0x08; // sprite hit
@@ -87,9 +88,9 @@ UINT8 nes_zapper_device::read_bit34()
 	return ret;
 }
 
-UINT8 nes_zapper_device::read_exp(offs_t offset)
+uint8_t nes_zapper_device::read_exp(offs_t offset)
 {
-	UINT8 ret = 0;
+	uint8_t ret = 0;
 	if (offset == 1)    // $4017
 		ret |= nes_zapper_device::read_bit34();
 	return ret;

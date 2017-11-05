@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
 #include "emu.h"
+#include "screen.h"
 
 
 //**************************************************************************
@@ -14,9 +15,9 @@ public:
 	c64dtv_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 	{
-		bitmap.fill(rgb_t::black);
+		bitmap.fill(rgb_t::black(), cliprect);
 		return 0;
 	}
 };
@@ -36,7 +37,7 @@ INPUT_PORTS_END
 //  MACHINE DRIVERS
 //**************************************************************************
 
-static MACHINE_CONFIG_START( c64dtv, c64dtv_state )
+static MACHINE_CONFIG_START( c64dtv )
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_UPDATE_DRIVER(c64dtv_state, screen_update)
@@ -65,4 +66,4 @@ ROM_END
 //  GAME DRIVERS
 //**************************************************************************
 
-CONS( 2005, c64dtv,  0,  0,    c64dtv,     c64dtv, driver_device,     0,     "The Toy:Lobster Company", "Commodore 64 Direct-to-TV (Version 2 050711) (PAL)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+CONS( 2005, c64dtv,  0,  0,    c64dtv,     c64dtv, c64dtv_state,     0,     "The Toy:Lobster Company", "Commodore 64 Direct-to-TV (Version 2 050711) (PAL)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

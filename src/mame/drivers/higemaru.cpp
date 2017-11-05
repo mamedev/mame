@@ -13,9 +13,12 @@ Use Player 1 joystick and button, then press START1 to go to next screen.
 ****************************************************************************/
 
 #include "emu.h"
+#include "includes/higemaru.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
-#include "includes/higemaru.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 TIMER_DEVICE_CALLBACK_MEMBER(higemaru_state::higemaru_scanline)
@@ -159,7 +162,7 @@ static GFXDECODE_START( higemaru )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( higemaru, higemaru_state )
+static MACHINE_CONFIG_START( higemaru )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/4)  /* 3 MHz Sharp LH0080A Z80A-CPU-D */
@@ -220,4 +223,4 @@ ROM_START( higemaru )
 ROM_END
 
 
-GAME( 1984, higemaru, 0, higemaru, higemaru, driver_device, 0, ROT0, "Capcom", "Pirate Ship Higemaru", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, higemaru, 0, higemaru, higemaru, higemaru_state, 0, ROT0, "Capcom", "Pirate Ship Higemaru", MACHINE_SUPPORTS_SAVE )

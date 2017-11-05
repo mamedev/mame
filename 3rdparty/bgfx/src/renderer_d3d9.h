@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2016 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
@@ -144,7 +144,7 @@ namespace bgfx { namespace d3d9
 				, _discard || (m_dynamic && 0 == _offset && m_size == _size) ? D3DLOCK_DISCARD : 0
 				) );
 
-			memcpy(buffer, _data, _size);
+			bx::memCopy(buffer, _data, _size);
 
 			DX_CHECK(m_ptr->Unlock() );
 		}
@@ -185,7 +185,7 @@ namespace bgfx { namespace d3d9
 				, _discard || (m_dynamic && 0 == _offset && m_size == _size) ? D3DLOCK_DISCARD : 0
 				) );
 
-			memcpy(buffer, _data, _size);
+			bx::memCopy(buffer, _data, _size);
 
 			DX_CHECK(m_ptr->Unlock() );
 		}
@@ -276,8 +276,8 @@ namespace bgfx { namespace d3d9
 			BX_CHECK(NULL != _fsh.m_pixelShader, "Fragment shader doesn't exist.");
 			m_fsh = &_fsh;
 
-			memcpy(&m_predefined[0], _vsh.m_predefined, _vsh.m_numPredefined*sizeof(PredefinedUniform) );
-			memcpy(&m_predefined[_vsh.m_numPredefined], _fsh.m_predefined, _fsh.m_numPredefined*sizeof(PredefinedUniform) );
+			bx::memCopy(&m_predefined[0], _vsh.m_predefined, _vsh.m_numPredefined*sizeof(PredefinedUniform) );
+			bx::memCopy(&m_predefined[_vsh.m_numPredefined], _fsh.m_predefined, _fsh.m_numPredefined*sizeof(PredefinedUniform) );
 			m_numPredefined = _vsh.m_numPredefined + _fsh.m_numPredefined;
 		}
 
@@ -323,11 +323,21 @@ namespace bgfx { namespace d3d9
 
 		void create(const Memory* _mem, uint32_t _flags, uint8_t _skip);
 
-		void destroy()
+		void destroy(bool _resize = false)
 		{
 			if (0 == (m_flags & BGFX_TEXTURE_INTERNAL_SHARED) )
 			{
-				DX_RELEASE(m_ptr, 0);
+				if (_resize)
+				{
+					// BK - at the time of resize there might be one reference held by frame buffer
+					//      surface. This frame buffer will be recreated later, and release reference
+					//      to existing surface. That's why here we don't care about ref count.
+					m_ptr->Release();
+				}
+				else
+				{
+					DX_RELEASE(m_ptr, 0);
+				}
 			}
 			DX_RELEASE(m_surface, 0);
 			DX_RELEASE(m_staging, 0);
@@ -383,10 +393,11 @@ namespace bgfx { namespace d3d9
 		FrameBufferD3D9()
 			: m_hwnd(NULL)
 			, m_denseIdx(UINT16_MAX)
-			, m_needResolve(0)
 			, m_num(0)
 			, m_numTh(0)
 			, m_dsIdx(UINT8_MAX)
+			, m_needResolve(false)
+			, m_needPresent(false)
 		{
 		}
 
@@ -398,6 +409,7 @@ namespace bgfx { namespace d3d9
 		void preReset();
 		void postReset();
 		void createNullColorRT();
+		void set();
 
 		IDirect3DSurface9* m_surface[BGFX_CONFIG_MAX_FRAME_BUFFER_ATTACHMENTS-1];
 		IDirect3DSwapChain9* m_swapChain;
@@ -407,10 +419,11 @@ namespace bgfx { namespace d3d9
 
 		Attachment m_attachment[BGFX_CONFIG_MAX_FRAME_BUFFER_ATTACHMENTS];
 		uint16_t m_denseIdx;
-		bool m_needResolve;
 		uint8_t m_num;
 		uint8_t m_numTh;
 		uint8_t m_dsIdx;
+		bool m_needResolve;
+		bool m_needPresent;
 	};
 
 	struct TimerQueryD3D9
@@ -455,6 +468,7 @@ namespace bgfx { namespace d3d9
 		void begin(Frame* _render, OcclusionQueryHandle _handle);
 		void end();
 		void resolve(Frame* _render, bool _wait = false);
+		void invalidate(OcclusionQueryHandle _handle);
 
 		struct Query
 		{
@@ -462,7 +476,7 @@ namespace bgfx { namespace d3d9
 			OcclusionQueryHandle m_handle;
 		};
 
-		Query m_query[BGFX_CONFIG_MAX_OCCUSION_QUERIES];
+		Query m_query[BGFX_CONFIG_MAX_OCCLUSION_QUERIES];
 		bx::RingBufferControl m_control;
 	};
 

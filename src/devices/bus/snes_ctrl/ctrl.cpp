@@ -6,7 +6,9 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "ctrl.h"
+
 // slot devices
 #include "bcbattle.h"
 #include "joypad.h"
@@ -22,7 +24,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type SNES_CONTROL_PORT = &device_creator<snes_control_port_device>;
+DEFINE_DEVICE_TYPE(SNES_CONTROL_PORT, snes_control_port_device, "snes_control_port", "Nintendo SNES / SFC controller port")
 
 
 //**************************************************************************
@@ -57,9 +59,9 @@ device_snes_control_port_interface::~device_snes_control_port_interface()
 //  snes_control_port_device - constructor
 //-------------------------------------------------
 
-snes_control_port_device::snes_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-						device_t(mconfig, SNES_CONTROL_PORT, "Nintendo SNES / SFC control port", tag, owner, clock, "snes_control_port", __FILE__),
-						device_slot_interface(mconfig, *this), m_device(nullptr)
+snes_control_port_device::snes_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, SNES_CONTROL_PORT, tag, owner, clock),
+	device_slot_interface(mconfig, *this), m_device(nullptr)
 {
 }
 
@@ -85,29 +87,29 @@ void snes_control_port_device::device_start()
 }
 
 
-UINT8 snes_control_port_device::read_pin4()
+uint8_t snes_control_port_device::read_pin4()
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 	if (m_device)
 		data |= m_device->read_pin4();
 	return data;
 }
 
-UINT8 snes_control_port_device::read_pin5()
+uint8_t snes_control_port_device::read_pin5()
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 	if (m_device)
 		data |= m_device->read_pin5();
 	return data;
 }
 
-void snes_control_port_device::write_strobe(UINT8 data)
+void snes_control_port_device::write_strobe(uint8_t data)
 {
 	if (m_device)
 		m_device->write_strobe(data);
 }
 
-void snes_control_port_device::write_pin6(UINT8 data)
+void snes_control_port_device::write_pin6(uint8_t data)
 {
 	if (m_device)
 		m_device->write_pin6(data);

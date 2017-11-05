@@ -9,7 +9,6 @@
 *********************************************************************/
 
 #include "emu.h"
-#include "includes/apple2.h"
 #include "imagedev/flopdrv.h"
 #include "formats/ap2_dsk.h"
 #include "machine/appldriv.h"
@@ -24,8 +23,9 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type A2BUS_DISKII = &device_creator<a2bus_diskii_device>;
-const device_type A2BUS_IWM_FDC = &device_creator<a2bus_iwmflop_device>;
+DEFINE_DEVICE_TYPE(A2BUS_DISKII,    a2bus_diskii_device,    "a2diskii",   "Apple Disk II controller")
+DEFINE_DEVICE_TYPE(A2BUS_IWM_FDC,   a2bus_iwmflop_device,   "a2iwm_flop", "Apple IWM floppy card")
+DEFINE_DEVICE_TYPE(A2BUS_AGAT7_FDC, a2bus_agat7flop_device, "agat7_flop", "Agat-7 140K floppy card")
 
 #define DISKII_ROM_REGION  "diskii_rom"
 #define FDC_TAG            "diskii_fdc"
@@ -47,63 +47,67 @@ static const floppy_interface floppy_interface =
 	"floppy_5_25"
 };
 
-MACHINE_CONFIG_FRAGMENT( diskii )
-	MCFG_APPLEFDC_ADD(FDC_TAG, fdc_interface)
-	MCFG_LEGACY_FLOPPY_APPLE_2_DRIVES_ADD(floppy_interface,15,16)
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_FRAGMENT( iwmflop )
-	MCFG_IWM_ADD(FDC_TAG, fdc_interface)
-	MCFG_LEGACY_FLOPPY_APPLE_2_DRIVES_ADD(floppy_interface,15,16)
-MACHINE_CONFIG_END
-
 ROM_START( diskii )
 	ROM_REGION(0x100, DISKII_ROM_REGION, 0)
 	ROM_LOAD( "341-0027-a.p5", 0x000000, 0x000100, CRC(ce7144f6) SHA1(d4181c9f046aafc3fb326b381baac809d9e38d16) )
 ROM_END
 
+ROM_START( agat7 )
+	ROM_REGION(0x100, DISKII_ROM_REGION, 0)
+	ROM_LOAD( "shugart7.rom", 0x0000, 0x0100, CRC(c6e4850c) SHA1(71626d3d2d4bbeeac2b77585b45a5566d20b8d34) )
+ROM_END
+
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor a2bus_floppy_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( diskii );
-}
+MACHINE_CONFIG_MEMBER( a2bus_floppy_device::device_add_mconfig )
+	MCFG_APPLEFDC_ADD(FDC_TAG, fdc_interface)
+	MCFG_LEGACY_FLOPPY_APPLE_2_DRIVES_ADD(floppy_interface,15,16)
+MACHINE_CONFIG_END
 
-machine_config_constructor a2bus_iwmflop_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( iwmflop );
-}
+MACHINE_CONFIG_MEMBER( a2bus_iwmflop_device::device_add_mconfig )
+	MCFG_IWM_ADD(FDC_TAG, fdc_interface)
+	MCFG_LEGACY_FLOPPY_APPLE_2_DRIVES_ADD(floppy_interface,15,16)
+MACHINE_CONFIG_END
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *a2bus_floppy_device::device_rom_region() const
+const tiny_rom_entry *a2bus_floppy_device::device_rom_region() const
 {
 	return ROM_NAME( diskii );
+}
+
+const tiny_rom_entry *a2bus_agat7flop_device::device_rom_region() const
+{
+	return ROM_NAME( agat7 );
 }
 
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
 
-a2bus_floppy_device::a2bus_floppy_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
-		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		device_a2bus_card_interface(mconfig, *this),
-		m_fdc(*this, FDC_TAG), m_rom(nullptr)
+a2bus_floppy_device::a2bus_floppy_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
+	device_a2bus_card_interface(mconfig, *this),
+	m_fdc(*this, FDC_TAG), m_rom(nullptr)
 {
 }
 
-a2bus_diskii_device::a2bus_diskii_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	a2bus_floppy_device(mconfig, A2BUS_DISKII, "Apple Disk II controller", tag, owner, clock, "a2diskii", __FILE__)
+a2bus_diskii_device::a2bus_diskii_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	a2bus_floppy_device(mconfig, A2BUS_DISKII, tag, owner, clock)
 {
 }
 
-a2bus_iwmflop_device::a2bus_iwmflop_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	a2bus_floppy_device(mconfig, A2BUS_IWM_FDC, "Apple IWM floppy card", tag, owner, clock, "a2iwm_flop", __FILE__)
+a2bus_iwmflop_device::a2bus_iwmflop_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	a2bus_floppy_device(mconfig, A2BUS_IWM_FDC, tag, owner, clock)
+{
+}
+
+a2bus_agat7flop_device::a2bus_agat7flop_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	a2bus_floppy_device(mconfig, A2BUS_AGAT7_FDC, tag, owner, clock)
 {
 }
 
@@ -128,7 +132,7 @@ void a2bus_floppy_device::device_reset()
     read_c0nx - called for reads from this card's c0nx space
 -------------------------------------------------*/
 
-UINT8 a2bus_floppy_device::read_c0nx(address_space &space, UINT8 offset)
+uint8_t a2bus_floppy_device::read_c0nx(address_space &space, uint8_t offset)
 {
 	return m_fdc->read(offset);
 }
@@ -138,7 +142,7 @@ UINT8 a2bus_floppy_device::read_c0nx(address_space &space, UINT8 offset)
     write_c0nx - called for writes to this card's c0nx space
 -------------------------------------------------*/
 
-void a2bus_floppy_device::write_c0nx(address_space &space, UINT8 offset, UINT8 data)
+void a2bus_floppy_device::write_c0nx(address_space &space, uint8_t offset, uint8_t data)
 {
 	m_fdc->write(offset, data);
 }
@@ -147,7 +151,7 @@ void a2bus_floppy_device::write_c0nx(address_space &space, UINT8 offset, UINT8 d
     read_cnxx - called for reads from this card's c0nx space
 -------------------------------------------------*/
 
-UINT8 a2bus_floppy_device::read_cnxx(address_space &space, UINT8 offset)
+uint8_t a2bus_floppy_device::read_cnxx(address_space &space, uint8_t offset)
 {
 	return m_rom[offset];
 }

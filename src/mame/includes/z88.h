@@ -6,19 +6,21 @@
  *
  ****************************************************************************/
 
-#ifndef Z88_H_
-#define Z88_H_
+#ifndef MAME_INCLUDES_Z88_H
+#define MAME_INCLUDES_Z88_H
 
-#include "emu.h"
 #include "cpu/z80/z80.h"
-#include "machine/upd65031.h"
 #include "machine/ram.h"
-#include "bus/z88/z88.h"
+#include "machine/upd65031.h"
+#include "sound/spkrdev.h"
+
 #include "bus/z88/flash.h"
 #include "bus/z88/ram.h"
 #include "bus/z88/rom.h"
-#include "sound/speaker.h"
+#include "bus/z88/z88.h"
+
 #include "rendlay.h"
+
 
 #define Z88_NUM_COLOURS 3
 
@@ -73,23 +75,23 @@ public:
 	DECLARE_WRITE8_MEMBER(bank3_cart_w);
 
 	// defined in video/z88.c
-	inline void plot_pixel(bitmap_ind16 &bitmap, int x, int y, UINT16 color);
-	inline UINT8* convert_address(UINT32 offset);
-	void vh_render_8x8(bitmap_ind16 &bitmap, int x, int y, UINT16 pen0, UINT16 pen1, UINT8 *gfx);
-	void vh_render_6x8(bitmap_ind16 &bitmap, int x, int y, UINT16 pen0, UINT16 pen1, UINT8 *gfx);
-	void vh_render_line(bitmap_ind16 &bitmap, int x, int y, UINT16 pen);
+	inline void plot_pixel(bitmap_ind16 &bitmap, int x, int y, uint16_t color);
+	inline uint8_t* convert_address(uint32_t offset);
+	void vh_render_8x8(bitmap_ind16 &bitmap, int x, int y, uint16_t pen0, uint16_t pen1, uint8_t *gfx);
+	void vh_render_6x8(bitmap_ind16 &bitmap, int x, int y, uint16_t pen0, uint16_t pen1, uint8_t *gfx);
+	void vh_render_line(bitmap_ind16 &bitmap, int x, int y, uint16_t pen);
 
 	struct
 	{
-		UINT8 slot;
-		UINT8 page;
+		uint8_t slot;
+		uint8_t page;
 	} m_bank[4];
 
 	int                   m_bank_type[4];
-	UINT8 *               m_bios;
-	UINT8 *               m_ram_base;
+	uint8_t *               m_bios;
+	uint8_t *               m_ram_base;
 	z88cart_slot_device * m_carts[4];
 	DECLARE_PALETTE_INIT(z88);
 };
 
-#endif /* Z88_H_ */
+#endif /* MAME_INCLUDES_Z88_H */

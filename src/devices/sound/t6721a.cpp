@@ -6,15 +6,11 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "t6721a.h"
 
-
-
-//**************************************************************************
-//  MACROS / CONSTANTS
-//**************************************************************************
-
-#define LOG 0
+//#define VERBOSE 1
+#include "logmacro.h"
 
 
 
@@ -23,7 +19,7 @@
 //**************************************************************************
 
 // device type definition
-const device_type T6721A = &device_creator<t6721a_device>;
+DEFINE_DEVICE_TYPE(T6721A, t6721a_device, "t6721a", "Toshiba T6721A")
 
 
 
@@ -35,8 +31,8 @@ const device_type T6721A = &device_creator<t6721a_device>;
 //  t6721a_device - constructor
 //-------------------------------------------------
 
-t6721a_device::t6721a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, T6721A, "T6721A", tag, owner, clock, "t6721a", __FILE__),
+t6721a_device::t6721a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, T6721A, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
 		m_write_eos(*this),
 		m_write_phi2(*this),

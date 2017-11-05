@@ -284,9 +284,12 @@ Notes:
 
 
 #include "emu.h"
+#include "includes/macrossp.h"
+
 #include "cpu/m68000/m68000.h"
 #include "sound/es5506.h"
-#include "includes/macrossp.h"
+#include "speaker.h"
+
 
 /*** VARIOUS READ / WRITE HANDLERS *******************************************/
 
@@ -307,7 +310,7 @@ WRITE32_MEMBER(macrossp_state::macrossp_soundcmd_w)
 	if (ACCESSING_BITS_16_31)
 	{
 		//logerror("%08x write soundcmd %08x (%08x)\n",space.device().safe_pc(),data,mem_mask);
-		soundlatch_word_w(space, 0, data >> 16, 0xffff);
+		m_soundlatch->write(space, 0, data >> 16, 0xffff);
 		m_sndpending = 1;
 		m_audiocpu->set_input_line(2, HOLD_LINE);
 		/* spin for a while to let the sound CPU read the command */
@@ -319,7 +322,7 @@ READ16_MEMBER(macrossp_state::macrossp_soundcmd_r)
 {
 	//  logerror("%06x read soundcmd\n",space.device().safe_pc());
 	m_sndpending = 0;
-	return soundlatch_word_r(space, offset, mem_mask);
+	return m_soundlatch->read(space, offset, mem_mask);
 }
 
 WRITE16_MEMBER(macrossp_state::palette_fade_w)
@@ -328,7 +331,7 @@ WRITE16_MEMBER(macrossp_state::palette_fade_w)
 	if (data >> 8 != 0xff)
 	{
 		// range seems to be 40 (brightest) to 252 (darkest)
-		UINT8 fade = ((data >> 8) - 40) / 212.0 * 255.0;
+		uint8_t fade = ((data >> 8) - 40) / 212.0 * 255.0;
 		m_screen->set_brightness(0xff - fade);
 	}
 }
@@ -536,7 +539,7 @@ void macrossp_state::machine_reset()
 	m_snd_toggle = 0;
 }
 
-static MACHINE_CONFIG_START( macrossp, macrossp_state )
+static MACHINE_CONFIG_START( macrossp )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68EC020, 50000000/2)   /* 25 MHz */
@@ -554,7 +557,7 @@ static MACHINE_CONFIG_START( macrossp, macrossp_state )
 	MCFG_SCREEN_SIZE(32*16, 16*16)
 	MCFG_SCREEN_VISIBLE_AREA(0*16, 24*16-1, 0*16, 15*16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(macrossp_state, screen_update_macrossp)
-	MCFG_SCREEN_VBLANK_DRIVER(macrossp_state, screen_eof_macrossp)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(macrossp_state, screen_vblank_macrossp))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", macrossp)
 
@@ -563,6 +566,8 @@ static MACHINE_CONFIG_START( macrossp, macrossp_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_GENERIC_LATCH_16_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ensoniq", ES5506, 16000000)
 	MCFG_ES5506_REGION0("ensoniq.0")

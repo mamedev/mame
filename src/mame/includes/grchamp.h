@@ -6,8 +6,10 @@
 
 *************************************************************************/
 
+#include "machine/input_merger.h"
 #include "machine/watchdog.h"
 #include "sound/discrete.h"
+#include "screen.h"
 
 class grchamp_state : public driver_device
 {
@@ -22,6 +24,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_screen(*this, "screen"),
+		m_soundnmi(*this, "soundnmi"),
 		m_radarram(*this, "radarram"),
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
@@ -37,26 +40,30 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
+	required_device<input_merger_device> m_soundnmi;
 
-	required_shared_ptr<UINT8> m_radarram;
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_spriteram;
-	required_shared_ptr<UINT8> m_leftram;
-	required_shared_ptr<UINT8> m_rightram;
-	required_shared_ptr<UINT8> m_centerram;
+	required_shared_ptr<uint8_t> m_radarram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<uint8_t> m_leftram;
+	required_shared_ptr<uint8_t> m_rightram;
+	required_shared_ptr<uint8_t> m_centerram;
 
-	UINT8       m_cpu0_out[16];
-	UINT8       m_cpu1_out[16];
+	uint8_t       m_cpu0_out[16];
+	uint8_t       m_cpu1_out[16];
 
-	UINT8       m_comm_latch;
-	UINT8       m_comm_latch2[4];
+	uint8_t       m_comm_latch;
+	uint8_t       m_comm_latch2[4];
 
-	UINT16      m_ledlatch;
-	UINT8       m_ledaddr;
-	UINT16      m_ledram[8];
+	uint16_t      m_ledlatch;
+	uint8_t       m_ledaddr;
+	uint16_t      m_ledram[8];
 
-	UINT16      m_collide;
-	UINT8       m_collmode;
+	uint8_t       m_soundlatch_data;
+	bool          m_soundlatch_flag;
+
+	uint16_t      m_collide;
+	uint8_t       m_collmode;
 
 	bitmap_ind16 m_work_bitmap;
 	tilemap_t * m_text_tilemap;
@@ -74,10 +81,15 @@ public:
 	DECLARE_READ8_MEMBER(sub_to_main_comm_r);
 	DECLARE_WRITE8_MEMBER(main_to_sub_comm_w);
 	DECLARE_READ8_MEMBER(main_to_sub_comm_r);
-	UINT8 get_pc3259_bits(int offs);
+	uint8_t get_pc3259_bits(int offs);
 	DECLARE_WRITE8_MEMBER(left_w);
 	DECLARE_WRITE8_MEMBER(center_w);
 	DECLARE_WRITE8_MEMBER(right_w);
+	TIMER_CALLBACK_MEMBER(soundlatch_w_cb);
+	TIMER_CALLBACK_MEMBER(soundlatch_clear7_w_cb);
+	DECLARE_READ8_MEMBER(soundlatch_r);
+	DECLARE_WRITE8_MEMBER(soundlatch_clear7_w);
+	DECLARE_READ8_MEMBER(soundlatch_flags_r);
 	DECLARE_WRITE8_MEMBER(portA_0_w);
 	DECLARE_WRITE8_MEMBER(portB_0_w);
 	DECLARE_WRITE8_MEMBER(portA_2_w);
@@ -98,8 +110,8 @@ public:
 	INTERRUPT_GEN_MEMBER(cpu1_interrupt);
 	TIMER_CALLBACK_MEMBER(main_to_sub_comm_sync_w);
 
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void draw_objects(int y, UINT8 *objdata);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void draw_objects(int y, uint8_t *objdata);
 };
 
 /* Discrete Sound Input Nodes */

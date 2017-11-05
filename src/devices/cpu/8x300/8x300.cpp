@@ -9,8 +9,9 @@
  *  Written by Barry Rodewald
  */
 
-#include "debugger.h"
+#include "emu.h"
 #include "8x300.h"
+#include "debugger.h"
 
 #define FETCHOP(a)         (m_direct->read_word(a))
 #define CYCLES(x)          do { m_icount -= (x); } while (0)
@@ -28,25 +29,33 @@
 #define DST_IS_RIGHT_BANK  (opcode & 0x0008)
 #define SRC_LSB ((opcode & 0x0700) >> 8)
 #define DST_LSB (opcode & 0x0007)
-#define SET_PC(x)  do { m_PC = (x); m_AR = m_PC; m_genPC = m_PC << 1; } while (0)
+#define SET_PC(x)  do { m_PC = (x); m_AR = m_PC; } while (0)
 // for XEC intruction, which sets the AR, but not PC, so that after the instruction at the relative address is done, execution
 // returns back to next instruction after XEC, unless a JMP or successful NZT is there.
-#define SET_AR(x)  do { m_AR = (x); m_genPC = m_AR << 1; m_PC--;} while (0)
+#define SET_AR(x)  do { m_AR = (x); m_increment_pc = false; } while (0)
 #define SRC_LATCH  do { if(SRC_IS_RIGHT_BANK) m_right_IV = READPORT(m_IVR+0x100); else m_left_IV = READPORT(m_IVL); } while (0)
 #define DST_LATCH  do { if(DST_IS_RIGHT_BANK) m_right_IV = READPORT(m_IVR+0x100); else m_left_IV = READPORT(m_IVL); } while (0)
 #define SET_OVF    do { if(result & 0xff00) m_OVF = 1; else m_OVF = 0; } while (0)
 
-const device_type N8X300 = &device_creator<n8x300_cpu_device>;
+DEFINE_DEVICE_TYPE(N8X300, n8x300_cpu_device, "8x300", "Signetics 8X300")
 
 
-n8x300_cpu_device::n8x300_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: cpu_device(mconfig, N8X300, "Signetics 8X300", tag, owner, clock, "8x300", __FILE__)
+n8x300_cpu_device::n8x300_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: cpu_device(mconfig, N8X300, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_BIG, 16, 14, 0)
 	, m_io_config("io", ENDIANNESS_BIG, 8, 9, 0)
 {
 }
 
-void n8x300_cpu_device::set_reg(UINT8 reg, UINT8 val)
+device_memory_interface::space_config_vector n8x300_cpu_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config),
+		std::make_pair(AS_IO,      &m_io_config)
+	};
+}
+
+void n8x300_cpu_device::set_reg(uint8_t reg, uint8_t val)
 {
 	switch(reg)
 	{
@@ -65,7 +74,7 @@ void n8x300_cpu_device::set_reg(UINT8 reg, UINT8 val)
 	}
 }
 
-UINT8 n8x300_cpu_device::get_reg(UINT8 reg)
+uint8_t n8x300_cpu_device::get_reg(uint8_t reg)
 {
 	switch(reg)
 	{
@@ -106,6 +115,8 @@ void n8x300_cpu_device::device_start()
 	save_item(NAME(m_OVF));
 	save_item(NAME(m_left_IV));
 	save_item(NAME(m_right_IV));
+	save_item(NAME(m_genPC));
+	save_item(NAME(m_increment_pc));
 
 	// reset registers here, since they are unchanged when /RESET goes low.
 	m_R1 = 0;
@@ -119,15 +130,12 @@ void n8x300_cpu_device::device_start()
 	m_IVR = 0;
 	m_AUX = 0;
 
-	m_PC = 0;
-	m_AR = 0;
 	m_IR = 0;
 	m_OVF = 0;
-	m_genPC = 0;
 
 	// Register state for debugger
-	state_add( _8X300_PC, "PC", m_PC).mask(0x1fff).formatstr("%04X");
-	state_add( _8X300_AR,  "AR",  m_AR).mask(0x1fff).formatstr("%04X");
+	state_add( _8X300_PC, "PC", m_PC).mask(0x1fff).callimport().formatstr("%04X");
+	state_add( _8X300_AR,  "AR",  m_AR).mask(0x1fff).callimport().formatstr("%04X");
 	state_add( _8X300_IR,  "IR",  m_IR).mask(0xffff).formatstr("%04X");
 	state_add( _8X300_AUX,  "AUX",  m_AUX).mask(0xff).formatstr("%02X");
 	state_add( _8X300_R1,  "R1",  m_R1).mask(0xff).formatstr("%02X");
@@ -140,18 +148,38 @@ void n8x300_cpu_device::device_start()
 	state_add( _8X300_OVF,  "OVF",  m_OVF).mask(0x01).formatstr("%01X");
 	state_add( _8X300_IVL,  "IVL",  m_IVL).mask(0xff).formatstr("%02X");
 	state_add( _8X300_IVR,  "IVR",  m_IVR).mask(0xff).formatstr("%02X");
-	state_add(STATE_GENPC, "curpc", m_genPC).noshow();
+	state_add(STATE_GENPC, "GENPC", m_genPC).mask(0x3ffe).callimport().noshow();
+	state_add(STATE_GENPCBASE, "CURPC", m_genPC).mask(0x3ffe).callimport().noshow();
 
 	m_icountptr = &m_icount;
 }
 
-void n8x300_cpu_device::state_string_export(const device_state_entry &entry, std::string &str) const
+//-------------------------------------------------
+//  state_import - import state into the device,
+//  after it has been set
+//-------------------------------------------------
+
+void n8x300_cpu_device::state_import(const device_state_entry &entry)
 {
 	switch (entry.index())
 	{
-//      case STATE_GENFLAGS:
-//          string.printf("%c%c%c%c%c%c",
-//          break;
+	case _8X300_PC:
+		m_AR = m_PC;
+		m_genPC = m_AR << 1;
+		m_increment_pc = true;
+		break;
+
+	case _8X300_AR:
+		m_genPC = m_AR << 1;
+		m_increment_pc = false;
+		break;
+
+	case STATE_GENPC:
+	case STATE_GENPCBASE:
+		m_AR = m_genPC >> 1;
+		m_PC = m_AR;
+		m_increment_pc = true;
+		break;
 	}
 }
 
@@ -160,28 +188,38 @@ void n8x300_cpu_device::device_reset()
 	/* zero registers */
 	m_PC = 0;
 	m_AR = 0;
-	m_IR = 0;
+	m_genPC = 0;
+	m_increment_pc = true;
 }
 
 void n8x300_cpu_device::execute_run()
 {
 	do
 	{
-		UINT16 opcode;
-		UINT8 src;
-		UINT8 dst;
-		UINT8 rotlen;  // rotate amount or I/O field length
-		UINT8 mask;
-		UINT16 result;
+		uint16_t opcode;
+		uint8_t src;
+		uint8_t dst;
+		uint8_t rotlen;  // rotate amount or I/O field length
+		uint8_t mask;
+		uint16_t result;
 
 		/* fetch the opcode */
+		m_genPC = m_AR << 1;
 		debugger_instruction_hook(this, m_genPC);
 		opcode = FETCHOP(m_genPC);
-		m_PC++;
-		m_PC &= 0x1fff;
+
+		if (m_increment_pc)
+		{
+			m_PC++;
+			m_PC &= 0x1fff;
+		}
+		else
+		{
+			m_increment_pc = true;
+		}
+
 		m_AR = m_PC;
 		m_IR = opcode;
-		m_genPC = m_PC << 1;
 
 		switch (OP)
 		{
@@ -552,8 +590,8 @@ void n8x300_cpu_device::execute_run()
 	} while (m_icount > 0);
 }
 
-offs_t n8x300_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t n8x300_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( n8x300 );
-	return CPU_DISASSEMBLE_NAME(n8x300)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(n8x300)(this, stream, pc, oprom, opram, options);
 }

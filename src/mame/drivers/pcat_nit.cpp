@@ -99,7 +99,7 @@ public:
 			m_uart(*this, "ns16450_0"),
 			m_microtouch(*this, "microtouch") { }
 
-	std::unique_ptr<UINT8[]> m_banked_nvram;
+	std::unique_ptr<uint8_t[]> m_banked_nvram;
 	required_device<ns16450_device> m_uart;
 	required_device<microtouch_device> m_microtouch;
 
@@ -217,7 +217,7 @@ void pcat_nit_state::machine_start()
 	membank("rombank")->set_entry(0);
 }
 
-static MACHINE_CONFIG_START( pcat_nit, pcat_nit_state )
+static MACHINE_CONFIG_START( pcat_nit )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I386, 14318180*2)   /* I386 ?? Mhz */
 	MCFG_CPU_PROGRAM_MAP(pcat_map)
@@ -236,7 +236,7 @@ static MACHINE_CONFIG_START( pcat_nit, pcat_nit_state )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( bonanza, pcat_nit_state )
+static MACHINE_CONFIG_START( bonanza )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I386, 14318180*2)   /* I386 ?? Mhz */
 	MCFG_CPU_PROGRAM_MAP(bonanza_map)
@@ -413,7 +413,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(pcat_nit_state,pcat_nit)
 {
-	m_banked_nvram = std::make_unique<UINT8[]>(0x2000);
+	m_banked_nvram = std::make_unique<uint8_t[]>(0x2000);
 	machine().device<nvram_device>("nvram")->set_base(m_banked_nvram.get(), 0x2000);
 }
 

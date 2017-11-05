@@ -15,7 +15,7 @@ Notes:
 
 TODO:
 - 02851: tetriskr: Corrupt game graphics after some time of gameplay, caused by a wrong
-  reading of the i/o $3c8 bit 1.
+  reading of the i/o $3c8 bit 1. (seems fixed?)
 - Add a proper FDC device.
 - Filetto: Add UM5100 sound chip, might be connected to the prototyping card;
 - buzzer sound has issues in both games
@@ -57,6 +57,7 @@ the main program is 9th October 1990.
 ******************************************************************************************/
 
 #include "emu.h"
+#include "bus/isa/cga.h"
 #include "cpu/i86/i86.h"
 #include "sound/hc55516.h"
 #include "machine/bankdev.h"
@@ -72,10 +73,10 @@ public:
 		m_bank(*this, "bank"){ }
 
 	int m_lastvalue;
-	UINT8 m_disk_data[2];
-	UINT8 m_port_b_data;
-	UINT8 m_status;
-	UINT8 m_clr_status;
+	uint8_t m_disk_data[2];
+	uint8_t m_port_b_data;
+	uint8_t m_status;
+	uint8_t m_clr_status;
 
 	DECLARE_READ8_MEMBER(disk_iobank_r);
 	DECLARE_WRITE8_MEMBER(disk_iobank_w);
@@ -99,19 +100,19 @@ class isa8_cga_filetto_device : public isa8_cga_device
 {
 public:
 	// construction/destruction
-	isa8_cga_filetto_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	isa8_cga_filetto_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 };
 
-const device_type ISA8_CGA_FILETTO = &device_creator<isa8_cga_filetto_device>;
+DEFINE_DEVICE_TYPE(ISA8_CGA_FILETTO, isa8_cga_filetto_device, "filetto_cga", "ISA8_CGA_FILETTO")
 
 //-------------------------------------------------
 //  isa8_cga_filetto_device - constructor
 //-------------------------------------------------
 
-isa8_cga_filetto_device::isa8_cga_filetto_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-		isa8_cga_device( mconfig, ISA8_CGA_FILETTO, "ISA8_CGA_FILETTO", tag, owner, clock, "filetto_cga", __FILE__)
+isa8_cga_filetto_device::isa8_cga_filetto_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	isa8_cga_device(mconfig, ISA8_CGA_FILETTO, tag, owner, clock)
 {
 }
 
@@ -120,7 +121,7 @@ ROM_START( filetto_cga )
 	ROM_LOAD("u67.bin", 0x0000, 0x2000, CRC(09710122) SHA1(de84bdd9245df287bbd3bb808f0c3531d13a3545) )
 ROM_END
 
-const rom_entry *isa8_cga_filetto_device::device_rom_region() const
+const tiny_rom_entry *isa8_cga_filetto_device::device_rom_region() const
 {
 	return ROM_NAME( filetto_cga );
 }
@@ -131,28 +132,28 @@ class isa8_cga_tetriskr_device : public isa8_cga_superimpose_device
 {
 public:
 	// construction/destruction
-	isa8_cga_tetriskr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	isa8_cga_tetriskr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
+	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
 	virtual void device_start() override;
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 
 	DECLARE_READ8_MEMBER(bg_bank_r);
 	DECLARE_WRITE8_MEMBER(bg_bank_w);
 private:
-	UINT8 m_bg_bank;
+	uint8_t m_bg_bank;
 };
 
 
 /* for superimposing CGA over a different source video (i.e. tetriskr) */
-const device_type ISA8_CGA_TETRISKR = &device_creator<isa8_cga_tetriskr_device>;
+DEFINE_DEVICE_TYPE(ISA8_CGA_TETRISKR, isa8_cga_tetriskr_device, "tetriskr_cga", "ISA8_CGA_TETRISKR")
 
 //-------------------------------------------------
 //  isa8_cga_tetriskr_device - constructor
 //-------------------------------------------------
 
-isa8_cga_tetriskr_device::isa8_cga_tetriskr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-		isa8_cga_superimpose_device( mconfig, ISA8_CGA_TETRISKR, "ISA8_CGA_TETRISKR", tag, owner, clock, "tetriskr_cga", __FILE__)
+isa8_cga_tetriskr_device::isa8_cga_tetriskr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	isa8_cga_superimpose_device(mconfig, ISA8_CGA_TETRISKR, tag, owner, clock)
 {
 }
 
@@ -161,7 +162,7 @@ void isa8_cga_tetriskr_device::device_start()
 {
 	m_bg_bank = 0;
 	isa8_cga_superimpose_device::device_start();
-	m_isa->install_device(0x3c0, 0x3c0, 0, 0,  read8_delegate( FUNC(isa8_cga_tetriskr_device::bg_bank_r), this ), write8_delegate( FUNC(isa8_cga_tetriskr_device::bg_bank_w), this ) );
+	m_isa->install_device(0x3c0, 0x3c0, read8_delegate( FUNC(isa8_cga_tetriskr_device::bg_bank_r), this ), write8_delegate( FUNC(isa8_cga_tetriskr_device::bg_bank_w), this ) );
 }
 
 WRITE8_MEMBER(isa8_cga_tetriskr_device::bg_bank_w)
@@ -175,15 +176,15 @@ READ8_MEMBER(isa8_cga_tetriskr_device::bg_bank_r)
 }
 
 
-UINT32 isa8_cga_tetriskr_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t isa8_cga_tetriskr_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int x,y;
 	int yi;
-	const UINT8 *bg_rom = memregion("gfx2")->base();
+	const uint8_t *bg_rom = memregion("gfx2")->base();
 
 	//popmessage("%04x",m_start_offs);
 
-	bitmap.fill(rgb_t::black, cliprect);
+	bitmap.fill(rgb_t::black(), cliprect);
 
 	for(y=0;y<200/8;y++)
 	{
@@ -191,7 +192,7 @@ UINT32 isa8_cga_tetriskr_device::screen_update(screen_device &screen, bitmap_rgb
 		{
 			for(x=0;x<320/8;x++)
 			{
-				UINT8 color;
+				uint8_t color;
 				int xi,pen_i;
 
 				for(xi=0;xi<8;xi++)
@@ -228,7 +229,7 @@ ROM_START( tetriskr_cga )
 	ROM_LOAD( "b-9.u43", 0x70000, 0x10000, CRC(4ea22349) SHA1(14dfd3dbd51f8bd6f3290293b8ea1c165e8cf7fd))
 ROM_END
 
-const rom_entry *isa8_cga_tetriskr_device::device_rom_region() const
+const tiny_rom_entry *isa8_cga_tetriskr_device::device_rom_region() const
 {
 	return ROM_NAME( tetriskr_cga );
 }
@@ -327,7 +328,7 @@ WRITE8_MEMBER(pcxt_state::port_b_w)
 
 READ8_MEMBER(pcxt_state::fdc765_status_r)
 {
-	UINT8 tmp;
+	uint8_t tmp;
 	tmp = m_status | 0x80;
 	m_clr_status++;
 	if(m_clr_status == 0x10)
@@ -387,7 +388,7 @@ static ADDRESS_MAP_START( tetriskr_io, AS_IO, 8, pcxt_state )
 //  AM_RANGE(0x03ce, 0x03ce) AM_READ_PORT("IN1") //read then discarded?
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bank_map, AS_0, 8, pcxt_state )
+static ADDRESS_MAP_START( bank_map, 0, 8, pcxt_state )
 	AM_RANGE(0x00000, 0x3ffff) AM_ROM AM_REGION("game_prg", 0)
 ADDRESS_MAP_END
 
@@ -479,7 +480,7 @@ static SLOT_INTERFACE_START( filetto_isa8_cards )
 SLOT_INTERFACE_END
 
 
-static MACHINE_CONFIG_START( filetto, pcxt_state )
+static MACHINE_CONFIG_START( filetto )
 	MCFG_CPU_ADD("maincpu", I8088, XTAL_14_31818MHz/3)
 	MCFG_CPU_PROGRAM_MAP(filetto_map)
 	MCFG_CPU_IO_MAP(filetto_io)
@@ -500,7 +501,7 @@ static MACHINE_CONFIG_START( filetto, pcxt_state )
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x10000)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( tetriskr, pcxt_state )
+static MACHINE_CONFIG_START( tetriskr )
 	MCFG_CPU_ADD("maincpu", I8088, XTAL_14_31818MHz/3)
 	MCFG_CPU_PROGRAM_MAP(tetriskr_map)
 	MCFG_CPU_IO_MAP(tetriskr_io)
@@ -539,5 +540,5 @@ ROM_START( tetriskr )
 	ROM_LOAD( "b-10.u10", 0x0000, 0x10000, CRC(efc2a0f6) SHA1(5f0f1e90237bee9b78184035a32055b059a91eb3) )
 ROM_END
 
-GAME( 1990, filetto,  0, filetto,  filetto, driver_device,  0,  ROT0,  "Novarmatic", "Filetto (v1.05 901009)",MACHINE_IMPERFECT_SOUND )
-GAME( 1988?,tetriskr, 0, tetriskr, tetriskr, driver_device,  0, ROT0,  "bootleg",    "Tetris (bootleg of Mirrorsoft PC-XT Tetris version)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+GAME( 1990, filetto,  0, filetto,  filetto,  pcxt_state,  0,  ROT0,  "Novarmatic", "Filetto (v1.05 901009)",                             MACHINE_IMPERFECT_SOUND )
+GAME( 1988?,tetriskr, 0, tetriskr, tetriskr, pcxt_state,  0,  ROT0,  "bootleg",    "Tetris (Korean bootleg of Mirrorsoft PC-XT Tetris)", MACHINE_IMPERFECT_SOUND )

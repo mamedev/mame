@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.10"/>
-<title>0.9.7: Common functions</title>
+<title>0.9.8: Floating-Point Pack and Unpack Functions</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -18,7 +18,7 @@
  <tr style="height: 56px;">
   <td id="projectlogo"><img alt="Logo" src="logo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
-   <div id="projectname">0.9.7
+   <div id="projectname">0.9.8
    </div>
   </td>
  </tr>
@@ -39,1076 +39,317 @@
   <div class="summary">
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
-<div class="title">Common functions<div class="ingroups"><a class="el" href="a00162.html">GLM Core</a></div></div>  </div>
+<div class="title">Floating-Point Pack and Unpack Functions<div class="ingroups"><a class="el" href="a00156.html">GLM Core</a></div></div>  </div>
 </div><!--header-->
 <div class="contents">
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:ga693d77696ff36572a0da79efec965acd"><td class="memTemplParams" colspan="2">template&lt;typename genType &gt; </td></tr>
-<tr class="memitem:ga693d77696ff36572a0da79efec965acd"><td class="memTemplItemLeft" align="right" valign="top">GLM_FUNC_DECL genType&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="a00151.html#ga693d77696ff36572a0da79efec965acd">abs</a> (genType x)</td></tr>
-<tr class="separator:ga693d77696ff36572a0da79efec965acd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga9189b2bec45ff301923ea8f8dd157fb8"><td class="memTemplParams" colspan="2">template&lt;typename T , precision P, template&lt; typename, precision &gt; class vecType&gt; </td></tr>
-<tr class="memitem:ga9189b2bec45ff301923ea8f8dd157fb8"><td class="memTemplItemLeft" align="right" valign="top">GLM_FUNC_DECL vecType&lt; T, P &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="a00151.html#ga9189b2bec45ff301923ea8f8dd157fb8">ceil</a> (vecType&lt; T, P &gt; const &amp;x)</td></tr>
-<tr class="separator:ga9189b2bec45ff301923ea8f8dd157fb8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga93bce26c7d80d30a62f5c508f8498a6c"><td class="memTemplParams" colspan="2">template&lt;typename genType &gt; </td></tr>
-<tr class="memitem:ga93bce26c7d80d30a62f5c508f8498a6c"><td class="memTemplItemLeft" align="right" valign="top">GLM_FUNC_DECL genType&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="a00151.html#ga93bce26c7d80d30a62f5c508f8498a6c">clamp</a> (genType x, genType minVal, genType maxVal)</td></tr>
-<tr class="separator:ga93bce26c7d80d30a62f5c508f8498a6c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga1425c1c3160ec51214b03a0469a3013d"><td class="memItemLeft" align="right" valign="top">GLM_FUNC_DECL int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00151.html#ga1425c1c3160ec51214b03a0469a3013d">floatBitsToInt</a> (float const &amp;v)</td></tr>
-<tr class="separator:ga1425c1c3160ec51214b03a0469a3013d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gac4a0710238ae54c67931dd29a0b0f873"><td class="memTemplParams" colspan="2">template&lt;template&lt; typename, precision &gt; class vecType, precision P&gt; </td></tr>
-<tr class="memitem:gac4a0710238ae54c67931dd29a0b0f873"><td class="memTemplItemLeft" align="right" valign="top">GLM_FUNC_DECL vecType&lt; int, P &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="a00151.html#gac4a0710238ae54c67931dd29a0b0f873">floatBitsToInt</a> (vecType&lt; float, P &gt; const &amp;v)</td></tr>
-<tr class="separator:gac4a0710238ae54c67931dd29a0b0f873"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga70e0271c34af52f3100c7960e18c3f2b"><td class="memItemLeft" align="right" valign="top">GLM_FUNC_DECL uint&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00151.html#ga70e0271c34af52f3100c7960e18c3f2b">floatBitsToUint</a> (float const &amp;v)</td></tr>
-<tr class="separator:ga70e0271c34af52f3100c7960e18c3f2b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga1804d4c443605d8a27be644aa461afe4"><td class="memTemplParams" colspan="2">template&lt;template&lt; typename, precision &gt; class vecType, precision P&gt; </td></tr>
-<tr class="memitem:ga1804d4c443605d8a27be644aa461afe4"><td class="memTemplItemLeft" align="right" valign="top">GLM_FUNC_DECL vecType&lt; uint, P &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="a00151.html#ga1804d4c443605d8a27be644aa461afe4">floatBitsToUint</a> (vecType&lt; float, P &gt; const &amp;v)</td></tr>
-<tr class="separator:ga1804d4c443605d8a27be644aa461afe4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga568b822b78f045f77c3325e165b44d5d"><td class="memTemplParams" colspan="2">template&lt;typename T , precision P, template&lt; typename, precision &gt; class vecType&gt; </td></tr>
-<tr class="memitem:ga568b822b78f045f77c3325e165b44d5d"><td class="memTemplItemLeft" align="right" valign="top">GLM_FUNC_DECL vecType&lt; T, P &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="a00151.html#ga568b822b78f045f77c3325e165b44d5d">floor</a> (vecType&lt; T, P &gt; const &amp;x)</td></tr>
-<tr class="separator:ga568b822b78f045f77c3325e165b44d5d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gad0f444d4b81cc53c3b6edf5aa25078c2"><td class="memTemplParams" colspan="2">template&lt;typename genType &gt; </td></tr>
-<tr class="memitem:gad0f444d4b81cc53c3b6edf5aa25078c2"><td class="memTemplItemLeft" align="right" valign="top">GLM_FUNC_DECL genType&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="a00151.html#gad0f444d4b81cc53c3b6edf5aa25078c2">fma</a> (genType const &amp;a, genType const &amp;b, genType const &amp;c)</td></tr>
-<tr class="separator:gad0f444d4b81cc53c3b6edf5aa25078c2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga8ba89e40e55ae5cdf228548f9b7639c7"><td class="memTemplParams" colspan="2">template&lt;typename genType &gt; </td></tr>
-<tr class="memitem:ga8ba89e40e55ae5cdf228548f9b7639c7"><td class="memTemplItemLeft" align="right" valign="top">GLM_FUNC_DECL genType&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="a00151.html#ga8ba89e40e55ae5cdf228548f9b7639c7">fract</a> (genType x)</td></tr>
-<tr class="separator:ga8ba89e40e55ae5cdf228548f9b7639c7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga20620e83544d1a988857a3bc4ebe0e1d"><td class="memTemplParams" colspan="2">template&lt;typename genType , typename genIType &gt; </td></tr>
-<tr class="memitem:ga20620e83544d1a988857a3bc4ebe0e1d"><td class="memTemplItemLeft" align="right" valign="top">GLM_FUNC_DECL genType&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="a00151.html#ga20620e83544d1a988857a3bc4ebe0e1d">frexp</a> (genType const &amp;x, genIType &amp;exp)</td></tr>
-<tr class="separator:ga20620e83544d1a988857a3bc4ebe0e1d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga4fb7c21c2dce064b26fd9ccdaf9adcd4"><td class="memItemLeft" align="right" valign="top">GLM_FUNC_DECL float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00151.html#ga4fb7c21c2dce064b26fd9ccdaf9adcd4">intBitsToFloat</a> (int const &amp;v)</td></tr>
-<tr class="separator:ga4fb7c21c2dce064b26fd9ccdaf9adcd4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gad21ab176dd0e6b59d923db5efca87f4e"><td class="memTemplParams" colspan="2">template&lt;template&lt; typename, precision &gt; class vecType, precision P&gt; </td></tr>
-<tr class="memitem:gad21ab176dd0e6b59d923db5efca87f4e"><td class="memTemplItemLeft" align="right" valign="top">GLM_FUNC_DECL vecType&lt; float, P &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="a00151.html#gad21ab176dd0e6b59d923db5efca87f4e">intBitsToFloat</a> (vecType&lt; int, P &gt; const &amp;v)</td></tr>
-<tr class="separator:gad21ab176dd0e6b59d923db5efca87f4e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gaf28f7a4696746f081685c9fd05c7e2de"><td class="memTemplParams" colspan="2">template&lt;typename T , precision P, template&lt; typename, precision &gt; class vecType&gt; </td></tr>
-<tr class="memitem:gaf28f7a4696746f081685c9fd05c7e2de"><td class="memTemplItemLeft" align="right" valign="top">GLM_FUNC_DECL vecType&lt; bool, P &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="a00151.html#gaf28f7a4696746f081685c9fd05c7e2de">isinf</a> (vecType&lt; T, P &gt; const &amp;x)</td></tr>
-<tr class="separator:gaf28f7a4696746f081685c9fd05c7e2de"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga6cb8f202a52eed2331724a3800198ebf"><td class="memTemplParams" colspan="2">template&lt;typename T , precision P, template&lt; typename, precision &gt; class vecType&gt; </td></tr>
-<tr class="memitem:ga6cb8f202a52eed2331724a3800198ebf"><td class="memTemplItemLeft" align="right" valign="top">GLM_FUNC_DECL vecType&lt; bool, P &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="a00151.html#ga6cb8f202a52eed2331724a3800198ebf">isnan</a> (vecType&lt; T, P &gt; const &amp;x)</td></tr>
-<tr class="separator:ga6cb8f202a52eed2331724a3800198ebf"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga52e319d7289b849ec92055abd4830533"><td class="memTemplParams" colspan="2">template&lt;typename genType , typename genIType &gt; </td></tr>
-<tr class="memitem:ga52e319d7289b849ec92055abd4830533"><td class="memTemplItemLeft" align="right" valign="top">GLM_FUNC_DECL genType&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="a00151.html#ga52e319d7289b849ec92055abd4830533">ldexp</a> (genType const &amp;x, genIType const &amp;exp)</td></tr>
-<tr class="separator:ga52e319d7289b849ec92055abd4830533"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga98caa7f95a94c86a86ebce893a45326c"><td class="memTemplParams" colspan="2">template&lt;typename genType &gt; </td></tr>
-<tr class="memitem:ga98caa7f95a94c86a86ebce893a45326c"><td class="memTemplItemLeft" align="right" valign="top">GLM_FUNC_DECL genType&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="a00151.html#ga98caa7f95a94c86a86ebce893a45326c">max</a> (genType x, genType y)</td></tr>
-<tr class="separator:ga98caa7f95a94c86a86ebce893a45326c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga2c2bde1cec025b7ddff83c74a1113719"><td class="memTemplParams" colspan="2">template&lt;typename genType &gt; </td></tr>
-<tr class="memitem:ga2c2bde1cec025b7ddff83c74a1113719"><td class="memTemplItemLeft" align="right" valign="top">GLM_FUNC_DECL genType&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="a00151.html#ga2c2bde1cec025b7ddff83c74a1113719">min</a> (genType x, genType y)</td></tr>
-<tr class="separator:ga2c2bde1cec025b7ddff83c74a1113719"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gadccbaffe46f369cf1a96b2aef92cbfdd"><td class="memTemplParams" colspan="2">template&lt;typename T , typename U , precision P, template&lt; typename, precision &gt; class vecType&gt; </td></tr>
-<tr class="memitem:gadccbaffe46f369cf1a96b2aef92cbfdd"><td class="memTemplItemLeft" align="right" valign="top">GLM_FUNC_DECL vecType&lt; T, P &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="a00151.html#gadccbaffe46f369cf1a96b2aef92cbfdd">mix</a> (vecType&lt; T, P &gt; const &amp;x, vecType&lt; T, P &gt; const &amp;y, vecType&lt; U, P &gt; const &amp;a)</td></tr>
-<tr class="separator:gadccbaffe46f369cf1a96b2aef92cbfdd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga12201563ef902e3b07e0d1d7656efdb1"><td class="memTemplParams" colspan="2">template&lt;typename genType &gt; </td></tr>
-<tr class="memitem:ga12201563ef902e3b07e0d1d7656efdb1"><td class="memTemplItemLeft" align="right" valign="top">GLM_FUNC_DECL genType&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="a00151.html#ga12201563ef902e3b07e0d1d7656efdb1">mod</a> (genType x, genType y)</td></tr>
-<tr class="separator:ga12201563ef902e3b07e0d1d7656efdb1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga85e33f139b8db1b39b590a5713b9e679"><td class="memTemplParams" colspan="2">template&lt;typename genType &gt; </td></tr>
-<tr class="memitem:ga85e33f139b8db1b39b590a5713b9e679"><td class="memTemplItemLeft" align="right" valign="top">GLM_FUNC_DECL genType&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="a00151.html#ga85e33f139b8db1b39b590a5713b9e679">modf</a> (genType x, genType &amp;i)</td></tr>
-<tr class="separator:ga85e33f139b8db1b39b590a5713b9e679"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gada0165544c0618d634c8056a88082ce9"><td class="memTemplParams" colspan="2">template&lt;typename T , precision P, template&lt; typename, precision &gt; class vecType&gt; </td></tr>
-<tr class="memitem:gada0165544c0618d634c8056a88082ce9"><td class="memTemplItemLeft" align="right" valign="top">GLM_FUNC_DECL vecType&lt; T, P &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="a00151.html#gada0165544c0618d634c8056a88082ce9">round</a> (vecType&lt; T, P &gt; const &amp;x)</td></tr>
-<tr class="separator:gada0165544c0618d634c8056a88082ce9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga655598104195a60a950291485e84a97e"><td class="memTemplParams" colspan="2">template&lt;typename T , precision P, template&lt; typename, precision &gt; class vecType&gt; </td></tr>
-<tr class="memitem:ga655598104195a60a950291485e84a97e"><td class="memTemplItemLeft" align="right" valign="top">GLM_FUNC_DECL vecType&lt; T, P &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="a00151.html#ga655598104195a60a950291485e84a97e">roundEven</a> (vecType&lt; T, P &gt; const &amp;x)</td></tr>
-<tr class="separator:ga655598104195a60a950291485e84a97e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gac3446b4138e0b8757561c07cd19f084d"><td class="memTemplParams" colspan="2">template&lt;typename T , precision P, template&lt; typename, precision &gt; class vecType&gt; </td></tr>
-<tr class="memitem:gac3446b4138e0b8757561c07cd19f084d"><td class="memTemplItemLeft" align="right" valign="top">GLM_FUNC_DECL vecType&lt; T, P &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="a00151.html#gac3446b4138e0b8757561c07cd19f084d">sign</a> (vecType&lt; T, P &gt; const &amp;x)</td></tr>
-<tr class="separator:gac3446b4138e0b8757561c07cd19f084d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga562edf7eca082cc5b7a0aaf180436daf"><td class="memTemplParams" colspan="2">template&lt;typename genType &gt; </td></tr>
-<tr class="memitem:ga562edf7eca082cc5b7a0aaf180436daf"><td class="memTemplItemLeft" align="right" valign="top">GLM_FUNC_DECL genType&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="a00151.html#ga562edf7eca082cc5b7a0aaf180436daf">smoothstep</a> (genType edge0, genType edge1, genType x)</td></tr>
-<tr class="separator:ga562edf7eca082cc5b7a0aaf180436daf"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga015a1261ff23e12650211aa872863cce"><td class="memTemplParams" colspan="2">template&lt;typename genType &gt; </td></tr>
-<tr class="memitem:ga015a1261ff23e12650211aa872863cce"><td class="memTemplItemLeft" align="right" valign="top">GLM_FUNC_DECL genType&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="a00151.html#ga015a1261ff23e12650211aa872863cce">step</a> (genType edge, genType x)</td></tr>
-<tr class="separator:ga015a1261ff23e12650211aa872863cce"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gaf15b74ab672af2c7d7b535a9b4803700"><td class="memTemplParams" colspan="2">template&lt;template&lt; typename, precision &gt; class vecType, typename T , precision P&gt; </td></tr>
-<tr class="memitem:gaf15b74ab672af2c7d7b535a9b4803700"><td class="memTemplItemLeft" align="right" valign="top">GLM_FUNC_DECL vecType&lt; T, P &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="a00151.html#gaf15b74ab672af2c7d7b535a9b4803700">step</a> (T edge, vecType&lt; T, P &gt; const &amp;x)</td></tr>
-<tr class="separator:gaf15b74ab672af2c7d7b535a9b4803700"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga6d84170051fb87c183c38883ec85b411"><td class="memTemplParams" colspan="2">template&lt;template&lt; typename, precision &gt; class vecType, typename T , precision P&gt; </td></tr>
-<tr class="memitem:ga6d84170051fb87c183c38883ec85b411"><td class="memTemplItemLeft" align="right" valign="top">GLM_FUNC_DECL vecType&lt; T, P &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="a00151.html#ga6d84170051fb87c183c38883ec85b411">step</a> (vecType&lt; T, P &gt; const &amp;edge, vecType&lt; T, P &gt; const &amp;x)</td></tr>
-<tr class="separator:ga6d84170051fb87c183c38883ec85b411"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga634cdbf8b37edca03f2248450570fd54"><td class="memTemplParams" colspan="2">template&lt;typename T , precision P, template&lt; typename, precision &gt; class vecType&gt; </td></tr>
-<tr class="memitem:ga634cdbf8b37edca03f2248450570fd54"><td class="memTemplItemLeft" align="right" valign="top">GLM_FUNC_DECL vecType&lt; T, P &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="a00151.html#ga634cdbf8b37edca03f2248450570fd54">trunc</a> (vecType&lt; T, P &gt; const &amp;x)</td></tr>
-<tr class="separator:ga634cdbf8b37edca03f2248450570fd54"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gab2bae0d15dcdca6093f88f76b3975d97"><td class="memItemLeft" align="right" valign="top">GLM_FUNC_DECL float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00151.html#gab2bae0d15dcdca6093f88f76b3975d97">uintBitsToFloat</a> (uint const &amp;v)</td></tr>
-<tr class="separator:gab2bae0d15dcdca6093f88f76b3975d97"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga3acab37650ecd792dc84548094b58684"><td class="memTemplParams" colspan="2">template&lt;template&lt; typename, precision &gt; class vecType, precision P&gt; </td></tr>
-<tr class="memitem:ga3acab37650ecd792dc84548094b58684"><td class="memTemplItemLeft" align="right" valign="top">GLM_FUNC_DECL vecType&lt; float, P &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="a00151.html#ga3acab37650ecd792dc84548094b58684">uintBitsToFloat</a> (vecType&lt; uint, P &gt; const &amp;v)</td></tr>
-<tr class="separator:ga3acab37650ecd792dc84548094b58684"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaa916ca426b2bb0343ba17e3753e245c2"><td class="memItemLeft" align="right" valign="top">GLM_FUNC_DECL double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00151.html#gaa916ca426b2bb0343ba17e3753e245c2">packDouble2x32</a> (uvec2 const &amp;v)</td></tr>
+<tr class="separator:gaa916ca426b2bb0343ba17e3753e245c2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga20f134b07db3a3d3a38efb2617388c92"><td class="memItemLeft" align="right" valign="top">GLM_FUNC_DECL uint&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00151.html#ga20f134b07db3a3d3a38efb2617388c92">packHalf2x16</a> (vec2 const &amp;v)</td></tr>
+<tr class="separator:ga20f134b07db3a3d3a38efb2617388c92"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga977ab172da5494e5ac63e952afacfbe2"><td class="memItemLeft" align="right" valign="top">GLM_FUNC_DECL uint&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00151.html#ga977ab172da5494e5ac63e952afacfbe2">packSnorm2x16</a> (vec2 const &amp;v)</td></tr>
+<tr class="separator:ga977ab172da5494e5ac63e952afacfbe2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga85e8f17627516445026ab7a9c2e3531a"><td class="memItemLeft" align="right" valign="top">GLM_FUNC_DECL uint&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00151.html#ga85e8f17627516445026ab7a9c2e3531a">packSnorm4x8</a> (vec4 const &amp;v)</td></tr>
+<tr class="separator:ga85e8f17627516445026ab7a9c2e3531a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga0e2d107039fe608a209497af867b85fb"><td class="memItemLeft" align="right" valign="top">GLM_FUNC_DECL uint&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00151.html#ga0e2d107039fe608a209497af867b85fb">packUnorm2x16</a> (vec2 const &amp;v)</td></tr>
+<tr class="separator:ga0e2d107039fe608a209497af867b85fb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaf7d2f7341a9eeb4a436929d6f9ad08f2"><td class="memItemLeft" align="right" valign="top">GLM_FUNC_DECL uint&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00151.html#gaf7d2f7341a9eeb4a436929d6f9ad08f2">packUnorm4x8</a> (vec4 const &amp;v)</td></tr>
+<tr class="separator:gaf7d2f7341a9eeb4a436929d6f9ad08f2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga5f4296dc5f12f0aa67ac05b8bb322483"><td class="memItemLeft" align="right" valign="top">GLM_FUNC_DECL uvec2&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00151.html#ga5f4296dc5f12f0aa67ac05b8bb322483">unpackDouble2x32</a> (double v)</td></tr>
+<tr class="separator:ga5f4296dc5f12f0aa67ac05b8bb322483"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaf59b52e6b28da9335322c4ae19b5d745"><td class="memItemLeft" align="right" valign="top">GLM_FUNC_DECL vec2&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00151.html#gaf59b52e6b28da9335322c4ae19b5d745">unpackHalf2x16</a> (uint v)</td></tr>
+<tr class="separator:gaf59b52e6b28da9335322c4ae19b5d745"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gacd8f8971a3fe28418be0d0fa1f786b38"><td class="memItemLeft" align="right" valign="top">GLM_FUNC_DECL vec2&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00151.html#gacd8f8971a3fe28418be0d0fa1f786b38">unpackSnorm2x16</a> (uint p)</td></tr>
+<tr class="separator:gacd8f8971a3fe28418be0d0fa1f786b38"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga2db488646d48b7c43d3218954523fe82"><td class="memItemLeft" align="right" valign="top">GLM_FUNC_DECL vec4&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00151.html#ga2db488646d48b7c43d3218954523fe82">unpackSnorm4x8</a> (uint p)</td></tr>
+<tr class="separator:ga2db488646d48b7c43d3218954523fe82"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga1f66188e5d65afeb9ffba1ad971e4007"><td class="memItemLeft" align="right" valign="top">GLM_FUNC_DECL vec2&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00151.html#ga1f66188e5d65afeb9ffba1ad971e4007">unpackUnorm2x16</a> (uint p)</td></tr>
+<tr class="separator:ga1f66188e5d65afeb9ffba1ad971e4007"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga7f903259150b67e9466f5f8edffcd197"><td class="memItemLeft" align="right" valign="top">GLM_FUNC_DECL vec4&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00151.html#ga7f903259150b67e9466f5f8edffcd197">unpackUnorm4x8</a> (uint p)</td></tr>
+<tr class="separator:ga7f903259150b67e9466f5f8edffcd197"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<p>These all operate component-wise. </p>
-<p>The description is per component. </p>
+<p>These functions do not operate component-wise, rather as described in each case. </p>
 <h2 class="groupheader">Function Documentation</h2>
-<a class="anchor" id="ga693d77696ff36572a0da79efec965acd"></a>
+<a class="anchor" id="gaa916ca426b2bb0343ba17e3753e245c2"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">GLM_FUNC_DECL genType glm::abs </td>
+          <td class="memname">GLM_FUNC_DECL double glm::packDouble2x32 </td>
           <td>(</td>
-          <td class="paramtype">genType&#160;</td>
-          <td class="paramname"><em>x</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Returns x if x &gt;= 0; otherwise, it returns -x. </p>
-<dl class="tparams"><dt>Template Parameters</dt><dd>
-  <table class="tparams">
-    <tr><td class="paramname">genType</td><td>floating-point or signed integer; scalar or vector types.</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section see"><dt>See also</dt><dd><a href="http://www.opengl.org/sdk/docs/manglsl/xhtml/abs.xml">GLSL abs man page</a> </dd>
-<dd>
-<a href="http://www.opengl.org/registry/doc/GLSLangSpec.4.20.8.pdf">GLSL 4.20.8 specification, section 8.3 Common Functions</a> </dd></dl>
-
-</div>
-</div>
-<a class="anchor" id="ga9189b2bec45ff301923ea8f8dd157fb8"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">GLM_FUNC_DECL vecType&lt;T, P&gt; glm::ceil </td>
-          <td>(</td>
-          <td class="paramtype">vecType&lt; T, P &gt; const &amp;&#160;</td>
-          <td class="paramname"><em>x</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Returns a value equal to the nearest integer that is greater than or equal to x. </p>
-<dl class="tparams"><dt>Template Parameters</dt><dd>
-  <table class="tparams">
-    <tr><td class="paramname">genType</td><td>Floating-point scalar or vector types.</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section see"><dt>See also</dt><dd><a href="http://www.opengl.org/sdk/docs/manglsl/xhtml/ceil.xml">GLSL ceil man page</a> </dd>
-<dd>
-<a href="http://www.opengl.org/registry/doc/GLSLangSpec.4.20.8.pdf">GLSL 4.20.8 specification, section 8.3 Common Functions</a> </dd></dl>
-
-</div>
-</div>
-<a class="anchor" id="ga93bce26c7d80d30a62f5c508f8498a6c"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">GLM_FUNC_DECL genType glm::clamp </td>
-          <td>(</td>
-          <td class="paramtype">genType&#160;</td>
-          <td class="paramname"><em>x</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">genType&#160;</td>
-          <td class="paramname"><em>minVal</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">genType&#160;</td>
-          <td class="paramname"><em>maxVal</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Returns min(max(x, minVal), maxVal) for each component in x using the floating-point values minVal and maxVal. </p>
-<dl class="tparams"><dt>Template Parameters</dt><dd>
-  <table class="tparams">
-    <tr><td class="paramname">genType</td><td>Floating-point or integer; scalar or vector types.</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section see"><dt>See also</dt><dd><a href="http://www.opengl.org/sdk/docs/manglsl/xhtml/clamp.xml">GLSL clamp man page</a> </dd>
-<dd>
-<a href="http://www.opengl.org/registry/doc/GLSLangSpec.4.20.8.pdf">GLSL 4.20.8 specification, section 8.3 Common Functions</a> </dd></dl>
-
-<p>Referenced by <a class="el" href="a00016_source.html#l00076">glm::saturate()</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="ga1425c1c3160ec51214b03a0469a3013d"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">GLM_FUNC_DECL int glm::floatBitsToInt </td>
-          <td>(</td>
-          <td class="paramtype">float const &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="a00157.html#ga9bcffa2d49f28d16f680757b5c0e7c84">uvec2</a> const &amp;&#160;</td>
           <td class="paramname"><em>v</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Returns a signed integer value representing the encoding of a floating-point value. </p>
-<p>The floating-point value's bit-level representation is preserved.</p>
-<dl class="section see"><dt>See also</dt><dd><a href="http://www.opengl.org/sdk/docs/manglsl/xhtml/floatBitsToInt.xml">GLSL floatBitsToInt man page</a> </dd>
+<p>Returns a double-precision value obtained by packing the components of v into a 64-bit value. </p>
+<p>If an IEEE 754 Inf or NaN is created, it will not signal, and the resulting floating point value is unspecified. Otherwise, the bit- level representation of v is preserved. The first vector component specifies the 32 least significant bits; the second component specifies the 32 most significant bits.</p>
+<dl class="section see"><dt>See also</dt><dd><a href="http://www.opengl.org/sdk/docs/manglsl/xhtml/packDouble2x32.xml">GLSL packDouble2x32 man page</a> </dd>
 <dd>
-<a href="http://www.opengl.org/registry/doc/GLSLangSpec.4.20.8.pdf">GLSL 4.20.8 specification, section 8.3 Common Functions</a> </dd></dl>
+<a href="http://www.opengl.org/registry/doc/GLSLangSpec.4.20.8.pdf">GLSL 4.20.8 specification, section 8.4 Floating-Point Pack and Unpack Functions</a> </dd></dl>
 
 </div>
 </div>
-<a class="anchor" id="gac4a0710238ae54c67931dd29a0b0f873"></a>
+<a class="anchor" id="ga20f134b07db3a3d3a38efb2617388c92"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">GLM_FUNC_DECL vecType&lt;int, P&gt; glm::floatBitsToInt </td>
+          <td class="memname">GLM_FUNC_DECL uint glm::packHalf2x16 </td>
           <td>(</td>
-          <td class="paramtype">vecType&lt; float, P &gt; const &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="a00157.html#ga09d0200e8ff86391d8804b4fefd5f1da">vec2</a> const &amp;&#160;</td>
           <td class="paramname"><em>v</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Returns a signed integer value representing the encoding of a floating-point value. </p>
-<p>The floatingpoint value's bit-level representation is preserved.</p>
-<dl class="section see"><dt>See also</dt><dd><a href="http://www.opengl.org/sdk/docs/manglsl/xhtml/floatBitsToInt.xml">GLSL floatBitsToInt man page</a> </dd>
+<p>Returns an unsigned integer obtained by converting the components of a two-component floating-point vector to the 16-bit floating-point representation found in the OpenGL Specification, and then packing these two 16- bit integers into a 32-bit unsigned integer. </p>
+<p>The first vector component specifies the 16 least-significant bits of the result; the second component specifies the 16 most-significant bits.</p>
+<dl class="section see"><dt>See also</dt><dd><a href="http://www.opengl.org/sdk/docs/manglsl/xhtml/packHalf2x16.xml">GLSL packHalf2x16 man page</a> </dd>
 <dd>
-<a href="http://www.opengl.org/registry/doc/GLSLangSpec.4.20.8.pdf">GLSL 4.20.8 specification, section 8.3 Common Functions</a> </dd></dl>
+<a href="http://www.opengl.org/registry/doc/GLSLangSpec.4.20.8.pdf">GLSL 4.20.8 specification, section 8.4 Floating-Point Pack and Unpack Functions</a> </dd></dl>
 
 </div>
 </div>
-<a class="anchor" id="ga70e0271c34af52f3100c7960e18c3f2b"></a>
+<a class="anchor" id="ga977ab172da5494e5ac63e952afacfbe2"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">GLM_FUNC_DECL uint glm::floatBitsToUint </td>
+          <td class="memname">GLM_FUNC_DECL uint glm::packSnorm2x16 </td>
           <td>(</td>
-          <td class="paramtype">float const &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="a00157.html#ga09d0200e8ff86391d8804b4fefd5f1da">vec2</a> const &amp;&#160;</td>
           <td class="paramname"><em>v</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Returns a unsigned integer value representing the encoding of a floating-point value. </p>
-<p>The floatingpoint value's bit-level representation is preserved.</p>
-<dl class="section see"><dt>See also</dt><dd><a href="http://www.opengl.org/sdk/docs/manglsl/xhtml/floatBitsToUint.xml">GLSL floatBitsToUint man page</a> </dd>
+<p>First, converts each component of the normalized floating-point value v into 8- or 16-bit integer values. </p>
+<p>Then, the results are packed into the returned 32-bit unsigned integer.</p>
+<p>The conversion for component c of v to fixed point is done as follows: packSnorm2x16: round(clamp(v, -1, +1) * 32767.0)</p>
+<p>The first component of the vector will be written to the least significant bits of the output; the last component will be written to the most significant bits.</p>
+<dl class="section see"><dt>See also</dt><dd><a href="http://www.opengl.org/sdk/docs/manglsl/xhtml/packSnorm2x16.xml">GLSL packSnorm2x16 man page</a> </dd>
 <dd>
-<a href="http://www.opengl.org/registry/doc/GLSLangSpec.4.20.8.pdf">GLSL 4.20.8 specification, section 8.3 Common Functions</a> </dd></dl>
+<a href="http://www.opengl.org/registry/doc/GLSLangSpec.4.20.8.pdf">GLSL 4.20.8 specification, section 8.4 Floating-Point Pack and Unpack Functions</a> </dd></dl>
 
 </div>
 </div>
-<a class="anchor" id="ga1804d4c443605d8a27be644aa461afe4"></a>
+<a class="anchor" id="ga85e8f17627516445026ab7a9c2e3531a"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">GLM_FUNC_DECL vecType&lt;uint, P&gt; glm::floatBitsToUint </td>
+          <td class="memname">GLM_FUNC_DECL uint glm::packSnorm4x8 </td>
           <td>(</td>
-          <td class="paramtype">vecType&lt; float, P &gt; const &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="a00157.html#gafbab23070ca47932487d25332adc7d7c">vec4</a> const &amp;&#160;</td>
           <td class="paramname"><em>v</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Returns a unsigned integer value representing the encoding of a floating-point value. </p>
-<p>The floatingpoint value's bit-level representation is preserved.</p>
-<dl class="section see"><dt>See also</dt><dd><a href="http://www.opengl.org/sdk/docs/manglsl/xhtml/floatBitsToUint.xml">GLSL floatBitsToUint man page</a> </dd>
+<p>First, converts each component of the normalized floating-point value v into 8- or 16-bit integer values. </p>
+<p>Then, the results are packed into the returned 32-bit unsigned integer.</p>
+<p>The conversion for component c of v to fixed point is done as follows: packSnorm4x8: round(clamp(c, -1, +1) * 127.0)</p>
+<p>The first component of the vector will be written to the least significant bits of the output; the last component will be written to the most significant bits.</p>
+<dl class="section see"><dt>See also</dt><dd><a href="http://www.opengl.org/sdk/docs/manglsl/xhtml/packSnorm4x8.xml">GLSL packSnorm4x8 man page</a> </dd>
 <dd>
-<a href="http://www.opengl.org/registry/doc/GLSLangSpec.4.20.8.pdf">GLSL 4.20.8 specification, section 8.3 Common Functions</a> </dd></dl>
+<a href="http://www.opengl.org/registry/doc/GLSLangSpec.4.20.8.pdf">GLSL 4.20.8 specification, section 8.4 Floating-Point Pack and Unpack Functions</a> </dd></dl>
 
 </div>
 </div>
-<a class="anchor" id="ga568b822b78f045f77c3325e165b44d5d"></a>
+<a class="anchor" id="ga0e2d107039fe608a209497af867b85fb"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">GLM_FUNC_DECL vecType&lt;T, P&gt; glm::floor </td>
+          <td class="memname">GLM_FUNC_DECL uint glm::packUnorm2x16 </td>
           <td>(</td>
-          <td class="paramtype">vecType&lt; T, P &gt; const &amp;&#160;</td>
-          <td class="paramname"><em>x</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Returns a value equal to the nearest integer that is less then or equal to x. </p>
-<dl class="tparams"><dt>Template Parameters</dt><dd>
-  <table class="tparams">
-    <tr><td class="paramname">genType</td><td>Floating-point scalar or vector types.</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section see"><dt>See also</dt><dd><a href="http://www.opengl.org/sdk/docs/manglsl/xhtml/floor.xml">GLSL floor man page</a> </dd>
-<dd>
-<a href="http://www.opengl.org/registry/doc/GLSLangSpec.4.20.8.pdf">GLSL 4.20.8 specification, section 8.3 Common Functions</a> </dd></dl>
-
-</div>
-</div>
-<a class="anchor" id="gad0f444d4b81cc53c3b6edf5aa25078c2"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">GLM_FUNC_DECL genType glm::fma </td>
-          <td>(</td>
-          <td class="paramtype">genType const &amp;&#160;</td>
-          <td class="paramname"><em>a</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">genType const &amp;&#160;</td>
-          <td class="paramname"><em>b</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">genType const &amp;&#160;</td>
-          <td class="paramname"><em>c</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Computes and returns a * b + c. </p>
-<dl class="tparams"><dt>Template Parameters</dt><dd>
-  <table class="tparams">
-    <tr><td class="paramname">genType</td><td>Floating-point scalar or vector types.</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section see"><dt>See also</dt><dd><a href="http://www.opengl.org/sdk/docs/manglsl/xhtml/fma.xml">GLSL fma man page</a> </dd>
-<dd>
-<a href="http://www.opengl.org/registry/doc/GLSLangSpec.4.20.8.pdf">GLSL 4.20.8 specification, section 8.3 Common Functions</a> </dd></dl>
-
-</div>
-</div>
-<a class="anchor" id="ga8ba89e40e55ae5cdf228548f9b7639c7"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">GLM_FUNC_DECL genType glm::fract </td>
-          <td>(</td>
-          <td class="paramtype">genType&#160;</td>
-          <td class="paramname"><em>x</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Return x - floor(x). </p>
-<dl class="tparams"><dt>Template Parameters</dt><dd>
-  <table class="tparams">
-    <tr><td class="paramname">genType</td><td>Floating-point scalar or vector types.</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section see"><dt>See also</dt><dd><a href="http://www.opengl.org/sdk/docs/manglsl/xhtml/fract.xml">GLSL fract man page</a> </dd>
-<dd>
-<a href="http://www.opengl.org/registry/doc/GLSLangSpec.4.20.8.pdf">GLSL 4.20.8 specification, section 8.3 Common Functions</a> </dd></dl>
-
-</div>
-</div>
-<a class="anchor" id="ga20620e83544d1a988857a3bc4ebe0e1d"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">GLM_FUNC_DECL genType glm::frexp </td>
-          <td>(</td>
-          <td class="paramtype">genType const &amp;&#160;</td>
-          <td class="paramname"><em>x</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">genIType &amp;&#160;</td>
-          <td class="paramname"><em>exp</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Splits x into a floating-point significand in the range [0.5, 1.0) and an integral exponent of two, such that: x = significand * exp(2, exponent) </p>
-<p>The significand is returned by the function and the exponent is returned in the parameter exp. For a floating-point value of zero, the significant and exponent are both zero. For a floating-point value that is an infinity or is not a number, the results are undefined.</p>
-<dl class="tparams"><dt>Template Parameters</dt><dd>
-  <table class="tparams">
-    <tr><td class="paramname">genType</td><td>Floating-point scalar or vector types.</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section see"><dt>See also</dt><dd><a href="http://www.opengl.org/sdk/docs/manglsl/xhtml/frexp.xml">GLSL frexp man page</a> </dd>
-<dd>
-<a href="http://www.opengl.org/registry/doc/GLSLangSpec.4.20.8.pdf">GLSL 4.20.8 specification, section 8.3 Common Functions</a> </dd></dl>
-
-</div>
-</div>
-<a class="anchor" id="ga4fb7c21c2dce064b26fd9ccdaf9adcd4"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">GLM_FUNC_DECL float glm::intBitsToFloat </td>
-          <td>(</td>
-          <td class="paramtype">int const &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="a00157.html#ga09d0200e8ff86391d8804b4fefd5f1da">vec2</a> const &amp;&#160;</td>
           <td class="paramname"><em>v</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Returns a floating-point value corresponding to a signed integer encoding of a floating-point value. </p>
-<p>If an inf or NaN is passed in, it will not signal, and the resulting floating point value is unspecified. Otherwise, the bit-level representation is preserved.</p>
-<dl class="section see"><dt>See also</dt><dd><a href="http://www.opengl.org/sdk/docs/manglsl/xhtml/intBitsToFloat.xml">GLSL intBitsToFloat man page</a> </dd>
+<p>First, converts each component of the normalized floating-point value v into 8- or 16-bit integer values. </p>
+<p>Then, the results are packed into the returned 32-bit unsigned integer.</p>
+<p>The conversion for component c of v to fixed point is done as follows: packUnorm2x16: round(clamp(c, 0, +1) * 65535.0)</p>
+<p>The first component of the vector will be written to the least significant bits of the output; the last component will be written to the most significant bits.</p>
+<dl class="section see"><dt>See also</dt><dd><a href="http://www.opengl.org/sdk/docs/manglsl/xhtml/packUnorm2x16.xml">GLSL packUnorm2x16 man page</a> </dd>
 <dd>
-<a href="http://www.opengl.org/registry/doc/GLSLangSpec.4.20.8.pdf">GLSL 4.20.8 specification, section 8.3 Common Functions</a> </dd></dl>
+<a href="http://www.opengl.org/registry/doc/GLSLangSpec.4.20.8.pdf">GLSL 4.20.8 specification, section 8.4 Floating-Point Pack and Unpack Functions</a> </dd></dl>
 
 </div>
 </div>
-<a class="anchor" id="gad21ab176dd0e6b59d923db5efca87f4e"></a>
+<a class="anchor" id="gaf7d2f7341a9eeb4a436929d6f9ad08f2"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">GLM_FUNC_DECL vecType&lt;float, P&gt; glm::intBitsToFloat </td>
+          <td class="memname">GLM_FUNC_DECL uint glm::packUnorm4x8 </td>
           <td>(</td>
-          <td class="paramtype">vecType&lt; int, P &gt; const &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="a00157.html#gafbab23070ca47932487d25332adc7d7c">vec4</a> const &amp;&#160;</td>
           <td class="paramname"><em>v</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Returns a floating-point value corresponding to a signed integer encoding of a floating-point value. </p>
-<p>If an inf or NaN is passed in, it will not signal, and the resulting floating point value is unspecified. Otherwise, the bit-level representation is preserved.</p>
-<dl class="section see"><dt>See also</dt><dd><a href="http://www.opengl.org/sdk/docs/manglsl/xhtml/intBitsToFloat.xml">GLSL intBitsToFloat man page</a> </dd>
+<p>First, converts each component of the normalized floating-point value v into 8- or 16-bit integer values. </p>
+<p>Then, the results are packed into the returned 32-bit unsigned integer.</p>
+<p>The conversion for component c of v to fixed point is done as follows: packUnorm4x8: round(clamp(c, 0, +1) * 255.0)</p>
+<p>The first component of the vector will be written to the least significant bits of the output; the last component will be written to the most significant bits.</p>
+<dl class="section see"><dt>See also</dt><dd><a href="http://www.opengl.org/sdk/docs/manglsl/xhtml/packUnorm4x8.xml">GLSL packUnorm4x8 man page</a> </dd>
 <dd>
-<a href="http://www.opengl.org/registry/doc/GLSLangSpec.4.20.8.pdf">GLSL 4.20.8 specification, section 8.3 Common Functions</a> </dd></dl>
+<a href="http://www.opengl.org/registry/doc/GLSLangSpec.4.20.8.pdf">GLSL 4.20.8 specification, section 8.4 Floating-Point Pack and Unpack Functions</a> </dd></dl>
 
 </div>
 </div>
-<a class="anchor" id="gaf28f7a4696746f081685c9fd05c7e2de"></a>
+<a class="anchor" id="ga5f4296dc5f12f0aa67ac05b8bb322483"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">GLM_FUNC_DECL vecType&lt;bool, P&gt; glm::isinf </td>
+          <td class="memname">GLM_FUNC_DECL uvec2 glm::unpackDouble2x32 </td>
           <td>(</td>
-          <td class="paramtype">vecType&lt; T, P &gt; const &amp;&#160;</td>
-          <td class="paramname"><em>x</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Returns true if x holds a positive infinity or negative infinity representation in the underlying implementation's set of floating point representations. </p>
-<p>Returns false otherwise, including for implementations with no infinity representations.</p>
-<dl class="tparams"><dt>Template Parameters</dt><dd>
-  <table class="tparams">
-    <tr><td class="paramname">genType</td><td>Floating-point scalar or vector types.</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section see"><dt>See also</dt><dd><a href="http://www.opengl.org/sdk/docs/manglsl/xhtml/isinf.xml">GLSL isinf man page</a> </dd>
-<dd>
-<a href="http://www.opengl.org/registry/doc/GLSLangSpec.4.20.8.pdf">GLSL 4.20.8 specification, section 8.3 Common Functions</a> </dd></dl>
-
-</div>
-</div>
-<a class="anchor" id="ga6cb8f202a52eed2331724a3800198ebf"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">GLM_FUNC_DECL vecType&lt;bool, P&gt; glm::isnan </td>
-          <td>(</td>
-          <td class="paramtype">vecType&lt; T, P &gt; const &amp;&#160;</td>
-          <td class="paramname"><em>x</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Returns true if x holds a NaN (not a number) representation in the underlying implementation's set of floating point representations. </p>
-<p>Returns false otherwise, including for implementations with no NaN representations.</p>
-<p>/!\ When using compiler fast math, this function may fail.</p>
-<dl class="tparams"><dt>Template Parameters</dt><dd>
-  <table class="tparams">
-    <tr><td class="paramname">genType</td><td>Floating-point scalar or vector types.</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section see"><dt>See also</dt><dd><a href="http://www.opengl.org/sdk/docs/manglsl/xhtml/isnan.xml">GLSL isnan man page</a> </dd>
-<dd>
-<a href="http://www.opengl.org/registry/doc/GLSLangSpec.4.20.8.pdf">GLSL 4.20.8 specification, section 8.3 Common Functions</a> </dd></dl>
-
-</div>
-</div>
-<a class="anchor" id="ga52e319d7289b849ec92055abd4830533"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">GLM_FUNC_DECL genType glm::ldexp </td>
-          <td>(</td>
-          <td class="paramtype">genType const &amp;&#160;</td>
-          <td class="paramname"><em>x</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">genIType const &amp;&#160;</td>
-          <td class="paramname"><em>exp</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Builds a floating-point number from x and the corresponding integral exponent of two in exp, returning: significand * exp(2, exponent) </p>
-<p>If this product is too large to be represented in the floating-point type, the result is undefined.</p>
-<dl class="tparams"><dt>Template Parameters</dt><dd>
-  <table class="tparams">
-    <tr><td class="paramname">genType</td><td>Floating-point scalar or vector types.</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section see"><dt>See also</dt><dd><a href="http://www.opengl.org/sdk/docs/manglsl/xhtml/ldexp.xml">GLSL ldexp man page</a>; </dd>
-<dd>
-<a href="http://www.opengl.org/registry/doc/GLSLangSpec.4.20.8.pdf">GLSL 4.20.8 specification, section 8.3 Common Functions</a> </dd></dl>
-
-</div>
-</div>
-<a class="anchor" id="ga98caa7f95a94c86a86ebce893a45326c"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">GLM_FUNC_DECL genType glm::max </td>
-          <td>(</td>
-          <td class="paramtype">genType&#160;</td>
-          <td class="paramname"><em>x</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">genType&#160;</td>
-          <td class="paramname"><em>y</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Returns y if x &lt; y; otherwise, it returns x. </p>
-<dl class="tparams"><dt>Template Parameters</dt><dd>
-  <table class="tparams">
-    <tr><td class="paramname">genType</td><td>Floating-point or integer; scalar or vector types.</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section see"><dt>See also</dt><dd><a href="http://www.opengl.org/sdk/docs/manglsl/xhtml/max.xml">GLSL max man page</a> </dd>
-<dd>
-<a href="http://www.opengl.org/registry/doc/GLSLangSpec.4.20.8.pdf">GLSL 4.20.8 specification, section 8.3 Common Functions</a> </dd></dl>
-
-</div>
-</div>
-<a class="anchor" id="ga2c2bde1cec025b7ddff83c74a1113719"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">GLM_FUNC_DECL genType glm::min </td>
-          <td>(</td>
-          <td class="paramtype">genType&#160;</td>
-          <td class="paramname"><em>x</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">genType&#160;</td>
-          <td class="paramname"><em>y</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Returns y if y &lt; x; otherwise, it returns x. </p>
-<dl class="tparams"><dt>Template Parameters</dt><dd>
-  <table class="tparams">
-    <tr><td class="paramname">genType</td><td>Floating-point or integer; scalar or vector types.</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section see"><dt>See also</dt><dd><a href="http://www.opengl.org/sdk/docs/manglsl/xhtml/min.xml">GLSL min man page</a> </dd>
-<dd>
-<a href="http://www.opengl.org/registry/doc/GLSLangSpec.4.20.8.pdf">GLSL 4.20.8 specification, section 8.3 Common Functions</a> </dd></dl>
-
-</div>
-</div>
-<a class="anchor" id="gadccbaffe46f369cf1a96b2aef92cbfdd"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">GLM_FUNC_DECL vecType&lt;T, P&gt; glm::mix </td>
-          <td>(</td>
-          <td class="paramtype">vecType&lt; T, P &gt; const &amp;&#160;</td>
-          <td class="paramname"><em>x</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">vecType&lt; T, P &gt; const &amp;&#160;</td>
-          <td class="paramname"><em>y</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">vecType&lt; U, P &gt; const &amp;&#160;</td>
-          <td class="paramname"><em>a</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>If genTypeU is a floating scalar or vector: Returns x * (1.0 - a) + y * a, i.e., the linear blend of x and y using the floating-point value a. </p>
-<p>The value for a is not restricted to the range [0, 1].</p>
-<p>If genTypeU is a boolean scalar or vector: Selects which vector each returned component comes from. For a component of  that is false, the corresponding component of x is returned. For a component of a that is true, the corresponding component of y is returned. Components of x and y that are not selected are allowed to be invalid floating point values and will have no effect on the results. Thus, this provides different functionality than genType mix(genType x, genType y, genType(a)) where a is a Boolean vector.</p>
-<dl class="section see"><dt>See also</dt><dd><a href="http://www.opengl.org/sdk/docs/manglsl/xhtml/mix.xml">GLSL mix man page</a> </dd>
-<dd>
-<a href="http://www.opengl.org/registry/doc/GLSLangSpec.4.20.8.pdf">GLSL 4.20.8 specification, section 8.3 Common Functions</a></dd></dl>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">x</td><td>Value to interpolate. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">y</td><td>Value to interpolate. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">a</td><td>Interpolant.</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="tparams"><dt>Template Parameters</dt><dd>
-  <table class="tparams">
-    <tr><td class="paramname">genTypeT</td><td>Floating point scalar or vector. </td></tr>
-    <tr><td class="paramname">genTypeU</td><td>Floating point or boolean scalar or vector. It can't be a vector if it is the length of genTypeT.</td></tr>
-  </table>
-  </dd>
-</dl>
-<div class="fragment"><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="a00040.html">glm/glm.hpp</a>&gt;</span></div>
-<div class="line">...</div>
-<div class="line">float a;</div>
-<div class="line"><span class="keywordtype">bool</span> b;</div>
-<div class="line"><a class="code" href="a00163.html#gabebd0c7e3c5cd337d95c313c5e8b8db4">glm::dvec3</a> <a class="code" href="a00168.html#gab83fb6de0f05d6c0d11bdf0479f8319e">e</a>;</div>
-<div class="line"><a class="code" href="a00163.html#gabebd0c7e3c5cd337d95c313c5e8b8db4">glm::dvec3</a> f;</div>
-<div class="line"><a class="code" href="a00163.html#gafbab23070ca47932487d25332adc7d7c">glm::vec4</a> g;</div>
-<div class="line"><a class="code" href="a00163.html#gafbab23070ca47932487d25332adc7d7c">glm::vec4</a> h;</div>
-<div class="line">...</div>
-<div class="line">glm::vec4 r = <a class="code" href="a00151.html#gadccbaffe46f369cf1a96b2aef92cbfdd">glm::mix</a>(g, h, a); <span class="comment">// Interpolate with a floating-point scalar two vectors. </span></div>
-<div class="line"><a class="code" href="a00163.html#gafbab23070ca47932487d25332adc7d7c">glm::vec4</a> s = <a class="code" href="a00151.html#gadccbaffe46f369cf1a96b2aef92cbfdd">glm::mix</a>(g, h, b); <span class="comment">// Teturns g or h;</span></div>
-<div class="line"><a class="code" href="a00163.html#gabebd0c7e3c5cd337d95c313c5e8b8db4">glm::dvec3</a> t = <a class="code" href="a00151.html#gadccbaffe46f369cf1a96b2aef92cbfdd">glm::mix</a>(<a class="code" href="a00168.html#gab83fb6de0f05d6c0d11bdf0479f8319e">e</a>, f, a); <span class="comment">// Types of the third parameter is not required to match with the first and the second.</span></div>
-<div class="line"><a class="code" href="a00163.html#gafbab23070ca47932487d25332adc7d7c">glm::vec4</a> u = <a class="code" href="a00151.html#gadccbaffe46f369cf1a96b2aef92cbfdd">glm::mix</a>(g, h, r); <span class="comment">// Interpolations can be perform per component with a vector for the last parameter.</span></div>
-</div><!-- fragment --> 
-<p>Referenced by <a class="el" href="a00016_source.html#l00067">glm::lerp()</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="ga12201563ef902e3b07e0d1d7656efdb1"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">GLM_FUNC_DECL genType glm::mod </td>
-          <td>(</td>
-          <td class="paramtype">genType&#160;</td>
-          <td class="paramname"><em>x</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">genType&#160;</td>
-          <td class="paramname"><em>y</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Modulus. </p>
-<p>Returns x - y * floor(x / y) for each component in x using the floating point value y.</p>
-<dl class="tparams"><dt>Template Parameters</dt><dd>
-  <table class="tparams">
-    <tr><td class="paramname">genType</td><td>Floating-point scalar or vector types.</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section see"><dt>See also</dt><dd><a href="http://www.opengl.org/sdk/docs/manglsl/xhtml/mod.xml">GLSL mod man page</a> </dd>
-<dd>
-<a href="http://www.opengl.org/registry/doc/GLSLangSpec.4.20.8.pdf">GLSL 4.20.8 specification, section 8.3 Common Functions</a> </dd></dl>
-
-</div>
-</div>
-<a class="anchor" id="ga85e33f139b8db1b39b590a5713b9e679"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">GLM_FUNC_DECL genType glm::modf </td>
-          <td>(</td>
-          <td class="paramtype">genType&#160;</td>
-          <td class="paramname"><em>x</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">genType &amp;&#160;</td>
-          <td class="paramname"><em>i</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Returns the fractional part of x and sets i to the integer part (as a whole number floating point value). </p>
-<p>Both the return value and the output parameter will have the same sign as x.</p>
-<dl class="tparams"><dt>Template Parameters</dt><dd>
-  <table class="tparams">
-    <tr><td class="paramname">genType</td><td>Floating-point scalar or vector types.</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section see"><dt>See also</dt><dd><a href="http://www.opengl.org/sdk/docs/manglsl/xhtml/modf.xml">GLSL modf man page</a> </dd>
-<dd>
-<a href="http://www.opengl.org/registry/doc/GLSLangSpec.4.20.8.pdf">GLSL 4.20.8 specification, section 8.3 Common Functions</a> </dd></dl>
-
-</div>
-</div>
-<a class="anchor" id="gada0165544c0618d634c8056a88082ce9"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">GLM_FUNC_DECL vecType&lt;T, P&gt; glm::round </td>
-          <td>(</td>
-          <td class="paramtype">vecType&lt; T, P &gt; const &amp;&#160;</td>
-          <td class="paramname"><em>x</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Returns a value equal to the nearest integer to x. </p>
-<p>The fraction 0.5 will round in a direction chosen by the implementation, presumably the direction that is fastest. This includes the possibility that round(x) returns the same value as roundEven(x) for all values of x.</p>
-<dl class="tparams"><dt>Template Parameters</dt><dd>
-  <table class="tparams">
-    <tr><td class="paramname">genType</td><td>Floating-point scalar or vector types.</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section see"><dt>See also</dt><dd><a href="http://www.opengl.org/sdk/docs/manglsl/xhtml/round.xml">GLSL round man page</a> </dd>
-<dd>
-<a href="http://www.opengl.org/registry/doc/GLSLangSpec.4.20.8.pdf">GLSL 4.20.8 specification, section 8.3 Common Functions</a> </dd></dl>
-
-</div>
-</div>
-<a class="anchor" id="ga655598104195a60a950291485e84a97e"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">GLM_FUNC_DECL vecType&lt;T, P&gt; glm::roundEven </td>
-          <td>(</td>
-          <td class="paramtype">vecType&lt; T, P &gt; const &amp;&#160;</td>
-          <td class="paramname"><em>x</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Returns a value equal to the nearest integer to x. </p>
-<p>A fractional part of 0.5 will round toward the nearest even integer. (Both 3.5 and 4.5 for x will return 4.0.)</p>
-<dl class="tparams"><dt>Template Parameters</dt><dd>
-  <table class="tparams">
-    <tr><td class="paramname">genType</td><td>Floating-point scalar or vector types.</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section see"><dt>See also</dt><dd><a href="http://www.opengl.org/sdk/docs/manglsl/xhtml/roundEven.xml">GLSL roundEven man page</a> </dd>
-<dd>
-<a href="http://www.opengl.org/registry/doc/GLSLangSpec.4.20.8.pdf">GLSL 4.20.8 specification, section 8.3 Common Functions</a> </dd>
-<dd>
-<a href="http://developer.amd.com/documentation/articles/pages/New-Round-to-Even-Technique.aspx">New round to even technique</a> </dd></dl>
-
-</div>
-</div>
-<a class="anchor" id="gac3446b4138e0b8757561c07cd19f084d"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">GLM_FUNC_DECL vecType&lt;T, P&gt; glm::sign </td>
-          <td>(</td>
-          <td class="paramtype">vecType&lt; T, P &gt; const &amp;&#160;</td>
-          <td class="paramname"><em>x</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Returns 1.0 if x &gt; 0, 0.0 if x == 0, or -1.0 if x &lt; 0. </p>
-<dl class="tparams"><dt>Template Parameters</dt><dd>
-  <table class="tparams">
-    <tr><td class="paramname">genType</td><td>Floating-point or signed integer; scalar or vector types.</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section see"><dt>See also</dt><dd><a href="http://www.opengl.org/sdk/docs/manglsl/xhtml/sign.xml">GLSL sign man page</a> </dd>
-<dd>
-<a href="http://www.opengl.org/registry/doc/GLSLangSpec.4.20.8.pdf">GLSL 4.20.8 specification, section 8.3 Common Functions</a> </dd></dl>
-
-</div>
-</div>
-<a class="anchor" id="ga562edf7eca082cc5b7a0aaf180436daf"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">GLM_FUNC_DECL genType glm::smoothstep </td>
-          <td>(</td>
-          <td class="paramtype">genType&#160;</td>
-          <td class="paramname"><em>edge0</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">genType&#160;</td>
-          <td class="paramname"><em>edge1</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">genType&#160;</td>
-          <td class="paramname"><em>x</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Returns 0.0 if x &lt;= edge0 and 1.0 if x &gt;= edge1 and performs smooth Hermite interpolation between 0 and 1 when edge0 &lt; x &lt; edge1. </p>
-<p>This is useful in cases where you would want a threshold function with a smooth transition. This is equivalent to: genType t; t = clamp ((x - edge0) / (edge1 - edge0), 0, 1); return t * t * (3 - 2 * t); Results are undefined if edge0 &gt;= edge1.</p>
-<dl class="tparams"><dt>Template Parameters</dt><dd>
-  <table class="tparams">
-    <tr><td class="paramname">genType</td><td>Floating-point scalar or vector types.</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section see"><dt>See also</dt><dd><a href="http://www.opengl.org/sdk/docs/manglsl/xhtml/smoothstep.xml">GLSL smoothstep man page</a> </dd>
-<dd>
-<a href="http://www.opengl.org/registry/doc/GLSLangSpec.4.20.8.pdf">GLSL 4.20.8 specification, section 8.3 Common Functions</a> </dd></dl>
-
-</div>
-</div>
-<a class="anchor" id="ga015a1261ff23e12650211aa872863cce"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">GLM_FUNC_DECL genType glm::step </td>
-          <td>(</td>
-          <td class="paramtype">genType&#160;</td>
-          <td class="paramname"><em>edge</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">genType&#160;</td>
-          <td class="paramname"><em>x</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Returns 0.0 if x &lt; edge, otherwise it returns 1.0 for each component of a genType. </p>
-<dl class="section see"><dt>See also</dt><dd><a href="http://www.opengl.org/sdk/docs/manglsl/xhtml/step.xml">GLSL step man page</a> </dd>
-<dd>
-<a href="http://www.opengl.org/registry/doc/GLSLangSpec.4.20.8.pdf">GLSL 4.20.8 specification, section 8.3 Common Functions</a> </dd></dl>
-
-</div>
-</div>
-<a class="anchor" id="gaf15b74ab672af2c7d7b535a9b4803700"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">GLM_FUNC_DECL vecType&lt;T, P&gt; glm::step </td>
-          <td>(</td>
-          <td class="paramtype">T&#160;</td>
-          <td class="paramname"><em>edge</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">vecType&lt; T, P &gt; const &amp;&#160;</td>
-          <td class="paramname"><em>x</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Returns 0.0 if x &lt; edge, otherwise it returns 1.0. </p>
-<dl class="section see"><dt>See also</dt><dd><a href="http://www.opengl.org/sdk/docs/manglsl/xhtml/step.xml">GLSL step man page</a> </dd>
-<dd>
-<a href="http://www.opengl.org/registry/doc/GLSLangSpec.4.20.8.pdf">GLSL 4.20.8 specification, section 8.3 Common Functions</a> </dd></dl>
-
-</div>
-</div>
-<a class="anchor" id="ga6d84170051fb87c183c38883ec85b411"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">GLM_FUNC_DECL vecType&lt;T, P&gt; glm::step </td>
-          <td>(</td>
-          <td class="paramtype">vecType&lt; T, P &gt; const &amp;&#160;</td>
-          <td class="paramname"><em>edge</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">vecType&lt; T, P &gt; const &amp;&#160;</td>
-          <td class="paramname"><em>x</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Returns 0.0 if x &lt; edge, otherwise it returns 1.0. </p>
-<dl class="section see"><dt>See also</dt><dd><a href="http://www.opengl.org/sdk/docs/manglsl/xhtml/step.xml">GLSL step man page</a> </dd>
-<dd>
-<a href="http://www.opengl.org/registry/doc/GLSLangSpec.4.20.8.pdf">GLSL 4.20.8 specification, section 8.3 Common Functions</a> </dd></dl>
-
-</div>
-</div>
-<a class="anchor" id="ga634cdbf8b37edca03f2248450570fd54"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">GLM_FUNC_DECL vecType&lt;T, P&gt; glm::trunc </td>
-          <td>(</td>
-          <td class="paramtype">vecType&lt; T, P &gt; const &amp;&#160;</td>
-          <td class="paramname"><em>x</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Returns a value equal to the nearest integer to x whose absolute value is not larger than the absolute value of x. </p>
-<dl class="tparams"><dt>Template Parameters</dt><dd>
-  <table class="tparams">
-    <tr><td class="paramname">genType</td><td>Floating-point scalar or vector types.</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section see"><dt>See also</dt><dd><a href="http://www.opengl.org/sdk/docs/manglsl/xhtml/trunc.xml">GLSL trunc man page</a> </dd>
-<dd>
-<a href="http://www.opengl.org/registry/doc/GLSLangSpec.4.20.8.pdf">GLSL 4.20.8 specification, section 8.3 Common Functions</a> </dd></dl>
-
-</div>
-</div>
-<a class="anchor" id="gab2bae0d15dcdca6093f88f76b3975d97"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">GLM_FUNC_DECL float glm::uintBitsToFloat </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="a00164.html#ga91ad9478d81a7aaf2593e8d9c3d06a14">uint</a> const &amp;&#160;</td>
+          <td class="paramtype">double&#160;</td>
           <td class="paramname"><em>v</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Returns a floating-point value corresponding to a unsigned integer encoding of a floating-point value. </p>
-<p>If an inf or NaN is passed in, it will not signal, and the resulting floating point value is unspecified. Otherwise, the bit-level representation is preserved.</p>
-<dl class="section see"><dt>See also</dt><dd><a href="http://www.opengl.org/sdk/docs/manglsl/xhtml/uintBitsToFloat.xml">GLSL uintBitsToFloat man page</a> </dd>
+<p>Returns a two-component unsigned integer vector representation of v. </p>
+<p>The bit-level representation of v is preserved. The first component of the vector contains the 32 least significant bits of the double; the second component consists the 32 most significant bits.</p>
+<dl class="section see"><dt>See also</dt><dd><a href="http://www.opengl.org/sdk/docs/manglsl/xhtml/unpackDouble2x32.xml">GLSL unpackDouble2x32 man page</a> </dd>
 <dd>
-<a href="http://www.opengl.org/registry/doc/GLSLangSpec.4.20.8.pdf">GLSL 4.20.8 specification, section 8.3 Common Functions</a> </dd></dl>
+<a href="http://www.opengl.org/registry/doc/GLSLangSpec.4.20.8.pdf">GLSL 4.20.8 specification, section 8.4 Floating-Point Pack and Unpack Functions</a> </dd></dl>
 
 </div>
 </div>
-<a class="anchor" id="ga3acab37650ecd792dc84548094b58684"></a>
+<a class="anchor" id="gaf59b52e6b28da9335322c4ae19b5d745"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">GLM_FUNC_DECL vecType&lt;float, P&gt; glm::uintBitsToFloat </td>
+          <td class="memname">GLM_FUNC_DECL vec2 glm::unpackHalf2x16 </td>
           <td>(</td>
-          <td class="paramtype">vecType&lt; <a class="el" href="a00164.html#ga91ad9478d81a7aaf2593e8d9c3d06a14">uint</a>, P &gt; const &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="a00158.html#ga91ad9478d81a7aaf2593e8d9c3d06a14">uint</a>&#160;</td>
           <td class="paramname"><em>v</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Returns a floating-point value corresponding to a unsigned integer encoding of a floating-point value. </p>
-<p>If an inf or NaN is passed in, it will not signal, and the resulting floating point value is unspecified. Otherwise, the bit-level representation is preserved.</p>
-<dl class="section see"><dt>See also</dt><dd><a href="http://www.opengl.org/sdk/docs/manglsl/xhtml/uintBitsToFloat.xml">GLSL uintBitsToFloat man page</a> </dd>
+<p>Returns a two-component floating-point vector with components obtained by unpacking a 32-bit unsigned integer into a pair of 16-bit values, interpreting those values as 16-bit floating-point numbers according to the OpenGL Specification, and converting them to 32-bit floating-point values. </p>
+<p>The first component of the vector is obtained from the 16 least-significant bits of v; the second component is obtained from the 16 most-significant bits of v.</p>
+<dl class="section see"><dt>See also</dt><dd><a href="http://www.opengl.org/sdk/docs/manglsl/xhtml/unpackHalf2x16.xml">GLSL unpackHalf2x16 man page</a> </dd>
 <dd>
-<a href="http://www.opengl.org/registry/doc/GLSLangSpec.4.20.8.pdf">GLSL 4.20.8 specification, section 8.3 Common Functions</a> </dd></dl>
+<a href="http://www.opengl.org/registry/doc/GLSLangSpec.4.20.8.pdf">GLSL 4.20.8 specification, section 8.4 Floating-Point Pack and Unpack Functions</a> </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="gacd8f8971a3fe28418be0d0fa1f786b38"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">GLM_FUNC_DECL vec2 glm::unpackSnorm2x16 </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="a00158.html#ga91ad9478d81a7aaf2593e8d9c3d06a14">uint</a>&#160;</td>
+          <td class="paramname"><em>p</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>First, unpacks a single 32-bit unsigned integer p into a pair of 16-bit unsigned integers, four 8-bit unsigned integers, or four 8-bit signed integers. </p>
+<p>Then, each component is converted to a normalized floating-point value to generate the returned two- or four-component vector.</p>
+<p>The conversion for unpacked fixed-point value f to floating point is done as follows: unpackSnorm2x16: clamp(f / 32767.0, -1, +1)</p>
+<p>The first component of the returned vector will be extracted from the least significant bits of the input; the last component will be extracted from the most significant bits.</p>
+<dl class="section see"><dt>See also</dt><dd><a href="http://www.opengl.org/sdk/docs/manglsl/xhtml/unpackSnorm2x16.xml">GLSL unpackSnorm2x16 man page</a> </dd>
+<dd>
+<a href="http://www.opengl.org/registry/doc/GLSLangSpec.4.20.8.pdf">GLSL 4.20.8 specification, section 8.4 Floating-Point Pack and Unpack Functions</a> </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="ga2db488646d48b7c43d3218954523fe82"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">GLM_FUNC_DECL vec4 glm::unpackSnorm4x8 </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="a00158.html#ga91ad9478d81a7aaf2593e8d9c3d06a14">uint</a>&#160;</td>
+          <td class="paramname"><em>p</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>First, unpacks a single 32-bit unsigned integer p into a pair of 16-bit unsigned integers, four 8-bit unsigned integers, or four 8-bit signed integers. </p>
+<p>Then, each component is converted to a normalized floating-point value to generate the returned two- or four-component vector.</p>
+<p>The conversion for unpacked fixed-point value f to floating point is done as follows: unpackSnorm4x8: clamp(f / 127.0, -1, +1)</p>
+<p>The first component of the returned vector will be extracted from the least significant bits of the input; the last component will be extracted from the most significant bits.</p>
+<dl class="section see"><dt>See also</dt><dd><a href="http://www.opengl.org/sdk/docs/manglsl/xhtml/unpackSnorm4x8.xml">GLSL unpackSnorm4x8 man page</a> </dd>
+<dd>
+<a href="http://www.opengl.org/registry/doc/GLSLangSpec.4.20.8.pdf">GLSL 4.20.8 specification, section 8.4 Floating-Point Pack and Unpack Functions</a> </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="ga1f66188e5d65afeb9ffba1ad971e4007"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">GLM_FUNC_DECL vec2 glm::unpackUnorm2x16 </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="a00158.html#ga91ad9478d81a7aaf2593e8d9c3d06a14">uint</a>&#160;</td>
+          <td class="paramname"><em>p</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>First, unpacks a single 32-bit unsigned integer p into a pair of 16-bit unsigned integers, four 8-bit unsigned integers, or four 8-bit signed integers. </p>
+<p>Then, each component is converted to a normalized floating-point value to generate the returned two- or four-component vector.</p>
+<p>The conversion for unpacked fixed-point value f to floating point is done as follows: unpackUnorm2x16: f / 65535.0</p>
+<p>The first component of the returned vector will be extracted from the least significant bits of the input; the last component will be extracted from the most significant bits.</p>
+<dl class="section see"><dt>See also</dt><dd><a href="http://www.opengl.org/sdk/docs/manglsl/xhtml/unpackUnorm2x16.xml">GLSL unpackUnorm2x16 man page</a> </dd>
+<dd>
+<a href="http://www.opengl.org/registry/doc/GLSLangSpec.4.20.8.pdf">GLSL 4.20.8 specification, section 8.4 Floating-Point Pack and Unpack Functions</a> </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="ga7f903259150b67e9466f5f8edffcd197"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">GLM_FUNC_DECL vec4 glm::unpackUnorm4x8 </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="a00158.html#ga91ad9478d81a7aaf2593e8d9c3d06a14">uint</a>&#160;</td>
+          <td class="paramname"><em>p</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>First, unpacks a single 32-bit unsigned integer p into a pair of 16-bit unsigned integers, four 8-bit unsigned integers, or four 8-bit signed integers. </p>
+<p>Then, each component is converted to a normalized floating-point value to generate the returned two- or four-component vector.</p>
+<p>The conversion for unpacked fixed-point value f to floating point is done as follows: unpackUnorm4x8: f / 255.0</p>
+<p>The first component of the returned vector will be extracted from the least significant bits of the input; the last component will be extracted from the most significant bits.</p>
+<dl class="section see"><dt>See also</dt><dd><a href="http://www.opengl.org/sdk/docs/manglsl/xhtml/unpackUnorm4x8.xml">GLSL unpackUnorm4x8 man page</a> </dd>
+<dd>
+<a href="http://www.opengl.org/registry/doc/GLSLangSpec.4.20.8.pdf">GLSL 4.20.8 specification, section 8.4 Floating-Point Pack and Unpack Functions</a> </dd></dl>
 
 </div>
 </div>

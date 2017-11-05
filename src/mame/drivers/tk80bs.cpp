@@ -26,8 +26,7 @@ TODO:
 #include "cpu/i8085/i8085.h"
 #include "machine/i8255.h"
 #include "machine/keyboard.h"
-
-#define KEYBOARD_TAG "keyboard"
+#include "screen.h"
 
 class tk80bs_state : public driver_device
 {
@@ -44,13 +43,13 @@ public:
 
 	DECLARE_READ8_MEMBER(ppi_custom_r);
 	DECLARE_WRITE8_MEMBER(ppi_custom_w);
-	DECLARE_WRITE8_MEMBER(kbd_put);
+	void kbd_put(u8 data);
 	DECLARE_READ8_MEMBER(port_a_r);
 	DECLARE_READ8_MEMBER(port_b_r);
-	UINT32 screen_update_tk80bs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	required_shared_ptr<UINT8> m_p_videoram;
+	uint32_t screen_update_tk80bs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	required_shared_ptr<uint8_t> m_p_videoram;
 private:
-	UINT8 m_term_data;
+	uint8_t m_term_data;
 	required_device<cpu_device> m_maincpu;
 	required_device<i8255_device> m_ppi;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -58,7 +57,7 @@ private:
 };
 
 
-UINT32 tk80bs_state::screen_update_tk80bs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t tk80bs_state::screen_update_tk80bs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x,y;
 	int count;
@@ -126,7 +125,7 @@ INPUT_PORTS_END
 
 READ8_MEMBER( tk80bs_state::port_a_r )
 {
-	UINT8 ret = m_term_data;
+	uint8_t ret = m_term_data;
 	m_term_data = 0;
 	return ret;
 }
@@ -143,7 +142,7 @@ READ8_MEMBER( tk80bs_state::port_b_r )
 		return 0;
 }
 
-WRITE8_MEMBER( tk80bs_state::kbd_put )
+void tk80bs_state::kbd_put(u8 data)
 {
 	data &= 0x7f;
 	if (data > 0x5f) data-=0x20;
@@ -167,7 +166,7 @@ static GFXDECODE_START( tk80bs )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( tk80bs, tk80bs_state )
+static MACHINE_CONFIG_START( tk80bs )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8080, XTAL_1MHz) //unknown clock
 	MCFG_CPU_PROGRAM_MAP(tk80bs_mem)
@@ -189,8 +188,8 @@ static MACHINE_CONFIG_START( tk80bs, tk80bs_state )
 	MCFG_I8255_IN_PORTA_CB(READ8(tk80bs_state, port_a_r))
 	MCFG_I8255_IN_PORTB_CB(READ8(tk80bs_state, port_b_r))
 
-	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(WRITE8(tk80bs_state, kbd_put))
+	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
+	MCFG_GENERIC_KEYBOARD_CB(PUT(tk80bs_state, kbd_put))
 MACHINE_CONFIG_END
 
 
@@ -221,5 +220,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT     CLASS         INIT     COMPANY                 FULLNAME       FLAGS */
-COMP( 1980, tk80bs,   tk80,   0,       tk80bs,    tk80bs,   driver_device, 0, "Nippon Electronic Company", "TK-80BS", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+//    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT     CLASS        INIT  COMPANY  FULLNAME   FLAGS
+COMP( 1980, tk80bs,   tk80,   0,       tk80bs,    tk80bs,   tk80bs_state, 0,   "NEC",   "TK-80BS", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)

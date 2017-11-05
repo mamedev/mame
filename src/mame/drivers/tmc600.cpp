@@ -21,7 +21,7 @@ HP14782-1
 |    K2                                                             ROM4    |---------|     |
 |                       |-------------|       4050   5114   5114                            |
 |           4013        |   CDP1802   |       4050   5114   5114    ROM3    4030  ROM6  4060|
-|           4013        |-------------|       4050   5114   5114                            |
+|           4013 3.57MHz|-------------|       4050   5114   5114                            |
 |           4081  40106                       4051   5114   5114    ROM2    4076  5114  4011|
 |                                             4556   5114   5114          CDP1856 5114      |
 |                   |-------|                        5114   5114    ROM1  CDP1856 5114  4076|
@@ -40,31 +40,48 @@ Notes:
     ROM6    - Hitachi HN462732G 4Kx8 EPROM
     5114    - RCA MWS5114E1 1024-Word x 4-Bit LSI Static RAM
     MC1374  - Motorola MC1374P TV Modulator
-    CDP1802 - RCA CDP1802BE CMOS 8-Bit Microprocessor running at ? MHz
+    CDP1802 - RCA CDP1802BE CMOS 8-Bit Microprocessor running at 3.57MHz
     CDP1852 - RCA CDP1852CE Byte-Wide Input/Output Port
     CDP1853 - RCA CDP1853CE N-Bit 1 of 8 Decoder
     CDP1856 - RCA CDP1856CE 4-Bit Memory Buffer
     CDP1869 - RCA CDP1869CE Video Interface System (VIS) Address and Sound Generator
     CDP1870 - RCA CDP1870CE Video Interface System (VIS) Color Video (DOT XTAL at 5.6260MHz, CHROM XTAL at 8.867238MHz)
     CN1     - RF connector [TMC-700]
-    CN2     - printer connector [TMC-700]
-    CN3     - EURO connector
-    CN4     - tape connector
-    CN5     - video connector
-    CN6     - power connector
-    CN7     - audio connector [TMCP-300]
-    CN8     - keyboard connector
+    CN2     - 10x2 pin printer connector [TMC-700]
+    CN3     - 32x3 pin EURO connector
+    CN4     - DIN5D tape connector
+                1   input (500 mV / 47 kohm)
+                2   GND
+                3   output (580 mV / 47 kohm)
+                4   input (500 mV / 47 kohm)
+                5   output (580 mV / 47 kohm)
+    CN5     - DIN5X video connector
+                1   GND
+                2   GND
+                3   ?
+                4   GND
+                5   ?
+    CN6     - DIN2 power connector
+                1   8..12V DC..400Hz 300mA
+                2   GND
+    CN7     - DIN5D audio connector [TMCP-300]
+                1   NC
+                2   GND
+                3   AUDIO
+                4   NC
+                5   AUDIO
+    CN8     - 10x2 pin keyboard connector
     SW1     - RUN/STOP switch
     SW2     - internal speaker/external audio switch [TMCP-300]
     P1      - color phase lock adjustment
-    C1      - dot oscillator adjustment
-    C2      - chrom oscillator adjustment
-    T1      - RF signal strength adjustment [TMC-700]
-    T2      - tape recording level adjustment (0.57 Vpp)
-    T3      - video output level adjustment (1 Vpp)
-    T4      - video synchronization pulse adjustment
-    K1      - RF signal quality adjustment [TMC-700]
-    K2      - RF channel adjustment (VHF I) [TMC-700]
+    C1      - dot oscillator adjustment variable capacitor
+    C2      - chroma oscillator adjustment variable capacitor
+    T1      - RF signal strength adjustment potentiometer [TMC-700]
+    T2      - tape recording level adjustment potentiometer (0.57 V p-p)
+    T3      - video output level adjustment potentiometer (1 V p-p)
+    T4      - video synchronization pulse adjustment potentiometer
+    K1      - RF signal quality adjustment variable inductor [TMC-700]
+    K2      - RF channel adjustment variable inductor (VHF I) [TMC-700]
     LS1     - loudspeaker
 
 */
@@ -75,12 +92,12 @@ Notes:
 
     - proper emulation of the VISMAC interface (cursor blinking, color RAM), schematics are needed
     - disk interface
-    - CPU frequency needs to be derived from the schematics
     - serial interface expansion card
     - centronics printer handshaking
 
 */
 
+#include "emu.h"
 #include "includes/tmc600.h"
 
 /* Read/Write Handlers */
@@ -208,7 +225,7 @@ READ_LINE_MEMBER( tmc600_state::ef2_r )
 
 READ_LINE_MEMBER( tmc600_state::ef3_r )
 {
-	UINT8 data = ~m_key_row[m_keylatch / 8]->read();
+	uint8_t data = ~m_key_row[m_keylatch / 8]->read();
 
 	return BIT(data, m_keylatch % 8);
 }
@@ -236,25 +253,15 @@ void tmc600_state::machine_start()
 		break;
 	}
 
-	// find keyboard rows
-	m_key_row[0] = m_y0;
-	m_key_row[1] = m_y1;
-	m_key_row[2] = m_y2;
-	m_key_row[3] = m_y3;
-	m_key_row[4] = m_y4;
-	m_key_row[5] = m_y5;
-	m_key_row[6] = m_y6;
-	m_key_row[7] = m_y7;
-
 	/* register for state saving */
 	save_item(NAME(m_keylatch));
 }
 
 /* Machine Drivers */
 
-static MACHINE_CONFIG_START( tmc600, tmc600_state )
+static MACHINE_CONFIG_START( tmc600 )
 	// basic system hardware
-	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, 3579545)  // ???
+	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, XTAL_3_57MHz)
 	MCFG_CPU_PROGRAM_MAP(tmc600_map)
 	MCFG_CPU_IO_MAP(tmc600_io_map)
 	MCFG_COSMAC_WAIT_CALLBACK(VCC)
@@ -309,6 +316,6 @@ ROM_START( tmc600s2 )
 ROM_END
 
 /* System Drivers */
-//    YEAR  NAME      PARENT    COMPAT   MACHINE   INPUT     INIT    COMPANY        FULLNAME
-//COMP( 1982, tmc600s1, 0,  0,       tmc600,   tmc600, driver_device,   0,        "Telercas Oy", "Telmac TMC-600 (Sarja I)",  MACHINE_NOT_WORKING )
-COMP( 1982, tmc600s2, 0,    0,       tmc600,   tmc600, driver_device,   0,     "Telercas Oy", "Telmac TMC-600 (Sarja II)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT   STATE         INIT  COMPANY        FULLNAME                     FLAGS
+//COMP( 1982, tmc600s1, 0,    0,      tmc600,   tmc600, tmc600_state, 0,    "Telercas Oy", "Telmac TMC-600 (Sarja I)",  MACHINE_NOT_WORKING )
+COMP( 1982, tmc600s2, 0,      0,      tmc600,   tmc600, tmc600_state, 0,    "Telercas Oy", "Telmac TMC-600 (Sarja II)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

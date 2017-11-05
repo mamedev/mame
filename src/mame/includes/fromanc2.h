@@ -1,6 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Takahiro Nogi, Uki
+
+#include "machine/gen_latch.h"
 #include "machine/eepromser.h"
+#include "machine/ins8250.h"
 
 class fromanc2_state : public driver_device
 {
@@ -13,11 +16,14 @@ public:
 		m_eeprom(*this, "eeprom"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_lpalette(*this, "lpalette"),
-		m_rpalette(*this, "rpalette") { }
+		m_rpalette(*this, "rpalette"),
+		m_soundlatch(*this, "soundlatch"),
+		m_soundlatch2(*this, "soundlatch2"),
+		m_uart(*this, "uart") { }
 
 	/* memory pointers */
-	std::unique_ptr<UINT16[]>   m_videoram[2][4];
-	std::unique_ptr<UINT8[]>    m_bankedram;
+	std::unique_ptr<uint16_t[]>   m_videoram[2][4];
+	std::unique_ptr<uint8_t[]>    m_bankedram;
 
 	/* video-related */
 	tilemap_t  *m_tilemap[2][4];
@@ -27,12 +33,12 @@ public:
 
 	/* misc */
 	int      m_portselect;
-	UINT8    m_subcpu_int_flag;
-	UINT8    m_subcpu_nmi_flag;
-	UINT8    m_sndcpu_nmi_flag;
-	UINT16   m_datalatch1;
-	UINT8    m_datalatch_2h;
-	UINT8    m_datalatch_2l;
+	uint8_t    m_subcpu_int_flag;
+	uint8_t    m_subcpu_nmi_flag;
+	uint8_t    m_sndcpu_nmi_flag;
+	uint16_t   m_datalatch1;
+	uint8_t    m_datalatch_2h;
+	uint8_t    m_datalatch_2l;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -42,6 +48,10 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_lpalette;
 	required_device<palette_device> m_rpalette;
+	required_device<generic_latch_8_device> m_soundlatch;
+	required_device<generic_latch_8_device> m_soundlatch2;
+	optional_device<ns16550_device> m_uart;
+
 	DECLARE_WRITE16_MEMBER(fromanc2_sndcmd_w);
 	DECLARE_WRITE16_MEMBER(fromanc2_portselect_w);
 	DECLARE_READ16_MEMBER(fromanc2_keymatrix_r);
@@ -55,6 +65,7 @@ public:
 	DECLARE_WRITE8_MEMBER(fromanc2_subcpu_nmi_clr);
 	DECLARE_READ8_MEMBER(fromanc2_sndcpu_nmi_clr);
 	DECLARE_WRITE8_MEMBER(fromanc2_subcpu_rombank_w);
+	DECLARE_WRITE16_MEMBER(uart_w);
 	DECLARE_WRITE16_MEMBER(fromanc2_videoram_0_w);
 	DECLARE_WRITE16_MEMBER(fromanc2_videoram_1_w);
 	DECLARE_WRITE16_MEMBER(fromanc2_videoram_2_w);
@@ -101,14 +112,13 @@ public:
 	DECLARE_VIDEO_START(fromancr);
 	DECLARE_MACHINE_START(fromanc4);
 	DECLARE_VIDEO_START(fromanc4);
-	UINT32 screen_update_fromanc2_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_fromanc2_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_fromanc2_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_fromanc2_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(fromanc2_interrupt);
 	inline void fromanc2_get_tile_info( tile_data &tileinfo, int tile_index, int vram, int layer );
 	inline void fromancr_get_tile_info( tile_data &tileinfo, int tile_index, int vram, int layer );
-	inline void fromanc2_dispvram_w( offs_t offset, UINT16 data, UINT16 mem_mask, int vram, int layer );
-	inline void fromancr_vram_w(offs_t offset, UINT16 data, UINT16 mem_mask, int layer );
+	inline void fromanc2_dispvram_w( offs_t offset, uint16_t data, uint16_t mem_mask, int vram, int layer );
+	inline void fromancr_vram_w(offs_t offset, uint16_t data, uint16_t mem_mask, int layer );
 	void fromancr_gfxbank_w( int data );
-	inline void fromanc4_vram_w( offs_t offset, UINT16 data, UINT16 mem_mask, int layer );
-	DECLARE_WRITE_LINE_MEMBER(irqhandler);
+	inline void fromanc4_vram_w( offs_t offset, uint16_t data, uint16_t mem_mask, int layer );
 };

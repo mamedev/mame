@@ -8,16 +8,16 @@
 struct wav_file
 {
 	FILE *file;
-	UINT32 total_offs;
-	UINT32 data_offs;
+	uint32_t total_offs;
+	uint32_t data_offs;
 };
 
 
 wav_file *wav_open(const char *filename, int sample_rate, int channels)
 {
 	wav_file *wav;
-	UINT32 bps, temp32;
-	UINT16 align, temp16;
+	uint32_t bps, temp32;
+	uint16_t align, temp16;
 
 	/* allocate memory for the wav struct */
 	wav = global_alloc_nothrow(wav_file);
@@ -47,33 +47,33 @@ wav_file *wav_open(const char *filename, int sample_rate, int channels)
 	fwrite("fmt ", 1, 4, wav->file);
 
 	/* write the format length */
-	temp32 = LITTLE_ENDIANIZE_INT32(16);
+	temp32 = little_endianize_int32(16);
 	fwrite(&temp32, 1, 4, wav->file);
 
 	/* write the format (PCM) */
-	temp16 = LITTLE_ENDIANIZE_INT16(1);
+	temp16 = little_endianize_int16(1);
 	fwrite(&temp16, 1, 2, wav->file);
 
 	/* write the channels */
-	temp16 = LITTLE_ENDIANIZE_INT16(channels);
+	temp16 = little_endianize_int16(channels);
 	fwrite(&temp16, 1, 2, wav->file);
 
 	/* write the sample rate */
-	temp32 = LITTLE_ENDIANIZE_INT32(sample_rate);
+	temp32 = little_endianize_int32(sample_rate);
 	fwrite(&temp32, 1, 4, wav->file);
 
 	/* write the bytes/second */
 	bps = sample_rate * 2 * channels;
-	temp32 = LITTLE_ENDIANIZE_INT32(bps);
+	temp32 = little_endianize_int32(bps);
 	fwrite(&temp32, 1, 4, wav->file);
 
 	/* write the block align */
 	align = 2 * channels;
-	temp16 = LITTLE_ENDIANIZE_INT16(align);
+	temp16 = little_endianize_int16(align);
 	fwrite(&temp16, 1, 2, wav->file);
 
 	/* write the bits/sample */
-	temp16 = LITTLE_ENDIANIZE_INT16(16);
+	temp16 = little_endianize_int16(16);
 	fwrite(&temp16, 1, 2, wav->file);
 
 	/* write the 'data' tag */
@@ -90,8 +90,8 @@ wav_file *wav_open(const char *filename, int sample_rate, int channels)
 
 void wav_close(wav_file *wav)
 {
-	UINT32 total;
-	UINT32 temp32;
+	uint32_t total;
+	uint32_t temp32;
 
 	if (!wav) return;
 
@@ -100,13 +100,13 @@ void wav_close(wav_file *wav)
 	/* update the total file size */
 	fseek(wav->file, wav->total_offs, SEEK_SET);
 	temp32 = total - (wav->total_offs + 4);
-	temp32 = LITTLE_ENDIANIZE_INT32(temp32);
+	temp32 = little_endianize_int32(temp32);
 	fwrite(&temp32, 1, 4, wav->file);
 
 	/* update the data size */
 	fseek(wav->file, wav->data_offs, SEEK_SET);
 	temp32 = total - (wav->data_offs + 4);
-	temp32 = LITTLE_ENDIANIZE_INT32(temp32);
+	temp32 = little_endianize_int32(temp32);
 	fwrite(&temp32, 1, 4, wav->file);
 
 	fclose(wav->file);
@@ -114,7 +114,7 @@ void wav_close(wav_file *wav)
 }
 
 
-void wav_add_data_16(wav_file *wav, INT16 *data, int samples)
+void wav_add_data_16(wav_file *wav, int16_t *data, int samples)
 {
 	if (!wav) return;
 
@@ -124,9 +124,9 @@ void wav_add_data_16(wav_file *wav, INT16 *data, int samples)
 }
 
 
-void wav_add_data_32(wav_file *wav, INT32 *data, int samples, int shift)
+void wav_add_data_32(wav_file *wav, int32_t *data, int samples, int shift)
 {
-	std::vector<INT16> temp;
+	std::vector<int16_t> temp;
 	int i;
 
 	if (!wav || !samples) return;
@@ -147,9 +147,9 @@ void wav_add_data_32(wav_file *wav, INT32 *data, int samples, int shift)
 }
 
 
-void wav_add_data_16lr(wav_file *wav, INT16 *left, INT16 *right, int samples)
+void wav_add_data_16lr(wav_file *wav, int16_t *left, int16_t *right, int samples)
 {
-	std::vector<INT16> temp;
+	std::vector<int16_t> temp;
 	int i;
 
 	if (!wav || !samples) return;
@@ -167,9 +167,9 @@ void wav_add_data_16lr(wav_file *wav, INT16 *left, INT16 *right, int samples)
 }
 
 
-void wav_add_data_32lr(wav_file *wav, INT32 *left, INT32 *right, int samples, int shift)
+void wav_add_data_32lr(wav_file *wav, int32_t *left, int32_t *right, int samples, int shift)
 {
-	std::vector<INT16> temp;
+	std::vector<int16_t> temp;
 	int i;
 
 	if (!wav || !samples) return;

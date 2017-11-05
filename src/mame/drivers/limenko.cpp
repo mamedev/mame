@@ -27,8 +27,11 @@
 #include "emu.h"
 #include "cpu/e132xs/e132xs.h"
 #include "machine/eepromser.h"
-#include "sound/qs1000.h"
+#include "machine/gen_latch.h"
 #include "sound/okim6295.h"
+#include "sound/qs1000.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class limenko_state : public driver_device
@@ -41,6 +44,7 @@ public:
 		m_qs1000(*this, "qs1000"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch"),
 		m_mainram(*this, "mainram"),
 		m_fg_videoram(*this, "fg_videoram"),
 		m_md_videoram(*this, "md_videoram"),
@@ -54,14 +58,15 @@ public:
 	optional_device<qs1000_device> m_qs1000;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
 
-	required_shared_ptr<UINT32> m_mainram;
-	required_shared_ptr<UINT32> m_fg_videoram;
-	required_shared_ptr<UINT32> m_md_videoram;
-	required_shared_ptr<UINT32> m_bg_videoram;
-	required_shared_ptr<UINT32> m_spriteram;
-	required_shared_ptr<UINT32> m_spriteram2;
-	required_shared_ptr<UINT32> m_videoreg;
+	required_shared_ptr<uint32_t> m_mainram;
+	required_shared_ptr<uint32_t> m_fg_videoram;
+	required_shared_ptr<uint32_t> m_md_videoram;
+	required_shared_ptr<uint32_t> m_bg_videoram;
+	required_shared_ptr<uint32_t> m_spriteram;
+	required_shared_ptr<uint32_t> m_spriteram2;
+	required_shared_ptr<uint32_t> m_videoreg;
 
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_md_tilemap;
@@ -71,7 +76,7 @@ public:
 	bitmap_ind16 m_sprites_bitmap;
 	bitmap_ind8 m_sprites_bitmap_pri;
 	int m_prev_sprites_count;
-	UINT8 m_spotty_sound_cmd;
+	uint8_t m_spotty_sound_cmd;
 
 	DECLARE_WRITE32_MEMBER(limenko_coincounter_w);
 	DECLARE_WRITE32_MEMBER(bg_videoram_w);
@@ -105,9 +110,9 @@ public:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 
 	virtual void video_start() override;
-	UINT32 screen_update_limenko(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_single_sprite(bitmap_ind16 &dest_bmp,const rectangle &clip,gfx_element *gfx,UINT32 code,UINT32 color,int flipx,int flipy,int sx,int sy,int priority);
-	void draw_sprites(UINT32 *sprites, const rectangle &cliprect, int count);
+	uint32_t screen_update_limenko(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_single_sprite(bitmap_ind16 &dest_bmp,const rectangle &clip,gfx_element *gfx,uint32_t code,uint32_t color,int flipx,int flipy,int sx,int sy,int priority);
+	void draw_sprites(uint32_t *sprites, const rectangle &cliprect, int count);
 	void copy_sprites(bitmap_ind16 &bitmap, bitmap_ind16 &sprites_bitmap, bitmap_ind8 &priority_bitmap, const rectangle &cliprect);
 };
 
@@ -176,7 +181,7 @@ WRITE32_MEMBER(limenko_state::spriteram_buffer_w)
 
 WRITE32_MEMBER(limenko_state::limenko_soundlatch_w)
 {
-	soundlatch_byte_w(space, 0, data >> 16);
+	m_soundlatch->write(space, 0, data >> 16);
 	m_qs1000->set_irq(ASSERT_LINE);
 
 	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
@@ -184,12 +189,12 @@ WRITE32_MEMBER(limenko_state::limenko_soundlatch_w)
 
 WRITE32_MEMBER(limenko_state::spotty_soundlatch_w)
 {
-	soundlatch_byte_w(space, 0, data >> 16);
+	m_soundlatch->write(space, 0, data >> 16);
 }
 
 READ8_MEMBER(limenko_state::qs1000_p1_r)
 {
-	return soundlatch_byte_r(space, 0);
+	return m_soundlatch->read(space, 0);
 }
 
 WRITE8_MEMBER(limenko_state::qs1000_p1_w)
@@ -283,7 +288,7 @@ READ8_MEMBER(limenko_state::spotty_sound_r)
 	// check m_spotty_sound_cmd bits...
 
 	if(m_spotty_sound_cmd == 0xf7)
-		return soundlatch_byte_r(space,0);
+		return m_soundlatch->read(space,0);
 	else
 		return m_oki->read(space,0);
 }
@@ -319,11 +324,11 @@ TILE_GET_INFO_MEMBER(limenko_state::get_fg_tile_info)
 }
 
 void limenko_state::draw_single_sprite(bitmap_ind16 &dest_bmp,const rectangle &clip,gfx_element *gfx,
-		UINT32 code,UINT32 color,int flipx,int flipy,int sx,int sy,
+		uint32_t code,uint32_t color,int flipx,int flipy,int sx,int sy,
 		int priority)
 {
 	int pal_base = gfx->colorbase() + gfx->granularity() * (color % gfx->colors());
-	const UINT8 *source_base = gfx->get_data(code % gfx->elements());
+	const uint8_t *source_base = gfx->get_data(code % gfx->elements());
 
 	int sprite_screen_height = ((1<<16)*gfx->height()+0x8000)>>16;
 	int sprite_screen_width = ((1<<16)*gfx->width()+0x8000)>>16;
@@ -390,9 +395,9 @@ void limenko_state::draw_single_sprite(bitmap_ind16 &dest_bmp,const rectangle &c
 
 			for( y=sy; y<ey; y++ )
 			{
-				const UINT8 *source = source_base + (y_index>>16) * gfx->rowbytes();
-				UINT16 *dest = &dest_bmp.pix16(y);
-				UINT8 *pri = &m_sprites_bitmap_pri.pix8(y);
+				const uint8_t *source = source_base + (y_index>>16) * gfx->rowbytes();
+				uint16_t *dest = &dest_bmp.pix16(y);
+				uint8_t *pri = &m_sprites_bitmap_pri.pix8(y);
 
 				int x, x_index = x_index_base;
 				for( x=sx; x<ex; x++ )
@@ -417,14 +422,14 @@ void limenko_state::draw_single_sprite(bitmap_ind16 &dest_bmp,const rectangle &c
 }
 
 // sprites aren't tile based (except for 8x8 ones)
-void limenko_state::draw_sprites(UINT32 *sprites, const rectangle &cliprect, int count)
+void limenko_state::draw_sprites(uint32_t *sprites, const rectangle &cliprect, int count)
 {
 	int i;
 
-	UINT8 *base_gfx = memregion("gfx1")->base();
-	UINT8 *gfx_max  = base_gfx + memregion("gfx1")->bytes();
+	uint8_t *base_gfx = memregion("gfx1")->base();
+	uint8_t *gfx_max  = base_gfx + memregion("gfx1")->bytes();
 
-	UINT8 *gfxdata;
+	uint8_t *gfxdata;
 
 	for(i = 0; i <= count*2; i += 2)
 	{
@@ -479,10 +484,10 @@ void limenko_state::copy_sprites(bitmap_ind16 &bitmap, bitmap_ind16 &sprites_bit
 	int y;
 	for( y=cliprect.min_y; y<=cliprect.max_y; y++ )
 	{
-		UINT16 *source = &sprites_bitmap.pix16(y);
-		UINT16 *dest = &bitmap.pix16(y);
-		UINT8 *dest_pri = &priority_bitmap.pix8(y);
-		UINT8 *source_pri = &m_sprites_bitmap_pri.pix8(y);
+		uint16_t *source = &sprites_bitmap.pix16(y);
+		uint16_t *dest = &bitmap.pix16(y);
+		uint8_t *dest_pri = &priority_bitmap.pix8(y);
+		uint8_t *source_pri = &m_sprites_bitmap_pri.pix8(y);
 
 		int x;
 		for( x=cliprect.min_x; x<=cliprect.max_x; x++ )
@@ -498,9 +503,9 @@ void limenko_state::copy_sprites(bitmap_ind16 &bitmap, bitmap_ind16 &sprites_bit
 
 void limenko_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(limenko_state::get_bg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,128,64);
-	m_md_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(limenko_state::get_md_tile_info),this),TILEMAP_SCAN_ROWS,8,8,128,64);
-	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(limenko_state::get_fg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,128,64);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(limenko_state::get_bg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,128,64);
+	m_md_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(limenko_state::get_md_tile_info),this),TILEMAP_SCAN_ROWS,8,8,128,64);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(limenko_state::get_fg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,128,64);
 
 	m_md_tilemap->set_transparent_pen(0);
 	m_fg_tilemap->set_transparent_pen(0);
@@ -512,7 +517,7 @@ void limenko_state::video_start()
 	save_item(NAME(m_prev_sprites_count));
 }
 
-UINT32 limenko_state::screen_update_limenko(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t limenko_state::screen_update_limenko(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// m_videoreg[4] ???? It always has this value: 0xffeffff8 (2 signed bytes? values: -17 and -8 ?)
 
@@ -725,7 +730,7 @@ GFXDECODE_END
 *****************************************************************************************************/
 
 
-static MACHINE_CONFIG_START( limenko, limenko_state )
+static MACHINE_CONFIG_START( limenko )
 	MCFG_CPU_ADD("maincpu", E132XN, 20000000*4) /* 4x internal multiplier */
 	MCFG_CPU_PROGRAM_MAP(limenko_map)
 	MCFG_CPU_IO_MAP(limenko_io_map)
@@ -749,6 +754,8 @@ static MACHINE_CONFIG_START( limenko, limenko_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("qs1000", QS1000, XTAL_24MHz)
 	MCFG_QS1000_EXTERNAL_ROM(true)
 	MCFG_QS1000_IN_P1_CB(READ8(limenko_state, qs1000_p1_r))
@@ -759,7 +766,7 @@ static MACHINE_CONFIG_START( limenko, limenko_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( spotty, limenko_state )
+static MACHINE_CONFIG_START( spotty )
 	MCFG_CPU_ADD("maincpu", GMS30C2232, 20000000)   /* 20 MHz, no internal multiplier */
 	MCFG_CPU_PROGRAM_MAP(spotty_map)
 	MCFG_CPU_IO_MAP(spotty_io_map)
@@ -787,7 +794,9 @@ static MACHINE_CONFIG_START( spotty, limenko_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", 4000000 / 4 , OKIM6295_PIN7_HIGH) //?
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
+	MCFG_OKIM6295_ADD("oki", 4000000 / 4 , PIN7_HIGH) //?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -1132,8 +1141,8 @@ DRIVER_INIT_MEMBER(limenko_state,sb2003)
 
 DRIVER_INIT_MEMBER(limenko_state,spotty)
 {
-	UINT8 *dst    = memregion("gfx1")->base();
-	UINT8 *src    = memregion("user2")->base();
+	uint8_t *dst    = memregion("gfx1")->base();
+	uint8_t *src    = memregion("user2")->base();
 	int x;
 
 	/* expand 4bpp roms to 8bpp space */
@@ -1152,10 +1161,10 @@ DRIVER_INIT_MEMBER(limenko_state,spotty)
 	save_item(NAME(m_spotty_sound_cmd));
 }
 
-GAME( 2000, dynabomb, 0,      limenko, sb2003, limenko_state,   dynabomb, ROT0, "Limenko", "Dynamite Bomber (Korea, Rev 1.5)",   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 2000, legendoh, 0,      limenko, legendoh, limenko_state, legendoh, ROT0, "Limenko", "Legend of Heroes",                   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 2003, sb2003,   0,      limenko, sb2003, limenko_state,   sb2003,   ROT0, "Limenko", "Super Bubble 2003 (World, Ver 1.0)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 2003, sb2003a,  sb2003, limenko, sb2003, limenko_state,   sb2003,   ROT0, "Limenko", "Super Bubble 2003 (Asia, Ver 1.0)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2000, dynabomb, 0,      limenko, sb2003,   limenko_state, dynabomb, ROT0, "Limenko",    "Dynamite Bomber (Korea, Rev 1.5)",   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2000, legendoh, 0,      limenko, legendoh, limenko_state, legendoh, ROT0, "Limenko",    "Legend of Heroes",                   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2003, sb2003,   0,      limenko, sb2003,   limenko_state, sb2003,   ROT0, "Limenko",    "Super Bubble 2003 (World, Ver 1.0)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2003, sb2003a,  sb2003, limenko, sb2003,   limenko_state, sb2003,   ROT0, "Limenko",    "Super Bubble 2003 (Asia, Ver 1.0)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
 // this game only uses the same graphics chip used in Limenko's system
-GAME( 2001, spotty,   0,      spotty,  spotty, limenko_state,   spotty,   ROT0, "Prince Co.", "Spotty (Ver. 2.0.2)",             MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2001, spotty,   0,      spotty,  spotty,   limenko_state, spotty,   ROT0, "Prince Co.", "Spotty (Ver. 2.0.2)",                MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

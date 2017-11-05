@@ -7,12 +7,11 @@
  *
  */
 
+#ifndef MAME_MACHINE_X76F041_H
+#define MAME_MACHINE_X76F041_H
+
 #pragma once
 
-#ifndef __X76F041_H__
-#define __X76F041_H__
-
-#include "emu.h"
 
 #define MCFG_X76F041_ADD( _tag ) \
 	MCFG_DEVICE_ADD( _tag, X76F041, 0 )
@@ -22,7 +21,7 @@ class x76f041_device : public device_t,
 {
 public:
 	// construction/destruction
-	x76f041_device( const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock );
+	x76f041_device( const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock );
 
 	DECLARE_WRITE_LINE_MEMBER( write_cs );
 	DECLARE_WRITE_LINE_MEMBER( write_rst );
@@ -41,7 +40,7 @@ protected:
 
 private:
 	inline void ATTR_PRINTF( 3, 4 ) verboselog( int n_level, const char *s_fmt, ... );
-	UINT8 *password();
+	uint8_t *password();
 	void password_ok();
 	void load_address();
 	int data_offset();
@@ -113,17 +112,17 @@ private:
 	int m_byte;
 	int m_command;
 	int m_address;
-	UINT8 m_write_buffer[ 8 ];
-	UINT8 m_response_to_reset[ 4 ];
-	UINT8 m_write_password[ 8 ];
-	UINT8 m_read_password[ 8 ];
-	UINT8 m_configuration_password[ 8 ];
-	UINT8 m_configuration_registers[ 8 ];
-	UINT8 m_data[ 512 ];
+	uint8_t m_write_buffer[ 8 ];
+	uint8_t m_response_to_reset[ 4 ];
+	uint8_t m_write_password[ 8 ];
+	uint8_t m_read_password[ 8 ];
+	uint8_t m_configuration_password[ 8 ];
+	uint8_t m_configuration_registers[ 8 ];
+	uint8_t m_data[ 512 ];
 };
 
 
 // device type definition
-extern const device_type X76F041;
+DECLARE_DEVICE_TYPE(X76F041, x76f041_device)
 
-#endif
+#endif // MAME_MACHINE_X76F041_H

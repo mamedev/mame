@@ -21,19 +21,19 @@ public:
 		m_palette(*this, "palette") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_colorram;
-	required_shared_ptr<UINT8> m_scrollx;
-	required_shared_ptr<UINT8> m_scrolly;
-	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_colorram;
+	required_shared_ptr<uint8_t> m_scrollx;
+	required_shared_ptr<uint8_t> m_scrolly;
+	required_shared_ptr<uint8_t> m_spriteram;
 
 	/* video-related */
 	tilemap_t    *m_bg_tilemap;
 	tilemap_t    *m_fg_tilemap;
-	UINT8      m_chon;
-	UINT8      m_objon;
-	UINT8      m_bgon;
-	UINT8      m_sprite3bank;
+	uint8_t      m_chon;
+	uint8_t      m_objon;
+	uint8_t      m_bgon;
+	uint8_t      m_sprite3bank;
 	DECLARE_READ8_MEMBER(gunsmoke_protection_r);
 	DECLARE_WRITE8_MEMBER(gunsmoke_videoram_w);
 	DECLARE_WRITE8_MEMBER(gunsmoke_colorram_w);
@@ -45,7 +45,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(gunsmoke);
-	UINT32 screen_update_gunsmoke(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_gunsmoke(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;

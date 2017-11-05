@@ -8,10 +8,11 @@
     See tms9900.c for documentation
 */
 
-#ifndef __TMS9900_H__
-#define __TMS9900_H__
+#ifndef MAME_CPU_TMS9900_TMS9900_H
+#define MAME_CPU_TMS9900_TMS9900_H
 
-#include "emu.h"
+#pragma once
+
 #include "debugger.h"
 #include "tms99com.h"
 
@@ -42,10 +43,6 @@ static const char opname[][5] =
 class tms99xx_device : public cpu_device
 {
 public:
-	tms99xx_device(const machine_config &mconfig, device_type type,  const char *name,
-				const char *tag, int databus_width, int prg_addr_bits, int cru_addr_bits,
-				device_t *owner, UINT32 clock, const char *shortname, const char *source);
-
 	~tms99xx_device();
 
 	// READY input line. When asserted (high), the memory is ready for data exchange.
@@ -66,6 +63,10 @@ public:
 	template<class _Object> static devcb_base &static_set_dbin_callback(device_t &device, _Object object) { return downcast<tms99xx_device &>(device).m_dbin_line.set_callback(object); }
 
 protected:
+	tms99xx_device(const machine_config &mconfig, device_type type,
+				const char *tag, int databus_width, int prg_addr_bits, int cru_addr_bits,
+				device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void        device_start() override;
 	virtual void        device_stop() override;
@@ -74,52 +75,52 @@ protected:
 	virtual void        resolve_lines();
 
 	// device_execute_interface overrides
-	virtual UINT32      execute_min_cycles() const override;
-	virtual UINT32      execute_max_cycles() const override;
-	virtual UINT32      execute_input_lines() const override;
+	virtual uint32_t      execute_min_cycles() const override;
+	virtual uint32_t      execute_max_cycles() const override;
+	virtual uint32_t      execute_input_lines() const override;
 	virtual void        execute_set_input(int irqline, int state) override;
 	virtual void        execute_run() override;
 
 	// device_disasm_interface overrides
-	virtual UINT32      disasm_min_opcode_bytes() const override;
-	virtual UINT32      disasm_max_opcode_bytes() const override;
-	virtual offs_t      disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	virtual uint32_t      disasm_min_opcode_bytes() const override;
+	virtual uint32_t      disasm_max_opcode_bytes() const override;
+	virtual offs_t      disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
-	const address_space_config* memory_space_config(address_spacenum spacenum) const override;
+	virtual space_config_vector memory_space_config() const override;
 
 	// Let these methods be overloaded by the TMS9980.
 	virtual void        mem_read(void);
 	virtual void        mem_write(void);
 	virtual void        acquire_instruction(void);
-	void                decode(UINT16 inst);
+	void                decode(uint16_t inst);
 
 	const address_space_config  m_program_config;
 	const address_space_config  m_io_config;
 	address_space*          m_prgspace;
 	address_space*          m_cru;
 
-	virtual UINT16  read_workspace_register_debug(int reg);
-	virtual void    write_workspace_register_debug(int reg, UINT16 data);
+	virtual uint16_t  read_workspace_register_debug(int reg);
+	virtual void    write_workspace_register_debug(int reg, uint16_t data);
 
 	// Cycle counter
 	int     m_icount;
 
 	// TMS9900 hardware registers
-	UINT16  WP;     // Workspace pointer
-	UINT16  PC;     // Program counter
-	UINT16  ST;     // Status register
+	uint16_t  WP;     // Workspace pointer
+	uint16_t  PC;     // Program counter
+	uint16_t  ST;     // Status register
 
 	// Internal register
-	UINT16  IR;     // Instruction register
+	uint16_t  IR;     // Instruction register
 
 	// Stored address
-	UINT16  m_address;
+	uint16_t  m_address;
 
 	// Stores the recently read word or the word to be written
-	UINT16  m_current_value;
+	uint16_t  m_current_value;
 
 	// Decoded command
-	UINT16  m_command;
+	uint16_t  m_command;
 
 	// Is it a byte operation? Only format 1 commands with the byte flag set
 	// and CRU commands with less than 9 bits to transfer are byte operations.
@@ -133,9 +134,6 @@ protected:
 	// single-bit accesses. (Needed for TMS9980)
 	int     m_pass;
 
-	// Data bus width. Needed for TMS9980.
-	int     m_databus_width;
-
 	// Check the READY line?
 	bool    m_check_ready;
 
@@ -143,8 +141,8 @@ protected:
 	int     m_mem_phase;
 
 	// Max address
-	const UINT16  m_prgaddr_mask;
-	const UINT16  m_cruaddr_mask;
+	const uint16_t  m_prgaddr_mask;
+	const uint16_t  m_cruaddr_mask;
 
 	bool    m_load_state;
 	bool    m_irq_state;
@@ -200,7 +198,7 @@ protected:
 	// full range 0000-fffe for its CRU operations.
 	//
 	// We could realize this via the CRU access as well, but the data bus access
-	// is not that simple to emulate. For the sake of homogenity between the
+	// is not that simple to emulate. For the sake of homogeneity between the
 	// chip emulations we use a dedicated callback.
 	devcb_write8   m_external_operation;
 
@@ -222,7 +220,7 @@ private:
 	bool    m_hold_state;
 
 	// State / debug management
-	UINT16  m_state_any;
+	uint16_t  m_state_any;
 	static const char* s_statename[];
 	virtual void state_import(const device_state_entry &entry) override;
 	virtual void state_export(const device_state_entry &entry) override;
@@ -237,7 +235,7 @@ private:
 	void build_command_lookup_table();
 
 	// Sequence of micro-operations
-	typedef const UINT8* microprogram;
+	typedef const uint8_t* microprogram;
 
 	// Method pointer
 	typedef void (tms99xx_device::*ophandler)(void);
@@ -245,7 +243,7 @@ private:
 	// Opcode list entry
 	struct tms_instruction
 	{
-		UINT16              opcode;
+		uint16_t              opcode;
 		int                 id;
 		int                 format;
 		microprogram        prog;       // Microprogram
@@ -254,15 +252,12 @@ private:
 	// Lookup table entry
 	struct lookup_entry
 	{
-		lookup_entry *next_digit;
-		const tms_instruction *entry;
+		std::unique_ptr<lookup_entry[]> next_digit;
+		int index; // pointing to the static instruction list
 	};
 
 	// Pointer to the lookup table
-	lookup_entry*   m_command_lookup_table;
-
-	// List of allocated tables (used for easy clean-up on exit)
-	lookup_entry*   m_lotables[32];
+	std::unique_ptr<lookup_entry[]>   m_command_lookup_table;
 
 	// List of pointers for micro-operations
 	static const tms99xx_device::ophandler s_microoperation[];
@@ -321,18 +316,18 @@ private:
 
 	void    abort_operation(void);
 
-	// Micro-operation
-	UINT8   m_op;
-
 	// Micro-operation program counter (as opposed to the program counter PC)
 	int     MPC;
 
 	// Current microprogram
-	const UINT8*    m_program;
+	int     m_program_index;
 
 	// Calling microprogram (used when data derivation is called)
-	const UINT8*    m_caller;
-	int             m_caller_MPC;
+	int     m_caller_index;
+	int     m_caller_MPC;
+
+	// Index of the interrupt program
+	int     m_interrupt_mp_index;
 
 	// State of the micro-operation. Needed for repeated ALU calls.
 	int     m_state;
@@ -353,39 +348,39 @@ private:
 	bool m_destination_even;
 
 	// Intermediate storage for the source operand
-	UINT16 m_source_address;
-	UINT16 m_source_value;
-	UINT16  m_address_saved;
+	uint16_t m_source_address;
+	uint16_t m_source_value;
+	uint16_t  m_address_saved;
 
 	// Another copy of the address
-	UINT16  m_address_copy;
+	uint16_t  m_address_copy;
 
 	// Stores the recently read register contents
-	UINT16  m_register_contents;
+	uint16_t  m_register_contents;
 
 	// Stores the register number for the next register access
 	int     m_regnumber;
 
 	// CRU support: Stores the CRU address
-	UINT16  m_cru_address;
+	uint16_t  m_cru_address;
 
 	// CRU support: Stores the number of bits to be transferred
 	int     m_count;
 
 	// Copy of the value
-	UINT16  m_value_copy;
+	uint16_t  m_value_copy;
 
 	// Another internal register, storing intermediate values
 	// Using 32 bits to support MPY
-	UINT32  m_value;
+	uint32_t  m_value;
 
 	// For two-argument commands. Indicates whether this is the second operand.
 	bool    m_get_destination;
 
 	// Status register update
 	inline void set_status_bit(int bit, bool state);
-	inline void compare_and_set_lae(UINT16 value1, UINT16 value2);
-	void set_status_parity(UINT8 value);
+	inline void compare_and_set_lae(uint16_t value1, uint16_t value2);
+	void set_status_parity(uint8_t value);
 };
 
 /*****************************************************************************/
@@ -393,11 +388,11 @@ private:
 class tms9900_device : public tms99xx_device
 {
 public:
-	tms9900_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tms9900_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 
 // device type definition
-extern const device_type TMS9900;
+DECLARE_DEVICE_TYPE(TMS9900, tms9900_device)
 
-#endif /* __TMS9900_H__ */
+#endif // MAME_CPU_TMS9900_TMS9900_H

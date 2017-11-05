@@ -44,18 +44,24 @@ Ports:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "formats/ace_tap.h"
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
 #include "bus/centronics/ctronics.h"
 #include "machine/i8255.h"
 #include "machine/ram.h"
+#include "machine/timer.h"
 #include "machine/z80pio.h"
 #include "sound/ay8910.h"
 #include "sound/sp0256.h"
-#include "sound/speaker.h"
+#include "sound/spkrdev.h"
 #include "sound/wave.h"
+
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
+#include "formats/ace_tap.h"
+
 
 #define Z80_TAG         "z0"
 #define AY8910_TAG      "ay8910"
@@ -93,7 +99,7 @@ public:
 
 	virtual void machine_start() override;
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER( io_r );
 	DECLARE_WRITE8_MEMBER( io_w );
@@ -131,8 +137,8 @@ private:
 	required_device<centronics_device> m_centronics;
 	required_device<ram_device> m_ram;
 	required_device<sp0256_device> m_sp0256;
-	required_shared_ptr<UINT8> m_video_ram;
-	required_shared_ptr<UINT8> m_char_ram;
+	required_shared_ptr<uint8_t> m_video_ram;
+	required_shared_ptr<uint8_t> m_char_ram;
 	required_ioport m_a8;
 	required_ioport m_a9;
 	required_ioport m_a10;
@@ -160,7 +166,7 @@ private:
 SNAPSHOT_LOAD_MEMBER( ace_state, ace )
 {
 	cpu_device *cpu = m_maincpu;
-	UINT8 *RAM = memregion(cpu->tag())->base();
+	uint8_t *RAM = memregion(cpu->tag())->base();
 	address_space &space = cpu->space(AS_PROGRAM);
 	unsigned char ace_repeat, ace_byte, loop;
 	int done=0, ace_index=0x2000;
@@ -169,7 +175,7 @@ SNAPSHOT_LOAD_MEMBER( ace_state, ace )
 	{
 		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "At least 16KB RAM expansion required");
 		image.message("At least 16KB RAM expansion required");
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 	}
 
 	logerror("Loading file %s.\r\n", image.filename());
@@ -206,7 +212,7 @@ SNAPSHOT_LOAD_MEMBER( ace_state, ace )
 	{
 		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "EOF marker not found");
 		image.message("EOF marker not found");
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 	}
 
 		// patch CPU registers
@@ -244,7 +250,7 @@ SNAPSHOT_LOAD_MEMBER( ace_state, ace )
 	for (ace_index = 0x2000; ace_index < 0x8000; ace_index++)
 		space.write_byte(ace_index, RAM[ace_index]);
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 //**************************************************************************
@@ -257,7 +263,7 @@ SNAPSHOT_LOAD_MEMBER( ace_state, ace )
 
 READ8_MEMBER( ace_state::io_r )
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	if (!BIT(offset, 8)) data &= m_a8->read();
 	if (!BIT(offset, 9)) data &= m_a9->read();
@@ -418,7 +424,7 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( ace_io, AS_IO, 8, ace_state )
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0xfffe) AM_MASK(0xff00) AM_READWRITE(io_r, io_w)
+	AM_RANGE(0x00, 0x00) AM_MIRROR(0x00fe) AM_SELECT(0xff00) AM_READWRITE(io_r, io_w)
 	AM_RANGE(0x01, 0x01) AM_MIRROR(0xff00) AM_READ_PORT("JOY")
 	AM_RANGE(0x41, 0x41) AM_MIRROR(0xff80) AM_READWRITE(ppi_pa_r, ppi_pa_w)
 	AM_RANGE(0x43, 0x43) AM_MIRROR(0xff80) AM_READWRITE(ppi_pb_r, ppi_pb_w)
@@ -447,7 +453,7 @@ static INPUT_PORTS_START( ace )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_RSHIFT)     PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Symbol Shift") PORT_CODE(KEYCODE_LSHIFT) PORT_CHAR(UCHAR_SHIFT_2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Z)          PORT_CHAR('z') PORT_CHAR('Z') PORT_CHAR(':')
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_X)          PORT_CHAR('x') PORT_CHAR('X') PORT_CHAR('\xA3')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_X)          PORT_CHAR('x') PORT_CHAR('X') PORT_CHAR(0xA3)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C)          PORT_CHAR('c') PORT_CHAR('C') PORT_CHAR('?')
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -569,16 +575,16 @@ TIMER_DEVICE_CALLBACK_MEMBER(ace_state::clear_irq)
 }
 
 
-UINT32 ace_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t ace_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 y,ra,chr,gfx;
-	UINT16 sy=56,ma=0,x;
+	uint8_t y,ra,chr,gfx;
+	uint16_t sy=56,ma=0,x;
 
 	for (y = 0; y < 24; y++)
 	{
 		for (ra = 0; ra < 8; ra++)
 		{
-			UINT16 *p = &bitmap.pix16(sy++, 40);
+			uint16_t *p = &bitmap.pix16(sy++, 40);
 
 			for (x = ma; x < ma+32; x++)
 			{
@@ -740,7 +746,7 @@ void ace_state::machine_start()
 //  MACHINE_CONFIG( ace )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( ace, ace_state )
+static MACHINE_CONFIG_START( ace )
 	// basic machine hardware
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_6_5MHz/2)
 	MCFG_CPU_PROGRAM_MAP(ace_mem)
@@ -830,5 +836,5 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME     PARENT    COMPAT  MACHINE    INPUT     INIT     COMPANY         FULLNAME      FLAGS
-COMP( 1981, jupace,     0,        0,      ace,       ace, driver_device,      0,   "Jupiter Cantab", "Jupiter Ace" , 0 )
+//    YEAR  NAME     PARENT    COMPAT  MACHINE    INPUT  STATE      INIT  COMPANY           FULLNAME       FLAGS
+COMP( 1981, jupace,  0,        0,      ace,       ace,   ace_state, 0,    "Jupiter Cantab", "Jupiter Ace", 0 )

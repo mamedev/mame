@@ -7,6 +7,7 @@
 *************************************************************************/
 
 #include "sound/discrete.h"
+#include "screen.h"
 
 /* Discrete Sound Input Nodes */
 #define TANK8_CRASH_EN          NODE_01
@@ -52,11 +53,11 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
-	required_shared_ptr<UINT8> m_video_ram;
-	required_shared_ptr<UINT8> m_pos_h_ram;
-	required_shared_ptr<UINT8> m_pos_v_ram;
-	required_shared_ptr<UINT8> m_pos_d_ram;
-	required_shared_ptr<UINT8> m_team;
+	required_shared_ptr<uint8_t> m_video_ram;
+	required_shared_ptr<uint8_t> m_pos_h_ram;
+	required_shared_ptr<uint8_t> m_pos_v_ram;
+	required_shared_ptr<uint8_t> m_pos_d_ram;
+	required_shared_ptr<uint8_t> m_team;
 
 	int m_collision_index;
 	tilemap_t *m_tilemap;
@@ -83,8 +84,8 @@ public:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(tank8);
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof(screen_device &screen, bool state);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 	void set_pens();
 	inline int get_x_pos(int n);
 	inline int get_y_pos(int n);

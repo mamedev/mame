@@ -10,10 +10,10 @@
 #include "pc_lpt.h"
 
 
-const device_type PC_LPT = &device_creator<pc_lpt_device>;
+DEFINE_DEVICE_TYPE(PC_LPT, pc_lpt_device, "pc_lpt", "PC LPT")
 
-pc_lpt_device::pc_lpt_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, PC_LPT, "PC-LPT", tag, owner, clock, "pc_lpt", __FILE__),
+pc_lpt_device::pc_lpt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, PC_LPT, tag, owner, clock),
 	m_irq(1),
 	m_data(0xff), m_control(0),
 	m_irq_enabled(1),
@@ -46,7 +46,7 @@ void pc_lpt_device::device_reset()
 	m_cent_ctrl_out->write(m_control);
 }
 
-static MACHINE_CONFIG_FRAGMENT( pc_lpt )
+MACHINE_CONFIG_MEMBER( pc_lpt_device::device_add_mconfig )
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
 	MCFG_CENTRONICS_DATA_INPUT_BUFFER("cent_data_in")
 	MCFG_CENTRONICS_FAULT_HANDLER(DEVWRITELINE("cent_status_in", input_buffer_device, write_bit3))
@@ -74,10 +74,6 @@ static MACHINE_CONFIG_FRAGMENT( pc_lpt )
 	MCFG_OUTPUT_LATCH_BIT4_HANDLER(WRITELINE(pc_lpt_device, write_irq_enabled))
 MACHINE_CONFIG_END
 
-machine_config_constructor pc_lpt_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( pc_lpt  );
-}
 
 READ8_MEMBER( pc_lpt_device::data_r )
 {

@@ -12,7 +12,7 @@
 #include "emu.h"
 #include "8530scc.h"
 
-const device_type SCC8530 = &device_creator<scc8530_t>;
+DEFINE_DEVICE_TYPE(SCC8530, scc8530_t, "scc8530l", "Zilog 8530 SCC (legacy)")
 
 
 /***************************************************************************
@@ -25,8 +25,9 @@ const device_type SCC8530 = &device_creator<scc8530_t>;
     IMPLEMENTATION
 ***************************************************************************/
 
-scc8530_t::scc8530_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, SCC8530, "Zilog 8530 SCC (Legacy)", tag, owner, clock, "scc8530l", __FILE__), mode(0), reg(0), status(0), IRQV(0), MasterIRQEnable(0), lastIRQStat(0), IRQType(),
+scc8530_t::scc8530_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, SCC8530, tag, owner, clock),
+	mode(0), reg(0), status(0), IRQV(0), MasterIRQEnable(0), lastIRQStat(0), IRQType(),
 	intrq_cb(*this)
 {
 }
@@ -214,7 +215,7 @@ void scc8530_t::acknowledge()
     scc_getareg
 -------------------------------------------------*/
 
-UINT8 scc8530_t::getareg()
+uint8_t scc8530_t::getareg()
 {
 	/* Not yet implemented */
 	#if LOG_SCC
@@ -223,7 +224,7 @@ UINT8 scc8530_t::getareg()
 
 	if (reg == 0)
 	{
-		UINT8 rv = 0;
+		uint8_t rv = 0;
 
 		Chan *ourCh = &channel[0];
 
@@ -246,7 +247,7 @@ UINT8 scc8530_t::getareg()
     scc_getareg
 -------------------------------------------------*/
 
-UINT8 scc8530_t::getbreg()
+uint8_t scc8530_t::getbreg()
 {
 	#if LOG_SCC
 	printf("SCC: port B reg %i read 0x%02x\n", reg, channel[1].reg_val[reg]);
@@ -254,7 +255,7 @@ UINT8 scc8530_t::getbreg()
 
 	if (reg == 0)
 	{
-		UINT8 rv = 0;
+		uint8_t rv = 0;
 
 		Chan *ourCh = &channel[1];
 
@@ -285,7 +286,7 @@ UINT8 scc8530_t::getbreg()
     scc_putreg
 -------------------------------------------------*/
 
-void scc8530_t::putreg(int ch, UINT8 data)
+void scc8530_t::putreg(int ch, uint8_t data)
 {
 	Chan *pChan = &channel[ch];
 
@@ -417,7 +418,7 @@ void scc8530_t::putreg(int ch, UINT8 data)
     scc8530_get_reg_a
 -------------------------------------------------*/
 
-UINT8 scc8530_t::get_reg_a(int reg)
+uint8_t scc8530_t::get_reg_a(int reg)
 {
 	return channel[0].reg_val[reg];
 }
@@ -428,7 +429,7 @@ UINT8 scc8530_t::get_reg_a(int reg)
     scc8530_get_reg_b
 -------------------------------------------------*/
 
-UINT8 scc8530_t::get_reg_b(int reg)
+uint8_t scc8530_t::get_reg_b(int reg)
 {
 	return channel[1].reg_val[reg];
 }
@@ -439,7 +440,7 @@ UINT8 scc8530_t::get_reg_b(int reg)
     scc8530_set_reg_a
 -------------------------------------------------*/
 
-void scc8530_t::set_reg_a(int reg, UINT8 data)
+void scc8530_t::set_reg_a(int reg, uint8_t data)
 {
 	channel[0].reg_val[reg] = data;
 }
@@ -447,56 +448,53 @@ void scc8530_t::set_reg_a(int reg, UINT8 data)
 
 
 /*-------------------------------------------------
-    scc8530_set_reg_a
+    scc8530_set_reg_b
 -------------------------------------------------*/
 
-void scc8530_t::set_reg_b(int reg, UINT8 data)
+void scc8530_t::set_reg_b(int reg, uint8_t data)
 {
 	channel[1].reg_val[reg] = data;
 }
 
 
 
-/*-------------------------------------------------
-    scc8530_r
--------------------------------------------------*/
+//-------------------------------------------------
+//  reg_r - read handler, trampolines into normal
+//  getter
+//-------------------------------------------------
 
-READ8_MEMBER( scc8530_t::reg_r)
+READ8_MEMBER(scc8530_t::reg_r)
 {
-	UINT8 result = 0;
+	return read_reg(offset & 3);
+}
 
-	offset %= 4;
+
+
+//-------------------------------------------------
+//  read_reg - reads either the control or data
+//  port for either SCC channel.
+//-------------------------------------------------
+
+uint8_t scc8530_t::read_reg(int offset)
+{
+	uint8_t result = 0;
 
 	switch(offset)
 	{
-		case 0:
-			/* Channel B (Printer Port) Control */
+		case 0: /* Channel B (Printer Port) Control */
+		case 1: /* Channel A (Modem Port) Control */
+
 			if (mode == 1)
 				mode = 0;
 			else
 				reg = 0;
 
-			result = getbreg();
+			result = (offset == 0) ? getbreg() : getareg();
 			break;
 
-		case 1:
-			/* Channel A (Modem Port) Control */
-			if (mode == 1)
-				mode = 0;
-			else
-				reg = 0;
-
-			result = getareg();
-			break;
-
-		case 2:
-			/* Channel B (Printer Port) Data */
-			result = channel[1].rxData;
-			break;
-
-		case 3:
-			/* Channel A (Modem Port) Data */
-			result = channel[0].rxData;
+		case 2: /* Channel B (Printer Port) Data */
+		case 3:/* Channel A (Modem Port) Data */
+			result = channel[offset == 2 ? 1 : 0].rxData;
 			break;
 	}
 	return result;
@@ -504,22 +502,36 @@ READ8_MEMBER( scc8530_t::reg_r)
 
 
 
-/*-------------------------------------------------
-    scc8530_w
--------------------------------------------------*/
+//-------------------------------------------------
+//  reg_w - write handler, trampolines into normal
+//  setter
+//-------------------------------------------------
 
 WRITE8_MEMBER( scc8530_t::reg_w )
 {
-	Chan *pChan;
+	write_reg(offset & 3, data);
+}
 
-	offset &= 3;
+
+
+//-------------------------------------------------
+//  write_reg - writes either the control or data
+//  port for either SCC channel.
+//-------------------------------------------------
+
+void scc8530_t::write_reg(int offset, uint8_t data)
+{
+	//offset & 3;
 
 //  printf(" mode %d data %x offset %d  \n", mode, data, offset);
 
+	//Chan *pChan;
 	switch(offset)
 	{
-		case 0:
-			/* Channel B (Printer Port) Control */
+		case 0: /* Channel B (Printer Port) Control */
+		case 1: /* Channel A (Modem Port) Control */
+		{
+			int chan = ((offset == 0) ? 1 : 0);
 			if (mode == 0)
 			{
 				if((data & 0xf0) == 0)  // not a reset command
@@ -530,89 +542,44 @@ WRITE8_MEMBER( scc8530_t::reg_w )
 				}
 				else if (data == 0x10)
 				{
-					pChan = &channel[1];
 					// clear ext. interrupts
-					pChan->extIRQPending = 0;
-					pChan->baudIRQPending = 0;
+					channel[chan].extIRQPending = 0;
+					channel[chan].baudIRQPending = 0;
 					updateirqs();
 				}
 			}
 			else
 			{
 				mode = 0;
-				putreg(1, data);
+				putreg(chan, data);
 			}
 			break;
+		}
 
-		case 1:
-			/* Channel A (Modem Port) Control */
-			if (mode == 0)
+		case 2: /* Channel B (Printer Port) Data */
+		case 3: /* Channel A (Modem Port) Data */
+		{
+			int chan = ((offset == 2) ? 1 : 0);
+			if (channel[chan].txEnable)
 			{
-				if((data & 0xf0) == 0)  // not a reset command
-				{
-					mode = 1;
-					reg = data & 0x0f;
-//                  putareg(data & 0xf0);
-				}
-				else if (data == 0x10)
-				{
-					pChan = &channel[0];
-					// clear ext. interrupts
-					pChan->extIRQPending = 0;
-					pChan->baudIRQPending = 0;
-					updateirqs();
-				}
-			}
-			else
-			{
-				mode = 0;
-				putreg(0, data);
-			}
-			break;
-
-		case 2:
-			/* Channel B (Printer Port) Data */
-			pChan = &channel[1];
-
-			if (pChan->txEnable)
-			{
-				pChan->txData = data;
+				channel[chan].txData = data;
 				// local loopback?
-				if (pChan->reg_val[14] & 0x10)
+				if (channel[chan].reg_val[14] & 0x10)
 				{
-					pChan->rxData = data;
-					pChan->reg_val[0] |= 0x01;  // Rx character available
+					channel[chan].rxData = data;
+					channel[chan].reg_val[0] |= 0x01;  // Rx character available
 				}
-				pChan->reg_val[1] |= 0x01;  // All sent
-				pChan->reg_val[0] |= 0x04;  // Tx empty
-				pChan->txUnderrun = 1;
-				pChan->txIRQPending = 1;
+				channel[chan].reg_val[1] |= 0x01;  // All sent
+				channel[chan].reg_val[0] |= 0x04;  // Tx empty
+				channel[chan].txUnderrun = 1;
+				channel[chan].txIRQPending = 1;
 				updateirqs();
 			}
 			break;
-
-		case 3:
-			/* Channel A (Modem Port) Data */
-			pChan = &channel[0];
-
-			if (pChan->txEnable)
-			{
-				pChan->txData = data;
-				// local loopback?
-				if (pChan->reg_val[14] & 0x10)
-				{
-					pChan->rxData = data;
-					pChan->reg_val[0] |= 0x01;  // Rx character available
-				}
-				pChan->reg_val[1] |= 0x01;  // All sent
-				pChan->reg_val[0] |= 0x04;  // Tx empty
-				pChan->txUnderrun = 1;
-				pChan->txIRQPending = 1;
-				updateirqs();
-			}
-			break;
+		}
 	}
 }
+
 
 /*
 

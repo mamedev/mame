@@ -1,13 +1,14 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
+#include "emu.h"
 #include "oricext.h"
 #include "jasmin.h"
 #include "microdisc.h"
 
-const device_type ORICEXT_CONNECTOR = &device_creator<oricext_connector>;
+DEFINE_DEVICE_TYPE(ORICEXT_CONNECTOR, oricext_connector, "oricext_connector", "ORIC extension connector")
 
-oricext_connector::oricext_connector(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, ORICEXT_CONNECTOR, "ORIC extension connector", tag, owner, clock, "oricext_connector", __FILE__),
+oricext_connector::oricext_connector(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, ORICEXT_CONNECTOR, tag, owner, clock),
 	device_slot_interface(mconfig, *this),
 	irq_handler(*this),
 	cputag(nullptr)
@@ -40,8 +41,8 @@ void oricext_connector::device_config_complete()
 		dev->set_cputag(cputag);
 }
 
-oricext_device::oricext_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
-	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+oricext_device::oricext_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
 	device_slot_card_interface(mconfig, *this),
 	cputag(nullptr),
 	cpu(nullptr),
@@ -72,8 +73,8 @@ void oricext_device::device_start()
 	bank_c000_w = membank(":bank_c000_w");
 	bank_e000_w = membank(":bank_e000_w");
 	bank_f800_w = membank(":bank_f800_w");
-	rom = (UINT8 *)machine().root_device().memregion(cputag)->base();
-	ram = (UINT8 *)memshare(":ram")->ptr();
+	rom = (uint8_t *)machine().root_device().memregion(cputag)->base();
+	ram = (uint8_t *)memshare(":ram")->ptr();
 
 	memset(junk_read, 0xff, sizeof(junk_read));
 	memset(junk_write, 0x00, sizeof(junk_write));

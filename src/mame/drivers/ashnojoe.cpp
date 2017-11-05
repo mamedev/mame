@@ -69,32 +69,26 @@ Dips:
 
    Easy (A) -> Difficult (D)
 
-Game is controled with 4-direction lever and two buttons
+Game is controlled with 4-direction lever and two buttons
 Coin B is not used
 
 *************************************************************************/
 
 #include "emu.h"
+#include "includes/ashnojoe.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/2203intf.h"
-#include "sound/msm5205.h"
-#include "includes/ashnojoe.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 READ16_MEMBER(ashnojoe_state::fake_4a00a_r)
 {
 	/* If it returns 1 there's no sound. Is it used to sync the game and sound?
 	or just a debug enable/disable register? */
 	return 0;
-}
-
-WRITE16_MEMBER(ashnojoe_state::ashnojoe_soundlatch_w)
-{
-	if (ACCESSING_BITS_0_7)
-	{
-		m_soundlatch_status = 1;
-		soundlatch_byte_w(space, 0, data & 0xff);
-	}
 }
 
 static ADDRESS_MAP_START( ashnojoe_map, AS_PROGRAM, 16, ashnojoe_state )
@@ -111,7 +105,7 @@ static ADDRESS_MAP_START( ashnojoe_map, AS_PROGRAM, 16, ashnojoe_state )
 	AM_RANGE(0x04a002, 0x04a003) AM_READ_PORT("P2")
 	AM_RANGE(0x04a004, 0x04a005) AM_READ_PORT("DSW")
 	AM_RANGE(0x04a006, 0x04a007) AM_WRITEONLY AM_SHARE("tilemap_reg")
-	AM_RANGE(0x04a008, 0x04a009) AM_WRITE(ashnojoe_soundlatch_w)
+	AM_RANGE(0x04a008, 0x04a009) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0x04a00a, 0x04a00b) AM_READ(fake_4a00a_r)  // ??
 	AM_RANGE(0x04a010, 0x04a019) AM_WRITE(joe_tilemaps_xscroll_w)
 	AM_RANGE(0x04a020, 0x04a029) AM_WRITE(joe_tilemaps_yscroll_w)
@@ -125,15 +119,9 @@ WRITE8_MEMBER(ashnojoe_state::adpcm_w)
 	m_adpcm_byte = data;
 }
 
-READ8_MEMBER(ashnojoe_state::sound_latch_r)
-{
-	m_soundlatch_status = 0;
-	return soundlatch_byte_r(space, 0);
-}
-
 READ8_MEMBER(ashnojoe_state::sound_latch_status_r)
 {
-	return m_soundlatch_status;
+	return m_soundlatch->pending_r();
 }
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, ashnojoe_state )
@@ -146,7 +134,7 @@ static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, ashnojoe_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
 	AM_RANGE(0x02, 0x02) AM_WRITE(adpcm_w)
-	AM_RANGE(0x04, 0x04) AM_READ(sound_latch_r)
+	AM_RANGE(0x04, 0x04) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x06, 0x06) AM_READ(sound_latch_status_r)
 ADDRESS_MAP_END
 
@@ -271,12 +259,6 @@ static GFXDECODE_START( ashnojoe )
 	GFXDECODE_ENTRY( "gfx5", 0, tiles16x16_layout, 0, 0x100 )
 GFXDECODE_END
 
-
-WRITE_LINE_MEMBER(ashnojoe_state::ym2203_irq_handler)
-{
-	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
 WRITE8_MEMBER(ashnojoe_state::ym2203_write_a)
 {
 	/* This gets called at 8910 startup with 0xff before the 5205 exists, causing a crash */
@@ -309,19 +291,17 @@ WRITE_LINE_MEMBER(ashnojoe_state::ashnojoe_vclk_cb)
 void ashnojoe_state::machine_start()
 {
 	save_item(NAME(m_adpcm_byte));
-	save_item(NAME(m_soundlatch_status));
 	save_item(NAME(m_msm5205_vclk_toggle));
 }
 
 void ashnojoe_state::machine_reset()
 {
 	m_adpcm_byte = 0;
-	m_soundlatch_status = 0;
 	m_msm5205_vclk_toggle = 0;
 }
 
 
-static MACHINE_CONFIG_START( ashnojoe, ashnojoe_state )
+static MACHINE_CONFIG_START( ashnojoe )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 8000000)
@@ -349,15 +329,17 @@ static MACHINE_CONFIG_START( ashnojoe, ashnojoe_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ymsnd", YM2203, 4000000)
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(ashnojoe_state, ym2203_irq_handler))
+	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(ashnojoe_state, ym2203_write_a))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(ashnojoe_state, ym2203_write_b))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.1)
 
 	MCFG_SOUND_ADD("msm", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(ashnojoe_state, ashnojoe_vclk_cb))
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -437,7 +419,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(ashnojoe_state,ashnojoe)
 {
-	UINT8 *ROM = memregion("adpcm")->base();
+	uint8_t *ROM = memregion("adpcm")->base();
 	membank("bank4")->configure_entries(0, 16, &ROM[0x00000], 0x8000);
 
 	membank("bank4")->set_entry(0);

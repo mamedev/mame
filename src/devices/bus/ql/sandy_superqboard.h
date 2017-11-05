@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_QL_SANDY_SUPERQBOARD_H
+#define MAME_BUS_QL_SANDY_SUPERQBOARD_H
 
-#ifndef __SANDY_SUPERQBOARD__
-#define __SANDY_SUPERQBOARD__
+#pragma once
 
 #include "exp.h"
 #include "bus/centronics/ctronics.h"
@@ -22,37 +22,37 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> sandy_superqboard_t
+// ======================> sandy_superqboard_device
 
-class sandy_superqboard_t : public device_t,
-							public device_ql_expansion_card_interface
+class sandy_superqboard_device : public device_t, public device_ql_expansion_card_interface
 {
 public:
 	// construction/destruction
-	sandy_superqboard_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	sandy_superqboard_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, int ram_size);
-
-	// optional information overrides
-	virtual const rom_entry *device_rom_region() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
-	WRITE_LINE_MEMBER( busy_w );
-
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	sandy_superqboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_INPUT_CHANGED_MEMBER( mouse_x_changed );
 	DECLARE_INPUT_CHANGED_MEMBER( mouse_y_changed );
 
 protected:
+	sandy_superqboard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int ram_size);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
+	// optional information overrides
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
+
 	// device_ql_expansion_card_interface overrides
-	virtual UINT8 read(address_space &space, offs_t offset, UINT8 data) override;
-	virtual void write(address_space &space, offs_t offset, UINT8 data) override;
+	virtual uint8_t read(address_space &space, offs_t offset, uint8_t data) override;
+	virtual void write(address_space &space, offs_t offset, uint8_t data) override;
 
 private:
+	WRITE_LINE_MEMBER( busy_w );
+
+	DECLARE_FLOPPY_FORMATS( floppy_formats );
+
 	enum
 	{
 		ST_BUSY = 0x01,
@@ -67,53 +67,53 @@ private:
 
 	void check_interrupt();
 
-	required_device<wd1772_t> m_fdc;
+	required_device<wd1772_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
 	required_device<centronics_device> m_centronics;
 	required_device<output_latch_device> m_latch;
 	required_memory_region m_rom;
-	optional_shared_ptr<UINT8> m_ram;
+	optional_shared_ptr<uint8_t> m_ram;
 	optional_ioport m_buttons;
 
 	int m_ram_size;
 	int m_fd6;
 	int m_fd7;
 
-	UINT8 m_status;
+	uint8_t m_status;
 };
 
 
-// ======================> sandy_superqboard_512k_t
+// ======================> sandy_superqboard_512k_device
 
-class sandy_superqboard_512k_t :  public sandy_superqboard_t
+class sandy_superqboard_512k_device :  public sandy_superqboard_device
 {
 public:
 	// construction/destruction
-	sandy_superqboard_512k_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sandy_superqboard_512k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 
-// ======================> sandy_superqmouse_t
+// ======================> sandy_superqmouse_device
 
-class sandy_superqmouse_t :  public sandy_superqboard_t
+class sandy_superqmouse_device :  public sandy_superqboard_device
 {
 public:
 	// construction/destruction
-	sandy_superqmouse_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sandy_superqmouse_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual ioport_constructor device_input_ports() const override;
 };
 
 
-// ======================> sandy_superqmouse_512k_t
+// ======================> sandy_superqmouse_512k_device
 
-class sandy_superqmouse_512k_t :  public sandy_superqboard_t
+class sandy_superqmouse_512k_device :  public sandy_superqboard_device
 {
 public:
 	// construction/destruction
-	sandy_superqmouse_512k_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sandy_superqmouse_512k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual ioport_constructor device_input_ports() const override;
@@ -121,11 +121,9 @@ public:
 
 
 // device type definition
-extern const device_type SANDY_SUPERQBOARD;
-extern const device_type SANDY_SUPERQBOARD_512K;
-extern const device_type SANDY_SUPERQMOUSE;
-extern const device_type SANDY_SUPERQMOUSE_512K;
+DECLARE_DEVICE_TYPE(SANDY_SUPERQBOARD,      sandy_superqboard_device)
+DECLARE_DEVICE_TYPE(SANDY_SUPERQBOARD_512K, sandy_superqboard_512k_device)
+DECLARE_DEVICE_TYPE(SANDY_SUPERQMOUSE,      sandy_superqmouse_device)
+DECLARE_DEVICE_TYPE(SANDY_SUPERQMOUSE_512K, sandy_superqmouse_512k_device)
 
-
-
-#endif
+#endif // MAME_BUS_QL_SANDY_SUPERQBOARD_H

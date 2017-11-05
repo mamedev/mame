@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "geocable.h"
 
 
@@ -22,28 +23,17 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_GEOCABLE = &device_creator<c64_geocable_device>;
+DEFINE_DEVICE_TYPE(C64_GEOCABLE, c64_geocable_device, "c64_geocable", "C64 geoCable")
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( c64_geocable )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( c64_geocable )
+MACHINE_CONFIG_MEMBER( c64_geocable_device::device_add_mconfig )
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(c64_geocable_device, output_b))
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor c64_geocable_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( c64_geocable );
-}
 
 
 
@@ -55,8 +45,8 @@ machine_config_constructor c64_geocable_device::device_mconfig_additions() const
 //  c64_geocable_device - constructor
 //-------------------------------------------------
 
-c64_geocable_device::c64_geocable_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, C64_GEOCABLE, "C64 geoCable", tag, owner, clock, "c64_geocable", __FILE__),
+c64_geocable_device::c64_geocable_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, C64_GEOCABLE, tag, owner, clock),
 	device_pet_user_port_interface(mconfig, *this),
 	m_centronics(*this, CENTRONICS_TAG)
 {

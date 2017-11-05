@@ -22,7 +22,7 @@
    * expansion carts do not contain the required game data => main PRG must be in the main cart
      so to remain connected even when an expansion is inserted (differently from Datach, where
      the base unit contains no PRG)
-   * bankswicth writes with bit3=0 (to access expansion) when no expansion is present should do
+   * bankswitch writes with bit3=0 (to access expansion) when no expansion is present should do
      nothing
 
  ***********************************************************************************************************/
@@ -51,9 +51,9 @@
 //-------------------------------------------------
 
 kstudio_cart_interface::kstudio_cart_interface(const machine_config &mconfig, device_t &device)
-					: device_slot_card_interface(mconfig, device),
-					m_rom(nullptr), m_bank(0)
-				{
+	: device_slot_card_interface(mconfig, device)
+	, m_rom(nullptr), m_bank(0)
+{
 }
 
 kstudio_cart_interface::~kstudio_cart_interface()
@@ -69,12 +69,13 @@ READ8_MEMBER(kstudio_cart_interface::read)
 //  sub-cart slot device
 //-------------------------------------------------
 
-const device_type NES_KSEXPANSION_SLOT = &device_creator<nes_kstudio_slot_device>;
+DEFINE_DEVICE_TYPE(NES_KSEXPANSION_SLOT, nes_kstudio_slot_device, "nes_ks_slot", "NES Karaoke Studio Expansion Slot")
 
-nes_kstudio_slot_device::nes_kstudio_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-							device_t(mconfig, NES_KSEXPANSION_SLOT, "NES Karaoke Studio Expansion Slot", tag, owner, clock, "nes_ks_slot", __FILE__),
-							device_image_interface(mconfig, *this),
-							device_slot_interface(mconfig, *this), m_cart(nullptr)
+nes_kstudio_slot_device::nes_kstudio_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, NES_KSEXPANSION_SLOT, tag, owner, clock)
+	, device_image_interface(mconfig, *this)
+	, device_slot_interface(mconfig, *this)
+	, m_cart(nullptr)
 {
 }
 
@@ -96,43 +97,37 @@ READ8_MEMBER(nes_kstudio_slot_device::read)
 	return 0xff;
 }
 
-bool nes_kstudio_slot_device::call_load()
+image_init_result nes_kstudio_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		UINT8 *ROM = m_cart->get_cart_base();
+		uint8_t *ROM = m_cart->get_cart_base();
 
 		if (!ROM)
-			return IMAGE_INIT_FAIL;
+			return image_init_result::FAIL;
 
-		// Existing exapnsion carts are all 128K, so we only load files of this size
-		if (software_entry() == nullptr)
+		// Existing expansion carts are all 128K, so we only load files of this size
+		if (!loaded_through_softlist())
 		{
 			if (length() != 0x20000)
-				return IMAGE_INIT_FAIL;
+				return image_init_result::FAIL;
 
 			fread(&ROM, 0x20000);
 		}
 		else
 		{
 			if (get_software_region_length("rom") != 0x20000)
-				return IMAGE_INIT_FAIL;
+				return image_init_result::FAIL;
 
 			memcpy(ROM, get_software_region("rom"), 0x20000);
 		}
 	}
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 
-bool nes_kstudio_slot_device::call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry)
-{
-	machine().rom_load().load_software_part_region(*this, swlist, swname, start_entry );
-	return TRUE;
-}
-
-std::string nes_kstudio_slot_device::get_default_card_software()
+std::string nes_kstudio_slot_device::get_default_card_software(get_default_card_software_hook &hook) const
 {
 	return software_get_default_slot("ks_exp");
 }
@@ -148,17 +143,17 @@ ROM_START( ks_exp_rom )
 	ROM_REGION(0x20000, "exrom", ROMREGION_ERASEFF)
 ROM_END
 
-const device_type NES_KSEXPANSION_ROM = &device_creator<nes_kstudio_rom_device>;
+DEFINE_DEVICE_TYPE(NES_KSEXPANSION_ROM, nes_kstudio_rom_device, "nes_ks_rom", "NES Karaoke Studio Expansion ROM")
 
-nes_kstudio_rom_device::nes_kstudio_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-							: device_t(mconfig, NES_KSEXPANSION_ROM, "NES Karaoke Studio Expansion ROM", tag, owner, clock, "nes_ks_rom", __FILE__),
-								kstudio_cart_interface( mconfig, *this )
+nes_kstudio_rom_device::nes_kstudio_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, NES_KSEXPANSION_ROM, tag, owner, clock)
+	, kstudio_cart_interface( mconfig, *this )
 {
 }
 
 void nes_kstudio_rom_device::device_start()
 {
-	m_rom = (UINT8*)memregion("exrom")->base();
+	m_rom = (uint8_t*)memregion("exrom")->base();
 	save_item(NAME(m_bank));
 }
 
@@ -167,12 +162,12 @@ void nes_kstudio_rom_device::device_reset()
 	m_bank = 0;
 }
 
-const rom_entry *nes_kstudio_rom_device::device_rom_region() const
+const tiny_rom_entry *nes_kstudio_rom_device::device_rom_region() const
 {
 	return ROM_NAME( ks_exp_rom );
 }
 
-UINT8 *nes_kstudio_rom_device::get_cart_base()
+uint8_t *nes_kstudio_rom_device::get_cart_base()
 {
 	return m_rom;
 }
@@ -184,13 +179,14 @@ UINT8 *nes_kstudio_rom_device::get_cart_base()
 //
 //------------------------------------------
 
-const device_type NES_KARAOKESTUDIO = &device_creator<nes_karaokestudio_device>;
+DEFINE_DEVICE_TYPE(NES_KARAOKESTUDIO, nes_karaokestudio_device, "nes_karaoke", "NES Cart Bandai Karaoke Studio PCB")
 
 
-nes_karaokestudio_device::nes_karaokestudio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: nes_nrom_device(mconfig, NES_KARAOKESTUDIO, "NES Cart Bandai Karaoke Studio PCB", tag, owner, clock, "nes_karaoke", __FILE__), m_exp_active(0),
-					m_subslot(*this, "exp_slot"),
-					m_mic_ipt(*this, "MIC")
+nes_karaokestudio_device::nes_karaokestudio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: nes_nrom_device(mconfig, NES_KARAOKESTUDIO, tag, owner, clock)
+	, m_exp_active(0)
+	, m_subslot(*this, "exp_slot")
+	, m_mic_ipt(*this, "MIC")
 {
 }
 
@@ -299,11 +295,6 @@ static SLOT_INTERFACE_START(karaoke_studio_cart)
 SLOT_INTERFACE_END
 
 
-MACHINE_CONFIG_FRAGMENT( karaoke_studio )
+MACHINE_CONFIG_MEMBER( nes_karaokestudio_device::device_add_mconfig )
 	MCFG_KSTUDIO_MINICART_ADD("exp_slot", karaoke_studio_cart)
 MACHINE_CONFIG_END
-
-machine_config_constructor nes_karaokestudio_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( karaoke_studio );
-}

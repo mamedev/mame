@@ -9,7 +9,6 @@ Functions to emulate the video hardware of the machine.
 ***************************************************************************/
 
 #include "emu.h"
-#include "sound/dac.h"
 #include "includes/cheekyms.h"
 
 /* bit 3 and 7 of the char color PROMs are used for something -- not currently emulated -
@@ -17,7 +16,7 @@ Functions to emulate the video hardware of the machine.
 
 PALETTE_INIT_MEMBER(cheekyms_state, cheekyms)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i, j, bit, r, g, b;
 
 	for (i = 0; i < 6; i++)
@@ -39,17 +38,23 @@ PALETTE_INIT_MEMBER(cheekyms_state, cheekyms)
 	}
 }
 
-
 WRITE8_MEMBER(cheekyms_state::port_40_w)
 {
-	/* the lower bits probably trigger sound samples */
-	m_dac->write_unsigned8(data ? 0x80 : 0);
+	m_sound_board->music_w(BIT(data, 7));
+	m_sound_board->cheese_w(BIT(data, 6));
+	m_sound_board->hammer_w(BIT(data, 5));
+	m_sound_board->mouse_dies_w(BIT(data, 4));
+	m_sound_board->pest_dies_w(BIT(data, 3));
+	m_sound_board->mouse_w(BIT(data, 2));
+	m_sound_board->pest_w(BIT(data, 1));
 }
 
 
 WRITE8_MEMBER(cheekyms_state::port_80_w)
 {
-	/* d0-d1 - sound enables, not sure which bit is which */
+	m_sound_board->coin_extra_w(BIT(data, 1));
+	m_sound_board->mute_w(BIT(data, 0));
+
 	/* d3-d5 - man scroll amount */
 	/* d6 - palette select (selects either 0 = PROM M9, 1 = PROM M8) */
 	/* d7 - screen flip */
@@ -98,7 +103,7 @@ void cheekyms_state::video_start()
 	height = m_screen->height();
 	m_bitmap_buffer = std::make_unique<bitmap_ind16>(width, height);
 
-	m_cm_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(cheekyms_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_cm_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cheekyms_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_cm_tilemap->set_transparent_pen(0);
 }
 
@@ -123,26 +128,26 @@ void cheekyms_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 			if (!flip)
 				code++;
 
-				gfx->transpen(bitmap,cliprect, code, color, 0, 0, x, y, 0);
+			gfx->transpen(bitmap,cliprect, code, color, 0, 0, x, y, 0);
 		}
 		else
 		{
 			if (m_spriteram[offs + 0] & 0x02)
 			{
-					gfx->transpen(bitmap,cliprect, code | 0x20, color, 0, 0,        x, y, 0);
-					gfx->transpen(bitmap,cliprect, code | 0x21, color, 0, 0, 0x10 + x, y, 0);
+				gfx->transpen(bitmap,cliprect, code | 0x20, color, 0, 0,        x, y, 0);
+				gfx->transpen(bitmap,cliprect, code | 0x21, color, 0, 0, 0x10 + x, y, 0);
 			}
 			else
 			{
-					gfx->transpen(bitmap,cliprect, code | 0x20, color, 0, 0, x,        y, 0);
-					gfx->transpen(bitmap,cliprect, code | 0x21, color, 0, 0, x, 0x10 + y, 0);
+				gfx->transpen(bitmap,cliprect, code | 0x20, color, 0, 0, x,        y, 0);
+				gfx->transpen(bitmap,cliprect, code | 0x21, color, 0, 0, x, 0x10 + y, 0);
 			}
 		}
 	}
 }
 
 
-UINT32 cheekyms_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t cheekyms_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int y, x;
 	int scrolly = ((*m_port_80 >> 3) & 0x07);

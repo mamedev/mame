@@ -32,14 +32,14 @@ MACHINE_CONFIG_EXTERN( megadriv_timers );
 MACHINE_CONFIG_EXTERN( md_ntsc );
 MACHINE_CONFIG_EXTERN( md_pal );
 MACHINE_CONFIG_EXTERN( md_bootleg );    // for topshoot.c & hshavoc.c
-
+MACHINE_CONFIG_EXTERN( dcat16_megadriv_base );
 
 struct genesis_z80_vars
 {
 	int z80_is_reset;
 	int z80_has_bus;
-	UINT32 z80_bank_addr;
-	std::unique_ptr<UINT8[]> z80_prgram;
+	uint32_t z80_bank_addr;
+	std::unique_ptr<uint8_t[]> z80_prgram;
 };
 
 
@@ -53,17 +53,18 @@ public:
 		m_ymsnd(*this,"ymsnd"),
 		m_vdp(*this,"gen_vdp"),
 		m_snsnd(*this, "snsnd"),
-		m_megadrive_ram(*this,"megadrive_ram")
+		m_megadrive_ram(*this,"megadrive_ram"),
+		m_io_reset(*this, "RESET")
 	{ }
 	required_device<m68000_base_device> m_maincpu;
 	optional_device<cpu_device> m_z80snd;
 	optional_device<ym2612_device> m_ymsnd;
 	required_device<sega315_5313_device> m_vdp;
 	required_device<sn76496_base_device> m_snsnd;
-	optional_shared_ptr<UINT16> m_megadrive_ram;
+	optional_shared_ptr<uint16_t> m_megadrive_ram;
 
 
-	ioport_port *m_io_reset;
+	optional_ioport m_io_reset;
 	ioport_port *m_io_pad_3b[4];
 	ioport_port *m_io_pad_6b[4];
 
@@ -80,7 +81,7 @@ public:
 	IRQ_CALLBACK_MEMBER(genesis_int_callback);
 	void megadriv_init_common();
 
-	void megadriv_z80_bank_w(UINT16 data);
+	void megadriv_z80_bank_w(uint16_t data);
 	DECLARE_WRITE16_MEMBER( megadriv_68k_z80_bank_write );
 	DECLARE_WRITE8_MEMBER(megadriv_z80_z80_bank_w);
 	DECLARE_READ16_MEMBER( megadriv_68k_io_read );
@@ -100,9 +101,9 @@ public:
 	/* Megadrive / Genesis has 3 I/O ports */
 	emu_timer *m_io_timeout[3];
 	int m_io_stage[3];
-	UINT8 m_megadrive_io_data_regs[3];
-	UINT8 m_megadrive_io_ctrl_regs[3];
-	UINT8 m_megadrive_io_tx_regs[3];
+	uint8_t m_megadrive_io_data_regs[3];
+	uint8_t m_megadrive_io_ctrl_regs[3];
+	uint8_t m_megadrive_io_tx_regs[3];
 	read8_delegate m_megadrive_io_read_data_port_ptr;
 	write16_delegate m_megadrive_io_write_data_port_ptr;
 
@@ -114,25 +115,25 @@ public:
 	void megadrive_reset_io();
 	DECLARE_READ8_MEMBER(megadrive_io_read_data_port_6button);
 	DECLARE_READ8_MEMBER(megadrive_io_read_data_port_3button);
-	UINT8 megadrive_io_read_ctrl_port(int portnum);
-	UINT8 megadrive_io_read_tx_port(int portnum);
-	UINT8 megadrive_io_read_rx_port(int portnum);
-	UINT8 megadrive_io_read_sctrl_port(int portnum);
+	uint8_t megadrive_io_read_ctrl_port(int portnum);
+	uint8_t megadrive_io_read_tx_port(int portnum);
+	uint8_t megadrive_io_read_rx_port(int portnum);
+	uint8_t megadrive_io_read_sctrl_port(int portnum);
 
 	DECLARE_WRITE16_MEMBER(megadrive_io_write_data_port_3button);
 	DECLARE_WRITE16_MEMBER(megadrive_io_write_data_port_6button);
-	void megadrive_io_write_ctrl_port(int portnum, UINT16 data);
-	void megadrive_io_write_tx_port(int portnum, UINT16 data);
-	void megadrive_io_write_rx_port(int portnum, UINT16 data);
-	void megadrive_io_write_sctrl_port(int portnum, UINT16 data);
+	void megadrive_io_write_ctrl_port(int portnum, uint16_t data);
+	void megadrive_io_write_tx_port(int portnum, uint16_t data);
+	void megadrive_io_write_rx_port(int portnum, uint16_t data);
+	void megadrive_io_write_sctrl_port(int portnum, uint16_t data);
 
 	void megadriv_stop_scanline_timer();
 
 	DECLARE_MACHINE_START( megadriv );
 	DECLARE_MACHINE_RESET( megadriv );
 	DECLARE_VIDEO_START( megadriv );
-	UINT32 screen_update_megadriv(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void screen_eof_megadriv(screen_device &screen, bool state);
+	uint32_t screen_update_megadriv(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_megadriv);
 
 	DECLARE_WRITE8_MEMBER(megadriv_tas_callback);
 };
@@ -155,7 +156,7 @@ public:
 	optional_device<sega_32x_device> m_32x;
 	optional_device<sega_segacd_device> m_segacd;
 	optional_device<md_cart_slot_device> m_cart;
-	optional_region_ptr<UINT16> m_tmss;
+	optional_region_ptr<uint16_t> m_tmss;
 
 	DECLARE_DRIVER_INIT(mess_md_common);
 	DECLARE_DRIVER_INIT(genesis);
@@ -170,11 +171,11 @@ public:
 	DECLARE_MACHINE_START( ms_megacd );     // setup ioport_port + dma delay for cd
 	DECLARE_MACHINE_RESET( ms_megadriv );
 
-	void screen_eof_console(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_console);
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( _32x_cart );
 
-	void _32x_scanline_callback(int x, UINT32 priority, UINT16 &lineptr);
+	void _32x_scanline_callback(int x, uint32_t priority, uint16_t &lineptr);
 	void _32x_interrupt_callback(int scanline, int irq6);
 	void _32x_scanline_helper_callback(int scanline);
 

@@ -1,4 +1,4 @@
-// license:LGPL-2.1+
+// license:BSD-3-Clause
 // copyright-holders:Tomasz Slanina
 
 /* Field Combat (c)1985 Jaleco
@@ -32,10 +32,13 @@ inputs + notes by stephh
 */
 
 #include "emu.h"
+#include "includes/fcombat.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "sound/ay8910.h"
-#include "includes/fcombat.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 INPUT_CHANGED_MEMBER(fcombat_state::coin_inserted)
@@ -283,7 +286,7 @@ void fcombat_state::machine_reset()
 	m_ty = 0;
 }
 
-static MACHINE_CONFIG_START( fcombat, fcombat_state )
+static MACHINE_CONFIG_START( fcombat )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 10000000/3)
@@ -327,11 +330,11 @@ MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER(fcombat_state,fcombat)
 {
-	UINT32 oldaddr, newaddr, length;
-	UINT8 *src, *dst;
+	uint32_t oldaddr, newaddr, length;
+	uint8_t *src, *dst;
 
 	/* allocate some temporary space */
-	dynamic_buffer temp(0x10000);
+	std::vector<uint8_t> temp(0x10000);
 
 	/* make a temporary copy of the character data */
 	src = &temp[0];

@@ -14,15 +14,15 @@
 #ifndef BENCHMARK_REPORTER_H_
 #define BENCHMARK_REPORTER_H_
 
+#include <cassert>
+#include <iosfwd>
 #include <string>
 #include <utility>
 #include <vector>
 
-#include "benchmark_api.h" // For forward declaration of BenchmarkReporter
+#include "benchmark_api.h"  // For forward declaration of BenchmarkReporter
 
 namespace benchmark {
-
-typedef std::pair<const char*,double> TimeUnitMultiplier;
 
 // Interface for custom benchmark result printers.
 // By default, benchmark reports are printed to stdout. However an application
@@ -42,20 +42,40 @@ class BenchmarkReporter {
 
   struct Run {
     Run() :
+      error_occurred(false),
       iterations(1),
       time_unit(kNanosecond),
       real_accumulated_time(0),
       cpu_accumulated_time(0),
       bytes_per_second(0),
       items_per_second(0),
-      max_heapbytes_used(0) {}
+      max_heapbytes_used(0),
+      complexity(oNone),
+      complexity_n(0),
+      report_big_o(false),
+      report_rms(false) {}
 
     std::string benchmark_name;
     std::string report_label;  // Empty if not set by benchmark.
+    bool error_occurred;
+    std::string error_message;
+
     int64_t iterations;
     TimeUnit time_unit;
     double real_accumulated_time;
     double cpu_accumulated_time;
+
+    // Return a value representing the real time per iteration in the unit
+    // specified by 'time_unit'.
+    // NOTE: If 'iterations' is zero the returned value represents the
+    // accumulated time.
+    double GetAdjustedRealTime() const;
+
+    // Return a value representing the cpu time per iteration in the unit
+    // specified by 'time_unit'.
+    // NOTE: If 'iterations' is zero the returned value represents the
+    // accumulated time.
+    double GetAdjustedCPUTime() const;
 
     // Zero if not set by benchmark.
     double bytes_per_second;
@@ -63,7 +83,20 @@ class BenchmarkReporter {
 
     // This is set to 0.0 if memory tracing is not enabled.
     double max_heapbytes_used;
+
+    // Keep track of arguments to compute asymptotic complexity
+    BigO complexity;
+    BigOFunc* complexity_lambda;
+    int complexity_n;
+
+    // Inform print function whether the current run is a complexity report
+    bool report_big_o;
+    bool report_rms;
   };
+
+  // Construct a BenchmarkReporter with the output stream set to 'std::cout'
+  // and the error stream set to 'std::cerr'
+  BenchmarkReporter();
 
   // Called once for every suite of benchmarks run.
   // The parameter "context" contains information that the
@@ -74,55 +107,119 @@ class BenchmarkReporter {
   virtual bool ReportContext(const Context& context) = 0;
 
   // Called once for each group of benchmark runs, gives information about
-  // cpu-time and heap memory usage during the benchmark run.
-  // Note that all the grouped benchmark runs should refer to the same
-  // benchmark, thus have the same name.
+  // cpu-time and heap memory usage during the benchmark run. If the group
+  // of runs contained more than two entries then 'report' contains additional
+  // elements representing the mean and standard deviation of those runs.
+  // Additionally if this group of runs was the last in a family of benchmarks
+  // 'reports' contains additional entries representing the asymptotic
+  // complexity and RMS of that benchmark family.
   virtual void ReportRuns(const std::vector<Run>& report) = 0;
 
   // Called once and only once after ever group of benchmarks is run and
   // reported.
-  virtual void Finalize();
+  virtual void Finalize() {}
+
+  // REQUIRES: The object referenced by 'out' is valid for the lifetime
+  // of the reporter.
+  void SetOutputStream(std::ostream* out) {
+    assert(out);
+    output_stream_ = out;
+  }
+
+  // REQUIRES: The object referenced by 'err' is valid for the lifetime
+  // of the reporter.
+  void SetErrorStream(std::ostream* err) {
+    assert(err);
+    error_stream_ = err;
+  }
+
+  std::ostream& GetOutputStream() const {
+    return *output_stream_;
+  }
+
+  std::ostream& GetErrorStream() const {
+    return *error_stream_;
+  }
 
   virtual ~BenchmarkReporter();
-protected:
-  static void ComputeStats(std::vector<Run> const& reports, Run* mean, Run* stddev);
-  static TimeUnitMultiplier GetTimeUnitAndMultiplier(TimeUnit unit);
+
+  // Write a human readable string to 'out' representing the specified
+  // 'context'.
+  // REQUIRES: 'out' is non-null.
+  static void PrintBasicContext(std::ostream* out, Context const& context);
+
+ private:
+  std::ostream* output_stream_;
+  std::ostream* error_stream_;
 };
 
 // Simple reporter that outputs benchmark data to the console. This is the
 // default reporter used by RunSpecifiedBenchmarks().
 class ConsoleReporter : public BenchmarkReporter {
- public:
+public:
+  enum OutputOptions {
+    OO_None,
+    OO_Color
+  };
+  explicit ConsoleReporter(OutputOptions color_output = OO_Color)
+      : color_output_(color_output == OO_Color) {}
+
   virtual bool ReportContext(const Context& context);
   virtual void ReportRuns(const std::vector<Run>& reports);
 
- protected:
+protected:
   virtual void PrintRunData(const Run& report);
-
   size_t name_field_width_;
+
+private:
+  bool color_output_;
 };
 
 class JSONReporter : public BenchmarkReporter {
-public:
+ public:
   JSONReporter() : first_report_(true) {}
   virtual bool ReportContext(const Context& context);
   virtual void ReportRuns(const std::vector<Run>& reports);
   virtual void Finalize();
 
-private:
+ private:
   void PrintRunData(const Run& report);
 
   bool first_report_;
 };
 
 class CSVReporter : public BenchmarkReporter {
-public:
+ public:
   virtual bool ReportContext(const Context& context);
   virtual void ReportRuns(const std::vector<Run>& reports);
 
-private:
+ private:
   void PrintRunData(const Run& report);
 };
 
-} // end namespace benchmark
-#endif // BENCHMARK_REPORTER_H_
+inline const char* GetTimeUnitString(TimeUnit unit) {
+  switch (unit) {
+    case kMillisecond:
+      return "ms";
+    case kMicrosecond:
+      return "us";
+    case kNanosecond:
+    default:
+      return "ns";
+  }
+}
+
+inline double GetTimeUnitMultiplier(TimeUnit unit) {
+  switch (unit) {
+    case kMillisecond:
+      return 1e3;
+    case kMicrosecond:
+      return 1e6;
+    case kNanosecond:
+    default:
+      return 1e9;
+  }
+}
+
+}  // end namespace benchmark
+#endif  // BENCHMARK_REPORTER_H_

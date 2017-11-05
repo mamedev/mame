@@ -13,22 +13,24 @@ public:
 	jackal_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_videoctrl(*this, "videoctrl"),
+		m_dials(*this, {"DIAL0", "DIAL1"}),
 		m_mastercpu(*this, "master"),
 		m_slavecpu(*this, "slave"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_videoctrl;
-	UINT8 *  m_scrollram;
+	required_shared_ptr<uint8_t> m_videoctrl;
+	uint8_t *  m_scrollram;
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
 
 	/* misc */
 	int      m_irq_enable;
-	UINT8    *m_rambank;
-	UINT8    *m_spritebank;
+	uint8_t    *m_rambank;
+	uint8_t    *m_spritebank;
+	optional_ioport_array<2> m_dials;
 
 	/* devices */
 	required_device<cpu_device> m_mastercpu;
@@ -50,10 +52,10 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(jackal);
-	UINT32 screen_update_jackal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_jackal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(jackal_interrupt);
 	void jackal_mark_tile_dirty( int offset );
 	void draw_background( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
-	void draw_sprites_region( bitmap_ind16 &bitmap, const rectangle &cliprect, const UINT8 *sram, int length, int bank );
+	void draw_sprites_region( bitmap_ind16 &bitmap, const rectangle &cliprect, const uint8_t *sram, int length, int bank );
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 };

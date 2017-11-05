@@ -1,11 +1,15 @@
 // license:BSD-3-Clause
 // copyright-holders:Allard van der Bas
+#ifndef MAME_AUDIO_WARPWARP_H
+#define MAME_AUDIO_WARPWARP_H
 
-class warpwarp_sound_device : public device_t,
-									public device_sound_interface
+#pragma once
+
+
+class warpwarp_sound_device : public device_t, public device_sound_interface
 {
 public:
-	warpwarp_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	warpwarp_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	enum
 	{
@@ -29,7 +33,7 @@ protected:
 
 private:
 	// internal state
-	std::unique_ptr<INT16[]> m_decay;
+	std::unique_ptr<int16_t[]> m_decay;
 	sound_stream *m_channel;
 	int m_sound_latch;
 	int m_music1_latch;
@@ -48,4 +52,6 @@ private:
 	int m_mcount;
 };
 
-extern const device_type WARPWARP;
+DECLARE_DEVICE_TYPE(WARPWARP, warpwarp_sound_device)
+
+#endif // MAME_AUDIO_WARPWARP_H

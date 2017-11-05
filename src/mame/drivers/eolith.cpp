@@ -1,4 +1,4 @@
-// license:LGPL-2.1+
+// license:BSD-3-Clause
 // copyright-holders:Tomasz Slanina,Pierpaolo Prazzoli
 /********************************************************************
  Eolith 32 bits hardware: Gradation 2D system
@@ -101,11 +101,13 @@
  *********************************************************************/
 
 #include "emu.h"
+#include "includes/eolith.h"
+
 #include "cpu/e132xs/e132xs.h"
 #include "cpu/mcs51/mcs51.h"
-
 #include "machine/eepromser.h"
-#include "includes/eolith.h"
+
+#include "speaker.h"
 
 
 /*************************************
@@ -542,7 +544,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( eolith45, eolith_state )
+static MACHINE_CONFIG_START( eolith45 )
 	MCFG_CPU_ADD("maincpu", E132N, 45000000)         /* 45 MHz */
 	MCFG_CPU_PROGRAM_MAP(eolith_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", eolith_state, eolith_speedup, "screen", 0, 1)
@@ -551,6 +553,7 @@ static MACHINE_CONFIG_START( eolith45, eolith_state )
 	MCFG_CPU_ADD("soundcpu", I8032, XTAL_12MHz)
 	MCFG_CPU_PROGRAM_MAP(sound_prg_map)
 	MCFG_CPU_IO_MAP(sound_io_map)
+	MCFG_MCS51_SERIAL_TX_CB(WRITE8(eolith_state, soundcpu_to_qs1000)) // Sound CPU -> QS1000 CPU serial link
 
 	MCFG_MACHINE_RESET_OVERRIDE(eolith_state,eolith)
 
@@ -593,7 +596,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ironfort, eolith45 )
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(44900000) /* Normaly 45MHz??? but PCB actually had a 44.9MHz OSC, so it's value is used */
+	MCFG_CPU_CLOCK(44900000) /* Normally 45MHz??? but PCB actually had a 44.9MHz OSC, so it's value is used */
 MACHINE_CONFIG_END
 
 
@@ -1143,6 +1146,35 @@ ROM_START( landbrka )
 	ROM_LOAD( "qs1001a.u96", 0x80000, 0x80000, CRC(d13c6407) SHA1(57b14f97c7d4f9b5d9745d3571a0b7115fbe3176) )
 ROM_END
 
+ROM_START( landbrkb )
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Hyperstone CPU Code */
+	ROM_LOAD( "lb_040.u43", 0x00000, 0x80000, CRC(a81d681b) SHA1(e92b0217a86271dd1e51bef75f5b4fda7a8415ed) )
+
+	ROM_REGION32_BE( 0x2000000, "user1", ROMREGION_ERASE00 ) /* Game Data - banked ROM, swapping necessary */
+	ROM_LOAD32_WORD_SWAP( "lb2-000.u39", 0x0000000, 0x400000, CRC(b37faf7a) SHA1(30e9af3957ada7c72d85f55add221c2e9b3ea823) )
+	ROM_LOAD32_WORD_SWAP( "lb2-001.u34", 0x0000002, 0x400000, CRC(07e620c9) SHA1(19f95316208fb4e52cef78f18c5d93460a644566) )
+	ROM_LOAD32_WORD_SWAP( "lb2-002.u40", 0x0800000, 0x400000, CRC(3bb4bca6) SHA1(115029be4a4e322549a35f3ae5093ec161e9a421) )
+	ROM_LOAD32_WORD_SWAP( "lb2-003.u35", 0x0800002, 0x400000, CRC(28ce863a) SHA1(1ba7d8be0ed4459dbdf99df18a2ad817904b9f04) )
+	ROM_LOAD32_WORD_SWAP( "lb2-004.u41", 0x1000000, 0x400000, CRC(cbe84b06) SHA1(52505939fb88cd24f409c795fe5ceed5b41a52c2) )
+	ROM_LOAD32_WORD_SWAP( "lb2-005.u36", 0x1000002, 0x400000, CRC(350c77a3) SHA1(231e65ea7db19019615a8aa4444922bcd5cf9e5c) )
+	ROM_LOAD32_WORD_SWAP( "lb2-006.u42", 0x1800000, 0x400000, CRC(22c57cd8) SHA1(c9eb745523005876395ff7f0b3e996994b3f1220) )
+	ROM_LOAD32_WORD_SWAP( "lb2-007.u37", 0x1800002, 0x400000, CRC(31f957b3) SHA1(ab1c4c50c2d5361ba8db047feb714423d84e6df4) )
+
+	ROM_REGION( 0x008000, "soundcpu", 0 ) /* AT89c52 */
+	/* This is the first 2K of rom1.u111 from landbrk, verify against the internal dump when decapped */
+	ROM_LOAD( "lb.103", 0x0000, 0x0800, BAD_DUMP CRC(92797034) SHA1(b600f19972986b2e09c56be0ea0c09f92a9fe422) ) /* MCU internal 2K flash */
+
+	ROM_REGION( 0x080000, "sounddata", 0 ) /* Music data */
+	ROM_LOAD( "lb_2.108", 0x00000, 0x80000, CRC(a99182d7) SHA1(628c8d09efb3917a4e97d9e02b6b0ca1f339825d) )
+
+	ROM_REGION( 0x008000, "qs1000:cpu", 0 ) /* QDSP (8052) Code */
+	ROM_LOAD( "lb.107", 0x0000, 0x8000, CRC(afd5263d) SHA1(71ace1b749d8a6b84d08b97185e7e512d04e4b8d) )
+
+	ROM_REGION( 0x1000000, "qs1000", 0 ) /* QDSP sample ROMs */
+	ROM_LOAD( "lb_3.u97",    0x00000, 0x80000, CRC(5b34dff0) SHA1(1668763e977e272781ddcc74beba97b53477cc9d) )
+	ROM_LOAD( "qs1001a.u96", 0x80000, 0x80000, CRC(d13c6407) SHA1(57b14f97c7d4f9b5d9745d3571a0b7115fbe3176) )
+ROM_END
+
 
 ROM_START( penfan )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* Hyperstone CPU Code */
@@ -1493,9 +1525,6 @@ DRIVER_INIT_MEMBER(eolith_state,eolith)
 {
 	init_speedup();
 
-	// Sound CPU -> QS1000 CPU serial link
-	m_soundcpu->i8051_set_serial_tx_callback(write8_delegate(FUNC(eolith_state::soundcpu_to_qs1000),this));
-
 	// Configure the sound ROM banking
 	membank("sound_bank")->configure_entries(0, 16, memregion("sounddata")->base(), 0x8000);
 
@@ -1509,18 +1538,35 @@ DRIVER_INIT_MEMBER(eolith_state,landbrk)
 	DRIVER_INIT_CALL(eolith);
 }
 
+/*
+The protected sets (where we're having to use a substitute ROM from an unprotected versions instead of the
+AT89c52 internal ROM) all have an extra startup check (to prevent you swapping in an external ROM?)
 
-// the protected sets all have an extra startup check (to prevent you swapping in an external ROM?)
-// currently not fully understood, and possibly not possible to make work without the MCU dump so we patch it.
-// to work with the unprotected code.
+Currently this is not fully understood, and possibly not possible to make work without the MCU dump so we
+patch it to work with the unprotected code.
+
+Using landbrka as an example it fails compares with memories:
+$4002d338 -> $4002d348 .... $4002d33f -> $4002d34f
+related with bits 0x100 - 0x200 read at startup from input(0) ?
+*/
+
+void eolith_state::patch_mcu_protection(uint32_t address)
+{
+	uint32_t *rombase = (uint32_t*)memregion("maincpu")->base();
+	rombase[address/4] = (rombase[address/4] & 0xffff) | 0x03000000; /* Change BR to NOP */
+}
+
 DRIVER_INIT_MEMBER(eolith_state,landbrka)
 {
-	//it fails compares with memories:
-	//$4002d338 -> $4002d348 .... $4002d33f -> $4002d34f
-	//related with bits 0x100 - 0x200 read at startup from input(0) ?
-	UINT32 *rombase = (UINT32*)memregion("maincpu")->base();
-	rombase[0x14f00/4] = (rombase[0x14f00/4] & 0xffff) | 0x03000000; /* Change BR to NOP */
+	patch_mcu_protection(0x14f00);
+	m_coin_counter_bit = 0x2000;
 
+	DRIVER_INIT_CALL(eolith);
+}
+
+DRIVER_INIT_MEMBER(eolith_state,landbrkb)
+{
+	patch_mcu_protection(0x14da8);
 	m_coin_counter_bit = 0x2000;
 
 	DRIVER_INIT_CALL(eolith);
@@ -1528,26 +1574,15 @@ DRIVER_INIT_MEMBER(eolith_state,landbrka)
 
 DRIVER_INIT_MEMBER(eolith_state,hidctch2)
 {
-	//it fails compares in memory like in landbrka
-	UINT32 *rombase = (UINT32*)memregion("maincpu")->base();
-	rombase[0xbcc8/4] = (rombase[0xbcc8/4] & 0xffff) | 0x03000000; /* Change BR to NOP */
-
+	patch_mcu_protection(0x0bcc8);
 	DRIVER_INIT_CALL(eolith);
 }
-
 
 DRIVER_INIT_MEMBER(eolith_state,hidnc2k)
 {
-	UINT32 *rombase = (UINT32*)memregion("maincpu")->base();
-	rombase[0x17b2c/4] = (rombase[0x17b2c/4] & 0x0000ffff) | 0x03000000; /* Change BR to NOP */
+	patch_mcu_protection(0x17b2c);
 	DRIVER_INIT_CALL(eolith);
 }
-
-
-
-
-
-
 
 DRIVER_INIT_MEMBER(eolith_state,hidctch3)
 {
@@ -1611,6 +1646,7 @@ static const struct
 	{ "hidctch2a",0x40029B58, -1, 240 },
 	{ "landbrk",  0x40023574, -1, 240 },
 	{ "landbrka", 0x4002446c, -1, 240 },
+	{ "landbrkb", 0x40023B28, -1, 240 },
 	{ "nhidctch", 0x40012778, -1, 240 },
 	{ "hidctch3", 0x4001f6a0, -1, 240 },
 	{ "fort2b",   0x000081e0, -1, 240 },
@@ -1672,7 +1708,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(eolith_state::eolith_speedup)
 
 CUSTOM_INPUT_MEMBER(eolith_state::eolith_speedup_getvblank)
 {
-//  printf("%s:eolith speedup_read data %02x\n",machine().describe_context(), m_speedup_vblank);
+//  printf("%s:eolith speedup_read data %02x\n",machine().describe_context().c_str(), m_speedup_vblank);
 
 
 	return (m_screen->vpos() >= 240);
@@ -1709,6 +1745,7 @@ GAME( 1999, hidctch2a, hidctch2, eolith50, hidctch2,  eolith_state, eolith,   RO
 GAME( 1999, hidnc2k,   0,        eolith50, hidctch2,  eolith_state, hidnc2k,  ROT0, "Eolith", "Hidden Catch 2000 (AT89c52 protected)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1999, landbrk,   0,        eolith45, landbrk,   eolith_state, landbrk,  ROT0, "Eolith", "Land Breaker (World) / Miss Tang Ja Ru Gi (Korea) (pcb ver 3.02)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // or Miss Ttang Jjareugi
 GAME( 1999, landbrka,  landbrk,  eolith45, landbrk,   eolith_state, landbrka, ROT0, "Eolith", "Land Breaker (World) / Miss Tang Ja Ru Gi (Korea) (pcb ver 3.03) (AT89c52 protected)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // or Miss Ttang Jjareugi
+GAME( 1999, landbrkb,  landbrk,  eolith45, landbrk,   eolith_state, landbrkb, ROT0, "Eolith", "Land Breaker (World) / Miss Tang Ja Ru Gi (Korea) (pcb ver 1.0) (AT89c52 protected)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // or Miss Ttang Jjareugi
 GAME( 1999, nhidctch,  0,        eolith45, hidctch2,  eolith_state, eolith,   ROT0, "Eolith", "New Hidden Catch (World) / New Tul Lin Gu Lim Chat Ki '98 (Korea) (pcb ver 3.02)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // or New Teurrin Geurim Chajgi '98
 GAME( 1999, penfan,    0,        eolith45, penfan,    eolith_state, eolith,   ROT0, "Eolith", "Penfan Girls - Step1. Mild Mind (set 1)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // alt title of Ribbon
 GAME( 1999, penfana,   penfan,   eolith45, penfan,    eolith_state, eolith,   ROT0, "Eolith", "Penfan Girls - Step1. Mild Mind (set 2)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

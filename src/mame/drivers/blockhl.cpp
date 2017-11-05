@@ -18,15 +18,18 @@
 *******************************************************************************/
 
 #include "emu.h"
+#include "includes/konamipt.h"
+
 #include "cpu/m6809/konami.h"
 #include "cpu/z80/z80.h"
 #include "machine/bankdev.h"
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
+#include "sound/ym2151.h"
 #include "video/k052109.h"
 #include "video/k051960.h"
-#include "sound/2151intf.h"
-#include "includes/konamipt.h"
+
+#include "speaker.h"
 
 
 //**************************************************************************
@@ -47,7 +50,7 @@ public:
 
 	K052109_CB_MEMBER(tile_callback);
 	K051960_CB_MEMBER(sprite_callback);
-	UINT32 screen_update_blockhl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_blockhl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_READ8_MEMBER(k052109_051960_r);
 	DECLARE_WRITE8_MEMBER(k052109_051960_w);
 
@@ -122,7 +125,7 @@ K051960_CB_MEMBER( blockhl_state::sprite_callback )
 	*color = sprite_colorbase + (*color & 0x0f);
 }
 
-UINT32 blockhl_state::screen_update_blockhl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t blockhl_state::screen_update_blockhl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	screen.priority().fill(0, cliprect);
 
@@ -267,7 +270,7 @@ INPUT_PORTS_END
 //  MACHINE DEFINTIONS
 //**************************************************************************
 
-static MACHINE_CONFIG_START( blockhl, blockhl_state )
+static MACHINE_CONFIG_START( blockhl )
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", KONAMI, XTAL_24MHz/8)     // Konami 052526
 	MCFG_CPU_PROGRAM_MAP(main_map)
@@ -375,5 +378,5 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME     PARENT   MACHINE  INPUT    CLASS          INIT  ROT   COMPANY   FULLNAME          FLAGS
-GAME( 1989, blockhl, 0,       blockhl, blockhl, driver_device, 0,    ROT0, "Konami", "Block Hole",     MACHINE_SUPPORTS_SAVE )
-GAME( 1989, quarth,  blockhl, blockhl, blockhl, driver_device, 0,    ROT0, "Konami", "Quarth (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, blockhl, 0,       blockhl, blockhl, blockhl_state, 0,    ROT0, "Konami", "Block Hole",     MACHINE_SUPPORTS_SAVE )
+GAME( 1989, quarth,  blockhl, blockhl, blockhl, blockhl_state, 0,    ROT0, "Konami", "Quarth (Japan)", MACHINE_SUPPORTS_SAVE )

@@ -41,11 +41,14 @@ Dip locations and factory settings verified with US manual
 */
 
 #include "emu.h"
+#include "includes/deadang.h"
+
 #include "cpu/nec/nec.h"
 #include "machine/watchdog.h"
 #include "sound/2203intf.h"
 #include "sound/msm5205.h"
-#include "includes/deadang.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 /* Read/Write Handlers */
@@ -66,7 +69,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, deadang_state )
 	AM_RANGE(0x03800, 0x03fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x04000, 0x04fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x05000, 0x05fff) AM_WRITEONLY
-	AM_RANGE(0x06000, 0x0600f) AM_DEVREADWRITE("seibu_sound", seibu_sound_device, main_word_r, main_word_w)
+	AM_RANGE(0x06000, 0x0600f) AM_DEVREADWRITE8("seibu_sound", seibu_sound_device, main_r, main_w, 0x00ff)
 	AM_RANGE(0x06010, 0x07fff) AM_WRITEONLY
 	AM_RANGE(0x08000, 0x087ff) AM_WRITE(text_w) AM_SHARE("videoram")
 	AM_RANGE(0x08800, 0x0bfff) AM_WRITEONLY
@@ -86,6 +89,33 @@ static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 16, deadang_state )
 	AM_RANGE(0x08000, 0x08001) AM_WRITE(bank_w)
 	AM_RANGE(0x0c000, 0x0c001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 	AM_RANGE(0xe0000, 0xfffff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, deadang_state )
+	AM_RANGE(0x0000, 0x1fff) AM_DEVREAD("sei80bu", sei80bu_device, data_r)
+	AM_RANGE(0x2000, 0x27ff) AM_RAM
+	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("seibu_sound", seibu_sound_device, pending_w)
+	AM_RANGE(0x4001, 0x4001) AM_DEVWRITE("seibu_sound", seibu_sound_device, irq_clear_w)
+	AM_RANGE(0x4002, 0x4002) AM_DEVWRITE("seibu_sound", seibu_sound_device, rst10_ack_w)
+	AM_RANGE(0x4003, 0x4003) AM_DEVWRITE("seibu_sound", seibu_sound_device, rst18_ack_w)
+	AM_RANGE(0x4005, 0x4006) AM_DEVWRITE("adpcm1", seibu_adpcm_device, adr_w)
+	AM_RANGE(0x4007, 0x4007) AM_DEVWRITE("seibu_sound", seibu_sound_device, bank_w)
+	AM_RANGE(0x4008, 0x4009) AM_DEVREADWRITE("seibu_sound", seibu_sound_device, ym_r, ym_w)
+	AM_RANGE(0x4010, 0x4011) AM_DEVREAD("seibu_sound", seibu_sound_device, soundlatch_r)
+	AM_RANGE(0x4012, 0x4012) AM_DEVREAD("seibu_sound", seibu_sound_device, main_data_pending_r)
+	AM_RANGE(0x4013, 0x4013) AM_READ_PORT("COIN")
+	AM_RANGE(0x4018, 0x4019) AM_DEVWRITE("seibu_sound", seibu_sound_device, main_data_w)
+	AM_RANGE(0x401a, 0x401a) AM_DEVWRITE("adpcm1", seibu_adpcm_device, ctl_w)
+	AM_RANGE(0x401b, 0x401b) AM_DEVWRITE("seibu_sound", seibu_sound_device, coin_w)
+	AM_RANGE(0x6005, 0x6006) AM_DEVWRITE("adpcm2", seibu_adpcm_device, adr_w)
+	AM_RANGE(0x6008, 0x6009) AM_DEVREADWRITE("ym2", ym2203_device, read, write)
+	AM_RANGE(0x601a, 0x601a) AM_DEVWRITE("adpcm2", seibu_adpcm_device, ctl_w)
+	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("seibu_bank1")
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( sound_decrypted_opcodes_map, AS_OPCODES, 8, deadang_state )
+	AM_RANGE(0x0000, 0x1fff) AM_DEVREAD("sei80bu", sei80bu_device, opcode_r)
+	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("seibu_bank1")
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -235,7 +265,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(deadang_state::sub_scanline)
 
 /* Machine Drivers */
 
-static MACHINE_CONFIG_START( deadang, deadang_state )
+static MACHINE_CONFIG_START( deadang )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V30,XTAL_16MHz/2) /* Sony 8623h9 CXQ70116D-8 (V30 compatible) */
@@ -246,8 +276,12 @@ static MACHINE_CONFIG_START( deadang, deadang_state )
 	MCFG_CPU_PROGRAM_MAP(sub_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer2", deadang_state, sub_scanline, "screen", 0, 1)
 
-	SEIBU3A_SOUND_SYSTEM_CPU(XTAL_14_31818MHz/4)
-	SEIBU_SOUND_SYSTEM_ENCRYPTED_LOW()
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_14_31818MHz/4)
+	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(sound_decrypted_opcodes_map)
+
+	MCFG_DEVICE_ADD("sei80bu", SEI80BU, 0)
+	MCFG_DEVICE_ROM("audiocpu")
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60)) // the game stops working with higher interleave rates..
 
@@ -266,10 +300,27 @@ static MACHINE_CONFIG_START( deadang, deadang_state )
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
-
 	/* sound hardware */
-	SEIBU_SOUND_SYSTEM_YM2203_INTERFACE(XTAL_14_31818MHz/4)
-	SEIBU_SOUND_SYSTEM_ADPCM_INTERFACE
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
+	MCFG_SEIBU_SOUND_CPU("audiocpu")
+	MCFG_SEIBU_SOUND_ROMBANK("seibu_bank1")
+	MCFG_SEIBU_SOUND_YM_READ_CB(DEVREAD8("ym1", ym2203_device, read))
+	MCFG_SEIBU_SOUND_YM_WRITE_CB(DEVWRITE8("ym1", ym2203_device, write))
+
+	MCFG_SOUND_ADD("ym1", YM2203, XTAL_14_31818MHz/4)
+	MCFG_YM2203_IRQ_HANDLER(DEVWRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+
+	MCFG_SOUND_ADD("ym2", YM2203, XTAL_14_31818MHz/4)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+
+	MCFG_SOUND_ADD("adpcm1", SEIBU_ADPCM, 8000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+
+	MCFG_SOUND_ADD("adpcm2", SEIBU_ADPCM, 8000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_CONFIG_END
 
 /* ROMs */
@@ -481,7 +532,7 @@ DRIVER_INIT_MEMBER(deadang_state,ghunter)
 
 /* Game Drivers */
 
-GAME( 1988, deadang,  0,       deadang, deadang, deadang_state, deadang, ROT0, "Seibu Kaihatsu",                        "Dead Angle",          MACHINE_SUPPORTS_SAVE )
-GAME( 1988, leadang,  deadang, deadang, deadang, deadang_state, deadang, ROT0, "Seibu Kaihatsu",                        "Lead Angle (Japan)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1988, deadang,  0,       deadang, deadang, deadang_state, deadang, ROT0, "Seibu Kaihatsu",                        "Dead Angle",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1988, leadang,  deadang, deadang, deadang, deadang_state, deadang, ROT0, "Seibu Kaihatsu",                        "Lead Angle (Japan)",               MACHINE_SUPPORTS_SAVE )
 GAME( 1988, ghunter,  deadang, deadang, ghunter, deadang_state, ghunter, ROT0, "Seibu Kaihatsu",                        "Gang Hunter / Dead Angle",         MACHINE_SUPPORTS_SAVE ) // Title is 'Gang Hunter' or 'Dead Angle' depending on control method dipswitch
 GAME( 1988, ghunters, deadang, deadang, ghunter, deadang_state, ghunter, ROT0, "Seibu Kaihatsu (Segasa/Sonic license)", "Gang Hunter / Dead Angle (Spain)", MACHINE_SUPPORTS_SAVE )

@@ -5,7 +5,7 @@
     D-Con                                   (c) 1992 Success
     SD Gundam Psycho Salamander no Kyoui    (c) 1991 Banpresto/Bandai
 
-    These games run on Seibu hardware.
+    These games run on Seibu hardware somewhat similar to Blood Bros.
 
     Emulation by Bryan McPhail, mish@tendril.co.uk
 
@@ -15,14 +15,28 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/dcon.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
-#include "audio/seibu.h"
-#include "includes/dcon.h"
+#include "sound/3812intf.h"
+#include "sound/ym2151.h"
+#include "sound/okim6295.h"
 #include "video/seibu_crtc.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 /***************************************************************************/
+
+READ8_MEMBER(dcon_state::sdgndmps_sound_comms_r)
+{
+	// Routine at 134C sends no sound commands if lowest bit is 0
+	if (offset == 5) // ($a000a)
+		return 1;
+
+	return m_seibu_sound->main_r(space, offset);
+}
 
 static ADDRESS_MAP_START( dcon_map, AS_PROGRAM, 16, dcon_state )
 	AM_RANGE(0x00000, 0x7ffff) AM_ROM
@@ -36,13 +50,18 @@ static ADDRESS_MAP_START( dcon_map, AS_PROGRAM, 16, dcon_state )
 	AM_RANGE(0x8f800, 0x8ffff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x9d000, 0x9d7ff) AM_WRITE(gfxbank_w)
 
-	AM_RANGE(0xa0000, 0xa000d) AM_DEVREADWRITE("seibu_sound", seibu_sound_device, main_word_r, main_word_w)
+	AM_RANGE(0xa0000, 0xa000d) AM_DEVREADWRITE8("seibu_sound", seibu_sound_device, main_r, main_w, 0x00ff)
 	AM_RANGE(0xc0000, 0xc004f) AM_DEVREADWRITE("crtc", seibu_crtc_device, read, write)
 	AM_RANGE(0xc0080, 0xc0081) AM_WRITENOP
 	AM_RANGE(0xc00c0, 0xc00c1) AM_WRITENOP
 	AM_RANGE(0xe0000, 0xe0001) AM_READ_PORT("DSW")
 	AM_RANGE(0xe0002, 0xe0003) AM_READ_PORT("P1_P2")
 	AM_RANGE(0xe0004, 0xe0005) AM_READ_PORT("SYSTEM")
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( sdgndmps_map, AS_PROGRAM, 16, dcon_state )
+	AM_RANGE(0xa0000, 0xa000d) AM_READ8(sdgndmps_sound_comms_r, 0x00ff)
+	AM_IMPORT_FROM(dcon_map)
 ADDRESS_MAP_END
 
 /******************************************************************************/
@@ -148,7 +167,7 @@ static INPUT_PORTS_START( sdgndmps )
 	PORT_SERVICE_NO_TOGGLE( 0x0100, IP_ACTIVE_LOW )
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x000f, 0x000f, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0x000f, 0x000f, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW2:1,2,3,4")
 	PORT_DIPSETTING(      0x0004, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(      0x000a, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( 2C_1C ) )
@@ -165,7 +184,7 @@ static INPUT_PORTS_START( sdgndmps )
 	PORT_DIPSETTING(      0x000d, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(      0x0005, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(      0x0009, DEF_STR( 1C_7C ) )
-	PORT_DIPNAME( 0x00f0, 0x00f0, DEF_STR( Coin_A ) )
+	PORT_DIPNAME( 0x00f0, 0x00f0, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW2:5,6,7,8")
 	PORT_DIPSETTING(      0x0040, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(      0x00a0, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(      0x0010, DEF_STR( 2C_1C ) )
@@ -182,29 +201,24 @@ static INPUT_PORTS_START( sdgndmps )
 	PORT_DIPSETTING(      0x0050, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(      0x0090, DEF_STR( 1C_7C ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(      0x0200, "2" )
 	PORT_DIPSETTING(      0x0300, "3" )
 	PORT_DIPSETTING(      0x0100, "4" )
 	PORT_DIPSETTING(      0x0000, "6" )
-	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) ) // plays a jingle at the game intro (why?)
+	PORT_DIPNAME( 0x0c00, 0x0c00, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW1:3,4")
+	PORT_DIPSETTING(      0x0800, DEF_STR( Easy ) )
+	PORT_DIPSETTING(      0x0c00, DEF_STR( Normal ) )
+	PORT_DIPSETTING(      0x0400, DEF_STR( Difficult ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Very_Difficult ) )
+	PORT_DIPNAME( 0x1000, 0x0000, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x0000, DEF_STR( Allow_Continue ) )
+	PORT_DIPNAME( 0x2000, 0x0000, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(      0x2000, DEF_STR( No ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPUNUSED_DIPLOC( 0x4000, 0x4000, "SW1:7" )
+	PORT_DIPUNUSED_DIPLOC( 0x8000, 0x8000, "SW1:8" )
 INPUT_PORTS_END
 
 
@@ -259,14 +273,15 @@ WRITE16_MEMBER( dcon_state::layer_scroll_w )
 
 /******************************************************************************/
 
-static MACHINE_CONFIG_START( dcon, dcon_state )
+static MACHINE_CONFIG_START( dcon )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)
 	MCFG_CPU_PROGRAM_MAP(dcon_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", dcon_state,  irq4_line_hold)
 
-	SEIBU_SOUND_SYSTEM_CPU(4000000) /* Perhaps 14318180/4? */
+	MCFG_CPU_ADD("audiocpu", Z80, 4000000) /* Perhaps 14318180/4? */
+	MCFG_CPU_PROGRAM_MAP(seibu_sound_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -286,17 +301,31 @@ static MACHINE_CONFIG_START( dcon, dcon_state )
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	/* sound hardware */
-	SEIBU_SOUND_SYSTEM_YM3812_INTERFACE(4000000,1320000)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_SOUND_ADD("ymsnd", YM3812, 4000000)
+	MCFG_YM3812_IRQ_HANDLER(DEVWRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	MCFG_OKIM6295_ADD("oki", 1320000, PIN7_LOW)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+
+	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
+	MCFG_SEIBU_SOUND_CPU("audiocpu")
+	MCFG_SEIBU_SOUND_ROMBANK("seibu_bank1")
+	MCFG_SEIBU_SOUND_YM_READ_CB(DEVREAD8("ymsnd", ym3812_device, read))
+	MCFG_SEIBU_SOUND_YM_WRITE_CB(DEVWRITE8("ymsnd", ym3812_device, write))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( sdgndmps, dcon_state )
+static MACHINE_CONFIG_START( sdgndmps ) /* PCB number is PB91008 */
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 10000000)
-	MCFG_CPU_PROGRAM_MAP(dcon_map)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz/2)
+	MCFG_CPU_PROGRAM_MAP(sdgndmps_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", dcon_state,  irq4_line_hold)
 
-	SEIBU2_SOUND_SYSTEM_CPU(14318180/4)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_14_31818MHz/4)
+	MCFG_CPU_PROGRAM_MAP(seibu_sound_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -316,7 +345,21 @@ static MACHINE_CONFIG_START( sdgndmps, dcon_state )
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	/* sound hardware */
-	SEIBU_SOUND_SYSTEM_YM2151_INTERFACE(14318180/4,1320000)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_YM2151_ADD("ymsnd", XTAL_14_31818MHz/4)
+	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
+	MCFG_SOUND_ROUTE(0, "mono", 0.50)
+	MCFG_SOUND_ROUTE(1, "mono", 0.50)
+
+	MCFG_OKIM6295_ADD("oki", XTAL_20MHz/16, PIN7_LOW) /* 1.25Mhz? unverified clock & divisor (was 1320000) */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+
+	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
+	MCFG_SEIBU_SOUND_CPU("audiocpu")
+	MCFG_SEIBU_SOUND_ROMBANK("seibu_bank1")
+	MCFG_SEIBU_SOUND_YM_READ_CB(DEVREAD8("ymsnd", ym2151_device, read))
+	MCFG_SEIBU_SOUND_YM_WRITE_CB(DEVWRITE8("ymsnd", ym2151_device, write))
 MACHINE_CONFIG_END
 
 /***************************************************************************/
@@ -393,17 +436,6 @@ ROM_START( sdgndmps )
 ROM_END
 
 /***************************************************************************/
-DRIVER_INIT_MEMBER(dcon_state,sdgndmps)
-{
-	UINT16 *RAM = (UINT16 *)memregion("maincpu")->base();
-	RAM[0x1356/2] = 0x4e71; /* beq -> nop */
-	RAM[0x1358/2] = 0x4e71;
 
-	RAM[0x4de/2]  = 0x4245; /* ROM checksum */
-	RAM[0x4e0/2]  = 0x4e71;
-	RAM[0x4e2/2]  = 0x4e71;
-}
-
-
-GAME( 1991, sdgndmps, 0, sdgndmps, sdgndmps, dcon_state, sdgndmps, ROT0, "Banpresto / Bandai", "SD Gundam Psycho Salamander no Kyoui", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1992, dcon,     0, dcon,     dcon, driver_device,     0,        ROT0, "Success",            "D-Con", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, sdgndmps, 0, sdgndmps, sdgndmps, dcon_state, 0, ROT0, "Banpresto / Bandai", "SD Gundam Psycho Salamander no Kyoui", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, dcon,     0, dcon,     dcon,     dcon_state, 0, ROT0, "Success",            "D-Con",                                MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

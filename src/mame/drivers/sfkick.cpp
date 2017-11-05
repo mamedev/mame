@@ -1,4 +1,4 @@
-// license:LGPL-2.1+
+// license:BSD-3-Clause
 // copyright-holders:Tomasz Slanina
 /*
   Super Free Kick / Spinkick by HEC (Haesung Enterprise Co.)
@@ -158,6 +158,8 @@ DIPSW-2
 #include "machine/gen_latch.h"
 #include "machine/i8255.h"
 #include "sound/2203intf.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class sfkick_state : public driver_device
@@ -187,7 +189,7 @@ public:
 		m_dsw2(*this, "DSW2")
 	{ }
 
-	std::unique_ptr<UINT8[]> m_main_mem;
+	std::unique_ptr<uint8_t[]> m_main_mem;
 	int m_bank_cfg;
 	int m_bank[8];
 	int m_input_mux;
@@ -204,7 +206,6 @@ public:
 	void sfkick_remap_banks();
 	void sfkick_bank_set(int num, int data);
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
-	DECLARE_WRITE_LINE_MEMBER(sfkick_vdp_interrupt);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
 	required_memory_region m_region_bios;
@@ -250,7 +251,7 @@ void sfkick_state::sfkick_remap_banks()
 	{
 		case 0: /* bios */
 		{
-			UINT8 *mem = m_region_bios->base();
+			uint8_t *mem = m_region_bios->base();
 			m_bank1->set_base(mem);
 			m_bank2->set_base(mem+0x2000);
 		}
@@ -258,7 +259,7 @@ void sfkick_state::sfkick_remap_banks()
 
 		case 1: /* ext rom */
 		{
-			UINT8 *mem = m_region_extrom->base();
+			uint8_t *mem = m_region_extrom->base();
 			m_bank1->set_base(mem+0x4000);
 			m_bank2->set_base(mem+0x6000);
 		}
@@ -266,7 +267,7 @@ void sfkick_state::sfkick_remap_banks()
 
 		case 2: /* banked */
 		{
-			UINT8 *mem = m_region_banked->base();
+			uint8_t *mem = m_region_banked->base();
 			m_bank1->set_base(mem+0x2000*m_bank[0]);
 			m_bank2->set_base(mem+0x2000*m_bank[1]);
 		}
@@ -274,7 +275,7 @@ void sfkick_state::sfkick_remap_banks()
 
 		case 3: /* unknown */
 		{
-			UINT8 *mem = m_region_banked->base();
+			uint8_t *mem = m_region_banked->base();
 			m_bank1->set_base(mem+0x18000);
 			m_bank2->set_base(mem+0x18000);
 		}
@@ -286,7 +287,7 @@ void sfkick_state::sfkick_remap_banks()
 	{
 		case 0: /* bios - upper part */
 		{
-			UINT8 *mem = m_region_bios->base();
+			uint8_t *mem = m_region_bios->base();
 			m_bank3->set_base(mem+0x4000);
 			m_bank4->set_base(mem+0x6000);
 		}
@@ -295,7 +296,7 @@ void sfkick_state::sfkick_remap_banks()
 		case 1:  /* unknown */
 		case 3:
 		{
-			UINT8 *mem = m_region_banked->base();
+			uint8_t *mem = m_region_banked->base();
 			m_bank3->set_base(mem+0x18000);
 			m_bank4->set_base(mem+0x18000);
 		}
@@ -303,7 +304,7 @@ void sfkick_state::sfkick_remap_banks()
 
 		case 2: /* banked */
 		{
-			UINT8 *mem = m_region_banked->base();
+			uint8_t *mem = m_region_banked->base();
 			m_bank3->set_base(mem+0x2000*m_bank[2]);
 			m_bank4->set_base(mem+0x2000*m_bank[3]);
 		}
@@ -315,7 +316,7 @@ void sfkick_state::sfkick_remap_banks()
 	{
 		case 0: /* cartridge */
 		{
-			UINT8 *mem = m_region_cartridge->base();
+			uint8_t *mem = m_region_cartridge->base();
 			m_bank5->set_base(mem+0x4000);
 			m_bank6->set_base(mem+0x6000);
 		}
@@ -324,7 +325,7 @@ void sfkick_state::sfkick_remap_banks()
 		case 1: /* unknown */
 		case 3:
 		{
-			UINT8 *mem = m_region_banked->base();
+			uint8_t *mem = m_region_banked->base();
 			m_bank5->set_base(mem+0x18000);
 			m_bank6->set_base(mem+0x18000);
 		}
@@ -332,7 +333,7 @@ void sfkick_state::sfkick_remap_banks()
 
 		case 2: /* banked */
 		{
-			UINT8 *mem = m_region_banked->base();
+			uint8_t *mem = m_region_banked->base();
 			m_bank5->set_base(mem+0x2000*m_bank[4]);
 			m_bank6->set_base(mem+0x2000*m_bank[5]);
 		}
@@ -345,7 +346,7 @@ void sfkick_state::sfkick_remap_banks()
 		case 0: /* unknown */
 		case 1:
 		{
-			UINT8 *mem = m_region_banked->base();
+			uint8_t *mem = m_region_banked->base();
 			m_bank7->set_base(mem+0x18000);
 			m_bank8->set_base(mem+0x18000);
 		}
@@ -353,7 +354,7 @@ void sfkick_state::sfkick_remap_banks()
 
 		case 2: /* banked */
 		{
-			UINT8 *mem = m_region_banked->base();
+			uint8_t *mem = m_region_banked->base();
 			m_bank7->set_base(mem+0x2000*m_bank[6]);
 			m_bank8->set_base(mem+0x2000*m_bank[7]);
 		}
@@ -558,10 +559,6 @@ static INPUT_PORTS_START( sfkick )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
 INPUT_PORTS_END
 
-WRITE_LINE_MEMBER(sfkick_state::sfkick_vdp_interrupt)
-{
-	m_maincpu->set_input_line(0, (state ? HOLD_LINE : CLEAR_LINE));
-}
 
 void sfkick_state::machine_reset()
 {
@@ -582,7 +579,7 @@ WRITE_LINE_MEMBER(sfkick_state::irqhandler)
 	m_soundcpu->set_input_line_and_vector(0, state ? ASSERT_LINE : CLEAR_LINE, 0xff);
 }
 
-static MACHINE_CONFIG_START( sfkick, sfkick_state )
+static MACHINE_CONFIG_START( sfkick )
 
 	MCFG_CPU_ADD("maincpu",Z80,MASTER_CLOCK/6)
 	MCFG_CPU_PROGRAM_MAP(sfkick_map)
@@ -595,7 +592,7 @@ static MACHINE_CONFIG_START( sfkick, sfkick_state )
 	MCFG_CPU_IO_MAP(sfkick_sound_io_map)
 
 	MCFG_V9938_ADD("v9938", "screen", 0x80000, MASTER_CLOCK)
-	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(sfkick_state,sfkick_vdp_interrupt))
+	MCFG_V99X8_INTERRUPT_CALLBACK(INPUTLINE("maincpu", 0))
 	MCFG_V99X8_SCREEN_ADD_NTSC("screen", "v9938", MASTER_CLOCK)
 
 	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
@@ -619,7 +616,7 @@ MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER(sfkick_state,sfkick)
 {
-	m_main_mem=std::make_unique<UINT8[]>(0x4000);
+	m_main_mem=std::make_unique<uint8_t[]>(0x4000);
 }
 
 

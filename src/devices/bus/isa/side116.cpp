@@ -8,6 +8,7 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "side116.h"
 
 
@@ -15,22 +16,17 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type ISA8_SIDE116 = &device_creator<side116_device>;
+DEFINE_DEVICE_TYPE(ISA8_SIDE116, side116_device, "side116", "Acculogic sIDE-1/16 IDE Disk Controller")
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( side116 )
+MACHINE_CONFIG_MEMBER( side116_device::device_add_mconfig )
 	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, false)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(side116_device, ide_interrupt))
 MACHINE_CONFIG_END
 
-machine_config_constructor side116_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( side116 );
-}
 
 //-------------------------------------------------
 //  input_ports - device-specific input ports
@@ -72,7 +68,7 @@ ROM_START( side116 )
 	ROM_LOAD("bios12.u2", 0x0000, 0x2000, CRC(c202a0e6) SHA1(a5b130a6d17c972d6c378cb2cd8113a4039631fe))
 ROM_END
 
-const rom_entry *side116_device::device_rom_region() const
+const tiny_rom_entry *side116_device::device_rom_region() const
 {
 	return ROM_NAME( side116 );
 }
@@ -86,8 +82,8 @@ const rom_entry *side116_device::device_rom_region() const
 //  side116_device - constructor
 //-------------------------------------------------
 
-side116_device::side116_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, ISA8_SIDE116, "Acculogic sIDE-1/16 IDE Disk Controller", tag, owner, clock, "side116", __FILE__),
+side116_device::side116_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, ISA8_SIDE116, tag, owner, clock),
 	device_isa8_card_interface( mconfig, *this ),
 	m_ata(*this, "ata"),
 	m_config(*this, "configuration"),
@@ -115,16 +111,16 @@ void side116_device::device_reset()
 	{
 		switch ((m_config->read() >> 1) & 0x03)
 		{
-		case 0: m_isa->install_rom(this, 0xc8000, 0xc9fff, 0, 0, "side116", "option"); break;
-		case 1: m_isa->install_rom(this, 0xd8000, 0xd9fff, 0, 0, "side116", "option"); break;
-		case 2: m_isa->install_rom(this, 0xcc000, 0xcdfff, 0, 0, "side116", "option"); break;
-		case 3: m_isa->install_rom(this, 0xdc000, 0xddfff, 0, 0, "side116", "option"); break;
+		case 0: m_isa->install_rom(this, 0xc8000, 0xc9fff, "side116", "option"); break;
+		case 1: m_isa->install_rom(this, 0xd8000, 0xd9fff, "side116", "option"); break;
+		case 2: m_isa->install_rom(this, 0xcc000, 0xcdfff, "side116", "option"); break;
+		case 3: m_isa->install_rom(this, 0xdc000, 0xddfff, "side116", "option"); break;
 		}
 	}
 
 	// install io access
 	if ((m_config->read() & 0x20) == 0x20)
-		m_isa->install_device(0x360, 0x36f, 0, 0, read8_delegate(FUNC(side116_device::read), this), write8_delegate(FUNC(side116_device::write), this));
+		m_isa->install_device(0x360, 0x36f, read8_delegate(FUNC(side116_device::read), this), write8_delegate(FUNC(side116_device::write), this));
 }
 
 
@@ -134,11 +130,11 @@ void side116_device::device_reset()
 
 READ8_MEMBER( side116_device::read )
 {
-	UINT8 data;
+	uint8_t data;
 
 	if (offset == 0)
 	{
-		UINT16 ide_data = m_ata->read_cs0(space, 0, 0xffff);
+		uint16_t ide_data = m_ata->read_cs0(space, 0, 0xffff);
 		data = ide_data & 0xff;
 		m_latch = ide_data >> 8;
 	}
@@ -162,7 +158,7 @@ WRITE8_MEMBER( side116_device::write )
 {
 	if (offset == 0)
 	{
-		UINT16 ide_data = (m_latch << 8) | data;
+		uint16_t ide_data = (m_latch << 8) | data;
 		m_ata->write_cs0(space, 0, ide_data, 0xffff);
 	}
 	else if (offset < 8)
@@ -181,7 +177,7 @@ WRITE8_MEMBER( side116_device::write )
 
 WRITE_LINE_MEMBER( side116_device::ide_interrupt )
 {
-	UINT8 level = m_config->read() & 0x18;
+	uint8_t level = m_config->read() & 0x18;
 
 	if (level == 0x08)
 		m_isa->irq2_w(state);

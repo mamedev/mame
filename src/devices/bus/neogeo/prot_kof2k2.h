@@ -2,31 +2,31 @@
 // copyright-holders:S. Smith,David Haywood,Fabio Priuli
 
 
+#ifndef MAME_BUS_NEOGEO_PROT_KOF2K2_H
+#define MAME_BUS_NEOGEO_PROT_KOF2K2_H
+
 #pragma once
 
-#ifndef __KOF2K2_PROT__
-#define __KOF2K2_PROT__
-
-extern const device_type KOF2002_PROT;
+DECLARE_DEVICE_TYPE(NG_KOF2002_PROT, kof2002_prot_device)
 
 #define MCFG_KOF2002_PROT_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, KOF2002_PROT, 0)
+	MCFG_DEVICE_ADD(_tag, NG_KOF2002_PROT, 0)
 
 
-class kof2002_prot_device :  public device_t
+class kof2002_prot_device : public device_t
 {
 public:
 	// construction/destruction
-	kof2002_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	kof2002_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void kof2002_decrypt_68k(UINT8* cpurom, UINT32 cpurom_size);
-	void matrim_decrypt_68k(UINT8* cpurom, UINT32 cpurom_size);
-	void samsho5_decrypt_68k(UINT8* cpurom, UINT32 cpurom_size);
-	void samsh5sp_decrypt_68k(UINT8* cpurom, UINT32 cpurom_size);
+	void kof2002_decrypt_68k(uint8_t* cpurom, uint32_t cpurom_size);
+	void matrim_decrypt_68k(uint8_t* cpurom, uint32_t cpurom_size);
+	void samsho5_decrypt_68k(uint8_t* cpurom, uint32_t cpurom_size);
+	void samsh5sp_decrypt_68k(uint8_t* cpurom, uint32_t cpurom_size);
 
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 };
 
-#endif
+#endif // MAME_BUS_NEOGEO_PROT_KOF2K2_H

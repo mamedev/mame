@@ -14,7 +14,7 @@
 
 PALETTE_INIT_MEMBER(kopunch_state, kopunch)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 
 	color_prom += 24; // first 24 colors are black
 
@@ -96,13 +96,13 @@ TILE_GET_INFO_MEMBER(kopunch_state::get_bg_tile_info)
 
 void kopunch_state::video_start()
 {
-	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(kopunch_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS,  8,  8, 32, 32);
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(kopunch_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(kopunch_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS,  8,  8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(kopunch_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
 
 	m_fg_tilemap->set_transparent_pen(0);
 }
 
-UINT32 kopunch_state::screen_update_kopunch(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t kopunch_state::screen_update_kopunch(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
 

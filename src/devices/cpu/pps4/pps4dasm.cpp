@@ -93,7 +93,7 @@ static const char *token_str[t_COUNT] = {
 	"sag"           /* special address generation */
 };
 
-static const UINT16 table[] = {
+static const uint16_t table[] = {
 /* 00 */ t_LBL | t_I8c,
 /* 01 */ t_TML | t_I4 | t_I8,
 /* 02 */ t_TML | t_I4 | t_I8,
@@ -367,70 +367,69 @@ static const UINT16 table[] = {
 /* ff */ t_TM | t_I6i | t_OVER
 };
 
-CPU_DISASSEMBLE( pps4 )
+CPU_DISASSEMBLE(pps4)
 {
-	UINT32 flags = 0;
+	uint32_t flags = 0;
 	unsigned PC = pc;
-	UINT8 op = OP(pc++);
-	UINT32 tok = table[op];
-	char *dst = nullptr;
+	uint8_t op = OP(pc++);
+	uint32_t tok = table[op];
 
 	if (0 == (tok & t_MASK)) {
-		sprintf(buffer, "%s", token_str[tok & t_MASK]);
+		stream << token_str[tok & t_MASK];
 	} else {
-		dst = buffer + sprintf(buffer, "%-7s", token_str[tok & t_MASK]);
+		util::stream_format(stream, "%-7s", token_str[tok & t_MASK]);
 	}
 
 	if (tok & t_I3c) {
 		// 3 bit immediate, complemented
-		UINT8 i = ~op & 7;
+		uint8_t i = ~op & 7;
 		if (0 != i)  // only print if non-zero
-			dst += sprintf(dst, "%x", i);
+			util::stream_format(stream, "%x", i);
 	}
 
 	if (tok & t_I4) {
 		// 4 bit immediate
-		UINT8 i = op & 15;
-		dst += sprintf(dst, "%x", i);
+		uint8_t i = op & 15;
+		util::stream_format(stream, "%x", i);
 	}
 
 	if (tok & t_I4c) {
 		// 4 bit immediate, complemented
-		UINT8 i = ~op & 15;
-		dst += sprintf(dst, "%x", i);
+		uint8_t i = ~op & 15;
+		util::stream_format(stream, "%x", i);
 	}
 
 	if (tok & t_I4p) {
 		// 4 bit immediate offset into page 3
-		UINT8 i = op & 15;
-		dst += sprintf(dst, "[%x]", 0x0c0 | i);
+		uint8_t i = op & 15;
+		util::stream_format(stream, "[%x]", 0x0c0 | i);
 	}
 
 	if (tok & t_I6p) {
 		// 6 bit immediate offset into current page
-		UINT8 i = op & 63;
-		dst += sprintf(dst, "%x", (PC & ~63) | i);
+		uint8_t i = op & 63;
+		util::stream_format(stream, "%x", (PC & ~63) | i);
 	}
 
 	if (tok & t_I6i) {
 		// 6 bit immediate offset into page 3
-		UINT16 i6p3 = (3 << 6) | (op & 63);
+		uint16_t i6p3 = (3 << 6) | (op & 63);
 		// 8 bit absolute offset at 0x0100
-		UINT16 addr = (1 << 8) | 0;     // ROM[ip3] can't be reached!?
+		uint16_t addr = (1 << 8) | 0;     // ROM[ip3] can't be reached!?
 		(void)addr; // avoid unused variable warning
-		dst += sprintf(dst, "[%x]", i6p3);
+		util::stream_format(stream, "[%x]", i6p3);
 	}
 
 	if (tok & t_I8) {
 		// 8 bit immediate I/O port address
-		UINT8 arg = ARG(pc++);
-		dst += sprintf(dst, "%02x", arg);
+		uint8_t arg = ARG(pc++);
+		util::stream_format(stream, "%02x", arg);
 	}
 
 	if (tok & t_I8c) {
 		// 8 bit immediate offset into page
-		UINT16 arg = ~ARG(pc++) & 255;
-		dst += sprintf(dst, "%02x", arg);
+		uint16_t arg = ~ARG(pc++) & 255;
+		util::stream_format(stream, "%02x", arg);
 	}
 
 	if (tok & t_OVER)  // TL or TML

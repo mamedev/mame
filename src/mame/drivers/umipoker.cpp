@@ -16,11 +16,16 @@
 ***************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
+#include "machine/nvram.h"
 #include "sound/3812intf.h"
 #include "sound/okim6295.h"
-#include "machine/nvram.h"
+
+#include "screen.h"
+#include "speaker.h"
+
 #include "saiyukip.lh"
 
 
@@ -38,15 +43,15 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")  { }
 
-	required_shared_ptr<UINT16> m_vram_0;
-	required_shared_ptr<UINT16> m_vram_1;
-	required_shared_ptr<UINT16> m_vram_2;
-	required_shared_ptr<UINT16> m_vram_3;
+	required_shared_ptr<uint16_t> m_vram_0;
+	required_shared_ptr<uint16_t> m_vram_1;
+	required_shared_ptr<uint16_t> m_vram_2;
+	required_shared_ptr<uint16_t> m_vram_3;
 	tilemap_t *m_tilemap_0;
 	tilemap_t *m_tilemap_1;
 	tilemap_t *m_tilemap_2;
 	tilemap_t *m_tilemap_3;
-	required_shared_ptr<UINT8> m_z80_wram;
+	required_shared_ptr<uint8_t> m_z80_wram;
 	int m_umipoker_scrolly[4];
 	DECLARE_READ8_MEMBER(z80_rom_readback_r);
 	DECLARE_READ8_MEMBER(z80_shared_ram_r);
@@ -72,7 +77,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_umipoker(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_umipoker(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -124,10 +129,10 @@ TILE_GET_INFO_MEMBER(umipoker_state::get_tile_info_3)
 
 void umipoker_state::video_start()
 {
-	m_tilemap_0 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(umipoker_state::get_tile_info_0),this),TILEMAP_SCAN_ROWS,8,8,64,32);
-	m_tilemap_1 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(umipoker_state::get_tile_info_1),this),TILEMAP_SCAN_ROWS,8,8,64,32);
-	m_tilemap_2 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(umipoker_state::get_tile_info_2),this),TILEMAP_SCAN_ROWS,8,8,64,32);
-	m_tilemap_3 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(umipoker_state::get_tile_info_3),this),TILEMAP_SCAN_ROWS,8,8,64,32);
+	m_tilemap_0 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(umipoker_state::get_tile_info_0),this),TILEMAP_SCAN_ROWS,8,8,64,32);
+	m_tilemap_1 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(umipoker_state::get_tile_info_1),this),TILEMAP_SCAN_ROWS,8,8,64,32);
+	m_tilemap_2 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(umipoker_state::get_tile_info_2),this),TILEMAP_SCAN_ROWS,8,8,64,32);
+	m_tilemap_3 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(umipoker_state::get_tile_info_3),this),TILEMAP_SCAN_ROWS,8,8,64,32);
 
 	m_tilemap_0->set_transparent_pen(0);
 	m_tilemap_1->set_transparent_pen(0);
@@ -136,7 +141,7 @@ void umipoker_state::video_start()
 
 }
 
-UINT32 umipoker_state::screen_update_umipoker(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t umipoker_state::screen_update_umipoker(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_tilemap_0->set_scrolly(0, m_umipoker_scrolly[0]);
 	m_tilemap_1->set_scrolly(0, m_umipoker_scrolly[1]);
@@ -155,7 +160,7 @@ UINT32 umipoker_state::screen_update_umipoker(screen_device &screen, bitmap_ind1
 
 READ8_MEMBER(umipoker_state::z80_rom_readback_r)
 {
-	UINT8 *ROM = memregion("audiocpu")->base();
+	uint8_t *ROM = memregion("audiocpu")->base();
 
 	return ROM[offset];
 }
@@ -652,7 +657,7 @@ void umipoker_state::machine_reset()
 }
 
 // TODO: clocks
-static MACHINE_CONFIG_START( umipoker, umipoker_state )
+static MACHINE_CONFIG_START( umipoker )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000,16000000) // TMP68HC000-16
@@ -688,7 +693,7 @@ static MACHINE_CONFIG_START( umipoker, umipoker_state )
 	MCFG_SOUND_ADD("ym", YM3812, 4000000 / 2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", 4000000 / 2, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", 4000000 / 2, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -758,6 +763,6 @@ DRIVER_INIT_MEMBER(umipoker_state,saiyukip)
 *              Game Drivers               *
 ******************************************/
 
-/*     YEAR  NAME       PARENT    MACHINE    INPUT      INIT      ROT    COMPANY                  FULLNAME                                 FLAGS   LAYOUT      */
+//     YEAR  NAME       PARENT    MACHINE    INPUT     STATE            INIT      ROT   COMPANY                  FULLNAME                                  FLAGS   LAYOUT
 GAME(  1997, umipoker,  0,        umipoker,  umipoker, umipoker_state,  umipoker, ROT0, "World Station Co.,LTD", "Umi de Poker / Marine Paradise (Japan)", 0 )                      // title screen is toggleable thru a dsw
 GAMEL( 1998, saiyukip,  0,        umipoker,  saiyukip, umipoker_state,  saiyukip, ROT0, "World Station Co.,LTD", "Slot Poker Saiyuki (Japan)",             0,      layout_saiyukip )

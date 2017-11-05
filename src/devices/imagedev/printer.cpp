@@ -13,29 +13,17 @@
 
 
 // device type definition
-const device_type PRINTER = &device_creator<printer_image_device>;
+DEFINE_DEVICE_TYPE(PRINTER, printer_image_device, "printer_image", "Printer")
 
 //-------------------------------------------------
 //  printer_image_device - constructor
 //-------------------------------------------------
 
-printer_image_device::printer_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, PRINTER, "Printer", tag, owner, clock, "printer_image", __FILE__),
+printer_image_device::printer_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, PRINTER, tag, owner, clock),
 	device_image_interface(mconfig, *this),
 	m_online_cb(*this)
 {
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void printer_image_device::device_config_complete()
-{
-	// set brief and instance name
-	update_names();
 }
 
 
@@ -68,7 +56,7 @@ int printer_image_device::is_ready()
     printer_output - outputs data to a printer
 -------------------------------------------------*/
 
-void printer_image_device::output(UINT8 data)
+void printer_image_device::output(uint8_t data)
 {
 	if (exists())
 	{
@@ -80,7 +68,7 @@ void printer_image_device::output(UINT8 data)
     DEVICE_IMAGE_CREATE( printer )
 -------------------------------------------------*/
 
-bool printer_image_device::call_create(int format_type, option_resolution *format_options)
+image_init_result printer_image_device::call_create(int format_type, util::option_resolution *format_options)
 {
 	return call_load();
 }
@@ -88,14 +76,14 @@ bool printer_image_device::call_create(int format_type, option_resolution *forma
 /*-------------------------------------------------
     DEVICE_IMAGE_LOAD( printer )
 -------------------------------------------------*/
-bool printer_image_device::call_load()
+image_init_result printer_image_device::call_load()
 {
 	/* send notify that the printer is now online */
 	if (!m_online_cb.isnull())
-		m_online_cb(TRUE);
+		m_online_cb(true);
 
 	/* we don't need to do anything special */
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 
@@ -106,5 +94,5 @@ void printer_image_device::call_unload()
 {
 	/* send notify that the printer is now offline */
 	if (!m_online_cb.isnull())
-		m_online_cb(FALSE);
+		m_online_cb(false);
 }

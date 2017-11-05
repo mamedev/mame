@@ -23,19 +23,14 @@ Memo:
 ******************************************************************************/
 
 #include "emu.h"
+#include "includes/pastelg.h"
+
 #include "cpu/z80/z80.h"
+#include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
-#include "includes/pastelg.h"
-#include "machine/nvram.h"
-
-
-#define SIGNED_DAC  0       // 0:unsigned DAC, 1:signed DAC
-#if SIGNED_DAC
-#define DAC_WRITE   write_signed8
-#else
-#define DAC_WRITE   write_unsigned8
-#endif
+#include "sound/volt_reg.h"
+#include "speaker.h"
 
 
 void pastelg_state::machine_start()
@@ -45,7 +40,7 @@ void pastelg_state::machine_start()
 
 READ8_MEMBER(pastelg_state::pastelg_sndrom_r)
 {
-	UINT8 *ROM = memregion("voice")->base();
+	uint8_t *ROM = memregion("voice")->base();
 
 	return ROM[pastelg_blitter_src_addr_r() & 0x7fff];
 }
@@ -73,7 +68,7 @@ static ADDRESS_MAP_START( pastelg_io_map, AS_IO, 8, pastelg_state )
 	AM_RANGE(0xb0, 0xb0) AM_DEVREAD("nb1413m3", nb1413m3_device, inputport2_r) AM_WRITE(pastelg_romsel_w)
 	AM_RANGE(0xc0, 0xc0) AM_READ(pastelg_sndrom_r)
 	AM_RANGE(0xc0, 0xcf) AM_WRITEONLY AM_SHARE("clut")
-	AM_RANGE(0xd0, 0xd0) AM_READ(pastelg_irq_ack_r) AM_DEVWRITE("dac", dac_device, write_unsigned8)
+	AM_RANGE(0xd0, 0xd0) AM_READ(pastelg_irq_ack_r) AM_DEVWRITE("dac", dac_byte_interface, write)
 	AM_RANGE(0xe0, 0xe0) AM_READ_PORT("DSWC")
 ADDRESS_MAP_END
 
@@ -126,7 +121,7 @@ static ADDRESS_MAP_START( threeds_io_map, AS_IO, 8, pastelg_state )
 	AM_RANGE(0xb0, 0xb0) AM_READ(threeds_inputport2_r) AM_WRITE(threeds_output_w)//writes: bit 3 is coin lockout, bit 1 is coin counter
 	AM_RANGE(0xc0, 0xcf) AM_WRITEONLY AM_SHARE("clut")
 	AM_RANGE(0xc0, 0xc0) AM_READ(threeds_rom_readback_r)
-	AM_RANGE(0xd0, 0xd0) AM_READ(pastelg_irq_ack_r) AM_DEVWRITE("dac", dac_device, write_unsigned8)
+	AM_RANGE(0xd0, 0xd0) AM_READ(pastelg_irq_ack_r) AM_DEVWRITE("dac", dac_byte_interface, write)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( pastelg )
@@ -206,7 +201,7 @@ static INPUT_PORTS_START( pastelg )
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, pastelg_state, nb1413m3_busyflag_r, nullptr)    // DRAW BUSY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )         //
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE3 )       // MEMORY RESET
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
 	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )                 // TEST
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )          // COIN1
@@ -375,7 +370,7 @@ static INPUT_PORTS_START( threeds )
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, pastelg_state,nb1413m3_hackbusyflag_r, nullptr)  // DRAW BUSY
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE3 )       // MEMORY RESET
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
 	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )                 // TEST
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )          // COIN1
@@ -399,7 +394,7 @@ static INPUT_PORTS_START( galds )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( pastelg, pastelg_state )
+static MACHINE_CONFIG_START( pastelg )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 19968000/4)    /* unknown divider, galds definitely relies on this for correct voice pitch */
@@ -425,15 +420,16 @@ static MACHINE_CONFIG_START( pastelg, pastelg_state )
 	MCFG_PALETTE_INIT_OWNER(pastelg_state, pastelg)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_SOUND_ADD("aysnd", AY8910, 1250000)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSWB"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSWA"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.35)
 
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 /*
@@ -459,7 +455,7 @@ Note
 
 */
 
-static MACHINE_CONFIG_START( threeds, pastelg_state )
+static MACHINE_CONFIG_START( threeds )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 19968000/4)    /* unknown divider, galds definitely relies on this for correct voice pitch */
@@ -483,15 +479,16 @@ static MACHINE_CONFIG_START( threeds, pastelg_state )
 	MCFG_PALETTE_INIT_OWNER(pastelg_state, pastelg)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_SOUND_ADD("aysnd", AY8910, 1250000)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSWB"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSWA"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.35)
 
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -520,14 +517,14 @@ ROM_END
 
 ROM_START( threeds )
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* program */
-	ROM_LOAD( "up9.9a",    0x00000, 0x04000, CRC(bc0e7cfd) SHA1(4e84f573fb2c1228757d34b8bc69649b145d9707) )
-	ROM_LOAD( "up10.10a",  0x04000, 0x04000, CRC(e185d9f5) SHA1(98d4a824ed6a89e42543fb87daed33ef606bcced) )
-	ROM_LOAD( "up11.11a",  0x08000, 0x04000, CRC(d1fb728b) SHA1(46e8e6ccdc1b78da29c969cd9290158c96bac4c4) )
+	ROM_LOAD( "ft9.9a",    0x00000, 0x04000, CRC(bc0e7cfd) SHA1(4e84f573fb2c1228757d34b8bc69649b145d9707) ) // labeled FT9  (red label)
+	ROM_LOAD( "ft10.10a",  0x04000, 0x04000, CRC(e185d9f5) SHA1(98d4a824ed6a89e42543fb87daed33ef606bcced) ) // labeled FT10 (red label)
+	ROM_LOAD( "ft11.11a",  0x08000, 0x04000, CRC(d1fb728b) SHA1(46e8e6ccdc1b78da29c969cd9290158c96bac4c4) ) // labeled FT11 (red label)
 
 	ROM_REGION( 0x08000, "voice", ROMREGION_ERASE00 ) /* voice */
 
 	ROM_REGION( 0x38000, "gfx1", 0 ) /* gfx */
-	ROM_LOAD( "1.1a",  0x00000, 0x08000, CRC(5734ca7d) SHA1(d22b9e604cc4e2c0bb4eb32ded06bb5fa519965f) )
+	ROM_LOAD( "1.1a",  0x00000, 0x08000, CRC(5734ca7d) SHA1(d22b9e604cc4e2c0bb4eb32ded06bb5fa519965f) ) // roms 1 through 7 where labeled simply "1" through "7" in black labels
 	ROM_LOAD( "2.2a",  0x08000, 0x08000, CRC(c7f21718) SHA1(4b2956d499e4db63e7f2329420e3d0313e6360ed) )
 	ROM_LOAD( "3.3a",  0x10000, 0x08000, CRC(87bd0a9e) SHA1(a0443017ef4c19f0135c4f764a96457f02cda743) )
 	ROM_LOAD( "4.4a",  0x18000, 0x08000, CRC(b75ecf2b) SHA1(50b8f27988dd24ff475a500d361db3c7a7051f40) )
@@ -565,6 +562,6 @@ ROM_END
 
 
 
-GAME( 1985, pastelg, 0,       pastelg, pastelg, driver_device, 0, ROT0, "Nichibutsu", "Pastel Gal (Japan 851224)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, threeds, 0,       threeds, threeds, driver_device, 0, ROT0, "Nichibutsu", "Three Ds - Three Dealers Casino House", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, galds,   threeds, threeds, galds,   driver_device, 0, ROT0, "Nihon System Corp.", "Gals Ds - Three Dealers Casino House (bootleg?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, pastelg, 0,       pastelg, pastelg, pastelg_state, 0, ROT0, "Nichibutsu", "Pastel Gal (Japan 851224)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, threeds, 0,       threeds, threeds, pastelg_state, 0, ROT0, "Nichibutsu", "Three Ds - Three Dealers Casino House", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, galds,   threeds, threeds, galds,   pastelg_state, 0, ROT0, "Nihon System Corp.", "Gals Ds - Three Dealers Casino House (bootleg?)", MACHINE_SUPPORTS_SAVE )

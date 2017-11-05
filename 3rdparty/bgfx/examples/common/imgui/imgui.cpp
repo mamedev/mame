@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2016 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
@@ -32,7 +32,10 @@
 
 #include "imgui.h"
 #include "ocornut_imgui.h"
+#include "../bgfx_utils.h"
 #include "../nanovg/nanovg.h"
+
+#include <bgfx/embedded_shader.h>
 
 // embedded shaders
 #include "vs_imgui_color.bin.h"
@@ -47,8 +50,25 @@
 #include "fs_imgui_image.bin.h"
 #include "fs_imgui_image_swizz.bin.h"
 
+static const bgfx::EmbeddedShader s_embeddedShaders[] =
+{
+	BGFX_EMBEDDED_SHADER(vs_imgui_color),
+	BGFX_EMBEDDED_SHADER(fs_imgui_color),
+	BGFX_EMBEDDED_SHADER(vs_imgui_texture),
+	BGFX_EMBEDDED_SHADER(fs_imgui_texture),
+	BGFX_EMBEDDED_SHADER(vs_imgui_cubemap),
+	BGFX_EMBEDDED_SHADER(fs_imgui_cubemap),
+	BGFX_EMBEDDED_SHADER(vs_imgui_latlong),
+	BGFX_EMBEDDED_SHADER(fs_imgui_latlong),
+	BGFX_EMBEDDED_SHADER(vs_imgui_image),
+	BGFX_EMBEDDED_SHADER(fs_imgui_image),
+	BGFX_EMBEDDED_SHADER(fs_imgui_image_swizz),
+
+	BGFX_EMBEDDED_SHADER_END()
+};
+
 // embedded font
-#include "droidsans.ttf.h"
+#include "roboto_regular.ttf.h"
 
 BX_PRAGMA_DIAGNOSTIC_IGNORED_MSVC(4244); // warning C4244: '=' : conversion from '' to '', possible loss of data
 
@@ -410,7 +430,15 @@ struct Imgui
 		const ImguiFontHandle handle = { m_fontHandle.alloc() };
 		const bgfx::Memory* mem = bgfx::alloc(m_textureWidth * m_textureHeight);
 		stbtt_BakeFontBitmap( (uint8_t*)_data, 0, _fontSize, mem->data, m_textureWidth, m_textureHeight, 32, 96, m_fonts[handle.idx].m_cdata);
-		m_fonts[handle.idx].m_texture = bgfx::createTexture2D(m_textureWidth, m_textureHeight, 1, bgfx::TextureFormat::R8, BGFX_TEXTURE_NONE, mem);
+		m_fonts[handle.idx].m_texture = bgfx::createTexture2D(
+			  m_textureWidth
+			, m_textureHeight
+			, false
+			, 1
+			, bgfx::TextureFormat::R8
+			, BGFX_TEXTURE_NONE
+			, mem
+			);
 		m_fonts[handle.idx].m_size = _fontSize;
 #else
 		const ImguiFontHandle handle = { bgfx::invalidHandle };
@@ -448,10 +476,18 @@ struct Imgui
 			}
 		}
 
-		return bgfx::createTexture2D(uint16_t(_width), uint16_t(_height), 0, bgfx::TextureFormat::BGRA8, 0, mem);
+		return bgfx::createTexture2D(
+					  uint16_t(_width)
+					, uint16_t(_height)
+					, false
+					, 1
+					, bgfx::TextureFormat::BGRA8
+					, 0
+					, mem
+					);
 	}
 
-	ImguiFontHandle create(const void* _data, uint32_t _size, float _fontSize, bx::AllocatorI* _allocator)
+	ImguiFontHandle create(float _fontSize, bx::AllocatorI* _allocator)
 	{
 		m_allocator = _allocator;
 
@@ -463,16 +499,10 @@ struct Imgui
 		}
 #endif // BX_CONFIG_ALLOCATOR_CRT
 
-		if (NULL == _data)
-		{
-			_data = s_droidSansTtf;
-			_size = sizeof(s_droidSansTtf);
-		}
-
-		IMGUI_create(_data, _size, _fontSize, m_allocator);
+		IMGUI_create(_fontSize, m_allocator);
 
 		m_nvg = nvgCreate(1, m_view, m_allocator);
- 		nvgCreateFontMem(m_nvg, "default", (unsigned char*)_data, INT32_MAX, 0);
+ 		nvgCreateFontMem(m_nvg, "default", (unsigned char*)s_robotoRegularTtf, INT32_MAX, 0);
  		nvgFontSize(m_nvg, _fontSize);
  		nvgFontFace(m_nvg, "default");
 
@@ -492,113 +522,41 @@ struct Imgui
 		u_imageSwizzle    = bgfx::createUniform("u_swizzle",         bgfx::UniformType::Vec4);
 		s_texColor        = bgfx::createUniform("s_texColor",        bgfx::UniformType::Int1);
 
-		const bgfx::Memory* vs_imgui_color;
-		const bgfx::Memory* fs_imgui_color;
-		const bgfx::Memory* vs_imgui_texture;
-		const bgfx::Memory* fs_imgui_texture;
-		const bgfx::Memory* vs_imgui_cubemap;
-		const bgfx::Memory* fs_imgui_cubemap;
-		const bgfx::Memory* vs_imgui_latlong;
-		const bgfx::Memory* fs_imgui_latlong;
-		const bgfx::Memory* vs_imgui_image;
-		const bgfx::Memory* fs_imgui_image;
-		const bgfx::Memory* fs_imgui_image_swizz;
-
-		switch (bgfx::getRendererType() )
-		{
-		case bgfx::RendererType::Direct3D9:
-			vs_imgui_color       = bgfx::makeRef(vs_imgui_color_dx9, sizeof(vs_imgui_color_dx9) );
-			fs_imgui_color       = bgfx::makeRef(fs_imgui_color_dx9, sizeof(fs_imgui_color_dx9) );
-			vs_imgui_texture     = bgfx::makeRef(vs_imgui_texture_dx9, sizeof(vs_imgui_texture_dx9) );
-			fs_imgui_texture     = bgfx::makeRef(fs_imgui_texture_dx9, sizeof(fs_imgui_texture_dx9) );
-			vs_imgui_cubemap     = bgfx::makeRef(vs_imgui_cubemap_dx9, sizeof(vs_imgui_cubemap_dx9) );
-			fs_imgui_cubemap     = bgfx::makeRef(fs_imgui_cubemap_dx9, sizeof(fs_imgui_cubemap_dx9) );
-			vs_imgui_latlong     = bgfx::makeRef(vs_imgui_latlong_dx9, sizeof(vs_imgui_latlong_dx9) );
-			fs_imgui_latlong     = bgfx::makeRef(fs_imgui_latlong_dx9, sizeof(fs_imgui_latlong_dx9) );
-			vs_imgui_image       = bgfx::makeRef(vs_imgui_image_dx9, sizeof(vs_imgui_image_dx9) );
-			fs_imgui_image       = bgfx::makeRef(fs_imgui_image_dx9, sizeof(fs_imgui_image_dx9) );
-			fs_imgui_image_swizz = bgfx::makeRef(fs_imgui_image_swizz_dx9, sizeof(fs_imgui_image_swizz_dx9) );
-			m_halfTexel = 0.5f;
-			break;
-
-		case bgfx::RendererType::Direct3D11:
-		case bgfx::RendererType::Direct3D12:
-			vs_imgui_color       = bgfx::makeRef(vs_imgui_color_dx11, sizeof(vs_imgui_color_dx11) );
-			fs_imgui_color       = bgfx::makeRef(fs_imgui_color_dx11, sizeof(fs_imgui_color_dx11) );
-			vs_imgui_texture     = bgfx::makeRef(vs_imgui_texture_dx11, sizeof(vs_imgui_texture_dx11) );
-			fs_imgui_texture     = bgfx::makeRef(fs_imgui_texture_dx11, sizeof(fs_imgui_texture_dx11) );
-			vs_imgui_cubemap     = bgfx::makeRef(vs_imgui_cubemap_dx11, sizeof(vs_imgui_cubemap_dx11) );
-			fs_imgui_cubemap     = bgfx::makeRef(fs_imgui_cubemap_dx11, sizeof(fs_imgui_cubemap_dx11) );
-			vs_imgui_latlong     = bgfx::makeRef(vs_imgui_latlong_dx11, sizeof(vs_imgui_latlong_dx11) );
-			fs_imgui_latlong     = bgfx::makeRef(fs_imgui_latlong_dx11, sizeof(fs_imgui_latlong_dx11) );
-			vs_imgui_image       = bgfx::makeRef(vs_imgui_image_dx11, sizeof(vs_imgui_image_dx11) );
-			fs_imgui_image       = bgfx::makeRef(fs_imgui_image_dx11, sizeof(fs_imgui_image_dx11) );
-			fs_imgui_image_swizz = bgfx::makeRef(fs_imgui_image_swizz_dx11, sizeof(fs_imgui_image_swizz_dx11) );
-			break;
-
-		case bgfx::RendererType::Metal:
-			vs_imgui_color       = bgfx::makeRef(vs_imgui_color_mtl, sizeof(vs_imgui_color_mtl) );
-			fs_imgui_color       = bgfx::makeRef(fs_imgui_color_mtl, sizeof(fs_imgui_color_mtl) );
-			vs_imgui_texture     = bgfx::makeRef(vs_imgui_texture_mtl, sizeof(vs_imgui_texture_mtl) );
-			fs_imgui_texture     = bgfx::makeRef(fs_imgui_texture_mtl, sizeof(fs_imgui_texture_mtl) );
-			vs_imgui_cubemap     = bgfx::makeRef(vs_imgui_cubemap_mtl, sizeof(vs_imgui_cubemap_mtl) );
-			fs_imgui_cubemap     = bgfx::makeRef(fs_imgui_cubemap_mtl, sizeof(fs_imgui_cubemap_mtl) );
-			vs_imgui_latlong     = bgfx::makeRef(vs_imgui_latlong_mtl, sizeof(vs_imgui_latlong_mtl) );
-			fs_imgui_latlong     = bgfx::makeRef(fs_imgui_latlong_mtl, sizeof(fs_imgui_latlong_mtl) );
-			vs_imgui_image       = bgfx::makeRef(vs_imgui_image_mtl, sizeof(vs_imgui_image_mtl) );
-			fs_imgui_image       = bgfx::makeRef(fs_imgui_image_mtl, sizeof(fs_imgui_image_mtl) );
-			fs_imgui_image_swizz = bgfx::makeRef(fs_imgui_image_swizz_mtl, sizeof(fs_imgui_image_swizz_mtl) );
-			break;
-
-		default:
-			vs_imgui_color       = bgfx::makeRef(vs_imgui_color_glsl, sizeof(vs_imgui_color_glsl) );
-			fs_imgui_color       = bgfx::makeRef(fs_imgui_color_glsl, sizeof(fs_imgui_color_glsl) );
-			vs_imgui_texture     = bgfx::makeRef(vs_imgui_texture_glsl, sizeof(vs_imgui_texture_glsl) );
-			fs_imgui_texture     = bgfx::makeRef(fs_imgui_texture_glsl, sizeof(fs_imgui_texture_glsl) );
-			vs_imgui_cubemap     = bgfx::makeRef(vs_imgui_cubemap_glsl, sizeof(vs_imgui_cubemap_glsl) );
-			fs_imgui_cubemap     = bgfx::makeRef(fs_imgui_cubemap_glsl, sizeof(fs_imgui_cubemap_glsl) );
-			vs_imgui_latlong     = bgfx::makeRef(vs_imgui_latlong_glsl, sizeof(vs_imgui_latlong_glsl) );
-			fs_imgui_latlong     = bgfx::makeRef(fs_imgui_latlong_glsl, sizeof(fs_imgui_latlong_glsl) );
-			vs_imgui_image       = bgfx::makeRef(vs_imgui_image_glsl, sizeof(vs_imgui_image_glsl) );
-			fs_imgui_image       = bgfx::makeRef(fs_imgui_image_glsl, sizeof(fs_imgui_image_glsl) );
-			fs_imgui_image_swizz = bgfx::makeRef(fs_imgui_image_swizz_glsl, sizeof(fs_imgui_image_swizz_glsl) );
-			break;
-		}
-
 		bgfx::ShaderHandle vsh;
 		bgfx::ShaderHandle fsh;
 
-		vsh = bgfx::createShader(vs_imgui_color);
-		fsh = bgfx::createShader(fs_imgui_color);
+		bgfx::RendererType::Enum type = bgfx::getRendererType();
+		vsh = bgfx::createEmbeddedShader(s_embeddedShaders, type, "vs_imgui_color");
+		fsh = bgfx::createEmbeddedShader(s_embeddedShaders, type, "fs_imgui_color");
 		m_colorProgram = bgfx::createProgram(vsh, fsh);
 		bgfx::destroyShader(vsh);
 		bgfx::destroyShader(fsh);
 
-		vsh = bgfx::createShader(vs_imgui_texture);
-		fsh = bgfx::createShader(fs_imgui_texture);
+		vsh = bgfx::createEmbeddedShader(s_embeddedShaders, type, "vs_imgui_texture");
+		fsh = bgfx::createEmbeddedShader(s_embeddedShaders, type, "fs_imgui_texture");
 		m_textureProgram = bgfx::createProgram(vsh, fsh);
 		bgfx::destroyShader(vsh);
 		bgfx::destroyShader(fsh);
 
-		vsh = bgfx::createShader(vs_imgui_cubemap);
-		fsh = bgfx::createShader(fs_imgui_cubemap);
+		vsh = bgfx::createEmbeddedShader(s_embeddedShaders, type, "vs_imgui_cubemap");
+		fsh = bgfx::createEmbeddedShader(s_embeddedShaders, type, "fs_imgui_cubemap");
 		m_cubeMapProgram = bgfx::createProgram(vsh, fsh);
 		bgfx::destroyShader(vsh);
 		bgfx::destroyShader(fsh);
 
-		vsh = bgfx::createShader(vs_imgui_latlong);
-		fsh = bgfx::createShader(fs_imgui_latlong);
+		vsh = bgfx::createEmbeddedShader(s_embeddedShaders, type, "vs_imgui_latlong");
+		fsh = bgfx::createEmbeddedShader(s_embeddedShaders, type, "fs_imgui_latlong");
 		m_latlongProgram = bgfx::createProgram(vsh, fsh);
 		bgfx::destroyShader(vsh);
 		bgfx::destroyShader(fsh);
 
-		vsh = bgfx::createShader(vs_imgui_image);
-		fsh = bgfx::createShader(fs_imgui_image);
+		vsh = bgfx::createEmbeddedShader(s_embeddedShaders, type, "vs_imgui_image");
+		fsh = bgfx::createEmbeddedShader(s_embeddedShaders, type, "fs_imgui_image");
 		m_imageProgram = bgfx::createProgram(vsh, fsh);
 		bgfx::destroyShader(fsh);
 
 		// Notice: using the same vsh.
-		fsh = bgfx::createShader(fs_imgui_image_swizz);
+		fsh = bgfx::createEmbeddedShader(s_embeddedShaders, type, "fs_imgui_image_swizz");
 		m_imageSwizzProgram = bgfx::createProgram(vsh, fsh);
 		bgfx::destroyShader(fsh);
 		bgfx::destroyShader(vsh);
@@ -606,7 +564,7 @@ struct Imgui
 		m_missingTexture = genMissingTexture(256, 256, 0.04f);
 
 #if !USE_NANOVG_FONT
-		const ImguiFontHandle handle = createFont(_data, _fontSize);
+		const ImguiFontHandle handle = createFont(s_robotoRegularTtf, _fontSize);
 		m_currentFontIdx = handle.idx;
 #else
 		const ImguiFontHandle handle = { bgfx::invalidHandle };
@@ -854,7 +812,7 @@ struct Imgui
 			m_surfaceWidth = _surfaceWidth / 2;
 
 			float proj[16];
-			bx::mtxProj(proj, hmd->eye[0].fov, 0.1f, 100.0f);
+			bx::mtxProj(proj, hmd->eye[0].fov, 0.1f, 100.0f, bgfx::getCaps()->homogeneousDepth);
 
 			static float time = 0.0f;
 			time += 0.05f;
@@ -879,7 +837,10 @@ struct Imgui
 			bgfx::setViewRect(_view, 0, 0, _width, _height);
 		}
 
-		updateInput(mx, my, _button, _scroll, _inputChar);
+		if (!ImGui::IsMouseHoveringAnyWindow() )
+		{
+			updateInput(mx, my, _button, _scroll, _inputChar);
+		}
 
 		m_hot = m_hotToBe;
 		m_hotToBe = 0;
@@ -1491,7 +1452,7 @@ struct Imgui
 		}
 	}
 
-	uint8_t tabs(uint8_t _selected, bool _enabled, ImguiAlign::Enum _align, int32_t _height, int32_t _r, uint8_t _nTabs, uint8_t _nEnabled, va_list _argList)
+	uint8_t tabs(uint8_t _selected, bool _enabled, ImguiAlign::Enum _align, int32_t _height, int32_t _r, uint32_t _nTabs, uint32_t _nEnabled, va_list _argList)
 	{
 		const char* titles[16];
 		bool tabEnabled[16];
@@ -1840,7 +1801,7 @@ struct Imgui
 
 		const uint32_t numVertices = 14;
 		const uint32_t numIndices  = 36;
-		if (bgfx::checkAvailTransientBuffers(numVertices, PosNormalVertex::ms_decl, numIndices) )
+		if (checkAvailTransientBuffers(numVertices, PosNormalVertex::ms_decl, numIndices) )
 		{
 			bgfx::TransientVertexBuffer tvb;
 			bgfx::allocTransientVertexBuffer(&tvb, numVertices, PosNormalVertex::ms_decl);
@@ -2375,7 +2336,7 @@ struct Imgui
 		}
 
 		uint32_t numVertices = _numCoords*6 + (_numCoords-2)*3;
-		if (bgfx::checkAvailTransientVertexBuffer(numVertices, PosColorVertex::ms_decl) )
+		if (numVertices == bgfx::getAvailTransientVertexBuffer(numVertices, PosColorVertex::ms_decl) )
 		{
 			bgfx::TransientVertexBuffer tvb;
 			bgfx::allocTransientVertexBuffer(&tvb, numVertices, PosColorVertex::ms_decl);
@@ -2662,7 +2623,7 @@ struct Imgui
 			getTextLength(m_fonts[m_currentFontIdx].m_cdata, _text, numVertices);
 		}
 
-		if (bgfx::checkAvailTransientVertexBuffer(numVertices, PosColorUvVertex::ms_decl) )
+		if (numVertices == bgfx::getAvailTransientVertexBuffer(numVertices, PosColorUvVertex::ms_decl) )
 		{
 			bgfx::TransientVertexBuffer tvb;
 			bgfx::allocTransientVertexBuffer(&tvb, numVertices, PosColorUvVertex::ms_decl);
@@ -2752,7 +2713,7 @@ struct Imgui
 
 	bool screenQuad(int32_t _x, int32_t _y, int32_t _width, uint32_t _height, bool _originBottomLeft = false)
 	{
-		if (bgfx::checkAvailTransientVertexBuffer(6, PosUvVertex::ms_decl) )
+		if (6 == bgfx::getAvailTransientVertexBuffer(6, PosUvVertex::ms_decl) )
 		{
 			bgfx::TransientVertexBuffer vb;
 			bgfx::allocTransientVertexBuffer(&vb, 6, PosUvVertex::ms_decl);
@@ -3262,9 +3223,9 @@ void imguiFree(void* _ptr, void*)
 	BX_FREE(s_imgui.m_allocator, _ptr);
 }
 
-ImguiFontHandle imguiCreate(const void* _data, uint32_t _size, float _fontSize, bx::AllocatorI* _allocator)
+ImguiFontHandle imguiCreate(const void*, uint32_t, float _fontSize, bx::AllocatorI* _allocator)
 {
-	return s_imgui.create(_data, _size, _fontSize, _allocator);
+	return s_imgui.create(_fontSize, _allocator);
 }
 
 void imguiDestroy()
@@ -3472,7 +3433,7 @@ void imguiInput(const char* _label, char* _str, uint32_t _len, bool _enabled, Im
 	s_imgui.input(_label, _str, _len, _enabled, _align, _r);
 }
 
-uint8_t imguiTabs(uint8_t _selected, bool _enabled, ImguiAlign::Enum _align, int32_t _height, int32_t _r, uint8_t _nTabs, uint8_t _nEnabled, ...)
+uint8_t imguiTabs(uint8_t _selected, bool _enabled, ImguiAlign::Enum _align, int32_t _height, int32_t _r, uint32_t _nTabs, uint32_t _nEnabled, ...)
 {
 	va_list argList;
 	va_start(argList, _nEnabled);
@@ -3482,7 +3443,7 @@ uint8_t imguiTabs(uint8_t _selected, bool _enabled, ImguiAlign::Enum _align, int
 	return result;
 }
 
-uint8_t imguiTabs(uint8_t _selected, bool _enabled, ImguiAlign::Enum _align, int32_t _height, int32_t _r, uint8_t _nTabs, ...)
+uint8_t imguiTabs(uint8_t _selected, bool _enabled, ImguiAlign::Enum _align, int32_t _height, int32_t _r, uint32_t _nTabs, ...)
 {
 	va_list argList;
 	va_start(argList, _nTabs);
@@ -3573,7 +3534,10 @@ float imguiGetTextLength(const char* _text, ImguiFontHandle _handle)
 
 bool imguiMouseOverArea()
 {
-	return s_imgui.m_insideArea;
+	return s_imgui.m_insideArea
+		|| ImGui::IsAnyItemHovered()
+		|| ImGui::IsMouseHoveringAnyWindow()
+		;
 }
 
 bgfx::ProgramHandle imguiGetImageProgram(uint8_t _mip)

@@ -6,12 +6,15 @@
 //
 //============================================================
 
+#include "emu.h"
 #import "deviceinfoviewer.h"
+
+#include "util/xmlfile.h"
 
 
 @interface MAMEDeviceInfoView : NSView
 {
-	CGFloat	minWidth;
+	CGFloat minWidth;
 }
 
 - (id)initWithFrame:(NSRect)frame;
@@ -40,7 +43,7 @@
 
 - (void)resizeWithOldSuperviewSize:(NSSize)oldBoundsSize {
 	NSSize const newBoundsSize = [[self superview] bounds].size;
-	[self setFrameSize:NSMakeSize(MAX(newBoundsSize.width, minWidth), [self frame].size.height)];
+	[self setFrameSize:NSMakeSize(std::max(newBoundsSize.width, minWidth), [self frame].size.height)];
 }
 
 @end
@@ -97,9 +100,9 @@
 - (void)addLabel:(NSString *)l withWidth:(CGFloat)w andField:(NSString *)f toView:(NSView *)v {
 	NSTextField *const label = [self makeLabel:l];
 	NSTextField *const field = [self makeField:f];
-	CGFloat const height = MAX([label frame].size.height, [field frame].size.height);
+	CGFloat const height = std::max([label frame].size.height, [field frame].size.height);
 	NSSize space = [v bounds].size;
-	space.width = MAX(space.width, [field frame].size.width + w + 52);
+	space.width = std::max(space.width, [field frame].size.width + w + 52);
 	space.height += height + 8;
 	[label setFrame:NSMakeRect(25, space.height - height - 20, w, height)];
 	[field setFrame:NSMakeRect(w + 27, space.height - height - 20, space.width - w - 52, height)];
@@ -115,7 +118,7 @@
 	NSTextField *const field = [self makeField:f];
 	[field setAutoresizingMask:(NSViewWidthSizable | NSViewMinYMargin)];
 	NSSize space = [b frame].size;
-	space.width = MAX(space.width, [field frame].size.width + 32);
+	space.width = std::max(space.width, [field frame].size.width + 32);
 	space.height += [field frame].size.height + 8;
 	[field setFrame:NSMakeRect(15, 14, space.width - 32, [field frame].size.height)];
 	[b setFrameSize:space];
@@ -126,7 +129,7 @@
 
 - (void)addBox:(NSBox *)b toView:(NSView *)v {
 	NSSize space = [v frame].size;
-	space.width = MAX(space.width, [b frame].size.width + 34);
+	space.width = std::max(space.width, [b frame].size.width + 34);
 	space.height += [b frame].size.height + 4;
 	[b setFrameOrigin:NSMakePoint(17, space.height - [b frame].size.height - 16)];
 	[v setFrameSize:space];
@@ -135,8 +138,8 @@
 
 
 - (id)initWithDevice:(device_t &)d machine:(running_machine &)m console:(MAMEDebugConsole *)c {
-	MAMEDeviceInfoView	*contentView;
-	NSScrollView		*contentScroll;
+	MAMEDeviceInfoView  *contentView;
+	NSScrollView        *contentScroll;
 
 	if (!(self = [super initWithMachine:m
 								  title:[NSString stringWithFormat:@"Device %s", d.tag()]
@@ -184,7 +187,7 @@
 	if (device->interface(memory))
 	{
 		NSBox *memoryBox = nil;
-		for (address_spacenum i = AS_0; i < ADDRESS_SPACES; i++)
+		for (int i = 0; i < memory->max_space_count(); i++)
 		{
 			if (memory->has_space(i))
 			{
@@ -218,6 +221,7 @@
 	[contentScroll setHasVerticalScroller:YES];
 	[contentScroll setAutohidesScrollers:YES];
 	[contentScroll setBorderType:NSNoBorder];
+	[contentScroll setDrawsBackground:NO];
 	[contentScroll setDocumentView:contentView];
 	[contentView release];
 	[[window contentView] addSubview:contentScroll];
@@ -228,6 +232,12 @@
 
 	// don't forget the result
 	return self;
+}
+
+
+- (void)saveConfigurationToNode:(util::xml::data_node *)node {
+	[super saveConfigurationToNode:node];
+	node->set_attribute_int("type", MAME_DEBUGGER_WINDOW_TYPE_DEVICE_INFO_VIEWER);
 }
 
 @end

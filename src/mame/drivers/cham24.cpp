@@ -59,6 +59,8 @@ Notes:
 #include "emu.h"
 #include "cpu/m6502/n2a03.h"
 #include "video/ppu2c0x.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class cham24_state : public driver_device
@@ -72,12 +74,12 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<ppu2c0x_device> m_ppu;
 
-	std::unique_ptr<UINT8[]> m_nt_ram;
-	UINT8* m_nt_page[4];
-	UINT32 m_in_0;
-	UINT32 m_in_1;
-	UINT32 m_in_0_shift;
-	UINT32 m_in_1_shift;
+	std::unique_ptr<uint8_t[]> m_nt_ram;
+	uint8_t* m_nt_page[4];
+	uint32_t m_in_0;
+	uint32_t m_in_1;
+	uint32_t m_in_0_shift;
+	uint32_t m_in_1_shift;
 	DECLARE_WRITE8_MEMBER(nt_w);
 	DECLARE_READ8_MEMBER(nt_r);
 	DECLARE_WRITE8_MEMBER(sprite_dma_w);
@@ -90,7 +92,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(cham24);
-	UINT32 screen_update_cham24(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_cham24(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void cham24_set_mirroring( int mirroring );
 	void ppu_irq(int *ppu_regs);
 };
@@ -180,14 +182,14 @@ READ8_MEMBER(cham24_state::cham24_IN1_r)
 
 WRITE8_MEMBER(cham24_state::cham24_mapper_w)
 {
-	UINT32 gfx_bank = offset & 0x3f;
-	UINT32 prg_16k_bank_page = (offset >> 6) & 0x01;
-	UINT32 prg_bank = (offset >> 7) & 0x1f;
-	UINT32 prg_bank_page_size = (offset >> 12) & 0x01;
-	UINT32 gfx_mirroring = (offset >> 13) & 0x01;
+	uint32_t gfx_bank = offset & 0x3f;
+	uint32_t prg_16k_bank_page = (offset >> 6) & 0x01;
+	uint32_t prg_bank = (offset >> 7) & 0x1f;
+	uint32_t prg_bank_page_size = (offset >> 12) & 0x01;
+	uint32_t gfx_mirroring = (offset >> 13) & 0x01;
 
-	UINT8* dst = memregion("maincpu")->base();
-	UINT8* src = memregion("user1")->base();
+	uint8_t* dst = memregion("maincpu")->base();
+	uint8_t* src = memregion("user1")->base();
 
 	// switch PPU VROM bank
 	membank("bank1")->set_base(memregion("gfx1")->base() + (0x2000 * gfx_bank));
@@ -249,10 +251,6 @@ static INPUT_PORTS_START( cham24 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
 INPUT_PORTS_END
 
-void cham24_state::machine_reset()
-{
-}
-
 PALETTE_INIT_MEMBER(cham24_state, cham24)
 {
 	m_ppu->init_palette(palette, 0);
@@ -267,7 +265,7 @@ void cham24_state::video_start()
 {
 }
 
-UINT32 cham24_state::screen_update_cham24(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t cham24_state::screen_update_cham24(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* render the ppu */
 	m_ppu->render(bitmap, 0, 0, 0, 0);
@@ -277,9 +275,15 @@ UINT32 cham24_state::screen_update_cham24(screen_device &screen, bitmap_ind16 &b
 
 void cham24_state::machine_start()
 {
+	/* need nametable ram, though. I doubt this uses more than 2k, but it starts up configured for 4 */
+	m_nt_ram = std::make_unique<uint8_t[]>(0x1000);
+}
+
+void cham24_state::machine_reset()
+{
 	/* switch PRG rom */
-	UINT8* dst = memregion("maincpu")->base();
-	UINT8* src = memregion("user1")->base();
+	uint8_t* dst = memregion("maincpu")->base();
+	uint8_t* src = memregion("user1")->base();
 
 	memcpy(&dst[0x8000], &src[0x0f8000], 0x4000);
 	memcpy(&dst[0xc000], &src[0x0f8000], 0x4000);
@@ -288,8 +292,6 @@ void cham24_state::machine_start()
 	m_ppu->space(AS_PROGRAM).install_read_bank(0x0000, 0x1fff, "bank1");
 	membank("bank1")->set_base(memregion("gfx1")->base());
 
-	/* need nametable ram, though. I doubt this uses more than 2k, but it starts up configured for 4 */
-	m_nt_ram = std::make_unique<UINT8[]>(0x1000);
 	m_nt_page[0] = m_nt_ram.get();
 	m_nt_page[1] = m_nt_ram.get() + 0x400;
 	m_nt_page[2] = m_nt_ram.get() + 0x800;
@@ -307,11 +309,10 @@ static GFXDECODE_START( cham24 )
 	/* none, the ppu generates one */
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( cham24, cham24_state )
+static MACHINE_CONFIG_START( cham24 )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", N2A03, N2A03_DEFAULTCLOCK)
+	MCFG_CPU_ADD("maincpu", N2A03, NTSC_APU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(cham24_map)
-
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

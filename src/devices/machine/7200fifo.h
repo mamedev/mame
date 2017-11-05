@@ -45,12 +45,11 @@ The following chips are functionally equivalent and pin-compatible.
 
 **********************************************************************/
 
+#ifndef MAME_MACHINE_7200FIFO_H
+#define MAME_MACHINE_7200FIFO_H
+
 #pragma once
 
-#ifndef _7200FIFO_H
-#define _7200FIFO_H
-
-#include "emu.h"
 
 
 //**************************************************************************
@@ -81,12 +80,12 @@ The following chips are functionally equivalent and pin-compatible.
 class fifo7200_device : public device_t
 {
 public:
-	fifo7200_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	fifo7200_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration helpers
-	template<class _Object> static devcb_base &set_ef_handler(device_t &device, _Object object) { return downcast<fifo7200_device &>(device).m_ef_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_ff_handler(device_t &device, _Object object) { return downcast<fifo7200_device &>(device).m_ff_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_hf_handler(device_t &device, _Object object) { return downcast<fifo7200_device &>(device).m_hf_handler.set_callback(object); }
+	template <class Object> static devcb_base &set_ef_handler(device_t &device, Object &&cb) { return downcast<fifo7200_device &>(device).m_ef_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_ff_handler(device_t &device, Object &&cb) { return downcast<fifo7200_device &>(device).m_ff_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_hf_handler(device_t &device, Object &&cb) { return downcast<fifo7200_device &>(device).m_hf_handler.set_callback(std::forward<Object>(cb)); }
 	static void set_ram_size(device_t &device, int size) { downcast<fifo7200_device &>(device).m_ram_size = size; }
 
 	DECLARE_READ_LINE_MEMBER( ef_r ) { return !m_ef; } // _EF
@@ -95,11 +94,11 @@ public:
 
 	// normal configuration
 	DECLARE_WRITE16_MEMBER( data_word_w ) { fifo_write(data); }
-	DECLARE_READ16_MEMBER( data_word_r ) { return (UINT16)fifo_read(); }
+	DECLARE_READ16_MEMBER( data_word_r ) { return (uint16_t)fifo_read(); }
 
 	// use these for simple configurations that don't have d8/q8 connected
 	DECLARE_WRITE8_MEMBER( data_byte_w ) { fifo_write(data); }
-	DECLARE_READ8_MEMBER( data_byte_r ) { return (UINT8)fifo_read(); }
+	DECLARE_READ8_MEMBER( data_byte_r ) { return (uint8_t)fifo_read(); }
 
 protected:
 	// device-level overrides
@@ -107,10 +106,10 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	void fifo_write(UINT16 data);
-	UINT16 fifo_read();
+	void fifo_write(uint16_t data);
+	uint16_t fifo_read();
 
-	std::vector<UINT16> m_buffer;
+	std::vector<uint16_t> m_buffer;
 	int m_ram_size;
 
 	int m_read_ptr;
@@ -126,7 +125,6 @@ private:
 };
 
 // device type definition
-extern const device_type FIFO7200;
+DECLARE_DEVICE_TYPE(FIFO7200, fifo7200_device)
 
-
-#endif /* _7200FIFO_H */
+#endif // MAME_MACHINE_7200FIFO_H

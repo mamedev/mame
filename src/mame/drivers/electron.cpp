@@ -62,7 +62,6 @@ Incomplete:
       the software list and loading code.
 
 Missing:
-    - Support for floppy disks
     - Other peripherals
 ******************************************************************************/
 
@@ -71,8 +70,11 @@ Missing:
 #include "includes/electron.h"
 #include "imagedev/cassette.h"
 #include "formats/uef_cas.h"
+#include "formats/csw_cas.h"
 #include "sound/beep.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
 
 static const rgb_t electron_palette[8]=
 {
@@ -92,7 +94,7 @@ PALETTE_INIT_MEMBER(electron_state, electron)
 }
 
 static ADDRESS_MAP_START(electron_mem, AS_PROGRAM, 8, electron_state )
-	AM_RANGE(0x0000, 0x7fff) AM_RAM AM_REGION("maincpu",  0x00000)                  /* 32KB of RAM */
+	AM_RANGE(0x0000, 0x7fff) AM_READWRITE(electron_mem_r, electron_mem_w)           /* 32KB of RAM */
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank2")                                    /* Banked ROM pages */
 	AM_RANGE(0xc000, 0xfbff) AM_ROM AM_REGION("user1", 0x40000)                     /* OS ROM */
 	AM_RANGE(0xfc00, 0xfcff) AM_READWRITE(electron_fred_r, electron_fred_w )        /* FRED */
@@ -103,7 +105,11 @@ ADDRESS_MAP_END
 
 INPUT_CHANGED_MEMBER(electron_state::trigger_reset)
 {
-	m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
+	if (newval)
+	{
+		m_exp->reset();
+	}
 }
 
 static INPUT_PORTS_START( electron )
@@ -122,7 +128,7 @@ static INPUT_PORTS_START( electron )
 
 	PORT_START("LINE.2")
 	PORT_BIT(0x01,  IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS)      PORT_CHAR('-') PORT_CHAR('=')
-	PORT_BIT(0x02,  IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("\xE2\x86\x91 \xC2\xA3 {") PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR(UCHAR_MAMEKEY(UP)) PORT_CHAR('\xA3') PORT_CHAR('{')
+	PORT_BIT(0x02,  IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("\xE2\x86\x91 \xC2\xA3 {") PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR(UCHAR_MAMEKEY(UP)) PORT_CHAR(0xA3) PORT_CHAR('{')
 	PORT_BIT(0x04,  IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_QUOTE)      PORT_CHAR(':') PORT_CHAR('*')
 	PORT_BIT(0x08,  IP_ACTIVE_HIGH, IPT_UNUSED)
 
@@ -196,9 +202,9 @@ static INPUT_PORTS_START( electron )
 	PORT_BIT(0x01,  IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("BREAK") PORT_CODE(KEYCODE_F12) PORT_CHAR(UCHAR_MAMEKEY(F12)) PORT_CHANGED_MEMBER(DEVICE_SELF, electron_state, trigger_reset, 0)
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( electron, electron_state )
+static MACHINE_CONFIG_START( electron )
 	MCFG_CPU_ADD( "maincpu", M6502, XTAL_16MHz/8 )
-	MCFG_CPU_PROGRAM_MAP( electron_mem)
+	MCFG_CPU_PROGRAM_MAP( electron_mem )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE( 50.08 )
@@ -215,45 +221,69 @@ static MACHINE_CONFIG_START( electron, electron_state )
 	MCFG_SOUND_ADD( "beeper", BEEP, 300 )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 
+	MCFG_RAM_ADD(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("32K")
+
 	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_FORMATS(uef_cassette_formats)
+	MCFG_CASSETTE_FORMATS(bbc_cassette_formats)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY)
 	MCFG_CASSETTE_INTERFACE("electron_cass")
 
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "electron_cart")
 	MCFG_GENERIC_LOAD(electron_state, electron_cart)
 
+	/* expansion port */
+	MCFG_ELECTRON_EXPANSION_SLOT_ADD("exp", electron_expansion_devices, "plus3", false)
+	MCFG_ELECTRON_EXPANSION_SLOT_IRQ_HANDLER(INPUTLINE("maincpu", M6502_IRQ_LINE))
+	MCFG_ELECTRON_EXPANSION_SLOT_NMI_HANDLER(INPUTLINE("maincpu", M6502_NMI_LINE))
+
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("cass_list","electron_cass")
-	MCFG_SOFTWARE_LIST_ADD("cart_list","electron_cart")
+	MCFG_SOFTWARE_LIST_ADD("cass_list", "electron_cass")
+	MCFG_SOFTWARE_LIST_ADD("cart_list", "electron_cart")
+MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_DERIVED( btm2105, electron )
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_COLOR(rgb_t::amber())
+
+	/* expansion port */
+	MCFG_DEVICE_MODIFY("exp")
+	MCFG_DEVICE_SLOT_INTERFACE(electron_expansion_devices, "m2105", true)
+
+	/* software lists */
+	MCFG_SOFTWARE_LIST_REMOVE("cass_list")
 MACHINE_CONFIG_END
 
 
 /* Electron Rom Load */
 ROM_START(electron)
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_REGION( 0x44000, "user1", 0 ) /* OS Rom */
-	ROM_LOAD( "os.rom", 0x40000, 0x4000, CRC(bf63fb1f) SHA1(a48b8fa0cfb09140e808ac8a187316c605a0b32e) ) /* Os rom */
-	/* 00000  0 available for cartridges                     */
-	/* 04000  1 available for cartridges                     */
-	/* 08000  2 available for cartridges                     */
-	/* 0c000  3 available for cartridges                     */
-	/* 10000  4 available for cartridges                     */
-	/* 14000  5 available for cartridges                     */
-	/* 18000  6 available for cartridges                     */
-	/* 1c000  7 available for cartridges                     */
-	/* 20000  8 keyboard                                     */
-	/* 24000  9 keyboard mirror                              */
-	/* 28000 10 Basic rom                                    */
-	ROM_LOAD( "basic.rom", 0x28000, 0x4000, CRC(79434781) SHA1(4a7393f3a45ea309f744441c16723e2ef447a281) )
-	/* 2c000 11 Basic rom mirror                             */
-	ROM_COPY( "user1", 0x28000, 0x2c000, 0x4000 )
-	/* 30000 12 available for cartridges with a language ROM */
-	/* 34000 13 available for cartridges with a language ROM */
-	/* 38000 14 available for cartridges with a language ROM */
-	/* 3c000 15 available for cartridges with a language ROM */
+	ROM_LOAD( "os.rom", 0x40000, 0x4000, CRC(bf63fb1f) SHA1(a48b8fa0cfb09140e808ac8a187316c605a0b32e) ) /* OS rom */
+	/* 00000  0 Second external socket on the expansion module (SK2) */
+	/* 04000  1 Second external socket on the expansion module (SK2) */
+	/* 08000  2 First external socket on the expansion module (SK1)  */
+	/* 0c000  3 First external socket on the expansion module (SK1)  */
+	/* 10000  4 Disc                                                 */
+	/* 14000  5 USER applications                                    */
+	/* 18000  6 USER applications                                    */
+	/* 1c000  7 Modem interface ROM                                  */
+	/* 20000  8 Keyboard                                             */
+	/* 24000  9 Keyboard mirror                                      */
+	/* 28000 10 BASIC rom                                            */
+	/* 2c000 11 BASIC rom mirror                                     */
+	/* 30000 12 Expansion module operating system                    */
+	/* 34000 13 High priority slot in expansion module               */
+	/* 38000 14 ECONET                                               */
+	/* 3c000 15 Reserved                                             */
+		ROM_LOAD("basic.rom", 0x28000, 0x4000, CRC(79434781) SHA1(4a7393f3a45ea309f744441c16723e2ef447a281))
+		ROM_COPY("user1", 0x28000, 0x2c000, 0x4000)
 ROM_END
 
-/*     YEAR  NAME         PARENT    COMPAT    MACHINE   INPUT     CLASS          INIT  COMPANY  FULLNAME */
-COMP ( 1983, electron,    0,        0,        electron, electron, driver_device, 0,    "Acorn", "Acorn Electron", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-//COMP ( 1985, btm2501,     electron, 0,        electron, electron, driver_device, 0,    "British Telecom Business Systems", "Merlin M2501", MACHINE_NOT_WORKING )
+
+#define rom_btm2105 rom_electron
+
+
+/*     YEAR  NAME       PARENT    COMPAT  MACHINE   INPUT     CLASS           INIT  COMPANY                             FULLNAME           FLAGS */
+COMP ( 1983, electron,  0,        0,      electron, electron, electron_state, 0,    "Acorn",                            "Acorn Electron",  MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+COMP ( 1985, btm2105,   electron, 0,      btm2105,  electron, electron_state, 0,    "British Telecom Business Systems", "BT Merlin M2105", MACHINE_NOT_WORKING )

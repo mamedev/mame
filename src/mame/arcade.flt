@@ -27,6 +27,7 @@ aeroboto.cpp
 aerofgt.cpp
 age_candy.cpp
 airbustr.cpp
+airraid.cpp
 ajax.cpp
 albazc.cpp
 albazg.cpp
@@ -40,12 +41,12 @@ allied.cpp
 alpha68k.cpp
 alvg.cpp
 amaticmg.cpp
-amazonlf.cpp
 ambush.cpp
 amerihok.cpp
 ampoker2.cpp
 amspdwy.cpp
 amusco.cpp
+anes.cpp
 angelkds.cpp
 appoooh.cpp
 aquarium.cpp
@@ -97,6 +98,7 @@ balsente.cpp
 bankp.cpp
 baraduke.cpp
 barata.cpp
+barni.cpp
 bartop52.cpp
 batman.cpp
 battlane.cpp
@@ -127,12 +129,12 @@ bingo.cpp
 bingoc.cpp
 bingoman.cpp
 bingor.cpp
+bingowav.cpp
 bionicc.cpp
 bishi.cpp
 bking.cpp
 blackt96.cpp
 bladestl.cpp
-blitz.cpp
 blitz68k.cpp
 blktiger.cpp
 blmbycar.cpp
@@ -194,6 +196,7 @@ cchance.cpp
 cchasm.cpp
 cclimber.cpp
 cdi.cpp
+cedar_magnet.cpp
 centiped.cpp
 cesclass.cpp
 chaknpop.cpp
@@ -222,6 +225,7 @@ cliffhgr.cpp
 cloak.cpp
 cloud9.cpp
 clowndwn.cpp
+clpoker.cpp
 clshroad.cpp
 cmmb.cpp
 cninja.cpp
@@ -251,7 +255,6 @@ crimfght.cpp
 crospang.cpp
 crshrace.cpp
 crystal.cpp
-cshooter.cpp
 csplayh5.cpp
 cswat.cpp
 cubeqst.cpp
@@ -301,6 +304,7 @@ dfruit.cpp
 dgpix.cpp
 dietgo.cpp
 discoboy.cpp
+divebomb.cpp
 diverboy.cpp
 djboy.cpp
 djmain.cpp
@@ -356,6 +360,7 @@ exprraid.cpp
 exterm.cpp
 extrema.cpp
 exzisus.cpp
+ez2d.cpp
 f1gp.cpp
 f-32.cpp
 famibox.cpp
@@ -392,6 +397,7 @@ fungames.cpp
 funkball.cpp
 funkybee.cpp
 funkyjet.cpp
+funtech.cpp
 funworld.cpp
 funybubl.cpp
 fuukifg2.cpp
@@ -400,6 +406,7 @@ g627.cpp
 gaelco.cpp
 gaelco2.cpp
 gaelco3d.cpp
+gaelcopc.cpp
 gaiden.cpp
 gal3.cpp
 galaga.cpp
@@ -409,6 +416,7 @@ galaxia.cpp
 galaxian.cpp
 galaxold.cpp
 galgame.cpp
+galgames.cpp
 galivan.cpp
 galpani2.cpp
 galpani3.cpp
@@ -427,6 +435,7 @@ gcpinbal.cpp
 gei.cpp
 ggconnie.cpp
 ghosteo.cpp
+giclassic.cpp
 gijoe.cpp
 ginganin.cpp
 gkigt.cpp
@@ -439,6 +448,7 @@ gng.cpp
 go2000.cpp
 goal92.cpp
 goindol.cpp
+gokidetor.cpp
 goldngam.cpp
 goldnpkr.cpp
 goldstar.cpp
@@ -475,6 +485,7 @@ gyruss.cpp
 halleys.cpp
 hanaawas.cpp
 hankin.cpp
+hapyfish.cpp
 harddriv.cpp
 hazelgr.cpp
 hcastle.cpp
@@ -504,6 +515,7 @@ ice_bozopail.cpp
 ice_tbd.cpp
 icecold.cpp
 ichiban.cpp
+idsa.cpp
 igs_fear.cpp
 igs_m027.cpp
 igs_m036.cpp
@@ -515,6 +527,7 @@ igspoker.cpp
 ikki.cpp
 imolagp.cpp
 inder.cpp
+inderp.cpp
 instantm.cpp
 intrscti.cpp
 inufuku.cpp
@@ -523,6 +536,7 @@ iqblock.cpp
 irobot.cpp
 ironhors.cpp
 istellar.cpp
+istrebiteli.cpp
 iteagle.cpp
 itech32.cpp
 itech8.cpp
@@ -543,6 +557,7 @@ jchan.cpp
 jclub2.cpp
 jedi.cpp
 jeutel.cpp
+joctronic.cpp
 jokrwild.cpp
 jollyjgr.cpp
 jongkyo.cpp
@@ -582,6 +597,7 @@ konamigv.cpp
 konamigx.cpp
 konamim2.cpp
 konendev.cpp
+konmedal.cpp
 kontest.cpp
 kopunch.cpp
 ksayakyu.cpp
@@ -637,6 +653,7 @@ m72.cpp
 m79amb.cpp
 m90.cpp
 m92.cpp
+macp.cpp
 macrossp.cpp
 macs.cpp
 madalien.cpp
@@ -646,6 +663,7 @@ magicard.cpp
 magicfly.cpp
 magictg.cpp
 magmax.cpp
+magreel.cpp
 magtouch.cpp
 mainevt.cpp
 mainsnk.cpp
@@ -657,6 +675,7 @@ marineb.cpp
 marinedt.cpp
 mario.cpp
 markham.cpp
+marywu.cpp
 mastboy.cpp
 matmania.cpp
 maxaflex.cpp
@@ -664,7 +683,6 @@ maygay1b.cpp
 maygayep.cpp
 maygaysw.cpp
 maygayv1.cpp
-mayumi.cpp
 mazerbla.cpp
 mcatadv.cpp
 mcr.cpp
@@ -715,6 +733,7 @@ missb2.cpp
 missile.cpp
 mitchell.cpp
 mjkjidai.cpp
+mjsenpu.cpp
 mjsister.cpp
 mlanding.cpp
 mmagic.cpp
@@ -734,8 +753,19 @@ mpu12wbk.cpp
 mpu2.cpp
 mpu3.cpp
 mpu4.cpp
+mpu4avan.cpp
+mpu4bwb.cpp
+mpu4concept.cpp
+mpu4crystal.cpp
 mpu4dealem.cpp
+mpu4empire.cpp
+mpu4mdm.cpp
+mpu4misc.cpp
+mpu4mod2sw.cpp
+mpu4mod4yam.cpp
 mpu4plasma.cpp
+mpu4sw.cpp
+mpu4union.cpp
 mpu4vid.cpp
 mpu5.cpp
 mquake.cpp
@@ -745,6 +775,7 @@ mrgame.cpp
 mrjong.cpp
 ms32.cpp
 msisaac.cpp
+mtouchxl.cpp
 mugsmash.cpp
 multfish.cpp
 multfish_boot.cpp
@@ -797,6 +828,7 @@ niyanpai.cpp
 nmg5.cpp
 nmk16.cpp
 norautp.cpp
+notechan.cpp
 nova2001.cpp
 nsm.cpp
 nsmpoker.cpp
@@ -815,6 +847,7 @@ opwolf.cpp
 orbit.cpp
 othello.cpp
 othunder.cpp
+otomedius.cpp
 overdriv.cpp
 pachifev.cpp
 pacland.cpp
@@ -828,6 +861,7 @@ parodius.cpp
 pasha2.cpp
 pass.cpp
 pastelg.cpp
+patapata.cpp
 pbaction.cpp
 pcat_dyn.cpp
 pcat_nit.cpp
@@ -839,6 +873,7 @@ peplus.cpp
 peyper.cpp
 pgm.cpp
 pgm2.cpp
+pgm3.cpp
 phoenix.cpp
 photon.cpp
 photon2.cpp
@@ -850,13 +885,13 @@ pinkiri8.cpp
 pipedrm.cpp
 pipeline.cpp
 pirates.cpp
+piratesh.cpp
 pitnrun.cpp
 pkscram.cpp
 pktgaldx.cpp
 play_1.cpp
 play_2.cpp
 play_3.cpp
-play_5.cpp
 playch10.cpp
 playmark.cpp
 pluto5.cpp
@@ -931,6 +966,7 @@ rohga.cpp
 rollerg.cpp
 rollext.cpp
 rollrace.cpp
+ron.cpp
 rotaryf.cpp
 roul.cpp
 route16.cpp
@@ -969,7 +1005,9 @@ scobra.cpp
 scotrsht.cpp
 scramble.cpp
 scregg.cpp
+scyclone.cpp
 sderby.cpp
+sderby2.cpp
 seabattl.cpp
 sealy.cpp
 seattle.cpp
@@ -992,8 +1030,10 @@ segasp.cpp
 segaufo.cpp
 segaxbd.cpp
 segaybd.cpp
+seibucats.cpp
 seibuspi.cpp
 seicross.cpp
+seicupbl.cpp
 sengokmj.cpp
 senjyo.cpp
 seta.cpp
@@ -1009,6 +1049,7 @@ shanghai.cpp
 shangkid.cpp
 shaolins.cpp
 shisen.cpp
+shootaway2.cpp
 shootout.cpp
 shougi.cpp
 shtzone.cpp
@@ -1060,6 +1101,7 @@ speedspn.cpp
 speglsht.cpp
 spiders.cpp
 spinb.cpp
+spirit76.cpp
 splash.cpp
 splus.cpp
 spoker.cpp
@@ -1090,6 +1132,7 @@ stactics.cpp
 stadhero.cpp
 starcrus.cpp
 starfire.cpp
+stargame.cpp
 starshp1.cpp
 starwars.cpp
 statriv2.cpp
@@ -1123,6 +1166,7 @@ suprloco.cpp
 suprnova.cpp
 suprridr.cpp
 suprslam.cpp
+supstarf.cpp
 surpratk.cpp
 system1.cpp
 system16.cpp
@@ -1190,7 +1234,6 @@ tnzs.cpp
 toaplan1.cpp
 toaplan2.cpp
 toki.cpp
-tokyocop.cpp
 tomcat.cpp
 tonton.cpp
 toobin.cpp
@@ -1214,7 +1257,6 @@ ttchamp.cpp
 tubep.cpp
 tugboat.cpp
 tumbleb.cpp
-tumblep.cpp
 tunhunt.cpp
 turbo.cpp
 turrett.cpp
@@ -1231,9 +1273,12 @@ ultratnk.cpp
 ultrsprt.cpp
 umipoker.cpp
 undrfire.cpp
+unianapc.cpp
 unico.cpp
+unkfr.cpp
 unkhorse.cpp
 upscope.cpp
+usbilliards.cpp
 usgames.cpp
 vamphalf.cpp
 vaportra.cpp
@@ -1318,6 +1363,7 @@ zerozone.cpp
 zn.cpp
 zodiack.cpp
 zr107.cpp
+zwackery.cpp
 //exceptions + to add - to remove from imported list
 //3do.cpp
 -3do

@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "c64_nl10.h"
 
 
@@ -14,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_NL10_INTERFACE = &device_creator<c64_nl10_interface_device>;
+DEFINE_DEVICE_TYPE(C64_NL10_INTERFACE, c64_nl10_interface_device, "c64_nl10", "Star NL-10 C64 Interface Cartridge")
 
 
 //-------------------------------------------------
@@ -31,7 +32,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *c64_nl10_interface_device::device_rom_region() const
+const tiny_rom_entry *c64_nl10_interface_device::device_rom_region() const
 {
 	return ROM_NAME( c64_nl10_interface );
 }
@@ -46,9 +47,9 @@ const rom_entry *c64_nl10_interface_device::device_rom_region() const
 //  c64_nl10_interface_device - constructor
 //-------------------------------------------------
 
-c64_nl10_interface_device::c64_nl10_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, C64_NL10_INTERFACE, "Star NL-10 C64 Interface Cartridge", tag, owner, clock, "c64_nl10", __FILE__),
-		device_cbm_iec_interface(mconfig, *this)
+c64_nl10_interface_device::c64_nl10_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, C64_NL10_INTERFACE, tag, owner, clock)
+	, device_cbm_iec_interface(mconfig, *this)
 {
 }
 

@@ -19,29 +19,31 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/keyboard.h"
+#include "screen.h"
 
-#define KEYBOARD_TAG "keyboard"
 
 class modellot_state : public driver_device
 {
 public:
 	modellot_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_p_videoram(*this, "videoram"),
-		m_maincpu(*this, "maincpu")
+		: driver_device(mconfig, type, tag)
+		, m_p_videoram(*this, "videoram")
+		, m_maincpu(*this, "maincpu")
+		, m_p_chargen(*this, "chargen")
 	{
 	}
 
 	DECLARE_READ8_MEMBER(port77_r);
 	DECLARE_READ8_MEMBER(portff_r);
-	DECLARE_WRITE8_MEMBER(kbd_put);
-	UINT32 screen_update_modellot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	required_shared_ptr<UINT8> m_p_videoram;
+	void kbd_put(u8 data);
+	uint32_t screen_update_modellot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
 private:
-	UINT8 m_term_data;
-	const UINT8 *m_p_chargen;
+	uint8_t m_term_data;
 	virtual void machine_reset() override;
+	required_shared_ptr<uint8_t> m_p_videoram;
 	required_device<cpu_device> m_maincpu;
+	required_region_ptr<u8> m_p_chargen;
 };
 
 static ADDRESS_MAP_START(modellot_mem, AS_PROGRAM, 8, modellot_state)
@@ -70,12 +72,12 @@ READ8_MEMBER( modellot_state::port77_r)
 
 READ8_MEMBER( modellot_state::portff_r)
 {
-	UINT8 data = (m_term_data) ? m_term_data ^ 0x7f : 0xff;
+	uint8_t data = (m_term_data) ? m_term_data ^ 0x7f : 0xff;
 	m_term_data = 0;
 	return data;
 }
 
-WRITE8_MEMBER( modellot_state::kbd_put )
+void modellot_state::kbd_put(u8 data)
 {
 	m_term_data = data;
 }
@@ -83,7 +85,6 @@ WRITE8_MEMBER( modellot_state::kbd_put )
 void modellot_state::machine_reset()
 {
 	m_term_data = 1;
-	m_p_chargen = memregion("chargen")->base();
 	m_maincpu->set_state_int(Z80_PC, 0xe000);
 }
 
@@ -104,16 +105,16 @@ static GFXDECODE_START( modellot )
 GFXDECODE_END
 
 
-UINT32 modellot_state::screen_update_modellot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t modellot_state::screen_update_modellot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 y,ra,chr,gfx,inv;
-	UINT16 sy=0,ma=0,x;
+	uint8_t y,ra,chr,gfx,inv;
+	uint16_t sy=0,ma=0,x;
 
 	for (y = 0; y < 16; y++)
 	{
 		for (ra = 0; ra < 16; ra++)
 		{
-			UINT16 *p = &bitmap.pix16(sy++);
+			uint16_t *p = &bitmap.pix16(sy++);
 
 			for (x = 0; x < 64; x++)
 			{
@@ -121,7 +122,7 @@ UINT32 modellot_state::screen_update_modellot(screen_device &screen, bitmap_ind1
 
 				chr = m_p_videoram[x+ma];
 
-				if BIT(chr, 7) inv = 0xff;
+				if (BIT(chr, 7)) inv = 0xff;
 
 				chr &= 0x7f; // cursor
 
@@ -148,14 +149,14 @@ UINT32 modellot_state::screen_update_modellot(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-static MACHINE_CONFIG_START( modellot, modellot_state )
+static MACHINE_CONFIG_START( modellot )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(modellot_mem)
 	MCFG_CPU_IO_MAP(modellot_io)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green)
+	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(64*8, 16*16)
@@ -167,8 +168,8 @@ static MACHINE_CONFIG_START( modellot, modellot_state )
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* Devices */
-	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(WRITE8(modellot_state, kbd_put))
+	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
+	MCFG_GENERIC_KEYBOARD_CB(PUT(modellot_state, kbd_put))
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -186,4 +187,4 @@ ROM_START( modellot )
 ROM_END
 
 /* Driver */
-COMP( 1979, modellot, 0, 0, modellot, modellot, driver_device, 0, "General Processor", "Modello T", MACHINE_IS_SKELETON)
+COMP( 1979, modellot, 0, 0, modellot, modellot, modellot_state, 0, "General Processor", "Modello T", MACHINE_IS_SKELETON )

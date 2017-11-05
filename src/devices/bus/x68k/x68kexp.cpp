@@ -11,7 +11,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type X68K_EXPANSION_SLOT = &device_creator<x68k_expansion_slot_device>;
+DEFINE_DEVICE_TYPE(X68K_EXPANSION_SLOT, x68k_expansion_slot_device, "x68k_expansion_slot", "Sharp X680x0 expansion slot")
 
 
 //**************************************************************************
@@ -33,13 +33,14 @@ device_x68k_expansion_card_interface::~device_x68k_expansion_card_interface()
 //  LIVE DEVICE
 //**************************************************************************
 
-x68k_expansion_slot_device::x68k_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-		device_t(mconfig, X68K_EXPANSION_SLOT, "Sharp X680x0 expansion slot", tag, owner, clock, "x68k_expansion_slot", __FILE__),
-		device_slot_interface(mconfig, *this),
-		m_out_irq2_cb(*this),
-		m_out_irq4_cb(*this),
-		m_out_nmi_cb(*this),
-		m_out_reset_cb(*this), m_card(nullptr)
+x68k_expansion_slot_device::x68k_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, X68K_EXPANSION_SLOT, tag, owner, clock),
+	device_slot_interface(mconfig, *this),
+	m_out_irq2_cb(*this),
+	m_out_irq4_cb(*this),
+	m_out_nmi_cb(*this),
+	m_out_reset_cb(*this),
+	m_card(nullptr)
 {
 }
 

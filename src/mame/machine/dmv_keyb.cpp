@@ -6,6 +6,7 @@
 
 *********************************************************************/
 
+#include "emu.h"
 #include "dmv_keyb.h"
 
 
@@ -13,7 +14,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type DMV_KEYBOARD = &device_creator<dmv_keyboard_device>;
+DEFINE_DEVICE_TYPE(DMV_KEYBOARD, dmv_keyboard_device, "dmv_keyboard", "Decision Mate V Keyboard")
 
 
 //***************************************************************************
@@ -24,18 +25,6 @@ ROM_START( dmv_keyboard )
 	ROM_REGION( 0x400, "mcu", 0 )
 	ROM_LOAD( "dmv_kbmcu.bin", 0x0000, 0x0400, CRC(14e376de) SHA1 (ed09048ef03c602dba17ad6fcfe125c082c9bb17))
 ROM_END
-
-
-static ADDRESS_MAP_START( dmv_keyboard_io, AS_IO, 8, dmv_keyboard_device )
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READ(port1_r)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READWRITE(port2_r, port2_w)
-ADDRESS_MAP_END
-
-
-static MACHINE_CONFIG_FRAGMENT( dmv_keyboard )
-	MCFG_CPU_ADD("mcu", I8741, XTAL_6MHz)
-	MCFG_CPU_IO_MAP(dmv_keyboard_io)
-MACHINE_CONFIG_END
 
 
 INPUT_PORTS_START( dmv_keyboard )
@@ -207,10 +196,10 @@ ioport_constructor dmv_keyboard_device::device_input_ports() const
 //  dmv_keyboard_device - constructor
 //-------------------------------------------------
 
-dmv_keyboard_device::dmv_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, DMV_KEYBOARD, "Decision Mate V Keyboard", tag, owner, clock, "dmv_keyboard", __FILE__),
-		m_maincpu(*this, "mcu"),
-		m_keyboard(*this, "COL")
+dmv_keyboard_device::dmv_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, DMV_KEYBOARD, tag, owner, clock)
+	, m_maincpu(*this, "mcu")
+	, m_keyboard(*this, "COL.%u", 0)
 {
 }
 
@@ -235,21 +224,22 @@ void dmv_keyboard_device::device_reset()
 }
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor dmv_keyboard_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( dmv_keyboard );
-}
+MACHINE_CONFIG_MEMBER( dmv_keyboard_device::device_add_mconfig )
+	MCFG_CPU_ADD("mcu", I8741, XTAL_6MHz)
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(dmv_keyboard_device, port1_r))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(dmv_keyboard_device, port2_r))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(dmv_keyboard_device, port2_w))
+MACHINE_CONFIG_END
 
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *dmv_keyboard_device::device_rom_region() const
+const tiny_rom_entry *dmv_keyboard_device::device_rom_region() const
 {
 	return ROM_NAME( dmv_keyboard );
 }

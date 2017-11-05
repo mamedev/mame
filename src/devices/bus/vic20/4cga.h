@@ -6,13 +6,12 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_VIC20_4CGA_H
+#define MAME_BUS_VIC20_4CGA_H
+
 #pragma once
 
-#ifndef __C64_4CGA__
-#define __C64_4CGA__
 
-
-#include "emu.h"
 #include "user.h"
 
 
@@ -28,7 +27,7 @@ class c64_4cga_device : public device_t,
 {
 public:
 	// construction/destruction
-	c64_4cga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	c64_4cga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual ioport_constructor device_input_ports() const override;
@@ -54,13 +53,13 @@ private:
 	void update_output();
 
 	int m_port;
-	UINT8 m_joy3;
-	UINT8 m_joy4;
+	uint8_t m_joy3;
+	uint8_t m_joy4;
 };
 
 
 // device type definition
-extern const device_type C64_4CGA;
+DECLARE_DEVICE_TYPE(C64_4CGA, c64_4cga_device)
 
 
-#endif
+#endif // MAME_BUS_VIC20_4CGA_H

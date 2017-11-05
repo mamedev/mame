@@ -8,10 +8,11 @@
 
 ***************************************************************************/
 
+#ifndef MAME_CPU_AM29000_AM29000_H
+#define MAME_CPU_AM29000_AM29000_H
+
 #pragma once
 
-#ifndef __AM29000_H__
-#define __AM29000_H__
 
 
 /***************************************************************************
@@ -20,8 +21,8 @@
 
 enum
 {
-	AM29000_PC = 1,
-	AM29000_VAB,
+	AM29000_PC = STATE_GENPC,
+	AM29000_VAB = 0,
 	AM29000_OPS,
 	AM29000_CPS,
 	AM29000_CFG,
@@ -431,11 +432,11 @@ enum
 #define AM29000_INTR3       3
 
 
-class am29000_cpu_device :  public cpu_device
+class am29000_cpu_device : public cpu_device
 {
 public:
 	// construction/destruction
-	am29000_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	am29000_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	// device-level overrides
@@ -443,39 +444,31 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual UINT32 execute_min_cycles() const override { return 1; }
-	virtual UINT32 execute_max_cycles() const override { return 2; }
-	virtual UINT32 execute_input_lines() const override { return 1; }
+	virtual uint32_t execute_min_cycles() const override { return 1; }
+	virtual uint32_t execute_max_cycles() const override { return 2; }
+	virtual uint32_t execute_input_lines() const override { return 1; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override
-	{
-		switch (spacenum)
-		{
-			case AS_PROGRAM: return &m_program_config;
-			case AS_IO:      return &m_io_config;
-			case AS_DATA:    return &m_data_config;
-			default:         return nullptr;
-		}
-	}
+	virtual space_config_vector memory_space_config() const override;
 
 	// device_state_interface overrides
-	void state_string_export(const device_state_entry &entry, std::string &str) const override;
+	virtual void state_import(const device_state_entry &entry) override;
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const override { return 4; }
-	virtual UINT32 disasm_max_opcode_bytes() const override { return 4; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	virtual uint32_t disasm_min_opcode_bytes() const override { return 4; }
+	virtual uint32_t disasm_max_opcode_bytes() const override { return 4; }
+	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
-	void signal_exception(UINT32 type);
+	void signal_exception(uint32_t type);
 	void external_irq_check();
-	UINT32 read_program_word(UINT32 address);
-	UINT32 get_abs_reg(UINT8 r, UINT32 iptr);
+	uint32_t read_program_word(uint32_t address);
+	uint32_t get_abs_reg(uint8_t r, uint32_t iptr);
 	void fetch_decode();
-	UINT32 read_spr(UINT32 idx);
-	void write_spr(UINT32 idx, UINT32 val);
+	uint32_t read_spr(uint32_t idx);
+	void write_spr(uint32_t idx, uint32_t val);
 	void ADD();
 	void ADDS();
 	void ADDU();
@@ -584,59 +577,59 @@ protected:
 	address_space_config m_io_config;
 	address_space_config m_data_config;
 
-	INT32           m_icount;
-	UINT32          m_pc;
+	int32_t           m_icount;
+	uint32_t          m_pc;
 
 	/* General purpose */
-	UINT32          m_r[256];     // TODO: There's only 192 implemented!
+	uint32_t          m_r[256];     // TODO: There's only 192 implemented!
 
 	/* TLB */
-	UINT32          m_tlb[128];
+	uint32_t          m_tlb[128];
 
 	/* Protected SPRs */
-	UINT32          m_vab;
-	UINT32          m_ops;
-	UINT32          m_cps;
-	UINT32          m_cfg;
-	UINT32          m_cha;
-	UINT32          m_chd;
-	UINT32          m_chc;
-	UINT32          m_rbp;
-	UINT32          m_tmc;
-	UINT32          m_tmr;
-	UINT32          m_pc0;
-	UINT32          m_pc1;
-	UINT32          m_pc2;
-	UINT32          m_mmu;
-	UINT32          m_lru;
+	uint32_t          m_vab;
+	uint32_t          m_ops;
+	uint32_t          m_cps;
+	uint32_t          m_cfg;
+	uint32_t          m_cha;
+	uint32_t          m_chd;
+	uint32_t          m_chc;
+	uint32_t          m_rbp;
+	uint32_t          m_tmc;
+	uint32_t          m_tmr;
+	uint32_t          m_pc0;
+	uint32_t          m_pc1;
+	uint32_t          m_pc2;
+	uint32_t          m_mmu;
+	uint32_t          m_lru;
 
 	/* Unprotected SPRs */
-	UINT32          m_ipc;
-	UINT32          m_ipa;
-	UINT32          m_ipb;
-	UINT32          m_q;
-	UINT32          m_alu;
-	UINT32          m_fpe;
-	UINT32          m_inte;
-	UINT32          m_fps;
+	uint32_t          m_ipc;
+	uint32_t          m_ipa;
+	uint32_t          m_ipb;
+	uint32_t          m_q;
+	uint32_t          m_alu;
+	uint32_t          m_fpe;
+	uint32_t          m_inte;
+	uint32_t          m_fps;
 
 	/* Pipeline state */
-	UINT32          m_exceptions;
-	UINT32          m_exception_queue[4];
+	uint32_t          m_exceptions;
+	uint32_t          m_exception_queue[4];
 
-	UINT8           m_irq_active;
-	UINT8           m_irq_lines;
+	uint8_t           m_irq_active;
+	uint8_t           m_irq_lines;
 
-	UINT32          m_exec_ir;
-	UINT32          m_next_ir;
+	uint32_t          m_exec_ir;
+	uint32_t          m_next_ir;
 
-	UINT32          m_pl_flags;
-	UINT32          m_next_pl_flags;
+	uint32_t          m_pl_flags;
+	uint32_t          m_next_pl_flags;
 
-	UINT32          m_iret_pc;
+	uint32_t          m_iret_pc;
 
-	UINT32          m_exec_pc;
-	UINT32          m_next_pc;
+	uint32_t          m_exec_pc;
+	uint32_t          m_next_pc;
 
 	address_space *m_program;
 	direct_read_data *m_direct;
@@ -647,14 +640,13 @@ protected:
 	typedef void ( am29000_cpu_device::*opcode_func ) ();
 	struct op_info {
 		opcode_func opcode;
-		UINT32 flags;
+		uint32_t flags;
 	};
 
 	static const op_info op_table[256];
 };
 
 
-extern const device_type AM29000;
+DECLARE_DEVICE_TYPE(AM29000, am29000_cpu_device)
 
-
-#endif /* __AM29000_H__ */
+#endif // MAME_CPU_AM29000_AM29000_H

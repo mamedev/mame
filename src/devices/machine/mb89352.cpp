@@ -6,6 +6,7 @@
  *  Should be compatible with the MB87030/31, and MB89351
  *
  *  Used on the Sharp X68000 Super, X68000 XVI and X68030 (internal), and on SCSI expansion cards for any X680x0 (external)
+ *  Also used in Sega's Soreike Kokology 1/2 (drives CD-ROM)
  *
  *  Registers (based on datasheet):
  *
@@ -104,19 +105,58 @@
 #include "emu.h"
 #include "mb89352.h"
 
+// SCSI lines readable via PSNS register (reg 5)
+#define MB89352_LINE_REQ 0x80
+#define MB89352_LINE_ACK 0x40
+#define MB89352_LINE_ATN 0x20
+#define MB89352_LINE_SEL 0x10
+#define MB89352_LINE_BSY 0x08
+#define MB89352_LINE_MSG 0x04
+#define MB89352_LINE_CD  0x02
+#define MB89352_LINE_IO  0x01
+
+// INTS bits
+#define INTS_RESET            0x01
+#define INTS_HARD_ERROR       0x02
+#define INTS_TIMEOUT          0x04
+#define INTS_SERVICE_REQUIRED 0x08
+#define INTS_COMMAND_COMPLETE 0x10
+#define INTS_DISCONNECTED     0x20
+#define INTS_RESELECTION      0x40
+#define INTS_SELECTION        0x80
+
+// SSTS status bits
+#define SSTS_DREG_EMPTY       0x01
+#define SSTS_DREG_FULL        0x02
+#define SSTS_TC_ZERO          0x04
+#define SSTS_SCSI_RST         0x08
+#define SSTS_XFER_IN_PROGRESS 0x10
+#define SSTS_SPC_BSY          0x20
+#define SSTS_TARG_CONNECTED   0x40
+#define SSTS_INIT_CONNECTED   0x80
+
+// SERR error status bits
+#define SERR_OFFSET     0x01
+#define SERR_SHORT_XFR  0x02
+#define SERR_PHASE_ERR  0x04
+#define SERR_TC_PAR     0x08
+#define SERR_SPC_PAR    0x40
+#define SERR_SCSI_PAR   0x80
+
+
 /*
  *  Device config
  */
 
-const device_type MB89352A = &device_creator<mb89352_device>;
+DEFINE_DEVICE_TYPE(MB89352A, mb89352_device, "mb89352", "Fujitsu MB89352A")
 
 
 /*
  * Device
  */
 
-mb89352_device::mb89352_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	legacy_scsi_host_adapter(mconfig, MB89352A, "MB89352A", tag, owner, clock, "mb89352", __FILE__),
+mb89352_device::mb89352_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	legacy_scsi_host_adapter(mconfig, MB89352A, tag, owner, clock),
 	m_irq_cb(*this),
 	m_drq_cb(*this)
 {
@@ -161,7 +201,7 @@ void mb89352_device::device_stop()
 }
 
 // get the length of a SCSI command based on it's command byte type
-int mb89352_device::get_scsi_cmd_len(UINT8 cbyte)
+int mb89352_device::get_scsi_cmd_len(uint8_t cbyte)
 {
 	int group;
 
@@ -247,7 +287,7 @@ void mb89352_device::set_phase(int phase)
 
 READ8_MEMBER( mb89352_device::mb89352_r )
 {
-	UINT8 ret;
+	uint8_t ret;
 	switch(offset & 0x0f)
 	{
 	case 0x00:  // BDID - Bus Device ID
@@ -451,6 +491,7 @@ WRITE8_MEMBER( mb89352_device::mb89352_w )
 			if(m_phase == SCSI_PHASE_DATAIN)  // if we are reading data...
 			{
 				m_spc_status &= ~SSTS_DREG_EMPTY;  // DREG is no longer empty
+				logerror("data-in\n");
 				read_data(m_buffer, 512);
 			}
 			if(m_phase == SCSI_PHASE_MESSAGE_IN)
@@ -459,10 +500,16 @@ WRITE8_MEMBER( mb89352_device::mb89352_w )
 				m_data = 0;
 				m_temp = 0x00;
 				set_phase(SCSI_PHASE_BUS_FREE);
+				logerror("message-in\n");
 				m_spc_status &= ~SSTS_XFER_IN_PROGRESS;
 				m_command_index = 0;
 			}
-			logerror("mb89352: SCMD: Start Transfer\n");
+			if(m_phase == SCSI_PHASE_COMMAND)
+			{
+				logerror("command-in\n");
+				m_spc_status |= SSTS_SPC_BSY;
+			}
+			logerror("mb89352: SCMD: Start Transfer %02x\n",m_phase);
 			break;
 		case 0x05:  // Transfer pause
 			logerror("mb89352: SCMD: Pause Transfer\n");
@@ -500,6 +547,9 @@ WRITE8_MEMBER( mb89352_device::mb89352_w )
 					else
 						set_phase(phase);
 					logerror("Command executed: ");
+					//m_spc_status &= ~SSTS_SPC_BSY;
+					//m_ints |= INTS_COMMAND_COMPLETE;
+
 					for(x=0;x<m_command_index;x++)
 						logerror(" %02x",m_command[x]);
 					logerror("\n");
@@ -559,6 +609,8 @@ WRITE8_MEMBER( mb89352_device::mb89352_w )
 				else
 					set_phase(phase);
 				logerror("Command executed: ");
+				//m_ints |= INTS_COMMAND_COMPLETE;
+
 				for(x=0;x<m_command_index;x++)
 					logerror(" %02x",m_command[x]);
 				logerror("\n");

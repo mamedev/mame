@@ -20,7 +20,11 @@ sound system appears to be the same as 'spartanxtec.cpp'
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
+#include "machine/timer.h"
 #include "sound/ay8910.h"
+#include "screen.h"
+#include "speaker.h"
+
 #include "spyhunttec.lh"
 
 class spyhuntertec_state : public driver_device
@@ -31,7 +35,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_analog_timer(*this, "analog_timer"),
-		m_analog_input(*this, "AN"),
+		m_analog_input(*this, "AN.%u", 0),
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
 		m_spriteram2(*this, "spriteram2"),
@@ -48,11 +52,11 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	required_device<timer_device> m_analog_timer;
 	required_ioport_array<2> m_analog_input;
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_spriteram;
-	required_shared_ptr<UINT8> m_spriteram2;
-	required_shared_ptr<UINT8> m_paletteram;
-	required_shared_ptr<UINT8> m_spyhunt_alpharam;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<uint8_t> m_spriteram2;
+	required_shared_ptr<uint8_t> m_paletteram;
+	required_shared_ptr<uint8_t> m_spyhunt_alpharam;
 	required_device<palette_device> m_palette;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
@@ -62,14 +66,14 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_spyhuntertec(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_spyhuntertec(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 
 
-	UINT8 m_spyhunt_sprite_color_mask;
-	INT16 m_spyhunt_scroll_offset;
-	INT16 m_spyhunt_scrollx;
-	INT16 m_spyhunt_scrolly;
+	uint8_t m_spyhunt_sprite_color_mask;
+	int16_t m_spyhunt_scroll_offset;
+	int16_t m_spyhunt_scrollx;
+	int16_t m_spyhunt_scrolly;
 
 	int mcr_cocktail_flip;
 
@@ -78,9 +82,8 @@ public:
 	DECLARE_WRITE8_MEMBER(spyhuntertec_paletteram_w);
 	DECLARE_DRIVER_INIT(spyhuntertec);
 //  DECLARE_VIDEO_START(spyhuntertec);
-//  UINT32 screen_update_spyhuntertec(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+//  uint32_t screen_update_spyhuntertec(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE8_MEMBER(spyhuntertec_port04_w);
-	DECLARE_WRITE8_MEMBER(spyhuntertec_fd00_w);
 	DECLARE_WRITE8_MEMBER(spyhuntertec_portf0_w);
 
 	DECLARE_WRITE8_MEMBER(spyhunt_videoram_w);
@@ -106,8 +109,8 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(analog_count_callback);
 	void reset_analog_timer();
 
-	UINT8 m_analog_select;
-	UINT8 m_analog_count;
+	uint8_t m_analog_select;
+	uint8_t m_analog_count;
 };
 
 WRITE8_MEMBER(spyhuntertec_state::ay1_porta_w)
@@ -156,7 +159,7 @@ READ8_MEMBER(spyhuntertec_state::ay2_porta_r)
 
 WRITE8_MEMBER(spyhuntertec_state::spyhunt_videoram_w)
 {
-	UINT8 *videoram = m_videoram;
+	uint8_t *videoram = m_videoram;
 	videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
@@ -214,7 +217,7 @@ TILEMAP_MAPPER_MEMBER(spyhuntertec_state::spyhunt_bg_scan)
 
 TILE_GET_INFO_MEMBER(spyhuntertec_state::spyhunt_get_bg_tile_info)
 {
-	UINT8 *videoram = m_videoram;
+	uint8_t *videoram = m_videoram;
 	int data = videoram[tile_index];
 	int code = (data & 0x3f) | ((data >> 1) & 0x40);
 	SET_TILE_INFO_MEMBER(0, code, 0, (data & 0x40) ? TILE_FLIPY : 0);
@@ -231,10 +234,10 @@ TILE_GET_INFO_MEMBER(spyhuntertec_state::spyhunt_get_alpha_tile_info)
 void spyhuntertec_state::video_start()
 {
 	/* initialize the background tilemap */
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(spyhuntertec_state::spyhunt_get_bg_tile_info),this), tilemap_mapper_delegate(FUNC(spyhuntertec_state::spyhunt_bg_scan),this),  64,16, 64,32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(spyhuntertec_state::spyhunt_get_bg_tile_info),this), tilemap_mapper_delegate(FUNC(spyhuntertec_state::spyhunt_bg_scan),this),  64,16, 64,32);
 
 	/* initialize the text tilemap */
-	m_alpha_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(spyhuntertec_state::spyhunt_get_alpha_tile_info),this), TILEMAP_SCAN_COLS,  16,8, 32,32);
+	m_alpha_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(spyhuntertec_state::spyhunt_get_alpha_tile_info),this), TILEMAP_SCAN_COLS,  16,8, 32,32);
 	m_alpha_tilemap->set_transparent_pen(0);
 	m_alpha_tilemap->set_scrollx(0, 16);
 
@@ -249,7 +252,7 @@ void spyhuntertec_state::video_start()
 
 void spyhuntertec_state::mcr3_update_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int color_mask, int code_xor, int dx, int dy, int interlaced)
 {
-	UINT8 *spriteram = m_spriteram;
+	uint8_t *spriteram = m_spriteram;
 	int offs;
 
 	m_screen->priority().fill(1, cliprect);
@@ -316,7 +319,7 @@ void spyhuntertec_state::mcr3_update_sprites(screen_device &screen, bitmap_ind16
 }
 
 
-UINT32 spyhuntertec_state::screen_update_spyhuntertec(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t spyhuntertec_state::screen_update_spyhuntertec(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* for every character in the Video RAM, check if it has been modified */
 	/* since last time and update it accordingly. */
@@ -334,16 +337,9 @@ UINT32 spyhuntertec_state::screen_update_spyhuntertec(screen_device &screen, bit
 
 
 
-WRITE8_MEMBER(spyhuntertec_state::spyhuntertec_fd00_w)
-{
-//  printf("%04x spyhuntertec_fd00_w %02x\n", space.device().safe_pc(), data);
-	m_soundlatch->write(space, 0, data);
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-}
-
 READ8_MEMBER(spyhuntertec_state::spyhuntertec_in2_r)
 {
-	// it writes 04 / 14 to the sound latch (spyhuntertec_fd00_w) before
+	// it writes 04 / 14 to the sound latch (at FD00) before
 	// reading bit 6 here a minimum of 32 times.
 	// seems to be how it reads the analog controls? probably via sound CPU??
 
@@ -418,7 +414,7 @@ READ8_MEMBER(spyhuntertec_state::spyhuntertec_in2_r)
 
 READ8_MEMBER(spyhuntertec_state::spyhuntertec_in3_r)
 {
-	UINT8 ret = ioport("IN3")->read();
+	uint8_t ret = ioport("IN3")->read();
 //  printf("%04x spyhuntertec_in3_r\n", space.device().safe_pc());
 	return ret;
 }
@@ -441,7 +437,7 @@ static ADDRESS_MAP_START( spyhuntertec_map, AS_PROGRAM, 8, spyhuntertec_state )
 	AM_RANGE(0xfc02, 0xfc02) AM_READ(spyhuntertec_in2_r)
 	AM_RANGE(0xfc03, 0xfc03) AM_READ(spyhuntertec_in3_r)
 
-	AM_RANGE(0xfd00, 0xfd00) AM_WRITE( spyhuntertec_fd00_w )
+	AM_RANGE(0xfd00, 0xfd00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 
 	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_SHARE("spriteram2") // actual spriteram for this hw??
 ADDRESS_MAP_END
@@ -486,14 +482,14 @@ static ADDRESS_MAP_START( spyhuntertec_sound_portmap, AS_IO, 8, spyhuntertec_sta
 
 	AM_RANGE(0x00, 0x00) AM_WRITE(sound_irq_ack)
 
-	AM_RANGE(0x0012, 0x0013) AM_DEVWRITE("ay3", ay8910_device, address_data_w)
-	AM_RANGE(0x0012, 0x0012) AM_DEVREAD("ay3", ay8910_device, data_r)
+	AM_RANGE(0x0012, 0x0013) AM_DEVWRITE("ay3", ay8912_device, address_data_w)
+	AM_RANGE(0x0012, 0x0012) AM_DEVREAD("ay3", ay8912_device, data_r)
 
-	AM_RANGE(0x0014, 0x0015) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
-	AM_RANGE(0x0014, 0x0014) AM_DEVREAD("ay1", ay8910_device, data_r)
+	AM_RANGE(0x0014, 0x0015) AM_DEVWRITE("ay1", ay8912_device, address_data_w)
+	AM_RANGE(0x0014, 0x0014) AM_DEVREAD("ay1", ay8912_device, data_r)
 
-	AM_RANGE(0x0018, 0x0019) AM_DEVWRITE("ay2", ay8910_device, address_data_w) // data written to port a
-	AM_RANGE(0x0018, 0x0018) AM_DEVREAD("ay2", ay8910_device, data_r) // actually read
+	AM_RANGE(0x0018, 0x0019) AM_DEVWRITE("ay2", ay8912_device, address_data_w) // data written to port a
+	AM_RANGE(0x0018, 0x0018) AM_DEVREAD("ay2", ay8912_device, data_r) // actually read
 
 ADDRESS_MAP_END
 
@@ -619,7 +615,7 @@ const gfx_layout spyhuntertec_sprite_layout =
 };
 
 
-static const UINT32 spyhuntp_charlayout_xoffset[64] =
+static const uint32_t spyhuntp_charlayout_xoffset[64] =
 {
 		0x0000*8,0x0000*8,   0x0000*8+1,0x0000*8+1,   0x0000*8+2,0x0000*8+2,   0x0000*8+3,0x0000*8+3,   0x0000*8+4,0x0000*8+4,   0x0000*8+5,0x0000*8+5,   0x0000*8+6,0x0000*8+6,   0x0000*8+7,0x0000*8+7,
 		0x1000*8,0x1000*8,   0x1000*8+1,0x1000*8+1,   0x1000*8+2,0x1000*8+2,   0x1000*8+3,0x1000*8+3,   0x1000*8+4,0x1000*8+4,   0x1000*8+5,0x1000*8+5,   0x1000*8+6,0x1000*8+6,   0x1000*8+7,0x1000*8+7,
@@ -661,7 +657,7 @@ void spyhuntertec_state::machine_reset()
 
 
 
-static MACHINE_CONFIG_START( spyhuntertec, spyhuntertec_state )
+static MACHINE_CONFIG_START( spyhuntertec )
 
 // note: no ctc, no nvram
 // 2*z80, 3*ay8912
@@ -698,6 +694,7 @@ static MACHINE_CONFIG_START( spyhuntertec, spyhuntertec_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
 	MCFG_SOUND_ADD("ay1", AY8912, 3000000/2) // AY-3-8912
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)

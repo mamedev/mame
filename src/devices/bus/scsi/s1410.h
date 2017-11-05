@@ -6,30 +6,31 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_SCSI_S1410_H
+#define MAME_BUS_SCSI_S1410_H
 
-#ifndef __S1410__
-#define __S1410__
+#pragma once
 
 #include "scsihd.h"
 
-class s1410_device  : public scsihd_device
+class s1410_device : public scsihd_device
 {
 public:
 	// construction/destruction
-	s1410_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-	// optional information overrides
-	virtual const rom_entry *device_rom_region() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	s1410_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void ExecCommand() override;
-	virtual void WriteData( UINT8 *data, int dataLength ) override;
-	virtual void ReadData( UINT8 *data, int dataLength ) override;
+	virtual void WriteData( uint8_t *data, int dataLength ) override;
+	virtual void ReadData( uint8_t *data, int dataLength ) override;
+
+protected:
+	// optional information overrides
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 };
 
 
 // device type definition
-extern const device_type S1410;
+DECLARE_DEVICE_TYPE(S1410, s1410_device)
 
-#endif
+#endif // MAME_BUS_SCSI_S1410_H

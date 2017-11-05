@@ -28,18 +28,18 @@
 #include "includes/neogeo.h"
 #include "machine/nvram.h"
 #include "imagedev/chd_cd.h"
-#include "sound/cdda.h"
+#include "machine/74259.h"
 #include "machine/megacdcd.h"
 #include "softlist.h"
 
 
 /* Stubs for various functions called by the FBA code, replace with MAME specifics later */
 
-UINT8 *NeoSpriteRAM, *NeoTextRAM;
-//UINT8* NeoSpriteROM;
-//UINT8* NeoTextROM;
-UINT8* YM2610ADPCMAROM;
-UINT8* NeoZ80ROMActive;
+uint8_t *NeoSpriteRAM, *NeoTextRAM;
+//uint8_t* NeoSpriteROM;
+//uint8_t* NeoTextROM;
+uint8_t* YM2610ADPCMAROM;
+uint8_t* NeoZ80ROMActive;
 
 // was it actually released in eu / asia?
 #define NEOCD_REGION_ASIA 3 // IronClad runs with a darkened screen (MVS has the same issue)
@@ -48,7 +48,7 @@ UINT8* NeoZ80ROMActive;
 #define NEOCD_REGION_JAPAN 0
 
 
-UINT8 NeoSystem = NEOCD_REGION_JAPAN;
+uint8_t NeoSystem = NEOCD_REGION_JAPAN;
 
 
 class ngcd_state : public aes_state
@@ -77,7 +77,7 @@ public:
 
 
 	void NeoCDDoDMA(address_space& curr_space);
-	void set_DMA_regs(int offset, UINT16 wordValue);
+	void set_DMA_regs(int offset, uint16_t wordValue);
 
 	DECLARE_READ16_MEMBER(neocd_memcard_r);
 	DECLARE_WRITE16_MEMBER(neocd_memcard_w);
@@ -93,16 +93,16 @@ public:
 
 	// neoCD
 
-	INT32 nActiveTransferArea;
-	INT32 nSpriteTransferBank;
-	INT32 nADPCMTransferBank;
-	INT32 NeoCDDMAAddress1;
-	INT32 NeoCDDMAAddress2;
-	INT32 NeoCDDMAValue1;
-	INT32 NeoCDDMAValue2;
-	INT32 NeoCDDMACount;
-	INT32 NeoCDDMAMode;
-	INT32 nIRQAcknowledge;
+	int32_t nActiveTransferArea;
+	int32_t nSpriteTransferBank;
+	int32_t nADPCMTransferBank;
+	int32_t NeoCDDMAAddress1;
+	int32_t NeoCDDMAAddress2;
+	int32_t NeoCDDMAValue1;
+	int32_t NeoCDDMAValue2;
+	int32_t NeoCDDMACount;
+	int32_t NeoCDDMAMode;
+	int32_t nIRQAcknowledge;
 	int nNeoCDIRQVectorAck;
 	int nNeoCDIRQVector;
 
@@ -114,28 +114,28 @@ public:
 	int get_nNeoCDIRQVectorAck(void) { return nNeoCDIRQVectorAck; }
 	void set_nNeoCDIRQVectorAck(int val) { nNeoCDIRQVectorAck = val; }
 	int get_nNeoCDIRQVector(void) { return nNeoCDIRQVector; }
-	void NeoCDIRQUpdate(UINT8 byteValue);
+	void NeoCDIRQUpdate(uint8_t byteValue);
 
 	// from the CDC
 	void interrupt_callback_type1(void);
 	void interrupt_callback_type2(void);
 	void interrupt_callback_type3(void);
 
-	UINT8 nTransferWriteEnable;
+	uint8_t nTransferWriteEnable;
 
 	bool prohibit_cdc_irq; // hack?
 
-	UINT32 screen_update_neocd(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_neocd(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_DRIVER_INIT(neocdz);
 	DECLARE_DRIVER_INIT(neocdzj);
 
 	IRQ_CALLBACK_MEMBER(neocd_int_callback);
 
-	std::unique_ptr<UINT8[]> m_meminternal_data;
+	std::unique_ptr<uint8_t[]> m_meminternal_data;
 protected:
 
-	INT32 SekIdle(INT32 nCycles);
+	int32_t SekIdle(int32_t nCycles);
 };
 
 
@@ -173,7 +173,7 @@ WRITE16_MEMBER(ngcd_state::neocd_memcard_w)
 
 READ16_MEMBER(ngcd_state::neocd_control_r)
 {
-	UINT32 sekAddress = 0xff0000+ (offset*2);
+	uint32_t sekAddress = 0xff0000+ (offset*2);
 
 	switch (sekAddress & 0xFFFF) {
 		case 0x0016:
@@ -202,8 +202,8 @@ READ16_MEMBER(ngcd_state::neocd_control_r)
 
 WRITE16_MEMBER(ngcd_state::neocd_control_w)
 {
-	UINT32 sekAddress = 0xff0000+ (offset*2);
-	UINT16 wordValue = data;
+	uint32_t sekAddress = 0xff0000+ (offset*2);
+	uint16_t wordValue = data;
 
 //  bprintf(PRINT_NORMAL, _T("  - NGCD port 0x%06X -> 0x%04X (PC: 0x%06X)\n"), sekAddress, wordValue, SekGetPC(-1));
 	int byteValue = wordValue & 0xff;
@@ -332,7 +332,7 @@ WRITE16_MEMBER(ngcd_state::neocd_control_w)
 				m_use_cart_vectors = (data == 0 ? 0 : 1);
 			}
 
-//extern INT32 bRunPause;
+//extern int32_t bRunPause;
 //bRunPause = 1;
 			break;
 
@@ -401,7 +401,7 @@ WRITE16_MEMBER(ngcd_state::neocd_control_w)
 
 READ8_MEMBER(ngcd_state::neocd_transfer_r)
 {
-	UINT32 sekAddress = 0xe00000+ (offset);
+	uint32_t sekAddress = 0xe00000+ (offset);
 	int address;
 	sekAddress ^= 1;
 
@@ -431,8 +431,8 @@ READ8_MEMBER(ngcd_state::neocd_transfer_r)
 
 WRITE8_MEMBER(ngcd_state::neocd_transfer_w)
 {
-	UINT8 byteValue = data;
-	UINT32 sekAddress = 0xe00000+ (offset);
+	uint8_t byteValue = data;
+	uint32_t sekAddress = 0xe00000+ (offset);
 
 	if (!nTransferWriteEnable) {
 //      return;
@@ -480,7 +480,7 @@ WRITE8_MEMBER(ngcd_state::neocd_transfer_w)
 
 
 
-void ngcd_state::set_DMA_regs(int offset, UINT16 wordValue)
+void ngcd_state::set_DMA_regs(int offset, uint16_t wordValue)
 {
 	switch (offset)
 	{
@@ -525,7 +525,7 @@ void ngcd_state::set_DMA_regs(int offset, UINT16 wordValue)
 
 
 
-INT32 ngcd_state::SekIdle(INT32 nCycles)
+int32_t ngcd_state::SekIdle(int32_t nCycles)
 {
 	return nCycles;
 }
@@ -710,7 +710,7 @@ void ngcd_state::NeoCDDoDMA(address_space& curr_space)
 if (NeoCDDMAAddress2 == 0x0800)  {
 // MapVectorTable(false);
 //  bprintf(PRINT_ERROR, _T("    RAM vectors mapped (PC = 0x%08X\n"), SekGetPC(0));
-//  extern INT32 bRunPause;
+//  extern int32_t bRunPause;
 //  bRunPause = 1;
 }
 			break;
@@ -810,7 +810,7 @@ if (NeoCDDMAAddress2 == 0x0800)  {
 			//bprintf(PRINT_ERROR, _T("    Unknown transfer type 0x%04X (PC: 0x%06X)\n"), NeoCDDMAMode, SekGetPC(-1));
 			//bprintf(PRINT_NORMAL, _T("    ??? : 0x%08X  0x%08X 0x%04X 0x%04X 0x%08X\n"), NeoCDDMAAddress1, NeoCDDMAAddress2, NeoCDDMAValue1, NeoCDDMAValue2, NeoCDDMACount);
 
-//extern INT32 bRunPause;
+//extern int32_t bRunPause;
 //bRunPause = 1;
 
 		}
@@ -845,7 +845,7 @@ MACHINE_START_MEMBER(ngcd_state,neocd)
 
 	// initialize the memcard data structure
 	// NeoCD doesn't have memcard slots, rather, it has a larger internal memory which works the same
-	m_meminternal_data = make_unique_clear<UINT8[]>(0x2000);
+	m_meminternal_data = make_unique_clear<uint8_t[]>(0x2000);
 	machine().device<nvram_device>("saveram")->set_base(m_meminternal_data.get(), 0x2000);
 	save_pointer(NAME(m_meminternal_data.get()), 0x2000);
 
@@ -892,11 +892,11 @@ static ADDRESS_MAP_START( neocd_main_map, AS_PROGRAM, 16, ngcd_state )
 
 	AM_RANGE(0x300000, 0x300001) AM_MIRROR(0x01fffe) AM_DEVREAD8("ctrl1", neogeo_control_port_device, ctrl_r, 0xff00)
 	AM_RANGE(0x320000, 0x320001) AM_MIRROR(0x01fffe) AM_READ_PORT("AUDIO") AM_WRITE8(audio_command_w, 0xff00)
-	AM_RANGE(0x340000, 0x340001) AM_MIRROR(0x01fffe) AM_DEVREAD8("ctrl1", neogeo_control_port_device, ctrl_r, 0xff00)
+	AM_RANGE(0x340000, 0x340001) AM_MIRROR(0x01fffe) AM_DEVREAD8("ctrl2", neogeo_control_port_device, ctrl_r, 0xff00)
 	AM_RANGE(0x360000, 0x37ffff) AM_READ(unmapped_r)
 	AM_RANGE(0x380000, 0x380001) AM_MIRROR(0x01fffe) AM_READ(aes_in2_r)
 	AM_RANGE(0x380000, 0x38007f) AM_MIRROR(0x01ff80) AM_WRITE8(io_control_w, 0x00ff)
-	AM_RANGE(0x3a0000, 0x3a001f) AM_MIRROR(0x01ffe0) AM_READ(unmapped_r) AM_WRITE8(system_control_w, 0x00ff)
+	AM_RANGE(0x3a0000, 0x3a001f) AM_MIRROR(0x01ffe0) AM_READ(unmapped_r) AM_DEVWRITE8("systemlatch", hc259_device, write_a3, 0x00ff)
 	AM_RANGE(0x3c0000, 0x3c0007) AM_MIRROR(0x01fff8) AM_READ(video_register_r)
 	AM_RANGE(0x3c0000, 0x3c000f) AM_MIRROR(0x01fff0) AM_WRITE(video_register_w)
 	AM_RANGE(0x3e0000, 0x3fffff) AM_READ(unmapped_r)
@@ -924,12 +924,12 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( neocd_audio_io_map, AS_IO, 8, ngcd_state )
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff00) AM_READWRITE(audio_command_r, soundlatch_clear_byte_w)
+	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff00) AM_READ(audio_command_r) AM_DEVWRITE("soundlatch", generic_latch_8_device, clear_w)
 	AM_RANGE(0x04, 0x07) AM_MIRROR(0xff00) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
-	AM_RANGE(0x08, 0x08) AM_MIRROR(0xff10) AM_MASK(0x0010) AM_WRITE(audio_cpu_enable_nmi_w)
+	AM_RANGE(0x08, 0x08) AM_MIRROR(0xff00) AM_SELECT(0x0010) AM_WRITE(audio_cpu_enable_nmi_w)
 	// banking reads are actually NOP on NeoCD? but some games still access them
-//  AM_RANGE(0x08, 0x0b) AM_MIRROR(0xfff0) AM_MASK(0xff03) AM_READ(audio_cpu_bank_select_r)
-	AM_RANGE(0x0c, 0x0c) AM_MIRROR(0xff00) AM_WRITE(soundlatch2_byte_w)
+//  AM_RANGE(0x08, 0x0b) AM_MIRROR(0x00f0) AM_SELECT(0xff00) AM_READ(audio_cpu_bank_select_r)
+	AM_RANGE(0x0c, 0x0c) AM_MIRROR(0xff00) AM_DEVWRITE("soundlatch2", generic_latch_8_device, write)
 
 	// ??
 	AM_RANGE(0x80, 0x80) AM_MIRROR(0xff00) AM_WRITENOP
@@ -994,7 +994,7 @@ void ngcd_state::interrupt_callback_type3(void)
 }
 
 
-void ngcd_state::NeoCDIRQUpdate(UINT8 byteValue)
+void ngcd_state::NeoCDIRQUpdate(uint8_t byteValue)
 {
 	// do we also need to check the regular interrupts like FBA?
 
@@ -1024,7 +1024,7 @@ void ngcd_state::NeoCDIRQUpdate(UINT8 byteValue)
 }
 
 
-UINT32 ngcd_state::screen_update_neocd(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t ngcd_state::screen_update_neocd(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	// fill with background color first
 	bitmap.fill(*m_bg_pen, cliprect);
@@ -1037,7 +1037,7 @@ UINT32 ngcd_state::screen_update_neocd(screen_device &screen, bitmap_rgb32 &bitm
 }
 
 
-static MACHINE_CONFIG_DERIVED_CLASS( neocd, neogeo_base, ngcd_state )
+static MACHINE_CONFIG_DERIVED( neocd, neogeo_base )
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(neocd_main_map)
@@ -1046,6 +1046,9 @@ static MACHINE_CONFIG_DERIVED_CLASS( neocd, neogeo_base, ngcd_state )
 	MCFG_CPU_MODIFY("audiocpu")
 	MCFG_CPU_PROGRAM_MAP(neocd_audio_map)
 	MCFG_CPU_IO_MAP(neocd_audio_io_map)
+
+	MCFG_DEVICE_MODIFY("systemlatch")
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(LOGGER("NeoCD: write to regular vector change address?")) // what IS going on with "neocdz doubledr" and why do games write here if it's hooked up to nothing?
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(ngcd_state, screen_update_neocd)
@@ -1074,7 +1077,7 @@ MACHINE_CONFIG_END
 
 /*************************************
  *
- *  Driver initalization
+ *  Driver initialization
  *
  *************************************/
 
@@ -1140,9 +1143,8 @@ DRIVER_INIT_MEMBER(ngcd_state,neocdzj)
 }
 
 
-/*    YEAR  NAME  PARENT COMPAT MACHINE INPUT  INIT     COMPANY      FULLNAME            FLAGS */
-CONS( 1996, neocdz,  0,      0,   neocd, neocd, ngcd_state,  neocdz,  "SNK", "Neo-Geo CDZ (US)", 0 ) // the CDZ is the newer model
-CONS( 1996, neocdzj, neocdz, 0,   neocd, neocd, ngcd_state,  neocdzj,  "SNK", "Neo-Geo CDZ (Japan)", 0 )
+//    YEAR  NAME     PARENT  COMPAT MACHINE INPUT  STATE       INIT     COMPANY FULLNAME               FLAGS */
+CONS( 1996, neocdz,  0,      0,     neocd,  neocd, ngcd_state, neocdz,  "SNK",  "Neo-Geo CDZ (US)",    0 ) // the CDZ is the newer model
+CONS( 1996, neocdzj, neocdz, 0,     neocd,  neocd, ngcd_state, neocdzj, "SNK",  "Neo-Geo CDZ (Japan)", 0 )
 
-
-CONS( 1994, neocd,   neocdz, 0,   neocd, neocd, driver_device,  0,  "SNK", "Neo-Geo CD", MACHINE_NOT_WORKING ) // older  model, ignores disc protections?
+CONS( 1994, neocd,   neocdz, 0,     neocd,  neocd, ngcd_state, 0,       "SNK",  "Neo-Geo CD",          MACHINE_NOT_WORKING ) // older  model, ignores disc protections?

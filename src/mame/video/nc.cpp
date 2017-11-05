@@ -56,7 +56,7 @@ void nc_state::nc200_video_set_backlight(int state)
   Do NOT call osd_update_display() from this function,
   it will be called by the main emulation engine.
 ***************************************************************************/
-UINT32 nc_state::screen_update_nc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t nc_state::screen_update_nc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int y;
 	int b;

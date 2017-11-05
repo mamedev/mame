@@ -514,13 +514,13 @@ HRESULT CDecoder::Code(ISequentialInStream * const *inStreams, const UInt64 * co
 
 STDMETHODIMP CDecoder::SetInStream2(UInt32 streamIndex, ISequentialInStream *inStream)
 {
-  inStreams[streamIndex] = inStream;
+  _inStreams[streamIndex] = inStream;
   return S_OK;
 }
 
 STDMETHODIMP CDecoder::ReleaseInStream2(UInt32 streamIndex)
 {
-  inStreams[streamIndex].Release();
+  _inStreams[streamIndex].Release();
   return S_OK;
 }
 
@@ -601,7 +601,7 @@ STDMETHODIMP CDecoder::Read(void *data, UInt32 size, UInt32 *processedSize)
       do
       {
         UInt32 curSize = _bufsCurSizes[dec.state] - (UInt32)totalRead;
-        HRESULT res2 = inStreams[dec.state]->Read(_bufs[dec.state] + totalRead, curSize, &curSize);
+        HRESULT res2 = _inStreams[dec.state]->Read(_bufs[dec.state] + totalRead, curSize, &curSize);
         _readRes[dec.state] = res2;
         if (curSize == 0)
           break;

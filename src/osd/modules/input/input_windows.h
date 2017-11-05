@@ -10,11 +10,11 @@
 #define INPUT_WIN_H_
 
 // standard windows headers
-#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #undef interface
 
 #include "window.h"
+#include "winmain.h"
 
 //============================================================
 //  TYPEDEFS
@@ -23,9 +23,9 @@
 // state information for a keyboard
 struct keyboard_state
 {
-	UINT8                   state[MAX_KEYS];
-	INT8                    oldkey[MAX_KEYS];
-	INT8                    currkey[MAX_KEYS];
+	uint8_t                   state[MAX_KEYS];
+	int8_t                    oldkey[MAX_KEYS];
+	int8_t                    currkey[MAX_KEYS];
 };
 
 // state information for a mouse (matches DIMOUSESTATE exactly)
@@ -49,10 +49,12 @@ public:
 	{
 	}
 
+	virtual ~wininput_module() { }
+
 	virtual bool should_hide_mouse()
 	{
 		if (winwindow_has_focus()  // has focus
-			&& (!video_config.windowed || !win_window_list.front()->win_has_menu()) // not windowed or doesn't have a menu
+			&& (!video_config.windowed || !osd_common_t::s_window_list.front()->win_has_menu()) // not windowed or doesn't have a menu
 			&& (input_enabled() && !input_paused()) // input enabled and not paused
 			&& (mouse_enabled() || lightgun_enabled())) // either mouse or lightgun enabled in the core
 		{
@@ -82,10 +84,4 @@ protected:
 	}
 };
 
-//============================================================
-//  INLINE FUNCTIONS
-//============================================================
-
-INT32 generic_button_get_state(void *device_internal, void *item_internal);
-INT32 generic_axis_get_state(void *device_internal, void *item_internal);
 #endif

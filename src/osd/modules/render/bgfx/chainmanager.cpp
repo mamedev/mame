@@ -9,6 +9,9 @@
 //
 //============================================================
 
+#include <bx/readerwriter.h>
+#include <bx/crtimpl.h>
+
 #include "emu.h"
 #include "../frontend/mame/ui/slider.h"
 
@@ -17,9 +20,6 @@
 
 #include <rapidjson/document.h>
 #include <rapidjson/error/en.h>
-
-#include <bx/readerwriter.h>
-#include <bx/crtimpl.h>
 
 #include "bgfxutil.h"
 
@@ -61,7 +61,9 @@ void chain_manager::refresh_available_chains()
 	m_available_chains.clear();
 	m_available_chains.push_back(chain_desc("none", ""));
 
-	find_available_chains(std::string(m_options.bgfx_path()) + "/chains", "");
+	std::string chains_path;
+	osd_subst_env(chains_path, util::string_format("%s" PATH_SEPARATOR "chains", m_options.bgfx_path()));
+	find_available_chains(chains_path, "");
 
 	destroy_unloaded_chains();
 }
@@ -91,12 +93,12 @@ void chain_manager::destroy_unloaded_chains()
 
 void chain_manager::find_available_chains(std::string root, std::string path)
 {
-	osd_directory *directory = osd_opendir((root + path).c_str());
+	osd::directory::ptr directory = osd::directory::open(root + path);
 	if (directory != nullptr)
 	{
-		for (const osd_directory_entry *entry = osd_readdir(directory); entry != nullptr; entry = osd_readdir(directory))
+		for (const osd::directory::entry *entry = directory->read(); entry != nullptr; entry = directory->read())
 		{
-			if (entry->type == ENTTYPE_FILE)
+			if (entry->type == osd::directory::entry::entry_type::FILE)
 			{
 				std::string name(entry->name);
 				std::string extension(".json");
@@ -114,7 +116,7 @@ void chain_manager::find_available_chains(std::string root, std::string path)
 					}
 				}
 			}
-			else if (entry->type == ENTTYPE_DIR)
+			else if (entry->type == osd::directory::entry::entry_type::DIR)
 			{
 				std::string name = entry->name;
 				if (!(name == "." || name == ".."))
@@ -128,18 +130,18 @@ void chain_manager::find_available_chains(std::string root, std::string path)
 				}
 			}
 		}
-
-		osd_closedir(directory);
 	}
 }
 
 bgfx_chain* chain_manager::load_chain(std::string name, uint32_t screen_index)
 {
-	if (name.length() < 5 || (name.compare(name.length() - 5, 5, ".json")!= 0))
+	if (name.length() < 5 || (name.compare(name.length() - 5, 5, ".json") != 0))
 	{
 		name = name + ".json";
 	}
-	std::string path = std::string(m_options.bgfx_path()) + "/chains/" + name;
+	std::string path;
+	osd_subst_env(path, util::string_format("%s" PATH_SEPARATOR "chains" PATH_SEPARATOR, m_options.bgfx_path()));
+	path += name;
 
 	bx::CrtFileReader reader;
 	if (!bx::open(&reader, path.c_str()))
@@ -295,17 +297,17 @@ void chain_manager::process_screen_quad(uint32_t view, uint32_t screen, render_p
 	bgfx_texture *texture = new bgfx_texture(full_name, bgfx::TextureFormat::RGBA8, tex_width, tex_height, mem, BGFX_TEXTURE_U_CLAMP | BGFX_TEXTURE_V_CLAMP | BGFX_TEXTURE_MIN_POINT | BGFX_TEXTURE_MAG_POINT | BGFX_TEXTURE_MIP_POINT);
 	m_textures.add_provider(full_name, texture);
 
-    const bool any_targets_rebuilt = m_targets.update_target_sizes(screen, tex_width, tex_height, TARGET_STYLE_GUEST);
+	const bool any_targets_rebuilt = m_targets.update_target_sizes(screen, tex_width, tex_height, TARGET_STYLE_GUEST);
 	if (any_targets_rebuilt)
-    {
-        for (bgfx_chain* chain : m_screen_chains)
-        {
-            if (chain != nullptr)
-            {
-                chain->repopulate_targets();
-            }
-        }
-    }
+	{
+		for (bgfx_chain* chain : m_screen_chains)
+		{
+			if (chain != nullptr)
+			{
+				chain->repopulate_targets();
+			}
+		}
+	}
 
 	bgfx_chain* chain = screen_chain(screen);
 	chain->process(prim, view, screen, m_textures, window, bgfx_util::get_blend_state(PRIMFLAG_GET_BLENDMODE(prim->flags)));
@@ -364,7 +366,7 @@ void chain_manager::update_screen_count(uint32_t screen_count)
 	}
 }
 
-INT32 chain_manager::slider_changed(running_machine &machine, void *arg, int id, std::string *str, INT32 newval)
+int32_t chain_manager::slider_changed(running_machine &machine, void *arg, int id, std::string *str, int32_t newval)
 {
 	if (newval != SLIDER_NOCHANGE)
 	{
@@ -392,9 +394,7 @@ void chain_manager::create_selection_slider(uint32_t screen_index)
 		return;
 	}
 
-	std::string description = "Window " + std::to_string(m_window_index) + ", Screen " + std::to_string(screen_index) + " Effect:";
-	size_t size = sizeof(slider_state) + description.length();
-	slider_state *state = reinterpret_cast<slider_state *>(auto_alloc_array_clear(m_machine, UINT8, size));
+	std::unique_ptr<slider_state> state = make_unique_clear<slider_state>();
 
 	state->minval = 0;
 	state->defval = m_current_chain[screen_index];
@@ -405,15 +405,16 @@ void chain_manager::create_selection_slider(uint32_t screen_index)
 	state->update = std::bind(&chain_manager::slider_changed, this, _1, _2, _3, _4, _5);
 	state->arg = this;
 	state->id = screen_index;
-	strcpy(state->description, description.c_str());
+	state->description = "Window " + std::to_string(m_window_index) + ", Screen " + std::to_string(screen_index) + " Effect:";
 
 	ui::menu_item item;
 	item.text = state->description;
 	item.subtext = "";
 	item.flags = 0;
-	item.ref = state;
+	item.ref = state.get();
 	item.type = ui::menu_item_type::SLIDER;
 	m_selection_sliders.push_back(item);
+	m_core_sliders.push_back(std::move(state));
 }
 
 uint32_t chain_manager::handle_screen_chains(uint32_t view, render_primitive *starting_prim, osd_window& window)
@@ -436,26 +437,26 @@ uint32_t chain_manager::handle_screen_chains(uint32_t view, render_primitive *st
 			continue;
 		}
 
-		uint16_t screen_width(floor((prim->bounds.x1 - prim->bounds.x0) + 0.5f));
-		uint16_t screen_height(floor((prim->bounds.y1 - prim->bounds.y0) + 0.5f));
+		uint16_t screen_width(floorf(prim->get_full_quad_width() + 0.5f));
+		uint16_t screen_height(floorf(prim->get_full_quad_height() + 0.5f));
 		if (window.swap_xy())
 		{
 			std::swap(screen_width, screen_height);
 		}
 
-        const bool any_targets_rebuilt = m_targets.update_target_sizes(screen_index, screen_width, screen_height, TARGET_STYLE_NATIVE);
-        if (any_targets_rebuilt)
-        {
-            for (bgfx_chain* chain : m_screen_chains)
-            {
-                if (chain != nullptr)
-                {
-                    chain->repopulate_targets();
-                }
-            }
-        }
+		const bool any_targets_rebuilt = m_targets.update_target_sizes(screen_index, screen_width, screen_height, TARGET_STYLE_NATIVE);
+		if (any_targets_rebuilt)
+		{
+			for (bgfx_chain* chain : m_screen_chains)
+			{
+				if (chain != nullptr)
+				{
+					chain->repopulate_targets();
+				}
+			}
+		}
 
-        process_screen_quad(view + used_views, screen_index, prim, window);
+		process_screen_quad(view + used_views, screen_index, prim, window);
 		used_views += screen_chain(screen_index)->applicable_passes();
 
 		screen_index++;

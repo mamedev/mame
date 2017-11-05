@@ -6,17 +6,13 @@
 
                     driver by   Luca Elia (l.elia@tin.it)
 
-
-    This file contains definitions used across multiple megasys1
-    and non megasys1 Jaleco games:
-
-    * Scrolling layers handling
-    * Code decryption handling
-
 ***************************************************************************/
 
 #include "machine/gen_latch.h"
+#include "machine/timer.h"
 #include "sound/okim6295.h"
+#include "video/ms1_tmap.h"
+#include "screen.h"
 
 
 class megasys1_state : public driver_device
@@ -24,9 +20,8 @@ class megasys1_state : public driver_device
 public:
 	megasys1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_vregs(*this, "vregs"),
 		m_objectram(*this, "objectram"),
-		m_scrollram(*this, "scrollram"),
+		m_tmap(*this, "scroll%u", 0),
 		m_ram(*this, "ram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
@@ -47,10 +42,9 @@ public:
 		m_io_dsw2(*this, "DSW2")
 		{ }
 
-	required_shared_ptr<UINT16> m_vregs;
-	required_shared_ptr<UINT16> m_objectram;
-	required_shared_ptr_array<UINT16,3> m_scrollram;
-	required_shared_ptr<UINT16> m_ram;
+	required_shared_ptr<uint16_t> m_objectram;
+	optional_device_array<megasys1_tilemap_device, 3> m_tmap;
+	required_shared_ptr<uint16_t> m_ram;
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
 	optional_device<okim6295_device> m_oki1;
@@ -61,7 +55,7 @@ public:
 	optional_device<generic_latch_16_device> m_soundlatch;
 	optional_device<generic_latch_16_device> m_soundlatch2;
 	optional_device<generic_latch_8_device> m_soundlatch_z;
-	required_region_ptr<UINT16> m_rom_maincpu;
+	required_region_ptr<uint16_t> m_rom_maincpu;
 	required_ioport m_io_system;
 	required_ioport m_io_p1;
 	required_ioport m_io_p2;
@@ -69,34 +63,40 @@ public:
 	optional_ioport m_io_dsw1;
 	optional_ioport m_io_dsw2;
 
-	bitmap_ind16 m_sprite_buffer_bitmap;
-
-	UINT16 *m_spriteram;
-	UINT16 m_ip_select_values[7];
-	UINT16 m_ip_latched;
-	UINT8 m_ignore_oki_status;
-	UINT16 m_protection_val;
-	int m_scrollx[3];
-	int m_scrolly[3];
-	int m_active_layers;
-	int m_bits_per_color_code;
-	int m_scroll_flag[3];
-	int m_sprite_bank;
-	int m_screen_flag;
-	int m_sprite_flag;
-	int m_8x8_scroll_factor[3];
-	int m_16x16_scroll_factor[3];
-	tilemap_t *m_tmap[3];
-	tilemap_t *m_tilemap[3][2][4];
-	int m_hardware_type_z;
-	std::unique_ptr<UINT16[]> m_buffer_objectram;
-	std::unique_ptr<UINT16[]> m_buffer2_objectram;
-	std::unique_ptr<UINT16[]> m_buffer_spriteram16;
-	std::unique_ptr<UINT16[]> m_buffer2_spriteram16;
+	// configuration
+	uint16_t m_ip_select_values[7]; // System B and C
+	int m_hardware_type_z; // System Z
 	int m_layers_order[16];
+	uint8_t m_ignore_oki_status;
 
+	// all
+	bitmap_ind16 m_sprite_buffer_bitmap;
+	uint16_t m_screen_flag;
+	std::unique_ptr<uint16_t[]> m_buffer_objectram;
+	std::unique_ptr<uint16_t[]> m_buffer2_objectram;
+	std::unique_ptr<uint16_t[]> m_buffer_spriteram16;
+	std::unique_ptr<uint16_t[]> m_buffer2_spriteram16;
+
+	// all but System Z
+	uint16_t m_active_layers;
+	uint16_t m_sprite_flag;
+
+	// System B and C
+	uint16_t m_ip_latched;
+
+	 // System C
+	uint16_t m_sprite_bank;
+
+	// System A only
 	int m_mcu_hs;
-	UINT16 m_mcu_hs_ram[0x10];
+	uint16_t m_mcu_hs_ram[0x10];
+
+	// peekaboo
+	uint16_t m_protection_val;
+
+	// soldam
+	uint16_t *m_spriteram;
+
 	DECLARE_WRITE_LINE_MEMBER(sound_irq);
 	DECLARE_READ16_MEMBER(ip_select_r);
 	DECLARE_WRITE16_MEMBER(ip_select_w);
@@ -104,27 +104,29 @@ public:
 	DECLARE_WRITE16_MEMBER(protection_peekaboo_w);
 	DECLARE_READ16_MEMBER(megasys1A_mcu_hs_r);
 	DECLARE_WRITE16_MEMBER(megasys1A_mcu_hs_w);
-	DECLARE_READ16_MEMBER(edfbl_input_r);
 	DECLARE_READ16_MEMBER(iganinju_mcu_hs_r);
 	DECLARE_WRITE16_MEMBER(iganinju_mcu_hs_w);
 	DECLARE_READ16_MEMBER(soldamj_spriteram16_r);
 	DECLARE_WRITE16_MEMBER(soldamj_spriteram16_w);
 	DECLARE_READ16_MEMBER(stdragon_mcu_hs_r);
 	DECLARE_WRITE16_MEMBER(stdragon_mcu_hs_w);
-	DECLARE_READ16_MEMBER(monkelf_input_r);
-	DECLARE_WRITE16_MEMBER(megasys1_scrollram_0_w);
-	DECLARE_WRITE16_MEMBER(megasys1_scrollram_1_w);
-	DECLARE_WRITE16_MEMBER(megasys1_scrollram_2_w);
-	DECLARE_WRITE16_MEMBER(megasys1_vregs_A_w);
-	DECLARE_WRITE16_MEMBER(megasys1_vregs_monkelf_w);
-	DECLARE_READ16_MEMBER(megasys1_vregs_C_r);
-	DECLARE_WRITE16_MEMBER(megasys1_vregs_C_w);
-	DECLARE_WRITE16_MEMBER(megasys1_vregs_D_w);
+	DECLARE_WRITE16_MEMBER(active_layers_w);
+	DECLARE_WRITE16_MEMBER(sprite_bank_w);
+	DECLARE_READ16_MEMBER(sprite_flag_r);
+	DECLARE_WRITE16_MEMBER(sprite_flag_w);
+	DECLARE_WRITE16_MEMBER(screen_flag_w);
+	DECLARE_WRITE16_MEMBER(soundlatch_w);
+	DECLARE_WRITE16_MEMBER(soundlatch_z_w);
+	DECLARE_WRITE16_MEMBER(soundlatch_c_w);
+	DECLARE_WRITE16_MEMBER(monkelf_scroll0_w);
+	DECLARE_WRITE16_MEMBER(monkelf_scroll1_w);
 	void megasys1_set_vreg_flag(int which, int data);
 	DECLARE_READ8_MEMBER(oki_status_1_r);
 	DECLARE_READ8_MEMBER(oki_status_2_r);
 	DECLARE_WRITE16_MEMBER(okim6295_both_1_w);
 	DECLARE_WRITE16_MEMBER(okim6295_both_2_w);
+	DECLARE_WRITE16_MEMBER(ram_w);
+
 	DECLARE_DRIVER_INIT(64street);
 	DECLARE_DRIVER_INIT(chimerab);
 	DECLARE_DRIVER_INIT(peekaboo);
@@ -143,35 +145,30 @@ public:
 	DECLARE_DRIVER_INIT(avspirit);
 	DECLARE_DRIVER_INIT(monkelf);
 	DECLARE_DRIVER_INIT(edf);
+	DECLARE_DRIVER_INIT(edfp);
 	DECLARE_DRIVER_INIT(bigstrik);
 	DECLARE_DRIVER_INIT(rodland);
 	DECLARE_DRIVER_INIT(edfbl);
 	DECLARE_DRIVER_INIT(stdragona);
 	DECLARE_DRIVER_INIT(stdragonb);
 	DECLARE_DRIVER_INIT(systemz);
-	TILEMAP_MAPPER_MEMBER(megasys1_scan_8x8);
-	TILEMAP_MAPPER_MEMBER(megasys1_scan_16x16);
-	TILE_GET_INFO_MEMBER(megasys1_get_scroll_tile_info_8x8);
-	TILE_GET_INFO_MEMBER(megasys1_get_scroll_tile_info_16x16);
 	DECLARE_MACHINE_RESET(megasys1);
 	DECLARE_VIDEO_START(megasys1);
 	DECLARE_PALETTE_INIT(megasys1);
 	DECLARE_MACHINE_RESET(megasys1_hachoo);
-	UINT32 screen_update_megasys1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof_megasys1(screen_device &screen, bool state);
+
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 	INTERRUPT_GEN_MEMBER(megasys1D_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(megasys1A_scanline);
 	TIMER_DEVICE_CALLBACK_MEMBER(megasys1A_iganinju_scanline);
 	TIMER_DEVICE_CALLBACK_MEMBER(megasys1B_scanline);
-	DECLARE_WRITE16_MEMBER(ms1_ram_w);
 
-	inline void scrollram_w(offs_t offset, UINT16 data, UINT16 mem_mask, int which);
-	void create_tilemaps();
-	void megasys1_priority_create();
+	void priority_create();
 	void mix_sprite_bitmap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void partial_clear_sprite_bitmap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 param);
+	void partial_clear_sprite_bitmap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t param);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect);
-	inline void draw_16x16_priority_sprite(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect, INT32 code, INT32 color, INT32 sx, INT32 sy, INT32 flipx, INT32 flipy, UINT8 mosaic, UINT8 mosaicsol, INT32 priority);
+	inline void draw_16x16_priority_sprite(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect, int32_t code, int32_t color, int32_t sx, int32_t sy, int32_t flipx, int32_t flipy, uint8_t mosaic, uint8_t mosaicsol, int32_t priority);
 	void rodland_gfx_unmangle(const char *region);
 	void jitsupro_gfx_unmangle(const char *region);
 	void stdragona_gfx_unmangle(const char *region);

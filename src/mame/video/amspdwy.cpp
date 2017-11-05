@@ -39,8 +39,8 @@ WRITE8_MEMBER(amspdwy_state::amspdwy_flipscreen_w)
 
 TILE_GET_INFO_MEMBER(amspdwy_state::get_tile_info)
 {
-	UINT8 code = m_videoram[tile_index];
-	UINT8 color = m_colorram[tile_index];
+	uint8_t code = m_videoram[tile_index];
+	uint8_t color = m_colorram[tile_index];
 	SET_TILE_INFO_MEMBER(0,
 			code + ((color & 0x18)<<5),
 			color & 0x07,
@@ -69,7 +69,7 @@ TILEMAP_MAPPER_MEMBER(amspdwy_state::tilemap_scan_cols_back)
 
 void amspdwy_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(amspdwy_state::get_tile_info),this), tilemap_mapper_delegate(FUNC(amspdwy_state::tilemap_scan_cols_back),this), 8, 8, 0x20, 0x20);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(amspdwy_state::get_tile_info),this), tilemap_mapper_delegate(FUNC(amspdwy_state::tilemap_scan_cols_back),this), 8, 8, 0x20, 0x20);
 }
 
 
@@ -94,7 +94,7 @@ Offset:     Format:     Value:
 
 void amspdwy_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	UINT8 *spriteram = m_spriteram;
+	uint8_t *spriteram = m_spriteram;
 	int i;
 	int max_x = m_screen->width()  - 1;
 	int max_y = m_screen->height() - 1;
@@ -134,7 +134,7 @@ void amspdwy_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 
 ***************************************************************************/
 
-UINT32 amspdwy_state::screen_update_amspdwy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t amspdwy_state::screen_update_amspdwy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	draw_sprites(bitmap, cliprect);

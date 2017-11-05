@@ -126,9 +126,9 @@ Angler King       Namco, 1998    Super System 23
 Gunmen Wars       Namco, 1998    Super System 23
 Race On!          Namco, 1998    Super System 23
 500 GP            Namco, 1998    Super System 23
-Final Furlong 2   Namco, 1999    Super System 23
+Final Furlong 2   Namco, 1998    Super System 23
 *Guitar Jam       Namco, 1999    Super System 23
-Crisis Zone       Namco, 2000    System 23 Evolution 2
+Crisis Zone       Namco, 1999    System 23 Evolution 2
 
 * - Guitar Jam is not dumped yet and the hardware type is not confirmed. It might not be on System 23 hardware.
 
@@ -812,7 +812,7 @@ Notes:
       PIC16F84 - Microchip PIC16F84 PIC (SOIC20)
                   - For 500GP and Angler King stamped 'CAP10'
                   - For Ridge Racer V (on System 246) stamped 'CAP11'
-      MCU      - Fujitsu MB90F574 Microcontroller (QFP120)
+      MCU      - Fujitsu MB90F574 F2MC-16LX Family Microcontroller (QFP120)
                   - For 500 GP and Angler King stamped 'FCAF10'
                   - For Ridge Racer V (on System 246) stamped 'FCAF11'
       ADM485   - Analog Devices ADM485 +5V Low Power EIA RS-485 Transceiver (SOIC8)
@@ -1255,22 +1255,32 @@ Notes:
 */
 
 #include "emu.h"
-#include <float.h>
-#include "video/poly.h"
-#include "cpu/mips/mips3.h"
 #include "cpu/h8/h83002.h"
 #include "cpu/h8/h83337.h"
-#include "cpu/sh2/sh2.h"
-#include "sound/c352.h"
+#include "cpu/mips/mips3.h"
+#include "cpu/sh/sh2.h"
+#include "machine/namco_settings.h"
 #include "machine/nvram.h"
 #include "machine/rtc4543.h"
-#include "machine/namco_settings.h"
+#include "sound/c352.h"
+#include "video/poly.h"
+#include "speaker.h"
+
+#include <float.h>
+
 
 #define JVSCLOCK    (XTAL_14_7456MHz)
-#define H8CLOCK     (16737350)      /* from 2061 */
-#define BUSCLOCK    (16737350*2)    /* 33MHz CPU bus clock / input */
-#define C352CLOCK   (25992000)  /* measured at 25.992MHz from 2061 pin 9  */
-#define C352DIV     (296)
+
+//#define H8CLOCK     (16737350)      /* from 2061 */
+//#define BUSCLOCK    (16737350*2)    /* 33MHz CPU bus clock / input */
+//#define C352CLOCK   (25401600)  /* previously measured at 25.992MHz from 2061 pin 9  */
+//#define C352DIV     (296)
+
+#define H8CLOCK     (16934400)      /* based on research (superctr) */
+#define BUSCLOCK    (16934400*2)
+#define C352CLOCK   (25401600)
+#define C352DIV     (288)
+
 #define VSYNC1      (59.8824)
 #define VSYNC2      (59.915)
 #define HSYNC       (16666150)
@@ -1296,9 +1306,9 @@ struct namcos23_render_entry
 	{
 		struct
 		{
-			UINT16 model;
-			INT16 m[9];
-			INT32 v[3];
+			uint16_t model;
+			int16_t m[9];
+			int32_t v[3];
 			float scaling;
 		} model;
 	};
@@ -1309,7 +1319,7 @@ struct namcos23_render_data
 	running_machine *machine;
 	const pen_t *pens;
 	bitmap_rgb32 *bitmap;
-	UINT32 (*texture_lookup)(running_machine &machine, const pen_t *pens, float x, float y);
+	uint32_t (*texture_lookup)(running_machine &machine, const pen_t *pens, float x, float y);
 };
 
 class namcos23_state;
@@ -1319,7 +1329,7 @@ class namcos23_renderer : public poly_manager<float, namcos23_render_data, 4, PO
 public:
 	namcos23_renderer(namcos23_state &state);
 	void render_flush(bitmap_rgb32& bitmap);
-	void render_scanline(INT32 scanline, const extent_t& extent, const namcos23_render_data& object, int threadid);
+	void render_scanline(int32_t scanline, const extent_t& extent, const namcos23_render_data& object, int threadid);
 	float* zBuffer() { return m_zBuffer; }
 
 private:
@@ -1341,32 +1351,32 @@ struct namcos23_poly_entry
 
 struct c417_t
 {
-	UINT16 ram[0x10000];
-	UINT16 adr;
-	UINT32 pointrom_adr;
+	uint16_t ram[0x10000];
+	uint16_t adr;
+	uint32_t pointrom_adr;
 };
 
 struct c412_t
 {
-	UINT16 sdram_a[0x100000]; // Framebuffers, probably
-	UINT16 sdram_b[0x100000];
-	UINT16 sram[0x20000];     // Ram-based tiles for rendering
-	UINT16 pczram[0x200];     // Ram-based tilemap for rendering, or something else
-	UINT32 adr;
-	UINT16 status_c;
+	uint16_t sdram_a[0x100000]; // Framebuffers, probably
+	uint16_t sdram_b[0x100000];
+	uint16_t sram[0x20000];     // Ram-based tiles for rendering
+	uint16_t pczram[0x200];     // Ram-based tilemap for rendering, or something else
+	uint32_t adr;
+	uint16_t status_c;
 };
 
 struct c421_t
 {
-	UINT16 dram_a[0x40000];
-	UINT16 dram_b[0x40000];
-	UINT16 sram[0x8000];
-	UINT32 adr;
+	uint16_t dram_a[0x40000];
+	uint16_t dram_b[0x40000];
+	uint16_t sram[0x8000];
+	uint32_t adr;
 };
 
 struct c422_t
 {
-	INT16 regs[0x10];
+	int16_t regs[0x10];
 };
 
 struct c361_t
@@ -1378,8 +1388,8 @@ struct c361_t
 struct c404_t
 {
 	rgb_t bgcolor;
-	UINT16 palbase;
-	UINT8 layer;
+	uint16_t palbase;
+	uint8_t layer;
 };
 
 struct render_t
@@ -1420,7 +1430,7 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_generic_paletteram_32(*this, "paletteram"),
-		m_adc_ports(*this, "ADC")
+		m_adc_ports(*this, "ADC.%u", 0)
 	{ }
 
 	required_device<mips3_device> m_maincpu;
@@ -1429,14 +1439,14 @@ public:
 	optional_device<h83334_device> m_iocpu;
 	required_device<rtc4543_device> m_rtc;
 	required_device<namco_settings_device> m_settings;
-	required_shared_ptr<UINT32> m_mainram;
-	required_shared_ptr<UINT32> m_shared_ram;
-	required_shared_ptr<UINT32> m_gammaram;
-	required_shared_ptr<UINT32> m_charram;
-	required_shared_ptr<UINT32> m_textram;
-	optional_shared_ptr<UINT32> m_czattr;
+	required_shared_ptr<uint32_t> m_mainram;
+	required_shared_ptr<uint32_t> m_shared_ram;
+	required_shared_ptr<uint32_t> m_gammaram;
+	required_shared_ptr<uint32_t> m_charram;
+	required_shared_ptr<uint32_t> m_textram;
+	optional_shared_ptr<uint32_t> m_czattr;
 	optional_device<cpu_device> m_gmen_sh2;
-	optional_shared_ptr<UINT32> m_gmen_sh2_shared;
+	optional_shared_ptr<uint32_t> m_gmen_sh2_shared;
 	required_device<gfxdecode_device> m_gfxdecode;
 	optional_ioport m_lightx;
 	optional_ioport m_lighty;
@@ -1444,7 +1454,7 @@ public:
 	required_ioport m_p2;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	required_shared_ptr<UINT32> m_generic_paletteram_32;
+	required_shared_ptr<uint32_t> m_generic_paletteram_32;
 	optional_ioport_array<4> m_adc_ports;
 
 	c404_t m_c404;
@@ -1456,22 +1466,22 @@ public:
 	render_t m_render;
 
 	tilemap_t *m_bgtilemap;
-	UINT8 m_jvssense;
-	INT32 m_has_jvsio;
-	UINT32 m_main_irqcause;
+	uint8_t m_jvssense;
+	int32_t m_has_jvsio;
+	uint32_t m_main_irqcause;
 	bool m_ctl_vbl_active;
-	UINT8 m_ctl_led;
-	UINT16 m_ctl_inp_buffer[2];
+	uint8_t m_ctl_led;
+	uint16_t m_ctl_inp_buffer[2];
 	bool m_subcpu_running;
-	UINT32 m_c435_address;
-	UINT32 m_c435_size;
-	const UINT32 *m_ptrom;
-	const UINT16 *m_tmlrom;
-	const UINT8 *m_tmhrom;
-	const UINT8 *m_texrom;
-	UINT32 m_tileid_mask;
-	UINT32 m_tile_mask;
-	UINT32 m_ptrom_limit;
+	uint32_t m_c435_address;
+	uint32_t m_c435_size;
+	const uint32_t *m_ptrom;
+	const uint16_t *m_tmlrom;
+	const uint8_t *m_tmhrom;
+	const uint8_t *m_texrom;
+	uint32_t m_tileid_mask;
+	uint32_t m_tile_mask;
+	uint32_t m_ptrom_limit;
 
 	int m_vblank_count;
 
@@ -1483,21 +1493,21 @@ public:
 // Matrices are stored in signed 2.14 fixed point
 // Vectors are stored in signed 10.14 fixed point
 
-	INT16 m_matrices[256][9];
-	INT32 m_vectors[256][3];
-	INT32 m_light_vector[3];
-	UINT16 m_scaling;
-	INT32 m_spv[3];
-	INT16 m_spm[3];
+	int16_t m_matrices[256][9];
+	int32_t m_vectors[256][3];
+	int32_t m_light_vector[3];
+	uint16_t m_scaling;
+	int32_t m_spv[3];
+	int16_t m_spm[3];
 
-	UINT16 m_c435_buffer[256];
+	uint16_t m_c435_buffer[256];
 	int m_c435_buffer_pos;
 
-	UINT8 m_sub_porta;
-	UINT8 m_sub_portb;
-	UINT8 m_tssio_port_4;
+	uint8_t m_sub_porta;
+	uint8_t m_sub_portb;
+	uint8_t m_tssio_port_4;
 
-	void update_main_interrupts(UINT32 cause);
+	void update_main_interrupts(uint32_t cause);
 	void update_mixer();
 
 	DECLARE_WRITE32_MEMBER(textram_w);
@@ -1552,23 +1562,23 @@ public:
 	DECLARE_MACHINE_RESET(gmen);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(interrupt);
 	TIMER_CALLBACK_MEMBER(c361_timer_cb);
-	void sub_irq(screen_device &screen, bool vblank_state);
-	UINT8 nthbyte(const UINT32 *pSource, int offs);
-	UINT16 nthword(const UINT32 *pSource, int offs);
-	inline INT32 u32_to_s24(UINT32 v);
-	inline INT32 u32_to_s10(UINT32 v);
-	float f24_to_f32(UINT32 v);
+	DECLARE_WRITE_LINE_MEMBER(sub_irq);
+	uint8_t nthbyte(const uint32_t *pSource, int offs);
+	uint16_t nthword(const uint32_t *pSource, int offs);
+	inline int32_t u32_to_s24(uint32_t v);
+	inline int32_t u32_to_s10(uint32_t v);
+	float f24_to_f32(uint32_t v);
 
-	INT32 *c435_getv(UINT16 id);
-	INT16 *c435_getm(UINT16 id);
+	int32_t *c435_getv(uint16_t id);
+	int16_t *c435_getm(uint16_t id);
 
-	void c435_state_set_interrupt(const UINT16 *param);
-	void c435_state_set_projection_matrix_line(const UINT16 *param);
-	void c435_state_set(UINT16 type, const UINT16 *param);
-	int c435_get_state_entry_size(UINT16 type);
+	void c435_state_set_interrupt(const uint16_t *param);
+	void c435_state_set_projection_matrix_line(const uint16_t *param);
+	void c435_state_set(uint16_t type, const uint16_t *param);
+	int c435_get_state_entry_size(uint16_t type);
 
 	void c435_matrix_matrix_mul();
 	void c435_matrix_set();
@@ -1579,24 +1589,24 @@ public:
 	void c435_render();
 	void c435_flush();
 
-	void c435_pio_w(UINT16 data);
-	void c435_dma(address_space &space, UINT32 adr, UINT32 size);
+	void c435_pio_w(uint16_t data);
+	void c435_dma(address_space &space, uint32_t adr, uint32_t size);
 
-	void render_apply_transform(INT32 xi, INT32 yi, INT32 zi, const namcos23_render_entry *re, poly_vertex &pv);
-	void render_apply_matrot(INT32 xi, INT32 yi, INT32 zi, const namcos23_render_entry *re, INT32 &x, INT32 &y, INT32 &z);
+	void render_apply_transform(int32_t xi, int32_t yi, int32_t zi, const namcos23_render_entry *re, poly_vertex &pv);
+	void render_apply_matrot(int32_t xi, int32_t yi, int32_t zi, const namcos23_render_entry *re, int32_t &x, int32_t &y, int32_t &z);
 	void render_project(poly_vertex &pv);
 	void render_one_model(const namcos23_render_entry *re);
 	void render_run(bitmap_rgb32 &bitmap);
 };
 
 
-UINT8 namcos23_state::nthbyte(const UINT32 *pSource, int offs)
+uint8_t namcos23_state::nthbyte(const uint32_t *pSource, int offs)
 {
 	pSource += offs/4;
 	return (pSource[0]<<((offs&3)*8))>>24;
 }
 
-UINT16 namcos23_state::nthword(const UINT32 *pSource, int offs)
+uint16_t namcos23_state::nthword(const uint32_t *pSource, int offs)
 {
 	pSource += offs/2;
 	return (pSource[0]<<((offs&1)*16))>>16;
@@ -1620,17 +1630,17 @@ namcos23_renderer::namcos23_renderer(namcos23_state &state)
 
 // 3D hardware, to throw at least in part in video/namcos23.c
 
-inline INT32 namcos23_state::u32_to_s24(UINT32 v)
+inline int32_t namcos23_state::u32_to_s24(uint32_t v)
 {
 	return v & 0x800000 ? v | 0xff000000 : v & 0xffffff;
 }
 
-inline INT32 namcos23_state::u32_to_s10(UINT32 v)
+inline int32_t namcos23_state::u32_to_s10(uint32_t v)
 {
 	return v & 0x200 ? v | 0xfffffe00 : v & 0x1ff;
 }
 
-float namcos23_state::f24_to_f32(UINT32 v)
+float namcos23_state::f24_to_f32(uint32_t v)
 {
 	// 8 bits exponent, 16 mantissa
 	// mantissa is 16-bits signed, 2-complement
@@ -1641,9 +1651,9 @@ float namcos23_state::f24_to_f32(UINT32 v)
 	if(!v)
 		return 0;
 
-	UINT32 r = v & 0x8000 ? 0x80000000 : 0;
-	UINT16 m = r ? -v : v;
-	UINT8 e = (v >> 16) + 0x60;
+	uint32_t r = v & 0x8000 ? 0x80000000 : 0;
+	uint16_t m = r ? -v : v;
+	uint8_t e = (v >> 16) + 0x60;
 	while(!(m & 0x8000)) {
 		m <<= 1;
 		e--;
@@ -1653,16 +1663,16 @@ float namcos23_state::f24_to_f32(UINT32 v)
 	return *(float *)&r;
 }
 
-static inline UINT8 light(UINT8 c, float l)
+static inline uint8_t light(uint8_t c, float l)
 {
 	if(l < 1)
 		l = l*c;
 	else
 		l = 255 - (255-c)/l;
-	return UINT8(l);
+	return uint8_t(l);
 }
 
-INT32 *namcos23_state::c435_getv(UINT16 id)
+int32_t *namcos23_state::c435_getv(uint16_t id)
 {
 	if(id == 0x8000)
 		return m_light_vector;
@@ -1673,7 +1683,7 @@ INT32 *namcos23_state::c435_getv(UINT16 id)
 	return m_vectors[id];
 }
 
-INT16 *namcos23_state::c435_getm(UINT16 id)
+int16_t *namcos23_state::c435_getm(uint16_t id)
 {
 	if(id >= 0x100) {
 		memset(m_spm, 0, sizeof(m_spm));
@@ -1682,7 +1692,7 @@ INT16 *namcos23_state::c435_getm(UINT16 id)
 	return m_matrices[id];
 }
 
-void namcos23_state::c435_state_set_interrupt(const UINT16 *param)
+void namcos23_state::c435_state_set_interrupt(const uint16_t *param)
 {
 	if(param[0] & 1)
 		update_main_interrupts(m_main_irqcause | MAIN_C435_IRQ);
@@ -1690,7 +1700,7 @@ void namcos23_state::c435_state_set_interrupt(const UINT16 *param)
 		update_main_interrupts(m_main_irqcause & ~MAIN_C435_IRQ);
 }
 
-void namcos23_state::c435_state_set_projection_matrix_line(const UINT16 *param)
+void namcos23_state::c435_state_set_projection_matrix_line(const uint16_t *param)
 {
 	// timecrs2:
 	//   sx = 640/2, sy = 480/2, t = tan(fov/2) (fov=45 degrees)
@@ -1707,7 +1717,7 @@ void namcos23_state::c435_state_set_projection_matrix_line(const UINT16 *param)
 	logerror(buf);
 }
 
-void namcos23_state::c435_state_set(UINT16 type, const UINT16 *param)
+void namcos23_state::c435_state_set(uint16_t type, const uint16_t *param)
 {
 	switch(type) {
 	case 0x0001: c435_state_set_interrupt(param); break;
@@ -1740,7 +1750,7 @@ WRITE16_MEMBER(namcos23_state::c435_state_pio_w)
 	m_c435_buffer_pos = 0;
 }
 
-int namcos23_state::c435_get_state_entry_size(UINT16 type)
+int namcos23_state::c435_get_state_entry_size(uint16_t type)
 {
 	switch(type) {
 	case 0x0001: return 1;
@@ -1767,19 +1777,19 @@ void namcos23_state::c435_matrix_matrix_mul() // 0.0
 	if(m_c435_buffer[3] != 0xffff)
 		logerror("WARNING: c435_matrix_matrix_mul with +2=%04x\n", m_c435_buffer[3]);
 
-	INT16 *t        = c435_getm(m_c435_buffer[1]);
-	const INT16 *m2 = c435_getm(m_c435_buffer[2]);
-	const INT16 *m1 = c435_getm(m_c435_buffer[4]);
+	int16_t *t        = c435_getm(m_c435_buffer[1]);
+	const int16_t *m2 = c435_getm(m_c435_buffer[2]);
+	const int16_t *m1 = c435_getm(m_c435_buffer[4]);
 
-	t[0] = INT16((m1[0]*m2[0] + m1[1]*m2[1] + m1[2]*m2[2]) >> 14);
-	t[1] = INT16((m1[0]*m2[3] + m1[1]*m2[4] + m1[2]*m2[5]) >> 14);
-	t[2] = INT16((m1[0]*m2[6] + m1[1]*m2[7] + m1[2]*m2[8]) >> 14);
-	t[3] = INT16((m1[3]*m2[0] + m1[4]*m2[1] + m1[5]*m2[2]) >> 14);
-	t[4] = INT16((m1[3]*m2[3] + m1[4]*m2[4] + m1[5]*m2[5]) >> 14);
-	t[5] = INT16((m1[3]*m2[6] + m1[4]*m2[7] + m1[5]*m2[8]) >> 14);
-	t[6] = INT16((m1[6]*m2[0] + m1[7]*m2[1] + m1[8]*m2[2]) >> 14);
-	t[7] = INT16((m1[6]*m2[3] + m1[7]*m2[4] + m1[8]*m2[5]) >> 14);
-	t[8] = INT16((m1[6]*m2[6] + m1[7]*m2[7] + m1[8]*m2[8]) >> 14);
+	t[0] = int16_t((m1[0]*m2[0] + m1[1]*m2[1] + m1[2]*m2[2]) >> 14);
+	t[1] = int16_t((m1[0]*m2[3] + m1[1]*m2[4] + m1[2]*m2[5]) >> 14);
+	t[2] = int16_t((m1[0]*m2[6] + m1[1]*m2[7] + m1[2]*m2[8]) >> 14);
+	t[3] = int16_t((m1[3]*m2[0] + m1[4]*m2[1] + m1[5]*m2[2]) >> 14);
+	t[4] = int16_t((m1[3]*m2[3] + m1[4]*m2[4] + m1[5]*m2[5]) >> 14);
+	t[5] = int16_t((m1[3]*m2[6] + m1[4]*m2[7] + m1[5]*m2[8]) >> 14);
+	t[6] = int16_t((m1[6]*m2[0] + m1[7]*m2[1] + m1[8]*m2[2]) >> 14);
+	t[7] = int16_t((m1[6]*m2[3] + m1[7]*m2[4] + m1[8]*m2[5]) >> 14);
+	t[8] = int16_t((m1[6]*m2[6] + m1[7]*m2[7] + m1[8]*m2[8]) >> 14);
 }
 
 void namcos23_state::c435_matrix_vector_mul() // 0.1
@@ -1794,23 +1804,23 @@ void namcos23_state::c435_matrix_vector_mul() // 0.1
 
 
 	if(m_c435_buffer[3] != 0xffff) {
-		INT32 *t        = c435_getv(m_c435_buffer[1]);
-		const INT16 *m  = c435_getm(m_c435_buffer[2]);
-		const INT32 *vt = c435_getv(m_c435_buffer[3]);
-		const INT32 *v  = c435_getv(m_c435_buffer[4]);
+		int32_t *t        = c435_getv(m_c435_buffer[1]);
+		const int16_t *m  = c435_getm(m_c435_buffer[2]);
+		const int32_t *vt = c435_getv(m_c435_buffer[3]);
+		const int32_t *v  = c435_getv(m_c435_buffer[4]);
 
-		t[0] = INT32((m[0]*INT64(v[0]) + m[1]*INT64(v[1]) + m[2]*INT64(v[2])) >> 14) + vt[0];
-		t[1] = INT32((m[3]*INT64(v[0]) + m[4]*INT64(v[1]) + m[5]*INT64(v[2])) >> 14) + vt[1];
-		t[2] = INT32((m[6]*INT64(v[0]) + m[7]*INT64(v[1]) + m[8]*INT64(v[2])) >> 14) + vt[2];
+		t[0] = int32_t((m[0]*int64_t(v[0]) + m[1]*int64_t(v[1]) + m[2]*int64_t(v[2])) >> 14) + vt[0];
+		t[1] = int32_t((m[3]*int64_t(v[0]) + m[4]*int64_t(v[1]) + m[5]*int64_t(v[2])) >> 14) + vt[1];
+		t[2] = int32_t((m[6]*int64_t(v[0]) + m[7]*int64_t(v[1]) + m[8]*int64_t(v[2])) >> 14) + vt[2];
 
 	} else {
-		INT32 *t       = c435_getv(m_c435_buffer[1]);
-		const INT16 *m = c435_getm(m_c435_buffer[2]);
-		const INT32 *v = c435_getv(m_c435_buffer[4]);
+		int32_t *t       = c435_getv(m_c435_buffer[1]);
+		const int16_t *m = c435_getm(m_c435_buffer[2]);
+		const int32_t *v = c435_getv(m_c435_buffer[4]);
 
-		t[0] = INT32((m[0]*INT64(v[0]) + m[1]*INT64(v[1]) + m[2]*INT64(v[2])) >> 14);
-		t[1] = INT32((m[3]*INT64(v[0]) + m[4]*INT64(v[1]) + m[5]*INT64(v[2])) >> 14);
-		t[2] = INT32((m[6]*INT64(v[0]) + m[7]*INT64(v[1]) + m[8]*INT64(v[2])) >> 14);
+		t[0] = int32_t((m[0]*int64_t(v[0]) + m[1]*int64_t(v[1]) + m[2]*int64_t(v[2])) >> 14);
+		t[1] = int32_t((m[3]*int64_t(v[0]) + m[4]*int64_t(v[1]) + m[5]*int64_t(v[2])) >> 14);
+		t[2] = int32_t((m[6]*int64_t(v[0]) + m[7]*int64_t(v[1]) + m[8]*int64_t(v[2])) >> 14);
 	}
 }
 
@@ -1824,7 +1834,7 @@ void namcos23_state::c435_matrix_set() // 0.4
 	if(m_c435_buffer[0] != 0x004a)
 		logerror("WARNING: c435_matrix_set header %04x\n", m_c435_buffer[0]);
 
-	INT16 *t = c435_getm(m_c435_buffer[1]);
+	int16_t *t = c435_getm(m_c435_buffer[1]);
 	for(int i=0; i<9; i++)
 		t[i] = m_c435_buffer[i+2];
 }
@@ -1838,7 +1848,7 @@ void namcos23_state::c435_vector_set() // 0.5
 	if(m_c435_buffer[0] != 0x057)
 		logerror("WARNING: c435_vector_set header %04x\n", m_c435_buffer[0]);
 
-	INT32 *t = c435_getv(m_c435_buffer[1]);
+	int32_t *t = c435_getv(m_c435_buffer[1]);
 	for(int i=0; i<3; i++)
 		t[i] = u32_to_s24((m_c435_buffer[2*i+2] << 16) | m_c435_buffer[2*i+3]);
 }
@@ -1886,8 +1896,8 @@ void namcos23_state::c435_render() // 8
 	}
 
 	// Vector and matrix may be inverted
-	const INT16 *m = c435_getm(m_c435_buffer[2]);
-	const INT32 *v = c435_getv(m_c435_buffer[3]);
+	const int16_t *m = c435_getm(m_c435_buffer[2]);
+	const int32_t *v = c435_getv(m_c435_buffer[3]);
 
 	namcos23_render_entry *re = render.entries[render.cur] + render.count[render.cur];
 	re->type = MODEL;
@@ -1923,10 +1933,10 @@ void namcos23_state::c435_flush() // c
 }
 
 
-void namcos23_state::c435_pio_w(UINT16 data)
+void namcos23_state::c435_pio_w(uint16_t data)
 {
 	m_c435_buffer[m_c435_buffer_pos++] = data;
-	UINT16 h = m_c435_buffer[0];
+	uint16_t h = m_c435_buffer[0];
 	int psize;
 	if((h & 0x4000) == 0x4000)
 		psize = h & 0xff;
@@ -1972,7 +1982,7 @@ void namcos23_state::c435_pio_w(UINT16 data)
 	m_c435_buffer_pos = 0;
 }
 
-void namcos23_state::c435_dma(address_space &space, UINT32 adr, UINT32 size)
+void namcos23_state::c435_dma(address_space &space, uint32_t adr, uint32_t size)
 {
 	adr &= 0x1fffffff;
 
@@ -2013,7 +2023,7 @@ WRITE32_MEMBER(namcos23_state::c435_w)
 
 
 
-void namcos23_renderer::render_scanline(INT32 scanline, const extent_t& extent, const namcos23_render_data& object, int threadid)
+void namcos23_renderer::render_scanline(int32_t scanline, const extent_t& extent, const namcos23_render_data& object, int threadid)
 {
 	const namcos23_render_data& rd = object;
 
@@ -2026,11 +2036,11 @@ void namcos23_renderer::render_scanline(INT32 scanline, const extent_t& extent, 
 	float dv = extent.param[2].dpdx;
 	float dl = extent.param[3].dpdx;
 
-	UINT32 *img = &object.bitmap->pix32(scanline, extent.startx);
+	uint32_t *img = &object.bitmap->pix32(scanline, extent.startx);
 
 	for(int x = extent.startx; x < extent.stopx; x++) {
 		float z = w ? 1/w : 0;
-		UINT32 pcol = rd.texture_lookup(*rd.machine, rd.pens, u*z, v*z);
+		uint32_t pcol = rd.texture_lookup(*rd.machine, rd.pens, u*z, v*z);
 		float ll = l*z;
 		*img = (light(pcol >> 16, ll) << 16) | (light(pcol >> 8, ll) << 8) | light(pcol, ll);
 
@@ -2042,14 +2052,14 @@ void namcos23_renderer::render_scanline(INT32 scanline, const extent_t& extent, 
 	}
 }
 
-void namcos23_state::render_apply_transform(INT32 xi, INT32 yi, INT32 zi, const namcos23_render_entry *re, poly_vertex &pv)
+void namcos23_state::render_apply_transform(int32_t xi, int32_t yi, int32_t zi, const namcos23_render_entry *re, poly_vertex &pv)
 {
-	pv.x =    (INT32((re->model.m[0]*INT64(xi) + re->model.m[1]*INT64(yi) + re->model.m[2]*INT64(zi)) >> 14)*re->model.scaling + re->model.v[0])/16384.0f;
-	pv.y =    (INT32((re->model.m[3]*INT64(xi) + re->model.m[4]*INT64(yi) + re->model.m[5]*INT64(zi)) >> 14)*re->model.scaling + re->model.v[1])/16384.0f;
-	pv.p[0] = (INT32((re->model.m[6]*INT64(xi) + re->model.m[7]*INT64(yi) + re->model.m[8]*INT64(zi)) >> 14)*re->model.scaling + re->model.v[2])/16384.0f;
+	pv.x =    (int32_t((re->model.m[0]*int64_t(xi) + re->model.m[1]*int64_t(yi) + re->model.m[2]*int64_t(zi)) >> 14)*re->model.scaling + re->model.v[0])/16384.0f;
+	pv.y =    (int32_t((re->model.m[3]*int64_t(xi) + re->model.m[4]*int64_t(yi) + re->model.m[5]*int64_t(zi)) >> 14)*re->model.scaling + re->model.v[1])/16384.0f;
+	pv.p[0] = (int32_t((re->model.m[6]*int64_t(xi) + re->model.m[7]*int64_t(yi) + re->model.m[8]*int64_t(zi)) >> 14)*re->model.scaling + re->model.v[2])/16384.0f;
 }
 
-void namcos23_state::render_apply_matrot(INT32 xi, INT32 yi, INT32 zi, const namcos23_render_entry *re, INT32 &x, INT32 &y, INT32 &z)
+void namcos23_state::render_apply_matrot(int32_t xi, int32_t yi, int32_t zi, const namcos23_render_entry *re, int32_t &x, int32_t &y, int32_t &z)
 {
 	x = (re->model.m[0]*xi + re->model.m[3]*yi + re->model.m[6]*zi) >> 14;
 	y = (re->model.m[1]*xi + re->model.m[4]*yi + re->model.m[7]*zi) >> 14;
@@ -2074,22 +2084,22 @@ void namcos23_state::render_project(poly_vertex &pv)
 	pv.p[0] = 1.0f / pv.p[0];
 }
 
-static UINT32 render_texture_lookup_nocache_point(running_machine &machine, const pen_t *pens, float x, float y)
+static uint32_t render_texture_lookup_nocache_point(running_machine &machine, const pen_t *pens, float x, float y)
 {
 	namcos23_state *state = machine.driver_data<namcos23_state>();
-	UINT32 xx = UINT32(x);
-	UINT32 yy = UINT32(y);
-	UINT32 tileid = ((xx >> 4) & 0xff) | ((yy << 4) & state->m_tileid_mask);
-	UINT8 attr = state->m_tmhrom[tileid >> 1];
+	uint32_t xx = uint32_t(x);
+	uint32_t yy = uint32_t(y);
+	uint32_t tileid = ((xx >> 4) & 0xff) | ((yy << 4) & state->m_tileid_mask);
+	uint8_t attr = state->m_tmhrom[tileid >> 1];
 	if(tileid & 1)
 		attr &= 15;
 	else
 		attr >>= 4;
-	UINT32 tile = (state->m_tmlrom[tileid] | (attr << 16)) & state->m_tile_mask;
+	uint32_t tile = (state->m_tmlrom[tileid] | (attr << 16)) & state->m_tile_mask;
 
 	// Probably swapx/swapy to add on bits 2-3 of attr
 	// Bits used by motoxgo at least
-	UINT8 color = state->m_texrom[(tile << 8) | ((yy << 4) & 0xf0) | (xx & 0x0f)];
+	uint8_t color = state->m_texrom[(tile << 8) | ((yy << 4) & 0xf0) | (xx & 0x0f)];
 	return pens[color];
 }
 
@@ -2104,7 +2114,7 @@ void namcos23_state::render_one_model(const namcos23_render_entry *re)
 	if(re->model.model == 3486)
 		return;
 
-	UINT32 adr = m_ptrom[re->model.model];
+	uint32_t adr = m_ptrom[re->model.model];
 	if(adr >= m_ptrom_limit) {
 		logerror("WARNING: model %04x base address %08x out-of-bounds - pointram?\n", re->model.model, adr);
 		return;
@@ -2113,11 +2123,11 @@ void namcos23_state::render_one_model(const namcos23_render_entry *re)
 	while(adr < m_ptrom_limit) {
 		poly_vertex pv[15];
 
-		UINT32 type = m_ptrom[adr++];
-		UINT32 h    = m_ptrom[adr++];
+		uint32_t type = m_ptrom[adr++];
+		uint32_t h    = m_ptrom[adr++];
 
 		float tbase = (type >> 24) << 12;
-		UINT8 color = (h >> 24) & 0x7f;
+		uint8_t color = (h >> 24) & 0x7f;
 		int lmode = (type >> 19) & 3;
 		int ne = (type >> 8) & 15;
 
@@ -2125,8 +2135,8 @@ void namcos23_state::render_one_model(const namcos23_render_entry *re)
 		if(type & 0x00001000)
 			adr++;
 
-		UINT32 light = 0;
-		UINT32 extptr = 0;
+		uint32_t light = 0;
+		uint32_t extptr = 0;
 
 		if(lmode == 3) {
 			extptr = adr;
@@ -2139,9 +2149,9 @@ void namcos23_state::render_one_model(const namcos23_render_entry *re)
 		float maxz = FLT_MIN;
 
 		for(int i=0; i<ne; i++) {
-			UINT32 v1 = m_ptrom[adr++];
-			UINT32 v2 = m_ptrom[adr++];
-			UINT32 v3 = m_ptrom[adr++];
+			uint32_t v1 = m_ptrom[adr++];
+			uint32_t v2 = m_ptrom[adr++];
+			uint32_t v3 = m_ptrom[adr++];
 
 			render_apply_transform(u32_to_s24(v1), u32_to_s24(v2), u32_to_s24(v3), re, pv[i]);
 			pv[i].p[1] = (((v1 >> 20) & 0xf00) | ((v2 >> 24 & 0xff))) + 0.5;
@@ -2163,11 +2173,11 @@ void namcos23_state::render_one_model(const namcos23_render_entry *re)
 				pv[i].p[3] = 1.0;
 				break;
 			case 3: {
-				UINT32 norm = m_ptrom[extptr++];
-				INT32 nx = u32_to_s10(norm >> 20);
-				INT32 ny = u32_to_s10(norm >> 10);
-				INT32 nz = u32_to_s10(norm);
-				INT32 nrx, nry, nrz;
+				uint32_t norm = m_ptrom[extptr++];
+				int32_t nx = u32_to_s10(norm >> 20);
+				int32_t ny = u32_to_s10(norm >> 10);
+				int32_t nz = u32_to_s10(norm);
+				int32_t nrx, nry, nrz;
 				render_apply_matrot(nx, ny, nz, re, nrx, nry, nrz);
 				float lsi = float(nrx*m_light_vector[0] + nry*m_light_vector[1] + nrz*m_light_vector[2])/4194304.0f;
 				if(lsi < 0)
@@ -2277,13 +2287,13 @@ void namcos23_renderer::render_flush(bitmap_rgb32& bitmap)
 
 		// We should probably split the polygons into triangles ourselves to insure everything is being rendered properly
 		if (p->vertex_count == 3)
-			render_triangle(scissor, render_delegate(FUNC(namcos23_renderer::render_scanline), this), 4, p->pv[0], p->pv[1], p->pv[2]);
+			render_triangle(scissor, render_delegate(&namcos23_renderer::render_scanline, this), 4, p->pv[0], p->pv[1], p->pv[2]);
 		else if (p->vertex_count == 4)
-			render_polygon<4>(scissor, render_delegate(FUNC(namcos23_renderer::render_scanline), this), 4, p->pv);
+			render_polygon<4>(scissor, render_delegate(&namcos23_renderer::render_scanline, this), 4, p->pv);
 		else if (p->vertex_count == 5)
-			render_polygon<5>(scissor, render_delegate(FUNC(namcos23_renderer::render_scanline), this), 4, p->pv);
+			render_polygon<5>(scissor, render_delegate(&namcos23_renderer::render_scanline, this), 4, p->pv);
 		else if (p->vertex_count == 6)
-			render_polygon<6>(scissor, render_delegate(FUNC(namcos23_renderer::render_scanline), this), 4, p->pv);
+			render_polygon<6>(scissor, render_delegate(&namcos23_renderer::render_scanline, this), 4, p->pv);
 	}
 	render.poly_count = 0;
 }
@@ -2346,7 +2356,7 @@ WRITE32_MEMBER(namcos23_state::paletteram_w)
 
 TILE_GET_INFO_MEMBER(namcos23_state::TextTilemapGetInfo)
 {
-	UINT16 data = nthword( m_textram,tile_index );
+	uint16_t data = nthword( m_textram,tile_index );
 	/**
 	* xxxx.----.----.---- palette select
 	* ----.xx--.----.---- flip
@@ -2374,15 +2384,15 @@ WRITE32_MEMBER(namcos23_state::textchar_w)
 
 VIDEO_START_MEMBER(namcos23_state,s23)
 {
-	m_gfxdecode->gfx(0)->set_source(reinterpret_cast<UINT8 *>(m_charram.target()));
-	m_bgtilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos23_state::TextTilemapGetInfo),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	m_gfxdecode->gfx(0)->set_source(reinterpret_cast<uint8_t *>(m_charram.target()));
+	m_bgtilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos23_state::TextTilemapGetInfo),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
 	m_bgtilemap->set_transparent_pen(0xf);
 	m_bgtilemap->set_scrolldx(860, 860);
 	m_render.polymgr = std::make_unique<namcos23_renderer>(*this);
 }
 
 
-UINT32 namcos23_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t namcos23_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	update_mixer();
 	bitmap.fill(m_c404.bgcolor, cliprect);
@@ -2411,9 +2421,9 @@ UINT32 namcos23_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 
 // Interrupts
 
-void namcos23_state::update_main_interrupts(UINT32 cause)
+void namcos23_state::update_main_interrupts(uint32_t cause)
 {
-	UINT32 changed = cause ^ m_main_irqcause;
+	uint32_t changed = cause ^ m_main_irqcause;
 	m_main_irqcause = cause;
 
 	// level 2: vblank
@@ -2450,11 +2460,11 @@ INTERRUPT_GEN_MEMBER(namcos23_state::interrupt)
 	m_render.count[m_render.cur] = 0;
 }
 
-void namcos23_state::sub_irq(screen_device &screen, bool vblank_state)
+WRITE_LINE_MEMBER(namcos23_state::sub_irq)
 {
-	m_subcpu->set_input_line(1, vblank_state ? ASSERT_LINE : CLEAR_LINE);
-	m_adc->adtrg_w(vblank_state);
-	m_sub_portb = (m_sub_portb & 0x7f) | (vblank_state << 7);
+	m_subcpu->set_input_line(1, state ? ASSERT_LINE : CLEAR_LINE);
+	m_adc->adtrg_w(state);
+	m_sub_portb = (m_sub_portb & 0x7f) | (state << 7);
 }
 
 
@@ -2799,7 +2809,7 @@ READ16_MEMBER(namcos23_state::ctl_r)
 	case 1:
 		return 0x0000 | ioport("DSW")->read() | ((m_main_irqcause & MAIN_C361_IRQ) ? 0x400 : 0);
 	case 2: case 3: {
-		UINT16 res = m_ctl_inp_buffer[offset-2] & 0x800 ? 0xffff : 0x0000;
+		uint16_t res = m_ctl_inp_buffer[offset-2] & 0x800 ? 0xffff : 0x0000;
 		m_ctl_inp_buffer[offset-2] = (m_ctl_inp_buffer[offset-2] << 1) | 1;
 		return res;
 	}
@@ -2967,7 +2977,7 @@ ADDRESS_MAP_END
 
 WRITE16_MEMBER(namcos23_state::sharedram_sub_w)
 {
-	UINT16 *shared16 = reinterpret_cast<UINT16 *>(m_shared_ram.target());
+	uint16_t *shared16 = reinterpret_cast<uint16_t *>(m_shared_ram.target());
 
 	// fake that an I/O board is connected for games w/o a dump or that aren't properly communicating with it yet
 	if(!m_has_jvsio) {
@@ -2981,7 +2991,7 @@ WRITE16_MEMBER(namcos23_state::sharedram_sub_w)
 
 READ16_MEMBER(namcos23_state::sharedram_sub_r)
 {
-	UINT16 *shared16 = reinterpret_cast<UINT16 *>(m_shared_ram.target());
+	uint16_t *shared16 = reinterpret_cast<uint16_t *>(m_shared_ram.target());
 
 	return shared16[BYTE_XOR_BE(offset)];
 }
@@ -3113,7 +3123,7 @@ WRITE16_MEMBER(namcos23_state::iob_p4_w)
 READ16_MEMBER(namcos23_state::iob_p6_r)
 {
 	// d4 is service button
-	UINT8 sb = (ioport("SERVICE")->read() & 1) << 4;
+	uint8_t sb = (ioport("SERVICE")->read() & 1) << 4;
 	// other bits: unknown
 
 	return sb | 0;
@@ -3129,7 +3139,7 @@ WRITE16_MEMBER(namcos23_state::iob_p6_w)
 
 READ16_MEMBER(namcos23_state::iob_analog_r)
 {
-	return read_safe(m_adc_ports[offset], 0);
+	return m_adc_ports[offset].read_safe(0);
 }
 
 
@@ -3156,8 +3166,8 @@ ADDRESS_MAP_END
 
 READ8_MEMBER(namcos23_state::iob_gun_r)
 {
-	UINT16 xpos = m_lightx->read();
-	UINT16 ypos = m_lighty->read();
+	uint16_t xpos = m_lightx->read();
+	uint16_t ypos = m_lighty->read();
 	// ypos is not completely understood yet, there should be a difference between case 1/4 and 2/5
 
 	switch(offset) {
@@ -3435,7 +3445,7 @@ void namcos23_state::machine_start()
 	m_c361.timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(namcos23_state::c361_timer_cb),this));
 	m_c361.timer->adjust(attotime::never);
 
-	m_maincpu->add_fastram(0, m_mainram.bytes()-1, FALSE, reinterpret_cast<UINT32 *>(memshare("mainram")->ptr()));
+	m_maincpu->add_fastram(0, m_mainram.bytes()-1, false, reinterpret_cast<uint32_t *>(memshare("mainram")->ptr()));
 }
 
 
@@ -3458,8 +3468,8 @@ MACHINE_RESET_MEMBER(namcos23_state,gmen)
 
 DRIVER_INIT_MEMBER(namcos23_state,s23)
 {
-	m_ptrom  = (const UINT32 *)memregion("pointrom")->base();
-	m_tmlrom = (const UINT16 *)memregion("textilemapl")->base();
+	m_ptrom  = (const uint32_t *)memregion("pointrom")->base();
+	m_tmlrom = (const uint16_t *)memregion("textilemapl")->base();
 	m_tmhrom = memregion("textilemaph")->base();
 	m_texrom = memregion("textile")->base();
 
@@ -3497,6 +3507,7 @@ DRIVER_INIT_MEMBER(namcos23_state,s23)
 		(!strcmp(machine().system().name, "crszonev3a")) ||
 		(!strcmp(machine().system().name, "crszonev2a")) ||
 		(!strcmp(machine().system().name, "timecrs2v2b")) ||
+		(!strcmp(machine().system().name, "timecrs2v1b")) ||
 		(!strcmp(machine().system().name, "timecrs2"))) {
 		m_has_jvsio = 1;
 	} else {
@@ -3525,7 +3536,7 @@ static GFXDECODE_START( namcos23 )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( gorgon, namcos23_state )
+static MACHINE_CONFIG_START( gorgon )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", R4650BE, BUSCLOCK*4)
@@ -3558,13 +3569,10 @@ static MACHINE_CONFIG_START( gorgon, namcos23_state )
 	MCFG_RTC4543_ADD("rtc", XTAL_32_768kHz)
 	MCFG_RTC4543_DATA_CALLBACK(DEVWRITELINE("subcpu:sci1", h8_sci_device, rx_w))
 
-	MCFG_LINE_DISPATCH_ADD("clk_dispatch", 2)
-	MCFG_LINE_DISPATCH_FWD_CB(0, 2, DEVWRITELINE(":rtc", rtc4543_device, clk_w)) MCFG_DEVCB_INVERT
-	MCFG_LINE_DISPATCH_FWD_CB(1, 2, DEVWRITELINE(":namco_settings", namco_settings_device, clk_w))
-
 	MCFG_DEVICE_MODIFY("subcpu:sci1")
 	MCFG_H8_SCI_TX_CALLBACK(DEVWRITELINE(":namco_settings", namco_settings_device, data_w))
-	MCFG_H8_SCI_CLK_CALLBACK(DEVWRITELINE(":clk_dispatch", devcb_line_dispatch_device<2>, in_w))
+	MCFG_H8_SCI_CLK_CALLBACK(DEVWRITELINE(":rtc", rtc4543_device, clk_w)) MCFG_DEVCB_INVERT
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE(":namco_settings", namco_settings_device, clk_w))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -3575,7 +3583,7 @@ static MACHINE_CONFIG_START( gorgon, namcos23_state )
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos23_state, screen_update)
-	MCFG_SCREEN_VBLANK_DRIVER(namcos23_state, sub_irq)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(namcos23_state, sub_irq))
 
 	MCFG_PALETTE_ADD("palette", 0x8000)
 
@@ -3587,14 +3595,14 @@ static MACHINE_CONFIG_START( gorgon, namcos23_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_C352_ADD("c352", C352CLOCK, C352DIV)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 1.00)
-	MCFG_SOUND_ROUTE(1, "lspeaker", 1.00)
-	MCFG_SOUND_ROUTE(2, "rspeaker", 1.00)
-	MCFG_SOUND_ROUTE(3, "lspeaker", 1.00)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
+	MCFG_SOUND_ROUTE(2, "lspeaker", 1.00)
+	MCFG_SOUND_ROUTE(3, "rspeaker", 1.00)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( s23, namcos23_state )
+static MACHINE_CONFIG_START( s23 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", R4650BE, BUSCLOCK*4)
@@ -3627,13 +3635,10 @@ static MACHINE_CONFIG_START( s23, namcos23_state )
 	MCFG_RTC4543_ADD("rtc", XTAL_32_768kHz)
 	MCFG_RTC4543_DATA_CALLBACK(DEVWRITELINE("subcpu:sci1", h8_sci_device, rx_w))
 
-	MCFG_LINE_DISPATCH_ADD("clk_dispatch", 2)
-	MCFG_LINE_DISPATCH_FWD_CB(0, 2, DEVWRITELINE(":rtc", rtc4543_device, clk_w)) MCFG_DEVCB_INVERT
-	MCFG_LINE_DISPATCH_FWD_CB(1, 2, DEVWRITELINE(":namco_settings", namco_settings_device, clk_w))
-
 	MCFG_DEVICE_MODIFY("subcpu:sci1")
 	MCFG_H8_SCI_TX_CALLBACK(DEVWRITELINE(":namco_settings", namco_settings_device, data_w))
-	MCFG_H8_SCI_CLK_CALLBACK(DEVWRITELINE(":clk_dispatch", devcb_line_dispatch_device<2>, in_w))
+	MCFG_H8_SCI_CLK_CALLBACK(DEVWRITELINE(":rtc", rtc4543_device, clk_w)) MCFG_DEVCB_INVERT
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE(":namco_settings", namco_settings_device, clk_w))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -3644,7 +3649,7 @@ static MACHINE_CONFIG_START( s23, namcos23_state )
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos23_state, screen_update)
-	MCFG_SCREEN_VBLANK_DRIVER(namcos23_state, sub_irq)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(namcos23_state, sub_irq))
 
 	MCFG_PALETTE_ADD("palette", 0x8000)
 
@@ -3683,7 +3688,7 @@ static MACHINE_CONFIG_DERIVED( gmen, s23 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( ss23, namcos23_state )
+static MACHINE_CONFIG_START( ss23 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", R4650BE, BUSCLOCK*5)
@@ -3707,13 +3712,10 @@ static MACHINE_CONFIG_START( ss23, namcos23_state )
 	MCFG_RTC4543_ADD("rtc", XTAL_32_768kHz)
 	MCFG_RTC4543_DATA_CALLBACK(DEVWRITELINE("subcpu:sci1", h8_sci_device, rx_w))
 
-	MCFG_LINE_DISPATCH_ADD("clk_dispatch", 2)
-	MCFG_LINE_DISPATCH_FWD_CB(0, 2, DEVWRITELINE(":rtc", rtc4543_device, clk_w)) MCFG_DEVCB_INVERT
-	MCFG_LINE_DISPATCH_FWD_CB(1, 2, DEVWRITELINE(":namco_settings", namco_settings_device, clk_w))
-
 	MCFG_DEVICE_MODIFY("subcpu:sci1")
 	MCFG_H8_SCI_TX_CALLBACK(DEVWRITELINE(":namco_settings", namco_settings_device, data_w))
-	MCFG_H8_SCI_CLK_CALLBACK(DEVWRITELINE(":clk_dispatch", devcb_line_dispatch_device<2>, in_w))
+	MCFG_H8_SCI_CLK_CALLBACK(DEVWRITELINE(":rtc", rtc4543_device, clk_w)) MCFG_DEVCB_INVERT
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE(":namco_settings", namco_settings_device, clk_w))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -3724,7 +3726,7 @@ static MACHINE_CONFIG_START( ss23, namcos23_state )
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos23_state, screen_update)
-	MCFG_SCREEN_VBLANK_DRIVER(namcos23_state, sub_irq)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(namcos23_state, sub_irq))
 
 	MCFG_PALETTE_ADD("palette", 0x8000)
 
@@ -4105,6 +4107,52 @@ ROM_START( motoxgov2a )
 	ROM_LOAD( "mg1ccrh.7k",   0x400000, 0x200000, CRC(2e77597d) SHA1(58dd83c1b0c08115e728c5e7dea5e62135b821ba) )
 ROM_END
 
+ROM_START( motoxgov2a2 )
+	ROM_REGION32_BE( 0x400000, "user1", 0 ) /* 4 megs for main R4650 code */
+	ROM_LOAD16_BYTE( "mg2vera1.ic2",  0x000000, 0x200000, CRC(0deab179) SHA1(9b45c0db3921bdfcd0eb220939a1197d8dd2860b) )
+	ROM_LOAD16_BYTE( "mg2vera1.ic1",  0x000001, 0x200000, CRC(4b1bc511) SHA1(884c08a0d09e885582283c0b3a5e56a184ccd1b5) )
+
+	ROM_REGION( 0x80000, "subcpu", 0 )  /* Hitachi H8/3002 MCU code */
+	ROM_LOAD16_WORD_SWAP( "mg3vera.ic3",  0x000000, 0x080000, CRC(9e3d46a8) SHA1(9ffa5b91ea51cc0fb97def25ce47efa3441f3c6f) )
+
+	ROM_REGION( 0x40000, "iocpu", 0 )   /* I/O board HD643334 H8/3334 MCU code */
+	ROM_LOAD( "asca-3a.ic14", 0x000000, 0x040000, CRC(8e9266e5) SHA1(ffa8782ca641d71d57df23ed1c5911db05d3df97) )
+
+	ROM_REGION( 0x20000, "exioboard", 0 )   /* "extra" I/O board (uses Fujitsu MB90611A MCU) */
+	ROM_LOAD( "mg1prog0a.3a", 0x000000, 0x020000, CRC(b2b5be8f) SHA1(803652b7b8fde2196b7fb742ba8b9843e4fcd2de) )
+
+	ROM_REGION32_BE( 0x2000000, "data", ROMREGION_ERASEFF ) /* data roms */
+	ROM_LOAD16_BYTE( "mg1mtah.2j",   0x000000, 0x800000, CRC(845f4768) SHA1(9c03b1f6dcd9d1f43c2958d855221be7f9415c47) )
+	ROM_LOAD16_BYTE( "mg1mtal.2h",   0x000001, 0x800000, CRC(fdad0f0a) SHA1(420d50f012af40f80b196d3aae320376e6c32367) )
+
+	ROM_REGION( 0x2000000, "textile", ROMREGION_ERASEFF )   /* texture tiles */
+	ROM_LOAD( "mg1cgll.4m",   0x0000000, 0x800000, CRC(175dfe34) SHA1(66ae35b0084159aea1afeb1a6486fffa635992b5) )
+	ROM_LOAD( "mg1cglm.4k",   0x0800000, 0x800000, CRC(b3e648e7) SHA1(98018ae2276f905a7f74e1dab540a44247524436) )
+	ROM_LOAD( "mg1cgum.4j",   0x1000000, 0x800000, CRC(46a77d73) SHA1(132ce2452ee68ba374e98b59032ac0a1a277078d) )
+
+	ROM_REGION16_LE( 0x400000, "textilemapl", 0 )   /* texture tilemap 0-15 */
+	ROM_LOAD( "mg1ccrl.7f",   0x000000, 0x400000, CRC(5372e300) SHA1(63a49782289ed93a321ca7d193241fb83ca97e6b) )
+
+	ROM_REGION( 0x200000, "textilemaph", 0 )        /* texture tilemap 16-17 + attr */
+	ROM_LOAD( "mg1ccrh.7e",   0x000000, 0x200000, CRC(2e77597d) SHA1(58dd83c1b0c08115e728c5e7dea5e62135b821ba) )
+
+	ROM_REGION32_BE( 0x1000000, "pointrom", ROMREGION_ERASEFF ) /* 3D model data */
+	ROM_LOAD32_WORD_SWAP( "mg1pt0h.7a",   0x000000, 0x400000, CRC(c9ba1b47) SHA1(42ec0638edb4c502ff0a340c4cf590bdd767cfe2) )
+	ROM_LOAD32_WORD_SWAP( "mg1pt0l.7c",   0x000002, 0x400000, CRC(3b9e95d3) SHA1(d7823ed6c590669ccd4098ed439599a3eb814ed1) )
+	ROM_LOAD32_WORD_SWAP( "mg1pt1h.5a",   0x800000, 0x400000, CRC(8d4f7097) SHA1(004e9ed0b5d6ce83ffadb9bd429fa7560abdb598) )
+	ROM_LOAD32_WORD_SWAP( "mg1pt1l.5c",   0x800002, 0x400000, CRC(0dd2f358) SHA1(3537e6be3fec9fec8d5a8dd02d9cf67b3805f8f0) )
+
+	ROM_REGION( 0x1000000, "c352", ROMREGION_ERASEFF ) /* C352 PCM samples */
+	ROM_LOAD( "mg1wavel.2c",  0x000000, 0x800000, CRC(f78b1b4d) SHA1(47cd654ec0a69de0dc81b8d83692eebf5611228b) )
+	ROM_LOAD( "mg1waveh.2a",  0x800000, 0x800000, CRC(8cb73877) SHA1(2e2b170c7ff889770c13b4ab7ac316b386ada153) )
+
+	ROM_REGION( 0x800000, "dups", 0 )   /* duplicate roms */
+	ROM_LOAD( "mg1cgll.5m",   0x000000, 0x800000, CRC(175dfe34) SHA1(66ae35b0084159aea1afeb1a6486fffa635992b5) )
+	ROM_LOAD( "mg1cglm.5k",   0x000000, 0x800000, CRC(b3e648e7) SHA1(98018ae2276f905a7f74e1dab540a44247524436) )
+	ROM_LOAD( "mg1cgum.5j",   0x000000, 0x800000, CRC(46a77d73) SHA1(132ce2452ee68ba374e98b59032ac0a1a277078d) )
+	ROM_LOAD( "mg1ccrl.7m",   0x000000, 0x400000, CRC(5372e300) SHA1(63a49782289ed93a321ca7d193241fb83ca97e6b) )
+	ROM_LOAD( "mg1ccrh.7k",   0x400000, 0x200000, CRC(2e77597d) SHA1(58dd83c1b0c08115e728c5e7dea5e62135b821ba) )
+ROM_END
 
 ROM_START( motoxgov1a )
 	ROM_REGION32_BE( 0x400000, "user1", 0 ) /* 4 megs for main R4650 code */
@@ -4208,7 +4256,7 @@ ROM_START( timecrs2 )
 	ROM_LOAD16_BYTE( "tss3verb.1",   0x000001, 0x200000, CRC(6e3f232b) SHA1(8007d8f31a605a5df89938d7c9f9d3d209c934be) )
 
 	ROM_REGION( 0x80000, "subcpu", 0 )  /* Hitachi H8/3002 MCU code */
-	ROM_LOAD16_WORD_SWAP( "tss3verb.3",   0x000000, 0x080000, CRC(41e41994) SHA1(eabc1a307c329070bfc6486cb68169c94ff8a162) )
+	ROM_LOAD16_WORD_SWAP( "tss1vera.3",   0x000000, 0x080000, CRC(41e41994) SHA1(eabc1a307c329070bfc6486cb68169c94ff8a162) ) /* Flash ROM type 29F400TC - Common code throughout all versions */
 
 	ROM_REGION( 0x40000, "iocpu", 0 )   /* I/O board HD643334 H8/3334 MCU code */
 	ROM_LOAD( "tssioprog.ic3", 0x000000, 0x040000, CRC(edad4538) SHA1(1330189184a636328d956c0e435f8d9ad2e96a80) )
@@ -4247,11 +4295,54 @@ ROM_END
 
 ROM_START( timecrs2v2b )
 	ROM_REGION32_BE( 0x400000, "user1", 0 ) /* 4 megs for main R4650 code */
-	ROM_LOAD16_BYTE( "tss2verb.ic2", 0x000000, 0x200000, BAD_DUMP CRC(9f56a4df) SHA1(5ecb3cd93726ab6be02762853fd6a45266d6c0bc) )
-	ROM_LOAD16_BYTE( "tss2verb.ic1", 0x000001, 0x200000, BAD_DUMP CRC(aa147f71) SHA1(e00267d1a8286942c83dc35289ad65bd3cb6d8db) )
+	ROM_LOAD16_BYTE( "tss2verb.2", 0x000000, 0x200000, BAD_DUMP CRC(9f56a4df) SHA1(5ecb3cd93726ab6be02762853fd6a45266d6c0bc) )
+	ROM_LOAD16_BYTE( "tss2verb.1", 0x000001, 0x200000, BAD_DUMP CRC(aa147f71) SHA1(e00267d1a8286942c83dc35289ad65bd3cb6d8db) )
 
 	ROM_REGION( 0x80000, "subcpu", 0 )  /* Hitachi H8/3002 MCU code */
-	ROM_LOAD16_WORD_SWAP( "tss3verb.3",   0x000000, 0x080000, CRC(41e41994) SHA1(eabc1a307c329070bfc6486cb68169c94ff8a162) )
+	ROM_LOAD16_WORD_SWAP( "tss1vera.3",   0x000000, 0x080000, CRC(41e41994) SHA1(eabc1a307c329070bfc6486cb68169c94ff8a162) ) /* Flash ROM type 29F400TC - Common code throughout all versions */
+
+	ROM_REGION( 0x40000, "iocpu", 0 )   /* I/O board HD643334 H8/3334 MCU code */
+	ROM_LOAD( "tssioprog.ic3", 0x000000, 0x040000, CRC(edad4538) SHA1(1330189184a636328d956c0e435f8d9ad2e96a80) )
+
+	ROM_REGION32_BE( 0x2000000, "data", 0 ) /* data roms */
+	ROM_LOAD16_BYTE( "tss1mtah.2j",  0x0000000, 0x800000, CRC(697c26ed) SHA1(72f6f69e89496ba0c6183b35c3bde71f5a3c721f) )
+	ROM_LOAD16_BYTE( "tss1mtal.2h",  0x0000001, 0x800000, CRC(bfc79190) SHA1(04bda00c4cc5660d27af4f3b0ee3550dea8d3805) )
+	ROM_LOAD16_BYTE( "tss1mtbh.2m",  0x1000000, 0x800000, CRC(82582776) SHA1(7c790d09bac660ea1c62da3ffb21ab43f2461594) )
+	ROM_LOAD16_BYTE( "tss1mtbl.2f",  0x1000001, 0x800000, CRC(e648bea4) SHA1(3803d03e72b25fbcc124d5b25066d25629b76b94) )
+
+	ROM_REGION( 0x2000000, "textile", 0 )   /* texture tiles */
+	ROM_LOAD( "tss1cgll.4m",  0x0000000, 0x800000, CRC(18433aaa) SHA1(08539beb2e66ec4e41062621fc098b121c669546) )
+	ROM_LOAD( "tss1cglm.4k",  0x0800000, 0x800000, CRC(669974c2) SHA1(cfebe199631e38f547b38fcd35f1645b74e8dd0a) )
+	ROM_LOAD( "tss1cgum.4j",  0x1000000, 0x800000, CRC(c22739e1) SHA1(8671ee047bb248033656c50befd1c35e5e478e1a) )
+	ROM_LOAD( "tss1cguu.4f",  0x1800000, 0x800000, CRC(76924e04) SHA1(751065d6ce658cbbcd88f854f6937ebd2204ec68) )
+
+	ROM_REGION16_LE( 0x400000, "textilemapl", 0 )   /* texture tilemap 0-15 */
+	ROM_LOAD( "tss1ccrl.7f",  0x000000, 0x400000, CRC(3a325fe7) SHA1(882735dce7aeb36f9e88a983498360f5de901e9d) )
+
+	ROM_REGION( 0x200000, "textilemaph", 0 )        /* texture tilemap 16-17 + attr */
+	ROM_LOAD( "tss1ccrh.7e",  0x000000, 0x200000, CRC(f998de1a) SHA1(371f540f505608297c5ffcfb623b983ca8310afb) )
+
+	ROM_REGION32_BE( 0x2000000, "pointrom", 0 ) /* 3D model data */
+	ROM_LOAD32_WORD_SWAP( "tss1pt0h.7a",  0x0000000, 0x400000, CRC(cdbe0ba8) SHA1(f8c6da31654c0a2a8024888ffb7fc1c783b2d629) )
+	ROM_LOAD32_WORD_SWAP( "tss1pt0l.7c",  0x0000002, 0x400000, CRC(896f0fb4) SHA1(bdfa99eb21ce4fc8021f9d95a5558a34f9942c57) )
+	ROM_LOAD32_WORD_SWAP( "tss1pt1h.5a",  0x0800000, 0x400000, CRC(63647596) SHA1(833412be8f61686bd7e06c2738df740e0e585d0f) )
+	ROM_LOAD32_WORD_SWAP( "tss1pt1l.5c",  0x0800002, 0x400000, CRC(5a09921f) SHA1(c23885708c7adf0b81c2c9346e21b869634a5b35) )
+	ROM_LOAD32_WORD_SWAP( "tss1pt2h.4a",  0x1000000, 0x400000, CRC(9b06e22d) SHA1(cff5ed098112a4f0a2bc8937e226f50066e605b1) )
+	ROM_LOAD32_WORD_SWAP( "tss1pt2l.4c",  0x1000002, 0x400000, CRC(4b230d79) SHA1(794cee0a19993e90913f58507c53224f361e9663) )
+
+	ROM_REGION( 0x1000000, "c352", 0 ) /* C352 PCM samples */
+	ROM_LOAD( "tss1wavel.2c", 0x000000, 0x800000, CRC(deaead26) SHA1(72dac0c3f41d4c3c290f9eb1b50236ae3040a472) )
+	ROM_LOAD( "tss1waveh.2a", 0x800000, 0x800000, CRC(5c8758b4) SHA1(b85c8f6869900224ef83a2340b17f5bbb2801af9) )
+ROM_END
+
+
+ROM_START( timecrs2v1b )
+	ROM_REGION32_BE( 0x400000, "user1", 0 ) /* 4 megs for main R4650 code */
+	ROM_LOAD16_BYTE( "tss1verb.2", 0x000000, 0x200000, CRC(10ebcb71) SHA1(9aeb9bf70f8a5949927ed84490b9212b19fe57ab) ) /* Flash ROM type 29F016A */
+	ROM_LOAD16_BYTE( "tss1verb.1", 0x000001, 0x200000, CRC(4f9a38ef) SHA1(7e38dae63b68f7ab43355b22247938d6e8f43dee) ) /* Flash ROM type 29F016A */
+
+	ROM_REGION( 0x80000, "subcpu", 0 )  /* Hitachi H8/3002 MCU code */
+	ROM_LOAD16_WORD_SWAP( "tss1vera.3",   0x000000, 0x080000, CRC(41e41994) SHA1(eabc1a307c329070bfc6486cb68169c94ff8a162) ) /* Flash ROM type 29F400TC - Common code throughout all versions */
 
 	ROM_REGION( 0x40000, "iocpu", 0 )   /* I/O board HD643334 H8/3334 MCU code */
 	ROM_LOAD( "tssioprog.ic3", 0x000000, 0x040000, CRC(edad4538) SHA1(1330189184a636328d956c0e435f8d9ad2e96a80) )
@@ -4294,7 +4385,50 @@ ROM_START( timecrs2v4a )
 	ROM_LOAD16_BYTE( "tss4vera.1",   0x000001, 0x200000, CRC(26f57c83) SHA1(c8983c26b7524a35257a242b66a9413eb354ca0d) )
 
 	ROM_REGION( 0x80000, "subcpu", 0 )  /* Hitachi H8/3002 MCU code */
-	ROM_LOAD16_WORD_SWAP( "tss4vera.3",   0x000000, 0x080000, CRC(41e41994) SHA1(eabc1a307c329070bfc6486cb68169c94ff8a162) )
+	ROM_LOAD16_WORD_SWAP( "tss1vera.3",   0x000000, 0x080000, CRC(41e41994) SHA1(eabc1a307c329070bfc6486cb68169c94ff8a162) ) /* Flash ROM type 29F400TC - Common code throughout all versions */
+
+	ROM_REGION( 0x40000, "iocpu", 0 )   /* I/O board HD643334 H8/3334 MCU code */
+	ROM_LOAD( "tssioprog.ic3", 0x000000, 0x040000, CRC(edad4538) SHA1(1330189184a636328d956c0e435f8d9ad2e96a80) )
+
+	ROM_REGION32_BE( 0x2000000, "data", 0 ) /* data roms */
+	ROM_LOAD16_BYTE( "tss1mtah.2j",  0x0000000, 0x800000, CRC(697c26ed) SHA1(72f6f69e89496ba0c6183b35c3bde71f5a3c721f) )
+	ROM_LOAD16_BYTE( "tss1mtal.2h",  0x0000001, 0x800000, CRC(bfc79190) SHA1(04bda00c4cc5660d27af4f3b0ee3550dea8d3805) )
+	ROM_LOAD16_BYTE( "tss1mtbh.2m",  0x1000000, 0x800000, CRC(82582776) SHA1(7c790d09bac660ea1c62da3ffb21ab43f2461594) )
+	ROM_LOAD16_BYTE( "tss1mtbl.2f",  0x1000001, 0x800000, CRC(e648bea4) SHA1(3803d03e72b25fbcc124d5b25066d25629b76b94) )
+
+	ROM_REGION( 0x2000000, "textile", 0 )   /* texture tiles */
+	ROM_LOAD( "tss1cgll.4m",  0x0000000, 0x800000, CRC(18433aaa) SHA1(08539beb2e66ec4e41062621fc098b121c669546) )
+	ROM_LOAD( "tss1cglm.4k",  0x0800000, 0x800000, CRC(669974c2) SHA1(cfebe199631e38f547b38fcd35f1645b74e8dd0a) )
+	ROM_LOAD( "tss1cgum.4j",  0x1000000, 0x800000, CRC(c22739e1) SHA1(8671ee047bb248033656c50befd1c35e5e478e1a) )
+	ROM_LOAD( "tss1cguu.4f",  0x1800000, 0x800000, CRC(76924e04) SHA1(751065d6ce658cbbcd88f854f6937ebd2204ec68) )
+
+	ROM_REGION16_LE( 0x400000, "textilemapl", 0 )   /* texture tilemap 0-15 */
+	ROM_LOAD( "tss1ccrl.7f",  0x000000, 0x400000, CRC(3a325fe7) SHA1(882735dce7aeb36f9e88a983498360f5de901e9d) )
+
+	ROM_REGION( 0x200000, "textilemaph", 0 )        /* texture tilemap 16-17 + attr */
+	ROM_LOAD( "tss1ccrh.7e",  0x000000, 0x200000, CRC(f998de1a) SHA1(371f540f505608297c5ffcfb623b983ca8310afb) )
+
+	ROM_REGION32_BE( 0x2000000, "pointrom", 0 ) /* 3D model data */
+	ROM_LOAD32_WORD_SWAP( "tss1pt0h.7a",  0x0000000, 0x400000, CRC(cdbe0ba8) SHA1(f8c6da31654c0a2a8024888ffb7fc1c783b2d629) )
+	ROM_LOAD32_WORD_SWAP( "tss1pt0l.7c",  0x0000002, 0x400000, CRC(896f0fb4) SHA1(bdfa99eb21ce4fc8021f9d95a5558a34f9942c57) )
+	ROM_LOAD32_WORD_SWAP( "tss1pt1h.5a",  0x0800000, 0x400000, CRC(63647596) SHA1(833412be8f61686bd7e06c2738df740e0e585d0f) )
+	ROM_LOAD32_WORD_SWAP( "tss1pt1l.5c",  0x0800002, 0x400000, CRC(5a09921f) SHA1(c23885708c7adf0b81c2c9346e21b869634a5b35) )
+	ROM_LOAD32_WORD_SWAP( "tss1pt2h.4a",  0x1000000, 0x400000, CRC(9b06e22d) SHA1(cff5ed098112a4f0a2bc8937e226f50066e605b1) )
+	ROM_LOAD32_WORD_SWAP( "tss1pt2l.4c",  0x1000002, 0x400000, CRC(4b230d79) SHA1(794cee0a19993e90913f58507c53224f361e9663) )
+
+	ROM_REGION( 0x1000000, "c352", 0 ) /* C352 PCM samples */
+	ROM_LOAD( "tss1wavel.2c", 0x000000, 0x800000, CRC(deaead26) SHA1(72dac0c3f41d4c3c290f9eb1b50236ae3040a472) )
+	ROM_LOAD( "tss1waveh.2a", 0x800000, 0x800000, CRC(5c8758b4) SHA1(b85c8f6869900224ef83a2340b17f5bbb2801af9) )
+ROM_END
+
+
+ROM_START( timecrs2v5a )
+	ROM_REGION32_BE( 0x400000, "user1", 0 ) /* 4 megs for main R4650 code */
+	ROM_LOAD16_BYTE( "tss5vera.2",   0x000000, 0x200000, CRC(71ef4821) SHA1(03999c2c3219725f8716b7d32efbf810b6401806) )
+	ROM_LOAD16_BYTE( "tss5vera.1",   0x000001, 0x200000, CRC(8dfcdd76) SHA1(ba8b2e7070814a225205010ab44ca73628e2913c) )
+
+	ROM_REGION( 0x80000, "subcpu", 0 )  /* Hitachi H8/3002 MCU code */
+	ROM_LOAD16_WORD_SWAP( "tss5vera.3",   0x000000, 0x080000, CRC(41e41994) SHA1(eabc1a307c329070bfc6486cb68169c94ff8a162) ) /* Flash ROM type 29F400TC - Common code throughout all versions */
 
 	ROM_REGION( 0x40000, "iocpu", 0 )   /* I/O board HD643334 H8/3334 MCU code */
 	ROM_LOAD( "tssioprog.ic3", 0x000000, 0x040000, CRC(edad4538) SHA1(1330189184a636328d956c0e435f8d9ad2e96a80) )
@@ -5119,32 +5253,35 @@ ROM_END
 
 
 /* Games */
-#define GAME_FLAGS (MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND)
+#define GAME_FLAGS (MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS )
 //    YEAR, NAME,        PARENT,   MACHINE,     INPUT,     INIT,                MNTR,  COMPANY, FULLNAME,                      FLAGS
-GAME( 1997, rapidrvr,    0,        gorgon,      rapidrvr,  namcos23_state, s23, ROT0, "Namco", "Rapid River (RD3 Ver. C)",     GAME_FLAGS ) // 97/11/27, USA
-GAME( 1997, rapidrvrv2c, rapidrvr, gorgon,      rapidrvr,  namcos23_state, s23, ROT0, "Namco", "Rapid River (RD2 Ver. C)",     GAME_FLAGS ) // 97/11/27, Europe
+GAME( 1997, rapidrvr,    0,        gorgon,      rapidrvr,  namcos23_state, s23, ROT0, "Namco", "Rapid River (US, RD3 Ver. C)",     GAME_FLAGS ) // 97/11/27, USA
+GAME( 1997, rapidrvrv2c, rapidrvr, gorgon,      rapidrvr,  namcos23_state, s23, ROT0, "Namco", "Rapid River (World, RD2 Ver. C)",     GAME_FLAGS ) // 97/11/27, Europe
 GAME( 1997, rapidrvrp,   rapidrvr, gorgon,      rapidrvrp, namcos23_state, s23, ROT0, "Namco", "Rapid River (prototype)",      GAME_FLAGS ) // 97/11/10, USA
-GAME( 1997, finfurl,     0,        gorgon,      finfurl,   namcos23_state, s23, ROT0, "Namco", "Final Furlong (FF2 Ver. A)",   GAME_FLAGS )
-GAME( 1997, downhill,    0,        s23,         downhill,  namcos23_state, s23, ROT0, "Namco", "Downhill Bikers (DH3 Ver. A)", GAME_FLAGS )
-GAME( 1997, motoxgo,     0,        s23,         s23,       namcos23_state, s23, ROT0, "Namco", "Motocross Go! (MG3 Ver. A)",   GAME_FLAGS )
-GAME( 1997, motoxgov2a,  motoxgo,  s23,         s23,       namcos23_state, s23, ROT0, "Namco", "Motocross Go! (MG2 Ver. A)",   GAME_FLAGS )
-GAME( 1997, motoxgov1a,  motoxgo,  s23,         s23,       namcos23_state, s23, ROT0, "Namco", "Motocross Go! (MG1 Ver. A, set 1)", GAME_FLAGS )
-GAME( 1997, motoxgov1a2, motoxgo,  s23,         s23,       namcos23_state, s23, ROT0, "Namco", "Motocross Go! (MG1 Ver. A, set 2)", GAME_FLAGS )
-GAME( 1997, timecrs2,    0,        timecrs2,    timecrs2,  namcos23_state, s23, ROT0, "Namco", "Time Crisis II (TSS3 Ver. B)", GAME_FLAGS )
-GAME( 1997, timecrs2v2b, timecrs2, timecrs2,    timecrs2,  namcos23_state, s23, ROT0, "Namco", "Time Crisis II (TSS2 Ver. B)", GAME_FLAGS )
-GAME( 1997, timecrs2v4a, timecrs2, timecrs2v4a, timecrs2,  namcos23_state, s23, ROT0, "Namco", "Time Crisis II (TSS4 Ver. A)", GAME_FLAGS )
-GAME( 1998, panicprk,    0,        s23,         s23,       namcos23_state, s23, ROT0, "Namco", "Panic Park (PNP2 Ver. A)",     GAME_FLAGS )
-GAME( 1998, panicprkj,   panicprk, s23,         s23,       namcos23_state, s23, ROT0, "Namco", "Panic Park (PNP1 Ver. B)",     GAME_FLAGS )
-GAME( 1998, gunwars,     0,        gmen,        s23,       namcos23_state, s23, ROT0, "Namco", "Gunmen Wars (GM1 Ver. B)",     GAME_FLAGS )
-GAME( 1998, gunwarsa,    gunwars,  gmen,        s23,       namcos23_state, s23, ROT0, "Namco", "Gunmen Wars (GM1 Ver. A)",     GAME_FLAGS )
-GAME( 1998, raceon,      0,        gmen,        s23,       namcos23_state, s23, ROT0, "Namco", "Race On! (RO2 Ver. A)",        GAME_FLAGS )
-GAME( 1998, 500gp,       0,        ss23,        s23,       namcos23_state, s23, ROT0, "Namco", "500 GP (5GP3 Ver. C)",         GAME_FLAGS )
-GAME( 1998, aking,       0,        ss23,        s23,       namcos23_state, s23, ROT0, "Namco", "Angler King (AG1 Ver. A)",     GAME_FLAGS )
-GAME( 1999, finfurl2,    0,        gmen,        s23,       namcos23_state, s23, ROT0, "Namco", "Final Furlong 2 (World)",      GAME_FLAGS )
-GAME( 1999, finfurl2j,   finfurl2, gmen,        s23,       namcos23_state, s23, ROT0, "Namco", "Final Furlong 2 (Japan)",      GAME_FLAGS )
-GAME( 2000, crszone,     0,        ss23e2,      s23,       namcos23_state, s23, ROT0, "Namco", "Crisis Zone (CSZO4 Ver. B)",   GAME_FLAGS )
-GAME( 2000, crszonev4a,  crszone,  ss23e2,      s23,       namcos23_state, s23, ROT0, "Namco", "Crisis Zone (CSZO4 Ver. A)",   GAME_FLAGS )
-GAME( 2000, crszonev3b,  crszone,  ss23e2,      s23,       namcos23_state, s23, ROT0, "Namco", "Crisis Zone (CSZO3 Ver. B, set 1)", GAME_FLAGS )
-GAME( 2000, crszonev3b2, crszone,  ss23e2,      s23,       namcos23_state, s23, ROT0, "Namco", "Crisis Zone (CSZO3 Ver. B, set 2)", GAME_FLAGS )
-GAME( 2000, crszonev3a,  crszone,  ss23e2,      s23,       namcos23_state, s23, ROT0, "Namco", "Crisis Zone (CSZO3 Ver. A)",   GAME_FLAGS )
-GAME( 2000, crszonev2a,  crszone,  ss23e2,      s23,       namcos23_state, s23, ROT0, "Namco", "Crisis Zone (CSZO2 Ver. A)",   GAME_FLAGS )
+GAME( 1997, finfurl,     0,        gorgon,      finfurl,   namcos23_state, s23, ROT0, "Namco", "Final Furlong (World, FF2 Ver. A)",   GAME_FLAGS )
+GAME( 1997, downhill,    0,        s23,         downhill,  namcos23_state, s23, ROT0, "Namco", "Downhill Bikers (US, DH3 Ver. A)", GAME_FLAGS )
+GAME( 1997, motoxgo,     0,        s23,         s23,       namcos23_state, s23, ROT0, "Namco", "Motocross Go! (US, MG3 Ver. A)",   GAME_FLAGS )
+GAME( 1997, motoxgov2a,  motoxgo,  s23,         s23,       namcos23_state, s23, ROT0, "Namco", "Motocross Go! (World, MG2 Ver. A, set 1)",   GAME_FLAGS )
+GAME( 1997, motoxgov2a2, motoxgo,  s23,         s23,       namcos23_state, s23, ROT0, "Namco", "Motocross Go! (World, MG2 Ver. A, set 2)",   GAME_FLAGS )
+GAME( 1997, motoxgov1a,  motoxgo,  s23,         s23,       namcos23_state, s23, ROT0, "Namco", "Motocross Go! (Japan, MG1 Ver. A, set 1)", GAME_FLAGS )
+GAME( 1997, motoxgov1a2, motoxgo,  s23,         s23,       namcos23_state, s23, ROT0, "Namco", "Motocross Go! (Japan, MG1 Ver. A, set 2)", GAME_FLAGS )
+GAME( 1997, timecrs2,    0,        timecrs2,    timecrs2,  namcos23_state, s23, ROT0, "Namco", "Time Crisis II (US, TSS3 Ver. B)", GAME_FLAGS )
+GAME( 1997, timecrs2v2b, timecrs2, timecrs2,    timecrs2,  namcos23_state, s23, ROT0, "Namco", "Time Crisis II (World, TSS2 Ver. B)", GAME_FLAGS )
+GAME( 1997, timecrs2v1b, timecrs2, timecrs2,    timecrs2,  namcos23_state, s23, ROT0, "Namco", "Time Crisis II (Japan, TSS1 Ver. B)", GAME_FLAGS )
+GAME( 1997, timecrs2v4a, timecrs2, timecrs2v4a, timecrs2,  namcos23_state, s23, ROT0, "Namco", "Time Crisis II (World, TSS4 Ver. A)", GAME_FLAGS )
+GAME( 1997, timecrs2v5a, timecrs2, timecrs2v4a, timecrs2,  namcos23_state, s23, ROT0, "Namco", "Time Crisis II (US, TSS5 Ver. A)", GAME_FLAGS )
+GAME( 1998, panicprk,    0,        s23,         s23,       namcos23_state, s23, ROT0, "Namco", "Panic Park (World, PNP2 Ver. A)",     GAME_FLAGS )
+GAME( 1998, panicprkj,   panicprk, s23,         s23,       namcos23_state, s23, ROT0, "Namco", "Panic Park (Japan, PNP1 Ver. B)",     GAME_FLAGS )
+GAME( 1998, gunwars,     0,        gmen,        s23,       namcos23_state, s23, ROT0, "Namco", "Gunmen Wars (Japan, GM1 Ver. B)",     GAME_FLAGS )
+GAME( 1998, gunwarsa,    gunwars,  gmen,        s23,       namcos23_state, s23, ROT0, "Namco", "Gunmen Wars (Japan, GM1 Ver. A)",     GAME_FLAGS )
+GAME( 1998, raceon,      0,        gmen,        s23,       namcos23_state, s23, ROT0, "Namco", "Race On! (World, RO2 Ver. A)",        GAME_FLAGS )
+GAME( 1998, 500gp,       0,        ss23,        s23,       namcos23_state, s23, ROT0, "Namco", "500 GP (US, 5GP3 Ver. C)",         GAME_FLAGS )
+GAME( 1998, aking,       0,        ss23,        s23,       namcos23_state, s23, ROT0, "Namco", "Angler King (Japan, AG1 Ver. A)",     GAME_FLAGS )
+GAME( 1998, finfurl2,    0,        gmen,        s23,       namcos23_state, s23, ROT0, "Namco", "Final Furlong 2 (World)",      GAME_FLAGS )
+GAME( 1998, finfurl2j,   finfurl2, gmen,        s23,       namcos23_state, s23, ROT0, "Namco", "Final Furlong 2 (Japan)",      GAME_FLAGS )
+GAME( 1999, crszone,     0,        ss23e2,      s23,       namcos23_state, s23, ROT0, "Namco", "Crisis Zone (World, CSZO4 Ver. B)",   GAME_FLAGS )
+GAME( 1999, crszonev4a,  crszone,  ss23e2,      s23,       namcos23_state, s23, ROT0, "Namco", "Crisis Zone (World, CSZO4 Ver. A)",   GAME_FLAGS )
+GAME( 1999, crszonev3b,  crszone,  ss23e2,      s23,       namcos23_state, s23, ROT0, "Namco", "Crisis Zone (US, CSZO3 Ver. B, set 1)", GAME_FLAGS )
+GAME( 1999, crszonev3b2, crszone,  ss23e2,      s23,       namcos23_state, s23, ROT0, "Namco", "Crisis Zone (US, CSZO3 Ver. B, set 2)", GAME_FLAGS )
+GAME( 1999, crszonev3a,  crszone,  ss23e2,      s23,       namcos23_state, s23, ROT0, "Namco", "Crisis Zone (US, CSZO3 Ver. A)",   GAME_FLAGS )
+GAME( 1999, crszonev2a,  crszone,  ss23e2,      s23,       namcos23_state, s23, ROT0, "Namco", "Crisis Zone (World, CSZO2 Ver. A)",   GAME_FLAGS )

@@ -21,12 +21,12 @@
 
 **********************************************************************/
 
+#ifndef MAME_MACHINE_HD64610_H
+#define MAME_MACHINE_HD64610_H
+
 #pragma once
 
-#ifndef __HD64610__
-#define __HD64610__
-
-#include "emu.h"
+#include "dirtc.h"
 
 
 
@@ -53,10 +53,10 @@ class hd64610_device :  public device_t,
 {
 public:
 	// construction/destruction
-	hd64610_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	hd64610_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &set_out_irq_callback(device_t &device, _Object object) { return downcast<hd64610_device &>(device).m_out_irq_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_1hz_callback(device_t &device, _Object object) { return downcast<hd64610_device &>(device).m_out_1hz_cb.set_callback(object); }
+	template <class Object> static devcb_base &set_out_irq_callback(device_t &device, Object &&cb) { return downcast<hd64610_device &>(device).m_out_irq_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_1hz_callback(device_t &device, Object &&cb) { return downcast<hd64610_device &>(device).m_out_1hz_cb.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -67,7 +67,6 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// device_rtc_interface overrides
@@ -80,8 +79,8 @@ protected:
 
 private:
 	inline void set_irq_line();
-	inline UINT8 read_counter(int counter);
-	inline void write_counter(int counter, UINT8 value);
+	inline uint8_t read_counter(int counter);
+	inline void write_counter(int counter, uint8_t value);
 	inline void check_alarm();
 
 	static const device_timer_id TIMER_UPDATE_COUNTER = 0;
@@ -89,7 +88,7 @@ private:
 	devcb_write_line        m_out_irq_cb;
 	devcb_write_line        m_out_1hz_cb;
 
-	UINT8   m_regs[0x10];       // Internal registers
+	uint8_t   m_regs[0x10];       // Internal registers
 	int     m_hline_state;      // H-Start/Stop line
 	int     m_irq_out;          // alarm output
 
@@ -99,7 +98,6 @@ private:
 
 
 // device type definition
-extern const device_type HD64610;
+DECLARE_DEVICE_TYPE(HD64610, hd64610_device)
 
-
-#endif
+#endif // MAME_MACHINE_HD64610_H

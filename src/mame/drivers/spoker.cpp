@@ -31,9 +31,11 @@
 #include "cpu/z180/z180.h"
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
-#include "sound/2413intf.h"
+#include "sound/ym2413.h"
 #include "sound/okim6295.h"
 #include "machine/nvram.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class spoker_state : public driver_device
@@ -54,21 +56,21 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
-	required_shared_ptr<UINT8> m_bg_tile_ram;
+	required_shared_ptr<uint8_t> m_bg_tile_ram;
 	tilemap_t *m_bg_tilemap;
 
-	required_shared_ptr<UINT8> m_fg_tile_ram;
-	required_shared_ptr<UINT8> m_fg_color_ram;
+	required_shared_ptr<uint8_t> m_fg_tile_ram;
+	required_shared_ptr<uint8_t> m_fg_color_ram;
 	tilemap_t *m_fg_tilemap;
 
 	// common
 	int m_nmi_ack;
-	UINT8 m_out[3];
+	uint8_t m_out[3];
 
 	// spk116it and spk115it specific
 	int m_video_enable;
 	int m_hopper;
-	UINT8 m_igs_magic[2];
+	uint8_t m_igs_magic[2];
 
 	// common
 	DECLARE_WRITE8_MEMBER(bg_tile_w);
@@ -94,7 +96,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -134,12 +136,12 @@ WRITE8_MEMBER(spoker_state::fg_color_w)
 
 void spoker_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(spoker_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8,  32, 128, 8);
-	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(spoker_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8,  8,  128, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(spoker_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8,  32, 128, 8);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(spoker_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8,  8,  128, 32);
 	m_fg_tilemap->set_transparent_pen(0);
 }
 
-UINT32 spoker_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t spoker_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->black_pen(), cliprect);
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
@@ -158,7 +160,7 @@ CUSTOM_INPUT_MEMBER(spoker_state::hopper_r)
 	return machine().input().code_pressed(KEYCODE_H);
 }
 
-static void show_out(running_machine &machine,  UINT8 *out)
+static void show_out(running_machine &machine,  uint8_t *out)
 {
 #ifdef MAME_DEBUG
 	machine.popmessage("%02x %02x %02x", out[0], out[1], out[2]);
@@ -289,7 +291,7 @@ static ADDRESS_MAP_START( 3super8_portmap, AS_IO, 8, spoker_state )
 //  AM_RANGE(0x4000, 0x40ff) AM_WRITENOP
 	AM_RANGE(0x5000, 0x5fff) AM_RAM_WRITE(fg_tile_w )  AM_SHARE("fg_tile_ram")
 
-//  The following one (0x6480) should be output. At begining of code, there is a PPI initialization
+//  The following one (0x6480) should be output. At beginning of code, there is a PPI initialization
 //  setting O-I-I for ports ABC. Except these routines are just a leftover from the original game,
 //  and now the I/O is handled by a CPLD or FPGA (as seen in goldstar and gp98).
 	AM_RANGE(0x6480, 0x6480) AM_READ_PORT( "IN0" )
@@ -314,19 +316,36 @@ static INPUT_PORTS_START( spoker )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPUNKNOWN( 0x02, 0x02 )
-	PORT_DIPUNKNOWN( 0x04, 0x04 )
-	PORT_DIPUNKNOWN( 0x08, 0x08 )
-	PORT_DIPUNKNOWN( 0x10, 0x10 )
-	PORT_DIPUNKNOWN( 0x20, 0x20 )
+	PORT_DIPNAME( 0x1c, 0x1c, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x1c, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x18, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x14, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x0c, "1 Coin/10 Credits" )
+	PORT_DIPSETTING(    0x08, "1 Coin/20 Credits" )
+	PORT_DIPSETTING(    0x04, "1 Coin/40 Credits" )
+	PORT_DIPSETTING(    0x00, "1 Coin/50 Credits" )
+	PORT_DIPNAME( 0x20, 0x20, "Card Type" )
+	PORT_DIPSETTING(    0x20, "Cards" )
+	PORT_DIPSETTING(    0x00, "Numbers" )
 	PORT_DIPUNKNOWN( 0x40, 0x40 )
 	PORT_DIPUNKNOWN( 0x80, 0x80 )
 
 	PORT_START("DSW2")
-	PORT_DIPUNKNOWN( 0x01, 0x01 )
-	PORT_DIPUNKNOWN( 0x02, 0x02 )
-	PORT_DIPUNKNOWN( 0x04, 0x04 )
-	PORT_DIPUNKNOWN( 0x08, 0x08 )
-	PORT_DIPUNKNOWN( 0x10, 0x10 )
+	PORT_DIPNAME( 0x03, 0x00, "Min Bet" )
+	PORT_DIPSETTING(    0x03, "1" )
+	PORT_DIPSETTING(    0x02, "5" )
+	PORT_DIPSETTING(    0x01, "10" )
+	PORT_DIPSETTING(    0x00, "20" )
+	PORT_DIPNAME( 0x1c, 0x1c, "Key In/Out" )
+	PORT_DIPSETTING(    0x1c, "10 Credits" )
+	PORT_DIPSETTING(    0x18, "20 Credits" )
+	PORT_DIPSETTING(    0x14, "40 Credits" )
+	PORT_DIPSETTING(    0x10, "50 Credits" )
+	PORT_DIPSETTING(    0x0c, "100 Credits" )
+	PORT_DIPSETTING(    0x08, "200 Credits" )
+	PORT_DIPSETTING(    0x04, "250 Credits" )
+	PORT_DIPSETTING(    0x00, "500 Credits" )
 	PORT_DIPUNKNOWN( 0x20, 0x20 )
 	PORT_DIPUNKNOWN( 0x40, 0x40 )
 	PORT_DIPUNKNOWN( 0x80, 0x80 )
@@ -336,16 +355,38 @@ static INPUT_PORTS_START( spoker )
 	PORT_DIPUNKNOWN( 0x02, 0x02 )
 	PORT_DIPUNKNOWN( 0x04, 0x04 )
 	PORT_DIPUNKNOWN( 0x08, 0x08 )
-	PORT_DIPUNKNOWN( 0x10, 0x10 )
+	PORT_DIPNAME( 0x10, 0x10, "Credit Limit" )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, "On (2000)" )
 	PORT_DIPUNKNOWN( 0x20, 0x20 )
 	PORT_DIPUNKNOWN( 0x40, 0x40 )
 	PORT_DIPUNKNOWN( 0x80, 0x80 )
 
 	PORT_START("DSW4")
-	PORT_DIPUNKNOWN( 0xff, 0xff )
+	PORT_DIPNAME( 0x07, 0x07, "Max Bet" )
+	PORT_DIPSETTING(    0x07, "1" )
+	PORT_DIPSETTING(    0x06, "2" )
+	PORT_DIPSETTING(    0x05, "5" )
+	PORT_DIPSETTING(    0x04, "10" )
+	PORT_DIPSETTING(    0x03, "20" )
+	PORT_DIPSETTING(    0x02, "40" )
+	PORT_DIPSETTING(    0x01, "50" )
+	PORT_DIPSETTING(    0x00, "100" )
+	PORT_DIPUNKNOWN( 0x08, 0x08 )
+	PORT_DIPUNKNOWN( 0x10, 0x10 )
+	PORT_DIPUNKNOWN( 0x20, 0x20 )
+	PORT_DIPUNKNOWN( 0x40, 0x40 )
+	PORT_DIPUNKNOWN( 0x80, 0x80 )
 
 	PORT_START("DSW5")
-	PORT_DIPUNKNOWN( 0xff, 0xff )
+	PORT_DIPUNKNOWN( 0x01, 0x01 )
+	PORT_DIPUNKNOWN( 0x02, 0x02 )
+	PORT_DIPUNKNOWN( 0x04, 0x04 )
+	PORT_DIPUNKNOWN( 0x08, 0x08 )
+	PORT_DIPUNKNOWN( 0x10, 0x10 )
+	PORT_DIPUNKNOWN( 0x20, 0x20 )
+	PORT_DIPUNKNOWN( 0x40, 0x40 )
+	PORT_DIPUNKNOWN( 0x80, 0x80 )
 
 	PORT_START("SERVICE")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN  )
@@ -548,7 +589,7 @@ void spoker_state::machine_reset()
                               Machine Drivers
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( spoker, spoker_state )
+static MACHINE_CONFIG_START( spoker )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z180, XTAL_12MHz / 2)   /* HD64180RP8, 8 MHz? */
@@ -586,7 +627,7 @@ static MACHINE_CONFIG_START( spoker, spoker_state )
 	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.4)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_12MHz / 12, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL_12MHz / 12, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -852,7 +893,7 @@ DRIVER_INIT_MEMBER(spoker_state, spkleftover)
     Maybe a leftover...
 */
 	int A, B;
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 
 	for (A = 0; A < 0x10000; A++)
 	{
@@ -864,7 +905,7 @@ DRIVER_INIT_MEMBER(spoker_state, spkleftover)
 DRIVER_INIT_MEMBER(spoker_state, spk116it)
 {
 	int A;
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 
 	for (A = 0; A < 0x10000; A++)
 	{
@@ -878,7 +919,7 @@ DRIVER_INIT_MEMBER(spoker_state, spk116it)
 
 DRIVER_INIT_MEMBER(spoker_state, 3super8)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	int i;
 
 	/* Decryption is probably done using one macrocell/output on an address decoding pal which we do not have a dump of */
@@ -888,7 +929,7 @@ DRIVER_INIT_MEMBER(spoker_state, 3super8)
 	/* nor-reduced: !(!(!(!A6|!A8))|!(!(A7|!A11)|!(!A9|A11))); */
 	for(i=0;i<0x20000;i++)
 	{
-		UINT8 a6, a7, a8, a9, a11, d5 = 0;
+		uint8_t a6, a7, a8, a9, a11, d5 = 0;
 		a6 = BIT(i,6); a7 = BIT(i,7); a8 = BIT(i,8); a9 = BIT(i,9); a11 = BIT(i,11);
 		d5 = (a6 & a8) & ((~a7 & a11) | (a9 & ~a11));
 		ROM[i] ^= d5*0x20;
@@ -896,9 +937,9 @@ DRIVER_INIT_MEMBER(spoker_state, 3super8)
 
 	/* cheesy hack: take gfx roms from spk116it and rearrange them for this game needs */
 	{
-		UINT8 *src = memregion("rep_gfx")->base();
-		UINT8 *dst = memregion("gfx1")->base();
-		UINT8 x;
+		uint8_t *src = memregion("rep_gfx")->base();
+		uint8_t *dst = memregion("gfx1")->base();
+		uint8_t x;
 
 		for(x=0;x<3;x++)
 		{
@@ -924,8 +965,8 @@ GAME( 1996,  spk205us,   spk306us, spoker,  spoker,  spoker_state,  spkleftover,
 GAME( 1996,  spk203us,   spk306us, spoker,  spoker,  spoker_state,  spkleftover, ROT0,  "IGS",       "Super Poker (v203US)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )  // needs proper machine driver
 GAME( 1996,  spk200ua,   spk306us, spoker,  spoker,  spoker_state,  spkleftover, ROT0,  "IGS",       "Super Poker (v200UA)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )  // needs proper machine driver
 GAME( 1993?, spk116it,   spk306us, spoker,  spoker,  spoker_state,  spk116it,    ROT0,  "IGS",       "Super Poker (v116IT)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1993?, spk116itmx, spk306us, spoker,  spoker,  driver_device, 0,           ROT0,  "IGS",       "Super Poker (v116IT-MX)",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )  // needs proper machine driver
+GAME( 1993?, spk116itmx, spk306us, spoker,  spoker,  spoker_state,  0,           ROT0,  "IGS",       "Super Poker (v116IT-MX)",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )  // needs proper machine driver
 GAME( 1993?, spk115it,   spk306us, spoker,  spoker,  spoker_state,  spk116it,    ROT0,  "IGS",       "Super Poker (v115IT)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1993?, spk114it,   spk306us, spoker,  spoker,  driver_device, 0,           ROT0,  "IGS",       "Super Poker (v114IT)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )  // needs proper machine driver
+GAME( 1993?, spk114it,   spk306us, spoker,  spoker,  spoker_state,  0,           ROT0,  "IGS",       "Super Poker (v114IT)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )  // needs proper machine driver
 GAME( 1996,  spk102ua,   spk306us, spoker,  spoker,  spoker_state,  spkleftover, ROT0,  "IGS",       "Super Poker (v102UA)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )  // needs proper machine driver
 GAME( 1993?, 3super8,    0,        3super8, 3super8, spoker_state,  3super8,     ROT0,  "<unknown>", "3 Super 8 (Italy)",        MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) //roms are badly dumped

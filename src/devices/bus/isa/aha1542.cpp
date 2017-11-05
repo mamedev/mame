@@ -74,6 +74,7 @@
  * source: http://download.adaptec.com/pdfs/installation_guides/1540cfig.pdf
  */
 
+#include "emu.h"
 #include "aha1542.h"
 #include "cpu/z80/z80.h"
 
@@ -133,19 +134,19 @@
 #define CMD_EXTBIOS     0x28    // return extended BIOS information
 #define CMD_MBENABLE    0x29    // set mailbox interface enable
 
-const device_type AHA1542 = &device_creator<aha1542_device>;
+DEFINE_DEVICE_TYPE(AHA1542, aha1542_device, "aha1542", "AHA1542 SCSI Controller")
 
 #define Z84C0010_TAG "u5"
 
 READ8_MEMBER( aha1542_device::aha1542_r )
 {
-	printf("%s aha1542_r(): offset=%d\n", machine().describe_context(), offset);
+	logerror("%s aha1542_r(): offset=%d\n", machine().describe_context(), offset);
 	return 0xff;
 }
 
 WRITE8_MEMBER( aha1542_device::aha1542_w )
 {
-	printf("%s aha1542_w(): offset=%d data=0x%02x\n", machine().describe_context(), offset, data);
+	logerror("%s aha1542_w(): offset=%d data=0x%02x\n", machine().describe_context(), offset, data);
 }
 
 //-------------------------------------------------
@@ -168,23 +169,18 @@ static ADDRESS_MAP_START( z84c0010_mem, AS_PROGRAM, 8, aha1542_device )
 	AM_RANGE(0xb000, 0xb000) AM_NOP        // something?
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_FRAGMENT( aha1542 )
-	MCFG_CPU_ADD(Z84C0010_TAG, Z80, XTAL_12MHz)
-	MCFG_CPU_PROGRAM_MAP( z84c0010_mem )
-MACHINE_CONFIG_END
-
-const rom_entry *aha1542_device::device_rom_region() const
+const tiny_rom_entry *aha1542_device::device_rom_region() const
 {
 	return ROM_NAME( aha1542 );
 }
 
-machine_config_constructor aha1542_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( aha1542 );
-}
+MACHINE_CONFIG_MEMBER( aha1542_device::device_add_mconfig )
+	MCFG_CPU_ADD(Z84C0010_TAG, Z80, XTAL_12MHz)
+	MCFG_CPU_PROGRAM_MAP( z84c0010_mem )
+MACHINE_CONFIG_END
 
-aha1542_device::aha1542_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, AHA1542, "AHA1542 SCSI Controller", tag, owner, clock, "aha1542", __FILE__    ),
+aha1542_device::aha1542_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, AHA1542, tag, owner, clock),
 	device_isa16_card_interface(mconfig, *this)
 {
 }
@@ -192,8 +188,8 @@ aha1542_device::aha1542_device(const machine_config &mconfig, const char *tag, d
 void aha1542_device::device_start()
 {
 	set_isa_device();
-	m_isa->install_rom(this, 0xdc000, 0xdffff, 0, 0, "aha1542", "aha1542");
-	m_isa->install_device(0x330, 0x333, 0, 0, read8_delegate(FUNC( aha1542_device::aha1542_r ), this),
+	m_isa->install_rom(this, 0xdc000, 0xdffff, "aha1542", "aha1542");
+	m_isa->install_device(0x330, 0x333, read8_delegate(FUNC( aha1542_device::aha1542_r ), this),
 	write8_delegate(FUNC( aha1542_device::aha1542_w ), this) );
 }
 

@@ -37,9 +37,35 @@
 
 */
 
+#include "emu.h"
 #include "melps4.h"
 #include "debugger.h"
 
+
+melps4_cpu_device::melps4_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, int d_pins, uint8_t sm_page, uint8_t int_page)
+	: cpu_device(mconfig, type, tag, owner, clock)
+	, m_program_config("program", ENDIANNESS_LITTLE, 16, prgwidth, -1, program)
+	, m_data_config("data", ENDIANNESS_LITTLE, 8, datawidth, 0, data)
+	, m_prgwidth(prgwidth)
+	, m_datawidth(datawidth)
+	, m_d_pins(d_pins)
+	, m_sm_page(sm_page)
+	, m_int_page(int_page)
+	, m_xami_mask(0xf)
+	, m_sp_mask(0x7<<4)
+	, m_ba_op(0x01)
+	, m_stack_levels(3)
+	, m_read_k(*this)
+	, m_read_d(*this)
+	, m_read_s(*this)
+	, m_read_f(*this)
+	, m_write_d(*this)
+	, m_write_s(*this)
+	, m_write_f(*this)
+	, m_write_g(*this)
+	, m_write_u(*this)
+	, m_write_t(*this)
+{ }
 
 // disasm
 void melps4_cpu_device::state_string_export(const device_state_entry &entry, std::string &str) const
@@ -187,7 +213,8 @@ void melps4_cpu_device::device_start()
 	save_item(NAME(m_w));
 
 	// register state for debugger
-	state_add(STATE_GENPC, "curpc", m_pc).formatstr("%04X").noshow();
+	state_add(STATE_GENPC, "GENPC", m_pc).formatstr("%04X").noshow();
+	state_add(STATE_GENPCBASE, "CURPC", m_pc).formatstr("%04X").noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_cy).formatstr("%9s").noshow();
 
 	state_add(MELPS4_PC, "PC", m_pc).formatstr("%04X");
@@ -207,7 +234,13 @@ void melps4_cpu_device::device_start()
 	m_icountptr = &m_icount;
 }
 
-
+device_memory_interface::space_config_vector melps4_cpu_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config),
+		std::make_pair(AS_DATA,    &m_data_config)
+	};
+}
 
 //-------------------------------------------------
 //  device_reset - device-specific reset
@@ -246,7 +279,7 @@ void melps4_cpu_device::device_reset()
 //  i/o handling
 //-------------------------------------------------
 
-UINT8 melps4_cpu_device::read_gen_port(int port)
+uint8_t melps4_cpu_device::read_gen_port(int port)
 {
 	// input generic port
 	switch (port)
@@ -263,7 +296,7 @@ UINT8 melps4_cpu_device::read_gen_port(int port)
 	return 0;
 }
 
-void melps4_cpu_device::write_gen_port(int port, UINT8 data)
+void melps4_cpu_device::write_gen_port(int port, uint8_t data)
 {
 	// output generic port
 	switch (port)
@@ -292,7 +325,7 @@ int melps4_cpu_device::read_d_pin(int bit)
 {
 	// read port D, return state of selected pin
 	bit &= 0xf;
-	UINT16 d = (m_port_d | m_read_d(bit, 0xffff)) & m_d_mask;
+	uint16_t d = (m_port_d | m_read_d(bit, 0xffff)) & m_d_mask;
 	return d >> bit & 1;
 }
 

@@ -9,8 +9,10 @@
 
 ***************************************************************************/
 
-#ifndef __H8_INTC_H__
-#define __H8_INTC_H__
+#ifndef MAME_CPU_H8_H8_INTC_H
+#define MAME_CPU_H8_H8_INTC_H
+
+#pragma once
 
 #include "h8.h"
 
@@ -26,8 +28,7 @@
 
 class h8_intc_device : public device_t {
 public:
-	h8_intc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	h8_intc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	h8_intc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	int interrupt_taken(int vector);
 	void internal_interrupt(int vector);
@@ -48,14 +49,16 @@ protected:
 
 	required_device<h8_device> cpu;
 
-	UINT32 pending_irqs[MAX_VECTORS/32];
+	uint32_t pending_irqs[MAX_VECTORS/32];
 	int irq_type[8];
 	bool nmi_input;
-	UINT8 irq_input;
-	UINT8 ier;
-	UINT8 isr;
-	UINT16 iscr;
+	uint8_t irq_input;
+	uint8_t ier;
+	uint8_t isr;
+	uint16_t iscr;
 	int icr_filter, ipr_filter;
+
+	h8_intc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -68,8 +71,7 @@ protected:
 
 class h8h_intc_device : public h8_intc_device {
 public:
-	h8h_intc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	h8h_intc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	h8h_intc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_READ8_MEMBER(isr_r);
 	DECLARE_WRITE8_MEMBER(isr_w);
@@ -85,7 +87,9 @@ public:
 protected:
 	static const int vector_to_slot[];
 
-	UINT32 icr;
+	uint32_t icr;
+
+	h8h_intc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -96,7 +100,7 @@ protected:
 
 class h8s_intc_device : public h8h_intc_device {
 public:
-	h8s_intc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	h8s_intc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_READ8_MEMBER(ipr_r);
 	DECLARE_WRITE8_MEMBER(ipr_w);
@@ -104,14 +108,14 @@ public:
 	DECLARE_WRITE8_MEMBER(iprk_w);
 private:
 	static const int vector_to_slot[];
-	UINT8 ipr[11];
+	uint8_t ipr[11];
 
 	virtual void get_priority(int vect, int &icr_pri, int &ipr_pri) const override;
 	virtual void device_reset() override;
 };
 
-extern const device_type H8_INTC;
-extern const device_type H8H_INTC;
-extern const device_type H8S_INTC;
+DECLARE_DEVICE_TYPE(H8_INTC,  h8_intc_device)
+DECLARE_DEVICE_TYPE(H8H_INTC, h8h_intc_device)
+DECLARE_DEVICE_TYPE(H8S_INTC, h8s_intc_device)
 
-#endif
+#endif // MAME_CPU_H8_H8_INTC_H

@@ -30,9 +30,13 @@ Interrupt frequency on audio CPU is not a periodical signal, but there are a lot
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/speedbal.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/3812intf.h"
-#include "includes/speedbal.h"
+#include "screen.h"
+#include "speaker.h"
+
 #include "speedbal.lh"
 
 
@@ -254,7 +258,7 @@ GFXDECODE_END
 
 
 
-static MACHINE_CONFIG_START( speedbal, speedbal_state )
+static MACHINE_CONFIG_START( speedbal )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_4MHz) // 4 MHz
@@ -292,8 +296,8 @@ MACHINE_CONFIG_END
 DRIVER_INIT_MEMBER(speedbal_state,speedbal)
 {
 	// sprite tiles are in an odd order, rearrange to simplify video drawing function
-	UINT8* rom = memregion("sprites")->base();
-	dynamic_buffer temp(0x200*128);
+	uint8_t* rom = memregion("sprites")->base();
+	std::vector<uint8_t> temp(0x200*128);
 
 	for (int i=0;i<0x200;i++)
 	{
@@ -359,9 +363,9 @@ ROM_END
 
 DRIVER_INIT_MEMBER(speedbal_state,musicbal)
 {
-	UINT8* rom = memregion("maincpu")->base();
+	uint8_t* rom = memregion("maincpu")->base();
 
-	const UINT8 xorTable[8] = {0x05, 0x06, 0x84, 0x84, 0x00, 0x87, 0x84, 0x84};     // XORs affecting bits #0, #1, #2 & #7
+	const uint8_t xorTable[8] = {0x05, 0x06, 0x84, 0x84, 0x00, 0x87, 0x84, 0x84};     // XORs affecting bits #0, #1, #2 & #7
 	const int swapTable[4][4] = {                                                   // 4 possible swaps affecting bits #0, #1, #2 & #7
 		{1,0,7,2},
 		{2,7,0,1},

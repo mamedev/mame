@@ -47,7 +47,7 @@ public:
 	required_memory_bank m_bank1000;
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_ram;
+	required_shared_ptr<uint8_t> m_ram;
 
 	DECLARE_READ8_MEMBER(bankedram_r);
 	DECLARE_WRITE8_MEMBER(bankedram_w);
@@ -59,7 +59,7 @@ public:
 	DECLARE_WRITE8_MEMBER(k052109_051960_w);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	UINT32 screen_update_88games(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_88games(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(k88games_interrupt);
 	K051316_CB_MEMBER(zoom_callback);
 	K052109_CB_MEMBER(tile_callback);

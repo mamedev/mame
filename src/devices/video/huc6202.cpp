@@ -7,37 +7,39 @@
 **********************************************************************/
 
 #include "emu.h"
-#include "huc6270.h"
 #include "huc6202.h"
 
+#include "huc6270.h"
 
-const device_type HUC6202 = &device_creator<huc6202_device>;
+
+DEFINE_DEVICE_TYPE(HUC6202, huc6202_device, "huc6202", "Hudson HuC6202 VPC")
 
 
-huc6202_device::huc6202_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, HUC6202, "HuC6202 VPC", tag, owner, clock, "huc6202", __FILE__),
-		m_next_pixel_0_cb(*this),
-		m_time_til_next_event_0_cb(*this),
-		m_vsync_changed_0_cb(*this),
-		m_hsync_changed_0_cb(*this),
-		m_read_0_cb(*this),
-		m_write_0_cb(*this),
-		m_next_pixel_1_cb(*this),
-		m_time_til_next_event_1_cb(*this),
-		m_vsync_changed_1_cb(*this),
-		m_hsync_changed_1_cb(*this),
-		m_read_1_cb(*this),
-		m_write_1_cb(*this), m_window1(0), m_window2(0), m_io_device(0), m_map_index(0), m_map_dirty(0)
+huc6202_device::huc6202_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, HUC6202, tag, owner, clock)
+	, m_next_pixel_0_cb(*this)
+	, m_time_til_next_event_0_cb(*this)
+	, m_vsync_changed_0_cb(*this)
+	, m_hsync_changed_0_cb(*this)
+	, m_read_0_cb(*this)
+	, m_write_0_cb(*this)
+	, m_next_pixel_1_cb(*this)
+	, m_time_til_next_event_1_cb(*this)
+	, m_vsync_changed_1_cb(*this)
+	, m_hsync_changed_1_cb(*this)
+	, m_read_1_cb(*this)
+	, m_write_1_cb(*this)
+	, m_window1(0), m_window2(0), m_io_device(0), m_map_index(0), m_map_dirty(0)
 {
 }
 
 
 READ16_MEMBER( huc6202_device::next_pixel )
 {
-	UINT16 data = huc6270_device::HUC6270_BACKGROUND;
+	uint16_t data = huc6270_device::HUC6270_BACKGROUND;
 
-	UINT16 data_0 = m_next_pixel_0_cb( 0, 0xffff );
-	UINT16 data_1 = m_next_pixel_1_cb( 0, 0xffff );
+	uint16_t data_0 = m_next_pixel_0_cb( 0, 0xffff );
+	uint16_t data_1 = m_next_pixel_1_cb( 0, 0xffff );
 
 	if ( data_0 == huc6270_device::HUC6270_SPRITE && data_1 == huc6270_device::HUC6270_SPRITE )
 	{
@@ -63,7 +65,7 @@ READ16_MEMBER( huc6202_device::next_pixel )
 	}
 	else
 	{
-		UINT8   prio_index = m_prio_map[ m_map_index ];
+		uint8_t   prio_index = m_prio_map[ m_map_index ];
 
 		if ( m_prio[ prio_index ].dev0_enabled && data_0 != huc6270_device::HUC6270_SPRITE )
 		{
@@ -94,10 +96,10 @@ READ16_MEMBER( huc6202_device::next_pixel )
 					break;
 
 				case 2:     /* Back - BG0 + SP1 => BG0 - Front
-                                      BG0 + BG1 => BG0
-                                      BG1 + SP0 => BG1
-                                      SP0 + SP1 => SP0
-                            */
+				                      BG0 + BG1 => BG0
+				                      BG1 + SP0 => BG1
+				                      SP0 + SP1 => SP0
+				            */
 					if ( data_1 > huc6270_device::HUC6270_SPRITE )
 					{
 						if ( data_0 > huc6270_device::HUC6270_SPRITE )
@@ -152,10 +154,10 @@ READ16_MEMBER( huc6202_device::next_pixel )
 
 READ16_MEMBER( huc6202_device::time_until_next_event )
 {
-	UINT16 next_event_clocks_0 = m_time_til_next_event_0_cb( 0, 0xffff  );
-	UINT16 next_event_clocks_1 = m_time_til_next_event_1_cb( 0, 0xffff );
+	uint16_t next_event_clocks_0 = m_time_til_next_event_0_cb( 0, 0xffff  );
+	uint16_t next_event_clocks_1 = m_time_til_next_event_1_cb( 0, 0xffff );
 
-	return MIN( next_event_clocks_0, next_event_clocks_1 );
+	return std::min( next_event_clocks_0, next_event_clocks_1 );
 }
 
 
@@ -175,7 +177,7 @@ WRITE_LINE_MEMBER( huc6202_device::hsync_changed )
 
 READ8_MEMBER( huc6202_device::read )
 {
-	UINT8 data = 0xFF;
+	uint8_t data = 0xFF;
 
 	switch ( offset & 7 )
 	{

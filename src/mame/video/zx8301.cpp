@@ -16,8 +16,10 @@
 
 */
 
+#include "emu.h"
 #include "zx8301.h"
 
+#include "screen.h"
 
 
 //**************************************************************************
@@ -50,11 +52,11 @@ static const rgb_t PALETTE_ZX8301[] =
 //**************************************************************************
 
 // devices
-const device_type ZX8301 = &device_creator<zx8301_device>;
+DEFINE_DEVICE_TYPE(ZX8301, zx8301_device, "zx8301", "Sinclair ZX8301")
 
 
 // default address map
-static ADDRESS_MAP_START( zx8301, AS_0, 8, zx8301_device )
+static ADDRESS_MAP_START( zx8301, 0, 8, zx8301_device )
 	AM_RANGE(0x00000, 0x1ffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -64,9 +66,11 @@ ADDRESS_MAP_END
 //  any address spaces owned by this device
 //-------------------------------------------------
 
-const address_space_config *zx8301_device::memory_space_config(address_spacenum spacenum) const
+device_memory_interface::space_config_vector zx8301_device::memory_space_config() const
 {
-	return (spacenum == AS_0) ? &m_space_config : nullptr;
+	return space_config_vector {
+		std::make_pair(0, &m_space_config)
+	};
 }
 
 
@@ -79,7 +83,7 @@ const address_space_config *zx8301_device::memory_space_config(address_spacenum 
 //  readbyte - read a byte at the given address
 //-------------------------------------------------
 
-inline UINT8 zx8301_device::readbyte(offs_t address)
+inline uint8_t zx8301_device::readbyte(offs_t address)
 {
 	return space().read_byte(address);
 }
@@ -89,7 +93,7 @@ inline UINT8 zx8301_device::readbyte(offs_t address)
 //  writebyte - write a byte at the given address
 //-------------------------------------------------
 
-inline void zx8301_device::writebyte(offs_t address, UINT8 data)
+inline void zx8301_device::writebyte(offs_t address, uint8_t data)
 {
 	space().write_byte(address, data);
 }
@@ -104,19 +108,19 @@ inline void zx8301_device::writebyte(offs_t address, UINT8 data)
 //  zx8301_device - constructor
 //-------------------------------------------------
 
-zx8301_device::zx8301_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, ZX8301, "Sinclair ZX8301", tag, owner, clock, "zx8301", __FILE__),
-		device_memory_interface(mconfig, *this),
-		device_video_interface(mconfig, *this),
-		m_space_config("videoram", ENDIANNESS_LITTLE, 8, 17, 0, nullptr, *ADDRESS_MAP_NAME(zx8301)),
-		m_cpu(*this),
-		m_write_vsync(*this),
-		m_dispoff(1),
-		m_mode8(0),
-		m_base(0),
-		m_flash(1),
-		m_vsync(1),
-		m_vda(0)
+zx8301_device::zx8301_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, ZX8301, tag, owner, clock)
+	, device_memory_interface(mconfig, *this)
+	, device_video_interface(mconfig, *this)
+	, m_space_config("videoram", ENDIANNESS_LITTLE, 8, 17, 0, nullptr, *ADDRESS_MAP_NAME(zx8301))
+	, m_cpu(*this, finder_base::DUMMY_TAG)
+	, m_write_vsync(*this)
+	, m_dispoff(1)
+	, m_mode8(0)
+	, m_base(0)
+	, m_flash(1)
+	, m_vsync(1)
+	, m_vda(0)
 {
 }
 
@@ -240,14 +244,14 @@ WRITE8_MEMBER( zx8301_device::data_w )
 //  draw_line_mode4 - draw mode 4 line
 //-------------------------------------------------
 
-void zx8301_device::draw_line_mode4(bitmap_rgb32 &bitmap, int y, UINT16 da)
+void zx8301_device::draw_line_mode4(bitmap_rgb32 &bitmap, int y, uint16_t da)
 {
 	int x = 0;
 
 	for (int word = 0; word < 64; word++)
 	{
-		UINT8 byte_high = readbyte(da++);
-		UINT8 byte_low = readbyte(da++);
+		uint8_t byte_high = readbyte(da++);
+		uint8_t byte_low = readbyte(da++);
 
 		for (int pixel = 0; pixel < 8; pixel++)
 		{
@@ -268,14 +272,14 @@ void zx8301_device::draw_line_mode4(bitmap_rgb32 &bitmap, int y, UINT16 da)
 //  draw_line_mode8 - draw mode 8 line
 //-------------------------------------------------
 
-void zx8301_device::draw_line_mode8(bitmap_rgb32 &bitmap, int y, UINT16 da)
+void zx8301_device::draw_line_mode8(bitmap_rgb32 &bitmap, int y, uint16_t da)
 {
 	int x = 0;
 
 	for (int word = 0; word < 64; word++)
 	{
-		UINT8 byte_high = readbyte(da++);
-		UINT8 byte_low = readbyte(da++);
+		uint8_t byte_high = readbyte(da++);
+		uint8_t byte_low = readbyte(da++);
 
 		for (int pixel = 0; pixel < 4; pixel++)
 		{
@@ -305,11 +309,11 @@ void zx8301_device::draw_line_mode8(bitmap_rgb32 &bitmap, int y, UINT16 da)
 //  screen_update -
 //-------------------------------------------------
 
-UINT32 zx8301_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t zx8301_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	if (!m_dispoff)
 	{
-		UINT32 da = m_base << 15;
+		uint32_t da = m_base << 15;
 
 		for (int y = 0; y < 256; y++)
 		{
@@ -327,7 +331,7 @@ UINT32 zx8301_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 	}
 	else
 	{
-		bitmap.fill(rgb_t::black, cliprect);
+		bitmap.fill(rgb_t::black(), cliprect);
 	}
 
 	return 0;

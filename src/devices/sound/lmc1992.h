@@ -24,12 +24,11 @@
 
 **********************************************************************/
 
+#ifndef MAME_SOUND_LMC1992_H
+#define MAME_SOUND_LMC1992_H
+
 #pragma once
 
-#ifndef __LMC1992__
-#define __LMC1992__
-
-#include "emu.h"
 
 
 
@@ -71,7 +70,7 @@ class lmc1992_device :  public device_t,
 {
 public:
 	// construction/destruction
-	lmc1992_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	lmc1992_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_WRITE_LINE_MEMBER( clock_w );
 	DECLARE_WRITE_LINE_MEMBER( data_w );
@@ -92,7 +91,7 @@ private:
 	int m_enable;                   // enable latch
 	int m_data;                     // data latch
 	int m_clk;                      // clock latch
-	UINT16 m_si;                    // serial in shift register
+	uint16_t m_si;                    // serial in shift register
 
 	int m_input;                    // input select
 	int m_bass;                     // bass
@@ -106,8 +105,6 @@ private:
 
 
 // device type definition
-extern const device_type LMC1992;
+DECLARE_DEVICE_TYPE(LMC1992, lmc1992_device)
 
-
-
-#endif
+#endif // MAME_SOUND_LMC1992_H

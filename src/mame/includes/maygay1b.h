@@ -19,11 +19,12 @@
 #include "machine/roc10937.h"   // vfd
 #include "machine/steppers.h"   // stepper motor
 #include "sound/ay8910.h"
-#include "sound/2413intf.h"
+#include "sound/ym2413.h"
 #include "sound/okim6376.h"
 #include "machine/nvram.h"
+#include "machine/timer.h"
 #include "sound/upd7759.h"
-
+#include "cpu/mcs51/mcs51.h"
 #include "sound/okim6295.h"
 
 class maygay1b_state : public driver_device
@@ -32,6 +33,7 @@ public:
 	maygay1b_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_mcu(*this, "mcu"),
 		m_vfd(*this, "vfd"),
 		m_ay(*this, "aysnd"),
 		m_msm6376(*this, "msm6376"),
@@ -40,12 +42,7 @@ public:
 		m_duart68681(*this, "duart68681"),
 		m_sw1_port(*this, "SW1"),
 		m_sw2_port(*this, "SW2"),
-		m_s2_port(*this, "STROBE2"),
-		m_s3_port(*this, "STROBE3"),
-		m_s4_port(*this, "STROBE4"),
-		m_s5_port(*this, "STROBE5"),
-		m_s6_port(*this, "STROBE6"),
-		m_s7_port(*this, "STROBE7"),
+		m_kbd_ports(*this, { "SW1", "SW2", "STROBE2", "STROBE3", "STROBE4", "STROBE5", "STROBE6", "STROBE7", }),
 		m_bank1(*this, "bank1"),
 		m_reel0(*this, "reel0"),
 		m_reel1(*this, "reel1"),
@@ -58,7 +55,8 @@ public:
 	{}
 
 	required_device<cpu_device> m_maincpu;
-	optional_device<s16lf01_t> m_vfd;
+	required_device<i80c51_device> m_mcu;
+	optional_device<s16lf01_device> m_vfd;
 	required_device<ay8910_device> m_ay;
 	optional_device<okim6376_device> m_msm6376;
 	optional_device<upd7759_device> m_upd7759;
@@ -66,12 +64,7 @@ public:
 	required_device<mc68681_device> m_duart68681;
 	required_ioport m_sw1_port;
 	required_ioport m_sw2_port;
-	required_ioport m_s2_port;
-	required_ioport m_s3_port;
-	required_ioport m_s4_port;
-	required_ioport m_s5_port;
-	required_ioport m_s6_port;
-	required_ioport m_s7_port;
+	required_ioport_array<8> m_kbd_ports;
 	required_memory_bank m_bank1;
 	required_device<stepper_device> m_reel0;
 	required_device<stepper_device> m_reel1;
@@ -80,9 +73,9 @@ public:
 	required_device<stepper_device> m_reel4;
 	required_device<stepper_device> m_reel5;
 	required_device<meters_device> m_meters;
-	optional_region_ptr<UINT8> m_oki_region;
+	optional_region_ptr<uint8_t> m_oki_region;
 
-	UINT8 m_lamppos;
+	uint8_t m_lamppos;
 	int m_lamp_strobe;
 	int m_old_lamp_strobe;
 	int m_lamp_strobe2;
@@ -95,7 +88,7 @@ public:
 	int m_NMIENABLE;
 	int m_meter;
 	TIMER_DEVICE_CALLBACK_MEMBER( maygay1b_nmitimer_callback );
-	UINT8 m_Lamps[256];
+	uint8_t m_Lamps[256];
 	int m_optic_pattern;
 	DECLARE_WRITE_LINE_MEMBER(reel0_optic_cb) { if (state) m_optic_pattern |= 0x01; else m_optic_pattern &= ~0x01; }
 	DECLARE_WRITE_LINE_MEMBER(reel1_optic_cb) { if (state) m_optic_pattern |= 0x02; else m_optic_pattern &= ~0x02; }
@@ -104,6 +97,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(reel4_optic_cb) { if (state) m_optic_pattern |= 0x10; else m_optic_pattern &= ~0x10; }
 	DECLARE_WRITE_LINE_MEMBER(reel5_optic_cb) { if (state) m_optic_pattern |= 0x20; else m_optic_pattern &= ~0x20; }
 	DECLARE_WRITE8_MEMBER(scanlines_w);
+	DECLARE_WRITE8_MEMBER(scanlines_2_w);
 	DECLARE_WRITE8_MEMBER(lamp_data_w);
 	DECLARE_WRITE8_MEMBER(lamp_data_2_w);
 	DECLARE_READ8_MEMBER(kbd_r);
@@ -128,6 +122,18 @@ public:
 	DECLARE_WRITE8_MEMBER(nec_bank1_w);
 	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
 	DECLARE_READ8_MEMBER(m1_duart_r);
+	DECLARE_WRITE8_MEMBER(mcu_port0_w);
+	DECLARE_WRITE8_MEMBER(mcu_port1_w);
+	DECLARE_WRITE8_MEMBER(mcu_port2_w);
+	DECLARE_WRITE8_MEMBER(mcu_port3_w);
+	DECLARE_READ8_MEMBER(mcu_port0_r);
+	DECLARE_READ8_MEMBER(mcu_port2_r);
+
+	DECLARE_WRITE8_MEMBER(main_to_mcu_0_w);
+	DECLARE_WRITE8_MEMBER(main_to_mcu_1_w);
+
+	uint8_t m_main_to_mcu;
+
 	DECLARE_DRIVER_INIT(m1);
 	DECLARE_DRIVER_INIT(m1common);
 	DECLARE_DRIVER_INIT(m1nec);

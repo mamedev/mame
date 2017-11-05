@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2016 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
@@ -28,7 +28,8 @@
 
 #include <bgfx/bgfx.h>
 #include <ocornut-imgui/imgui.h>
-#include <ocornut-imgui/imgui_wm.h>
+#include <iconfontheaders/icons_kenney.h>
+#include <iconfontheaders/icons_font_awesome.h>
 
 #define IMGUI_MBUT_LEFT   0x01
 #define IMGUI_MBUT_RIGHT  0x02
@@ -131,13 +132,13 @@ inline uint32_t imguiRGBA(uint8_t _r, uint8_t _g, uint8_t _b, uint8_t _a = 255)
 
 BGFX_HANDLE(ImguiFontHandle);
 
-ImguiFontHandle imguiCreateFont(const void* _data, float _fontSize=15.0f);
+ImguiFontHandle imguiCreateFont(const void* _data, float _fontSize = 18.0f);
 void imguiSetFont(ImguiFontHandle _handle);
 ImguiFontHandle imguiGetCurrentFont();
 
 namespace bx { struct AllocatorI; }
 
-ImguiFontHandle imguiCreate(const void* _data = NULL, uint32_t _size = 0, float _fontSize = 15.0f, bx::AllocatorI* _allocator = NULL);
+ImguiFontHandle imguiCreate(const void* _data = NULL, uint32_t _size = 0, float _fontSize = 18.0f, bx::AllocatorI* _allocator = NULL);
 void imguiDestroy();
 
 void imguiBeginFrame(int32_t _mx, int32_t _my, uint8_t _button, int32_t _scroll, uint16_t _width, uint16_t _height, char _inputChar = 0, uint8_t _view = 255);
@@ -188,8 +189,8 @@ void imguiInput(const char* _label, char* _str, uint32_t _len, bool _enabled = t
 /// _nEnabled - Number of specified 'enabled' flags. All other unspecified tabs are considered enabled by default.
 ///             In the above example, there are 2 enabled flags: 'Tab0' is specified as enabled and 'Tab1' is specified as disabled.
 ///             Tab2 is unspecified and therefore is treated as enabled.
-uint8_t imguiTabs(uint8_t _selected, bool _enabled, ImguiAlign::Enum _align, int32_t _height, int32_t _r, uint8_t _nTabs, uint8_t _nEnabled, ...);
-uint8_t imguiTabs(uint8_t _selected, bool _enabled, ImguiAlign::Enum _align, int32_t _height, int32_t _r, uint8_t _nTabs, ...);
+uint8_t imguiTabs(uint8_t _selected, bool _enabled, ImguiAlign::Enum _align, int32_t _height, int32_t _r, uint32_t _nTabs, uint32_t _nEnabled, ...);
+uint8_t imguiTabs(uint8_t _selected, bool _enabled, ImguiAlign::Enum _align, int32_t _height, int32_t _r, uint32_t _nTabs, ...);
 
 uint32_t imguiChooseUseMacroInstead(uint32_t _selected, ...);
 #define imguiChoose(...) imguiChooseUseMacroInstead(__VA_ARGS__, NULL)

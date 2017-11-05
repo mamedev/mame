@@ -6,13 +6,14 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "mouse.h"
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type SNES_MOUSE = &device_creator<snes_mouse_device>;
+DEFINE_DEVICE_TYPE(SNES_MOUSE, snes_mouse_device, "snes_mouse", "Nintendo SNES / SFC Mouse Controller")
 
 
 static INPUT_PORTS_START( snes_mouse )
@@ -58,13 +59,15 @@ ioport_constructor snes_mouse_device::device_input_ports() const
 //  snes_mouse_device - constructor
 //-------------------------------------------------
 
-snes_mouse_device::snes_mouse_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-					device_t(mconfig, SNES_MOUSE, "Nintendo SNES / SFC Mouse Controller", tag, owner, clock, "snes_mouse", __FILE__),
-					device_snes_control_port_interface(mconfig, *this),
-					m_buttons(*this, "BUTTONS"),
-					m_xaxis(*this, "MOUSE_X"),
-					m_yaxis(*this, "MOUSE_Y"), m_strobe(0), m_idx(0), m_latch(0), m_x(0), m_y(0), m_oldx(0), m_oldy(0), m_deltax(0),
-	m_deltay(0), m_speed(0), m_dirx(0), m_diry(0)
+snes_mouse_device::snes_mouse_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, SNES_MOUSE, tag, owner, clock),
+	device_snes_control_port_interface(mconfig, *this),
+	m_buttons(*this, "BUTTONS"),
+	m_xaxis(*this, "MOUSE_X"),
+	m_yaxis(*this, "MOUSE_Y"),
+	m_strobe(0), m_idx(0), m_latch(0),
+	m_x(0), m_y(0), m_oldx(0), m_oldy(0),
+	m_deltax(0), m_deltay(0), m_speed(0), m_dirx(0), m_diry(0)
 {
 }
 
@@ -117,7 +120,7 @@ void snes_mouse_device::device_reset()
 
 void snes_mouse_device::port_poll()
 {
-	INT16 var;
+	int16_t var;
 	int new_dir;
 	m_idx = 0;
 	m_latch = m_buttons->read();
@@ -193,9 +196,9 @@ void snes_mouse_device::port_poll()
 //  read
 //-------------------------------------------------
 
-UINT8 snes_mouse_device::read_pin4()
+uint8_t snes_mouse_device::read_pin4()
 {
-	UINT8 res = 0;
+	uint8_t res = 0;
 
 	if (m_strobe == 1)
 	{
@@ -230,7 +233,7 @@ UINT8 snes_mouse_device::read_pin4()
 //  write
 //-------------------------------------------------
 
-void snes_mouse_device::write_strobe(UINT8 data)
+void snes_mouse_device::write_strobe(uint8_t data)
 {
 	int old = m_strobe;
 	m_strobe = data & 0x01;

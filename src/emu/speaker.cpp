@@ -9,6 +9,7 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "speaker.h"
 
 
 
@@ -27,7 +28,7 @@
 //**************************************************************************
 
 // device type definition
-const device_type SPEAKER = &device_creator<speaker_device>;
+DEFINE_DEVICE_TYPE(SPEAKER, speaker_device, "speaker", "Speaker")
 
 
 
@@ -39,17 +40,16 @@ const device_type SPEAKER = &device_creator<speaker_device>;
 //  speaker_device - constructor
 //-------------------------------------------------
 
-speaker_device::speaker_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, SPEAKER, "Speaker", tag, owner, clock, "speaker", __FILE__),
-		device_mixer_interface(mconfig, *this),
-		m_x(0.0),
-		m_y(0.0),
-		m_z(0.0)
+speaker_device::speaker_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, SPEAKER, tag, owner, clock)
+	, device_mixer_interface(mconfig, *this)
+	, m_x(0.0)
+	, m_y(0.0)
+	, m_z(0.0)
 #ifdef MAME_DEBUG
-	,
-		m_max_sample(0),
-		m_clipped_samples(0),
-		m_total_samples(0)
+	, m_max_sample(0)
+	, m_clipped_samples(0)
+	, m_total_samples(0)
 #endif
 {
 }
@@ -87,7 +87,7 @@ void speaker_device::static_set_position(device_t &device, double x, double y, d
 //  mix - mix in samples from the speaker's stream
 //-------------------------------------------------
 
-void speaker_device::mix(INT32 *leftmix, INT32 *rightmix, int &samples_this_update, bool suppress)
+void speaker_device::mix(s32 *leftmix, s32 *rightmix, int &samples_this_update, bool suppress)
 {
 	// skip if no stream
 	if (m_mixer_stream == nullptr)

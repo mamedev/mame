@@ -7,9 +7,10 @@
     6510 derivative, capable of running at 2MHz.
 
 ***************************************************************************/
+#ifndef MAME_CPU_M6502_M8502_H
+#define MAME_CPU_M6502_M8502_H
 
-#ifndef __M8502_H__
-#define __M8502_H__
+#pragma once
 
 #include "m6510.h"
 
@@ -21,7 +22,7 @@
 
 class m8502_device : public m6510_device {
 public:
-	m8502_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	m8502_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 enum {
@@ -29,6 +30,6 @@ enum {
 	M8502_NMI_LINE = m6502_device::NMI_LINE
 };
 
-extern const device_type M8502;
+DECLARE_DEVICE_TYPE(M8502, m8502_device)
 
-#endif
+#endif // MAME_CPU_M6502_M8502_H

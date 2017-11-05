@@ -27,19 +27,9 @@ DRIVER_INIT_MEMBER(patinho_feio_state, patinho_feio)
 	m_prev_RC = 0;
 }
 
-READ16_MEMBER(patinho_feio_state::rc_r)
-{
-	return ioport("RC")->read();
-}
-
-READ16_MEMBER(patinho_feio_state::buttons_r)
-{
-	return ioport("BUTTONS")->read();
-}
-
-void patinho_feio_state::update_panel(UINT8 ACC, UINT8 opcode, UINT8 mem_data, UINT16 mem_addr, UINT16 PC, UINT8 FLAGS, UINT16 RC, UINT8 mode){
+void patinho_feio_state::update_panel(uint8_t ACC, uint8_t opcode, uint8_t mem_data, uint16_t mem_addr, uint16_t PC, uint8_t FLAGS, uint16_t RC, uint8_t mode){
 	char lamp_id[11];
-	const char* button_names[] = {
+	static char const *const button_names[] = {
 		"NORMAL",
 		"CICLOUNICO",
 		"INSTRUCAOUNICA",
@@ -116,7 +106,7 @@ TIMER_CALLBACK_MEMBER(patinho_feio_state::decwriter_callback)
 	m_decwriter_timer->enable(0); //stop the timer
 }
 
-WRITE8_MEMBER(patinho_feio_state::decwriter_kbd_input)
+void patinho_feio_state::decwriter_kbd_input(u8 data)
 {
 	m_maincpu->transfer_byte_from_external_device(0xA, ~data);
 }
@@ -139,7 +129,7 @@ TIMER_CALLBACK_MEMBER(patinho_feio_state::teletype_callback)
 	m_teletype_timer->enable(0); //stop the timer
 }
 
-WRITE8_MEMBER(patinho_feio_state::teletype_kbd_input)
+void patinho_feio_state::teletype_kbd_input(u8 data)
 {
 	//I figured out that the data is provided inverted (2's complement)
 	//based on a comment in the source code listing of the HEXAM program.
@@ -157,15 +147,15 @@ WRITE8_MEMBER(patinho_feio_state::teletype_kbd_input)
    not use this function at all.
 */
 void patinho_feio_state::load_tape(const char* name){
-	UINT8 *RAM = (UINT8 *) memshare("maincpu:internalram")->ptr();
-	UINT8 *data = memregion(name)->base();
+	uint8_t *RAM = (uint8_t *) memshare("maincpu:internalram")->ptr();
+	uint8_t *data = memregion(name)->base();
 	unsigned int data_length = data[0];
 	unsigned int start_address = data[1]*256 + data[2];
-	INT8 expected_checksum = data[data_length + 3];
-	INT8 checksum = 0;
+	int8_t expected_checksum = data[data_length + 3];
+	int8_t checksum = 0;
 
 	for (int i = 0; i < data_length + 3; i++){
-		checksum -= (INT8) data[i];
+		checksum -= (int8_t) data[i];
 	}
 
 	if (checksum != expected_checksum){
@@ -177,21 +167,22 @@ void patinho_feio_state::load_tape(const char* name){
 }
 
 void patinho_feio_state::load_raw_data(const char* name, unsigned int start_address, unsigned int data_length){
-	UINT8 *RAM = (UINT8 *) memshare("maincpu:internalram")->ptr();
-	UINT8 *data = memregion(name)->base();
+	uint8_t *RAM = (uint8_t *) memshare("maincpu:internalram")->ptr();
+	uint8_t *data = memregion(name)->base();
 
 	memcpy(&RAM[start_address], data, data_length);
 }
 
 DEVICE_IMAGE_LOAD_MEMBER( patinho_feio_state, patinho_tape )
 {
-	if (image.software_entry() != nullptr){
+	if (image.loaded_through_softlist())
+	{
 		paper_tape_length = image.get_software_region_length("rom");
 		paper_tape_data = image.get_software_region("rom");
 		paper_tape_address = 0;
 	}
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 void patinho_feio_state::machine_start(){
@@ -232,39 +223,39 @@ static INPUT_PORTS_START( patinho_feio )
 	PORT_BIT(0x800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RC bit 11") PORT_CODE(KEYCODE_1) PORT_TOGGLE
 
 	PORT_START("BUTTONS")
-	/* Modo de Operação: EXECUÇÃO */
+	/* Modo de Operacao: EXECUCAO */
 	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("NORMAL") PORT_CODE(KEYCODE_A)
-	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("CICLO ÚNICO") PORT_CODE(KEYCODE_S)
-	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("INSTRUÇÃO ÚNICA") PORT_CODE(KEYCODE_D)
-	/* Modo de Operação: MEMÓRIA */
-	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ENDEREÇAMENTO") PORT_CODE(KEYCODE_Z)
+	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("CICLO UNICO") PORT_CODE(KEYCODE_S)
+	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("INSTRUCAO UNICA") PORT_CODE(KEYCODE_D)
+	/* Modo de Operacao: MEMORIA */
+	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ENDERECAMENTO") PORT_CODE(KEYCODE_Z)
 	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ARMAZENAMENTO") PORT_CODE(KEYCODE_X)
-	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("EXPOSIÇÃO") PORT_CODE(KEYCODE_C)
+	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("EXPOSICAO") PORT_CODE(KEYCODE_C)
 	/* Comando: */
 	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ESPERA") PORT_CODE(KEYCODE_Q)
-	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("INTERRUPÇÃO") PORT_CODE(KEYCODE_W)
+	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("INTERRUPCAO") PORT_CODE(KEYCODE_W)
 	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("PARTIDA") PORT_CODE(KEYCODE_E)
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("PREPARAÇÃO") PORT_CODE(KEYCODE_R)
+	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("PREPARACAO") PORT_CODE(KEYCODE_R)
 	/* Switches */
-	PORT_BIT(0x400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ENDEREÇAMENTO (Fixo/Sequencial)") PORT_CODE(KEYCODE_N) PORT_TOGGLE
-	PORT_BIT(0x800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("MEMÓRIA (Liberada/Protegida)") PORT_CODE(KEYCODE_M) PORT_TOGGLE
+	PORT_BIT(0x400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ENDERECAMENTO (Fixo/Sequencial)") PORT_CODE(KEYCODE_N) PORT_TOGGLE
+	PORT_BIT(0x800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("MEMORIA (Liberada/Protegida)") PORT_CODE(KEYCODE_M) PORT_TOGGLE
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( patinho_feio, patinho_feio_state )
+static MACHINE_CONFIG_START( patinho_feio )
 	/* basic machine hardware */
 	/* CPU @ approx. 500 kHz (memory cycle time is 2usec) */
-	MCFG_CPU_ADD("maincpu", PATINHO_FEIO, 500000)
-	MCFG_PATINHO_RC_READ_CB(READ16(patinho_feio_state, rc_r))
-	MCFG_PATINHO_BUTTONS_READ_CB(READ16(patinho_feio_state, buttons_r))
+	MCFG_CPU_ADD("maincpu", PATO_FEIO_CPU, 500000)
+	MCFG_PATINHO_RC_READ_CB(IOPORT("RC"))
+	MCFG_PATINHO_BUTTONS_READ_CB(IOPORT("BUTTONS"))
 
 	/* Printer */
-//	MCFG_PATINHO_IODEV_WRITE_CB(0x5, WRITE8(patinho_feio_state, printer_data_w))
+//  MCFG_PATINHO_IODEV_WRITE_CB(0x5, WRITE8(patinho_feio_state, printer_data_w))
 
 	/* Papertape Puncher */
-//	MCFG_PATINHO_IODEV_WRITE_CB(0x8, WRITE8(patinho_feio_state, papertape_punch_data_w))
+//  MCFG_PATINHO_IODEV_WRITE_CB(0x8, WRITE8(patinho_feio_state, papertape_punch_data_w))
 
 	/* Card Reader */
-//	MCFG_PATINHO_IODEV_READ_CB(0x9, READ8(patinho_feio_state, cardreader_data_r))
+//  MCFG_PATINHO_IODEV_READ_CB(0x9, READ8(patinho_feio_state, cardreader_data_r))
 
 	/* DECWRITER
 	   (max. speed: ?) */
@@ -279,15 +270,15 @@ static MACHINE_CONFIG_START( patinho_feio, patinho_feio_state )
 	/* Papertape Reader
 	   Hewlett-Packard HP-2737-A
 	   Optical Papertape Reader (max. speed: 300 characteres per second) */
-//	MCFG_PATINHO_IODEV_READ_CB(0xE, READ8(patinho_feio_state, papertapereader_data_r))
+//  MCFG_PATINHO_IODEV_READ_CB(0xE, READ8(patinho_feio_state, papertapereader_data_r))
 
 	/* DECWRITER */
 	MCFG_DEVICE_ADD("decwriter", TELEPRINTER, 0)
-	MCFG_GENERIC_TELEPRINTER_KEYBOARD_CB(WRITE8(patinho_feio_state, decwriter_kbd_input))
+	MCFG_GENERIC_TELEPRINTER_KEYBOARD_CB(PUT(patinho_feio_state, decwriter_kbd_input))
 
 	/* Teletype */
 	MCFG_DEVICE_ADD("teletype", TELEPRINTER, 1)
-	MCFG_GENERIC_TELEPRINTER_KEYBOARD_CB(WRITE8(patinho_feio_state, teletype_kbd_input))
+	MCFG_GENERIC_TELEPRINTER_KEYBOARD_CB(PUT(patinho_feio_state, teletype_kbd_input))
 
 	/* punched tape */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "patinho_tape")
@@ -297,7 +288,7 @@ static MACHINE_CONFIG_START( patinho_feio, patinho_feio_state )
 	MCFG_DEFAULT_LAYOUT(layout_patinho)
 
 	// software lists
-//	MCFG_SOFTWARE_LIST_ADD("tape_list", "patinho")
+//  MCFG_SOFTWARE_LIST_ADD("tape_list", "patinho")
 MACHINE_CONFIG_END
 
 ROM_START( patinho )
@@ -313,9 +304,9 @@ ROM_START( patinho )
 	/* Micro pre-loader:
 	   This was re-created by professor Joao Jose Neto based on his vague
 	   recollection of sequences of opcode values from almost 40 years ago :-) */
-	ROM_REGION( 0x02a, "micro_pre_loader", 0 ) 
+	ROM_REGION( 0x02a, "micro_pre_loader", 0 )
 	ROM_LOAD( "micro-pre-loader.bin", 0x000, 0x02a, CRC(1921feab) SHA1(bb063102e44e9ab963f95b45710141dc2c5046b0) )
 ROM_END
 
-/*    YEAR  NAME      PARENT    COMPAT  MACHINE        INPUT         INIT                              COMPANY                                           FULLNAME */
-COMP( 1972, patinho,  0,        0,      patinho_feio,  patinho_feio, patinho_feio_state, patinho_feio, "Escola Politecnica - Universidade de Sao Paulo", "Patinho Feio" , MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING)
+//    YEAR  NAME      PARENT    COMPAT  MACHINE        INPUT         STATE               INIT          COMPANY                                           FULLNAME         FLAGS
+COMP( 1972, patinho,  0,        0,      patinho_feio,  patinho_feio, patinho_feio_state, patinho_feio, "Escola Politecnica - Universidade de Sao Paulo", "Patinho Feio" , MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )

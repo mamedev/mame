@@ -26,8 +26,8 @@
 #include "emu.h"
 #include <ctype.h>
 
-static const UINT8 *rombase;
-static const UINT8 *rambase;
+static const uint8_t *rombase;
+static const uint8_t *rambase;
 static offs_t pcbase;
 #define READOP16(A)  (rombase[(A) - pcbase] | (rombase[(A) + 1 - pcbase] << 8))
 #define READARG16(A) (rambase[(A) - pcbase] | (rambase[(A) + 1 - pcbase] << 8))
@@ -135,7 +135,7 @@ static void InitDasm16C5x(void)
 			fatalerror("not enough bits in encoding '%s %s' %d\n",
 				ops[0],ops[1],bit);
 		}
-		while (isspace((UINT8)*p)) p++;
+		while (isspace((uint8_t)*p)) p++;
 		if (*p) Op[i].extcode = *p;
 		Op[i].bits = bits;
 		Op[i].mask = mask;
@@ -149,7 +149,7 @@ static void InitDasm16C5x(void)
 	OpInizialized = 1;
 }
 
-CPU_DISASSEMBLE( pic16c5x )
+CPU_DISASSEMBLE(pic16c5x)
 {
 	int a, b, d, f, k;  /* these can all be filled in by parsing an instruction */
 	int i;
@@ -159,7 +159,7 @@ CPU_DISASSEMBLE( pic16c5x )
 	int bit;
 	//char *buffertmp;
 	const char *cp;             /* character pointer in OpFormats */
-	UINT32 flags = 0;
+	uint32_t flags = 0;
 
 	rombase = oprom;
 	rambase = opram;
@@ -183,7 +183,7 @@ CPU_DISASSEMBLE( pic16c5x )
 	}
 	if (op == -1)
 	{
-		sprintf(buffer,"???? dw %04Xh",code);
+		util::stream_format(stream, "???? dw %04Xh",code);
 		return cnt;
 	}
 	//buffertmp = buffer;
@@ -231,25 +231,21 @@ CPU_DISASSEMBLE( pic16c5x )
 	{
 		if (*cp == '%')
 		{
-			char num[30], *q;
 			cp++;
 			switch (*cp++)
 			{
-				case 'A': sprintf(num,"$%03X",a); break;
-				case 'B': sprintf(num,"%d",b); break;
-				case 'D': sprintf(num,"%s",dest[d]); break;
-				case 'F': sprintf(num,"%s",regfile[f]); break;
-				case 'K': sprintf(num,"%02Xh",k); break;
+				case 'A': util::stream_format(stream, "$%03X", a); break;
+				case 'B': util::stream_format(stream, "%d", b); break;
+				case 'D': util::stream_format(stream, "%s", dest[d]); break;
+				case 'F': util::stream_format(stream, "%s", regfile[f]); break;
+				case 'K': util::stream_format(stream, "%02Xh", k); break;
 				default:
 					fatalerror("illegal escape character in format '%s'\n",Op[op].fmt);
 			}
-			q = num; while (*q) *buffer++ = *q++;
-			*buffer = '\0';
 		}
 		else
 		{
-			*buffer++ = *cp++;
-			*buffer = '\0';
+			stream << *cp++;
 		}
 	}
 	return cnt | flags | DASMFLAG_SUPPORTED;

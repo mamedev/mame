@@ -7,12 +7,11 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_VCS_CTRL_JOYBOOSTER_H
+#define MAME_BUS_VCS_CTRL_JOYBOOSTER_H
+
 #pragma once
 
-#ifndef __VCS_JOYSTICKBOOSTER__
-#define __VCS_JOYSTICKBOOSTER__
-
-#include "emu.h"
 #include "ctrl.h"
 
 
@@ -28,7 +27,7 @@ class vcs_joystick_booster_device : public device_t,
 {
 public:
 	// construction/destruction
-	vcs_joystick_booster_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	vcs_joystick_booster_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual ioport_constructor device_input_ports() const override;
@@ -38,9 +37,9 @@ protected:
 	virtual void device_start() override;
 
 	// device_vcs_control_port_interface overrides
-	virtual UINT8 vcs_joy_r() override;
-	virtual UINT8 vcs_pot_x_r() override;
-	virtual UINT8 vcs_pot_y_r() override;
+	virtual uint8_t vcs_joy_r() override;
+	virtual uint8_t vcs_pot_x_r() override;
+	virtual uint8_t vcs_pot_y_r() override;
 
 	virtual bool has_pot_x() override { return true; }
 	virtual bool has_pot_y() override { return true; }
@@ -53,7 +52,6 @@ private:
 
 
 // device type definition
-extern const device_type VCS_JOYSTICK_BOOSTER;
+DECLARE_DEVICE_TYPE(VCS_JOYSTICK_BOOSTER, vcs_joystick_booster_device)
 
-
-#endif
+#endif // MAME_BUS_VCS_CTRL_JOYBOOSTER_H

@@ -1,4 +1,4 @@
-// license:LGPL-2.1+
+// license:BSD-3-Clause
 // copyright-holders:Tomasz Slanina, Pierpaolo Prazzoli
 /*
 Dynamic Dice (??)
@@ -34,10 +34,13 @@ dy_6.bin (near Z80)
 */
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
 #include "cpu/i8085/i8085.h"
-#include "sound/ay8910.h"
+#include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
 #include "machine/nvram.h"
+#include "sound/ay8910.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class dynadice_state : public driver_device
@@ -50,8 +53,8 @@ public:
 		m_gfxdecode(*this, "gfxdecode") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_videoram;
-//  UINT8 *  m_nvram;     // currently this uses generic nvram handling
+	required_shared_ptr<uint8_t> m_videoram;
+//  uint8_t *  m_nvram;     // currently this uses generic nvram handling
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
@@ -67,7 +70,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_dynadice(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_dynadice(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 };
@@ -116,7 +119,7 @@ static ADDRESS_MAP_START( dynadice_io_map, AS_IO, 8, dynadice_state )
 	AM_RANGE(0x51, 0x51) AM_READ_PORT("IN1")
 	AM_RANGE(0x52, 0x52) AM_READ_PORT("DSW")
 	AM_RANGE(0x62, 0x62) AM_WRITENOP
-	AM_RANGE(0x63, 0x63) AM_WRITE(soundlatch_byte_w)
+	AM_RANGE(0x63, 0x63) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0x70, 0x77) AM_WRITENOP
 ADDRESS_MAP_END
 
@@ -127,8 +130,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dynadice_sound_io_map, AS_IO, 8, dynadice_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(soundlatch_byte_r)
-	AM_RANGE(0x01, 0x01) AM_WRITE(soundlatch_clear_byte_w)
+	AM_RANGE(0x00, 0x00) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
+	AM_RANGE(0x01, 0x01) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0x02, 0x02) AM_WRITE(sound_data_w)
 	AM_RANGE(0x03, 0x03) AM_WRITE(sound_control_w)
 ADDRESS_MAP_END
@@ -211,12 +214,12 @@ TILE_GET_INFO_MEMBER(dynadice_state::get_tile_info)
 void dynadice_state::video_start()
 {
 	/* pacman - style videoram layout */
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dynadice_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_top_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dynadice_state::get_tile_info),this), TILEMAP_SCAN_COLS, 8, 8, 2, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(dynadice_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_top_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(dynadice_state::get_tile_info),this), TILEMAP_SCAN_COLS, 8, 8, 2, 32);
 	m_bg_tilemap->set_scrollx(0, -16);
 }
 
-UINT32 dynadice_state::screen_update_dynadice(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t dynadice_state::screen_update_dynadice(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	rectangle myclip = cliprect;
 	myclip.max_x = 15;
@@ -235,7 +238,7 @@ void dynadice_state::machine_reset()
 	m_ay_data = 0;
 }
 
-static MACHINE_CONFIG_START( dynadice, dynadice_state )
+static MACHINE_CONFIG_START( dynadice )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080,18432000/8)
@@ -263,6 +266,8 @@ static MACHINE_CONFIG_START( dynadice, dynadice_state )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("aysnd", AY8910, 2000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -289,10 +294,10 @@ ROM_END
 DRIVER_INIT_MEMBER(dynadice_state,dynadice)
 {
 	int i, j;
-	UINT8 *usr1 = memregion("user1")->base();
-	UINT8 *cpu2 = memregion("audiocpu")->base();
-	UINT8 *gfx1 = memregion("gfx1")->base();
-	UINT8 *gfx2 = memregion("gfx2")->base();
+	uint8_t *usr1 = memregion("user1")->base();
+	uint8_t *cpu2 = memregion("audiocpu")->base();
+	uint8_t *gfx1 = memregion("gfx1")->base();
+	uint8_t *gfx2 = memregion("gfx2")->base();
 
 	cpu2[0x0b] = 0x23;  /* bug in game code  Dec HL -> Inc HL*/
 

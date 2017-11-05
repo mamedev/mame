@@ -22,7 +22,7 @@ void madmotor_state::video_start()
 
 /******************************************************************************/
 
-UINT32 madmotor_state::screen_update_madmotor(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t madmotor_state::screen_update_madmotor(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	flip_screen_set(m_tilegen1->get_flip_state());
 

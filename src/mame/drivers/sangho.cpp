@@ -48,7 +48,9 @@ TODO:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "video/v9938.h"
-#include "sound/2413intf.h"
+#include "sound/ym2413.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class sangho_state : public driver_device
@@ -69,10 +71,10 @@ public:
 		, m_bank8(*this, "bank8")
 	{ }
 
-	std::unique_ptr<UINT8[]> m_ram;
-	UINT8 m_sexyboom_bank[8];
-	UINT8 m_pzlestar_mem_bank;
-	UINT8 m_pzlestar_rom_bank;
+	std::unique_ptr<uint8_t[]> m_ram;
+	uint8_t m_sexyboom_bank[8];
+	uint8_t m_pzlestar_mem_bank;
+	uint8_t m_pzlestar_rom_bank;
 	required_device<v9958_device> m_v9958;
 	required_device<cpu_device> m_maincpu;
 	required_memory_region m_region_user1;
@@ -84,7 +86,7 @@ public:
 	required_memory_bank m_bank6;
 	required_memory_bank m_bank7;
 	required_memory_bank m_bank8;
-	UINT8 m_sec_slot[4];
+	uint8_t m_sec_slot[4];
 
 	DECLARE_WRITE8_MEMBER(pzlestar_bank_w);
 	DECLARE_WRITE8_MEMBER(pzlestar_mem_bank_w);
@@ -96,7 +98,6 @@ public:
 	DECLARE_MACHINE_RESET(sexyboom);
 	void pzlestar_map_banks();
 	void sexyboom_map_bank(int bank);
-	DECLARE_WRITE_LINE_MEMBER(msx_vdp_interrupt);
 	DECLARE_READ8_MEMBER(sec_slot_r);
 	DECLARE_WRITE8_MEMBER(sec_slot_w);
 };
@@ -226,8 +227,8 @@ void sangho_state::sexyboom_map_bank(int bank)
 	memory_bank *read_bank[4] = { m_bank1, m_bank2, m_bank3, m_bank4 };
 	memory_bank *write_bank[4] = { m_bank5, m_bank6, m_bank7, m_bank8 };
 
-	UINT8 banknum = m_sexyboom_bank[bank*2];
-	UINT8 banktype = m_sexyboom_bank[bank*2 + 1];
+	uint8_t banknum = m_sexyboom_bank[bank*2];
+	uint8_t banktype = m_sexyboom_bank[bank*2 + 1];
 
 	if (banktype == 0)
 	{
@@ -425,7 +426,7 @@ INPUT_PORTS_END
 
 void sangho_state::machine_start()
 {
-	m_ram = std::make_unique<UINT8[]>(0x20000); // TODO: define how much RAM these ones have (MSX2+ can potentially go up to 4MB)
+	m_ram = std::make_unique<uint8_t[]>(0x20000); // TODO: define how much RAM these ones have (MSX2+ can potentially go up to 4MB)
 }
 
 MACHINE_RESET_MEMBER(sangho_state,pzlestar)
@@ -450,39 +451,34 @@ MACHINE_RESET_MEMBER(sangho_state,sexyboom)
 	sexyboom_map_bank(3);
 }
 
-WRITE_LINE_MEMBER(sangho_state::msx_vdp_interrupt)
-{
-	m_maincpu->set_input_line(0, (state ? HOLD_LINE : CLEAR_LINE));
-}
 
+static MACHINE_CONFIG_START( pzlestar )
 
-static MACHINE_CONFIG_START( pzlestar, sangho_state )
-
-	MCFG_CPU_ADD("maincpu", Z80,8000000) // ?
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_21_4772MHz/6) // ?
 	MCFG_CPU_PROGRAM_MAP(sangho_map)
 	MCFG_CPU_IO_MAP(pzlestar_io_map)
 
 	MCFG_V9958_ADD("v9958", "screen", 0x20000, XTAL_21_4772MHz) // typical 9958 clock, not verified
-	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(sangho_state,msx_vdp_interrupt))
+	MCFG_V99X8_INTERRUPT_CALLBACK(INPUTLINE("maincpu", 0))
 	MCFG_V99X8_SCREEN_ADD_NTSC("screen", "v9958", XTAL_21_4772MHz)
 
 	MCFG_MACHINE_RESET_OVERRIDE(sangho_state,pzlestar)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ymsnd", YM2413, 3580000)
+	MCFG_SOUND_ADD("ymsnd", YM2413,  XTAL_21_4772MHz/6)
 
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( sexyboom, sangho_state )
+static MACHINE_CONFIG_START( sexyboom )
 
-	MCFG_CPU_ADD("maincpu", Z80,8000000) // ?
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_21_4772MHz/6)
 	MCFG_CPU_PROGRAM_MAP(sangho_map)
 	MCFG_CPU_IO_MAP(sexyboom_io_map)
 
-	MCFG_V9958_ADD("v9958", "screen", 0x20000, XTAL_21_4772MHz) // typical 9958 clock, not verified
-	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(sangho_state,msx_vdp_interrupt))
+	MCFG_V9958_ADD("v9958", "screen", 0x20000, XTAL_21_4772MHz)
+	MCFG_V99X8_INTERRUPT_CALLBACK(INPUTLINE("maincpu", 0))
 	MCFG_V99X8_SCREEN_ADD_NTSC("screen", "v9958", XTAL_21_4772MHz)
 
 	MCFG_MACHINE_RESET_OVERRIDE(sangho_state,sexyboom)
@@ -490,7 +486,7 @@ static MACHINE_CONFIG_START( sexyboom, sangho_state )
 	MCFG_PALETTE_ADD("palette", 19780)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ymsnd", YM2413, 3580000)
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_21_4772MHz/6)
 
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -535,7 +531,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(sangho_state,pzlestar)
 {
-	UINT8 *ROM = m_region_user1->base();
+	uint8_t *ROM = m_region_user1->base();
 
 	/* patch nasty looping check, related to sound? */
 	ROM[0x12ca7] = 0x00;
@@ -543,4 +539,4 @@ DRIVER_INIT_MEMBER(sangho_state,pzlestar)
 }
 
 GAME( 1991, pzlestar,  0,    pzlestar, pzlestar, sangho_state,  pzlestar,   ROT270, "Sang Ho Soft", "Puzzle Star (Sang Ho Soft)", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND )
-GAME( 1992, sexyboom,  0,    sexyboom, sexyboom, driver_device, 0,          ROT270, "Sang Ho Soft", "Sexy Boom", 0 )
+GAME( 1992, sexyboom,  0,    sexyboom, sexyboom, sangho_state,  0,          ROT270, "Sang Ho Soft", "Sexy Boom", 0 )

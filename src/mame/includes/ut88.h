@@ -9,7 +9,6 @@
 #ifndef UT88_H_
 #define UT88_H_
 
-#include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "sound/dac.h"
 #include "sound/wave.h"
@@ -31,7 +30,7 @@ public:
 		m_cassette(*this, "cassette"),
 		m_ppi(*this, "ppi8255"),
 		m_dac(*this, "dac"),
-		m_p_videoram(*this, "p_videoram"),
+		m_p_videoram(*this, "videoram"),
 		m_region_maincpu(*this, "maincpu"),
 		m_region_proms(*this, "proms"),
 		m_bank1(*this, "bank1"),
@@ -48,9 +47,6 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")  { }
 
-	required_device<cassette_image_device> m_cassette;
-	optional_device<i8255_device> m_ppi;
-	optional_device<dac_device> m_dac;
 	DECLARE_READ8_MEMBER(ut88_keyboard_r);
 	DECLARE_WRITE8_MEMBER(ut88_keyboard_w);
 	DECLARE_WRITE8_MEMBER(ut88_sound_w);
@@ -60,18 +56,21 @@ public:
 	DECLARE_READ8_MEMBER(ut88_8255_portb_r);
 	DECLARE_READ8_MEMBER(ut88_8255_portc_r);
 	DECLARE_WRITE8_MEMBER(ut88_8255_porta_w);
-	optional_shared_ptr<UINT8> m_p_videoram;
-	int m_keyboard_mask;
-	int m_lcd_digit[6];
 	DECLARE_DRIVER_INIT(ut88);
 	DECLARE_DRIVER_INIT(ut88mini);
 	DECLARE_MACHINE_RESET(ut88);
 	DECLARE_VIDEO_START(ut88);
 	DECLARE_MACHINE_START(ut88mini);
 	DECLARE_MACHINE_RESET(ut88mini);
-	UINT32 screen_update_ut88(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_ut88(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-protected:
+private:
+	required_device<cassette_image_device> m_cassette;
+	optional_device<i8255_device> m_ppi;
+	optional_device<dac_bit_interface> m_dac;
+	optional_shared_ptr<uint8_t> m_p_videoram;
+	int m_keyboard_mask;
+	int m_lcd_digit[6];
 	required_memory_region m_region_maincpu;
 	optional_memory_region m_region_proms;
 	optional_memory_bank m_bank1;

@@ -95,7 +95,7 @@ WRITE8_MEMBER(irobot_state::irobot_statwr_w)
 
 WRITE8_MEMBER(irobot_state::irobot_out0_w)
 {
-	UINT8 *RAM = memregion("maincpu")->base();
+	uint8_t *RAM = memregion("maincpu")->base();
 
 	m_out0 = data;
 	switch (data & 0x60)
@@ -117,7 +117,7 @@ WRITE8_MEMBER(irobot_state::irobot_out0_w)
 
 WRITE8_MEMBER(irobot_state::irobot_rom_banksel_w)
 {
-	UINT8 *RAM = memregion("maincpu")->base();
+	uint8_t *RAM = memregion("maincpu")->base();
 
 	switch ((data & 0x0E) >> 1)
 	{
@@ -162,7 +162,7 @@ TIMER_CALLBACK_MEMBER(irobot_state::scanline_callback)
 
 void irobot_state::machine_reset()
 {
-	UINT8 *MB = memregion("mathbox")->base();
+	uint8_t *MB = memregion("mathbox")->base();
 
 	/* initialize the memory regions */
 	m_mbROM     = MB + 0x00000;
@@ -282,38 +282,38 @@ static void disassemble_instruction(irmb_ops *op);
 #endif
 
 
-UINT32 irobot_state::irmb_din(const irmb_ops *curop)
+uint32_t irobot_state::irmb_din(const irmb_ops *curop)
 {
-	UINT32 d = 0;
+	uint32_t d = 0;
 
 	if (!(curop->flags & FL_MBMEMDEC) && (curop->flags & FL_MBRW))
 	{
-		UINT32 ad = curop->diradd | (m_irmb_latch & curop->latchmask);
+		uint32_t ad = curop->diradd | (m_irmb_latch & curop->latchmask);
 
 		if (curop->diren || (m_irmb_latch & 0x6000) == 0)
-			d = ((UINT16 *)m_mbRAM)[ad & 0xfff];             /* MB RAM read */
+			d = ((uint16_t *)m_mbRAM)[ad & 0xfff];             /* MB RAM read */
 		else if (m_irmb_latch & 0x4000)
-			d = ((UINT16 *)m_mbROM)[ad + 0x2000];                /* MB ROM read, CEMATH = 1 */
+			d = ((uint16_t *)m_mbROM)[ad + 0x2000];                /* MB ROM read, CEMATH = 1 */
 		else
-			d = ((UINT16 *)m_mbROM)[ad & 0x1fff];                /* MB ROM read, CEMATH = 0 */
+			d = ((uint16_t *)m_mbROM)[ad & 0x1fff];                /* MB ROM read, CEMATH = 0 */
 	}
 	return d;
 }
 
 
-void irobot_state::irmb_dout(const irmb_ops *curop, UINT32 d)
+void irobot_state::irmb_dout(const irmb_ops *curop, uint32_t d)
 {
 	/* Write to video com ram */
 	if (curop->ramsel == 3)
-		((UINT16 *)m_combase_mb)[m_irmb_latch & 0x7ff] = d;
+		((uint16_t *)m_combase_mb)[m_irmb_latch & 0x7ff] = d;
 
 	/* Write to mathox ram */
 	if (!(curop->flags & FL_MBMEMDEC))
 	{
-		UINT32 ad = curop->diradd | (m_irmb_latch & curop->latchmask);
+		uint32_t ad = curop->diradd | (m_irmb_latch & curop->latchmask);
 
 		if (curop->diren || (m_irmb_latch & 0x6000) == 0)
-			((UINT16 *)m_mbRAM)[ad & 0xfff] = d;             /* MB RAM write */
+			((uint16_t *)m_mbRAM)[ad & 0xfff] = d;             /* MB RAM write */
 	}
 }
 
@@ -321,7 +321,7 @@ void irobot_state::irmb_dout(const irmb_ops *curop, UINT32 d)
 /* Convert microcode roms to a more usable form */
 void irobot_state::load_oproms()
 {
-	UINT8 *MB = memregion("proms")->base() + 0x20;
+	uint8_t *MB = memregion("proms")->base() + 0x20;
 	int i;
 
 	/* allocate RAM */
@@ -529,23 +529,23 @@ void irobot_state::irmb_run()
 	const irmb_ops *prevop = &m_mbops[0];
 	const irmb_ops *curop = &m_mbops[0];
 
-	UINT32 Q = 0;
-	UINT32 Y = 0;
-	UINT32 nflag = 0;
-	UINT32 vflag = 0;
-	UINT32 cflag = 0;
-	UINT32 zresult = 1;
-	UINT32 CI = 0;
-	UINT32 SP = 0;
-	UINT32 icount = 0;
+	uint32_t Q = 0;
+	uint32_t Y = 0;
+	uint32_t nflag = 0;
+	uint32_t vflag = 0;
+	uint32_t cflag = 0;
+	uint32_t zresult = 1;
+	uint32_t CI = 0;
+	uint32_t SP = 0;
+	uint32_t icount = 0;
 
 	g_profiler.start(PROFILER_USER1);
 
 	while ((prevop->flags & (FL_DPSEL | FL_carry)) != (FL_DPSEL | FL_carry))
 	{
-		UINT32 result;
-		UINT32 fu;
-		UINT32 tmp;
+		uint32_t result;
+		uint32_t fu;
+		uint32_t tmp;
 
 		icount += curop->cycles;
 

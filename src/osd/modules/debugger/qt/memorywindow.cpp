@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Andrew Gardner
+#include "emu.h"
 #include <QtGui/QClipboard>
 #include <QtGui/QMouseEvent>
 #include <QtWidgets/QActionGroup>
@@ -291,7 +292,7 @@ void MemoryWindow::populateComboBox()
 
 void MemoryWindow::setToCurrentCpu()
 {
-	device_t* curCpu = debug_cpu_get_visible_cpu(*m_machine);
+	device_t* curCpu = m_machine->debugger().cpu().get_visible_cpu();
 	const debug_view_source *source = m_memTable->view()->source_for_device(curCpu);
 	const int listIndex = m_memTable->view()->source_list().indexof(*source);
 	m_memoryComboBox->setCurrentIndex(listIndex);
@@ -328,7 +329,7 @@ void DebuggerMemView::mousePressEvent(QMouseEvent* event)
 	{
 		QFontMetrics actualFont = fontMetrics();
 		const double fontWidth = actualFont.width(QString(100, '_')) / 100.;
-		const int fontHeight = MAX(1, actualFont.height());
+		const int fontHeight = std::max(1, actualFont.height());
 
 		debug_view_xy topLeft = view()->visible_position();
 		debug_view_xy clickViewPosition;
@@ -346,7 +347,7 @@ void DebuggerMemView::mousePressEvent(QMouseEvent* event)
 			const debug_view_memory_source* source = downcast<const debug_view_memory_source*>(memView->source());
 			address_space* addressSpace = source->space();
 			const int nativeDataWidth = addressSpace->data_width() / 8;
-			const UINT64 memValue = debug_read_memory(*addressSpace,
+			const uint64_t memValue = source->device()->machine().debugger().cpu().read_memory(*addressSpace,
 														addressSpace->address_to_byte(address),
 														nativeDataWidth,
 														true);
@@ -430,21 +431,21 @@ void MemoryWindowQtConfig::applyToQWidget(QWidget* widget)
 }
 
 
-void MemoryWindowQtConfig::addToXmlDataNode(xml_data_node* node) const
+void MemoryWindowQtConfig::addToXmlDataNode(util::xml::data_node &node) const
 {
 	WindowQtConfig::addToXmlDataNode(node);
-	xml_set_attribute_int(node, "memoryregion", m_memoryRegion);
-	xml_set_attribute_int(node, "reverse", m_reverse);
-	xml_set_attribute_int(node, "addressmode", m_addressMode);
-	xml_set_attribute_int(node, "dataformat", m_dataFormat);
+	node.set_attribute_int("memoryregion", m_memoryRegion);
+	node.set_attribute_int("reverse", m_reverse);
+	node.set_attribute_int("addressmode", m_addressMode);
+	node.set_attribute_int("dataformat", m_dataFormat);
 }
 
 
-void MemoryWindowQtConfig::recoverFromXmlNode(xml_data_node* node)
+void MemoryWindowQtConfig::recoverFromXmlNode(util::xml::data_node const &node)
 {
 	WindowQtConfig::recoverFromXmlNode(node);
-	m_memoryRegion = xml_get_attribute_int(node, "memoryregion", m_memoryRegion);
-	m_reverse = xml_get_attribute_int(node, "reverse", m_reverse);
-	m_addressMode = xml_get_attribute_int(node, "addressmode", m_addressMode);
-	m_dataFormat = xml_get_attribute_int(node, "dataformat", m_dataFormat);
+	m_memoryRegion = node.get_attribute_int("memoryregion", m_memoryRegion);
+	m_reverse = node.get_attribute_int("reverse", m_reverse);
+	m_addressMode = node.get_attribute_int("addressmode", m_addressMode);
+	m_dataFormat = node.get_attribute_int("dataformat", m_dataFormat);
 }

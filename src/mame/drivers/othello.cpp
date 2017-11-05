@@ -1,4 +1,4 @@
-// license:LGPL-2.1+
+// license:BSD-3-Clause
 // copyright-holders:Tomasz Slanina
 /*
 
@@ -16,7 +16,7 @@ CPU Board:
  D8243          - I/O Expander for D7751C (8048 based)
 
 Video Board:
- almost empty - 3/4 sodlering pins not populated
+ almost empty - 3/4 soldering pins not populated
 
 
 
@@ -38,12 +38,18 @@ Limit for help/undo (matta):
 */
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
+
 #include "cpu/mcs48/mcs48.h"
+#include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
 #include "machine/i8243.h"
-#include "sound/dac.h"
 #include "sound/ay8910.h"
+#include "sound/dac.h"
+#include "sound/volt_reg.h"
 #include "video/mc6845.h"
+
+#include "screen.h"
+#include "speaker.h"
 
 
 #define TILE_WIDTH 6
@@ -58,12 +64,13 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_ay1(*this, "ay1"),
 		m_ay2(*this, "ay2"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch")
 	{
 	}
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<uint8_t> m_videoram;
 
 	/* video-related */
 	int    m_tile_bank;
@@ -71,8 +78,8 @@ public:
 	/* misc */
 	int   m_ay_select;
 	int   m_ack_data;
-	UINT8 m_n7751_command;
-//  UINT32 m_n7751_rom_address;
+	uint8_t m_n7751_command;
+//  uint32_t m_n7751_rom_address;
 	int m_sound_addr;
 	int m_n7751_busy;
 
@@ -83,6 +90,7 @@ public:
 	mc6845_device *m_mc6845;
 	device_t *m_n7751;
 	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
 
 	DECLARE_READ8_MEMBER(unk_87_r);
 	DECLARE_WRITE8_MEMBER(unk_8a_w);
@@ -98,7 +106,6 @@ public:
 	DECLARE_WRITE8_MEMBER(ay_data_w);
 	DECLARE_READ8_MEMBER(n7751_rom_r);
 	DECLARE_READ8_MEMBER(n7751_command_r);
-	DECLARE_READ8_MEMBER(n7751_t1_r);
 	DECLARE_WRITE8_MEMBER(n7751_p2_w);
 	DECLARE_WRITE8_MEMBER(n7751_rom_control_w);
 	virtual void machine_start() override;
@@ -112,10 +119,10 @@ MC6845_UPDATE_ROW( othello_state::crtc_update_row )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	int cx, x;
-	UINT32 data_address;
-	UINT32 tmp;
+	uint32_t data_address;
+	uint32_t tmp;
 
-	const UINT8 *gfx = memregion("gfx")->base();
+	const uint8_t *gfx = memregion("gfx")->base();
 
 	for(cx = 0; cx < x_count; ++cx)
 	{
@@ -212,14 +219,14 @@ static ADDRESS_MAP_START( main_portmap, AS_IO, 8, othello_state )
 	AM_RANGE(0x87, 0x87) AM_READ(unk_87_r)
 	AM_RANGE(0x8a, 0x8a) AM_WRITE(unk_8a_w)
 	AM_RANGE(0x8c, 0x8c) AM_READWRITE(unk_8c_r, unk_8c_w)
-	AM_RANGE(0x8d, 0x8d) AM_READWRITE(sound_ack_r, soundlatch_byte_w)
+	AM_RANGE(0x8d, 0x8d) AM_READ(sound_ack_r) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0x8f, 0x8f) AM_WRITE(unk_8f_w)
 ADDRESS_MAP_END
 
 READ8_MEMBER(othello_state::latch_r)
 {
-	int retval = soundlatch_byte_r(space, 0);
-	soundlatch_clear_byte_w(space, 0, 0);
+	int retval = m_soundlatch->read(space, 0);
+	m_soundlatch->clear_w(space, 0, 0);
 	return retval;
 }
 
@@ -306,27 +313,12 @@ WRITE8_MEMBER(othello_state::n7751_p2_w)
 	i8243_device *device = machine().device<i8243_device>("n7751_8243");
 
 	/* write to P2; low 4 bits go to 8243 */
-	device->i8243_p2_w(space, offset, data & 0x0f);
+	device->p2_w(space, offset, data & 0x0f);
 
 	/* output of bit $80 indicates we are ready (1) or busy (0) */
 	/* no other outputs are used */
 	m_n7751_busy = data;
 }
-
-READ8_MEMBER(othello_state::n7751_t1_r)
-{
-	/* T1 - labelled as "TEST", connected to ground */
-	return 0;
-}
-
-static ADDRESS_MAP_START( n7751_portmap, AS_IO, 8, othello_state )
-	AM_RANGE(MCS48_PORT_T1,   MCS48_PORT_T1) AM_READ(n7751_t1_r)
-	AM_RANGE(MCS48_PORT_P2,   MCS48_PORT_P2) AM_READ(n7751_command_r)
-	AM_RANGE(MCS48_PORT_BUS,  MCS48_PORT_BUS) AM_READ(n7751_rom_r)
-	AM_RANGE(MCS48_PORT_P1,   MCS48_PORT_P1) AM_DEVWRITE("dac", dac_device, write_unsigned8)
-	AM_RANGE(MCS48_PORT_P2,   MCS48_PORT_P2) AM_WRITE(n7751_p2_w)
-	AM_RANGE(MCS48_PORT_PROG, MCS48_PORT_PROG) AM_DEVWRITE("n7751_8243", i8243_device, i8243_prog_w)
-ADDRESS_MAP_END
 
 static INPUT_PORTS_START( othello )
 	PORT_START("DSW")
@@ -397,7 +389,7 @@ void othello_state::machine_reset()
 	m_n7751_busy = 0;
 }
 
-static MACHINE_CONFIG_START( othello, othello_state )
+static MACHINE_CONFIG_START( othello )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80,XTAL_8MHz/2)
@@ -410,7 +402,12 @@ static MACHINE_CONFIG_START( othello, othello_state )
 	MCFG_CPU_IO_MAP(audio_portmap)
 
 	MCFG_CPU_ADD("n7751", N7751, XTAL_6MHz)
-	MCFG_CPU_IO_MAP(n7751_portmap)
+	MCFG_MCS48_PORT_T1_IN_CB(GND) // labelled as "TEST", connected to ground
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(othello_state, n7751_command_r))
+	MCFG_MCS48_PORT_BUS_IN_CB(READ8(othello_state, n7751_rom_r))
+	MCFG_MCS48_PORT_P1_OUT_CB(DEVWRITE8("dac", dac_byte_interface, write))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(othello_state, n7751_p2_w))
+	MCFG_MCS48_PORT_PROG_OUT_CB(DEVWRITELINE("n7751_8243", i8243_device, prog_w))
 
 	MCFG_I8243_ADD("n7751_8243", NOOP, WRITE8(othello_state,n7751_rom_control_w))
 
@@ -432,16 +429,19 @@ static MACHINE_CONFIG_START( othello, othello_state )
 	MCFG_MC6845_UPDATE_ROW_CB(othello_state, crtc_update_row)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ay1", AY8910, 2000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.15)
 
 	MCFG_SOUND_ADD("ay2", AY8910, 2000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.15)
 
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
+	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 ROM_START( othello )
@@ -464,4 +464,4 @@ ROM_START( othello )
 	ROM_LOAD( "7.ic42",   0x4000, 0x2000, CRC(a76705f7) SHA1(b7d2a65d65d065732ddd0b3b738749369b382b48))
 ROM_END
 
-GAME( 1984, othello,  0,       othello,  othello, driver_device,  0, ROT0, "Success", "Othello (version 3.0)", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, othello,  0,       othello,  othello, othello_state,  0, ROT0, "Success", "Othello (version 3.0)", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

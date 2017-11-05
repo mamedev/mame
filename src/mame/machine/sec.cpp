@@ -13,7 +13,7 @@ void SEC::reset(void)
 	m_curbyte = m_clks = n_reqpos = m_rxclk = m_rxlen = m_rxpos = 0;
 }
 
-void SEC::write_cs_line(UINT8 bit)
+void SEC::write_cs_line(uint8_t bit)
 {
 	if ( bit )
 	{
@@ -35,17 +35,17 @@ void SEC::write_cs_line(UINT8 bit)
 	}
 }
 
-void SEC::write_data_line(UINT8 bit)
+void SEC::write_data_line(uint8_t bit)
 {
 	m_data = bit ? 1 : 0;
 }
 
-UINT8 SEC::read_data_line(void)
+uint8_t SEC::read_data_line(void)
 {
 	return m_rxdat;
 }
 
-void SEC::write_clock_line(UINT8 bit)
+void SEC::write_clock_line(uint8_t bit)
 {
 	bit = bit ? 1 : 0;
 
@@ -132,9 +132,9 @@ void SEC::Do_Command(void)
 	}
 }
 
-UINT8 SEC::CalcByteSum(int length)
+uint8_t SEC::CalcByteSum(int length)
 {
-	UINT8 csum = 0;
+	uint8_t csum = 0;
 	for ( int i = 0; i < 3 + length; i++ )
 	{
 		csum += m_reply[i];
@@ -294,7 +294,7 @@ void SEC::Cmd_Set_Mrk(void)
 void SEC::Cmd_Set_Txt(void)
 {
 	char valbuf[8];
-	UINT8 meter = m_request[3];
+	uint8_t meter = m_request[3];
 	memcpy( valbuf, &m_request[4], 7);
 	valbuf[7] = 0;
 	strcpy(m_strings[meter], valbuf);
@@ -311,8 +311,8 @@ void SEC::Cmd_Set_Txt(void)
 
 void SEC::Cmd_Inc_Sml(void)
 {
-	UINT8 meter = m_request[3];
-	UINT8 value = m_request[4] & 0xf;
+	uint8_t meter = m_request[3];
+	uint8_t value = m_request[4] & 0xf;
 	m_counters[meter] += value;
 
 	m_reply[0] = SEC_ACK;
@@ -326,8 +326,8 @@ void SEC::Cmd_Inc_Sml(void)
 
 void SEC::Cmd_Inc_Med(void)
 {
-	UINT8 meter = m_request[3];
-	UINT8 value = m_request[4];
+	uint8_t meter = m_request[3];
+	uint8_t value = m_request[4];
 	m_counters[meter] += value;
 
 	m_reply[0] = SEC_ACK;
@@ -341,8 +341,8 @@ void SEC::Cmd_Inc_Med(void)
 
 void SEC::Cmd_Inc_Lrg(void)
 {
-	UINT8 meter = m_request[3];
-	UINT8 value = m_request[4] + 256 * m_request[5];
+	uint8_t meter = m_request[3];
+	uint8_t value = m_request[4] + 256 * m_request[5];
 	m_counters[meter] += value;
 
 	m_reply[0] = SEC_ACK;

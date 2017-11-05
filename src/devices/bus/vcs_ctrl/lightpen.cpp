@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "lightpen.h"
 
 
@@ -14,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type VCS_LIGHTPEN = &device_creator<vcs_lightpen_device>;
+DEFINE_DEVICE_TYPE(VCS_LIGHTPEN, vcs_lightpen_device, "vcs_lightpen", "Atari / CBM Light Pen")
 
 
 INPUT_CHANGED_MEMBER( vcs_lightpen_device::trigger )
@@ -56,8 +57,8 @@ ioport_constructor vcs_lightpen_device::device_input_ports() const
 //  vcs_lightpen_device - constructor
 //-------------------------------------------------
 
-vcs_lightpen_device::vcs_lightpen_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, VCS_LIGHTPEN, "Atari / CBM Light Pen", tag, owner, clock, "vcs_lightpen", __FILE__),
+vcs_lightpen_device::vcs_lightpen_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, VCS_LIGHTPEN, tag, owner, clock),
 	device_vcs_control_port_interface(mconfig, *this),
 	m_joy(*this, "JOY"),
 	m_lightx(*this, "LIGHTX"),
@@ -79,7 +80,7 @@ void vcs_lightpen_device::device_start()
 //  vcs_joy_r - lightpen read
 //-------------------------------------------------
 
-UINT8 vcs_lightpen_device::vcs_joy_r()
+uint8_t vcs_lightpen_device::vcs_joy_r()
 {
 	return m_joy->read();
 }

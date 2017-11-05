@@ -2,7 +2,7 @@
 // copyright-holders:Angelo Salese, Roberto Fresca
 /**************************************************************************
 
-  Waku Waku Doubutsu Land TonTon (c) 199? Success.
+  Waku Waku Doubutsu Land TonTon (c) 1987 Success.
 
   HW based off MSX2
 
@@ -25,10 +25,11 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/nvram.h"
+#include "machine/ticket.h"
 #include "sound/ay8910.h"
 #include "video/v9938.h"
-#include "machine/ticket.h"
-#include "machine/nvram.h"
+#include "speaker.h"
 
 class tonton_state : public driver_device
 {
@@ -46,7 +47,6 @@ public:
 	DECLARE_WRITE8_MEMBER(ay_bout_w);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_WRITE_LINE_MEMBER(tonton_vdp0_interrupt);
 	required_device<cpu_device> m_maincpu;
 	required_device<ticket_dispenser_device> m_hopper;
 };
@@ -57,16 +57,6 @@ public:
 
 #define HOPPER_PULSE    50          // time between hopper pulses in milliseconds
 #define VDP_MEM         0x30000
-
-
-/*************************************************
-*                Video Hardware                  *
-*************************************************/
-
-WRITE_LINE_MEMBER(tonton_state::tonton_vdp0_interrupt)
-{
-	m_maincpu->set_input_line(0, (state ? HOLD_LINE : CLEAR_LINE));
-}
 
 
 /*************************************************
@@ -220,7 +210,7 @@ WRITE8_MEMBER(tonton_state::ay_bout_w)
 *                 Machine Driver                 *
 *************************************************/
 
-static MACHINE_CONFIG_START( tonton, tonton_state )
+static MACHINE_CONFIG_START( tonton )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, CPU_CLOCK)  /* Guess. According to other MSX2 based gambling games */
@@ -232,7 +222,7 @@ static MACHINE_CONFIG_START( tonton, tonton_state )
 
 	/* video hardware */
 	MCFG_V9938_ADD("v9938", "screen", VDP_MEM, MAIN_CLOCK)
-	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(tonton_state,tonton_vdp0_interrupt))
+	MCFG_V99X8_INTERRUPT_CALLBACK(INPUTLINE("maincpu", 0))
 	MCFG_V99X8_SCREEN_ADD_NTSC("screen", "v9938", MAIN_CLOCK)
 
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(HOPPER_PULSE), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW )
@@ -266,5 +256,5 @@ ROM_START( tonton )
 ROM_END
 
 
-/*    YEAR  NAME     PARENT  MACHINE  INPUT   STATE          INIT  ROT    COMPANY                   FULLNAME                                 FLAGS  */
-GAME( 199?, tonton,  0,      tonton,  tonton, driver_device, 0,    ROT0, "Success / Taiyo Jidoki", "Waku Waku Doubutsu Land TonTon (Japan)", 0 )
+//    YEAR  NAME     PARENT  MACHINE  INPUT   STATE         INIT  ROT    COMPANY                   FULLNAME                                 FLAGS
+GAME( 1987, tonton,  0,      tonton,  tonton, tonton_state, 0,    ROT0, "Success / Taiyo Jidoki", "Waku Waku Doubutsu Land TonTon (Japan)", 0 )

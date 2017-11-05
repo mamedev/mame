@@ -13,21 +13,6 @@
 
 void skydiver_state::machine_reset()
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-
-	/* reset all latches */
-	start_lamp_1_w(space, 0, 0);
-	start_lamp_2_w(space, 0, 0);
-	lamp_s_w(space, 0, 0);
-	lamp_k_w(space, 0, 0);
-	lamp_y_w(space, 0, 0);
-	lamp_d_w(space, 0, 0);
-	output().set_value("lampi", 0);
-	output().set_value("lampv", 0);
-	output().set_value("lampe", 0);
-	output().set_value("lampr", 0);
-	width_w(space, 0, 0);
-	coin_lockout_w(space, 0, 0);
 }
 
 
@@ -39,7 +24,7 @@ void skydiver_state::machine_reset()
 
 TILE_GET_INFO_MEMBER(skydiver_state::get_tile_info)
 {
-	UINT8 code = m_videoram[tile_index];
+	uint8_t code = m_videoram[tile_index];
 	SET_TILE_INFO_MEMBER(0, code & 0x3f, code >> 6, 0);
 }
 
@@ -53,7 +38,7 @@ TILE_GET_INFO_MEMBER(skydiver_state::get_tile_info)
 
 void skydiver_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(skydiver_state::get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(skydiver_state::get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
 
 	save_item(NAME(m_nmion));
 	save_item(NAME(m_width));
@@ -84,79 +69,73 @@ WRITE8_MEMBER(skydiver_state::wram_w)
 }
 
 
-WRITE8_MEMBER(skydiver_state::width_w)
+WRITE_LINE_MEMBER(skydiver_state::width_w)
 {
-	m_width = offset;
+	m_width = state;
 }
 
 
-WRITE8_MEMBER(skydiver_state::coin_lockout_w)
+WRITE_LINE_MEMBER(skydiver_state::coin_lockout_w)
 {
-	machine().bookkeeping().coin_lockout_global_w(!offset);
+	machine().bookkeeping().coin_lockout_global_w(!state);
 }
 
 
-WRITE8_MEMBER(skydiver_state::start_lamp_1_w)
+WRITE_LINE_MEMBER(skydiver_state::start_lamp_1_w)
 {
-	output().set_led_value(0, offset);
+	output().set_led_value(0, state);
 }
 
-WRITE8_MEMBER(skydiver_state::start_lamp_2_w)
+WRITE_LINE_MEMBER(skydiver_state::start_lamp_2_w)
 {
-	output().set_led_value(1, offset);
+	output().set_led_value(1, state);
 }
 
 
-WRITE8_MEMBER(skydiver_state::lamp_s_w)
+WRITE_LINE_MEMBER(skydiver_state::lamp_s_w)
 {
-	output().set_value("lamps", offset);
+	output().set_value("lamps", state);
 }
 
-WRITE8_MEMBER(skydiver_state::lamp_k_w)
+WRITE_LINE_MEMBER(skydiver_state::lamp_k_w)
 {
-	output().set_value("lampk", offset);
+	output().set_value("lampk", state);
 }
 
-WRITE8_MEMBER(skydiver_state::lamp_y_w)
+WRITE_LINE_MEMBER(skydiver_state::lamp_y_w)
 {
-	output().set_value("lampy", offset);
+	output().set_value("lampy", state);
 }
 
-WRITE8_MEMBER(skydiver_state::lamp_d_w)
+WRITE_LINE_MEMBER(skydiver_state::lamp_d_w)
 {
-	output().set_value("lampd", offset);
+	output().set_value("lampd", state);
 }
 
-WRITE8_MEMBER(skydiver_state::_2000_201F_w)
+WRITE_LINE_MEMBER(skydiver_state::lamp_i_w)
 {
-	int bit = offset & 0x01;
+	output().set_value("lampi", state);
+}
 
-	m_watchdog->reset_w(space,0,0);
+WRITE_LINE_MEMBER(skydiver_state::lamp_v_w)
+{
+	output().set_value("lampv", state);
+}
 
-	switch (offset & 0x0e)
-	{
-		case (0x02):
-			output().set_value("lampi", bit);
-			break;
-		case (0x04):
-			output().set_value("lampv", bit);
-			break;
-		case (0x06):
-			output().set_value("lampe", bit);
-			break;
-		case (0x08):
-			output().set_value("lampr", bit);
-			break;
-		case (0x0a):
-			m_discrete->write(space, SKYDIVER_OCT1_EN, bit);
-			break;
-		case (0x0c):
-			m_discrete->write(space, SKYDIVER_OCT2_EN, bit);
-			break;
-		case (0x0e):
-			m_discrete->write(space, SKYDIVER_NOISE_RST, bit);
-			break;
-	}
+WRITE_LINE_MEMBER(skydiver_state::lamp_e_w)
+{
+	output().set_value("lampe", state);
+}
+
+WRITE_LINE_MEMBER(skydiver_state::lamp_r_w)
+{
+	output().set_value("lampr", state);
+}
+
+WRITE8_MEMBER(skydiver_state::latch3_watchdog_w)
+{
+	m_watchdog->reset_w(space, 0, 0);
+	m_latch3->write_a0(space, offset, 0);
 }
 
 
@@ -203,7 +182,7 @@ void skydiver_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 }
 
 
-UINT32 skydiver_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t skydiver_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0,0);
 

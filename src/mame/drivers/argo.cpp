@@ -25,6 +25,7 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "screen.h"
 
 
 class argo_state : public driver_device
@@ -36,34 +37,35 @@ public:
 	};
 
 	argo_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_p_videoram(*this, "p_videoram"){ }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_p_videoram(*this, "videoram")
+		, m_p_chargen(*this, "chargen")
+	{ }
 
-	required_device<cpu_device> m_maincpu;
 	DECLARE_WRITE8_MEMBER(argo_videoram_w);
 	DECLARE_READ8_MEMBER(argo_io_r);
 	DECLARE_WRITE8_MEMBER(argo_io_w);
-	required_shared_ptr<UINT8> m_p_videoram;
-	const UINT8 *m_p_chargen;
-	UINT8 m_framecnt;
-	UINT8 m_cursor_pos[3];
-	UINT8 m_p_cursor_pos;
-	bool m_ram_ctrl;
-	UINT8 m_scroll_ctrl;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_DRIVER_INIT(argo);
 
-protected:
+private:
+	required_device<cpu_device> m_maincpu;
+	required_shared_ptr<uint8_t> m_p_videoram;
+	required_region_ptr<u8> m_p_chargen;
+	uint8_t m_framecnt;
+	uint8_t m_cursor_pos[3];
+	uint8_t m_p_cursor_pos;
+	bool m_ram_ctrl;
+	uint8_t m_scroll_ctrl;
+	virtual void machine_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
 // write to videoram if following 'out b9,61' otherwise write to the unknown 'extra' ram
 WRITE8_MEMBER(argo_state::argo_videoram_w)
 {
-	UINT8 *RAM;
+	uint8_t *RAM;
 	if (m_ram_ctrl)
 		RAM = memregion("videoram")->base();
 	else
@@ -74,13 +76,13 @@ WRITE8_MEMBER(argo_state::argo_videoram_w)
 
 READ8_MEMBER(argo_state::argo_io_r)
 {
-	UINT8 low_io = offset;
+	uint8_t low_io = offset;
 
 	switch (low_io)
 	{
 	case 0xA1: // keyboard
 		char kbdrow[6];
-		sprintf(kbdrow,"X%X",offset>>8);
+		sprintf(kbdrow,"X%X",uint8_t(offset>>8));
 		return ioport(kbdrow)->read();
 
 	case 0xE8: // wants bit 4 low then high
@@ -94,7 +96,7 @@ READ8_MEMBER(argo_state::argo_io_r)
 
 WRITE8_MEMBER(argo_state::argo_io_w)
 {
-	UINT8 low_io = offset;
+	uint8_t low_io = offset;
 
 	switch (low_io)
 	{
@@ -110,9 +112,9 @@ WRITE8_MEMBER(argo_state::argo_io_w)
 	case 0xE8: // hardware scroll - we should use ports E0,E1,E2,E3
 		if ((m_scroll_ctrl == 2) & (data == 0xe3))
 		{
-			UINT8 *RAM = memregion("videoram")->base();
+			uint8_t *RAM = memregion("videoram")->base();
 			m_scroll_ctrl = 0;
-			memcpy(RAM, RAM+80, 24*80);
+			memmove(RAM, RAM+80, 24*80);
 		}
 		break;
 
@@ -143,7 +145,7 @@ static ADDRESS_MAP_START(argo_mem, AS_PROGRAM, 8, argo_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_RAMBANK("boot")
 	AM_RANGE(0x0800, 0xf7af) AM_RAM
-	AM_RANGE(0xf7b0, 0xf7ff) AM_RAM AM_SHARE("p_videoram")
+	AM_RANGE(0xf7b0, 0xf7ff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0xf800, 0xffff) AM_ROM AM_WRITE(argo_videoram_w)
 ADDRESS_MAP_END
 
@@ -266,7 +268,7 @@ void argo_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 		membank("boot")->set_entry(0);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in argo_state::device_timer");
+		assert_always(false, "Unknown id in argo_state::device_timer");
 	}
 }
 
@@ -278,20 +280,15 @@ void argo_state::machine_reset()
 
 DRIVER_INIT_MEMBER(argo_state,argo)
 {
-	UINT8 *RAM = memregion("maincpu")->base();
+	uint8_t *RAM = memregion("maincpu")->base();
 	membank("boot")->configure_entries(0, 2, &RAM[0x0000], 0xf800);
 }
 
-void argo_state::video_start()
+uint32_t argo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_p_chargen = memregion("chargen")->base();
-}
-
-UINT32 argo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	UINT8 y,ra,chr,gfx;
-	UINT16 sy=0,ma=0,x;
-	UINT8 *p_vram = m_p_videoram;
+	uint8_t y,ra,chr,gfx;
+	uint16_t sy=0,ma=0,x;
+	uint8_t *p_vram = m_p_videoram;
 
 	m_framecnt++;
 
@@ -299,7 +296,7 @@ UINT32 argo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 	{
 		for (ra = 0; ra < 10; ra++)
 		{
-			UINT16 *p = &bitmap.pix16(sy++);
+			uint16_t *p = &bitmap.pix16(sy++);
 
 			for (x = 1; x < 81; x++) // align x to the cursor position numbers
 			{
@@ -345,7 +342,7 @@ UINT32 argo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 	return 0;
 }
 
-static MACHINE_CONFIG_START( argo, argo_state )
+static MACHINE_CONFIG_START( argo )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 3500000)
 	MCFG_CPU_PROGRAM_MAP(argo_mem)
@@ -378,5 +375,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY           FULLNAME       FLAGS */
-COMP( 1986, argo,  0,      0,       argo,     argo, argo_state,    argo,     "<unknown>",   "Argo", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+/*    YEAR  NAME   PARENT  COMPAT   MACHINE   INPUT  STATE        INIT    COMPANY        FULLNAME  FLAGS */
+COMP( 1986, argo,  0,      0,       argo,     argo,  argo_state,  argo,   "<unknown>",   "Argo",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

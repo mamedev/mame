@@ -12,11 +12,14 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
+#include "includes/lockon.h"
+
 #include "cpu/nec/nec.h"
+#include "cpu/z80/z80.h"
 #include "sound/2203intf.h"
 #include "sound/flt_vol.h"
-#include "includes/lockon.h"
+#include "speaker.h"
+
 
 #define V30_GND_ADDR    ((m_ctrl_reg & 0x3) << 16)
 #define V30_OBJ_ADDR    ((m_ctrl_reg & 0x18) << 13)
@@ -477,7 +480,7 @@ void lockon_state::machine_reset()
 	m_main_inten = 0;
 }
 
-static MACHINE_CONFIG_START( lockon, lockon_state )
+static MACHINE_CONFIG_START( lockon )
 
 	MCFG_CPU_ADD("maincpu", V30, XTAL_16MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(main_v30)
@@ -501,7 +504,7 @@ static MACHINE_CONFIG_START( lockon, lockon_state )
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(lockon_state, screen_update_lockon)
-	MCFG_SCREEN_VBLANK_DRIVER(lockon_state, screen_eof_lockon)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(lockon_state, screen_vblank_lockon))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lockon)
@@ -775,5 +778,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1986, lockon,  0,      lockon,  lockon, driver_device,  0, ROT0, "Tatsumi", "Lock-On (rev. E)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, lockonc, lockon, lockon,  lockone, driver_device, 0, ROT0, "Tatsumi", "Lock-On (rev. C)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, lockon,  0,      lockon,  lockon,  lockon_state, 0, ROT0, "Tatsumi", "Lock-On (rev. E)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, lockonc, lockon, lockon,  lockone, lockon_state, 0, ROT0, "Tatsumi", "Lock-On (rev. C)", MACHINE_SUPPORTS_SAVE )

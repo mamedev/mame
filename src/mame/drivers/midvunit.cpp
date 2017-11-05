@@ -34,6 +34,7 @@ Known to exist but not dumped:
 #include "machine/ataintf.h"
 #include "machine/nvram.h"
 #include "includes/midvunit.h"
+#include "crusnusa.lh"
 
 
 #define CPU_CLOCK       50000000
@@ -47,6 +48,8 @@ Known to exist but not dumped:
 
 void midvunit_state::machine_start()
 {
+	m_adc_ready_timer = timer_alloc(TIMER_ADC_READY);
+
 	save_item(NAME(m_cmos_protected));
 	save_item(NAME(m_control_data));
 	save_item(NAME(m_adc_data));
@@ -54,6 +57,9 @@ void midvunit_state::machine_start()
 	save_item(NAME(m_last_port0));
 	save_item(NAME(m_shifter_state));
 	save_item(NAME(m_timer_rate));
+	save_item(NAME(m_wheel_board_output));
+	save_item(NAME(m_wheel_board_last));
+	save_item(NAME(m_wheel_board_u8_latch));
 }
 
 
@@ -94,8 +100,8 @@ MACHINE_RESET_MEMBER(midvunit_state,midvplus)
 
 READ32_MEMBER(midvunit_state::port0_r)
 {
-	UINT16 val = ioport("IN0")->read();
-	UINT16 diff = val ^ m_last_port0;
+	uint16_t val = ioport("IN0")->read();
+	uint16_t diff = val ^ m_last_port0;
 
 	/* make sure the shift controls are mutually exclusive */
 	if ((diff & 0x0400) && !(val & 0x0400))
@@ -135,15 +141,14 @@ READ32_MEMBER(midvunit_state::midvunit_adc_r)
 
 WRITE32_MEMBER(midvunit_state::midvunit_adc_w)
 {
-	static const char *const adcnames[] = { "WHEEL", "ACCEL", "BRAKE" };
-
 	if (!(m_control_data & 0x20))
 	{
 		int which = (data >> m_adc_shift) - 4;
 		if (which < 0 || which > 2)
 			logerror("adc_w: unexpected which = %02X\n", which + 4);
-		m_adc_data = read_safe(ioport(adcnames[which]), 0);
-		timer_set(attotime::from_msec(1), TIMER_ADC_READY);
+		else
+			m_adc_data = m_adc_ports[which].read_safe(0);
+		m_adc_ready_timer->adjust(attotime::from_msec(1));
 	}
 	else
 		logerror("adc_w without enabling writes!\n");
@@ -185,7 +190,7 @@ READ32_MEMBER(midvunit_state::midvunit_cmos_r)
 
 WRITE32_MEMBER(midvunit_state::midvunit_control_w)
 {
-	UINT16 olddata = m_control_data;
+	uint16_t olddata = m_control_data;
 	COMBINE_DATA(&m_control_data);
 
 	/* bit 7 is the LED */
@@ -205,7 +210,7 @@ WRITE32_MEMBER(midvunit_state::midvunit_control_w)
 
 WRITE32_MEMBER(midvunit_state::crusnwld_control_w)
 {
-	UINT16 olddata = m_control_data;
+	uint16_t olddata = m_control_data;
 	COMBINE_DATA(&m_control_data);
 
 	/* bit 11 is the DCS sound reset */
@@ -244,7 +249,7 @@ READ32_MEMBER(midvunit_state::tms32031_control_r)
 	{
 		/* timer is clocked at 100ns */
 		int which = (offset >> 4) & 1;
-		INT32 result = (m_timer[which]->time_elapsed() * m_timer_rate).as_double();
+		int32_t result = (m_timer[which]->time_elapsed() * m_timer_rate).as_double();
 //      logerror("%06X:tms32031_control_r(%02X) = %08X\n", space.device().safe_pc(), offset, result);
 		return result;
 	}
@@ -323,7 +328,7 @@ WRITE32_MEMBER(midvunit_state::crusnwld_serial_data_w)
  *************************************/
 
 /* values from offset 3, 6, and 10 must add up to 0x904752a2 */
-static const UINT32 bit_data[0x10] =
+static const uint32_t bit_data[0x10] =
 {
 	0x3017c636,0x3017c636,0x3017c636,0x3017c636,
 	0x3017c636,0x3017c636,0x3017c636,0x3017c636,
@@ -371,6 +376,134 @@ WRITE32_MEMBER(midvunit_state::offroadc_serial_data_w)
 	m_midway_serial_pic2->write(space, 0, data >> 16);
 }
 
+READ32_MEMBER(midvunit_state::midvunit_wheel_board_r)
+{
+	//logerror("midvunit_wheel_board_r: %08X\n", m_wheel_board_output);
+	return m_wheel_board_output;
+}
+
+void midvunit_state::set_input(const char *s)
+{
+	m_galil_input = s;
+	m_galil_input_index = 0;
+	m_galil_input_length = strlen(s);
+}
+
+WRITE32_MEMBER(midvunit_state::midvunit_wheel_board_w)
+{
+	//logerror("midvunit_wheel_board_w: %08X\n", data);
+
+	// U8 PAL22V10 "DECODE0" TODO: Needs dump "A-19674"
+	if (BIT(data, 11) && !BIT(m_wheel_board_last, 11))
+	{
+		logerror("Wheel board (U8 PAL22V10; DECODE0) = %03X\n", BIT(data, 11) | ((data & 0xF) << 1) | ((data & 0x700) << 1));
+		m_wheel_board_u8_latch = 0;
+		m_wheel_board_u8_latch |= BIT(data, 0) << 6; // WA0; A for U9
+		m_wheel_board_u8_latch |= BIT(data, 1) << 5; // WA1; B for U9
+		m_wheel_board_u8_latch |= BIT(data, 2) << 4; // WA2; C for U9
+		m_wheel_board_u8_latch |= BIT(data, 3) << 3; // WA3; G2B for U9
+	}
+
+	if (!BIT(data, 9))
+	{
+		logerror("Wheel board (U13 74HC245; DCS) = %02X\n", data & 0xFF);
+	}
+	else if (!BIT(data, 10)) // G2A for U9
+	{
+		uint8_t arg = data & 0xFF;
+		uint8_t wa = BIT(m_wheel_board_u8_latch, 6) | (BIT(m_wheel_board_u8_latch, 5) << 1) | (BIT(m_wheel_board_u8_latch, 4) << 2);
+		if (BIT(m_wheel_board_u8_latch, 3))
+		{
+			// U19 PAL22V10 "GALIL" TODO: Needs dump "A-19675", needs Galil emulation
+			logerror("Wheel board (U19 PAL22V10; GALIL) = %03X\n", (m_wheel_board_u8_latch & 0x78) | ((data & 0x3F) << 6));
+			switch (wa)
+			{
+				case 0:
+					m_wheel_board_output = m_galil_input[m_galil_input_index++] << 8;
+					break;
+				case 1:
+					if (arg != 0xD)
+					{
+						m_galil_output[m_galil_output_index] = (char)arg;
+						if (m_galil_output_index < 450)
+							m_galil_output_index++;
+					}
+					else
+					{
+						// G, W, S, and Q are commented out because they are error commands.
+						if (strstr(m_galil_output,"MG \"V\" IBO {$2.0}"))
+							set_input("V$00");
+						else if (strstr(m_galil_output,"MG \"X\", _TSX {$2.0}"))
+							set_input("X$00");
+						else if (strstr(m_galil_output,"MG \"Y\", _TSY {$2.0}"))
+							set_input("Y$00");
+						else if (strstr(m_galil_output,"MG \"Z\", _TSZ {$2.0}"))
+							set_input("Z$00");
+						/*else if (strstr(m_galil_output,"MG \"G\""))
+						    set_input("G");
+						else if (strstr(m_galil_output,"MG \"W\""))
+						    set_input("W");
+						else if (strstr(m_galil_output,"MG \"S\""))
+						    set_input("S");
+						else if (strstr(m_galil_output,"MG \"Q\""))
+						    set_input("Q");*/
+						else
+							set_input(":");
+						logerror("Galil Command: %s\n", m_galil_output);
+						memset(m_galil_output, 0, m_galil_output_index);
+						m_galil_output_index = 0;
+					}
+					break;
+				case 2:
+					m_wheel_board_output = (m_galil_input_index < m_galil_input_length) ? 0x8000 : 0x0;
+					break;
+				case 3: // Galil init?
+					break;
+				case 4: // Galil init?
+					set_input(":");
+					m_galil_output_index = 0;
+					memset(m_galil_output, 0, 450);
+					break;
+			}
+		}
+		else
+		{
+			// U9 74LS138
+			switch (wa)
+			{
+				case 0: // SNDCTLZ
+					logerror("Wheel board (U14 74HC574; DCS Control) = %02X\n", arg);
+					break;
+				case 1: // GALCTLZ
+					logerror("Wheel board (U19 PAL22V10; Galil Control) = %02X\n", arg);
+					break;
+				case 2: // ATODWRZ
+					logerror("Wheel board (ATODWRZ) = %02X\n", arg);
+					break;
+				case 3: // ATODRDZ
+					logerror("Wheel board (ATODRDZ) = %02X\n", arg);
+					break;
+				case 4: // WHLCTLZ
+					output().set_value("wheel", arg);
+					//logerror("Wheel board (U4 74HC574; Motor) = %02X\n", arg);
+					break;
+				case 5: // DRVCTLZ
+					for (uint8_t bit = 0; bit < 8; bit++)
+						output().set_lamp_value(bit, BIT(data, bit));
+					//logerror("Wheel board (U10 74HC574; Lamps) = %02X\n", arg);
+					break;
+				case 6: // PRTCTLZ
+					logerror("Wheel board (PRTCTLZ) = %02X\n", arg);
+					break;
+				case 7: // PRTSTATZ
+					logerror("Wheel board (PRTSTATZ) = %02X\n", arg);
+					break;
+			}
+		}
+	}
+
+	m_wheel_board_last = data;
+}
 
 
 /*************************************
@@ -381,7 +514,7 @@ WRITE32_MEMBER(midvunit_state::offroadc_serial_data_w)
 
 READ32_MEMBER(midvunit_state::midvplus_misc_r)
 {
-	UINT32 result = m_midvplus_misc[offset];
+	uint32_t result = m_midvplus_misc[offset];
 
 	switch (offset)
 	{
@@ -406,8 +539,8 @@ READ32_MEMBER(midvunit_state::midvplus_misc_r)
 
 WRITE32_MEMBER(midvunit_state::midvplus_misc_w)
 {
-	UINT32 olddata = m_midvplus_misc[offset];
-	int logit = 1;
+	uint32_t olddata = m_midvplus_misc[offset];
+	bool logit = true;
 
 	COMBINE_DATA(&m_midvplus_misc[offset]);
 
@@ -418,12 +551,12 @@ WRITE32_MEMBER(midvunit_state::midvplus_misc_w)
 			if ((olddata ^ m_midvplus_misc[offset]) & 0x0010)
 			{
 				m_watchdog->reset_w(space, 0, 0);
-				logit = 0;
+				logit = false;
 			}
 			break;
 
 		case 3:
-			logit = 0;
+			logit = false;
 			break;
 	}
 
@@ -477,7 +610,7 @@ static ADDRESS_MAP_START( midvunit_map, AS_PROGRAM, 32, midvunit_state )
 	AM_RANGE(0x992000, 0x992000) AM_READ_PORT("992000")
 	AM_RANGE(0x993000, 0x993000) AM_READWRITE(midvunit_adc_r, midvunit_adc_w)
 	AM_RANGE(0x994000, 0x994000) AM_WRITE(midvunit_control_w)
-	AM_RANGE(0x995000, 0x995000) AM_WRITENOP    // force feedback?
+	AM_RANGE(0x995000, 0x995000) AM_READWRITE(midvunit_wheel_board_r, midvunit_wheel_board_w)
 	AM_RANGE(0x995020, 0x995020) AM_WRITE(midvunit_cmos_protect_w)
 	AM_RANGE(0x997000, 0x997000) AM_NOP // communications
 	AM_RANGE(0x9a0000, 0x9a0000) AM_WRITE(midvunit_sound_w)
@@ -554,8 +687,15 @@ static INPUT_PORTS_START( crusnusa )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("View 1")  /* view 1 */
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_NAME("View 2")  /* view 2 */
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_NAME("View 3") /* view 3 */
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON11 ) PORT_NAME("View 4") /* view 4 */
-	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_NAME("Motion Stop")
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_NAME("Right Mat")
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_NAME("Rear Mat")
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_NAME("Left Mat")
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_NAME("Front Mat")
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_NAME("Mat Plugin")
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_NAME("Mat Step")
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_NAME("Opto Detector")
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_NAME("Failsafe Switch")
 
 	PORT_START("DSW")
 	/* DSW2 at U97 */
@@ -1000,7 +1140,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( midvcommon, midvunit_state )
+static MACHINE_CONFIG_START( midvcommon )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS32031, CPU_CLOCK)
@@ -1677,7 +1817,7 @@ PCB LAYOUT
 |-----------------------------|  |---------------------------------------|  |---------------------------------------|
 */
 
-ROM_START( wargods ) /* Boot EPROM Version 1.0, Game Type: 452 (10/09/1996) */
+ROM_START( wargods ) /* Boot EPROM Version 1.0, Game Type: 452 (11/07/1996) */
 	ROM_REGION16_LE( 0x10000, "dcs", 0 )    /* sound data */
 	ROM_LOAD16_BYTE( "u2.rom",   0x000000, 0x8000, CRC(bec7d3ae) SHA1(db80aa4a645804a4574b07b9f34dec6b6b64190d) )
 
@@ -1685,7 +1825,9 @@ ROM_START( wargods ) /* Boot EPROM Version 1.0, Game Type: 452 (10/09/1996) */
 	ROM_LOAD( "u41.rom", 0x000000, 0x20000, CRC(398c54cc) SHA1(6c4b5d6ec5c844dcbf181f9d86a9196a088ed2db) )
 
 	DISK_REGION( "ata:0:hdd:image" )
-	DISK_IMAGE( "wargods_10-09-1996", 0, SHA1(7585bc65b1038589cb59d3e7c56e08ca9d7015b8) )
+	DISK_IMAGE( "wargods_11-07-1996", 0, SHA1(7585bc65b1038589cb59d3e7c56e08ca9d7015b8) ) // HDD had a label of 10-09-1996, but the game reports
+																						  // a version of 11-07-1996, so it was probably upgraded
+																						  // in the field.
 ROM_END
 
 ROM_START( wargodsa ) /* Boot EPROM Version 1.0, Game Type: 452 (08/15/1996) */
@@ -1783,7 +1925,7 @@ DRIVER_INIT_MEMBER(midvunit_state,offroadc)
 
 DRIVER_INIT_MEMBER(midvunit_state,wargods)
 {
-	UINT8 default_nvram[256];
+	uint8_t default_nvram[256];
 
 	/* initialize the subsystems */
 	m_adc_shift = 16;
@@ -1812,23 +1954,23 @@ DRIVER_INIT_MEMBER(midvunit_state,wargods)
  *
  *************************************/
 
-GAME( 1994, crusnusa,   0,        midvunit, crusnusa, midvunit_state, crusnusa, ROT0, "Midway", "Cruis'n USA (rev L4.1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, crusnusa40, crusnusa, midvunit, crusnusa, midvunit_state, crusnu40, ROT0, "Midway", "Cruis'n USA (rev L4.0)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, crusnusa21, crusnusa, midvunit, crusnusa, midvunit_state, crusnu21, ROT0, "Midway", "Cruis'n USA (rev L2.1)", MACHINE_SUPPORTS_SAVE )
+GAMEL( 1994, crusnusa,   0,        midvunit, crusnusa, midvunit_state, crusnusa, ROT0, "Midway", "Cruis'n USA (rev L4.1)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
+GAMEL( 1994, crusnusa40, crusnusa, midvunit, crusnusa, midvunit_state, crusnu40, ROT0, "Midway", "Cruis'n USA (rev L4.0)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
+GAMEL( 1994, crusnusa21, crusnusa, midvunit, crusnusa, midvunit_state, crusnu21, ROT0, "Midway", "Cruis'n USA (rev L2.1)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
 
-GAME( 1996, crusnwld,   0,        crusnwld, crusnwld, midvunit_state, crusnwld, ROT0, "Midway", "Cruis'n World (rev L2.5)", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, crusnwld24, crusnwld, crusnwld, crusnwld, midvunit_state, crusnwld, ROT0, "Midway", "Cruis'n World (rev L2.4)", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, crusnwld23, crusnwld, crusnwld, crusnwld, midvunit_state, crusnwld, ROT0, "Midway", "Cruis'n World (rev L2.3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, crusnwld20, crusnwld, crusnwld, crusnwld, midvunit_state, crusnwld, ROT0, "Midway", "Cruis'n World (rev L2.0)", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, crusnwld19, crusnwld, crusnwld, crusnwld, midvunit_state, crusnwld, ROT0, "Midway", "Cruis'n World (rev L1.9)", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, crusnwld17, crusnwld, crusnwld, crusnwld, midvunit_state, crusnwld, ROT0, "Midway", "Cruis'n World (rev L1.7)", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, crusnwld13, crusnwld, crusnwld, crusnwld, midvunit_state, crusnwld, ROT0, "Midway", "Cruis'n World (rev L1.3)", MACHINE_SUPPORTS_SAVE )
+GAMEL( 1996, crusnwld,   0,        crusnwld, crusnwld, midvunit_state, crusnwld, ROT0, "Midway", "Cruis'n World (rev L2.5)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
+GAMEL( 1996, crusnwld24, crusnwld, crusnwld, crusnwld, midvunit_state, crusnwld, ROT0, "Midway", "Cruis'n World (rev L2.4)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
+GAMEL( 1996, crusnwld23, crusnwld, crusnwld, crusnwld, midvunit_state, crusnwld, ROT0, "Midway", "Cruis'n World (rev L2.3)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
+GAMEL( 1996, crusnwld20, crusnwld, crusnwld, crusnwld, midvunit_state, crusnwld, ROT0, "Midway", "Cruis'n World (rev L2.0)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
+GAMEL( 1996, crusnwld19, crusnwld, crusnwld, crusnwld, midvunit_state, crusnwld, ROT0, "Midway", "Cruis'n World (rev L1.9)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
+GAMEL( 1996, crusnwld17, crusnwld, crusnwld, crusnwld, midvunit_state, crusnwld, ROT0, "Midway", "Cruis'n World (rev L1.7)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
+GAMEL( 1996, crusnwld13, crusnwld, crusnwld, crusnwld, midvunit_state, crusnwld, ROT0, "Midway", "Cruis'n World (rev L1.3)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
 
-GAME( 1997, offroadc,  0,        offroadc, offroadc, midvunit_state, offroadc, ROT0, "Midway", "Off Road Challenge (v1.63)", MACHINE_SUPPORTS_SAVE )
-GAME( 1997, offroadc5, offroadc, offroadc, offroadc, midvunit_state, offroadc, ROT0, "Midway", "Off Road Challenge (v1.50)", MACHINE_SUPPORTS_SAVE )
-GAME( 1997, offroadc4, offroadc, offroadc, offroadc, midvunit_state, offroadc, ROT0, "Midway", "Off Road Challenge (v1.40)", MACHINE_SUPPORTS_SAVE )
-GAME( 1997, offroadc3, offroadc, offroadc, offroadc, midvunit_state, offroadc, ROT0, "Midway", "Off Road Challenge (v1.30)", MACHINE_SUPPORTS_SAVE )
-GAME( 1997, offroadc1, offroadc, offroadc, offroadc, midvunit_state, offroadc, ROT0, "Midway", "Off Road Challenge (v1.10)", MACHINE_SUPPORTS_SAVE )
+GAMEL( 1997, offroadc,  0,        offroadc, offroadc, midvunit_state, offroadc, ROT0, "Midway", "Off Road Challenge (v1.63)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
+GAMEL( 1997, offroadc5, offroadc, offroadc, offroadc, midvunit_state, offroadc, ROT0, "Midway", "Off Road Challenge (v1.50)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
+GAMEL( 1997, offroadc4, offroadc, offroadc, offroadc, midvunit_state, offroadc, ROT0, "Midway", "Off Road Challenge (v1.40)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
+GAMEL( 1997, offroadc3, offroadc, offroadc, offroadc, midvunit_state, offroadc, ROT0, "Midway", "Off Road Challenge (v1.30)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
+GAMEL( 1997, offroadc1, offroadc, offroadc, offroadc, midvunit_state, offroadc, ROT0, "Midway", "Off Road Challenge (v1.10)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
 
 GAME( 1995, wargods,   0,        midvplus, wargods, midvunit_state,  wargods,  ROT0, "Midway", "War Gods (HD 10/09/1996 - Dual Resolution)", MACHINE_SUPPORTS_SAVE )
 GAME( 1995, wargodsa,  wargods,  midvplus, wargodsa, midvunit_state, wargods,  ROT0, "Midway", "War Gods (HD 08/15/1996)", MACHINE_SUPPORTS_SAVE )

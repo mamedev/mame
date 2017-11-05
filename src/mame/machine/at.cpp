@@ -6,19 +6,21 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "machine/at.h"
 #include "cpu/i86/i286.h"
 #include "cpu/i386/i386.h"
 #include "machine/at_keybc.h"
 #include "bus/pc_kbd/pc_kbdc.h"
-#include "sound/dac.h"
+#include "softlist_dev.h"
+#include "speaker.h"
 
 #define LOG_PORT80  0
 
-const device_type AT_MB = &device_creator<at_mb_device>;
+DEFINE_DEVICE_TYPE(AT_MB, at_mb_device, "at_mb", "PC/AT Motherboard")
 
-at_mb_device::at_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, AT_MB, "PC/AT Motherboard", tag, owner, clock, "at_mb", __FILE__),
+at_mb_device::at_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, AT_MB, tag, owner, clock),
 	m_maincpu(*this, ":maincpu"),
 	m_isabus(*this, "isabus"),
 	m_pic8259_slave(*this, "pic8259_slave"),
@@ -41,18 +43,17 @@ void at_mb_device::device_reset()
 void at_mb_device::device_start()
 {
 	if(!strncmp(m_maincpu->shortname(), "i80286", 6))
-		i80286_cpu_device::static_set_a20_callback(m_maincpu, i80286_cpu_device::a20_cb(FUNC(at_mb_device::a20_286), this));
+		i80286_cpu_device::static_set_a20_callback(*m_maincpu, i80286_cpu_device::a20_cb(&at_mb_device::a20_286, this));
 }
 
-MACHINE_CONFIG_FRAGMENT( at_softlists )
+MACHINE_CONFIG_START( at_softlists )
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("pc_disk_list","ibm5150")
-	MCFG_SOFTWARE_LIST_ADD("xt_disk_list","ibm5160_flop")
 	MCFG_SOFTWARE_LIST_ADD("at_disk_list","ibm5170")
 	MCFG_SOFTWARE_LIST_ADD("at_cdrom_list","ibm5170_cdrom")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_FRAGMENT( at_mb )
+MACHINE_CONFIG_MEMBER( at_mb_device::device_add_mconfig )
 	MCFG_DEVICE_ADD("pit8254", PIT8254, 0)
 	MCFG_PIT8253_CLK0(4772720/4) /* heartbeat IRQ */
 	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("pic8259_master", pic8259_device, ir0_w))
@@ -92,8 +93,14 @@ static MACHINE_CONFIG_FRAGMENT( at_mb )
 	MCFG_I8237_OUT_DACK_2_CB(WRITELINE(at_mb_device, dack6_w))
 	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(at_mb_device, dack7_w))
 
-	MCFG_PIC8259_ADD( "pic8259_master", INPUTLINE(":maincpu", 0), VCC, READ8(at_mb_device, get_slave_ack) )
-	MCFG_PIC8259_ADD( "pic8259_slave", DEVWRITELINE("pic8259_master", pic8259_device, ir2_w), GND, NOOP)
+	MCFG_DEVICE_ADD("pic8259_master", PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(INPUTLINE(":maincpu", 0))
+	MCFG_PIC8259_IN_SP_CB(VCC)
+	MCFG_PIC8259_CASCADE_ACK_CB(READ8(at_mb_device, get_slave_ack))
+
+	MCFG_DEVICE_ADD("pic8259_slave", PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(DEVWRITELINE("pic8259_master", pic8259_device, ir2_w))
+	MCFG_PIC8259_IN_SP_CB(GND)
 
 	MCFG_DEVICE_ADD("isabus", ISA16, 0)
 	MCFG_ISA16_CPU(":maincpu")
@@ -136,10 +143,6 @@ static MACHINE_CONFIG_FRAGMENT( at_mb )
 	MCFG_PC_KBDC_OUT_DATA_CB(DEVWRITELINE("keybc", at_keyboard_controller_device, keyboard_data_w))
 MACHINE_CONFIG_END
 
-machine_config_constructor at_mb_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME(at_mb);
-}
 
 DEVICE_ADDRESS_MAP_START( map, 16, at_mb_device )
 	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("dma8237_1", am9517a_device, read, write, 0xffff)
@@ -173,7 +176,7 @@ READ8_MEMBER( at_mb_device::get_slave_ack )
  *
  *************************************************************************/
 
-void at_mb_device::speaker_set_spkrdata(UINT8 data)
+void at_mb_device::speaker_set_spkrdata(uint8_t data)
 {
 	m_at_spkrdata = data ? 1 : 0;
 	m_speaker->level_w(m_at_spkrdata & m_pit_out2);
@@ -202,7 +205,7 @@ WRITE_LINE_MEMBER( at_mb_device::pit8254_out2_changed )
 
 READ8_MEMBER( at_mb_device::page8_r )
 {
-	UINT8 data = m_at_pages[offset % 0x10];
+	uint8_t data = m_at_pages[offset % 0x10];
 
 	switch(offset % 8)
 	{
@@ -264,8 +267,8 @@ READ8_MEMBER(at_mb_device::dma_read_byte)
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM); // get the right address space
 	if(m_dma_channel == -1)
 		return 0xff;
-	UINT8 result;
-	offs_t page_offset = (((offs_t) m_dma_offset[0][m_dma_channel]) << 16) & 0xFF0000;
+	uint8_t result;
+	offs_t page_offset = ((offs_t) m_dma_offset[0][m_dma_channel]) << 16;
 
 	result = prog_space.read_byte(page_offset + offset);
 	return result;
@@ -277,7 +280,7 @@ WRITE8_MEMBER(at_mb_device::dma_write_byte)
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM); // get the right address space
 	if(m_dma_channel == -1)
 		return;
-	offs_t page_offset = (((offs_t) m_dma_offset[0][m_dma_channel]) << 16) & 0xFF0000;
+	offs_t page_offset = ((offs_t) m_dma_offset[0][m_dma_channel]) << 16;
 
 	prog_space.write_byte(page_offset + offset, data);
 }
@@ -288,10 +291,10 @@ READ8_MEMBER(at_mb_device::dma_read_word)
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM); // get the right address space
 	if(m_dma_channel == -1)
 		return 0xff;
-	UINT16 result;
-	offs_t page_offset = (((offs_t) m_dma_offset[1][m_dma_channel & 3]) << 16) & 0xFE0000;
+	uint16_t result;
+	offs_t page_offset = ((offs_t) m_dma_offset[1][m_dma_channel & 3]) << 16;
 
-	result = prog_space.read_word(page_offset + ( offset << 1 ) );
+	result = prog_space.read_word((page_offset & 0xfe0000) | (offset << 1));
 	m_dma_high_byte = result & 0xFF00;
 
 	return result & 0xFF;
@@ -303,18 +306,18 @@ WRITE8_MEMBER(at_mb_device::dma_write_word)
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM); // get the right address space
 	if(m_dma_channel == -1)
 		return;
-	offs_t page_offset = (((offs_t) m_dma_offset[1][m_dma_channel & 3]) << 16) & 0xFE0000;
+	offs_t page_offset = ((offs_t) m_dma_offset[1][m_dma_channel & 3]) << 16;
 
-	prog_space.write_word(page_offset + ( offset << 1 ), m_dma_high_byte | data);
+	prog_space.write_word((page_offset & 0xfe0000) | (offset << 1), m_dma_high_byte | data);
 }
 
 READ8_MEMBER( at_mb_device::dma8237_0_dack_r ) { return m_isabus->dack_r(0); }
 READ8_MEMBER( at_mb_device::dma8237_1_dack_r ) { return m_isabus->dack_r(1); }
 READ8_MEMBER( at_mb_device::dma8237_2_dack_r ) { return m_isabus->dack_r(2); }
 READ8_MEMBER( at_mb_device::dma8237_3_dack_r ) { return m_isabus->dack_r(3); }
-READ8_MEMBER( at_mb_device::dma8237_5_dack_r ) { UINT16 ret = m_isabus->dack16_r(5); m_dma_high_byte = ret & 0xff00; return ret; }
-READ8_MEMBER( at_mb_device::dma8237_6_dack_r ) { UINT16 ret = m_isabus->dack16_r(6); m_dma_high_byte = ret & 0xff00; return ret; }
-READ8_MEMBER( at_mb_device::dma8237_7_dack_r ) { UINT16 ret = m_isabus->dack16_r(7); m_dma_high_byte = ret & 0xff00; return ret; }
+READ8_MEMBER( at_mb_device::dma8237_5_dack_r ) { uint16_t ret = m_isabus->dack16_r(5); m_dma_high_byte = ret & 0xff00; return ret; }
+READ8_MEMBER( at_mb_device::dma8237_6_dack_r ) { uint16_t ret = m_isabus->dack16_r(6); m_dma_high_byte = ret & 0xff00; return ret; }
+READ8_MEMBER( at_mb_device::dma8237_7_dack_r ) { uint16_t ret = m_isabus->dack16_r(7); m_dma_high_byte = ret & 0xff00; return ret; }
 
 
 WRITE8_MEMBER( at_mb_device::dma8237_0_dack_w ){ m_isabus->dack_w(0, data); }
@@ -358,7 +361,7 @@ WRITE8_MEMBER( at_mb_device::write_rtc )
 	}
 }
 
-UINT32 at_mb_device::a20_286(bool state)
+uint32_t at_mb_device::a20_286(bool state)
 {
 	return (state ? 0xffffff : 0xefffff);
 }
@@ -379,7 +382,7 @@ WRITE_LINE_MEMBER( at_mb_device::dack7_w ) { set_dma_channel(7, state); }
 
 READ8_MEMBER( at_mb_device::portb_r )
 {
-	UINT8 data = m_at_speaker;
+	uint8_t data = m_at_speaker;
 	data &= ~0xd0; /* AT BIOS don't likes this being set */
 
 	/* 0x10 is the dram refresh line bit, 15.085us. */

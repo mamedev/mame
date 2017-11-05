@@ -19,6 +19,7 @@
 #include <stddef.h>
 #include <mutex>
 #include <memory>
+#include <algorithm>
 
 // MAME headers
 #include "emu.h"
@@ -35,19 +36,20 @@
 #define GET_WINDOW(ev) window_from_id((ev)->windowID)
 //#define GET_WINDOW(ev) ((ev)->windowID)
 
-static inline std::shared_ptr<sdl_window_info> window_from_id(Uint32 windowID)
+static std::shared_ptr<sdl_window_info> window_from_id(Uint32 windowID)
 {
-	SDL_Window *window = SDL_GetWindowFromID(windowID);
+	SDL_Window *sdl_window = SDL_GetWindowFromID(windowID);
 
-	for (auto w : sdl_window_list)
+	auto& windows = osd_common_t::s_window_list;
+	auto window = std::find_if(windows.begin(), windows.end(), [sdl_window](std::shared_ptr<osd_window> w)
 	{
-		//printf("w->window_id: %d\n", w->window_id);
-		if (w->platform_window<SDL_Window*>() == window)
-		{
-			return w;
-		}
-	}
-	return nullptr;
+		return std::static_pointer_cast<sdl_window_info>(w)->platform_window() == sdl_window;
+	});
+
+	if (window == windows.end())
+		return nullptr;
+
+	return std::static_pointer_cast<sdl_window_info>(*window);
 }
 
 void sdl_event_manager::process_events(running_machine &machine)
@@ -64,8 +66,10 @@ void sdl_event_manager::process_events(running_machine &machine)
 		auto subscribers = m_subscription_index.equal_range(sdlevent.type);
 
 		// Dispatch the events
-		for (auto iter = subscribers.first; iter != subscribers.second; ++iter)
-			iter->second->handle_event(sdlevent);
+		std::for_each(subscribers.first, subscribers.second, [&sdlevent](auto sub)
+		{
+			sub.second->handle_event(sdlevent);
+		});
 	}
 }
 
@@ -74,7 +78,10 @@ void sdl_event_manager::process_window_event(running_machine &machine, SDL_Event
 	std::shared_ptr<sdl_window_info> window = GET_WINDOW(&sdlevent.window);
 
 	if (window == nullptr)
+	{
+		osd_printf_warning("Skipped window event due to missing window param from SDL\n");
 		return;
+	}
 
 	switch (sdlevent.window.event)
 	{
@@ -98,7 +105,7 @@ void sdl_event_manager::process_window_event(running_machine &machine, SDL_Event
 		break;
 
 	case SDL_WINDOWEVENT_RESIZED:
-#ifndef SDLMAME_WIN32
+#ifdef SDLMAME_LINUX
 		/* FIXME: SDL2 sends some spurious resize events on Ubuntu
 		* while in fullscreen mode. Ignore them for now.
 		*/
@@ -254,6 +261,14 @@ void sdl_osd_interface::customize_input_type_list(simple_list<input_type_entry> 
 		case IPT_UI_CONFIGURE:
 			entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_TAB, input_seq::not_code, KEYCODE_LALT, input_seq::not_code, KEYCODE_RALT);
 			break;
+
+#if defined(__APPLE__) && defined(__MACH__)
+		// 78-key Apple MacBook & Bluetooth keyboards have no right control key
+		case IPT_MAHJONG_SCORE:
+			if (entry.player() == 0)
+				entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_SLASH);
+			break;
+#endif
 
 			// leave everything else alone
 		default:

@@ -29,7 +29,7 @@
 #define SCREEN_HEIGHT    320
 #else
 #define SCREEN_WIDTH    512
-#define SCREEN_HEIGHT   317
+#define SCREEN_HEIGHT   320
 #endif
 
 /* This is indexed by SDL_GameControllerButton. */
@@ -67,7 +67,7 @@ SDL_bool done = SDL_FALSE;
 SDL_Texture *background, *button, *axis;
 
 static SDL_Texture *
-LoadTexture(SDL_Renderer *renderer, char *file, SDL_bool transparent)
+LoadTexture(SDL_Renderer *renderer, const char *file, SDL_bool transparent)
 {
     SDL_Surface *temp = NULL;
     SDL_Texture *texture = NULL;
@@ -129,7 +129,7 @@ loop(void *arg)
     for (i = 0; i < SDL_CONTROLLER_BUTTON_MAX; ++i) {
         if (SDL_GameControllerGetButton(gamecontroller, (SDL_GameControllerButton)i) == SDL_PRESSED) {
             const SDL_Rect dst = { button_positions[i].x, button_positions[i].y, 50, 50 };
-            SDL_RenderCopyEx(screen, button, NULL, &dst, 0, NULL, 0);
+            SDL_RenderCopyEx(screen, button, NULL, &dst, 0, NULL, SDL_FLIP_NONE);
         }
     }
 
@@ -139,11 +139,11 @@ loop(void *arg)
         if (value < -deadzone) {
             const SDL_Rect dst = { axis_positions[i].x, axis_positions[i].y, 50, 50 };
             const double angle = axis_positions[i].angle;
-            SDL_RenderCopyEx(screen, axis, NULL, &dst, angle, NULL, 0);
+            SDL_RenderCopyEx(screen, axis, NULL, &dst, angle, NULL, SDL_FLIP_NONE);
         } else if (value > deadzone) {
             const SDL_Rect dst = { axis_positions[i].x, axis_positions[i].y, 50, 50 };
             const double angle = axis_positions[i].angle + 180.0;
-            SDL_RenderCopyEx(screen, axis, NULL, &dst, angle, NULL, 0);
+            SDL_RenderCopyEx(screen, axis, NULL, &dst, angle, NULL, SDL_FLIP_NONE);
         }
     }
 
@@ -181,6 +181,8 @@ WatchGameController(SDL_GameController * gamecontroller)
     window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED,
                               SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH,
                               SCREEN_HEIGHT, 0);
+    SDL_free(title);
+    title = NULL;
     if (window == NULL) {
         SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't create window: %s\n", SDL_GetError());
         return SDL_FALSE;

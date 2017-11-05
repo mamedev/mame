@@ -23,9 +23,9 @@ public:
 		m_gfxdecode(*this, "gfxdecode") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT16> m_fgvideoram;
-	required_shared_ptr<UINT16> m_bgvideoram;
-	required_shared_ptr<UINT16> m_spriteram;
+	required_shared_ptr<uint16_t> m_fgvideoram;
+	required_shared_ptr<uint16_t> m_bgvideoram;
+	required_shared_ptr<uint16_t> m_spriteram;
 	optional_device<decospr_device> m_sprgen;
 
 	/* video-related */
@@ -33,7 +33,7 @@ public:
 	tilemap_t     *m_fg_tilemap;
 	int         m_banksel;
 	int         m_gfxbank[4];
-	UINT16      m_scroll[4];
+	uint16_t      m_scroll[4];
 
 	/* devices */
 	required_device<cpu_device> m_audiocpu;
@@ -50,8 +50,8 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_gotcha(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	inline void get_tile_info( tile_data &tileinfo, int tile_index ,UINT16 *vram, int color_offs);
+	uint32_t screen_update_gotcha(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	inline void get_tile_info( tile_data &tileinfo, int tile_index ,uint16_t *vram, int color_offs);
 	required_device<cpu_device> m_maincpu;
 	required_device<okim6295_device> m_oki;
 	required_device<gfxdecode_device> m_gfxdecode;

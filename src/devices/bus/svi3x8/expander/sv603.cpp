@@ -6,15 +6,18 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "sv603.h"
+
 #include "softlist.h"
+#include "speaker.h"
 
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type SV603 = &device_creator<sv603_device>;
+DEFINE_DEVICE_TYPE(SV603, sv603_device, "sv603", "SV-603 Coleco Game Adapter")
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
@@ -25,17 +28,16 @@ ROM_START( sv603 )
 	ROM_LOAD("sv603.ic10", 0x0000, 0x2000, CRC(19e91b82) SHA1(8a30abe5ffef810b0f99b86db38b1b3c9d259b78))
 ROM_END
 
-const rom_entry *sv603_device::device_rom_region() const
+const tiny_rom_entry *sv603_device::device_rom_region() const
 {
 	return ROM_NAME( sv603 );
 }
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( sv603 )
+MACHINE_CONFIG_MEMBER( sv603_device::device_add_mconfig )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("snd", SN76489A, XTAL_10_738635MHz / 3)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
@@ -47,11 +49,6 @@ static MACHINE_CONFIG_FRAGMENT( sv603 )
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "coleco")
 MACHINE_CONFIG_END
 
-machine_config_constructor sv603_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( sv603 );
-}
-
 
 //**************************************************************************
 //  CARTRIDGE
@@ -59,12 +56,12 @@ machine_config_constructor sv603_device::device_mconfig_additions() const
 
 DEVICE_IMAGE_LOAD_MEMBER( sv603_device, cartridge )
 {
-	UINT32 size = m_cart_rom->common_get_size("rom");
+	uint32_t size = m_cart_rom->common_get_size("rom");
 
 	m_cart_rom->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	m_cart_rom->common_load_rom(m_cart_rom->get_rom_base(), size, "rom");
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 
@@ -76,8 +73,8 @@ DEVICE_IMAGE_LOAD_MEMBER( sv603_device, cartridge )
 //  sv603_device - constructor
 //-------------------------------------------------
 
-sv603_device::sv603_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, SV603, "SV-603 Coleco Game Adapter", tag, owner, clock, "sv603", __FILE__),
+sv603_device::sv603_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, SV603, tag, owner, clock),
 	device_svi_expander_interface(mconfig, *this),
 	m_bios(*this, "bios"),
 	m_snd(*this, "snd"),
@@ -117,7 +114,7 @@ READ8_MEMBER( sv603_device::mreq_r )
 	if (offset >= 0x8000 && offset < 0xa000)
 	{
 		m_expander->ramdis_w(0);
-		return m_bios->u8(offset & 0x1fff);
+		return m_bios->as_u8(offset & 0x1fff);
 	}
 
 	return 0xff;

@@ -103,7 +103,7 @@ adc_c_zpi
 adc_c_zpx
 	TMP = read_pc();
 	read(TMP);
-	TMP = read(UINT8(TMP+X));
+	TMP = read(uint8_t(TMP+X));
 	do_adc(TMP);
 	if(P & F_D) {
 		read_pc_noinc();
@@ -139,7 +139,7 @@ bbr_zpb
 	TMP = read_pc();
 	read_pc_noinc();
 	if(!(TMP2 & (1 << ((inst_state >> 4) & 7)))) {
-		PC += INT8(TMP);
+		PC += int8_t(TMP);
 	}
 	prefetch();
 
@@ -150,7 +150,7 @@ bbs_zpb
 	TMP = read_pc();
 	read_pc_noinc();
 	if(TMP2 & (1 << ((inst_state >> 4) & 7))) {
-		PC += INT8(TMP);
+		PC += int8_t(TMP);
 	}
 	prefetch();
 
@@ -175,17 +175,17 @@ bit_imm
 bit_zpx
 	TMP = read_pc();
 	read(TMP);
-	TMP = read(UINT8(TMP+X));
+	TMP = read(uint8_t(TMP+X));
 	do_bit(TMP);
 	prefetch();
 
 bra_rel
 	TMP = read_pc();
 	read_pc_noinc();
-	if(page_changing(PC, INT8(TMP))) {
-		read_arg(set_l(PC, PC+INT8(TMP)));
+	if(page_changing(PC, int8_t(TMP))) {
+		read_arg(set_l(PC, PC+int8_t(TMP)));
 	}
-	PC += INT8(TMP);
+	PC += int8_t(TMP);
 	prefetch();
 
 brk_c_imp
@@ -474,7 +474,7 @@ sbc_c_zpi
 sbc_c_zpx
 	TMP = read_pc();
 	read(TMP);
-	TMP = read(UINT8(TMP+X));
+	TMP = read(uint8_t(TMP+X));
 	do_sbc(TMP);
 	if(P & F_D) {
 		read_pc_noinc();
@@ -524,7 +524,7 @@ stz_zpg
 stz_zpx
 	TMP = read_pc();
 	read(TMP);
-	write(UINT8(TMP+X), 0x00);
+	write(uint8_t(TMP+X), 0x00);
 	prefetch();
 
 trb_aba

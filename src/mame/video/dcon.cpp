@@ -8,6 +8,7 @@
 
 #include "emu.h"
 #include "includes/dcon.h"
+#include "screen.h"
 
 
 /******************************************************************************/
@@ -98,10 +99,10 @@ TILE_GET_INFO_MEMBER(dcon_state::get_text_tile_info)
 
 void dcon_state::video_start()
 {
-	m_background_layer = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dcon_state::get_back_tile_info),this),TILEMAP_SCAN_ROWS,     16,16,32,32);
-	m_foreground_layer = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dcon_state::get_fore_tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,32);
-	m_midground_layer =  &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dcon_state::get_mid_tile_info),this), TILEMAP_SCAN_ROWS,16,16,32,32);
-	m_text_layer =       &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dcon_state::get_text_tile_info),this),TILEMAP_SCAN_ROWS,  8,8,64,32);
+	m_background_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(dcon_state::get_back_tile_info),this),TILEMAP_SCAN_ROWS,     16,16,32,32);
+	m_foreground_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(dcon_state::get_fore_tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,32);
+	m_midground_layer =  &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(dcon_state::get_mid_tile_info),this), TILEMAP_SCAN_ROWS,16,16,32,32);
+	m_text_layer =       &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(dcon_state::get_text_tile_info),this),TILEMAP_SCAN_ROWS,  8,8,64,32);
 
 	m_midground_layer->set_transparent_pen(15);
 	m_foreground_layer->set_transparent_pen(15);
@@ -117,7 +118,7 @@ void dcon_state::video_start()
 
 void dcon_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
-	UINT16 *spriteram16 = m_spriteram;
+	uint16_t *spriteram16 = m_spriteram;
 	int offs,fx,fy,x,y,color,sprite;
 	int dx,dy,ax,ay,inc,pri_mask = 0;
 
@@ -240,7 +241,7 @@ void dcon_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap,const
 	}
 }
 
-UINT32 dcon_state::screen_update_dcon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t dcon_state::screen_update_dcon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	screen.priority().fill(0, cliprect);
 
@@ -272,7 +273,7 @@ UINT32 dcon_state::screen_update_dcon(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-UINT32 dcon_state::screen_update_sdgndmps(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t dcon_state::screen_update_sdgndmps(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	screen.priority().fill(0, cliprect);
 

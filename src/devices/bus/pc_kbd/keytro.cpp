@@ -336,8 +336,8 @@ ROM_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type PC_KBD_KEYTRONIC_PC3270       = &device_creator<pc_kbd_keytronic_pc3270_device>;
-const device_type PC_KBD_KEYTRONIC_PC3270_AT    = &device_creator<pc_kbd_keytronic_pc3270_at_device>;
+DEFINE_DEVICE_TYPE(PC_KBD_KEYTRONIC_PC3270,    pc_kbd_keytronic_pc3270_device,    "keytronic_pc3270",    "Keytronic PC3270")
+DEFINE_DEVICE_TYPE(PC_KBD_KEYTRONIC_PC3270_AT, pc_kbd_keytronic_pc3270_at_device, "keytronic_pc3270_at", "Keytronic PC3270 AT")
 
 
 /*****************************************************************************
@@ -356,17 +356,6 @@ static ADDRESS_MAP_START( keytronic_pc3270_io, AS_IO, 8, pc_kbd_keytronic_pc3270
 ADDRESS_MAP_END
 
 
-/*****************************************************************************
-    MACHINE CONFIG
-*****************************************************************************/
-
-MACHINE_CONFIG_FRAGMENT( keytronic_pc3270 )
-	MCFG_CPU_ADD("kb_keytr", I8051, 11060250)
-	MCFG_CPU_PROGRAM_MAP(keytronic_pc3270_program)
-	MCFG_CPU_IO_MAP(keytronic_pc3270_io)
-MACHINE_CONFIG_END
-
-
 /***************************************************************************
     ROM DEFINITIONS
 ***************************************************************************/
@@ -377,10 +366,27 @@ ROM_START( keytronic_pc3270 )
 ROM_END
 
 
-pc_kbd_keytronic_pc3270_device::pc_kbd_keytronic_pc3270_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, PC_KBD_KEYTRONIC_PC3270, "Keytronic PC3270", tag, owner, clock, "keytronic_pc3270", __FILE__),
+pc_kbd_keytronic_pc3270_device::pc_kbd_keytronic_pc3270_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	pc_kbd_keytronic_pc3270_device(mconfig, PC_KBD_KEYTRONIC_PC3270, tag, owner, clock)
+{
+}
+
+
+pc_kbd_keytronic_pc3270_device::pc_kbd_keytronic_pc3270_device(
+		machine_config const &mconfig,
+		device_type type,
+		char const *tag,
+		device_t *owner,
+		uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
 	device_pc_kbd_interface(mconfig, *this),
 	m_cpu(*this, "kb_keytr"), m_p1(0), m_p1_data(0), m_p2(0), m_p3(0), m_last_write_addr(0)
+{
+}
+
+
+pc_kbd_keytronic_pc3270_at_device::pc_kbd_keytronic_pc3270_at_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	pc_kbd_keytronic_pc3270_device(mconfig, PC_KBD_KEYTRONIC_PC3270_AT, tag, owner, clock)
 {
 }
 
@@ -413,14 +419,14 @@ void pc_kbd_keytronic_pc3270_device::device_reset()
 
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor pc_kbd_keytronic_pc3270_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( keytronic_pc3270 );
-}
+MACHINE_CONFIG_MEMBER( pc_kbd_keytronic_pc3270_device::device_add_mconfig )
+	MCFG_CPU_ADD("kb_keytr", I8051, 11060250)
+	MCFG_CPU_PROGRAM_MAP(keytronic_pc3270_program)
+	MCFG_CPU_IO_MAP(keytronic_pc3270_io)
+MACHINE_CONFIG_END
 
 
 ioport_constructor pc_kbd_keytronic_pc3270_device::device_input_ports() const
@@ -439,7 +445,7 @@ ioport_constructor pc_kbd_keytronic_pc3270_at_device::device_input_ports() const
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *pc_kbd_keytronic_pc3270_device::device_rom_region() const
+const tiny_rom_entry *pc_kbd_keytronic_pc3270_device::device_rom_region() const
 {
 	return ROM_NAME( keytronic_pc3270 );
 }
@@ -606,7 +612,7 @@ WRITE8_MEMBER( pc_kbd_keytronic_pc3270_device::p2_write )
 
 READ8_MEMBER( pc_kbd_keytronic_pc3270_device::p3_read )
 {
-	UINT8 data = m_p3;
+	uint8_t data = m_p3;
 
 	data &= ~0x14;
 

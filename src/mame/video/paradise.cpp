@@ -152,9 +152,9 @@ WRITE8_MEMBER(paradise_state::pixmap_w)
 
 void paradise_state::video_start()
 {
-	m_tilemap_0 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(paradise_state::get_tile_info_0),this), TILEMAP_SCAN_ROWS, 8, 8, 0x20, 0x20);
-	m_tilemap_1 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(paradise_state::get_tile_info_1),this), TILEMAP_SCAN_ROWS, 8, 8, 0x20, 0x20);
-	m_tilemap_2 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(paradise_state::get_tile_info_2),this), TILEMAP_SCAN_ROWS, 8, 8, 0x20, 0x20);
+	m_tilemap_0 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(paradise_state::get_tile_info_0),this), TILEMAP_SCAN_ROWS, 8, 8, 0x20, 0x20);
+	m_tilemap_1 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(paradise_state::get_tile_info_1),this), TILEMAP_SCAN_ROWS, 8, 8, 0x20, 0x20);
+	m_tilemap_2 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(paradise_state::get_tile_info_2),this), TILEMAP_SCAN_ROWS, 8, 8, 0x20, 0x20);
 
 	/* pixmap */
 	m_screen->register_screen_bitmap(m_tmpbitmap);
@@ -226,7 +226,7 @@ void paradise_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 ***************************************************************************/
 
-UINT32 paradise_state::screen_update_paradise(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t paradise_state::screen_update_paradise(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int layers_ctrl = -1;
 
@@ -276,7 +276,7 @@ if (machine().input().code_pressed(KEYCODE_Z))
 }
 
 /* no pix layer, no tilemap_0, different priority bits */
-UINT32 paradise_state::screen_update_torus(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t paradise_state::screen_update_torus(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
@@ -306,7 +306,7 @@ UINT32 paradise_state::screen_update_torus(screen_device &screen, bitmap_ind16 &
 }
 
 /* I don't know how the priority bits work on this one */
-UINT32 paradise_state::screen_update_madball(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t paradise_state::screen_update_madball(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->black_pen(), cliprect);
 	m_tilemap_0->draw(screen, bitmap, cliprect, 0, 0);

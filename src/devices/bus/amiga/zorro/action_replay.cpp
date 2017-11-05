@@ -14,6 +14,7 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "action_replay.h"
 
 
@@ -21,9 +22,9 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type ACTION_REPLAY_MK1 = &device_creator<action_replay_mk1_device>;
-const device_type ACTION_REPLAY_MK2 = &device_creator<action_replay_mk2_device>;
-const device_type ACTION_REPLAY_MK3 = &device_creator<action_replay_mk3_device>;
+DEFINE_DEVICE_TYPE(ACTION_REPLAY_MK1, action_replay_mk1_device, "amiga_ar1", "Datel Action Replay MK-I")
+DEFINE_DEVICE_TYPE(ACTION_REPLAY_MK2, action_replay_mk2_device, "amiga_ar2", "Datel Action Replay MK-II")
+DEFINE_DEVICE_TYPE(ACTION_REPLAY_MK3, action_replay_mk3_device, "amiga_ar3", "Datel Action Replay MK-III")
 
 //-------------------------------------------------
 //  input_ports - device-specific input ports
@@ -52,7 +53,7 @@ ROM_START( ar_mk1 )
 	ROMX_LOAD("ar1_v150.bin", 0x0000, 0x10000, BAD_DUMP CRC(f82c4258) SHA1(843b433b2c56640e045d5fdc854dc6b1a4964e7c), ROM_BIOS(2))
 ROM_END
 
-const rom_entry *action_replay_mk1_device::device_rom_region() const
+const tiny_rom_entry *action_replay_mk1_device::device_rom_region() const
 {
 	return ROM_NAME( ar_mk1 );
 }
@@ -68,7 +69,7 @@ ROM_START( ar_mk2 )
 	ROMX_LOAD("ar2_v214.bin", 0x0000, 0x20000, BAD_DUMP CRC(1bb3d0a8) SHA1(14b1f5a69efb6f4e2331970e6ca0f33c0f04ac91), ROM_BIOS(3))
 ROM_END
 
-const rom_entry *action_replay_mk2_device::device_rom_region() const
+const tiny_rom_entry *action_replay_mk2_device::device_rom_region() const
 {
 	return ROM_NAME( ar_mk2 );
 }
@@ -83,7 +84,7 @@ ROM_START( ar_mk3 )
 	ROMX_LOAD("ar3_v314.bin", 0x0000, 0x40000, BAD_DUMP CRC(009f7768) SHA1(0439d6ccc2a0e5c2e83fcf2389dc4d4a440a4c62), ROM_BIOS(2))
 ROM_END
 
-const rom_entry *action_replay_mk3_device::device_rom_region() const
+const tiny_rom_entry *action_replay_mk3_device::device_rom_region() const
 {
 	return ROM_NAME( ar_mk3 );
 }
@@ -97,26 +98,25 @@ const rom_entry *action_replay_mk3_device::device_rom_region() const
 //  action_replay_device - constructor
 //-------------------------------------------------
 
-action_replay_device::action_replay_device(const machine_config &mconfig, device_type type, const char *tag,
-	device_t *owner, UINT32 clock, const char *name, const char *shortname) :
-	device_t(mconfig, type, name, tag, owner, clock, shortname, __FILE__),
+action_replay_device::action_replay_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
 	device_exp_card_interface(mconfig, *this),
 	m_button(*this, "freeze")
 {
 }
 
-action_replay_mk1_device::action_replay_mk1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	action_replay_device(mconfig, ACTION_REPLAY_MK1, tag, owner, clock, "Datel Action Replay MK-I", "amiga_ar1")
+action_replay_mk1_device::action_replay_mk1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	action_replay_device(mconfig, ACTION_REPLAY_MK1, tag, owner, clock)
 {
 }
 
-action_replay_mk2_device::action_replay_mk2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	action_replay_device(mconfig, ACTION_REPLAY_MK1, tag, owner, clock, "Datel Action Replay MK-II", "amiga_ar2")
+action_replay_mk2_device::action_replay_mk2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	action_replay_device(mconfig, ACTION_REPLAY_MK2, tag, owner, clock)
 {
 }
 
-action_replay_mk3_device::action_replay_mk3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	action_replay_device(mconfig, ACTION_REPLAY_MK1, tag, owner, clock, "Datel Action Replay MK-III", "amiga_ar3")
+action_replay_mk3_device::action_replay_mk3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	action_replay_device(mconfig, ACTION_REPLAY_MK3, tag, owner, clock)
 {
 }
 

@@ -9,9 +9,9 @@
 **********************************************************************/
 
 #include "emu.h"
+#include "includes/thomson.h"
 #include "machine/thomflop.h"
 #include "formats/thom_dsk.h"
-#include "includes/thomson.h"
 #include "machine/6821pia.h"
 #include "machine/ram.h"
 
@@ -95,7 +95,7 @@ int thomson_state::to7_get_cassette()
 			/* demodulate wave signal on-the-fly */
 			/* we simply count sign changes... */
 			int k, chg;
-			INT8 data[40];
+			int8_t data[40];
 			cassette_get_samples( cass, 0, pos, TO7_BIT_LENGTH * 15. / 14., 40, 1, data, 0 );
 
 			for ( k = 1, chg = 0; k < 40; k++ )
@@ -120,9 +120,9 @@ int thomson_state::to7_get_cassette()
 
 
 /* 1-bit cassette output */
-void thomson_state::to7_set_cassette( int data )
+WRITE_LINE_MEMBER(thomson_state::to7_set_cassette)
 {
-	m_cassette->output(data ? 1. : -1. );
+	m_cassette->output(state ? 1. : -1. );
 }
 
 
@@ -172,7 +172,7 @@ int thomson_state::mo5_get_cassette()
 		cassette_image* cass = m_cassette->get_image();
 		cassette_state state = m_cassette->get_state();
 		double pos = m_cassette->get_position();
-		INT32 hbit;
+		int32_t hbit;
 
 		if ( (state & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_DISABLED )
 			return 1;
@@ -359,11 +359,11 @@ void thomson_state::thom_set_caps_led( int led )
 DEVICE_IMAGE_LOAD_MEMBER( thomson_state, to7_cartridge )
 {
 	int i,j;
-	UINT8* pos = memregion("maincpu" )->base() + 0x10000;
+	uint8_t* pos = memregion("maincpu" )->base() + 0x10000;
 	offs_t size;
 	char name[129];
 
-	if (image.software_entry() == nullptr)
+	if (!image.loaded_through_softlist())
 		size = image.length();
 	else
 		size = image.get_software_region_length("rom");
@@ -380,15 +380,15 @@ DEVICE_IMAGE_LOAD_MEMBER( thomson_state, to7_cartridge )
 	else
 	{
 		image.seterror(IMAGE_ERROR_UNSUPPORTED, string_format("Invalid cartridge size %u", size).c_str());
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 	}
 
-	if (image.software_entry() == nullptr)
+	if (!image.loaded_through_softlist())
 	{
 		if ( image.fread( pos, size ) != size )
 		{
 			image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Read error");
-			return IMAGE_INIT_FAIL;
+			return image_init_result::FAIL;
 		}
 	}
 	else
@@ -411,7 +411,7 @@ DEVICE_IMAGE_LOAD_MEMBER( thomson_state, to7_cartridge )
 
 	PRINT (( "to7_cartridge_load: cartridge \"%s\" banks=%i, size=%i\n", name, m_thom_cart_nb_banks, size ));
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 
@@ -460,9 +460,9 @@ WRITE8_MEMBER( thomson_state::to7_cartridge_w )
 /* read signal to 0000-0003 generates a bank switch */
 READ8_MEMBER( thomson_state::to7_cartridge_r )
 {
-	UINT8* pos = memregion( "maincpu" )->base() + 0x10000;
-	UINT8 data = pos[offset + (m_thom_cart_bank % m_thom_cart_nb_banks) * 0x4000];
-	if ( !space.debugger_access() )
+	uint8_t* pos = memregion( "maincpu" )->base() + 0x10000;
+	uint8_t data = pos[offset + (m_thom_cart_bank % m_thom_cart_nb_banks) * 0x4000];
+	if ( !machine().side_effect_disabled() )
 	{
 		m_thom_cart_bank = offset & 3;
 		to7_update_cart_bank();
@@ -487,13 +487,6 @@ WRITE8_MEMBER( thomson_state::to7_timer_port_out )
 
 
 
-WRITE8_MEMBER( thomson_state::to7_timer_cp2_out )
-{
-	m_buzzer->write_unsigned8(data ? 0x80 : 0); /* 1-bit buzzer */
-}
-
-
-
 READ8_MEMBER( thomson_state::to7_timer_port_in )
 {
 	int lightpen = (m_io_lightpen_button->read() & 1) ? 2 : 0;
@@ -501,13 +494,6 @@ READ8_MEMBER( thomson_state::to7_timer_port_in )
 	return lightpen | cass;
 }
 
-
-
-WRITE8_MEMBER( thomson_state::to7_timer_tco_out )
-{
-	/* 1-bit cassette output */
-	to7_set_cassette( data );
-}
 
 
 /* ------------ lightpen automaton ------------ */
@@ -573,7 +559,7 @@ READ8_MEMBER( thomson_state::to7_sys_porta_in )
 	{
 		/* keyboard  */
 		int keyline = m_pia_sys->b_output();
-		UINT8 val = 0xff;
+		uint8_t val = 0xff;
 		int i;
 
 		for ( i = 0; i < 8; i++ )
@@ -607,21 +593,21 @@ READ8_MEMBER( thomson_state::to7_sys_portb_in )
    because the Data Transmit Ready bit is shared in an incompatible way!
 */
 
-const device_type TO7_IO_LINE = &device_creator<to7_io_line_device>;
+DEFINE_DEVICE_TYPE(TO7_IO_LINE, to7_io_line_device, "to7_io_line", "TO7 Serial source")
 
 //-------------------------------------------------
 //  to7_io_line_device - constructor
 //-------------------------------------------------
 
-to7_io_line_device::to7_io_line_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, TO7_IO_LINE, "T07 Serial source", tag, owner, clock, "to7_io_line", __FILE__),
+to7_io_line_device::to7_io_line_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, TO7_IO_LINE, tag, owner, clock),
 	m_pia_io(*this, THOM_PIA_IO),
 	m_rs232(*this, "rs232"),
 	m_last_low(0)
 {
 }
 
-static MACHINE_CONFIG_FRAGMENT( to7_io_line )
+MACHINE_CONFIG_MEMBER( to7_io_line_device::device_add_mconfig )
 	/// THIS PIO is part of CC 90-232 expansion
 	MCFG_DEVICE_ADD(THOM_PIA_IO, PIA6821, 0)
 	MCFG_PIA_READPA_HANDLER(READ8(to7_io_line_device, porta_in))
@@ -644,10 +630,6 @@ static MACHINE_CONFIG_FRAGMENT( to7_io_line )
 
 MACHINE_CONFIG_END
 
-machine_config_constructor to7_io_line_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( to7_io_line );
-}
 
 void to7_io_line_device::device_start()
 {
@@ -773,7 +755,7 @@ void thomson_state::to7_modem_init()
 
 READ8_MEMBER( thomson_state::to7_modem_mea8000_r )
 {
-	if ( space.debugger_access() )
+	if ( machine().side_effect_disabled() )
 	{
 		return 0;
 	}
@@ -847,11 +829,11 @@ WRITE8_MEMBER( thomson_state::to7_modem_mea8000_w )
    This is similar Atari & Amiga mouses.
    Returns: 0 0 0 0 0 0 YB XB YA XA
  */
-UINT8 thomson_state::to7_get_mouse_signal()
+uint8_t thomson_state::to7_get_mouse_signal()
 {
-	UINT8 xa, xb, ya, yb;
-	UINT16 dx = m_io_mouse_x->read(); /* x axis */
-	UINT16 dy = m_io_mouse_y->read(); /* y axis */
+	uint8_t xa, xb, ya, yb;
+	uint16_t dx = m_io_mouse_x->read(); /* x axis */
+	uint16_t dy = m_io_mouse_y->read(); /* y axis */
 	xa = ((dx + 1) & 3) <= 1;
 	xb = (dx & 3) <= 1;
 	ya = ((dy + 1) & 3) <= 1;
@@ -863,14 +845,14 @@ UINT8 thomson_state::to7_get_mouse_signal()
 
 void thomson_state::to7_game_sound_update()
 {
-	m_dac->write_unsigned8(m_to7_game_mute ? 0 : (m_to7_game_sound << 2) );
+	m_dac->write(m_to7_game_mute ? 0 : m_to7_game_sound );
 }
 
 
 
 READ8_MEMBER( thomson_state::to7_game_porta_in )
 {
-	UINT8 data;
+	uint8_t data;
 	if ( m_io_config->read() & 1 )
 	{
 		/* mouse */
@@ -911,11 +893,11 @@ READ8_MEMBER( thomson_state::to7_game_porta_in )
 
 READ8_MEMBER( thomson_state::to7_game_portb_in )
 {
-	UINT8 data;
+	uint8_t data;
 	if ( m_io_config->read() & 1 )
 	{
 		/* mouse */
-		UINT8 mouse =  to7_get_mouse_signal();
+		uint8_t mouse =  to7_get_mouse_signal();
 		data = 0;
 		if ( mouse & 1 )
 			data |= 0x04; /* XA */
@@ -959,14 +941,14 @@ TIMER_CALLBACK_MEMBER(thomson_state::to7_game_update_cb)
 	if ( m_io_config->read() & 1 )
 	{
 		/* mouse */
-		UINT8 mouse = to7_get_mouse_signal();
+		uint8_t mouse = to7_get_mouse_signal();
 		m_pia_game->ca1_w( (mouse & 1) ? 1 : 0 ); /* XA */
 		m_pia_game->ca2_w( (mouse & 2) ? 1 : 0 ); /* YA */
 	}
 	else
 	{
 		/* joystick */
-		UINT8 in = m_io_game_port_buttons->read();
+		uint8_t in = m_io_game_port_buttons->read();
 		m_pia_game->cb2_w( (in & 0x80) ? 1 : 0 ); /* P2 action A */
 		m_pia_game->ca2_w( (in & 0x40) ? 1 : 0 ); /* P1 action A */
 		m_pia_game->cb1_w( (in & 0x08) ? 1 : 0 ); /* P2 action B */
@@ -1099,8 +1081,8 @@ MACHINE_RESET_MEMBER( thomson_state, to7 )
 MACHINE_START_MEMBER( thomson_state, to7 )
 {
 	address_space& space = m_maincpu->space(AS_PROGRAM);
-	UINT8* mem = memregion("maincpu")->base();
-	UINT8* ram = m_ram->pointer();
+	uint8_t* mem = memregion("maincpu")->base();
+	uint8_t* ram = m_ram->pointer();
 
 	LOG (( "to7: machine start called\n" ));
 
@@ -1177,7 +1159,7 @@ READ8_MEMBER( thomson_state::to770_sys_porta_in )
 void thomson_state::to770_update_ram_bank()
 {
 	address_space& space = m_maincpu->space(AS_PROGRAM);
-	UINT8 portb = m_pia_sys->port_b_z_mask();
+	uint8_t portb = m_pia_sys->port_b_z_mask();
 	int bank;
 
 	switch (portb & 0xf8)
@@ -1323,8 +1305,8 @@ MACHINE_RESET_MEMBER( thomson_state, to770 )
 
 MACHINE_START_MEMBER( thomson_state, to770 )
 {
-	UINT8* mem = memregion("maincpu")->base();
-	UINT8* ram = m_ram->pointer();
+	uint8_t* mem = memregion("maincpu")->base();
+	uint8_t* ram = m_ram->pointer();
 
 	LOG (( "to770: machine start called\n" ));
 
@@ -1426,16 +1408,9 @@ READ8_MEMBER( thomson_state::mo5_sys_porta_in )
 
 
 
-WRITE8_MEMBER( thomson_state::mo5_sys_portb_out )
-{
-	m_buzzer->write_unsigned8((data & 1) ? 0x80 : 0); /* 1-bit buzzer */
-}
-
-
-
 READ8_MEMBER( thomson_state::mo5_sys_portb_in )
 {
-	UINT8 portb = m_pia_sys->b_output();
+	uint8_t portb = m_pia_sys->b_output();
 	int col = (portb >> 1) & 7;       /* key column */
 	int lin = 7 - ((portb >> 4) & 7); /* key line */
 
@@ -1489,12 +1464,12 @@ WRITE8_MEMBER( thomson_state::mo5_gatearray_w )
 
 DEVICE_IMAGE_LOAD_MEMBER( thomson_state, mo5_cartridge )
 {
-	UINT8* pos = memregion("maincpu")->base() + 0x10000;
-	UINT64 size, i;
+	uint8_t* pos = memregion("maincpu")->base() + 0x10000;
+	uint64_t size, i;
 	int j;
 	char name[129];
 
-	if (image.software_entry() == nullptr)
+	if (!image.loaded_through_softlist())
 		size = image.length();
 	else
 		size = image.get_software_region_length("rom");
@@ -1511,15 +1486,15 @@ DEVICE_IMAGE_LOAD_MEMBER( thomson_state, mo5_cartridge )
 	else
 	{
 		image.seterror(IMAGE_ERROR_UNSUPPORTED, string_format("Invalid cartridge size %d", size).c_str());
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 	}
 
-	if (image.software_entry() == nullptr)
+	if (!image.loaded_through_softlist())
 	{
 		if ( image.fread(pos, size ) != size )
 		{
 			image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Read error");
-			return IMAGE_INIT_FAIL;
+			return image_init_result::FAIL;
 		}
 	}
 	else
@@ -1542,7 +1517,7 @@ DEVICE_IMAGE_LOAD_MEMBER( thomson_state, mo5_cartridge )
 
 	PRINT (( "mo5_cartridge_load: cartridge \"%s\" banks=%i, size=%u\n", name, m_thom_cart_nb_banks, (unsigned) size ));
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 
@@ -1651,9 +1626,9 @@ WRITE8_MEMBER( thomson_state::mo5_cartridge_w )
 /* read signal to bffc-bfff generates a bank switch */
 READ8_MEMBER( thomson_state::mo5_cartridge_r )
 {
-	UINT8* pos = memregion( "maincpu" )->base() + 0x10000;
-	UINT8 data = pos[offset + 0xbffc + (m_thom_cart_bank % m_thom_cart_nb_banks) * 0x4000];
-	if ( !space.debugger_access() )
+	uint8_t* pos = memregion( "maincpu" )->base() + 0x10000;
+	uint8_t data = pos[offset + 0xbffc + (m_thom_cart_bank % m_thom_cart_nb_banks) * 0x4000];
+	if ( !machine().side_effect_disabled() )
 	{
 		m_thom_cart_bank = offset & 3;
 		mo5_update_cart_bank();
@@ -1711,8 +1686,8 @@ MACHINE_RESET_MEMBER( thomson_state, mo5 )
 
 MACHINE_START_MEMBER( thomson_state, mo5 )
 {
-	UINT8* mem = memregion("maincpu")->base();
-	UINT8* ram = m_ram->pointer();
+	uint8_t* mem = memregion("maincpu")->base();
+	uint8_t* ram = m_ram->pointer();
 
 	LOG (( "mo5: machine start called\n" ));
 
@@ -1820,7 +1795,7 @@ WRITE8_MEMBER( thomson_state::to9_gatearray_w )
 
 
 /* style: 0 => TO9, 1 => TO8/TO9, 2 => MO6 */
-void thomson_state::to9_set_video_mode( UINT8 data, int style )
+void thomson_state::to9_set_video_mode( uint8_t data, int style )
 {
 	switch ( data & 0x7f )
 	{
@@ -1876,8 +1851,8 @@ READ8_MEMBER( thomson_state::to9_vreg_r )
 	{
 	case 0: /* palette data */
 	{
-		UINT8 c =  m_to9_palette_data[ m_to9_palette_idx ];
-		if ( !space.debugger_access() )
+		uint8_t c =  m_to9_palette_data[ m_to9_palette_idx ];
+		if ( !machine().side_effect_disabled() )
 		{
 			m_to9_palette_idx = ( m_to9_palette_idx + 1 ) & 31;
 		}
@@ -1907,7 +1882,7 @@ WRITE8_MEMBER( thomson_state::to9_vreg_w )
 	{
 	case 0: /* palette data */
 	{
-		UINT16 color, idx;
+		uint16_t color, idx;
 		m_to9_palette_data[ m_to9_palette_idx ] = data;
 		idx = m_to9_palette_idx / 2;
 		color = m_to9_palette_data[ 2 * idx + 1 ];
@@ -2055,9 +2030,9 @@ WRITE8_MEMBER( thomson_state::to9_cartridge_w )
 /* read signal to 0000-0003 generates a bank switch */
 READ8_MEMBER( thomson_state::to9_cartridge_r )
 {
-	UINT8* pos = memregion( "maincpu" )->base() + 0x10000;
-	UINT8 data = pos[offset + (m_thom_cart_bank % m_thom_cart_nb_banks) * 0x4000];
-	if ( !space.debugger_access() )
+	uint8_t* pos = memregion( "maincpu" )->base() + 0x10000;
+	uint8_t data = pos[offset + (m_thom_cart_bank % m_thom_cart_nb_banks) * 0x4000];
+	if ( !machine().side_effect_disabled() )
 	{
 		m_thom_cart_bank = offset & 3;
 		to9_update_cart_bank();
@@ -2070,9 +2045,9 @@ READ8_MEMBER( thomson_state::to9_cartridge_r )
 void thomson_state::to9_update_ram_bank()
 {
 	address_space& space = m_maincpu->space(AS_PROGRAM);
-	UINT8 port = m_mc6846->get_output_port();
-	UINT8 portb = m_pia_sys->port_b_z_mask();
-	UINT8 disk = ((port >> 2) & 1) | ((port >> 5) & 2); /* bits 6,2: RAM bank */
+	uint8_t port = m_mc6846->get_output_port();
+	uint8_t portb = m_pia_sys->port_b_z_mask();
+	uint8_t disk = ((port >> 2) & 1) | ((port >> 5) & 2); /* bits 6,2: RAM bank */
 	int bank;
 
 	switch ( portb & 0xf8 )
@@ -2135,7 +2110,7 @@ void thomson_state::to9_update_ram_bank_postload()
 /* normal mode: polling interval */
 #define TO9_KBD_POLL_PERIOD  attotime::from_msec( 10 )
 
-/* peripherial mode: time between two bytes, and after last byte */
+/* peripheral mode: time between two bytes, and after last byte */
 #define TO9_KBD_BYTE_SPACE   attotime::from_usec( 300 )
 #define TO9_KBD_END_SPACE    attotime::from_usec( 9100 )
 
@@ -2149,7 +2124,7 @@ void thomson_state::to9_update_ram_bank_postload()
 int thomson_state::to9_kbd_ktest()
 {
 	int line, bit;
-	UINT8 port;
+	uint8_t port;
 
 	for ( line = 0; line < 10; line++ )
 	{
@@ -2211,7 +2186,7 @@ READ8_MEMBER( thomson_state::to9_kbd_r )
 		return m_to9_kbd_status;
 
 	case 1: /* get input data */
-		if ( !space.debugger_access() )
+		if ( !machine().side_effect_disabled() )
 		{
 			m_to9_kbd_status &= ~(ACIA_6850_irq | ACIA_6850_PE);
 			if ( m_to9_kbd_overrun )
@@ -2313,7 +2288,7 @@ WRITE8_MEMBER( thomson_state::to9_kbd_w )
    note: parity is not used as a checksum but to actually transmit a 9-th bit
    of information!
 */
-void thomson_state::to9_kbd_send( UINT8 data, int parity )
+void thomson_state::to9_kbd_send( uint8_t data, int parity )
 {
 	if ( m_to9_kbd_status & ACIA_6850_RDRF )
 	{
@@ -2382,7 +2357,7 @@ int thomson_state::to9_kbd_get_key()
 	int control = ! (m_io_keyboard[7]->read() & 1);
 	int shift   = ! (m_io_keyboard[9]->read() & 1);
 	int key = -1, line, bit;
-	UINT8 port;
+	uint8_t port;
 
 	for ( line = 0; line < 10; line++ )
 	{
@@ -2467,7 +2442,7 @@ TIMER_CALLBACK_MEMBER(thomson_state::to9_kbd_timer_cb)
 {
 	if ( m_to9_kbd_periph )
 	{
-		/* peripherial mode: every 10 ms we send 4 bytes */
+		/* peripheral mode: every 10 ms we send 4 bytes */
 
 		switch ( m_to9_kbd_byte_count )
 		{
@@ -2478,7 +2453,7 @@ TIMER_CALLBACK_MEMBER(thomson_state::to9_kbd_timer_cb)
 		case 1: /* x axis */
 		{
 			int newx = m_io_mouse_x->read();
-			UINT8 data = ( (newx - m_to9_mouse_x) & 0xf ) - 8;
+			uint8_t data = ( (newx - m_to9_mouse_x) & 0xf ) - 8;
 			to9_kbd_send( data, 1 );
 			m_to9_mouse_x = newx;
 			break;
@@ -2487,7 +2462,7 @@ TIMER_CALLBACK_MEMBER(thomson_state::to9_kbd_timer_cb)
 		case 2: /* y axis */
 		{
 			int newy = m_io_mouse_y->read();
-			UINT8 data = ( (newy - m_to9_mouse_y) & 0xf ) - 8;
+			uint8_t data = ( (newy - m_to9_mouse_y) & 0xf ) - 8;
 			to9_kbd_send( data, 1 );
 			m_to9_mouse_y = newy;
 			break;
@@ -2496,7 +2471,7 @@ TIMER_CALLBACK_MEMBER(thomson_state::to9_kbd_timer_cb)
 		case 3: /* axis overflow & buttons */
 		{
 			int b = m_io_mouse_button->read();
-			UINT8 data = 0;
+			uint8_t data = 0;
 			if ( b & 1 ) data |= 1;
 			if ( b & 2 ) data |= 4;
 			to9_kbd_send( data, 1 );
@@ -2566,7 +2541,7 @@ void thomson_state::to9_kbd_init()
 
 READ8_MEMBER( thomson_state::to9_sys_porta_in )
 {
-	UINT8 ktest = to9_kbd_ktest();
+	uint8_t ktest = to9_kbd_ktest();
 
 	LOG_KBD(( "to9_sys_porta_in: ktest=%i\n", ktest ));
 
@@ -2654,8 +2629,8 @@ MACHINE_RESET_MEMBER( thomson_state, to9 )
 
 MACHINE_START_MEMBER( thomson_state, to9 )
 {
-	UINT8* mem = memregion("maincpu")->base();
-	UINT8* ram = m_ram->pointer();
+	uint8_t* mem = memregion("maincpu")->base();
+	uint8_t* ram = m_ram->pointer();
 
 	LOG (( "to9: machine start called\n" ));
 
@@ -2733,7 +2708,7 @@ MACHINE_START_MEMBER( thomson_state, to9 )
 int thomson_state::to8_kbd_ktest()
 {
 	int line, bit;
-	UINT8 port;
+	uint8_t port;
 
 	if ( m_io_config->read() & 2 )
 		return 0; /* disabled */
@@ -2763,7 +2738,7 @@ int thomson_state::to8_kbd_get_key()
 	int control = (m_io_keyboard[7]->read() & 1) ? 0 : 0x100;
 	int shift   = (m_io_keyboard[9]->read() & 1) ? 0 : 0x080;
 	int key = -1, line, bit;
-	UINT8 port;
+	uint8_t port;
 
 	if ( m_io_config->read() & 2 )
 		return -1; /* disabled */
@@ -2997,7 +2972,7 @@ void thomson_state::to8_kbd_reset()
 void thomson_state::to8_kbd_init()
 {
 	m_to8_kbd_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(thomson_state::to8_kbd_timer_cb),this));
-	m_to8_kbd_signal = machine().scheduler().timer_alloc(FUNC_NULL);
+	m_to8_kbd_signal = machine().scheduler().timer_alloc(timer_expired_delegate());
 	save_item(NAME(m_to8_kbd_ack));
 	save_item(NAME(m_to8_kbd_data));
 	save_item(NAME(m_to8_kbd_step));
@@ -3036,7 +3011,7 @@ void thomson_state::to8_update_floppy_bank_postload()
 void thomson_state::to8_update_ram_bank()
 {
 	address_space& space = m_maincpu->space(AS_PROGRAM);
-	UINT8 bank = 0;
+	uint8_t bank = 0;
 
 	if ( m_to8_reg_sys1 & 0x10 )
 	{
@@ -3044,7 +3019,7 @@ void thomson_state::to8_update_ram_bank()
 	}
 	else
 	{
-		UINT8 portb = m_pia_sys->port_b_z_mask();
+		uint8_t portb = m_pia_sys->port_b_z_mask();
 
 		switch ( portb & 0xf8 )
 		{
@@ -3260,9 +3235,9 @@ WRITE8_MEMBER( thomson_state::to8_cartridge_w )
 /* read signal to 0000-0003 generates a bank switch */
 READ8_MEMBER( thomson_state::to8_cartridge_r )
 {
-	UINT8* pos = memregion( "maincpu" )->base() + 0x10000;
-	UINT8 data = pos[offset + (m_thom_cart_bank % m_thom_cart_nb_banks) * 0x4000];
-	if ( !space.debugger_access() )
+	uint8_t* pos = memregion( "maincpu" )->base() + 0x10000;
+	uint8_t data = pos[offset + (m_thom_cart_bank % m_thom_cart_nb_banks) * 0x4000];
+	if ( !machine().side_effect_disabled() )
 	{
 		m_thom_cart_bank = offset & 3;
 		to8_update_cart_bank();
@@ -3277,7 +3252,7 @@ READ8_MEMBER( thomson_state::to8_cartridge_r )
 
 void thomson_state::to8_floppy_init()
 {
-	UINT8* mem = memregion("maincpu")->base();
+	uint8_t* mem = memregion("maincpu")->base();
 	to7_floppy_init( mem + 0x34000 );
 }
 
@@ -3285,7 +3260,7 @@ void thomson_state::to8_floppy_init()
 
 void thomson_state::to8_floppy_reset()
 {
-	UINT8* mem = memregion("maincpu")->base();
+	uint8_t* mem = memregion("maincpu")->base();
 	to7_floppy_reset();
 	if ( THOM_FLOPPY_INT )
 		thmfc_floppy_reset();
@@ -3296,7 +3271,7 @@ void thomson_state::to8_floppy_reset()
 
 READ8_MEMBER( thomson_state::to8_floppy_r )
 {
-	if ( space.debugger_access() )
+	if ( machine().side_effect_disabled() )
 		return 0;
 
 	if ( (m_to8_reg_sys1 & 0x80) && THOM_FLOPPY_EXT )
@@ -3337,7 +3312,7 @@ READ8_MEMBER( thomson_state::to8_gatearray_r )
 	struct thom_vsignal v = thom_get_vsignal();
 	struct thom_vsignal l = thom_get_lightpen_vsignal( TO8_LIGHTPEN_DECAL, m_to7_lightpen_step - 1, 6 );
 	int count, inil, init, lt3;
-	UINT8 res;
+	uint8_t res;
 	count = m_to7_lightpen ? l.count : v.count;
 	inil  = m_to7_lightpen ? l.inil  : v.inil;
 	init  = m_to7_lightpen ? l.init  : v.init;
@@ -3355,7 +3330,7 @@ READ8_MEMBER( thomson_state::to8_gatearray_r )
 	case 1: /* ram register / lightpen register 2 */
 		if ( m_to7_lightpen )
 		{
-			if ( !space.debugger_access() )
+			if ( !machine().side_effect_disabled() )
 			{
 				thom_firq_2( 0 );
 				m_to8_lightpen_intr = 0;
@@ -3440,7 +3415,7 @@ READ8_MEMBER( thomson_state::to8_vreg_r )
 	/* 0xe7dc from external floppy drive aliases the video gate-array */
 	if ( ( offset == 3 ) && ( m_to8_reg_ram & 0x80 ) && ( m_to8_reg_sys1 & 0x80 ) )
 	{
-		if ( space.debugger_access() )
+		if ( machine().side_effect_disabled() )
 			return 0;
 
 		if ( THOM_FLOPPY_EXT )
@@ -3453,8 +3428,8 @@ READ8_MEMBER( thomson_state::to8_vreg_r )
 	{
 	case 0: /* palette data */
 	{
-		UINT8 c =  m_to9_palette_data[ m_to9_palette_idx ];
-		if ( !space.debugger_access() )
+		uint8_t c =  m_to9_palette_data[ m_to9_palette_idx ];
+		if ( !machine().side_effect_disabled() )
 		{
 			m_to9_palette_idx = ( m_to9_palette_idx + 1 ) & 31;
 		}
@@ -3486,7 +3461,7 @@ WRITE8_MEMBER( thomson_state::to8_vreg_w )
 	{
 	case 0: /* palette data */
 	{
-		UINT16 color, idx;
+		uint16_t color, idx;
 		m_to9_palette_data[ m_to9_palette_idx ] = data;
 		idx = m_to9_palette_idx / 2;
 		color = m_to9_palette_data[ 2 * idx + 1 ];
@@ -3587,10 +3562,10 @@ WRITE8_MEMBER( thomson_state::to8_timer_port_out )
 
 
 
-WRITE8_MEMBER( thomson_state::to8_timer_cp2_out )
+WRITE_LINE_MEMBER( thomson_state::to8_timer_cp2_out )
 {
 	/* mute */
-	m_to7_game_mute = data;
+	m_to7_game_mute = state;
 	to7_game_sound_update();
 }
 
@@ -3665,8 +3640,8 @@ MACHINE_RESET_MEMBER( thomson_state, to8 )
 
 MACHINE_START_MEMBER( thomson_state, to8 )
 {
-	UINT8* mem = memregion("maincpu")->base();
-	UINT8* ram = m_ram->pointer();
+	uint8_t* mem = memregion("maincpu")->base();
+	uint8_t* ram = m_ram->pointer();
 
 	LOG (( "to8: machine start called\n" ));
 
@@ -3816,8 +3791,8 @@ MACHINE_RESET_MEMBER( thomson_state, to9p )
 
 MACHINE_START_MEMBER( thomson_state, to9p )
 {
-	UINT8* mem = memregion("maincpu")->base();
-	UINT8* ram = m_ram->pointer();
+	uint8_t* mem = memregion("maincpu")->base();
+	uint8_t* ram = m_ram->pointer();
 
 	LOG (( "to9p: machine start called\n" ));
 
@@ -3882,7 +3857,7 @@ MACHINE_START_MEMBER( thomson_state, to9p )
 
 void thomson_state::mo6_update_ram_bank()
 {
-	UINT8 bank = 0;
+	uint8_t bank = 0;
 
 	if ( m_to8_reg_sys1 & 0x10 )
 	{
@@ -4134,9 +4109,9 @@ WRITE8_MEMBER( thomson_state::mo6_cartridge_w )
 /* read signal generates a bank switch */
 READ8_MEMBER( thomson_state::mo6_cartridge_r )
 {
-	UINT8* pos = memregion( "maincpu" )->base() + 0x10000;
-	UINT8 data = pos[offset + 0xbffc + (m_thom_cart_bank % m_thom_cart_nb_banks) * 0x4000];
-	if ( !space.debugger_access() )
+	uint8_t* pos = memregion( "maincpu" )->base() + 0x10000;
+	uint8_t data = pos[offset + 0xbffc + (m_thom_cart_bank % m_thom_cart_nb_banks) * 0x4000];
+	if ( !machine().side_effect_disabled() )
 	{
 		m_thom_cart_bank = offset & 3;
 		mo6_update_cart_bank();
@@ -4191,14 +4166,14 @@ TIMER_CALLBACK_MEMBER(thomson_state::mo6_game_update_cb)
 	/* unlike the TO8, CB1 & CB2 are not connected to buttons */
 	if ( m_io_config->read() & 1 )
 	{
-		UINT8 mouse = to7_get_mouse_signal();
+		uint8_t mouse = to7_get_mouse_signal();
 		m_pia_game->ca1_w( BIT(mouse, 0) ); /* XA */
 		m_pia_game->ca2_w( BIT(mouse, 1) ); /* YA */
 	}
 	else
 	{
 		/* joystick */
-		UINT8 in = m_io_game_port_buttons->read();
+		uint8_t in = m_io_game_port_buttons->read();
 		m_pia_game->ca1_w( BIT(in, 2) ); /* P1 action B */
 		m_pia_game->ca2_w( BIT(in, 6) ); /* P1 action A */
 	}
@@ -4246,8 +4221,8 @@ READ8_MEMBER( thomson_state::mo6_sys_porta_in )
 READ8_MEMBER( thomson_state::mo6_sys_portb_in )
 {
 	/* keyboard: 9 lines of 8 keys */
-	UINT8 porta = m_pia_sys->a_output();
-	UINT8 portb = m_pia_sys->b_output();
+	uint8_t porta = m_pia_sys->a_output();
+	uint8_t portb = m_pia_sys->b_output();
 	int col = (portb >> 4) & 7;    /* B bits 4-6: kbd column */
 	int lin = (portb >> 1) & 7;    /* B bits 1-3: kbd line */
 
@@ -4273,13 +4248,6 @@ WRITE8_MEMBER( thomson_state::mo6_sys_porta_out )
 
 
 
-WRITE8_MEMBER( thomson_state::mo6_sys_portb_out )
-{
-	m_buzzer->write_unsigned8((data & 1) ? 0x80 : 0); /* bit 0: buzzer */
-}
-
-
-
 WRITE_LINE_MEMBER( thomson_state::mo6_sys_cb2_out )
 {
 	/* SCART pin 8 = slow switch (?) */
@@ -4299,7 +4267,7 @@ READ8_MEMBER( thomson_state::mo6_gatearray_r )
 	struct thom_vsignal v = thom_get_vsignal();
 	struct thom_vsignal l = thom_get_lightpen_vsignal( MO6_LIGHTPEN_DECAL, m_to7_lightpen_step - 1, 6 );
 	int count, inil, init, lt3;
-	UINT8 res;
+	uint8_t res;
 	count = m_to7_lightpen ? l.count : v.count;
 	inil  = m_to7_lightpen ? l.inil  : v.inil;
 	init  = m_to7_lightpen ? l.init  : v.init;
@@ -4317,7 +4285,7 @@ READ8_MEMBER( thomson_state::mo6_gatearray_r )
 	case 1: /* ram register / lightpen register 2 */
 		if ( m_to7_lightpen )
 		{
-			if ( !space.debugger_access() )
+			if ( !machine().side_effect_disabled() )
 			{
 				thom_firq_2( 0 );
 				m_to8_lightpen_intr = 0;
@@ -4399,7 +4367,7 @@ READ8_MEMBER( thomson_state::mo6_vreg_r )
 	/* 0xa7dc from external floppy drive aliases the video gate-array */
 	if ( ( offset == 3 ) && ( m_to8_reg_ram & 0x80 ) )
 		{
-		if ( !space.debugger_access() )
+		if ( !machine().side_effect_disabled() )
 			return to7_floppy_r( space, 0xc );
 		}
 
@@ -4509,8 +4477,8 @@ MACHINE_RESET_MEMBER( thomson_state, mo6 )
 
 MACHINE_START_MEMBER( thomson_state, mo6 )
 {
-	UINT8* mem = memregion("maincpu")->base();
-	UINT8* ram = m_ram->pointer();
+	uint8_t* mem = memregion("maincpu")->base();
+	uint8_t* ram = m_ram->pointer();
 
 	LOG (( "mo6: machine start called\n" ));
 
@@ -4580,7 +4548,7 @@ MACHINE_START_MEMBER( thomson_state, mo6 )
 
 READ8_MEMBER( thomson_state::mo5nr_net_r )
 {
-	if ( space.debugger_access() )
+	if ( machine().side_effect_disabled() )
 		return 0;
 
 	if ( to7_controller_type )
@@ -4612,7 +4580,7 @@ WRITE8_MEMBER( thomson_state::mo5nr_net_w )
 
 READ8_MEMBER( thomson_state::mo5nr_prn_r )
 {
-	UINT8 result = 0;
+	uint8_t result = 0;
 
 	result |= m_centronics_busy << 7;
 
@@ -4635,7 +4603,7 @@ WRITE8_MEMBER( thomson_state::mo5nr_prn_w )
 READ8_MEMBER( thomson_state::mo5nr_sys_portb_in )
 {
 	/* keyboard: only 8 lines of 8 keys (MO6 has 9 lines) */
-	UINT8 portb = m_pia_sys->b_output();
+	uint8_t portb = m_pia_sys->b_output();
 	int col = (portb >> 4) & 7;    /* B bits 4-6: kbd column */
 	int lin = (portb >> 1) & 7;    /* B bits 1-3: kbd line */
 
@@ -4733,8 +4701,8 @@ MACHINE_RESET_MEMBER( thomson_state, mo5nr )
 
 MACHINE_START_MEMBER( thomson_state, mo5nr )
 {
-	UINT8* mem = memregion("maincpu")->base();
-	UINT8* ram = m_ram->pointer();
+	uint8_t* mem = memregion("maincpu")->base();
+	uint8_t* ram = m_ram->pointer();
 
 	LOG (( "mo5nr: machine start called\n" ));
 

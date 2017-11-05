@@ -5,42 +5,39 @@
  *
  */
 
-#include <cstdio>
-
 #include "pconfig.h"
 #include "palloc.h"
+#include "pfmtlog.h"
 
-PLIB_NAMESPACE_START()
+#include <algorithm>
+
+namespace plib {
 
 //============================================================
-//  Exceptions
+//  Memory pool
 //============================================================
 
-pexception::pexception(const pstring &text)
-{
-	m_text = text;
-	fprintf(stderr, "%s\n", m_text.cstr());
-}
-
-pmempool::pmempool(int min_alloc, int min_align)
+mempool::mempool(size_t min_alloc, size_t min_align)
 : m_min_alloc(min_alloc), m_min_align(min_align)
 {
 }
-pmempool::~pmempool()
+mempool::~mempool()
 {
 	for (auto & b : m_blocks)
 	{
 		if (b.m_num_alloc != 0)
-			fprintf(stderr, "Found block with dangling allocations\n");
-		delete b.data;
+		{
+			fprintf(stderr, "Found block with %d dangling allocations\n", static_cast<int>(b.m_num_alloc));
+		}
+		::operator delete(b.data);
 	}
 	m_blocks.clear();
 }
 
-int pmempool::new_block()
+size_t mempool::new_block()
 {
 	block b;
-	b.data = new char[m_min_alloc];
+	b.data = static_cast<char *>(::operator new(m_min_alloc));
 	b.cur_ptr = b.data;
 	b.m_free = m_min_alloc;
 	b.m_num_alloc = 0;
@@ -48,51 +45,61 @@ int pmempool::new_block()
 	return m_blocks.size() - 1;
 }
 
-
-void *pmempool::alloc(size_t size)
+size_t mempool::mininfosize()
 {
-	size_t rs = (size + sizeof(info) + m_min_align - 1) & ~(m_min_align - 1);
-	for (int bn=0; bn < m_blocks.size(); bn++)
+	size_t sinfo = sizeof(mempool::info);
+#ifdef __APPLE__
+	size_t ma = 16;
+#else
+	size_t ma = 8;
+#endif
+	return ((std::max(m_min_align, sinfo) + ma - 1) / ma) * ma;
+}
+
+void *mempool::alloc(size_t size)
+{
+	size_t rs = (size + mininfosize() + m_min_align - 1) & ~(m_min_align - 1);
+	for (size_t bn=0; bn < m_blocks.size(); bn++)
 	{
 		auto &b = m_blocks[bn];
 		if (b.m_free > rs)
 		{
 			b.m_free -= rs;
 			b.m_num_alloc++;
-			info *i = (info *) b.cur_ptr;
+			auto i = reinterpret_cast<info *>(b.cur_ptr);
 			i->m_block = bn;
-			void *ret = (void *) (b.cur_ptr + sizeof(info));
+			auto ret = reinterpret_cast<void *>(b.cur_ptr + mininfosize());
 			b.cur_ptr += rs;
 			return ret;
 		}
 	}
 	{
-		int bn = new_block();
+		size_t bn = new_block();
 		auto &b = m_blocks[bn];
 		b.m_num_alloc = 1;
 		b.m_free = m_min_alloc - rs;
-		info *i = (info *) b.cur_ptr;
+		auto i = reinterpret_cast<info *>(b.cur_ptr);
 		i->m_block = bn;
-		void *ret = (void *) (b.cur_ptr + sizeof(info));
+		auto ret = reinterpret_cast<void *>(b.cur_ptr + mininfosize());
 		b.cur_ptr += rs;
 		return ret;
 	}
 }
 
-void pmempool::free(void *ptr)
+void mempool::free(void *ptr)
 {
-	char *p = (char *) ptr;
+	auto p = reinterpret_cast<char *>(ptr);
 
-	info *i = (info *) (p - sizeof(info));
+	auto i = reinterpret_cast<info *>(p - mininfosize());
 	block *b = &m_blocks[i->m_block];
 	if (b->m_num_alloc == 0)
 		fprintf(stderr, "Argh .. double free\n");
 	else
 	{
-		b->m_free = m_min_alloc;
-		b->cur_ptr = b->data;
+		//b->m_free = m_min_alloc;
+		//b->cur_ptr = b->data;
 	}
 	b->m_num_alloc--;
 }
 
-PLIB_NAMESPACE_END()
+}

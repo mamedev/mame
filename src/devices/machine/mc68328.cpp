@@ -9,9 +9,328 @@
 **********************************************************************/
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
 #include "machine/mc68328.h"
+#include "cpu/m68000/m68000.h"
 #include "machine/ram.h"
+
+
+#define SCR_BETO                0x80
+#define SCR_WPV                 0x40
+#define SCR_PRV                 0x20
+#define SCR_BETEN               0x10
+#define SCR_SO                  0x08
+#define SCR_DMAP                0x04
+#define SCR_WDTH8               0x01
+
+#define ICR_POL6                0x0100
+#define ICR_POL3                0x0200
+#define ICR_POL2                0x0400
+#define ICR_POL1                0x0800
+#define ICR_ET6                 0x1000
+#define ICR_ET3                 0x2000
+#define ICR_ET2                 0x4000
+#define ICR_ET1                 0x8000
+
+#define INT_SPIM                0x000001
+#define INT_TIMER2              0x000002
+#define INT_UART                0x000004
+#define INT_WDT                 0x000008
+#define INT_RTC                 0x000010
+#define INT_RESERVED            0x000020
+#define INT_KB                  0x000040
+#define INT_PWM                 0x000080
+#define INT_INT0                0x000100
+#define INT_INT1                0x000200
+#define INT_INT2                0x000400
+#define INT_INT3                0x000800
+#define INT_INT4                0x001000
+#define INT_INT5                0x002000
+#define INT_INT6                0x004000
+#define INT_INT7                0x008000
+#define INT_KBDINTS             0x00ff00
+#define INT_IRQ1                0x010000
+#define INT_IRQ2                0x020000
+#define INT_IRQ3                0x040000
+#define INT_IRQ6                0x080000
+#define INT_PEN                 0x100000
+#define INT_SPIS                0x200000
+#define INT_TIMER1              0x400000
+#define INT_IRQ7                0x800000
+
+#define INT_M68K_LINE1          (INT_IRQ1)
+#define INT_M68K_LINE2          (INT_IRQ2)
+#define INT_M68K_LINE3          (INT_IRQ3)
+#define INT_M68K_LINE4          (INT_INT0 | INT_INT1 | INT_INT2 | INT_INT3 | INT_INT4 | INT_INT5 | INT_INT6 | INT_INT7 | \
+									INT_PWM | INT_KB | INT_RTC | INT_WDT | INT_UART | INT_TIMER2 | INT_SPIM)
+#define INT_M68K_LINE5          (INT_PEN)
+#define INT_M68K_LINE6          (INT_IRQ6 | INT_TIMER1 | INT_SPIS)
+#define INT_M68K_LINE7          (INT_IRQ7)
+#define INT_M68K_LINE67         (INT_M68K_LINE6 | INT_M68K_LINE7)
+#define INT_M68K_LINE567        (INT_M68K_LINE5 | INT_M68K_LINE6 | INT_M68K_LINE7)
+#define INT_M68K_LINE4567       (INT_M68K_LINE4 | INT_M68K_LINE5 | INT_M68K_LINE6 | INT_M68K_LINE7)
+#define INT_M68K_LINE34567      (INT_M68K_LINE3 | INT_M68K_LINE4 | INT_M68K_LINE5 | INT_M68K_LINE6 | INT_M68K_LINE7)
+#define INT_M68K_LINE234567     (INT_M68K_LINE2 | INT_M68K_LINE3 | INT_M68K_LINE4 | INT_M68K_LINE5 | INT_M68K_LINE6 | INT_M68K_LINE7)
+
+#define INT_IRQ1_SHIFT          0x000001
+#define INT_IRQ2_SHIFT          0x000002
+#define INT_IRQ3_SHIFT          0x000004
+#define INT_IRQ6_SHIFT          0x000008
+#define INT_PEN_SHIFT           0x000010
+#define INT_SPIS_SHIFT          0x000020
+#define INT_TIMER1_SHIFT        0x000040
+#define INT_IRQ7_SHIFT          0x000080
+
+#define INT_ACTIVE              1
+#define INT_INACTIVE            0
+
+#define GRPBASE_BASE_ADDR       0xfff0
+#define GRPBASE_VALID           0x0001
+
+#define GRPMASK_BASE_MASK       0xfff0
+
+#define CSAB_COMPARE            0xff000000
+#define CSAB_BSW                0x00010000
+#define CSAB_MASK               0x0000ff00
+#define CSAB_RO                 0x00000008
+#define CSAB_WAIT               0x00000007
+
+#define CSCD_COMPARE            0xfff00000
+#define CSCD_BSW                0x00010000
+#define CSCD_MASK               0x0000fff0
+#define CSCD_RO                 0x00000008
+#define CSCD_WAIT               0x00000007
+
+#define PLLCR_PIXCLK_SEL        0x3800
+#define PLLCR_PIXCLK_SEL_DIV2       0x0000
+#define PLLCR_PIXCLK_SEL_DIV4       0x0800
+#define PLLCR_PIXCLK_SEL_DIV8       0x1000
+#define PLLCR_PIXCLK_SEL_DIV16      0x1800
+#define PLLCR_PIXCLK_SEL_DIV1_0     0x2000
+#define PLLCR_PIXCLK_SEL_DIV1_1     0x2800
+#define PLLCR_PIXCLK_SEL_DIV1_2     0x3000
+#define PLLCR_PIXCLK_SEL_DIV1_3     0x3800
+#define PLLCR_SYSCLK_SEL        0x0700
+#define PLLCR_SYSCLK_SEL_DIV2       0x0000
+#define PLLCR_SYSCLK_SEL_DIV4       0x0100
+#define PLLCR_SYSCLK_SEL_DIV8       0x0200
+#define PLLCR_SYSCLK_SEL_DIV16      0x0300
+#define PLLCR_SYSCLK_SEL_DIV1_0     0x0400
+#define PLLCR_SYSCLK_SEL_DIV1_1     0x0500
+#define PLLCR_SYSCLK_SEL_DIV1_2     0x0600
+#define PLLCR_SYSCLK_SEL_DIV1_3     0x0700
+#define PLLCR_CLKEN             0x0010
+#define PLLCR_DISPLL            0x0008
+
+#define PLLFSR_CLK32            0x8000
+#define PLLFSR_PROT             0x4000
+#define PLLFSR_QCNT             0x0f00
+#define PLLFSR_PCNT             0x00ff
+
+#define PCTLR_PC_EN             0x80
+#define PCTLR_STOP              0x40
+#define PCTLR_WIDTH             0x1f
+
+#define CXP_CC                  0xc000
+#define CXP_CC_XLU                  0x0000
+#define CXP_CC_BLACK                0x4000
+#define CXP_CC_INVERSE              0x8000
+#define CXP_CC_INVALID              0xc000
+#define CXP_MASK                0x03ff
+
+#define CYP_MASK                0x01ff
+
+#define CWCH_CW                 0x1f00
+#define CWCH_CH                 0x001f
+
+#define BLKC_BKEN               0x80
+#define BLKC_BD                 0x7f
+
+#define LPICF_PBSIZ             0x06
+#define LPICF_PBSIZ_1               0x00
+#define LPICF_PBSIZ_2               0x02
+#define LPICF_PBSIZ_4               0x04
+#define LPICF_PBSIZ_INVALID         0x06
+
+#define LPOLCF_LCKPOL           0x08
+#define LPOLCF_FLMPOL           0x04
+#define LPOLCF_LPPOL            0x02
+#define LPOLCF_PIXPOL           0x01
+
+#define LACDRC_MASK             0x0f
+
+#define LPXCD_MASK              0x3f
+
+#define LCKCON_LCDC_EN          0x80
+#define LCKCON_LCDON            0x80
+#define LCKCON_DMA16            0x40
+#define LCKCON_WS               0x30
+#define LCKCON_WS_1                 0x00
+#define LCKCON_WS_2                 0x10
+#define LCKCON_WS_3                 0x20
+#define LCKCON_WS_4                 0x30
+#define LCKCON_DWIDTH           0x02
+#define LCKCON_PCDS             0x01
+
+#define LBAR_MASK               0x7f
+
+#define LPOSR_BOS               0x08
+#define LPOSR_POS               0x07
+
+#define LFRCM_XMOD              0xf0
+#define LFRCM_YMOD              0x0f
+
+#define LGPMR_PAL1              0x7000
+#define LGPMR_PAL0              0x0700
+#define LGPMR_PAL3              0x0070
+#define LGPMR_PAL2              0x0007
+
+#define RTCHMSR_HOURS           0x1f000000
+#define RTCHMSR_MINUTES         0x003f0000
+#define RTCHMSR_SECONDS         0x0000003f
+
+#define RTCCTL_38_4             0x0020
+#define RTCCTL_ENABLE           0x0080
+
+#define RTCINT_STOPWATCH        0x0001
+#define RTCINT_MINUTE           0x0002
+#define RTCINT_ALARM            0x0004
+#define RTCINT_DAY              0x0008
+#define RTCINT_SECOND           0x0010
+
+#define RTCSTPWTCH_MASK         0x003f
+
+#define TCTL_TEN                0x0001
+#define TCTL_TEN_ENABLE             0x0001
+#define TCTL_CLKSOURCE          0x000e
+#define TCTL_CLKSOURCE_STOP         0x0000
+#define TCTL_CLKSOURCE_SYSCLK       0x0002
+#define TCTL_CLKSOURCE_SYSCLK16     0x0004
+#define TCTL_CLKSOURCE_TIN          0x0006
+#define TCTL_CLKSOURCE_32KHZ4       0x0008
+#define TCTL_CLKSOURCE_32KHZ5       0x000a
+#define TCTL_CLKSOURCE_32KHZ6       0x000c
+#define TCTL_CLKSOURCE_32KHZ7       0x000e
+#define TCTL_IRQEN              0x0010
+#define TCTL_IRQEN_ENABLE           0x0010
+#define TCTL_OM                 0x0020
+#define TCTL_OM_ACTIVELOW           0x0000
+#define TCTL_OM_TOGGLE              0x0020
+#define TCTL_CAPTURE            0x00c0
+#define TCTL_CAPTURE_NOINT          0x0000
+#define TCTL_CAPTURE_RISING         0x0040
+#define TCTL_CAPTURE_FALLING        0x0080
+#define TCTL_CAPTURE_BOTH           0x00c0
+#define TCTL_FRR                0x0100
+#define TCTL_FRR_RESTART            0x0000
+#define TCTL_FRR_FREERUN            0x0100
+
+#define TSTAT_COMP              0x0001
+#define TSTAT_CAPT              0x0002
+
+#define WCTLR_WDRST             0x0008
+#define WCTLR_LOCK              0x0004
+#define WCTLR_FI                0x0002
+#define WCTLR_WDEN              0x0001
+
+#define USTCNT_UART_EN          0x8000
+#define USTCNT_RX_EN            0x4000
+#define USTCNT_TX_EN            0x2000
+#define USTCNT_RX_CLK_CONT      0x1000
+#define USTCNT_PARITY_EN        0x0800
+#define USTCNT_ODD_EVEN         0x0400
+#define USTCNT_STOP_BITS        0x0200
+#define USTCNT_8_7              0x0100
+#define USTCNT_GPIO_DELTA_EN    0x0080
+#define USTCNT_CTS_DELTA_EN     0x0040
+#define USTCNT_RX_FULL_EN       0x0020
+#define USTCNT_RX_HALF_EN       0x0010
+#define USTCNT_RX_RDY_EN        0x0008
+#define USTCNT_TX_EMPTY_EN      0x0004
+#define USTCNT_TX_HALF_EN       0x0002
+#define USTCNT_TX_AVAIL_EN      0x0001
+
+#define UBAUD_GPIO_DELTA        0x8000
+#define UBAUD_GPIO              0x4000
+#define UBAUD_GPIO_DIR          0x2000
+#define UBAUD_GPIO_SRC          0x1000
+#define UBAUD_BAUD_SRC          0x0800
+#define UBAUD_DIVIDE            0x0700
+#define UBAUD_DIVIDE_1              0x0000
+#define UBAUD_DIVIDE_2              0x0100
+#define UBAUD_DIVIDE_4              0x0200
+#define UBAUD_DIVIDE_8              0x0300
+#define UBAUD_DIVIDE_16             0x0400
+#define UBAUD_DIVIDE_32             0x0500
+#define UBAUD_DIVIDE_64             0x0600
+#define UBAUD_DIVIDE_128            0x0700
+#define UBAUD_PRESCALER         0x00ff
+
+#define URX_FIFO_FULL           0x8000
+#define URX_FIFO_HALF           0x4000
+#define URX_DATA_READY          0x2000
+#define URX_OVRUN               0x0800
+#define URX_FRAME_ERROR         0x0400
+#define URX_BREAK               0x0200
+#define URX_PARITY_ERROR        0x0100
+
+#define UTX_FIFO_EMPTY          0x8000
+#define UTX_FIFO_HALF           0x4000
+#define UTX_TX_AVAIL            0x2000
+#define UTX_SEND_BREAK          0x1000
+#define UTX_IGNORE_CTS          0x0800
+#define UTX_CTS_STATUS          0x0200
+#define UTX_CTS_DELTA           0x0100
+
+#define UMISC_CLK_SRC           0x4000
+#define UMISC_FORCE_PERR        0x2000
+#define UMISC_LOOP              0x1000
+#define UMISC_RTS_CONT          0x0080
+#define UMISC_RTS               0x0040
+#define UMISC_IRDA_ENABLE       0x0020
+#define UMISC_IRDA_LOOP         0x0010
+
+#define SPIS_SPIS_IRQ           0x8000
+#define SPIS_IRQEN              0x4000
+#define SPIS_ENPOL              0x2000
+#define SPIS_DATA_RDY           0x1000
+#define SPIS_OVRWR              0x0800
+#define SPIS_PHA                0x0400
+#define SPIS_POL                0x0200
+#define SPIS_SPISEN             0x0100
+
+#define SPIM_CLOCK_COUNT        0x000f
+#define SPIM_POL                0x0010
+#define SPIM_POL_HIGH               0x0000
+#define SPIM_POL_LOW                0x0010
+#define SPIM_PHA                0x0020
+#define SPIM_PHA_NORMAL             0x0000
+#define SPIM_PHA_OPPOSITE           0x0020
+#define SPIM_IRQEN              0x0040
+#define SPIM_SPIMIRQ            0x0080
+#define SPIM_XCH                0x0100
+#define SPIM_XCH_IDLE               0x0000
+#define SPIM_XCH_INIT               0x0100
+#define SPIM_SPMEN              0x0200
+#define SPIM_SPMEN_DISABLE          0x0000
+#define SPIM_SPMEN_ENABLE           0x0200
+#define SPIM_RATE               0xe000
+#define SPIM_RATE_4                 0x0000
+#define SPIM_RATE_8                 0x2000
+#define SPIM_RATE_16                0x4000
+#define SPIM_RATE_32                0x6000
+#define SPIM_RATE_64                0x8000
+#define SPIM_RATE_128               0xa000
+#define SPIM_RATE_256               0xc000
+#define SPIM_RATE_512               0xe000
+
+#define PWMC_PWMIRQ             0x8000
+#define PWMC_IRQEN              0x4000
+#define PWMC_LOAD               0x0100
+#define PWMC_PIN                0x0080
+#define PWMC_POL                0x0040
+#define PWMC_PWMEN              0x0010
+#define PWMC_CLKSEL             0x0007
+
 
 #define VERBOSE_LEVEL   (0)
 
@@ -28,36 +347,37 @@ static inline void ATTR_PRINTF(3,4) verboselog(device_t &device, int n_level, co
 	}
 }
 
-const device_type MC68328 = &device_creator<mc68328_device>;
+DEFINE_DEVICE_TYPE(MC68328, mc68328_device, "mc68328", "MC68328 DragonBall Integrated Processor")
 
 
-mc68328_device::mc68328_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-				: device_t(mconfig, MC68328, "MC68328 (DragonBall) Integrated Processor", tag, owner, clock, "mc68328", __FILE__), m_rtc(nullptr), m_pwm(nullptr),
-				m_out_port_a_cb(*this),
-				m_out_port_b_cb(*this),
-				m_out_port_c_cb(*this),
-				m_out_port_d_cb(*this),
-				m_out_port_e_cb(*this),
-				m_out_port_f_cb(*this),
-				m_out_port_g_cb(*this),
-				m_out_port_j_cb(*this),
-				m_out_port_k_cb(*this),
-				m_out_port_m_cb(*this),
-				m_in_port_a_cb(*this),
-				m_in_port_b_cb(*this),
-				m_in_port_c_cb(*this),
-				m_in_port_d_cb(*this),
-				m_in_port_e_cb(*this),
-				m_in_port_f_cb(*this),
-				m_in_port_g_cb(*this),
-				m_in_port_j_cb(*this),
-				m_in_port_k_cb(*this),
-				m_in_port_m_cb(*this),
-				m_out_pwm_cb(*this),
-				m_out_spim_cb(*this),
-				m_in_spim_cb(*this),
-				m_spim_xch_trigger_cb(*this),
-				m_cpu(*this)
+mc68328_device::mc68328_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, MC68328, tag, owner, clock)
+	, m_rtc(nullptr), m_pwm(nullptr)
+	, m_out_port_a_cb(*this)
+	, m_out_port_b_cb(*this)
+	, m_out_port_c_cb(*this)
+	, m_out_port_d_cb(*this)
+	, m_out_port_e_cb(*this)
+	, m_out_port_f_cb(*this)
+	, m_out_port_g_cb(*this)
+	, m_out_port_j_cb(*this)
+	, m_out_port_k_cb(*this)
+	, m_out_port_m_cb(*this)
+	, m_in_port_a_cb(*this)
+	, m_in_port_b_cb(*this)
+	, m_in_port_c_cb(*this)
+	, m_in_port_d_cb(*this)
+	, m_in_port_e_cb(*this)
+	, m_in_port_f_cb(*this)
+	, m_in_port_g_cb(*this)
+	, m_in_port_j_cb(*this)
+	, m_in_port_k_cb(*this)
+	, m_in_port_m_cb(*this)
+	, m_out_pwm_cb(*this)
+	, m_out_spim_cb(*this)
+	, m_in_spim_cb(*this)
+	, m_spim_xch_trigger_cb(*this)
+	, m_cpu(*this, finder_base::DUMMY_TAG)
 {
 }
 
@@ -243,7 +563,7 @@ void mc68328_device::device_reset()
 }
 
 
-void mc68328_device::set_interrupt_line(UINT32 line, UINT32 active)
+void mc68328_device::set_interrupt_line(uint32_t line, uint32_t active)
 {
 	if (active)
 	{
@@ -320,9 +640,9 @@ void mc68328_device::set_interrupt_line(UINT32 line, UINT32 active)
 
 void mc68328_device::poll_port_d_interrupts()
 {
-	UINT8 line_transitions = m_regs.pddataedge & m_regs.pdirqedge;
-	UINT8 line_holds = m_regs.pddata &~ m_regs.pdirqedge;
-	UINT8 line_interrupts = (line_transitions | line_holds) & m_regs.pdirqen;
+	uint8_t line_transitions = m_regs.pddataedge & m_regs.pdirqedge;
+	uint8_t line_holds = m_regs.pddata &~ m_regs.pdirqedge;
+	uint8_t line_interrupts = (line_transitions | line_holds) & m_regs.pdirqen;
 
 	if (line_interrupts)
 	{
@@ -347,9 +667,9 @@ WRITE_LINE_MEMBER( mc68328_device::set_penirq_line )
 	}
 }
 
-void mc68328_device::set_port_d_lines(UINT8 state, int bit)
+void mc68328_device::set_port_d_lines(uint8_t state, int bit)
 {
-	UINT8 old_button_state = m_regs.pddata;
+	uint8_t old_button_state = m_regs.pddata;
 
 	if (state & (1 << bit))
 	{
@@ -365,9 +685,9 @@ void mc68328_device::set_port_d_lines(UINT8 state, int bit)
 	poll_port_d_interrupts();
 }
 
-UINT32 mc68328_device::get_timer_frequency(UINT32 index)
+uint32_t mc68328_device::get_timer_frequency(uint32_t index)
 {
-	UINT32 frequency = 0;
+	uint32_t frequency = 0;
 
 	switch (m_regs.tctl[index] & TCTL_CLKSOURCE)
 	{
@@ -391,7 +711,7 @@ UINT32 mc68328_device::get_timer_frequency(UINT32 index)
 	return frequency;
 }
 
-void mc68328_device::maybe_start_timer(UINT32 index, UINT32 new_enable)
+void mc68328_device::maybe_start_timer(uint32_t index, uint32_t new_enable)
 {
 	if ((m_regs.tctl[index] & TCTL_TEN) == TCTL_TEN_ENABLE && (m_regs.tctl[index] & TCTL_CLKSOURCE) > TCTL_CLKSOURCE_STOP)
 	{
@@ -405,7 +725,7 @@ void mc68328_device::maybe_start_timer(UINT32 index, UINT32 new_enable)
 		}
 		else
 		{
-			UINT32 frequency = get_timer_frequency(index);
+			uint32_t frequency = get_timer_frequency(index);
 			attotime period = (attotime::from_hz(frequency) *  m_regs.tcmp[index]);
 
 			if (new_enable)
@@ -422,14 +742,14 @@ void mc68328_device::maybe_start_timer(UINT32 index, UINT32 new_enable)
 	}
 }
 
-void mc68328_device::timer_compare_event(UINT32 index)
+void mc68328_device::timer_compare_event(uint32_t index)
 {
 	m_regs.tcn[index] = m_regs.tcmp[index];
 	m_regs.tstat[index] |= TSTAT_COMP;
 
 	if ((m_regs.tctl[index] & TCTL_FRR) == TCTL_FRR_RESTART)
 	{
-		UINT32 frequency = get_timer_frequency(index);
+		uint32_t frequency = get_timer_frequency(index);
 
 		if (frequency > 0)
 		{
@@ -446,7 +766,7 @@ void mc68328_device::timer_compare_event(UINT32 index)
 	}
 	else
 	{
-		UINT32 frequency = get_timer_frequency(index);
+		uint32_t frequency = get_timer_frequency(index);
 
 		if (frequency > 0)
 		{
@@ -486,8 +806,8 @@ TIMER_CALLBACK_MEMBER( mc68328_device::pwm_transition )
 	if (((m_regs.pwmc & PWMC_POL) == 0 && (m_regs.pwmc & PWMC_PIN) != 0) ||
 		((m_regs.pwmc & PWMC_POL) != 0 && (m_regs.pwmc & PWMC_PIN) == 0))
 	{
-		UINT32 frequency = 32768 * 506;
-		UINT32 divisor = 4 << (m_regs.pwmc & PWMC_CLKSEL); // ?? Datasheet says 2 <<, but then we're an octave higher than CoPilot.
+		uint32_t frequency = 32768 * 506;
+		uint32_t divisor = 4 << (m_regs.pwmc & PWMC_CLKSEL); // ?? Datasheet says 2 <<, but then we're an octave higher than CoPilot.
 		attotime period;
 
 		frequency /= divisor;
@@ -502,8 +822,8 @@ TIMER_CALLBACK_MEMBER( mc68328_device::pwm_transition )
 	}
 	else
 	{
-		UINT32 frequency = 32768 * 506;
-		UINT32 divisor = 4 << (m_regs.pwmc & PWMC_CLKSEL); // ?? Datasheet says 2 <<, but then we're an octave higher than CoPilot.
+		uint32_t frequency = 32768 * 506;
+		uint32_t divisor = 4 << (m_regs.pwmc & PWMC_CLKSEL); // ?? Datasheet says 2 <<, but then we're an octave higher than CoPilot.
 		attotime period;
 
 		frequency /= divisor;
@@ -524,7 +844,7 @@ TIMER_CALLBACK_MEMBER( mc68328_device::rtc_tick )
 {
 	if (m_regs.rtcctl & RTCCTL_ENABLE)
 	{
-		UINT32 set_int = 0;
+		uint32_t set_int = 0;
 
 		m_regs.hmsr++;
 
@@ -600,9 +920,9 @@ TIMER_CALLBACK_MEMBER( mc68328_device::rtc_tick )
 
 WRITE16_MEMBER( mc68328_device::write )
 {
-	UINT32 address = offset << 1;
-	UINT16 temp16[4] = { 0 };
-	UINT32 imr_old = m_regs.imr, imr_diff;
+	uint32_t address = offset << 1;
+	uint16_t temp16[4] = { 0 };
+	uint32_t imr_old = m_regs.imr, imr_diff;
 
 	switch (address)
 	{
@@ -1300,8 +1620,8 @@ WRITE16_MEMBER( mc68328_device::write )
 
 			if ((m_regs.pwmc & PWMC_PWMEN) != 0 && m_regs.pwmw != 0 && m_regs.pwmp != 0)
 			{
-				UINT32 frequency = 32768 * 506;
-				UINT32 divisor = 4 << (m_regs.pwmc & PWMC_CLKSEL); // ?? Datasheet says 2 <<, but then we're an octave higher than CoPilot.
+				uint32_t frequency = 32768 * 506;
+				uint32_t divisor = 4 << (m_regs.pwmc & PWMC_CLKSEL); // ?? Datasheet says 2 <<, but then we're an octave higher than CoPilot.
 				attotime period;
 				frequency /= divisor;
 				period = attotime::from_hz(frequency) * m_regs.pwmw;
@@ -1794,8 +2114,8 @@ WRITE16_MEMBER( mc68328_device::write )
 
 READ16_MEMBER( mc68328_device::read )
 {
-	UINT16 temp16;
-	UINT32 address = offset << 1;
+	uint16_t temp16;
+	uint32_t address = offset << 1;
 
 	switch (address)
 	{
@@ -2692,11 +3012,11 @@ READ16_MEMBER( mc68328_device::read )
 }
 
 /* THIS IS PRETTY MUCH TOTALLY WRONG AND DOESN'T REFLECT THE MC68328'S INTERNAL FUNCTIONALITY AT ALL! */
-UINT32 mc68328_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t mc68328_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT16 *video_ram = (UINT16 *)(machine().device<ram_device>(RAM_TAG)->pointer() + (m_regs.lssa & 0x00ffffff));
-	UINT16 word;
-	UINT16 *line;
+	uint16_t *video_ram = (uint16_t *)(machine().device<ram_device>(RAM_TAG)->pointer() + (m_regs.lssa & 0x00ffffff));
+	uint16_t word;
+	uint16_t *line;
 	int y, x, b;
 
 	if (m_regs.lckcon & LCKCON_LCDC_EN)

@@ -10,7 +10,7 @@
   203d: 0 BUSY, 1 PRINT, 3 JAPAN, 4 SMALL, 5 SHIFT, 6 DEF
   207c: 1 DEF 1 RAD 2 GRAD 5 ERROR 6 FLAG */
 
-static const UINT8 pocketc_palette[] =
+static const uint8_t pocketc_palette[] =
 {
 	99,107,99,
 	94,111,103,
@@ -33,7 +33,7 @@ const unsigned short pocketc_state::pocketc_colortable[8][2] = {
 
 PALETTE_INIT_MEMBER(pocketc_state, pocketc)
 {
-	UINT8 i=0, r, b, g, color_count = 6;
+	uint8_t i=0, r, b, g, color_count = 6;
 
 	while (color_count--)
 	{

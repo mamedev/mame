@@ -15,6 +15,7 @@
 
 #include "osdcore.h"
 
+#include <chrono>
 #include <cstdint>
 #include <memory>
 #include <string>
@@ -77,6 +78,7 @@ public:
 	virtual bool current_is_directory() const = 0;
 	virtual const std::string &current_name() const = 0;
 	virtual std::uint64_t current_uncompressed_length() const = 0;
+	virtual std::chrono::system_clock::time_point current_last_modified() const = 0;
 	virtual std::uint32_t current_crc() const = 0;
 
 	// decompress the most recently found file in the ZIP

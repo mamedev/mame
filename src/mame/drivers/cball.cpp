@@ -8,6 +8,7 @@
 
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
+#include "screen.h"
 
 
 class cball_state : public driver_device
@@ -33,7 +34,7 @@ public:
 	required_device<palette_device> m_palette;
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_video_ram;
+	required_shared_ptr<uint8_t> m_video_ram;
 
 	/* video-related */
 	tilemap_t* m_bg_tilemap;
@@ -52,7 +53,7 @@ public:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(cball);
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -61,7 +62,7 @@ protected:
 
 TILE_GET_INFO_MEMBER(cball_state::get_tile_info)
 {
-	UINT8 code = m_video_ram[tile_index];
+	uint8_t code = m_video_ram[tile_index];
 
 	SET_TILE_INFO_MEMBER(0, code, code >> 7, 0);
 }
@@ -76,11 +77,11 @@ WRITE8_MEMBER(cball_state::vram_w)
 
 void cball_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(cball_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cball_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 
-UINT32 cball_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t cball_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* draw playfield */
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
@@ -104,7 +105,7 @@ void cball_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 		interrupt_callback(ptr, param);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in cball_state::device_timer");
+		assert_always(false, "Unknown id in cball_state::device_timer");
 	}
 }
 
@@ -258,7 +259,7 @@ static GFXDECODE_START( cball )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( cball, cball_state )
+static MACHINE_CONFIG_START( cball )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, XTAL_12_096MHz / 16) /* ? */
@@ -303,4 +304,4 @@ ROM_START( cball )
 ROM_END
 
 
-GAME( 1976, cball, 0, cball, cball, driver_device, 0, ROT0, "Atari", "Cannonball (Atari, prototype)", MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1976, cball, 0, cball, cball, cball_state, 0, ROT0, "Atari", "Cannonball (Atari, prototype)", MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

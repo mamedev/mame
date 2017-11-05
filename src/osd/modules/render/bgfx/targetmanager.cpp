@@ -102,10 +102,10 @@ bool target_manager::update_target_sizes(uint32_t screen, uint16_t width, uint16
 	{
 		sizes[screen] = osd_dim(width, height);
 		rebuild_targets(screen, style);
-        return true;
+		return true;
 	}
 
-    return false;
+	return false;
 }
 
 void target_manager::rebuild_targets(uint32_t screen, uint32_t style)

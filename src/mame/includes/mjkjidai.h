@@ -15,7 +15,7 @@ public:
 		m_palette(*this, "palette"),
 		m_adpcmrom(*this, "adpcm"),
 		m_videoram(*this, "videoram"),
-		m_row(*this, "ROW") { }
+		m_row(*this, "ROW.%u", 0) { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<msm5205_device> m_msm;
@@ -23,8 +23,8 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	required_region_ptr<UINT8> m_adpcmrom;
-	required_shared_ptr<UINT8> m_videoram;
+	required_region_ptr<uint8_t> m_adpcmrom;
+	required_shared_ptr<uint8_t> m_videoram;
 
 	required_ioport_array<12> m_row;
 
@@ -36,7 +36,8 @@ public:
 	tilemap_t *m_bg_tilemap;
 
 	DECLARE_CUSTOM_INPUT_MEMBER(keyboard_r);
-	DECLARE_WRITE8_MEMBER(keyboard_select_w);
+	DECLARE_WRITE8_MEMBER(keyboard_select_lo_w);
+	DECLARE_WRITE8_MEMBER(keyboard_select_hi_w);
 	DECLARE_WRITE8_MEMBER(mjkjidai_videoram_w);
 	DECLARE_WRITE8_MEMBER(mjkjidai_ctrl_w);
 	DECLARE_WRITE8_MEMBER(adpcm_w);
@@ -45,7 +46,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_mjkjidai(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_mjkjidai(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 };

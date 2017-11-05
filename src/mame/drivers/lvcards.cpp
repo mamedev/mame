@@ -68,17 +68,19 @@ I/O Ports:
 TODO:
 
 - What do the control ports do? Payout?
-- CPU speed/ YM2149 frequencies
 - Input ports need to be cleaned up
 - NVRAM does not work for lvcards?
 
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "sound/ay8910.h"
-#include "machine/nvram.h"
 #include "includes/lvcards.h"
+
+#include "cpu/z80/z80.h"
+#include "machine/nvram.h"
+#include "sound/ay8910.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 MACHINE_START_MEMBER(lvcards_state,lvpoker)
@@ -272,7 +274,7 @@ static INPUT_PORTS_START( lvpoker )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Analyzer") PORT_TOGGLE
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_MINUS) PORT_NAME("Memory Reset")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET ) PORT_CODE(KEYCODE_MINUS)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Clear Stats")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_EQUALS) PORT_NAME("Hopper Reset")
@@ -449,16 +451,14 @@ GFXDECODE_END
 
 /* Sound Interfaces */
 
-static MACHINE_CONFIG_START( lvcards, lvcards_state )
+static MACHINE_CONFIG_START( lvcards )
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu",Z80, 18432000/6) // 3.072 MHz ?
-
+	MCFG_CPU_ADD("maincpu",Z80, 18432000/4) // unknown frequency, assume same as tehkanwc.cpp
 	MCFG_CPU_PROGRAM_MAP(lvcards_map)
 	MCFG_CPU_IO_MAP(lvcards_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", lvcards_state,  irq0_line_hold)
 
 	// video hardware
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
@@ -474,7 +474,7 @@ static MACHINE_CONFIG_START( lvcards, lvcards_state )
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 18432000/12)
+	MCFG_SOUND_ADD("aysnd", AY8910, 18432000/12) // unknown frequency, assume same as tehkanwc.cpp
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW0"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW1"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
@@ -499,8 +499,8 @@ static MACHINE_CONFIG_DERIVED( ponttehk, lvcards )
 	MCFG_MACHINE_RESET_OVERRIDE(lvcards_state,lvpoker)
 
 	// video hardware
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_INIT_OWNER(lvcards_state,ponttehk)
+	MCFG_DEVICE_REMOVE("palette")
+	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 MACHINE_CONFIG_END
 
 ROM_START( lvpoker )
@@ -564,6 +564,6 @@ ROM_START( ponttehk )
 	ROM_LOAD( "pon24s10.001", 0x0200, 0x0100, CRC(c64ecee8) SHA1(80c9ec21e135235f7f2d41ce7900cf3904123823) )  /* blue component */
 ROM_END
 
-GAME( 1985, lvcards,        0, lvcards,  lvcards, driver_device,  0, ROT0, "Tehkan", "Lovely Cards", 0 )
-GAME( 1985, lvpoker,  lvcards, lvpoker,  lvpoker, driver_device,  0, ROT0, "Tehkan", "Lovely Poker [BET]", 0 )
-GAME( 1985, ponttehk,       0, ponttehk, ponttehk, driver_device, 0, ROT0, "Tehkan", "Pontoon (Tehkan)", 0 )
+GAME( 1985, lvcards,        0, lvcards,  lvcards,  lvcards_state, 0, ROT0, "Tehkan", "Lovely Cards",       0 )
+GAME( 1985, lvpoker,  lvcards, lvpoker,  lvpoker,  lvcards_state, 0, ROT0, "Tehkan", "Lovely Poker [BET]", 0 )
+GAME( 1985, ponttehk,       0, ponttehk, ponttehk, lvcards_state, 0, ROT0, "Tehkan", "Pontoon (Tehkan)",   0 )

@@ -377,15 +377,18 @@ Notes:
 */
 
 #include "emu.h"
-#include "cpu/tms32051/tms32051.h"
+#include "includes/taitojc.h"
+#include "audio/taito_en.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/mc68hc11/mc68hc11.h"
+#include "cpu/tms32051/tms32051.h"
+#include "machine/eepromser.h"
+#include "machine/taitoio.h"
 #include "sound/es5506.h"
 #include "sound/okim6295.h"
-#include "machine/taitoio.h"
-#include "machine/eepromser.h"
-#include "audio/taito_en.h"
-#include "includes/taitojc.h"
+
+#include "speaker.h"
 
 #include "dendego.lh"
 
@@ -449,6 +452,15 @@ static const int dendego_pressure_table[0x100] =
 
 
 #define DSP_IDLESKIP        1 /* dsp idle skipping speedup hack */
+
+
+WRITE8_MEMBER(taitojc_state::coin_control_w)
+{
+	machine().bookkeeping().coin_lockout_w(0, ~data & 0x01);
+	machine().bookkeeping().coin_lockout_w(1, ~data & 0x02);
+	machine().bookkeeping().coin_counter_w(0, data & 0x04);
+	machine().bookkeeping().coin_counter_w(1, data & 0x08);
+}
 
 
 /***************************************************************************
@@ -575,33 +587,6 @@ WRITE8_MEMBER(taitojc_state::mcu_comm_w)
 	}
 }
 
-READ32_MEMBER(taitojc_state::snd_share_r)
-{
-	switch (offset & 3)
-	{
-		case 0: return (m_snd_shared_ram[(offset/4)] <<  0) & 0xff000000;
-		case 1: return (m_snd_shared_ram[(offset/4)] <<  8) & 0xff000000;
-		case 2: return (m_snd_shared_ram[(offset/4)] << 16) & 0xff000000;
-		case 3: return (m_snd_shared_ram[(offset/4)] << 24) & 0xff000000;
-	}
-
-	return 0;
-}
-
-WRITE32_MEMBER(taitojc_state::snd_share_w)
-{
-	if (ACCESSING_BITS_24_31)
-	{
-		switch (offset & 3)
-		{
-			case 0: m_snd_shared_ram[(offset/4)] &= ~0xff000000; m_snd_shared_ram[(offset/4)] |= (data >>  0 & 0xff000000); break;
-			case 1: m_snd_shared_ram[(offset/4)] &= ~0x00ff0000; m_snd_shared_ram[(offset/4)] |= (data >>  8 & 0x00ff0000); break;
-			case 2: m_snd_shared_ram[(offset/4)] &= ~0x0000ff00; m_snd_shared_ram[(offset/4)] |= (data >> 16 & 0x0000ff00); break;
-			case 3: m_snd_shared_ram[(offset/4)] &= ~0x000000ff; m_snd_shared_ram[(offset/4)] |= (data >> 24 & 0x000000ff); break;
-		}
-	}
-}
-
 
 READ8_MEMBER(taitojc_state::jc_pcbid_r)
 {
@@ -646,7 +631,7 @@ static ADDRESS_MAP_START( taitojc_map, AS_PROGRAM, 32, taitojc_state )
 	AM_RANGE(0x06600000, 0x0660001f) AM_DEVREADWRITE8("tc0640fio", tc0640fio_device, read, write, 0xff000000)
 	AM_RANGE(0x0660004c, 0x0660004f) AM_WRITE_PORT("EEPROMOUT")
 	AM_RANGE(0x06800000, 0x06800003) AM_WRITE8(jc_irq_unk_w, 0x00ff0000)
-	AM_RANGE(0x06a00000, 0x06a01fff) AM_READWRITE(snd_share_r, snd_share_w) AM_SHARE("snd_shared")
+	AM_RANGE(0x06a00000, 0x06a01fff) AM_DEVREADWRITE8("taito_en:dpram", mb8421_device, left_r, left_w, 0xff000000)
 	AM_RANGE(0x06c00000, 0x06c0001f) AM_READWRITE8(jc_lan_r, jc_lan_w, 0x00ff0000)
 	AM_RANGE(0x08000000, 0x080fffff) AM_RAM AM_SHARE("main_ram")
 	AM_RANGE(0x10001ff8, 0x10001ffb) AM_READ16(dsp_to_main_7fe_r, 0xffff0000)
@@ -754,7 +739,7 @@ WRITE8_MEMBER(taitojc_state::hc11_output_w)
 
 READ8_MEMBER(taitojc_state::hc11_analog_r)
 {
-	return read_safe(m_analog_ports[offset], 0);
+	return m_analog_ports[offset].read_safe(0);
 }
 
 
@@ -843,7 +828,7 @@ READ16_MEMBER(taitojc_state::dsp_math_unk_r)
 READ16_MEMBER(taitojc_state::dsp_rom_r)
 {
 	assert (m_dsp_rom_pos < 0x800000); // never happens
-	return ((UINT16*)m_gfx2->base())[m_dsp_rom_pos++];
+	return ((uint16_t*)m_gfx2->base())[m_dsp_rom_pos++];
 }
 
 WRITE16_MEMBER(taitojc_state::dsp_rom_w)
@@ -1083,7 +1068,7 @@ void taitojc_state::machine_start()
 }
 
 
-static MACHINE_CONFIG_START( taitojc, taitojc_state )
+static MACHINE_CONFIG_START( taitojc )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68040, XTAL_10MHz*2) // 20MHz, clock source = CY7C991
@@ -1108,6 +1093,7 @@ static MACHINE_CONFIG_START( taitojc, taitojc_state )
 	MCFG_TC0640FIO_READ_1_CB(IOPORT("COINS"))
 	MCFG_TC0640FIO_READ_2_CB(IOPORT("START"))
 	MCFG_TC0640FIO_READ_3_CB(IOPORT("UNUSED"))
+	MCFG_TC0640FIO_WRITE_4_CB(WRITE8(taitojc_state, coin_control_w))
 	MCFG_TC0640FIO_READ_7_CB(IOPORT("BUTTONS"))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
@@ -1138,7 +1124,7 @@ static MACHINE_CONFIG_DERIVED( dendego, taitojc )
 
 	/* sound hardware */
 	MCFG_SPEAKER_ADD("subwoofer", 0.0, 0.0, 1.0)
-	MCFG_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", 1056000, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "subwoofer", 0.20)
 MACHINE_CONFIG_END
 
@@ -1216,6 +1202,7 @@ ROM_START( sidebs ) /* Side by Side ver 2.7 J */
 	ROM_LOAD32_WORD( "e23-12.ic22",  0x0800000, 0x200000, CRC(7365333c) SHA1(4f7b75088799ea37f714bc7e5c5b276a7e5d933f) )
 	ROM_LOAD32_WORD( "e23-06.ic10",  0x0c00002, 0x200000, CRC(ffcfd153) SHA1(65fa486cf0156e2988bd6e7060d66f87f765a123) )
 	ROM_LOAD32_WORD( "e23-13.ic23",  0x0c00000, 0x200000, CRC(16982d37) SHA1(134370f7dfadb1886f1e5e5dd16f8b72ad08fc68) )
+	ROM_FILL(                        0x1000000, 0x400000, 0 )
 	ROM_LOAD32_WORD( "e23-07.ic12",  0x1400002, 0x200000, CRC(90f2a87c) SHA1(770bb89fa42cb2a1d5a58525b8d72ed7df3f93ed) )
 	ROM_LOAD32_WORD( "e23-14.ic25",  0x1400000, 0x200000, CRC(1bc5a914) SHA1(92f82a4e2fbac73dbb3293726fc09022bd11a8fe) )
 
@@ -1258,6 +1245,7 @@ ROM_START( sidebsja ) /* Side by Side ver 2.6 J */
 	ROM_LOAD32_WORD( "e23-12.ic22",  0x0800000, 0x200000, CRC(7365333c) SHA1(4f7b75088799ea37f714bc7e5c5b276a7e5d933f) )
 	ROM_LOAD32_WORD( "e23-06.ic10",  0x0c00002, 0x200000, CRC(ffcfd153) SHA1(65fa486cf0156e2988bd6e7060d66f87f765a123) )
 	ROM_LOAD32_WORD( "e23-13.ic23",  0x0c00000, 0x200000, CRC(16982d37) SHA1(134370f7dfadb1886f1e5e5dd16f8b72ad08fc68) )
+	ROM_FILL(                        0x1000000, 0x400000, 0 )
 	ROM_LOAD32_WORD( "e23-07.ic12",  0x1400002, 0x200000, CRC(90f2a87c) SHA1(770bb89fa42cb2a1d5a58525b8d72ed7df3f93ed) )
 	ROM_LOAD32_WORD( "e23-14.ic25",  0x1400000, 0x200000, CRC(1bc5a914) SHA1(92f82a4e2fbac73dbb3293726fc09022bd11a8fe) )
 
@@ -1300,6 +1288,7 @@ ROM_START( sidebsjb ) /* Side by Side ver 2.5 J */
 	ROM_LOAD32_WORD( "e23-12.ic22",  0x0800000, 0x200000, CRC(7365333c) SHA1(4f7b75088799ea37f714bc7e5c5b276a7e5d933f) )
 	ROM_LOAD32_WORD( "e23-06.ic10",  0x0c00002, 0x200000, CRC(ffcfd153) SHA1(65fa486cf0156e2988bd6e7060d66f87f765a123) )
 	ROM_LOAD32_WORD( "e23-13.ic23",  0x0c00000, 0x200000, CRC(16982d37) SHA1(134370f7dfadb1886f1e5e5dd16f8b72ad08fc68) )
+	ROM_FILL(                        0x1000000, 0x400000, 0 )
 	ROM_LOAD32_WORD( "e23-07.ic12",  0x1400002, 0x200000, CRC(90f2a87c) SHA1(770bb89fa42cb2a1d5a58525b8d72ed7df3f93ed) )
 	ROM_LOAD32_WORD( "e23-14.ic25",  0x1400000, 0x200000, CRC(1bc5a914) SHA1(92f82a4e2fbac73dbb3293726fc09022bd11a8fe) )
 
@@ -1452,7 +1441,73 @@ ROM_START( sidebs2u ) /* Side by Side 2 Ver 2.6 A */
 	*/
 ROM_END
 
-ROM_START( sidebs2j ) /* Side by Side 2 Evoluzione Ver 2.4 J */
+ROM_START( sidebs2j ) /* Side by Side 2 Evoluzione RR Ver 3.1 J */
+	ROM_REGION(0x200000, "maincpu", 0)      /* 68040 code */
+	ROM_LOAD32_BYTE( "e38-32.ic36", 0x000000, 0x80000, CRC(88385c6e) SHA1(935b4892a8322a73a8afdf0bd3799c4b11510ac9) )
+	ROM_LOAD32_BYTE( "e38-33.ic37", 0x000001, 0x80000, CRC(d02a9963) SHA1(74d567869b79a7e129a2e5876900e7fecb70d568) )
+	ROM_LOAD32_BYTE( "e38-34.ic38", 0x000002, 0x80000, CRC(7c4d8176) SHA1(89c5da4c60f88bca95980b1829015a6def2eabd5) )
+	ROM_LOAD32_BYTE( "e38-35.ic39", 0x000003, 0x80000, CRC(8746188d) SHA1(de7f611195cd9359328821a0c0c63ac079fad341) )
+
+	ROM_REGION( 0x180000, "taito_en:audiocpu", 0 )       /* 68000 Code */
+	ROM_LOAD16_BYTE( "e38-19.ic30", 0x100001, 0x040000, CRC(3f50cb7b) SHA1(76af65c9b74ede843a3182f79cecda8c3e3febe6) )
+	ROM_LOAD16_BYTE( "e38-20.ic31", 0x100000, 0x040000, CRC(d01340e7) SHA1(76ee48d644dc1ec415d47e0df4864c64ac928b9d) )
+
+	ROM_REGION( 0x4000, "dsp", ROMREGION_ERASE00 ) /* TMS320C51 internal rom */
+	ROM_LOAD16_WORD( "e07-11.ic29", 0x0000, 0x4000, NO_DUMP )
+
+	ROM_REGION( 0x010000, "sub", 0 )        /* MC68HC11M0 code */
+	ROM_LOAD( "e17-23.ic65",  0x000000, 0x010000, CRC(80ac1428) SHA1(5a2a1e60a11ecdb8743c20ddacfb61f9fd00f01c) )
+
+	ROM_REGION( 0x1800000, "gfx1", 0 )
+	ROM_LOAD32_WORD( "e38-05.ic9",  0x0800002, 0x200000, CRC(bda366bf) SHA1(a7558e6d5e4583a2d8e3d2bfa8cabcc459d3ee83) )
+	ROM_LOAD32_WORD( "e38-13.ic22", 0x0800000, 0x200000, CRC(1bd7582b) SHA1(35763b9489f995433f66ef72d4f6b6ac67df5480) )
+	ROM_LOAD32_WORD( "e38-06.ic10", 0x0c00002, 0x200000, CRC(308d2783) SHA1(22c309273444bc6c1df78069850958a739664998) )
+	ROM_LOAD32_WORD( "e38-14.ic23", 0x0c00000, 0x200000, CRC(f1699f27) SHA1(3c9a9cefe6f215fd9f0a9746da97147d14df1da4) )
+	ROM_LOAD32_WORD( "e38-07.ic11", 0x1000002, 0x200000, CRC(226ba93d) SHA1(98e6342d070ddd988c1e9bff21afcfb28df86844) )
+	ROM_LOAD32_WORD( "e38-15.ic24", 0x1000000, 0x200000, CRC(2853c2e3) SHA1(046dbbd4bcb3b07cddab19a284fee9fe736f8def) )
+	ROM_LOAD32_WORD( "e38-08.ic12", 0x1400002, 0x200000, CRC(9c513b32) SHA1(fe26e39d3d65073d23d525bc17771f0c244a38c2) )
+	ROM_LOAD32_WORD( "e38-16.ic25", 0x1400000, 0x200000, CRC(fceafae2) SHA1(540ecd5d1aa64c0428a08ea1e4e634e00f7e6bd6) )
+
+	ROM_REGION( 0x1000000, "gfx2", 0 )      /* only accessible to the TMS */
+	ROM_LOAD( "e38-01.ic5",  0x0000000, 0x200000, CRC(a3c2e2c7) SHA1(538208534f996782167e4cf0d157ad93ce2937bd) )
+	ROM_LOAD( "e38-02.ic6",  0x0200000, 0x200000, CRC(ecdfb75a) SHA1(85e7afa321846816fa3bd9074ad9dec95abe23fe) )
+	ROM_LOAD( "e38-03.ic7",  0x0400000, 0x200000, CRC(28e9cb59) SHA1(a2651fd81a1263573f868864ee049f8fc4177ffa) )
+	ROM_LOAD( "e38-04.ic8",  0x0600000, 0x080000, CRC(26cab05b) SHA1(d5bcf021646dade834840051e0ce083319c53985) )
+	ROM_RELOAD(              0x0680000, 0x080000 )
+	ROM_RELOAD(              0x0700000, 0x080000 )
+	ROM_RELOAD(              0x0780000, 0x080000 )
+	ROM_LOAD( "e38-09.ic18", 0x0800000, 0x200000, CRC(03c95a7f) SHA1(fc046cf5fcfcf5648f68af4bed78576f6d67b32f) )
+	ROM_LOAD( "e38-10.ic19", 0x0a00000, 0x200000, CRC(0fb06794) SHA1(2d0e3b07ded698235572fe9e907a84d5779ac2c5) )
+	ROM_LOAD( "e38-11.ic20", 0x0c00000, 0x200000, CRC(6a312351) SHA1(8037e377f8eef4cc6dd84aec9c829106f0bb130c) )
+	ROM_LOAD( "e38-12.ic21", 0x0e00000, 0x080000, CRC(193a5774) SHA1(aa017ae4fec92bb87c0eb94f59d093853ddbabc9) )
+	ROM_RELOAD(              0x0e80000, 0x080000 )
+	ROM_RELOAD(              0x0f00000, 0x080000 )
+	ROM_RELOAD(              0x0f80000, 0x080000 )
+
+	ROM_REGION16_BE( 0x1000000, "ensoniq.0", ROMREGION_ERASE00  )
+	ROM_LOAD16_BYTE( "e23-15.ic32", 0x000000, 0x200000, CRC(8955b7c7) SHA1(767626bd5cf6810b0368ee85e487c12ef7e8a23d) ) // from sidebs (redump)
+	ROM_LOAD16_BYTE( "e38-17.ic33", 0x400000, 0x200000, CRC(61e81c7f) SHA1(aa650bc139685ad456c233b79aa60005a8fd6d79) )
+	ROM_LOAD16_BYTE( "e38-18.ic34", 0x800000, 0x200000, CRC(43e2f149) SHA1(32ea9156948a886dda5bd071e9f493ddc2b06212) )
+	ROM_LOAD16_BYTE( "e38-21.ic35", 0xc00000, 0x200000, CRC(25373c5f) SHA1(ab9f917dbde7c808be2cd836ce2d3fc558e290f1) )
+
+	/* PALS
+	e23-28.ic18    NOT A ROM
+	e23-27.ic13    NOT A ROM
+	e23-26.ic4     NOT A ROM
+	e23-25-1.ic3   NOT A ROM
+	e23-30.ic40    NOT A ROM
+	e23-29.ic39    NOT A ROM
+	e23-31.ic46    NOT A ROM
+	e23-32-1.ic51  NOT A ROM
+	e23-34.ic72    NOT A ROM
+	e23-33.ic53    NOT A ROM
+	e23-35.ic110   NOT A ROM
+	e23-38.ic73    NOT A ROM
+	e23-37.ic69    NOT A ROM
+	*/
+ROM_END
+
+ROM_START( sidebs2ja ) /* Side by Side 2 Evoluzione Ver 2.4 J */
 	ROM_REGION(0x200000, "maincpu", 0)      /* 68040 code */
 	ROM_LOAD32_BYTE( "e38-23+.ic36", 0x000000, 0x80000, CRC(b3d8e2d9) SHA1(6de6a51c3d9ace532fa03517bab93101b5a3eaae) ) /* Actual label E38-23* */
 	ROM_LOAD32_BYTE( "e38-24+.ic37", 0x000001, 0x80000, CRC(2a47d80d) SHA1(41b889e4a1397c7f0d4f6ef136ed8abfd7e1ed86) ) /* Actual label E38-24* */
@@ -1981,18 +2036,19 @@ ROM_START( dangcurv )
 ROM_END
 
 
-GAME( 1995, dangcurv,  0,        taitojc, dangcurv, taitojc_state, dangcurv, ROT0, "Taito", "Dangerous Curves (Ver 2.2 J)",                         MACHINE_NOT_WORKING )                        // DANGEROUS CURVES       VER 2.2 J   1995.07.20   17:45
-GAME( 1995, landgear,  0,        taitojc, landgear, taitojc_state, taitojc,  ROT0, "Taito", "Landing Gear (Ver 4.2 O)",                             MACHINE_IMPERFECT_GRAPHICS )                 // LANDING GEAR           VER 4.2 O   Feb  8 1996  09:46:22
-GAME( 1995, landgearj, landgear, taitojc, landgear, taitojc_state, taitojc,  ROT0, "Taito", "Landing Gear (Ver 4.2 J)",                             MACHINE_IMPERFECT_GRAPHICS )                 // LANDING GEAR           VER 4.2 J   Feb  8 1996  09:46:22
-GAME( 1995, landgeara, landgear, taitojc, landgear, taitojc_state, taitojc,  ROT0, "Taito", "Landing Gear (Ver 3.1 O)",                             MACHINE_IMPERFECT_GRAPHICS )                 // LANDING GEAR           VER 3.1 O   Feb  8 1996  09:46:22
-GAME( 1995, landgearja,landgear, taitojc, landgear, taitojc_state, taitojc,  ROT0, "Taito", "Landing Gear (Ver 3.0 J)",                             MACHINE_IMPERFECT_GRAPHICS )                 // LANDING GEAR           VER 3.0 J   Feb  8 1996  09:46:22
-GAME( 1996, sidebs,    0,        taitojc, sidebs,   taitojc_state, taitojc,  ROT0, "Taito", "Side by Side (Ver 2.7 J)",                             MACHINE_IMPERFECT_GRAPHICS )                 // SIDE BY SIDE           VER 2.7 J   1996/10/11   14:54:10
-GAME( 1996, sidebsja,  sidebs,   taitojc, sidebs,   taitojc_state, taitojc,  ROT0, "Taito", "Side by Side (Ver 2.6 J)",                             MACHINE_IMPERFECT_GRAPHICS )                 // SIDE BY SIDE           VER 2.6 J   1996/ 7/ 1   18:41:51
-GAME( 1996, sidebsjb,  sidebs,   taitojc, sidebs,   taitojc_state, taitojc,  ROT0, "Taito", "Side by Side (Ver 2.5 J)",                             MACHINE_IMPERFECT_GRAPHICS )                 // SIDE BY SIDE           VER 2.5 J   1996/ 6/20   18:13:14
-GAMEL(1996, dendego,   0,        dendego, dendego,  taitojc_state, taitojc,  ROT0, "Taito", "Densha de GO! (Ver 2.2 J)",                            MACHINE_IMPERFECT_GRAPHICS, layout_dendego ) // DENSYA DE GO           VER 2.2 J   1997/ 2/ 4   12:00:28
-GAMEL(1996, dendegox,  dendego,  dendego, dendego,  taitojc_state, taitojc,  ROT0, "Taito", "Densha de GO! EX (Ver 2.4 J)",                         MACHINE_IMPERFECT_GRAPHICS, layout_dendego ) // DENSYA DE GO           VER 2.4 J   1997/ 4/18   13:38:34
-GAME( 1997, sidebs2,   0,        taitojc, sidebs,   taitojc_state, taitojc,  ROT0, "Taito", "Side by Side 2 (Ver 2.6 OK)",                          MACHINE_IMPERFECT_GRAPHICS )                 // SIDE BY SIDE2          VER 2.6 OK  1997/ 6/ 4   17:27:37
-GAME( 1997, sidebs2u,  sidebs2,  taitojc, sidebs,   taitojc_state, taitojc,  ROT0, "Taito", "Side by Side 2 (Ver 2.6 A)",                           MACHINE_IMPERFECT_GRAPHICS )                 // SIDE BY SIDE2          VER 2.6 A   1997/ 6/19   09:39:22
-GAME( 1997, sidebs2j,  sidebs2,  taitojc, sidebs,   taitojc_state, taitojc,  ROT0, "Taito", "Side by Side 2 Evoluzione (Ver 2.4 J)",                MACHINE_IMPERFECT_GRAPHICS )                 // SIDE BY SIDE2          VER 2.4 J   1997/ 5/26   13:06:37
-GAMEL(1998, dendego2,  0,        dendego, dendego,  taitojc_state, dendego2, ROT0, "Taito", "Densha de GO! 2 Kousoku-hen (Ver 2.5 J)",              MACHINE_IMPERFECT_GRAPHICS, layout_dendego ) // DENSYA DE GO2          VER 2.5 J   1998/ 3/ 2   15:30:55
-GAMEL(1998, dendego23k,dendego2, dendego, dendego,  taitojc_state, dendego2, ROT0, "Taito", "Densha de GO! 2 Kousoku-hen 3000-bandai (Ver 2.20 J)", MACHINE_IMPERFECT_GRAPHICS, layout_dendego ) // DENSYA DE GO! 2 3000   VER 2.20 J  1998/ 7/15   17:42:38
+GAME( 1995, dangcurv,  0,        taitojc, dangcurv, taitojc_state, dangcurv, ROT0, "Taito", "Dangerous Curves (Ver 2.2 J)",                         MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING )                        // DANGEROUS CURVES       VER 2.2 J   1995.07.20   17:45
+GAME( 1995, landgear,  0,        taitojc, landgear, taitojc_state, taitojc,  ROT0, "Taito", "Landing Gear (Ver 4.2 O)",                             MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING )                 // LANDING GEAR           VER 4.2 O   Feb  8 1996  09:46:22
+GAME( 1995, landgearj, landgear, taitojc, landgear, taitojc_state, taitojc,  ROT0, "Taito", "Landing Gear (Ver 4.2 J)",                             MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING )                 // LANDING GEAR           VER 4.2 J   Feb  8 1996  09:46:22
+GAME( 1995, landgeara, landgear, taitojc, landgear, taitojc_state, taitojc,  ROT0, "Taito", "Landing Gear (Ver 3.1 O)",                             MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING )                 // LANDING GEAR           VER 3.1 O   Feb  8 1996  09:46:22
+GAME( 1995, landgearja,landgear, taitojc, landgear, taitojc_state, taitojc,  ROT0, "Taito", "Landing Gear (Ver 3.0 J)",                             MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING )                 // LANDING GEAR           VER 3.0 J   Feb  8 1996  09:46:22
+GAME( 1996, sidebs,    0,        taitojc, sidebs,   taitojc_state, taitojc,  ROT0, "Taito", "Side by Side (Ver 2.7 J)",                             MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING )                 // SIDE BY SIDE           VER 2.7 J   1996/10/11   14:54:10
+GAME( 1996, sidebsja,  sidebs,   taitojc, sidebs,   taitojc_state, taitojc,  ROT0, "Taito", "Side by Side (Ver 2.6 J)",                             MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING )                 // SIDE BY SIDE           VER 2.6 J   1996/ 7/ 1   18:41:51
+GAME( 1996, sidebsjb,  sidebs,   taitojc, sidebs,   taitojc_state, taitojc,  ROT0, "Taito", "Side by Side (Ver 2.5 J)",                             MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING )                 // SIDE BY SIDE           VER 2.5 J   1996/ 6/20   18:13:14
+GAMEL(1996, dendego,   0,        dendego, dendego,  taitojc_state, taitojc,  ROT0, "Taito", "Densha de GO! (Ver 2.2 J)",                            MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING, layout_dendego ) // DENSYA DE GO           VER 2.2 J   1997/ 2/ 4   12:00:28
+GAMEL(1996, dendegox,  dendego,  dendego, dendego,  taitojc_state, taitojc,  ROT0, "Taito", "Densha de GO! EX (Ver 2.4 J)",                         MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING, layout_dendego ) // DENSYA DE GO           VER 2.4 J   1997/ 4/18   13:38:34
+GAME( 1997, sidebs2,   0,        taitojc, sidebs,   taitojc_state, taitojc,  ROT0, "Taito", "Side by Side 2 (Ver 2.6 OK)",                          MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING )                 // SIDE BY SIDE2          VER 2.6 OK  1997/ 6/ 4   17:27:37
+GAME( 1997, sidebs2u,  sidebs2,  taitojc, sidebs,   taitojc_state, taitojc,  ROT0, "Taito", "Side by Side 2 (Ver 2.6 A)",                           MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING )                 // SIDE BY SIDE2          VER 2.6 A   1997/ 6/19   09:39:22
+GAME( 1997, sidebs2j,  sidebs2,  taitojc, sidebs,   taitojc_state, taitojc,  ROT0, "Taito", "Side by Side 2 Evoluzione RR (Ver 3.1 J)",             MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING )                 // SIDE BY SIDE2          VER 3.1 J   1997/10/ 7   13:55:38
+GAME( 1997, sidebs2ja, sidebs2,  taitojc, sidebs,   taitojc_state, taitojc,  ROT0, "Taito", "Side by Side 2 Evoluzione (Ver 2.4 J)",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING )                 // SIDE BY SIDE2          VER 2.4 J   1997/ 5/26   13:06:37
+GAMEL(1998, dendego2,  0,        dendego, dendego,  taitojc_state, dendego2, ROT0, "Taito", "Densha de GO! 2 Kousoku-hen (Ver 2.5 J)",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING, layout_dendego ) // DENSYA DE GO2          VER 2.5 J   1998/ 3/ 2   15:30:55
+GAMEL(1998, dendego23k,dendego2, dendego, dendego,  taitojc_state, dendego2, ROT0, "Taito", "Densha de GO! 2 Kousoku-hen 3000-bandai (Ver 2.20 J)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING, layout_dendego ) // DENSYA DE GO! 2 3000   VER 2.20 J  1998/ 7/15   17:42:38

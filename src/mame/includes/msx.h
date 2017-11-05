@@ -9,7 +9,6 @@
 #ifndef __MSX_H__
 #define __MSX_H__
 
-#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 #include "machine/rp5c01.h"
@@ -18,7 +17,7 @@
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "sound/wave.h"
-#include "sound/2413intf.h"
+#include "sound/ym2413.h"
 #include "video/v9938.h"
 #include "video/tms9928a.h"
 #include "imagedev/flopdrv.h"
@@ -39,6 +38,7 @@
 #include "bus/msx_slot/fs4600.h"
 #include "bus/msx_slot/panasonic08.h"
 #include "bus/msx_slot/sony08.h"
+#include "machine/msx_switched.h"
 
 
 #define TC8521_TAG  "rtc"
@@ -123,7 +123,6 @@ public:
 		, m_ay8910(*this, "ay8910")
 		, m_dac(*this, "dac")
 		, m_rtc(*this, TC8521_TAG)
-		, m_switched_device_as_config("switched_device", ENDIANNESS_LITTLE, 8, 16, 0, address_map_delegate(FUNC(msx_state::switched_device_map), this))
 		, m_region_maincpu(*this, "maincpu")
 		, m_region_kanji(*this, "kanji")
 		, m_io_joy0(*this, "JOY0")
@@ -131,19 +130,13 @@ public:
 		, m_io_dsw(*this, "DSW")
 		, m_io_mouse0(*this, "MOUSE0")
 		, m_io_mouse1(*this, "MOUSE1")
-		, m_io_key0(*this, "KEY0")
-		, m_io_key1(*this, "KEY1")
-		, m_io_key2(*this, "KEY2")
-		, m_io_key3(*this, "KEY3")
-		, m_io_key4(*this, "KEY4")
-		, m_io_key5(*this, "KEY5")
+		, m_io_key(*this, {"KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5"})
 		, m_psg_b(0)
 		, m_rtc_latch(0)
 		, m_kanji_latch(0)
 		, m_primary_slot(0)
 		, m_port_c_old(0)
 		, m_keylatch(0)
-		, m_current_switched_device(0)
 	{
 		for (int prim = 0; prim < 4; prim++ )
 		{
@@ -166,13 +159,12 @@ public:
 	}
 
 	// static configuration helpers
-	static void install_slot_pages(device_t &owner, UINT8 prim, UINT8 sec, UINT8 page, UINT8 numpages, device_t *device);
+	static void install_slot_pages(device_t &owner, uint8_t prim, uint8_t sec, uint8_t page, uint8_t numpages, device_t *device);
 
 	virtual void driver_start() override;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_ADDRESS_MAP(switched_device_map, 8);
 	DECLARE_WRITE8_MEMBER(msx_sec_slot_w);
 	DECLARE_READ8_MEMBER(msx_sec_slot_r);
 	DECLARE_READ8_MEMBER(msx_kanji_r);
@@ -190,7 +182,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(turbo_w);
 
 	void msx_memory_map_all();
-	void msx_memory_map_page(UINT8 page);
+	void msx_memory_map_page(uint8_t page);
 	void msx_memory_reset();
 
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
@@ -209,8 +201,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(msx_irq_source2) { msx_irq_source(2, state); }  // usually second cartridge slot
 	DECLARE_WRITE_LINE_MEMBER(msx_irq_source3) { msx_irq_source(3, state); }  // sometimes expansion slot
 
-protected:
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return (spacenum == 0) ? &m_switched_device_as_config : nullptr; }
+	std::vector<msx_switched_interface *> m_switched;
 
 private:
 	required_device<z80_device> m_maincpu;
@@ -218,9 +209,8 @@ private:
 	optional_device<v9958_device> m_v9958;
 	required_device<cassette_image_device> m_cassette;
 	required_device<ay8910_device> m_ay8910;
-	required_device<dac_device> m_dac;
+	required_device<dac_bit_interface> m_dac;
 	optional_device<rp5c01_device> m_rtc;
-	address_space_config m_switched_device_as_config;
 	required_memory_region m_region_maincpu;
 	optional_memory_region m_region_kanji;
 	required_ioport m_io_joy0;
@@ -228,17 +218,12 @@ private:
 	required_ioport m_io_dsw;
 	required_ioport m_io_mouse0;
 	required_ioport m_io_mouse1;
-	required_ioport m_io_key0;
-	required_ioport m_io_key1;
-	required_ioport m_io_key2;
-	required_ioport m_io_key3;
-	required_ioport m_io_key4;
-	required_ioport m_io_key5;
+	required_ioport_array<6> m_io_key;
 
 	/* PSG */
 	int m_psg_b;
 	/* mouse */
-	UINT16 m_mouse[2];
+	uint16_t m_mouse[2];
 	int m_mouse_stat[2];
 	/* rtc */
 	int m_rtc_latch;
@@ -249,11 +234,10 @@ private:
 	msx_internal_slot_interface *m_all_slots[4][4][4];
 	msx_internal_slot_interface *m_current_page[4];
 	bool m_slot_expanded[4];
-	UINT8 m_primary_slot;
-	UINT8 m_secondary_slot[4];
+	uint8_t m_primary_slot;
+	uint8_t m_secondary_slot[4];
 	int m_port_c_old;
 	int m_keylatch;
-	UINT8 m_current_switched_device;
 
 	int m_irq_state[4];
 

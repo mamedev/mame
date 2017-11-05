@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:smf
-#pragma once
+#ifndef MAME_MACHINE_RF5C296_H
+#define MAME_MACHINE_RF5C296_H
 
-#ifndef __RF5C296_H__
-#define __RF5C296_H__
+#pragma once
 
 #include "pccard.h"
 
@@ -13,7 +13,7 @@
 class rf5c296_device : public device_t
 {
 public:
-	rf5c296_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	rf5c296_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration helpers
 	static void set_pccard_name(device_t &device, const char *name) { downcast<rf5c296_device &>(device).m_pccard_name = name; }
@@ -28,14 +28,14 @@ protected:
 	virtual void device_start() override;
 
 private:
-	void reg_w(ATTR_UNUSED UINT8 reg, UINT8 data);
-	UINT8 reg_r(ATTR_UNUSED UINT8 reg);
+	void reg_w(ATTR_UNUSED uint8_t reg, uint8_t data);
+	uint8_t reg_r(ATTR_UNUSED uint8_t reg);
 
 	unsigned char m_rf5c296_reg;
 	pccard_slot_device *m_pccard;
 	const char *m_pccard_name;
 };
 
-extern const device_type RF5C296;
+DECLARE_DEVICE_TYPE(RF5C296, rf5c296_device)
 
-#endif
+#endif // MAME_MACHINE_RF5C296_H

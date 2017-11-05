@@ -1,6 +1,6 @@
 /*
- * Copyright 2011-2016 Branimir Karadzic. All rights reserved.
- * License: http://www.opensource.org/licenses/BSD-2-Clause
+ * Copyright 2011-2017 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
 #include "common.h"
@@ -17,11 +17,6 @@
 
 #include <dirent.h>
 
-#include "vs_texture.bin.h"
-#include "fs_texture.bin.h"
-#include "vs_texture_cube.bin.h"
-#include "fs_texture_cube.bin.h"
-
 #include <bx/crtimpl.h>
 
 #include <tinystl/allocator.h>
@@ -31,14 +26,39 @@ namespace stl = tinystl;
 
 #include "image.h"
 
+#include <bgfx/embedded_shader.h>
+
+#include "vs_texture.bin.h"
+#include "fs_texture.bin.h"
+#include "fs_texture_array.bin.h"
+#include "vs_texture_cube.bin.h"
+#include "fs_texture_cube.bin.h"
+#include "fs_texture_sdf.bin.h"
+
+static const bgfx::EmbeddedShader s_embeddedShaders[] =
+{
+	BGFX_EMBEDDED_SHADER(vs_texture),
+	BGFX_EMBEDDED_SHADER(fs_texture),
+	BGFX_EMBEDDED_SHADER(fs_texture_array),
+	BGFX_EMBEDDED_SHADER(vs_texture_cube),
+	BGFX_EMBEDDED_SHADER(fs_texture_cube),
+	BGFX_EMBEDDED_SHADER(fs_texture_sdf),
+
+	BGFX_EMBEDDED_SHADER_END()
+};
+
 static const char* s_supportedExt[] =
 {
+	"bmp",
 	"dds",
+	"exr",
+	"gif",
 	"jpg",
 	"jpeg",
 	"hdr",
 	"ktx",
 	"png",
+	"psd",
 	"pvr",
 	"tga",
 };
@@ -80,12 +100,17 @@ static const InputBinding s_bindingView[] =
 	{ entry::Key::PageUp,    entry::Modifier::None,       1, NULL, "view file-pgup"   },
 	{ entry::Key::PageDown,  entry::Modifier::None,       1, NULL, "view file-pgdown" },
 
+	{ entry::Key::Left,      entry::Modifier::None,       1, NULL, "view layer prev"  },
+	{ entry::Key::Right,     entry::Modifier::None,       1, NULL, "view layer next"  },
+
 	{ entry::Key::KeyR,      entry::Modifier::None,       1, NULL, "view rgb r"       },
 	{ entry::Key::KeyG,      entry::Modifier::None,       1, NULL, "view rgb g"       },
 	{ entry::Key::KeyB,      entry::Modifier::None,       1, NULL, "view rgb b"       },
 	{ entry::Key::KeyA,      entry::Modifier::None,       1, NULL, "view rgb a"       },
 
 	{ entry::Key::KeyH,      entry::Modifier::None,       1, NULL, "view help"        },
+
+	{ entry::Key::KeyS,      entry::Modifier::None,       1, NULL, "view sdf"         },
 
 	INPUT_BINDING_END
 };
@@ -110,11 +135,13 @@ struct View
 		: m_fileIndex(0)
 		, m_scaleFn(0)
 		, m_mip(0)
+		, m_layer(0)
 		, m_abgr(UINT32_MAX)
 		, m_zoom(1.0f)
 		, m_filter(true)
 		, m_alpha(false)
 		, m_help(false)
+		, m_sdf(false)
 	{
 	}
 
@@ -152,6 +179,35 @@ struct View
 				else
 				{
 					m_mip = 0;
+				}
+			}
+			if (0 == strcmp(_argv[1], "layer") )
+			{
+				if (_argc >= 3)
+				{
+					uint32_t layer = m_layer;
+					if (0 == strcmp(_argv[2], "next") )
+					{
+						++layer;
+					}
+					else if (0 == strcmp(_argv[2], "prev") )
+					{
+						--layer;
+					}
+					else if (0 == strcmp(_argv[2], "last") )
+					{
+						layer = INT32_MAX;
+					}
+					else
+					{
+						layer = atoi(_argv[2]);
+					}
+
+					m_layer = bx::uint32_iclamp(layer, 0, m_info.numLayers-1);
+				}
+				else
+				{
+					m_layer = 0;
 				}
 			}
 			else if (0 == strcmp(_argv[1], "zoom") )
@@ -225,6 +281,10 @@ struct View
 					m_alpha = false;
 				}
 			}
+			else if (0 == strcmp(_argv[1], "sdf") )
+			{
+				m_sdf ^= true;
+			}
 			else if (0 == strcmp(_argv[1], "help") )
 			{
 				m_help ^= true;
@@ -259,7 +319,7 @@ struct View
 						bool supported = false;
 						for (uint32_t ii = 0; ii < BX_COUNTOF(s_supportedExt); ++ii)
 						{
-							if (0 == bx::stricmp(ext, s_supportedExt[ii]) )
+							if (0 == bx::strincmp(ext, s_supportedExt[ii]) )
 							{
 								supported = true;
 								break;
@@ -294,11 +354,13 @@ struct View
 	uint32_t m_fileIndex;
 	uint32_t m_scaleFn;
 	uint32_t m_mip;
+	uint32_t m_layer;
 	uint32_t m_abgr;
 	float    m_zoom;
 	bool     m_filter;
 	bool     m_alpha;
 	bool     m_help;
+	bool     m_sdf;
 };
 
 int cmdView(CmdContext* /*_context*/, void* _userData, int _argc, char const* const* _argv)
@@ -332,7 +394,7 @@ bgfx::VertexDecl PosUvColorVertex::ms_decl;
 
 bool screenQuad(int32_t _x, int32_t _y, int32_t _width, uint32_t _height, uint32_t _abgr, bool _originBottomLeft = false)
 {
-	if (bgfx::checkAvailTransientVertexBuffer(6, PosUvColorVertex::ms_decl) )
+	if (6 == bgfx::getAvailTransientVertexBuffer(6, PosUvColorVertex::ms_decl) )
 	{
 		bgfx::TransientVertexBuffer vb;
 		bgfx::allocTransientVertexBuffer(&vb, 6, PosUvColorVertex::ms_decl);
@@ -456,7 +518,7 @@ void help(const char* _error = NULL)
 
 	fprintf(stderr
 		, "texturev, bgfx texture viewer tool\n"
-		  "Copyright 2011-2016 Branimir Karadzic. All rights reserved.\n"
+		  "Copyright 2011-2017 Branimir Karadzic. All rights reserved.\n"
 		  "License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause\n\n"
 		);
 
@@ -520,7 +582,7 @@ void associate()
 	bx::Error err;
 	if (bx::open(&writer, temp, false, &err) )
 	{
-		bx::write(&writer, str.c_str(), str.length(), &err);
+		bx::write(&writer, str.c_str(), uint32_t(str.length()), &err);
 		bx::close(&writer);
 
 		if (err.isOk() )
@@ -551,7 +613,7 @@ void associate()
 	bx::Error err;
 	if (bx::open(&writer, "/tmp/texturev.sh", false, &err) )
 	{
-		bx::write(&writer, str.c_str(), str.length(), &err);
+		bx::write(&writer, str.c_str(), uint32_t(str.length()), &err);
 		bx::close(&writer);
 
 		if (err.isOk() )
@@ -607,47 +669,36 @@ int _main_(int _argc, char** _argv)
 
 	PosUvColorVertex::init();
 
-	const bgfx::Memory* vs_texture;
-	const bgfx::Memory* fs_texture;
-	const bgfx::Memory* vs_texture_cube;
-	const bgfx::Memory* fs_texture_cube;
+	bgfx::RendererType::Enum type = bgfx::getRendererType();
 
-	switch (bgfx::getRendererType())
-	{
-	case bgfx::RendererType::Direct3D9:
-		vs_texture      = bgfx::makeRef(vs_texture_dx9,      sizeof(vs_texture_dx9) );
-		fs_texture      = bgfx::makeRef(fs_texture_dx9,      sizeof(fs_texture_dx9) );
-		vs_texture_cube = bgfx::makeRef(vs_texture_cube_dx9, sizeof(vs_texture_cube_dx9) );
-		fs_texture_cube = bgfx::makeRef(fs_texture_cube_dx9, sizeof(fs_texture_cube_dx9) );
-		break;
-
-	case bgfx::RendererType::Direct3D11:
-	case bgfx::RendererType::Direct3D12:
-		vs_texture      = bgfx::makeRef(vs_texture_dx11,      sizeof(vs_texture_dx11) );
-		fs_texture      = bgfx::makeRef(fs_texture_dx11,      sizeof(fs_texture_dx11) );
-		vs_texture_cube = bgfx::makeRef(vs_texture_cube_dx11, sizeof(vs_texture_cube_dx11) );
-		fs_texture_cube = bgfx::makeRef(fs_texture_cube_dx11, sizeof(fs_texture_cube_dx11) );
-		break;
-
-	default:
-		vs_texture      = bgfx::makeRef(vs_texture_glsl,      sizeof(vs_texture_glsl) );
-		fs_texture      = bgfx::makeRef(fs_texture_glsl,      sizeof(fs_texture_glsl) );
-		vs_texture_cube = bgfx::makeRef(vs_texture_cube_glsl, sizeof(vs_texture_cube_glsl) );
-		fs_texture_cube = bgfx::makeRef(fs_texture_cube_glsl, sizeof(fs_texture_cube_glsl) );
-		break;
-	}
+	bgfx::ShaderHandle vsTexture      = bgfx::createEmbeddedShader(s_embeddedShaders, type, "vs_texture");
+	bgfx::ShaderHandle fsTexture      = bgfx::createEmbeddedShader(s_embeddedShaders, type, "fs_texture");
+	bgfx::ShaderHandle fsTextureArray = bgfx::createEmbeddedShader(s_embeddedShaders, type, "fs_texture_array");
 
 	bgfx::ProgramHandle textureProgram = bgfx::createProgram(
-			  bgfx::createShader(vs_texture)
-			, bgfx::createShader(fs_texture)
+			  vsTexture
+			, fsTexture
+			, true
+			);
+
+	bgfx::ProgramHandle textureArrayProgram = bgfx::createProgram(
+			  vsTexture
+			, bgfx::isValid(fsTextureArray)
+			? fsTextureArray
+			: fsTexture
 			, true
 			);
 
 	bgfx::ProgramHandle textureCubeProgram = bgfx::createProgram(
-			  bgfx::createShader(vs_texture_cube)
-			, bgfx::createShader(fs_texture_cube)
+			  bgfx::createEmbeddedShader(s_embeddedShaders, type, "vs_texture_cube")
+			, bgfx::createEmbeddedShader(s_embeddedShaders, type, "fs_texture_cube")
 			, true
 			);
+
+	bgfx::ProgramHandle textureSDFProgram = bgfx::createProgram(
+			  vsTexture
+			, bgfx::createEmbeddedShader(s_embeddedShaders, type, "fs_texture_sdf")
+			, true);
 
 	bgfx::UniformHandle s_texColor = bgfx::createUniform("s_texColor", bgfx::UniformType::Int1);
 	bgfx::UniformHandle u_mtx      = bgfx::createUniform("u_mtx",      bgfx::UniformType::Mat4);
@@ -656,9 +707,10 @@ int _main_(int _argc, char** _argv)
 	float speed = 0.37f;
 	float time  = 0.0f;
 
-	Interpolator mip(0.0);
-	Interpolator zoom(1.0);
-	Interpolator scale(1.0);
+	Interpolator mip(0.0f);
+	Interpolator layer(0.0f);
+	Interpolator zoom(1.0f);
+	Interpolator scale(1.0f);
 
 	const char* filePath = _argc < 2 ? "" : _argv[1];
 	bool directory = false;
@@ -707,8 +759,8 @@ int _main_(int _argc, char** _argv)
 				| (mouseState.m_buttons[entry::MouseButton::Right ] ? IMGUI_MBUT_RIGHT  : 0)
 				| (mouseState.m_buttons[entry::MouseButton::Middle] ? IMGUI_MBUT_MIDDLE : 0)
 				, mouseState.m_mz
-				, width
-				, height
+				, uint16_t(width)
+				, uint16_t(height)
 				);
 
 			static bool help = false;
@@ -721,11 +773,11 @@ int _main_(int _argc, char** _argv)
 
 			if (ImGui::BeginPopupModal("Help", NULL, ImGuiWindowFlags_AlwaysAutoResize) )
 			{
-				ImGui::SetWindowFontScale(1.2f);
+				ImGui::SetWindowFontScale(1.0f);
 
 				ImGui::Text(
-					"texturev, bgfx texture viewer tool\n"
-					"Copyright 2011-2016 Branimir Karadzic. All rights reserved.\n"
+					"texturev, bgfx texture viewer tool " ICON_KI_WRENCH "\n"
+					"Copyright 2011-2017 Branimir Karadzic. All rights reserved.\n"
 					"License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause\n"
 					);
 				ImGui::Separator();
@@ -733,6 +785,7 @@ int _main_(int _argc, char** _argv)
 
 				ImGui::Text("Key bindings:\n\n");
 
+				ImGui::PushFont(ImGui::Font::Mono);
 				ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "ESC");   ImGui::SameLine(64); ImGui::Text("Exit.");
 				ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "h");     ImGui::SameLine(64); ImGui::Text("Toggle help screen.");
 				ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "f");     ImGui::SameLine(64); ImGui::Text("Toggle full-screen.");
@@ -747,12 +800,22 @@ int _main_(int _argc, char** _argv)
 				ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "/");     ImGui::SameLine(64); ImGui::Text("Toggle linear/point texture sampling.");
 				ImGui::NextLine();
 
+				ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "left");  ImGui::SameLine(64); ImGui::Text("Previous layer in texture array.");
+				ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "right"); ImGui::SameLine(64); ImGui::Text("Next layer in texture array.");
+				ImGui::NextLine();
+
 				ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "up");    ImGui::SameLine(64); ImGui::Text("Previous texture.");
 				ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "down");  ImGui::SameLine(64); ImGui::Text("Next texture.");
 				ImGui::NextLine();
 
 				ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "r/g/b"); ImGui::SameLine(64); ImGui::Text("Toggle R, G, or B color channel.");
 				ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "a");     ImGui::SameLine(64); ImGui::Text("Toggle alpha blending.");
+				ImGui::NextLine();
+
+				ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "s");     ImGui::SameLine(64); ImGui::Text("Toggle Multi-channel SDF rendering");
+
+				ImGui::PopFont();
+
 				ImGui::NextLine();
 
 				ImGui::Dummy(ImVec2(0.0f, 0.0f) );
@@ -768,9 +831,6 @@ int _main_(int _argc, char** _argv)
 			}
 
 			help = view.m_help;
-
-//			bool b;
-//			ImGui::ShowTestWindow(&b);
 
 			imguiEndFrame();
 
@@ -796,13 +856,20 @@ int _main_(int _argc, char** _argv)
 						);
 
 				std::string title;
-				bx::stringPrintf(title, "%s (%d x %d%s, %s)"
-					, filePath
-					, view.m_info.width
-					, view.m_info.height
-					, view.m_info.cubeMap ? " CubeMap" : ""
-					, bgfx::getName(view.m_info.format)
-					);
+				if (isValid(texture) )
+				{
+					bx::stringPrintf(title, "%s (%d x %d%s, %s)"
+						, filePath
+						, view.m_info.width
+						, view.m_info.height
+						, view.m_info.cubeMap ? " CubeMap" : ""
+						, bgfx::getName(view.m_info.format)
+						);
+				}
+				else
+				{
+					bx::stringPrintf(title, "Failed to load %s!", filePath);
+				}
 				entry::WindowHandle handle = { 0 };
 				entry::setWindowTitle(handle, title.c_str() );
 			}
@@ -818,7 +885,7 @@ int _main_(int _argc, char** _argv)
 			float ortho[16];
 			bx::mtxOrtho(ortho, 0.0f, (float)width, (float)height, 0.0f, 0.0f, 1000.0f);
 			bgfx::setViewTransform(0, NULL, ortho);
-			bgfx::setViewRect(0, 0, 0, width, height);
+			bgfx::setViewRect(0, 0, 0, uint16_t(width), uint16_t(height) );
 			bgfx::touch(0);
 
 			bgfx::dbgTextClear();
@@ -844,9 +911,10 @@ int _main_(int _argc, char** _argv)
 			bx::mtxRotateXY(mtx, 0.0f, time);
 			bgfx::setUniform(u_mtx, mtx);
 
-			mip.set( float(view.m_mip), 0.5f);
+			mip.set(float(view.m_mip), 0.5f);
+			layer.set(float(view.m_layer), 0.25f);
 
-			float params[4] = { mip.getValue(), 0.0f, 0.0f, 0.0f };
+			float params[4] = { mip.getValue(), layer.getValue(), 0.0f, 0.0f };
 			bgfx::setUniform(u_params, params);
 
 			bgfx::setTexture(0
@@ -864,7 +932,12 @@ int _main_(int _argc, char** _argv)
 				| BGFX_STATE_ALPHA_WRITE
 				| (view.m_alpha ? BGFX_STATE_BLEND_ALPHA : BGFX_STATE_NONE)
 				);
-			bgfx::submit(0, view.m_info.cubeMap ? textureCubeProgram : textureProgram);
+			bgfx::submit(0
+					,     view.m_info.cubeMap   ? textureCubeProgram
+					: 1 < view.m_info.numLayers ? textureArrayProgram
+					:     view.m_sdf            ? textureSDFProgram
+					:                             textureProgram
+					);
 
 			bgfx::frame();
 		}
@@ -878,6 +951,7 @@ int _main_(int _argc, char** _argv)
 	bgfx::destroyUniform(u_mtx);
 	bgfx::destroyUniform(u_params);
 	bgfx::destroyProgram(textureProgram);
+	bgfx::destroyProgram(textureArrayProgram);
 	bgfx::destroyProgram(textureCubeProgram);
 
 	imguiDestroy();

@@ -88,23 +88,28 @@
 
 ***************************************************************************/
 
-#include "bus/midi/midi.h"
-#include "cpu/m68000/m68000.h"
-#include "cpu/es5510/es5510.h"
-#include "sound/es5506.h"
-#include "machine/mc68681.h"
+#include "emu.h"
 #include "machine/esqpanel.h"
+
+#include "bus/midi/midi.h"
+#include "cpu/es5510/es5510.h"
+#include "cpu/m68000/m68000.h"
+#include "machine/mc68681.h"
+#include "sound/es5506.h"
+
+#include "speaker.h"
+
 
 class esqkt_state : public driver_device
 {
 public:
 	esqkt_state(const machine_config &mconfig, device_type type, const char *tag)
-	: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_esp(*this, "esp"),
-		m_duart(*this, "duart"),
-		m_sq1panel(*this, "sq1panel"),
-		m_mdout(*this, "mdout")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_esp(*this, "esp")
+		, m_duart(*this, "duart")
+		, m_sq1panel(*this, "sq1panel")
+		, m_mdout(*this, "mdout")
 	{ }
 
 	required_device<m68ec020_device> m_maincpu;
@@ -120,7 +125,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(duart_tx_b);
 	DECLARE_WRITE8_MEMBER(duart_output);
 
-	UINT8 m_duart_io;
+	uint8_t m_duart_io;
 	bool  m_bCalibSecondByte;
 
 public:
@@ -196,14 +201,14 @@ WRITE_LINE_MEMBER(esqkt_state::duart_tx_b)
 	m_sq1panel->rx_w(state);
 }
 
-static MACHINE_CONFIG_START( kt, esqkt_state )
+static MACHINE_CONFIG_START( kt )
 	MCFG_CPU_ADD("maincpu", M68EC020, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(kt_map)
 
 	MCFG_CPU_ADD("esp", ES5510, XTAL_10MHz)
 	MCFG_DEVICE_DISABLE()
 
-	MCFG_ESQPANEL2x16_SQ1_ADD("sq1panel")
+	MCFG_ESQPANEL2X16_SQ1_ADD("sq1panel")
 	MCFG_ESQPANEL_TX_CALLBACK(DEVWRITELINE("duart", mc68681_device, rx_b_w))
 
 	MCFG_MC68681_ADD("duart", 4000000)

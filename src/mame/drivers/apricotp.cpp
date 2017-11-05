@@ -25,19 +25,21 @@
 */
 
 #include "emu.h"
+#include "bus/centronics/ctronics.h"
 #include "cpu/i86/i86.h"
-#include "cpu/m6800/m6800.h"
+#include "cpu/m6800/m6801.h"
+#include "formats/apridisk.h"
 #include "machine/am9517a.h"
 #include "machine/apricotkb.h"
-#include "bus/centronics/ctronics.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 #include "machine/ram.h"
 #include "machine/wd_fdc.h"
-#include "machine/z80dart.h"
+#include "machine/z80sio.h"
 #include "sound/sn76496.h"
 #include "video/mc6845.h"
-#include "formats/apridisk.h"
+#include "screen.h"
+#include "speaker.h"
 #include "apricotp.lh"
 
 
@@ -109,8 +111,8 @@ public:
 	required_device<am9517a_device> m_dmac;
 	required_device<pic8259_device> m_pic;
 	required_device<pit8253_device> m_pit;
-	required_device<z80dart_device> m_sio;
-	required_device<wd2797_t> m_fdc;
+	required_device<z80sio_device> m_sio;
+	required_device<wd2797_device> m_fdc;
 	required_device<mc6845_device> m_crtc;
 	required_device<ram_device> m_ram;
 	required_device<floppy_connector> m_floppy0;
@@ -122,7 +124,7 @@ public:
 	virtual void machine_reset() override;
 
 	virtual void video_start() override;
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	MC6845_UPDATE_ROW(update_row);
 	DECLARE_READ16_MEMBER( mem_r );
@@ -137,11 +139,11 @@ public:
 
 	void lat_ls259_w(offs_t offset, int state);
 
-	optional_shared_ptr<UINT16> m_work_ram;
+	optional_shared_ptr<uint16_t> m_work_ram;
 
 	// video state
-	optional_shared_ptr<UINT16> m_video_ram;
-	UINT8 m_video;
+	optional_shared_ptr<uint16_t> m_video_ram;
+	uint8_t m_video;
 
 	int m_centronics_busy;
 	int m_centronics_select;
@@ -169,7 +171,7 @@ MC6845_UPDATE_ROW( fp_state::update_row )
 {
 }
 
-UINT32 fp_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t fp_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	offs_t addr = (!BIT(m_video, 4) << 15) | (BIT(m_video, 1) << 14);
 
@@ -177,7 +179,7 @@ UINT32 fp_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, cons
 	{
 		for (int sx = 0; sx < 40; sx++)
 		{
-			UINT16 data = m_video_ram[addr++];
+			uint16_t data = m_video_ram[addr++];
 
 			for (int x = 0; x < 16; x++)
 			{
@@ -228,7 +230,7 @@ READ8_MEMBER( fp_state::prtr_snd_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	// centronics
 	data |= m_centronics_busy;
@@ -334,7 +336,7 @@ WRITE8_MEMBER( fp_state::lat_w )
 
 READ16_MEMBER( fp_state::mem_r )
 {
-	UINT16 data = 0xffff;
+	uint16_t data = 0xffff;
 
 	if (offset >= 0xd0000/2 && offset < 0xf0000/2)
 	{
@@ -431,9 +433,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fp_io, AS_IO, 16, fp_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000, 0x007) AM_DEVREADWRITE8(WD2797_TAG, wd2797_t, read, write, 0x00ff)
+	AM_RANGE(0x000, 0x007) AM_DEVREADWRITE8(WD2797_TAG, wd2797_device, read, write, 0x00ff)
 	AM_RANGE(0x008, 0x00f) AM_DEVREADWRITE8(I8253A5_TAG, pit8253_device, read, write, 0x00ff)
-	AM_RANGE(0x018, 0x01f) AM_DEVREADWRITE8(Z80SIO0_TAG, z80sio0_device, ba_cd_r, ba_cd_w, 0x00ff)
+	AM_RANGE(0x018, 0x01f) AM_DEVREADWRITE8(Z80SIO0_TAG, z80sio_device, ba_cd_r, ba_cd_w, 0x00ff)
 	AM_RANGE(0x020, 0x021) AM_DEVWRITE8("cent_data_out", output_latch_device, write, 0x00ff)
 	AM_RANGE(0x022, 0x023) AM_WRITE8(pint_clr_w, 0x00ff)
 	AM_RANGE(0x024, 0x025) AM_READ8(prtr_snd_r, 0x00ff)
@@ -572,7 +574,7 @@ SLOT_INTERFACE_END
 //  MACHINE_CONFIG( fp )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( fp, fp_state )
+static MACHINE_CONFIG_START( fp )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(I8086_TAG, I8086, XTAL_15MHz/3)
 	MCFG_CPU_PROGRAM_MAP(fp_mem)
@@ -617,11 +619,14 @@ static MACHINE_CONFIG_START( fp, fp_state )
 
 	/* Devices */
 	MCFG_DEVICE_ADD(APRICOT_KEYBOARD_TAG, APRICOT_KEYBOARD, 0)
+
 	MCFG_DEVICE_ADD(I8237_TAG, AM9517A, 250000)
 	MCFG_I8237_OUT_EOP_CB(DEVWRITELINE(I8259A_TAG, pic8259_device, ir7_w))
-	MCFG_I8237_IN_IOR_1_CB(DEVREAD8(WD2797_TAG, wd_fdc_t, data_r))
-	MCFG_I8237_OUT_IOW_1_CB(DEVWRITE8(WD2797_TAG, wd_fdc_t, data_w))
-	MCFG_PIC8259_ADD(I8259A_TAG, INPUTLINE(I8086_TAG, INPUT_LINE_IRQ0), VCC, NOOP)
+	MCFG_I8237_IN_IOR_1_CB(DEVREAD8(WD2797_TAG, wd_fdc_device_base, data_r))
+	MCFG_I8237_OUT_IOW_1_CB(DEVWRITE8(WD2797_TAG, wd_fdc_device_base, data_w))
+
+	MCFG_DEVICE_ADD(I8259A_TAG, PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(INPUTLINE(I8086_TAG, INPUT_LINE_IRQ0))
 
 	MCFG_DEVICE_ADD(I8253A5_TAG, PIT8253, 0)
 	MCFG_PIT8253_CLK0(2000000)
@@ -629,8 +634,8 @@ static MACHINE_CONFIG_START( fp, fp_state )
 	MCFG_PIT8253_CLK1(2000000)
 	MCFG_PIT8253_CLK2(2000000)
 
-	MCFG_Z80SIO0_ADD(Z80SIO0_TAG, 2500000, 0, 0, 0, 0)
-	MCFG_Z80DART_OUT_INT_CB(DEVWRITELINE(I8259A_TAG, pic8259_device, ir4_w))
+	MCFG_DEVICE_ADD(Z80SIO0_TAG, Z80SIO, 2500000)
+	MCFG_Z80SIO_OUT_INT_CB(DEVWRITELINE(I8259A_TAG, pic8259_device, ir4_w))
 
 	MCFG_WD2797_ADD(WD2797_TAG, 2000000)
 	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE(I8259A_TAG, pic8259_device, ir1_w))
@@ -686,5 +691,5 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT     COMPANY             FULLNAME        FLAGS
-COMP( 1984, fp,    0,      0,      fp,   fp, driver_device,    0,     "ACT",   "Apricot Portable / FP", MACHINE_NOT_WORKING )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  STATE     INIT  COMPANY  FULLNAME                 FLAGS
+COMP( 1984, fp,    0,      0,      fp,      fp,    fp_state, 0,    "ACT",   "Apricot Portable / FP", MACHINE_NOT_WORKING )

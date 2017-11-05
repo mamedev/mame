@@ -56,8 +56,8 @@ public:
 	DECLARE_READ8_MEMBER(minicom_io_r);
 	DECLARE_DRIVER_INIT(minicom);
 private:
-	UINT8 m_p[4];
-	UINT16 m_display_data;
+	uint8_t m_p[4];
+	uint16_t m_display_data;
 	int m_digit_index;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -111,7 +111,7 @@ READ8_MEMBER(minicom_state::minicom_io_r)
 }
 
 #if LOG_IO_PORTS
-static void printbits(UINT8 v) {
+static void printbits(uint8_t v) {
 	int i;
 	for(i = 7; i >= 0; i--) putchar('0' + ((v >> i) & 1));
 }
@@ -150,7 +150,7 @@ WRITE8_MEMBER(minicom_state::minicom_io_w)
 			if (data != m_p[offset])
 			{
 #if LOG_IO_PORTS
-				UINT8 changed = m_p[offset] ^ data;
+				uint8_t changed = m_p[offset] ^ data;
 				if (changed ^ P1_UNKNOWN_BITS)
 				{
 					printf("Write to P1: %02X changed: (        ) (", data);
@@ -172,7 +172,7 @@ WRITE8_MEMBER(minicom_state::minicom_io_w)
 			if (data != m_p[offset])
 			{
 #if LOG_IO_PORTS
-				UINT8 changed = m_p[offset] ^ data;
+				uint8_t changed = m_p[offset] ^ data;
 				if (changed ^ P2_UNKNOWN_BITS)
 				{
 					printf("Write to P2: %02X changed: (        ) (        ) (", data);
@@ -188,7 +188,7 @@ WRITE8_MEMBER(minicom_state::minicom_io_w)
 		{
 			if (data != m_p[offset])
 			{
-				UINT8 changed = m_p[offset] ^ data;
+				uint8_t changed = m_p[offset] ^ data;
 #if LOG_IO_PORTS
 				if (changed ^ P3_UNKNOWN_BITS)
 				{
@@ -225,7 +225,7 @@ DRIVER_INIT_MEMBER( minicom_state, minicom )
 {
 }
 
-static MACHINE_CONFIG_START( minicom, minicom_state )
+static MACHINE_CONFIG_START( minicom )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I87C52, XTAL_10MHz) /*FIX-ME: verify the correct clock frequency */
 	MCFG_CPU_IO_MAP(i87c52_io)
@@ -249,6 +249,6 @@ ROM_START( mcom4_02 )
 	ROM_LOAD( "ultratec_minicom_iv_20020419.rom",  0x0000, 0x2000, CRC(99b6cc35) SHA1(32577005bf02042f893c8880f8ce5b3d8a5f55f9) )
 ROM_END
 
-/*    YEAR  NAME      PARENT  COMPAT  MACHINE     INPUT     CLASS          INIT     COMPANY     FULLNAME         FLAGS */
-COMP( 1997, minicom,   0,     0,      minicom,    0,        minicom_state, minicom, "Ultratec", "Minicom IV (1997-08-11)",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND) /* fw release data: 11th Aug 1997 */
-COMP( 2002, mcom4_02,   0,     0,      minicom,    0,        minicom_state, minicom, "Ultratec", "Minicom IV (2002-04-19)",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND) /* fw release data: 19th Apr 2002 */
+//    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT  CLASS          INIT     COMPANY     FULLNAME                   FLAGS
+COMP( 1997, minicom,  0,      0,      minicom, 0,     minicom_state, minicom, "Ultratec", "Minicom IV (1997-08-11)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND ) // fw release data: 11th Aug 1997
+COMP( 2002, mcom4_02, 0,      0,      minicom, 0,     minicom_state, minicom, "Ultratec", "Minicom IV (2002-04-19)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND ) // fw release data: 19th Apr 2002

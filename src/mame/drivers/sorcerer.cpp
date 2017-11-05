@@ -115,8 +115,7 @@ It was often hooked to a printer, a joystick, a music card, or a speaker.
 We emulate the printer and the speaker.
 
 Another 25-pin port provided two-way serial communications. Only two speeds are
-available - 300 baud and 1200 baud. There is no handshaking. This protocol is
-currently not emulated.
+available - 300 baud and 1200 baud. There is no handshaking.
 
 Other pins on this connector provided for two cassette players. The connections
 for cassette unit 1 are duplicated on a set of phono plugs.
@@ -155,10 +154,19 @@ NOTES (2011-08-08)
                          stable, so be prepared to cold boot whenever something
                          goes wrong.
 
+NOTES (2016-06-06)
+1. SORCERER_USING_RS232 removed, since the core now supports RS-232 as a device.
+                         Not actually tested due to the bios bugs making it
+                         pretty much impossible to use.
+
 ********************************************************************************/
 
+#include "emu.h"
 #include "includes/sorcerer.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
 
 static ADDRESS_MAP_START( sorcerer_mem, AS_PROGRAM, 8, sorcerer_state)
 	ADDRESS_MAP_UNMAP_HIGH
@@ -351,11 +359,11 @@ void sorcerer_state::video_start()
 	m_p_videoram = memregion("maincpu")->base()+0xf000;
 }
 
-UINT32 sorcerer_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t sorcerer_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 y,ra,chr,gfx;
-	UINT16 sy=0,ma=0x80,x;
-	UINT16 *p;
+	uint8_t y,ra,chr,gfx;
+	uint16_t sy=0,ma=0x80,x;
+	uint16_t *p;
 
 	for (y = 0; y < 30; y++)
 	{
@@ -396,10 +404,18 @@ static const floppy_interface sorcerer_floppy_interface =
 	"floppy_8"
 };
 
+static DEVICE_INPUT_DEFAULTS_START( terminal )
+	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_1200 )
+	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_1200 )
+	DEVICE_INPUT_DEFAULTS( "RS232_STARTBITS", 0xff, RS232_STARTBITS_1 )
+	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_8 )
+	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_NONE )
+	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_2 )
+DEVICE_INPUT_DEFAULTS_END
 
-static MACHINE_CONFIG_START( sorcerer, sorcerer_state )
+static MACHINE_CONFIG_START( sorcerer )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 12638000/6)
+	MCFG_CPU_ADD("maincpu", Z80, ES_CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(sorcerer_mem)
 	MCFG_CPU_IO_MAP(sorcerer_io)
 
@@ -423,8 +439,10 @@ static MACHINE_CONFIG_START( sorcerer, sorcerer_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05) // cass2 speaker
 
 	MCFG_DEVICE_ADD( "uart", AY31015, 0 )
-	MCFG_AY31015_TX_CLOCK(4800.0)
-	MCFG_AY31015_RX_CLOCK(4800.0)
+	MCFG_AY31015_TX_CLOCK(ES_UART_CLOCK)
+	MCFG_AY31015_RX_CLOCK(ES_UART_CLOCK)
+	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "null_modem")
+	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 
 	/* printer */
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "covox")
@@ -479,7 +497,7 @@ MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER(sorcerer_state, sorcerer)
 {
-	UINT8 *RAM = memregion("maincpu")->base();
+	uint8_t *RAM = memregion("maincpu")->base();
 	membank("boot")->configure_entries(0, 2, &RAM[0x0000], 0xe000);
 }
 
@@ -517,7 +535,7 @@ ROM_START(sorcerer2)
 	ROMX_LOAD("tvc-2.2e",    0xe800, 0x0800, CRC(bc194487) SHA1(dcfd916558e3e3be22091c5558ea633c332cf6c7), ROM_BIOS(2) )
 ROM_END
 
-/*   YEAR  NAME       PARENT    COMPAT    MACHINE    INPUT     INIT        COMPANY     FULLNAME */
-COMP(1979, sorcerer,  0,        0,        sorcerer,  sorcerer, sorcerer_state, sorcerer, "Exidy Inc", "Sorcerer", 0 )
-COMP(1979, sorcerer2, sorcerer, 0,        sorcerer,  sorcerer, sorcerer_state, sorcerer, "Exidy Inc", "Sorcerer 2", 0 )
+/*   YEAR  NAME       PARENT    COMPAT    MACHINE    INPUT     STATE           INIT      COMPANY      FULLNAME */
+COMP(1979, sorcerer,  0,        0,        sorcerer,  sorcerer, sorcerer_state, sorcerer, "Exidy Inc", "Sorcerer",                     0 )
+COMP(1979, sorcerer2, sorcerer, 0,        sorcerer,  sorcerer, sorcerer_state, sorcerer, "Exidy Inc", "Sorcerer 2",                   0 )
 COMP(1979, sorcererd, sorcerer, 0,        sorcererd, sorcerer, sorcerer_state, sorcerer, "Exidy Inc", "Sorcerer (with floppy disks)", 0 )

@@ -923,7 +923,7 @@
 		</part>
 	</software>
 
-	<software name="dragnegg">
+	<software name="dragnegg" supported="no">
 		<description>Dragon Egg!</description>
 		<year>1991</year>
 		<publisher>Masiya</publisher>
@@ -3093,7 +3093,7 @@
 		</part>
 	</software>
 
-	<software name="ptennis">
+	<software name="ptennis" supported="partial">
 		<description>Power Tennis</description>
 		<year>1993</year>
 		<publisher>Hudson</publisher>

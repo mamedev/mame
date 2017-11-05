@@ -12,7 +12,7 @@
 
 TILE_GET_INFO_MEMBER(dragrace_state::get_tile_info)
 {
-	UINT8 code = m_playfield_ram[tile_index];
+	uint8_t code = m_playfield_ram[tile_index];
 	int num = 0;
 	int col = 0;
 
@@ -43,11 +43,11 @@ TILE_GET_INFO_MEMBER(dragrace_state::get_tile_info)
 
 void dragrace_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dragrace_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(dragrace_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
 }
 
 
-UINT32 dragrace_state::screen_update_dragrace(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t dragrace_state::screen_update_dragrace(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->mark_all_dirty();
 

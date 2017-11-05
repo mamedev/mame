@@ -46,8 +46,8 @@
 #define TO7_PERIOD_CASS_0 ( 1. / TO7_FREQ_CASS_0 )
 #define TO7_PERIOD_CASS_1 ( 1. / TO7_FREQ_CASS_1 )
 
-static UINT32 to7_k7_bitsize;
-static UINT8* to7_k7_bits;
+static uint32_t to7_k7_bitsize;
+static uint8_t* to7_k7_bits;
 
 #define MO5_BIT_LENGTH   0.000833
 #define MO5_HBIT_LENGTH (MO5_BIT_LENGTH / 2.)
@@ -95,23 +95,23 @@ static const struct CassetteModulation to7_k7_modulation =
 
 
 
-static casserr_t to7_k7_identify ( cassette_image *cass, struct CassetteOptions *opts )
+static cassette_image::error to7_k7_identify ( cassette_image *cass, struct CassetteOptions *opts )
 {
-	casserr_t e = cassette_modulation_identify( cass, &to7_k7_modulation, opts );
+	cassette_image::error e = cassette_modulation_identify( cass, &to7_k7_modulation, opts );
 	return e;
 }
 
 
 
-static casserr_t to7_k7_load( cassette_image *cass )
+static cassette_image::error to7_k7_load( cassette_image *cass )
 {
 #if ! K7_SPEED_HACK
-	static const INT8 square_wave[] = { -128, 127 };
+	static const int8_t square_wave[] = { -128, 127 };
 	double time = 0.;
 #endif
 	size_t size = cassette_image_size( cass ), pos = 0;
 	int i, sz, sz2, bitmax = 1024, invalid = 0;
-	UINT8 in, typ, block[264];
+	uint8_t in, typ, block[264];
 
 	LOG (( "to7_k7_load: start conversion, size=%li\n", (long)size ));
 	PRINT (( "to7_k7_load: open cassette, length: %li bytes\n", (long) size ));
@@ -123,7 +123,7 @@ static casserr_t to7_k7_load( cassette_image *cass )
 	}
 
 	to7_k7_bitsize = 0;
-	to7_k7_bits = (UINT8*)malloc(bitmax );
+	to7_k7_bits = (uint8_t*)malloc(bitmax );
 
 /* store one period */
 #if K7_SPEED_HACK
@@ -132,10 +132,10 @@ static casserr_t to7_k7_load( cassette_image *cass )
 #define K7_PUT( PERIOD ) \
 	do                              \
 	{                               \
-		casserr_t err;                      \
+		cassette_image::error err;                      \
 		err = cassette_put_samples( cass, 0, time, (PERIOD), 2, 1, \
 						square_wave, CASSETTE_WAVEFORM_8BIT ); \
-		if ( err )                      \
+		if ( err != cassette_image::error::SUCCESS )                      \
 			return err;                 \
 		time += (PERIOD);                   \
 	} while (0)
@@ -158,7 +158,7 @@ static casserr_t to7_k7_load( cassette_image *cass )
 		}                           \
 		if ( to7_k7_bitsize + 1 >= bitmax )         \
 		{                           \
-			UINT8* a = (UINT8*)malloc(bitmax * 2);      \
+			uint8_t* a = (uint8_t*)malloc(bitmax * 2);      \
 			memcpy ( a, to7_k7_bits, bitmax );      \
 			bitmax *= 2;                    \
 			to7_k7_bits = a;                \
@@ -170,7 +170,7 @@ static casserr_t to7_k7_load( cassette_image *cass )
 #define K7_PUT_BYTE( BYTE ) \
 	do                          \
 	{                           \
-		UINT8 x;                    \
+		uint8_t x;                    \
 		K7_PUT_BIT( 0 );                \
 		for ( x = 0; x < 8; x++ )           \
 			K7_PUT_BIT( ( (BYTE) >> x ) & 1 );  \
@@ -290,8 +290,8 @@ static casserr_t to7_k7_load( cassette_image *cass )
 		if ( typ == 0 )
 		{
 			char name[] = "01234567.ABC";
-			UINT8 t = block[15];
-			UINT8 u = block[16];
+			uint8_t t = block[15];
+			uint8_t u = block[16];
 			int p = (to7_k7_bitsize - sz2 - 4 - sz) * TO7_BIT_LENGTH;
 			memcpy( name, block+4, 8 );
 			memcpy( name+9, block+12, 3 );
@@ -331,7 +331,7 @@ static casserr_t to7_k7_load( cassette_image *cass )
 			}
 			if ( invalid < 10 && sz > 4 && in == 0x01 && pos + 4 <= size )
 			{
-				UINT8 in1,in2;
+				uint8_t in1,in2;
 				cassette_image_read( cass, &in1,   pos+1, 1 );
 				cassette_image_read( cass, &in2, pos+2, 1 );
 				if ( (in1 == 0x3c) && ((in2 == 0x00) || (in2 == 0x01) ) )
@@ -360,7 +360,7 @@ static casserr_t to7_k7_load( cassette_image *cass )
 	sz = to7_k7_bitsize * TO7_BIT_LENGTH;
 	PRINT (( "to7_k7_load: cassette length: %imn %is (%i samples)\n", sz / 60, sz % 60, to7_k7_bitsize ));
 
-	return CASSETTE_ERROR_SUCCESS;
+	return cassette_image::error::SUCCESS;
 }
 
 
@@ -374,18 +374,18 @@ static const struct CassetteFormat to7_k7 =
 
 
 
-static casserr_t to7_wav_identify ( cassette_image *cass,
+static cassette_image::error to7_wav_identify ( cassette_image *cass,
 					struct CassetteOptions *opts )
 {
-	casserr_t e = wavfile_format.identify( cass, opts );
+	cassette_image::error e = wavfile_format.identify( cass, opts );
 	return e;
 }
 
 
 
-static casserr_t to7_wav_load ( cassette_image *cass )
+static cassette_image::error to7_wav_load ( cassette_image *cass )
 {
-	casserr_t e = wavfile_format.load( cass );
+	cassette_image::error e = wavfile_format.load( cass );
 	struct CassetteInfo info;
 	double len;
 
@@ -395,7 +395,7 @@ static casserr_t to7_wav_load ( cassette_image *cass )
 		to7_k7_bits = nullptr;
 	}
 
-	if ( e != CASSETTE_ERROR_SUCCESS )
+	if ( e != cassette_image::error::SUCCESS )
 		return e;
 
 	cassette_get_info( cass, &info );
@@ -407,12 +407,12 @@ static casserr_t to7_wav_load ( cassette_image *cass )
 			info.sample_frequency, info.bits_per_sample,
 			(int) (len / TO7_BIT_LENGTH) ));
 
-	return CASSETTE_ERROR_SUCCESS;
+	return cassette_image::error::SUCCESS;
 }
 
 
 
-static casserr_t to7_wav_save ( cassette_image *cass, const struct CassetteInfo *info )
+static cassette_image::error to7_wav_save ( cassette_image *cass, const struct CassetteInfo *info )
 {
 	int len = info->sample_count / info->sample_frequency;
 	PRINT (( "to7_wav_save: saving cassette, length %imn %is, %i Hz, %i bps\n", len / 60, len % 60, info->sample_frequency, info->bits_per_sample ));
@@ -431,13 +431,13 @@ static const struct CassetteFormat to7_wav =
 
 
 
-static casserr_t mo5_k5_identify ( cassette_image *cass,
+static cassette_image::error mo5_k5_identify ( cassette_image *cass,
 					struct CassetteOptions *opts )
 {
 	opts -> bits_per_sample = 8;
 	opts -> channels = 1;
 	opts -> sample_frequency = 22100;//11050;
-	return CASSETTE_ERROR_SUCCESS;
+	return cassette_image::error::SUCCESS;
 }
 
 
@@ -462,11 +462,11 @@ static casserr_t mo5_k5_identify ( cassette_image *cass,
    kinds of blocks, when the motor is supposed to go off and back on.
 */
 
-static casserr_t mo5_k5_load( cassette_image *cass )
+static cassette_image::error mo5_k5_load( cassette_image *cass )
 {
 	size_t size = cassette_image_size( cass ), pos = 0;
 	int i, sz, sz2, hbit = 0;
-	UINT8 in, in2, in3, typ, block[264], sum;
+	uint8_t in, in2, in3, typ, block[264], sum;
 	int invalid = 0, hbitsize = 0, dcmoto = 0;
 
 	LOG (( "mo5_k5_load: start conversion, size=%li\n", (long)size ));
@@ -502,7 +502,7 @@ static casserr_t mo5_k5_load( cassette_image *cass )
 #define K5_PUT_BYTE( BYTE ) \
 	do                          \
 	{                           \
-		UINT8 b = BYTE;                 \
+		uint8_t b = BYTE;                 \
 		int x;                      \
 		for ( x = 0; x < 8; x++ )           \
 			K5_PUT_BIT( (b >> (7 - x)) & 1 );   \
@@ -596,7 +596,7 @@ static casserr_t mo5_k5_load( cassette_image *cass )
 		}
 		cassette_image_read( cass, block, pos, 4 );
 		typ = block[2];
-		sz2 = (UINT8) (block[3]-1);
+		sz2 = (uint8_t) (block[3]-1);
 		if ( block[0] != 0x3c || block[1] != 0x5a || ( typ != 0x00 && typ != 0x01 && typ !=  0xff ) || pos+sz2 > size )
 		{
 			pos -= sz;
@@ -635,8 +635,8 @@ static casserr_t mo5_k5_load( cassette_image *cass )
 		if ( typ == 0 )
 		{
 			char name[] = "01234567.ABC";
-			UINT8 t = block[15];
-			UINT8 u = block[16];
+			uint8_t t = block[15];
+			uint8_t u = block[16];
 			int p = (hbitsize - sz2 - 4 - sz) * MO5_HBIT_LENGTH;
 			memcpy( name, block+4, 8 );
 			memcpy( name+9, block+12, 3 );
@@ -724,7 +724,7 @@ static casserr_t mo5_k5_load( cassette_image *cass )
 	sz = hbitsize * MO5_HBIT_LENGTH;
 	PRINT (( "mo5_k5_load: cassette length: %imn %is (%i half-bits)\n", sz / 60, sz % 60, hbitsize ));
 
-	return CASSETTE_ERROR_SUCCESS;
+	return cassette_image::error::SUCCESS;
 }
 
 
@@ -737,21 +737,21 @@ static const struct CassetteFormat mo5_k5 =
 
 
 
-static casserr_t mo5_wav_identify ( cassette_image *cass,
+static cassette_image::error mo5_wav_identify ( cassette_image *cass,
 					struct CassetteOptions *opts )
 {
-	casserr_t e = wavfile_format.identify( cass, opts );
+	cassette_image::error e = wavfile_format.identify( cass, opts );
 	return e;
 }
 
 
 
-static casserr_t mo5_wav_load ( cassette_image *cass )
+static cassette_image::error mo5_wav_load ( cassette_image *cass )
 {
-	casserr_t e = wavfile_format.load( cass );
+	cassette_image::error e = wavfile_format.load( cass );
 	struct CassetteInfo info;
 	int len;
-	if ( e == CASSETTE_ERROR_SUCCESS )
+	if ( e == cassette_image::error::SUCCESS )
 	{
 		cassette_get_info( cass, &info );
 		len = info.sample_count / info.sample_frequency;
@@ -762,7 +762,7 @@ static casserr_t mo5_wav_load ( cassette_image *cass )
 
 
 
-static casserr_t mo5_wav_save ( cassette_image *cass, const struct CassetteInfo *info )
+static cassette_image::error mo5_wav_save ( cassette_image *cass, const struct CassetteInfo *info )
 {
 	int len = info->sample_count / info->sample_frequency;
 	PRINT (( "mo5_wav_save: saving cassette, length %imn %is, %i Hz, %i bps\n", len / 60, len % 60, info->sample_frequency, info->bits_per_sample ));

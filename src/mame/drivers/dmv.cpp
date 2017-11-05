@@ -10,15 +10,15 @@
 
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
+
 #include "cpu/mcs48/mcs48.h"
-#include "machine/upd765.h"
+#include "cpu/z80/z80.h"
 #include "machine/am9517a.h"
-#include "machine/pit8253.h"
 #include "machine/dmv_keyb.h"
-#include "sound/speaker.h"
+#include "machine/pit8253.h"
+#include "machine/upd765.h"
+#include "sound/spkrdev.h"
 #include "video/upd7220.h"
-#include "formats/dmv_dsk.h"
 
 // expansion slots
 #include "bus/dmv/dmvbus.h"
@@ -31,7 +31,11 @@
 #include "bus/dmv/k806.h"
 #include "bus/dmv/ram.h"
 
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
+#include "formats/dmv_dsk.h"
 
 #include "dmv.lh"
 
@@ -74,7 +78,7 @@ public:
 	required_device<floppy_connector> m_floppy1;
 	required_device<dmv_keyboard_device> m_keyboard;
 	required_device<speaker_sound_device> m_speaker;
-	required_shared_ptr<UINT16> m_video_ram;
+	required_shared_ptr<uint16_t> m_video_ram;
 	required_device<palette_device> m_palette;
 	required_memory_region m_ram;
 	required_memory_region m_bootrom;
@@ -141,16 +145,16 @@ public:
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
-	UINT8 program_read(address_space &space, int cas, offs_t offset);
-	void program_write(address_space &space, int cas, offs_t offset, UINT8 data);
+	uint8_t program_read(address_space &space, int cas, offs_t offset);
+	void program_write(address_space &space, int cas, offs_t offset, uint8_t data);
 
-	void ifsel_r(address_space &space, int ifsel, offs_t offset, UINT8 &data);
-	void ifsel_w(address_space &space, int ifsel, offs_t offset, UINT8 data);
-	DECLARE_READ8_MEMBER(ifsel0_r)  { UINT8 data = 0xff;   ifsel_r(space, 0, offset, data);   return data; }
-	DECLARE_READ8_MEMBER(ifsel1_r)  { UINT8 data = 0xff;   ifsel_r(space, 1, offset, data);   return data; }
-	DECLARE_READ8_MEMBER(ifsel2_r)  { UINT8 data = 0xff;   ifsel_r(space, 2, offset, data);   return data; }
-	DECLARE_READ8_MEMBER(ifsel3_r)  { UINT8 data = 0xff;   ifsel_r(space, 3, offset, data);   return data; }
-	DECLARE_READ8_MEMBER(ifsel4_r)  { UINT8 data = 0xff;   ifsel_r(space, 4, offset, data);   return data; }
+	void ifsel_r(address_space &space, int ifsel, offs_t offset, uint8_t &data);
+	void ifsel_w(address_space &space, int ifsel, offs_t offset, uint8_t data);
+	DECLARE_READ8_MEMBER(ifsel0_r)  { uint8_t data = 0xff;   ifsel_r(space, 0, offset, data);   return data; }
+	DECLARE_READ8_MEMBER(ifsel1_r)  { uint8_t data = 0xff;   ifsel_r(space, 1, offset, data);   return data; }
+	DECLARE_READ8_MEMBER(ifsel2_r)  { uint8_t data = 0xff;   ifsel_r(space, 2, offset, data);   return data; }
+	DECLARE_READ8_MEMBER(ifsel3_r)  { uint8_t data = 0xff;   ifsel_r(space, 3, offset, data);   return data; }
+	DECLARE_READ8_MEMBER(ifsel4_r)  { uint8_t data = 0xff;   ifsel_r(space, 4, offset, data);   return data; }
 	DECLARE_WRITE8_MEMBER(ifsel0_w) { ifsel_w(space, 0, offset, data); }
 	DECLARE_WRITE8_MEMBER(ifsel1_w) { ifsel_w(space, 1, offset, data); }
 	DECLARE_WRITE8_MEMBER(ifsel2_w) { ifsel_w(space, 2, offset, data); }
@@ -255,7 +259,7 @@ READ8_MEMBER(dmv_state::sys_status_r)
 	    ---- --x- 16-bit CPU available (active low)
 	    ---- ---x FDD motor (active low)
 	*/
-	UINT8 data = 0x00;
+	uint8_t data = 0x00;
 
 	if (m_floppy_motor)
 		data |= 0x01;
@@ -287,9 +291,9 @@ UPD7220_DISPLAY_PIXELS_MEMBER( dmv_state::hgdc_display_pixels )
 	if (m_color_mode)
 	{
 		// 96KB videoram (32KB green + 32KB red + 32KB blue)
-		UINT16 green = m_video_ram[(0x00000 + (address & 0x7fff)) >> 1];
-		UINT16 red   = m_video_ram[(0x08000 + (address & 0x7fff)) >> 1];
-		UINT16 blue  = m_video_ram[(0x10000 + (address & 0x7fff)) >> 1];
+		uint16_t green = m_video_ram[(0x00000 + (address & 0x7fff)) >> 1];
+		uint16_t red   = m_video_ram[(0x08000 + (address & 0x7fff)) >> 1];
+		uint16_t blue  = m_video_ram[(0x10000 + (address & 0x7fff)) >> 1];
 
 		for(int xi=0; xi<16; xi++)
 		{
@@ -306,12 +310,12 @@ UPD7220_DISPLAY_PIXELS_MEMBER( dmv_state::hgdc_display_pixels )
 		const rgb_t *palette = m_palette->palette()->entry_list_raw();
 
 		// 32KB videoram
-		UINT16 gfx = m_video_ram[(address & 0xffff) >> 1];
+		uint16_t gfx = m_video_ram[(address & 0xffff) >> 1];
 
 		for(int xi=0;xi<16;xi++)
 		{
 			if (bitmap.cliprect().contains(x + xi, y))
-				bitmap.pix32(y, x + xi) = ((gfx >> xi) & 1) ? palette[1] : palette[0];
+				bitmap.pix32(y, x + xi) = ((gfx >> xi) & 1) ? palette[2] : palette[0];
 		}
 	}
 }
@@ -320,8 +324,8 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( dmv_state::hgdc_draw_text )
 {
 	for( int x = 0; x < pitch; x++ )
 	{
-		UINT8 tile = m_video_ram[(((addr+x)*2) & 0x1ffff) >> 1] & 0xff;
-		UINT8 attr = m_video_ram[(((addr+x)*2) & 0x1ffff) >> 1] >> 8;
+		uint8_t tile = m_video_ram[(((addr+x)*2) & 0x1ffff) >> 1] & 0xff;
+		uint8_t attr = m_video_ram[(((addr+x)*2) & 0x1ffff) >> 1] >> 8;
 
 		rgb_t bg, fg;
 		if (m_color_mode)
@@ -332,13 +336,13 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( dmv_state::hgdc_draw_text )
 		else
 		{
 			const rgb_t *palette = m_palette->palette()->entry_list_raw();
-			bg = palette[(attr & 1) ? 1 : 0];
-			fg = palette[(attr & 1) ? 0 : 1];
+			bg = palette[(attr & 1) ? 2 : 0];
+			fg = palette[(attr & 1) ? 0 : 2];
 		}
 
 		for( int yi = 0; yi < lr; yi++)
 		{
-			UINT8 tile_data = m_chargen->base()[(tile*16+yi) & 0x7ff];
+			uint8_t tile_data = m_chargen->base()[(tile*16+yi) & 0x7ff];
 
 			if(cursor_on && cursor_addr == addr+x) //TODO
 				tile_data^=0xff;
@@ -368,14 +372,14 @@ static SLOT_INTERFACE_START( dmv_floppies )
 SLOT_INTERFACE_END
 
 
-void dmv_state::ifsel_r(address_space &space, int ifsel, offs_t offset, UINT8 &data)
+void dmv_state::ifsel_r(address_space &space, int ifsel, offs_t offset, uint8_t &data)
 {
 	dmvcart_slot_device *slots[] = { m_slot2, m_slot2a, m_slot3, m_slot4, m_slot5, m_slot6, m_slot7, m_slot7a };
 	for(auto & slot : slots)
 		slot->io_read(space, ifsel, offset, data);
 }
 
-void dmv_state::ifsel_w(address_space &space, int ifsel, offs_t offset, UINT8 data)
+void dmv_state::ifsel_w(address_space &space, int ifsel, offs_t offset, uint8_t data)
 {
 	dmvcart_slot_device *slots[] = { m_slot2, m_slot2a, m_slot3, m_slot4, m_slot5, m_slot6, m_slot7, m_slot7a };
 	for(auto & slot : slots)
@@ -461,7 +465,7 @@ void dmv_state::update_irqs(int slot, int state)
 	}
 }
 
-void dmv_state::program_write(address_space &space, int cas, offs_t offset, UINT8 data)
+void dmv_state::program_write(address_space &space, int cas, offs_t offset, uint8_t data)
 {
 	bool tramd = false;
 	dmvcart_slot_device *slots[] = { m_slot2, m_slot2a, m_slot3, m_slot4, m_slot5, m_slot6, m_slot7, m_slot7a };
@@ -477,9 +481,9 @@ void dmv_state::program_write(address_space &space, int cas, offs_t offset, UINT
 	}
 }
 
-UINT8 dmv_state::program_read(address_space &space, int cas, offs_t offset)
+uint8_t dmv_state::program_read(address_space &space, int cas, offs_t offset)
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 	if (m_ramoutdis && offset < 0x2000)
 	{
 		data = m_bootrom->base()[offset];
@@ -550,12 +554,7 @@ WRITE8_MEMBER(dmv_state::kb_mcu_port2_w)
 	m_slot7->keyint_w(BIT(data, 4));
 }
 
-static ADDRESS_MAP_START( dmv_kb_ctrl_io, AS_IO, 8, dmv_state )
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READWRITE(kb_mcu_port1_r, kb_mcu_port1_w) // bit 0 data from kb, bit 1 data to kb
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(kb_mcu_port2_w)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( upd7220_map, AS_0, 16, dmv_state )
+static ADDRESS_MAP_START( upd7220_map, 0, 16, dmv_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x1ffff)
 	AM_RANGE(0x00000, 0x1ffff) AM_RAM  AM_SHARE("video_ram")
 ADDRESS_MAP_END
@@ -713,34 +712,35 @@ static SLOT_INTERFACE_START(dmv_slot7a)
 	SLOT_INTERFACE("k235", DMV_K235)            // K235 Internal 8088 module with interrupt controller
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( dmv, dmv_state )
+static MACHINE_CONFIG_START( dmv )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_24MHz / 6)
 	MCFG_CPU_PROGRAM_MAP(dmv_mem)
 	MCFG_CPU_IO_MAP(dmv_io)
 
 	MCFG_CPU_ADD("kb_ctrl_mcu", I8741, XTAL_6MHz)
-	MCFG_CPU_IO_MAP(dmv_kb_ctrl_io)
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(dmv_state, kb_mcu_port1_r)) // bit 0 data from kb
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(dmv_state, kb_mcu_port1_w)) // bit 1 data to kb
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(dmv_state, kb_mcu_port2_w))
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
 	MCFG_DMV_KEYBOARD_ADD("keyboard")
 
 	/* video hardware */
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green)
+	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_UPDATE_DEVICE("upd7220", upd7220_device, screen_update)
 	MCFG_SCREEN_SIZE(640, 400)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 400-1)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dmv)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	MCFG_PALETTE_ADD_3BIT_RGB("palette")
 	MCFG_DEFAULT_LAYOUT(layout_dmv)
 
 	// devices
 	MCFG_DEVICE_ADD("upd7220", UPD7220, XTAL_5MHz/2) // unk clock
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, upd7220_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, upd7220_map)
 	MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(dmv_state, hgdc_display_pixels)
 	MCFG_UPD7220_DRAW_TEXT_CALLBACK_OWNER(dmv_state, hgdc_draw_text)
 
@@ -749,10 +749,10 @@ static MACHINE_CONFIG_START( dmv, dmv_state )
 	MCFG_I8237_OUT_EOP_CB(WRITELINE(dmv_state, dmac_eop))
 	MCFG_I8237_IN_MEMR_CB(READ8(dmv_state, program_r))
 	MCFG_I8237_OUT_MEMW_CB(WRITE8(dmv_state, program_w))
-	MCFG_I8237_IN_IOR_0_CB(LOGGER("DMA CH1", 0))
-	MCFG_I8237_OUT_IOW_0_CB(LOGGER("DMA CH1", 0))
-	MCFG_I8237_IN_IOR_1_CB(LOGGER("DMA CH2", 0))
-	MCFG_I8237_OUT_IOW_1_CB(LOGGER("DMA CH2", 0))
+	MCFG_I8237_IN_IOR_0_CB(LOGGER("Read DMA CH1"))
+	MCFG_I8237_OUT_IOW_0_CB(LOGGER("Write DMA CH1"))
+	MCFG_I8237_IN_IOR_1_CB(LOGGER("Read DMA CH2"))
+	MCFG_I8237_OUT_IOW_1_CB(LOGGER("Write DMA CH2"))
 	MCFG_I8237_IN_IOR_2_CB(DEVREAD8("upd7220", upd7220_device, dack_r))
 	MCFG_I8237_OUT_IOW_2_CB(DEVWRITE8("upd7220", upd7220_device, dack_w))
 	MCFG_I8237_IN_IOR_3_CB(DEVREAD8("i8272", i8272a_device, mdma_r))
@@ -850,5 +850,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME             FLAGS */
-COMP( 1984, dmv,    0,       0,         dmv,    dmv, driver_device,  0,      "NCR",   "Decision Mate V",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME    PARENT  COMPAT   MACHINE  INPUT  STATE      INIT   COMPANY  FULLNAME             FLAGS
+COMP( 1984, dmv,    0,      0,       dmv,     dmv,   dmv_state, 0,     "NCR",   "Decision Mate V",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

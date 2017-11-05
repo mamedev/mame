@@ -42,7 +42,11 @@
 
 ****************************************************************************/
 
+#include "emu.h"
 #include "includes/zx.h"
+
+#include "speaker.h"
+
 
 /* Memory Maps */
 
@@ -56,7 +60,7 @@ static ADDRESS_MAP_START( zx81_map, AS_PROGRAM, 8, zx_state )
 	AM_RANGE(0x4000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ula_map, AS_DECRYPTED_OPCODES, 8, zx_state )
+static ADDRESS_MAP_START( ula_map, AS_OPCODES, 8, zx_state )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(ula_low_r)
 	AM_RANGE(0x8000, 0xffff) AM_READ(ula_high_r)
 ADDRESS_MAP_END
@@ -140,7 +144,7 @@ these functions in Input (This System) menu, hence we live some empty space in t
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("ROW7")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SPACE  \xC2\xA3  BREAK") PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ') PORT_CHAR('\xA3')
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SPACE  \xC2\xA3  BREAK") PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ') PORT_CHAR(0xA3)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(".  ,") PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR(',')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("M  >") PORT_CODE(KEYCODE_M) PORT_CHAR('M') PORT_CHAR('>')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("N  <  NEXT") PORT_CODE(KEYCODE_N) PORT_CHAR('N') PORT_CHAR('<')
@@ -212,7 +216,7 @@ static INPUT_PORTS_START( pc8300 )
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("ROW7")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SPACE  \xC2\xA3") PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ') PORT_CHAR('\xA3')
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SPACE  \xC2\xA3") PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ') PORT_CHAR(0xA3)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(".  ,") PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR(',')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("M  >  PAUSE") PORT_CODE(KEYCODE_M) PORT_CHAR('M') PORT_CHAR('>')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("N  <  NEXT") PORT_CODE(KEYCODE_N) PORT_CHAR('N') PORT_CHAR('<')
@@ -306,17 +310,17 @@ INPUT_PORTS_END
 
 PALETTE_INIT_MEMBER(zx_state, zx)
 {
-	palette.set_pen_color(0,rgb_t::white); /* white */
-	palette.set_pen_color(1,rgb_t::black); /* black */
+	palette.set_pen_color(0, rgb_t::white());
+	palette.set_pen_color(1, rgb_t::black());
 }
 
 PALETTE_INIT_MEMBER(zx_state,ts1000)
 {
-	palette.set_pen_color(0,rgb_t(64, 244, 244)); /* cyan */
-	palette.set_pen_color(1,rgb_t::black); /* black */
+	palette.set_pen_color(0, rgb_t(64, 244, 244)); /* cyan */
+	palette.set_pen_color(1, rgb_t::black());
 }
 
-static MACHINE_CONFIG_START( zx80, zx_state )
+static MACHINE_CONFIG_START( zx80 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_6_5MHz/2)
 	MCFG_CPU_PROGRAM_MAP(zx80_map)
@@ -339,11 +343,15 @@ static MACHINE_CONFIG_START( zx80, zx_state )
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_CASSETTE_FORMATS(zx80_o_format)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED)
+	MCFG_CASSETTE_INTERFACE("zx80_cass")
+
+	/* software lists */
+	MCFG_SOFTWARE_LIST_ADD("cass_list", "zx80_cass")
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("1K")
-	MCFG_RAM_EXTRA_OPTIONS("16K,32K,48K")
+	MCFG_RAM_EXTRA_OPTIONS("1K,2K,3K,16K")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( zx81, zx80 )
@@ -352,7 +360,16 @@ static MACHINE_CONFIG_DERIVED( zx81, zx80 )
 	MCFG_CPU_IO_MAP(zx81_io_map)
 
 	MCFG_CASSETTE_MODIFY( "cassette" )
-	MCFG_CASSETTE_FORMATS(zx81_p_format)
+	MCFG_CASSETTE_FORMATS(zx81_cassette_formats)
+	MCFG_CASSETTE_INTERFACE("zx81_cass")
+
+	/* software lists */
+	MCFG_SOFTWARE_LIST_MODIFY("cass_list", "zx81_cass")
+
+	/* internal ram */
+	MCFG_RAM_MODIFY(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("16K")
+	MCFG_RAM_EXTRA_OPTIONS("1K,32K,48K")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( zx81_spk, zx81 )
@@ -368,6 +385,10 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( ts1000, zx81 )
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(zx_state, ts1000)
+
+	/* internal ram */
+	MCFG_RAM_MODIFY(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("2K")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ts1500, ts1000 )
@@ -473,13 +494,14 @@ ROM_END
 
 /* Game Drivers */
 
-COMP( 1980, zx80,       0,      0,      zx80,       zx80,    zx_state,    zx,     "Sinclair Research Ltd",    "ZX-80",               MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1981, zx81,       0,      0,      zx81,       zx81,    zx_state,    zx,     "Sinclair Research Ltd",    "ZX-81",               MACHINE_NO_SOUND )
-COMP( 1982, ts1000,     zx81,   0,      ts1000,     zx81,    zx_state,    zx,     "Timex Sinclair",           "Timex Sinclair 1000", MACHINE_NO_SOUND )
-COMP( 1983, ts1500,     zx81,   0,      ts1500,     zx81,    zx_state,    zx,     "Timex Sinclair",           "Timex Sinclair 1500", MACHINE_NO_SOUND )
-COMP( 1983, tk85,       zx81,   0,      ts1000,     zx81,    zx_state,    zx,     "Microdigital",             "TK85",                MACHINE_NO_SOUND )
-COMP( 1983, ringo470,   zx81,   0,      ts1000,     zx81,    zx_state,    zx,     "Ritas do Brasil Ltda",     "Ringo 470",           MACHINE_NO_SOUND )
+//    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT    CLASS        INIT    COMPANY                     FULLNAME               FLAGS
+COMP( 1980, zx80,       0,      0,      zx80,       zx80,    zx_state,    zx,     "Sinclair Research Ltd",    "ZX-80",               MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1981, zx81,       0,      0,      zx81,       zx81,    zx_state,    zx,     "Sinclair Research Ltd",    "ZX-81",               MACHINE_NO_SOUND_HW )
+COMP( 1982, ts1000,     zx81,   0,      ts1000,     zx81,    zx_state,    zx,     "Timex Sinclair",           "Timex Sinclair 1000", MACHINE_NO_SOUND_HW )
+COMP( 1983, ts1500,     zx81,   0,      ts1500,     zx81,    zx_state,    zx,     "Timex Sinclair",           "Timex Sinclair 1500", MACHINE_NO_SOUND_HW )
+COMP( 1983, tk85,       zx81,   0,      ts1000,     zx81,    zx_state,    zx,     "Microdigital",             "TK85",                MACHINE_NO_SOUND_HW )
+COMP( 1983, ringo470,   zx81,   0,      ts1000,     zx81,    zx_state,    zx,     "Ritas do Brasil Ltda",     "Ringo 470",           MACHINE_NO_SOUND_HW )
 COMP( 1984, pc8300,     zx81,   0,      pc8300,     pc8300,  zx_state,    zx,     "Your Computer",            "PC8300",              MACHINE_NOT_WORKING )
 COMP( 1983, pow3000,    zx81,   0,      pow3000,    pow3000, zx_state,    zx,     "Creon Enterprises",        "Power 3000",          MACHINE_NOT_WORKING )
 COMP( 1982, lambda,     zx81,   0,      pow3000,    pow3000, zx_state,    zx,     "Lambda Electronics Ltd",   "Lambda 8300",         MACHINE_NOT_WORKING )
-COMP( 1997, zx97,       zx81,   0,      zx81,       zx81,    zx_state,    zx,     "Wilf Rigter",              "ZX97", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_UNOFFICIAL )
+COMP( 1997, zx97,       zx81,   0,      zx81,       zx81,    zx_state,    zx,     "Wilf Rigter",              "ZX97",                MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_UNOFFICIAL )

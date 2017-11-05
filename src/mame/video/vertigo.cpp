@@ -56,7 +56,7 @@
  *************************************/
 
 #define V_ADDPOINT(h,v,c,i) \
-	m_vector->add_point (((h) & 0x7ff) << 14, (0x6ff - ((v) & 0x7ff)) << 14, VECTOR_COLOR444(c), (i))
+	m_vector->add_point (((h) & 0x7ff) << 14, (0x6ff - ((v) & 0x7ff)) << 14, vector_device::color444(c), (i))
 
 #define ADD(r,s,c)  (((r)  + (s) + (c)) & 0xffff)
 #define SUBR(r,s,c) ((~(r) + (s) + (c)) & 0xffff)
@@ -156,10 +156,10 @@ void vertigo_state::vertigo_vproc_init()
 void vertigo_state::vertigo_vproc_reset()
 {
 	int i;
-	UINT64 *mcode;
+	uint64_t *mcode;
 
-	m_vectorrom = (UINT16 *)memregion("user1")->base();
-	mcode = (UINT64 *)memregion("proms")->base();
+	m_vectorrom = (uint16_t *)memregion("user1")->base();
+	mcode = (uint64_t *)memregion("proms")->base();
 
 	/* Decode microcode */
 	for (i = 0; i < MC_LENGTH; i++)

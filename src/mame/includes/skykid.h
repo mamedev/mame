@@ -16,10 +16,10 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette") { }
 
-	UINT8 m_inputport_selected;
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_textram;
-	required_shared_ptr<UINT8> m_spriteram;
+	uint8_t m_inputport_selected;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_textram;
+	required_shared_ptr<uint8_t> m_spriteram;
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_mcu;
 	required_device<namco_cus30_device> m_cus30;
@@ -27,11 +27,11 @@ public:
 	required_device<palette_device> m_palette;
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_tx_tilemap;
-	UINT8 m_priority;
-	UINT16 m_scroll_x;
-	UINT16 m_scroll_y;
-	UINT8 m_main_irq_mask;
-	UINT8 m_mcu_irq_mask;
+	uint8_t m_priority;
+	uint16_t m_scroll_x;
+	uint16_t m_scroll_y;
+	uint8_t m_main_irq_mask;
+	uint8_t m_mcu_irq_mask;
 	DECLARE_WRITE8_MEMBER(inputport_select_w);
 	DECLARE_READ8_MEMBER(inputport_r);
 	DECLARE_WRITE8_MEMBER(skykid_led_w);
@@ -54,7 +54,7 @@ public:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(skykid);
-	UINT32 screen_update_skykid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_skykid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(main_vblank_irq);
 	INTERRUPT_GEN_MEMBER(mcu_vblank_irq);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);

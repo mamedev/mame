@@ -9,13 +9,17 @@ driver by Mirko Buffoni
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/solomon.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
-#include "includes/solomon.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 WRITE8_MEMBER(solomon_state::solomon_sh_command_w)
 {
-	soundlatch_byte_w(space, offset, data);
+	m_soundlatch->write(space, offset, data);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -70,7 +74,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, solomon_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
-	AM_RANGE(0x8000, 0x8000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x8000, 0x8000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0xffff, 0xffff) AM_WRITENOP    /* watchdog? */
 ADDRESS_MAP_END
 
@@ -202,7 +206,7 @@ INTERRUPT_GEN_MEMBER(solomon_state::vblank_irq)
 
 
 
-static MACHINE_CONFIG_START( solomon, solomon_state )
+static MACHINE_CONFIG_START( solomon )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)   /* 4.0 MHz (?????) */
@@ -230,6 +234,8 @@ static MACHINE_CONFIG_START( solomon, solomon_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ay1", AY8910, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.12)
@@ -301,5 +307,5 @@ ROM_END
 
 
 
-GAME( 1986, solomon,  0,       solomon, solomon, driver_device, 0, ROT0, "Tecmo", "Solomon's Key (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, solomonj, solomon, solomon, solomon, driver_device, 0, ROT0, "Tecmo", "Solomon no Kagi (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, solomon,  0,       solomon, solomon, solomon_state, 0, ROT0, "Tecmo", "Solomon's Key (US)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1986, solomonj, solomon, solomon, solomon, solomon_state, 0, ROT0, "Tecmo", "Solomon no Kagi (Japan)", MACHINE_SUPPORTS_SAVE )

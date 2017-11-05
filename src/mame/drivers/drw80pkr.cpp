@@ -28,9 +28,11 @@
 
 ***********************************************************************************/
 #include "emu.h"
+#include "cpu/mcs48/mcs48.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
-#include "cpu/mcs48/mcs48.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class drw80pkr_state : public driver_device
@@ -42,29 +44,25 @@ public:
 		m_gfxdecode(*this, "gfxdecode") { }
 
 	tilemap_t *m_bg_tilemap;
-	UINT8 m_t0;
-	UINT8 m_t1;
-	UINT8 m_p0;
-	UINT8 m_p1;
-	UINT8 m_p2;
-	UINT8 m_prog;
-	UINT8 m_bus;
-	UINT8 m_attract_mode;
-	UINT8 m_active_bank;
-	UINT8 m_pkr_io_ram[0x100];
-	UINT16 m_video_ram[0x0400];
-	UINT8 m_color_ram[0x0400];
-	DECLARE_WRITE8_MEMBER(t0_w);
-	DECLARE_WRITE8_MEMBER(t1_w);
-	DECLARE_WRITE8_MEMBER(p0_w);
+	uint8_t m_t0;
+	uint8_t m_t1;
+	uint8_t m_p0;
+	uint8_t m_p1;
+	uint8_t m_p2;
+	uint8_t m_prog;
+	uint8_t m_bus;
+	uint8_t m_attract_mode;
+	uint8_t m_active_bank;
+	uint8_t m_pkr_io_ram[0x100];
+	uint16_t m_video_ram[0x0400];
+	uint8_t m_color_ram[0x0400];
 	DECLARE_WRITE8_MEMBER(p1_w);
 	DECLARE_WRITE8_MEMBER(p2_w);
-	DECLARE_WRITE8_MEMBER(prog_w);
+	DECLARE_WRITE_LINE_MEMBER(prog_w);
 	DECLARE_WRITE8_MEMBER(bus_w);
 	DECLARE_WRITE8_MEMBER(drw80pkr_io_w);
-	DECLARE_READ8_MEMBER(t0_r);
-	DECLARE_READ8_MEMBER(t1_r);
-	DECLARE_READ8_MEMBER(p0_r);
+	DECLARE_READ_LINE_MEMBER(t0_r);
+	DECLARE_READ_LINE_MEMBER(t1_r);
 	DECLARE_READ8_MEMBER(p1_r);
 	DECLARE_READ8_MEMBER(p2_r);
 	DECLARE_READ8_MEMBER(bus_r);
@@ -74,7 +72,7 @@ public:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(drw80pkr);
-	UINT32 screen_update_drw80pkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_drw80pkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 };
@@ -93,21 +91,6 @@ void drw80pkr_state::machine_start()
 * Write Handlers *
 ******************/
 
-WRITE8_MEMBER(drw80pkr_state::t0_w)
-{
-	m_t0 = data;
-}
-
-WRITE8_MEMBER(drw80pkr_state::t1_w)
-{
-	m_t1 = data;
-}
-
-WRITE8_MEMBER(drw80pkr_state::p0_w)
-{
-	m_p0 = data;
-}
-
 WRITE8_MEMBER(drw80pkr_state::p1_w)
 {
 	m_p1 = data;
@@ -118,9 +101,9 @@ WRITE8_MEMBER(drw80pkr_state::p2_w)
 	m_p2 = data;
 }
 
-WRITE8_MEMBER(drw80pkr_state::prog_w)
+WRITE_LINE_MEMBER(drw80pkr_state::prog_w)
 {
-	m_prog = data;
+	m_prog = state;
 
 	// Bankswitch Program Memory
 	if (m_prog == 0x01)
@@ -138,7 +121,7 @@ WRITE8_MEMBER(drw80pkr_state::bus_w)
 
 WRITE8_MEMBER(drw80pkr_state::drw80pkr_io_w)
 {
-	UINT16 n_offs;
+	uint16_t n_offs;
 
 	if (m_p2 == 0x3f || m_p2 == 0x7f)
 	{
@@ -214,19 +197,14 @@ WRITE8_MEMBER(drw80pkr_state::drw80pkr_io_w)
 * Read Handlers *
 ****************/
 
-READ8_MEMBER(drw80pkr_state::t0_r)
+READ_LINE_MEMBER(drw80pkr_state::t0_r)
 {
 	return m_t0;
 }
 
-READ8_MEMBER(drw80pkr_state::t1_r)
+READ_LINE_MEMBER(drw80pkr_state::t1_r)
 {
 	return m_t1;
-}
-
-READ8_MEMBER(drw80pkr_state::p0_r)
-{
-	return m_p0;
 }
 
 READ8_MEMBER(drw80pkr_state::p1_r)
@@ -246,8 +224,8 @@ READ8_MEMBER(drw80pkr_state::bus_r)
 
 READ8_MEMBER(drw80pkr_state::drw80pkr_io_r)
 {
-	UINT8 ret;
-	UINT16 kbdin;
+	uint8_t ret;
+	uint16_t kbdin;
 
 	ret = 0x00;
 
@@ -342,10 +320,10 @@ TILE_GET_INFO_MEMBER(drw80pkr_state::get_bg_tile_info)
 
 void drw80pkr_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(drw80pkr_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 24, 27);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(drw80pkr_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 24, 27);
 }
 
-UINT32 drw80pkr_state::screen_update_drw80pkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t drw80pkr_state::screen_update_drw80pkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
@@ -354,7 +332,7 @@ UINT32 drw80pkr_state::screen_update_drw80pkr(screen_device &screen, bitmap_ind1
 
 PALETTE_INIT_MEMBER(drw80pkr_state, drw80pkr)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int j;
 
 	for (j = 0; j < palette.entries(); j++)
@@ -421,18 +399,11 @@ DRIVER_INIT_MEMBER(drw80pkr_state,drw80pkr)
 *************************/
 
 static ADDRESS_MAP_START( drw80pkr_map, AS_PROGRAM, 8, drw80pkr_state )
-	AM_RANGE(0x0000, 0x1fff) AM_ROMBANK("bank1")
+	AM_RANGE(0x0000, 0x0fff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( drw80pkr_io_map, AS_IO, 8, drw80pkr_state )
 	AM_RANGE(0x00, 0xff) AM_READWRITE(drw80pkr_io_r, drw80pkr_io_w)
-	AM_RANGE(MCS48_PORT_T0,   MCS48_PORT_T0) AM_READWRITE(t0_r, t0_w)
-	AM_RANGE(MCS48_PORT_T1,   MCS48_PORT_T1) AM_READWRITE(t1_r, t1_w)
-	AM_RANGE(MCS48_PORT_P0,   MCS48_PORT_P0) AM_READWRITE(p0_r, p0_w)
-	AM_RANGE(MCS48_PORT_P1,   MCS48_PORT_P1) AM_READWRITE(p1_r, p1_w)
-	AM_RANGE(MCS48_PORT_P2,   MCS48_PORT_P2) AM_READWRITE(p2_r, p2_w)
-	AM_RANGE(MCS48_PORT_PROG, MCS48_PORT_PROG) AM_RAM_WRITE(prog_w)
-	AM_RANGE(MCS48_PORT_BUS,  MCS48_PORT_BUS) AM_READWRITE(bus_r, bus_w)
 ADDRESS_MAP_END
 
 /*************************
@@ -467,11 +438,20 @@ INPUT_PORTS_END
 *     Machine Driver     *
 *************************/
 
-static MACHINE_CONFIG_START( drw80pkr, drw80pkr_state )
+static MACHINE_CONFIG_START( drw80pkr )
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", I8039, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(drw80pkr_map)
 	MCFG_CPU_IO_MAP(drw80pkr_io_map)
+	MCFG_MCS48_PORT_T0_IN_CB(READLINE(drw80pkr_state, t0_r))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(drw80pkr_state, t1_r))
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(drw80pkr_state, p1_r))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(drw80pkr_state, p1_w))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(drw80pkr_state, p2_r))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(drw80pkr_state, p2_w))
+	MCFG_MCS48_PORT_PROG_OUT_CB(WRITELINE(drw80pkr_state, prog_w))
+	MCFG_MCS48_PORT_BUS_IN_CB(READ8(drw80pkr_state, bus_r))
+	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(drw80pkr_state, bus_w))
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", drw80pkr_state,  irq0_line_hold)
 
 
@@ -532,6 +512,6 @@ ROM_END
 *      Game Drivers      *
 *************************/
 
-/*    YEAR  NAME      PARENT  MACHINE   INPUT     INIT      ROT    COMPANY                                  FULLNAME                FLAGS   */
+//    YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT      ROT    COMPANY                                FULLNAME                FLAGS
 GAME( 1982, drw80pkr, 0,      drw80pkr, drw80pkr, drw80pkr_state, drw80pkr, ROT0,  "IGT - International Game Technology", "Draw 80 Poker",        MACHINE_NOT_WORKING )
 GAME( 1983, drw80pk2, 0,      drw80pkr, drw80pkr, drw80pkr_state, drw80pkr, ROT0,  "IGT - International Game Technology", "Draw 80 Poker - Minn", MACHINE_NOT_WORKING )

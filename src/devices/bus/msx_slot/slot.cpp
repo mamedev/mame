@@ -20,14 +20,14 @@ msx_internal_slot_interface::msx_internal_slot_interface()
 {
 }
 
-void msx_internal_slot_interface::set_start_address(device_t &device, UINT32 start_address)
+void msx_internal_slot_interface::set_start_address(device_t &device, uint32_t start_address)
 {
 	msx_internal_slot_interface &dev = dynamic_cast<msx_internal_slot_interface &>(device);
 	dev.m_start_address = start_address;
 	dev.m_end_address = dev.m_start_address + dev.m_size;
 }
 
-void msx_internal_slot_interface::set_size(device_t &device, UINT32 size)
+void msx_internal_slot_interface::set_size(device_t &device, uint32_t size)
 {
 	msx_internal_slot_interface &dev = dynamic_cast<msx_internal_slot_interface &>(device);
 

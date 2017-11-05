@@ -29,9 +29,15 @@
 
 */
 
+#include "emu.h"
 #include "includes/px8.h"
+
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
 #include "px8.lh"
+
 
 /***************************************************************************
     CONSTANTS
@@ -79,8 +85,8 @@ enum
 void px8_state::bankswitch()
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
-	UINT8 *ram = m_ram->pointer();
-	UINT8 *ipl_rom = memregion(UPD70008_TAG)->base();
+	uint8_t *ram = m_ram->pointer();
+	uint8_t *ipl_rom = memregion(UPD70008_TAG)->base();
 
 	if (!m_bank0)
 	{
@@ -373,7 +379,7 @@ WRITE8_MEMBER( px8_state::gah40m_w )
 
 READ8_MEMBER( px8_state::gah40s_r )
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	switch (offset)
 	{
@@ -449,9 +455,9 @@ WRITE8_MEMBER( px8_state::gah40s_ier_w )
    krtn_read - read keyboard return
 -------------------------------------------------*/
 
-UINT8 px8_state::krtn_read()
+uint8_t px8_state::krtn_read()
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	switch (m_ksc)
 	{
@@ -691,7 +697,7 @@ PALETTE_INIT_MEMBER(px8_state, px8)
 	palette.set_pen_color(1, 0x31, 0x39, 0x10);
 }
 
-UINT32 px8_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t px8_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
@@ -752,7 +758,7 @@ void px8_state::machine_reset()
     MACHINE DRIVERS
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( px8, px8_state )
+static MACHINE_CONFIG_START( px8 )
 	/* main cpu (uPD70008) */
 	MCFG_CPU_ADD(UPD70008_TAG, Z80, XTAL_CR1 / 4) /* 2.45 MHz */
 	MCFG_CPU_PROGRAM_MAP(px8_mem)
@@ -829,11 +835,27 @@ ROM_START( px8 )
 
 	ROM_REGION( 0x1000, UPD7508_TAG, 0 )
 	ROM_LOAD( "upd7508 sub cpu internal rom.2e", 0x0000, 0x1000, NO_DUMP )
+
+	// Possibly cartridges
+	ROM_REGION( 0x54000, "carts", 0 )
+	ROM_LOAD( "px8-util.rom",           0x00000, 0x8000, CRC(4430a271) SHA1(58c23a5f25ad9cdb70ada44dc773e6899e9bd8bf) ) // various utilities
+	ROM_LOAD( "px8-ws.rom",             0x08000, 0x8000, CRC(7f64dd48) SHA1(6d9f4e797fd7ac7b1ae2f0083d5461fa16731842) ) // WordStar
+	ROM_LOAD( "px8-tam.rom",            0x10000, 0x8000, CRC(281c65d3) SHA1(e6a24161248877fa6c3edc18d56127b263f5b2e0) ) // The Traveling Appointment Manager
+	ROM_LOAD( "px8-tem.rom",            0x18000, 0x8000, CRC(f2a8aa41) SHA1(16203488eeac3cd21e11c8e0f2007527dd375597) ) // The Traveling Expense Manager
+	ROM_LOAD( "px8-ttm.rom",            0x20000, 0x8000, CRC(2303dcc3) SHA1(0cc3926ef58ce1cf05fbe8caedf259439d204388) ) // The Traveling Time Manager
+	ROM_LOAD( "clock.rom",              0x28000, 0x4000, CRC(6f254cc9) SHA1(003eaf209c01e0148dc112adc34a35d33ac0bf60) ) // Clock by Stefan Bodrato
+	ROM_LOAD( "dakcom_v1.1.bin",        0x2c000, 0x2000, CRC(3a74a975) SHA1(46300aeb10ec208a906143e2acd1f93badb6792d) ) // DakComm v1.1 (comms)
+	ROM_LOAD( "px8-dcom.rom",           0x2e000, 0x8000, CRC(ddea1bbf) SHA1(791c58bf2fec8a19ca0face2e7b3eebe25ef4823) ) // this may be DakComm overdumped
+	ROM_LOAD( "genevaconnection.bin",   0x36000, 0x2000, CRC(7971e79a) SHA1(97cc1af6e7733eabcb4a85663022c6d3acea9d5a) ) // Geneva Connection
+	ROM_LOAD( "othello.rom",            0x38000, 0x4000, CRC(1a01059e) SHA1(1e275ad3d3f5014dd6a6f553bf9e062a39221cb8) ) // Othello by Stefan Bodrato
+	ROM_LOAD( "supercalc-1.bin",        0x3c000, 0x8000, CRC(58a0a411) SHA1(7b80361cd594e3b9b9e925e6a193606f8faa185c) ) // Supercalc rom 1
+	ROM_LOAD( "supercalc-2.bin",        0x44000, 0x8000, CRC(ba1c664b) SHA1(3c2a54a187f286eafb91f7571479a035d69d1df1) ) // Supercalc rom 2
+	ROM_LOAD( "tpascal.rom",            0x4c000, 0x8000, CRC(30a71af7) SHA1(e3f89fc4db6df8acc2f940e86e12eafb7af1303d) ) // Turbo Pascal
 ROM_END
 
 /***************************************************************************
     SYSTEM DRIVERS
 ***************************************************************************/
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY     FULLNAME    FLAGS */
-COMP( 1984, px8,    0,      0,      px8,    px8, driver_device, 0,      "Epson",    "PX-8",     MACHINE_NOT_WORKING )
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT  STATE      INIT    COMPANY     FULLNAME    FLAGS */
+COMP( 1984, px8,    0,      0,      px8,    px8,   px8_state, 0,      "Epson",    "PX-8",     MACHINE_NOT_WORKING )

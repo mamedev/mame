@@ -8,6 +8,7 @@
 
 #include "emu.h"
 #include "video32.h"
+#include "screen.h"
 
 
 /***************************************************************************
@@ -40,7 +41,7 @@ static const gfx_layout iq151_video32_charlayout =
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type IQ151_VIDEO32 = &device_creator<iq151_video32_device>;
+DEFINE_DEVICE_TYPE(IQ151_VIDEO32, iq151_video32_device, "iq151_video32", "IQ151 video32")
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -50,10 +51,12 @@ const device_type IQ151_VIDEO32 = &device_creator<iq151_video32_device>;
 //  iq151_video32_device - constructor
 //-------------------------------------------------
 
-iq151_video32_device::iq151_video32_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-		: device_t(mconfig, IQ151_VIDEO32, "IQ151 video32", tag, owner, clock, "iq151_video32", __FILE__),
-		device_gfx_interface(mconfig, *this, nullptr, "^^palette"),
-		device_iq151cart_interface( mconfig, *this ), m_videoram(nullptr), m_chargen(nullptr)
+iq151_video32_device::iq151_video32_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, IQ151_VIDEO32, tag, owner, clock)
+	, device_gfx_interface(mconfig, *this, nullptr, "^^palette")
+	, device_iq151cart_interface(mconfig, *this)
+	, m_videoram(*this, "videoram")
+	, m_chargen(*this, "chargen")
 {
 }
 
@@ -64,10 +67,7 @@ iq151_video32_device::iq151_video32_device(const machine_config &mconfig, const 
 
 void iq151_video32_device::device_start()
 {
-	m_videoram = (UINT8*)memregion("videoram")->base();
-	m_chargen = (UINT8*)memregion("chargen")->base();
-
-	set_gfx(0, std::make_unique<gfx_element>(palette(), iq151_video32_charlayout, m_chargen, 0, 1, 0));
+	set_gfx(0, std::make_unique<gfx_element>(&palette(), iq151_video32_charlayout, m_chargen, 0, 1, 0));
 }
 
 //-------------------------------------------------
@@ -87,7 +87,7 @@ void iq151_video32_device::device_reset()
 //  device_rom_region
 //-------------------------------------------------
 
-const rom_entry *iq151_video32_device::device_rom_region() const
+const tiny_rom_entry *iq151_video32_device::device_rom_region() const
 {
 	return ROM_NAME( iq151_video32 );
 }
@@ -96,7 +96,7 @@ const rom_entry *iq151_video32_device::device_rom_region() const
 //  read
 //-------------------------------------------------
 
-void iq151_video32_device::read(offs_t offset, UINT8 &data)
+void iq151_video32_device::read(offs_t offset, uint8_t &data)
 {
 	// videoram is mapped at 0xec00-0xefff
 	if (offset >= 0xec00 && offset < 0xf000)
@@ -107,7 +107,7 @@ void iq151_video32_device::read(offs_t offset, UINT8 &data)
 //  write
 //-------------------------------------------------
 
-void iq151_video32_device::write(offs_t offset, UINT8 data)
+void iq151_video32_device::write(offs_t offset, uint8_t data)
 {
 	if (offset >= 0xec00 && offset < 0xf000)
 		m_videoram[offset & 0x3ff] = data;
@@ -119,18 +119,18 @@ void iq151_video32_device::write(offs_t offset, UINT8 data)
 
 void iq151_video32_device::video_update(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT16 ma = 0, sy = 0;
+	uint16_t ma = 0, sy = 0;
 
 	for (int y = 0; y < 32; y++)
 	{
 		for (int ra = 0; ra < 8; ra++)
 		{
-			UINT16 *p = &bitmap.pix16(sy++);
+			uint16_t *p = &bitmap.pix16(sy++);
 
 			for (int x = ma; x < ma + 32; x++)
 			{
-				UINT8 chr = m_videoram[x] & 0x7f; // rom only has 128 characters
-				UINT8 gfx = m_chargen[(chr<<3) | ra ];
+				uint8_t chr = m_videoram[x] & 0x7f; // rom only has 128 characters
+				uint8_t gfx = m_chargen[(chr<<3) | ra ];
 
 				// chars above 0x7f have colors inverted
 				if (m_videoram[x] > 0x7f)

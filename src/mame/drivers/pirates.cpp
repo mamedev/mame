@@ -90,10 +90,13 @@ Notes:
 ---*/
 
 #include "emu.h"
+#include "includes/pirates.h"
+
 #include "cpu/m68000/m68000.h"
 #include "machine/eepromser.h"
 #include "sound/okim6295.h"
-#include "includes/pirates.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 WRITE16_MEMBER(pirates_state::out_w)
@@ -106,7 +109,7 @@ WRITE16_MEMBER(pirates_state::out_w)
 		m_eeprom->clk_write((data & 0x02) ? ASSERT_LINE : CLEAR_LINE);
 
 		/* bit 6 selects oki bank */
-		m_oki->set_bank_base((data & 0x40) ? 0x40000 : 0x00000);
+		m_oki->set_rom_bank((data >> 6) & 1);
 
 		/* bit 7 used (function unknown) */
 	}
@@ -248,7 +251,7 @@ GFXDECODE_END
 
 /* Machine Driver + Related bits */
 
-static MACHINE_CONFIG_START( pirates, pirates_state )
+static MACHINE_CONFIG_START( pirates )
 	MCFG_CPU_ADD("maincpu", M68000, 16000000) /* 16mhz */
 	MCFG_CPU_PROGRAM_MAP(pirates_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pirates_state,  irq1_line_hold)
@@ -272,7 +275,7 @@ static MACHINE_CONFIG_START( pirates, pirates_state )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", 1333333, OKIM6295_PIN7_LOW)
+	MCFG_OKIM6295_ADD("oki", 1333333, PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -351,16 +354,16 @@ ROM_END
 
 void pirates_state::decrypt_68k()
 {
-	UINT16 *rom = (UINT16 *)memregion("maincpu")->base();
+	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 	size_t rom_size = memregion("maincpu")->bytes();
-	std::vector<UINT16> buf(rom_size/2);
+	std::vector<uint16_t> buf(rom_size/2);
 
 	memcpy (&buf[0], rom, rom_size);
 
 	for (int i=0; i<rom_size/2; i++)
 	{
 		int adrl, adrr;
-		UINT8 vl, vr;
+		uint8_t vl, vr;
 
 		adrl = BITSWAP24(i,23,22,21,20,19,18,4,8,3,14,2,15,17,0,9,13,10,5,16,7,12,6,1,11);
 		vl = BITSWAP8(buf[adrl],    4,2,7,1,6,5,0,3);
@@ -375,12 +378,12 @@ void pirates_state::decrypt_68k()
 void pirates_state::decrypt_p()
 {
 	int rom_size;
-	UINT8 *rom;
+	uint8_t *rom;
 	int i;
 
 	rom_size = memregion("gfx1")->bytes();
 
-	dynamic_buffer buf(rom_size);
+	std::vector<uint8_t> buf(rom_size);
 
 	rom = memregion("gfx1")->base();
 	memcpy (&buf[0], rom, rom_size);
@@ -398,12 +401,12 @@ void pirates_state::decrypt_p()
 void pirates_state::decrypt_s()
 {
 	int rom_size;
-	UINT8 *rom;
+	uint8_t *rom;
 	int i;
 
 	rom_size = memregion("gfx2")->bytes();
 
-	dynamic_buffer buf(rom_size);
+	std::vector<uint8_t> buf(rom_size);
 
 	rom = memregion("gfx2")->base();
 	memcpy (&buf[0], rom, rom_size);
@@ -422,12 +425,12 @@ void pirates_state::decrypt_s()
 void pirates_state::decrypt_oki()
 {
 	int rom_size;
-	UINT8 *rom;
+	uint8_t *rom;
 	int i;
 
 	rom_size = memregion("oki")->bytes();
 
-	dynamic_buffer buf(rom_size);
+	std::vector<uint8_t> buf(rom_size);
 
 	rom = memregion("oki")->base();
 	memcpy (&buf[0], rom, rom_size);
@@ -442,7 +445,7 @@ void pirates_state::decrypt_oki()
 
 DRIVER_INIT_MEMBER(pirates_state,pirates)
 {
-	UINT16 *rom = (UINT16 *)memregion("maincpu")->base();
+	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 
 	decrypt_68k();
 	decrypt_p();
@@ -469,7 +472,7 @@ DRIVER_INIT_MEMBER(pirates_state,genix)
 
 /* GAME */
 
-GAME( 1994, pirates, 0,        pirates, pirates, pirates_state, pirates,  0, "NIX", "Pirates (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, pirates,  0,       pirates, pirates, pirates_state, pirates,  0, "NIX", "Pirates (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1995, piratesb, pirates, pirates, pirates, pirates_state, pirates,  0, "NIX", "Pirates (set 2)", MACHINE_SUPPORTS_SAVE ) // shows 'Copyright 1995' instead of (c)1994 Nix, but isn't unprotected, various changes to the names in the credis + a few other minor alterations
 
-GAME( 1994, genix,   0,        pirates, pirates, pirates_state, genix,    0, "NIX", "Genix Family", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, genix,    0,       pirates, pirates, pirates_state, genix,    0, "NIX", "Genix Family",    MACHINE_SUPPORTS_SAVE )

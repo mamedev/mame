@@ -21,6 +21,8 @@
     Notes:
         * The Sigma set has Japanese voice samples, while the Gottlieb
           one is English
+        * Taito T.T. New York New York's ROMs match the ones from the
+          Sigma set
         * In cocktail mode New York! New York! programs the CRTC with an
           incorrect value.  Interestingly, when the Flip Screen DIP
           is set, the value programmed is correct.  This bug does not
@@ -28,7 +30,7 @@
         * The Crosshatch switch only works on the title screen
         * The Service Mode switch, which displays the total number of
           credits stored in the NVRAM, only works on the "Start Game"
-          screen after a coin has been insered.  Hold down the key to
+          screen after a coin has been inserted.  Hold down the key to
           display the coin count
         * The schematics mixed up port A and B on both AY-8910
 
@@ -64,15 +66,21 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "machine/rescap.h"
-#include "machine/6821pia.h"
-#include "machine/74123.h"
-#include "video/mc6845.h"
+
 #include "cpu/m6800/m6800.h"
 #include "cpu/m6809/m6809.h"
+#include "machine/6821pia.h"
+#include "machine/74123.h"
+#include "machine/gen_latch.h"
+#include "machine/nvram.h"
+#include "machine/rescap.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
-#include "machine/nvram.h"
+#include "sound/volt_reg.h"
+#include "video/mc6845.h"
+
+#include "screen.h"
+#include "speaker.h"
 
 
 #define MAIN_CPU_MASTER_CLOCK       XTAL_11_2MHz
@@ -100,19 +108,22 @@ public:
 		m_mc6845(*this, "crtc"),
 		m_palette(*this, "palette"),
 		m_pia1(*this, "pia1"),
-		m_pia2(*this, "pia2") { }
+		m_pia2(*this, "pia2"),
+		m_soundlatch(*this, "soundlatch"),
+		m_soundlatch2(*this, "soundlatch2"),
+		m_soundlatch3(*this, "soundlatch3") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_videoram1;
-	required_shared_ptr<UINT8> m_colorram1;
-	required_shared_ptr<UINT8> m_videoram2;
-	required_shared_ptr<UINT8> m_colorram2;
+	required_shared_ptr<uint8_t> m_videoram1;
+	required_shared_ptr<uint8_t> m_colorram1;
+	required_shared_ptr<uint8_t> m_videoram2;
+	required_shared_ptr<uint8_t> m_colorram2;
 
 	/* video-related */
 	int      m_flipscreen;
-	UINT8    m_star_enable;
-	UINT16   m_star_delay_counter;
-	UINT16   m_star_shift_reg;
+	uint8_t    m_star_enable;
+	uint16_t   m_star_delay_counter;
+	uint16_t   m_star_shift_reg;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -123,6 +134,9 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<pia6821_device> m_pia1;
 	required_device<pia6821_device> m_pia2;
+	required_device<generic_latch_8_device> m_soundlatch;
+	required_device<generic_latch_8_device> m_soundlatch2;
+	required_device<generic_latch_8_device> m_soundlatch3;
 
 	DECLARE_WRITE8_MEMBER(audio_1_command_w);
 	DECLARE_WRITE8_MEMBER(audio_1_answer_w);
@@ -248,11 +262,11 @@ WRITE_LINE_MEMBER(nyny_state::flipscreen_w)
 
 MC6845_UPDATE_ROW( nyny_state::crtc_update_row )
 {
-	UINT8 x = 0;
+	uint8_t x = 0;
 
-	for (UINT8 cx = 0; cx < x_count; cx++)
+	for (uint8_t cx = 0; cx < x_count; cx++)
 	{
-		UINT8 data1, data2, color1, color2;
+		uint8_t data1, data2, color1, color2;
 
 		/* the memory is hooked up to the MA, RA lines this way */
 		offs_t offs = ((ma << 5) & 0x8000) |
@@ -270,7 +284,7 @@ MC6845_UPDATE_ROW( nyny_state::crtc_update_row )
 
 		for (int i = 0; i < 8; i++)
 		{
-			UINT8 bit1, bit2, color;
+			uint8_t bit1, bit2, color;
 
 			if (m_flipscreen)
 			{
@@ -314,7 +328,7 @@ void nyny_state::shift_star_generator(  )
 MC6845_END_UPDATE( nyny_state::crtc_end_update )
 {
 	/* draw the star field into the bitmap */
-	UINT16 delay_counter = m_star_delay_counter;
+	uint16_t delay_counter = m_star_delay_counter;
 
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
@@ -325,7 +339,7 @@ MC6845_END_UPDATE( nyny_state::crtc_end_update )
 				((m_star_shift_reg & 0x80ff) == 0x00ff) &&
 				(((y & 0x01) ^ m_flipscreen) ^ (((x & 0x08) >> 3) ^ m_flipscreen)))
 			{
-				UINT8 color = ((m_star_shift_reg & 0x0100) >>  8) |  /* R */
+				uint8_t color = ((m_star_shift_reg & 0x0100) >>  8) |  /* R */
 								((m_star_shift_reg & 0x0400) >>  9) |    /* G */
 								((m_star_shift_reg & 0x1000) >> 10);     /* B */
 
@@ -355,14 +369,14 @@ WRITE_LINE_MEMBER(nyny_state::display_enable_changed)
 
 WRITE8_MEMBER(nyny_state::audio_1_command_w)
 {
-	soundlatch_byte_w(space, 0, data);
-	m_audiocpu->set_input_line(M6800_IRQ_LINE, HOLD_LINE);
+	m_soundlatch->write(space, 0, data);
+	m_audiocpu->set_input_line(M6802_IRQ_LINE, HOLD_LINE);
 }
 
 
 WRITE8_MEMBER(nyny_state::audio_1_answer_w)
 {
-	soundlatch3_byte_w(space, 0, data);
+	m_soundlatch3->write(space, 0, data);
 	m_maincpu->set_input_line(M6809_IRQ_LINE, HOLD_LINE);
 }
 
@@ -382,8 +396,8 @@ WRITE8_MEMBER(nyny_state::nyny_ay8910_37_port_a_w)
 
 WRITE8_MEMBER(nyny_state::audio_2_command_w)
 {
-	soundlatch2_byte_w(space, 0, (data & 0x60) >> 5);
-	m_audiocpu2->set_input_line(M6800_IRQ_LINE, BIT(data, 7) ? CLEAR_LINE : ASSERT_LINE);
+	m_soundlatch2->write(space, 0, (data & 0x60) >> 5);
+	m_audiocpu2->set_input_line(M6802_IRQ_LINE, BIT(data, 7) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -396,7 +410,7 @@ WRITE8_MEMBER(nyny_state::audio_2_command_w)
 
 READ8_MEMBER(nyny_state::nyny_pia_1_2_r)
 {
-	UINT8 ret = 0;
+	uint8_t ret = 0;
 
 	/* the address bits are directly connected to the chip selects */
 	if (BIT(offset, 2))  ret = m_pia1->read(space, offset & 0x03);
@@ -424,7 +438,7 @@ static ADDRESS_MAP_START( nyny_main_map, AS_PROGRAM, 8, nyny_state )
 	AM_RANGE(0xa100, 0xa100) AM_MIRROR(0x00fe) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0xa101, 0xa101) AM_MIRROR(0x00fe) AM_DEVWRITE("crtc", mc6845_device, register_w)
 	AM_RANGE(0xa200, 0xa20f) AM_MIRROR(0x00f0) AM_READWRITE(nyny_pia_1_2_r, nyny_pia_1_2_w)
-	AM_RANGE(0xa300, 0xa300) AM_MIRROR(0x00ff) AM_READ(soundlatch3_byte_r) AM_WRITE(audio_1_command_w)
+	AM_RANGE(0xa300, 0xa300) AM_MIRROR(0x00ff) AM_DEVREAD("soundlatch3", generic_latch_8_device, read) AM_WRITE(audio_1_command_w)
 	AM_RANGE(0xa400, 0xa7ff) AM_NOP
 	AM_RANGE(0xa800, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
@@ -436,7 +450,7 @@ static ADDRESS_MAP_START( nyny_audio_1_map, AS_PROGRAM, 8, nyny_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x007f) AM_RAM     /* internal RAM */
 	AM_RANGE(0x0080, 0x0fff) AM_NOP
-	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x0fff) AM_READ(soundlatch_byte_r) AM_WRITE(audio_1_answer_w)
+	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x0fff) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITE(audio_1_answer_w)
 	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x0fff) AM_READ_PORT("SW3")
 	AM_RANGE(0x3000, 0x3000) AM_MIRROR(0x0ffc) AM_DEVREAD("ay1", ay8910_device, data_r)
 	AM_RANGE(0x3000, 0x3001) AM_MIRROR(0x0ffc) AM_DEVWRITE("ay1", ay8910_device, data_address_w)
@@ -453,7 +467,7 @@ static ADDRESS_MAP_START( nyny_audio_2_map, AS_PROGRAM, 8, nyny_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x007f) AM_RAM     /* internal RAM */
 	AM_RANGE(0x0080, 0x0fff) AM_NOP
-	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x0fff) AM_READ(soundlatch2_byte_r)
+	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x0fff) AM_DEVREAD("soundlatch2", generic_latch_8_device, read)
 	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x0ffe) AM_DEVREAD("ay3", ay8910_device, data_r)
 	AM_RANGE(0x2000, 0x2001) AM_MIRROR(0x0ffe) AM_DEVWRITE("ay3", ay8910_device, data_address_w)
 	AM_RANGE(0x3000, 0x6fff) AM_NOP
@@ -577,7 +591,7 @@ void nyny_state::machine_reset()
  *
  *************************************/
 
-static MACHINE_CONFIG_START( nyny, nyny_state )
+static MACHINE_CONFIG_START( nyny )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, 1400000) /* 1.40 MHz? The clock signal is generated by analog chips */
@@ -630,23 +644,28 @@ static MACHINE_CONFIG_START( nyny, nyny_state )
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(nyny_state,main_cpu_irq))
 
 	/* audio hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch3")
 
 	MCFG_SOUND_ADD("ay1", AY8910, AUDIO_CPU_1_CLOCK)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(nyny_state, nyny_ay8910_37_port_a_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(DEVWRITE8("dac", dac_device, write_unsigned8))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_AY8910_PORT_B_WRITE_CB(DEVWRITE8("dac", dac_byte_interface, write))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 
 	MCFG_SOUND_ADD("ay2", AY8910, AUDIO_CPU_1_CLOCK)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("SW2"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("SW1"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 
 	MCFG_SOUND_ADD("ay3", AY8910, AUDIO_CPU_2_CLOCK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.03)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.03)
 
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -659,21 +678,21 @@ MACHINE_CONFIG_END
 
 ROM_START( nyny )
 	ROM_REGION(0x10000, "maincpu", 0)   /* main CPU */
-	ROM_LOAD( "nyny01s.100",  0xa800, 0x0800, CRC(a2b76eca) SHA1(e46717e6ad330be4c4e7d9fab4f055f89aa31bcc) )
-	ROM_LOAD( "nyny02s.099",  0xb000, 0x0800, CRC(ef2d4dae) SHA1(718c0ecf7770a780aebb1dc8bf4ca86ea0a5ea28) )
-	ROM_LOAD( "nyny03s.098",  0xb800, 0x0800, CRC(2734c229) SHA1(b028d057d26838bae50b8ddb90a3755b5315b4ee) )
-	ROM_LOAD( "nyny04s.097",  0xe000, 0x0800, CRC(bd94087f) SHA1(02dde604bb84097fcd95c434847c55198b4e4309) )
-	ROM_LOAD( "nyny05s.096",  0xe800, 0x0800, CRC(248b22c4) SHA1(d64d89bf78fa19d36e02720c296a60621ab8fe21) )
-	ROM_LOAD( "nyny06s.095",  0xf000, 0x0800, CRC(8c073052) SHA1(0ce103ac0e79124ac9f1e097dda1a0664b92b89b) )
-	ROM_LOAD( "nyny07s.094",  0xf800, 0x0800, CRC(d49d7429) SHA1(c12eaae7ba0b1d44c45a584232db03c5731c046a) )
+	ROM_LOAD( "nyny01s.100",  0xa800, 0x0800, CRC(a2b76eca) SHA1(e46717e6ad330be4c4e7d9fab4f055f89aa31bcc) ) // NE01.IC10.2716 on Taito PCB
+	ROM_LOAD( "nyny02s.099",  0xb000, 0x0800, CRC(ef2d4dae) SHA1(718c0ecf7770a780aebb1dc8bf4ca86ea0a5ea28) ) // NE02.IC99.2716 on Taito PCB
+	ROM_LOAD( "nyny03s.098",  0xb800, 0x0800, CRC(2734c229) SHA1(b028d057d26838bae50b8ddb90a3755b5315b4ee) ) // NE03.IC98.2716 on Taito PCB
+	ROM_LOAD( "nyny04s.097",  0xe000, 0x0800, CRC(bd94087f) SHA1(02dde604bb84097fcd95c434847c55198b4e4309) ) // NE04.IC97.2716 on Taito PCB
+	ROM_LOAD( "nyny05s.096",  0xe800, 0x0800, CRC(248b22c4) SHA1(d64d89bf78fa19d36e02720c296a60621ab8fe21) ) // NE05.IC96.2716 on Taito PCB
+	ROM_LOAD( "nyny06s.095",  0xf000, 0x0800, CRC(8c073052) SHA1(0ce103ac0e79124ac9f1e097dda1a0664b92b89b) ) // NE06.IC95.2716 on Taito PCB
+	ROM_LOAD( "nyny07s.094",  0xf800, 0x0800, CRC(d49d7429) SHA1(c12eaae7ba0b1d44c45a584232db03c5731c046a) ) // NE07.IC94.2716 on Taito PCB
 
 	ROM_REGION(0x10000, "audiocpu", 0)  /* first audio CPU */
-	ROM_LOAD( "nyny08.093",   0x5000, 0x0800, CRC(19ddb6c3) SHA1(0097fad542f9a33849565093c2fb106d90007b1a) )
-	ROM_LOAD( "nyny09.092",   0x6000, 0x0800, CRC(a359c6f1) SHA1(1bc7b487581399908c3cec823733810fb6d944ce) )
-	ROM_LOAD( "nyny10.091",   0x7000, 0x0800, CRC(a72a70fa) SHA1(deed7dec9cc43fa1d6c4854ba18169c894c9a2f0) )
+	ROM_LOAD( "nyny08.093",   0x5000, 0x0800, CRC(19ddb6c3) SHA1(0097fad542f9a33849565093c2fb106d90007b1a) ) // NE08.IC93.2716 on Taito PCB
+	ROM_LOAD( "nyny09.092",   0x6000, 0x0800, CRC(a359c6f1) SHA1(1bc7b487581399908c3cec823733810fb6d944ce) ) // NE09.IC92.2716 on Taito PCB
+	ROM_LOAD( "nyny10.091",   0x7000, 0x0800, CRC(a72a70fa) SHA1(deed7dec9cc43fa1d6c4854ba18169c894c9a2f0) ) // NE10.IC91.2716 on Taito PCB
 
 	ROM_REGION(0x10000, "audio2", 0) /* second audio CPU */
-	ROM_LOAD( "nyny11.snd",   0x7000, 0x0800, CRC(650450fc) SHA1(214693df394ca05eff5dbe1e800107d326ba80f6) )
+	ROM_LOAD( "nyny11.snd",   0x7000, 0x0800, CRC(650450fc) SHA1(214693df394ca05eff5dbe1e800107d326ba80f6) ) // NE11.IC2.2516 on Taito PCB
 ROM_END
 
 
@@ -726,6 +745,6 @@ ROM_END
  *
  *************************************/
 
-GAME( 1980, nyny,    0,    nyny, nyny, driver_device, 0, ROT270, "Sigma Enterprises Inc.", "New York! New York!", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, nynyg,   nyny, nyny, nyny, driver_device, 0, ROT270, "Sigma Enterprises Inc. (Gottlieb license)", "New York! New York! (Gottlieb)", MACHINE_IMPERFECT_SOUND  | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, warcadia,nyny, nyny, nyny, driver_device, 0, ROT270, "Sigma Enterprises Inc.", "Waga Seishun no Arcadia", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, nyny,    0,    nyny, nyny, nyny_state, 0, ROT270, "Sigma Enterprises Inc.", "New York! New York!", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, nynyg,   nyny, nyny, nyny, nyny_state, 0, ROT270, "Sigma Enterprises Inc. (Gottlieb license)", "New York! New York! (Gottlieb)", MACHINE_IMPERFECT_SOUND  | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, warcadia,nyny, nyny, nyny, nyny_state, 0, ROT270, "Sigma Enterprises Inc.", "Waga Seishun no Arcadia", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

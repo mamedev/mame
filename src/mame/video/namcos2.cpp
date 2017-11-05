@@ -3,18 +3,13 @@
 /* video hardware for Namco System II */
 
 #include "emu.h"
-
 #include "includes/namcos2.h"
-#include "includes/namcoic.h"
 
-static void
-TilemapCB( running_machine &machine, UINT16 code, int *tile, int *mask )
-//void namcos2_shared_state::tilemap_cb(UINT16 code, int *tile, int *mask)
+void namcos2_state::TilemapCB(uint16_t code, int *tile, int *mask)
 {
 	*mask = code;
 
-	namcos2_shared_state *state = machine.driver_data<namcos2_shared_state>();
-	switch( state->m_gametype )
+	switch( m_gametype )
 	{
 	case NAMCOS2_FINAL_LAP_2:
 	case NAMCOS2_FINAL_LAP_3:
@@ -57,8 +52,8 @@ TILE_GET_INFO_MEMBER( namcos2_state::roz_tile_info )
 
 struct roz_param
 {
-	UINT32 size;
-	UINT32 startx,starty;
+	uint32_t size;
+	uint32_t startx,starty;
 	int incxx,incxy,incyx,incyy;
 	int color;
 	int wrap;
@@ -68,23 +63,23 @@ static inline void
 draw_roz_helper_block(const struct roz_param *rozInfo, int destx, int desty,
 	int srcx, int srcy, int width, int height,
 	bitmap_ind16 &destbitmap, bitmap_ind8 &flagsbitmap,
-	bitmap_ind16 &srcbitmap, UINT32 size_mask)
+	bitmap_ind16 &srcbitmap, uint32_t size_mask)
 {
 	int desty_end = desty + height;
 
 	int end_incrx = rozInfo->incyx - (width * rozInfo->incxx);
 	int end_incry = rozInfo->incyy - (width * rozInfo->incxy);
 
-	UINT16 *dest = &destbitmap.pix16(desty, destx);
+	uint16_t *dest = &destbitmap.pix16(desty, destx);
 	int dest_rowinc = destbitmap.rowpixels() - width;
 
 	while (desty < desty_end)
 	{
-		UINT16 *dest_end = dest + width;
+		uint16_t *dest_end = dest + width;
 		while (dest < dest_end)
 		{
-			UINT32 xpos = (srcx >> 16);
-			UINT32 ypos = (srcy >> 16);
+			uint32_t xpos = (srcx >> 16);
+			uint32_t ypos = (srcy >> 16);
 
 			if (rozInfo->wrap)
 			{
@@ -155,12 +150,12 @@ draw_roz_helper(
 
 #define ROZ_BLOCK_SIZE 8
 
-		UINT32 size_mask = rozInfo->size - 1;
+		uint32_t size_mask = rozInfo->size - 1;
 		bitmap_ind16 &srcbitmap = tmap->pixmap();
 		bitmap_ind8 &flagsbitmap = tmap->flagsmap();
-		UINT32 srcx = (rozInfo->startx + (clip.min_x * rozInfo->incxx) +
+		uint32_t srcx = (rozInfo->startx + (clip.min_x * rozInfo->incxx) +
 			(clip.min_y * rozInfo->incyx));
-		UINT32 srcy = (rozInfo->starty + (clip.min_x * rozInfo->incxy) +
+		uint32_t srcy = (rozInfo->starty + (clip.min_x * rozInfo->incxy) +
 			(clip.min_y * rozInfo->incyy));
 		int destx = clip.min_x;
 		int desty = clip.min_y;
@@ -244,12 +239,12 @@ void namcos2_state::draw_roz(screen_device &screen, bitmap_ind16 &bitmap, const 
 	struct roz_param rozParam;
 
 	rozParam.color = (m_gfx_ctrl & 0x0f00);
-	rozParam.incxx  = (INT16)m_roz_ctrl[0];
-	rozParam.incxy  = (INT16)m_roz_ctrl[1];
-	rozParam.incyx  = (INT16)m_roz_ctrl[2];
-	rozParam.incyy  = (INT16)m_roz_ctrl[3];
-	rozParam.startx = (INT16)m_roz_ctrl[4];
-	rozParam.starty = (INT16)m_roz_ctrl[5];
+	rozParam.incxx  = (int16_t)m_roz_ctrl[0];
+	rozParam.incxy  = (int16_t)m_roz_ctrl[1];
+	rozParam.incyx  = (int16_t)m_roz_ctrl[2];
+	rozParam.incyy  = (int16_t)m_roz_ctrl[3];
+	rozParam.startx = (int16_t)m_roz_ctrl[4];
+	rozParam.starty = (int16_t)m_roz_ctrl[5];
 	rozParam.size = 2048;
 	rozParam.wrap = 1;
 
@@ -292,17 +287,17 @@ WRITE16_MEMBER( namcos2_state::rozram_word_w )
 {
 	COMBINE_DATA(&m_rozram[offset]);
 	m_tilemap_roz->mark_tile_dirty(offset);
-//      if( space.machine().input().code_pressed(KEYCODE_Q) )
-//      {
-//          debugger_break(space.machine());
-//      }
+	//if( space.machine().input().code_pressed(KEYCODE_Q) )
+	//{
+	//  machine().debug_break();
+	//}
 }
 
 /**************************************************************************/
 
-UINT16 namcos2_state::get_palette_register( int which )
+uint16_t namcos2_state::get_palette_register( int which )
 {
-	const UINT16 *source = &m_paletteram[0x3000/2];
+	const uint16_t *source = &m_paletteram[0x3000/2];
 	return ((source[which*2]&0xff)<<8) | (source[which*2+1]&0xff);
 }
 
@@ -348,10 +343,9 @@ WRITE16_MEMBER( namcos2_state::paletteram_word_w )
 
 			/* register 5: POSIRQ scanline (only 8 bits used) */
 			/*case 0x180a:*/ case 0x180b:
-				if (data^m_paletteram[offset]) {
+				//if (data^m_paletteram[offset]) {
 					m_paletteram[offset] = data;
-					adjust_posirq_timer(get_pos_irq_scanline());
-				}
+				//}
 				break;
 
 			/* registers 6,7: nothing? */
@@ -402,8 +396,8 @@ void namcos2_state::draw_sprite_init()
 
 void namcos2_state::video_start()
 {
-	namco_tilemap_init(2, memregion("gfx4")->base(), TilemapCB);
-	m_tilemap_roz = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos2_state::roz_tile_info), this), TILEMAP_SCAN_ROWS, 8,8,256,256);
+	c123_tilemap_init(2, memregion("gfx4")->base(), namcos2_shared_state::c123_tilemap_delegate(&namcos2_state::TilemapCB, this));
+	m_tilemap_roz = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos2_state::roz_tile_info), this), TILEMAP_SCAN_ROWS, 8,8,256,256);
 	m_tilemap_roz->set_transparent_pen(0xff);
 	draw_sprite_init();
 }
@@ -418,7 +412,7 @@ void namcos2_state::apply_clip( rectangle &clip, const rectangle &cliprect )
 	clip &= cliprect;
 }
 
-UINT32 namcos2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t namcos2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	rectangle clip;
 	int pri;
@@ -434,7 +428,7 @@ UINT32 namcos2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	{
 		if( (pri&1)==0 )
 		{
-			namco_tilemap_draw( screen, bitmap, clip, pri/2 );
+			c123_tilemap_draw( screen, bitmap, clip, pri/2 );
 
 			if( ((m_gfx_ctrl & 0x7000) >> 12)==pri/2 )
 			{
@@ -450,11 +444,11 @@ UINT32 namcos2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 void namcos2_state::video_start_finallap()
 {
-	namco_tilemap_init(2,memregion("gfx4")->base(),TilemapCB);
+	c123_tilemap_init(2,memregion("gfx4")->base(),namcos2_shared_state::c123_tilemap_delegate(&namcos2_state::TilemapCB, this));
 	draw_sprite_init();
 }
 
-UINT32 namcos2_state::screen_update_finallap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t namcos2_state::screen_update_finallap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	rectangle clip;
 	int pri;
@@ -467,7 +461,7 @@ UINT32 namcos2_state::screen_update_finallap(screen_device &screen, bitmap_ind16
 	{
 		if( (pri&1)==0 )
 		{
-			namco_tilemap_draw( screen, bitmap, clip, pri/2 );
+			c123_tilemap_draw( screen, bitmap, clip, pri/2 );
 		}
 		m_c45_road->draw(bitmap,clip,pri);
 		draw_sprites(screen,bitmap,clip,pri,m_gfx_ctrl );
@@ -479,7 +473,7 @@ UINT32 namcos2_state::screen_update_finallap(screen_device &screen, bitmap_ind16
 
 void namcos2_state::video_start_luckywld()
 {
-	namco_tilemap_init(2,memregion("gfx4")->base(),TilemapCB);
+	c123_tilemap_init(2,memregion("gfx4")->base(),namcos2_shared_state::c123_tilemap_delegate(&namcos2_state::TilemapCB, this));
 	c355_obj_init( 0, 0x0, namcos2_shared_state::c355_obj_code2tile_delegate() );
 	if( m_gametype==NAMCOS2_LUCKY_AND_WILD )
 	{
@@ -487,7 +481,7 @@ void namcos2_state::video_start_luckywld()
 	}
 }
 
-UINT32 namcos2_state::screen_update_luckywld(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t namcos2_state::screen_update_luckywld(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	rectangle clip;
 	int pri;
@@ -500,7 +494,7 @@ UINT32 namcos2_state::screen_update_luckywld(screen_device &screen, bitmap_ind16
 	{
 		if( (pri&1)==0 )
 		{
-			namco_tilemap_draw( screen, bitmap, clip, pri/2 );
+			c123_tilemap_draw( screen, bitmap, clip, pri/2 );
 		}
 		m_c45_road->draw(bitmap,clip,pri);
 		if( m_gametype==NAMCOS2_LUCKY_AND_WILD )
@@ -516,11 +510,11 @@ UINT32 namcos2_state::screen_update_luckywld(screen_device &screen, bitmap_ind16
 
 void namcos2_state::video_start_sgunner()
 {
-	namco_tilemap_init(2,memregion("gfx4")->base(),TilemapCB);
+	c123_tilemap_init(2,memregion("gfx4")->base(),namcos2_shared_state::c123_tilemap_delegate(&namcos2_state::TilemapCB, this));
 	c355_obj_init( 0, 0x0, namcos2_shared_state::c355_obj_code2tile_delegate() );
 }
 
-UINT32 namcos2_state::screen_update_sgunner(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t namcos2_state::screen_update_sgunner(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	rectangle clip;
 	int pri;
@@ -531,7 +525,7 @@ UINT32 namcos2_state::screen_update_sgunner(screen_device &screen, bitmap_ind16 
 
 	for( pri=0; pri<8; pri++ )
 	{
-		namco_tilemap_draw( screen, bitmap, clip, pri );
+		c123_tilemap_draw( screen, bitmap, clip, pri );
 		c355_obj_draw(screen, bitmap, clip, pri );
 	}
 	return 0;
@@ -542,11 +536,11 @@ UINT32 namcos2_state::screen_update_sgunner(screen_device &screen, bitmap_ind16 
 
 void namcos2_state::video_start_metlhawk()
 {
-	namco_tilemap_init(2,memregion("gfx4")->base(),TilemapCB);
+	c123_tilemap_init(2,memregion("gfx4")->base(),namcos2_shared_state::c123_tilemap_delegate(&namcos2_state::TilemapCB, this));
 	c169_roz_init(1, "gfx5");
 }
 
-UINT32 namcos2_state::screen_update_metlhawk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t namcos2_state::screen_update_metlhawk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	rectangle clip;
 	int pri;
@@ -559,7 +553,7 @@ UINT32 namcos2_state::screen_update_metlhawk(screen_device &screen, bitmap_ind16
 	{
 		if( (pri&1)==0 )
 		{
-			namco_tilemap_draw( screen, bitmap, clip, pri/2 );
+			c123_tilemap_draw( screen, bitmap, clip, pri/2 );
 		}
 		c169_roz_draw(screen, bitmap, clip, pri);
 		draw_sprites_metalhawk(screen,bitmap,clip,pri );

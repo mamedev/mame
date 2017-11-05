@@ -28,12 +28,12 @@ public:
 		m_gfxdecode(*this, "gfxdecode") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_fg_videoram;
-	required_shared_ptr<UINT8> m_spriteram_1;
-	required_shared_ptr<UINT8> m_sharedram;
-	required_shared_ptr<UINT8> m_bg_videoram;
-	required_shared_ptr<UINT8> m_spriteram_2;
-	required_shared_ptr<UINT8> m_snd_sharedram;
+	required_shared_ptr<uint8_t> m_fg_videoram;
+	required_shared_ptr<uint8_t> m_spriteram_1;
+	required_shared_ptr<uint8_t> m_sharedram;
+	required_shared_ptr<uint8_t> m_bg_videoram;
+	required_shared_ptr<uint8_t> m_spriteram_2;
+	required_shared_ptr<uint8_t> m_snd_sharedram;
 
 	/* video-related */
 	tilemap_t     *m_fg_tilemap;
@@ -72,8 +72,8 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(ddribble);
-	UINT32 screen_update_ddribble(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_ddribble(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(ddribble_interrupt_0);
 	INTERRUPT_GEN_MEMBER(ddribble_interrupt_1);
-	void draw_sprites(  bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8* source, int lenght, int gfxset, int flipscreen );
+	void draw_sprites(  bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t* source, int lenght, int gfxset, int flipscreen );
 };

@@ -97,12 +97,17 @@ Game is V30 based, with rom banking (2Mb)
 *************************************************************************************************/
 
 #include "emu.h"
-#include "cpu/nec/nec.h"
+
 #include "cpu/i86/i186.h"
-#include "sound/okim6376.h"
+#include "cpu/nec/nec.h"
 #include "machine/nvram.h"
-#include "fashion.lh"
+#include "sound/okim6376.h"
 #include "video/ramdac.h"
+
+#include "screen.h"
+#include "speaker.h"
+
+#include "fashion.lh"
 
 
 class highvdeo_state : public driver_device
@@ -115,10 +120,10 @@ public:
 		m_okim6376(*this, "oki"),
 		m_palette(*this, "palette") { }
 
-	required_shared_ptr<UINT16> m_blit_ram;
-	UINT16 m_vblank_bit;
-	UINT16 m_brasil_prot_latch;
-	UINT16 m_grancapi_prot_latch;
+	required_shared_ptr<uint16_t> m_blit_ram;
+	uint16_t m_vblank_bit;
+	uint16_t m_brasil_prot_latch;
+	uint16_t m_grancapi_prot_latch;
 	DECLARE_READ16_MEMBER(read0_r);
 	DECLARE_READ16_MEMBER(read1_r);
 	DECLARE_READ16_MEMBER(read2_r);
@@ -147,8 +152,8 @@ public:
 	DECLARE_DRIVER_INIT(ciclone);
 	DECLARE_DRIVER_INIT(record);
 	DECLARE_VIDEO_START(tourvisn);
-	UINT32 screen_update_tourvisn(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_brasil(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_tourvisn(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_brasil(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	INTERRUPT_GEN_MEMBER(vblank_irq_80186);
 	required_device<cpu_device> m_maincpu;
@@ -163,7 +168,7 @@ VIDEO_START_MEMBER(highvdeo_state,tourvisn)
 {
 }
 
-UINT32 highvdeo_state::screen_update_tourvisn(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t highvdeo_state::screen_update_tourvisn(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int x,y,count;
 
@@ -173,7 +178,7 @@ UINT32 highvdeo_state::screen_update_tourvisn(screen_device &screen, bitmap_rgb3
 	{
 		for(x=0;x<(screen.visible_area().max_x+1)/2;x++)
 		{
-			UINT32 color;
+			uint32_t color;
 
 			color = ((m_blit_ram[count]) & 0x00ff)>>0;
 
@@ -193,7 +198,7 @@ UINT32 highvdeo_state::screen_update_tourvisn(screen_device &screen, bitmap_rgb3
 }
 
 /*Later HW, RGB565 instead of RAM-based pens (+ ramdac).*/
-UINT32 highvdeo_state::screen_update_brasil(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t highvdeo_state::screen_update_brasil(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int x,y,count;
 
@@ -203,10 +208,10 @@ UINT32 highvdeo_state::screen_update_brasil(screen_device &screen, bitmap_rgb32 
 	{
 		for(x=0;x<400;x++)
 		{
-			UINT32 color;
-			UINT32 b;
-			UINT32 g;
-			UINT32 r;
+			uint32_t color;
+			uint32_t b;
+			uint32_t g;
+			uint32_t r;
 
 			color = (m_blit_ram[count]) & 0xffff;
 
@@ -243,8 +248,8 @@ READ16_MEMBER(highvdeo_state::read2_r)
 
 WRITE16_MEMBER(highvdeo_state::tv_vcf_bankselect_w)
 {
-	UINT32 bankaddress;
-	UINT8 *ROM = memregion("user1")->base();
+	uint32_t bankaddress;
+	uint8_t *ROM = memregion("user1")->base();
 
 	/* bits 0, 1 select the ROM bank */
 	bankaddress = (data & 0x03) * 0x40000;
@@ -409,8 +414,8 @@ WRITE16_MEMBER(highvdeo_state::nyj_write2_w)
 
 WRITE16_MEMBER(highvdeo_state::tv_tcf_bankselect_w)
 {
-	UINT32 bankaddress;
-	UINT8 *ROM = memregion("user1")->base();
+	uint32_t bankaddress;
+	uint8_t *ROM = memregion("user1")->base();
 
 	/* bits 0, 1, 2 select the ROM bank */
 	bankaddress = (data & 0x07) * 0x40000;
@@ -508,7 +513,7 @@ ADDRESS_MAP_END
 
 READ16_MEMBER(highvdeo_state::brasil_status_r)
 {
-	static UINT16 resetpulse;
+	static uint16_t resetpulse;
 
 	switch(offset*2)
 	{
@@ -525,8 +530,8 @@ READ16_MEMBER(highvdeo_state::brasil_status_r)
 /*bankaddress might be incorrect.*/
 WRITE16_MEMBER(highvdeo_state::brasil_status_w)
 {
-	UINT32 bankaddress;
-	UINT8 *ROM = memregion("user1")->base();
+	uint32_t bankaddress;
+	uint8_t *ROM = memregion("user1")->base();
 
 	switch(data & 3) //data & 7?
 	{
@@ -544,7 +549,7 @@ WRITE16_MEMBER(highvdeo_state::brasil_status_w)
 
 READ16_MEMBER(highvdeo_state::grancapi_status_r)
 {
-	static UINT16 resetpulse;
+	static uint16_t resetpulse;
 
 	switch(offset*2)
 	{
@@ -561,8 +566,8 @@ READ16_MEMBER(highvdeo_state::grancapi_status_r)
 /*bankaddress might be incorrect.*/
 WRITE16_MEMBER(highvdeo_state::grancapi_status_w)
 {
-	UINT32 bankaddress;
-	UINT8 *ROM = memregion("user1")->base();
+	uint32_t bankaddress;
+	uint8_t *ROM = memregion("user1")->base();
 
 	switch(data & 3) //data & 7?
 	{
@@ -580,7 +585,7 @@ WRITE16_MEMBER(highvdeo_state::grancapi_status_w)
 
 READ16_MEMBER(highvdeo_state::magicbom_status_r)
 {
-	static UINT16 resetpulse;
+	static uint16_t resetpulse;
 
 	switch(offset*2)
 	{
@@ -1114,12 +1119,12 @@ INTERRUPT_GEN_MEMBER(highvdeo_state::vblank_irq_80186)
 	device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static ADDRESS_MAP_START( ramdac_map, AS_0, 8, highvdeo_state )
+static ADDRESS_MAP_START( ramdac_map, 0, 8, highvdeo_state )
 	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
 ADDRESS_MAP_END
 
 
-static MACHINE_CONFIG_START( tv_vcf, highvdeo_state )
+static MACHINE_CONFIG_START( tv_vcf )
 	MCFG_CPU_ADD("maincpu", V30, XTAL_12MHz/2 ) // ?
 	MCFG_CPU_PROGRAM_MAP(tv_vcf_map)
 	MCFG_CPU_IO_MAP(tv_vcf_io)
@@ -1197,7 +1202,7 @@ static MACHINE_CONFIG_DERIVED( ciclone, tv_tcf )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", highvdeo_state,  vblank_irq_80186)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( brasil, highvdeo_state )
+static MACHINE_CONFIG_START( brasil )
 	MCFG_CPU_ADD("maincpu", I80186, 20000000 )  // fashion doesn't like 20/2 Mhz
 	MCFG_CPU_PROGRAM_MAP(brasil_map)
 	MCFG_CPU_IO_MAP(brasil_io)
@@ -1223,7 +1228,7 @@ static MACHINE_CONFIG_START( brasil, highvdeo_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( grancapi, highvdeo_state )
+static MACHINE_CONFIG_START( grancapi )
 	MCFG_CPU_ADD("maincpu", I80186, 20000000 )
 	MCFG_CPU_PROGRAM_MAP(brasil_map)
 	MCFG_CPU_IO_MAP(grancapi_io)
@@ -1249,7 +1254,7 @@ static MACHINE_CONFIG_START( grancapi, highvdeo_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( magicbom, highvdeo_state )
+static MACHINE_CONFIG_START( magicbom )
 	MCFG_CPU_ADD("maincpu", I80186, 20000000 )
 	MCFG_CPU_PROGRAM_MAP(brasil_map)
 	MCFG_CPU_IO_MAP(magicbom_io)
@@ -1496,7 +1501,7 @@ ROM_END
 /*Ciclone*/
 READ16_MEMBER(highvdeo_state::ciclone_status_r)
 {
-	static UINT16 resetpulse;
+	static uint16_t resetpulse;
 	switch(offset*2)
 	{
 		case 0:
@@ -1623,7 +1628,7 @@ ROM_END
 
 READ16_MEMBER(highvdeo_state::record_status_r)
 {
-	static UINT16 resetpulse;
+	static uint16_t resetpulse;
 	switch(offset*2)
 	{
 		case 0:
@@ -1641,20 +1646,20 @@ DRIVER_INIT_MEMBER(highvdeo_state, record)
 }
 
 
-GAMEL( 2000, tour4000,  0,      tv_vcf,   tv_vcf,  driver_device,   0,       ROT0,  "High Video", "Tour 4000",         0, layout_fashion )
-GAMEL( 2000, cfever40,  0,      tv_vcf,   tv_vcf,  driver_device,   0,       ROT0,  "High Video", "Casino Fever 4.0",  0, layout_fashion )
-GAMEL( 2000, cfever50,  0,      tv_vcf,   tv_vcf,  driver_device,   0,       ROT0,  "High Video", "Casino Fever 5.0",  0, layout_fashion )
-GAMEL( 2000, tour4010,  0,      tv_ncf,   tv_ncf,  driver_device,   0,       ROT0,  "High Video", "Tour 4010",         0, layout_fashion )
-GAMEL( 2000, cfever51,  0,      tv_ncf,   tv_ncf,  driver_device,   0,       ROT0,  "High Video", "Casino Fever 5.1",  0, layout_fashion )
-GAMEL( 2000, cfever61,  0,      tv_ncf,   tv_ncf,  driver_device,   0,       ROT0,  "High Video", "Casino Fever 6.1",  0, layout_fashion )
-GAMEL( 2000, nyjoker,   0,      nyjoker,  nyjoker, driver_device,   0,       ROT0,  "High Video", "New York Joker",    0, layout_fashion )
-GAMEL( 2000, cfever1k,  0,      tv_tcf,   tv_tcf,  driver_device,   0,       ROT0,  "High Video", "Casino Fever 1k",   0, layout_fashion )
-GAMEL( 2000, girotutt,  0,      tv_tcf,   tv_tcf,  driver_device,   0,       ROT0,  "High Video", "GiroTutto",         0, layout_fashion )
-GAMEL( 2000, galeone,   0,      nyjoker,  nyjoker, driver_device,   0,       ROT0,  "San Remo Games", "Il Galeone",    0, layout_fashion )
-GAMEL( 2000, ciclone,   0,      ciclone,  tv_tcf,  highvdeo_state,  ciclone, ROT0,  "High Video", "Ciclone",           0, layout_fashion )
-GAMEL( 2000, newmcard,  0,      newmcard, tv_tcf,  driver_device,   0,       ROT0,  "High Video", "New Magic Card",    0, layout_fashion )
-GAMEL( 2000, brasil,    0,      brasil,   brasil,  driver_device,   0,       ROT0,  "High Video", "Bra$il (Version 3)",       0,                layout_fashion )
-GAMEL( 2000, fashion,   brasil, brasil,   fashion, highvdeo_state,  fashion, ROT0,  "High Video", "Fashion (Version 2.14)",   0,                layout_fashion )
-GAMEL( 2000, grancapi,  0,      grancapi, brasil,  driver_device,   0,       ROT0,  "High Video", "Gran Capitan (Version 3)", MACHINE_NOT_WORKING, layout_fashion )
-GAMEL( 2000, magicbom,  0,      magicbom, fashion, highvdeo_state,  fashion, ROT0,  "High Video", "Magic Bomb (Version 1)",   MACHINE_NOT_WORKING, layout_fashion )
-GAMEL( 2000, record,    0,      newmcard, tv_tcf,  highvdeo_state,  record,  ROT0,  "High Video", "Record (Version 1)",       0,                layout_fashion )
+GAMEL( 2000, tour4000,  0,      tv_vcf,   tv_vcf,  highvdeo_state,  0,       ROT0,  "High Video",     "Tour 4000",                0,                   layout_fashion )
+GAMEL( 2000, cfever40,  0,      tv_vcf,   tv_vcf,  highvdeo_state,  0,       ROT0,  "High Video",     "Casino Fever 4.0",         0,                   layout_fashion )
+GAMEL( 2000, cfever50,  0,      tv_vcf,   tv_vcf,  highvdeo_state,  0,       ROT0,  "High Video",     "Casino Fever 5.0",         0,                   layout_fashion )
+GAMEL( 2000, tour4010,  0,      tv_ncf,   tv_ncf,  highvdeo_state,  0,       ROT0,  "High Video",     "Tour 4010",                0,                   layout_fashion )
+GAMEL( 2000, cfever51,  0,      tv_ncf,   tv_ncf,  highvdeo_state,  0,       ROT0,  "High Video",     "Casino Fever 5.1",         0,                   layout_fashion )
+GAMEL( 2000, cfever61,  0,      tv_ncf,   tv_ncf,  highvdeo_state,  0,       ROT0,  "High Video",     "Casino Fever 6.1",         0,                   layout_fashion )
+GAMEL( 2000, nyjoker,   0,      nyjoker,  nyjoker, highvdeo_state,  0,       ROT0,  "High Video",     "New York Joker",           0,                   layout_fashion )
+GAMEL( 2000, cfever1k,  0,      tv_tcf,   tv_tcf,  highvdeo_state,  0,       ROT0,  "High Video",     "Casino Fever 1k",          0,                   layout_fashion )
+GAMEL( 2000, girotutt,  0,      tv_tcf,   tv_tcf,  highvdeo_state,  0,       ROT0,  "High Video",     "GiroTutto",                0,                   layout_fashion )
+GAMEL( 2000, galeone,   0,      nyjoker,  nyjoker, highvdeo_state,  0,       ROT0,  "San Remo Games", "Il Galeone",               0,                   layout_fashion )
+GAMEL( 2000, ciclone,   0,      ciclone,  tv_tcf,  highvdeo_state,  ciclone, ROT0,  "High Video",     "Ciclone",                  0,                   layout_fashion )
+GAMEL( 2000, newmcard,  0,      newmcard, tv_tcf,  highvdeo_state,  0,       ROT0,  "High Video",     "New Magic Card",           0,                   layout_fashion )
+GAMEL( 2000, brasil,    0,      brasil,   brasil,  highvdeo_state,  0,       ROT0,  "High Video",     "Bra$il (Version 3)",       0,                   layout_fashion )
+GAMEL( 2000, fashion,   brasil, brasil,   fashion, highvdeo_state,  fashion, ROT0,  "High Video",     "Fashion (Version 2.14)",   0,                   layout_fashion )
+GAMEL( 2000, grancapi,  0,      grancapi, brasil,  highvdeo_state,  0,       ROT0,  "High Video",     "Gran Capitan (Version 3)", MACHINE_NOT_WORKING, layout_fashion )
+GAMEL( 2000, magicbom,  0,      magicbom, fashion, highvdeo_state,  fashion, ROT0,  "High Video",     "Magic Bomb (Version 1)",   MACHINE_NOT_WORKING, layout_fashion )
+GAMEL( 2000, record,    0,      newmcard, tv_tcf,  highvdeo_state,  record,  ROT0,  "High Video",     "Record (Version 1)",       0,                   layout_fashion )

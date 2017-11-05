@@ -12,23 +12,23 @@
 
 
 #include "emu.h"
-
 #include "includes/bfm_sc5.h"
 
-
-#include "machine/mcf5206e.h"
-#include "bfm_sc5.lh"
-#include "video/awpvid.h"
 #include "machine/bfm_sc45_helper.h"
+#include "machine/mcf5206e.h"
+#include "video/awpvid.h"
+#include "speaker.h"
+
+#include "bfm_sc5.lh"
 
 
 
 WRITE16_MEMBER( bfm_sc5_state::sc5_duart_w )
 {
 	// clearly a duart of some kind, write patterns are the same as SC4 games
-//  printf("%s: duart_w %1x %04x %04x\n", machine().describe_context(), offset, data, mem_mask);
+//  logerror("%s: duart_w %1x %04x %04x\n", machine().describe_context(), offset, data, mem_mask);
 
-	if (mem_mask &0xff00)
+	if (ACCESSING_BITS_8_15)
 	{
 		m_duart->write(space,offset,(data>>8)&0x00ff);
 	}
@@ -47,7 +47,7 @@ READ8_MEMBER( bfm_sc5_state::sc5_mux1_r )
 			return machine().rand();
 	}
 
-	printf("%s: sc5_mux1_r %1x\n", machine().describe_context(), offset);
+	logerror("%s: sc5_mux1_r %1x\n", machine().describe_context(), offset);
 
 	return 0x00;
 }
@@ -61,7 +61,7 @@ WRITE8_MEMBER( bfm_sc5_state::sc5_mux1_w )
 	}
 	else
 	{
-		printf("%s: sc5_mux1_w %1x %04x\n", machine().describe_context(), offset, data);
+		logerror("%s: sc5_mux1_w %1x %04x\n", machine().describe_context(), offset, data);
 	}
 }
 
@@ -75,7 +75,7 @@ WRITE8_MEMBER( bfm_sc5_state::sc5_mux2_w )
 	}
 	else
 	{
-		printf("%s: sc5_mux2_w %1x %04x\n", machine().describe_context(), offset, data);
+		logerror("%s: sc5_mux2_w %1x %04x\n", machine().describe_context(), offset, data);
 	}
 }
 
@@ -164,7 +164,7 @@ READ8_MEMBER( bfm_sc5_state::sc5_10202F0_r )
 		case 0x1:
 		case 0x2:
 		case 0x3:
-			printf("%s: sc5_10202F0_r %d\n", machine().describe_context(), offset);
+			logerror("%s: sc5_10202F0_r %d\n", machine().describe_context(), offset);
 			return machine().rand();
 	}
 
@@ -177,12 +177,12 @@ WRITE8_MEMBER( bfm_sc5_state::sc5_10202F0_w )
 	{
 		case 0x0:
 			bfm_sc45_write_serial_vfd((data &0x4)?1:0, (data &0x1)?1:0, (data&0x2) ? 0:1);
-			if (data&0xf8) printf("%s: sc5_10202F0_w %d - %02x\n", machine().describe_context(), offset, data);
+			if (data&0xf8) logerror("%s: sc5_10202F0_w %d - %02x\n", machine().describe_context(), offset, data);
 			break;
 		case 0x1:
 		case 0x2:
 		case 0x3:
-			printf("%s: sc5_10202F0_w %d - %02x\n", machine().describe_context(), offset, data);
+			logerror("%s: sc5_10202F0_w %d - %02x\n", machine().describe_context(), offset, data);
 			break;
 	}
 }
@@ -190,7 +190,7 @@ WRITE8_MEMBER( bfm_sc5_state::sc5_10202F0_w )
 
 WRITE_LINE_MEMBER(bfm_sc5_state::bfm_sc5_duart_irq_handler)
 {
-	printf("bfm_sc5_duart_irq_handler\n");
+	logerror("bfm_sc5_duart_irq_handler\n");
 }
 
 WRITE_LINE_MEMBER(bfm_sc5_state::bfm_sc5_duart_txa)
@@ -200,7 +200,7 @@ WRITE_LINE_MEMBER(bfm_sc5_state::bfm_sc5_duart_txa)
 
 READ8_MEMBER(bfm_sc5_state::bfm_sc5_duart_input_r)
 {
-	printf("bfm_sc5_duart_input_r\n");
+	logerror("bfm_sc5_duart_input_r\n");
 	return 0xff;
 }
 
@@ -209,7 +209,7 @@ WRITE8_MEMBER(bfm_sc5_state::bfm_sc5_duart_output_w)
 	logerror("bfm_sc5_duart_output_w\n");
 }
 
-MACHINE_CONFIG_START( bfm_sc5, bfm_sc5_state )
+MACHINE_CONFIG_START( bfm_sc5 )
 	MCFG_CPU_ADD("maincpu", MCF5206E, 40000000) /* MCF5206eFT */
 	MCFG_CPU_PROGRAM_MAP(sc5_map)
 	MCFG_MCF5206E_PERIPHERAL_ADD("maincpu_onboard")

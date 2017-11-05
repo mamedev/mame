@@ -9,9 +9,10 @@
 
 *********************************************************************/
 
+#include "emu.h"
 #include "a2alfam2.h"
-#include "includes/apple2.h"
 #include "sound/sn76496.h"
+#include "speaker.h"
 
 /***************************************************************************
     PARAMETERS
@@ -21,15 +22,24 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type A2BUS_ALFAM2 = &device_creator<a2bus_alfam2_device>;
-const device_type A2BUS_AESMS = &device_creator<a2bus_aesms_device>;
+DEFINE_DEVICE_TYPE(A2BUS_ALFAM2, a2bus_alfam2_device, "a2alfam2", "ALF MC1 / Apple Music II")
+DEFINE_DEVICE_TYPE(A2BUS_AESMS,  a2bus_aesms_device,  "a2aesms",  "Applied Engineering Super Music Synthesizer")
 
 #define SN1_TAG         "sn76489_1" // left
 #define SN2_TAG         "sn76489_2" // center
 #define SN3_TAG         "sn76489_3" // right
 #define SN4_TAG         "sn76489_4" // center?
 
-MACHINE_CONFIG_FRAGMENT( a2alfam2 )
+
+/***************************************************************************
+    FUNCTION PROTOTYPES
+***************************************************************************/
+
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+MACHINE_CONFIG_MEMBER( a2bus_sn76489_device::device_add_mconfig )
 	MCFG_SPEAKER_STANDARD_STEREO("alf_l", "alf_r")
 
 	MCFG_SOUND_ADD(SN1_TAG, SN76489, 1020484)
@@ -41,7 +51,7 @@ MACHINE_CONFIG_FRAGMENT( a2alfam2 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "alf_r", 0.50)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_FRAGMENT( a2aesms )
+MACHINE_CONFIG_MEMBER( a2bus_aesms_device::device_add_mconfig )
 	MCFG_SPEAKER_STANDARD_STEREO("alf_l", "alf_r")
 
 	MCFG_SOUND_ADD(SN1_TAG, SN76489, 1020484)
@@ -59,31 +69,12 @@ MACHINE_CONFIG_FRAGMENT( a2aesms )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "alf_r", 0.50)
 MACHINE_CONFIG_END
 
-/***************************************************************************
-    FUNCTION PROTOTYPES
-***************************************************************************/
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor a2bus_sn76489_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( a2alfam2 );
-}
-
-machine_config_constructor a2bus_aesms_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( a2aesms );
-}
-
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
 
-a2bus_sn76489_device::a2bus_sn76489_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
-	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+a2bus_sn76489_device::a2bus_sn76489_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
 	device_a2bus_card_interface(mconfig, *this),
 	m_sn1(*this, SN1_TAG),
 	m_sn2(*this, SN2_TAG),
@@ -92,14 +83,14 @@ a2bus_sn76489_device::a2bus_sn76489_device(const machine_config &mconfig, device
 {
 }
 
-a2bus_alfam2_device::a2bus_alfam2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	a2bus_sn76489_device(mconfig, A2BUS_ALFAM2, "ALF MC1 / Apple Music II", tag, owner, clock, "a2alfam2", __FILE__)
+a2bus_alfam2_device::a2bus_alfam2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	a2bus_sn76489_device(mconfig, A2BUS_ALFAM2, tag, owner, clock)
 {
 	m_has4thsn = false;
 }
 
-a2bus_aesms_device::a2bus_aesms_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	a2bus_sn76489_device(mconfig, A2BUS_ALFAM2, "Applied Engineering Super Music Synthesizer", tag, owner, clock, "a2aesms", __FILE__)
+a2bus_aesms_device::a2bus_aesms_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	a2bus_sn76489_device(mconfig, A2BUS_AESMS, tag, owner, clock)
 {
 	m_has4thsn = true;
 }
@@ -125,7 +116,7 @@ void a2bus_sn76489_device::device_reset()
 	m_latch0 = m_latch1 = m_latch2 = m_latch3 = 0;
 }
 
-UINT8 a2bus_sn76489_device::read_c0nx(address_space &space, UINT8 offset)
+uint8_t a2bus_sn76489_device::read_c0nx(address_space &space, uint8_t offset)
 {
 	// SN76489 can't be read, it appears from the schematics this is what happens
 	switch (offset)
@@ -146,7 +137,7 @@ UINT8 a2bus_sn76489_device::read_c0nx(address_space &space, UINT8 offset)
 	return 0xff;
 }
 
-void a2bus_sn76489_device::write_c0nx(address_space &space, UINT8 offset, UINT8 data)
+void a2bus_sn76489_device::write_c0nx(address_space &space, uint8_t offset, uint8_t data)
 {
 	switch (offset)
 	{

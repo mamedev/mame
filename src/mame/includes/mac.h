@@ -14,6 +14,7 @@
 #include "machine/8530scc.h"
 #include "machine/6522via.h"
 #include "machine/ram.h"
+#include "machine/timer.h"
 #include "machine/egret.h"
 #include "machine/cuda.h"
 #include "bus/nubus/nubus.h"
@@ -24,7 +25,9 @@
 #include "machine/macrtc.h"
 #include "sound/asc.h"
 #include "sound/awacs.h"
+#include "sound/dac.h"
 #include "cpu/m68000/m68000.h"
+#include "screen.h"
 
 #define MAC_SCREEN_NAME "screen"
 #define MAC_539X_1_TAG "539x_1"
@@ -145,46 +148,6 @@ enum model_t
 
 void mac_fdc_set_enable_lines(device_t *device, int enable_mask);
 
-/*----------- defined in audio/mac.c -----------*/
-
-class mac_sound_device : public device_t,
-							public device_sound_interface
-{
-public:
-	mac_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	~mac_sound_device() {}
-
-	void enable_sound(int on);
-	void set_sound_buffer(int buffer);
-	void set_volume(int volume);
-	void sh_updatebuffer();
-
-protected:
-	// device-level overrides
-	virtual void device_config_complete() override;
-	virtual void device_start() override;
-
-	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
-private:
-	// internal state
-
-	ram_device *m_ram;
-	model_t m_mac_model;
-
-	sound_stream *m_mac_stream;
-	int m_sample_enable;
-	UINT16 *m_mac_snd_buf_ptr;
-	std::unique_ptr<UINT8[]> m_snd_cache;
-	int m_snd_cache_len;
-	int m_snd_cache_head;
-	int m_snd_cache_tail;
-	int m_indexx;
-};
-
-extern const device_type MAC_SOUND;
-
-
 /* Mac driver data */
 
 class mac_state : public driver_device
@@ -208,19 +171,17 @@ public:
 		m_mouse0(*this, "MOUSE0"),
 		m_mouse1(*this, "MOUSE1"),
 		m_mouse2(*this, "MOUSE2"),
-		m_key0(*this, "KEY0"),
-		m_key1(*this, "KEY1"),
-		m_key2(*this, "KEY2"),
-		m_key3(*this, "KEY3"),
-		m_key4(*this, "KEY4"),
-		m_key5(*this, "KEY5"),
-		m_key6(*this, "KEY6"),
+		m_keys(*this, "KEY%u", 0),
 		m_montype(*this, "MONTYPE"),
+		m_snd_enable(false),
+		m_main_buffer(true),
+		m_snd_vol(7),
 		m_vram(*this,"vram"),
 		m_vram16(*this,"vram16"),
 		m_via2_ca1_hack(0),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_dac(*this, "dac")
 	{
 	}
 
@@ -239,25 +200,30 @@ public:
 	optional_device<rtc3430042_device> m_rtc;
 
 	required_ioport m_mouse0, m_mouse1, m_mouse2;
-	required_ioport m_key0, m_key1, m_key2, m_key3, m_key4, m_key5;
-	optional_ioport m_key6, m_montype;
+	optional_ioport_array<7> m_keys;
+	optional_ioport m_montype;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	model_t m_model;
 
-	UINT32 m_overlay;
+	uint32_t m_overlay;
 	int m_drive_select;
 	int m_scsiirq_enable;
 
-	UINT32 m_via2_vbl;
-	UINT32 m_se30_vbl_enable;
-	UINT8 m_nubus_irq_state;
+	uint32_t m_via2_vbl;
+	uint32_t m_se30_vbl_enable;
+	uint8_t m_nubus_irq_state;
 
 	emu_timer *m_overlay_timeout;
 	TIMER_CALLBACK_MEMBER(overlay_timeout_func);
 	DECLARE_READ32_MEMBER(rom_switch_r);
+
+	TIMER_DEVICE_CALLBACK_MEMBER(mac_scanline);
+	bool m_snd_enable;
+	bool m_main_buffer;
+	int m_snd_vol;
 
 #ifndef MAC_USE_EMULATED_KBD
 	/* used to store the reply to most keyboard commands */
@@ -290,40 +256,40 @@ public:
 	int irq_count, ca1_data, ca2_data;
 
 	// Mac ADB state
-	INT32 m_adb_irq_pending, m_adb_waiting_cmd, m_adb_datasize, m_adb_buffer[257];
-	INT32 m_adb_state, m_adb_command, m_adb_send, m_adb_timer_ticks, m_adb_extclock, m_adb_direction;
-	INT32 m_adb_listenreg, m_adb_listenaddr, m_adb_last_talk, m_adb_srq_switch;
-	INT32 m_adb_streaming, m_adb_stream_ptr;
-	INT32 m_adb_linestate;
+	int32_t m_adb_irq_pending, m_adb_waiting_cmd, m_adb_datasize, m_adb_buffer[257];
+	int32_t m_adb_state, m_adb_command, m_adb_send, m_adb_timer_ticks, m_adb_extclock, m_adb_direction;
+	int32_t m_adb_listenreg, m_adb_listenaddr, m_adb_last_talk, m_adb_srq_switch;
+	int32_t m_adb_streaming, m_adb_stream_ptr;
+	int32_t m_adb_linestate;
 	bool  m_adb_srqflag;
 #define kADBKeyBufSize 32
-		UINT8 m_adb_keybuf[kADBKeyBufSize];
-		UINT8 m_adb_keybuf_start;
-		UINT8 m_adb_keybuf_end;
+		uint8_t m_adb_keybuf[kADBKeyBufSize];
+		uint8_t m_adb_keybuf_start;
+		uint8_t m_adb_keybuf_end;
 
 	// Portable/PB100 Power Manager IC comms (chapter 4, "Guide to the Macintosh Family Hardware", second edition)
-	UINT8 m_pm_data_send, m_pm_data_recv, m_pm_ack, m_pm_req, m_pm_cmd[32], m_pm_out[32], m_pm_dptr, m_pm_sptr, m_pm_slen, m_pm_state;
-	UINT8 m_pmu_int_status, m_pmu_last_adb_command, m_pmu_poll;
+	uint8_t m_pm_data_send, m_pm_data_recv, m_pm_ack, m_pm_req, m_pm_cmd[32], m_pm_out[32], m_pm_dptr, m_pm_sptr, m_pm_slen, m_pm_state;
+	uint8_t m_pmu_int_status, m_pmu_last_adb_command, m_pmu_poll;
 	emu_timer *m_pmu_send_timer;
 
 	// 60.15 Hz timer for RBV/V8/Sonora/Eagle/VASP/etc.
 	emu_timer *m_6015_timer;
 
 	// RBV and friends (V8, etc)
-	UINT8 m_rbv_regs[256], m_rbv_ier, m_rbv_ifr, m_rbv_type, m_rbv_montype, m_rbv_vbltime;
-	UINT32 m_rbv_colors[3], m_rbv_count, m_rbv_clutoffs, m_rbv_immed10wr;
-	UINT32 m_rbv_palette[256];
-	UINT8 m_sonora_vctl[8];
+	uint8_t m_rbv_regs[256], m_rbv_ier, m_rbv_ifr, m_rbv_type, m_rbv_montype, m_rbv_vbltime;
+	uint32_t m_rbv_colors[3], m_rbv_count, m_rbv_clutoffs, m_rbv_immed10wr;
+	uint32_t m_rbv_palette[256];
+	uint8_t m_sonora_vctl[8];
 	emu_timer *m_vbl_timer, *m_cursor_timer;
-	UINT16 m_cursor_line;
-	UINT16 m_dafb_int_status;
+	uint16_t m_cursor_line;
+	uint16_t m_dafb_int_status;
 	int m_dafb_scsi1_drq, m_dafb_scsi2_drq;
-	UINT8 m_dafb_mode;
-	UINT32 m_dafb_base, m_dafb_stride;
+	uint8_t m_dafb_mode;
+	uint32_t m_dafb_base, m_dafb_stride;
 
 	// this is shared among all video setups with vram
-	optional_shared_ptr<UINT32> m_vram;
-	optional_shared_ptr<UINT16> m_vram16;
+	optional_shared_ptr<uint32_t> m_vram;
+	optional_shared_ptr<uint16_t> m_vram16;
 
 	// interrupts
 	int m_scc_interrupt, m_via_interrupt, m_via2_interrupt, m_scsi_interrupt, m_asc_interrupt, m_last_taken_interrupt;
@@ -332,7 +298,7 @@ public:
 	void v8_resize();
 	void set_memory_overlay(int overlay);
 	void scc_mouse_irq( int x, int y );
-	void nubus_slot_interrupt(UINT8 slot, UINT32 state);
+	void nubus_slot_interrupt(uint8_t slot, uint32_t state);
 	DECLARE_WRITE_LINE_MEMBER(set_scc_interrupt);
 	void set_via_interrupt(int value);
 	void set_via2_interrupt(int value);
@@ -344,6 +310,7 @@ public:
 	void pmu_exec();
 	void mac_adb_newaction(int state);
 	void set_adb_line(int linestate);
+	void update_volume();
 
 	DECLARE_READ16_MEMBER ( mac_via_r );
 	DECLARE_WRITE16_MEMBER ( mac_via_w );
@@ -426,9 +393,9 @@ private:
 	void adb_vblank();
 	int adb_pollkbd(int update);
 	int adb_pollmouse();
-	void adb_accummouse( UINT8 *MouseX, UINT8 *MouseY );
-	void pmu_one_byte_reply(UINT8 result);
-	void pmu_three_byte_reply(UINT8 result1, UINT8 result2, UINT8 result3);
+	void adb_accummouse( uint8_t *MouseX, uint8_t *MouseY );
+	void pmu_one_byte_reply(uint8_t result);
+	void pmu_three_byte_reply(uint8_t result1, uint8_t result2, uint8_t result3);
 
 	// wait states for accessing the VIA
 	int m_via_cycles;
@@ -442,19 +409,21 @@ private:
 	int m_adb_keybinitialized, m_adb_currentkeys[2], m_adb_modifiers;
 
 	// PRAM for ADB MCU HLEs (mostly unused now)
-	UINT8 m_adb_pram[256];
+	uint8_t m_adb_pram[256];
 
-	UINT8 m_oss_regs[0x400];
+	uint8_t m_oss_regs[0x400];
 
 	// AMIC for x100 PowerMacs
-	UINT8 m_amic_regs[0x200];
+	uint8_t m_amic_regs[0x200];
 
 	// HMC for x100 PowerMacs
-	UINT64 m_hmc_reg, m_hmc_shiftout;
+	uint64_t m_hmc_reg, m_hmc_shiftout;
 
 	int m_via2_ca1_hack;
 	optional_device<screen_device> m_screen;
 	optional_device<palette_device> m_palette;
+	optional_device<dac_8bit_pwm_device> m_dac;
+
 public:
 	emu_timer *m_scanline_timer;
 	emu_timer *m_adb_timer;
@@ -471,12 +440,9 @@ public:
 	DECLARE_DRIVER_INIT(maciifx);
 	DECLARE_DRIVER_INIT(maclc);
 	DECLARE_DRIVER_INIT(macpb160);
-	DECLARE_DRIVER_INIT(macplus);
 	DECLARE_DRIVER_INIT(macse);
 	DECLARE_DRIVER_INIT(macpb140);
-	DECLARE_DRIVER_INIT(mac128k512k);
 	DECLARE_DRIVER_INIT(macpm6100);
-	DECLARE_DRIVER_INIT(mac512ke);
 	DECLARE_DRIVER_INIT(maclc520);
 	DECLARE_DRIVER_INIT(maciici);
 	DECLARE_DRIVER_INIT(maciix);
@@ -500,17 +466,17 @@ public:
 	DECLARE_VIDEO_RESET(macsonora);
 	DECLARE_VIDEO_RESET(maceagle);
 	DECLARE_VIDEO_START(macrbv);
-	UINT32 screen_update_mac(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_macprtb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_macse30(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_macpb140(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_macpb160(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_macrbv(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_macdafb(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_macrbvvram(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_macv8(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_macsonora(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_macpbwd(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_mac(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_macprtb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_macse30(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_macpb140(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_macpb160(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_macrbv(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_macdafb(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_macrbvvram(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_macv8(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_macsonora(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_macpbwd(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(mac_rbv_vbl);
 #ifndef MAC_USE_EMULATED_KBD
 	TIMER_CALLBACK_MEMBER(kbd_clock);
@@ -557,6 +523,7 @@ public:
 	void mac_driver_init(model_t model);
 	void mac_install_memory(offs_t memory_begin, offs_t memory_end,
 		offs_t memory_size, void *memory_data, int is_rom, const char *bank);
+	offs_t mac_dasm_override(device_t &device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options);
 };
 
 #endif /* MAC_H_ */

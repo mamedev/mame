@@ -37,6 +37,7 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "screen.h"
 
 
 class sys2900_state : public driver_device
@@ -54,7 +55,7 @@ public:
 	DECLARE_DRIVER_INIT(sys2900);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_sys2900(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_sys2900(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 
 protected:
@@ -89,7 +90,7 @@ void sys2900_state::device_timer(emu_timer &timer, device_timer_id id, int param
 		membank("boot")->set_entry(0);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in sys2900_state::device_timer");
+		assert_always(false, "Unknown id in sys2900_state::device_timer");
 	}
 }
 
@@ -101,7 +102,7 @@ void sys2900_state::machine_reset()
 
 DRIVER_INIT_MEMBER(sys2900_state,sys2900)
 {
-	UINT8 *RAM = memregion("maincpu")->base();
+	uint8_t *RAM = memregion("maincpu")->base();
 	membank("boot")->configure_entries(0, 2, &RAM[0x0000], 0xf000);
 }
 
@@ -109,12 +110,12 @@ void sys2900_state::video_start()
 {
 }
 
-UINT32 sys2900_state::screen_update_sys2900(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t sys2900_state::screen_update_sys2900(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
 
-static MACHINE_CONFIG_START( sys2900, sys2900_state )
+static MACHINE_CONFIG_START( sys2900 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(sys2900_mem)
@@ -142,5 +143,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT    INIT        COMPANY          FULLNAME       FLAGS */
+//    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT    STATE          INIT     COMPANY          FULLNAME       FLAGS
 COMP( 1981, sys2900, 0,      0,       sys2900,   sys2900, sys2900_state, sys2900, "Systems Group", "System 2900", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

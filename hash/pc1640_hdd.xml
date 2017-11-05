@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="pc1640_hdd" description="Amstrad PC1640 hard disks">
+
+	<software name="hd20">
+		<description>Amstrad PC1640 HD20</description>
+		<year>1987</year>
+		<publisher>Amstrad</publisher>
+
+		<!-- Amstrad 40095 (Alps DRMD20A12A), Tandon TM-262 -->
+		<part name="hdd" interface="scsi_hdd">
+			<diskarea name="harddriv">
+				<disk name="40095" sha1="d3c8b579e40063e98331e667caf7bd3667b18d1c" writeable="yes" />
+			</diskarea>
+		</part>
+	</software>
+
+</softwarelist>

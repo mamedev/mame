@@ -138,17 +138,20 @@ Stephh's notes (based on the games M68000 code and some tests) :
 ******************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "cpu/m68000/m68000.h"
-#include "sound/2610intf.h"
 #include "includes/mcatadv.h"
+
+#include "cpu/m68000/m68000.h"
+#include "cpu/z80/z80.h"
+#include "sound/2610intf.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 /*** Main CPU ***/
 
 WRITE16_MEMBER(mcatadv_state::mcat_soundlatch_w)
 {
-	soundlatch_byte_w(space, 0, data);
+	m_soundlatch->write(space, 0, data);
 	m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -200,7 +203,7 @@ static ADDRESS_MAP_START( mcatadv_map, AS_PROGRAM, 16, mcatadv_state )
 
 	AM_RANGE(0xb00018, 0xb00019) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w) // NOST Only
 	AM_RANGE(0xb0001e, 0xb0001f) AM_READ(mcat_wd_r) // MCAT Only
-	AM_RANGE(0xc00000, 0xc00001) AM_READ(soundlatch2_word_r) AM_WRITE(mcat_soundlatch_w)
+	AM_RANGE(0xc00000, 0xc00001) AM_DEVREAD8("soundlatch2", generic_latch_8_device, read, 0x00ff) AM_WRITE(mcat_soundlatch_w)
 ADDRESS_MAP_END
 
 /*** Sound ***/
@@ -221,7 +224,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mcatadv_sound_io_map, AS_IO, 8, mcatadv_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x80, 0x80) AM_READWRITE(soundlatch_byte_r, soundlatch2_byte_w)
+	AM_RANGE(0x80, 0x80) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_DEVWRITE("soundlatch2", generic_latch_8_device, write)
 ADDRESS_MAP_END
 
 
@@ -236,7 +239,7 @@ static ADDRESS_MAP_START( nost_sound_io_map, AS_IO, 8, mcatadv_state )
 	AM_RANGE(0x00, 0x03) AM_DEVWRITE("ymsnd", ym2610_device, write)
 	AM_RANGE(0x04, 0x07) AM_DEVREAD("ymsnd", ym2610_device, read)
 	AM_RANGE(0x40, 0x40) AM_WRITE(mcatadv_sound_bw_w)
-	AM_RANGE(0x80, 0x80) AM_READWRITE(soundlatch_byte_r, soundlatch2_byte_w)
+	AM_RANGE(0x80, 0x80) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_DEVWRITE("soundlatch2", generic_latch_8_device, write)
 ADDRESS_MAP_END
 
 /*** Inputs ***/
@@ -413,16 +416,9 @@ static GFXDECODE_START( mcatadv )
 GFXDECODE_END
 
 
-/* Stolen from Psikyo.c */
-WRITE_LINE_MEMBER(mcatadv_state::sound_irq)
-{
-	m_soundcpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
-
 void mcatadv_state::machine_start()
 {
-	UINT8 *ROM = memregion("soundcpu")->base();
+	uint8_t *ROM = memregion("soundcpu")->base();
 
 	membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
 	membank("bank1")->set_entry(1);
@@ -432,7 +428,7 @@ void mcatadv_state::machine_start()
 	save_item(NAME(m_palette_bank2));
 }
 
-static MACHINE_CONFIG_START( mcatadv, mcatadv_state )
+static MACHINE_CONFIG_START( mcatadv )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz) /* verified on pcb */
@@ -451,7 +447,7 @@ static MACHINE_CONFIG_START( mcatadv, mcatadv_state )
 	MCFG_SCREEN_SIZE(320, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mcatadv_state, screen_update_mcatadv)
-	MCFG_SCREEN_VBLANK_DRIVER(mcatadv_state, screen_eof_mcatadv)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(mcatadv_state, screen_vblank_mcatadv))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mcatadv)
@@ -465,8 +461,11 @@ static MACHINE_CONFIG_START( mcatadv, mcatadv_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+
 	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_16MHz/2) /* verified on pcb */
-	MCFG_YM2610_IRQ_HANDLER(WRITELINE(mcatadv_state, sound_irq))
+	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.32)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.32)
 	MCFG_SOUND_ROUTE(1, "lspeaker",  0.5)
@@ -483,7 +482,7 @@ static MACHINE_CONFIG_DERIVED( nost, mcatadv )
 	MCFG_DEVICE_REMOVE("rspeaker")
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_REPLACE("ymsnd", YM2610, XTAL_16MHz/2) /* verified on pcb */
-		MCFG_YM2610_IRQ_HANDLER(WRITELINE(mcatadv_state, sound_irq))
+		MCFG_YM2610_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
 		MCFG_SOUND_ROUTE(0, "mono", 0.2)
 		MCFG_SOUND_ROUTE(1, "mono", 0.5)
 		MCFG_SOUND_ROUTE(2, "mono", 0.5)
@@ -669,9 +668,9 @@ ROM_START( nostk )
 ROM_END
 
 
-GAME( 1993, mcatadv,  0,       mcatadv, mcatadv, driver_device, 0, ROT0,   "Wintechno", "Magical Cat Adventure", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, mcatadvj, mcatadv, mcatadv, mcatadv, driver_device, 0, ROT0,   "Wintechno", "Magical Cat Adventure (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, catt,     mcatadv, mcatadv, mcatadv, driver_device, 0, ROT0,   "Wintechno", "Catt (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, nost,     0,       nost,    nost, driver_device,    0, ROT270, "Face",      "Nostradamus", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, nostj,    nost,    nost,    nost, driver_device,    0, ROT270, "Face",      "Nostradamus (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, nostk,    nost,    nost,    nost, driver_device,    0, ROT270, "Face",      "Nostradamus (Korea)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, mcatadv,  0,       mcatadv, mcatadv, mcatadv_state, 0, ROT0,   "Wintechno", "Magical Cat Adventure",         MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, mcatadvj, mcatadv, mcatadv, mcatadv, mcatadv_state, 0, ROT0,   "Wintechno", "Magical Cat Adventure (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, catt,     mcatadv, mcatadv, mcatadv, mcatadv_state, 0, ROT0,   "Wintechno", "Catt (Japan)",                  MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, nost,     0,       nost,    nost,    mcatadv_state, 0, ROT270, "Face",      "Nostradamus",                   MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, nostj,    nost,    nost,    nost,    mcatadv_state, 0, ROT270, "Face",      "Nostradamus (Japan)",           MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, nostk,    nost,    nost,    nost,    mcatadv_state, 0, ROT270, "Face",      "Nostradamus (Korea)",           MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

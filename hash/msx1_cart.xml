@@ -4313,7 +4313,7 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
-	<software name="dngmster">
+	<software name="dmaster">
 		<description>Dungeon Master (Jpn)</description>
 		<year>1986</year>
 		<publisher>ASCII</publisher>
@@ -6752,19 +6752,6 @@ kept for now until finding out what those bytes affect...
 		<part name="cart" interface="msx_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="kage no densetsu - legend of kage, the (japan).rom" size="32768" crc="69367e10" sha1="ffc8c57b26f2f495bd77efac5b815efe9c25336c" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="legkagea" cloneof="legkage">
-		<description>Kage no Densetsu - The Legend of Kage (Jpn, Alt)</description>
-		<year>1986</year>
-		<publisher>Taito</publisher>
-		<info name="serial" value="MSX-9" />
-		<info name="alt_title" value="影の伝説" />
-		<part name="cart" interface="msx_cart">
-			<dataarea name="rom" size="32768">
-				<rom name="kage no densetsu - legend of kage, the (japan) (alt 1).rom" size="32768" crc="b581f746" sha1="666e82d8a8e5d2672a9b7159adcdc861a31c8fa1" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -10325,6 +10312,21 @@ kept for now until finding out what those bytes affect...
 				<rom size="16384" offset="0x4000" loadflag="reload" />
 				<rom size="16384" offset="0x8000" loadflag="reload" />
 				<rom size="16384" offset="0xc000" loadflag="reload" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rocnrope">
+		<description>Roc'n Rope</description>
+		<year>2008</year>
+		<publisher>Icon Games</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami_scc" />
+			<feature name="mapper" value="KONAMI-SCC" />
+			<dataarea name="rom" size="32768">
+<!-- Original Dump from an 39SF010 flashrom - 128kb Image.  32KB Rom file cropped out of image after discarding unused area (FF)
+                <rom name="roc'n rope.bin" size="131072" crc="a71c2009" sha1="4429fe7090953dd509feccafd87ea4e8deb6360f" offset="0" />  -->
+				<rom name="roc'n rope.rom" size="32768" crc="c0c32c3e" sha1="74b2dbb51437b531ca78c314d666aabe0fd2e177" offset="0" />
 			</dataarea>
 		</part>
 	</software>

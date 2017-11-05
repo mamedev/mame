@@ -9,7 +9,7 @@ driver by Phil Stroffolino and Nicola Salmoria
 
 *1987 X77 Mahjong Hourouki Part1 -Seisyun Hen-
 *1987 X72 Mahjong Hourouki Gaiden
- 1988     Mahjong Joshi Pro-wres -Give up 5 byou mae-
+*1988 X73 Mahjong Joshi Pro-wres -Give up 5 byou mae-
 *1988 A74 Mahjong Hourouki Okite
 *1988 X80 Mahjong Clinic
 *1988 M81 Mahjong Rokumeikan
@@ -147,15 +147,30 @@ Sound:  SN76489
 OSC:    16.000MHz 9.000MHz
 
 ----------------------------------------------------------------------------
+----------------------------------------------------------------------------
+Mahjong Joshi Pro-wres -Give up 5 byou mae-
+(c)1988 HOME DATA
+
+Board:  X73-PWB-A(C)
+
+CPU:    6809 uPC324C
+Sound:  SN76489
+OSC:    16.000MHz 9.000MHz
+ROM:    28 pin mask rom devices are 1mbit, 32 pin are 2mbit.
+
+----------------------------------------------------------------------------
 Mahjong Vitamin C
 (c)1989 Home Data
 
 Board:  X73-PWB-A(A)
+Board:  X83-PWB-AC(A)
 
 CPU:    68B09E uPD7807CW(?)
 Sound:  SN76489AN DAC
 OSC:    9.000MHz 16.000MHz
 Custom: GX61A01
+
+Note: Manual dips are completely wrong, this actually matches pteacher
 
 ----------------------------------------------------------------------------
 Mahjong-yougo no Kisotairyoku
@@ -175,10 +190,11 @@ Mahjong Kinjirareta Asobi
 Board:  X83-PWB-A(A)
 
 CPU:    68B09E uPD7807CW
-Sound:  SN76489AN
-        DAC
+Sound:  SN76489AN DAC
 OSC:    11.000MHz 16.000MHz
 Custom: GX61A01
+
+Note: seems likely above 11mhz crystal was a repair
 
 ----------------------------------------------------------------------------
 Mahjong Jogakuen
@@ -218,12 +234,16 @@ Custom: GX61A01
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
+#include "includes/homedata.h"
+
 #include "cpu/m6809/m6809.h"
 #include "cpu/upd7810/upd7810.h"
-#include "includes/homedata.h"
+#include "cpu/z80/z80.h"
 #include "sound/dac.h"
-#include "sound/2203intf.h"
+#include "sound/volt_reg.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 INTERRUPT_GEN_MEMBER(homedata_state::homedata_irq)
 {
@@ -289,7 +309,7 @@ WRITE8_MEMBER(homedata_state::mrokumei_keyboard_select_w)
 READ8_MEMBER(homedata_state::mrokumei_sound_io_r)
 {
 	if (m_sndbank & 4)
-		return(soundlatch_byte_r(space, 0));
+		return(m_soundlatch->read(space, 0));
 	else
 		return memregion("audiocpu")->base()[0x10000 + offset + (m_sndbank & 1) * 0x10000];
 }
@@ -302,22 +322,9 @@ WRITE8_MEMBER(homedata_state::mrokumei_sound_bank_w)
 	m_sndbank = data;
 }
 
-WRITE8_MEMBER(homedata_state::mrokumei_sound_io_w)
-{
-	switch (offset & 0xff)
-	{
-		case 0x40:
-			m_dac->write_signed8(data);
-			break;
-		default:
-			logerror("%04x: I/O write to port %04x\n", space.device().safe_pc(), offset);
-			break;
-	}
-}
-
 WRITE8_MEMBER(homedata_state::mrokumei_sound_cmd_w)
 {
-	soundlatch_byte_w(space, offset, data);
+	m_soundlatch->write(space, offset, data);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
@@ -544,13 +551,17 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mrokumei_sound_map, AS_PROGRAM, 8, homedata_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	// TODO: might be that the entire area is sound_bank_w
 	AM_RANGE(0xfffc, 0xfffd) AM_WRITENOP    /* stack writes happen here, but there's no RAM */
 	AM_RANGE(0x8080, 0x8080) AM_WRITE(mrokumei_sound_bank_w)
+	AM_RANGE(0xffbf, 0xffbf) AM_WRITE(mrokumei_sound_bank_w) // hourouki mirror
 ADDRESS_MAP_END
 
-
 static ADDRESS_MAP_START( mrokumei_sound_io_map, AS_IO, 8, homedata_state )
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(mrokumei_sound_io_r, mrokumei_sound_io_w) /* read address is 16-bit, write address is only 8-bit */
+	AM_RANGE(0x0000, 0xffff) AM_READ(mrokumei_sound_io_r) /* read address is 16-bit */
+	AM_RANGE(0x0040, 0x0040) AM_MIRROR(0xff00) AM_DEVWRITE("dac", dac_byte_interface, write) /* write address is only 8-bit */
+	// hourouki mirror...
+	AM_RANGE(0x007f, 0x007f) AM_MIRROR(0xff00) AM_DEVWRITE("dac", dac_byte_interface, write) /* write address is only 8-bit */
 ADDRESS_MAP_END
 
 /********************************************************************************/
@@ -576,14 +587,6 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( reikaids_upd7807_map, AS_PROGRAM, 8, homedata_state )
 	AM_RANGE(0x0000, 0xfeff) AM_ROMBANK("bank2")    /* External ROM (Banked) */
-	AM_RANGE(0xff00, 0xffff) AM_RAM /* Internal RAM */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( reikaids_upd7807_io_map, AS_IO, 8, homedata_state )
-	AM_RANGE(UPD7807_PORTA, UPD7807_PORTA) AM_READWRITE(reikaids_upd7807_porta_r, reikaids_upd7807_porta_w)
-	AM_RANGE(UPD7807_PORTB, UPD7807_PORTB) AM_DEVWRITE("dac", dac_device, write_signed8)
-	AM_RANGE(UPD7807_PORTC, UPD7807_PORTC) AM_WRITE(reikaids_upd7807_portc_w)
-	AM_RANGE(UPD7807_PORTT, UPD7807_PORTT) AM_READ(reikaids_snd_command_r)
 ADDRESS_MAP_END
 
 /**************************************************************************/
@@ -611,14 +614,6 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( pteacher_upd7807_map, AS_PROGRAM, 8, homedata_state )
 	AM_RANGE(0x0000, 0x0000) AM_WRITE(pteacher_snd_answer_w)
 	AM_RANGE(0x0000, 0xfeff) AM_ROMBANK("bank2")    /* External ROM (Banked) */
-	AM_RANGE(0xff00, 0xffff) AM_RAM /* Internal RAM */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( pteacher_upd7807_io_map, AS_IO, 8, homedata_state )
-	AM_RANGE(UPD7807_PORTA, UPD7807_PORTA) AM_READWRITE(pteacher_upd7807_porta_r, pteacher_upd7807_porta_w)
-	AM_RANGE(UPD7807_PORTB, UPD7807_PORTB) AM_DEVWRITE("dac", dac_device, write_signed8)
-	AM_RANGE(UPD7807_PORTC, UPD7807_PORTC) AM_READ_PORT("COIN") AM_WRITE(pteacher_upd7807_portc_w)
-	AM_RANGE(UPD7807_PORTT, UPD7807_PORTT) AM_READ(pteacher_keyboard_r)
 ADDRESS_MAP_END
 
 /**************************************************************************/
@@ -626,21 +621,19 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( mjhokite )
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coinage ) )
+		PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "SW1:7" )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1:6,5")
 	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x10, 0x10, "Initial Score" )
+	PORT_DIPNAME( 0x10, 0x10, "Initial Score" )     PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x10, "1000" )
 	PORT_DIPSETTING(    0x00, "2000" )
-	PORT_DIPNAME( 0xe0, 0xe0, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0xe0, 0x80, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW1:3,2,1")
 	PORT_DIPSETTING(    0xe0, "1 (easiest)" )
 	PORT_DIPSETTING(    0xc0, "2" )
 	PORT_DIPSETTING(    0xa0, "3" )
@@ -651,30 +644,18 @@ static INPUT_PORTS_START( mjhokite )
 	PORT_DIPSETTING(    0x00, "8 (hardest)" )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, "Girl Voice" )
+	PORT_DIPNAME( 0x02, 0x00, "Girl Voice" )        PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW2:6" )
+		PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "SW2:5" )
+	PORT_DIPUNUSED_DIPLOC( 0x10, 0x10, "SW2:4" )
+		PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "SW2:3" )
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW2:2" )
+		PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW2:1" )
 
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -731,23 +712,23 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( reikaids )
 	PORT_START("IN0")   // 0x7801
-	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(1)
-	PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(1)
-	PORT_BIT(  0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_PLAYER(1)
-	PORT_BIT(  0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_PLAYER(1)
-	PORT_BIT(  0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) /* punch */
-	PORT_BIT(  0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) /* kick */
-	PORT_BIT(  0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) /* jump */
+	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT(  0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT(  0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT(  0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Punch")
+	PORT_BIT(  0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Kick")
+	PORT_BIT(  0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("P1 Jump / Defense")
 	PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_START1 )
 
 	PORT_START("IN1")   // 0x7802
-	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(2)
-	PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(2)
-	PORT_BIT(  0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_PLAYER(2)
-	PORT_BIT(  0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_PLAYER(2)
-	PORT_BIT(  0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) /* punch */
-	PORT_BIT(  0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) /* kick */
-	PORT_BIT(  0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) /* jump */
+	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT(  0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT(  0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT(  0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Punch")
+	PORT_BIT(  0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Kick")
+	PORT_BIT(  0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("P2 Jump / Defense")
 	PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_START2 )
 
 	PORT_START("IN2")   // 0x7803
@@ -761,45 +742,45 @@ static INPUT_PORTS_START( reikaids )
 	PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Allow_Continue ) )
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Allow_Continue ) )  PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x06, 0x06, DEF_STR( Bonus_Life ) )
+	PORT_DIPNAME( 0x06, 0x06, DEF_STR( Bonus_Life ) )      PORT_DIPLOCATION("SW1:2,3")
 	PORT_DIPSETTING(    0x06, "20k then every 60k" )
 	PORT_DIPSETTING(    0x04, "30k then every 80k" )
 	PORT_DIPSETTING(    0x02, "20k" )
 	PORT_DIPSETTING(    0x00, "30k" )
-	PORT_DIPNAME( 0x18, 0x10, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x18, 0x10, DEF_STR( Lives ) )           PORT_DIPLOCATION("SW1:4,5")
 	PORT_DIPSETTING(    0x18, "2" )
 	PORT_DIPSETTING(    0x10, "3" )
 	PORT_DIPSETTING(    0x08, "4" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x20, 0x20, "Time" )
+	PORT_DIPNAME( 0x20, 0x20, "Time" )                     PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x20, "60" )
 	PORT_DIPSETTING(    0x00, "45" )
-	PORT_DIPNAME( 0x40, 0x40, "Unknown 2-6" )
+	PORT_DIPNAME( 0x40, 0x40, "Unknown 2-6" )              PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Unknown 2-7" )
+	PORT_DIPNAME( 0x80, 0x80, "Unknown 2-7" )              PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )      PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x03, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Demo_Sounds ) )     PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Flip_Screen ) )     PORT_DIPLOCATION("SW2:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Cabinet ) )         PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0xe0, 0xe0, DEF_STR( Coinage ) )
+	PORT_DIPNAME( 0xe0, 0xe0, DEF_STR( Coinage ) )         PORT_DIPLOCATION("SW2:6,7,8")
 	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( 2C_1C ) )
@@ -813,8 +794,8 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( battlcry )
 	PORT_INCLUDE( reikaids )
 
-	PORT_MODIFY("DSW1")
-	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Allow_Continue ) )
+	PORT_MODIFY("DSW1")  // According to manual these DSW #s should be reversed
+	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Allow_Continue ) )  PORT_DIPLOCATION("SW1:1,2,3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x02, "Up To Stage 1" )
 	PORT_DIPSETTING(    0x06, "Up To Stage 2" )
@@ -822,29 +803,32 @@ static INPUT_PORTS_START( battlcry )
 	PORT_DIPSETTING(    0x05, "Up To Stage 4" )
 	PORT_DIPSETTING(    0x03, "Up To Stage 5" )
 	PORT_DIPSETTING(    0x07, "Up To Stage 6" )
-	PORT_DIPNAME( 0x18, 0x10, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x18, 0x10, DEF_STR( Lives ) )           PORT_DIPLOCATION("SW1:4,5")
 	PORT_DIPSETTING(    0x18, "1" )
 	PORT_DIPSETTING(    0x10, "2" )
 	PORT_DIPSETTING(    0x08, "3" )
 	PORT_DIPSETTING(    0x00, "4" )
-	PORT_DIPNAME( 0x20, 0x20, "Time" )
+	PORT_DIPNAME( 0x20, 0x20, "Time" )                     PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x20, "90" )
 	PORT_DIPSETTING(    0x00, "120" )
-	PORT_DIPNAME( 0x40, 0x40, "Test Mode" )
+	PORT_DIPNAME( 0x40, 0x40, "Test Mode" )                PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "Unused - Leave OFF" )       PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_MODIFY("DSW2")
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Demo_Sounds ) )     PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "Background Music" )
+	PORT_DIPNAME( 0x08, 0x08, "Background Music" )         PORT_DIPLOCATION("SW2:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Flip_Screen ) )     PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0xe0, 0xe0, DEF_STR( Coinage ) )
+	PORT_DIPNAME( 0xe0, 0xe0, DEF_STR( Coinage ) )         PORT_DIPLOCATION("SW2:6,7,8")
 	PORT_DIPSETTING(    0x80, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0xc0, DEF_STR( 2C_1C ) )
@@ -854,7 +838,6 @@ static INPUT_PORTS_START( battlcry )
 	PORT_DIPSETTING(    0x20, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
 INPUT_PORTS_END
-
 
 static INPUT_PORTS_START( mj_keyboard )
 	PORT_START("KEY0")
@@ -914,40 +897,30 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( pteacher )
 	PORT_START("DSW")   /* dip switches (handled by pteacher_keyboard_r) */
-	PORT_DIPNAME( 0x0001, 0x0000, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x0001, 0x0000, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x0002, 0x0000, "In-Game BGM")        PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_SERVICE( 0x0100, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+		PORT_DIPNAME( 0x000c, 0x000c, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1:3,4")
+		PORT_DIPSETTING(      0x0000, DEF_STR( 3C_1C ) )
+		PORT_DIPSETTING(      0x0004, DEF_STR( 2C_1C ) )
+		PORT_DIPSETTING(      0x000c, DEF_STR( 1C_1C ) )
+		PORT_DIPSETTING(      0x0008, DEF_STR( 1C_2C ) )
+		PORT_DIPNAME( 0x0010, 0x0010, "Female Voices" )         PORT_DIPLOCATION("SW1:5")
+		PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+		PORT_DIPSETTING(      0x0010, DEF_STR( On ) )
+		PORT_DIPUNKNOWN_DIPLOC( 0x0020, 0x0020, "SW1:6" )
+		PORT_DIPUNKNOWN_DIPLOC( 0x0040, 0x0040, "SW1:7" )
+		PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SW1:8")
+		PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+		PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
+		PORT_SERVICE_DIPLOC(0x0100, IP_ACTIVE_LOW, "SW2:1" )
+		PORT_DIPUNKNOWN_DIPLOC( 0x0200, 0x0200, "SW2:2" )
+		PORT_DIPUNKNOWN_DIPLOC( 0x0400, 0x0400, "SW2:3" )
+		PORT_DIPUNKNOWN_DIPLOC( 0x0800, 0x0800, "SW2:4" )
 	PORT_BIT( 0xf000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("COIN")
@@ -958,38 +931,26 @@ static INPUT_PORTS_START( pteacher )
 	PORT_INCLUDE( mj_keyboard )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( lemnangl )
+static INPUT_PORTS_START( mjjoship )
 	PORT_INCLUDE( pteacher )
 
-	PORT_MODIFY("DSW")
-	PORT_DIPNAME( 0x0001, 0x0000, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW1:1")
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0000, "In-Game BGM" )           PORT_DIPLOCATION("SW1:2")
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x000c, 0x000c, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1:3,4")
-	PORT_DIPSETTING(      0x0000, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(      0x000c, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x0010, 0x0010, "Female Voices" )         PORT_DIPLOCATION("SW1:5")
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( On ) )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0020, 0x0020, "SW1:6" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0040, 0x0040, "SW1:7" )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SW1:8")
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	// Manual wrong for this game - it's an incomplete version of the
+		// pteacher set, with no service mode and start score instead of
+	// girl voices.  Coins stated in manual in same place but do nothing
 
-	PORT_SERVICE_DIPLOC(0x0100, IP_ACTIVE_LOW, "SW2:1" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0200, 0x0200, "SW2:2" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0400, 0x0400, "SW2:3" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0800, 0x0800, "SW2:4" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x1000, 0x1000, "SW2:5" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x2000, 0x2000, "SW2:6" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x4000, 0x4000, "SW2:7" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x8000, 0x8000, "SW2:8" )
+	PORT_MODIFY("DSW")
+	// SW1
+	PORT_DIPUNUSED_DIPLOC( 0x0002, 0x0002, "SW1:2" )
+	PORT_DIPUNUSED_DIPLOC( 0x0004, 0x0004, "SW1:3" )
+	PORT_DIPUNUSED_DIPLOC( 0x0008, 0x0008, "SW1:4" )
+	PORT_DIPNAME( 0x0010, 0x0010, "Player Start Score" )    PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(    0x0010, "1000" )
+	PORT_DIPSETTING(    0x0000, "2000" )
+
+	// SW2
+	PORT_DIPUNUSED_DIPLOC( 0x0100, 0x0100, "SW2:1" )
+	PORT_DIPUNUSED_DIPLOC( 0x0200, 0x0200, "SW2:2" )
+
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( jogakuen )
@@ -1159,8 +1120,6 @@ GFXDECODE_END
 
 MACHINE_START_MEMBER(homedata_state,homedata)
 {
-	m_sn = machine().device<sn76489a_device>("snsnd");
-
 	save_item(NAME(m_visible_page));
 	save_item(NAME(m_flipscreen));
 	save_item(NAME(m_blitter_bank));
@@ -1174,7 +1133,7 @@ MACHINE_START_MEMBER(homedata_state,homedata)
 
 MACHINE_START_MEMBER(homedata_state,reikaids)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	membank("bank1")->configure_entries(0, 8, &ROM[0xc000], 0x4000);
 	membank("bank2")->configure_entries(0, 4, memregion("audiocpu")->base(), 0x10000);
@@ -1190,7 +1149,7 @@ MACHINE_START_MEMBER(homedata_state,reikaids)
 
 MACHINE_START_MEMBER(homedata_state,pteacher)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	membank("bank1")->configure_entries(0, 4, &ROM[0xc000], 0x4000);
 	membank("bank2")->configure_entries(0, 4, memregion("audiocpu")->base(), 0x10000);
@@ -1252,7 +1211,7 @@ MACHINE_RESET_MEMBER(homedata_state,reikaids)
 	m_gfx_bank[1] = 0;  // this is not used by reikaids
 }
 
-static MACHINE_CONFIG_START( mrokumei, homedata_state )
+static MACHINE_CONFIG_START( mrokumei )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, 16000000/4)  /* 4MHz ? */
@@ -1274,7 +1233,7 @@ static MACHINE_CONFIG_START( mrokumei, homedata_state )
 	// visible area can be changed at runtime
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 54*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(homedata_state, screen_update_mrokumei)
-	MCFG_SCREEN_VBLANK_DRIVER(homedata_state, screen_eof_homedata)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(homedata_state, screen_vblank_homedata))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mrokumei)
@@ -1284,19 +1243,22 @@ static MACHINE_CONFIG_START( mrokumei, homedata_state )
 	MCFG_VIDEO_START_OVERRIDE(homedata_state,mrokumei)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("snsnd", SN76489A, 16000000/4)     // SN76489AN actually
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
 /**************************************************************************/
 
-static MACHINE_CONFIG_START( reikaids, homedata_state )
+static MACHINE_CONFIG_START( reikaids )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, 16000000/4)  /* 4MHz ? */
@@ -1305,7 +1267,11 @@ static MACHINE_CONFIG_START( reikaids, homedata_state )
 
 	MCFG_CPU_ADD("audiocpu", UPD7807, 8000000)  /* ??? MHz (max speed for the 7807 is 12MHz) */
 	MCFG_CPU_PROGRAM_MAP(reikaids_upd7807_map)
-	MCFG_CPU_IO_MAP(reikaids_upd7807_io_map)
+	MCFG_UPD7807_PORTA_READ_CB(READ8(homedata_state, reikaids_upd7807_porta_r))
+	MCFG_UPD7807_PORTA_WRITE_CB(WRITE8(homedata_state, reikaids_upd7807_porta_w))
+	MCFG_UPD7807_PORTB_WRITE_CB(DEVWRITE8("dac", dac_byte_interface, write))
+	MCFG_UPD7807_PORTC_WRITE_CB(WRITE8(homedata_state, reikaids_upd7807_portc_w))
+	MCFG_UPD7807_PORTT_READ_CB(READ8(homedata_state, reikaids_snd_command_r))
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", homedata_state,  upd7807_irq)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(30000)) // very high interleave required to sync for startup tests
@@ -1320,7 +1286,7 @@ static MACHINE_CONFIG_START( reikaids, homedata_state )
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 16, 256-1-16)
 	MCFG_SCREEN_UPDATE_DRIVER(homedata_state, screen_update_reikaids)
-	MCFG_SCREEN_VBLANK_DRIVER(homedata_state, screen_eof_homedata)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(homedata_state, screen_vblank_homedata))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", reikaids)
@@ -1330,24 +1296,25 @@ static MACHINE_CONFIG_START( reikaids, homedata_state )
 	MCFG_VIDEO_START_OVERRIDE(homedata_state,reikaids)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, 3000000)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
-	MCFG_SOUND_ROUTE(0, "mono", 0.25)
-	MCFG_SOUND_ROUTE(1, "mono", 0.25)
-	MCFG_SOUND_ROUTE(2, "mono", 0.25)
-	MCFG_SOUND_ROUTE(3, "mono", 1.0)
+	MCFG_SOUND_ROUTE(0, "speaker", 0.25)
+	MCFG_SOUND_ROUTE(1, "speaker", 0.25)
+	MCFG_SOUND_ROUTE(2, "speaker", 0.25)
+	MCFG_SOUND_ROUTE(3, "speaker", 1.0)
 
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
 /**************************************************************************/
 
-static MACHINE_CONFIG_START( pteacher, homedata_state )
+static MACHINE_CONFIG_START( pteacher )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, 16000000/4)  /* 4MHz ? */
@@ -1356,7 +1323,12 @@ static MACHINE_CONFIG_START( pteacher, homedata_state )
 
 	MCFG_CPU_ADD("audiocpu", UPD7807, 9000000)  /* 9MHz ? */
 	MCFG_CPU_PROGRAM_MAP(pteacher_upd7807_map)
-	MCFG_CPU_IO_MAP(pteacher_upd7807_io_map)
+	MCFG_UPD7807_PORTA_READ_CB(READ8(homedata_state, pteacher_upd7807_porta_r))
+	MCFG_UPD7807_PORTA_WRITE_CB(WRITE8(homedata_state, pteacher_upd7807_porta_w))
+	MCFG_UPD7807_PORTB_WRITE_CB(DEVWRITE8("dac", dac_byte_interface, write))
+	MCFG_UPD7807_PORTC_READ_CB(IOPORT("COIN"))
+	MCFG_UPD7807_PORTC_WRITE_CB(WRITE8(homedata_state, pteacher_upd7807_portc_w))
+	MCFG_UPD7807_PORTT_READ_CB(READ8(homedata_state, pteacher_keyboard_r))
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", homedata_state,  upd7807_irq)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  // should be enough
@@ -1372,7 +1344,7 @@ static MACHINE_CONFIG_START( pteacher, homedata_state )
 	// visible area can be changed at runtime
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 54*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(homedata_state, screen_update_pteacher)
-	MCFG_SCREEN_VBLANK_DRIVER(homedata_state, screen_eof_homedata)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(homedata_state, screen_vblank_homedata))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pteacher)
@@ -1382,13 +1354,14 @@ static MACHINE_CONFIG_START( pteacher, homedata_state )
 	MCFG_VIDEO_START_OVERRIDE(homedata_state,pteacher)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_SOUND_ADD("snsnd", SN76489A, 16000000/4)     // SN76489AN actually
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mjkinjas, pteacher )
@@ -1510,7 +1483,7 @@ GFXDECODE_END
 
 /* clocks are 16mhz and 9mhz */
 
-static MACHINE_CONFIG_START( mirderby, homedata_state )
+static MACHINE_CONFIG_START( mirderby )
 
 	MCFG_CPU_ADD("maincpu", M6809, 16000000/8)  /* 2 Mhz */
 	MCFG_CPU_PROGRAM_MAP(cpu2_map)
@@ -1545,13 +1518,13 @@ static MACHINE_CONFIG_START( mirderby, homedata_state )
 	MCFG_VIDEO_START_OVERRIDE(homedata_state,mirderby)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, 2000000)
-	MCFG_SOUND_ROUTE(0, "mono", 0.25)
-	MCFG_SOUND_ROUTE(1, "mono", 0.25)
-	MCFG_SOUND_ROUTE(2, "mono", 0.25)
-	MCFG_SOUND_ROUTE(3, "mono", 1.0)
+	MCFG_SOUND_ROUTE(0, "speaker", 0.25)
+	MCFG_SOUND_ROUTE(1, "speaker", 0.25)
+	MCFG_SOUND_ROUTE(2, "speaker", 0.25)
+	MCFG_SOUND_ROUTE(3, "speaker", 1.0)
 MACHINE_CONFIG_END
 
 /**************************************************************************/
@@ -1631,6 +1604,31 @@ ROM_END
 ROM_START( mjclinic )
 	ROM_REGION( 0x010000, "maincpu", 0 ) /* 6809 Code */
 	ROM_LOAD( "x80_g01.6g", 0x08000, 0x8000, CRC(787b4fb5) SHA1(d1708979d209113b604f6d0973fe14a0c4348351) )
+
+	ROM_REGION( 0x30000, "audiocpu", 0 )    /* Z80 code */
+	ROM_LOAD( "x80_a10.11k", 0x00000, 0x20000, CRC(afedbadf) SHA1(e2f101b59c0d23f9dc9b057c41d496fc3223cbb8) )
+	ROM_RELOAD(              0x10000, 0x20000 )
+
+	ROM_REGION( 0x20000, "gfx1", 0 )
+	ROM_LOAD( "x80_a03.1g", 0, 0x20000, CRC(34b63c89) SHA1(98383ce8e464ecc53677c060338cc03aa6238a0e) )
+
+	ROM_REGION( 0x80000, "gfx2", 0 )
+	ROM_LOAD( "x80_a040.bin", 0x00000, 0x20000, CRC(6f18a8cf) SHA1(af8de2bd8b2157ceaa8192ead51ac4489c464ab2) )
+	ROM_LOAD( "x80_a050.bin", 0x20000, 0x20000, CRC(6b1ec3a9) SHA1(dc7a857bb102325ebf2522369a231260c2e02c89) )
+	ROM_LOAD( "x80_a041.bin", 0x40000, 0x20000, CRC(f70bb001) SHA1(3b29bb0bd155e97d3ccc72a8a07046c676c8452d) )
+	ROM_LOAD( "x80_a051.bin", 0x60000, 0x20000, CRC(c7469cb8) SHA1(bcf7021667e943991865fdbc9620f00b09e1db3e) )
+
+	ROM_REGION( 0x010000, "proms", 0 )  /* static palette */
+	ROM_LOAD16_BYTE( "x80_a06.1l", 0x00000, 0x8000, CRC(c1f9b2fb) SHA1(abe17e2b3b880f91564e32c246116c33e2884889) )
+	ROM_LOAD16_BYTE( "x80_a07.1m", 0x00001, 0x8000, CRC(e3120152) SHA1(b4a778a9b91e204e2c068dff9a40bd29eccf04a5) )
+
+	ROM_REGION( 0x20000, "user1", 0 ) /* blitter data */
+	ROM_LOAD( "x80_a08.13a", 0x0000, 0x20000, CRC(174e8ec0) SHA1(a5075fe4bba9403ef9e0636d5f3f66aad8b2bc54) )
+ROM_END
+
+ROM_START( mjclinica )
+	ROM_REGION( 0x010000, "maincpu", 0 ) /* 6809 Code */
+	ROM_LOAD( "x80_f01.6g", 0x08000, 0x8000, CRC(cd814ec0) SHA1(55b2c9519fc98f71a2731c3851ce56ee8e57bd66) ) // labeled f01 instead of g01. Earlier version?
 
 	ROM_REGION( 0x30000, "audiocpu", 0 )    /* Z80 code */
 	ROM_LOAD( "x80_a10.11k", 0x00000, 0x20000, CRC(afedbadf) SHA1(e2f101b59c0d23f9dc9b057c41d496fc3223cbb8) )
@@ -1779,6 +1777,39 @@ ROM_START( mjkojink )
 	ROM_REGION( 0x40000, "user1", 0 ) /* blitter data */
 	ROM_LOAD( "x83b03.12e", 0x0000, 0x40000, CRC(4ba8b5ec) SHA1(cee77583f2f7b7fdba7e0f17e4d1244891488d36) )
 ROM_END
+
+ROM_START( mjjoship )
+		ROM_REGION( 0x01c000, "maincpu", 0 ) /* 6809 Code */
+		ROM_LOAD( "X73_L01.16E", 0x010000, 0xc000, CRC(df950025) SHA1(3dc22c0a8cf03cff7310fbff36f83804019a5337) )
+		ROM_CONTINUE(           0x00c000, 0x4000             )
+
+		ROM_REGION( 0x40000, "audiocpu", 0) /* uPD7807 code */
+		ROM_LOAD( "X73_B02.9G",  0x00000, 0x20000, CRC(6b01503b) SHA1(2e1575dac0b9b7c7233a3b8262a99a10e24ec813) )
+	ROM_RELOAD(             0x20000, 0x20000 )
+
+		ROM_REGION( 0x80000, "gfx1", 0 )
+		ROM_LOAD32_BYTE( "X73A14.1F",  0, 0x20000, CRC(42f429a5) SHA1(41f64258a65b56f818f8a6ecddab606d0bdc11ab) )
+		ROM_LOAD32_BYTE( "X73A15.3F",  1, 0x20000, CRC(2d827236) SHA1(d392dc64f136fd2ef19a2874758ad7804741882a) )
+	ROM_IGNORE( 0x20000 )
+		ROM_LOAD32_BYTE( "X73A16.4F",  2, 0x20000, CRC(c606cd02) SHA1(d316f11ad56359c8ae74858a84b373dd06934888) )
+	ROM_IGNORE( 0x20000 )
+		ROM_LOAD32_BYTE( "X73A17.6F",  3, 0x20000, CRC(2c0fdbc9) SHA1(3ae5b590db4705deeaeff93680a10ca980e6264f) )
+	ROM_IGNORE( 0x20000 )
+
+		ROM_REGION( 0x100000, "gfx2", 0 )
+		ROM_LOAD32_BYTE( "X73A10.1C",  0, 0x40000, CRC(e6663a99) SHA1(361503c16e32977c8f6b9c5ff981002ac0f97426) )
+		ROM_LOAD32_BYTE( "X73A11.3C",  1, 0x40000, CRC(d8a35ebe) SHA1(b6e12db38ddd6dcefa8335b92c0a6e269a6a1e9a) )
+		ROM_LOAD32_BYTE( "X73A12.4C",  2, 0x40000, CRC(f3b6ad98) SHA1(d91eeffd18684300809c99fa93d4ac0188530ff7) )
+		ROM_LOAD32_BYTE( "X73A13.6C",  3, 0x40000, CRC(30ff8c5f) SHA1(e51d89f6b5db0d8e2c22a046337993f962f6ba8c) )
+
+		ROM_REGION( 0x010000, "proms", 0 )  /* static palette */
+		ROM_LOAD16_BYTE( "X73_C19.4K", 0x00000, 0x8000, CRC(f4bdce8a) SHA1(e3168d6aa6f8cd24b497706a117c77353d1c6ef3) )
+		ROM_LOAD16_BYTE( "X73_C18.3K", 0x00001, 0x8000, CRC(1ab265cc) SHA1(24dced438a28ea9eb2f06c8859c5c07f4d975bfd) )
+
+		ROM_REGION( 0x20000, "user1", 0 ) /* blitter data */
+		ROM_LOAD( "X73A03.12E", 0x0000, 0x20000, CRC(fd32eb8c) SHA1(584afb1ed2da776a4ff9c0b9eb2906c914b28928) )
+ROM_END
+
 
 ROM_START( vitaminc )
 	ROM_REGION( 0x01c000, "maincpu", 0 ) /* 6809 Code */
@@ -2033,23 +2064,25 @@ DRIVER_INIT_MEMBER(homedata_state,mirderby)
 }
 
 
-GAME( 1987, hourouki, 0, mrokumei, mjhokite, driver_device,  0,          ROT0, "Home Data", "Mahjong Hourouki Part 1 - Seisyun Hen (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, mhgaiden, 0, mrokumei, mjhokite, driver_device,  0,          ROT0, "Home Data", "Mahjong Hourouki Gaiden (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, mjhokite, 0, mrokumei, mjhokite, driver_device,  0,          ROT0, "Home Data", "Mahjong Hourouki Okite (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, mjclinic, 0, mrokumei, mjhokite, driver_device,  0,          ROT0, "Home Data", "Mahjong Clinic (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, mrokumei, 0, mrokumei, mjhokite, driver_device,  0,          ROT0, "Home Data", "Mahjong Rokumeikan (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, hourouki,  0,        mrokumei, mjhokite, homedata_state, 0,          ROT0, "Home Data",  "Mahjong Hourouki Part 1 - Seisyun Hen (Japan)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, mhgaiden,  0,        mrokumei, mjhokite, homedata_state, 0,          ROT0, "Home Data",  "Mahjong Hourouki Gaiden (Japan)",                     MACHINE_SUPPORTS_SAVE )
+GAME( 1988, mjhokite,  0,        mrokumei, mjhokite, homedata_state, 0,          ROT0, "Home Data",  "Mahjong Hourouki Okite (Japan)",                      MACHINE_SUPPORTS_SAVE )
+GAME( 1988, mjclinic,  0,        mrokumei, mjhokite, homedata_state, 0,          ROT0, "Home Data",  "Mahjong Clinic (Japan, set 1)",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1988, mjclinica, mjclinic, mrokumei, mjhokite, homedata_state, 0,          ROT0, "Home Data",  "Mahjong Clinic (Japan, set 2)",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1988, mrokumei,  0,        mrokumei, mjhokite, homedata_state, 0,          ROT0, "Home Data",  "Mahjong Rokumeikan (Japan)",                          MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, reikaids, 0, reikaids, reikaids, homedata_state, reikaids,   ROT0, "Home Data", "Reikai Doushi (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, battlcry, 0, reikaids, battlcry, homedata_state, battlcry,   ROT0, "Home Data", "Battlecry", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, mjkojink, 0, pteacher, pteacher, driver_device,  0,          ROT0, "Home Data", "Mahjong Kojinkyouju (Private Teacher) (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, vitaminc, 0, pteacher, pteacher, driver_device,  0,          ROT0, "Home Data", "Mahjong Vitamin C (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, mjyougo,  0, pteacher, pteacher, driver_device,  0,          ROT0, "Home Data", "Mahjong-yougo no Kisotairyoku (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, mjkinjas, 0, mjkinjas, pteacher, driver_device,  0,          ROT0, "Home Data", "Mahjong Kinjirareta Asobi (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992?,jogakuen, 0, pteacher, jogakuen, homedata_state, jogakuen,   ROT0, "Windom",    "Mahjong Jogakuen (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, reikaids,  0,        reikaids, reikaids, homedata_state, reikaids,   ROT0, "Home Data",  "Reikai Doushi (Japan)",                               MACHINE_SUPPORTS_SAVE )
+GAME( 1991, battlcry,  0,        reikaids, battlcry, homedata_state, battlcry,   ROT0, "Home Data",  "Battlecry",                                           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, mjkojink,  0,        pteacher, pteacher, homedata_state, 0,          ROT0, "Home Data",  "Mahjong Kojinkyouju (Private Teacher) (Japan)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1988, mjjoship,  0,        pteacher, mjjoship, homedata_state, 0,          ROT0, "Home Data",  "Mahjong Joshi Pro-wres -Give up 5 byou mae- (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, vitaminc,  0,        pteacher, pteacher, homedata_state, 0,          ROT0, "Home Data",  "Mahjong Vitamin C (Japan)",                           MACHINE_SUPPORTS_SAVE )
+GAME( 1989, mjyougo,   0,        pteacher, pteacher, homedata_state, 0,          ROT0, "Home Data",  "Mahjong-yougo no Kisotairyoku (Japan)",               MACHINE_SUPPORTS_SAVE )
+GAME( 1991, mjkinjas,  0,        mjkinjas, pteacher, homedata_state, 0,          ROT0, "Home Data",  "Mahjong Kinjirareta Asobi (Japan)",                   MACHINE_SUPPORTS_SAVE )
+GAME( 1992?,jogakuen,  0,        pteacher, jogakuen, homedata_state, jogakuen,   ROT0, "Windom",     "Mahjong Jogakuen (Japan)",                            MACHINE_SUPPORTS_SAVE )
 
-GAME( 1990, lemnangl, 0, lemnangl, lemnangl, driver_device,  0,          ROT0, "Home Data", "Mahjong Lemon Angel (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, mjprivat, 0, lemnangl, pteacher, driver_device,  0,          ROT0, "Matoba",    "Mahjong Private (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, lemnangl,  0,        lemnangl, pteacher, homedata_state, 0,          ROT0, "Home Data",  "Mahjong Lemon Angel (Japan)",                         MACHINE_SUPPORTS_SAVE )
+GAME( 1991, mjprivat,  0,        lemnangl, pteacher, homedata_state, 0,          ROT0, "Matoba",     "Mahjong Private (Japan)",                             MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991?,mjikaga,  0, lemnangl, mjikaga,  homedata_state, mjikaga,    ROT0, "Mitchell",  "Mahjong Ikaga Desu ka (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1991?,mjikaga,   0,        lemnangl, mjikaga,  homedata_state, mjikaga,    ROT0, "Mitchell",   "Mahjong Ikaga Desu ka (Japan)",                       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, mirderby, 0, mirderby, mirderby, homedata_state, mirderby,   ROT0, "Home Data?", "Miracle Derby - Ascot", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
+GAME( 1988, mirderby,  0,        mirderby, mirderby, homedata_state, mirderby,   ROT0, "Home Data?", "Miracle Derby - Ascot",                               MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

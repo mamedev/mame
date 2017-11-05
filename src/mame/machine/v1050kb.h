@@ -6,12 +6,11 @@
 
 *********************************************************************/
 
+#ifndef MAME_MACHINE_V1050KB_H
+#define MAME_MACHINE_V1050KB_H
+
 #pragma once
 
-#ifndef __V1050_KEYBOARD__
-#define __V1050_KEYBOARD__
-
-#include "emu.h"
 #include "cpu/mcs48/mcs48.h"
 #include "sound/discrete.h"
 
@@ -36,51 +35,39 @@ class v1050_keyboard_device :  public device_t
 {
 public:
 	// construction/destruction
-	v1050_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	v1050_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &set_out_tx_handler(device_t &device, _Object object) { return downcast<v1050_keyboard_device &>(device).m_out_tx_handler.set_callback(object); }
+	// device flags
+	static constexpr feature_type imperfect_features() { return feature::KEYBOARD; }
 
-	// optional information overrides
-	virtual const rom_entry *device_rom_region() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual ioport_constructor device_input_ports() const override;
+	template <class Object> static devcb_base &set_out_tx_handler(device_t &device, Object &&cb) { return downcast<v1050_keyboard_device &>(device).m_out_tx_handler.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_WRITE_LINE_MEMBER( si_w );
-
-	// not really public
-	DECLARE_READ8_MEMBER( kb_p1_r );
-	DECLARE_WRITE8_MEMBER( kb_p1_w );
-	DECLARE_WRITE8_MEMBER( kb_p2_w );
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	// optional information overrides
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override;
 
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<discrete_sound_device> m_discrete;
-	required_ioport m_y0;
-	required_ioport m_y1;
-	required_ioport m_y2;
-	required_ioport m_y3;
-	required_ioport m_y4;
-	required_ioport m_y5;
-	required_ioport m_y6;
-	required_ioport m_y7;
-	required_ioport m_y8;
-	required_ioport m_y9;
-	required_ioport m_ya;
-	required_ioport m_yb;
+	required_ioport_array<12> m_y;
 	devcb_write_line   m_out_tx_handler;
 
-	UINT8 m_y;
+	uint8_t m_keylatch;
+
+	DECLARE_READ8_MEMBER( kb_p1_r );
+	DECLARE_WRITE8_MEMBER( kb_p1_w );
+	DECLARE_WRITE8_MEMBER( kb_p2_w );
 };
 
 
 // device type definition
-extern const device_type V1050_KEYBOARD;
+DECLARE_DEVICE_TYPE(V1050_KEYBOARD, v1050_keyboard_device)
 
-
-
-#endif
+#endif // MAME_MACHINE_V1050KB_H

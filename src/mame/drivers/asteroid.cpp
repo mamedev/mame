@@ -186,20 +186,21 @@ There is not a rev 03 known or dumped. An Asteroids rev 03 is not mentioned in a
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/m6502/m6502.h"
-#include "machine/watchdog.h"
-#include "video/vector.h"
-#include "video/avgdvg.h"
-#include "machine/atari_vg.h"
 #include "includes/asteroid.h"
-#include "sound/discrete.h"
-#include "sound/pokey.h"
 #include "audio/llander.h"
+#include "cpu/m6502/m6502.h"
+#include "machine/74259.h"
+#include "machine/atari_vg.h"
+#include "machine/watchdog.h"
+#include "sound/pokey.h"
+#include "video/avgdvg.h"
+#include "video/vector.h"
+#include "screen.h"
 
 #include "astdelux.lh"
 
 #define MASTER_CLOCK (XTAL_12_096MHz)
-#define CLOCK_3KHZ   ((double)MASTER_CLOCK / 4096)
+#define CLOCK_3KHZ   (double(MASTER_CLOCK) / 4096)
 
 /*************************************
  *
@@ -207,9 +208,19 @@ There is not a rev 03 known or dumped. An Asteroids rev 03 is not mentioned in a
  *
  *************************************/
 
-WRITE8_MEMBER(asteroid_state::astdelux_coin_counter_w)
+WRITE_LINE_MEMBER(asteroid_state::coin_counter_left_w)
 {
-	machine().bookkeeping().coin_counter_w(offset,data);
+	machine().bookkeeping().coin_counter_w(0, state);
+}
+
+WRITE_LINE_MEMBER(asteroid_state::coin_counter_center_w)
+{
+	machine().bookkeeping().coin_counter_w(1, state);
+}
+
+WRITE_LINE_MEMBER(asteroid_state::coin_counter_right_w)
+{
+	machine().bookkeeping().coin_counter_w(2, state);
 }
 
 
@@ -251,7 +262,7 @@ static ADDRESS_MAP_START( asteroid_map, AS_PROGRAM, 8, asteroid_state )
 	AM_RANGE(0x3400, 0x3400) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x3600, 0x3600) AM_WRITE(asteroid_explode_w)
 	AM_RANGE(0x3a00, 0x3a00) AM_WRITE(asteroid_thump_w)
-	AM_RANGE(0x3c00, 0x3c05) AM_WRITE(asteroid_sounds_w)
+	AM_RANGE(0x3c00, 0x3c07) AM_DEVWRITE("audiolatch", ls259_device, write_d7)
 	AM_RANGE(0x3e00, 0x3e00) AM_WRITE(asteroid_noise_reset_w)
 	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("vectorram") AM_REGION("maincpu", 0x4000)
 	AM_RANGE(0x5000, 0x57ff) AM_ROM                     /* vector rom */
@@ -274,10 +285,7 @@ static ADDRESS_MAP_START( astdelux_map, AS_PROGRAM, 8, asteroid_state )
 	AM_RANGE(0x3400, 0x3400) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x3600, 0x3600) AM_WRITE(asteroid_explode_w)
 	AM_RANGE(0x3a00, 0x3a00) AM_DEVWRITE("earom", atari_vg_earom_device, ctrl_w)
-	AM_RANGE(0x3c00, 0x3c01) AM_WRITE(astdelux_led_w)
-	AM_RANGE(0x3c03, 0x3c03) AM_WRITE(astdelux_sounds_w)
-	AM_RANGE(0x3c04, 0x3c04) AM_WRITE(astdelux_bank_switch_w)
-	AM_RANGE(0x3c05, 0x3c07) AM_WRITE(astdelux_coin_counter_w)
+	AM_RANGE(0x3c00, 0x3c07) AM_DEVWRITE("audiolatch", ls259_device, write_d7)
 	AM_RANGE(0x3e00, 0x3e00) AM_WRITE(asteroid_noise_reset_w)
 	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("vectorram") AM_REGION("maincpu", 0x4000)
 	AM_RANGE(0x4800, 0x57ff) AM_ROM                     /* vector rom */
@@ -323,7 +331,7 @@ static INPUT_PORTS_START( asteroid )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER("dvg", dvg_device, done_r, nullptr)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_CODE(KEYCODE_SPACE) PORT_CODE(JOYCODE_BUTTON3)       /* hyperspace */
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(JOYCODE_BUTTON1)    /* fire */
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Diagnostic Step") PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Diagnostic Step")
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_TILT )
 	PORT_SERVICE( 0x80, IP_ACTIVE_HIGH )
 
@@ -416,7 +424,7 @@ static INPUT_PORTS_START( asterock )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, asteroid_state,clock_r, nullptr)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_CODE(KEYCODE_SPACE) PORT_CODE(JOYCODE_BUTTON3)        /* hyperspace */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(JOYCODE_BUTTON1)     /* fire */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Diagnostic Step") PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Diagnostic Step")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
@@ -457,7 +465,7 @@ static INPUT_PORTS_START( astdelux )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER("dvg", dvg_device, done_r, nullptr)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_CODE(KEYCODE_SPACE) PORT_CODE(JOYCODE_BUTTON3)       /* hyperspace */
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(JOYCODE_BUTTON1)    /* fire */
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Diagnostic Step") PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Diagnostic Step")
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_TILT )
 	PORT_SERVICE( 0x80, IP_ACTIVE_HIGH )
 
@@ -542,7 +550,7 @@ static INPUT_PORTS_START( llander )
 	/* Of the rest, Bit 6 is the 3KHz source. 3,4 and 5 are unknown */
 	PORT_BIT( 0x38, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, asteroid_state,clock_r, nullptr)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Diagnostic Step") PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Diagnostic Step")
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
@@ -642,7 +650,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( asteroid, asteroid_state )
+static MACHINE_CONFIG_START( asteroid_base )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK/8)
@@ -661,13 +669,12 @@ static MACHINE_CONFIG_START( asteroid, asteroid_state )
 
 	MCFG_DEVICE_ADD("dvg", DVG, 0)
 	MCFG_AVGDVG_VECTOR("vector")
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( asteroid, asteroid_base )
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
-	MCFG_DISCRETE_INTF(asteroid)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.4)
+	MCFG_FRAGMENT_ADD(asteroid_sound)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( asterock, asteroid )
@@ -678,7 +685,7 @@ static MACHINE_CONFIG_DERIVED( asterock, asteroid )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( astdelux, asteroid )
+static MACHINE_CONFIG_DERIVED( astdelux, asteroid_base )
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -687,18 +694,25 @@ static MACHINE_CONFIG_DERIVED( astdelux, asteroid )
 	MCFG_ATARIVGEAROM_ADD("earom")
 
 	/* sound hardware */
-	MCFG_SOUND_REPLACE("discrete", DISCRETE, 0)
-	MCFG_DISCRETE_INTF(astdelux)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_FRAGMENT_ADD(astdelux_sound)
 
 	MCFG_SOUND_ADD("pokey", POKEY, MASTER_CLOCK/8)
 	MCFG_POKEY_ALLPOT_R_CB(IOPORT("DSW2"))
 	MCFG_POKEY_OUTPUT_RC(RES_K(10), CAP_U(0.015), 5.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	MCFG_DEVICE_MODIFY("audiolatch")
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(asteroid_state, start1_led_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(asteroid_state, start2_led_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(MEMBANK("ram1"))
+	MCFG_DEVCB_CHAIN_OUTPUT(MEMBANK("ram2"))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(asteroid_state, coin_counter_left_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(asteroid_state, coin_counter_center_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(asteroid_state, coin_counter_right_w))
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( llander, asteroid )
+static MACHINE_CONFIG_DERIVED( llander, asteroid_base )
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -711,9 +725,7 @@ static MACHINE_CONFIG_DERIVED( llander, asteroid )
 	MCFG_SCREEN_UPDATE_DEVICE("vector", vector_device, screen_update)
 
 	/* sound hardware */
-	MCFG_SOUND_REPLACE("discrete", DISCRETE, 0)
-	MCFG_DISCRETE_INTF(llander)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_FRAGMENT_ADD(llander_sound)
 MACHINE_CONFIG_END
 
 
@@ -932,7 +944,7 @@ explain why there is this mismatch in revision numbers, it seems Atari released 
 they needed to change default settings becasue of earnings potential in their default
 first set (revision 1), not once, but twice! then they changed the romset altogether. The documents
 in question are CO-174-02 (2 pages, 3 sides). this document shows what i think was the final revision
-of roms to be produced, they consist of a wholly -02 romset, with the expection being a -03 rom at
+of roms to be produced, they consist of a wholly -02 romset, with the exception being a -03 rom at
 location J1.
 
 So, anyhow, find in this file, the FIRST revision of rom -01 in J1. This pcb contained the following
@@ -975,7 +987,7 @@ ROM_START( llander )
 	/* Vector ROM */
 	ROM_LOAD( "034599-01.r3",  0x4800, 0x0800, CRC(355a9371) SHA1(6ecb40169b797d9eb623bcb17872f745b1bf20fa) )
 	ROM_LOAD( "034598-01.np3", 0x5000, 0x0800, CRC(9c4ffa68) SHA1(eb4ffc289d254f699f821df3146aa2c6cd78597f) )
-	ROM_LOAD( "034597-01.m3",  0x5800, 0x0800, CRC(503f992e) SHA1(3e88a110ced9ee1927b0ba760b8d92cbc93e645d) ) /* built from original Atari source code */
+	ROM_LOAD( "034597-01.m3",  0x5800, 0x0800, CRC(ebb744f2) SHA1(e685b094c1261a351e4e82dfb487462163f136a4) ) /* built from original Atari source code */
 
 	/* DVG PROM */
 	ROM_REGION( 0x100, "user1", 0 )
@@ -991,7 +1003,7 @@ ROM_START( llander1 )
 	/* Vector ROM */
 	ROM_LOAD( "034599-01.r3",  0x4800, 0x0800, CRC(355a9371) SHA1(6ecb40169b797d9eb623bcb17872f745b1bf20fa) )
 	ROM_LOAD( "034598-01.np3", 0x5000, 0x0800, CRC(9c4ffa68) SHA1(eb4ffc289d254f699f821df3146aa2c6cd78597f) )
-	ROM_LOAD( "034597-01.m3",  0x5800, 0x0800, CRC(503f992e) SHA1(3e88a110ced9ee1927b0ba760b8d92cbc93e645d) ) /* built from original Atari source code */
+	ROM_LOAD( "034597-01.m3",  0x5800, 0x0800, CRC(ebb744f2) SHA1(e685b094c1261a351e4e82dfb487462163f136a4) ) /* built from original Atari source code */
 
 	/* DVG PROM */
 	ROM_REGION( 0x100, "user1", 0 )
@@ -1040,22 +1052,22 @@ DRIVER_INIT_MEMBER(asteroid_state,asterock)
  *
  *************************************/
 
-GAME( 1979, asteroid,  0,         asteroid,  asteroid,  driver_device,  0,         ROT0, "Atari",   "Asteroids (rev 4)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1979, asteroid2, asteroid,  asteroid,  asteroid,  driver_device,  0,         ROT0, "Atari",   "Asteroids (rev 2)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1979, asteroid1, asteroid,  asteroid,  asteroid,  driver_device,  0,         ROT0, "Atari",   "Asteroids (rev 1)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1979, asteroid,  0,         asteroid,  asteroid,  asteroid_state, 0,         ROT0, "Atari",   "Asteroids (rev 4)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1979, asteroid2, asteroid,  asteroid,  asteroid,  asteroid_state, 0,         ROT0, "Atari",   "Asteroids (rev 2)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1979, asteroid1, asteroid,  asteroid,  asteroid,  asteroid_state, 0,         ROT0, "Atari",   "Asteroids (rev 1)",        MACHINE_SUPPORTS_SAVE )
 GAME( 1979, asteroidb, asteroid,  asteroid,  asteroidb, asteroid_state, asteroidb, ROT0, "bootleg", "Asteroids (bootleg on Lunar Lander hardware)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1981, spcrocks,  asteroid,  asteroid,  aerolitos, driver_device,  0,         ROT0, "J.Estevez (Barcelona)", "Space Rocks (Spanish clone of Asteroids)",        MACHINE_SUPPORTS_SAVE ) // Space Rocks seems to be a legit set. Cabinet registered to 'J.Estevez (Barcelona).
-GAME( 1980, aerolitos, asteroid,  asteroid,  aerolitos, driver_device,  0,         ROT0, "bootleg (Rodmar Elec.)","Aerolitos (Spanish bootleg of Asteroids)",        MACHINE_SUPPORTS_SAVE ) // 'Aerolitos' appears on the cabinet, this was distributed in Spain, the Spanish text is different to that contained in the original version (corrected)
+GAME( 1981, spcrocks,  asteroid,  asteroid,  aerolitos, asteroid_state, 0,         ROT0, "Atari (J.Estevez license)", "Space Rocks (Spanish clone of Asteroids)",        MACHINE_SUPPORTS_SAVE ) // Space Rocks seems to be a legit set. Cabinet registered to 'J.Estevez (Barcelona).
+GAME( 1980, aerolitos, asteroid,  asteroid,  aerolitos, asteroid_state, 0,         ROT0, "bootleg (Rodmar Elec.)","Aerolitos (Spanish bootleg of Asteroids)",        MACHINE_SUPPORTS_SAVE ) // 'Aerolitos' appears on the cabinet, this was distributed in Spain, the Spanish text is different to that contained in the original version (corrected)
 GAME( 1979, asterock,  asteroid,  asterock,  asterock,  asteroid_state, asterock,  ROT0, "bootleg (Sidam)",       "Asterock (Sidam bootleg of Asteroids)",     MACHINE_SUPPORTS_SAVE )
 GAME( 1979, asterockv, asteroid,  asterock,  asterock,  asteroid_state, asterock,  ROT0, "bootleg (Videotron)",   "Asterock (Videotron bootleg of Asteroids)", MACHINE_SUPPORTS_SAVE )
-GAME( 1979, meteorts,  asteroid,  asteroid,  asteroid,  driver_device,  0,         ROT0, "bootleg (VGG)",         "Meteorites (bootleg of Asteroids)", MACHINE_SUPPORTS_SAVE )
-GAME( 1979, meteorho,  asteroid,  asteroid,  asteroid,  driver_device,  0,         ROT0, "bootleg (Hoei)",        "Meteor (bootleg of Asteroids)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1979, hyperspc,  asteroid,  asteroid,  asteroid,  driver_device,  0,         ROT0, "bootleg (Rumiano)",     "Hyperspace (bootleg of Asteroids)", MACHINE_SUPPORTS_SAVE )
+GAME( 1979, meteorts,  asteroid,  asteroid,  asteroid,  asteroid_state, 0,         ROT0, "bootleg (VGG)",         "Meteorites (bootleg of Asteroids)", MACHINE_SUPPORTS_SAVE )
+GAME( 1979, meteorho,  asteroid,  asteroid,  asteroid,  asteroid_state, 0,         ROT0, "bootleg (Hoei)",        "Meteor (bootleg of Asteroids)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1979, hyperspc,  asteroid,  asteroid,  asteroid,  asteroid_state, 0,         ROT0, "bootleg (Rumiano)",     "Hyperspace (bootleg of Asteroids)", MACHINE_SUPPORTS_SAVE )
 
-GAMEL(1980, astdelux,  0,         astdelux,  astdelux,  driver_device,  0,         ROT0, "Atari",   "Asteroids Deluxe (rev 3)", MACHINE_SUPPORTS_SAVE, layout_astdelux )
-GAMEL(1980, astdelux2, astdelux,  astdelux,  astdelux,  driver_device,  0,         ROT0, "Atari",   "Asteroids Deluxe (rev 2)", MACHINE_SUPPORTS_SAVE, layout_astdelux )
-GAMEL(1980, astdelux1, astdelux,  astdelux,  astdelux,  driver_device,  0,         ROT0, "Atari",   "Asteroids Deluxe (rev 1)", MACHINE_SUPPORTS_SAVE, layout_astdelux )
+GAMEL(1980, astdelux,  0,         astdelux,  astdelux,  asteroid_state, 0,         ROT0, "Atari",   "Asteroids Deluxe (rev 3)", MACHINE_SUPPORTS_SAVE, layout_astdelux )
+GAMEL(1980, astdelux2, astdelux,  astdelux,  astdelux,  asteroid_state, 0,         ROT0, "Atari",   "Asteroids Deluxe (rev 2)", MACHINE_SUPPORTS_SAVE, layout_astdelux )
+GAMEL(1980, astdelux1, astdelux,  astdelux,  astdelux,  asteroid_state, 0,         ROT0, "Atari",   "Asteroids Deluxe (rev 1)", MACHINE_SUPPORTS_SAVE, layout_astdelux )
 
-GAME( 1979, llander,   0,         llander,   llander,   driver_device,  0,         ROT0, "Atari",   "Lunar Lander (rev 2)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1979, llander1,  llander,   llander,   llander1,  driver_device,  0,         ROT0, "Atari",   "Lunar Lander (rev 1)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1979, llandert,  llander,   llander,   llandert,  driver_device,  0,         ROT0, "Atari",   "Lunar Lander (screen test)", MACHINE_SUPPORTS_SAVE ) // no copyright shown, assume it's an in-house diagnostics romset (PCB came from a seller that has had Atari prototypes in his possession before)
+GAME( 1979, llander,   0,         llander,   llander,   asteroid_state, 0,         ROT0, "Atari",   "Lunar Lander (rev 2)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1979, llander1,  llander,   llander,   llander1,  asteroid_state, 0,         ROT0, "Atari",   "Lunar Lander (rev 1)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1979, llandert,  llander,   llander,   llandert,  asteroid_state, 0,         ROT0, "Atari",   "Lunar Lander (screen test)", MACHINE_SUPPORTS_SAVE ) // no copyright shown, assume it's an in-house diagnostics romset (PCB came from a seller that has had Atari prototypes in his possession before)

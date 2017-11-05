@@ -25,7 +25,7 @@ public:
 
 	// output_module
 
-	virtual void notify(const char *outname, INT32 value) override { osd_printf_info("%s = %d\n", ((outname==nullptr) ? "none" : outname), value); }
+	virtual void notify(const char *outname, int32_t value) override { osd_printf_info("%s = %d\n", ((outname==nullptr) ? "none" : outname), value); }
 
 };
 

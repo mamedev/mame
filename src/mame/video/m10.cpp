@@ -15,7 +15,7 @@
 #include "emu.h"
 #include "includes/m10.h"
 
-static const UINT32 extyoffs[] =
+static const uint32_t extyoffs[] =
 {
 	STEP256(0, 8)
 };
@@ -97,7 +97,7 @@ inline void m10_state::plot_pixel_m10( bitmap_ind16 &bm, int x, int y, int col )
 
 VIDEO_START_MEMBER(m10_state,m10)
 {
-	m_tx_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(m10_state::get_tile_info),this), tilemap_mapper_delegate(FUNC(m10_state::tilemap_scan),this), 8, 8, 32, 32);
+	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(m10_state::get_tile_info),this), tilemap_mapper_delegate(FUNC(m10_state::tilemap_scan),this), 8, 8, 32, 32);
 	m_tx_tilemap->set_transparent_pen(0);
 
 	m_gfxdecode->set_gfx(1, std::make_unique<gfx_element>(m_palette, backlayout, m_chargen, 0, 8, 0));
@@ -109,7 +109,7 @@ VIDEO_START_MEMBER(m10_state,m15)
 {
 	m_gfxdecode->set_gfx(0,std::make_unique<gfx_element>(m_palette, charlayout, m_chargen, 0, 8, 0));
 
-	m_tx_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(m10_state::get_tile_info),this),tilemap_mapper_delegate(FUNC(m10_state::tilemap_scan),this), 8, 8, 32, 32);
+	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(m10_state::get_tile_info),this),tilemap_mapper_delegate(FUNC(m10_state::tilemap_scan),this), 8, 8, 32, 32);
 
 	return ;
 }
@@ -120,7 +120,7 @@ VIDEO_START_MEMBER(m10_state,m15)
 
 ***************************************************************************/
 
-UINT32 m10_state::screen_update_m10(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t m10_state::screen_update_m10(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int offs;
 	static const int color[4]= { 3, 3, 5, 5 };
@@ -159,7 +159,7 @@ UINT32 m10_state::screen_update_m10(screen_device &screen, bitmap_ind16 &bitmap,
 
 ***************************************************************************/
 
-UINT32 m10_state::screen_update_m15(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t m10_state::screen_update_m15(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int offs;
 

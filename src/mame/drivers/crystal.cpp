@@ -26,7 +26,6 @@ The Crystal of Kings
 Brezza Soft Corporation (Japan), 2001
 
 This game runs on a small cartridge-based PCB known as the 'Crystal System'
-There are only two known games running on this system, Crystal of Kings and Evolution Soccer.
 The main PCB is small (approx 6" square) and contains only a few components. All of the processing
 work is done by the large IC in the middle of the PCB. The system looks a bit like IGS's PGM System, in
 that it's housed in a plastic case and has a single slot for insertion of a game cart. However this
@@ -120,18 +119,18 @@ Notes:
 
 P's Attack (c) 2004 Uniana Co., Ltd
 
-+----------1||||---1|||||--1|||||---------------------------+
++----------54321---654321--654321---------------------------+
 |VOL       TICKET  GUN_1P  GUN_2P                 +---------|
 |                                                 |         |
 +-+                                               |  256MB  |
   |       CC-DAC                                  | Compact |
 +-+                                  EMUL*        |  Flash  |
 |                                                 |         |
-|J          +---+                                 +---------|
-|A          |   |                                           |
-|M          | R |   25.1750MHz              +--------------+|
-|M          | A |                           |     42Pin*   ||
-|A          | M |                           +--------------+|
+|5          +---+                                 +---------|
+|6          |   |                                           |
+|P          | R |   25.1750MHz              +--------------+|
+|I          | A |                           |     42Pin*   ||
+|N          | M |                           +--------------+|
 |           |   |                           +--------------+|
 |C          +---+       +------------+      |     SYS      ||
 |O                      |            |      +--------------+|
@@ -162,33 +161,80 @@ EMUL is an unpopulated 8 pin connector
 EEPROM is a 93C86 16K 5.0v Serial EEPROM (2048x8-bit or 1024x16-bit)
 CC-DAC is a TDA1311A Stereo Continuous Calibration DAC
 
+
+ P's Attack non JAMMA standard 56pin Edge Connector Pinout:
+
+                          56pin Edge Connector
+          Solder Side            |             Parts Side
+------------------------------------------------------------------
+             GND             | A | 1 |             GND
+             GND             | B | 2 |             GND
+             +5              | C | 3 |             +5
+             +5              | D | 4 |             +5
+       Player 1 Start Lamp   | E | 5 |         Coin Lamp
+             +12             | F | 6 |             +12
+------------ KEY ------------| G | 7 |------------ KEY -----------
+       Player 2 Start Lamp   | H | 8 |        Coin Counter
+        L Speaker (-)        | J | 9 |        L Speaker (+)
+        R Speaker (-)        | K | 10|        R Speaker (+)
+     Video Vertical Sync     | L | 11|
+        Video Green          | M | 12|        Video Red
+        Video Sync           | N | 13|        Video Blue
+        Service Switch       | P | 14|        Video GND
+    Video Horizontal Sync    | R | 15|        Test Switch
+                             | S | 16|        Coin Switch
+       Start Player 2        | T | 17|        Start Player 1
+                             | U | 18|
+                             | V | 19|
+                             | W | 20|
+                             | X | 21|
+                             | Y | 22|
+                             | a | 23|
+                             | b | 24|
+                             | d | 25|
+                             | e | 26|
+             GND             | f | 27|             GND
+             GND             | g | 28|             GND
+
+
 TICKET is a 5 pin connector:
 
-  1| +12v
-  2| IN
+  1| LED
+  2| GND
   3| OUT
-  4| GND
-  5| LED
+  4| IN
+  5| +12v
 
-GUN_xP are 6 pin gun connectors (pins 1-4 match the UNICO sytle guns):
+GUN_xP are 6 pin gun connectors (pins 3-6 match the UNICO sytle guns):
+
+ GUN-1P: Left (Blue) Gun Connector Pinout
 
   1| GND
-  2| SW
-  3| +5v
-  4| SENS
-  5| SOL
+  2| Solenoid
+  3| Sensor
+  4| +5V
+  5| Switch (Trigger)
   6| GND
 
+ GUN-2P: Right (Pink) Gun Connector Pinout
 
+  1| GND
+  2| Solenoid
+  3| Sensor
+  4| +5V
+  5| Switch (Trigger)
+  6| GND
 
 */
 
 #include "emu.h"
 #include "cpu/se3208/se3208.h"
-#include "video/vrender0.h"
 #include "machine/ds1302.h"
-#include "sound/vrender0.h"
 #include "machine/nvram.h"
+#include "sound/vrender0.h"
+#include "video/vrender0.h"
+#include "screen.h"
+#include "speaker.h"
 
 #define IDLE_LOOP_SPEEDUP
 
@@ -207,16 +253,15 @@ public:
 		m_vr0(*this, "vr0"),
 		m_ds1302(*this, "rtc"),
 		m_screen(*this, "screen")
-		{ }
+	{ }
 
 	/* memory pointers */
-	required_shared_ptr<UINT32> m_sysregs;
-	required_shared_ptr<UINT32> m_workram;
-	required_shared_ptr<UINT32> m_vidregs;
-	required_shared_ptr<UINT32> m_textureram;
-	required_shared_ptr<UINT32> m_frameram;
-	optional_shared_ptr<UINT32> m_reset_patch; // not needed for trivrus
-//  UINT32 *  m_nvram;    // currently this uses generic nvram handling
+	required_shared_ptr<uint32_t> m_sysregs;
+	required_shared_ptr<uint32_t> m_workram;
+	required_shared_ptr<uint32_t> m_vidregs;
+	required_shared_ptr<uint32_t> m_textureram;
+	required_shared_ptr<uint32_t> m_frameram;
+	optional_shared_ptr<uint32_t> m_reset_patch; // not needed for trivrus
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -225,18 +270,20 @@ public:
 	required_device<screen_device> m_screen;
 
 #ifdef IDLE_LOOP_SPEEDUP
-	UINT8     m_FlipCntRead;
+	uint8_t     m_FlipCntRead;
 #endif
 
-	UINT32    m_Bank;
-	UINT8     m_FlipCount;
-	UINT8     m_IntHigh;
-	UINT32    m_Timerctrl[4];
-	emu_timer *m_Timer[4];
-	UINT32    m_FlashCmd;
-	UINT32    m_PIO;
-	UINT32    m_DMActrl[2];
-	UINT8     m_OldPort4;
+	uint32_t    m_Bank;
+	uint8_t     m_FlipCount;
+	uint8_t     m_IntHigh;
+	emu_timer  *m_Timer[4];
+	uint32_t    m_FlashCmd;
+	uint32_t    m_PIO;
+	uint32_t    m_DMActrl[2];
+	uint8_t     m_OldPort4;
+
+	uint32_t *TimerRegsPtr(int which) const;
+	void TimerStart(int which);
 
 	DECLARE_READ32_MEMBER(FlipCount_r);
 	DECLARE_WRITE32_MEMBER(FlipCount_w);
@@ -268,31 +315,33 @@ public:
 
 	DECLARE_READ32_MEMBER(trivrus_input_r);
 	DECLARE_WRITE32_MEMBER(trivrus_input_w);
-	UINT8 m_trivrus_input;
+	uint8_t m_trivrus_input;
+
+	DECLARE_READ32_MEMBER(crzyddz2_key_r);
+	DECLARE_WRITE32_MEMBER(crzyddz2_PIO_w);
+	uint8_t m_crzyddz2_prot;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	UINT32 screen_update_crystal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof_crystal(screen_device &screen, bool state);
+	uint32_t screen_update_crystal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_crystal);
 	INTERRUPT_GEN_MEMBER(crystal_interrupt);
 	TIMER_CALLBACK_MEMBER(Timercb);
 	IRQ_CALLBACK_MEMBER(icallback);
 	void crystal_banksw_postload();
 	void IntReq( int num );
-	inline void Timer_w( address_space &space, int which, UINT32 data, UINT32 mem_mask );
-	inline void DMA_w( address_space &space, int which, UINT32 data, UINT32 mem_mask );
+	inline void Timer_w( address_space &space, int which, uint32_t data, uint32_t mem_mask );
+	inline void DMA_w( address_space &space, int which, uint32_t data, uint32_t mem_mask );
 	void PatchReset(  );
-	UINT16 GetVidReg( address_space &space, UINT16 reg );
-	void SetVidReg( address_space &space, UINT16 reg, UINT16 val );
-
-
+	uint16_t GetVidReg( address_space &space, uint16_t reg );
+	void SetVidReg( address_space &space, uint16_t reg, uint16_t val );
 };
 
 void crystal_state::IntReq( int num )
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	UINT32 IntEn = space.read_dword(0x01800c08);
-	UINT32 IntPend = space.read_dword(0x01800c0c);
+	uint32_t IntEn = space.read_dword(0x01800c08);
+	uint32_t IntPend = space.read_dword(0x01800c0c);
 	if (IntEn & (1 << num))
 	{
 		IntPend |= (1 << num);
@@ -308,17 +357,17 @@ void crystal_state::IntReq( int num )
 READ32_MEMBER(crystal_state::FlipCount_r)
 {
 #ifdef IDLE_LOOP_SPEEDUP
-	UINT32 IntPend = space.read_dword(0x01800c0c);
+	uint32_t IntPend = space.read_dword(0x01800c0c);
 	m_FlipCntRead++;
 	if (m_FlipCntRead >= 16 && !IntPend && m_FlipCount != 0)
 		m_maincpu->suspend(SUSPEND_REASON_SPIN, 1);
 #endif
-	return ((UINT32) m_FlipCount) << 16;
+	return ((uint32_t) m_FlipCount) << 16;
 }
 
 WRITE32_MEMBER(crystal_state::FlipCount_w)
 {
-	if (mem_mask & 0x00ff0000)
+	if (ACCESSING_BITS_16_23)
 	{
 		int fc = (data >> 16) & 0xff;
 		if (fc == 1)
@@ -336,7 +385,7 @@ READ32_MEMBER(crystal_state::Input_r)
 		return ioport("P3_P4")->read();
 	else if( offset == 2)
 	{
-		UINT8 Port4 = ioport("SYSTEM")->read();
+		uint8_t Port4 = ioport("SYSTEM")->read();
 		if (!(Port4 & 0x10) && ((m_OldPort4 ^ Port4) & 0x10))   //coin buttons trigger IRQs
 			IntReq(12);
 		if (!(Port4 & 0x20) && ((m_OldPort4 ^ Port4) & 0x20))
@@ -349,23 +398,23 @@ READ32_MEMBER(crystal_state::Input_r)
 
 WRITE32_MEMBER(crystal_state::IntAck_w)
 {
-	UINT32 IntPend = space.read_dword(0x01800c0c);
+	uint32_t IntPend = space.read_dword(0x01800c0c);
 
-	if (mem_mask & 0xff)
+	if (ACCESSING_BITS_0_7)
 	{
 		IntPend &= ~(1 << (data & 0x1f));
 		space.write_dword(0x01800c0c, IntPend);
 		if (!IntPend)
 			m_maincpu->set_input_line(SE3208_INT, CLEAR_LINE);
 	}
-	if (mem_mask & 0xff00)
+	if (ACCESSING_BITS_8_15)
 		m_IntHigh = (data >> 8) & 7;
 }
 
 IRQ_CALLBACK_MEMBER(crystal_state::icallback)
 {
 	address_space &space = device.memory().space(AS_PROGRAM);
-	UINT32 IntPend = space.read_dword(0x01800c0c);
+	uint32_t IntPend = space.read_dword(0x01800c0c);
 	int i;
 
 	for (i = 0; i < 32; ++i)
@@ -387,31 +436,58 @@ WRITE32_MEMBER(crystal_state::Banksw_w)
 		membank("bank1")->set_base(memregion("user2")->base());
 }
 
+uint32_t *crystal_state::TimerRegsPtr(int which) const
+{
+	return &m_sysregs[0x1400/4 + which * 8/4];
+}
+
+void crystal_state::TimerStart(int which)
+{
+	uint32_t *regs = TimerRegsPtr(which);
+
+	int PD = (regs[0] >> 8) & 0xff;
+	int TCV = regs[1] & 0xffff;
+	attotime period = attotime::from_hz(43000000) * ((PD + 1) * (TCV + 1));
+	m_Timer[which]->adjust(period);
+
+//  printf("timer %d start, PD = %x TCV = %x period = %s\n", which, PD, TCV, period.as_string());
+}
+
 TIMER_CALLBACK_MEMBER(crystal_state::Timercb)
 {
-	int which = (int)(FPTR)ptr;
+	int which = (int)(uintptr_t)ptr;
 	static const int num[] = { 0, 1, 9, 10 };
 
-	if (!(m_Timerctrl[which] & 2))
-		m_Timerctrl[which] &= ~1;
+	uint32_t *regs = TimerRegsPtr(which);
+
+	if (regs[0] & 2)
+		TimerStart(which);
+	else
+		regs[0] &= ~1;
 
 	IntReq(num[which]);
 }
 
-void crystal_state::Timer_w( address_space &space, int which, UINT32 data, UINT32 mem_mask )
+void crystal_state::Timer_w( address_space &space, int which, uint32_t data, uint32_t mem_mask )
 {
-	if (((data ^ m_Timerctrl[which]) & 1) && (data & 1)) //Timer activate
-	{
-		int PD = (data >> 8) & 0xff;
-		int TCV = space.read_dword(0x01801404 + which * 8);
-		attotime period = attotime::from_hz(43000000) * ((PD + 1) * (TCV + 1));
+	uint32_t *regs = TimerRegsPtr(which);
 
-		if (m_Timerctrl[which] & 2)
-			m_Timer[which]->adjust(period, 0, period);
+	uint32_t old = regs[0];
+	data = COMBINE_DATA(&regs[0]);
+
+	if ((data ^ old) & 1)
+	{
+		if (data & 1)
+		{
+			TimerStart(which);
+		}
 		else
-			m_Timer[which]->adjust(period);
+		{
+			// Timer stop
+			m_Timer[which]->adjust(attotime::never);
+//          printf("timer %d stop\n", which);
+		}
 	}
-	COMBINE_DATA(&m_Timerctrl[which]);
 }
 
 WRITE32_MEMBER(crystal_state::Timer0_w)
@@ -421,7 +497,7 @@ WRITE32_MEMBER(crystal_state::Timer0_w)
 
 READ32_MEMBER(crystal_state::Timer0_r)
 {
-	return m_Timerctrl[0];
+	return *TimerRegsPtr(0);
 }
 
 WRITE32_MEMBER(crystal_state::Timer1_w)
@@ -431,7 +507,7 @@ WRITE32_MEMBER(crystal_state::Timer1_w)
 
 READ32_MEMBER(crystal_state::Timer1_r)
 {
-	return m_Timerctrl[1];
+	return *TimerRegsPtr(1);
 }
 
 WRITE32_MEMBER(crystal_state::Timer2_w)
@@ -441,7 +517,7 @@ WRITE32_MEMBER(crystal_state::Timer2_w)
 
 READ32_MEMBER(crystal_state::Timer2_r)
 {
-	return m_Timerctrl[2];
+	return *TimerRegsPtr(2);
 }
 
 WRITE32_MEMBER(crystal_state::Timer3_w)
@@ -451,7 +527,7 @@ WRITE32_MEMBER(crystal_state::Timer3_w)
 
 READ32_MEMBER(crystal_state::Timer3_r)
 {
-	return m_Timerctrl[3];
+	return *TimerRegsPtr(3);
 }
 
 READ32_MEMBER(crystal_state::FlashCmd_r)
@@ -460,7 +536,7 @@ READ32_MEMBER(crystal_state::FlashCmd_r)
 	{
 		if (m_Bank <= 2)
 		{
-			UINT32 *ptr = (UINT32*)(memregion("user1")->base() + m_Bank * 0x1000000);
+			uint32_t *ptr = (uint32_t*)(memregion("user1")->base() + m_Bank * 0x1000000);
 			return ptr[0];
 		}
 		else
@@ -488,9 +564,9 @@ READ32_MEMBER(crystal_state::PIO_r)
 
 WRITE32_MEMBER(crystal_state::PIO_w)
 {
-	UINT32 RST = data & 0x01000000;
-	UINT32 CLK = data & 0x02000000;
-	UINT32 DAT = data & 0x10000000;
+	uint32_t RST = data & 0x01000000;
+	uint32_t CLK = data & 0x02000000;
+	uint32_t DAT = data & 0x10000000;
 
 	m_ds1302->ce_w(RST ? 1 : 0);
 	m_ds1302->io_w(DAT ? 1 : 0);
@@ -504,21 +580,21 @@ WRITE32_MEMBER(crystal_state::PIO_w)
 	COMBINE_DATA(&m_PIO);
 }
 
-void crystal_state::DMA_w( address_space &space, int which, UINT32 data, UINT32 mem_mask )
+void crystal_state::DMA_w( address_space &space, int which, uint32_t data, uint32_t mem_mask )
 {
 	if (((data ^ m_DMActrl[which]) & (1 << 10)) && (data & (1 << 10)))   //DMAOn
 	{
-		UINT32 CTR = data;
-		UINT32 SRC = space.read_dword(0x01800804 + which * 0x10);
-		UINT32 DST = space.read_dword(0x01800808 + which * 0x10);
-		UINT32 CNT = space.read_dword(0x0180080C + which * 0x10);
+		uint32_t CTR = data;
+		uint32_t SRC = space.read_dword(0x01800804 + which * 0x10);
+		uint32_t DST = space.read_dword(0x01800808 + which * 0x10);
+		uint32_t CNT = space.read_dword(0x0180080C + which * 0x10);
 		int i;
 
 		if (CTR & 0x2)  //32 bits
 		{
 			for (i = 0; i < CNT; ++i)
 			{
-				UINT32 v = space.read_dword(SRC + i * 4);
+				uint32_t v = space.read_dword(SRC + i * 4);
 				space.write_dword(DST + i * 4, v);
 			}
 		}
@@ -526,7 +602,7 @@ void crystal_state::DMA_w( address_space &space, int which, UINT32 data, UINT32 
 		{
 			for (i = 0; i < CNT; ++i)
 			{
-				UINT16 v = space.read_word(SRC + i * 2);
+				uint16_t v = space.read_word(SRC + i * 2);
 				space.write_word(DST + i * 2, v);
 			}
 		}
@@ -534,7 +610,7 @@ void crystal_state::DMA_w( address_space &space, int which, UINT32 data, UINT32 
 		{
 			for (i = 0; i < CNT; ++i)
 			{
-				UINT8 v = space.read_byte(SRC + i);
+				uint8_t v = space.read_byte(SRC + i);
 				space.write_byte(DST + i, v);
 			}
 		}
@@ -573,16 +649,17 @@ static ADDRESS_MAP_START( crystal_mem, AS_PROGRAM, 32, crystal_state )
 	AM_RANGE(0x01280000, 0x01280003) AM_WRITE(Banksw_w)
 	AM_RANGE(0x01400000, 0x0140ffff) AM_RAM AM_SHARE("nvram")
 
+	AM_RANGE(0x01800800, 0x01800803) AM_READWRITE(DMA0_r, DMA0_w)
+	AM_RANGE(0x01800810, 0x01800813) AM_READWRITE(DMA1_r, DMA1_w)
+
+	AM_RANGE(0x01800c04, 0x01800c07) AM_WRITE(IntAck_w)
+
 	AM_RANGE(0x01801400, 0x01801403) AM_READWRITE(Timer0_r, Timer0_w)
 	AM_RANGE(0x01801408, 0x0180140b) AM_READWRITE(Timer1_r, Timer1_w)
 	AM_RANGE(0x01801410, 0x01801413) AM_READWRITE(Timer2_r, Timer2_w)
 	AM_RANGE(0x01801418, 0x0180141b) AM_READWRITE(Timer3_r, Timer3_w)
 	AM_RANGE(0x01802004, 0x01802007) AM_READWRITE(PIO_r, PIO_w)
 
-	AM_RANGE(0x01800800, 0x01800803) AM_READWRITE(DMA0_r, DMA0_w)
-	AM_RANGE(0x01800810, 0x01800813) AM_READWRITE(DMA1_r, DMA1_w)
-
-	AM_RANGE(0x01800c04, 0x01800c07) AM_WRITE(IntAck_w)
 	AM_RANGE(0x01800000, 0x0180ffff) AM_RAM AM_SHARE("sysregs")
 	AM_RANGE(0x02000000, 0x027fffff) AM_RAM AM_SHARE("workram")
 
@@ -597,7 +674,6 @@ static ADDRESS_MAP_START( crystal_mem, AS_PROGRAM, 32, crystal_state )
 	AM_RANGE(0x05000000, 0x05ffffff) AM_ROMBANK("bank1")
 
 	AM_RANGE(0x44414F4C, 0x44414F7F) AM_RAM AM_SHARE("reset_patch")
-
 ADDRESS_MAP_END
 
 // Trivia R Us
@@ -637,16 +713,17 @@ static ADDRESS_MAP_START( trivrus_mem, AS_PROGRAM, 32, crystal_state )
 //  0x0150001c & 0x000000ff = year - 2000
 	AM_RANGE(0x01600000, 0x01607fff) AM_RAM AM_SHARE("nvram")
 
+	AM_RANGE(0x01800800, 0x01800803) AM_READWRITE(DMA0_r, DMA0_w)
+	AM_RANGE(0x01800810, 0x01800813) AM_READWRITE(DMA1_r, DMA1_w)
+
+	AM_RANGE(0x01800c04, 0x01800c07) AM_WRITE(IntAck_w)
+
 	AM_RANGE(0x01801400, 0x01801403) AM_READWRITE(Timer0_r, Timer0_w)
 	AM_RANGE(0x01801408, 0x0180140b) AM_READWRITE(Timer1_r, Timer1_w)
 	AM_RANGE(0x01801410, 0x01801413) AM_READWRITE(Timer2_r, Timer2_w)
 	AM_RANGE(0x01801418, 0x0180141b) AM_READWRITE(Timer3_r, Timer3_w)
 	AM_RANGE(0x01802004, 0x01802007) AM_READWRITE(PIO_r, PIO_w)
 
-	AM_RANGE(0x01800800, 0x01800803) AM_READWRITE(DMA0_r, DMA0_w)
-	AM_RANGE(0x01800810, 0x01800813) AM_READWRITE(DMA1_r, DMA1_w)
-
-	AM_RANGE(0x01800c04, 0x01800c07) AM_WRITE(IntAck_w)
 	AM_RANGE(0x01800000, 0x0180ffff) AM_RAM AM_SHARE("sysregs")
 	AM_RANGE(0x02000000, 0x027fffff) AM_RAM AM_SHARE("workram")
 
@@ -661,7 +738,93 @@ static ADDRESS_MAP_START( trivrus_mem, AS_PROGRAM, 32, crystal_state )
 	AM_RANGE(0x05000000, 0x05ffffff) AM_ROMBANK("bank1")
 
 //  AM_RANGE(0x44414F4C, 0x44414F7F) AM_RAM AM_SHARE("reset_patch")
+ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( crospuzl_mem, AS_PROGRAM, 32, crystal_state )
+	AM_RANGE(0x01500000, 0x01500003) AM_READ(FlashCmd_r)
+	AM_RANGE(0x01500100, 0x01500103) AM_WRITE(FlashCmd_w)
+	AM_RANGE(0x01510000, 0x01510003) AM_READ_PORT("IN0")
+	AM_RANGE(0x01511000, 0x01511003) AM_READ_PORT("IN1")
+	AM_RANGE(0x01512000, 0x01512003) AM_READ_PORT("IN2")
+	AM_RANGE(0x01513000, 0x01513003) AM_READ_PORT("IN3")
+	AM_IMPORT_FROM( trivrus_mem )
+
+ADDRESS_MAP_END
+
+// Crazy Dou Di Zhu II
+// To do: HY04 (pic?) protection
+
+WRITE32_MEMBER(crystal_state::crzyddz2_PIO_w)
+{
+	COMBINE_DATA(&m_PIO);
+
+	if (ACCESSING_BITS_8_15)
+	{
+		int mux = (m_PIO >> 8) & 0x1f;
+		if (mux == 0x1f)
+		{
+			m_crzyddz2_prot = ((m_PIO >> 8) & 0xc0) ^ 0x40;
+			logerror("%s: PIO = %08x, prot = %02x\n", machine().describe_context(), m_PIO, m_crzyddz2_prot);
+		}
+	}
+}
+
+READ32_MEMBER(crystal_state::crzyddz2_key_r)
+{
+	static const char *const key_names[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4" };
+
+	int mux = (m_PIO >> 8) & 0x1f;
+
+	uint8_t data = 0x3f;
+	for (int i = 0; i < sizeof(key_names)/sizeof(key_names[0]); ++i)
+		if (!BIT(mux,i))
+			data =  ioport(key_names[i])->read();
+
+/*
+crzyddz2    in      out
+            00      40
+            40      00
+            c0      80
+*/
+//  m_crzyddz2_prot = (m_PIO >> 8) & 0xc0) ^ 0x40;
+	m_crzyddz2_prot = (machine().rand() & 0xc0);
+
+	return 0xffffff00 | data | m_crzyddz2_prot;
+}
+
+static ADDRESS_MAP_START( crzyddz2_mem, AS_PROGRAM, 32, crystal_state )
+	AM_RANGE(0x00000000, 0x00ffffff) AM_ROM AM_WRITENOP
+
+	AM_RANGE(0x01280000, 0x01280003) AM_WRITE(Banksw_w)
+	AM_RANGE(0x01400000, 0x0140ffff) AM_RAM AM_SHARE("nvram")
+	AM_RANGE(0x01500000, 0x01500003) AM_READ_PORT("P1_P2")
+	AM_RANGE(0x01500004, 0x01500007) AM_READ(crzyddz2_key_r)
+
+	AM_RANGE(0x01800800, 0x01800803) AM_READWRITE(DMA0_r, DMA0_w)
+	AM_RANGE(0x01800810, 0x01800813) AM_READWRITE(DMA1_r, DMA1_w)
+
+	AM_RANGE(0x01800c04, 0x01800c07) AM_WRITE(IntAck_w)
+
+	AM_RANGE(0x01801400, 0x01801403) AM_READWRITE(Timer0_r, Timer0_w)
+	AM_RANGE(0x01801408, 0x0180140b) AM_READWRITE(Timer1_r, Timer1_w)
+	AM_RANGE(0x01801410, 0x01801413) AM_READWRITE(Timer2_r, Timer2_w)
+	AM_RANGE(0x01801418, 0x0180141b) AM_READWRITE(Timer3_r, Timer3_w)
+	AM_RANGE(0x01802004, 0x01802007) AM_READWRITE(PIO_r, crzyddz2_PIO_w)
+
+	AM_RANGE(0x01800000, 0x0180ffff) AM_RAM AM_SHARE("sysregs")
+	AM_RANGE(0x02000000, 0x027fffff) AM_RAM AM_SHARE("workram")
+
+	AM_RANGE(0x030000a4, 0x030000a7) AM_READWRITE(FlipCount_r, FlipCount_w)
+
+	AM_RANGE(0x03000000, 0x0300ffff) AM_RAM AM_SHARE("vidregs")
+	AM_RANGE(0x03800000, 0x03ffffff) AM_RAM AM_SHARE("textureram")
+	AM_RANGE(0x04000000, 0x047fffff) AM_RAM AM_SHARE("frameram")
+	AM_RANGE(0x04800000, 0x04800fff) AM_DEVREADWRITE("vrender", vrender0_device, vr0_snd_read, vr0_snd_write)
+
+	AM_RANGE(0x05000000, 0x05000003) AM_READWRITE(FlashCmd_r, FlashCmd_w)
+	AM_RANGE(0x05000000, 0x05ffffff) AM_ROMBANK("bank1")
+
+//  AM_RANGE(0x44414F4C, 0x44414F7F) AM_RAM AM_SHARE("reset_patch")
 ADDRESS_MAP_END
 
 
@@ -694,7 +857,7 @@ loop:
 
 
 #if 1
-	static const UINT32 Patch[] =
+	static const uint32_t Patch[] =
 	{
 		0x40c0ea01,
 		0xe906400a,
@@ -706,7 +869,7 @@ loop:
 
 	memcpy(m_reset_patch, Patch, sizeof(Patch));
 #else
-	static const UINT8 Patch[] =
+	static const uint8_t Patch[] =
 	{
 		0x01,0xEA,0xC0,0x40,0x0A,0x40,0x06,0xE9,
 		0x20,0x2A,0xC0,0x40,0x0A,0x40,0x06,0xE9,
@@ -730,7 +893,7 @@ void crystal_state::machine_start()
 	int i;
 
 	for (i = 0; i < 4; i++)
-		m_Timer[i] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(crystal_state::Timercb),this), (void*)(FPTR)i);
+		m_Timer[i] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(crystal_state::Timercb),this), (void*)(uintptr_t)i);
 
 	PatchReset();
 
@@ -741,7 +904,6 @@ void crystal_state::machine_start()
 	save_item(NAME(m_Bank));
 	save_item(NAME(m_FlipCount));
 	save_item(NAME(m_IntHigh));
-	save_item(NAME(m_Timerctrl));
 	save_item(NAME(m_FlashCmd));
 	save_item(NAME(m_PIO));
 	save_item(NAME(m_DMActrl));
@@ -756,6 +918,7 @@ void crystal_state::machine_reset()
 
 	memset(m_sysregs, 0, 0x10000);
 	memset(m_vidregs, 0, 0x10000);
+
 	m_FlipCount = 0;
 	m_IntHigh = 0;
 	m_Bank = 0;
@@ -768,7 +931,7 @@ void crystal_state::machine_reset()
 
 	for (i = 0; i < 4; i++)
 	{
-		m_Timerctrl[i] = 0;
+		*TimerRegsPtr(i) = 0xff << 8;
 		m_Timer[i]->adjust(attotime::never);
 	}
 
@@ -778,20 +941,22 @@ void crystal_state::machine_reset()
 #endif
 
 	PatchReset();
+
+	m_crzyddz2_prot = 0x00;
 }
 
-UINT16 crystal_state::GetVidReg( address_space &space, UINT16 reg )
+uint16_t crystal_state::GetVidReg( address_space &space, uint16_t reg )
 {
 	return space.read_word(0x03000000 + reg);
 }
 
-void crystal_state::SetVidReg( address_space &space, UINT16 reg, UINT16 val )
+void crystal_state::SetVidReg( address_space &space, uint16_t reg, uint16_t val )
 {
 	space.write_word(0x03000000 + reg, val);
 }
 
 
-UINT32 crystal_state::screen_update_crystal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t crystal_state::screen_update_crystal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int xres = 320;
 	int yres = 240;
@@ -814,29 +979,29 @@ UINT32 crystal_state::screen_update_crystal(screen_device &screen, bitmap_ind16 
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	int DoFlip;
 
-	UINT32 B0 = 0x0;
-	UINT32 B1 = (GetVidReg(space, 0x90) & 0x8000) ? 0x400000 : 0x100000;
-	UINT16 *Front, *Back;
-	UINT16 *Visible, *DrawDest;
-	UINT16 *srcline;
+	uint32_t B0 = 0x0;
+	uint32_t B1 = (GetVidReg(space, 0x90) & 0x8000) ? 0x400000 : 0x100000;
+	uint16_t *Front, *Back;
+	uint16_t *Visible, *DrawDest;
+	uint16_t *srcline;
 	int y;
-	UINT16 head, tail;
-	UINT32 width = screen.width();
+	uint16_t head, tail;
+	uint32_t width = screen.width();
 
 	if (GetVidReg(space, 0x8e) & 1)
 	{
-		Front = (UINT16*) (m_frameram + B1 / 4);
-		Back  = (UINT16*) (m_frameram + B0 / 4);
+		Front = (uint16_t*) (m_frameram + B1 / 4);
+		Back  = (uint16_t*) (m_frameram + B0 / 4);
 	}
 	else
 	{
-		Front = (UINT16*) (m_frameram + B0 / 4);
-		Back  = (UINT16*) (m_frameram + B1 / 4);
+		Front = (uint16_t*) (m_frameram + B0 / 4);
+		Back  = (uint16_t*) (m_frameram + B1 / 4);
 	}
 
-	Visible  = (UINT16*) Front;
+	Visible  = (uint16_t*) Front;
 	// ERROR: This cast is NOT endian-safe without the use of BYTE/WORD/DWORD_XOR_* macros!
-	DrawDest = reinterpret_cast<UINT16 *>(m_frameram.target());
+	DrawDest = reinterpret_cast<uint16_t *>(m_frameram.target());
 
 
 	if (GetVidReg(space, 0x8c) & 0x80)
@@ -846,7 +1011,7 @@ UINT32 crystal_state::screen_update_crystal(screen_device &screen, bitmap_ind16 
 
 //  DrawDest = Visible;
 
-	srcline = (UINT16 *) DrawDest;
+	srcline = (uint16_t *) DrawDest;
 
 	DoFlip = 0;
 	head = GetVidReg(space, 0x82);
@@ -854,7 +1019,7 @@ UINT32 crystal_state::screen_update_crystal(screen_device &screen, bitmap_ind16 
 	while ((head & 0x7ff) != (tail & 0x7ff))
 	{
 		// ERROR: This cast is NOT endian-safe without the use of BYTE/WORD/DWORD_XOR_* macros!
-		DoFlip = m_vr0->vrender0_ProcessPacket(0x03800000 + head * 64, DrawDest, reinterpret_cast<UINT8*>(m_textureram.target()));
+		DoFlip = m_vr0->vrender0_ProcessPacket(0x03800000 + head * 64, DrawDest, reinterpret_cast<uint8_t*>(m_textureram.target()));
 		head++;
 		head &= 0x7ff;
 		if (DoFlip)
@@ -864,27 +1029,27 @@ UINT32 crystal_state::screen_update_crystal(screen_device &screen, bitmap_ind16 
 	if (DoFlip)
 		SetVidReg(space, 0x8e, GetVidReg(space, 0x8e) ^ 1);
 
-	srcline = (UINT16 *) Visible;
+	srcline = (uint16_t *) Visible;
 	for (y = 0; y < screen.height(); y++)
 		memcpy(&bitmap.pix16(y), &srcline[y * 1024], width * 2);
 
 	return 0;
 }
 
-void crystal_state::screen_eof_crystal(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(crystal_state::screen_vblank_crystal)
 {
 	// rising edge
 	if (state)
 	{
 		address_space &space = m_maincpu->space(AS_PROGRAM);
-		UINT16 head, tail;
+		uint16_t head, tail;
 		int DoFlip = 0;
 
 		head = GetVidReg(space, 0x82);
 		tail = GetVidReg(space, 0x80);
 		while ((head & 0x7ff) != (tail & 0x7ff))
 		{
-			UINT16 Packet0 = space.read_word(0x03800000 + head * 64);
+			uint16_t Packet0 = space.read_word(0x03800000 + head * 64);
 			if (Packet0 & 0x81)
 				DoFlip = 1;
 			head++;
@@ -1133,8 +1298,180 @@ static INPUT_PORTS_START(trivrus)
 	PORT_BIT( 0xffffff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START(crospuzl)
+	PORT_START("IN0")
+	PORT_DIPNAME( 0x01, 0x01, "DSW1" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0xffffff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-static MACHINE_CONFIG_START( crystal, crystal_state )
+	PORT_START("IN1")
+	PORT_DIPNAME( 0x01, 0x01, "IN1" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0xffffff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN2")
+	PORT_DIPNAME( 0x01, 0x01, "IN2" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0xffffff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN3")
+	PORT_DIPNAME( 0x01, 0x01, "IN3" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("PCB-SW1")
+	PORT_BIT( 0xffffff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START(crzyddz2)
+	PORT_START("P1_P2") // 1500002 & 1500000
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    ) // up
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  ) // down  (next secret code)
+	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) // left  (inc secret code)
+	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) // right (dec secret code)
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_BUTTON1        ) // A
+	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_BUTTON2        ) // B
+	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_BUTTON3        ) // C     (bet)
+	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_BUTTON4        ) // D
+	PORT_BIT( 0x0000ff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_START1         ) // start (secret code screen)
+	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_SERVICE2       ) // .. 2  (next secret code / stats)
+	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_SERVICE        ) // .. 1  (secret code screen / service mode)
+	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_SERVICE1       ) // .. 3  (inc secret code / credit)
+	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_UNKNOWN        )
+	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_SERVICE3       ) // .. 4  (exit secret screen / clear credits)
+	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_SERVICE4       ) //       (reset and clear ram?)
+	PORT_BIT( 0x00800000, IP_ACTIVE_LOW, IPT_UNKNOWN        )
+	PORT_BIT( 0xff000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	// 1500004 (multiplexed by 1802005)
+	PORT_START("KEY0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A         )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E         )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_I         )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_M         )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_KAN       ) // kan
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP ) // start?
+
+	PORT_START("KEY1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B         )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F         )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_J         )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_N         )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_REACH     ) // ?
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_BET       ) // ? + C
+
+	PORT_START("KEY2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C         )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_G         )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_K         )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_CHI       ) // chi
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE     ) // ?
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN           ) // nothing
+
+	PORT_START("KEY3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D         )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_H         )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_L         )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_PON       ) // pon
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN           ) // nothing
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN           ) // nothing
+
+	PORT_START("KEY4")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN           ) // nothing
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_RON       ) // ron
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP ) // ?
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN           ) // nothing
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_BIG       ) // big
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL     ) // small + D
+INPUT_PORTS_END
+
+
+static MACHINE_CONFIG_START( crystal )
 
 	MCFG_CPU_ADD("maincpu", SE3208, 43000000)
 	MCFG_CPU_PROGRAM_MAP(crystal_mem)
@@ -1149,7 +1486,7 @@ static MACHINE_CONFIG_START( crystal, crystal_state )
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
 	MCFG_SCREEN_UPDATE_DRIVER(crystal_state, screen_update_crystal)
-	MCFG_SCREEN_VBLANK_DRIVER(crystal_state, screen_eof_crystal)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(crystal_state, screen_vblank_crystal))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("vr0", VIDEO_VRENDER0, 0)
@@ -1171,6 +1508,16 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( trivrus, crystal )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(trivrus_mem)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( crospuzl, crystal )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(crospuzl_mem)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( crzyddz2, crystal )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(crzyddz2_mem)
 MACHINE_CONFIG_END
 
 
@@ -1260,6 +1607,21 @@ ROM_START( trivrus )
 	ROM_REGION( 0x1000000, "user2", ROMREGION_ERASEFF ) // Unmapped flash
 ROM_END
 
+/*
+  uses ADC 'Amazon-LF' SoC, EISC CPU core - similar to crystal system?
+*/
+
+ROM_START( crospuzl )
+	ROM_REGION( 0x80010, "maincpu", 0 )
+	ROM_LOAD("en29lv040a.u5",  0x000000, 0x80010, CRC(d50e8500) SHA1(d681cd18cd0e48854c24291d417d2d6d28fe35c1) )
+
+	ROM_REGION32_LE( 0x8400010, "user1", ROMREGION_ERASEFF ) // Flash
+	// mostly empty, but still looks good
+	ROM_LOAD("k9f1g08u0a.riser",  0x000000, 0x8400010, CRC(7f3c88c3) SHA1(db3169a7b4caab754e9d911998a2ece13c65ce5b) )
+
+	ROM_REGION( 0x1000000, "user2", ROMREGION_ERASEFF ) // Unmapped flash
+ROM_END
+
 ROM_START( psattack )
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD("5.sys",  0x000000, 0x200000, CRC(f09878e4) SHA1(25b8dbac47d3911615c8874746e420ece13e7181) )
@@ -1287,12 +1649,93 @@ ROM_START( ddz )
 	ROM_REGION( 0x1000000, "user2",   ROMREGION_ERASEFF )
 ROM_END
 
+/***************************************************************************
 
+Crazy Dou Di Zhu II
+Sealy, 2006
+
+PCB Layout
+----------
+
+070405-fd-VER1.2
+|--------------------------------------|
+|       PAL        27C322.U36          |
+|                               BATTERY|
+|    M59PW1282     62256  14.31818MHz  |
+|                             W9864G66 |
+|                                      |
+|J                     VRENDERZERO+    |
+|A            W9864G66                 |
+|M                            W9864G66 |
+|M              8MHz                   |
+|A    HY04    0260F8A                  |
+|                     28.63636MHz      |
+|                                      |
+|                 VR1       TLDA1311   |
+|                               TDA1519|
+|  18WAY                  VOL  10WAY   |
+|--------------------------------------|
+Notes:
+      0260F8A   - unknown TQFP44
+      HY04      - rebadged DIP8 PIC - type unknown *
+      W9864G66  - Winbond 64MBit DRAM
+      M59PW1282 - ST Microelectronics 128MBit SOP44 FlashROM.
+                  This is two 64MB SOP44 ROMs in one package
+
+* The pins are:
+  1 ground
+  2 nothing
+  3 data (only active for 1/4 second when the playing cards or "PASS" shows in game next to each player)
+  4 nothing
+  5 nothing
+  6 clock
+  7 +5V (could be VPP for programming voltage)
+  8 +5V
+
+***************************************************************************/
+
+ROM_START( crzyddz2 )
+	ROM_REGION32_LE( 0x3000000, "user1", ROMREGION_ERASEFF ) // Flash
+	ROM_LOAD( "rom.u48", 0x000000, 0x1000000, CRC(0f3a1987) SHA1(6cad943846c79db31226676c7391f32216cfff79) )
+
+	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASEFF )
+	ROM_COPY( "user1",      0x000000, 0x000000, 0x1000000 ) // copy flash here
+	ROM_LOAD( "27c322.u49", 0x000000, 0x0200000, CRC(b3177f39) SHA1(2a28bf8045bd2e053d88549b79fbc11f30ef9a32) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_CONTINUE(           0x000000, 0x0200000 )
+
+	ROM_REGION( 0x4280, "pic", 0 ) // hy04
+	ROM_LOAD("hy04", 0x000000, 0x4280, NO_DUMP )
+
+	ROM_REGION( 0x1000000, "user2", ROMREGION_ERASEFF ) // Unmapped flash
+ROM_END
+
+/***************************************************************************
+
+Meng Hong Lou (Dream of the Red Chamber)
+Sealy, 2004?
+
+Red PCB, very similar to crzyddz2
+
+***************************************************************************/
+
+ROM_START( menghong )
+	ROM_REGION32_LE( 0x3000000, "user1", ROMREGION_ERASEFF ) // Flash
+	ROM_LOAD( "rom.u48", 0x000000, 0x1000000, CRC(e24257c4) SHA1(569d79a61ff6d35100ba5727069363146df9e0b7) )
+
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_COPY( "user1",      0x000000, 0x000000, 0x1000000 ) // copy flash here
+	ROM_LOAD( "060511_08-01-18.u49",  0x000000, 0x0200000, CRC(b0c12107) SHA1(b1753757bbdb7d996df563ac6abdc6b46676704b) ) // 27C160
+
+	ROM_REGION( 0x4280, "pic", 0 ) // hy04
+	ROM_LOAD("menghong_hy04", 0x000000, 0x4280, NO_DUMP )
+
+	ROM_REGION( 0x1000000, "user2", ROMREGION_ERASEFF ) // Unmapped flash
+ROM_END
 
 
 DRIVER_INIT_MEMBER(crystal_state,crysking)
 {
-	UINT16 *Rom = (UINT16*) memregion("user1")->base();
+	uint16_t *Rom = (uint16_t*) memregion("user1")->base();
 
 	//patch the data feed by the protection
 
@@ -1311,7 +1754,7 @@ DRIVER_INIT_MEMBER(crystal_state,crysking)
 
 DRIVER_INIT_MEMBER(crystal_state,evosocc)
 {
-	UINT16 *Rom = (UINT16*) memregion("user1")->base();
+	uint16_t *Rom = (uint16_t*) memregion("user1")->base();
 	Rom += 0x1000000 * 2 / 2;
 
 	Rom[WORD_XOR_LE(0x97388E/2)] = 0x90FC;  //PUSH R2..R7
@@ -1339,7 +1782,7 @@ also it seems that bit 0x40000000 is the PIC reset.
 DRIVER_INIT_MEMBER(crystal_state,topbladv)
 {
 	// patches based on analysis of PIC dump
-	UINT16 *Rom = (UINT16*) memregion("user1")->base();
+	uint16_t *Rom = (uint16_t*) memregion("user1")->base();
 	/*
 	    PIC Protection data:
 	    - RAM ADDR - --PATCH--
@@ -1366,7 +1809,7 @@ DRIVER_INIT_MEMBER(crystal_state,topbladv)
 DRIVER_INIT_MEMBER(crystal_state,officeye)
 {
 	// patches based on analysis of PIC dump
-	UINT16 *Rom = (UINT16*) memregion("user1")->base();
+	uint16_t *Rom = (uint16_t*) memregion("user1")->base();
 
 	/*
 	    PIC Protection data:
@@ -1392,7 +1835,7 @@ DRIVER_INIT_MEMBER(crystal_state,officeye)
 
 DRIVER_INIT_MEMBER(crystal_state, donghaer)
 {
-	UINT16 *Rom = (UINT16*)memregion("user1")->base();
+	uint16_t *Rom = (uint16_t*)memregion("user1")->base();
 
 	Rom[WORD_XOR_LE(0x037A2 / 2)] = 0x9004; // PUSH %R2
 	Rom[WORD_XOR_LE(0x037A4 / 2)] = 0x8202; // LD   (%SP,0x8),%R2
@@ -1412,14 +1855,17 @@ DRIVER_INIT_MEMBER(crystal_state,psattack)
 }
 
 
-GAME( 2001, crysbios,        0, crystal,  crystal, driver_device,         0, ROT0, "BrezzaSoft",          "Crystal System BIOS",                  MACHINE_IS_BIOS_ROOT )
-GAME( 2001, crysking, crysbios, crystal,  crystal, crystal_state,  crysking, ROT0, "BrezzaSoft",          "The Crystal of Kings",                 0 )
-GAME( 2001, evosocc,  crysbios, crystal,  crystal, crystal_state,  evosocc,  ROT0, "Evoga",               "Evolution Soccer",                     0 )
-GAME( 2003, topbladv, crysbios, crystal,  crystal, crystal_state,  topbladv, ROT0, "SonoKong / Expotato", "Top Blade V",                          0 )
-GAME( 2001, officeye,        0, crystal,  officeye,crystal_state,  officeye, ROT0, "Danbi",               "Office Yeo In Cheon Ha (version 1.2)", MACHINE_NOT_WORKING ) // still has some instability issues
-GAME( 2001, donghaer,        0, crystal,  crystal, crystal_state,  donghaer, ROT0, "Danbi",               "Donggul Donggul Haerong",              MACHINE_NOT_WORKING )
-GAME( 2009, trivrus,         0, trivrus,  trivrus, driver_device,         0, ROT0, "AGT",                 "Trivia R Us (v1.07)",                  0 )
-// has a CF card instead of flash roms
-GAME( 2004, psattack, 0, crystal, crystal, crystal_state, psattack, ROT0, "Uniana", "P's Attack", MACHINE_IS_SKELETON )
+GAME( 2001, crysbios, 0,        crystal,  crystal,  crystal_state, 0,        ROT0, "BrezzaSoft",          "Crystal System BIOS",                  MACHINE_IS_BIOS_ROOT )
+GAME( 2001, crysking, crysbios, crystal,  crystal,  crystal_state, crysking, ROT0, "BrezzaSoft",          "The Crystal of Kings",                 0 )
+GAME( 2001, evosocc,  crysbios, crystal,  crystal,  crystal_state, evosocc,  ROT0, "Evoga",               "Evolution Soccer",                     0 )
+GAME( 2003, topbladv, crysbios, crystal,  crystal,  crystal_state, topbladv, ROT0, "SonoKong / Expotato", "Top Blade V",                          0 )
+GAME( 2001, officeye, 0,        crystal,  officeye, crystal_state, officeye, ROT0, "Danbi",               "Office Yeo In Cheon Ha (version 1.2)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // still has some instability issues
+GAME( 2001, donghaer, 0,        crystal,  crystal,  crystal_state, donghaer, ROT0, "Danbi",               "Donggul Donggul Haerong",              MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2004?,menghong, 0,        crzyddz2, crzyddz2, crystal_state, 0,        ROT0, "Sealy",               "Meng Hong Lou",                        MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2006, crzyddz2, 0,        crzyddz2, crzyddz2, crystal_state, 0,        ROT0, "Sealy",               "Crazy Dou Di Zhu II",                  MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2009, trivrus,  0,        trivrus,  trivrus,  crystal_state, 0,        ROT0, "AGT",                 "Trivia R Us (v1.07)",                  0 ) // has a CF card instead of flash roms
+GAME( 200?, crospuzl, 0,        crospuzl, crospuzl, crystal_state, 0,        ROT0, "<unknown>",           "Cross Puzzle",                         MACHINE_NOT_WORKING )
+
+GAME( 2004, psattack, 0,        crystal,  crystal,  crystal_state, psattack, ROT0, "Uniana",              "P's Attack",                           MACHINE_IS_SKELETON )
 // looks like the same kind of hw from strings in the ROM, but scrambled / encrypted?
-GAME( 200?, ddz,    0,  crystal, crystal, driver_device, 0, ROT0, "IGS?", "Dou Di Zhu", MACHINE_IS_SKELETON )
+GAME( 200?, ddz,      0,        crystal,  crystal,  crystal_state, 0,        ROT0, "IGS?",                "Dou Di Zhu",                           MACHINE_IS_SKELETON )

@@ -3,16 +3,13 @@
 /***************************************************************************
 
   BIG 10
-  ------
+  Success, 1985.
 
   Driver by Angelo Salese, Roberto Fresca & Tomasz Slanina.
-
 
 ****************************************************************************
 
   Dumper Notes:
-
-  Possibly some kind of gambling game.
 
   Z80A
   XTAL is 21.?727
@@ -21,7 +18,6 @@
   RAM 6264 x1
   RAM 41464 x4
   unknown SDIP64 chip with welded heatsink! Might be a video chip or MCU?
-
 
 ****************************************************************************
 
@@ -63,6 +59,9 @@
 #include "sound/ay8910.h"
 #include "video/v9938.h"
 #include "machine/nvram.h"
+#include "machine/ticket.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class big10_state : public driver_device
@@ -72,45 +71,22 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_v9938(*this, "v9938")
 		, m_maincpu(*this, "maincpu")
-		, m_in1(*this, "IN1")
-		, m_in2(*this, "IN2")
-		, m_in3(*this, "IN3")
+		, m_hopper(*this, "hopper")
+		, m_in(*this, "IN%u", 1)
 	{ }
 
 	required_device<v9938_device> m_v9938;
-	UINT8 m_mux_data;
+	uint8_t m_mux_data;
 	DECLARE_READ8_MEMBER(mux_r);
 	DECLARE_WRITE8_MEMBER(mux_w);
-	virtual void machine_reset() override;
-	DECLARE_WRITE_LINE_MEMBER(big10_vdp_interrupt);
 	required_device<cpu_device> m_maincpu;
-	required_ioport m_in1;
-	required_ioport m_in2;
-	required_ioport m_in3;
+	required_device<ticket_dispenser_device> m_hopper;
+	required_ioport_array<6> m_in;
 };
 
 
+#define HOPPER_PULSE        40          // time between hopper pulses in milliseconds
 #define VDP_MEM             0x40000
-
-
-/***************************************
-*      Interrupt handling & Video      *
-***************************************/
-
-WRITE_LINE_MEMBER(big10_state::big10_vdp_interrupt)
-{
-	m_maincpu->set_input_line(0, (state ? ASSERT_LINE : CLEAR_LINE));
-}
-
-
-
-/*************************************
-*           Machine Reset            *
-*************************************/
-
-void big10_state::machine_reset()
-{
-}
 
 
 /****************************************
@@ -121,18 +97,18 @@ void big10_state::machine_reset()
 WRITE8_MEMBER(big10_state::mux_w)
 {
 	m_mux_data = ~data;
+	m_hopper->write(space, 0, (data & 0x40) << 1);
+	machine().output().set_lamp_value(1, BIT(~data, 7)); // maybe a coin counter?
 }
 
 READ8_MEMBER(big10_state::mux_r)
 {
-	switch(m_mux_data)
-	{
-		case 1: return m_in1->read();
-		case 2: return m_in2->read();
-		case 4: return m_in3->read();
-	}
+	uint8_t result = 0xff;
+	for (int b = 0; b < 6; b++)
+		if (BIT(m_mux_data, b))
+			result &= m_in[b]->read();
 
-	return m_mux_data;
+	return result;
 }
 
 
@@ -163,9 +139,9 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( big10 )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_TOGGLE    /* Service Mode */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_R) PORT_NAME("Reset")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_W) PORT_NAME("Payout")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) PORT_NAME("Analyze Mode") PORT_TOGGLE
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MEMORY_RESET )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )   PORT_IMPULSE(2)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )                    // in test mode, go to the game whilst keep pressed.
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )                    // in test mode, go to the game whilst keep pressed.
@@ -173,46 +149,53 @@ static INPUT_PORTS_START( big10 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN3 )   PORT_IMPULSE(2)
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON7 )  PORT_CODE(KEYCODE_0_PAD) PORT_NAME("Number 0")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON8 )  PORT_CODE(KEYCODE_1_PAD) PORT_NAME("Number 1")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON9 )  PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Number 2")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("Number 3")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON11 ) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("Number 4")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON12 ) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("Number 5")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON13 ) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("Number 6")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON14 ) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("Number 7")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD )   PORT_CODE(KEYCODE_0_PAD) PORT_NAME("Number 0")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD )   PORT_CODE(KEYCODE_1_PAD) PORT_NAME("Number 1")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD )   PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Number 2")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD )   PORT_CODE(KEYCODE_3_PAD) PORT_NAME("Number 3")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD )   PORT_CODE(KEYCODE_4_PAD) PORT_NAME("Number 4")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD )   PORT_CODE(KEYCODE_5_PAD) PORT_NAME("Number 5")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD )   PORT_CODE(KEYCODE_6_PAD) PORT_NAME("Number 6")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD )   PORT_CODE(KEYCODE_7_PAD) PORT_NAME("Number 7")
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON15 ) PORT_CODE(KEYCODE_8_PAD)     PORT_NAME("Number 8")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON16 ) PORT_CODE(KEYCODE_9_PAD)     PORT_NAME("Number 9")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE )  PORT_CODE(KEYCODE_F)         PORT_NAME("Flip Flop")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD )   PORT_CODE(KEYCODE_8_PAD)     PORT_NAME("Number 8")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD )   PORT_CODE(KEYCODE_9_PAD)     PORT_NAME("Number 9")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER )    PORT_CODE(KEYCODE_F)         PORT_NAME("Flip Flop")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER )    PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("Select")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER )    PORT_CODE(KEYCODE_Z)         PORT_NAME("Select 10")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER )    PORT_CODE(KEYCODE_MINUS_PAD) PORT_NAME("Cancel All")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )  PORT_CODE(KEYCODE_2)         PORT_NAME("Start")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )  PORT_CODE(KEYCODE_1)         PORT_NAME("Bet")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START )    PORT_NAME("Start")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
 
 	PORT_START("IN3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CODE(KEYCODE_3) PORT_NAME("Double Up")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_CODE(KEYCODE_4) PORT_NAME("Take Score")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_CODE(KEYCODE_A) PORT_NAME("Big")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_CODE(KEYCODE_S) PORT_NAME("Small")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH ) PORT_NAME("Big")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_LOW ) PORT_NAME("Small")
 	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )    // in test mode triggers a sound and screen turns black, hanging the game.
 
+	PORT_START("IN4")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN5")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN6")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSW1:8")
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSW1:7")
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSW1:6")
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSW1:5")
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x03, 0x03, "Credit Limit?" )             PORT_DIPLOCATION("DSW1:8,7")
+	PORT_DIPSETTING(    0x00, "500" )
+	PORT_DIPSETTING(    0x01, "1000" )
+	PORT_DIPSETTING(    0x02, "3000" )
+	PORT_DIPSETTING(    0x03, "9999" )
+	PORT_DIPNAME( 0x0c, 0x0c, "Unknown" )                   PORT_DIPLOCATION("DSW1:6,5") // $C17E
+	PORT_DIPSETTING(    0x00, "0" )
+	PORT_DIPSETTING(    0x04, "1" )
+	PORT_DIPSETTING(    0x08, "2" )
+	PORT_DIPSETTING(    0x0c, "3" )
 	PORT_DIPNAME( 0x30, 0x30, "Main Game Rate" )            PORT_DIPLOCATION("DSW1:4,3")
 	PORT_DIPSETTING(    0x00, "60%" )
 	PORT_DIPSETTING(    0x10, "70%" )
@@ -234,7 +217,7 @@ INPUT_PORTS_END
 *           Machine Driver            *
 **************************************/
 
-static MACHINE_CONFIG_START( big10, big10_state )
+static MACHINE_CONFIG_START( big10 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)    /* guess */
@@ -245,7 +228,7 @@ static MACHINE_CONFIG_START( big10, big10_state )
 
 	/* video hardware */
 	MCFG_V9938_ADD("v9938", "screen", VDP_MEM, MASTER_CLOCK)
-	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(big10_state, big10_vdp_interrupt))
+	MCFG_V99X8_INTERRUPT_CALLBACK(INPUTLINE("maincpu", 0))
 	MCFG_V99X8_SCREEN_ADD_NTSC("screen", "v9938", MASTER_CLOCK)
 
 	/* sound hardware */
@@ -255,6 +238,8 @@ static MACHINE_CONFIG_START( big10, big10_state )
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW1"))
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(big10_state, mux_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+
+	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(HOPPER_PULSE), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW )
 MACHINE_CONFIG_END
 
 
@@ -274,5 +259,5 @@ ROM_END
 *           Game Driver(s)            *
 **************************************/
 
-/*    YEAR  NAME      PARENT    MACHINE   INPUT     STATE          INIT      ROT      COMPANY      FULLNAME   FLAGS  */
-GAME( 198?, big10,    0,        big10,    big10,    driver_device, 0,        ROT0,   "<unknown>", "Big 10",   0 )
+/*    YEAR  NAME      PARENT    MACHINE   INPUT     STATE          INIT    ROT      COMPANY     FULLNAME   FLAGS  */
+GAME( 1985, big10,    0,        big10,    big10,    big10_state,   0,      ROT0,   "Success",  "Big 10",   0 )

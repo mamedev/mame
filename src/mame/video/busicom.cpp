@@ -13,7 +13,7 @@
 // Printer font 34x44 as provided by MIT Media Lab
 
 
-static const UINT8 printer_font[]= {
+static const uint8_t printer_font[]= {
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -1818,16 +1818,16 @@ void busicom_state::video_start()
 {
 }
 
-UINT32 busicom_state::screen_update_busicom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t busicom_state::screen_update_busicom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int y, x, b, j;
 	//34x44
 	for (y = 0; y < 11; y++)
 	{
-		UINT8 col = 8 * m_printer_line_color[y];
+		uint8_t col = 8 * m_printer_line_color[y];
 		for (x = 0; x < 17; x++)
 		{
-			UINT8 chr = m_printer_line[y][x];
+			uint8_t chr = m_printer_line[y][x];
 			for (j = 0; j < 44; j++) {
 				for (b = 0; b < 34; b++)
 				{
@@ -1843,9 +1843,9 @@ UINT32 busicom_state::screen_update_busicom(screen_device &screen, bitmap_ind16 
 	}
 	return 0;
 }
-static const UINT8 color[] = { 0xFF,0xDB,0xB7,0x92,0x6E,0x49,0x25,0x00 };
+static const uint8_t color[] = { 0xFF,0xDB,0xB7,0x92,0x6E,0x49,0x25,0x00 };
 
-static const UINT8 color_red[] = { 0xb0,0xb5,0xc0,0xc5,0xd0,0xd5,0xdf };
+static const uint8_t color_red[] = { 0xb0,0xb5,0xc0,0xc5,0xd0,0xd5,0xdf };
 
 PALETTE_INIT_MEMBER(busicom_state, busicom)
 {

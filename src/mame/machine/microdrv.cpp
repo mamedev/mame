@@ -37,14 +37,14 @@
 ***************************************************************************/
 
 // device type definition
-const device_type MICRODRIVE = &device_creator<microdrive_image_device>;
+DEFINE_DEVICE_TYPE(MICRODRIVE, microdrive_image_device, "microdrive_image", "Sinclair Microdrive")
 
 //-------------------------------------------------
 //  microdrive_image_device - constructor
 //-------------------------------------------------
 
-microdrive_image_device::microdrive_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, MICRODRIVE, "Microdrive", tag, owner, clock, "microdrive_image", __FILE__),
+microdrive_image_device::microdrive_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, MICRODRIVE, tag, owner, clock),
 	device_image_interface(mconfig, *this),
 	m_write_comms_out(*this)
 {
@@ -58,18 +58,6 @@ microdrive_image_device::~microdrive_image_device()
 {
 }
 
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void microdrive_image_device::device_config_complete()
-{
-	// set brief and instance name
-	update_names();
-}
-
 
 void microdrive_image_device::device_start()
 {
@@ -77,8 +65,8 @@ void microdrive_image_device::device_start()
 	m_write_comms_out.resolve_safe();
 
 	// allocate track buffers
-	m_left = std::make_unique<UINT8[]>(MDV_IMAGE_LENGTH / 2);
-	m_right = std::make_unique<UINT8[]>(MDV_IMAGE_LENGTH / 2);
+	m_left = std::make_unique<uint8_t[]>(MDV_IMAGE_LENGTH / 2);
+	m_right = std::make_unique<uint8_t[]>(MDV_IMAGE_LENGTH / 2);
 
 	// allocate timers
 	m_bit_timer = timer_alloc();
@@ -90,10 +78,10 @@ void microdrive_image_device::device_start()
 	m_comms_out = 0;
 }
 
-bool microdrive_image_device::call_load()
+image_init_result microdrive_image_device::call_load()
 {
 	if (length() != MDV_IMAGE_LENGTH)
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 
 	for (int i = 0; i < MDV_IMAGE_LENGTH / 2; i++)
 	{
@@ -104,7 +92,7 @@ bool microdrive_image_device::call_load()
 	m_bit_offset = 0;
 	m_byte_offset = 0;
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 void microdrive_image_device::call_unload()

@@ -91,12 +91,16 @@ Are the OKI M6295 clocks from Heavy Smash are correct at least for the Mitchell 
 */
 
 #include "emu.h"
+#include "includes/simpl156.h"
+
 #include "machine/decocrpt.h"
 #include "machine/deco156.h"
 #include "cpu/arm/arm.h"
-#include "includes/simpl156.h"
 #include "machine/eepromser.h"
 #include "sound/okim6295.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 static INPUT_PORTS_START( simpl156 )
 	PORT_START("IN0")
@@ -128,6 +132,22 @@ static INPUT_PORTS_START( simpl156 )
 	PORT_BIT( 0xffff0000, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( magdrop )
+	PORT_INCLUDE(simpl156)
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_OPTIONAL // not used in gameplay
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_OPTIONAL // not used in gameplay
+INPUT_PORTS_END
+
 
 WRITE32_MEMBER(simpl156_state::simpl156_eeprom_w)
 {
@@ -135,7 +155,7 @@ WRITE32_MEMBER(simpl156_state::simpl156_eeprom_w)
 
 	//okibank = data & 0x07;
 
-	m_okimusic->set_bank_base(0x40000 * (data & 0x7));
+	m_okimusic->set_rom_bank(data & 0x7);
 
 	m_eeprom->clk_write(BIT(data, 5) ? ASSERT_LINE : CLEAR_LINE);
 	m_eeprom->di_write(BIT(data, 4));
@@ -376,7 +396,7 @@ DECOSPR_PRIORITY_CB_MEMBER(simpl156_state::pri_callback)
 }
 
 
-static MACHINE_CONFIG_START( chainrec, simpl156_state )
+static MACHINE_CONFIG_START( chainrec )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", ARM, 28000000 /* /4 */) /*DE156*/ /* 7.000 MHz */ /* measured at 7.. seems to need 28? */
@@ -422,11 +442,11 @@ static MACHINE_CONFIG_START( chainrec, simpl156_state )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_OKIM6295_ADD("okisfx", 32220000/32, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("okisfx", 32220000/32, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.6)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.6)
 
-	MCFG_OKIM6295_ADD("okimusic", 32220000/16, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("okimusic", 32220000/16, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.2)
 MACHINE_CONFIG_END
@@ -458,7 +478,7 @@ static MACHINE_CONFIG_DERIVED( mitchell156, chainrec )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(mitchell156_map)
 
-	MCFG_OKIM6295_REPLACE("okimusic", 32220000/32, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_REPLACE("okimusic", 32220000/32, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.2)
 MACHINE_CONFIG_END
@@ -1017,16 +1037,16 @@ ROM_END
 
 DRIVER_INIT_MEMBER(simpl156_state,simpl156)
 {
-	UINT8 *rom = memregion("okimusic")->base();
+	uint8_t *rom = memregion("okimusic")->base();
 	int length = memregion("okimusic")->bytes();
-	dynamic_buffer buf1(length);
+	std::vector<uint8_t> buf1(length);
 
-	UINT32 x;
+	uint32_t x;
 
 	/* hmm low address line goes to banking chip instead? */
 	for (x = 0; x < length; x++)
 	{
-		UINT32 addr;
+		uint32_t addr;
 
 		addr = BITSWAP24 (x,23,22,21,0, 20,
 							19,18,17,16,
@@ -1117,9 +1137,9 @@ DRIVER_INIT_MEMBER(simpl156_state,osman)
 GAME( 1994, joemacr,  0,        joemacr,     simpl156, simpl156_state, joemacr,  ROT0, "Data East", "Joe & Mac Returns (World, Version 1.1, 1994.05.27)", MACHINE_SUPPORTS_SAVE ) /* bootleg board with genuine DECO parts */
 GAME( 1994, joemacra, joemacr,  joemacr,     simpl156, simpl156_state, joemacr,  ROT0, "Data East", "Joe & Mac Returns (World, Version 1.0, 1994.05.19)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, joemacrj, joemacr,  joemacr,     simpl156, simpl156_state, joemacr,  ROT0, "Data East", "Joe & Mac Returns (Japan, Version 1.2, 1994.06.06)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, chainrec, 0,        chainrec,    simpl156, simpl156_state, chainrec, ROT0, "Data East", "Chain Reaction (World, Version 2.2, 1995.09.25)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, magdrop,  chainrec, magdrop,     simpl156, simpl156_state, chainrec, ROT0, "Data East", "Magical Drop (Japan, Version 1.1, 1995.06.21)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, magdropp, chainrec, magdropp,    simpl156, simpl156_state, chainrec, ROT0, "Data East", "Magical Drop Plus 1 (Japan, Version 2.1, 1995.09.12)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, chainrec, 0,        chainrec,    magdrop,  simpl156_state, chainrec, ROT0, "Data East", "Chain Reaction (World, Version 2.2, 1995.09.25)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, magdrop,  chainrec, magdrop,     magdrop,  simpl156_state, chainrec, ROT0, "Data East", "Magical Drop (Japan, Version 1.1, 1995.06.21)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, magdropp, chainrec, magdropp,    magdrop,  simpl156_state, chainrec, ROT0, "Data East", "Magical Drop Plus 1 (Japan, Version 2.1, 1995.09.12)", MACHINE_SUPPORTS_SAVE )
 
 /* Mitchell games running on the DEC-22VO / MT5601-0 PCB */
 GAME( 1995, charlien, 0,        mitchell156, simpl156, simpl156_state, charlien, ROT0,  "Mitchell", "Charlie Ninja" , MACHINE_SUPPORTS_SAVE ) /* language in service mode */

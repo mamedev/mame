@@ -6,12 +6,11 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_CBMIEC_SERIALBOX_H
+#define MAME_BUS_CBMIEC_SERIALBOX_H
+
 #pragma once
 
-#ifndef __SERIAL_BOX__
-#define __SERIAL_BOX__
-
-#include "emu.h"
 #include "cpu/m6502/m65c02.h"
 #include "bus/cbmiec/cbmiec.h"
 
@@ -31,21 +30,20 @@
 
 // ======================> serial_box_device
 
-class serial_box_device :  public device_t,
-							public device_cbm_iec_interface
+class serial_box_device : public device_t, public device_cbm_iec_interface
 {
 public:
 	// construction/destruction
-	serial_box_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-	// optional information overrides
-	virtual const rom_entry *device_rom_region() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	serial_box_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
+	// optional information overrides
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	// device_cbm_iec_interface overrides
 	void cbm_iec_atn(int state) override;
@@ -58,8 +56,7 @@ private:
 
 
 // device type definition
-extern const device_type SERIAL_BOX;
+DECLARE_DEVICE_TYPE(SERIAL_BOX, serial_box_device)
 
 
-
-#endif
+#endif // MAME_BUS_CBMIEC_SERIALBOX_H

@@ -16,8 +16,6 @@
 #include "debugger.h"
 #include <ctype.h>
 
-
-
 /***************************************************************************
     CONSTANTS
 ***************************************************************************/
@@ -28,96 +26,61 @@
 #define ERRORLOG_BUF_SIZE   (1024 * 1024)
 #define ERRORLOG_MAX_LINES  (ERRORLOG_BUF_SIZE / 20)
 
-
-
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
-
-struct debug_command
-{
-	debug_command * next;
-	char            command[32];
-	const char *    params;
-	const char *    help;
-	void            (*handler)(running_machine &machine, int ref, int params, const char **param);
-	void            (*handler_ex)(int ref);
-	UINT32          flags;
-	int             ref;
-	int             minparams;
-	int             maxparams;
-};
-
-
-
-/***************************************************************************
-    LOCAL VARIABLES
-***************************************************************************/
-
-static text_buffer *console_textbuf;
-static text_buffer *errorlog_textbuf;
-
-static debug_command *commandlist;
-
-
-
-/***************************************************************************
-    FUNCTION PROTOTYPES
-***************************************************************************/
-
-static void debug_console_exit(running_machine &machine);
-
-
-
 /***************************************************************************
 
     Initialization and tear down
 
 ***************************************************************************/
 
-/*-------------------------------------------------
-    debug_console_init - initializes the console
-    system
--------------------------------------------------*/
-
-void debug_console_init(running_machine &machine)
+debugger_console::debugger_console(running_machine &machine)
+	: m_machine(machine)
+	, m_console_textbuf(nullptr)
+	, m_errorlog_textbuf(nullptr)
+	, m_commandlist(nullptr)
 {
 	/* allocate text buffers */
-	console_textbuf = text_buffer_alloc(CONSOLE_BUF_SIZE, CONSOLE_MAX_LINES);
-	if (!console_textbuf)
+	m_console_textbuf = text_buffer_alloc(CONSOLE_BUF_SIZE, CONSOLE_MAX_LINES);
+	if (!m_console_textbuf)
 		return;
 
-	errorlog_textbuf = text_buffer_alloc(ERRORLOG_BUF_SIZE, ERRORLOG_MAX_LINES);
-	if (!errorlog_textbuf)
+	m_errorlog_textbuf = text_buffer_alloc(ERRORLOG_BUF_SIZE, ERRORLOG_MAX_LINES);
+	if (!m_errorlog_textbuf)
 		return;
 
 	/* print the opening lines */
-	debug_console_printf(machine, "%s debugger version %s\n", emulator_info::get_appname(), emulator_info::get_build_version());
-	debug_console_printf(machine, "Currently targeting %s (%s)\n", machine.system().name, machine.system().description);
+	printf("%s debugger version %s\n", emulator_info::get_appname(), emulator_info::get_build_version());
+	printf("Currently targeting %s (%s)\n", m_machine.system().name, m_machine.system().type.fullname());
 
 	/* request callback upon exiting */
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(debug_console_exit), &machine));
+	m_machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&debugger_console::exit, this));
+
+	/* listen in on the errorlog */
+	using namespace std::placeholders;
+	m_machine.add_logerror_callback(std::bind(&debugger_console::errorlog_write_line, this, _1));
 }
 
 
 /*-------------------------------------------------
-    debug_console_exit - frees the console
-    system
+    exit - frees the console system
 -------------------------------------------------*/
 
-static void debug_console_exit(running_machine &machine)
+void debugger_console::exit()
 {
 	/* free allocated memory */
-	if (console_textbuf)
-		text_buffer_free(console_textbuf);
-	console_textbuf = nullptr;
+	if (m_console_textbuf)
+	{
+		text_buffer_free(m_console_textbuf);
+	}
+	m_console_textbuf = nullptr;
 
-	if (errorlog_textbuf)
-		text_buffer_free(errorlog_textbuf);
-	errorlog_textbuf = nullptr;
+	if (m_errorlog_textbuf)
+	{
+		text_buffer_free(m_errorlog_textbuf);
+	}
+	m_errorlog_textbuf = nullptr;
 
 	/* free the command list */
-	commandlist = nullptr;
+	m_commandlist = nullptr;
 }
 
 
@@ -133,16 +96,16 @@ static void debug_console_exit(running_machine &machine)
     command
 -------------------------------------------------*/
 
-static void trim_parameter(char **paramptr, int keep_quotes)
+void debugger_console::trim_parameter(char **paramptr, bool keep_quotes)
 {
 	char *param = *paramptr;
 	size_t len = strlen(param);
-	int repeat;
+	bool repeat;
 
 	/* loop until all adornments are gone */
 	do
 	{
-		repeat = 0;
+		repeat = false;
 
 		/* check for begin/end quotes */
 		if (len >= 2 && param[0] == '"' && param[len - 1] == '"')
@@ -161,7 +124,7 @@ static void trim_parameter(char **paramptr, int keep_quotes)
 			param[len - 1] = 0;
 			param++;
 			len -= 2;
-			repeat = 1;
+			repeat = true;
 		}
 
 		/* check for leading spaces */
@@ -169,7 +132,7 @@ static void trim_parameter(char **paramptr, int keep_quotes)
 		{
 			param++;
 			len--;
-			repeat = 1;
+			repeat = true;
 		}
 
 		/* check for trailing spaces */
@@ -177,7 +140,7 @@ static void trim_parameter(char **paramptr, int keep_quotes)
 		{
 			param[len - 1] = 0;
 			len--;
-			repeat = 1;
+			repeat = true;
 		}
 	} while (repeat);
 
@@ -190,7 +153,7 @@ static void trim_parameter(char **paramptr, int keep_quotes)
     command
 -------------------------------------------------*/
 
-static CMDERR internal_execute_command(running_machine &machine, int execute, int params, char **param)
+CMDERR debugger_console::internal_execute_command(bool execute, int params, char **param)
 {
 	debug_command *cmd, *found = nullptr;
 	int i, foundcount = 0;
@@ -202,12 +165,12 @@ static CMDERR internal_execute_command(running_machine &machine, int execute, in
 		return CMDERR_NONE;
 
 	/* the first parameter has the command and the real first parameter; separate them */
-	for (p = param[0]; *p && isspace((UINT8)*p); p++) { }
-	for (command = p; *p && !isspace((UINT8)*p); p++) { }
+	for (p = param[0]; *p && isspace(u8(*p)); p++) { }
+	for (command = p; *p && !isspace(u8(*p)); p++) { }
 	if (*p != 0)
 	{
 		*p++ = 0;
-		for ( ; *p && isspace((UINT8)*p); p++) { }
+		for ( ; *p && isspace(u8(*p)); p++) { }
 		if (*p != 0)
 			param[0] = p;
 		else
@@ -221,7 +184,7 @@ static CMDERR internal_execute_command(running_machine &machine, int execute, in
 
 	/* search the command list */
 	len = strlen(command);
-	for (cmd = commandlist; cmd != nullptr; cmd = cmd->next)
+	for (cmd = m_commandlist; cmd != nullptr; cmd = cmd->next)
 		if (!strncmp(command, cmd->command, len))
 		{
 			foundcount++;
@@ -255,7 +218,10 @@ static CMDERR internal_execute_command(running_machine &machine, int execute, in
 
 	/* execute the handler */
 	if (execute)
-		(*found->handler)(machine, found->ref, params, (const char **)param);
+	{
+		std::vector<std::string> params_vec(param, param + params);
+		found->handler(found->ref, params_vec);
+	}
 	return CMDERR_NONE;
 }
 
@@ -265,7 +231,7 @@ static CMDERR internal_execute_command(running_machine &machine, int execute, in
     and either executes or just validates it
 -------------------------------------------------*/
 
-static CMDERR internal_parse_command(running_machine &machine, const char *original_command, int execute)
+CMDERR debugger_console::internal_parse_command(const std::string &original_command, bool execute)
 {
 	char command[MAX_COMMAND_LENGTH], parens[MAX_COMMAND_LENGTH];
 	char *params[MAX_COMMAND_PARAMS] = { nullptr };
@@ -274,12 +240,13 @@ static CMDERR internal_parse_command(running_machine &machine, const char *origi
 	char *p, c = 0;
 
 	/* make a copy of the command */
-	strcpy(command, original_command);
+	strcpy(command, original_command.c_str());
 
 	/* loop over all semicolon-separated stuff */
 	for (p = command; *p != 0; )
 	{
-		int paramcount = 0, foundend = FALSE, instring = FALSE, isexpr = FALSE, parendex = 0;
+		int paramcount = 0, parendex = 0;
+		bool foundend = false, instring = false, isexpr = false;
 
 		/* find a semicolon or the end */
 		for (params[paramcount++] = p; !foundend; p++)
@@ -288,13 +255,13 @@ static CMDERR internal_parse_command(running_machine &machine, const char *origi
 			if (instring)
 			{
 				if (c == '"' && p[-1] != '\\')
-					instring = FALSE;
+					instring = false;
 			}
 			else
 			{
 				switch (c)
 				{
-					case '"':   instring = TRUE; break;
+					case '"':   instring = true; break;
 					case '(':
 					case '[':
 					case '{':   parens[parendex++] = c; break;
@@ -302,12 +269,12 @@ static CMDERR internal_parse_command(running_machine &machine, const char *origi
 					case ']':   if (parendex == 0 || parens[--parendex] != '[') return MAKE_CMDERR_UNBALANCED_PARENS(p - command); break;
 					case '}':   if (parendex == 0 || parens[--parendex] != '{') return MAKE_CMDERR_UNBALANCED_PARENS(p - command); break;
 					case ',':   if (parendex == 0) params[paramcount++] = p; break;
-					case ';':   if (parendex == 0) foundend = TRUE; break;
-					case '-':   if (parendex == 0 && paramcount == 1 && p[1] == '-') isexpr = TRUE; *p = c; break;
-					case '+':   if (parendex == 0 && paramcount == 1 && p[1] == '+') isexpr = TRUE; *p = c; break;
-					case '=':   if (parendex == 0 && paramcount == 1) isexpr = TRUE; *p = c; break;
-					case 0:     foundend = TRUE; break;
-					default:    *p = tolower((UINT8)c); break;
+					case ';':   if (parendex == 0) foundend = true; break;
+					case '-':   if (parendex == 0 && paramcount == 1 && p[1] == '-') isexpr = true; *p = c; break;
+					case '+':   if (parendex == 0 && paramcount == 1 && p[1] == '+') isexpr = true; *p = c; break;
+					case '=':   if (parendex == 0 && paramcount == 1) isexpr = true; *p = c; break;
+					case 0:     foundend = true; break;
+					default:    *p = tolower(u8(c)); break;
 				}
 			}
 		}
@@ -326,9 +293,9 @@ static CMDERR internal_parse_command(running_machine &machine, const char *origi
 		command_start = params[0];
 
 		/* allow for "do" commands */
-		if (tolower((UINT8)command_start[0] == 'd') && tolower((UINT8)command_start[1] == 'o') && isspace((UINT8)command_start[2]))
+		if (tolower(u8(command_start[0])) == 'd' && tolower(u8(command_start[1])) == 'o' && isspace(u8(command_start[2])))
 		{
-			isexpr = TRUE;
+			isexpr = true;
 			command_start += 3;
 		}
 
@@ -337,8 +304,8 @@ static CMDERR internal_parse_command(running_machine &machine, const char *origi
 		{
 			try
 			{
-				UINT64 expresult;
-				parsed_expression expression(debug_cpu_get_visible_symtable(machine), command_start, &expresult);
+				u64 expresult;
+				parsed_expression expression(m_machine.debugger().cpu().get_visible_symtable(), command_start, &expresult);
 			}
 			catch (expression_error &err)
 			{
@@ -347,7 +314,7 @@ static CMDERR internal_parse_command(running_machine &machine, const char *origi
 		}
 		else
 		{
-			result = internal_execute_command(machine, execute, paramcount, &params[0]);
+			result = internal_execute_command(execute, paramcount, &params[0]);
 			if (result != CMDERR_NONE)
 				return MAKE_CMDERR(CMDERR_ERROR_CLASS(result), command_start - command);
 		}
@@ -357,64 +324,59 @@ static CMDERR internal_parse_command(running_machine &machine, const char *origi
 
 
 /*-------------------------------------------------
-    debug_console_execute_command - execute a
-    command string
+    execute_command - execute a command string
 -------------------------------------------------*/
 
-CMDERR debug_console_execute_command(running_machine &machine, const char *command, int echo)
+CMDERR debugger_console::execute_command(const std::string &command, bool echo)
 {
 	CMDERR result;
 
 	/* echo if requested */
 	if (echo)
-		debug_console_printf(machine, ">%s\n", command);
+		printf(">%s\n", command.c_str());
 
 	/* parse and execute */
-	result = internal_parse_command(machine, command, TRUE);
+	result = internal_parse_command(command, true);
 
 	/* display errors */
 	if (result != CMDERR_NONE)
 	{
 		if (!echo)
-			debug_console_printf(machine, ">%s\n", command);
-		debug_console_printf(machine, " %*s^\n", CMDERR_ERROR_OFFSET(result), "");
-		debug_console_printf(machine, "%s\n", debug_cmderr_to_string(result));
+			printf(">%s\n", command.c_str());
+		printf(" %*s^\n", CMDERR_ERROR_OFFSET(result), "");
+		printf("%s\n", cmderr_to_string(result).c_str());
 	}
 
 	/* update all views */
 	if (echo)
 	{
-		machine.debug_view().update_all();
-		machine.debugger().refresh_display();
+		m_machine.debug_view().update_all();
+		m_machine.debugger().refresh_display();
 	}
 	return result;
 }
 
 
 /*-------------------------------------------------
-    debug_console_validate_command - validate a
-    command string
+    validate_command - validate a command string
 -------------------------------------------------*/
 
-CMDERR debug_console_validate_command(running_machine &machine, const char *command)
+CMDERR debugger_console::validate_command(const char *command)
 {
-	return internal_parse_command(machine, command, FALSE);
+	return internal_parse_command(command, false);
 }
 
 
 /*-------------------------------------------------
-    debug_console_register_command - register a
-    command handler
+    register_command - register a command handler
 -------------------------------------------------*/
 
-void debug_console_register_command(running_machine &machine, const char *command, UINT32 flags, int ref, int minparams, int maxparams, void (*handler)(running_machine &machine, int ref, int params, const char **param))
+void debugger_console::register_command(const char *command, u32 flags, int ref, int minparams, int maxparams, std::function<void(int, const std::vector<std::string> &)> handler)
 {
-	debug_command *cmd;
+	assert_always(m_machine.phase() == machine_phase::INIT, "Can only call register_command() at init time!");
+	assert_always((m_machine.debug_flags & DEBUG_FLAG_ENABLED) != 0, "Cannot call register_command() when debugger is not running");
 
-	assert_always(machine.phase() == MACHINE_PHASE_INIT, "Can only call debug_console_register_command() at init time!");
-	assert_always((machine.debug_flags & DEBUG_FLAG_ENABLED) != 0, "Cannot call debug_console_register_command() when debugger is not running");
-
-	cmd = auto_alloc_clear(machine, <debug_command>());
+	debug_command *cmd = auto_alloc_clear(m_machine, <debug_command>());
 
 	/* fill in the command */
 	strcpy(cmd->command, command);
@@ -425,8 +387,8 @@ void debug_console_register_command(running_machine &machine, const char *comman
 	cmd->handler = handler;
 
 	/* link it */
-	cmd->next = commandlist;
-	commandlist = cmd;
+	cmd->next = m_commandlist;
+	m_commandlist = cmd;
 }
 
 
@@ -438,12 +400,13 @@ void debug_console_register_command(running_machine &machine, const char *comman
 ***************************************************************************/
 
 /*-------------------------------------------------
-    debug_cmderr_to_string - return a friendly
-    string for a given command error
+    cmderr_to_string - return a friendly string
+    for a given command error
 -------------------------------------------------*/
 
-const char *debug_cmderr_to_string(CMDERR error)
+std::string debugger_console::cmderr_to_string(CMDERR error)
 {
+	int offset = CMDERR_ERROR_OFFSET(error);
 	switch (CMDERR_ERROR_CLASS(error))
 	{
 		case CMDERR_UNKNOWN_COMMAND:        return "unknown command";
@@ -452,7 +415,8 @@ const char *debug_cmderr_to_string(CMDERR error)
 		case CMDERR_UNBALANCED_QUOTES:      return "unbalanced quotes";
 		case CMDERR_NOT_ENOUGH_PARAMS:      return "not enough parameters for command";
 		case CMDERR_TOO_MANY_PARAMS:        return "too many parameters for command";
-		case CMDERR_EXPRESSION_ERROR:       return "error in assignment expression";
+		case CMDERR_EXPRESSION_ERROR:       return string_format("error in assignment expression: %s",
+																 expression_error(static_cast<expression_error::error_code>(offset)).code_string());
 		default:                            return "unknown error";
 	}
 }
@@ -466,83 +430,61 @@ const char *debug_cmderr_to_string(CMDERR error)
 ***************************************************************************/
 
 /*-------------------------------------------------
-    debug_console_vprintf - vprintfs the given
-    arguments using the format to the debug
-    console
+    vprintf - vprintfs the given arguments using
+    the format to the debug console
 -------------------------------------------------*/
 
-void debug_console_vprintf(running_machine &machine, util::format_argument_pack<std::ostream> const &args)
+void debugger_console::vprintf(util::format_argument_pack<std::ostream> const &args)
 {
-	text_buffer_print(console_textbuf, util::string_format(args).c_str());
+	text_buffer_print(m_console_textbuf, util::string_format(args).c_str());
 
 	/* force an update of any console views */
-	machine.debug_view().update_all(DVT_CONSOLE);
+	m_machine.debug_view().update_all(DVT_CONSOLE);
 }
 
-void debug_console_vprintf(running_machine &machine, util::format_argument_pack<std::ostream> &&args)
+void debugger_console::vprintf(util::format_argument_pack<std::ostream> &&args)
 {
-	text_buffer_print(console_textbuf, util::string_format(std::move(args)).c_str());
+	text_buffer_print(m_console_textbuf, util::string_format(std::move(args)).c_str());
 
 	/* force an update of any console views */
-	machine.debug_view().update_all(DVT_CONSOLE);
+	m_machine.debug_view().update_all(DVT_CONSOLE);
 }
 
 
 /*-------------------------------------------------
-    debug_console_vprintf_wrap - vprintfs the given
-    arguments using the format to the debug
-    console
+    vprintf_wrap - vprintfs the given arguments
+    using the format to the debug console
 -------------------------------------------------*/
 
-void debug_console_vprintf_wrap(running_machine &machine, int wrapcol, util::format_argument_pack<std::ostream> const &args)
+void debugger_console::vprintf_wrap(int wrapcol, util::format_argument_pack<std::ostream> const &args)
 {
-	text_buffer_print_wrap(console_textbuf, util::string_format(args).c_str(), wrapcol);
+	text_buffer_print_wrap(m_console_textbuf, util::string_format(args).c_str(), wrapcol);
 
 	/* force an update of any console views */
-	machine.debug_view().update_all(DVT_CONSOLE);
+	m_machine.debug_view().update_all(DVT_CONSOLE);
 }
 
-void debug_console_vprintf_wrap(running_machine &machine, int wrapcol, util::format_argument_pack<std::ostream> &&args)
+void debugger_console::vprintf_wrap(int wrapcol, util::format_argument_pack<std::ostream> &&args)
 {
-	text_buffer_print_wrap(console_textbuf, util::string_format(std::move(args)).c_str(), wrapcol);
+	text_buffer_print_wrap(m_console_textbuf, util::string_format(std::move(args)).c_str(), wrapcol);
 
 	/* force an update of any console views */
-	machine.debug_view().update_all(DVT_CONSOLE);
+	m_machine.debug_view().update_all(DVT_CONSOLE);
 }
 
 
 /*-------------------------------------------------
-    debug_console_get_textbuf - return a pointer
-    to the console text buffer
+    errorlog_write_line - writes a line to the
+    errorlog ring buffer
 -------------------------------------------------*/
 
-text_buffer *debug_console_get_textbuf(void)
+void debugger_console::errorlog_write_line(const char *line)
 {
-	return console_textbuf;
-}
-
-
-/*-------------------------------------------------
-    debug_errorlog_write_line - writes a line to
-    the errorlog ring buffer
--------------------------------------------------*/
-
-void debug_errorlog_write_line(const running_machine &machine, const char *line)
-{
-	if (errorlog_textbuf)
-		text_buffer_print(errorlog_textbuf, line);
+	if (m_errorlog_textbuf)
+	{
+		text_buffer_print(m_errorlog_textbuf, line);
+	}
 
 	/* force an update of any log views */
-	machine.debug_view().update_all(DVT_LOG);
-}
-
-
-/*-------------------------------------------------
-    debug_errorlog_get_textbuf - return a pointer
-    to the errorlog text buffer
--------------------------------------------------*/
-
-text_buffer *debug_errorlog_get_textbuf(void)
-{
-	return errorlog_textbuf;
+	m_machine.debug_view().update_all(DVT_LOG);
 }

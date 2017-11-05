@@ -158,17 +158,17 @@
 		<bezel element="text_num"><bounds x="8" y="36.5" width="22" height="3.5" /></bezel>
 		<bezel element="text_seq"><bounds x="30" y="36.5" width="22" height="3.5" /></bezel>
 
-		<bezel name="lamp4" element="lamp"><bounds x="8" y="2" width="8" height="6" /></bezel>
-		<bezel name="lamp10" element="lamp"><bounds x="8" y="9" width="8" height="6" /></bezel>
-		<bezel name="lamp2" element="lamp"><bounds x="8" y="16" width="8" height="6" /></bezel>
-		<bezel name="lamp1" element="lamp"><bounds x="8" y="23" width="8" height="6" /></bezel>
-		<bezel name="lamp0" element="lamp"><bounds x="8" y="30" width="8" height="6" /></bezel>
+		<bezel name="0.4" element="lamp"><bounds x="8" y="2" width="8" height="6" /></bezel>
+		<bezel name="0.10" element="lamp"><bounds x="8" y="9" width="8" height="6" /></bezel>
+		<bezel name="0.2" element="lamp"><bounds x="8" y="16" width="8" height="6" /></bezel>
+		<bezel name="0.1" element="lamp"><bounds x="8" y="23" width="8" height="6" /></bezel>
+		<bezel name="0.0" element="lamp"><bounds x="8" y="30" width="8" height="6" /></bezel>
 
-		<bezel name="lamp9" element="lamp"><bounds x="44" y="2" width="8" height="6" /></bezel>
-		<bezel name="lamp8" element="lamp"><bounds x="44" y="9" width="8" height="6" /></bezel>
-		<bezel name="lamp7" element="lamp"><bounds x="44" y="16" width="8" height="6" /></bezel>
-		<bezel name="lamp6" element="lamp"><bounds x="44" y="23" width="8" height="6" /></bezel>
-		<bezel name="lamp5" element="lamp"><bounds x="44" y="30" width="8" height="6" /></bezel>
+		<bezel name="0.9" element="lamp"><bounds x="44" y="2" width="8" height="6" /></bezel>
+		<bezel name="0.8" element="lamp"><bounds x="44" y="9" width="8" height="6" /></bezel>
+		<bezel name="0.7" element="lamp"><bounds x="44" y="16" width="8" height="6" /></bezel>
+		<bezel name="0.6" element="lamp"><bounds x="44" y="23" width="8" height="6" /></bezel>
+		<bezel name="0.5" element="lamp"><bounds x="44" y="30" width="8" height="6" /></bezel>
 
 	<!-- button panel -->
 

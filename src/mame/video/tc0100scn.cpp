@@ -142,14 +142,15 @@ the wide tilemap mode)
 
 #include "emu.h"
 #include "tc0100scn.h"
+#include "screen.h"
 
 #define TC0100SCN_RAM_SIZE        0x14000   /* enough for double-width tilemaps */
 #define TC0100SCN_TOTAL_CHARS     256
 
-const device_type TC0100SCN = &device_creator<tc0100scn_device>;
+DEFINE_DEVICE_TYPE(TC0100SCN, tc0100scn_device, "tc0100scn", "Taito TC0100SCN")
 
-tc0100scn_device::tc0100scn_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, TC0100SCN, "Taito TC0100SCN", tag, owner, clock, "tc0100scn", __FILE__),
+tc0100scn_device::tc0100scn_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, TC0100SCN, tag, owner, clock),
 	m_ram(nullptr),
 	m_bg_ram(nullptr),
 	m_fg_ram(nullptr),
@@ -178,8 +179,8 @@ tc0100scn_device::tc0100scn_device(const machine_config &mconfig, const char *ta
 	m_flip_text_yoffs(0),
 	m_multiscrn_xoffs(0),
 	m_multiscrn_hack(0),
-	m_gfxdecode(*this),
-	m_palette(*this)
+	m_gfxdecode(*this, finder_base::DUMMY_TAG),
+	m_palette(*this, finder_base::DUMMY_TAG)
 {
 }
 
@@ -231,14 +232,14 @@ void tc0100scn_device::device_start()
 	   we're safe as it uses single width tilemaps. */
 
 	/* Single width versions */
-	m_tilemap[0][0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0100scn_device::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-	m_tilemap[1][0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0100scn_device::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-	m_tilemap[2][0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0100scn_device::get_tx_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_tilemap[0][0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0100scn_device::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_tilemap[1][0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0100scn_device::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_tilemap[2][0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0100scn_device::get_tx_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 
 	/* Double width versions */
-	m_tilemap[0][1] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0100scn_device::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
-	m_tilemap[1][1] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0100scn_device::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
-	m_tilemap[2][1] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0100scn_device::get_tx_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 128, 32);
+	m_tilemap[0][1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0100scn_device::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
+	m_tilemap[1][1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0100scn_device::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
+	m_tilemap[2][1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0100scn_device::get_tx_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 128, 32);
 
 	m_tilemap[0][0]->set_transparent_pen(0);
 	m_tilemap[1][0]->set_transparent_pen(0);
@@ -284,12 +285,12 @@ void tc0100scn_device::device_start()
 
 	m_bg_tilemask = 0xffff;    /* Mjnquest has 0x7fff tilemask */
 
-	m_ram = make_unique_clear<UINT16[]>(TC0100SCN_RAM_SIZE / 2);
+	m_ram = make_unique_clear<uint16_t[]>(TC0100SCN_RAM_SIZE / 2);
 
 	set_layer_ptrs();
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	m_gfxdecode->set_gfx(m_txnum, std::make_unique<gfx_element>(m_palette, tc0100scn_charlayout, (UINT8 *)m_char_ram, NATIVE_ENDIAN_VALUE_LE_BE(8,0), 256, 0));
+	m_gfxdecode->set_gfx(m_txnum, std::make_unique<gfx_element>(m_palette, tc0100scn_charlayout, (uint8_t *)m_char_ram, NATIVE_ENDIAN_VALUE_LE_BE(8,0), 256, 0));
 
 	gfx_element *gfx = m_gfxdecode->gfx(m_gfxnum);
 	gfx_element *txt = m_gfxdecode->gfx(m_txnum);
@@ -327,7 +328,7 @@ void tc0100scn_device::device_reset()
     DEVICE HANDLERS
 *****************************************************************************/
 
-void tc0100scn_device::common_get_tile_info( tile_data &tileinfo, int tile_index, UINT16 *ram, int colbank )
+void tc0100scn_device::common_get_tile_info( tile_data &tileinfo, int tile_index, uint16_t *ram, int colbank )
 {
 	int code, attr;
 
@@ -446,7 +447,7 @@ void tc0100scn_device::postload()
 	set_layer_ptrs();
 	restore_scroll();
 
-	m_gfxdecode->gfx(m_txnum)->set_source((UINT8 *)m_char_ram);
+	m_gfxdecode->gfx(m_txnum)->set_source((uint8_t *)m_char_ram);
 
 	m_tilemap[0][0]->mark_all_dirty();
 	m_tilemap[1][0]->mark_all_dirty();
@@ -541,7 +542,7 @@ WRITE16_MEMBER( tc0100scn_device::ctrl_word_w )
 				dirty_tilemaps();
 
 				/* reset the pointer to the text characters (and dirty them all) */
-				m_gfxdecode->gfx(m_txnum)->set_source((UINT8 *)m_char_ram);
+				m_gfxdecode->gfx(m_txnum)->set_source((uint8_t *)m_char_ram);
 			}
 
 			break;
@@ -620,7 +621,7 @@ void tc0100scn_device::tilemap_update()
 		m_tilemap[1][m_dblwidth]->set_scrollx((j + m_fgscrolly) & 0x1ff, m_fgscrollx - m_fgscroll_ram[j]);
 }
 
-void tc0100scn_device::tilemap_draw_fg( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t* tmap, int flags, UINT32 priority )
+void tc0100scn_device::tilemap_draw_fg( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t* tmap, int flags, uint32_t priority )
 {
 	const bitmap_ind16 &src_bitmap = tmap->pixmap();
 	int width_mask, height_mask, x, y, p;
@@ -655,7 +656,7 @@ void tc0100scn_device::tilemap_draw_fg( screen_device &screen, bitmap_ind16 &bit
 				bitmap.pix16(y, x + cliprect.min_x) = p;
 				if (screen.priority().valid())
 				{
-					UINT8 *pri = &screen.priority().pix8(y);
+					uint8_t *pri = &screen.priority().pix8(y);
 					pri[x + cliprect.min_x] |= priority;
 				}
 			}
@@ -665,7 +666,7 @@ void tc0100scn_device::tilemap_draw_fg( screen_device &screen, bitmap_ind16 &bit
 	}
 }
 
-int tc0100scn_device::tilemap_draw( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, UINT32 priority )
+int tc0100scn_device::tilemap_draw( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, uint32_t priority )
 {
 	int disable = m_ctrl[6] & 0xf7;
 	rectangle clip = cliprect;

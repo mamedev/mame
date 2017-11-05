@@ -350,6 +350,46 @@
 		</part>
 	</software>
 
+	<software name="prodos241">
+		<description>ProDOS (v2.4.1)</description>
+		<!-- Copyright by Apple, but rewritten by John Brooks in 2016 - Compatible with 6502 & some Apple II clone machines -->
+		<!-- Copyright date 16-Aug-16 (IE: 16-8-16 ;-) -->
+		<year>2016</year>
+		<publisher>Apple Computer, Inc.</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="prodos 2.4.1.dsk" size="143360" crc="066cfa27" sha1="88d0d66867e607d6ee1117f61b83f8fe37d29f69" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="unidos33p">
+		<description>UniDOS 3.3 Plus v2.0.1</description>
+		<!-- Each 800K disk is two 400K DOS partions, Drive1 = D1 and D3 (even if no Drive2), Drive2 = D2 and D4 -->
+		<year>1986</year>
+		<publisher>Microsparc, Inc.</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819264">
+				<rom name="unidos 3.3 plus v2.0.1 (1986)(microsparc).2mg" size="819264" crc="f9fab5b6" sha1="a9f178545af6cd48b9c16d1db248a33b9ad7f6e9" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="unidosplus">
+		<description>UniDOS Plus v2.1</description>
+		<!-- Each 800K disk is two 400K DOS partions, Drive1 = D1 and D3 (even if no Drive2), Drive2 = D2 and D4 -->
+		<year>1986</year>
+		<publisher>Microsparc, Inc.</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819264">
+				<rom name="unidos plus v2.1 (1986)(microsparc).2mg" size="819264" crc="9328f3cb" sha1="90219aafc3ccba331b8d8d7c4682aecc8c85559b" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="221baker">
 		<description>221B Baker Street</description>
 		<year>1986</year>
@@ -570,8 +610,8 @@
 	</software>
 
 	<software name="aklabeth">
-		<description>Aklabeth</description>
-		<year>19??</year>
+		<description>Akalabeth - World of Doom</description>
+		<year>1979</year>
 		<publisher>California Pacific Computer</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
@@ -582,13 +622,13 @@
 	</software>
 
 	<software name="alcazar">
-		<description>Alcazar the Forgotten  Fortress</description>
+		<description>Alcazar the Forgotten Fortress (clean crack)</description>
 		<year>1985</year>
 		<publisher>Activision</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
-				<rom name="alcazar the forgotten fortress (1985)(activision)[cr disk jockey].do" size="143360" crc="7ef58da3" sha1="65f0036593f8083537b901cabe9e7a7859249600" offset="0x0000" />
+				<rom name="alcazar the forgotten fortress (1985)(activision)(clean crack).dsk" size="143360" crc="38a4bc9f" sha1="0d58e0821508b06ccbb73cbe6d7b45b07f7bfda8" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -611,25 +651,25 @@
 	</software>
 
 	<software name="aliens">
-		<description>Aliens</description>
+		<description>Aliens (clean crack)</description>
 		<year>1986</year>
 		<publisher>Activision</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
-				<rom name="aliens (1986)(activision)(disk 1 of 2)[cr digital gang][unk filesys].do" size="143360" crc="35b077e3" sha1="890876f6f65808a1a1a5e0bd60bce15bb564af87" offset="0x0000" />
+				<rom name="aliens (1986)(activision)(disk 1 of 2)(clean crack).dsk" size="143360" crc="bf0f7f72" sha1="d77b4d92ce266c75c4d7f08b85e507529e0afc68" offset="0x0000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
-				<rom name="aliens (1986)(activision)(disk 2 of 2)[cr digital gang].do" size="143360" crc="9ed3a7e3" sha1="f1dddc3518f66121e097b719f3bfac9e3f880421" offset="0x0000" />
+				<rom name="aliens (1986)(activision)(disk 2 of 2)(clean crack).dsk" size="143360" crc="001325b2" sha1="077d7e3d9fb920b6f7cfc69381eb447f44ce0713" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="alien">
 		<description>Alien</description>
-		<year>19??</year>
+		<year>1982</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
@@ -966,13 +1006,13 @@
 	</software>
 
 	<software name="aztec">
-		<description>Aztec</description>
+		<description>Aztec (clean crack)</description>
 		<year>1982</year>
 		<publisher>Datamost</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
-				<rom name="aztec (1982)(datamost)[cr grossiers].do" size="143360" crc="aa0e78c9" sha1="9a9d639798dda33e9b591e419ea4de602ff405fb" offset="0x0000" />
+				<rom name="aztec (4am crack).dsk " size="143360" crc="f4c40d91" sha1="71d639bb9b55369abc2ef534bab6b74a731b7e65" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1060,13 +1100,13 @@
 	</software>
 
 	<software name="amchal">
-		<description>The American Challenge</description>
+		<description>The American Challenge (clean crack)</description>
 		<year>1986</year>
 		<publisher>MIndscape</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
-				<rom name="american challenge, the (1986)(mindscape)[cr first class].dsk" size="143360" crc="f4320ad1" sha1="90d6b869c22f5245a16999bc0186e21bad1414b1" offset="0x0000" />
+				<rom name="american challenge, the (1986)(mindscape)(trex crack).dsk" size="143360" crc="26af56f8" sha1="89d4c5c1a232a0c6ef1960d9da0e05e626890e55" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1312,7 +1352,7 @@
 		<year>1980</year>
 		<publisher>Avalon Hill</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="b1 bomber game (1980)(avalon hill).do" size="143360" crc="d9adb54d" sha1="0c060316242ab059db79f0b2e82a636462ee3931" offset="0x0000" />
 			</dataarea>
@@ -1324,7 +1364,7 @@
 		<year>1987</year>
 		<publisher>Strategic Simulations, Inc.</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="b-24 (1987)(ssi)[rdos].dsk" size="143360" crc="196ea757" sha1="3805ebf9b2c610c65c76b501c1c3ba9871b64f92" offset="0x0000" />
 			</dataarea>
@@ -1336,12 +1376,12 @@
 		<year>1988</year>
 		<publisher>Data East</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="bad dudes (1988)(data east - quicksilver software)(disk 1 of 2)[cr blade].do" size="143360" crc="1f56bd96" sha1="4113ecf9373304bf0411d5572957999ed890579c" offset="0x0000" />
 			</dataarea>
 		</part>
-		<part name="flop12" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="bad dudes (1988)(data east - quicksilver software)(disk 2 of 2)[cr blade].do" size="143360" crc="619150e1" sha1="044530cd7e299f9262883a09e36f7098840f2344" offset="0x0000" />
 			</dataarea>
@@ -1353,12 +1393,12 @@
 		<year>1988</year>
 		<publisher>Data East</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="bad dudes (1988)(data east - quicksilver software)(disk 1 of 2).do" size="143360" crc="0d06af1b" sha1="2be089d8b62107f824ded57c3b3a8f5bc1a25428" offset="0x0000" />
 			</dataarea>
 		</part>
-		<part name="flop12" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="bad dudes (1988)(data east - quicksilver software)(disk 2 of 2)[unk filesys].do" size="143360" crc="8ba935f8" sha1="26e5aace577206df8c94f2fcd8f26978574c31d4" offset="0x0000" />
 			</dataarea>
@@ -1370,7 +1410,7 @@
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="ball blaster (19xx)(-).dsk" size="143360" crc="1dd166d2" sha1="ac10005ce09e78f99562f1b8d519548d18bd6ca5" offset="0x0000" />
 			</dataarea>
@@ -1382,7 +1422,7 @@
 		<year>1987</year>
 		<publisher>Mindscape</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="balance of power (1987)(mindscape)[cr coast to coast].po" size="143360" crc="b6126d44" sha1="c1fea91b323ba3dc68808c5aaccb11e74d2ec9c5" offset="0x0000" />
 			</dataarea>
@@ -1394,7 +1434,7 @@
 		<year>1984</year>
 		<publisher>Strategic Simulations, Inc.</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="baltic 1985 (1984)(ssi).po" size="143360" crc="074f48ac" sha1="e7b0530ef418d9de796c1439db6d8bb791788e0e" offset="0x0000" />
 			</dataarea>
@@ -1406,7 +1446,7 @@
 		<year>1982</year>
 		<publisher>Sirius Software</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="bandits (1982)(sirius software)[cr nameless cracker - pirate treck - krakowicz][t +1].do" size="143360" crc="4fe03754" sha1="263d3c77de7cce9bd0d4c63511d3ffb6300adcf9" offset="0x0000" />
 			</dataarea>
@@ -1418,7 +1458,7 @@
 		<year>1982</year>
 		<publisher>Sirius Software</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="bandits (1982)(sirius software)[f].do" size="143360" crc="ed9f2a73" sha1="84a84fdc584f9191f7df57d51af7870025d3a093" offset="0x0000" />
 			</dataarea>
@@ -1430,7 +1470,7 @@
 		<year>1982</year>
 		<publisher>Sirius Software</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="bandits (1982)(sirius software)[m].do" size="143360" crc="e0748c20" sha1="b3b4594857db8281729dd5de4f2a7893693d4f88" offset="0x0000" />
 			</dataarea>
@@ -1442,7 +1482,7 @@
 		<year>1982</year>
 		<publisher>Sirius Software</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143363">
 				<rom name="bandits (1982)(sirius software)[o].dsk" size="143363" crc="c17024c9" sha1="c8e8a830f20c3bc609ef85c81ac95467b2919a7b" offset="0x0000" />
 			</dataarea>
@@ -1454,12 +1494,12 @@
 		<year>1986</year>
 		<publisher>Froggy Software</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="baratin blues (1986)(froggy software)(fr)(side a)[a].dsk" size="143360" crc="d510b552" sha1="3ecdcd5f89afe4e2951c344b0f01c01e9d329474" offset="0x0000" />
 			</dataarea>
 		</part>
-		<part name="flop12" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="baratin blues (1986)(froggy software)(fr)(side b)[a].dsk" size="143360" crc="6ca89c81" sha1="d09555dde3ebd2ca4d7b839f5333cfa5a5f5efc3" offset="0x0000" />
 			</dataarea>
@@ -1471,12 +1511,12 @@
 		<year>1986</year>
 		<publisher>Froggy Software</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="baratin blues (1986)(froggy software)(fr)(side a).dsk" size="143360" crc="1d20249b" sha1="63fdf3769ce4f60d2be8daec340462be10761daa" offset="0x0000" />
 			</dataarea>
 		</part>
-		<part name="flop12" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="baratin blues (1986)(froggy software)(fr)(side b).dsk" size="143360" crc="9f8698dc" sha1="50b6fb3501d87e486257f27113636da0767208a9" offset="0x0000" />
 			</dataarea>
@@ -1488,22 +1528,22 @@
 		<year>1986</year>
 		<publisher>Electronic Arts</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="bard's tale ii - the destiny knight, the (1986)(electronic arts)(disk 1 of 4).dsk" size="143360" crc="b6843a24" sha1="89ea71a9b3abe8318d3d63eada377474af327019" offset="0x0000" />
 			</dataarea>
 		</part>
-		<part name="flop12" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="bard's tale ii - the destiny knight, the (1986)(electronic arts)(disk 2 of 4)(character).dsk" size="143360" crc="d392ec46" sha1="b2b84c93d0d08c32ddaca8bbb5ef077fd91440fb" offset="0x0000" />
 			</dataarea>
 		</part>
-		<part name="flop13" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="bard's tale ii - the destiny knight, the (1986)(electronic arts)(disk 3 of 4)(dungeon 1).dsk" size="143360" crc="b4b02734" sha1="0a6db98da9bace113c133d0118975e48795c489e" offset="0x0000" />
 			</dataarea>
 		</part>
-		<part name="flop14" interface="floppy_5_25">
+		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="bard's tale ii - the destiny knight, the (1986)(electronic arts)(disk 4 of 4)(dungeon 2).dsk" size="143360" crc="1a97f984" sha1="700a60007453199f8d80ca99f5c40baeb8ffaa7a" offset="0x0000" />
 			</dataarea>
@@ -1515,22 +1555,22 @@
 		<year>1988</year>
 		<publisher>Interplay</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143358">
 				<rom name="bard's tale iii - the thief of fate, the (1988)(interplay)(disk 1 of 4).dsk" size="143358" crc="a8798140" sha1="dfc3fd97c3abc209ddf170538af97f4848a26d4f" offset="0x0000" />
 			</dataarea>
 		</part>
-		<part name="flop12" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop1" size="143358">
 				<rom name="bard's tale iii - the thief of fate, the (1988)(interplay)(disk 2 of 4)(character).dsk" size="143358" crc="7c748e7d" sha1="e7ca50fd58df7d136c5c42710f1901d1b0e01b93" offset="0x0000" />
 			</dataarea>
 		</part>
-		<part name="flop13" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop1" size="143195">
 				<rom name="bard's tale iii - the thief of fate, the (1988)(interplay)(disk 3 of 4)(dungeon 1).dsk" size="143195" crc="9af87667" sha1="cd65428c5365f89e457adae867a970fbad47243e" offset="0x0000" />
 			</dataarea>
 		</part>
-		<part name="flop14" interface="floppy_5_25">
+		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop1" size="143358">
 				<rom name="bard's tale iii - the thief of fate, the (1988)(interplay)(disk 3 of 4)(dungeon 2).dsk" size="143358" crc="d6f2595b" sha1="a25d0dbebbf9767785115829c6cc624a81eb11dc" offset="0x0000" />
 			</dataarea>
@@ -1542,22 +1582,22 @@
 		<year>1985</year>
 		<publisher>Electronic Arts</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="bard's tale, the (1985)(electronic arts)(disk 1 of 4)(boot)[cr numero 6].dsk" size="143360" crc="ddbd6a83" sha1="2ee23f0c2a0a5bab3b823316802d158bcb5870af" offset="0x0000" />
 			</dataarea>
 		</part>
-		<part name="flop12" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="bard's tale, the (1985)(electronic arts)(disk 2 of 4)(character)[cr].dsk" size="143360" crc="c4dfab6f" sha1="7c843a0e79e6fe5c89493d466305163e6dbfa97a" offset="0x0000" />
 			</dataarea>
 		</part>
-		<part name="flop13" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="bard's tale, the (1985)(electronic arts)(disk 3 of 4)(dungeon 1)[cr].dsk" size="143360" crc="e94d34e4" sha1="08e4e5178be609d7f2ba04c0940dd8e71783df33" offset="0x0000" />
 			</dataarea>
 		</part>
-		<part name="flop14" interface="floppy_5_25">
+		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="bard's tale, the (1985)(electronic arts)(disk 4 of 4)(dungeon 2)[cr].dsk" size="143360" crc="eae221ba" sha1="f6b6d6e6ceac0c4b5950a1401a763e178a1493bd" offset="0x0000" />
 			</dataarea>
@@ -1569,22 +1609,22 @@
 		<year>1985</year>
 		<publisher>Electronic Arts</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="bard's tale, the (1985)(electronic arts)(disk 1 of 4)(boot)[cr club x].dsk" size="143360" crc="ee0c10db" sha1="904233118d7744d3bf20ca3931481afc89f4185e" offset="0x0000" />
 			</dataarea>
 		</part>
-		<part name="flop12" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="bard's tale, the (1985)(electronic arts)(disk 2 of 4)(character)[cr club x].dsk" size="143360" crc="f55ba619" sha1="210c3d1f6e5221077d03f6f8cd99732ba0a183c8" offset="0x0000" />
 			</dataarea>
 		</part>
-		<part name="flop13" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="bard's tale, the (1985)(electronic arts)(disk 3 of 4)(dungeon 1)[cr club x].dsk" size="143360" crc="76f2d041" sha1="f319b69df12b0b00772956f76071300105a5d43a" offset="0x0000" />
 			</dataarea>
 		</part>
-		<part name="flop14" interface="floppy_5_25">
+		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="bard's tale, the (1985)(electronic arts)(disk 4 of 4)(dungeon 2)[cr].dsk" size="143360" crc="eae221ba" sha1="f6b6d6e6ceac0c4b5950a1401a763e178a1493bd" offset="0x0000" />
 			</dataarea>
@@ -1596,7 +1636,7 @@
 		<year>1983</year>
 		<publisher>Blue Chip</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="baron - the real estate simulation (1983)(blue chip)[cr whip].do" size="143360" crc="3ad57aa9" sha1="6091b493ddeabc77b78a6fa4c9dc40d9d50196c5" offset="0x0000" />
 			</dataarea>
@@ -1608,7 +1648,7 @@
 		<year>1984</year>
 		<publisher>Simulations Canada</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="batatlan (1984)(simulations canada).do" size="143360" crc="b858486a" sha1="a013e6fe9429d8abbc14e47c9bb6b7f4d3b4a2cc" offset="0x0000" />
 			</dataarea>
@@ -1620,7 +1660,7 @@
 		<year>1982</year>
 		<publisher>Strategic Simulations, Inc.</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="battle for normandy (1982)(ssi)[rdos].dsk" size="143360" crc="7c691cae" sha1="c927eae6946b95073bb5fd197b04ff6b666013fb" offset="0x0000" />
 			</dataarea>
@@ -1632,12 +1672,12 @@
 		<year>1985</year>
 		<publisher>Strategic Simulations, Inc.</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="battle of antietam (1985)(ssi)(disk 1 of 2)[rdos].dsk" size="143360" crc="76366fee" sha1="301294484acb1836b7c50cd4c949edb29a643c69" offset="0x0000" />
 			</dataarea>
 		</part>
-		<part name="flop12" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="battle of antietam (1985)(ssi)(disk 2 of 2)[rdos].dsk" size="143360" crc="83074fd7" sha1="2d9212bf0cb8d6d0e6250ec61e03620382bd1121" offset="0x0000" />
 			</dataarea>
@@ -1645,18 +1685,18 @@
 	</software>
 
 	<software name="batlches">
-		<description>Battle Chess (crack)</description>
+		<description>Battle Chess (clean crack)</description>
 		<year>1990</year>
 		<publisher>Interplay</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
-				<rom name="battle chess (1990)(interplay)(side a)[cr la sing].po" size="143360" crc="0f914273" sha1="78e73f3cae2fc438939d41f9d34fa298a9d2ce1c" offset="0x0000" />
+				<rom name="battle chess side a (1990)(interplay)(trex crack).dsk" size="143360" crc="a81e4ae5" sha1="5b0e79fa0d4257a4855864c9324840cc1a41284e" offset="0x0000" />
 			</dataarea>
 		</part>
-		<part name="flop12" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
-				<rom name="battle chess (1990)(interplay)(side b)[cr la sing][unk filesys].po" size="143360" crc="222f0942" sha1="72adf7950a97f52d1be62a5be6f5887a68ffa0e7" offset="0x0000" />
+				<rom name="battle chess side b (1990)(interplay)(trex crack)[unk filesys].dsk" size="143360" crc="54359fd3" sha1="19b3ed795c9827f580df77f559ad02eca55455b9" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1666,7 +1706,7 @@
 		<year>1987</year>
 		<publisher>Strategic Simulations, Inc.</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="battlecruiser 1 (1987)(ssi)[rdos].dsk" size="143360" crc="31a883c6" sha1="e6369d74b18ed05a01a2681e41d230f3bc47e47d" offset="0x0000" />
 			</dataarea>
@@ -1678,7 +1718,7 @@
 		<year>1987</year>
 		<publisher>Strategic Simulations, Inc.</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="battlecruiser 2 (1987)(ssi)[rdos].dsk" size="143360" crc="8fe6c98c" sha1="3bc19b5abf445cb2362e747a898987ba627377e7" offset="0x0000" />
 			</dataarea>
@@ -1690,12 +1730,12 @@
 		<year>1986</year>
 		<publisher>Strategic Studies Group</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="232960">
 				<rom name="battlefront (1986)(ssg)(disk 1 of 2).nib" size="232960" crc="53c5a952" sha1="48269523d77c47d2267fc372976683c1f04dd898" offset="0x0000" />
 			</dataarea>
 		</part>
-		<part name="flop12" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop1" size="232960">
 				<rom name="battlefront (1986)(ssg)(disk 2 of 2).nib" size="232960" crc="31adbd97" sha1="9769cd7e94b7d953900f5a048e09a8e7a9396ca9" offset="0x0000" />
 			</dataarea>
@@ -1707,12 +1747,12 @@
 		<year>1986</year>
 		<publisher>Strategic Simulations, Inc.</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="battle group (1986)(ssi)(disk 1 of 2)[rdos].dsk" size="143360" crc="2ece2239" sha1="3b2007c1f17cea3fae4c7f52f1484e0c3bb98286" offset="0x0000" />
 			</dataarea>
 		</part>
-		<part name="flop12" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="battle group (1986)(ssi)(disk 2 of 2)[rdos].dsk" size="143360" crc="f7e14047" sha1="e8fbec371e70fba41b4ab2714013ef555d26f927" offset="0x0000" />
 			</dataarea>
@@ -1724,7 +1764,7 @@
 		<year>1980</year>
 		<publisher>Tukumo</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="battle of hoth (1980)(tukumo).do" size="143360" crc="9f25ae79" sha1="062d6b8b092917201ff74c7d9f1dddc92a82de00" offset="0x0000" />
 			</dataarea>
@@ -1736,32 +1776,32 @@
 		<year>1988</year>
 		<publisher>Strategic Simulations, Inc.</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="battle of napoleon (1988)(ssi)(disk 1 of 4)[rdos].dsk" size="143360" crc="5c05c8ab" sha1="798298107d376bd86061c1cd3612d2fe21194e17" offset="0x0000" />
 			</dataarea>
 		</part>
-		<part name="flop12" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="battle of napoleon (1988)(ssi)(disk 2 of 4 side a)(game)[rdos].dsk" size="143360" crc="f530e6e9" sha1="0f3e12058233d314bbbd2aea0cfebd4d457a6ad3" offset="0x0000" />
 			</dataarea>
 		</part>
-		<part name="flop13" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="battle of napoleon (1988)(ssi)(disk 2 of 4 side b)(game)[rdos].dsk" size="143360" crc="344a0139" sha1="77e10a26da0e8945b498b3f60d08d4cd07bf2629" offset="0x0000" />
 			</dataarea>
 		</part>
-		<part name="flop14" interface="floppy_5_25">
+		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="battle of napoleon (1988)(ssi)(disk 3 of 4 side a)(scenario)[rdos].dsk" size="143360" crc="2c3b2f0c" sha1="b432862f68807bc7cb3a64a125adc2358a5f30dc" offset="0x0000" />
 			</dataarea>
 		</part>
-		<part name="flop15" interface="floppy_5_25">
+		<part name="flop5" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="battle of napoleon (1988)(ssi)(disk 3 of 4 side b)(scenario)[rdos].dsk" size="143360" crc="02e97a47" sha1="eec1dc8c5e1c7b429c3fa6930d7dd0b2f5aab24e" offset="0x0000" />
 			</dataarea>
 		</part>
-		<part name="flop16" interface="floppy_5_25">
+		<part name="flop6" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="battle of napoleon (1988)(ssi)(disk 4 of 4)(save).dsk" size="143360" crc="1964c542" sha1="535575457bdfaa4c1b7ce8e406884cfe23e482b6" offset="0x0000" />
 			</dataarea>
@@ -1773,7 +1813,7 @@
 		<year>1983</year>
 		<publisher>Avalon Hill</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="battle of the parthian kings (1983)(avalon hill).do" size="143360" crc="a24021e5" sha1="94d1c975a60eee32e9877eba73e814ea978684dd" offset="0x0000" />
 			</dataarea>
@@ -1785,7 +1825,7 @@
 		<year>1982</year>
 		<publisher>Versa Computing</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="battlesight (1982)(versa computing)[cr mr. xerox].do" size="143360" crc="73db6aae" sha1="c4c4b8cee559bee90bdba3f693cbd38cf78c2c85" offset="0x0000" />
 			</dataarea>
@@ -1797,7 +1837,7 @@
 		<year>1981</year>
 		<publisher>Strategic Simulations, Inc.</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="232960">
 				<rom name="battle of shiloh, the (1981)(ssi)[rdos].nib" size="232960" crc="0c3f964e" sha1="db4cbce0ae1588a4af3339ffc1ccf4b8b372f987" offset="0x0000" />
 			</dataarea>
@@ -1809,7 +1849,7 @@
 		<year>1980</year>
 		<publisher>Eagle Computer Systems</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="battleship (1980)(eagle computer systems).do" size="143360" crc="42876b10" sha1="fdc6613d84710701f61a645b4a397f954865af1a" offset="0x0000" />
 			</dataarea>
@@ -1821,12 +1861,12 @@
 		<year>1987</year>
 		<publisher>Keating, Trout, Taubman, Power, Whiley</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="232960">
 				<rom name="battles in normandy v1.0 (1987)(keating - trout - taubman - power - whiley)(disk 1 of 2).nib" size="232960" crc="b4b205f1" sha1="50844efe24698bfecd030ef03f3cf9a88ebf9fb5" offset="0x0000" />
 			</dataarea>
 		</part>
-		<part name="flop12" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop1" size="232960">
 				<rom name="battles in normandy v1.0 (1987)(keating - trout - taubman - power - whiley)(disk 2 of 2).nib" size="232960" crc="a12274bd" sha1="e2a1209adf72ca369811b9bbab71e43cba0d491f" offset="0x0000" />
 			</dataarea>
@@ -1838,12 +1878,12 @@
 		<year>1988</year>
 		<publisher>Infocom / Westwood</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="battletech (1988)(infocom - westwood)(disk 1 of 2)[rdos].dsk" size="143360" crc="6b926187" sha1="57afda5d8ed1ffc3415a5bea242ebe20643fb245" offset="0x0000" />
 			</dataarea>
 		</part>
-		<part name="flop12" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="battletech (1988)(infocom - westwood)(disk 2 of 2)(character).dsk" size="143360" crc="38da70ce" sha1="ac3207772551ed219c727dece7bddead0d664bc0" offset="0x0000" />
 			</dataarea>
@@ -1855,48 +1895,31 @@
 		<year>1988</year>
 		<publisher>Infocom / Westwood</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="battletech (1988)(infocom - westwood)(disk 1 of 2)[cr 6502 crew][rdos].dsk" size="143360" crc="09a9fe2a" sha1="68d3929b2a1e40abdeb3a2532f88ab321cfb3207" offset="0x0000" />
 			</dataarea>
 		</part>
-		<part name="flop12" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="battletech (1988)(infocom - westwood)(disk 2 of 2)(character)[cr 6502 crew].dsk" size="143360" crc="2b765939" sha1="d608462a0f1f03d4a6f430071676df1c13521cb0" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="batmancr">
-		<description>Batman (crack)</description>
-		<year>1988</year>
-		<publisher>Data East</publisher>
-
-		<part name="flop11" interface="floppy_5_25">
-			<dataarea name="flop1" size="143360">
-				<rom name="batman (1988)(data east)(side a)[cr blade].do" size="143360" crc="aa091b36" sha1="be2ae48be4ccc2adb92d02d061829d8ce72c5a2a" offset="0x0000" />
-			</dataarea>
-		</part>
-		<part name="flop12" interface="floppy_5_25">
-			<dataarea name="flop1" size="143360">
-				<rom name="batman (1988)(data east)(side b)[cr blade].do" size="143360" crc="0aebbb48" sha1="97888412b36e2f65725a8177c46cb1d5f2a9e083" offset="0x0000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="batman">
-		<description>Batman</description>
+		<description>Batman (clean crack)</description>
 		<year>1988</year>
 		<publisher>Data East</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
-				<rom name="batman (1988)(data east)(side a).do" size="143360" crc="03803d2c" sha1="38f1f2775b6a14740a158dc418fb1397a6160d90" offset="0x0000" />
+				<rom name="batman (1988)(data east)(side a)(4am crack).dsk" size="143360" crc="d8ddda60" sha1="456ced865c6a7f74af89e2bc1fbad0bde44fb55d" offset="0x0000" />
 			</dataarea>
 		</part>
-		<part name="flop12" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
-				<rom name="batman (1988)(data east)(side b).do" size="143360" crc="f6edc353" sha1="90b9fccc88c7214e3c25bcb8fe65ca3e25bf4e2e" offset="0x0000" />
+				<rom name="batman (1988)(data east)(side b)(4am crack).dsk" size="143360" crc="0aebbb48" sha1="97888412b36e2f65725a8177c46cb1d5f2a9e083" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1906,7 +1929,7 @@
 		<year>19??</year>
 		<publisher>Strategic Simulations, Inc.</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="battalion commander (19xx)(ssi)[rdos].dsk" size="143360" crc="c24e6631" sha1="3f916c1f2f44c977e354f9e0d55d17c5bc852323" offset="0x0000" />
 			</dataarea>
@@ -1914,33 +1937,33 @@
 	</software>
 
 	<software name="bbblocks">
-		<description>BASIC Building Blocks (crack)</description>
+		<description>BASIC Building Blocks (clean crack)</description>
 		<year>1983</year>
 		<publisher>Micro Education</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
-				<rom name="basic building blocks (1983)(micro education)(disk 1 of 2)[cr copycatter].po" size="143360" crc="94dea7d3" sha1="77788be0e8b8c17ab1223f7c534461656652596a" offset="0x0000" />
+				<rom name="basic building blocks (1983)(micro education)(disk 1)(4am crack).dsk" size="143360" crc="a1752e9a" sha1="cfdd011756427b782935732446c27cb1caa6b8a1" offset="0x0000" />
 			</dataarea>
 		</part>
-		<part name="flop12" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
-				<rom name="basic building blocks (1983)(micro education)(disk 2 of 2)[cr copycatter].po" size="143360" crc="fd089cd2" sha1="b7991ba3101ad50011efde9562a89ba25446f689" offset="0x0000" />
+				<rom name="basic building blocks (1983)(micro education)(disk 2)(4am crack).dsk" size="143360" crc="a51a3503" sha1="98b6d27d0da675c2f5d351340cd56f2d8d807eba" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="bbcstlwf">
 		<description>Beyond Beyond Castle Wolfenstein</description>
-		<year>19??</year>
+		<year>1984</year>
 		<publisher>Mindscape</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="beyond beyond castle wolfenstein (19xx)(mindscape)(side a).do" size="143360" crc="96e6caf6" sha1="66edcb20ed52dc42888ff2132cd967f0cc4e13e6" offset="0x0000" />
 			</dataarea>
 		</part>
-		<part name="flop12" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="beyond beyond castle wolfenstein (19xx)(mindscape)(side b).do" size="143360" crc="ae5ff11d" sha1="6c8db13d0d35bfa30ccaae29d3df666c2b36d880" offset="0x0000" />
 			</dataarea>
@@ -1952,7 +1975,7 @@
 		<year>1981</year>
 		<publisher>Avalon Hill</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="baseball strategy (1981)(avalon hill).do" size="143360" crc="58a010f4" sha1="2380378876ebe6f85da5c92d6f53f527007cc895" offset="0x0000" />
 			</dataarea>
@@ -1964,7 +1987,7 @@
 		<year>1985</year>
 		<publisher>Access Software</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="beach-head ii (1985)(access)[cr disk jockey][a].dsk" size="143360" crc="646c8c72" sha1="97ab328fdfc53736d3237ad50b87f00b4a7b67bb" offset="0x0000" />
 			</dataarea>
@@ -1976,7 +1999,7 @@
 		<year>1985</year>
 		<publisher>Access Software</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="beach-head ii (1985)(access)[cr disk jockey].dsk" size="143360" crc="9b5a3deb" sha1="ca5f05454777d46a5aedff1e75e4b4eccacf57fe" offset="0x0000" />
 			</dataarea>
@@ -1988,7 +2011,7 @@
 		<year>1985</year>
 		<publisher>Access Software</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="beach-head (1985)(access)[cr copyart].dsk" size="143360" crc="86c5c3b4" sha1="beb94d65523e05630b2391aebc9900bdf67fdb45" offset="0x0000" />
 			</dataarea>
@@ -2000,7 +2023,7 @@
 		<year>1985</year>
 		<publisher>Access Software</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="beach-head ii (1985)(access).dsk" size="143360" crc="bf29aab2" sha1="1fc5958de3f8c8a014c86e299fd73c9935979bb3" offset="0x0000" />
 			</dataarea>
@@ -2012,7 +2035,7 @@
 		<year>1984</year>
 		<publisher>Optimum Resource</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="beach landing (1984)(optimun resource)[cr black bag].dsk" size="143360" crc="31f2e62e" sha1="cd63708f20f2c9bde3445231b49660a74782e69c" offset="0x0000" />
 			</dataarea>
@@ -2024,7 +2047,7 @@
 		<year>1984</year>
 		<publisher>Muse Software</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="beyond castle wolfenstein (1984)(muse)[cr stainless steel rat].do" size="143360" crc="38e0cf1f" sha1="939d4394fd5d133a98d76a2f8e48cef5aa3caa2a" offset="0x0000" />
 			</dataarea>
@@ -2036,7 +2059,7 @@
 		<year>1985</year>
 		<publisher>Avalon Hill</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="beast war (1985)(avalon hill)[cr gonif - wombat].do" size="143360" crc="f95d6976" sha1="aeb0f517bfc102ed8c367543154ab0686ba46e6a" offset="0x0000" />
 			</dataarea>
@@ -2048,12 +2071,12 @@
 		<year>1985</year>
 		<publisher>Windham Classics</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="below the root (1985)(windham classics)(side a)[cr mr. clean].do" size="143360" crc="7c9f9a8b" sha1="76db80bd4626aa454daeaa97840654de9058cc93" offset="0x0000" />
 			</dataarea>
 		</part>
-		<part name="flop12" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="below the root (1985)(windham classics)(side b)[cr mr. clean][unk filesys].do" size="143360" crc="3298fdc6" sha1="f6b2a638a96afb4c99e182ff6ee477763bb440fa" offset="0x0000" />
 			</dataarea>
@@ -2065,7 +2088,7 @@
 		<year>1980</year>
 		<publisher>Crystal</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="beneath the pyramids (1980)(crystal).do" size="143360" crc="c6023564" sha1="c0a5fe25970465e394cb7dd854e608f47bc18322" offset="0x0000" />
 			</dataarea>
@@ -2077,7 +2100,7 @@
 		<year>1985</year>
 		<publisher>Infinity Limited</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="berzap! v2.1 (1985)(infinity limited).dsk" size="143360" crc="7175e6b7" sha1="4b193b3ded239be2ded470385823b7d74b13d7f5" offset="0x0000" />
 			</dataarea>
@@ -2089,7 +2112,7 @@
 		<year>1984</year>
 		<publisher>Infinity Limited</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143363">
 				<rom name="berzap! (1984)(infinity limited)[cr krackle - magic merlin][o].dsk" size="143363" crc="9df3945f" sha1="300439d5d90d25a3b6a39c62f2419df74d96ba93" offset="0x0000" />
 			</dataarea>
@@ -2101,7 +2124,7 @@
 		<year>1984</year>
 		<publisher>Infinity Limited</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="berzap! (1984)(infinity limited)[b].dsk" size="143360" crc="948c69af" sha1="3fc8e33925edfb2bec4eb6e0b987b624e443e48a" offset="0x0000" />
 			</dataarea>
@@ -2110,20 +2133,20 @@
 
 	<software name="betedugv">
 		<description>La Bete du Gevaudan (crack)</description>
-		<year>19??</year>
+		<year>1985</year>
 		<publisher>Cil</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="bete du gevaudan, la (198x)(cil)(fr)(disk 1 of 2)[cr a.b.c.].dsk" size="143360" crc="aad13850" sha1="eb4538d414863495c98b97176b0cd639fe666c2a" offset="0x0000" />
 			</dataarea>
 		</part>
-		<part name="flop12" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="bete du gevaudan, la (198x)(cil)(fr)(disk 2 of 2 side a)[cr a.b.c.].dsk" size="143360" crc="c5b76ec4" sha1="cbb444e6d5f44ca3105e3f39b2d16f6b80ef1721" offset="0x0000" />
 			</dataarea>
 		</part>
-		<part name="flop13" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="bete du gevaudan, la (198x)(cil)(fr)(disk 2 of 2 side b)[cr a.b.c.].dsk" size="143360" crc="bf45b03f" sha1="74511f7e8a294ed6156ed63ee0ee337e27c1c00d" offset="0x0000" />
 			</dataarea>
@@ -2135,7 +2158,7 @@
 		<year>19??</year>
 		<publisher>Apple Pugetsound Program Library Exchange</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="big mac iie (198x)(apple)[b].do" size="143360" crc="cd04c083" sha1="66a7cde197cf1d77486533a1c105675dac20ce3e" offset="0x0000" />
 			</dataarea>
@@ -2147,7 +2170,7 @@
 		<year>1982</year>
 		<publisher>Apple Pugetsound Program Library Exchange</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="big mac (1982)(apple)[a].do" size="143360" crc="db6f200e" sha1="203d17db2eefe3ba73d5546b5d379f71a05f3f32" offset="0x0000" />
 			</dataarea>
@@ -2159,7 +2182,7 @@
 		<year>1982</year>
 		<publisher>Apple Pugetsound Program Library Exchange</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="big mac (1982)(apple).do" size="143360" crc="2527c345" sha1="0c5f539f68bc69be9e5cd9084921ebcacf8f4930" offset="0x0000" />
 			</dataarea>
@@ -2168,10 +2191,10 @@
 
 	<software name="bilestod">
 		<description>The Bilestoad (crack)</description>
-		<year>19??</year>
+		<year>1982</year>
 		<publisher>Mangrove Earthshoe</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="bilestoad, the (19xx)(mangrove earthshoe)[cr dirty dozen].do" size="143360" crc="d247623e" sha1="38754f1511842af6a8c220432bd927b1196756fb" offset="0x0000" />
 			</dataarea>
@@ -2183,7 +2206,7 @@
 		<year>1987</year>
 		<publisher>Datasoft</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="bismarck (1987)(datasoft)[cr digital gang].dsk" size="143360" crc="8313ee35" sha1="b835c0f417796b36f64130ae0362974953e8278b" offset="0x0000" />
 			</dataarea>
@@ -2195,7 +2218,7 @@
 		<year>1984</year>
 		<publisher>Earthware</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="black belt (1984)(earthware)[cr syndicate - ware lords - 202 alliance].do" size="143360" crc="cfe8b2b3" sha1="4cb233ac48f3fee6a8d8dfb1a1cb189dde34caf3" offset="0x0000" />
 			</dataarea>
@@ -2207,7 +2230,7 @@
 		<year>1987</year>
 		<publisher>Epyx</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="boulder dash construction kit (1987)(epyx)[cr digital gang - usalliance].do" size="143360" crc="b80fd3ea" sha1="4727b679ff565c1e9056565e14a653830a3a271c" offset="0x0000" />
 			</dataarea>
@@ -2219,12 +2242,12 @@
 		<year>1982</year>
 		<publisher>Sirius Software</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="blade of blackpoole, the (1982)(sirius software)(side a)[cr trystan ii].do" size="143360" crc="2140b97d" sha1="42ae0dfa3d6fee1053610bd8bbd37c67a84300c1" offset="0x0000" />
 			</dataarea>
 		</part>
-		<part name="flop12" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="blade of blackpoole, the (1982)(sirius software)(side b)[cr trystan ii].do" size="143360" crc="2c983095" sha1="bc55195b34fb66fff05f31879789c23584ff9f6b" offset="0x0000" />
 			</dataarea>
@@ -2236,7 +2259,7 @@
 		<year>19??</year>
 		<publisher>Questware</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="blood quest (19xx)(questware)[cr torch].do" size="143360" crc="c3acfa52" sha1="7d986f91497e9c74ab73c523c55f30d3b7f9ffa6" offset="0x0000" />
 			</dataarea>
@@ -2248,7 +2271,7 @@
 		<year>1984</year>
 		<publisher>Microlab</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="boulder dash (1984)(microlab).do" size="143360" crc="bf75d6da" sha1="18700ac799dce7245e29d47beb9f6a3e295b700b" offset="0x0000" />
 			</dataarea>
@@ -2260,7 +2283,7 @@
 		<year>1984</year>
 		<publisher>Microlab</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="boulder dash (1984)(microlab)[cr association of broadcasting crackers].dsk" size="143360" crc="b5220abf" sha1="34d1a539cfb9b3b1811928f3eaccdf86071a727b" offset="0x0000" />
 			</dataarea>
@@ -2272,7 +2295,7 @@
 		<year>19??</year>
 		<publisher>Micro Fun</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="boulder dash ii (19xx)(micro fun).do" size="143360" crc="69525d68" sha1="a8f324474f28baaef71a9d51411bad749a34e214" offset="0x0000" />
 			</dataarea>
@@ -2284,27 +2307,27 @@
 		<year>1985</year>
 		<publisher>Sierra On-Line / Walt Disney</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="black cauldron, the (1985)(sierra - walt disney)(disk 1 of 3 side a)[cr digital gang][b].dsk" size="143360" crc="51bc5da0" sha1="0089e4cdd2ab5c1a4463d78d680bf615c1f87f67" offset="0x0000" />
 			</dataarea>
 		</part>
-		<part name="flop12" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="black cauldron, the (1985)(sierra - walt disney)(disk 1 of 3 side b)[cr digital gang][b].dsk" size="143360" crc="a2dd6af3" sha1="1f80a3586c639ae1212a5f35574a080f360bc97a" offset="0x0000" />
 			</dataarea>
 		</part>
-		<part name="flop13" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="black cauldron, the (1985)(sierra - walt disney)(disk 2 of 3 side a)[cr digital gang][b].dsk" size="143360" crc="4725d5cb" sha1="6c401bf80165543cf124c1b0f789997caabf1d0e" offset="0x0000" />
 			</dataarea>
 		</part>
-		<part name="flop14" interface="floppy_5_25">
+		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="black cauldron, the (1985)(sierra - walt disney)(disk 2 of 3 side b)[cr digital gang][b].dsk" size="143360" crc="eedb8a2b" sha1="b129fa75bc8ffb54fcc85e383e1e26c59ca94e23" offset="0x0000" />
 			</dataarea>
 		</part>
-		<part name="flop15" interface="floppy_5_25">
+		<part name="flop5" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="black cauldron, the (1985)(sierra - walt disney)(disk 3 of 3 side a).dsk" size="143360" crc="492719a1" sha1="c062ed6343a056bbaa5f8a2584e02419252d2617" offset="0x0000" />
 			</dataarea>
@@ -2316,7 +2339,7 @@
 		<year>1987</year>
 		<publisher>Datasoft</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="black magic (1987)(datasoft)[a].dsk" size="143360" crc="e0fa1b65" sha1="52155e91a4da055f23bf2197332964410e5d4995" offset="0x0000" />
 			</dataarea>
@@ -2328,7 +2351,7 @@
 		<year>1987</year>
 		<publisher>Datasoft</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="black magic (1987)(datasoft)[cr mindreader].dsk" size="143360" crc="56ee8dfb" sha1="824a820a965717046a29cc4f7e04100ed262608e" offset="0x0000" />
 			</dataarea>
@@ -2340,7 +2363,7 @@
 		<year>1987</year>
 		<publisher>Datasoft</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="black magic (1987)(datasoft).dsk" size="143360" crc="b4f3d2ef" sha1="40bc76ee03c9fdfa5b7cba6ae10bd30eb12279bf" offset="0x0000" />
 			</dataarea>
@@ -2352,7 +2375,7 @@
 		<year>1980</year>
 		<publisher>Poly-Versa-Technology Software</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="black sage, the (1980)(poly-versa-technology software).do" size="143360" crc="ec1de1ef" sha1="0363c47babd65798b97807f508baf1fa838489e3" offset="0x0000" />
 			</dataarea>
@@ -2364,7 +2387,7 @@
 		<year>1981</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="blacksmith market falcons (1981)(-).do" size="143360" crc="d91815d7" sha1="529d742a5af5733fd00238debbec638c2ab6cf59" offset="0x0000" />
 			</dataarea>
@@ -2376,7 +2399,7 @@
 		<year>1979</year>
 		<publisher>Programma Software</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="blitzkrieg (1979)(programma software).do" size="143360" crc="17f2686e" sha1="27f1d02f2b680a89092d4ec3a149728f1d759e92" offset="0x0000" />
 			</dataarea>
@@ -2388,7 +2411,7 @@
 		<year>1983</year>
 		<publisher>Penguin Software</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="bouncing kamungas, the (1983)(penguin software)[cr dr. micro - freeze].do" size="143360" crc="1670953a" sha1="13ba824b0a1f2f26596192bbee6aee6aae45b06b" offset="0x0000" />
 			</dataarea>
@@ -2400,7 +2423,7 @@
 		<year>1984</year>
 		<publisher>John Romero</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="bongo's bash (1984)(romero, john).do" size="143360" crc="102c461a" sha1="d723a3ec7c4bac332d26385b7072490d2daec454" offset="0x0000" />
 			</dataarea>
@@ -2412,7 +2435,7 @@
 		<year>1982</year>
 		<publisher>Synergistic Software</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="bolo (1982)(synergistic software)[cr trystan ii][no boot].do" size="143360" crc="249e618d" sha1="22d0c9ad90fd6feb1267ad0de66ecd8227d38188" offset="0x0000" />
 			</dataarea>
@@ -2424,7 +2447,7 @@
 		<year>1982</year>
 		<publisher>Synergistic Software</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="bolo (1982)(synergistic software).do" size="143360" crc="f0b0f657" sha1="0e64f70f20c715a8364457c22b987fefffd3052d" offset="0x0000" />
 			</dataarea>
@@ -2436,7 +2459,7 @@
 		<year>1993</year>
 		<publisher>Strategic Simulations, Inc.</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="bomb alley (1993)(ssi).po" size="143360" crc="b90400ea" sha1="bb1826ec692c3f60e31066f878326093a60f6060" offset="0x0000" />
 			</dataarea>
@@ -2448,7 +2471,7 @@
 		<year>19??</year>
 		<publisher>Strategic Simulations, Inc.</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="bomb alley (19xx)(ssi)[rdos].dsk" size="143360" crc="782a8bbe" sha1="2f35f99a46d29ef1c84c58f35afc690d796adf5a" offset="0x0000" />
 			</dataarea>
@@ -2460,12 +2483,12 @@
 		<year>19??</year>
 		<publisher>Timothee Herpin - Oliver Gisselbrecht</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="bons baisers d'outre tombe (19xx)(herpin, timothee - gisselbrecht, oliver)(fr)(side a).do" size="143360" crc="09e575ef" sha1="7da1e162609304b725eb92d4d950ae9e81a50d6d" offset="0x0000" />
 			</dataarea>
 		</part>
-		<part name="flop12" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="bons baisers d'outre tombe (19xx)(herpin, timothee - gisselbrecht, oliver)(fr)(side b).do" size="143360" crc="ac50cac6" sha1="4d049c7b08a121f479fe3243383790de0165ee72" offset="0x0000" />
 			</dataarea>
@@ -2477,7 +2500,7 @@
 		<year>1981</year>
 		<publisher>Sirius Software</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="borg (1981)(sirius software)[cr worm].do" size="143360" crc="a68504ab" sha1="eb61ea2eab4e354e2a97d959d0da045452a49e36" offset="0x0000" />
 			</dataarea>
@@ -2489,7 +2512,7 @@
 		<year>19??</year>
 		<publisher>Sirius Software</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="both barrels (19xx)(sirius software)[cr black bag].do" size="143360" crc="e3abe7e0" sha1="3a173268f39dc548e14cc87364a7000542243269" offset="0x0000" />
 			</dataarea>
@@ -2501,7 +2524,7 @@
 		<year>2004</year>
 		<publisher>Ventzislav Tzvetkov</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="box world (2004)(tzvetkov, ventzislav).do" size="143360" crc="bd44cd5e" sha1="d2f5eecafb15e36e6b8a74e5f15399208b9258c7" offset="0x0000" />
 			</dataarea>
@@ -2513,12 +2536,12 @@
 		<year>19??</year>
 		<publisher>Garde</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="blue powder grey smoke (19xx)(garde)(disk 1 of 2)[cr first class].po" size="143360" crc="7f919f76" sha1="a57265a81ecb51daf55751dc1ea291e0911c1340" offset="0x0000" />
 			</dataarea>
 		</part>
-		<part name="flop12" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="blue powder grey smoke (19xx)(garde)(disk 2 of 2)[cr first class][unk filesys].po" size="143360" crc="7c9b5711" sha1="ac89f2da023d8485118ad83594515a830b6358a0" offset="0x0000" />
 			</dataarea>
@@ -2530,7 +2553,7 @@
 		<year>1984</year>
 		<publisher>Datasoft</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="bruce lee (1984)(datasoft)[cr black bag][a].dsk" size="143360" crc="8a5c4230" sha1="745c269e7d1592f30ab779cb07ce252787596a0b" offset="0x0000" />
 			</dataarea>
@@ -2542,7 +2565,7 @@
 		<year>1984</year>
 		<publisher>Datasoft</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="bruce lee (1984)(datasoft)[cr black bag].po" size="143360" crc="798a94f5" sha1="3fb8782f4fe96a5ad51395600ebd363918a7c784" offset="0x0000" />
 			</dataarea>
@@ -2554,7 +2577,7 @@
 		<year>1978</year>
 		<publisher>Georges Duisman</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="bridge challenger (1978)(georges duisman).do" size="143360" crc="ebd18433" sha1="ea0a145ecfdb0e35a4d46ab49191325259d3d60b" offset="0x0000" />
 			</dataarea>
@@ -2566,7 +2589,7 @@
 		<year>1983</year>
 		<publisher>Strategic Simulations, Inc.</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="broadsides (1983)(ssi)[cr jean-pierre - paul].do" size="143360" crc="76707e94" sha1="17cc431f5a47e9715965e05d9823988078ccf214" offset="0x0000" />
 			</dataarea>
@@ -2578,7 +2601,7 @@
 		<year>1983</year>
 		<publisher>Strategic Simulations, Inc.</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="broadsides (19xx)(ssi)[cr mr. clean].do" size="143360" crc="18a25bc3" sha1="f5c09f8037ca0544861a72e2d973f9c6148f7eea" offset="0x0000" />
 			</dataarea>
@@ -2590,7 +2613,7 @@
 		<year>1983</year>
 		<publisher>Strategic Simulations, Inc.</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="broadsides (1983)(ssi)[cr ace].do" size="143360" crc="3a0416eb" sha1="cc1e84bdb4706897ef82298ee8b07ae3db3c14ac" offset="0x0000" />
 			</dataarea>
@@ -2602,7 +2625,7 @@
 		<year>1983</year>
 		<publisher>Strategic Simulations, Inc.</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="broadsides (1983)(ssi).do" size="143360" crc="9b4d9cb1" sha1="dc54002d76e57286623e7ccb6498acd9671e3d84" offset="0x0000" />
 			</dataarea>
@@ -2614,7 +2637,7 @@
 		<year>19??</year>
 		<publisher>Apple Computer, Inc.</publisher> <!-- programmed by Steve Wozniak -->
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="breakout (19xx)(-).do" size="143360" crc="3e11433e" sha1="c747481daa49ec99b3c557eace2f27e8c7b9d15e" offset="0x0000" />
 			</dataarea>
@@ -2626,17 +2649,17 @@
 		<year>1985</year>
 		<publisher>Synapse Software</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="brimstone (1985)(synapse software)(disk 1 of 2 side a).do" size="143360" crc="e9545cc9" sha1="2b6fdbd3130258e82c03d034d37924aa056182dd" offset="0x0000" />
 			</dataarea>
 		</part>
-		<part name="flop12" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="brimstone (1985)(synapse software)(disk 1 of 2 side b)[unk filesys].do" size="143360" crc="8b9c4558" sha1="1337eaf86f51929bc6da13dfb4a4fdcafdd02082" offset="0x0000" />
 			</dataarea>
 		</part>
-		<part name="flop13" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="brimstone (1985)(synapse software)(disk 2 of 2 side a)[unk filesys].do" size="143360" crc="7013fa0a" sha1="412ba74b073cf3734a3b8478c5475b13725ba036" offset="0x0000" />
 			</dataarea>
@@ -2648,12 +2671,12 @@
 		<year>1984</year>
 		<publisher>Strategic Simulations, Inc.</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="breakthrough in the ardennes v1.1 (1984)(ssi)(side a)[rdos].dsk" size="143360" crc="e84f1d59" sha1="b9538102b3b73769c997c483f54d6973c685a733" offset="0x0000" />
 			</dataarea>
 		</part>
-		<part name="flop12" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="breakthrough in the ardennes v1.1 (1984)(ssi)(side b)[rdos].dsk" size="143360" crc="7c71b30b" sha1="e3012c9ed21854d7426475e51918c7d1b318f2e2" offset="0x0000" />
 			</dataarea>
@@ -2665,7 +2688,7 @@
 		<year>1983</year>
 		<publisher>Gentry Software</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="break the bank! (1983)(gentry software)[a].do" size="143360" crc="2dd18181" sha1="56f46aeba76b77903e162024a4d14d4ed654312f" offset="0x0000" />
 			</dataarea>
@@ -2677,7 +2700,7 @@
 		<year>1983</year>
 		<publisher>Gentry Software</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="break the bank! (1983)(gentry software).do" size="143360" crc="07916a59" sha1="91268224aff4421524849f3d8ed800617f120c03" offset="0x0000" />
 			</dataarea>
@@ -2689,7 +2712,7 @@
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="breaktrough (19xx)(-)[a].do" size="143360" crc="26968cfa" sha1="6edb78fecce20d49daab908996d4bd0b059e0537" offset="0x0000" />
 			</dataarea>
@@ -2701,7 +2724,7 @@
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="breaktrough (19xx)(-).do" size="143360" crc="1523b0ae" sha1="1ffaf68e858661b4ae45ce805437b63f22b6eae5" offset="0x0000" />
 			</dataarea>
@@ -2713,7 +2736,7 @@
 		<year>1983</year>
 		<publisher>Sams Software</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="bermuda race, the (1983)(sams software)[cr whip].do" size="143360" crc="1aa258cb" sha1="286dc8777f2a5255dfa8b792a3a57d976eb1e208" offset="0x0000" />
 			</dataarea>
@@ -2725,12 +2748,12 @@
 		<year>1986</year>
 		<publisher>Softdisk</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="brain machine, the (1986)(softdisk)(side a).po" size="143360" crc="fead4922" sha1="20f24ea503f8eeae51ccfd689fa836eea6573495" offset="0x0000" />
 			</dataarea>
 		</part>
-		<part name="flop12" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="brain machine, the (1986)(softdisk)(side b).po" size="143360" crc="a3bead35" sha1="5c33a59078e837d4f5616ca0b1b825848587187d" offset="0x0000" />
 			</dataarea>
@@ -2742,12 +2765,12 @@
 		<year>1986</year>
 		<publisher>Commonweaalth</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="bronze dragon side ii (1986)(commonwealth)(disk 1 of 2).do" size="143360" crc="bda99692" sha1="4f527d1c715270b40dd6166c8078d75003891c8d" offset="0x0000" />
 			</dataarea>
 		</part>
-		<part name="flop12" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="bronze dragon side ii (1986)(commonwealth)(disk 2 of 2)(dragon side ii).do" size="143360" crc="f95eac42" sha1="7d61fc0a2ed63e2dfb15eda78f076cbde893cf92" offset="0x0000" />
 			</dataarea>
@@ -2759,27 +2782,27 @@
 		<year>1985</year>
 		<publisher>Connonwealth</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="bronze dragon (1985)(commonwealth)(disk 1 of 5)(bronze side).do" size="143360" crc="1f912dfa" sha1="9546353cc40520039ecbf9f02ae4a1cce3c22875" offset="0x0000" />
 			</dataarea>
 		</part>
-		<part name="flop12" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="bronze dragon (1985)(commonwealth)(disk 2 of 5)(character).do" size="143360" crc="765860ec" sha1="3b74da5c3d646de8e1d3b23729818085b9d08f80" offset="0x0000" />
 			</dataarea>
 		</part>
-		<part name="flop13" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="bronze dragon (1985)(commonwealth)(disk 3 of 5)(castle disk).do" size="143360" crc="38118596" sha1="364557ec17da685161697a9f3836841e544c569f" offset="0x0000" />
 			</dataarea>
 		</part>
-		<part name="flop14" interface="floppy_5_25">
+		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="bronze dragon (1985)(commonwealth)(disk 4 of 5)(module disk).do" size="143360" crc="35ccddc6" sha1="93b30e5b4ab5941f96c7e68a3e31c6a06e98cbce" offset="0x0000" />
 			</dataarea>
 		</part>
-		<part name="flop15" interface="floppy_5_25">
+		<part name="flop5" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="bronze dragon (1985)(commonwealth)(disk 5 of 5)(dragon side).do" size="143360" crc="c1539a01" sha1="fc9782f24d712d7acbef22cda1c5d987327bf8ca" offset="0x0000" />
 			</dataarea>
@@ -2791,7 +2814,7 @@
 		<year>1984</year>
 		<publisher>Sega</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="buck rogers - planet of zoom (1984)(sega)[cr apple bandit - syndicate][a].do" size="143360" crc="6d318792" sha1="453764af08eaeea4af1153101bec149df321de97" offset="0x0000" />
 			</dataarea>
@@ -2803,7 +2826,7 @@
 		<year>1984</year>
 		<publisher>Sega</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="buck rogers - planet of zoom (1984)(sega)[cr apple bandit - syndicate].do" size="143360" crc="45b52422" sha1="aa47bb1985cfcb0f9b8e8b3aa89f26909906143e" offset="0x0000" />
 			</dataarea>
@@ -2815,12 +2838,12 @@
 		<year>1985</year>
 		<publisher>Activision</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="borrowed time (1985)(activision)(side a).do" size="143360" crc="d84feb22" sha1="bedca910c2c7b07ecd819a305c0a11d7d8d57408" offset="0x0000" />
 			</dataarea>
 		</part>
-		<part name="flop12" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="borrowed time (1985)(activision)(side b)[unk filesys].do" size="143360" crc="5a4e3ea5" sha1="3c70da1723f4456cd759283dcd4e3a964d46bfcd" offset="0x0000" />
 			</dataarea>
@@ -2832,12 +2855,12 @@
 		<year>1985</year>
 		<publisher>Activision</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="borrowed time (1985)(activision)(side a)[cr first class].do" size="143360" crc="b13dbfd7" sha1="1df7e641e1efc8ca69931fe9d7a3c2be3e4995f8" offset="0x0000" />
 			</dataarea>
 		</part>
-		<part name="flop12" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="borrowed time (1985)(activision)(side b)[cr first class][unk filesys].do" size="143360" crc="c3af19d8" sha1="10f0f7b600aef99b738a0da9cde3ae16f29c312b" offset="0x0000" />
 			</dataarea>
@@ -2849,7 +2872,7 @@
 		<year>1979</year>
 		<publisher>Bill Budge</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="best of bill budge, the (1979)(bill budge)[a].dsk" size="143360" crc="85b497f5" sha1="1f44b03e49b5988e10c9f2950e4a1e4f6761ae3c" offset="0x0000" />
 			</dataarea>
@@ -2861,43 +2884,26 @@
 		<year>1979</year>
 		<publisher>Bill Budge</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="best of bill budge, the (1979)(bill budge).dsk" size="143360" crc="3bc1f214" sha1="7556e7a6612bec7636b33d6e6675024f29460493" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="bublbbcr">
-		<description>Bubble Bobble (crack)</description>
-		<year>1988</year>
-		<publisher>Taito / NovaLogic</publisher>
-
-		<part name="flop11" interface="floppy_5_25">
-			<dataarea name="flop1" size="143360">
-				<rom name="bubble bobble (1988)(taito - novalogic)(side a)[cr club 96].dsk" size="143360" crc="ec39dae6" sha1="ae9f3498829ff1e164e897bfd1e92ac887c1d99c" offset="0x0000" />
-			</dataarea>
-		</part>
-		<part name="flop12" interface="floppy_5_25">
-			<dataarea name="flop1" size="143360">
-				<rom name="bubble bobble (1988)(taito - novalogic)(side b)[cr club 96].dsk" size="143360" crc="ac056c8d" sha1="0f30fb98d37e91f166d0c8c6b328e898cdf37ec1" offset="0x0000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="bublbobl">
-		<description>Bubble Bobble</description>
+		<description>Bubble Bobble (clean crack)</description>
 		<year>1988</year>
-		<publisher>Taito / NovaLogic</publisher>
+		<publisher>Taito America / NovaLogic</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
-				<rom name="bubble bobble (1988)(taito - novalogic)(side a).dsk" size="143360" crc="2982842c" sha1="2de1b0a0656f9b2962c957ced9ceb6d5c142f32d" offset="0x0000" />
+				<rom name="bubble bobble disk 1 of 2 (1988)(taito america - novalogic)(trex crack).dsk" size="143360" crc="2af0a5d4" sha1="4810c07e9514d6d3a49ee9babee7497103428d43" offset="0x0000" />
 			</dataarea>
 		</part>
-		<part name="flop12" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
-				<rom name="bubble bobble (1988)(taito - novalogic)(side b).dsk" size="143360" crc="5efacf8b" sha1="9db4bf2d403784c9cda4ad992f65f7f2b3ed3dfe" offset="0x0000" />
+				<rom name="bubble bobble disk 2 of 2 (1988)(taito america - novalogic)(trex crack).dsk" size="143360" crc="ac056c8d" sha1="0f30fb98d37e91f166d0c8c6b328e898cdf37ec1" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2907,7 +2913,7 @@
 		<year>1983</year>
 		<publisher>Tellus Systems</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="bubble-head (1983)(tellus systems)[t +1 hi-res hijackers - ware lords].do" size="143360" crc="0674da8f" sha1="f1e927b01bc1b14eecfbab98988f4a8fcf95ce1c" offset="0x0000" />
 			</dataarea>
@@ -2919,7 +2925,7 @@
 		<year>1984</year>
 		<publisher>Bruce Jaeger</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="bucks! (1984)(jaeger, bruce)[a].do" size="143360" crc="2f796db9" sha1="9a365c5cbfe608b9500b6b4ef32862b546d82aa4" offset="0x0000" />
 			</dataarea>
@@ -2931,7 +2937,7 @@
 		<year>1984</year>
 		<publisher>Bruce Jaeger</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="bucks! (1984)(jaeger, bruce)[a2].do" size="143360" crc="e87b3907" sha1="08dfc62a7bfb8a3329304118cb931313b640fda0" offset="0x0000" />
 			</dataarea>
@@ -2943,7 +2949,7 @@
 		<year>1984</year>
 		<publisher>Bruce Jaeger</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="bucks! (1984)(jaeger, bruce).do" size="143360" crc="a83d2759" sha1="bdbe5a9fa360f307da937e609a6e971138244e47" offset="0x0000" />
 			</dataarea>
@@ -2955,7 +2961,7 @@
 		<year>1981</year>
 		<publisher>Cavalier Computer</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="bug attack (1981)(cavalier computer).do" size="143360" crc="76ea825e" sha1="fc1766228357b28e8d80cba4e89955e2b1093928" offset="0x0000" />
 			</dataarea>
@@ -2967,7 +2973,7 @@
 		<year>19??</year>
 		<publisher>Greg Hale - Ted Cohn</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="beyond floppy (19xx)(greg hale - ted cohn)[cr great lake alliance].dsk" size="143360" crc="474c3436" sha1="0545743bd364166116cf39894f6b14d3a9f77267" offset="0x0000" />
 			</dataarea>
@@ -2979,7 +2985,7 @@
 		<year>1984</year>
 		<publisher>Muse Software</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="beyond castle wolfenstein (1984)(muse).do" size="143360" crc="1aa5716b" sha1="fcd011e9abb1baf7c1baf24abb0d3c575ca91b87" offset="0x0000" />
 			</dataarea>
@@ -2991,7 +2997,7 @@
 		<year>1986</year>
 		<publisher>Dark Logic</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="beyond pinball (1986)(dark logic)[cr brian fist].do" size="143360" crc="409e51a1" sha1="3ff56ccc964160df4395c72bb70b848281564c29" offset="0x0000" />
 			</dataarea>
@@ -3003,7 +3009,7 @@
 		<year>1987</year>
 		<publisher>Infocom</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="232960">
 				<rom name="beyond zork (1987)(infocom)(side b).nib" size="232960" crc="887a1827" sha1="2d937985ea62e3f7204be36c06f3efbe00066a5d" offset="0x0000" />
 			</dataarea>
@@ -3015,7 +3021,7 @@
 		<year>1984</year>
 		<publisher>Sylvain Fatome</publisher>
 
-		<part name="flop11" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="143360">
 				<rom name="bunker, le (1984)(sylvain fatome)(fr).do" size="143360" crc="3e6cdf5f" sha1="7e340bc1a30e15f6fed5a0535d9e70e917cedd93" offset="0x0000" />
 			</dataarea>
@@ -3076,7 +3082,7 @@
 	</software>
 
 	<software name="captckoo">
-		<description>Captain Cuckoo</description>
+		<description>Captain Cuckoo (cracked)</description>
 		<year>1984</year>
 		<publisher>Kurt and Yan Software</publisher>
 
@@ -3614,7 +3620,7 @@
 	<software name="cmpairna">
 		<description>Computer Air Combat - New Aircraft</description>
 		<year>198?</year>
-		<publisher>Strategic Simluations, Inc.</publisher>
+		<publisher>Strategic Simulations, Inc.</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
@@ -3626,7 +3632,7 @@
 	<software name="cmpambsh">
 		<description>Computer Ambush</description>
 		<year>1982</year>
-		<publisher>Strategic Simluations, Inc.</publisher>
+		<publisher>Strategic Simulations, Inc.</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
@@ -3638,7 +3644,7 @@
 	<software name="cmpbaseb">
 		<description>Computer Baseball</description>
 		<year>1981</year>
-		<publisher>Strategic Simluations, Inc.</publisher>
+		<publisher>Strategic Simulations, Inc.</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
@@ -3650,7 +3656,7 @@
 	<software name="cmpbsmrk">
 		<description>Computer Bismarck</description>
 		<year>1980</year>
-		<publisher>Strategic Simluations, Inc.</publisher>
+		<publisher>Strategic Simulations, Inc.</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
@@ -3662,7 +3668,7 @@
 	<software name="cmpcnfl">
 		<description>Computer Conflict</description>
 		<year>1980</year>
-		<publisher>Strategic Simluations, Inc.</publisher>
+		<publisher>Strategic Simulations, Inc.</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
@@ -3674,7 +3680,7 @@
 	<software name="cmpnapol">
 		<description>Computer Napoleonics</description>
 		<year>1980</year>
-		<publisher>Strategic Simluations, Inc.</publisher>
+		<publisher>Strategic Simulations, Inc.</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
@@ -3686,7 +3692,7 @@
 	<software name="cmpqb">
 		<description>Computer Quarterback</description>
 		<year>1981</year>
-		<publisher>Strategic Simluations, Inc.</publisher>
+		<publisher>Strategic Simulations, Inc.</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
@@ -3720,13 +3726,13 @@
 	</software>
 
 	<software name="cntdsht">
-		<description>Countdown to Shutdown</description>
+		<description>Countdown to Shutdown (clean crack)</description>
 		<year>1985</year>
 		<publisher>Activision</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
-				<rom name="countdown to shutdown (1985)(activision)[cr circle k].dsk" size="143360" crc="d5b2f897" sha1="b8217d8a0077fd3001410b3bef6bf95363e4abae" offset="0x0000" />
+				<rom name="countdown to shutdown (1985)(activision)(trex crack).dsk" size="143360" crc="cf4ac129" sha1="ee6843930f3c78c738f3ef4cf1e306ef5897d8af" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3781,13 +3787,13 @@
 	</software>
 
 	<software name="cogito">
-		<description>Cogito!</description>
+		<description>Cogito! (clean crack)</description>
 		<year>198??</year>
 		<publisher>Reader's Digest Software</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
-				<rom name="cogito! (19xx)(reader's digest software)[cr soft sector].do" size="143360" crc="adce5f14" sha1="b54922baa49063b2721e4155c2ee6db479b9e438" offset="0x0000" />
+				<rom name="cogito! (19xx)(reader's digest software)(4am crack)" size="143360" crc="dab73665" sha1="fac81f70393ce06a08830913560c2e3f6e694ed0" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4010,13 +4016,13 @@
 	</software>
 
 	<software name="crismntn">
-		<description>Crisis Mountain</description>
+		<description>Crisis Mountain (clean crack)</description>
 		<year>1982</year>
 		<publisher>Synergistic Software</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
-				<rom name="crisis mountain (1982)(synergistic software)[cr sowbug][no boot].do" size="143360" crc="fe592264" sha1="afc45df54e078b8f1a9fd6c6d2c06c052f7a8fc6" offset="0x0000" />
+				<rom name="crisis mountain (1982)(synergistic software)(4am crack).dsk" size="143360" crc="f43e80de" sha1="1bbdbe1a89ea35dce064406b79cee8cb10da81a4" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4436,13 +4442,14 @@
 	</software>
 
 	<software name="arkanoi2">
-		<description>Arkanoid 2: Revenge of DOH</description>
+		<!-- Arkanoid 2: Revenge of DOH was never released for the Apple II, only a native Apple IIgs version -->
+		<description>Arkanoid 2 (level hack of cracked Arkanoid)</description>
 		<year>1988</year>
-		<publisher>Taito America</publisher>
+		<publisher>Hack</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
-				<rom name="arkanoi2.dsk" size="143360" crc="c35c1af5" sha1="b695b594496b74baa65f8c09cca324a2d5ea4a6b" offset="0x0000" />
+				<rom name="arkanoi2 (level hack of arkanoid).dsk" size="143360" crc="c35c1af5" sha1="b695b594496b74baa65f8c09cca324a2d5ea4a6b" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4583,6 +4590,72 @@
 		</part>
 	</software>
 
+	<software name="carmntime">
+		<description>Where in Time is Carmen Sandiego v1.1 (clean crack)</description>
+		<year>1989</year>
+		<publisher>Broderbund</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="where in time is carmen sandiego v1.1 side a (1989)(broderbund)(trex crack).dsk" size="143360" crc="9d391061" sha1="32f18c02974e0a915e3ac74abe10ec9cf5f67533" offset="0x0000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="where in time is carmen sandiego v1.1 side b (1989)(broderbund)(trex crack).dsk" size="143360" crc="33e65f76" sha1="8995ca7786b6a70d68b8305625e65a534c15d435" offset="0x0000" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="where in time is carmen sandiego v1.1 side c (1989)(broderbund)(trex crack).dsk" size="143360" crc="15942fc0" sha1="03189fdefa100e64c0ad9ba38804bab7508f9881" offset="0x0000" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="where in time is carmen sandiego v1.1 side d (1989)(broderbund)(trex crack).dsk " size="143360" crc="704551a0" sha1="469ef6f3be3919cd904c63d37d6e8d46e895ab31" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="carmntime35">
+		<description>Where in Time is Carmen Sandiego v1.1 800K 3.5 disc (clean crack)</description>
+		<year>1989</year>
+		<publisher>Broderbund</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819264">
+				<rom name="where in time is carmen sandiego v1.1 800k 3.5 disk (1989)(broderbund)(trex crack).2mg" size="819264" crc="36d3ff6d" sha1="21051ecf94f598da648355e75e46641351ed3230" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="carmntime10">
+		<description>Where in Time is Carmen Sandiego v1.0 (clean crack)</description>
+		<year>1989</year>
+		<publisher>Broderbund</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="where in time is carmen sandiego v1.0 (4am crack) side a.dsk" size="143360" crc="cd3da2a7" sha1="21a9fc7220c84ffec91b4e76b28dc8b514ab56a3" offset="0x0000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="where in time is carmen sandiego v1.0 (4am crack) side b.dsk" size="143360" crc="3bad4b59" sha1="7e84dc0db9e964db44692fa340b6c6828f83bfe6" offset="0x0000" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="where in time is carmen sandiego v1.0 (4am crack) side c.dsk" size="143360" crc="650735af" sha1="aecf8b17bb26e73036100ac648e5eddede12fe91" offset="0x0000" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="where in time is carmen sandiego v1.0 (4am crack) side d.dsk " size="143360" crc="3c7643ca" sha1="8a6a168f25b4698465b89db9546d9b35489fe042" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="carmnusa">
 		<description>Where in the USA is Carmen Sandiego?</description>
 		<year>1986</year>
@@ -4694,6 +4767,23 @@
 		</part>
 	</software>
 
+	<software name="dmaster">
+		<description>Dungeon Master's Assistant (clean crack)</description>
+		<year>1988</year>
+		<publisher>SSI</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop1" size="143360">
+				<rom name="dungeon master's assistant side a (1988)(ssi)(trex crack)[rdos].dsk" size="143360" crc="14904b40" sha1="9a8953ed45bb36f340b13db1eb6d75a26e498815" offset="0x0000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop1" size="143360">
+				<rom name="dungeon master's assistant side b (1988)(ssi)(trex crack)[rdos].dsk" size="143360" crc="fafa454c" sha1="169ec625b5d72f6c624534e4c031915a0e36c82d" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="dvmidmgc">
 		<description>David's Midnight Magic</description>
 		<year>1981</year>
@@ -4778,6 +4868,18 @@
 		</part>
 	</software>
 
+	<software name="gamemaker">
+		<description>Gamemaker</description>
+		<year>1985</year>
+		<publisher>Activision</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="gamemaker (1985)(activision)(trex crack).dsk" size="143360" crc="10b94ba0" sha1="ba1bdfa1b30edc981a8ad8d33a68ab5c81b9485b" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="gauntlet">
 		<description>Gauntlet</description>
 		<year>1986</year>
@@ -4795,14 +4897,27 @@
 		</part>
 	</software>
 
+	<software name="genesis">
+		<description>Genesis (clean crack)</description>
+		<!-- Original disk wouldn't boot on 65C02 or later -->
+		<year>1983</year>
+		<publisher>Datasoft / Design Labs</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="genesis (1983)(datasoft - design labs)(trex single file crack).dsk" size="143360" crc="c55fd79c" sha1="34940df9dc08c88f38000f9d3311bae429a2f735" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="gbust">
-		<description>Ghostbusters</description>
+		<description>Ghostbusters (clean crack)</description>
 		<year>1984</year>
 		<publisher>Activision</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
-				<rom name="ghostbusters.dsk" size="143360" crc="de55f2c3" sha1="75305180d48135b0170ee73bafc51624a5a04e7b" offset="0x0000" />
+				<rom name="ghostbusters (1984)(activision)(clean crack).dsk" size="143360" crc="7664a255" sha1="708fc0c0903a7c3f61b0b873ce032e81762367ba" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4836,14 +4951,14 @@
 		</part>
 	</software>
 
-	<software name="hhgg">
-		<description>Hitchhiker's Guide to the Galaxy</description>
-		<year>1984</year>
-		<publisher>Infocom</publisher>
+	<software name="hardball">
+		<description>Hardball (clean crack)</description>
+		<year>1985</year>
+		<publisher>Accolade</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
-				<rom name="hitchhiker's guide to the galaxy, the (1984)(infocom)[a].dsk" size="143360" crc="dc05d339" sha1="865a1634c0a5fdaef93f2e71a014b440a493f97b" offset="0x0000" />
+				<rom name="hardball (1985)(accolade)(trex crack).dsk" size="143360" crc="bfc321c3" sha1="08b9d470a0f64c6d8c078058484b85153682cd32" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4856,6 +4971,31 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="hard hat mack clean crack.dsk" size="143360" crc="eb4733c7" sha1="32e01bbc99ac6c71fbcd424b9259624699dee5bf" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="heist">
+		<description>The Heist (clean crack)</description>
+		<!-- High scores stored on disc, reset to AAA 5000, BBB 4000, CCC 3000, DDD 2000 & EEE 1000 -->
+		<year>1983</year>
+		<publisher>Microlab</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="the heist (1983)(microlab)(trex crack).dsk" size="143360" crc="47965be3" sha1="b050eae4631b6737d7bd8264de1544341a3a2042" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hhgg">
+		<description>Hitchhiker's Guide to the Galaxy</description>
+		<year>1984</year>
+		<publisher>Infocom</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="hitchhiker's guide to the galaxy, the (1984)(infocom)[a].dsk" size="143360" crc="dc05d339" sha1="865a1634c0a5fdaef93f2e71a014b440a493f97b" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -5027,6 +5167,18 @@
 		</part>
 	</software>
 
+	<software name="lawwest">
+		<description>Law of the West (clean crack)</description>
+		<year>1985</year>
+		<publisher>Accolade</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="law of the west (1985)(accolade)(trex crack).dsk" size="143360" crc="db08e8b9" sha1="45b7f1c4dd834891b69d0d62852527e479579150" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="leepers">
 		<description>Lunar Leepers</description>
 		<year>1982</year>
@@ -5138,6 +5290,18 @@
 		</part>
 	</software>
 
+	<software name="masterlamp">
+		<description>Master of the Lamps (clean crack)</description>
+		<year>1985</year>
+		<publisher>Activision</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="master of the lamps (1985)(activision)(trex crack).dsk" size="143360" crc="59c4b8d3" sha1="f48b13d0c8d7129983ad4d78e0f50458fe124b91" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="midi8pl1">
 		<description>MIDI/8 Plus</description>
 		<year>1984</year>
@@ -5219,13 +5383,14 @@
 	</software>
 
 	<software name="minr2049">
-		<description>Miner 2049er</description>
+		<description>Miner 2049er (clean crack)</description>
+		<!-- High scores stored on disc, reset to AAA 5000, AAA 4000, AAA 3000, AAA 2000 & AAA 1000 -->
 		<year>1982</year>
 		<publisher>Micro Fun</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
-				<rom name="miner_2049er.dsk" size="143360" crc="8c16b767" sha1="b336bb4975674eaf6d8ae2234b19df4fb08b473d" offset="0x0000" />
+				<rom name="miner 2049er (1982)(micro fun)(clean crack).dsk" size="143360" crc="c1024360" sha1="a5913a155a4902310de20c5037067655e11ab088" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -5255,25 +5420,25 @@
 	</software>
 
 	<software name="mrdo">
-		<description>Mr. Do</description>
+		<description>Mr. Do (clean crack)</description>
 		<year>1983</year>
 		<publisher>Datasoft</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
-				<rom name="mrdo.dsk" size="143360" crc="b503e1b8" sha1="72b7c3c5b2da00bafbd43e658e3713fd132f7117" offset="0x0000" />
+				<rom name="mr. do (4am crack).dsk" size="143360" crc="a3e4f90f" sha1="ca54e92fcf4266061e782ad841867cec5eed347f" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="mspac">
-		<description>Ms. Pac Man</description>
+		<description>Ms. Pac Man (clean crack)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
-				<rom name="mspacman.dsk" size="143360" crc="9e367d85" sha1="63648dce05d5aec358d0e038c5158614c1ae74c4" offset="0x0000" />
+				<rom name="ms. pac-man (atari)(4am crack).dsk" size="143360" crc="7b7196fc" sha1="49b21f8c3a838c12b2d785f4342432212698c0bb" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -5322,6 +5487,21 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="nibbler.do" size="143360" crc="79fb7ff7" sha1="598cdd5e93695d6ae8a26b83c6853e6067e53074" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nightmar">
+		<!-- Left & Right arrows or Paddle0 for controls - Select with "K" for keyboard / "P" for paddle -->
+		<!-- press SLASH "/" to fire with keyboard or use Button0 when using the paddle -->
+		<!-- "C" for continuous fire, SPACE BAR for shields, CRTL-S toggles sound on/off, ESC for pause  -->
+		<description>Nightmare Gallery (clean crack)</description>
+		<year>1982</year>
+		<publisher>Synergistic Software</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="nightmare gallery (1982)(synergistic)(clean crack).dsk" size="143360" crc="070c08bf" sha1="803dda9229bd086979f400949b4300d18285c75b" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -5385,25 +5565,73 @@
 	</software>
 
 	<software name="pacman">
-		<description>Pac-Man</description>
+		<description>Pac-Man - Atari (clean crack)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
-				<rom name="pacman.dsk" size="143360" crc="f35578be" sha1="5a907f53299bc40c46dab4d5956cd9e70911f515" offset="0x0000" />
+				<rom name="pac-man (atari)(4am crack).dsk" size="143360" crc="988e08f1" sha1="5eb20be8a79227715177b65cd0ea4a34be273629" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pacmand">
+		<description>Pac-Man - Datasoft (clean crack)</description>
+		<year>1983</year>
+		<publisher>Datasoft / Namco America</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="pac-man (datasoft)(4am crack).dsk" size="143360" crc="9852a378" sha1="dd4cec96fd37aba85f5bd2a5b75d0656904765d1" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pacmant">
+		<description>Pac-Man - Thunder Mountain (clean crack)</description>
+		<year>1983</year>
+		<publisher>Thunder Mountain / Namco</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="pac-man (thunder mountain)(4am crack).dsk" size="143360" crc="82379bed" sha1="9b3e1b9e78dcfb1f8f55925c9bf2f6161423004d" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="paperboy">
-		<description>Paperboy</description>
+		<description>Paperboy (clean crack)</description>
 		<year>1986</year>
 		<publisher>Mindscape / Atari</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="paperboy (4am crack).dsk" size="143360" crc="e0914bc0" sha1="37da2f836f9182c53931a8f08827f72826f844ac" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="papermodels">
+		<description>Paper Models - The Christmas Kit (clean crack)</description>
+		<year>1986</year>
+		<publisher>Activision</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="paper models - the christmas kit (1986)(activision)(trex crack).dsk" size="143360" crc="22dd3174" sha1="01653481820b5a14374e21af182c766ee87b7861" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pigpen">
+		<description>Pigpen (clean crack)</description>
+		<year>1982</year>
+		<publisher>Datamost / TMQ Software</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="pigpen (1982)(datamost - tmq software)(clean crack).dsk" size="143360" crc="69abf73f" sha1="0811f5331a44df93edebbf3908b036c972733b55" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -5416,6 +5644,18 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="pinballcset.dsk" size="143360" crc="e9a48021" sha1="3be3e6602348149efdf28c75c6527c3094f3a36a" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pipedream">
+		<description>Pipe Dream (clean crack)</description>
+		<year>1990</year>
+		<publisher>Lucasfilm</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="pipe dream (1990)(lucasfilm)(trex crack).dsk" size="143360" crc="46befc67" sha1="654d9f22147a111a77f59cd775a3e2822579b085" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -5513,26 +5753,95 @@
 		</part>
 	</software>
 
+	<software name="portal">
+		<description>Portal (clean crack)</description>
+		<year>1986</year>
+		<publisher>Activision</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="portal disk 1 of 4 (1986)(activision)(trex crack).dsk" size="143360" crc="5f90a84a" sha1="1fcc3990b5680d47ee5a87fd0dac8266433e7a7d" offset="0x0000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="portal disk 2 of 4 (1986)(activision)(trex crack).dsk" size="143360" crc="56038539" sha1="e2f98196e977a60d088948d5689a254c831b78d5" offset="0x0000" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="portal disk 3 of 4 (1986)(activision)(trex crack).dsk" size="143360" crc="43fa124b" sha1="96e8eb50e1f7c5608f0e5c21c8510f950f475340" offset="0x0000" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="portal disk 4 of 4 (1986)(activision)(trex crack).dsk" size="143360" crc="0cc78e02" sha1="ea7f178de04fe64aa62ed25df5e64aa405ee13b5" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="qix">
-		<description>Qix</description>
+		<description>Qix (clean crack)</description>
 		<year>1989</year>
 		<publisher>Taito</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
-				<rom name="qix.dsk" size="143360" crc="f4612a2c" sha1="2477fce2193e131be825adabaa8d325d84750c4a" offset="0x0000" />
+				<rom name="qix (1981-89)(taito america)(trex crack).dsk" size="143360" crc="7540d5ea" sha1="ed5b36df6f6940730313cd6d7ea9702003629dcc" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="racter">
+		<description>Racter (clean crack)</description>
+		<year>1985</year>
+		<publisher>Mindscape</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="racter (1985)(mindscape)(trex crack).dsk" size="143360" crc="4e8d06f8" sha1="43baa8c78fe606b526f575e191dd954548c70470" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rambo">
+		<description>Rambo First Blood Part II (clean crack)</description>
+		<year>1985</year>
+		<publisher>Mindscape / Angelsoft</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="rambo first blood part ii (1985)(mindscape - angelsoft)(trex crack).dsk" size="143360" crc="58606af1" sha1="82208a4baeadd03b00cb28cab503db266db4fbb2" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="rampage">
-		<description>Rampage</description>
+		<description>Rampage (clean crack)</description>
 		<year>1988</year>
 		<publisher>Activision</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
-				<rom name="rampage.dsk" size="143360" crc="92baaac9" sha1="199ac85d0950022afe3540442f061d3f92d2e720" offset="0x0000" />
+				<rom name="rampage (1988)(activision)(trex crack).dsk" size="143360" crc="cd8a8b4c" sha1="e0000ec8544481784f6cab8be2bc91358c0ea37b" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="renegade">
+		<description>Renegade (clean crack)</description>
+		<!-- ProDOS 8 based & hard drive compatable -->
+		<year>1988</year>
+		<publisher>Taito America / NovaLogic</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop1" size="143360">
+				<rom name="renegade disk 1 of 2 (1988)(taito america - novalogic)(trex crack).dsk" size="143360" crc="9d480dec" sha1="bca268ad1859c8cfd214496c3195b88362a31502" offset="0x0000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop1" size="143360">
+				<rom name="renegade disk 2 of 2 (1988)(taito america - novalogic)(trex crack).dsk" size="143360" crc="c01e6c75" sha1="b4b789285ee0c06315ffb216c413414c09a7756a" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -5667,6 +5976,18 @@
 		</part>
 	</software>
 
+	<software name="shanghai">
+		<description>Shanghai (clean crack)</description>
+		<year>1986</year>
+		<publisher>Activision</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="shanghai (1986)(activision)(trex crack).dsk" size="143360" crc="19ea813b" sha1="f0cafa24a30b7fdf2ee24d8a39485d71779e7aab" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="shogun">
 		<description>James Clavell's Shogun</description>
 		<year>1989</year>
@@ -5748,7 +6069,7 @@
 	</software>
 
 	<software name="sneakers">
-		<description>Sneakers</description>
+		<description>Sneakers (clean crack)</description>
 		<year>1981</year>
 		<publisher>Sirius Software</publisher>
 
@@ -5825,13 +6146,13 @@
 	</software>
 
 	<software name="spindizy">
-		<description>Spindizzy</description>
+		<description>Spindizzy (clean crack)</description>
 		<year>1986</year>
 		<publisher>Activision</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
-				<rom name="spindizzy.dsk" size="143360" crc="46652a8f" sha1="4c4ed34613afe050ae543e8477ce9b3371f098d7" offset="0x0000" />
+				<rom name="spindizzy (1986)(activision)(trex crack).dsk" size="143360" crc="3ee443b4" sha1="937bc75ed99a1d1134eaa276abac09a10bd9b53d" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -6039,13 +6360,14 @@
 	</software>
 
 	<software name="tapper">
-		<description>Tapper</description>
+		<description>Tapper (clean crack)</description>
+		<!-- Corrected rerip 09/19/2016 -->
 		<year>1983</year>
 		<publisher>Bally/Midway</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
-				<rom name="tapper.dsk" size="143360" crc="e86b1b99" sha1="7af7c32e3b21c0aa69290d7535b26089fc865999" offset="0x0000" />
+				<rom name="tapper (4am crack).dsk" size="143360" crc="66c7cab7" sha1="20ad51af4623623c1204bb7d9c6612aafadaf882" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -6129,6 +6451,21 @@
 		<part name="flop6" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="toy_shop_data2_b.dsk" size="143360" crc="18ff41b4" sha1="b715dc919fb98716ee1d4fa323940148d8865605" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="thief">
+		<description>Thief (clean crack)</description>
+		<!-- Apple II clone of Berzerk arcade game by Bob Flanagan - Thief: "The damn things nearly killed me." -->
+		<!-- All files transfered from a highly protected DOS 3.2 disc to a PronoDOS disc -->
+		<!-- Also includes a single file BRUNable conversion of the game -->
+		<year>1981</year>
+		<publisher>Datamost</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="thief (1981)(datamost)(san inc &amp; trex crack).dsk" size="143360" crc="e2faf16e" sha1="bedfb20b1753acb6d1babdc44143761d07bc8782" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -6618,7 +6955,7 @@
 	</software>
 
 	<software name="xevious">
-		<description>Xevious</description>
+		<description>Xevious (clean crack)</description>
 		<year>1983</year>
 		<publisher>Mindscape</publisher>
 
@@ -6708,7 +7045,7 @@
 <!-- 4am adds, A-E -->
 
 	<software name="123seqme">
-		<description>1-2-3 Sequence Me</description>
+		<description>1-2-3 Sequence Me (clean crack)</description>
 		<year>1991</year>
 		<publisher>Sunburst</publisher>
 
@@ -6720,7 +7057,7 @@
 	</software>
 
 	<software name="acedect">
-		<description>Ace Detective</description>
+		<description>Ace Detective (clean crack)</description>
 		<year>1987</year>
 		<publisher>Mindplay</publisher>
 
@@ -6737,7 +7074,7 @@
 	</software>
 
 	<software name="addsub1">
-		<description>Mathematics Courseware Series: Addition and Subtraction 1</description>
+		<description>Mathematics Courseware Series: Addition and Subtraction 1 (clean crack)</description>
 		<year>1985</year>
 		<publisher>Scott, Foresman and Company</publisher>
 
@@ -6749,7 +7086,7 @@
 	</software>
 
 	<software name="addsub2">
-		<description>Mathematics Courseware Series: Addition and Subtraction 2</description>
+		<description>Mathematics Courseware Series: Addition and Subtraction 2 (clean crack)</description>
 		<year>1985</year>
 		<publisher>Scott, Foresman and Company</publisher>
 
@@ -6761,7 +7098,7 @@
 	</software>
 
 	<software name="afrpiano">
-		<description>Alfred's Basic Piano Theory Software</description>
+		<description>Alfred's Basic Piano Theory Software (clean crack)</description>
 		<year>1986</year>
 		<publisher>Alfred Publishing Company</publisher>
 
@@ -6773,7 +7110,7 @@
 	</software>
 
 	<software name="agentusa">
-		<description>Agent USA</description>
+		<description>Agent USA (clean crack)</description>
 		<year>1984</year>
 		<publisher>Scholastic</publisher>
 
@@ -6785,7 +7122,7 @@
 	</software>
 
 	<software name="alcircus">
-		<description>Alphabet Circus</description>
+		<description>Alphabet Circus (clean crack)</description>
 		<year>1984</year>
 		<publisher>NeoSoft</publisher>
 
@@ -6797,7 +7134,7 @@
 	</software>
 
 	<software name="alcwndrl">
-		<description>Alice in Wonderland</description>
+		<description>Alice in Wonderland (clean crack)</description>
 		<year>1985</year>
 		<publisher>Windham Classics</publisher>
 
@@ -6814,7 +7151,7 @@
 	</software>
 
 	<software name="algebra2">
-		<description>Algebra 2</description>
+		<description>Algebra 2 (clean crack)</description>
 		<year>1982</year>
 		<publisher>Edu-Ware</publisher>
 
@@ -6826,7 +7163,7 @@
 	</software>
 
 	<software name="algeplus">
-		<description>Alge-Blaster Plus!</description>
+		<description>Alge-Blaster Plus! (clean crack)</description>
 		<year>1989</year>
 		<publisher>Davidson &amp; Associates, Inc.</publisher>
 		<info name="usage" value="Works with Apple II Mouse Card in slot 4: -sl4 mouse" />
@@ -6854,7 +7191,7 @@
 	</software>
 
 	<software name="algernon">
-		<description>Algernon</description>
+		<description>Algernon (clean crack)</description>
 		<year>1987</year>
 		<publisher>Sunburst</publisher>
 
@@ -6866,7 +7203,7 @@
 	</software>
 
 	<software name="algevol1">
-		<description>Algebra, Volume 1</description>
+		<description>Algebra, Volume 1 (clean crack)</description>
 		<year>1984</year>
 		<publisher>Peachtree Software</publisher>
 
@@ -6878,7 +7215,7 @@
 	</software>
 
 	<software name="alienadd">
-		<description>Alien Addition</description>
+		<description>Alien Addition (clean crack)</description>
 		<year>1982</year>
 		<publisher>Developmental Learning Materials</publisher>
 
@@ -6890,7 +7227,7 @@
 	</software>
 
 	<software name="amhisadv">
-		<description>American History Adventure</description>
+		<description>American History Adventure (clean crack)</description>
 		<year>1984</year>
 		<publisher>Queue Inc.</publisher>
 
@@ -6907,7 +7244,7 @@
 	</software>
 
 	<software name="animkngd">
-		<description>Animal Kingdom</description>
+		<description>Animal Kingdom (clean crack)</description>
 		<year>1985</year>
 		<publisher>Unicorn Software</publisher>
 
@@ -6924,7 +7261,7 @@
 	</software>
 
 	<software name="arkanoid">
-		<description>Arkanoid</description>
+		<description>Arkanoid (clean crack)</description>
 		<year>1988</year>
 		<publisher>Taito America</publisher>
 		<info name="usage" value="Works with Apple II Mouse Card in slot 4: -sl4 mouse" />
@@ -6937,7 +7274,7 @@
 	</software>
 
 	<software name="ballblzr">
-		<description>BallBlazer</description>
+		<description>BallBlazer (clean crack)</description>
 		<year>1985</year>
 		<publisher>Lucasfilm Games</publisher>
 
@@ -6949,7 +7286,7 @@
 	</software>
 
 	<software name="bandsaw">
-		<description>Band Saw and Shaper Safety</description>
+		<description>Band Saw and Shaper Safety (clean crack)</description>
 		<year>1986</year>
 		<publisher>Abraxas Basic Courseware</publisher>
 
@@ -6961,7 +7298,7 @@
 	</software>
 
 	<software name="basmathf">
-		<description>Basic Math Facts and Games</description>
+		<description>Basic Math Facts and Games (clean crack)</description>
 		<year>1981</year>
 		<publisher>Random House</publisher>
 
@@ -6973,7 +7310,7 @@
 	</software>
 
 	<software name="basvocb">
-		<description>Basic Vocabulary Builder Demo</description>
+		<description>Basic Vocabulary Builder Demo (clean crack)</description>
 		<year>1984</year>
 		<publisher>National Textbook Company</publisher>
 
@@ -6985,7 +7322,7 @@
 	</software>
 
 	<software name="beerrun">
-		<description>Beer Run</description>
+		<description>Beer Run (clean crack)</description>
 		<year>1981</year>
 		<publisher>Sirius Software</publisher>
 
@@ -6997,7 +7334,7 @@
 	</software>
 
 	<software name="bigbkmkr">
-		<description>Big Book Maker</description>
+		<description>Big Book Maker (clean crack)</description>
 		<year>1992</year>
 		<publisher>Pelican Software</publisher>
 
@@ -7024,7 +7361,7 @@
 	</software>
 
 	<software name="bingoha">
-		<description>Bingo Bugglebee Presents: Home Alone</description>
+		<description>Bingo Bugglebee Presents: Home Alone (clean crack)</description>
 		<year>1985</year>
 		<publisher>Quest Learning Systems</publisher>
 
@@ -7036,7 +7373,7 @@
 	</software>
 
 	<software name="bingoos">
-		<description>Bingo Bugglebee Presents: Outdoor Safety</description>
+		<description>Bingo Bugglebee Presents: Outdoor Safety (clean crack)</description>
 		<year>1985</year>
 		<publisher>Quest Learning Systems</publisher>
 
@@ -7048,7 +7385,7 @@
 	</software>
 
 	<software name="binomult">
-		<description>Binomial Multiplication</description>
+		<description>Binomial Multiplication (clean crack)</description>
 		<year>1984</year>
 		<publisher>Mindscape</publisher>
 
@@ -7060,7 +7397,7 @@
 	</software>
 
 	<software name="blzpdls">
-		<description>Blazing Paddles</description>
+		<description>Blazing Paddles (clean crack)</description>
 		<year>1985</year>
 		<publisher>Baudville</publisher>
 		<info name="usage" value="Works with Apple II Mouse Card in slot 4: -sl4 mouse" />
@@ -7072,7 +7409,7 @@
 	</software>
 
 	<software name="bmblgmes">
-		<description>Bumble Games</description>
+		<description>Bumble Games (clean crack)</description>
 		<year>1982</year>
 		<publisher>The Learning Company</publisher>
 
@@ -7084,7 +7421,7 @@
 	</software>
 
 	<software name="bopgwdc">
-		<description>Boppie's Great Word Chase</description>
+		<description>Boppie's Great Word Chase (clean crack)</description>
 		<year>1985</year>
 		<publisher>Developmental Learning Materials</publisher>
 
@@ -7096,7 +7433,7 @@
 	</software>
 
 	<software name="bounce">
-		<description>Bounce</description>
+		<description>Bounce (clean crack)</description>
 		<year>1988</year>
 		<publisher>Sunburst</publisher>
 
@@ -7108,7 +7445,7 @@
 	</software>
 
 	<software name="bridge40">
-		<description>Bridge 4.0</description>
+		<description>Bridge 4.0 (clean crack)</description>
 		<year>1983</year>
 		<publisher>Artworx</publisher>
 
@@ -7120,7 +7457,7 @@
 	</software>
 
 	<software name="btime">
-		<description>BurgerTime</description>
+		<description>BurgerTime (clean crack)</description>
 		<year>1982</year>
 		<publisher>Mattel Electronics</publisher>
 
@@ -7132,7 +7469,7 @@
 	</software>
 
 	<software name="bzone">
-		<description>Battlezone</description>
+		<description>Battlezone (clean crack)</description>
 		<year>1983</year>
 		<publisher>Atarisoft</publisher>
 
@@ -7144,7 +7481,7 @@
 	</software>
 
 	<software name="calgames">
-		<description>California Games</description>
+		<description>California Games (clean crack)</description>
 		<year>1987</year>
 		<publisher>Epyx</publisher>
 
@@ -7161,7 +7498,7 @@
 	</software>
 
 	<software name="calskils">
-		<description>Calendar Skills (version 08.31.86)</description>
+		<description>Calendar Skills (version 08.31.86) (clean crack)</description>
 		<year>1986</year>
 		<publisher>Hartley Courseware, Inc.</publisher>
 
@@ -7173,7 +7510,7 @@
 	</software>
 
 	<software name="casegtr">
-		<description>Case of the Great Train Robbery</description>
+		<description>Case of the Great Train Robbery (clean crack)</description>
 		<year>1986</year>
 		<publisher>Troll Associates</publisher>
 
@@ -7185,7 +7522,7 @@
 	</software>
 
 	<software name="casemisc">
-		<description>Case of the Missing Chick</description>
+		<description>Case of the Missing Chick (clean crack)</description>
 		<year>1986</year>
 		<publisher>Troll Associates</publisher>
 
@@ -7197,7 +7534,7 @@
 	</software>
 
 	<software name="catmouse">
-		<description>Cat 'n Mouse</description>
+		<description>Cat 'n Mouse (clean crack)</description>
 		<year>1986</year>
 		<publisher>Mindplay</publisher>
 
@@ -7209,7 +7546,7 @@
 	</software>
 
 	<software name="centiped">
-		<description>Centipede</description>
+		<description>Centipede (clean crack)</description>
 		<year>1983</year>
 		<publisher>Atarisoft</publisher>
 
@@ -7221,7 +7558,7 @@
 	</software>
 
 	<software name="cgotrspc">
-		<description>Curious George In Outer Space</description>
+		<description>Curious George In Outer Space (clean crack)</description>
 		<year>1989</year>
 		<publisher>Developmental Learning Materials</publisher>
 
@@ -7238,7 +7575,7 @@
 	</software>
 
 	<software name="cgshopng">
-		<description>Curious George Goes Shopping</description>
+		<description>Curious George Goes Shopping (clean crack)</description>
 		<year>1989</year>
 		<publisher>Developmental Learning Materials</publisher>
 
@@ -7255,7 +7592,7 @@
 	</software>
 
 	<software name="chalmath">
-		<description>Challenge Math</description>
+		<description>Challenge Math (clean crack)</description>
 		<year>1982</year>
 		<publisher>Sunburst</publisher>
 
@@ -7267,7 +7604,7 @@
 	</software>
 
 	<software name="chbr123">
-		<description>Charlie Brown's 1-2-3s</description>
+		<description>Charlie Brown's 1-2-3s (clean crack)</description>
 		<year>1985</year>
 		<publisher>Random House</publisher>
 
@@ -7284,7 +7621,7 @@
 	</software>
 
 	<software name="chbrabc">
-		<description>Charlie Brown's ABCs</description>
+		<description>Charlie Brown's ABCs (clean crack)</description>
 		<year>1984</year>
 		<publisher>Random House</publisher>
 
@@ -7301,7 +7638,7 @@
 	</software>
 
 	<software name="chldrnr">
-		<description>Championship Lode Runner</description>
+		<description>Championship Lode Runner (clean crack)</description>
 		<year>1984</year>
 		<publisher>Broderbund</publisher>
 
@@ -7313,7 +7650,7 @@
 	</software>
 
 	<software name="chwrest">
-		<description>Championship Wrestling</description>
+		<description>Championship Wrestling (clean crack)</description>
 		<year>1986</year>
 		<publisher>Epyx</publisher>
 
@@ -7330,7 +7667,7 @@
 	</software>
 
 	<software name="clabcalc">
-		<description>Computer Laboratory for Calculus</description>
+		<description>Computer Laboratory for Calculus (clean crack)</description>
 		<year>1985</year>
 		<publisher>The Math Lab</publisher>
 
@@ -7342,7 +7679,7 @@
 	</software>
 
 	<software name="clasanbk">
-		<description>Classifying Animals With Backbones</description>
+		<description>Classifying Animals With Backbones (clean crack)</description>
 		<year>1985</year>
 		<publisher>D.C. Heath and Company</publisher>
 
@@ -7356,7 +7693,7 @@
 	<software name="clasmate">
 		<description>ClassMate</description>
 		<year>1987</year>
-		<publisher>Davidson and Associates</publisher>
+		<publisher>Davidson and Associates (clean crack)</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
@@ -7366,7 +7703,7 @@
 	</software>
 
 	<software name="cltrcy">
-		<description>Computer Literacy: Introduction</description>
+		<description>Computer Literacy: Introduction (clean crack)</description>
 		<year>1982</year>
 		<publisher>Control Data Corporation</publisher>
 
@@ -7378,7 +7715,7 @@
 	</software>
 
 	<software name="colorme">
-		<description>Color Me</description>
+		<description>Color Me (clean crack)</description>
 		<year>1985</year>
 		<publisher>Mindscape</publisher>
 
@@ -7410,7 +7747,7 @@
 	</software>
 
 	<software name="commando">
-		<description>Commando</description>
+		<description>Commando (clean crack)</description>
 		<year>1987</year>
 		<publisher>Data East</publisher>
 
@@ -7422,7 +7759,7 @@
 	</software>
 
 	<software name="compread">
-		<description>Compu-Read 3.4</description>
+		<description>Compu-Read 3.4 (clean crack)</description>
 		<year>1982</year>
 		<publisher>Edu-Ware Services Inc.</publisher>
 
@@ -7434,7 +7771,7 @@
 	</software>
 
 	<software name="conan">
-		<description>Conan</description>
+		<description>Conan (clean crack)</description>
 		<year>1984</year>
 		<publisher>DataSoft</publisher>
 
@@ -7451,7 +7788,7 @@
 	</software>
 
 	<software name="cotntale">
-		<description>Cotton Tales</description>
+		<description>Cotton Tales (clean crack)</description>
 		<year>1987</year>
 		<publisher>Mindplay</publisher>
 
@@ -7463,7 +7800,7 @@
 	</software>
 
 	<software name="crcreate">
-		<description>Creature Creator</description>
+		<description>Creature Creator (clean crack)</description>
 		<year>1983</year>
 		<publisher>DesignWare</publisher>
 
@@ -7477,7 +7814,7 @@
 	<software name="creation">
 		<description>Creation</description>
 		<year>1988</year>
-		<publisher>Pelican Software</publisher>
+		<publisher>Pelican Software (clean crack)</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
@@ -7492,7 +7829,7 @@
 	</software>
 
 	<software name="crumbetr">
-		<description>Crumb Eater</description>
+		<description>Crumb Eater (clean crack)</description>
 		<year>1983</year>
 		<publisher>Davka Corporation</publisher>
 
@@ -7504,7 +7841,7 @@
 	</software>
 
 	<software name="cryptcbe">
-		<description>Crypto Cube</description>
+		<description>Crypto Cube (clean crack)</description>
 		<year>1983</year>
 		<publisher>DesignWare</publisher>
 
@@ -7516,7 +7853,7 @@
 	</software>
 
 	<software name="cseefft">
-		<description>Cause and Effect: What Makes It Happen?</description>
+		<description>Cause and Effect: What Makes It Happen? (clean crack)</description>
 		<year>1988</year>
 		<publisher>Troll Associates</publisher>
 
@@ -7528,7 +7865,7 @@
 	</software>
 
 	<software name="deathswd">
-		<description>Death Sword</description>
+		<description>Death Sword (clean crack)</description>
 		<year>1988</year>
 		<publisher>Epyx</publisher>
 
@@ -7540,7 +7877,7 @@
 	</software>
 
 	<software name="decdisc">
-		<description>Decimal Discovery</description>
+		<description>Decimal Discovery (clean crack)</description>
 		<year>1986</year>
 		<publisher>Developmental Learning Materials</publisher>
 
@@ -7552,7 +7889,7 @@
 	</software>
 
 	<software name="decimals">
-		<description>Decimals (ver 3.0)</description>
+		<description>Decimals (ver 3.0) (clean crack)</description>
 		<year>1982</year>
 		<publisher>Edu-Ware</publisher>
 
@@ -7564,7 +7901,7 @@
 	</software>
 
 	<software name="defender">
-		<description>Defender</description>
+		<description>Defender (clean crack)</description>
 		<year>1983</year>
 		<publisher>Atarisoft</publisher>
 
@@ -7576,7 +7913,7 @@
 	</software>
 
 	<software name="deltadrw">
-		<description>Delta Drawing</description>
+		<description>Delta Drawing (clean crack)</description>
 		<year>1982</year>
 		<publisher>Spinnaker</publisher>
 
@@ -7588,7 +7925,7 @@
 	</software>
 
 	<software name="digduga">
-		<description>Dig Dug (Atarisoft)</description>
+		<description>Dig Dug (Atarisoft) (clean crack)</description>
 		<year>1983</year>
 		<publisher>Atarisoft</publisher>
 
@@ -7600,7 +7937,7 @@
 	</software>
 
 	<software name="digdug">
-		<description>Dig Dug (Thunder Mountain)</description>
+		<description>Dig Dug (Thunder Mountain) (clean crack)</description>
 		<year>1983</year>
 		<publisher>Thunder Mountain</publisher>
 
@@ -7612,7 +7949,7 @@
 	</software>
 
 	<software name="dinodig">
-		<description>Dino Dig</description>
+		<description>Dino Dig (clean crack)</description>
 		<year>1992</year>
 		<publisher>Troll Associates</publisher>
 
@@ -7624,7 +7961,7 @@
 	</software>
 
 	<software name="dinoeggs">
-		<description>Dino Eggs</description>
+		<description>Dino Eggs (clean crack)</description>
 		<year>1983</year>
 		<publisher>Micro Fun</publisher>
 
@@ -7636,7 +7973,7 @@
 	</software>
 
 	<software name="dinosars">
-		<description>Dinosaurs</description>
+		<description>Dinosaurs (clean crack)</description>
 		<year>1984</year>
 		<publisher>Advanced Ideas, Inc.</publisher>
 
@@ -7648,7 +7985,7 @@
 	</software>
 
 	<software name="divebmbr">
-		<description>Dive Bomber</description>
+		<description>Dive Bomber (clean crack)</description>
 		<year>1988</year>
 		<publisher>Acme Animation, Inc.</publisher>
 
@@ -7660,7 +7997,7 @@
 	</software>
 
 	<software name="dkong">
-		<description>Donkey Kong</description>
+		<description>Donkey Kong (clean crack)</description>
 		<year>1983</year>
 		<publisher>Atarisoft</publisher>
 
@@ -7672,7 +8009,7 @@
 	</software>
 
 	<software name="dunzhin">
-		<description>Dunzhin</description>
+		<description>Dunzhin (clean crack)</description>
 		<year>1982</year>
 		<publisher>Screenplay</publisher>
 
@@ -7684,7 +8021,7 @@
 	</software>
 
 	<software name="dynoqst">
-		<description>Dyno-Quest</description>
+		<description>Dyno-Quest (clean crack)</description>
 		<year>1984</year>
 		<publisher>Mindplay</publisher>
 
@@ -7696,7 +8033,7 @@
 	</software>
 
 	<software name="dyohachd">
-		<description>Design Your Own Home: Architectural Design</description>
+		<description>Design Your Own Home: Architectural Design (clean crack)</description>
 		<year>1984</year>
 		<publisher>Avant-Garde Publishing Corp.</publisher>
 
@@ -7718,7 +8055,7 @@
 	</software>
 
 	<software name="dyoharch">
-		<description>Design Your Own Home: Architectural</description>
+		<description>Design Your Own Home: Architectural (clean crack)</description>
 		<year>1983</year>
 		<publisher>Avant-Garde Publishing Corp.</publisher>
 
@@ -7730,7 +8067,7 @@
 	</software>
 
 	<software name="dyoh">
-		<description>Design Your Own Home: Interior Design</description>
+		<description>Design Your Own Home: Interior Design (clean crack)</description>
 		<year>1986</year>
 		<publisher>Avant-Garde Publishing Corp.</publisher>
 
@@ -7752,7 +8089,7 @@
 	</software>
 
 	<software name="easyabc">
-		<description>Easy as ABC</description>
+		<description>Easy as ABC (clean crack)</description>
 		<year>1984</year>
 		<publisher>Springboard Software</publisher>
 
@@ -7764,7 +8101,7 @@
 	</software>
 
 	<software name="easyrddm">
-		<description>Easy Reader Demo</description>
+		<description>Easy Reader Demo (clean crack)</description>
 		<year>1983</year>
 		<publisher>American Educational Computer, Inc.</publisher>
 
@@ -7791,7 +8128,7 @@
 	</software>
 
 	<software name="easystr">
-		<description>Easy Street</description>
+		<description>Easy Street (clean crack)</description>
 		<year>1988</year>
 		<publisher>Mindplay</publisher>
 
@@ -7803,7 +8140,7 @@
 	</software>
 
 	<software name="ecryfarm">
-		<description>Electric Crayon Fun On The Farm</description>
+		<description>Electric Crayon Fun On The Farm (clean crack)</description>
 		<year>1986</year>
 		<publisher>Polarware</publisher>
 		<info name="usage" value="Works with Apple II Mouse Card in slot 4: -sl4 mouse" />
@@ -7816,7 +8153,7 @@
 	</software>
 
 	<software name="educalc">
-		<description>Edu-Calc</description>
+		<description>Edu-Calc (clean crack)</description>
 		<year>1985</year>
 		<publisher>Grolier</publisher>
 
@@ -7833,7 +8170,7 @@
 	</software>
 
 	<software name="egyc">
-		<description>Early Games For Young Children</description>
+		<description>Early Games For Young Children (clean crack)</description>
 		<year>1982</year>
 		<publisher>Springboard</publisher>
 
@@ -7845,7 +8182,7 @@
 	</software>
 
 	<software name="euronat">
-		<description>European Nations And Locations</description>
+		<description>European Nations And Locations (clean crack)</description>
 		<year>1985</year>
 		<publisher>DesignWare, Inc.</publisher>
 
@@ -7857,7 +8194,7 @@
 	</software>
 
 	<software name="expsctmp">
-		<description>Exploring Science: Temperature</description>
+		<description>Exploring Science: Temperature (clean crack)</description>
 		<year>1988</year>
 		<publisher>Sunburst</publisher>
 
@@ -7871,7 +8208,7 @@
 <!-- end 4am adds, A-E -->
 <!-- 4am adds, F-L -->
 	<software name="1stdegle">
-		<description>First Degree Linear Equations</description>
+		<description>First Degree Linear Equations (clean crack)</description>
 		<year>1984</year>
 		<publisher>Mindscape</publisher>
 
@@ -7883,7 +8220,7 @@
 	</software>
 
 	<software name="facemkr">
-		<description>Facemaker</description>
+		<description>Facemaker (clean crack)</description>
 		<year>1982</year>
 		<publisher>Spinnaker</publisher>
 
@@ -7895,7 +8232,7 @@
 	</software>
 
 	<software name="falcons">
-		<description>Falcons</description>
+		<description>Falcons (clean crack)</description>
 		<year>1981</year>
 		<publisher>Piccadilly Software</publisher>
 
@@ -7907,7 +8244,7 @@
 	</software>
 
 	<software name="fantlrd">
-		<description>Professor Davensteev's Fantasy Land (Red Level)</description>
+		<description>Professor Davensteev's Fantasy Land (Red Level) (clean crack)</description>
 		<year>1983</year>
 		<publisher>Learning Well / Methods &amp; Solutions</publisher>
 
@@ -7919,7 +8256,7 @@
 	</software>
 
 	<software name="fctalgex">
-		<description>Factoring Algebraic Expressions</description>
+		<description>Factoring Algebraic Expressions (clean crack)</description>
 		<year>1984</year>
 		<publisher>Mindscape</publisher>
 
@@ -7931,7 +8268,7 @@
 	</software>
 
 	<software name="finfacts">
-		<description>Financial Facts</description>
+		<description>Financial Facts (clean crack)</description>
 		<year>1981</year>
 		<publisher>Advanced Operating Systems</publisher>
 
@@ -7943,7 +8280,7 @@
 	</software>
 
 	<software name="flshsphc">
-		<description>Flash Spell Helicopter</description>
+		<description>Flash Spell Helicopter (clean crack)</description>
 		<year>1983</year>
 		<publisher>Microcomputer Workships Courseware</publisher>
 
@@ -7955,7 +8292,7 @@
 	</software>
 
 	<software name="flycolor">
-		<description>Flying Colors</description>
+		<description>Flying Colors (clean crack)</description>
 		<year>1983</year>
 		<publisher>The Computer Colorworks</publisher>
 
@@ -7967,7 +8304,7 @@
 	</software>
 
 	<software name="forcemtn">
-		<description>Force And Motion</description>
+		<description>Force And Motion (clean crack)</description>
 		<year>1990</year>
 		<publisher>Queue, Inc.</publisher>
 
@@ -7984,7 +8321,7 @@
 	</software>
 
 	<software name="fornext">
-		<description>FOR Your NEXT Adventure: FOR-NEXT Loops</description>
+		<description>FOR Your NEXT Adventure: FOR-NEXT Loops (clean crack)</description>
 		<year>1985</year>
 		<publisher>Sunburst</publisher>
 
@@ -7996,7 +8333,7 @@
 	</software>
 
 	<software name="frctnoid">
-		<description>Fraction-oids</description>
+		<description>Fraction-oids (clean crack)</description>
 		<year>1989</year>
 		<publisher>Mindplay</publisher>
 
@@ -8008,7 +8345,7 @@
 	</software>
 
 	<software name="frctns2">
-		<description>Fractions II</description>
+		<description>Fractions II (clean crack)</description>
 		<year>1987</year>
 		<publisher>Silver Burdett Company</publisher>
 
@@ -8020,7 +8357,7 @@
 	</software>
 
 	<software name="frctntut">
-		<description>Fraction Tutorial</description>
+		<description>Fraction Tutorial (clean crack)</description>
 		<year>19??</year>
 		<publisher>Opportunities For Learning</publisher>
 
@@ -8037,7 +8374,7 @@
 	</software>
 
 	<software name="fredpzad">
-		<description>Freddy's Puzzling Adventures</description>
+		<description>Freddy's Puzzling Adventures (clean crack)</description>
 		<year>1984</year>
 		<publisher>Developmental Learning Materials</publisher>
 
@@ -8049,7 +8386,7 @@
 	</software>
 
 	<software name="frenchvb">
-		<description>French Vocabulary Builder</description>
+		<description>French Vocabulary Builder (clean crack)</description>
 		<year>1982</year>
 		<publisher>Control Data Corporation</publisher>
 
@@ -8061,7 +8398,7 @@
 	</software>
 
 	<software name="frogdog">
-		<description>Frogs, Dogs, Kittens, and Kids 1</description>
+		<description>Frogs, Dogs, Kittens, and Kids 1 (clean crack)</description>
 		<year>1988</year>
 		<publisher>Hartley Courseware</publisher>
 
@@ -8083,7 +8420,7 @@
 	</software>
 
 	<software name="frogger2">
-		<description>Frogger II: Threedeep</description>
+		<description>Frogger II: Threedeep (clean crack)</description>
 		<year>1984</year>
 		<publisher>Sega Enterprises Inc.</publisher>
 
@@ -8095,7 +8432,7 @@
 	</software>
 
 	<software name="frogger">
-		<description>Frogger</description>
+		<description>Frogger (clean crack)</description>
 		<year>1981</year>
 		<publisher>Sierra On-Line</publisher>
 
@@ -8107,7 +8444,7 @@
 	</software>
 
 	<software name="frogjon">
-		<description>Frog Jump Ordering Numbers</description>
+		<description>Frog Jump Ordering Numbers (clean crack)</description>
 		<year>1985</year>
 		<publisher>Scott, Foresman and Company</publisher>
 
@@ -8119,7 +8456,7 @@
 	</software>
 
 	<software name="galaxat">
-		<description>Galaxian (Atarisoft)</description>
+		<description>Galaxian (Atarisoft) (clean crack)</description>
 		<year>1983</year>
 		<publisher>Atarisoft</publisher>
 
@@ -8131,7 +8468,7 @@
 	</software>
 
 	<software name="galaxian">
-		<description>Galaxian (Thunder Mountain)</description>
+		<description>Galaxian (Thunder Mountain) (clean crack)</description>
 		<year>1983</year>
 		<publisher>Thunder Mountain</publisher>
 
@@ -8143,7 +8480,7 @@
 	</software>
 
 	<software name="garfleyw">
-		<description>Garfield Eat Your Words</description>
+		<description>Garfield Eat Your Words (clean crack)</description>
 		<year>1985</year>
 		<publisher>Random House</publisher>
 
@@ -8160,7 +8497,7 @@
 	</software>
 
 	<software name="genemach">
-		<description>Gene Machine (version 2.0)</description>
+		<description>Gene Machine (version 2.0) (clean crack)</description>
 		<year>1983</year>
 		<publisher>HRM Software</publisher>
 
@@ -8172,7 +8509,7 @@
 	</software>
 
 	<software name="gertrude">
-		<description>Gertrude's Secrets (version 1.2)</description>
+		<description>Gertrude's Secrets (version 1.2) (clean crack)</description>
 		<year>1982</year>
 		<publisher>The Learning Company</publisher>
 
@@ -8184,7 +8521,7 @@
 	</software>
 
 	<software name="gramgrem">
-		<description>Grammar Gremlins</description>
+		<description>Grammar Gremlins (clean crack)</description>
 		<year>1986</year>
 		<publisher>Davidson &amp; Associates, Inc.</publisher>
 
@@ -8201,7 +8538,7 @@
 	</software>
 
 	<software name="grammst2">
-		<description>Grammar Mastery II</description>
+		<description>Grammar Mastery II (clean crack)</description>
 		<year>1987</year>
 		<publisher>American Language Academy</publisher>
 
@@ -8293,7 +8630,7 @@
 	</software>
 
 	<software name="greetcrd">
-		<description>Greeting Card Maker</description>
+		<description>Greeting Card Maker (clean crack)</description>
 		<year>1986</year>
 		<publisher>Activision</publisher>
 
@@ -8305,7 +8642,7 @@
 	</software>
 
 	<software name="gremlins">
-		<description>Gremlins</description>
+		<description>Gremlins (clean crack)</description>
 		<year>1984</year>
 		<publisher>Atarisoft</publisher>
 
@@ -8317,7 +8654,7 @@
 	</software>
 
 	<software name="grphlnfc">
-		<description>Graphing Linear Functions</description>
+		<description>Graphing Linear Functions (clean crack)</description>
 		<year>1984</year>
 		<publisher>Microcomputer Workshops Courseware</publisher>
 
@@ -8329,7 +8666,7 @@
 	</software>
 
 	<software name="gulfstrk">
-		<description>Gulf Strike</description>
+		<description>Gulf Strike (clean crack)</description>
 		<year>1985</year>
 		<publisher>The Avalon Hill Game Company</publisher>
 
@@ -8340,8 +8677,21 @@
 		</part>
 	</software>
 
+	<software name="gumball">
+		<description>Gumball (clean crack)</description>
+		<!-- Corrected image 09/24/2016 -->
+		<year>1983</year>
+		<publisher>Broderbund</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="gumball (4am &amp; san inc crack).dsk" size="143360" crc="56e68a48" sha1="6d0e3652cce177637f332a6df34d7fb133cad2c7" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="heredog">
-		<description>Heredity Dog</description>
+		<description>Heredity Dog (clean crack)</description>
 		<year>1983</year>
 		<publisher>HRM Software</publisher>
 
@@ -8353,7 +8703,7 @@
 	</software>
 
 	<software name="heydidle">
-		<description>Hey Diddle Diddle</description>
+		<description>Hey Diddle Diddle (clean crack)</description>
 		<year>1983</year>
 		<publisher>Spinnaker</publisher>
 
@@ -8365,7 +8715,7 @@
 	</software>
 
 	<software name="homehlpr">
-		<description>Homework Helper: Writing</description>
+		<description>Homework Helper: Writing (clean crack)</description>
 		<year>1985</year>
 		<publisher>Spinnaker</publisher>
 
@@ -8402,7 +8752,7 @@
 	</software>
 
 	<software name="homewrtr">
-		<description>Homework Writer</description>
+		<description>Homework Writer (clean crack)</description>
 		<year>1988</year>
 		<publisher>Scholastic, Inc.</publisher>
 
@@ -8419,7 +8769,7 @@
 	</software>
 
 	<software name="housefir">
-		<description>House-A-Fire!</description>
+		<description>House-A-Fire! (clean crack)</description>
 		<year>1988</year>
 		<publisher>Decision Development Co</publisher>
 
@@ -8436,7 +8786,7 @@
 	</software>
 
 	<software name="howwest">
-		<description>How The West Was One + Three x Four</description>
+		<description>How The West Was One + Three x Four (clean crack)</description>
 		<year>1987</year>
 		<publisher>Sunburst</publisher>
 
@@ -8448,7 +8798,7 @@
 	</software>
 
 	<software name="impmiss2">
-		<description>Impossible Mission II</description>
+		<description>Impossible Mission II (clean crack)</description>
 		<year>1988</year>
 		<publisher>Epyx</publisher>
 
@@ -8465,7 +8815,7 @@
 	</software>
 
 	<software name="invscmth">
-		<description>Investigating Secondary Mathematics With Computers</description>
+		<description>Investigating Secondary Mathematics With Computers (clean crack)</description>
 		<year>1985</year>
 		<publisher>University of Massachusetts</publisher>
 
@@ -8482,7 +8832,7 @@
 	</software>
 
 	<software name="jackbnst">
-		<description>Jack And The Beanstalk</description>
+		<description>Jack And The Beanstalk (clean crack)</description>
 		<year>1985</year>
 		<publisher>HRM Software</publisher>
 
@@ -8494,7 +8844,7 @@
 	</software>
 
 	<software name="jmpmthfl">
-		<description>Jumping Math Flash</description>
+		<description>Jumping Math Flash (clean crack)</description>
 		<year>1988</year>
 		<publisher>Mindscape</publisher>
 
@@ -8505,8 +8855,25 @@
 		</part>
 	</software>
 
+	<software name="jumpman">
+		<description>Jumpman (clean crack)</description>
+		<year>1983</year>
+		<publisher>Epyx</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="jumpman (4am crack) side a.dsk" size="143360" crc="4f291aa3" sha1="1c43eac018c0a04e70177cf413d7b20b4eaa3a89" offset="0x0000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="jumpman (4am crack) side b.dsk" size="143360" crc="90312d4c" sha1="0ba7c41afbb31c93e4dc602da12cf577876dbc2c" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="junghunt">
-		<description>Jungle Hunt</description>
+		<description>Jungle Hunt (clean crack)</description>
 		<year>1984</year>
 		<publisher>Atarisoft</publisher>
 
@@ -8518,7 +8885,7 @@
 	</software>
 
 	<software name="kenuston">
-		<description>Ken Uston's Professional Blackjack (v1.23)</description>
+		<description>Ken Uston's Professional Blackjack (v1.23) (clean crack)</description>
 		<year>1983</year>
 		<publisher>Intelligent Statements, Inc.</publisher>
 
@@ -8530,7 +8897,7 @@
 	</software>
 
 	<software name="kidskeys">
-		<description>Kids On Keys</description>
+		<description>Kids On Keys (clean crack)</description>
 		<year>1983</year>
 		<publisher>Spinnaker</publisher>
 
@@ -8542,7 +8909,7 @@
 	</software>
 
 	<software name="kindrcmp">
-		<description>Kindercomp</description>
+		<description>Kindercomp (clean crack)</description>
 		<year>1983</year>
 		<publisher>Spinnaker</publisher>
 
@@ -8554,7 +8921,7 @@
 	</software>
 
 	<software name="kittenkf">
-		<description>Kittens, Kids, And A Frog (version 01.11.85)</description>
+		<description>Kittens, Kids, And A Frog (version 01.11.85) (clean crack)</description>
 		<year>1985</year>
 		<publisher>Hartley Courseware, Inc.</publisher>
 
@@ -8571,7 +8938,7 @@
 	</software>
 
 	<software name="kmwldhis">
-		<description>Knowledge Master World History 1</description>
+		<description>Knowledge Master World History 1 (clean crack)</description>
 		<year>1987</year>
 		<publisher>Academic Hallmarks</publisher>
 
@@ -8583,7 +8950,7 @@
 	</software>
 
 	<software name="krelllgo">
-		<description>Krell's Logo</description>
+		<description>Krell's Logo (clean crack)</description>
 		<year>1981</year>
 		<publisher>Krell</publisher>
 
@@ -8595,7 +8962,7 @@
 	</software>
 
 	<software name="viewkill">
-		<description>James Bond 007 In: A View To A Kill</description>
+		<description>James Bond 007 In: A View To A Kill (clean crack)</description>
 		<year>1985</year>
 		<publisher>Mindscape</publisher>
 

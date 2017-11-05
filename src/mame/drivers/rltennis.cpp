@@ -1,4 +1,4 @@
-// license:LGPL-2.1+
+// license:BSD-3-Clause
 // copyright-holders:Tomasz Slanina
 /****************************************************************************************
 Reality Tennis - (c) 1993 TCH
@@ -60,12 +60,17 @@ player - when there's nothing to play - first, empty 2k of ROMs are selected.
 
 
 ****************************************************************************************/
+
 #include "emu.h"
 #include "includes/rltennis.h"
+
 #include "cpu/m68000/m68000.h"
 #include "machine/nvram.h"
-#include "sound/dac.h"
+#include "sound/volt_reg.h"
 #include "video/ramdac.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 #define RLT_REFRESH_RATE   60
 #define RLT_TIMER_FREQ     (RLT_REFRESH_RATE*256)
@@ -141,8 +146,8 @@ TIMER_CALLBACK_MEMBER(rltennis_state::sample_player)
 	}
 	++m_dac_counter; /* update low address bits */
 
-	m_dac_1->write_signed8(m_samples_1[m_sample_rom_offset_1 + ( m_dac_counter&0x7ff )]);
-	m_dac_2->write_unsigned8(m_samples_2[m_sample_rom_offset_2 + ( m_dac_counter&0x7ff )]);
+	m_dac1->write(m_samples_1[m_sample_rom_offset_1 + (m_dac_counter & 0x7ff)]);
+	m_dac2->write(m_samples_2[m_sample_rom_offset_2 + (m_dac_counter & 0x7ff)]);
 	m_timer->adjust(attotime::from_hz( RLT_TIMER_FREQ ));
 }
 
@@ -174,11 +179,11 @@ void rltennis_state::machine_reset()
 	m_timer->adjust(attotime::from_hz(RLT_TIMER_FREQ));
 }
 
-static ADDRESS_MAP_START( ramdac_map, AS_0, 8, rltennis_state )
+static ADDRESS_MAP_START( ramdac_map, 0, 8, rltennis_state )
 	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb888_w)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( rltennis, rltennis_state )
+static MACHINE_CONFIG_START( rltennis )
 
 	MCFG_CPU_ADD("maincpu", M68000, RLT_XTAL/2) /* 68000P8  ??? */
 	MCFG_CPU_PROGRAM_MAP(rltennis_main)
@@ -198,13 +203,13 @@ static MACHINE_CONFIG_START( rltennis, rltennis_state )
 	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
 	MCFG_RAMDAC_SPLIT_READ(1)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
-	MCFG_DAC_ADD("dac1")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", .5)
-	MCFG_DAC_ADD("dac2")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", .5)
-
+	MCFG_SOUND_ADD("dac1", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
+	MCFG_SOUND_ADD("dac2", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac1", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 ROM_START( rltennis )
@@ -231,4 +236,4 @@ ROM_START( rltennis )
 	ROM_LOAD( "tennis_3.u52", 0x00000, 0x80000, CRC(517dcd0e) SHA1(b2703e185ee8cf7e115ea07151e7bee8be34948b) )
 ROM_END
 
-GAME( 1993, rltennis,    0, rltennis,    rltennis, driver_device,    0, ROT0,  "TCH", "Reality Tennis", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, rltennis,    0, rltennis,    rltennis, rltennis_state,    0, ROT0,  "TCH", "Reality Tennis", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

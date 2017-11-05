@@ -17,6 +17,7 @@
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
 #include "machine/serflash.h"
+#include "screen.h"
 
 //#include "machine/i2cmem.h"
 
@@ -32,7 +33,7 @@ public:
 		m_serflash(*this, "flash")
 	{ }
 
-	required_shared_ptr<UINT32> m_mainram;
+	required_shared_ptr<uint32_t> m_mainram;
 	required_device<cpu_device> m_maincpu;
 	required_device<serflash_device> m_serflash;
 
@@ -45,11 +46,8 @@ public:
 	DECLARE_DRIVER_INIT(nexus3d);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_nexus3d(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_nexus3d(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
-
-
-
 
 
 
@@ -108,7 +106,7 @@ void nexus3d_state::video_start()
 {
 }
 
-UINT32 nexus3d_state::screen_update_nexus3d(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t nexus3d_state::screen_update_nexus3d(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
@@ -117,7 +115,7 @@ void nexus3d_state::machine_reset()
 {
 }
 
-static MACHINE_CONFIG_START( nexus3d, nexus3d_state )
+static MACHINE_CONFIG_START( nexus3d )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", ARM920T, 200000000)
@@ -175,5 +173,5 @@ DRIVER_INIT_MEMBER(nexus3d_state,nexus3d)
 	memcpy( m_mainram, memregion("flash")->base(), 4 * 1024);
 }
 
-GAME( 2005, acheart,  0, nexus3d, nexus3d, nexus3d_state, nexus3d, ROT0, "Examu", "Arcana Heart",MACHINE_IS_SKELETON )
-GAME( 2006, acheartf, 0, nexus3d, nexus3d, nexus3d_state, nexus3d, ROT0, "Examu", "Arcana Heart Full",MACHINE_IS_SKELETON )
+GAME( 2005, acheart,  0, nexus3d, nexus3d, nexus3d_state, nexus3d, ROT0, "Examu", "Arcana Heart",      MACHINE_IS_SKELETON )
+GAME( 2006, acheartf, 0, nexus3d, nexus3d, nexus3d_state, nexus3d, ROT0, "Examu", "Arcana Heart Full", MACHINE_IS_SKELETON )

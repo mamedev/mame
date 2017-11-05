@@ -21,41 +21,45 @@
   - understand reg 9
   - understand other writes to $90-$ff area
 
+  Links:
+  https://siliconpr0n.org/map/capcom/dl-1425
+
 ***************************************************************************/
 
 #include "emu.h"
 #include "qsound.h"
 
 // device type definition
-const device_type QSOUND = &device_creator<qsound_device>;
+DEFINE_DEVICE_TYPE(QSOUND, qsound_device, "qsound", "Q-Sound")
 
 
-// program map for the DSP (points to internal 4096 words of internal ROM)
+// program map for the DSP16A; note that apparently Western Electric/AT&T
+// expanded the size of the available mask ROM on the DSP16A over time after
+// it was released.
+// As originally released, the DSP16A had 4096 words of ROM, but the DL-1425
+// chip decapped by siliconpr0n clearly shows 3x as much ROM as that, a total
+// of 12288 words of internal ROM.
+// The older DSP16 non-a part has 2048 words of ROM.
 static ADDRESS_MAP_START( dsp16_program_map, AS_PROGRAM, 16, qsound_device )
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
+	AM_RANGE(0x0000, 0x2fff) AM_ROM
 ADDRESS_MAP_END
 
 
-// data map for the DSP (the dsp16 appears to use 2048 words of internal RAM)
+// data map for the DSP16A; again, Western Electric/AT&T expanded the size of
+// the ram over time.
+// As originally released, the DSP16A had 1024 words of internal RAM,
+// but this was expanded to 2048 words in the DL-1425 decap.
+// The older DSP16 non-a part has 512 words of RAM.
 static ADDRESS_MAP_START( dsp16_data_map, AS_DATA, 16, qsound_device )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 ADDRESS_MAP_END
 
 
-// machine fragment
-static MACHINE_CONFIG_FRAGMENT( qsound )
-	MCFG_CPU_ADD("qsound", DSP16, QSOUND_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(dsp16_program_map)
-	MCFG_CPU_DATA_MAP(dsp16_data_map)
-MACHINE_CONFIG_END
-
-
 // ROM definition for the Qsound program ROM
-// NOTE: ROM is marked as bad since a handful of questionable bits haven't been fully examined.
 ROM_START( qsound )
-	ROM_REGION( 0x2000, "qsound", 0 )
-	ROM_LOAD16_WORD( "qsound.bin", 0x0000, 0x2000, BAD_DUMP CRC(059c847d) SHA1(229cead1be2f86733dd80573d4983ba482355ece) )
+	ROM_REGION( 0x6000, "qsound", 0 )
+	ROM_LOAD16_WORD( "dl-1425.bin", 0x0000, 0x6000, CRC(d6cf5ef5) SHA1(555f50fe5cdf127619da7d854c03f4a244a0c501) )
 ROM_END
 
 
@@ -67,8 +71,8 @@ ROM_END
 //  qsound_device - constructor
 //-------------------------------------------------
 
-qsound_device::qsound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, QSOUND, "Q-Sound", tag, owner, clock, "qsound", __FILE__),
+qsound_device::qsound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, QSOUND, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
 		m_cpu(*this, "qsound"),
 		m_sample_rom(*this, DEVICE_SELF),
@@ -83,21 +87,21 @@ qsound_device::qsound_device(const machine_config &mconfig, const char *tag, dev
 //  internal ROM region
 //-------------------------------------------------
 
-const rom_entry *qsound_device::device_rom_region() const
+const tiny_rom_entry *qsound_device::device_rom_region() const
 {
 	return ROM_NAME( qsound );
 }
 
 
 //-------------------------------------------------
-//  machine_config_additions - return a pointer to
-//  the device's machine fragment
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor qsound_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( qsound );
-}
+MACHINE_CONFIG_MEMBER( qsound_device::device_add_mconfig )
+	MCFG_CPU_ADD("qsound", DSP16, QSOUND_CLOCK)
+	MCFG_CPU_PROGRAM_MAP(dsp16_program_map)
+	MCFG_CPU_DATA_MAP(dsp16_data_map)
+MACHINE_CONFIG_END
 
 
 //-------------------------------------------------
@@ -182,7 +186,7 @@ void qsound_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 					}
 				}
 
-				INT8 sample = read_sample(elem.bank | elem.address);
+				int8_t sample = read_sample(elem.bank | elem.address);
 				*lmix++ += ((sample * elem.lvol * elem.vol) >> 14);
 				*rmix++ += ((sample * elem.rvol * elem.vol) >> 14);
 			}
@@ -222,7 +226,7 @@ READ8_MEMBER(qsound_device::qsound_r)
 }
 
 
-void qsound_device::write_data(UINT8 address, UINT16 data)
+void qsound_device::write_data(uint8_t address, uint16_t data)
 {
 	int ch = 0, reg;
 

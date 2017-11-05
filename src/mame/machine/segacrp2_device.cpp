@@ -47,10 +47,10 @@
 #include "emu.h"
 #include "segacrp2_device.h"
 
-static void decode(UINT8 *rom, UINT8 *decrypted,
-					const UINT8 xor_table[128],const int swap_table[128])
+static void decode(uint8_t *rom, uint8_t *decrypted,
+					const uint8_t xor_table[128],const int swap_table[128])
 {
-	static const UINT8 swaptable[24][4] =
+	static const uint8_t swaptable[24][4] =
 	{
 		{ 6,4,2,0 }, { 4,6,2,0 }, { 2,4,6,0 }, { 0,4,2,6 },
 		{ 6,2,4,0 }, { 6,0,2,4 }, { 6,4,0,2 }, { 2,6,4,0 },
@@ -64,8 +64,8 @@ static void decode(UINT8 *rom, UINT8 *decrypted,
 	for (int A = 0x0000;A < 0x8000;A++)
 	{
 		int row;
-		UINT8 src;
-		const UINT8 *tbl;
+		uint8_t src;
+		const uint8_t *tbl;
 
 
 		src = rom[A];
@@ -84,23 +84,20 @@ static void decode(UINT8 *rom, UINT8 *decrypted,
 	}
 }
 
+DEFINE_DEVICE_TYPE(SEGA_315_5179, sega_315_5179_device, "sega_315_5179", "Sega 315-5179")
+DEFINE_DEVICE_TYPE(SEGA_315_5178, sega_315_5178_device, "sega_315_5178", "Sega 315-5178")
+DEFINE_DEVICE_TYPE(SEGA_315_5177, sega_315_5177_device, "sega_315_5177", "Sega 315-5177") // also seen as 317-5000
+DEFINE_DEVICE_TYPE(SEGA_315_5176, sega_315_5176_device, "sega_315_5176", "Sega 315-5176") // TODO!
+DEFINE_DEVICE_TYPE(SEGA_315_5162, sega_315_5162_device, "sega_315_5162", "Sega 315-5162")
 
-const device_type SEGACRP2_Z80 = &device_creator<segacrp2_z80_device>;
-
-const device_type SEGA_315_5179 = &device_creator<sega_315_5179_device>;
-const device_type SEGA_315_5178 = &device_creator<sega_315_5178_device>;
-const device_type SEGA_315_5177 = &device_creator<sega_315_5177_device>; // also seen as 317-5000
-const device_type SEGA_315_5176 = &device_creator<sega_315_5176_device>; // TODO!
-const device_type SEGA_315_5162 = &device_creator<sega_315_5162_device>;
-
-const device_type SEGA_317_0004 = &device_creator<sega_317_0004_device>;
-const device_type SEGA_317_0005 = &device_creator<sega_317_0005_device>;
-const device_type SEGA_317_0006 = &device_creator<sega_317_0006_device>;
-const device_type SEGA_317_0007 = &device_creator<sega_317_0007_device>;
+DEFINE_DEVICE_TYPE(SEGA_317_0004, sega_317_0004_device, "sega_317_0004", "Sega 317-0004")
+DEFINE_DEVICE_TYPE(SEGA_317_0005, sega_317_0005_device, "sega_317_0005", "Sega 317-0005")
+DEFINE_DEVICE_TYPE(SEGA_317_0006, sega_317_0006_device, "sega_317_0006", "Sega 317-0006")
+DEFINE_DEVICE_TYPE(SEGA_317_0007, sega_317_0007_device, "sega_317_0007", "Sega 317-0007")
 
 
 
-segacrp2_z80_device::segacrp2_z80_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : z80_device(mconfig, SEGACRP2_Z80, "Z80 SegaCrypt2", tag, owner, clock, "z80_sega2", __FILE__) {}
+segacrp2_z80_device::segacrp2_z80_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) : z80_device(mconfig, type, tag, owner, clock) {}
 void segacrp2_z80_device::device_start() { z80_device::device_start(); decrypt();  }
 void segacrp2_z80_device::device_reset() { z80_device::device_reset(); }
 void segacrp2_z80_device::decrypt() { }
@@ -112,11 +109,12 @@ void segacrp2_z80_device::set_decrypted_tag(device_t &device, const char* decryp
 }
 
 
-sega_315_5177_device::sega_315_5177_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : segacrp2_z80_device(mconfig, tag, owner, clock) {}
+sega_315_5177_device::sega_315_5177_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : segacrp2_z80_device(mconfig, SEGA_315_5177, tag, owner, clock) {}
+
 void sega_315_5177_device::decrypt()
 {
 	// 315-5177
-	static const UINT8 xor_table[128] =
+	static const uint8_t xor_table[128] =
 	{
 		0x04,0x54,0x51,0x15,0x40,0x44,0x01,0x51,0x55,0x10,0x44,0x41,
 		0x05,0x55,0x50,0x14,0x41,0x45,0x00,0x50,0x54,0x11,0x45,0x40,
@@ -165,11 +163,12 @@ void sega_315_5177_device::decrypt()
 		20,20,20,20,20,
 		21,21,
 	};
-	decode(memregion(tag())->base(), (UINT8*)memshare(m_decrypted_tag)->ptr(), xor_table, swap_table);
+	decode(memregion(tag())->base(), (uint8_t*)memshare(m_decrypted_tag)->ptr(), xor_table, swap_table);
 }
 
 
-sega_315_5176_device::sega_315_5176_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : segacrp2_z80_device(mconfig, tag, owner, clock) {}
+sega_315_5176_device::sega_315_5176_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : segacrp2_z80_device(mconfig, SEGA_315_5176, tag, owner, clock) {}
+
 void sega_315_5176_device::decrypt()
 {
 	// 315-5176
@@ -177,11 +176,11 @@ void sega_315_5176_device::decrypt()
 }
 
 
-sega_315_5162_device::sega_315_5162_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : segacrp2_z80_device(mconfig, tag, owner, clock) {}
+sega_315_5162_device::sega_315_5162_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : segacrp2_z80_device(mconfig, SEGA_315_5162, tag, owner, clock) {}
 void sega_315_5162_device::decrypt()
 {
 	// 315-5162
-	static const UINT8 xor_table[128] =
+	static const uint8_t xor_table[128] =
 	{
 				0x40,0x10,0x50,0x04,0x44,0x14,0x54,0x01,0x41,0x11,0x51,0x05,0x45,0x15,0x55,
 		0x00,0x40,0x10,0x50,0x04,0x44,0x14,0x54,0x01,0x41,0x11,0x51,0x05,0x45,0x15,0x55,
@@ -207,16 +206,16 @@ void sega_315_5162_device::decrypt()
 		12,
 	};
 
-	decode(memregion(tag())->base(), (UINT8*)memshare(m_decrypted_tag)->ptr(), xor_table, swap_table);
+	decode(memregion(tag())->base(), (uint8_t*)memshare(m_decrypted_tag)->ptr(), xor_table, swap_table);
 }
 
 
 
 
-sega_315_5178_device::sega_315_5178_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : segacrp2_z80_device(mconfig, tag, owner, clock) {}
+sega_315_5178_device::sega_315_5178_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : segacrp2_z80_device(mconfig, SEGA_315_5178, tag, owner, clock) {}
 void sega_315_5178_device::decrypt()
 {   // 315-5178
-	static const UINT8 xor_table[128] =
+	static const uint8_t xor_table[128] =
 	{
 		0x00,0x55,0x45,0x05,0x11,0x41,0x01,0x14,0x44,0x50,0x10,
 		0x00,0x55,0x15,0x05,0x51,0x41,0x01,0x14,0x44,0x04,0x10,
@@ -256,15 +255,15 @@ void sega_315_5178_device::decrypt()
 		14, 8,10,12,14, 8,10,
 	};
 
-	decode(memregion(tag())->base(), (UINT8*)memshare(m_decrypted_tag)->ptr(), xor_table, swap_table);
+	decode(memregion(tag())->base(), (uint8_t*)memshare(m_decrypted_tag)->ptr(), xor_table, swap_table);
 }
 
 
 
-sega_315_5179_device::sega_315_5179_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : segacrp2_z80_device(mconfig, tag, owner, clock) {}
+sega_315_5179_device::sega_315_5179_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : segacrp2_z80_device(mconfig, SEGA_315_5179, tag, owner, clock) {}
 void sega_315_5179_device::decrypt()
 {   // 315-5179
-	static const UINT8 xor_table[128] =
+	static const uint8_t xor_table[128] =
 	{
 		0x00,0x45,0x41,0x14,0x10,0x55,0x51,0x01,0x04,0x40,0x45,0x11,0x14,0x50,
 		0x00,0x05,0x41,0x44,0x10,0x15,0x51,0x54,0x04,
@@ -300,7 +299,7 @@ void sega_315_5179_device::decrypt()
 			7,
 	};
 
-	decode(memregion(tag())->base(), (UINT8*)memshare(m_decrypted_tag)->ptr(), xor_table, swap_table);
+	decode(memregion(tag())->base(), (uint8_t*)memshare(m_decrypted_tag)->ptr(), xor_table, swap_table);
 }
 
 
@@ -311,9 +310,9 @@ void sega_315_5179_device::decrypt()
 
 ******************************************************************************/
 
-void _sega_decode_317(UINT8 *rom, UINT8 *decrypted, int shift)
+static void sega_decode_317(uint8_t *rom, uint8_t *decrypted, int shift)
 {
-	static const UINT8 xor_table[128+3] =
+	static const uint8_t xor_table[128+3] =
 	{
 		0x04,0x54,0x44,0x14,0x15,0x15,0x51,0x41,0x41,0x14,0x10,0x50,0x15,0x55,0x54,0x05,
 		0x04,0x41,0x51,0x01,0x05,0x10,0x55,0x51,0x05,0x05,0x54,0x11,0x45,0x05,0x04,0x14,
@@ -343,29 +342,29 @@ void _sega_decode_317(UINT8 *rom, UINT8 *decrypted, int shift)
 }
 
 
-sega_317_0004_device::sega_317_0004_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : segacrp2_z80_device(mconfig, tag, owner, clock) {}
+sega_317_0004_device::sega_317_0004_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : segacrp2_z80_device(mconfig, SEGA_317_0004, tag, owner, clock) {}
 void sega_317_0004_device::decrypt()
 {   // 317-0004
-	_sega_decode_317(memregion(tag())->base(), (UINT8*)memshare(m_decrypted_tag)->ptr(), 0);
+	sega_decode_317(memregion(tag())->base(), (uint8_t*)memshare(m_decrypted_tag)->ptr(), 0);
 }
 
 
 
-sega_317_0005_device::sega_317_0005_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : segacrp2_z80_device(mconfig, tag, owner, clock) {}
+sega_317_0005_device::sega_317_0005_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : segacrp2_z80_device(mconfig, SEGA_317_0005, tag, owner, clock) {}
 void sega_317_0005_device::decrypt()
 {   // 317-0005
-	_sega_decode_317(memregion(tag())->base(), (UINT8*)memshare(m_decrypted_tag)->ptr(), 1);
+	sega_decode_317(memregion(tag())->base(), (uint8_t*)memshare(m_decrypted_tag)->ptr(), 1);
 }
 
 
-sega_317_0006_device::sega_317_0006_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : segacrp2_z80_device(mconfig, tag, owner, clock) {}
+sega_317_0006_device::sega_317_0006_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : segacrp2_z80_device(mconfig, SEGA_317_0006, tag, owner, clock) {}
 void sega_317_0006_device::decrypt()
 {   // 317-0006
-	_sega_decode_317(memregion(tag())->base(), (UINT8*)memshare(m_decrypted_tag)->ptr(), 2);
+	sega_decode_317(memregion(tag())->base(), (uint8_t*)memshare(m_decrypted_tag)->ptr(), 2);
 }
 
-sega_317_0007_device::sega_317_0007_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : segacrp2_z80_device(mconfig, tag, owner, clock) {}
+sega_317_0007_device::sega_317_0007_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : segacrp2_z80_device(mconfig, SEGA_317_0007, tag, owner, clock) {}
 void sega_317_0007_device::decrypt()
 {   // 317-0006
-	_sega_decode_317(memregion(tag())->base(), (UINT8*)memshare(m_decrypted_tag)->ptr(), 3);
+	sega_decode_317(memregion(tag())->base(), (uint8_t*)memshare(m_decrypted_tag)->ptr(), 3);
 }

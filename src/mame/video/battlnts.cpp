@@ -39,7 +39,7 @@ WRITE8_MEMBER(battlnts_state::battlnts_spritebank_w)
 
 ***************************************************************************/
 
-UINT32 battlnts_state::screen_update_battlnts(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t battlnts_state::screen_update_battlnts(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_k007342->tilemap_update();
 

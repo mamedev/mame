@@ -17,24 +17,19 @@
 //  constructor
 //-------------------------------------------------
 
-const device_type A78_HISCORE = &device_creator<a78_hiscore_device>;
+DEFINE_DEVICE_TYPE(A78_HISCORE, a78_hiscore_device, "a78_hiscore", "Atari 7800 High Score Cart")
 
 
-a78_hiscore_device::a78_hiscore_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: a78_rom_device(mconfig, A78_HISCORE, "Atari 7800 High Score Cart", tag, owner, clock, "a78_highscore", __FILE__),
-						m_hscslot(*this, "hsc_slot")
+a78_hiscore_device::a78_hiscore_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: a78_rom_device(mconfig, A78_HISCORE, tag, owner, clock)
+	, m_hscslot(*this, "hsc_slot")
 {
 }
 
 
-static MACHINE_CONFIG_FRAGMENT( a78_highscore )
+MACHINE_CONFIG_MEMBER( a78_hiscore_device::device_add_mconfig )
 	MCFG_A78_CARTRIDGE_ADD("hsc_slot", a7800_cart, nullptr)
 MACHINE_CONFIG_END
-
-machine_config_constructor a78_hiscore_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( a78_highscore );
-}
 
 
 /*-------------------------------------------------

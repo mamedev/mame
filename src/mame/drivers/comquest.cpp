@@ -42,13 +42,16 @@ icq3250a-d
  */
 
 #include "emu.h"
-#include "cpu/m6805/m6805.h"
 #include "includes/comquest.h"
+
+#include "cpu/m6805/m6805.h"
+#include "screen.h"
+
 
 #ifdef UNUSED_FUNCTION
 READ8_MEMBER(comquest_state::comquest_read)
 {
-	UINT8 data=0;
+	uint8_t data=0;
 	logerror("comquest read %.4x %.2x\n",offset,data);
 	return data;
 }
@@ -61,9 +64,7 @@ WRITE8_MEMBER(comquest_state::comquest_write)
 
 static ADDRESS_MAP_START( comquest_mem , AS_PROGRAM, 8, comquest_state )
 //  { 0x0000, 0x7fff, SMH_BANK(1) },
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xffff) AM_READONLY AM_WRITENOP
-//  { 0x8000, 0xffff, SMH_RAM }, // batterie buffered
+	AM_RANGE(0x0000, 0xfff) AM_ROM
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( comquest )
@@ -206,12 +207,12 @@ GFXDECODE_END
 
 void comquest_state::machine_reset()
 {
-//  UINT8 *mem=memregion("user1")->base();
+//  uint8_t *mem=memregion("user1")->base();
 //  membank(1)->set_base(mem+0x00000);
 }
 
 
-static MACHINE_CONFIG_START( comquest, comquest_state )
+static MACHINE_CONFIG_START( comquest )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6805, 4000000)     /* 4000000? */
 	/*MCFG_CPU_ADD("maincpu", HD63705, 4000000)    instruction set looks like m6805/m6808 */
@@ -303,5 +304,5 @@ ROM_END
 
 ***************************************************************************/
 
-/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT    MONITOR COMPANY   FULLNAME */
-CONS( 1995, comquest, 0,        0,      comquest, comquest, driver_device, 0,       "Data Concepts",  "ComQuest Plus (German)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     STATE           INIT  COMPANY          FULLNAME                  FLAGS
+CONS( 1995, comquest, 0,        0,      comquest, comquest, comquest_state, 0,    "Data Concepts", "ComQuest Plus (German)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

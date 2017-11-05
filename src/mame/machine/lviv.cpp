@@ -2,7 +2,7 @@
 // copyright-holders:Krzysztof Strzecha
 /***************************************************************************
 
-  machine.c
+  lviv.cpp
 
   Functions to emulate general aspects of PK-01 Lviv (RAM, ROM, interrupts,
   I/O ports)
@@ -12,23 +12,17 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "imagedev/cassette.h"
-#include "imagedev/snapquik.h"
-#include "cpu/i8085/i8085.h"
-#include "machine/i8255.h"
 #include "includes/lviv.h"
-#include "sound/speaker.h"
-#include "machine/ram.h"
+
+#include "cpu/i8085/i8085.h"
+
 
 #define LVIV_SNAPSHOT_SIZE  82219
 
 
-
-
-
 void lviv_state::lviv_update_memory ()
 {
-	UINT8 *ram = m_ram->pointer();
+	uint8_t *ram = m_ram->pointer();
 
 	if (m_ppi_port_outputs[0][2] & 0x02)
 	{
@@ -59,7 +53,7 @@ READ8_MEMBER(lviv_state::lviv_ppi_0_portb_r)
 
 READ8_MEMBER(lviv_state::lviv_ppi_0_portc_r)
 {
-	UINT8 data = m_ppi_port_outputs[0][2] & 0x0f;
+	uint8_t data = m_ppi_port_outputs[0][2] & 0x0f;
 	if (m_cassette->input() > 0.038)
 		data |= 0x10;
 	if (m_ppi_port_outputs[0][0] & ioport("JOY")->read())
@@ -159,7 +153,7 @@ WRITE8_MEMBER(lviv_state::lviv_io_w)
 	address_space &cpuspace = m_maincpu->space(AS_PROGRAM);
 	if (m_startup_mem_map)
 	{
-		UINT8 *ram = m_ram->pointer();
+		uint8_t *ram = m_ram->pointer();
 
 		m_startup_mem_map = 0;
 
@@ -197,7 +191,7 @@ WRITE8_MEMBER(lviv_state::lviv_io_w)
 void lviv_state::machine_reset()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	UINT8 *mem;
+	uint8_t *mem;
 
 	m_video_ram = m_ram->pointer() + 0xc000;
 
@@ -213,8 +207,6 @@ void lviv_state::machine_reset()
 	membank("bank2")->set_base(mem + 0x010000);
 	membank("bank3")->set_base(mem + 0x010000);
 	membank("bank4")->set_base(mem + 0x010000);
-
-	/*machine().scheduler().timer_pulse(TIME_IN_NSEC(200), FUNC(lviv_draw_pixel));*/
 
 	/*memset(m_ram->pointer(), 0, sizeof(unsigned char)*0xffff);*/
 }
@@ -235,29 +227,29 @@ Lviv snapshot files (SAV)
 1411D - 1412A:  ??? (something additional)
 *******************************************************************************/
 
-void lviv_state::lviv_setup_snapshot (UINT8 * data)
+void lviv_state::lviv_setup_snapshot(uint8_t * data)
 {
 	unsigned char lo,hi;
 
 	/* Set registers */
 	lo = data[0x14112] & 0x0ff;
 	hi = data[0x14111] & 0x0ff;
-	m_maincpu->set_state_int(I8085_BC, (hi << 8) | lo);
+	m_maincpu->set_state_int(i8080_cpu_device::I8085_BC, (hi << 8) | lo);
 	lo = data[0x14114] & 0x0ff;
 	hi = data[0x14113] & 0x0ff;
-	m_maincpu->set_state_int(I8085_DE, (hi << 8) | lo);
+	m_maincpu->set_state_int(i8080_cpu_device::I8085_DE, (hi << 8) | lo);
 	lo = data[0x14116] & 0x0ff;
 	hi = data[0x14115] & 0x0ff;
-	m_maincpu->set_state_int(I8085_HL, (hi << 8) | lo);
+	m_maincpu->set_state_int(i8080_cpu_device::I8085_HL, (hi << 8) | lo);
 	lo = data[0x14118] & 0x0ff;
 	hi = data[0x14117] & 0x0ff;
-	m_maincpu->set_state_int(I8085_AF, (hi << 8) | lo);
+	m_maincpu->set_state_int(i8080_cpu_device::I8085_AF, (hi << 8) | lo);
 	lo = data[0x14119] & 0x0ff;
 	hi = data[0x1411a] & 0x0ff;
-	m_maincpu->set_state_int(I8085_SP, (hi << 8) | lo);
+	m_maincpu->set_state_int(i8080_cpu_device::I8085_SP, (hi << 8) | lo);
 	lo = data[0x1411b] & 0x0ff;
 	hi = data[0x1411c] & 0x0ff;
-	m_maincpu->set_state_int(I8085_PC, (hi << 8) | lo);
+	m_maincpu->set_state_int(i8080_cpu_device::I8085_PC, (hi << 8) | lo);
 
 	/* Memory dump */
 	memcpy (m_ram->pointer(), data+0x0011, 0xc000);
@@ -273,43 +265,43 @@ void lviv_state::lviv_setup_snapshot (UINT8 * data)
 
 void lviv_state::dump_registers()
 {
-	logerror("PC   = %04x\n", (unsigned) m_maincpu->state_int(I8085_PC));
-	logerror("SP   = %04x\n", (unsigned) m_maincpu->state_int(I8085_SP));
-	logerror("AF   = %04x\n", (unsigned) m_maincpu->state_int(I8085_AF));
-	logerror("BC   = %04x\n", (unsigned) m_maincpu->state_int(I8085_BC));
-	logerror("DE   = %04x\n", (unsigned) m_maincpu->state_int(I8085_DE));
-	logerror("HL   = %04x\n", (unsigned) m_maincpu->state_int(I8085_HL));
+	logerror("PC   = %04x\n", (unsigned) m_maincpu->state_int(i8080_cpu_device::I8085_PC));
+	logerror("SP   = %04x\n", (unsigned) m_maincpu->state_int(i8080_cpu_device::I8085_SP));
+	logerror("AF   = %04x\n", (unsigned) m_maincpu->state_int(i8080_cpu_device::I8085_AF));
+	logerror("BC   = %04x\n", (unsigned) m_maincpu->state_int(i8080_cpu_device::I8085_BC));
+	logerror("DE   = %04x\n", (unsigned) m_maincpu->state_int(i8080_cpu_device::I8085_DE));
+	logerror("HL   = %04x\n", (unsigned) m_maincpu->state_int(i8080_cpu_device::I8085_HL));
 }
 
-int lviv_state::lviv_verify_snapshot (UINT8 * data, UINT32 size)
+image_verify_result lviv_state::lviv_verify_snapshot(uint8_t * data, uint32_t size)
 {
 	const char* tag = "LVOV/DUMP/2.0/";
 
-	if( strncmp( tag, (char*)data, strlen(tag) ) )
+	if (strncmp(tag, (char*)data, strlen(tag)))
 	{
 		logerror("Not a Lviv snapshot\n");
-		return IMAGE_VERIFY_FAIL;
+		return image_verify_result::FAIL;
 	}
 
 	if (size != LVIV_SNAPSHOT_SIZE)
 	{
 		logerror ("Incomplete snapshot file\n");
-		return IMAGE_VERIFY_FAIL;
+		return image_verify_result::FAIL;
 	}
 
 	logerror("returning ID_OK\n");
-	return IMAGE_VERIFY_PASS;
+	return image_verify_result::PASS;
 }
 
 SNAPSHOT_LOAD_MEMBER( lviv_state, lviv )
 {
-	dynamic_buffer lviv_snapshot_data(LVIV_SNAPSHOT_SIZE);
+	std::vector<uint8_t> lviv_snapshot_data(LVIV_SNAPSHOT_SIZE);
 
 	image.fread( &lviv_snapshot_data[0], LVIV_SNAPSHOT_SIZE);
 
-	if(lviv_verify_snapshot(&lviv_snapshot_data[0], snapshot_size) == IMAGE_VERIFY_FAIL)
+	if (lviv_verify_snapshot(&lviv_snapshot_data[0], snapshot_size) != image_verify_result::PASS)
 	{
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 	}
 
 	lviv_setup_snapshot (&lviv_snapshot_data[0]);
@@ -317,5 +309,5 @@ SNAPSHOT_LOAD_MEMBER( lviv_state, lviv )
 	dump_registers();
 
 	logerror("Snapshot file loaded\n");
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }

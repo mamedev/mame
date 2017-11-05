@@ -6,13 +6,12 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_PET_PETUJA_H
+#define MAME_BUS_PET_PETUJA_H
+
 #pragma once
 
-#ifndef __PETUJA__
-#define __PETUJA__
 
-
-#include "emu.h"
 #include "user.h"
 
 
@@ -28,7 +27,7 @@ class pet_userport_joystick_adapter_device : public device_t,
 {
 public:
 	// construction/destruction
-	pet_userport_joystick_adapter_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pet_userport_joystick_adapter_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual ioport_constructor device_input_ports() const override;
@@ -57,7 +56,7 @@ protected:
 
 
 // device type definition
-extern const device_type PET_USERPORT_JOYSTICK_ADAPTER;
+DECLARE_DEVICE_TYPE(PET_USERPORT_JOYSTICK_ADAPTER, pet_userport_joystick_adapter_device)
 
 
-#endif
+#endif // MAME_BUS_PET_PETUJA_H

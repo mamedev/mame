@@ -44,14 +44,19 @@
 ****************************************************************************/
 
 #include "emu.h"
+#include "includes/taitoipt.h"
+#include "audio/taitosnd.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/tms32025/tms32025.h"
 #include "cpu/z80/z80.h"
-#include "includes/taitoipt.h"
 #include "machine/z80ctc.h"
-#include "audio/taitosnd.h"
-#include "sound/2151intf.h"
+#include "machine/taitoio_yoke.h"
 #include "sound/msm5205.h"
+#include "sound/ym2151.h"
+
+#include "screen.h"
+#include "speaker.h"
 
 
 
@@ -69,7 +74,7 @@ public:
 		TIMER_DMA_COMPLETE
 	};
 
-	static const UINT32 c_dma_bank_words = 0x2000;
+	static const uint32_t c_dma_bank_words = 0x2000;
 
 	mlanding_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
@@ -78,6 +83,7 @@ public:
 		m_dsp(*this, "dsp"),
 		m_audiocpu(*this, "audiocpu"),
 		m_mechacpu(*this, "mechacpu"),
+		m_yoke(*this, "yokectrl"),
 		m_msm1(*this, "msm1"),
 		m_msm2(*this, "msm2"),
 		m_ctc(*this, "ctc"),
@@ -96,31 +102,32 @@ public:
 	required_device<cpu_device> m_dsp;
 	required_device<cpu_device> m_audiocpu;
 	required_device<cpu_device> m_mechacpu;
+	required_device<taitoio_yoke_device> m_yoke;
 	required_device<msm5205_device> m_msm1;
 	required_device<msm5205_device> m_msm2;
 	required_device<z80ctc_device> m_ctc;
 
 	required_memory_bank    m_dma_bank;
-	required_region_ptr<UINT8> m_msm1_rom;
-	required_region_ptr<UINT8> m_msm2_rom;
+	required_region_ptr<uint8_t> m_msm1_rom;
+	required_region_ptr<uint8_t> m_msm2_rom;
 
-	required_shared_ptr<UINT16> m_g_ram;
-	required_shared_ptr<UINT16> m_cha_ram;
-	required_shared_ptr<UINT16> m_dot_ram;
-	required_shared_ptr<UINT8>  m_power_ram;
+	required_shared_ptr<uint16_t> m_g_ram;
+	required_shared_ptr<uint16_t> m_cha_ram;
+	required_shared_ptr<uint16_t> m_dot_ram;
+	required_shared_ptr<uint8_t>  m_power_ram;
 
 	required_device<palette_device> m_palette;
 
-	std::unique_ptr<UINT16[]> m_dma_ram;
-	UINT8   m_dma_cpu_bank;
-	UINT8   m_dma_busy;
-	UINT16  m_dsp_hold_signal;
+	std::unique_ptr<uint16_t[]> m_dma_ram;
+	uint8_t   m_dma_cpu_bank;
+	uint8_t   m_dma_busy;
+	uint16_t  m_dsp_hold_signal;
 
-	UINT32  m_msm_pos[2];
-	UINT8   m_msm_reset[2];
-	UINT8   m_msm_nibble[2];
-	UINT8   m_msm2_vck;
-	UINT8   m_msm2_vck2;
+	uint32_t  m_msm_pos[2];
+	uint8_t   m_msm_reset[2];
+	uint8_t   m_msm_nibble[2];
+	uint8_t   m_msm2_vck;
+	uint8_t   m_msm2_vck2;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -153,8 +160,8 @@ public:
 
 	DECLARE_READ8_MEMBER(motor_r);
 
-	UINT32 screen_update_mlanding(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 exec_dma();
+	uint32_t screen_update_mlanding(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t exec_dma();
 	void msm5205_update(int chip);
 
 protected:
@@ -172,7 +179,7 @@ protected:
 void mlanding_state::machine_start()
 {
 	// Allocate two DMA RAM banks
-	m_dma_ram = std::make_unique<UINT16[]>(c_dma_bank_words * 2);
+	m_dma_ram = std::make_unique<uint16_t[]>(c_dma_bank_words * 2);
 	m_dma_bank->configure_entries(0, 2, m_dma_ram.get(), c_dma_bank_words * 2);
 
 	// Register state for saving
@@ -215,16 +222,16 @@ void mlanding_state::machine_reset()
  *
  *************************************/
 
-UINT32 mlanding_state::screen_update_mlanding(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t mlanding_state::screen_update_mlanding(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	const pen_t *pens = m_palette->pens();
 
-	for (UINT32 y = cliprect.min_y; y <= cliprect.max_y; ++y)
+	for (uint32_t y = cliprect.min_y; y <= cliprect.max_y; ++y)
 	{
-		UINT16 *src = &m_g_ram[(112 + y) * 512 + cliprect.min_x];
-		UINT16 *dst = &bitmap.pix16(y, cliprect.min_x);
+		uint16_t *src = &m_g_ram[(112 + y) * 512 + cliprect.min_x];
+		uint16_t *dst = &bitmap.pix16(y, cliprect.min_x);
 
-		for (UINT32 x = cliprect.min_x; x <= cliprect.max_x; ++x)
+		for (uint32_t x = cliprect.min_x; x <= cliprect.max_x; ++x)
 		{
 			*dst++ = pens[*src++ & 0x3fff];
 		}
@@ -246,7 +253,7 @@ WRITE16_MEMBER(mlanding_state::dma_start_w)
 	m_dma_cpu_bank ^= 1;
 	membank("dma_ram")->set_entry(m_dma_cpu_bank);
 
-	UINT32 pixels = exec_dma();
+	uint32_t pixels = exec_dma();
 
 	if (pixels)
 	{
@@ -282,58 +289,58 @@ WRITE16_MEMBER(mlanding_state::dma_stop_w)
 
     3   ........ ....xxxx       Colour
 */
-UINT32 mlanding_state::exec_dma()
+uint32_t mlanding_state::exec_dma()
 {
-	UINT32 pixcnt = 0;
-	UINT32 gram_mask = m_g_ram.bytes() - 1;
-	UINT16 *dma_ram = &m_dma_ram[(m_dma_cpu_bank ^ 1) * c_dma_bank_words];
+	uint32_t pixcnt = 0;
+	uint32_t gram_mask = m_g_ram.bytes() - 1;
+	uint16_t *dma_ram = &m_dma_ram[(m_dma_cpu_bank ^ 1) * c_dma_bank_words];
 
 	// Process the entries in DMA RAM
-	for (UINT32 offs = 0; offs < c_dma_bank_words; offs += 4)
+	for (uint32_t offs = 0; offs < c_dma_bank_words; offs += 4)
 	{
-		UINT16 attr = dma_ram[offs];
+		uint16_t attr = dma_ram[offs];
 
 		if (attr == 0)
 			continue;
 
-		UINT16 code = attr & 0x1fff;
+		uint16_t code = attr & 0x1fff;
 
-		UINT16 xword = dma_ram[offs + 1];
-		UINT16 yword = dma_ram[offs + 2];
+		uint16_t xword = dma_ram[offs + 1];
+		uint16_t yword = dma_ram[offs + 2];
 
-		UINT16 x = xword & 0x1ff;
-		UINT16 y = yword & 0x1ff;
-		UINT16 sx = ((xword >> 11) & 0x1f) + 1;
-		UINT16 sy = ((yword >> 11) & 0x1f) + 1;
+		uint16_t x = xword & 0x1ff;
+		uint16_t y = yword & 0x1ff;
+		uint16_t sx = ((xword >> 11) & 0x1f) + 1;
+		uint16_t sy = ((yword >> 11) & 0x1f) + 1;
 
-		UINT8 colour = dma_ram[offs + 3] & 0xff;
+		uint8_t colour = dma_ram[offs + 3] & 0xff;
 
 		if ((attr & 0x2000) == 0)
 		{
 			// Normal draw mode
-			UINT8 basepix = colour << 4;
+			uint8_t basepix = colour << 4;
 
-			for (UINT32 j = 0; j < sx; ++j)
+			for (uint32_t j = 0; j < sx; ++j)
 			{
-				for (UINT32 k = 0; k < sy; ++k)
+				for (uint32_t k = 0; k < sy; ++k)
 				{
 					// Draw an 8x8 tile
-					for (UINT32 y1 = 0; y1 < 8; ++y1)
+					for (uint32_t y1 = 0; y1 < 8; ++y1)
 					{
-						UINT16 *src = &m_cha_ram[(code * 2 * 8) + y1 * 2];
-						UINT32 byteaddr = ((y + k * 8 + y1) * 512 + (j * 8 + x)) * 2;
+						uint16_t *src = &m_cha_ram[(code * 2 * 8) + y1 * 2];
+						uint32_t byteaddr = ((y + k * 8 + y1) * 512 + (j * 8 + x)) * 2;
 
-						UINT8 *pixdata = reinterpret_cast<UINT8 *>(m_g_ram.target()) + BYTE_XOR_BE(1);
+						uint8_t *pixdata = reinterpret_cast<uint8_t *>(m_g_ram.target()) + BYTE_XOR_BE(1);
 
-						UINT8 p2 = *src & 0xff;
-						UINT8 p1 = *src++ >> 8;
-						UINT8 p4 = *src;
-						UINT8 p3 = *src++ >> 8;
+						uint8_t p2 = *src & 0xff;
+						uint8_t p1 = *src++ >> 8;
+						uint8_t p4 = *src;
+						uint8_t p3 = *src++ >> 8;
 
 						// Draw 8 pixels
-						for (UINT32 x1 = 0; x1 < 8; ++x1)
+						for (uint32_t x1 = 0; x1 < 8; ++x1)
 						{
-							UINT16 pix = (BIT(p4, x1) << 3) | (BIT(p3, x1) << 2) | (BIT(p2, x1) << 1) | BIT(p1, x1);
+							uint16_t pix = (BIT(p4, x1) << 3) | (BIT(p3, x1) << 2) | (BIT(p2, x1) << 1) | BIT(p1, x1);
 
 							if ((attr & 0x8000) == 0)
 							{
@@ -359,16 +366,16 @@ UINT32 mlanding_state::exec_dma()
 		else
 		{
 			// Set pixel or palette data
-			for (UINT32 y1 = 0; y1 < sy * 8; ++y1)
+			for (uint32_t y1 = 0; y1 < sy * 8; ++y1)
 			{
-				UINT32 byteaddr = (((y + y1) * 512) + x) * 2;
+				uint32_t byteaddr = (((y + y1) * 512) + x) * 2;
 
 				if ((attr & 0x4000) == 0)
 				{
 					// Clear pixel data
-					UINT8 *pixdata = reinterpret_cast<UINT8 *>(m_g_ram.target()) + BYTE_XOR_BE(1);
+					uint8_t *pixdata = reinterpret_cast<uint8_t *>(m_g_ram.target()) + BYTE_XOR_BE(1);
 
-					for (UINT32 x1 = 0; x1 < sx * 8; ++x1)
+					for (uint32_t x1 = 0; x1 < sx * 8; ++x1)
 					{
 						pixdata[byteaddr & gram_mask] = colour;
 						byteaddr += 2;
@@ -378,9 +385,9 @@ UINT32 mlanding_state::exec_dma()
 				else
 				{
 					// Clear palette data
-					UINT8 *paldata = reinterpret_cast<UINT8 *>(m_g_ram.target()) + BYTE_XOR_BE(0);
+					uint8_t *paldata = reinterpret_cast<uint8_t *>(m_g_ram.target()) + BYTE_XOR_BE(0);
 
-					for (UINT32 x1 = 0; x1 < sx * 8; ++x1)
+					for (uint32_t x1 = 0; x1 < sx * 8; ++x1)
 					{
 						paldata[byteaddr & gram_mask] = colour;
 						byteaddr += 2;
@@ -404,7 +411,7 @@ void mlanding_state::device_timer(emu_timer &timer, device_timer_id id, int para
 			break;
 
 		default:
-			assert_always(FALSE, "Unknown id in mlanding_state::device_timer");
+			assert_always(false, "Unknown id in mlanding_state::device_timer");
 	}
 }
 
@@ -425,8 +432,8 @@ READ16_MEMBER(mlanding_state::input_r)
 	    x....... ........   DMA busy
 	*/
 
-	UINT8 dswa = ioport("DSWA")->read();
-	UINT8 dswb = ioport("DSWB")->read() & 0x7f;
+	uint8_t dswa = ioport("DSWA")->read();
+	uint8_t dswb = ioport("DSWB")->read() & 0x7f;
 	return m_dma_busy << 15 | dswb << 8 | dswa;
 }
 
@@ -446,6 +453,8 @@ WRITE16_MEMBER(mlanding_state::output_w)
 	*/
 	m_subcpu->set_input_line(INPUT_LINE_RESET, data & 0x10 ? CLEAR_LINE : ASSERT_LINE);
 	m_mechacpu->set_input_line(INPUT_LINE_RESET, data & 0x40 ? CLEAR_LINE : ASSERT_LINE);
+	machine().bookkeeping().coin_counter_w(0, data & 4);
+	machine().bookkeeping().coin_counter_w(1, data & 8);
 }
 
 
@@ -458,19 +467,19 @@ WRITE16_MEMBER(mlanding_state::output_w)
 
 READ16_MEMBER(mlanding_state::analog1_msb_r)
 {
-	return (ioport("THROTTLE")->read() >> 4) & 0xff;
+	return (m_yoke->throttle_r(space,0) >> 4) & 0xff;
 }
 
 
 READ16_MEMBER(mlanding_state::analog2_msb_r)
 {
-	return (ioport("STICK_X")->read() >> 4) & 0xff;
+	return (m_yoke->stickx_r(space,0) >> 4) & 0xff;
 }
 
 
 READ16_MEMBER(mlanding_state::analog3_msb_r)
 {
-	return (ioport("STICK_Y")->read() >> 4) & 0xff;
+	return (m_yoke->sticky_r(space,0) >> 4) & 0xff;
 }
 
 
@@ -479,22 +488,12 @@ READ16_MEMBER(mlanding_state::analog1_lsb_r)
 	/*
 	    76543210
 	    ....xxxx    Counter 1 bits 3-0
-	    ...x....    Handle left
-	    ..x.....    Slot down
-	    .x......    Slot up
+	    ...x....    Handle right
+	    ..x.....    Slot up
+	    .x......    Slot down
 	*/
-	UINT16 throttle = ioport("THROTTLE")->read();
-	UINT16 x = ioport("STICK_X")->read();
 
-	UINT8 res = 0x70 | (throttle & 0x0f);
-
-	if (throttle & 0x800)
-		res ^= 0x20;
-	else if (throttle > 0)
-		res ^= 0x40;
-
-	if (!(x & 0x800) && x > 0)
-		res ^= 0x10;
+	uint8_t res = (ioport("LIMIT0")->read() & 0x70) | (m_yoke->throttle_r(space,0) & 0xf);
 
 	return res;
 }
@@ -506,7 +505,7 @@ READ16_MEMBER(mlanding_state::analog2_lsb_r)
 	    76543210
 	    ....xxxx    Counter 2 bits 3-0
 	*/
-	return ioport("STICK_X")->read() & 0x0f;
+	return m_yoke->stickx_r(space,0) & 0x0f;
 }
 
 
@@ -515,22 +514,11 @@ READ16_MEMBER(mlanding_state::analog3_lsb_r)
 	/*
 	    76543210
 	    ....xxxx    Counter 3 bits 3-0
-	    ...x....    Handle up
-	    ..x.....    Handle right
-	    .x......    Handle down
+	    ...x....    Handle down
+	    ..x.....    Handle left
+	    .x......    Handle up
 	*/
-	UINT16 x = ioport("STICK_X")->read();
-	UINT16 y = ioport("STICK_Y")->read();
-
-	UINT8 res = 0x70 | (y & 0x0f);
-
-	if (y & 0x800)
-		res ^= 0x40;
-	else if (y > 0)
-		res ^= 0x10;
-
-	if (x & 0x800)
-		res ^= 0x20;
+	uint8_t res = (ioport("LIMIT1")->read() & 0x70) | (m_yoke->sticky_r(space,0) & 0xf);
 
 	return res;
 }
@@ -576,8 +564,8 @@ void mlanding_state::msm5205_update(int chip)
 	if (m_msm_reset[chip])
 		return;
 
-	const UINT8 *rom = chip ? m_msm2_rom : m_msm1_rom;
-	UINT8 data = rom[m_msm_pos[chip]];
+	const uint8_t *rom = chip ? m_msm2_rom : m_msm1_rom;
+	uint8_t data = rom[m_msm_pos[chip]];
 	msm5205_device *msm = chip ? m_msm2 : m_msm1;
 
 	msm->data_w((m_msm_nibble[chip] ? data : data >> 4) & 0xf);
@@ -742,8 +730,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, mlanding_state )
 	AM_RANGE(0x2b0006, 0x2b0007) AM_READ(analog2_lsb_r)
 	AM_RANGE(0x2c0000, 0x2c0001) AM_READ(analog3_msb_r)
 	AM_RANGE(0x2c0002, 0x2c0003) AM_READ(analog3_lsb_r)
-	AM_RANGE(0x2d0000, 0x2d0001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0x00ff)
-	AM_RANGE(0x2d0002, 0x2d0003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0x00ff)
+	AM_RANGE(0x2d0000, 0x2d0001) AM_READNOP AM_DEVWRITE8("ciu", pc060ha_device, master_port_w, 0x00ff)
+	AM_RANGE(0x2d0002, 0x2d0003) AM_DEVREADWRITE8("ciu", pc060ha_device, master_comm_r, master_comm_w, 0x00ff)
 ADDRESS_MAP_END
 
 
@@ -761,7 +749,8 @@ static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 16, mlanding_state )
 	AM_RANGE(0x060000, 0x060001) AM_WRITE(dsp_control_w)
 	AM_RANGE(0x1c0000, 0x1c3fff) AM_RAMBANK("dma_ram")
 	AM_RANGE(0x1c4000, 0x1cffff) AM_RAM AM_SHARE("sub_com_ram")
-	AM_RANGE(0x200000, 0x203fff) AM_RAM AM_SHARE("dot_ram")
+	AM_RANGE(0x200000, 0x2007ff) AM_RAM
+	AM_RANGE(0x200800, 0x203fff) AM_RAM AM_SHARE("dot_ram")
 ADDRESS_MAP_END
 
 
@@ -777,15 +766,8 @@ static ADDRESS_MAP_START( dsp_map_prog, AS_PROGRAM, 16, mlanding_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dsp_map_data, AS_DATA, 16, mlanding_state )
-	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("dot_ram")
+	AM_RANGE(0x0400, 0x1fff) AM_RAM AM_SHARE("dot_ram")
 ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( dsp_map_io, AS_IO, 16, mlanding_state )
-	AM_RANGE(TMS32025_HOLD, TMS32025_HOLD) AM_READ(dsp_hold_signal_r)
-	AM_RANGE(TMS32025_HOLDA, TMS32025_HOLDA) AM_WRITENOP
-ADDRESS_MAP_END
-
-
 
 /*************************************
  *
@@ -797,8 +779,8 @@ static ADDRESS_MAP_START( audio_map_prog, AS_PROGRAM, 8, mlanding_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("tc0140syt", tc0140syt_device, slave_port_w)
-	AM_RANGE(0xa001, 0xa001) AM_DEVREADWRITE("tc0140syt", tc0140syt_device, slave_comm_r, slave_comm_w)
+	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("ciu", pc060ha_device, slave_port_w)
+	AM_RANGE(0xa001, 0xa001) AM_DEVREADWRITE("ciu", pc060ha_device, slave_comm_r, slave_comm_w)
 	AM_RANGE(0xb000, 0xb000) AM_WRITE(msm5205_2_start_w)
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(msm5205_2_stop_w)
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(msm5205_1_start_w)
@@ -907,14 +889,16 @@ static INPUT_PORTS_START( mlanding )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("THROTTLE")
-	PORT_BIT( 0x0fff, 0x0000, IPT_AD_STICK_Z ) PORT_MINMAX(0x00800, 0x07ff) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_PLAYER(1) PORT_REVERSE
+	// despite what the service mode claims limits are really active low.
+	PORT_START("LIMIT0")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("yokectrl", taitoio_yoke_device, handle_right_r )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("yokectrl", taitoio_yoke_device, slot_up_r )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("yokectrl", taitoio_yoke_device, slot_down_r )
 
-	PORT_START("STICK_X")
-	PORT_BIT( 0x0fff, 0x0000, IPT_AD_STICK_X ) PORT_MINMAX(0x00800, 0x07ff) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_PLAYER(1)
-
-	PORT_START("STICK_Y")
-	PORT_BIT( 0x0fff, 0x0000, IPT_AD_STICK_Y ) PORT_MINMAX(0x00800, 0x07ff) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_PLAYER(1)
+	PORT_START("LIMIT1")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("yokectrl", taitoio_yoke_device, handle_down_r )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("yokectrl", taitoio_yoke_device, handle_left_r )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("yokectrl", taitoio_yoke_device, handle_up_r )
 INPUT_PORTS_END
 
 
@@ -924,7 +908,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( mlanding, mlanding_state )
+static MACHINE_CONFIG_START( mlanding )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 8000000) // Appears to be 68000P8 in PCB photo
@@ -945,16 +929,19 @@ static MACHINE_CONFIG_START( mlanding, mlanding_state )
 	MCFG_CPU_ADD("dsp", TMS32025, 32000000) // ?
 	MCFG_CPU_PROGRAM_MAP(dsp_map_prog)
 	MCFG_CPU_DATA_MAP(dsp_map_data)
-	MCFG_CPU_IO_MAP(dsp_map_io)
+	MCFG_TMS32025_HOLD_IN_CB(READ16(mlanding_state, dsp_hold_signal_r))
+	MCFG_TMS32025_HOLD_ACK_OUT_CB(NOOP)
 
 	MCFG_DEVICE_ADD("ctc", Z80CTC, 4000000)
 	MCFG_Z80CTC_ZC0_CB(WRITELINE(mlanding_state, z80ctc_to0))
 
-	MCFG_DEVICE_ADD("tc0140syt", TC0140SYT, 0)
-	MCFG_TC0140SYT_MASTER_CPU("maincpu")
-	MCFG_TC0140SYT_SLAVE_CPU("audiocpu")
+	MCFG_DEVICE_ADD("ciu", PC060HA, 0)
+	MCFG_PC060HA_MASTER_CPU("maincpu")
+	MCFG_PC060HA_SLAVE_CPU("audiocpu")
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
+
+	MCFG_TAITOIO_YOKE_ADD("yokectrl")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -978,11 +965,11 @@ static MACHINE_CONFIG_START( mlanding, mlanding_state )
 
 	MCFG_SOUND_ADD("msm1", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(mlanding_state, msm5205_1_vck)) // VCK function
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      // 8 kHz, 4-bit
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      // 8 kHz, 4-bit
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	MCFG_SOUND_ADD("msm2", MSM5205, 384000)
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_SEX_4B)      // Slave mode, 4-bit
+	MCFG_MSM5205_PRESCALER_SELECTOR(SEX_4B)      // Slave mode, 4-bit
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 MACHINE_CONFIG_END
 
@@ -1032,4 +1019,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1987, mlanding, 0, mlanding, mlanding, driver_device, 0, ROT0, "Taito America Corporation", "Midnight Landing (Germany)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, mlanding, 0, mlanding, mlanding, mlanding_state, 0, ROT0, "Taito America Corporation", "Midnight Landing (Germany)", MACHINE_SUPPORTS_SAVE )

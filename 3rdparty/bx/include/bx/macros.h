@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2016 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
@@ -7,6 +7,7 @@
 #define BX_MACROS_H_HEADER_GUARD
 
 #include "bx.h"
+#include <type_traits>
 
 ///
 #if BX_COMPILER_MSVC
@@ -63,7 +64,7 @@
 #if BX_COMPILER_GCC || BX_COMPILER_CLANG
 #	define BX_ALIGN_DECL(_align, _decl) _decl __attribute__( (aligned(_align) ) )
 #	define BX_ALLOW_UNUSED __attribute__( (unused) )
-#	define BX_FORCE_INLINE __extension__ static __inline __attribute__( (__always_inline__) )
+#	define BX_FORCE_INLINE inline __attribute__( (__always_inline__) )
 #	define BX_FUNCTION __PRETTY_FUNCTION__
 #	define BX_LIKELY(_x)   __builtin_expect(!!(_x), 1)
 #	define BX_UNLIKELY(_x) __builtin_expect(!!(_x), 0)
@@ -71,7 +72,7 @@
 #	define BX_NO_RETURN __attribute__( (noreturn) )
 #	define BX_NO_VTABLE
 #	define BX_OVERRIDE
-#	define BX_PRINTF_ARGS(_format, _args) __attribute__ ( (format(__printf__, _format, _args) ) )
+#	define BX_PRINTF_ARGS(_format, _args) __attribute__( (format(__printf__, _format, _args) ) )
 #	if BX_CLANG_HAS_FEATURE(cxx_thread_local)
 #		define BX_THREAD_LOCAL __thread
 #	endif // BX_COMPILER_CLANG
@@ -79,9 +80,9 @@
 #		define BX_THREAD_LOCAL __thread
 #	endif // BX_COMPILER_GCC
 #	define BX_ATTRIBUTE(_x) __attribute__( (_x) )
-#	if BX_COMPILER_MSVC_COMPATIBLE
+#	if BX_CRT_MSVC
 #		define __stdcall
-#	endif // BX_COMPILER_MSVC_COMPATIBLE
+#	endif // BX_CRT_MSVC
 #elif BX_COMPILER_MSVC
 #	define BX_ALIGN_DECL(_align, _decl) __declspec(align(_align) ) _decl
 #	define BX_ALLOW_UNUSED
@@ -100,8 +101,7 @@
 #	error "Unknown BX_COMPILER_?"
 #endif
 
-// #define BX_STATIC_ASSERT(_condition, ...) static_assert(_condition, "" __VA_ARGS__)
-#define BX_STATIC_ASSERT(_condition, ...) typedef char BX_CONCATENATE(BX_STATIC_ASSERT_, __LINE__)[1][(_condition)] BX_ATTRIBUTE(unused)
+#define BX_STATIC_ASSERT(_condition, ...) static_assert(_condition, "" __VA_ARGS__)
 
 ///
 #define BX_ALIGN_DECL_16(_decl) BX_ALIGN_DECL(16, _decl)
@@ -136,56 +136,54 @@
 
 ///
 #if BX_COMPILER_CLANG
-#	define BX_PRAGMA_DIAGNOSTIC_PUSH_CLANG()      _Pragma("clang diagnostic push")
-#	define BX_PRAGMA_DIAGNOSTIC_POP_CLANG()       _Pragma("clang diagnostic pop")
+#	define BX_PRAGMA_DIAGNOSTIC_PUSH_CLANG_()     _Pragma("clang diagnostic push")
+#	define BX_PRAGMA_DIAGNOSTIC_POP_CLANG_()      _Pragma("clang diagnostic pop")
 #	define BX_PRAGMA_DIAGNOSTIC_IGNORED_CLANG(_x) _Pragma(BX_STRINGIZE(clang diagnostic ignored _x) )
 #else
-#	define BX_PRAGMA_DIAGNOSTIC_PUSH_CLANG()
-#	define BX_PRAGMA_DIAGNOSTIC_POP_CLANG()
+#	define BX_PRAGMA_DIAGNOSTIC_PUSH_CLANG_()
+#	define BX_PRAGMA_DIAGNOSTIC_POP_CLANG_()
 #	define BX_PRAGMA_DIAGNOSTIC_IGNORED_CLANG(_x)
 #endif // BX_COMPILER_CLANG
 
 #if BX_COMPILER_GCC && BX_COMPILER_GCC >= 40600
-#	define BX_PRAGMA_DIAGNOSTIC_PUSH_GCC()        _Pragma("GCC diagnostic push")
-#	define BX_PRAGMA_DIAGNOSTIC_POP_GCC()         _Pragma("GCC diagnostic pop")
+#	define BX_PRAGMA_DIAGNOSTIC_PUSH_GCC_()       _Pragma("GCC diagnostic push")
+#	define BX_PRAGMA_DIAGNOSTIC_POP_GCC_()        _Pragma("GCC diagnostic pop")
 #	define BX_PRAGMA_DIAGNOSTIC_IGNORED_GCC(_x)   _Pragma(BX_STRINGIZE(GCC diagnostic ignored _x) )
 #else
-#	define BX_PRAGMA_DIAGNOSTIC_PUSH_GCC()
-#	define BX_PRAGMA_DIAGNOSTIC_POP_GCC()
+#	define BX_PRAGMA_DIAGNOSTIC_PUSH_GCC_()
+#	define BX_PRAGMA_DIAGNOSTIC_POP_GCC_()
 #	define BX_PRAGMA_DIAGNOSTIC_IGNORED_GCC(_x)
 #endif // BX_COMPILER_GCC
 
 #if BX_COMPILER_MSVC
-#	define BX_PRAGMA_DIAGNOSTIC_PUSH_MSVC()      __pragma(warning(push) )
-#	define BX_PRAGMA_DIAGNOSTIC_POP_MSVC()       __pragma(warning(pop) )
+#	define BX_PRAGMA_DIAGNOSTIC_PUSH_MSVC_()     __pragma(warning(push) )
+#	define BX_PRAGMA_DIAGNOSTIC_POP_MSVC_()      __pragma(warning(pop) )
 #	define BX_PRAGMA_DIAGNOSTIC_IGNORED_MSVC(_x) __pragma(warning(disable:_x) )
 #else
-#	define BX_PRAGMA_DIAGNOSTIC_PUSH_MSVC()
-#	define BX_PRAGMA_DIAGNOSTIC_POP_MSVC()
+#	define BX_PRAGMA_DIAGNOSTIC_PUSH_MSVC_()
+#	define BX_PRAGMA_DIAGNOSTIC_POP_MSVC_()
 #	define BX_PRAGMA_DIAGNOSTIC_IGNORED_MSVC(_x)
 #endif // BX_COMPILER_CLANG
 
 #if BX_COMPILER_CLANG
-#	define BX_PRAGMA_DIAGNOSTIC_PUSH              BX_PRAGMA_DIAGNOSTIC_PUSH_CLANG
-#	define BX_PRAGMA_DIAGNOSTIC_POP               BX_PRAGMA_DIAGNOSTIC_POP_CLANG
+#	define BX_PRAGMA_DIAGNOSTIC_PUSH              BX_PRAGMA_DIAGNOSTIC_PUSH_CLANG_
+#	define BX_PRAGMA_DIAGNOSTIC_POP               BX_PRAGMA_DIAGNOSTIC_POP_CLANG_
 #	define BX_PRAGMA_DIAGNOSTIC_IGNORED_CLANG_GCC BX_PRAGMA_DIAGNOSTIC_IGNORED_CLANG
 #elif BX_COMPILER_GCC
-#	define BX_PRAGMA_DIAGNOSTIC_PUSH              BX_PRAGMA_DIAGNOSTIC_PUSH_GCC
-#	define BX_PRAGMA_DIAGNOSTIC_POP               BX_PRAGMA_DIAGNOSTIC_POP_GCC
+#	define BX_PRAGMA_DIAGNOSTIC_PUSH              BX_PRAGMA_DIAGNOSTIC_PUSH_GCC_
+#	define BX_PRAGMA_DIAGNOSTIC_POP               BX_PRAGMA_DIAGNOSTIC_POP_GCC_
 #	define BX_PRAGMA_DIAGNOSTIC_IGNORED_CLANG_GCC BX_PRAGMA_DIAGNOSTIC_IGNORED_GCC
 #elif BX_COMPILER_MSVC
-#	define BX_PRAGMA_DIAGNOSTIC_PUSH              BX_PRAGMA_DIAGNOSTIC_PUSH_MSVC
-#	define BX_PRAGMA_DIAGNOSTIC_POP	              BX_PRAGMA_DIAGNOSTIC_POP_MSVC
+#	define BX_PRAGMA_DIAGNOSTIC_PUSH              BX_PRAGMA_DIAGNOSTIC_PUSH_MSVC_
+#	define BX_PRAGMA_DIAGNOSTIC_POP               BX_PRAGMA_DIAGNOSTIC_POP_MSVC_
 #	define BX_PRAGMA_DIAGNOSTIC_IGNORED_CLANG_GCC(_x)
 #endif // BX_COMPILER_
 
 ///
-#if BX_COMPILER_GCC && defined(__is_pod)
-#	define BX_TYPE_IS_POD(t) __is_pod(t)
-#elif BX_COMPILER_MSVC
+#if BX_COMPILER_MSVC
 #	define BX_TYPE_IS_POD(t) (!__is_class(t) || __is_pod(t))
 #else
-#	define BX_TYPE_IS_POD(t) false
+#	define BX_TYPE_IS_POD(t) std::is_pod<t>::value
 #endif
 ///
 #define BX_CLASS_NO_DEFAULT_CTOR(_class) \
@@ -225,5 +223,8 @@
 #ifndef BX_WARN
 #	define BX_WARN(_condition, ...) BX_NOOP()
 #endif // BX_CHECK
+
+// static_assert sometimes causes unused-local-typedef...
+BX_PRAGMA_DIAGNOSTIC_IGNORED_CLANG("-Wunused-local-typedef")
 
 #endif // BX_MACROS_H_HEADER_GUARD

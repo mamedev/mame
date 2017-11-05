@@ -1,13 +1,14 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
-#ifndef __TC0100SCN_H__
-#define __TC0100SCN_H__
+#ifndef MAME_VIDEO_TC0100SCN_H
+#define MAME_VIDEO_TC0100SCN_H
+
+#pragma once
 
 class tc0100scn_device : public device_t
 {
 public:
-	tc0100scn_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	~tc0100scn_device() {}
+	tc0100scn_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration
 	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
@@ -35,7 +36,7 @@ public:
 		dev.m_flip_text_yoffs = y_offset;
 	}
 
-	#define TC0100SCN_SINGLE_VDU    1024
+	static constexpr unsigned SINGLE_VDU = 1024; // for set_multiscr_xoffs
 
 	/* Function to set separate color banks for the three tilemapped layers.
 	To change from the default (0,0,0) use after calling TC0100SCN_vh_start */
@@ -59,7 +60,7 @@ public:
 	DECLARE_WRITE32_MEMBER(ctrl_long_w);
 
 	void tilemap_update();
-	int tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, UINT32 priority);
+	int tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, uint32_t priority);
 
 	/* returns 0 or 1 depending on the lowest priority tilemap set in the internal
 	register. Use this function to draw tilemaps in the correct order. */
@@ -74,16 +75,16 @@ protected:
 
 private:
 	// internal state
-	UINT16       m_ctrl[8];
+	uint16_t       m_ctrl[8];
 
-	std::unique_ptr<UINT16[]>    m_ram;
-	UINT16 *     m_bg_ram;
-	UINT16 *     m_fg_ram;
-	UINT16 *     m_tx_ram;
-	UINT16 *     m_char_ram;
-	UINT16 *     m_bgscroll_ram;
-	UINT16 *     m_fgscroll_ram;
-	UINT16 *     m_colscroll_ram;
+	std::unique_ptr<uint16_t[]>    m_ram;
+	uint16_t *     m_bg_ram;
+	uint16_t *     m_fg_ram;
+	uint16_t *     m_tx_ram;
+	uint16_t *     m_char_ram;
+	uint16_t *     m_bgscroll_ram;
+	uint16_t *     m_fgscroll_ram;
+	uint16_t *     m_colscroll_ram;
 
 	int          m_bgscrollx, m_bgscrolly, m_fgscrollx, m_fgscrolly;
 
@@ -91,8 +92,8 @@ private:
 	tilemap_t      *m_tilemap[3][2];
 
 	int          m_bg_tilemask;
-	INT32        m_gfxbank;
-	INT32        m_bg0_colbank, m_bg1_colbank, m_tx_colbank;
+	int32_t        m_gfxbank;
+	int32_t        m_bg0_colbank, m_bg1_colbank, m_tx_colbank;
 	int          m_dblwidth;
 
 	int          m_gfxnum;
@@ -110,15 +111,15 @@ private:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
 
-	void common_get_tile_info(tile_data &tileinfo, int tile_index, UINT16 *ram, int colbank);
+	void common_get_tile_info(tile_data &tileinfo, int tile_index, uint16_t *ram, int colbank);
 
-	void tilemap_draw_fg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t* tmap, int flags, UINT32 priority);
+	void tilemap_draw_fg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t* tmap, int flags, uint32_t priority);
 	void set_layer_ptrs();
 	void dirty_tilemaps();
 	void restore_scroll();
 };
 
-extern const device_type TC0100SCN;
+DECLARE_DEVICE_TYPE(TC0100SCN, tc0100scn_device)
 
 
 #define MCFG_TC0100SCN_GFX_REGION(_region) \
@@ -148,4 +149,4 @@ extern const device_type TC0100SCN;
 #define MCFG_TC0100SCN_PALETTE(_palette_tag) \
 	tc0100scn_device::static_set_palette_tag(*device, "^" _palette_tag);
 
-#endif
+#endif // MAME_VIDEO_TC0100SCN_H

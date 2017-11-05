@@ -13,7 +13,7 @@ driver by Hau, Nicola Salmoria
 special thanks to Nekomata, NTD & code-name'Siberia'
 
 TODO:
-- wrong background in fstarfrc title
+- wrong background in fstarfrc title (Video ref. -> https://www.youtube.com/watch?v=EXBTNk-0ejk)
 - there could be some priorities problems in riot
   (more noticeable in level 2)
 
@@ -26,22 +26,15 @@ Notes:
 ******************************************************************************/
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
-#include "cpu/z80/z80.h"
-#include "sound/2151intf.h"
-#include "sound/okim6295.h"
 #include "includes/tecmo16.h"
 
-/******************************************************************************/
+#include "cpu/m68000/m68000.h"
+#include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
+#include "sound/okim6295.h"
+#include "sound/ym2151.h"
+#include "speaker.h"
 
-WRITE16_MEMBER(tecmo16_state::sound_command_w)
-{
-	if (ACCESSING_BITS_0_7)
-	{
-		soundlatch_byte_w(space, 0x00, data & 0xff);
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-	}
-}
 
 /******************************************************************************/
 
@@ -57,7 +50,7 @@ static ADDRESS_MAP_START( fstarfrc_map, AS_PROGRAM, 16, tecmo16_state )
 	AM_RANGE(0x130000, 0x130fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x140000, 0x141fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x150000, 0x150001) AM_WRITE(flipscreen_w)
-	AM_RANGE(0x150010, 0x150011) AM_WRITE(sound_command_w)
+	AM_RANGE(0x150010, 0x150011) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0x150030, 0x150031) AM_READ_PORT("DSW2") AM_WRITENOP   /* ??? */
 	AM_RANGE(0x150040, 0x150041) AM_READ_PORT("DSW1")
 	AM_RANGE(0x150050, 0x150051) AM_READ_PORT("P1_P2")
@@ -80,7 +73,7 @@ static ADDRESS_MAP_START( ginkun_map, AS_PROGRAM, 16, tecmo16_state )
 	AM_RANGE(0x130000, 0x130fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x140000, 0x141fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x150000, 0x150001) AM_WRITE(flipscreen_w)
-	AM_RANGE(0x150010, 0x150011) AM_WRITE(sound_command_w)
+	AM_RANGE(0x150010, 0x150011) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0x150020, 0x150021) AM_READ_PORT("EXTRA") AM_WRITENOP  /* ??? */
 	AM_RANGE(0x150030, 0x150031) AM_READ_PORT("DSW2") AM_WRITENOP   /* ??? */
 	AM_RANGE(0x150040, 0x150041) AM_READ_PORT("DSW1")
@@ -98,7 +91,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, tecmo16_state )
 	AM_RANGE(0xf000, 0xfbff) AM_RAM /* Sound RAM */
 	AM_RANGE(0xfc00, 0xfc00) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0xfc04, 0xfc05) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0xfc08, 0xfc08) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xfc08, 0xfc08) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0xfc0c, 0xfc0c) AM_NOP
 	AM_RANGE(0xfffe, 0xffff) AM_RAM
 ADDRESS_MAP_END
@@ -366,7 +359,7 @@ GFXDECODE_END
 #define MASTER_CLOCK XTAL_24MHz
 #define OKI_CLOCK XTAL_8MHz
 
-static MACHINE_CONFIG_START( fstarfrc, tecmo16_state )
+static MACHINE_CONFIG_START( fstarfrc )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,MASTER_CLOCK/2)          /* 12MHz */
@@ -397,19 +390,22 @@ static MACHINE_CONFIG_START( fstarfrc, tecmo16_state )
 	MCFG_TECMO_MIXER_SHIFTS(10,9,4)
 	MCFG_TECMO_MIXER_BLENDCOLS(   0x0400 + 0x300, 0x0400 + 0x200, 0x0400 + 0x100, 0x0400 + 0x000 )
 	MCFG_TECMO_MIXER_REGULARCOLS( 0x0000 + 0x300, 0x0000 + 0x200, 0x0000 + 0x100, 0x0000 + 0x000 )
-	MCFG_TECMO_MIXER_BLENDSOUCE( 0x0800 + 0x000, 0x0800 + 0x100) // riot seems to set palettes in 0x800 + 0x200, could be more to this..
+	MCFG_TECMO_MIXER_BLENDSOURCE( 0x0800 + 0x000, 0x0800 + 0x100) // riot seems to set palettes in 0x800 + 0x200, could be more to this..
 	MCFG_TECMO_MIXER_REVSPRITETILE
 	MCFG_TECMO_MIXER_BGPEN(0x000 + 0x300)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+
 	MCFG_YM2151_ADD("ymsnd", MASTER_CLOCK/6) // 4 MHz
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.60)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.60)
 
-	MCFG_OKIM6295_ADD("oki", OKI_CLOCK/8, OKIM6295_PIN7_HIGH) // sample rate 1 MHz / 132
+	MCFG_OKIM6295_ADD("oki", OKI_CLOCK/8, PIN7_HIGH) // sample rate 1 MHz / 132
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 MACHINE_CONFIG_END
@@ -631,7 +627,7 @@ ROM_END
 
 /******************************************************************************/
 
-GAME( 1992, fstarfrc,  0,        fstarfrc, fstarfrc, driver_device, 0, ROT90, "Tecmo", "Final Star Force (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, fstarfrcj, fstarfrc, fstarfrc, fstarfrc, driver_device, 0, ROT90, "Tecmo", "Final Star Force (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, riot,      0,        riot,     riot, driver_device,     0, ROT0,  "NMK",   "Riot", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, ginkun,    0,        ginkun,   ginkun, driver_device,   0, ROT0,  "Tecmo", "Ganbare Ginkun", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, fstarfrc,  0,        fstarfrc, fstarfrc, tecmo16_state, 0, ROT90, "Tecmo", "Final Star Force (US)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1992, fstarfrcj, fstarfrc, fstarfrc, fstarfrc, tecmo16_state, 0, ROT90, "Tecmo", "Final Star Force (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, riot,      0,        riot,     riot,     tecmo16_state, 0, ROT0,  "NMK",   "Riot",                     MACHINE_SUPPORTS_SAVE )
+GAME( 1995, ginkun,    0,        ginkun,   ginkun,   tecmo16_state, 0, ROT0,  "Tecmo", "Ganbare Ginkun",           MACHINE_SUPPORTS_SAVE )

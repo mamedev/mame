@@ -8,18 +8,18 @@
  *
  ****************************************************************************/
 
-#ifndef LISA_H_
-#define LISA_H_
+#ifndef MAME_INCLUDES_LISA_H
+#define MAME_INCLUDES_LISA_H
 
-#include "emu.h"
 #include "cpu/m68000/m68000.h"
+#include "machine/74259.h"
+#include "machine/6522via.h"
 #include "machine/6522via.h"
 #include "machine/8530scc.h"
-#include "machine/6522via.h"
-#include "machine/nvram.h"
 #include "machine/applefdc.h"
+#include "machine/nvram.h"
 #include "machine/sonydriv.h"
-#include "sound/speaker.h"
+#include "sound/spkrdev.h"
 
 #define COP421_TAG      "u9f"
 #define KB_COP421_TAG   "kbcop"
@@ -27,8 +27,8 @@
 /* lisa MMU segment regs */
 struct real_mmu_entry
 {
-	UINT16 sorg;
-	UINT16 slim;
+	uint16_t sorg;
+	uint16_t slim;
 };
 
 /* MMU regs translated into a more efficient format */
@@ -86,7 +86,7 @@ struct lisa_features_t
 										I simply don't understand : in one case the VIA is
 										connected to the 68k E clock, which is CPUCK/10, and in
 										another case, to a generated PH2 clock which is CPUCK/4,
-										with additionnal logic to keep it in phase with the 68k
+										with additional logic to keep it in phase with the 68k
 										memory cycle.  After hearing the beep when MacWorks XL
 										boots, I bet the correct values are .625 MHz and .5 MHz.
 										Maybe the schematics are wrong, and PH2 is CPUCK/8.
@@ -110,6 +110,7 @@ public:
 		m_scc(*this, "scc"),
 		m_speaker(*this, "speaker"),
 		m_nvram(*this, "nvram"),
+		m_latch(*this, "latch"),
 		m_fdc_rom(*this,"fdc_rom"),
 		m_fdc_ram(*this,"fdc_ram"),
 		m_io_line0(*this, "LINE0"),
@@ -132,9 +133,10 @@ public:
 	required_device<scc8530_t> m_scc;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<nvram_device> m_nvram;
+	required_device<ls259_device> m_latch;
 
-	required_shared_ptr<UINT8> m_fdc_rom;
-	required_shared_ptr<UINT8> m_fdc_ram;
+	required_shared_ptr<uint8_t> m_fdc_rom;
+	required_shared_ptr<uint8_t> m_fdc_ram;
 
 	required_ioport m_io_line0;
 	required_ioport m_io_line1;
@@ -149,23 +151,23 @@ public:
 
 	required_device<palette_device> m_palette;
 
-	UINT8 *m_ram_ptr;
-	UINT8 *m_rom_ptr;
-	UINT8 *m_videoROM_ptr;
+	uint8_t *m_ram_ptr;
+	uint8_t *m_rom_ptr;
+	uint8_t *m_videoROM_ptr;
 	int m_setup;
 	int m_seg;
 	real_mmu_entry m_real_mmu_regs[4][128];
 	mmu_entry m_mmu_regs[4][128];
 	int m_diag2;
 	int m_test_parity;
-	UINT16 m_mem_err_addr_latch;
+	uint16_t m_mem_err_addr_latch;
 	int m_parity_error_pending;
 	int m_bad_parity_count;
-	std::unique_ptr<UINT8[]> m_bad_parity_table;
+	std::unique_ptr<uint8_t[]> m_bad_parity_table;
 	int m_VTMSK;
 	int m_VTIR;
-	UINT16 m_video_address_latch;
-	UINT16 *m_videoram_ptr;
+	uint16_t m_video_address_latch;
+	uint16_t *m_videoram_ptr;
 	int m_KBIR;
 	int m_FDIR;
 	int m_DISK_DIAG;
@@ -182,6 +184,7 @@ public:
 	int m_mouse_data_offset;
 	int m_COPS_force_unplug;
 	emu_timer *m_mouse_timer;
+	emu_timer *m_cops_ready_timer;
 	int m_hold_COPS_data;
 	int m_NMIcode;
 	clock_regs_t m_clock_regs;
@@ -192,14 +195,18 @@ public:
 	int m_videoROM_address;
 	DECLARE_READ8_MEMBER(lisa_fdc_io_r);
 	DECLARE_WRITE8_MEMBER(lisa_fdc_io_w);
-	DECLARE_READ8_MEMBER(lisa_fdc_r);
-	DECLARE_READ8_MEMBER(lisa210_fdc_r);
-	DECLARE_WRITE8_MEMBER(lisa_fdc_w);
-	DECLARE_WRITE8_MEMBER(lisa210_fdc_w);
 	DECLARE_READ16_MEMBER(lisa_r);
 	DECLARE_WRITE16_MEMBER(lisa_w);
 	DECLARE_READ16_MEMBER(lisa_IO_r);
 	DECLARE_WRITE16_MEMBER(lisa_IO_w);
+	DECLARE_WRITE_LINE_MEMBER(diag1_w);
+	DECLARE_WRITE_LINE_MEMBER(diag2_w);
+	DECLARE_WRITE_LINE_MEMBER(seg1_w);
+	DECLARE_WRITE_LINE_MEMBER(seg2_w);
+	DECLARE_WRITE_LINE_MEMBER(setup_w);
+	DECLARE_WRITE_LINE_MEMBER(vtmsk_w);
+	DECLARE_WRITE_LINE_MEMBER(sfmsk_w);
+	DECLARE_WRITE_LINE_MEMBER(hdmsk_w);
 
 	DECLARE_DRIVER_INIT(lisa210);
 	DECLARE_DRIVER_INIT(mac_xl);
@@ -208,7 +215,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	void nvram_init(nvram_device &nvram, void *data, size_t size);
-	UINT32 screen_update_lisa(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_lisa(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(lisa_interrupt);
 	TIMER_CALLBACK_MEMBER(handle_mouse);
 	TIMER_CALLBACK_MEMBER(read_COPS_command);
@@ -226,11 +233,11 @@ public:
 	void reset_COPS();
 	void lisa_fdc_ttl_glue_access(offs_t offset);
 	void COPS_send_data_if_possible();
-	void COPS_queue_data(const UINT8 *data, int len);
+	void COPS_queue_data(const uint8_t *data, int len);
 	void COPS_via_irq_func(int val);
 	void scan_keyboard();
 	void unplug_keyboard();
 	void plug_keyboard();
 };
 
-#endif /* LISA_H_ */
+#endif // MAME_INCLUDES_LISA_H

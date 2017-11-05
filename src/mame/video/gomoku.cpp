@@ -22,7 +22,7 @@
 
 PALETTE_INIT_MEMBER(gomoku_state, gomoku)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 	int bit0, bit1, bit2, r, g, b;
 
@@ -86,14 +86,14 @@ WRITE8_MEMBER(gomoku_state::gomoku_bgram_w)
 	m_bgram[offset] = data;
 }
 
-WRITE8_MEMBER(gomoku_state::gomoku_flipscreen_w)
+WRITE_LINE_MEMBER(gomoku_state::flipscreen_w)
 {
-	m_flipscreen = (data & 0x02) ? 0 : 1;
+	m_flipscreen = state ? 0 : 1;
 }
 
-WRITE8_MEMBER(gomoku_state::gomoku_bg_dispsw_w)
+WRITE_LINE_MEMBER(gomoku_state::bg_dispsw_w)
 {
-	m_bg_dispsw = (data & 0x02) ? 0 : 1;
+	m_bg_dispsw = state ? 0 : 1;
 }
 
 
@@ -105,16 +105,16 @@ WRITE8_MEMBER(gomoku_state::gomoku_bg_dispsw_w)
 
 void gomoku_state::video_start()
 {
-	UINT8 *GOMOKU_BG_X = memregion( "user1" )->base();
-	UINT8 *GOMOKU_BG_Y = memregion( "user2" )->base();
-	UINT8 *GOMOKU_BG_D = memregion( "user3" )->base();
+	uint8_t *GOMOKU_BG_X = memregion( "user1" )->base();
+	uint8_t *GOMOKU_BG_Y = memregion( "user2" )->base();
+	uint8_t *GOMOKU_BG_D = memregion( "user3" )->base();
 	int x, y;
 	int bgdata;
 	int color;
 
 	m_screen->register_screen_bitmap(m_bg_bitmap);
 
-	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(gomoku_state::get_fg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(gomoku_state::get_fg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32, 32);
 
 	m_fg_tilemap->set_transparent_pen(0);
 
@@ -145,11 +145,11 @@ void gomoku_state::video_start()
 
 ******************************************************************************/
 
-UINT32 gomoku_state::screen_update_gomoku(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t gomoku_state::screen_update_gomoku(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 *GOMOKU_BG_X = memregion( "user1" )->base();
-	UINT8 *GOMOKU_BG_Y = memregion( "user2" )->base();
-	UINT8 *GOMOKU_BG_D = memregion( "user3" )->base();
+	uint8_t *GOMOKU_BG_X = memregion( "user1" )->base();
+	uint8_t *GOMOKU_BG_Y = memregion( "user2" )->base();
+	uint8_t *GOMOKU_BG_D = memregion( "user3" )->base();
 	int x, y;
 	int bgram;
 	int bgoffs;

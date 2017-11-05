@@ -39,7 +39,7 @@ const naslite_format::format naslite_format::formats[] = {
 	{}
 };
 
-void naslite_format::build_sector_description(const format &f, UINT8 *sectdata, desc_s *sectors, int track, int head) const
+void naslite_format::build_sector_description(const format &f, uint8_t *sectdata, desc_s *sectors, int track, int head) const
 {
 	for(int i=0; i<f.sector_count; i++) {
 		int cur_offset = 0;

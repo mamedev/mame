@@ -156,15 +156,17 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/kangaroo.h"
+
 #include "cpu/mb88xx/mb88xx.h"
 #include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
 #include "sound/ay8910.h"
-#include "includes/kangaroo.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 #define MASTER_CLOCK        XTAL_10MHz
-
-
 
 
 
@@ -256,7 +258,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, kangaroo_state )
 	AM_RANGE(0xe000, 0xe3ff) AM_RAM
 	AM_RANGE(0xe400, 0xe400) AM_MIRROR(0x03ff) AM_READ_PORT("DSW0")
 	AM_RANGE(0xe800, 0xe80a) AM_MIRROR(0x03f0) AM_WRITE(kangaroo_video_control_w) AM_SHARE("video_control")
-	AM_RANGE(0xec00, 0xec00) AM_MIRROR(0x00ff) AM_READ_PORT("IN0") AM_WRITE(soundlatch_byte_w)
+	AM_RANGE(0xec00, 0xec00) AM_MIRROR(0x00ff) AM_READ_PORT("IN0") AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0xed00, 0xed00) AM_MIRROR(0x00ff) AM_READ_PORT("IN1") AM_WRITE(kangaroo_coin_counter_w)
 	AM_RANGE(0xee00, 0xee00) AM_MIRROR(0x00ff) AM_READ_PORT("IN2")
 ADDRESS_MAP_END
@@ -272,7 +274,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, kangaroo_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x0c00) AM_RAM
-	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x0fff) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x0fff) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x7000, 0x7000) AM_MIRROR(0x0fff) AM_DEVWRITE("aysnd", ay8910_device, data_w)
 	AM_RANGE(0x8000, 0x8000) AM_MIRROR(0x0fff) AM_DEVWRITE("aysnd", ay8910_device, address_w)
 ADDRESS_MAP_END
@@ -282,7 +284,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, kangaroo_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x0c00) AM_RAM
-	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x0fff) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x0fff) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x7000, 0x7000) AM_MIRROR(0x0fff) AM_DEVWRITE("aysnd", ay8910_device, data_w)
 	AM_RANGE(0x8000, 0x8000) AM_MIRROR(0x0fff) AM_DEVWRITE("aysnd", ay8910_device, address_w)
 ADDRESS_MAP_END
@@ -424,7 +426,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( nomcu, kangaroo_state )
+static MACHINE_CONFIG_START( nomcu )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/4)
@@ -447,6 +449,9 @@ static MACHINE_CONFIG_START( nomcu, kangaroo_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("aysnd", AY8910, MASTER_CLOCK/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
@@ -540,21 +545,23 @@ ROM_END
 
 ROM_START( kangaroob )
 	ROM_REGION( 0x14000, "maincpu", 0 )
-	ROM_LOAD( "tvg_75.0",    0x0000, 0x1000, CRC(0d18c581) SHA1(0e0f89d644b79e887c53e5294783843ca7e875ba) )
-	ROM_LOAD( "tvg_76.1",    0x1000, 0x1000, CRC(5978d37a) SHA1(684c1092de4a0927a03752903c86c3bbe99e868a) )
-	ROM_LOAD( "tvg_77.2",    0x2000, 0x1000, CRC(522d1097) SHA1(09fe627a46d32df2e098d9fad7757f9d61bef41f) )
-	ROM_LOAD( "tvg_78.3",    0x3000, 0x1000, CRC(063da970) SHA1(582ff21dd46c651f07a4846e0f8a7544a5891988) )
-	ROM_LOAD( "tvg_79.4",    0x4000, 0x1000, CRC(9e5cf8ca) SHA1(015387f038c5670f88c9b22453d074bd9b2a129d) )
-	ROM_LOAD( "k6",          0x5000, 0x1000, CRC(7644504a) SHA1(7a8a4bd163d2cdf27390ab2ef65fb7fa6fc1a361) )
+	ROM_LOAD( "k1.ic7",      0x0000, 0x1000, CRC(0d18c581) SHA1(0e0f89d644b79e887c53e5294783843ca7e875ba) )
+	ROM_LOAD( "k2.ic8",      0x1000, 0x1000, CRC(5978d37a) SHA1(684c1092de4a0927a03752903c86c3bbe99e868a) )
+	ROM_LOAD( "k3.ic9",      0x2000, 0x1000, CRC(522d1097) SHA1(09fe627a46d32df2e098d9fad7757f9d61bef41f) )
+	ROM_LOAD( "k4.ic10",     0x3000, 0x1000, CRC(063da970) SHA1(582ff21dd46c651f07a4846e0f8a7544a5891988) )
+	ROM_LOAD( "k5.ic16",     0x4000, 0x1000, CRC(9e5cf8ca) SHA1(015387f038c5670f88c9b22453d074bd9b2a129d) )
+	ROM_LOAD( "k6.ic17",     0x5000, 0x1000, CRC(7644504a) SHA1(7a8a4bd163d2cdf27390ab2ef65fb7fa6fc1a361) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "tvg_81.8",    0x0000, 0x1000, CRC(fb449bfd) SHA1(f593a0339f47e121736a927587132aeb52704557) )
+	ROM_LOAD( "k7.ic24",     0x0000, 0x1000, CRC(fb449bfd) SHA1(f593a0339f47e121736a927587132aeb52704557) )
+
+	// MB8841 at IC29 and 2716 at IC28 not populated
 
 	ROM_REGION( 0x4000, "gfx1", 0 )
-	ROM_LOAD( "tvg_83.v0",   0x0000, 0x1000, CRC(c0446ca6) SHA1(fca6ba565051337c0198c93b7b8477632e0dd0b6) )
-	ROM_LOAD( "tvg_85.v2",   0x1000, 0x1000, CRC(72c52695) SHA1(87f4715fbb7d509bd9cc4e71e2afb0d475bbac13) )
-	ROM_LOAD( "tvg_84.v1",   0x2000, 0x1000, CRC(e4cb26c2) SHA1(5016db9d48fdcfb757618659d063b90862eb0e90) )
-	ROM_LOAD( "tvg_86.v3",   0x3000, 0x1000, CRC(9e6a599f) SHA1(76b4eddb4efcd8189d8cc5962d8497e82885f212) )
+	ROM_LOAD( "k10.ic76",    0x0000, 0x1000, CRC(c0446ca6) SHA1(fca6ba565051337c0198c93b7b8477632e0dd0b6) )
+	ROM_LOAD( "k11.ic77",    0x1000, 0x1000, CRC(72c52695) SHA1(87f4715fbb7d509bd9cc4e71e2afb0d475bbac13) )
+	ROM_LOAD( "k8.ic52",     0x2000, 0x1000, CRC(e4cb26c2) SHA1(5016db9d48fdcfb757618659d063b90862eb0e90) )
+	ROM_LOAD( "k9.ic53",     0x3000, 0x1000, CRC(9e6a599f) SHA1(76b4eddb4efcd8189d8cc5962d8497e82885f212) )
 ROM_END
 
 
@@ -565,7 +572,7 @@ ROM_END
  *
  *************************************/
 
-GAME( 1981, fnkyfish,  0,        nomcu, fnkyfish, driver_device, 0, ROT90, "Sun Electronics",                 "Funky Fish", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, kangaroo,  0,        mcu,   kangaroo, driver_device, 0, ROT90, "Sun Electronics",                 "Kangaroo", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, kangarooa, kangaroo, mcu,   kangaroo, driver_device, 0, ROT90, "Sun Electronics (Atari license)", "Kangaroo (Atari)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, kangaroob, kangaroo, nomcu, kangaroo, driver_device, 0, ROT90, "bootleg",                         "Kangaroo (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, fnkyfish,  0,        nomcu, fnkyfish, kangaroo_state, 0, ROT90, "Sun Electronics",                 "Funky Fish",         MACHINE_SUPPORTS_SAVE )
+GAME( 1982, kangaroo,  0,        mcu,   kangaroo, kangaroo_state, 0, ROT90, "Sun Electronics",                 "Kangaroo",           MACHINE_SUPPORTS_SAVE )
+GAME( 1982, kangarooa, kangaroo, mcu,   kangaroo, kangaroo_state, 0, ROT90, "Sun Electronics (Atari license)", "Kangaroo (Atari)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1982, kangaroob, kangaroo, nomcu, kangaroo, kangaroo_state, 0, ROT90, "bootleg",                         "Kangaroo (bootleg)", MACHINE_SUPPORTS_SAVE )

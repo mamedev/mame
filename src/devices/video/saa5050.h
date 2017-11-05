@@ -23,12 +23,11 @@
 
 **********************************************************************/
 
+#ifndef MAME_VIDEO_SAA5050_H
+#define MAME_VIDEO_SAA5050_H
+
 #pragma once
 
-#ifndef __SAA5050__
-#define __SAA5050__
-
-#include "emu.h"
 
 
 
@@ -55,20 +54,19 @@ class saa5050_device :  public device_t
 {
 public:
 	// construction/destruction
-	saa5050_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	saa5050_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	saa5050_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	static void static_set_screen_size(device_t &device, int cols, int rows, int size) { downcast<saa5050_device &>(device).m_cols = cols; downcast<saa5050_device &>(device).m_rows = rows; downcast<saa5050_device &>(device).m_size = size; }
 
-	template<class _Object> static devcb_base &set_d_rd_callback(device_t &device, _Object object) { return downcast<saa5050_device &>(device).m_read_d.set_callback(object); }
+	template <class Object> static devcb_base &set_d_rd_callback(device_t &device, Object &&cb) { return downcast<saa5050_device &>(device).m_read_d.set_callback(std::forward<Object>(cb)); }
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 
 	DECLARE_WRITE_LINE_MEMBER( crs_w );
 	DECLARE_WRITE_LINE_MEMBER( dew_w );
 	DECLARE_WRITE_LINE_MEMBER( lose_w );
-	void write(UINT8 data);
+	void write(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( f1_w );
 	DECLARE_WRITE_LINE_MEMBER( tr6_w );
 	int get_rgb();
@@ -76,9 +74,11 @@ public:
 	// NOTE: the following are provided for convenience only, SAA5050 is not a display controller
 	// this emulates the common setup where bit 7 of data inverts the display, and the
 	// bottom half of a double height row gets the same character data as the top half
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
+	saa5050_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -120,23 +120,23 @@ private:
 		RELEASE_GRAPHICS
 	};
 
-	void process_control_character(UINT8 data);
+	void process_control_character(uint8_t data);
 	void set_next_chartype();
-	UINT16 get_gfx_data(UINT8 data, offs_t row, bool separated);
-	UINT16 get_rom_data(UINT8 data, offs_t row);
-	UINT16 character_rounding(UINT16 a, UINT16 b);
-	void get_character_data(UINT8 data);
+	uint16_t get_gfx_data(uint8_t data, offs_t row, bool separated);
+	uint16_t get_rom_data(uint8_t data, offs_t row);
+	uint16_t character_rounding(uint16_t a, uint16_t b);
+	void get_character_data(uint8_t data);
 
-	required_region_ptr<UINT8> m_char_rom;
+	required_region_ptr<uint8_t> m_char_rom;
 
 	devcb_read8    m_read_d;
 
-	UINT8 m_code;
-	UINT8 m_held_char;
-	UINT8 m_next_chartype;
-	UINT8 m_curr_chartype;
-	UINT8 m_held_chartype;
-	UINT16 m_char_data;
+	uint8_t m_code;
+	uint8_t m_held_char;
+	uint8_t m_next_chartype;
+	uint8_t m_curr_chartype;
+	uint8_t m_held_chartype;
+	uint16_t m_char_data;
 	int m_bit;
 	rgb_t m_color;
 	int m_crs;
@@ -169,10 +169,10 @@ class saa5051_device :  public saa5050_device
 {
 public:
 	// construction/destruction
-	saa5051_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	saa5051_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 };
 
 
@@ -182,10 +182,10 @@ class saa5052_device :  public saa5050_device
 {
 public:
 	// construction/destruction
-	saa5052_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	saa5052_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 };
 
 
@@ -195,10 +195,10 @@ class saa5053_device :  public saa5050_device
 {
 public:
 	// construction/destruction
-	saa5053_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	saa5053_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 };
 
 
@@ -208,10 +208,10 @@ class saa5054_device :  public saa5050_device
 {
 public:
 	// construction/destruction
-	saa5054_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	saa5054_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 };
 
 
@@ -221,10 +221,10 @@ class saa5055_device :  public saa5050_device
 {
 public:
 	// construction/destruction
-	saa5055_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	saa5055_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 };
 
 
@@ -234,10 +234,10 @@ class saa5056_device :  public saa5050_device
 {
 public:
 	// construction/destruction
-	saa5056_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	saa5056_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 };
 
 
@@ -247,23 +247,21 @@ class saa5057_device :  public saa5050_device
 {
 public:
 	// construction/destruction
-	saa5057_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	saa5057_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 };
 
 
 // device type definition
-extern const device_type SAA5050; // English
-extern const device_type SAA5051; // German
-extern const device_type SAA5052; // Swedish/Finnish
-extern const device_type SAA5053; // Italian
-extern const device_type SAA5054; // Belgian
-extern const device_type SAA5055; // US ASCII
-extern const device_type SAA5056; // Hebrew
-extern const device_type SAA5057; // Cyrillic
+DECLARE_DEVICE_TYPE(SAA5050, saa5050_device) // English
+DECLARE_DEVICE_TYPE(SAA5051, saa5051_device) // German
+DECLARE_DEVICE_TYPE(SAA5052, saa5052_device) // Swedish/Finnish
+DECLARE_DEVICE_TYPE(SAA5053, saa5053_device) // Italian
+DECLARE_DEVICE_TYPE(SAA5054, saa5054_device) // Belgian
+DECLARE_DEVICE_TYPE(SAA5055, saa5055_device) // US ASCII
+DECLARE_DEVICE_TYPE(SAA5056, saa5056_device) // Hebrew
+DECLARE_DEVICE_TYPE(SAA5057, saa5057_device) // Cyrillic
 
-
-
-#endif
+#endif // MAME_VIDEO_SAA5050_H

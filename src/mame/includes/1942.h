@@ -7,6 +7,7 @@
 ***************************************************************************/
 
 #include "machine/gen_latch.h"
+#include "machine/timer.h"
 
 class _1942_state : public driver_device
 {
@@ -24,16 +25,16 @@ public:
 		m_soundlatch(*this, "soundlatch") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_spriteram;
-	required_shared_ptr<UINT8> m_fg_videoram;
-	required_shared_ptr<UINT8> m_bg_videoram;
-	optional_shared_ptr<UINT8> m_protopal;
+	required_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<uint8_t> m_fg_videoram;
+	required_shared_ptr<uint8_t> m_bg_videoram;
+	optional_shared_ptr<uint8_t> m_protopal;
 
 	/* video-related */
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_bg_tilemap;
 	int m_palette_bank;
-	UINT8 m_scroll[2];
+	uint8_t m_scroll[2];
 	void create_palette();
 	DECLARE_PALETTE_INIT(1942);
 	DECLARE_PALETTE_INIT(1942p);
@@ -48,7 +49,6 @@ public:
 	DECLARE_WRITE8_MEMBER(c1942_scroll_w);
 	DECLARE_WRITE8_MEMBER(c1942_c804_w);
 	DECLARE_WRITE8_MEMBER(c1942p_f600_w);
-	DECLARE_WRITE8_MEMBER(c1942p_soundlatch_w);
 	DECLARE_DRIVER_INIT(1942);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
@@ -56,8 +56,8 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	void video_start_c1942p();
-	UINT32 screen_update_1942(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_1942p(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_1942(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_1942p(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(c1942_scanline);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void draw_sprites_p( bitmap_ind16 &bitmap, const rectangle &cliprect );

@@ -6,12 +6,12 @@
 //
 //====================================================================
 
+#include "emu.h"
 #include "diagnostics_module.h"
 
 #if defined(OSD_WINDOWS) || defined(SDLMAME_WIN32)
 
 // standard windows headers
-#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 
 #if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
@@ -22,39 +22,31 @@
 
 #include <memory>
 #include <vector>
+#include <utility>
+
+#include "modules/lib/osdlib.h"
+
 #include <windows/winutil.h>
 
-template<typename _FunctionPtr>
-class dynamic_bind
-{
-public:
-	// constructor which looks up the function
-	dynamic_bind(const TCHAR *dll, const char *symbol)
-		: m_function(nullptr)
-	{
-		HMODULE module = LoadLibrary(dll);
-		if (module != nullptr)
-			m_function = reinterpret_cast<_FunctionPtr>(GetProcAddress(module, symbol));
-	}
-
-	// bool to test if the function is nullptr or not
-	operator bool() const { return (m_function != nullptr); }
-
-	// dereference to get the underlying pointer
-	_FunctionPtr operator *() const { return m_function; }
-
-private:
-	_FunctionPtr    m_function;
-};
+// Typedefs for dynamically loaded functions
+typedef BOOL (WINAPI *StackWalk64_fn)(DWORD, HANDLE, HANDLE, LPSTACKFRAME64, PVOID, PREAD_PROCESS_MEMORY_ROUTINE64, PFUNCTION_TABLE_ACCESS_ROUTINE64, PGET_MODULE_BASE_ROUTINE64, PTRANSLATE_ADDRESS_ROUTINE64);
+typedef BOOL (WINAPI *SymInitialize_fn)(HANDLE, LPCTSTR, BOOL);
+typedef PVOID (WINAPI *SymFunctionTableAccess64_fn)(HANDLE, DWORD64);
+typedef DWORD64 (WINAPI *SymGetModuleBase64_fn)(HANDLE, DWORD64);
+typedef BOOL (WINAPI *SymFromAddr_fn)(HANDLE, DWORD64, PDWORD64, PSYMBOL_INFO);
+typedef BOOL (WINAPI *SymGetLineFromAddr64_fn)(HANDLE, DWORD64, PDWORD, PIMAGEHLP_LINE64);
+typedef PIMAGE_SECTION_HEADER (WINAPI *ImageRvaToSection_fn)(PIMAGE_NT_HEADERS, PVOID, ULONG);
+typedef PIMAGE_NT_HEADERS (WINAPI *ImageNtHeader_fn)(PVOID);
+typedef VOID (WINAPI *RtlCaptureContext_fn)(PCONTEXT);
 
 class stack_walker
 {
 public:
 	stack_walker();
 
-	FPTR ip() const { return m_stackframe.AddrPC.Offset; }
-	FPTR sp() const { return m_stackframe.AddrStack.Offset; }
-	FPTR frame() const { return m_stackframe.AddrFrame.Offset; }
+	uintptr_t ip() const { return m_stackframe.AddrPC.Offset; }
+	uintptr_t sp() const { return m_stackframe.AddrStack.Offset; }
+	uintptr_t frame() const { return m_stackframe.AddrFrame.Offset; }
 
 	bool reset();
 	void reset(CONTEXT &context, HANDLE thread);
@@ -67,12 +59,14 @@ private:
 	CONTEXT         m_context;
 	bool            m_first;
 
-	dynamic_bind<BOOL(WINAPI *)(DWORD, HANDLE, HANDLE, LPSTACKFRAME64, PVOID, PREAD_PROCESS_MEMORY_ROUTINE64, PFUNCTION_TABLE_ACCESS_ROUTINE64, PGET_MODULE_BASE_ROUTINE64, PTRANSLATE_ADDRESS_ROUTINE64)>
-		m_stack_walk_64;
-	dynamic_bind<BOOL(WINAPI *)(HANDLE, LPCTSTR, BOOL)> m_sym_initialize;
-	dynamic_bind<PVOID(WINAPI *)(HANDLE, DWORD64)> m_sym_function_table_access_64;
-	dynamic_bind<DWORD64(WINAPI *)(HANDLE, DWORD64)> m_sym_get_module_base_64;
-	dynamic_bind<VOID(WINAPI *)(PCONTEXT)> m_rtl_capture_context;
+	osd::dynamic_module::ptr    m_dbghelp_dll;
+	osd::dynamic_module::ptr    m_kernel32_dll;
+
+	StackWalk64_fn              m_stack_walk_64;
+	SymInitialize_fn            m_sym_initialize;
+	SymFunctionTableAccess64_fn m_sym_function_table_access_64;
+	SymGetModuleBase64_fn       m_sym_get_module_base_64;
+	RtlCaptureContext_fn        m_rtl_capture_context;
 
 	static bool     s_initialized;
 };
@@ -86,54 +80,54 @@ public:
 	~symbol_manager();
 
 	// getters
-	FPTR last_base() const { return m_last_base; }
+	uintptr_t last_base() const { return m_last_base; }
 
 	// core symbol lookup
-	const char *symbol_for_address(FPTR address);
-	const char *symbol_for_address(PVOID address) { return symbol_for_address(reinterpret_cast<FPTR>(address)); }
+	const char *symbol_for_address(uintptr_t address);
+	const char *symbol_for_address(PVOID address) { return symbol_for_address(reinterpret_cast<uintptr_t>(address)); }
 
 	// force symbols to be cached
 	void cache_symbols() { scan_file_for_address(0, true); }
 
-	void reset_cache() { m_cache.reset(); }
+	void reset_cache() { m_cache.clear(); }
 private:
 	// internal helpers
-	bool query_system_for_address(FPTR address);
-	void scan_file_for_address(FPTR address, bool create_cache);
-	bool parse_sym_line(const char *line, FPTR &address, std::string &symbol);
-	bool parse_map_line(const char *line, FPTR &address, std::string &symbol);
-	void scan_cache_for_address(FPTR address);
-	void format_symbol(const char *name, UINT32 displacement, const char *filename = nullptr, int linenumber = 0);
+	bool query_system_for_address(uintptr_t address);
+	void scan_file_for_address(uintptr_t address, bool create_cache);
+	bool parse_sym_line(const char *line, uintptr_t &address, std::string &symbol);
+	bool parse_map_line(const char *line, uintptr_t &address, std::string &symbol);
+	void scan_cache_for_address(uintptr_t address);
+	void format_symbol(const char *name, uint32_t displacement, const char *filename = nullptr, int linenumber = 0);
 
-	static FPTR get_text_section_base();
+	static uintptr_t get_text_section_base();
 
 	struct cache_entry
 	{
-		cache_entry(FPTR address, const char *symbol) :
-			m_next(nullptr), m_address(address), m_name(symbol) { }
-		cache_entry *next() const { return m_next; }
+		cache_entry(uintptr_t address, const char *symbol) :
+			m_address(address), m_name(symbol) { }
 
-		cache_entry *   m_next;
-		FPTR            m_address;
+		uintptr_t            m_address;
 		std::string     m_name;
 	};
-	simple_list<cache_entry> m_cache;
+	std::vector<std::unique_ptr<cache_entry>> m_cache;
 
 	std::string     m_mapfile;
 	std::string     m_symfile;
 	std::string     m_buffer;
 	HANDLE          m_process;
-	FPTR            m_last_base;
-	FPTR            m_text_base;
+	uintptr_t            m_last_base;
+	uintptr_t            m_text_base;
 
-	dynamic_bind<BOOL(WINAPI *)(HANDLE, DWORD64, PDWORD64, PSYMBOL_INFO)> m_sym_from_addr;
-	dynamic_bind<BOOL(WINAPI *)(HANDLE, DWORD64, PDWORD, PIMAGEHLP_LINE64)> m_sym_get_line_from_addr_64;
+	osd::dynamic_module::ptr m_dbghelp_dll;
+
+	SymFromAddr_fn           m_sym_from_addr;
+	SymGetLineFromAddr64_fn  m_sym_get_line_from_addr_64;
 };
 
 class sampling_profiler
 {
 public:
-	sampling_profiler(UINT32 max_seconds, UINT8 stack_depth);
+	sampling_profiler(uint32_t max_seconds, uint8_t stack_depth);
 	~sampling_profiler();
 
 	void start();
@@ -155,11 +149,11 @@ private:
 	DWORD           m_thread_id;
 	volatile bool   m_thread_exit;
 
-	UINT8           m_stack_depth;
-	UINT8           m_entry_stride;
-	std::vector<FPTR>    m_buffer;
-	FPTR *          m_buffer_ptr;
-	FPTR *          m_buffer_end;
+	uint8_t           m_stack_depth;
+	uint8_t           m_entry_stride;
+	std::vector<uintptr_t>    m_buffer;
+	uintptr_t *          m_buffer_ptr;
+	uintptr_t *          m_buffer_end;
 };
 
 
@@ -176,16 +170,20 @@ bool stack_walker::s_initialized = false;
 stack_walker::stack_walker()
 	: m_process(GetCurrentProcess()),
 	m_thread(GetCurrentThread()),
-	m_first(true),
-	m_stack_walk_64(TEXT("dbghelp.dll"), "StackWalk64"),
-	m_sym_initialize(TEXT("dbghelp.dll"), "SymInitialize"),
-	m_sym_function_table_access_64(TEXT("dbghelp.dll"), "SymFunctionTableAccess64"),
-	m_sym_get_module_base_64(TEXT("dbghelp.dll"), "SymGetModuleBase64"),
-	m_rtl_capture_context(TEXT("kernel32.dll"), "RtlCaptureContext")
+	m_first(true)
 {
 	// zap the structs
 	memset(&m_stackframe, 0, sizeof(m_stackframe));
 	memset(&m_context, 0, sizeof(m_context));
+
+	m_dbghelp_dll = osd::dynamic_module::open({ "dbghelp.dll" });
+	m_kernel32_dll = osd::dynamic_module::open({ "kernel32.dll" });
+
+	m_stack_walk_64 = m_dbghelp_dll->bind<StackWalk64_fn>("StackWalk64");
+	m_sym_initialize = m_dbghelp_dll->bind<SymInitialize_fn>("SymInitialize");
+	m_sym_function_table_access_64 = m_dbghelp_dll->bind<SymFunctionTableAccess64_fn>("SymFunctionTableAccess64");
+	m_sym_get_module_base_64 = m_dbghelp_dll->bind<SymGetModuleBase64_fn>("SymGetModuleBase64");
+	m_rtl_capture_context = m_kernel32_dll->bind<RtlCaptureContext_fn>("RtlCaptureContext");
 
 	// initialize the symbols
 	if (!s_initialized && m_sym_initialize && m_stack_walk_64 && m_sym_function_table_access_64 && m_sym_get_module_base_64)
@@ -294,9 +292,7 @@ symbol_manager::symbol_manager(const char *argv0)
 	m_symfile(argv0),
 	m_process(GetCurrentProcess()),
 	m_last_base(0),
-	m_text_base(0),
-	m_sym_from_addr(TEXT("dbghelp.dll"), "SymFromAddr"),
-	m_sym_get_line_from_addr_64(TEXT("dbghelp.dll"), "SymGetLineFromAddr64")
+	m_text_base(0)
 {
 #ifdef __GNUC__
 	// compute the name of the mapfile
@@ -317,6 +313,11 @@ symbol_manager::symbol_manager(const char *argv0)
 
 	// expand the buffer to be decently large up front
 	m_buffer = string_format("%500s", "");
+
+	m_dbghelp_dll = osd::dynamic_module::open({ "dbghelp.dll" });
+
+	m_sym_from_addr = m_dbghelp_dll->bind<SymFromAddr_fn>("SymFromAddr");
+	m_sym_get_line_from_addr_64 = m_dbghelp_dll->bind<SymGetLineFromAddr64_fn>("SymGetLineFromAddr64");
 }
 
 
@@ -335,7 +336,7 @@ symbol_manager::~symbol_manager()
 //  file
 //-------------------------------------------------
 
-const char *symbol_manager::symbol_for_address(FPTR address)
+const char *symbol_manager::symbol_for_address(uintptr_t address)
 {
 	// default the buffer
 	m_buffer.assign(" (not found)");
@@ -361,7 +362,7 @@ const char *symbol_manager::symbol_for_address(FPTR address)
 //  look up our address
 //-------------------------------------------------
 
-bool symbol_manager::query_system_for_address(FPTR address)
+bool symbol_manager::query_system_for_address(uintptr_t address)
 {
 	// need at least the sym_from_addr API
 	if (!m_sym_from_addr)
@@ -399,7 +400,7 @@ bool symbol_manager::query_system_for_address(FPTR address)
 //  along the way
 //-------------------------------------------------
 
-void symbol_manager::scan_file_for_address(FPTR address, bool create_cache)
+void symbol_manager::scan_file_for_address(uintptr_t address, bool create_cache)
 {
 	bool is_symfile = false;
 	FILE *srcfile = nullptr;
@@ -420,7 +421,7 @@ void symbol_manager::scan_file_for_address(FPTR address, bool create_cache)
 
 	// reset the best info
 	std::string best_symbol;
-	FPTR best_addr = 0;
+	uintptr_t best_addr = 0;
 
 	// parse the file, looking for valid entries
 	std::string symbol;
@@ -428,7 +429,7 @@ void symbol_manager::scan_file_for_address(FPTR address, bool create_cache)
 	while (fgets(line, sizeof(line) - 1, srcfile))
 	{
 		// parse the line looking for an interesting symbol
-		FPTR addr = 0;
+		uintptr_t addr = 0;
 		bool valid = is_symfile ? parse_sym_line(line, addr, symbol) : parse_map_line(line, addr, symbol);
 
 		// if we got one, see if this is the best
@@ -443,7 +444,7 @@ void symbol_manager::scan_file_for_address(FPTR address, bool create_cache)
 
 			// also create a cache entry if we can
 			if (create_cache)
-				m_cache.append(*global_alloc(cache_entry(addr, symbol.c_str())));
+				m_cache.push_back(std::make_unique<cache_entry>(addr, symbol.c_str()));
 		}
 	}
 
@@ -461,20 +462,20 @@ void symbol_manager::scan_file_for_address(FPTR address, bool create_cache)
 //  find the best match for the given address
 //-------------------------------------------------
 
-void symbol_manager::scan_cache_for_address(FPTR address)
+void symbol_manager::scan_cache_for_address(uintptr_t address)
 {
 	// reset the best info
 	std::string best_symbol;
-	FPTR best_addr = 0;
+	uintptr_t best_addr = 0;
 
 	// walk the cache, looking for valid entries
-	for (cache_entry &entry : m_cache)
+	for (auto &entry : m_cache)
 
 		// if this is the best one so far, remember it
-		if (entry.m_address <= address && entry.m_address > best_addr)
+		if (entry->m_address <= address && entry->m_address > best_addr)
 		{
-			best_addr = entry.m_address;
-			best_symbol = entry.m_name;
+			best_addr = entry->m_address;
+			best_symbol = entry->m_name;
 		}
 
 	// format the symbol and remember the last base
@@ -488,7 +489,7 @@ void symbol_manager::scan_cache_for_address(FPTR address)
 //  which is just the output of objdump
 //-------------------------------------------------
 
-bool symbol_manager::parse_sym_line(const char *line, FPTR &address, std::string &symbol)
+bool symbol_manager::parse_sym_line(const char *line, uintptr_t &address, std::string &symbol)
 {
 #ifdef __GNUC__
 	/*
@@ -521,7 +522,7 @@ bool symbol_manager::parse_sym_line(const char *line, FPTR &address, std::string
 			void *temp;
 			if (sscanf(chptr, "0x%p", &temp) != 1)
 				return false;
-			address = m_text_base + reinterpret_cast<FPTR>(temp);
+			address = m_text_base + reinterpret_cast<uintptr_t>(temp);
 
 			// skip forward until we're past the space
 			while (*chptr != 0 && !isspace(*chptr))
@@ -542,7 +543,7 @@ bool symbol_manager::parse_sym_line(const char *line, FPTR &address, std::string
 //  generated map file
 //-------------------------------------------------
 
-bool symbol_manager::parse_map_line(const char *line, FPTR &address, std::string &symbol)
+bool symbol_manager::parse_map_line(const char *line, uintptr_t &address, std::string &symbol)
 {
 #ifdef __GNUC__
 	/*
@@ -560,7 +561,7 @@ bool symbol_manager::parse_map_line(const char *line, FPTR &address, std::string
 		void *temp;
 		if (sscanf(&line[16], "0x%p", &temp) != 1)
 			return false;
-		address = reinterpret_cast<FPTR>(temp);
+		address = reinterpret_cast<uintptr_t>(temp);
 
 		// skip forward until we're past the space
 		const char *chptr = &line[16];
@@ -580,12 +581,12 @@ bool symbol_manager::parse_map_line(const char *line, FPTR &address, std::string
 //  format_symbol - common symbol formatting
 //-------------------------------------------------
 
-void symbol_manager::format_symbol(const char *name, UINT32 displacement, const char *filename, int linenumber)
+void symbol_manager::format_symbol(const char *name, uint32_t displacement, const char *filename, int linenumber)
 {
 	// start with the address and offset
 	m_buffer = string_format(" (%s", name);
 	if (displacement != 0)
-		m_buffer.append(string_format("+0x%04x", (UINT32)displacement));
+		m_buffer.append(string_format("+0x%04x", (uint32_t)displacement));
 
 	// append file/line if present
 	if (filename != nullptr)
@@ -601,10 +602,12 @@ void symbol_manager::format_symbol(const char *name, UINT32 displacement, const 
 //  of the .text section
 //-------------------------------------------------
 
-FPTR symbol_manager::get_text_section_base()
+uintptr_t symbol_manager::get_text_section_base()
 {
-	dynamic_bind<PIMAGE_SECTION_HEADER(WINAPI *)(PIMAGE_NT_HEADERS, PVOID, ULONG)> image_rva_to_section(TEXT("dbghelp.dll"), "ImageRvaToSection");
-	dynamic_bind<PIMAGE_NT_HEADERS(WINAPI *)(PVOID)> image_nt_header(TEXT("dbghelp.dll"), "ImageNtHeader");
+	osd::dynamic_module::ptr m_dbghelp_dll = osd::dynamic_module::open({ "dbghelp.dll" });
+
+	ImageRvaToSection_fn image_rva_to_section = m_dbghelp_dll->bind<ImageRvaToSection_fn>("ImageRvaToSection");
+	ImageNtHeader_fn image_nt_header = m_dbghelp_dll->bind<ImageNtHeader_fn>("ImageNtHeader");
 
 	// start with the image base
 	PVOID base = reinterpret_cast<PVOID>(GetModuleHandleUni());
@@ -618,13 +621,13 @@ FPTR symbol_manager::get_text_section_base()
 		assert(headers != nullptr);
 
 		// look ourself up (assuming we are in the .text section)
-		PIMAGE_SECTION_HEADER section = (*image_rva_to_section)(headers, base, reinterpret_cast<FPTR>(get_text_section_base) - reinterpret_cast<FPTR>(base));
+		PIMAGE_SECTION_HEADER section = (*image_rva_to_section)(headers, base, reinterpret_cast<uintptr_t>(get_text_section_base) - reinterpret_cast<uintptr_t>(base));
 		if (section != nullptr)
-			return reinterpret_cast<FPTR>(base) + section->VirtualAddress;
+			return reinterpret_cast<uintptr_t>(base) + section->VirtualAddress;
 	}
 
 	// fallback to returning the image base (wrong)
-	return reinterpret_cast<FPTR>(base);
+	return reinterpret_cast<uintptr_t>(base);
 }
 
 
@@ -637,7 +640,7 @@ FPTR symbol_manager::get_text_section_base()
 //  sampling_profiler - constructor
 //-------------------------------------------------
 
-sampling_profiler::sampling_profiler(UINT32 max_seconds, UINT8 stack_depth = 0)
+sampling_profiler::sampling_profiler(uint32_t max_seconds, uint8_t stack_depth = 0)
 	: m_target_thread(nullptr),
 	m_thread(nullptr),
 	m_thread_id(0),
@@ -705,9 +708,9 @@ void sampling_profiler::stop()
 
 int CLIB_DECL sampling_profiler::compare_address(const void *item1, const void *item2)
 {
-	const FPTR *entry1 = reinterpret_cast<const FPTR *>(item1);
-	const FPTR *entry2 = reinterpret_cast<const FPTR *>(item2);
-	int mincount = MIN(entry1[0], entry2[0]);
+	const uintptr_t *entry1 = reinterpret_cast<const uintptr_t *>(item1);
+	const uintptr_t *entry2 = reinterpret_cast<const uintptr_t *>(item2);
+	int mincount = std::min(entry1[0], entry2[0]);
 
 	// sort in order of: bucket, caller, caller's caller, etc.
 	for (int index = 1; index <= mincount; index++)
@@ -726,8 +729,8 @@ int CLIB_DECL sampling_profiler::compare_address(const void *item1, const void *
 
 int CLIB_DECL sampling_profiler::compare_frequency(const void *item1, const void *item2)
 {
-	const FPTR *entry1 = reinterpret_cast<const FPTR *>(item1);
-	const FPTR *entry2 = reinterpret_cast<const FPTR *>(item2);
+	const uintptr_t *entry1 = reinterpret_cast<const uintptr_t *>(item1);
+	const uintptr_t *entry2 = reinterpret_cast<const uintptr_t *>(item2);
 
 	// sort by frequency, then by address
 	if (entry1[0] != entry2[0])
@@ -746,7 +749,7 @@ void sampling_profiler::print_results(symbol_manager &symbols)
 	symbols.cache_symbols();
 
 	// step 1: find the base of each entry
-	for (FPTR *current = &m_buffer[0]; current < m_buffer_ptr; current += m_entry_stride)
+	for (uintptr_t *current = &m_buffer[0]; current < m_buffer_ptr; current += m_entry_stride)
 	{
 		assert(current[0] >= 1 && current[0] < m_entry_stride);
 
@@ -756,14 +759,14 @@ void sampling_profiler::print_results(symbol_manager &symbols)
 	}
 
 	// step 2: sort the results
-	qsort(&m_buffer[0], (m_buffer_ptr - &m_buffer[0]) / m_entry_stride, m_entry_stride * sizeof(FPTR), compare_address);
+	qsort(&m_buffer[0], (m_buffer_ptr - &m_buffer[0]) / m_entry_stride, m_entry_stride * sizeof(uintptr_t), compare_address);
 
 	// step 3: count and collapse unique entries
-	UINT32 total_count = 0;
-	for (FPTR *current = &m_buffer[0]; current < m_buffer_ptr; )
+	uint32_t total_count = 0;
+	for (uintptr_t *current = &m_buffer[0]; current < m_buffer_ptr; )
 	{
 		int count = 1;
-		FPTR *scan;
+		uintptr_t *scan;
 		for (scan = current + m_entry_stride; scan < m_buffer_ptr; scan += m_entry_stride)
 		{
 			if (compare_address(current, scan) != 0)
@@ -777,18 +780,18 @@ void sampling_profiler::print_results(symbol_manager &symbols)
 	}
 
 	// step 4: sort the results again, this time by frequency
-	qsort(&m_buffer[0], (m_buffer_ptr - &m_buffer[0]) / m_entry_stride, m_entry_stride * sizeof(FPTR), compare_frequency);
+	qsort(&m_buffer[0], (m_buffer_ptr - &m_buffer[0]) / m_entry_stride, m_entry_stride * sizeof(uintptr_t), compare_frequency);
 
 	// step 5: print the results
-	UINT32 num_printed = 0;
-	for (FPTR *current = &m_buffer[0]; current < m_buffer_ptr && num_printed < 30; current += m_entry_stride)
+	uint32_t num_printed = 0;
+	for (uintptr_t *current = &m_buffer[0]; current < m_buffer_ptr && num_printed < 30; current += m_entry_stride)
 	{
 		// once we hit 0 frequency, we're done
 		if (current[0] == 0)
 			break;
 
 		// output the result
-		printf("%4.1f%% - %6d : %p%s\n", (double)current[0] * 100.0 / (double)total_count, (UINT32)current[0], reinterpret_cast<void *>(current[1]), symbols.symbol_for_address(current[1]));
+		printf("%4.1f%% - %6d : %p%s\n", (double)current[0] * 100.0 / (double)total_count, (uint32_t)current[0], reinterpret_cast<void *>(current[1]), symbols.symbol_for_address(current[1]));
 		for (int index = 2; index < m_entry_stride; index++)
 		{
 			if (current[index] == 0)
@@ -832,7 +835,7 @@ void sampling_profiler::thread_run()
 		GetThreadContext(m_target_thread, &context);
 
 		// first entry is a count
-		FPTR *count = m_buffer_ptr++;
+		uintptr_t *count = m_buffer_ptr++;
 		*count = 0;
 
 		// iterate over the frames until we run out or hit an error
@@ -967,7 +970,7 @@ private:
 		auto diagnostics = downcast<diagnostics_win32 *>(get_instance());
 
 		fprintf(stderr, "Exception at EIP=%p%s: %s\n", info->ExceptionRecord->ExceptionAddress,
-			diagnostics->m_symbols->symbol_for_address((FPTR)info->ExceptionRecord->ExceptionAddress), exception_table[i].string);
+			diagnostics->m_symbols->symbol_for_address((uintptr_t)info->ExceptionRecord->ExceptionAddress), exception_table[i].string);
 
 		// for access violations, print more info
 		if (info->ExceptionRecord->ExceptionCode == EXCEPTION_ACCESS_VIOLATION)

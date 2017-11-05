@@ -2,10 +2,9 @@
 // copyright-holders:Tatsuyuki Satoh
 /*
 
-Notice: please do not modify this file, except in case of compile- or critical emulation error
-A more accurate implementation is in mame/alpha8201.*
+Notice: The alpha 8201 is now emulated using mame/alpha8201.*
 
-cpu/alph8201/ will be removed soon
+cpu/alph8201/ will be removed when the alpha 8304 has been dumped.
 
 
 
@@ -162,12 +161,12 @@ Timming
 ****************************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
 #include "alph8201.h"
+#include "debugger.h"
 
 
-const device_type ALPHA8201L = &device_creator<alpha8201_cpu_device>;
-const device_type ALPHA8301L = &device_creator<alpha8301_cpu_device>;
+DEFINE_DEVICE_TYPE(ALPHA8201L, alpha8201_cpu_device, "alpha8201l", "ALPHA-8201L")
+DEFINE_DEVICE_TYPE(ALPHA8301L, alpha8301_cpu_device, "alpha8301l", "ALPHA-8301L")
 
 
 /* instruction cycle count */
@@ -185,29 +184,32 @@ const device_type ALPHA8301L = &device_creator<alpha8301_cpu_device>;
 #define FN(x) &alpha8201_cpu_device::x
 
 
-alpha8201_cpu_device::alpha8201_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: cpu_device(mconfig, ALPHA8201L, "ALPHA-8201L", tag, owner, clock, "alpha8201l", __FILE__)
+alpha8201_cpu_device::alpha8201_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: alpha8201_cpu_device(mconfig, ALPHA8201L, tag, owner, clock, opcode_8201)
+{
+}
+
+
+alpha8201_cpu_device::alpha8201_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, const s_opcode *opmap)
+	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 10, 0)
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, 6, 0)
-	, m_opmap(opcode_8201)
+	, m_opmap(opmap)
 {
 }
 
-
-alpha8201_cpu_device::alpha8201_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
-	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
-	, m_program_config("program", ENDIANNESS_LITTLE, 8, 10, 0)
-	, m_io_config("io", ENDIANNESS_LITTLE, 8, 6, 0)
-	, m_opmap(opcode_8201)
+alpha8301_cpu_device::alpha8301_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: alpha8201_cpu_device(mconfig, ALPHA8301L, tag, owner, clock, opcode_8301)
 {
 }
 
-alpha8301_cpu_device::alpha8301_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: alpha8201_cpu_device(mconfig, ALPHA8301L, "ALPHA-8301L", tag, owner, clock, "alpha8301l", __FILE__)
+device_memory_interface::space_config_vector alpha8201_cpu_device::memory_space_config() const
 {
-	m_opmap = opcode_8301;
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config),
+		std::make_pair(AS_IO,      &m_io_config)
+	};
 }
-
 
 /* Get next opcode argument and increment program counter */
 unsigned alpha8201_cpu_device::M_RDMEM_OPCODE()
@@ -218,49 +220,49 @@ unsigned alpha8201_cpu_device::M_RDMEM_OPCODE()
 	return retval;
 }
 
-void alpha8201_cpu_device::M_ADD(UINT8 dat)
+void alpha8201_cpu_device::M_ADD(u8 dat)
 {
-	UINT16 temp = m_A + dat;
+	u16 temp = m_A + dat;
 	m_A = temp & 0xff;
 	m_zf = (m_A==0);
 	m_cf = temp>>8;
 }
 
-void alpha8201_cpu_device::M_ADDB(UINT8 dat)
+void alpha8201_cpu_device::M_ADDB(u8 dat)
 {
-	UINT16 temp = m_B + dat;
+	u16 temp = m_B + dat;
 	m_B = temp & 0xff;
 	m_zf = (m_B==0);
 	m_cf = temp>>8;
 }
 
-void alpha8201_cpu_device::M_SUB(UINT8 dat)
+void alpha8201_cpu_device::M_SUB(u8 dat)
 {
 	m_cf = (m_A>=dat);  // m_cf is No Borrow
 	m_A -= dat;
 	m_zf = (m_A==0);
 }
 
-void alpha8201_cpu_device::M_AND(UINT8 dat)
+void alpha8201_cpu_device::M_AND(u8 dat)
 {
 	m_A &= dat;
 	m_zf = (m_A==0);
 }
 
-void alpha8201_cpu_device::M_OR(UINT8 dat)
+void alpha8201_cpu_device::M_OR(u8 dat)
 {
 	m_A |= dat;
 	m_zf = (m_A==0);
 }
 
-void alpha8201_cpu_device::M_XOR(UINT8 dat)
+void alpha8201_cpu_device::M_XOR(u8 dat)
 {
 	m_A ^= dat;
 	m_zf = (m_A==0);
 	m_cf = 0;
 }
 
-void alpha8201_cpu_device::M_JMP(UINT8 dat)
+void alpha8201_cpu_device::M_JMP(u8 dat)
 {
 	m_pc.b.l = dat;
 	/* update pc page */
@@ -274,27 +276,27 @@ void alpha8201_cpu_device::M_UNDEFINED()
 	osd_printf_debug("alpha8201:  PC = %03x,  Unimplemented opcode = %02x\n", m_pc.w.l-1, M_RDMEM(m_pc.w.l-1));
 #endif
 #if BREAK_ON_UNKNOWN_OPCODE
-	debugger_break(machine());
+	machine().debug_break();
 #endif
 }
 
 void alpha8201_cpu_device::M_UNDEFINED2()
 {
-	UINT8 op  = M_RDOP(m_pc.w.l-1);
-	UINT8 imm = M_RDMEM_OPCODE();
+	u8 op  = M_RDOP(m_pc.w.l-1);
+	u8 imm = M_RDMEM_OPCODE();
 	logerror("alpha8201:  PC = %03x,  Unimplemented opcode = %02x,%02x\n", m_pc.w.l-2, op,imm);
 #if SHOW_MESSAGE_CONSOLE
 	osd_printf_debug("alpha8201:  PC = %03x,  Unimplemented opcode = %02x,%02x\n", m_pc.w.l-2, op,imm);
 #endif
 #if BREAK_ON_UNKNOWN_OPCODE
-	debugger_break(machine());
+	machine().debug_break();
 #endif
 }
 
 
 void alpha8201_cpu_device::stop()
 {
-	UINT8 pcptr = M_RDMEM(0x001) & 0x1f;
+	u8 pcptr = M_RDMEM(0x001) & 0x1f;
 	M_WRMEM(pcptr,(M_RDMEM(pcptr)&0xf)+0x08); /* mark entry point ODD to HALT */
 	m_mb |= 0x08;        /* mark internal HALT state */
 }
@@ -394,12 +396,10 @@ void alpha8201_cpu_device::device_start()
 	m_program = &space(AS_PROGRAM);
 	m_direct = &m_program->direct();
 
-	state_add( ALPHA8201_PC, "PC", m_pc.w.l ).mask(0x3ff).formatstr("%03X");
+	state_add( ALPHA8201_PC, "PC", m_pc.w.l ).callimport().mask(0x3ff).formatstr("%03X");
 	state_add( ALPHA8201_SP, "SP", m_sp ).callimport().callexport().formatstr("%02X");
 	state_add( ALPHA8201_RB, "RB", m_regPtr ).mask(0x7);
 	state_add( ALPHA8201_MB, "MB", m_mb ).mask(0x3);
-	state_add( ALPHA8201_CF, "CF", m_cf ).mask(0x1);
-	state_add( ALPHA8201_ZF, "ZF", m_zf ).mask(0x1);
 	state_add( ALPHA8201_IX0, "IX0", m_ix0.b.l );
 	state_add( ALPHA8201_IX1, "IX1", m_ix1.b.l );
 	state_add( ALPHA8201_IX2, "IX2", m_ix2.b.l );
@@ -416,6 +416,9 @@ void alpha8201_cpu_device::device_start()
 	state_add( ALPHA8201_R5, "R5", m_R[5] ).callimport().callexport().formatstr("%02X");
 	state_add( ALPHA8201_R6, "R6", m_R[6] ).callimport().callexport().formatstr("%02X");
 	state_add( ALPHA8201_R7, "R7", m_R[7] ).callimport().callexport().formatstr("%02X");
+	state_add( STATE_GENPCBASE, "CURPC", m_PREVPC ).callimport().noshow();
+	state_add( STATE_GENFLAGS, "CURFLAGS", m_flags ).callimport().callexport().formatstr("%2s").noshow();
+	state_add( STATE_GENSP, "CURSP", m_sp ).callimport().callexport();
 
 	save_item(NAME(m_RAM));
 	save_item(NAME(m_PREVPC));
@@ -441,11 +444,30 @@ void alpha8201_cpu_device::device_start()
 }
 
 
+//-------------------------------------------------
+//  state_import - import state into the device,
+//  after it has been set
+//-------------------------------------------------
+
 void alpha8201_cpu_device::state_import(const device_state_entry &entry)
 {
 	switch (entry.index())
 	{
+		case ALPHA8201_PC:
+			m_PREVPC = m_pc.w.l;
+			break;
+
+		case STATE_GENPCBASE:
+			m_pc.w.l = m_PREVPC;
+			break;
+
+		case STATE_GENFLAGS:
+			m_cf = BIT(m_flags, 1);
+			m_zf = BIT(m_flags, 0);
+			break;
+
 		case ALPHA8201_SP:
+		case STATE_GENSP:
 			M_WRMEM(0x001, m_sp);
 			break;
 
@@ -484,11 +506,21 @@ void alpha8201_cpu_device::state_import(const device_state_entry &entry)
 }
 
 
+//-------------------------------------------------
+//  state_export - export state from the device,
+//  to a known location where it can be read
+//-------------------------------------------------
+
 void alpha8201_cpu_device::state_export(const device_state_entry &entry)
 {
 	switch (entry.index())
 	{
+		case STATE_GENFLAGS:
+			m_flags = (m_cf << 1) | m_zf;
+			break;
+
 		case ALPHA8201_SP:
+		case STATE_GENSP:
 			m_sp = M_RDMEM(0x001);
 			break;
 
@@ -526,6 +558,11 @@ void alpha8201_cpu_device::state_export(const device_state_entry &entry)
 	}
 }
 
+
+//-------------------------------------------------
+//  state_string_export - export state as a string
+//  for the debugger
+//-------------------------------------------------
 
 void alpha8201_cpu_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
@@ -566,7 +603,7 @@ void alpha8201_cpu_device::device_reset()
 void alpha8201_cpu_device::execute_run()
 {
 	unsigned opcode;
-	UINT8 pcptr;
+	u8 pcptr;
 
 	if(m_halt)
 	{
@@ -654,8 +691,8 @@ void alpha8201_cpu_device::execute_set_input(int inputnum, int state)
 }
 
 
-offs_t alpha8201_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t alpha8201_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, u32 options)
 {
 	extern CPU_DISASSEMBLE( alpha8201 );
-	return CPU_DISASSEMBLE_NAME(alpha8201)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(alpha8201)(this, stream, pc, oprom, opram, options);
 }

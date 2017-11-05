@@ -23,7 +23,7 @@ WRITE8_MEMBER(portrait_state::fgvideo_write)
 	m_fgvideoram[offset] = data;
 }
 
-inline void portrait_state::get_tile_info( tile_data &tileinfo, int tile_index, const UINT8 *source )
+inline void portrait_state::get_tile_info( tile_data &tileinfo, int tile_index, const uint8_t *source )
 {
 	int attr    = source[tile_index*2+0];
 	int tilenum = source[tile_index*2+1];
@@ -66,8 +66,8 @@ TILE_GET_INFO_MEMBER(portrait_state::get_fg_tile_info)
 
 void portrait_state::video_start()
 {
-	m_background = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(portrait_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32 );
-	m_foreground = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(portrait_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32 );
+	m_background = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(portrait_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32 );
+	m_foreground = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(portrait_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32 );
 
 	m_foreground->set_transparent_pen(7);
 
@@ -78,9 +78,9 @@ void portrait_state::video_start()
 
 PALETTE_INIT_MEMBER(portrait_state, portrait)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
-	UINT8* lookup = memregion("tileattr")->base();
+	uint8_t* lookup = memregion("tileattr")->base();
 
 /*
     for (i = 0;i < 0x40;i++)
@@ -120,7 +120,7 @@ PALETTE_INIT_MEMBER(portrait_state, portrait)
 
 	for (i = 0;i < 0x800;i++)
 	{
-		UINT8 ctabentry = lookup[i]&0x3f;
+		uint8_t ctabentry = lookup[i]&0x3f;
 		palette.set_pen_indirect(i, ctabentry);
 	}
 }
@@ -128,8 +128,8 @@ PALETTE_INIT_MEMBER(portrait_state, portrait)
 
 void portrait_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 *source = m_spriteram;
-	UINT8 *finish = source + 0x200;
+	uint8_t *source = m_spriteram;
+	uint8_t *finish = source + 0x200;
 
 	while( source < finish )
 	{
@@ -184,7 +184,7 @@ void portrait_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 	}
 }
 
-UINT32 portrait_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t portrait_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	rectangle cliprect_scroll, cliprect_no_scroll;
 

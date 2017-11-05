@@ -5,38 +5,34 @@
 
 #define SADDR 0xcc000
 
-static MACHINE_CONFIG_FRAGMENT(el2_3c503_config)
+MACHINE_CONFIG_MEMBER(el2_3c503_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("dp8390d", DP8390D, 0)
 	MCFG_DP8390D_IRQ_CB(WRITELINE(el2_3c503_device, el2_3c503_irq_w))
 	MCFG_DP8390D_MEM_READ_CB(READ8(el2_3c503_device, el2_3c503_mem_read))
 	MCFG_DP8390D_MEM_WRITE_CB(WRITE8(el2_3c503_device, el2_3c503_mem_write))
 MACHINE_CONFIG_END
 
-const device_type EL2_3C503 = &device_creator<el2_3c503_device>;
+DEFINE_DEVICE_TYPE(EL2_3C503, el2_3c503_device, "el2_3c503", "3C503 Network Adapter")
 
-machine_config_constructor el2_3c503_device::device_mconfig_additions() const {
-	return MACHINE_CONFIG_NAME(el2_3c503_config);
-}
-
-el2_3c503_device::el2_3c503_device(const machine_config& mconfig, const char* tag, device_t* owner, UINT32 clock)
-	: device_t(mconfig, EL2_3C503, "3C503 Network Adapter", tag, owner, clock, "el2_3c503", __FILE__),
-		device_isa8_card_interface(mconfig, *this),
-		m_dp8390(*this, "dp8390d"),
-		m_irq_state(0)
+el2_3c503_device::el2_3c503_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock)
+	: device_t(mconfig, EL2_3C503, tag, owner, clock)
+	, device_isa8_card_interface(mconfig, *this)
+	, m_dp8390(*this, "dp8390d")
+	, m_irq_state(0)
 {
 }
 
 void el2_3c503_device::device_start() {
 	char mac[7];
-	UINT32 num = rand();
+	uint32_t num = machine().rand();
 	memset(m_prom, 0x57, 16);
 	sprintf(mac, "\x02\x60\x8c%c%c%c", (num >> 16) & 0xff, (num >> 8) & 0xff, num & 0xff);
 	memcpy(m_prom, mac, 6);
 	memset(m_rom, 0, 8*1024); // empty
 	m_dp8390->set_mac(mac);
 	set_isa_device();
-	m_isa->install_device(0x0300, 0x030f, 0, 0, read8_delegate(FUNC(el2_3c503_device::el2_3c503_loport_r), this), write8_delegate(FUNC(el2_3c503_device::el2_3c503_loport_w), this));
-	m_isa->install_device(0x0700, 0x070f, 0, 0, read8_delegate(FUNC(el2_3c503_device::el2_3c503_hiport_r), this), write8_delegate(FUNC(el2_3c503_device::el2_3c503_hiport_w), this));
+	m_isa->install_device(0x0300, 0x030f, read8_delegate(FUNC(el2_3c503_device::el2_3c503_loport_r), this), write8_delegate(FUNC(el2_3c503_device::el2_3c503_loport_w), this));
+	m_isa->install_device(0x0700, 0x070f, read8_delegate(FUNC(el2_3c503_device::el2_3c503_hiport_r), this), write8_delegate(FUNC(el2_3c503_device::el2_3c503_hiport_w), this));
 
 	// TODO: This is wrong, fix if anything actually uses it
 	//  DMA can change in runtime
@@ -46,7 +42,7 @@ void el2_3c503_device::device_start() {
 			chan++;
 			idcfr >>= 1;
 		}
-		m_isa->set_dma_channel(chan, this, FALSE);
+		m_isa->set_dma_channel(chan, this, false);
 	}
 }
 
@@ -57,8 +53,8 @@ void el2_3c503_device::device_reset() {
 	m_regs.pcfr = 0x20; // address 0xcc000
 	m_regs.ctrl = 0x0a;
 	m_irq_state = CLEAR_LINE;
-	m_isa->unmap_bank(SADDR, SADDR + 0x1fff, 0, 0);
-	m_isa->install_bank(SADDR, SADDR + 0x1fff, 0, 0, "3c503 rom", m_rom);
+	m_isa->unmap_bank(SADDR, SADDR + 0x1fff);
+	m_isa->install_bank(SADDR, SADDR + 0x1fff, "3c503 rom", m_rom);
 }
 
 void el2_3c503_device::set_irq(int state) {
@@ -100,12 +96,12 @@ void el2_3c503_device::eop_w(int state) {
 	}
 }
 
-UINT8 el2_3c503_device::dack_r(int line) {
+uint8_t el2_3c503_device::dack_r(int line) {
 	set_drq(CLEAR_LINE);
 	return el2_3c503_mem_read(m_regs.da++);
 }
 
-void el2_3c503_device::dack_w(int line, UINT8 data) {
+void el2_3c503_device::dack_w(int line, uint8_t data) {
 	set_drq(CLEAR_LINE);
 	el2_3c503_mem_write(m_regs.da++, data);
 }
@@ -193,16 +189,16 @@ WRITE8_MEMBER(el2_3c503_device::el2_3c503_hiport_w) {
 		return;
 	case 5:
 		if((m_regs.gacfr & 0xf) != (data & 0xf)) {
-			m_isa->unmap_bank(SADDR, SADDR + 0x1fff, 0, 0);
+			m_isa->unmap_bank(SADDR, SADDR + 0x1fff);
 			switch(data & 0xf) {
 			case 0:
-				m_isa->install_bank(SADDR, SADDR + 0x1fff, 0, 0, "3c503 rom", m_rom);
+				m_isa->install_bank(SADDR, SADDR + 0x1fff, "3c503 rom", m_rom);
 				break;
 			case 9:
-				m_isa->install_bank(SADDR, SADDR + 0x1fff, 0, 0, "3c503 ram", m_board_ram);
+				m_isa->install_bank(SADDR, SADDR + 0x1fff, "3c503 ram", m_board_ram);
 				break;
 			default:
-				m_isa->install_bank(SADDR, SADDR + 0x1fff, 0, 0, "3c503 no map", m_rom);
+				m_isa->install_bank(SADDR, SADDR + 0x1fff, "3c503 no map", m_rom);
 				break;
 			}
 		}
@@ -295,12 +291,12 @@ WRITE8_MEMBER(el2_3c503_device::el2_3c503_mem_write) {
 	el2_3c503_mem_write(offset, data);
 }
 
-UINT8 el2_3c503_device::el2_3c503_mem_read(offs_t offset) {
+uint8_t el2_3c503_device::el2_3c503_mem_read(offs_t offset) {
 	if((offset < 8*1024) || (offset >= 16*1024)) return 0xff;
 	return m_board_ram[offset - (8*1024)];
 }
 
-void el2_3c503_device::el2_3c503_mem_write(offs_t offset, UINT8 data) {
+void el2_3c503_device::el2_3c503_mem_write(offs_t offset, uint8_t data) {
 	if((offset < 8*1024) || (offset >= 16*1024)) return;
 	m_board_ram[offset - (8*1024)] = data;
 }

@@ -31,13 +31,14 @@
 ****************************************************************************/
 
 #include "emu.h"
+#include "williams.h"
 #include "machine/6821pia.h"
 #include "cpu/m6809/m6809.h"
-#include "williams.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 #include "sound/okim6295.h"
 #include "sound/hc55516.h"
 #include "sound/dac.h"
+#include "sound/volt_reg.h"
 
 
 #define NARC_MASTER_CLOCK       XTAL_8MHz
@@ -55,9 +56,9 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-extern const device_type WILLIAMS_NARC_SOUND = &device_creator<williams_narc_sound_device>;
-extern const device_type WILLIAMS_CVSD_SOUND = &device_creator<williams_cvsd_sound_device>;
-extern const device_type WILLIAMS_ADPCM_SOUND = &device_creator<williams_adpcm_sound_device>;
+DEFINE_DEVICE_TYPE(WILLIAMS_CVSD_SOUND, williams_cvsd_sound_device, "wmscvsd", "Williams CVSD Sound Board")
+DEFINE_DEVICE_TYPE(WILLIAMS_NARC_SOUND, williams_narc_sound_device, "wmsnarc", "Williams NARC Sound Board")
+DEFINE_DEVICE_TYPE(WILLIAMS_ADPCM_SOUND, williams_adpcm_sound_device, "wmsadpcm", "Williams ADPCM Sound Board")
 
 
 
@@ -69,8 +70,8 @@ extern const device_type WILLIAMS_ADPCM_SOUND = &device_creator<williams_adpcm_s
 //  williams_cvsd_sound_device - constructor
 //-------------------------------------------------
 
-williams_cvsd_sound_device::williams_cvsd_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, WILLIAMS_CVSD_SOUND, "Williams CVSD Sound Board", tag, owner, clock, "wmscvsd", __FILE__),
+williams_cvsd_sound_device::williams_cvsd_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, WILLIAMS_CVSD_SOUND, tag, owner, clock),
 		device_mixer_interface(mconfig, *this),
 		m_cpu(*this, "cpu"),
 		m_pia(*this, "pia"),
@@ -155,39 +156,6 @@ WRITE8_MEMBER(williams_cvsd_sound_device::cvsd_clock_set_w)
 
 
 //-------------------------------------------------
-//  ym2151_irq_w - process IRQ signal changes from
-//  the YM2151
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER(williams_cvsd_sound_device::ym2151_irq_w)
-{
-	m_pia->ca1_w(!state);
-}
-
-
-//-------------------------------------------------
-//  pia_irqa - process IRQ A signal changes from
-//  the 6821
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER(williams_cvsd_sound_device::pia_irqa)
-{
-	m_cpu->set_input_line(M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
-
-//-------------------------------------------------
-//  pia_irqb - process IRQ B signal changes from
-//  the 6821
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER(williams_cvsd_sound_device::pia_irqb)
-{
-	m_cpu->set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
-
-//-------------------------------------------------
 //  audio CPU map
 //-------------------------------------------------
 
@@ -203,40 +171,30 @@ ADDRESS_MAP_END
 
 
 //-------------------------------------------------
-//  machine configuration
+// device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( williams_cvsd_sound )
+MACHINE_CONFIG_MEMBER( williams_cvsd_sound_device::device_add_mconfig )
 	MCFG_CPU_ADD("cpu", M6809E, CVSD_MASTER_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(williams_cvsd_map)
 
 	MCFG_DEVICE_ADD("pia", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(DEVWRITE8("dac", dac_device, write_unsigned8))
+	MCFG_PIA_WRITEPA_HANDLER(DEVWRITE8("dac", dac_byte_interface, write))
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(williams_cvsd_sound_device, talkback_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(williams_cvsd_sound_device, pia_irqa))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(williams_cvsd_sound_device, pia_irqb))
+	MCFG_PIA_IRQA_HANDLER(INPUTLINE("cpu", M6809_FIRQ_LINE))
+	MCFG_PIA_IRQB_HANDLER(INPUTLINE("cpu", INPUT_LINE_NMI))
 
 	MCFG_YM2151_ADD("ym2151", CVSD_FM_CLOCK)
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE(williams_cvsd_sound_device, ym2151_irq_w))
+	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("pia", pia6821_device, ca1_w)) MCFG_DEVCB_INVERT // IRQ is not true state
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.10)
 
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.50)
+	MCFG_SOUND_ADD("dac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.25)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 	MCFG_SOUND_ADD("cvsd", HC55516, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.60)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  device_mconfig_additions - return a pointer to
-//  the device's machine fragment
-//-------------------------------------------------
-
-machine_config_constructor williams_cvsd_sound_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( williams_cvsd_sound );
-}
 
 
 //-------------------------------------------------
@@ -246,7 +204,7 @@ machine_config_constructor williams_cvsd_sound_device::device_mconfig_additions(
 void williams_cvsd_sound_device::device_start()
 {
 	// configure master CPU banks
-	UINT8 *rom = memregion("cpu")->base();
+	uint8_t *rom = memregion("cpu")->base();
 	for (int bank = 0; bank < 16; bank++)
 	{
 		//
@@ -302,8 +260,8 @@ void williams_cvsd_sound_device::device_timer(emu_timer &timer, device_timer_id 
 //  williams_narc_sound_device - constructor
 //-------------------------------------------------
 
-williams_narc_sound_device::williams_narc_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, WILLIAMS_NARC_SOUND, "Williams NARC Sound Board", tag, owner, clock, "wmsnarc", __FILE__),
+williams_narc_sound_device::williams_narc_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, WILLIAMS_NARC_SOUND, tag, owner, clock),
 		device_mixer_interface(mconfig, *this),
 		m_cpu0(*this, "cpu0"),
 		m_cpu1(*this, "cpu1"),
@@ -494,17 +452,6 @@ WRITE8_MEMBER(williams_narc_sound_device::cvsd_clock_set_w)
 
 
 //-------------------------------------------------
-//  ym2151_irq_w - handle line changes on the
-//  YM2151 IRQ line
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER(williams_narc_sound_device::ym2151_irq_w)
-{
-	m_cpu0->set_input_line(M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
-
-//-------------------------------------------------
 //  master CPU map
 //-------------------------------------------------
 
@@ -513,7 +460,7 @@ static ADDRESS_MAP_START( williams_narc_master_map, AS_PROGRAM, 8, williams_narc
 	AM_RANGE(0x2000, 0x2001) AM_MIRROR(0x03fe) AM_DEVREADWRITE("ym2151", ym2151_device, read, write)
 	AM_RANGE(0x2800, 0x2800) AM_MIRROR(0x03ff) AM_WRITE(master_talkback_w)
 	AM_RANGE(0x2c00, 0x2c00) AM_MIRROR(0x03ff) AM_WRITE(command2_w)
-	AM_RANGE(0x3000, 0x3000) AM_MIRROR(0x03ff) AM_DEVWRITE("dac1", dac_device, write_unsigned8)
+	AM_RANGE(0x3000, 0x3000) AM_MIRROR(0x03ff) AM_DEVWRITE("dac1", dac_byte_interface, write)
 	AM_RANGE(0x3400, 0x3400) AM_MIRROR(0x03ff) AM_READ(command_r)
 	AM_RANGE(0x3800, 0x3800) AM_MIRROR(0x03ff) AM_WRITE(master_bank_select_w)
 	AM_RANGE(0x3c00, 0x3c00) AM_MIRROR(0x03ff) AM_WRITE(master_sync_w)
@@ -531,7 +478,7 @@ static ADDRESS_MAP_START( williams_narc_slave_map, AS_PROGRAM, 8, williams_narc_
 	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x03ff) AM_WRITE(cvsd_clock_set_w)
 	AM_RANGE(0x2400, 0x2400) AM_MIRROR(0x03ff) AM_WRITE(cvsd_digit_clock_clear_w)
 	AM_RANGE(0x2800, 0x2800) AM_MIRROR(0x03ff) AM_WRITE(slave_talkback_w)
-	AM_RANGE(0x3000, 0x3000) AM_MIRROR(0x03ff) AM_DEVWRITE("dac2", dac_device, write_unsigned8)
+	AM_RANGE(0x3000, 0x3000) AM_MIRROR(0x03ff) AM_DEVWRITE("dac2", dac_byte_interface, write)
 	AM_RANGE(0x3400, 0x3400) AM_MIRROR(0x03ff) AM_READ(command2_r)
 	AM_RANGE(0x3800, 0x3800) AM_MIRROR(0x03ff) AM_WRITE(slave_bank_select_w)
 	AM_RANGE(0x3c00, 0x3c00) AM_MIRROR(0x03ff) AM_WRITE(slave_sync_w)
@@ -541,10 +488,11 @@ ADDRESS_MAP_END
 
 
 //-------------------------------------------------
-//  machine configuration
+// device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( williams_narc_sound )
+
+MACHINE_CONFIG_MEMBER( williams_narc_sound_device::device_add_mconfig )
 	MCFG_CPU_ADD("cpu0", M6809E, NARC_MASTER_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(williams_narc_master_map)
 
@@ -552,29 +500,18 @@ static MACHINE_CONFIG_FRAGMENT( williams_narc_sound )
 	MCFG_CPU_PROGRAM_MAP(williams_narc_slave_map)
 
 	MCFG_YM2151_ADD("ym2151", NARC_FM_CLOCK)
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE(williams_narc_sound_device, ym2151_irq_w))
+	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("cpu0", M6809_FIRQ_LINE))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.10)
 
-	MCFG_DAC_ADD("dac1")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.50)
-
-	MCFG_DAC_ADD("dac2")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.50)
+	MCFG_SOUND_ADD("dac1", AD7224, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.25)
+	MCFG_SOUND_ADD("dac2", AD7224, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.25)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac1", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
 
 	MCFG_SOUND_ADD("cvsd", HC55516, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.60)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  device_mconfig_additions - return a pointer to
-//  the device's machine fragment
-//-------------------------------------------------
-
-machine_config_constructor williams_narc_sound_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( williams_narc_sound );
-}
 
 
 //-------------------------------------------------
@@ -584,7 +521,7 @@ machine_config_constructor williams_narc_sound_device::device_mconfig_additions(
 void williams_narc_sound_device::device_start()
 {
 	// configure master CPU banks
-	UINT8 *rom = memregion("cpu0")->base();
+	uint8_t *rom = memregion("cpu0")->base();
 	for (int bank = 0; bank < 16; bank++)
 	{
 		//
@@ -675,8 +612,8 @@ void williams_narc_sound_device::device_timer(emu_timer &timer, device_timer_id 
 //  williams_adpcm_sound_device - constructor
 //-------------------------------------------------
 
-williams_adpcm_sound_device::williams_adpcm_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, WILLIAMS_ADPCM_SOUND, "Williams ADPCM Sound Board", tag, owner, clock, "wmsadpcm", __FILE__),
+williams_adpcm_sound_device::williams_adpcm_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, WILLIAMS_ADPCM_SOUND, tag, owner, clock),
 		device_mixer_interface(mconfig, *this),
 		m_cpu(*this, "cpu"),
 		m_latch(0),
@@ -777,16 +714,6 @@ WRITE8_MEMBER(williams_adpcm_sound_device::talkback_w)
 
 
 //-------------------------------------------------
-//  talkback_w - write to the talkback latch
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER(williams_adpcm_sound_device::ym2151_irq_w)
-{
-	m_cpu->set_input_line(M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
-
-//-------------------------------------------------
 //  audio CPU map
 //-------------------------------------------------
 
@@ -794,7 +721,7 @@ static ADDRESS_MAP_START( williams_adpcm_map, AS_PROGRAM, 8, williams_adpcm_soun
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x03ff) AM_WRITE(bank_select_w)
 	AM_RANGE(0x2400, 0x2401) AM_MIRROR(0x03fe) AM_DEVREADWRITE("ym2151", ym2151_device, read, write)
-	AM_RANGE(0x2800, 0x2800) AM_MIRROR(0x03ff) AM_DEVWRITE("dac", dac_device, write_unsigned8)
+	AM_RANGE(0x2800, 0x2800) AM_MIRROR(0x03ff) AM_DEVWRITE("dac", dac_byte_interface, write)
 	AM_RANGE(0x2c00, 0x2c00) AM_MIRROR(0x03ff) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0x3000, 0x3000) AM_MIRROR(0x03ff) AM_READ(command_r)
 	AM_RANGE(0x3400, 0x3400) AM_MIRROR(0x03ff) AM_WRITE(oki6295_bank_select_w)
@@ -808,42 +735,32 @@ ADDRESS_MAP_END
 //  OKI6295 map
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( williams_adpcm_oki_map, AS_0, 8, williams_adpcm_sound_device )
+static ADDRESS_MAP_START( williams_adpcm_oki_map, 0, 8, williams_adpcm_sound_device )
 	AM_RANGE(0x00000, 0x1ffff) AM_ROMBANK("okibank")
 	AM_RANGE(0x20000, 0x3ffff) AM_ROM AM_REGION("oki", 0x60000)
 ADDRESS_MAP_END
 
 
 //-------------------------------------------------
-//  machine configuration
+// device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( williams_adpcm_sound )
+MACHINE_CONFIG_MEMBER( williams_adpcm_sound_device::device_add_mconfig )
 	MCFG_CPU_ADD("cpu", M6809E, ADPCM_MASTER_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(williams_adpcm_map)
 
 	MCFG_YM2151_ADD("ym2151", ADPCM_FM_CLOCK)
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE(williams_adpcm_sound_device, ym2151_irq_w))
+	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("cpu", M6809_FIRQ_LINE))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.10)
 
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.50)
+	MCFG_SOUND_ADD("dac", AD7524, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.5)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
-	MCFG_OKIM6295_ADD("oki", ADPCM_MASTER_CLOCK/8, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, williams_adpcm_oki_map)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.50)
+	MCFG_OKIM6295_ADD("oki", ADPCM_MASTER_CLOCK/8, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADDRESS_MAP(0, williams_adpcm_oki_map)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.5)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  device_mconfig_additions - return a pointer to
-//  the device's machine fragment
-//-------------------------------------------------
-
-machine_config_constructor williams_adpcm_sound_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( williams_adpcm_sound );
-}
 
 
 //-------------------------------------------------
@@ -853,7 +770,7 @@ machine_config_constructor williams_adpcm_sound_device::device_mconfig_additions
 void williams_adpcm_sound_device::device_start()
 {
 	// configure banks
-	UINT8 *rom = memregion("cpu")->base();
+	uint8_t *rom = memregion("cpu")->base();
 	membank("rombank")->configure_entries(0, 8, &rom[0x10000], 0x8000);
 	membank("romupper")->set_base(&rom[0x10000 + 0x4000 + 7 * 0x8000]);
 

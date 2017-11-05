@@ -159,7 +159,7 @@ void taitob_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect
 
 	int x, y, xlatch = 0, ylatch = 0, x_no = 0, y_no = 0, x_num = 0, y_num = 0, big_sprite = 0;
 	int offs, code, color, flipx, flipy;
-	UINT32 data, zoomx, zoomy, zx, zy, zoomxlatch = 0, zoomylatch = 0;
+	uint32_t data, zoomx, zoomy, zx, zy, zoomxlatch = 0, zoomylatch = 0;
 
 	for (offs = (0x1980 - 16) / 2; offs >=0; offs -= 8)
 	{
@@ -173,7 +173,7 @@ void taitob_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect
 		if (color & 0x3fc0)
 		{
 			logerror("sprite color (taitob)=%4x ofs=%4x\n", color, offs);
-			color = rand() & 0x3f;
+			color = machine().rand() & 0x3f;
 		}
 #endif
 		color = (color & 0x3f) * 16;
@@ -258,9 +258,9 @@ void taitob_state::draw_framebuffer( bitmap_ind16 &bitmap, const rectangle &clip
 {
 	rectangle myclip = cliprect;
 	int x, y;
-	address_space &space = machine().driver_data()->generic_space();
-	UINT8 video_control = m_tc0180vcu->get_videoctrl(space, 0);
-	UINT8 framebuffer_page = m_tc0180vcu->get_fb_page(space, 0);
+	address_space &space = machine().dummy_space();
+	uint8_t video_control = m_tc0180vcu->get_videoctrl(space, 0);
+	uint8_t framebuffer_page = m_tc0180vcu->get_fb_page(space, 0);
 
 g_profiler.start(PROFILER_USER1);
 
@@ -279,14 +279,14 @@ g_profiler.start(PROFILER_USER1);
 			/*popmessage("1. X[%3i;%3i] Y[%3i;%3i]", myclip.min_x, myclip.max_x, myclip.min_y, myclip.max_y);*/
 			for (y = myclip.min_y; y <= myclip.max_y; y++)
 			{
-				UINT16 *src = &m_framebuffer[framebuffer_page]->pix16(y, myclip.min_x);
-				UINT16 *dst;
+				uint16_t *src = &m_framebuffer[framebuffer_page]->pix16(y, myclip.min_x);
+				uint16_t *dst;
 
 				dst = &bitmap.pix16(bitmap.height()-1-y, myclip.max_x);
 
 				for (x = myclip.min_x; x <= myclip.max_x; x++)
 				{
-					UINT16 c = *src++;
+					uint16_t c = *src++;
 
 					if (c != 0)
 						*dst = m_b_sp_color_base + c;
@@ -299,12 +299,12 @@ g_profiler.start(PROFILER_USER1);
 		{
 			for (y = myclip.min_y; y <= myclip.max_y; y++)
 			{
-				UINT16 *src = &m_framebuffer[framebuffer_page]->pix16(y, myclip.min_x);
-				UINT16 *dst = &bitmap.pix16(y, myclip.min_x);
+				uint16_t *src = &m_framebuffer[framebuffer_page]->pix16(y, myclip.min_x);
+				uint16_t *dst = &bitmap.pix16(y, myclip.min_x);
 
 				for (x = myclip.min_x; x <= myclip.max_x; x++)
 				{
-					UINT16 c = *src++;
+					uint16_t c = *src++;
 
 					if (c != 0)
 						*dst = m_b_sp_color_base + c;
@@ -321,14 +321,14 @@ g_profiler.start(PROFILER_USER1);
 			/*popmessage("3. X[%3i;%3i] Y[%3i;%3i]", myclip.min_x, myclip.max_x, myclip.min_y, myclip.max_y);*/
 			for (y = myclip.min_y ;y <= myclip.max_y; y++)
 			{
-				UINT16 *src = &m_framebuffer[framebuffer_page]->pix16(y, myclip.min_x);
-				UINT16 *dst;
+				uint16_t *src = &m_framebuffer[framebuffer_page]->pix16(y, myclip.min_x);
+				uint16_t *dst;
 
 				dst = &bitmap.pix16(bitmap.height()-1-y, myclip.max_x);
 
 				for (x = myclip.min_x; x <= myclip.max_x; x++)
 				{
-					UINT16 c = *src++;
+					uint16_t c = *src++;
 
 					if (c != 0 && (c & 0x10) == priority)
 						*dst = m_b_sp_color_base + c;
@@ -341,12 +341,12 @@ g_profiler.start(PROFILER_USER1);
 		{
 			for (y = myclip.min_y; y <= myclip.max_y; y++)
 			{
-				UINT16 *src = &m_framebuffer[framebuffer_page]->pix16(y, myclip.min_x);
-				UINT16 *dst = &bitmap.pix16(y, myclip.min_x);
+				uint16_t *src = &m_framebuffer[framebuffer_page]->pix16(y, myclip.min_x);
+				uint16_t *dst = &bitmap.pix16(y, myclip.min_x);
 
 				for (x = myclip.min_x; x <= myclip.max_x; x++)
 				{
-					UINT16 c = *src++;
+					uint16_t c = *src++;
 
 					if (c != 0 && (c & 0x10) == priority)
 						*dst = m_b_sp_color_base + c;
@@ -359,10 +359,10 @@ g_profiler.start(PROFILER_USER1);
 g_profiler.stop();
 }
 
-UINT32 taitob_state::screen_update_taitob(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t taitob_state::screen_update_taitob(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	address_space &space = machine().driver_data()->generic_space();
-	UINT8 video_control = m_tc0180vcu->get_videoctrl(space, 0);
+	address_space &space = machine().dummy_space();
+	uint8_t video_control = m_tc0180vcu->get_videoctrl(space, 0);
 
 	if ((video_control & 0x20) == 0)
 	{
@@ -377,10 +377,12 @@ UINT32 taitob_state::screen_update_taitob(screen_device &screen, bitmap_ind16 &b
 
 	m_tc0180vcu->tilemap_draw(screen, bitmap, cliprect, 1, 0);
 
-	if (m_pixel_bitmap)  /* hitice only */
+	// TODO: only hiticej properly enables this up during attract mode,
+	//       hitice / hiticerb keeps this disabled, maybe a btanb fixed in later revision?
+	if (m_pixel_bitmap && (m_pixel_scroll[0] & 0x5800) == 0x5000)  /* hitice only */
 	{
-		int scrollx = -2 * m_pixel_scroll[0]; //+320;
-		int scrolly = - m_pixel_scroll[1]; //+240;
+		int scrollx = -2 * m_pixel_scroll[1]; //+320;
+		int scrolly = 16 - m_pixel_scroll[2]; //+240;
 		/* bit 15 of pixel_scroll[0] is probably flip screen */
 
 		copyscrollbitmap_trans(bitmap, *m_pixel_bitmap, 1, &scrollx, 1, &scrolly, cliprect, m_b_fg_color_base * 16);
@@ -395,11 +397,11 @@ UINT32 taitob_state::screen_update_taitob(screen_device &screen, bitmap_ind16 &b
 
 
 
-UINT32 taitob_state::screen_update_realpunc(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t taitob_state::screen_update_realpunc(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	address_space &space = machine().driver_data()->generic_space();
+	address_space &space = machine().dummy_space();
 	const pen_t *palette = m_palette->pens();
-	UINT8 video_control = m_tc0180vcu->get_videoctrl(space, 0);
+	uint8_t video_control = m_tc0180vcu->get_videoctrl(space, 0);
 	int x, y;
 
 	/* Video blanked? */
@@ -437,7 +439,7 @@ UINT32 taitob_state::screen_update_realpunc(screen_device &screen, bitmap_rgb32 
 			for (x = 0; x <= cliprect.max_x; x++)
 			{
 				int r, g, b;
-				UINT16 srcpix = m_realpunc_bitmap->pix16(cliprect.min_y + y, cliprect.min_x + x);
+				uint16_t srcpix = m_realpunc_bitmap->pix16(cliprect.min_y + y, cliprect.min_x + x);
 
 				r = (BIT(srcpix, 1)) | ((srcpix >> 11) & 0x1e);
 				g = (BIT(srcpix, 2)) | ((srcpix >> 7) & 0x1e);
@@ -481,17 +483,17 @@ UINT32 taitob_state::screen_update_realpunc(screen_device &screen, bitmap_rgb32 
 
 
 
-void taitob_state::screen_eof_taitob(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(taitob_state::screen_vblank_taitob)
 {
 	// rising edge
 	if (state)
 	{
-		address_space &space = machine().driver_data()->generic_space();
-		UINT8 video_control = m_tc0180vcu->get_videoctrl(space, 0);
-		UINT8 framebuffer_page = m_tc0180vcu->get_fb_page(space, 0);
+		address_space &space = machine().dummy_space();
+		uint8_t video_control = m_tc0180vcu->get_videoctrl(space, 0);
+		uint8_t framebuffer_page = m_tc0180vcu->get_fb_page(space, 0);
 
 		if (~video_control & 0x01)
-			m_framebuffer[framebuffer_page]->fill(0, screen.visible_area());
+			m_framebuffer[framebuffer_page]->fill(0, m_screen->visible_area());
 
 		if (~video_control & 0x80)
 		{
@@ -499,6 +501,6 @@ void taitob_state::screen_eof_taitob(screen_device &screen, bool state)
 			m_tc0180vcu->set_fb_page(space, 0, framebuffer_page);
 		}
 
-		draw_sprites(*m_framebuffer[framebuffer_page], screen.visible_area());
+		draw_sprites(*m_framebuffer[framebuffer_page], m_screen->visible_area());
 	}
 }

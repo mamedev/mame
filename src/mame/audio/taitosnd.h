@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Philip Bennett
-#ifndef __TAITOSND_H__
-#define __TAITOSND_H__
+#ifndef MAME_AUDIO_TAITOSND_H
+#define MAME_AUDIO_TAITOSND_H
 
 
 //**************************************************************************
@@ -14,6 +14,9 @@
 #define MCFG_TC0140SYT_SLAVE_CPU(_tag) \
 	tc0140syt_device::set_slave_tag(*device, "^" _tag);
 
+#define MCFG_PC060HA_MASTER_CPU(_tag) MCFG_TC0140SYT_MASTER_CPU(_tag)
+#define MCFG_PC060HA_SLAVE_CPU(_tag) MCFG_TC0140SYT_SLAVE_CPU(_tag)
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -24,8 +27,7 @@
 class tc0140syt_device : public device_t
 {
 public:
-	tc0140syt_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	~tc0140syt_device() { }
+	tc0140syt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	static void set_master_tag(device_t &device, const char *tag) { downcast<tc0140syt_device &>(device).m_mastercpu.set_tag(tag); }
 	static void set_slave_tag(device_t &device, const char *tag)  { downcast<tc0140syt_device &>(device).m_slavecpu.set_tag(tag); }
@@ -41,6 +43,8 @@ public:
 	DECLARE_WRITE8_MEMBER( slave_comm_w );
 
 protected:
+	tc0140syt_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -48,18 +52,27 @@ protected:
 private:
 	void update_nmi();
 
-	UINT8     m_slavedata[4];  /* Data on master->slave port (4 nibbles) */
-	UINT8     m_masterdata[4]; /* Data on slave->master port (4 nibbles) */
-	UINT8     m_mainmode;      /* Access mode on master cpu side */
-	UINT8     m_submode;       /* Access mode on slave cpu side */
-	UINT8     m_status;        /* Status data */
-	UINT8     m_nmi_enabled;   /* 1 if slave cpu has nmi's enabled */
+	uint8_t     m_slavedata[4];  /* Data on master->slave port (4 nibbles) */
+	uint8_t     m_masterdata[4]; /* Data on slave->master port (4 nibbles) */
+	uint8_t     m_mainmode;      /* Access mode on master cpu side */
+	uint8_t     m_submode;       /* Access mode on slave cpu side */
+	uint8_t     m_status;        /* Status data */
+	uint8_t     m_nmi_enabled;   /* 1 if slave cpu has nmi's enabled */
 
 	required_device<cpu_device> m_mastercpu;     /* this is the maincpu */
 	required_device<cpu_device> m_slavecpu;      /* this is the audiocpu */
 };
 
-extern const device_type TC0140SYT;
+// ======================> pc060ha_device
+
+class pc060ha_device : public tc0140syt_device
+{
+public:
+	pc060ha_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+DECLARE_DEVICE_TYPE(TC0140SYT, tc0140syt_device)
+DECLARE_DEVICE_TYPE(PC060HA, pc060ha_device)
 
 
-#endif /*__TAITOSND_H__*/
+#endif // MAME_AUDIO_TAITOSND_H

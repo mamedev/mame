@@ -11,7 +11,7 @@ import sys
 
 def parse_args():
     def usage():
-        sys.stderr.write('Usage: verinfo.py [-b mame|mess|ume|ldplayer] [-r|-p] [-o <outfile>] <srcfile>\n')
+        sys.stderr.write('Usage: verinfo.py [-b mame|mess|ume] [-r|-p] [-o <outfile>] <srcfile>\n')
         sys.exit(1)
 
     flags = True
@@ -90,7 +90,7 @@ if build == "mess":
     author = "MESS Team"
     comments = "Multi Emulation Super System"
     company_name = "MESS Team"
-    file_description = "Multi Emulation Super System"
+    file_description = "MESS"
     internal_name = "MESS"
     original_filename = "MESS"
     product_name = "MESS"
@@ -98,9 +98,9 @@ if build == "mess":
 else:
     # MAME
     author = "Nicola Salmoria and the MAME Team"
-    comments = "Multiple Arcade Machine Emulator"
+    comments = "Multi-purpose emulation framework"
     company_name = "MAME Team"
-    file_description = "Multiple Arcade Machine Emulator"
+    file_description = "MAME"
     internal_name = "MAME" if build == "mame" else build
     original_filename = "MAME" if build == "mame" else build
     product_name = "MAME" if build == "mame" else build

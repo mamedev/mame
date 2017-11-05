@@ -621,7 +621,7 @@ come from... they might be eventually removed -->
 
 
 <!-- This is only Sord memory expansion -->
-	<software name="em-5" supported="no">
+	<software name="em_5" supported="no">
 		<description>EM-5 Expansion memory 32Kb</description>
 		<year>198?</year>
 		<publisher>Sord</publisher>

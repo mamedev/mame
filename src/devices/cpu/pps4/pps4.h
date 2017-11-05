@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Juergen Buchmueller
-#ifndef __PPS4_H__
-#define __PPS4_H__
+#ifndef MAME_CPU_PPS4_PPS4_H
+#define MAME_CPU_PPS4_PPS4_H
+
+#pragma once
 
 
 /***************************************************************************
@@ -19,60 +21,78 @@ enum
 	PPS4_SAG,
 	PPS4_I1,
 	PPS4_I2,
-	PPS4_Ip,
-	PPS4_GENPC = STATE_GENPC,
-	PPS4_GENSP = STATE_GENSP,
-	PPS4_GENPCBASE = STATE_GENPCBASE,
-	PPS4_PORT_A = 256,
-	PPS4_PORT_B = 257
+	PPS4_Ip
 };
 
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
+//**************************************************************************
+//  INTERFACE CONFIGURATION MACROS
+//**************************************************************************
+
+#define MCFG_PPS4_DISCRETE_INPUT_A_CB(_devcb) \
+	devcb = &pps4_device::set_dia_cb(*device, DEVCB_##_devcb);
+
+#define MCFG_PPS4_DISCRETE_INPUT_B_CB(_devcb) \
+	devcb = &pps4_device::set_dib_cb(*device, DEVCB_##_devcb);
+
+#define MCFG_PPS4_DISCRETE_OUTPUT_CB(_devcb) \
+	devcb = &pps4_device::set_do_cb(*device, DEVCB_##_devcb);
+
+//**************************************************************************
+//  DEVICE TYPE DEFINITIONS
+//**************************************************************************
+
+DECLARE_DEVICE_TYPE(PPS4,   pps4_device)
+DECLARE_DEVICE_TYPE(PPS4_2, pps4_2_device)
 
 /***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-extern const device_type PPS4;
-
 class pps4_device : public cpu_device
 {
 public:
 	// construction/destruction
-	pps4_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pps4_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	// static configuration helpers
+	template <class Object> static devcb_base &set_dia_cb(device_t &device, Object &&cb) { return downcast<pps4_device &>(device).m_dia_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_dib_cb(device_t &device, Object &&cb) { return downcast<pps4_device &>(device).m_dib_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_do_cb(device_t &device, Object &&cb) { return downcast<pps4_device &>(device).m_do_cb.set_callback(std::forward<Object>(cb)); }
+
+	DECLARE_READ16_MEMBER(address_bus_r);
 
 protected:
+	pps4_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual UINT32 execute_min_cycles() const override { return 1; }
-	virtual UINT32 execute_max_cycles() const override { return 3; }
-	virtual UINT32 execute_input_lines() const override { return 0; }
-	virtual UINT32 execute_default_irq_vector() const override { return 0; }
+	virtual u32 execute_min_cycles() const override { return 1; }
+	virtual u32 execute_max_cycles() const override { return 3; }
+	virtual u32 execute_input_lines() const override { return 0; }
+	virtual u32 execute_default_irq_vector() const override { return 0; }
 	virtual void execute_run() override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override
-	{
-		return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_IO) ? &m_io_config : ( (spacenum == AS_DATA) ? &m_data_config : nullptr ) );
-	}
+	virtual space_config_vector memory_space_config() const override;
 
 	// device_state_interface overrides
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const override { return 1; }
-	virtual UINT32 disasm_max_opcode_bytes() const override { return 2; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	virtual u32 disasm_min_opcode_bytes() const override { return 1; }
+	virtual u32 disasm_max_opcode_bytes() const override { return 2; }
+	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, u32 options) override;
 
-private:
 	address_space_config m_program_config;
 	address_space_config m_data_config;
 	address_space_config m_io_config;
+
+	devcb_read8 m_dia_cb;
+	devcb_read8 m_dib_cb;
+	devcb_write8 m_do_cb;
 
 	address_space *m_program;
 	direct_read_data *m_direct;
@@ -80,32 +100,32 @@ private:
 	address_space *m_io;
 	int     m_icount;
 
-	UINT8   m_A;        //!< Accumulator A(4:1)
-	UINT8   m_X;        //!< X register X(4:1)
-	UINT16  m_P;        //!< program counter P(12:1)
-	UINT16  m_SA;       //!< Shift register SA(12:1)
-	UINT16  m_SB;       //!< Shift register SB(12:1)
-	UINT8   m_Skip;     //!< Skip next instruction
-	UINT16  m_SAG;      //!< Special address generation mask
-	UINT16  m_B;        //!< B register B(12:1) (BL, BM and BH)
-	UINT8   m_C;        //!< Carry flip-flop
-	UINT8   m_FF1;      //!< Flip-flop 1
-	UINT8   m_FF2;      //!< Flip-flop 2
-	UINT8   m_I1;        //!< Most recent instruction I(8:1)
-	UINT8   m_I2;       //!< Most recent parameter I2(8:1)
-	UINT8   m_Ip;       //!< Previous instruction I(8:1)
+	u8        m_A;        //!< Accumulator A(4:1)
+	u8        m_X;        //!< X register X(4:1)
+	u16       m_P;        //!< program counter P(12:1)
+	u16       m_SA;       //!< Shift register SA(12:1)
+	u16       m_SB;       //!< Shift register SB(12:1)
+	u8        m_Skip;     //!< Skip next instruction
+	u16       m_SAG;      //!< Special address generation mask
+	u16       m_B;        //!< B register B(12:1) (BL, BM and BH)
+	u8        m_C;        //!< Carry flip-flop
+	u8        m_FF1;      //!< Flip-flop 1
+	u8        m_FF2;      //!< Flip-flop 2
+	u8        m_I1;        //!< Most recent instruction I(8:1)
+	u8        m_I2;       //!< Most recent parameter I2(8:1)
+	u8        m_Ip;       //!< Previous instruction I(8:1)
 
 	//! return memory at address B(12:1)
-	inline UINT8 M();
+	inline u8 M();
 
 	//! write to memory at address B(12:1)
-	inline void W(UINT8 data);
+	inline void W(u8 data);
 
 	//! return the next opcode (also in m_I)
-	inline UINT8 ROP();
+	inline u8 ROP();
 
 	//! return the next argument (also in m_I2)
-	inline UINT8 ARG();
+	inline u8 ARG();
 
 	void iAD();          //!< Add
 	void iADC();         //!< Add with carry-in
@@ -136,7 +156,7 @@ private:
 	void iXBMX();        //!< Exchange BM and X registers
 	void iXAX();         //!< Exchange accumulator and X
 	void iXS();          //!< Eychange SA and SB registers
-	void iCYS();         //!< Cycle SA register and accumulaor
+	void iCYS();         //!< Cycle SA register and accumulator
 	void iLB();          //!< Load B indirect
 	void iLBL();         //!< Load B long
 	void iINCB();        //!< Increment BL
@@ -154,11 +174,33 @@ private:
 	void iRTNSK();       //!< Return and skip
 	void iIOL();         //!< Input/Output long
 	void iDIA();         //!< Discrete input group A
-	void iDIB();         //!< Discrete input group B
-	void iDOA();         //!< Discrete output group A
+	virtual void iDIB(); //!< Discrete input group B
+	virtual void iDOA(); //!< Discrete output group A
 	void iSAG();         //!< Special address generation
 
 	void execute_one(); //!< execute one instruction
 };
 
-#endif  // __PPS4_H__
+class pps4_2_device : public pps4_device
+{
+public:
+	// construction/destruction
+	pps4_2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+	// device_execute_interface overrides (NOTE: these assume internal XTAL divider is always used)
+	virtual u64 execute_clocks_to_cycles(u64 clocks) const override { return (clocks + 18 - 1) / 18; }
+	virtual u64 execute_cycles_to_clocks(u64 cycles) const override { return (cycles * 18); }
+
+	virtual void iDIB() override;
+	virtual void iDOA() override;
+
+private:
+	u8        m_DIO;      //!< DIO clamp
+};
+
+#endif // MAME_CPU_PPS4_PPS4_H

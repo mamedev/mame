@@ -10,11 +10,15 @@ Driver by Takahiro Nogi (nogi@kt.rim.or.jp) 1999/10/04
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/ssozumo.h"
+
 #include "cpu/m6502/m6502.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
-#include "includes/ssozumo.h"
+#include "sound/volt_reg.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 void ssozumo_state::machine_start()
@@ -24,7 +28,7 @@ void ssozumo_state::machine_start()
 
 WRITE8_MEMBER(ssozumo_state::sh_command_w)
 {
-	soundlatch_byte_w(space, 0, data);
+	m_soundlatch->write(space, 0, data);
 	m_audiocpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
 }
 
@@ -58,9 +62,9 @@ static ADDRESS_MAP_START( ssozumo_sound_map, AS_PROGRAM, 8, ssozumo_state )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
 	AM_RANGE(0x2000, 0x2001) AM_DEVWRITE("ay1", ay8910_device, data_address_w)
 	AM_RANGE(0x2002, 0x2003) AM_DEVWRITE("ay2", ay8910_device, data_address_w)
-	AM_RANGE(0x2004, 0x2004) AM_DEVWRITE("dac", dac_device, write_signed8)
+	AM_RANGE(0x2004, 0x2004) AM_DEVWRITE("dac", dac_byte_interface, write)
 	AM_RANGE(0x2005, 0x2005) AM_WRITE(sound_nmi_mask_w)
-	AM_RANGE(0x2007, 0x2007) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x2007, 0x2007) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -193,7 +197,7 @@ INTERRUPT_GEN_MEMBER(ssozumo_state::sound_timer_irq)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static MACHINE_CONFIG_START( ssozumo, ssozumo_state )
+static MACHINE_CONFIG_START( ssozumo )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 1200000) /* 1.2 MHz ???? */
@@ -218,16 +222,19 @@ static MACHINE_CONFIG_START( ssozumo, ssozumo_state )
 	MCFG_PALETTE_INIT_OWNER(ssozumo_state, ssozumo)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ay1", AY8910, 1500000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
 
 	MCFG_SOUND_ADD("ay2", AY8910, 1500000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
 
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -289,4 +296,4 @@ ROM_END
 
 
 
-GAME( 1984, ssozumo, 0, ssozumo, ssozumo, driver_device, 0, ROT270, "Technos Japan", "Syusse Oozumou (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, ssozumo, 0, ssozumo, ssozumo, ssozumo_state, 0, ROT270, "Technos Japan", "Syusse Oozumou (Japan)", MACHINE_SUPPORTS_SAVE )

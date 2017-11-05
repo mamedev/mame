@@ -12,31 +12,36 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "screen.h"
+
 
 class m79152pc_state : public driver_device
 {
 public:
 	m79152pc_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_p_videoram(*this, "p_videoram"),
-		m_p_attributes(*this, "p_attributes"),
-		m_maincpu(*this, "maincpu") { }
+		: driver_device(mconfig, type, tag)
+		, m_p_videoram(*this, "videoram")
+		, m_p_attributes(*this, "attributes")
+		, m_maincpu(*this, "maincpu")
+		, m_p_chargen(*this, "chargen")
+	{ }
 
-	UINT8 *m_p_chargen;
-	required_shared_ptr<UINT8> m_p_videoram;
-	required_shared_ptr<UINT8> m_p_attributes;
+	uint32_t screen_update_m79152pc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+private:
 	virtual void machine_reset() override;
-	virtual void video_start() override;
-	UINT32 screen_update_m79152pc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	required_shared_ptr<uint8_t> m_p_videoram;
+	required_shared_ptr<uint8_t> m_p_attributes;
 	required_device<cpu_device> m_maincpu;
+	required_region_ptr<u8> m_p_chargen;
 };
 
 static ADDRESS_MAP_START(m79152pc_mem, AS_PROGRAM, 8, m79152pc_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
-	AM_RANGE(0x8000, 0x8fff) AM_RAM AM_SHARE("p_videoram")
-	AM_RANGE(0x9000, 0x9fff) AM_RAM AM_SHARE("p_attributes")
+	AM_RANGE(0x8000, 0x8fff) AM_RAM AM_SHARE("videoram")
+	AM_RANGE(0x9000, 0x9fff) AM_RAM AM_SHARE("attributes")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( m79152pc_io, AS_IO, 8, m79152pc_state)
@@ -53,28 +58,23 @@ void m79152pc_state::machine_reset()
 {
 }
 
-void m79152pc_state::video_start()
-{
-	m_p_chargen = memregion("chargen")->base()+4;
-}
-
-UINT32 m79152pc_state::screen_update_m79152pc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t m79152pc_state::screen_update_m79152pc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 // Attributes are unknown so are not implemented
-	UINT8 y,ra,chr,gfx; //,attr;
-	UINT16 sy=0,ma=0,x;
+	uint8_t y,ra,chr,gfx; //,attr;
+	uint16_t sy=0,ma=0,x;
 
 	for (y = 0; y < 25; y++)
 	{
 		for (ra = 0; ra < 12; ra++)
 		{
-			UINT16 *p = &bitmap.pix16(sy++);
+			uint16_t *p = &bitmap.pix16(sy++);
 
 			for (x = ma; x < ma + 80; x++)
 			{
 				chr = m_p_videoram[x];
 				//attr = m_p_attributes[x];
-				gfx = m_p_chargen[(chr<<4) | ra ];
+				gfx = m_p_chargen[((chr<<4) | ra) + 4 ];
 
 				/* Display a scanline of a character */
 				*p++ = BIT(gfx, 7);
@@ -110,7 +110,7 @@ static GFXDECODE_START( m79152pc )
 	GFXDECODE_ENTRY( "chargen", 0x0000, m79152pc_charlayout, 0, 1 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( m79152pc, m79152pc_state )
+static MACHINE_CONFIG_START( m79152pc )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(m79152pc_mem)
@@ -141,5 +141,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME       PARENT   COMPAT   MACHINE    INPUT     INIT    COMPANY     FULLNAME       FLAGS */
-COMP( ????, m79152pc,  0,       0,       m79152pc,  m79152pc, driver_device, 0,   "Mera-Elzab", "MERA 79152 PC", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME       PARENT   COMPAT   MACHINE    INPUT     STATE           INIT  COMPANY       FULLNAME         FLAGS
+COMP( ????, m79152pc,  0,       0,       m79152pc,  m79152pc, m79152pc_state, 0,    "Mera-Elzab", "MERA 79152 PC", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

@@ -78,30 +78,35 @@ Notes:
 
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/ram.h"
-#include "rendlay.h"
+#include "machine/timer.h"
 
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+
+#include "rendlay.h"
+#include "screen.h"
 #include "softlist.h"
+
 
 class prestige_state : public driver_device
 {
 public:
 	prestige_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_ram(*this, RAM_TAG),
-			m_cart(*this, "cartslot"),
-			m_keyboard(*this, "KEY"),
-			m_cart_type(*this, "CART_TYPE"),
-			m_bank1(*this, "bank1"),
-			m_bank2(*this, "bank2"),
-			m_bank3(*this, "bank3"),
-			m_bank4(*this, "bank4"),
-			m_bank5(*this, "bank5")
-		{ }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_ram(*this, RAM_TAG)
+		, m_cart(*this, "cartslot")
+		, m_keyboard(*this, "KEY.%u", 0)
+		, m_cart_type(*this, "CART_TYPE")
+		, m_bank1(*this, "bank1")
+		, m_bank2(*this, "bank2")
+		, m_bank3(*this, "bank3")
+		, m_bank4(*this, "bank4")
+		, m_bank5(*this, "bank5")
+	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
@@ -114,26 +119,26 @@ public:
 	required_memory_bank m_bank4;
 	required_memory_bank m_bank5;
 
-	UINT8 m_bank[7];
-	UINT8 m_kb_matrix;
-	UINT8 m_irq_counter;
-	UINT8 m_mousex;
-	UINT8 m_mousey;
-	UINT8 *m_vram;
+	uint8_t m_bank[7];
+	uint8_t m_kb_matrix;
+	uint8_t m_irq_counter;
+	uint8_t m_mousex;
+	uint8_t m_mousey;
+	uint8_t *m_vram;
 	struct
 	{
-		UINT16  addr1;
-		UINT16  addr2;
-		UINT8   lcd_w;
-		UINT8   lcd_h;
-		UINT8   fb_width;
-		UINT8   split_pos;
+		uint16_t  addr1;
+		uint16_t  addr2;
+		uint8_t   lcd_w;
+		uint8_t   lcd_h;
+		uint8_t   fb_width;
+		uint8_t   split_pos;
 	} m_lcdc;
 
 	virtual void machine_start() override;
-	UINT32 screen_update(int bpp, screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_1bpp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_2bpp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(int bpp, screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_1bpp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_2bpp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	memory_region *m_cart_rom;
 
@@ -225,7 +230,7 @@ WRITE8_MEMBER( prestige_state::bankswitch_w )
 
 READ8_MEMBER( prestige_state::kb_r )
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	for (int line=0; line<8; line++)
 		if (!(m_kb_matrix & (1<<line)))
@@ -241,7 +246,7 @@ WRITE8_MEMBER( prestige_state::kb_w )
 
 READ8_MEMBER( prestige_state::mouse_r )
 {
-	INT16 data = 0;
+	int16_t data = 0;
 
 	switch( offset )
 	{
@@ -253,8 +258,8 @@ READ8_MEMBER( prestige_state::mouse_r )
 			break;
 	}
 
-	data = MIN(data, +127);
-	data = MAX(data, -127);
+	data = (std::min)(data, int16_t(+127));
+	data = (std::max)(data, int16_t(-127));
 
 	return 0x80 + data;
 }
@@ -601,7 +606,7 @@ INPUT_PORTS_END
 
 IRQ_CALLBACK_MEMBER(prestige_state::prestige_int_ack)
 {
-	UINT32 vector;
+	uint32_t vector;
 
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 
@@ -624,8 +629,8 @@ void prestige_state::machine_start()
 	std::string region_tag;
 	m_cart_rom = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
 
-	UINT8 *rom = memregion("maincpu")->base();
-	UINT8 *cart = nullptr;
+	uint8_t *rom = memregion("maincpu")->base();
+	uint8_t *cart = nullptr;
 	if (m_cart_rom != nullptr)
 	{
 		cart = m_cart_rom->base();
@@ -634,7 +639,7 @@ void prestige_state::machine_start()
 	{
 		cart = rom + 0x40000;   // internal ROM also includes extra contents that are activated by a cartridge that works as a jumper
 	}
-	UINT8 *ram = m_ram->pointer();
+	uint8_t *ram = m_ram->pointer();
 	memset(ram, 0x00, m_ram->size());
 
 	m_bank1->configure_entries(0, 64, rom,  0x4000);
@@ -670,7 +675,7 @@ PALETTE_INIT_MEMBER(prestige_state, glcolor)
 	palette.set_pen_color(3, rgb_t(0xff,0xdf,0x1f));
 }
 
-UINT32 prestige_state::screen_update(int bpp, screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t prestige_state::screen_update(int bpp, screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int width = m_lcdc.fb_width + m_lcdc.lcd_w + 1;
 
@@ -684,7 +689,7 @@ UINT32 prestige_state::screen_update(int bpp, screen_device &screen, bitmap_ind1
 
 		for (int sx = 0; sx <= m_lcdc.lcd_w; sx++)
 		{
-			UINT8 data = m_vram[(line_start + sx) & 0x1fff];
+			uint8_t data = m_vram[(line_start + sx) & 0x1fff];
 
 			for (int x = 0; x < 8 / bpp; x++)
 			{
@@ -703,12 +708,12 @@ UINT32 prestige_state::screen_update(int bpp, screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-UINT32 prestige_state::screen_update_1bpp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t prestige_state::screen_update_1bpp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return screen_update(1, screen, bitmap, cliprect);
 }
 
-UINT32 prestige_state::screen_update_2bpp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t prestige_state::screen_update_2bpp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return screen_update(2, screen, bitmap, cliprect);
 }
@@ -718,7 +723,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(prestige_state::irq_timer)
 	m_maincpu->set_input_line(0, ASSERT_LINE);
 }
 
-static MACHINE_CONFIG_START( prestige_base, prestige_state )
+static MACHINE_CONFIG_START( prestige_base )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_8MHz)  // Z84C008
 	MCFG_CPU_PROGRAM_MAP(prestige_mem)
@@ -802,6 +807,12 @@ static MACHINE_CONFIG_DERIVED( gjmovie, prestige_base )
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "gjmovie")
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( princ, prestige_base )
+	MCFG_DEVICE_REMOVE("cartslot")
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "princ_cart")
+	MCFG_SOFTWARE_LIST_ADD("cart_list", "princ")
+MACHINE_CONFIG_END
+
 /* ROM definition */
 ROM_START( gl6000sl )
 	ROM_REGION(0x100000, "maincpu", 0)
@@ -841,6 +852,11 @@ ROM_END
 ROM_START( snotecex )
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "27-5758-00.u6", 0x00000, 0x080000, CRC(aac672be) SHA1(6ac09c3ae8c1c987072b2272cfcf34d9083431cb) )
+ROM_END
+
+ROM_START( snotecu )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD("27-6100-00.U1", 0x00000, 0x100000, CRC(b2f979d5) SHA1(d2a76e99351971d1fb4cf4df9fe5741a606eb844))
 ROM_END
 
 ROM_START( glmcolor )
@@ -893,32 +909,42 @@ ROM_START( cars2lap )
 	ROM_LOAD("n25s16.u6", 0x00000, 0x200000, CRC(ec1ba96e) SHA1(51b8844ae77adf20f74f268d380d268c9ce19785))
 ROM_END
 
+ROM_START( princ )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD("29F800T.U4", 0x00000, 0x100000, CRC(30b6b864) SHA1(7ada3af85dd8dd3f95ca8965ad8e642c26445293))
+ROM_END
+
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1994, glcolor,   0,       0,  glcolor,    glcolor,  driver_device,     0,  "VTech",   "Genius Leader Color (Germany)",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1994, glscolor,  glcolor, 0,  glcolor,    glcolor,  driver_device,     0,  "VTech",   "Genius Leader Super Color (Germany)",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1995, snotec,    0,       0,  snotec,     glcolor,  driver_device,     0,  "Bandai",  "Super Note Club (Japan)",                MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1996, snotecex,  0,       0,  snotec,     glcolor,  driver_device,     0,  "Bandai",  "Super Note Club EX (Japan)",             MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1996, glmcolor,  0,       0,  glmcolor,   glmcolor, driver_device,     0,  "VTech",   "Genius Leader Magic Color (Germany)",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1997, gl6000sl,  0,       0,  gl6000sl,   prestige, driver_device,     0,  "VTech",   "Genius Leader 6000SL (Germany)",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1998, gl7007sl,  0,       0,  gl7007sl,   prestige, driver_device,     0,  "VTech",   "Genius Leader 7007SL (Germany)",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1998, prestige,  0,       0,  prestige,   prestige, driver_device,     0,  "VTech",   "PreComputer Prestige Elite",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1999, gwnf,      0,       0,  prestige,   prestige, driver_device,     0,  "VTech",   "Genius Winner Notebook Fun (Germany)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME      PARENT   COMPAT  MACHINE     INPUT     STATE           INIT  COMPANY   FULLNAME                                FLAGS
+COMP( 1994, glcolor,  0,       0,      glcolor,    glcolor,  prestige_state, 0,    "VTech",  "Genius Leader Color (Germany)",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1994, glscolor, glcolor, 0,      glcolor,    glcolor,  prestige_state, 0,    "VTech",  "Genius Leader Super Color (Germany)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1995, snotec,   0,       0,      snotec,     glcolor,  prestige_state, 0,    "Bandai", "Super Note Club (Japan)",              MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1996, snotecex, 0,       0,      snotec,     glcolor,  prestige_state, 0,    "Bandai", "Super Note Club EX (Japan)",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1996, glmcolor, 0,       0,      glmcolor,   glmcolor, prestige_state, 0,    "VTech",  "Genius Leader Magic Color (Germany)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1997, gl6000sl, 0,       0,      gl6000sl,   prestige, prestige_state, 0,    "VTech",  "Genius Leader 6000SL (Germany)",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1998, snotecu,  0,       0,      snotec,     glcolor,  prestige_state, 0,    "Bandai", "Super Note Club \xce\xbc (Japan)",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1998, gl7007sl, 0,       0,      gl7007sl,   prestige, prestige_state, 0,    "VTech",  "Genius Leader 7007SL (Germany)",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1998, prestige, 0,       0,      prestige,   prestige, prestige_state, 0,    "VTech",  "PreComputer Prestige Elite",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1999, gwnf,     0,       0,      prestige,   prestige, prestige_state, 0,    "VTech",  "Genius Winner Notebook Fun (Germany)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
 
 // these systems need to be moved into a separate driver
-COMP( 1996, gj4000,    0,       0,  prestige,   prestige, driver_device,     0,  "VTech",   "Genius Junior 4000 (Germany)", MACHINE_IS_SKELETON)
-COMP( 1996, gkidabc,   0,       0,  prestige,   prestige, driver_device,     0,  "VTech",   "Genius KID ABC Fan (Germany)", MACHINE_IS_SKELETON)
-COMP( 1993, gjmovie,   0,       0,  gjmovie,    prestige, driver_device,     0,  "VTech",   "Genius Junior Movie (Germany)", MACHINE_IS_SKELETON)
-COMP( 1996, gjrstar,   0,       0,  prestige,   prestige, driver_device,     0,  "VTech",   "Genius Junior Redstar(Germany)", MACHINE_IS_SKELETON)
-COMP( 1996, gjrstar2,  gjrstar, 0,  prestige,   prestige, driver_device,     0,  "VTech",   "Genius Junior Redstar 2 (Germany)", MACHINE_IS_SKELETON)
-COMP( 1998, gjrstar3,  0,       0,  prestige,   prestige, driver_device,     0,  "VTech",   "Genius Junior Redstar 3 (Germany)", MACHINE_IS_SKELETON)
-COMP( 1998, gj5000,    0,       0,  prestige,   prestige, driver_device,     0,  "VTech",   "Genius Junior 5000 (Germany)", MACHINE_IS_SKELETON)
-COMP( 2012, cars2lap,  0,       0,  prestige,   prestige, driver_device,     0,  "VTech",   "CARS 2 Laptop (Germany)", MACHINE_IS_SKELETON)
+COMP( 1996, gj4000,   0,       0,      prestige,   prestige, prestige_state, 0,    "VTech",  "Genius Junior 4000 (Germany)",         MACHINE_IS_SKELETON )
+COMP( 1996, gkidabc,  0,       0,      prestige,   prestige, prestige_state, 0,    "VTech",  "Genius KID ABC Fan (Germany)",         MACHINE_IS_SKELETON )
+COMP( 1993, gjmovie,  0,       0,      gjmovie,    prestige, prestige_state, 0,    "VTech",  "Genius Junior Movie (Germany)",        MACHINE_IS_SKELETON )
+COMP( 1996, gjrstar,  0,       0,      prestige,   prestige, prestige_state, 0,    "VTech",  "Genius Junior Redstar(Germany)",       MACHINE_IS_SKELETON )
+COMP( 1996, gjrstar2, gjrstar, 0,      prestige,   prestige, prestige_state, 0,    "VTech",  "Genius Junior Redstar 2 (Germany)",    MACHINE_IS_SKELETON )
+COMP( 1998, gjrstar3, 0,       0,      prestige,   prestige, prestige_state, 0,    "VTech",  "Genius Junior Redstar 3 (Germany)",    MACHINE_IS_SKELETON )
+COMP( 1998, gj5000,   0,       0,      prestige,   prestige, prestige_state, 0,    "VTech",  "Genius Junior 5000 (Germany)",         MACHINE_IS_SKELETON )
+COMP( 2012, cars2lap, 0,       0,      prestige,   prestige, prestige_state, 0,    "VTech",  "CARS 2 Laptop (Germany)",              MACHINE_IS_SKELETON )
 
 
 // gl6600cx use a NSC1028 system-on-a-chip designed by National Semiconductor specifically for VTech
 // http://web.archive.org/web/19991127134657/http://www.national.com/news/item/0,1735,425,00.html
-COMP( 1999, gl6600cx,  0,       0,  prestige,   prestige, driver_device,     0,  "VTech",   "Genius Leader 6600CX (Germany)", MACHINE_IS_SKELETON)
+COMP( 1999, gl6600cx, 0,       0,      prestige,   prestige, prestige_state, 0,    "VTech",  "Genius Leader 6600CX (Germany)",       MACHINE_IS_SKELETON )
+
+// TODO: move into a separate driver
+// Prin-C use a Fujitsu MB90611A MCU (F2MC-16L)
+COMP( ????, princ,    0,       0,      princ,      prestige, prestige_state, 0,    "Tomy",   "Prin-C",                               MACHINE_IS_SKELETON )

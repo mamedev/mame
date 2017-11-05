@@ -65,8 +65,8 @@
 
 void fantland_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
-	UINT8 *spriteram_2 = m_spriteram2;
-	UINT8   *indx_ram   =   m_spriteram + 0x2000,    // this ram contains indexes into offs_ram
+	uint8_t *spriteram_2 = m_spriteram2;
+	uint8_t   *indx_ram   =   m_spriteram + 0x2000,    // this ram contains indexes into offs_ram
 			*offs_ram   =   m_spriteram + 0x2400,    // this ram contains x,y offsets or indexes into spriteram_2
 			*ram        =   m_spriteram,         // current sprite pointer in spriteram
 			*ram2       =   indx_ram;           // current sprite pointer in indx_ram
@@ -140,7 +140,7 @@ void fantland_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect
 	}
 }
 
-UINT32 fantland_state::screen_update_fantland(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t fantland_state::screen_update_fantland(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
 	draw_sprites(bitmap,cliprect);

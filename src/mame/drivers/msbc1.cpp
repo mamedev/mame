@@ -52,10 +52,23 @@ Notes:
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/terminal.h"
-#include "includes/msbc1.h"
+#define MC68000R12_TAG  "u50"
+#define MK68564_0_TAG   "u14"
+#define MK68564_1_TAG   "u15"
+#define MC68230L10_TAG  "u16"
 
-#define TERMINAL_TAG "terminal"
+class msbc1_state : public driver_device
+{
+public:
+	msbc1_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, MC68000R12_TAG)
+	{ }
+
+private:
+	virtual void machine_reset() override;
+	required_device<cpu_device> m_maincpu;
+};
 
 static ADDRESS_MAP_START( msbc1_mem, AS_PROGRAM, 16, msbc1_state )
 	ADDRESS_MAP_UNMAP_HIGH
@@ -70,20 +83,17 @@ INPUT_PORTS_END
 void msbc1_state::machine_reset()
 {
 	void *ram = m_maincpu->space(AS_PROGRAM).get_write_ptr(0);
-	UINT8 *rom = memregion(MC68000R12_TAG)->base();
+	uint8_t *rom = memregion(MC68000R12_TAG)->base();
 
 	memcpy(ram, rom, 8);
 
 	m_maincpu->reset();
 }
 
-static MACHINE_CONFIG_START( msbc1, msbc1_state )
+static MACHINE_CONFIG_START( msbc1 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(MC68000R12_TAG, M68000, XTAL_12_5MHz)
 	MCFG_CPU_PROGRAM_MAP(msbc1_mem)
-
-	// devices
-	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -109,5 +119,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1985, msbc1,  0,      0,       msbc1,     msbc1, driver_device,   0,    "Omnibyte", "MSBC-1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE        INIT  COMPANY     FULLNAME  FLAGS
+COMP( 1985, msbc1,  0,      0,       msbc1,     msbc1, msbc1_state, 0,    "Omnibyte", "MSBC-1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

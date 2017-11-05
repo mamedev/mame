@@ -6,6 +6,7 @@
 
 *********************************************************************/
 
+#include "emu.h"
 #include "k7659kb.h"
 
 
@@ -21,7 +22,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type K7659_KEYBOARD = &device_creator<k7659_keyboard_device>;
+DEFINE_DEVICE_TYPE(K7659_KEYBOARD, k7659_keyboard_device, "k7659_keyboard", "K7659 Keyboard")
 
 
 
@@ -39,7 +40,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *k7659_keyboard_device::device_rom_region() const
+const tiny_rom_entry *k7659_keyboard_device::device_rom_region() const
 {
 	return ROM_NAME( k7659_keyboard );
 }
@@ -56,25 +57,13 @@ const rom_entry *k7659_keyboard_device::device_rom_region() const
 //-------------------------------------------------
 
 
-
 //-------------------------------------------------
-//  MACHINE_DRIVER( k7659_keyboard )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( k7659_keyboard )
+MACHINE_CONFIG_MEMBER( k7659_keyboard_device::device_add_mconfig )
 
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor k7659_keyboard_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( k7659_keyboard );
-}
 
 
 //-------------------------------------------------
@@ -212,8 +201,8 @@ ioport_constructor k7659_keyboard_device::device_input_ports() const
 //  k7659_keyboard_device - constructor
 //-------------------------------------------------
 
-k7659_keyboard_device::k7659_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, K7659_KEYBOARD, "K7659 Keyboard", tag, owner, clock, "k7659kb", __FILE__)
+k7659_keyboard_device::k7659_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, K7659_KEYBOARD, tag, owner, clock)
 {}
 
 
@@ -243,20 +232,20 @@ void k7659_keyboard_device::device_reset()
 
 void k7659_keyboard_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	UINT8 retVal = 0;//m_lookup;
-	UINT8 a1 = ioport("A1")->read();
-	UINT8 a2 = ioport("A2")->read();
-	UINT8 a3 = ioport("A3")->read();
-	UINT8 a4 = ioport("A4")->read();
-	UINT8 a5 = ioport("A5")->read();
-	UINT8 a6 = ioport("A6")->read();
-	UINT8 a7 = ioport("A7")->read();
-	UINT8 a8 = ioport("A8")->read();
-	UINT8 a9 = ioport("A9")->read();
-	UINT8 a10 = ioport("A10")->read();
-	UINT8 a11 = ioport("A11")->read();
-	UINT8 a12 = ioport("A12")->read();
-	UINT16 code = 0;
+	uint8_t retVal = 0;//m_lookup;
+	uint8_t a1 = ioport("A1")->read();
+	uint8_t a2 = ioport("A2")->read();
+	uint8_t a3 = ioport("A3")->read();
+	uint8_t a4 = ioport("A4")->read();
+	uint8_t a5 = ioport("A5")->read();
+	uint8_t a6 = ioport("A6")->read();
+	uint8_t a7 = ioport("A7")->read();
+	uint8_t a8 = ioport("A8")->read();
+	uint8_t a9 = ioport("A9")->read();
+	uint8_t a10 = ioport("A10")->read();
+	uint8_t a11 = ioport("A11")->read();
+	uint8_t a12 = ioport("A12")->read();
+	uint16_t code = 0;
 	if (a1)
 		code = 0x10 + key_pos(a1);
 	else if (a2)
@@ -292,7 +281,7 @@ void k7659_keyboard_device::device_timer(emu_timer &timer, device_timer_id id, i
 	m_key = retVal;
 }
 
-UINT8 k7659_keyboard_device::key_pos(UINT8 val)
+uint8_t k7659_keyboard_device::key_pos(uint8_t val)
 {
 	if (BIT(val,0)) return 1;
 	if (BIT(val,1)) return 2;

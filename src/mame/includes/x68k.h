@@ -8,18 +8,22 @@
  *
  ****************************************************************************/
 
-#ifndef X68K_H_
-#define X68K_H_
+#ifndef MAME_INCLUDES_X68K_H
+#define MAME_INCLUDES_X68K_H
 
 #include "cpu/m68000/m68000.h"
+#include "machine/8530scc.h"
 #include "machine/hd63450.h"
+#include "machine/i8255.h"
+#include "machine/mc68901.h"
+#include "machine/ram.h"
 #include "machine/rp5c15.h"
 #include "machine/upd765.h"
 #include "sound/okim6258.h"
-#include "machine/ram.h"
-#include "machine/8530scc.h"
-#include "sound/2151intf.h"
-#include "machine/i8255.h"
+#include "sound/ym2151.h"
+#include "bus/x68k/x68kexp.h"
+
+#include "screen.h"
 
 #define MC68901_TAG     "mc68901"
 #define RP5C15_TAG      "rp5c15"
@@ -64,6 +68,7 @@ public:
 			m_ppi(*this, "ppi8255"),
 			m_screen(*this, "screen"),
 			m_upd72065(*this, "upd72065"),
+			m_expansion(*this, "exp"),
 			m_options(*this, "options"),
 			m_mouse1(*this, "mouse1"),
 			m_mouse2(*this, "mouse2"),
@@ -75,10 +80,10 @@ public:
 			m_md3b(*this, "md3b"),
 			m_md6b(*this, "md6b"),
 			m_md6b_extra(*this, "md6b_extra"),
-			m_nvram(0x4000/sizeof(UINT16)),
-			m_tvram(0x80000/sizeof(UINT16)),
-			m_gvram(0x80000/sizeof(UINT16)),
-			m_spritereg(0x8000/sizeof(UINT16), 0)
+			m_nvram(0x4000/sizeof(uint16_t)),
+			m_tvram(0x80000/sizeof(uint16_t)),
+			m_gvram(0x80000/sizeof(uint16_t)),
+			m_spritereg(0x8000/sizeof(uint16_t), 0)
 	{ }
 
 	required_device<m68000_base_device> m_maincpu;
@@ -95,6 +100,7 @@ public:
 	required_device<i8255_device> m_ppi;
 	required_device<screen_device> m_screen;
 	required_device<upd72065_device> m_upd72065;
+	required_device<x68k_expansion_slot_device> m_expansion;
 
 	required_ioport m_options;
 	required_ioport m_mouse1;
@@ -108,17 +114,17 @@ public:
 	required_ioport m_md6b;
 	required_ioport m_md6b_extra;
 
-	std::vector<UINT16> m_nvram;
-	std::vector<UINT16> m_tvram;
-	std::vector<UINT16> m_gvram;
-	std::vector<UINT16> m_spritereg;
+	std::vector<uint16_t> m_nvram;
+	std::vector<uint16_t> m_tvram;
+	std::vector<uint16_t> m_gvram;
+	std::vector<uint16_t> m_spritereg;
 
 	bitmap_ind16 m_pcgbitmap;
 	bitmap_ind16 m_gfxbitmap;
 	bitmap_ind16 m_special;
 
 	void floppy_load_unload(bool load, floppy_image_device *dev);
-	int floppy_load(floppy_image_device *dev);
+	image_init_result floppy_load(floppy_image_device *dev);
 	void floppy_unload(floppy_image_device *dev);
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
@@ -128,7 +134,7 @@ public:
 		int monitor;
 		int contrast;
 		int keyctrl;
-		UINT16 cputype;
+		uint16_t cputype;
 	} m_sysport;
 	struct
 	{
@@ -223,16 +229,16 @@ public:
 		int seq2;  // part of 6-button input sequence.
 		emu_timer* io_timeout2;
 	} m_mdctrl;
-	UINT8 m_ppi_port[3];
+	uint8_t m_ppi_port[3];
 	int m_current_vector[8];
-	UINT8 m_current_irq_line;
+	uint8_t m_current_irq_line;
 	unsigned int m_scanline;
 	int m_led_state;
 	emu_timer* m_mouse_timer;
 	emu_timer* m_led_timer;
 	emu_timer* m_net_timer;
 	unsigned char m_scc_prev;
-	UINT16 m_ppi_prev;
+	uint16_t m_ppi_prev;
 	int m_mfp_prev;
 	emu_timer* m_scanline_timer;
 	emu_timer* m_raster_irq;
@@ -240,7 +246,7 @@ public:
 	emu_timer* m_fdc_tc;
 	emu_timer* m_adpcm_timer;
 	emu_timer* m_bus_error_timer;
-	UINT16* m_spriteram;
+	uint16_t* m_spriteram;
 	tilemap_t* m_bg0_8;
 	tilemap_t* m_bg1_8;
 	tilemap_t* m_bg0_16;
@@ -260,7 +266,7 @@ public:
 	DECLARE_MACHINE_START(x68000);
 	DECLARE_VIDEO_START(x68000);
 	DECLARE_PALETTE_INIT(x68000);
-	UINT32 screen_update_x68000(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_x68000(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(x68k_led_callback);
 	TIMER_CALLBACK_MEMBER(x68k_scc_ack);
 	TIMER_CALLBACK_MEMBER(md_6button_port1_timeout);
@@ -290,13 +296,14 @@ public:
 
 	int x68k_read_mouse();
 	void x68k_set_adpcm();
-	UINT8 md_3button_r(int port);
+	uint8_t md_3button_r(int port);
 	void md_6button_init();
-	UINT8 md_6button_r(int port);
-	UINT8 xpd1lr_r(int port);
+	uint8_t md_6button_r(int port);
+	uint8_t xpd1lr_r(int port);
 
 	DECLARE_WRITE_LINE_MEMBER(x68k_fm_irq);
 	DECLARE_WRITE_LINE_MEMBER(x68k_irq2_line);
+	DECLARE_WRITE_LINE_MEMBER(x68k_irq4_line);
 
 	DECLARE_WRITE16_MEMBER(x68k_scc_w);
 	DECLARE_WRITE16_MEMBER(x68k_fdc_w);
@@ -335,11 +342,11 @@ public:
 	IRQ_CALLBACK_MEMBER(x68k_int_ack);
 
 private:
-	inline void x68k_plot_pixel(bitmap_rgb32 &bitmap, int x, int y, UINT32 color);
-	void x68k_crtc_text_copy(int src, int dest, UINT8 planes);
+	inline void x68k_plot_pixel(bitmap_rgb32 &bitmap, int x, int y, uint32_t color);
+	void x68k_crtc_text_copy(int src, int dest, uint8_t planes);
 	void x68k_crtc_refresh_mode();
 	void x68k_draw_text(bitmap_rgb32 &bitmap, int xscr, int yscr, rectangle rect);
-	bool x68k_draw_gfx_scanline(bitmap_ind16 &bitmap, rectangle cliprect, UINT8 priority);
+	bool x68k_draw_gfx_scanline(bitmap_ind16 &bitmap, rectangle cliprect, uint8_t priority);
 	void x68k_draw_gfx(bitmap_rgb32 &bitmap,rectangle cliprect);
 	void x68k_draw_sprites(bitmap_ind16 &bitmap, int priority, rectangle cliprect);
 
@@ -348,10 +355,10 @@ public:
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-	void set_bus_error(UINT32 address, bool write, UINT16 mem_mask);
+	void set_bus_error(uint32_t address, bool write, uint16_t mem_mask);
 	bool m_bus_error;
 };
 
 
 
-#endif /* X68K_H_ */
+#endif // MAME_INCLUDES_X68K_H

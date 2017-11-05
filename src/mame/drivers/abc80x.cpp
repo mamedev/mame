@@ -141,17 +141,20 @@ Notes:
 
     TODO:
 
+    - option ROM/HR video RAM access needs refactor of memory banking
     - cassette
     - abc806 RTC
     - abc806 disks except ufd631 won't boot
 
 */
 
+#include "emu.h"
 #include "includes/abc80x.h"
 #include "video/abc800.h"
 #include "video/abc802.h"
 #include "video/abc806.h"
 #include "softlist.h"
+#include "speaker.h"
 
 
 //**************************************************************************
@@ -251,7 +254,7 @@ void abc802_state::bankswitch()
 void abc806_state::bankswitch()
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
-	UINT32 videoram_mask = m_ram->size() - (32 * 1024) - 1;
+	uint32_t videoram_mask = m_ram->size() - (32 * 1024) - 1;
 	int bank;
 	char bank_name[10];
 
@@ -259,15 +262,15 @@ void abc806_state::bankswitch()
 	{
 		// 32K block mapping
 
-		UINT32 videoram_start = (m_hrs & 0xf0) << 11;
+		uint32_t videoram_start = (m_hrs & 0xf0) << 11;
 
 		for (bank = 1; bank <= 8; bank++)
 		{
 			// 0x0000-0x7FFF is video RAM
 
-			UINT16 start_addr = 0x1000 * (bank - 1);
-			UINT16 end_addr = start_addr + 0xfff;
-			UINT32 videoram_offset = (videoram_start + start_addr) & videoram_mask;
+			uint16_t start_addr = 0x1000 * (bank - 1);
+			uint16_t end_addr = start_addr + 0xfff;
+			uint32_t videoram_offset = (videoram_start + start_addr) & videoram_mask;
 			sprintf(bank_name,"bank%d",bank);
 			//logerror("%04x-%04x: Video RAM %04x (32K)\n", start_addr, end_addr, videoram_offset);
 
@@ -280,8 +283,8 @@ void abc806_state::bankswitch()
 		{
 			// 0x8000-0xFFFF is main RAM
 
-			UINT16 start_addr = 0x1000 * (bank - 1);
-			UINT16 end_addr = start_addr + 0xfff;
+			uint16_t start_addr = 0x1000 * (bank - 1);
+			uint16_t end_addr = start_addr + 0xfff;
 			sprintf(bank_name,"bank%d",bank);
 			//logerror("%04x-%04x: Work RAM (32K)\n", start_addr, end_addr);
 
@@ -295,10 +298,10 @@ void abc806_state::bankswitch()
 
 		for (bank = 1; bank <= 16; bank++)
 		{
-			UINT16 start_addr = 0x1000 * (bank - 1);
-			UINT16 end_addr = start_addr + 0xfff;
-			UINT8 map = m_map[bank - 1];
-			UINT32 videoram_offset = ((map & 0x7f) << 12) & videoram_mask;
+			uint16_t start_addr = 0x1000 * (bank - 1);
+			uint16_t end_addr = start_addr + 0xfff;
+			uint8_t map = m_map[bank - 1];
+			uint32_t videoram_offset = ((map & 0x7f) << 12) & videoram_mask;
 			sprintf(bank_name,"bank%d",bank);
 			if (BIT(map, 7) && m_eme)
 			{
@@ -330,7 +333,7 @@ void abc806_state::bankswitch()
 
 					program.install_read_bank(0x7000, 0x77ff, bank_name);
 					program.unmap_write(0x7000, 0x77ff);
-					program.install_readwrite_handler(0x7800, 0x7fff, 0, 0, READ8_DELEGATE(abc806_state, charram_r), WRITE8_DELEGATE(abc806_state, charram_w));
+					program.install_readwrite_handler(0x7800, 0x7fff, READ8_DELEGATE(abc806_state, charram_r), WRITE8_DELEGATE(abc806_state, charram_w));
 					membank(bank_name)->set_entry(0);
 					break;
 
@@ -350,22 +353,22 @@ void abc806_state::bankswitch()
 	{
 		// 30K block mapping
 
-		UINT32 videoram_start = (m_hrs & 0xf0) << 11;
+		uint32_t videoram_start = (m_hrs & 0xf0) << 11;
 
 		for (bank = 1; bank <= 8; bank++)
 		{
 			// 0x0000-0x77FF is video RAM
 
-			UINT16 start_addr = 0x1000 * (bank - 1);
-			UINT16 end_addr = start_addr + 0xfff;
-			UINT32 videoram_offset = (videoram_start + start_addr) & videoram_mask;
+			uint16_t start_addr = 0x1000 * (bank - 1);
+			uint16_t end_addr = start_addr + 0xfff;
+			uint32_t videoram_offset = (videoram_start + start_addr) & videoram_mask;
 			sprintf(bank_name,"bank%d",bank);
 			//logerror("%04x-%04x: Video RAM %04x (30K)\n", start_addr, end_addr, videoram_offset);
 
 			if (start_addr == 0x7000)
 			{
 				program.install_readwrite_bank(0x7000, 0x77ff, bank_name);
-				program.install_readwrite_handler(0x7800, 0x7fff, 0, 0, READ8_DELEGATE(abc806_state, charram_r), WRITE8_DELEGATE(abc806_state, charram_w));
+				program.install_readwrite_handler(0x7800, 0x7fff, READ8_DELEGATE(abc806_state, charram_r), WRITE8_DELEGATE(abc806_state, charram_w));
 			}
 			else
 			{
@@ -445,15 +448,15 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( abc800c_io, AS_IO, 8, abc800_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0x18) AM_DEVREADWRITE(ABCBUS_TAG, abcbus_slot_t, inp_r, out_w)
-	AM_RANGE(0x01, 0x01) AM_MIRROR(0x18) AM_DEVREADWRITE(ABCBUS_TAG, abcbus_slot_t, stat_r, cs_w)
-	AM_RANGE(0x02, 0x02) AM_MIRROR(0x18) AM_DEVWRITE(ABCBUS_TAG, abcbus_slot_t, c1_w)
-	AM_RANGE(0x03, 0x03) AM_MIRROR(0x18) AM_DEVWRITE(ABCBUS_TAG, abcbus_slot_t, c2_w)
-	AM_RANGE(0x04, 0x04) AM_MIRROR(0x18) AM_DEVWRITE(ABCBUS_TAG, abcbus_slot_t, c3_w)
-	AM_RANGE(0x05, 0x05) AM_MIRROR(0x18) AM_DEVWRITE(ABCBUS_TAG, abcbus_slot_t, c4_w)
+	AM_RANGE(0x00, 0x00) AM_MIRROR(0x18) AM_DEVREADWRITE(ABCBUS_TAG, abcbus_slot_device, inp_r, out_w)
+	AM_RANGE(0x01, 0x01) AM_MIRROR(0x18) AM_DEVREADWRITE(ABCBUS_TAG, abcbus_slot_device, stat_r, cs_w)
+	AM_RANGE(0x02, 0x02) AM_MIRROR(0x18) AM_DEVWRITE(ABCBUS_TAG, abcbus_slot_device, c1_w)
+	AM_RANGE(0x03, 0x03) AM_MIRROR(0x18) AM_DEVWRITE(ABCBUS_TAG, abcbus_slot_device, c2_w)
+	AM_RANGE(0x04, 0x04) AM_MIRROR(0x18) AM_DEVWRITE(ABCBUS_TAG, abcbus_slot_device, c3_w)
+	AM_RANGE(0x05, 0x05) AM_MIRROR(0x18) AM_DEVWRITE(ABCBUS_TAG, abcbus_slot_device, c4_w)
 	AM_RANGE(0x05, 0x05) AM_MIRROR(0x18) AM_READ(pling_r)
 	AM_RANGE(0x06, 0x06) AM_MIRROR(0x18) AM_WRITE(hrs_w)
-	AM_RANGE(0x07, 0x07) AM_MIRROR(0x18) AM_DEVREAD(ABCBUS_TAG, abcbus_slot_t, rst_r) AM_WRITE(hrc_w)
+	AM_RANGE(0x07, 0x07) AM_MIRROR(0x18) AM_DEVREAD(ABCBUS_TAG, abcbus_slot_device, rst_r) AM_WRITE(hrc_w)
 	AM_RANGE(0x20, 0x23) AM_MIRROR(0x0c) AM_DEVREADWRITE(Z80DART_TAG, z80dart_device, ba_cd_r, ba_cd_w)
 	AM_RANGE(0x40, 0x43) AM_MIRROR(0x1c) AM_DEVREADWRITE(Z80SIO_TAG, z80sio2_device, ba_cd_r, ba_cd_w)
 	AM_RANGE(0x60, 0x63) AM_MIRROR(0x1c) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_device, read, write)
@@ -504,14 +507,14 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( abc802_io, AS_IO, 8, abc802_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0x18) AM_DEVREADWRITE(ABCBUS_TAG, abcbus_slot_t, inp_r, out_w)
-	AM_RANGE(0x01, 0x01) AM_MIRROR(0x18) AM_DEVREADWRITE(ABCBUS_TAG, abcbus_slot_t, stat_r, cs_w)
-	AM_RANGE(0x02, 0x02) AM_MIRROR(0x18) AM_DEVWRITE(ABCBUS_TAG, abcbus_slot_t, c1_w)
-	AM_RANGE(0x03, 0x03) AM_MIRROR(0x18) AM_DEVWRITE(ABCBUS_TAG, abcbus_slot_t, c2_w)
-	AM_RANGE(0x04, 0x04) AM_MIRROR(0x18) AM_DEVWRITE(ABCBUS_TAG, abcbus_slot_t, c3_w)
-	AM_RANGE(0x05, 0x05) AM_MIRROR(0x18) AM_DEVWRITE(ABCBUS_TAG, abcbus_slot_t, c4_w)
+	AM_RANGE(0x00, 0x00) AM_MIRROR(0x18) AM_DEVREADWRITE(ABCBUS_TAG, abcbus_slot_device, inp_r, out_w)
+	AM_RANGE(0x01, 0x01) AM_MIRROR(0x18) AM_DEVREADWRITE(ABCBUS_TAG, abcbus_slot_device, stat_r, cs_w)
+	AM_RANGE(0x02, 0x02) AM_MIRROR(0x18) AM_DEVWRITE(ABCBUS_TAG, abcbus_slot_device, c1_w)
+	AM_RANGE(0x03, 0x03) AM_MIRROR(0x18) AM_DEVWRITE(ABCBUS_TAG, abcbus_slot_device, c2_w)
+	AM_RANGE(0x04, 0x04) AM_MIRROR(0x18) AM_DEVWRITE(ABCBUS_TAG, abcbus_slot_device, c3_w)
+	AM_RANGE(0x05, 0x05) AM_MIRROR(0x18) AM_DEVWRITE(ABCBUS_TAG, abcbus_slot_device, c4_w)
 	AM_RANGE(0x05, 0x05) AM_MIRROR(0x08) AM_READ(pling_r)
-	AM_RANGE(0x07, 0x07) AM_MIRROR(0x18) AM_DEVREAD(ABCBUS_TAG, abcbus_slot_t, rst_r)
+	AM_RANGE(0x07, 0x07) AM_MIRROR(0x18) AM_DEVREAD(ABCBUS_TAG, abcbus_slot_device, rst_r)
 	AM_RANGE(0x20, 0x23) AM_MIRROR(0x0c) AM_DEVREADWRITE(Z80DART_TAG, z80dart_device, ba_cd_r, ba_cd_w)
 	AM_RANGE(0x31, 0x31) AM_MIRROR(0x06) AM_DEVREAD(MC6845_TAG, mc6845_device, register_r)
 	AM_RANGE(0x38, 0x38) AM_MIRROR(0x06) AM_DEVWRITE(MC6845_TAG, mc6845_device, address_w)
@@ -552,20 +555,20 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( abc806_io, AS_IO, 8, abc806_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff18) AM_DEVREADWRITE(ABCBUS_TAG, abcbus_slot_t, inp_r, out_w)
-	AM_RANGE(0x01, 0x01) AM_MIRROR(0xff18) AM_DEVREADWRITE(ABCBUS_TAG, abcbus_slot_t, stat_r, cs_w)
-	AM_RANGE(0x02, 0x02) AM_MIRROR(0xff18) AM_DEVWRITE(ABCBUS_TAG, abcbus_slot_t, c1_w)
-	AM_RANGE(0x03, 0x03) AM_MIRROR(0xff18) AM_DEVWRITE(ABCBUS_TAG, abcbus_slot_t, c2_w)
-	AM_RANGE(0x04, 0x04) AM_MIRROR(0xff18) AM_DEVWRITE(ABCBUS_TAG, abcbus_slot_t, c3_w)
-	AM_RANGE(0x05, 0x05) AM_MIRROR(0xff18) AM_DEVWRITE(ABCBUS_TAG, abcbus_slot_t, c4_w)
+	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff18) AM_DEVREADWRITE(ABCBUS_TAG, abcbus_slot_device, inp_r, out_w)
+	AM_RANGE(0x01, 0x01) AM_MIRROR(0xff18) AM_DEVREADWRITE(ABCBUS_TAG, abcbus_slot_device, stat_r, cs_w)
+	AM_RANGE(0x02, 0x02) AM_MIRROR(0xff18) AM_DEVWRITE(ABCBUS_TAG, abcbus_slot_device, c1_w)
+	AM_RANGE(0x03, 0x03) AM_MIRROR(0xff18) AM_DEVWRITE(ABCBUS_TAG, abcbus_slot_device, c2_w)
+	AM_RANGE(0x04, 0x04) AM_MIRROR(0xff18) AM_DEVWRITE(ABCBUS_TAG, abcbus_slot_device, c3_w)
+	AM_RANGE(0x05, 0x05) AM_MIRROR(0xff18) AM_DEVWRITE(ABCBUS_TAG, abcbus_slot_device, c4_w)
 	AM_RANGE(0x06, 0x06) AM_MIRROR(0xff18) AM_WRITE(hrs_w)
-	AM_RANGE(0x07, 0x07) AM_MIRROR(0xff18) AM_DEVREAD(ABCBUS_TAG, abcbus_slot_t, rst_r) AM_WRITE(hrc_w)
+	AM_RANGE(0x07, 0x07) AM_MIRROR(0xff18) AM_DEVREAD(ABCBUS_TAG, abcbus_slot_device, rst_r) AM_WRITE(hrc_w)
 	AM_RANGE(0x20, 0x23) AM_MIRROR(0xff0c) AM_DEVREADWRITE(Z80DART_TAG, z80dart_device, ba_cd_r, ba_cd_w)
 	AM_RANGE(0x31, 0x31) AM_MIRROR(0xff00) AM_DEVREAD(MC6845_TAG, mc6845_device, register_r)
-	AM_RANGE(0x34, 0x34) AM_MIRROR(0xff00) AM_MASK(0xff00) AM_READWRITE(mai_r, mao_w)
+	AM_RANGE(0x34, 0x34) AM_SELECT(0xff00) AM_READWRITE(mai_r, mao_w)
 	AM_RANGE(0x35, 0x35) AM_MIRROR(0xff00) AM_READWRITE(ami_r, amo_w)
 	AM_RANGE(0x36, 0x36) AM_MIRROR(0xff00) AM_READWRITE(sti_r, sto_w)
-	AM_RANGE(0x37, 0x37) AM_MIRROR(0xff00) AM_MASK(0xff00) AM_READWRITE(cli_r, sso_w)
+	AM_RANGE(0x37, 0x37) AM_SELECT(0xff00) AM_READWRITE(cli_r, sso_w)
 	AM_RANGE(0x38, 0x38) AM_MIRROR(0xff00) AM_DEVWRITE(MC6845_TAG, mc6845_device, address_w)
 	AM_RANGE(0x39, 0x39) AM_MIRROR(0xff00) AM_DEVWRITE(MC6845_TAG, mc6845_device, register_w)
 	AM_RANGE(0x40, 0x43) AM_MIRROR(0xff1c) AM_DEVREADWRITE(Z80SIO_TAG, z80sio2_device, ba_cd_r, ba_cd_w)
@@ -902,7 +905,7 @@ void abc802_state::machine_start()
 
 void abc802_state::machine_reset()
 {
-	UINT8 config = m_config->read();
+	uint8_t config = m_config->read();
 	m_sb = m_io_sb->read();
 
 	// memory banking
@@ -936,8 +939,8 @@ void abc806_state::machine_start()
 	m_ctc_timer->adjust(attotime::from_hz(ABC800_X01/2/2/2), 0, attotime::from_hz(ABC800_X01/2/2/2));
 
 	// setup memory banking
-	UINT8 *mem = m_rom->base();
-	UINT32 videoram_size = m_ram->size() - (32 * 1024);
+	uint8_t *mem = m_rom->base();
+	uint32_t videoram_size = m_ram->size() - (32 * 1024);
 	int bank;
 	char bank_name[10];
 
@@ -1015,7 +1018,7 @@ void abc806_state::machine_reset()
 //  MACHINE_CONFIG( abc800c )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( abc800c, abc800c_state )
+static MACHINE_CONFIG_START( abc800c )
 	// basic machine hardware
 	MCFG_CPU_ADD(Z80_TAG, Z80, ABC800_X01/2/2)
 	MCFG_Z80_DAISY_CHAIN(abc800_daisy_chain)
@@ -1038,7 +1041,7 @@ static MACHINE_CONFIG_START( abc800c, abc800c_state )
 	MCFG_Z80CTC_ZC1_CB(WRITELINE(abc800_state, ctc_z1_w))
 	MCFG_Z80CTC_ZC2_CB(WRITELINE(abc800_state, ctc_z2_w))
 
-	MCFG_Z80SIO2_ADD(Z80SIO_TAG, ABC800_X01/2/2, 0, 0, 0, 0 )
+	MCFG_DEVICE_ADD(Z80SIO_TAG, Z80SIO2, ABC800_X01/2/2)
 	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE(RS232_B_TAG, rs232_port_device, write_txd))
 	MCFG_Z80DART_OUT_DTRA_CB(DEVWRITELINE(RS232_B_TAG, rs232_port_device, write_dtr))
 	MCFG_Z80DART_OUT_RTSA_CB(DEVWRITELINE(RS232_B_TAG, rs232_port_device, write_rts))
@@ -1047,7 +1050,7 @@ static MACHINE_CONFIG_START( abc800c, abc800c_state )
 	MCFG_Z80DART_OUT_RTSB_CB(WRITELINE(abc800_state, sio_txdb_w))
 	MCFG_Z80DART_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 
-	MCFG_Z80DART_ADD(Z80DART_TAG, ABC800_X01/2/2, 0, 0, 0, 0 )
+	MCFG_DEVICE_ADD(Z80DART_TAG, Z80DART, ABC800_X01/2/2)
 	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_txd))
 	MCFG_Z80DART_OUT_DTRA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_dtr))
 	MCFG_Z80DART_OUT_RTSA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_rts))
@@ -1090,7 +1093,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( abc800m )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( abc800m, abc800m_state )
+static MACHINE_CONFIG_START( abc800m )
 	// basic machine hardware
 	MCFG_CPU_ADD(Z80_TAG, Z80, ABC800_X01/2/2)
 	MCFG_Z80_DAISY_CHAIN(abc800_daisy_chain)
@@ -1113,7 +1116,7 @@ static MACHINE_CONFIG_START( abc800m, abc800m_state )
 	MCFG_Z80CTC_ZC1_CB(WRITELINE(abc800_state, ctc_z1_w))
 	MCFG_Z80CTC_ZC2_CB(WRITELINE(abc800_state, ctc_z2_w))
 
-	MCFG_Z80SIO2_ADD(Z80SIO_TAG, ABC800_X01/2/2, 0, 0, 0, 0 )
+	MCFG_DEVICE_ADD(Z80SIO_TAG, Z80SIO2, ABC800_X01/2/2)
 	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE(RS232_B_TAG, rs232_port_device, write_txd))
 	MCFG_Z80DART_OUT_DTRA_CB(DEVWRITELINE(RS232_B_TAG, rs232_port_device, write_dtr))
 	MCFG_Z80DART_OUT_RTSA_CB(DEVWRITELINE(RS232_B_TAG, rs232_port_device, write_rts))
@@ -1122,7 +1125,7 @@ static MACHINE_CONFIG_START( abc800m, abc800m_state )
 	MCFG_Z80DART_OUT_RTSB_CB(WRITELINE(abc800_state, sio_txdb_w))
 	MCFG_Z80DART_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 
-	MCFG_Z80DART_ADD(Z80DART_TAG, ABC800_X01/2/2, 0, 0, 0, 0 )
+	MCFG_DEVICE_ADD(Z80DART_TAG, Z80DART, ABC800_X01/2/2)
 	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_txd))
 	MCFG_Z80DART_OUT_DTRA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_dtr))
 	MCFG_Z80DART_OUT_RTSA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_rts))
@@ -1165,7 +1168,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( abc802 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( abc802, abc802_state )
+static MACHINE_CONFIG_START( abc802 )
 	// basic machine hardware
 	MCFG_CPU_ADD(Z80_TAG, Z80, ABC800_X01/2/2)
 	MCFG_Z80_DAISY_CHAIN(abc800_daisy_chain)
@@ -1188,7 +1191,7 @@ static MACHINE_CONFIG_START( abc802, abc802_state )
 	MCFG_Z80CTC_ZC1_CB(WRITELINE(abc800_state, ctc_z1_w))
 	MCFG_Z80CTC_ZC2_CB(WRITELINE(abc800_state, ctc_z2_w))
 
-	MCFG_Z80SIO2_ADD(Z80SIO_TAG, ABC800_X01/2/2, 0, 0, 0, 0 )
+	MCFG_DEVICE_ADD(Z80SIO_TAG, Z80SIO2, ABC800_X01/2/2)
 	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE(RS232_B_TAG, rs232_port_device, write_txd))
 	MCFG_Z80DART_OUT_DTRA_CB(DEVWRITELINE(RS232_B_TAG, rs232_port_device, write_dtr))
 	MCFG_Z80DART_OUT_RTSA_CB(DEVWRITELINE(RS232_B_TAG, rs232_port_device, write_rts))
@@ -1197,7 +1200,7 @@ static MACHINE_CONFIG_START( abc802, abc802_state )
 	MCFG_Z80DART_OUT_RTSB_CB(WRITELINE(abc800_state, sio_txdb_w))
 	MCFG_Z80DART_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 
-	MCFG_Z80DART_ADD(Z80DART_TAG, ABC800_X01/2/2, 0, 0, 0, 0 )
+	MCFG_DEVICE_ADD(Z80DART_TAG, Z80DART, ABC800_X01/2/2)
 	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_txd))
 	MCFG_Z80DART_OUT_DTRA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_dtr))
 	MCFG_Z80DART_OUT_RTSA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_rts))
@@ -1241,7 +1244,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( abc806 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( abc806, abc806_state )
+static MACHINE_CONFIG_START( abc806 )
 	// basic machine hardware
 	MCFG_CPU_ADD(Z80_TAG, Z80, ABC800_X01/2/2)
 	MCFG_Z80_DAISY_CHAIN(abc800_daisy_chain)
@@ -1260,7 +1263,7 @@ static MACHINE_CONFIG_START( abc806, abc806_state )
 	MCFG_Z80CTC_ZC1_CB(WRITELINE(abc800_state, ctc_z1_w))
 	MCFG_Z80CTC_ZC2_CB(WRITELINE(abc800_state, ctc_z2_w))
 
-	MCFG_Z80SIO2_ADD(Z80SIO_TAG, ABC800_X01/2/2, 0, 0, 0, 0 )
+	MCFG_DEVICE_ADD(Z80SIO_TAG, Z80SIO2, ABC800_X01/2/2)
 	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE(RS232_B_TAG, rs232_port_device, write_txd))
 	MCFG_Z80DART_OUT_DTRA_CB(DEVWRITELINE(RS232_B_TAG, rs232_port_device, write_dtr))
 	MCFG_Z80DART_OUT_RTSA_CB(DEVWRITELINE(RS232_B_TAG, rs232_port_device, write_rts))
@@ -1269,7 +1272,7 @@ static MACHINE_CONFIG_START( abc806, abc806_state )
 	MCFG_Z80DART_OUT_RTSB_CB(WRITELINE(abc800_state, sio_txdb_w))
 	MCFG_Z80DART_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 
-	MCFG_Z80DART_ADD(Z80DART_TAG, ABC800_X01/2/2, 0, 0, 0, 0 )
+	MCFG_DEVICE_ADD(Z80DART_TAG, Z80DART, ABC800_X01/2/2)
 	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_txd))
 	MCFG_Z80DART_OUT_DTRA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_dtr))
 	MCFG_Z80DART_OUT_RTSA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_rts))
@@ -1413,11 +1416,37 @@ ROM_START( abc802 )
 	ROMX_LOAD( "abc 32-31.14f", 0x6000, 0x2000, CRC(fc8be7a8) SHA1(a1d4cb45cf5ae21e636dddfa70c99bfd2050ad60), ROM_BIOS(3) )
 	ROM_SYSTEM_BIOS( 3, "mica620", "MICA DOS v.20 (1984-03-02)" )
 	ROMX_LOAD( "mica820.14f",   0x6000, 0x2000, CRC(edf998af) SHA1(daae7e1ff6ef3e0ddb83e932f324c56f4a98f79b), ROM_BIOS(4) )
+	ROM_SYSTEM_BIOS( 4, "luxnet01", "LUXNET 01" )
+	ROMX_LOAD( "322n01.14f",   0x6000, 0x2000, CRC(0911bc92) SHA1(bf58b3be40ce07638eb265aa2dd97c5562a0c41b), ROM_BIOS(5) )
+	ROM_SYSTEM_BIOS( 5, "luxnet02", "LUXNET 02" )
+	ROMX_LOAD( "322n02.14f",   0x6000, 0x2000, CRC(2384baec) SHA1(8ae0371242c201913b2d33a75f670d2bccf29582), ROM_BIOS(6) )
 
 	ROM_REGION( 0x1000, MC6845_TAG, 0 )
 	ROM_LOAD( "abc t02-1.3g", 0x0000, 0x1000, CRC(4d54eed8) SHA1(04cb5fc5f3d7ba9b9a5ae0ec94241d1fe83647f7) ) // 64 90191-01
 
 	ROM_REGION( 0x400, "plds", 0 )
+	/*
+	    1   CLK
+	    2   CUR
+	    3   FC
+	    4   IHS
+	    5   LL
+	    6   ATE
+	    7   ATD
+	    8   AT0
+	    9   AT1
+	    10  GND
+	    11  GND
+	    12  >O1
+	    13  >O0
+	    14
+	    15
+	    16  >RI
+	    17  >RG
+	    18  INV
+	    19  >D
+	    20  Vcc
+	*/
 	ROM_LOAD( "abc p2-1.2g", 0x000, 0x400, NO_DUMP ) // PAL16R4
 ROM_END
 
@@ -1443,6 +1472,8 @@ ROM_START( abc806 )
 	ROMX_LOAD( "mica2006.2k",  0x6000, 0x1000, CRC(58bc2aa8) SHA1(0604bd2396f7d15fcf3d65888b4b673f554037c0), ROM_BIOS(3) )
 	ROM_SYSTEM_BIOS( 3, "catnet", "CAT-NET" )
 	ROMX_LOAD( "cmd8_5.2k",    0x6000, 0x1000, CRC(25430ef7) SHA1(03a36874c23c215a19b0be14ad2f6b3b5fb2c839), ROM_BIOS(4) )
+	ROM_SYSTEM_BIOS( 4, "luxnet", "LUXNET" )
+	ROMX_LOAD( "ln806.2k",    0x6000, 0x1000, CRC(034b5991) SHA1(ba7f8653f4e516687a4399abef450e361f2bfd20), ROM_BIOS(5) )
 	ROM_LOAD_OPTIONAL( "abc 76-11.2j",  0x7000, 0x1000, CRC(3eb5f6a1) SHA1(02d4e38009c71b84952eb3b8432ad32a98a7fe16) ) // Options-PROM ABC 76-11 "64 90238-02"
 	ROM_LOAD( "abc 76-xx.2j",  0x7000, 0x1000, CRC(b364cc49) SHA1(9a2c373778856a31902cdbd2ae3362c200a38e24) ) // Enhanced Options-PROM
 
@@ -1464,7 +1495,7 @@ ROM_START( abc806 )
 	//ROM_REGION( 0x200, "v60", 0 )
 	//ROM_LOAD( "60 90319-01.7e", 0x000, 0x200, NO_DUMP ) // "V60" 7621 (82S131), HR vertical timing 60Hz
 
-	ROM_REGION( 0x400, "att_hand", 0 )
+	//ROM_REGION( 0x400, "att_hand", 0 )
 	/*
 	    1   E6P (RAD A8)
 	    2   THP (chargen A12)
@@ -1491,145 +1522,58 @@ ROM_START( abc806 )
 	    23  E5P (RAD A7)
 	    24  Vcc
 	*/
-	ROM_LOAD( "60 90225-01.11c", 0x000, 0x400, NO_DUMP ) // "VIDEO ATTRIBUTE" 40033A (?)
+	//ROM_LOAD( "60 90225-01.11c", 0x000, 0x400, NO_DUMP ) // "VIDEO ATTRIBUTE" 40033A (?)
 
 	ROM_REGION( 0x104, "abc_p3", 0 )
+	/*
+	    1   12MHz
+	    2   DOT
+	    3   RTF
+	    4   GTF
+	    5   BTF
+	    6   RTB
+	    7   GTB
+	    8   BTB
+	    9   SFG
+	    10  GND
+	    11  GND
+	    12  RFG
+	    13  GFG
+	    14  >YL
+	    15  >BL
+	    16  >GL
+	    17  >RL
+	    18  BFG
+	    19  >FGE
+	    20  Vcc
+	*/
 	ROM_LOAD( "60 90239-01.1b",  0x000, 0x104, CRC(f3d0ba00) SHA1(bcc0ee26ecac0028aef6bf5cb308133b509bb360) ) // "ABC P3-11" PAL16R4, color encoder
 
 	ROM_REGION( 0x104, "abc_p4", 0 )
+	/*
+	    1   I3
+	    2   A15
+	    3   A14
+	    4   A13
+	    5   A12
+	    6   A11
+	    7   MIL
+	    8   EME
+	    9   ENL
+	    10  GND
+	    11  XML
+	    12  >ROMD
+	    13  HRAL
+	    14  HRBL
+	    15  KDL
+	    16  >HRE
+	    17  RKDL
+	    18  MUX
+	    19  >RAMD
+	    20  Vcc
+	*/
 	ROM_LOAD( "60 90240-01.2d",  0x000, 0x104, CRC(3cc5518d) SHA1(343cf951d01c9d361b695bb4e80eaadf0820b6bc) ) // "ABC P4-11" PAL16L8, memory mapper
 ROM_END
-
-
-
-//**************************************************************************
-//  DRIVER INITIALIZATION
-//**************************************************************************
-
-//-------------------------------------------------
-//  DRIVER_INIT( abc800c )
-//-------------------------------------------------
-
-DIRECT_UPDATE_MEMBER( abc800c_state::direct_update_handler )
-{
-	if (address >= 0x7c00 && address < 0x8000)
-	{
-		direct.explicit_configure(0x7c00, 0x7fff, 0x3ff, m_rom->base() + 0x7c00);
-
-		if (!m_fetch_charram)
-		{
-			m_fetch_charram = 1;
-			bankswitch();
-		}
-
-		return ~0;
-	}
-
-	if (m_fetch_charram)
-	{
-		m_fetch_charram = 0;
-		bankswitch();
-	}
-
-	return address;
-}
-
-DRIVER_INIT_MEMBER(abc800c_state,driver_init)
-{
-	m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(abc800c_state::direct_update_handler), this));
-}
-
-
-//-------------------------------------------------
-//  DRIVER_INIT( abc800m )
-//-------------------------------------------------
-
-DIRECT_UPDATE_MEMBER( abc800m_state::direct_update_handler )
-{
-	if (address >= 0x7800 && address < 0x8000)
-	{
-		direct.explicit_configure(0x7800, 0x7fff, 0x7ff, m_rom->base() + 0x7800);
-
-		if (!m_fetch_charram)
-		{
-			m_fetch_charram = 1;
-			bankswitch();
-		}
-
-		return ~0;
-	}
-
-	if (m_fetch_charram)
-	{
-		m_fetch_charram = 0;
-		bankswitch();
-	}
-
-	return address;
-}
-
-DRIVER_INIT_MEMBER(abc800m_state,driver_init)
-{
-	m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(abc800m_state::direct_update_handler), this));
-}
-
-
-//-------------------------------------------------
-//  DRIVER_INIT( abc802 )
-//-------------------------------------------------
-
-DIRECT_UPDATE_MEMBER( abc802_state::direct_update_handler )
-{
-	if (m_lrs)
-	{
-		if (address >= 0x7800 && address < 0x8000)
-		{
-			direct.explicit_configure(0x7800, 0x7fff, 0x7ff, m_rom->base() + 0x7800);
-			return ~0;
-		}
-	}
-
-	return address;
-}
-
-DRIVER_INIT_MEMBER(abc802_state,driver_init)
-{
-	m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(abc802_state::direct_update_handler), this));
-}
-
-
-//-------------------------------------------------
-//  DRIVER_INIT( abc806 )
-//-------------------------------------------------
-
-DIRECT_UPDATE_MEMBER( abc806_state::direct_update_handler )
-{
-	if (address >= 0x7800 && address < 0x8000)
-	{
-		direct.explicit_configure(0x7800, 0x7fff, 0x7ff, m_rom->base() + 0x7800);
-
-		if (!m_fetch_charram)
-		{
-			m_fetch_charram = 1;
-			bankswitch();
-		}
-
-		return ~0;
-	}
-
-	if (m_fetch_charram)
-	{
-		m_fetch_charram = 0;
-		bankswitch();
-	}
-
-	return address;
-}
-
-DRIVER_INIT_MEMBER(abc806_state,driver_init)
-{
-	m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(abc806_state::direct_update_handler), this));
-}
 
 
 
@@ -1637,8 +1581,8 @@ DRIVER_INIT_MEMBER(abc806_state,driver_init)
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT                         COMPANY             FULLNAME        FLAGS
-COMP( 1981, abc800c,    0,          0,      abc800c,    abc800, abc800c_state,  driver_init, "Luxor Datorer AB", "ABC 800 C/HR", MACHINE_SUPPORTS_SAVE )
-COMP( 1981, abc800m,    abc800c,    0,      abc800m,    abc800, abc800m_state,  driver_init, "Luxor Datorer AB", "ABC 800 M/HR", MACHINE_SUPPORTS_SAVE )
-COMP( 1983, abc802,     0,          0,      abc802,     abc802, abc802_state,   driver_init, "Luxor Datorer AB", "ABC 802",      MACHINE_SUPPORTS_SAVE )
-COMP( 1983, abc806,     0,          0,      abc806,     abc806, abc806_state,   driver_init, "Luxor Datorer AB", "ABC 806",      MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   STATE           INIT  COMPANY             FULLNAME        FLAGS
+COMP( 1981, abc800c,    0,          0,      abc800c,    abc800, abc800c_state,  0,    "Luxor Datorer AB", "ABC 800 C/HR", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+COMP( 1981, abc800m,    abc800c,    0,      abc800m,    abc800, abc800m_state,  0,    "Luxor Datorer AB", "ABC 800 M/HR", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+COMP( 1983, abc802,     0,          0,      abc802,     abc802, abc802_state,   0,    "Luxor Datorer AB", "ABC 802",      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+COMP( 1983, abc806,     0,          0,      abc806,     abc806, abc806_state,   0,    "Luxor Datorer AB", "ABC 806",      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

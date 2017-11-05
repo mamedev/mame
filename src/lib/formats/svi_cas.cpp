@@ -10,7 +10,7 @@
 #define CAS_EMPTY_SAMPLES (24220)
 #define CAS_INIT_SAMPLES    (200)
 
-static const UINT8 CasHeader[17] =
+static const uint8_t CasHeader[17] =
 {
 	0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55,
 	0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x7f
@@ -24,7 +24,7 @@ static int cas_size;
 /*******************************************************************
    Generate samples for the tape image
 ********************************************************************/
-static int svi_cas_fill_wave(INT16 *buffer, int sample_count, UINT8 *bytes)
+static int svi_cas_fill_wave(int16_t *buffer, int sample_count, uint8_t *bytes)
 {
 	int cas_pos, samples_pos, n, i;
 
@@ -112,7 +112,7 @@ static int svi_cas_fill_wave(INT16 *buffer, int sample_count, UINT8 *bytes)
 /*******************************************************************
    Calculate the number of samples needed for this tape image
 ********************************************************************/
-static int svi_cas_to_wav_size(const UINT8 *casdata, int caslen)
+static int svi_cas_to_wav_size(const uint8_t *casdata, int caslen)
 {
 	int cas_pos, samples_pos, size, i;
 
@@ -184,14 +184,14 @@ static const struct CassetteLegacyWaveFiller svi_legacy_fill_wave =
 
 
 
-static casserr_t svi_cas_identify(cassette_image *cassette, struct CassetteOptions *opts)
+static cassette_image::error svi_cas_identify(cassette_image *cassette, struct CassetteOptions *opts)
 {
 	return cassette_legacy_identify(cassette, opts, &svi_legacy_fill_wave);
 }
 
 
 
-static casserr_t svi_cas_load(cassette_image *cassette)
+static cassette_image::error svi_cas_load(cassette_image *cassette)
 {
 	return cassette_legacy_construct(cassette, &svi_legacy_fill_wave);
 }

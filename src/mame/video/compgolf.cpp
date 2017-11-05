@@ -13,7 +13,7 @@
 
 PALETTE_INIT_MEMBER(compgolf_state, compgolf)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 	for (i = 0; i < palette.entries(); i++)
@@ -71,8 +71,8 @@ TILE_GET_INFO_MEMBER(compgolf_state::get_back_info)
 
 void compgolf_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(compgolf_state::get_back_info),this), tilemap_mapper_delegate(FUNC(compgolf_state::back_scan),this), 16, 16, 32, 32);
-	m_text_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(compgolf_state::get_text_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(compgolf_state::get_back_info),this), tilemap_mapper_delegate(FUNC(compgolf_state::back_scan),this), 16, 16, 32, 32);
+	m_text_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(compgolf_state::get_text_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_text_tilemap->set_transparent_pen(0);
 }
@@ -115,7 +115,7 @@ void compgolf_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 	}
 }
 
-UINT32 compgolf_state::screen_update_compgolf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t compgolf_state::screen_update_compgolf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int scrollx = m_scrollx_hi + m_scrollx_lo;
 	int scrolly = m_scrolly_hi + m_scrolly_lo;

@@ -20,18 +20,19 @@
 #include "machine/i8255.h"
 #include "machine/i8251.h"
 #include "video/i8275.h"
+#include "screen.h"
 
 
 class sm1800_state : public driver_device
 {
 public:
 	sm1800_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_uart(*this, "i8251"),
-	m_ppi(*this, "i8255"),
-	m_crtc(*this, "i8275"),
-	m_palette(*this, "palette")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_uart(*this, "i8251")
+		, m_ppi(*this, "i8255")
+		, m_crtc(*this, "i8275")
+		, m_palette(*this, "palette")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -43,7 +44,7 @@ public:
 	DECLARE_WRITE8_MEMBER(sm1800_8255_portc_w);
 	DECLARE_READ8_MEMBER(sm1800_8255_porta_r);
 	DECLARE_READ8_MEMBER(sm1800_8255_portc_r);
-	UINT8 m_irq_state;
+	uint8_t m_irq_state;
 	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(sm1800);
 	INTERRUPT_GEN_MEMBER(sm1800_vblank_interrupt);
@@ -92,8 +93,8 @@ I8275_DRAW_CHARACTER_MEMBER( sm1800_state::crtc_display_pixels )
 {
 	int i;
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	UINT8 *charmap = memregion("chargen")->base();
-	UINT8 pixels = charmap[(linecount & 7) + (charcode << 3)] ^ 0xff;
+	uint8_t *charmap = memregion("chargen")->base();
+	uint8_t pixels = charmap[(linecount & 7) + (charcode << 3)] ^ 0xff;
 	if (vsp)
 		pixels = 0;
 
@@ -127,9 +128,9 @@ READ8_MEMBER( sm1800_state::sm1800_8255_portc_r )
 
 PALETTE_INIT_MEMBER(sm1800_state, sm1800)
 {
-	palette.set_pen_color(0, rgb_t::black); // black
+	palette.set_pen_color(0, rgb_t::black()); // black
 	palette.set_pen_color(1, 0xa0, 0xa0, 0xa0); // white
-	palette.set_pen_color(2, rgb_t::white); // highlight
+	palette.set_pen_color(2, rgb_t::white()); // highlight
 }
 
 
@@ -152,7 +153,7 @@ static GFXDECODE_START( sm1800 )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( sm1800, sm1800_state )
+static MACHINE_CONFIG_START( sm1800 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8080, XTAL_2MHz)
 	MCFG_CPU_PROGRAM_MAP(sm1800_mem)
@@ -197,5 +198,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( ????, sm1800,  0,       0,     sm1800,    sm1800, driver_device,     0,   "<unknown>", "SM1800", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+/*    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT   STATE           INIT   COMPANY      FULLNAME   FLAGS */
+COMP( ????, sm1800,  0,      0,       sm1800,    sm1800, sm1800_state,   0,     "<unknown>", "SM1800",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

@@ -100,8 +100,12 @@
 
 
 
+#include "emu.h"
 #include "includes/tdv2324.h"
+
+#include "screen.h"
 #include "softlist.h"
+
 
 READ8_MEMBER( tdv2324_state::tdv2324_main_io_30 )
 {
@@ -224,7 +228,7 @@ void tdv2324_state::video_start()
 }
 
 
-UINT32 tdv2324_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t tdv2324_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
@@ -253,7 +257,7 @@ SLOT_INTERFACE_END
 //  MACHINE_CONFIG( tdv2324 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( tdv2324, tdv2324_state )
+static MACHINE_CONFIG_START( tdv2324 )
 	// basic system hardware
 	MCFG_CPU_ADD(P8085AH_0_TAG, I8085A, 8700000/2) // ???
 	MCFG_CPU_PROGRAM_MAP(tdv2324_mem)
@@ -267,7 +271,7 @@ static MACHINE_CONFIG_START( tdv2324, tdv2324_state )
 	MCFG_CPU_PROGRAM_MAP(tdv2324_fdc_mem)
 
 	// video hardware
-	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green)
+	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green())
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_UPDATE_DRIVER(tdv2324_state, screen_update)
 	MCFG_SCREEN_SIZE(800, 400)
@@ -279,13 +283,13 @@ static MACHINE_CONFIG_START( tdv2324, tdv2324_state )
 	MCFG_TMS9927_CHAR_WIDTH(8)
 
 	// devices
-	MCFG_PIC8259_ADD(P8259A_TAG, NOOP, VCC, NOOP)
+	MCFG_DEVICE_ADD(P8259A_TAG, PIC8259, 0)
 
 	MCFG_DEVICE_ADD(P8253_5_0_TAG, PIT8253, 0)
 
 	MCFG_DEVICE_ADD(P8253_5_1_TAG, PIT8253, 0)
 
-	MCFG_Z80SIO2_ADD(MK3887N4_TAG, 8000000/2, 0, 0, 0, 0)
+	MCFG_DEVICE_ADD(MK3887N4_TAG, Z80SIO2, 8000000/2)
 
 	MCFG_FD1797_ADD(FD1797PL02_TAG, 8000000/4)
 	MCFG_FLOPPY_DRIVE_ADD(FD1797PL02_TAG":0", tdv2324_floppies, "8dsdd", floppy_image_device::default_floppy_formats)
@@ -345,5 +349,5 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     INIT  COMPANY     FULLNAME     FLAGS
-COMP( 1983, tdv2324,        0,      0,      tdv2324,        tdv2324, driver_device,     0,      "Tandberg",     "TDV 2324",     MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT    STATE          INIT  COMPANY     FULLNAME    FLAGS
+COMP( 1983, tdv2324,  0,      0,      tdv2324,  tdv2324, tdv2324_state, 0,    "Tandberg", "TDV 2324", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

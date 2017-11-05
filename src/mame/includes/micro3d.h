@@ -5,6 +5,10 @@
      Microprose Games 3D hardware
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_MICRO3D_H
+#define MAME_INCLUDES_MICRO3D_H
+
+#pragma once
 
 #include "cpu/tms34010/tms34010.h"
 #include "cpu/mcs51/mcs51.h"
@@ -19,7 +23,7 @@
 
 struct micro3d_vtx
 {
-	INT32 x, y, z;
+	int32_t x, y, z;
 };
 
 enum planes
@@ -30,13 +34,6 @@ enum planes
 		CLIP_X_MAX,
 		CLIP_Y_MIN,
 		CLIP_Y_MAX
-};
-
-enum dac_registers {
-	VCF,
-	VCQ,
-	VCA,
-	PAN
 };
 
 class micro3d_sound_device;
@@ -88,57 +85,56 @@ public:
 	optional_ioport m_joystick_y;
 	optional_ioport m_throttle;
 
-	required_shared_ptr<UINT16> m_shared_ram;
-	UINT8               m_m68681_tx0;
+	required_shared_ptr<uint16_t> m_shared_ram;
+	uint8_t               m_m68681_tx0;
 
 	/* Sound */
-	UINT8               m_sound_port_latch[4];
-	UINT8               m_dac_data;
+	uint8_t               m_sound_port_latch[4];
 
 	/* TI UART */
-	UINT8               m_ti_uart[9];
+	uint8_t               m_ti_uart[9];
 	int                 m_ti_uart_mode_cycle;
 	int                 m_ti_uart_sync_cycle;
 
 	/* ADC */
-	UINT8               m_adc_val;
+	uint8_t               m_adc_val;
 
 	/* Hardware version-check latch for BOTSS 1.1a */
-	UINT8               m_botss_latch;
+	uint8_t               m_botss_latch;
 
 	/* MAC */
-	required_shared_ptr<UINT32> m_mac_sram;
-	UINT32              m_sram_r_addr;
-	UINT32              m_sram_w_addr;
-	UINT32              m_vtx_addr;
-	UINT32              m_mrab11;
-	UINT32              m_mac_stat;
-	UINT32              m_mac_inst;
+	required_shared_ptr<uint32_t> m_mac_sram;
+	uint32_t              m_sram_r_addr;
+	uint32_t              m_sram_w_addr;
+	uint32_t              m_vtx_addr;
+	uint32_t              m_mrab11;
+	uint32_t              m_mac_stat;
+	uint32_t              m_mac_inst;
 
 	/* 2D video */
-	required_shared_ptr<UINT16> m_sprite_vram;
-	UINT16              m_creg;
-	UINT16              m_xfer3dk;
+	required_shared_ptr<uint16_t> m_sprite_vram;
+	uint16_t              m_creg;
+	uint16_t              m_xfer3dk;
 
 	/* 3D pipeline */
-	UINT32              m_pipe_data;
-	UINT32              m_pipeline_state;
-	INT32               m_vtx_fifo[512];
-	UINT32              m_fifo_idx;
-	UINT32              m_draw_cmd;
+	uint32_t              m_pipe_data;
+	uint32_t              m_pipeline_state;
+	int32_t               m_vtx_fifo[512];
+	uint32_t              m_fifo_idx;
+	uint32_t              m_draw_cmd;
 	int                 m_draw_state;
-	INT32               m_x_min;
-	INT32               m_x_max;
-	INT32               m_y_min;
-	INT32               m_y_max;
-	INT32               m_z_min;
-	INT32               m_z_max;
-	INT32               m_x_mid;
-	INT32               m_y_mid;
+	int32_t               m_x_min;
+	int32_t               m_x_max;
+	int32_t               m_y_min;
+	int32_t               m_y_max;
+	int32_t               m_z_min;
+	int32_t               m_z_max;
+	int32_t               m_x_mid;
+	int32_t               m_y_mid;
 	int                 m_dpram_bank;
-	UINT32              m_draw_dpram[1024];
-	std::unique_ptr<UINT16[]>              m_frame_buffers[2];
-	std::unique_ptr<UINT16[]>              m_tmp_buffer;
+	uint32_t              m_draw_dpram[1024];
+	std::unique_ptr<uint16_t[]>              m_frame_buffers[2];
+	std::unique_ptr<uint16_t[]>              m_tmp_buffer;
 	int                 m_drawing_buffer;
 	int                 m_display_buffer;
 
@@ -192,78 +188,15 @@ public:
 	/* 3D graphics */
 	int inside(micro3d_vtx *v, enum planes plane);
 	micro3d_vtx intersect(micro3d_vtx *v1, micro3d_vtx *v2, enum planes plane);
-	inline void write_span(UINT32 y, UINT32 x);
-	void draw_line(UINT32 x1, UINT32 y1, UINT32 x2, UINT32 y2);
-	void rasterise_spans(UINT32 min_y, UINT32 max_y, UINT32 attr);
+	inline void write_span(uint32_t y, uint32_t x);
+	void draw_line(uint32_t x1, uint32_t y1, uint32_t x2, uint32_t y2);
+	void rasterise_spans(uint32_t min_y, uint32_t max_y, uint32_t attr);
 	int clip_triangle(micro3d_vtx *v, micro3d_vtx *vout, int num_vertices, enum planes plane);
-	void draw_triangles(UINT32 attr);
+	void draw_triangles(uint32_t attr);
 
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
-/*----------- defined in audio/micro3d.c -----------*/
-
-struct biquad
-{
-	double a0, a1, a2;      /* Numerator coefficients */
-	double b0, b1, b2;      /* Denominator coefficients */
-};
-
-struct lp_filter
-{
-	std::unique_ptr<float[]> history;
-	std::unique_ptr<float[]> coef;
-	double fs;
-	biquad ProtoCoef[2];
-};
-
-struct m3d_filter_state
-{
-	double      capval;
-	double      exponent;
-};
-
-class micro3d_sound_device : public device_t,
-									public device_sound_interface
-{
-public:
-	micro3d_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	~micro3d_sound_device() {}
-
-	void noise_sh_w(UINT8 data);
-
-protected:
-	// device-level overrides
-	virtual void device_config_complete() override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
-
-	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
-private:
-	// internal state
-//  union
-//  {
-//      struct
-//      {
-//          UINT8 m_vcf;
-//          UINT8 m_vcq;
-//          UINT8 m_vca;
-//          UINT8 m_pan;
-//      };
-		UINT8 m_dac[4];
-//  };
-
-	float               m_gain;
-	UINT32              m_noise_shift;
-	UINT8               m_noise_value;
-	UINT8               m_noise_subcount;
-
-	m3d_filter_state    m_noise_filters[4];
-	lp_filter           m_filter;
-	sound_stream        *m_stream;
-};
-
-extern const device_type MICRO3D;
+#endif // MAME_INCLUDES_MICRO3D_H

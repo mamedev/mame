@@ -1,4 +1,4 @@
-// license:LGPL-2.1+
+// license:BSD-3-Clause
 // copyright-holders:Tomasz Slanina
 /****************************************************************************************
 
@@ -35,6 +35,9 @@ TODO:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 #define MASTER_CLOCK XTAL_18_432MHz
 
@@ -55,16 +58,16 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
-	required_shared_ptr<UINT8> m_videoram_bg;
-	required_shared_ptr<UINT8> m_videoram_fg;
-	required_shared_ptr<UINT8> m_colorram_bg;
-	required_shared_ptr<UINT8> m_colorram_fg;
+	required_shared_ptr<uint8_t> m_videoram_bg;
+	required_shared_ptr<uint8_t> m_videoram_fg;
+	required_shared_ptr<uint8_t> m_colorram_bg;
+	required_shared_ptr<uint8_t> m_colorram_fg;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	UINT8 m_tile_bank;
-	UINT8 m_sound_byte;
-	UINT8 m_nmi_enable;
+	uint8_t m_tile_bank;
+	uint8_t m_sound_byte;
+	uint8_t m_nmi_enable;
 
 	tilemap_t * m_bg_tilemap;
 	tilemap_t * m_fg_tilemap;
@@ -91,7 +94,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(superwng);
-	UINT32 screen_update_superwng(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_superwng(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(superwng_nmi_interrupt);
 	INTERRUPT_GEN_MEMBER(superwng_sound_nmi_assert);
 };
@@ -137,13 +140,13 @@ TILE_GET_INFO_MEMBER(superwng_state::get_fg_tile_info)
 
 void superwng_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(superwng_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(superwng_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(superwng_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(superwng_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_bg_tilemap->set_scrollx(0, 64);
 }
 
-UINT32 superwng_state::screen_update_superwng(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t superwng_state::screen_update_superwng(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	rectangle tmp = cliprect;
@@ -192,7 +195,7 @@ UINT32 superwng_state::screen_update_superwng(screen_device &screen, bitmap_ind1
 }
 
 
-static const UINT8 superwng_colors[]= /* temporary */
+static const uint8_t superwng_colors[]= /* temporary */
 {
 	0x00, 0xc4, 0xff, 0x87, 0x00, 0xb0, 0xff, 0x2f, 0x00, 0x07, 0xff, 0xe0, 0x00, 0x86, 0xff, 0xc6,
 	0x00, 0x07, 0x3f, 0xff, 0x00, 0xb0, 0x38, 0x27, 0x00, 0x20, 0xff, 0x27, 0x00, 0xa4, 0xff, 0x87,
@@ -203,7 +206,7 @@ static const UINT8 superwng_colors[]= /* temporary */
 PALETTE_INIT_MEMBER(superwng_state, superwng)
 {
 	int i;
-	const UINT8 * ptr=superwng_colors;
+	const uint8_t * ptr=superwng_colors;
 
 	for (i = 0; i < palette.entries(); i++)
 	{
@@ -467,7 +470,7 @@ void superwng_state::machine_reset()
 	m_nmi_enable = 0;
 }
 
-static MACHINE_CONFIG_START( superwng, superwng_state )
+static MACHINE_CONFIG_START( superwng )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/4)
@@ -522,4 +525,4 @@ ROM_START( superwng )
 ROM_END
 
 
-GAME( 1985, superwng,   0,      superwng, superwng, driver_device, 0, ROT90, "Wing", "Super Wing", MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // crashes after bonus stage, see notes, bad rom?
+GAME( 1985, superwng,   0,      superwng, superwng, superwng_state, 0, ROT90, "Wing", "Super Wing", MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // crashes after bonus stage, see notes, bad rom?

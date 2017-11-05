@@ -17,7 +17,7 @@
 
 TIMER_CALLBACK_MEMBER(bk_state::keyboard_callback)
 {
-	UINT8 code, i, j;
+	uint8_t code, i, j;
 	static const char *const keynames[] = {
 		"LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6",
 		"LINE7", "LINE8", "LINE9", "LINE10", "LINE11"
@@ -69,7 +69,8 @@ TIMER_CALLBACK_MEMBER(bk_state::keyboard_callback)
 
 void bk_state::machine_start()
 {
-	machine().scheduler().timer_pulse(attotime::from_hz(2400), timer_expired_delegate(FUNC(bk_state::keyboard_callback),this));
+	m_kbd_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(bk_state::keyboard_callback), this));
+	m_kbd_timer->adjust(attotime::from_hz(2400), 0, attotime::from_hz(2400));
 }
 
 IRQ_CALLBACK_MEMBER(bk_state::bk0010_irq_callback)
@@ -102,7 +103,7 @@ READ16_MEMBER(bk_state::bk_vid_scrool_r)
 READ16_MEMBER(bk_state::bk_key_press_r)
 {
 	double level = m_cassette->input();
-	UINT16 cas;
+	uint16_t cas;
 	if (level < 0)
 	{
 		cas = 0x00;

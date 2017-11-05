@@ -6,12 +6,11 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_S100_DJ2DB_H
+#define MAME_BUS_S100_DJ2DB_H
+
 #pragma once
 
-#ifndef __S100_DJ2DB__
-#define __S100_DJ2DB__
-
-#include "emu.h"
 #include "s100.h"
 #include "machine/com8116.h"
 #include "machine/wd_fdc.h"
@@ -29,33 +28,32 @@ class s100_dj2db_device : public device_t,
 {
 public:
 	// construction/destruction
-	s100_dj2db_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-	// optional information overrides
-	virtual const rom_entry *device_rom_region() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual ioport_constructor device_input_ports() const override;
-
-	// not really public
-	DECLARE_WRITE_LINE_MEMBER( fr_w );
-	DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );
-	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
+	s100_dj2db_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
+	// optional information overrides
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override;
+
 	// device_s100_card_interface overrides
-	virtual UINT8 s100_smemr_r(address_space &space, offs_t offset) override;
-	virtual void s100_mwrt_w(address_space &space, offs_t offset, UINT8 data) override;
-	virtual UINT8 s100_sinp_r(address_space &space, offs_t offset) override;
-	virtual void s100_sout_w(address_space &space, offs_t offset, UINT8 data) override;
+	virtual uint8_t s100_smemr_r(address_space &space, offs_t offset) override;
+	virtual void s100_mwrt_w(address_space &space, offs_t offset, uint8_t data) override;
+	virtual uint8_t s100_sinp_r(address_space &space, offs_t offset) override;
+	virtual void s100_sout_w(address_space &space, offs_t offset, uint8_t data) override;
 	virtual void s100_phantom_w(int state) override;
 
 private:
+	DECLARE_WRITE_LINE_MEMBER( fr_w );
+	DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );
+	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
+
 	// internal state
-	required_device<mb8866_t> m_fdc;
+	required_device<mb8866_device> m_fdc;
 	required_device<com8116_device> m_dbrg;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
@@ -63,7 +61,7 @@ private:
 	required_device<floppy_connector> m_floppy3;
 	floppy_image_device *m_floppy;
 	required_memory_region m_rom;
-	optional_shared_ptr<UINT8> m_ram;
+	optional_shared_ptr<uint8_t> m_ram;
 	required_ioport m_j1a;
 	required_ioport m_j3a;
 	required_ioport m_j4;
@@ -82,7 +80,6 @@ private:
 
 
 // device type definition
-extern const device_type S100_DJ2DB;
+DECLARE_DEVICE_TYPE(S100_DJ2DB, s100_dj2db_device)
 
-
-#endif
+#endif // MAME_BUS_S100_DJ2DB_H

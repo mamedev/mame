@@ -156,6 +156,58 @@
 	end
 
 
+--
+-- Bundle tests
+--
+
+	function T.targets.Bundle_Build_WindowsNames()
+		cfg.kind = "Bundle"
+		result = premake.gettarget(cfg, "build", "posix", "windows", "macosx")
+		test.isequal([[../bin/MyProject.dll]], result.fullpath)
+	end
+
+	function T.targets.Bundle_Link_WindowsNames()
+		cfg.kind = "Bundle"
+		result = premake.gettarget(cfg, "link", "posix", "windows", "macosx")
+		test.isequal([[../bin/MyProject.lib]], result.fullpath)
+	end
+
+	function T.targets.Bundle_Build_PosixNames_OnWindows()
+		cfg.kind = "Bundle"
+		result = premake.gettarget(cfg, "build", "posix", "posix", "windows")
+		test.isequal([[../bin/MyProject.dll]], result.fullpath)
+	end
+
+	function T.targets.Bundle_Link_PosixNames_OnWindows()
+		cfg.kind = "Bundle"
+		result = premake.gettarget(cfg, "link", "posix", "posix", "windows")
+		test.isequal([[../bin/libMyProject.a]], result.fullpath)
+	end
+
+	function T.targets.Bundle_Build_PosixNames_OnLinux()
+		cfg.kind = "Bundle"
+		result = premake.gettarget(cfg, "build", "posix", "posix", "linux")
+		test.isequal([[../bin/libMyProject.so]], result.fullpath)
+	end
+
+	function T.targets.Bundle_Link_PosixNames_OnLinux()
+		cfg.kind = "Bundle"
+		result = premake.gettarget(cfg, "link", "posix", "posix", "linux")
+		test.isequal([[../bin/libMyProject.so]], result.fullpath)
+	end
+
+	function T.targets.Bundle_Build_PosixNames_OnMacOSX()
+		cfg.kind = "Bundle"
+		result = premake.gettarget(cfg, "build", "posix", "posix", "macosx")
+		test.isequal([[../bin/MyProject.bundle]], result.fullpath)
+	end
+
+	function T.targets.Bundle_Link_PosixNames_OnMacOSX()
+		cfg.kind = "Bundle"
+		result = premake.gettarget(cfg, "link", "posix", "posix", "macosx")
+		test.isequal([[../bin/MyProject.bundle]], result.fullpath)
+	end
+
 
 --
 -- StaticLib tests

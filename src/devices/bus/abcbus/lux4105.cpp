@@ -6,6 +6,7 @@
 
 *********************************************************************/
 
+#include "emu.h"
 #include "lux4105.h"
 #include "bus/scsi/scsihd.h"
 #include "bus/scsi/s1410.h"
@@ -24,7 +25,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type LUXOR_4105 = &device_creator<luxor_4105_device>;
+DEFINE_DEVICE_TYPE(LUXOR_4105, luxor_4105_device, "lux4105", "Luxor 4105")
 
 
 WRITE_LINE_MEMBER( luxor_4105_device::write_sasi_bsy )
@@ -68,10 +69,10 @@ WRITE_LINE_MEMBER( luxor_4105_device::write_sasi_cd )
 
 
 //-------------------------------------------------
-//  MACHINE_DRIVER( luxor_4105 )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( luxor_4105 )
+MACHINE_CONFIG_MEMBER( luxor_4105_device::device_add_mconfig )
 	MCFG_DEVICE_ADD(SASIBUS_TAG, SCSI_PORT, 0)
 	MCFG_SCSI_DATA_INPUT_BUFFER("sasi_data_in")
 	MCFG_SCSI_BSY_HANDLER(WRITELINE(luxor_4105_device, write_sasi_bsy))
@@ -83,17 +84,6 @@ static MACHINE_CONFIG_FRAGMENT( luxor_4105 )
 	MCFG_SCSI_OUTPUT_LATCH_ADD("sasi_data_out", SASIBUS_TAG)
 	MCFG_DEVICE_ADD("sasi_data_in", INPUT_BUFFER, 0)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor luxor_4105_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( luxor_4105 );
-}
 
 
 //-------------------------------------------------
@@ -174,8 +164,8 @@ inline void luxor_4105_device::update_trrq_int()
 //  luxor_4105_device - constructor
 //-------------------------------------------------
 
-luxor_4105_device::luxor_4105_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, LUXOR_4105, "Luxor 4105", tag, owner, clock, "lux4105", __FILE__),
+luxor_4105_device::luxor_4105_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, LUXOR_4105, tag, owner, clock),
 	device_abcbus_card_interface(mconfig, *this),
 	m_sasibus(*this, SASIBUS_TAG),
 	m_sasi_data_out(*this, "sasi_data_out"),
@@ -227,7 +217,7 @@ void luxor_4105_device::device_reset()
 //  abcbus_cs -
 //-------------------------------------------------
 
-void luxor_4105_device::abcbus_cs(UINT8 data)
+void luxor_4105_device::abcbus_cs(uint8_t data)
 {
 	m_cs = (data == m_5e->read());
 }
@@ -247,9 +237,9 @@ int luxor_4105_device::abcbus_csb()
 //  abcbus_stat -
 //-------------------------------------------------
 
-UINT8 luxor_4105_device::abcbus_stat()
+uint8_t luxor_4105_device::abcbus_stat()
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	if (m_cs)
 	{
@@ -282,9 +272,9 @@ UINT8 luxor_4105_device::abcbus_stat()
 //  abcbus_inp -
 //-------------------------------------------------
 
-UINT8 luxor_4105_device::abcbus_inp()
+uint8_t luxor_4105_device::abcbus_inp()
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	if (m_cs)
 	{
@@ -314,7 +304,7 @@ UINT8 luxor_4105_device::abcbus_inp()
 //  abcbus_utp -
 //-------------------------------------------------
 
-void luxor_4105_device::abcbus_out(UINT8 data)
+void luxor_4105_device::abcbus_out(uint8_t data)
 {
 	if (m_cs)
 	{
@@ -337,7 +327,7 @@ void luxor_4105_device::abcbus_out(UINT8 data)
 //  abcbus_c1 -
 //-------------------------------------------------
 
-void luxor_4105_device::abcbus_c1(UINT8 data)
+void luxor_4105_device::abcbus_c1(uint8_t data)
 {
 	if (m_cs)
 	{
@@ -350,7 +340,7 @@ void luxor_4105_device::abcbus_c1(UINT8 data)
 //  abcbus_c3 -
 //-------------------------------------------------
 
-void luxor_4105_device::abcbus_c3(UINT8 data)
+void luxor_4105_device::abcbus_c3(uint8_t data)
 {
 	if (m_cs)
 	{
@@ -367,7 +357,7 @@ void luxor_4105_device::abcbus_c3(UINT8 data)
 //  abcbus_c4 -
 //-------------------------------------------------
 
-void luxor_4105_device::abcbus_c4(UINT8 data)
+void luxor_4105_device::abcbus_c4(uint8_t data)
 {
 	if (m_cs)
 	{

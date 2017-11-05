@@ -8,10 +8,10 @@
 
 ****************************************************************************/
 
-#pragma once
+#ifndef MAME_CPU_UPD7725_UPD7725_H
+#define MAME_CPU_UPD7725_UPD7725_H
 
-#ifndef __UPD7725_H__
-#define __UPD7725_H__
+#pragma once
 
 //**************************************************************************
 //  ENUMERATIONS
@@ -27,10 +27,6 @@ enum
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
-
-class necdsp_device;
-class upd7725_device;
-class upd96050_device;
 
 
 #define MCFG_NECDSP_IN_INT_CB(_devcb) \
@@ -71,41 +67,39 @@ class upd96050_device;
 
 class necdsp_device : public cpu_device
 {
+public:
+	template <class Object> static devcb_base &set_in_int_callback(device_t &device, Object &&cb) { return downcast<necdsp_device &>(device).m_in_int_cb.set_callback(std::forward<Object>(cb)); }
+	//template <class Object> static devcb_base &set_in_si_callback(device_t &device, Object &&cb) { return downcast<necdsp_device &>(device).m_in_si_cb.set_callback(std::forward<Object>(cb)); }
+	//template <class Object> static devcb_base &set_in_sck_callback(device_t &device, Object &&cb) { return downcast<necdsp_device &>(device).m_in_sck_cb.set_callback(std::forward<Object>(cb)); }
+	//template <class Object> static devcb_base &set_in_sien_callback(device_t &device, Object &&cb) { return downcast<necdsp_device &>(device).m_in_sien_cb.set_callback(std::forward<Object>(cb)); }
+	//template <class Object> static devcb_base &set_in_soen_callback(device_t &device, Object &&cb) { return downcast<necdsp_device &>(device).m_in_soen_cb.set_callback(std::forward<Object>(cb)); }
+	//template <class Object> static devcb_base &set_in_dack_callback(device_t &device, Object &&cb) { return downcast<necdsp_device &>(device).m_in_dack_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_p0_callback(device_t &device, Object &&cb) { return downcast<necdsp_device &>(device).m_out_p0_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_p1_callback(device_t &device, Object &&cb) { return downcast<necdsp_device &>(device).m_out_p1_cb.set_callback(std::forward<Object>(cb)); }
+	//template <class Object> static devcb_base &set_out_so_callback(device_t &device, Object &&cb) { return downcast<necdsp_device &>(device).m_out_so_cb.set_callback(std::forward<Object>(cb)); }
+	//template <class Object> static devcb_base &set_out_sorq_callback(device_t &device, Object &&cb) { return downcast<necdsp_device &>(device).m_out_sorq_cb.set_callback(std::forward<Object>(cb)); }
+	//template <class Object> static devcb_base &set_out_drq_callback(device_t &device, Object &&cb) { return downcast<necdsp_device &>(device).m_out_drq_cb.set_callback(std::forward<Object>(cb)); }
+
+	uint8_t snesdsp_read(bool mode);
+	void snesdsp_write(bool mode, uint8_t data);
+
 protected:
 	// construction/destruction
-	necdsp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock, UINT32 abits, UINT32 dbits, const char *name, const char *shortname, const char *source);
+	necdsp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t abits, uint32_t dbits);
 
-public:
-
-	template<class _Object> static devcb_base &set_in_int_callback(device_t &device, _Object object) { return downcast<necdsp_device &>(device).m_in_int_cb.set_callback(object); }
-	//template<class _Object> static devcb_base &set_in_si_callback(device_t &device, _Object object) { return downcast<necdsp_device &>(device).m_in_si_cb.set_callback(object); }
-	//template<class _Object> static devcb_base &set_in_sck_callback(device_t &device, _Object object) { return downcast<necdsp_device &>(device).m_in_sck_cb.set_callback(object); }
-	//template<class _Object> static devcb_base &set_in_sien_callback(device_t &device, _Object object) { return downcast<necdsp_device &>(device).m_in_sien_cb.set_callback(object); }
-	//template<class _Object> static devcb_base &set_in_soen_callback(device_t &device, _Object object) { return downcast<necdsp_device &>(device).m_in_soen_cb.set_callback(object); }
-	//template<class _Object> static devcb_base &set_in_dack_callback(device_t &device, _Object object) { return downcast<necdsp_device &>(device).m_in_dack_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_p0_callback(device_t &device, _Object object) { return downcast<necdsp_device &>(device).m_out_p0_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_p1_callback(device_t &device, _Object object) { return downcast<necdsp_device &>(device).m_out_p1_cb.set_callback(object); }
-	//template<class _Object> static devcb_base &set_out_so_callback(device_t &device, _Object object) { return downcast<necdsp_device &>(device).m_out_so_cb.set_callback(object); }
-	//template<class _Object> static devcb_base &set_out_sorq_callback(device_t &device, _Object object) { return downcast<necdsp_device &>(device).m_out_sorq_cb.set_callback(object); }
-	//template<class _Object> static devcb_base &set_out_drq_callback(device_t &device, _Object object) { return downcast<necdsp_device &>(device).m_out_drq_cb.set_callback(object); }
-
-	UINT8 snesdsp_read(bool mode);
-	void snesdsp_write(bool mode, UINT8 data);
-
-protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual UINT32 execute_min_cycles() const override;
-	virtual UINT32 execute_max_cycles() const override;
-	virtual UINT32 execute_input_lines() const override;
+	virtual uint32_t execute_min_cycles() const override;
+	virtual uint32_t execute_max_cycles() const override;
+	virtual uint32_t execute_input_lines() const override;
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
+	virtual space_config_vector memory_space_config() const override;
 
 	// device_state_interface overrides
 	virtual void state_import(const device_state_entry &entry) override;
@@ -113,28 +107,28 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const override;
-	virtual UINT32 disasm_max_opcode_bytes() const override;
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	virtual uint32_t disasm_min_opcode_bytes() const override;
+	virtual uint32_t disasm_max_opcode_bytes() const override;
+	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 	// inline data
 	const address_space_config m_program_config, m_data_config;
 
-	UINT16 dataRAM[2048];
+	uint16_t dataRAM[2048];
 
 private:
 	struct Flag
 	{
-		bool s1, s0, c, z, ov1, ov0, ov0p, ov0pp;
+		bool s1, s0, c, z, ov1, ov0;
 
 		inline operator unsigned() const
 		{
-			return (s1 << 7) + (s0 << 6) + (c << 5) + (z << 4) + (ov1 << 3) + (ov0 << 2) + (ov0p << 1) + (ov0pp << 0);
+			return (s1 << 5) + (s0 << 4) + (c << 3) + (z << 2) + (ov1 << 1) + (ov0 << 0);
 		}
 
 		inline unsigned operator=(unsigned d)
 		{
-			s1 = d & 0x80; s0 = d & 0x40; c = d & 0x20; z = d & 0x10; ov1 = d & 0x08; ov0 = d & 0x04; ov0p = d & 0x02; ov0pp = d & 0x01;
+			s1 = d & 0x20; s0 = d & 0x10; c = d & 0x08; z = d & 0x04; ov1 = d & 0x02; ov0 = d & 0x01;
 			return d;
 		}
 	};
@@ -161,36 +155,41 @@ private:
 
 	struct Regs
 	{
-		UINT16 pc;          //program counter
-		UINT16 stack[16];   //LIFO
-		UINT16 rp;          //ROM pointer
-		UINT16 dp;          //data pointer
-		UINT8  sp;          //stack pointer
-		INT16  k;
-		INT16  l;
-		INT16  m;
-		INT16  n;
-		INT16  a;         //accumulator
-		INT16  b;         //accumulator
+		uint16_t pc;          //program counter
+		uint16_t stack[16];   //LIFO
+		uint16_t rp;          //ROM pointer
+		uint16_t dp;          //data pointer
+		uint8_t  sp;          //stack pointer
+		int16_t  k;
+		int16_t  l;
+		int16_t  m;
+		int16_t  n;
+		int16_t  a;         //accumulator
+		int16_t  b;         //accumulator
 		Flag  flaga;
 		Flag  flagb;
-		UINT16 tr;        //temporary register
-		UINT16 trb;       //temporary register
+		uint16_t tr;        //temporary register
+		uint16_t trb;       //temporary register
 		Status sr;        //status register
-		UINT16 dr;        //data register
-		UINT16 si;
-		UINT16 so;
-		UINT16 idb;
+		uint16_t dr;        //data register
+		uint16_t si;
+		uint16_t so;
+		uint16_t idb;
+		bool siack;         // Serial in ACK
+		bool soack;         // Serial out ACK
 	} regs;
 
-	void exec_op(UINT32 opcode);
-	void exec_rt(UINT32 opcode);
-	void exec_jp(UINT32 opcode);
-	void exec_ld(UINT32 opcode);
+	void exec_op(uint32_t opcode);
+	void exec_rt(uint32_t opcode);
+	void exec_jp(uint32_t opcode);
+	void exec_ld(uint32_t opcode);
 
 	int m_icount;
-	int m_irq; // old irq line state, for detecting rising edges.
-
+	bool m_irq; // old irq line state, for detecting rising edges.
+	// m_irq_firing: if an irq has fired; 0 = not fired or has already finished firing
+	// 1 = next opcode is the first half of int firing 'NOP'
+	// 2 = next opcode is the second half of int firing 'CALL 0100'
+	int m_irq_firing;
 	address_space *m_program, *m_data;
 	direct_read_data *m_direct;
 
@@ -213,22 +212,24 @@ class upd7725_device : public necdsp_device
 {
 public:
 	// construction/destruction
-	upd7725_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	upd7725_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class upd96050_device : public necdsp_device
 {
 public:
 	// construction/destruction
-	upd96050_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	upd96050_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	UINT16 dataram_r(UINT16 addr) { return dataRAM[addr]; }
-	void dataram_w(UINT16 addr, UINT16 data) { dataRAM[addr] = data; }
+	uint16_t dataram_r(uint16_t addr) { return dataRAM[addr]; }
+	void dataram_w(uint16_t addr, uint16_t data) { dataRAM[addr] = data; }
 };
 
 // device type definition
 extern const device_type UPD7725;
 extern const device_type UPD96050;
+DECLARE_DEVICE_TYPE(UPD7725,  upd7725_device)
+DECLARE_DEVICE_TYPE(UPD96050, upd96050_device)
 
 //**************************************************************************
 //  ENUMERATIONS
@@ -255,7 +256,9 @@ enum
 	UPD7725_TRB,
 	UPD7725_SI,
 	UPD7725_SO,
-	UPD7725_IDB
+	UPD7725_IDB,
+	UPD7725_SIACK,
+	UPD7725_SOACK
 };
 
-#endif /* __UPD7725_H__ */
+#endif // MAME_CPU_UPD7725_UPD7725_H

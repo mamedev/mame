@@ -14,13 +14,16 @@
         6809 Microcomputer Programming & Interfacing with Experiments"
             by Andrew C. Staugaard, Jr.; Howard W. Sams & Co., Inc.
 
-    System dependencies:    UINT16 must be 16 bit unsigned int
-                            UINT8 must be 8 bit unsigned int
-                            UINT32 must be more than 16 bits
+    System dependencies:    uint16_t must be 16 bit unsigned int
+                            uint8_t must be 8 bit unsigned int
+                            uint32_t must be more than 16 bits
                             arrays up to 65536 bytes must be supported
                             machine must be twos complement
 
     History:
+
+July 2016 ErikGav:
+    Unify with 6309 pairs and quads (A+B=D, E+F=W, D+W=Q)
 
 March 2013 NPW:
     Rewrite of 6809/6309/Konami CPU; attempted to make cycle exact.
@@ -100,16 +103,16 @@ March 2013 NPW:
 //  DEVICE INTERFACE
 //**************************************************************************
 
-const device_type M6809 = &device_creator<m6809_device>;
-const device_type M6809E = &device_creator<m6809e_device>;
+DEFINE_DEVICE_TYPE(M6809, m6809_device, "m6809", "M6809")
+DEFINE_DEVICE_TYPE(M6809E, m6809e_device, "m6809e", "M6809E")
 
 
 //-------------------------------------------------
 //  m6809_base_device - constructor
 //-------------------------------------------------
 
-m6809_base_device::m6809_base_device(const machine_config &mconfig, const char *name, const char *tag, device_t *owner, UINT32 clock, const device_type type, int divider, const char *shortname, const char *source)
-	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source),
+m6809_base_device::m6809_base_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, const device_type type, int divider)
+	: cpu_device(mconfig, type, tag, owner, clock),
 	m_lic_func(*this),
 	m_program_config("program", ENDIANNESS_BIG, 8, 16),
 	m_sprogram_config("decrypted_opcodes", ENDIANNESS_BIG, 8, 16),
@@ -117,7 +120,6 @@ m6809_base_device::m6809_base_device(const machine_config &mconfig, const char *
 {
 	m_mintf = nullptr;
 }
-
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -129,7 +131,7 @@ void m6809_base_device::device_start()
 		m_mintf = new mi_default;
 
 	m_mintf->m_program  = &space(AS_PROGRAM);
-	m_mintf->m_sprogram = has_space(AS_DECRYPTED_OPCODES) ? &space(AS_DECRYPTED_OPCODES) : m_mintf->m_program;
+	m_mintf->m_sprogram = has_space(AS_OPCODES) ? &space(AS_OPCODES) : m_mintf->m_program;
 
 	m_mintf->m_direct  = &m_mintf->m_program->direct();
 	m_mintf->m_sdirect = &m_mintf->m_sprogram->direct();
@@ -137,25 +139,29 @@ void m6809_base_device::device_start()
 	m_lic_func.resolve_safe();
 
 	// register our state for the debugger
-	state_add(STATE_GENPC,     "GENPC",     m_pc.w).noshow();
-	state_add(STATE_GENPCBASE, "GENPCBASE", m_ppc.w).noshow();
-	state_add(STATE_GENFLAGS,  "GENFLAGS",  m_cc).callimport().callexport().formatstr("%8s").noshow();
-	state_add(M6809_PC,        "PC",        m_pc.w).mask(0xffff);
+	state_add(STATE_GENPCBASE, "CURPC",     m_ppc.w).callimport().noshow();
+	state_add(STATE_GENFLAGS,  "CURFLAGS",  m_cc).formatstr("%8s").noshow();
+	state_add(M6809_PC,        "PC",        m_pc.w).callimport().mask(0xffff);
 	state_add(M6809_S,         "S",         m_s.w).mask(0xffff);
 	state_add(M6809_CC,        "CC",        m_cc).mask(0xff);
-	state_add(M6809_U,         "U",         m_u.w).mask(0xffff);
-	state_add(M6809_A,         "A",         m_d.b.h).mask(0xff);
-	state_add(M6809_B,         "B",         m_d.b.l).mask(0xff);
-	state_add(M6809_X,         "X",         m_x.w).mask(0xffff);
-	state_add(M6809_Y,         "Y",         m_y.w).mask(0xffff);
 	state_add(M6809_DP,        "DP",        m_dp).mask(0xff);
+
+	if (is_6809())
+	{
+		state_add(M6809_A,     "A",         m_q.r.a).mask(0xff);
+		state_add(M6809_B,     "B",         m_q.r.b).mask(0xff);
+		state_add(M6809_D,     "D",         m_q.r.d).mask(0xffff);
+		state_add(M6809_X,     "X",         m_x.w).mask(0xffff);
+		state_add(M6809_Y,     "Y",         m_y.w).mask(0xffff);
+		state_add(M6809_U,     "U",         m_u.w).mask(0xffff);
+	}
 
 	// initialize variables
 	m_cc = 0;
 	m_pc.w = 0;
 	m_s.w = 0;
 	m_u.w = 0;
-	m_d.w = 0;
+	m_q.q = 0;
 	m_x.w = 0;
 	m_y.w = 0;
 	m_dp = 0;
@@ -166,7 +172,7 @@ void m6809_base_device::device_start()
 	// setup regtable
 	save_item(NAME(m_pc.w));
 	save_item(NAME(m_ppc.w));
-	save_item(NAME(m_d.w));
+	save_item(NAME(m_q.q));
 	save_item(NAME(m_dp));
 	save_item(NAME(m_u.w));
 	save_item(NAME(m_s.w));
@@ -225,11 +231,11 @@ void m6809_base_device::device_reset()
 
 void m6809_base_device::device_pre_save()
 {
-	if (m_reg8 == &m_d.b.h)
+	if (m_reg8 == &m_q.r.a)
 		m_reg = M6809_A;
-	else if (m_reg8 == &m_d.b.l)
+	else if (m_reg8 == &m_q.r.b)
 		m_reg = M6809_B;
-	else if (m_reg16 == &m_d)
+	else if (m_reg16 == &m_q.p.d)
 		m_reg = M6809_D;
 	else if (m_reg16 == &m_x)
 		m_reg = M6809_X;
@@ -256,13 +262,13 @@ void m6809_base_device::device_post_load()
 	switch(m_reg)
 	{
 		case M6809_A:
-			set_regop8(m_d.b.h);
+			set_regop8(m_q.r.a);
 			break;
 		case M6809_B:
-			set_regop8(m_d.b.l);
+			set_regop8(m_q.r.b);
 			break;
 		case M6809_D:
-			set_regop16(m_d);
+			set_regop16(m_q.p.d);
 			break;
 		case M6809_X:
 			set_regop16(m_x);
@@ -286,16 +292,38 @@ void m6809_base_device::device_post_load()
 //  the space doesn't exist
 //-------------------------------------------------
 
-const address_space_config *m6809_base_device::memory_space_config(address_spacenum spacenum) const
+device_memory_interface::space_config_vector m6809_base_device::memory_space_config() const
 {
-	switch(spacenum)
-	{
-	case AS_PROGRAM:           return &m_program_config;
-	case AS_DECRYPTED_OPCODES: return has_configured_map(AS_DECRYPTED_OPCODES) ? &m_sprogram_config : nullptr;
-	default:                   return nullptr;
-	}
+	if(has_configured_map(AS_OPCODES))
+		return space_config_vector {
+			std::make_pair(AS_PROGRAM, &m_program_config),
+			std::make_pair(AS_OPCODES, &m_sprogram_config)
+		};
+	else
+		return space_config_vector {
+			std::make_pair(AS_PROGRAM, &m_program_config)
+		};
 }
 
+
+//-------------------------------------------------
+//  state_import - import state into the device,
+//  after it has been set
+//-------------------------------------------------
+
+void m6809_base_device::state_import(const device_state_entry &entry)
+{
+	switch (entry.index())
+	{
+	case M6809_PC:
+		m_ppc.w = m_pc.w;
+		break;
+
+	case STATE_GENPCBASE:
+		m_pc.w = m_ppc.w;
+		break;
+	}
+}
 
 //-------------------------------------------------
 //  state_string_export - export state as a string
@@ -326,7 +354,7 @@ void m6809_base_device::state_string_export(const device_state_entry &entry, std
 //  of the shortest instruction, in bytes
 //-------------------------------------------------
 
-UINT32 m6809_base_device::disasm_min_opcode_bytes() const
+uint32_t m6809_base_device::disasm_min_opcode_bytes() const
 {
 	return 1;
 }
@@ -337,7 +365,7 @@ UINT32 m6809_base_device::disasm_min_opcode_bytes() const
 //  of the longest instruction, in bytes
 //-------------------------------------------------
 
-UINT32 m6809_base_device::disasm_max_opcode_bytes() const
+uint32_t m6809_base_device::disasm_max_opcode_bytes() const
 {
 	return 5;
 }
@@ -348,10 +376,10 @@ UINT32 m6809_base_device::disasm_max_opcode_bytes() const
 //  helper function
 //-------------------------------------------------
 
-offs_t m6809_base_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t m6809_base_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( m6809 );
-	return CPU_DISASSEMBLE_NAME(m6809)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(m6809)(this, stream, pc, oprom, opram, options);
 }
 
 
@@ -364,7 +392,7 @@ offs_t m6809_base_device::disasm_disassemble(char *buffer, offs_t pc, const UINT
 //  clock into cycles per second
 //-------------------------------------------------
 
-UINT64 m6809_base_device::execute_clocks_to_cycles(UINT64 clocks) const
+uint64_t m6809_base_device::execute_clocks_to_cycles(uint64_t clocks) const
 {
 	return (clocks + m_clock_divider - 1) / m_clock_divider;
 }
@@ -375,7 +403,7 @@ UINT64 m6809_base_device::execute_clocks_to_cycles(UINT64 clocks) const
 //  count back to raw clocks
 //-------------------------------------------------
 
-UINT64 m6809_base_device::execute_cycles_to_clocks(UINT64 cycles) const
+uint64_t m6809_base_device::execute_cycles_to_clocks(uint64_t cycles) const
 {
 	return cycles * m_clock_divider;
 }
@@ -386,7 +414,7 @@ UINT64 m6809_base_device::execute_cycles_to_clocks(UINT64 cycles) const
 //  cycles it takes for one instruction to execute
 //-------------------------------------------------
 
-UINT32 m6809_base_device::execute_min_cycles() const
+uint32_t m6809_base_device::execute_min_cycles() const
 {
 	return 1;
 }
@@ -397,7 +425,7 @@ UINT32 m6809_base_device::execute_min_cycles() const
 //  cycles it takes for one instruction to execute
 //-------------------------------------------------
 
-UINT32 m6809_base_device::execute_max_cycles() const
+uint32_t m6809_base_device::execute_max_cycles() const
 {
 	return 19;
 }
@@ -408,7 +436,7 @@ UINT32 m6809_base_device::execute_max_cycles() const
 //  input/interrupt lines
 //-------------------------------------------------
 
-UINT32 m6809_base_device::execute_input_lines() const
+uint32_t m6809_base_device::execute_input_lines() const
 {
 	return 3;
 }
@@ -465,7 +493,7 @@ const char *m6809_base_device::inputnum_string(int inputnum)
 //  read_exgtfr_register
 //-------------------------------------------------
 
-m6809_base_device::exgtfr_register m6809_base_device::read_exgtfr_register(UINT8 reg)
+m6809_base_device::exgtfr_register m6809_base_device::read_exgtfr_register(uint8_t reg)
 {
 	exgtfr_register result;
 	result.byte_value = 0xFF;
@@ -473,14 +501,14 @@ m6809_base_device::exgtfr_register m6809_base_device::read_exgtfr_register(UINT8
 
 	switch(reg & 0x0F)
 	{
-		case  0: result.word_value = m_d.w;     break;  // D
+		case  0: result.word_value = m_q.r.d;   break;  // D
 		case  1: result.word_value = m_x.w;     break;  // X
 		case  2: result.word_value = m_y.w;     break;  // Y
 		case  3: result.word_value = m_u.w;     break;  // U
 		case  4: result.word_value = m_s.w;     break;  // S
 		case  5: result.word_value = m_pc.w;    break;  // PC
-		case  8: result.byte_value = m_d.b.h;   break;  // A
-		case  9: result.byte_value = m_d.b.l;   break;  // B
+		case  8: result.byte_value = m_q.r.a;   break;  // A
+		case  9: result.byte_value = m_q.r.b;   break;  // B
 		case 10: result.byte_value = m_cc;      break;  // CC
 		case 11: result.byte_value = m_dp;      break;  // DP
 	}
@@ -492,18 +520,18 @@ m6809_base_device::exgtfr_register m6809_base_device::read_exgtfr_register(UINT8
 //  write_exgtfr_register
 //-------------------------------------------------
 
-void m6809_base_device::write_exgtfr_register(UINT8 reg, m6809_base_device::exgtfr_register value)
+void m6809_base_device::write_exgtfr_register(uint8_t reg, m6809_base_device::exgtfr_register value)
 {
 	switch(reg & 0x0F)
 	{
-		case  0: m_d.w   = value.word_value;    break;  // D
+		case  0: m_q.r.d = value.word_value;    break;  // D
 		case  1: m_x.w   = value.word_value;    break;  // X
 		case  2: m_y.w   = value.word_value;    break;  // Y
 		case  3: m_u.w   = value.word_value;    break;  // U
 		case  4: m_s.w   = value.word_value;    break;  // S
 		case  5: m_pc.w  = value.word_value;    break;  // PC
-		case  8: m_d.b.h = value.byte_value;    break;  // A
-		case  9: m_d.b.l = value.byte_value;    break;  // B
+		case  8: m_q.r.a = value.byte_value;    break;  // A
+		case  9: m_q.r.b = value.byte_value;    break;  // B
 		case 10: m_cc    = value.byte_value;    break;  // CC
 		case 11: m_dp    = value.byte_value;    break;  // DP
 	}
@@ -548,23 +576,23 @@ void m6809_base_device::execute_run()
 }
 
 
-UINT8 m6809_base_device::mi_default::read(UINT16 adr)
+uint8_t m6809_base_device::mi_default::read(uint16_t adr)
 {
 	return m_program->read_byte(adr);
 }
 
-UINT8 m6809_base_device::mi_default::read_opcode(UINT16 adr)
+uint8_t m6809_base_device::mi_default::read_opcode(uint16_t adr)
 {
 	return m_sdirect->read_byte(adr);
 }
 
-UINT8 m6809_base_device::mi_default::read_opcode_arg(UINT16 adr)
+uint8_t m6809_base_device::mi_default::read_opcode_arg(uint16_t adr)
 {
 	return m_direct->read_byte(adr);
 }
 
 
-void m6809_base_device::mi_default::write(UINT16 adr, UINT8 val)
+void m6809_base_device::mi_default::write(uint16_t adr, uint8_t val)
 {
 	m_program->write_byte(adr, val);
 }
@@ -575,8 +603,8 @@ void m6809_base_device::mi_default::write(UINT16 adr, UINT8 val)
 //  m6809_device
 //-------------------------------------------------
 
-m6809_device::m6809_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: m6809_base_device(mconfig, "M6809", tag, owner, clock, M6809, 1, "m6809", __FILE__)
+m6809_device::m6809_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: m6809_base_device(mconfig, tag, owner, clock, M6809, 1)
 {
 }
 
@@ -586,22 +614,7 @@ m6809_device::m6809_device(const machine_config &mconfig, const char *tag, devic
 //  m6809e_device
 //-------------------------------------------------
 
-m6809e_device::m6809e_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-		: m6809_base_device(mconfig, "M6809E", tag, owner, clock, M6809E, 4, "m6809e", __FILE__)
+m6809e_device::m6809e_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		: m6809_base_device(mconfig, tag, owner, clock, M6809E, 4)
 {
-}
-
-WRITE_LINE_MEMBER( m6809_base_device::irq_line )
-{
-	set_input_line( M6809_IRQ_LINE, state );
-}
-
-WRITE_LINE_MEMBER( m6809_base_device::firq_line )
-{
-	set_input_line( M6809_FIRQ_LINE, state );
-}
-
-WRITE_LINE_MEMBER( m6809_base_device::nmi_line )
-{
-	set_input_line( INPUT_LINE_NMI, state );
 }

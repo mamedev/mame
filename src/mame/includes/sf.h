@@ -35,16 +35,16 @@ public:
 	required_device<generic_latch_8_device> m_soundlatch;
 
 	/* memory pointers */
-	required_shared_ptr<UINT16> m_videoram;
-	required_shared_ptr<UINT16> m_objectram;
+	required_shared_ptr<uint16_t> m_videoram;
+	required_shared_ptr<uint16_t> m_objectram;
 
 	/* video-related */
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_tx_tilemap;
 	int m_active;
-	UINT16 m_bgscroll;
-	UINT16 m_fgscroll;
+	uint16_t m_bgscroll;
+	uint16_t m_fgscroll;
 
 	DECLARE_WRITE8_MEMBER(coin_w);
 	DECLARE_WRITE8_MEMBER(soundcmd_w);
@@ -62,8 +62,8 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	inline int invert( int nb );
 	void draw_sprites( bitmap_ind16 &bitmap,const rectangle &cliprect );
-	void write_dword( address_space &space, offs_t offset, UINT32 data );
+	void write_dword( address_space &space, offs_t offset, uint32_t data );
 };

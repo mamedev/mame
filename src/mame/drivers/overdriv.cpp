@@ -27,13 +27,15 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
-#include "video/k053250.h"
-#include "machine/eepromser.h"
-#include "cpu/m6809/m6809.h"
-#include "sound/2151intf.h"
-#include "sound/k053260.h"
 #include "includes/overdriv.h"
+
+#include "cpu/m68000/m68000.h"
+#include "cpu/m6809/m6809.h"
+#include "machine/eepromser.h"
+#include "sound/k053260.h"
+#include "sound/ym2151.h"
+#include "video/k053250.h"
+#include "speaker.h"
 
 #include "overdriv.lh"
 
@@ -43,7 +45,7 @@
 
 ***************************************************************************/
 
-static const UINT16 overdriv_default_eeprom[64] =
+static const uint16_t overdriv_default_eeprom[64] =
 {
 	0x7758,0xFFFF,0x0078,0x9000,0x0078,0x7000,0x0078,0x5000,
 	0x5441,0x4B51,0x3136,0x4655,0x4AFF,0x0300,0x0270,0x0250,
@@ -186,7 +188,7 @@ WRITE16_MEMBER( overdriv_state::overdriv_k053246_word_w )
 {
 	m_k053246->k053246_word_w(space,offset,data,mem_mask);
 
-	UINT16 *src, *dst;
+	uint16_t *src, *dst;
 
 	m_k053246->k053247_get_ram(&dst);
 
@@ -214,7 +216,7 @@ TIMER_CALLBACK_MEMBER(overdriv_state::objdma_end_cb )
 WRITE16_MEMBER(overdriv_state::objdma_w)
 {
 	if(data & 0x10)
-		machine().scheduler().timer_set(attotime::from_usec(100), timer_expired_delegate(FUNC(overdriv_state::objdma_end_cb), this));
+		m_objdma_end_timer->adjust(attotime::from_usec(100));
 
 	m_k053246->k053246_w(space,5,data,mem_mask);
 }
@@ -253,6 +255,9 @@ static ADDRESS_MAP_START( overdriv_sound_map, AS_PROGRAM, 8, overdriv_state )
 	AM_RANGE(0x1000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( overdriv_k053260_map, 0, 8, overdriv_state )
+	AM_RANGE(0x00000000, 0x001fffff) AM_ROM AM_REGION("k053260", 0)
+ADDRESS_MAP_END
 
 /* Both IPT_START1 assignments are needed. The game will reset during */
 /* the "continue" sequence if the assignment on the first port        */
@@ -291,10 +296,13 @@ INPUT_PORTS_END
 
 void overdriv_state::machine_start()
 {
+	m_objdma_end_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(overdriv_state::objdma_end_cb), this));
+
 	save_item(NAME(m_cpuB_ctrl));
 	save_item(NAME(m_sprite_colorbase));
 	save_item(NAME(m_zoom_colorbase));
 	save_item(NAME(m_road_colorbase));
+	save_item(NAME(m_fake_timer));
 }
 
 void overdriv_state::machine_reset()
@@ -311,7 +319,7 @@ void overdriv_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( overdriv, overdriv_state )
+static MACHINE_CONFIG_START( overdriv )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)  /* 12 MHz */
@@ -375,12 +383,12 @@ static MACHINE_CONFIG_START( overdriv, overdriv_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.5)
 
 	MCFG_K053260_ADD("k053260_1", XTAL_3_579545MHz)
-	MCFG_K053260_REGION("shared")
+	MCFG_DEVICE_ADDRESS_MAP(0, overdriv_k053260_map)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.35)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.35)
 
 	MCFG_K053260_ADD("k053260_2", XTAL_3_579545MHz)
-	MCFG_K053260_REGION("shared")
+	MCFG_DEVICE_ADDRESS_MAP(0, overdriv_k053260_map)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.35)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.35)
 MACHINE_CONFIG_END
@@ -426,7 +434,7 @@ ROM_START( overdriv )
 	ROM_LOAD( "789e17.p17", 0x000000, 0x040000, CRC(04c07248) SHA1(873445002cbf90c9fc5a35bf4a8f6c43193ee342) )
 	ROM_LOAD( "789e16.p12", 0x040000, 0x040000, CRC(9348dee1) SHA1(367193373e28962b5b0e54cc15d68ed88ab83f12) )
 
-	ROM_REGION( 0x200000, "shared", 0 ) /* 053260 samples */
+	ROM_REGION( 0x200000, "k053260", 0 ) /* 053260 samples */
 	ROM_LOAD( "789e03.j1", 0x000000, 0x100000, CRC(51ebfebe) SHA1(17f0c23189258e801f48d5833fe934e7a48d071b) )
 	ROM_LOAD( "789e02.f1", 0x100000, 0x100000, CRC(bdd3b5c6) SHA1(412332d64052c0a3714f4002c944b0e7d32980a4) )
 ROM_END
@@ -464,7 +472,7 @@ ROM_START( overdriva )
 	ROM_LOAD( "789e17.p17", 0x000000, 0x040000, CRC(04c07248) SHA1(873445002cbf90c9fc5a35bf4a8f6c43193ee342) )
 	ROM_LOAD( "789e16.p12", 0x040000, 0x040000, CRC(9348dee1) SHA1(367193373e28962b5b0e54cc15d68ed88ab83f12) )
 
-	ROM_REGION( 0x200000, "shared", 0 ) /* 053260 samples */
+	ROM_REGION( 0x200000, "k053260", 0 ) /* 053260 samples */
 	ROM_LOAD( "789e03.j1", 0x000000, 0x100000, CRC(51ebfebe) SHA1(17f0c23189258e801f48d5833fe934e7a48d071b) )
 	ROM_LOAD( "789e02.f1", 0x100000, 0x100000, CRC(bdd3b5c6) SHA1(412332d64052c0a3714f4002c944b0e7d32980a4) )
 ROM_END
@@ -502,11 +510,11 @@ ROM_START( overdrivb )
 	ROM_LOAD( "789e17.p17", 0x000000, 0x040000, CRC(04c07248) SHA1(873445002cbf90c9fc5a35bf4a8f6c43193ee342) )
 	ROM_LOAD( "789e16.p12", 0x040000, 0x040000, CRC(9348dee1) SHA1(367193373e28962b5b0e54cc15d68ed88ab83f12) )
 
-	ROM_REGION( 0x200000, "shared", 0 ) /* 053260 samples */
+	ROM_REGION( 0x200000, "k053260", 0 ) /* 053260 samples */
 	ROM_LOAD( "789e03.j1", 0x000000, 0x100000, CRC(51ebfebe) SHA1(17f0c23189258e801f48d5833fe934e7a48d071b) )
 	ROM_LOAD( "789e02.f1", 0x100000, 0x100000, CRC(bdd3b5c6) SHA1(412332d64052c0a3714f4002c944b0e7d32980a4) )
 ROM_END
 
-GAMEL( 1990, overdriv,         0, overdriv, overdriv, driver_device, 0, ROT90, "Konami", "Over Drive (set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_overdriv ) // US version
-GAMEL( 1990, overdriva, overdriv, overdriv, overdriv, driver_device, 0, ROT90, "Konami", "Over Drive (set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_overdriv ) // Overseas?
-GAMEL( 1990, overdrivb, overdriv, overdriv, overdriv, driver_device, 0, ROT90, "Konami", "Over Drive (set 3)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_overdriv ) // Overseas?
+GAMEL( 1990, overdriv,         0, overdriv, overdriv, overdriv_state, 0, ROT90, "Konami", "Over Drive (set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_overdriv ) // US version
+GAMEL( 1990, overdriva, overdriv, overdriv, overdriv, overdriv_state, 0, ROT90, "Konami", "Over Drive (set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_overdriv ) // Overseas?
+GAMEL( 1990, overdrivb, overdriv, overdriv, overdriv, overdriv_state, 0, ROT90, "Konami", "Over Drive (set 3)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_overdriv ) // Overseas?

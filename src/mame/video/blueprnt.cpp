@@ -28,7 +28,7 @@ PALETTE_INIT_MEMBER(blueprnt_state, blueprnt)
 
 	for (i = 0; i < palette.entries(); i++)
 	{
-		UINT8 pen;
+		uint8_t pen;
 		int r, g, b;
 
 		if (i < 0x200)
@@ -118,7 +118,7 @@ TILE_GET_INFO_MEMBER(blueprnt_state::get_bg_tile_info)
 
 VIDEO_START_MEMBER(blueprnt_state,blueprnt)
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(blueprnt_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS_FLIP_X, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(blueprnt_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS_FLIP_X, 8, 8, 32, 32);
 	m_bg_tilemap->set_transparent_pen(0);
 	m_bg_tilemap->set_scroll_cols(32);
 
@@ -151,7 +151,7 @@ void blueprnt_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 	}
 }
 
-UINT32 blueprnt_state::screen_update_blueprnt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t blueprnt_state::screen_update_blueprnt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int i;
 

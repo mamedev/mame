@@ -8,25 +8,25 @@
 
 ***************************************************************************/
 
-#ifndef __I8XC196_H__
-#define __I8XC196_H__
+#ifndef MAME_CPU_MCS96_I8XC196_H
+#define MAME_CPU_MCS96_I8XC196_H
 
 #include "mcs96.h"
 
 class i8xc196_device : public mcs96_device {
-public:
-	i8xc196_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+protected:
+	i8xc196_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	static const disasm_entry disasm_entries[0x100];
 
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) override;
+	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 	virtual void do_exec_full() override;
 	virtual void do_exec_partial() override;
 
-	virtual void io_w8(UINT8 adr, UINT8 data) override;
-	virtual void io_w16(UINT8 adr, UINT16 data) override;
-	virtual UINT8 io_r8(UINT8 adr) override;
-	virtual UINT16 io_r16(UINT8 adr) override;
+	virtual void io_w8(uint8_t adr, uint8_t data) override;
+	virtual void io_w16(uint8_t adr, uint16_t data) override;
+	virtual uint8_t io_r8(uint8_t adr) override;
+	virtual uint16_t io_r16(uint8_t adr) override;
 
 #define O(o) void o ## _196_full(); void o ## _196_partial()
 
@@ -43,4 +43,4 @@ public:
 #undef O
 };
 
-#endif
+#endif // MAME_CPU_MCS96_I8XC196_H

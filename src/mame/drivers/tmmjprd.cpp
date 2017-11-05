@@ -32,8 +32,11 @@
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/eepromser.h"
+#include "machine/timer.h"
 #include "sound/i5000.h"
 #include "rendlay.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class tmmjprd_state : public driver_device
@@ -45,7 +48,7 @@ public:
 		m_eeprom(*this, "eeprom"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_tilemap_regs(*this, "tilemap_regs"),
+		m_tilemap_regs(*this, "tilemap_regs.%u", 0),
 		m_spriteregs(*this, "spriteregs"),
 		m_spriteram(*this, "spriteram") { }
 
@@ -54,13 +57,13 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	required_shared_ptr_array<UINT32, 4> m_tilemap_regs;
-	required_shared_ptr<UINT32> m_spriteregs;
-	required_shared_ptr<UINT32> m_spriteram;
+	required_shared_ptr_array<uint32_t, 4> m_tilemap_regs;
+	required_shared_ptr<uint32_t> m_spriteregs;
+	required_shared_ptr<uint32_t> m_spriteram;
 
-	std::unique_ptr<UINT32[]> m_tilemap_ram[4];
-	UINT8 m_mux_data;
-	UINT8 m_system_in;
+	std::unique_ptr<uint32_t[]> m_tilemap_ram[4];
+	uint8_t m_mux_data;
+	uint8_t m_system_in;
 	double m_old_brt1;
 	double m_old_brt2;
 
@@ -81,14 +84,14 @@ public:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 
-	UINT32 screen_update_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int screen);
-	void draw_tile(bitmap_ind16 &bitmap, const rectangle &cliprect, int x,int y,int sizex,int sizey, UINT32 tiledata, UINT8* rom);
-	void draw_tilemap(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT32*tileram, UINT32*tileregs, UINT8*rom );
+	void draw_tile(bitmap_ind16 &bitmap, const rectangle &cliprect, int x,int y,int sizex,int sizey, uint32_t tiledata, uint8_t* rom);
+	void draw_tilemap(bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t*tileram, uint32_t*tileregs, uint8_t*rom );
 };
 
 
@@ -121,11 +124,11 @@ void tmmjprd_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 	int xoffs;
 	//  int todraw = (m_spriteregs[5]&0x0fff0000)>>16; // how many sprites to draw (start/end reg..) what is the other half?
 
-//  UINT32 *source = (m_spriteram+ (todraw*2))-2;
-//  UINT32 *finish = m_spriteram;
+//  uint32_t *source = (m_spriteram+ (todraw*2))-2;
+//  uint32_t *finish = m_spriteram;
 
-	UINT32 *source = m_spriteram+(0xc000/4)-2;
-	UINT32 *finish = m_spriteram;
+	uint32_t *source = m_spriteram+(0xc000/4)-2;
+	uint32_t *finish = m_spriteram;
 	xoffs = (screen & 1)*320;
 
 	for(;source>finish;source-=2)
@@ -143,8 +146,8 @@ void tmmjprd_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 		}
 		else
 		{
-			UINT32 *calc_abs;
-			UINT8 calc_abs_helper;
+			uint32_t *calc_abs;
+			uint8_t calc_abs_helper;
 			int abs_x = 0,abs_y = 0;
 
 			calc_abs = source-2;
@@ -190,7 +193,7 @@ void tmmjprd_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 	}
 }
 
-void tmmjprd_state::draw_tile(bitmap_ind16 &bitmap, const rectangle &cliprect, int x,int y,int sizex,int sizey, UINT32 tiledata, UINT8* rom)
+void tmmjprd_state::draw_tile(bitmap_ind16 &bitmap, const rectangle &cliprect, int x,int y,int sizex,int sizey, uint32_t tiledata, uint8_t* rom)
 {
 	/* note, it's tile address _NOT_ tile number, 'sub-tile' access is possible, hence using the custom rendering */
 	int tileaddr = (tiledata&0x000fffff)>>0;
@@ -222,8 +225,8 @@ void tmmjprd_state::draw_tile(bitmap_ind16 &bitmap, const rectangle &cliprect, i
 	{
 		for (drawx=x;drawx<x+sizex;drawx++)
 		{
-			UINT16 dat;
-			UINT16* dst;
+			uint16_t dat;
+			uint16_t* dst;
 
 			if (!depth)
 			{
@@ -269,7 +272,7 @@ void tmmjprd_state::draw_tile(bitmap_ind16 &bitmap, const rectangle &cliprect, i
 	}
 }
 
-void tmmjprd_state::draw_tilemap(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT32*tileram, UINT32*tileregs, UINT8*rom )
+void tmmjprd_state::draw_tilemap(bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t*tileram, uint32_t*tileregs, uint8_t*rom )
 {
 	int y,x;
 	int count;
@@ -301,7 +304,7 @@ void tmmjprd_state::draw_tilemap(bitmap_ind16 &bitmap, const rectangle &cliprect
 	{
 		for (x=0;x<tilemap_sizex;x++)
 		{
-			UINT32 tiledata = tileram[count];
+			uint32_t tiledata = tileram[count];
 			// todo: handle wraparound
 			draw_tile(bitmap,cliprect,(x*tile_sizex)-scrollx,(y*tile_sizey)-scrolly,tile_sizex,tile_sizey, tiledata, rom);
 			count++;
@@ -310,9 +313,9 @@ void tmmjprd_state::draw_tilemap(bitmap_ind16 &bitmap, const rectangle &cliprect
 
 }
 
-UINT32 tmmjprd_state::screen_update_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t tmmjprd_state::screen_update_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8* gfxroms = memregion("gfx2")->base();
+	uint8_t* gfxroms = memregion("gfx2")->base();
 
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
@@ -344,9 +347,9 @@ UINT32 tmmjprd_state::screen_update_left(screen_device &screen, bitmap_ind16 &bi
 	return 0;
 }
 
-UINT32 tmmjprd_state::screen_update_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t tmmjprd_state::screen_update_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8* gfxroms = memregion("gfx2")->base();
+	uint8_t* gfxroms = memregion("gfx2")->base();
 
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
@@ -361,10 +364,10 @@ void tmmjprd_state::video_start()
 {
 	/* the tilemaps are bigger than the regions the cpu can see, need to allocate the ram here */
 	/* or maybe not for this game/hw .... */
-	m_tilemap_ram[0] = make_unique_clear<UINT32[]>(0x8000);
-	m_tilemap_ram[1] = make_unique_clear<UINT32[]>(0x8000);
-	m_tilemap_ram[2] = make_unique_clear<UINT32[]>(0x8000);
-	m_tilemap_ram[3] = make_unique_clear<UINT32[]>(0x8000);
+	m_tilemap_ram[0] = make_unique_clear<uint32_t[]>(0x8000);
+	m_tilemap_ram[1] = make_unique_clear<uint32_t[]>(0x8000);
+	m_tilemap_ram[2] = make_unique_clear<uint32_t[]>(0x8000);
+	m_tilemap_ram[3] = make_unique_clear<uint32_t[]>(0x8000);
 
 
 	save_pointer(NAME(m_tilemap_ram[0].get()), 0x8000);
@@ -413,7 +416,7 @@ TIMER_CALLBACK_MEMBER(tmmjprd_state::blit_done)
 
 void tmmjprd_state::do_blit()
 {
-	UINT8 *blt_data = memregion("gfx1")->base();
+	uint8_t *blt_data = memregion("gfx1")->base();
 	int blt_source = (m_blitterregs[0]&0x000fffff)>>0;
 	int blt_column = (m_blitterregs[1]&0x00ff0000)>>16;
 	int blt_line   = (m_blitterregs[1]&0x000000ff);
@@ -761,7 +764,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(tmmjprd_state::scanline)
 
 }
 
-static MACHINE_CONFIG_START( tmmjprd, tmmjprd_state )
+static MACHINE_CONFIG_START( tmmjprd )
 	MCFG_CPU_ADD("maincpu",M68EC020,24000000) /* 24 MHz */
 	MCFG_CPU_PROGRAM_MAP(tmmjprd_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", tmmjprd_state, scanline, "lscreen", 0, 1)
@@ -884,5 +887,5 @@ ROM_START( tmpdoki )
 ROM_END
 
 
-GAME( 1997, tmmjprd,       0, tmmjprd, tmmjprd, driver_device, 0, ROT0, "Media / Sonnet", "Tokimeki Mahjong Paradise - Dear My Love", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1998, tmpdoki, tmmjprd, tmpdoki, tmmjprd, driver_device, 0, ROT0, "Media / Sonnet", "Tokimeki Mahjong Paradise - Doki Doki Hen", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // missing gfx due to wrong roms?
+GAME( 1997, tmmjprd,       0, tmmjprd, tmmjprd, tmmjprd_state, 0, ROT0, "Media / Sonnet", "Tokimeki Mahjong Paradise - Dear My Love",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, tmpdoki, tmmjprd, tmpdoki, tmmjprd, tmmjprd_state, 0, ROT0, "Media / Sonnet", "Tokimeki Mahjong Paradise - Doki Doki Hen", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // missing gfx due to wrong roms?
