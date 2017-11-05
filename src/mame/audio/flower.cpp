@@ -259,7 +259,7 @@ WRITE8_MEMBER( flower_sound_device::start_address_w )
 
 	voice = &m_channel_list[ch];
 	voice->start_nibbles[offset & 7] = data & 0xf;
-	if(offset == 4)
+	if((offset & 7) == 4)
 		voice->effect = data >> 4;
 }
 
