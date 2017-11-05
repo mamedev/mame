@@ -30,7 +30,6 @@ public:
 	optional_device<buffered_spriteram8_device> m_spriteram8;
 	optional_device<buffered_spriteram16_device> m_spriteram16;
 
-	int m_toaplan_main_cpu;
 	int32_t m_fg_rom_bank;
 	int32_t m_bg_ram_bank;
 	int m_intenable;

@@ -357,8 +357,6 @@ void wardner_state::machine_reset()
 {
 	MACHINE_RESET_CALL_MEMBER(twincobr);
 
-	m_toaplan_main_cpu = 1;     /* Z80 */
-
 	m_membank->set_bank(0);
 }
 

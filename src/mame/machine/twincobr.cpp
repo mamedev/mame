@@ -243,7 +243,6 @@ WRITE16_MEMBER(twincobr_state::twincobr_sharedram_w)
 
 MACHINE_RESET_MEMBER(twincobr_state,twincobr)
 {
-	m_toaplan_main_cpu = 0;     /* 68000 */
 	m_dsp_addr_w = 0;
 	m_main_ram_seg = 0;
 	m_dsp_execute = 0;
@@ -253,7 +252,6 @@ MACHINE_RESET_MEMBER(twincobr_state,twincobr)
 
 void twincobr_state::twincobr_driver_savestate()
 {
-	save_item(NAME(m_toaplan_main_cpu));
 	save_item(NAME(m_intenable));
 	save_item(NAME(m_dsp_on));
 	save_item(NAME(m_dsp_addr_w));
