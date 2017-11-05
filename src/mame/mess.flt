@@ -188,6 +188,7 @@ elf.cpp
 elwro800.cpp
 enmirage.cpp
 ep64.cpp
+esprit.cpp
 esq1.cpp
 esq5505.cpp
 esqasr.cpp
@@ -247,7 +248,6 @@ h8.cpp
 h89.cpp
 harriet.cpp
 hazeltin.cpp
-hazeltine.cpp
 hec2hrp.cpp
 hh_amis2k.cpp
 hh_cop400.cpp

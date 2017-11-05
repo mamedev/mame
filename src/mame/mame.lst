@@ -12232,6 +12232,10 @@ espial                          // (c) 1983 Thunderbolt, Orca logo is hidden in 
 espialu                         // (c) 1983 Thunderbolt, Orca logo is hidden in title screen
 netwars                         // (c) 1983 Orca + Esco Trading Co license
 
+@source:esprit.cpp
+esprit                          // Hazeltine Esprit
+esprit3                         // Hazeltine Esprit III
+
 @source:esq1.cpp
 esq1                            // 1986 ESQ-1 Digital Wave Synthesizer
 esqm                            // 1986 ESQ-M rack-mount ESQ-1
@@ -14559,10 +14563,6 @@ hg_frd                          // Fruit Deuce
 
 @source:hazeltin.cpp
 hazl1500                        // Hazeltine 1500 (c) 1977
-
-@source:hazeltine.cpp
-esprit                          // Hazeltine Esprit
-esprit3                         // Hazeltine Esprit III
 
 @source:hcastle.cpp
 akumajou                        // GX768 (c) 1988 (Japan)
