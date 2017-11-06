@@ -62,41 +62,41 @@ void kyugo_state::video_start()
  *
  *************************************/
 
-WRITE8_MEMBER(kyugo_state::kyugo_fgvideoram_w)
+WRITE8_MEMBER(kyugo_state::fgvideoram_w)
 {
 	m_fgvideoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_MEMBER(kyugo_state::kyugo_bgvideoram_w)
+WRITE8_MEMBER(kyugo_state::bgvideoram_w)
 {
 	m_bgvideoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_MEMBER(kyugo_state::kyugo_bgattribram_w)
+WRITE8_MEMBER(kyugo_state::bgattribram_w)
 {
 	m_bgattribram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
-READ8_MEMBER(kyugo_state::kyugo_spriteram_2_r)
+READ8_MEMBER(kyugo_state::spriteram_2_r)
 {
 	// only the lower nibble is connected
 	return m_spriteram_2[offset] | 0xf0;
 }
 
 
-WRITE8_MEMBER(kyugo_state::kyugo_scroll_x_lo_w)
+WRITE8_MEMBER(kyugo_state::scroll_x_lo_w)
 {
 	m_scroll_x_lo = data;
 }
 
 
-WRITE8_MEMBER(kyugo_state::kyugo_gfxctrl_w)
+WRITE8_MEMBER(kyugo_state::gfxctrl_w)
 {
 	/* bit 0 is scroll MSB */
 	m_scroll_x_hi = data & 0x01;
@@ -121,7 +121,7 @@ WRITE8_MEMBER(kyugo_state::kyugo_gfxctrl_w)
 }
 
 
-WRITE8_MEMBER(kyugo_state::kyugo_scroll_y_w)
+WRITE8_MEMBER(kyugo_state::scroll_y_w)
 {
 	m_scroll_y = data;
 }
@@ -139,7 +139,7 @@ WRITE_LINE_MEMBER(kyugo_state::flipscreen_w)
  *
  *************************************/
 
-void kyugo_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
+void kyugo_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* sprite information is scattered through memory */
 	/* and uses a portion of the text layer memory (outside the visible area) */
@@ -197,7 +197,7 @@ void kyugo_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect 
 }
 
 
-uint32_t kyugo_state::screen_update_kyugo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t kyugo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if (flip_screen())
 		m_bg_tilemap->set_scrollx(0, -(m_scroll_x_lo + (m_scroll_x_hi * 256)));
