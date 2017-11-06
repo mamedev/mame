@@ -7,13 +7,6 @@
     Decryption should be correct in most cases.
     The ARM appears to be ARMv5T, probably an ARM9.
 
-    We need to determine where VRAM etc. map in order to attempt tests on the PCBs.
-
-    We will also need to try to attack the internal ROM, as there are many many calls made into it.
-    Chances are it'll be possible to get it to copy itself out, or black-box the behavior.
-    All calls to the IROM are done through small shims, so it should also be possible to hack around
-    the IROM if we can't get the dump out.
-
     PGM2 Motherboard Components:
 
      IS61LV25616AL(SRAM)
@@ -55,13 +48,19 @@
 #include "machine/igs036crypt.h"
 #include "screen.h"
 #include "speaker.h"
+#include "machine/nvram.h"
 
 class pgm2_state : public driver_device
 {
 public:
 	pgm2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_fg_videoram(*this, "fg_videoram"),
+		m_gfxdecode(*this, "gfxdecode") { }
+
+	DECLARE_READ32_MEMBER(unk_startup_r);
+	DECLARE_WRITE32_MEMBER(fg_videoram_w);
 
 	DECLARE_DRIVER_INIT(kov2nl);
 	DECLARE_DRIVER_INIT(orleg2);
@@ -71,25 +70,53 @@ public:
 	DECLARE_DRIVER_INIT(kov3_102);
 	DECLARE_DRIVER_INIT(kov3_100);
 
+	uint32_t screen_update_pgm2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_pgm2);
+
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	uint32_t screen_update_pgm2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank_pgm2);
-	required_device<cpu_device> m_maincpu;
-private:
+
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+
 	void pgm_create_dummy_internal_arm_region();
 	void decrypt_kov3_module(uint32_t addrxor, uint16_t dataxor);
+
+// devices
+	required_device<cpu_device> m_maincpu;
+	required_shared_ptr<uint32_t> m_fg_videoram;
+	tilemap_t    *m_fg_tilemap;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
+
+// checked on startup, or doesn't boot
+READ32_MEMBER(pgm2_state::unk_startup_r)
+{
+	return 0xffffffff;
+}
 
 static ADDRESS_MAP_START( pgm2_map, AS_PROGRAM, 32, pgm2_state )
 	AM_RANGE(0x00000000, 0x00003fff) AM_ROM //AM_REGION("user1", 0x00000) // internal ROM
 
-	// these might be swapped
-	AM_RANGE(0x10000000, 0x107fffff) AM_ROM AM_MIRROR(0x0f800000) AM_REGION("user1", 0) // external ROM
-	AM_RANGE(0x20000000, 0x2007ffff) AM_RAM // main SRAM?
-	// This doesn't exist, it's just necessary because our stub IPL doesn't set SP
-	AM_RANGE(0xfff00000, 0xffffffff) AM_RAM
+	AM_RANGE(0x02000000, 0x0200ffff) AM_RAM AM_SHARE("sram") // 'battery ram'
+
+	AM_RANGE(0x10000000, 0x107fffff) AM_ROM AM_REGION("user1", 0) // external ROM
+	AM_RANGE(0x20000000, 0x207fffff) AM_RAM
+
+	AM_RANGE(0x30020000, 0x30021fff) AM_RAM // bg ram?
+	AM_RANGE(0x30040000, 0x30045fff) AM_RAM_WRITE(fg_videoram_w) AM_SHARE("fg_videoram")
+
+	// these are written straight after fg_videoram writes might be DMA triggers?
+	//AM_RANGE(0x300a0004, 0x300a0007) AM_WRITE() // [:maincpu] ':maincpu' (00002C34): unmapped program memory write to 300A0004 = 00FFFFFF & FFFFFFFF
+	//AM_RANGE(0x300a003c, 0x300a003f) AM_WRITE() // [:maincpu] ':maincpu' (00002C3C): unmapped program memory write to 300A003C = 00000000 & FFFFFFFF
+
+	// internal to IGS036?
+	AM_RANGE(0xffffec00, 0xffffec5f) AM_RAM // other encryption data?
+	AM_RANGE(0xfffffc00, 0xfffffcff) AM_RAM // encryption table (see code at 3950)
+
+//	AM_RANGE(0xfffffa08, 0xfffffa0b) AM_WRITE(table_done_w) // after uploading encryption? table might actually send it or enable external ROM?
+	AM_RANGE(0xfffffa0c, 0xfffffa0f) AM_READ(unk_startup_r)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( pgm2 )
@@ -97,6 +124,7 @@ INPUT_PORTS_END
 
 uint32_t pgm2_state::screen_update_pgm2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
 
@@ -104,8 +132,21 @@ WRITE_LINE_MEMBER(pgm2_state::screen_vblank_pgm2)
 {
 }
 
+WRITE32_MEMBER(pgm2_state::fg_videoram_w)
+{
+	COMBINE_DATA(&m_fg_videoram[offset]);
+	m_fg_tilemap->mark_tile_dirty(offset);
+}
+
+TILE_GET_INFO_MEMBER(pgm2_state::get_fg_tile_info)
+{
+	int tileno = m_fg_videoram[tile_index];
+	SET_TILE_INFO_MEMBER(0, tileno, 1, 0);
+}
+
 void pgm2_state::video_start()
 {
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(pgm2_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 96, 48); // 0x4800 bytes
 }
 
 void pgm2_state::machine_start()
@@ -252,22 +293,18 @@ void pgm2_state::pgm_create_dummy_internal_arm_region()
 	}
 }
 
-
-
 static MACHINE_CONFIG_START( pgm2 )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", ARM9, 20000000) // ?? ARM baesd CPU, has internal ROM.
+	MCFG_CPU_ADD("maincpu", IGS036, 20000000) // ?? ARM based CPU, has internal ROM.
 	MCFG_CPU_PROGRAM_MAP(pgm2_map)
-
-
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 64*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 56*8-1, 0*8, 28*8-1)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0, 448-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(pgm2_state, screen_update_pgm2)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(pgm2_state, screen_vblank_pgm2))
 	MCFG_SCREEN_PALETTE("palette")
@@ -275,6 +312,7 @@ static MACHINE_CONFIG_START( pgm2 )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pgm2)
 	MCFG_PALETTE_ADD("palette", 0x1000)
 
+	MCFG_NVRAM_ADD_0FILL("sram")
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_YMZ770_ADD("ymz770", 16384000)  // Actually a YMZ774 on-board
@@ -284,7 +322,7 @@ MACHINE_CONFIG_END
 
 ROM_START( orleg2 )
 	ROM_REGION( 0x04000, "maincpu", 0 )
-	ROM_LOAD( "xyj2_igs036.rom",         0x00000000, 0x0004000, NO_DUMP )
+	ROM_LOAD( "xyj2_igs036.rom", 0x00000000, 0x0004000, CRC(bcce7641) SHA1(c3b5cf6e9f6eae09b6785314777a52b34c3c7657) )
 
 	ROM_REGION( 0x800000, "user1", 0 )
 	ROM_LOAD( "xyj2_v104cn.u7",          0x00000000, 0x0800000, CRC(7c24a4f5) SHA1(3cd9f9264ef2aad0869afdf096e88eb8d74b2570) )
@@ -310,7 +348,7 @@ ROM_END
 
 ROM_START( orleg2o )
 	ROM_REGION( 0x04000, "maincpu", 0 )
-	ROM_LOAD( "xyj2_igs036.rom",         0x00000000, 0x0004000, NO_DUMP )
+	ROM_LOAD( "xyj2_igs036.rom", 0x00000000, 0x0004000, CRC(bcce7641) SHA1(c3b5cf6e9f6eae09b6785314777a52b34c3c7657) )
 
 	ROM_REGION( 0x800000, "user1", 0 )
 	ROM_LOAD( "xyj2_v103cn.u7",  0x000000, 0x800000, CRC(21c1fae8) SHA1(36eeb7a5e8dc8ee7c834f3ff1173c28cf6c2f1a3) )
@@ -336,7 +374,7 @@ ROM_END
 
 ROM_START( orleg2oa )
 	ROM_REGION( 0x04000, "maincpu", 0 )
-	ROM_LOAD( "xyj2_igs036.rom",         0x00000000, 0x0004000, NO_DUMP )
+	ROM_LOAD( "xyj2_igs036.rom", 0x00000000, 0x0004000, CRC(bcce7641) SHA1(c3b5cf6e9f6eae09b6785314777a52b34c3c7657) )
 
 	ROM_REGION( 0x800000, "user1", 0 )
 	ROM_LOAD( "orleg2_xyj2_v101cn.u7",  0x000000, 0x800000, CRC(45805b53) SHA1(f2a8399c821b75fadc53e914f6f318707e70787c) )
@@ -609,8 +647,6 @@ DRIVER_INIT_MEMBER(pgm2_state,orleg2)
 
 	igs036_decryptor decrypter(orleg2_key);
 	decrypter.decrypter_rom(memregion("user1"));
-
-	pgm_create_dummy_internal_arm_region();
 }
 
 DRIVER_INIT_MEMBER(pgm2_state,kov2nl)

@@ -53,6 +53,7 @@ DEFINE_DEVICE_TYPE(ARM920T,  arm920t_cpu_device,  "arm920t",  "ARM920T")
 DEFINE_DEVICE_TYPE(ARM946ES, arm946es_cpu_device, "arm946es", "ARM946ES")
 DEFINE_DEVICE_TYPE(PXA255,   pxa255_cpu_device,   "pxa255",   "Intel XScale PXA255")
 DEFINE_DEVICE_TYPE(SA1110,   sa1110_cpu_device,   "sa1110",   "Intel StrongARM SA-1110")
+DEFINE_DEVICE_TYPE(IGS036,   igs036_cpu_device,   "igs036",   "IGS036")
 
 arm7_cpu_device::arm7_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: arm7_cpu_device(mconfig, ARM7, tag, owner, clock, 4, ARCHFLAG_T, ENDIANNESS_LITTLE)
@@ -174,6 +175,13 @@ sa1110_cpu_device::sa1110_cpu_device(const machine_config &mconfig, const char *
 			   | ARM9_COPRO_ID_PART_SA1110
 			   | ARM9_COPRO_ID_STEP_SA1110_A0;
 }
+
+// unknown configuration
+igs036_cpu_device::igs036_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: arm9_cpu_device(mconfig, IGS036, tag, owner, clock, 5, ARCHFLAG_T | ARCHFLAG_E, ENDIANNESS_LITTLE)
+{
+}
+
 
 device_memory_interface::space_config_vector arm7_cpu_device::memory_space_config() const
 {
@@ -1222,6 +1230,13 @@ WRITE32_MEMBER( arm7_cpu_device::arm7_rt_w_callback )
 	}
 }
 
+WRITE32_MEMBER(igs036_cpu_device::arm7_rt_w_callback)
+{
+	arm7_cpu_device::arm7_rt_w_callback(space, offset, data, mem_mask);
+	/* disable the MMU for now, it doesn't seem to set up valid mappings
+	   so could be entirely different here */
+	COPRO_CTRL &= ~COPRO_CTRL_MMU_EN;
+}
 
 void arm7_cpu_device::arm7_dt_r_callback(uint32_t insn, uint32_t *prn)
 {
