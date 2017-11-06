@@ -618,6 +618,7 @@ MACHINES["FGA002"] = true
 MACHINES["I82586"] = true
 MACHINES["INPUT_MERGER"] = true
 -- MACHINES["K054321"] = true
+MACHINES["ADC0844"] = true
 
 --------------------------------------------------
 -- specify available bus cores
@@ -3019,8 +3020,6 @@ files {
 createMESSProjects(_target, _subtarget, "tatung")
 files {
 	MAME_DIR .. "src/mame/drivers/einstein.cpp",
-	MAME_DIR .. "src/mame/includes/einstein.h",
-	MAME_DIR .. "src/mame/machine/einstein.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "teamconc")
