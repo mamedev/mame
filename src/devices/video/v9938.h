@@ -76,7 +76,6 @@ class v99x8_device :    public device_t,
 {
 public:
 	template <class Object> devcb_base &set_interrupt_callback(Object &&irq) { return m_int_callback.set_callback(std::forward<Object>(irq)); }
-	//pen_t get_transpen() const;
 	bitmap_rgb32 &get_bitmap() { return m_bitmap; }
 	void update_mouse_state(int mx_delta, int my_delta, int button_state);
 

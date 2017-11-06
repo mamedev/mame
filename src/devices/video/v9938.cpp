@@ -240,25 +240,6 @@ void v99x8_device::configure_pal_ntsc()
 }
 
 
-#ifdef UNUSED_FUNCTION
-/*
-    Not really right... won't work with sprites in graphics 7
-    and with palette updated mid-screen
-*/
-pen_t v99x8_device::get_transpen() const
-{
-	if (m_mode == V9938_MODE_GRAPHIC7)
-	{
-		return pen256(0);
-	}
-	else
-	{
-		return pen16(0);
-	}
-}
-#endif
-
-
 /*
     Driver-specific function: update the vdp mouse state
 */
