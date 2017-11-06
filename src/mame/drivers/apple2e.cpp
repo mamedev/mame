@@ -400,7 +400,7 @@ private:
 	bool m_intc8rom;
 
 	bool m_isiic, m_isiicplus, m_iscec;
-	uint8_t m_migram[0x200];
+	uint8_t m_migram[0x800];
 	uint16_t m_migpage;
 
 	uint8_t *m_ram_ptr, *m_rom_ptr, *m_cec_ptr;
@@ -464,7 +464,7 @@ uint8_t apple2e_state::mig_r(uint16_t offset)
 	if (offset == 0x20)
 	{
 		m_migpage += 0x20;
-		m_migpage &= 0x1ff;	// make sure we wrap
+		m_migpage &= 0x7ff;	// make sure we wrap
 	}
 
 	// reset MIG RAM window
@@ -489,7 +489,7 @@ void apple2e_state::mig_w(uint16_t offset, uint8_t data)
 	if (offset == 0x20)
 	{
 		m_migpage += 0x20;
-		m_migpage &= 0x1ff;	// make sure we wrap
+		m_migpage &= 0x7ff;	// make sure we wrap
 	}
 
 	// reset MIG RAM window
