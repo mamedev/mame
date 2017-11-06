@@ -5,6 +5,20 @@
    Scopus Sagitta 150 / 180
    Serial terminal
 
+   driver by: Felipe Correa da Silva Sanches <juca@members.fsf.org>
+
+   Thanks to Werner Moecke for the help in inspecting the circuits and
+     debugging this driver.
+
+   TODO:
+   - document the dipswitches
+   - figure out how the additional ROMs are mapped into memory
+   - figure out how/if the ROMs of the two models (150 and 180) can
+     be switched (is that via a dipswitch setting?) The model 180
+     contains a Model 150 ROM as well.
+   - emulate the printer port
+   - document the keyboard layout and emulate it
+
 *********************************************************************/
 
 #include "emu.h"
