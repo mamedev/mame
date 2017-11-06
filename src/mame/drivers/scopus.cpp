@@ -141,11 +141,17 @@ static INPUT_PORTS_START( sagitta180 )
 	   * byte width and parity are specified by dipswitch seetings below.
 	*/
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x03, 0x01, "Serial settings" )
+	PORT_DIPNAME( 0x03, 0x01, "Serial settings" ) PORT_DIPLOCATION("SW1:8,7")
 	PORT_DIPSETTING(    0x00, "7 bits, even parity" )
 	PORT_DIPSETTING(    0x01, "8 bits, parity disabled" )
 	PORT_DIPSETTING(    0x02, "7 bits, odd parity" )
 	//PORT_DIPSETTING(  0x03, "8 bits, parity disabled" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x00, "SW1:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x00, "SW1:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x00, "SW1:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x00, "SW1:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x00, "SW1:2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x00, "SW1:1" )
 INPUT_PORTS_END
 
 WRITE_LINE_MEMBER(sagitta180_state::hrq_w)
