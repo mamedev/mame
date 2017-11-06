@@ -11,7 +11,6 @@
      debugging this driver.
 
    TODO:
-   - document the dipswitches
    - figure out how the additional ROMs are mapped into memory
    - figure out how/if the ROMs of the two models (150 and 180) can
      be switched (is that via a dipswitch setting?) The model 180
@@ -132,14 +131,21 @@ static ADDRESS_MAP_START( maincpu_io_map, AS_IO, 8, sagitta180_state )
 	AM_RANGE(0x40, 0x48) AM_DEVREADWRITE("dma", i8257_device, read, write)
 ADDRESS_MAP_END
 
+
 static INPUT_PORTS_START( sagitta180 )
-        PORT_START("DSW")
-        PORT_DIPNAME( 0x02, 0x00, "Unknown Bit #1" )
-        PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-        PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-        PORT_DIPNAME( 0x01, 0x00, "Unknown Bit #0" )
-        PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-        PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	/*
+	  Serial settings:
+	   * async
+	   * 1 stop-bit
+	   * baud-rate factor = 16x
+	   * byte width and parity are specified by dipswitch seetings below.
+	*/
+	PORT_START("DSW")
+	PORT_DIPNAME( 0x03, 0x01, "Serial settings" )
+	PORT_DIPSETTING(    0x00, "7 bits, even parity" )
+	PORT_DIPSETTING(    0x01, "8 bits, parity disabled" )
+	PORT_DIPSETTING(    0x02, "7 bits, odd parity" )
+	//PORT_DIPSETTING(  0x03, "8 bits, parity disabled" )
 INPUT_PORTS_END
 
 WRITE_LINE_MEMBER(sagitta180_state::hrq_w)
