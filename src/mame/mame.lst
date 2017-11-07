@@ -17147,12 +17147,18 @@ wndrplnt                        // (c) 1987 Data East Corporation (Japan)
 kas89                           // 1989, SFC S.R.L.
 
 @source:kaypro.cpp
-kaypro10                        // Kaypro 10
-kaypro2x                        // Kaypro 2 - 2/84
-kaypro4                         // Kaypro 4 - 4/83
-kaypro4a                        // Kaypro 4 - 4/84
-kaypro4p88                      // Kaypro 4 - 4/83 w/plus88 board installed
+kaypro1							// Kaypro 1
+kaypro10						// Kaypro 10/83
+kaypro1084                      // Kaypro 10/84
+kaypro2x                        // Kaypro 2x
+kaypro4x                        // Kaypro 4x
+kaypro284						// Kaypro 2 - 2/84
+kaypro484                       // Kaypro 4 - 4/84
+kayproiip88                     // Kaypro II - 4/83 w/plus88 board installed
+kaypro484p88                    // Kaypro 4/84 - 4/84 w/plus88 board installed
 kayproii                        // Kaypro II - 2/83
+kayproiv						// Kaypro IV - 4/83
+kaypronew2						// Kaypro new 2
 omni2                           // Omni II
 omni4                           // Omni 4
 robie                           // Kaypro Robie
