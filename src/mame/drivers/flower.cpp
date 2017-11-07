@@ -8,10 +8,10 @@
     original "wiped off due of not anymore licenseable" driver by insideoutboy.
 
     TODO:
-	- priority might be wrong in some places (title screen stars around the 
+	- priority might be wrong in some places (title screen stars around the
 	  galaxy, planet ship 3rd boss, 2nd boss);
 	- sound chips (similar to Namco custom chips?)
-	
+
 ===============================================================================
 
 Flower (c)1986 Komax (USA license)
@@ -116,8 +116,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 	INTERRUPT_GEN_MEMBER(master_vblank_irq);
 	INTERRUPT_GEN_MEMBER(slave_vblank_irq);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info); 
-	TILE_GET_INFO_MEMBER(get_fg_tile_info); 
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
@@ -126,7 +126,7 @@ protected:
 	virtual void machine_reset() override;
 
 	virtual void video_start() override;
-	
+
 private:
 	required_device<cpu_device> m_mastercpu;
 	required_device<cpu_device> m_slavecpu;
@@ -142,10 +142,10 @@ private:
 	required_shared_ptr<uint8_t> m_fgscroll;
 	required_device<generic_latch_8_device> m_soundlatch;
 	bitmap_ind16 m_temp_bitmap;
-	
+
 	void draw_legacy_text(bitmap_ind16 &bitmap,const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
-	
+
 	bool m_audio_nmi_enable;
 	bool m_flip_screen;
 	tilemap_t *m_bg_tilemap;
@@ -155,7 +155,7 @@ private:
 TILE_GET_INFO_MEMBER(flower_state::get_bg_tile_info)
 {
 	int code = m_bgvram[tile_index];
-	int color = (m_bgvram[tile_index+0x100] & 0xf0) >> 4; 
+	int color = (m_bgvram[tile_index+0x100] & 0xf0) >> 4;
 
 	SET_TILE_INFO_MEMBER(1, code, color, 0);
 }
@@ -163,8 +163,8 @@ TILE_GET_INFO_MEMBER(flower_state::get_bg_tile_info)
 TILE_GET_INFO_MEMBER(flower_state::get_fg_tile_info)
 {
 	int code = m_fgvram[tile_index];
-	int color = (m_fgvram[tile_index+0x100] & 0xf0) >> 4; 
-	
+	int color = (m_fgvram[tile_index+0x100] & 0xf0) >> 4;
+
 	SET_TILE_INFO_MEMBER(1, code, color, 0);
 }
 
@@ -172,12 +172,12 @@ void flower_state::video_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(flower_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(flower_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
-	
-	m_screen->register_screen_bitmap(m_temp_bitmap);	
+
+	m_screen->register_screen_bitmap(m_temp_bitmap);
 	m_fg_tilemap->set_transparent_pen(15);
 
 	save_item(NAME(m_flip_screen));
-	
+
 	m_bg_tilemap->set_scrolldx(16, 0);
 	m_fg_tilemap->set_scrolldx(16, 0);
 }
@@ -230,7 +230,7 @@ void flower_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
 	uint8_t *spr_ptr = &m_workram[0x1e08];
 	gfx_element *gfx_2 = m_gfxdecode->gfx(2);
-	
+
 	// traverse from top to bottom
 	for(int i=0x1f0;i>=0;i-=8)
 	{
@@ -249,12 +249,12 @@ void flower_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 		uint32_t xshrink_zoom = ((spr_ptr[i+3] & 0x07) >> 0) + 1;
 		yshrink_zoom <<= 13;
 		xshrink_zoom <<= 13;
-		int ypixels = (yshrink_zoom*16) >> 16; 
+		int ypixels = (yshrink_zoom*16) >> 16;
 		int xpixels = (xshrink_zoom*16) >> 16;
-		
+
 		tile |= (attr & 1) << 6;
 		tile |= (attr & 8) << 4;
-		
+
 		if(flip_screen())
 		{
 			x += xsize*16;
@@ -264,16 +264,16 @@ void flower_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 
 		if(ysize == 2)
 			y-=16;
-		
+
 		for(int yi=0;yi<ysize;yi++)
 		{
 			int yoffs = (16-ypixels)/ydiv;
-			
+
 			for(int xi=0;xi<xsize;xi++)
 			{
 				int tile_offs;
 				int xoffs = (16-xpixels)/xdiv;
-				
+
 				tile_offs = fx ? (xsize-xi-1) * 8 : xi*8;
 				tile_offs+= fy ? (ysize-yi-1) : yi;
 
@@ -511,10 +511,10 @@ static MACHINE_CONFIG_START( flower )
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	
+
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("flower", FLOWER_CUSTOM, 0)
+	MCFG_SOUND_ADD("flower", FLOWER_CUSTOM, 96000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
