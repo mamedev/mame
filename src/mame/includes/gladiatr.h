@@ -14,6 +14,8 @@ public:
 	DECLARE_WRITE8_MEMBER(paletteram_w);
 	DECLARE_WRITE_LINE_MEMBER(spritebuffer_w);
 	DECLARE_WRITE8_MEMBER(spritebuffer_w);
+	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
+	DECLARE_WRITE_LINE_MEMBER(gladiator_ym_irq);
 
 protected:
 	gladiatr_state_base(const machine_config &mconfig, device_type type, const char *tag)
@@ -106,11 +108,9 @@ public:
 
 	DECLARE_WRITE8_MEMBER(gladiator_cpu_sound_command_w);
 	DECLARE_READ8_MEMBER(gladiator_cpu_sound_command_r);
-	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
 	DECLARE_WRITE8_MEMBER(gladiatr_irq_patch_w);
 	DECLARE_WRITE8_MEMBER(gladiator_int_control_w);
 	DECLARE_WRITE8_MEMBER(gladiator_adpcm_w);
-	DECLARE_WRITE_LINE_MEMBER(gladiator_ym_irq);
 
 	DECLARE_WRITE_LINE_MEMBER(tclk_w);
 	DECLARE_READ8_MEMBER(cctl_p1_r);
@@ -175,6 +175,8 @@ public:
 	DECLARE_READ8_MEMBER(ppking_qx3_r);
 	DECLARE_READ8_MEMBER(ppking_qx0_r);
 	DECLARE_READ8_MEMBER(ppking_qx1_r);
+	DECLARE_READ8_MEMBER(ppking_qxunk_r);
+	DECLARE_WRITE8_MEMBER(ppking_qxunk_w);
 	DECLARE_WRITE8_MEMBER(ppking_video_registers_w);
 
 	DECLARE_DRIVER_INIT(ppking);

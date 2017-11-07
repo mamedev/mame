@@ -224,7 +224,7 @@ WRITE8_MEMBER(gladiatr_state::gladiator_int_control_w)
 }
 
 /* YM2203 IRQ */
-WRITE_LINE_MEMBER(gladiatr_state::gladiator_ym_irq)
+WRITE_LINE_MEMBER(gladiatr_state_base::gladiator_ym_irq)
 {
 	/* NMI IRQ is not used by gladiator sound program */
 	m_subcpu->set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
@@ -253,7 +253,7 @@ READ8_MEMBER(gladiatr_state::gladiator_cpu_sound_command_r)
 	return m_soundlatch->read(space,0);
 }
 
-WRITE_LINE_MEMBER(gladiatr_state::flipscreen_w)
+WRITE_LINE_MEMBER(gladiatr_state_base::flipscreen_w)
 {
 	flip_screen_set(state);
 }
@@ -389,7 +389,6 @@ READ8_MEMBER(ppking_state::ppking_f1_r)
  **********************************/
 
 //#include "debugger.h"
-
  
 inline bool ppking_state::mcu_parity_check()
 {
@@ -450,6 +449,7 @@ READ8_MEMBER(ppking_state::ppking_qx0_r)
 				{
 					m_mcu[0].rxd = ((ioport("P1")->read()) & 0x3f);
 					m_mcu[0].rxd |= ((ioport("SYSTEM")->read()) & 0x80);
+					
 				}
 				
 				break;
@@ -468,13 +468,6 @@ READ8_MEMBER(ppking_state::ppking_qx0_r)
 					m_mcu[0].rxd |= ((ioport("SYSTEM")->read()) & 0x80);
 				}
 				
-				break;
-			}
-			
-			case 4:
-			{
-				m_mcu[0].rxd = ((ioport("P1")->read() | ioport("P2")->read()) & 0x3f);
-				//m_mcu[0].rxd |= ((ioport("SYSTEM")->read()) & 0x80);
 				break;
 			}
 		}
@@ -522,9 +515,10 @@ WRITE8_MEMBER(ppking_state::ppking_qx0_w)
 				//m_mcu[0].state = 0;
 				break;
 			case 3:
+				m_mcu[0].rxd = 0;
 				//m_mcu[0].rxd = (ioport("DSW1")->read() & 0x1f) << 2;
 				m_mcu[0].rst = 1;
-				m_mcu[0].txd = 0;
+				//m_mcu[0].txd = 0;
 				//m_mcu[0].state = 0;
 				break;
 
@@ -536,7 +530,7 @@ WRITE8_MEMBER(ppking_state::ppking_qx0_w)
 	else
 	{
 		m_mcu[0].txd = data;
-		
+				
 		if(m_mcu[0].txd == 0x41)
 		{
 			m_mcu[0].state = 1;
@@ -554,7 +548,9 @@ WRITE8_MEMBER(ppking_state::ppking_qx0_w)
 		}
 		else
 		{
-			m_mcu[0].state = 4;
+//			if(data != 0x60)
+//			printf("%02x\n",data);
+			//m_mcu[0].state = 0;
 		}
 	}
 }
@@ -595,6 +591,20 @@ READ8_MEMBER(ppking_state::ppking_qx3_r)
 	return machine().rand()&0xf;
 }
 
+// a mirror of any of above?
+READ8_MEMBER(ppking_state::ppking_qxunk_r)
+{
+	if(offset == 1)
+		return 1;
+	
+	return 0;
+}
+
+WRITE8_MEMBER(ppking_state::ppking_qxunk_w)
+{
+	// ...
+}
+
 MACHINE_RESET_MEMBER(ppking_state, ppking)
 {
 	m_data1 = m_data2 = 0;
@@ -625,10 +635,11 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ppking_cpu1_io, AS_IO, 8, ppking_state )
 //  ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xc000, 0xc000) AM_WRITE(spritebuffer_w)
-	AM_RANGE(0xc004, 0xc004) AM_NOP // WRITE(ppking_irq_patch_w)
+	AM_RANGE(0xc000, 0xc007) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
+//	AM_RANGE(0xc004, 0xc004) AM_NOP // WRITE(ppking_irq_patch_w)
 	AM_RANGE(0xc09e, 0xc09f) AM_READ(ppking_qx0_r) AM_WRITE(ppking_qx0_w)
 	AM_RANGE(0xc0bf, 0xc0bf) AM_NOP
+	AM_RANGE(0xc0c0, 0xc0c1) AM_READ(ppking_qxunk_r) AM_WRITE(ppking_qxunk_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ppking_cpu2_io, AS_IO, 8, ppking_state )
@@ -735,6 +746,7 @@ static INPUT_PORTS_START( ppking )
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_UNUSED )
 	
+	// cabinet (upright/cocktail) & coinage, not currently working (see above)
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x01, 0x00, "DSW2" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
@@ -938,6 +950,14 @@ static MACHINE_CONFIG_START( ppking )
 	MCFG_MACHINE_RESET_OVERRIDE(ppking_state, ppking)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
+	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 5L on main board
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(ppking_state, spritebuffer_w))
+//	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(gladiatr_state, spritebank_w))
+//	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(MEMBANK("bank1"))
+//	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(INPUTLINE("sub", INPUT_LINE_RESET)) // shadowed by aforementioned hack
+//  Q6 used
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(ppking_state, flipscreen_w))
+	
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -958,6 +978,7 @@ static MACHINE_CONFIG_START( ppking )
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/8) /* verified on pcb */
+	MCFG_YM2203_IRQ_HANDLER(WRITELINE(gladiatr_state_base, gladiator_ym_irq))
 	MCFG_AY8910_PORT_A_READ_CB(READ8(ppking_state, ppking_f1_r))
 	MCFG_AY8910_PORT_B_READ_CB(READ8(ppking_state, ppking_f1_r))
 	MCFG_SOUND_ROUTE(0, "mono", 0.60)
@@ -1048,7 +1069,7 @@ static MACHINE_CONFIG_START( gladiatr )
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/8) /* verified on pcb */
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(gladiatr_state, gladiator_ym_irq))
+	MCFG_YM2203_IRQ_HANDLER(WRITELINE(gladiatr_state_base, gladiator_ym_irq))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW3")) /* port B read */
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(gladiatr_state, gladiator_int_control_w)) /* port A write */
 	MCFG_SOUND_ROUTE(0, "mono", 0.60)
