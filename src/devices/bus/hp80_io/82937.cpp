@@ -26,34 +26,34 @@
 
 // Bit manipulation
 namespace {
-	static constexpr unsigned BIT_MASK(unsigned n)
+	template<typename T> constexpr T BIT_MASK(unsigned n)
 	{
-		return 1U << n;
+		return (T)1U << n;
 	}
 
 	template<typename T> void BIT_SET(T& w , unsigned n)
 	{
-		w |= (T)BIT_MASK(n);
+		w |= BIT_MASK<T>(n);
 	}
 }
 
 // Bits in U3 (m_latch)
-static constexpr unsigned LATCH_CA_BIT = 5; // Controller Active
-static constexpr unsigned LATCH_TA_BIT = 4; // Talker Active
-static constexpr unsigned LATCH_EN_IFC_INT_BIT = 3; // Enable IFC interrupt
-static constexpr unsigned LATCH_EN_REN_INT_BIT = 2; // Enable REN interrupt
-static constexpr unsigned LATCH_EN_ATN_INT_BIT = 1; // Enable ATN interrupt
-static constexpr unsigned LATCH_EN_NDAC_BIT = 0;    // Enable NDAC
+constexpr unsigned LATCH_CA_BIT = 5; // Controller Active
+constexpr unsigned LATCH_TA_BIT = 4; // Talker Active
+constexpr unsigned LATCH_EN_IFC_INT_BIT = 3; // Enable IFC interrupt
+constexpr unsigned LATCH_EN_REN_INT_BIT = 2; // Enable REN interrupt
+constexpr unsigned LATCH_EN_ATN_INT_BIT = 1; // Enable ATN interrupt
+constexpr unsigned LATCH_EN_NDAC_BIT = 0;    // Enable NDAC
 
 // Bits on P1 port of 8049
-static constexpr unsigned P1_IFC_BIT = 7;
-static constexpr unsigned P1_REN_BIT = 6;
-static constexpr unsigned P1_SRQ_BIT = 5;
-static constexpr unsigned P1_ATN_BIT = 4;
-static constexpr unsigned P1_EOI_BIT = 3;
-static constexpr unsigned P1_DAV_BIT = 2;
-static constexpr unsigned P1_NDAC_BIT = 1;
-static constexpr unsigned P1_NRFD_BIT = 0;
+constexpr unsigned P1_IFC_BIT = 7;
+constexpr unsigned P1_REN_BIT = 6;
+constexpr unsigned P1_SRQ_BIT = 5;
+constexpr unsigned P1_ATN_BIT = 4;
+constexpr unsigned P1_EOI_BIT = 3;
+constexpr unsigned P1_DAV_BIT = 2;
+constexpr unsigned P1_NDAC_BIT = 1;
+constexpr unsigned P1_NRFD_BIT = 0;
 
 hp82937_io_card_device::hp82937_io_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: hp80_io_card_device(mconfig , HP82937_IO_CARD , tag , owner , clock),
