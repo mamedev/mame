@@ -239,9 +239,6 @@ void micro3d_state::device_timer(emu_timer &timer, device_timer_id id, int param
 	case TIMER_MAC_DONE:
 		mac_done_callback(ptr, param);
 		break;
-	case TIMER_ADC_DONE:
-		adc_done_callback(ptr, param);
-		break;
 	default:
 		assert_always(false, "Unknown id in micro3d_state::device_timer");
 	}
@@ -483,36 +480,9 @@ READ16_MEMBER(micro3d_state::micro3d_encoder_l_r)
 	return ((y_encoder & 0xff) << 8) | (x_encoder & 0xff);
 }
 
-TIMER_CALLBACK_MEMBER(micro3d_state::adc_done_callback)
+READ8_MEMBER( micro3d_state::adc_volume_r )
 {
-	switch (param)
-	{
-		case 0: m_adc_val = m_throttle.read_safe(0);
-				break;
-		case 1: m_adc_val = (uint8_t)((255.0/100.0) * m_volume->read() + 0.5);
-				break;
-		case 2: break;
-		case 3: break;
-	}
-
-//  mc68901_int_gen(machine(), GPIP3);
-}
-
-READ16_MEMBER(micro3d_state::micro3d_adc_r)
-{
-	return m_adc_val;
-}
-
-WRITE16_MEMBER(micro3d_state::micro3d_adc_w)
-{
-	/* Only handle single-ended mode */
-	if (data < 4 || data > 7)
-	{
-		logerror("ADC0844 unhandled MUX mode: %x\n", data);
-		return;
-	}
-
-	timer_set(attotime::from_usec(40), TIMER_ADC_DONE, data & ~4);
+	return (uint8_t)((255.0/100.0) * m_volume->read() + 0.5);
 }
 
 CUSTOM_INPUT_MEMBER(micro3d_state::botss_hwchk_r)
