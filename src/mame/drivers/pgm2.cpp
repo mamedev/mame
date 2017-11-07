@@ -49,6 +49,135 @@
 #include "screen.h"
 #include "speaker.h"
 #include "machine/nvram.h"
+#include "machine/timer.h"
+
+// see http://sam7-ex256.narod.ru/include/HTML/AT91SAM7X256_AIC.html
+DECLARE_DEVICE_TYPE(ARM_AIC, arm_aic_device)
+
+#define MCFG_ARM_AIC_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, ARM_AIC, 0)
+
+#define MCFG_IRQ_LINE_CB(_devcb) \
+	devcb = &arm_aic_device::set_line_callback(*device, DEVCB_##_devcb);
+
+class arm_aic_device : public device_t
+{
+public:
+	// construction/destruction
+	arm_aic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+		device_t(mconfig, ARM_AIC, tag, owner, clock),
+		m_irq_out(*this)
+	{ 
+	}
+
+	// configuration
+	template <class Object> static devcb_base &set_line_callback(device_t &device, Object &&cb) { return downcast<arm_aic_device &>(device).m_irq_out.set_callback(std::forward<Object>(cb)); }
+
+	DECLARE_ADDRESS_MAP(regs_map, 32);
+
+	DECLARE_READ32_MEMBER(irq_vector_r);
+	DECLARE_READ32_MEMBER(firq_vector_r);
+
+	// can't use AM_RAM and AM_SHARE in device submaps
+	DECLARE_READ32_MEMBER(aic_smr_r) { return m_aic_smr[offset]; };
+	DECLARE_READ32_MEMBER(aic_svr_r) { return m_aic_svr[offset]; };
+	DECLARE_WRITE32_MEMBER(aic_smr_w) { COMBINE_DATA(&m_aic_smr[offset]); };
+	DECLARE_WRITE32_MEMBER(aic_svr_w) { COMBINE_DATA(&m_aic_svr[offset]); };
+
+	DECLARE_WRITE32_MEMBER(aic_iecr_w) { /*logerror("%s: aic_iecr_w  %08x (Interrupt Enable Command Register)\n", machine().describe_context().c_str(), data);*/ COMBINE_DATA(&m_irqs_enabled); };
+	DECLARE_WRITE32_MEMBER(aic_idcr_w) { /*logerror("%s: aic_idcr_w  %08x (Interrupt Disable Command Register)\n", machine().describe_context().c_str(), data);*/ };
+	DECLARE_WRITE32_MEMBER(aic_iccr_w);
+	DECLARE_WRITE32_MEMBER(aic_eoicr_w){ /*logerror("%s: aic_eoicr_w (End of Interrupt Command Register)\n", machine().describe_context().c_str());*/ }; // value doesn't matter
+
+	void set_irq(int identity);
+
+protected:
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	
+	uint32_t m_irqs_enabled;
+	uint32_t m_current_irq_vector;
+	uint32_t m_current_firq_vector;
+
+	devcb_write_line    m_irq_out;
+
+private:
+	uint32_t m_aic_smr[32];
+	uint32_t m_aic_svr[32];
+};
+
+DEFINE_DEVICE_TYPE(ARM_AIC, arm_aic_device, "arm_aic", "ARM Advanced Interrupt Controller")
+
+DEVICE_ADDRESS_MAP_START( regs_map, 32, arm_aic_device )
+	AM_RANGE(0x000, 0x07f) AM_READWRITE(aic_smr_r, aic_smr_w) // AIC_SMR[32] (AIC_SMR)	Source Mode Register
+	AM_RANGE(0x080, 0x0ff) AM_READWRITE(aic_svr_r, aic_svr_w) // AIC_SVR[32] (AIC_SVR)	Source Vector Register
+	AM_RANGE(0x100, 0x103) AM_READ(irq_vector_r)      // AIC_IVR	IRQ Vector Register
+	AM_RANGE(0x104, 0x107) AM_READ(firq_vector_r)     // AIC_FVR	FIQ Vector Register
+// 0x108	AIC_ISR	Interrupt Status Register
+// 0x10C	AIC_IPR	Interrupt Pending Register
+// 0x110	AIC_IMR	Interrupt Mask Register
+// 0x114	AIC_CISR	Core Interrupt Status Register
+	AM_RANGE(0x120, 0x123) AM_WRITE(aic_iecr_w) // 0x120	AIC_IECR	Interrupt Enable Command Register
+	AM_RANGE(0x124, 0x127) AM_WRITE(aic_idcr_w) // 0x124	AIC_IDCR	Interrupt Disable Command Register
+	AM_RANGE(0x128, 0x12b) AM_WRITE(aic_iccr_w) // 0x128	AIC_ICCR	Interrupt Clear Command Register
+// 0x12C	AIC_ISCR	Interrupt Set Command Register
+	AM_RANGE(0x130, 0x133) AM_WRITE(aic_eoicr_w) // 0x130	AIC_EOICR	End of Interrupt Command Register
+// 0x134	AIC_SPU	Spurious Vector Register
+// 0x138	AIC_DCR	Debug Control Register (Protect)
+// 0x140	AIC_FFER	Fast Forcing Enable Register
+// 0x144	AIC_FFDR	Fast Forcing Disable Register
+// 0x148	AIC_FFSR	Fast Forcing Status Register
+ADDRESS_MAP_END
+
+
+READ32_MEMBER(arm_aic_device::irq_vector_r)
+{
+	return m_current_irq_vector;
+}
+
+READ32_MEMBER(arm_aic_device::firq_vector_r)
+{
+	return m_current_firq_vector;
+}
+
+void arm_aic_device::device_start()
+{
+	m_irq_out.resolve_safe();
+}
+
+void arm_aic_device::device_reset()
+{
+	m_irqs_enabled = 0;
+	m_current_irq_vector = 0;
+	m_current_firq_vector = 0;
+
+	for(auto & elem : m_aic_smr) { elem = 0; }
+	for(auto & elem : m_aic_svr) { elem = 0; }
+}
+
+void arm_aic_device::set_irq(int identity)
+{
+	for (int i = 0;i < 32;i++)
+	{
+		if (m_aic_smr[i] == identity)
+		{
+			if ((m_irqs_enabled >> i) & 1)
+			{
+				m_current_irq_vector = m_aic_svr[i];
+				m_irq_out(ASSERT_LINE);
+				return;
+			}
+		}
+	}
+}
+
+WRITE32_MEMBER(arm_aic_device::aic_iccr_w)
+{
+	//logerror("%s: aic_iccr_w  %08x (Interrupt Clear Command Register)\n", machine().describe_context().c_str(), data);
+	m_irq_out(CLEAR_LINE);
+};
+
+
 
 class pgm2_state : public driver_device
 {
@@ -57,10 +186,16 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_fg_videoram(*this, "fg_videoram"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_bg_videoram(*this, "bg_videoram"),
+		m_sp_videoram(*this, "sp_videoram"),
+		m_gfxdecode2(*this, "gfxdecode2"),
+		m_gfxdecode3(*this, "gfxdecode3"),
+		m_arm_aic(*this, "arm_aic")
+	{ }
 
 	DECLARE_READ32_MEMBER(unk_startup_r);
 	DECLARE_WRITE32_MEMBER(fg_videoram_w);
+	DECLARE_WRITE32_MEMBER(bg_videoram_w);
 
 	DECLARE_DRIVER_INIT(kov2nl);
 	DECLARE_DRIVER_INIT(orleg2);
@@ -70,8 +205,18 @@ public:
 	DECLARE_DRIVER_INIT(kov3_102);
 	DECLARE_DRIVER_INIT(kov3_100);
 
-	uint32_t screen_update_pgm2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_READ32_MEMBER(pgm2_3660000_r) { return 0xffffffff; }
+	DECLARE_READ32_MEMBER(pgm2_3680000_r) { return 0xffffffff; }
+	DECLARE_READ32_MEMBER(pgm2_3900000_r) { return 0xffffffff; }
+	DECLARE_READ32_MEMBER(pgm2_3a00000_r) { return 0xffffffff; }
+
+	void draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_pgm2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_pgm2);
+	DECLARE_WRITE_LINE_MEMBER(irq);
+
+	INTERRUPT_GEN_MEMBER(igs_interrupt);
+	TIMER_DEVICE_CALLBACK_MEMBER(igs_interrupt2);
 
 private:
 	virtual void machine_start() override;
@@ -79,57 +224,459 @@ private:
 	virtual void video_start() override;
 
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
 	void pgm_create_dummy_internal_arm_region();
 	void decrypt_kov3_module(uint32_t addrxor, uint16_t dataxor);
 
-// devices
+	tilemap_t    *m_fg_tilemap;
+	tilemap_t    *m_bg_tilemap;
+
+	// devices
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint32_t> m_fg_videoram;
-	tilemap_t    *m_fg_tilemap;
-	required_device<gfxdecode_device> m_gfxdecode;
+	required_shared_ptr<uint32_t> m_bg_videoram;
+	required_shared_ptr<uint32_t> m_sp_videoram;
+	required_device<gfxdecode_device> m_gfxdecode2;
+	required_device<gfxdecode_device> m_gfxdecode3;
+	required_device<arm_aic_device> m_arm_aic;
 };
+
 
 // checked on startup, or doesn't boot
 READ32_MEMBER(pgm2_state::unk_startup_r)
 {
+	printf("%s: unk_startup_r\n", machine().describe_context().c_str());
 	return 0xffffffff;
 }
+
+
+
+INTERRUPT_GEN_MEMBER(pgm2_state::igs_interrupt)
+{
+	m_arm_aic->set_irq(0x47);
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(pgm2_state::igs_interrupt2)
+{
+	int scanline = param;
+
+	if(scanline == 0)
+		 m_arm_aic->set_irq(0x46);
+}
+
+
 
 static ADDRESS_MAP_START( pgm2_map, AS_PROGRAM, 32, pgm2_state )
 	AM_RANGE(0x00000000, 0x00003fff) AM_ROM //AM_REGION("user1", 0x00000) // internal ROM
 
 	AM_RANGE(0x02000000, 0x0200ffff) AM_RAM AM_SHARE("sram") // 'battery ram'
+	
+	AM_RANGE(0x03600000, 0x03600003) AM_WRITENOP
+	AM_RANGE(0x03620000, 0x03620003) AM_WRITENOP
+	AM_RANGE(0x03640000, 0x03640003) AM_WRITENOP
+	AM_RANGE(0x03660000, 0x03660003) AM_READ_PORT("UNK1")
+	AM_RANGE(0x03680000, 0x03680003) AM_READ_PORT("UNK2")
+	AM_RANGE(0x036a0000, 0x036a0003) AM_WRITENOP
+
+	AM_RANGE(0x03900000, 0x03900003) AM_READ_PORT("INPUTS0")
+	AM_RANGE(0x03a00000, 0x03a00003) AM_READ_PORT("INPUTS1")
 
 	AM_RANGE(0x10000000, 0x107fffff) AM_ROM AM_REGION("user1", 0) // external ROM
 	AM_RANGE(0x20000000, 0x207fffff) AM_RAM
 
-	AM_RANGE(0x30020000, 0x30021fff) AM_RAM // bg ram?
+	AM_RANGE(0x30000000, 0x30000fff) AM_RAM AM_SHARE("sp_videoram") // spriteram (size unknown, never read, only written)
+
+	AM_RANGE(0x30020000, 0x30021fff) AM_RAM_WRITE(bg_videoram_w) AM_SHARE("bg_videoram")
 	AM_RANGE(0x30040000, 0x30045fff) AM_RAM_WRITE(fg_videoram_w) AM_SHARE("fg_videoram")
 
-	// these are written straight after fg_videoram writes might be DMA triggers?
-	//AM_RANGE(0x300a0004, 0x300a0007) AM_WRITE() // [:maincpu] ':maincpu' (00002C34): unmapped program memory write to 300A0004 = 00FFFFFF & FFFFFFFF
-	//AM_RANGE(0x300a003c, 0x300a003f) AM_WRITE() // [:maincpu] ':maincpu' (00002C3C): unmapped program memory write to 300A003C = 00000000 & FFFFFFFF
+	AM_RANGE(0x30060000, 0x30063fff) AM_RAM_DEVWRITE("sp_palette", palette_device, write) AM_SHARE("sp_palette")
 
-	// internal to IGS036?
+	AM_RANGE(0x30080000, 0x30081fff) AM_RAM_DEVWRITE("bg_palette", palette_device, write) AM_SHARE("bg_palette") 
+
+	AM_RANGE(0x300a0000, 0x300a07ff) AM_RAM_DEVWRITE("tx_palette", palette_device, write) AM_SHARE("tx_palette") 
+
+	AM_RANGE(0x300c0000, 0x300c01ff) AM_RAM // zoom table?
+	AM_RANGE(0x300e0000, 0x300e03bf) AM_RAM
+
+	AM_RANGE(0x30100000, 0x301000ff) AM_RAM // maybe linescroll?
+
+	AM_RANGE(0x30120000, 0x3012003f) AM_RAM // scroll etc.?
+
+	AM_RANGE(0x40000000, 0x40000003) AM_READNOP AM_WRITENOP // sound?
+	
+	// internal to IGS036? - various other writes down here on startup too
 	AM_RANGE(0xffffec00, 0xffffec5f) AM_RAM // other encryption data?
 	AM_RANGE(0xfffffc00, 0xfffffcff) AM_RAM // encryption table (see code at 3950)
+
+	AM_RANGE(0xfffff000, 0xfffff14b) AM_DEVICE("arm_aic", arm_aic_device, regs_map)
+
+	AM_RANGE(0xfffff430, 0xfffff433) AM_WRITENOP // often
+	AM_RANGE(0xfffff434, 0xfffff437) AM_WRITENOP // often
+
+	AM_RANGE(0xfffffd28, 0xfffffd2b) AM_READNOP // often
 
 //	AM_RANGE(0xfffffa08, 0xfffffa0b) AM_WRITE(table_done_w) // after uploading encryption? table might actually send it or enable external ROM?
 	AM_RANGE(0xfffffa0c, 0xfffffa0f) AM_READ(unk_startup_r)
 ADDRESS_MAP_END
 
+
+
+
 static INPUT_PORTS_START( pgm2 )
+// probably not inputs
+	PORT_START("UNK1")
+	PORT_DIPNAME( 0x0001, 0x0001, "100" )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0100, 0x0100, "101" )
+	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x00010000, 0x00010000, "110" )
+	PORT_DIPSETTING(      0x00010000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x00000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x00020000, 0x00020000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x00020000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x00000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x00040000, 0x00040000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x00040000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x00000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x00080000, 0x00080000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x00080000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x00000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x00100000, 0x00100000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x00100000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x00000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x00200000, 0x00200000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x00200000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x00000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x00400000, 0x00400000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x00400000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x00000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x00800000, 0x00800000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x00800000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x00000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x01000000, 0x01000000, "111" )
+	PORT_DIPSETTING(      0x01000000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x00000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02000000, 0x02000000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x02000000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x00000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04000000, 0x04000000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x04000000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x00000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08000000, 0x08000000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x08000000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x00000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10000000, 0x10000000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x10000000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x00000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20000000, 0x20000000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x20000000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x00000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40000000, 0x40000000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x40000000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x00000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80000000, 0x80000000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x80000000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x00000000, DEF_STR( On ) )
+
+// probably not inputs
+	PORT_START("UNK2")
+	PORT_DIPNAME( 0x0001, 0x0001, "200" )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0100, 0x0100, "201" )
+	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x00010000, 0x00010000, "210" )
+	PORT_DIPSETTING(      0x00010000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x00000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x00020000, 0x00020000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x00020000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x00000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x00040000, 0x00040000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x00040000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x00000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x00080000, 0x00080000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x00080000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x00000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x00100000, 0x00100000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x00100000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x00000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x00200000, 0x00200000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x00200000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x00000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x00400000, 0x00400000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x00400000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x00000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x00800000, 0x00800000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x00800000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x00000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x01000000, 0x01000000, "211" )
+	PORT_DIPSETTING(      0x01000000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x00000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02000000, 0x02000000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x02000000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x00000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04000000, 0x04000000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x04000000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x00000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08000000, 0x08000000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x08000000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x00000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10000000, 0x10000000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x10000000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x00000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20000000, 0x20000000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x20000000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x00000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40000000, 0x40000000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x40000000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x00000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80000000, 0x80000000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x80000000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x00000000, DEF_STR( On ) )
+
+	PORT_START("INPUTS0")
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
+	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
+	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
+	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
+	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
+	PORT_BIT( 0x00000800, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
+	PORT_BIT( 0x00001000, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
+	PORT_BIT( 0x00002000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
+	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
+	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(3)
+	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(3)
+	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(3)
+	PORT_BIT( 0x00800000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(3)
+	PORT_BIT( 0x01000000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
+	PORT_BIT( 0x02000000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
+	PORT_BIT( 0x04000000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(3)
+	PORT_BIT( 0x08000000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(3)
+	PORT_BIT( 0x10000000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20000000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80000000, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("INPUTS1")
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(4)
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(4)
+	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(4)
+	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(4)
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4)
+	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4)
+	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(4)
+	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(4)
+	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x00000800, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x00001000, IP_ACTIVE_LOW, IPT_START3 )
+	PORT_BIT( 0x00002000, IP_ACTIVE_LOW, IPT_START4 )
+	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_COIN3 )
+	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_COIN4 )
+	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_SERVICE1 ) // test key p1+p2
+	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_UNUSED ) // should be test key p3+p4 but doesn't work in test mode?
+	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_SERVICE3 ) // service key p1+p2
+	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_SERVICE2 ) // service key p3+p4
+	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x00800000, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_SERVICE( 0x01000000, IP_ACTIVE_LOW ) PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x02000000, 0x02000000, "Music" )  PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(          0x00000000, DEF_STR( Off ) )
+	PORT_DIPSETTING(          0x02000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04000000, 0x04000000, "Voice" )  PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(          0x00000000, DEF_STR( Off ) )
+	PORT_DIPSETTING(          0x04000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08000000, 0x08000000, "Free" )  PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(          0x08000000, DEF_STR( Off ) )
+	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10000000, 0x10000000, "Stop" )  PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(          0x10000000, DEF_STR( Off ) )
+	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20000000, 0x20000000, DEF_STR( Unused ) )  PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(          0x20000000, DEF_STR( Off ) )
+	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40000000, 0x40000000, DEF_STR( Unused ) )  PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(          0x40000000, DEF_STR( Off ) )
+	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80000000, 0x80000000, DEF_STR( Unused ) )  PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(          0x80000000, DEF_STR( Off ) )
+	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
 INPUT_PORTS_END
 
-uint32_t pgm2_state::screen_update_pgm2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+
+
+
+void pgm2_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	int endoflist = -1;
+
+//	printf("frame\n");
+
+	for (int i = 0;i < 0x1000 / 4;i++)
+	{
+		if (m_sp_videoram[i] == 0x80000000)
+		{
+			endoflist = i;
+			i = 0x1000;
+		}
+	}
+
+	if (endoflist != -1)
+	{
+
+		uint32_t* dstptr_bitmap;
+
+		for (int i = 0; i < endoflist-2; i += 4)
+		{
+		//	printf("sprite with %08x %08x %08x %08x\n", m_sp_videoram[i + 0], m_sp_videoram[i + 1], m_sp_videoram[i + 2], m_sp_videoram[i + 3]);
+		
+			int x = (m_sp_videoram[i + 0] >> 0) & 0x7ff;
+			int y = (m_sp_videoram[i + 0] >> 11) & 0x7ff;
+
+			for (int ydraw = 0; ydraw < 16;ydraw++)
+			{
+				int realy = ydraw + y;
+
+				for (int xdraw = 0; xdraw < 16;xdraw++)
+				{
+					int realx = xdraw + x;
+
+					if (cliprect.contains(realx, realy))
+					{
+						dstptr_bitmap = &bitmap.pix32(realy);
+
+						dstptr_bitmap[realx] = rand();
+					}
+
+				}
+			}
+		}
+
+	}
+
+}
+
+uint32_t pgm2_state::screen_update_pgm2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+
+	draw_sprites(screen, bitmap, cliprect);
 	return 0;
 }
 
 WRITE_LINE_MEMBER(pgm2_state::screen_vblank_pgm2)
 {
+}
+
+WRITE_LINE_MEMBER(pgm2_state::irq)
+{
+//	printf("irq\n");
+	if (state == ASSERT_LINE) m_maincpu->set_input_line(ARM7_IRQ_LINE, ASSERT_LINE);
+	else m_maincpu->set_input_line(ARM7_IRQ_LINE, CLEAR_LINE);
+
 }
 
 WRITE32_MEMBER(pgm2_state::fg_videoram_w)
@@ -141,12 +688,30 @@ WRITE32_MEMBER(pgm2_state::fg_videoram_w)
 TILE_GET_INFO_MEMBER(pgm2_state::get_fg_tile_info)
 {
 	int tileno = m_fg_videoram[tile_index];
-	SET_TILE_INFO_MEMBER(0, tileno, 1, 0);
+	int attr = (tileno & 0xfffc0000) >> 18;
+	tileno &= 0x0003ffff;
+	SET_TILE_INFO_MEMBER(0, tileno, attr, 0);
+}
+
+
+WRITE32_MEMBER(pgm2_state::bg_videoram_w)
+{
+	COMBINE_DATA(&m_bg_videoram[offset]);
+	m_bg_tilemap->mark_tile_dirty(offset);
+}
+
+TILE_GET_INFO_MEMBER(pgm2_state::get_bg_tile_info)
+{
+	int tileno = m_bg_videoram[tile_index];
+	int attr = (tileno & 0xfffc0000) >> 18;
+	tileno &= 0x0000ffff;
+	SET_TILE_INFO_MEMBER(0, tileno, attr, 0);
 }
 
 void pgm2_state::video_start()
 {
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(pgm2_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 96, 48); // 0x4800 bytes
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode2, tilemap_get_info_delegate(FUNC(pgm2_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 96, 48); // 0x4800 bytes
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode3, tilemap_get_info_delegate(FUNC(pgm2_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 32, 32, 64, 32); // 0x2000 bytes
 }
 
 void pgm2_state::machine_start()
@@ -168,49 +733,29 @@ static const gfx_layout tiles8x8_layout =
 	32*8
 };
 
-/* slightly odd decode, and ends up with multiple letters in a single 32x32 tile, can probably specify corners, or needs an address line swap before decode */
-/* actually 7bpp? roms report fixed bits, but should be good dumps */
 static const gfx_layout tiles32x32x8_layout =
 {
 	32,32,
 	RGN_FRAC(1,1),
-	8,
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 2*8, 1*8, 3*8, 4*8, 6*8, 5*8, 7*8, 8*8, 10*8, 9*8, 11*8, 12*8, 14*8, 13*8, 15*8,
-		16*8, 18*8, 17*8, 19*8, 20*8, 22*8, 21*8, 23*8, 24*8, 26*8, 25*8, 27*8, 28*8, 30*8, 29*8, 31*8 },
+	7,
+	{ 1, 2, 3, 4, 5, 6, 7 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8,
+		16*8, 17*8, 18*8, 19*8, 20*8, 21*8, 22*8, 23*8, 24*8, 25*8, 26*8, 27*8, 28*8, 29*8, 30*8, 31*8 },
 	{ 0*256, 1*256, 2*256, 3*256, 4*256, 5*256, 6*256, 7*256, 8*256, 9*256, 10*256, 11*256, 12*256, 13*256, 14*256, 15*256,
 		16*256, 17*256, 18*256, 19*256, 20*256, 21*256, 22*256, 23*256, 24*256, 25*256, 26*256, 27*256, 28*256, 29*256, 30*256, 31*256
 	},
 	256*32
 };
 
-#if 0
-/* sprites aren't tile based, this is variable width 1bpp data, colour data is almost certainly in sprites b */
-/* there don't seem to be any indexes into the colour data, probably provided by the program, or the colour data references the bitmaps (reverse of PGM) */
-static const gfx_layout tiles32x8x1_layout =
-{
-	32,8,
-	RGN_FRAC(1,1),
-	1,
-	{ 0 },
-	{ 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31 },
-	{ 0*32,1*32,2*32,3*32,4*32,5*32,6*32,7*32 },
-	8*32
-};
-#endif
 
 
-
-static GFXDECODE_START( pgm2 )
+static GFXDECODE_START( pgm2_tx )
 	GFXDECODE_ENTRY( "tiles", 0, tiles8x8_layout, 0, 16 )
-	GFXDECODE_ENTRY( "bgtile", 0, tiles32x32x8_layout, 0, 16 )
-#if 0
-	// not tile based
-	GFXDECODE_ENTRY( "spritesa", 0, tiles32x8x1_layout, 0, 16 )
-	GFXDECODE_ENTRY( "spritesb", 0, tiles32x8x1_layout, 0, 16 )
-#endif
 GFXDECODE_END
 
+static GFXDECODE_START( pgm2_bg )
+	GFXDECODE_ENTRY( "bgtile", 0, tiles32x32x8_layout, 0, 0x2000/4/0x80 )
+GFXDECODE_END
 
 
 void pgm2_state::pgm_create_dummy_internal_arm_region()
@@ -299,6 +844,13 @@ static MACHINE_CONFIG_START( pgm2 )
 	MCFG_CPU_ADD("maincpu", IGS036, 20000000) // ?? ARM based CPU, has internal ROM.
 	MCFG_CPU_PROGRAM_MAP(pgm2_map)
 
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", pgm2_state,  igs_interrupt)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", pgm2_state, igs_interrupt2, "screen", 0, 1)
+
+
+	MCFG_ARM_AIC_ADD("arm_aic")
+	MCFG_IRQ_LINE_CB(WRITELINE(pgm2_state, irq))
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -307,10 +859,21 @@ static MACHINE_CONFIG_START( pgm2 )
 	MCFG_SCREEN_VISIBLE_AREA(0, 448-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(pgm2_state, screen_update_pgm2)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(pgm2_state, screen_vblank_pgm2))
-	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pgm2)
-	MCFG_PALETTE_ADD("palette", 0x1000)
+
+	MCFG_GFXDECODE_ADD("gfxdecode2", "tx_palette", pgm2_tx)
+	
+	MCFG_GFXDECODE_ADD("gfxdecode3", "bg_palette", pgm2_bg)
+
+	MCFG_PALETTE_ADD("sp_palette", 0x4000/4) // sprites
+	MCFG_PALETTE_FORMAT(XRGB)
+	
+	MCFG_PALETTE_ADD("tx_palette", 0x800/4) // text
+	MCFG_PALETTE_FORMAT(XRGB)
+
+	MCFG_PALETTE_ADD("bg_palette", 0x2000/4) // bg
+	MCFG_PALETTE_FORMAT(XRGB)
+
 
 	MCFG_NVRAM_ADD_0FILL("sram")
 
