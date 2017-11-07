@@ -35,6 +35,7 @@ There is a 4MHz crystal connected to the 9513.
 #include "machine/i8251.h"
 #include "machine/pic8259.h"
 #include "bus/rs232/rs232.h"
+//#include "bus/s100/s100.h"
 
 
 class seattle_comp_state : public driver_device

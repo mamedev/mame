@@ -200,15 +200,15 @@ void wd_fdc_device_base::set_floppy(floppy_image_device *_floppy)
 		ready_callback(floppy, next_ready);
 }
 
-void wd_fdc_device_base::dden_w(bool _dden)
+WRITE_LINE_MEMBER(wd_fdc_device_base::dden_w)
 {
 	if(disable_mfm) {
 		logerror("Error, this chip does not have a dden line\n");
 		return;
 	}
 
-	if(dden != _dden) {
-		dden = _dden;
+	if(dden != bool(state)) {
+		dden = bool(state);
 		if (TRACE_LINES) logerror("select %s\n", dden ? "fm" : "mfm");
 	}
 }
@@ -1368,27 +1368,27 @@ void wd_fdc_device_base::index_callback(floppy_image_device *floppy, int state)
 	general_continue();
 }
 
-bool wd_fdc_device_base::intrq_r()
+READ_LINE_MEMBER(wd_fdc_device_base::intrq_r)
 {
 	return intrq;
 }
 
-bool wd_fdc_device_base::drq_r()
+READ_LINE_MEMBER(wd_fdc_device_base::drq_r)
 {
 	return drq;
 }
 
-bool wd_fdc_device_base::hld_r()
+READ_LINE_MEMBER(wd_fdc_device_base::hld_r)
 {
 	return hld;
 }
 
-void wd_fdc_device_base::hlt_w(bool state)
+WRITE_LINE_MEMBER(wd_fdc_device_base::hlt_w)
 {
-	hlt = state;
+	hlt = bool(state);
 }
 
-bool wd_fdc_device_base::enp_r()
+READ_LINE_MEMBER(wd_fdc_device_base::enp_r)
 {
 	return enp;
 }

@@ -76,8 +76,8 @@ Notes:
 
     TODO:
 
-	- needs mid-instruction wait state support from Z80 core
-	- inverted A4/5/6/7 chip select
+    - needs mid-instruction wait state support from Z80 core
+    - inverted A4/5/6/7 chip select
     - copy protection device (sends sector header bytes to CPU? DDEN is serial clock? code checks for either $b6 or $f7)
 
         06F8: ld   a,$2F                    ; SEEK

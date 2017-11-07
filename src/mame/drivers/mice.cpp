@@ -13,14 +13,11 @@ Each CPU has a plugin card with various chips. The usual complement is
 
 The connection to the outside world is via RS232 to a terminal.
 
-No schematic or manuals available. This driver is guesswork.
+No schematic available. This driver is guesswork.
 
 There's a mistake in the boot rom: if the test of the 8155 or 8255 fail, it
 attempts to write a suitable message to the screen, but as the 8251 hasn't
 yet been initialised, it hangs.
-
-After successfully testing the hardware, it goes off waiting for something
-to happen, and this is why there's no output to the screen.
 
 ****************************************************************************/
 
@@ -30,7 +27,6 @@ to happen, and this is why there's no output to the screen.
 #include "machine/i8155.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
-#include "machine/clock.h"
 #include "bus/rs232/rs232.h"
 
 class mice_state : public driver_device
@@ -40,8 +36,6 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 	{ }
-
-	DECLARE_READ8_MEMBER(rpt_pc_r);
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -66,13 +60,34 @@ ADDRESS_MAP_END
 
 /* Input ports */
 static INPUT_PORTS_START( mice )
+	PORT_START("BAUD")
+	PORT_DIPNAME(0x07, 0x02, "Baud Rate") PORT_DIPLOCATION("DSW7:1,2,3")
+	PORT_DIPSETTING(0x07, "110")
+	PORT_DIPSETTING(0x06, "150")
+	PORT_DIPSETTING(0x05, "300")
+	PORT_DIPSETTING(0x04, "600")
+	PORT_DIPSETTING(0x03, "1200")
+	PORT_DIPSETTING(0x02, "2400")
+	PORT_DIPSETTING(0x01, "4800")
+	PORT_DIPSETTING(0x00, "9600")
+	PORT_DIPNAME(0x08, 0x00, "Data Bits") PORT_DIPLOCATION("DSW7:4")
+	PORT_DIPSETTING(0x00, "7")
+	PORT_DIPSETTING(0x08, "8")
+	PORT_DIPNAME(0x30, 0x30, "Parity") PORT_DIPLOCATION("DSW7:5,6")
+	PORT_DIPSETTING(0x00, DEF_STR(None))
+	PORT_DIPSETTING(0x30, "Even")
+	PORT_DIPSETTING(0x10, "Odd")
+	// "The number of stop bits is permanently set to one; and the communication is full duplex." (manual, p. 6)
 INPUT_PORTS_END
 
-// This port presumably connects to dipswitches to set the serial protocol
-READ8_MEMBER( mice_state::rpt_pc_r )
-{
-	return 0xef; // select our default rs232 settings
-}
+static DEVICE_INPUT_DEFAULTS_START( terminal )
+	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_2400 )
+	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_2400 )
+	DEVICE_INPUT_DEFAULTS( "RS232_STARTBITS", 0xff, RS232_STARTBITS_1 )
+	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_7 )
+	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_EVEN )
+	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
+DEVICE_INPUT_DEFAULTS_END
 
 
 static MACHINE_CONFIG_START( mice )
@@ -81,23 +96,24 @@ static MACHINE_CONFIG_START( mice )
 	MCFG_CPU_PROGRAM_MAP(mice_mem)
 	MCFG_CPU_IO_MAP(mice_io)
 
-	/* video hardware */
-	MCFG_DEVICE_ADD("uart_clock", CLOCK, 153600)
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("uart", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart", i8251_device, write_rxc))
-
-	MCFG_DEVICE_ADD("uart", I8251, 0)
+	MCFG_DEVICE_ADD("uart", I8251, XTAL_6_144MHz / 2)
 	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
 	MCFG_I8251_DTR_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
 	MCFG_I8251_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
+	MCFG_I8251_TXRDY_HANDLER(INPUTLINE("maincpu", I8085_RST65_LINE))
+	MCFG_I8251_RXRDY_HANDLER(INPUTLINE("maincpu", I8085_RST75_LINE))
 
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart", i8251_device, write_rxd))
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart", i8251_device, write_dsr))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart", i8251_device, write_cts))
+	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 
-	MCFG_DEVICE_ADD("rpt", I8155, 1000) // this value is the timer clock, no idea what it should be.
-	MCFG_I8155_IN_PORTC_CB(READ8(mice_state, rpt_pc_r))
+	MCFG_DEVICE_ADD("rpt", I8155, XTAL_6_144MHz / 2)
+	MCFG_I8155_IN_PORTC_CB(IOPORT("BAUD"))
+	MCFG_I8155_OUT_TIMEROUT_CB(DEVWRITELINE("uart", i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart", i8251_device, write_rxc))
+
 	MCFG_DEVICE_ADD("ppi", I8255, 0)
 MACHINE_CONFIG_END
 
@@ -127,4 +143,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME   PARENT  COMPAT   MACHINE   INPUT  CLASS       INIT  COMPANY                       FULLNAME  FLAGS
-COMP( 1981, mice,  0,      0,       mice,     mice,  mice_state, 0,    "Microtek International Inc", "Mice",   MACHINE_IS_SKELETON )
+COMP( 1981, mice,  0,      0,       mice,     mice,  mice_state, 0,    "Microtek International Inc", "Mice",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

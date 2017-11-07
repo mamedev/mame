@@ -2245,13 +2245,24 @@ enum
 
 oso_device::oso_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	bus::hexbus::hexbus_chained_device(mconfig, TI99_OSO, tag, owner, clock),
+	m_int(*this),
 	m_data(0),
 	m_status(0xff),
 	m_control(0),
-	m_xmit(0),
+	m_xmit(0), m_lasthxvalue(0x01),
 	m_clkcount(0),
-	m_xmit_send(0)
+	m_sbav(false), m_sbavold(true),
+	m_bav(false), m_bavhold(false),
+	m_shsk(false), m_shskold(true),
+	m_hsk(false), m_hskhold(false),
+	m_wq1(false), m_wq1old(true), m_wq2(false), m_wq2old(true),
+	m_wnp(false),
+	m_wbusy(false), m_wbusyold(false),
+	m_sendbyte(false),
+	m_wrst(false), m_counting(false),
+	m_rq2(false), m_rq2old(true)
 {
+	(void)m_shskold;
 	m_hexbus_inbound = nullptr;
 	m_hexbus_outbound = nullptr;
 }
@@ -2270,7 +2281,11 @@ READ8_MEMBER( oso_device::read )
 	case 1:
 		// read 5FFA: read status register
 		value = m_status;
-		if (TRACE_OSO) logerror("Read status %02x\n", value);
+		clear_int_status();
+		if (TRACE_OSO) logerror("Read status %02x (HSKWT=%d,HSKRD=%d,BAVIAS=%d,BAVAIS=%d,SBAV=%d,WBUSY=%d,RBUSY=%d,SHSK=%d)\n", value,
+			(value&HSKWT)? 1:0, (value&HSKRD)? 1:0, (value&BAVIAS)? 1:0,
+			(value&BAVAIS)? 1:0, (value&SBAV)? 1:0, (value&WBUSY)? 1:0,
+			(value&RBUSY)? 1:0,(value&SHSK)? 1:0);
 		break;
 	case 2:
 		// read 5FFC: read control register
@@ -2294,20 +2309,42 @@ WRITE8_MEMBER( oso_device::write )
 	case 0:
 		// write 5FF8: write transmit register
 		if (TRACE_OSO) logerror("Write transmit register %02x\n", data);
+
+		// trigger some actions in the write subsystem
+		m_sendbyte = true;
+		if (!m_wq1)
+		{
+			m_wbusy = true;
+			m_wbusyold = true;
+			set_status(WBUSY, m_wbusy);
+		}
+
 		m_xmit = data;
-		m_xmit_send = 2;
-		m_status |= HSKWT;
 		break;
 	case 1:
 		// write 5FFA: write control register
-		if (TRACE_OSO) logerror("Write control register %02x\n", data);
+		if (TRACE_OSO) logerror("Write control register %02x (WIEN=%d, RIEN=%d, BAVIAEN=%d, BAVAIEN=%d, BAVC=%d, WEN=%d, REN=%d)\n",
+			data, (data & WIEN)? 1:0, (data & RIEN)? 1:0, (data&BAVIAEN)? 1:0, (data&BAVAIEN)? 1:0,
+			(data & BAVC)? 1:0, (data & WEN)? 1:0, (data & REN)? 1:0);
 		m_control = data;
+		if (!control_bit(WEN))
+		{
+			// Reset some flipflops in the write timing section
+			m_wq1 = m_wq2 = m_wrst = false;
+		}
+		m_bav = control_bit(BAVC);
 		break;
 	default:
 		// write 5FFC, 5FFE: undefined
 		if (TRACE_OSO) logerror("Invalid write on %04x: %02x\n", (offset<<1) | 0x5ff0, data);
 		break;
 	}
+}
+
+void oso_device::clear_int_status()
+{
+	m_status &= ~(HSKWT | HSKRD | BAVIAS | BAVAIS);
+	m_int(CLEAR_LINE);
 }
 
 void oso_device::hexbus_value_changed(uint8_t data)
@@ -2320,27 +2357,184 @@ void oso_device::hexbus_value_changed(uint8_t data)
 */
 WRITE_LINE_MEMBER( oso_device::clock_in )
 {
-	if (state==ASSERT_LINE) m_clkcount++;
-	if (m_clkcount > 30 && ((m_control & WEN)!=0) && (m_xmit_send > 0))
+	if (state==ASSERT_LINE)
 	{
-		if (TRACE_OSO) logerror("Write nibble %d\n", 3-m_xmit_send);
-		hexbus_write(((m_xmit & 0x0c)<<4) | (m_xmit & 0x03));
-		m_xmit >>= 4;
-		m_clkcount = 0;
-		m_xmit_send--;
+		// Control lines SHSK, SBAV
+		// When BAV/HSK is 0/1 for two rising edges of Phi3*, SBAV/SHSK goes to
+		// 0/1 at the following falling edge of Phi3*.
+		// Page 5
+		m_sbav = m_bavhold && m_bav;
+		m_bavhold = m_bav;
+		m_shsk = m_hskhold && m_hsk;
+		m_hskhold = m_hsk;
+		set_status(SHSK, m_shsk);
+		set_status(SBAV, m_sbav);
+
+		// Implement the write timing logic
+		// This subcircuit in the OSO chip autonomously runs the Hexbus
+		// protocol. After loading a byte into the transmit register, it sends
+		// both nibbles (little-endian) one after another over the Hexbus,
+		// pausing for 30 cycles, and checking the HSK line.
+
+		// The schematics show some fascinating signal line spaghetti with
+		// embedded JK* flipflops which may give you some major headaches.
+		// Compared to that, the lines below are a true relief.
+
+		if (control_bit(WEN))  // Nothing happens without WEN
+		{
+			if (TRACE_OSO) if (!m_wrst && m_sendbyte) logerror("Starting write process\n");
+			// Page 3: Write timing
+			// Note: First pass counts to 30, second to 31
+			bool cnt30 = ((m_clkcount & 0x1e) == 30);
+			bool cont = (m_wrst && !m_wq2 && !m_wq1) || (cnt30 && m_wq2 && !m_wq1)
+			|| (cnt30 && !m_wq2 && m_wq1) || (m_shsk && m_wq2 && m_wq1);
+
+			bool jwq1 = cont && m_wq2;
+			bool kwq1 = !((cont && !m_wq2) || (!cont && m_wq2 && m_wnp));
+
+			bool jwq2 = cont;
+			bool kwq2 = !(m_wq1 && !cont);
+
+			if (m_wq1 == m_wq2) m_clkcount = 0;
+
+			// Reset "byte loaded" flipflop during the second phase
+			if (m_wq1 == true)
+				m_sendbyte = false;
+
+			// WBUSY is asserted on byte load, during phase 1, and phase 2.
+			m_wbusy = m_sendbyte || m_wq1 || m_wq2;
+
+			// Set status bits and raise interrupt (p. 4)
+			set_status(WBUSY, m_wbusy);
+			if (m_wbusy != m_wbusyold)
+			{
+				// Raising edge of wbusy*
+				if (!m_wbusy) set_status(HSKWT, !m_wbusy);
+				m_wbusyold = m_wbusy;
+			}
+
+			if (m_rq2 != m_rq2old)
+			{
+				// Raising edge of RQ2*
+				if (!m_rq2)
+				{
+					set_status(HSKRD, m_rq2);
+				}
+				m_wbusyold = m_wbusy;
+			}
+
+			if (m_sbav != m_sbavold)
+			{
+				// Raising edge of SBAV -> BAVIA
+				// Falling edge of SBAV -> BAVAI
+				if (m_sbav)
+					set_status(BAVIAS, m_sbav);
+				else
+					set_status(BAVAIS, !m_sbav);
+			}
+
+			// Operate flipflops
+			// Write phases
+			// 74LS109: J-K* flipflop (inverted K)
+			if (jwq1)
+			{
+				if (!kwq1) m_wq1 = !m_wq1;
+				else m_wq1 = true;
+			}
+			else
+				if (!kwq1) m_wq1 = false;
+
+			if (jwq2)
+			{
+				if (!kwq2) m_wq2 = !m_wq2;
+				else m_wq2 = true;
+			}
+			else
+				if (!kwq2) m_wq2 = false;
+
+			// Set WNP on rising edge of WQ2*
+			if (m_wq2 != m_wq2old)
+			{
+				if (!m_wq2)
+					m_wnp = true;
+
+				m_wq2old = m_wq2;
+			}
+			m_wq1old = m_wq1;
+
+			// Set HSK
+			m_hsk = !m_wq1 && m_wq2;
+
+			// Reset WNP if phases are done
+			if (!m_wq2 && !m_wq1)
+			{
+				m_wnp = false;
+			}
+			update_hexbus();
+		}
+		else
+		{
+			m_wq1 = m_wq2 = m_wrst = m_counting = false;
+			m_clkcount = 0;
+		}
 	}
+	// Actions that occur for Phi3=0
+	else
+	{
+		m_wrst = m_sendbyte;
+		// Only count when one phase is active
+		m_counting = !(m_wq1==m_wq2);
+
+		if (m_counting)
+			m_clkcount++;
+		else
+			m_clkcount = 0; // Reset when not counting
+	}
+
+	// Show some lines in log
+	if (TRACE_OSO) {
+		if (m_sbav != m_sbavold) {
+			logerror("SBAV = %d\n", m_sbav? 1 : 0);
+			m_sbavold = m_sbav;
+		}
+	}
+
+	// Raise interrupt
+	if ((control_bit(WIEN) && status_bit(HSKWT))
+		|| (control_bit(RIEN) && status_bit(HSKRD))
+		|| (control_bit(BAVAIEN) && status_bit(BAVAIS))
+		|| (control_bit(BAVIAEN) && status_bit(BAVIAS)))
+	{
+		m_int(ASSERT_LINE);
+	}
+}
+
+void oso_device::update_hexbus()
+{
+	uint8_t value = 0x00;
+	uint8_t nibble = m_xmit;
+	if (m_wnp) nibble >>= 4;
+
+	value = ((m_xmit & 0x0c)<<4) | (m_xmit & 0x03);
+	if (!m_hsk) value |= 0x10;
+	if (!m_bav) value |= 0x04;
+	if (value != m_lasthxvalue)
+	{
+		if (TRACE_OSO) logerror("Set hexbus = %02x (BAV*=%d, HSK*=%d, data=%01x)\n", value, (value & 0x04)? 1:0, (value & 0x10)? 1:0, ((value>>4)&0x0c) | (value&0x03));
+		hexbus_write(value);
+	}
+	m_lasthxvalue = value;
 }
 
 void oso_device::device_start()
 {
 	logerror("Starting\n");
 	m_status = m_xmit = m_control = m_data = 0;
+	m_int.resolve_safe();
 
 	m_hexbus_outbound = dynamic_cast<bus::hexbus::hexbus_device*>(machine().device(TI_HEXBUS_TAG));
 
 	// Establish callback for inbound propagations
-	m_hexbus_outbound->set_chain_element(this);
-	// Establish callback
 	m_hexbus_outbound->set_chain_element(this);
 
 	save_item(NAME(m_data));

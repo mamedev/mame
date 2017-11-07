@@ -181,18 +181,6 @@ KinderComp (Spinnaker)
 		</part>
 	</software>
 
-	<!-- This rom acts as a bios replacement, this is not yet supported by the driver -->
-	<software name="quiksilv" supported="no">
-		<description>QuickSilver</description>
-		<year>19??</year>
-		<publisher>Synectics</publisher>
-		<part name="cart" interface="ibmpcjr_cart">
-			<dataarea name="rom" size="65536">
-				<rom name="quiksilv.bin" size="65536" crc="86aaa1c4" sha1="b3d7e8ce5de17441891e0b71e5261ed01a169dc1" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="riveraid">
 		<description>River Raid</description>
 		<year>1984</year>

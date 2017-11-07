@@ -945,7 +945,9 @@ static MACHINE_CONFIG_DERIVED( sharrier, sharrier_base )
 
 	MCFG_CPU_ADD("mcu", I8751, 8000000)
 	MCFG_CPU_IO_MAP(mcu_io_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segahang_state, irq0_line_pulse)
+
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("mcu", INPUT_LINE_IRQ0))
 MACHINE_CONFIG_END
 
 

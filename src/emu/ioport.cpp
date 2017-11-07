@@ -3388,7 +3388,13 @@ analog_field::analog_field(ioport_field &field)
 
 			// relative controls reverse from 1 past their max range
 			if (m_wraps)
-				m_reverse_val -= INPUT_RELATIVE_PER_PIXEL;
+			{
+				// FIXME: positional needs -1, using INPUT_RELATIVE_PER_PIXEL skips a position (and reads outside the table array)
+				if(field.type() == IPT_POSITIONAL || field.type() == IPT_POSITIONAL_V)
+					m_reverse_val --;
+				else
+					m_reverse_val -= INPUT_RELATIVE_PER_PIXEL;
+			}
 		}
 	}
 

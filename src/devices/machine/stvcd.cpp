@@ -1383,7 +1383,7 @@ void saturn_state::cd_exec_command( void )
 			if(cr2 == 0x0001) // MPEG card
 				cr2 = 0x2;
 			else
-				cr2 = 0x4;    // 0 = No CD, 1 = Audio CD, 2 Regular Data disk (not Saturn), 3 pirate disc, 4 Saturn disc 
+				cr2 = 0x4;    // 0 = No CD, 1 = Audio CD, 2 Regular Data disk (not Saturn), 3 pirate disc, 4 Saturn disc
 			cr3 = 0;
 			cr4 = 0;
 			hirqreg |= (CMOK);
@@ -1410,19 +1410,19 @@ void saturn_state::cd_exec_command( void )
 			cr4 = 0;
 			hirqreg |= (CMOK);
 			break;
-			
+
 		// MPEG init
 		case 0x93:
 			hirqreg |= (CMOK|MPED);
 			if(cr2 == 0x0001)
 				hirqreg |= (MPCM);
-			
+
 			cr1 = cd_stat;
 			cr2 = 0;
 			cr3 = 0;
 			cr4 = 0;
 			break;
-			
+
 		default:
 			CDROM_LOG(("CD: Unknown command %04x\n", cr1>>8))
 			popmessage("CD Block unknown command %02x, contact MAMEdev",cr1>>8);

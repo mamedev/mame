@@ -576,16 +576,16 @@ inline void construct_core_types_pedal(simple_list<input_type_entry> &typelist)
 
 inline void construct_core_types_pedal2(simple_list<input_type_entry> &typelist)
 {
-	INPUT_PORT_ANALOG_TYPE(  1, PLAYER1, PEDAL2,              "P1 Pedal 2",             input_seq(JOYCODE_Z_POS_ABSOLUTE_INDEXED(0)), input_seq(), input_seq(KEYCODE_LALT, input_seq::or_code, JOYCODE_BUTTON2_INDEXED(0)) )
-	INPUT_PORT_ANALOG_TYPE(  2, PLAYER2, PEDAL2,              "P2 Pedal 2",             input_seq(JOYCODE_Z_POS_ABSOLUTE_INDEXED(1)), input_seq(), input_seq(KEYCODE_S, input_seq::or_code, JOYCODE_BUTTON2_INDEXED(1)) )
-	INPUT_PORT_ANALOG_TYPE(  3, PLAYER3, PEDAL2,              "P3 Pedal 2",             input_seq(JOYCODE_Z_POS_ABSOLUTE_INDEXED(2)), input_seq(), input_seq(KEYCODE_RSHIFT, input_seq::or_code, JOYCODE_BUTTON2_INDEXED(2)) )
-	INPUT_PORT_ANALOG_TYPE(  4, PLAYER4, PEDAL2,              "P4 Pedal 2",             input_seq(JOYCODE_Z_POS_ABSOLUTE_INDEXED(3)), input_seq(), input_seq(KEYCODE_DEL_PAD, input_seq::or_code, JOYCODE_BUTTON2_INDEXED(3)) )
-	INPUT_PORT_ANALOG_TYPE(  5, PLAYER5, PEDAL2,              "P5 Pedal 2",             input_seq(JOYCODE_Z_POS_ABSOLUTE_INDEXED(4)), input_seq(), input_seq(JOYCODE_BUTTON2_INDEXED(4)) )
-	INPUT_PORT_ANALOG_TYPE(  6, PLAYER6, PEDAL2,              "P6 Pedal 2",             input_seq(JOYCODE_Z_POS_ABSOLUTE_INDEXED(5)), input_seq(), input_seq(JOYCODE_BUTTON2_INDEXED(5)) )
-	INPUT_PORT_ANALOG_TYPE(  7, PLAYER7, PEDAL2,              "P7 Pedal 2",             input_seq(JOYCODE_Z_POS_ABSOLUTE_INDEXED(6)), input_seq(), input_seq(JOYCODE_BUTTON2_INDEXED(6)) )
-	INPUT_PORT_ANALOG_TYPE(  8, PLAYER8, PEDAL2,              "P8 Pedal 2",             input_seq(JOYCODE_Z_POS_ABSOLUTE_INDEXED(7)), input_seq(), input_seq(JOYCODE_BUTTON2_INDEXED(7)) )
-	INPUT_PORT_ANALOG_TYPE(  9, PLAYER9, PEDAL2,              "P9 Pedal 2",             input_seq(JOYCODE_Z_POS_ABSOLUTE_INDEXED(8)), input_seq(), input_seq(JOYCODE_BUTTON2_INDEXED(8)) )
-	INPUT_PORT_ANALOG_TYPE( 10, PLAYER10, PEDAL2,             "P10 Pedal 2",            input_seq(JOYCODE_Z_POS_ABSOLUTE_INDEXED(9)), input_seq(), input_seq(JOYCODE_BUTTON2_INDEXED(9)) )
+	INPUT_PORT_ANALOG_TYPE(  1, PLAYER1, PEDAL2,              "P1 Pedal 2",             input_seq(JOYCODE_W_NEG_ABSOLUTE_INDEXED(0)), input_seq(), input_seq(KEYCODE_LALT, input_seq::or_code, JOYCODE_BUTTON2_INDEXED(0)) )
+	INPUT_PORT_ANALOG_TYPE(  2, PLAYER2, PEDAL2,              "P2 Pedal 2",             input_seq(JOYCODE_W_NEG_ABSOLUTE_INDEXED(1)), input_seq(), input_seq(KEYCODE_S, input_seq::or_code, JOYCODE_BUTTON2_INDEXED(1)) )
+	INPUT_PORT_ANALOG_TYPE(  3, PLAYER3, PEDAL2,              "P3 Pedal 2",             input_seq(JOYCODE_W_NEG_ABSOLUTE_INDEXED(2)), input_seq(), input_seq(KEYCODE_RSHIFT, input_seq::or_code, JOYCODE_BUTTON2_INDEXED(2)) )
+	INPUT_PORT_ANALOG_TYPE(  4, PLAYER4, PEDAL2,              "P4 Pedal 2",             input_seq(JOYCODE_W_NEG_ABSOLUTE_INDEXED(3)), input_seq(), input_seq(KEYCODE_DEL_PAD, input_seq::or_code, JOYCODE_BUTTON2_INDEXED(3)) )
+	INPUT_PORT_ANALOG_TYPE(  5, PLAYER5, PEDAL2,              "P5 Pedal 2",             input_seq(JOYCODE_W_NEG_ABSOLUTE_INDEXED(4)), input_seq(), input_seq(JOYCODE_BUTTON2_INDEXED(4)) )
+	INPUT_PORT_ANALOG_TYPE(  6, PLAYER6, PEDAL2,              "P6 Pedal 2",             input_seq(JOYCODE_W_NEG_ABSOLUTE_INDEXED(5)), input_seq(), input_seq(JOYCODE_BUTTON2_INDEXED(5)) )
+	INPUT_PORT_ANALOG_TYPE(  7, PLAYER7, PEDAL2,              "P7 Pedal 2",             input_seq(JOYCODE_W_NEG_ABSOLUTE_INDEXED(6)), input_seq(), input_seq(JOYCODE_BUTTON2_INDEXED(6)) )
+	INPUT_PORT_ANALOG_TYPE(  8, PLAYER8, PEDAL2,              "P8 Pedal 2",             input_seq(JOYCODE_W_NEG_ABSOLUTE_INDEXED(7)), input_seq(), input_seq(JOYCODE_BUTTON2_INDEXED(7)) )
+	INPUT_PORT_ANALOG_TYPE(  9, PLAYER9, PEDAL2,              "P9 Pedal 2",             input_seq(JOYCODE_W_NEG_ABSOLUTE_INDEXED(8)), input_seq(), input_seq(JOYCODE_BUTTON2_INDEXED(8)) )
+	INPUT_PORT_ANALOG_TYPE( 10, PLAYER10, PEDAL2,             "P10 Pedal 2",            input_seq(JOYCODE_W_NEG_ABSOLUTE_INDEXED(9)), input_seq(), input_seq(JOYCODE_BUTTON2_INDEXED(9)) )
 }
 
 inline void construct_core_types_pedal3(simple_list<input_type_entry> &typelist)
@@ -627,7 +627,7 @@ inline void construct_core_types_paddle_v(simple_list<input_type_entry> &typelis
 	INPUT_PORT_ANALOG_TYPE(  7, PLAYER7, PADDLE_V,            "Paddle V 7",             input_seq(JOYCODE_Y_INDEXED(6), input_seq::or_code, MOUSECODE_Y_INDEXED(6)), input_seq(), input_seq() )
 	INPUT_PORT_ANALOG_TYPE(  8, PLAYER8, PADDLE_V,            "Paddle V 8",             input_seq(JOYCODE_Y_INDEXED(7), input_seq::or_code, MOUSECODE_Y_INDEXED(7)), input_seq(), input_seq() )
 	INPUT_PORT_ANALOG_TYPE(  9, PLAYER9, PADDLE_V,            "Paddle V 9",             input_seq(JOYCODE_Y_INDEXED(8), input_seq::or_code, MOUSECODE_Y_INDEXED(8)), input_seq(), input_seq() )
-	INPUT_PORT_ANALOG_TYPE( 10, PLAYER10, PADDLE_V,            "Paddle V 10",             input_seq(JOYCODE_Y_INDEXED(9), input_seq::or_code, MOUSECODE_Y_INDEXED(9)), input_seq(), input_seq() )
+	INPUT_PORT_ANALOG_TYPE( 10, PLAYER10, PADDLE_V,            "Paddle V 10",           input_seq(JOYCODE_Y_INDEXED(9), input_seq::or_code, MOUSECODE_Y_INDEXED(9)), input_seq(), input_seq() )
 }
 
 inline void construct_core_types_positional(simple_list<input_type_entry> &typelist)

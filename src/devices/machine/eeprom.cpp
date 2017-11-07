@@ -317,8 +317,8 @@ void eeprom_base_device::internal_write(offs_t address, uint32_t data)
 {
 	if (m_data_bits == 16)
 	{
-		m_data[address*2] = data;
-		m_data[address*2+1] = data >> 8;
+		m_data[address * 2] = data;
+		m_data[address * 2 + 1] = data >> 8;
 	} else
 		m_data[address] = data;
 }

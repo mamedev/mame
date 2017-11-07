@@ -5306,6 +5306,17 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="qnxdemo">
+		<description>QNX Demonstration (Apr 17th, 1989)</description>
+		<year>1989</year>
+		<publisher>Quantum Software Systems</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="qnx1989.img" size="368640" crc="1f63eb66" sha1="746d459686e4b8f9ca6e22c20138557e2bff363d" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- "Thoroughbred Passport" copy-protection dongle not emulated -->
 	<software name="tbos" supported="no">
 		<description>Thoroughbred/OS 6.6.2-6</description>
@@ -5586,6 +5597,123 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="azurebnd">
+		<description>Advanced Dungeons &amp; Dragons - Curse of the Azure Bonds (V1.2)</description>
+		<year>1989</year>
+		<publisher>SSI</publisher>
+		<info name="version" value="1.2" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="azurebnd_1.img" size="368640" crc="9fa8ca28" sha1="236ca717a0eede9a8f90cb9e4fe3250ffaa46595" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="azurebnd_2.img" size="368640" crc="44f4999f" sha1="cb4b65d94c96caaeeaf3a4bd84fdf23185b14cbf" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="azurebnd_3.img" size="368640" crc="17b7d451" sha1="c574643cb1808037a250ba5da624ab89b5feab4f" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="azurebnd_4.img" size="368640" crc="ecea8cc9" sha1="33f8fcac0f0c8d6fb0e8d45d98afb5754fc22380" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="azurebnda" cloneof="azurebnd">
+		<description>Advanced Dungeons &amp; Dragons - Curse of the Azure Bonds (V1.1)</description>
+		<year>1989</year>
+		<publisher>SSI</publisher>
+		<info name="version" value="1.1" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Curse of the Azure Bonds (USA) (5.25'') (Disk 1).img" size="368640" crc="8edb2f3c" sha1="d43ee33399e3594b4cd1afd35a1a062089e40c5c" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Curse of the Azure Bonds (USA) (5.25'') (Disk 2).img" size="368640" crc="7cec17f4" sha1="a8cad973fa508e88f16b681d230857249b30f02d" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Curse of the Azure Bonds (USA) (5.25'') (Disk 3).img" size="368640" crc="5c55a8ca" sha1="23165433804e07706b450e3aa51cde23f39bb992" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Curse of the Azure Bonds (USA) (5.25'') (Disk 4).img" size="368640" crc="08644e84" sha1="4f2443861e454e716470c9d3128c4c76a6ea4b5f" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="poolrad">
+		<description>Advanced Dungeons &amp; Dragons - Pool of Radiance</description>
+		<year>1988</year>
+		<publisher>SSI</publisher>
+		<info name="version" value="1.2" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Pool of Radiance (USA) (Disk 1).img" size="737280" crc="7fceae07" sha1="a081a9f811ba0cf8d6fedb0aca4771bbe8e787de" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Pool of Radiance (USA) (Disk 2).img" size="737280" crc="360019c5" sha1="9b2b08d5bd64c635032fa0582362f218cf4a1b94" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pooldark">
+		<description>Advanced Dungeons &amp; Dragons - Pools of Darkness</description>
+		<year>1991</year>
+		<publisher>SSI</publisher>
+		<info name="version" value="1.00" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Pools of Darkness (USA) (Disk 1).img" size="737280" crc="732e3424" sha1="5345521c5e6083641fc3cf4a7c37bfc63c7b079c" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Pools of Darkness (USA) (Disk 2).img" size="737280" crc="18e5a10d" sha1="1602709a31850016a608d7298b81afd0b2bbb23d" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Pools of Darkness (USA) (Disk 3).img" size="737280" crc="576daf15" sha1="0fd8ecf7a44be7b1f1e6dfb24e9016e77039ab73" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="silvblad">
+		<description>Advanced Dungeons &amp; Dragons - Secret of the Silver Blades (1.20)</description>
+		<year>1990</year>
+		<publisher>SSI</publisher>
+		<info name="version" value="1.20" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Secret of the Silver Blades (1990)(SSI).dsk" size="737280" crc="fac4327b" sha1="05c4a640183fb83d7c539eefb4f82cb213ebaa9f" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="silvblada" cloneof="silvblad">
+		<description>Advanced Dungeons &amp; Dragons - Secret of the Silver Blades (1.10)</description>
+		<year>1990</year>
+		<publisher>SSI</publisher>
+		<info name="version" value="1.10" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Secret of the Silver Blades (USA).img" size="737280" crc="64b5ce63" sha1="66f92af0f871081d3c1ff7554ab8b6b1c3402344" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="captcom">
 		<description>The Adventures of Captain Comic</description>
 		<year>1988</year>
@@ -5594,6 +5722,20 @@ has been replaced with an all-zero block. -->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="[PC] The Adventures of Captain Comic [3.5DD] [Disk 1 of 1].img" size="737280" crc="d6e6c920" sha1="57b2273a52f3b519768027fcf603ca6fce981e4a" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alpntram">
+		<!-- Dumped via Kryoflux, four tracks show as modified -->
+		<description>Alpine Tram Ride</description>
+		<year>1987</year>
+		<publisher>Learning Technologies</publisher>
+		<info name="version" value="1.1" />
+		<info name="user_notes" value="Must be run from drive A" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "1167427">
+				<rom name="Alpine Tram Ride 1.1 for IBM PC (1987) (Kryoflux).mfm" size="1167427" crc="65210439" sha1="f47d610d0c539f2e8d41ee9ea95f7246255e3f44" offset="0" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7986,17 +8128,6 @@ has been replaced with an all-zero block. -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="[PC] Savage [5.25].img" size="368640" crc="336dd3b9" sha1="68ba386d590f2bd85c64adabcceb4e7d1679c5ca" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="silvblad">
-		<description>Secret of the Silver Blades</description>
-		<year>1990</year>
-		<publisher>SSI</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "737280">
-				<rom name="Secret of the Silver Blades (1990)(SSI).dsk" size="737280" crc="fac4327b" sha1="05c4a640183fb83d7c539eefb4f82cb213ebaa9f" offset="0"/>
 			</dataarea>
 		</part>
 	</software>

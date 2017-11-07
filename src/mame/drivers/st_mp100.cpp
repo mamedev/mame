@@ -814,8 +814,14 @@ ROM_END
 /-------------------------------*/
 ROM_START(trident)
 	ROM_REGION(0x1000, "roms", 0)
-	ROM_LOAD( "cpu_u2.716", 0x0000, 0x0800, CRC(934e49dd) SHA1(cbf6ca2759166f522f651825da0c75cf7248d3da))
-	ROM_LOAD( "cpu_u6.716", 0x0800, 0x0800, CRC(540bce56) SHA1(0b21385501b83e448403e0216371487ed54026b7))
+	ROM_LOAD( "25AROM_P11A.U2",  0x0000, 0x0800, CRC(6dcd6ad3) SHA1(f748acc8628c5013b630a5c7b25a1bf72e36b16d))   // 9316A-2920
+	ROM_LOAD( "25AROM_P12AU.U6", 0x0800, 0x0800, CRC(fb955a6f) SHA1(387080d5af318463475797fecff026d6db776a0c))   // 9316A-2921
+ROM_END
+
+ROM_START(tridento)
+	ROM_REGION(0x1000, "roms", 0)
+	ROM_LOAD( "25AROM_P11.U2",  0x0000, 0x0800, CRC(934e49dd) SHA1(cbf6ca2759166f522f651825da0c75cf7248d3da))
+	ROM_LOAD( "25AROM_P12U.U6", 0x0800, 0x0800, CRC(540bce56) SHA1(0b21385501b83e448403e0216371487ed54026b7))
 ROM_END
 
 /*-------------------------------------
@@ -858,7 +864,8 @@ GAME( 1978,  nugent,     0,      st_mp100,   mp100, st_mp100_state, 0,   ROT0,  
 GAME( 1979,  dracula,    0,      st_mp100,   mp100, st_mp100_state, 0,   ROT0,   "Stern", "Dracula (Pinball)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
 // different inputs
-GAME( 1979,  trident,    0,      st_mp100,   mp200, st_mp100_state, 0,   ROT0,   "Stern", "Trident",           MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 1979,  hothand,    0,      st_mp100,   mp200, st_mp100_state, 0,   ROT0,   "Stern", "Hot Hand",          MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 1979,  princess,   0,      st_mp100,   mp200, st_mp100_state, 0,   ROT0,   "Stern", "Cosmic Princess",   MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 1979,  magic,      0,      st_mp100,   mp200, st_mp100_state, 0,   ROT0,   "Stern", "Magic",             MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1979,  trident,    0,       st_mp100,   mp200, st_mp100_state, 0,   ROT0,   "Stern", "Trident",             MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1979,  tridento,   trident, st_mp100,   mp200, st_mp100_state, 0,   ROT0,   "Stern", "Trident (Older set)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1979,  hothand,    0,       st_mp100,   mp200, st_mp100_state, 0,   ROT0,   "Stern", "Hot Hand",            MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1979,  princess,   0,       st_mp100,   mp200, st_mp100_state, 0,   ROT0,   "Stern", "Cosmic Princess",     MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1979,  magic,      0,       st_mp100,   mp200, st_mp100_state, 0,   ROT0,   "Stern", "Magic",               MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

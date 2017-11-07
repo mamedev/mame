@@ -1961,7 +1961,7 @@ ADDRESS_MAP_END
 
 /* changes from galaxian map:
     galaxian sound removed
-    $4800-$57ff: cointains video and object RAM (normally at $5000-$5fff)
+    $4800-$57ff: contains video and object RAM (normally at $5000-$5fff)
     $5800-$5fff: AY-8910 access added
     $6002-$6006: graphics banking controls replace coin lockout, coin counter, and lfo
     $7002: coin counter (moved from $6003)

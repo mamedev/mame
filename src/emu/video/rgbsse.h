@@ -299,9 +299,9 @@ public:
 	// Leave this here in case Model3 blows up...
 	//inline void scale_imm_and_clamp(const s32 scale)
 	//{
-	//	mul_imm(scale);
-	//	sra_imm(8);
-	//	clamp_to_uint8();
+	//  mul_imm(scale);
+	//  sra_imm(8);
+	//  clamp_to_uint8();
 	//}
 
 	// This version needs values to be 12 bits or less

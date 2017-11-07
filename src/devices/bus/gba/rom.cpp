@@ -158,7 +158,7 @@ void gba_rom_device::device_reset()
 	m_gpio_regs[1] = 0;
 	m_gpio_regs[2] = 0;
 	m_gpio_regs[3] = 0;
-	m_gpio_write_only = 0;
+	m_gpio_write_only = 1;
 	m_gpio_dirs = 0;
 }
 
@@ -273,7 +273,6 @@ void gba_rom_3dmatrix_device::device_reset()
 
 READ32_MEMBER(gba_rom_device::read_gpio)
 {
-	logerror("read GPIO offs %X\n", offset);
 	if (!m_gpio_write_only)
 	{
 		switch (offset)
@@ -301,7 +300,6 @@ READ32_MEMBER(gba_rom_device::read_gpio)
 
 WRITE32_MEMBER(gba_rom_device::write_gpio)
 {
-	logerror("write GPIO offs %X data %X\n", offset, data);
 	switch (offset)
 	{
 		case 0:

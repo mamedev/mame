@@ -121,7 +121,7 @@ It's a very rare computer. It has 2 processors, Z80 and 8088, so it can run both
 #include "machine/pit8253.h"
 #include "machine/ram.h"
 #include "machine/wd_fdc.h"
-#include "machine/z80dart.h"
+#include "machine/z80sio.h"
 #include "sound/spkrdev.h"
 #include "video/scn2674.h"
 
@@ -245,7 +245,7 @@ private:
 	required_device<pit8253_device> m_pit;
 	required_device<i8255_device> m_ppi;
 	required_device<speaker_sound_device> m_speaker;
-	required_device<z80sio2_device> m_serial;
+	required_device<z80sio_device> m_serial;
 	required_device<centronics_device> m_parallel;
 	required_device<address_map_bank_device> m_z80_bankdev;
 	required_device<ram_device> m_ram;
@@ -300,10 +300,10 @@ static ADDRESS_MAP_START( octopus_io, AS_IO, 8, octopus_state )
 	AM_RANGE(0x51, 0x51) AM_DEVREADWRITE("keyboard", i8251_device, status_r, control_w)
 	// 0x70-73: HD controller
 	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE("pit", pit8253_device, read, write)
-	AM_RANGE(0xa0, 0xa0) AM_DEVREADWRITE("serial", z80sio2_device, da_r, da_w)
-	AM_RANGE(0xa1, 0xa1) AM_DEVREADWRITE("serial", z80sio2_device, ca_r, ca_w)
-	AM_RANGE(0xa2, 0xa2) AM_DEVREADWRITE("serial", z80sio2_device, db_r, db_w)
-	AM_RANGE(0xa3, 0xa3) AM_DEVREADWRITE("serial", z80sio2_device, cb_r, cb_w)
+	AM_RANGE(0xa0, 0xa0) AM_DEVREADWRITE("serial", z80sio_device, da_r, da_w)
+	AM_RANGE(0xa1, 0xa1) AM_DEVREADWRITE("serial", z80sio_device, ca_r, ca_w)
+	AM_RANGE(0xa2, 0xa2) AM_DEVREADWRITE("serial", z80sio_device, db_r, db_w)
+	AM_RANGE(0xa3, 0xa3) AM_DEVREADWRITE("serial", z80sio_device, cb_r, cb_w)
 	AM_RANGE(0xb0, 0xb1) AM_DEVREADWRITE("pic_master", pic8259_device, read, write)
 	AM_RANGE(0xb4, 0xb5) AM_DEVREADWRITE("pic_slave", pic8259_device, read, write)
 	AM_RANGE(0xc0, 0xc7) AM_DEVREADWRITE("crtc", scn2674_device, read, write)
@@ -952,7 +952,7 @@ static MACHINE_CONFIG_START( octopus )
 	MCFG_PIT8253_CLK0(2457500)  // DART channel A
 	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(octopus_state,serial_clock_w))  // being able to write both Rx and Tx clocks at one time would be nice
 	MCFG_PIT8253_CLK1(2457500)  // DART channel B
-	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE("serial",z80sio2_device,rxtxcb_w))
+	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE("serial",z80sio_device,rxtxcb_w))
 	MCFG_PIT8253_CLK2(2457500)  // speaker frequency
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(octopus_state,spk_freq_w))
 
@@ -960,21 +960,21 @@ static MACHINE_CONFIG_START( octopus )
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_DEVICE_ADD("serial", Z80SIO2, XTAL_16MHz / 4) // clock rate not mentioned in tech manual
-	MCFG_Z80DART_OUT_INT_CB(DEVWRITELINE("pic_master",pic8259_device, ir1_w))
-	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE("serial_a",rs232_port_device, write_txd))
-	MCFG_Z80DART_OUT_TXDB_CB(DEVWRITELINE("serial_b",rs232_port_device, write_txd))
-	MCFG_Z80DART_OUT_RTSA_CB(DEVWRITELINE("serial_a",rs232_port_device, write_rts))
-	MCFG_Z80DART_OUT_RTSB_CB(DEVWRITELINE("serial_b",rs232_port_device, write_rts))
+	MCFG_DEVICE_ADD("serial", Z80SIO, XTAL_16MHz / 4) // clock rate not mentioned in tech manual
+	MCFG_Z80SIO_OUT_INT_CB(DEVWRITELINE("pic_master",pic8259_device, ir1_w))
+	MCFG_Z80SIO_OUT_TXDA_CB(DEVWRITELINE("serial_a",rs232_port_device, write_txd))
+	MCFG_Z80SIO_OUT_TXDB_CB(DEVWRITELINE("serial_b",rs232_port_device, write_txd))
+	MCFG_Z80SIO_OUT_RTSA_CB(DEVWRITELINE("serial_a",rs232_port_device, write_rts))
+	MCFG_Z80SIO_OUT_RTSB_CB(DEVWRITELINE("serial_b",rs232_port_device, write_rts))
 
 	MCFG_RS232_PORT_ADD("serial_a", default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("serial",z80sio2_device, rxa_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("serial",z80sio2_device, ctsa_w)) MCFG_DEVCB_INVERT
-	MCFG_RS232_RI_HANDLER(DEVWRITELINE("serial",z80sio2_device, ria_w)) MCFG_DEVCB_INVERT
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("serial",z80sio_device, rxa_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("serial",z80sio_device, ctsa_w)) MCFG_DEVCB_INVERT
+	//MCFG_RS232_RI_HANDLER(DEVWRITELINE("serial",z80sio_device, ria_w)) MCFG_DEVCB_INVERT
 	MCFG_RS232_PORT_ADD("serial_b", default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("serial",z80sio2_device, rxb_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("serial",z80sio2_device, ctsb_w)) MCFG_DEVCB_INVERT
-	MCFG_RS232_RI_HANDLER(DEVWRITELINE("serial",z80sio2_device, rib_w)) MCFG_DEVCB_INVERT
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("serial",z80sio_device, rxb_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("serial",z80sio_device, ctsb_w)) MCFG_DEVCB_INVERT
+	//MCFG_RS232_RI_HANDLER(DEVWRITELINE("serial",z80sio_device, rib_w)) MCFG_DEVCB_INVERT
 
 	MCFG_CENTRONICS_ADD("parallel", octopus_centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(octopus_state, parallel_busy_w))

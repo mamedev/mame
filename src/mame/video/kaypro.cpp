@@ -115,14 +115,14 @@ uint32_t kaypro_state::screen_update_omni2(screen_device &screen, bitmap_ind16 &
 	return 0;
 }
 
-uint32_t kaypro_state::screen_update_kaypro2x(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t kaypro_state::screen_update_kaypro484(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	m_framecnt++;
 	m_crtc->screen_update(screen, bitmap, cliprect);
 	return 0;
 }
 
-/* bit 6 of kaypro2x_system_port selects alternate characters (A12 on character generator rom).
+/* bit 6 of kaypro484_system_port selects alternate characters (A12 on character generator rom).
     The diagram specifies a 2732 with 28 pins, and more address pins. Possibly a 2764 or 27128.
     Since our dump only goes up to A11, the alternate character set doesn't exist.
 
@@ -135,7 +135,7 @@ uint32_t kaypro_state::screen_update_kaypro2x(screen_device &screen, bitmap_rgb3
     Not sure how the attributes interact, for example does an underline blink? */
 
 
-MC6845_UPDATE_ROW( kaypro_state::kaypro2x_update_row )
+MC6845_UPDATE_ROW( kaypro_state::kaypro484_update_row )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	uint32_t *p = &bitmap.pix32(y);
@@ -253,20 +253,20 @@ void kaypro_state::mc6845_screen_configure()
 
 /**************************** I/O PORTS *****************************************************************/
 
-READ8_MEMBER( kaypro_state::kaypro2x_status_r )
+READ8_MEMBER( kaypro_state::kaypro484_status_r )
 {
 /* Need bit 7 high or computer hangs */
 
 	return 0x80 | m_crtc->register_r(space, 0);
 }
 
-WRITE8_MEMBER( kaypro_state::kaypro2x_index_w )
+WRITE8_MEMBER( kaypro_state::kaypro484_index_w )
 {
 	m_mc6845_ind = data & 0x1f;
 	m_crtc->address_w( space, 0, data );
 }
 
-WRITE8_MEMBER( kaypro_state::kaypro2x_register_w )
+WRITE8_MEMBER( kaypro_state::kaypro484_register_w )
 {
 	static const uint8_t mcmask[32]={0xff,0xff,0xff,0x0f,0x7f,0x1f,0x7f,0x7f,3,0x1f,0x7f,0x1f,0x3f,0xff,0x3f,0xff,0,0};
 
@@ -297,12 +297,12 @@ WRITE8_MEMBER( kaypro_state::kaypro_videoram_w )
 	m_p_videoram[offset] = data;
 }
 
-READ8_MEMBER( kaypro_state::kaypro2x_videoram_r )
+READ8_MEMBER( kaypro_state::kaypro484_videoram_r )
 {
 	return m_p_videoram[m_mc6845_video_address];
 }
 
-WRITE8_MEMBER( kaypro_state::kaypro2x_videoram_w )
+WRITE8_MEMBER( kaypro_state::kaypro484_videoram_w )
 {
 	m_p_videoram[m_mc6845_video_address] = data;
 }

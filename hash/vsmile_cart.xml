@@ -67,6 +67,7 @@ Game cartridges
 +========+===================+============================================================================+
 |        | 80-090000(US)     | Up  <- need pic                                                            |
 |        | 80-090000-001(US) | Up                                                                         |
+|   XX   | 80-090003-003(UK) | Up                                                                         |
 |        | 80-090004(GE)     | Oben                                                                       |
 |   XX   | 80-090004-004(GE) | Oben                                                                       |
 |        | 80-090005(FR)     | La Haut                                                                    |
@@ -176,7 +177,7 @@ Game cartridges
 |        |          (FI)     | Mickey                                                                     |
 +========+===================+============================================================================+
 |   XX   | 80-092100(US)     | The Lion King: Simba's Big Adventure                                       |
-|        |          (IT)     | Il Re Leone - La Grande Avventura di Simba                                 |
+|   XX   |          (IT)     | Il Re Leone - La Grande Avventura di Simba                                 |
 |        | 80-092102(NL)     | Leeuwenkoning - De wonderwereld van Simba                                  |
 |        | 80-092103(UK)     | The Lion King: Simba's Big Adventure                                       |
 |        | 80-092104(GE)     | Der Koenig der Loewen - Simbas grosses Abenteuer                           |
@@ -189,7 +190,7 @@ Game cartridges
 |        |          (FI)     | Leijona kuningas - Simban suuri seikkailu                                  |
 +========+===================+============================================================================+
 |        | 80-092120(US)     | The Little Mermaid - Ariel's Majestic Journey                              |
-|        | 80-092121(IT)     | Sirenetta - Ariel e le                                                     |
+|   XX   | 80-092121(IT)     | La sirenetta - Ariel e la crociera magica                                  |
 |        | 80-092122(NL)     | De Kleine Zeemeermin - De Wunderwereld von Ariel                           |
 |        | 80-092123(UK)     | The Little Mermaid - Ariel's Majestic Journey                              |
 |   XX   | 80-092124(GE)     | Arielle die Meerjungfrau - Arielles aufregendes Abenteuer                  |
@@ -216,7 +217,7 @@ Game cartridges
 +========+===================+============================================================================+
 |   XX   | 80-092160(US)     | Scooby-Doo! - Funland Frenzy                                               |
 |        | 80-092160-101(US) | Scooby-Doo! - Funland Frenzy (ALT)                                         |
-|        |          (IT)     | Scooby-Doo! - Avventura e Funland                                          |
+|   XX   |          (IT)     | Scooby-Doo! - Avventura a Funland                                          |
 |        | 80-092162(NL)     | Scooby-Doo griezelen in het pretpark                                       |
 |        | 80-092163(UK)     | Scooby-Doo! - Funland Frenzy                                               |
 |        | 80-092163-103(UK) | Scooby-Doo! - Funland Frenzy                                               |
@@ -257,7 +258,7 @@ Game cartridges
 |        |          (FI)     | Toy Story 2                                                                |
 +========+===================+============================================================================+
 |   XX   | 80-092240(US)     | Cinderella - Cinderella's Magic Wishes                                     |
-|        |          (IT)     | Cenerentola - I desideri magici di Cenerentola                             |
+|   XX   |          (IT)     | Cenerentola - I desideri magici di Cenerentola   (cart says 52-92251 Ita)  |
 |        | 80-092242(NL)     | Assepoester - De wonderwereld van Assepoester                              |
 |        | 80-092242-123(NL) | Assepoester - De wonderwereld van Assepoester | 2007                       |
 |        | 80-092243(UK)     | Cinderella - Cinderella's Magic Wishes                                     |
@@ -332,7 +333,7 @@ Game cartridges
 |        | 80-092362(NL)     | Zayzoo - Mijn Buitenaardse Vriendje                                        |
 |        | 80-092363(UK)     | Zayzoo My Alien Classmate   <- yes, duped#                                 |
 |        | 80-092363(UK)     | Zayzoo - An Earth Adventure <- saw it, can't find pic again                |
-|        | 80-092363-103(UK) | Zayzoo - An Earth Adventure                                                |
+|   XX   | 80-092363-103(UK) | Zayzoo - An Earth Adventure                                                |
 |   XX   | 80-092364(GE)     | Zayzoos Lernall                                                            |
 |   XX   | 80-092365(FR)     | Zézou - Notre Ami Venu d'Ailleurs                                          |
 |        | 80-092367(SP)     | Zayzoo - Mi Amiga del Espacio (Alien Classmate)                            |
@@ -468,7 +469,7 @@ Game cartridges
 |        | 80-092867(SP)     | Shrek Tercero - En Busca De Arturo                                         |
 +========+===================+============================================================================+
 |        | 80-092880(US)     | Ratatouille - Remy's New Recipes                                           |
-|        |          (IT)     | Ratatouille - Le nuove Ricette di Remy                                     |
+|   XX   |          (IT)     | Ratatouille - Le nuove Ricette di Remy                                     |
 |        | 80-092882(NL)     | Ratatouille - Remy's Nieuwe Recepten                                       |
 |        | 80-092883(UK)     | Ratatouille - Remy's New Recipes                                           |
 |   XX   | 80-092884(GE)     | Ratatouille - Remys neue Rezepte                                           |
@@ -500,7 +501,7 @@ Game cartridges
 +========+===================+============================================================================+
 |        | 80-092960(US)     | Kung Fu Panda - Path of the Panda                                          |
 |        | 80-092962(NL)     | Kung Fu Panda - Het pad van de panda                                       |
-|        | 80-092963(UK)     | Kung Fu Panda - Path of the Panda                                          |
+|   XX   | 80-092963(UK)     | Kung Fu Panda - Path of the Panda                                          |
 |        | 80-092964(GE)     | Kung Fu Panda - Der Weg des Panda                                          |
 |        | 80-092965(FR)     | Kung Fu Panda - La ?????                                                   |
 |        | 80-092967(SP)     | Kung Fu Panda - Aventura en el Valle de la Paz                             |
@@ -656,6 +657,17 @@ Game cartridges
 			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
 				<rom name="92134.u1" size="8388608" crc="e567db85" sha1="ca52eaca6cf1b361fd4b1ae2b2380095c612668d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="arieli" cloneof="ariel" supported="no">
+		<description>Disney La sirenetta - Ariel e la crociera magica (Ita)</description>
+		<year>2005</year>
+		<publisher>VTech / Giochi Preziosi</publisher>
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="La Sirenetta - Ariel e la Crociera Magica (Italy).bin" size="8388608" crc="280b335b" sha1="256ea4f5725dcfd51be08ea6c135ad71701cc296" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -847,6 +859,18 @@ Game cartridges
 		<part name="cart" interface="vsmile_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="52-92240(us).bin" size="8388608" crc="0a89723c" sha1="15082b565f6f71a0f993c2734cb807f37611eb17" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cinderlai" cloneof="cinderla" supported="no">
+		<description>Disney Cenerentola - I desideri magici di Cenerentola (Ita)</description>
+		<year>2006</year>
+		<publisher>VTech / Giochi Preziosi</publisher>
+		<info name="serial" value="52-92251 (Ita)" />
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="Cenerentola - I Desideri Magici di Cenerentola (Italy).bin" size="8388608" crc="cb28ac0d" sha1="e938504a40a4f47cd4b09489f515c0a6545a1800" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1152,6 +1176,30 @@ Game cartridges
 		</part>
 	</software>
 
+	<software name="lionkingi" cloneof="lionking" supported="no">
+		<description>Disney Il re leone - La grande avventura di Simba (Ita)</description>
+		<year>2005</year>
+		<publisher>VTech / Giochi Preziosi</publisher>
+		<info name="serial" value="80-092113(DK)" />
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="Re Leone, Il - La Grande Avventura di Simba (Italy).bin" size="8388608" crc="6f807218" sha1="2783734d1596021f0aadf1b20d7398d2f73abb04" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kungfupuk" supported="no">
+		<description>Kung Fu Panda - Path of the Panda (UK)</description>
+		<year>2008</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="52-092963(UK)" />
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="Kung Fu Panda - Path of the Panda (Europe).bin" size="8388608" crc="0a56ba7b" sha1="04afc9bb216154c91fa3ef92b6bbcc88a9a2a43e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="manny" supported="no">
 		<description>Meister Manny's Werkzeugkiste (Ger)</description>
 		<year>2009?</year>
@@ -1344,6 +1392,18 @@ Game cartridges
 		</part>
 	</software>
 
+	<software name="upuk" cloneof="oben" supported="no">
+		<description>Disney/Pixar Up (UK)</description>
+		<year>2009</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-090003-003(UK)" />
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="Up (Europe).bin" size="8388608" crc="739a10a0" sha1="1d88241675f304ad50b756af49b33062b7de05dc" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="partyprk" supported="no">
 		<description>Cranium Partyland Park - A Carnival of Play-and-Learn Fun (USA)</description>
 		<year>2007?</year>
@@ -1372,6 +1432,17 @@ Game cartridges
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
 				<rom name="92884.u1" size="8388608" crc="d8e36793" sha1="e8d7078726b077d1bf0a13b715de4a03fd93189c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ratati" cloneof="ratat" supported="no">
+		<description>Disney/Pixar Ratatouille - Le nuove ricette di Remy (Ita)</description>
+		<year>2007</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="Ratatouille - Le Nuove Ricette di Remy (Italy).bin" size="8388608" crc="438550fb" sha1="1edc845aecac91eb640185895d3f7a3cdf462159" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1452,6 +1523,17 @@ Game cartridges
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
 				<rom name="092174.u1" size="8388608" crc="ecec53de" sha1="ad021dae6a8633b66172e3b0ef357b2dd52b021e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scoobydoi" cloneof="scoobydo" supported="no">
+		<description>Scooby-Doo! - Avventura a Funland (Ita)</description>
+		<year>200?</year>
+		<publisher>VTech / Giochi Preziosi</publisher>
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="Scooby-Doo! - Avventura a Funland (Italy).bin" size="8388608" crc="a2bd7a0c" sha1="e8d4863616b1fdf83ed3c33327d6e17ac63b1443" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1963,6 +2045,18 @@ Game cartridges
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
 				<rom name="92364.u1" size="8388608" crc="93e9dcf3" sha1="5889e46806d1fa70ac92ec6b2158a339126a26d2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zayzaeauk" cloneof="zayzaea" supported="no">
+		<description>Zayzoo: An Earth Adventure (UK)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092363-103(UK)" />
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="Zayzoo - An Earth Adventure (UK).bin" size="8388608" crc="4e94fce2" sha1="b65a446199d390d6b25046fb66fb7e7f329e84c5" offset="0" />
 			</dataarea>
 		</part>
 	</software>

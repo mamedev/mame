@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
+#include "emu.h"
 #include "sh.h"
 
 void sh_common_execution::device_start()
@@ -758,7 +759,7 @@ void sh_common_execution::EXTUW(uint32_t m, uint32_t n)
 void sh_common_execution::JMP(uint32_t m)
 {
 	m_sh2_state->m_delay = m_sh2_state->ea = m_sh2_state->r[m];
-	m_sh2_state->icount--; // not in SH4 implementation?
+	//m_sh2_state->icount--; // not in SH4 implementation?
 }
 
 /*  JSR     @Rm */
@@ -1303,6 +1304,7 @@ void sh_common_execution::OR(uint32_t m, uint32_t n)
 void sh_common_execution::ORI(uint32_t i)
 {
 	m_sh2_state->r[0] |= i;
+	m_sh2_state->icount -= 2; // not in SH2 implementation?
 }
 
 /*  OR.B    #imm,@(R0,GBR) */
@@ -1314,7 +1316,7 @@ void sh_common_execution::ORM(uint32_t i)
 	temp = RB( m_sh2_state->ea );
 	temp |= i;
 	WB( m_sh2_state->ea, temp );
-	m_sh2_state->icount -= 2;
+	//m_sh2_state->icount -= 2; // not in SH4 implementation?
 }
 
 /*  ROTCL   Rn */
@@ -1971,7 +1973,7 @@ void sh_common_execution::execute_one(const uint16_t opcode)
 	switch(opcode & 0xf000)
 	{
 		case 0x0000: execute_one_0000(opcode); break;
-		case 0x1000: MOVLS4(Rm, opcode & 0x0f, Rn);	break;
+		case 0x1000: MOVLS4(Rm, opcode & 0x0f, Rn); break;
 		case 0x2000: op0010(opcode); break;
 		case 0x3000: op0011(opcode); break;
 		case 0x4000: execute_one_4000(opcode); break;
@@ -2530,10 +2532,10 @@ void sh_common_execution::generate_checksum_block(drcuml_block *block, compiler_
 	else
 	{
 		uint32_t sum = 0;
-		void *base;	
+		void *base;
 		if (m_xor == 0) base = m_direct->read_ptr(seqhead->physpc, SH2_CODE_XOR(0));
-		else if (m_xor == 1) base = m_direct->read_ptr(seqhead->physpc, SH34LE_CODE_XOR(0)); 
-		else base = m_direct->read_ptr(seqhead->physpc, SH34BE_CODE_XOR(0)); 
+		else if (m_xor == 1) base = m_direct->read_ptr(seqhead->physpc, SH34LE_CODE_XOR(0));
+		else base = m_direct->read_ptr(seqhead->physpc, SH34BE_CODE_XOR(0));
 
 		UML_LOAD(block, I0, base, 0, SIZE_WORD, SCALE_x4);                              // load    i0,base,word
 		sum += seqhead->opptr.w[0];

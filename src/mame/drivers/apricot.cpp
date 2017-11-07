@@ -20,6 +20,7 @@
 #include "cpu/i8089/i8089.h"
 #include "formats/apridisk.h"
 #include "imagedev/flopdrv.h"
+#include "machine/clock.h"
 #include "machine/ram.h"
 #include "machine/74153.h"
 #include "machine/i8255.h"
@@ -412,8 +413,10 @@ static MACHINE_CONFIG_START( apricot )
 	MCFG_TTL153_ZA_CB(DEVWRITELINE("ic15", z80sio_device, rxca_w))
 	MCFG_TTL153_ZB_CB(DEVWRITELINE("ic15", z80sio_device, txca_w))
 
+	MCFG_CLOCK_ADD("ic15_rxtxcb", XTAL_4MHz / 16)
+	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("ic15", z80sio_device, rxtxcb_w))
+
 	MCFG_DEVICE_ADD("ic15", Z80SIO, XTAL_15MHz / 6)
-	MCFG_Z80SIO_OFFSETS(0, 0, XTAL_4MHz / 16, XTAL_4MHz / 16)
 	MCFG_Z80SIO_CPU("ic91")
 	MCFG_Z80SIO_OUT_TXDA_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
 	MCFG_Z80SIO_OUT_DTRA_CB(DEVWRITELINE("rs232", rs232_port_device, write_dtr))

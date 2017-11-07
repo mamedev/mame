@@ -67,4 +67,17 @@
 	  </dataarea>
 	</part>
   </software>
+  <software name="mass">
+	<description>Mass storage ROM</description>
+	<year>1979</year>
+	<publisher>Hewlett-Packard</publisher>
+	<info name="serial" value="00085-15001"/>
+
+	<part name="rom" interface="hp80_rom">
+	  <feature name="sc" value="0xD0"/>
+	  <dataarea name="rom" size="0x2000">
+	<rom name="rom320.bin" size="0x2000" crc="9c03582c" sha1="1cc9a5013739821cd1d7e2a52e8abbd29045e850" offset="0"/>
+	  </dataarea>
+	</part>
+  </software>
 </softwarelist>

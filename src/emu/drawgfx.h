@@ -352,6 +352,8 @@ void copybitmap(bitmap_rgb32 &dest, const bitmap_rgb32 &src, int flipx, int flip
 void copybitmap_trans(bitmap_ind16 &dest, const bitmap_ind16 &src, int flipx, int flipy, s32 destx, s32 desty, const rectangle &cliprect, u32 transpen);
 void copybitmap_trans(bitmap_rgb32 &dest, const bitmap_rgb32 &src, int flipx, int flipy, s32 destx, s32 desty, const rectangle &cliprect, u32 transpen);
 
+void copybitmap_transalpha(bitmap_rgb32 &dest, const bitmap_rgb32 &src, int flipx, int flipy, s32 destx, s32 desty, const rectangle &cliprect);
+
 /*
   Copy a bitmap onto another with scroll and wraparound.
   These functions support multiple independently scrolling rows/columns.
@@ -429,7 +431,7 @@ constexpr u32 alpha_blend_r16(u32 d, u32 s, u8 level)
 
 
 //-------------------------------------------------
-//  alpha_blend_r16 - alpha blend two 32-bit
+//  alpha_blend_r32 - alpha blend two 32-bit
 //  8-8-8 RGB pixels
 //-------------------------------------------------
 

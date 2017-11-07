@@ -32,6 +32,7 @@ public:
 	DECLARE_READ16_MEMBER(switches_r);
 
 private:
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	required_shared_ptr<uint16_t> m_p_base;
@@ -63,6 +64,12 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( ft68m )
 INPUT_PORTS_END
 
+
+void ft68m_state::machine_start()
+{
+	// GATE 1 is tied to Vcc; other GATE and SRC pins are all grounded
+	subdevice<am9513_device>("stc")->gate1_w(1);
+}
 
 void ft68m_state::machine_reset()
 {

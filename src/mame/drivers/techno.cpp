@@ -29,6 +29,12 @@ public:
 		, m_switch(*this, "SWITCH.%u", 0)
 	{ }
 
+	enum
+	{
+		IRQ_SET_TIMER,
+		IRQ_ADVANCE_TIMER
+	};
+
 	DECLARE_READ16_MEMBER(key_r);
 	DECLARE_READ16_MEMBER(rtrg_r);
 	DECLARE_READ16_MEMBER(sound_r);
@@ -40,15 +46,22 @@ public:
 	DECLARE_WRITE16_MEMBER(sol1_w);
 	DECLARE_WRITE16_MEMBER(sol2_w);
 	DECLARE_WRITE16_MEMBER(sound_w);
-	INTERRUPT_GEN_MEMBER(techno_intgen);
+
 private:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	required_device<cpu_device> m_maincpu;
+	required_ioport_array<8> m_switch;
+
+	emu_timer *m_irq_set_timer;
+	emu_timer *m_irq_advance_timer;
+
 	bool m_digwait;
 	uint8_t m_keyrow;
 	uint16_t m_digit;
 	uint8_t m_vector;
-	virtual void machine_reset() override;
-	required_device<cpu_device> m_maincpu;
-	required_ioport_array<8> m_switch;
 };
 
 
@@ -228,28 +241,47 @@ static INPUT_PORTS_START( techno )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Fix top left target middle") PORT_CODE(KEYCODE_EQUALS)
 INPUT_PORTS_END
 
-INTERRUPT_GEN_MEMBER(techno_state::techno_intgen)
+void techno_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	// vectors change per int: 88-8F, 98-9F)
-	if ((m_vector & 7) == 7)
-		m_vector = (m_vector ^ 0x10) & 0x97;
-	m_vector++;
-	// core doesn't support clearing of irq via hardware
-	generic_pulse_irq_line_and_vector(device.execute(), 1, m_vector, 1);
+	if (id == IRQ_ADVANCE_TIMER)
+	{
+		// vectors change per int: 88-8F, 98-9F)
+		if ((m_vector & 7) == 7)
+			m_vector = (m_vector ^ 0x10) & 0x97;
+		m_vector++;
+
+		// schematics show a 74HC74 cleared only upon IRQ acknowledgment or reset, but this is clearly incorrect for xforce
+		m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
+	}
+	else if (id == IRQ_SET_TIMER)
+	{
+		m_maincpu->set_input_line_and_vector(M68K_IRQ_1, ASSERT_LINE, m_vector);
+		m_irq_advance_timer->adjust(attotime::from_hz(XTAL_8MHz / 32));
+	}
+}
+
+void techno_state::machine_start()
+{
+	m_irq_set_timer = timer_alloc(IRQ_SET_TIMER);
+	m_irq_advance_timer = timer_alloc(IRQ_ADVANCE_TIMER);
 }
 
 void techno_state::machine_reset()
 {
 	m_vector = 0x88;
 	m_digit = 0;
+
+	attotime freq = attotime::from_hz(XTAL_8MHz / 256); // 31250Hz
+	m_irq_set_timer->adjust(freq, 0, freq);
+	m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
 }
 
 static MACHINE_CONFIG_START( techno )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_8MHz)
 	MCFG_CPU_PROGRAM_MAP(techno_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(techno_state, techno_intgen,  XTAL_8MHz/256) // 31250Hz
 	MCFG_NVRAM_ADD_0FILL("nvram")
+
 	//MCFG_CPU_ADD("cpu2", TMS7000, XTAL_4MHz)
 	//MCFG_CPU_PROGRAM_MAP(techno_sub_map)
 

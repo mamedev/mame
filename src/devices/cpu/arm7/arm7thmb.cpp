@@ -1557,18 +1557,21 @@ void arm7_cpu_device::tg0e_0(uint32_t pc, uint32_t op)
 
 void arm7_cpu_device::tg0e_1(uint32_t pc, uint32_t op)
 {
+	/* BLX (LO) */
+
 	uint32_t addr = GetRegister(14);
 	addr += (op & THUMB_BLOP_OFFS) << 1;
 	addr &= 0xfffffffc;
-	SetRegister(14, (R15 + 4) | 1);
+	SetRegister(14, (R15 + 2) | 1);
 	R15 = addr;
 	set_cpsr(GET_CPSR & ~T_MASK);
 }
 
-	/* BL */
 
 void arm7_cpu_device::tg0f_0(uint32_t pc, uint32_t op)
 {
+	/* BL (HI) */
+
 	uint32_t addr = (op & THUMB_BLOP_OFFS) << 12;
 	if (addr & (1 << 22))
 	{
@@ -1581,6 +1584,8 @@ void arm7_cpu_device::tg0f_0(uint32_t pc, uint32_t op)
 
 void arm7_cpu_device::tg0f_1(uint32_t pc, uint32_t op) /* BL */
 {
+	/* BL (LO) */
+
 	uint32_t addr = GetRegister(14) & ~1;
 	addr += (op & THUMB_BLOP_OFFS) << 1;
 	SetRegister(14, (R15 + 2) | 1);

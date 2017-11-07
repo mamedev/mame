@@ -300,6 +300,9 @@ ac1scch                         // 1984 Amateurcomputer AC1 SCCH
 @source:accomm.cpp
 accomm                          // 1986 Acorn Computer
 
+@source:acd.cpp
+acd                             //
+
 @source:aceex.cpp
 aceex2814
 
@@ -1084,8 +1087,14 @@ alphatro                        //
 @source:altair.cpp
 al8800bt                        //
 
+@source:alto1.cpp
+alto1                           // 1973 Xerox Alto I
+
 @source:alto2.cpp
 alto2                           //
+
+@source:altos2.cpp
+altos2                          // Altos II terminal
 
 @source:altos5.cpp
 altos5                          //
@@ -1178,8 +1187,14 @@ sigma2k                         // (c) 2000 Sigma
 sigmapkr                        // (c) 1995 Sigma
 videomat                        // 1990 bootleg
 
+@source:ampex.cpp
+dialog80                        // Ampex Dialogue 80
+
 @source:ampro.cpp
 ampro                           //
+
+@source:ampscarp.cpp
+ampscarp                        // Motorola Amps Car Phone
 
 @source:amspdwy.cpp
 amspdwy                         // no copyright notice, but (c) 1987 Enerdyne Technologies, Inc.
@@ -2483,6 +2498,7 @@ laststar                        // (proto)          (c) 1984
 antiairc                        // (c) 1975 Atari
 crashnsc                        // (c) 1975 Atari
 gtrak10                         // (c) 1974 Atari / Kee
+gtrak10a                        // (c) 1974 Atari / Kee
 gtrak20                         // (c) 1974 Atari / Kee
 indy4                           // (c) 1976 Atari / Kee
 indy800                         // (c) 1975 Atari / Kee
@@ -2561,7 +2577,8 @@ tajmah                          // Tajmahal
 att4425                         //
 
 @source:attache.cpp
-attache                         //
+attache                         // (c) 1982 Otrona
+attache816                      // (c) 1983 Otrona
 
 @source:attckufo.cpp
 attckufo                        // (c) 1980 Ryoto Electric Co.
@@ -8711,6 +8728,7 @@ bishi                           // GX575 (c) 1996 (Japan)
 sbishi                          // GX675 (c) 1998 (Japan)
 sbishik                         // GX675 (c) 1998 (Korea)
 sbishika                        // GX675 (c) 1998 (Korea)
+dobouchn                        //
 
 @source:bitgraph.cpp
 bitgrpha                        //
@@ -8961,6 +8979,7 @@ zavigaj                         // (c)
 blackjck                        //
 bowarrow                        //
 eightbll                        //
+eightblo                        //
 evelknie                        //
 freedom                         //
 matahari                        //
@@ -8976,6 +8995,7 @@ blakpyra                        //
 blbeauty                        //
 bmx                             //
 bullseye                        //
+bullseyn                        //
 centaur                         //
 cobrap                          //
 cosflash                        //
@@ -9782,7 +9802,7 @@ cocoe                           // Color Computer (Extended BASIC 1.0)
 cp400                           // Prologica CP400
 lzcolor64                       // Digiponto LZ Color64
 mx1600                          // Dynacom MX-1600
-t4426                           // Terco T4426 CNC programming station
+t4426                           // Terco 4426 CNC programming station
 
 @source:coco3.cpp
 coco3                           // Color Computer 3 (NTSC)
@@ -10611,6 +10631,7 @@ tsarevna                        //
 tsarevnaa                       //
 
 @source:cv1k.cpp
+akatana                         // (c) 2010 Cave (AMI license) - 2010/ 8/13 MASTER VER.
 ddpdfk                          // (c) 2008 Cave (AMI license) - 2008/06/23  MASTER VER 1.5
 ddpdfk10                        // (c) 2008 Cave (AMI license) - 2008/05/16  MASTER VER
 deathsml                        // (c) 2007 Cave (AMI license) - 2007/10/09 MASTER VER
@@ -12079,7 +12100,6 @@ egghunt                         // (c) 1995 Invi Image
 
 @source:einstein.cpp
 einst256                        //
-einstei2                        //
 einstein                        //
 
 @source:electra.cpp
@@ -12211,6 +12231,10 @@ eshb                            // (c) 1984 Funai / Gakken
 espial                          // (c) 1983 Thunderbolt, Orca logo is hidden in title screen
 espialu                         // (c) 1983 Thunderbolt, Orca logo is hidden in title screen
 netwars                         // (c) 1983 Orca + Esco Trading Co license
+
+@source:esprit.cpp
+esprit                          // Hazeltine Esprit
+esprit3                         // Hazeltine Esprit III
 
 @source:esq1.cpp
 esq1                            // 1986 ESQ-1 Digital Wave Synthesizer
@@ -12563,6 +12587,7 @@ feagv11                         //
 feagv2                          //
 feagv2a                         //
 feagv7                          //
+feagv7a                         //
 feagv9                          //
 fex68k                          //
 fex68km2                        //
@@ -12894,6 +12919,7 @@ rotation                        //
 bigkarnk                        // (c) 1991 - Ref 901112-1
 biomtoy                         // (c) 1995 - Ref 922804/2 - (unprotected)
 biomtoya                        // (c) 1995 - Ref 922804/2 - (unprotected)
+biomtoyb                        // (c) 1995 - Ref 922804/2 - (unprotected)
 maniacsp                        // (c) 1996 - Ref 922804/2 - (prototype)
 squash                          // (c) 1992 - Ref 922804/2
 thoop                           // (c) 1992 - Ref 922804/1
@@ -13585,6 +13611,7 @@ pwrflip                         // (c) 1994 Excellent System
 amuse                           // (c) 1982 Greyhound Electronics
 amuse1                          // (c) 1982 Greyhound Electronics
 amuse1a                         // (c) 1983 Greyhound Electronics
+bigjoke                         // (c) 1987 Greyhound Electronics
 findout                         // (c) 1987 [Elettronolo]
 geimulti                        // (c) 1992 Grayhound Electronics
 gepoker                         // (c) 1984 Greyhound Electronics
@@ -14869,6 +14896,7 @@ homez80                         //
 
 @source:horizon.cpp
 nshrz                           //
+nshrz2mhz                       //
 vector1                         //
 
 @source:hornet.cpp
@@ -14897,6 +14925,9 @@ hp16500b                        //
 hp1650b                         //
 hp1651b                         //
 hp165ka0                        //
+
+@source:hp2100.cpp
+hp2100                          // HP 2100 and HP 1000
 
 @source:hp48.cpp
 hp38g                           //
@@ -14971,6 +15002,7 @@ hvyunitu                        // (c) 1988 Kaneko
 @source:hx20.cpp
 ehx20                           //
 ehx20e                          //
+ecm6000                         //
 
 @source:hyhoo.cpp
 hyhoo                           // (c) 1987
@@ -15196,7 +15228,11 @@ hector1                         //
 interact                        //
 
 @source:interpro.cpp
-ip2800                          // Intergraph InterPro 28xx workstation
+ip2000                          // Intergraph InterPro/InterServe 20x0
+ip2400                          // Intergraph InterPro/InterServe 24x0
+ip2500                          // Intergraph InterPro/InterServe 25x0
+ip2700                          // Intergraph InterPro/InterServe 27x0
+ip2800                          // Intergraph InterPro/InterServe 28x0
 
 @source:intrscti.cpp
 intrscti                        // ????
@@ -17111,14 +17147,20 @@ wndrplnt                        // (c) 1987 Data East Corporation (Japan)
 kas89                           // 1989, SFC S.R.L.
 
 @source:kaypro.cpp
-kaypro10                        // Kaypro 10
-kaypro2x                        // Kaypro 2 - 2/84
-kaypro4                         // Kaypro 4 - 4/83
-kaypro4a                        // Kaypro 4 - 4/84
-kaypro4p88                      // Kaypro 4 - 4/83 w/plus88 board installed
+kaypro1							// Kaypro 1
+kaypro10						// Kaypro 10/83
+kaypro1084                      // Kaypro 10/84
+kaypro2x                        // Kaypro 2x
+kaypro4x                        // Kaypro 4x
+kaypro284						// Kaypro 2 - 2/84
+kaypro484                       // Kaypro 4 - 4/84
+kayproiip88                     // Kaypro II - 4/83 w/plus88 board installed
+kaypro484p88                    // Kaypro 4/84 - 4/84 w/plus88 board installed
 kayproii                        // Kaypro II - 2/83
+kayproiv						// Kaypro IV - 4/83
+kaypronew2						// Kaypro new 2
 omni2                           // Omni II
-omni4							// Omni 4
+omni4                           // Omni 4
 robie                           // Kaypro Robie
 
 @source:kc.cpp
@@ -17447,6 +17489,7 @@ trsm100                         //
 @source:kyugo.cpp
 99lstwar                        // (c) 1985 Proma
 99lstwara                       // (c) 1985 Proma
+99lstwarb                       // bootleg
 99lstwark                       // (c) 1985 Kyugo
 airwolf                         // (c) 1987 Kyugo
 airwolfa                        // (c) 1987 Kyugo
@@ -17677,6 +17720,9 @@ yellowcbj                       // (c) 1984
 @source:liberatr.cpp
 liberatr                        // 136012           (c) 1982
 liberatr2                       // 136012           (c) 1982
+
+@source:lilith.cpp
+lilith                          //
 
 @source:limenko.cpp
 dynabomb                        // (c) 2000 Limenko
@@ -20848,6 +20894,9 @@ mk4a                            // (c) 1997 Midway (v2.1)
 mk4b                            // (c) 1997 Midway (v1.0)
 thegrid                         // (c) 2001 Midway (v1.2) Latest offical release
 thegrida                        // (c) 2001 Midway (v1.1)
+
+@source:mightyframe.cpp
+mightyframe                     // Convergent
 
 @source:mikie.cpp
 mikie                           // GX469 (c) 1984
@@ -30986,6 +31035,9 @@ pexmp022                        // (c) 1997 IGT - International Game Technology
 pexmp026                        // (c) 1997 IGT - International Game Technology
 pexmp030                        // (c) 1997 IGT - International Game Technology
 
+@source:perq.cpp
+perq                            //
+
 @source:pes.cpp
 pes                             //
 
@@ -31145,6 +31197,7 @@ martmast                        // (c) 2001 Martial Masters
 martmastc                       //
 martmastc103                    //
 martmastc102                    //
+martmasttw                      //
 olds                            // (c) 1999 Oriental Legend Super / Special
 olds100                         //
 olds100a                        //
@@ -31181,6 +31234,8 @@ kov2nl                          // (c) 2008
 kov2nlo                         //
 kov2nloa                        //
 kov3                            //
+kov3_102                        //
+kov3_100                        //
 orleg2                          // (c) 2007
 orleg2o                         //
 orleg2oa                        //
@@ -31714,6 +31769,9 @@ powerinsb                       // (c) 1993 Atlus (bootleg of USA version)
 powerinsj                       // (c) 1993 Atlus (Japan)
 powerinsp                       // prototype
 
+@source:powerstack.cpp
+powerstk                        // Motorola Powerstack II
+
 @source:pp01.cpp
 pp01                            //
 
@@ -31925,6 +31983,9 @@ i8555081                        // IBM PS/2 8550-081 (Model 55SX)
 i8580071                        // IBM PS/2 8580-071 (Model 80)
 i8580111                        // IBM PS/2 8580-111 (Model 80)
 
+@source:ps2sony.cpp
+ps2                             // Sony Playstation 2
+
 @source:pse.cpp
 bazooka                         // (c) 1976 PSE
 bazookabr                       // (c) 1977 Taito do Brasil
@@ -31965,6 +32026,7 @@ daraku                          // (c) 1998
 dragnblz                        // (c) 2000
 gnbarich                        // (c) 2001
 gunbird2                        // (c) 1998
+gunbird2a                       // (c) 1998
 mjgtaste                        // (c) 2002
 s1945ii                         // (c) 1997
 s1945iii                        // (c) 1999
@@ -33442,7 +33504,7 @@ fpoint1                         // (c) 1989 (Japan, FD1094)
 fpoint1d                        //
 fpointbj                        // (c) 1989 (Datsu bootleg, Japan)
 fpointbl                        // (c) 1989 (Datsu bootleg)
-fpointbla						//
+fpointbla                       //
 fpointd                         //
 goldnaxe                        // (c) 1989 (8751)
 goldnaxe1                       // (c) 1989 (FD1094)
@@ -33736,9 +33798,9 @@ strkfgtr                        // 1991.06 Strike Fighter (World)
 strkfgtrj                       // 1991.06 Strike Fighter (Japan)
 
 @source:seibucats.cpp
-emjjoshi						// (c) 1999 Seibu Kaihatsu / CATS
-emjscanb						// (c) 2001 Seibu Kaihatsu / CATS
-emjtrapz						// (c) 2001 Seibu Kaihatsu / CATS
+emjjoshi                        // (c) 1999 Seibu Kaihatsu / CATS
+emjscanb                        // (c) 2001 Seibu Kaihatsu / CATS
+emjtrapz                        // (c) 2001 Seibu Kaihatsu / CATS
 
 @source:seibuspi.cpp
 batlball                        // (c) 1995 Seibu Kaihatsu (Tuning License)
@@ -34645,6 +34707,9 @@ sorcererd                       // Sorcerer with floppies
 @source:sothello.cpp
 sothello                        // (c) 1986 Success / Fujiwara.
 
+@source:solbourne.cpp
+sols5e                          // Solbourne Series 5E computer workstation
+
 @source:spacefb.cpp
 spacebrd                        // bootleg
 spacedem                        // (c) 1980 Fortrek + made by Nintendo
@@ -34942,6 +35007,7 @@ princess                        //
 stars                           //
 stingray                        //
 trident                         //
+tridento                        //
 wildfyre                        //
 
 @source:st_mp200.cpp
@@ -34950,6 +35016,7 @@ biggame                         //
 blkshpsq                        //
 catacomp                        //
 cheetah                         //
+cheetahb                        //
 dragfist                        //
 flight2k                        //
 freefall                        //
@@ -35014,10 +35081,26 @@ tomcatsw                        // (proto)          (c) 1983
 @source:statriv2.cpp
 bbchall                         // (c) 1986 Status Games
 bigcsino                        // (c) 1984 Status Games
-cstrip                          // (c) 1984 Status Games
-cstripix                        // (c) 1985 Status Games
-cstripviii                      // (c) 1985 Status Games
-cstripxi                        // (c) 1988 Status Games
+cs1_spp                         //
+cs1_spp2                        //
+cs10_sps                        //
+cs11_sps                        //
+cs11_sps2                       //
+cs11_ssp                        //
+cs12_sps                        //
+cs2_sps                         //
+cs3_qps                         //
+cs5_spp                         //
+cs5_ssp                         //
+cs6_sps                         //
+cs6_ssp                         //
+cs8_spp                         //
+cs8_sps                         //
+cs8_ssp                         //
+cs9_qps                         //
+cs9_spp                         //
+cspe_qps                        //
+csv1_qps                        //
 funcsino                        // (c) 1981 Status Games
 hangman                         // (c) 1984 Status Games
 nsupertr3                       // (c) 1988 Status Games
@@ -36193,6 +36276,9 @@ temptube                        // (hack)
 @source:terak.cpp
 terak                           //
 
+@source:terco.cpp
+t4490                           // Terco 4490 Mill CNC Control (c) 1986
+
 @source:terracre.cpp
 amatelas                        // (c) 1986
 amazon                          // (c) 1986
@@ -36866,6 +36952,10 @@ trs80l2                         // TRS-80 Model I - Level II BASIC
 trs80m3                         // TRS-80 Model III - Radio Shack/Tandy
 trs80m4                         //
 trs80m4p                        //
+cp500                           // Prologica CP500
+
+@source:trs80dt1.cpp
+trs80dt1                        // TRS-80 Data Terminal 1
 
 @source:trs80m2.cpp
 trs80m16                        //
@@ -36897,6 +36987,9 @@ ts803h                          //
 @source:ts816.cpp
 ts816                           //
 
+@source:ts3000.cpp
+ts3000                          // Televideo TS-3000
+
 @source:tsamurai.cpp
 alphaxz                         // AZ  (c) 1986 Ed/Wood Place
 ladymstr                        // A49 (c) 1985 Taito
@@ -36907,6 +37000,7 @@ m660j                           // ??? (c) 1986 Taito Corporation (Japan)
 nunchaku                        // ??? (c) 1985 Taito
 ringfgt                         // (c) 1984 Taito
 ringfgt2                        // (c) 1984 Taito
+the26thz                        // A72 (c) 1986 Taito
 tsamurai                        // A35 (c) 1985 Taito
 tsamurai2                       // A35 (c) 1985 Taito
 tsamuraih                       // bootleg
@@ -36920,6 +37014,9 @@ prose2ko                        //
 @source:ttchamp.cpp
 ttchamp                         //
 ttchampa                        //
+
+@source:tti.cpp
+tti                             //
 
 @source:tubep.cpp
 rjammer                         // (c) 1984 + Alice
@@ -37259,6 +37356,9 @@ vector4                         //
 @source:vectrex.cpp
 raaspec                         // (c) Roy Abel & Associates 1984
 vectrex                         // General Consumer Electric Vectrex - 1982-1984
+
+@source:vectrix.cpp
+vectrix                         // (c) 19?? Olympia?
 
 @source:vega.cpp
 vega                            // (c) 19?? Olympia?
@@ -38446,6 +38546,11 @@ wwfsstaru7                      // TA-0024 (c) 1989 (US, newer)
 wwfsstaru6                      // TA-0024 (c) 1989 (US)
 wwfsstaru4                      // TA-0024 (c) 1989 (US)
 
+@source:wyse.cpp
+wy50                            // WY-50
+wy160                           // WY-160
+wy30p                           // WY-30+
+
 @source:wyvernf0.cpp
 wyvernf0                        // A39 (c) 1985 Taito Corporation (Japan)
 
@@ -38836,6 +38941,9 @@ zrt80                           //
 
 @source:zsbc3.cpp
 zsbc3                           //
+
+@source:zt8802.cpp
+zt8802                          // (c) 19?? Olympia?
 
 @source:zwackery.cpp
 zwackery                        // (c) 1984

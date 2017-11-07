@@ -138,35 +138,27 @@ public:
 	INTERRUPT_GEN_MEMBER( nmi_line_assert );
 
 	INTERRUPT_GEN_MEMBER( irq0_line_hold );
-	INTERRUPT_GEN_MEMBER( irq0_line_pulse );
 	INTERRUPT_GEN_MEMBER( irq0_line_assert );
 
 	INTERRUPT_GEN_MEMBER( irq1_line_hold );
-	INTERRUPT_GEN_MEMBER( irq1_line_pulse );
 	INTERRUPT_GEN_MEMBER( irq1_line_assert );
 
 	INTERRUPT_GEN_MEMBER( irq2_line_hold );
-	INTERRUPT_GEN_MEMBER( irq2_line_pulse );
 	INTERRUPT_GEN_MEMBER( irq2_line_assert );
 
 	INTERRUPT_GEN_MEMBER( irq3_line_hold );
-	INTERRUPT_GEN_MEMBER( irq3_line_pulse );
 	INTERRUPT_GEN_MEMBER( irq3_line_assert );
 
 	INTERRUPT_GEN_MEMBER( irq4_line_hold );
-	INTERRUPT_GEN_MEMBER( irq4_line_pulse );
 	INTERRUPT_GEN_MEMBER( irq4_line_assert );
 
 	INTERRUPT_GEN_MEMBER( irq5_line_hold );
-	INTERRUPT_GEN_MEMBER( irq5_line_pulse );
 	INTERRUPT_GEN_MEMBER( irq5_line_assert );
 
 	INTERRUPT_GEN_MEMBER( irq6_line_hold );
-	INTERRUPT_GEN_MEMBER( irq6_line_pulse );
 	INTERRUPT_GEN_MEMBER( irq6_line_assert );
 
 	INTERRUPT_GEN_MEMBER( irq7_line_hold );
-	INTERRUPT_GEN_MEMBER( irq7_line_pulse );
 	INTERRUPT_GEN_MEMBER( irq7_line_assert );
 
 

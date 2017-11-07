@@ -1,9 +1,14 @@
 <?xml version="1.0"?>
 <mamelayout version="2">
 	<view name="Main Screen Standard (4:3)">
+		<bounds left="0" top="0" right="4" bottom="3" />
 		<screen index="0">
 			<bounds left="0" top="0" right="4" bottom="3" />
 		</screen>
+
+		<!-- workaround for MAME selecting a 3-screen view by default -->
+		<screen index="1"><bounds left="10" top="0" right="14" bottom="3" /></screen>
+		<screen index="2"><bounds left="10" top="0" right="14" bottom="3" /></screen>
 	</view>
 
 	<view name="SegaScope Left LCD Standard (4:3)">

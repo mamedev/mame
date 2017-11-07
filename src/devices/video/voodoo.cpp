@@ -1431,8 +1431,8 @@ inline int32_t voodoo_device::tmu_state::prepare()
 	return (-lodbase + (12 << 8)) / 2;
 #else
 	double tmpTex = texdx;
-	lodbase = new_log2(tmpTex);
-	return (lodbase + (12 << 8) - (56 << 8)) / 2;
+	lodbase = new_log2(tmpTex, 0);
+	return (lodbase + (12 << 8)) / 2;
 #endif
 }
 

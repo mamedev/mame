@@ -279,7 +279,7 @@ WRITE16_MEMBER (hk68v10_state::bootvect_w){
 	LOG (("%s offset %08x, mask %08x, data %04x\n", FUNCNAME, offset, mem_mask, data));
 	m_sysram[offset % sizeof(m_sysram)] &= ~mem_mask;
 	m_sysram[offset % sizeof(m_sysram)] |= (data & mem_mask);
-	m_sysrom = &m_sysram[0]; // redirect all upcomming accesses to masking RAM until reset.
+	m_sysrom = &m_sysram[0]; // redirect all upcoming accesses to masking RAM until reset.
 }
 
 #if 0

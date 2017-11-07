@@ -587,7 +587,7 @@ void mpcc_device::tra_complete()
 }
 
 //-------------------------------------------------
-//  rcv_callback - called when it is time to sample incomming data bit
+//  rcv_callback - called when it is time to sample incoming data bit
 //-------------------------------------------------
 void mpcc_device::rcv_callback()
 {

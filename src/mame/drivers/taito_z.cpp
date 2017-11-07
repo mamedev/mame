@@ -3588,7 +3588,8 @@ static MACHINE_CONFIG_START( dblaxle )
 	MCFG_MACHINE_START_OVERRIDE(taitoz_state,taitoz)
 	MCFG_MACHINE_RESET_OVERRIDE(taitoz_state,taitoz)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))
+	// make quantum time to be a multiple of the xtal (fixes road layer stuck on continue)
+	MCFG_QUANTUM_TIME(attotime::from_hz(XTAL_32MHz/1024))
 
 	MCFG_DEVICE_ADD("tc0510nio", TC0510NIO, 0)
 	MCFG_TC0510NIO_READ_0_CB(IOPORT("DSWA"))

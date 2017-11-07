@@ -3678,7 +3678,9 @@ static MACHINE_CONFIG_DERIVED( system16b_i8751, system16b )
 
 	MCFG_CPU_ADD("mcu", I8751, MASTER_CLOCK_8MHz)
 	MCFG_CPU_IO_MAP(mcu_io_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segas16b_state, irq0_line_pulse)
+
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("mcu", INPUT_LINE_IRQ0))
 MACHINE_CONFIG_END
 
 // same as the above, but with custom Sega ICs
@@ -8453,6 +8455,7 @@ ROM_END
 //  Wrestle War, Sega System 16B
 //  CPU: FD1094 (317-0090)
 //  ROM Board type: 171-5704
+//  Sega ID# for ROM board: 834-6888-01
 //
 ROM_START( wrestwar1 )
 	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code

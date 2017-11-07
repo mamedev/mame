@@ -36,7 +36,7 @@ uint16_t sh4be_frontend::read_word(opcode_desc &desc)
 	if (desc.physpc >= 0xe0000000)
 		return m_sh->m_direct->read_word(desc.physpc, SH34BE_CODE_XOR(0));
 
-	return m_sh->m_direct->read_word(desc.physpc & SH34_AM, SH34BE_CODE_XOR(0));	
+	return m_sh->m_direct->read_word(desc.physpc & SH34_AM, SH34BE_CODE_XOR(0));
 }
 
 
@@ -259,7 +259,7 @@ bool sh4_frontend::describe_group_15(opcode_desc &desc, const opcode_desc *prev,
 	case 0x0e:  return true; // FMAC(opcode); break;
 	case 0x0f:
 		return true;
-		//if (opcode == 0xffff) return true; 	// atomiswave uses ffff as NOP?
+		//if (opcode == 0xffff) return true;    // atomiswave uses ffff as NOP?
 		//return false; // dbreak(opcode); break;
 	}
 	return false;

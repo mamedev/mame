@@ -140,6 +140,18 @@ ROM_START( slicer )
 	ROM_REGION(0x8001, "bios", 0)
 	// built from sources, reset.asm adds an extra byte
 	ROM_LOAD("epbios.bin", 0x0000, 0x8001, CRC(96fe9dd4) SHA1(5fc43454fe7d51f2ae97aef822155dcd28eb7f23))
+
+	ROM_REGION(0x10000, "user1", 0)
+	//slicer_h.bin : main slicer board, high byte
+	//slicer_l.bin : main slicer board, low byte
+	//slvid_cg.bin : slicer video/keyboard expansion board, character generator
+	//slvid_e.bin : slicer video/keyboard expansion board, even byte
+	//slvid_o.bin : slicer video/keyboard expansion board, odd byte
+	ROM_LOAD( "slicer_h.bin", 0x000000, 0x004000, CRC(1f9a79b7) SHA1(2070c6818d39fe7ec4370fc2304469793a126731) )
+	ROM_LOAD( "slicer_l.bin", 0x000000, 0x004000, CRC(6feef94b) SHA1(174488591b727a4130166bcb2e83c0e74323d43b) )
+	ROM_LOAD( "slvid_cg.bin", 0x000000, 0x001000, CRC(d4d9ac2f) SHA1(866c760320b224ba8670501ea905de32193acedc) )
+	ROM_LOAD( "slvid_o.bin",  0x000000, 0x001000, CRC(c62dda77) SHA1(1d0b9abc53412b0725072d4c33c478fb5358ab5c) )
+	ROM_LOAD( "slvid_e.bin",  0x000000, 0x001000, CRC(8694274f) SHA1(8373baaea8d689bf52699b587942a57f26baf740) )
 ROM_END
 
 COMP( 1983, slicer, 0, 0, slicer, 0, slicer_state, 0, "Slicer Computers", "Slicer", MACHINE_NO_SOUND )

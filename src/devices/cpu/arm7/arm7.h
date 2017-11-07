@@ -128,6 +128,20 @@ protected:
 	address_space_config m_program_config;
 
 	uint32_t m_r[/*NUM_REGS*/37];
+
+	void update_insn_prefetch(uint32_t curr_pc);
+	virtual uint16_t insn_fetch_thumb(uint32_t pc);
+	uint32_t insn_fetch_arm(uint32_t pc);
+	int get_insn_prefetch_index(uint32_t address);
+
+	uint32_t m_insn_prefetch_depth;
+	uint32_t m_insn_prefetch_count;
+	uint32_t m_insn_prefetch_index;
+	uint32_t m_insn_prefetch_buffer[3];
+	uint32_t m_insn_prefetch_address[3];
+	const uint32_t m_prefetch_word0_shift;
+	const uint32_t m_prefetch_word1_shift;
+
 	bool m_pendingIrq;
 	bool m_pendingFiq;
 	bool m_pendingAbtD;
@@ -201,7 +215,7 @@ protected:
 	void arm9ops_e(uint32_t insn);
 
 	void set_cpsr(uint32_t val);
-	bool arm7_tlb_translate(offs_t &addr, int flags);
+	bool arm7_tlb_translate(offs_t &addr, int flags, bool no_exception = false);
 	uint32_t arm7_tlb_get_second_level_descriptor( uint32_t granularity, uint32_t first_desc, uint32_t vaddr );
 	int detect_fault(int desc_lvl1, int ap, int flags);
 	void arm7_check_irq_state();
@@ -216,7 +230,7 @@ protected:
 	// Coprocessor support
 	DECLARE_WRITE32_MEMBER( arm7_do_callback );
 	DECLARE_READ32_MEMBER( arm7_rt_r_callback );
-	DECLARE_WRITE32_MEMBER( arm7_rt_w_callback );
+	virtual DECLARE_WRITE32_MEMBER( arm7_rt_w_callback );
 	void arm7_dt_r_callback(uint32_t insn, uint32_t *prn);
 	void arm7_dt_w_callback(uint32_t insn, uint32_t *prn);
 
@@ -606,6 +620,14 @@ public:
 	sa1110_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
+class igs036_cpu_device : public arm9_cpu_device
+{
+public:
+	// construction/destruction
+	igs036_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	virtual DECLARE_WRITE32_MEMBER( arm7_rt_w_callback ) override;
+};
+
 
 DECLARE_DEVICE_TYPE(ARM7,     arm7_cpu_device)
 DECLARE_DEVICE_TYPE(ARM7_BE,  arm7_be_cpu_device)
@@ -615,5 +637,6 @@ DECLARE_DEVICE_TYPE(ARM920T,  arm920t_cpu_device)
 DECLARE_DEVICE_TYPE(ARM946ES, arm946es_cpu_device)
 DECLARE_DEVICE_TYPE(PXA255,   pxa255_cpu_device)
 DECLARE_DEVICE_TYPE(SA1110,   sa1110_cpu_device)
+DECLARE_DEVICE_TYPE(IGS036,   igs036_cpu_device)
 
 #endif // MAME_CPU_ARM7_ARM7_H

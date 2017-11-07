@@ -28,11 +28,11 @@ class alphatpx_state : public driver_device
 {
 public:
 	alphatpx_state(const machine_config &mconfig, device_type type, const char *tag) :
-	driver_device(mconfig, type, tag),
-	m_bankdev(*this, "bankdev"),
-	m_palette(*this, "palette"),
-	m_vram(*this, "vram"),
-	m_gfx(*this, "gfx")
+		driver_device(mconfig, type, tag),
+		m_bankdev(*this, "bankdev"),
+		m_palette(*this, "palette"),
+		m_vram(*this, "vram"),
+		m_gfx(*this, "gfx")
 	{ }
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -225,7 +225,7 @@ ROM_START( alphatp3 )
 	ROM_LOAD("caap36_02_19.bin", 0x0000, 0x1000, CRC(23df6666) SHA1(5ea04cd299dec9951425eb91ecceb4818c4c6378))
 
 	ROM_REGION(0x400, "mcu", 0)
-	ROM_LOAD("p3_8041.bin", 0x000, 0x400, CRC(97206ad7) SHA1(e4e6b2ebf87ae9dc0b051f3f478496109d124896))
+	ROM_LOAD("p3_8041.bin", 0x000, 0x400, NO_DUMP)
 
 	ROM_REGION(0x800, "gfx", 0)
 	ROM_LOAD("cajp08_01_15.bin", 0x000, 0x800, CRC(4ed11dac) SHA1(9db9b8e0edf471faaddbb5521d6223121146bab8))

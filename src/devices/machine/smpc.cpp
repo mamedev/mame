@@ -179,7 +179,7 @@ DEFINE_DEVICE_TYPE(SMPC_HLE, smpc_hle_device, "smpc_hle", "Sega Saturn SMPC HLE 
 // TODO: use DEVICE_ADDRESS_MAP once this fatalerror is fixed:
 // "uplift_submaps unhandled case: range straddling slots."
 static ADDRESS_MAP_START( smpc_regs, 0, 8, smpc_hle_device )
-//	ADDRESS_MAP_UNMAP_HIGH
+//  ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x0d) AM_WRITE(ireg_w)
 	AM_RANGE(0x1f, 0x1f) AM_WRITE(command_register_w)
 	AM_RANGE(0x20, 0x5f) AM_READ(oreg_r)
@@ -205,7 +205,7 @@ smpc_hle_device::smpc_hle_device(const machine_config &mconfig, const char *tag,
 	: device_t(mconfig, SMPC_HLE, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
 	m_space_config("regs", ENDIANNESS_LITTLE, 8, 7, 0, nullptr, *ADDRESS_MAP_NAME(smpc_regs)),
-    m_mini_nvram(*this, "smem"),
+	m_mini_nvram(*this, "smem"),
 	m_mshres(*this),
 	m_mshnmi(*this),
 	m_sshres(*this),
@@ -249,7 +249,7 @@ void smpc_hle_device::static_set_control_port_tags(device_t &device, const char 
 
 MACHINE_CONFIG_MEMBER(smpc_hle_device::device_add_mconfig)
 	MCFG_NVRAM_ADD_0FILL("smem")
-	
+
 	// TODO: custom RTC subdevice
 MACHINE_CONFIG_END
 
@@ -261,11 +261,11 @@ void smpc_hle_device::device_start()
 {
 	system_time systime;
 	machine().base_datetime(systime);
-	
-//	check if SMEM has valid data via byte 4 in the array, if not then simulate a battery backup fail 
+
+//  check if SMEM has valid data via byte 4 in the array, if not then simulate a battery backup fail
 //  (-> call the RTC / Language select menu for Saturn)
 	m_mini_nvram->set_base(&m_smem, 5);
-	
+
 	m_mshres.resolve_safe();
 	m_mshnmi.resolve_safe();
 	m_sshres.resolve_safe();
@@ -274,12 +274,12 @@ void smpc_hle_device::device_start()
 	m_syshalt.resolve_safe();
 	m_dotsel.resolve_safe();
 	m_irq_line.resolve_safe();
-	
+
 	m_pdr1_read.resolve_safe(0xff);
 	m_pdr2_read.resolve_safe(0xff);
 	m_pdr1_write.resolve_safe();
 	m_pdr2_write.resolve_safe();
-	
+
 	save_item(NAME(m_sf));
 	save_item(NAME(m_sr));
 	save_item(NAME(m_ddr1));
@@ -299,15 +299,15 @@ void smpc_hle_device::device_start()
 	save_item(NAME(m_pmode));
 	save_item(NAME(m_rtc_data));
 	save_item(NAME(m_smem));
-	
+
 	m_cmd_timer = timer_alloc(COMMAND_ID);
 	m_rtc_timer = timer_alloc(RTC_ID);
 	m_intback_timer = timer_alloc(INTBACK_ID);
 	m_sndres_timer = timer_alloc(SNDRES_ID);
-	
-// 	TODO: tag-ify, needed when SCU will be a device
+
+//  TODO: tag-ify, needed when SCU will be a device
 	m_screen = machine().first_screen();
-	
+
 	m_rtc_data[0] = DectoBCD(systime.local_time.year / 100);
 	m_rtc_data[1] = DectoBCD(systime.local_time.year % 100);
 	m_rtc_data[2] = (systime.local_time.weekday << 4) | (systime.local_time.month+1);
@@ -321,7 +321,7 @@ void smpc_hle_device::device_start()
 		m_ctrl1 = downcast<saturn_control_port_device *>(machine().device(m_ctrl1_tag));
 		m_ctrl2 = downcast<saturn_control_port_device *>(machine().device(m_ctrl2_tag));
 	}
-//	m_has_ctrl_ports = (m_ctrl1 != nullptr && m_ctrl2 != nullptr);
+//  m_has_ctrl_ports = (m_ctrl1 != nullptr && m_ctrl2 != nullptr);
 }
 
 
@@ -338,10 +338,10 @@ void smpc_hle_device::device_reset()
 	m_ddr2 = 0;
 	m_pdr1_readback = 0;
 	m_pdr2_readback = 0;
-	
+
 	memset(m_ireg,0,7);
 	memset(m_oreg,0,32);
-	
+
 	m_cmd_timer->reset();
 	m_intback_timer->reset();
 	m_sndres_timer->reset();
@@ -349,7 +349,7 @@ void smpc_hle_device::device_reset()
 	m_command_in_progress = false;
 	m_NMI_reset = false;
 	m_cur_dotsel = false;
-	
+
 	m_rtc_timer->adjust(attotime::zero, 0, attotime::from_seconds(1));
 }
 
@@ -369,10 +369,10 @@ WRITE8_MEMBER( smpc_hle_device::ireg_w )
 {
 	if (!(offset & 1)) // avoid writing to even bytes
 		return;
-		
+
 	m_ireg[offset >> 1] = data;
-	
-	if(offset == 1) // check if we are under intback 
+
+	if(offset == 1) // check if we are under intback
 	{
 		if(m_intback_stage)
 		{
@@ -385,8 +385,8 @@ WRITE8_MEMBER( smpc_hle_device::ireg_w )
 			else if(data & 0x80)
 			{
 				if(LOG_PAD_CMD) printf("SMPC: CONTINUE request\n");
-				
-				m_intback_timer->adjust(attotime::from_usec(700));	// TODO: is timing correct?
+
+				m_intback_timer->adjust(attotime::from_usec(700));  // TODO: is timing correct?
 
 				// TODO: following looks wrong here
 				m_oreg[31] = 0x10;
@@ -397,7 +397,7 @@ WRITE8_MEMBER( smpc_hle_device::ireg_w )
 }
 
 READ8_MEMBER( smpc_hle_device::oreg_r )
-{	
+{
 	if (!(offset & 1)) // avoid reading to even bytes (TODO: is it 0s or 1s?)
 		return 0x00;
 
@@ -424,14 +424,14 @@ WRITE8_MEMBER( smpc_hle_device::status_flag_w )
 READ8_MEMBER( smpc_hle_device::pdr1_r )
 {
 	uint8_t res = (m_pdr1_read() & ~m_ddr1) | m_pdr1_readback;
-	
+
 	return res;
 }
 
 READ8_MEMBER( smpc_hle_device::pdr2_r )
 {
 	uint8_t res = (m_pdr2_read() & ~m_ddr2) | m_pdr2_readback;
-	
+
 	return res;
 }
 
@@ -540,26 +540,26 @@ WRITE8_MEMBER( smpc_hle_device::write )
 
 WRITE8_MEMBER( smpc_hle_device::command_register_w )
 {
-//	don't send a command if previous one is still in progress
+//  don't send a command if previous one is still in progress
 //  ST-V tries to send a sysres command if OREG31 doesn't return the ack command
 	if(m_command_in_progress == true)
 		return;
-	
+
 	m_comreg = data & 0x1f;
-	
+
 	if(data & 0xe0)
 		logerror("%s COMREG = %02x!?\n",this->tag(),data);
-	
+
 	m_command_in_progress = true;
 	if(m_comreg == 0x0e || m_comreg == 0x0f)
 	{
 		/* on ST-V timing of this is pretty fussy, you get 2 credits at start-up otherwise
-		 * My current theory is that the PLL device can halt the whole system until the frequency change occurs. 
-		 *  (cfr. diagram on page 3 of SMPC manual) 
+		 * My current theory is that the PLL device can halt the whole system until the frequency change occurs.
+		 *  (cfr. diagram on page 3 of SMPC manual)
 		 * I really don't think that the system can do an usable mid-frame clock switching anyway.
 		 */
 		m_syshalt(1);
-		
+
 		m_cmd_timer->adjust(m_screen->time_until_pos(m_screen->visible_area().max_y,0));
 	}
 	else if(m_comreg == 0x10)
@@ -567,7 +567,7 @@ WRITE8_MEMBER( smpc_hle_device::command_register_w )
 		// copy ireg to our intback buffer
 		for(int i=0;i<3;i++)
 			m_intback_buf[i] = m_ireg[i];
-		
+
 		// calculate the timing for intback command
 		int timing;
 
@@ -576,12 +576,12 @@ WRITE8_MEMBER( smpc_hle_device::command_register_w )
 		if( m_ireg[0] != 0) // non-peripheral data
 			timing += 8;
 
-		// TODO: At vblank-out actually ... 
+		// TODO: At vblank-out actually ...
 		if( m_ireg[1] & 8) // peripheral data
 			timing += 700;
-		
+
 		// TODO: check against ireg2, must be 0xf0
-		
+
 		m_cmd_timer->adjust(attotime::from_usec(timing));
 	}
 	else
@@ -607,7 +607,7 @@ void smpc_hle_device::device_timer(emu_timer &timer, device_timer_id id, int par
 					// enable or disable Slave SH2
 					m_sshres(m_comreg & 1);
 					break;
-				
+
 				case 0x06: // SNDON
 				case 0x07: // SNDOFF
 					// enable or disable 68k
@@ -621,15 +621,15 @@ void smpc_hle_device::device_timer(emu_timer &timer, device_timer_id id, int par
 					m_oreg[31] = m_comreg;
 					sf_ack(true); //clear hand-shake flag (TODO: diagnostic wants this to have bit 3 high)
 					return;
-					
-//				case 0x0a: // NETLINKON
-//				case 0x0b: // NETLINKOFF
-					
+
+//              case 0x0a: // NETLINKON
+//              case 0x0b: // NETLINKOFF
+
 				case 0x0d: // SYSRES
 					// send a 1 -> 0 to device reset lines
 					m_sysres(1);
 					m_sysres(0);
-	
+
 					// send a 1 -> 0 transition to reset line (was PULSE_LINE)
 					m_mshres(1);
 					m_mshres(0);
@@ -638,7 +638,7 @@ void smpc_hle_device::device_timer(emu_timer &timer, device_timer_id id, int par
 				case 0x0e: // CKCHG352
 				case 0x0f: // CKCHG320
 					m_dotsel(m_comreg & 1);
-					
+
 					// send a NMI to Master SH2 if enabled
 					if(m_NMI_reset == false)
 						master_sh2_nmi();
@@ -647,22 +647,22 @@ void smpc_hle_device::device_timer(emu_timer &timer, device_timer_id id, int par
 					m_sshres(1);
 					// clear PLL system halt
 					m_syshalt(0);
-					
+
 					// setup the new dot select
 					m_cur_dotsel = (m_comreg & 1) ^ 1;
 					break;
 
 				case 0x10: // INTBACK
 					resolve_intback();
-					return; 
-	
+					return;
+
 				case 0x16: // SETTIME
 				{
 					for(int i=0;i<7;i++)
 						m_rtc_data[i] = m_ireg[i];
 					break;
 				}
-					
+
 				case 0x17: // SETSMEM
 				{
 					for(int i=0;i<4;i++)
@@ -672,7 +672,7 @@ void smpc_hle_device::device_timer(emu_timer &timer, device_timer_id id, int par
 					m_smem[4] = 0xff;
 					break;
 				}
-				
+
 				case 0x18: // NMIREQ
 					// NMI is unconditionally requested
 					master_sh2_nmi();
@@ -712,11 +712,11 @@ void smpc_hle_device::device_timer(emu_timer &timer, device_timer_id id, int par
 void smpc_hle_device::resolve_intback()
 {
 	int i;
-	
+
 	m_command_in_progress = false;
 
 	if(m_intback_buf[0] != 0)
-	{	
+	{
 		m_oreg[0] = ((m_smem[4] & 0x80) | ((m_NMI_reset & 1) << 6));
 
 		for(i=0;i<7;i++)
@@ -725,11 +725,11 @@ void smpc_hle_device::resolve_intback()
 		m_oreg[8] = 0; // CTG0 / CTG1?
 
 		m_oreg[9] = m_region_code; // TODO: system region on Saturn
-			
+
 		/*
 		 0-11 -1-- unknown
 		 -x-- ---- VDP2 dot select
-	     ---- x--- MSHNMI
+		 ---- x--- MSHNMI
 		 ---- --x- SYSRES
 		 ---- ---x SOUNDRES
 		 */
@@ -741,7 +741,7 @@ void smpc_hle_device::resolve_intback()
 					 1 << 2 |
 					 0 << 1 |
 					 0 << 0;
-		
+
 		m_oreg[11] = 0 << 6; // CDRES
 
 		for(i=0;i<4;i++)
@@ -755,7 +755,7 @@ void smpc_hle_device::resolve_intback()
 		m_pmode = m_intback_buf[0]>>4;
 
 		irq_request();
-		
+
 		// put issued command in OREG31
 		m_oreg[31] = 0x10; // TODO: doc says 0?
 		/* clear hand-shake flag */
@@ -780,7 +780,7 @@ void smpc_hle_device::intback_continue_request()
 {
 	if( m_has_ctrl_ports == true )
 		read_saturn_ports();
-	
+
 	if (m_intback_stage == 2)
 	{
 		sr_set(0x80 | m_pmode);     // pad 2, no more data, echo back pad mode set by intback
@@ -793,8 +793,8 @@ void smpc_hle_device::intback_continue_request()
 	}
 	irq_request();
 
-	m_oreg[31] = 0x10; // callback for last command issued 
-	sf_ack(false);	
+	m_oreg[31] = 0x10; // callback for last command issued
+	sf_ack(false);
 }
 
 int smpc_hle_device::DectoBCD(int num)
@@ -940,21 +940,21 @@ void smpc_hle_device::read_saturn_ports()
 	for (int i = 0; i < (status1 & 0xf); i++)
 	{
 		uint8_t id = m_ctrl1->read_id(i);
-		
+
 		m_oreg[reg_offset++] = id;
 		for (int j = 0; j < (id & 0xf); j++)
 			m_oreg[reg_offset++] = m_ctrl1->read_ctrl(j + ctrl1_offset);
 
 		ctrl1_offset += (id & 0xf);
 	}
-	
+
 	m_oreg[reg_offset++] = status2;
 
 	// read ctrl2
 	for (int i = 0; i < (status2 & 0xf); i++)
 	{
 		uint8_t id = m_ctrl2->read_id(i);
-		
+
 		m_oreg[reg_offset++] = id;
 
 		for (int j = 0; j < (id & 0xf); j++)

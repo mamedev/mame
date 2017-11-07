@@ -519,8 +519,7 @@ static ADDRESS_MAP_START( hitice_map, AS_PROGRAM, 16, taitob_state )
 	AM_RANGE(0x800000, 0x803fff) AM_RAM /* Main RAM */
 	AM_RANGE(0xa00000, 0xa01fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xb00000, 0xb7ffff) AM_RAM_WRITE(hitice_pixelram_w) AM_SHARE("pixelram")
-//  { 0xbffff0, 0xbffff1, ???
-	AM_RANGE(0xbffff2, 0xbffff5) AM_WRITE(hitice_pixel_scroll_w)
+	AM_RANGE(0xbffff0, 0xbffff5) AM_WRITE(hitice_pixel_scroll_w)
 //  { 0xbffffa, 0xbffffb, ???
 ADDRESS_MAP_END
 

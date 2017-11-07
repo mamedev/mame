@@ -213,6 +213,7 @@ suspicious code:
 #include "machine/timer.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "video/ramdac.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -250,9 +251,6 @@ public:
 	std::unique_ptr<int32_t[]> m_zoom_table;
 	std::unique_ptr<uint16_t[]> m_blitter_data;
 
-	std::unique_ptr<uint8_t[]> m_palette_ptr;
-	int32_t m_palpos;
-
 	scroll_info *m_scanlines;
 
 	int32_t m_direct_write_x0;
@@ -280,8 +278,6 @@ public:
 	}
 	DECLARE_WRITE16_MEMBER(wheelfir_scanline_cnt_w);
 	DECLARE_WRITE16_MEMBER(wheelfir_blit_w);
-	DECLARE_WRITE16_MEMBER(pal_reset_pos_w);
-	DECLARE_WRITE16_MEMBER(pal_data_w);
 	DECLARE_WRITE16_MEMBER(wheelfir_7c0000_w);
 	DECLARE_READ16_MEMBER(wheelfir_7c0000_r);
 	DECLARE_WRITE16_MEMBER(wheelfir_snd_w);
@@ -564,28 +560,6 @@ WRITE_LINE_MEMBER(wheelfir_state::screen_vblank_wheelfir)
 }
 
 
-WRITE16_MEMBER(wheelfir_state::pal_reset_pos_w)
-{
-	m_palpos = 0;
-}
-
-WRITE16_MEMBER(wheelfir_state::pal_data_w)
-{
-	int color=m_palpos/3;
-	m_palette_ptr[m_palpos] = data & 0xff;
-	++m_palpos;
-
-	m_palpos %=NUM_COLORS*3;
-
-	{
-		int r = m_palette_ptr[color*3];
-		int g = m_palette_ptr[color*3+1];
-		int b = m_palette_ptr[color*3+2];
-		m_palette->set_pen_color(color, rgb_t(r,g,b));
-	}
-
-}
-
 WRITE16_MEMBER(wheelfir_state::wheelfir_7c0000_w)
 {
 	if (ACCESSING_BITS_8_15)
@@ -636,9 +610,9 @@ static ADDRESS_MAP_START( wheelfir_main, AS_PROGRAM, 16, wheelfir_state )
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 
 	AM_RANGE(0x700000, 0x70001f) AM_WRITE(wheelfir_blit_w)
-	AM_RANGE(0x720000, 0x720001) AM_WRITE(pal_reset_pos_w)
-	AM_RANGE(0x720002, 0x720003) AM_WRITE(pal_data_w)
-	AM_RANGE(0x720004, 0x720005) AM_WRITENOP // always ffff?
+	AM_RANGE(0x720000, 0x720001) AM_DEVWRITE8("ramdac",ramdac_device, index_w, 0x00ff )
+	AM_RANGE(0x720002, 0x720003) AM_DEVWRITE8("ramdac",ramdac_device, pal_w, 0x00ff )
+	AM_RANGE(0x720004, 0x720005) AM_DEVWRITE8("ramdac",ramdac_device, mask_w, 0x00ff ) // word write?
 	AM_RANGE(0x740000, 0x740001) AM_DEVWRITE("soundlatch", generic_latch_16_device, write)
 	AM_RANGE(0x760000, 0x760001) AM_WRITE(coin_cnt_w)
 	AM_RANGE(0x780000, 0x780005) AM_WRITENOP // Start ADC0808 conversion
@@ -743,7 +717,6 @@ void wheelfir_state::machine_start()
 	m_blitter_data = std::make_unique<uint16_t[]>(16);
 
 	m_scanlines = reinterpret_cast<scroll_info*>(auto_alloc_array(machine(), uint8_t, sizeof(scroll_info)*(NUM_SCANLINES+NUM_VBLANK_LINES)));
-	m_palette_ptr = std::make_unique<uint8_t[]>(NUM_COLORS*3);
 
 
 	for(int i=0;i<(ZOOM_TABLE_SIZE);++i)
@@ -770,6 +743,9 @@ void wheelfir_state::machine_start()
 	}
 }
 
+static ADDRESS_MAP_START( ramdac_map, 0, 8, wheelfir_state )
+	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb888_w)
+ADDRESS_MAP_END
 
 static MACHINE_CONFIG_START( wheelfir )
 
@@ -793,6 +769,7 @@ static MACHINE_CONFIG_START( wheelfir )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", NUM_COLORS)
+	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 

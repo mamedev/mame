@@ -54,6 +54,7 @@ public:
 		, m_pia1(*this, "pia1")
 		, m_ptm(*this, "ptm")
 		, m_speaker(*this, "speaker")
+		, m_acia_clock(*this, "acia_clock")
 		, m_videoram(*this, "videoram")
 	{ }
 
@@ -62,6 +63,7 @@ public:
 	DECLARE_READ8_MEMBER(videoram_r);
 	DECLARE_WRITE_LINE_MEMBER( ptm_o2_callback );
 	DECLARE_WRITE_LINE_MEMBER( ptm_o3_callback );
+	DECLARE_WRITE8_MEMBER(baud_rate_w);
 
 protected:
 	virtual void machine_reset() override;
@@ -72,6 +74,7 @@ private:
 	required_device<pia6821_device> m_pia1;
 	required_device<ptm6840_device> m_ptm;
 	required_device<speaker_sound_device> m_speaker;
+	required_device<clock_device> m_acia_clock;
 	required_shared_ptr<uint8_t> m_videoram;
 	uint8_t m_term_data;
 };
@@ -85,7 +88,7 @@ static ADDRESS_MAP_START(poly_mem, AS_PROGRAM, 8, poly_state)
 	AM_RANGE(0xe000,0xe003) AM_DEVREADWRITE("pia0", pia6821_device, read, write) //video control PIA 6821
 	AM_RANGE(0xe004,0xe004) AM_DEVREADWRITE("acia", acia6850_device, status_r, control_w)
 	AM_RANGE(0xe005,0xe005) AM_DEVREADWRITE("acia", acia6850_device, data_r, data_w)
-	//AM_RANGE(0xe006, 0xe006) // baud rate controller (0=9600,2=4800,4=2400,6=1200,8=600,A=300)
+	AM_RANGE(0xe006,0xe006) AM_WRITE(baud_rate_w)
 	AM_RANGE(0xe00c,0xe00f) AM_DEVREADWRITE("pia1", pia6821_device, read, write) //keyboard PIA 6821
 	AM_RANGE(0xe020,0xe027) AM_DEVREADWRITE("ptm", ptm6840_device, read, write) //timer 6840
 	AM_RANGE(0xe030,0xe037) AM_DEVREADWRITE("adlc", mc6854_device, read, write) //Data Link Controller 6854
@@ -141,9 +144,16 @@ WRITE_LINE_MEMBER( poly_state::ptm_o3_callback )
 	m_speaker->level_w(state);
 }
 
+WRITE8_MEMBER(poly_state::baud_rate_w)
+{
+	// baud rate controller (0=9600,2=4800,4=2400,6=1200,8=600,A=300)
+	int selector = (data & 0x0e) >> 1;
+	m_acia_clock->set_clock_scale((selector <= 5) ? 1.0 / (1 << selector) : 0.0);
+}
+
 static MACHINE_CONFIG_START( poly )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809E, XTAL_12MHz / 3) // 12.0576MHz
+	MCFG_CPU_ADD("maincpu", M6809E, XTAL_12_0576MHz / 3)
 	MCFG_CPU_PROGRAM_MAP(poly_mem)
 
 	/* video hardware */
@@ -160,7 +170,7 @@ static MACHINE_CONFIG_START( poly )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */
-	MCFG_DEVICE_ADD("saa5050", SAA5050, 6000000)
+	MCFG_DEVICE_ADD("saa5050", SAA5050, XTAL_12_0576MHz / 2)
 	MCFG_SAA5050_D_CALLBACK(READ8(poly_state, videoram_r))
 	MCFG_SAA5050_SCREEN_SIZE(40, 24, 40)
 
@@ -174,7 +184,7 @@ static MACHINE_CONFIG_START( poly )
 	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
 	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
 
-	MCFG_DEVICE_ADD("ptm", PTM6840, XTAL_12MHz / 3)
+	MCFG_DEVICE_ADD("ptm", PTM6840, XTAL_12_0576MHz / 3)
 	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
 	MCFG_PTM6840_OUT1_CB(WRITELINE(poly_state, ptm_o2_callback))
 	MCFG_PTM6840_OUT2_CB(WRITELINE(poly_state, ptm_o3_callback))
@@ -184,9 +194,9 @@ static MACHINE_CONFIG_START( poly )
 	//MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
 	//MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
 
-	//MCFG_DEVICE_ADD("acia_clock", CLOCK, 153600)
-	//MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("acia", acia6850_device, write_txc))
-	//MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("acia", acia6850_device, write_rxc))
+	MCFG_DEVICE_ADD("acia_clock", CLOCK, 153600)
+	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("acia", acia6850_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("acia", acia6850_device, write_rxc))
 
 	MCFG_DEVICE_ADD("adlc", MC6854, 0)
 

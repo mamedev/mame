@@ -11,8 +11,8 @@
 TODO:
 - A lot of unimplemented features, even simple ones like panning,
   these should be added once we find out any software that uses it.
-- Is channel volume linear(current implementation) or logarithmic?
 - Sequencer is very preliminary
+- verify if pan 100% correct
 - What does channel ATBL mean?
 - Is YMZ774(and other variants) the same family as this chip?
   What are the differences?
@@ -167,14 +167,17 @@ void ymz770_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 		}
 
 		// process channels
-		int32_t mix = 0;
+		int32_t mixl = 0;
+		int32_t mixr = 0;
 
 		for (auto & elem : m_channels)
 		{
 			if (elem.output_remaining > 0)
 			{
 				// force finish current block
-				mix += (elem.output_data[elem.output_ptr++]*elem.volume);
+				int32_t smpl = elem.output_data[elem.output_ptr++] * elem.volume;	// volume is linear, 0 - 128 (100%)
+				mixr += (smpl * elem.pan) >> 11;	// pan seems linear, 0 - 16, where 0 = 100% left, 16 = 100% right, 8 = 50% left 50% right
+				mixl += (smpl * (16 - elem.pan)) >> 11;
 				elem.output_remaining--;
 
 				if (elem.output_remaining == 0 && !elem.is_playing)
@@ -217,12 +220,39 @@ retry:
 					elem.output_remaining--;
 					elem.output_ptr = 1;
 
-					mix += (elem.output_data[0]*elem.volume);
+					int32_t smpl = elem.output_data[0] * elem.volume;
+					mixr += (smpl * elem.pan) >> 11;
+					mixl += (smpl * (16 - elem.pan)) >> 11;
 				}
 			}
 		}
 
-		outL[i] = outR[i] = mix>>8;
+		mixr *= m_vlma;	// main volume is linear, 0 - 255, where 128 = 100%
+		mixl *= m_vlma;
+		mixr >>= 7 - m_bsl;
+		mixl >>= 7 - m_bsl;
+		// Clip limiter: 0 - off, 1 - 6.02 dB (100%), 2 - 4.86 dB (87.5%), 3 - 3.52 dB (75%). values taken from YMZ773 docs, might be incorrect for YMZ770.
+		constexpr int32_t ClipMax3 = 32768 * 75 / 100;
+		constexpr int32_t ClipMax2 = 32768 * 875 / 1000;
+		switch (m_cpl)
+		{
+		case 3:
+			mixl = (mixl > ClipMax3) ? ClipMax3 : (mixl < -ClipMax3) ? -ClipMax3 : mixl;
+			mixr = (mixr > ClipMax3) ? ClipMax3 : (mixr < -ClipMax3) ? -ClipMax3 : mixr;
+			break;
+		case 2:
+			mixl = (mixl > ClipMax2) ? ClipMax2 : (mixl < -ClipMax2) ? -ClipMax2 : mixl;
+			mixr = (mixr > ClipMax2) ? ClipMax2 : (mixr < -ClipMax2) ? -ClipMax2 : mixr;
+			break;
+		case 1:
+			mixl = (mixl > 32767) ? 32767 : (mixl < -32768) ? -32768 : mixl;
+			mixr = (mixr > 32767) ? 32767 : (mixr < -32768) ? -32768 : mixr;
+			break;
+		}
+		if (m_mute)
+			mixr = mixl = 0;
+		outL[i] = mixl;
+		outR[i] = mixr;
 	}
 }
 

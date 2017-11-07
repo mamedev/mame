@@ -48,21 +48,6 @@ READ16_MEMBER(lemmings_state::lemmings_trackball_r)
 	return 0;
 }
 
-
-
-
-
-void lemmings_state::lemmings_sound_cb( address_space &space, uint16_t data, uint16_t mem_mask )
-{
-	m_soundlatch->write(space, 0, data & 0xff);
-	m_audiocpu->set_input_line(1, HOLD_LINE);
-}
-
-WRITE8_MEMBER(lemmings_state::lemmings_sound_ack_w)
-{
-	m_audiocpu->set_input_line(1, CLEAR_LINE);
-}
-
 READ16_MEMBER( lemmings_state::lem_protection_region_0_146_r )
 {
 	int real_address = 0 + (offset *2);
@@ -106,7 +91,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, lemmings_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x0800, 0x0801) AM_DEVREADWRITE("ymsnd", ym2151_device,read,write)
 	AM_RANGE(0x1000, 0x1000) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0x1800, 0x1800) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITE(lemmings_sound_ack_w)
+	AM_RANGE(0x1800, 0x1800) AM_DEVREAD("ioprot", deco_146_base_device, soundlatch_r) AM_WRITENOP // writes an extra irq ack?
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -274,7 +259,7 @@ static MACHINE_CONFIG_START( lemmings )
 	MCFG_DECO146_IN_PORTB_CB(IOPORT("SYSTEM"))
 	MCFG_DECO146_IN_PORTC_CB(IOPORT("DSW"))
 	MCFG_DECO146_SET_USE_MAGIC_ADDRESS_XOR
-	MCFG_DECO146_SET_SOUNDLATCH_CALLBACK(lemmings_state, lemmings_sound_cb)
+	MCFG_DECO146_SOUNDLATCH_IRQ_CB(INPUTLINE("audiocpu", 1))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

@@ -48,11 +48,8 @@ Known to exist but not dumped:
 
 void midvunit_state::machine_start()
 {
-	m_adc_ready_timer = timer_alloc(TIMER_ADC_READY);
-
 	save_item(NAME(m_cmos_protected));
 	save_item(NAME(m_control_data));
-	save_item(NAME(m_adc_data));
 	save_item(NAME(m_adc_shift));
 	save_item(NAME(m_last_port0));
 	save_item(NAME(m_shifter_state));
@@ -126,30 +123,20 @@ READ32_MEMBER(midvunit_state::port0_r)
  *
  *************************************/
 
-READ32_MEMBER(midvunit_state::midvunit_adc_r)
+READ32_MEMBER( midvunit_state::adc_r )
 {
 	if (!(m_control_data & 0x40))
-	{
-		m_maincpu->set_input_line(3, CLEAR_LINE);
-		return m_adc_data << m_adc_shift;
-	}
+		return m_adc->read(space, 0) << m_adc_shift;
 	else
 		logerror("adc_r without enabling reads!\n");
+
 	return 0xffffffff;
 }
 
-
-WRITE32_MEMBER(midvunit_state::midvunit_adc_w)
+WRITE32_MEMBER( midvunit_state::adc_w )
 {
 	if (!(m_control_data & 0x20))
-	{
-		int which = (data >> m_adc_shift) - 4;
-		if (which < 0 || which > 2)
-			logerror("adc_w: unexpected which = %02X\n", which + 4);
-		else
-			m_adc_data = m_adc_ports[which].read_safe(0);
-		m_adc_ready_timer->adjust(attotime::from_msec(1));
-	}
+		m_adc->write(space, 0, data >> m_adc_shift);
 	else
 		logerror("adc_w without enabling writes!\n");
 }
@@ -608,7 +595,7 @@ static ADDRESS_MAP_START( midvunit_map, AS_PROGRAM, 32, midvunit_state )
 //  AM_RANGE(0x991050, 0x991050) AM_READONLY // seems to be another port
 	AM_RANGE(0x991060, 0x991060) AM_READ(port0_r)
 	AM_RANGE(0x992000, 0x992000) AM_READ_PORT("992000")
-	AM_RANGE(0x993000, 0x993000) AM_READWRITE(midvunit_adc_r, midvunit_adc_w)
+	AM_RANGE(0x993000, 0x993000) AM_READWRITE(adc_r, adc_w)
 	AM_RANGE(0x994000, 0x994000) AM_WRITE(midvunit_control_w)
 	AM_RANGE(0x995000, 0x995000) AM_READWRITE(midvunit_wheel_board_r, midvunit_wheel_board_w)
 	AM_RANGE(0x995020, 0x995020) AM_WRITE(midvunit_cmos_protect_w)
@@ -1161,6 +1148,11 @@ static MACHINE_CONFIG_START( midvcommon )
 	MCFG_SCREEN_UPDATE_DRIVER(midvunit_state, screen_update_midvunit)
 	MCFG_SCREEN_PALETTE("palette")
 
+	MCFG_ADC0844_ADD("adc")
+	MCFG_ADC0844_INTR_CB(INPUTLINE("maincpu", 3))
+	MCFG_ADC0844_CH1_CB(IOPORT("WHEEL"))
+	MCFG_ADC0844_CH2_CB(IOPORT("ACCEL"))
+	MCFG_ADC0844_CH3_CB(IOPORT("BRAKE"))
 MACHINE_CONFIG_END
 
 
@@ -1200,6 +1192,8 @@ static MACHINE_CONFIG_DERIVED( midvplus, midvcommon )
 	MCFG_MIDWAY_IOASIC_SHUFFLE(0)
 	MCFG_MIDWAY_IOASIC_UPPER(452) /* no alternates */
 	MCFG_MIDWAY_IOASIC_YEAR_OFFS(94)
+
+	MCFG_DEVICE_REMOVE("adc")
 
 	/* sound hardware */
 	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2115, 0)
@@ -1926,9 +1920,6 @@ DRIVER_INIT_MEMBER(midvunit_state,offroadc)
 DRIVER_INIT_MEMBER(midvunit_state,wargods)
 {
 	uint8_t default_nvram[256];
-
-	/* initialize the subsystems */
-	m_adc_shift = 16;
 
 	/* we need proper VRAM */
 	memset(default_nvram, 0xff, sizeof(default_nvram));

@@ -50,26 +50,26 @@ Notes:
     CN2     - 10x2 pin printer connector [TMC-700]
     CN3     - 32x3 pin EURO connector
     CN4     - DIN5D tape connector
-    			1	input (500 mV / 47 kohm)
-    			2	GND
-    			3	output (580 mV / 47 kohm)
-    			4	input (500 mV / 47 kohm)
-    			5	output (580 mV / 47 kohm)
+                1   input (500 mV / 47 kohm)
+                2   GND
+                3   output (580 mV / 47 kohm)
+                4   input (500 mV / 47 kohm)
+                5   output (580 mV / 47 kohm)
     CN5     - DIN5X video connector
-    			1	GND
-    			2	GND
-    			3	?
-    			4	GND
-    			5	?
+                1   GND
+                2   GND
+                3   ?
+                4   GND
+                5   ?
     CN6     - DIN2 power connector
-    			1	8..12V DC..400Hz 300mA
-    			2 	GND
+                1   8..12V DC..400Hz 300mA
+                2   GND
     CN7     - DIN5D audio connector [TMCP-300]
-    			1 	NC
-    			2	GND
-    			3	AUDIO
-    			4 	NC
-    			5 	AUDIO 
+                1   NC
+                2   GND
+                3   AUDIO
+                4   NC
+                5   AUDIO
     CN8     - 10x2 pin keyboard connector
     SW1     - RUN/STOP switch
     SW2     - internal speaker/external audio switch [TMCP-300]

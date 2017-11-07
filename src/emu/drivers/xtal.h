@@ -133,6 +133,7 @@ enum
 	XTAL_11_8MHz        = 11800000,     /* IBM PC Music Feature Card */
 	XTAL_11_9808MHz     = 11980800,     /* Luxor ABC 80 */
 	XTAL_12MHz          = 12000000,     /* Extremely common, used on 100's of PCBs */
+	XTAL_12_0576MHz     = 12057600,     /* Poly 1 (38400 * 314) */
 	XTAL_12_096MHz      = 12096000,     /* Some early 80's Atari games */
 	XTAL_12_288MHz      = 12288000,     /* Sega Model 3 digital audio board */
 	XTAL_12_432MHz      = 12432000,     /* Kaneko Fly Boy/Fast Freddie Hardware */
@@ -150,6 +151,7 @@ enum
 	XTAL_13_5168MHz     = 13516800,     /* Kontron KDT6 */
 	XTAL_14MHz          = 14000000,
 	XTAL_14_112MHz      = 14112000,     /* Timex/Sinclair TS2068 */
+	XTAL_14_192640MHz   = 14192640,     /* Reported by Central Data 2650 document, true xtal unchecked on PCB */
 	XTAL_14_3MHz        = 14300000,     /* Agat-7 */
 	XTAL_14_314MHz      = 14314000,     /* Taito TTL Board  */
 	XTAL_14_31818MHz    = 14318181,     /* Extremely common, used on 100's of PCBs (4x NTSC subcarrier) */
@@ -161,7 +163,7 @@ enum
 	XTAL_15_468MHz      = 15468480,     /* Bank Panic h/w, Sega G80 */
 	XTAL_15_8976MHz     = 15897600,     /* IAI Swyft */
 	XTAL_15_92MHz       = 15920000,     /* HP Integral PC */
-	XTAL_15_9744MHz     = 15974400,     /* Osborne 1 */
+	XTAL_15_9744MHz     = 15974400,     /* Osborne 1 (9600 * 52 * 32) */
 	XTAL_16MHz          = 16000000,     /* Extremely common, used on 100's of PCBs */
 	XTAL_16_384MHz      = 16384000,
 	XTAL_16_4MHz        = 16400000,     /* MS 6102 */
@@ -169,6 +171,7 @@ enum
 	XTAL_16_67MHz       = 16670000,
 	XTAL_16_777216MHz   = 16777216,     /* Nintendo Game Boy Advance */
 	XTAL_16_9344MHz     = 16934400,     /* Usually used to drive 90's Yamaha OPL/FM chips (44100 * 384) */
+	XTAL_17_064MHz      = 17064000,     /* Memorex 1377 */
 	XTAL_17_36MHz       = 17360000,     /* OMTI Series 10 SCSI controller */
 	XTAL_17_73447MHz    = 17734470,     /* (~4x PAL subcarrier) */
 	XTAL_17_734472MHz   = 17734472,     /* actually ~4x PAL subcarrier */
@@ -176,6 +179,7 @@ enum
 	XTAL_18MHz          = 18000000,     /* S.A.R, Ikari Warriors 3 */
 	XTAL_18_432MHz      = 18432000,     /* Extremely common, used on 100's of PCBs (48000 * 384) */
 	XTAL_18_720MHz      = 18720000,     /* Nokia MikroMikko 1 */
+	XTAL_18_8696MHz     = 18869600,     /* Memorex 2178 */
 	XTAL_19_6MHz        = 19600000,     /* Universal Mr. Do - Model 8021 PCB */
 	XTAL_19_6608MHz     = 19660800,     /* Euro League (bootleg), labeled as "UKI 19.6608 20PF" */
 	XTAL_19_923MHz      = 19923000,     /* Cinematronics vectors */

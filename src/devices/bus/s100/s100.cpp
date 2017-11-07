@@ -41,7 +41,7 @@ device_s100_card_interface::device_s100_card_interface(const machine_config &mco
 s100_slot_device::s100_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, S100_SLOT, tag, owner, clock),
 	device_slot_interface(mconfig, *this),
-	m_bus(nullptr)
+	m_bus(*this, DEVICE_SELF_OWNER)
 {
 }
 
@@ -52,7 +52,6 @@ s100_slot_device::s100_slot_device(const machine_config &mconfig, const char *ta
 
 void s100_slot_device::device_start()
 {
-	m_bus = machine().device<s100_bus_device>(S100_TAG);
 	device_s100_card_interface *dev = dynamic_cast<device_s100_card_interface *>(get_card_device());
 	if (dev) m_bus->add_card(dev);
 }

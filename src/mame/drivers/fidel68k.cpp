@@ -537,6 +537,12 @@ ROM_START( feagv7 )
 	ROM_LOAD16_BYTE("eag-v7a", 0x00001, 0x10000, CRC(506b688f) SHA1(0a091c35d0f01166b57f964b111cde51c5720d58) )
 ROM_END
 
+ROM_START( feagv7a )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD16_BYTE("eag-v7b", 0x00000, 0x10000, CRC(44baefbf) SHA1(dbc24340d7e3013cc8f111ebb2a59169c5dcb8e8) )
+	ROM_LOAD16_BYTE("eag-v7a", 0x00001, 0x10000, CRC(951a7857) SHA1(dad21b049fd4f411a79d4faefb922c1277569c0e) )
+ROM_END
+
 ROM_START( feagv9 )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD16_BYTE("eag-v9b", 0x00000, 0x10000, CRC(60523199) SHA1(a308eb6b782732af1ab2fd0ed8b046de7a8dd24b) )
@@ -572,7 +578,8 @@ CONS( 1988, fex68km3, fex68k,  0, fex68km3, fex68k, fidel68k_state, 0,    "Fidel
 
 CONS( 1989, feagv2,   0,       0, eag,      eag,    fidel68k_state, eag,  "Fidelity Electronics", "Elite Avant Garde (model 6114-2/3/4, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 CONS( 1989, feagv2a,  feagv2,  0, eag,      eag,    fidel68k_state, eag,  "Fidelity Electronics", "Elite Avant Garde (model 6114-2/3/4, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1990, feagv7,   feagv2,  0, eagv7,    eag,    fidel68k_state, 0,    "Fidelity Electronics", "Elite Avant Garde (model 6117-7)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1990, feagv7,   feagv2,  0, eagv7,    eag,    fidel68k_state, 0,    "Fidelity Electronics", "Elite Avant Garde (model 6117-7, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1990, feagv7a,  feagv2,  0, eagv7,    eag,    fidel68k_state, 0,    "Fidelity Electronics", "Elite Avant Garde (model 6117-7, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 CONS( 1990, feagv9,   feagv2,  0, eagv9,    eag,    fidel68k_state, 0,    "Fidelity Electronics", "Elite Avant Garde (model 6117-9)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 CONS( 1990, feagv10,  feagv2,  0, eagv10,   eag,    fidel68k_state, 0,    "Fidelity Electronics", "Elite Avant Garde (model 6117-10)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_TIMING )
 CONS( 2002, feagv11,  feagv2,  0, eagv11,   eag,    fidel68k_state, 0,    "hack (Wilfried Bucke)", "Elite Avant Garde (model 6117-11)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_TIMING )

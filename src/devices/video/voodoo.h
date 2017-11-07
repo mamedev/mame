@@ -1593,10 +1593,12 @@ protected:
 
 	struct tmu_state
 	{
+		class stw_t;
 		void recompute_texture_params();
 		void init(uint8_t vdt, tmu_shared_state &share, voodoo_reg *r, void *memory, int tmem);
 		int32_t prepare();
-		rgbaint_t genTexture(int32_t x, const uint8_t *dither4, const uint32_t TEXMODE, rgb_t *LOOKUP, int32_t LODBASE, int64_t ITERS, int64_t ITERT, int64_t ITERW, int32_t &lod);
+		static int32_t new_log2(double &value, const int &offset);
+		rgbaint_t genTexture(int32_t x, const uint8_t *dither4, const uint32_t TEXMODE, rgb_t *LOOKUP, int32_t LODBASE, const stw_t &iterstw, int32_t &lod);
 		rgbaint_t combineTexture(const uint32_t TEXMODE, const rgbaint_t& c_local, const rgbaint_t& c_other, int32_t lod);
 
 		struct ncc_table
@@ -1957,5 +1959,87 @@ DECLARE_DEVICE_TYPE(VOODOO_1,       voodoo_1_device)
 DECLARE_DEVICE_TYPE(VOODOO_2,       voodoo_2_device)
 DECLARE_DEVICE_TYPE(VOODOO_BANSHEE, voodoo_banshee_device)
 DECLARE_DEVICE_TYPE(VOODOO_3,       voodoo_3_device)
+
+// use SSE on 64-bit implementations, where it can be assumed
+#if 1 && ((!defined(MAME_DEBUG) || defined(__OPTIMIZE__)) && (defined(__SSE2__) || defined(_MSC_VER)) && defined(PTR64))
+#include <emmintrin.h>
+#ifdef __SSE4_1__
+#include <smmintrin.h>
+#endif
+class voodoo_device::tmu_state::stw_t
+{
+public:
+	stw_t() {}
+	stw_t(const stw_t& other) = default;
+	stw_t &operator=(const stw_t& other) = default;
+
+	inline void set(s64 s, s64 t, s64 w) { m_st = _mm_set_pd(s, t); m_w = _mm_set1_pd(w); }
+	inline int is_w_neg() const { return _mm_comilt_sd(m_w, _mm_set1_pd(0.0)); }
+	inline void get_st_shiftr(s32 &s, s32 &t, const s32 &shift) const {
+		s64 tmpS = _mm_cvtsd_si64(_mm_shuffle_pd(m_st, _mm_setzero_pd(), 1));
+		s = tmpS >> shift;
+		s64 tmpT = _mm_cvtsd_si64(m_st);
+		t = tmpT >> shift;
+	}
+	inline void add(const stw_t& other)
+	{
+		m_st = _mm_add_pd(m_st, other.m_st);
+		m_w = _mm_add_pd(m_w, other.m_w);
+	}
+	inline void calc_stow(s32 &sow, s32 &tow, int32_t &oowlog) const
+	{
+		__m128d tmp = _mm_div_pd(m_st, m_w);
+		// Allow for 8 bits of decimal in integer
+		tmp = _mm_mul_pd(tmp, _mm_set1_pd(256.0));
+		__m128i tmp2 = _mm_cvttpd_epi32(tmp);
+#ifdef __SSE4_1__
+		sow = _mm_extract_epi32(tmp2, 1);
+		tow = _mm_extract_epi32(tmp2, 0);
+#else
+		sow = _mm_cvtsi128_si32(_mm_shuffle_epi32(tmp2, _MM_SHUFFLE(0, 0, 0, 1)));
+		tow = _mm_cvtsi128_si32(tmp2);
+#endif
+		double dW = _mm_cvtsd_f64(m_w);
+		oowlog = -new_log2(dW, 0);
+	}
+private:
+	__m128d m_st;
+	__m128d m_w;
+};
+#else
+class voodoo_device::tmu_state::stw_t
+{
+public:
+	stw_t() {}
+	stw_t(const stw_t& other) = default;
+	stw_t &operator=(const stw_t& other) = default;
+
+	inline void set(s64 s, s64 t, s64 w) { m_s = s; m_t = t; m_w = w; }
+	inline int is_w_neg() const { return (m_w < 0) ? 1 : 0; }
+	inline void get_st_shiftr(s32 &s, s32 &t, const s32 &shift) const {
+		s = m_s >> shift;
+		t = m_t >> shift;
+	}
+	inline void add(const stw_t& other)
+	{
+		m_s += other.m_s;
+		m_t += other.m_t;
+		m_w += other.m_w;
+	}
+	// Computes s/w and t/w and returns log2 of 1/w
+	// s, t and c are 16.32 values.  The results are 24.8.
+	inline void calc_stow(s32 &sow, s32 &tow, int32_t &oowlog) const
+	{
+		double recip = double(1ULL << (47 - 39)) / m_w;
+		double resAD = m_s * recip;
+		double resBD = m_t * recip;
+		oowlog = new_log2(recip, 56);
+		sow = resAD;
+		tow = resBD;
+	}
+private:
+	s64 m_s, m_t, m_w;
+};
+#endif
 
 #endif // MAME_VIDEO_VOODOO_H

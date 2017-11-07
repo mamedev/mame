@@ -23,6 +23,7 @@
 #include "formats/ace_tap.h"
 #include "formats/adam_cas.h"
 #include "formats/apf_apt.h"
+#include "formats/atom_tap.h"
 #include "formats/cbm_tap.h"
 #include "formats/cgen_cas.h"
 #include "formats/coco_cas.h"
@@ -69,6 +70,7 @@ struct SupportedCassetteFormats
 const struct SupportedCassetteFormats formats[] = {
 	{"a26", a26_cassette_formats               ,"Atari 2600 SuperCharger"},
 	{"apf", apf_cassette_formats               ,"APF Imagination Machine"},
+	{"atom", atom_cassette_formats             ,"Acorn Atom"},
 	{"bbc", bbc_cassette_formats               ,"Acorn BBC & Electron"},
 	{"cbm", cbm_cassette_formats               ,"Commodore 8-bit series"},
 	{"cdt", cdt_cassette_formats               ,"Amstrad CPC"},
@@ -110,7 +112,6 @@ const struct SupportedCassetteFormats formats[] = {
 	{"trs80l2", trs80l2_cassette_formats       ,"TRS-80 Level 2"},
 	{"tvc64", tvc64_cassette_formats           ,"Videoton TVC 64"},
 	{"tzx", tzx_cassette_formats               ,"Sinclair ZX Spectrum"},
-	{"uef", uef_cassette_formats               ,"Acorn Electron"},
 	{"vg5k", vg5k_cassette_formats             ,"Philips VG 5000"},
 	{"vtech1", vtech1_cassette_formats         ,"Video Technology Laser 110-310"},
 	{"vtech2", vtech2_cassette_formats         ,"Video Technology Laser 350-700"},
@@ -205,7 +206,7 @@ int CLIB_DECL main(int argc, char *argv[])
 	}
 
 	/* Usage */
-	fprintf(stderr, "castool - Generic cassette manipulation tool for use with MESS\n\n");
+	fprintf(stderr, "castool - Generic cassette manipulation tool for use with MAME\n\n");
 	display_usage();
 	fprintf(stderr, "\n");
 	display_formats();

@@ -553,7 +553,7 @@ WRITE_LINE_MEMBER( huc6270_device::hsync_changed )
 			{
 				m_status |= HUC6270_RR;
 				m_irq_changed_cb( ASSERT_LINE );
-			}			
+			}
 		}
 	}
 
@@ -571,18 +571,18 @@ inline void huc6270_device::handle_dma()
 		int sour_inc = ( m_dcr & 0x0004 ) ? -1 : +1;
 
 		LOG("doing dma sour = %04x, desr = %04x, lenr = %04x\n", m_sour, m_desr, m_lenr );
-		
+
 		do {
 			uint16_t data;
-			
+
 			// area 0x8000-0xffff cannot be r/w (open bus)
-			if((m_sour & 0x8000) == 0)
-				data = m_vram[ m_sour & m_vram_mask ];
+			if(m_sour <= m_vram_mask)
+				data = m_vram[ m_sour ];
 			else
 				data = 0;
-			
-			if((m_desr & 0x8000) == 0)
-				m_vram[ m_desr & m_vram_mask ] = data;
+
+			if(m_desr <= m_vram_mask)
+				m_vram[ m_desr ] = data;
 			m_sour += sour_inc;
 			m_desr += desr_inc;
 			m_lenr -= 1;
@@ -618,9 +618,9 @@ READ8_MEMBER( huc6270_device::read )
 			if ( m_register_index == VxR )
 			{
 				m_marr += vram_increments[ ( m_cr >> 11 ) & 3 ];
-				
-				if((m_marr & 0x8000) == 0)
-					m_vrr = m_vram[ m_marr & m_vram_mask ];
+
+				if(m_marr <= m_vram_mask)
+					m_vrr = m_vram[ m_marr ];
 				else
 				{
 					// TODO: test with real HW
@@ -653,8 +653,8 @@ WRITE8_MEMBER( huc6270_device::write )
 
 				case MARR:      /* memory address read register LSB */
 					m_marr = ( m_marr & 0xFF00 ) | data;
-					if((m_marr & 0x8000) == 0)
-						m_vrr = m_vram[ m_marr & m_vram_mask ];
+					if(m_marr <= m_vram_mask)
+						m_vrr = m_vram[ m_marr ];
 					else
 					{
 						// TODO: test with real HW
@@ -749,14 +749,17 @@ WRITE8_MEMBER( huc6270_device::write )
 
 				case MARR:      /* memory address read register MSB */
 					m_marr = ( m_marr & 0x00FF ) | ( data << 8 );
-					m_vrr = m_vram[ m_marr & m_vram_mask ];
+					if(m_marr <= m_vram_mask)
+						m_vrr = m_vram[ m_marr ];
+					else
+						m_vrr = 0;
 					break;
 
 				case VxR:       /* vram write data MSB */
 					m_vwr = ( m_vwr & 0x00FF ) | ( data << 8 );
 					// area 0x8000-0xffff is NOP and cannot be written to.
-					if((m_mawr & 0x8000) == 0)
-						m_vram[ m_mawr & m_vram_mask ] = m_vwr;
+					if(m_mawr <= m_vram_mask)
+						m_vram[ m_mawr ] = m_vwr;
 					m_mawr += vram_increments[ ( m_cr >> 11 ) & 3 ];
 					break;
 

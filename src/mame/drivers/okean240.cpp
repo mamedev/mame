@@ -52,8 +52,10 @@ Usage of terminal:
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "machine/keyboard.h"
-#include "machine/clock.h"
 #include "machine/i8251.h"
+#include "machine/i8255.h"
+#include "machine/pic8259.h"
+#include "machine/pit8253.h"
 #include "bus/rs232/rs232.h"
 #include "screen.h"
 
@@ -81,9 +83,12 @@ public:
 	DECLARE_READ8_MEMBER(okean240a_kbd_status_r);
 	DECLARE_READ8_MEMBER(term_status_r);
 	DECLARE_READ8_MEMBER(term_r);
-	DECLARE_READ8_MEMBER(okean240_keyboard_r);
-	DECLARE_WRITE8_MEMBER(okean240_keyboard_w);
-	DECLARE_READ8_MEMBER(okean240a_keyboard_r);
+	DECLARE_READ8_MEMBER(okean240_port40_r);
+	DECLARE_READ8_MEMBER(okean240_port41_r);
+	DECLARE_WRITE8_MEMBER(okean240_port42_w);
+	DECLARE_READ8_MEMBER(okean240a_port40_r);
+	DECLARE_READ8_MEMBER(okean240a_port41_r);
+	DECLARE_READ8_MEMBER(okean240a_port42_r);
 	void kbd_put(u8 data);
 	DECLARE_WRITE8_MEMBER(scroll_w);
 	DECLARE_DRIVER_INIT(okean240);
@@ -105,7 +110,7 @@ private:
 };
 
 // okean240 requires bit 4 to change
-READ8_MEMBER( okean240_state::okean240_kbd_status_r )
+READ8_MEMBER(okean240_state::okean240_kbd_status_r)
 {
 	m_tog ^= 0x18;
 	if (m_term_data)
@@ -115,7 +120,7 @@ READ8_MEMBER( okean240_state::okean240_kbd_status_r )
 }
 
 // see if a key is pressed and indicate status
-READ8_MEMBER( okean240_state::okean240a_kbd_status_r )
+READ8_MEMBER(okean240_state::okean240a_kbd_status_r)
 {
 	uint8_t i,j;
 	m_tog ^= 0x18;
@@ -131,78 +136,78 @@ READ8_MEMBER( okean240_state::okean240a_kbd_status_r )
 }
 
 // for test rom
-READ8_MEMBER( okean240_state::term_status_r )
+READ8_MEMBER(okean240_state::term_status_r)
 {
 	return (m_term_data) ? 3 : 1;
 }
 
-READ8_MEMBER( okean240_state::okean240_keyboard_r )
+READ8_MEMBER(okean240_state::okean240_port40_r)
 {
-	if (offset == 0) // port 40 (get ascii key value)
-		return term_r(space, offset);
-	else
-	if (offset == 1) // port 41 bit 1 (test rom status bit)
-	{
-		m_tog ^= 6;
-		return m_tog;
-	}
-	else // port 42 (not used)
-		return 0;
+	// port 40 (get ascii key value)
+	return term_r(space, offset);
 }
 
-READ8_MEMBER( okean240_state::okean240a_keyboard_r )
+READ8_MEMBER(okean240_state::okean240_port41_r)
 {
-	uint8_t i,j;
+	// port 41 bit 1 (test rom status bit)
+	m_tog ^= 6;
+	return m_tog;
+}
 
-	if (offset == 0) // port 40 (get a column)
+READ8_MEMBER(okean240_state::okean240a_port40_r)
+{
+	// port 40 (get a column)
+	for (uint8_t i = 0; i < 11; i++)
 	{
-		for (i = 0; i < 11; i++)
+		uint8_t j = m_io_port[i]->read();
+		if (j)
 		{
-			j = m_io_port[i]->read();
-			if (j)
-			{
-				if (j==m_j) return 0;
-				m_j=j;
-				return j;
-			}
+			if (j==m_j) return 0;
+			m_j=j;
+			return j;
 		}
-		m_j=0;
-		return 0;
 	}
-	else
-	if (offset == 1) // port 41 bits 6&7 (modifier keys), and bit 1 (test rom status bit)
+	m_j=0;
+	return 0;
+}
+
+READ8_MEMBER(okean240_state::okean240a_port41_r)
+{
+	// port 41 bits 6&7 (modifier keys), and bit 1 (test rom status bit)
 	{
 		m_tog ^= 2;
 		return m_tog | m_io_modifiers->read();
 	}
-	else // port 42 (get a row)
+}
+
+READ8_MEMBER(okean240_state::okean240a_port42_r)
+{
+	// port 42 (get a row)
+	for (uint8_t i = 0; i < 11; i++)
 	{
-		for (i = 0; i < 11; i++)
-		{
-			if (m_io_port[i]->read() )
-				return i;
-		}
+		if (m_io_port[i]->read() )
+			return i;
 	}
 	return 0;
 }
 
 // This is a keyboard acknowledge pulse, it goes high then
 // straightaway low, if reading port 40 indicates a key is pressed.
-WRITE8_MEMBER( okean240_state::okean240_keyboard_w )
+WRITE8_MEMBER(okean240_state::okean240_port42_w)
 {
 // okean240: port 42 bit 7
 // okean240a: port 42 bit 4
 }
 
 // for test rom
-READ8_MEMBER( okean240_state::term_r )
+READ8_MEMBER(okean240_state::term_r)
 {
 	uint8_t ret = m_term_data;
 	m_term_data = 0;
 	return ret;
 }
 
-WRITE8_MEMBER( okean240_state::scroll_w )
+WRITE8_MEMBER(okean240_state::scroll_w)
 {
 	m_scroll = data;
 }
@@ -218,20 +223,26 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(okean240_io, AS_IO, 8, okean240_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x40, 0x42) AM_READWRITE(okean240_keyboard_r,okean240_keyboard_w)
+	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE("ppikbd", i8255_device, read, write)
+	AM_RANGE(0x60, 0x63) AM_DEVREADWRITE("pit", pit8253_device, read, write)
 	AM_RANGE(0x80, 0x80) AM_READ(okean240_kbd_status_r)
+	AM_RANGE(0x80, 0x81) AM_DEVREADWRITE("pic", pic8259_device, read, write)
 	AM_RANGE(0xa0, 0xa0) AM_READ(term_r)
 	AM_RANGE(0xa1, 0xa1) AM_READ(term_status_r)
-	AM_RANGE(0xc0, 0xc0) AM_WRITE(scroll_w)
+	AM_RANGE(0xc0, 0xc3) AM_DEVREADWRITE("ppic", i8255_device, read, write)
+	AM_RANGE(0xe0, 0xe3) AM_DEVREADWRITE("ppie", i8255_device, read, write)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(okean240a_io, AS_IO, 8, okean240_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x40, 0x42) AM_READWRITE(okean240a_keyboard_r,okean240_keyboard_w)
+	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE("ppikbd", i8255_device, read, write)
+	AM_RANGE(0x60, 0x63) AM_DEVREADWRITE("pit", pit8253_device, read, write)
 	AM_RANGE(0x80, 0x80) AM_READ(okean240a_kbd_status_r)
+	AM_RANGE(0x80, 0x81) AM_DEVREADWRITE("pic", pic8259_device, read, write)
 	AM_RANGE(0xa0, 0xa0) AM_DEVREADWRITE("uart", i8251_device, data_r, data_w)
 	AM_RANGE(0xa1, 0xa1) AM_DEVREADWRITE("uart", i8251_device, status_r, control_w)
-	AM_RANGE(0xc0, 0xc0) AM_WRITE(scroll_w)
+	AM_RANGE(0xc0, 0xc3) AM_DEVREADWRITE("ppic", i8255_device, read, write)
+	AM_RANGE(0xe0, 0xe3) AM_DEVREADWRITE("ppie", i8255_device, read, write)
 	// AM_RANGE(0x00, 0x1f)=ppa00.data
 	// AM_RANGE(0x20, 0x23)=dsk.data
 	// AM_RANGE(0x24, 0x24)=dsk.wait
@@ -247,13 +258,14 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(okean240t_io, AS_IO, 8, okean240_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x20, 0x23) AM_WRITENOP
-	AM_RANGE(0x40, 0x42) AM_READ(okean240_keyboard_r)
+	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE("ppikbd", i8255_device, read, write)
+	AM_RANGE(0x60, 0x63) AM_DEVREADWRITE("pit", pit8253_device, read, write)
 	AM_RANGE(0x80, 0x80) AM_READ(okean240_kbd_status_r)
+	AM_RANGE(0x80, 0x81) AM_DEVREADWRITE("pic", pic8259_device, read, write)
 	AM_RANGE(0xa0, 0xa0) AM_DEVREADWRITE("uart", i8251_device, data_r, data_w)
 	AM_RANGE(0xa1, 0xa1) AM_DEVREADWRITE("uart", i8251_device, status_r, control_w)
-	AM_RANGE(0xc0, 0xc0) AM_WRITE(scroll_w)
-	AM_RANGE(0xc1, 0xc3) AM_WRITENOP
-	AM_RANGE(0xe0, 0xe3) AM_WRITENOP
+	AM_RANGE(0xc0, 0xc3) AM_DEVREADWRITE("ppic", i8255_device, read, write)
+	AM_RANGE(0xe0, 0xe3) AM_DEVREADWRITE("ppie", i8255_device, read, write)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -486,10 +498,6 @@ static MACHINE_CONFIG_START( okean240t )
 	MCFG_CPU_PROGRAM_MAP(okean240_mem)
 	MCFG_CPU_IO_MAP(okean240t_io)
 
-	MCFG_DEVICE_ADD("uart_clock", CLOCK, 153600)
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("uart", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart", i8251_device, write_rxc))
-
 	MCFG_DEVICE_ADD("uart", I8251, 0)
 	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
 	MCFG_I8251_DTR_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
@@ -499,6 +507,23 @@ static MACHINE_CONFIG_START( okean240t )
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart", i8251_device, write_rxd))
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart", i8251_device, write_dsr))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart", i8251_device, write_cts))
+
+	MCFG_DEVICE_ADD("ppikbd", I8255, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(okean240_state, okean240_port40_r))
+	MCFG_I8255_IN_PORTB_CB(READ8(okean240_state, okean240_port41_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(okean240_state, okean240_port42_w))
+
+	MCFG_DEVICE_ADD("ppic", I8255, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(okean240_state, scroll_w))
+
+	MCFG_DEVICE_ADD("ppie", I8255, 0)
+
+	MCFG_DEVICE_ADD("pit", PIT8253, 0)
+	MCFG_PIT8253_CLK1(3072000) // artificial rate
+	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE("uart", i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart", i8251_device, write_rxc))
+
+	MCFG_DEVICE_ADD("pic", PIC8259, 0)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen1", RASTER)
@@ -521,6 +546,14 @@ static MACHINE_CONFIG_DERIVED( okean240a, okean240t )
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart", i8251_device, write_rxd))
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart", i8251_device, write_dsr))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart", i8251_device, write_cts))
+
+	MCFG_DEVICE_MODIFY("ppikbd")
+	MCFG_I8255_IN_PORTA_CB(READ8(okean240_state, okean240a_port40_r))
+	MCFG_I8255_IN_PORTB_CB(READ8(okean240_state, okean240a_port41_r))
+	MCFG_I8255_IN_PORTC_CB(READ8(okean240_state, okean240a_port42_r))
+
+	MCFG_DEVICE_MODIFY("pit")
+	MCFG_PIT8253_CLK1(1536000) // artificial rate
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( okean240, okean240t )
@@ -528,8 +561,9 @@ static MACHINE_CONFIG_DERIVED( okean240, okean240t )
 	MCFG_CPU_IO_MAP(okean240_io)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", okean240)
 	MCFG_DEVICE_REMOVE("uart")
-	MCFG_DEVICE_REMOVE("uart_clock")
 	MCFG_DEVICE_REMOVE("rs232")
+	MCFG_DEVICE_MODIFY("pit")
+	MCFG_PIT8253_OUT1_HANDLER(NOOP)
 	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
 	MCFG_GENERIC_KEYBOARD_CB(PUT(okean240_state, kbd_put))
 MACHINE_CONFIG_END

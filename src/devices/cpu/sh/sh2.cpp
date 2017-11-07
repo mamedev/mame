@@ -456,8 +456,8 @@ void sh2_device::device_start()
 	/*
 	for (int i = 0; i < 16; ++i)
 	{
-		save_item(NAME(m_irq_queue[i].irq_vector), i);
-		save_item(NAME(m_irq_queue[i].irq_priority), i);
+	    save_item(NAME(m_irq_queue[i].irq_vector), i);
+	    save_item(NAME(m_irq_queue[i].irq_priority), i);
 	}
 	*/
 
