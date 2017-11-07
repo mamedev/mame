@@ -26,10 +26,10 @@
 #include "emu.h"
 #include "includes/micro3d.h"
 #include "audio/micro3d.h"
-
 #include "cpu/am29000/am29000.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/mcs51/mcs51.h"
+#include "bus/rs232/rs232.h"
 #include "machine/adc0844.h"
 #include "machine/mc68681.h"
 #include "machine/mc68901.h"
@@ -302,6 +302,7 @@ static MACHINE_CONFIG_START( micro3d )
 
 	MCFG_CPU_ADD("vgb", TMS34010, XTAL_40MHz)
 	MCFG_CPU_PROGRAM_MAP(vgbmem)
+	MCFG_VIDEO_SET_SCREEN("screen")
 	MCFG_TMS340X0_HALT_ON_RESET(false) /* halt on reset */
 	MCFG_TMS340X0_PIXEL_CLOCK(XTAL_40MHz / 8) /* pixel clock */
 	MCFG_TMS340X0_PIXELS_PER_CLOCK(4) /* pixels per clock */
@@ -320,6 +321,7 @@ static MACHINE_CONFIG_START( micro3d )
 
 	MCFG_MC68681_ADD("duart68681", XTAL_3_6864MHz)
 	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(micro3d_state, duart_irq_handler))
+	MCFG_MC68681_A_TX_CALLBACK(DEVWRITELINE("monitor", rs232_port_device, write_txd))
 	MCFG_MC68681_B_TX_CALLBACK(WRITELINE(micro3d_state, duart_txb))
 	MCFG_MC68681_INPORT_CALLBACK(READ8(micro3d_state, duart_input_r))
 	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(micro3d_state, duart_output_w))
@@ -340,6 +342,9 @@ static MACHINE_CONFIG_START( micro3d )
 	MCFG_SCREEN_RAW_PARAMS(XTAL_40MHz/8*4, 192*4, 0, 144*4, 434, 0, 400)
 	MCFG_SCREEN_UPDATE_DEVICE("vgb", tms34010_device, tms340x0_ind16)
 	MCFG_SCREEN_PALETTE("palette")
+
+	MCFG_RS232_PORT_ADD("monitor", default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("duart68681", mc68681_device, rx_a_w))
 
 	MCFG_ADC0844_ADD("adc")
 	MCFG_ADC0844_INTR_CB(DEVWRITELINE("mc68901", mc68901_device, i3_w))
