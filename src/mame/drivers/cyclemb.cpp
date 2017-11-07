@@ -1086,6 +1086,7 @@ DRIVER_INIT_MEMBER(cyclemb_state,cyclemb)
 	membank("bank1")->configure_entries(0, 4, memregion("maincpu")->base() + 0x10000, 0x1000);
 	m_dsw_pc_hack = 0x760;
 	
+	// patch audio CPU crash + ROM checksum
 	rom[0x282] = 0x00;
 	rom[0x283] = 0x00;
 	rom[0x284] = 0x00;
@@ -1101,6 +1102,7 @@ DRIVER_INIT_MEMBER(cyclemb_state,skydest)
 	membank("bank1")->configure_entries(0, 4, memregion("maincpu")->base() + 0x10000, 0x1000);
 	m_dsw_pc_hack = 0x554;
 	
+	// patch audio CPU crash + ROM checksum
 	rom[0x286] = 0x00;
 	rom[0x287] = 0x00;
 	rom[0x288] = 0x00;

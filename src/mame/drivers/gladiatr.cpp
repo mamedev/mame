@@ -224,7 +224,7 @@ WRITE8_MEMBER(gladiatr_state::gladiator_int_control_w)
 }
 
 /* YM2203 IRQ */
-WRITE_LINE_MEMBER(gladiatr_state_base::gladiator_ym_irq)
+WRITE_LINE_MEMBER(gladiatr_state_base::ym_irq)
 {
 	/* NMI IRQ is not used by gladiator sound program */
 	m_subcpu->set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
@@ -530,7 +530,10 @@ WRITE8_MEMBER(ppking_state::ppking_qx0_w)
 	else
 	{
 		m_mcu[0].txd = data;
-				
+
+		m_mcu[1].rst = 0;
+		m_soundlatch->write(space, 0, data & 0xff);
+
 		if(m_mcu[0].txd == 0x41)
 		{
 			m_mcu[0].state = 1;
@@ -557,10 +560,10 @@ WRITE8_MEMBER(ppking_state::ppking_qx0_w)
 
 WRITE8_MEMBER(ppking_state::ppking_qx1_w)
 {
-	if(!offset)
+	if(offset == 1)
 	{
-		m_data1 = data;
-		m_flag1 = 1;
+		if(data == 0xf0)
+			m_mcu[1].rst = 1;
 	}
 }
 
@@ -575,10 +578,14 @@ WRITE8_MEMBER(ppking_state::ppking_qx3_w)
 
 READ8_MEMBER(ppking_state::ppking_qx1_r)
 {
-	if (!offset)
-		return m_data2;
-	else
-		return m_flag1;
+	// status
+	if(offset == 1)
+		return 1;
+	
+	if(m_mcu[1].rst == 1)
+		return 0x40;
+	
+	return m_soundlatch->read(space,0);
 }
 
 READ8_MEMBER(ppking_state::ppking_qx2_r)
@@ -940,7 +947,7 @@ static MACHINE_CONFIG_START( ppking )
 	MCFG_CPU_ADD("sub", Z80, XTAL_12MHz/4) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(cpu2_map)
 	MCFG_CPU_IO_MAP(ppking_cpu2_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", ppking_state,  irq0_line_hold)
+	MCFG_CPU_PERIODIC_INT_DRIVER(ppking_state,  irq0_line_hold, 60)
 
 	MCFG_CPU_ADD("audiocpu", M6809, XTAL_12MHz/16) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(ppking_cpu3_map)
@@ -978,7 +985,7 @@ static MACHINE_CONFIG_START( ppking )
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/8) /* verified on pcb */
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(gladiatr_state_base, gladiator_ym_irq))
+	MCFG_YM2203_IRQ_HANDLER(WRITELINE(gladiatr_state_base, ym_irq))
 	MCFG_AY8910_PORT_A_READ_CB(READ8(ppking_state, ppking_f1_r))
 	MCFG_AY8910_PORT_B_READ_CB(READ8(ppking_state, ppking_f1_r))
 	MCFG_SOUND_ROUTE(0, "mono", 0.60)
@@ -1069,7 +1076,7 @@ static MACHINE_CONFIG_START( gladiatr )
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/8) /* verified on pcb */
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(gladiatr_state_base, gladiator_ym_irq))
+	MCFG_YM2203_IRQ_HANDLER(WRITELINE(gladiatr_state_base, ym_irq))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW3")) /* port B read */
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(gladiatr_state, gladiator_int_control_w)) /* port A write */
 	MCFG_SOUND_ROUTE(0, "mono", 0.60)
@@ -1442,13 +1449,26 @@ DRIVER_INIT_MEMBER(ppking_state, ppking)
 		}
 	}
 
+	rom = memregion("sub")->base();
+
+	// patch audio CPU crash + ROM checksums
+	rom[0x1b9] = 0x00;
+	rom[0x1ba] = 0x00;
+	rom[0x1bb] = 0x00;
+	rom[0x839] = 0x00;
+	rom[0x83a] = 0x00;
+	rom[0x83b] = 0x00;
+	rom[0x845] = 0x00;
+	rom[0x846] = 0x00;
+	rom[0x847] = 0x00;
+	
 	save_item(NAME(m_data1));
 	save_item(NAME(m_data2));
 }
 
 
 
-GAME( 1985, ppking,   0,        ppking,   ppking,   ppking_state,   ppking,   ROT90, "Taito America Corporation", "Ping-Pong King", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_NODEVICE_LAN )
+GAME( 1985, ppking,   0,        ppking,   ppking,   ppking_state,   ppking,   ROT90, "Taito America Corporation", "Ping-Pong King", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL | MACHINE_NODEVICE_LAN )
 GAME( 1986, gladiatr, 0,        gladiatr, gladiatr, gladiatr_state, gladiatr, ROT0,  "Allumer / Taito America Corporation", "Gladiator (US)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, ogonsiro, gladiatr, gladiatr, gladiatr, gladiatr_state, gladiatr, ROT0,  "Allumer / Taito Corporation", "Ougon no Shiro (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, greatgur, gladiatr, gladiatr, gladiatr, gladiatr_state, gladiatr, ROT0,  "Allumer / Taito Corporation", "Great Gurianos (Japan?)", MACHINE_SUPPORTS_SAVE )

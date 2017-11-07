@@ -15,7 +15,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(spritebuffer_w);
 	DECLARE_WRITE8_MEMBER(spritebuffer_w);
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
-	DECLARE_WRITE_LINE_MEMBER(gladiator_ym_irq);
+	DECLARE_WRITE_LINE_MEMBER(ym_irq);
 
 protected:
 	gladiatr_state_base(const machine_config &mconfig, device_type type, const char *tag)
