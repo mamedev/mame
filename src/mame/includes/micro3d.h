@@ -62,7 +62,6 @@ public:
 		m_volume(*this, "VOLUME"),
 		m_joystick_x(*this, "JOYSTICK_X"),
 		m_joystick_y(*this, "JOYSTICK_Y"),
-		m_throttle(*this, "THROTTLE"),
 		m_shared_ram(*this, "shared_ram"),
 		m_mac_sram(*this, "mac_sram"),
 		m_sprite_vram(*this, "sprite_vram") { }
@@ -82,7 +81,6 @@ public:
 	required_ioport m_volume;
 	optional_ioport m_joystick_x;
 	optional_ioport m_joystick_y;
-	optional_ioport m_throttle;
 
 	required_shared_ptr<uint16_t> m_shared_ram;
 	uint8_t               m_m68681_tx0;
