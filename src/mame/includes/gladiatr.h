@@ -192,4 +192,15 @@ private:
 	u8  m_data2;
 	u8  m_flag1;
 	u8  m_flag2;
+	
+	struct
+	{
+		uint8_t rxd;
+		uint8_t txd;
+		uint8_t rst;
+		uint8_t state;
+		uint8_t packet_type;
+	} m_mcu[2];
+	
+	bool mcu_parity_check();
 };
