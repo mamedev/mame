@@ -379,16 +379,18 @@ READ8_MEMBER(ppking_state::ppking_f1_r)
 	return 0xff;
 }
 
-READ8_MEMBER(ppking_state::ppking_f6a3_r)
-{
-	if (space.device().safe_pcbase() == 0x8e)
-		m_nvram[0x6a3] = 1;
+/**********************************
+ *
+ * Ping Pong King MCU simulation
+ *
+ * 0x8ad = 
+ * 0x8f6 = IO check (must return 0x40)
+ * 
+ **********************************/
 
-	return m_nvram[0x6a3];
-}
+//#include "debugger.h"
 
-#include "debugger.h"
-
+ 
 inline bool ppking_state::mcu_parity_check()
 {
 	int i;
@@ -405,6 +407,8 @@ inline bool ppking_state::mcu_parity_check()
 	
 	return true;
 }
+
+/**/
 
 READ8_MEMBER(ppking_state::ppking_qx0_r)
 {
@@ -450,11 +454,36 @@ READ8_MEMBER(ppking_state::ppking_qx0_r)
 				
 				break;
 			}
+			
+			case 3:
+			{
+				//m_mcu[0].packet_type^=1;
+				//if(m_mcu[0].packet_type & 1)
+				//{
+				//	m_mcu[0].rxd = ((ioport("P2")->read()) & 0x9f);
+				//}
+				//else
+				{
+					m_mcu[0].rxd = ((ioport("P2")->read()) & 0x3f);
+					m_mcu[0].rxd |= ((ioport("SYSTEM")->read()) & 0x80);
+				}
+				
+				break;
+			}
+			
+			case 4:
+			{
+				m_mcu[0].rxd = ((ioport("P1")->read() | ioport("P2")->read()) & 0x3f);
+				//m_mcu[0].rxd |= ((ioport("SYSTEM")->read()) & 0x80);
+				break;
+			}
 		}
 		
 		if(mcu_parity_check() == false)
 			m_mcu[0].rxd |= 0x40;
 	}
+
+	//printf("%04x rst %d\n",m_maincpu->pc(),m_mcu[0].rst);
 	
 	return m_mcu[0].rxd;
 }
@@ -483,16 +512,20 @@ WRITE8_MEMBER(ppking_state::ppking_qx0_w)
 				*/
 				m_mcu[0].rxd = 0x40;
 				m_mcu[0].rst = 0;
+				//m_mcu[0].state = 0;
 				break;
 			case 2:
-				m_mcu[0].rxd = 0;//(ioport("DSW2")->read() & 0x1f) << 2;
+				m_mcu[0].rxd = 0;
+				//m_mcu[0].rxd = ((ioport("DSW2")->read() & 0x1f) << 2);
+				//m_mcu[0].rxd|= mcu_parity_check() == true ? 0 : 1;
 				m_mcu[0].rst = 0;
-				//machine().debug_break();
+				//m_mcu[0].state = 0;
 				break;
 			case 3:
 				//m_mcu[0].rxd = (ioport("DSW1")->read() & 0x1f) << 2;
 				m_mcu[0].rst = 1;
 				m_mcu[0].txd = 0;
+				//m_mcu[0].state = 0;
 				break;
 
 			default:
@@ -515,9 +548,13 @@ WRITE8_MEMBER(ppking_state::ppking_qx0_w)
 			//m_mcu[0].packet_type = 0;
 			//machine().debug_break();
 		}
+		else if(m_mcu[0].txd == 0x44)
+		{
+			m_mcu[0].state = 3;
+		}
 		else
 		{
-			printf("%02x DATA PC=%04x\n",data,m_maincpu->pc());
+			m_mcu[0].state = 4;
 		}
 	}
 }
@@ -562,6 +599,11 @@ MACHINE_RESET_MEMBER(ppking_state, ppking)
 {
 	m_data1 = m_data2 = 0;
 	m_flag1 = m_flag2 = 1;
+	
+	// yes, it expects to read DSW1 without sending commands first ...
+	m_mcu[0].rxd = (ioport("DSW1")->read() & 0x1f) << 2;;
+	m_mcu[0].rst = 0;
+	m_mcu[0].state = 0;
 }
 
 static ADDRESS_MAP_START( ppking_cpu1_map, AS_PROGRAM, 8, ppking_state )
@@ -655,25 +697,13 @@ static INPUT_PORTS_START( ppking )
 	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNUSED )
 	
 	PORT_START("P2")
-	PORT_DIPNAME( 0x01, 0x00, "P2" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )  PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
@@ -690,8 +720,23 @@ static INPUT_PORTS_START( ppking )
 	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(2)
 	
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW1:7,6")
+	PORT_DIPSETTING(    0x03, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
+	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW1:5" )
+	PORT_DIPNAME( 0x08, 0x08, "VS Mode (link)" ) PORT_DIPLOCATION("SW1:4") // unemulated
+	PORT_DIPSETTING(    0x08, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x10, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_UNUSED )
+	
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x00, "DSW2" ) // being it off makes game to freeze
+	PORT_DIPNAME( 0x01, 0x00, "DSW2" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
@@ -724,7 +769,6 @@ static INPUT_PORTS_START( ppking )
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_SERVICE_DIPLOC(   0x80, IP_ACTIVE_HIGH, "SW3:8" )
-
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( gladiatr )
@@ -1376,7 +1420,6 @@ DRIVER_INIT_MEMBER(ppking_state, ppking)
 			rom[i+2*j*0x2000] = rom[i+j*0x2000];
 		}
 	}
-	//m_maincpu->space(AS_PROGRAM).install_read_handler(0xf6a3,0xf6a3,read8_delegate(FUNC(ppking_state::ppking_f6a3_r),this));
 
 	save_item(NAME(m_data1));
 	save_item(NAME(m_data2));
@@ -1384,7 +1427,7 @@ DRIVER_INIT_MEMBER(ppking_state, ppking)
 
 
 
-GAME( 1985, ppking,   0,        ppking,   ppking,   ppking_state,   ppking,   ROT90, "Taito America Corporation", "Ping-Pong King", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, ppking,   0,        ppking,   ppking,   ppking_state,   ppking,   ROT90, "Taito America Corporation", "Ping-Pong King", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_NODEVICE_LAN )
 GAME( 1986, gladiatr, 0,        gladiatr, gladiatr, gladiatr_state, gladiatr, ROT0,  "Allumer / Taito America Corporation", "Gladiator (US)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, ogonsiro, gladiatr, gladiatr, gladiatr, gladiatr_state, gladiatr, ROT0,  "Allumer / Taito Corporation", "Ougon no Shiro (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, greatgur, gladiatr, gladiatr, gladiatr, gladiatr_state, gladiatr, ROT0,  "Allumer / Taito Corporation", "Great Gurianos (Japan?)", MACHINE_SUPPORTS_SAVE )
