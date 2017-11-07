@@ -325,7 +325,7 @@ ROM_START( ps2 )
 	ROMX_LOAD( "ps2-0250j-20100415.bin", 0x0000, 0x400000, CRC(4e8c160c) SHA1(4b5ef16b67e3b523d28ed2406106cb80470a06d0), ROM_BIOS(53) )
 
 	// These came from unknown sources and are of unknown quality
-	ROM_SYSTEM_BIOS( 53, "unknown", "Unknown" )
+	ROM_SYSTEM_BIOS( 54, "unknown", "Unknown" )
 	ROM_LOAD( "scph-30004r_bios_v6_eur_160.bin", 0x000000, 0x400000, CRC(9386a740) SHA1(8fa040852d4b8688f0c84bcfffc65eb208f2b432) )
 	ROM_LOAD( "scph39004.bin", 0x000000, 0x400000, CRC(1f2a283c) SHA1(004cc467439f053d5a1fcf4d1b7c13338ce63403) )
 	ROM_LOAD( "scph50003.bin", 0x000000, 0x400000, CRC(a5860b09) SHA1(003f9bdae45a04c5eb28689813e818566a8c4610) )
