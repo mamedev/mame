@@ -214,7 +214,6 @@ void flower_state::draw_legacy_text(bitmap_ind16 &bitmap,const rectangle &clipre
 
 		gfx_0->transpen(bitmap,cliprect,tile,attr >> 2,0,0,x*8+256+16,y*8,3);
 	}
-
 }
 
 /*
