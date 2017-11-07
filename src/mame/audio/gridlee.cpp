@@ -11,7 +11,7 @@
 
 
 // device type definition
-DEFINE_DEVICE_TYPE(GRIDLEE, gridlee_sound_device, "gridlee_sound", "Gridlee Audio Custom")
+DEFINE_DEVICE_TYPE(GRIDLEE, gridlee_sound_device, "gridlee_sound", "Gridlee Custom Sound")
 
 
 //**************************************************************************
