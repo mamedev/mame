@@ -191,7 +191,8 @@ public:
 		m_gfxdecode2(*this, "gfxdecode2"),
 		m_gfxdecode3(*this, "gfxdecode3"),
 		m_arm_aic(*this, "arm_aic"),
-		m_sprites_mask(*this, "sprites_mask")
+		m_sprites_mask(*this, "sprites_mask"),
+		m_bg_palette(*this, "bg_palette")
 	{ }
 
 	DECLARE_READ32_MEMBER(unk_startup_r);
@@ -206,10 +207,10 @@ public:
 	DECLARE_DRIVER_INIT(kov3_102);
 	DECLARE_DRIVER_INIT(kov3_100);
 
-	DECLARE_READ32_MEMBER(pgm2_3660000_r) { return 0xffffffff; }
-	DECLARE_READ32_MEMBER(pgm2_3680000_r) { return 0xffffffff; }
-	DECLARE_READ32_MEMBER(pgm2_3900000_r) { return 0xffffffff; }
-	DECLARE_READ32_MEMBER(pgm2_3a00000_r) { return 0xffffffff; }
+	//DECLARE_READ32_MEMBER(pgm2_3660000_r) { return 0xffffffff; }
+	//DECLARE_READ32_MEMBER(pgm2_3680000_r) { return 0xffffffff; }
+	//DECLARE_READ32_MEMBER(pgm2_3900000_r) { return 0xffffffff; }
+	//DECLARE_READ32_MEMBER(pgm2_3a00000_r) { return 0xffffffff; }
 
 	void draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_pgm2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -242,6 +243,7 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode3;
 	required_device<arm_aic_device> m_arm_aic;
 	required_region_ptr<uint8_t> m_sprites_mask;
+	required_device<palette_device> m_bg_palette;
 };
 
 
@@ -688,9 +690,11 @@ void pgm2_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const
 
 uint32_t pgm2_state::screen_update_pgm2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	bitmap.fill(m_bg_palette->black_pen(), cliprect);
 
 	draw_sprites(screen, bitmap, cliprect);
+
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
 
@@ -738,6 +742,8 @@ TILE_GET_INFO_MEMBER(pgm2_state::get_bg_tile_info)
 void pgm2_state::video_start()
 {
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode2, tilemap_get_info_delegate(FUNC(pgm2_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 96, 48); // 0x4800 bytes
+	m_fg_tilemap->set_transparent_pen(0);
+
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode3, tilemap_get_info_delegate(FUNC(pgm2_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 32, 32, 64, 32); // 0x2000 bytes
 }
 
