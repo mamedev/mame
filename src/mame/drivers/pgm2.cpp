@@ -643,17 +643,22 @@ void pgm2_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const
 		{
 			//printf("sprite with %08x %08x %08x %08x\n", m_sp_videoram[i + 0], m_sp_videoram[i + 1], m_sp_videoram[i + 2], m_sp_videoram[i + 3]);
 		
-			int x =   (m_sp_videoram[i + 0] & 0x000007ff) >> 0;
-			int y =   (m_sp_videoram[i + 0] & 0x003ff800) >> 11;
-			int pal = (m_sp_videoram[i + 0] & 0x0fc00000) >> 22;
+			int x =     (m_sp_videoram[i + 0] & 0x000007ff) >> 0;
+			int y =     (m_sp_videoram[i + 0] & 0x003ff800) >> 11;
+			int pal =   (m_sp_videoram[i + 0] & 0x0fc00000) >> 22;
+			int sizex = (m_sp_videoram[i + 1] & 0x0000003f) >> 0;
+			int sizey = (m_sp_videoram[i + 1] & 0x00003fc0) >> 6;
 
-			int sizex = (m_sp_videoram[i + 1] >> 0) & 0x3f;
-			int sizey = (m_sp_videoram[i + 1] >> 6) & 0xff;
+			int flipx = (m_sp_videoram[i + 1] & 0x00800000) >> 23;
+			int flipy = (m_sp_videoram[i + 1] & 0x80000000) >> 31;
 
 			int mask_offset = (m_sp_videoram[i + 2]<<1);
-			mask_offset &= 0x3ffffff;
-
 			int palette_offset = (m_sp_videoram[i + 3]);
+
+			if (x & 0x400) x -=0x800;
+			if (y & 0x200) y -=0x400;
+
+			mask_offset &= 0x3ffffff;
 			palette_offset &= 0x7ffffff;
 
 			const pen_t *paldata = m_sp_palette->pens();
@@ -664,17 +669,32 @@ void pgm2_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const
 
 				for (int xdraw = 0; xdraw < sizex;xdraw++)
 				{
+					if (flipy)
+					{
+						// wrong
+						mask_offset -= 4;
+					}
+
 					uint32_t maskdata = m_sprites_mask[mask_offset+0] << 24;
 					maskdata |= m_sprites_mask[mask_offset+1] << 16;
 					maskdata |= m_sprites_mask[mask_offset+2] << 8;
 					maskdata |= m_sprites_mask[mask_offset+3] << 0;
 					
-					mask_offset += 4;
+					if (!flipy)
+					{
+						mask_offset += 4;
+					}
+				
+					
 					mask_offset &= 0x3ffffff;
 
 					for (int xchunk = 0;xchunk < 32;xchunk++)
 					{
-						int realx = (xdraw * 32) + x + xchunk;	
+						int realx;
+						
+						if (!flipx) realx = x + (xdraw * 32) + xchunk;
+						else realx = ((x + sizex*32)-1) - ((xdraw * 32) + xchunk);
+
 						int pix = (maskdata >> (31 - xchunk)) & 1;
 
 						if (pix)
@@ -688,8 +708,17 @@ void pgm2_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const
 								dstptr_bitmap = &bitmap.pix32(realy);
 								dstptr_bitmap[realx] = paldata[pendat];
 							}
+						
 
-							palette_offset++;
+							if (!flipy)
+							{
+								palette_offset++;
+							}
+							else
+							{	// wrong
+								palette_offset--;
+							}
+								
 							palette_offset &= 0x7ffffff;
 						}
 						
