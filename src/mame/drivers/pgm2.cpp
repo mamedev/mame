@@ -703,7 +703,7 @@ void pgm2_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const
 						{
 							if (cliprect.contains(realx, realy))
 							{
-								uint16_t pendat = m_sprites_colour[palette_offset];
+								uint16_t pendat = m_sprites_colour[palette_offset] & 0x3f; // there are some stray 0xff bytes in some roms, so mask
 
 								pendat |= pal * 0x40;
 
@@ -774,10 +774,11 @@ WRITE32_MEMBER(pgm2_state::fg_videoram_w)
 
 TILE_GET_INFO_MEMBER(pgm2_state::get_fg_tile_info)
 {
-	int tileno = m_fg_videoram[tile_index];
-	int attr = (tileno & 0xfffc0000) >> 18;
-	tileno &= 0x0003ffff;
-	SET_TILE_INFO_MEMBER(0, tileno, attr, 0);
+	int tileno = (m_fg_videoram[tile_index] & 0x0003ffff) >> 0;
+	int colour = (m_fg_videoram[tile_index] & 0x007c0000) >> 18; // 5 bits
+	int flipxy = (m_fg_videoram[tile_index] & 0x01800000) >> 23;
+
+	SET_TILE_INFO_MEMBER(0, tileno, colour, TILE_FLIPXY(flipxy));
 }
 
 
@@ -789,10 +790,11 @@ WRITE32_MEMBER(pgm2_state::bg_videoram_w)
 
 TILE_GET_INFO_MEMBER(pgm2_state::get_bg_tile_info)
 {
-	int tileno = m_bg_videoram[tile_index];
-	int attr = (tileno & 0xfffc0000) >> 18;
-	tileno &= 0x0000ffff;
-	SET_TILE_INFO_MEMBER(0, tileno, attr, 0);
+	int tileno = (m_bg_videoram[tile_index] & 0x0003ffff) >> 0;
+	int colour = (m_bg_videoram[tile_index] & 0x003c0000) >> 18; // 4 bits
+	int flipxy = (m_bg_videoram[tile_index] & 0x01800000) >> 23;
+
+	SET_TILE_INFO_MEMBER(0, tileno, colour, TILE_FLIPXY(flipxy));
 }
 
 void pgm2_state::video_start()
@@ -879,7 +881,7 @@ GFXDECODE_END
 #endif
 
 static GFXDECODE_START( pgm2_tx )
-	GFXDECODE_ENTRY( "tiles", 0, tiles8x8_layout, 0, 16 )
+	GFXDECODE_ENTRY( "tiles", 0, tiles8x8_layout, 0, 0x800/4/0x10 )
 GFXDECODE_END
 
 static GFXDECODE_START( pgm2_bg )
