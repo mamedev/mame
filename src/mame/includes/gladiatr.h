@@ -180,6 +180,7 @@ public:
 	DECLARE_WRITE8_MEMBER(ppking_qxunk_w);
 	DECLARE_WRITE8_MEMBER(ppking_video_registers_w);
 	DECLARE_WRITE8_MEMBER(ppking_adpcm_w);
+	DECLARE_WRITE8_MEMBER(cpu2_irq_ack_w);
 
 	DECLARE_DRIVER_INIT(ppking);
 
@@ -207,4 +208,5 @@ private:
 	} m_mcu[2];
 	
 	bool mcu_parity_check();
+	void mcu_input_check();
 };
