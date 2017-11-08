@@ -192,7 +192,10 @@ public:
 		m_gfxdecode3(*this, "gfxdecode3"),
 		m_arm_aic(*this, "arm_aic"),
 		m_sprites_mask(*this, "sprites_mask"),
-		m_bg_palette(*this, "bg_palette")
+		m_sprites_colour(*this, "sprites_colour"),
+		m_sp_palette(*this, "sp_palette"),
+		m_bg_palette(*this, "bg_palette"),
+		m_tx_palette(*this, "tx_palette")
 	{ }
 
 	DECLARE_READ32_MEMBER(unk_startup_r);
@@ -243,7 +246,10 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode3;
 	required_device<arm_aic_device> m_arm_aic;
 	required_region_ptr<uint8_t> m_sprites_mask;
+	required_region_ptr<uint8_t> m_sprites_colour;
+	required_device<palette_device> m_sp_palette;
 	required_device<palette_device> m_bg_palette;
+	required_device<palette_device> m_tx_palette;
 };
 
 
@@ -639,7 +645,7 @@ void pgm2_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const
 		
 			int x =   (m_sp_videoram[i + 0] & 0x000007ff) >> 0;
 			int y =   (m_sp_videoram[i + 0] & 0x003ff800) >> 11;
-			//int pal = (m_sp_videoram[i + 0] & 0x0fc00000) >> 22;
+			int pal = (m_sp_videoram[i + 0] & 0x0fc00000) >> 22;
 
 			int sizex = (m_sp_videoram[i + 1] >> 0) & 0x3f;
 			int sizey = (m_sp_videoram[i + 1] >> 6) & 0xff;
@@ -648,7 +654,11 @@ void pgm2_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const
 			//mask_offset = mask_offset;
 			mask_offset &= 0x3ffffff;
 
+			int palette_offset = (m_sp_videoram[i + 3]);
+			palette_offset &= 0x7ffffff;
+
 			//sizex = sizex * 32;
+			const pen_t *paldata = m_sp_palette->pens();
 
 			for (int ydraw = 0; ydraw < sizey;ydraw++)
 			{
@@ -666,18 +676,25 @@ void pgm2_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const
 
 					for (int xchunk = 0;xchunk < 32;xchunk++)
 					{
-						int realx = (xdraw * 32) + x + xchunk;
-					
-						if (cliprect.contains(realx, realy))
-						{
-							int pix = (maskdata >> (31 - xchunk)) & 1;
+						int realx = (xdraw * 32) + x + xchunk;	
+						int pix = (maskdata >> (31 - xchunk)) & 1;
 
-							if (pix)
+						if (pix)
+						{
+							if (cliprect.contains(realx, realy))
 							{
+								uint8_t pendat = m_sprites_colour[palette_offset];
+
+								pendat |= pal * 0x40;
+
 								dstptr_bitmap = &bitmap.pix32(realy);
-								dstptr_bitmap[realx] = m_sp_videoram[i + 3];
+								dstptr_bitmap[realx] = paldata[pendat];
 							}
+
+							palette_offset++;
+							palette_offset &= 0x7ffffff;
 						}
+						
 					}
 
 				}
@@ -780,7 +797,7 @@ static const gfx_layout tiles32x32x8_layout =
 	256*32
 };
 
-#if 0
+#if 1
 /* sprites aren't tile based but are multiples of 32 wide */
 static const gfx_layout tiles32x8x1_layout =
 {
@@ -813,7 +830,7 @@ static const gfx_layout hng64_texlayout =
 static GFXDECODE_START( pgm2_sp )
 	GFXDECODE_ENTRY( "sprites_mask", 0, tiles32x8x1_layout, 0, 16 )
 	GFXDECODE_ENTRY( "sprites_mask", 0, hng64_texlayout, 0, 16 )
-	GFXDECODE_ENTRY( "spritesb", 0, tiles32x8x1_layout, 0, 16 )
+	GFXDECODE_ENTRY( "sprites_colour", 0, tiles32x8x1_layout, 0, 16 )
 GFXDECODE_END
 #endif
 
@@ -927,7 +944,7 @@ static MACHINE_CONFIG_START( pgm2 )
 	MCFG_SCREEN_VISIBLE_AREA(0, 448-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(pgm2_state, screen_update_pgm2)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(pgm2_state, screen_vblank_pgm2))
-#if 0
+#if 1
 	MCFG_GFXDECODE_ADD("gfxdecode1", "sp_palette", pgm2_sp)
 #endif
 	MCFG_GFXDECODE_ADD("gfxdecode2", "tx_palette", pgm2_tx)
@@ -966,11 +983,11 @@ ROM_START( orleg2 )
 	ROM_LOAD32_WORD( "ig-a_bgl.u35",     0x00000000, 0x0800000, CRC(083a8315) SHA1(0dba25e132fbb12faa59ced648c27b881dc73478) )
 	ROM_LOAD32_WORD( "ig-a_bgh.u36",     0x00000002, 0x0800000, CRC(e197221d) SHA1(5574b1e3da4b202db725be906dd868edc2fd4634) )
 
-	ROM_REGION( 0x2000000, "sprites_mask", 0 ) // 1bpp sprite mask data
+	ROM_REGION( 0x2000000, "sprites_mask", 0 ) // 1bpp sprite mask data (packed)
 	ROM_LOAD32_WORD( "ig-a_bml.u12",     0x00000000, 0x1000000, CRC(113a331c) SHA1(ee6b31bb2b052cc8799573de0d2f0a83f0ab4f6a) )
 	ROM_LOAD32_WORD( "ig-a_bmh.u16",     0x00000002, 0x1000000, CRC(fbf411c8) SHA1(5089b5cc9bbf6496ef1367c6255e63e9ab895117) )
 
-	ROM_REGION( 0x4000000, "spritesb", 0 ) // sprite colour data
+	ROM_REGION( 0x4000000, "sprites_colour", 0 ) // sprite colour data (5bpp data, 3 bits unused)
 	ROM_LOAD32_WORD( "ig-a_cgl.u18",     0x00000000, 0x2000000, CRC(43501fa6) SHA1(58ccce6d393964b771fec3f5c583e3ede57482a3) )
 	ROM_LOAD32_WORD( "ig-a_cgh.u26",     0x00000002, 0x2000000, CRC(7051d020) SHA1(3d9b24c6fda4c9699bb9f00742e0888059b623e1) )
 
@@ -996,7 +1013,7 @@ ROM_START( orleg2o )
 	ROM_LOAD32_WORD( "ig-a_bml.u12",     0x00000000, 0x1000000, CRC(113a331c) SHA1(ee6b31bb2b052cc8799573de0d2f0a83f0ab4f6a) )
 	ROM_LOAD32_WORD( "ig-a_bmh.u16",     0x00000002, 0x1000000, CRC(fbf411c8) SHA1(5089b5cc9bbf6496ef1367c6255e63e9ab895117) )
 
-	ROM_REGION( 0x4000000, "spritesb", 0 ) // sprite colour data
+	ROM_REGION( 0x4000000, "sprites_colour", 0 ) // sprite colour data
 	ROM_LOAD32_WORD( "ig-a_cgl.u18",     0x00000000, 0x2000000, CRC(43501fa6) SHA1(58ccce6d393964b771fec3f5c583e3ede57482a3) )
 	ROM_LOAD32_WORD( "ig-a_cgh.u26",     0x00000002, 0x2000000, CRC(7051d020) SHA1(3d9b24c6fda4c9699bb9f00742e0888059b623e1) )
 
@@ -1022,7 +1039,7 @@ ROM_START( orleg2oa )
 	ROM_LOAD32_WORD( "ig-a_bml.u12",     0x00000000, 0x1000000, CRC(113a331c) SHA1(ee6b31bb2b052cc8799573de0d2f0a83f0ab4f6a) )
 	ROM_LOAD32_WORD( "ig-a_bmh.u16",     0x00000002, 0x1000000, CRC(fbf411c8) SHA1(5089b5cc9bbf6496ef1367c6255e63e9ab895117) )
 
-	ROM_REGION( 0x4000000, "spritesb", 0 ) // sprite colour data
+	ROM_REGION( 0x4000000, "sprites_colour", 0 ) // sprite colour data
 	ROM_LOAD32_WORD( "ig-a_cgl.u18",     0x00000000, 0x2000000, CRC(43501fa6) SHA1(58ccce6d393964b771fec3f5c583e3ede57482a3) )
 	ROM_LOAD32_WORD( "ig-a_cgh.u26",     0x00000002, 0x2000000, CRC(7051d020) SHA1(3d9b24c6fda4c9699bb9f00742e0888059b623e1) )
 
@@ -1048,7 +1065,7 @@ ROM_START( kov2nl )
 	ROM_LOAD32_WORD( "ig-a3_bml.u12",    0x00000000, 0x1000000, CRC(0bf63836) SHA1(b8e4f1951f8074b475b795bd7840c5a375b6f5ef) )
 	ROM_LOAD32_WORD( "ig-a3_bmh.u16",    0x00000002, 0x1000000, CRC(4a378542) SHA1(5d06a8a8796285a786ebb690c34610f923ef5570) )
 
-	ROM_REGION( 0x4000000, "spritesb", 0 ) // sprite colour data
+	ROM_REGION( 0x4000000, "sprites_colour", 0 ) // sprite colour data
 	ROM_LOAD32_WORD( "ig-a3_cgl.u18",    0x00000000, 0x2000000, CRC(8d923e1f) SHA1(14371cf385dd8857017d3111cd4710f4291b1ae2) )
 	ROM_LOAD32_WORD( "ig-a3_cgh.u26",    0x00000002, 0x2000000, CRC(5b6fbf3f) SHA1(d1f52e230b91ee6cde939d7c2b74da7fd6527e73) )
 
@@ -1074,7 +1091,7 @@ ROM_START( kov2nlo )
 	ROM_LOAD32_WORD( "ig-a3_bml.u12",    0x00000000, 0x1000000, CRC(0bf63836) SHA1(b8e4f1951f8074b475b795bd7840c5a375b6f5ef) )
 	ROM_LOAD32_WORD( "ig-a3_bmh.u16",    0x00000002, 0x1000000, CRC(4a378542) SHA1(5d06a8a8796285a786ebb690c34610f923ef5570) )
 
-	ROM_REGION( 0x4000000, "spritesb", 0 ) // sprite colour data
+	ROM_REGION( 0x4000000, "sprites_colour", 0 ) // sprite colour data
 	ROM_LOAD32_WORD( "ig-a3_cgl.u18",    0x00000000, 0x2000000, CRC(8d923e1f) SHA1(14371cf385dd8857017d3111cd4710f4291b1ae2) )
 	ROM_LOAD32_WORD( "ig-a3_cgh.u26",    0x00000002, 0x2000000, CRC(5b6fbf3f) SHA1(d1f52e230b91ee6cde939d7c2b74da7fd6527e73) )
 
@@ -1100,7 +1117,7 @@ ROM_START( kov2nloa )
 	ROM_LOAD32_WORD( "ig-a3_bml.u12",    0x00000000, 0x1000000, CRC(0bf63836) SHA1(b8e4f1951f8074b475b795bd7840c5a375b6f5ef) )
 	ROM_LOAD32_WORD( "ig-a3_bmh.u16",    0x00000002, 0x1000000, CRC(4a378542) SHA1(5d06a8a8796285a786ebb690c34610f923ef5570) )
 
-	ROM_REGION( 0x4000000, "spritesb", 0 ) // sprite colour data
+	ROM_REGION( 0x4000000, "sprites_colour", 0 ) // sprite colour data
 	ROM_LOAD32_WORD( "ig-a3_cgl.u18",    0x00000000, 0x2000000, CRC(8d923e1f) SHA1(14371cf385dd8857017d3111cd4710f4291b1ae2) )
 	ROM_LOAD32_WORD( "ig-a3_cgh.u26",    0x00000002, 0x2000000, CRC(5b6fbf3f) SHA1(d1f52e230b91ee6cde939d7c2b74da7fd6527e73) )
 
@@ -1126,7 +1143,7 @@ ROM_START( ddpdojh )
 	ROM_LOAD32_WORD( "ddpdoj_mapl0.u13", 0x00000000, 0x800000, CRC(bcfbb0fc) SHA1(9ec478eba9905913cf997bd9b46c70c1ad383630) )
 	ROM_LOAD32_WORD( "ddpdoj_maph0.u15", 0x00000002, 0x800000, CRC(0cc75d4e) SHA1(6d1b5ef0fdebf1e84fa199b939ffa07b810b12c9) )
 
-	ROM_REGION( 0x2000000, "spritesb", 0 ) // sprite colour data
+	ROM_REGION( 0x2000000, "sprites_colour", 0 ) // sprite colour data
 	ROM_LOAD32_WORD( "ddpdoj_spa0.u9",   0x00000000, 0x1000000, CRC(1232c1b4) SHA1(ecc1c549ae19d2f052a85fe4a993608aedf49a25) )
 	ROM_LOAD32_WORD( "ddpdoj_spb0.u18",  0x00000002, 0x1000000, CRC(6a9e2cbf) SHA1(8e0a4ea90f5ef534820303d62f0873f8ac9f080e) )
 
@@ -1159,7 +1176,7 @@ ROM_START( kov3 )
 	ROM_LOAD32_WORD( "kov3_mapl0.u15",   0x00000000, 0x2000000, CRC(9e569bf7) SHA1(03d26e000e9d8e744546be9649628d2130f2ec4c) )
 	ROM_LOAD32_WORD( "kov3_maph0.u16",   0x00000002, 0x2000000, CRC(6f200ad8) SHA1(cd12c136d4f5d424bd7daeeacd5c4127beb3d565) )
 
-	ROM_REGION( 0x8000000, "spritesb", 0 ) // sprite colour data
+	ROM_REGION( 0x8000000, "sprites_colour", 0 ) // sprite colour data
 	ROM_LOAD32_WORD( "kov3_spa0.u17",    0x00000000, 0x4000000, CRC(3a1e58a9) SHA1(6ba251407c69ee62f7ea0baae91bc133acc70c6f) )
 	ROM_LOAD32_WORD( "kov3_spb0.u10",    0x00000002, 0x4000000, CRC(90396065) SHA1(01bf9f69d77a792d5b39afbba70fbfa098e194f1) )
 
@@ -1185,7 +1202,7 @@ ROM_START( kov3_102 )
 	ROM_LOAD32_WORD( "kov3_mapl0.u15",   0x00000000, 0x2000000, CRC(9e569bf7) SHA1(03d26e000e9d8e744546be9649628d2130f2ec4c) )
 	ROM_LOAD32_WORD( "kov3_maph0.u16",   0x00000002, 0x2000000, CRC(6f200ad8) SHA1(cd12c136d4f5d424bd7daeeacd5c4127beb3d565) )
 
-	ROM_REGION( 0x8000000, "spritesb", 0 ) // sprite colour data
+	ROM_REGION( 0x8000000, "sprites_colour", 0 ) // sprite colour data
 	ROM_LOAD32_WORD( "kov3_spa0.u17",    0x00000000, 0x4000000, CRC(3a1e58a9) SHA1(6ba251407c69ee62f7ea0baae91bc133acc70c6f) )
 	ROM_LOAD32_WORD( "kov3_spb0.u10",    0x00000002, 0x4000000, CRC(90396065) SHA1(01bf9f69d77a792d5b39afbba70fbfa098e194f1) )
 
@@ -1211,7 +1228,7 @@ ROM_START( kov3_100 )
 	ROM_LOAD32_WORD( "kov3_mapl0.u15",   0x00000000, 0x2000000, CRC(9e569bf7) SHA1(03d26e000e9d8e744546be9649628d2130f2ec4c) )
 	ROM_LOAD32_WORD( "kov3_maph0.u16",   0x00000002, 0x2000000, CRC(6f200ad8) SHA1(cd12c136d4f5d424bd7daeeacd5c4127beb3d565) )
 
-	ROM_REGION( 0x8000000, "spritesb", 0 ) // sprite colour data
+	ROM_REGION( 0x8000000, "sprites_colour", 0 ) // sprite colour data
 	ROM_LOAD32_WORD( "kov3_spa0.u17",    0x00000000, 0x4000000, CRC(3a1e58a9) SHA1(6ba251407c69ee62f7ea0baae91bc133acc70c6f) )
 	ROM_LOAD32_WORD( "kov3_spb0.u10",    0x00000002, 0x4000000, CRC(90396065) SHA1(01bf9f69d77a792d5b39afbba70fbfa098e194f1) )
 
