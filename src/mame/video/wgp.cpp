@@ -7,7 +7,7 @@
 
 /*******************************************************************/
 
-inline void wgp_state::common_get_piv_tile_info( tile_data &tileinfo, int tile_index, int num )
+inline void wgp_state::common_get_piv_tile_info(tile_data &tileinfo, int tile_index, int num)
 {
 	uint16_t tilenum = m_pivram[tile_index + num * 0x1000];    /* 3 blocks of $2000 */
 	uint16_t attr = m_pivram[tile_index + num * 0x1000 + 0x8000];  /* 3 blocks of $2000 */
@@ -34,7 +34,7 @@ TILE_GET_INFO_MEMBER(wgp_state::get_piv2_tile_info)
 }
 
 
-void wgp_state::wgp_core_vh_start( int piv_xoffs, int piv_yoffs )
+void wgp_state::core_vh_start(int piv_xoffs, int piv_yoffs)
 {
 	m_piv_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(wgp_state::get_piv0_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
 	m_piv_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(wgp_state::get_piv1_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
@@ -67,12 +67,12 @@ void wgp_state::wgp_core_vh_start( int piv_xoffs, int piv_yoffs )
 
 void wgp_state::video_start()
 {
-	wgp_core_vh_start(32, 16);
+	core_vh_start(32, 16);
 }
 
 VIDEO_START_MEMBER(wgp_state,wgp2)
 {
-	wgp_core_vh_start(32, 16);
+	core_vh_start(32, 16);
 }
 
 
@@ -120,12 +120,7 @@ custom chip capable of four rather than three tilemaps.)
 
 *******************************************************************/
 
-READ16_MEMBER(wgp_state::wgp_pivram_word_r)
-{
-	return m_pivram[offset];
-}
-
-WRITE16_MEMBER(wgp_state::wgp_pivram_word_w)
+WRITE16_MEMBER(wgp_state::pivram_word_w)
 {
 	COMBINE_DATA(&m_pivram[offset]);
 
@@ -143,12 +138,7 @@ WRITE16_MEMBER(wgp_state::wgp_pivram_word_w)
 	}
 }
 
-READ16_MEMBER(wgp_state::wgp_piv_ctrl_word_r)
-{
-	return m_piv_ctrlram[offset];
-}
-
-WRITE16_MEMBER(wgp_state::wgp_piv_ctrl_word_w)
+WRITE16_MEMBER(wgp_state::piv_ctrl_word_w)
 {
 	uint16_t a, b;
 
@@ -339,7 +329,7 @@ static const uint8_t ylookup[16] =
 		2, 2, 3, 3,
 		2, 2, 3, 3 };
 
-void wgp_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs )
+void wgp_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs)
 {
 	uint16_t *spriteram = m_spriteram;
 	int offs, i, j, k;
@@ -478,8 +468,8 @@ void wgp_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const
                        CUSTOM DRAW
 *********************************************************/
 
-static inline void bryan2_drawscanline( bitmap_ind16 &bitmap, int x, int y, int length,
-		const uint16_t *src, int transparent, uint32_t orient, bitmap_ind8 &priority, int pri )
+static inline void bryan2_drawscanline(bitmap_ind16 &bitmap, int x, int y, int length,
+		const uint16_t *src, int transparent, uint32_t orient, bitmap_ind8 &priority, int pri)
 {
 	uint16_t *dsti = &bitmap.pix16(y, x);
 	uint8_t *dstp = &priority.pix8(y, x);
@@ -510,7 +500,7 @@ static inline void bryan2_drawscanline( bitmap_ind16 &bitmap, int x, int y, int 
 
 
 
-void wgp_state::wgp_piv_layer_draw( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, uint32_t priority )
+void wgp_state::piv_layer_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, uint32_t priority)
 {
 	bitmap_ind16 &srcbitmap = m_piv_tilemap[layer]->pixmap();
 	bitmap_ind8 &flagsbitmap = m_piv_tilemap[layer]->flagsmap();
@@ -625,7 +615,7 @@ void wgp_state::wgp_piv_layer_draw( screen_device &screen, bitmap_ind16 &bitmap,
                         SCREEN REFRESH
 **************************************************************/
 
-uint32_t wgp_state::screen_update_wgp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t wgp_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int i;
 	uint8_t layer[3];
@@ -681,21 +671,21 @@ uint32_t wgp_state::screen_update_wgp(screen_device &screen, bitmap_ind16 &bitma
 #ifdef MAME_DEBUG
 	if (m_dislayer[layer[0]] == 0)
 #endif
-	wgp_piv_layer_draw(screen, bitmap, cliprect, layer[0], TILEMAP_DRAW_OPAQUE, 1);
+	piv_layer_draw(screen, bitmap, cliprect, layer[0], TILEMAP_DRAW_OPAQUE, 1);
 
 #ifdef MAME_DEBUG
 	if (m_dislayer[layer[1]] == 0)
 #endif
-	wgp_piv_layer_draw(screen, bitmap, cliprect, layer[1], 0, 2);
+	piv_layer_draw(screen, bitmap, cliprect, layer[1], 0, 2);
 
 #ifdef MAME_DEBUG
 	if (m_dislayer[layer[2]] == 0)
 #endif
-	wgp_piv_layer_draw(screen, bitmap, cliprect, layer[2], 0, 4);
+	piv_layer_draw(screen, bitmap, cliprect, layer[2], 0, 4);
 
 	draw_sprites(screen, bitmap, cliprect, 16);
 
-/* ... then here we should apply rotation from wgp_sate_ctrl[] to the bitmap before we draw the TC0100SCN layers on it */
+/* ... then here we should apply rotation from m_rotate_ctrl[] to the bitmap before we draw the TC0100SCN layers on it */
 	layer[0] = m_tc0100scn->bottomlayer();
 	layer[1] = layer[0] ^ 1;
 	layer[2] = 2;
@@ -711,7 +701,7 @@ uint32_t wgp_state::screen_update_wgp(screen_device &screen, bitmap_ind16 &bitma
 #if 0
 	{
 		char buf[80];
-		sprintf(buf,"wgp_piv_ctrl_reg: %04x y zoom: %04x %04x %04x",m_piv_ctrl_reg,
+		sprintf(buf,"piv_ctrl_reg: %04x y zoom: %04x %04x %04x",m_piv_ctrl_reg,
 						m_piv_zoom[0],m_piv_zoom[1],m_piv_zoom[2]);
 		popmessage(buf);
 	}
@@ -725,7 +715,7 @@ uint32_t wgp_state::screen_update_wgp(screen_device &screen, bitmap_ind16 &bitma
 
 		for (i = 0; i < 8; i += 1)
 		{
-			sprintf (buf, "%02x: %04x", i, wgp_rotate_ctrl[i]);
+			sprintf (buf, "%02x: %04x", i, rotate_ctrl[i]);
 			ui_draw_text (buf, 0, i*8);
 		}
 	}

@@ -322,7 +322,7 @@ Stephh's notes (based on the game M68000 code and some tests) :
       * 0x0000 (Japan) use TAITO_COINAGE_JAPAN_NEW
       * 0x0001 (US) use TAITO_COINAGE_US
       * 0x0002 (World), 0x0003 (US, licensed to ROMSTAR) and 0x0004 (licensed to PHOENIX ELECTRONICS CO.)
-        use slighlty different TAITO_COINAGE_WORLD : 1C_7C instead of 1C_6C for Coin B
+        use slightly different TAITO_COINAGE_WORLD : 1C_7C instead of 1C_6C for Coin B
   - GP order relies on the sub-region (code at 0x00bc9c) :
       * 0x0000 : 0x00 0x01 0x02 0x03 0x04 0x05 0x06 0x07
       * 0x0001 : 0x01 0x00 0x02 0x03 0x04 0x05 0x06 0x07
@@ -380,12 +380,12 @@ Stephh's notes (based on the game M68000 code and some tests) :
   - Coinage relies on the region (code at 0x00166e) :
       * 0x0000 (Japan) use TAITO_COINAGE_JAPAN_NEW
       * 0x0001 (US) use TAITO_COINAGE_US
-      * 0x0002 (World) use slighlty different TAITO_COINAGE_WORLD :
+      * 0x0002 (World) use slightly different TAITO_COINAGE_WORLD :
         1C_7C instead of 1C_6C for Coin B, same settings otherwise
   - Notice screen only if region = 0x0000 or region = 0x0001
   - FBI logo only if region = 0x0001
   - Routine at 0x01116c is the same as the one in 'wgp' based on sub-region;
-    however, as you can partically select your GP at start, and as I suck
+    however, as you can practically select your GP at start, and as I suck
     at such driving game, I wonder if this routine is still called !
   - DSWA bit 0 does the following things when set to ON :
       * unknown effect (code at 0x0126f6)
@@ -399,7 +399,6 @@ Stephh's notes (based on the game M68000 code and some tests) :
 #include "emu.h"
 #include "includes/wgp.h"
 #include "includes/taitoipt.h"
-#include "audio/taitosnd.h"
 
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
@@ -439,14 +438,14 @@ void wgp_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 	switch (id)
 	{
 	/* 68000 A */
-	case TIMER_WGP_INTERRUPT4:
+	case TIMER_INTERRUPT4:
 		m_maincpu->set_input_line(4, HOLD_LINE);
 		break;
-	case TIMER_WGP_INTERRUPT6:
+	case TIMER_INTERRUPT6:
 		m_maincpu->set_input_line(6, HOLD_LINE);
 		break;
 	/* 68000 B */
-	case TIMER_WGP_CPUB_INTERRUPT6:
+	case TIMER_CPUB_INTERRUPT6:
 		m_subcpu->set_input_line(6, HOLD_LINE); /* assumes Z80 sandwiched between the 68Ks */
 		break;
 	default:
@@ -460,9 +459,9 @@ void wgp_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 /* FWIW offset of 10000,10500 on ints can get CPUB obeying the
    first CPUA command the same frame; probably not necessary */
 
-INTERRUPT_GEN_MEMBER(wgp_state::wgp_cpub_interrupt)
+INTERRUPT_GEN_MEMBER(wgp_state::cpub_interrupt)
 {
-	timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(200000-500), TIMER_WGP_CPUB_INTERRUPT6);
+	m_cpub_int6_timer->adjust(m_subcpu->cycles_to_attotime(200000-500));
 	device.execute().set_input_line(4, HOLD_LINE);
 }
 
@@ -518,7 +517,7 @@ WRITE16_MEMBER(wgp_state::rotate_port_w)
 #define UNKNOWN_PORT_TAG "UNKNOWN"
 #define FAKE_PORT_TAG    "FAKE"
 
-READ16_MEMBER(wgp_state::wgp_adinput_r)
+READ16_MEMBER(wgp_state::adinput_r)
 {
 	int steer = 0x40;
 	int fake = m_fake.read_safe(0);
@@ -579,13 +578,13 @@ logerror("CPU #0 PC %06x: warning - read unmapped a/d input offset %06x\n",space
 	return 0xff;
 }
 
-WRITE16_MEMBER(wgp_state::wgp_adinput_w)
+WRITE16_MEMBER(wgp_state::adinput_w)
 {
 	/* Each write invites a new interrupt as soon as the
 	   hardware has got the next a/d conversion ready. We set a token
 	   delay of 10000 cycles although our inputs are always ready. */
 
-	timer_set(downcast<cpu_device *>(&space.device())->cycles_to_attotime(10000), TIMER_WGP_INTERRUPT6);
+	m_int6_timer->adjust(m_maincpu->cycles_to_attotime(10000));
 }
 
 WRITE8_MEMBER(wgp_state::coins_w)
@@ -606,23 +605,6 @@ WRITE8_MEMBER(wgp_state::sound_bankswitch_w)
 	m_z80bank->set_entry(data & 3);
 }
 
-WRITE16_MEMBER(wgp_state::wgp_sound_w)
-{
-	if (offset == 0)
-		m_tc0140syt->master_port_w(space, 0, data & 0xff);
-	else if (offset == 1)
-		m_tc0140syt->master_comm_w(space, 0, data & 0xff);
-}
-
-READ16_MEMBER(wgp_state::wgp_sound_r)
-{
-	if (offset == 1)
-		return ((m_tc0140syt->master_comm_r(space, 0) & 0xff));
-	else
-		return 0;
-}
-
-
 /*****************************************************************
                          MEMORY STRUCTURES
 *****************************************************************/
@@ -633,15 +615,15 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, wgp_state )
 	AM_RANGE(0x140000, 0x143fff) AM_RAM AM_SHARE("sharedram")
 	AM_RANGE(0x180000, 0x18000f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, read, write, 0xff00)
 	AM_RANGE(0x1c0000, 0x1c0001) AM_WRITE(cpua_ctrl_w)
-	AM_RANGE(0x200000, 0x20000f) AM_READWRITE(wgp_adinput_r,wgp_adinput_w)
+	AM_RANGE(0x200000, 0x20000f) AM_READWRITE(adinput_r, adinput_w)
 	AM_RANGE(0x300000, 0x30ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_device, word_r, word_w)            /* tilemaps */
 	AM_RANGE(0x320000, 0x32000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_device, ctrl_word_r, ctrl_word_w)
 	AM_RANGE(0x400000, 0x40bfff) AM_RAM AM_SHARE("spritemap")   /* sprite tilemaps */
 	AM_RANGE(0x40c000, 0x40dfff) AM_RAM AM_SHARE("spriteram")   /* sprite ram */
 	AM_RANGE(0x40fff0, 0x40fff1) AM_WRITENOP    /* ?? (writes 0x8000 and 0 alternately - Wgp2 just 0) */
 	AM_RANGE(0x500000, 0x501fff) AM_RAM                 /* unknown/unused */
-	AM_RANGE(0x502000, 0x517fff) AM_READWRITE(wgp_pivram_word_r, wgp_pivram_word_w) AM_SHARE("pivram") /* piv tilemaps */
-	AM_RANGE(0x520000, 0x52001f) AM_READWRITE(wgp_piv_ctrl_word_r, wgp_piv_ctrl_word_w) AM_SHARE("piv_ctrlram")
+	AM_RANGE(0x502000, 0x517fff) AM_RAM_WRITE(pivram_word_w) AM_SHARE("pivram") /* piv tilemaps */
+	AM_RANGE(0x520000, 0x52001f) AM_RAM_WRITE(piv_ctrl_word_w) AM_SHARE("piv_ctrlram")
 	AM_RANGE(0x600000, 0x600003) AM_WRITE(rotate_port_w)    /* rotation control ? */
 	AM_RANGE(0x700000, 0x701fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 ADDRESS_MAP_END
@@ -650,7 +632,8 @@ static ADDRESS_MAP_START( cpu2_map, AS_PROGRAM, 16  /* LAN areas not mapped... *
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM
 	AM_RANGE(0x140000, 0x143fff) AM_RAM AM_SHARE("sharedram")
-	AM_RANGE(0x200000, 0x200003) AM_READWRITE(wgp_sound_r,wgp_sound_w)
+	AM_RANGE(0x200000, 0x200001) AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0x00ff)
+	AM_RANGE(0x200002, 0x200003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0x00ff)
 //  AM_RANGE(0x380000, 0x383fff) AM_READONLY       // LAN RAM
 //  AM_RANGE(0x380000, 0x383fff) AM_WRITEONLY    // LAN RAM
 	AM_RANGE(0x380000, 0x380001) AM_READ(lan_status_r)  // ??
@@ -886,20 +869,18 @@ However sync to vblank is lacking, which is causing the
 graphics glitches.
 ***********************************************************/
 
-void wgp_state::wgp_postload()
+void wgp_state::postload()
 {
 	parse_control();
 }
 
 void wgp_state::machine_reset()
 {
-	int i;
-
 	m_cpua_ctrl = 0xff;
 	m_port_sel = 0;
 	m_piv_ctrl_reg = 0;
 
-	for (i = 0; i < 3; i++)
+	for (int i = 0; i < 3; i++)
 	{
 		m_piv_zoom[i] = 0;
 		m_piv_scrollx[i] = 0;
@@ -913,9 +894,12 @@ void wgp_state::machine_start()
 {
 	m_z80bank->configure_entries(0, 4, memregion("audiocpu")->base(), 0x4000);
 
+	m_int6_timer = timer_alloc(TIMER_INTERRUPT6);
+	m_cpub_int6_timer = timer_alloc(TIMER_CPUB_INTERRUPT6);
+
 	save_item(NAME(m_cpua_ctrl));
 	save_item(NAME(m_port_sel));
-	machine().save().register_postload(save_prepost_delegate(FUNC(wgp_state::wgp_postload), this));
+	machine().save().register_postload(save_prepost_delegate(FUNC(wgp_state::postload), this));
 }
 
 static MACHINE_CONFIG_START( wgp )
@@ -923,14 +907,14 @@ static MACHINE_CONFIG_START( wgp )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* 12 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", wgp_state,  irq4_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", wgp_state, irq4_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 16000000/4)   /* 4 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(z80_sound_map)
 
 	MCFG_CPU_ADD("sub", M68000, 12000000)   /* 12 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(cpu2_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", wgp_state,  wgp_cpub_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", wgp_state, cpub_interrupt)
 
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(30000))
@@ -949,7 +933,7 @@ static MACHINE_CONFIG_START( wgp )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(wgp_state, screen_update_wgp)
+	MCFG_SCREEN_UPDATE_DRIVER(wgp_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", wgp)
@@ -982,7 +966,7 @@ static MACHINE_CONFIG_DERIVED( wgp2, wgp )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
 	/* video hardware */
-	MCFG_VIDEO_START_OVERRIDE(wgp_state,wgp2)
+	MCFG_VIDEO_START_OVERRIDE(wgp_state, wgp2)
 
 	MCFG_DEVICE_MODIFY("tc0100scn")
 	MCFG_TC0100SCN_OFFSETS(4, 2)
@@ -1211,8 +1195,8 @@ DRIVER_INIT_MEMBER(wgp_state,wgp2)
 
 /* Working Games with some graphics problems - e.g. missing rotation */
 
-GAME( 1989, wgp,      0,      wgp,    wgp,    wgp_state, wgp,    ROT0, "Taito America Corporation", "World Grand Prix (US)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-GAME( 1989, wgpj,     wgp,    wgp,    wgpj,   wgp_state, wgp,    ROT0, "Taito Corporation",         "World Grand Prix (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-GAME( 1989, wgpjoy,   wgp,    wgp,    wgpjoy, wgp_state, wgp,    ROT0, "Taito Corporation",         "World Grand Prix (joystick version) (Japan, set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-GAME( 1989, wgpjoya,  wgp,    wgp,    wgpjoy, wgp_state, wgp,    ROT0, "Taito Corporation",         "World Grand Prix (joystick version) (Japan, set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-GAME( 1990, wgp2,     wgp,    wgp2,   wgp2,   wgp_state, wgp2,   ROT0, "Taito Corporation",         "World Grand Prix 2 (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1989, wgp,      0,      wgp,    wgp,    wgp_state, wgp,    ROT0, "Taito America Corporation", "World Grand Prix (US)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, wgpj,     wgp,    wgp,    wgpj,   wgp_state, wgp,    ROT0, "Taito Corporation",         "World Grand Prix (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, wgpjoy,   wgp,    wgp,    wgpjoy, wgp_state, wgp,    ROT0, "Taito Corporation",         "World Grand Prix (joystick version) (Japan, set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, wgpjoya,  wgp,    wgp,    wgpjoy, wgp_state, wgp,    ROT0, "Taito Corporation",         "World Grand Prix (joystick version) (Japan, set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, wgp2,     wgp,    wgp2,   wgp2,   wgp_state, wgp2,   ROT0, "Taito Corporation",         "World Grand Prix 2 (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
