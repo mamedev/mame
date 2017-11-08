@@ -81,7 +81,10 @@ void ymz770_device::device_start()
 	{
 		save_item(NAME(m_channels[ch].phrase), ch);
 		save_item(NAME(m_channels[ch].pan), ch);
+		save_item(NAME(m_channels[ch].pan_delay), ch);
 		save_item(NAME(m_channels[ch].volume), ch);
+		save_item(NAME(m_channels[ch].volume_delay), ch);
+		save_item(NAME(m_channels[ch].volume2), ch);
 		save_item(NAME(m_channels[ch].loop), ch);
 		save_item(NAME(m_channels[ch].is_playing), ch);
 		save_item(NAME(m_channels[ch].last_block), ch);
@@ -110,8 +113,11 @@ void ymz770_device::device_reset()
 	for (auto & elem : m_channels)
 	{
 		elem.phrase = 0;
-		elem.pan = 8;
+		elem.pan = 64;
+		elem.pan_delay = 0;
 		elem.volume = 0;
+		elem.volume_delay = 0;
+		elem.volume2 = 0;
 		elem.loop = 0;
 		elem.is_playing = false;
 		elem.output_remaining = 0;
@@ -337,7 +343,7 @@ void ymz770_device::internal_reg_write(uint8_t reg, uint8_t data)
 				break;
 
 			case 2:
-				m_channels[ch].pan = (data & 0x1f) << 3;
+				m_channels[ch].pan = data << 3;
 				break;
 
 			case 3:
@@ -404,30 +410,55 @@ ymz774_device::ymz774_device(const machine_config &mconfig, const char *tag, dev
 
 READ8_MEMBER(ymz774_device::read)
 {
-	// TODO status read ?
+	if (offset & 1)
+	{
+		if (m_cur_reg == 0xe3 || m_cur_reg == 0xe4)
+		{
+			m_stream->update();
+			uint8_t res = 0;
+			auto bank = (m_cur_reg == 0xe3) ? 8 : 0;
+			for (auto i = 0; i < 8; i++)
+				if (m_channels[i + bank].is_playing)
+					res |= 1 << i;
+			return res;
+		}
+	}
+	logerror("unimplemented read %02X\n", m_cur_reg);
 	return 0;
 }
 
 void ymz774_device::internal_reg_write(uint8_t reg, uint8_t data)
 {
 	// playback registers
-	if (reg < 0x60) {
+	if (reg < 0x10)  // phrase num H and L
+	{
+		int ch = ((reg >> 1) & 7) + m_bank * 8;
+		if (reg & 1)
+			m_channels[ch].phrase = (m_channels[ch].phrase & 0xff00) | data;
+		else
+			m_channels[ch].phrase = (m_channels[ch].phrase & 0x00ff) | ((data & 7) << 8);
+	}
+	else if (reg < 0x60)
+	{
 		int ch = (reg & 7) + m_bank * 8;
 		switch (reg & 0xf8)
 		{
-		case 0x00: // phrase# H and L
-		case 0x08:
-			ch = ((reg >> 1) & 7) + m_bank * 8;
-			if (reg & 1)
-				m_channels[ch].phrase = (m_channels[ch].phrase & 0xff00) | data;
-			else
-				m_channels[ch].phrase = (m_channels[ch].phrase & 0x00ff) | (data << 8);
-			break;
 		case 0x10: // Volume 1
 			m_channels[ch].volume = data;
 			break;
+		case 0x18: // Volume 1 delayed transition
+			if (data) logerror("unimplemented write %02X %02X\n", reg, data);
+			m_channels[ch].volume_delay = data;
+			break;
+		case 0x20: // Volume 2
+			m_channels[ch].volume2 = data;
+			break;
 		case 0x28: // Pan L/R
 			m_channels[ch].pan = data;
+			break;
+		case 0x30: // Pan L/R delayed transition
+			if (data) logerror("unimplemented write %02X %02X\n", reg, data);
+			m_channels[ch].pan_delay = data;
 			break;
 		case 0x48: // Loop
 			m_channels[ch].loop = data;
@@ -447,10 +478,21 @@ void ymz774_device::internal_reg_write(uint8_t reg, uint8_t data)
 				m_channels[ch].is_playing = false;
 			}
 			break;
+		case 0x58: // Pause / Resume
+			if (data) logerror("pause/resume unimplemented %02X %02X\n", reg, data);
+			break;
 		}
 	}
+	else if (reg < 0xd0)
+	{
+		if (m_bank == 0) // Sequencer, is it used in PGM2 ?
+		{
+			if (data) logerror("sequencer unimplemented %02X %02X\n", reg, data);
+		}
+		// else bank1 - Equalizer control
+	}
 	// global registers
-	else if (reg >= 0xd0)
+	else
 	{
 		switch (reg) {
 		case 0xd0:
@@ -461,6 +503,7 @@ void ymz774_device::internal_reg_write(uint8_t reg, uint8_t data)
 			break;
 		case 0xf0:
 			m_bank = data & 1;
+			if (data > 1) logerror("Set bank %02X!\n", data);
 			break;
 		}
 	}

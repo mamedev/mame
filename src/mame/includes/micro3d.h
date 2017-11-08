@@ -54,7 +54,7 @@ public:
 		m_drmath(*this, "drmath"),
 		m_vgb(*this, "vgb"),
 		m_palette(*this, "palette"),
-		m_duart68681(*this, "duart68681"),
+		m_duart(*this, "duart"),
 		m_noise_1(*this, "noise_1"),
 		m_noise_2(*this, "noise_2"),
 		m_vertex(*this, "vertex"),
@@ -72,7 +72,7 @@ public:
 	required_device<cpu_device> m_drmath;
 	required_device<tms34010_device> m_vgb;
 	required_device<palette_device> m_palette;
-	required_device<mc68681_device> m_duart68681;
+	required_device<mc68681_device> m_duart;
 	required_device<micro3d_sound_device> m_noise_1;
 	required_device<micro3d_sound_device> m_noise_2;
 	required_memory_region m_vertex;

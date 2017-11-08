@@ -251,6 +251,11 @@ WRITE8_MEMBER(ppking_state::ppking_adpcm_w)
 	m_msm->vclk_w (BIT(data, 4));   // bit 4
 }
 
+WRITE8_MEMBER(ppking_state::cpu2_irq_ack_w)
+{
+	m_subcpu->set_input_line(0, CLEAR_LINE);
+}
+
 WRITE8_MEMBER(gladiatr_state_base::adpcm_command_w)
 {
 	m_soundlatch->write(space,0,data);
@@ -417,6 +422,25 @@ inline bool ppking_state::mcu_parity_check()
 	return true;
 }
 
+inline void ppking_state::mcu_input_check()
+{
+	if(m_mcu[0].txd == 0x41)
+	{
+		m_mcu[0].state = 1;
+		//m_mcu[0].packet_type = 0;
+	}
+	else if(m_mcu[0].txd == 0x42)
+	{
+		m_mcu[0].state = 2;
+		//m_mcu[0].packet_type = 0;
+		//machine().debug_break();
+	}
+	else if(m_mcu[0].txd == 0x44)
+	{
+		m_mcu[0].state = 3;
+	}
+}
+
 /**/
 
 READ8_MEMBER(ppking_state::ppking_qx0_r)
@@ -525,7 +549,7 @@ WRITE8_MEMBER(ppking_state::ppking_qx0_w)
 				//m_mcu[0].state = 0;
 				break;
 			case 3:
-				m_mcu[0].rxd = 0;
+				mcu_input_check();
 				//m_mcu[0].rxd = (ioport("DSW1")->read() & 0x1f) << 2;
 				m_mcu[0].rst = 1;
 				//m_mcu[0].txd = 0;
@@ -544,27 +568,8 @@ WRITE8_MEMBER(ppking_state::ppking_qx0_w)
 		m_mcu[1].rst = 0;
 		m_soundlatch2->write(space, 0, data & 0xff);
 
-		if(m_mcu[0].txd == 0x41)
-		{
-			m_mcu[0].state = 1;
-			//m_mcu[0].packet_type = 0;
-		}
-		else if(m_mcu[0].txd == 0x42)
-		{
-			m_mcu[0].state = 2;
-			//m_mcu[0].packet_type = 0;
-			//machine().debug_break();
-		}
-		else if(m_mcu[0].txd == 0x44)
-		{
-			m_mcu[0].state = 3;
-		}
-		else
-		{
-//			if(data != 0x60)
-//			printf("%02x\n",data);
-			//m_mcu[0].state = 0;
-		}
+		mcu_input_check();
+
 	}
 }
 
@@ -664,7 +669,7 @@ static ADDRESS_MAP_START( ppking_cpu2_io, AS_IO, 8, ppking_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
 	AM_RANGE(0x20, 0x21) AM_READ(ppking_qx1_r) AM_WRITE(ppking_qx1_w)
-	AM_RANGE(0x40, 0x40) AM_READNOP
+	AM_RANGE(0x40, 0x40) AM_WRITE(cpu2_irq_ack_w)
 	AM_RANGE(0x60, 0x61) AM_READWRITE(ppking_qx2_r,ppking_qx2_w) // unaccessed, probably leftover
 	AM_RANGE(0x80, 0x81) AM_READWRITE(ppking_qx3_r,ppking_qx3_w)
 	AM_RANGE(0xe0, 0xe0) AM_WRITE(adpcm_command_w)
@@ -795,7 +800,7 @@ static INPUT_PORTS_START( ppking )
 	PORT_DIPSETTING(    0x04, DEF_STR( Yes ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "SW3:4" )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW3:5")
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW3:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Yes ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -959,7 +964,7 @@ static MACHINE_CONFIG_START( ppking )
 	MCFG_CPU_ADD("sub", Z80, XTAL_12MHz/4) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(cpu2_map)
 	MCFG_CPU_IO_MAP(ppking_cpu2_io)
-	MCFG_CPU_PERIODIC_INT_DRIVER(ppking_state,  irq0_line_hold, 60)
+	MCFG_CPU_PERIODIC_INT_DRIVER(ppking_state,  irq0_line_assert, 60)
 
 	MCFG_CPU_ADD("audiocpu", M6809, XTAL_12MHz/16) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(ppking_cpu3_map)
@@ -979,10 +984,11 @@ static MACHINE_CONFIG_START( ppking )
 	
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+//	MCFG_SCREEN_REFRESH_RATE(60)
+//	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+//	MCFG_SCREEN_SIZE(32*8, 32*8)
+//	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_12MHz/2,384,0,256,264,16,240) // assume same as Arkanoid
 	MCFG_SCREEN_UPDATE_DRIVER(ppking_state, screen_update_ppking)
 	MCFG_SCREEN_PALETTE("palette")
 
