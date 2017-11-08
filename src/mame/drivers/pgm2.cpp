@@ -623,7 +623,7 @@ void pgm2_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const
 {
 	int endoflist = -1;
 
-//	printf("frame\n");
+	//printf("frame\n");
 
 	for (int i = 0;i < 0x1000 / 4;i++)
 	{
@@ -651,13 +651,11 @@ void pgm2_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const
 			int sizey = (m_sp_videoram[i + 1] >> 6) & 0xff;
 
 			int mask_offset = (m_sp_videoram[i + 2]<<1);
-			//mask_offset = mask_offset;
 			mask_offset &= 0x3ffffff;
 
 			int palette_offset = (m_sp_videoram[i + 3]);
 			palette_offset &= 0x7ffffff;
 
-			//sizex = sizex * 32;
 			const pen_t *paldata = m_sp_palette->pens();
 
 			for (int ydraw = 0; ydraw < sizey;ydraw++)
@@ -683,7 +681,7 @@ void pgm2_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const
 						{
 							if (cliprect.contains(realx, realy))
 							{
-								uint8_t pendat = m_sprites_colour[palette_offset];
+								uint16_t pendat = m_sprites_colour[palette_offset];
 
 								pendat |= pal * 0x40;
 
@@ -797,7 +795,7 @@ static const gfx_layout tiles32x32x8_layout =
 	256*32
 };
 
-#if 1
+#if 0
 /* sprites aren't tile based but are multiples of 32 wide */
 static const gfx_layout tiles32x8x1_layout =
 {
@@ -944,7 +942,7 @@ static MACHINE_CONFIG_START( pgm2 )
 	MCFG_SCREEN_VISIBLE_AREA(0, 448-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(pgm2_state, screen_update_pgm2)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(pgm2_state, screen_vblank_pgm2))
-#if 1
+#if 0
 	MCFG_GFXDECODE_ADD("gfxdecode1", "sp_palette", pgm2_sp)
 #endif
 	MCFG_GFXDECODE_ADD("gfxdecode2", "tx_palette", pgm2_tx)
@@ -987,7 +985,7 @@ ROM_START( orleg2 )
 	ROM_LOAD32_WORD( "ig-a_bml.u12",     0x00000000, 0x1000000, CRC(113a331c) SHA1(ee6b31bb2b052cc8799573de0d2f0a83f0ab4f6a) )
 	ROM_LOAD32_WORD( "ig-a_bmh.u16",     0x00000002, 0x1000000, CRC(fbf411c8) SHA1(5089b5cc9bbf6496ef1367c6255e63e9ab895117) )
 
-	ROM_REGION( 0x4000000, "sprites_colour", 0 ) // sprite colour data (5bpp data, 3 bits unused)
+	ROM_REGION( 0x4000000, "sprites_colour", 0 ) // sprite colour data (6bpp data, 2 bits unused except for 4 bytes that are randomly 0xff - check dump?)
 	ROM_LOAD32_WORD( "ig-a_cgl.u18",     0x00000000, 0x2000000, CRC(43501fa6) SHA1(58ccce6d393964b771fec3f5c583e3ede57482a3) )
 	ROM_LOAD32_WORD( "ig-a_cgh.u26",     0x00000002, 0x2000000, CRC(7051d020) SHA1(3d9b24c6fda4c9699bb9f00742e0888059b623e1) )
 
@@ -1287,12 +1285,30 @@ static void iga_u12_decode(uint16_t* rom, int len, int ixor)
 	}
 }
 
+static void sprite_colour_decode(uint16_t* rom, int len)
+{
+	int i;
+
+	for (i = 0; i < len / 2; i++)
+	{
+		rom[i] = BITSWAP16(rom[i], 15, 14, /* unused - 6bpp */
+			                       13, 12, 11,
+			                       5, 4, 3,
+			                       7, 6, /* unused - 6bpp */
+			                       10, 9, 8,  
+			                       2, 1, 0  );
+	}
+}
+
 DRIVER_INIT_MEMBER(pgm2_state,orleg2)
 {
 	uint16_t *src = (uint16_t *)memregion("sprites_mask")->base();
 
 	iga_u12_decode(src, 0x2000000, 0x4761);
 	iga_u16_decode(src, 0x2000000, 0xc79f);
+
+	src = (uint16_t *)memregion("sprites_colour")->base();
+	sprite_colour_decode(src, 0x4000000);
 
 	igs036_decryptor decrypter(orleg2_key);
 	decrypter.decrypter_rom(memregion("user1"));
