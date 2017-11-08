@@ -34,7 +34,7 @@
 
 WRITE_LINE_MEMBER(micro3d_state::duart_irq_handler)
 {
-	m_maincpu->set_input_line_and_vector(3, state, m_duart68681->get_irq_vector());
+	m_maincpu->set_input_line_and_vector(3, state, m_duart->get_irq_vector());
 }
 
 WRITE_LINE_MEMBER(micro3d_state::duart_txb)
@@ -52,7 +52,7 @@ READ8_MEMBER(micro3d_state::data_to_i8031)
 
 WRITE8_MEMBER(micro3d_state::data_from_i8031)
 {
-	m_duart68681->rx_b_w(data);
+	m_duart->rx_b_w(data);
 }
 
 /*
