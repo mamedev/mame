@@ -13,7 +13,6 @@ Nicola Salmoria. Thanks to Richard Bush and the Raine team, whose open
 source was very helpful in many areas particularly the sprites.)
 
 
-
 The Taito Z system has a number of similarities with the Taito F2 system,
 and uses some of the same custom Taito components.
 
@@ -83,7 +82,7 @@ Taito Sound PCB J1100137A K1100314A:
 Notes: B33-30 is a OKI M27512-15
 
 
-Taito Video Baord PCB J1100139A K1100316A:
+Taito Video Board PCB J1100139A K1100316A:
 
  B33-03     TC0050VDZ     TC0050VDZ                       TC0050VDZ
  B33-04
@@ -858,7 +857,7 @@ Strange page in test mode which lets you alter all sorts of settings,
 may relate to sit-in cockpit version. Can't find a dip that disables
 this. <- Test Mode 1? That's used for lamps and motor testing... -AS
 
-Motors (located at the 0xe000**) are mirrored, they uses both bytes of a
+Motors (located at the 0xe000**) are mirrored, they use both bytes of a
 word, the high one is used during gameplay and the other one is used on service
 mode. The gameplay port is xor'ed (!).
 It works like this:
@@ -881,6 +880,9 @@ in the upright version), they lights when the player gets hit and/or if he's dyi
 
 Aqua Jack
 ---------
+
+Some wrong colors. Hovercraft body should be red. 1st level sky/water
+should be blue.
 
 Sprites left on screen under hiscore table. Deliberate? Or is there
 a sprite disable bit somewhere.
