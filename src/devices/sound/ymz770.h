@@ -78,7 +78,10 @@ protected:
 	{
 		uint16_t phrase;
 		uint8_t pan;
+		uint8_t pan_delay;
 		uint8_t volume;
+		uint8_t volume_delay;
+		uint8_t volume2;
 		uint8_t loop;
 
 		bool is_playing, last_block;
@@ -115,8 +118,8 @@ public:
 	DECLARE_READ8_MEMBER(read);
 protected:
 	virtual void internal_reg_write(uint8_t reg, uint8_t data) override; 
-	virtual uint32_t get_phrase_offs(int phrase) override { return (m_rom[(4 * phrase) + 1] << 16 | m_rom[(4 * phrase) + 2] << 8 | m_rom[(4 * phrase) + 3]) * 2; };
-	virtual uint32_t get_seq_offs(int sqn) override { return (m_rom[(4 * sqn) + 1 + 0x2000] << 16 | m_rom[(4 * sqn) + 2 + 0x2000] << 8 | m_rom[(4 * sqn) + 3 + 0x2000]) * 2; };
+	virtual uint32_t get_phrase_offs(int phrase) override { int ph = phrase * 4; return ((m_rom[ph] & 0x0f) << 24 | m_rom[ph + 1] << 16 | m_rom[ph + 2] << 8 | m_rom[ph + 3]) * 2; };
+	virtual uint32_t get_seq_offs(int sqn) override { int sq = sqn * 4 + 0x2000; return ((m_rom[sq] & 0x0f) << 24 | m_rom[sq + 1] << 16 | m_rom[sq + 2] << 8 | m_rom[sq + 3]) * 2; };
 	virtual void sequencer() override {};
 private:
 	int m_bank;
