@@ -190,7 +190,8 @@ public:
 		m_sp_videoram(*this, "sp_videoram"),
 		m_gfxdecode2(*this, "gfxdecode2"),
 		m_gfxdecode3(*this, "gfxdecode3"),
-		m_arm_aic(*this, "arm_aic")
+		m_arm_aic(*this, "arm_aic"),
+		m_sprites_mask(*this, "sprites_mask")
 	{ }
 
 	DECLARE_READ32_MEMBER(unk_startup_r);
@@ -240,6 +241,7 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode2;
 	required_device<gfxdecode_device> m_gfxdecode3;
 	required_device<arm_aic_device> m_arm_aic;
+	required_region_ptr<uint8_t> m_sprites_mask;
 };
 
 
@@ -631,24 +633,49 @@ void pgm2_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const
 
 		for (int i = 0; i < endoflist-2; i += 4)
 		{
-		//	printf("sprite with %08x %08x %08x %08x\n", m_sp_videoram[i + 0], m_sp_videoram[i + 1], m_sp_videoram[i + 2], m_sp_videoram[i + 3]);
+			//printf("sprite with %08x %08x %08x %08x\n", m_sp_videoram[i + 0], m_sp_videoram[i + 1], m_sp_videoram[i + 2], m_sp_videoram[i + 3]);
 		
-			int x = (m_sp_videoram[i + 0] >> 0) & 0x7ff;
-			int y = (m_sp_videoram[i + 0] >> 11) & 0x7ff;
+			int x =   (m_sp_videoram[i + 0] & 0x000007ff) >> 0;
+			int y =   (m_sp_videoram[i + 0] & 0x003ff800) >> 11;
+			//int pal = (m_sp_videoram[i + 0] & 0x0fc00000) >> 22;
 
-			for (int ydraw = 0; ydraw < 16;ydraw++)
+			int sizex = (m_sp_videoram[i + 1] >> 0) & 0x3f;
+			int sizey = (m_sp_videoram[i + 1] >> 6) & 0xff;
+
+			int mask_offset = (m_sp_videoram[i + 2]<<1);
+			//mask_offset = mask_offset;
+			mask_offset &= 0x3ffffff;
+
+			//sizex = sizex * 32;
+
+			for (int ydraw = 0; ydraw < sizey;ydraw++)
 			{
 				int realy = ydraw + y;
 
-				for (int xdraw = 0; xdraw < 16;xdraw++)
+				for (int xdraw = 0; xdraw < sizex;xdraw++)
 				{
-					int realx = xdraw + x;
+					uint32_t maskdata = m_sprites_mask[mask_offset+0] << 24;
+					maskdata |= m_sprites_mask[mask_offset+1] << 16;
+					maskdata |= m_sprites_mask[mask_offset+2] << 8;
+					maskdata |= m_sprites_mask[mask_offset+3] << 0;
+					
+					mask_offset += 4;
+					mask_offset &= 0x3ffffff;
 
-					if (cliprect.contains(realx, realy))
+					for (int xchunk = 0;xchunk < 32;xchunk++)
 					{
-						dstptr_bitmap = &bitmap.pix32(realy);
+						int realx = (xdraw * 32) + x + xchunk;
+					
+						if (cliprect.contains(realx, realy))
+						{
+							int pix = (maskdata >> (31 - xchunk)) & 1;
 
-						dstptr_bitmap[realx] = rand();
+							if (pix)
+							{
+								dstptr_bitmap = &bitmap.pix32(realy);
+								dstptr_bitmap[realx] = m_sp_videoram[i + 3];
+							}
+						}
 					}
 
 				}
@@ -747,7 +774,42 @@ static const gfx_layout tiles32x32x8_layout =
 	256*32
 };
 
+#if 0
+/* sprites aren't tile based but are multiples of 32 wide */
+static const gfx_layout tiles32x8x1_layout =
+{
+	32,8,
+	RGN_FRAC(1,1),
+	1,
+	{ 0 },
+	{ 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31 },
+	{ 0*32,1*32,2*32,3*32,4*32,5*32,6*32,7*32 },
+	8*32
+};
 
+static const uint32_t texlayout_xoffset[256] = { STEP256(0,1) };
+static const uint32_t texlayout_yoffset[8] = { STEP8(0,256) };
+static const gfx_layout hng64_texlayout =
+{
+	256, 8,
+	RGN_FRAC(1,1),
+	1,
+	{ 0 },
+	EXTENDED_XOFFS,
+	EXTENDED_YOFFS,
+	256*8,
+	texlayout_xoffset,
+	texlayout_yoffset
+};
+
+
+
+static GFXDECODE_START( pgm2_sp )
+	GFXDECODE_ENTRY( "sprites_mask", 0, tiles32x8x1_layout, 0, 16 )
+	GFXDECODE_ENTRY( "sprites_mask", 0, hng64_texlayout, 0, 16 )
+	GFXDECODE_ENTRY( "spritesb", 0, tiles32x8x1_layout, 0, 16 )
+GFXDECODE_END
+#endif
 
 static GFXDECODE_START( pgm2_tx )
 	GFXDECODE_ENTRY( "tiles", 0, tiles8x8_layout, 0, 16 )
@@ -859,8 +921,9 @@ static MACHINE_CONFIG_START( pgm2 )
 	MCFG_SCREEN_VISIBLE_AREA(0, 448-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(pgm2_state, screen_update_pgm2)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(pgm2_state, screen_vblank_pgm2))
-
-
+#if 0
+	MCFG_GFXDECODE_ADD("gfxdecode1", "sp_palette", pgm2_sp)
+#endif
 	MCFG_GFXDECODE_ADD("gfxdecode2", "tx_palette", pgm2_tx)
 	
 	MCFG_GFXDECODE_ADD("gfxdecode3", "bg_palette", pgm2_bg)
@@ -897,7 +960,7 @@ ROM_START( orleg2 )
 	ROM_LOAD32_WORD( "ig-a_bgl.u35",     0x00000000, 0x0800000, CRC(083a8315) SHA1(0dba25e132fbb12faa59ced648c27b881dc73478) )
 	ROM_LOAD32_WORD( "ig-a_bgh.u36",     0x00000002, 0x0800000, CRC(e197221d) SHA1(5574b1e3da4b202db725be906dd868edc2fd4634) )
 
-	ROM_REGION( 0x2000000, "spritesa", 0 ) // 1bpp sprite mask data
+	ROM_REGION( 0x2000000, "sprites_mask", 0 ) // 1bpp sprite mask data
 	ROM_LOAD32_WORD( "ig-a_bml.u12",     0x00000000, 0x1000000, CRC(113a331c) SHA1(ee6b31bb2b052cc8799573de0d2f0a83f0ab4f6a) )
 	ROM_LOAD32_WORD( "ig-a_bmh.u16",     0x00000002, 0x1000000, CRC(fbf411c8) SHA1(5089b5cc9bbf6496ef1367c6255e63e9ab895117) )
 
@@ -923,7 +986,7 @@ ROM_START( orleg2o )
 	ROM_LOAD32_WORD( "ig-a_bgl.u35",     0x00000000, 0x0800000, CRC(083a8315) SHA1(0dba25e132fbb12faa59ced648c27b881dc73478) )
 	ROM_LOAD32_WORD( "ig-a_bgh.u36",     0x00000002, 0x0800000, CRC(e197221d) SHA1(5574b1e3da4b202db725be906dd868edc2fd4634) )
 
-	ROM_REGION( 0x2000000, "spritesa", 0 ) // 1bpp sprite mask data
+	ROM_REGION( 0x2000000, "sprites_mask", 0 ) // 1bpp sprite mask data
 	ROM_LOAD32_WORD( "ig-a_bml.u12",     0x00000000, 0x1000000, CRC(113a331c) SHA1(ee6b31bb2b052cc8799573de0d2f0a83f0ab4f6a) )
 	ROM_LOAD32_WORD( "ig-a_bmh.u16",     0x00000002, 0x1000000, CRC(fbf411c8) SHA1(5089b5cc9bbf6496ef1367c6255e63e9ab895117) )
 
@@ -949,7 +1012,7 @@ ROM_START( orleg2oa )
 	ROM_LOAD32_WORD( "ig-a_bgl.u35",     0x00000000, 0x0800000, CRC(083a8315) SHA1(0dba25e132fbb12faa59ced648c27b881dc73478) )
 	ROM_LOAD32_WORD( "ig-a_bgh.u36",     0x00000002, 0x0800000, CRC(e197221d) SHA1(5574b1e3da4b202db725be906dd868edc2fd4634) )
 
-	ROM_REGION( 0x2000000, "spritesa", 0 ) // 1bpp sprite mask data
+	ROM_REGION( 0x2000000, "sprites_mask", 0 ) // 1bpp sprite mask data
 	ROM_LOAD32_WORD( "ig-a_bml.u12",     0x00000000, 0x1000000, CRC(113a331c) SHA1(ee6b31bb2b052cc8799573de0d2f0a83f0ab4f6a) )
 	ROM_LOAD32_WORD( "ig-a_bmh.u16",     0x00000002, 0x1000000, CRC(fbf411c8) SHA1(5089b5cc9bbf6496ef1367c6255e63e9ab895117) )
 
@@ -975,7 +1038,7 @@ ROM_START( kov2nl )
 	ROM_LOAD32_WORD( "ig-a3_bgl.u35",    0x00000000, 0x0800000, CRC(2d46b1f6) SHA1(ea8c805eda6292e86a642e9633d8fee7054d10b1) )
 	ROM_LOAD32_WORD( "ig-a3_bgh.u36",    0x00000002, 0x0800000, CRC(df710c36) SHA1(f826c3f496c4f17b46d18af1d8e02cac7b7027ac) )
 
-	ROM_REGION( 0x2000000, "spritesa", 0 ) // 1bpp sprite mask data
+	ROM_REGION( 0x2000000, "sprites_mask", 0 ) // 1bpp sprite mask data
 	ROM_LOAD32_WORD( "ig-a3_bml.u12",    0x00000000, 0x1000000, CRC(0bf63836) SHA1(b8e4f1951f8074b475b795bd7840c5a375b6f5ef) )
 	ROM_LOAD32_WORD( "ig-a3_bmh.u16",    0x00000002, 0x1000000, CRC(4a378542) SHA1(5d06a8a8796285a786ebb690c34610f923ef5570) )
 
@@ -1001,7 +1064,7 @@ ROM_START( kov2nlo )
 	ROM_LOAD32_WORD( "ig-a3_bgl.u35",    0x00000000, 0x0800000, CRC(2d46b1f6) SHA1(ea8c805eda6292e86a642e9633d8fee7054d10b1) )
 	ROM_LOAD32_WORD( "ig-a3_bgh.u36",    0x00000002, 0x0800000, CRC(df710c36) SHA1(f826c3f496c4f17b46d18af1d8e02cac7b7027ac) )
 
-	ROM_REGION( 0x2000000, "spritesa", 0 ) // 1bpp sprite mask data
+	ROM_REGION( 0x2000000, "sprites_mask", 0 ) // 1bpp sprite mask data
 	ROM_LOAD32_WORD( "ig-a3_bml.u12",    0x00000000, 0x1000000, CRC(0bf63836) SHA1(b8e4f1951f8074b475b795bd7840c5a375b6f5ef) )
 	ROM_LOAD32_WORD( "ig-a3_bmh.u16",    0x00000002, 0x1000000, CRC(4a378542) SHA1(5d06a8a8796285a786ebb690c34610f923ef5570) )
 
@@ -1027,7 +1090,7 @@ ROM_START( kov2nloa )
 	ROM_LOAD32_WORD( "ig-a3_bgl.u35",    0x00000000, 0x0800000, CRC(2d46b1f6) SHA1(ea8c805eda6292e86a642e9633d8fee7054d10b1) )
 	ROM_LOAD32_WORD( "ig-a3_bgh.u36",    0x00000002, 0x0800000, CRC(df710c36) SHA1(f826c3f496c4f17b46d18af1d8e02cac7b7027ac) )
 
-	ROM_REGION( 0x2000000, "spritesa", 0 ) // 1bpp sprite mask data
+	ROM_REGION( 0x2000000, "sprites_mask", 0 ) // 1bpp sprite mask data
 	ROM_LOAD32_WORD( "ig-a3_bml.u12",    0x00000000, 0x1000000, CRC(0bf63836) SHA1(b8e4f1951f8074b475b795bd7840c5a375b6f5ef) )
 	ROM_LOAD32_WORD( "ig-a3_bmh.u16",    0x00000002, 0x1000000, CRC(4a378542) SHA1(5d06a8a8796285a786ebb690c34610f923ef5570) )
 
@@ -1053,7 +1116,7 @@ ROM_START( ddpdojh )
 	ROM_LOAD32_WORD( "ddpdoj_bgl.u23",   0x00000000, 0x1000000, CRC(ff65fdab) SHA1(abdd5ca43599a2daa722547a999119123dd9bb28) )
 	ROM_LOAD32_WORD( "ddpdoj_bgh.u24",   0x00000002, 0x1000000, CRC(bb84d2a6) SHA1(a576a729831b5946287fa8f0d923016f43a9bedb) )
 
-	ROM_REGION( 0x1000000, "spritesa", 0 ) // 1bpp sprite mask data
+	ROM_REGION( 0x1000000, "sprites_mask", 0 ) // 1bpp sprite mask data
 	ROM_LOAD32_WORD( "ddpdoj_mapl0.u13", 0x00000000, 0x800000, CRC(bcfbb0fc) SHA1(9ec478eba9905913cf997bd9b46c70c1ad383630) )
 	ROM_LOAD32_WORD( "ddpdoj_maph0.u15", 0x00000002, 0x800000, CRC(0cc75d4e) SHA1(6d1b5ef0fdebf1e84fa199b939ffa07b810b12c9) )
 
@@ -1086,7 +1149,7 @@ ROM_START( kov3 )
 	ROM_LOAD32_WORD( "kov3_bgl.u6",      0x00000000, 0x1000000, CRC(49a4c5bc) SHA1(26b7da91067bda196252520e9b4893361c2fc675) )
 	ROM_LOAD32_WORD( "kov3_bgh.u7",      0x00000002, 0x1000000, CRC(adc1aff1) SHA1(b10490f0dbef9905cdb064168c529f0b5a2b28b8) )
 
-	ROM_REGION( 0x4000000, "spritesa", 0 ) // 1bpp sprite mask data
+	ROM_REGION( 0x4000000, "sprites_mask", 0 ) // 1bpp sprite mask data
 	ROM_LOAD32_WORD( "kov3_mapl0.u15",   0x00000000, 0x2000000, CRC(9e569bf7) SHA1(03d26e000e9d8e744546be9649628d2130f2ec4c) )
 	ROM_LOAD32_WORD( "kov3_maph0.u16",   0x00000002, 0x2000000, CRC(6f200ad8) SHA1(cd12c136d4f5d424bd7daeeacd5c4127beb3d565) )
 
@@ -1112,7 +1175,7 @@ ROM_START( kov3_102 )
 	ROM_LOAD32_WORD( "kov3_bgl.u6",      0x00000000, 0x1000000, CRC(49a4c5bc) SHA1(26b7da91067bda196252520e9b4893361c2fc675) )
 	ROM_LOAD32_WORD( "kov3_bgh.u7",      0x00000002, 0x1000000, CRC(adc1aff1) SHA1(b10490f0dbef9905cdb064168c529f0b5a2b28b8) )
 
-	ROM_REGION( 0x4000000, "spritesa", 0 ) // 1bpp sprite mask data
+	ROM_REGION( 0x4000000, "sprites_mask", 0 ) // 1bpp sprite mask data
 	ROM_LOAD32_WORD( "kov3_mapl0.u15",   0x00000000, 0x2000000, CRC(9e569bf7) SHA1(03d26e000e9d8e744546be9649628d2130f2ec4c) )
 	ROM_LOAD32_WORD( "kov3_maph0.u16",   0x00000002, 0x2000000, CRC(6f200ad8) SHA1(cd12c136d4f5d424bd7daeeacd5c4127beb3d565) )
 
@@ -1138,7 +1201,7 @@ ROM_START( kov3_100 )
 	ROM_LOAD32_WORD( "kov3_bgl.u6",      0x00000000, 0x1000000, CRC(49a4c5bc) SHA1(26b7da91067bda196252520e9b4893361c2fc675) )
 	ROM_LOAD32_WORD( "kov3_bgh.u7",      0x00000002, 0x1000000, CRC(adc1aff1) SHA1(b10490f0dbef9905cdb064168c529f0b5a2b28b8) )
 
-	ROM_REGION( 0x4000000, "spritesa", 0 ) // 1bpp sprite mask data
+	ROM_REGION( 0x4000000, "sprites_mask", 0 ) // 1bpp sprite mask data
 	ROM_LOAD32_WORD( "kov3_mapl0.u15",   0x00000000, 0x2000000, CRC(9e569bf7) SHA1(03d26e000e9d8e744546be9649628d2130f2ec4c) )
 	ROM_LOAD32_WORD( "kov3_maph0.u16",   0x00000002, 0x2000000, CRC(6f200ad8) SHA1(cd12c136d4f5d424bd7daeeacd5c4127beb3d565) )
 
@@ -1203,7 +1266,7 @@ static void iga_u12_decode(uint16_t* rom, int len, int ixor)
 
 DRIVER_INIT_MEMBER(pgm2_state,orleg2)
 {
-	uint16_t *src = (uint16_t *)memregion("spritesa")->base();
+	uint16_t *src = (uint16_t *)memregion("sprites_mask")->base();
 
 	iga_u12_decode(src, 0x2000000, 0x4761);
 	iga_u16_decode(src, 0x2000000, 0xc79f);
@@ -1214,7 +1277,7 @@ DRIVER_INIT_MEMBER(pgm2_state,orleg2)
 
 DRIVER_INIT_MEMBER(pgm2_state,kov2nl)
 {
-	uint16_t *src = (uint16_t *)memregion("spritesa")->base();
+	uint16_t *src = (uint16_t *)memregion("sprites_mask")->base();
 
 	iga_u12_decode(src, 0x2000000, 0xa193);
 	iga_u16_decode(src, 0x2000000, 0xb780);
@@ -1227,7 +1290,7 @@ DRIVER_INIT_MEMBER(pgm2_state,kov2nl)
 
 DRIVER_INIT_MEMBER(pgm2_state,ddpdojh)
 {
-	uint16_t *src = (uint16_t *)memregion("spritesa")->base();
+	uint16_t *src = (uint16_t *)memregion("sprites_mask")->base();
 
 	iga_u12_decode(src, 0x800000, 0x1e96);
 	iga_u16_decode(src, 0x800000, 0x869c);
@@ -1240,7 +1303,7 @@ DRIVER_INIT_MEMBER(pgm2_state,ddpdojh)
 
 DRIVER_INIT_MEMBER(pgm2_state,kov3)
 {
-	uint16_t *src = (uint16_t *)memregion("spritesa")->base();
+	uint16_t *src = (uint16_t *)memregion("sprites_mask")->base();
 
 	iga_u12_decode(src, 0x2000000, 0x956d);
 	iga_u16_decode(src, 0x2000000, 0x3d17);
