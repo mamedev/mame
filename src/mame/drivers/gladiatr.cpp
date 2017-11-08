@@ -241,13 +241,23 @@ WRITE8_MEMBER(gladiatr_state::gladiator_adpcm_w)
 	m_msm->vclk_w (BIT(data, 4));   // bit 4
 }
 
-WRITE8_MEMBER(gladiatr_state::gladiator_cpu_sound_command_w)
+WRITE8_MEMBER(ppking_state::ppking_adpcm_w)
+{
+	// bit 6 = bank offset
+	//membank("bank2")->set_entry((data & 0x40) ? 1 : 0);
+
+	m_msm->data_w(data);            // bit 0..3
+	m_msm->reset_w(BIT(data, 5));   // bit 5
+	m_msm->vclk_w (BIT(data, 4));   // bit 4
+}
+
+WRITE8_MEMBER(gladiatr_state_base::adpcm_command_w)
 {
 	m_soundlatch->write(space,0,data);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-READ8_MEMBER(gladiatr_state::gladiator_cpu_sound_command_r)
+READ8_MEMBER(gladiatr_state_base::adpcm_command_r)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	return m_soundlatch->read(space,0);
@@ -532,7 +542,7 @@ WRITE8_MEMBER(ppking_state::ppking_qx0_w)
 		m_mcu[0].txd = data;
 
 		m_mcu[1].rst = 0;
-		m_soundlatch->write(space, 0, data & 0xff);
+		m_soundlatch2->write(space, 0, data & 0xff);
 
 		if(m_mcu[0].txd == 0x41)
 		{
@@ -585,7 +595,7 @@ READ8_MEMBER(ppking_state::ppking_qx1_r)
 	if(m_mcu[1].rst == 1)
 		return 0x40;
 	
-	return m_soundlatch->read(space,0);
+	return m_soundlatch2->read(space,0);
 }
 
 READ8_MEMBER(ppking_state::ppking_qx2_r)
@@ -636,8 +646,9 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( ppking_cpu3_map, AS_PROGRAM, 8, ppking_state )
-	AM_RANGE(0x2000, 0x2fff) AM_ROM
-	AM_RANGE(0xc000, 0xffff) AM_ROM
+	AM_RANGE(0x1000, 0x1fff) AM_WRITE(ppking_adpcm_w)
+	AM_RANGE(0x2000, 0x2fff) AM_READ(adpcm_command_r)
+	AM_RANGE(0x8000, 0xffff) AM_ROM AM_WRITENOP
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ppking_cpu1_io, AS_IO, 8, ppking_state )
@@ -654,8 +665,9 @@ static ADDRESS_MAP_START( ppking_cpu2_io, AS_IO, 8, ppking_state )
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
 	AM_RANGE(0x20, 0x21) AM_READ(ppking_qx1_r) AM_WRITE(ppking_qx1_w)
 	AM_RANGE(0x40, 0x40) AM_READNOP
-	AM_RANGE(0x60, 0x61) AM_READWRITE(ppking_qx2_r,ppking_qx2_w)
+	AM_RANGE(0x60, 0x61) AM_READWRITE(ppking_qx2_r,ppking_qx2_w) // unaccessed, probably leftover
 	AM_RANGE(0x80, 0x81) AM_READWRITE(ppking_qx3_r,ppking_qx3_w)
+	AM_RANGE(0xe0, 0xe0) AM_WRITE(adpcm_command_w)
 ADDRESS_MAP_END
 
 
@@ -680,8 +692,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gladiatr_cpu3_map, AS_PROGRAM, 8, gladiatr_state )
 	AM_RANGE(0x1000, 0x1fff) AM_WRITE(gladiator_adpcm_w)
-	AM_RANGE(0x2000, 0x2fff) AM_READ(gladiator_cpu_sound_command_r)
-	AM_RANGE(0x4000, 0xffff) AM_ROMBANK("bank2")
+	AM_RANGE(0x2000, 0x2fff) AM_READ(adpcm_command_r)
+	AM_RANGE(0x4000, 0xffff) AM_ROMBANK("bank2") AM_WRITENOP
 ADDRESS_MAP_END
 
 
@@ -700,7 +712,7 @@ static ADDRESS_MAP_START( gladiatr_cpu2_io, AS_IO, 8, gladiatr_state )
 	AM_RANGE(0x60, 0x61) AM_DEVREADWRITE("cctl", upi41_cpu_device, upi41_master_r, upi41_master_w)
 	AM_RANGE(0x80, 0x81) AM_DEVREADWRITE("ccpu", upi41_cpu_device, upi41_master_r, upi41_master_w)
 	AM_RANGE(0xa0, 0xa7) AM_DEVWRITE("filtlatch", ls259_device, write_d0)
-	AM_RANGE(0xe0, 0xe0) AM_WRITE(gladiator_cpu_sound_command_w)
+	AM_RANGE(0xe0, 0xe0) AM_WRITE(adpcm_command_w)
 ADDRESS_MAP_END
 
 
@@ -983,6 +995,7 @@ static MACHINE_CONFIG_START( ppking )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/8) /* verified on pcb */
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE(gladiatr_state_base, ym_irq))
@@ -1111,9 +1124,11 @@ ROM_START( ppking )
 	ROM_LOAD( "q0_16.6e",       0x4000, 0x2000, CRC(b1e32588) SHA1(13c74479238a34a08e249f9120b42a52d80f8274) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "q0_19.5n",       0x0c000, 0x2000, CRC(4bcf896d) SHA1(f587a66fcc63e989742ce2d5f4cf2bb464987038) )
+	ROM_LOAD( "q0_19.5n",       0x0a000, 0x2000, CRC(4bcf896d) SHA1(f587a66fcc63e989742ce2d5f4cf2bb464987038) )
+	ROM_RELOAD(                 0x08000, 0x2000 )
 	ROM_LOAD( "q0_18.5m",       0x0e000, 0x2000, CRC(89ba64f8) SHA1(fa01316ea744b4277ee64d5f14cb6d7e3a949f2b) )
-
+	ROM_RELOAD(                 0x0c000, 0x2000 )
+	
 	ROM_REGION( 0x02000, "gfx1", 0 )
 	ROM_LOAD( "q0_15.1r",       0x00000, 0x2000, CRC(fbd33219) SHA1(78b9bb327ededaa818d26c41c5e8fd1c041ef142) )
 
