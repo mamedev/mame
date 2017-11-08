@@ -185,6 +185,7 @@ public:
 	pgm2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_screen(*this, "screen"),
 		m_fg_videoram(*this, "fg_videoram"),
 		m_bg_videoram(*this, "bg_videoram"),
 		m_sp_videoram(*this, "sp_videoram"),
@@ -214,7 +215,6 @@ public:
 	//DECLARE_READ32_MEMBER(pgm2_3660000_r) { return 0xffffffff; }
 	//DECLARE_READ32_MEMBER(pgm2_3680000_r) { return 0xffffffff; }
 
-	void draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, uint32_t* spriteram);
 	uint32_t screen_update_pgm2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_pgm2);
 	DECLARE_WRITE_LINE_MEMBER(irq);
@@ -238,8 +238,14 @@ private:
 
 	std::unique_ptr<uint32_t[]>     m_spritebufferram; // buffered spriteram
 
+	bitmap_ind16 m_sprite_bitmap;
+
+	void draw_sprites(screen_device &screen, const rectangle &cliprect, uint32_t* spriteram);
+	void copy_sprites_from_bitmap(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int pri);
+
 	// devices
 	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
 	required_shared_ptr<uint32_t> m_fg_videoram;
 	required_shared_ptr<uint32_t> m_bg_videoram;
 	required_shared_ptr<uint32_t> m_sp_videoram;
@@ -258,7 +264,7 @@ private:
 // checked on startup, or doesn't boot
 READ32_MEMBER(pgm2_state::unk_startup_r)
 {
-	printf("%s: unk_startup_r\n", machine().describe_context().c_str());
+	logerror("%s: unk_startup_r\n", machine().describe_context().c_str());
 	return 0xffffffff;
 }
 
@@ -621,11 +627,13 @@ INPUT_PORTS_END
 
 
 
-void pgm2_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, uint32_t* spriteram)
+void pgm2_state::draw_sprites(screen_device &screen, const rectangle &cliprect, uint32_t* spriteram)
 {
+	m_sprite_bitmap.fill(0x8000, cliprect);
+
 	int endoflist = -1;
 
-	//printf("frame\n");
+//	printf("frame\n");
 
 	for (int i = 0;i < 0x1000 / 4;i++)
 	{
@@ -639,7 +647,7 @@ void pgm2_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const
 	if (endoflist != -1)
 	{
 
-		uint32_t* dstptr_bitmap;
+		uint16_t* dstptr_bitmap;
 
 		for (int i = 0; i < endoflist-2; i += 4)
 		{
@@ -648,9 +656,10 @@ void pgm2_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const
 			int x =     (spriteram[i + 0] & 0x000007ff) >> 0;
 			int y =     (spriteram[i + 0] & 0x003ff800) >> 11;
 			int pal =   (spriteram[i + 0] & 0x0fc00000) >> 22;
+			int pri =   (spriteram[i + 0] & 0x80000000) >> 31;
+
 			int sizex = (spriteram[i + 1] & 0x0000003f) >> 0;
 			int sizey = (spriteram[i + 1] & 0x00003fc0) >> 6;
-
 			int flipx = (spriteram[i + 1] & 0x00800000) >> 23;
 			int flipy = (spriteram[i + 1] & 0x80000000) >> 31; // more of a 'reverse entire drawing' flag than y-flip, but used for that purpose
 
@@ -666,7 +675,7 @@ void pgm2_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const
 			mask_offset &= 0x3ffffff;
 			palette_offset &= 0x7ffffff;
 
-			const pen_t *paldata = m_sp_palette->pens();
+			pal |= (pri << 6); // encode priority with the palette for manual mixing later
 
 			for (int ydraw = 0; ydraw < sizey;ydraw++)
 			{
@@ -719,12 +728,12 @@ void pgm2_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const
 						{
 							if (cliprect.contains(realx, realy))
 							{
-								uint16_t pendat = m_sprites_colour[palette_offset] & 0x3f; // there are some stray 0xff bytes in some roms, so mask
+								uint16_t pix = m_sprites_colour[palette_offset] & 0x3f; // there are some stray 0xff bytes in some roms, so mask
 
-								pendat |= pal * 0x40;
+								uint16_t pendat = pix + (pal * 0x40);
 
-								dstptr_bitmap = &bitmap.pix32(realy);
-								dstptr_bitmap[realx] = paldata[pendat];
+								dstptr_bitmap = &m_sprite_bitmap.pix16(realy);
+								dstptr_bitmap[realx] = pendat;
 							}
 						
 
@@ -747,19 +756,53 @@ void pgm2_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const
 		}
 
 	}
-
 }
+
+void pgm2_state::copy_sprites_from_bitmap(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int pri)
+{
+	pri <<= 12;
+
+	const pen_t *paldata = m_sp_palette->pens();
+	uint16_t* srcptr_bitmap;
+	uint32_t* dstptr_bitmap;
+
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	{
+		srcptr_bitmap = &m_sprite_bitmap.pix16(y);
+		dstptr_bitmap = &bitmap.pix32(y);
+
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		{
+			uint16_t pix = srcptr_bitmap[x];
+
+			if (pix != 0x8000)
+			{
+				if ((pix&0x1000) == pri)
+					dstptr_bitmap[x] = paldata[pix & 0xfff];
+			}
+		}
+
+	}
+}
+
+
 
 uint32_t pgm2_state::screen_update_pgm2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(m_bg_palette->black_pen(), cliprect);
-
 	m_bg_tilemap->set_scrolly(0, (m_vid_regs[0x0/4] & 0xffff0000)>>16 );
 	m_bg_tilemap->set_scrollx(0, (m_vid_regs[0x0/4] & 0x0000ffff)>>0 );
-	
+
+	const pen_t *paldata = m_bg_palette->pens();
+
+	bitmap.fill(paldata[0x2f0], cliprect); // is there a bg pen register, this is incorrect (stage with 'spider web' floor in orlegend2)
+
+	draw_sprites(screen, cliprect, m_spritebufferram.get());
+
+	copy_sprites_from_bitmap(screen, bitmap, cliprect, 1);
+
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
-	draw_sprites(screen, bitmap, cliprect, m_spritebufferram.get());
+	copy_sprites_from_bitmap(screen, bitmap, cliprect, 0);
 
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
@@ -819,8 +862,11 @@ void pgm2_state::video_start()
 	m_fg_tilemap->set_transparent_pen(0);
 
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode3, tilemap_get_info_delegate(FUNC(pgm2_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 32, 32, 64, 32); // 0x2000 bytes
+	m_bg_tilemap->set_transparent_pen(0);
 
 	m_spritebufferram = make_unique_clear<uint32_t[]>(0x1000/4);
+
+	m_screen->register_screen_bitmap(m_sprite_bitmap);
 
 	save_pointer(NAME(m_spritebufferram.get()), 0x1000/4);
 
