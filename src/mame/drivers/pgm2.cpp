@@ -1013,42 +1013,139 @@ MACHINE_CONFIG_END
 	ROM_LOAD32_WORD( "ig-a_bmh.u16",     0x00000002, 0x1000000, CRC(fbf411c8) SHA1(5089b5cc9bbf6496ef1367c6255e63e9ab895117) ) \
 	\
 	ROM_REGION( 0x4000000, "sprites_colour", 0 ) /* sprite colour data (6bpp data, 2 bits unused except for 4 bytes that are randomly 0xff - check dump?) */ \
-	ROM_LOAD32_WORD( "ig-a_cgl.u18",     0x00000000, 0x2000000, CRC(43501fa6) SHA1(58ccce6d393964b771fec3f5c583e3ede57482a3) ) \
-	ROM_LOAD32_WORD( "ig-a_cgh.u26",     0x00000002, 0x2000000, CRC(7051d020) SHA1(3d9b24c6fda4c9699bb9f00742e0888059b623e1) ) \
+	ROM_LOAD32_WORD( "ig-a_cgl.u18",     0x00000000, 0x2000000, BAD_DUMP CRC(43501fa6) SHA1(58ccce6d393964b771fec3f5c583e3ede57482a3) ) \
+	ROM_LOAD32_WORD( "ig-a_cgh.u26",     0x00000002, 0x2000000, BAD_DUMP CRC(7051d020) SHA1(3d9b24c6fda4c9699bb9f00742e0888059b623e1) ) \
 	\
 	ROM_REGION( 0x1000000, "ymz774", ROMREGION_ERASEFF ) /* ymz770 */ \
-	ROM_LOAD16_WORD_SWAP( "ig-a_sp.u2",              0x00000000, 0x1000000, CRC(8250688c) SHA1(d2488477afc528aeee96826065deba2bce4f0a7d) )
+	ROM_LOAD16_WORD_SWAP( "ig-a_sp.u2",  0x00000000, 0x1000000, CRC(8250688c) SHA1(d2488477afc528aeee96826065deba2bce4f0a7d) ) \
+	\
+	ROM_REGION( 0x10000, "sram", 0 ) \
+	ROM_LOAD( "xyj2_nvram",            0x00000000, 0x10000, CRC(ccccc71c) SHA1(585b5ccbf89dd28d8532da785d7c8af12f31c6d6) )
 
-
-ROM_START( orleg2 )
-	ROM_REGION( 0x04000, "maincpu", 0 )
-	ROM_LOAD( "xyj2_igs036.rom", 0x00000000, 0x0004000, CRC(bcce7641) SHA1(c3b5cf6e9f6eae09b6785314777a52b34c3c7657) )
-
-	ROM_REGION( 0x800000, "user1", 0 )
+#define ORLEG2_PROGRAM_104 \
+	ROM_REGION( 0x800000, "user1", 0 ) \
 	ROM_LOAD( "xyj2_v104cn.u7",          0x00000000, 0x0800000, CRC(7c24a4f5) SHA1(3cd9f9264ef2aad0869afdf096e88eb8d74b2570) )
 
-	ORLEG2_VIDEO_SOUND_ROMS
-ROM_END
-
-ROM_START( orleg2o )
-	ROM_REGION( 0x04000, "maincpu", 0 )
-	ROM_LOAD( "xyj2_igs036.rom", 0x00000000, 0x0004000, CRC(bcce7641) SHA1(c3b5cf6e9f6eae09b6785314777a52b34c3c7657) )
-
-	ROM_REGION( 0x800000, "user1", 0 )
+#define ORLEG2_PROGRAM_103 \
+	ROM_REGION( 0x800000, "user1", 0 ) \
 	ROM_LOAD( "xyj2_v103cn.u7",  0x000000, 0x800000, CRC(21c1fae8) SHA1(36eeb7a5e8dc8ee7c834f3ff1173c28cf6c2f1a3) )
 
+#define ORLEG2_PROGRAM_101 \
+	ROM_REGION( 0x800000, "user1", 0 ) \
+	ROM_LOAD( "xyj2_v101cn.u7",  0x000000, 0x800000, CRC(45805b53) SHA1(f2a8399c821b75fadc53e914f6f318707e70787c) )
+
+#define ORLEG2_INTERNAL_CHINA \
+	ROM_REGION( 0x04000, "maincpu", 0 ) \
+	ROM_LOAD( "xyj2_igs036_china.rom", 0x00000000, 0x0004000, CRC(bcce7641) SHA1(c3b5cf6e9f6eae09b6785314777a52b34c3c7657) )
+
+#define ORLEG2_INTERNAL_OVERSEA \
+	ROM_REGION( 0x04000, "maincpu", 0 ) \
+	ROM_LOAD( "xyj2_igs036_oversea.rom", 0x00000000, 0x0004000, BAD_DUMP CRC(cc4d398a) SHA1(c50bcc81f02cd5aa8ad157d73209dc53bdedc023) )
+
+#define ORLEG2_INTERNAL_TAIWAN \
+	ROM_REGION( 0x04000, "maincpu", 0 ) \
+	ROM_LOAD( "xyj2_igs036_taiwan.rom", 0x00000000, 0x0004000, BAD_DUMP CRC(3b8a6703) SHA1(addabc4e6d23933a81845d64b033c30c4d96943d))
+
+#define ORLEG2_INTERNAL_HONGKONG \
+	ROM_REGION( 0x04000, "maincpu", 0 ) \
+	ROM_LOAD( "xyj2_igs036_hongkong.rom", 0x00000000, 0x0004000, BAD_DUMP CRC(ee7343c6) SHA1(e37ce0352255df78af1a290ffdc8331c56d1d2cd) )
+
+#define ORLEG2_INTERNAL_JAPAN \
+	ROM_REGION( 0x04000, "maincpu", 0 ) \
+	ROM_LOAD( "xyj2_igs036_japan.rom", 0x00000000, 0x0004000, BAD_DUMP CRC(69375284) SHA1(a120c6a3d8d7898cc3ca508abea78e5e54090c66) )
+
+ROM_START( orleg2 )
+	ORLEG2_INTERNAL_CHINA
+	ORLEG2_PROGRAM_104
 	ORLEG2_VIDEO_SOUND_ROMS
 ROM_END
 
-ROM_START( orleg2oa )
-	ROM_REGION( 0x04000, "maincpu", 0 )
-	ROM_LOAD( "xyj2_igs036.rom", 0x00000000, 0x0004000, CRC(bcce7641) SHA1(c3b5cf6e9f6eae09b6785314777a52b34c3c7657) )
-
-	ROM_REGION( 0x800000, "user1", 0 )
-	ROM_LOAD( "orleg2_xyj2_v101cn.u7",  0x000000, 0x800000, CRC(45805b53) SHA1(f2a8399c821b75fadc53e914f6f318707e70787c) )
-
+ROM_START( orleg2_103 )
+	ORLEG2_INTERNAL_CHINA
+	ORLEG2_PROGRAM_103
 	ORLEG2_VIDEO_SOUND_ROMS
 ROM_END
+
+ROM_START( orleg2_101 )
+	ORLEG2_INTERNAL_CHINA
+	ORLEG2_PROGRAM_101
+	ORLEG2_VIDEO_SOUND_ROMS
+ROM_END
+
+ROM_START( orleg2_104o )
+	ORLEG2_INTERNAL_OVERSEA
+	ORLEG2_PROGRAM_104
+	ORLEG2_VIDEO_SOUND_ROMS
+ROM_END
+
+ROM_START( orleg2_103o )
+	ORLEG2_INTERNAL_OVERSEA
+	ORLEG2_PROGRAM_103
+	ORLEG2_VIDEO_SOUND_ROMS
+ROM_END
+
+ROM_START( orleg2_101o )
+	ORLEG2_INTERNAL_OVERSEA
+	ORLEG2_PROGRAM_101
+	ORLEG2_VIDEO_SOUND_ROMS
+ROM_END
+
+ROM_START( orleg2_104tw )
+	ORLEG2_INTERNAL_TAIWAN
+	ORLEG2_PROGRAM_104
+	ORLEG2_VIDEO_SOUND_ROMS
+ROM_END
+
+ROM_START( orleg2_103tw )
+	ORLEG2_INTERNAL_TAIWAN
+	ORLEG2_PROGRAM_103
+	ORLEG2_VIDEO_SOUND_ROMS
+ROM_END
+
+ROM_START( orleg2_101tw )
+	ORLEG2_INTERNAL_TAIWAN
+	ORLEG2_PROGRAM_101
+	ORLEG2_VIDEO_SOUND_ROMS
+ROM_END
+
+ROM_START( orleg2_104hk )
+	ORLEG2_INTERNAL_HONGKONG
+	ORLEG2_PROGRAM_104
+	ORLEG2_VIDEO_SOUND_ROMS
+ROM_END
+
+ROM_START( orleg2_103hk )
+	ORLEG2_INTERNAL_HONGKONG
+	ORLEG2_PROGRAM_103
+	ORLEG2_VIDEO_SOUND_ROMS
+ROM_END
+
+ROM_START( orleg2_101hk )
+	ORLEG2_INTERNAL_HONGKONG
+	ORLEG2_PROGRAM_101
+	ORLEG2_VIDEO_SOUND_ROMS
+ROM_END
+
+ROM_START( orleg2_104j )
+	ORLEG2_INTERNAL_JAPAN
+	ORLEG2_PROGRAM_104
+	ORLEG2_VIDEO_SOUND_ROMS
+ROM_END
+
+ROM_START( orleg2_103j )
+	ORLEG2_INTERNAL_JAPAN
+	ORLEG2_PROGRAM_103
+	ORLEG2_VIDEO_SOUND_ROMS
+ROM_END
+
+ROM_START( orleg2_101j )
+	ORLEG2_INTERNAL_JAPAN
+	ORLEG2_PROGRAM_101
+	ORLEG2_VIDEO_SOUND_ROMS
+ROM_END
+
+
+
 
 #define KOV2NL_VIDEO_SOUND_ROMS \
 	ROM_REGION( 0x200000, "tiles", ROMREGION_ERASEFF ) \
@@ -1340,23 +1437,46 @@ DRIVER_INIT_MEMBER(pgm2_state, kov3_100)
 
 
 /* PGM2 */
-GAME( 2007, orleg2,       0,         pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V104, China)", MACHINE_IS_SKELETON )
-GAME( 2007, orleg2o,      orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V103, China)", MACHINE_IS_SKELETON )
-GAME( 2007, orleg2oa,     orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V101, China)", MACHINE_IS_SKELETON )
-// should be a V100 too
 
-GAME( 2008, kov2nl,       0,         pgm2,    pgm2, pgm2_state,     kov2nl,       ROT0, "IGS", "Knights of Valour 2 New Legend (V302, China)", MACHINE_IS_SKELETON )
-GAME( 2008, kov2nlo,      kov2nl,    pgm2,    pgm2, pgm2_state,     kov2nl,       ROT0, "IGS", "Knights of Valour 2 New Legend (V301, China)", MACHINE_IS_SKELETON )
-GAME( 2008, kov2nloa,     kov2nl,    pgm2,    pgm2, pgm2_state,     kov2nl,       ROT0, "IGS", "Knights of Valour 2 New Legend (V300, Taiwan)", MACHINE_IS_SKELETON )
+// Oriental Legend 2 - should be a V102 and V100 too
+GAME( 2007, orleg2,       0,         pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V104, China)", MACHINE_NOT_WORKING )
+GAME( 2007, orleg2_103,   orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V103, China)", MACHINE_NOT_WORKING )
+GAME( 2007, orleg2_101,   orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V101, China)", MACHINE_NOT_WORKING )
 
-GAME( 2010, ddpdojh,      0,    pgm2,    pgm2, pgm2_state,     ddpdojh,    ROT270, "IGS", "Dodonpachi Daioujou Tamashii (V201, China)", MACHINE_IS_SKELETON )
-// should be a V200 too
+GAME( 2007, orleg2_104o,  orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V104, Oversea)", MACHINE_NOT_WORKING )
+GAME( 2007, orleg2_103o,  orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V103, Oversea)", MACHINE_NOT_WORKING )
+GAME( 2007, orleg2_101o,  orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V101, Oversea)", MACHINE_NOT_WORKING )
 
-GAME( 2011, kov3,         0,    pgm2,    pgm2, pgm2_state,     kov3_104,   ROT0, "IGS", "Knights of Valour 3 (V104, China)", MACHINE_IS_SKELETON )
-GAME( 2011, kov3_102,     kov3, pgm2,    pgm2, pgm2_state,     kov3_102,   ROT0, "IGS", "Knights of Valour 3 (V102, China)", MACHINE_IS_SKELETON )
-GAME( 2011, kov3_100,     kov3, pgm2,    pgm2, pgm2_state,     kov3_100,   ROT0, "IGS", "Knights of Valour 3 (V100, China)", MACHINE_IS_SKELETON )
-// should be V103 and V101 at least
+GAME( 2007, orleg2_104tw, orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V104, Taiwan)", MACHINE_NOT_WORKING )
+GAME( 2007, orleg2_103tw, orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V103, Taiwan)", MACHINE_NOT_WORKING )
+GAME( 2007, orleg2_101tw, orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V101, Taiwan)", MACHINE_NOT_WORKING )
+
+GAME( 2007, orleg2_104hk, orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V104, Hong Kong)", MACHINE_NOT_WORKING )
+GAME( 2007, orleg2_103hk, orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V103, Hong Kong)", MACHINE_NOT_WORKING )
+GAME( 2007, orleg2_101hk, orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V101, Hong Kong)", MACHINE_NOT_WORKING )
+
+GAME( 2007, orleg2_104j,  orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V104, Japan)", MACHINE_NOT_WORKING )
+GAME( 2007, orleg2_103j,  orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V103, Japan)", MACHINE_NOT_WORKING )
+GAME( 2007, orleg2_101j,  orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V101, Japan)", MACHINE_NOT_WORKING )
+
+
+// Knights of Valour 2 New Legend 
+GAME( 2008, kov2nl,       0,         pgm2,    pgm2, pgm2_state,     kov2nl,       ROT0, "IGS", "Knights of Valour 2 New Legend (V302, China)", MACHINE_NOT_WORKING )
+GAME( 2008, kov2nlo,      kov2nl,    pgm2,    pgm2, pgm2_state,     kov2nl,       ROT0, "IGS", "Knights of Valour 2 New Legend (V301, China)", MACHINE_NOT_WORKING )
+GAME( 2008, kov2nloa,     kov2nl,    pgm2,    pgm2, pgm2_state,     kov2nl,       ROT0, "IGS", "Knights of Valour 2 New Legend (V300, Taiwan)", MACHINE_NOT_WORKING )
+
+// Dodonpachi Daioujou Tamashii - should be a V200 too
+GAME( 2010, ddpdojh,      0,    pgm2,    pgm2, pgm2_state,     ddpdojh,    ROT270, "IGS", "Dodonpachi Daioujou Tamashii (V201, China)", MACHINE_NOT_WORKING )
+
+// Knights of Valour 3 - should be a V103 and V101 too
+GAME( 2011, kov3,         0,    pgm2,    pgm2, pgm2_state,     kov3_104,   ROT0, "IGS", "Knights of Valour 3 (V104, China)", MACHINE_NOT_WORKING )
+GAME( 2011, kov3_102,     kov3, pgm2,    pgm2, pgm2_state,     kov3_102,   ROT0, "IGS", "Knights of Valour 3 (V102, China)", MACHINE_NOT_WORKING )
+GAME( 2011, kov3_100,     kov3, pgm2,    pgm2, pgm2_state,     kov3_100,   ROT0, "IGS", "Knights of Valour 3 (V100, China)", MACHINE_NOT_WORKING )
 
 // The King of Fighters '98 - Ultimate Match - Hero
+
 // Jigsaw World Arena
-//Puzzle of Ocha / Ochainu No Pazuru
+
+// Puzzle of Ocha / Ochainu No Pazuru
+
+
