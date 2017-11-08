@@ -188,6 +188,7 @@ public:
 		m_fg_videoram(*this, "fg_videoram"),
 		m_bg_videoram(*this, "bg_videoram"),
 		m_sp_videoram(*this, "sp_videoram"),
+		m_vid_regs(*this, "vid_regs"),
 		m_gfxdecode2(*this, "gfxdecode2"),
 		m_gfxdecode3(*this, "gfxdecode3"),
 		m_arm_aic(*this, "arm_aic"),
@@ -212,10 +213,8 @@ public:
 
 	//DECLARE_READ32_MEMBER(pgm2_3660000_r) { return 0xffffffff; }
 	//DECLARE_READ32_MEMBER(pgm2_3680000_r) { return 0xffffffff; }
-	//DECLARE_READ32_MEMBER(pgm2_3900000_r) { return 0xffffffff; }
-	//DECLARE_READ32_MEMBER(pgm2_3a00000_r) { return 0xffffffff; }
 
-	void draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, uint32_t* spriteram);
 	uint32_t screen_update_pgm2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_pgm2);
 	DECLARE_WRITE_LINE_MEMBER(irq);
@@ -237,11 +236,14 @@ private:
 	tilemap_t    *m_fg_tilemap;
 	tilemap_t    *m_bg_tilemap;
 
+	std::unique_ptr<uint32_t[]>     m_spritebufferram; // buffered spriteram
+
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint32_t> m_fg_videoram;
 	required_shared_ptr<uint32_t> m_bg_videoram;
 	required_shared_ptr<uint32_t> m_sp_videoram;
+	required_shared_ptr<uint32_t> m_vid_regs;
 	required_device<gfxdecode_device> m_gfxdecode2;
 	required_device<gfxdecode_device> m_gfxdecode3;
 	required_device<arm_aic_device> m_arm_aic;
@@ -306,12 +308,12 @@ static ADDRESS_MAP_START( pgm2_map, AS_PROGRAM, 32, pgm2_state )
 
 	AM_RANGE(0x300a0000, 0x300a07ff) AM_RAM_DEVWRITE("tx_palette", palette_device, write) AM_SHARE("tx_palette") 
 
-	AM_RANGE(0x300c0000, 0x300c01ff) AM_RAM // zoom table?
-	AM_RANGE(0x300e0000, 0x300e03bf) AM_RAM
+	AM_RANGE(0x300c0000, 0x300c01ff) AM_RAM // sprite zoom table?
+	AM_RANGE(0x300e0000, 0x300e03bf) AM_RAM // unknown
 
 	AM_RANGE(0x30100000, 0x301000ff) AM_RAM // maybe linescroll?
 
-	AM_RANGE(0x30120000, 0x3012003f) AM_RAM // scroll etc.?
+	AM_RANGE(0x30120000, 0x3012003f) AM_RAM AM_SHARE("vid_regs") // scroll etc.?
 
 	AM_RANGE(0x40000000, 0x40000003) AM_DEVREADWRITE8("ymz774", ymz774_device, read, write, 0xffffffff)
 	
@@ -619,7 +621,7 @@ INPUT_PORTS_END
 
 
 
-void pgm2_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+void pgm2_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, uint32_t* spriteram)
 {
 	int endoflist = -1;
 
@@ -627,7 +629,7 @@ void pgm2_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const
 
 	for (int i = 0;i < 0x1000 / 4;i++)
 	{
-		if (m_sp_videoram[i] == 0x80000000)
+		if (spriteram[i] == 0x80000000)
 		{
 			endoflist = i;
 			i = 0x1000;
@@ -641,19 +643,19 @@ void pgm2_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const
 
 		for (int i = 0; i < endoflist-2; i += 4)
 		{
-			//printf("sprite with %08x %08x %08x %08x\n", m_sp_videoram[i + 0], m_sp_videoram[i + 1], m_sp_videoram[i + 2], m_sp_videoram[i + 3]);
+			//printf("sprite with %08x %08x %08x %08x\n", spriteram[i + 0], spriteram[i + 1], spriteram[i + 2], spriteram[i + 3]);
 		
-			int x =     (m_sp_videoram[i + 0] & 0x000007ff) >> 0;
-			int y =     (m_sp_videoram[i + 0] & 0x003ff800) >> 11;
-			int pal =   (m_sp_videoram[i + 0] & 0x0fc00000) >> 22;
-			int sizex = (m_sp_videoram[i + 1] & 0x0000003f) >> 0;
-			int sizey = (m_sp_videoram[i + 1] & 0x00003fc0) >> 6;
+			int x =     (spriteram[i + 0] & 0x000007ff) >> 0;
+			int y =     (spriteram[i + 0] & 0x003ff800) >> 11;
+			int pal =   (spriteram[i + 0] & 0x0fc00000) >> 22;
+			int sizex = (spriteram[i + 1] & 0x0000003f) >> 0;
+			int sizey = (spriteram[i + 1] & 0x00003fc0) >> 6;
 
-			int flipx = (m_sp_videoram[i + 1] & 0x00800000) >> 23;
-			int flipy = (m_sp_videoram[i + 1] & 0x80000000) >> 31;
+			int flipx = (spriteram[i + 1] & 0x00800000) >> 23;
+			int flipy = (spriteram[i + 1] & 0x80000000) >> 31;
 
-			int mask_offset = (m_sp_videoram[i + 2]<<1);
-			int palette_offset = (m_sp_videoram[i + 3]);
+			int mask_offset = (spriteram[i + 2]<<1);
+			int palette_offset = (spriteram[i + 3]);
 
 			if (x & 0x400) x -=0x800;
 			if (y & 0x400) y -=0x800;
@@ -736,7 +738,12 @@ uint32_t pgm2_state::screen_update_pgm2(screen_device &screen, bitmap_rgb32 &bit
 {
 	bitmap.fill(m_bg_palette->black_pen(), cliprect);
 
-	draw_sprites(screen, bitmap, cliprect);
+	m_bg_tilemap->set_scrolly(0, (m_vid_regs[0x0/4] & 0xffff0000)>>16 );
+	m_bg_tilemap->set_scrollx(0, (m_vid_regs[0x0/4] & 0x0000ffff)>>0 );
+	
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+
+	draw_sprites(screen, bitmap, cliprect, m_spritebufferram.get());
 
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
@@ -744,6 +751,11 @@ uint32_t pgm2_state::screen_update_pgm2(screen_device &screen, bitmap_rgb32 &bit
 
 WRITE_LINE_MEMBER(pgm2_state::screen_vblank_pgm2)
 {
+	// rising edge
+	if (state)
+	{
+		memcpy(m_spritebufferram.get(), m_sp_videoram, 0x1000);
+	}
 }
 
 WRITE_LINE_MEMBER(pgm2_state::irq)
@@ -789,6 +801,11 @@ void pgm2_state::video_start()
 	m_fg_tilemap->set_transparent_pen(0);
 
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode3, tilemap_get_info_delegate(FUNC(pgm2_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 32, 32, 64, 32); // 0x2000 bytes
+
+	m_spritebufferram = make_unique_clear<uint32_t[]>(0x1000/4);
+
+	save_pointer(NAME(m_spritebufferram.get()), 0x1000/4);
+
 }
 
 void pgm2_state::machine_start()
