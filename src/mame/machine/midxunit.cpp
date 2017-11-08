@@ -26,7 +26,6 @@ void midxunit_state::register_state_saving()
 	save_item(NAME(m_cmos_write_enable));
 	save_item(NAME(m_iodata));
 	save_item(NAME(m_ioshuffle));
-	save_item(NAME(m_analog_port));
 	save_item(NAME(m_uart));
 	save_item(NAME(m_security_bits));
 }
@@ -129,21 +128,6 @@ READ16_MEMBER(midxunit_state::midxunit_io_r)
 			break;
 	}
 	return ~0;
-}
-
-
-READ16_MEMBER(midxunit_state::midxunit_analog_r)
-{
-	static const char *const portnames[] = { "AN0", "AN1", "AN2", "AN3", "AN4", "AN5" };
-
-	return ioport(portnames[m_analog_port])->read();
-}
-
-
-WRITE16_MEMBER(midxunit_state::midxunit_analog_select_w)
-{
-	if (offset == 0 && ACCESSING_BITS_0_7)
-		m_analog_port = data - 8;
 }
 
 

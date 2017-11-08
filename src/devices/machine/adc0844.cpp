@@ -76,6 +76,8 @@ void adc0844_device::device_start()
 
 void adc0848_device::device_start()
 {
+	adc0844_device::device_start();
+
 	// resolve callbacks
 	m_ch5_cb.resolve_safe(0xff);
 	m_ch6_cb.resolve_safe(0xff);
