@@ -152,7 +152,7 @@ static ADDRESS_MAP_START( hpz80unk_io, AS_IO, 8, hpz80unk_state )
 	AM_RANGE(0x04, 0x04) AM_READWRITE(port04_r,port04_w) // uart2 data
 	AM_RANGE(0x0d, 0x0d) AM_READ(port0d_r) // uart3 status
 	AM_RANGE(0x0e, 0x0e) AM_WRITE(port0e_w) // uart3 data
-	AM_RANGE(0x1d, 0x1e) // top of memory is written here, little-endian
+	AM_RANGE(0x1d, 0x1e) // top of memory is written here, big-endian
 	AM_RANGE(0x1f, 0x1f) AM_READ_PORT("DSW") // select which uarts to use
 	AM_RANGE(0xfc, 0xfc) AM_READ(portfc_r)
 ADDRESS_MAP_END
