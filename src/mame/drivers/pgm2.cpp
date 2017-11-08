@@ -652,13 +652,16 @@ void pgm2_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const
 			int sizey = (spriteram[i + 1] & 0x00003fc0) >> 6;
 
 			int flipx = (spriteram[i + 1] & 0x00800000) >> 23;
-			int flipy = (spriteram[i + 1] & 0x80000000) >> 31;
+			int flipy = (spriteram[i + 1] & 0x80000000) >> 31; // more of a 'reverse entire drawing' flag than y-flip, but used for that purpose
 
 			int mask_offset = (spriteram[i + 2]<<1);
 			int palette_offset = (spriteram[i + 3]);
 
 			if (x & 0x400) x -=0x800;
 			if (y & 0x400) y -=0x800;
+
+			if (flipy)
+				mask_offset -= 2;
 
 			mask_offset &= 0x3ffffff;
 			palette_offset &= 0x7ffffff;
@@ -671,18 +674,16 @@ void pgm2_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const
 
 				for (int xdraw = 0; xdraw < sizex;xdraw++)
 				{
-					if (flipy)
-					{
-						// wrong
-						mask_offset -= 4;
-					}
-
 					uint32_t maskdata = m_sprites_mask[mask_offset+0] << 24;
 					maskdata |= m_sprites_mask[mask_offset+1] << 16;
 					maskdata |= m_sprites_mask[mask_offset+2] << 8;
 					maskdata |= m_sprites_mask[mask_offset+3] << 0;
-					
-					if (!flipy)
+				
+					if (flipy)
+					{
+						mask_offset -= 4;
+					}
+					else if (!flipy)
 					{
 						mask_offset += 4;
 					}
@@ -692,12 +693,27 @@ void pgm2_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const
 
 					for (int xchunk = 0;xchunk < 32;xchunk++)
 					{
-						int realx;
-						
-						if (!flipx) realx = x + (xdraw * 32) + xchunk;
-						else realx = ((x + sizex*32)-1) - ((xdraw * 32) + xchunk);
+						int realx, pix;
+				
+						if (!flipx)
+						{
+							if (!flipy) realx = x + (xdraw * 32) + xchunk;
+							else realx = ((x + sizex * 32) - 1) - ((xdraw * 32) + xchunk);
+						}
+						else
+						{
+							if (!flipy) realx = ((x + sizex * 32) - 1) - ((xdraw * 32) + xchunk);
+							else realx = x + (xdraw * 32) + xchunk;
+						}
 
-						int pix = (maskdata >> (31 - xchunk)) & 1;
+						if (!flipy)
+						{
+							pix = (maskdata >> (31 - xchunk)) & 1;
+						}
+						else
+						{
+							pix = (maskdata >> xchunk) & 1;
+						}
 
 						if (pix)
 						{
@@ -717,7 +733,7 @@ void pgm2_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const
 								palette_offset++;
 							}
 							else
-							{	// wrong
+							{
 								palette_offset--;
 							}
 								
