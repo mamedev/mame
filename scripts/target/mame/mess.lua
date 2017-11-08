@@ -618,6 +618,7 @@ MACHINES["FGA002"] = true
 MACHINES["I82586"] = true
 MACHINES["INPUT_MERGER"] = true
 -- MACHINES["K054321"] = true
+MACHINES["ADC0844"] = true
 
 --------------------------------------------------
 -- specify available bus cores
@@ -2136,6 +2137,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/hp64k.cpp",
 	MAME_DIR .. "src/mame/drivers/hp_ipc.cpp",
 	MAME_DIR .. "src/mame/drivers/hp80.cpp",
+	MAME_DIR .. "src/mame/drivers/hp2100.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "hec2hrp")
@@ -2941,6 +2943,7 @@ files {
 	MAME_DIR .. "src/mame/machine/psxcd.h",
 	MAME_DIR .. "src/mame/drivers/pve500.cpp",
 	MAME_DIR .. "src/mame/drivers/smc777.cpp",
+	MAME_DIR .. "src/mame/drivers/ps2sony.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "sord")
@@ -3017,8 +3020,6 @@ files {
 createMESSProjects(_target, _subtarget, "tatung")
 files {
 	MAME_DIR .. "src/mame/drivers/einstein.cpp",
-	MAME_DIR .. "src/mame/includes/einstein.h",
-	MAME_DIR .. "src/mame/machine/einstein.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "teamconc")
@@ -3469,6 +3470,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/dual68.cpp",
 	MAME_DIR .. "src/mame/drivers/eacc.cpp",
 	MAME_DIR .. "src/mame/drivers/elwro800.cpp",
+	MAME_DIR .. "src/mame/drivers/esprit.cpp",
 	MAME_DIR .. "src/mame/drivers/eti660.cpp",
 	MAME_DIR .. "src/mame/includes/eti660.h",
 	MAME_DIR .. "src/mame/drivers/eurocom2.cpp",
@@ -3489,7 +3491,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/grfd2301.cpp",
 	MAME_DIR .. "src/mame/drivers/harriet.cpp",
 	MAME_DIR .. "src/mame/drivers/hazeltin.cpp",
-	MAME_DIR .. "src/mame/drivers/hazeltine.cpp",
 	MAME_DIR .. "src/mame/drivers/hprot1.cpp",
 	MAME_DIR .. "src/mame/drivers/hpz80unk.cpp",
 	MAME_DIR .. "src/mame/drivers/ht68k.cpp",

@@ -569,19 +569,6 @@ static ADDRESS_MAP_START( suprpokr_map, AS_PROGRAM, 8, gei_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( geimulti_map, AS_PROGRAM, 8, gei_state )
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x4800, 0x4803) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
-	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
-	AM_RANGE(0x5800, 0x5fff) AM_ROM
-	AM_RANGE(0x5a00, 0x5cff) AM_WRITE(geimulti_bank_w)
-	AM_RANGE(0x6000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x8002) AM_WRITE(gei_drawctrl_w)
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("rombank")
-	AM_RANGE(0xc000, 0xffff) AM_RAM_WRITE(gei_bitmap_w)
-ADDRESS_MAP_END
-
 static ADDRESS_MAP_START( sprtauth_map, AS_PROGRAM, 8, gei_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("nvram")
@@ -1179,12 +1166,6 @@ static MACHINE_CONFIG_DERIVED( suprpokr, getrivia )
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(suprpokr_map)
-MACHINE_CONFIG_END
-
-static MACHINE_CONFIG_DERIVED( geimulti, getrivia )
-
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(geimulti_map)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( sprtauth, getrivia )
@@ -1963,6 +1944,12 @@ ROM_START( geimulti )
 	ROM_LOAD( "entr#1",    0x60000, 0x8000, CRC(caceaa7b) SHA1(c51f10f5acd3d3fedce43103b9f11d006139043c) )
 	ROM_LOAD( "grph",      0x68000, 0x8000, CRC(25e265db) SHA1(6e184309ee67dbe7930570b135ace09eeb1eb333) )
 
+	ROM_REGION( 0x0800, "nvram", 0 )
+	ROM_LOAD( "geimulti.nvram",   0x0000, 0x0800, CRC(232bbad1) SHA1(23a4011ad3b322cbda40859a1619dc1f5472fdfc) ) /* Defaults */
+
+	// strangely checks the signature only for questions "fact#1", "adltsex#1", "nfl#1" and "entr#1"
+	ROM_REGION( 0x0008, "signature", 0 ) // bytes 0x03 through 0x0a of the listed question ROMs - to prevent ROM swaps
+	ROM_LOAD( "geimulti.sig",   0x0000, 0x0008, CRC(c8e944a3) SHA1(d34de9e3163ba61fa4e4f2264caff40434fcc9b0) )
 ROM_END
 
 ROM_START( sprtauth )
@@ -2074,5 +2061,5 @@ GAME( 1991, quiz211,   0,        findout,   quiz,     gei_state, bank8k,   ROT0,
 
 GAME( 1992, sexappl,   0,        findout,   sexappl,  gei_state, bank8k,   ROT0, "Grayhound Electronics",  "Sex Appeal (Version 6.02)",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1992, geimulti,  0,        geimulti,  geimulti, gei_state, geimulti, ROT0, "Grayhound Electronics",  "GEI Multi Game",                         MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, geimulti,  0,        sprtauth,  geimulti, gei_state, geimulti, ROT0, "Grayhound Electronics",  "GEI Multi Game",                         MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1992, sprtauth,  0,        sprtauth,  sprtauth, gei_state, geimulti, ROT0, "Classic Games",          "Sports Authority",                       MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

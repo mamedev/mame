@@ -25,6 +25,12 @@
 #define MCFG_YMZ770_REPLACE(_tag, _clock) \
 	MCFG_DEVICE_REPLACE(_tag, YMZ770, _clock)
 
+#define MCFG_YMZ774_ADD(_tag, _clock) \
+	MCFG_DEVICE_ADD(_tag, YMZ774, _clock)
+
+#define MCFG_YMZ774_REPLACE(_tag, _clock) \
+	MCFG_DEVICE_REPLACE(_tag, YMZ774, _clock)
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -49,9 +55,15 @@ protected:
 
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
-	void internal_reg_write(uint8_t reg, uint8_t data);
+	virtual void internal_reg_write(uint8_t reg, uint8_t data);
+	virtual uint32_t get_phrase_offs(int phrase) { return m_rom[(4 * phrase) + 1] << 16 | m_rom[(4 * phrase) + 2] << 8 | m_rom[(4 * phrase) + 3]; };
+	virtual uint32_t get_seq_offs(int sqn) { return m_rom[(4 * sqn) + 1 + 0x400] << 16 | m_rom[(4 * sqn) + 2 + 0x400] << 8 | m_rom[(4 * sqn) + 3 + 0x400]; };
+	virtual void sequencer();
+
+	ymz770_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t sclock);
 
 	sound_stream *m_stream;
+	uint32_t m_sclock;
 
 	// data
 	uint8_t m_cur_reg;
@@ -62,13 +74,12 @@ protected:
 	uint8_t m_cpl;          // clip limiter
 	required_region_ptr<uint8_t> m_rom;
 
-private:
 	struct ymz_channel
 	{
-		uint8_t phrase;
+		uint16_t phrase;
 		uint8_t pan;
 		uint8_t volume;
-		uint8_t control;
+		uint8_t loop;
 
 		bool is_playing, last_block;
 
@@ -79,19 +90,40 @@ private:
 		int output_ptr;
 		int atbl;
 		int pptr;
-
-		uint8_t sequence;
+	};
+	struct ymz_sequence
+	{
+		uint16_t sequence;
 		uint8_t seqcontrol;
 		uint8_t seqdelay;
 		uint8_t *seqdata;
 		bool is_seq_playing;
 	};
 
-	ymz_channel m_channels[8];
+	ymz_channel m_channels[16];
+	ymz_sequence m_sequences[8];
 };
 
+// ======================> ymz774_device
+
+class ymz774_device : public ymz770_device
+{
+public:
+	// construction/destruction
+	ymz774_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	DECLARE_READ8_MEMBER(read);
+protected:
+	virtual void internal_reg_write(uint8_t reg, uint8_t data) override; 
+	virtual uint32_t get_phrase_offs(int phrase) override { return (m_rom[(4 * phrase) + 1] << 16 | m_rom[(4 * phrase) + 2] << 8 | m_rom[(4 * phrase) + 3]) * 2; };
+	virtual uint32_t get_seq_offs(int sqn) override { return (m_rom[(4 * sqn) + 1 + 0x2000] << 16 | m_rom[(4 * sqn) + 2 + 0x2000] << 8 | m_rom[(4 * sqn) + 3 + 0x2000]) * 2; };
+	virtual void sequencer() override {};
+private:
+	int m_bank;
+};
 
 // device type definition
 DECLARE_DEVICE_TYPE(YMZ770, ymz770_device)
+DECLARE_DEVICE_TYPE(YMZ774, ymz774_device)
 
 #endif // MAME_SOUND_YMZ770_H

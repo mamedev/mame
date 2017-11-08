@@ -306,7 +306,7 @@ static MACHINE_CONFIG_START( firebatl )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("custom", WIPING, 0)
+	MCFG_SOUND_ADD("custom", WIPING_CUSTOM, 96000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -346,7 +346,7 @@ static MACHINE_CONFIG_START( clshroad )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("custom", WIPING, 0)
+	MCFG_SOUND_ADD("custom", WIPING_CUSTOM, 96000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -560,15 +560,9 @@ ROM_END
 
 DRIVER_INIT_MEMBER(clshroad_state,firebatl)
 {
-/*
-Pugsy> firebatl:0:05C6:C3:100:Fix the Game:It's a hack but seems to make it work!
-Pugsy> firebatl:0:05C7:8D:600:Fix the Game (2/3)
-Pugsy> firebatl:0:05C8:23:600:Fix the Game (3/3)
-
-without this the death sequence never ends so the game is unplayable after you
-die once, it would be nice to avoid the hack however
-
-*/
+	// applying HACK to fix the game
+	// without this the death sequence never ends so the game is unplayable after you
+	// die once, it would be nice to avoid the hack however
 	uint8_t *ROM = memregion("maincpu")->base();
 
 	ROM[0x05C6] = 0xc3;

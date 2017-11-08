@@ -72,7 +72,7 @@ WRITE8_MEMBER( kaypro_state::kayproii_pio_system_w )
 	m_system_port = data;
 }
 
-WRITE8_MEMBER( kaypro_state::kaypro4_pio_system_w )
+WRITE8_MEMBER( kaypro_state::kayproiv_pio_system_w )
 {
 	kayproii_pio_system_w(space, offset, data);
 
@@ -82,19 +82,19 @@ WRITE8_MEMBER( kaypro_state::kaypro4_pio_system_w )
 
 /***********************************************************
 
-    KAYPRO2X SYSTEM PORT
+    KAYPRO484 SYSTEM PORT
 
     The PIOs were replaced by a few standard 74xx chips
 
 ************************************************************/
 
-READ8_MEMBER( kaypro_state::kaypro2x_system_port_r )
+READ8_MEMBER( kaypro_state::kaypro484_system_port_r )
 {
 	uint8_t data = m_centronics_busy << 6;
 	return (m_system_port & 0xbf) | data;
 }
 
-WRITE8_MEMBER( kaypro_state::kaypro2x_system_port_w )
+WRITE8_MEMBER( kaypro_state::kaypro484_system_port_w )
 {
 /*  d7 bank select
     d6 alternate character set (write only)
@@ -138,7 +138,7 @@ WRITE8_MEMBER( kaypro_state::kaypro2x_system_port_w )
 
     SIO
 
-    On Kaypro2x, Channel B on both SIOs is hardwired to 300 baud.
+    On Kaypro484, Channel B on both SIOs is hardwired to 300 baud.
 
     Both devices on sio2 (printer and modem) are not emulated.
 

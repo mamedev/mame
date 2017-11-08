@@ -11,6 +11,7 @@
 #include "audio/midway.h"
 #include "audio/williams.h"
 #include "machine/6840ptm.h"
+#include "machine/adc0844.h"
 #include "screen.h"
 
 class mcr68_state : public driver_device
@@ -21,6 +22,7 @@ public:
 		m_sounds_good(*this, "sg"),
 		m_turbo_cheap_squeak(*this, "tcs"),
 		m_cvsd_sound(*this, "cvsd"),
+		m_adc(*this, "adc"),
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram") ,
 		m_maincpu(*this, "maincpu"),
@@ -32,6 +34,7 @@ public:
 	optional_device<midway_sounds_good_device> m_sounds_good;
 	optional_device<midway_turbo_cheap_squeak_device> m_turbo_cheap_squeak;
 	optional_device<williams_cvsd_sound_device> m_cvsd_sound;
+	optional_device<adc0844_device> m_adc;
 
 	required_shared_ptr<uint16_t> m_videoram;
 	required_shared_ptr<uint16_t> m_spriteram;

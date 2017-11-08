@@ -20,41 +20,6 @@ public:
 		m_bg_videoram(*this, "bg_videoram"),
 		m_spriteram(*this, "spriteram") { }
 
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
-	optional_device<cpu_device> m_audio2;
-	optional_device<cpu_device> m_audio3;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
-	optional_device<generic_latch_8_device> m_soundlatch; // vsgongf only
-
-	required_shared_ptr<uint8_t> m_videoram;
-	optional_shared_ptr<uint8_t> m_colorram;
-	optional_shared_ptr<uint8_t> m_bg_videoram;
-	required_shared_ptr<uint8_t> m_spriteram;
-
-	tilemap_t *m_background;
-	tilemap_t *m_foreground;
-
-	//common
-	int m_flicker;
-	int m_textbank1;
-	int m_nmi_enabled;
-
-	// tsamurai and m660 specific
-	int m_bgcolor;
-	int m_sound_command1;
-	int m_sound_command2;
-
-	//m660 specific
-	int m_textbank2;
-	int m_sound_command3;
-
-	//vsgongf specific
-	int m_vsgongf_sound_nmi_enabled;
-	int m_vsgongf_color;
-	int m_key_count; //debug only
-
 	// common
 	DECLARE_WRITE_LINE_MEMBER(nmi_enable_w);
 	DECLARE_WRITE_LINE_MEMBER(coin1_counter_w);
@@ -93,23 +58,62 @@ public:
 	DECLARE_READ8_MEMBER(vsgongf_a100_r);
 	DECLARE_WRITE8_MEMBER(vsgongf_sound_command_w);
 
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	TILE_GET_INFO_MEMBER(get_vsgongf_tile_info);
-
-	virtual void machine_start() override;
 	DECLARE_MACHINE_START(m660);
 	DECLARE_MACHINE_START(tsamurai);
 	DECLARE_MACHINE_START(vsgongf);
-	virtual void video_start() override;
 	DECLARE_VIDEO_START(m660);
 	DECLARE_VIDEO_START(tsamurai);
 	DECLARE_VIDEO_START(vsgongf);
+	DECLARE_DRIVER_INIT(the26thz);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_vsgongf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
 
 	INTERRUPT_GEN_MEMBER(interrupt);
 	INTERRUPT_GEN_MEMBER(vsgongf_sound_interrupt);
+
+protected:
+	virtual void machine_start() override;
+	virtual void video_start() override;
+
+private:
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	optional_device<cpu_device> m_audio2;
+	optional_device<cpu_device> m_audio3;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	optional_device<generic_latch_8_device> m_soundlatch; // vsgongf only
+
+	required_shared_ptr<uint8_t> m_videoram;
+	optional_shared_ptr<uint8_t> m_colorram;
+	optional_shared_ptr<uint8_t> m_bg_videoram;
+	required_shared_ptr<uint8_t> m_spriteram;
+
+	tilemap_t *m_background;
+	tilemap_t *m_foreground;
+
+	//common
+	int m_flicker;
+	int m_textbank1;
+	int m_nmi_enabled;
+
+	// tsamurai and m660 specific
+	int m_bgcolor;
+	int m_sound_command1;
+	int m_sound_command2;
+
+	//m660 specific
+	int m_textbank2;
+	int m_sound_command3;
+
+	//vsgongf specific
+	int m_vsgongf_sound_nmi_enabled;
+	int m_vsgongf_color;
+	int m_key_count; //debug only
+
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	TILE_GET_INFO_MEMBER(get_vsgongf_tile_info);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
 };

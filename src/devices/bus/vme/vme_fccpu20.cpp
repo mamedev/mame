@@ -489,8 +489,8 @@ READ32_MEMBER (vme_fccpu20_device::bootvect_r)
 WRITE32_MEMBER (vme_fccpu20_device::bootvect_w)
 {
 	LOG("%s\n", FUNCNAME);
-	m_sysram[offset % sizeof(m_sysram)] &= ~mem_mask;
-	m_sysram[offset % sizeof(m_sysram)] |= (data & mem_mask);
+	m_sysram[offset % ARRAY_LENGTH(m_sysram)] &= ~mem_mask;
+	m_sysram[offset % ARRAY_LENGTH(m_sysram)] |= (data & mem_mask);
 	m_sysrom = &m_sysram[0]; // redirect all upcoming accesses to masking RAM until reset.
 }
 

@@ -8,10 +8,10 @@
     original "wiped off due of not anymore licenseable" driver by insideoutboy.
 
     TODO:
-	- priority might be wrong in some places (title screen stars around the 
+	- priority might be wrong in some places (title screen stars around the
 	  galaxy, planet ship 3rd boss, 2nd boss);
 	- sound chips (similar to Namco custom chips?)
-	
+
 ===============================================================================
 
 Flower (c)1986 Komax (USA license)
@@ -81,7 +81,7 @@ CHIP #  POSITION   TYPE
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
-#include "audio/wiping.h"
+#include "audio/flower.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -116,8 +116,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 	INTERRUPT_GEN_MEMBER(master_vblank_irq);
 	INTERRUPT_GEN_MEMBER(slave_vblank_irq);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info); 
-	TILE_GET_INFO_MEMBER(get_fg_tile_info); 
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
@@ -126,7 +126,7 @@ protected:
 	virtual void machine_reset() override;
 
 	virtual void video_start() override;
-	
+
 private:
 	required_device<cpu_device> m_mastercpu;
 	required_device<cpu_device> m_slavecpu;
@@ -142,10 +142,10 @@ private:
 	required_shared_ptr<uint8_t> m_fgscroll;
 	required_device<generic_latch_8_device> m_soundlatch;
 	bitmap_ind16 m_temp_bitmap;
-	
+
 	void draw_legacy_text(bitmap_ind16 &bitmap,const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
-	
+
 	bool m_audio_nmi_enable;
 	bool m_flip_screen;
 	tilemap_t *m_bg_tilemap;
@@ -155,7 +155,7 @@ private:
 TILE_GET_INFO_MEMBER(flower_state::get_bg_tile_info)
 {
 	int code = m_bgvram[tile_index];
-	int color = (m_bgvram[tile_index+0x100] & 0xf0) >> 4; 
+	int color = (m_bgvram[tile_index+0x100] & 0xf0) >> 4;
 
 	SET_TILE_INFO_MEMBER(1, code, color, 0);
 }
@@ -163,8 +163,8 @@ TILE_GET_INFO_MEMBER(flower_state::get_bg_tile_info)
 TILE_GET_INFO_MEMBER(flower_state::get_fg_tile_info)
 {
 	int code = m_fgvram[tile_index];
-	int color = (m_fgvram[tile_index+0x100] & 0xf0) >> 4; 
-	
+	int color = (m_fgvram[tile_index+0x100] & 0xf0) >> 4;
+
 	SET_TILE_INFO_MEMBER(1, code, color, 0);
 }
 
@@ -172,12 +172,12 @@ void flower_state::video_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(flower_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(flower_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
-	
-	m_screen->register_screen_bitmap(m_temp_bitmap);	
+
+	m_screen->register_screen_bitmap(m_temp_bitmap);
 	m_fg_tilemap->set_transparent_pen(15);
 
 	save_item(NAME(m_flip_screen));
-	
+
 	m_bg_tilemap->set_scrolldx(16, 0);
 	m_fg_tilemap->set_scrolldx(16, 0);
 }
@@ -214,7 +214,6 @@ void flower_state::draw_legacy_text(bitmap_ind16 &bitmap,const rectangle &clipre
 
 		gfx_0->transpen(bitmap,cliprect,tile,attr >> 2,0,0,x*8+256+16,y*8,3);
 	}
-
 }
 
 /*
@@ -230,7 +229,7 @@ void flower_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
 	uint8_t *spr_ptr = &m_workram[0x1e08];
 	gfx_element *gfx_2 = m_gfxdecode->gfx(2);
-	
+
 	// traverse from top to bottom
 	for(int i=0x1f0;i>=0;i-=8)
 	{
@@ -249,12 +248,12 @@ void flower_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 		uint32_t xshrink_zoom = ((spr_ptr[i+3] & 0x07) >> 0) + 1;
 		yshrink_zoom <<= 13;
 		xshrink_zoom <<= 13;
-		int ypixels = (yshrink_zoom*16) >> 16; 
+		int ypixels = (yshrink_zoom*16) >> 16;
 		int xpixels = (xshrink_zoom*16) >> 16;
-		
+
 		tile |= (attr & 1) << 6;
 		tile |= (attr & 8) << 4;
-		
+
 		if(flip_screen())
 		{
 			x += xsize*16;
@@ -264,16 +263,16 @@ void flower_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 
 		if(ysize == 2)
 			y-=16;
-		
+
 		for(int yi=0;yi<ysize;yi++)
 		{
 			int yoffs = (16-ypixels)/ydiv;
-			
+
 			for(int xi=0;xi<xsize;xi++)
 			{
 				int tile_offs;
 				int xoffs = (16-xpixels)/xdiv;
-				
+
 				tile_offs = fx ? (xsize-xi-1) * 8 : xi*8;
 				tile_offs+= fy ? (ysize-yi-1) : yi;
 
@@ -359,9 +358,8 @@ static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, flower_state )
 	AM_RANGE(0x4000, 0x4000) AM_WRITENOP // audio irq related (0 at start, 1 at end)
 	AM_RANGE(0x4001, 0x4001) AM_WRITE(audio_nmi_mask_w)
 	AM_RANGE(0x6000, 0x6000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	// TODO: wrong for this
-	AM_RANGE(0x8000, 0x803f) AM_DEVWRITE("wiping1", wiping_sound_device, sound_w)
-	AM_RANGE(0xa000, 0xa03f) AM_DEVWRITE("wiping2", wiping_sound_device, sound_w)
+	AM_RANGE(0x8000, 0x803f) AM_DEVWRITE("flower", flower_sound_device, lower_write)
+	AM_RANGE(0xa000, 0xa03f) AM_DEVWRITE("flower", flower_sound_device, upper_write)
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 ADDRESS_MAP_END
 
@@ -512,13 +510,10 @@ static MACHINE_CONFIG_START( flower )
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	
+
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("wiping1", WIPING, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	
-	MCFG_SOUND_ADD("wiping2", WIPING, 0)
+	MCFG_SOUND_ADD("flower", FLOWER_CUSTOM, 96000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -551,7 +546,7 @@ ROM_START( flower ) /* Komax version */
 	ROM_REGION( 0x8000, "samples", 0 )
 	ROM_LOAD( "4.12a",  0x0000, 0x8000, CRC(851ed9fd) SHA1(5dc048b612e45da529502bf33d968737a7b0a646) )  /* 8-bit samples */
 
-	ROM_REGION( 0x4000, "soundproms", 0 )
+	ROM_REGION( 0x4000, "soundvol", 0 )
 	ROM_LOAD( "5.16a",  0x0000, 0x4000, CRC(42fa2853) SHA1(cc1e8b8231d6f27f48b05d59390e93ea1c1c0e4c) )  /* volume tables? */
 
 	ROM_REGION( 0x300, "proms", 0 ) /* RGB proms */
@@ -594,7 +589,7 @@ ROM_START( flowerj ) /* Sega/Alpha version.  Sega game number 834-5998 */
 	ROM_REGION( 0x8000, "samples", 0 )
 	ROM_LOAD( "4.12a",  0x0000, 0x8000, CRC(851ed9fd) SHA1(5dc048b612e45da529502bf33d968737a7b0a646) )  /* 8-bit samples */
 
-	ROM_REGION( 0x4000, "soundproms", 0 )
+	ROM_REGION( 0x4000, "soundvol", 0 )
 	ROM_LOAD( "5.16a",  0x0000, 0x4000, CRC(42fa2853) SHA1(cc1e8b8231d6f27f48b05d59390e93ea1c1c0e4c) )  /* volume tables? */
 
 	ROM_REGION( 0x300, "proms", 0 ) /* RGB proms */
@@ -610,5 +605,5 @@ ROM_START( flowerj ) /* Sega/Alpha version.  Sega game number 834-5998 */
 ROM_END
 
 
-GAME( 1986, flower,  0,      flower, flower, flower_state, 0, ROT0, "Clarue (Komax license)",                   "Flower (US)",    MACHINE_NO_SOUND|MACHINE_IMPERFECT_GRAPHICS|MACHINE_NO_COCKTAIL )
-GAME( 1986, flowerj, flower, flower, flower, flower_state, 0, ROT0, "Clarue (Sega / Alpha Denshi Co. license)", "Flower (Japan)", MACHINE_NO_SOUND|MACHINE_IMPERFECT_GRAPHICS|MACHINE_NO_COCKTAIL )
+GAME( 1986, flower,  0,      flower, flower, flower_state, 0, ROT0, "Clarue (Komax license)",                   "Flower (US)",    MACHINE_IMPERFECT_SOUND|MACHINE_IMPERFECT_GRAPHICS|MACHINE_NO_COCKTAIL )
+GAME( 1986, flowerj, flower, flower, flower, flower_state, 0, ROT0, "Clarue (Sega / Alpha Denshi Co. license)", "Flower (Japan)", MACHINE_IMPERFECT_SOUND|MACHINE_IMPERFECT_GRAPHICS|MACHINE_NO_COCKTAIL )
