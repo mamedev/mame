@@ -48,6 +48,27 @@
 #define MCFG_ADC0844_CH4_CB(_devcb) \
 	devcb = &adc0844_device::set_ch4_callback(*device, DEVCB_##_devcb);
 
+#define MCFG_ADC0848_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, ADC0848, 0)
+
+#define MCFG_ADC0848_INTR_CB MCFG_ADC0844_INTR_CB
+#define MCFG_ADC0848_CH1_CB  MCFG_ADC0844_CH1_CB
+#define MCFG_ADC0848_CH2_CB  MCFG_ADC0844_CH2_CB
+#define MCFG_ADC0848_CH3_CB  MCFG_ADC0844_CH3_CB
+#define MCFG_ADC0848_CH4_CB  MCFG_ADC0844_CH4_CB
+
+#define MCFG_ADC0848_CH5_CB(_devcb) \
+	devcb = &adc0848_device::set_ch5_callback(*device, DEVCB_##_devcb);
+
+#define MCFG_ADC0848_CH6_CB(_devcb) \
+	devcb = &adc0848_device::set_ch6_callback(*device, DEVCB_##_devcb);
+
+#define MCFG_ADC0848_CH7_CB(_devcb) \
+	devcb = &adc0848_device::set_ch7_callback(*device, DEVCB_##_devcb);
+
+#define MCFG_ADC0848_CH8_CB(_devcb) \
+	devcb = &adc0848_device::set_ch8_callback(*device, DEVCB_##_devcb);
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -64,32 +85,32 @@ public:
 	{ return downcast<adc0844_device &>(device).m_intr_cb.set_callback(std::forward<Object>(cb)); }
 
 	template <class Object> static devcb_base &set_ch1_callback(device_t &device, Object &&cb)
-	{ return downcast<adc0844_device &>(device).m_channel_cb[0].set_callback(std::forward<Object>(cb)); }
+	{ return downcast<adc0844_device &>(device).m_ch1_cb.set_callback(std::forward<Object>(cb)); }
 
 	template <class Object> static devcb_base &set_ch2_callback(device_t &device, Object &&cb)
-	{ return downcast<adc0844_device &>(device).m_channel_cb[1].set_callback(std::forward<Object>(cb)); }
+	{ return downcast<adc0844_device &>(device).m_ch2_cb.set_callback(std::forward<Object>(cb)); }
 
 	template <class Object> static devcb_base &set_ch3_callback(device_t &device, Object &&cb)
-	{ return downcast<adc0844_device &>(device).m_channel_cb[2].set_callback(std::forward<Object>(cb)); }
+	{ return downcast<adc0844_device &>(device).m_ch3_cb.set_callback(std::forward<Object>(cb)); }
 
 	template <class Object> static devcb_base &set_ch4_callback(device_t &device, Object &&cb)
-	{ return downcast<adc0844_device &>(device).m_channel_cb[3].set_callback(std::forward<Object>(cb)); }
+	{ return downcast<adc0844_device &>(device).m_ch4_cb.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	virtual DECLARE_WRITE8_MEMBER(write);
 
 protected:
+	adc0844_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-private:
 	uint8_t clamp(int value);
 
 	// callbacks
 	devcb_write_line m_intr_cb;
-	devcb_read8 m_channel_cb[4];
+	devcb_read8 m_ch1_cb, m_ch2_cb, m_ch3_cb, m_ch4_cb;
 
 	emu_timer *m_conversion_timer;
 
@@ -98,7 +119,38 @@ private:
 	uint8_t m_result;
 };
 
+class adc0848_device : public adc0844_device
+{
+public:
+	// construction/destruction
+	adc0848_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	// configuration
+	template <class Object> static devcb_base &set_ch5_callback(device_t &device, Object &&cb)
+	{ return downcast<adc0848_device &>(device).m_ch5_cb.set_callback(std::forward<Object>(cb)); }
+
+	template <class Object> static devcb_base &set_ch6_callback(device_t &device, Object &&cb)
+	{ return downcast<adc0848_device &>(device).m_ch6_cb.set_callback(std::forward<Object>(cb)); }
+
+	template <class Object> static devcb_base &set_ch7_callback(device_t &device, Object &&cb)
+	{ return downcast<adc0848_device &>(device).m_ch7_cb.set_callback(std::forward<Object>(cb)); }
+
+	template <class Object> static devcb_base &set_ch8_callback(device_t &device, Object &&cb)
+	{ return downcast<adc0848_device &>(device).m_ch8_cb.set_callback(std::forward<Object>(cb)); }
+
+	virtual DECLARE_WRITE8_MEMBER(write) override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+private:
+	devcb_read8 m_ch5_cb, m_ch6_cb, m_ch7_cb, m_ch8_cb;
+};
+
 // device type definition
 DECLARE_DEVICE_TYPE(ADC0844, adc0844_device)
+DECLARE_DEVICE_TYPE(ADC0848, adc0848_device)
 
 #endif // MAME_DEVICES_MACHINE_ADC0844_H
