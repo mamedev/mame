@@ -659,7 +659,7 @@ void pgm2_state::draw_sprites(screen_device &screen, const rectangle &cliprect, 
 			int pri =   (spriteram[i + 0] & 0x80000000) >> 31;
 
 			int sizex = (spriteram[i + 1] & 0x0000003f) >> 0;
-			int sizey = (spriteram[i + 1] & 0x00003fc0) >> 6;
+			int sizey = (spriteram[i + 1] & 0x00007fc0) >> 6;
 			int flipx = (spriteram[i + 1] & 0x00800000) >> 23;
 			int flipy = (spriteram[i + 1] & 0x80000000) >> 31; // more of a 'reverse entire drawing' flag than y-flip, but used for that purpose
 
@@ -794,7 +794,7 @@ uint32_t pgm2_state::screen_update_pgm2(screen_device &screen, bitmap_rgb32 &bit
 
 	const pen_t *paldata = m_bg_palette->pens();
 
-	bitmap.fill(paldata[0x2f0], cliprect); // is there a bg pen register, this is incorrect (stage with 'spider web' floor in orlegend2)
+	bitmap.fill(paldata[0], cliprect); // are there any places bg pen is showing so we know what it should be?
 
 	draw_sprites(screen, cliprect, m_spritebufferram.get());
 
