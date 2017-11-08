@@ -656,7 +656,7 @@ void pgm2_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const
 			int palette_offset = (m_sp_videoram[i + 3]);
 
 			if (x & 0x400) x -=0x800;
-			if (y & 0x200) y -=0x400;
+			if (y & 0x400) y -=0x800;
 
 			mask_offset &= 0x3ffffff;
 			palette_offset &= 0x7ffffff;
