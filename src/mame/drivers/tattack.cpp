@@ -59,16 +59,20 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode") { }
 
-	required_shared_ptr<uint8_t> m_videoram;
-	required_shared_ptr<uint8_t> m_colorram;
-	tilemap_t *m_tmap;
+//	DECLARE_WRITE8_MEMBER(paddle_w);
+	DECLARE_WRITE8_MEMBER(ball_w);
 	DECLARE_DRIVER_INIT(tattack);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(tattack);
 	uint32_t screen_update_tattack(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+private:
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_colorram;
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	tilemap_t *m_tmap;
+	uint8_t m_ball_regs[2];
 };
 
 
@@ -91,14 +95,40 @@ TILE_GET_INFO_MEMBER(tattack_state::get_tile_info)
 
 uint32_t tattack_state::screen_update_tattack(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	const uint8_t white_pen = 0xf;
+
 	m_tmap->mark_all_dirty();
 	m_tmap->draw(screen, bitmap, cliprect, 0,0);
+
+	// draw ball
+	for(int xi=0;xi<4;xi++)
+		for(int yi=0;yi<4;yi++)
+		{
+			int resx = m_ball_regs[0]+xi-2;
+			int resy = m_ball_regs[1]+yi;
+
+			if(cliprect.contains(resx,resy))
+				bitmap.pix16(resy, resx) = (white_pen);
+		}
+
 	return 0;
 }
 
 void tattack_state::video_start()
 {
 	m_tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tattack_state::get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32 );
+}
+
+#if 0
+WRITE8_MEMBER(tattack_state::paddle_w)
+{
+	// ...
+}
+#endif
+
+WRITE8_MEMBER(tattack_state::ball_w)
+{
+	m_ball_regs[offset] = data;
 }
 
 static ADDRESS_MAP_START( mem, AS_PROGRAM, 8, tattack_state )
@@ -110,7 +140,8 @@ static ADDRESS_MAP_START( mem, AS_PROGRAM, 8, tattack_state )
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("DSW1")       // dsw ? something else ?
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("INPUTS") AM_WRITENOP
 	AM_RANGE(0xc001, 0xc002) AM_WRITENOP                // bit 7 = strobe ($302)
-	AM_RANGE(0xc005, 0xc007) AM_WRITENOP
+	AM_RANGE(0xc005, 0xc005) AM_WRITENOP
+	AM_RANGE(0xc006, 0xc007) AM_WRITE(ball_w)
 	AM_RANGE(0xe000, 0xe3ff) AM_RAM
 ADDRESS_MAP_END
 
