@@ -25,7 +25,7 @@
 
 #define MCFG_IBM5160_MOTHERBOARD_ADD(_tag, _cputag) \
 	MCFG_DEVICE_ADD(_tag, IBM5160_MOTHERBOARD, 0) \
-	ibm5160_mb_device::static_set_cputag(*device, _cputag);
+	ibm5160_mb_device::static_set_cputag(*device, "^" _cputag);
 // ======================> ibm5160_mb_device
 class ibm5160_mb_device : public device_t
 {
@@ -116,8 +116,6 @@ protected:
 	DECLARE_WRITE_LINE_MEMBER( pc_dack2_w );
 	DECLARE_WRITE_LINE_MEMBER( pc_dack3_w );
 
-	const char *m_cputag;
-
 	void pc_select_dma_channel(int channel, bool state);
 };
 
@@ -128,7 +126,7 @@ DECLARE_DEVICE_TYPE(IBM5160_MOTHERBOARD, ibm5160_mb_device)
 
 #define MCFG_IBM5150_MOTHERBOARD_ADD(_tag, _cputag) \
 	MCFG_DEVICE_ADD(_tag, IBM5150_MOTHERBOARD, 0) \
-	ibm5150_mb_device::static_set_cputag(*device, _cputag);
+	ibm5150_mb_device::static_set_cputag(*device, "^" _cputag);
 
 // ======================> ibm5150_mb_device
 class ibm5150_mb_device : public ibm5160_mb_device
@@ -160,7 +158,7 @@ DECLARE_DEVICE_TYPE(IBM5150_MOTHERBOARD, ibm5150_mb_device)
 
 #define MCFG_EC1841_MOTHERBOARD_ADD(_tag, _cputag) \
 	MCFG_DEVICE_ADD(_tag, EC1841_MOTHERBOARD, 0) \
-	ec1841_mb_device::static_set_cputag(*device, _cputag);
+	ec1841_mb_device::static_set_cputag(*device, "^" _cputag);
 
 class ec1841_mb_device : public ibm5160_mb_device
 {
@@ -185,7 +183,7 @@ DECLARE_DEVICE_TYPE(EC1841_MOTHERBOARD, ec1841_mb_device)
 
 #define MCFG_PCNOPPI_MOTHERBOARD_ADD(_tag, _cputag) \
 	MCFG_DEVICE_ADD(_tag, PCNOPPI_MOTHERBOARD, 0) \
-	pc_noppi_mb_device::static_set_cputag(*device, _cputag);
+	pc_noppi_mb_device::static_set_cputag(*device, "^" _cputag);
 
 class pc_noppi_mb_device : public ibm5160_mb_device
 {

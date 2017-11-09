@@ -494,7 +494,7 @@ ioport_constructor ibm5160_mb_device::device_input_ports() const
 void ibm5160_mb_device::static_set_cputag(device_t &device, const char *tag)
 {
 	ibm5160_mb_device &board = downcast<ibm5160_mb_device &>(device);
-	board.m_cputag = tag;
+	board.m_maincpu.set_tag(tag);
 }
 
 //**************************************************************************
@@ -517,7 +517,7 @@ ibm5160_mb_device::ibm5160_mb_device(
 		device_t *owner,
 		uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
-	, m_maincpu(*owner, "maincpu")
+	, m_maincpu(*this, finder_base::DUMMY_TAG)
 	, m_pic8259(*this, "pic8259")
 	, m_pit8253(*this, "pit8253")
 	, m_dma8237(*this, "dma8237")
