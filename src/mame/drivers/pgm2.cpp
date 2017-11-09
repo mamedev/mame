@@ -95,15 +95,15 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	
+private:
 	uint32_t m_irqs_enabled;
 	uint32_t m_current_irq_vector;
 	uint32_t m_current_firq_vector;
 
-	devcb_write_line    m_irq_out;
-
-private:
 	uint32_t m_aic_smr[32];
 	uint32_t m_aic_svr[32];
+
+	devcb_write_line    m_irq_out;
 };
 
 DEFINE_DEVICE_TYPE(ARM_AIC, arm_aic_device, "arm_aic", "ARM Advanced Interrupt Controller")
@@ -143,6 +143,14 @@ READ32_MEMBER(arm_aic_device::firq_vector_r)
 void arm_aic_device::device_start()
 {
 	m_irq_out.resolve_safe();
+
+	save_item(NAME(m_irqs_enabled));
+	save_item(NAME(m_current_irq_vector));
+	save_item(NAME(m_current_firq_vector));
+
+	save_item(NAME(m_aic_smr));
+	save_item(NAME(m_aic_svr));
+
 }
 
 void arm_aic_device::device_reset()
@@ -186,6 +194,9 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
+		m_lineram(*this, "lineram"),
+		m_sp_zoom(*this, "sp_zoom"),
+		m_mainram(*this, "mainram"),
 		m_fg_videoram(*this, "fg_videoram"),
 		m_bg_videoram(*this, "bg_videoram"),
 		m_sp_videoram(*this, "sp_videoram"),
@@ -246,6 +257,9 @@ private:
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
+	required_shared_ptr<uint32_t> m_lineram;
+	required_shared_ptr<uint32_t> m_sp_zoom;
+	required_shared_ptr<uint32_t> m_mainram;
 	required_shared_ptr<uint32_t> m_fg_videoram;
 	required_shared_ptr<uint32_t> m_bg_videoram;
 	required_shared_ptr<uint32_t> m_sp_videoram;
@@ -301,9 +315,9 @@ static ADDRESS_MAP_START( pgm2_map, AS_PROGRAM, 32, pgm2_state )
 	AM_RANGE(0x03a00000, 0x03a00003) AM_READ_PORT("INPUTS1")
 
 	AM_RANGE(0x10000000, 0x107fffff) AM_ROM AM_REGION("user1", 0) // external ROM
-	AM_RANGE(0x20000000, 0x207fffff) AM_RAM
+	AM_RANGE(0x20000000, 0x207fffff) AM_RAM AM_SHARE("mainram")
 
-	AM_RANGE(0x30000000, 0x30000fff) AM_RAM AM_SHARE("sp_videoram") // spriteram (size unknown, never read, only written)
+	AM_RANGE(0x30000000, 0x30001fff) AM_RAM AM_SHARE("sp_videoram") // spriteram ('move' ram in test mode)
 
 	AM_RANGE(0x30020000, 0x30021fff) AM_RAM_WRITE(bg_videoram_w) AM_SHARE("bg_videoram")
 	AM_RANGE(0x30040000, 0x30045fff) AM_RAM_WRITE(fg_videoram_w) AM_SHARE("fg_videoram")
@@ -314,10 +328,10 @@ static ADDRESS_MAP_START( pgm2_map, AS_PROGRAM, 32, pgm2_state )
 
 	AM_RANGE(0x300a0000, 0x300a07ff) AM_RAM_DEVWRITE("tx_palette", palette_device, write) AM_SHARE("tx_palette") 
 
-	AM_RANGE(0x300c0000, 0x300c01ff) AM_RAM // sprite zoom table?
-	AM_RANGE(0x300e0000, 0x300e03bf) AM_RAM // unknown
+	AM_RANGE(0x300c0000, 0x300c01ff) AM_RAM AM_SHARE("sp_zoom") // sprite zoom table?
+	AM_RANGE(0x300e0000, 0x300e03bf) AM_RAM AM_SHARE("lineram") // linescroll - 0x3bf is enough bytes for 240 lines if each rowscroll value was 8 bytes, but each row is 4, so only half of this is used? or tx can do it too (unlikely, as orl2 writes 256 lines of data) maybe just bad mem check bounds on orleg2, it reports pass even if it fails the first byte!
 
-	AM_RANGE(0x30100000, 0x301000ff) AM_RAM // maybe linescroll?
+	AM_RANGE(0x30100000, 0x301000ff) AM_RAM // unknown 
 
 	AM_RANGE(0x30120000, 0x3012003f) AM_RAM AM_SHARE("vid_regs") // scroll etc.?
 
@@ -635,12 +649,12 @@ void pgm2_state::draw_sprites(screen_device &screen, const rectangle &cliprect, 
 
 //	printf("frame\n");
 
-	for (int i = 0;i < 0x1000 / 4;i++)
+	for (int i = 0;i < 0x2000 / 4;i++)
 	{
 		if (spriteram[i] == 0x80000000)
 		{
 			endoflist = i;
-			i = 0x1000;
+			i = 0x2000;
 		}
 	}
 
@@ -790,7 +804,12 @@ void pgm2_state::copy_sprites_from_bitmap(screen_device &screen, bitmap_rgb32 &b
 uint32_t pgm2_state::screen_update_pgm2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->set_scrolly(0, (m_vid_regs[0x0/4] & 0xffff0000)>>16 );
-	m_bg_tilemap->set_scrollx(0, (m_vid_regs[0x0/4] & 0x0000ffff)>>0 );
+
+	for (int y = 0; y < 224; y++)
+	{
+		uint16_t linescroll = (y & 1) ? ((m_lineram[(y >> 1)] & 0xffff0000) >> 16) : (m_lineram[(y >> 1)] & 0x0000ffff);
+		m_bg_tilemap->set_scrollx((y + ((m_vid_regs[0x0 / 4] & 0xffff0000) >> 16)) & 0x3ff, ((m_vid_regs[0x0 / 4] & 0x0000ffff) >> 0) + linescroll);
+	}
 
 	const pen_t *paldata = m_bg_palette->pens();
 
@@ -813,7 +832,7 @@ WRITE_LINE_MEMBER(pgm2_state::screen_vblank_pgm2)
 	// rising edge
 	if (state)
 	{
-		memcpy(m_spritebufferram.get(), m_sp_videoram, 0x1000);
+		memcpy(m_spritebufferram.get(), m_sp_videoram, 0x2000);
 	}
 }
 
@@ -863,13 +882,13 @@ void pgm2_state::video_start()
 
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode3, tilemap_get_info_delegate(FUNC(pgm2_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 32, 32, 64, 32); // 0x2000 bytes
 	m_bg_tilemap->set_transparent_pen(0);
+	m_bg_tilemap->set_scroll_rows(32 * 32);
 
-	m_spritebufferram = make_unique_clear<uint32_t[]>(0x1000/4);
+	m_spritebufferram = make_unique_clear<uint32_t[]>(0x2000/4);
 
 	m_screen->register_screen_bitmap(m_sprite_bitmap);
 
-	save_pointer(NAME(m_spritebufferram.get()), 0x1000/4);
-
+	save_pointer(NAME(m_spritebufferram.get()), 0x2000/4);
 }
 
 void pgm2_state::machine_start()
