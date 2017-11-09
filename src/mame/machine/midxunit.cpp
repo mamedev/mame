@@ -28,6 +28,7 @@ void midxunit_state::register_state_saving()
 	save_item(NAME(m_ioshuffle));
 	save_item(NAME(m_uart));
 	save_item(NAME(m_security_bits));
+	save_item(NAME(m_adc_int));
 }
 
 
@@ -102,6 +103,12 @@ WRITE16_MEMBER(midxunit_state::midxunit_unknown_w)
 }
 
 
+WRITE_LINE_MEMBER(midxunit_state::adc_int_w)
+{
+	m_adc_int = (state != CLEAR_LINE);
+}
+
+
 
 /*************************************
  *
@@ -109,32 +116,10 @@ WRITE16_MEMBER(midxunit_state::midxunit_unknown_w)
  *
  *************************************/
 
-READ16_MEMBER(midxunit_state::midxunit_io_r)
-{
-	static const char *const portnames[] = { "IN0", "IN1", "IN2", "DSW" };
-
-	offset = (offset / 2) % 8;
-
-	switch (offset)
-	{
-		case 0:
-		case 1:
-		case 2:
-		case 3:
-			return ioport(portnames[offset])->read();
-
-		default:
-			logerror("%08X:Unknown I/O read from %d\n", space.device().safe_pc(), offset);
-			break;
-	}
-	return ~0;
-}
-
-
 READ16_MEMBER(midxunit_state::midxunit_status_r)
 {
 	/* low bit indicates whether the ADC is done reading the current input */
-	return (m_midway_serial_pic->status_r(space,0) << 1) | 1;
+	return (m_midway_serial_pic->status_r(space,0) << 1) | (m_adc_int ? 1 : 0);
 }
 
 

@@ -110,7 +110,10 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, midxunit_state )
 	AM_RANGE(0x20000000, 0x20ffffff) AM_RAM
 	AM_RANGE(0x40800000, 0x4fffffff) AM_WRITE(midxunit_unknown_w)
 	AM_RANGE(0x60400000, 0x6040001f) AM_READWRITE(midxunit_status_r, midxunit_security_clock_w)
-	AM_RANGE(0x60c00000, 0x60c0007f) AM_READ(midxunit_io_r)
+	AM_RANGE(0x60c00000, 0x60c0001f) AM_READ_PORT("IN0")
+	AM_RANGE(0x60c00020, 0x60c0003f) AM_READ_PORT("IN1")
+	AM_RANGE(0x60c00040, 0x60c0005f) AM_READ_PORT("IN2")
+	AM_RANGE(0x60c00060, 0x60c0007f) AM_READ_PORT("DSW")
 	AM_RANGE(0x60c00080, 0x60c000df) AM_WRITE(midxunit_io_w)
 	AM_RANGE(0x60c000e0, 0x60c000ff) AM_READWRITE(midxunit_security_r, midxunit_security_w)
 	AM_RANGE(0x80800000, 0x8080000f) AM_DEVREADWRITE8("adc", adc0848_device, read, write, 0x00ff)
@@ -267,7 +270,7 @@ static MACHINE_CONFIG_START( midxunit )
 	MCFG_MIDWAY_SERIAL_PIC_UPPER(419);
 
 	MCFG_ADC0848_ADD("adc")
-	MCFG_ADC0848_INTR_CB(NOOP) // passed through PLSI1032; what does ADC INT actually map to?
+	MCFG_ADC0848_INTR_CB(WRITELINE(midxunit_state, adc_int_w)) // ADC INT passed through PLSI1032
 	MCFG_ADC0848_CH1_CB(IOPORT("AN0"))
 	MCFG_ADC0848_CH2_CB(IOPORT("AN1"))
 	MCFG_ADC0848_CH3_CB(IOPORT("AN2"))

@@ -20,7 +20,7 @@ public:
 	DECLARE_WRITE16_MEMBER(midxunit_cmos_w);
 	DECLARE_WRITE16_MEMBER(midxunit_io_w);
 	DECLARE_WRITE16_MEMBER(midxunit_unknown_w);
-	DECLARE_READ16_MEMBER(midxunit_io_r);
+	DECLARE_WRITE_LINE_MEMBER(adc_int_w);
 	DECLARE_READ16_MEMBER(midxunit_status_r);
 	DECLARE_READ16_MEMBER(midxunit_uart_r);
 	DECLARE_WRITE16_MEMBER(midxunit_uart_w);
@@ -45,4 +45,5 @@ private:
 	uint8_t m_ioshuffle[16];
 	uint8_t m_uart[8];
 	uint8_t m_security_bits;
+	bool m_adc_int;
 };
