@@ -570,10 +570,6 @@ WRITE8_MEMBER(ppking_state::ppking_qx1_w)
 	}
 }
 
-WRITE8_MEMBER(ppking_state::ppking_qx2_w)
-{
-}
-
 WRITE8_MEMBER(ppking_state::ppking_qx3_w)
 {
 }
@@ -591,17 +587,17 @@ READ8_MEMBER(ppking_state::ppking_qx1_r)
 	return m_soundlatch2->read(space,0);
 }
 
-READ8_MEMBER(ppking_state::ppking_qx2_r)
-{
-	return machine().rand();
-}
-
 READ8_MEMBER(ppking_state::ppking_qx3_r)
 {
-	return machine().rand()&0xf;
+	if(offset == 1)
+		return 1;
+	
+	return 0;
 }
 
-// serial communication with another board
+// serial communication with another board (COMU in service mode)
+// NMI is used to acquire data from the other board,
+// either sent via 1->0 poll of the 0xc003 port or by reading 0xc0c0 (former more likely)
 READ8_MEMBER(ppking_state::ppking_qxcomu_r)
 {
 	if(offset == 1)
@@ -655,7 +651,6 @@ static ADDRESS_MAP_START( ppking_cpu2_io, AS_IO, 8, ppking_state )
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
 	AM_RANGE(0x20, 0x21) AM_READ(ppking_qx1_r) AM_WRITE(ppking_qx1_w)
 	AM_RANGE(0x40, 0x40) AM_WRITE(cpu2_irq_ack_w)
-	AM_RANGE(0x60, 0x61) AM_READWRITE(ppking_qx2_r,ppking_qx2_w) // unaccessed, probably leftover
 	AM_RANGE(0x80, 0x81) AM_READWRITE(ppking_qx3_r,ppking_qx3_w)
 	AM_RANGE(0xe0, 0xe0) AM_WRITE(adpcm_command_w)
 ADDRESS_MAP_END
@@ -776,10 +771,12 @@ static INPUT_PORTS_START( ppking )
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Free_Play ) ) PORT_DIPLOCATION("SW3:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x02, 0x00, "Round" ) PORT_DIPLOCATION("SW3:2")
-	PORT_DIPSETTING(    0x00, "Normal" )
-	PORT_DIPSETTING(    0x02, "Free" )
-	PORT_DIPNAME( 0x04, 0x00, "Backup Clear" ) PORT_DIPLOCATION("SW3:3")
+	// Round -> Normal/Round Free in manual, allows player to continue playing even if he loses
+	PORT_DIPNAME( 0x02, 0x00, "Win Round even when losing (Cheat)" ) PORT_DIPLOCATION("SW3:2")
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Yes ) )
+	// Happens at reset
+	PORT_DIPNAME( 0x04, 0x00, "Backup RAM Clear" ) PORT_DIPLOCATION("SW3:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Yes ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPUNUSED_DIPLOC( 0x08, 0x00, "SW3:4" )
@@ -1470,7 +1467,7 @@ DRIVER_INIT_MEMBER(ppking_state, ppking)
 
 
 
-GAME( 1985, ppking,   0,        ppking,   ppking,   ppking_state,   ppking,   ROT90, "Taito America Corporation", "Ping-Pong King", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL | MACHINE_NODEVICE_LAN )
+GAME( 1985, ppking,   0,        ppking,   ppking,   ppking_state,   ppking,   ROT90, "Taito America Corporation", "Ping-Pong King", MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL | MACHINE_NODEVICE_LAN )
 GAME( 1986, gladiatr, 0,        gladiatr, gladiatr, gladiatr_state, gladiatr, ROT0,  "Allumer / Taito America Corporation", "Gladiator (US)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, ogonsiro, gladiatr, gladiatr, gladiatr, gladiatr_state, gladiatr, ROT0,  "Allumer / Taito Corporation", "Ougon no Shiro (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, greatgur, gladiatr, gladiatr, gladiatr, gladiatr_state, gladiatr, ROT0,  "Allumer / Taito Corporation", "Great Gurianos (Japan?)", MACHINE_SUPPORTS_SAVE )

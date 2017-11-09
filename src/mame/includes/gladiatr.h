@@ -166,9 +166,7 @@ public:
 	DECLARE_READ8_MEMBER(ppking_f1_r);
 	DECLARE_WRITE8_MEMBER(ppking_qx0_w);
 	DECLARE_WRITE8_MEMBER(ppking_qx1_w);
-	DECLARE_WRITE8_MEMBER(ppking_qx2_w);
 	DECLARE_WRITE8_MEMBER(ppking_qx3_w);
-	DECLARE_READ8_MEMBER(ppking_qx2_r);
 	DECLARE_READ8_MEMBER(ppking_qx3_r);
 	DECLARE_READ8_MEMBER(ppking_qx0_r);
 	DECLARE_READ8_MEMBER(ppking_qx1_r);
