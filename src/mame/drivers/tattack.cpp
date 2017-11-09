@@ -54,9 +54,10 @@ class tattack_state : public driver_device
 public:
 	tattack_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_ram(*this, "ram"),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
-		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode") { }
 
 //	DECLARE_WRITE8_MEMBER(paddle_w);
@@ -67,12 +68,15 @@ public:
 	DECLARE_PALETTE_INIT(tattack);
 	uint32_t screen_update_tattack(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 private:
+	required_device<cpu_device> m_maincpu;
+	required_shared_ptr<uint8_t> m_ram;
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
-	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	tilemap_t *m_tmap;
 	uint8_t m_ball_regs[2];
+	
+	void draw_gameplay_bitmap(bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -93,23 +97,61 @@ TILE_GET_INFO_MEMBER(tattack_state::get_tile_info)
 		0);
 }
 
-uint32_t tattack_state::screen_update_tattack(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void tattack_state::draw_gameplay_bitmap(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	const uint8_t white_pen = 0xf;
-
-	m_tmap->mark_all_dirty();
-	m_tmap->draw(screen, bitmap, cliprect, 0,0);
-
-	// draw ball
-	for(int xi=0;xi<4;xi++)
-		for(int yi=0;yi<4;yi++)
+	const uint8_t green_pen = 0x5;
+	const uint8_t yellow_pen = 0x7;
+	uint16_t ram_offs;
+	const int x_base = -8;
+	int xi,yi;
+	
+	
+	// draw wall pattern
+	for(ram_offs=0x50;ram_offs<0x5e;ram_offs++)
+	{
+		uint8_t cur_column = m_ram[ram_offs];
+		
+		for(int bit=7;bit>-1;bit--)
 		{
-			int resx = m_ball_regs[0]+xi-2;
+			bool draw_block = ((cur_column >> bit) & 1) == 1;
+			
+			if(draw_block == true)
+			{
+				for(xi=0;xi<3;xi++)
+				{
+					for(yi=0;yi<15;yi++)
+					{
+						int resx = bit*4+xi+160+x_base;
+						int resy = (ram_offs & 0xf)*16+yi+16;
+						
+						if(cliprect.contains(resx,resy))
+							bitmap.pix16(resy, resx) = (bit & 4 ? yellow_pen : green_pen);
+					}
+				}
+			}
+		}
+	}
+		
+	// draw ball
+	for(xi=0;xi<4;xi++)
+		for(yi=0;yi<4;yi++)
+		{
+			int resx = m_ball_regs[0]+xi-2+x_base;
 			int resy = m_ball_regs[1]+yi;
 
 			if(cliprect.contains(resx,resy))
 				bitmap.pix16(resy, resx) = (white_pen);
 		}
+}
+
+uint32_t tattack_state::screen_update_tattack(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+
+	m_tmap->mark_all_dirty();
+	m_tmap->draw(screen, bitmap, cliprect, 0,0);
+
+	draw_gameplay_bitmap(bitmap, cliprect);
 
 	return 0;
 }
@@ -133,7 +175,7 @@ WRITE8_MEMBER(tattack_state::ball_w)
 
 static ADDRESS_MAP_START( mem, AS_PROGRAM, 8, tattack_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
-//  AM_RANGE(0x4000, 0x4000) AM_READNOP $315
+	AM_RANGE(0x4000, 0x4000) AM_READNOP // $315, checks again with same memory, loops if different (?)
 	AM_RANGE(0x5000, 0x53ff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x7000, 0x73ff) AM_RAM AM_SHARE("colorram")    // color map ? something else .. only bits 1-3 are used
 	AM_RANGE(0x6000, 0x6000) AM_READ_PORT("DSW2")
@@ -142,21 +184,21 @@ static ADDRESS_MAP_START( mem, AS_PROGRAM, 8, tattack_state )
 	AM_RANGE(0xc001, 0xc002) AM_WRITENOP                // bit 7 = strobe ($302)
 	AM_RANGE(0xc005, 0xc005) AM_WRITENOP
 	AM_RANGE(0xc006, 0xc007) AM_WRITE(ball_w)
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM
+	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_SHARE("ram")
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( tattack )
 	PORT_START("INPUTS")
-	PORT_DIPNAME( 0x01, 0x00, "1-01" )
+	PORT_DIPNAME( 0x01, 0x00, "1-01" ) // reset switch?
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, "1-02" )
+	PORT_DIPNAME( 0x02, 0x02, "1-02" )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, "1-03" )
+	PORT_DIPNAME( 0x04, 0x04, "1-03" )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, "1-04" )
+	PORT_DIPNAME( 0x08, 0x08, "1-04" )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON3 )
@@ -299,18 +341,18 @@ ROM_END
 
 DRIVER_INIT_MEMBER(tattack_state,tattack)
 {
-	uint8_t *rom = memregion("maincpu")->base();
+//	uint8_t *rom = memregion("maincpu")->base();
 
-	rom[0x1b4]=0;
-	rom[0x1b5]=0;
+//	rom[0x1b4]=0;
+//	rom[0x1b5]=0;
 
-	rom[0x262]=0;
-	rom[0x263]=0;
-	rom[0x264]=0;
+//	rom[0x262]=0;
+//	rom[0x263]=0;
+//	rom[0x264]=0;
 
-	rom[0x32a]=0;
-	rom[0x32b]=0;
-	rom[0x32c]=0;
+//	rom[0x32a]=0;
+//	rom[0x32b]=0;
+//	rom[0x32c]=0;
 
 /*
     possible jumps to 0 (protection checks?)
