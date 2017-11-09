@@ -77,6 +77,11 @@ private:
 	uint8_t m_ball_regs[2];
 	
 	void draw_gameplay_bitmap(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_edge_bitmap(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	
+	static const uint8_t white_pen = 0xf;
+	static const uint8_t green_pen = 0x5;
+	static const uint8_t yellow_pen = 0x7;
 };
 
 
@@ -97,17 +102,24 @@ TILE_GET_INFO_MEMBER(tattack_state::get_tile_info)
 		0);
 }
 
+void tattack_state::draw_edge_bitmap(bitmap_ind16 &bitmap, const rectangle &cliprect)
+{	
+	// left column
+	bitmap.plot_box(0,16,216,4,white_pen);
+	// upper row
+	bitmap.plot_box(216,16,6,226,white_pen);
+	// right column
+	bitmap.plot_box(0,238,216,4,white_pen);
+	// TODO: fourth line on bottom, definitely has an enable somewhere ...
+}
+
 void tattack_state::draw_gameplay_bitmap(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	const uint8_t white_pen = 0xf;
-	const uint8_t green_pen = 0x5;
-	const uint8_t yellow_pen = 0x7;
 	uint16_t ram_offs;
 	const int x_base = -8;
 	int xi,yi;
 	
-	
-	// draw wall pattern
+	// draw brick pattern
 	for(ram_offs=0x50;ram_offs<0x5e;ram_offs++)
 	{
 		uint8_t cur_column = m_ram[ram_offs];
@@ -147,11 +159,14 @@ void tattack_state::draw_gameplay_bitmap(bitmap_ind16 &bitmap, const rectangle &
 
 uint32_t tattack_state::screen_update_tattack(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	m_tmap->mark_all_dirty();
 	m_tmap->draw(screen, bitmap, cliprect, 0,0);
-
+	
+	// draw bricks/ball/paddle
 	draw_gameplay_bitmap(bitmap, cliprect);
+	// draw edges
+	// probably enables thru 0xe040?
+	draw_edge_bitmap(bitmap,cliprect);
 
 	return 0;
 }
@@ -293,7 +308,7 @@ PALETTE_INIT_MEMBER(tattack_state, tattack)
 		else
 			r=g=b=128;
 
-		palette.set_pen_color(2*i,rgb_t(0x00,0x00,0x00));
+		palette.set_pen_color(2*i,rgb_t(0x00,0x00,0xff));
 		palette.set_pen_color(2*i+1,rgb_t(r,g,b));
 	}
 }
@@ -311,7 +326,7 @@ static MACHINE_CONFIG_START( tattack )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
+	MCFG_SCREEN_VISIBLE_AREA(24, 256-32-1, 13, 256-11-1)
 	MCFG_SCREEN_UPDATE_DRIVER(tattack_state, screen_update_tattack)
 	MCFG_SCREEN_PALETTE("palette")
 
