@@ -37,12 +37,13 @@ public:
 		, m_p_ram(*this, "ram")
 		{ }
 
+private:
 	virtual void machine_reset() override;
 	required_device<tms9995_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_p_ram;
 };
 
-static ADDRESS_MAP_START( cortex_mem, AS_PROGRAM, 8, cortex_state )
+static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, cortex_state )
 	AM_RANGE(0x0000, 0xefff) AM_RAM AM_SHARE("ram")
 	AM_RANGE(0xf100, 0xf11f) AM_RAM // memory mapping unit
 	AM_RANGE(0xf120, 0xf120) AM_DEVREADWRITE("tms9928a", tms9928a_device, vram_read, vram_write)
@@ -50,7 +51,7 @@ static ADDRESS_MAP_START( cortex_mem, AS_PROGRAM, 8, cortex_state )
 	//AM_RANGE(0xf140, 0xf147) // fdc tms9909
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cortex_io, AS_IO, 8, cortex_state )
+static ADDRESS_MAP_START( io_map, AS_IO, 8, cortex_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x000f) AM_MIRROR(0x0030) AM_DEVWRITE("control", ls259_device, write_a0)
 	//AM_RANGE(0x0000, 0x000f) AM_MIRROR(0x0020) AM_READ(pio_r)
@@ -81,7 +82,7 @@ static MACHINE_CONFIG_START( cortex )
 	/* TMS9995 CPU @ 12.0 MHz */
 	// Standard variant, no overflow int
 	// No lines connected yet
-	MCFG_TMS99xx_ADD("maincpu", TMS9995, 12000000, cortex_mem, cortex_io)
+	MCFG_TMS99xx_ADD("maincpu", TMS9995, 12000000, mem_map, io_map)
 
 	MCFG_DEVICE_ADD("control", LS259, 0) // IC64
 	//MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(cortex_state, basic_led_w))

@@ -117,7 +117,7 @@ private:
 	required_device<floppy_connector> m_floppy1;
 };
 
-static ADDRESS_MAP_START(excali64_mem, AS_PROGRAM, 8, excali64_state)
+static ADDRESS_MAP_START(mem_map, AS_PROGRAM, 8, excali64_state)
 	AM_RANGE(0x0000, 0x1FFF) AM_READ_BANK("bankr1") AM_WRITE_BANK("bankw1")
 	AM_RANGE(0x2000, 0x2FFF) AM_READ_BANK("bankr2") AM_WRITE_BANK("bankw2")
 	AM_RANGE(0x3000, 0x3FFF) AM_READ_BANK("bankr3") AM_WRITE_BANK("bankw3")
@@ -125,7 +125,7 @@ static ADDRESS_MAP_START(excali64_mem, AS_PROGRAM, 8, excali64_state)
 	AM_RANGE(0xC000, 0xFFFF) AM_RAM AM_REGION("rambank", 0xC000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(excali64_io, AS_IO, 8, excali64_state)
+static ADDRESS_MAP_START(io_map, AS_IO, 8, excali64_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x0f) AM_READ(port00_r)
 	AM_RANGE(0x10, 0x10) AM_MIRROR(0x0e) AM_DEVREADWRITE("uart",i8251_device, data_r, data_w)
@@ -546,8 +546,8 @@ MC6845_UPDATE_ROW( excali64_state::update_row )
 static MACHINE_CONFIG_START( excali64 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz / 4)
-	MCFG_CPU_PROGRAM_MAP(excali64_mem)
-	MCFG_CPU_IO_MAP(excali64_io)
+	MCFG_CPU_PROGRAM_MAP(mem_map)
+	MCFG_CPU_IO_MAP(io_map)
 
 	MCFG_MACHINE_RESET_OVERRIDE(excali64_state, excali64)
 

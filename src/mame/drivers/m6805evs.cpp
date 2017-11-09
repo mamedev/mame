@@ -79,7 +79,7 @@ private:
 };
 
 
-static ADDRESS_MAP_START( m6805evs_mem, AS_PROGRAM, 8, m6805evs_state )
+static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, m6805evs_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	ADDRESS_MAP_UNMAP_HIGH
 
@@ -101,7 +101,7 @@ void m6805evs_state::machine_reset()
 static MACHINE_CONFIG_START( m6805evs )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6805, XTAL_4MHz)
-	MCFG_CPU_PROGRAM_MAP(m6805evs_mem)
+	MCFG_CPU_PROGRAM_MAP(mem_map)
 MACHINE_CONFIG_END
 
 ROM_START(m6805evs)

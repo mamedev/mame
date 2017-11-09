@@ -36,14 +36,14 @@ private:
 	required_shared_ptr<uint8_t> m_p_videoram;
 };
 
-static ADDRESS_MAP_START( tvgame_mem, AS_PROGRAM, 8, tvgame_state )
+static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, tvgame_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x7fff ) AM_ROM
 	AM_RANGE( 0x8000, 0xbfff ) AM_RAM
 	AM_RANGE( 0xc000, 0xdfff ) AM_RAM AM_SHARE("videoram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tvgame_io, AS_IO, 8, tvgame_state )
+static ADDRESS_MAP_START( io_map, AS_IO, 8, tvgame_state )
 	ADDRESS_MAP_GLOBAL_MASK(3)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x0003) AM_DEVREADWRITE("ppi", i8255_device, read, write)
@@ -96,8 +96,8 @@ uint32_t tvgame_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 static MACHINE_CONFIG_START( tvgame )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_4MHz)
-	MCFG_CPU_PROGRAM_MAP(tvgame_mem)
-	MCFG_CPU_IO_MAP(tvgame_io)
+	MCFG_CPU_PROGRAM_MAP(mem_map)
+	MCFG_CPU_IO_MAP(io_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

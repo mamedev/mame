@@ -172,13 +172,13 @@ void amust_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 //      floppy->ss_w(BIT(data, 4));
 //}
 
-static ADDRESS_MAP_START(amust_mem, AS_PROGRAM, 8, amust_state)
+static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, amust_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xffff) AM_READ_BANK("bankr0") AM_WRITE_BANK("bankw0")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(amust_io, AS_IO, 8, amust_state)
+static ADDRESS_MAP_START( io_map, AS_IO, 8, amust_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	//AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("uart1", i8251_device, data_r, data_w)
@@ -393,8 +393,8 @@ DRIVER_INIT_MEMBER( amust_state, amust )
 static MACHINE_CONFIG_START( amust )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_16MHz / 4)
-	MCFG_CPU_PROGRAM_MAP(amust_mem)
-	MCFG_CPU_IO_MAP(amust_io)
+	MCFG_CPU_PROGRAM_MAP(mem_map)
+	MCFG_CPU_IO_MAP(io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", amust_state, irq_vs)
 	MCFG_MACHINE_RESET_OVERRIDE(amust_state, amust)
 
