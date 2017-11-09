@@ -2408,7 +2408,7 @@ GAME( 1985, gimeabrk, 0,        balsente, gimeabrk, balsente_state, gimeabrk, RO
 GAME( 1985, minigolf, 0,        balsente, minigolf, balsente_state, minigolf, ROT0, "Bally/Sente",  "Mini Golf (11/25/85)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, minigolf2,minigolf, balsente, minigolf2,balsente_state, minigolf2,ROT0, "Bally/Sente",  "Mini Golf (10/8/85)", MACHINE_SUPPORTS_SAVE )
 GAME( 1984, triviabb, 0,        balsente, triviag1, balsente_state, triviag2, ROT0, "Bally/Sente",  "Trivial Pursuit (Baby Boomer Edition) (3/20/85)", MACHINE_SUPPORTS_SAVE )
-GAME( 198?, grudge,   0,        balsente, grudge,   balsente_state, grudge,   ROT0, "Bally Midway", "Grudge Match (V00.90, Italy, location test?)", MACHINE_SUPPORTS_SAVE ) // newer than set below, had a complete cabinet + art
+GAME( 198?, grudge,   0,        balsente, grudge,   balsente_state, grudge,   ROT0, "Bally Midway", "Grudge Match (v00.90, Italy, location test?)", MACHINE_SUPPORTS_SAVE ) // newer than set below, had a complete cabinet + art
 GAME( 198?, grudgep,  grudge,   balsente, grudge,   balsente_state, grudge,   ROT0, "Bally Midway", "Grudge Match (v00.80, prototype)", MACHINE_SUPPORTS_SAVE )
 
 /* Board: Unknown  */
