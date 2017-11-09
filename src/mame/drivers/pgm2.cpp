@@ -215,6 +215,8 @@ public:
 	DECLARE_WRITE32_MEMBER(fg_videoram_w);
 	DECLARE_WRITE32_MEMBER(bg_videoram_w);
 
+	DECLARE_READ32_MEMBER(orleg2_speedup_r);
+
 	DECLARE_DRIVER_INIT(kov2nl);
 	DECLARE_DRIVER_INIT(orleg2);
 	DECLARE_DRIVER_INIT(ddpdojh);
@@ -1053,7 +1055,7 @@ void pgm2_state::pgm_create_dummy_internal_arm_region()
 static MACHINE_CONFIG_START( pgm2 )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", IGS036, 20000000) // ?? ARM based CPU, has internal ROM.
+	MCFG_CPU_ADD("maincpu", IGS036, 100000000) // ?? ARM based CPU, has internal ROM.
 	MCFG_CPU_PROGRAM_MAP(pgm2_map)
 
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pgm2_state,  igs_interrupt)
@@ -1361,6 +1363,22 @@ static void sprite_colour_decode(uint16_t* rom, int len)
 	}
 }
 
+READ32_MEMBER(pgm2_state::orleg2_speedup_r)
+{
+	int pc = space.device().safe_pc();
+	if ((pc == 0x1002faec) || (pc == 0x1002f9b8))
+	{
+		if ((m_mainram[0x20114 / 4] == 0x00) && (m_mainram[0x20118 / 4] == 0x00))
+			space.device().execute().spin_until_interrupt();
+	}
+	/*else
+	{
+		printf("pc is %08x\n", pc);
+	}*/
+
+	return m_mainram[0x20114 / 4];
+}
+
 DRIVER_INIT_MEMBER(pgm2_state,orleg2)
 {
 	uint16_t *src = (uint16_t *)memregion("sprites_mask")->base();
@@ -1373,6 +1391,8 @@ DRIVER_INIT_MEMBER(pgm2_state,orleg2)
 
 	igs036_decryptor decrypter(orleg2_key);
 	decrypter.decrypter_rom(memregion("user1"));
+
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x20020114, 0x20020117, read32_delegate(FUNC(pgm2_state::orleg2_speedup_r),this));
 }
 
 DRIVER_INIT_MEMBER(pgm2_state,kov2nl)
