@@ -2,14 +2,18 @@
 // copyright-holders:Robbbert
 /***************************************************************************
 
-        Schleicher MES
+Schleicher MES
 
-        30/08/2010 Skeleton driver
+2010-08-30 Skeleton driver
 
 ****************************************************************************/
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/z80ctc.h"
+#include "machine/z80pio.h"
+#include "machine/z80sio.h"
+#include "machine/keyboard.h"
 #include "screen.h"
 
 
@@ -24,8 +28,13 @@ public:
 	{ }
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void kbd_put(u8 data);
+	DECLARE_READ8_MEMBER(port00_r);
+	DECLARE_READ8_MEMBER(port08_r);
 
 private:
+	u8 m_term_data;
+	u8 m_port08;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_p_videoram;
@@ -33,16 +42,32 @@ private:
 };
 
 
+READ8_MEMBER( mes_state::port00_r )
+{
+	u8 ret = m_term_data;
+	m_term_data = 0;
+	return ret;
+}
 
-static ADDRESS_MAP_START(mes_mem, AS_PROGRAM, 8, mes_state)
+READ8_MEMBER( mes_state::port08_r )
+{
+	return m_port08 | (m_term_data ? 0x80 : 0);
+}
+
+static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, mes_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
+	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION("roms", 0)
 	AM_RANGE(0x1000, 0xefff) AM_RAM
 	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("videoram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mes_io, AS_IO, 8, mes_state)
+static ADDRESS_MAP_START( io_map, AS_IO, 8, mes_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x00, 0x00) AM_READ(port00_r)
+	AM_RANGE(0x08, 0x08) AM_READ(port08_r)
+	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE("ctc", z80ctc_device, read, write)
+	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("sio", z80sio_device, cd_ba_r, cd_ba_w)
+	AM_RANGE(0x18, 0x1b) AM_DEVREADWRITE("pio", z80pio_device, read, write)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -51,17 +76,16 @@ INPUT_PORTS_END
 
 void mes_state::machine_reset()
 {
+	m_port08 = 0;
+	m_term_data = 0;
 }
 
 /* This system appears to have 2 screens. Not implemented.
     Also the screen dimensions are a guess. */
 uint32_t mes_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	//static uint8_t framecnt=0;
 	uint8_t y,ra,chr,gfx;
-	uint16_t sy=0,ma=0,x,xx;
-
-	//framecnt++;
+	uint16_t sy=0,ma=0,x;
 
 	for (y = 0; y < 25; y++)
 	{
@@ -69,23 +93,15 @@ uint32_t mes_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 		{
 			uint16_t *p = &bitmap.pix16(sy++);
 
-			xx = ma;
 			for (x = ma; x < ma + 80; x++)
 			{
 				gfx = 0;
 				if (ra < 9)
 				{
-					chr = m_p_videoram[xx++];
-
-				//  /* Take care of flashing characters */
-				//  if ((chr < 0x80) && (framecnt & 0x08))
-				//      chr |= 0x80;
-
-					if (chr & 0x80)  // ignore attribute bytes
-						x--;
-					else
-						gfx = m_p_chargen[(chr<<4) | ra ];
+					chr = m_p_videoram[x];
+					gfx = m_p_chargen[(chr<<4) | ra ];
 				}
+
 				/* Display a scanline of a character */
 				*p++ = BIT(gfx, 7);
 				*p++ = BIT(gfx, 6);
@@ -102,11 +118,16 @@ uint32_t mes_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	return 0;
 }
 
+void mes_state::kbd_put(u8 data)
+{
+	m_term_data = data;
+}
+
 static MACHINE_CONFIG_START( mes )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz / 4)
-	MCFG_CPU_PROGRAM_MAP(mes_mem)
-	MCFG_CPU_IO_MAP(mes_io)
+	MCFG_CPU_PROGRAM_MAP(mem_map)
+	MCFG_CPU_IO_MAP(io_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -118,15 +139,22 @@ static MACHINE_CONFIG_START( mes )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
+
+	MCFG_DEVICE_ADD("ctc", Z80CTC, 0)
+	MCFG_DEVICE_ADD("pio", Z80PIO, 0)
+	MCFG_DEVICE_ADD("sio", Z80SIO, 0)
+
+	MCFG_DEVICE_ADD("keybd", GENERIC_KEYBOARD, 0)
+	MCFG_GENERIC_KEYBOARD_CB(PUT(mes_state, kbd_put))
 MACHINE_CONFIG_END
 
 
 /* ROM definition */
 ROM_START( mes )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x1000, "roms", ROMREGION_ERASEFF )
 	ROM_LOAD( "mescpu.bin",   0x0000, 0x1000, CRC(b6d90cf4) SHA1(19e608af5bdaabb00a134e1106b151b00e2a0b04))
 
-	ROM_REGION( 0x10000, "xebec", ROMREGION_ERASEFF )
+	ROM_REGION( 0x2000, "xebec", ROMREGION_ERASEFF )
 	ROM_LOAD( "mesxebec.bin", 0x0000, 0x2000, CRC(061b7212) SHA1(c5d600116fb7563c69ebd909eb9613269b2ada0f))
 
 	/* character generator not dumped, using the one from 'c10' for now */
