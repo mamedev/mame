@@ -33405,6 +33405,10 @@ segapm                          // 1996 Sega Picture Magic (32x type hardware)
 @source:segas16a.cpp
 aceattaca                       // (c) 1988 (FD1094)
 afighter                        // (c) 1986 (FD1089A)
+afightera
+afighterb
+afighterc
+afighterd
 alexkidd                        // (c) 1986 (Unprotected)
 alexkidd1                       // (c) 1986 (FD1089A)
 aliensyn2                       // (c) 1987 (FD1089A)
@@ -33442,6 +33446,10 @@ wb35d                           //
 
 @source:segas16b.cpp
 aceattac                        // (c) 1988 (FD1094)
+afightere
+afighterf
+afighterg
+afighterh
 aliensyn                        // (c) 1987 (Unprotected)
 aliensyn3                       // (c) 1987 (FD1089A)
 aliensyn7                       // (c) 1987 (MC-8123B)
