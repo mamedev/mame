@@ -1136,23 +1136,8 @@ MACHINE_CONFIG_END
 
 #define ORLEG2_INTERNAL_CHINA \
 	ROM_REGION( 0x04000, "maincpu", 0 ) \
+	/* offset 3cb8 of the internal rom controls the region, however only China is dumped at the moment and it appears Overseas and Japan at least need different external ROMs or will crash later in game */ \
 	ROM_LOAD( "xyj2_igs036_china.rom", 0x00000000, 0x0004000, CRC(bcce7641) SHA1(c3b5cf6e9f6eae09b6785314777a52b34c3c7657) )
-
-#define ORLEG2_INTERNAL_OVERSEA \
-	ROM_REGION( 0x04000, "maincpu", 0 ) \
-	ROM_LOAD( "xyj2_igs036_oversea.rom", 0x00000000, 0x0004000, BAD_DUMP CRC(cc4d398a) SHA1(c50bcc81f02cd5aa8ad157d73209dc53bdedc023) )
-
-#define ORLEG2_INTERNAL_TAIWAN \
-	ROM_REGION( 0x04000, "maincpu", 0 ) \
-	ROM_LOAD( "xyj2_igs036_taiwan.rom", 0x00000000, 0x0004000, BAD_DUMP CRC(3b8a6703) SHA1(addabc4e6d23933a81845d64b033c30c4d96943d))
-
-#define ORLEG2_INTERNAL_HONGKONG \
-	ROM_REGION( 0x04000, "maincpu", 0 ) \
-	ROM_LOAD( "xyj2_igs036_hongkong.rom", 0x00000000, 0x0004000, BAD_DUMP CRC(ee7343c6) SHA1(e37ce0352255df78af1a290ffdc8331c56d1d2cd) )
-
-#define ORLEG2_INTERNAL_JAPAN \
-	ROM_REGION( 0x04000, "maincpu", 0 ) \
-	ROM_LOAD( "xyj2_igs036_japan.rom", 0x00000000, 0x0004000, BAD_DUMP CRC(69375284) SHA1(a120c6a3d8d7898cc3ca508abea78e5e54090c66) )
 
 ROM_START( orleg2 )
 	ORLEG2_INTERNAL_CHINA
@@ -1171,81 +1156,6 @@ ROM_START( orleg2_101 )
 	ORLEG2_PROGRAM_101
 	ORLEG2_VIDEO_SOUND_ROMS
 ROM_END
-
-ROM_START( orleg2_104o )
-	ORLEG2_INTERNAL_OVERSEA
-	ORLEG2_PROGRAM_104
-	ORLEG2_VIDEO_SOUND_ROMS
-ROM_END
-
-ROM_START( orleg2_103o )
-	ORLEG2_INTERNAL_OVERSEA
-	ORLEG2_PROGRAM_103
-	ORLEG2_VIDEO_SOUND_ROMS
-ROM_END
-
-ROM_START( orleg2_101o )
-	ORLEG2_INTERNAL_OVERSEA
-	ORLEG2_PROGRAM_101
-	ORLEG2_VIDEO_SOUND_ROMS
-ROM_END
-
-ROM_START( orleg2_104tw )
-	ORLEG2_INTERNAL_TAIWAN
-	ORLEG2_PROGRAM_104
-	ORLEG2_VIDEO_SOUND_ROMS
-ROM_END
-
-ROM_START( orleg2_103tw )
-	ORLEG2_INTERNAL_TAIWAN
-	ORLEG2_PROGRAM_103
-	ORLEG2_VIDEO_SOUND_ROMS
-ROM_END
-
-ROM_START( orleg2_101tw )
-	ORLEG2_INTERNAL_TAIWAN
-	ORLEG2_PROGRAM_101
-	ORLEG2_VIDEO_SOUND_ROMS
-ROM_END
-
-ROM_START( orleg2_104hk )
-	ORLEG2_INTERNAL_HONGKONG
-	ORLEG2_PROGRAM_104
-	ORLEG2_VIDEO_SOUND_ROMS
-ROM_END
-
-ROM_START( orleg2_103hk )
-	ORLEG2_INTERNAL_HONGKONG
-	ORLEG2_PROGRAM_103
-	ORLEG2_VIDEO_SOUND_ROMS
-ROM_END
-
-ROM_START( orleg2_101hk )
-	ORLEG2_INTERNAL_HONGKONG
-	ORLEG2_PROGRAM_101
-	ORLEG2_VIDEO_SOUND_ROMS
-ROM_END
-
-ROM_START( orleg2_104j )
-	ORLEG2_INTERNAL_JAPAN
-	ORLEG2_PROGRAM_104
-	ORLEG2_VIDEO_SOUND_ROMS
-ROM_END
-
-ROM_START( orleg2_103j )
-	ORLEG2_INTERNAL_JAPAN
-	ORLEG2_PROGRAM_103
-	ORLEG2_VIDEO_SOUND_ROMS
-ROM_END
-
-ROM_START( orleg2_101j )
-	ORLEG2_INTERNAL_JAPAN
-	ORLEG2_PROGRAM_101
-	ORLEG2_VIDEO_SOUND_ROMS
-ROM_END
-
-
-
 
 #define KOV2NL_VIDEO_SOUND_ROMS \
 	ROM_REGION( 0x200000, "tiles", ROMREGION_ERASEFF ) \
@@ -1542,23 +1452,6 @@ DRIVER_INIT_MEMBER(pgm2_state, kov3_100)
 GAME( 2007, orleg2,       0,         pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V104, China)", MACHINE_NOT_WORKING )
 GAME( 2007, orleg2_103,   orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V103, China)", MACHINE_NOT_WORKING )
 GAME( 2007, orleg2_101,   orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V101, China)", MACHINE_NOT_WORKING )
-
-GAME( 2007, orleg2_104o,  orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V104, Oversea)", MACHINE_NOT_WORKING )
-GAME( 2007, orleg2_103o,  orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V103, Oversea)", MACHINE_NOT_WORKING )
-GAME( 2007, orleg2_101o,  orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V101, Oversea)", MACHINE_NOT_WORKING )
-
-GAME( 2007, orleg2_104tw, orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V104, Taiwan)", MACHINE_NOT_WORKING )
-GAME( 2007, orleg2_103tw, orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V103, Taiwan)", MACHINE_NOT_WORKING )
-GAME( 2007, orleg2_101tw, orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V101, Taiwan)", MACHINE_NOT_WORKING )
-
-GAME( 2007, orleg2_104hk, orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V104, Hong Kong)", MACHINE_NOT_WORKING )
-GAME( 2007, orleg2_103hk, orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V103, Hong Kong)", MACHINE_NOT_WORKING )
-GAME( 2007, orleg2_101hk, orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V101, Hong Kong)", MACHINE_NOT_WORKING )
-
-GAME( 2007, orleg2_104j,  orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V104, Japan)", MACHINE_NOT_WORKING )
-GAME( 2007, orleg2_103j,  orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V103, Japan)", MACHINE_NOT_WORKING )
-GAME( 2007, orleg2_101j,  orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V101, Japan)", MACHINE_NOT_WORKING )
-
 
 // Knights of Valour 2 New Legend 
 GAME( 2008, kov2nl,       0,         pgm2,    pgm2, pgm2_state,     kov2nl,       ROT0, "IGS", "Knights of Valour 2 New Legend (V302, China)", MACHINE_NOT_WORKING )

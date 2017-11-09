@@ -31239,19 +31239,6 @@ kov3_100                        //
 orleg2                          // (c) 2007
 orleg2_103                      //
 orleg2_101                      //
-orleg2_104o                     //
-orleg2_103o                     //
-orleg2_101o                     //
-orleg2_104tw                    //
-orleg2_103tw                    //
-orleg2_101tw                    //
-orleg2_104hk                    //
-orleg2_103hk                    //
-orleg2_101hk                    //
-orleg2_104j                     //
-orleg2_103j                     //
-orleg2_101j                     //
-
 
 @source:pgm3.cpp
 kov3hd
