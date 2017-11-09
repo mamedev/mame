@@ -499,6 +499,13 @@ void arm7_cpu_device::HandleMemSingle(uint32_t insn)
 				}
 			}
 		}
+		
+		// Todo: PGM2 needs this, might not be the correct place tho, check
+		if (R15 & 1) {
+			set_cpsr(GET_CPSR|T_MASK);
+			R15--;
+		}
+
 	}
 	else
 	{
@@ -1371,6 +1378,13 @@ void arm7_cpu_device::HandleMemBlock(uint32_t insn)
 						SwitchMode(temp & 3);
 					}
 				}
+				
+				// Todo: PGM2 needs this, might not be the correct place tho, check
+				if (R15 & 1) {
+					set_cpsr(GET_CPSR|T_MASK);
+					R15--;
+				}
+
 				// LDM PC - takes 2 extra cycles
 				ARM7_ICOUNT -= 2;
 			}
