@@ -2643,7 +2643,7 @@ msgid ""
 "Ensure that cheatpath folder exists"
 msgstr ""
 "No se ha podido escribir el fichero\n"
-"Asegúrese de que existe la ruta del fichero de trucos"
+"Asegúrese de que existe la ruta de la carpeta cheatpath"
 
 #: plugins/cheatfind/init.lua:421
 msgid "Cancel"
