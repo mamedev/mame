@@ -7113,6 +7113,78 @@
 		</part>
 	</software>
 
+	<software name="ecstatic">
+		<description>Ecstatica</description>
+		<year>1994</year>
+		<publisher>Psygnosis</publisher>
+		<info name="developer" value="Andrew Spencer Studios" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Ecstatica [Psygnosis] [1994] [3.5HD] [Disk 1 of 13].img" size="1474560" crc="1de19db5" sha1="b47143463303532e2441330b3fd20806dbc83e5e" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Ecstatica [Psygnosis] [1994] [3.5HD] [Disk 2 of 13].img" size="1474560" crc="4796aa9e" sha1="a1825e0aeba6cb798e84f8783550629db2b6846a" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Ecstatica [Psygnosis] [1994] [3.5HD] [Disk 3 of 13].img" size="1474560" crc="8d2df315" sha1="620ef6d38b3071da22b87635a8ca5f68c1633e64" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Ecstatica [Psygnosis] [1994] [3.5HD] [Disk 4 of 13].img" size="1474560" crc="d9da75ae" sha1="567be978903a1b65ce4e19d3ef563e72d6341dcd" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Ecstatica [Psygnosis] [1994] [3.5HD] [Disk 5 of 13].img" size="1474560" crc="7f0d231e" sha1="f8e4bce59a936c18971cb935c5bff5df44c4bb64" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Ecstatica [Psygnosis] [1994] [3.5HD] [Disk 6 of 13].img" size="1474560" crc="0a928c6d" sha1="3980fa0e1e918c53601e9a3e968c02725227143b" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Ecstatica [Psygnosis] [1994] [3.5HD] [Disk 7 of 13].img" size="1474560" crc="cd5d91ad" sha1="e39af059c97fd31eaabad95578e37ee0fb39c636" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Ecstatica [Psygnosis] [1994] [3.5HD] [Disk 8 of 13].img" size="1474560" crc="9e1f532a" sha1="e0583482f0c4d042a6bfc37803458ccfc951cf22" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Ecstatica [Psygnosis] [1994] [3.5HD] [Disk 9 of 13].img" size="1474560" crc="4ce37f3d" sha1="24ebdfb8f8e19c621f778bd684d3966bb47a5c72" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop10" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Ecstatica [Psygnosis] [1994] [3.5HD] [Disk 10 of 13].img" size="1474560" crc="427173b9" sha1="78adb4b86639cc86dc339ed692e65b1e9c30b1ce" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop11" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Ecstatica [Psygnosis] [1994] [3.5HD] [Disk 11 of 13].img" size="1474560" crc="f276ad02" sha1="f05373c6ad4e938062710b588fc85e40e1a163bc" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop12" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Ecstatica [Psygnosis] [1994] [3.5HD] [Disk 12 of 13].img" size="1474560" crc="ae0ba745" sha1="628ba589f91440162769952675417b3ff08520f4" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop13" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Ecstatica [Psygnosis] [1994] [3.5HD] [Disk 13 of 13].img" size="1474560" crc="535e4378" sha1="a989a98acfeb65a5fe961ec7ca79f1c3241d273b" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="epicpin1">
 		<description>Epic Pinball Pack 1 (v2.1)</description>
 		<year>1994</year>
@@ -7355,6 +7427,44 @@
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Gods [Renegade Software] [1991] [3.5HD].img" size="1474560" crc="ac47d483" sha1="8c1767c96fc5b881a7145d6bcf68a75bf4281e66" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hoc">
+		<description>Heart of China</description>
+		<year>1991</year>
+		<publisher>Dynamix</publisher>
+		<info name="developer" value="Dynamix" />
+		<info name="version" value="0.100" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Heart of China [Dynamix] [1991] [3.5HD] [Disk 1 of 6].img" size="1474560" crc="1424f3b8" sha1="1ca9f283a46a1d0c8b7127ff9463b95099728a49" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Heart of China [Dynamix] [1991] [3.5HD] [Disk 2 of 6].img" size="1474560" crc="a3076c16" sha1="ef67d76fafa1c945162ebae2195e3d2d39f566e3" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Heart of China [Dynamix] [1991] [3.5HD] [Disk 3 of 6].img" size="1474560" crc="9bf33ab0" sha1="d5c1b86cde354e490d06e5178f3c402e274fe0f2" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Heart of China [Dynamix] [1991] [3.5HD] [Disk 4 of 6].img" size="1474560" crc="62f41d1f" sha1="4fd7aad663fcf129a57e89c815550bd5e92c6130" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Heart of China [Dynamix] [1991] [3.5HD] [Disk 5 of 6].img" size="1474560" crc="6decc910" sha1="4d4f12d84662a99d31644162f78f88828daf0dc2" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Heart of China [Dynamix] [1991] [3.5HD] [Disk 6 of 6].img" size="1474560" crc="60debbba" sha1="837e98b16ef93626d28abe099a0865b7b6d388a5" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8175,6 +8285,45 @@
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Realms of Chaos (USA) (v1.0) (Disk 3).img" size="1474560" crc="4611a516" sha1="157f4bb42c1293feb5bac9d7452619711bb4c1dd" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rotd">
+		<description>Rise of the Dragon</description>
+		<year>1990</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="developer" value="Dynamix" />
+		<info name="version" value="1.000" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<!-- has a saved configuration file -->
+				<rom name="Rise of the Dragon [Sierra] [1990] [3.5HD] [Disk 1 of 6].img" size="1474560" crc="feba710f" sha1="4692dda4267b4b4b0791c837e9bdb27a45e48240" offset="0" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Rise of the Dragon [Sierra] [1990] [3.5HD] [Disk 2 of 6].img" size="1474560" crc="885f0fdf" sha1="edb9d69a0084c8580bc9f53d20871cee490e47eb" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Rise of the Dragon [Sierra] [1990] [3.5HD] [Disk 3 of 6].img" size="1474560" crc="81eb1a78" sha1="a75db5e8946a87f017554b449abb10e60ec96189" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Rise of the Dragon [Sierra] [1990] [3.5HD] [Disk 4 of 6].img" size="1474560" crc="5c58a4cb" sha1="f4621dead8b052bd5dfbaf5c4ca825f48d773aba" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Rise of the Dragon [Sierra] [1990] [3.5HD] [Disk 5 of 6].img" size="1474560" crc="8c5b0dfc" sha1="2a9d824c492f44e3ec654b4b8e16ac2413c54b03" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Rise of the Dragon [Sierra] [1990] [3.5HD] [Disk 6 of 6].img" size="1474560" crc="2fcf9807" sha1="33d1c3803fdaf451cfce89df63c844adf02c2c08" offset="0"/>
 			</dataarea>
 		</part>
 	</software>

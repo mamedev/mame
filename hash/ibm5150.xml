@@ -5839,6 +5839,28 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="batcet" cloneof="bat">
+		<description>B.A.T. (CGA/EGA/Tandy versions) (Quest &amp; Glory Compilation)</description>
+		<year>1990</year>
+		<publisher>Ubi Soft Entertainment Software</publisher>
+		<info name="developer" value="Computer's Dream" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="B.A.T. (Quest &amp; Glory Compilation) [Ubi Soft] [1990] [3.5DD] [Disk 1 of 3].img" size="737280" crc="1e2b7b9d" sha1="e5258fff99c193e7a47a9f6a011ac2bfcddbafc9" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="B.A.T. (Quest &amp; Glory Compilation) [Ubi Soft] [1990] [3.5DD] [Disk 2 of 3].img" size="737280" crc="c36915ba" sha1="914314ac2117f75702dfa7c3789e40bee5b41174" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="B.A.T. (Quest &amp; Glory Compilation) [Ubi Soft] [1990] [3.5DD] [Disk 3 of 3].img" size="737280" crc="1fa2b8ae" sha1="dbe4f4fe74456a09be7d7c3661ef163ab0f6216c" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="bttf2">
 		<description>Back to the Future Part II</description>
 		<year>1990</year>
@@ -8598,6 +8620,23 @@ has been replaced with an all-zero block. -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="Superstar Outdoor Soccer (1991)(Mindscape).dsk" size="368640" crc="e4e0f70f" sha1="48fcb5a65edd641abc7f9c0451e37c00ba94850a" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tmht2">
+		<description>Teenage Mutant Hero Turtles: The Coin-Op!</description>
+		<year>1991</year>
+		<publisher>Image Works</publisher>
+		<info name="developer" value="Konami" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Teenage Mutant Hero Turtles - The Coin-Op! [Image Works] [1991] [3.5DD] [Disk 1 of 2].img" size="737280" crc="278eea7d" sha1="57441bd093713932e67b0b2c598b6aff3df7ad09" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Teenage Mutant Hero Turtles - The Coin-Op! [Image Works] [1991] [3.5DD] [Disk 2 of 2].img" size="737280" crc="a9a418bf" sha1="2cddbacdb027d39f888845f78e7610ac601c7c22" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
