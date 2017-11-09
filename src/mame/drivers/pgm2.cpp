@@ -1393,6 +1393,26 @@ DRIVER_INIT_MEMBER(pgm2_state,orleg2)
 	decrypter.decrypter_rom(memregion("user1"));
 
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x20020114, 0x20020117, read32_delegate(FUNC(pgm2_state::orleg2_speedup_r),this));
+
+	/* HACK!
+	   patch out an ingame assert that ends up being triggered after the 5 element / fire chariot boss due to an invalid value in R3 
+	   todo: why does this happen? ARM core bug? is patching out the assert actually safe? game continues as normal like this, but there could be memory corruption.
+	*/
+	uint16_t* rom;
+	rom = (uint16_t*)memregion("user1")->base();
+	if (rom[0x12620 / 2] == 0xd301) // 104 / 103
+	{
+		rom[0x12622 / 2] = 0x0009;
+		rom[0x12624 / 2] = 0x0009;
+	}
+	else if (rom[0x1257C / 2] == 0xd301) // 101
+	{
+		rom[0x1257E / 2] = 0x0009;
+		rom[0x12580 / 2] = 0x0009;
+	}
+	rom = (uint16_t*)memregion("maincpu")->base(); // BEQ -> BNE for checksum
+	rom[0x39f2 / 2] = 0x1a00;
+
 }
 
 DRIVER_INIT_MEMBER(pgm2_state,kov2nl)
