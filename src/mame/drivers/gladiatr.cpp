@@ -480,7 +480,6 @@ READ8_MEMBER(ppking_state::ppking_qx0_r)
 				{
 					m_mcu[0].rxd = ((ioport("P1")->read()) & 0x3f);
 					m_mcu[0].rxd |= ((ioport("SYSTEM")->read()) & 0x80);
-					
 				}
 				
 				break;
@@ -542,7 +541,7 @@ WRITE8_MEMBER(ppking_state::ppking_qx0_w)
 			case 2:
 				// TODO: DSW2 reads here
 				m_mcu[0].rxd = 0;
-				//m_mcu[0].rxd = ((ioport("DSW2")->read() & 0x1f) << 2);
+				m_mcu[0].rxd = ((ioport("DSW2")->read() & 0x1f) << 2);
 				m_mcu[0].rst = 0;
 				//m_mcu[0].state = 0;
 				break;
@@ -766,23 +765,21 @@ static INPUT_PORTS_START( ppking )
 	PORT_DIPSETTING(    0x10, DEF_STR( No ) )
 	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_UNUSED )
 	
-	// cabinet (upright/cocktail) & coinage, not currently working (see above)
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x00, "DSW2" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	// TODO: coinage not working (controlled by MCU)
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW2:8,7")
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_5C ) )
+	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW2:6,5")
+	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( 5C_1C ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW2:4")
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Cocktail ) )
 	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_UNUSED )
 	
 	PORT_START("DSW3")
