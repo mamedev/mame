@@ -15514,7 +15514,7 @@ jackie                          // (c) 1993 IGS
 jackpool                        // (c) 1997 Electronic Projects
 
 @source:jade.cpp
-jade                            //
+jgz80                           // Jade JGZ-80
 
 @source:jaguar.cpp
 a51mxr3k                        // ??           (c) 1998
@@ -33244,7 +33244,7 @@ vaportrxp                       // (c) 1998 Atari Games
 wg3dh                           // (c) 1996 Atari Games
 
 @source:seattlecmp.cpp
-seattle                         //
+scp300f                         // Seattle SCP-300F
 
 @source:sega_sawatte.cpp
 sawatte                         //

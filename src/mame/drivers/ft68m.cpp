@@ -46,7 +46,7 @@ READ16_MEMBER( ft68m_state::switches_r )
 }
 
 
-static ADDRESS_MAP_START(ft68m_mem, AS_PROGRAM, 16, ft68m_state)
+static ADDRESS_MAP_START(mem_map, AS_PROGRAM, 16, ft68m_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xffffff)
 	AM_RANGE(0x000000, 0x1fffff) AM_RAM AM_SHARE("rambase")
@@ -82,7 +82,7 @@ static MACHINE_CONFIG_START( ft68m )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_19_6608MHz / 2)
-	MCFG_CPU_PROGRAM_MAP(ft68m_mem)
+	MCFG_CPU_PROGRAM_MAP(mem_map)
 
 	MCFG_DEVICE_ADD("mpsc", UPD7201_NEW, 0)
 	MCFG_Z80SIO_OUT_TXDA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_txd))
