@@ -273,7 +273,6 @@ WRITE_LINE_MEMBER(gladiatr_state_base::flipscreen_w)
 	flip_screen_set(state);
 }
 
-
 #if 1
 /* !!!!! patch to IRQ timing for 2nd CPU !!!!! */
 WRITE8_MEMBER(gladiatr_state::gladiatr_irq_patch_w)
@@ -464,22 +463,20 @@ READ8_MEMBER(ppking_state::ppking_qx0_r)
 				else
 				{
 					m_mcu[0].rxd = ((ioport("SYSTEM")->read()) & 0x9f);
-				}
-				
-				//printf("%02x\n",m_mcu[0].rxd);
-				
+				}				
 
 				break;
 			}
 			
 			case 2:
 			{
-				//m_mcu[0].packet_type^=1;
-				//if(m_mcu[0].packet_type & 1)
-				//{
-				//	m_mcu[0].rxd = ((ioport("P2")->read()) & 0x9f);
-				//}
-				//else
+				m_mcu[0].packet_type^=1;
+				if(m_mcu[0].packet_type & 1)
+				{
+					// Host wants this from time to time, otherwise huge input lag happens periodically (protection?)
+					m_mcu[0].rxd = 0x17;
+				}
+				else
 				{
 					m_mcu[0].rxd = ((ioport("P1")->read()) & 0x3f);
 					m_mcu[0].rxd |= ((ioport("SYSTEM")->read()) & 0x80);
@@ -491,12 +488,13 @@ READ8_MEMBER(ppking_state::ppking_qx0_r)
 			
 			case 3:
 			{
-				//m_mcu[0].packet_type^=1;
-				//if(m_mcu[0].packet_type & 1)
-				//{
-				//	m_mcu[0].rxd = ((ioport("P2")->read()) & 0x9f);
-				//}
-				//else
+				m_mcu[0].packet_type^=1;
+				if(m_mcu[0].packet_type & 1)
+				{
+					// same as above for player 2
+					m_mcu[0].rxd = 0x17;
+				}
+				else
 				{
 					m_mcu[0].rxd = ((ioport("P2")->read()) & 0x3f);
 					m_mcu[0].rxd |= ((ioport("SYSTEM")->read()) & 0x80);
@@ -542,9 +540,9 @@ WRITE8_MEMBER(ppking_state::ppking_qx0_w)
 				//m_mcu[0].state = 0;
 				break;
 			case 2:
+				// TODO: DSW2 reads here
 				m_mcu[0].rxd = 0;
 				//m_mcu[0].rxd = ((ioport("DSW2")->read() & 0x1f) << 2);
-				//m_mcu[0].rxd|= mcu_parity_check() == true ? 0 : 1;
 				m_mcu[0].rst = 0;
 				//m_mcu[0].state = 0;
 				break;
@@ -613,8 +611,8 @@ READ8_MEMBER(ppking_state::ppking_qx3_r)
 	return machine().rand()&0xf;
 }
 
-// a mirror of any of above?
-READ8_MEMBER(ppking_state::ppking_qxunk_r)
+// serial communication with another board
+READ8_MEMBER(ppking_state::ppking_qxcomu_r)
 {
 	if(offset == 1)
 		return 1;
@@ -622,16 +620,14 @@ READ8_MEMBER(ppking_state::ppking_qxunk_r)
 	return 0;
 }
 
-WRITE8_MEMBER(ppking_state::ppking_qxunk_w)
+WRITE8_MEMBER(ppking_state::ppking_qxcomu_w)
 {
 	// ...
 }
 
 MACHINE_RESET_MEMBER(ppking_state, ppking)
-{
-	m_data1 = m_data2 = 0;
-	m_flag1 = m_flag2 = 1;
-	
+{	
+	m_nmi_enable = false;
 	// yes, it expects to read DSW1 without sending commands first ...
 	m_mcu[0].rxd = (ioport("DSW1")->read() & 0x1f) << 2;;
 	m_mcu[0].rst = 0;
@@ -661,8 +657,8 @@ static ADDRESS_MAP_START( ppking_cpu1_io, AS_IO, 8, ppking_state )
 	AM_RANGE(0xc000, 0xc007) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
 //	AM_RANGE(0xc004, 0xc004) AM_NOP // WRITE(ppking_irq_patch_w)
 	AM_RANGE(0xc09e, 0xc09f) AM_READ(ppking_qx0_r) AM_WRITE(ppking_qx0_w)
-	AM_RANGE(0xc0bf, 0xc0bf) AM_NOP
-	AM_RANGE(0xc0c0, 0xc0c1) AM_READ(ppking_qxunk_r) AM_WRITE(ppking_qxunk_w)
+	AM_RANGE(0xc0bf, 0xc0bf) AM_NOP // watchdog
+	AM_RANGE(0xc0c0, 0xc0c1) AM_READ(ppking_qxcomu_r) AM_WRITE(ppking_qxcomu_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ppking_cpu2_io, AS_IO, 8, ppking_state )
@@ -765,9 +761,9 @@ static INPUT_PORTS_START( ppking )
 	PORT_DIPNAME( 0x08, 0x08, "VS Mode (link)" ) PORT_DIPLOCATION("SW1:4") // unemulated
 	PORT_DIPSETTING(    0x08, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW1:3")
-	PORT_DIPSETTING(    0x10, DEF_STR( Yes ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( No ) )
 	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_UNUSED )
 	
 	// cabinet (upright/cocktail) & coinage, not currently working (see above)
@@ -799,7 +795,7 @@ static INPUT_PORTS_START( ppking )
 	PORT_DIPNAME( 0x04, 0x00, "Backup Clear" ) PORT_DIPLOCATION("SW3:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Yes ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "SW3:4" )
+	PORT_DIPUNUSED_DIPLOC( 0x08, 0x00, "SW3:4" )
 	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW3:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Yes ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
@@ -978,6 +974,7 @@ static MACHINE_CONFIG_START( ppking )
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(ppking_state, spritebuffer_w))
 //	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(gladiatr_state, spritebank_w))
 //	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(MEMBANK("bank1"))
+//	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(ppking_state, nmi_mask_w))
 //	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(INPUTLINE("sub", INPUT_LINE_RESET)) // shadowed by aforementioned hack
 //  Q6 used
 	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(ppking_state, flipscreen_w))
@@ -1006,7 +1003,7 @@ static MACHINE_CONFIG_START( ppking )
 	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/8) /* verified on pcb */
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE(gladiatr_state_base, ym_irq))
 	MCFG_AY8910_PORT_A_READ_CB(READ8(ppking_state, ppking_f1_r))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(ppking_state, ppking_f1_r))
+	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW3")) /* port B read */
 	MCFG_SOUND_ROUTE(0, "mono", 0.60)
 	MCFG_SOUND_ROUTE(1, "mono", 0.60)
 	MCFG_SOUND_ROUTE(2, "mono", 0.60)
@@ -1482,9 +1479,6 @@ DRIVER_INIT_MEMBER(ppking_state, ppking)
 	rom[0x845] = 0x00;
 	rom[0x846] = 0x00;
 	rom[0x847] = 0x00;
-	
-	save_item(NAME(m_data1));
-	save_item(NAME(m_data2));
 }
 
 

@@ -160,10 +160,6 @@ public:
 		: gladiatr_state_base(mconfig, type, tag)
 		, m_nvram(*this, "nvram")
 		, m_soundlatch2(*this, "soundlatch2")
-		, m_data1(0)
-		, m_data2(0)
-		, m_flag1(0)
-		, m_flag2(0)
 	{
 	}
 
@@ -176,12 +172,12 @@ public:
 	DECLARE_READ8_MEMBER(ppking_qx3_r);
 	DECLARE_READ8_MEMBER(ppking_qx0_r);
 	DECLARE_READ8_MEMBER(ppking_qx1_r);
-	DECLARE_READ8_MEMBER(ppking_qxunk_r);
-	DECLARE_WRITE8_MEMBER(ppking_qxunk_w);
+	DECLARE_READ8_MEMBER(ppking_qxcomu_r);
+	DECLARE_WRITE8_MEMBER(ppking_qxcomu_w);
 	DECLARE_WRITE8_MEMBER(ppking_video_registers_w);
 	DECLARE_WRITE8_MEMBER(ppking_adpcm_w);
 	DECLARE_WRITE8_MEMBER(cpu2_irq_ack_w);
-
+	
 	DECLARE_DRIVER_INIT(ppking);
 
 	DECLARE_MACHINE_RESET(ppking);
@@ -193,10 +189,7 @@ private:
 	required_shared_ptr<uint8_t>    m_nvram;
 	required_device<generic_latch_8_device> m_soundlatch2;
 
-	u8  m_data1;
-	u8  m_data2;
-	u8  m_flag1;
-	u8  m_flag2;
+	bool m_nmi_enable;
 	
 	struct
 	{
