@@ -20717,7 +20717,11 @@ mhavocp                         // 136025           (c) 1983
 mhavocrv                        // (hack)
 
 @source:mice.cpp
-mice                            //
+mice_6502                       // (c) 1981 Microtek International, Inc.
+mice2_z80                       // (c) 1986 Microtek International, Inc.
+mice2_6502                      // (c) 1986 Microtek International, Inc.
+mice2_8085                      // (c) 1986 Microtek International, Inc.
+mice2_6809                      // (c) 1986 Microtek International, Inc.
 
 @source:micral.cpp
 micral                          //
