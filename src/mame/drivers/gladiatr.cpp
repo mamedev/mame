@@ -440,8 +440,6 @@ inline void ppking_state::mcu_input_check()
 	}
 }
 
-/**/
-
 READ8_MEMBER(ppking_state::ppking_qx0_r)
 {
 	// status 
@@ -536,21 +534,14 @@ WRITE8_MEMBER(ppking_state::ppking_qx0_w)
 				*/
 				m_mcu[0].rxd = 0x40;
 				m_mcu[0].rst = 0;
-				//m_mcu[0].state = 0;
 				break;
 			case 2:
-				// TODO: DSW2 reads here
-				m_mcu[0].rxd = 0;
 				m_mcu[0].rxd = ((ioport("DSW2")->read() & 0x1f) << 2);
 				m_mcu[0].rst = 0;
-				//m_mcu[0].state = 0;
 				break;
 			case 3:
 				mcu_input_check();
-				//m_mcu[0].rxd = (ioport("DSW1")->read() & 0x1f) << 2;
 				m_mcu[0].rst = 1;
-				//m_mcu[0].txd = 0;
-				//m_mcu[0].state = 0;
 				break;
 
 			default:
@@ -626,7 +617,6 @@ WRITE8_MEMBER(ppking_state::ppking_qxcomu_w)
 
 MACHINE_RESET_MEMBER(ppking_state, ppking)
 {	
-	m_nmi_enable = false;
 	// yes, it expects to read DSW1 without sending commands first ...
 	m_mcu[0].rxd = (ioport("DSW1")->read() & 0x1f) << 2;;
 	m_mcu[0].rst = 0;

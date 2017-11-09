@@ -188,8 +188,6 @@ public:
 private:
 	required_shared_ptr<uint8_t>    m_nvram;
 	required_device<generic_latch_8_device> m_soundlatch2;
-
-	bool m_nmi_enable;
 	
 	struct
 	{
