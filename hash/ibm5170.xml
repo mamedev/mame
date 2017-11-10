@@ -5018,6 +5018,17 @@
 		</part>
 	</software>
 
+	<software name="diagncra">
+		<description>NCR System Diagnostics AT Class</description>
+		<year>198?</year>
+		<publisher>NCR</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="284775">
+				<rom name="ncr system diagnostics at class.td0" size="284775" crc="e73601ed" sha1="f253bb8ea508c98b88dd94c130e0dc87b9934b99" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="bpdx301g">
 		<!-- KryoFlux dump from original media, many modified sectors -->
 		<description>Paradox 3.01 (German)</description>

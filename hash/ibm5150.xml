@@ -59,6 +59,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 <softwarelist name="ibm5150" description="IBM PC disk images">
 
 	<!-- Booter Games -->
+
 	<software name="3ktrivia">
 		<description>3-K Trivia</description>
 		<year>1984</year>
@@ -2671,24 +2672,6 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		</part>
 	</software>
 
-	<software name="ibmcobol">
-		<description>IBM COBOL Compiler v 1.00</description>
-		<year>1982</year>
-		<publisher>IBM</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Compiler" />
-			<dataarea name="flop" size="163840">
-				<rom name="ibm cobol v 1.00 compiler.img" size="163840" crc="ef5629c4" sha1="95f997fc50ba7e629a8afbb70c6dc439ce8acf4f" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Library" />
-			<dataarea name="flop" size="163840">
-				<rom name="ibm cobol v 1.00 library.img" size="163840" crc="6987e3a7" sha1="ac6c78c3c55a0faac00e108f13df8574efae25f2" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="desk3">
 		<description>DeskMate (3.05, 5.25")</description>
 		<year>1990</year>
@@ -2833,6 +2816,37 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		</part>
 	</software>
 
+	<software name="editexte">
+		<description>EDITEXTE</description>
+		<year>1992</year>
+		<publisher>Gérard Lyannaz</publisher>
+		<info name="version" value="2º" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="[PC] EDITEXTE [5.25].img" size="368640" crc="bbf2d707" sha1="e3a2e08005b6beb097e3db74ce894007b6cebfb5" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ibmcobol">
+		<description>IBM Personal Computer COBOL Compiler (Version 1.00)</description>
+		<year>1982</year>
+		<publisher>IBM</publisher>
+		<info name="version" value="1.00" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Compiler" />
+			<dataarea name="flop" size="163840">
+				<rom name="ibm cobol v 1.00 compiler.img" size="163840" crc="ef5629c4" sha1="95f997fc50ba7e629a8afbb70c6dc439ce8acf4f" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Library" />
+			<dataarea name="flop" size="163840">
+				<rom name="ibm cobol v 1.00 library.img" size="163840" crc="6987e3a7" sha1="ac6c78c3c55a0faac00e108f13df8574efae25f2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="diag202a">
 		<description>IBM System Diagnostics v 2.02 (Version A)</description>
 		<year>198?</year>
@@ -2862,40 +2876,6 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="115117">
 				<rom name="ibm system diagnostics v 2.08.td0" size="115117" crc="cc1c2688" sha1="be6b46c67523c6abbf56afa32a88d54ba9f2729c" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="diagpc4i">
-		<description>NRC PC4I System Diagnostics Disk</description>
-		<year>198?</year>
-		<publisher>NCR</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="47656">
-				<rom name="ncr pc4i system diagnostics disk.td0" size="47656" crc="a0e9d9fe" sha1="dd27bb2ab23d0148c5abb61b676287ce5adf47b7" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="diagncra">
-		<description>NCR System Diagnostics AT Class</description>
-		<year>198?</year>
-		<publisher>NCR</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="284775">
-				<rom name="ncr system diagnostics at class.td0" size="284775" crc="e73601ed" sha1="f253bb8ea508c98b88dd94c130e0dc87b9934b99" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="editexte">
-		<description>EDITEXTE</description>
-		<year>1992</year>
-		<publisher>Gérard Lyannaz</publisher>
-		<info name="version" value="2º" />
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size = "368640">
-				<rom name="[PC] EDITEXTE [5.25].img" size="368640" crc="bbf2d707" sha1="e3a2e08005b6beb097e3db74ce894007b6cebfb5" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2931,6 +2911,17 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="[PC] MultiTexte [5.25].img" size="368640" crc="a38bd8d8" sha1="2a88e879c9ee89da687eebacf07037a85422a0d6" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="diagpc4i">
+		<description>NCR PC4I System Diagnostics Disk</description>
+		<year>198?</year>
+		<publisher>NCR</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="47656">
+				<rom name="ncr pc4i system diagnostics disk.td0" size="47656" crc="a0e9d9fe" sha1="dd27bb2ab23d0148c5abb61b676287ce5adf47b7" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3177,18 +3168,6 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		</part>
 	</software>
 
-	<software name="visicalc">
-		<description>VisiCalc</description>
-		<year>1982</year>
-		<publisher>VisiCorp</publisher>
-		<info name="version" value="1.2" />
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="161562">
-				<rom name="visicalc.imd" size="161562" crc="23089a93" sha1="70f3914e07c52657294fe618a341c25f8c423189" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="strecalc">
 		<description>StretchCalc</description>
 		<year>1983</year>
@@ -3223,8 +3202,8 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<publisher>Borland</publisher>
 		<info name="version" value="1.0" />
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="disk_serial" value="D1B0098461"/>
 			<dataarea name="flop" size="313312">
-				<!--info name="serial" value="D1B0098461"/-->
 				<rom name="program disk.imd" size="313312" crc="0b1307d1" sha1="e2857a26879d01a6a95510a13cad9c010e791453" offset="0" />
 			</dataarea>
 		</part>
@@ -3265,6 +3244,18 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="266276">
 				<rom name="turbodospc.imd" size="266276" crc="3029fd8f" sha1="b383b04e77c27ebdded4ca1509819b66655471dc" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="visicalc">
+		<description>VisiCalc</description>
+		<year>1982</year>
+		<publisher>VisiCorp</publisher>
+		<info name="version" value="1.2" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="161562">
+				<rom name="visicalc.imd" size="161562" crc="23089a93" sha1="70f3914e07c52657294fe618a341c25f8c423189" offset="0" />
 			</dataarea>
 		</part>
 	</software>
