@@ -1,9 +1,10 @@
 // license:BSD-3-Clause
-// copyright-holders:Tomasz Slanina
+// copyright-holders:Tomasz Slanina, Angelo Salese
 /****************************************************************************
     Time Attacker
 
     driver by Tomasz Slanina analog[at]op.pl
+	improvements by Angelo Salese
 
     Z80A,
     xtal 8MHz,
@@ -15,9 +16,11 @@
     no proms
 
     TODO:
-    - colors
+    - non-tilemap video offsets/sizes are guessworked;
+	- random brick flickering effect is unemulated (probably $e033 has a further role in this);
+	- outputs (coin counter port same as sound writes?);
+	- some dipswitches;
     - sound (requires Epson 7910 Multi-Melody emulation)
-    - game logic
 
     Connector pinout from manual
 
@@ -79,6 +82,9 @@ private:
 	tilemap_t *m_tmap;
 	uint8_t m_ball_regs[2];
 	uint8_t m_paddle_reg;
+	int m_paddle_ysize;
+	bool m_bottom_edge_enable;
+	bool m_bricks_color_bank;
 	
 	void draw_gameplay_bitmap(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_edge_bitmap(bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -86,6 +92,8 @@ private:
 	static const uint8_t white_pen = 0xf;
 	static const uint8_t green_pen = 0x5;
 	static const uint8_t yellow_pen = 0x7;
+	static const uint8_t red_pen = 0x3;
+	static const int paddle_xpos = 38;
 };
 
 
@@ -114,17 +122,19 @@ void tattack_state::draw_edge_bitmap(bitmap_ind16 &bitmap, const rectangle &clip
 	bitmap.plot_box(216,16,6,226,white_pen);
 	// right column
 	bitmap.plot_box(0,238,216,4,white_pen);
-	// TODO: fourth line on bottom, definitely has an enable somewhere ...
+	if(m_bottom_edge_enable == true)
+		bitmap.plot_box(paddle_xpos,16,4,226,white_pen);
 }
 
 void tattack_state::draw_gameplay_bitmap(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	uint16_t ram_offs;
+	const uint16_t ram_base = 0x40+(m_ram[0x33] & 0x10);
 	const int x_base = -8;
 	int xi,yi;
-	
+
 	// draw brick pattern
-	for(ram_offs=0x50;ram_offs<0x5e;ram_offs++)
+	for(ram_offs=ram_base;ram_offs<ram_base+0xe;ram_offs++)
 	{
 		uint8_t cur_column = m_ram[ram_offs];
 		
@@ -142,7 +152,7 @@ void tattack_state::draw_gameplay_bitmap(bitmap_ind16 &bitmap, const rectangle &
 						int resy = (ram_offs & 0xf)*16+yi+16;
 						
 						if(cliprect.contains(resx,resy))
-							bitmap.pix16(resy, resx) = (bit & 4 ? yellow_pen : green_pen);
+							bitmap.pix16(resy, resx) = m_bricks_color_bank == true ? red_pen : (bit & 4 ? yellow_pen : green_pen);
 					}
 				}
 			}
@@ -150,19 +160,21 @@ void tattack_state::draw_gameplay_bitmap(bitmap_ind16 &bitmap, const rectangle &
 	}
 	
 	// draw paddle
-	for(xi=0;xi<4;xi++)
-		for(yi=0;yi<16;yi++)
-		{
-			int resx =(38+xi);
-			int resy = m_paddle_reg+yi;
+	if(m_bottom_edge_enable == false)
+	{
+		for(xi=0;xi<4;xi++)
+			for(yi=0;yi<m_paddle_ysize;yi++)
+			{
+				int resx =(paddle_xpos+xi);
+				int resy = m_paddle_reg+yi;
 
-			if(cliprect.contains(resx,resy))
-				bitmap.pix16(resy, resx) = white_pen;
-		}
-	
+				if(cliprect.contains(resx,resy))
+					bitmap.pix16(resy, resx) = white_pen;
+			}
+	}	
 	// draw ball
-	for(xi=0;xi<4;xi++)
-		for(yi=0;yi<4;yi++)
+	for(xi=0;xi<3;xi++)
+		for(yi=0;yi<3;yi++)
 		{
 			int resx = m_ball_regs[0]+xi-2+x_base;
 			int resy = m_ball_regs[1]+yi;
@@ -204,9 +216,14 @@ WRITE8_MEMBER(tattack_state::ball_w)
 WRITE8_MEMBER(tattack_state::brick_dma_w)
 {
 	// bit 7: 0->1 transfers from RAM to internal video buffer
-	// bit 4: bricks color bank?
-	// bit 3: enable bottom edge?
-	
+	// bit 6: bricks color bank 
+	m_bricks_color_bank = BIT(data,6);
+	// bit 5: flip screen
+	flip_screen_set(!(data & 0x20));
+	// bit 4: x paddle half size
+	m_paddle_ysize = data & 0x10 ? 8 : 16;
+	// bit 3: enable bottom edge
+	m_bottom_edge_enable = BIT(data,3);
 //	popmessage("%02x",data&0x7f);
 }
 
@@ -217,7 +234,7 @@ static ADDRESS_MAP_START( tattack_map, AS_PROGRAM, 8, tattack_state )
 	AM_RANGE(0x6000, 0x6000) AM_READ_PORT("DSW2")
 	AM_RANGE(0x7000, 0x73ff) AM_RAM AM_SHARE("colorram")    // color map ? something else .. only bits 1-3 are used
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("DSW1")       // dsw ? something else ?
-	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("INPUTS") AM_WRITENOP
+	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("INPUTS") AM_WRITENOP // sound
 	AM_RANGE(0xc001, 0xc001) AM_WRITE(brick_dma_w) // bit 7 = strobe ($302)
 	AM_RANGE(0xc002, 0xc002) AM_WRITENOP
 	AM_RANGE(0xc005, 0xc005) AM_WRITE(paddle_w)
@@ -239,32 +256,29 @@ static INPUT_PORTS_START( tattack )
 	PORT_DIPNAME( 0x08, 0x08, "1-04" )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON3 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x00, "DSW1 1" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
+	PORT_DIPNAME( 0x01, 0x00, "Enable green square blocks" )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
-
-	PORT_DIPNAME( 0x04, 0x04, "Time" )
+	PORT_DIPNAME( 0x04, 0x04, "Number of bricks to destroy" )
 	PORT_DIPSETTING(    0x04, "112" )
-	PORT_DIPSETTING(    0x00, "5" ) // game ends after breaking five bricks!?
+	PORT_DIPSETTING(    0x00, "5" ) // testing option?
 	PORT_DIPNAME( 0x08, 0x00, "DSW1 4" )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, "DSW1 5" )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, "DSW1 6" )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x30, 0x00, "Paddle in middle of screen" )
+	PORT_DIPSETTING(    0x00, "Never on screen" )
+	PORT_DIPSETTING(    0x10, "Mode 1" ) // - appears after a set number of bricks destroyed, might be same setting
+	PORT_DIPSETTING(    0x20, "Mode 2" ) // /
+	PORT_DIPSETTING(    0x30, "Always on screen" )
 	PORT_DIPNAME( 0x40, 0x00, "DSW1 7" )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -288,15 +302,14 @@ static INPUT_PORTS_START( tattack )
 	PORT_DIPNAME( 0x10, 0x00, "DSW2 5" )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, "DSW2 6" )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, "DSW2 7" )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, "DSW2 8" )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Cocktail ) )
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPSETTING(    0x40, "5" )
+	PORT_DIPSETTING(    0x80, "7" )
+	PORT_DIPSETTING(    0xc0, DEF_STR( Infinite ) )
 	
 	PORT_START("AN_PADDLE")
 	PORT_BIT( 0xff, 0x00, IPT_PADDLE ) PORT_MINMAX(0,0xff) PORT_SENSITIVITY(10) PORT_KEYDELTA(10) PORT_CENTERDELTA(0)
@@ -377,7 +390,6 @@ ROM_START( tattack )
 
 	ROM_REGION( 0x1000, "gfx1", 0 )
 	ROM_LOAD( "rom.6c",     0x0000, 0x1000, CRC(88ce45cf) SHA1(c7a43bfc9e9c2aeb75a98f723558bc88e53401a7) )
-
 ROM_END
 
 DRIVER_INIT_MEMBER(tattack_state,tattack)
@@ -417,4 +429,5 @@ DRIVER_INIT_MEMBER(tattack_state,tattack)
 
 }
 
-GAME( 198?, tattack, 0, tattack, tattack, tattack_state, tattack, ROT270, "Shonan", "Time Attacker", MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING)
+GAME( 1983?, tattack, 0, tattack, tattack, tattack_state, tattack, ROT270, "Shonan", "Time Attacker", MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_NO_COCKTAIL )
+// there is another undumped version with katakana Shonan logo and black background
