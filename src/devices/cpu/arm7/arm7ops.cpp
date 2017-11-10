@@ -492,8 +492,7 @@ void arm7_cpu_device::HandleMemSingle(uint32_t insn)
 						R15 = (R15 & ~0x03FFFFFC) /* N Z C V I F M1 M0 */ | ((data - 4) & 0x03FFFFFC);
 				// LDR, PC takes 2S + 2N + 1I (5 total cycles)
 					ARM7_ICOUNT -= 2;
-					// TODO only ARMv5T and above
-					if (data & 1)
+					if ((data & 1) && m_archRev >= 5)
 					{
 						set_cpsr(GET_CPSR | T_MASK);
 						R15--;
@@ -1377,9 +1376,8 @@ void arm7_cpu_device::HandleMemBlock(uint32_t insn)
 						SwitchMode(temp & 3);
 					}
 				}
-				// TODO only ARMv5T and above
 				else
-					if (R15 & 1)
+					if ((R15 & 1) && m_archRev >= 5)
 					{
 						set_cpsr(GET_CPSR | T_MASK);
 						R15--;
@@ -1441,9 +1439,8 @@ void arm7_cpu_device::HandleMemBlock(uint32_t insn)
 						SwitchMode(temp & 3);
 					}
 				}
-				// TODO only ARMv5T and above
 				else
-					if (R15 & 1)
+					if ((R15 & 1) && m_archRev >= 5)
 					{
 						set_cpsr(GET_CPSR | T_MASK);
 						R15--;
