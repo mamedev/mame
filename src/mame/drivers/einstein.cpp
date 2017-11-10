@@ -6,9 +6,7 @@
     Tatung Einstein
 
     TODO:
-    - Verify centronics printer
-    - Hook up RS232 port
-    - Einstein 256 support
+    - Einstein 256 support (need bios dump)
 
  ******************************************************************************/
 
@@ -19,6 +17,7 @@
 #include "bus/centronics/ctronics.h"
 #include "bus/einstein/pipe/pipe.h"
 #include "bus/einstein/userport/userport.h"
+#include "bus/rs232/rs232.h"
 #include "machine/adc0844.h"
 #include "machine/clock.h"
 #include "machine/i8251.h"
@@ -604,9 +603,19 @@ static MACHINE_CONFIG_START( einstein )
 
 	MCFG_TIMER_DRIVER_ADD("strobe", einstein_state, strobe_callback)
 
-	/* uart */
-	MCFG_DEVICE_ADD(IC_I060, I8251, 0)
+	// uart
+	MCFG_DEVICE_ADD(IC_I060, I8251, XTAL_X002 / 4)
+	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_I8251_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
+	MCFG_I8251_DTR_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
 
+	// rs232 port
+	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(IC_I060, i8251_device, write_rxd))
+	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(IC_I060, i8251_device, write_dsr))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(IC_I060, i8251_device, write_cts))
+
+	// floppy
 	MCFG_WD1770_ADD(IC_I042, XTAL_X002)
 
 	MCFG_FLOPPY_DRIVE_ADD(IC_I042 ":0", einstein_floppies, "3ss", floppy_image_device::default_floppy_formats)
