@@ -91,7 +91,7 @@ public:
 	MC6845_UPDATE_ROW(update_row);
 	DECLARE_WRITE_LINE_MEMBER(crtc_hs);
 	DECLARE_WRITE_LINE_MEMBER(crtc_vs);
-	DECLARE_WRITE8_MEMBER(motor_w);
+	DECLARE_WRITE_LINE_MEMBER(motor_w);
 	DECLARE_MACHINE_RESET(excali64);
 	required_device<palette_device> m_palette;
 
@@ -240,9 +240,9 @@ static SLOT_INTERFACE_START( excali64_floppies )
 SLOT_INTERFACE_END
 
 // pulses from port E4 bit 5 restart the 74123. After 3.6 secs without a pulse, the motor gets turned off.
-WRITE8_MEMBER( excali64_state::motor_w )
+WRITE_LINE_MEMBER( excali64_state::motor_w )
 {
-	m_motor = BIT(data, 0);
+	m_motor = state;
 	m_floppy1->get_device()->mon_w(!m_motor);
 	m_floppy0->get_device()->mon_w(!m_motor);
 }
@@ -265,7 +265,7 @@ WRITE8_MEMBER( excali64_state::porte4_w )
 	if (floppy)
 		floppy->ss_w(BIT(data, 4));
 
-	m_u12->b_w(space,offset, BIT(data, 5)); // motor pulse
+	m_u12->b_w(BIT(data, 5)); // motor pulse
 }
 
 /*
@@ -616,7 +616,7 @@ static MACHINE_CONFIG_START( excali64 )
 	MCFG_TTL74123_A_PIN_VALUE(0)                  /* A pin - grounded */
 	MCFG_TTL74123_B_PIN_VALUE(1)                  /* B pin - driven by port e4 bit 5 */
 	MCFG_TTL74123_CLEAR_PIN_VALUE(1)                  /* Clear pin - pulled high */
-	MCFG_TTL74123_OUTPUT_CHANGED_CB(WRITE8(excali64_state, motor_w))
+	MCFG_TTL74123_OUTPUT_CHANGED_CB(WRITELINE(excali64_state, motor_w))
 
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(excali64_state, cent_busy_w))
