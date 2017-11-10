@@ -471,7 +471,7 @@ void pgm2_state::draw_sprites(screen_device &screen, const rectangle &cliprect, 
 		if (spriteram[i] == 0x80000000)
 		{
 			endoflist = i;
-			i = 0x2000;
+			break;
 		}
 	}
 
@@ -1180,7 +1180,7 @@ DRIVER_INIT_MEMBER(pgm2_state,orleg2)
 
 	if (rom[0x12620 / 2] == 0xd301) // 104 / 103
 	{
-		hackaddress = 0x12620;
+		hackaddress = 0x12620; // RAM: 10012620
 	}
 	else if (rom[0x1257C / 2] == 0xd301) // 101
 	{
@@ -1189,8 +1189,8 @@ DRIVER_INIT_MEMBER(pgm2_state,orleg2)
 
 	if (hackaddress != -1)
 	{
-		rom[(hackaddress + 2) / 2] = 0x0009;
-		rom[(hackaddress + 4) / 2] = 0x0009;
+		rom[(hackaddress + 2) / 2] = 0x2300;
+		rom[(hackaddress + 4) / 2] = 0x2300;
 		rom = (uint16_t*)memregion("maincpu")->base(); // BEQ -> BNE for checksum
 		rom[0x39f2 / 2] = 0x1a00;
 
