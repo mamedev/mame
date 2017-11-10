@@ -132,6 +132,7 @@ enum
 	XTAL_11_6688MHz     = 11668800,     /* Gameplan pixel clock */
 	XTAL_11_8MHz        = 11800000,     /* IBM PC Music Feature Card */
 	XTAL_11_9808MHz     = 11980800,     /* Luxor ABC 80 */
+	XTAL_11_9931MHz		= 11993100,		/* DECO HMC20 CRTC */
 	XTAL_12MHz          = 12000000,     /* Extremely common, used on 100's of PCBs */
 	XTAL_12_0576MHz     = 12057600,     /* Poly 1 (38400 * 314) */
 	XTAL_12_096MHz      = 12096000,     /* Some early 80's Atari games */
