@@ -2,20 +2,22 @@
 // copyright-holders:Olivier Galibert, R. Belmont, MetalliC
 /***************************************************************************
 
-    ymz770.c
+    Yamaha YMZ770C and YMZ774
 
     Emulation by R. Belmont and MetalliC
     AMM decode by Olivier Galibert
 
 -----
 TODO:
-- A lot of unimplemented features, even simple ones like panning,
-  these should be added once we find out any software that uses it.
-- Sequencer is very preliminary
-- verify if pan 100% correct
 - What does channel ATBL mean?
-- Is YMZ774(and other variants) the same family as this chip?
-  What are the differences?
+ 770:
+- verify if pan 100% correct
+- sequencer timers and triggers not implemented (seems used in Deathsmiles ending tune)
+ 774:
+- find out how volume/pan delayed transition works (used few times in orleg2 attract mode)
+- 4 channel output
+- Equalizer
+- Sequencer (not used)
 
 ***************************************************************************/
 
@@ -45,6 +47,7 @@ ymz770_device::ymz770_device(const machine_config &mconfig, device_type type, co
 	, m_mute(0)
 	, m_doen(0)
 	, m_vlma(0)
+	, m_vlma1(0)
 	, m_bsl(0)
 	, m_cpl(0)
 	, m_rom(*this, DEVICE_SELF)
@@ -74,6 +77,7 @@ void ymz770_device::device_start()
 	save_item(NAME(m_mute));
 	save_item(NAME(m_doen));
 	save_item(NAME(m_vlma));
+	save_item(NAME(m_vlma1));
 	save_item(NAME(m_bsl));
 	save_item(NAME(m_cpl));
 
@@ -82,6 +86,8 @@ void ymz770_device::device_start()
 		save_item(NAME(m_channels[ch].phrase), ch);
 		save_item(NAME(m_channels[ch].pan), ch);
 		save_item(NAME(m_channels[ch].pan_delay), ch);
+		save_item(NAME(m_channels[ch].pan1), ch);
+		save_item(NAME(m_channels[ch].pan1_delay), ch);
 		save_item(NAME(m_channels[ch].volume), ch);
 		save_item(NAME(m_channels[ch].volume_delay), ch);
 		save_item(NAME(m_channels[ch].volume2), ch);
@@ -115,6 +121,8 @@ void ymz770_device::device_reset()
 		channel.phrase = 0;
 		channel.pan = 64;
 		channel.pan_delay = 0;
+		channel.pan1 = 64;
+		channel.pan1_delay = 0;
 		channel.volume = 0;
 		channel.volume_delay = 0;
 		channel.volume2 = 0;
@@ -158,9 +166,10 @@ void ymz770_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 			if (channel.output_remaining > 0)
 			{
 				// force finish current block
-				int32_t smpl = channel.output_data[channel.output_ptr++] * channel.volume;	// volume is linear, 0 - 128 (100%)
-				mixr += (smpl * channel.pan) >> 14;	// pan seems linear, 0 - 128, where 0 = 100% left, 128 = 100% right, 64 = 50% left 50% right
-				mixl += (smpl * (128 - channel.pan)) >> 14;
+				int32_t smpl = (channel.output_data[channel.output_ptr++] * channel.volume) >> 7;	// volume is linear, 0 - 128 (100%)
+				smpl = (smpl * channel.volume2) >> 7;
+				mixr += (smpl * channel.pan) >> 7;	// pan seems linear, 0 - 128, where 0 = 100% left, 128 = 100% right, 64 = 50% left 50% right
+				mixl += (smpl * (128 - channel.pan)) >> 7;
 				channel.output_remaining--;
 
 				if (channel.output_remaining == 0 && !channel.is_playing)
@@ -205,9 +214,10 @@ retry:
 					channel.output_remaining--;
 					channel.output_ptr = 1;
 
-					int32_t smpl = channel.output_data[0] * channel.volume;
-					mixr += (smpl * channel.pan) >> 14;
-					mixl += (smpl * (128 - channel.pan)) >> 14;
+					int32_t smpl = (channel.output_data[0] * channel.volume) >> 7;
+					smpl = (smpl * channel.volume2) >> 7;
+					mixr += (smpl * channel.pan) >> 7;
+					mixl += (smpl * (128 - channel.pan)) >> 7;
 				}
 			}
 		}
@@ -340,6 +350,7 @@ void ymz770_device::internal_reg_write(uint8_t reg, uint8_t data)
 
 			case 1:
 				m_channels[ch].volume = data;
+				m_channels[ch].volume2 = 128;
 				break;
 
 			case 2:
@@ -460,6 +471,13 @@ void ymz774_device::internal_reg_write(uint8_t reg, uint8_t data)
 			if (data) logerror("unimplemented write %02X %02X\n", reg, data);
 			m_channels[ch].pan_delay = data;
 			break;
+		case 0x38: // Pan T/B
+			m_channels[ch].pan1 = data;
+			break;
+		case 0x40: // Pan T/B delayed transition
+			if (data) logerror("unimplemented write %02X %02X\n", reg, data);
+			m_channels[ch].pan1_delay = data;
+			break;
 		case 0x48: // Loop
 			m_channels[ch].loop = data;
 			break;
@@ -485,7 +503,7 @@ void ymz774_device::internal_reg_write(uint8_t reg, uint8_t data)
 	}
 	else if (reg < 0xd0)
 	{
-		if (m_bank == 0) // Sequencer, is it used in PGM2 ?
+		if (m_bank == 0) // Sequencer, in PGM2 games not used at all
 		{
 			if (data) logerror("sequencer unimplemented %02X %02X\n", reg, data);
 		}
@@ -497,6 +515,9 @@ void ymz774_device::internal_reg_write(uint8_t reg, uint8_t data)
 		switch (reg) {
 		case 0xd0:
 			m_vlma = data;
+			break;
+		case 0xd1:
+			m_vlma1 = data;
 			break;
 		case 0xd2:
 			m_cpl = data;

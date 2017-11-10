@@ -65,7 +65,8 @@ protected:
 	uint8_t m_cur_reg;
 	uint8_t m_mute;         // mute chip
 	uint8_t m_doen;         // digital output enable
-	uint8_t m_vlma;         // overall AAM volume
+	uint8_t m_vlma;         // overall volume L0/R0
+	uint8_t m_vlma1;        // overall volume L1/R1
 	uint8_t m_bsl;          // boost level
 	uint8_t m_cpl;          // clip limiter
 	required_region_ptr<uint8_t> m_rom;
@@ -75,6 +76,8 @@ protected:
 		uint16_t phrase;
 		uint8_t pan;
 		uint8_t pan_delay;
+		uint8_t pan1;
+		uint8_t pan1_delay;
 		uint8_t volume;
 		uint8_t volume_delay;
 		uint8_t volume2;
