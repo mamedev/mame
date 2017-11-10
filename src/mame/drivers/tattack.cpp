@@ -60,13 +60,16 @@ public:
 		m_colorram(*this, "colorram"),
 		m_gfxdecode(*this, "gfxdecode") { }
 
-//	DECLARE_WRITE8_MEMBER(paddle_w);
+	DECLARE_WRITE8_MEMBER(paddle_w);
 	DECLARE_WRITE8_MEMBER(ball_w);
+	DECLARE_WRITE8_MEMBER(brick_dma_w);
 	DECLARE_DRIVER_INIT(tattack);
 	TILE_GET_INFO_MEMBER(get_tile_info);
-	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(tattack);
+
 	uint32_t screen_update_tattack(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+protected:
+	virtual void video_start() override;
 private:
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_ram;
@@ -75,6 +78,7 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	tilemap_t *m_tmap;
 	uint8_t m_ball_regs[2];
+	uint8_t m_paddle_reg;
 	
 	void draw_gameplay_bitmap(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_edge_bitmap(bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -144,7 +148,18 @@ void tattack_state::draw_gameplay_bitmap(bitmap_ind16 &bitmap, const rectangle &
 			}
 		}
 	}
-		
+	
+	// draw paddle
+	for(xi=0;xi<4;xi++)
+		for(yi=0;yi<16;yi++)
+		{
+			int resx =(38+xi);
+			int resy = m_paddle_reg+yi;
+
+			if(cliprect.contains(resx,resy))
+				bitmap.pix16(resy, resx) = white_pen;
+		}
+	
 	// draw ball
 	for(xi=0;xi<4;xi++)
 		for(yi=0;yi<4;yi++)
@@ -176,28 +191,36 @@ void tattack_state::video_start()
 	m_tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tattack_state::get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32 );
 }
 
-#if 0
 WRITE8_MEMBER(tattack_state::paddle_w)
 {
-	// ...
+	m_paddle_reg = data;
 }
-#endif
 
 WRITE8_MEMBER(tattack_state::ball_w)
 {
 	m_ball_regs[offset] = data;
 }
 
-static ADDRESS_MAP_START( mem, AS_PROGRAM, 8, tattack_state )
+WRITE8_MEMBER(tattack_state::brick_dma_w)
+{
+	// bit 7: 0->1 transfers from RAM to internal video buffer
+	// bit 4: bricks color bank?
+	// bit 3: enable bottom edge?
+	
+//	popmessage("%02x",data&0x7f);
+}
+
+static ADDRESS_MAP_START( tattack_map, AS_PROGRAM, 8, tattack_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x4000, 0x4000) AM_READNOP // $315, checks again with same memory, loops if different (?)
+	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("AN_PADDLE") // $315, checks again with same memory, loops if different (?)
 	AM_RANGE(0x5000, 0x53ff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x7000, 0x73ff) AM_RAM AM_SHARE("colorram")    // color map ? something else .. only bits 1-3 are used
 	AM_RANGE(0x6000, 0x6000) AM_READ_PORT("DSW2")
+	AM_RANGE(0x7000, 0x73ff) AM_RAM AM_SHARE("colorram")    // color map ? something else .. only bits 1-3 are used
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("DSW1")       // dsw ? something else ?
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("INPUTS") AM_WRITENOP
-	AM_RANGE(0xc001, 0xc002) AM_WRITENOP                // bit 7 = strobe ($302)
-	AM_RANGE(0xc005, 0xc005) AM_WRITENOP
+	AM_RANGE(0xc001, 0xc001) AM_WRITE(brick_dma_w) // bit 7 = strobe ($302)
+	AM_RANGE(0xc002, 0xc002) AM_WRITENOP
+	AM_RANGE(0xc005, 0xc005) AM_WRITE(paddle_w)
 	AM_RANGE(0xc006, 0xc007) AM_WRITE(ball_w)
 	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_SHARE("ram")
 ADDRESS_MAP_END
@@ -230,9 +253,9 @@ static INPUT_PORTS_START( tattack )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
 
-	PORT_DIPNAME( 0x04, 0x00, "Time" )
+	PORT_DIPNAME( 0x04, 0x04, "Time" )
 	PORT_DIPSETTING(    0x04, "112" )
-	PORT_DIPSETTING(    0x00, "5" )
+	PORT_DIPSETTING(    0x00, "5" ) // game ends after breaking five bricks!?
 	PORT_DIPNAME( 0x08, 0x00, "DSW1 4" )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -274,6 +297,9 @@ static INPUT_PORTS_START( tattack )
 	PORT_DIPNAME( 0x80, 0x00, "DSW2 8" )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	
+	PORT_START("AN_PADDLE")
+	PORT_BIT( 0xff, 0x00, IPT_PADDLE ) PORT_MINMAX(0,0xff) PORT_SENSITIVITY(10) PORT_KEYDELTA(10) PORT_CENTERDELTA(0)
 INPUT_PORTS_END
 
 
@@ -318,7 +344,7 @@ static MACHINE_CONFIG_START( tattack )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 8000000 / 2)   /* 4 MHz ? */
-	MCFG_CPU_PROGRAM_MAP(mem)
+	MCFG_CPU_PROGRAM_MAP(tattack_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", tattack_state,  irq0_line_hold)
 
 	/* video hardware */
