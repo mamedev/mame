@@ -6,6 +6,8 @@ QT Computer Systems SBC +2/4
 
 2009-12-11 Skeleton driver.
 
+This looks like the same system as the Compu/Time SBC-880 Processor Board.
+
 Currently it crashes. There's a memory move routine at 50A4, and after
 a few turns it is told to move E603 bytes which corrupts everything.
 
@@ -15,6 +17,20 @@ Chips: P8251, D8253C, MK3880N-4 (Z80). 3x 6-sw dips. Unmarked crystal.
 There's a blue jumper marked 4M and 2M. Assumed to be selectable CPU clock.
 Also assumed this is what the "2/4" in the name refers to.
 
+Feature list from QT ad:
+- 1K RAM (which can be located at any 1K boundary) plus one each
+  Parallel and Serial I/O ports on board
+- Power on jump to onboard EPROM (2708 or 2716)
+- EPROM addressable on any 1K or 2K boundary
+- Full 64K use of RAM allowed in shadow mode
+- Programmable Baud rate selection, 110-9600
+- 2 or 4MHz switch selectable
+- DMA capability allows MWRT signal generation on CPU board or elsewhere
+  in system under DMA logic or front panel control
+- Two programmable timers available for use by programs run with the
+  SBC+2/4 (timer output and controls available at parallel I/O connector;
+  parallel input and output ports available for use on CPU board).
+
 ****************************************************************************/
 
 #include "emu.h"
@@ -22,6 +38,7 @@ Also assumed this is what the "2/4" in the name refers to.
 #include "machine/i8251.h"
 #include "machine/pit8253.h"
 #include "bus/rs232/rs232.h"
+//#include "bus/s100/s100.h"
 
 
 class qtsbc_state : public driver_device
