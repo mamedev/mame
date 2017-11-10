@@ -12,10 +12,6 @@
 #pragma once
 
 //**************************************************************************
-//  CONSTANTS
-//**************************************************************************
-
-//**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
@@ -97,10 +93,10 @@ protected:
 	struct ymz_sequence
 	{
 		uint16_t sequence;
-		uint8_t seqcontrol;
-		uint8_t seqdelay;
-		uint8_t *seqdata;
-		bool is_seq_playing;
+		uint8_t control;
+		uint8_t delay;
+		uint8_t *data;
+		bool is_playing;
 	};
 
 	ymz_channel m_channels[16];
@@ -117,7 +113,7 @@ public:
 
 	DECLARE_READ8_MEMBER(read);
 protected:
-	virtual void internal_reg_write(uint8_t reg, uint8_t data) override; 
+	virtual void internal_reg_write(uint8_t reg, uint8_t data) override;
 	virtual uint32_t get_phrase_offs(int phrase) override { int ph = phrase * 4; return ((m_rom[ph] & 0x0f) << 24 | m_rom[ph + 1] << 16 | m_rom[ph + 2] << 8 | m_rom[ph + 3]) * 2; };
 	virtual uint32_t get_seq_offs(int sqn) override { int sq = sqn * 4 + 0x2000; return ((m_rom[sq] & 0x0f) << 24 | m_rom[sq + 1] << 16 | m_rom[sq + 2] << 8 | m_rom[sq + 3]) * 2; };
 	virtual void sequencer() override {};

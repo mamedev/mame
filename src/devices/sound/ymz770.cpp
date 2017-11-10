@@ -61,13 +61,13 @@ void ymz770_device::device_start()
 	// create the stream
 	m_stream = machine().sound().stream_alloc(*this, 0, 2, m_sclock);
 
-	for (auto & elem : m_channels)
+	for (auto & channel : m_channels)
 	{
-		elem.is_playing = false;
-		elem.decoder = new mpeg_audio(&m_rom[0], mpeg_audio::AMM, false, 0);
+		channel.is_playing = false;
+		channel.decoder = new mpeg_audio(&m_rom[0], mpeg_audio::AMM, false, 0);
 	}
-	for (auto & elem : m_sequences)
-		elem.is_seq_playing = false;
+	for (auto & sequence : m_sequences)
+		sequence.is_playing = false;
 
 	// register for save states
 	save_item(NAME(m_cur_reg));
@@ -97,9 +97,9 @@ void ymz770_device::device_start()
 	for (int ch = 0; ch < 8; ch++)
 	{
 		save_item(NAME(m_sequences[ch].sequence), ch);
-		save_item(NAME(m_sequences[ch].seqcontrol), ch);
-		save_item(NAME(m_sequences[ch].seqdelay), ch);
-		save_item(NAME(m_sequences[ch].is_seq_playing), ch);
+		save_item(NAME(m_sequences[ch].control), ch);
+		save_item(NAME(m_sequences[ch].delay), ch);
+		save_item(NAME(m_sequences[ch].is_playing), ch);
 	}
 }
 
@@ -110,25 +110,25 @@ void ymz770_device::device_start()
 
 void ymz770_device::device_reset()
 {
-	for (auto & elem : m_channels)
+	for (auto & channel : m_channels)
 	{
-		elem.phrase = 0;
-		elem.pan = 64;
-		elem.pan_delay = 0;
-		elem.volume = 0;
-		elem.volume_delay = 0;
-		elem.volume2 = 0;
-		elem.loop = 0;
-		elem.is_playing = false;
-		elem.output_remaining = 0;
-		elem.decoder->clear();
+		channel.phrase = 0;
+		channel.pan = 64;
+		channel.pan_delay = 0;
+		channel.volume = 0;
+		channel.volume_delay = 0;
+		channel.volume2 = 0;
+		channel.loop = 0;
+		channel.is_playing = false;
+		channel.output_remaining = 0;
+		channel.decoder->clear();
 	}
-	for (auto & elem : m_sequences)
+	for (auto & sequence : m_sequences)
 	{
-		elem.sequence = 0;
-		elem.seqcontrol = 0;
-		elem.seqdelay = 0;
-		elem.is_seq_playing = false;
+		sequence.sequence = 0;
+		sequence.control = 0;
+		sequence.delay = 0;
+		sequence.is_playing = false;
 	}
 }
 
@@ -153,61 +153,61 @@ void ymz770_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 		int32_t mixl = 0;
 		int32_t mixr = 0;
 
-		for (auto & elem : m_channels)
+		for (auto & channel : m_channels)
 		{
-			if (elem.output_remaining > 0)
+			if (channel.output_remaining > 0)
 			{
 				// force finish current block
-				int32_t smpl = elem.output_data[elem.output_ptr++] * elem.volume;	// volume is linear, 0 - 128 (100%)
-				mixr += (smpl * elem.pan) >> 14;	// pan seems linear, 0 - 128, where 0 = 100% left, 128 = 100% right, 64 = 50% left 50% right
-				mixl += (smpl * (128 - elem.pan)) >> 14;
-				elem.output_remaining--;
+				int32_t smpl = channel.output_data[channel.output_ptr++] * channel.volume;	// volume is linear, 0 - 128 (100%)
+				mixr += (smpl * channel.pan) >> 14;	// pan seems linear, 0 - 128, where 0 = 100% left, 128 = 100% right, 64 = 50% left 50% right
+				mixl += (smpl * (128 - channel.pan)) >> 14;
+				channel.output_remaining--;
 
-				if (elem.output_remaining == 0 && !elem.is_playing)
-					elem.decoder->clear();
+				if (channel.output_remaining == 0 && !channel.is_playing)
+					channel.decoder->clear();
 			}
 
-			else if (elem.is_playing)
+			else if (channel.is_playing)
 			{
 retry:
-				if (elem.last_block)
+				if (channel.last_block)
 				{
-					if (elem.loop)
+					if (channel.loop)
 					{
-						if (elem.loop != 255)
-							--elem.loop;
+						if (channel.loop != 255)
+							--channel.loop;
 						// loop sample
-						int phrase = elem.phrase;
-						elem.atbl = m_rom[(4*phrase)+0] >> 4 & 7;
-						elem.pptr = 8 * get_phrase_offs(phrase);
+						int phrase = channel.phrase;
+						channel.atbl = m_rom[(4*phrase)+0] >> 4 & 7;
+						channel.pptr = 8 * get_phrase_offs(phrase);
 					}
 					else
 					{
-						elem.is_playing = false;
-						elem.output_remaining = 0;
-						elem.decoder->clear();
+						channel.is_playing = false;
+						channel.output_remaining = 0;
+						channel.decoder->clear();
 					}
 				}
 
-				if (elem.is_playing)
+				if (channel.is_playing)
 				{
 					// next block
 					int sample_rate, channel_count;
-					if (!elem.decoder->decode_buffer(elem.pptr, m_rom.bytes()*8, elem.output_data, elem.output_remaining, sample_rate, channel_count) || elem.output_remaining == 0)
+					if (!channel.decoder->decode_buffer(channel.pptr, m_rom.bytes()*8, channel.output_data, channel.output_remaining, sample_rate, channel_count) || channel.output_remaining == 0)
 					{
-						elem.is_playing = !elem.last_block; // detect infinite retry loop
-						elem.last_block = true;
-						elem.output_remaining = 0;
+						channel.is_playing = !channel.last_block; // detect infinite retry loop
+						channel.last_block = true;
+						channel.output_remaining = 0;
 						goto retry;
 					}
 
-					elem.last_block = elem.output_remaining < 1152;
-					elem.output_remaining--;
-					elem.output_ptr = 1;
+					channel.last_block = channel.output_remaining < 1152;
+					channel.output_remaining--;
+					channel.output_ptr = 1;
 
-					int32_t smpl = elem.output_data[0] * elem.volume;
-					mixr += (smpl * elem.pan) >> 14;
-					mixl += (smpl * (128 - elem.pan)) >> 14;
+					int32_t smpl = channel.output_data[0] * channel.volume;
+					mixr += (smpl * channel.pan) >> 14;
+					mixl += (smpl * (128 - channel.pan)) >> 14;
 				}
 			}
 		}
@@ -243,35 +243,35 @@ retry:
 
 void ymz770_device::sequencer()
 {
-	for (auto & elem : m_sequences)
+	for (auto & sequence : m_sequences)
 	{
-		if (elem.is_seq_playing)
+		if (sequence.is_playing)
 		{
-			if (elem.seqdelay > 0)
+			if (sequence.delay > 0)
 			{
-				elem.seqdelay--;
+				sequence.delay--;
 			}
 			else
 			{
-				int reg = *elem.seqdata++;
-				uint8_t data = *elem.seqdata++;
+				int reg = *sequence.data++;
+				uint8_t data = *sequence.data++;
 				switch (reg)
 				{
 				case 0x0f:
-					if (elem.seqcontrol & 1)
+					if (sequence.control & 1)
 					{
 						// loop sequence
-						uint8_t sqn = elem.sequence;
+						uint8_t sqn = sequence.sequence;
 						uint32_t pptr = get_seq_offs(sqn);
-						elem.seqdata = &m_rom[pptr];
+						sequence.data = &m_rom[pptr];
 					}
 					else
 					{
-						elem.is_seq_playing = false;
+						sequence.is_playing = false;
 					}
 					break;
 				case 0x0e:
-					elem.seqdelay = 32 - 1;
+					sequence.delay = 32 - 1;
 					break;
 				default:
 					internal_reg_write(reg, data);
@@ -381,16 +381,16 @@ void ymz770_device::internal_reg_write(uint8_t reg, uint8_t data)
 				{
 					uint8_t sqn = m_sequences[ch].sequence;
 					uint32_t pptr = get_seq_offs(sqn);
-					m_sequences[ch].seqdata = &m_rom[pptr];
-					m_sequences[ch].seqdelay = 0;
-					m_sequences[ch].is_seq_playing = true;
+					m_sequences[ch].data = &m_rom[pptr];
+					m_sequences[ch].delay = 0;
+					m_sequences[ch].is_playing = true;
 				}
 				else
 				{
-					m_sequences[ch].is_seq_playing = false;
+					m_sequences[ch].is_playing = false;
 				}
 
-				m_sequences[ch].seqcontrol = data;
+				m_sequences[ch].control = data;
 				break;
 
 			default:
