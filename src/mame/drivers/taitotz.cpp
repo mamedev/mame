@@ -57,7 +57,7 @@ Bottom board
 
 IC40    Toshiba TMP95C063F
 IC55    Panasonic MN89306
-EPSON 9X5C pscillator near IC55
+EPSON 9X5C oscillator near IC55
 IC56    HY57V161610D TC-10
 IC22    ID7133 SA70J
 25.000 oscillator near IC22
@@ -84,7 +84,7 @@ HIN239CB (+5v Powered RS-232 Transmitter/Receiver - 120kbps)
 LC321664AM-80 (1Meg (65536 words x 16bits) DRAM)
 74HC4040A (12-Stage Binary Ripple Counter)
 
-E74-07.IC6 & E74-08.IC8 are the OKI samples and are indentical
+E74-07.IC6 & E74-08.IC8 are the OKI samples and are identical
 E74-06.IC2 is the TMP95C063 program code.
 
 
@@ -2777,6 +2777,26 @@ ROM_START( landhigh )
 	DISK_IMAGE( "landhigh", 0, SHA1(7cea4ea5c3899e6ac774a4eb12821f44541d9c9c) )
 ROM_END
 
+ROM_START( landhigha )
+	ROM_REGION64_BE( 0x100000, "user1", 0 )
+	TAITOTZ_BIOS_V152
+
+	ROM_REGION( 0x40000, "io_cpu", 0 )
+	ROM_LOAD16_BYTE( "e82-03.ic14", 0x000000, 0x020000, CRC(0de65b4d) SHA1(932316f7435259b723a29843d58b2e3dca92e7b7) )
+	ROM_LOAD16_BYTE( "e82-04.ic15", 0x000001, 0x020000, CRC(b3cb0f3d) SHA1(80414f50a1593c6b849d9f37e94a32168699a5c1) )
+
+	ROM_REGION( 0x10000, "sound_cpu", 0 ) /* Internal ROM :( */
+	ROM_LOAD( "e68-01.ic7", 0x000000, 0x010000, NO_DUMP )
+
+	ROM_REGION( 0x500, "plds", 0 )
+	ROM_LOAD( "e82-01.ic44", 0x000, 0x117, CRC(49eea30f) SHA1(ef97c792358f05b9214a2f58ee1e97e8208806c4) )
+	ROM_LOAD( "e82-02.ic45", 0x117, 0x2dd, CRC(f581cff5) SHA1(468e0e6a3828f2dcda35c6d523154510f9c99db7) )
+	ROM_LOAD( "e68-06.ic24", 0x3f4, 0x100, NO_DUMP )
+
+	DISK_REGION( "ata:0:hdd:image" )
+	DISK_IMAGE( "landhigha", 0, SHA1(830ff12671a977a4c243491b68444f8ca69d0819) )
+ROM_END
+
 ROM_START( batlgear )
 	ROM_REGION64_BE( 0x100000, "user1", 0 )
 	TAITOTZ_BIOS_V111A
@@ -2917,6 +2937,7 @@ ROM_END
 
 GAME( 1999, taitotz,   0,        taitotz,  taitotz,  taitotz_state, 0,        ROT0, "Taito", "Type Zero BIOS", MACHINE_NO_SOUND|MACHINE_NOT_WORKING|MACHINE_IS_BIOS_ROOT)
 GAME( 1999, landhigh,  taitotz,  landhigh, landhigh, taitotz_state, landhigh, ROT0, "Taito", "Landing High Japan  (Ver 2.01 OK)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1999, landhigha, landhigh, landhigh, landhigh, taitotz_state, landhigh, ROT0, "Taito", "Landing High Japan  (Ver 2.02 O)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // needs correct hd serial number
 GAME( 1999, batlgear,  taitotz,  taitotz,  batlgr2,  taitotz_state, batlgear, ROT0, "Taito", "Battle Gear (Ver 2.40 A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 1999, pwrshovl,  taitotz,  taitotz,  pwrshovl, taitotz_state, pwrshovl, ROT0, "Taito", "Power Shovel ni Norou!! - Power Shovel Simulator (v2.07J)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 1999/8/5 19:13:35
 GAME( 1999, pwrshovla, pwrshovl, taitotz,  pwrshovl, taitotz_state, pwrshovl, ROT0, "Taito", "Power Shovel ni Norou!! - Power Shovel Simulator (v2.07J, alt)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // seem to be some differences in drive content, but identifies as the same revision, is it just user data changes??
