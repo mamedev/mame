@@ -242,8 +242,8 @@ static MACHINE_CONFIG_START( bogeyman )
 //	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 //	MCFG_SCREEN_SIZE(32*8, 32*8)
 //	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	// HMC20
-	MCFG_SCREEN_RAW_PARAMS(XTAL_11_9931MHz/2,384,0,256,272,8,248)
+	// DECO video CRTC, unverified
+	MCFG_SCREEN_RAW_PARAMS(XTAL_12MHz/2,384,0,256,272,8,248)
 	MCFG_SCREEN_UPDATE_DRIVER(bogeyman_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -255,6 +255,7 @@ static MACHINE_CONFIG_START( bogeyman )
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	// verified to be YM2149s from PCB pic
 	MCFG_SOUND_ADD("ay1", YM2149, 1500000)  /* Verified */
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(bogeyman_state, colbank_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)

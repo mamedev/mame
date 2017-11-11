@@ -500,7 +500,7 @@ READ16_MEMBER(dec0_state::slyspy_controls_r)
 	return ~0;
 }
 
-// TODO: this can be a timer access, maybe HMC20 or VSC30 counter returns (and used as RNG in both games)
+// TODO: this can be a timer access, maybe video counter returns (and used as RNG in both games)
 READ16_MEMBER(dec0_state::slyspy_protection_r)
 {
 	switch (offset<<1) 
@@ -1593,10 +1593,9 @@ GFXDECODE_END
 
 
 
-/* This is guesswork, in order to get ~57,41 Hz.
- * If real Pixel Clock isn't 5 MHz then htotal/vtotal is different too ... */
-#define MCFG_SCREEN_RAW_PARAMS_DECO_HMC20 \
-		MCFG_SCREEN_RAW_PARAMS(XTAL_11_9931MHz/2,384,0,256,272,8,248)
+// DECO video CRTC, pixel clock is unverified (actually 24MHz/4?)
+#define MCFG_SCREEN_RAW_PARAMS_DATA_EAST \
+		MCFG_SCREEN_RAW_PARAMS(XTAL_12MHz/2,384,0,256,272,8,248)
 
 
 
@@ -1606,7 +1605,7 @@ static MACHINE_CONFIG_START( dec0_base )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	//MCFG_SCREEN_REFRESH_RATE(57.41)
 	//MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529) /* 57.41 Hz, 529us Vblank */)
-	MCFG_SCREEN_RAW_PARAMS_DECO_HMC20
+	MCFG_SCREEN_RAW_PARAMS_DATA_EAST
 	//MCFG_SCREEN_SIZE(32*8, 32*8)
 	//MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	//MCFG_SCREEN_UPDATE_DRIVER differs per game
@@ -1739,7 +1738,7 @@ static MACHINE_CONFIG_START( automat )
 	MCFG_SCREEN_ADD("screen", RASTER)
 //  MCFG_SCREEN_REFRESH_RATE(57.41)
 //  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529) /* 57.41 Hz, 529us Vblank */)
-	MCFG_SCREEN_RAW_PARAMS_DECO_HMC20
+	MCFG_SCREEN_RAW_PARAMS_DATA_EAST
 	MCFG_SCREEN_UPDATE_DRIVER(dec0_automat_state, screen_update_automat)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -1814,7 +1813,7 @@ static MACHINE_CONFIG_START( secretab )
 	MCFG_SCREEN_ADD("screen", RASTER)
 //  MCFG_SCREEN_REFRESH_RATE(57.41)
 //  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529) /* 57.41 Hz, 529us Vblank */)
-	MCFG_SCREEN_RAW_PARAMS_DECO_HMC20
+	MCFG_SCREEN_RAW_PARAMS_DATA_EAST
 	MCFG_SCREEN_UPDATE_DRIVER(dec0_automat_state, screen_update_secretab)
 	MCFG_SCREEN_PALETTE("palette")
 
