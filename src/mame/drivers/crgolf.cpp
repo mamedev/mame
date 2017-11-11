@@ -373,6 +373,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mastrglf_map, AS_PROGRAM, 8, crgolf_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
+	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x6000, 0x8fff) AM_RAM // maybe RAM and ROM here?
 	AM_RANGE(0x9000, 0x9fff) AM_RAM
 	AM_RANGE(0xa000, 0xffff) AM_DEVICE("vrambank", address_map_bank_device, amap8)
@@ -383,7 +384,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( mastrglf_io, AS_IO, 8, crgolf_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x07) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
-//  AM_RANGE(0x20, 0x20) AM_WRITE( main_to_sound_w )
+//  AM_RANGE(0x20, 0x20) AM_WRITE(rom_bank_select_w)
 	AM_RANGE(0x40, 0x40) AM_WRITE( main_to_sound_w )
 	AM_RANGE(0xa0, 0xa0) AM_READ( sound_to_main_r )
 ADDRESS_MAP_END
@@ -418,13 +419,14 @@ WRITE8_MEMBER(crgolf_state::unk_sub_0c_w)
 
 static ADDRESS_MAP_START( mastrglf_subio, AS_IO, 8, crgolf_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(sound_to_main_w)
+	AM_RANGE(0x00, 0x00) AM_READ(main_to_sound_r) AM_WRITENOP
 	AM_RANGE(0x02, 0x02) AM_READ(unk_sub_02_r )
 	AM_RANGE(0x05, 0x05) AM_READ(unk_sub_05_r )
+	AM_RANGE(0x06, 0x06) AM_READNOP
 	AM_RANGE(0x07, 0x07) AM_READ(unk_sub_07_r )
-
+	AM_RANGE(0x08, 0x08) AM_WRITE(sound_to_main_w)
 	AM_RANGE(0x0c, 0x0c) AM_WRITE(unk_sub_0c_w)
-	AM_RANGE(0x06, 0x06) AM_READ(main_to_sound_r)
+	AM_RANGE(0x10, 0x11) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
 ADDRESS_MAP_END
 
 

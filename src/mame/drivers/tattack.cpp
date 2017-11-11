@@ -424,11 +424,10 @@ static MACHINE_CONFIG_START( tattack )
 	MCFG_SAMPLES_NAMES(tattack_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.6)
 
-//  MCFG_SOUND_ADD("discrete", DISCRETE, 0)
-//  MCFG_DISCRETE_INTF(m14)
-//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	/* Discrete ???? */
-
+//  MCFG_SOUND_ADD("discrete", DISCRETE, 0)
+//  MCFG_DISCRETE_INTF(tattack)
+//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 /***************************************************************************
