@@ -20,8 +20,9 @@
 	- random brick flickering effect is guessworked too, leave MACHINE_IMPERFECT_COLORS in until is tested on HW.
 	- outputs (coin counter port same as sound writes?);
 	- some dipswitches;
-    - sound (requires Epson 7910 Multi-Melody emulation)
-
+    - sound (requires Epson 7910 Multi-Melody emulation?)
+	\- victory BGM cuts off too late?
+	
     Connector pinout from manual
 
           Solder Side      Parts Side
@@ -50,6 +51,8 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "screen.h"
+#include "sound/samples.h"
+#include "speaker.h"
 
 
 class tattack_state : public driver_device
@@ -61,11 +64,14 @@ public:
 		m_ram(*this, "ram"),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_samples(*this,"samples")
+		{ }
 
 	DECLARE_WRITE8_MEMBER(paddle_w);
 	DECLARE_WRITE8_MEMBER(ball_w);
 	DECLARE_WRITE8_MEMBER(brick_dma_w);
+	DECLARE_WRITE8_MEMBER(sound_w);
 	DECLARE_DRIVER_INIT(tattack);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	DECLARE_PALETTE_INIT(tattack);
@@ -79,6 +85,7 @@ private:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<samples_device> m_samples;
 	tilemap_t *m_tmap;
 	uint8_t m_ball_regs[2];
 	uint8_t m_paddle_reg;
@@ -241,6 +248,20 @@ WRITE8_MEMBER(tattack_state::brick_dma_w)
 //	popmessage("%02x",data&0x7f);
 }
 
+WRITE8_MEMBER(tattack_state::sound_w)
+{
+	// bit 4 enabled on coin insertion (coin counter?)
+	// bit 3-0 samples enable, @see tattack_sample_names
+	for(int i=0;i<4;i++)
+	{
+		// don't restart playing if it is still enabled (victory BGM relies on this)
+		if(data & 1 << i && m_samples->playing(i) == false)
+			m_samples->start(i,i);
+		//if((data & 1 << i) == 0 && m_samples->playing(i) == true)
+		//	m_samples->stop(i);
+	}
+}
+
 static ADDRESS_MAP_START( tattack_map, AS_PROGRAM, 8, tattack_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("AN_PADDLE") // $315, checks again with same memory, loops if different (?)
@@ -248,9 +269,9 @@ static ADDRESS_MAP_START( tattack_map, AS_PROGRAM, 8, tattack_state )
 	AM_RANGE(0x6000, 0x6000) AM_READ_PORT("DSW2")
 	AM_RANGE(0x7000, 0x73ff) AM_RAM AM_SHARE("colorram")    // color map ? something else .. only bits 1-3 are used
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("DSW1")       // dsw ? something else ?
-	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("INPUTS") AM_WRITENOP // sound
+	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("INPUTS") AM_WRITE(sound_w) // sound
 	AM_RANGE(0xc001, 0xc001) AM_WRITE(brick_dma_w) // bit 7 = strobe ($302)
-	AM_RANGE(0xc002, 0xc002) AM_WRITENOP
+	AM_RANGE(0xc002, 0xc002) AM_WRITENOP // same as sound port, outputs?
 	AM_RANGE(0xc005, 0xc005) AM_WRITE(paddle_w)
 	AM_RANGE(0xc006, 0xc007) AM_WRITE(ball_w)
 	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_SHARE("ram")
@@ -366,6 +387,15 @@ PALETTE_INIT_MEMBER(tattack_state, tattack)
 	}
 }
 
+static const char *const tattack_sample_names[] =
+{
+	"*tattack",
+	"paddle_hit",
+	"wall_hit",     
+	"brick_destroy", 
+	"win_bgm", 
+	nullptr
+};
 
 static MACHINE_CONFIG_START( tattack )
 
@@ -388,6 +418,15 @@ static MACHINE_CONFIG_START( tattack )
 	MCFG_PALETTE_INIT_OWNER(tattack_state, tattack)
 
 	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(4)
+	MCFG_SAMPLES_NAMES(tattack_sample_names)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.6)
+
+//  MCFG_SOUND_ADD("discrete", DISCRETE, 0)
+//  MCFG_DISCRETE_INTF(m14)
+//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	/* Discrete ???? */
 
 MACHINE_CONFIG_END
@@ -443,5 +482,5 @@ DRIVER_INIT_MEMBER(tattack_state,tattack)
 
 }
 
-GAME( 1983?, tattack, 0, tattack, tattack, tattack_state, tattack, ROT270, "Shonan", "Time Attacker", MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_NO_COCKTAIL )
+GAME( 1983?, tattack, 0, tattack, tattack, tattack_state, tattack, ROT270, "Shonan", "Time Attacker", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_NO_COCKTAIL )
 // there is another undumped version with katakana Shonan logo and black background
