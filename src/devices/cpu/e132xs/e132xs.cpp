@@ -699,6 +699,7 @@ void hyperstone_device::set_global_register(uint8_t code, uint32_t val)
 #define S_BIT                   ((OP & 0x100) >> 8)
 #define D_BIT                   ((OP & 0x200) >> 9)
 #define N_VALUE                 (((OP & 0x100) >> 4) | (OP & 0x0f))
+#define N_OP_MASK               (m_op & 0x10f)
 #define DST_CODE                ((OP & 0xf0) >> 4)
 #define SRC_CODE                (OP & 0x0f)
 #define SIGN_BIT(val)           ((val & 0x80000000) >> 31)
@@ -1041,8 +1042,11 @@ do                                                                              
 	}                                                                               \
 } while (0)
 
-void hyperstone_device::execute_br(int32_t offset)
+void hyperstone_device::execute_br()
 {
+	const int32_t offset = decode_pcrel();
+	check_delay_PC();
+
 	PPC = PC;
 	PC += offset;
 	SR &= ~M_MASK;
@@ -1604,7 +1608,7 @@ void hyperstone_device::device_reset()
 
 void hyperstone_device::device_stop()
 {
-#if 1
+#if 0
 	int indices[256];
 	for (int i = 0; i < 256; i++)
 	{
@@ -2000,26 +2004,6 @@ void hyperstone_device::hyperstone_cmp(regs_decode &decode)
 	m_icount -= m_clock_cycles_1;
 }
 
-void hyperstone_device::hyperstone_mov(regs_decode &decode)
-{
-	if (!GET_S && decode.dst >= 16)
-	{
-		uint32_t addr = get_trap_addr(TRAPNO_PRIVILEGE_ERROR);
-		execute_exception(addr);
-	}
-
-	SET_DREG(SREG);
-
-	if (DST_IS_PC)
-		SR &= ~M_MASK;
-
-	SET_Z(SREG == 0 ? 1 : 0);
-	SET_N(SIGN_BIT(SREG));
-
-	m_icount -= m_clock_cycles_1;
-}
-
-
 void hyperstone_device::hyperstone_add(regs_decode &decode)
 {
 	if (SRC_IS_SR)
@@ -2241,54 +2225,6 @@ void hyperstone_device::hyperstone_negs(regs_decode &decode)
 	}
 }
 
-void hyperstone_device::hyperstone_movi(regs_decode &decode)
-{
-	if (!GET_S && decode.dst >= 16)
-	{
-		uint32_t addr = get_trap_addr(TRAPNO_PRIVILEGE_ERROR);
-		execute_exception(addr);
-	}
-
-	SET_DREG(EXTRA_U);
-
-	if (DST_IS_PC)
-		SR &= ~M_MASK;
-
-	SET_Z(EXTRA_U == 0 ? 1 : 0);
-	SET_N(SIGN_BIT(EXTRA_U));
-
-#if MISSIONCRAFT_FLAGS
-	SR &= ~V_MASK; // or V undefined ?
-#endif
-
-	m_icount -= m_clock_cycles_1;
-}
-
-void hyperstone_device::hyperstone_addi(regs_decode &decode)
-{
-	uint32_t imm;
-	if (N_VALUE)
-		imm = EXTRA_U;
-	else
-		imm = GET_C & ((GET_Z == 0 ? 1 : 0) | (DREG & 0x01));
-
-
-	uint64_t tmp = (uint64_t)(imm) + (uint64_t)(DREG);
-	CHECK_C(tmp);
-	CHECK_VADD(imm,DREG,tmp);
-
-	DREG = imm + DREG;
-	SET_DREG(DREG);
-
-	if (DST_IS_PC)
-		SR &= ~M_MASK;
-
-	SET_Z(DREG == 0 ? 1 : 0);
-	SET_N(SIGN_BIT(DREG));
-
-	m_icount -= m_clock_cycles_1;
-}
-
 void hyperstone_device::hyperstone_addsi(regs_decode &decode)
 {
 	int32_t imm;
@@ -2320,35 +2256,6 @@ void hyperstone_device::hyperstone_addsi(regs_decode &decode)
 	}
 }
 
-void hyperstone_device::hyperstone_cmpbi(regs_decode &decode)
-{
-	uint32_t imm;
-
-	if( N_VALUE )
-	{
-		if( N_VALUE == 31 )
-		{
-			imm = 0x7fffffff; // bit 31 = 0, others = 1
-		}
-		else
-		{
-			imm = EXTRA_U;
-		}
-
-		SET_Z( (DREG & imm) == 0 ? 1 : 0 );
-	}
-	else
-	{
-		if( (DREG & 0xff000000) == 0 || (DREG & 0x00ff0000) == 0 ||
-			(DREG & 0x0000ff00) == 0 || (DREG & 0x000000ff) == 0 )
-			SET_Z(1);
-		else
-			SET_Z(0);
-	}
-
-	m_icount -= m_clock_cycles_1;
-}
-
 void hyperstone_device::hyperstone_andni(regs_decode &decode)
 {
 	uint32_t imm;
@@ -2359,16 +2266,6 @@ void hyperstone_device::hyperstone_andni(regs_decode &decode)
 		imm = EXTRA_U;
 
 	DREG = DREG & ~imm;
-
-	SET_DREG(DREG);
-	SET_Z( DREG == 0 ? 1 : 0 );
-
-	m_icount -= m_clock_cycles_1;
-}
-
-void hyperstone_device::hyperstone_xori(regs_decode &decode)
-{
-	DREG = DREG ^ EXTRA_U;
 
 	SET_DREG(DREG);
 	SET_Z( DREG == 0 ? 1 : 0 );
@@ -2595,130 +2492,6 @@ void hyperstone_device::hyperstone_rol(regs_decode &decode)
 
 	SET_Z(val == 0 ? 1 : 0);
 	SET_N(SIGN_BIT(val));
-
-	m_icount -= m_clock_cycles_1;
-}
-
-//TODO: add trap error
-void hyperstone_device::hyperstone_ldxx1(regs_decode &decode)
-{
-	uint32_t load;
-
-	if (DST_IS_SR)
-	{
-		switch( decode.sub_type )
-		{
-			case 0: // LDBS.A
-
-				load = READ_B(EXTRA_S);
-				load |= (load & 0x80) ? 0xffffff00 : 0;
-				SET_SREG(load);
-
-				break;
-
-			case 1: // LDBU.A
-
-				load = READ_B(EXTRA_S);
-				SET_SREG(load);
-
-				break;
-
-			case 2:
-
-				load = READ_HW(EXTRA_S);
-
-				if( EXTRA_S & 1 ) // LDHS.A
-				{
-					load |= (load & 0x8000) ? 0xffff0000 : 0;
-				}
-				/*
-				else          // LDHU.A
-				{
-				    // nothing more
-				}
-				*/
-
-				SET_SREG(load);
-
-				break;
-
-			case 3:
-
-				if( (EXTRA_S & 3) == 3 )      // LDD.IOA
-				{
-					SET_SREG(IO_READ_W(EXTRA_S));
-
-					load = IO_READ_W((EXTRA_S & ~3) + 4);
-					SET_SREGF(load);
-
-					m_icount -= m_clock_cycles_1; // extra cycle
-				}
-				else if ((EXTRA_S & 3) == 2) // LDW.IOA
-				{
-					SET_SREG(IO_READ_W(EXTRA_S));
-				}
-				else if( (EXTRA_S & 3) == 1) // LDD.A
-				{
-					SET_SREG(READ_W(EXTRA_S));
-					SET_SREGF(READ_W(EXTRA_S + 4));
-					m_icount -= m_clock_cycles_1; // extra cycle
-				}
-				else // LDW.A
-				{
-					SET_SREG(READ_W(EXTRA_S));
-				}
-
-				break;
-		}
-	}
-	else
-	{
-		switch (decode.sub_type)
-		{
-			case 0: // LDBS.D
-				SET_SREG((int32_t)(int8_t)READ_B(DREG + EXTRA_S));
-				break;
-
-			case 1: // LDBU.D
-				SET_SREG(READ_B(DREG + EXTRA_S));
-				break;
-
-			case 2:
-				if (EXTRA_S & 1)
-				{
-					SET_SREG((int32_t)(int16_t)READ_HW(DREG + (EXTRA_S & ~1)));
-				}
-				else
-				{
-					SET_SREG(READ_HW(DREG + (EXTRA_S & ~1)));
-				}
-				break;
-
-			case 3:
-				if ((EXTRA_S & 3) == 3) // LDD.IOD
-				{
-					SET_SREG(IO_READ_W(DREG + (EXTRA_S & ~3)));
-					SET_SREGF(IO_READ_W(DREG + (EXTRA_S & ~3) + 4));
-					m_icount -= m_clock_cycles_1; // extra cycle
-				}
-				else if ((EXTRA_S & 3) == 2) // LDW.IOD
-				{
-					SET_SREG(IO_READ_W(DREG + (EXTRA_S & ~3)));
-				}
-				else if ((EXTRA_S & 3) == 1) // LDD.D
-				{
-					SET_SREG(READ_W(DREG + (EXTRA_S & ~1)));
-					SET_SREGF(READ_W(DREG + (EXTRA_S & ~1) + 4));
-					m_icount -= m_clock_cycles_1; // extra cycle
-				}
-				else // LDW.D
-				{
-					SET_SREG(READ_W(DREG + (EXTRA_S & ~1)));
-				}
-
-				break;
-		}
-	}
 
 	m_icount -= m_clock_cycles_1;
 }
@@ -3024,24 +2797,6 @@ void hyperstone_device::hyperstone_stxx2(regs_decode &decode)
 	m_icount -= m_clock_cycles_1;
 }
 
-void hyperstone_device::hyperstone_shri(regs_decode &decode)
-{
-	uint32_t val = DREG;
-
-	if (N_VALUE)
-		SET_C((val >> (N_VALUE - 1)) & 1);
-	else
-		SET_C(0);
-
-	val >>= N_VALUE;
-
-	SET_DREG(val);
-	SET_Z(val == 0 ? 1 : 0);
-	SET_N(SIGN_BIT(val));
-
-	m_icount -= m_clock_cycles_1;
-}
-
 void hyperstone_device::hyperstone_sari(regs_decode &decode)
 {
 	uint32_t val = DREG;
@@ -3127,344 +2882,6 @@ void hyperstone_device::hyperstone_muls(regs_decode &decode)
 		m_icount -= m_clock_cycles_6;
 }
 
-void hyperstone_device::hyperstone_set(regs_decode &decode)
-{
-	const uint32_t n = N_VALUE;
-
-	if ( DST_IS_PC)
-	{
-		DEBUG_PRINTF(("Denoted PC in hyperstone_set. PC = %08X\n", PC));
-	}
-	else if (DST_IS_SR)
-	{
-		//TODO: add fetch opcode when there's the pipeline
-
-		//TODO: no 1!
-		m_icount -= m_clock_cycles_1;
-	}
-	else
-	{
-		switch (n)
-		{
-			// SETADR
-			case 0:
-				SET_DREG((SP & 0xfffffe00) | (GET_FP << 2) | (((SP & 0x100) && (SIGN_BIT(SR) == 0)) ? 1 : 0));
-				break;
-
-			// Reserved
-			case 1:
-			case 16:
-			case 17:
-			case 19:
-				DEBUG_PRINTF(("Used reserved N value (%d) in hyperstone_set. PC = %08X\n", n, PC));
-				break;
-
-			// SETxx
-			case 2:
-				SET_DREG(1);
-				break;
-
-			case 3:
-				SET_DREG(0);
-				break;
-
-			case 4:
-				if( GET_N || GET_Z )
-				{
-					SET_DREG(1);
-				}
-				else
-				{
-					SET_DREG(0);
-				}
-
-				break;
-
-			case 5:
-				if( !GET_N && !GET_Z )
-				{
-					SET_DREG(1);
-				}
-				else
-				{
-					SET_DREG(0);
-				}
-
-				break;
-
-			case 6:
-				if( GET_N )
-				{
-					SET_DREG(1);
-				}
-				else
-				{
-					SET_DREG(0);
-				}
-
-				break;
-
-			case 7:
-				if( !GET_N )
-				{
-					SET_DREG(1);
-				}
-				else
-				{
-					SET_DREG(0);
-				}
-
-				break;
-
-			case 8:
-				if( GET_C || GET_Z )
-				{
-					SET_DREG(1);
-				}
-				else
-				{
-					SET_DREG(0);
-				}
-
-				break;
-
-			case 9:
-				if( !GET_C && !GET_Z )
-				{
-					SET_DREG(1);
-				}
-				else
-				{
-					SET_DREG(0);
-				}
-
-				break;
-
-			case 10:
-				if( GET_C )
-				{
-					SET_DREG(1);
-				}
-				else
-				{
-					SET_DREG(0);
-				}
-
-				break;
-
-			case 11:
-				if( !GET_C )
-				{
-					SET_DREG(1);
-				}
-				else
-				{
-					SET_DREG(0);
-				}
-
-				break;
-
-			case 12:
-				if( GET_Z )
-				{
-					SET_DREG(1);
-				}
-				else
-				{
-					SET_DREG(0);
-				}
-
-				break;
-
-			case 13:
-				if( !GET_Z )
-				{
-					SET_DREG(1);
-				}
-				else
-				{
-					SET_DREG(0);
-				}
-
-				break;
-
-			case 14:
-				if( GET_V )
-				{
-					SET_DREG(1);
-				}
-				else
-				{
-					SET_DREG(0);
-				}
-
-				break;
-
-			case 15:
-				if( !GET_V )
-				{
-					SET_DREG(1);
-				}
-				else
-				{
-					SET_DREG(0);
-				}
-
-				break;
-
-			case 18:
-				SET_DREG(-1);
-				break;
-
-			case 20:
-				if( GET_N || GET_Z )
-				{
-					SET_DREG(-1);
-				}
-				else
-				{
-					SET_DREG(0);
-				}
-
-				break;
-
-			case 21:
-				if( !GET_N && !GET_Z )
-				{
-					SET_DREG(-1);
-				}
-				else
-				{
-					SET_DREG(0);
-				}
-
-				break;
-
-			case 22:
-				if( GET_N )
-				{
-					SET_DREG(-1);
-				}
-				else
-				{
-					SET_DREG(0);
-				}
-
-				break;
-
-			case 23:
-				if( !GET_N )
-				{
-					SET_DREG(-1);
-				}
-				else
-				{
-					SET_DREG(0);
-				}
-
-				break;
-
-			case 24:
-				if( GET_C || GET_Z )
-				{
-					SET_DREG(-1);
-				}
-				else
-				{
-					SET_DREG(0);
-				}
-
-				break;
-
-			case 25:
-				if( !GET_C && !GET_Z )
-				{
-					SET_DREG(-1);
-				}
-				else
-				{
-					SET_DREG(0);
-				}
-
-				break;
-
-			case 26:
-				if( GET_C )
-				{
-					SET_DREG(-1);
-				}
-				else
-				{
-					SET_DREG(0);
-				}
-
-				break;
-
-			case 27:
-				if( !GET_C )
-				{
-					SET_DREG(-1);
-				}
-				else
-				{
-					SET_DREG(0);
-				}
-
-				break;
-
-			case 28:
-				if( GET_Z )
-				{
-					SET_DREG(-1);
-				}
-				else
-				{
-					SET_DREG(0);
-				}
-
-				break;
-
-			case 29:
-				if( !GET_Z )
-				{
-					SET_DREG(-1);
-				}
-				else
-				{
-					SET_DREG(0);
-				}
-
-				break;
-
-			case 30:
-				if( GET_V )
-				{
-					SET_DREG(-1);
-				}
-				else
-				{
-					SET_DREG(0);
-				}
-
-				break;
-
-			case 31:
-				if( !GET_V )
-				{
-					SET_DREG(-1);
-				}
-				else
-				{
-					SET_DREG(0);
-				}
-
-				break;
-		}
-
-		m_icount -= m_clock_cycles_1;
-	}
-}
-
 void hyperstone_device::hyperstone_mul(regs_decode &decode)
 {
 	// PC or SR aren't denoted, else result is undefined
@@ -3542,16 +2959,6 @@ void hyperstone_device::hyperstone_lddp(regs_decode &decode)
 	m_icount -= m_clock_cycles_2;
 }
 
-void hyperstone_device::hyperstone_stwr(regs_decode &decode)
-{
-	if( SRC_IS_SR )
-		SREG = 0;
-
-	WRITE_W(DREG, SREG);
-
-	m_icount -= m_clock_cycles_1;
-}
-
 void hyperstone_device::hyperstone_stdr(regs_decode &decode)
 {
 	if( SRC_IS_SR )
@@ -3592,85 +2999,72 @@ void hyperstone_device::hyperstone_stdp(regs_decode &decode)
 
 void hyperstone_device::hyperstone_trap()
 {
-	uint8_t code, trapno;
-	uint32_t addr;
+	check_delay_PC();
 
-	trapno = (OP & 0xfc) >> 2;
+	const uint8_t trapno = (m_op & 0xfc) >> 2;
 
-	addr = get_trap_addr(trapno);
-	code = ((OP & 0x300) >> 6) | (OP & 0x03);
+	const uint32_t addr = get_trap_addr(trapno);
+	const uint8_t code = ((m_op & 0x300) >> 6) | (m_op & 0x03);
 
-	switch( code )
+	switch (code)
 	{
 		case TRAPLE:
-			if( GET_N || GET_Z )
+			if (SR & (N_MASK | Z_MASK))
 				execute_trap(addr);
-
 			break;
 
 		case TRAPGT:
-			if( !GET_N && !GET_Z )
+			if(!(SR & (N_MASK | Z_MASK)))
 				execute_trap(addr);
-
 			break;
 
 		case TRAPLT:
-			if( GET_N )
+			if (SR & N_MASK)
 				execute_trap(addr);
-
 			break;
 
 		case TRAPGE:
-			if( !GET_N )
+			if (!(SR & N_MASK))
 				execute_trap(addr);
-
 			break;
 
 		case TRAPSE:
-			if( GET_C || GET_Z )
+			if (SR & (C_MASK | Z_MASK))
 				execute_trap(addr);
-
 			break;
 
 		case TRAPHT:
-			if( !GET_C && !GET_Z )
+			if (!(SR & (C_MASK | Z_MASK)))
 				execute_trap(addr);
-
 			break;
 
 		case TRAPST:
-			if( GET_C )
+			if (SR & C_MASK)
 				execute_trap(addr);
-
 			break;
 
 		case TRAPHE:
-			if( !GET_C )
+			if (!(SR & C_MASK))
 				execute_trap(addr);
-
 			break;
 
 		case TRAPE:
-			if( GET_Z )
+			if (SR & Z_MASK)
 				execute_trap(addr);
-
 			break;
 
 		case TRAPNE:
-			if( !GET_Z )
+			if (!(SR & Z_MASK))
 				execute_trap(addr);
-
 			break;
 
 		case TRAPV:
-			if( GET_V )
+			if (SR & V_MASK)
 				execute_trap(addr);
-
 			break;
 
 		case TRAP:
 			execute_trap(addr);
-
 			break;
 	}
 
@@ -3725,7 +3119,6 @@ void hyperstone_device::execute_set_input(int inputnum, int state)
 		ISR &= ~(1 << inputnum);
 }
 
-
 //-------------------------------------------------
 //  execute_run - execute a timeslice's worth of
 //  opcodes
@@ -3760,9 +3153,9 @@ void hyperstone_device::execute_run()
 			case 0x02: hyperstone_chk_local_global(); break;
 			case 0x03: hyperstone_chk_local_local(); break;
 			case 0x04: op04(); break;
-			case 0x05: op05(); break;
-			case 0x06: op06(); break;
-			case 0x07: op07(); break;
+			case 0x05: hyperstone_movd_global_local(); break;
+			case 0x06: hyperstone_movd_local_global(); break;
+			case 0x07: hyperstone_movd_local_local(); break;
 			case 0x08: op08(); break;
 			case 0x09: op09(); break;
 			case 0x0a: op0a(); break;
@@ -3770,63 +3163,63 @@ void hyperstone_device::execute_run()
 			case 0x0c: op0c(); break;
 			case 0x0d: op0d(); break;
 			case 0x0e: op0e(); break;
-			case 0x0f: op0f(); break;
+			case 0x0f: hyperstone_divs_local_local(); break;
 			case 0x10: op10(); break;
 			case 0x11: op11(); break;
 			case 0x12: op12(); break;
 			case 0x13: op13(); break;
 			case 0x14: op14(); break;
-			case 0x15: op15(); break;
-			case 0x16: op16(); break;
-			case 0x17: op17(); break;
-			case 0x18: op18(); break;
+			case 0x15: hyperstone_mask_global_local(); break;
+			case 0x16: hyperstone_mask_local_global(); break;
+			case 0x17: hyperstone_mask_local_local(); break;
+			case 0x18: hyperstone_sum_global_global(); break;
 			case 0x19: op19(); break;
-			case 0x1a: op1a(); break;
-			case 0x1b: op1b(); break;
+			case 0x1a: hyperstone_sum_local_global(); break;
+			case 0x1b: hyperstone_sum_local_local(); break;
 			case 0x1c: op1c(); break;
 			case 0x1d: op1d(); break;
 			case 0x1e: op1e(); break;
 			case 0x1f: op1f(); break;
 			case 0x20: op20(); break;
 			case 0x21: op21(); break;
-			case 0x22: op22(); break;
-			case 0x23: op23(); break;
-			case 0x24: op24(); break;
-			case 0x25: op25(); break;
-			case 0x26: op26(); break;
-			case 0x27: op27(); break;
+			case 0x22: hyperstone_cmp_local_global(); break;
+			case 0x23: hyperstone_cmp_local_local(); break;
+			case 0x24: hyperstone_mov_global_global(); break;
+			case 0x25: hyperstone_mov_global_local(); break;
+			case 0x26: hyperstone_mov_local_global(); break;
+			case 0x27: hyperstone_mov_local_local(); break;
 			case 0x28: op28(); break;
-			case 0x29: op29(); break;
-			case 0x2a: op2a(); break;
-			case 0x2b: op2b(); break;
+			case 0x29: hyperstone_add_global_local(); break;
+			case 0x2a: hyperstone_add_local_global(); break;
+			case 0x2b: hyperstone_add_local_local(); break;
 			case 0x2c: op2c(); break;
 			case 0x2d: op2d(); break;
 			case 0x2e: op2e(); break;
 			case 0x2f: op2f(); break;
-			case 0x30: op30(); break; // cmpb
-			case 0x31: op31(); break; // cmpb
-			case 0x32: op32(); break; // cmpb
-			case 0x33: op33(); break; // cmpb
-			case 0x34: op34(); break;
-			case 0x35: op35(); break;
-			case 0x36: op36(); break;
-			case 0x37: op37(); break;
-			case 0x38: op38(); break;
-			case 0x39: op39(); break;
-			case 0x3a: op3a(); break;
-			case 0x3b: op3b(); break;
-			case 0x3c: op3c(); break;
-			case 0x3d: op3d(); break;
-			case 0x3e: op3e(); break;
-			case 0x3f: op3f(); break;
+			case 0x30: hyperstone_cmpb_global_global(); break;
+			case 0x31: hyperstone_cmpb_global_local(); break;
+			case 0x32: hyperstone_cmpb_local_global(); break;
+			case 0x33: hyperstone_cmpb_local_local(); break;
+			case 0x34: hyperstone_andn_global_global(); break;
+			case 0x35: hyperstone_andn_global_local(); break;
+			case 0x36: hyperstone_andn_local_global(); break;
+			case 0x37: hyperstone_andn_local_local(); break;
+			case 0x38: hyperstone_or_global_global(); break;
+			case 0x39: hyperstone_or_global_local(); break;
+			case 0x3a: hyperstone_or_local_global(); break;
+			case 0x3b: hyperstone_or_local_local(); break;
+			case 0x3c: hyperstone_xor_global_global(); break;
+			case 0x3d: hyperstone_xor_global_local(); break;
+			case 0x3e: hyperstone_xor_local_global(); break;
+			case 0x3f: hyperstone_xor_local_local(); break;
 			case 0x40: op40(); break;
 			case 0x41: op41(); break;
 			case 0x42: op42(); break;
 			case 0x43: op43(); break;
-			case 0x44: op44(); break;
-			case 0x45: op45(); break;
-			case 0x46: op46(); break;
-			case 0x47: op47(); break;
+			case 0x44: hyperstone_not_global_global(); break;
+			case 0x45: hyperstone_not_global_local(); break;
+			case 0x46: hyperstone_not_local_global(); break;
+			case 0x47: hyperstone_not_local_local(); break;
 			case 0x48: op48(); break;
 			case 0x49: op49(); break;
 			case 0x4a: op4a(); break;
@@ -3855,22 +3248,22 @@ void hyperstone_device::execute_run()
 			case 0x61: hyperstone_cmpi_global_limm(); break;
 			case 0x62: hyperstone_cmpi_local_simm(); break;
 			case 0x63: hyperstone_cmpi_local_limm(); break;
-			case 0x64: op64(); break;
-			case 0x65: op65(); break;
-			case 0x66: op66(); break;
-			case 0x67: op67(); break;
-			case 0x68: op68(); break;
-			case 0x69: op69(); break;
-			case 0x6a: op6a(); break;
-			case 0x6b: op6b(); break;
+			case 0x64: hyperstone_movi_global_simm(); break;
+			case 0x65: hyperstone_movi_global_limm(); break;
+			case 0x66: hyperstone_movi_local_simm(); break;
+			case 0x67: hyperstone_movi_local_limm(); break;
+			case 0x68: hyperstone_addi_global_simm(); break;
+			case 0x69: hyperstone_addi_global_limm(); break;
+			case 0x6a: hyperstone_addi_local_simm(); break;
+			case 0x6b: hyperstone_addi_local_limm(); break;
 			case 0x6c: op6c(); break;
 			case 0x6d: op6d(); break;
 			case 0x6e: op6e(); break;
 			case 0x6f: op6f(); break;
-			case 0x70: op70(); break;
-			case 0x71: op71(); break;
-			case 0x72: op72(); break;
-			case 0x73: op73(); break;
+			case 0x70: hyperstone_cmpbi_global_simm(); break;
+			case 0x71: hyperstone_cmpbi_global_limm(); break;
+			case 0x72: hyperstone_cmpbi_local_simm(); break;
+			case 0x73: hyperstone_cmpbi_local_limm(); break;
 			case 0x74: op74(); break;
 			case 0x75: op75(); break;
 			case 0x76: op76(); break;
@@ -3879,10 +3272,10 @@ void hyperstone_device::execute_run()
 			case 0x79: hyperstone_ori_global_limm(); break;
 			case 0x7a: hyperstone_ori_local_simm(); break;
 			case 0x7b: hyperstone_ori_local_limm(); break;
-			case 0x7c: op7c(); break;
-			case 0x7d: op7d(); break;
-			case 0x7e: op7e(); break;
-			case 0x7f: op7f(); break;
+			case 0x7c: hyperstone_xori_global_simm(); break;
+			case 0x7d: hyperstone_xori_global_limm(); break;
+			case 0x7e: hyperstone_xori_local_simm(); break;
+			case 0x7f: hyperstone_xori_local_limm(); break;
 			case 0x80: op80(); break;
 			case 0x81: op81(); break;
 			case 0x82: hyperstone_shrd(); break;
@@ -3899,10 +3292,10 @@ void hyperstone_device::execute_run()
 			case 0x8d: op8d(); break;
 			case 0x8e: hyperstone_testlz(); break;
 			case 0x8f: op8f(); break;
-			case 0x90: op90(); break;
-			case 0x91: op91(); break;
-			case 0x92: op92(); break;
-			case 0x93: op93(); break;
+			case 0x90: hyperstone_ldxx1_global_global(); break;
+			case 0x91: hyperstone_ldxx1_global_local(); break;
+			case 0x92: hyperstone_ldxx1_local_global(); break;
+			case 0x93: hyperstone_ldxx1_local_local(); break;
 			case 0x94: op94(); break;
 			case 0x95: op95(); break;
 			case 0x96: op96(); break;
@@ -3915,8 +3308,8 @@ void hyperstone_device::execute_run()
 			case 0x9d: op9d(); break;
 			case 0x9e: op9e(); break;
 			case 0x9f: op9f(); break;
-			case 0xa0: opa0(); break;
-			case 0xa1: opa1(); break;
+			case 0xa0: hyperstone_shri_global(); break;
+			case 0xa1: hyperstone_shri_global(); break;
 			case 0xa2: hyperstone_shri_local(); break;
 			case 0xa3: hyperstone_shri_local(); break;
 			case 0xa4: opa4(); break;
@@ -3939,10 +3332,10 @@ void hyperstone_device::execute_run()
 			case 0xb5: opb5(); break;
 			case 0xb6: opb6(); break;
 			case 0xb7: opb7(); break;
-			case 0xb8: opb8(); break;
-			case 0xb9: opb9(); break;
-			case 0xba: opba(); break;
-			case 0xbb: opbb(); break;
+			case 0xb8: hyperstone_set_global(); break;
+			case 0xb9: hyperstone_set_global(); break;
+			case 0xba: hyperstone_set_local(); break;
+			case 0xbb: hyperstone_set_local(); break;
 			case 0xbc: opbc(); break;
 			case 0xbd: opbd(); break;
 			case 0xbe: opbe(); break;
@@ -3971,8 +3364,8 @@ void hyperstone_device::execute_run()
 			case 0xd5: opd5(); break;
 			case 0xd6: opd6(); break;
 			case 0xd7: opd7(); break;
-			case 0xd8: opd8(); break;
-			case 0xd9: opd9(); break;
+			case 0xd8: hyperstone_stwr_global(); break;
+			case 0xd9: hyperstone_stwr_local(); break;
 			case 0xda: opda(); break;
 			case 0xdb: opdb(); break;
 			case 0xdc: opdc(); break;
@@ -4007,10 +3400,10 @@ void hyperstone_device::execute_run()
 			case 0xf9: opf9(); break;
 			case 0xfa: opfa(); break;
 			case 0xfb: opfb(); break;
-			case 0xfc: opfc(); break;
-			case 0xfd: opfd(); break;
-			case 0xfe: opfe(); break;
-			case 0xff: opff(); break;
+			case 0xfc: execute_br(); break;
+			case 0xfd: hyperstone_trap(); break;
+			case 0xfe: hyperstone_trap(); break;
+			case 0xff: hyperstone_trap(); break;
 		}
 #else
 		(this->*m_opcode[(OP & 0xff00) >> 8])();
