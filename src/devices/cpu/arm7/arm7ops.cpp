@@ -66,18 +66,12 @@ uint32_t arm7_cpu_device::decodeShift(uint32_t insn, uint32_t *pCarry)
 			if ((insn & 0x80) == 0x80)
 				LOG(("%08x:  RegShift ERROR (p36)\n", R15));
 #endif
-
-		// see p35 for check on this
-		//k = GetRegister(k >> 1) & 0x1f;
-
 		// Keep only the bottom 8 bits for a Register Shift
 		k = GetRegister(k >> 1) & 0xff;
 
 		if (k == 0) /* Register shift by 0 is a no-op */
 		{
 //          LOG(("%08x:  NO-OP Regshift\n", R15));
-			/* TODO this is wrong for at least ROR by reg with lower
-			 *      5 bits 0 but lower 8 bits non zero */
 			if (pCarry)
 				*pCarry = GET_CPSR & C_MASK;
 			return rm;
@@ -145,11 +139,19 @@ uint32_t arm7_cpu_device::decodeShift(uint32_t insn, uint32_t *pCarry)
 	case 3:                     /* ROR and RRX */
 		if (k)
 		{
-			while (k > 32)
-				k -= 32;
-			if (pCarry)
-				*pCarry = rm & (1 << (k - 1));
-			return ROR(rm, k);
+			k &= 31;
+			if (k)
+			{
+				if (pCarry)
+					*pCarry = rm & (1 << (k - 1));
+				return ROR(rm, k);
+			}
+			else
+			{
+				if (pCarry)
+					*pCarry = rm & SIGN_BIT;
+				return rm;
+			}
 		}
 		else
 		{
