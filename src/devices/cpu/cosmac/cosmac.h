@@ -126,7 +126,9 @@
 // input lines
 enum
 {
-	COSMAC_INPUT_LINE_INT = 0,
+	COSMAC_INPUT_LINE_WAIT = 0,
+	COSMAC_INPUT_LINE_CLEAR,
+	COSMAC_INPUT_LINE_INT,
 	COSMAC_INPUT_LINE_DMAIN,
 	COSMAC_INPUT_LINE_DMAOUT,
 	COSMAC_INPUT_LINE_EF1,
@@ -205,6 +207,8 @@ public:
 	// public interfaces
 	offs_t get_memory_address();
 
+	DECLARE_WRITE_LINE_MEMBER( wait_w ) { set_input_line(COSMAC_INPUT_LINE_WAIT, state); }
+	DECLARE_WRITE_LINE_MEMBER( clear_w ) { set_input_line(COSMAC_INPUT_LINE_CLEAR, state); }
 	DECLARE_WRITE_LINE_MEMBER( int_w ) { set_input_line(COSMAC_INPUT_LINE_INT, state); }
 	DECLARE_WRITE_LINE_MEMBER( dma_in_w ) { set_input_line(COSMAC_INPUT_LINE_DMAIN, state); }
 	DECLARE_WRITE_LINE_MEMBER( dma_out_w ) { set_input_line(COSMAC_INPUT_LINE_DMAOUT, state); }
@@ -411,6 +415,8 @@ protected:
 	cosmac_state        m_state;            // state
 	cosmac_mode         m_mode;             // control mode
 	cosmac_mode         m_pmode;            // previous control mode
+	bool m_wait;
+	bool m_clear;
 	int                 m_irq;              // interrupt request
 	int                 m_dmain;            // DMA input request
 	int                 m_dmaout;           // DMA output request
