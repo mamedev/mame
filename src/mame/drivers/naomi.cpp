@@ -4413,7 +4413,7 @@ ROM_START( tduno2 )
 	ROM_PARAMETER( ":rom_board:key", "2f6f0f8d" )
 ROM_END
 
-ROM_START( mtkob2 )
+ROM_START( mushike )
 	NAOMI_BIOS
 	NAOMI_DEFAULT_EEPROM
 
@@ -10226,7 +10226,7 @@ ROM_END
 /* 0136    */ GAME( 2004, shootplm,  naomi,    naomim1, naomi,   naomi_state, naomi,   ROT0, "Sega", "Shootout Pool Prize (Export) / Shootout Pool The Medal (Japan) Version B", GAME_FLAGS ) // Build: 23 Jan 2004
 /* 0136    */ GAME( 2004, shootplmp, shootplm, naomim2, naomi,   naomi_state, naomi,   ROT0, "Sega", "Shootout Pool Prize (Export) / Shootout Pool The Medal (Japan) Version B (prototype)", GAME_FLAGS ) // Build: 15 Dec 2003
 /* 0140    */ GAME( 2004, kick4csh,  naomi,    naomim1, naomi,   naomi_state, naomi,   ROT0, "Sega", "Kick '4' Cash (Export)", GAME_FLAGS )
-/* 0150    */ GAME( 2003, mtkob2,    naomi,    naomim1, naomi,   naomi_state, naomi,   ROT0, "Sega", "Mushiking The King Of Beetle (2K3 2ND, World)", GAME_FLAGS ) // not for Japan
+/* 0150    */ GAME( 2004, mushike,   naomi,    naomim1, naomi,   naomi_state, naomi,   ROT0, "Sega", "Mushiking The King Of Beetle (2K3 2ND, World)", GAME_FLAGS ) // not for Japan
 /* 0152    */ GAME( 2004, mushi2k4,  naomi,    naomim2, naomi,   naomi_state, naomi,   ROT0, "Sega", "Mushiking The King Of Beetles 2004 Second (Japan)", GAME_FLAGS )
 /* 0158    */ GAME( 2005, mushi2k5,  naomi,    naomim2, naomi,   naomi_state, naomi,   ROT0, "Sega", "Mushiking The King Of Beetles 2005 First (Japan)", GAME_FLAGS )
 /* 0164    */ GAME( 2005, mushi2eo,  mushik2e, naomim4, naomi,   naomi_state, naomi,   ROT0, "Sega", "Mushiking The King Of Beetles - Mushiking II / III / III+ (Ver. 1.001) (World)", GAME_FLAGS ) // not for Japan or Korea, version can be changed in secret menu, ~equivalent of Japanese 2K5 versions.
