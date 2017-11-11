@@ -49,13 +49,14 @@ public:
 	};
 
 	sys2900_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
-		m_maincpu(*this, "maincpu") { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu") { }
 
 	DECLARE_DRIVER_INIT(sys2900);
+	uint32_t screen_update_sys2900(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+private:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	uint32_t screen_update_sys2900(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 
 protected:
@@ -63,7 +64,7 @@ protected:
 };
 
 
-static ADDRESS_MAP_START(sys2900_mem, AS_PROGRAM, 8, sys2900_state)
+static ADDRESS_MAP_START(mem_map, AS_PROGRAM, 8, sys2900_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x07ff ) AM_RAMBANK("boot")
 	AM_RANGE( 0x0800, 0xefff ) AM_RAM
@@ -71,7 +72,7 @@ static ADDRESS_MAP_START(sys2900_mem, AS_PROGRAM, 8, sys2900_state)
 	AM_RANGE( 0xf800, 0xffff ) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(sys2900_io, AS_IO, 8, sys2900_state)
+static ADDRESS_MAP_START(io_map, AS_IO, 8, sys2900_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
@@ -118,8 +119,8 @@ uint32_t sys2900_state::screen_update_sys2900(screen_device &screen, bitmap_ind1
 static MACHINE_CONFIG_START( sys2900 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
-	MCFG_CPU_PROGRAM_MAP(sys2900_mem)
-	MCFG_CPU_IO_MAP(sys2900_io)
+	MCFG_CPU_PROGRAM_MAP(mem_map)
+	MCFG_CPU_IO_MAP(io_map)
 
 
 	/* video hardware */
