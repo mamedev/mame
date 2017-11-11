@@ -132,13 +132,6 @@ protected:
 	direct_read_data *m_direct;
 	address_space *m_io;
 
-	/* Delay information */
-	struct delay_info
-	{
-		int32_t   delay_cmd;
-		uint32_t  delay_pc;
-	};
-
 	// CPU registers
 	uint32_t  m_global_regs[32];
 	uint32_t  m_local_regs[64];
@@ -161,7 +154,8 @@ protected:
 	uint8_t   m_timer_int_pending;
 	emu_timer *m_timer;
 
-	delay_info m_delay;
+	uint32_t m_delay_pc;
+	bool m_delay_slot;
 
 	uint32_t m_opcodexor;
 
@@ -174,8 +168,8 @@ protected:
 	typedef void (hyperstone_device::*ophandler)();
 
 	ophandler m_opcode[256];
-
-	static const ophandler s_opcodetable[256];
+	uint64_t m_opcode_hits[256];
+	uint8_t m_fl_lut[16];
 
 private:
 	struct regs_decode
@@ -215,14 +209,21 @@ private:
 
 	TIMER_CALLBACK_MEMBER(timer_callback);
 
-	void execute_br(regs_decode &decode);
-	void execute_dbr(regs_decode &decode);
+	void execute_br(int32_t offset);
+	void execute_dbr(int32_t offset);
 	void execute_trap(uint32_t addr);
 	void execute_int(uint32_t addr);
 	void execute_exception(uint32_t addr);
-	void execute_software(regs_decode &decode);
+	void execute_software();
 
-	void hyperstone_chk(regs_decode &decode);
+	void ignore_immediate_s();
+	uint32_t decode_immediate_s();
+	uint32_t decode_const();
+
+	void hyperstone_chk_global_global();
+	void hyperstone_chk_global_local();
+	void hyperstone_chk_local_global();
+	void hyperstone_chk_local_local();
 	void hyperstone_movd(regs_decode &decode);
 	void hyperstone_divu(regs_decode &decode);
 	void hyperstone_divs(regs_decode &decode);
@@ -234,39 +235,42 @@ private:
 	void hyperstone_mov(regs_decode &decode);
 	void hyperstone_add(regs_decode &decode);
 	void hyperstone_adds(regs_decode &decode);
-	void hyperstone_cmpb(regs_decode &decode);
-	void hyperstone_andn(regs_decode &decode);
-	void hyperstone_or(regs_decode &decode);
-	void hyperstone_xor(regs_decode &decode);
 	void hyperstone_subc(regs_decode &decode);
-	void hyperstone_not(regs_decode &decode);
 	void hyperstone_sub(regs_decode &decode);
 	void hyperstone_subs(regs_decode &decode);
 	void hyperstone_addc(regs_decode &decode);
-	void hyperstone_and(regs_decode &decode);
 	void hyperstone_neg(regs_decode &decode);
 	void hyperstone_negs(regs_decode &decode);
-	void hyperstone_cmpi(regs_decode &decode);
+	void hyperstone_and_global_global();
+	void hyperstone_and_global_local();
+	void hyperstone_and_local_global();
+	void hyperstone_and_local_local();
+	void hyperstone_cmpi_global_simm();
+	void hyperstone_cmpi_global_limm();
+	void hyperstone_cmpi_local_simm();
+	void hyperstone_cmpi_local_limm();
 	void hyperstone_movi(regs_decode &decode);
 	void hyperstone_addi(regs_decode &decode);
 	void hyperstone_addsi(regs_decode &decode);
 	void hyperstone_cmpbi(regs_decode &decode);
 	void hyperstone_andni(regs_decode &decode);
-	void hyperstone_ori(regs_decode &decode);
+	void hyperstone_ori_global_simm();
+	void hyperstone_ori_global_limm();
+	void hyperstone_ori_local_simm();
+	void hyperstone_ori_local_limm();
 	void hyperstone_xori(regs_decode &decode);
 	void hyperstone_shrdi(regs_decode &decode);
-	void hyperstone_shrd(regs_decode &decode);
+	void hyperstone_shrd();
 	void hyperstone_shr(regs_decode &decode);
 	void hyperstone_shri(regs_decode &decode);
-	void hyperstone_sardi(regs_decode &decode);
-	void hyperstone_sard(regs_decode &decode);
+	void hyperstone_sardi();
+	void hyperstone_sard();
 	void hyperstone_sar(regs_decode &decode);
 	void hyperstone_sari(regs_decode &decode);
-	void hyperstone_shldi(regs_decode &decode);
-	void hyperstone_shld(regs_decode &decode);
-	void hyperstone_shl(regs_decode &decode);
-	void hyperstone_shli(regs_decode &decode);
-	void hyperstone_testlz(regs_decode &decode);
+	void hyperstone_shldi();
+	void hyperstone_shld();
+	void hyperstone_shl();
+	void hyperstone_testlz();
 	void hyperstone_rol(regs_decode &decode);
 	void hyperstone_ldxx1(regs_decode &decode);
 	void hyperstone_ldxx2(regs_decode &decode);
@@ -276,25 +280,6 @@ private:
 	void hyperstone_muls(regs_decode &decode);
 	void hyperstone_mul(regs_decode &decode);
 	void hyperstone_set(regs_decode &decode);
-
-	void hyperstone_fadd(regs_decode &decode);
-	void hyperstone_faddd(regs_decode &decode);
-	void hyperstone_fsub(regs_decode &decode);
-	void hyperstone_fsubd(regs_decode &decode);
-	void hyperstone_fmul(regs_decode &decode);
-	void hyperstone_fmuld(regs_decode &decode);
-	void hyperstone_fdiv(regs_decode &decode);
-	void hyperstone_fdivd(regs_decode &decode);
-
-	void hyperstone_fcmp(regs_decode &decode);
-	void hyperstone_fcmpd(regs_decode &decode);
-	void hyperstone_fcmpu(regs_decode &decode);
-	void hyperstone_fcmpud(regs_decode &decode);
-
-	void hyperstone_fcvt(regs_decode &decode);
-	void hyperstone_fcvtd(regs_decode &decode);
-
-	void hyperstone_extend(regs_decode &decode);
 
 	void hyperstone_ldwr(regs_decode &decode);
 	void hyperstone_lddr(regs_decode &decode);
@@ -306,39 +291,15 @@ private:
 	void hyperstone_stwp(regs_decode &decode);
 	void hyperstone_stdp(regs_decode &decode);
 
-	void hyperstone_dbv(regs_decode &decode);
-	void hyperstone_dbnv(regs_decode &decode);
-	void hyperstone_dbe(regs_decode &decode);
-	void hyperstone_dbne(regs_decode &decode);
-	void hyperstone_dbc(regs_decode &decode);
-	void hyperstone_dbnc(regs_decode &decode);
-	void hyperstone_dbse(regs_decode &decode);
-	void hyperstone_dbht(regs_decode &decode);
-	void hyperstone_dbn(regs_decode &decode);
-	void hyperstone_dbnn(regs_decode &decode);
-	void hyperstone_dble(regs_decode &decode);
-	void hyperstone_dbgt(regs_decode &decode);
-	void hyperstone_dbr(regs_decode &decode);
-
-	void hyperstone_frame(regs_decode &decode);
-	void hyperstone_call(regs_decode &decode);
-
-	void hyperstone_bv(regs_decode &decode);
-	void hyperstone_bnv(regs_decode &decode);
-	void hyperstone_be(regs_decode &decode);
-	void hyperstone_bne(regs_decode &decode);
-	void hyperstone_bc(regs_decode &decode);
-	void hyperstone_bnc(regs_decode &decode);
-	void hyperstone_bse(regs_decode &decode);
-	void hyperstone_bht(regs_decode &decode);
-	void hyperstone_bn(regs_decode &decode);
-	void hyperstone_bnn(regs_decode &decode);
-	void hyperstone_ble(regs_decode &decode);
-	void hyperstone_bgt(regs_decode &decode);
-	void hyperstone_br(regs_decode &decode);
-
-	void hyperstone_trap(regs_decode &decode);
+	void hyperstone_trap();
 	void hyperstone_do(regs_decode &decode);
+
+	void hyperstone_shli_global();
+	void hyperstone_shli_local();
+	void hyperstone_shri_local();
+
+	int32_t decode_pcrel();
+	void ignore_pcrel();
 
 #if 0
 	void execute_run_drc();
@@ -356,7 +317,7 @@ private:
 	bool generate_opcode(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
 #endif
 
-	void op00();    void op01();    void op02();    void op03();    void op04();    void op05();    void op06();    void op07();
+																	void op04();    void op05();    void op06();    void op07();
 	void op08();    void op09();    void op0a();    void op0b();    void op0c();    void op0d();    void op0e();    void op0f();
 	void op10();    void op11();    void op12();    void op13();    void op14();    void op15();    void op16();    void op17();
 	void op18();    void op19();    void op1a();    void op1b();    void op1c();    void op1d();    void op1e();    void op1f();
@@ -366,22 +327,22 @@ private:
 	void op38();    void op39();    void op3a();    void op3b();    void op3c();    void op3d();    void op3e();    void op3f();
 	void op40();    void op41();    void op42();    void op43();    void op44();    void op45();    void op46();    void op47();
 	void op48();    void op49();    void op4a();    void op4b();    void op4c();    void op4d();    void op4e();    void op4f();
-	void op50();    void op51();    void op52();    void op53();    void op54();    void op55();    void op56();    void op57();
+	void op50();    void op51();    void op52();    void op53();
 	void op58();    void op59();    void op5a();    void op5b();    void op5c();    void op5d();    void op5e();    void op5f();
-	void op60();    void op61();    void op62();    void op63();    void op64();    void op65();    void op66();    void op67();
+																	void op64();    void op65();    void op66();    void op67();
 	void op68();    void op69();    void op6a();    void op6b();    void op6c();    void op6d();    void op6e();    void op6f();
 	void op70();    void op71();    void op72();    void op73();    void op74();    void op75();    void op76();    void op77();
-	void op78();    void op79();    void op7a();    void op7b();    void op7c();    void op7d();    void op7e();    void op7f();
-	void op80();    void op81();    void op82();    void op83();    void op84();    void op85();    void op86();    void op87();
-	void op88();    void op89();    void op8a();    void op8b();    void op8c();    void op8d();    void op8e();    void op8f();
+																	void op7c();    void op7d();    void op7e();    void op7f();
+	void op80();    void op81();    				void op83();    												void op87();
+	    															void op8c();    void op8d();    				void op8f();
 	void op90();    void op91();    void op92();    void op93();    void op94();    void op95();    void op96();    void op97();
 	void op98();    void op99();    void op9a();    void op9b();    void op9c();    void op9d();    void op9e();    void op9f();
-	void opa0();    void opa1();    void opa2();    void opa3();    void opa4();    void opa5();    void opa6();    void opa7();
-	void opa8();    void opa9();    void opaa();    void opab();    void opac();    void opad();    void opae();    void opaf();
+	void opa0();    void opa1();    								void opa4();    void opa5();    void opa6();    void opa7();
+																	void opac();    void opad();    void opae();    void opaf();
 	void opb0();    void opb1();    void opb2();    void opb3();    void opb4();    void opb5();    void opb6();    void opb7();
 	void opb8();    void opb9();    void opba();    void opbb();    void opbc();    void opbd();    void opbe();    void opbf();
-	void opc0();    void opc1();    void opc2();    void opc3();    void opc4();    void opc5();    void opc6();    void opc7();
-	void opc8();    void opc9();    void opca();    void opcb();    void opcc();    void opcd();    void opce();    void opcf();
+
+																									void opce();    void opcf();
 	void opd0();    void opd1();    void opd2();    void opd3();    void opd4();    void opd5();    void opd6();    void opd7();
 	void opd8();    void opd9();    void opda();    void opdb();    void opdc();    void opdd();    void opde();    void opdf();
 	void ope0();    void ope1();    void ope2();    void ope3();    void ope4();    void ope5();    void ope6();    void ope7();
