@@ -17,7 +17,7 @@
 
     TODO:
     - non-tilemap video offsets/sizes are guessworked;
-	- random brick flickering effect is unemulated (probably $e033 has a further role in this);
+	- random brick flickering effect is guessworked too, leave MACHINE_IMPERFECT_COLORS in until is tested on HW.
 	- outputs (coin counter port same as sound writes?);
 	- some dipswitches;
     - sound (requires Epson 7910 Multi-Melody emulation)
@@ -142,6 +142,20 @@ void tattack_state::draw_gameplay_bitmap(bitmap_ind16 &bitmap, const rectangle &
 		{
 			bool draw_block = ((cur_column >> bit) & 1) == 1;
 			
+			// blinking
+			// If player hits a blinking brick then a 30 seconds bonus is awarded.
+			// Sometimes game forgets to update the location or the blinking itself (both bits 0)
+			// can be either intentional or a game bug.
+			// TODO: the mask used here is guessed 
+			if((m_ram[0x33] & 0x3) == 3)
+			{
+				int blink_row = m_ram[0x2b];
+				int blink_col = m_ram[0x2c];
+				
+				if(bit == blink_col && (ram_offs & 0xf) == blink_row)
+					draw_block = false;
+			}
+		
 			if(draw_block == true)
 			{
 				for(xi=0;xi<3;xi++)
