@@ -3320,3 +3320,15 @@ if (BUSES["EINSTEIN_USERPORT"]~=null) then
 		MAME_DIR .. "src/devices/bus/einstein/userport/speech.h",
 	}
 end
+
+---------------------------------------------------
+--
+--@src/devices/bus/tmc600/euro.h,BUSES["TMC600"] = true
+---------------------------------------------------
+
+if (BUSES["TMC600"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/tmc600/euro.cpp",
+		MAME_DIR .. "src/devices/bus/tmc600/euro.h",
+	}
+end
