@@ -414,6 +414,13 @@ static MACHINE_CONFIG_START( bishi )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( dobouchn, bishi )
+//  TODO: change accordingly (ASCII charset definitely not 8bpp)
+	MCFG_DEVICE_MODIFY("k056832")
+//	MCFG_K056832_CB(bishi_state, dobouchn_tile_callback)
+	MCFG_K056832_CONFIG("gfx1", K056832_BPP_8, 1, 0, "none")
+MACHINE_CONFIG_END
+
 // ROM definitions
 
 
@@ -507,8 +514,13 @@ ROM_START( dobouchn )
 	ROM_LOAD16_WORD_SWAP( "640-a05-2n.bin", 0x000000, 0x080000, CRC(7643dbc6) SHA1(3b55a782f04a741088b93954279b35c1c90af622) )
 
 	ROM_REGION( 0x200000, "gfx1", 0 )
+	// makes GFX ROM test to pass
+	// must return 0xf0c3 and 0xee9e, check snippets at 0x2e1c and 0x2e42
+	// TODO: might require a different K056832_rom_r callback instead
 	ROM_LOAD16_BYTE( "640-a06-14n.bin", 0x000000, 0x080000, CRC(c6c5016c) SHA1(ad0b5258e2c1d0ba95dfc0d8fc6332b524f2c1e2) )
-	ROM_LOAD16_BYTE( "640-a07-17n.bin", 0x080000, 0x080000, CRC(614fee32) SHA1(080fea72c0417752eb0a0b109b524d87379b2921) )
+	ROM_RELOAD(                         0x100001, 0x080000 )
+	ROM_LOAD16_BYTE( "640-a07-17n.bin", 0x000001, 0x080000, CRC(614fee32) SHA1(080fea72c0417752eb0a0b109b524d87379b2921) )
+	ROM_RELOAD(                         0x100000, 0x080000 )
 
 	// dummy region (game has no sprites, but we want to use the GX mixer)
 	ROM_REGION( 0x80000, "gfx2", ROMREGION_ERASE00 )
@@ -518,8 +530,8 @@ ROM_START( dobouchn )
 	ROM_LOAD( "640-a02-4f.bin", 0x080000, 0x080000, CRC(ab6593f5) SHA1(95907ee4a2cdf3bf27b7c0c1283b2bc36b868d9d) )
 ROM_END
 
-GAME( 1996, bishi,    0,      bishi, bishi,   bishi_state,   0, ROT0, "Konami", "Bishi Bashi Championship Mini Game Senshuken (ver JAA, 3 Players)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1998, sbishi,   0,      bishi, bishi2p, bishi_state,   0, ROT0, "Konami", "Super Bishi Bashi Championship (ver JAA, 2 Players)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1998, sbishik,  sbishi, bishi, bishi,   bishi_state,   0, ROT0, "Konami", "Super Bishi Bashi Championship (ver KAB, 3 Players)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1998, sbishika, sbishi, bishi, bishi,   bishi_state,   0, ROT0, "Konami", "Super Bishi Bashi Championship (ver KAA, 3 Players)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, dobouchn, 0,      bishi, bishi,   bishi_state,   0, ROT0, "Konami", "Dobou-Chan (ver JAA)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, bishi,    0,      bishi,    bishi,   bishi_state,   0, ROT0, "Konami", "Bishi Bashi Championship Mini Game Senshuken (ver JAA, 3 Players)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, sbishi,   0,      bishi,    bishi2p, bishi_state,   0, ROT0, "Konami", "Super Bishi Bashi Championship (ver JAA, 2 Players)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, sbishik,  sbishi, bishi,    bishi,   bishi_state,   0, ROT0, "Konami", "Super Bishi Bashi Championship (ver KAB, 3 Players)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, sbishika, sbishi, bishi,    bishi,   bishi_state,   0, ROT0, "Konami", "Super Bishi Bashi Championship (ver KAA, 3 Players)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, dobouchn, 0,      dobouchn, bishi,   bishi_state,   0, ROT0, "Konami", "Dobou-Chan (ver JAA)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
