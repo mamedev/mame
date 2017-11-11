@@ -598,6 +598,7 @@ public:
 	DECLARE_DRIVER_INIT(pwrshovl);
 	DECLARE_DRIVER_INIT(batlgear);
 	DECLARE_DRIVER_INIT(landhigh);
+	DECLARE_DRIVER_INIT(landhigha);
 	DECLARE_DRIVER_INIT(raizpin);
 	DECLARE_DRIVER_INIT(raizpinj);
 	DECLARE_DRIVER_INIT(styphp);
@@ -2628,6 +2629,9 @@ void taitotz_state::init_taitotz_111a()
 static const char LANDHIGH_HDD_SERIAL[] =           // "824915746386        "
 	{ 0x38, 0x32, 0x34, 0x39, 0x31, 0x35, 0x37, 0x34, 0x36, 0x33, 0x38, 0x36, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20 };
 
+static const char LANDHIGHA_HDD_SERIAL[] =          // "824915546750        "
+	{ 0x38, 0x32, 0x34, 0x39, 0x31, 0x35, 0x35, 0x34, 0x36, 0x37, 0x35, 0x30, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20 };
+
 static const char BATLGR2_HDD_SERIAL[] =            // "            05412842"
 	{ 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x30, 0x35, 0x34, 0x31, 0x32, 0x38, 0x34, 0x32 };
 
@@ -2648,6 +2652,15 @@ DRIVER_INIT_MEMBER(taitotz_state,landhigh)
 	init_taitotz_152();
 
 	m_hdd_serial_number = LANDHIGH_HDD_SERIAL;
+
+	m_scr_base = 0x1c0000;
+}
+
+DRIVER_INIT_MEMBER(taitotz_state,landhigha)
+{
+	init_taitotz_152();
+
+	m_hdd_serial_number = LANDHIGHA_HDD_SERIAL;
 
 	m_scr_base = 0x1c0000;
 }
@@ -2937,7 +2950,7 @@ ROM_END
 
 GAME( 1999, taitotz,   0,        taitotz,  taitotz,  taitotz_state, 0,        ROT0, "Taito", "Type Zero BIOS", MACHINE_NO_SOUND|MACHINE_NOT_WORKING|MACHINE_IS_BIOS_ROOT)
 GAME( 1999, landhigh,  taitotz,  landhigh, landhigh, taitotz_state, landhigh, ROT0, "Taito", "Landing High Japan  (Ver 2.01 OK)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 1999, landhigha, landhigh, landhigh, landhigh, taitotz_state, landhigh, ROT0, "Taito", "Landing High Japan  (Ver 2.02 O)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // needs correct hd serial number
+GAME( 1999, landhigha, landhigh, landhigh, landhigh, taitotz_state, landhigha,ROT0, "Taito", "Landing High Japan  (Ver 2.02 O)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 1999, batlgear,  taitotz,  taitotz,  batlgr2,  taitotz_state, batlgear, ROT0, "Taito", "Battle Gear (Ver 2.40 A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 1999, pwrshovl,  taitotz,  taitotz,  pwrshovl, taitotz_state, pwrshovl, ROT0, "Taito", "Power Shovel ni Norou!! - Power Shovel Simulator (v2.07J)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 1999/8/5 19:13:35
 GAME( 1999, pwrshovla, pwrshovl, taitotz,  pwrshovl, taitotz_state, pwrshovl, ROT0, "Taito", "Power Shovel ni Norou!! - Power Shovel Simulator (v2.07J, alt)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // seem to be some differences in drive content, but identifies as the same revision, is it just user data changes??
