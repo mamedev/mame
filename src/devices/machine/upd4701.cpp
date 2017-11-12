@@ -354,11 +354,12 @@ READ8_MEMBER(upd4701_device::read_y)
 
 READ8_MEMBER(upd4701_device::read_xy)
 {
+	bool old_cs = m_cs;
 	cs_w(0);
 	xy_w(BIT(offset, 1));
 	ul_w(BIT(offset, 0));
 	u8 result = d_r(space, 0);
-	cs_w(1);
+	cs_w(old_cs);
 	return result;
 }
 

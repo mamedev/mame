@@ -502,11 +502,11 @@ WRITE16_MEMBER(konamigv_state::btc_trackball_w)
 {
 //  osd_printf_debug( "w %08x %08x %08x %08x\n", space.device().safe_pc(), offset, data, mem_mask );
 
-	// Is this correct? The write pattern looks more like CS than RESET...
-	if (BIT(data, 1))
+	for (int i = 0; i < 2; i++)
 	{
-		m_btc_trackball[0]->reset_xy(space, 0, 0, 0xff);
-		m_btc_trackball[1]->reset_xy(space, 0, 0, 0xff);
+		m_btc_trackball[i]->cs_w(BIT(data, 1));
+		m_btc_trackball[i]->resetx_w(!BIT(data, 0));
+		m_btc_trackball[i]->resety_w(!BIT(data, 0));
 	}
 }
 
