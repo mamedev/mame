@@ -166,6 +166,7 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( bishi )
 	/* Currently, this "IN0" is not read */
+	// TODO: leftover?
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -259,7 +260,6 @@ static INPUT_PORTS_START( bishi )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Red")
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START2 )
 INPUT_PORTS_END
-
 
 /* The game will respond to the 'player 2' inputs from the normal
    input define if mapped, however, the game will function in an abnormal way
@@ -361,6 +361,76 @@ static INPUT_PORTS_START( bishi2p )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED ) // 'p2' START
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( dobouchn )
+	PORT_INCLUDE( bishi )
+	
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_MODIFY("INPUTS")
+	PORT_BIT( 0x001f, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 Shoot")
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
+	
+	PORT_MODIFY("SYSTEM")
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("M. Ack") // ???
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_NAME("Coin 2 (Medal)")
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0xf000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:1,2,3")
+	PORT_DIPSETTING(    0x00, "5 Coins / 2 Credits" )
+	PORT_DIPSETTING(    0x01, DEF_STR( 4C_3C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x05, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) )
+	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "SW1:4" )
+	PORT_DIPNAME( 0x70, 0x70, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW1:5,6,7")
+	PORT_DIPSETTING(    0x00, "15 Medals" )
+	PORT_DIPSETTING(    0x10, "13 Medals" )
+	PORT_DIPSETTING(    0x20, "11 Medals" )
+	PORT_DIPSETTING(    0x30, "9 Medals" )
+	PORT_DIPSETTING(    0x40, "7 Medals" )
+	PORT_DIPSETTING(    0x50, "5 Medals" )
+	PORT_DIPSETTING(    0x60, "3 Medals" )
+	PORT_DIPSETTING(    0x70, "2 Medals" )
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW1:8" )
+
+	PORT_DIPNAME( 0x0f00, 0x0f00, "Payout" ) PORT_DIPLOCATION("SW2:1,2,3,4")
+	PORT_DIPSETTING(    0x000, "90%" )
+	PORT_DIPSETTING(    0x100, "85%" )
+	PORT_DIPSETTING(    0x200, "80%" )
+	PORT_DIPSETTING(    0x300, "75%" )
+	PORT_DIPSETTING(    0x400, "70%" )
+	PORT_DIPSETTING(    0x500, "65%" )
+	PORT_DIPSETTING(    0x600, "60%" )
+	PORT_DIPSETTING(    0x700, "55%" )
+	PORT_DIPSETTING(    0x800, "50%" )
+	PORT_DIPSETTING(    0x900, "45%" )
+	PORT_DIPSETTING(    0xa00, "40%" )
+	PORT_DIPSETTING(    0xb00, "35%" )
+	PORT_DIPSETTING(    0xc00, "30%" )
+	PORT_DIPSETTING(    0xd00, "25%" )
+	PORT_DIPSETTING(    0xe00, "20%" )
+	PORT_DIPSETTING(    0xf00, "15%" )
+	PORT_DIPNAME( 0x3000, 0x3000, "Play Timer" ) PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPSETTING(    0x0000, "30 seconds" )
+	PORT_DIPSETTING(    0x1000, "24 seconds" )
+	PORT_DIPSETTING(    0x2000, "18 seconds" )
+	PORT_DIPSETTING(    0x3000, "12 seconds" )
+	// TODO: needs NVRAM hookup and default hookup
+	PORT_DIPNAME( 0x4000, 0x0000, "Backup RAM clear" ) PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(      0x4000, DEF_STR( No ) ) 
+	PORT_DIPSETTING(      0x0000, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x8000, 0x0000, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(    0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+INPUT_PORTS_END
 
 void bishi_state::machine_start()
 {
@@ -415,7 +485,7 @@ static MACHINE_CONFIG_START( bishi )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( dobouchn, bishi )
-//  TODO: change accordingly (ASCII charset definitely not 8bpp)
+//  TODO: change accordingly (ASCII charset definitely not 8bpp, 5bpp perhaps?)
 	MCFG_DEVICE_MODIFY("k056832")
 //	MCFG_K056832_CB(bishi_state, dobouchn_tile_callback)
 	MCFG_K056832_CONFIG("gfx1", K056832_BPP_8, 1, 0, "none")
@@ -530,8 +600,8 @@ ROM_START( dobouchn )
 	ROM_LOAD( "640-a02-4f.bin", 0x080000, 0x080000, CRC(ab6593f5) SHA1(95907ee4a2cdf3bf27b7c0c1283b2bc36b868d9d) )
 ROM_END
 
-GAME( 1996, bishi,    0,      bishi,    bishi,   bishi_state,   0, ROT0, "Konami", "Bishi Bashi Championship Mini Game Senshuken (ver JAA, 3 Players)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1998, sbishi,   0,      bishi,    bishi2p, bishi_state,   0, ROT0, "Konami", "Super Bishi Bashi Championship (ver JAA, 2 Players)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1998, sbishik,  sbishi, bishi,    bishi,   bishi_state,   0, ROT0, "Konami", "Super Bishi Bashi Championship (ver KAB, 3 Players)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1998, sbishika, sbishi, bishi,    bishi,   bishi_state,   0, ROT0, "Konami", "Super Bishi Bashi Championship (ver KAA, 3 Players)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, dobouchn, 0,      dobouchn, bishi,   bishi_state,   0, ROT0, "Konami", "Dobou-Chan (ver JAA)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, bishi,    0,      bishi,    bishi,    bishi_state,   0, ROT0, "Konami", "Bishi Bashi Championship Mini Game Senshuken (ver JAA, 3 Players)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, sbishi,   0,      bishi,    bishi2p,  bishi_state,   0, ROT0, "Konami", "Super Bishi Bashi Championship (ver JAA, 2 Players)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, sbishik,  sbishi, bishi,    bishi,    bishi_state,   0, ROT0, "Konami", "Super Bishi Bashi Championship (ver KAB, 3 Players)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, sbishika, sbishi, bishi,    bishi,    bishi_state,   0, ROT0, "Konami", "Super Bishi Bashi Championship (ver KAA, 3 Players)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, dobouchn, 0,      dobouchn, dobouchn, bishi_state,   0, ROT0, "Konami", "Dobou-Chan (ver JAA)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
