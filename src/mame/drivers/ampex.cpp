@@ -6,14 +6,14 @@
 
 Ampex Dialogue 80 terminal
 
-Chips: CRT-5037, COM8017, MK3880N (Z80)
+Chips: CRT-5037, COM8017, SMC5016-5, MK3880N (Z80)
 Crystals: 4.9152, 23.814
 Other: Beeper, 5x 10sw-dips.
 
 ************************************************************************************************************************************/
 
 #include "emu.h"
-#include "cpu/i8085/i8085.h"
+#include "cpu/z80/z80.h"
 
 class ampex_state : public driver_device
 {
@@ -43,7 +43,7 @@ static INPUT_PORTS_START( ampex )
 INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( ampex )
-	MCFG_CPU_ADD("maincpu", I8080A, 2'000'000) // no idea of clock.
+	MCFG_CPU_ADD("maincpu", Z80, 2'000'000) // no idea of clock.
 	MCFG_CPU_PROGRAM_MAP(mem_map)
 MACHINE_CONFIG_END
 
