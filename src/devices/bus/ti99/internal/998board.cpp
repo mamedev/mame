@@ -2259,16 +2259,16 @@ oso_device::oso_device(const machine_config &mconfig, const char *tag, device_t 
 	m_status(0xff),
 	m_control(0),
 	m_xmit(0), m_lasthxvalue(0x01),
-	m_bav(false), m_sbav(false), m_sbavold(true), m_bavhold(false),
-	m_hsk(false), m_shsk(false), m_shskold(true), m_hskhold(false),
-	m_wq1(false), m_wq1old(true), m_wq2(false), m_wq2old(true),
+	m_bav(false), m_sbav(false), m_sbavold(false), m_bavhold(false),
+	m_hsk(false), m_shsk(false), m_shskold(false), m_hskhold(false),
+	m_wq1(false), m_wq1old(false), m_wq2(false), m_wq2old(false),
 	m_wnp(false), m_wbusyold(false), m_sendbyte(false),
 	m_wrset(false), m_counting(false), m_clkcount(0),
-	m_rq1(false), m_rq2(false), m_rq2old(true),
+	m_rq1(false), m_rq2(false), m_rq2old(false),
 	m_rnib(false), m_rnibcold(false),
-	m_rdset(false), m_rdsetold(true),
+	m_rdset(false), m_rdsetold(false),
 	m_msns(false), m_lsns(false),
-	m_rdend(false), m_byteavailable(false)
+	m_rhsus(false)
 {
 	(void)m_shskold;
 	m_hexbus_inbound = nullptr;
@@ -2286,7 +2286,7 @@ READ8_MEMBER( oso_device::read )
 		if (TRACE_OSO) logerror("Read data register = %02x\n", value);
 		value = m_data;
 		// Release the handshake
-		m_byteavailable = false;
+		m_rhsus = false;
 		break;
 	case 1:
 		// read 5FFA: read status register
@@ -2357,7 +2357,6 @@ WRITE8_MEMBER( oso_device::write )
 void oso_device::clear_int_status()
 {
 	m_status &= ~(HSKWT | HSKRD | BAVIAS | BAVAIS);
-	m_rdend = false;
 	m_int(CLEAR_LINE);
 }
 
@@ -2432,7 +2431,7 @@ WRITE_LINE_MEMBER( oso_device::clock_in )
 			if (m_wq1 == true)
 				m_sendbyte = false;
 
-//          logerror("sendbyte=%d, wq1=%d, wq2=%d, jwq1=%d, kwq1=%d, jwq2=%d, kwq2=%d, shsk=%d\n", m_sendbyte, m_wq1, m_wq2, jwq1, kwq1, jwq2, kwq2, m_shsk);
+			// logerror("sendbyte=%d, wq1=%d, wq2=%d, jwq1=%d, kwq1=%d, jwq2=%d, kwq2=%d, shsk=%d\n", m_sendbyte, m_wq1, m_wq2, jwq1, kwq1, jwq2, kwq2, m_shsk);
 			// WBUSY is asserted on byte load, during phase 1, and phase 2.
 			bool wbusy = m_sendbyte || m_wq1 || m_wq2;
 
@@ -2524,23 +2523,22 @@ WRITE_LINE_MEMBER( oso_device::clock_in )
 			if (m_rq2old == true && m_rq2 == false)
 			{
 				set_status(HSKRD, true);
-				m_rdend = true;
+				m_rhsus = true;  // byte is available for reading
 			}
 			m_rq2old = m_rq2;
 		}
 		else
 		{
-			m_byteavailable = false;
+			m_rhsus = false;
 		}
 
 		// Handshake control
 		// Set HSK (Page 6, RHSUS*)
 		bool hskwrite = !m_wq1 && m_wq2;
-		if (m_rdend) m_byteavailable = true;
 
 		// We can simplify this to a single flag because the CPU read operation
 		// is atomic here (starts and immediately terminates)
-		m_hsk = hskwrite || m_byteavailable;
+		m_hsk = hskwrite || m_rhsus;
 		update_hexbus();
 	}
 	// Actions that occur for Phi3=0
@@ -2565,14 +2563,6 @@ WRITE_LINE_MEMBER( oso_device::clock_in )
 	if (!control_bit(REN))
 	{
 		m_rq1 = m_rq2 = m_rdset = false;
-	}
-
-	// Show some lines in log
-	if (TRACE_OSO) {
-		if (m_sbav != m_sbavold) {
-			logerror("SBAV = %d\n", m_sbav? 1 : 0);
-			m_sbavold = m_sbav;
-		}
 	}
 
 	// Raise interrupt

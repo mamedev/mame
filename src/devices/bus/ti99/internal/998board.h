@@ -488,10 +488,8 @@ private:
 	bool m_msns;        // Upper 4 bits
 	bool m_lsns;        // Lower 4 bits
 
-	bool m_rdend;       // Read completed
-
-	// Page 6
-	bool m_byteavailable;   // Needed to assert the HSK line until the CPU has read the byte
+	// Page 6 (RHSUS*)
+	bool m_rhsus;       // Needed to assert the HSK line until the CPU has read the byte
 };
 
 class mainboard8_device : public device_t
