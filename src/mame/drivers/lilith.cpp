@@ -9,25 +9,27 @@ CPU consists of various parts including AM2901 and AM2911.
 ************************************************************************************************************************************/
 
 #include "emu.h"
-//#include "cpu/mcs51/mcs51.h"
 
 class lilith_state : public driver_device
 {
 public:
 	lilith_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-//		, maincpu(*this, "maincpu")
+//		, m_maincpu(*this, "maincpu")
 	{ }
 
-protected:
-//	required_device<i80c52_device> maincpu;
+private:
+//	required_device<cpu_device> m_maincpu;
 };
+
+//static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, lilith_state )
+//ADDRESS_MAP_END
+
+//static ADDRESS_MAP_START( io_map, AS_PROGRAM, 8, lilith_state )
+//ADDRESS_MAP_END
 
 static INPUT_PORTS_START( lilith )
 INPUT_PORTS_END
-
-//static ADDRESS_MAP_START( prg_map, AS_PROGRAM, 8, lilith_state )
-//ADDRESS_MAP_END
 
 static MACHINE_CONFIG_START( lilith )
 MACHINE_CONFIG_END

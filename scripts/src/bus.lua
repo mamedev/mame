@@ -232,6 +232,8 @@ if (BUSES["BBC_FDC"]~=null) then
 		MAME_DIR .. "src/devices/bus/bbc/fdc/acorn.h",
 		MAME_DIR .. "src/devices/bus/bbc/fdc/cumana.cpp",
 		MAME_DIR .. "src/devices/bus/bbc/fdc/cumana.h",
+		MAME_DIR .. "src/devices/bus/bbc/fdc/cv1797.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/fdc/cv1797.h",
 		MAME_DIR .. "src/devices/bus/bbc/fdc/opus.cpp",
 		MAME_DIR .. "src/devices/bus/bbc/fdc/opus.h",
 		MAME_DIR .. "src/devices/bus/bbc/fdc/watford.cpp",
@@ -712,6 +714,8 @@ if (BUSES["ELECTRON"]~=null) then
 		MAME_DIR .. "src/devices/bus/electron/exp.h",
 		MAME_DIR .. "src/devices/bus/electron/fbjoy.cpp",
 		MAME_DIR .. "src/devices/bus/electron/fbjoy.h",
+		MAME_DIR .. "src/devices/bus/electron/plus1.cpp",
+		MAME_DIR .. "src/devices/bus/electron/plus1.h",
 		MAME_DIR .. "src/devices/bus/electron/plus3.cpp",
 		MAME_DIR .. "src/devices/bus/electron/plus3.h",
 		MAME_DIR .. "src/devices/bus/electron/pwrjoy.cpp",
@@ -1760,6 +1764,10 @@ if (BUSES["A2BUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/a2bus/agat7ram.h",
 		MAME_DIR .. "src/devices/bus/a2bus/ssprite.cpp",
 		MAME_DIR .. "src/devices/bus/a2bus/ssprite.h",
+		MAME_DIR .. "src/devices/bus/a2bus/ssbapple.cpp",
+		MAME_DIR .. "src/devices/bus/a2bus/ssbapple.h",
+		MAME_DIR .. "src/devices/bus/a2bus/transwarp.cpp",
+		MAME_DIR .. "src/devices/bus/a2bus/transwarp.h",
 	}
 end
 
@@ -3290,6 +3298,8 @@ if (BUSES["TATUNG_PIPE"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/einstein/pipe/pipe.cpp",
 		MAME_DIR .. "src/devices/bus/einstein/pipe/pipe.h",
+		MAME_DIR .. "src/devices/bus/einstein/pipe/silicon_disc.cpp",
+		MAME_DIR .. "src/devices/bus/einstein/pipe/silicon_disc.h",
 		MAME_DIR .. "src/devices/bus/einstein/pipe/tk02.cpp",
 		MAME_DIR .. "src/devices/bus/einstein/pipe/tk02.h",
 	}
@@ -3304,7 +3314,21 @@ if (BUSES["EINSTEIN_USERPORT"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/einstein/userport/userport.cpp",
 		MAME_DIR .. "src/devices/bus/einstein/userport/userport.h",
+		MAME_DIR .. "src/devices/bus/einstein/userport/mouse.cpp",
+		MAME_DIR .. "src/devices/bus/einstein/userport/mouse.h",
 		MAME_DIR .. "src/devices/bus/einstein/userport/speech.cpp",
 		MAME_DIR .. "src/devices/bus/einstein/userport/speech.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/bus/tmc600/euro.h,BUSES["TMC600"] = true
+---------------------------------------------------
+
+if (BUSES["TMC600"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/tmc600/euro.cpp",
+		MAME_DIR .. "src/devices/bus/tmc600/euro.h",
 	}
 end

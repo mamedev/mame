@@ -12,7 +12,6 @@
 
     - white noise
     - scanline based update
-    - CMSEL output
 
 */
 

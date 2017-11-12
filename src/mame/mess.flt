@@ -30,12 +30,15 @@ alphasma.cpp
 alphatpx.cpp
 alphatro.cpp
 altair.cpp
+alto1.cpp
 alto2.cpp
+altos2.cpp
 altos5.cpp
 altos486.cpp
 altos8600.cpp
 amico2k.cpp
 amiga.cpp
+ampex.cpp
 ampro.cpp
 ampscarp.cpp
 amstr_pc.cpp
@@ -185,6 +188,7 @@ elf.cpp
 elwro800.cpp
 enmirage.cpp
 ep64.cpp
+esprit.cpp
 esq1.cpp
 esq5505.cpp
 esqasr.cpp
@@ -259,6 +263,7 @@ homez80.cpp
 horizon.cpp
 hp_ipc.cpp
 hp16500.cpp
+hp2100.cpp
 hp48.cpp
 hp49gp.cpp
 hp64k.cpp
@@ -374,6 +379,7 @@ microvsn.cpp
 mikro80.cpp
 mikromik.cpp
 mikrosha.cpp
+mightyframe.cpp
 mini2440.cpp
 minicom.cpp
 miniforce.cpp
@@ -524,6 +530,7 @@ prof80.cpp
 prophet600.cpp
 proteus3.cpp
 ps2.cpp
+ps2sony.cpp
 psion.cpp
 psx.cpp
 pt68k4.cpp
@@ -683,6 +690,7 @@ ts803.cpp
 ts816.cpp
 ts3000.cpp
 tsispch.cpp
+tti.cpp
 tutor.cpp
 tv910.cpp
 tv950.cpp
@@ -707,6 +715,7 @@ vcs80.cpp
 vector06.cpp
 vector4.cpp
 vectrex.cpp
+vectrix.cpp
 vg5k.cpp
 vic10.cpp
 vic20.cpp
@@ -753,6 +762,7 @@ zexall.cpp
 zorba.cpp
 zrt80.cpp
 zsbc3.cpp
+zt8802.cpp
 zx.cpp
 //exceptions + to add - to remove from imported list
 //3do.cpp

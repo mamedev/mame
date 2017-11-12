@@ -160,13 +160,13 @@ public:
 	DECLARE_WRITE16_MEMBER(metro_window_w);
 	void blt_write( address_space &space, const int tmap, const offs_t offs, const uint16_t data, const uint16_t mask );
 	DECLARE_CUSTOM_INPUT_MEMBER(custom_soundstatus_r);
-	DECLARE_WRITE16_MEMBER(gakusai_oki_bank_hi_w);
-	DECLARE_WRITE16_MEMBER(gakusai_oki_bank_lo_w);
-	DECLARE_READ16_MEMBER(gakusai_eeprom_r);
-	DECLARE_WRITE16_MEMBER(gakusai_eeprom_w);
-	DECLARE_READ16_MEMBER(dokyusp_eeprom_r);
-	DECLARE_WRITE16_MEMBER(dokyusp_eeprom_bit_w);
-	DECLARE_WRITE16_MEMBER(dokyusp_eeprom_reset_w);
+	DECLARE_WRITE8_MEMBER(gakusai_oki_bank_hi_w);
+	DECLARE_WRITE8_MEMBER(gakusai_oki_bank_lo_w);
+	DECLARE_READ8_MEMBER(gakusai_eeprom_r);
+	DECLARE_WRITE8_MEMBER(gakusai_eeprom_w);
+	DECLARE_READ8_MEMBER(dokyusp_eeprom_r);
+	DECLARE_WRITE8_MEMBER(dokyusp_eeprom_bit_w);
+	DECLARE_WRITE8_MEMBER(dokyusp_eeprom_reset_w);
 	DECLARE_WRITE8_MEMBER(mouja_sound_rombank_w);
 	void gakusai_oki_bank_set();
 

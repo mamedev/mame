@@ -1158,22 +1158,16 @@ void metro_state::gakusai_oki_bank_set()
 	m_oki->set_rom_bank(bank);
 }
 
-WRITE16_MEMBER(metro_state::gakusai_oki_bank_hi_w)
+WRITE8_MEMBER(metro_state::gakusai_oki_bank_hi_w)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		m_gakusai_oki_bank_hi = data & 0xff;
-		gakusai_oki_bank_set();
-	}
+	m_gakusai_oki_bank_hi = data;
+	gakusai_oki_bank_set();
 }
 
-WRITE16_MEMBER(metro_state::gakusai_oki_bank_lo_w)
+WRITE8_MEMBER(metro_state::gakusai_oki_bank_lo_w)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		m_gakusai_oki_bank_lo = data & 0xff;
-		gakusai_oki_bank_set();
-	}
+	m_gakusai_oki_bank_lo = data;
+	gakusai_oki_bank_set();
 }
 
 
@@ -1189,24 +1183,21 @@ READ16_MEMBER(metro_state::gakusai_input_r)
 	return 0xffff;
 }
 
-READ16_MEMBER(metro_state::gakusai_eeprom_r)
+READ8_MEMBER(metro_state::gakusai_eeprom_r)
 {
 	return m_eeprom->do_read() & 1;
 }
 
-WRITE16_MEMBER(metro_state::gakusai_eeprom_w)
+WRITE8_MEMBER(metro_state::gakusai_eeprom_w)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		// latch the bit
-		m_eeprom->di_write(BIT(data, 0));
+	// latch the bit
+	m_eeprom->di_write(BIT(data, 0));
 
-		// reset line asserted: reset.
-		m_eeprom->cs_write(BIT(data, 2) ? ASSERT_LINE : CLEAR_LINE );
+	// reset line asserted: reset.
+	m_eeprom->cs_write(BIT(data, 2) ? ASSERT_LINE : CLEAR_LINE );
 
-		// clock line asserted: write latch or select next bit to read
-		m_eeprom->clk_write(BIT(data, 1) ? ASSERT_LINE : CLEAR_LINE );
-	}
+	// clock line asserted: write latch or select next bit to read
+	m_eeprom->clk_write(BIT(data, 1) ? ASSERT_LINE : CLEAR_LINE );
 }
 
 static ADDRESS_MAP_START( gakusai_map, AS_PROGRAM, 16, metro_state )
@@ -1234,11 +1225,11 @@ static ADDRESS_MAP_START( gakusai_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x278888, 0x278889) AM_WRITEONLY AM_SHARE("input_sel")                 // Inputs
 	AM_RANGE(0x279700, 0x279713) AM_WRITEONLY AM_SHARE("videoregs")                 // Video Registers
 	AM_RANGE(0x400000, 0x400001) AM_WRITENOP                                        // ? 5
-	AM_RANGE(0x500000, 0x500001) AM_WRITE(gakusai_oki_bank_lo_w)                    // Sound
+	AM_RANGE(0x500000, 0x500001) AM_WRITE8(gakusai_oki_bank_lo_w, 0x00ff)           // Sound
 	AM_RANGE(0x600000, 0x600003) AM_DEVWRITE8("ymsnd", ym2413_device, write, 0x00ff)
 	AM_RANGE(0x700000, 0x700001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)  // Sound
-	AM_RANGE(0xc00000, 0xc00001) AM_READWRITE(gakusai_eeprom_r, gakusai_eeprom_w)   // EEPROM
-	AM_RANGE(0xd00000, 0xd00001) AM_WRITE(gakusai_oki_bank_hi_w)
+	AM_RANGE(0xc00000, 0xc00001) AM_READWRITE8(gakusai_eeprom_r, gakusai_eeprom_w, 0x00ff)      // EEPROM
+	AM_RANGE(0xd00000, 0xd00001) AM_WRITE8(gakusai_oki_bank_hi_w, 0x00ff)
 	AM_RANGE(0xf00000, 0xf0ffff) AM_RAM AM_MIRROR(0x0f0000)                         // RAM (mirrored)
 ADDRESS_MAP_END
 
@@ -1273,11 +1264,11 @@ static ADDRESS_MAP_START( gakusai2_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x678888, 0x678889) AM_WRITEONLY AM_SHARE("input_sel")                 // Inputs
 	AM_RANGE(0x679700, 0x679713) AM_WRITEONLY AM_SHARE("videoregs")                 // Video Registers
 	AM_RANGE(0x800000, 0x800001) AM_WRITENOP                                        // ? 5
-	AM_RANGE(0x900000, 0x900001) AM_WRITE(gakusai_oki_bank_lo_w)                    // Sound bank
-	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(gakusai_oki_bank_hi_w)                    //
+	AM_RANGE(0x900000, 0x900001) AM_WRITE8(gakusai_oki_bank_lo_w, 0x00ff)           // Sound bank
+	AM_RANGE(0xa00000, 0xa00001) AM_WRITE8(gakusai_oki_bank_hi_w, 0x00ff)           //
 	AM_RANGE(0xb00000, 0xb00001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)  // Sound
 	AM_RANGE(0xc00000, 0xc00003) AM_DEVWRITE8("ymsnd", ym2413_device, write, 0x00ff)
-	AM_RANGE(0xe00000, 0xe00001) AM_READWRITE(gakusai_eeprom_r,gakusai_eeprom_w)    // EEPROM
+	AM_RANGE(0xe00000, 0xe00001) AM_READWRITE8(gakusai_eeprom_r, gakusai_eeprom_w, 0x00ff)      // EEPROM
 	AM_RANGE(0xf00000, 0xf0ffff) AM_RAM AM_MIRROR(0x0f0000)                         // RAM (mirrored)
 ADDRESS_MAP_END
 
@@ -1286,7 +1277,7 @@ ADDRESS_MAP_END
                         Mahjong Doukyuusei Special
 ***************************************************************************/
 
-READ16_MEMBER(metro_state::dokyusp_eeprom_r)
+READ8_MEMBER(metro_state::dokyusp_eeprom_r)
 {
 	// clock line asserted: write latch or select next bit to read
 	m_eeprom->clk_write(CLEAR_LINE);
@@ -1295,26 +1286,20 @@ READ16_MEMBER(metro_state::dokyusp_eeprom_r)
 	return m_eeprom->do_read() & 1;
 }
 
-WRITE16_MEMBER(metro_state::dokyusp_eeprom_bit_w)
+WRITE8_MEMBER(metro_state::dokyusp_eeprom_bit_w)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		// latch the bit
-		m_eeprom->di_write(BIT(data, 0));
+	// latch the bit
+	m_eeprom->di_write(BIT(data, 0));
 
-		// clock line asserted: write latch or select next bit to read
-		m_eeprom->clk_write(CLEAR_LINE);
-		m_eeprom->clk_write(ASSERT_LINE);
-	}
+	// clock line asserted: write latch or select next bit to read
+	m_eeprom->clk_write(CLEAR_LINE);
+	m_eeprom->clk_write(ASSERT_LINE);
 }
 
-WRITE16_MEMBER(metro_state::dokyusp_eeprom_reset_w)
+WRITE8_MEMBER(metro_state::dokyusp_eeprom_reset_w)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		// reset line asserted: reset.
-		m_eeprom->cs_write(BIT(data, 0) ? ASSERT_LINE : CLEAR_LINE);
-	}
+	// reset line asserted: reset.
+	m_eeprom->cs_write(BIT(data, 0) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static ADDRESS_MAP_START( dokyusp_map, AS_PROGRAM, 16, metro_state )
@@ -1342,11 +1327,11 @@ static ADDRESS_MAP_START( dokyusp_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x278888, 0x278889) AM_WRITEONLY AM_SHARE("input_sel")                 //
 	AM_RANGE(0x279700, 0x279713) AM_WRITEONLY AM_SHARE("videoregs")                 // Video Registers
 	AM_RANGE(0x400000, 0x400001) AM_WRITENOP                                        // ? 5
-	AM_RANGE(0x500000, 0x500001) AM_WRITE(gakusai_oki_bank_lo_w)                    // Sound
+	AM_RANGE(0x500000, 0x500001) AM_WRITE8(gakusai_oki_bank_lo_w, 0x00ff)           // Sound
 	AM_RANGE(0x600000, 0x600003) AM_DEVWRITE8("ymsnd", ym2413_device, write, 0x00ff)
 	AM_RANGE(0x700000, 0x700001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)  // Sound
-	AM_RANGE(0xc00000, 0xc00001) AM_WRITE(dokyusp_eeprom_reset_w)                       // EEPROM
-	AM_RANGE(0xd00000, 0xd00001) AM_READWRITE(dokyusp_eeprom_r, dokyusp_eeprom_bit_w)   // EEPROM
+	AM_RANGE(0xc00000, 0xc00001) AM_WRITE8(dokyusp_eeprom_reset_w, 0x00ff)                      // EEPROM
+	AM_RANGE(0xd00000, 0xd00001) AM_READWRITE8(dokyusp_eeprom_r, dokyusp_eeprom_bit_w, 0x00ff)  // EEPROM
 	AM_RANGE(0xf00000, 0xf0ffff) AM_RAM AM_MIRROR(0x0f0000)                         // RAM (mirrored)
 ADDRESS_MAP_END
 
@@ -1383,9 +1368,9 @@ static ADDRESS_MAP_START( dokyusei_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x478886, 0x478887) AM_READ_PORT("DSW1")                               //
 	AM_RANGE(0x478888, 0x478889) AM_WRITEONLY AM_SHARE("input_sel")                 // Inputs
 	AM_RANGE(0x479700, 0x479713) AM_WRITEONLY AM_SHARE("videoregs")                 // Video Registers
-	AM_RANGE(0x800000, 0x800001) AM_WRITE(gakusai_oki_bank_hi_w)                    // Samples Bank?
+	AM_RANGE(0x800000, 0x800001) AM_WRITE8(gakusai_oki_bank_hi_w, 0x00ff)           // Samples Bank?
 	AM_RANGE(0x900000, 0x900001) AM_WRITENOP                                        // ? 4
-	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(gakusai_oki_bank_lo_w)                    // Samples Bank
+	AM_RANGE(0xa00000, 0xa00001) AM_WRITE8(gakusai_oki_bank_lo_w, 0x00ff)           // Samples Bank
 	AM_RANGE(0xc00000, 0xc00003) AM_DEVWRITE8("ymsnd", ym2413_device, write, 0x00ff)     //
 	AM_RANGE(0xd00000, 0xd00001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)  // Sound
 	AM_RANGE(0xf00000, 0xf0ffff) AM_RAM AM_MIRROR(0x0f0000)                         // RAM (mirrored)

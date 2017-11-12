@@ -43,14 +43,14 @@ private:
 	required_region_ptr<u8> m_p_chargen;
 };
 
-static ADDRESS_MAP_START(vta2000_mem, AS_PROGRAM, 8, vta2000_state)
+static ADDRESS_MAP_START(mem_map, AS_PROGRAM, 8, vta2000_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x5fff ) AM_ROM AM_REGION("roms", 0)
 	AM_RANGE( 0x8000, 0xc7ff ) AM_RAM AM_SHARE("videoram")
 	AM_RANGE( 0xc800, 0xc8ff ) AM_ROM AM_REGION("roms", 0x5000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(vta2000_io, AS_IO, 8, vta2000_state)
+static ADDRESS_MAP_START(io_map, AS_IO, 8, vta2000_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 ADDRESS_MAP_END
@@ -157,8 +157,8 @@ PALETTE_INIT_MEMBER(vta2000_state, vta2000)
 static MACHINE_CONFIG_START( vta2000 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8080, XTAL_4MHz / 4)
-	MCFG_CPU_PROGRAM_MAP(vta2000_mem)
-	MCFG_CPU_IO_MAP(vta2000_io)
+	MCFG_CPU_PROGRAM_MAP(mem_map)
+	MCFG_CPU_IO_MAP(io_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

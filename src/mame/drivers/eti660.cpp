@@ -80,7 +80,7 @@ WRITE8_MEMBER( eti660_state::colorram_w )
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( eti660_map, AS_PROGRAM, 8, eti660_state )
+static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, eti660_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xfff)
 	AM_RANGE(0x0000, 0x03ff) AM_ROM
 	AM_RANGE(0x0400, 0x047f) AM_RAM
@@ -88,7 +88,7 @@ static ADDRESS_MAP_START( eti660_map, AS_PROGRAM, 8, eti660_state )
 	AM_RANGE(0x0600, 0x0fff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( eti660_io_map, AS_IO, 8, eti660_state )
+static ADDRESS_MAP_START( io_map, AS_IO, 8, eti660_state )
 	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE(CDP1864_TAG, cdp1864_device, dispon_r, step_bgcolor_w)
 	AM_RANGE(0x02, 0x02) AM_READWRITE(pia_r, pia_w)
 	AM_RANGE(0x03, 0x03) AM_WRITE(colorram_w)
@@ -305,8 +305,8 @@ QUICKLOAD_LOAD_MEMBER( eti660_state, eti660 )
 static MACHINE_CONFIG_START( eti660 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, XTAL_8_867238MHz/5)
-	MCFG_CPU_PROGRAM_MAP(eti660_map)
-	MCFG_CPU_IO_MAP(eti660_io_map)
+	MCFG_CPU_PROGRAM_MAP(mem_map)
+	MCFG_CPU_IO_MAP(io_map)
 	MCFG_COSMAC_WAIT_CALLBACK(VCC)
 	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(eti660_state, clear_r))
 	MCFG_COSMAC_EF2_CALLBACK(READLINE(eti660_state, ef2_r))

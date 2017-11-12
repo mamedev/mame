@@ -46,14 +46,14 @@ private:
 	required_region_ptr<u8> m_p_chargen;
 };
 
-static ADDRESS_MAP_START(modellot_mem, AS_PROGRAM, 8, modellot_state)
+static ADDRESS_MAP_START(mem_map, AS_PROGRAM, 8, modellot_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xbfff) AM_RAM // 48k ram
 	AM_RANGE(0xc000, 0xc3ff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(modellot_io, AS_IO, 8, modellot_state)
+static ADDRESS_MAP_START(io_map, AS_IO, 8, modellot_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x77, 0x77) AM_READ(port77_r)
@@ -152,8 +152,8 @@ uint32_t modellot_state::screen_update_modellot(screen_device &screen, bitmap_in
 static MACHINE_CONFIG_START( modellot )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
-	MCFG_CPU_PROGRAM_MAP(modellot_mem)
-	MCFG_CPU_IO_MAP(modellot_io)
+	MCFG_CPU_PROGRAM_MAP(mem_map)
+	MCFG_CPU_IO_MAP(io_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())

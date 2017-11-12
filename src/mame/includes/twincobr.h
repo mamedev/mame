@@ -30,7 +30,6 @@ public:
 	optional_device<buffered_spriteram8_device> m_spriteram8;
 	optional_device<buffered_spriteram16_device> m_spriteram16;
 
-	int m_toaplan_main_cpu;
 	int32_t m_fg_rom_bank;
 	int32_t m_bg_ram_bank;
 	int m_intenable;
@@ -70,13 +69,14 @@ public:
 	DECLARE_READ16_MEMBER(fsharkbt_dsp_r);
 	DECLARE_WRITE16_MEMBER(fsharkbt_dsp_w);
 	DECLARE_READ_LINE_MEMBER(twincobr_BIO_r);
-	DECLARE_WRITE16_MEMBER(twincobr_control_w);
-	DECLARE_WRITE8_MEMBER(wardner_control_w);
+	DECLARE_WRITE_LINE_MEMBER(int_enable_w);
+	DECLARE_WRITE_LINE_MEMBER(dsp_int_w);
+	DECLARE_WRITE_LINE_MEMBER(coin_counter_1_w);
+	DECLARE_WRITE_LINE_MEMBER(coin_counter_2_w);
+	DECLARE_WRITE_LINE_MEMBER(coin_lockout_1_w);
+	DECLARE_WRITE_LINE_MEMBER(coin_lockout_2_w);
 	DECLARE_READ16_MEMBER(twincobr_sharedram_r);
 	DECLARE_WRITE16_MEMBER(twincobr_sharedram_w);
-	DECLARE_WRITE16_MEMBER(fshark_coin_dsp_w);
-	DECLARE_WRITE8_MEMBER(twincobr_coin_w);
-	DECLARE_WRITE8_MEMBER(wardner_coin_dsp_w);
 	DECLARE_WRITE16_MEMBER(twincobr_txoffs_w);
 	DECLARE_READ16_MEMBER(twincobr_txram_r);
 	DECLARE_WRITE16_MEMBER(twincobr_txram_w);
@@ -112,12 +112,11 @@ public:
 	INTERRUPT_GEN_MEMBER(wardner_interrupt);
 	void twincobr_restore_dsp();
 	void twincobr_create_tilemaps();
-	void twincobr_display(int enable);
-	void twincobr_flipscreen(int flip);
+	DECLARE_WRITE_LINE_MEMBER(display_on_w);
+	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
+	DECLARE_WRITE_LINE_MEMBER(bg_ram_bank_w);
+	DECLARE_WRITE_LINE_MEMBER(fg_rom_bank_w);
 	void twincobr_log_vram();
-	void twincobr_dsp(int enable);
-	void toaplan0_control_w(int offset, int data);
-	void toaplan0_coin_dsp_w(address_space &space, int offset, int data);
 	void twincobr_driver_savestate();
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_dsp;

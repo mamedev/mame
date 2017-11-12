@@ -66,7 +66,7 @@ private:
 	required_device<floppy_connector> m_floppy1;
 };
 
-static ADDRESS_MAP_START(altos5_mem, AS_PROGRAM, 8, altos5_state)
+static ADDRESS_MAP_START(mem_map, AS_PROGRAM, 8, altos5_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x0fff ) AM_READ_BANK("bankr0") AM_WRITE_BANK("bankw0")
 	AM_RANGE( 0x1000, 0x1fff ) AM_READ_BANK("bankr1") AM_WRITE_BANK("bankw1")
@@ -86,7 +86,7 @@ static ADDRESS_MAP_START(altos5_mem, AS_PROGRAM, 8, altos5_state)
 	AM_RANGE( 0xf000, 0xffff ) AM_READ_BANK("bankrf") AM_WRITE_BANK("bankwf")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(altos5_io, AS_IO, 8, altos5_state)
+static ADDRESS_MAP_START(io_map, AS_IO, 8, altos5_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("dma", z80dma_device, read, write)
 	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("fdc", fd1797_device, read, write)
@@ -347,8 +347,8 @@ DRIVER_INIT_MEMBER( altos5_state, altos5 )
 static MACHINE_CONFIG_START( altos5 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_8MHz / 2)
-	MCFG_CPU_PROGRAM_MAP(altos5_mem)
-	MCFG_CPU_IO_MAP(altos5_io)
+	MCFG_CPU_PROGRAM_MAP(mem_map)
+	MCFG_CPU_IO_MAP(io_map)
 	MCFG_Z80_DAISY_CHAIN(daisy_chain_intf)
 
 	MCFG_DEVICE_ADD("ctc_clock", CLOCK, XTAL_8MHz / 4) // 2MHz

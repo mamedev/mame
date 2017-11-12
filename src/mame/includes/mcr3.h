@@ -5,6 +5,8 @@
     Midway MCR-3 system
 
 **************************************************************************/
+
+#include "machine/adc0844.h"
 #include "screen.h"
 
 class mcr3_state : public mcr_state
@@ -13,17 +15,18 @@ public:
 	mcr3_state(const machine_config &mconfig, device_type type, const char *tag)
 		: mcr_state(mconfig, type, tag),
 		m_spyhunt_alpharam(*this, "spyhunt_alpha"),
+		m_maxrpm_adc(*this, "adc"),
 		m_screen(*this, "screen")
 	{ }
 
 	optional_shared_ptr<uint8_t> m_spyhunt_alpharam;
+	optional_device<adc0844_device> m_maxrpm_adc;
 	required_device<screen_device> m_screen;
 
 	uint8_t m_input_mux;
 	uint8_t m_latched_input;
 	uint8_t m_last_op4;
 	uint8_t m_maxrpm_adc_control;
-	uint8_t m_maxrpm_adc_select;
 	uint8_t m_maxrpm_last_shift;
 	int8_t m_maxrpm_p1_shift;
 	int8_t m_maxrpm_p2_shift;

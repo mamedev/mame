@@ -2641,9 +2641,9 @@ void voodoo_device::raster_##name(void *destbase, int32_t y, const poly_extent *
 	int32_t stopx = extent->stopx;                                                \
 	rgbaint_t iterargb, iterargbDelta;                                           \
 	int32_t iterz;                                                                \
-	int64_t iterw, iterw0 = 0, iterw1 = 0;                                        \
-	int64_t iters0 = 0, iters1 = 0;                                               \
-	int64_t itert0 = 0, itert1 = 0;                                               \
+	int64_t iterw;                                                                \
+	tmu_state::stw_t iterstw0, iterstw1;                                                     \
+	tmu_state::stw_t deltastw0, deltastw1;                                                   \
 	uint16_t *depth;                                                              \
 	uint16_t *dest;                                                               \
 	int32_t dx, dy;                                                               \
@@ -2713,15 +2713,19 @@ void voodoo_device::raster_##name(void *destbase, int32_t y, const poly_extent *
 	iterw = extra->startw + dy * extra->dwdy + dx * extra->dwdx;                \
 	if (TMUS >= 1)                                                              \
 	{                                                                           \
-		iterw0 = extra->startw0 + dy * extra->dw0dy +   dx * extra->dw0dx;      \
-		iters0 = extra->starts0 + dy * extra->ds0dy + dx * extra->ds0dx;        \
-		itert0 = extra->startt0 + dy * extra->dt0dy + dx * extra->dt0dx;        \
+		iterstw0.set(                                                           \
+		extra->starts0 + dy * extra->ds0dy + dx * extra->ds0dx,        \
+		extra->startt0 + dy * extra->dt0dy + dx * extra->dt0dx,        \
+		extra->startw0 + dy * extra->dw0dy +   dx * extra->dw0dx);     \
+		deltastw0.set(extra->ds0dx, extra->dt0dx, extra->dw0dx);       \
 	}                                                                           \
 	if (TMUS >= 2)                                                              \
 	{                                                                           \
-		iterw1 = extra->startw1 + dy * extra->dw1dy +   dx * extra->dw1dx;      \
-		iters1 = extra->starts1 + dy * extra->ds1dy + dx * extra->ds1dx;        \
-		itert1 = extra->startt1 + dy * extra->dt1dy + dx * extra->dt1dx;        \
+		iterstw1.set(                                                           \
+		extra->starts1 + dy * extra->ds1dy + dx * extra->ds1dx,        \
+		extra->startt1 + dy * extra->dt1dy + dx * extra->dt1dx,        \
+		extra->startw1 + dy * extra->dw1dy + dx * extra->dw1dx);       \
+		deltastw1.set(extra->ds1dx, extra->dt1dx, extra->dw1dx);       \
 	}                                                                           \
 	extra->info->hits++;                                                        \
 	/* loop in X */                                                             \
@@ -2743,7 +2747,7 @@ void voodoo_device::raster_##name(void *destbase, int32_t y, const poly_extent *
 			int32_t tmp; \
 			const rgbaint_t texelZero(0);  \
 			texel = vd->tmu[1].genTexture(x, dither4, TEXMODE1, vd->tmu[1].lookup, extra->lodbase1, \
-														iters1, itert1, iterw1, tmp); \
+														iterstw1, tmp); \
 			texel = vd->tmu[1].combineTexture(TEXMODE1, texel, texelZero, tmp); \
 		} \
 		/* run the texture pipeline on TMU0 to produce a final */               \
@@ -2756,7 +2760,7 @@ void voodoo_device::raster_##name(void *destbase, int32_t y, const poly_extent *
 				int32_t lod0; \
 				rgbaint_t texelT0;                                                \
 				texelT0 = vd->tmu[0].genTexture(x, dither4, TEXMODE0, vd->tmu[0].lookup, extra->lodbase0, \
-																iters0, itert0, iterw0, lod0); \
+																iterstw0, lod0); \
 				texel = vd->tmu[0].combineTexture(TEXMODE0, texelT0, texel, lod0); \
 			}                                                                   \
 			else                                                                \
@@ -2792,15 +2796,11 @@ void voodoo_device::raster_##name(void *destbase, int32_t y, const poly_extent *
 		iterw += extra->dwdx;                                                   \
 		if (TMUS >= 1)                                                          \
 		{                                                                       \
-			iterw0 += extra->dw0dx;                                             \
-			iters0 += extra->ds0dx;                                             \
-			itert0 += extra->dt0dx;                                             \
+			iterstw0.add(deltastw0);                                            \
 		}                                                                       \
 		if (TMUS >= 2)                                                          \
 		{                                                                       \
-			iterw1 += extra->dw1dx;                                             \
-			iters1 += extra->ds1dx;                                             \
-			itert1 += extra->dt1dx;                                             \
+			iterstw1.add(deltastw1);                                            \
 		}                                                                       \
 	}                                                                           \
 }
@@ -2812,38 +2812,23 @@ void voodoo_device::raster_##name(void *destbase, int32_t y, const poly_extent *
 // The maximum error using a 4 bit lookup from the mantissa is 0.0875, which is less than 1/2 lsb (0.125) for 2 bits of fraction.
 // An offset of  +(56 << 8) is added for alignment in multi_reciplog
 // ******************************************************************************************************************************
-static inline int32_t ATTR_FORCE_INLINE new_log2(double &value)
+inline int32_t ATTR_FORCE_INLINE voodoo_device::tmu_state::new_log2(double &value, const int &offset)
 {
-	static const int32_t new_log2_table[16] = {0 + (56 << 8), 22 + (56 << 8), 44 + (56 << 8), 63 + (56 << 8), 82 + (56 << 8),
-		100 + (56 << 8), 118 + (56 << 8), 134 + (56 << 8), 150 + (56 << 8), 165 + (56 << 8), 179 + (56 << 8), 193 + (56 << 8),
-		207 + (56 << 8), 220 + (56 << 8), 232 + (56 << 8), 244 + (56 << 8)};
+	static const int32_t new_log2_table[16] = {0, 22, 44, 63, 82, 100, 118, 134, 150, 165, 179, 193, 207, 220, 232, 244};
 	uint64_t ival = *((uint64_t *)&value);
 	// Return 0 if negative
 	if (ival & ((uint64_t)1 << 63))
 		return 0;
 	// We zero the result if negative so don't worry about the sign bit
 	int32_t exp = (ival>>52);
-	exp -= 1023+32;
+	exp -= 1023+32-offset;
 	exp <<= 8;
 	uint32_t addr = (uint64_t)(ival>>48) & 0xf;
 	exp += new_log2_table[addr];
 	return exp;
 }
 
-// Computes A/C and B/C and returns log2 of 1/C
-// A, B and C are 16.32 values.  The results are 24.8.
-static inline void ATTR_FORCE_INLINE multi_reciplog(int64_t valueA, int64_t valueB, int64_t valueC, int32_t &log, int32_t &resA, int32_t &resB)
-{
-	double recip = double(1ULL<<(47-39))/valueC;
-	double resAD = valueA * recip;
-	double resBD = valueB * recip;
-	log = new_log2(recip);
-	resA = resAD;
-	resB = resBD;
-}
-
-
-inline rgbaint_t ATTR_FORCE_INLINE voodoo_device::tmu_state::genTexture(int32_t x, const uint8_t *dither4, const uint32_t TEXMODE, rgb_t *LOOKUP, int32_t LODBASE, int64_t ITERS, int64_t ITERT, int64_t ITERW, int32_t &lod)
+inline rgbaint_t ATTR_FORCE_INLINE voodoo_device::tmu_state::genTexture(int32_t x, const uint8_t *dither4, const uint32_t TEXMODE, rgb_t *LOOKUP, int32_t LODBASE, const stw_t &iterstw, int32_t &lod)
 {
 	rgbaint_t result;
 	int32_t s, t, ilod;
@@ -2853,23 +2838,16 @@ inline rgbaint_t ATTR_FORCE_INLINE voodoo_device::tmu_state::genTexture(int32_t 
 	if (TEXMODE_ENABLE_PERSPECTIVE(TEXMODE))
 	{
 		int32_t wLog;
-		if (USE_FAST_RECIP) {
-			const int32_t oow = fast_reciplog((ITERW), &wLog);
-			s = ((int64_t)oow * (ITERS)) >> (29+10);
-			t = ((int64_t)oow * (ITERT)) >> (29+10);
-		} else {
-			multi_reciplog(ITERS, ITERT, ITERW, wLog, s, t);
-		}
+		iterstw.calc_stow(s, t, wLog);
 		lod += wLog;
 	}
 	else
 	{
-		s = (ITERS) >> (14+10);
-		t = (ITERT) >> (14+10);
+		iterstw.get_st_shiftr(s, t, (14 + 10));
 	}
 
 	/* clamp W */
-	if (TEXMODE_CLAMP_NEG_W(TEXMODE) && (ITERW) < 0)
+	if (TEXMODE_CLAMP_NEG_W(TEXMODE) && iterstw.is_w_neg())
 	{
 		s = t = 0;
 	}

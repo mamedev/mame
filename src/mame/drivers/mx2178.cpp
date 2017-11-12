@@ -23,9 +23,10 @@ TODO:
 ***************************************************************************************************/
 
 #include "emu.h"
-#include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
+//#include "cpu/8x300/8x300.h" // device = N8X300
 #include "machine/6850acia.h"
+#include "bus/rs232/rs232.h"
 #include "machine/clock.h"
 #include "video/mc6845.h"
 #include "screen.h"
@@ -47,7 +48,7 @@ public:
 private:
 	virtual void machine_reset() override;
 	required_device<palette_device> m_palette;
-	required_shared_ptr<uint8_t> m_p_videoram;
+	required_shared_ptr<u8> m_p_videoram;
 	required_device<z80_device> m_maincpu;
 	required_region_ptr<u8> m_p_chargen;
 };

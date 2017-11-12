@@ -29,15 +29,29 @@ public:
 		m_palette(*this, "palette"),
 		m_screen(*this, "screen") { }
 
+	DECLARE_READ16_MEMBER(control_r);
+	DECLARE_WRITE16_MEMBER(control_w);
+	DECLARE_WRITE16_MEMBER(control2_w);
+	DECLARE_READ16_MEMBER(bishi_mirror_r);
+	DECLARE_READ16_MEMBER(bishi_K056832_rom_r);
+	uint32_t screen_update_bishi(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	TIMER_DEVICE_CALLBACK_MEMBER(bishi_scanline);
+	K056832_CB_MEMBER(tile_callback);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+private:
 	/* memory pointers */
 	uint8_t *    m_ram;
-
-	/* video-related */
-	int        m_layer_colorbase[4];
 
 	/* misc */
 	uint16_t     m_cur_control;
 	uint16_t     m_cur_control2;
+
+	/* video-related */
+	int        m_layer_colorbase[4];
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -47,15 +61,4 @@ public:
 	required_device<k055555_device> m_k055555;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
-	DECLARE_READ16_MEMBER(control_r);
-	DECLARE_WRITE16_MEMBER(control_w);
-	DECLARE_WRITE16_MEMBER(control2_w);
-	DECLARE_READ16_MEMBER(bishi_mirror_r);
-	DECLARE_READ16_MEMBER(bishi_K056832_rom_r);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	uint32_t screen_update_bishi(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(bishi_scanline);
-	K056832_CB_MEMBER(tile_callback);
 };

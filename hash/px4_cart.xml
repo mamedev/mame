@@ -58,4 +58,15 @@
 		</part>
 	</software>
 
+	<software name="dialtext">
+		<description>Dialtext 4</description>
+		<year>198?</year>
+		<publisher>EPSON</publisher>
+		<part name="cart" interface="px4_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="dialtext.bin" size="32768" crc="7eaa31ba" sha1="0bec906e3c5e92d9b1aba1a10d91db08d05e83f4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

@@ -2,16 +2,15 @@
 // copyright-holders:Angelo Salese
 /******************************************************************************
 
-    Flower (c) 1986 Clarue
+    Flower (c) 1986 Clarue (licensed to Komax/Sega)
 
     driver by Angelo Salese,
     original "wiped off due of not anymore licenseable" driver by insideoutboy.
 
     TODO:
-    - sprite zooming;
-    - some video glitches;
-    - $a000 outputs;
-    - sound, third z80 not hooked up;
+	- priority might be wrong in some places (title screen stars around the
+	  galaxy, planet ship 3rd boss, 2nd boss);
+	- sound chips (similar to Namco custom chips?)
 
 ===============================================================================
 
@@ -22,12 +21,6 @@ There is a PCB picture that shows two stickers, the first says
  "Flower (c) 1986 Clarue" while the second one is an original
  serial number tag also showing "Clarue". GFX ROM contents also
  show (C) 1986 CLARUE. A Wood Place Inc. spinoff perhaps?
-
-
-todo:
-
-fix sound and timing
-
 
         FLOWER   CHIP PLACEMENT
 
@@ -87,14 +80,22 @@ CHIP #  POSITION   TYPE
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
+#include "audio/flower.h"
 #include "screen.h"
+#include "speaker.h"
+
+#define MASTER_CLOCK XTAL_18_432MHz
 
 class flower_state : public driver_device
 {
 public:
 	flower_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
+		m_mastercpu(*this, "mastercpu"),
+		m_slavecpu(*this, "slavecpu"),
+		m_audiocpu(*this, "audiocpu"),
+		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_txvram(*this, "txvram"),
@@ -102,10 +103,35 @@ public:
 		m_fgvram(*this, "fgvram"),
 		m_workram(*this, "workram"),
 		m_bgscroll(*this, "bgscroll"),
-		m_fgscroll(*this, "fgscroll")
+		m_fgscroll(*this, "fgscroll"),
+		m_soundlatch(*this, "soundlatch")
 	{ }
 
-	required_device<cpu_device> m_maincpu;
+	DECLARE_WRITE8_MEMBER(flipscreen_w);
+	DECLARE_WRITE8_MEMBER(coin_counter_w);
+	DECLARE_WRITE8_MEMBER(sound_command_w);
+	DECLARE_WRITE8_MEMBER(audio_nmi_mask_w);
+	DECLARE_WRITE8_MEMBER(bgvram_w);
+	DECLARE_WRITE8_MEMBER(fgvram_w);
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+	INTERRUPT_GEN_MEMBER(master_vblank_irq);
+	INTERRUPT_GEN_MEMBER(slave_vblank_irq);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+protected:
+	// driver_device overrides
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	virtual void video_start() override;
+
+private:
+	required_device<cpu_device> m_mastercpu;
+	required_device<cpu_device> m_slavecpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_shared_ptr<uint8_t> m_txvram;
@@ -114,18 +140,49 @@ public:
 	required_shared_ptr<uint8_t> m_workram;
 	required_shared_ptr<uint8_t> m_bgscroll;
 	required_shared_ptr<uint8_t> m_fgscroll;
+	required_device<generic_latch_8_device> m_soundlatch;
+	bitmap_ind16 m_temp_bitmap;
 
+	void draw_legacy_text(bitmap_ind16 &bitmap,const rectangle &cliprect);
+	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void legacy_tx_draw(bitmap_ind16 &bitmap,const rectangle &cliprect);
-	void legacy_layers_draw(bitmap_ind16 &bitmap,const rectangle &cliprect);
-	void sprites_draw(bitmap_ind16 &bitmap,const rectangle &cliprect);
+	bool m_audio_nmi_enable;
+	bool m_flip_screen;
+	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_fg_tilemap;
 };
 
+TILE_GET_INFO_MEMBER(flower_state::get_bg_tile_info)
+{
+	int code = m_bgvram[tile_index];
+	int color = (m_bgvram[tile_index+0x100] & 0xf0) >> 4;
 
+	SET_TILE_INFO_MEMBER(1, code, color, 0);
+}
 
-void flower_state::legacy_tx_draw(bitmap_ind16 &bitmap,const rectangle &cliprect)
+TILE_GET_INFO_MEMBER(flower_state::get_fg_tile_info)
+{
+	int code = m_fgvram[tile_index];
+	int color = (m_fgvram[tile_index+0x100] & 0xf0) >> 4;
+
+	SET_TILE_INFO_MEMBER(1, code, color, 0);
+}
+
+void flower_state::video_start()
+{
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(flower_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(flower_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
+
+	m_screen->register_screen_bitmap(m_temp_bitmap);
+	m_fg_tilemap->set_transparent_pen(15);
+
+	save_item(NAME(m_flip_screen));
+
+	m_bg_tilemap->set_scrolldx(16, 0);
+	m_fg_tilemap->set_scrolldx(16, 0);
+}
+
+void flower_state::draw_legacy_text(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
 	gfx_element *gfx_0 = m_gfxdecode->gfx(0);
 	int count;
@@ -141,10 +198,10 @@ void flower_state::legacy_tx_draw(bitmap_ind16 &bitmap,const rectangle &cliprect
 		if(attr & 0x03) // debug
 			attr = machine().rand() & 0xfc;
 
-		gfx_0->transpen(bitmap,cliprect,tile,attr >> 2,0,0,x*8,y*8,3);
+		gfx_0->transpen(bitmap,cliprect,tile,attr >> 2,0,0,x*8+16,y*8,3);
 	}
 
-	for (count=0;count<4*32;count++)
+	for (count=0;count<0x40;count++)
 	{
 		int x = count / 32;
 		int y = count % 32;
@@ -155,45 +212,7 @@ void flower_state::legacy_tx_draw(bitmap_ind16 &bitmap,const rectangle &cliprect
 		if(attr & 0x03) // debug
 			attr = machine().rand() & 0xfc;
 
-		gfx_0->transpen(bitmap,cliprect,tile,attr >> 2,0,0,x*8+256,y*8,3);
-	}
-
-}
-
-void flower_state::legacy_layers_draw(bitmap_ind16 &bitmap,const rectangle &cliprect)
-{
-	gfx_element *gfx_1 = m_gfxdecode->gfx(1);
-	int bg_ybase = m_bgscroll[0];
-	int fg_ybase = m_fgscroll[0];
-	int count;
-
-	for (count=0;count<16*16;count++)
-	{
-		int x = count % 16;
-		int y = count / 16;
-		uint8_t tile, attr;
-
-		tile = m_bgvram[count];
-		attr = m_bgvram[count+0x100];
-		if(attr & 0xf) // debug
-			attr = machine().rand() & 0xf0;
-
-		gfx_1->opaque(bitmap,cliprect, tile,  attr >> 4, 0, 0, x*16, (y*16 - bg_ybase) & 0xff);
-	}
-
-
-	for (count=0;count<16*16;count++)
-	{
-		int x = count % 16;
-		int y = count / 16;
-		uint8_t tile, attr;
-
-		tile = m_fgvram[count];
-		attr = m_fgvram[count+0x100];
-		if(attr & 0xf)
-			attr = machine().rand() & 0xf0;
-
-		gfx_1->transpen(bitmap,cliprect, tile, attr >> 4, 0, 0, x*16, (y*16 - fg_ybase) & 0xff, 15);
+		gfx_0->transpen(bitmap,cliprect,tile,attr >> 2,0,0,x*8+256+16,y*8,3);
 	}
 }
 
@@ -206,39 +225,58 @@ void flower_state::legacy_layers_draw(bitmap_ind16 &bitmap,const rectangle &clip
  [5] XXXX XXXX X offset MSB
  [6] cccc ---- color base
  */
-void flower_state::sprites_draw(bitmap_ind16 &bitmap,const rectangle &cliprect)
+void flower_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
 	uint8_t *spr_ptr = &m_workram[0x1e08];
 	gfx_element *gfx_2 = m_gfxdecode->gfx(2);
 
-	for(int i=0;i<0x1fb;i+=8)
+	// traverse from top to bottom
+	for(int i=0x1f0;i>=0;i-=8)
 	{
 		uint8_t tile = (spr_ptr[i+1] & 0x3f);
 		uint8_t color = spr_ptr[i+6] >> 4;
-		int x = (spr_ptr[i+4] | (spr_ptr[i+5]<<8))-55;
+		int x = (spr_ptr[i+4] | (spr_ptr[i+5]<<8))-39;
 		int y = 241-spr_ptr[i+0];
 		uint8_t attr = spr_ptr[i+2];
 		uint8_t fy = spr_ptr[i+1] & 0x80;
 		uint8_t fx = spr_ptr[i+1] & 0x40;
 		uint8_t ysize = ((spr_ptr[i+3] & 0x80) >> 7) + 1;
 		uint8_t xsize = ((spr_ptr[i+3] & 0x08) >> 3) + 1;
+		uint8_t ydiv = ysize == 2 ? 1 : 2;
+		uint8_t xdiv = xsize == 2 ? 1 : 2;
+		uint32_t yshrink_zoom = ((spr_ptr[i+3] & 0x70) >> 4) + 1;
+		uint32_t xshrink_zoom = ((spr_ptr[i+3] & 0x07) >> 0) + 1;
+		yshrink_zoom <<= 13;
+		xshrink_zoom <<= 13;
+		int ypixels = (yshrink_zoom*16) >> 16;
+		int xpixels = (xshrink_zoom*16) >> 16;
+
+		tile |= (attr & 1) << 6;
+		tile |= (attr & 8) << 4;
+
+		if(flip_screen())
+		{
+			x += xsize*16;
+			x = 288-x;
+			y -= 2;
+		}
 
 		if(ysize == 2)
 			y-=16;
 
-		tile |= (attr & 1) << 6;
-		tile |= (attr & 8) << 4;
-		// TODO: zoom
 		for(int yi=0;yi<ysize;yi++)
 		{
+			int yoffs = (16-ypixels)/ydiv;
+
 			for(int xi=0;xi<xsize;xi++)
 			{
 				int tile_offs;
+				int xoffs = (16-xpixels)/xdiv;
 
 				tile_offs = fx ? (xsize-xi-1) * 8 : xi*8;
 				tile_offs+= fy ? (ysize-yi-1) : yi;
 
-				gfx_2->transpen(bitmap,cliprect, tile+tile_offs, color, fx, fy, x+xi*16, y+yi*16, 15);
+				gfx_2->zoom_transpen(bitmap,cliprect, tile+tile_offs, color, fx, fy, x+xi*xpixels+xoffs, y+yi*ypixels+yoffs, xshrink_zoom, yshrink_zoom, 15);
 			}
 		}
 	}
@@ -246,30 +284,88 @@ void flower_state::sprites_draw(bitmap_ind16 &bitmap,const rectangle &cliprect)
 
 uint32_t flower_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	legacy_layers_draw(bitmap,cliprect);
-	sprites_draw(bitmap,cliprect);
-	legacy_tx_draw(bitmap,cliprect);
+	m_bg_tilemap->set_scrolly(0, m_bgscroll[0]);
+	m_fg_tilemap->set_scrolly(0, m_fgscroll[0]);
+
+	m_temp_bitmap.fill(0,cliprect);
+	m_bg_tilemap->draw(screen, m_temp_bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(screen, m_temp_bitmap, cliprect, 0, 0);
+	draw_sprites(m_temp_bitmap,cliprect);
+	draw_legacy_text(m_temp_bitmap,cliprect);
+
+	copybitmap(bitmap,m_temp_bitmap,m_flip_screen,m_flip_screen,m_flip_screen == true ? -154 : 0, m_flip_screen == true ? -7 : 0, cliprect);
 	return 0;
+}
+
+WRITE8_MEMBER(flower_state::flipscreen_w)
+{
+	flip_screen_set(data & 1);
+	m_flip_screen = BIT(data,0);
+}
+
+WRITE8_MEMBER(flower_state::coin_counter_w)
+{
+	machine().bookkeeping().coin_counter_w(0,data & 1);
+}
+
+WRITE8_MEMBER(flower_state::sound_command_w)
+{
+	m_soundlatch->write(space, 0, data & 0xff);
+	if(m_audio_nmi_enable == true)
+		m_audiocpu->set_input_line(INPUT_LINE_NMI,PULSE_LINE);
+}
+
+WRITE8_MEMBER(flower_state::audio_nmi_mask_w)
+{
+	m_audio_nmi_enable = BIT(data,0);
+}
+
+WRITE8_MEMBER(flower_state::bgvram_w)
+{
+	m_bgvram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset & 0xff);
+}
+
+WRITE8_MEMBER(flower_state::fgvram_w)
+{
+	m_fgvram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset & 0xff);
 }
 
 static ADDRESS_MAP_START( shared_map, AS_PROGRAM, 8, flower_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_SHARE("workram")
 	AM_RANGE(0xa000, 0xa000) AM_WRITENOP
+	AM_RANGE(0xa001, 0xa001) AM_WRITE(flipscreen_w)
+	AM_RANGE(0xa002, 0xa002) AM_WRITENOP // master irq related (0 at start, 1 at end)
+	AM_RANGE(0xa003, 0xa003) AM_WRITENOP // slave irq related (0 at start, 1 at end)
+	AM_RANGE(0xa004, 0xa004) AM_WRITE(coin_counter_w)
+	AM_RANGE(0xa005, 0xa005) AM_WRITENOP
 	AM_RANGE(0xa100, 0xa100) AM_READ_PORT("P1")
 	AM_RANGE(0xa101, 0xa101) AM_READ_PORT("P2")
 	AM_RANGE(0xa102, 0xa102) AM_READ_PORT("DSW1")
 	AM_RANGE(0xa103, 0xa103) AM_READ_PORT("DSW2")
+	AM_RANGE(0xa400, 0xa400) AM_WRITE(sound_command_w)
 	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE("txvram")
-	AM_RANGE(0xf000, 0xf1ff) AM_RAM AM_SHARE("bgvram")
-	AM_RANGE(0xf200, 0xf200) AM_RAM AM_SHARE("bgscroll")
-	AM_RANGE(0xf800, 0xf9ff) AM_RAM AM_SHARE("fgvram")
-	AM_RANGE(0xfa00, 0xfa00) AM_RAM AM_SHARE("fgscroll")
+	AM_RANGE(0xf000, 0xf1ff) AM_RAM_WRITE(fgvram_w) AM_SHARE("fgvram")
+	AM_RANGE(0xf200, 0xf200) AM_RAM AM_SHARE("fgscroll")
+	AM_RANGE(0xf800, 0xf9ff) AM_RAM_WRITE(bgvram_w) AM_SHARE("bgvram")
+	AM_RANGE(0xfa00, 0xfa00) AM_RAM AM_SHARE("bgscroll")
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, flower_state )
+	AM_RANGE(0x0000, 0x3fff) AM_ROM
+	AM_RANGE(0x4000, 0x4000) AM_WRITENOP // audio irq related (0 at start, 1 at end)
+	AM_RANGE(0x4001, 0x4001) AM_WRITE(audio_nmi_mask_w)
+	AM_RANGE(0x6000, 0x6000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
+	AM_RANGE(0x8000, 0x803f) AM_DEVWRITE("flower", flower_sound_device, lower_write)
+	AM_RANGE(0xa000, 0xa03f) AM_DEVWRITE("flower", flower_sound_device, upper_write)
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 ADDRESS_MAP_END
 
 INPUT_CHANGED_MEMBER(flower_state::coin_inserted)
 {
-	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
+	m_mastercpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static INPUT_PORTS_START( flower )
@@ -367,31 +463,66 @@ static GFXDECODE_START( flower )
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout, 0,  16 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( flower )
-	MCFG_CPU_ADD("maincpu",Z80,4000000)
-	MCFG_CPU_PROGRAM_MAP(shared_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", flower_state,  irq0_line_hold)
+void flower_state::machine_start()
+{
+	save_item(NAME(m_audio_nmi_enable));
+}
 
-	MCFG_CPU_ADD("subcpu",Z80,4000000)
+void flower_state::machine_reset()
+{
+	m_audio_nmi_enable = false;
+}
+
+INTERRUPT_GEN_MEMBER(flower_state::master_vblank_irq)
+{
+	//if(m_master_irq_enable == true)
+		device.execute().set_input_line(0, HOLD_LINE);
+}
+
+INTERRUPT_GEN_MEMBER(flower_state::slave_vblank_irq)
+{
+	//if(m_slave_irq_enable == true)
+		device.execute().set_input_line(0, HOLD_LINE);
+}
+
+
+static MACHINE_CONFIG_START( flower )
+	MCFG_CPU_ADD("mastercpu",Z80,MASTER_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(shared_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", flower_state,  irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", flower_state, master_vblank_irq)
+
+	MCFG_CPU_ADD("slavecpu",Z80,MASTER_CLOCK/4)
+	MCFG_CPU_PROGRAM_MAP(shared_map)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", flower_state, slave_vblank_irq)
+
+	MCFG_CPU_ADD("audiocpu",Z80,MASTER_CLOCK/4)
+	MCFG_CPU_PROGRAM_MAP(audio_map)
+	MCFG_CPU_PERIODIC_INT_DRIVER(flower_state, irq0_line_hold, 90)
+
+	MCFG_QUANTUM_PERFECT_CPU("mastercpu")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_UPDATE_DRIVER(flower_state, screen_update)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_3_579545MHz*2, 442, 0, 272, 263, 16, 240)  /* generic NTSC video timing at 256x224 */
+	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/3,384,0,288,264,16,240) // derived from Galaxian HW, 60.606060
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", flower)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_SOUND_ADD("flower", FLOWER_CUSTOM, 96000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
 ROM_START( flower ) /* Komax version */
-	ROM_REGION( 0x10000, "maincpu", 0 ) /* main cpu */
+	ROM_REGION( 0x10000, "mastercpu", 0 ) /* main cpu */
 	ROM_LOAD( "1.5j",   0x0000, 0x8000, CRC(a4c3af78) SHA1(d149b0e0d82318273dd9cc5a143b175cdc818d0d) )
 
-	ROM_REGION( 0x10000, "subcpu", 0 ) /* sub cpu */
+	ROM_REGION( 0x10000, "slavecpu", 0 ) /* sub cpu */
 	ROM_LOAD( "2.5f",   0x0000, 0x8000, CRC(7c7ee2d8) SHA1(1e67bfe0f3585be5a6e6719ccf9db764bafbcb01) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* sound cpu */
@@ -412,10 +543,10 @@ ROM_START( flower ) /* Komax version */
 	ROM_LOAD( "12.16e", 0x4000, 0x2000, CRC(e3779f7f) SHA1(8e12d06b3cdc2fcb7b77cc35f8eca45544cc4873) )
 	ROM_LOAD( "11.14e", 0x6000, 0x2000, CRC(8801b34f) SHA1(256059fcd16b21e076db1c18fd9669128df1d658) )
 
-	ROM_REGION( 0x8000, "sound1", 0 )
+	ROM_REGION( 0x8000, "samples", 0 )
 	ROM_LOAD( "4.12a",  0x0000, 0x8000, CRC(851ed9fd) SHA1(5dc048b612e45da529502bf33d968737a7b0a646) )  /* 8-bit samples */
 
-	ROM_REGION( 0x4000, "sound2", 0 )
+	ROM_REGION( 0x4000, "soundvol", 0 )
 	ROM_LOAD( "5.16a",  0x0000, 0x4000, CRC(42fa2853) SHA1(cc1e8b8231d6f27f48b05d59390e93ea1c1c0e4c) )  /* volume tables? */
 
 	ROM_REGION( 0x300, "proms", 0 ) /* RGB proms */
@@ -431,10 +562,10 @@ ROM_START( flower ) /* Komax version */
 ROM_END
 
 ROM_START( flowerj ) /* Sega/Alpha version.  Sega game number 834-5998 */
-	ROM_REGION( 0x10000, "maincpu", 0 ) /* main cpu */
+	ROM_REGION( 0x10000, "mastercpu", 0 ) /* main cpu */
 	ROM_LOAD( "1",   0x0000, 0x8000, CRC(63a2ef04) SHA1(0770f5a18d58b780abcda7e000c2a5e46f96d319) ) // hacked? "AKINA.N" changed to "JUKYUNG"
 
-	ROM_REGION( 0x10000, "subcpu", 0 ) /* sub cpu */
+	ROM_REGION( 0x10000, "slavecpu", 0 ) /* sub cpu */
 	ROM_LOAD( "2.5f",   0x0000, 0x8000, CRC(7c7ee2d8) SHA1(1e67bfe0f3585be5a6e6719ccf9db764bafbcb01) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* sound cpu */
@@ -455,10 +586,10 @@ ROM_START( flowerj ) /* Sega/Alpha version.  Sega game number 834-5998 */
 	ROM_LOAD( "12.16e", 0x4000, 0x2000, CRC(e3779f7f) SHA1(8e12d06b3cdc2fcb7b77cc35f8eca45544cc4873) )
 	ROM_LOAD( "11.14e", 0x6000, 0x2000, CRC(8801b34f) SHA1(256059fcd16b21e076db1c18fd9669128df1d658) )
 
-	ROM_REGION( 0x8000, "sound1", 0 )
+	ROM_REGION( 0x8000, "samples", 0 )
 	ROM_LOAD( "4.12a",  0x0000, 0x8000, CRC(851ed9fd) SHA1(5dc048b612e45da529502bf33d968737a7b0a646) )  /* 8-bit samples */
 
-	ROM_REGION( 0x4000, "sound2", 0 )
+	ROM_REGION( 0x4000, "soundvol", 0 )
 	ROM_LOAD( "5.16a",  0x0000, 0x4000, CRC(42fa2853) SHA1(cc1e8b8231d6f27f48b05d59390e93ea1c1c0e4c) )  /* volume tables? */
 
 	ROM_REGION( 0x300, "proms", 0 ) /* RGB proms */
@@ -474,5 +605,5 @@ ROM_START( flowerj ) /* Sega/Alpha version.  Sega game number 834-5998 */
 ROM_END
 
 
-GAME( 1986, flower,  0,      flower, flower, flower_state, 0, ROT0, "Clarue (Komax license)",                   "Flower (US)",    MACHINE_NOT_WORKING|MACHINE_NO_SOUND|MACHINE_IMPERFECT_GRAPHICS|MACHINE_NO_COCKTAIL )
-GAME( 1986, flowerj, flower, flower, flower, flower_state, 0, ROT0, "Clarue (Sega / Alpha Denshi Co. license)", "Flower (Japan)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND|MACHINE_IMPERFECT_GRAPHICS|MACHINE_NO_COCKTAIL )
+GAME( 1986, flower,  0,      flower, flower, flower_state, 0, ROT0, "Clarue (Komax license)",                   "Flower (US)",    MACHINE_IMPERFECT_SOUND|MACHINE_IMPERFECT_GRAPHICS|MACHINE_NO_COCKTAIL )
+GAME( 1986, flowerj, flower, flower, flower, flower_state, 0, ROT0, "Clarue (Sega / Alpha Denshi Co. license)", "Flower (Japan)", MACHINE_IMPERFECT_SOUND|MACHINE_IMPERFECT_GRAPHICS|MACHINE_NO_COCKTAIL )

@@ -40,9 +40,6 @@ void midvunit_state::device_timer(emu_timer &timer, device_timer_id id, int para
 {
 	switch (id)
 	{
-	case TIMER_ADC_READY:
-		m_maincpu->set_input_line(3, ASSERT_LINE);
-		break;
 	case TIMER_SCANLINE:
 		scanline_timer_cb(ptr, param);
 		break;

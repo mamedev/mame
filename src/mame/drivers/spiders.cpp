@@ -276,10 +276,10 @@ INTERRUPT_GEN_MEMBER(spiders_state::update_pia_1)
  *
  *************************************/
 
-WRITE8_MEMBER(spiders_state::ic60_74123_output_changed)
+WRITE_LINE_MEMBER(spiders_state::ic60_74123_output_changed)
 {
 	pia6821_device *pia2 = machine().device<pia6821_device>("pia2");
-	pia2->ca1_w(data);
+	pia2->ca1_w(state);
 }
 
 /*************************************
@@ -367,11 +367,6 @@ MC6845_UPDATE_ROW( spiders_state::crtc_update_row )
 	}
 }
 
-
-WRITE_LINE_MEMBER(spiders_state::display_enable_changed)
-{
-	machine().device<ttl74123_device>("ic60")->a_w(generic_space(), 0, state);
-}
 
 
 /*************************************
@@ -564,7 +559,7 @@ static MACHINE_CONFIG_START( spiders )
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(spiders_state, crtc_update_row)
-	MCFG_MC6845_OUT_DE_CB(WRITELINE(spiders_state, display_enable_changed))
+	MCFG_MC6845_OUT_DE_CB(DEVWRITELINE("ic60", ttl74123_device, a_w))
 
 	/* 74LS123 */
 
@@ -599,7 +594,7 @@ static MACHINE_CONFIG_START( spiders )
 	MCFG_TTL74123_A_PIN_VALUE(1)                  /* A pin - driven by the CRTC */
 	MCFG_TTL74123_B_PIN_VALUE(1)                  /* B pin - pulled high */
 	MCFG_TTL74123_CLEAR_PIN_VALUE(1)                  /* Clear pin - pulled high */
-	MCFG_TTL74123_OUTPUT_CHANGED_CB(WRITE8(spiders_state, ic60_74123_output_changed))
+	MCFG_TTL74123_OUTPUT_CHANGED_CB(WRITELINE(spiders_state, ic60_74123_output_changed))
 
 	/* audio hardware */
 	MCFG_FRAGMENT_ADD(spiders_audio)

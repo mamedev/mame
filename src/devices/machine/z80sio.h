@@ -283,9 +283,9 @@ protected:
 		WR1_RX_INT_FIRST          = 0x08,
 		WR1_RX_INT_ALL_PARITY     = 0x10,
 		WR1_RX_INT_ALL            = 0x18,
-		WR1_WRDY_ON_RX_TX         = 0x20, // not supported
-		WR1_WRDY_FUNCTION         = 0x40, // not supported
-		WR1_WRDY_ENABLE           = 0x80  // not supported
+		WR1_WRDY_ON_RX_TX         = 0x20,
+		WR1_WRDY_FUNCTION         = 0x40, // WAIT not supported
+		WR1_WRDY_ENABLE           = 0x80
 	};
 
 	enum
@@ -364,6 +364,7 @@ protected:
 	void update_rts();
 	void set_dtr(int state);
 	void set_rts(int state);
+	void set_ready(bool ready);
 
 	int get_clock_mode();
 	stop_bits_t get_stop_bits();

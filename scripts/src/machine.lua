@@ -3287,3 +3287,15 @@ if (MACHINES["I82586"]~=null) then
 		MAME_DIR .. "src/devices/machine/i82586.h",
 	}
 end
+
+---------------------------------------------------
+--
+--@src/devices/machine/adc0844.h,MACHINES["ADC0844"] = true
+---------------------------------------------------
+
+if (MACHINES["ADC0844"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/adc0844.cpp",
+		MAME_DIR .. "src/devices/machine/adc0844.h",
+	}
+end

@@ -172,8 +172,9 @@ WRITE8_MEMBER(electron_state::electron_mem_w)
 
 READ8_MEMBER(electron_state::electron_fred_r)
 {
+	/* The Issue 4 ULA returns data from OS ROM, whereas Issue 6 ULA will return 0xfc */
 	logerror("FRED: read fc%02x\n", offset);
-	return 0xff;
+	return 0xfc;
 }
 
 WRITE8_MEMBER(electron_state::electron_fred_w)
@@ -182,8 +183,9 @@ WRITE8_MEMBER(electron_state::electron_fred_w)
 
 READ8_MEMBER(electron_state::electron_jim_r)
 {
+	/* The Issue 4 ULA returns data from OS ROM, whereas Issue 6 ULA will return 0xfd */
 	logerror("JIM: read fd%02x\n", offset);
-	return 0xff;
+	return 0xfd;
 }
 
 WRITE8_MEMBER(electron_state::electron_jim_w)
@@ -192,7 +194,9 @@ WRITE8_MEMBER(electron_state::electron_jim_w)
 
 READ8_MEMBER(electron_state::electron_sheila_r)
 {
-	uint8_t data = ((uint8_t *)memregion("user1")->base())[0x43E00 + offset];
+	/* The Issue 4 ULA returns data from OS ROM, whereas Issue 6 ULA will return 0xfe */
+	uint8_t data = 0xfe;
+
 	switch ( offset & 0x0f )
 	{
 	case 0x00:  /* Interrupt status */
@@ -311,6 +315,7 @@ WRITE8_MEMBER(electron_state::electron_sheila_w)
 		m_ula.cassette_motor_mode = ( data >> 6 ) & 0x01;
 		m_cassette->change_state(m_ula.cassette_motor_mode ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MOTOR_DISABLED );
 		m_ula.capslock_mode = ( data >> 7 ) & 0x01;
+		output().set_value("capslock_led", m_ula.capslock_mode);
 		break;
 	case 0x08: case 0x0A: case 0x0C: case 0x0E:
 		// video_update
@@ -379,72 +384,11 @@ void electron_state::machine_reset()
 
 void electron_state::machine_start()
 {
-	uint8_t *lo_rom, *up_rom;
-	std::string region_tag;
-	memory_region *cart_rom = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
-
-	if (cart_rom)
-		up_rom = cart_rom->base();
-	else
-		up_rom = memregion("user1")->base() + 12 * 0x4000;
-	if (cart_rom && cart_rom->bytes() > 0x4000)
-		lo_rom = cart_rom->base() + 0x4000;
-	else
-		lo_rom = memregion("user1")->base();
-
-	membank("bank2")->configure_entries(0, 1, lo_rom, 0x4000);
-	membank("bank2")->configure_entries(1, 1, up_rom, 0x4000);
-
-	for (int page = 2; page < 16; page++)
+	for (int page = 0; page < 16; page++)
 		membank("bank2")->configure_entries(page, 1, memregion("user1")->base() + page * 0x4000, 0x4000);
 
 	m_ula.interrupt_status = 0x82;
 	m_ula.interrupt_control = 0x00;
 	timer_set(attotime::zero, TIMER_SETUP_BEEP);
 	m_tape_timer = timer_alloc(TIMER_TAPE_HANDLER);
-}
-
-DEVICE_IMAGE_LOAD_MEMBER( electron_state, electron_cart )
-{
-	if (!image.loaded_through_softlist())
-	{
-		uint32_t filesize = image.length();
-
-		if (filesize != 16384)
-		{
-			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid size: Only size 16384 is supported");
-			return image_init_result::FAIL;
-		}
-
-		m_cart->rom_alloc(filesize, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
-		image.fread(m_cart->get_rom_base(), filesize);
-		return image_init_result::PASS;
-	}
-	else
-	{
-		int upsize = image.get_software_region_length("uprom");
-		int losize = image.get_software_region_length("lorom");
-
-		if (upsize != 16384 && upsize != 0)
-		{
-			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid size for uprom");
-			return image_init_result::FAIL;
-		}
-
-		if (losize != 16384 && losize != 0)
-		{
-			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid size for lorom");
-			return image_init_result::FAIL;
-		}
-
-		m_cart->rom_alloc(upsize + losize, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
-
-		if (upsize)
-			memcpy(m_cart->get_rom_base(), image.get_software_region("uprom"), upsize);
-
-		if (losize)
-			memcpy(m_cart->get_rom_base() + upsize, image.get_software_region("lorom"), losize);
-
-		return image_init_result::PASS;
-	}
 }
