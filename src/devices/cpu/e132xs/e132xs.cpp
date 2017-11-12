@@ -2422,79 +2422,6 @@ void hyperstone_device::hyperstone_testlz()
 	m_icount -= m_clock_cycles_2;
 }
 
-void hyperstone_device::hyperstone_ldxx2(regs_decode &decode)
-{
-	if (DST_IS_PC || DST_IS_SR)
-	{
-		DEBUG_PRINTF(("Denoted PC or SR in hyperstone_ldxx2. PC = %08X\n", PC));
-	}
-	else
-	{
-		switch( decode.sub_type )
-		{
-			case 0: // LDBS.N
-				SET_SREG((int32_t)(int8_t)READ_B(DREG));
-
-				if (!decode.same_src_dst)
-					SET_DREG(DREG + EXTRA_S);
-				break;
-
-			case 1: // LDBU.N
-				SET_SREG(READ_B(DREG));
-
-				if(!decode.same_src_dst)
-					SET_DREG(DREG + EXTRA_S);
-				break;
-
-			case 2:
-				if (EXTRA_S & 1) // LDHS.N
-					SET_SREG((int32_t)(int16_t)READ_HW(DREG));
-				else // LDHU.N
-					SET_SREG(READ_HW(DREG));
-
-				if(!decode.same_src_dst)
-					SET_DREG(DREG + (EXTRA_S & ~1));
-				break;
-
-			case 3:
-				switch (EXTRA_S & 3)
-				{
-					case 0: // LDW.N
-						SET_SREG(READ_W(DREG));
-						if(!decode.same_src_dst)
-							SET_DREG(DREG + (EXTRA_S & ~1));
-						break;
-					case 1: // LDD.N
-						SET_SREG(READ_W(DREG));
-						SET_SREGF(READ_W(DREG + 4));
-
-						if (!decode.same_src_dst && !decode.same_srcf_dst)
-							SET_DREG(DREG + (EXTRA_S & ~1));
-
-						m_icount -= m_clock_cycles_1; // extra cycle
-						break;
-					case 2: // Reserved
-						DEBUG_PRINTF(("Executed Reserved instruction in hyperstone_ldxx2. PC = %08X\n", PC));
-						break;
-					case 3: // LDW.S
-						if (DREG < SP)
-							SET_SREG(READ_W(DREG));
-						else
-							SET_SREG(m_local_regs[(DREG & 0xfc) >> 2]);
-
-						if (!decode.same_src_dst)
-							SET_DREG(DREG + (EXTRA_S & ~3));
-
-						m_icount -= m_clock_cycles_2; // extra cycles
-						break;
-				}
-				break;
-		}
-	}
-
-	m_icount -= m_clock_cycles_1;
-}
-
 void hyperstone_device::hyperstone_stxx2(regs_decode &decode)
 {
 	if( SRC_IS_SR )
@@ -2991,7 +2918,7 @@ void hyperstone_device::execute_run()
 			case 0x47: hyperstone_not_local_local(); break;
 			case 0x48: op48(); break;
 			case 0x49: op49(); break;
-			case 0x4a: op4a(); break;
+			case 0x4a: hyperstone_sub_local_global(); break;
 			case 0x4b: hyperstone_sub_local_local(); break;
 			case 0x4c: op4c(); break;
 			case 0x4d: op4d(); break;
@@ -3067,7 +2994,7 @@ void hyperstone_device::execute_run()
 			case 0x93: hyperstone_ldxx1_local_local(); break;
 			case 0x94: hyperstone_ldxx2_global_global(); break;
 			case 0x95: hyperstone_ldxx2_global_local(); break;
-			case 0x96: op96(); break;
+			case 0x96: hyperstone_ldxx2_local_global(); break;
 			case 0x97: hyperstone_ldxx2_local_local(); break;
 			case 0x98: hyperstone_stxx1_global_global(); break;
 			case 0x99: hyperstone_stxx1_global_local(); break;

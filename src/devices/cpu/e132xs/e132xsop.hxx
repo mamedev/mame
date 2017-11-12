@@ -1528,6 +1528,7 @@ void hyperstone_device::op43()
 	decode.same_src_dst = (SRC_CODE == DST_CODE);
 	decode.same_src_dstf = (SRC_CODE == ((DST_CODE + 1) & 0x3f));
 	decode.same_srcf_dst = (((SRC_CODE + 1) & 0x3f) == DST_CODE);
+
 	hyperstone_subc(decode);
 }
 
@@ -1625,20 +1626,32 @@ void hyperstone_device::op49()
 	hyperstone_sub(decode);
 }
 
-void hyperstone_device::op4a()
+void hyperstone_device::hyperstone_sub_local_global()
 {
-	regs_decode decode;
 	check_delay_PC();
-	decode.src = SRC_CODE;
-	decode.dst = DST_CODE;
 
-	decode.src_is_local = 0;
-	SREG = m_global_regs[decode.src];
+	const uint32_t src_code = SRC_CODE;
+	const uint32_t sreg = (src_code == SR_REGISTER) ? (SR & C_MASK) : m_global_regs[src_code];
+	const uint32_t dst_code = (DST_CODE + GET_FP) & 0x3f;
+	uint32_t dreg = m_local_regs[dst_code];
 
-	decode.dst_is_local = 1;
-	DREG = m_local_regs[(decode.dst + GET_FP) & 0x3f]; /* registers offset by frame pointer */
+	const uint64_t tmp = (uint64_t)dreg - (uint64_t)sreg;
 
-	hyperstone_sub(decode);
+	SR &= ~(C_MASK | V_MASK | Z_MASK | N_MASK);
+
+	SR |= (tmp & 0x100000000L) >> 32;
+
+	if ((tmp ^ dreg) & (dreg ^ sreg) & 0x80000000)
+		SR |= V_MASK;
+
+	dreg -= sreg;
+	m_local_regs[dst_code] = dreg;
+
+	if (dreg == 0)
+		SR |= Z_MASK;
+	SR |= SIGN_TO_N(dreg);
+
+	m_icount -= m_clock_cycles_1;
 }
 
 void hyperstone_device::hyperstone_sub_local_local()
@@ -3700,26 +3713,90 @@ void hyperstone_device::hyperstone_ldxx2_global_local()
 	m_icount -= m_clock_cycles_1;
 }
 
-void hyperstone_device::op96()
+void hyperstone_device::hyperstone_ldxx2_local_global()
 {
-	regs_decode decode;
-	decode_dis(decode);
+	uint16_t next_1 = READ_OP(PC);
+	PC += 2;
+
+	const uint16_t sub_type = next_1 & 0x3000;
+
+	uint32_t extra_s;
+	if (next_1 & 0x8000)
+	{
+		const uint16_t next_2 = READ_OP(PC);
+		PC += 2;
+		m_instruction_length = (3<<19);
+
+		extra_s = next_2;
+		extra_s |= ((next_1 & 0xfff) << 16);
+
+		if (next_1 & 0x4000)
+			extra_s |= 0xf0000000;
+	}
+	else
+	{
+		m_instruction_length = (2<<19);
+		extra_s = next_1 & 0xfff;
+
+		if (next_1 & 0x4000)
+			extra_s |= 0xfffff000;
+	}
+
 	check_delay_PC();
-	decode.src = SRC_CODE;
-	decode.dst = DST_CODE;
-	decode.src_is_local = 0;
 
-	SREG = m_global_regs[decode.src];
-	SREGF = m_global_regs[decode.src + 1];
+	const uint32_t src_code = SRC_CODE;
+	const uint32_t dst_code = (DST_CODE + GET_FP) & 0x3f;
+	const uint32_t dreg = m_local_regs[dst_code];
 
-	decode.dst_is_local = 1;
-	DREG = m_local_regs[(decode.dst + GET_FP) & 0x3f]; /* registers offset by frame pointer */
-	DREGF = m_local_regs[(decode.dst + 1 + GET_FP) & 0x3f];
+	switch (sub_type)
+	{
+		case 0x0000: // LDBS.N
+			set_global_register(src_code, (int32_t)(int8_t)READ_B(dreg));
+			m_local_regs[dst_code] += extra_s;
+			break;
 
-	decode.same_src_dst = 0;
-	decode.same_src_dstf = 0;
-	decode.same_srcf_dst = 0;
-	hyperstone_ldxx2(decode);
+		case 0x1000: // LDBU.N
+			set_global_register(src_code, READ_B(dreg));
+			m_local_regs[dst_code] += extra_s;
+			break;
+
+		case 0x2000:
+			if (extra_s & 1) // LDHS.N
+				set_global_register(src_code, (int32_t)(int16_t)READ_HW(dreg));
+			else // LDHU.N
+				set_global_register(src_code, READ_HW(dreg));
+			m_local_regs[dst_code] += extra_s & ~1;
+			break;
+
+		case 0x3000:
+			switch (extra_s & 3)
+			{
+				case 0: // LDW.N
+					set_global_register(src_code, READ_W(dreg));
+					m_local_regs[dst_code] += extra_s & ~1;
+					break;
+				case 1: // LDD.N
+					set_global_register(src_code, READ_W(dreg));
+					set_global_register(src_code + 1, READ_W(dreg + 4));
+					m_local_regs[dst_code] += extra_s & ~1;
+					m_icount -= m_clock_cycles_1; // extra cycle
+					break;
+				case 2: // Reserved
+					DEBUG_PRINTF(("Executed Reserved instruction in hyperstone_ldxx2. PC = %08X\n", PC));
+					break;
+				case 3: // LDW.S
+					if (dreg < SP)
+						set_global_register(src_code, READ_W(dreg));
+					else
+						set_global_register(src_code, m_local_regs[(dreg & 0xfc) >> 2]);
+					m_local_regs[dst_code] += extra_s & ~3;
+					m_icount -= m_clock_cycles_2; // extra cycles
+					break;
+			}
+			break;
+	}
+
+	m_icount -= m_clock_cycles_1;
 }
 
 void hyperstone_device::hyperstone_ldxx2_local_local()

@@ -262,6 +262,7 @@ private:
 	void hyperstone_cmpb_local_local();
 	void hyperstone_subc(regs_decode &decode);
 	void hyperstone_sub(regs_decode &decode);
+	void hyperstone_sub_local_global();
 	void hyperstone_sub_local_local();
 	void hyperstone_subs(regs_decode &decode);
 	void hyperstone_addc(regs_decode &decode);
@@ -338,9 +339,9 @@ private:
 	void hyperstone_ldxx1_global_local();
 	void hyperstone_ldxx1_local_global();
 	void hyperstone_ldxx1_local_local();
-	void hyperstone_ldxx2(regs_decode &decode);
 	void hyperstone_ldxx2_global_global();
 	void hyperstone_ldxx2_global_local();
+	void hyperstone_ldxx2_local_global();
 	void hyperstone_ldxx2_local_local();
 	void hyperstone_stxx1_global_global();
 	void hyperstone_stxx1_global_local();
@@ -444,7 +445,7 @@ private:
 
 
 	void op40();    void op41();    void op42();    void op43();
-	void op48();    void op49();    void op4a();    				void op4c();    void op4d();    void op4e();    void op4f();
+	void op48();    void op49();    								void op4c();    void op4d();    void op4e();    void op4f();
 	void op50();    void op51();
 	void op58();    void op59();    void op5a();    				void op5c();    void op5d();    void op5e();    void op5f();
 
@@ -453,7 +454,7 @@ private:
 																	void op7c();	void op7d();	void op7e();	void op7f();
 																													void op87();
 
-																									void op96();
+
 																					void op9d();
 	void opa0();	void opa1();									void opa4();    void opa5();
 
