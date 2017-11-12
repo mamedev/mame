@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:
+// copyright-holders:AJR
 /***********************************************************************************************************************************
 
 2017-11-02 Skeleton
@@ -16,6 +16,8 @@ Other: LED, 20MHz crystal. Next to the MC68901P is another chip just as large (4
 #include "emu.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/m68000/m68000.h"
+#include "machine/74259.h"
+#include "machine/eepromser.h"
 #include "machine/mc68901.h"
 
 class tti_state : public driver_device
@@ -46,6 +48,7 @@ static ADDRESS_MAP_START( prg_map, AS_PROGRAM, 8, tti_state )
 	AM_RANGE(0x00000, 0x07fff) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0x78000, 0x7ffff) AM_RAM
 	AM_RANGE(0x80000, 0x80017) AM_DEVREADWRITE("mfp", mc68901_device, read, write)
+	AM_RANGE(0x80070, 0x80077) AM_DEVWRITE("bitlatch", ls259_device, write_d0)
 ADDRESS_MAP_END
 
 static MACHINE_CONFIG_START( tti )
@@ -62,6 +65,14 @@ static MACHINE_CONFIG_START( tti )
 
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("mfp", mc68901_device, write_rx))
+
+	MCFG_EEPROM_SERIAL_X24C44_ADD("eeprom") // actual type unknown
+	MCFG_EEPROM_SERIAL_DO_CALLBACK(DEVWRITELINE("mfp", mc68901_device, i0_w))
+
+	MCFG_DEVICE_ADD("bitlatch", LS259, 0) // actual type unknown
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(DEVWRITELINE("eeprom", eeprom_serial_x24c44_device, di_write))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(DEVWRITELINE("eeprom", eeprom_serial_x24c44_device, clk_write))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(DEVWRITELINE("eeprom", eeprom_serial_x24c44_device, cs_write))
 MACHINE_CONFIG_END
 
 ROM_START( tti )
