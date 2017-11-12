@@ -90,13 +90,19 @@ Notes:
 
 	TODO
 
-	- real time clock
 	- connect expansion bus
 
 */
 
 #include "emu.h"
 #include "includes/tmc600.h"
+
+READ8_MEMBER( tmc600_state::rtc_r )
+{
+	m_rtc_int = m_vismac_reg_latch >> 3;
+
+	return 0;
+}
 
 WRITE8_MEMBER( tmc600_state::printer_w )
 {
@@ -125,7 +131,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( tmc600_io_map, AS_IO, 8, tmc600_state )
 	AM_RANGE(0x03, 0x03) AM_DEVWRITE(CDP1852_KB_TAG, cdp1852_device, write)
 	AM_RANGE(0x04, 0x04) AM_DEVWRITE(CDP1852_TMC700_TAG, cdp1852_device, write)
-	AM_RANGE(0x05, 0x05) AM_WRITE(vismac_data_w)
+	AM_RANGE(0x05, 0x05) AM_READWRITE(rtc_r, vismac_data_w)
 //  AM_RANGE(0x06, 0x06) AM_WRITE(floppy_w)
 	AM_RANGE(0x07, 0x07) AM_WRITE(vismac_register_w)
 ADDRESS_MAP_END
@@ -236,6 +242,13 @@ WRITE_LINE_MEMBER( tmc600_state::q_w )
 	m_cassette->output(state ? +1.0 : -1.0);
 }
 
+WRITE8_MEMBER( tmc600_state::sc_w )
+{
+	if (data == COSMAC_STATE_CODE_S3_INTERRUPT) {
+		m_maincpu->int_w(CLEAR_LINE);
+	}
+}
+
 /* Machine Drivers */
 
 static MACHINE_CONFIG_START( tmc600 )
@@ -247,6 +260,7 @@ static MACHINE_CONFIG_START( tmc600 )
 	MCFG_COSMAC_EF2_CALLBACK(READLINE(tmc600_state, ef2_r))
 	MCFG_COSMAC_EF3_CALLBACK(READLINE(tmc600_state, ef3_r))
 	MCFG_COSMAC_Q_CALLBACK(WRITELINE(tmc600_state, q_w))
+	MCFG_COSMAC_SC_CALLBACK(WRITE8(tmc600_state, sc_w))	
 
 	// sound and video hardware
 	MCFG_FRAGMENT_ADD(tmc600_video)

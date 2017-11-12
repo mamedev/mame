@@ -72,10 +72,15 @@ WRITE_LINE_MEMBER( tmc600_state::prd_w )
 	if (state) {
 		m_frame++;
 		
-		if (m_frame == 32) {
-			m_frame = 0;
-
-			m_blink = !m_blink;
+		switch (m_frame)
+		{
+			case 31:
+				m_frame = 0;
+				m_blink = !m_blink;
+				// fallthru
+			case 15:
+				m_maincpu->int_w(m_rtc_int);
+				break;
 		}
 	}
 }

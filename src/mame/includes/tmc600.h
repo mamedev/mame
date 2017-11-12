@@ -61,6 +61,7 @@ public:
 
 	virtual void video_start() override;
 
+	DECLARE_READ8_MEMBER( rtc_r );
 	DECLARE_WRITE8_MEMBER( printer_w );
 	DECLARE_WRITE8_MEMBER( vismac_register_w );
 	DECLARE_WRITE8_MEMBER( vismac_data_w );
@@ -69,6 +70,7 @@ public:
 	DECLARE_READ_LINE_MEMBER( ef2_r );
 	DECLARE_READ_LINE_MEMBER( ef3_r );
 	DECLARE_WRITE_LINE_MEMBER( q_w );
+	DECLARE_WRITE8_MEMBER( sc_w );
 	DECLARE_WRITE_LINE_MEMBER( prd_w );
 
 	uint8_t get_color(uint16_t pma);
@@ -78,6 +80,7 @@ public:
 	int m_vismac_color_latch;   // color latch
 	bool m_blink;                // cursor blink
 	int m_frame;
+	bool m_rtc_int;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(blink_tick);
 	CDP1869_CHAR_RAM_READ_MEMBER(tmc600_char_ram_r);
