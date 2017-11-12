@@ -492,6 +492,7 @@ void hyperstone_device::update_timer_prescale()
 	m_clck_scale = (TPR >> 26) & m_clock_scale_mask;
 	m_clock_cycles_1 = 1 << m_clck_scale;
 	m_clock_cycles_2 = 2 << m_clck_scale;
+	m_clock_cycles_3 = 3 << m_clck_scale;
 	m_clock_cycles_4 = 4 << m_clck_scale;
 	m_clock_cycles_6 = 6 << m_clck_scale;
 	m_tr_clocks_per_tick = ((TPR >> 16) & 0xff) + 2;
@@ -1608,7 +1609,7 @@ void hyperstone_device::device_reset()
 
 void hyperstone_device::device_stop()
 {
-#if 1
+#if 0
 	int indices[256];
 	for (int i = 0; i < 256; i++)
 	{
@@ -1784,27 +1785,6 @@ void hyperstone_device::hyperstone_subc(regs_decode &decode)
 	m_icount -= m_clock_cycles_1;
 }
 
-void hyperstone_device::hyperstone_sub(regs_decode &decode)
-{
-	if (SRC_IS_SR)
-		SREG = GET_C;
-
-	uint64_t tmp = (uint64_t)(DREG) - (uint64_t)(SREG);
-	CHECK_C(tmp);
-	CHECK_VSUB(SREG,DREG,tmp);
-
-	DREG = DREG - SREG;
-	SET_DREG(DREG);
-
-	if (DST_IS_PC)
-		SR &= ~M_MASK;
-
-	SET_Z(DREG == 0 ? 1 : 0);
-	SET_N(SIGN_BIT(DREG));
-
-	m_icount -= m_clock_cycles_1;
-}
-
 void hyperstone_device::hyperstone_subs(regs_decode &decode)
 {
 	if (SRC_IS_SR)
@@ -1834,63 +1814,6 @@ void hyperstone_device::hyperstone_subs(regs_decode &decode)
 	}
 }
 
-void hyperstone_device::hyperstone_addc(regs_decode &decode)
-{
-	uint64_t tmp;
-	if (SRC_IS_SR)
-	{
-		tmp = (uint64_t)(DREG) + (uint64_t)(GET_C);
-		CHECK_VADD(DREG,GET_C,tmp);
-	}
-	else
-	{
-		tmp = (uint64_t)(SREG) + (uint64_t)(DREG) + (uint64_t)(GET_C);
-
-		//CHECK!
-		//CHECK_VADD1: V = (DREG == 0x7FFF) && (C == 1);
-		//OVERFLOW = CHECK_VADD1(DREG, C, DREG+C) | CHECK_VADD(SREG, DREG+C, SREG+DREG+C)
-		/* check if DREG + GET_C overflows */
-//      if( (DREG == 0x7FFFFFFF) && (GET_C == 1) )
-//          SET_V(1);
-//      else
-//          CHECK_VADD(SREG,DREG + GET_C,tmp);
-
-		CHECK_VADD3(SREG,DREG,GET_C,tmp);
-	}
-
-	if (SRC_IS_SR)
-		DREG = DREG + GET_C;
-	else
-		DREG = SREG + DREG + GET_C;
-
-	CHECK_C(tmp);
-
-	SET_DREG(DREG);
-	SET_Z(GET_Z & (DREG == 0 ? 1 : 0));
-	SET_N(SIGN_BIT(DREG));
-
-	m_icount -= m_clock_cycles_1;
-}
-
-void hyperstone_device::hyperstone_neg(regs_decode &decode)
-{
-	if (SRC_IS_SR)
-		SREG = GET_C;
-
-	uint64_t tmp = -(uint64_t)(SREG);
-	CHECK_C(tmp);
-	CHECK_VSUB(SREG,0,tmp);
-
-	DREG = -SREG;
-
-	SET_DREG(DREG);
-
-	SET_Z(DREG == 0 ? 1 : 0);
-	SET_N(SIGN_BIT(DREG));
-
-	m_icount -= m_clock_cycles_1;
-}
-
 void hyperstone_device::hyperstone_negs(regs_decode &decode)
 {
 	if (SRC_IS_SR)
@@ -1914,37 +1837,6 @@ void hyperstone_device::hyperstone_negs(regs_decode &decode)
 	m_icount -= m_clock_cycles_1;
 
 	if (GET_V && !SRC_IS_SR) //trap doesn't occur when source is SR
-	{
-		uint32_t addr = get_trap_addr(TRAPNO_RANGE_ERROR);
-		execute_exception(addr);
-	}
-}
-
-void hyperstone_device::hyperstone_addsi(regs_decode &decode)
-{
-	int32_t imm;
-	if (N_VALUE)
-		imm = EXTRA_S;
-	else
-		imm = GET_C & ((GET_Z == 0 ? 1 : 0) | (DREG & 0x01));
-
-	int64_t tmp = (int64_t)(imm) + (int64_t)((int32_t)(DREG));
-	CHECK_VADD(imm,DREG,tmp);
-
-//#if SETCARRYS
-//  CHECK_C(tmp);
-//#endif
-
-	int32_t res = imm + (int32_t)(DREG);
-
-	SET_DREG(res);
-
-	SET_Z(res == 0 ? 1 : 0);
-	SET_N(SIGN_BIT(res));
-
-	m_icount -= m_clock_cycles_1;
-
-	if (SR & V_MASK)
 	{
 		uint32_t addr = get_trap_addr(TRAPNO_RANGE_ERROR);
 		execute_exception(addr);
@@ -2051,241 +1943,6 @@ void hyperstone_device::hyperstone_shl()
 	SET_N(SIGN_BIT(ret));
 
 	m_icount -= m_clock_cycles_1;
-}
-
-void hyperstone_device::hyperstone_testlz()
-{
-	check_delay_PC();
-
-	uint32_t sreg = m_local_regs[(SRC_CODE + GET_FP) % 64];
-	uint32_t zeros = 0;
-	for (uint32_t mask = 0x80000000; mask != 0; mask >>= 1 )
-	{
-		if (sreg & mask)
-			break;
-		else
-			zeros++;
-	}
-
-	m_local_regs[(DST_CODE + GET_FP) % 64] = zeros;
-
-	m_icount -= m_clock_cycles_2;
-}
-
-void hyperstone_device::hyperstone_stxx2(regs_decode &decode)
-{
-	if( SRC_IS_SR )
-		SREG = SREGF = 0;
-
-	if( DST_IS_PC || DST_IS_SR )
-	{
-		DEBUG_PRINTF(("Denoted PC or SR in hyperstone_stxx2. PC = %08X\n", PC));
-	}
-	else
-	{
-		switch( decode.sub_type )
-		{
-			case 0: // STBS.N
-
-				/* TODO: missing trap on range error */
-				WRITE_B(DREG, SREG & 0xff);
-				SET_DREG(DREG + EXTRA_S);
-
-				break;
-
-			case 1: // STBU.N
-
-				WRITE_B(DREG, SREG & 0xff);
-				SET_DREG(DREG + EXTRA_S);
-
-				break;
-
-			case 2:
-
-				WRITE_HW(DREG, SREG & 0xffff);
-				SET_DREG(DREG + (EXTRA_S & ~1));
-
-				/*
-				if( EXTRA_S & 1 ) // STHS.N
-				{
-				    // TODO: missing trap on range error
-				}
-				else          // STHU.N
-				{
-				    // nothing more
-				}
-				*/
-
-				break;
-
-			case 3:
-
-				if( (EXTRA_S & 3) == 3 )      // STW.S
-				{
-					if(DREG < SP)
-						WRITE_W(DREG, SREG);
-					else
-					{
-						if(((DREG & 0xfc) >> 2) == ((decode.src + GET_FP) % 64) && (OP & 0x100))
-							DEBUG_PRINTF(("STW.S denoted the same local register @ %08X\n",PPC));
-
-						m_local_regs[(DREG & 0xfc) >> 2] = SREG;
-					}
-
-					SET_DREG(DREG + (EXTRA_S & ~3));
-
-					m_icount -= m_clock_cycles_2; // extra cycles
-
-				}
-				else if( (EXTRA_S & 3) == 2 ) // Reserved
-				{
-					DEBUG_PRINTF(("Executed Reserved instruction in hyperstone_stxx2. PC = %08X\n", PC));
-				}
-				else if( (EXTRA_S & 3) == 1 ) // STD.N
-				{
-					WRITE_W(DREG, SREG);
-					SET_DREG(DREG + (EXTRA_S & ~1));
-
-					if( decode.same_srcf_dst )
-						WRITE_W(DREG + 4, SREGF + (EXTRA_S & ~1));  // because DREG == SREGF and DREG has been incremented
-					else
-						WRITE_W(DREG + 4, SREGF);
-
-					m_icount -= m_clock_cycles_1; // extra cycle
-				}
-				else                      // STW.N
-				{
-					WRITE_W(DREG, SREG);
-					SET_DREG(DREG + (EXTRA_S & ~1));
-				}
-
-				break;
-		}
-	}
-
-	m_icount -= m_clock_cycles_1;
-}
-
-void hyperstone_device::hyperstone_sari(regs_decode &decode)
-{
-	uint32_t val = DREG;
-	uint32_t sign_bit = val & 0x80000000;
-
-	const uint32_t n = N_VALUE;
-
-	SR &= ~(C_MASK | Z_MASK | N_MASK);
-	if (n)
-		SET_C((val >> (n - 1)) & 1);
-
-	val >>= n;
-
-	if (sign_bit)
-		for (int i = 0; i < n; i++)
-			val |= (0x80000000 >> i);
-
-	SET_DREG(val);
-	if (val == 0)
-		SR |= Z_MASK;
-	if (SIGN_BIT(val))
-		SR |= N_MASK;
-
-	m_icount -= m_clock_cycles_1;
-}
-
-void hyperstone_device::hyperstone_mulu(regs_decode &decode)
-{
-	uint32_t low_order, high_order;
-	uint64_t double_word;
-
-	// PC or SR aren't denoted, else result is undefined
-	if( SRC_IS_PC || SRC_IS_SR || DST_IS_PC || DST_IS_SR  )
-	{
-		DEBUG_PRINTF(("Denoted PC or SR in hyperstone_mulu instruction. PC = %08X\n", PC));
-	}
-	else
-	{
-		double_word = (uint64_t)SREG *(uint64_t)DREG;
-
-		low_order = double_word & 0xffffffff;
-		high_order = double_word >> 32;
-
-		SET_DREG(high_order);
-		SET_DREGF(low_order);
-
-		SET_Z( double_word == 0 ? 1 : 0 );
-		SET_N( SIGN_BIT(high_order) );
-	}
-
-	if(SREG <= 0xffff && DREG <= 0xffff)
-		m_icount -= m_clock_cycles_4;
-	else
-		m_icount -= m_clock_cycles_6;
-}
-
-void hyperstone_device::hyperstone_muls(regs_decode &decode)
-{
-	uint32_t low_order, high_order;
-	int64_t double_word;
-
-	// PC or SR aren't denoted, else result is undefined
-	if( SRC_IS_PC || SRC_IS_SR || DST_IS_PC || DST_IS_SR  )
-	{
-		DEBUG_PRINTF(("Denoted PC or SR in hyperstone_muls instruction. PC = %08X\n", PC));
-	}
-	else
-	{
-		double_word = (int64_t)(int32_t)(SREG) * (int64_t)(int32_t)(DREG);
-		low_order = double_word & 0xffffffff;
-		high_order = double_word >> 32;
-
-		SET_DREG(high_order);
-		SET_DREGF(low_order);
-
-		SET_Z( double_word == 0 ? 1 : 0 );
-		SET_N( SIGN_BIT(high_order) );
-	}
-
-	if((SREG >= 0xffff8000 && SREG <= 0x7fff) && (DREG >= 0xffff8000 && DREG <= 0x7fff))
-		m_icount -= m_clock_cycles_4;
-	else
-		m_icount -= m_clock_cycles_6;
-}
-
-void hyperstone_device::hyperstone_mul(regs_decode &decode)
-{
-	// PC or SR aren't denoted, else result is undefined
-	if( SRC_IS_PC || SRC_IS_SR || DST_IS_PC || DST_IS_SR  )
-	{
-		DEBUG_PRINTF(("Denoted PC or SR in hyperstone_mul instruction. PC = %08X\n", PC));
-	}
-	else
-	{
-		const uint32_t single_word = (SREG * DREG);// & 0xffffffff; // only the low-order word is taken
-
-		SET_DREG(single_word);
-
-		SR &= ~(Z_MASK | N_MASK);
-		if (single_word == 0)
-			SR |= Z_MASK;
-		if (SIGN_BIT(single_word))
-			SR |= N_MASK;
-	}
-
-	if ((SREG >= 0xffff8000 && SREG <= 0x7fff) && (DREG >= 0xffff8000 && DREG <= 0x7fff))
-		m_icount -= 3 << m_clck_scale;
-	else
-		m_icount -= 5 << m_clck_scale;
-}
-
-void hyperstone_device::hyperstone_stdr(regs_decode &decode)
-{
-	if( SRC_IS_SR )
-		SREG = SREGF = 0;
-
-	WRITE_W(DREG, SREG);
-	WRITE_W(DREG + 4, SREGF);
-
-	m_icount -= m_clock_cycles_2;
 }
 
 void hyperstone_device::hyperstone_trap()
@@ -2435,7 +2092,7 @@ void hyperstone_device::execute_run()
 		m_instruction_length = (1<<19);
 
 #if 1
-		m_opcode_hits[(OP >> 8) & 0x00ff]++;
+		//m_opcode_hits[(OP >> 8) & 0x00ff]++;
 		/* execute opcode */
 		switch ((OP >> 8) & 0x00ff)
 		{
@@ -2511,25 +2168,25 @@ void hyperstone_device::execute_run()
 			case 0x45: hyperstone_not_global_local(); break;
 			case 0x46: hyperstone_not_local_global(); break;
 			case 0x47: hyperstone_not_local_local(); break;
-			case 0x48: op48(); break;
-			case 0x49: op49(); break;
+			case 0x48: hyperstone_sub_global_global(); break;
+			case 0x49: hyperstone_sub_global_local(); break;
 			case 0x4a: hyperstone_sub_local_global(); break;
 			case 0x4b: hyperstone_sub_local_local(); break;
 			case 0x4c: op4c(); break;
 			case 0x4d: op4d(); break;
 			case 0x4e: op4e(); break;
 			case 0x4f: op4f(); break;
-			case 0x50: op50(); break;
-			case 0x51: op51(); break;
+			case 0x50: hyperstone_addc_global_global(); break;
+			case 0x51: hyperstone_addc_global_local(); break;
 			case 0x52: hyperstone_addc_local_global(); break;
 			case 0x53: hyperstone_addc_local_local(); break;
 			case 0x54: hyperstone_and_global_global(); break;
 			case 0x55: hyperstone_and_global_local(); break;
 			case 0x56: hyperstone_and_local_global(); break;
 			case 0x57: hyperstone_and_local_local(); break;
-			case 0x58: op58(); break;
-			case 0x59: op59(); break;
-			case 0x5a: op5a(); break;
+			case 0x58: hyperstone_neg_global_global(); break;
+			case 0x59: hyperstone_neg_global_local(); break;
+			case 0x5a: hyperstone_neg_local_global(); break;
 			case 0x5b: hyperstone_neg_local_local(); break;
 			case 0x5c: op5c(); break;
 			case 0x5d: op5d(); break;
@@ -2547,10 +2204,10 @@ void hyperstone_device::execute_run()
 			case 0x69: hyperstone_addi_global_limm(); break;
 			case 0x6a: hyperstone_addi_local_simm(); break;
 			case 0x6b: hyperstone_addi_local_limm(); break;
-			case 0x6c: op6c(); break;
-			case 0x6d: op6d(); break;
-			case 0x6e: op6e(); break;
-			case 0x6f: op6f(); break;
+			case 0x6c: hyperstone_addsi_global_simm(); break;
+			case 0x6d: hyperstone_addsi_global_limm(); break;
+			case 0x6e: hyperstone_addsi_local_simm(); break;
+			case 0x6f: hyperstone_addsi_local_limm(); break;
 			case 0x70: hyperstone_cmpbi_global_simm(); break;
 			case 0x71: hyperstone_cmpbi_global_limm(); break;
 			case 0x72: hyperstone_cmpbi_local_simm(); break;
@@ -2596,15 +2253,15 @@ void hyperstone_device::execute_run()
 			case 0x9a: hyperstone_stxx1_local_global(); break;
 			case 0x9b: hyperstone_stxx1_local_local(); break;
 			case 0x9c: hyperstone_stxx2_global_global(); break;
-			case 0x9d: op9d(); break;
+			case 0x9d: hyperstone_stxx2_global_local(); break;
 			case 0x9e: hyperstone_stxx2_local_global(); break;
 			case 0x9f: hyperstone_stxx2_local_local(); break;
 			case 0xa0: hyperstone_shri_global(); break;
 			case 0xa1: hyperstone_shri_global(); break;
 			case 0xa2: hyperstone_shri_local(); break;
 			case 0xa3: hyperstone_shri_local(); break;
-			case 0xa4: opa4(); break;
-			case 0xa5: opa5(); break;
+			case 0xa4: hyperstone_sari_global(); break;
+			case 0xa5: hyperstone_sari_global(); break;
 			case 0xa6: hyperstone_sari_local(); break;
 			case 0xa7: hyperstone_sari_local(); break;
 			case 0xa8: hyperstone_shli_global(); break;
@@ -2615,21 +2272,21 @@ void hyperstone_device::execute_run()
 			case 0xad: DEBUG_PRINTF(("Executed Reserved opcode. PC = %08X OP = %04X\n", PC, OP)); break;
 			case 0xae: DEBUG_PRINTF(("Executed Reserved opcode. PC = %08X OP = %04X\n", PC, OP)); break;
 			case 0xaf: DEBUG_PRINTF(("Executed Reserved opcode. PC = %08X OP = %04X\n", PC, OP)); break;
-			case 0xb0: opb0(); break;
-			case 0xb1: opb1(); break;
-			case 0xb2: opb2(); break;
+			case 0xb0: hyperstone_mulu_global_global(); break;
+			case 0xb1: hyperstone_mulu_global_local(); break;
+			case 0xb2: hyperstone_mulu_local_global(); break;
 			case 0xb3: hyperstone_mulu_local_local(); break;
-			case 0xb4: opb4(); break;
-			case 0xb5: opb5(); break;
-			case 0xb6: opb6(); break;
+			case 0xb4: hyperstone_muls_global_global(); break;
+			case 0xb5: hyperstone_muls_global_local(); break;
+			case 0xb6: hyperstone_muls_local_global(); break;
 			case 0xb7: hyperstone_muls_local_local(); break;
 			case 0xb8: hyperstone_set_global(); break;
 			case 0xb9: hyperstone_set_global(); break;
 			case 0xba: hyperstone_set_local(); break;
 			case 0xbb: hyperstone_set_local(); break;
-			case 0xbc: opbc(); break;
-			case 0xbd: opbd(); break;
-			case 0xbe: opbe(); break;
+			case 0xbc: hyperstone_mul_global_global(); break;
+			case 0xbd: hyperstone_mul_global_local(); break;
+			case 0xbe: hyperstone_mul_local_global(); break;
 			case 0xbf: hyperstone_mul_local_local(); break;
 			case 0xc0: execute_software(); break; // fadd
 			case 0xc1: execute_software(); break; // faddd
@@ -2657,8 +2314,8 @@ void hyperstone_device::execute_run()
 			case 0xd7: hyperstone_lddp_local_local(); break;
 			case 0xd8: hyperstone_stwr_global(); break;
 			case 0xd9: hyperstone_stwr_local(); break;
-			case 0xda: opda(); break;
-			case 0xdb: opdb(); break;
+			case 0xda: hyperstone_stdr_global(); break;
+			case 0xdb: hyperstone_stdr_local(); break;
 			case 0xdc: hyperstone_stwp_global_local(); break;
 			case 0xdd: hyperstone_stwp_local_local(); break;
 			case 0xde: hyperstone_stdp_global_local(); break;

@@ -145,6 +145,7 @@ protected:
 	uint8_t   m_clck_scale;
 	uint8_t   m_clock_cycles_1;
 	uint8_t   m_clock_cycles_2;
+	uint8_t   m_clock_cycles_3;
 	uint8_t   m_clock_cycles_4;
 	uint8_t   m_clock_cycles_6;
 
@@ -271,14 +272,18 @@ private:
 	void hyperstone_cmpb_local_global();
 	void hyperstone_cmpb_local_local();
 	void hyperstone_subc(regs_decode &decode);
-	void hyperstone_sub(regs_decode &decode);
+	void hyperstone_sub_global_global();
+	void hyperstone_sub_global_local();
 	void hyperstone_sub_local_global();
 	void hyperstone_sub_local_local();
 	void hyperstone_subs(regs_decode &decode);
-	void hyperstone_addc(regs_decode &decode);
+	void hyperstone_addc_global_global();
+	void hyperstone_addc_global_local();
 	void hyperstone_addc_local_global();
 	void hyperstone_addc_local_local();
-	void hyperstone_neg(regs_decode &decode);
+	void hyperstone_neg_global_global();
+	void hyperstone_neg_global_local();
+	void hyperstone_neg_local_global();
 	void hyperstone_neg_local_local();
 	void hyperstone_negs(regs_decode &decode);
 	void hyperstone_and_global_global();
@@ -315,7 +320,10 @@ private:
 	void hyperstone_addi_global_limm();
 	void hyperstone_addi_local_simm();
 	void hyperstone_addi_local_limm();
-	void hyperstone_addsi(regs_decode &decode);
+	void hyperstone_addsi_global_simm();
+	void hyperstone_addsi_global_limm();
+	void hyperstone_addsi_local_simm();
+	void hyperstone_addsi_local_limm();
 	void hyperstone_cmpbi_global_simm();
 	void hyperstone_cmpbi_global_limm();
 	void hyperstone_cmpbi_local_simm();
@@ -335,14 +343,18 @@ private:
 	void hyperstone_shrdi();
 	void hyperstone_shrd();
 	void hyperstone_shr();
+	void hyperstone_shri_global();
+	void hyperstone_shri_local();
 	void hyperstone_sardi();
 	void hyperstone_sard();
 	void hyperstone_sar();
-	void hyperstone_sari(regs_decode &decode);
+	void hyperstone_sari_global();
 	void hyperstone_sari_local();
 	void hyperstone_shldi();
 	void hyperstone_shld();
 	void hyperstone_shl();
+	void hyperstone_shli_global();
+	void hyperstone_shli_local();
 	void hyperstone_testlz();
 	void hyperstone_rol();
 	void hyperstone_ldxx1_global_global();
@@ -357,20 +369,25 @@ private:
 	void hyperstone_stxx1_global_local();
 	void hyperstone_stxx1_local_global();
 	void hyperstone_stxx1_local_local();
-	void hyperstone_stxx2(regs_decode &decode);
 	void hyperstone_stxx2_global_global();
+	void hyperstone_stxx2_global_local();
 	void hyperstone_stxx2_local_global();
 	void hyperstone_stxx2_local_local();
-	void hyperstone_mulu(regs_decode &decode);
+	void hyperstone_mulu_global_global();
+	void hyperstone_mulu_global_local();
+	void hyperstone_mulu_local_global();
 	void hyperstone_mulu_local_local();
-	void hyperstone_muls(regs_decode &decode);
+	void hyperstone_muls_global_global();
+	void hyperstone_muls_global_local();
+	void hyperstone_muls_local_global();
 	void hyperstone_muls_local_local();
-	void hyperstone_mul(regs_decode &decode);
+	void hyperstone_mul_global_global();
+	void hyperstone_mul_global_local();
+	void hyperstone_mul_local_global();
 	void hyperstone_mul_local_local();
 	void hyperstone_set_global();
 	void hyperstone_set_local();
 
-	void hyperstone_ldwr(regs_decode &decode);
 	void hyperstone_ldwr_global_local();
 	void hyperstone_ldwr_local_local();
 	void hyperstone_lddr_global_local();
@@ -382,7 +399,8 @@ private:
 
 	void hyperstone_stwr_global();
 	void hyperstone_stwr_local();
-	void hyperstone_stdr(regs_decode &decode);
+	void hyperstone_stdr_global();
+	void hyperstone_stdr_local();
 	void hyperstone_stwp_global_local();
 	void hyperstone_stwp_local_local();
 	void hyperstone_stdp_global_local();
@@ -420,13 +438,7 @@ private:
 	void hyperstone_bgt();
 
 	void hyperstone_trap();
-	void hyperstone_do(regs_decode &decode);
 	void hyperstone_extend();
-
-	void hyperstone_shli_global();
-	void hyperstone_shli_local();
-	void hyperstone_shri_global();
-	void hyperstone_shri_local();
 
 	int32_t decode_pcrel();
 	void ignore_pcrel();
@@ -447,38 +459,10 @@ private:
 	bool generate_opcode(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
 #endif
 
-
-
-
-
-
-																	void op2c();    void op2d();    void op2e();    void op2f();
-
-
-	void op40();    void op41();    void op42();    void op43();
-	void op48();    void op49();    								void op4c();    void op4d();    void op4e();    void op4f();
-	void op50();    void op51();
-	void op58();    void op59();    void op5a();    				void op5c();    void op5d();    void op5e();    void op5f();
-
-																	void op6c();    void op6d();    void op6e();    void op6f();
-
-
-
-
-
-																					void op9d();
-																	void opa4();    void opa5();
-
-	void opb0();    void opb1();    void opb2();    				void opb4();    void opb5();    void opb6();
-																	void opbc();    void opbd();    void opbe();
-
-
-
-									void opda();    void opdb();
-
-
-
-
+	void op2c();    void op2d();    void op2e();    void op2f(); // addc
+	void op40();    void op41();    void op42();    void op43(); // subc
+	void op4c();    void op4d();    void op4e();    void op4f(); // subs
+	void op5c();    void op5d();    void op5e();    void op5f(); // negs
 
 #if 0
 	void generate_op00(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_op01(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
