@@ -224,26 +224,36 @@ private:
 	void hyperstone_chk_global_local();
 	void hyperstone_chk_local_global();
 	void hyperstone_chk_local_local();
-	void hyperstone_movd(regs_decode &decode);
+	void hyperstone_movd_global_global();
 	void hyperstone_movd_global_local();
 	void hyperstone_movd_local_global();
 	void hyperstone_movd_local_local();
-	void hyperstone_divu(regs_decode &decode);
+	void hyperstone_divu_global_global();
+	void hyperstone_divu_global_local();
+	void hyperstone_divu_local_global();
 	void hyperstone_divu_local_local();
-	void hyperstone_divs(regs_decode &decode);
+	void hyperstone_divs_global_global();
+	void hyperstone_divs_global_local();
+	void hyperstone_divs_local_global();
 	void hyperstone_divs_local_local();
-	void hyperstone_xm(regs_decode &decode);
+	void hyperstone_xm_global_global();
+	void hyperstone_xm_global_local();
+	void hyperstone_xm_local_global();
 	void hyperstone_xm_local_local();
-	void hyperstone_mask(regs_decode &decode);
+	void hyperstone_mask_global_global();
 	void hyperstone_mask_global_local();
 	void hyperstone_mask_local_global();
 	void hyperstone_mask_local_local();
-	void hyperstone_sum(regs_decode &decode);
 	void hyperstone_sum_global_global();
+	void hyperstone_sum_global_local();
 	void hyperstone_sum_local_global();
 	void hyperstone_sum_local_local();
-	void hyperstone_sums(regs_decode &decode);
-	void hyperstone_cmp(regs_decode &decode);
+	void hyperstone_sums_global_global();
+	void hyperstone_sums_global_local();
+	void hyperstone_sums_local_global();
+	void hyperstone_sums_local_local();
+	void hyperstone_cmp_global_global();
+	void hyperstone_cmp_global_local();
 	void hyperstone_cmp_local_global();
 	void hyperstone_cmp_local_local();
 	void hyperstone_mov(regs_decode &decode);
@@ -251,7 +261,7 @@ private:
 	void hyperstone_mov_global_local();
 	void hyperstone_mov_local_global();
 	void hyperstone_mov_local_local();
-	void hyperstone_add(regs_decode &decode);
+	void hyperstone_add_global_global();
 	void hyperstone_add_global_local();
 	void hyperstone_add_local_global();
 	void hyperstone_add_local_local();
@@ -375,7 +385,7 @@ private:
 	void hyperstone_stdr(regs_decode &decode);
 	void hyperstone_stwp_global_local();
 	void hyperstone_stwp_local_local();
-	void hyperstone_stdp(regs_decode &decode);
+	void hyperstone_stdp_global_local();
 	void hyperstone_stdp_local_local();
 
 	void hyperstone_dbv();
@@ -437,12 +447,12 @@ private:
 	bool generate_opcode(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
 #endif
 
-																	void op04();
-	void op08();    void op09();    void op0a();    				void op0c();    void op0d();    void op0e();
-	void op10();    void op11();    void op12();    				void op14();
-					void op19();    								void op1c();    void op1d();    void op1e();    void op1f();
-	void op20();    void op21();
-	void op28();    												void op2c();    void op2d();    void op2e();    void op2f();
+
+
+
+
+
+																	void op2c();    void op2d();    void op2e();    void op2f();
 
 
 	void op40();    void op41();    void op42();    void op43();
@@ -464,7 +474,7 @@ private:
 
 
 
-									void opda();    void opdb();    								void opde();
+									void opda();    void opdb();
 
 
 
