@@ -1266,7 +1266,7 @@ void towns_state::towns_crtc_draw_scan_layer_16(bitmap_rgb32 &bitmap,const recta
 		if(!(m_video.towns_video_reg[0] & 0x10))
 			return;
 		if(!(m_video.towns_crtc_reg[28] & 0x10))
-			off += m_video.towns_crtc_reg[21];  // initial offset
+			off += m_video.towns_crtc_reg[21] << 2;  // initial offset
 		else
 		{
 			scroll = ((m_video.towns_crtc_reg[21] & 0xfc00)<<2) | (((m_video.towns_crtc_reg[21] & 0x3ff)<<2));
@@ -1278,7 +1278,7 @@ void towns_state::towns_crtc_draw_scan_layer_16(bitmap_rgb32 &bitmap,const recta
 	else
 	{
 		if(!(m_video.towns_crtc_reg[28] & 0x20))
-			off += m_video.towns_crtc_reg[17];  // initial offset
+			off += m_video.towns_crtc_reg[17] << 2;  // initial offset
 		else
 		{
 			scroll = ((m_video.towns_crtc_reg[17] & 0xfc00)<<2) | (((m_video.towns_crtc_reg[17] & 0x3ff)<<2));
