@@ -55,8 +55,6 @@ private:
 	uint8_t           m_alloc_count;
 
 	/* transmit/receive FIFOs */
-	uint8_t           m_fifo_count;
-
 	uint32_t          rx_fifo_out;
 	uint32_t          rx_fifo_in;
 	uint8_t           m_rx[ETHER_BUFFER_SIZE * ETHER_RX_BUFFERS];
