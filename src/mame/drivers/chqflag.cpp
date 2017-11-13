@@ -57,6 +57,14 @@ WRITE8_MEMBER(chqflag_state::chqflag_bankswitch_w)
 	/* other bits unknown/unused */
 }
 
+inline void chqflag_state::update_background_shadows(uint8_t data)
+{
+	double brt = (data & 0x80) ? PALETTE_DEFAULT_SHADOW_FACTOR : 1.0;
+
+	for (int i = 512; i < 1024; i++)
+		m_palette->set_pen_contrast(i, brt);
+}
+
 WRITE8_MEMBER(chqflag_state::chqflag_vreg_w)
 {
 	/* bits 0 & 1 = coin counters */
@@ -78,14 +86,10 @@ WRITE8_MEMBER(chqflag_state::chqflag_vreg_w)
 
 	if ((data & 0x80) != m_last_vreg)
 	{
-		double brt = (data & 0x80) ? PALETTE_DEFAULT_SHADOW_FACTOR : 1.0;
-		int i;
-
 		m_last_vreg = data & 0x80;
 
 		/* only affect the background */
-		for (i = 512; i < 1024; i++)
-			m_palette->set_pen_contrast(i, brt);
+		update_background_shadows(data);
 	}
 
 //if ((data & 0xf8) && (data & 0xf8) != 0x88)
@@ -286,6 +290,7 @@ void chqflag_state::machine_reset()
 	m_analog_ctrl = 0;
 	m_accel = 0;
 	m_wheel = 0;
+	update_background_shadows(0);
 }
 
 static MACHINE_CONFIG_START( chqflag )
