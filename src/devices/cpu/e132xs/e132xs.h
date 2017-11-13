@@ -173,26 +173,6 @@ protected:
 	uint8_t m_fl_lut[16];
 
 private:
-	struct regs_decode
-	{
-		uint8_t   src, dst;       // destination and source register code
-		uint32_t  src_value;      // current source register value
-		uint32_t  next_src_value; // current next source register value
-		uint32_t  dst_value;      // current destination register value
-		uint32_t  next_dst_value; // current next destination register value
-		uint8_t   sub_type;       // sub type opcode (for DD and X_CODE bits)
-		union
-		{
-			uint32_t u;
-			int32_t  s;
-		} extra;                // extra value such as immediate value, const, pcrel, ...
-		uint8_t   src_is_local;
-		uint8_t   dst_is_local;
-		uint8_t   same_src_dst;
-		uint8_t   same_src_dstf;
-		uint8_t   same_srcf_dst;
-	};
-
 	// internal functions
 	void check_interrupts();
 
@@ -211,7 +191,6 @@ private:
 	TIMER_CALLBACK_MEMBER(timer_callback);
 
 	void execute_br();
-	void execute_dbr(int32_t offset);
 	void execute_trap(uint32_t addr);
 	void execute_int(uint32_t addr);
 	void execute_exception(uint32_t addr);

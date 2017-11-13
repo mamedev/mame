@@ -718,85 +718,6 @@ static const int32_t immediate_values[32] =
 
 #define WRITE_ONLY_REGMASK  ((1 << BCR_REGISTER) | (1 << TPR_REGISTER) | (1 << FCR_REGISTER) | (1 << MCR_REGISTER))
 
-#define decode_source_local(decode)                                                 \
-do                                                                                  \
-{                                                                                   \
-} while (0)
-
-#define decode_source_noh(decode)                                                   \
-do                                                                                  \
-{                                                                                   \
-	decode.src_is_local = 0;                                                        \
-																				    \
-	SREG = get_global_register(decode.src);                                         \
-																				    \
-	/* bound safe */                                                                \
-	if (decode.src != 15)                                                           \
-		SREGF = get_global_register(decode.src + 1);                                \
-	else                                                                            \
-		SREGF = 0;                                                                  \
-} while (0)
-
-#define decode_source(decode, hflag)                                                \
-do                                                                                  \
-{                                                                                   \
-	decode.src_is_local = 0;                                                        \
-																				    \
-	if (!hflag)                                                                     \
-	{                                                                               \
-		SREG = get_global_register(decode.src);                                     \
-																				    \
-		/* bound safe */                                                            \
-		if (decode.src != 15)                                                       \
-			SREGF = get_global_register(decode.src + 1);                            \
-		else                                                                        \
-			SREGF = 0;                                                              \
-	}                                                                               \
-	else                                                                            \
-	{                                                                               \
-		decode.src += 16;                                                           \
-																				    \
-		SREG = get_global_register(decode.src);                                     \
-		if ((WRITE_ONLY_REGMASK >> decode.src) & 1)                                 \
-			SREG = 0; /* write-only registers */                                    \
-		else if (decode.src == ISR_REGISTER)                                        \
-			DEBUG_PRINTF(("read src ISR. PC = %08X\n",PPC));                        \
-																				    \
-		/* bound safe */                                                            \
-		if (decode.src != 31)                                                       \
-			SREGF = get_global_register(decode.src + 1);                            \
-		else                                                                        \
-			SREGF = 0;                                                              \
-	}                                                                               \
-} while (0)
-
-#define decode_dest(decode, hflag)                                                  \
-do                                                                                  \
-{                                                                                   \
-	decode.dst_is_local = 0;                                                        \
-																				    \
-	if (!hflag)                                                                     \
-	{                                                                               \
-		DREG = get_global_register(decode.dst);                                     \
-																				    \
-		/* bound safe */                                                            \
-		if (decode.dst != 15)                                                       \
-			DREGF = get_global_register(decode.dst + 1);                            \
-	}                                                                               \
-	else                                                                            \
-	{                                                                               \
-		decode.dst += 16;                                                           \
-																				    \
-		DREG = get_global_register(decode.dst);                                     \
-		if( decode.dst == ISR_REGISTER )                                            \
-			DEBUG_PRINTF(("read dst ISR. PC = %08X\n",PPC));                        \
-																				    \
-		/* bound safe */                                                            \
-		if (decode.dst != 31)                                                       \
-			DREGF = get_global_register(decode.dst + 1);                            \
-	}                                                                               \
-} while (0)
-
 #define check_delay_PC()                                                            \
 do                                                                                  \
 {                                                                                   \
@@ -805,41 +726,6 @@ do                                                                              
 	{                                                                               \
 		PC = m_delay_pc;                                                            \
 		m_delay_slot = false;                                                       \
-	}                                                                               \
-} while (0)
-
-#define decode_immediate_u(decode)                                                  \
-do                                                                                  \
-{                                                                                   \
-		EXTRA_U = immediate_values[OP & 0x0f];                                      \
-} while (0)
-
-#define DECODE_IMMEDIATE_S(decode)                                                  \
-do                                                                                  \
-{                                                                                   \
-	switch( OP & 0x0f )                                                             \
-	{                                                                               \
-		default:                                                                    \
-			EXTRA_U = immediate_values[0x10 + (OP & 0x0f)];                         \
-			break;                                                                  \
-																				    \
-		case 1:                                                                     \
-			m_instruction_length = (3<<19);                                         \
-			EXTRA_U = (READ_OP(PC) << 16) | READ_OP(PC + 2);                        \
-			PC += 4;                                                                \
-			break;                                                                  \
-																				    \
-		case 2:                                                                     \
-			m_instruction_length = (2<<19);                                         \
-			EXTRA_U = READ_OP(PC);                                                  \
-			PC += 2;                                                                \
-			break;                                                                  \
-																				    \
-		case 3:                                                                     \
-			m_instruction_length = (2<<19);                                         \
-			EXTRA_U = 0xffff0000 | READ_OP(PC);                                     \
-			PC += 2;                                                                \
-			break;                                                                  \
 	}                                                                               \
 } while (0)
 
@@ -883,40 +769,6 @@ uint32_t hyperstone_device::decode_immediate_s()
 		}
 	}
 }
-
-#define DECODE_CONST(decode)                                                        \
-do                                                                                  \
-{                                                                                   \
-	uint16_t imm_1 = READ_OP(PC);                                                   \
-																					\
-	PC += 2;                                                                        \
-	m_instruction_length = (2<<19);                                                 \
-																					\
-	if( E_BIT(imm_1) )                                                              \
-	{                                                                               \
-		uint16_t imm_2 = READ_OP(PC);                                               \
-																					\
-		PC += 2;                                                                    \
-		m_instruction_length = (3<<19);                                             \
-																					\
-		EXTRA_S = imm_2;                                                            \
-		EXTRA_S |= ((imm_1 & 0x3fff) << 16);                                        \
-																					\
-		if( S_BIT_CONST(imm_1) )                                                    \
-		{                                                                           \
-			EXTRA_S |= 0xc0000000;                                                  \
-		}                                                                           \
-	}                                                                               \
-	else                                                                            \
-	{                                                                               \
-		EXTRA_S = imm_1 & 0x3fff;                                                   \
-																					\
-		if( S_BIT_CONST(imm_1) )                                                    \
-		{                                                                           \
-			EXTRA_S |= 0xffffc000;                                                  \
-		}                                                                           \
-	}                                                                               \
-} while (0)
 
 uint32_t hyperstone_device::decode_const()
 {
@@ -986,63 +838,6 @@ void hyperstone_device::ignore_pcrel()
 	}
 }
 
-#define decode_dis(decode)                                                          \
-do                                                                                  \
-{                                                                                   \
-	uint16_t next_1 = READ_OP(PC);                                                  \
-																					\
-	PC += 2;                                                                        \
-	m_instruction_length = (2<<19);                                                 \
-																					\
-	decode.sub_type = DD(next_1);                                                   \
-																					\
-	if( E_BIT(next_1) )                                                             \
-	{                                                                               \
-		uint16_t next_2 = READ_OP(PC);                                              \
-																					\
-		PC += 2;                                                                    \
-		m_instruction_length = (3<<19);                                             \
-																					\
-		EXTRA_S = next_2;                                                           \
-		EXTRA_S |= ((next_1 & 0xfff) << 16);                                        \
-																					\
-		if( S_BIT_CONST(next_1) )                                                   \
-		{                                                                           \
-			EXTRA_S |= 0xf0000000;                                                  \
-		}                                                                           \
-	}                                                                               \
-	else                                                                            \
-	{                                                                               \
-		EXTRA_S = next_1 & 0xfff;                                                   \
-																					\
-		if( S_BIT_CONST(next_1) )                                                   \
-		{                                                                           \
-			EXTRA_S |= 0xfffff000;                                                  \
-		}                                                                           \
-	}                                                                               \
-} while (0)
-
-#define decode_lim(decode)                                                          \
-do                                                                                  \
-{                                                                                   \
-	uint32_t next = READ_OP(PC);                                                    \
-	PC += 2;                                                                        \
-	m_instruction_length = (2<<19);                                                 \
-																					\
-	decode.sub_type = X_CODE(next);                                                 \
-																					\
-	if( E_BIT(next) )                                                               \
-	{                                                                               \
-		EXTRA_U = ((next & 0xfff) << 16) | READ_OP(PC);                             \
-		PC += 2;                                                                    \
-		m_instruction_length = (3<<19);                                             \
-	}                                                                               \
-	else                                                                            \
-	{                                                                               \
-		EXTRA_U = next & 0xfff;                                                     \
-	}                                                                               \
-} while (0)
-
 void hyperstone_device::execute_br()
 {
 	const int32_t offset = decode_pcrel();
@@ -1054,15 +849,6 @@ void hyperstone_device::execute_br()
 
 	m_icount -= m_clock_cycles_2;
 }
-
-void hyperstone_device::execute_dbr(int32_t offset)
-{
-	m_delay_slot = true;
-	m_delay_pc = PC + offset;
-
-	m_intblock = 3;
-}
-
 
 void hyperstone_device::execute_trap(uint32_t addr)
 {

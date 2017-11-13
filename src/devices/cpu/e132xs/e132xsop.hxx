@@ -357,22 +357,7 @@ void hyperstone_device::hyperstone_divu_global_local()
 
 void hyperstone_device::hyperstone_divu_local_global()
 {
-	regs_decode decode;
 	check_delay_PC();
-	decode.src = SRC_CODE;
-	decode.dst = DST_CODE;
-	decode.src_is_local = 0;
-
-	SREG = m_global_regs[decode.src];
-	SREGF = m_global_regs[decode.src + 1];
-
-	decode.dst_is_local = 1;
-	DREG = m_local_regs[(decode.dst + GET_FP) & 0x3f]; /* registers offset by frame pointer */
-	DREGF = m_local_regs[(decode.dst + 1 + GET_FP) & 0x3f];
-
-	decode.same_src_dst = 0;
-	decode.same_src_dstf = 0;
-	decode.same_srcf_dst = 0;
 
 	const uint32_t src_code = SRC_CODE;
 	const uint32_t sreg = m_global_regs[src_code];
@@ -3563,8 +3548,8 @@ void hyperstone_device::hyperstone_sardi()
 {
 	check_delay_PC();
 
-	const uint32_t dst_code = (DST_CODE + GET_FP) % 64;
-	const uint32_t dstf_code = (DST_CODE + GET_FP + 1) % 64;
+	const uint32_t dst_code = (DST_CODE + GET_FP) & 0x3f;
+	const uint32_t dstf_code = (dst_code + 1) & 0x3f;
 
 	uint64_t val = concat_64(m_local_regs[dst_code], m_local_regs[dstf_code]);
 
@@ -3579,9 +3564,7 @@ void hyperstone_device::hyperstone_sardi()
 		val >>= n;
 
 		if (sign_bit)
-		{
 			val |= 0xffffffff00000000U << (32 - n);
-		}
 	}
 
 	m_local_regs[dst_code] = (uint32_t)(val >> 32);
@@ -3715,40 +3698,43 @@ void hyperstone_device::hyperstone_shld()
 {
 	check_delay_PC();
 
-	uint32_t src_code = (SRC_CODE + GET_FP) % 64;
-	uint32_t dst_code = (DST_CODE + GET_FP) % 64;
-	uint32_t dstf_code = (DST_CODE + GET_FP + 1) % 64;
+	const uint32_t fp = GET_FP;
+	const uint32_t d_code = DST_CODE;
+	uint32_t src_code = (SRC_CODE + fp) & 0x3f;
+	uint32_t dst_code = (d_code + fp) & 0x3f;
+	uint32_t dstf_code = (d_code + fp + 1) & 0x3f;
 
 	// result undefined if Ls denotes the same register as Ld or Ldf
 	if (src_code == dst_code || src_code == dstf_code)
 	{
 		DEBUG_PRINTF(("Denoted same registers in hyperstone_shld. PC = %08X\n", PC));
+		m_icount -= m_clock_cycles_2;
+		return;
 	}
-	else
-	{
-		uint32_t n = m_local_regs[src_code % 64] & 0x1f;
-		uint32_t high_order = m_local_regs[dst_code]; /* registers offset by frame pointer */
-		uint32_t low_order  = m_local_regs[dstf_code];
 
-		uint64_t mask = ((((uint64_t)1) << (32 - n)) - 1) ^ 0xffffffff;
+	uint32_t n = m_local_regs[src_code & 0x3f] & 0x1f;
+	uint32_t high_order = m_local_regs[dst_code]; /* registers offset by frame pointer */
+	uint32_t low_order  = m_local_regs[dstf_code];
 
-		uint64_t val = concat_64(high_order, low_order);
-		SET_C( (n)?(((val<<(n-1))&0x8000000000000000U)?1:0):0);
-		uint32_t tmp = high_order << n;
+	uint64_t mask = ((((uint64_t)1) << (32 - n)) - 1) ^ 0xffffffff;
 
-		if (((high_order & mask) && (!(tmp & 0x80000000))) || (((high_order & mask) ^ mask) && (tmp & 0x80000000)))
-			SET_V(1);
-		else
-			SR &= ~V_MASK;
+	uint64_t val = concat_64(high_order, low_order);
 
-		val <<= n;
+	SR &= ~(C_MASK | V_MASK | Z_MASK | N_MASK);
+	SR |= (n)?(((val<<(n-1))&0x8000000000000000U)?1:0):0;
 
-		m_local_regs[dst_code] = extract_64hi(val);
-		m_local_regs[dstf_code] = extract_64lo(val);
+	uint32_t tmp = high_order << n;
+	if (((high_order & mask) && (!(tmp & 0x80000000))) || (((high_order & mask) ^ mask) && (tmp & 0x80000000)))
+		SR |= V_MASK;
 
-		SET_Z(val == 0 ? 1 : 0);
-		SET_N(SIGN_BIT(high_order));
-	}
+	val <<= n;
+
+	m_local_regs[dst_code] = extract_64hi(val);
+	m_local_regs[dstf_code] = extract_64lo(val);
+
+	if (val == 0)
+		SR |= Z_MASK;
+	SR |= SIGN_TO_N(m_local_regs[dst_code]);
 
 	m_icount -= m_clock_cycles_2;
 }
@@ -3757,23 +3743,27 @@ void hyperstone_device::hyperstone_shl()
 {
 	check_delay_PC();
 
-	uint32_t src_code = SRC_CODE + GET_FP;
-	uint32_t dst_code = DST_CODE + GET_FP;
+	const uint32_t fp = GET_FP;
+	uint32_t src_code = SRC_CODE + fp;
+	uint32_t dst_code = DST_CODE + fp;
 
-	uint32_t n    = m_local_regs[src_code % 64] & 0x1f;
-	uint32_t base = m_local_regs[dst_code % 64]; /* registers offset by frame pointer */
+	uint32_t n    = m_local_regs[src_code & 0x3f] & 0x1f;
+	uint32_t base = m_local_regs[dst_code & 0x3f]; /* registers offset by frame pointer */
 	uint64_t mask = ((((uint64_t)1) << (32 - n)) - 1) ^ 0xffffffff;
-	SET_C( (n)?(((base<<(n-1))&0x80000000)?1:0):0);
+
+	SR &= ~(C_MASK | V_MASK | Z_MASK | N_MASK);
+
+	SR |= (n)?(((base<<(n-1))&0x80000000)?1:0):0;
 	uint32_t ret  = base << n;
 
 	if (((base & mask) && (!(ret & 0x80000000))) || (((base & mask) ^ mask) && (ret & 0x80000000)))
-		SET_V(1);
-	else
-		SR &= ~V_MASK;
+		SR |= V_MASK;
 
-	m_local_regs[dst_code % 64] = ret;
-	SET_Z(ret == 0 ? 1 : 0);
-	SET_N(SIGN_BIT(ret));
+	m_local_regs[dst_code & 0x3f] = ret;
+
+	if (ret == 0)
+		SR |= Z_MASK;
+	SR |= SIGN_TO_N(ret);
 
 	m_icount -= m_clock_cycles_1;
 }
@@ -3782,7 +3772,8 @@ void hyperstone_device::hyperstone_testlz()
 {
 	check_delay_PC();
 
-	uint32_t sreg = m_local_regs[(SRC_CODE + GET_FP) % 64];
+	const uint32_t fp = GET_FP;
+	const uint32_t sreg = m_local_regs[(SRC_CODE + fp) & 0x3f];
 	uint32_t zeros = 0;
 	for (uint32_t mask = 0x80000000; mask != 0; mask >>= 1 )
 	{
@@ -3792,7 +3783,7 @@ void hyperstone_device::hyperstone_testlz()
 			zeros++;
 	}
 
-	m_local_regs[(DST_CODE + GET_FP) % 64] = zeros;
+	m_local_regs[(DST_CODE + fp) & 0x3f] = zeros;
 
 	m_icount -= m_clock_cycles_2;
 }
@@ -6754,7 +6745,9 @@ void hyperstone_device::hyperstone_dbv()
 	{
 		const int32_t offset = decode_pcrel();
 		check_delay_PC();
-		execute_dbr(offset);
+		m_delay_slot = true;
+		m_delay_pc = PC + offset;
+		m_intblock = 3;
 	}
 	else
 	{
@@ -6776,7 +6769,9 @@ void hyperstone_device::hyperstone_dbnv()
 	{
 		const int32_t offset = decode_pcrel();
 		check_delay_PC();
-		execute_dbr(offset);
+		m_delay_slot = true;
+		m_delay_pc = PC + offset;
+		m_intblock = 3;
 	}
 
 	m_icount -= m_clock_cycles_1;
@@ -6788,7 +6783,9 @@ void hyperstone_device::hyperstone_dbe()
 	{
 		const int32_t offset = decode_pcrel();
 		check_delay_PC();
-		execute_dbr(offset);
+		m_delay_slot = true;
+		m_delay_pc = PC + offset;
+		m_intblock = 3;
 	}
 	else
 	{
@@ -6810,7 +6807,9 @@ void hyperstone_device::hyperstone_dbne()
 	{
 		const int32_t offset = decode_pcrel();
 		check_delay_PC();
-		execute_dbr(offset);
+		m_delay_slot = true;
+		m_delay_pc = PC + offset;
+		m_intblock = 3;
 	}
 	m_icount -= m_clock_cycles_1;
 }
@@ -6821,7 +6820,9 @@ void hyperstone_device::hyperstone_dbc()
 	{
 		const int32_t offset = decode_pcrel();
 		check_delay_PC();
-		execute_dbr(offset);
+		m_delay_slot = true;
+		m_delay_pc = PC + offset;
+		m_intblock = 3;
 	}
 	else
 	{
@@ -6843,7 +6844,9 @@ void hyperstone_device::hyperstone_dbnc()
 	{
 		const int32_t offset = decode_pcrel();
 		check_delay_PC();
-		execute_dbr(offset);
+		m_delay_slot = true;
+		m_delay_pc = PC + offset;
+		m_intblock = 3;
 	}
 
 	m_icount -= m_clock_cycles_1;
@@ -6855,7 +6858,9 @@ void hyperstone_device::hyperstone_dbse()
 	{
 		const int32_t offset = decode_pcrel();
 		check_delay_PC();
-		execute_dbr(offset);
+		m_delay_slot = true;
+		m_delay_pc = PC + offset;
+		m_intblock = 3;
 	}
 	else
 	{
@@ -6877,7 +6882,9 @@ void hyperstone_device::hyperstone_dbht()
 	{
 		const int32_t offset = decode_pcrel();
 		check_delay_PC();
-		execute_dbr(offset);
+		m_delay_slot = true;
+		m_delay_pc = PC + offset;
+		m_intblock = 3;
 	}
 
 	m_icount -= m_clock_cycles_1;
@@ -6889,7 +6896,9 @@ void hyperstone_device::hyperstone_dbn()
 	{
 		const int32_t offset = decode_pcrel();
 		check_delay_PC();
-		execute_dbr(offset);
+		m_delay_slot = true;
+		m_delay_pc = PC + offset;
+		m_intblock = 3;
 	}
 	else
 	{
@@ -6911,7 +6920,9 @@ void hyperstone_device::hyperstone_dbnn()
 	{
 		const int32_t offset = decode_pcrel();
 		check_delay_PC();
-		execute_dbr(offset);
+		m_delay_slot = true;
+		m_delay_pc = PC + offset;
+		m_intblock = 3;
 	}
 
 	m_icount -= m_clock_cycles_1;
@@ -6923,7 +6934,9 @@ void hyperstone_device::hyperstone_dble()
 	{
 		const int32_t offset = decode_pcrel();
 		check_delay_PC();
-		execute_dbr(offset);
+		m_delay_slot = true;
+		m_delay_pc = PC + offset;
+		m_intblock = 3;
 	}
 	else
 	{
@@ -6945,7 +6958,9 @@ void hyperstone_device::hyperstone_dbgt()
 	{
 		const int32_t offset = decode_pcrel();
 		check_delay_PC();
-		execute_dbr(offset);
+		m_delay_slot = true;
+		m_delay_pc = PC + offset;
+		m_intblock = 3;
 	}
 
 	m_icount -= m_clock_cycles_1;
