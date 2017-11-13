@@ -140,12 +140,13 @@ void smc91c9x_device::device_reset()
 	unsigned char i;
 	const unsigned char * mac;
 
-	memset(m_reg, 0, sizeof(m_reg));
+	std::fill(m_reg, m_reg + sizeof(m_reg), 0);
 
-	memset(m_rx, 0, sizeof(m_rx));
-	memset(m_tx, 0, sizeof(m_tx));
+	std::fill(m_rx, m_rx + sizeof(m_rx), 0);
+	std::fill(m_tx, m_tx + sizeof(m_tx), 0);
 
-	memset(m_regmask, 0, sizeof(m_regmask));
+	std::fill(m_regmask, m_regmask + sizeof(m_regmask), 0);
+
 	m_irq_state = 0;
 	m_alloc_count = 0;
 	rx_fifo_out = 0;
@@ -161,14 +162,14 @@ void smc91c9x_device::device_reset()
 
 	mac = (const unsigned char *)get_mac();
 
-	if (LOG_ETHERNET)
+	if ( LOG_ETHERNET )
 	{
 		logerror("MAC : ");
-		for(i=0;i<ETHERNET_ADDR_SIZE;i++)
+		for ( i = 0 ; i < ETHERNET_ADDR_SIZE ; i++ )
 		{
 			logerror("%.2X",mac[i]);
 		}
-		logerror("\r\n");
+		logerror("\n");
 	}
 
 	set_promisc(true);
@@ -216,6 +217,7 @@ void smc91c9x_device::device_reset()
 	update_ethernet_irq();
 }
 
+
 DEFINE_DEVICE_TYPE(SMC91C94, smc91c94_device, "smc91c94", "SMC91C94 Ethernet Controller")
 
 smc91c94_device::smc91c94_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -234,14 +236,14 @@ void smc91c9x_device::clear_tx_fifo()
 {
 	tx_fifo_in = 0;
 	tx_fifo_out = 0;
-	memset(m_tx, 0, sizeof(m_tx));
+	std::fill(m_tx, m_tx + sizeof(m_tx), 0);
 }
 
 void smc91c9x_device::clear_rx_fifo()
 {
 	rx_fifo_in = 0;
 	rx_fifo_out = 0;
-	memset(m_rx, 0, sizeof(m_rx));
+	std::fill(m_rx, m_rx + sizeof(m_rx), 0);
 }
 
 int smc91c9x_device::is_broadcast(uint8_t mac_address[])
@@ -255,7 +257,7 @@ int smc91c9x_device::is_broadcast(uint8_t mac_address[])
 		i++;
 	}
 
-	if(i == 6)
+	if ( i == 6 )
 		return 1;
 
 	return 0;
@@ -270,8 +272,8 @@ int smc91c9x_device::ethernet_packet_is_for_me(const uint8_t mac_address[])
 	int i;
 	uint8_t local_address[ETHERNET_ADDR_SIZE];
 
-	if (LOG_ETHERNET)
-		logerror("\r\n");
+	if ( LOG_ETHERNET )
+		logerror("\n");
 
 	local_address[0] = (m_reg[EREG_IA0_1]>>0) & 0xFF;
 	local_address[1] = (m_reg[EREG_IA0_1]>>8) & 0xFF;
@@ -280,14 +282,14 @@ int smc91c9x_device::ethernet_packet_is_for_me(const uint8_t mac_address[])
 	local_address[4] = (m_reg[EREG_IA4_5]>>0) & 0xFF;
 	local_address[5] = (m_reg[EREG_IA4_5]>>8) & 0xFF;
 
-	if (LOG_ETHERNET)
+	if ( LOG_ETHERNET )
 	{
-		for(i=0;i<ETHERNET_ADDR_SIZE;i++)
+		for ( i = 0 ; i < ETHERNET_ADDR_SIZE ; i++ )
 		{
 			logerror("%.2X",local_address[i]);
 		}
 		logerror("=");
-		for(i=0;i<ETHERNET_ADDR_SIZE;i++)
+		for ( i = 0 ; i < ETHERNET_ADDR_SIZE ; i++ )
 		{
 			logerror("%.2X",mac_address[i]);
 		}
@@ -297,20 +299,20 @@ int smc91c9x_device::ethernet_packet_is_for_me(const uint8_t mac_address[])
 	// skip Ethernet broadcast packets if RECV_BROAD is not set
 	if ( is_broadcast((uint8_t *)mac_address) )
 	{
-		if (LOG_ETHERNET)
-			logerror(" -- Broadcast rx\r\n");
+		if ( LOG_ETHERNET )
+			logerror(" -- Broadcast rx\n");
 		return 2;
 	}
 
 	if (memcmp(mac_address, local_address, ETHERNET_ADDR_SIZE) == 0)
 	{
-		if (LOG_ETHERNET)
-			logerror(" -- Address Match\r\n");
+		if ( LOG_ETHERNET )
+			logerror(" -- Address Match\n");
 		return 1;
 	}
 
-	if (LOG_ETHERNET)
-		logerror(" -- Not Matching\r\n");
+	if ( LOG_ETHERNET )
+		logerror(" -- Not Matching\n");
 
 	return 0;
 }
@@ -324,33 +326,33 @@ void smc91c9x_device::recv_cb(uint8_t *data, int length)
 	uint8_t *packet;
 	int isforme,i,dst;
 
-	if (LOG_ETHERNET)
-		logerror("recv_cb : %d/0x%x\r\n",length,length);
+	if ( LOG_ETHERNET )
+		logerror("recv_cb : %d/0x%x\n",length,length);
 
 	isforme = ethernet_packet_is_for_me( data );
 
-	if (isforme==1 && length >= ETHERNET_ADDR_SIZE && LOG_ETHERNET)
+	if ( isforme==1 && length >= ETHERNET_ADDR_SIZE && LOG_ETHERNET )
 	{
 		logerror("RX: ");
-		for(i=0;i<ETHERNET_ADDR_SIZE;i++)
+		for ( i = 0 ; i < ETHERNET_ADDR_SIZE ; i++ )
 		{
 			logerror("%.2X",data[i]);
 		}
 
 		logerror(" ");
 
-		for(i=0;i<length-ETHERNET_ADDR_SIZE;i++)
+		for ( i = 0 ; i < length-ETHERNET_ADDR_SIZE ; i++ )
 		{
 			logerror("%.2X",data[ETHERNET_ADDR_SIZE+i]);
 		}
 
-		logerror(" - IsForMe %d - %d/0x%x bytes\r\n",isforme,length,length);
+		logerror(" - IsForMe %d - %d/0x%x bytes\n",isforme,length,length);
 	}
 
 	if ( (length < ETHERNET_ADDR_SIZE || !isforme) && !(m_reg[EREG_RCR] & 0x0100) )
 	{
-		if (LOG_ETHERNET)
-			logerror("\r\n");
+		if ( LOG_ETHERNET )
+			logerror("\n");
 		// skip packet
 		return;
 	}
@@ -359,11 +361,11 @@ void smc91c9x_device::recv_cb(uint8_t *data, int length)
 
 	/* compute the packet length */
 
-	if( ( length < ( ETHER_BUFFER_SIZE - ( 2+2+2 )  ) ) )
+	if ( ( length < ( ETHER_BUFFER_SIZE - ( 2+2+2 ) ) ) )
 	{
 		packet = &m_rx[ ( rx_fifo_in & ( ETHER_RX_BUFFERS - 1 ) ) * ETHER_BUFFER_SIZE];
 
-		memset(packet,0x00,ETHER_BUFFER_SIZE);
+		std::fill(packet, packet + ETHER_BUFFER_SIZE, 0);
 
 		dst = 0;
 
@@ -371,8 +373,9 @@ void smc91c9x_device::recv_cb(uint8_t *data, int length)
 
 		// Status word
 		packet[dst++] = 0x00;
+
 		// set the broadcast flag
-		if (isforme==2)
+		if ( isforme == 2 )
 			packet[dst++] |= 0x40;
 		else
 			packet[dst++] = 0x00;
@@ -384,7 +387,7 @@ void smc91c9x_device::recv_cb(uint8_t *data, int length)
 		memcpy(&packet[dst], data, length );
 		dst += length;
 
-		if( dst & 1 )
+		if ( dst & 1 )
 		{
 			// ODD Frame
 			packet[dst++] = 0x40 | 0x20; // Control
@@ -408,14 +411,14 @@ void smc91c9x_device::recv_cb(uint8_t *data, int length)
 		rx_fifo_in = (rx_fifo_in + 1) & ( ETHER_RX_BUFFERS - 1 );
 	}
 	else{
-		if (LOG_ETHERNET)
+		if ( LOG_ETHERNET )
 			logerror("Rejected ! Fifo Full ?");
 	}
 
 	update_ethernet_irq();
 
-	if (LOG_ETHERNET)
-		logerror("\r\n");
+	if ( LOG_ETHERNET )
+		logerror("\n");
 }
 
 /***************************************************************************
@@ -433,7 +436,7 @@ void smc91c9x_device::update_ethernet_irq()
 
 	/* update the IRQ state */
 	m_irq_state = ((mask & state) != 0);
-	if (!m_irq_handler.isnull()) {
+	if ( !m_irq_handler.isnull() ) {
 		m_irq_handler(m_irq_state ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
@@ -445,7 +448,7 @@ void smc91c9x_device::update_ethernet_irq()
 
 void smc91c9x_device::update_stats()
 {
-	if (DISPLAY_STATS)
+	if ( DISPLAY_STATS )
 		popmessage("Sent:%d  Rec'd:%d", m_sent, m_recd);
 }
 
@@ -469,7 +472,7 @@ int smc91c9x_device::send_frame()
 	/* update the EPH register and stuff it in the first transmit word */
 	m_reg[EREG_EPH_STATUS] = 0x0001;
 
-	if (is_broadcast)
+	if ( is_broadcast )
 		m_reg[EREG_EPH_STATUS] |= 0x0040;
 
 	tx_buffer[0] = m_reg[EREG_EPH_STATUS];
@@ -485,28 +488,28 @@ int smc91c9x_device::send_frame()
 
 	int buffer_len = ((tx_buffer[3] << 8) | tx_buffer[2]) & 0x7ff;
 
-	if (LOG_ETHERNET)
+	if ( LOG_ETHERNET )
 	{
 		logerror("TX: ");
-		for(i=4;i<4+ETHERNET_ADDR_SIZE;i++)
+		for ( i = 4 ; i < 4+ETHERNET_ADDR_SIZE ; i++ )
 		{
 			logerror("%.2X",tx_buffer[i]);
 		}
 
 		logerror(" ");
 
-		for(i=0;i<buffer_len-(ETHERNET_ADDR_SIZE+4);i++)
+		for ( i = 0 ; i < buffer_len-(ETHERNET_ADDR_SIZE+4) ; i++ )
 		{
 			logerror("%.2X",tx_buffer[4+ETHERNET_ADDR_SIZE+i]);
 		}
 
-		logerror("--- %d/0x%x bytes\r\n",buffer_len,buffer_len);
+		logerror("--- %d/0x%x bytes\n",buffer_len,buffer_len);
 	}
 
-	if(buffer_len>4)
+	if ( buffer_len > 4 )
 	{
 		// odd or even sized frame ?
-		if(tx_buffer[buffer_len-1] & 0x20)
+		if ( tx_buffer[buffer_len-1] & 0x20 )
 			buffer_len--;
 		else
 			buffer_len -= 2;
@@ -514,10 +517,10 @@ int smc91c9x_device::send_frame()
 		if ( !(m_reg[EREG_TCR] & 0x2002) )
 		{
 			// No loopback... Send the frame
-			if (!send(&tx_buffer[4], buffer_len-4))
+			if ( !send(&tx_buffer[4], buffer_len-4) )
 			{
 				// FIXME: failed to send the Ethernet packet
-				//logerror("failed to send Ethernet packet\r\n");
+				//logerror("failed to send Ethernet packet\n");
 				//LOG(this,("read_command_port(): !!! failed to send Ethernet packet"));
 			}
 		}
@@ -539,12 +542,12 @@ void smc91c9x_device::process_command(uint16_t data)
 	switch ((data >> 4) & 0xF)
 	{
 		case ECMD_NOP:
-			if (LOG_ETHERNET)
+			if ( LOG_ETHERNET )
 				logerror("   NOP\n");
 			break;
 
 		case ECMD_ALLOCATE:
-			if (LOG_ETHERNET)
+			if ( LOG_ETHERNET )
 				logerror("   ALLOCATE MEMORY FOR TX (%d)\n", (data & 7));
 			m_reg[EREG_PNR_ARR] &= ~0xff00;
 			m_reg[EREG_PNR_ARR] |= (m_alloc_count++ & 0x7F) << 8;
@@ -560,7 +563,7 @@ void smc91c9x_device::process_command(uint16_t data)
 			interrupts, resets packet FIFO pointers.
 			*/
 
-			if (LOG_ETHERNET)
+			if ( LOG_ETHERNET )
 				logerror("   RESET MMU\n");
 			// Flush fifos.
 			clear_tx_fifo();
@@ -568,24 +571,24 @@ void smc91c9x_device::process_command(uint16_t data)
 			break;
 
 		case ECMD_REMOVE_TOPFRAME_TX:
-			if (LOG_ETHERNET)
+			if ( LOG_ETHERNET )
 				logerror("   REMOVE FRAME FROM TX FIFO\n");
 			break;
 
 		case ECMD_REMOVE_TOPFRAME_RX:
-			if (LOG_ETHERNET)
+			if ( LOG_ETHERNET )
 				logerror("   REMOVE FRAME FROM RX FIFO\n");
 
 		case ECMD_REMOVE_RELEASE_TOPFRAME_RX:
-			if (LOG_ETHERNET)
+			if ( LOG_ETHERNET )
 				logerror("   REMOVE AND RELEASE FRAME FROM RX FIFO (RXI=%d RXO=%d)\n",rx_fifo_in & ( ETHER_RX_BUFFERS - 1 ),rx_fifo_out & ( ETHER_RX_BUFFERS - 1 ));
 
 			m_reg[EREG_INTERRUPT] &= ~EINT_RCV;
 
-			if( (rx_fifo_in & ( ETHER_RX_BUFFERS - 1 ) ) != (rx_fifo_out & ( ETHER_RX_BUFFERS - 1 ) ) )
+			if ( (rx_fifo_in & ( ETHER_RX_BUFFERS - 1 ) ) != (rx_fifo_out & ( ETHER_RX_BUFFERS - 1 ) ) )
 				rx_fifo_out = ( (rx_fifo_out + 1) & ( ETHER_RX_BUFFERS - 1 ) );
 
-			if( (rx_fifo_in & ( ETHER_RX_BUFFERS - 1 ) ) != (rx_fifo_out & ( ETHER_RX_BUFFERS - 1 ) ) )
+			if ( (rx_fifo_in & ( ETHER_RX_BUFFERS - 1 ) ) != (rx_fifo_out & ( ETHER_RX_BUFFERS - 1 ) ) )
 			{
 				m_reg[EREG_INTERRUPT] |= EINT_RCV;
 				m_reg[EREG_FIFO_PORTS] &= ~0x8000;
@@ -599,18 +602,18 @@ void smc91c9x_device::process_command(uint16_t data)
 			break;
 
 		case ECMD_RELEASE_PACKET:
-			if (LOG_ETHERNET)
+			if ( LOG_ETHERNET )
 				logerror("   RELEASE SPECIFIC PACKET\n");
 			break;
 
 		case ECMD_ENQUEUE_PACKET:
-			if (LOG_ETHERNET)
+			if ( LOG_ETHERNET )
 				logerror("   ENQUEUE TX PACKET\n");
 
-			if (m_link_unconnected)
+			if ( m_link_unconnected )
 			{
 				// Set lost carrier
-				if (m_reg[EREG_TCR] & 0x0400)
+				if ( m_reg[EREG_TCR] & 0x0400 )
 				{
 					m_reg[EREG_EPH_STATUS] |= 0x400;
 					// Clear Tx Enable on error
@@ -618,7 +621,7 @@ void smc91c9x_device::process_command(uint16_t data)
 				}
 
 				// Set signal quality error
-				if (m_reg[EREG_TCR] & 0x1000)
+				if ( m_reg[EREG_TCR] & 0x1000 )
 				{
 					m_reg[EREG_EPH_STATUS] |= 0x20;
 					// Clear Tx Enable on error
@@ -636,7 +639,7 @@ void smc91c9x_device::process_command(uint16_t data)
 			}
 			else
 			{
-				if (m_reg[EREG_TCR] & 0x0001) // TX EN ?
+				if ( m_reg[EREG_TCR] & 0x0001 ) // TX EN ?
 				{
 					send_frame();
 				}
@@ -647,7 +650,7 @@ void smc91c9x_device::process_command(uint16_t data)
 			break;
 
 		case ECMD_RESET_FIFOS:
-			if (LOG_ETHERNET)
+			if ( LOG_ETHERNET )
 				logerror("   RESET TX FIFOS\n");
 			// Flush fifos.
 			clear_tx_fifo();
@@ -675,7 +678,7 @@ READ16_MEMBER( smc91c9x_device::read )
 
 	/* determine the effective register */
 	offset %= 8;
-	if (offset != EREG_BANK)
+	if ( offset != EREG_BANK )
 		offset += 8 * (m_reg[EREG_BANK] & 7);
 
 	result = m_reg[offset];
@@ -688,7 +691,7 @@ READ16_MEMBER( smc91c9x_device::read )
 			break;
 
 		case EREG_PNR_ARR:
-			if (ACCESSING_BITS_8_15)
+			if ( ACCESSING_BITS_8_15 )
 			{
 				m_reg[EREG_INTERRUPT] &= ~0x0008;
 				update_ethernet_irq();
@@ -701,7 +704,7 @@ READ16_MEMBER( smc91c9x_device::read )
 			uint8_t *buffer;
 			int addr = m_reg[EREG_POINTER] & 0x7ff;
 
-			if(m_reg[EREG_POINTER] & 0x8000)
+			if ( m_reg[EREG_POINTER] & 0x8000 )
 			{
 				buffer = &m_rx[(rx_fifo_out & ( ETHER_RX_BUFFERS - 1 )) * ETHER_BUFFER_SIZE];
 			}
@@ -711,16 +714,16 @@ READ16_MEMBER( smc91c9x_device::read )
 			}
 
 			result = buffer[addr++];
-			if (ACCESSING_BITS_8_15)
+			if ( ACCESSING_BITS_8_15 )
 				result |= buffer[addr++] << 8;
-			if (m_reg[EREG_POINTER] & 0x4000)
+			if ( m_reg[EREG_POINTER] & 0x4000 )
 				m_reg[EREG_POINTER] = (m_reg[EREG_POINTER] & ~0x7ff) | (addr & 0x7ff);
 			break;
 		}
 	}
 
-	if (LOG_ETHERNET && offset != EREG_BANK)
-		logerror("%s:smc91c9x_r(%s) = %04X & %04X\n", (machine().describe_context()).c_str(), ethernet_regname[offset], result, mem_mask);
+	if ( LOG_ETHERNET && offset != EREG_BANK )
+		logerror("%s:smc91c9x_r(%s) = %04X & %04X\n", machine().describe_context(), ethernet_regname[offset], result, mem_mask);
 	return result;
 }
 
@@ -733,13 +736,13 @@ WRITE16_MEMBER( smc91c9x_device::write )
 {
 	/* determine the effective register */
 	offset %= 8;
-	if (offset != EREG_BANK)
+	if ( offset != EREG_BANK )
 		offset += 8 * (m_reg[EREG_BANK] & 7);
 
 	/* update the data generically */
 
-	if (LOG_ETHERNET && offset != 7 && offset < sizeof(m_reg))
-		logerror("%s:smc91c9x_w(%s) = [%04X]<-%04X & (%04X & %04X)\n", (machine().describe_context()).c_str(), ethernet_regname[offset], offset, data, mem_mask , m_regmask[offset]);
+	if ( LOG_ETHERNET && offset != 7 && offset < sizeof(m_reg) )
+		logerror("%s:smc91c9x_w(%s) = [%04X]<-%04X & (%04X & %04X)\n", machine().describe_context(), ethernet_regname[offset], offset, data, mem_mask , m_regmask[offset]);
 
 	mem_mask &= m_regmask[offset];
 	COMBINE_DATA(&m_reg[offset]);
@@ -749,68 +752,68 @@ WRITE16_MEMBER( smc91c9x_device::write )
 	{
 		case EREG_TCR:      /* transmit control register */
 			// Setting Tx Enable clears some status and interrupts
-			if (data & 0x1) {
+			if ( data & 0x1 ) {
 				m_reg[EREG_EPH_STATUS] &= ~0x420;
 				m_reg[EREG_INTERRUPT] &= ~EINT_EPH;
 				update_ethernet_irq();
 			}
 
-			if (LOG_ETHERNET)
+			if ( LOG_ETHERNET )
 			{
-				if (data & 0x2000) logerror("   EPH LOOP\n");
-				if (data & 0x1000) logerror("   STP SQET\n");
-				if (data & 0x0800) logerror("   FDUPLX\n");
-				if (data & 0x0400) logerror("   MON_CSN\n");
-				if (data & 0x0100) logerror("   NOCRC\n");
-				if (data & 0x0080) logerror("   PAD_EN\n");
-				if (data & 0x0004) logerror("   FORCOL\n");
-				if (data & 0x0002) logerror("   LOOP\n");
-				if (data & 0x0001) logerror("   TXENA\n");
+				if ( data & 0x2000 ) logerror("   EPH LOOP\n");
+				if ( data & 0x1000 ) logerror("   STP SQET\n");
+				if ( data & 0x0800 ) logerror("   FDUPLX\n");
+				if ( data & 0x0400 ) logerror("   MON_CSN\n");
+				if ( data & 0x0100 ) logerror("   NOCRC\n");
+				if ( data & 0x0080 ) logerror("   PAD_EN\n");
+				if ( data & 0x0004 ) logerror("   FORCOL\n");
+				if ( data & 0x0002 ) logerror("   LOOP\n");
+				if ( data & 0x0001 ) logerror("   TXENA\n");
 			}
 			break;
 
 		case EREG_RCR:      /* receive control register */
 
-			if (data & 0x8000)
+			if ( data & 0x8000 )
 			{
 				clear_rx_fifo();
 				clear_tx_fifo();
 			}
 
-			if (!(data & 0x0100))
+			if ( !(data & 0x0100) )
 			{
 				clear_rx_fifo();
 			}
 
-			if (LOG_ETHERNET)
+			if ( LOG_ETHERNET )
 			{
-				if (data & 0x8000) reset();
-				if (data & 0x8000) logerror("   SOFT RST\n");
-				if (data & 0x4000) logerror("   FILT_CAR\n");
-				if (data & 0x0200) logerror("   STRIP CRC\n");
-				if (data & 0x0100) logerror("   RXEN\n");
-				if (data & 0x0004) logerror("   ALMUL\n");
-				if (data & 0x0002) logerror("   PRMS\n");
-				if (data & 0x0001) logerror("   RX_ABORT\n");
+				if ( data & 0x8000 ) reset();
+				if ( data & 0x8000 ) logerror("   SOFT RST\n");
+				if ( data & 0x4000 ) logerror("   FILT_CAR\n");
+				if ( data & 0x0200 ) logerror("   STRIP CRC\n");
+				if ( data & 0x0100 ) logerror("   RXEN\n");
+				if ( data & 0x0004 ) logerror("   ALMUL\n");
+				if ( data & 0x0002 ) logerror("   PRMS\n");
+				if ( data & 0x0001 ) logerror("   RX_ABORT\n");
 			}
 			break;
 
 		case EREG_CONFIG:       /* configuration register */
-			if (LOG_ETHERNET)
+			if ( LOG_ETHERNET )
 			{
-				if (data & 0x1000) logerror("   NO WAIT\n");
-				if (data & 0x0400) logerror("   FULL STEP\n");
-				if (data & 0x0200) logerror("   SET SQLCH\n");
-				if (data & 0x0100) logerror("   AUI SELECT\n");
-				if (data & 0x0080) logerror("   16 BIT\n");
-				if (data & 0x0040) logerror("   DIS LINK\n");
-				if (data & 0x0004) logerror("   INT SEL1\n");
-				if (data & 0x0002) logerror("   INT SEL0\n");
+				if ( data & 0x1000 ) logerror("   NO WAIT\n");
+				if ( data & 0x0400 ) logerror("   FULL STEP\n");
+				if ( data & 0x0200 ) logerror("   SET SQLCH\n");
+				if ( data & 0x0100 ) logerror("   AUI SELECT\n");
+				if ( data & 0x0080 ) logerror("   16 BIT\n");
+				if ( data & 0x0040 ) logerror("   DIS LINK\n");
+				if ( data & 0x0004 ) logerror("   INT SEL1\n");
+				if ( data & 0x0002 ) logerror("   INT SEL0\n");
 			}
 			break;
 
 		case EREG_BASE:     /* base address register */
-			if (LOG_ETHERNET)
+			if ( LOG_ETHERNET )
 			{
 				logerror("   base = $%04X\n", (data & 0xe000) | ((data & 0x1f00) >> 3));
 				logerror("   romsize = %d\n", ((data & 0xc0) >> 6));
@@ -819,17 +822,17 @@ WRITE16_MEMBER( smc91c9x_device::write )
 			break;
 
 		case EREG_CONTROL:      /* control register */
-			if (LOG_ETHERNET)
+			if ( LOG_ETHERNET )
 			{
-				if (data & 0x4000) logerror("   RCV_BAD\n");
-				if (data & 0x2000) logerror("   PWRDN\n");
-				if (data & 0x0800) logerror("   AUTO RELEASE\n");
-				if (data & 0x0080) logerror("   LE ENABLE\n");
-				if (data & 0x0040) logerror("   CR ENABLE\n");
-				if (data & 0x0020) logerror("   TE ENABLE\n");
-				if (data & 0x0004) logerror("   EEPROM SELECT\n");
-				if (data & 0x0002) logerror("   RELOAD\n");
-				if (data & 0x0001) logerror("   STORE\n");
+				if ( data & 0x4000 ) logerror("   RCV_BAD\n");
+				if ( data & 0x2000 ) logerror("   PWRDN\n");
+				if ( data & 0x0800 ) logerror("   AUTO RELEASE\n");
+				if ( data & 0x0080 ) logerror("   LE ENABLE\n");
+				if ( data & 0x0040 ) logerror("   CR ENABLE\n");
+				if ( data & 0x0020 ) logerror("   TE ENABLE\n");
+				if ( data & 0x0004 ) logerror("   EEPROM SELECT\n");
+				if ( data & 0x0002 ) logerror("   RELOAD\n");
+				if ( data & 0x0001 ) logerror("   STORE\n");
 			}
 			break;
 
@@ -843,7 +846,7 @@ WRITE16_MEMBER( smc91c9x_device::write )
 			uint8_t *buffer;
 			int addr = m_reg[EREG_POINTER] & 0x7ff;
 
-			if(m_reg[EREG_POINTER] & 0x8000)
+			if ( m_reg[EREG_POINTER] & 0x8000 )
 			{
 				buffer = &m_rx[(rx_fifo_out & ( ETHER_RX_BUFFERS - 1 )) * ETHER_BUFFER_SIZE];
 			}
@@ -853,9 +856,9 @@ WRITE16_MEMBER( smc91c9x_device::write )
 			}
 
 			buffer[addr++] = data;
-			if (ACCESSING_BITS_8_15)
+			if ( ACCESSING_BITS_8_15 )
 				buffer[addr++] = data >> 8;
-			if (m_reg[EREG_POINTER] & 0x4000)
+			if ( m_reg[EREG_POINTER] & 0x4000 )
 				m_reg[EREG_POINTER] = (m_reg[EREG_POINTER] & ~0x7ff) | (addr & 0x7ff);
 			break;
 		}
@@ -863,7 +866,7 @@ WRITE16_MEMBER( smc91c9x_device::write )
 		case EREG_INTERRUPT:
 			m_reg[EREG_INTERRUPT] &= ~(data & 0x56);
 			// Need to clear tx int here for vegas cartfury
-			if (m_reg[EREG_FIFO_PORTS] & 0x0080)
+			if ( m_reg[EREG_FIFO_PORTS] & 0x0080 )
 				m_reg[EREG_INTERRUPT] &= ~EINT_TX;
 			update_ethernet_irq();
 			break;
