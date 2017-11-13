@@ -1721,42 +1721,6 @@ offs_t hyperstone_device::disasm_disassemble(std::ostream &stream, offs_t pc, co
 
 /* Opcodes */
 
-void hyperstone_device::hyperstone_subc(regs_decode &decode)
-{
-	uint64_t tmp;
-
-	if (SRC_IS_SR)
-	{
-		tmp = (uint64_t)(DREG) - (uint64_t)(GET_C);
-		CHECK_VSUB(GET_C,DREG,tmp);
-	}
-	else
-	{
-		tmp = (uint64_t)(DREG) - ((uint64_t)(SREG) + (uint64_t)(GET_C));
-		//CHECK!
-		CHECK_VSUB((SREG + GET_C),DREG,tmp);
-	}
-
-
-	if (SRC_IS_SR)
-	{
-		DREG = DREG - GET_C;
-	}
-	else
-	{
-		DREG = DREG - (SREG + GET_C);
-	}
-
-	CHECK_C(tmp);
-
-	SET_DREG(DREG);
-
-	SET_Z(GET_Z & (DREG == 0 ? 1 : 0));
-	SET_N(SIGN_BIT(DREG));
-
-	m_icount -= m_clock_cycles_1;
-}
-
 void hyperstone_device::hyperstone_subs(regs_decode &decode)
 {
 	if (SRC_IS_SR)
@@ -2103,10 +2067,10 @@ void hyperstone_device::execute_run()
 			case 0x3d: hyperstone_xor_global_local(); break;
 			case 0x3e: hyperstone_xor_local_global(); break;
 			case 0x3f: hyperstone_xor_local_local(); break;
-			case 0x40: op40(); break;
-			case 0x41: op41(); break;
-			case 0x42: op42(); break;
-			case 0x43: op43(); break;
+			case 0x40: hyperstone_subc_global_global(); break;
+			case 0x41: hyperstone_subc_global_local(); break;
+			case 0x42: hyperstone_subc_local_global(); break;
+			case 0x43: hyperstone_subc_local_local(); break;
 			case 0x44: hyperstone_not_global_global(); break;
 			case 0x45: hyperstone_not_global_local(); break;
 			case 0x46: hyperstone_not_local_global(); break;

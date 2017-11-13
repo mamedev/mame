@@ -1780,93 +1780,131 @@ void hyperstone_device::hyperstone_xor_local_local()
 
 
 
-void hyperstone_device::op40()
+void hyperstone_device::hyperstone_subc_global_global()
 {
-	regs_decode decode;
-	check_delay_PC();
-	decode.src = SRC_CODE;
-	decode.dst = DST_CODE;
+	const uint32_t src_code = SRC_CODE;
+	const uint32_t dst_code = DST_CODE;
+	uint32_t dreg = m_global_regs[dst_code];
 
-	decode.src_is_local = 0;
-	SREG = m_global_regs[decode.src];
-	SREGF = m_global_regs[decode.src + 1];
+	if (src_code == SR_REGISTER)
+	{
+		const uint32_t c = SR & C_MASK;
+		const uint64_t tmp = (uint64_t)dreg - (uint64_t)c;
+		SR &= ~(C_MASK | V_MASK | Z_MASK | N_MASK);
+		SR |= ((tmp ^ dreg) & dreg & 0x80000000);
+		SR |= (tmp & 0x100000000L) >> 32;
+		dreg -= c;
+	}
+	else
+	{
+		const uint32_t sreg = m_global_regs[src_code];
+		const uint32_t c = SR & C_MASK;
+		const uint64_t tmp = (uint64_t)dreg - ((uint64_t)sreg + (uint64_t)c);
+		SR &= ~(C_MASK | V_MASK | Z_MASK | N_MASK);
+		//CHECK!
+		const uint32_t sreg_c = sreg + c;
+		SR |= ((tmp ^ dreg) & (dreg ^ sreg_c) & 0x80000000);
+		SR |= (tmp & 0x100000000L) >> 32;
+		dreg -= sreg_c;
+	}
 
-	decode.dst_is_local = 0;
-	DREG = m_global_regs[decode.dst];
-	DREGF = m_global_regs[decode.dst + 1];
+	set_global_register(DST_CODE, dreg);
 
-	decode.same_src_dst = (SRC_CODE == DST_CODE);
-	decode.same_src_dstf = (SRC_CODE == (DST_CODE + 1));
-	decode.same_srcf_dst = ((SRC_CODE + 1) == DST_CODE);
-	hyperstone_subc(decode);
-	printf("0x40, subc global,global\n");
+	if (dreg == 0)
+		SR |= Z_MASK;
+	SR |= SIGN_TO_N(dreg);
+
+	m_icount -= m_clock_cycles_1;
 }
 
-void hyperstone_device::op41()
+void hyperstone_device::hyperstone_subc_global_local()
 {
-	regs_decode decode;
-	check_delay_PC();
-	decode.src = SRC_CODE;
-	decode.dst = DST_CODE;
+	const uint32_t dst_code = DST_CODE;
+	const uint32_t sreg = m_local_regs[(SRC_CODE + GET_FP) & 0x3f];
+	uint32_t dreg = m_global_regs[dst_code];
 
-	decode.src_is_local = 1;
-	SREG = m_local_regs[(decode.src + GET_FP) & 0x3f];
-	SREGF = m_local_regs[(decode.src + 1 + GET_FP) & 0x3f];
+	const uint32_t c = SR & C_MASK;
+	const uint64_t tmp = (uint64_t)dreg - ((uint64_t)sreg + (uint64_t)c);
 
-	decode.dst_is_local = 0;
-	DREG = m_global_regs[decode.dst];
-	DREGF = m_global_regs[decode.dst + 1];
+	//CHECK!
+	const uint32_t sreg_c = sreg + c;
 
-	decode.same_src_dst = 0;
-	decode.same_src_dstf = 0;
-	decode.same_srcf_dst = 0;
-	hyperstone_subc(decode);
-	printf("0x41, subc global,global\n");
+	SR &= ~(C_MASK | V_MASK | Z_MASK | N_MASK);
+	SR |= ((tmp ^ dreg) & (dreg ^ sreg_c) & 0x80000000);
+	SR |= (tmp & 0x100000000L) >> 32;
+	dreg -= sreg_c;
+
+	set_global_register(dst_code, dreg);
+
+	if (dreg == 0)
+		SR |= Z_MASK;
+	SR |= SIGN_TO_N(dreg);
+
+	m_icount -= m_clock_cycles_1;
 }
 
-void hyperstone_device::op42()
+void hyperstone_device::hyperstone_subc_local_global()
 {
-	regs_decode decode;
-	check_delay_PC();
-	decode.src = SRC_CODE;
-	decode.dst = DST_CODE;
-	decode.src_is_local = 0;
+	const uint32_t src_code = SRC_CODE;
+	const uint32_t dst_code = (DST_CODE + GET_FP) & 0x3f;
+	uint32_t dreg = m_local_regs[dst_code];
 
-	SREG = m_global_regs[decode.src];
-	SREGF = m_global_regs[decode.src + 1];
+	if (src_code == SR_REGISTER)
+	{
+		const uint32_t c = SR & C_MASK;
+		const uint64_t tmp = (uint64_t)dreg - (uint64_t)c;
+		SR &= ~(C_MASK | V_MASK | Z_MASK | N_MASK);
+		SR |= ((tmp ^ dreg) & dreg & 0x80000000);
+		SR |= (tmp & 0x100000000L) >> 32;
+		dreg -= c;
+	}
+	else
+	{
+		const uint32_t sreg = m_global_regs[src_code];
+		const uint32_t c = SR & C_MASK;
+		const uint64_t tmp = (uint64_t)dreg - ((uint64_t)sreg + (uint64_t)c);
+		SR &= ~(C_MASK | V_MASK | Z_MASK | N_MASK);
+		//CHECK!
+		const uint32_t sreg_c = sreg + c;
+		SR |= ((tmp ^ dreg) & (dreg ^ sreg_c) & 0x80000000);
+		SR |= (tmp & 0x100000000L) >> 32;
+		dreg -= sreg_c;
+	}
 
-	decode.dst_is_local = 1;
-	DREG = m_local_regs[(decode.dst + GET_FP) & 0x3f]; /* registers offset by frame pointer */
-	DREGF = m_local_regs[(decode.dst + 1 + GET_FP) & 0x3f];
+	m_local_regs[dst_code] = dreg;
 
-	decode.same_src_dst = 0;
-	decode.same_src_dstf = 0;
-	decode.same_srcf_dst = 0;
-	hyperstone_subc(decode);
-	printf("0x42, subc global,global\n");
+	if (dreg == 0)
+		SR |= Z_MASK;
+	SR |= SIGN_TO_N(dreg);
+
+	m_icount -= m_clock_cycles_1;
 }
 
-void hyperstone_device::op43()
+void hyperstone_device::hyperstone_subc_local_local()
 {
-	regs_decode decode;
-	check_delay_PC();
-	decode.src = SRC_CODE;
-	decode.dst = DST_CODE;
+	const uint32_t fp = GET_FP;
+	const uint32_t dst_code = (DST_CODE + fp) & 0x3f;
+	const uint32_t sreg = m_local_regs[(SRC_CODE + fp) & 0x3f];
+	uint32_t dreg = m_local_regs[dst_code];
 
-	decode.src_is_local = 1;
-	SREG = m_local_regs[(decode.src + GET_FP) & 0x3f];
-	SREGF = m_local_regs[(decode.src + 1 + GET_FP) & 0x3f];
+	const uint32_t c = SR & C_MASK;
+	const uint64_t tmp = (uint64_t)dreg - ((uint64_t)sreg + (uint64_t)c);
 
-	decode.dst_is_local = 1;
-	DREG = m_local_regs[(decode.dst + GET_FP) & 0x3f]; /* registers offset by frame pointer */
-	DREGF = m_local_regs[(decode.dst + 1 + GET_FP) & 0x3f];
+	//CHECK!
+	const uint32_t sreg_c = sreg + c;
 
-	decode.same_src_dst = (SRC_CODE == DST_CODE);
-	decode.same_src_dstf = (SRC_CODE == ((DST_CODE + 1) & 0x3f));
-	decode.same_srcf_dst = (((SRC_CODE + 1) & 0x3f) == DST_CODE);
+	SR &= ~(C_MASK | V_MASK | Z_MASK | N_MASK);
+	SR |= ((tmp ^ dreg) & (dreg ^ sreg_c) & 0x80000000);
+	SR |= (tmp & 0x100000000L) >> 32;
+	dreg -= sreg_c;
 
-	hyperstone_subc(decode);
-	//printf("0x43, subc global,global\n");
+	m_local_regs[dst_code] = dreg;
+
+	if (dreg == 0)
+		SR |= Z_MASK;
+	SR |= SIGN_TO_N(dreg);
+
+	m_icount -= m_clock_cycles_1;
 }
 
 void hyperstone_device::hyperstone_not_global_global()

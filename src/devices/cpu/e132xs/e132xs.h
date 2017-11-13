@@ -257,7 +257,6 @@ private:
 	void hyperstone_cmp_global_local();
 	void hyperstone_cmp_local_global();
 	void hyperstone_cmp_local_local();
-	void hyperstone_mov(regs_decode &decode);
 	void hyperstone_mov_global_global();
 	void hyperstone_mov_global_local();
 	void hyperstone_mov_local_global();
@@ -274,7 +273,10 @@ private:
 	void hyperstone_cmpb_global_local();
 	void hyperstone_cmpb_local_global();
 	void hyperstone_cmpb_local_local();
-	void hyperstone_subc(regs_decode &decode);
+	void hyperstone_subc_global_global();
+	void hyperstone_subc_global_local();
+	void hyperstone_subc_local_global();
+	void hyperstone_subc_local_local();
 	void hyperstone_sub_global_global();
 	void hyperstone_sub_global_local();
 	void hyperstone_sub_local_global();
@@ -316,12 +318,10 @@ private:
 	void hyperstone_cmpi_global_limm();
 	void hyperstone_cmpi_local_simm();
 	void hyperstone_cmpi_local_limm();
-	void hyperstone_movi(regs_decode &decode);
 	void hyperstone_movi_global_simm();
 	void hyperstone_movi_global_limm();
 	void hyperstone_movi_local_simm();
 	void hyperstone_movi_local_limm();
-	void hyperstone_addi(regs_decode &decode);
 	void hyperstone_addi_global_simm();
 	void hyperstone_addi_global_limm();
 	void hyperstone_addi_local_simm();
@@ -465,7 +465,6 @@ private:
 	bool generate_opcode(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
 #endif
 
-	void op40();    void op41();    void op42();    void op43(); // subc
 	void op4c();    void op4d();    void op4e();    void op4f(); // subs
 
 #if 0
