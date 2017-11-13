@@ -90,6 +90,18 @@
         93Cxx has ERASE command; this maps to WRITE on ER5911
         93Cxx has WRITEALL command; no equivalent on ER5911
 
+    The Xicor X2444 NOVRAM (static RAM/EEPROM overlay) has a pin-compatible
+    serial interface, but its commands follow a rather different format:
+
+        Start   Address     Opcode      Command
+          1      aaaa        011        WRITE data
+          1      aaaa        11x        READ data
+          1      xxxx        000        WRDS = WRite DiSable
+          1      xxxx        001        STO = STOre RAM data in EEPROM
+          1      xxxx        010        SLEEP mode (not in CMOS version)
+          1      xxxx        100        WREN = WRite ENable
+          1      xxxx        101        RCL = ReCaLl RAM data from EEPROM
+
 ****************************************************************************
 
     Issues with:
