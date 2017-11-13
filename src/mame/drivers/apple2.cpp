@@ -949,7 +949,7 @@ static ADDRESS_MAP_START( apple2_map, AS_PROGRAM, 8, napple2_state )
 	AM_RANGE(0xc010, 0xc010) AM_MIRROR(0xf) AM_READWRITE(keyb_strobe_r, keyb_strobe_w)
 	AM_RANGE(0xc020, 0xc020) AM_MIRROR(0xf) AM_READWRITE(cassette_toggle_r, cassette_toggle_w)
 	AM_RANGE(0xc030, 0xc030) AM_MIRROR(0xf) AM_READWRITE(speaker_toggle_r, speaker_toggle_w)
-	AM_RANGE(0xc040, 0xc04f) AM_MIRROR(0xf) AM_READWRITE(utility_strobe_r, utility_strobe_w)
+	AM_RANGE(0xc040, 0xc040) AM_MIRROR(0xf) AM_READWRITE(utility_strobe_r, utility_strobe_w)
 	AM_RANGE(0xc050, 0xc05f) AM_READ(switches_r) AM_DEVWRITE("softlatch", addressable_latch_device, write_a0)
 	AM_RANGE(0xc060, 0xc067) AM_MIRROR(0x8) AM_READ(flags_r) AM_WRITENOP // includes IIgs STATE register, which ProDOS touches
 	AM_RANGE(0xc070, 0xc070) AM_MIRROR(0xf) AM_READWRITE(controller_strobe_r, controller_strobe_w)
