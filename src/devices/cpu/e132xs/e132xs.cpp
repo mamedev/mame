@@ -1103,7 +1103,6 @@ void hyperstone_device::init(int scale_mask)
 {
 	memset(m_global_regs, 0, sizeof(uint32_t) * 32);
 	memset(m_local_regs, 0, sizeof(uint32_t) * 64);
-	memset(m_opcode_hits, 0, sizeof(uint64_t) * 256);
 	m_ppc = 0;
 	m_op = 0;
 	m_trap_entry = 0;
@@ -1395,33 +1394,6 @@ void hyperstone_device::device_reset()
 
 void hyperstone_device::device_stop()
 {
-#if 0
-	int indices[256];
-	for (int i = 0; i < 256; i++)
-	{
-		indices[i] = i;
-	}
-	for (int i = 0; i < 256; i++)
-	{
-		for (int j = i + 1; j < 256; j++)
-		{
-			if (m_opcode_hits[i] > m_opcode_hits[j])
-			{
-				uint64_t tmp = m_opcode_hits[i];
-				m_opcode_hits[i] = m_opcode_hits[j];
-				m_opcode_hits[j] = tmp;
-				int tmpi = indices[i];
-				indices[i] = indices[j];
-				indices[j] = tmpi;
-			}
-		}
-	}
-
-	for (int i = 255; i >= 0 && m_opcode_hits[i] != 0; i--)
-	{
-		printf("%02x: %08x%08x\n", indices[i], (uint32_t)(m_opcode_hits[i] >> 32), (uint32_t)m_opcode_hits[i]);
-	}
-#endif
 }
 
 
@@ -1628,6 +1600,16 @@ void hyperstone_device::execute_set_input(int inputnum, int state)
 		ISR &= ~(1 << inputnum);
 }
 
+void hyperstone_device::hyperstone_reserved()
+{
+	DEBUG_PRINTF(("Executed Reserved opcode. PC = %08X OP = %04X\n", PC, OP));
+}
+
+void hyperstone_device::hyperstone_do()
+{
+	fatalerror("Executed hyperstone_do instruction. PC = %08X\n", PPC);
+}
+
 //-------------------------------------------------
 //  execute_run - execute a timeslice's worth of
 //  opcodes
@@ -1652,9 +1634,6 @@ void hyperstone_device::execute_run()
 
 		m_instruction_length = (1<<19);
 
-#if 1
-		//m_opcode_hits[(OP >> 8) & 0x00ff]++;
-		/* execute opcode */
 		switch ((OP >> 8) & 0x00ff)
 		{
 			case 0x00: hyperstone_chk_global_global(); break;
@@ -1797,8 +1776,8 @@ void hyperstone_device::execute_run()
 			case 0x89: hyperstone_shldi(); break;
 			case 0x8a: hyperstone_shld(); break;
 			case 0x8b: hyperstone_shl(); break;
-			case 0x8c: DEBUG_PRINTF(("Executed Reserved opcode. PC = %08X OP = %04X\n", PC, OP)); break;
-			case 0x8d: DEBUG_PRINTF(("Executed Reserved opcode. PC = %08X OP = %04X\n", PC, OP)); break;
+			case 0x8c: hyperstone_reserved(); break;
+			case 0x8d: hyperstone_reserved(); break;
 			case 0x8e: hyperstone_testlz(); break;
 			case 0x8f: hyperstone_rol(); break;
 			case 0x90: hyperstone_ldxx1_global_global(); break;
@@ -1829,10 +1808,10 @@ void hyperstone_device::execute_run()
 			case 0xa9: hyperstone_shli_global(); break;
 			case 0xaa: hyperstone_shli_local(); break;
 			case 0xab: hyperstone_shli_local(); break;
-			case 0xac: DEBUG_PRINTF(("Executed Reserved opcode. PC = %08X OP = %04X\n", PC, OP)); break;
-			case 0xad: DEBUG_PRINTF(("Executed Reserved opcode. PC = %08X OP = %04X\n", PC, OP)); break;
-			case 0xae: DEBUG_PRINTF(("Executed Reserved opcode. PC = %08X OP = %04X\n", PC, OP)); break;
-			case 0xaf: DEBUG_PRINTF(("Executed Reserved opcode. PC = %08X OP = %04X\n", PC, OP)); break;
+			case 0xac: hyperstone_reserved(); break;
+			case 0xad: hyperstone_reserved(); break;
+			case 0xae: hyperstone_reserved(); break;
+			case 0xaf: hyperstone_reserved(); break;
 			case 0xb0: hyperstone_mulu_global_global(); break;
 			case 0xb1: hyperstone_mulu_global_local(); break;
 			case 0xb2: hyperstone_mulu_local_global(); break;
@@ -1864,7 +1843,7 @@ void hyperstone_device::execute_run()
 			case 0xcc: execute_software(); break; // fcvt
 			case 0xcd: execute_software(); break; // fcvtd
 			case 0xce: hyperstone_extend(); break;
-			case 0xcf: fatalerror("Executed hyperstone_do instruction. PC = %08X\n", PPC); break;
+			case 0xcf: hyperstone_do(); break;
 			case 0xd0: hyperstone_ldwr_global_local(); break;
 			case 0xd1: hyperstone_ldwr_local_local(); break;
 			case 0xd2: hyperstone_lddr_global_local(); break;
@@ -1914,9 +1893,6 @@ void hyperstone_device::execute_run()
 			case 0xfe: hyperstone_trap(); break;
 			case 0xff: hyperstone_trap(); break;
 		}
-#else
-		(this->*m_opcode[(OP & 0xff00) >> 8])();
-#endif
 
 		/* clear the H state if it was previously set */
 		SR ^= oldh;

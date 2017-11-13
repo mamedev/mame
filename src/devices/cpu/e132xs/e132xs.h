@@ -166,10 +166,6 @@ protected:
 	// other internal state
 	int     m_icount;
 
-	typedef void (hyperstone_device::*ophandler)();
-
-	ophandler m_opcode[256];
-	uint64_t m_opcode_hits[256];
 	uint8_t m_fl_lut[16];
 
 private:
@@ -427,6 +423,9 @@ private:
 
 	void hyperstone_trap();
 	void hyperstone_extend();
+
+	void hyperstone_reserved();
+	void hyperstone_do();
 
 	int32_t decode_pcrel();
 	void ignore_pcrel();
