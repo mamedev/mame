@@ -1721,143 +1721,11 @@ offs_t hyperstone_device::disasm_disassemble(std::ostream &stream, offs_t pc, co
 
 /* Opcodes */
 
-void hyperstone_device::hyperstone_subs(regs_decode &decode)
-{
-	if (SRC_IS_SR)
-		SREG = GET_C;
-
-	int64_t tmp = (int64_t)((int32_t)(DREG)) - (int64_t)((int32_t)(SREG));
-
-//#ifdef SETCARRYS
-//  CHECK_C(tmp);
-//#endif
-
-	CHECK_VSUB(SREG,DREG,tmp);
-
-	int32_t res = (int32_t)(DREG) - (int32_t)(SREG);
-
-	SET_DREG(res);
-
-	SET_Z(res == 0 ? 1 : 0);
-	SET_N(SIGN_BIT(res));
-
-	m_icount -= m_clock_cycles_1;
-
-	if (SR & V_MASK)
-	{
-		uint32_t addr = get_trap_addr(TRAPNO_RANGE_ERROR);
-		execute_exception(addr);
-	}
-}
-
-void hyperstone_device::hyperstone_sardi()
-{
-	check_delay_PC();
-
-	const uint32_t dst_code = (DST_CODE + GET_FP) % 64;
-	const uint32_t dstf_code = (DST_CODE + GET_FP + 1) % 64;
-
-	uint64_t val = concat_64(m_local_regs[dst_code], m_local_regs[dstf_code]);
-
-	SR &= ~(C_MASK | Z_MASK | N_MASK);
-
-	const uint32_t n = N_VALUE;
-	if (n)
-	{
-		SR |= (val >> (n - 1)) & 1;
-
-		const uint64_t sign_bit = val >> 63;
-		val >>= n;
-
-		if (sign_bit)
-		{
-			val |= 0xffffffff00000000U << (32 - n);
-		}
-	}
-
-	m_local_regs[dst_code] = (uint32_t)(val >> 32);
-	m_local_regs[dstf_code] = (uint32_t)val;
-
-	if (val == 0)
-		SR |= Z_MASK;
-	SR |= SIGN_TO_N(m_local_regs[dst_code]);
-
-	m_icount -= m_clock_cycles_2;
-}
-
-void hyperstone_device::hyperstone_shld()
-{
-	check_delay_PC();
-
-	uint32_t src_code = (SRC_CODE + GET_FP) % 64;
-	uint32_t dst_code = (DST_CODE + GET_FP) % 64;
-	uint32_t dstf_code = (DST_CODE + GET_FP + 1) % 64;
-
-	// result undefined if Ls denotes the same register as Ld or Ldf
-	if (src_code == dst_code || src_code == dstf_code)
-	{
-		DEBUG_PRINTF(("Denoted same registers in hyperstone_shld. PC = %08X\n", PC));
-	}
-	else
-	{
-		uint32_t n = m_local_regs[src_code % 64] & 0x1f;
-		uint32_t high_order = m_local_regs[dst_code]; /* registers offset by frame pointer */
-		uint32_t low_order  = m_local_regs[dstf_code];
-
-		uint64_t mask = ((((uint64_t)1) << (32 - n)) - 1) ^ 0xffffffff;
-
-		uint64_t val = concat_64(high_order, low_order);
-		SET_C( (n)?(((val<<(n-1))&0x8000000000000000U)?1:0):0);
-		uint32_t tmp = high_order << n;
-
-		if (((high_order & mask) && (!(tmp & 0x80000000))) || (((high_order & mask) ^ mask) && (tmp & 0x80000000)))
-			SET_V(1);
-		else
-			SR &= ~V_MASK;
-
-		val <<= n;
-
-		m_local_regs[dst_code] = extract_64hi(val);
-		m_local_regs[dstf_code] = extract_64lo(val);
-
-		SET_Z(val == 0 ? 1 : 0);
-		SET_N(SIGN_BIT(high_order));
-	}
-
-	m_icount -= m_clock_cycles_2;
-}
-
-void hyperstone_device::hyperstone_shl()
-{
-	check_delay_PC();
-
-	uint32_t src_code = SRC_CODE + GET_FP;
-	uint32_t dst_code = DST_CODE + GET_FP;
-
-	uint32_t n    = m_local_regs[src_code % 64] & 0x1f;
-	uint32_t base = m_local_regs[dst_code % 64]; /* registers offset by frame pointer */
-	uint64_t mask = ((((uint64_t)1) << (32 - n)) - 1) ^ 0xffffffff;
-	SET_C( (n)?(((base<<(n-1))&0x80000000)?1:0):0);
-	uint32_t ret  = base << n;
-
-	if (((base & mask) && (!(ret & 0x80000000))) || (((base & mask) ^ mask) && (ret & 0x80000000)))
-		SET_V(1);
-	else
-		SR &= ~V_MASK;
-
-	m_local_regs[dst_code % 64] = ret;
-	SET_Z(ret == 0 ? 1 : 0);
-	SET_N(SIGN_BIT(ret));
-
-	m_icount -= m_clock_cycles_1;
-}
-
 void hyperstone_device::hyperstone_trap()
 {
 	check_delay_PC();
 
 	const uint8_t trapno = (m_op & 0xfc) >> 2;
-
 	const uint32_t addr = get_trap_addr(trapno);
 	const uint8_t code = ((m_op & 0x300) >> 6) | (m_op & 0x03);
 
@@ -2079,10 +1947,10 @@ void hyperstone_device::execute_run()
 			case 0x49: hyperstone_sub_global_local(); break;
 			case 0x4a: hyperstone_sub_local_global(); break;
 			case 0x4b: hyperstone_sub_local_local(); break;
-			case 0x4c: op4c(); break;
-			case 0x4d: op4d(); break;
-			case 0x4e: op4e(); break;
-			case 0x4f: op4f(); break;
+			case 0x4c: hyperstone_subs_global_global(); break;
+			case 0x4d: hyperstone_subs_global_local(); break;
+			case 0x4e: hyperstone_subs_local_global(); break;
+			case 0x4f: hyperstone_subs_local_local(); break;
 			case 0x50: hyperstone_addc_global_global(); break;
 			case 0x51: hyperstone_addc_global_local(); break;
 			case 0x52: hyperstone_addc_local_global(); break;

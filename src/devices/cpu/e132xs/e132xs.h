@@ -281,7 +281,10 @@ private:
 	void hyperstone_sub_global_local();
 	void hyperstone_sub_local_global();
 	void hyperstone_sub_local_local();
-	void hyperstone_subs(regs_decode &decode);
+	void hyperstone_subs_global_global();
+	void hyperstone_subs_global_local();
+	void hyperstone_subs_local_global();
+	void hyperstone_subs_local_local();
 	void hyperstone_addc_global_global();
 	void hyperstone_addc_global_local();
 	void hyperstone_addc_local_global();
@@ -464,8 +467,6 @@ private:
 	void generate_sequence_instruction(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
 	bool generate_opcode(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
 #endif
-
-	void op4c();    void op4d();    void op4e();    void op4f(); // subs
 
 #if 0
 	void generate_op00(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_op01(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
