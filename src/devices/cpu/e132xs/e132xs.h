@@ -266,7 +266,10 @@ private:
 	void hyperstone_add_global_local();
 	void hyperstone_add_local_global();
 	void hyperstone_add_local_local();
-	void hyperstone_adds(regs_decode &decode);
+	void hyperstone_adds_global_global();
+	void hyperstone_adds_global_local();
+	void hyperstone_adds_local_global();
+	void hyperstone_adds_local_local();
 	void hyperstone_cmpb_global_global();
 	void hyperstone_cmpb_global_local();
 	void hyperstone_cmpb_local_global();
@@ -462,7 +465,6 @@ private:
 	bool generate_opcode(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
 #endif
 
-	void op2c();    void op2d();    void op2e();    void op2f(); // addc
 	void op40();    void op41();    void op42();    void op43(); // subc
 	void op4c();    void op4d();    void op4e();    void op4f(); // subs
 

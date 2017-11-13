@@ -1721,34 +1721,6 @@ offs_t hyperstone_device::disasm_disassemble(std::ostream &stream, offs_t pc, co
 
 /* Opcodes */
 
-void hyperstone_device::hyperstone_adds(regs_decode &decode)
-{
-	if (SRC_IS_SR)
-		SREG = GET_C;
-
-	int64_t tmp = (int64_t)((int32_t)(SREG)) + (int64_t)((int32_t)(DREG));
-
-	CHECK_VADD(SREG, DREG, tmp);
-
-//#if SETCARRYS
-//  CHECK_C(tmp);
-//#endif
-
-	int32_t res = (int32_t)(SREG) + (int32_t)(DREG);
-
-	SET_DREG(res);
-	SET_Z(res == 0 ? 1 : 0);
-	SET_N(SIGN_BIT(res));
-
-	m_icount -= m_clock_cycles_1;
-
-	if (SR & V_MASK)
-	{
-		uint32_t addr = get_trap_addr(TRAPNO_RANGE_ERROR);
-		execute_exception(addr);
-	}
-}
-
 void hyperstone_device::hyperstone_subc(regs_decode &decode)
 {
 	uint64_t tmp;
@@ -2111,10 +2083,10 @@ void hyperstone_device::execute_run()
 			case 0x29: hyperstone_add_global_local(); break;
 			case 0x2a: hyperstone_add_local_global(); break;
 			case 0x2b: hyperstone_add_local_local(); break;
-			case 0x2c: op2c(); break;
-			case 0x2d: op2d(); break;
-			case 0x2e: op2e(); break;
-			case 0x2f: op2f(); break;
+			case 0x2c: hyperstone_adds_global_global(); break;
+			case 0x2d: hyperstone_adds_global_local(); break;
+			case 0x2e: hyperstone_adds_local_global(); break;
+			case 0x2f: hyperstone_adds_local_local(); break;
 			case 0x30: hyperstone_cmpb_global_global(); break;
 			case 0x31: hyperstone_cmpb_global_local(); break;
 			case 0x32: hyperstone_cmpb_local_global(); break;

@@ -1411,73 +1411,115 @@ void hyperstone_device::hyperstone_add_local_local()
 	m_icount -= m_clock_cycles_1;
 }
 
-void hyperstone_device::op2c()
+void hyperstone_device::hyperstone_adds_global_global()
 {
-	regs_decode decode;
-	check_delay_PC();
-	decode.src = SRC_CODE;
-	decode.dst = DST_CODE;
+	const uint32_t src_code = SRC_CODE;
+	const uint32_t dst_code = DST_CODE;
+	const int32_t sreg = (src_code == SR_REGISTER) ? (SR & C_MASK) : (int32_t)m_global_regs[src_code];
+	const int32_t dreg = m_global_regs[dst_code];
+	const int64_t tmp = (int64_t)sreg + (int64_t)dreg;
 
-	decode.src_is_local = 0;
-	SREG = m_global_regs[decode.src];
+	SR &= ~(V_MASK | Z_MASK | N_MASK);
+	SR |= ((sreg ^ tmp) & (dreg ^ tmp) & 0x80000000) >> 28;
 
-	decode.dst_is_local = 0;
-	DREG = m_global_regs[decode.dst];
-	DREGF = m_global_regs[decode.dst + 1];
+//#if SETCARRYS
+//  CHECK_C(tmp);
+//#endif
 
-	hyperstone_adds(decode);
-	printf("0x2c, adds global,global\n");
+	const int32_t res = sreg + dreg;
+	m_global_regs[dst_code] = res;
+
+	if (res == 0)
+		SR |= Z_MASK;
+	SR |= SIGN_TO_N(res);
+
+	m_icount -= m_clock_cycles_1;
+
+	if (SR & V_MASK)
+		execute_exception(get_trap_addr(TRAPNO_RANGE_ERROR));
 }
 
-void hyperstone_device::op2d()
+void hyperstone_device::hyperstone_adds_global_local()
 {
-	regs_decode decode;
-	check_delay_PC();
-	decode.src = SRC_CODE;
-	decode.dst = DST_CODE;
+	const uint32_t dst_code = DST_CODE;
+	const int32_t sreg = (int32_t)m_local_regs[(SRC_CODE + GET_FP) & 0x3f];
+	const int32_t dreg = m_global_regs[dst_code];
+	const int64_t tmp = (int64_t)sreg + (int64_t)dreg;
 
-	decode.src_is_local = 1;
-	SREG = m_local_regs[(decode.src + GET_FP) & 0x3f];
+	SR &= ~(V_MASK | Z_MASK | N_MASK);
+	SR |= ((sreg ^ tmp) & (dreg ^ tmp) & 0x80000000) >> 28;
 
-	decode.dst_is_local = 0;
-	DREG = m_global_regs[decode.dst];
+//#if SETCARRYS
+//  CHECK_C(tmp);
+//#endif
 
-	hyperstone_adds(decode);
-	printf("0x2d, adds global,local\n");
+	const int32_t res = sreg + dreg;
+	m_global_regs[dst_code] = res;
+
+	if (res == 0)
+		SR |= Z_MASK;
+	SR |= SIGN_TO_N(res);
+
+	m_icount -= m_clock_cycles_1;
+
+	if (SR & V_MASK)
+		execute_exception(get_trap_addr(TRAPNO_RANGE_ERROR));
 }
 
-void hyperstone_device::op2e()
+void hyperstone_device::hyperstone_adds_local_global()
 {
-	regs_decode decode;
-	check_delay_PC();
-	decode.src = SRC_CODE;
-	decode.dst = DST_CODE;
+	const uint32_t src_code = SRC_CODE;
+	const uint32_t dst_code = (DST_CODE + GET_FP) & 0x3f;
+	const int32_t sreg = (src_code == SR_REGISTER) ? (SR & C_MASK) : (int32_t)m_global_regs[src_code];
+	const int32_t dreg = m_local_regs[dst_code];
+	const int64_t tmp = (int64_t)sreg + (int64_t)dreg;
 
-	decode.src_is_local = 0;
-	SREG = m_global_regs[decode.src];
+	SR &= ~(V_MASK | Z_MASK | N_MASK);
+	SR |= ((sreg ^ tmp) & (dreg ^ tmp) & 0x80000000) >> 28;
 
-	decode.dst_is_local = 1;
-	DREG = m_local_regs[(decode.dst + GET_FP) & 0x3f]; /* registers offset by frame pointer */
+//#if SETCARRYS
+//  CHECK_C(tmp);
+//#endif
 
-	hyperstone_adds(decode);
-	printf("0x2e, adds local,global\n");
+	const int32_t res = sreg + dreg;
+	m_local_regs[dst_code] = res;
+
+	if (res == 0)
+		SR |= Z_MASK;
+	SR |= SIGN_TO_N(res);
+
+	m_icount -= m_clock_cycles_1;
+
+	if (SR & V_MASK)
+		execute_exception(get_trap_addr(TRAPNO_RANGE_ERROR));
 }
 
-void hyperstone_device::op2f()
+void hyperstone_device::hyperstone_adds_local_local()
 {
-	regs_decode decode;
-	check_delay_PC();
-	decode.src = SRC_CODE;
-	decode.dst = DST_CODE;
+	const uint32_t fp = GET_FP;
+	const uint32_t dst_code = (DST_CODE + fp) & 0x3f;
+	const int32_t sreg = (int32_t)m_local_regs[(SRC_CODE + fp) & 0x3f];
+	const int32_t dreg = m_local_regs[dst_code];
+	const int64_t tmp = (int64_t)sreg + (int64_t)dreg;
 
-	decode.src_is_local = 1;
-	SREG = m_local_regs[(decode.src + GET_FP) & 0x3f];
+	SR &= ~(V_MASK | Z_MASK | N_MASK);
+	SR |= ((sreg ^ tmp) & (dreg ^ tmp) & 0x80000000) >> 28;
 
-	decode.dst_is_local = 1;
-	DREG = m_local_regs[(decode.dst + GET_FP) & 0x3f]; /* registers offset by frame pointer */
+//#if SETCARRYS
+//  CHECK_C(tmp);
+//#endif
 
-	hyperstone_adds(decode);
-	printf("0x2f, adds local,local\n");
+	const int32_t res = sreg + dreg;
+	m_local_regs[dst_code] = res;
+
+	if (res == 0)
+		SR |= Z_MASK;
+	SR |= SIGN_TO_N(res);
+
+	m_icount -= m_clock_cycles_1;
+
+	if (SR & V_MASK)
+		execute_exception(get_trap_addr(TRAPNO_RANGE_ERROR));
 }
 
 
@@ -3589,11 +3631,9 @@ void hyperstone_device::hyperstone_rol()
 #ifdef MISSIONCRAFT_FLAGS
 	SR &= ~(V_MASK | Z_MASK | C_MASK);
 	if (((base & mask) && (!(val & 0x80000000))) || (((base & mask) ^ mask) && (val & 0x80000000)))
-		SET_V(1);
-	else
-		SET_V(0);
+		SR |= V_MASK;
 #else
-	SR &= ~(Z_MASK | C_MASK);
+	SR &= ~(Z_MASK | C_MASK | N_MASK);
 #endif
 
 	m_local_regs[dst_code] = val;
