@@ -3192,9 +3192,6 @@ GAME( 1996, tekken3ja, tekken3,  coh700,   namcos12, namcos12_state, namcos12, R
 GAME( 1997, lbgrande,  0,        coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Libero Grande (World, LG2/VER.A)", MACHINE_IMPERFECT_GRAPHICS ) /* KC014 */
 GAME( 1997, lbgrandeja,lbgrande, coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Libero Grande (Japan, LG1/VER.A)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) /* KC014 */
 GAME( 1997, toukon3,   0,        coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco / Tomy",    "Shin Nihon Pro Wrestling Toukon Retsuden 3 Arcade Edition (Japan, TR1/VER.A)", MACHINE_IMPERFECT_GRAPHICS ) /* KC019 */
-GAME( 1997, ehrgeiz,   0,        coh700,   namcos12, namcos12_state, namcos12, ROT0, "Square / Namco",  "Ehrgeiz (World, EG2/VER.A)", MACHINE_IMPERFECT_GRAPHICS ) /* KC021 */
-GAME( 1997, ehrgeizua, ehrgeiz,  coh700,   namcos12, namcos12_state, namcos12, ROT0, "Square / Namco",  "Ehrgeiz (US, EG3/VER.A)", MACHINE_IMPERFECT_GRAPHICS ) /* KC021 */
-GAME( 1997, ehrgeizja, ehrgeiz,  coh700,   namcos12, namcos12_state, namcos12, ROT0, "Square / Namco",  "Ehrgeiz (Japan, EG1/VER.A)", MACHINE_IMPERFECT_GRAPHICS ) /* KC021 */
 GAME( 1998, soulclbr,  0,        coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Soul Calibur (World, SOC14/VER.C)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1998, soulclbrwb,soulclbr, coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Soul Calibur (World, SOC14/VER.B)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1998, soulclbruc,soulclbr, coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Soul Calibur (US, SOC13/VER.C)", MACHINE_IMPERFECT_GRAPHICS )
@@ -3202,6 +3199,9 @@ GAME( 1998, soulclbrub,soulclbr, coh700,   namcos12, namcos12_state, namcos12, R
 GAME( 1998, soulclbrjc,soulclbr, coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Soul Calibur (Japan, SOC11/VER.C)", MACHINE_IMPERFECT_GRAPHICS ) /* KC020 */
 GAME( 1998, soulclbrjb,soulclbr, coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Soul Calibur (Japan, SOC11/VER.B)", MACHINE_IMPERFECT_GRAPHICS ) /* KC020 */
 GAME( 1998, soulclbrja,soulclbr, coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Soul Calibur (Japan, SOC11/VER.A2)", MACHINE_IMPERFECT_GRAPHICS ) /* KC020 */
+GAME( 1998, ehrgeiz,   0,        coh700,   namcos12, namcos12_state, namcos12, ROT0, "Square / Namco",  "Ehrgeiz (World, EG2/VER.A)", MACHINE_IMPERFECT_GRAPHICS ) /* KC021 */
+GAME( 1998, ehrgeizua, ehrgeiz,  coh700,   namcos12, namcos12_state, namcos12, ROT0, "Square / Namco",  "Ehrgeiz (US, EG3/VER.A)", MACHINE_IMPERFECT_GRAPHICS ) /* KC021 */
+GAME( 1998, ehrgeizja, ehrgeiz,  coh700,   namcos12, namcos12_state, namcos12, ROT0, "Square / Namco",  "Ehrgeiz (Japan, EG1/VER.A)", MACHINE_IMPERFECT_GRAPHICS ) /* KC021 */
 GAME( 1998, mdhorse,   0,        coh700,   namcos12, namcos12_state, namcos12, ROT0, "MOSS / Namco",    "Derby Quiz My Dream Horse (Japan, MDH1/VER.A2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) /* KC035 */
 GAME( 1998, aplarail,  0,        aplarail, aplarail, namcos12_state, namcos12, ROT0, "Namco / Tomy",    "Attack Pla Rail (Japan, AP1/VER.A)", MACHINE_IMPERFECT_GRAPHICS ) /* KC032 */
 GAME( 1998, sws98,     0,        coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Super World Stadium '98 (Japan, SS81/VER.A)", MACHINE_IMPERFECT_GRAPHICS ) /* KC0?? */
