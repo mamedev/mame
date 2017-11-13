@@ -6458,7 +6458,7 @@ GAME( 1998, dirtdvlsj, dirtdvls, model3_21_5881, scud,     model3_state, dirtdvl
 GAME( 1998, swtrilgy,         0, model3_21_5881, swtrilgy, model3_state, swtrilgy, ROT0, "Sega / LucasArts", "Star Wars Trilogy Arcade (Revision A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1998, swtrilgya, swtrilgy, model3_21_5881, swtrilgy, model3_state, swtrilga, ROT0, "Sega / LucasArts", "Star Wars Trilogy Arcade", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1998, spikeout,         0, model3_21_5881, model3,   model3_state, spikeout, ROT0, "Sega", "Spikeout (Revision C)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1998, spikeofe,         0, model3_21_5881, model3,   model3_state, spikeofe, ROT0, "Sega", "Spikeout Final Edition", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1999, spikeofe,         0, model3_21_5881, model3,   model3_state, spikeofe, ROT0, "Sega", "Spikeout Final Edition", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1998, magtruck,         0, model3_21_5881, eca,      model3_state, magtruck, ROT0, "Sega", "Magical Truck Adventure (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1999, eca,              0, model3_21_5881, eca,      model3_state, eca,      ROT0, "Sega", "Emergency Call Ambulance (Export)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1999, ecau,           eca, model3_21_5881, eca,      model3_state, eca,      ROT0, "Sega", "Emergency Call Ambulance (USA)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
