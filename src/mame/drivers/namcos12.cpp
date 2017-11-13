@@ -1489,8 +1489,8 @@ void namcos12_state::machine_reset()
 	m_has_tektagt_dma = 0;
 
 	if( strcmp( machine().system().name, "tektagt" ) == 0 ||
-		strcmp( machine().system().name, "tektagtac" ) == 0 ||
-		strcmp( machine().system().name, "tektagtac1" ) == 0 ||
+		strcmp( machine().system().name, "tektagtc1" ) == 0 ||
+		strcmp( machine().system().name, "tektagtuc1" ) == 0 ||
 		strcmp( machine().system().name, "tektagtub" ) == 0 ||
 		strcmp( machine().system().name, "tektagtjc1" ) == 0 ||
 		strcmp( machine().system().name, "tektagtjb" ) == 0 ||
