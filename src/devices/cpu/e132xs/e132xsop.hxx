@@ -2365,72 +2365,123 @@ void hyperstone_device::hyperstone_neg_local_local()
 	m_icount -= m_clock_cycles_1;
 }
 
-void hyperstone_device::op5c()
+void hyperstone_device::hyperstone_negs_global_global()
 {
-	regs_decode decode;
 	check_delay_PC();
-	decode.src = SRC_CODE;
-	decode.dst = DST_CODE;
 
-	decode.src_is_local = 0;
-	SREG = m_global_regs[decode.src];
+	const uint32_t src_code = SRC_CODE;
+	const int32_t sreg = (src_code == SR_REGISTER) ? (SR & C_MASK) : (int32_t)m_global_regs[src_code];
+	const int64_t tmp = -(int64_t)sreg;
 
-	decode.dst_is_local = 0;
-	DREG = m_global_regs[decode.dst];
+	SR &= ~(V_MASK | Z_MASK | N_MASK);
 
-	hyperstone_negs(decode);
-	printf("0x5c, negs global,global\n");
+	if (tmp & sreg & 0x80000000)
+		SR |= V_MASK;
+
+//#if SETCARRYS
+//  CHECK_C(tmp);
+//#endif
+
+	const int32_t res = -sreg;
+	set_global_register(DST_CODE, res);
+
+	if (res == 0)
+		SR |= Z_MASK;
+	SR |= SIGN_TO_N(res);
+
+	m_icount -= m_clock_cycles_1;
+
+	if (GET_V && src_code != SR_REGISTER) // trap doesn't occur when source is SR
+		execute_exception(get_trap_addr(TRAPNO_RANGE_ERROR));
 }
 
-void hyperstone_device::op5d()
+void hyperstone_device::hyperstone_negs_global_local()
 {
-	regs_decode decode;
 	check_delay_PC();
-	decode.src = SRC_CODE;
-	decode.dst = DST_CODE;
 
-	decode.src_is_local = 1;
-	SREG = m_local_regs[(decode.src + GET_FP) & 0x3f];
+	const int32_t sreg = (int32_t)m_local_regs[(SRC_CODE + GET_FP) & 0x3f];
+	const int64_t tmp = -(int64_t)sreg;
 
-	decode.dst_is_local = 0;
-	DREG = m_global_regs[decode.dst];
+	SR &= ~(V_MASK | Z_MASK | N_MASK);
 
-	hyperstone_negs(decode);
-	printf("0x5d, negs global,local\n");
+	if (tmp & sreg & 0x80000000)
+		SR |= V_MASK;
+
+//#if SETCARRYS
+//  CHECK_C(tmp);
+//#endif
+
+	const int32_t res = -sreg;
+	set_global_register(DST_CODE, res);
+
+	if (res == 0)
+		SR |= Z_MASK;
+	SR |= SIGN_TO_N(res);
+
+	m_icount -= m_clock_cycles_1;
+
+	if (GET_V)
+		execute_exception(get_trap_addr(TRAPNO_RANGE_ERROR));
 }
 
-void hyperstone_device::op5e()
+void hyperstone_device::hyperstone_negs_local_global()
 {
-	regs_decode decode;
 	check_delay_PC();
-	decode.src = SRC_CODE;
-	decode.dst = DST_CODE;
 
-	decode.src_is_local = 0;
-	SREG = m_global_regs[decode.src];
+	const uint32_t src_code = SRC_CODE;
+	const int32_t sreg = (src_code == SR_REGISTER) ? (SR & C_MASK) : (int32_t)m_global_regs[src_code];
+	const int64_t tmp = -(int64_t)sreg;
 
-	decode.dst_is_local = 1;
-	DREG = m_local_regs[(decode.dst + GET_FP) & 0x3f]; /* registers offset by frame pointer */
+	SR &= ~(V_MASK | Z_MASK | N_MASK);
 
-	hyperstone_negs(decode);
-	printf("0x5e, negs local,global");
+	if (tmp & sreg & 0x80000000)
+		SR |= V_MASK;
+
+//#if SETCARRYS
+//  CHECK_C(tmp);
+//#endif
+
+	const int32_t res = -sreg;
+	m_local_regs[(DST_CODE + GET_FP) & 0x3f] = res;
+
+	if (res == 0)
+		SR |= Z_MASK;
+	SR |= SIGN_TO_N(res);
+
+	m_icount -= m_clock_cycles_1;
+
+	if (GET_V && src_code != SR_REGISTER) // trap doesn't occur when source is SR
+		execute_exception(get_trap_addr(TRAPNO_RANGE_ERROR));
 }
 
-void hyperstone_device::op5f()
+void hyperstone_device::hyperstone_negs_local_local()
 {
-	regs_decode decode;
 	check_delay_PC();
-	decode.src = SRC_CODE;
-	decode.dst = DST_CODE;
 
-	decode.src_is_local = 1;
-	SREG = m_local_regs[(decode.src + GET_FP) & 0x3f];
+	const uint32_t fp = GET_FP;
+	const int32_t sreg = (int32_t)m_local_regs[(SRC_CODE + fp) & 0x3f];
+	const int64_t tmp = -(int64_t)sreg;
 
-	decode.dst_is_local = 1;
-	DREG = m_local_regs[(decode.dst + GET_FP) & 0x3f]; /* registers offset by frame pointer */
+	SR &= ~(V_MASK | Z_MASK | N_MASK);
 
-	hyperstone_negs(decode);
-	printf("0x5f, negs local,local\n");
+	if (tmp & sreg & 0x80000000)
+		SR |= V_MASK;
+
+//#if SETCARRYS
+//  CHECK_C(tmp);
+//#endif
+
+	const int32_t res = -sreg;
+	m_local_regs[(DST_CODE + fp) & 0x3f] = res;
+
+	if (res == 0)
+		SR |= Z_MASK;
+	SR |= SIGN_TO_N(res);
+
+	m_icount -= m_clock_cycles_1;
+
+	if (GET_V)
+		execute_exception(get_trap_addr(TRAPNO_RANGE_ERROR));
 }
 
 
@@ -6301,7 +6352,7 @@ void hyperstone_device::hypesrtone_ldwp_local_local()
 
 	// post increment the destination register if it's different from the source one
 	// (needed by Hidden Catch)
-	if (src_code != dst_code || (m_op & 0x100))
+	if (src_code != dst_code)
 		m_local_regs[dst_code] += 4;
 
 	m_icount -= m_clock_cycles_1;
@@ -6338,7 +6389,7 @@ void hyperstone_device::hyperstone_lddp_local_local()
 
 	// post increment the destination register if it's different from the source one
 	// and from the "next source" one
-	if (!(src_code == dst_code && (m_op & 0x100)) && !same_srcf_dst)
+	if (src_code != dst_code && !same_srcf_dst)
 	{
 		m_local_regs[dst_code] += 8;
 	}

@@ -285,7 +285,10 @@ private:
 	void hyperstone_neg_global_local();
 	void hyperstone_neg_local_global();
 	void hyperstone_neg_local_local();
-	void hyperstone_negs(regs_decode &decode);
+	void hyperstone_negs_global_global();
+	void hyperstone_negs_global_local();
+	void hyperstone_negs_local_global();
+	void hyperstone_negs_local_local();
 	void hyperstone_and_global_global();
 	void hyperstone_and_global_local();
 	void hyperstone_and_local_global();
@@ -462,7 +465,6 @@ private:
 	void op2c();    void op2d();    void op2e();    void op2f(); // addc
 	void op40();    void op41();    void op42();    void op43(); // subc
 	void op4c();    void op4d();    void op4e();    void op4f(); // subs
-	void op5c();    void op5d();    void op5e();    void op5f(); // negs
 
 #if 0
 	void generate_op00(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_op01(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);

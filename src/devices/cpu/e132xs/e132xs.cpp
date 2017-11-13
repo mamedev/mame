@@ -1814,35 +1814,6 @@ void hyperstone_device::hyperstone_subs(regs_decode &decode)
 	}
 }
 
-void hyperstone_device::hyperstone_negs(regs_decode &decode)
-{
-	if (SRC_IS_SR)
-		SREG = GET_C;
-
-	int64_t tmp = -(int64_t)((int32_t)(SREG));
-	CHECK_VSUB(SREG,0,tmp);
-
-//#if SETCARRYS
-//  CHECK_C(tmp);
-//#endif
-
-	int32_t res = -(int32_t)(SREG);
-
-	SET_DREG(res);
-
-	SET_Z(res == 0 ? 1 : 0);
-	SET_N(SIGN_BIT(res));
-
-
-	m_icount -= m_clock_cycles_1;
-
-	if (GET_V && !SRC_IS_SR) //trap doesn't occur when source is SR
-	{
-		uint32_t addr = get_trap_addr(TRAPNO_RANGE_ERROR);
-		execute_exception(addr);
-	}
-}
-
 void hyperstone_device::hyperstone_sardi()
 {
 	check_delay_PC();
@@ -2188,10 +2159,10 @@ void hyperstone_device::execute_run()
 			case 0x59: hyperstone_neg_global_local(); break;
 			case 0x5a: hyperstone_neg_local_global(); break;
 			case 0x5b: hyperstone_neg_local_local(); break;
-			case 0x5c: op5c(); break;
-			case 0x5d: op5d(); break;
-			case 0x5e: op5e(); break;
-			case 0x5f: op5f(); break;
+			case 0x5c: hyperstone_negs_global_global(); break;
+			case 0x5d: hyperstone_negs_global_local(); break;
+			case 0x5e: hyperstone_negs_local_global(); break;
+			case 0x5f: hyperstone_negs_local_local(); break;
 			case 0x60: hyperstone_cmpi_global_simm(); break;
 			case 0x61: hyperstone_cmpi_global_limm(); break;
 			case 0x62: hyperstone_cmpi_local_simm(); break;
