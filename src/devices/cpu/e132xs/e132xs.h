@@ -307,10 +307,7 @@ private:
 	template <reg_bank DST_GLOBAL, imm_size IMM_LONG> void hyperstone_cmpi();
 	template <reg_bank DST_GLOBAL, imm_size IMM_LONG> void hyperstone_movi();
 	template <reg_bank DST_GLOBAL, imm_size IMM_LONG> void hyperstone_addi();
-	void hyperstone_addsi_global_simm();
-	void hyperstone_addsi_global_limm();
-	void hyperstone_addsi_local_simm();
-	void hyperstone_addsi_local_limm();
+	template <reg_bank DST_GLOBAL, imm_size IMM_LONG> void hyperstone_addsi();
 	void hyperstone_cmpbi_global_simm();
 	void hyperstone_cmpbi_global_limm();
 	void hyperstone_cmpbi_local_simm();

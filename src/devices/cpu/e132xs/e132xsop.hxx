@@ -2714,57 +2714,35 @@ void hyperstone_device::hyperstone_addi()
 	m_icount -= m_clock_cycles_1;
 }
 
-void hyperstone_device::hyperstone_addsi_global_simm()
+template <hyperstone_device::reg_bank DST_GLOBAL, hyperstone_device::imm_size IMM_LONG>
+void hyperstone_device::hyperstone_addsi()
 {
-	check_delay_PC();
+	if (!IMM_LONG)
+		check_delay_PC();
 
-	const uint32_t dst_code = DST_CODE;
-	const int32_t dreg = m_global_regs[dst_code];
-
-	int32_t imm;
-	if (N_OP_MASK)
-		imm = immediate_values[m_op & 0x0f];
-	else
-		imm = SR & (((SR & Z_MASK) ? 0 : 1) | (dreg & 0x01));
-
-	SR &= ~(V_MASK | Z_MASK | N_MASK);
-
-	const int64_t tmp = (int64_t)imm + (int64_t)(int32_t)dreg;
-	SR |= ((imm ^ tmp) & (dreg ^ tmp) & 0x80000000) >> 28;
-
-//#if SETCARRYS
-//  CHECK_C(tmp);
-//#endif
-
-	const int32_t res = imm + (int32_t)dreg;
-
-	set_global_register(dst_code, res);
-
-	if (res == 0)
-		SR |= Z_MASK;
-	SR |= SIGN_TO_N(res);
-
-	m_icount -= m_clock_cycles_1;
-
-	if (SR & V_MASK)
-		execute_exception(get_trap_addr(TRAPNO_RANGE_ERROR));
-}
-
-void hyperstone_device::hyperstone_addsi_global_limm()
-{
-	const uint32_t dst_code = DST_CODE;
-	const int32_t dreg = m_global_regs[dst_code];
+	const uint32_t dst_code = DST_GLOBAL ? DST_CODE : ((DST_CODE + GET_FP) & 0x3f);
+	const int32_t dreg = (DST_GLOBAL ? m_global_regs : m_local_regs)[dst_code];
 
 	int32_t imm;
 	if (N_OP_MASK)
 	{
-		imm = decode_immediate_s();
-		check_delay_PC();
+		if (IMM_LONG)
+		{
+			imm = decode_immediate_s();
+			check_delay_PC();
+		}
+		else
+		{
+			imm = immediate_values[m_op & 0x0f];
+		}
 	}
 	else
 	{
-		ignore_immediate_s();
-		check_delay_PC();
+		if (IMM_LONG)
+		{
+			ignore_immediate_s();
+			check_delay_PC();
+		}
 		imm = SR & (((SR & Z_MASK) ? 0 : 1) | (dreg & 0x01));
 	}
 
@@ -2779,84 +2757,10 @@ void hyperstone_device::hyperstone_addsi_global_limm()
 
 	const int32_t res = imm + (int32_t)dreg;
 
-	set_global_register(dst_code, res);
-
-	if (res == 0)
-		SR |= Z_MASK;
-	SR |= SIGN_TO_N(res);
-
-	m_icount -= m_clock_cycles_1;
-
-	if (SR & V_MASK)
-		execute_exception(get_trap_addr(TRAPNO_RANGE_ERROR));
-}
-
-void hyperstone_device::hyperstone_addsi_local_simm()
-{
-	check_delay_PC();
-
-	const uint32_t dst_code = (DST_CODE + GET_FP) & 0x3f;
-	const int32_t dreg = m_local_regs[dst_code];
-
-	int32_t imm;
-	if (N_OP_MASK)
-		imm = immediate_values[m_op & 0x0f];
+	if (DST_GLOBAL)
+		set_global_register(dst_code, res);
 	else
-		imm = SR & (((SR & Z_MASK) ? 0 : 1) | (dreg & 0x01));
-
-	SR &= ~(V_MASK | Z_MASK | N_MASK);
-
-	const int64_t tmp = (int64_t)imm + (int64_t)(int32_t)dreg;
-	SR |= ((imm ^ tmp) & (dreg ^ tmp) & 0x80000000) >> 28;
-
-//#if SETCARRYS
-//  CHECK_C(tmp);
-//#endif
-
-	const int32_t res = imm + (int32_t)dreg;
-
-	m_local_regs[dst_code] = res;
-
-	if (res == 0)
-		SR |= Z_MASK;
-	SR |= SIGN_TO_N(res);
-
-	m_icount -= m_clock_cycles_1;
-
-	if (SR & V_MASK)
-		execute_exception(get_trap_addr(TRAPNO_RANGE_ERROR));
-}
-
-void hyperstone_device::hyperstone_addsi_local_limm()
-{
-	const uint32_t dst_code = (DST_CODE + GET_FP) & 0x3f;
-	const int32_t dreg = m_local_regs[dst_code];
-
-	int32_t imm;
-	if (N_OP_MASK)
-	{
-		imm = decode_immediate_s();
-		check_delay_PC();
-	}
-	else
-	{
-		ignore_immediate_s();
-		check_delay_PC();
-		imm = SR & (((SR & Z_MASK) ? 0 : 1) | (dreg & 0x01));
-	}
-
-	SR &= ~(V_MASK | Z_MASK | N_MASK);
-
-	const int64_t tmp = (int64_t)imm + (int64_t)(int32_t)dreg;
-	SR |= ((imm ^ tmp) & (dreg ^ tmp) & 0x80000000) >> 28;
-
-//#if SETCARRYS
-//  CHECK_C(tmp);
-//#endif
-
-	const int32_t res = imm + (int32_t)dreg;
-
-	m_local_regs[dst_code] = res;
+		m_local_regs[dst_code] = res;
 
 	if (res == 0)
 		SR |= Z_MASK;

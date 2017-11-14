@@ -1742,10 +1742,10 @@ void hyperstone_device::execute_run()
 			case 0x69: hyperstone_addi<GLOBAL, LIMM>(); break;
 			case 0x6a: hyperstone_addi<LOCAL, SIMM>(); break;
 			case 0x6b: hyperstone_addi<LOCAL, LIMM>(); break;
-			case 0x6c: hyperstone_addsi_global_simm(); break;
-			case 0x6d: hyperstone_addsi_global_limm(); break;
-			case 0x6e: hyperstone_addsi_local_simm(); break;
-			case 0x6f: hyperstone_addsi_local_limm(); break;
+			case 0x6c: hyperstone_addsi<GLOBAL, SIMM>(); break;
+			case 0x6d: hyperstone_addsi<GLOBAL, LIMM>(); break;
+			case 0x6e: hyperstone_addsi<LOCAL, SIMM>(); break;
+			case 0x6f: hyperstone_addsi<LOCAL, LIMM>(); break;
 			case 0x70: hyperstone_cmpbi_global_simm(); break;
 			case 0x71: hyperstone_cmpbi_global_limm(); break;
 			case 0x72: hyperstone_cmpbi_local_simm(); break;
