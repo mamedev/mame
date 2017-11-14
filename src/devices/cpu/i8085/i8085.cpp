@@ -142,7 +142,6 @@ constexpr u16 ADDR_RST65    = 0x0034;
 constexpr u16 ADDR_RST75    = 0x003c;
 
 
-
 /***************************************************************************
     STATIC TABLES
 ***************************************************************************/
@@ -250,6 +249,351 @@ void i8085a_cpu_device::device_clock_changed()
 {
 	if (!m_clk_out_func.isnull())
 		m_clk_out_func(clock() / 2);
+}
+
+
+/***************************************************************************
+    CORE INITIALIZATION
+***************************************************************************/
+
+void i8085a_cpu_device::init_tables()
+{
+	u8 zs;
+	int i, p;
+	for (i = 0; i < 256; i++)
+	{
+		/* cycles */
+		lut_cycles[i] = is_8085() ? lut_cycles_8085[i] : lut_cycles_8080[i];
+
+		/* flags */
+		zs = 0;
+		if (i==0) zs |= ZF;
+		if (i&128) zs |= SF;
+		p = 0;
+		if (i&1) ++p;
+		if (i&2) ++p;
+		if (i&4) ++p;
+		if (i&8) ++p;
+		if (i&16) ++p;
+		if (i&32) ++p;
+		if (i&64) ++p;
+		if (i&128) ++p;
+		lut_zs[i] = zs;
+		lut_zsp[i] = zs | ((p&1) ? 0 : PF);
+	}
+}
+
+void i8085a_cpu_device::device_start()
+{
+	m_PC.d = 0;
+	m_SP.d = 0;
+	m_AF.d = 0;
+	m_BC.d = 0;
+	m_DE.d = 0;
+	m_HL.d = 0;
+	m_WZ.d = 0;
+	m_halt = 0;
+	m_im = 0;
+	m_status = 0;
+	m_after_ei = 0;
+	m_nmi_state = 0;
+	m_irq_state[3] = m_irq_state[2] = m_irq_state[1] = m_irq_state[0] = 0;
+	m_trap_pending = 0;
+	m_trap_im_copy = 0;
+	m_sod_state = 0;
+	m_ietemp = false;
+
+	init_tables();
+
+	/* set up the state table */
+	{
+		state_add(I8085_PC,     "PC",     m_PC.w.l);
+		state_add(STATE_GENPC,  "GENPC",  m_PC.w.l).noshow();
+		state_add(STATE_GENPCBASE, "CURPC", m_PC.w.l).noshow();
+		state_add(I8085_SP,     "SP",     m_SP.w.l);
+		state_add(STATE_GENSP,  "GENSP",  m_SP.w.l).noshow();
+		state_add(STATE_GENFLAGS, "GENFLAGS", m_AF.b.l).noshow().formatstr("%8s");
+		state_add(I8085_A,      "A",      m_AF.b.h).noshow();
+		state_add(I8085_B,      "B",      m_BC.b.h).noshow();
+		state_add(I8085_C,      "C",      m_BC.b.l).noshow();
+		state_add(I8085_D,      "D",      m_DE.b.h).noshow();
+		state_add(I8085_E,      "E",      m_DE.b.l).noshow();
+		state_add(I8085_F,      "F",      m_AF.b.l).noshow();
+		state_add(I8085_H,      "H",      m_HL.b.h).noshow();
+		state_add(I8085_L,      "L",      m_HL.b.l).noshow();
+		state_add(I8085_AF,     "AF",     m_AF.w.l);
+		state_add(I8085_BC,     "BC",     m_BC.w.l);
+		state_add(I8085_DE,     "DE",     m_DE.w.l);
+		state_add(I8085_HL,     "HL",     m_HL.w.l);
+		state_add(I8085_STATUS, "STATUS", m_status);
+		state_add(I8085_SOD,    "SOD",    m_sod_state).mask(0x1);
+		state_add(I8085_SID,    "SID",    m_ietemp).mask(0x1).callimport().callexport();
+		state_add(I8085_INTE,   "INTE",   m_ietemp).mask(0x1).callimport().callexport();
+	}
+
+	m_program = &space(AS_PROGRAM);
+	m_direct = &m_program->direct();
+	m_io = &space(AS_IO);
+
+	/* resolve callbacks */
+	m_out_status_func.resolve_safe();
+	m_out_inte_func.resolve_safe();
+	m_in_sid_func.resolve_safe(0);
+	m_out_sod_func.resolve_safe();
+
+	/* register for state saving */
+	save_item(NAME(m_PC.w.l));
+	save_item(NAME(m_SP.w.l));
+	save_item(NAME(m_AF.w.l));
+	save_item(NAME(m_BC.w.l));
+	save_item(NAME(m_DE.w.l));
+	save_item(NAME(m_HL.w.l));
+	save_item(NAME(m_halt));
+	save_item(NAME(m_im));
+	save_item(NAME(m_status));
+	save_item(NAME(m_after_ei));
+	save_item(NAME(m_nmi_state));
+	save_item(NAME(m_irq_state));
+	save_item(NAME(m_trap_pending));
+	save_item(NAME(m_trap_im_copy));
+	save_item(NAME(m_sod_state));
+
+	m_icountptr = &m_icount;
+}
+
+
+/***************************************************************************
+    COMMON RESET
+***************************************************************************/
+
+void i8085a_cpu_device::device_reset()
+{
+	m_PC.d = 0;
+	m_halt = 0;
+	m_im &= ~IM_I75;
+	m_im |= IM_M55 | IM_M65 | IM_M75;
+	m_after_ei = false;
+	m_trap_pending = false;
+	m_trap_im_copy = 0;
+	set_inte(0);
+	set_sod(0);
+}
+
+
+/***************************************************************************
+    COMMON STATE IMPORT/EXPORT
+***************************************************************************/
+
+void i8085a_cpu_device::state_import(const device_state_entry &entry)
+{
+	switch (entry.index())
+	{
+		case I8085_SID:
+			if (m_ietemp)
+			{
+				m_im |= IM_SID;
+			}
+			else
+			{
+				m_im &= ~IM_SID;
+			}
+			break;
+
+		case I8085_INTE:
+			if (m_ietemp)
+			{
+				m_im |= IM_IE;
+			}
+			else
+			{
+				m_im &= ~IM_IE;
+			}
+			break;
+
+		default:
+			fatalerror("CPU_IMPORT_STATE(i808x) called for unexpected value\n");
+	}
+}
+
+void i8085a_cpu_device::state_export(const device_state_entry &entry)
+{
+	switch (entry.index())
+	{
+		case I8085_SID:
+			m_ietemp = ((m_im & IM_SID) != 0) && m_in_sid_func() != 0;
+			break;
+
+		case I8085_INTE:
+			m_ietemp = ((m_im & IM_IE) != 0);
+			break;
+
+		default:
+			fatalerror("CPU_EXPORT_STATE(i808x) called for unexpected value\n");
+	}
+}
+
+void i8085a_cpu_device::state_string_export(const device_state_entry &entry, std::string &str) const
+{
+	switch (entry.index())
+	{
+		case STATE_GENFLAGS:
+			str = string_format("%c%c%c%c%c%c%c%c",
+				m_AF.b.l & 0x80 ? 'S':'.',
+				m_AF.b.l & 0x40 ? 'Z':'.',
+				m_AF.b.l & 0x20 ? 'X':'.', // X5
+				m_AF.b.l & 0x10 ? 'H':'.',
+				m_AF.b.l & 0x08 ? '?':'.',
+				m_AF.b.l & 0x04 ? 'P':'.',
+				m_AF.b.l & 0x02 ? 'V':'.',
+				m_AF.b.l & 0x01 ? 'C':'.');
+			break;
+	}
+}
+
+offs_t i8085a_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, u32 options)
+{
+	extern CPU_DISASSEMBLE( i8085 );
+	return CPU_DISASSEMBLE_NAME(i8085)(this, stream, pc, oprom, opram, options);
+}
+
+
+/***************************************************************************
+    INTERRUPTS
+***************************************************************************/
+
+void i8085a_cpu_device::execute_set_input(int irqline, int state)
+{
+	int newstate = (state != CLEAR_LINE);
+
+	/* NMI is edge-triggered */
+	if (irqline == INPUT_LINE_NMI)
+	{
+		if (!m_nmi_state && newstate)
+			m_trap_pending = true;
+		m_nmi_state = newstate;
+	}
+
+	/* RST7.5 is edge-triggered */
+	else if (irqline == I8085_RST75_LINE)
+	{
+		if (!m_irq_state[I8085_RST75_LINE] && newstate)
+			m_im |= IM_I75;
+		m_irq_state[I8085_RST75_LINE] = newstate;
+	}
+
+	/* remaining sources are level triggered */
+	else if (irqline < ARRAY_LENGTH(m_irq_state))
+		m_irq_state[irqline] = state;
+}
+
+void i8085a_cpu_device::break_halt_for_interrupt()
+{
+	/* de-halt if necessary */
+	if (m_halt)
+	{
+		m_PC.w.l++;
+		m_halt = 0;
+		set_status(0x26); /* int ack while halt */
+	}
+	else
+		set_status(0x23); /* int ack */
+}
+
+void i8085a_cpu_device::check_for_interrupts()
+{
+	/* TRAP is the highest priority */
+	if (m_trap_pending)
+	{
+		/* the first RIM after a TRAP reflects the original IE state; remember it here,
+		   setting the high bit to indicate it is valid */
+		m_trap_im_copy = m_im | 0x80;
+
+		/* reset the pending state */
+		m_trap_pending = false;
+
+		/* break out of HALT state and call the IRQ ack callback */
+		break_halt_for_interrupt();
+		standard_irq_callback(INPUT_LINE_NMI);
+
+		/* push the PC and jump to $0024 */
+		op_push(m_PC);
+		set_inte(0);
+		m_PC.w.l = ADDR_TRAP;
+		m_icount -= 11;
+	}
+
+	/* followed by RST7.5 */
+	else if ((m_im & IM_I75) && !(m_im & IM_M75) && (m_im & IM_IE))
+	{
+		/* reset the pending state (which is CPU-visible via the RIM instruction) */
+		m_im &= ~IM_I75;
+
+		/* break out of HALT state and call the IRQ ack callback */
+		break_halt_for_interrupt();
+		standard_irq_callback(I8085_RST75_LINE);
+
+		/* push the PC and jump to $003C */
+		op_push(m_PC);
+		set_inte(0);
+		m_PC.w.l = ADDR_RST75;
+		m_icount -= 11;
+	}
+
+	/* followed by RST6.5 */
+	else if (m_irq_state[I8085_RST65_LINE] && !(m_im & IM_M65) && (m_im & IM_IE))
+	{
+		/* break out of HALT state and call the IRQ ack callback */
+		break_halt_for_interrupt();
+		standard_irq_callback(I8085_RST65_LINE);
+
+		/* push the PC and jump to $0034 */
+		op_push(m_PC);
+		set_inte(0);
+		m_PC.w.l = ADDR_RST65;
+		m_icount -= 11;
+	}
+
+	/* followed by RST5.5 */
+	else if (m_irq_state[I8085_RST55_LINE] && !(m_im & IM_M55) && (m_im & IM_IE))
+	{
+		/* break out of HALT state and call the IRQ ack callback */
+		break_halt_for_interrupt();
+		standard_irq_callback(I8085_RST55_LINE);
+
+		/* push the PC and jump to $002C */
+		op_push(m_PC);
+		set_inte(0);
+		m_PC.w.l = ADDR_RST55;
+		m_icount -= 11;
+	}
+
+	/* followed by classic INTR */
+	else if (m_irq_state[I8085_INTR_LINE] && (m_im & IM_IE))
+	{
+		u32 vector;
+
+		/* break out of HALT state and call the IRQ ack callback */
+		break_halt_for_interrupt();
+		vector = standard_irq_callback(I8085_INTR_LINE);
+
+		/* use the resulting vector as an opcode to execute */
+		set_inte(0);
+		switch (vector & 0xff0000)
+		{
+			case 0xcd0000:  /* CALL nnnn */
+				m_icount -= 7;
+				op_push(m_PC);
+			case 0xc30000:  /* JMP  nnnn */
+				m_icount -= 10;
+				m_PC.d = vector & 0xffff;
+				break;
+
+			default:
+				LOG("i8085 take int $%02x\n", vector);
+				execute_one(vector & 0xff);
+				break;
+		}
+	}
 }
 
 
@@ -484,145 +828,6 @@ void i8085a_cpu_device::op_rst(u8 v)
 	m_PC.d = 8 * v;
 }
 
-
-/***************************************************************************
-    INTERRUPTS
-***************************************************************************/
-
-void i8085a_cpu_device::execute_set_input(int irqline, int state)
-{
-	int newstate = (state != CLEAR_LINE);
-
-	/* NMI is edge-triggered */
-	if (irqline == INPUT_LINE_NMI)
-	{
-		if (!m_nmi_state && newstate)
-			m_trap_pending = true;
-		m_nmi_state = newstate;
-	}
-
-	/* RST7.5 is edge-triggered */
-	else if (irqline == I8085_RST75_LINE)
-	{
-		if (!m_irq_state[I8085_RST75_LINE] && newstate)
-			m_im |= IM_I75;
-		m_irq_state[I8085_RST75_LINE] = newstate;
-	}
-
-	/* remaining sources are level triggered */
-	else if (irqline < ARRAY_LENGTH(m_irq_state))
-		m_irq_state[irqline] = state;
-}
-
-void i8085a_cpu_device::break_halt_for_interrupt()
-{
-	/* de-halt if necessary */
-	if (m_halt)
-	{
-		m_PC.w.l++;
-		m_halt = 0;
-		set_status(0x26); /* int ack while halt */
-	}
-	else
-		set_status(0x23); /* int ack */
-}
-
-void i8085a_cpu_device::check_for_interrupts()
-{
-	/* TRAP is the highest priority */
-	if (m_trap_pending)
-	{
-		/* the first RIM after a TRAP reflects the original IE state; remember it here,
-		   setting the high bit to indicate it is valid */
-		m_trap_im_copy = m_im | 0x80;
-
-		/* reset the pending state */
-		m_trap_pending = false;
-
-		/* break out of HALT state and call the IRQ ack callback */
-		break_halt_for_interrupt();
-		standard_irq_callback(INPUT_LINE_NMI);
-
-		/* push the PC and jump to $0024 */
-		op_push(m_PC);
-		set_inte(0);
-		m_PC.w.l = ADDR_TRAP;
-		m_icount -= 11;
-	}
-
-	/* followed by RST7.5 */
-	else if ((m_im & IM_I75) && !(m_im & IM_M75) && (m_im & IM_IE))
-	{
-		/* reset the pending state (which is CPU-visible via the RIM instruction) */
-		m_im &= ~IM_I75;
-
-		/* break out of HALT state and call the IRQ ack callback */
-		break_halt_for_interrupt();
-		standard_irq_callback(I8085_RST75_LINE);
-
-		/* push the PC and jump to $003C */
-		op_push(m_PC);
-		set_inte(0);
-		m_PC.w.l = ADDR_RST75;
-		m_icount -= 11;
-	}
-
-	/* followed by RST6.5 */
-	else if (m_irq_state[I8085_RST65_LINE] && !(m_im & IM_M65) && (m_im & IM_IE))
-	{
-		/* break out of HALT state and call the IRQ ack callback */
-		break_halt_for_interrupt();
-		standard_irq_callback(I8085_RST65_LINE);
-
-		/* push the PC and jump to $0034 */
-		op_push(m_PC);
-		set_inte(0);
-		m_PC.w.l = ADDR_RST65;
-		m_icount -= 11;
-	}
-
-	/* followed by RST5.5 */
-	else if (m_irq_state[I8085_RST55_LINE] && !(m_im & IM_M55) && (m_im & IM_IE))
-	{
-		/* break out of HALT state and call the IRQ ack callback */
-		break_halt_for_interrupt();
-		standard_irq_callback(I8085_RST55_LINE);
-
-		/* push the PC and jump to $002C */
-		op_push(m_PC);
-		set_inte(0);
-		m_PC.w.l = ADDR_RST55;
-		m_icount -= 11;
-	}
-
-	/* followed by classic INTR */
-	else if (m_irq_state[I8085_INTR_LINE] && (m_im & IM_IE))
-	{
-		u32 vector;
-
-		/* break out of HALT state and call the IRQ ack callback */
-		break_halt_for_interrupt();
-		vector = standard_irq_callback(I8085_INTR_LINE);
-
-		/* use the resulting vector as an opcode to execute */
-		set_inte(0);
-		switch (vector & 0xff0000)
-		{
-			case 0xcd0000:  /* CALL nnnn */
-				m_icount -= 7;
-				op_push(m_PC);
-			case 0xc30000:  /* JMP  nnnn */
-				m_icount -= 10;
-				m_PC.d = vector & 0xffff;
-				break;
-
-			default:
-				LOG("i8085 take int $%02x\n", vector);
-				execute_one(vector & 0xff);
-				break;
-		}
-	}
-}
 
 /***************************************************************************
     COMMON EXECUTION
@@ -1410,219 +1615,4 @@ void i8085a_cpu_device::execute_one(int opcode)
 			op_rst(7);
 			break;
 	} // end big switch
-}
-
-
-
-
-
-/***************************************************************************
-    CORE INITIALIZATION
-***************************************************************************/
-
-void i8085a_cpu_device::init_tables()
-{
-	u8 zs;
-	int i, p;
-	for (i = 0; i < 256; i++)
-	{
-		/* cycles */
-		lut_cycles[i] = is_8085() ? lut_cycles_8085[i] : lut_cycles_8080[i];
-
-		/* flags */
-		zs = 0;
-		if (i==0) zs |= ZF;
-		if (i&128) zs |= SF;
-		p = 0;
-		if (i&1) ++p;
-		if (i&2) ++p;
-		if (i&4) ++p;
-		if (i&8) ++p;
-		if (i&16) ++p;
-		if (i&32) ++p;
-		if (i&64) ++p;
-		if (i&128) ++p;
-		lut_zs[i] = zs;
-		lut_zsp[i] = zs | ((p&1) ? 0 : PF);
-	}
-}
-
-
-void i8085a_cpu_device::device_start()
-{
-	m_PC.d = 0;
-	m_SP.d = 0;
-	m_AF.d = 0;
-	m_BC.d = 0;
-	m_DE.d = 0;
-	m_HL.d = 0;
-	m_WZ.d = 0;
-	m_halt = 0;
-	m_im = 0;
-	m_status = 0;
-	m_after_ei = 0;
-	m_nmi_state = 0;
-	m_irq_state[3] = m_irq_state[2] = m_irq_state[1] = m_irq_state[0] = 0;
-	m_trap_pending = 0;
-	m_trap_im_copy = 0;
-	m_sod_state = 0;
-	m_ietemp = false;
-
-	init_tables();
-
-	/* set up the state table */
-	{
-		state_add(I8085_PC,     "PC",     m_PC.w.l);
-		state_add(STATE_GENPC,  "GENPC",  m_PC.w.l).noshow();
-		state_add(STATE_GENPCBASE, "CURPC", m_PC.w.l).noshow();
-		state_add(I8085_SP,     "SP",     m_SP.w.l);
-		state_add(STATE_GENSP,  "GENSP",  m_SP.w.l).noshow();
-		state_add(STATE_GENFLAGS, "GENFLAGS", m_AF.b.l).noshow().formatstr("%8s");
-		state_add(I8085_A,      "A",      m_AF.b.h).noshow();
-		state_add(I8085_B,      "B",      m_BC.b.h).noshow();
-		state_add(I8085_C,      "C",      m_BC.b.l).noshow();
-		state_add(I8085_D,      "D",      m_DE.b.h).noshow();
-		state_add(I8085_E,      "E",      m_DE.b.l).noshow();
-		state_add(I8085_F,      "F",      m_AF.b.l).noshow();
-		state_add(I8085_H,      "H",      m_HL.b.h).noshow();
-		state_add(I8085_L,      "L",      m_HL.b.l).noshow();
-		state_add(I8085_AF,     "AF",     m_AF.w.l);
-		state_add(I8085_BC,     "BC",     m_BC.w.l);
-		state_add(I8085_DE,     "DE",     m_DE.w.l);
-		state_add(I8085_HL,     "HL",     m_HL.w.l);
-		state_add(I8085_STATUS, "STATUS", m_status);
-		state_add(I8085_SOD,    "SOD",    m_sod_state).mask(0x1);
-		state_add(I8085_SID,    "SID",    m_ietemp).mask(0x1).callimport().callexport();
-		state_add(I8085_INTE,   "INTE",   m_ietemp).mask(0x1).callimport().callexport();
-	}
-
-	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
-	m_io = &space(AS_IO);
-
-	/* resolve callbacks */
-	m_out_status_func.resolve_safe();
-	m_out_inte_func.resolve_safe();
-	m_in_sid_func.resolve_safe(0);
-	m_out_sod_func.resolve_safe();
-
-	/* register for state saving */
-	save_item(NAME(m_PC.w.l));
-	save_item(NAME(m_SP.w.l));
-	save_item(NAME(m_AF.w.l));
-	save_item(NAME(m_BC.w.l));
-	save_item(NAME(m_DE.w.l));
-	save_item(NAME(m_HL.w.l));
-	save_item(NAME(m_halt));
-	save_item(NAME(m_im));
-	save_item(NAME(m_status));
-	save_item(NAME(m_after_ei));
-	save_item(NAME(m_nmi_state));
-	save_item(NAME(m_irq_state));
-	save_item(NAME(m_trap_pending));
-	save_item(NAME(m_trap_im_copy));
-	save_item(NAME(m_sod_state));
-
-	m_icountptr = &m_icount;
-}
-
-
-/***************************************************************************
-    COMMON RESET
-***************************************************************************/
-
-void i8085a_cpu_device::device_reset()
-{
-	m_PC.d = 0;
-	m_halt = 0;
-	m_im &= ~IM_I75;
-	m_im |= IM_M55 | IM_M65 | IM_M75;
-	m_after_ei = false;
-	m_trap_pending = false;
-	m_trap_im_copy = 0;
-	set_inte(0);
-	set_sod(0);
-}
-
-
-
-/***************************************************************************
-    COMMON STATE IMPORT/EXPORT
-***************************************************************************/
-
-void i8085a_cpu_device::state_import(const device_state_entry &entry)
-{
-	switch (entry.index())
-	{
-		case I8085_SID:
-			if (m_ietemp)
-			{
-				m_im |= IM_SID;
-			}
-			else
-			{
-				m_im &= ~IM_SID;
-			}
-			break;
-
-		case I8085_INTE:
-			if (m_ietemp)
-			{
-				m_im |= IM_IE;
-			}
-			else
-			{
-				m_im &= ~IM_IE;
-			}
-			break;
-
-		default:
-			fatalerror("CPU_IMPORT_STATE(i808x) called for unexpected value\n");
-	}
-}
-
-
-void i8085a_cpu_device::state_export(const device_state_entry &entry)
-{
-	switch (entry.index())
-	{
-		case I8085_SID:
-			m_ietemp = ((m_im & IM_SID) != 0) && m_in_sid_func() != 0;
-			break;
-
-		case I8085_INTE:
-			m_ietemp = ((m_im & IM_IE) != 0);
-			break;
-
-		default:
-			fatalerror("CPU_EXPORT_STATE(i808x) called for unexpected value\n");
-	}
-}
-
-void i8085a_cpu_device::state_string_export(const device_state_entry &entry, std::string &str) const
-{
-	switch (entry.index())
-	{
-		case STATE_GENFLAGS:
-			str = string_format("%c%c%c%c%c%c%c%c",
-				m_AF.b.l & 0x80 ? 'S':'.',
-				m_AF.b.l & 0x40 ? 'Z':'.',
-				m_AF.b.l & 0x20 ? 'X':'.', // X5
-				m_AF.b.l & 0x10 ? 'H':'.',
-				m_AF.b.l & 0x08 ? '?':'.',
-				m_AF.b.l & 0x04 ? 'P':'.',
-				m_AF.b.l & 0x02 ? 'V':'.',
-				m_AF.b.l & 0x01 ? 'C':'.');
-			break;
-	}
-}
-
-
-
-
-
-offs_t i8085a_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, u32 options)
-{
-	extern CPU_DISASSEMBLE( i8085 );
-	return CPU_DISASSEMBLE_NAME(i8085)(this, stream, pc, oprom, opram, options);
 }
