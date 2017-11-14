@@ -2829,90 +2829,33 @@ void hyperstone_device::hyperstone_cmpbi()
 	m_icount -= m_clock_cycles_1;
 }
 
-void hyperstone_device::hyperstone_andni_global_simm()
+template <hyperstone_device::reg_bank DST_GLOBAL, hyperstone_device::imm_size IMM_LONG>
+void hyperstone_device::hyperstone_andni()
 {
+	uint32_t imm;
+	if (IMM_LONG)
+		imm = decode_immediate_s();
+
 	check_delay_PC();
 
-	uint32_t imm;
 	if (N_OP_MASK == 0x10f)
 		imm = 0x7fffffff; // bit 31 = 0, others = 1
-	else
+	else if (!IMM_LONG)
 		imm = immediate_values[m_op & 0x0f];
 
-	const uint32_t dst_code = DST_CODE;
-	const uint32_t dreg = m_global_regs[dst_code] & ~imm;
-	set_global_register(dst_code, dreg);
-
-	if (dreg == 0)
-		SR |= Z_MASK;
+	uint32_t dreg;
+	if (DST_GLOBAL)
+	{
+		const uint32_t dst_code = DST_CODE;
+		dreg = m_global_regs[dst_code] & ~imm;
+		set_global_register(dst_code, dreg);
+	}
 	else
-		SR &= ~Z_MASK;
-
-	m_icount -= m_clock_cycles_1;
-}
-
-void hyperstone_device::hyperstone_andni_global_limm()
-{
-	const uint32_t extra_u = decode_immediate_s();
-
-	check_delay_PC();
-
-	uint32_t imm;
-	if (N_OP_MASK == 0x10f)
-		imm = 0x7fffffff; // bit 31 = 0, others = 1
-	else
-		imm = extra_u;
-
-	const uint32_t dst_code = DST_CODE;
-	const uint32_t dreg = m_global_regs[dst_code] & ~imm;
-	set_global_register(dst_code, dreg);
-
-	if (dreg == 0)
-		SR |= Z_MASK;
-	else
-		SR &= ~Z_MASK;
-
-	m_icount -= m_clock_cycles_1;
-}
-
-void hyperstone_device::hyperstone_andni_local_simm()
-{
-	check_delay_PC();
-
-	uint32_t imm;
-	if (N_OP_MASK == 0x10f)
-		imm = 0x7fffffff; // bit 31 = 0, others = 1
-	else
-		imm = immediate_values[m_op & 0x0f];
-
-	const uint32_t dst_code = (DST_CODE + GET_FP) & 0x3f;
-	const uint32_t dreg = m_local_regs[dst_code] & ~imm;
-	m_local_regs[dst_code] = dreg;
-
-	if (dreg == 0)
-		SR |= Z_MASK;
-	else
-		SR &= ~Z_MASK;
-
-	m_icount -= m_clock_cycles_1;
-}
-
-void hyperstone_device::hyperstone_andni_local_limm()
-{
-	const uint32_t extra_u = decode_immediate_s();
-
-	check_delay_PC();
-
-	const uint32_t dst_code = (DST_CODE + GET_FP) & 0x3f;
-
-	uint32_t imm;
-	if (N_OP_MASK == 0x10f)
-		imm = 0x7fffffff; // bit 31 = 0, others = 1
-	else
-		imm = extra_u;
-
-	const uint32_t dreg = m_local_regs[dst_code] & ~imm;
-	m_local_regs[dst_code] = dreg;
+	{
+		const uint32_t dst_code = (DST_CODE + GET_FP) & 0x3f;
+		dreg = m_local_regs[dst_code] & ~imm;
+		m_local_regs[dst_code] = dreg;
+	}
 
 	if (dreg == 0)
 		SR |= Z_MASK;
