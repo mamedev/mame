@@ -103,7 +103,7 @@
 #include "emu.h"
 #include "debugger.h"
 #include "i8085.h"
-#include "i8085cpu.h"
+#include "i8085ops.hxx"
 
 #define VERBOSE 0
 #include "logmacro.h"
