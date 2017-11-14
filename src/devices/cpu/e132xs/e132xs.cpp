@@ -706,8 +706,6 @@ void hyperstone_device::set_global_register(uint8_t code, uint32_t val)
 #define SIGN_BIT(val)           ((val & 0x80000000) >> 31)
 #define SIGN_TO_N(val)          ((val & 0x80000000) >> 29)
 
-#define LOCAL  1
-
 static const int32_t immediate_values[32] =
 {
 	0, 1, 2, 3, 4, 5, 6, 7,
@@ -1732,10 +1730,10 @@ void hyperstone_device::execute_run()
 			case 0x5d: hyperstone_negs_global_local(); break;
 			case 0x5e: hyperstone_negs_local_global(); break;
 			case 0x5f: hyperstone_negs_local_local(); break;
-			case 0x60: hyperstone_cmpi_global_simm(); break;
-			case 0x61: hyperstone_cmpi_global_limm(); break;
-			case 0x62: hyperstone_cmpi_local_simm(); break;
-			case 0x63: hyperstone_cmpi_local_limm(); break;
+			case 0x60: hyperstone_cmpi<GLOBAL, SIMM>(); break;
+			case 0x61: hyperstone_cmpi<GLOBAL, LIMM>(); break;
+			case 0x62: hyperstone_cmpi<LOCAL, SIMM>(); break;
+			case 0x63: hyperstone_cmpi<LOCAL, LIMM>(); break;
 			case 0x64: hyperstone_movi_global_simm(); break;
 			case 0x65: hyperstone_movi_global_limm(); break;
 			case 0x66: hyperstone_movi_local_simm(); break;

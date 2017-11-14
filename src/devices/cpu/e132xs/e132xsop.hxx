@@ -2598,87 +2598,19 @@ void hyperstone_device::hyperstone_negs_local_local()
 
 
 
-void hyperstone_device::hyperstone_cmpi_global_simm()
+template <hyperstone_device::reg_bank DST_GLOBAL, hyperstone_device::imm_size IMM_LONG>
+void hyperstone_device::hyperstone_cmpi()
 {
-	check_delay_PC();
-
-	const uint32_t imm = immediate_values[m_op & 0x0f];
-	const uint32_t dreg = m_global_regs[DST_CODE];
-
-	SR &= ~(V_MASK | Z_MASK | N_MASK | C_MASK);
-
-	uint64_t tmp = (uint64_t)dreg - (uint64_t)imm;
-	SR |= ((tmp ^ dreg) & (dreg ^ imm) & 0x80000000) >> 28;
-
-	if (dreg == imm)
-		SR |= Z_MASK;
-
-	if ((int32_t)dreg < (int32_t)imm)
-		SR |= N_MASK;
-
-	if (dreg < imm)
-		SR |= C_MASK;
-
-	m_icount -= m_clock_cycles_1;
-}
-
-void hyperstone_device::hyperstone_cmpi_global_limm()
-{
-	const uint32_t imm = decode_immediate_s();
+	uint32_t imm;
+	if (IMM_LONG)
+		imm = decode_immediate_s();
 
 	check_delay_PC();
 
-	const uint32_t dreg = m_global_regs[DST_CODE];
-
-	SR &= ~(V_MASK | Z_MASK | N_MASK | C_MASK);
-
-	uint64_t tmp = (uint64_t)dreg - (uint64_t)imm;
-	SR |= ((tmp ^ dreg) & (dreg ^ imm) & 0x80000000) >> 28;
-
-	if (dreg == imm)
-		SR |= Z_MASK;
-
-	if ((int32_t)dreg < (int32_t)imm)
-		SR |= N_MASK;
-
-	if (dreg < imm)
-		SR |= C_MASK;
-
-	m_icount -= m_clock_cycles_1;
-}
-
-void hyperstone_device::hyperstone_cmpi_local_simm()
-{
-	check_delay_PC();
-
-	const uint32_t imm = immediate_values[m_op & 0x0f];
-	const uint32_t dreg = m_local_regs[(DST_CODE + GET_FP) & 0x3f];
-
-	SR &= ~(V_MASK | Z_MASK | N_MASK | C_MASK);
-
-	uint64_t tmp = (uint64_t)dreg - (uint64_t)imm;
-	SR |= ((tmp ^ dreg) & (dreg ^ imm) & 0x80000000) >> 28;
-
-	if (dreg == imm)
-		SR |= Z_MASK;
-
-	if ((int32_t)dreg < (int32_t)imm)
-		SR |= N_MASK;
-
-	if (dreg < imm)
-		SR |= C_MASK;
-
-	m_icount -= m_clock_cycles_1;
-}
-
-void hyperstone_device::hyperstone_cmpi_local_limm()
-{
-	uint32_t imm = decode_immediate_s();
-
-	check_delay_PC();
-
-	const uint32_t dst_code = (DST_CODE + GET_FP) & 0x3f;
-	const uint32_t dreg = m_local_regs[dst_code];
+	if (!IMM_LONG)
+		imm = immediate_values[m_op & 0x0f];
+	const uint32_t dst_code = DST_GLOBAL ? DST_CODE : ((DST_CODE + GET_FP) & 0x3f);
+	const uint32_t dreg = (DST_GLOBAL ? m_global_regs : m_local_regs)[dst_code];
 
 	SR &= ~(V_MASK | Z_MASK | N_MASK | C_MASK);
 

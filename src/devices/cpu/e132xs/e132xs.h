@@ -96,6 +96,18 @@ protected:
 		E132XS_L60, E132XS_L61, E132XS_L62, E132XS_L63
 	};
 
+	enum reg_bank
+	{
+		LOCAL = 0,
+		GLOBAL = 1
+	};
+
+	enum imm_size
+	{
+		SIMM = 0,
+		LIMM = 1
+	};
+
 	// construction/destruction
 	hyperstone_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock,
 						const device_type type, uint32_t prg_data_width, uint32_t io_data_width, address_map_constructor internal_map);
@@ -292,10 +304,7 @@ private:
 	void hyperstone_not_global_local();
 	void hyperstone_not_local_global();
 	void hyperstone_not_local_local();
-	void hyperstone_cmpi_global_simm();
-	void hyperstone_cmpi_global_limm();
-	void hyperstone_cmpi_local_simm();
-	void hyperstone_cmpi_local_limm();
+	template <reg_bank DST_GLOBAL, imm_size IMM_LONG> void hyperstone_cmpi();
 	void hyperstone_movi_global_simm();
 	void hyperstone_movi_global_limm();
 	void hyperstone_movi_local_simm();
