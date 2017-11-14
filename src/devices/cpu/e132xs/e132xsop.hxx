@@ -1253,6 +1253,8 @@ void hyperstone_device::hyperstone_add()
 template <hyperstone_device::reg_bank DST_GLOBAL, hyperstone_device::reg_bank SRC_GLOBAL>
 void hyperstone_device::hyperstone_adds()
 {
+	check_delay_PC();
+
 	const uint32_t fp = GET_FP;
 	const uint32_t src_code = SRC_GLOBAL ? SRC_CODE : ((SRC_CODE + fp) & 0x3f);
 	const uint32_t dst_code = DST_GLOBAL ? DST_CODE : ((DST_CODE + fp) & 0x3f);
@@ -1269,7 +1271,10 @@ void hyperstone_device::hyperstone_adds()
 //#endif
 
 	const int32_t res = sreg + dreg;
-	(DST_GLOBAL ? m_global_regs : m_local_regs)[dst_code] = res;
+	if (DST_GLOBAL)
+		set_global_register(dst_code, res);
+	else
+		m_local_regs[dst_code] = res;
 
 	if (res == 0)
 		SR |= Z_MASK;
@@ -1371,6 +1376,8 @@ void hyperstone_device::hyperstone_xor()
 template <hyperstone_device::reg_bank DST_GLOBAL, hyperstone_device::reg_bank SRC_GLOBAL>
 void hyperstone_device::hyperstone_subc()
 {
+	check_delay_PC();
+
 	const uint32_t fp = GET_FP;
 	const uint32_t src_code = SRC_GLOBAL ? SRC_CODE : ((SRC_CODE + fp) & 0x3f);
 	const uint32_t dst_code = DST_GLOBAL ? DST_CODE : ((DST_CODE + fp) & 0x3f);
@@ -1471,6 +1478,8 @@ void hyperstone_device::hyperstone_sub()
 template <hyperstone_device::reg_bank DST_GLOBAL, hyperstone_device::reg_bank SRC_GLOBAL>
 void hyperstone_device::hyperstone_subs()
 {
+	check_delay_PC();
+
 	const uint32_t fp = GET_FP;
 	const uint32_t src_code = SRC_GLOBAL ? SRC_CODE : ((SRC_CODE + fp) & 0x3f);
 	const uint32_t dst_code = DST_GLOBAL ? DST_CODE : ((DST_CODE + fp) & 0x3f);
@@ -1578,7 +1587,6 @@ void hyperstone_device::hyperstone_neg()
 
 	const uint32_t fp = GET_FP;
 	const uint32_t src_code = SRC_GLOBAL ? SRC_CODE : ((SRC_CODE + fp) & 0x3f);
-	const uint32_t dst_code = DST_GLOBAL ? DST_CODE : ((DST_CODE + fp) & 0x3f);
 
 	const uint32_t sreg = SRC_GLOBAL ? ((src_code == SR_REGISTER) ? GET_C : m_global_regs[src_code]) : m_local_regs[src_code];
 	const uint64_t tmp = -uint64_t(sreg);
@@ -1588,7 +1596,10 @@ void hyperstone_device::hyperstone_neg()
 	SR |= (tmp & sreg & 0x80000000) >> 28;
 
 	const uint32_t dreg = -sreg;
-	(DST_GLOBAL ? m_global_regs : m_local_regs)[dst_code] = dreg;
+	if (DST_GLOBAL)
+		set_global_register(DST_CODE, dreg);
+	else
+		m_local_regs[(DST_CODE + fp) & 0x3f] = dreg;
 
 	if (dreg == 0)
 		SR |= Z_MASK;
@@ -1621,7 +1632,7 @@ void hyperstone_device::hyperstone_negs()
 	if (DST_GLOBAL)
 		set_global_register(DST_CODE, res);
 	else
-		m_local_regs[(DST_CODE + GET_FP) & 0x3f] = res;
+		m_local_regs[(DST_CODE + fp) & 0x3f] = res;
 
 	if (res == 0)
 		SR |= Z_MASK;
