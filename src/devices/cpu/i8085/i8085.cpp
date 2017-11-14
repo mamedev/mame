@@ -140,7 +140,6 @@ constexpr u16 ADDR_TRAP     = 0x0024;
 constexpr u16 ADDR_RST55    = 0x002c;
 constexpr u16 ADDR_RST65    = 0x0034;
 constexpr u16 ADDR_RST75    = 0x003c;
-constexpr u16 ADDR_INTR     = 0x0038;
 
 
 
