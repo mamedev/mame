@@ -9,6 +9,12 @@
  *   Copyright Juergen Buchmueller, all rights reserved.
  *   Partially based on information out of Z80Em by Marcel De Kogel
  *
+ *   TODO:
+ *   - 8085 DAA fails on 8080/8085 CPU Exerciser
+ *   - not sure if 8085 DSUB H flag is correct
+ *
+ * ---------------------------------------------------------------------------
+ *
  * changes in V1.3
  *   - Added undocumented opcodes for the 8085A, based on a german
  *     book about microcomputers: "Mikrocomputertechnik mit dem
@@ -349,30 +355,7 @@ void i8085a_cpu_device::WM(uint32_t a, uint8_t v)
 }
 
 
-#define M_MVI(R) R=ARG()
 
-/* rotate */
-#define M_RLC { \
-	m_AF.b.h = (m_AF.b.h << 1) | (m_AF.b.h >> 7); \
-	m_AF.b.l = (m_AF.b.l & 0xfe) | (m_AF.b.h & CF); \
-}
-
-#define M_RRC { \
-	m_AF.b.l = (m_AF.b.l & 0xfe) | (m_AF.b.h & CF); \
-	m_AF.b.h = (m_AF.b.h >> 1) | (m_AF.b.h << 7); \
-}
-
-#define M_RAL { \
-	int c = m_AF.b.l&CF; \
-	m_AF.b.l = (m_AF.b.l & 0xfe) | (m_AF.b.h >> 7); \
-	m_AF.b.h = (m_AF.b.h << 1) | c; \
-}
-
-#define M_RAR { \
-	int c = (m_AF.b.l&CF) << 7; \
-	m_AF.b.l = (m_AF.b.l & 0xfe) | (m_AF.b.h & CF); \
-	m_AF.b.h = (m_AF.b.h >> 1) | c; \
-}
 
 /* logical */
 #define M_ORA(R) m_AF.b.h|=R; m_AF.b.l=ZSP[m_AF.b.h]
@@ -418,31 +401,6 @@ void i8085a_cpu_device::WM(uint32_t a, uint8_t v)
 	m_AF.b.l = (m_AF.b.l & ~CF) | (q>>16 & CF ); \
 	m_HL.w.l = q; \
 }
-
-// DSUB is 8085-only, not sure if H flag handling is correct
-#define M_DSUB() { \
-	int q = m_HL.b.l-m_BC.b.l; \
-	m_AF.b.l=ZS[q&255]|((q>>8)&CF)|VF| \
-		((m_HL.b.l^q^m_BC.b.l)&HF)| \
-		(((m_BC.b.l^m_HL.b.l)&(m_HL.b.l^q)&SF)>>5); \
-	m_HL.b.l=q; \
-	q = m_HL.b.h-m_BC.b.h-(m_AF.b.l&CF); \
-	m_AF.b.l=ZS[q&255]|((q>>8)&CF)|VF| \
-		((m_HL.b.h^q^m_BC.b.h)&HF)| \
-		(((m_BC.b.h^m_HL.b.h)&(m_HL.b.h^q)&SF)>>5); \
-	if (m_HL.b.l!=0) m_AF.b.l&=~ZF; \
-}
-
-/* i/o */
-#define M_IN \
-	set_status(0x42); \
-	m_WZ.d=ARG(); \
-	m_AF.b.h=m_io->read_byte(m_WZ.d);
-
-#define M_OUT \
-	set_status(0x10); \
-	m_WZ.d=ARG(); \
-	m_io->write_byte(m_WZ.d,m_AF.b.h)
 
 /* stack */
 #define M_PUSH(R) { \
@@ -693,16 +651,23 @@ void i8085a_cpu_device::execute_one(int opcode)
 			M_DCR(m_BC.b.h);
 			break;
 		case 0x06: // MVI B,nn
-			M_MVI(m_BC.b.h);
+			m_BC.b.h = ARG();
 			break;
 		case 0x07: // RLC
-			M_RLC;
+			m_AF.b.h = (m_AF.b.h << 1) | (m_AF.b.h >> 7);
+			m_AF.b.l = (m_AF.b.l & 0xfe) | (m_AF.b.h & CF);
 			break;
 
 		case 0x08: // 8085: DSUB, otherwise undocumented NOP
 			if (IS_8085())
 			{
-				M_DSUB();
+				int q = m_HL.b.l - m_BC.b.l;
+				m_AF.b.l = ZS[q & 255] | ((q >> 8) & CF) | VF | ((m_HL.b.l ^ q ^ m_BC.b.l) & HF) | (((m_BC.b.l ^ m_HL.b.l) & (m_HL.b.l ^ q) & SF) >> 5);
+				m_HL.b.l = q;
+				q = m_HL.b.h - m_BC.b.h - (m_AF.b.l & CF);
+				m_AF.b.l = ZS[q & 255] | ((q >> 8) & CF) | VF | ((m_HL.b.h ^ q ^ m_BC.b.h) & HF) | (((m_BC.b.h ^ m_HL.b.h) & (m_HL.b.h ^ q) & SF) >> 5);
+				if (m_HL.b.l != 0 )
+					m_AF.b.l &= ~ZF;
 			}
 			break;
 		case 0x09: // DAD B
@@ -728,10 +693,11 @@ void i8085a_cpu_device::execute_one(int opcode)
 			M_DCR(m_BC.b.l);
 			break;
 		case 0x0e: // MVI C,nn
-			M_MVI(m_BC.b.l);
+			m_BC.b.l = ARG();
 			break;
 		case 0x0f: // RRC
-			M_RRC;
+			m_AF.b.l = (m_AF.b.l & 0xfe) | (m_AF.b.h & CF);
+			m_AF.b.h = (m_AF.b.h >> 1) | (m_AF.b.h << 7);
 			break;
 
 		case 0x10: // 8085: ASRH, otherwise undocumented NOP
@@ -764,11 +730,15 @@ void i8085a_cpu_device::execute_one(int opcode)
 			M_DCR(m_DE.b.h);
 			break;
 		case 0x16: // MVI D,nn
-			M_MVI(m_DE.b.h);
+			m_DE.b.h = ARG();
 			break;
 		case 0x17: // RAL
-			M_RAL;
+		{
+			int c = m_AF.b.l & CF;
+			m_AF.b.l = (m_AF.b.l & 0xfe) | (m_AF.b.h >> 7);
+			m_AF.b.h = (m_AF.b.h << 1) | c;
 			break;
+		}
 
 		case 0x18: // 8085: RLDE, otherwise undocumented NOP
 			if (IS_8085())
@@ -802,11 +772,15 @@ void i8085a_cpu_device::execute_one(int opcode)
 			M_DCR(m_DE.b.l);
 			break;
 		case 0x1e: // MVI E,nn
-			M_MVI(m_DE.b.l);
+			m_DE.b.l = ARG();
 			break;
 		case 0x1f: // RAR
-			M_RAR;
+		{
+			int c = (m_AF.b.l & CF) << 7;
+			m_AF.b.l = (m_AF.b.l & 0xfe) | (m_AF.b.h & CF);
+			m_AF.b.h = (m_AF.b.h >> 1) | c;
 			break;
+		}
 
 		case 0x20: // 8085: RIM, otherwise undocumented NOP
 			if (IS_8085())
@@ -845,26 +819,26 @@ void i8085a_cpu_device::execute_one(int opcode)
 			M_DCR(m_HL.b.h);
 			break;
 		case 0x26: // MVI H,nn
-			M_MVI(m_HL.b.h);
+			m_HL.b.h = ARG();
 			break;
 		case 0x27: // DAA
 			m_WZ.b.h = m_AF.b.h;
-			if (IS_8085() && m_AF.b.l&VF)
+			if (IS_8085() && m_AF.b.l & VF)
 			{
-				if ((m_AF.b.l&HF) || ((m_AF.b.h&0xf)>9))
+				if ((m_AF.b.l & HF) || ((m_AF.b.h & 0xf) > 9))
 					m_WZ.b.h -= 6;
-				if ((m_AF.b.l&CF) || (m_AF.b.h>0x99))
+				if ((m_AF.b.l & CF) || (m_AF.b.h > 0x99))
 					m_WZ.b.h -= 0x60;
 			}
 			else
 			{
-				if ((m_AF.b.l&HF) || ((m_AF.b.h&0xf)>9))
+				if ((m_AF.b.l & HF) || ((m_AF.b.h & 0xf) > 9))
 					m_WZ.b.h += 6;
-				if ((m_AF.b.l&CF) || (m_AF.b.h>0x99))
+				if ((m_AF.b.l & CF) || (m_AF.b.h > 0x99))
 					m_WZ.b.h += 0x60;
 			}
 
-			m_AF.b.l = (m_AF.b.l&3) | (m_AF.b.h&0x28) | (m_AF.b.h>0x99) | ((m_AF.b.h^m_WZ.b.h)&0x10) | ZSP[m_WZ.b.h];
+			m_AF.b.l = (m_AF.b.l & 3) | (m_AF.b.h & 0x28) | ((m_AF.b.h > 0x99) ? 1 : 0) | ((m_AF.b.h ^ m_WZ.b.h) & 0x10) | ZSP[m_WZ.b.h];
 			m_AF.b.h = m_WZ.b.h;
 			break;
 
@@ -901,7 +875,7 @@ void i8085a_cpu_device::execute_one(int opcode)
 			M_DCR(m_HL.b.l);
 			break;
 		case 0x2e: // MVI L,nn
-			M_MVI(m_HL.b.l);
+			m_HL.b.l = ARG();
 			break;
 		case 0x2f: // CMA
 			m_AF.b.h ^= 0xff;
@@ -1003,7 +977,7 @@ void i8085a_cpu_device::execute_one(int opcode)
 			M_DCR(m_AF.b.h);
 			break;
 		case 0x3e: // MVI A,nn
-			M_MVI(m_AF.b.h);
+			m_AF.b.h = ARG();
 			break;
 		case 0x3f: // CMC
 			m_AF.b.l = (m_AF.b.l & 0xfe) | (~m_AF.b.l & CF);
@@ -1233,7 +1207,9 @@ void i8085a_cpu_device::execute_one(int opcode)
 			M_JMP(!(m_AF.b.l & CF));
 			break;
 		case 0xd3: // OUT nn
-			M_OUT;
+			set_status(0x10);
+			m_WZ.d = ARG();
+			m_io->write_byte(m_WZ.d, m_AF.b.h);
 			break;
 		case 0xd4: // CNC nnnn
 			M_CALL(!(m_AF.b.l & CF));
@@ -1269,7 +1245,9 @@ void i8085a_cpu_device::execute_one(int opcode)
 			M_JMP(m_AF.b.l & CF);
 			break;
 		case 0xdb: // IN nn
-			M_IN;
+			set_status(0x42);
+			m_WZ.d = ARG();
+			m_AF.b.h = m_io->read_byte(m_WZ.d);
 			break;
 		case 0xdc: // CC nnnn
 			M_CALL(m_AF.b.l & CF);
@@ -1376,7 +1354,7 @@ void i8085a_cpu_device::execute_one(int opcode)
 		case 0xf5: // PUSH A
 			// on 8080, VF=1 and X3F=0 and X5F=0 always! (we don't have to check for it elsewhere)
 			if (IS_8080())
-				m_AF.b.l = (m_AF.b.l&~(X3F|X5F))|VF;
+				m_AF.b.l = (m_AF.b.l & ~(X3F | X5F)) | VF;
 			M_PUSH(AF);
 			break;
 		case 0xf6: // ORI nn
