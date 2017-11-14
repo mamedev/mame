@@ -104,6 +104,13 @@ protected:
 	virtual uint32_t disasm_max_opcode_bytes() const override { return 3; }
 	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
+	enum
+	{
+		CPUTYPE_8080 = 0,
+		CPUTYPE_8080A,
+		CPUTYPE_8085A
+	};
+
 private:
 	address_space_config m_program_config;
 	address_space_config m_io_config;
@@ -114,7 +121,10 @@ private:
 	devcb_write_line m_out_sod_func;
 	clock_update_delegate m_clk_out_func;
 
-	int m_cputype;            /* 0 8080, 1 8085A */
+	inline bool is_8080() { return m_cputype == CPUTYPE_8080 || m_cputype == CPUTYPE_8080A; }
+	inline bool is_8085() { return m_cputype == CPUTYPE_8085A; }
+	int m_cputype;
+
 	PAIR m_PC,m_SP,m_AF,m_BC,m_DE,m_HL,m_WZ;
 	uint8_t m_halt;
 	uint8_t m_im;             /* interrupt mask (8085A only) */

@@ -3,7 +3,6 @@
 // thanks-to:Marcel De Kogel
 /*****************************************************************************
  *
- *   i8085.c
  *   Portable I8085A emulator V1.2
  *
  *   Copyright Juergen Buchmueller, all rights reserved.
@@ -114,41 +113,34 @@
 #define VERBOSE 0
 #include "logmacro.h"
 
-#define CPUTYPE_8080    0
-#define CPUTYPE_8085    1
-
-
 
 /***************************************************************************
-    MACROS AND CONSTANTS
+    CONSTANTS
 ***************************************************************************/
 
-#define IS_8080()          (m_cputype == CPUTYPE_8080)
-#define IS_8085()          (m_cputype == CPUTYPE_8085)
+constexpr u8 SF             = 0x80;
+constexpr u8 ZF             = 0x40;
+constexpr u8 X5F            = 0x20;
+constexpr u8 HF             = 0x10;
+constexpr u8 X3F            = 0x08;
+constexpr u8 PF             = 0x04;
+constexpr u8 VF             = 0x02;
+constexpr u8 CF             = 0x01;
 
-#define SF              0x80
-#define ZF              0x40
-#define X5F             0x20
-#define HF              0x10
-#define X3F             0x08
-#define PF              0x04
-#define VF              0x02
-#define CF              0x01
+constexpr u8 IM_SID         = 0x80;
+constexpr u8 IM_I75         = 0x40;
+constexpr u8 IM_I65         = 0x20;
+constexpr u8 IM_I55         = 0x10;
+constexpr u8 IM_IE          = 0x08;
+constexpr u8 IM_M75         = 0x04;
+constexpr u8 IM_M65         = 0x02;
+constexpr u8 IM_M55         = 0x01;
 
-#define IM_SID          0x80
-#define IM_I75          0x40
-#define IM_I65          0x20
-#define IM_I55          0x10
-#define IM_IE           0x08
-#define IM_M75          0x04
-#define IM_M65          0x02
-#define IM_M55          0x01
-
-#define ADDR_TRAP       0x0024
-#define ADDR_RST55      0x002c
-#define ADDR_RST65      0x0034
-#define ADDR_RST75      0x003c
-#define ADDR_INTR       0x0038
+constexpr u16 ADDR_TRAP     = 0x0024;
+constexpr u16 ADDR_RST55    = 0x002c;
+constexpr u16 ADDR_RST65    = 0x0034;
+constexpr u16 ADDR_RST75    = 0x003c;
+constexpr u16 ADDR_INTR     = 0x0038;
 
 
 
@@ -212,7 +204,7 @@ DEFINE_DEVICE_TYPE(I8085A, i8085a_cpu_device, "i8085a", "8085A")
 
 
 i8085a_cpu_device::i8085a_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: i8085a_cpu_device(mconfig, I8085A, tag, owner, clock, CPUTYPE_8085)
+	: i8085a_cpu_device(mconfig, I8085A, tag, owner, clock, CPUTYPE_8085A)
 {
 }
 
@@ -234,7 +226,7 @@ i8080_cpu_device::i8080_cpu_device(const machine_config &mconfig, const char *ta
 }
 
 i8080a_cpu_device::i8080a_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: i8085a_cpu_device(mconfig, I8080A, tag, owner, clock, CPUTYPE_8080)
+	: i8085a_cpu_device(mconfig, I8080A, tag, owner, clock, CPUTYPE_8080A)
 {
 }
 
@@ -360,7 +352,7 @@ void i8085a_cpu_device::write_mem(uint32_t a, uint8_t v)
 /* logical */
 #define M_ORA(R) m_AF.b.h|=R; m_AF.b.l=lut_zsp[m_AF.b.h]
 #define M_XRA(R) m_AF.b.h^=R; m_AF.b.l=lut_zsp[m_AF.b.h]
-#define M_ANA(R) {uint8_t hc = ((m_AF.b.h | R)<<1) & HF; m_AF.b.h&=R; m_AF.b.l=lut_zsp[m_AF.b.h]; if(IS_8085()) { m_AF.b.l |= HF; } else {m_AF.b.l |= hc; } }
+#define M_ANA(R) {uint8_t hc = ((m_AF.b.h | R)<<1) & HF; m_AF.b.h&=R; m_AF.b.l=lut_zsp[m_AF.b.h]; if(is_8085()) { m_AF.b.l |= HF; } else {m_AF.b.l |= hc; } }
 
 /* increase / decrease */
 #define M_INR(R) {uint8_t hc = ((R & 0x0f) == 0x0f) ? HF : 0; ++R; m_AF.b.l= (m_AF.b.l & CF ) | lut_zsp[R] | hc; }
@@ -422,7 +414,7 @@ void i8085a_cpu_device::write_mem(uint32_t a, uint8_t v)
 		m_PC.w.l = read_arg16(); \
 	} else { \
 		m_PC.w.l += 2; \
-		m_icount += (IS_8085()) ? 3 : 0; \
+		m_icount += (is_8085()) ? 3 : 0; \
 	} \
 }
 
@@ -432,12 +424,12 @@ void i8085a_cpu_device::write_mem(uint32_t a, uint8_t v)
 	if (cc) \
 	{ \
 		uint16_t a = read_arg16(); \
-		m_icount -= (IS_8085()) ? 7 : 6 ; \
+		m_icount -= (is_8085()) ? 7 : 6 ; \
 		M_PUSH(PC); \
 		m_PC.d = a; \
 	} else { \
 		m_PC.w.l += 2; \
-		m_icount += (IS_8085()) ? 2 : 0; \
+		m_icount += (is_8085()) ? 2 : 0; \
 	} \
 }
 
@@ -636,7 +628,7 @@ void i8085a_cpu_device::execute_one(int opcode)
 			break;
 		case 0x03: // INX B
 			m_BC.w.l++;
-			if (IS_8085())
+			if (is_8085())
 			{
 				if (m_BC.w.l == 0x0000)
 					m_AF.b.l |= X5F;
@@ -659,7 +651,7 @@ void i8085a_cpu_device::execute_one(int opcode)
 			break;
 
 		case 0x08: // 8085: DSUB, otherwise undocumented NOP
-			if (IS_8085())
+			if (is_8085())
 			{
 				int q = m_HL.b.l - m_BC.b.l;
 				m_AF.b.l = lut_zs[q & 255] | ((q >> 8) & CF) | VF | ((m_HL.b.l ^ q ^ m_BC.b.l) & HF) | (((m_BC.b.l ^ m_HL.b.l) & (m_HL.b.l ^ q) & SF) >> 5);
@@ -678,7 +670,7 @@ void i8085a_cpu_device::execute_one(int opcode)
 			break;
 		case 0x0b: // DCX B
 			m_BC.w.l--;
-			if (IS_8085())
+			if (is_8085())
 			{
 				if (m_BC.w.l == 0xffff)
 					m_AF.b.l |= X5F;
@@ -701,7 +693,7 @@ void i8085a_cpu_device::execute_one(int opcode)
 			break;
 
 		case 0x10: // 8085: ASRH, otherwise undocumented NOP
-			if (IS_8085())
+			if (is_8085())
 			{
 				m_AF.b.l = (m_AF.b.l & ~CF) | (m_HL.b.l & CF);
 				m_HL.w.l = (m_HL.w.l >> 1);
@@ -715,7 +707,7 @@ void i8085a_cpu_device::execute_one(int opcode)
 			break;
 		case 0x13: // INX D
 			m_DE.w.l++;
-			if (IS_8085())
+			if (is_8085())
 			{
 				if (m_DE.w.l == 0x0000)
 					m_AF.b.l |= X5F;
@@ -741,7 +733,7 @@ void i8085a_cpu_device::execute_one(int opcode)
 		}
 
 		case 0x18: // 8085: RLDE, otherwise undocumented NOP
-			if (IS_8085())
+			if (is_8085())
 			{
 				m_AF.b.l = (m_AF.b.l & ~(CF | VF)) | (m_DE.b.h >> 7);
 				m_DE.w.l = (m_DE.w.l << 1) | (m_DE.w.l >> 15);
@@ -757,7 +749,7 @@ void i8085a_cpu_device::execute_one(int opcode)
 			break;
 		case 0x1b: // DCX D
 			m_DE.w.l--;
-			if (IS_8085())
+			if (is_8085())
 			{
 				if (m_DE.w.l == 0xffff)
 					m_AF.b.l |= X5F;
@@ -783,7 +775,7 @@ void i8085a_cpu_device::execute_one(int opcode)
 		}
 
 		case 0x20: // 8085: RIM, otherwise undocumented NOP
-			if (IS_8085())
+			if (is_8085())
 			{
 				m_AF.b.h = get_rim_value();
 
@@ -804,7 +796,7 @@ void i8085a_cpu_device::execute_one(int opcode)
 			break;
 		case 0x23: // INX H
 			m_HL.w.l++;
-			if (IS_8085())
+			if (is_8085())
 			{
 				if (m_HL.w.l == 0x0000)
 					m_AF.b.l |= X5F;
@@ -823,7 +815,7 @@ void i8085a_cpu_device::execute_one(int opcode)
 			break;
 		case 0x27: // DAA
 			m_WZ.b.h = m_AF.b.h;
-			if (IS_8085() && m_AF.b.l & VF)
+			if (is_8085() && m_AF.b.l & VF)
 			{
 				if ((m_AF.b.l & HF) || ((m_AF.b.h & 0xf) > 9))
 					m_WZ.b.h -= 6;
@@ -843,7 +835,7 @@ void i8085a_cpu_device::execute_one(int opcode)
 			break;
 
 		case 0x28: // 8085: LDEH nn, otherwise undocumented NOP
-			if (IS_8085())
+			if (is_8085())
 			{
 				m_WZ.d = read_arg();
 				m_DE.d = (m_HL.d + m_WZ.d) & 0xffff;
@@ -860,7 +852,7 @@ void i8085a_cpu_device::execute_one(int opcode)
 			break;
 		case 0x2b: // DCX H
 			m_HL.w.l--;
-			if (IS_8085())
+			if (is_8085())
 			{
 				if (m_HL.w.l == 0xffff)
 					m_AF.b.l |= X5F;
@@ -879,12 +871,12 @@ void i8085a_cpu_device::execute_one(int opcode)
 			break;
 		case 0x2f: // CMA
 			m_AF.b.h ^= 0xff;
-			if (IS_8085())
+			if (is_8085())
 				m_AF.b.l |= HF | VF;
 			break;
 
 		case 0x30: // 8085: SIM, otherwise undocumented NOP
-			if (IS_8085())
+			if (is_8085())
 			{
 				// if bit 3 is set, bits 0-2 become the new masks
 				if (m_AF.b.h & 0x08)
@@ -920,7 +912,7 @@ void i8085a_cpu_device::execute_one(int opcode)
 			break;
 		case 0x33: // INX SP
 			m_SP.w.l++;
-			if (IS_8085())
+			if (is_8085())
 			{
 				if (m_SP.w.l == 0x0000)
 					m_AF.b.l |= X5F;
@@ -947,7 +939,7 @@ void i8085a_cpu_device::execute_one(int opcode)
 			break;
 
 		case 0x38: // 8085: LDES nn, otherwise undocumented NOP
-			if (IS_8085())
+			if (is_8085())
 			{
 				m_WZ.d = read_arg();
 				m_DE.d = (m_SP.d + m_WZ.d) & 0xffff;
@@ -962,7 +954,7 @@ void i8085a_cpu_device::execute_one(int opcode)
 			break;
 		case 0x3b: // DCX SP
 			m_SP.w.l--;
-			if (IS_8085())
+			if (is_8085())
 			{
 				if (m_SP.w.l == 0xffff)
 					m_AF.b.l |= X5F;
@@ -1169,7 +1161,7 @@ void i8085a_cpu_device::execute_one(int opcode)
 			M_JMP(m_AF.b.l & ZF);
 			break;
 		case 0xcb: // 8085: RST V, otherwise undocumented JMP nnnn
-			if (IS_8085())
+			if (is_8085())
 			{
 				if (m_AF.b.l & VF)
 				{
@@ -1229,7 +1221,7 @@ void i8085a_cpu_device::execute_one(int opcode)
 			M_RET(m_AF.b.l & CF);
 			break;
 		case 0xd9: // 8085: SHLX, otherwise undocumented RET
-			if (IS_8085())
+			if (is_8085())
 			{
 				m_WZ.w.l = m_DE.w.l;
 				write_mem(m_WZ.d, m_HL.b.l);
@@ -1253,7 +1245,7 @@ void i8085a_cpu_device::execute_one(int opcode)
 			M_CALL(m_AF.b.l & CF);
 			break;
 		case 0xdd: // 8085: JNX nnnn, otherwise undocumented CALL nnnn
-			if (IS_8085())
+			if (is_8085())
 			{
 				M_JMP(!(m_AF.b.l & X5F));
 			}
@@ -1316,7 +1308,7 @@ void i8085a_cpu_device::execute_one(int opcode)
 			M_CALL(m_AF.b.l & PF);
 			break;
 		case 0xed: // 8085: LHLX, otherwise undocumented CALL nnnn
-			if (IS_8085())
+			if (is_8085())
 			{
 				m_WZ.w.l = m_DE.w.l;
 				m_HL.b.l = read_mem(m_WZ.d);
@@ -1353,7 +1345,7 @@ void i8085a_cpu_device::execute_one(int opcode)
 			break;
 		case 0xf5: // PUSH A
 			// on 8080, VF=1 and X3F=0 and X5F=0 always! (we don't have to check for it elsewhere)
-			if (IS_8080())
+			if (is_8080())
 				m_AF.b.l = (m_AF.b.l & ~(X3F | X5F)) | VF;
 			M_PUSH(AF);
 			break;
@@ -1382,7 +1374,7 @@ void i8085a_cpu_device::execute_one(int opcode)
 			M_CALL(m_AF.b.l & SF);
 			break;
 		case 0xfd: // 8085: JX nnnn, otherwise undocumented CALL nnnn
-			if (IS_8085())
+			if (is_8085())
 			{
 				M_JMP(m_AF.b.l & X5F);
 			}
@@ -1416,7 +1408,7 @@ void i8085a_cpu_device::init_tables()
 	for (i = 0; i < 256; i++)
 	{
 		/* cycles */
-		lut_cycles[i] = m_cputype?lut_cycles_8085[i]:lut_cycles_8080[i];
+		lut_cycles[i] = is_8085() ? lut_cycles_8085[i] : lut_cycles_8080[i];
 
 		/* flags */
 		zs = 0;
