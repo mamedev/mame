@@ -96,6 +96,18 @@ protected:
 		E132XS_L60, E132XS_L61, E132XS_L62, E132XS_L63
 	};
 
+	enum reg_bank
+	{
+		LOCAL = 0,
+		GLOBAL = 1
+	};
+
+	enum imm_size
+	{
+		SIMM = 0,
+		LIMM = 1
+	};
+
 	// construction/destruction
 	hyperstone_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock,
 						const device_type type, uint32_t prg_data_width, uint32_t io_data_width, address_map_constructor internal_map);
@@ -228,102 +240,33 @@ private:
 	void hyperstone_sums_global_local();
 	void hyperstone_sums_local_global();
 	void hyperstone_sums_local_local();
-	void hyperstone_cmp_global_global();
-	void hyperstone_cmp_global_local();
-	void hyperstone_cmp_local_global();
-	void hyperstone_cmp_local_local();
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void hyperstone_cmp();
 	void hyperstone_mov_global_global();
 	void hyperstone_mov_global_local();
 	void hyperstone_mov_local_global();
 	void hyperstone_mov_local_local();
-	void hyperstone_add_global_global();
-	void hyperstone_add_global_local();
-	void hyperstone_add_local_global();
-	void hyperstone_add_local_local();
-	void hyperstone_adds_global_global();
-	void hyperstone_adds_global_local();
-	void hyperstone_adds_local_global();
-	void hyperstone_adds_local_local();
-	void hyperstone_cmpb_global_global();
-	void hyperstone_cmpb_global_local();
-	void hyperstone_cmpb_local_global();
-	void hyperstone_cmpb_local_local();
-	void hyperstone_subc_global_global();
-	void hyperstone_subc_global_local();
-	void hyperstone_subc_local_global();
-	void hyperstone_subc_local_local();
-	void hyperstone_sub_global_global();
-	void hyperstone_sub_global_local();
-	void hyperstone_sub_local_global();
-	void hyperstone_sub_local_local();
-	void hyperstone_subs_global_global();
-	void hyperstone_subs_global_local();
-	void hyperstone_subs_local_global();
-	void hyperstone_subs_local_local();
-	void hyperstone_addc_global_global();
-	void hyperstone_addc_global_local();
-	void hyperstone_addc_local_global();
-	void hyperstone_addc_local_local();
-	void hyperstone_neg_global_global();
-	void hyperstone_neg_global_local();
-	void hyperstone_neg_local_global();
-	void hyperstone_neg_local_local();
-	void hyperstone_negs_global_global();
-	void hyperstone_negs_global_local();
-	void hyperstone_negs_local_global();
-	void hyperstone_negs_local_local();
-	void hyperstone_and_global_global();
-	void hyperstone_and_global_local();
-	void hyperstone_and_local_global();
-	void hyperstone_and_local_local();
-	void hyperstone_andn_global_global();
-	void hyperstone_andn_global_local();
-	void hyperstone_andn_local_global();
-	void hyperstone_andn_local_local();
-	void hyperstone_or_global_global();
-	void hyperstone_or_global_local();
-	void hyperstone_or_local_global();
-	void hyperstone_or_local_local();
-	void hyperstone_xor_global_global();
-	void hyperstone_xor_global_local();
-	void hyperstone_xor_local_global();
-	void hyperstone_xor_local_local();
-	void hyperstone_not_global_global();
-	void hyperstone_not_global_local();
-	void hyperstone_not_local_global();
-	void hyperstone_not_local_local();
-	void hyperstone_cmpi_global_simm();
-	void hyperstone_cmpi_global_limm();
-	void hyperstone_cmpi_local_simm();
-	void hyperstone_cmpi_local_limm();
-	void hyperstone_movi_global_simm();
-	void hyperstone_movi_global_limm();
-	void hyperstone_movi_local_simm();
-	void hyperstone_movi_local_limm();
-	void hyperstone_addi_global_simm();
-	void hyperstone_addi_global_limm();
-	void hyperstone_addi_local_simm();
-	void hyperstone_addi_local_limm();
-	void hyperstone_addsi_global_simm();
-	void hyperstone_addsi_global_limm();
-	void hyperstone_addsi_local_simm();
-	void hyperstone_addsi_local_limm();
-	void hyperstone_cmpbi_global_simm();
-	void hyperstone_cmpbi_global_limm();
-	void hyperstone_cmpbi_local_simm();
-	void hyperstone_cmpbi_local_limm();
-	void hyperstone_andni_global_simm();
-	void hyperstone_andni_global_limm();
-	void hyperstone_andni_local_simm();
-	void hyperstone_andni_local_limm();
-	void hyperstone_ori_global_simm();
-	void hyperstone_ori_global_limm();
-	void hyperstone_ori_local_simm();
-	void hyperstone_ori_local_limm();
-	void hyperstone_xori_global_simm();
-	void hyperstone_xori_global_limm();
-	void hyperstone_xori_local_simm();
-	void hyperstone_xori_local_limm();
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void hyperstone_add();
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void hyperstone_adds();
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void hyperstone_cmpb();
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void hyperstone_subc();
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void hyperstone_sub();
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void hyperstone_subs();
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void hyperstone_addc();
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void hyperstone_neg();
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void hyperstone_negs();
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void hyperstone_and();
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void hyperstone_andn();
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void hyperstone_or();
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void hyperstone_xor();
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void hyperstone_not();
+	template <reg_bank DST_GLOBAL, imm_size IMM_LONG> void hyperstone_cmpi();
+	template <reg_bank DST_GLOBAL, imm_size IMM_LONG> void hyperstone_movi();
+	template <reg_bank DST_GLOBAL, imm_size IMM_LONG> void hyperstone_addi();
+	template <reg_bank DST_GLOBAL, imm_size IMM_LONG> void hyperstone_addsi();
+	template <reg_bank DST_GLOBAL, imm_size IMM_LONG> void hyperstone_cmpbi();
+	template <reg_bank DST_GLOBAL, imm_size IMM_LONG> void hyperstone_andni();
+	template <reg_bank DST_GLOBAL, imm_size IMM_LONG> void hyperstone_ori();
+	template <reg_bank DST_GLOBAL, imm_size IMM_LONG> void hyperstone_xori();
 	void hyperstone_shrdi();
 	void hyperstone_shrd();
 	void hyperstone_shr();
