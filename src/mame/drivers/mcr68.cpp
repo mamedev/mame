@@ -22,6 +22,9 @@
             - CPU/Video Board: XTAL 16.000MHz at 1D, XTAL 20.000MHz at 1F
             - Sound Board:     XTAL 16.000MHz
 
+    Spy Hunter II reads its extra analog inputs through the "Reflective
+    Sensor Control" board (A084-91854-B000), which is also used by Max RPM.
+
 ****************************************************************************
 
     Memory map
