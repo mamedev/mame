@@ -248,14 +248,8 @@ private:
 	void hyperstone_mov_global_local();
 	void hyperstone_mov_local_global();
 	void hyperstone_mov_local_local();
-	void hyperstone_add_global_global();
-	void hyperstone_add_global_local();
-	void hyperstone_add_local_global();
-	void hyperstone_add_local_local();
-	void hyperstone_adds_global_global();
-	void hyperstone_adds_global_local();
-	void hyperstone_adds_local_global();
-	void hyperstone_adds_local_local();
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void hyperstone_add();
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void hyperstone_adds();
 	void hyperstone_cmpb_global_global();
 	void hyperstone_cmpb_global_local();
 	void hyperstone_cmpb_local_global();
@@ -272,10 +266,7 @@ private:
 	void hyperstone_subs_global_local();
 	void hyperstone_subs_local_global();
 	void hyperstone_subs_local_local();
-	void hyperstone_addc_global_global();
-	void hyperstone_addc_global_local();
-	void hyperstone_addc_local_global();
-	void hyperstone_addc_local_local();
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void hyperstone_addc();
 	void hyperstone_neg_global_global();
 	void hyperstone_neg_global_local();
 	void hyperstone_neg_local_global();
