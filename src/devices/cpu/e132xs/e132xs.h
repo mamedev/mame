@@ -305,14 +305,8 @@ private:
 	void hyperstone_not_local_global();
 	void hyperstone_not_local_local();
 	template <reg_bank DST_GLOBAL, imm_size IMM_LONG> void hyperstone_cmpi();
-	void hyperstone_movi_global_simm();
-	void hyperstone_movi_global_limm();
-	void hyperstone_movi_local_simm();
-	void hyperstone_movi_local_limm();
-	void hyperstone_addi_global_simm();
-	void hyperstone_addi_global_limm();
-	void hyperstone_addi_local_simm();
-	void hyperstone_addi_local_limm();
+	template <reg_bank DST_GLOBAL, imm_size IMM_LONG> void hyperstone_movi();
+	template <reg_bank DST_GLOBAL, imm_size IMM_LONG> void hyperstone_addi();
 	void hyperstone_addsi_global_simm();
 	void hyperstone_addsi_global_limm();
 	void hyperstone_addsi_local_simm();
