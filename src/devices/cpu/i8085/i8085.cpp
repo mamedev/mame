@@ -149,7 +149,7 @@ constexpr u16 ADDR_INTR     = 0x0038;
 ***************************************************************************/
 
 /* cycles lookup */
-const uint8_t i8085a_cpu_device::lut_cycles_8080[256]={
+const u8 i8085a_cpu_device::lut_cycles_8080[256]={
 /*      0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F  */
 /* 0 */ 4, 10,7, 5, 5, 5, 7, 4, 4, 10,7, 5, 5, 5, 7, 4,
 /* 1 */ 4, 10,7, 5, 5, 5, 7, 4, 4, 10,7, 5, 5, 5, 7, 4,
@@ -167,7 +167,7 @@ const uint8_t i8085a_cpu_device::lut_cycles_8080[256]={
 /* D */ 5, 10,10,10,11,11,7, 11,5, 10,10,10,11,11,7, 11,
 /* E */ 5, 10,10,18,11,11,7, 11,5, 5, 10,5, 11,11,7, 11,
 /* F */ 5, 10,10,4, 11,11,7, 11,5, 5, 10,4, 11,11,7, 11 };
-const uint8_t i8085a_cpu_device::lut_cycles_8085[256]={
+const u8 i8085a_cpu_device::lut_cycles_8085[256]={
 /*      0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F  */
 /* 0 */ 4, 10,7, 6, 4, 4, 7, 4, 10,10,7, 6, 4, 4, 7, 4,
 /* 1 */ 7, 10,7, 6, 4, 4, 7, 4, 10,10,7, 6, 4, 4, 7, 4,
@@ -203,12 +203,12 @@ DEFINE_DEVICE_TYPE(I8080A, i8080a_cpu_device, "i8080a", "8080A")
 DEFINE_DEVICE_TYPE(I8085A, i8085a_cpu_device, "i8085a", "8085A")
 
 
-i8085a_cpu_device::i8085a_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+i8085a_cpu_device::i8085a_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: i8085a_cpu_device(mconfig, I8085A, tag, owner, clock, CPUTYPE_8085A)
 {
 }
 
-i8085a_cpu_device::i8085a_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int cputype)
+i8085a_cpu_device::i8085a_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int cputype)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0)
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, 8, 0)
@@ -220,12 +220,12 @@ i8085a_cpu_device::i8085a_cpu_device(const machine_config &mconfig, device_type 
 {
 }
 
-i8080_cpu_device::i8080_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+i8080_cpu_device::i8080_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: i8085a_cpu_device(mconfig, I8080, tag, owner, clock, CPUTYPE_8080)
 {
 }
 
-i8080a_cpu_device::i8080a_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+i8080a_cpu_device::i8080a_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: i8085a_cpu_device(mconfig, I8080A, tag, owner, clock, CPUTYPE_8080A)
 {
 }
@@ -288,7 +288,7 @@ void i8085a_cpu_device::set_inte(int state)
 }
 
 
-void i8085a_cpu_device::set_status(uint8_t status)
+void i8085a_cpu_device::set_status(u8 status)
 {
 	if (status != m_status)
 		m_out_status_func(status);
@@ -297,9 +297,9 @@ void i8085a_cpu_device::set_status(uint8_t status)
 }
 
 
-uint8_t i8085a_cpu_device::get_rim_value()
+u8 i8085a_cpu_device::get_rim_value()
 {
-	uint8_t result = m_im;
+	u8 result = m_im;
 	int sid = m_in_sid_func();
 
 	/* copy live RST5.5 and RST6.5 states */
@@ -313,20 +313,20 @@ uint8_t i8085a_cpu_device::get_rim_value()
 	return result;
 }
 
-uint8_t i8085a_cpu_device::read_op()
+u8 i8085a_cpu_device::read_op()
 {
 	set_status(0xa2); // instruction fetch
 	return m_direct->read_byte(m_PC.w.l++);
 }
 
-uint8_t i8085a_cpu_device::read_arg()
+u8 i8085a_cpu_device::read_arg()
 {
 	return m_direct->read_byte(m_PC.w.l++);
 }
 
-uint16_t i8085a_cpu_device::read_arg16()
+u16 i8085a_cpu_device::read_arg16()
 {
-	uint16_t w;
+	u16 w;
 	w  = m_direct->read_byte(m_PC.d);
 	m_PC.w.l++;
 	w += m_direct->read_byte(m_PC.d) << 8;
@@ -334,13 +334,13 @@ uint16_t i8085a_cpu_device::read_arg16()
 	return w;
 }
 
-uint8_t i8085a_cpu_device::read_mem(uint32_t a)
+u8 i8085a_cpu_device::read_mem(u32 a)
 {
 	set_status(0x82); // memory read
 	return m_program->read_byte(a);
 }
 
-void i8085a_cpu_device::write_mem(uint32_t a, uint8_t v)
+void i8085a_cpu_device::write_mem(u32 a, u8 v)
 {
 	set_status(0x00); // memory write
 	m_program->write_byte(a, v);
@@ -352,11 +352,11 @@ void i8085a_cpu_device::write_mem(uint32_t a, uint8_t v)
 /* logical */
 #define M_ORA(R) m_AF.b.h|=R; m_AF.b.l=lut_zsp[m_AF.b.h]
 #define M_XRA(R) m_AF.b.h^=R; m_AF.b.l=lut_zsp[m_AF.b.h]
-#define M_ANA(R) {uint8_t hc = ((m_AF.b.h | R)<<1) & HF; m_AF.b.h&=R; m_AF.b.l=lut_zsp[m_AF.b.h]; if(is_8085()) { m_AF.b.l |= HF; } else {m_AF.b.l |= hc; } }
+#define M_ANA(R) {u8 hc = ((m_AF.b.h | R)<<1) & HF; m_AF.b.h&=R; m_AF.b.l=lut_zsp[m_AF.b.h]; if(is_8085()) { m_AF.b.l |= HF; } else {m_AF.b.l |= hc; } }
 
 /* increase / decrease */
-#define M_INR(R) {uint8_t hc = ((R & 0x0f) == 0x0f) ? HF : 0; ++R; m_AF.b.l= (m_AF.b.l & CF ) | lut_zsp[R] | hc; }
-#define M_DCR(R) {uint8_t hc = ((R & 0x0f) != 0x00) ? HF : 0; --R; m_AF.b.l= (m_AF.b.l & CF ) | lut_zsp[R] | hc | VF; }
+#define M_INR(R) {u8 hc = ((R & 0x0f) == 0x0f) ? HF : 0; ++R; m_AF.b.l= (m_AF.b.l & CF ) | lut_zsp[R] | hc; }
+#define M_DCR(R) {u8 hc = ((R & 0x0f) != 0x00) ? HF : 0; --R; m_AF.b.l= (m_AF.b.l & CF ) | lut_zsp[R] | hc | VF; }
 
 /* arithmetic */
 #define M_ADD(R) { \
@@ -423,7 +423,7 @@ void i8085a_cpu_device::write_mem(uint32_t a, uint8_t v)
 { \
 	if (cc) \
 	{ \
-		uint16_t a = read_arg16(); \
+		u16 a = read_arg16(); \
 		m_icount -= (is_8085()) ? 7 : 6 ; \
 		M_PUSH(PC); \
 		m_PC.d = a; \
@@ -561,7 +561,7 @@ void i8085a_cpu_device::check_for_interrupts()
 	/* followed by classic INTR */
 	else if (m_irq_state[I8085_INTR_LINE] && (m_im & IM_IE))
 	{
-		uint32_t vector;
+		u32 vector;
 
 		/* break out of HALT state and call the IRQ ack callback */
 		break_halt_for_interrupt();
@@ -1403,7 +1403,7 @@ void i8085a_cpu_device::execute_one(int opcode)
 
 void i8085a_cpu_device::init_tables()
 {
-	uint8_t zs;
+	u8 zs;
 	int i, p;
 	for (i = 0; i < 256; i++)
 	{
@@ -1602,7 +1602,7 @@ void i8085a_cpu_device::state_string_export(const device_state_entry &entry, std
 
 
 
-offs_t i8085a_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t i8085a_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, u32 options)
 {
 	extern CPU_DISASSEMBLE( i8085 );
 	return CPU_DISASSEMBLE_NAME(i8085)(this, stream, pc, oprom, opram, options);
