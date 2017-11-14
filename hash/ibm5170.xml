@@ -7297,6 +7297,110 @@
 		</part>
 	</software>
 
+	<software name="kyrandia">
+		<description>Fables &amp; Fiends - The Legend of Kyrandia Book One</description>
+		<year>1992</year>
+		<publisher>Virgin Games</publisher>
+		<info name="version" value="1.3" />
+		<info name="developer" value="Westwood Studios" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="The Legend of Kyrandia [Virgin] [1992] [3.5HD] [1 of 4].img" size="1474560" crc="88c6742b" sha1="dcd249c0c721612a020e309e044a1be620a72237" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="The Legend of Kyrandia [Virgin] [1992] [3.5HD] [2 of 4].img" size="1474560" crc="ab4f5e1d" sha1="42625e4285b28f0901f60c2976222d05bf083cef" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="The Legend of Kyrandia [Virgin] [1992] [3.5HD] [3 of 4].img" size="1474560" crc="5c483502" sha1="d5bfed28919ab68c0f23bb85b6be8ed17c5baa06" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="The Legend of Kyrandia [Virgin] [1992] [3.5HD] [4 of 4].img" size="1474560" crc="6fb0f878" sha1="f51fc0625a1328a089b735c3d1b99d357b99d492" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kyrandiafr" cloneof="kyrandia">
+		<description>Fables &amp; Fiends - The Legend of Kyrandia Book One (French)</description>
+		<year>1992</year>
+		<publisher>Virgin Games</publisher>
+		<info name="version" value="1.7" />
+		<info name="developer" value="Westwood Studios" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Legend of Kyrandia, The - Book One (France) (v1.7) (Disk 1).img" size="1474560" crc="9df53388" sha1="96df77412dfe2a0c80bca51e72cabf3058ba1d26" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Legend of Kyrandia, The - Book One (France) (v1.7) (Disk 2).img" size="1474560" crc="c6731e11" sha1="961d4389b73a64952177dbf4734b9223cf0f76a1" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Legend of Kyrandia, The - Book One (France) (v1.7) (Disk 3).img" size="1474560" crc="99fb7189" sha1="956b45a92c9fa534c705c63487b772ed58f7da43" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Legend of Kyrandia, The - Book One (France) (v1.7) (Disk 4).img" size="1474560" crc="3de1063c" sha1="722230054057db52b1809ce9db7c4eca8d71c65f" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hofde">
+		<description>Fables &amp; Fiends - The Hand of Fate (German)</description>
+		<year>1993</year>
+		<publisher>Virgin Interactive Entertainment</publisher>
+		<info name="version" value="1.41" />
+		<info name="developer" value="Westwood Studios" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="The Hand of Fate [1994] [Virgin] [DE] [3.5HD] [Disk 1 of 8].img" size="1474560" crc="f109ad49" sha1="c11eebac377d87990374f802a47f3574e92310fa" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="The Hand of Fate [1994] [Virgin] [DE] [3.5HD] [Disk 2 of 8].img" size="1474560" crc="9bcefa29" sha1="c71360c47f26cc50f024259747499a024355c86b" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="The Hand of Fate [1994] [Virgin] [DE] [3.5HD] [Disk 3 of 8].img" size="1474560" crc="4bd2ef7b" sha1="e39f0df11f5e042d5c2e08d80c2a8a76a2f61aa8" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="The Hand of Fate [1994] [Virgin] [DE] [3.5HD] [Disk 4 of 8].img" size="1474560" crc="ca427f9b" sha1="6edf8d1696645b37ef58f1444c8d68a637d7c6d7" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="The Hand of Fate [1994] [Virgin] [DE] [3.5HD] [Disk 5 of 8].img" size="1474560" crc="f12b7d73" sha1="f8cc1cfeb466f464f8c4dd3df5e33f1055ca25a9" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="The Hand of Fate [1994] [Virgin] [DE] [3.5HD] [Disk 6 of 8].img" size="1474560" crc="2c3743dd" sha1="5bb7ffcaf7159658adf11c701fd875e89f93c466" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="The Hand of Fate [1994] [Virgin] [DE] [3.5HD] [Disk 7 of 8].img" size="1474560" crc="34f16970" sha1="71f3fc2e66ec11105fd33d1bc55fa6e8c5e7aa71" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="The Hand of Fate [1994] [Virgin] [DE] [3.5HD] [Disk 8 of 8].img" size="1474560" crc="ee9bfc16" sha1="52fed013a128433583c40bb8fcc3ada9b28597d3" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pharkas">
 		<description>Freddy Pharkas, Frontier Pharmacist</description>
 		<year>1993</year>
@@ -7836,62 +7940,6 @@
 			<feature name="part_id" value="Disk 8" />
 			<dataarea name="flop" size = "1228800">
 				<rom name="King's Quest V - Absence Makes the Heart Go Yonder! (USA) (Re-release) (Disk 8).img" size="1228800" crc="99a71113" sha1="3d68e348c5412b78174c54c558a4cca11de053ef" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="kyrandia">
-		<description>The Legend of Kyrandia Book One - Fables &amp; Fiends</description>
-		<year>1992</year>
-		<publisher>Virgin Games</publisher>
-		<info name="version" value="1.3" />
-		<info name="developer" value="Westwood Studios" />
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "1474560">
-				<rom name="The Legend of Kyrandia [Virgin] [1992] [3.5HD] [1 of 4].img" size="1474560" crc="88c6742b" sha1="dcd249c0c721612a020e309e044a1be620a72237" offset="0"/>
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_3_5">
-			<dataarea name="flop" size = "1474560">
-				<rom name="The Legend of Kyrandia [Virgin] [1992] [3.5HD] [2 of 4].img" size="1474560" crc="ab4f5e1d" sha1="42625e4285b28f0901f60c2976222d05bf083cef" offset="0"/>
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_3_5">
-			<dataarea name="flop" size = "1474560">
-				<rom name="The Legend of Kyrandia [Virgin] [1992] [3.5HD] [3 of 4].img" size="1474560" crc="5c483502" sha1="d5bfed28919ab68c0f23bb85b6be8ed17c5baa06" offset="0"/>
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_3_5">
-			<dataarea name="flop" size = "1474560">
-				<rom name="The Legend of Kyrandia [Virgin] [1992] [3.5HD] [4 of 4].img" size="1474560" crc="6fb0f878" sha1="f51fc0625a1328a089b735c3d1b99d357b99d492" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="kyrandiafr" cloneof="kyrandia">
-		<description>The Legend of Kyrandia Book One - Fables &amp; Fiends (French)</description>
-		<year>1992</year>
-		<publisher>Virgin Games</publisher>
-		<info name="version" value="1.7" />
-		<info name="developer" value="Westwood Studios" />
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "1474560">
-				<rom name="Legend of Kyrandia, The - Book One (France) (v1.7) (Disk 1).img" size="1474560" crc="9df53388" sha1="96df77412dfe2a0c80bca51e72cabf3058ba1d26" offset="0"/>
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_3_5">
-			<dataarea name="flop" size = "1474560">
-				<rom name="Legend of Kyrandia, The - Book One (France) (v1.7) (Disk 2).img" size="1474560" crc="c6731e11" sha1="961d4389b73a64952177dbf4734b9223cf0f76a1" offset="0"/>
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_3_5">
-			<dataarea name="flop" size = "1474560">
-				<rom name="Legend of Kyrandia, The - Book One (France) (v1.7) (Disk 3).img" size="1474560" crc="99fb7189" sha1="956b45a92c9fa534c705c63487b772ed58f7da43" offset="0"/>
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_3_5">
-			<dataarea name="flop" size = "1474560">
-				<rom name="Legend of Kyrandia, The - Book One (France) (v1.7) (Disk 4).img" size="1474560" crc="3de1063c" sha1="722230054057db52b1809ce9db7c4eca8d71c65f" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
