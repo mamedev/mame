@@ -132,26 +132,26 @@ private:
 	address_space *m_program;
 	direct_read_data *m_direct;
 	address_space *m_io;
-	int                 m_icount;
+	int m_icount;
 
 	/* cycles lookup */
 	static const uint8_t lut_cycles_8080[256];
 	static const uint8_t lut_cycles_8085[256];
 	uint8_t lut_cycles[256];
 	/* flags lookup */
-	uint8_t ZS[256];
-	uint8_t ZSP[256];
+	uint8_t lut_zs[256];
+	uint8_t lut_zsp[256];
 
 	void set_sod(int state);
 	void set_inte(int state);
 	void set_status(uint8_t status);
 	uint8_t get_rim_value();
 	void break_halt_for_interrupt();
-	uint8_t ROP();
-	uint8_t ARG();
-	uint16_t ARG16();
-	uint8_t RM(uint32_t a);
-	void WM(uint32_t a, uint8_t v);
+	uint8_t read_op();
+	uint8_t read_arg();
+	uint16_t read_arg16();
+	uint8_t read_mem(uint32_t a);
+	void write_mem(uint32_t a, uint8_t v);
 	void check_for_interrupts();
 	void execute_one(int opcode);
 	void init_tables();

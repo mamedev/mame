@@ -321,18 +321,18 @@ uint8_t i8085a_cpu_device::get_rim_value()
 	return result;
 }
 
-uint8_t i8085a_cpu_device::ROP()
+uint8_t i8085a_cpu_device::read_op()
 {
 	set_status(0xa2); // instruction fetch
 	return m_direct->read_byte(m_PC.w.l++);
 }
 
-uint8_t i8085a_cpu_device::ARG()
+uint8_t i8085a_cpu_device::read_arg()
 {
 	return m_direct->read_byte(m_PC.w.l++);
 }
 
-uint16_t i8085a_cpu_device::ARG16()
+uint16_t i8085a_cpu_device::read_arg16()
 {
 	uint16_t w;
 	w  = m_direct->read_byte(m_PC.d);
@@ -342,13 +342,13 @@ uint16_t i8085a_cpu_device::ARG16()
 	return w;
 }
 
-uint8_t i8085a_cpu_device::RM(uint32_t a)
+uint8_t i8085a_cpu_device::read_mem(uint32_t a)
 {
 	set_status(0x82); // memory read
 	return m_program->read_byte(a);
 }
 
-void i8085a_cpu_device::WM(uint32_t a, uint8_t v)
+void i8085a_cpu_device::write_mem(uint32_t a, uint8_t v)
 {
 	set_status(0x00); // memory write
 	m_program->write_byte(a, v);
@@ -358,42 +358,42 @@ void i8085a_cpu_device::WM(uint32_t a, uint8_t v)
 
 
 /* logical */
-#define M_ORA(R) m_AF.b.h|=R; m_AF.b.l=ZSP[m_AF.b.h]
-#define M_XRA(R) m_AF.b.h^=R; m_AF.b.l=ZSP[m_AF.b.h]
-#define M_ANA(R) {uint8_t hc = ((m_AF.b.h | R)<<1) & HF; m_AF.b.h&=R; m_AF.b.l=ZSP[m_AF.b.h]; if(IS_8085()) { m_AF.b.l |= HF; } else {m_AF.b.l |= hc; } }
+#define M_ORA(R) m_AF.b.h|=R; m_AF.b.l=lut_zsp[m_AF.b.h]
+#define M_XRA(R) m_AF.b.h^=R; m_AF.b.l=lut_zsp[m_AF.b.h]
+#define M_ANA(R) {uint8_t hc = ((m_AF.b.h | R)<<1) & HF; m_AF.b.h&=R; m_AF.b.l=lut_zsp[m_AF.b.h]; if(IS_8085()) { m_AF.b.l |= HF; } else {m_AF.b.l |= hc; } }
 
 /* increase / decrease */
-#define M_INR(R) {uint8_t hc = ((R & 0x0f) == 0x0f) ? HF : 0; ++R; m_AF.b.l= (m_AF.b.l & CF ) | ZSP[R] | hc; }
-#define M_DCR(R) {uint8_t hc = ((R & 0x0f) != 0x00) ? HF : 0; --R; m_AF.b.l= (m_AF.b.l & CF ) | ZSP[R] | hc | VF; }
+#define M_INR(R) {uint8_t hc = ((R & 0x0f) == 0x0f) ? HF : 0; ++R; m_AF.b.l= (m_AF.b.l & CF ) | lut_zsp[R] | hc; }
+#define M_DCR(R) {uint8_t hc = ((R & 0x0f) != 0x00) ? HF : 0; --R; m_AF.b.l= (m_AF.b.l & CF ) | lut_zsp[R] | hc | VF; }
 
 /* arithmetic */
 #define M_ADD(R) { \
 	int q = m_AF.b.h+R; \
-	m_AF.b.l=ZSP[q&255]|((q>>8)&CF)|((m_AF.b.h^q^R)&HF); \
+	m_AF.b.l=lut_zsp[q&255]|((q>>8)&CF)|((m_AF.b.h^q^R)&HF); \
 	m_AF.b.h=q; \
 }
 
 #define M_ADC(R) { \
 	int q = m_AF.b.h+R+(m_AF.b.l&CF); \
-	m_AF.b.l=ZSP[q&255]|((q>>8)&CF)|((m_AF.b.h^q^R)&HF); \
+	m_AF.b.l=lut_zsp[q&255]|((q>>8)&CF)|((m_AF.b.h^q^R)&HF); \
 	m_AF.b.h=q; \
 }
 
 #define M_SUB(R) { \
 	int q = m_AF.b.h-R; \
-	m_AF.b.l=ZSP[q&255]|((q>>8)&CF)|(~(m_AF.b.h^q^R)&HF)|VF; \
+	m_AF.b.l=lut_zsp[q&255]|((q>>8)&CF)|(~(m_AF.b.h^q^R)&HF)|VF; \
 	m_AF.b.h=q; \
 }
 
 #define M_SBB(R) { \
 	int q = m_AF.b.h-R-(m_AF.b.l&CF); \
-	m_AF.b.l=ZSP[q&255]|((q>>8)&CF)|(~(m_AF.b.h^q^R)&HF)|VF; \
+	m_AF.b.l=lut_zsp[q&255]|((q>>8)&CF)|(~(m_AF.b.h^q^R)&HF)|VF; \
 	m_AF.b.h=q; \
 }
 
 #define M_CMP(R) { \
 	int q = m_AF.b.h-R; \
-	m_AF.b.l=ZSP[q&255]|((q>>8)&CF)|(~(m_AF.b.h^q^R)&HF)|VF; \
+	m_AF.b.l=lut_zsp[q&255]|((q>>8)&CF)|(~(m_AF.b.h^q^R)&HF)|VF; \
 }
 
 #define M_DAD(R) { \
@@ -419,7 +419,7 @@ void i8085a_cpu_device::WM(uint32_t a, uint8_t v)
 // On 8085 jump if condition is not satisfied is shorter
 #define M_JMP(cc) { \
 	if (cc) { \
-		m_PC.w.l = ARG16(); \
+		m_PC.w.l = read_arg16(); \
 	} else { \
 		m_PC.w.l += 2; \
 		m_icount += (IS_8085()) ? 3 : 0; \
@@ -431,7 +431,7 @@ void i8085a_cpu_device::WM(uint32_t a, uint8_t v)
 { \
 	if (cc) \
 	{ \
-		uint16_t a = ARG16(); \
+		uint16_t a = read_arg16(); \
 		m_icount -= (IS_8085()) ? 7 : 6 ; \
 		M_PUSH(PC); \
 		m_PC.d = a; \
@@ -615,7 +615,7 @@ void i8085a_cpu_device::execute_run()
 			check_for_interrupts();
 
 		/* here we go... */
-		execute_one(ROP());
+		execute_one(read_op());
 
 	} while (m_icount > 0);
 }
@@ -629,10 +629,10 @@ void i8085a_cpu_device::execute_one(int opcode)
 		case 0x00: // NOP
 			break;
 		case 0x01: // LXI B,nnnn
-			m_BC.w.l = ARG16();
+			m_BC.w.l = read_arg16();
 			break;
 		case 0x02: // STAX B
-			WM(m_BC.d, m_AF.b.h);
+			write_mem(m_BC.d, m_AF.b.h);
 			break;
 		case 0x03: // INX B
 			m_BC.w.l++;
@@ -651,7 +651,7 @@ void i8085a_cpu_device::execute_one(int opcode)
 			M_DCR(m_BC.b.h);
 			break;
 		case 0x06: // MVI B,nn
-			m_BC.b.h = ARG();
+			m_BC.b.h = read_arg();
 			break;
 		case 0x07: // RLC
 			m_AF.b.h = (m_AF.b.h << 1) | (m_AF.b.h >> 7);
@@ -662,10 +662,10 @@ void i8085a_cpu_device::execute_one(int opcode)
 			if (IS_8085())
 			{
 				int q = m_HL.b.l - m_BC.b.l;
-				m_AF.b.l = ZS[q & 255] | ((q >> 8) & CF) | VF | ((m_HL.b.l ^ q ^ m_BC.b.l) & HF) | (((m_BC.b.l ^ m_HL.b.l) & (m_HL.b.l ^ q) & SF) >> 5);
+				m_AF.b.l = lut_zs[q & 255] | ((q >> 8) & CF) | VF | ((m_HL.b.l ^ q ^ m_BC.b.l) & HF) | (((m_BC.b.l ^ m_HL.b.l) & (m_HL.b.l ^ q) & SF) >> 5);
 				m_HL.b.l = q;
 				q = m_HL.b.h - m_BC.b.h - (m_AF.b.l & CF);
-				m_AF.b.l = ZS[q & 255] | ((q >> 8) & CF) | VF | ((m_HL.b.h ^ q ^ m_BC.b.h) & HF) | (((m_BC.b.h ^ m_HL.b.h) & (m_HL.b.h ^ q) & SF) >> 5);
+				m_AF.b.l = lut_zs[q & 255] | ((q >> 8) & CF) | VF | ((m_HL.b.h ^ q ^ m_BC.b.h) & HF) | (((m_BC.b.h ^ m_HL.b.h) & (m_HL.b.h ^ q) & SF) >> 5);
 				if (m_HL.b.l != 0 )
 					m_AF.b.l &= ~ZF;
 			}
@@ -674,7 +674,7 @@ void i8085a_cpu_device::execute_one(int opcode)
 			M_DAD(BC);
 			break;
 		case 0x0a: // LDAX B
-			m_AF.b.h = RM(m_BC.d);
+			m_AF.b.h = read_mem(m_BC.d);
 			break;
 		case 0x0b: // DCX B
 			m_BC.w.l--;
@@ -693,7 +693,7 @@ void i8085a_cpu_device::execute_one(int opcode)
 			M_DCR(m_BC.b.l);
 			break;
 		case 0x0e: // MVI C,nn
-			m_BC.b.l = ARG();
+			m_BC.b.l = read_arg();
 			break;
 		case 0x0f: // RRC
 			m_AF.b.l = (m_AF.b.l & 0xfe) | (m_AF.b.h & CF);
@@ -708,10 +708,10 @@ void i8085a_cpu_device::execute_one(int opcode)
 			}
 			break;
 		case 0x11: // LXI D,nnnn
-			m_DE.w.l = ARG16();
+			m_DE.w.l = read_arg16();
 			break;
 		case 0x12: // STAX D
-			WM(m_DE.d, m_AF.b.h);
+			write_mem(m_DE.d, m_AF.b.h);
 			break;
 		case 0x13: // INX D
 			m_DE.w.l++;
@@ -730,7 +730,7 @@ void i8085a_cpu_device::execute_one(int opcode)
 			M_DCR(m_DE.b.h);
 			break;
 		case 0x16: // MVI D,nn
-			m_DE.b.h = ARG();
+			m_DE.b.h = read_arg();
 			break;
 		case 0x17: // RAL
 		{
@@ -753,7 +753,7 @@ void i8085a_cpu_device::execute_one(int opcode)
 			M_DAD(DE);
 			break;
 		case 0x1a: // LDAX D
-			m_AF.b.h = RM(m_DE.d);
+			m_AF.b.h = read_mem(m_DE.d);
 			break;
 		case 0x1b: // DCX D
 			m_DE.w.l--;
@@ -772,7 +772,7 @@ void i8085a_cpu_device::execute_one(int opcode)
 			M_DCR(m_DE.b.l);
 			break;
 		case 0x1e: // MVI E,nn
-			m_DE.b.l = ARG();
+			m_DE.b.l = read_arg();
 			break;
 		case 0x1f: // RAR
 		{
@@ -794,13 +794,13 @@ void i8085a_cpu_device::execute_one(int opcode)
 			}
 			break;
 		case 0x21: // LXI H,nnnn
-			m_HL.w.l = ARG16();
+			m_HL.w.l = read_arg16();
 			break;
 		case 0x22: // SHLD nnnn
-			m_WZ.w.l = ARG16();
-			WM(m_WZ.d, m_HL.b.l);
+			m_WZ.w.l = read_arg16();
+			write_mem(m_WZ.d, m_HL.b.l);
 			m_WZ.w.l++;
-			WM(m_WZ.d, m_HL.b.h);
+			write_mem(m_WZ.d, m_HL.b.h);
 			break;
 		case 0x23: // INX H
 			m_HL.w.l++;
@@ -819,7 +819,7 @@ void i8085a_cpu_device::execute_one(int opcode)
 			M_DCR(m_HL.b.h);
 			break;
 		case 0x26: // MVI H,nn
-			m_HL.b.h = ARG();
+			m_HL.b.h = read_arg();
 			break;
 		case 0x27: // DAA
 			m_WZ.b.h = m_AF.b.h;
@@ -838,14 +838,14 @@ void i8085a_cpu_device::execute_one(int opcode)
 					m_WZ.b.h += 0x60;
 			}
 
-			m_AF.b.l = (m_AF.b.l & 3) | (m_AF.b.h & 0x28) | ((m_AF.b.h > 0x99) ? 1 : 0) | ((m_AF.b.h ^ m_WZ.b.h) & 0x10) | ZSP[m_WZ.b.h];
+			m_AF.b.l = (m_AF.b.l & 3) | (m_AF.b.h & 0x28) | ((m_AF.b.h > 0x99) ? 1 : 0) | ((m_AF.b.h ^ m_WZ.b.h) & 0x10) | lut_zsp[m_WZ.b.h];
 			m_AF.b.h = m_WZ.b.h;
 			break;
 
 		case 0x28: // 8085: LDEH nn, otherwise undocumented NOP
 			if (IS_8085())
 			{
-				m_WZ.d = ARG();
+				m_WZ.d = read_arg();
 				m_DE.d = (m_HL.d + m_WZ.d) & 0xffff;
 			}
 			break;
@@ -853,10 +853,10 @@ void i8085a_cpu_device::execute_one(int opcode)
 			M_DAD(HL);
 			break;
 		case 0x2a: // LHLD nnnn
-			m_WZ.d = ARG16();
-			m_HL.b.l = RM(m_WZ.d);
+			m_WZ.d = read_arg16();
+			m_HL.b.l = read_mem(m_WZ.d);
 			m_WZ.w.l++;
-			m_HL.b.h = RM(m_WZ.d);
+			m_HL.b.h = read_mem(m_WZ.d);
 			break;
 		case 0x2b: // DCX H
 			m_HL.w.l--;
@@ -875,7 +875,7 @@ void i8085a_cpu_device::execute_one(int opcode)
 			M_DCR(m_HL.b.l);
 			break;
 		case 0x2e: // MVI L,nn
-			m_HL.b.l = ARG();
+			m_HL.b.l = read_arg();
 			break;
 		case 0x2f: // CMA
 			m_AF.b.h ^= 0xff;
@@ -912,11 +912,11 @@ void i8085a_cpu_device::execute_one(int opcode)
 			}
 			break;
 		case 0x31: // LXI SP,nnnn
-			m_SP.w.l = ARG16();
+			m_SP.w.l = read_arg16();
 			break;
 		case 0x32: // STAX nnnn
-			m_WZ.d = ARG16();
-			WM(m_WZ.d, m_AF.b.h);
+			m_WZ.d = read_arg16();
+			write_mem(m_WZ.d, m_AF.b.h);
 			break;
 		case 0x33: // INX SP
 			m_SP.w.l++;
@@ -929,18 +929,18 @@ void i8085a_cpu_device::execute_one(int opcode)
 			}
 			break;
 		case 0x34: // INR M
-			m_WZ.b.l = RM(m_HL.d);
+			m_WZ.b.l = read_mem(m_HL.d);
 			M_INR(m_WZ.b.l);
-			WM(m_HL.d, m_WZ.b.l);
+			write_mem(m_HL.d, m_WZ.b.l);
 			break;
 		case 0x35: // DCR M
-			m_WZ.b.l = RM(m_HL.d);
+			m_WZ.b.l = read_mem(m_HL.d);
 			M_DCR(m_WZ.b.l);
-			WM(m_HL.d, m_WZ.b.l);
+			write_mem(m_HL.d, m_WZ.b.l);
 			break;
 		case 0x36: // MVI M,nn
-			m_WZ.b.l = ARG();
-			WM(m_HL.d, m_WZ.b.l);
+			m_WZ.b.l = read_arg();
+			write_mem(m_HL.d, m_WZ.b.l);
 			break;
 		case 0x37: // STC
 			m_AF.b.l = (m_AF.b.l & 0xfe) | CF;
@@ -949,7 +949,7 @@ void i8085a_cpu_device::execute_one(int opcode)
 		case 0x38: // 8085: LDES nn, otherwise undocumented NOP
 			if (IS_8085())
 			{
-				m_WZ.d = ARG();
+				m_WZ.d = read_arg();
 				m_DE.d = (m_SP.d + m_WZ.d) & 0xffff;
 			}
 			break;
@@ -957,8 +957,8 @@ void i8085a_cpu_device::execute_one(int opcode)
 			M_DAD(SP);
 			break;
 		case 0x3a: // LDAX nnnn
-			m_WZ.d = ARG16();
-			m_AF.b.h = RM(m_WZ.d);
+			m_WZ.d = read_arg16();
+			m_AF.b.h = read_mem(m_WZ.d);
 			break;
 		case 0x3b: // DCX SP
 			m_SP.w.l--;
@@ -977,7 +977,7 @@ void i8085a_cpu_device::execute_one(int opcode)
 			M_DCR(m_AF.b.h);
 			break;
 		case 0x3e: // MVI A,nn
-			m_AF.b.h = ARG();
+			m_AF.b.h = read_arg();
 			break;
 		case 0x3f: // CMC
 			m_AF.b.l = (m_AF.b.l & 0xfe) | (~m_AF.b.l & CF);
@@ -990,7 +990,7 @@ void i8085a_cpu_device::execute_one(int opcode)
 		case 0x43: m_BC.b.h = m_DE.b.l; break;
 		case 0x44: m_BC.b.h = m_HL.b.h; break;
 		case 0x45: m_BC.b.h = m_HL.b.l; break;
-		case 0x46: m_BC.b.h = RM(m_HL.d); break;
+		case 0x46: m_BC.b.h = read_mem(m_HL.d); break;
 		case 0x47: m_BC.b.h = m_AF.b.h; break;
 
 		case 0x48: m_BC.b.l = m_BC.b.h; break;
@@ -999,7 +999,7 @@ void i8085a_cpu_device::execute_one(int opcode)
 		case 0x4b: m_BC.b.l = m_DE.b.l; break;
 		case 0x4c: m_BC.b.l = m_HL.b.h; break;
 		case 0x4d: m_BC.b.l = m_HL.b.l; break;
-		case 0x4e: m_BC.b.l = RM(m_HL.d); break;
+		case 0x4e: m_BC.b.l = read_mem(m_HL.d); break;
 		case 0x4f: m_BC.b.l = m_AF.b.h; break;
 
 		case 0x50: m_DE.b.h = m_BC.b.h; break;
@@ -1008,7 +1008,7 @@ void i8085a_cpu_device::execute_one(int opcode)
 		case 0x53: m_DE.b.h = m_DE.b.l; break;
 		case 0x54: m_DE.b.h = m_HL.b.h; break;
 		case 0x55: m_DE.b.h = m_HL.b.l; break;
-		case 0x56: m_DE.b.h = RM(m_HL.d); break;
+		case 0x56: m_DE.b.h = read_mem(m_HL.d); break;
 		case 0x57: m_DE.b.h = m_AF.b.h; break;
 
 		case 0x58: m_DE.b.l = m_BC.b.h; break;
@@ -1017,7 +1017,7 @@ void i8085a_cpu_device::execute_one(int opcode)
 		case 0x5b: break; // MOV E,E
 		case 0x5c: m_DE.b.l = m_HL.b.h; break;
 		case 0x5d: m_DE.b.l = m_HL.b.l; break;
-		case 0x5e: m_DE.b.l = RM(m_HL.d); break;
+		case 0x5e: m_DE.b.l = read_mem(m_HL.d); break;
 		case 0x5f: m_DE.b.l = m_AF.b.h; break;
 
 		case 0x60: m_HL.b.h = m_BC.b.h; break;
@@ -1026,7 +1026,7 @@ void i8085a_cpu_device::execute_one(int opcode)
 		case 0x63: m_HL.b.h = m_DE.b.l; break;
 		case 0x64: break; // MOV H,H
 		case 0x65: m_HL.b.h = m_HL.b.l; break;
-		case 0x66: m_HL.b.h = RM(m_HL.d); break;
+		case 0x66: m_HL.b.h = read_mem(m_HL.d); break;
 		case 0x67: m_HL.b.h = m_AF.b.h; break;
 
 		case 0x68: m_HL.b.l = m_BC.b.h; break;
@@ -1035,21 +1035,21 @@ void i8085a_cpu_device::execute_one(int opcode)
 		case 0x6b: m_HL.b.l = m_DE.b.l; break;
 		case 0x6c: m_HL.b.l = m_HL.b.h; break;
 		case 0x6d: break; // MOV L,L
-		case 0x6e: m_HL.b.l = RM(m_HL.d); break;
+		case 0x6e: m_HL.b.l = read_mem(m_HL.d); break;
 		case 0x6f: m_HL.b.l = m_AF.b.h; break;
 
-		case 0x70: WM(m_HL.d, m_BC.b.h); break;
-		case 0x71: WM(m_HL.d, m_BC.b.l); break;
-		case 0x72: WM(m_HL.d, m_DE.b.h); break;
-		case 0x73: WM(m_HL.d, m_DE.b.l); break;
-		case 0x74: WM(m_HL.d, m_HL.b.h); break;
-		case 0x75: WM(m_HL.d, m_HL.b.l); break;
+		case 0x70: write_mem(m_HL.d, m_BC.b.h); break;
+		case 0x71: write_mem(m_HL.d, m_BC.b.l); break;
+		case 0x72: write_mem(m_HL.d, m_DE.b.h); break;
+		case 0x73: write_mem(m_HL.d, m_DE.b.l); break;
+		case 0x74: write_mem(m_HL.d, m_HL.b.h); break;
+		case 0x75: write_mem(m_HL.d, m_HL.b.l); break;
 		case 0x76: // HLT (instead of MOV M,M)
 			m_PC.w.l--;
 			m_HALT = 1;
 			set_status(0x8a); // halt acknowledge
 			break;
-		case 0x77: WM(m_HL.d, m_AF.b.h); break;
+		case 0x77: write_mem(m_HL.d, m_AF.b.h); break;
 
 		case 0x78: m_AF.b.h = m_BC.b.h; break;
 		case 0x79: m_AF.b.h = m_BC.b.l; break;
@@ -1057,7 +1057,7 @@ void i8085a_cpu_device::execute_one(int opcode)
 		case 0x7b: m_AF.b.h = m_DE.b.l; break;
 		case 0x7c: m_AF.b.h = m_HL.b.h; break;
 		case 0x7d: m_AF.b.h = m_HL.b.l; break;
-		case 0x7e: m_AF.b.h = RM(m_HL.d); break;
+		case 0x7e: m_AF.b.h = read_mem(m_HL.d); break;
 		case 0x7f: break; // MOV A,A
 
 		// alu op [B/C/D/E/H/L/M/A]
@@ -1067,7 +1067,7 @@ void i8085a_cpu_device::execute_one(int opcode)
 		case 0x83: M_ADD(m_DE.b.l); break;
 		case 0x84: M_ADD(m_HL.b.h); break;
 		case 0x85: M_ADD(m_HL.b.l); break;
-		case 0x86: m_WZ.b.l = RM(m_HL.d); M_ADD(m_WZ.b.l); break;
+		case 0x86: m_WZ.b.l = read_mem(m_HL.d); M_ADD(m_WZ.b.l); break;
 		case 0x87: M_ADD(m_AF.b.h); break;
 
 		case 0x88: M_ADC(m_BC.b.h); break;
@@ -1076,7 +1076,7 @@ void i8085a_cpu_device::execute_one(int opcode)
 		case 0x8b: M_ADC(m_DE.b.l); break;
 		case 0x8c: M_ADC(m_HL.b.h); break;
 		case 0x8d: M_ADC(m_HL.b.l); break;
-		case 0x8e: m_WZ.b.l = RM(m_HL.d); M_ADC(m_WZ.b.l); break;
+		case 0x8e: m_WZ.b.l = read_mem(m_HL.d); M_ADC(m_WZ.b.l); break;
 		case 0x8f: M_ADC(m_AF.b.h); break;
 
 		case 0x90: M_SUB(m_BC.b.h); break;
@@ -1085,7 +1085,7 @@ void i8085a_cpu_device::execute_one(int opcode)
 		case 0x93: M_SUB(m_DE.b.l); break;
 		case 0x94: M_SUB(m_HL.b.h); break;
 		case 0x95: M_SUB(m_HL.b.l); break;
-		case 0x96: m_WZ.b.l = RM(m_HL.d); M_SUB(m_WZ.b.l); break;
+		case 0x96: m_WZ.b.l = read_mem(m_HL.d); M_SUB(m_WZ.b.l); break;
 		case 0x97: M_SUB(m_AF.b.h); break;
 
 		case 0x98: M_SBB(m_BC.b.h); break;
@@ -1094,7 +1094,7 @@ void i8085a_cpu_device::execute_one(int opcode)
 		case 0x9b: M_SBB(m_DE.b.l); break;
 		case 0x9c: M_SBB(m_HL.b.h); break;
 		case 0x9d: M_SBB(m_HL.b.l); break;
-		case 0x9e: m_WZ.b.l = RM(m_HL.d); M_SBB(m_WZ.b.l); break;
+		case 0x9e: m_WZ.b.l = read_mem(m_HL.d); M_SBB(m_WZ.b.l); break;
 		case 0x9f: M_SBB(m_AF.b.h); break;
 
 		case 0xa0: M_ANA(m_BC.b.h); break;
@@ -1103,7 +1103,7 @@ void i8085a_cpu_device::execute_one(int opcode)
 		case 0xa3: M_ANA(m_DE.b.l); break;
 		case 0xa4: M_ANA(m_HL.b.h); break;
 		case 0xa5: M_ANA(m_HL.b.l); break;
-		case 0xa6: m_WZ.b.l = RM(m_HL.d); M_ANA(m_WZ.b.l); break;
+		case 0xa6: m_WZ.b.l = read_mem(m_HL.d); M_ANA(m_WZ.b.l); break;
 		case 0xa7: M_ANA(m_AF.b.h); break;
 
 		case 0xa8: M_XRA(m_BC.b.h); break;
@@ -1112,7 +1112,7 @@ void i8085a_cpu_device::execute_one(int opcode)
 		case 0xab: M_XRA(m_DE.b.l); break;
 		case 0xac: M_XRA(m_HL.b.h); break;
 		case 0xad: M_XRA(m_HL.b.l); break;
-		case 0xae: m_WZ.b.l = RM(m_HL.d); M_XRA(m_WZ.b.l); break;
+		case 0xae: m_WZ.b.l = read_mem(m_HL.d); M_XRA(m_WZ.b.l); break;
 		case 0xaf: M_XRA(m_AF.b.h); break;
 
 		case 0xb0: M_ORA(m_BC.b.h); break;
@@ -1121,7 +1121,7 @@ void i8085a_cpu_device::execute_one(int opcode)
 		case 0xb3: M_ORA(m_DE.b.l); break;
 		case 0xb4: M_ORA(m_HL.b.h); break;
 		case 0xb5: M_ORA(m_HL.b.l); break;
-		case 0xb6: m_WZ.b.l = RM(m_HL.d); M_ORA(m_WZ.b.l); break;
+		case 0xb6: m_WZ.b.l = read_mem(m_HL.d); M_ORA(m_WZ.b.l); break;
 		case 0xb7: M_ORA(m_AF.b.h); break;
 
 		case 0xb8: M_CMP(m_BC.b.h); break;
@@ -1130,7 +1130,7 @@ void i8085a_cpu_device::execute_one(int opcode)
 		case 0xbb: M_CMP(m_DE.b.l); break;
 		case 0xbc: M_CMP(m_HL.b.h); break;
 		case 0xbd: M_CMP(m_HL.b.l); break;
-		case 0xbe: m_WZ.b.l = RM(m_HL.d); M_CMP(m_WZ.b.l); break;
+		case 0xbe: m_WZ.b.l = read_mem(m_HL.d); M_CMP(m_WZ.b.l); break;
 		case 0xbf: M_CMP(m_AF.b.h); break;
 
 		case 0xc0: // RNZ
@@ -1152,7 +1152,7 @@ void i8085a_cpu_device::execute_one(int opcode)
 			M_PUSH(BC);
 			break;
 		case 0xc6: // ADI nn
-			m_WZ.b.l = ARG();
+			m_WZ.b.l = read_arg();
 			M_ADD(m_WZ.b.l);
 			break;
 		case 0xc7: // RST 0
@@ -1190,7 +1190,7 @@ void i8085a_cpu_device::execute_one(int opcode)
 			M_CALL(1);
 			break;
 		case 0xce: // ACI nn
-			m_WZ.b.l = ARG();
+			m_WZ.b.l = read_arg();
 			M_ADC(m_WZ.b.l);
 			break;
 		case 0xcf: // RST 1
@@ -1208,7 +1208,7 @@ void i8085a_cpu_device::execute_one(int opcode)
 			break;
 		case 0xd3: // OUT nn
 			set_status(0x10);
-			m_WZ.d = ARG();
+			m_WZ.d = read_arg();
 			m_io->write_byte(m_WZ.d, m_AF.b.h);
 			break;
 		case 0xd4: // CNC nnnn
@@ -1218,7 +1218,7 @@ void i8085a_cpu_device::execute_one(int opcode)
 			M_PUSH(DE);
 			break;
 		case 0xd6: // SUI nn
-			m_WZ.b.l = ARG();
+			m_WZ.b.l = read_arg();
 			M_SUB(m_WZ.b.l);
 			break;
 		case 0xd7: // RST 2
@@ -1232,9 +1232,9 @@ void i8085a_cpu_device::execute_one(int opcode)
 			if (IS_8085())
 			{
 				m_WZ.w.l = m_DE.w.l;
-				WM(m_WZ.d, m_HL.b.l);
+				write_mem(m_WZ.d, m_HL.b.l);
 				m_WZ.w.l++;
-				WM(m_WZ.d, m_HL.b.h);
+				write_mem(m_WZ.d, m_HL.b.h);
 			}
 			else
 			{
@@ -1246,7 +1246,7 @@ void i8085a_cpu_device::execute_one(int opcode)
 			break;
 		case 0xdb: // IN nn
 			set_status(0x42);
-			m_WZ.d = ARG();
+			m_WZ.d = read_arg();
 			m_AF.b.h = m_io->read_byte(m_WZ.d);
 			break;
 		case 0xdc: // CC nnnn
@@ -1263,7 +1263,7 @@ void i8085a_cpu_device::execute_one(int opcode)
 			}
 			break;
 		case 0xde: // SBI nn
-			m_WZ.b.l = ARG();
+			m_WZ.b.l = read_arg();
 			M_SBB(m_WZ.b.l);
 			break;
 		case 0xdf: // RST 3
@@ -1291,7 +1291,7 @@ void i8085a_cpu_device::execute_one(int opcode)
 			M_PUSH(HL);
 			break;
 		case 0xe6: // ANI nn
-			m_WZ.b.l = ARG();
+			m_WZ.b.l = read_arg();
 			M_ANA(m_WZ.b.l);
 			break;
 		case 0xe7: // RST 4
@@ -1319,9 +1319,9 @@ void i8085a_cpu_device::execute_one(int opcode)
 			if (IS_8085())
 			{
 				m_WZ.w.l = m_DE.w.l;
-				m_HL.b.l = RM(m_WZ.d);
+				m_HL.b.l = read_mem(m_WZ.d);
 				m_WZ.w.l++;
-				m_HL.b.h = RM(m_WZ.d);
+				m_HL.b.h = read_mem(m_WZ.d);
 			}
 			else
 			{
@@ -1329,7 +1329,7 @@ void i8085a_cpu_device::execute_one(int opcode)
 			}
 			break;
 		case 0xee: // XRI nn
-			m_WZ.b.l = ARG();
+			m_WZ.b.l = read_arg();
 			M_XRA(m_WZ.b.l);
 			break;
 		case 0xef: // RST 5
@@ -1358,7 +1358,7 @@ void i8085a_cpu_device::execute_one(int opcode)
 			M_PUSH(AF);
 			break;
 		case 0xf6: // ORI nn
-			m_WZ.b.l = ARG();
+			m_WZ.b.l = read_arg();
 			M_ORA(m_WZ.b.l);
 			break;
 		case 0xf7: // RST 6
@@ -1392,7 +1392,7 @@ void i8085a_cpu_device::execute_one(int opcode)
 			}
 			break;
 		case 0xfe: // CPI nn
-			m_WZ.b.l = ARG();
+			m_WZ.b.l = read_arg();
 			M_CMP(m_WZ.b.l);
 			break;
 		case 0xff: // RST 7
@@ -1431,8 +1431,8 @@ void i8085a_cpu_device::init_tables()
 		if (i&32) ++p;
 		if (i&64) ++p;
 		if (i&128) ++p;
-		ZS[i] = zs;
-		ZSP[i] = zs | ((p&1) ? 0 : PF);
+		lut_zs[i] = zs;
+		lut_zsp[i] = zs | ((p&1) ? 0 : PF);
 	}
 }
 
