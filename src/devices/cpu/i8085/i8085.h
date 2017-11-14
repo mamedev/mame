@@ -159,12 +159,30 @@ private:
 	void break_halt_for_interrupt();
 	u8 read_op();
 	u8 read_arg();
-	u16 read_arg16();
+	PAIR read_arg16();
 	u8 read_mem(u32 a);
 	void write_mem(u32 a, u8 v);
+	void op_push(PAIR p);
+	PAIR op_pop();
 	void check_for_interrupts();
 	void execute_one(int opcode);
 	void init_tables();
+
+	void op_ora(u8 v);
+	void op_xra(u8 v);
+	void op_ana(u8 v);
+	u8 op_inr(u8 v);
+	u8 op_dcr(u8 v);
+	void op_add(u8 v);
+	void op_adc(u8 v);
+	void op_sub(u8 v);
+	void op_sbb(u8 v);
+	void op_cmp(u8 v);
+	void op_dad(u16 v);
+	void op_jmp(int cond);
+	void op_call(int cond);
+	void op_ret(int cond);
+	void op_rst(u8 v);
 };
 
 

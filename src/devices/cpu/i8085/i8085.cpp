@@ -186,13 +186,13 @@ const u8 i8085a_cpu_device::lut_cycles_8085[256]={
 /* F */ 6, 10,10,4, 11,12,7, 12,6, 6, 10,4, 11,10,7, 12 };
 
 /* special cases (partially taken care of elsewhere):
-               base c    taken?   not taken?
-M_RET  8080    5         +6(11)   -0            (conditional)
-M_RET  8085    6         +6(12)   -0            (conditional)
-M_JMP  8080    10        +0       -0
-M_JMP  8085    10        +0       -3(7)
-M_CALL 8080    11        +6(17)   -0
-M_CALL 8085    11        +7(18)   -2(9)
+                base c    taken?   not taken?
+op_ret  8080    5         +6(11)   -0            (conditional)
+op_ret  8085    6         +6(12)   -0            (conditional)
+op_jmp  8080    10        +0       -0
+op_jmp  8085    10        +0       -3(7)
+op_call 8080    11        +6(17)   -0
+op_call 8085    11        +7(18)   -2(9)
 
 */
 
@@ -271,7 +271,6 @@ void i8085a_cpu_device::set_sod(int state)
 	}
 }
 
-
 void i8085a_cpu_device::set_inte(int state)
 {
 	if (state != 0 && (m_im & IM_IE) == 0)
@@ -286,7 +285,6 @@ void i8085a_cpu_device::set_inte(int state)
 	}
 }
 
-
 void i8085a_cpu_device::set_status(u8 status)
 {
 	if (status != m_status)
@@ -294,7 +292,6 @@ void i8085a_cpu_device::set_status(u8 status)
 
 	m_status = status;
 }
-
 
 u8 i8085a_cpu_device::get_rim_value()
 {
@@ -312,25 +309,24 @@ u8 i8085a_cpu_device::get_rim_value()
 	return result;
 }
 
-u8 i8085a_cpu_device::read_op()
-{
-	set_status(0xa2); // instruction fetch
-	return m_direct->read_byte(m_PC.w.l++);
-}
-
+// memory access
 u8 i8085a_cpu_device::read_arg()
 {
 	return m_direct->read_byte(m_PC.w.l++);
 }
 
-u16 i8085a_cpu_device::read_arg16()
+PAIR i8085a_cpu_device::read_arg16()
 {
-	u16 w;
-	w  = m_direct->read_byte(m_PC.d);
-	m_PC.w.l++;
-	w += m_direct->read_byte(m_PC.d) << 8;
-	m_PC.w.l++;
-	return w;
+	PAIR p;
+	p.b.l = m_direct->read_byte(m_PC.w.l++);
+	p.b.h = m_direct->read_byte(m_PC.w.l++);
+	return p;
+}
+
+u8 i8085a_cpu_device::read_op()
+{
+	set_status(0xa2); // instruction fetch
+	return m_direct->read_byte(m_PC.w.l++);
 }
 
 u8 i8085a_cpu_device::read_mem(u32 a)
@@ -345,107 +341,149 @@ void i8085a_cpu_device::write_mem(u32 a, u8 v)
 	m_program->write_byte(a, v);
 }
 
-
-
-
-/* logical */
-#define M_ORA(R) m_AF.b.h|=R; m_AF.b.l=lut_zsp[m_AF.b.h]
-#define M_XRA(R) m_AF.b.h^=R; m_AF.b.l=lut_zsp[m_AF.b.h]
-#define M_ANA(R) {u8 hc = ((m_AF.b.h | R)<<1) & HF; m_AF.b.h&=R; m_AF.b.l=lut_zsp[m_AF.b.h]; if(is_8085()) { m_AF.b.l |= HF; } else {m_AF.b.l |= hc; } }
-
-/* increase / decrease */
-#define M_INR(R) {u8 hc = ((R & 0x0f) == 0x0f) ? HF : 0; ++R; m_AF.b.l= (m_AF.b.l & CF ) | lut_zsp[R] | hc; }
-#define M_DCR(R) {u8 hc = ((R & 0x0f) != 0x00) ? HF : 0; --R; m_AF.b.l= (m_AF.b.l & CF ) | lut_zsp[R] | hc | VF; }
-
-/* arithmetic */
-#define M_ADD(R) { \
-	int q = m_AF.b.h+R; \
-	m_AF.b.l=lut_zsp[q&255]|((q>>8)&CF)|((m_AF.b.h^q^R)&HF); \
-	m_AF.b.h=q; \
+void i8085a_cpu_device::op_push(PAIR p)
+{
+	set_status(0x04); // stack push
+	m_program->write_byte(--m_SP.w.l, p.b.h);
+	m_program->write_byte(--m_SP.w.l, p.b.l);
 }
 
-#define M_ADC(R) { \
-	int q = m_AF.b.h+R+(m_AF.b.l&CF); \
-	m_AF.b.l=lut_zsp[q&255]|((q>>8)&CF)|((m_AF.b.h^q^R)&HF); \
-	m_AF.b.h=q; \
+PAIR i8085a_cpu_device::op_pop()
+{
+	PAIR p;
+	set_status(0x86); // stack pop
+	p.b.l = m_program->read_byte(m_SP.w.l++);
+	p.b.h = m_program->read_byte(m_SP.w.l++);
+	return p;
 }
 
-#define M_SUB(R) { \
-	int q = m_AF.b.h-R; \
-	m_AF.b.l=lut_zsp[q&255]|((q>>8)&CF)|(~(m_AF.b.h^q^R)&HF)|VF; \
-	m_AF.b.h=q; \
+// logical
+void i8085a_cpu_device::op_ora(u8 v)
+{
+	m_AF.b.h |= v;
+	m_AF.b.l = lut_zsp[m_AF.b.h];
 }
 
-#define M_SBB(R) { \
-	int q = m_AF.b.h-R-(m_AF.b.l&CF); \
-	m_AF.b.l=lut_zsp[q&255]|((q>>8)&CF)|(~(m_AF.b.h^q^R)&HF)|VF; \
-	m_AF.b.h=q; \
+void i8085a_cpu_device::op_xra(u8 v)
+{
+	m_AF.b.h ^= v;
+	m_AF.b.l = lut_zsp[m_AF.b.h];
 }
 
-#define M_CMP(R) { \
-	int q = m_AF.b.h-R; \
-	m_AF.b.l=lut_zsp[q&255]|((q>>8)&CF)|(~(m_AF.b.h^q^R)&HF)|VF; \
+void i8085a_cpu_device::op_ana(u8 v)
+{
+	u8 hc = ((m_AF.b.h | v) << 1) & HF;
+	m_AF.b.h &= v;
+	m_AF.b.l = lut_zsp[m_AF.b.h];
+	if (is_8085())
+		m_AF.b.l |= HF;
+	else
+		m_AF.b.l |= hc;
 }
 
-#define M_DAD(R) { \
-	int q = m_HL.d + m_##R.d; \
-	m_AF.b.l = (m_AF.b.l & ~CF) | (q>>16 & CF ); \
-	m_HL.w.l = q; \
+// increase / decrease
+u8 i8085a_cpu_device::op_inr(u8 v)
+{
+	u8 hc = ((v & 0x0f) == 0x0f) ? HF : 0;
+	m_AF.b.l = (m_AF.b.l & CF ) | lut_zsp[++v] | hc;
+	return v;
 }
 
-/* stack */
-#define M_PUSH(R) { \
-	set_status(0x04); \
-	m_program->write_byte(--m_SP.w.l, m_##R.b.h); \
-	m_program->write_byte(--m_SP.w.l, m_##R.b.l); \
+u8 i8085a_cpu_device::op_dcr(u8 v)
+{
+	u8 hc = ((v & 0x0f) != 0x00) ? HF : 0;
+	m_AF.b.l = (m_AF.b.l & CF) | lut_zsp[--v] | hc | VF;
+	return v;
 }
 
-#define M_POP(R) { \
-	set_status(0x86); \
-	m_##R.b.l = m_program->read_byte(m_SP.w.l++); \
-	m_##R.b.h = m_program->read_byte(m_SP.w.l++); \
+// arithmetic
+void i8085a_cpu_device::op_add(u8 v)
+{
+	int q = m_AF.b.h + v;
+	m_AF.b.l = lut_zsp[q & 0xff] | ((q >> 8) & CF) | ((m_AF.b.h ^ q ^ v) & HF);
+	m_AF.b.h = q;
 }
 
-/* jumps */
-// On 8085 jump if condition is not satisfied is shorter
-#define M_JMP(cc) { \
-	if (cc) { \
-		m_PC.w.l = read_arg16(); \
-	} else { \
-		m_PC.w.l += 2; \
-		m_icount += (is_8085()) ? 3 : 0; \
-	} \
+void i8085a_cpu_device::op_adc(u8 v)
+{
+	int q = m_AF.b.h + v + (m_AF.b.l & CF);
+	m_AF.b.l = lut_zsp[q & 0xff] | ((q >> 8) & CF) | ((m_AF.b.h ^ q ^ v) & HF);
+	m_AF.b.h = q;
 }
 
-// On 8085 call if condition is not satisfied is 9 ticks
-#define M_CALL(cc) \
-{ \
-	if (cc) \
-	{ \
-		u16 a = read_arg16(); \
-		m_icount -= (is_8085()) ? 7 : 6 ; \
-		M_PUSH(PC); \
-		m_PC.d = a; \
-	} else { \
-		m_PC.w.l += 2; \
-		m_icount += (is_8085()) ? 2 : 0; \
-	} \
+void i8085a_cpu_device::op_sub(u8 v)
+{
+	int q = m_AF.b.h - v;
+	m_AF.b.l = lut_zsp[q & 0xff] | ((q >> 8) & CF) | (~(m_AF.b.h ^ q ^ v) & HF) | VF;
+	m_AF.b.h = q;
 }
 
-// conditional RET only
-#define M_RET(cc) \
-{ \
-	if (cc) \
-	{ \
-		m_icount -= 6; \
-		M_POP(PC); \
-	} \
+void i8085a_cpu_device::op_sbb(u8 v)
+{
+	int q = m_AF.b.h - v - (m_AF.b.l & CF);
+	m_AF.b.l = lut_zsp[q & 0xff] | ((q >> 8) & CF) | (~(m_AF.b.h ^ q ^ v) & HF) | VF;
+	m_AF.b.h = q;
 }
 
-#define M_RST(nn) { \
-	M_PUSH(PC); \
-	m_PC.d = 8 * nn; \
+void i8085a_cpu_device::op_cmp(u8 v)
+{
+	int q = m_AF.b.h - v;
+	m_AF.b.l = lut_zsp[q & 0xff] | ((q >> 8) & CF) | (~(m_AF.b.h ^ q ^ v) & HF) | VF;
 }
+
+void i8085a_cpu_device::op_dad(u16 v)
+{
+	int q = m_HL.w.l + v;
+	m_AF.b.l = (m_AF.b.l & ~CF) | (q >> 16 & CF);
+	m_HL.w.l = q;
+}
+
+// jumps
+void i8085a_cpu_device::op_jmp(int cond)
+{
+	// on 8085, jump if condition is not satisfied is shorter
+	if (cond)
+		m_PC = read_arg16();
+	else
+	{
+		m_PC.w.l += 2;
+		m_icount += (is_8085()) ? 3 : 0;
+	}
+}
+
+void i8085a_cpu_device::op_call(int cond)
+{
+	// on 8085, call if condition is not satisfied is 9 ticks
+	if (cond)
+	{
+		PAIR p = read_arg16();
+		m_icount -= (is_8085()) ? 7 : 6 ;
+		op_push(m_PC);
+		m_PC = p;
+	}
+	else
+	{
+		m_PC.w.l += 2;
+		m_icount += (is_8085()) ? 2 : 0;
+	}
+}
+
+void i8085a_cpu_device::op_ret(int cond)
+{
+	// conditional RET only
+	if (cond)
+	{
+		m_icount -= 6;
+		m_PC = op_pop();
+	}
+}
+
+void i8085a_cpu_device::op_rst(u8 v)
+{
+	op_push(m_PC);
+	m_PC.d = 8 * v;
+}
+
 
 /***************************************************************************
     INTERRUPTS
@@ -506,7 +544,7 @@ void i8085a_cpu_device::check_for_interrupts()
 		standard_irq_callback(INPUT_LINE_NMI);
 
 		/* push the PC and jump to $0024 */
-		M_PUSH(PC);
+		op_push(m_PC);
 		set_inte(0);
 		m_PC.w.l = ADDR_TRAP;
 		m_icount -= 11;
@@ -523,7 +561,7 @@ void i8085a_cpu_device::check_for_interrupts()
 		standard_irq_callback(I8085_RST75_LINE);
 
 		/* push the PC and jump to $003C */
-		M_PUSH(PC);
+		op_push(m_PC);
 		set_inte(0);
 		m_PC.w.l = ADDR_RST75;
 		m_icount -= 11;
@@ -537,7 +575,7 @@ void i8085a_cpu_device::check_for_interrupts()
 		standard_irq_callback(I8085_RST65_LINE);
 
 		/* push the PC and jump to $0034 */
-		M_PUSH(PC);
+		op_push(m_PC);
 		set_inte(0);
 		m_PC.w.l = ADDR_RST65;
 		m_icount -= 11;
@@ -551,7 +589,7 @@ void i8085a_cpu_device::check_for_interrupts()
 		standard_irq_callback(I8085_RST55_LINE);
 
 		/* push the PC and jump to $002C */
-		M_PUSH(PC);
+		op_push(m_PC);
 		set_inte(0);
 		m_PC.w.l = ADDR_RST55;
 		m_icount -= 11;
@@ -572,7 +610,7 @@ void i8085a_cpu_device::check_for_interrupts()
 		{
 			case 0xcd0000:  /* CALL nnnn */
 				m_icount -= 7;
-				M_PUSH(PC);
+				op_push(m_PC);
 			case 0xc30000:  /* JMP  nnnn */
 				m_icount -= 10;
 				m_PC.d = vector & 0xffff;
@@ -620,7 +658,7 @@ void i8085a_cpu_device::execute_one(int opcode)
 		case 0x00: // NOP
 			break;
 		case 0x01: // LXI B,nnnn
-			m_BC.w.l = read_arg16();
+			m_BC = read_arg16();
 			break;
 		case 0x02: // STAX B
 			write_mem(m_BC.d, m_AF.b.h);
@@ -636,10 +674,10 @@ void i8085a_cpu_device::execute_one(int opcode)
 			}
 			break;
 		case 0x04: // INR B
-			M_INR(m_BC.b.h);
+			m_BC.b.h = op_inr(m_BC.b.h);
 			break;
 		case 0x05: // DCR B
-			M_DCR(m_BC.b.h);
+			m_BC.b.h = op_dcr(m_BC.b.h);
 			break;
 		case 0x06: // MVI B,nn
 			m_BC.b.h = read_arg();
@@ -653,16 +691,16 @@ void i8085a_cpu_device::execute_one(int opcode)
 			if (is_8085())
 			{
 				int q = m_HL.b.l - m_BC.b.l;
-				m_AF.b.l = lut_zs[q & 255] | ((q >> 8) & CF) | VF | ((m_HL.b.l ^ q ^ m_BC.b.l) & HF) | (((m_BC.b.l ^ m_HL.b.l) & (m_HL.b.l ^ q) & SF) >> 5);
+				m_AF.b.l = lut_zs[q & 0xff] | ((q >> 8) & CF) | VF | ((m_HL.b.l ^ q ^ m_BC.b.l) & HF) | (((m_BC.b.l ^ m_HL.b.l) & (m_HL.b.l ^ q) & SF) >> 5);
 				m_HL.b.l = q;
 				q = m_HL.b.h - m_BC.b.h - (m_AF.b.l & CF);
-				m_AF.b.l = lut_zs[q & 255] | ((q >> 8) & CF) | VF | ((m_HL.b.h ^ q ^ m_BC.b.h) & HF) | (((m_BC.b.h ^ m_HL.b.h) & (m_HL.b.h ^ q) & SF) >> 5);
+				m_AF.b.l = lut_zs[q & 0xff] | ((q >> 8) & CF) | VF | ((m_HL.b.h ^ q ^ m_BC.b.h) & HF) | (((m_BC.b.h ^ m_HL.b.h) & (m_HL.b.h ^ q) & SF) >> 5);
 				if (m_HL.b.l != 0 )
 					m_AF.b.l &= ~ZF;
 			}
 			break;
 		case 0x09: // DAD B
-			M_DAD(BC);
+			op_dad(m_BC.w.l);
 			break;
 		case 0x0a: // LDAX B
 			m_AF.b.h = read_mem(m_BC.d);
@@ -678,10 +716,10 @@ void i8085a_cpu_device::execute_one(int opcode)
 			}
 			break;
 		case 0x0c: // INR C
-			M_INR(m_BC.b.l);
+			m_BC.b.l = op_inr(m_BC.b.l);
 			break;
 		case 0x0d: // DCR C
-			M_DCR(m_BC.b.l);
+			m_BC.b.l = op_dcr(m_BC.b.l);
 			break;
 		case 0x0e: // MVI C,nn
 			m_BC.b.l = read_arg();
@@ -699,7 +737,7 @@ void i8085a_cpu_device::execute_one(int opcode)
 			}
 			break;
 		case 0x11: // LXI D,nnnn
-			m_DE.w.l = read_arg16();
+			m_DE = read_arg16();
 			break;
 		case 0x12: // STAX D
 			write_mem(m_DE.d, m_AF.b.h);
@@ -715,10 +753,10 @@ void i8085a_cpu_device::execute_one(int opcode)
 			}
 			break;
 		case 0x14: // INR D
-			M_INR(m_DE.b.h);
+			m_DE.b.h = op_inr(m_DE.b.h);
 			break;
 		case 0x15: // DCR D
-			M_DCR(m_DE.b.h);
+			m_DE.b.h = op_dcr(m_DE.b.h);
 			break;
 		case 0x16: // MVI D,nn
 			m_DE.b.h = read_arg();
@@ -741,7 +779,7 @@ void i8085a_cpu_device::execute_one(int opcode)
 			}
 			break;
 		case 0x19: // DAD D
-			M_DAD(DE);
+			op_dad(m_DE.w.l);
 			break;
 		case 0x1a: // LDAX D
 			m_AF.b.h = read_mem(m_DE.d);
@@ -757,10 +795,10 @@ void i8085a_cpu_device::execute_one(int opcode)
 			}
 			break;
 		case 0x1c: // INR E
-			M_INR(m_DE.b.l);
+			m_DE.b.l = op_inr(m_DE.b.l);
 			break;
 		case 0x1d: // DCR E
-			M_DCR(m_DE.b.l);
+			m_DE.b.l = op_dcr(m_DE.b.l);
 			break;
 		case 0x1e: // MVI E,nn
 			m_DE.b.l = read_arg();
@@ -785,10 +823,10 @@ void i8085a_cpu_device::execute_one(int opcode)
 			}
 			break;
 		case 0x21: // LXI H,nnnn
-			m_HL.w.l = read_arg16();
+			m_HL = read_arg16();
 			break;
 		case 0x22: // SHLD nnnn
-			m_WZ.w.l = read_arg16();
+			m_WZ = read_arg16();
 			write_mem(m_WZ.d, m_HL.b.l);
 			m_WZ.w.l++;
 			write_mem(m_WZ.d, m_HL.b.h);
@@ -804,10 +842,10 @@ void i8085a_cpu_device::execute_one(int opcode)
 			}
 			break;
 		case 0x24: // INR H
-			M_INR(m_HL.b.h);
+			m_HL.b.h = op_inr(m_HL.b.h);
 			break;
 		case 0x25: // DCR H
-			M_DCR(m_HL.b.h);
+			m_HL.b.h = op_dcr(m_HL.b.h);
 			break;
 		case 0x26: // MVI H,nn
 			m_HL.b.h = read_arg();
@@ -841,10 +879,10 @@ void i8085a_cpu_device::execute_one(int opcode)
 			}
 			break;
 		case 0x29: // DAD H
-			M_DAD(HL);
+			op_dad(m_HL.w.l);
 			break;
 		case 0x2a: // LHLD nnnn
-			m_WZ.d = read_arg16();
+			m_WZ = read_arg16();
 			m_HL.b.l = read_mem(m_WZ.d);
 			m_WZ.w.l++;
 			m_HL.b.h = read_mem(m_WZ.d);
@@ -860,10 +898,10 @@ void i8085a_cpu_device::execute_one(int opcode)
 			}
 			break;
 		case 0x2c: // INR L
-			M_INR(m_HL.b.l);
+			m_HL.b.l = op_inr(m_HL.b.l);
 			break;
 		case 0x2d: // DCR L
-			M_DCR(m_HL.b.l);
+			m_HL.b.l = op_dcr(m_HL.b.l);
 			break;
 		case 0x2e: // MVI L,nn
 			m_HL.b.l = read_arg();
@@ -903,10 +941,10 @@ void i8085a_cpu_device::execute_one(int opcode)
 			}
 			break;
 		case 0x31: // LXI SP,nnnn
-			m_SP.w.l = read_arg16();
+			m_SP = read_arg16();
 			break;
 		case 0x32: // STAX nnnn
-			m_WZ.d = read_arg16();
+			m_WZ = read_arg16();
 			write_mem(m_WZ.d, m_AF.b.h);
 			break;
 		case 0x33: // INX SP
@@ -920,13 +958,11 @@ void i8085a_cpu_device::execute_one(int opcode)
 			}
 			break;
 		case 0x34: // INR M
-			m_WZ.b.l = read_mem(m_HL.d);
-			M_INR(m_WZ.b.l);
+			m_WZ.b.l = op_inr(read_mem(m_HL.d));
 			write_mem(m_HL.d, m_WZ.b.l);
 			break;
 		case 0x35: // DCR M
-			m_WZ.b.l = read_mem(m_HL.d);
-			M_DCR(m_WZ.b.l);
+			m_WZ.b.l = op_dcr(read_mem(m_HL.d));
 			write_mem(m_HL.d, m_WZ.b.l);
 			break;
 		case 0x36: // MVI M,nn
@@ -945,10 +981,10 @@ void i8085a_cpu_device::execute_one(int opcode)
 			}
 			break;
 		case 0x39: // DAD SP
-			M_DAD(SP);
+			op_dad(m_SP.w.l);
 			break;
 		case 0x3a: // LDAX nnnn
-			m_WZ.d = read_arg16();
+			m_WZ = read_arg16();
 			m_AF.b.h = read_mem(m_WZ.d);
 			break;
 		case 0x3b: // DCX SP
@@ -962,10 +998,10 @@ void i8085a_cpu_device::execute_one(int opcode)
 			}
 			break;
 		case 0x3c: // INR A
-			M_INR(m_AF.b.h);
+			m_AF.b.h = op_inr(m_AF.b.h);
 			break;
 		case 0x3d: // DCR A
-			M_DCR(m_AF.b.h);
+			m_AF.b.h = op_dcr(m_AF.b.h);
 			break;
 		case 0x3e: // MVI A,nn
 			m_AF.b.h = read_arg();
@@ -1052,150 +1088,146 @@ void i8085a_cpu_device::execute_one(int opcode)
 		case 0x7f: break; // MOV A,A
 
 		// alu op [B/C/D/E/H/L/M/A]
-		case 0x80: M_ADD(m_BC.b.h); break;
-		case 0x81: M_ADD(m_BC.b.l); break;
-		case 0x82: M_ADD(m_DE.b.h); break;
-		case 0x83: M_ADD(m_DE.b.l); break;
-		case 0x84: M_ADD(m_HL.b.h); break;
-		case 0x85: M_ADD(m_HL.b.l); break;
-		case 0x86: m_WZ.b.l = read_mem(m_HL.d); M_ADD(m_WZ.b.l); break;
-		case 0x87: M_ADD(m_AF.b.h); break;
+		case 0x80: op_add(m_BC.b.h); break;
+		case 0x81: op_add(m_BC.b.l); break;
+		case 0x82: op_add(m_DE.b.h); break;
+		case 0x83: op_add(m_DE.b.l); break;
+		case 0x84: op_add(m_HL.b.h); break;
+		case 0x85: op_add(m_HL.b.l); break;
+		case 0x86: m_WZ.b.l = read_mem(m_HL.d); op_add(m_WZ.b.l); break;
+		case 0x87: op_add(m_AF.b.h); break;
 
-		case 0x88: M_ADC(m_BC.b.h); break;
-		case 0x89: M_ADC(m_BC.b.l); break;
-		case 0x8a: M_ADC(m_DE.b.h); break;
-		case 0x8b: M_ADC(m_DE.b.l); break;
-		case 0x8c: M_ADC(m_HL.b.h); break;
-		case 0x8d: M_ADC(m_HL.b.l); break;
-		case 0x8e: m_WZ.b.l = read_mem(m_HL.d); M_ADC(m_WZ.b.l); break;
-		case 0x8f: M_ADC(m_AF.b.h); break;
+		case 0x88: op_adc(m_BC.b.h); break;
+		case 0x89: op_adc(m_BC.b.l); break;
+		case 0x8a: op_adc(m_DE.b.h); break;
+		case 0x8b: op_adc(m_DE.b.l); break;
+		case 0x8c: op_adc(m_HL.b.h); break;
+		case 0x8d: op_adc(m_HL.b.l); break;
+		case 0x8e: m_WZ.b.l = read_mem(m_HL.d); op_adc(m_WZ.b.l); break;
+		case 0x8f: op_adc(m_AF.b.h); break;
 
-		case 0x90: M_SUB(m_BC.b.h); break;
-		case 0x91: M_SUB(m_BC.b.l); break;
-		case 0x92: M_SUB(m_DE.b.h); break;
-		case 0x93: M_SUB(m_DE.b.l); break;
-		case 0x94: M_SUB(m_HL.b.h); break;
-		case 0x95: M_SUB(m_HL.b.l); break;
-		case 0x96: m_WZ.b.l = read_mem(m_HL.d); M_SUB(m_WZ.b.l); break;
-		case 0x97: M_SUB(m_AF.b.h); break;
+		case 0x90: op_sub(m_BC.b.h); break;
+		case 0x91: op_sub(m_BC.b.l); break;
+		case 0x92: op_sub(m_DE.b.h); break;
+		case 0x93: op_sub(m_DE.b.l); break;
+		case 0x94: op_sub(m_HL.b.h); break;
+		case 0x95: op_sub(m_HL.b.l); break;
+		case 0x96: m_WZ.b.l = read_mem(m_HL.d); op_sub(m_WZ.b.l); break;
+		case 0x97: op_sub(m_AF.b.h); break;
 
-		case 0x98: M_SBB(m_BC.b.h); break;
-		case 0x99: M_SBB(m_BC.b.l); break;
-		case 0x9a: M_SBB(m_DE.b.h); break;
-		case 0x9b: M_SBB(m_DE.b.l); break;
-		case 0x9c: M_SBB(m_HL.b.h); break;
-		case 0x9d: M_SBB(m_HL.b.l); break;
-		case 0x9e: m_WZ.b.l = read_mem(m_HL.d); M_SBB(m_WZ.b.l); break;
-		case 0x9f: M_SBB(m_AF.b.h); break;
+		case 0x98: op_sbb(m_BC.b.h); break;
+		case 0x99: op_sbb(m_BC.b.l); break;
+		case 0x9a: op_sbb(m_DE.b.h); break;
+		case 0x9b: op_sbb(m_DE.b.l); break;
+		case 0x9c: op_sbb(m_HL.b.h); break;
+		case 0x9d: op_sbb(m_HL.b.l); break;
+		case 0x9e: m_WZ.b.l = read_mem(m_HL.d); op_sbb(m_WZ.b.l); break;
+		case 0x9f: op_sbb(m_AF.b.h); break;
 
-		case 0xa0: M_ANA(m_BC.b.h); break;
-		case 0xa1: M_ANA(m_BC.b.l); break;
-		case 0xa2: M_ANA(m_DE.b.h); break;
-		case 0xa3: M_ANA(m_DE.b.l); break;
-		case 0xa4: M_ANA(m_HL.b.h); break;
-		case 0xa5: M_ANA(m_HL.b.l); break;
-		case 0xa6: m_WZ.b.l = read_mem(m_HL.d); M_ANA(m_WZ.b.l); break;
-		case 0xa7: M_ANA(m_AF.b.h); break;
+		case 0xa0: op_ana(m_BC.b.h); break;
+		case 0xa1: op_ana(m_BC.b.l); break;
+		case 0xa2: op_ana(m_DE.b.h); break;
+		case 0xa3: op_ana(m_DE.b.l); break;
+		case 0xa4: op_ana(m_HL.b.h); break;
+		case 0xa5: op_ana(m_HL.b.l); break;
+		case 0xa6: m_WZ.b.l = read_mem(m_HL.d); op_ana(m_WZ.b.l); break;
+		case 0xa7: op_ana(m_AF.b.h); break;
 
-		case 0xa8: M_XRA(m_BC.b.h); break;
-		case 0xa9: M_XRA(m_BC.b.l); break;
-		case 0xaa: M_XRA(m_DE.b.h); break;
-		case 0xab: M_XRA(m_DE.b.l); break;
-		case 0xac: M_XRA(m_HL.b.h); break;
-		case 0xad: M_XRA(m_HL.b.l); break;
-		case 0xae: m_WZ.b.l = read_mem(m_HL.d); M_XRA(m_WZ.b.l); break;
-		case 0xaf: M_XRA(m_AF.b.h); break;
+		case 0xa8: op_xra(m_BC.b.h); break;
+		case 0xa9: op_xra(m_BC.b.l); break;
+		case 0xaa: op_xra(m_DE.b.h); break;
+		case 0xab: op_xra(m_DE.b.l); break;
+		case 0xac: op_xra(m_HL.b.h); break;
+		case 0xad: op_xra(m_HL.b.l); break;
+		case 0xae: m_WZ.b.l = read_mem(m_HL.d); op_xra(m_WZ.b.l); break;
+		case 0xaf: op_xra(m_AF.b.h); break;
 
-		case 0xb0: M_ORA(m_BC.b.h); break;
-		case 0xb1: M_ORA(m_BC.b.l); break;
-		case 0xb2: M_ORA(m_DE.b.h); break;
-		case 0xb3: M_ORA(m_DE.b.l); break;
-		case 0xb4: M_ORA(m_HL.b.h); break;
-		case 0xb5: M_ORA(m_HL.b.l); break;
-		case 0xb6: m_WZ.b.l = read_mem(m_HL.d); M_ORA(m_WZ.b.l); break;
-		case 0xb7: M_ORA(m_AF.b.h); break;
+		case 0xb0: op_ora(m_BC.b.h); break;
+		case 0xb1: op_ora(m_BC.b.l); break;
+		case 0xb2: op_ora(m_DE.b.h); break;
+		case 0xb3: op_ora(m_DE.b.l); break;
+		case 0xb4: op_ora(m_HL.b.h); break;
+		case 0xb5: op_ora(m_HL.b.l); break;
+		case 0xb6: m_WZ.b.l = read_mem(m_HL.d); op_ora(m_WZ.b.l); break;
+		case 0xb7: op_ora(m_AF.b.h); break;
 
-		case 0xb8: M_CMP(m_BC.b.h); break;
-		case 0xb9: M_CMP(m_BC.b.l); break;
-		case 0xba: M_CMP(m_DE.b.h); break;
-		case 0xbb: M_CMP(m_DE.b.l); break;
-		case 0xbc: M_CMP(m_HL.b.h); break;
-		case 0xbd: M_CMP(m_HL.b.l); break;
-		case 0xbe: m_WZ.b.l = read_mem(m_HL.d); M_CMP(m_WZ.b.l); break;
-		case 0xbf: M_CMP(m_AF.b.h); break;
+		case 0xb8: op_cmp(m_BC.b.h); break;
+		case 0xb9: op_cmp(m_BC.b.l); break;
+		case 0xba: op_cmp(m_DE.b.h); break;
+		case 0xbb: op_cmp(m_DE.b.l); break;
+		case 0xbc: op_cmp(m_HL.b.h); break;
+		case 0xbd: op_cmp(m_HL.b.l); break;
+		case 0xbe: m_WZ.b.l = read_mem(m_HL.d); op_cmp(m_WZ.b.l); break;
+		case 0xbf: op_cmp(m_AF.b.h); break;
 
 		case 0xc0: // RNZ
-			M_RET(!(m_AF.b.l & ZF));
+			op_ret(!(m_AF.b.l & ZF));
 			break;
 		case 0xc1: // POP B
-			M_POP(BC);
+			m_BC = op_pop();
 			break;
 		case 0xc2: // JNZ nnnn
-			M_JMP(!(m_AF.b.l & ZF));
+			op_jmp(!(m_AF.b.l & ZF));
 			break;
 		case 0xc3: // JMP nnnn
-			M_JMP(1);
+			op_jmp(1);
 			break;
 		case 0xc4: // CNZ nnnn
-			M_CALL(!(m_AF.b.l & ZF));
+			op_call(!(m_AF.b.l & ZF));
 			break;
 		case 0xc5: // PUSH B
-			M_PUSH(BC);
+			op_push(m_BC);
 			break;
 		case 0xc6: // ADI nn
 			m_WZ.b.l = read_arg();
-			M_ADD(m_WZ.b.l);
+			op_add(m_WZ.b.l);
 			break;
 		case 0xc7: // RST 0
-			M_RST(0);
+			op_rst(0);
 			break;
 
 		case 0xc8: // RZ
-			M_RET(m_AF.b.l & ZF);
+			op_ret(m_AF.b.l & ZF);
 			break;
 		case 0xc9: // RET
-			M_POP(PC);
+			m_PC = op_pop();
 			break;
 		case 0xca: // JZ  nnnn
-			M_JMP(m_AF.b.l & ZF);
+			op_jmp(m_AF.b.l & ZF);
 			break;
 		case 0xcb: // 8085: RST V, otherwise undocumented JMP nnnn
 			if (is_8085())
 			{
 				if (m_AF.b.l & VF)
-				{
-					M_RST(8);
-				}
+					op_rst(8);
 				else
 					m_icount += 6; // RST not taken
 			}
 			else
-			{
-				M_JMP(1);
-			}
+				op_jmp(1);
 			break;
 		case 0xcc: // CZ  nnnn
-			M_CALL(m_AF.b.l & ZF);
+			op_call(m_AF.b.l & ZF);
 			break;
 		case 0xcd: // CALL nnnn
-			M_CALL(1);
+			op_call(1);
 			break;
 		case 0xce: // ACI nn
 			m_WZ.b.l = read_arg();
-			M_ADC(m_WZ.b.l);
+			op_adc(m_WZ.b.l);
 			break;
 		case 0xcf: // RST 1
-			M_RST(1);
+			op_rst(1);
 			break;
 
 		case 0xd0: // RNC
-			M_RET(!(m_AF.b.l & CF));
+			op_ret(!(m_AF.b.l & CF));
 			break;
 		case 0xd1: // POP D
-			M_POP(DE);
+			m_DE = op_pop();
 			break;
 		case 0xd2: // JNC nnnn
-			M_JMP(!(m_AF.b.l & CF));
+			op_jmp(!(m_AF.b.l & CF));
 			break;
 		case 0xd3: // OUT nn
 			set_status(0x10);
@@ -1203,21 +1235,21 @@ void i8085a_cpu_device::execute_one(int opcode)
 			m_io->write_byte(m_WZ.d, m_AF.b.h);
 			break;
 		case 0xd4: // CNC nnnn
-			M_CALL(!(m_AF.b.l & CF));
+			op_call(!(m_AF.b.l & CF));
 			break;
 		case 0xd5: // PUSH D
-			M_PUSH(DE);
+			op_push(m_DE);
 			break;
 		case 0xd6: // SUI nn
 			m_WZ.b.l = read_arg();
-			M_SUB(m_WZ.b.l);
+			op_sub(m_WZ.b.l);
 			break;
 		case 0xd7: // RST 2
-			M_RST(2);
+			op_rst(2);
 			break;
 
 		case 0xd8: // RC
-			M_RET(m_AF.b.l & CF);
+			op_ret(m_AF.b.l & CF);
 			break;
 		case 0xd9: // 8085: SHLX, otherwise undocumented RET
 			if (is_8085())
@@ -1228,12 +1260,10 @@ void i8085a_cpu_device::execute_one(int opcode)
 				write_mem(m_WZ.d, m_HL.b.h);
 			}
 			else
-			{
-				M_POP(PC);
-			}
+				m_PC = op_pop();
 			break;
 		case 0xda: // JC nnnn
-			M_JMP(m_AF.b.l & CF);
+			op_jmp(m_AF.b.l & CF);
 			break;
 		case 0xdb: // IN nn
 			set_status(0x42);
@@ -1241,62 +1271,58 @@ void i8085a_cpu_device::execute_one(int opcode)
 			m_AF.b.h = m_io->read_byte(m_WZ.d);
 			break;
 		case 0xdc: // CC nnnn
-			M_CALL(m_AF.b.l & CF);
+			op_call(m_AF.b.l & CF);
 			break;
 		case 0xdd: // 8085: JNX nnnn, otherwise undocumented CALL nnnn
 			if (is_8085())
-			{
-				M_JMP(!(m_AF.b.l & X5F));
-			}
+				op_jmp(!(m_AF.b.l & X5F));
 			else
-			{
-				M_CALL(1);
-			}
+				op_call(1);
 			break;
 		case 0xde: // SBI nn
 			m_WZ.b.l = read_arg();
-			M_SBB(m_WZ.b.l);
+			op_sbb(m_WZ.b.l);
 			break;
 		case 0xdf: // RST 3
-			M_RST(3);
+			op_rst(3);
 			break;
 
 		case 0xe0: // RPO
-			M_RET(!(m_AF.b.l & PF));
+			op_ret(!(m_AF.b.l & PF));
 			break;
 		case 0xe1: // POP H
-			M_POP(HL);
+			m_HL = op_pop();
 			break;
 		case 0xe2: // JPO nnnn
-			M_JMP(!(m_AF.b.l & PF));
+			op_jmp(!(m_AF.b.l & PF));
 			break;
 		case 0xe3: // XTHL
-			M_POP(WZ);
-			M_PUSH(HL);
+			m_WZ = op_pop();
+			op_push(m_HL);
 			m_HL.d = m_WZ.d;
 			break;
 		case 0xe4: // CPO nnnn
-			M_CALL(!(m_AF.b.l & PF));
+			op_call(!(m_AF.b.l & PF));
 			break;
 		case 0xe5: // PUSH H
-			M_PUSH(HL);
+			op_push(m_HL);
 			break;
 		case 0xe6: // ANI nn
 			m_WZ.b.l = read_arg();
-			M_ANA(m_WZ.b.l);
+			op_ana(m_WZ.b.l);
 			break;
 		case 0xe7: // RST 4
-			M_RST(4);
+			op_rst(4);
 			break;
 
 		case 0xe8: // RPE
-			M_RET(m_AF.b.l & PF);
+			op_ret(m_AF.b.l & PF);
 			break;
 		case 0xe9: // PCHL
 			m_PC.d = m_HL.w.l;
 			break;
 		case 0xea: // JPE nnnn
-			M_JMP(m_AF.b.l & PF);
+			op_jmp(m_AF.b.l & PF);
 			break;
 		case 0xeb: // XCHG
 			m_WZ.d = m_DE.d;
@@ -1304,7 +1330,7 @@ void i8085a_cpu_device::execute_one(int opcode)
 			m_HL.d = m_WZ.d;
 			break;
 		case 0xec: // CPE nnnn
-			M_CALL(m_AF.b.l & PF);
+			op_call(m_AF.b.l & PF);
 			break;
 		case 0xed: // 8085: LHLX, otherwise undocumented CALL nnnn
 			if (is_8085())
@@ -1315,79 +1341,73 @@ void i8085a_cpu_device::execute_one(int opcode)
 				m_HL.b.h = read_mem(m_WZ.d);
 			}
 			else
-			{
-				M_CALL(1);
-			}
+				op_call(1);
 			break;
 		case 0xee: // XRI nn
 			m_WZ.b.l = read_arg();
-			M_XRA(m_WZ.b.l);
+			op_xra(m_WZ.b.l);
 			break;
 		case 0xef: // RST 5
-			M_RST(5);
+			op_rst(5);
 			break;
 
 		case 0xf0: // RP
-			M_RET(!(m_AF.b.l & SF));
+			op_ret(!(m_AF.b.l & SF));
 			break;
 		case 0xf1: // POP A
-			M_POP(AF);
+			m_AF = op_pop();
 			break;
 		case 0xf2: // JP nnnn
-			M_JMP(!(m_AF.b.l & SF));
+			op_jmp(!(m_AF.b.l & SF));
 			break;
 		case 0xf3: // DI
 			set_inte(0);
 			break;
 		case 0xf4: // CP nnnn
-			M_CALL(!(m_AF.b.l & SF));
+			op_call(!(m_AF.b.l & SF));
 			break;
 		case 0xf5: // PUSH A
 			// on 8080, VF=1 and X3F=0 and X5F=0 always! (we don't have to check for it elsewhere)
 			if (is_8080())
 				m_AF.b.l = (m_AF.b.l & ~(X3F | X5F)) | VF;
-			M_PUSH(AF);
+			op_push(m_AF);
 			break;
 		case 0xf6: // ORI nn
 			m_WZ.b.l = read_arg();
-			M_ORA(m_WZ.b.l);
+			op_ora(m_WZ.b.l);
 			break;
 		case 0xf7: // RST 6
-			M_RST(6);
+			op_rst(6);
 			break;
 
 		case 0xf8: // RM
-			M_RET(m_AF.b.l & SF);
+			op_ret(m_AF.b.l & SF);
 			break;
 		case 0xf9: // SPHL
 			m_SP.d = m_HL.d;
 			break;
 		case 0xfa: // JM nnnn
-			M_JMP(m_AF.b.l & SF);
+			op_jmp(m_AF.b.l & SF);
 			break;
 		case 0xfb: // EI
 			set_inte(1);
 			m_after_ei = 2;
 			break;
 		case 0xfc: // CM nnnn
-			M_CALL(m_AF.b.l & SF);
+			op_call(m_AF.b.l & SF);
 			break;
 		case 0xfd: // 8085: JX nnnn, otherwise undocumented CALL nnnn
 			if (is_8085())
-			{
-				M_JMP(m_AF.b.l & X5F);
-			}
+				op_jmp(m_AF.b.l & X5F);
 			else
-			{
-				M_CALL(1);
-			}
+				op_call(1);
 			break;
 		case 0xfe: // CPI nn
 			m_WZ.b.l = read_arg();
-			M_CMP(m_WZ.b.l);
+			op_cmp(m_WZ.b.l);
 			break;
 		case 0xff: // RST 7
-			M_RST(7);
+			op_rst(7);
 			break;
 	} // end big switch
 }
