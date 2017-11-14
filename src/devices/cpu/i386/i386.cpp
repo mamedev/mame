@@ -139,7 +139,6 @@ device_memory_interface::space_config_vector i386_device::memory_space_config() 
 	};
 }
 
-int i386_parity_table[256];
 MODRM_TABLE i386_MODRM_table[256];
 
 #define FAULT(fault,error) {m_ext = 1; i386_trap_with_error(fault,0,0,error); return;}
@@ -3215,7 +3214,6 @@ void i386_device::i386_postload()
 
 void i386_device::i386_common_init()
 {
-	int i, j;
 	static const int regs8[8] = {AL,CL,DL,BL,AH,CH,DH,BH};
 	static const int regs16[8] = {AX,CX,DX,BX,SP,BP,SI,DI};
 	static const int regs32[8] = {EAX,ECX,EDX,EBX,ESP,EBP,ESI,EDI};
@@ -3224,16 +3222,8 @@ void i386_device::i386_common_init()
 
 	build_cycle_table();
 
-	for( i=0; i < 256; i++ ) {
-		int c=0;
-		for( j=0; j < 8; j++ ) {
-			if( i & (1 << j) )
-				c++;
-		}
-		i386_parity_table[i] = ~(c & 0x1) & 0x1;
-	}
-
-	for( i=0; i < 256; i++ ) {
+	for (int i = 0; i < 256; i++)
+	{
 		i386_MODRM_table[i].reg.b = regs8[(i >> 3) & 0x7];
 		i386_MODRM_table[i].reg.w = regs16[(i >> 3) & 0x7];
 		i386_MODRM_table[i].reg.d = regs32[(i >> 3) & 0x7];

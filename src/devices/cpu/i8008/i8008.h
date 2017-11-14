@@ -61,7 +61,6 @@ protected:
 	uint16_t get_addr();
 	void illegal(uint8_t opcode);
 	void take_interrupt();
-	void init_tables(void);
 
 	int m_pc_pos; // PC position in ADDR
 	int m_icount;
@@ -81,8 +80,6 @@ protected:
 	uint8_t   m_flags; // temporary I/O only
 
 	uint8_t   m_irq_state;
-
-	uint8_t m_PARITY[256];
 
 	address_space *m_program;
 	address_space *m_io;

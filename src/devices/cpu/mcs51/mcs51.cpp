@@ -844,16 +844,7 @@ void mcs51_cpu_device::pop_pc()
 void mcs51_cpu_device::set_parity()
 {
 	//This flag will be set when the accumulator contains an odd # of bits set..
-	uint8_t p = 0;
-	int i;
-	uint8_t a = ACC;
-
-	for (i=0; i<8; i++) {       //Test for each of the 8 bits in the ACC!
-		p ^= (a & 1);
-		a = (a >> 1);
-	}
-
-	SET_P(p & 1);
+	SET_P(parity_8(ACC));
 }
 
 uint8_t mcs51_cpu_device::bit_address_r(uint8_t offset)

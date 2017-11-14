@@ -46,14 +46,14 @@
 #endif // !defined(MAME_NOASM)
 
 
-/***************************************************************************
-    INLINE MATH FUNCTIONS
-***************************************************************************/
+//**************************************************************************
+//  INLINE MATH FUNCTIONS
+//**************************************************************************
 
-/*-------------------------------------------------
-    mul_32x32 - perform a signed 32 bit x 32 bit
-    multiply and return the full 64 bit result
--------------------------------------------------*/
+//-------------------------------------------------
+//  mul_32x32 - perform a signed 32 bit x 32 bit
+//  multiply and return the full 64 bit result
+//-------------------------------------------------
 
 #ifndef mul_32x32
 inline int64_t mul_32x32(int32_t a, int32_t b)
@@ -63,11 +63,11 @@ inline int64_t mul_32x32(int32_t a, int32_t b)
 #endif
 
 
-/*-------------------------------------------------
-    mulu_32x32 - perform an unsigned 32 bit x
-    32 bit multiply and return the full 64 bit
-    result
--------------------------------------------------*/
+//-------------------------------------------------
+//  mulu_32x32 - perform an unsigned 32 bit x
+//  32 bit multiply and return the full 64 bit
+//  result
+//-------------------------------------------------
 
 #ifndef mulu_32x32
 inline uint64_t mulu_32x32(uint32_t a, uint32_t b)
@@ -77,11 +77,11 @@ inline uint64_t mulu_32x32(uint32_t a, uint32_t b)
 #endif
 
 
-/*-------------------------------------------------
-    mul_32x32_hi - perform a signed 32 bit x 32 bit
-    multiply and return the upper 32 bits of the
-    result
--------------------------------------------------*/
+//-------------------------------------------------
+//  mul_32x32_hi - perform a signed 32 bit x 32 bit
+//  multiply and return the upper 32 bits of the
+//  result
+//-------------------------------------------------
 
 #ifndef mul_32x32_hi
 inline int32_t mul_32x32_hi(int32_t a, int32_t b)
@@ -91,11 +91,11 @@ inline int32_t mul_32x32_hi(int32_t a, int32_t b)
 #endif
 
 
-/*-------------------------------------------------
-    mulu_32x32_hi - perform an unsigned 32 bit x
-    32 bit multiply and return the upper 32 bits
-    of the result
--------------------------------------------------*/
+//-------------------------------------------------
+//  mulu_32x32_hi - perform an unsigned 32 bit x
+//  32 bit multiply and return the upper 32 bits
+//  of the result
+//-------------------------------------------------
 
 #ifndef mulu_32x32_hi
 inline uint32_t mulu_32x32_hi(uint32_t a, uint32_t b)
@@ -105,12 +105,12 @@ inline uint32_t mulu_32x32_hi(uint32_t a, uint32_t b)
 #endif
 
 
-/*-------------------------------------------------
-    mul_32x32_shift - perform a signed 32 bit x
-    32 bit multiply and shift the result by the
-    given number of bits before truncating the
-    result to 32 bits
--------------------------------------------------*/
+//-------------------------------------------------
+//  mul_32x32_shift - perform a signed 32 bit x
+//  32 bit multiply and shift the result by the
+//  given number of bits before truncating the
+//  result to 32 bits
+//-------------------------------------------------
 
 #ifndef mul_32x32_shift
 inline int32_t mul_32x32_shift(int32_t a, int32_t b, uint8_t shift)
@@ -120,12 +120,12 @@ inline int32_t mul_32x32_shift(int32_t a, int32_t b, uint8_t shift)
 #endif
 
 
-/*-------------------------------------------------
-    mulu_32x32_shift - perform an unsigned 32 bit x
-    32 bit multiply and shift the result by the
-    given number of bits before truncating the
-    result to 32 bits
--------------------------------------------------*/
+//-------------------------------------------------
+//  mulu_32x32_shift - perform an unsigned 32 bit x
+//  32 bit multiply and shift the result by the
+//  given number of bits before truncating the
+//  result to 32 bits
+//-------------------------------------------------
 
 #ifndef mulu_32x32_shift
 inline uint32_t mulu_32x32_shift(uint32_t a, uint32_t b, uint8_t shift)
@@ -135,10 +135,10 @@ inline uint32_t mulu_32x32_shift(uint32_t a, uint32_t b, uint8_t shift)
 #endif
 
 
-/*-------------------------------------------------
-    div_64x32 - perform a signed 64 bit x 32 bit
-    divide and return the 32 bit quotient
--------------------------------------------------*/
+//-------------------------------------------------
+//  div_64x32 - perform a signed 64 bit x 32 bit
+//  divide and return the 32 bit quotient
+//-------------------------------------------------
 
 #ifndef div_64x32
 inline int32_t div_64x32(int64_t a, int32_t b)
@@ -148,10 +148,10 @@ inline int32_t div_64x32(int64_t a, int32_t b)
 #endif
 
 
-/*-------------------------------------------------
-    divu_64x32 - perform an unsigned 64 bit x 32 bit
-    divide and return the 32 bit quotient
--------------------------------------------------*/
+//-------------------------------------------------
+//  divu_64x32 - perform an unsigned 64 bit x 32 bit
+//  divide and return the 32 bit quotient
+//-------------------------------------------------
 
 #ifndef divu_64x32
 inline uint32_t divu_64x32(uint64_t a, uint32_t b)
@@ -161,11 +161,11 @@ inline uint32_t divu_64x32(uint64_t a, uint32_t b)
 #endif
 
 
-/*-------------------------------------------------
-    div_64x32_rem - perform a signed 64 bit x 32
-    bit divide and return the 32 bit quotient and
-    32 bit remainder
--------------------------------------------------*/
+//-------------------------------------------------
+//  div_64x32_rem - perform a signed 64 bit x 32
+//  bit divide and return the 32 bit quotient and
+//  32 bit remainder
+//-------------------------------------------------
 
 #ifndef div_64x32_rem
 inline int32_t div_64x32_rem(int64_t a, int32_t b, int32_t *remainder)
@@ -177,11 +177,11 @@ inline int32_t div_64x32_rem(int64_t a, int32_t b, int32_t *remainder)
 #endif
 
 
-/*-------------------------------------------------
-    divu_64x32_rem - perform an unsigned 64 bit x
-    32 bit divide and return the 32 bit quotient
-    and 32 bit remainder
--------------------------------------------------*/
+//-------------------------------------------------
+//  divu_64x32_rem - perform an unsigned 64 bit x
+//  32 bit divide and return the 32 bit quotient
+//  and 32 bit remainder
+//-------------------------------------------------
 
 #ifndef divu_64x32_rem
 inline uint32_t divu_64x32_rem(uint64_t a, uint32_t b, uint32_t *remainder)
@@ -193,11 +193,11 @@ inline uint32_t divu_64x32_rem(uint64_t a, uint32_t b, uint32_t *remainder)
 #endif
 
 
-/*-------------------------------------------------
-    div_32x32_shift - perform a signed divide of
-    two 32 bit values, shifting the first before
-    division, and returning the 32 bit quotient
--------------------------------------------------*/
+//-------------------------------------------------
+//  div_32x32_shift - perform a signed divide of
+//  two 32 bit values, shifting the first before
+//  division, and returning the 32 bit quotient
+//-------------------------------------------------
 
 #ifndef div_32x32_shift
 inline int32_t div_32x32_shift(int32_t a, int32_t b, uint8_t shift)
@@ -207,11 +207,11 @@ inline int32_t div_32x32_shift(int32_t a, int32_t b, uint8_t shift)
 #endif
 
 
-/*-------------------------------------------------
-    divu_32x32_shift - perform an unsigned divide of
-    two 32 bit values, shifting the first before
-    division, and returning the 32 bit quotient
--------------------------------------------------*/
+//-------------------------------------------------
+//  divu_32x32_shift - perform an unsigned divide of
+//  two 32 bit values, shifting the first before
+//  division, and returning the 32 bit quotient
+//-------------------------------------------------
 
 #ifndef divu_32x32_shift
 inline uint32_t divu_32x32_shift(uint32_t a, uint32_t b, uint8_t shift)
@@ -221,10 +221,10 @@ inline uint32_t divu_32x32_shift(uint32_t a, uint32_t b, uint8_t shift)
 #endif
 
 
-/*-------------------------------------------------
-    mod_64x32 - perform a signed 64 bit x 32 bit
-    divide and return the 32 bit remainder
--------------------------------------------------*/
+//-------------------------------------------------
+//  mod_64x32 - perform a signed 64 bit x 32 bit
+//  divide and return the 32 bit remainder
+//-------------------------------------------------
 
 #ifndef mod_64x32
 inline int32_t mod_64x32(int64_t a, int32_t b)
@@ -234,10 +234,10 @@ inline int32_t mod_64x32(int64_t a, int32_t b)
 #endif
 
 
-/*-------------------------------------------------
-    modu_64x32 - perform an unsigned 64 bit x 32 bit
-    divide and return the 32 bit remainder
--------------------------------------------------*/
+//-------------------------------------------------
+//  modu_64x32 - perform an unsigned 64 bit x 32 bit
+//  divide and return the 32 bit remainder
+//-------------------------------------------------
 
 #ifndef modu_64x32
 inline uint32_t modu_64x32(uint64_t a, uint32_t b)
@@ -247,10 +247,10 @@ inline uint32_t modu_64x32(uint64_t a, uint32_t b)
 #endif
 
 
-/*-------------------------------------------------
-    recip_approx - compute an approximate floating
-    point reciprocal
--------------------------------------------------*/
+//-------------------------------------------------
+//  recip_approx - compute an approximate floating
+//  point reciprocal
+//-------------------------------------------------
 
 #ifndef recip_approx
 inline float recip_approx(float value)
@@ -261,14 +261,14 @@ inline float recip_approx(float value)
 
 
 
-/***************************************************************************
-    INLINE BIT MANIPULATION FUNCTIONS
-***************************************************************************/
+//**************************************************************************
+//  INLINE BIT MANIPULATION FUNCTIONS
+//**************************************************************************
 
-/*-------------------------------------------------
-    count_leading_zeros - return the number of
-    leading zero bits in a 32-bit value
--------------------------------------------------*/
+//-------------------------------------------------
+//  count_leading_zeros - return the number of
+//  leading zero bits in a 32-bit value
+//-------------------------------------------------
 
 #ifndef count_leading_zeros
 inline uint8_t count_leading_zeros(uint32_t val)
@@ -280,10 +280,10 @@ inline uint8_t count_leading_zeros(uint32_t val)
 #endif
 
 
-/*-------------------------------------------------
-    count_leading_ones - return the number of
-    leading one bits in a 32-bit value
--------------------------------------------------*/
+//-------------------------------------------------
+//  count_leading_ones - return the number of
+//  leading one bits in a 32-bit value
+//-------------------------------------------------
 
 #ifndef count_leading_ones
 inline uint8_t count_leading_ones(uint32_t val)
@@ -295,10 +295,61 @@ inline uint8_t count_leading_ones(uint32_t val)
 #endif
 
 
-/*-------------------------------------------------
-    population_count_32 - return the number of
-    one bits in a 32-bit value
--------------------------------------------------*/
+//-------------------------------------------------
+//  parity_8 - check the parity of a 8-bit value
+//  and return true for odd or false for even
+//-------------------------------------------------
+
+#ifndef parity_8
+inline bool parity_8(uint8_t data)
+{
+	data ^= data >> 4;
+	data ^= data >> 2;
+	data ^= data >> 1;
+	return (data & 1) != 0;
+}
+#endif
+
+
+//-------------------------------------------------
+//  parity_16 - check the parity of a 16-bit value
+//  and return true for odd or false for even
+//-------------------------------------------------
+
+#ifndef parity_16
+inline bool parity_16(uint16_t data)
+{
+	data ^= data >> 8;
+	data ^= data >> 4;
+	data ^= data >> 2;
+	data ^= data >> 1;
+	return (data & 1) != 0;
+}
+#endif
+
+
+//-------------------------------------------------
+//  parity_32 - check the parity of a 16-bit value
+//  and return true for odd or false for even
+//-------------------------------------------------
+
+#ifndef parity_32
+inline bool parity_32(uint32_t data)
+{
+	data ^= data >> 16;
+	data ^= data >> 8;
+	data ^= data >> 4;
+	data ^= data >> 2;
+	data ^= data >> 1;
+	return (data & 1) != 0;
+}
+#endif
+
+
+//-------------------------------------------------
+//  population_count_32 - return the number of
+//  one bits in a 32-bit value
+//-------------------------------------------------
 
 #ifndef population_count_32
 #if defined(__NetBSD__)
@@ -326,10 +377,10 @@ inline unsigned population_count_32(uint32_t val)
 #endif
 
 
-/*-------------------------------------------------
-    population_count_64 - return the number of
-    one bits in a 64-bit value
--------------------------------------------------*/
+//-------------------------------------------------
+//  population_count_64 - return the number of
+//  one bits in a 64-bit value
+//-------------------------------------------------
 
 #ifndef population_count_64
 #if defined(__NetBSD__)

@@ -35,21 +35,6 @@ device_serial_interface::device_serial_interface(const machine_config &mconfig, 
 	m_tra_clock_state(false),
 	m_rcv_clock_state(false)
 {
-	/* if sum of all bits in the byte is even, then the data
-	has even parity, otherwise it has odd parity */
-	for (int i=0; i<256; i++)
-	{
-		int sum = 0;
-		int data = i;
-
-		for (int b=0; b<8; b++)
-		{
-			sum+=data & 0x01;
-			data = data>>1;
-		}
-
-		m_serial_parity_table[i] = sum & 0x01;
-	}
 }
 
 device_serial_interface::~device_serial_interface()
@@ -319,7 +304,7 @@ void device_serial_interface::receive_register_extract()
 		case PARITY_EVEN:
 		{
 			/* compute parity for received bits */
-			//computed_parity = serial_helper_get_parity(data);
+			//computed_parity = parity_8(data);
 
 			if (m_df_parity == PARITY_ODD)
 			{
@@ -407,7 +392,7 @@ void device_serial_interface::transmit_register_setup(u8 data_byte)
 			/* get parity */
 			/* if parity = 0, data has even parity - i.e. there is an even number of one bits in the data */
 			/* if parity = 1, data has odd parity - i.e. there is an odd number of one bits in the data */
-			parity = serial_helper_get_parity(data_byte);
+			parity = parity_8(data_byte);
 			break;
 		case PARITY_MARK:
 			parity = 1;

@@ -154,8 +154,6 @@ uint16_t v25_common_device::fetchword()
 #include "necea.h"
 #include "necmodrm.h"
 
-static uint8_t parity_table[256];
-
 uint8_t v25_common_device::fetchop()
 {
 	uint8_t ret;
@@ -426,25 +424,16 @@ offs_t v25_common_device::disasm_disassemble(std::ostream &stream, offs_t pc, co
 
 void v25_common_device::device_start()
 {
-	unsigned int i, j, c;
-
 	static const WREGS wreg_name[8]={ AW, CW, DW, BW, SP, BP, IX, IY };
 	static const BREGS breg_name[8]={ AL, CL, DL, BL, AH, CH, DH, BH };
 
-	for (i = 0; i < 256; i++)
-	{
-		for (j = i, c = 0; j > 0; j >>= 1)
-			if (j & 1) c++;
-		parity_table[i] = !(c & 1);
-	}
-
-	for (i = 0; i < 256; i++)
+	for (int i = 0; i < 256; i++)
 	{
 		Mod_RM.reg.b[i] = breg_name[(i & 0x38) >> 3];
 		Mod_RM.reg.w[i] = wreg_name[(i & 0x38) >> 3];
 	}
 
-	for (i = 0xc0; i < 0x100; i++)
+	for (int i = 0xc0; i < 0x100; i++)
 	{
 		Mod_RM.RM.w[i] = wreg_name[i & 7];
 		Mod_RM.RM.b[i] = breg_name[i & 7];
@@ -459,7 +448,7 @@ void v25_common_device::device_start()
 	m_EO = 0;
 	m_E16 = 0;
 
-	for (i = 0; i < 4; i++)
+	for (int i = 0; i < 4; i++)
 		m_timers[i] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(v25_common_device::v25_timer_callback),this));
 
 	save_item(NAME(m_ram.w));

@@ -75,7 +75,7 @@ enum BREGS {
 #define CF      (m_CarryVal!=0)
 #define SF      (m_SignVal<0)
 #define ZF      (m_ZeroVal==0)
-#define PF      m_parity_table[(uint8_t)m_ParityVal]
+#define PF      !parity_8(m_ParityVal)
 #define AF      (m_AuxVal!=0)
 #define OF      (m_OverVal!=0)
 #define MD      (m_MF!=0)
@@ -107,17 +107,6 @@ v30mz_cpu_device::v30mz_cpu_device(const machine_config &mconfig, const char *ta
 	, m_pc(0)
 {
 	static const BREGS reg_name[8]={ AL, CL, DL, BL, AH, CH, DH, BH };
-
-	/* Set up parity lookup table. */
-	for (uint16_t i = 0;i < 256; i++)
-	{
-		uint16_t c = 0;
-		for (uint16_t j = i; j > 0; j >>= 1)
-		{
-			if (j & 1) c++;
-		}
-		m_parity_table[i] = !(c & 1);
-	}
 
 	for (uint16_t i = 0; i < 256; i++)
 	{

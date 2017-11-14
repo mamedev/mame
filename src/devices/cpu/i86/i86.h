@@ -335,7 +335,6 @@ protected:
 	uint32_t  m_pc;
 
 	// Lookup tables
-	uint8_t m_parity_table[256];
 	struct {
 		struct {
 			int w[256];

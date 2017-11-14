@@ -1232,28 +1232,17 @@ void i8085a_cpu_device::execute_run()
 
 void i8085a_cpu_device::init_tables()
 {
-	uint8_t zs;
-	int i, p;
-	for (i = 0; i < 256; i++)
+	for (int i = 0; i < 256; i++)
 	{
 		/* cycles */
 		lut_cycles[i] = m_cputype?lut_cycles_8085[i]:lut_cycles_8080[i];
 
 		/* flags */
-		zs = 0;
+		uint8_t zs = 0;
 		if (i==0) zs |= ZF;
 		if (i&128) zs |= SF;
-		p = 0;
-		if (i&1) ++p;
-		if (i&2) ++p;
-		if (i&4) ++p;
-		if (i&8) ++p;
-		if (i&16) ++p;
-		if (i&32) ++p;
-		if (i&64) ++p;
-		if (i&128) ++p;
 		ZS[i] = zs;
-		ZSP[i] = zs | ((p&1) ? 0 : PF);
+		ZSP[i] = zs | (parity_8(i) ? 0 : PF);
 	}
 }
 
