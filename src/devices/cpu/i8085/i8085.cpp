@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Juergen Buchmueller, hap
+// thanks-to:Marcel De Kogel
 /*****************************************************************************
  *
  *   i8085.c
@@ -103,7 +104,6 @@
 #include "emu.h"
 #include "debugger.h"
 #include "i8085.h"
-#include "i8085ops.hxx"
 
 #define VERBOSE 0
 #include "logmacro.h"
@@ -114,11 +114,35 @@
 
 
 /***************************************************************************
-    MACROS
+    MACROS AND CONSTANTS
 ***************************************************************************/
 
 #define IS_8080()          (m_cputype == CPUTYPE_8080)
 #define IS_8085()          (m_cputype == CPUTYPE_8085)
+
+#define SF              0x80
+#define ZF              0x40
+#define X5F             0x20
+#define HF              0x10
+#define X3F             0x08
+#define PF              0x04
+#define VF              0x02
+#define CF              0x01
+
+#define IM_SID          0x80
+#define IM_I75          0x40
+#define IM_I65          0x20
+#define IM_I55          0x10
+#define IM_IE           0x08
+#define IM_M75          0x04
+#define IM_M65          0x02
+#define IM_M55          0x01
+
+#define ADDR_TRAP       0x0024
+#define ADDR_RST55      0x002c
+#define ADDR_RST65      0x0034
+#define ADDR_RST75      0x003c
+#define ADDR_INTR       0x0038
 
 
 
@@ -186,7 +210,6 @@ i8085a_cpu_device::i8085a_cpu_device(const machine_config &mconfig, const char *
 {
 }
 
-
 i8085a_cpu_device::i8085a_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int cputype)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0)
@@ -199,12 +222,10 @@ i8085a_cpu_device::i8085a_cpu_device(const machine_config &mconfig, device_type 
 {
 }
 
-
 i8080_cpu_device::i8080_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: i8085a_cpu_device(mconfig, I8080, tag, owner, clock, CPUTYPE_8080)
 {
 }
-
 
 i8080a_cpu_device::i8080a_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: i8085a_cpu_device(mconfig, I8080A, tag, owner, clock, CPUTYPE_8080)
@@ -234,6 +255,10 @@ void i8085a_cpu_device::device_clock_changed()
 		m_clk_out_func(clock() / 2);
 }
 
+
+/***************************************************************************
+    OPCODE HELPERS
+***************************************************************************/
 
 void i8085a_cpu_device::set_sod(int state)
 {
@@ -290,21 +315,6 @@ uint8_t i8085a_cpu_device::get_rim_value()
 	return result;
 }
 
-
-void i8085a_cpu_device::break_halt_for_interrupt()
-{
-	/* de-halt if necessary */
-	if (m_HALT)
-	{
-		m_PC.w.l++;
-		m_HALT = 0;
-		set_status(0x26); /* int ack while halt */
-	}
-	else
-		set_status(0x23); /* int ack */
-}
-
-
 uint8_t i8085a_cpu_device::ROP()
 {
 	set_status(0xa2); // instruction fetch
@@ -338,6 +348,197 @@ void i8085a_cpu_device::WM(uint32_t a, uint8_t v)
 	m_program->write_byte(a, v);
 }
 
+
+#define M_MVI(R) R=ARG()
+
+/* rotate */
+#define M_RLC { \
+	m_AF.b.h = (m_AF.b.h << 1) | (m_AF.b.h >> 7); \
+	m_AF.b.l = (m_AF.b.l & 0xfe) | (m_AF.b.h & CF); \
+}
+
+#define M_RRC { \
+	m_AF.b.l = (m_AF.b.l & 0xfe) | (m_AF.b.h & CF); \
+	m_AF.b.h = (m_AF.b.h >> 1) | (m_AF.b.h << 7); \
+}
+
+#define M_RAL { \
+	int c = m_AF.b.l&CF; \
+	m_AF.b.l = (m_AF.b.l & 0xfe) | (m_AF.b.h >> 7); \
+	m_AF.b.h = (m_AF.b.h << 1) | c; \
+}
+
+#define M_RAR { \
+	int c = (m_AF.b.l&CF) << 7; \
+	m_AF.b.l = (m_AF.b.l & 0xfe) | (m_AF.b.h & CF); \
+	m_AF.b.h = (m_AF.b.h >> 1) | c; \
+}
+
+/* logical */
+#define M_ORA(R) m_AF.b.h|=R; m_AF.b.l=ZSP[m_AF.b.h]
+#define M_XRA(R) m_AF.b.h^=R; m_AF.b.l=ZSP[m_AF.b.h]
+#define M_ANA(R) {uint8_t hc = ((m_AF.b.h | R)<<1) & HF; m_AF.b.h&=R; m_AF.b.l=ZSP[m_AF.b.h]; if(IS_8085()) { m_AF.b.l |= HF; } else {m_AF.b.l |= hc; } }
+
+/* increase / decrease */
+#define M_INR(R) {uint8_t hc = ((R & 0x0f) == 0x0f) ? HF : 0; ++R; m_AF.b.l= (m_AF.b.l & CF ) | ZSP[R] | hc; }
+#define M_DCR(R) {uint8_t hc = ((R & 0x0f) != 0x00) ? HF : 0; --R; m_AF.b.l= (m_AF.b.l & CF ) | ZSP[R] | hc | VF; }
+
+/* arithmetic */
+#define M_ADD(R) { \
+	int q = m_AF.b.h+R; \
+	m_AF.b.l=ZSP[q&255]|((q>>8)&CF)|((m_AF.b.h^q^R)&HF); \
+	m_AF.b.h=q; \
+}
+
+#define M_ADC(R) { \
+	int q = m_AF.b.h+R+(m_AF.b.l&CF); \
+	m_AF.b.l=ZSP[q&255]|((q>>8)&CF)|((m_AF.b.h^q^R)&HF); \
+	m_AF.b.h=q; \
+}
+
+#define M_SUB(R) { \
+	int q = m_AF.b.h-R; \
+	m_AF.b.l=ZSP[q&255]|((q>>8)&CF)|(~(m_AF.b.h^q^R)&HF)|VF; \
+	m_AF.b.h=q; \
+}
+
+#define M_SBB(R) { \
+	int q = m_AF.b.h-R-(m_AF.b.l&CF); \
+	m_AF.b.l=ZSP[q&255]|((q>>8)&CF)|(~(m_AF.b.h^q^R)&HF)|VF; \
+	m_AF.b.h=q; \
+}
+
+#define M_CMP(R) { \
+	int q = m_AF.b.h-R; \
+	m_AF.b.l=ZSP[q&255]|((q>>8)&CF)|(~(m_AF.b.h^q^R)&HF)|VF; \
+}
+
+#define M_DAD(R) { \
+	int q = m_HL.d + m_##R.d; \
+	m_AF.b.l = (m_AF.b.l & ~CF) | (q>>16 & CF ); \
+	m_HL.w.l = q; \
+}
+
+// DSUB is 8085-only, not sure if H flag handling is correct
+#define M_DSUB() { \
+	int q = m_HL.b.l-m_BC.b.l; \
+	m_AF.b.l=ZS[q&255]|((q>>8)&CF)|VF| \
+		((m_HL.b.l^q^m_BC.b.l)&HF)| \
+		(((m_BC.b.l^m_HL.b.l)&(m_HL.b.l^q)&SF)>>5); \
+	m_HL.b.l=q; \
+	q = m_HL.b.h-m_BC.b.h-(m_AF.b.l&CF); \
+	m_AF.b.l=ZS[q&255]|((q>>8)&CF)|VF| \
+		((m_HL.b.h^q^m_BC.b.h)&HF)| \
+		(((m_BC.b.h^m_HL.b.h)&(m_HL.b.h^q)&SF)>>5); \
+	if (m_HL.b.l!=0) m_AF.b.l&=~ZF; \
+}
+
+/* i/o */
+#define M_IN \
+	set_status(0x42); \
+	m_WZ.d=ARG(); \
+	m_AF.b.h=m_io->read_byte(m_WZ.d);
+
+#define M_OUT \
+	set_status(0x10); \
+	m_WZ.d=ARG(); \
+	m_io->write_byte(m_WZ.d,m_AF.b.h)
+
+/* stack */
+#define M_PUSH(R) { \
+	set_status(0x04); \
+	m_program->write_byte(--m_SP.w.l, m_##R.b.h); \
+	m_program->write_byte(--m_SP.w.l, m_##R.b.l); \
+}
+
+#define M_POP(R) { \
+	set_status(0x86); \
+	m_##R.b.l = m_program->read_byte(m_SP.w.l++); \
+	m_##R.b.h = m_program->read_byte(m_SP.w.l++); \
+}
+
+/* jumps */
+// On 8085 jump if condition is not satisfied is shorter
+#define M_JMP(cc) { \
+	if (cc) { \
+		m_PC.w.l = ARG16(); \
+	} else { \
+		m_PC.w.l += 2; \
+		m_icount += (IS_8085()) ? 3 : 0; \
+	} \
+}
+
+// On 8085 call if condition is not satisfied is 9 ticks
+#define M_CALL(cc) \
+{ \
+	if (cc) \
+	{ \
+		uint16_t a = ARG16(); \
+		m_icount -= (IS_8085()) ? 7 : 6 ; \
+		M_PUSH(PC); \
+		m_PC.d = a; \
+	} else { \
+		m_PC.w.l += 2; \
+		m_icount += (IS_8085()) ? 2 : 0; \
+	} \
+}
+
+// conditional RET only
+#define M_RET(cc) \
+{ \
+	if (cc) \
+	{ \
+		m_icount -= 6; \
+		M_POP(PC); \
+	} \
+}
+
+#define M_RST(nn) { \
+	M_PUSH(PC); \
+	m_PC.d = 8 * nn; \
+}
+
+/***************************************************************************
+    INTERRUPTS
+***************************************************************************/
+
+void i8085a_cpu_device::execute_set_input(int irqline, int state)
+{
+	int newstate = (state != CLEAR_LINE);
+
+	/* NMI is edge-triggered */
+	if (irqline == INPUT_LINE_NMI)
+	{
+		if (!m_nmi_state && newstate)
+			m_trap_pending = true;
+		m_nmi_state = newstate;
+	}
+
+	/* RST7.5 is edge-triggered */
+	else if (irqline == I8085_RST75_LINE)
+	{
+		if (!m_irq_state[I8085_RST75_LINE] && newstate)
+			m_IM |= IM_I75;
+		m_irq_state[I8085_RST75_LINE] = newstate;
+	}
+
+	/* remaining sources are level triggered */
+	else if (irqline < ARRAY_LENGTH(m_irq_state))
+		m_irq_state[irqline] = state;
+}
+
+void i8085a_cpu_device::break_halt_for_interrupt()
+{
+	/* de-halt if necessary */
+	if (m_HALT)
+	{
+		m_PC.w.l++;
+		m_HALT = 0;
+		set_status(0x26); /* int ack while halt */
+	}
+	else
+		set_status(0x23); /* int ack */
+}
 
 void i8085a_cpu_device::check_for_interrupts()
 {
@@ -436,6 +637,30 @@ void i8085a_cpu_device::check_for_interrupts()
 	}
 }
 
+/***************************************************************************
+    COMMON EXECUTION
+***************************************************************************/
+
+void i8085a_cpu_device::execute_run()
+{
+	/* check for TRAPs before diving in (can't do others because of after_ei) */
+	if (m_trap_pending || m_after_ei == 0)
+		check_for_interrupts();
+
+	do
+	{
+		debugger_instruction_hook(this, m_PC.d);
+
+		/* the instruction after an EI does not take an interrupt, so
+		   we cannot check immediately; handle post-EI behavior here */
+		if (m_after_ei != 0 && --m_after_ei == 0)
+			check_for_interrupts();
+
+		/* here we go... */
+		execute_one(ROP());
+
+	} while (m_icount > 0);
+}
 
 void i8085a_cpu_device::execute_one(int opcode)
 {
@@ -1199,30 +1424,6 @@ void i8085a_cpu_device::execute_one(int opcode)
 }
 
 
-/***************************************************************************
-    COMMON EXECUTION
-***************************************************************************/
-
-void i8085a_cpu_device::execute_run()
-{
-	/* check for TRAPs before diving in (can't do others because of after_ei) */
-	if (m_trap_pending || m_after_ei == 0)
-		check_for_interrupts();
-
-	do
-	{
-		debugger_instruction_hook(this, m_PC.d);
-
-		/* the instruction after an EI does not take an interrupt, so
-		   we cannot check immediately; handle post-EI behavior here */
-		if (m_after_ei != 0 && --m_after_ei == 0)
-			check_for_interrupts();
-
-		/* here we go... */
-		execute_one(ROP());
-
-	} while (m_icount > 0);
-}
 
 
 
@@ -1428,30 +1629,7 @@ void i8085a_cpu_device::state_string_export(const device_state_entry &entry, std
 }
 
 
-void i8085a_cpu_device::execute_set_input(int irqline, int state)
-{
-	int newstate = (state != CLEAR_LINE);
 
-	/* NMI is edge-triggered */
-	if (irqline == INPUT_LINE_NMI)
-	{
-		if (!m_nmi_state && newstate)
-			m_trap_pending = true;
-		m_nmi_state = newstate;
-	}
-
-	/* RST7.5 is edge-triggered */
-	else if (irqline == I8085_RST75_LINE)
-	{
-		if (!m_irq_state[I8085_RST75_LINE] && newstate)
-			m_IM |= IM_I75;
-		m_irq_state[I8085_RST75_LINE] = newstate;
-	}
-
-	/* remaining sources are level triggered */
-	else if (irqline < ARRAY_LENGTH(m_irq_state))
-		m_irq_state[irqline] = state;
-}
 
 
 offs_t i8085a_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)

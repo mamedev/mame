@@ -108,26 +108,26 @@ private:
 	address_space_config m_program_config;
 	address_space_config m_io_config;
 
-	devcb_write8       m_out_status_func;
-	devcb_write_line   m_out_inte_func;
-	devcb_read_line    m_in_sid_func;
-	devcb_write_line   m_out_sod_func;
+	devcb_write8 m_out_status_func;
+	devcb_write_line m_out_inte_func;
+	devcb_read_line m_in_sid_func;
+	devcb_write_line m_out_sod_func;
 	clock_update_delegate m_clk_out_func;
 
-	int                 m_cputype;        /* 0 8080, 1 8085A */
-	PAIR                m_PC,m_SP,m_AF,m_BC,m_DE,m_HL,m_WZ;
-	uint8_t               m_HALT;
-	uint8_t               m_IM;             /* interrupt mask (8085A only) */
-	uint8_t               m_STATUS;         /* status word */
+	int m_cputype;            /* 0 8080, 1 8085A */
+	PAIR m_PC,m_SP,m_AF,m_BC,m_DE,m_HL,m_WZ;
+	uint8_t m_HALT;
+	uint8_t m_IM;             /* interrupt mask (8085A only) */
+	uint8_t m_STATUS;         /* status word */
 
-	uint8_t               m_after_ei;       /* post-EI processing; starts at 2, check for ints at 0 */
-	uint8_t               m_nmi_state;      /* raw NMI line state */
-	uint8_t               m_irq_state[4];   /* raw IRQ line states */
-	uint8_t               m_trap_pending;   /* TRAP interrupt latched? */
-	uint8_t               m_trap_im_copy;   /* copy of IM register when TRAP was taken */
-	uint8_t               m_sod_state;      /* state of the SOD line */
+	uint8_t m_after_ei;       /* post-EI processing; starts at 2, check for ints at 0 */
+	uint8_t m_nmi_state;      /* raw NMI line state */
+	uint8_t m_irq_state[4];   /* raw IRQ line states */
+	uint8_t m_trap_pending;   /* TRAP interrupt latched? */
+	uint8_t m_trap_im_copy;   /* copy of IM register when TRAP was taken */
+	uint8_t m_sod_state;      /* state of the SOD line */
 
-	bool                m_ietemp;         /* import/export temp space */
+	bool m_ietemp;            /* import/export temp space */
 
 	address_space *m_program;
 	direct_read_data *m_direct;
@@ -155,7 +155,6 @@ private:
 	void check_for_interrupts();
 	void execute_one(int opcode);
 	void init_tables();
-
 };
 
 
