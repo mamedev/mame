@@ -3131,12 +3131,14 @@ void hyperstone_device::hyperstone_ldxx2_local_local()
 	{
 		case 0: // LDBS.N
 			m_local_regs[src_code] = (int32_t)(int8_t)READ_B(dreg);
-			m_local_regs[dst_code] += extra_s;
+			if(src_code != dst_code)
+				m_local_regs[dst_code] += extra_s;
 			break;
 
 		case 1: // LDBU.N
 			m_local_regs[src_code] = READ_B(dreg);
-			m_local_regs[dst_code] += extra_s;
+			if(src_code != dst_code)
+				m_local_regs[dst_code] += extra_s;
 			break;
 
 		case 2:
@@ -3144,7 +3146,8 @@ void hyperstone_device::hyperstone_ldxx2_local_local()
 				m_local_regs[src_code] = (int32_t)(int16_t)READ_HW(dreg);
 			else // LDHU.N
 				m_local_regs[src_code] = READ_HW(dreg);
-			m_local_regs[dst_code] += extra_s & ~1;
+			if(src_code != dst_code)
+				m_local_regs[dst_code] += extra_s & ~1;
 			break;
 
 		case 3:
@@ -3152,12 +3155,14 @@ void hyperstone_device::hyperstone_ldxx2_local_local()
 			{
 				case 0: // LDW.N
 					m_local_regs[src_code] = READ_W(dreg);
-					m_local_regs[dst_code] += extra_s & ~1;
+					if(src_code != dst_code)
+						m_local_regs[dst_code] += extra_s & ~1;
 					break;
 				case 1: // LDD.N
 					m_local_regs[src_code] = READ_W(dreg);
 					m_local_regs[srcf_code] = READ_W(dreg + 4);
-					m_local_regs[dst_code] += extra_s & ~1;
+					if(src_code != dst_code)
+						m_local_regs[dst_code] += extra_s & ~1;
 					m_icount -= m_clock_cycles_1; // extra cycle
 					break;
 				case 2: // Reserved
@@ -3168,7 +3173,8 @@ void hyperstone_device::hyperstone_ldxx2_local_local()
 						m_local_regs[src_code] = READ_W(dreg);
 					else
 						m_local_regs[src_code] = m_local_regs[(dreg & 0xfc) >> 2];
-					m_local_regs[dst_code] += extra_s & ~3;
+					if(src_code != dst_code)
+						m_local_regs[dst_code] += extra_s & ~3;
 					m_icount -= m_clock_cycles_2; // extra cycles
 					break;
 			}
