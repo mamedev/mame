@@ -252,14 +252,8 @@ private:
 	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void hyperstone_sub();
 	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void hyperstone_subs();
 	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void hyperstone_addc();
-	void hyperstone_neg_global_global();
-	void hyperstone_neg_global_local();
-	void hyperstone_neg_local_global();
-	void hyperstone_neg_local_local();
-	void hyperstone_negs_global_global();
-	void hyperstone_negs_global_local();
-	void hyperstone_negs_local_global();
-	void hyperstone_negs_local_local();
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void hyperstone_neg();
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void hyperstone_negs();
 	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void hyperstone_and();
 	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void hyperstone_andn();
 	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void hyperstone_or();
