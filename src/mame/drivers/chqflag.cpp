@@ -79,11 +79,19 @@ WRITE8_MEMBER(chqflag_state::chqflag_vreg_w)
 	/* Bits 3 and 7 are set in night stages, where the background should get darker and */
 	/* the headlight (which have the shadow bit set) become highlights */
 	/* Maybe one of the bits inverts the SHAD line while the other darkens the background. */
-	if (data & 0x08)
-		m_palette->set_shadow_factor(1 / PALETTE_DEFAULT_SHADOW_FACTOR);
-	else
-		m_palette->set_shadow_factor(PALETTE_DEFAULT_SHADOW_FACTOR);
-
+	/*
+	 * Update according to a reference:
+	 * 0x00 is certainly shadow (car pit-in shadow when zoomed in/clouds before rain)
+	 * 0x80 is used when rain shows up (which should be white/highlighted)
+	 * 0x88 is for when night shows up (max amount of highlight)
+	 * 0x08 is used at dawn after 0x88 state
+	 * The shadow part looks ugly when rain starts/ends pouring (-> black colored with a setting of 0x00), 
+	 * apparently the reference shows dimmed background when car pits in which maybe translates in a 
+	 * global zoomed sprite that gets clipped in emulation?
+	 */
+	const float shadow_factors[4] = {PALETTE_DEFAULT_SHADOW_FACTOR, 1.33f, 1.66f, 2.0f };
+	m_palette->set_shadow_factor(shadow_factors[((data & 0x80) >> 6) | ((data & 0x08) >> 3)]);
+	
 	if ((data & 0x80) != m_last_vreg)
 	{
 		m_last_vreg = data & 0x80;
