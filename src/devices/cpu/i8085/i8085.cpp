@@ -283,14 +283,14 @@ void i8085a_cpu_device::set_sod(int state)
 
 void i8085a_cpu_device::set_inte(int state)
 {
-	if (state != 0 && (m_IM & IM_IE) == 0)
+	if (state != 0 && (m_im & IM_IE) == 0)
 	{
-		m_IM |= IM_IE;
+		m_im |= IM_IE;
 		m_out_inte_func(1);
 	}
-	else if (state == 0 && (m_IM & IM_IE) != 0)
+	else if (state == 0 && (m_im & IM_IE) != 0)
 	{
-		m_IM &= ~IM_IE;
+		m_im &= ~IM_IE;
 		m_out_inte_func(0);
 	}
 }
@@ -298,16 +298,16 @@ void i8085a_cpu_device::set_inte(int state)
 
 void i8085a_cpu_device::set_status(uint8_t status)
 {
-	if (status != m_STATUS)
+	if (status != m_status)
 		m_out_status_func(status);
 
-	m_STATUS = status;
+	m_status = status;
 }
 
 
 uint8_t i8085a_cpu_device::get_rim_value()
 {
-	uint8_t result = m_IM;
+	uint8_t result = m_im;
 	int sid = m_in_sid_func();
 
 	/* copy live RST5.5 and RST6.5 states */
@@ -476,7 +476,7 @@ void i8085a_cpu_device::execute_set_input(int irqline, int state)
 	else if (irqline == I8085_RST75_LINE)
 	{
 		if (!m_irq_state[I8085_RST75_LINE] && newstate)
-			m_IM |= IM_I75;
+			m_im |= IM_I75;
 		m_irq_state[I8085_RST75_LINE] = newstate;
 	}
 
@@ -488,10 +488,10 @@ void i8085a_cpu_device::execute_set_input(int irqline, int state)
 void i8085a_cpu_device::break_halt_for_interrupt()
 {
 	/* de-halt if necessary */
-	if (m_HALT)
+	if (m_halt)
 	{
 		m_PC.w.l++;
-		m_HALT = 0;
+		m_halt = 0;
 		set_status(0x26); /* int ack while halt */
 	}
 	else
@@ -505,7 +505,7 @@ void i8085a_cpu_device::check_for_interrupts()
 	{
 		/* the first RIM after a TRAP reflects the original IE state; remember it here,
 		   setting the high bit to indicate it is valid */
-		m_trap_im_copy = m_IM | 0x80;
+		m_trap_im_copy = m_im | 0x80;
 
 		/* reset the pending state */
 		m_trap_pending = false;
@@ -522,10 +522,10 @@ void i8085a_cpu_device::check_for_interrupts()
 	}
 
 	/* followed by RST7.5 */
-	else if ((m_IM & IM_I75) && !(m_IM & IM_M75) && (m_IM & IM_IE))
+	else if ((m_im & IM_I75) && !(m_im & IM_M75) && (m_im & IM_IE))
 	{
 		/* reset the pending state (which is CPU-visible via the RIM instruction) */
-		m_IM &= ~IM_I75;
+		m_im &= ~IM_I75;
 
 		/* break out of HALT state and call the IRQ ack callback */
 		break_halt_for_interrupt();
@@ -539,7 +539,7 @@ void i8085a_cpu_device::check_for_interrupts()
 	}
 
 	/* followed by RST6.5 */
-	else if (m_irq_state[I8085_RST65_LINE] && !(m_IM & IM_M65) && (m_IM & IM_IE))
+	else if (m_irq_state[I8085_RST65_LINE] && !(m_im & IM_M65) && (m_im & IM_IE))
 	{
 		/* break out of HALT state and call the IRQ ack callback */
 		break_halt_for_interrupt();
@@ -553,7 +553,7 @@ void i8085a_cpu_device::check_for_interrupts()
 	}
 
 	/* followed by RST5.5 */
-	else if (m_irq_state[I8085_RST55_LINE] && !(m_IM & IM_M55) && (m_IM & IM_IE))
+	else if (m_irq_state[I8085_RST55_LINE] && !(m_im & IM_M55) && (m_im & IM_IE))
 	{
 		/* break out of HALT state and call the IRQ ack callback */
 		break_halt_for_interrupt();
@@ -567,7 +567,7 @@ void i8085a_cpu_device::check_for_interrupts()
 	}
 
 	/* followed by classic INTR */
-	else if (m_irq_state[I8085_INTR_LINE] && (m_IM & IM_IE))
+	else if (m_irq_state[I8085_INTR_LINE] && (m_im & IM_IE))
 	{
 		uint32_t vector;
 
@@ -889,19 +889,19 @@ void i8085a_cpu_device::execute_one(int opcode)
 				// if bit 3 is set, bits 0-2 become the new masks
 				if (m_AF.b.h & 0x08)
 				{
-					m_IM &= ~(IM_M55 | IM_M65 | IM_M75 | IM_I55 | IM_I65);
-					m_IM |= m_AF.b.h & (IM_M55 | IM_M65 | IM_M75);
+					m_im &= ~(IM_M55 | IM_M65 | IM_M75 | IM_I55 | IM_I65);
+					m_im |= m_AF.b.h & (IM_M55 | IM_M65 | IM_M75);
 
 					// update live state based on the new masks
-					if ((m_IM & IM_M55) == 0 && m_irq_state[I8085_RST55_LINE])
-						m_IM |= IM_I55;
-					if ((m_IM & IM_M65) == 0 && m_irq_state[I8085_RST65_LINE])
-						m_IM |= IM_I65;
+					if ((m_im & IM_M55) == 0 && m_irq_state[I8085_RST55_LINE])
+						m_im |= IM_I55;
+					if ((m_im & IM_M65) == 0 && m_irq_state[I8085_RST65_LINE])
+						m_im |= IM_I65;
 				}
 
 				// bit if 4 is set, the 7.5 flip-flop is cleared
 				if (m_AF.b.h & 0x10)
-					m_IM &= ~IM_I75;
+					m_im &= ~IM_I75;
 
 				// if bit 6 is set, then bit 7 is the new SOD state
 				if (m_AF.b.h & 0x40)
@@ -1046,7 +1046,7 @@ void i8085a_cpu_device::execute_one(int opcode)
 		case 0x75: write_mem(m_HL.d, m_HL.b.l); break;
 		case 0x76: // HLT (instead of MOV M,M)
 			m_PC.w.l--;
-			m_HALT = 1;
+			m_halt = 1;
 			set_status(0x8a); // halt acknowledge
 			break;
 		case 0x77: write_mem(m_HL.d, m_AF.b.h); break;
@@ -1446,9 +1446,9 @@ void i8085a_cpu_device::device_start()
 	m_DE.d = 0;
 	m_HL.d = 0;
 	m_WZ.d = 0;
-	m_HALT = 0;
-	m_IM = 0;
-	m_STATUS = 0;
+	m_halt = 0;
+	m_im = 0;
+	m_status = 0;
 	m_after_ei = 0;
 	m_nmi_state = 0;
 	m_irq_state[3] = m_irq_state[2] = m_irq_state[1] = m_irq_state[0] = 0;
@@ -1479,7 +1479,7 @@ void i8085a_cpu_device::device_start()
 		state_add(I8085_BC,     "BC",     m_BC.w.l);
 		state_add(I8085_DE,     "DE",     m_DE.w.l);
 		state_add(I8085_HL,     "HL",     m_HL.w.l);
-		state_add(I8085_STATUS, "STATUS", m_STATUS);
+		state_add(I8085_STATUS, "STATUS", m_status);
 		state_add(I8085_SOD,    "SOD",    m_sod_state).mask(0x1);
 		state_add(I8085_SID,    "SID",    m_ietemp).mask(0x1).callimport().callexport();
 		state_add(I8085_INTE,   "INTE",   m_ietemp).mask(0x1).callimport().callexport();
@@ -1502,9 +1502,9 @@ void i8085a_cpu_device::device_start()
 	save_item(NAME(m_BC.w.l));
 	save_item(NAME(m_DE.w.l));
 	save_item(NAME(m_HL.w.l));
-	save_item(NAME(m_HALT));
-	save_item(NAME(m_IM));
-	save_item(NAME(m_STATUS));
+	save_item(NAME(m_halt));
+	save_item(NAME(m_im));
+	save_item(NAME(m_status));
 	save_item(NAME(m_after_ei));
 	save_item(NAME(m_nmi_state));
 	save_item(NAME(m_irq_state));
@@ -1523,9 +1523,9 @@ void i8085a_cpu_device::device_start()
 void i8085a_cpu_device::device_reset()
 {
 	m_PC.d = 0;
-	m_HALT = 0;
-	m_IM &= ~IM_I75;
-	m_IM |= IM_M55 | IM_M65 | IM_M75;
+	m_halt = 0;
+	m_im &= ~IM_I75;
+	m_im |= IM_M55 | IM_M65 | IM_M75;
 	m_after_ei = false;
 	m_trap_pending = false;
 	m_trap_im_copy = 0;
@@ -1546,22 +1546,22 @@ void i8085a_cpu_device::state_import(const device_state_entry &entry)
 		case I8085_SID:
 			if (m_ietemp)
 			{
-				m_IM |= IM_SID;
+				m_im |= IM_SID;
 			}
 			else
 			{
-				m_IM &= ~IM_SID;
+				m_im &= ~IM_SID;
 			}
 			break;
 
 		case I8085_INTE:
 			if (m_ietemp)
 			{
-				m_IM |= IM_IE;
+				m_im |= IM_IE;
 			}
 			else
 			{
-				m_IM &= ~IM_IE;
+				m_im &= ~IM_IE;
 			}
 			break;
 
@@ -1576,11 +1576,11 @@ void i8085a_cpu_device::state_export(const device_state_entry &entry)
 	switch (entry.index())
 	{
 		case I8085_SID:
-			m_ietemp = ((m_IM & IM_SID) != 0) && m_in_sid_func() != 0;
+			m_ietemp = ((m_im & IM_SID) != 0) && m_in_sid_func() != 0;
 			break;
 
 		case I8085_INTE:
-			m_ietemp = ((m_IM & IM_IE) != 0);
+			m_ietemp = ((m_im & IM_IE) != 0);
 			break;
 
 		default:

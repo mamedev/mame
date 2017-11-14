@@ -116,9 +116,9 @@ private:
 
 	int m_cputype;            /* 0 8080, 1 8085A */
 	PAIR m_PC,m_SP,m_AF,m_BC,m_DE,m_HL,m_WZ;
-	uint8_t m_HALT;
-	uint8_t m_IM;             /* interrupt mask (8085A only) */
-	uint8_t m_STATUS;         /* status word */
+	uint8_t m_halt;
+	uint8_t m_im;             /* interrupt mask (8085A only) */
+	uint8_t m_status;         /* status word */
 
 	uint8_t m_after_ei;       /* post-EI processing; starts at 2, check for ints at 0 */
 	uint8_t m_nmi_state;      /* raw NMI line state */
