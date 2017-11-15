@@ -229,6 +229,7 @@ public:
 	DECLARE_WRITE32_MEMBER(bg_videoram_w);
 
 	DECLARE_READ32_MEMBER(orleg2_speedup_r);
+	DECLARE_READ32_MEMBER(kov2nl_speedup_r);
 
 	DECLARE_DRIVER_INIT(kov2nl);
 	DECLARE_DRIVER_INIT(orleg2);
@@ -950,36 +951,46 @@ ROM_END
 	ROM_LOAD32_WORD( "ig-a3_cgh.u26",    0x00000002, 0x2000000, CRC(5b6fbf3f) SHA1(d1f52e230b91ee6cde939d7c2b74da7fd6527e73) ) \
 	\
 	ROM_REGION( 0x2000000, "ymz774", ROMREGION_ERASEFF ) /* ymz770 */ \
-	ROM_LOAD16_WORD_SWAP( "ig-a3_sp.u37",            0x00000000, 0x2000000, CRC(45cdf422) SHA1(8005d284bcee73cff37a147fcd1c3e9f039a7203) )
+	ROM_LOAD16_WORD_SWAP( "ig-a3_sp.u37",            0x00000000, 0x2000000, CRC(45cdf422) SHA1(8005d284bcee73cff37a147fcd1c3e9f039a7203) ) \
+	\
+	ROM_REGION(0x10000, "sram", 0) \
+	ROM_LOAD("gsyx_nvram", 0x00000000, 0x10000, CRC(22400c16) SHA1(f775a16299c30f2ce23d683161b910e06eff37c1) )
+
+
+
+
+#define KOV2NL_PROGRAM_302 \
+	ROM_REGION( 0x800000, "user1", 0 ) \
+	ROM_LOAD("gsyx_v302cn.u7", 0x00000000, 0x0800000, CRC(b19cf540) SHA1(25da5804bbfd7ef2cdf5cc5aabaa803d18b98929) )
+
+#define KOV2NL_PROGRAM_301 \
+	ROM_REGION( 0x800000, "user1", 0 ) \
+	ROM_LOAD("gsyx_v301cn.u7", 0x000000, 0x800000, CRC(c4595c2c) SHA1(09e379556ef76f81a63664f46d3f1415b315f384) )
+
+#define KOV2NL_PROGRAM_300 \
+	ROM_REGION( 0x800000, "user1", 0 ) \
+	ROM_LOAD("gsyx_v300tw.u7", 0x000000, 0x800000, CRC(08da7552) SHA1(303b97d7694405474c8133a259303ccb49db48b1) )
+
+#define KOV2NL_INTERNAL_CHINA \
+	ROM_REGION( 0x04000, "maincpu", 0 ) \
+	ROM_LOAD( "gsyx_igs036_china.rom", 0x00000000, 0x0004000, CRC(e09fe4ce) SHA1(c0cac64ef8727cbe79d503ec4df66ddb6f2c925e) )
 
 
 ROM_START( kov2nl )
-	ROM_REGION( 0x04000, "maincpu", 0 )
-	ROM_LOAD( "gsyx_igs036.rom",         0x00000000, 0x0004000, NO_DUMP )
-
-	ROM_REGION( 0x800000, "user1", 0 )
-	ROM_LOAD( "gsyx_v302cn.u7",          0x00000000, 0x0800000, CRC(b19cf540) SHA1(25da5804bbfd7ef2cdf5cc5aabaa803d18b98929) )
-
+	KOV2NL_INTERNAL_CHINA
+	KOV2NL_PROGRAM_302
 	KOV2NL_VIDEO_SOUND_ROMS
 ROM_END
 
-ROM_START( kov2nlo )
-	ROM_REGION( 0x04000, "maincpu", 0 )
-	ROM_LOAD( "gsyx_igs036.rom",         0x00000000, 0x0004000, NO_DUMP )
-
-	ROM_REGION( 0x800000, "user1", 0 )
-	ROM_LOAD( "gsyx_v301cn.u7",  0x000000, 0x800000, CRC(c4595c2c) SHA1(09e379556ef76f81a63664f46d3f1415b315f384) )
-
+ROM_START( kov2nl_301 )
+	KOV2NL_INTERNAL_CHINA
+	KOV2NL_PROGRAM_301
 	KOV2NL_VIDEO_SOUND_ROMS
 ROM_END
 
-ROM_START( kov2nloa )
-	ROM_REGION( 0x04000, "maincpu", 0 )
-	ROM_LOAD( "gsyx_igs036.rom",         0x00000000, 0x0004000, NO_DUMP )
-
-	ROM_REGION( 0x800000, "user1", 0 )
-	ROM_LOAD( "kov2nl_gsyx_v300tw.u7",  0x000000, 0x800000, CRC(08da7552) SHA1(303b97d7694405474c8133a259303ccb49db48b1) )
-
+ROM_START( kov2nl_300 )
+	KOV2NL_INTERNAL_CHINA
+	KOV2NL_PROGRAM_300
 	KOV2NL_VIDEO_SOUND_ROMS
 ROM_END
 
@@ -1153,6 +1164,25 @@ READ32_MEMBER(pgm2_state::orleg2_speedup_r)
 	return m_mainram[0x20114 / 4];
 }
 
+READ32_MEMBER(pgm2_state::kov2nl_speedup_r)
+{
+	int pc = space.device().safe_pc();
+
+	if ((pc == 0x10053a94) || (pc == 0x1005332c) || (pc == 0x1005327c))
+	{
+		if ((m_mainram[0x20470 / 4] == 0x00) && (m_mainram[0x20474 / 4] == 0x00))
+			space.device().execute().spin_until_interrupt();
+	}
+	/*
+	else
+	{
+		printf("pc is %08x\n", pc);
+	}
+	*/
+
+	return m_mainram[0x20470 / 4];
+}
+
 
 
 DRIVER_INIT_MEMBER(pgm2_state,orleg2)
@@ -1210,10 +1240,13 @@ DRIVER_INIT_MEMBER(pgm2_state,kov2nl)
 	iga_u12_decode(src, 0x2000000, 0xa193);
 	iga_u16_decode(src, 0x2000000, 0xb780);
 
+	src = (uint16_t *)memregion("sprites_colour")->base();
+	sprite_colour_decode(src, 0x4000000);
+
 	igs036_decryptor decrypter(kov2_key);
 	decrypter.decrypter_rom(memregion("user1"));
 
-	pgm_create_dummy_internal_arm_region();
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x20020470, 0x20020473, read32_delegate(FUNC(pgm2_state::kov2nl_speedup_r), this));
 }
 
 DRIVER_INIT_MEMBER(pgm2_state,ddpdojh)
@@ -1283,8 +1316,8 @@ GAME( 2007, orleg2_101,   orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,     
 
 // Knights of Valour 2 New Legend 
 GAME( 2008, kov2nl,       0,         pgm2,    pgm2, pgm2_state,     kov2nl,       ROT0, "IGS", "Knights of Valour 2 New Legend (V302, China)", MACHINE_NOT_WORKING )
-GAME( 2008, kov2nlo,      kov2nl,    pgm2,    pgm2, pgm2_state,     kov2nl,       ROT0, "IGS", "Knights of Valour 2 New Legend (V301, China)", MACHINE_NOT_WORKING )
-GAME( 2008, kov2nloa,     kov2nl,    pgm2,    pgm2, pgm2_state,     kov2nl,       ROT0, "IGS", "Knights of Valour 2 New Legend (V300, Taiwan)", MACHINE_NOT_WORKING )
+GAME( 2008, kov2nl_301,   kov2nl,    pgm2,    pgm2, pgm2_state,     kov2nl,       ROT0, "IGS", "Knights of Valour 2 New Legend (V301, China)", MACHINE_NOT_WORKING )
+GAME( 2008, kov2nl_300,   kov2nl,    pgm2,    pgm2, pgm2_state,     kov2nl,       ROT0, "IGS", "Knights of Valour 2 New Legend (V300, China)", MACHINE_NOT_WORKING ) // was dumped from a Taiwan board tho
 
 // Dodonpachi Daioujou Tamashii - should be a V200 too
 GAME( 2010, ddpdojh,      0,    pgm2,    pgm2, pgm2_state,     ddpdojh,    ROT270, "IGS", "Dodonpachi Daioujou Tamashii (V201, China)", MACHINE_NOT_WORKING )
