@@ -142,6 +142,8 @@ void hyperstone_device::hyperstone_movd_global_local()
 			SP -= 4;
 			m_local_regs[(SP & 0xfc) >> 2] = READ_W(SP);
 		}
+
+		m_icount -= m_clock_cycles_1;
 	}
 	else
 	{
@@ -3049,6 +3051,8 @@ void hyperstone_device::hyperstone_stxx1_local_global()
 			}
 			break;
 	}
+
+	m_icount -= m_clock_cycles_1;
 }
 
 void hyperstone_device::hyperstone_stxx1_local_local()
@@ -3124,6 +3128,8 @@ void hyperstone_device::hyperstone_stxx1_local_local()
 			}
 			break;
 	}
+
+	m_icount -= m_clock_cycles_1;
 }
 
 void hyperstone_device::hyperstone_stxx2_global_global()
@@ -3219,6 +3225,8 @@ void hyperstone_device::hyperstone_stxx2_global_global()
 			}
 			break;
 	}
+
+	m_icount -= m_clock_cycles_1;
 }
 
 void hyperstone_device::hyperstone_stxx2_global_local()
