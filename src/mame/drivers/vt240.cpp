@@ -370,7 +370,7 @@ WRITE8_MEMBER(vt240_state::vom_w)
 	if(!BIT(m_reg0, 2))
 	{
 		m_vom[offset] = data;
-		data = ~BITSWAP8(data, 0, 1, 2, 3, 4, 5, 6, 7);
+		data = ~BITSWAP8(data, 1, 0, 3, 2, 5, 4, 7, 6);
 		m_palette->set_pen_color(offset, pal2bit(data >> 6), pal2bit(data >> 6), pal2bit(data >> 6));
 		m_palette->set_pen_color((offset + 16), pal2bit(data >> 0), pal2bit(data >> 2), pal2bit(data >> 4));
 	}
@@ -659,8 +659,8 @@ static MACHINE_CONFIG_START( vt240 )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+	MCFG_SCREEN_SIZE(800, 480)
+	MCFG_SCREEN_VISIBLE_AREA(0, 800-1, 0, 480-1)
 	MCFG_SCREEN_UPDATE_DEVICE("upd7220", upd7220_device, screen_update)
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", vt240)
