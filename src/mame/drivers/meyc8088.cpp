@@ -164,7 +164,7 @@ uint32_t meyc8088_state::screen_update_meyc8088(screen_device &screen, bitmap_in
 WRITE_LINE_MEMBER(meyc8088_state::screen_vblank_meyc8088)
 {
 	// INTR on LC255 (pulses at start and end of vblank), INTA hardwired to $20
-	m_maincpu->pulse_input_line_and_vector(0, 0x20, 1);
+	m_maincpu->pulse_input_line_and_vector(0, 0x20);
 }
 
 
