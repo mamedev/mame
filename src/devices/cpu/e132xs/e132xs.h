@@ -208,10 +208,7 @@ private:
 	uint32_t decode_immediate_s();
 	uint32_t decode_const();
 
-	void hyperstone_chk_global_global();
-	void hyperstone_chk_global_local();
-	void hyperstone_chk_local_global();
-	void hyperstone_chk_local_local();
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void hyperstone_chk();
 	void hyperstone_movd_global_global();
 	void hyperstone_movd_global_local();
 	void hyperstone_movd_local_global();
@@ -224,22 +221,10 @@ private:
 	void hyperstone_divs_global_local();
 	void hyperstone_divs_local_global();
 	void hyperstone_divs_local_local();
-	void hyperstone_xm_global_global();
-	void hyperstone_xm_global_local();
-	void hyperstone_xm_local_global();
-	void hyperstone_xm_local_local();
-	void hyperstone_mask_global_global();
-	void hyperstone_mask_global_local();
-	void hyperstone_mask_local_global();
-	void hyperstone_mask_local_local();
-	void hyperstone_sum_global_global();
-	void hyperstone_sum_global_local();
-	void hyperstone_sum_local_global();
-	void hyperstone_sum_local_local();
-	void hyperstone_sums_global_global();
-	void hyperstone_sums_global_local();
-	void hyperstone_sums_local_global();
-	void hyperstone_sums_local_local();
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void hyperstone_xm();
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void hyperstone_mask();
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void hyperstone_sum();
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void hyperstone_sums();
 	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void hyperstone_cmp();
 	void hyperstone_mov_global_global();
 	void hyperstone_mov_global_local();

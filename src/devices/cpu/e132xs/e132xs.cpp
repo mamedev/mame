@@ -1634,10 +1634,10 @@ void hyperstone_device::execute_run()
 
 		switch ((OP >> 8) & 0x00ff)
 		{
-			case 0x00: hyperstone_chk_global_global(); break;
-			case 0x01: hyperstone_chk_global_local(); break;
-			case 0x02: hyperstone_chk_local_global(); break;
-			case 0x03: hyperstone_chk_local_local(); break;
+			case 0x00: hyperstone_chk<GLOBAL, GLOBAL>(); break;
+			case 0x01: hyperstone_chk<GLOBAL, LOCAL>(); break;
+			case 0x02: hyperstone_chk<LOCAL, GLOBAL>(); break;
+			case 0x03: hyperstone_chk<LOCAL, LOCAL>(); break;
 			case 0x04: hyperstone_movd_global_global(); break;
 			case 0x05: hyperstone_movd_global_local(); break;
 			case 0x06: hyperstone_movd_local_global(); break;
@@ -1650,22 +1650,22 @@ void hyperstone_device::execute_run()
 			case 0x0d: hyperstone_divs_global_local(); break;
 			case 0x0e: hyperstone_divs_local_global(); break;
 			case 0x0f: hyperstone_divs_local_local(); break;
-			case 0x10: hyperstone_xm_global_global(); break;
-			case 0x11: hyperstone_xm_global_local(); break;
-			case 0x12: hyperstone_xm_local_global(); break;
-			case 0x13: hyperstone_xm_local_local(); break;
-			case 0x14: hyperstone_mask_global_global(); break;
-			case 0x15: hyperstone_mask_global_local(); break;
-			case 0x16: hyperstone_mask_local_global(); break;
-			case 0x17: hyperstone_mask_local_local(); break;
-			case 0x18: hyperstone_sum_global_global(); break;
-			case 0x19: hyperstone_sum_global_local(); break;
-			case 0x1a: hyperstone_sum_local_global(); break;
-			case 0x1b: hyperstone_sum_local_local(); break;
-			case 0x1c: hyperstone_sums_global_global(); break;
-			case 0x1d: hyperstone_sums_global_local(); break;
-			case 0x1e: hyperstone_sums_local_global(); break;
-			case 0x1f: hyperstone_sums_local_local(); break;
+			case 0x10: hyperstone_xm<GLOBAL, GLOBAL>(); break;
+			case 0x11: hyperstone_xm<GLOBAL, LOCAL>(); break;
+			case 0x12: hyperstone_xm<LOCAL, GLOBAL>(); break;
+			case 0x13: hyperstone_xm<LOCAL, LOCAL>(); break;
+			case 0x14: hyperstone_mask<GLOBAL, GLOBAL>(); break;
+			case 0x15: hyperstone_mask<GLOBAL, LOCAL>(); break;
+			case 0x16: hyperstone_mask<LOCAL, GLOBAL>(); break;
+			case 0x17: hyperstone_mask<LOCAL, LOCAL>(); break;
+			case 0x18: hyperstone_sum<GLOBAL, GLOBAL>(); break;
+			case 0x19: hyperstone_sum<GLOBAL, LOCAL>(); break;
+			case 0x1a: hyperstone_sum<LOCAL, GLOBAL>(); break;
+			case 0x1b: hyperstone_sum<LOCAL, LOCAL>(); break;
+			case 0x1c: hyperstone_sums<GLOBAL, GLOBAL>(); break;
+			case 0x1d: hyperstone_sums<GLOBAL, LOCAL>(); break;
+			case 0x1e: hyperstone_sums<LOCAL, GLOBAL>(); break;
+			case 0x1f: hyperstone_sums<LOCAL, LOCAL>(); break;
 			case 0x20: hyperstone_cmp<GLOBAL, GLOBAL>(); break;
 			case 0x21: hyperstone_cmp<GLOBAL, LOCAL>(); break;
 			case 0x22: hyperstone_cmp<LOCAL, GLOBAL>(); break;
