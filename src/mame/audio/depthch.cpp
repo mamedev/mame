@@ -25,6 +25,7 @@ static const char *const depthch_sample_names[] =
 	"longex",
 	"shortex",
 	"spray",
+	"bonus",
 	"sonar",
 	nullptr
 };
@@ -36,6 +37,7 @@ enum
 	SND_LONGEXPL = 0,
 	SND_SHRTEXPL,
 	SND_SPRAY,
+	SND_BONUS,
 	SND_SONAR
 };
 
@@ -74,6 +76,9 @@ WRITE8_MEMBER( vicdual_state::depthch_audio_w )
 	if ( bitsGoneLow & OUT_PORT_1_SONAR )
 	{
 		STOP( m_samples, SND_SONAR );
+
+		// bonus sound on same line as sonar
+		PLAY( m_samples, SND_BONUS, 0 );
 	}
 }
 
@@ -82,7 +87,7 @@ MACHINE_CONFIG_START( depthch_audio )
 
 	/* samples */
 	MCFG_SOUND_ADD("samples", SAMPLES, 0)
-	MCFG_SAMPLES_CHANNELS(4)
+	MCFG_SAMPLES_CHANNELS(5)
 	MCFG_SAMPLES_NAMES(depthch_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
