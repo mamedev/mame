@@ -924,12 +924,13 @@ void hyperstone_device::hyperstone_subc()
 	uint32_t dreg = (DST_GLOBAL ? m_global_regs : m_local_regs)[dst_code];
 	const uint32_t c = GET_C;
 
+	uint32_t old_z = SR & Z_MASK;
 	SR &= ~(C_MASK | V_MASK | Z_MASK | N_MASK);
 
 	if (SRC_GLOBAL && (src_code == SR_REGISTER))
 	{
 		const uint64_t tmp = uint64_t(dreg) - uint64_t(c);
-		SR |= ((tmp ^ dreg) & dreg & 0x80000000);
+		SR |= ((tmp ^ dreg) & dreg & 0x80000000) >> 28;
 		SR |= (tmp & 0x100000000) >> 32;
 		dreg -= c;
 	}
@@ -939,7 +940,7 @@ void hyperstone_device::hyperstone_subc()
 		const uint64_t tmp = uint64_t(dreg) - (uint64_t(sreg) + uint64_t(c));
 		//CHECK!
 		const uint32_t sreg_c = sreg + c;
-		SR |= ((tmp ^ dreg) & (dreg ^ sreg_c) & 0x80000000);
+		SR |= ((tmp ^ dreg) & (dreg ^ sreg_c) & 0x80000000) >> 28;
 		SR |= (tmp & 0x100000000) >> 32;
 		dreg -= sreg_c;
 	}
@@ -949,7 +950,7 @@ void hyperstone_device::hyperstone_subc()
 	else
 		m_local_regs[dst_code] = dreg;
 
-	if (dreg == 0)
+	if (old_z && dreg == 0)
 		SR |= Z_MASK;
 	SR |= SIGN_TO_N(dreg);
 
