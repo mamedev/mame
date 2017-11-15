@@ -209,10 +209,7 @@ private:
 	uint32_t decode_const();
 
 	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void hyperstone_chk();
-	void hyperstone_movd_global_global();
-	void hyperstone_movd_global_local();
-	void hyperstone_movd_local_global();
-	void hyperstone_movd_local_local();
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void hyperstone_movd();
 	void hyperstone_divu_global_global();
 	void hyperstone_divu_global_local();
 	void hyperstone_divu_local_global();

@@ -1635,10 +1635,10 @@ void hyperstone_device::execute_run()
 			case 0x01: hyperstone_chk<GLOBAL, LOCAL>(); break;
 			case 0x02: hyperstone_chk<LOCAL, GLOBAL>(); break;
 			case 0x03: hyperstone_chk<LOCAL, LOCAL>(); break;
-			case 0x04: hyperstone_movd_global_global(); break;
-			case 0x05: hyperstone_movd_global_local(); break;
-			case 0x06: hyperstone_movd_local_global(); break;
-			case 0x07: hyperstone_movd_local_local(); break;
+			case 0x04: hyperstone_movd<GLOBAL, GLOBAL>(); break;
+			case 0x05: hyperstone_movd<GLOBAL, LOCAL>(); break;
+			case 0x06: hyperstone_movd<LOCAL, GLOBAL>(); break;
+			case 0x07: hyperstone_movd<LOCAL, LOCAL>(); break;
 			case 0x08: hyperstone_divu_global_global(); break;
 			case 0x09: hyperstone_divu_global_local(); break;
 			case 0x0a: hyperstone_divu_local_global(); break;
