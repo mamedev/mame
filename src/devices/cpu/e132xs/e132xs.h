@@ -289,14 +289,10 @@ private:
 
 	template <reg_bank DST_GLOBAL> void hyperstone_set();
 
-	void hyperstone_ldwr_global();
-	void hyperstone_ldwr_local();
-	void hyperstone_lddr_global();
-	void hyperstone_lddr_local();
-	void hypesrtone_ldwp_global();
-	void hypesrtone_ldwp_local();
-	void hyperstone_lddp_global();
-	void hyperstone_lddp_local();
+	template <reg_bank SRC_GLOBAL> void hyperstone_ldwr();
+	template <reg_bank SRC_GLOBAL> void hyperstone_lddr();
+	template <reg_bank SRC_GLOBAL> void hypesrtone_ldwp();
+	template <reg_bank SRC_GLOBAL> void hyperstone_lddp();
 
 	void hyperstone_stwr_global();
 	void hyperstone_stwr_local();

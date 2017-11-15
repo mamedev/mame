@@ -4101,111 +4101,93 @@ void hyperstone_device::hyperstone_extend()
 }
 
 
-
-void hyperstone_device::hyperstone_ldwr_global()
-{
-	check_delay_PC();
-	set_global_register(SRC_CODE, READ_W(m_local_regs[(DST_CODE + GET_FP) & 0x3f]));
-	m_icount -= m_clock_cycles_1;
-}
-
-void hyperstone_device::hyperstone_ldwr_local() // ldwr local,local
+template <hyperstone_device::reg_bank SRC_GLOBAL>
+void hyperstone_device::hyperstone_ldwr()
 {
 	check_delay_PC();
 	const uint32_t fp = GET_FP;
-	m_local_regs[(SRC_CODE + fp) & 0x3f] = READ_W(m_local_regs[(DST_CODE + fp) & 0x3f]);
+	if (SRC_GLOBAL)
+		set_global_register(SRC_CODE, READ_W(m_local_regs[(DST_CODE + fp) & 0x3f]));
+	else
+		m_local_regs[(SRC_CODE + fp) & 0x3f] = READ_W(m_local_regs[(DST_CODE + fp) & 0x3f]);
 	m_icount -= m_clock_cycles_1;
 }
 
-void hyperstone_device::hyperstone_lddr_global()
-{
-	check_delay_PC();
-
-	const uint32_t src_code = SRC_CODE;
-	const uint32_t dreg = m_local_regs[(DST_CODE + GET_FP) & 0x3f];
-	set_global_register(src_code, READ_W(dreg));
-	set_global_register(src_code + 1, READ_W(dreg + 4));
-
-	m_icount -= m_clock_cycles_2;
-}
-
-void hyperstone_device::hyperstone_lddr_local()
+template <hyperstone_device::reg_bank SRC_GLOBAL>
+void hyperstone_device::hyperstone_lddr()
 {
 	check_delay_PC();
 
 	const uint32_t fp = GET_FP;
-	const uint32_t src_code = SRC_CODE + fp;
+	const uint32_t src_code = SRC_GLOBAL ? SRC_CODE : ((SRC_CODE + fp) & 0x3f);
 	const uint32_t dreg = m_local_regs[(DST_CODE + fp) & 0x3f];
 
-	m_local_regs[src_code & 0x3f] = READ_W(dreg);
-	m_local_regs[(src_code + 1) & 0x3f] = READ_W(dreg + 4);
-
-	m_icount -= m_clock_cycles_2;
-}
-
-void hyperstone_device::hypesrtone_ldwp_global()
-{
-	check_delay_PC();
-
-	const uint32_t dst_code = (DST_CODE + GET_FP) & 0x3f;
-	set_global_register(SRC_CODE, READ_W(m_local_regs[dst_code]));
-	m_local_regs[dst_code] += 4;
-
-	m_icount -= m_clock_cycles_1;
-}
-
-void hyperstone_device::hypesrtone_ldwp_local()
-{
-	check_delay_PC();
-
-	const uint32_t fp = GET_FP;
-	const uint32_t src_code = (SRC_CODE + fp) & 0x3f;
-	const uint32_t dst_code = (DST_CODE + fp) & 0x3f;
-
-	m_local_regs[src_code] = READ_W(m_local_regs[dst_code]);
-
-	// post increment the destination register if it's different from the source one
-	// (needed by Hidden Catch)
-	if (src_code != dst_code)
-		m_local_regs[dst_code] += 4;
-
-	m_icount -= m_clock_cycles_1;
-}
-
-void hyperstone_device::hyperstone_lddp_global()
-{
-	check_delay_PC();
-
-	const uint32_t src_code = SRC_CODE;
-	const uint32_t dst_code = (DST_CODE + GET_FP) & 0x3f;
-	const uint32_t dreg = m_local_regs[dst_code];
-
-	set_global_register(src_code, READ_W(dreg));
-	set_global_register(src_code + 1, READ_W(dreg + 4));
-
-	m_local_regs[dst_code] += 8;
-
-	m_icount -= m_clock_cycles_2;
-}
-
-void hyperstone_device::hyperstone_lddp_local()
-{
-	check_delay_PC();
-
-	const uint32_t fp = GET_FP;
-	const uint32_t src_code = SRC_CODE + fp;
-	const uint32_t dst_code = (DST_CODE + fp) & 0x3f;
-	const uint32_t dreg = m_local_regs[dst_code];
-	const bool same_srcf_dst = (((src_code + 1) & 0x3f) == dst_code);
-
-	m_local_regs[src_code & 0x3f] = READ_W(dreg);
-	m_local_regs[(src_code + 1) & 0x3f] = READ_W(dreg + 4);
-
-	// post increment the destination register if it's different from the source one
-	// and from the "next source" one
-	if (src_code != dst_code && !same_srcf_dst)
+	if (SRC_GLOBAL)
 	{
+		set_global_register(src_code, READ_W(dreg));
+		set_global_register(src_code + 1, READ_W(dreg + 4));
+	}
+	else
+	{
+		m_local_regs[src_code] = READ_W(dreg);
+		m_local_regs[(src_code + 1) & 0x3f] = READ_W(dreg + 4);
+	}
+
+	m_icount -= m_clock_cycles_2;
+}
+
+template <hyperstone_device::reg_bank SRC_GLOBAL>
+void hyperstone_device::hypesrtone_ldwp()
+{
+	check_delay_PC();
+
+	const uint32_t fp = GET_FP;
+	const uint32_t dst_code = (DST_CODE + fp) & 0x3f;
+
+	if (SRC_GLOBAL)
+	{
+		set_global_register(SRC_CODE, READ_W(m_local_regs[dst_code]));
+		m_local_regs[dst_code] += 4;
+	}
+	else
+	{
+		const uint32_t src_code = (SRC_CODE + fp) & 0x3f;
+		m_local_regs[src_code] = READ_W(m_local_regs[dst_code]);
+		// post increment the destination register if it's different from the source one
+		// (needed by Hidden Catch)
+		if (src_code != dst_code)
+			m_local_regs[dst_code] += 4;
+	}
+
+	m_icount -= m_clock_cycles_1;
+}
+
+template <hyperstone_device::reg_bank SRC_GLOBAL>
+void hyperstone_device::hyperstone_lddp()
+{
+	check_delay_PC();
+
+	const uint32_t fp = GET_FP;
+	const uint32_t src_code = SRC_GLOBAL ? SRC_CODE : ((SRC_CODE + fp) & 0x3f);
+	const uint32_t dst_code = (DST_CODE + fp) & 0x3f;
+	const uint32_t dreg = m_local_regs[dst_code];
+
+	if (SRC_GLOBAL)
+	{
+		set_global_register(src_code, READ_W(dreg));
+		set_global_register(src_code + 1, READ_W(dreg + 4));
 		m_local_regs[dst_code] += 8;
+	}
+	else
+	{
+		const uint32_t srcf_code = (src_code + 1) & 0x3f;
+		m_local_regs[src_code] = READ_W(dreg);
+		m_local_regs[srcf_code] = READ_W(dreg + 4);
+
+		// post increment the destination register if it's different from the source one
+		// and from the "next source" one
+		if (src_code != dst_code && srcf_code != dst_code)
+			m_local_regs[dst_code] += 8;
 	}
 
 	m_icount -= m_clock_cycles_2;

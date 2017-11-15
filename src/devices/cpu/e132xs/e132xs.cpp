@@ -1839,14 +1839,14 @@ void hyperstone_device::execute_run()
 			case 0xcd: execute_software(); break; // fcvtd
 			case 0xce: hyperstone_extend(); break;
 			case 0xcf: hyperstone_do(); break;
-			case 0xd0: hyperstone_ldwr_global(); break;
-			case 0xd1: hyperstone_ldwr_local(); break;
-			case 0xd2: hyperstone_lddr_global(); break;
-			case 0xd3: hyperstone_lddr_local(); break;
-			case 0xd4: hypesrtone_ldwp_global(); break;
-			case 0xd5: hypesrtone_ldwp_local(); break;
-			case 0xd6: hyperstone_lddp_global(); break;
-			case 0xd7: hyperstone_lddp_local(); break;
+			case 0xd0: hyperstone_ldwr<GLOBAL>(); break;
+			case 0xd1: hyperstone_ldwr<LOCAL>(); break;
+			case 0xd2: hyperstone_lddr<GLOBAL>(); break;
+			case 0xd3: hyperstone_lddr<LOCAL>(); break;
+			case 0xd4: hypesrtone_ldwp<GLOBAL>(); break;
+			case 0xd5: hypesrtone_ldwp<LOCAL>(); break;
+			case 0xd6: hyperstone_lddp<GLOBAL>(); break;
+			case 0xd7: hyperstone_lddp<LOCAL>(); break;
 			case 0xd8: hyperstone_stwr_global(); break;
 			case 0xd9: hyperstone_stwr_local(); break;
 			case 0xda: hyperstone_stdr_global(); break;
