@@ -39,7 +39,7 @@ void hyperstone_device::hyperstone_movd_global_global()
 		// RET instruction
 		if (src_code < 2)
 		{
-			DEBUG_PRINTF(("Denoted PC or SR in RET instruction. PC = %08X\n", PC));
+			LOG("Denoted PC or SR in RET instruction. PC = %08X\n", PC);
 			m_icount -= m_clock_cycles_1;
 			return;
 		}
@@ -227,7 +227,7 @@ void hyperstone_device::hyperstone_divu_global_global()
 
 	if (src_code == dst_code || src_code == dstf_code || src_code < 2)
 	{
-		DEBUG_PRINTF(("Denoted the same register code or PC/SR as source in hyperstone_divu instruction. PC = %08X\n", PC));
+		LOG("Denoted the same register code or PC/SR as source in hyperstone_divu instruction. PC = %08X\n", PC);
 		m_icount -= 36 << m_clck_scale;
 		return;
 	}
@@ -305,7 +305,7 @@ void hyperstone_device::hyperstone_divu_local_global()
 
 	if (src_code < 2)
 	{
-		DEBUG_PRINTF(("Denoted the same register code or PC/SR as source in hyperstone_divu instruction. PC = %08X\n", PC));
+		LOG("Denoted the same register code or PC/SR as source in hyperstone_divu instruction. PC = %08X\n", PC);
 		m_icount -= 36 << m_clck_scale;
 		return;
 	}
@@ -390,7 +390,7 @@ void hyperstone_device::hyperstone_divs_global_global()
 
 	if(src_code == dst_code || src_code == dstf_code || src_code < 2)
 	{
-		DEBUG_PRINTF(("Denoted invalid register code in hyperstone_divs instruction. PC = %08X\n", PC));
+		LOG("Denoted invalid register code in hyperstone_divs instruction. PC = %08X\n", PC);
 		m_icount -= 36 << m_clck_scale;
 		return;
 	}
@@ -465,7 +465,7 @@ void hyperstone_device::hyperstone_divs_local_global()
 
 	if (src_code < 2)
 	{
-		DEBUG_PRINTF(("Denoted PC or SR as source register in hyperstone_divs instruction. PC = %08X\n", PC));
+		LOG("Denoted PC or SR as source register in hyperstone_divs instruction. PC = %08X\n", PC);
 		m_icount -= 36 << m_clck_scale;
 		return;
 	}
@@ -570,7 +570,7 @@ void hyperstone_device::hyperstone_xm()
 
 	if ((SRC_GLOBAL && (src_code == SR_REGISTER)) || (DST_GLOBAL && (dst_code < 2)))
 	{
-		DEBUG_PRINTF(("Denoted PC or SR in hyperstone_xm. PC = %08X\n", PC));
+		LOG("Denoted PC or SR in hyperstone_xm. PC = %08X\n", PC);
 		m_icount -= m_clock_cycles_1;
 		return;
 	}
@@ -712,107 +712,40 @@ void hyperstone_device::hyperstone_cmp()
 	m_icount -= m_clock_cycles_1;
 }
 
-void hyperstone_device::hyperstone_mov_global_global()
+template <hyperstone_device::reg_bank DST_GLOBAL, hyperstone_device::reg_bank SRC_GLOBAL>
+void hyperstone_device::hyperstone_mov()
 {
 	check_delay_PC();
 
-	const uint32_t dst_code = DST_CODE;
-
-	uint32_t sreg;
-	if (SR & H_MASK)
+	const bool h = (SR & H_MASK) != 0;
+	if (DST_GLOBAL && h && !(SR & S_MASK))
 	{
-		if (!(SR & S_MASK))
-			execute_exception(get_trap_addr(TRAPNO_PRIVILEGE_ERROR));
-
-		const uint32_t src_code = SRC_CODE + 16;
-		sreg = (WRITE_ONLY_REGMASK & (1 << src_code)) ? 0 : get_global_register(src_code);
-		set_global_register(dst_code + 16, sreg);
+		execute_exception(get_trap_addr(TRAPNO_PRIVILEGE_ERROR));
 	}
 	else
 	{
-		sreg = m_global_regs[SRC_CODE];
-		m_global_regs[dst_code] = sreg;
+		const uint32_t fp = GET_FP;
+		const uint32_t src_code = SRC_GLOBAL ? (SRC_CODE + (h ? 16 : 0)) : ((SRC_CODE + fp) & 0x3f);
+		const uint32_t sreg = SRC_GLOBAL ? ((WRITE_ONLY_REGMASK & (1 << src_code)) ? 0 : get_global_register(src_code)) : m_local_regs[src_code];
 
-		if (dst_code == PC_REGISTER)
-			SR &= ~M_MASK;
+		if (DST_GLOBAL)
+		{
+			const uint32_t dst_code = DST_CODE + (h ? 16 : 0);
+			set_global_register(dst_code, sreg);
+
+			if (dst_code == PC_REGISTER)
+				SR &= ~M_MASK;
+		}
+		else
+		{
+			m_local_regs[(DST_CODE + fp) & 0x3f] = sreg;
+		}
+
+		SR &= ~(Z_MASK | N_MASK);
+		if (sreg == 0)
+			SR |= Z_MASK;
+		SR |= SIGN_TO_N(sreg);
 	}
-
-	SR &= ~(Z_MASK | N_MASK);
-	if (sreg == 0)
-		SR |= Z_MASK;
-	SR |= SIGN_TO_N(sreg);
-
-	m_icount -= m_clock_cycles_1;
-}
-
-void hyperstone_device::hyperstone_mov_global_local()
-{
-	check_delay_PC();
-
-	const uint32_t dst_code = DST_CODE;
-	const uint32_t sreg = m_local_regs[(SRC_CODE + GET_FP) & 0x3f];
-
-	if (SR & H_MASK)
-	{
-		if (!(SR & S_MASK))
-			execute_exception(get_trap_addr(TRAPNO_PRIVILEGE_ERROR));
-
-		set_global_register(DST_CODE + 16, sreg);
-	}
-	else
-	{
-		m_global_regs[dst_code] = sreg;
-
-		if (dst_code == PC_REGISTER)
-			SR &= ~M_MASK;
-	}
-
-	SR &= ~(Z_MASK | N_MASK);
-	if (sreg == 0)
-		SR |= Z_MASK;
-	SR |= SIGN_TO_N(sreg);
-
-	m_icount -= m_clock_cycles_1;
-}
-
-void hyperstone_device::hyperstone_mov_local_global()
-{
-	check_delay_PC();
-	uint32_t src_code = SRC_CODE;
-
-	uint32_t sreg;
-	if (SR & H_MASK)
-	{
-		src_code += 16;
-		sreg = (WRITE_ONLY_REGMASK & (1 << src_code)) ? 0 : get_global_register(src_code);
-	}
-	else
-	{
-		sreg = m_global_regs[src_code];                                     \
-	}
-
-	m_local_regs[(DST_CODE + GET_FP) & 0x3f] = sreg;
-
-	SR &= ~(Z_MASK | N_MASK);
-	if (sreg == 0)
-		SR |= Z_MASK;
-	SR |= SIGN_TO_N(sreg);
-
-	m_icount -= m_clock_cycles_1;
-}
-
-void hyperstone_device::hyperstone_mov_local_local()
-{
-	check_delay_PC();
-
-	const uint32_t fp = GET_FP;
-	const uint32_t sreg = m_local_regs[(SRC_CODE + fp) & 0x3f];
-	m_local_regs[(DST_CODE + fp) & 0x3f] = sreg;
-
-	SR &= ~(Z_MASK | N_MASK);
-	if (sreg == 0)
-		SR |= Z_MASK;
-	SR |= SIGN_TO_N(sreg);
 
 	m_icount -= m_clock_cycles_1;
 }
@@ -1293,34 +1226,36 @@ void hyperstone_device::hyperstone_movi()
 
 	if (!IMM_LONG)
 		imm = immediate_values[m_op & 0x0f];
-	if (DST_GLOBAL)
+
+	const bool h = (SR & H_MASK) != 0;
+	if (DST_GLOBAL && h && !(SR & S_MASK))
 	{
-		uint32_t dst_code = DST_CODE;
-		if (SR & H_MASK)
-		{
-			dst_code += 16;
-			if (!(SR & S_MASK))
-				execute_exception(get_trap_addr(TRAPNO_PRIVILEGE_ERROR));
-		}
-
-		set_global_register(dst_code, imm);
-
-		if (dst_code == PC_REGISTER)
-			SR &= ~M_MASK;
+		execute_exception(get_trap_addr(TRAPNO_PRIVILEGE_ERROR));
 	}
 	else
 	{
-		m_local_regs[(DST_CODE + GET_FP) & 0x3f] = imm;
-	}
+		if (DST_GLOBAL)
+		{
+			const uint32_t dst_code = DST_CODE + (h ? 16 : 0);
+			set_global_register(dst_code, imm);
 
-	SR &= ~(Z_MASK | N_MASK);
-	if (imm == 0)
-		SR |= Z_MASK;
-	SR |= SIGN_TO_N(imm);
+			if (dst_code == PC_REGISTER)
+				SR &= ~M_MASK;
+		}
+		else
+		{
+			m_local_regs[(DST_CODE + GET_FP) & 0x3f] = imm;
+		}
+
+		SR &= ~(Z_MASK | N_MASK);
+		if (imm == 0)
+			SR |= Z_MASK;
+		SR |= SIGN_TO_N(imm);
 
 #if MISSIONCRAFT_FLAGS
-	SR &= ~V_MASK; // or V undefined ?
+		SR &= ~V_MASK; // or V undefined ?
 #endif
+	}
 
 	m_icount -= m_clock_cycles_1;
 }
@@ -1845,7 +1780,7 @@ void hyperstone_device::hyperstone_shld()
 	// result undefined if Ls denotes the same register as Ld or Ldf
 	if (src_code == dst_code || src_code == dstf_code)
 	{
-		DEBUG_PRINTF(("Denoted same registers in hyperstone_shld. PC = %08X\n", PC));
+		LOG("Denoted same registers in hyperstone_shld. PC = %08X\n", PC);
 		m_icount -= m_clock_cycles_2;
 		return;
 	}
@@ -2444,7 +2379,7 @@ void hyperstone_device::hyperstone_ldxx2_global_global()
 	if (dst_code < 2)
 	{
 		m_icount -= m_clock_cycles_1;
-		DEBUG_PRINTF(("Denoted PC or SR in hyperstone_ldxx2. PC = %08X\n", PC));
+		LOG("Denoted PC or SR in hyperstone_ldxx2. PC = %08X\n", PC);
 		return;
 	}
 
@@ -2493,7 +2428,7 @@ void hyperstone_device::hyperstone_ldxx2_global_global()
 					m_icount -= m_clock_cycles_1; // extra cycle
 					break;
 				case 2: // Reserved
-					DEBUG_PRINTF(("Executed Reserved instruction in hyperstone_ldxx2. PC = %08X\n", PC));
+					LOG("Executed Reserved instruction in hyperstone_ldxx2. PC = %08X\n", PC);
 					break;
 				case 3: // LDW.S
 					if (dreg < SP)
@@ -2553,7 +2488,7 @@ void hyperstone_device::hyperstone_ldxx2_global_local()
 
 	if (dst_code < 2)
 	{
-		DEBUG_PRINTF(("Denoted PC or SR in hyperstone_ldxx2. PC = %08X\n", PC));
+		LOG("Denoted PC or SR in hyperstone_ldxx2. PC = %08X\n", PC);
 		m_icount -= m_clock_cycles_1;
 		return;
 	}
@@ -2592,7 +2527,7 @@ void hyperstone_device::hyperstone_ldxx2_global_local()
 					m_icount -= m_clock_cycles_1; // extra cycle
 					break;
 				case 2: // Reserved
-					DEBUG_PRINTF(("Executed Reserved instruction in hyperstone_ldxx2. PC = %08X\n", PC));
+					LOG("Executed Reserved instruction in hyperstone_ldxx2. PC = %08X\n", PC);
 					break;
 				case 3: // LDW.S
 					if (dreg < SP)
@@ -2678,7 +2613,7 @@ void hyperstone_device::hyperstone_ldxx2_local_global()
 					m_icount -= m_clock_cycles_1; // extra cycle
 					break;
 				case 2: // Reserved
-					DEBUG_PRINTF(("Executed Reserved instruction in hyperstone_ldxx2. PC = %08X\n", PC));
+					LOG("Executed Reserved instruction in hyperstone_ldxx2. PC = %08X\n", PC);
 					break;
 				case 3: // LDW.S
 					if (dreg < SP)
@@ -2772,7 +2707,7 @@ void hyperstone_device::hyperstone_ldxx2_local_local()
 					m_icount -= m_clock_cycles_1; // extra cycle
 					break;
 				case 2: // Reserved
-					DEBUG_PRINTF(("Executed Reserved instruction in hyperstone_ldxx2. PC = %08X\n", PC));
+					LOG("Executed Reserved instruction in hyperstone_ldxx2. PC = %08X\n", PC);
 					break;
 				case 3: // LDW.S
 					if (dreg < SP)
@@ -3270,7 +3205,7 @@ void hyperstone_device::hyperstone_stxx2_global_global()
 					m_icount -= m_clock_cycles_1; // extra cycle
 					break;
 				case 2: // Reserved
-					DEBUG_PRINTF(("Executed Reserved instruction in hyperstone_stxx2. PC = %08X\n", PC));
+					LOG("Executed Reserved instruction in hyperstone_stxx2. PC = %08X\n", PC);
 					break;
 				case 3: // STW.S
 					if(dreg < SP)
@@ -3320,7 +3255,7 @@ void hyperstone_device::hyperstone_stxx2_global_local()
 
 	if (dst_code < 2)
 	{
-		DEBUG_PRINTF(("Denoted PC or SR in hyperstone_stxx2. PC = %08X\n", PC));
+		LOG("Denoted PC or SR in hyperstone_stxx2. PC = %08X\n", PC);
 		m_icount -= m_clock_cycles_1;
 		return;
 	}
@@ -3364,7 +3299,7 @@ void hyperstone_device::hyperstone_stxx2_global_local()
 					m_icount -= m_clock_cycles_1; // extra cycle
 					break;
 				case 2: // Reserved
-					DEBUG_PRINTF(("Executed Reserved instruction in hyperstone_stxx2. PC = %08X\n", PC));
+					LOG("Executed Reserved instruction in hyperstone_stxx2. PC = %08X\n", PC);
 					break;
 				case 3: // STW.S
 					if(dreg < SP)
@@ -3452,7 +3387,7 @@ void hyperstone_device::hyperstone_stxx2_local_global()
 					m_icount -= m_clock_cycles_1; // extra cycle
 					break;
 				case 2: // Reserved
-					DEBUG_PRINTF(("Executed Reserved instruction in hyperstone_stxx2. PC = %08X\n", PC));
+					LOG("Executed Reserved instruction in hyperstone_stxx2. PC = %08X\n", PC);
 					break;
 				case 3: // STW.S
 					if(dreg < SP)
@@ -3540,7 +3475,7 @@ void hyperstone_device::hyperstone_stxx2_local_local()
 					m_icount -= m_clock_cycles_1; // extra cycle
 					break;
 				case 2: // Reserved
-					DEBUG_PRINTF(("Executed Reserved instruction in hyperstone_stxx2. PC = %08X\n", PC));
+					LOG("Executed Reserved instruction in hyperstone_stxx2. PC = %08X\n", PC);
 					break;
 				case 3: // STW.S
 					if(dreg < SP)
@@ -3725,7 +3660,7 @@ void hyperstone_device::hyperstone_mulu_global_global()
 
 	if (src_code < 2 || dst_code < 2)
 	{
-		DEBUG_PRINTF(("Denoted PC or SR in hyperstone_mulu instruction. PC = %08X\n", PC));
+		LOG("Denoted PC or SR in hyperstone_mulu instruction. PC = %08X\n", PC);
 		return;
 	}
 
@@ -3758,7 +3693,7 @@ void hyperstone_device::hyperstone_mulu_global_local()
 
 	if (dst_code < 2)
 	{
-		DEBUG_PRINTF(("Denoted PC or SR in hyperstone_mulu instruction. PC = %08X\n", PC));
+		LOG("Denoted PC or SR in hyperstone_mulu instruction. PC = %08X\n", PC);
 		return;
 	}
 
@@ -3792,7 +3727,7 @@ void hyperstone_device::hyperstone_mulu_local_global()
 
 	if (src_code < 2)
 	{
-		DEBUG_PRINTF(("Denoted PC or SR in hyperstone_mulu instruction. PC = %08X\n", PC));
+		LOG("Denoted PC or SR in hyperstone_mulu instruction. PC = %08X\n", PC);
 		return;
 	}
 
@@ -3855,7 +3790,7 @@ void hyperstone_device::hyperstone_muls_global_global()
 
 	if (src_code < 2 || dst_code < 2)
 	{
-		DEBUG_PRINTF(("Denoted PC or SR in hyperstone_muls instruction. PC = %08X\n", PC));
+		LOG("Denoted PC or SR in hyperstone_muls instruction. PC = %08X\n", PC);
 		return;
 	}
 
@@ -3889,7 +3824,7 @@ void hyperstone_device::hyperstone_muls_global_local()
 
 	if (dst_code < 2)
 	{
-		DEBUG_PRINTF(("Denoted PC or SR in hyperstone_muls instruction. PC = %08X\n", PC));
+		LOG("Denoted PC or SR in hyperstone_muls instruction. PC = %08X\n", PC);
 		return;
 	}
 
@@ -3926,7 +3861,7 @@ void hyperstone_device::hyperstone_muls_local_global()
 
 	if (src_code < 2)
 	{
-		DEBUG_PRINTF(("Denoted PC or SR in hyperstone_muls instruction. PC = %08X\n", PC));
+		LOG("Denoted PC or SR in hyperstone_muls instruction. PC = %08X\n", PC);
 		return;
 	}
 
@@ -4006,7 +3941,7 @@ void hyperstone_device::hyperstone_set_global()
 		case 16:
 		case 17:
 		case 19:
-			DEBUG_PRINTF(("Used reserved N value (%d) in hyperstone_set. PC = %08X\n", n, PC));
+			LOG("Used reserved N value (%d) in hyperstone_set. PC = %08X\n", n, PC);
 			break;
 
 		// SETxx
@@ -4213,7 +4148,7 @@ void hyperstone_device::hyperstone_set_local()
 		case 16:
 		case 17:
 		case 19:
-			DEBUG_PRINTF(("Used reserved N value (%d) in hyperstone_set. PC = %08X\n", n, PC));
+			LOG("Used reserved N value (%d) in hyperstone_set. PC = %08X\n", n, PC);
 			break;
 
 		// SETxx
@@ -4410,7 +4345,7 @@ void hyperstone_device::hyperstone_mul_global_global()
 
 	if (src_code < 2 || dst_code < 2)
 	{
-		DEBUG_PRINTF(("Denoted PC or SR in hyperstone_mul instruction. PC = %08X\n", PC));
+		LOG("Denoted PC or SR in hyperstone_mul instruction. PC = %08X\n", PC);
 		return;
 	}
 
@@ -4440,7 +4375,7 @@ void hyperstone_device::hyperstone_mul_global_local()
 
 	if (dst_code < 2)
 	{
-		DEBUG_PRINTF(("Denoted PC or SR in hyperstone_mul instruction. PC = %08X\n", PC));
+		LOG("Denoted PC or SR in hyperstone_mul instruction. PC = %08X\n", PC);
 		return;
 	}
 
@@ -4470,7 +4405,7 @@ void hyperstone_device::hyperstone_mul_local_global()
 
 	if (src_code < 2)
 	{
-		DEBUG_PRINTF(("Denoted PC or SR in hyperstone_mul instruction. PC = %08X\n", PC));
+		LOG("Denoted PC or SR in hyperstone_mul instruction. PC = %08X\n", PC);
 		return;
 	}
 
@@ -4641,7 +4576,7 @@ void hyperstone_device::hyperstone_extend()
 		}
 
 		default:
-			DEBUG_PRINTF(("Executed Illegal extended opcode (%X). PC = %08X\n", func, PC));
+			LOG("Executed Illegal extended opcode (%X). PC = %08X\n", func, PC);
 			break;
 	}
 

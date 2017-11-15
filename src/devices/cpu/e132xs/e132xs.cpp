@@ -220,11 +220,8 @@
 
 #include "32xsdefs.h"
 
-#ifdef MAME_DEBUG
-#define DEBUG_PRINTF(x) do { osd_printf_debug x; } while (0)
-#else
-#define DEBUG_PRINTF(x) do { } while (0)
-#endif
+//#define VERBOSE 1
+#include "logmacro.h"
 
 //**************************************************************************
 //  INTERNAL ADDRESS MAP
@@ -473,7 +470,7 @@ void hyperstone_device::hyperstone_set_trap_entry(int which)
 			break;
 
 		default:
-			DEBUG_PRINTF(("Set entry point to a reserved value: %d\n", which));
+			LOG("Set entry point to a reserved value: %d\n", which);
 			break;
 	}
 }
@@ -573,23 +570,23 @@ uint32_t hyperstone_device::get_global_register(uint8_t code)
         case 29:
         case 30:
         case 31:
-            DEBUG_PRINTF(("read _Reserved_ Global Register %d @ %08X\n",code,PC));
+            LOG("read _Reserved_ Global Register %d @ %08X\n",code,PC);
             break;
 
         case BCR_REGISTER:
-            DEBUG_PRINTF(("read write-only BCR register @ %08X\n",PC));
+            LOG("read write-only BCR register @ %08X\n",PC);
             return 0;
 
         case TPR_REGISTER:
-            DEBUG_PRINTF(("read write-only TPR register @ %08X\n",PC));
+            LOG("read write-only TPR register @ %08X\n",PC);
             return 0;
 
         case FCR_REGISTER:
-            DEBUG_PRINTF(("read write-only FCR register @ %08X\n",PC));
+            LOG("read write-only FCR register @ %08X\n",PC);
             return 0;
 
         case MCR_REGISTER:
-            DEBUG_PRINTF(("read write-only MCR register @ %08X\n",PC));
+            LOG("read write-only MCR register @ %08X\n",PC);
             return 0;
         }
     }
@@ -706,15 +703,15 @@ void hyperstone_device::set_global_register(uint8_t code, uint32_t val)
 #define SIGN_BIT(val)           ((val & 0x80000000) >> 31)
 #define SIGN_TO_N(val)          ((val & 0x80000000) >> 29)
 
-static const int32_t immediate_values[32] =
+static constexpr int32_t immediate_values[32] =
 {
 	0, 1, 2, 3, 4, 5, 6, 7,
 	8, 9, 10, 11, 12, 13, 14, 15,
-	16, 0, 0, 0, 32, 64, 128, static_cast<int32_t>(0x80000000),
+	16, 0, 0, 0, 32, 64, 128, int32_t(0x80000000),
 	-8, -7, -6, -5, -4, -3, -2, -1
 };
 
-#define WRITE_ONLY_REGMASK  ((1 << BCR_REGISTER) | (1 << TPR_REGISTER) | (1 << FCR_REGISTER) | (1 << MCR_REGISTER))
+constexpr uint32_t WRITE_ONLY_REGMASK = (1 << BCR_REGISTER) | (1 << TPR_REGISTER) | (1 << FCR_REGISTER) | (1 << MCR_REGISTER);
 
 #define check_delay_PC()                                                            \
 do                                                                                  \
@@ -929,7 +926,7 @@ void hyperstone_device::execute_exception(uint32_t addr)
 	PPC = PC;
 	PC = addr;
 
-	DEBUG_PRINTF(("EXCEPTION! PPC = %08X PC = %08X\n",PPC-2,PC-2));
+	LOG("EXCEPTION! PPC = %08X PC = %08X\n",PPC-2,PC-2);
 	m_icount -= m_clock_cycles_2;
 }
 
@@ -1600,7 +1597,7 @@ void hyperstone_device::execute_set_input(int inputnum, int state)
 
 void hyperstone_device::hyperstone_reserved()
 {
-	DEBUG_PRINTF(("Executed Reserved opcode. PC = %08X OP = %04X\n", PC, OP));
+	LOG("Executed Reserved opcode. PC = %08X OP = %04X\n", PC, OP);
 }
 
 void hyperstone_device::hyperstone_do()
@@ -1670,10 +1667,10 @@ void hyperstone_device::execute_run()
 			case 0x21: hyperstone_cmp<GLOBAL, LOCAL>(); break;
 			case 0x22: hyperstone_cmp<LOCAL, GLOBAL>(); break;
 			case 0x23: hyperstone_cmp<LOCAL, LOCAL>(); break;
-			case 0x24: hyperstone_mov_global_global(); break;
-			case 0x25: hyperstone_mov_global_local(); break;
-			case 0x26: hyperstone_mov_local_global(); break;
-			case 0x27: hyperstone_mov_local_local(); break;
+			case 0x24: hyperstone_mov<GLOBAL, GLOBAL>(); break;
+			case 0x25: hyperstone_mov<GLOBAL, LOCAL>(); break;
+			case 0x26: hyperstone_mov<LOCAL, GLOBAL>(); break;
+			case 0x27: hyperstone_mov<LOCAL, LOCAL>(); break;
 			case 0x28: hyperstone_add<GLOBAL, GLOBAL>(); break;
 			case 0x29: hyperstone_add<GLOBAL, LOCAL>(); break;
 			case 0x2a: hyperstone_add<LOCAL, GLOBAL>(); break;

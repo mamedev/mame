@@ -226,10 +226,7 @@ private:
 	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void hyperstone_sum();
 	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void hyperstone_sums();
 	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void hyperstone_cmp();
-	void hyperstone_mov_global_global();
-	void hyperstone_mov_global_local();
-	void hyperstone_mov_local_global();
-	void hyperstone_mov_local_local();
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void hyperstone_mov();
 	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void hyperstone_add();
 	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void hyperstone_adds();
 	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void hyperstone_cmpb();
