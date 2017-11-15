@@ -164,8 +164,8 @@ public:
 	int input_state(int linenum) const { return m_input[linenum].m_curstate; }
 	void pulse_input_line(int irqline, const attotime &duration);
 	void pulse_input_line_and_vector(int irqline, int vector, const attotime &duration);
-	void pulse_input_line(int irqline, u32 cycles = 0) { pulse_input_line(irqline, cycles_to_attotime((cycles == 0) ? min_cycles() : cycles)); }
-	void pulse_input_line_and_vector(int irqline, int vector, u32 cycles = 0) { pulse_input_line_and_vector(irqline, vector, cycles_to_attotime((cycles == 0) ? min_cycles() : cycles)); }
+	void pulse_input_line(int irqline, int cycles) { pulse_input_line(irqline, cycles_to_attotime(cycles * min_cycles())); }
+	void pulse_input_line_and_vector(int irqline, int vector, int cycles) { pulse_input_line_and_vector(irqline, vector, cycles_to_attotime(cycles * min_cycles())); }
 
 	// suspend/resume
 	void suspend(u32 reason, bool eatcycles);

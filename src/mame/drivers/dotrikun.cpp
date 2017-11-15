@@ -68,7 +68,7 @@ public:
 
 TIMER_DEVICE_CALLBACK_MEMBER(dotrikun_state::interrupt)
 {
-	m_maincpu->pulse_input_line(0);
+	m_maincpu->pulse_input_line(0, 1);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(dotrikun_state::scanline_off)
