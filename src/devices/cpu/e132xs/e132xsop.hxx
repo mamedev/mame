@@ -4193,35 +4193,30 @@ void hyperstone_device::hyperstone_lddp()
 	m_icount -= m_clock_cycles_2;
 }
 
-void hyperstone_device::hyperstone_stwr_global()
-{
-	check_delay_PC();
-
-	const uint32_t src_code = SRC_CODE;
-	const uint32_t sreg = ((src_code == SR_REGISTER) ? 0 : m_global_regs[src_code]);
-	WRITE_W(m_local_regs[(DST_CODE + GET_FP) & 0x3f], sreg);
-
-	m_icount -= m_clock_cycles_1;
-}
-
-void hyperstone_device::hyperstone_stwr_local()
+template <hyperstone_device::reg_bank SRC_GLOBAL>
+void hyperstone_device::hyperstone_stwr()
 {
 	check_delay_PC();
 
 	const uint32_t fp = GET_FP;
-	WRITE_W(m_local_regs[(DST_CODE + fp) & 0x3f], m_local_regs[(SRC_CODE + fp) & 0x3f]);
+	const uint32_t src_code = SRC_GLOBAL ? SRC_CODE : ((SRC_CODE + fp) & 0x3f);
+	const uint32_t sreg = (SRC_GLOBAL && src_code == SR_REGISTER) ? 0 : (SRC_GLOBAL ? m_global_regs : m_local_regs)[src_code];
+	WRITE_W(m_local_regs[(DST_CODE + fp) & 0x3f], sreg);
 
 	m_icount -= m_clock_cycles_1;
 }
 
-void hyperstone_device::hyperstone_stdr_global()
+template <hyperstone_device::reg_bank SRC_GLOBAL>
+void hyperstone_device::hyperstone_stdr()
 {
 	check_delay_PC();
 
-	const uint32_t src_code = SRC_CODE;
-	const bool src_is_sr = (src_code == SR_REGISTER);
-	const uint32_t sreg = src_is_sr ? 0 : m_global_regs[src_code];
-	const uint32_t sregf = src_is_sr ? 0 : m_global_regs[src_code + 1];
+	const uint32_t fp = GET_FP;
+	const uint32_t src_code = SRC_GLOBAL ? SRC_CODE : ((SRC_CODE + fp) & 0x3f);
+	const uint32_t srcf_code = SRC_GLOBAL ? (SRC_CODE + 1) : ((src_code + 1) & 0x3f);
+	const uint32_t sreg = (SRC_GLOBAL && src_code == SR_REGISTER) ? 0 : (SRC_GLOBAL ? m_global_regs : m_local_regs)[src_code];
+	const uint32_t sregf = (SRC_GLOBAL && src_code == SR_REGISTER) ? 0 : (SRC_GLOBAL ? m_global_regs : m_local_regs)[srcf_code];
+
 	const uint32_t dreg = m_local_regs[(DST_CODE + GET_FP) & 0x3f];
 
 	WRITE_W(dreg, sreg);
@@ -4230,28 +4225,16 @@ void hyperstone_device::hyperstone_stdr_global()
 	m_icount -= m_clock_cycles_2;
 }
 
-void hyperstone_device::hyperstone_stdr_local()
+template <hyperstone_device::reg_bank SRC_GLOBAL>
+void hyperstone_device::hyperstone_stwp()
 {
 	check_delay_PC();
 
 	const uint32_t fp = GET_FP;
-	const uint32_t src_code = (SRC_CODE + fp) & 0x3f;
-	const uint32_t dreg = m_local_regs[(DST_CODE + fp) & 0x3f];
+	const uint32_t src_code = SRC_GLOBAL ? SRC_CODE : ((SRC_CODE + fp) & 0x3f);
+	const uint32_t sreg = (SRC_GLOBAL && src_code == SR_REGISTER) ? 0 : (SRC_GLOBAL ? m_global_regs : m_local_regs)[src_code];
 
-	WRITE_W(dreg, m_local_regs[src_code]);
-	WRITE_W(dreg + 4, m_local_regs[(src_code + 1) & 0x3f]);
-
-	m_icount -= m_clock_cycles_2;
-}
-
-void hyperstone_device::hyperstone_stwp_global()
-{
-	check_delay_PC();
-
-	const uint32_t src_code = SRC_CODE;
-	const uint32_t sreg = ((src_code == SR_REGISTER) ? 0 : m_global_regs[src_code]);
-
-	const uint32_t dst_code = (DST_CODE + GET_FP) & 0x3f;
+	const uint32_t dst_code = (DST_CODE + fp) & 0x3f;
 	const uint32_t dreg = m_local_regs[dst_code];
 
 	WRITE_W(dreg, sreg);
@@ -4260,62 +4243,31 @@ void hyperstone_device::hyperstone_stwp_global()
 	m_icount -= m_clock_cycles_1;
 }
 
-void hyperstone_device::hyperstone_stwp_local()
+template <hyperstone_device::reg_bank SRC_GLOBAL>
+void hyperstone_device::hyperstone_stdp()
 {
 	check_delay_PC();
 
 	const uint32_t fp = GET_FP;
+	const uint32_t src_code = SRC_GLOBAL ? SRC_CODE : ((SRC_CODE + fp) & 0x3f);
+	const uint32_t srcf_code = SRC_GLOBAL ? (src_code + 1) : ((src_code + 1) & 0x3f);
+	const uint32_t sreg = (SRC_GLOBAL && src_code == SR_REGISTER) ? 0 : (SRC_GLOBAL ? m_global_regs : m_local_regs)[src_code];
+	const uint32_t sregf = (SRC_GLOBAL && src_code == SR_REGISTER) ? 0 : (SRC_GLOBAL ? m_global_regs : m_local_regs)[srcf_code];
+
 	const uint32_t dst_code = (DST_CODE + fp) & 0x3f;
-	WRITE_W(m_local_regs[dst_code], m_local_regs[(SRC_CODE + fp) & 0x3f]);
-	m_local_regs[dst_code] += 4;
-
-	m_icount -= m_clock_cycles_1;
-}
-
-void hyperstone_device::hyperstone_stdp_global()
-{
-	check_delay_PC();
-
-	const uint32_t src_code = SRC_CODE;
-	const uint32_t sreg = (src_code == SR_REGISTER) ? 0 : m_global_regs[src_code];
-	const uint32_t sregf = (src_code == SR_REGISTER) ? 0 : m_global_regs[src_code + 1];
-
-	const uint32_t dst_code = (DST_CODE + GET_FP) & 0x3f;
 	const uint32_t dreg = m_local_regs[dst_code];
 
 	WRITE_W(dreg, sreg);
-	WRITE_W(dreg + 4, sregf);
+
 	m_local_regs[dst_code] += 8;
 
-	m_icount -= m_clock_cycles_2;
-}
-
-void hyperstone_device::hyperstone_stdp_local()
-{
-	check_delay_PC();
-	const uint32_t fp = GET_FP;
-	const uint32_t src_code = SRC_CODE + fp;
-	const uint32_t srcf_code = (SRC_CODE + fp + 1) & 0x3f;
-	const uint32_t dst_code = (DST_CODE + fp) & 0x3f;
-
-	const uint32_t sreg = m_local_regs[src_code & 0x3f];
-	const uint32_t sregf = m_local_regs[srcf_code];
-	const uint32_t dreg = m_local_regs[dst_code]; /* registers offset by frame pointer */
-
-	bool same_srcf_dst = (srcf_code == dst_code);
-
-	WRITE_W(dreg, sreg);
-	m_local_regs[dst_code] += 8;
-
-	if (same_srcf_dst)
-		WRITE_W(dreg + 4, sregf + 8); // because DREG == SREGF and DREG has been incremented
-	else
+	if (SRC_GLOBAL || srcf_code != dst_code)
 		WRITE_W(dreg + 4, sregf);
+	else
+		WRITE_W(dreg + 4, sregf + 8); // because DREG == SREGF and DREG has been incremented
 
 	m_icount -= m_clock_cycles_2;
 }
-
-
 
 void hyperstone_device::hyperstone_dbv()
 {

@@ -294,14 +294,10 @@ private:
 	template <reg_bank SRC_GLOBAL> void hypesrtone_ldwp();
 	template <reg_bank SRC_GLOBAL> void hyperstone_lddp();
 
-	void hyperstone_stwr_global();
-	void hyperstone_stwr_local();
-	void hyperstone_stdr_global();
-	void hyperstone_stdr_local();
-	void hyperstone_stwp_global();
-	void hyperstone_stwp_local();
-	void hyperstone_stdp_global();
-	void hyperstone_stdp_local();
+	template <reg_bank SRC_GLOBAL> void hyperstone_stwr();
+	template <reg_bank SRC_GLOBAL> void hyperstone_stdr();
+	template <reg_bank SRC_GLOBAL> void hyperstone_stwp();
+	template <reg_bank SRC_GLOBAL> void hyperstone_stdp();
 
 	void hyperstone_dbv();
 	void hyperstone_dbnv();
