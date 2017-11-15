@@ -284,7 +284,7 @@ INPUT_CHANGED_MEMBER(pntnpuzl_state::coin_inserted)
 {
 	/* TODO: change this! */
 	if(newval)
-		generic_pulse_irq_line(*m_maincpu, (uint8_t)(uintptr_t)param, 1);
+		m_maincpu->pulse_input_line((uint8_t)(uintptr_t)param, 1);
 }
 
 static INPUT_PORTS_START( pntnpuzl )

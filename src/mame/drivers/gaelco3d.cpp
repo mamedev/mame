@@ -561,7 +561,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(gaelco3d_state::adsp_autobuffer_irq)
 		reg = m_adsp_ireg_base;
 
 		/* generate the (internal, thats why the pulse) irq */
-		generic_pulse_irq_line(*m_adsp, ADSP2105_IRQ1, 1);
+		m_adsp->pulse_input_line(ADSP2105_IRQ1, 1);
 	}
 
 	/* store it */
