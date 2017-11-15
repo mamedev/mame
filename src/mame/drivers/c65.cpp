@@ -100,6 +100,7 @@ private:
 	uint8_t m_VIC2_IRQPend, m_VIC2_IRQMask;
 	/* 0x20: border color (TODO: different thread?) */
 	uint8_t m_VIC2_EXTColor;
+	uint8_t m_VIC2_BK0_Color;
 	/* 0x30: banking + PAL + EXT SYNC */
 	uint8_t m_VIC3_ControlA;
 	/* 0x31: video modes */
@@ -128,28 +129,42 @@ int c65_state::inner_y_char(int yoffs)
 
 uint32_t c65_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	int y,x;
-	int border_color = m_VIC2_EXTColor & 0xf;
+	int pixel_width = (m_VIC3_ControlB & 0x80) ? 1 : 2;
+	int columns = 80 / pixel_width;
 
 	// TODO: border area
-	for(y=0;y<m_screen->height();y++)
+	for(int y=0;y<m_screen->height();y++)
 	{
-		for(x=0;x<m_screen->width();x++)
+		for(int x=0;x<m_screen->width();x++)
 		{
 			//int, xi,yi,xm,ym,dot_x;
-			int xi = inner_x_char(x);
+			int xi = inner_x_char(x / pixel_width);
 			int yi = inner_y_char(y);
-			int xm = 7 - (x & 7);
+			int xm = 7 - ((x / pixel_width) & 7);
 			int ym = (y & 7);
-			uint8_t tile = m_workram[xi+yi*80+0x800];
-			uint8_t attr = m_cram[xi+yi*80];
-			if(attr & 0xf0)
-				attr = machine().rand() & 0xf;
+			uint8_t tile = m_workram[xi+yi*columns+0x800];
+			uint8_t attr = m_cram[xi+yi*columns];
+			int foreground_color = attr & 0xf;
+			int background_color = m_VIC2_BK0_Color & 0xf;
+			int highlight_color = 0;
 
 			int enable_dot = ((m_iplrom[(tile<<3)+ym+0xd000] >> xm) & 1);
 
+			if (attr & 0x10)
+			{
+				if ((machine().time().attoseconds() / (ATTOSECONDS_PER_SECOND / 2)) & 1)
+					attr &= 0x0f;
+				else if ((attr & 0xf0) != 0x10)
+					attr &= ~0x10;
+			}
+
+			if ((attr & 0x80) && ym == 7) enable_dot = 1;
+			if (attr & 0x40) highlight_color = 16;
+			if (attr & 0x20) enable_dot = !enable_dot;
+			if (attr & 0x10) enable_dot = 0;
+
 			//if(cliprect.contains(x, y))
-			bitmap.pix16(y, x) = m_palette->pen((enable_dot) ? attr & 0xf : border_color);
+			bitmap.pix16(y, x) = m_palette->pen(highlight_color + (enable_dot) ? foreground_color : background_color);
 
 
 			//gfx->opaque(bitmap,cliprect,tile,0,0,0,x*8,y*8);
@@ -183,6 +198,9 @@ READ8_MEMBER(c65_state::vic4567_dummy_r)
 		case 0x20:
 			return m_VIC2_EXTColor;
 
+		case 0x21:
+			return m_VIC2_BK0_Color;
+
 		case 0x30:
 			return m_VIC3_ControlA;
 		case 0x31:
@@ -209,6 +227,10 @@ WRITE8_MEMBER(c65_state::vic4567_dummy_w)
 		case 0x20:
 			m_VIC2_EXTColor = data & 0xf;
 			break;
+		case 0x21:
+			m_VIC2_BK0_Color = data & 0xf;
+			break;
+
 		/* KEY register, handles vic-iii and vic-ii modes via two consecutive writes
 		  0xa5 -> 0x96 vic-iii mode
 		  any other write vic-ii mode
