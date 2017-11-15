@@ -3649,29 +3649,30 @@ void hyperstone_device::hyperstone_shli_local()
 	m_icount -= m_clock_cycles_1;
 }
 
-
-
-void hyperstone_device::hyperstone_mulu_global_global()
+template <hyperstone_device::reg_bank DST_GLOBAL, hyperstone_device::reg_bank SRC_GLOBAL>
+void hyperstone_device::hyperstone_mulu()
 {
 	check_delay_PC();
 
-	const uint32_t src_code = SRC_CODE;
-	const uint32_t dst_code = DST_CODE;
+	const uint32_t fp = GET_FP;
+	const uint32_t src_code = SRC_GLOBAL ? SRC_CODE : ((SRC_CODE + fp) & 0x3f);
+	const uint32_t dst_code = DST_GLOBAL ? DST_CODE : ((DST_CODE + fp) & 0x3f);
+	const uint32_t dstf_code = DST_GLOBAL ? (dst_code + 1) : ((dst_code + 1) & 0x3f);
 
-	if (src_code < 2 || dst_code < 2)
+	if ((SRC_GLOBAL && src_code < 2) || (DST_GLOBAL && dst_code < 2))
 	{
 		LOG("Denoted PC or SR in hyperstone_mulu instruction. PC = %08X\n", PC);
 		return;
 	}
 
-	const uint32_t dreg = m_global_regs[dst_code];
-	const uint32_t sreg = m_global_regs[src_code];
+	const uint32_t dreg = (DST_GLOBAL ? m_global_regs : m_local_regs)[dst_code];
+	const uint32_t sreg = (SRC_GLOBAL ? m_global_regs : m_local_regs)[src_code];
 	const uint64_t double_word = (uint64_t)sreg *(uint64_t)dreg;
 
 	const uint32_t high_order = (uint32_t)(double_word >> 32);
 
-	set_global_register(dst_code, high_order);
-	set_global_register(dst_code + 1, (uint32_t)double_word);
+	(DST_GLOBAL ? m_global_regs : m_local_regs)[dst_code] = high_order;
+	(DST_GLOBAL ? m_global_regs : m_local_regs)[dstf_code] = (uint32_t)double_word;
 
 	SR &= ~(Z_MASK | N_MASK);
 	if (double_word == 0)
@@ -3684,124 +3685,30 @@ void hyperstone_device::hyperstone_mulu_global_global()
 		m_icount -= m_clock_cycles_6;
 }
 
-void hyperstone_device::hyperstone_mulu_global_local()
-{
-	check_delay_PC();
-
-	const uint32_t src_code = (SRC_CODE + GET_FP) & 0x3f;
-	const uint32_t dst_code = DST_CODE;
-
-	if (dst_code < 2)
-	{
-		LOG("Denoted PC or SR in hyperstone_mulu instruction. PC = %08X\n", PC);
-		return;
-	}
-
-	const uint32_t dreg = m_global_regs[dst_code];
-	const uint32_t sreg = m_local_regs[src_code];
-	const uint64_t double_word = (uint64_t)sreg *(uint64_t)dreg;
-
-	const uint32_t high_order = (uint32_t)(double_word >> 32);
-
-	set_global_register(dst_code, high_order);
-	set_global_register(dst_code + 1, (uint32_t)double_word);
-
-	SR &= ~(Z_MASK | N_MASK);
-	if (double_word == 0)
-		SR |= Z_MASK;
-	SR |= SIGN_TO_N(high_order);
-
-	if(sreg <= 0xffff && dreg <= 0xffff)
-		m_icount -= m_clock_cycles_4;
-	else
-		m_icount -= m_clock_cycles_6;
-}
-
-void hyperstone_device::hyperstone_mulu_local_global()
-{
-	check_delay_PC();
-
-	const uint32_t src_code = SRC_CODE;
-	const uint32_t dst_code = (DST_CODE + GET_FP) & 0x3f;
-	const uint32_t dstf_code = (dst_code + 1) & 0x3f;
-
-	if (src_code < 2)
-	{
-		LOG("Denoted PC or SR in hyperstone_mulu instruction. PC = %08X\n", PC);
-		return;
-	}
-
-	const uint32_t dreg = m_local_regs[dst_code];
-	const uint32_t sreg = m_global_regs[src_code];
-	const uint64_t double_word = (uint64_t)sreg *(uint64_t)dreg;
-
-	const uint32_t high_order = (uint32_t)(double_word >> 32);
-
-	m_local_regs[dst_code] = high_order;
-	m_local_regs[dstf_code] = (uint32_t)double_word;
-
-	SR &= ~(Z_MASK | N_MASK);
-	if (double_word == 0)
-		SR |= Z_MASK;
-	SR |= SIGN_TO_N(high_order);
-
-	if(sreg <= 0xffff && dreg <= 0xffff)
-		m_icount -= m_clock_cycles_4;
-	else
-		m_icount -= m_clock_cycles_6;
-}
-
-void hyperstone_device::hyperstone_mulu_local_local()
+template <hyperstone_device::reg_bank DST_GLOBAL, hyperstone_device::reg_bank SRC_GLOBAL>
+void hyperstone_device::hyperstone_muls()
 {
 	check_delay_PC();
 
 	const uint32_t fp = GET_FP;
-	const uint32_t code = DST_CODE;
-	const uint32_t dst_code = (code + fp) & 0x3f;
-	const uint32_t dstf_code = (code + 1 + fp) & 0x3f;
-	const uint32_t dreg = m_local_regs[dst_code];
+	const uint32_t src_code = SRC_GLOBAL ? SRC_CODE : ((SRC_CODE + fp) & 0x3f);
+	const uint32_t dst_code = DST_GLOBAL ? DST_CODE : ((DST_CODE + fp) & 0x3f);
+	const uint32_t dstf_code = DST_GLOBAL ? (dst_code + 1) : ((dst_code + 1) & 0x3f);
 
-	const uint32_t sreg = m_local_regs[(SRC_CODE + fp) & 0x3f];
-	const uint64_t double_word = (uint64_t)sreg *(uint64_t)dreg;
-
-	const uint32_t high_order = (uint32_t)(double_word >> 32);
-
-	m_local_regs[dst_code] = high_order;
-	m_local_regs[dstf_code] = (uint32_t)double_word;
-
-	SR &= ~(Z_MASK | N_MASK);
-	if (double_word == 0)
-		SR |= Z_MASK;
-	SR |= SIGN_TO_N(high_order);
-
-	if(sreg <= 0xffff && dreg <= 0xffff)
-		m_icount -= m_clock_cycles_4;
-	else
-		m_icount -= m_clock_cycles_6;
-}
-
-void hyperstone_device::hyperstone_muls_global_global()
-{
-	check_delay_PC();
-
-	const uint32_t src_code = SRC_CODE;
-	const uint32_t dst_code = DST_CODE;
-	const uint32_t dstf_code = dst_code + 1;
-
-	if (src_code < 2 || dst_code < 2)
+	if ((SRC_GLOBAL && src_code < 2) || (DST_GLOBAL && dst_code < 2))
 	{
 		LOG("Denoted PC or SR in hyperstone_muls instruction. PC = %08X\n", PC);
 		return;
 	}
 
-	const uint32_t dreg = m_global_regs[dst_code];
-	const uint32_t sreg = m_global_regs[src_code];
-	const int64_t double_word = (int64_t)(int32_t)sreg * (int64_t)(int32_t)dreg;
+	const int32_t dreg = (int32_t)(DST_GLOBAL ? m_global_regs : m_local_regs)[dst_code];
+	const int32_t sreg = (int32_t)(SRC_GLOBAL ? m_global_regs : m_local_regs)[src_code];
+	const int64_t double_word = (int64_t)sreg * (int64_t)dreg;
 
 	const uint32_t high_order = (uint32_t)(double_word >> 32);
 
-	set_global_register(dst_code, high_order);
-	set_global_register(dstf_code, (uint32_t)double_word);
+	(DST_GLOBAL ? m_global_regs : m_local_regs)[dst_code] = high_order;
+	(DST_GLOBAL ? m_global_regs : m_local_regs)[dstf_code] = (uint32_t)double_word;
 
 	SR &= ~(Z_MASK | N_MASK);
 	if (double_word == 0)
@@ -3814,116 +3721,15 @@ void hyperstone_device::hyperstone_muls_global_global()
 		m_icount -= m_clock_cycles_6;
 }
 
-void hyperstone_device::hyperstone_muls_global_local()
+template <hyperstone_device::reg_bank DST_GLOBAL>
+void hyperstone_device::hyperstone_set()
 {
 	check_delay_PC();
 
-	const uint32_t src_code = (SRC_CODE + GET_FP) & 0x3f;
-	const uint32_t dst_code = DST_CODE;
-	const uint32_t dstf_code = dst_code + 1;
-
-	if (dst_code < 2)
-	{
-		LOG("Denoted PC or SR in hyperstone_muls instruction. PC = %08X\n", PC);
-		return;
-	}
-
-	const uint32_t dreg = m_global_regs[dst_code];
-	const uint32_t sreg = m_local_regs[src_code];
-	const int64_t double_word = (int64_t)(int32_t)sreg * (int64_t)(int32_t)dreg;
-
-	const uint32_t high_order = (uint32_t)(double_word >> 32);
-
-	set_global_register(dst_code, high_order);
-	set_global_register(dstf_code, (uint32_t)double_word);
-
-	SR &= ~(Z_MASK | N_MASK);
-	if (double_word == 0)
-		SR |= Z_MASK;
-	SR |= SIGN_TO_N(high_order);
-
-	if((sreg >= 0xffff8000 && sreg <= 0x7fff) && (dreg >= 0xffff8000 && dreg <= 0x7fff))
-		m_icount -= m_clock_cycles_4;
-	else
-		m_icount -= m_clock_cycles_6;
-}
-
-void hyperstone_device::hyperstone_muls_local_global()
-{
-	check_delay_PC();
-
-	const uint32_t fp = GET_FP;
-	const uint32_t src_code = SRC_CODE;
-
-	const uint32_t d_code = DST_CODE;
-	const uint32_t dst_code = (d_code + fp) & 0x3f;
-	const uint32_t dstf_code = (d_code + 1 + fp) & 0x3f;
-
-	if (src_code < 2)
-	{
-		LOG("Denoted PC or SR in hyperstone_muls instruction. PC = %08X\n", PC);
-		return;
-	}
-
-	const uint32_t dreg = m_local_regs[dst_code];
-	const uint32_t sreg = m_local_regs[src_code];
-	const int64_t double_word = (int64_t)(int32_t)sreg * (int64_t)(int32_t)dreg;
-
-	const uint32_t high_order = (uint32_t)(double_word >> 32);
-
-	m_local_regs[dst_code] = high_order;
-	m_local_regs[dstf_code] = (uint32_t)double_word;
-
-	SR &= ~(Z_MASK | N_MASK);
-	if (double_word == 0)
-		SR |= Z_MASK;
-	SR |= SIGN_TO_N(high_order);
-
-	if((sreg >= 0xffff8000 && sreg <= 0x7fff) && (dreg >= 0xffff8000 && dreg <= 0x7fff))
-		m_icount -= m_clock_cycles_4;
-	else
-		m_icount -= m_clock_cycles_6;
-}
-
-void hyperstone_device::hyperstone_muls_local_local()
-{
-	check_delay_PC();
-
-	const uint32_t fp = GET_FP;
-	const uint32_t src_code = (SRC_CODE + fp) & 0x3f;
-	const uint32_t sreg = m_local_regs[src_code];
-
-	const uint32_t d_code = DST_CODE;
-	const uint32_t dst_code = (d_code + fp) & 0x3f;
-	const uint32_t dstf_code = (d_code + 1 + fp) & 0x3f;
-	const uint32_t dreg = m_local_regs[dst_code];
-
-	const int64_t double_word = (int64_t)(int32_t)sreg * (int64_t)(int32_t)dreg;
-
-	const uint32_t high_order = (uint32_t)(double_word >> 32);
-
-	m_local_regs[dst_code] = high_order;
-	m_local_regs[dstf_code] = (uint32_t)double_word;
-
-	SR &= ~(Z_MASK | N_MASK);
-	if (double_word == 0)
-		SR |= Z_MASK;
-	SR |= SIGN_TO_N(high_order);
-
-	if((sreg >= 0xffff8000 && sreg <= 0x7fff) && (dreg >= 0xffff8000 && dreg <= 0x7fff))
-		m_icount -= m_clock_cycles_4;
-	else
-		m_icount -= m_clock_cycles_6;
-}
-
-void hyperstone_device::hyperstone_set_global()
-{
-	check_delay_PC();
-
-	const uint32_t dst_code = DST_CODE;
+	const uint32_t dst_code = DST_GLOBAL ? DST_CODE : ((DST_CODE + GET_FP) & 0x3f);
 	const uint32_t n = N_VALUE;
 
-	if (dst_code < 2)
+	if (DST_GLOBAL && dst_code < 2)
 	{
 		m_icount -= m_clock_cycles_1;
 		return;
@@ -3933,7 +3739,7 @@ void hyperstone_device::hyperstone_set_global()
 	{
 		// SETADR
 		case 0:
-			m_global_regs[dst_code] = (SP & 0xfffffe00) | (GET_FP << 2) | (((SP & 0x100) && (SIGN_BIT(SR) == 0)) ? 1 : 0);
+			(DST_GLOBAL ? m_global_regs : m_local_regs)[dst_code] = (SP & 0xfffffe00) | (GET_FP << 2) | (((SP & 0x100) && (SIGN_BIT(SR) == 0)) ? 1 : 0);
 			break;
 
 		// Reserved
@@ -3946,497 +3752,209 @@ void hyperstone_device::hyperstone_set_global()
 
 		// SETxx
 		case 2:
-			m_global_regs[dst_code] = 1;
+			(DST_GLOBAL ? m_global_regs : m_local_regs)[dst_code] = 1;
 			break;
 
 		case 3:
-			m_global_regs[dst_code] = 0;
+			(DST_GLOBAL ? m_global_regs : m_local_regs)[dst_code] = 0;
 			break;
 
 		case 4:
 			if (SR & (N_MASK | Z_MASK))
-				m_global_regs[dst_code] = 1;
+				(DST_GLOBAL ? m_global_regs : m_local_regs)[dst_code] = 1;
 			else
-				m_global_regs[dst_code] = 0;
+				(DST_GLOBAL ? m_global_regs : m_local_regs)[dst_code] = 0;
 			break;
 
 		case 5:
 			if (SR & (N_MASK | Z_MASK))
-				m_global_regs[dst_code] = 0;
+				(DST_GLOBAL ? m_global_regs : m_local_regs)[dst_code] = 0;
 			else
-				m_global_regs[dst_code] = 1;
+				(DST_GLOBAL ? m_global_regs : m_local_regs)[dst_code] = 1;
 			break;
 
 		case 6:
 			if (SR & N_MASK)
-				m_global_regs[dst_code] = 1;
+				(DST_GLOBAL ? m_global_regs : m_local_regs)[dst_code] = 1;
 			else
-				m_global_regs[dst_code] = 0;
+				(DST_GLOBAL ? m_global_regs : m_local_regs)[dst_code] = 0;
 			break;
 
 		case 7:
 			if (SR & N_MASK)
-				m_global_regs[dst_code] = 0;
+				(DST_GLOBAL ? m_global_regs : m_local_regs)[dst_code] = 0;
 			else
-				m_global_regs[dst_code] = 1;
+				(DST_GLOBAL ? m_global_regs : m_local_regs)[dst_code] = 1;
 			break;
 
 		case 8:
 			if (SR & (C_MASK | Z_MASK))
-				m_global_regs[dst_code] = 1;
+				(DST_GLOBAL ? m_global_regs : m_local_regs)[dst_code] = 1;
 			else
-				m_global_regs[dst_code] = 0;
+				(DST_GLOBAL ? m_global_regs : m_local_regs)[dst_code] = 0;
 			break;
 
 		case 9:
 			if (SR & (C_MASK | Z_MASK))
-				m_global_regs[dst_code] = 0;
+				(DST_GLOBAL ? m_global_regs : m_local_regs)[dst_code] = 0;
 			else
-				m_global_regs[dst_code] = 1;
+				(DST_GLOBAL ? m_global_regs : m_local_regs)[dst_code] = 1;
 			break;
 
 		case 10:
 			if (SR & C_MASK)
-				m_global_regs[dst_code] = 1;
+				(DST_GLOBAL ? m_global_regs : m_local_regs)[dst_code] = 1;
 			else
-				m_global_regs[dst_code] = 0;
+				(DST_GLOBAL ? m_global_regs : m_local_regs)[dst_code] = 0;
 			break;
 
 		case 11:
 			if (SR & C_MASK)
-				m_global_regs[dst_code] = 0;
+				(DST_GLOBAL ? m_global_regs : m_local_regs)[dst_code] = 0;
 			else
-				m_global_regs[dst_code] = 1;
+				(DST_GLOBAL ? m_global_regs : m_local_regs)[dst_code] = 1;
 			break;
 
 		case 12:
 			if (SR & Z_MASK)
-				m_global_regs[dst_code] = 1;
+				(DST_GLOBAL ? m_global_regs : m_local_regs)[dst_code] = 1;
 			else
-				m_global_regs[dst_code] = 0;
+				(DST_GLOBAL ? m_global_regs : m_local_regs)[dst_code] = 0;
 			break;
 
 		case 13:
 			if (SR & Z_MASK)
-				m_global_regs[dst_code] = 0;
+				(DST_GLOBAL ? m_global_regs : m_local_regs)[dst_code] = 0;
 			else
-				m_global_regs[dst_code] = 1;
+				(DST_GLOBAL ? m_global_regs : m_local_regs)[dst_code] = 1;
 			break;
 
 		case 14:
 			if (SR & V_MASK)
-				m_global_regs[dst_code] = 1;
+				(DST_GLOBAL ? m_global_regs : m_local_regs)[dst_code] = 1;
 			else
-				m_global_regs[dst_code] = 0;
+				(DST_GLOBAL ? m_global_regs : m_local_regs)[dst_code] = 0;
 			break;
 
 		case 15:
 			if (SR & V_MASK)
-				m_global_regs[dst_code] = 0;
+				(DST_GLOBAL ? m_global_regs : m_local_regs)[dst_code] = 0;
 			else
-				m_global_regs[dst_code] = 1;
+				(DST_GLOBAL ? m_global_regs : m_local_regs)[dst_code] = 1;
 			break;
 
 		case 18:
-			m_global_regs[dst_code] = ~0;
+			(DST_GLOBAL ? m_global_regs : m_local_regs)[dst_code] = ~0;
 			break;
 
 		case 20:
 			if (SR & (N_MASK | Z_MASK))
-				m_global_regs[dst_code] = ~0;
+				(DST_GLOBAL ? m_global_regs : m_local_regs)[dst_code] = ~0;
 			else
-				m_global_regs[dst_code] = 0;
+				(DST_GLOBAL ? m_global_regs : m_local_regs)[dst_code] = 0;
 			break;
 
 		case 21:
 			if (SR & (N_MASK | Z_MASK))
-				m_global_regs[dst_code] = 0;
+				(DST_GLOBAL ? m_global_regs : m_local_regs)[dst_code] = 0;
 			else
-				m_global_regs[dst_code] = ~0;
+				(DST_GLOBAL ? m_global_regs : m_local_regs)[dst_code] = ~0;
 			break;
 
 		case 22:
 			if (SR & N_MASK)
-				m_global_regs[dst_code] = ~0;
+				(DST_GLOBAL ? m_global_regs : m_local_regs)[dst_code] = ~0;
 			else
-				m_global_regs[dst_code] = 0;
+				(DST_GLOBAL ? m_global_regs : m_local_regs)[dst_code] = 0;
 			break;
 
 		case 23:
 			if (SR & N_MASK)
-				m_global_regs[dst_code] = 0;
+				(DST_GLOBAL ? m_global_regs : m_local_regs)[dst_code] = 0;
 			else
-				m_global_regs[dst_code] = ~0;
+				(DST_GLOBAL ? m_global_regs : m_local_regs)[dst_code] = ~0;
 			break;
 
 		case 24:
 			if (SR & (C_MASK | Z_MASK))
-				m_global_regs[dst_code] = ~0;
+				(DST_GLOBAL ? m_global_regs : m_local_regs)[dst_code] = ~0;
 			else
-				m_global_regs[dst_code] = 0;
+				(DST_GLOBAL ? m_global_regs : m_local_regs)[dst_code] = 0;
 			break;
 
 		case 25:
 			if (SR & (C_MASK | Z_MASK))
-				m_global_regs[dst_code] = 0;
+				(DST_GLOBAL ? m_global_regs : m_local_regs)[dst_code] = 0;
 			else
-				m_global_regs[dst_code] = ~0;
+				(DST_GLOBAL ? m_global_regs : m_local_regs)[dst_code] = ~0;
 			break;
 
 		case 26:
 			if (SR & C_MASK)
-				m_global_regs[dst_code] = ~0;
+				(DST_GLOBAL ? m_global_regs : m_local_regs)[dst_code] = ~0;
 			else
-				m_global_regs[dst_code] = 0;
+				(DST_GLOBAL ? m_global_regs : m_local_regs)[dst_code] = 0;
 			break;
 
 		case 27:
 			if (SR & C_MASK)
-				m_global_regs[dst_code] = 0;
+				(DST_GLOBAL ? m_global_regs : m_local_regs)[dst_code] = 0;
 			else
-				m_global_regs[dst_code] = ~0;
+				(DST_GLOBAL ? m_global_regs : m_local_regs)[dst_code] = ~0;
 			break;
 
 		case 28:
 			if (SR & Z_MASK)
-				m_global_regs[dst_code] = ~0;
+				(DST_GLOBAL ? m_global_regs : m_local_regs)[dst_code] = ~0;
 			else
-				m_global_regs[dst_code] = 0;
+				(DST_GLOBAL ? m_global_regs : m_local_regs)[dst_code] = 0;
 			break;
 
 		case 29:
 			if (SR & Z_MASK)
-				m_global_regs[dst_code] = 0;
+				(DST_GLOBAL ? m_global_regs : m_local_regs)[dst_code] = 0;
 			else
-				m_global_regs[dst_code] = ~0;
+				(DST_GLOBAL ? m_global_regs : m_local_regs)[dst_code] = ~0;
 			break;
 
 		case 30:
 			if (SR & V_MASK)
-				m_global_regs[dst_code] = ~0;
+				(DST_GLOBAL ? m_global_regs : m_local_regs)[dst_code] = ~0;
 			else
-				m_global_regs[dst_code] = 0;
+				(DST_GLOBAL ? m_global_regs : m_local_regs)[dst_code] = 0;
 			break;
 
 		case 31:
 			if (SR & V_MASK)
-				m_global_regs[dst_code] = 0;
+				(DST_GLOBAL ? m_global_regs : m_local_regs)[dst_code] = 0;
 			else
-				m_global_regs[dst_code] = ~0;
+				(DST_GLOBAL ? m_global_regs : m_local_regs)[dst_code] = ~0;
 			break;
 	}
 
 	m_icount -= m_clock_cycles_1;
 }
 
-void hyperstone_device::hyperstone_set_local()
-{
-	check_delay_PC();
-
-	const uint32_t dst_code = (DST_CODE + GET_FP) & 0x3f;
-	const uint32_t n = N_VALUE;
-
-	switch (n)
-	{
-		// SETADR
-		case 0:
-			m_local_regs[dst_code] = (SP & 0xfffffe00) | (GET_FP << 2) | (((SP & 0x100) && (SIGN_BIT(SR) == 0)) ? 1 : 0);
-			break;
-
-		// Reserved
-		case 1:
-		case 16:
-		case 17:
-		case 19:
-			LOG("Used reserved N value (%d) in hyperstone_set. PC = %08X\n", n, PC);
-			break;
-
-		// SETxx
-		case 2:
-			m_local_regs[dst_code] = 1;
-			break;
-
-		case 3:
-			m_local_regs[dst_code] = 0;
-			break;
-
-		case 4:
-			if (SR & (N_MASK | Z_MASK))
-				m_local_regs[dst_code] = 1;
-			else
-				m_local_regs[dst_code] = 0;
-			break;
-
-		case 5:
-			if (SR & (N_MASK | Z_MASK))
-				m_local_regs[dst_code] = 0;
-			else
-				m_local_regs[dst_code] = 1;
-			break;
-
-		case 6:
-			if (SR & N_MASK)
-				m_local_regs[dst_code] = 1;
-			else
-				m_local_regs[dst_code] = 0;
-			break;
-
-		case 7:
-			if (SR & N_MASK)
-				m_local_regs[dst_code] = 0;
-			else
-				m_local_regs[dst_code] = 1;
-			break;
-
-		case 8:
-			if (SR & (C_MASK | Z_MASK))
-				m_local_regs[dst_code] = 1;
-			else
-				m_local_regs[dst_code] = 0;
-			break;
-
-		case 9:
-			if (SR & (C_MASK | Z_MASK))
-				m_local_regs[dst_code] = 0;
-			else
-				m_local_regs[dst_code] = 1;
-			break;
-
-		case 10:
-			if (SR & C_MASK)
-				m_local_regs[dst_code] = 1;
-			else
-				m_local_regs[dst_code] = 0;
-			break;
-
-		case 11:
-			if (SR & C_MASK)
-				m_local_regs[dst_code] = 0;
-			else
-				m_local_regs[dst_code] = 1;
-			break;
-
-		case 12:
-			if (SR & Z_MASK)
-				m_local_regs[dst_code] = 1;
-			else
-				m_local_regs[dst_code] = 0;
-			break;
-
-		case 13:
-			if (SR & Z_MASK)
-				m_local_regs[dst_code] = 0;
-			else
-				m_local_regs[dst_code] = 1;
-			break;
-
-		case 14:
-			if (SR & V_MASK)
-				m_local_regs[dst_code] = 1;
-			else
-				m_local_regs[dst_code] = 0;
-			break;
-
-		case 15:
-			if (SR & V_MASK)
-				m_local_regs[dst_code] = 0;
-			else
-				m_local_regs[dst_code] = 1;
-			break;
-
-		case 18:
-			m_local_regs[dst_code] = ~0;
-			break;
-
-		case 20:
-			if (SR & (N_MASK | Z_MASK))
-				m_local_regs[dst_code] = ~0;
-			else
-				m_local_regs[dst_code] = 0;
-			break;
-
-		case 21:
-			if (SR & (N_MASK | Z_MASK))
-				m_local_regs[dst_code] = 0;
-			else
-				m_local_regs[dst_code] = ~0;
-			break;
-
-		case 22:
-			if (SR & N_MASK)
-				m_local_regs[dst_code] = ~0;
-			else
-				m_local_regs[dst_code] = 0;
-			break;
-
-		case 23:
-			if (SR & N_MASK)
-				m_local_regs[dst_code] = 0;
-			else
-				m_local_regs[dst_code] = ~0;
-			break;
-
-		case 24:
-			if (SR & (C_MASK | Z_MASK))
-				m_local_regs[dst_code] = ~0;
-			else
-				m_local_regs[dst_code] = 0;
-			break;
-
-		case 25:
-			if (SR & (C_MASK | Z_MASK))
-				m_local_regs[dst_code] = 0;
-			else
-				m_local_regs[dst_code] = ~0;
-			break;
-
-		case 26:
-			if (SR & C_MASK)
-				m_local_regs[dst_code] = ~0;
-			else
-				m_local_regs[dst_code] = 0;
-			break;
-
-		case 27:
-			if (SR & C_MASK)
-				m_local_regs[dst_code] = 0;
-			else
-				m_local_regs[dst_code] = ~0;
-			break;
-
-		case 28:
-			if (SR & Z_MASK)
-				m_local_regs[dst_code] = ~0;
-			else
-				m_local_regs[dst_code] = 0;
-			break;
-
-		case 29:
-			if (SR & Z_MASK)
-				m_local_regs[dst_code] = 0;
-			else
-				m_local_regs[dst_code] = ~0;
-			break;
-
-		case 30:
-			if (SR & V_MASK)
-				m_local_regs[dst_code] = ~0;
-			else
-				m_local_regs[dst_code] = 0;
-			break;
-
-		case 31:
-			if (SR & V_MASK)
-				m_local_regs[dst_code] = 0;
-			else
-				m_local_regs[dst_code] = ~0;
-			break;
-	}
-
-	m_icount -= m_clock_cycles_1;
-}
-
-void hyperstone_device::hyperstone_mul_global_global()
-{
-	check_delay_PC();
-
-	const uint32_t src_code = SRC_CODE;
-	const uint32_t dst_code = DST_CODE;
-
-	if (src_code < 2 || dst_code < 2)
-	{
-		LOG("Denoted PC or SR in hyperstone_mul instruction. PC = %08X\n", PC);
-		return;
-	}
-
-	const uint32_t sreg = m_global_regs[src_code];
-	const uint32_t dreg = m_global_regs[dst_code];
-	const uint32_t result = sreg * dreg;
-
-	set_global_register(dst_code, result);
-
-	SR &= ~(Z_MASK | N_MASK);
-	if (result == 0)
-		SR |= Z_MASK;
-	SR |= SIGN_TO_N(result);
-
-	if ((sreg >= 0xffff8000 && sreg <= 0x7fff) && (dreg >= 0xffff8000 && dreg <= 0x7fff))
-		m_icount -= 3 << m_clck_scale;
-	else
-		m_icount -= 5 << m_clck_scale;
-}
-
-void hyperstone_device::hyperstone_mul_global_local()
-{
-	check_delay_PC();
-
-	const uint32_t src_code = (SRC_CODE + GET_FP) & 0x3f;
-	const uint32_t dst_code = DST_CODE;
-
-	if (dst_code < 2)
-	{
-		LOG("Denoted PC or SR in hyperstone_mul instruction. PC = %08X\n", PC);
-		return;
-	}
-
-	const uint32_t sreg = m_local_regs[src_code];
-	const uint32_t dreg = m_global_regs[dst_code];
-	const uint32_t result = sreg * dreg;
-
-	set_global_register(dst_code, result);
-
-	SR &= ~(Z_MASK | N_MASK);
-	if (result == 0)
-		SR |= Z_MASK;
-	SR |= SIGN_TO_N(result);
-
-	if ((sreg >= 0xffff8000 && sreg <= 0x7fff) && (dreg >= 0xffff8000 && dreg <= 0x7fff))
-		m_icount -= 3 << m_clck_scale;
-	else
-		m_icount -= 5 << m_clck_scale;
-}
-
-void hyperstone_device::hyperstone_mul_local_global()
-{
-	check_delay_PC();
-
-	const uint32_t src_code = SRC_CODE;
-	const uint32_t dst_code = (DST_CODE + GET_FP) & 0x3f;
-
-	if (src_code < 2)
-	{
-		LOG("Denoted PC or SR in hyperstone_mul instruction. PC = %08X\n", PC);
-		return;
-	}
-
-	const uint32_t sreg = m_global_regs[src_code];
-	const uint32_t dreg = m_local_regs[dst_code];
-	const uint32_t result = sreg * dreg;
-
-	m_local_regs[dst_code] = result;
-
-	SR &= ~(Z_MASK | N_MASK);
-	if (result == 0)
-		SR |= Z_MASK;
-	SR |= SIGN_TO_N(result);
-
-	if ((sreg >= 0xffff8000 && sreg <= 0x7fff) && (dreg >= 0xffff8000 && dreg <= 0x7fff))
-		m_icount -= 3 << m_clck_scale;
-	else
-		m_icount -= 5 << m_clck_scale;
-}
-
-void hyperstone_device::hyperstone_mul_local_local()
+template <hyperstone_device::reg_bank DST_GLOBAL, hyperstone_device::reg_bank SRC_GLOBAL>
+void hyperstone_device::hyperstone_mul()
 {
 	check_delay_PC();
 
 	const uint32_t fp = GET_FP;
-	const uint32_t dst_code = (DST_CODE + fp) & 0x3f;
-	const uint32_t sreg = m_local_regs[(SRC_CODE + fp) & 0x3f];
-	const uint32_t dreg = m_local_regs[dst_code];
+	const uint32_t src_code = SRC_GLOBAL ? SRC_CODE : ((SRC_CODE + fp) & 0x3f);
+	const uint32_t dst_code = DST_GLOBAL ? DST_CODE : ((DST_CODE + fp) & 0x3f);
+
+	if ((SRC_GLOBAL && src_code < 2) || (DST_GLOBAL && dst_code < 2))
+	{
+		LOG("Denoted PC or SR in hyperstone_mul instruction. PC = %08X\n", PC);
+		return;
+	}
+
+	const uint32_t dreg = (DST_GLOBAL ? m_global_regs : m_local_regs)[dst_code];
+	const uint32_t sreg = (SRC_GLOBAL ? m_global_regs : m_local_regs)[src_code];
 	const uint32_t result = sreg * dreg;
 
-	m_local_regs[dst_code] = result;
+	(DST_GLOBAL ? m_global_regs : m_local_regs)[dst_code] = result;
 
 	SR &= ~(Z_MASK | N_MASK);
 	if (result == 0)
@@ -4448,7 +3966,6 @@ void hyperstone_device::hyperstone_mul_local_local()
 	else
 		m_icount -= 5 << m_clck_scale;
 }
-
 
 void hyperstone_device::hyperstone_extend()
 {
@@ -4585,14 +4102,14 @@ void hyperstone_device::hyperstone_extend()
 
 
 
-void hyperstone_device::hyperstone_ldwr_global_local()
+void hyperstone_device::hyperstone_ldwr_global()
 {
 	check_delay_PC();
 	set_global_register(SRC_CODE, READ_W(m_local_regs[(DST_CODE + GET_FP) & 0x3f]));
 	m_icount -= m_clock_cycles_1;
 }
 
-void hyperstone_device::hyperstone_ldwr_local_local() // ldwr local,local
+void hyperstone_device::hyperstone_ldwr_local() // ldwr local,local
 {
 	check_delay_PC();
 	const uint32_t fp = GET_FP;
@@ -4600,7 +4117,7 @@ void hyperstone_device::hyperstone_ldwr_local_local() // ldwr local,local
 	m_icount -= m_clock_cycles_1;
 }
 
-void hyperstone_device::hyperstone_lddr_global_local()
+void hyperstone_device::hyperstone_lddr_global()
 {
 	check_delay_PC();
 
@@ -4612,7 +4129,7 @@ void hyperstone_device::hyperstone_lddr_global_local()
 	m_icount -= m_clock_cycles_2;
 }
 
-void hyperstone_device::hyperstone_lddr_local_local()
+void hyperstone_device::hyperstone_lddr_local()
 {
 	check_delay_PC();
 
@@ -4626,7 +4143,7 @@ void hyperstone_device::hyperstone_lddr_local_local()
 	m_icount -= m_clock_cycles_2;
 }
 
-void hyperstone_device::hypesrtone_ldwp_global_local()
+void hyperstone_device::hypesrtone_ldwp_global()
 {
 	check_delay_PC();
 
@@ -4637,7 +4154,7 @@ void hyperstone_device::hypesrtone_ldwp_global_local()
 	m_icount -= m_clock_cycles_1;
 }
 
-void hyperstone_device::hypesrtone_ldwp_local_local()
+void hyperstone_device::hypesrtone_ldwp_local()
 {
 	check_delay_PC();
 
@@ -4655,7 +4172,7 @@ void hyperstone_device::hypesrtone_ldwp_local_local()
 	m_icount -= m_clock_cycles_1;
 }
 
-void hyperstone_device::hyperstone_lddp_global_local()
+void hyperstone_device::hyperstone_lddp_global()
 {
 	check_delay_PC();
 
@@ -4671,7 +4188,7 @@ void hyperstone_device::hyperstone_lddp_global_local()
 	m_icount -= m_clock_cycles_2;
 }
 
-void hyperstone_device::hyperstone_lddp_local_local()
+void hyperstone_device::hyperstone_lddp_local()
 {
 	check_delay_PC();
 
@@ -4745,7 +4262,7 @@ void hyperstone_device::hyperstone_stdr_local()
 	m_icount -= m_clock_cycles_2;
 }
 
-void hyperstone_device::hyperstone_stwp_global_local()
+void hyperstone_device::hyperstone_stwp_global()
 {
 	check_delay_PC();
 
@@ -4761,7 +4278,7 @@ void hyperstone_device::hyperstone_stwp_global_local()
 	m_icount -= m_clock_cycles_1;
 }
 
-void hyperstone_device::hyperstone_stwp_local_local()
+void hyperstone_device::hyperstone_stwp_local()
 {
 	check_delay_PC();
 
@@ -4773,7 +4290,7 @@ void hyperstone_device::hyperstone_stwp_local_local()
 	m_icount -= m_clock_cycles_1;
 }
 
-void hyperstone_device::hyperstone_stdp_global_local()
+void hyperstone_device::hyperstone_stdp_global()
 {
 	check_delay_PC();
 
@@ -4791,7 +4308,7 @@ void hyperstone_device::hyperstone_stdp_global_local()
 	m_icount -= m_clock_cycles_2;
 }
 
-void hyperstone_device::hyperstone_stdp_local_local()
+void hyperstone_device::hyperstone_stdp_local()
 {
 	check_delay_PC();
 	const uint32_t fp = GET_FP;

@@ -282,38 +282,30 @@ private:
 	void hyperstone_stxx2_global_local();
 	void hyperstone_stxx2_local_global();
 	void hyperstone_stxx2_local_local();
-	void hyperstone_mulu_global_global();
-	void hyperstone_mulu_global_local();
-	void hyperstone_mulu_local_global();
-	void hyperstone_mulu_local_local();
-	void hyperstone_muls_global_global();
-	void hyperstone_muls_global_local();
-	void hyperstone_muls_local_global();
-	void hyperstone_muls_local_local();
-	void hyperstone_mul_global_global();
-	void hyperstone_mul_global_local();
-	void hyperstone_mul_local_global();
-	void hyperstone_mul_local_local();
-	void hyperstone_set_global();
-	void hyperstone_set_local();
 
-	void hyperstone_ldwr_global_local();
-	void hyperstone_ldwr_local_local();
-	void hyperstone_lddr_global_local();
-	void hyperstone_lddr_local_local();
-	void hypesrtone_ldwp_global_local();
-	void hypesrtone_ldwp_local_local();
-	void hyperstone_lddp_global_local();
-	void hyperstone_lddp_local_local();
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void hyperstone_mulu();
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void hyperstone_muls();
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void hyperstone_mul();
+
+	template <reg_bank DST_GLOBAL> void hyperstone_set();
+
+	void hyperstone_ldwr_global();
+	void hyperstone_ldwr_local();
+	void hyperstone_lddr_global();
+	void hyperstone_lddr_local();
+	void hypesrtone_ldwp_global();
+	void hypesrtone_ldwp_local();
+	void hyperstone_lddp_global();
+	void hyperstone_lddp_local();
 
 	void hyperstone_stwr_global();
 	void hyperstone_stwr_local();
 	void hyperstone_stdr_global();
 	void hyperstone_stdr_local();
-	void hyperstone_stwp_global_local();
-	void hyperstone_stwp_local_local();
-	void hyperstone_stdp_global_local();
-	void hyperstone_stdp_local_local();
+	void hyperstone_stwp_global();
+	void hyperstone_stwp_local();
+	void hyperstone_stdp_global();
+	void hyperstone_stdp_local();
 
 	void hyperstone_dbv();
 	void hyperstone_dbnv();
