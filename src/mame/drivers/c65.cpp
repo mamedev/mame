@@ -96,6 +96,7 @@ private:
 	uint8_t m_VIC2_IRQPend, m_VIC2_IRQMask;
 	/* 0x20: border color (TODO: different thread?) */
 	uint8_t m_VIC2_EXTColor;
+	uint8_t m_VIC2_VS_CB_Base;
 	uint8_t m_VIC2_BK0_Color;
 	/* 0x30: banking + PAL + EXT SYNC */
 	uint8_t m_VIC3_ControlA;
@@ -128,6 +129,8 @@ uint32_t c65_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, 
 	int pixel_width = (m_VIC3_ControlB & 0x80) ? 1 : 2;
 	int columns = 80 / pixel_width;
 
+	uint8_t *cptr = &m_iplrom[((m_VIC3_ControlA & 0x40) ? 0x9000: 0xd000) + ((m_VIC2_VS_CB_Base & 0x2) << 10)];
+
 	// TODO: border area
 	for(int y=cliprect.min_y;y<=cliprect.max_y;y++)
 	{
@@ -144,7 +147,7 @@ uint32_t c65_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, 
 			int background_color = m_VIC2_BK0_Color & 0xf;
 			int highlight_color = 0;
 
-			int enable_dot = ((m_iplrom[(tile<<3)+ym+0xd000] >> xm) & 1);
+			int enable_dot = ((cptr[(tile<<3)+ym] >> xm) & 1);
 
 			if (attr & 0x10)
 			{
@@ -185,6 +188,10 @@ READ8_MEMBER(c65_state::vic4567_dummy_r)
 			return res;
 		case 0x15:
 			return 0xff; // silence log for now
+
+		case 0x18:
+			return m_VIC2_VS_CB_Base;
+
 		case 0x19:
 			return m_VIC2_IRQPend;
 
@@ -212,6 +219,9 @@ WRITE8_MEMBER(c65_state::vic4567_dummy_w)
 {
 	switch(offset)
 	{
+		case 0x18:
+			m_VIC2_VS_CB_Base = data;
+			break;
 		case 0x19:
 			m_VIC2_IRQPend &= ~data;
 			IRQCheck(0);
