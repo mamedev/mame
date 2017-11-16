@@ -15,13 +15,16 @@
  *
  * These devices use a JEDEC-standard pinout allowing them to be fitted to a
  * standard EPROM socket, but have their own command set which is not
- * compatible with the JEDEC-standard set implemented by the intelfsh devices.
+ * compatible with the set implemented by the intelfsh devices. It appears the
+ * command set used here is a variation on the one defined by JEDEC standard
+ * 21-C, as "dual power supply eeprom command set", in figure 3.5.1-11 on page
+ * 23, here: https://www.jedec.org/system/files/docs/3_05_01R14.pdf
  *
  * This implementation has been developed primarily against Intel's datasheet,
  * with some minor adjustments to match details in the AMD equivalent.
  *
  * TODO
- *  - implemnt more variants
+ *  - implement more variants
  *  - testing in systems other than InterPro
  *
  */
@@ -32,7 +35,7 @@
 #define VERBOSE 0
 #include "logmacro.h"
 
-// probably the same manufacturer codes as intelfsh
+// manufacturer codes defined by JEDEC: https://www.jedec.org/system/files/docs/JEP106AV.pdf
 enum manufacturer_codes
 {
 	MFG_AMD   = 0x01,
