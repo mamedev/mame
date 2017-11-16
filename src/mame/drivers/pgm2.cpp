@@ -263,7 +263,10 @@ private:
 	std::unique_ptr<uint32_t[]>     m_spritebufferram; // buffered spriteram
 
 	bitmap_ind16 m_sprite_bitmap;
-
+	
+	void skip_sprite_chunk(int &palette_offset, uint32_t maskdata, int flipy);
+	void draw_sprite_chunk(const rectangle &cliprect, int &palette_offset, int x, int realy, int flipx, int flipy, int sizex, int xdraw, int pal, uint32_t maskdata);
+	void draw_sprite_line(const rectangle &cliprect, int &mask_offset, int &palette_offset, int x, int realy, int flipx, int flipy, int sizex, int pal, int zoomybit);
 	void draw_sprites(screen_device &screen, const rectangle &cliprect, uint32_t* spriteram);
 	void copy_sprites_from_bitmap(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int pri);
 
@@ -336,8 +339,13 @@ static ADDRESS_MAP_START( pgm2_map, AS_PROGRAM, 32, pgm2_state )
 
 	AM_RANGE(0x300a0000, 0x300a07ff) AM_RAM_DEVWRITE("tx_palette", palette_device, write) AM_SHARE("tx_palette") 
 
-	AM_RANGE(0x300c0000, 0x300c01ff) AM_RAM AM_SHARE("sp_zoom") // sprite zoom table?
-	AM_RANGE(0x300e0000, 0x300e03bf) AM_RAM AM_SHARE("lineram") // linescroll - 0x3bf is enough bytes for 240 lines if each rowscroll value was 8 bytes, but each row is 4, so only half of this is used? or tx can do it too (unlikely, as orl2 writes 256 lines of data) maybe just bad mem check bounds on orleg2, it reports pass even if it fails the first byte!
+	AM_RANGE(0x300c0000, 0x300c01ff) AM_RAM AM_SHARE("sp_zoom") // sprite zoom table - it uploads the same data 4x, maybe xshrink,xgrow,yshrink,ygrow or just redundant mirrors
+
+	/* linescroll ram - it clears to 0x3bf on startup which is enough bytes for 240 lines if each rowscroll value was 8 bytes, but each row is 4,
+	so only half of this is used? or tx can do it too (unlikely, as orl2 writes 256 lines of data) maybe just bad mem check bounds on orleg2.
+	It reports pass even if it fails the first byte but if the first byte passes it attempts to test 0x10000 bytes, which is far too big so
+	what is the real size? */
+	AM_RANGE(0x300e0000, 0x300e03ff) AM_RAM AM_SHARE("lineram") AM_MIRROR(0x000fc00)
 
 	AM_RANGE(0x30100000, 0x301000ff) AM_RAM // unknown 
 
@@ -457,7 +465,104 @@ static INPUT_PORTS_START( pgm2 )
 INPUT_PORTS_END
 
 
+inline void pgm2_state::draw_sprite_chunk(const rectangle &cliprect, int &palette_offset, int x, int realy, int flipx, int flipy, int sizex, int xdraw, int pal, uint32_t maskdata)
+{
+	for (int xchunk = 0; xchunk < 32; xchunk++)
+	{
+		int realx, pix;
 
+		if (!flipx)
+		{
+			if (!flipy) realx = x + (xdraw * 32) + xchunk;
+			else realx = ((x + sizex * 32) - 1) - ((xdraw * 32) + xchunk);
+		}
+		else
+		{
+			if (!flipy) realx = ((x + sizex * 32) - 1) - ((xdraw * 32) + xchunk);
+			else realx = x + (xdraw * 32) + xchunk;
+		}
+
+		if (!flipy)
+		{
+			pix = (maskdata >> (31 - xchunk)) & 1;
+		}
+		else
+		{
+			pix = (maskdata >> xchunk) & 1;
+		}
+
+		if (pix)
+		{
+			if (cliprect.contains(realx, realy))
+			{
+				uint16_t pix = m_sprites_colour[palette_offset] & 0x3f; // there are some stray 0xff bytes in some roms, so mask
+
+				uint16_t pendat = pix + (pal * 0x40);
+
+				uint16_t* dstptr_bitmap = &m_sprite_bitmap.pix16(realy);
+				dstptr_bitmap[realx] = pendat;
+			}
+
+
+			if (!flipy)
+			{
+				palette_offset++;
+			}
+			else
+			{
+				palette_offset--;
+			}
+
+			palette_offset &= 0x7ffffff;
+		}
+	}
+}
+
+
+inline void pgm2_state::skip_sprite_chunk(int &palette_offset, uint32_t maskdata, int flipy)
+{
+	int bits = population_count_32(maskdata);
+
+	if (!flipy)
+	{
+		palette_offset+=bits;
+	}
+	else
+	{
+		palette_offset-=bits;
+	}
+
+	palette_offset &= 0x7ffffff;
+
+}
+
+
+
+inline void pgm2_state::draw_sprite_line(const rectangle &cliprect, int &mask_offset, int &palette_offset, int x, int realy, int flipx, int flipy, int sizex, int pal, int zoomybit)
+{
+	for (int xdraw = 0; xdraw < sizex; xdraw++)
+	{
+		uint32_t maskdata = m_sprites_mask[mask_offset + 0] << 24;
+		maskdata |= m_sprites_mask[mask_offset + 1] << 16;
+		maskdata |= m_sprites_mask[mask_offset + 2] << 8;
+		maskdata |= m_sprites_mask[mask_offset + 3] << 0;
+
+		if (flipy)
+		{
+			mask_offset -= 4;
+		}
+		else if (!flipy)
+		{
+			mask_offset += 4;
+		}
+
+
+		mask_offset &= 0x3ffffff;
+
+		if (zoomybit) draw_sprite_chunk(cliprect, palette_offset, x, realy, flipx, flipy, sizex, xdraw, pal, maskdata);
+		else skip_sprite_chunk(palette_offset, maskdata, flipy);
+	}
+}
 
 void pgm2_state::draw_sprites(screen_device &screen, const rectangle &cliprect, uint32_t* spriteram)
 {
@@ -465,7 +570,7 @@ void pgm2_state::draw_sprites(screen_device &screen, const rectangle &cliprect, 
 
 	int endoflist = -1;
 
-//	printf("frame\n");
+	//printf("frame\n");
 
 	for (int i = 0;i < 0x2000 / 4;i++)
 	{
@@ -478,8 +583,6 @@ void pgm2_state::draw_sprites(screen_device &screen, const rectangle &cliprect, 
 
 	if (endoflist != -1)
 	{
-		uint16_t* dstptr_bitmap;
-
 		for (int i = 0; i < endoflist-2; i += 4)
 		{
 			//printf("sprite with %08x %08x %08x %08x\n", spriteram[i + 0], spriteram[i + 1], spriteram[i + 2], spriteram[i + 3]);
@@ -489,15 +592,26 @@ void pgm2_state::draw_sprites(screen_device &screen, const rectangle &cliprect, 
 			int pal =   (spriteram[i + 0] & 0x0fc00000) >> 22;
 			int pri =   (spriteram[i + 0] & 0x80000000) >> 31;
 
+			//int unk0 =  (spriteram[i + 0] & 0x70000000) >> 0;
+
 			int sizex = (spriteram[i + 1] & 0x0000003f) >> 0;
 			int sizey = (spriteram[i + 1] & 0x00007fc0) >> 6;
 			int flipx = (spriteram[i + 1] & 0x00800000) >> 23;
 			int flipy = (spriteram[i + 1] & 0x80000000) >> 31; // more of a 'reverse entire drawing' flag than y-flip, but used for that purpose
 			//int zoomx = (spriteram[i + 1] & 0x001f0000) >> 16;
-			//int zoomy = (spriteram[i + 1] & 0x1f000000) >> 24;
+			//int growx = (spriteram[i + 1] & 0x00200000) >> 21;
+			int zoomy = (spriteram[i + 1] & 0x1f000000) >> 24;
+			int growy = (spriteram[i + 1] & 0x20000000) >> 29;
+			//int unk1 = (spriteram[i + 1] & 0x40408000) >> 0;
+
+			//if (unk0 || unk1)
+			//	printf("unused bits set unk0 %08x unk1 %08x\n", unk0, unk1);
+
 
 			int mask_offset = (spriteram[i + 2]<<1);
 			int palette_offset = (spriteram[i + 3]);
+
+			uint32_t zoomy_bits = m_sp_zoom[zoomy];
 
 			if (x & 0x400) x -=0x800;
 			if (y & 0x400) y -=0x800;
@@ -510,78 +624,35 @@ void pgm2_state::draw_sprites(screen_device &screen, const rectangle &cliprect, 
 
 			pal |= (pri << 6); // encode priority with the palette for manual mixing later
 
-			for (int ydraw = 0; ydraw < sizey;ydraw++)
+			int realy = y;
+
+			int sourceline = 0;
+			for (int ydraw = 0; ydraw < sizey;sourceline++)
 			{
-				int realy = ydraw + y;
+				int zoomy_bit = (zoomy_bits >> (sourceline & 0x1f)) & 1;
 
-				for (int xdraw = 0; xdraw < sizex;xdraw++)
+				// store these for when we need to draw a line twice
+				uint32_t pre_palette_offset = palette_offset;
+				uint32_t pre_mask_offset = mask_offset;
+
+				if (!growy) // skipping lines
 				{
-					uint32_t maskdata = m_sprites_mask[mask_offset+0] << 24;
-					maskdata |= m_sprites_mask[mask_offset+1] << 16;
-					maskdata |= m_sprites_mask[mask_offset+2] << 8;
-					maskdata |= m_sprites_mask[mask_offset+3] << 0;
-				
-					if (flipy)
+					draw_sprite_line(cliprect, mask_offset, palette_offset, x, realy, flipx, flipy, sizex, pal, zoomy_bit);
+					if (zoomy_bit) realy++;
+
+					ydraw++;
+				}
+				else // doubling lines
+				{
+					draw_sprite_line(cliprect, mask_offset, palette_offset, x, realy, flipx, flipy, sizex, pal, 1);
+					realy++;
+
+					if (zoomy_bit)
 					{
-						mask_offset -= 4;
+						palette_offset = pre_palette_offset;
+						mask_offset = pre_mask_offset;
 					}
-					else if (!flipy)
-					{
-						mask_offset += 4;
-					}
-				
-					
-					mask_offset &= 0x3ffffff;
-
-					for (int xchunk = 0;xchunk < 32;xchunk++)
-					{
-						int realx, pix;
-				
-						if (!flipx)
-						{
-							if (!flipy) realx = x + (xdraw * 32) + xchunk;
-							else realx = ((x + sizex * 32) - 1) - ((xdraw * 32) + xchunk);
-						}
-						else
-						{
-							if (!flipy) realx = ((x + sizex * 32) - 1) - ((xdraw * 32) + xchunk);
-							else realx = x + (xdraw * 32) + xchunk;
-						}
-
-						if (!flipy)
-						{
-							pix = (maskdata >> (31 - xchunk)) & 1;
-						}
-						else
-						{
-							pix = (maskdata >> xchunk) & 1;
-						}
-
-						if (pix)
-						{
-							if (cliprect.contains(realx, realy))
-							{
-								uint16_t pix = m_sprites_colour[palette_offset] & 0x3f; // there are some stray 0xff bytes in some roms, so mask
-
-								uint16_t pendat = pix + (pal * 0x40);
-
-								dstptr_bitmap = &m_sprite_bitmap.pix16(realy);
-								dstptr_bitmap[realx] = pendat;
-							}
-						
-
-							if (!flipy)
-							{
-								palette_offset++;
-							}
-							else
-							{
-								palette_offset--;
-							}
-								
-							palette_offset &= 0x7ffffff;
-						}					
-					}
+					else ydraw++;
 				}
 			}
 		}
