@@ -6,10 +6,6 @@ C=65 / C=64DX (c) 1991 Commodore
 
 Attempt at rewriting the driver ...
 
-TODO:
-- I need to subtract border color to -1 in order to get blue color (-> register is 6 and blue color is 5 in palette array).
-  Also top-left logo seems to draw wrong palette for entries 4,5,6,7. CPU core bug?
-
 Note:
 - VIC-4567 will be eventually be added via compile switch, once that I
   get the hang of the system (and checking where the old code fails
@@ -133,9 +129,9 @@ uint32_t c65_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, 
 	int columns = 80 / pixel_width;
 
 	// TODO: border area
-	for(int y=0;y<m_screen->height();y++)
+	for(int y=cliprect.min_y;y<=cliprect.max_y;y++)
 	{
-		for(int x=0;x<m_screen->width();x++)
+		for(int x=cliprect.min_x;x<=cliprect.max_x;x++)
 		{
 			//int, xi,yi,xm,ym,dot_x;
 			int xi = inner_x_char(x / pixel_width);
@@ -164,7 +160,7 @@ uint32_t c65_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, 
 			if (attr & 0x10) enable_dot = 0;
 
 			//if(cliprect.contains(x, y))
-			bitmap.pix16(y, x) = m_palette->pen(highlight_color + (enable_dot) ? foreground_color : background_color);
+			bitmap.pix16(y, x) = m_palette->pen(highlight_color + ((enable_dot) ? foreground_color : background_color));
 
 
 			//gfx->opaque(bitmap,cliprect,tile,0,0,0,x*8,y*8);
@@ -612,7 +608,8 @@ void c65_state::machine_reset()
 
 PALETTE_INIT_MEMBER(c65_state, c65)
 {
-	// TODO: initial state?
+	for (int i = 0; i < 0x100; i++)
+		PalEntryFlush(i);
 }
 
 static const gfx_layout charlayout =
