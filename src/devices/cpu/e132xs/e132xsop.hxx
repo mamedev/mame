@@ -119,24 +119,26 @@ void hyperstone_device::hyperstone_movd()
 	}
 }
 
-void hyperstone_device::hyperstone_divu_global_global()
+template <hyperstone_device::reg_bank DST_GLOBAL, hyperstone_device::reg_bank SRC_GLOBAL>
+void hyperstone_device::hyperstone_divu()
 {
 	check_delay_PC();
 
-	const uint32_t dst_code = DST_CODE;
-	const uint32_t dstf_code = dst_code + 1;
+	const uint32_t fp = GET_FP;
+	const uint32_t dst_code = DST_GLOBAL ? DST_CODE : ((DST_CODE + fp) & 0x3f);
+	const uint32_t dstf_code = DST_GLOBAL ? (dst_code + 1) : ((dst_code + 1) & 0x3f);
+	const uint32_t src_code = SRC_GLOBAL ? SRC_CODE : ((SRC_CODE + fp) & 0x3f);
 
-	const uint32_t src_code = SRC_CODE;
-	const uint32_t sreg = m_global_regs[src_code];
-
-	if (src_code == dst_code || src_code == dstf_code || src_code < 2)
+	if ((SRC_GLOBAL == DST_GLOBAL && (src_code == dst_code || src_code == dstf_code)) || (SRC_GLOBAL && src_code < 2))
 	{
 		LOG("Denoted the same register code or PC/SR as source in hyperstone_divu instruction. PC = %08X\n", PC);
 		m_icount -= 36 << m_clck_scale;
 		return;
 	}
 
-	if (src_code == 0)
+	const uint32_t sreg = (SRC_GLOBAL ? m_global_regs : m_local_regs)[src_code];
+
+	if (sreg == 0)
 	{
 		//Rd//Rdf -> undefined
 		//Z -> undefined
@@ -147,12 +149,22 @@ void hyperstone_device::hyperstone_divu_global_global()
 	}
 	else
 	{
-		const uint64_t dividend = concat_64(m_global_regs[dst_code], m_global_regs[dstf_code]);
+		const uint32_t dreg = (DST_GLOBAL ? m_global_regs : m_local_regs)[dst_code];
+		const uint32_t dregf = (DST_GLOBAL ? m_global_regs : m_local_regs)[dstf_code];
+		const uint64_t dividend = concat_64(dreg, dregf);
 
 		/* TODO: add quotient overflow */
 		uint32_t quotient = dividend / sreg;
-		set_global_register(dst_code, dividend % sreg);
-		set_global_register(dst_code + 1, quotient);
+		if (DST_GLOBAL)
+		{
+			set_global_register(dst_code, dividend % sreg);
+			set_global_register(dst_code + 1, quotient);
+		}
+		else
+		{
+			m_local_regs[dst_code] = dividend % sreg;
+			m_local_regs[dstf_code] = quotient;
+		}
 
 		SR &= ~(V_MASK | Z_MASK | N_MASK);
 		if (quotient == 0)
@@ -163,143 +175,27 @@ void hyperstone_device::hyperstone_divu_global_global()
 	m_icount -= 36 << m_clck_scale;
 }
 
-void hyperstone_device::hyperstone_divu_global_local()
-{
-	check_delay_PC();
-
-	const uint32_t dst_code = DST_CODE;
-	const uint32_t dstf_code = dst_code + 1;
-	const uint32_t sreg = m_local_regs[(SRC_CODE + GET_FP) & 0x3f];
-
-	if (sreg == 0)
-	{
-		//Rd//Rdf -> undefined
-		//Z -> undefined
-		//N -> undefined
-		SR |= V_MASK;
-		execute_exception(get_trap_addr(TRAPNO_RANGE_ERROR));
-	}
-	else
-	{
-		const uint64_t dividend = concat_64(m_global_regs[dst_code], m_global_regs[dstf_code]);
-
-		/* TODO: add quotient overflow */
-		uint32_t quotient = dividend / sreg;
-		set_global_register(dst_code, dividend % sreg);
-		set_global_register(dstf_code, quotient);
-
-		SR &= ~(V_MASK | Z_MASK | N_MASK);
-		if (quotient == 0)
-			SR |= Z_MASK;
-		SR |= SIGN_TO_N(quotient);
-	}
-
-	m_icount -= 36 << m_clck_scale;
-}
-
-void hyperstone_device::hyperstone_divu_local_global()
-{
-	check_delay_PC();
-
-	const uint32_t src_code = SRC_CODE;
-	const uint32_t sreg = m_global_regs[src_code];
-
-	const uint32_t dst_code = (DST_CODE + GET_FP) & 0x3f;
-	const uint32_t dstf_code = (dst_code + 1) & 0x3f;
-
-	if (src_code < 2)
-	{
-		LOG("Denoted the same register code or PC/SR as source in hyperstone_divu instruction. PC = %08X\n", PC);
-		m_icount -= 36 << m_clck_scale;
-		return;
-	}
-
-	if (sreg == 0)
-	{
-		//Rd//Rdf -> undefined
-		//Z -> undefined
-		//N -> undefined
-		SR |= V_MASK;
-		execute_exception(get_trap_addr(TRAPNO_RANGE_ERROR));
-	}
-	else
-	{
-		const uint64_t dividend = concat_64(m_local_regs[dst_code], m_local_regs[dstf_code]);
-
-		/* TODO: add quotient overflow */
-		uint32_t quotient = dividend / sreg;
-		m_local_regs[dst_code] = dividend % sreg;
-		m_local_regs[dstf_code] = quotient;
-
-		SR &= ~(V_MASK | Z_MASK | N_MASK);
-		if (quotient == 0)
-			SR |= Z_MASK;
-		SR |= SIGN_TO_N(quotient);
-	}
-
-	m_icount -= 36 << m_clck_scale;
-}
-
-void hyperstone_device::hyperstone_divu_local_local()
+template <hyperstone_device::reg_bank DST_GLOBAL, hyperstone_device::reg_bank SRC_GLOBAL>
+void hyperstone_device::hyperstone_divs()
 {
 	check_delay_PC();
 
 	const uint32_t fp = GET_FP;
-	const uint32_t src_code = (SRC_CODE + fp) & 0x3f;
-	const uint32_t d_code = DST_CODE + fp;
-	const uint32_t dst_code = d_code & 0x3f;
-	const uint32_t dstf_code = (d_code + 1) & 0x3f;
+	const uint32_t dst_code = DST_GLOBAL ? DST_CODE : ((DST_CODE + fp) & 0x3f);
+	const uint32_t dstf_code = DST_GLOBAL ? (dst_code + 1) : ((dst_code + 1) & 0x3f);
+	const uint32_t src_code = SRC_GLOBAL ? SRC_CODE : ((SRC_CODE + fp) & 0x3f);
 
-	if (src_code == dst_code || src_code == dstf_code)
-	{
-		m_icount -= 36 << m_clck_scale;
-		return;
-	}
-
-	const uint32_t sreg = m_local_regs[src_code];
-	const uint64_t dividend = concat_64(m_local_regs[dst_code], m_local_regs[dstf_code]);
-
-	if (sreg == 0)
-	{
-		//Rd//Rdf -> undefined
-		//Z -> undefined
-		//N -> undefined
-		SR |= V_MASK;
-		execute_exception(get_trap_addr(TRAPNO_RANGE_ERROR));
-	}
-	else
-	{
-		/* TODO: add quotient overflow */
-		const uint32_t quotient = dividend / sreg;
-		m_local_regs[dst_code] = dividend % sreg;
-		m_local_regs[dstf_code] = quotient;
-
-		SR &= ~(V_MASK | Z_MASK | N_MASK);
-		if (quotient == 0)
-			SR |= Z_MASK;
-		SR |= SIGN_TO_N(quotient);
-	}
-
-	m_icount -= 36 << m_clck_scale;
-}
-
-void hyperstone_device::hyperstone_divs_global_global()
-{
-	check_delay_PC();
-
-	const uint32_t src_code = SRC_CODE;
-	const uint32_t dst_code = DST_CODE;
-	const uint32_t dstf_code = dst_code + 1;
-	const int32_t sreg = (int32_t)m_global_regs[src_code];
-
-	if(src_code == dst_code || src_code == dstf_code || src_code < 2)
+	if ((SRC_GLOBAL == DST_GLOBAL && (src_code == dst_code || src_code == dstf_code)) || (SRC_GLOBAL && src_code < 2))
 	{
 		LOG("Denoted invalid register code in hyperstone_divs instruction. PC = %08X\n", PC);
 		m_icount -= 36 << m_clck_scale;
 		return;
 	}
 
-	const int64_t dividend = (int64_t) concat_64(m_global_regs[dst_code], m_global_regs[dstf_code]);
+	const int32_t sreg = (int32_t)(SRC_GLOBAL ? m_global_regs : m_local_regs)[src_code];
+	const uint32_t dreg = (DST_GLOBAL ? m_global_regs : m_local_regs)[dst_code];
+	const uint32_t dregf = (DST_GLOBAL ? m_global_regs : m_local_regs)[dstf_code];
+	const int64_t dividend = (int64_t) concat_64(dreg, dregf);
 
 	if (sreg == 0 || (dividend & 0x8000000000000000U))
 	{
@@ -313,8 +209,16 @@ void hyperstone_device::hyperstone_divs_global_global()
 	{
 		/* TODO: add quotient overflow */
 		const int32_t quotient = dividend / sreg;
-		set_global_register(dst_code, dividend % sreg);
-		set_global_register(dst_code + 1, quotient);
+		if (DST_GLOBAL)
+		{
+			set_global_register(dst_code, dividend % sreg);
+			set_global_register(dst_code + 1, quotient);
+		}
+		else
+		{
+			m_local_regs[dst_code] = dividend % sreg;
+			m_local_regs[dstf_code] = quotient;
+		}
 
 		SR &= ~(V_MASK | Z_MASK | N_MASK);
 		if (quotient == 0)
@@ -324,127 +228,6 @@ void hyperstone_device::hyperstone_divs_global_global()
 
 	m_icount -= 36 << m_clck_scale;
 }
-
-void hyperstone_device::hyperstone_divs_global_local()
-{
-	check_delay_PC();
-
-	const uint32_t dst_code = DST_CODE;
-	const int32_t sreg = (int32_t)m_local_regs[(SRC_CODE + GET_FP) & 0x3f];
-	const int64_t dividend = (int64_t) concat_64(m_global_regs[dst_code], m_global_regs[dst_code + 1]);
-
-	if (sreg == 0 || (dividend & 0x8000000000000000U))
-	{
-		//Rd//Rdf -> undefined
-		//Z -> undefined
-		//N -> undefined
-		SR |= V_MASK;
-		execute_exception(get_trap_addr(TRAPNO_RANGE_ERROR));
-	}
-	else
-	{
-		/* TODO: add quotient overflow */
-		const int32_t quotient = dividend / sreg;
-		set_global_register(dst_code, dividend % sreg);
-		set_global_register(dst_code + 1, quotient);
-
-		SR &= ~(V_MASK | Z_MASK | N_MASK);
-		if (quotient == 0)
-			SR |= Z_MASK;
-		SR |= SIGN_TO_N(quotient);
-	}
-
-	m_icount -= 36 << m_clck_scale;
-}
-
-void hyperstone_device::hyperstone_divs_local_global()
-{
-	check_delay_PC();
-
-	const uint32_t fp = GET_FP;
-	const uint32_t dst_code = (DST_CODE + fp) & 0x3f;
-	const uint32_t dstf_code = (dst_code + 1) & 0x3f;
-	const uint32_t src_code = SRC_CODE;
-	const int32_t sreg = (int32_t)m_global_regs[src_code];
-
-	if (src_code < 2)
-	{
-		LOG("Denoted PC or SR as source register in hyperstone_divs instruction. PC = %08X\n", PC);
-		m_icount -= 36 << m_clck_scale;
-		return;
-	}
-
-	const int64_t dividend = (int64_t) concat_64(m_local_regs[dst_code], m_local_regs[dstf_code]);
-
-	if (sreg == 0 || (dividend & 0x8000000000000000U))
-	{
-		//Rd//Rdf -> undefined
-		//Z -> undefined
-		//N -> undefined
-		SR |= V_MASK;
-		execute_exception(get_trap_addr(TRAPNO_RANGE_ERROR));
-	}
-	else
-	{
-		/* TODO: add quotient overflow */
-		const int32_t quotient = dividend / sreg;
-		m_local_regs[dst_code] = (int32_t)(dividend % sreg);
-		m_local_regs[dstf_code] = quotient;
-
-		SR &= ~(V_MASK | Z_MASK | N_MASK);
-
-		if (quotient == 0)
-			SR |= Z_MASK;
-		SR |= SIGN_TO_N(quotient);
-	}
-
-	m_icount -= 36 << m_clck_scale;
-}
-
-void hyperstone_device::hyperstone_divs_local_local()
-{
-	check_delay_PC();
-
-	const uint32_t fp = GET_FP;
-	const uint32_t src_code = (SRC_CODE + fp) & 0x3f;
-	const uint32_t d_code = DST_CODE;
-	const uint32_t dst_code = (d_code + fp) & 0x3f;
-	const uint32_t dstf_code = (d_code + 1 + fp) & 0x3f;
-
-	if (src_code == dst_code || src_code == dstf_code)
-	{
-		m_icount -= 36 << m_clck_scale;
-		return;
-	}
-
-	const int32_t sreg = (int32_t)m_local_regs[src_code];
-	const int64_t dividend = (int64_t) concat_64(m_local_regs[dst_code], m_local_regs[dstf_code]);
-
-	if (sreg == 0 || (dividend & 0x8000000000000000U))
-	{
-		//Rd//Rdf -> undefined
-		//Z -> undefined
-		//N -> undefined
-		SR |= V_MASK;
-		execute_exception(get_trap_addr(TRAPNO_RANGE_ERROR));
-	}
-	else
-	{
-		/* TODO: add quotient overflow */
-		const int32_t quotient = dividend / sreg;
-		m_local_regs[dst_code] = dividend % sreg;
-		m_local_regs[dstf_code] = quotient;
-
-		SR &= ~(V_MASK | Z_MASK | N_MASK);
-		if (quotient == 0)
-			SR |= Z_MASK;
-		SR |= SIGN_TO_N(quotient);
-	}
-
-	m_icount -= 36 << m_clck_scale;
-}
-
-
 
 template <hyperstone_device::reg_bank DST_GLOBAL, hyperstone_device::reg_bank SRC_GLOBAL>
 void hyperstone_device::hyperstone_xm()
