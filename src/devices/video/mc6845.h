@@ -256,6 +256,7 @@ protected:
 
 	void update_upd_adr_timer();
 	void call_on_update_address(int strobe);
+	void transparent_update();
 	void recompute_parameters(bool postload);
 	void update_counters();
 	void set_de(int state);
