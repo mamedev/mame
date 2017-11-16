@@ -103,7 +103,6 @@ class amusco_state : public driver_device
 public:
 	amusco_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_pit(*this, "pit8253"),
@@ -132,7 +131,7 @@ protected:
 	virtual void video_start() override;
 	virtual void machine_start() override;	
 private:
-	required_shared_ptr<uint8_t> m_videoram;
+	uint8_t *m_videoram;
 	tilemap_t *m_bg_tilemap;
 
 	required_device<cpu_device> m_maincpu;
@@ -146,6 +145,7 @@ private:
 	uint8_t m_mc6845_address;
 	uint16_t m_video_update_address;
 	bool m_blink_state;
+	static constexpr uint32_t videoram_size = 0x10000;
 };
 
 
@@ -179,6 +179,10 @@ void amusco_state::video_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(amusco_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 10, 74, 24);
 	m_blink_state = false;
+	
+	m_videoram = auto_alloc_array_clear(machine(), uint8_t, videoram_size);
+	
+	save_pointer(NAME(m_videoram), videoram_size);
 }
 
 void amusco_state::machine_start()
@@ -192,7 +196,6 @@ void amusco_state::machine_start()
 
 static ADDRESS_MAP_START( amusco_mem_map, AS_PROGRAM, 8, amusco_state )
 	AM_RANGE(0x00000, 0x0ffff) AM_RAM
-	AM_RANGE(0xec000, 0xecfff) AM_RAM AM_SHARE("videoram")  // placeholder
 	AM_RANGE(0xf8000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
