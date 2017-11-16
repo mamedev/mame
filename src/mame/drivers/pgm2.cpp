@@ -512,16 +512,14 @@ inline void pgm2_state::draw_sprite_chunk(const rectangle &cliprect, int &palett
 		{
 			if (pix)
 			{
-				if (xzoombit)
-				{
-					draw_sprite_pixel(cliprect, palette_offset, x + realxdraw, realy, pal);
-					palette_offset++;
-					palette_offset &= 0x7ffffff;
-				}
-
+				if (xzoombit) draw_sprite_pixel(cliprect, palette_offset, x + realxdraw, realy, pal);
+			
+				palette_offset++;
+				palette_offset &= 0x7ffffff;
 			}
 
-			if (xzoombit) realxdraw++;
+			if (xzoombit)
+				realxdraw++;
 		}
 	}
 }
