@@ -263,10 +263,7 @@ private:
 	void hyperstone_shli_local();
 	void hyperstone_testlz();
 	void hyperstone_rol();
-	void hyperstone_ldxx1_global_global();
-	void hyperstone_ldxx1_global_local();
-	void hyperstone_ldxx1_local_global();
-	void hyperstone_ldxx1_local_local();
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void hyperstone_ldxx1();
 	void hyperstone_ldxx2_global_global();
 	void hyperstone_ldxx2_global_local();
 	void hyperstone_ldxx2_local_global();

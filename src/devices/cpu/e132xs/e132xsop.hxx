@@ -1801,375 +1801,8 @@ void hyperstone_device::hyperstone_rol()
 	m_icount -= m_clock_cycles_1;
 }
 
-
-
-void hyperstone_device::hyperstone_ldxx1_global_global()
-{
-	uint16_t next_1 = READ_OP(PC);
-	PC += 2;
-
-	const uint16_t sub_type = (next_1 & 0x3000) >> 12;
-
-	uint32_t extra_s;
-	if (next_1 & 0x8000)
-	{
-		const uint16_t next_2 = READ_OP(PC);
-		PC += 2;
-		m_instruction_length = (3<<19);
-
-		extra_s = next_2;
-		extra_s |= ((next_1 & 0xfff) << 16);
-
-		if (next_1 & 0x4000)
-			extra_s |= 0xf0000000;
-	}
-	else
-	{
-		m_instruction_length = (2<<19);
-		extra_s = next_1 & 0xfff;
-
-		if (next_1 & 0x4000)
-			extra_s |= 0xfffff000;
-	}
-
-	check_delay_PC();
-
-	const uint32_t src_code = SRC_CODE;
-	const uint32_t dst_code = DST_CODE;
-	const uint32_t srcf_code = src_code + 1;
-
-	if (dst_code == SR_REGISTER)
-	{
-		switch (sub_type)
-		{
-			case 0: // LDBS.A
-				m_global_regs[src_code] = (int32_t)(int8_t)READ_B(extra_s);
-				break;
-
-			case 1: // LDBU.A
-				m_global_regs[src_code] = READ_B(extra_s);
-				break;
-
-			case 2:
-				if (extra_s & 1) // LDHS.A
-					m_global_regs[src_code] = (int32_t)(int16_t)READ_HW(extra_s);
-				else // LDHU.A
-					m_global_regs[src_code] = READ_HW(extra_s);
-				break;
-
-			case 3:
-				switch (extra_s & 3)
-				{
-					case 0: // LDW.A
-						m_global_regs[src_code] = READ_W(extra_s);
-						break;
-					case 1: // LDD.A
-						m_global_regs[src_code] = READ_W(extra_s);
-						m_global_regs[srcf_code] = READ_W(extra_s + 4);
-						m_icount -= m_clock_cycles_1; // extra cycle
-						break;
-					case 2: // LDW.IOA
-						m_global_regs[src_code] = IO_READ_W(extra_s);
-						break;
-					case 3: // LDD.IOA
-						m_global_regs[src_code] = IO_READ_W(extra_s);
-						m_global_regs[srcf_code] = IO_READ_W((extra_s & ~3) + 4);
-						m_icount -= m_clock_cycles_1; // extra cycle
-						break;
-				}
-				break;
-		}
-	}
-	else
-	{
-		const uint32_t dreg = m_global_regs[dst_code];
-		switch (sub_type)
-		{
-			case 0: // LDBS.D
-				m_global_regs[src_code] = (int32_t)(int8_t)READ_B(dreg + extra_s);
-				break;
-
-			case 1: // LDBU.D
-				m_global_regs[src_code] = READ_B(dreg + extra_s);
-				break;
-
-			case 2:
-				if (extra_s & 1)
-					m_global_regs[src_code] = (int32_t)(int16_t)READ_HW(dreg + (extra_s & ~1));
-				else
-					m_global_regs[src_code] = READ_HW(dreg + (extra_s & ~1));
-				break;
-
-			case 3:
-				switch (extra_s & 3)
-				{
-					case 0: // LDW.D
-						m_global_regs[src_code] = READ_W(dreg + (extra_s & ~1));
-						break;
-					case 1: // LDD.D
-						m_global_regs[src_code] = READ_W(dreg + (extra_s & ~1));
-						m_global_regs[srcf_code] = READ_W(dreg + (extra_s & ~1) + 4);
-						m_icount -= m_clock_cycles_1; // extra cycle
-						break;
-					case 2: // LDW.IOD
-						m_global_regs[src_code] = IO_READ_W(dreg + (extra_s & ~3));
-						break;
-					case 3: // LDD.IOD
-						m_global_regs[src_code] = IO_READ_W(dreg + (extra_s & ~3));
-						m_global_regs[srcf_code] = IO_READ_W(dreg + (extra_s & ~3) + 4);
-						m_icount -= m_clock_cycles_1; // extra cycle
-						break;
-				}
-				break;
-		}
-	}
-
-	m_icount -= m_clock_cycles_1;
-}
-
-void hyperstone_device::hyperstone_ldxx1_global_local()
-{
-	uint16_t next_1 = READ_OP(PC);
-	PC += 2;
-
-	const uint16_t sub_type = (next_1 & 0x3000) >> 12;
-
-	uint32_t extra_s;
-	if (next_1 & 0x8000)
-	{
-		const uint16_t next_2 = READ_OP(PC);
-		PC += 2;
-		m_instruction_length = (3<<19);
-
-		extra_s = next_2;
-		extra_s |= ((next_1 & 0xfff) << 16);
-
-		if (next_1 & 0x4000)
-			extra_s |= 0xf0000000;
-	}
-	else
-	{
-		m_instruction_length = (2<<19);
-		extra_s = next_1 & 0xfff;
-
-		if (next_1 & 0x4000)
-			extra_s |= 0xfffff000;
-	}
-
-	check_delay_PC();
-
-	const uint32_t src_code = (SRC_CODE + GET_FP) & 0x3f;
-
-	if (DST_CODE == SR_REGISTER)
-	{
-		switch (sub_type)
-		{
-			case 0: // LDBS.A
-				m_local_regs[src_code] = (int32_t)(int8_t)READ_B(extra_s);
-				break;
-
-			case 1: // LDBU.A
-				m_local_regs[src_code] = READ_B(extra_s);
-				break;
-
-			case 2:
-				if (extra_s & 1) // LDHS.A
-					m_local_regs[src_code] = (int32_t)(int16_t)READ_HW(extra_s);
-				else // LDHU.A
-					m_local_regs[src_code] = READ_HW(extra_s);
-				break;
-
-			case 3:
-				switch (extra_s & 3)
-				{
-					case 0: // LDW.A
-						m_local_regs[src_code] = READ_W(extra_s);
-						break;
-					case 1: // LDD.A
-						m_local_regs[src_code] = READ_W(extra_s);
-						m_local_regs[(src_code + 1) & 0x3f] = READ_W(extra_s + 4);
-						m_icount -= m_clock_cycles_1; // extra cycle
-						break;
-					case 2: // LDW.IOA
-						m_local_regs[src_code] = IO_READ_W(extra_s);
-						break;
-					case 3: // LDD.IOA
-						m_local_regs[src_code] = IO_READ_W(extra_s);
-						m_local_regs[(src_code + 1) & 0x3f] = IO_READ_W((extra_s & ~3) + 4);
-						m_icount -= m_clock_cycles_1; // extra cycle
-						break;
-				}
-				break;
-		}
-	}
-	else
-	{
-		const uint32_t dreg = m_global_regs[DST_CODE];
-		switch (sub_type)
-		{
-			case 0: // LDBS.D
-				m_local_regs[src_code] = (int32_t)(int8_t)READ_B(dreg + extra_s);
-				break;
-
-			case 1: // LDBU.D
-				m_local_regs[src_code] = READ_B(dreg + extra_s);
-				break;
-
-			case 2:
-				if (extra_s & 1)
-					m_local_regs[src_code] = (int32_t)(int16_t)READ_HW(dreg + (extra_s & ~1));
-				else
-					m_local_regs[src_code] = READ_HW(dreg + (extra_s & ~1));
-				break;
-
-			case 3:
-				switch (extra_s & 3)
-				{
-					case 0: // LDW.D
-						m_local_regs[src_code] = READ_W(dreg + (extra_s & ~1));
-						break;
-					case 1: // LDD.D
-						m_local_regs[src_code] = READ_W(dreg + (extra_s & ~1));
-						m_local_regs[(src_code + 1) & 0x3f] = READ_W(dreg + (extra_s & ~1) + 4);
-						m_icount -= m_clock_cycles_1; // extra cycle
-						break;
-					case 2: // LDW.IOD
-						m_local_regs[src_code] = IO_READ_W(dreg + (extra_s & ~3));
-						break;
-					case 3: // LDD.IOD
-						m_local_regs[src_code] = IO_READ_W(dreg + (extra_s & ~3));
-						m_local_regs[(src_code + 1) & 0x3f] = IO_READ_W(dreg + (extra_s & ~3) + 4);
-						m_icount -= m_clock_cycles_1; // extra cycle
-						break;
-				}
-				break;
-		}
-	}
-
-	m_icount -= m_clock_cycles_1;
-}
-
-void hyperstone_device::hyperstone_ldxx1_local_global()
-{
-	uint16_t next_1 = READ_OP(PC);
-	PC += 2;
-
-	const uint16_t sub_type = (next_1 & 0x3000) >> 12;
-
-	uint32_t extra_s;
-	if (next_1 & 0x8000)
-	{
-		const uint16_t next_2 = READ_OP(PC);
-		PC += 2;
-		m_instruction_length = (3<<19);
-
-		extra_s = next_2;
-		extra_s |= ((next_1 & 0xfff) << 16);
-
-		if (next_1 & 0x4000)
-			extra_s |= 0xf0000000;
-	}
-	else
-	{
-		m_instruction_length = (2<<19);
-		extra_s = next_1 & 0xfff;
-
-		if (next_1 & 0x4000)
-			extra_s |= 0xfffff000;
-	}
-
-	check_delay_PC();
-
-	if (DST_CODE == SR_REGISTER)
-	{
-		switch (sub_type)
-		{
-			case 0: // LDBS.A
-				set_global_register(SRC_CODE, (int32_t)(int8_t)READ_B(extra_s));
-				break;
-
-			case 1: // LDBU.A
-				set_global_register(SRC_CODE, READ_B(extra_s));
-				break;
-
-			case 2:
-				if (extra_s & 1) // LDHS.A
-					set_global_register(SRC_CODE, (int32_t)(int16_t)READ_HW(extra_s));
-				else // LDHU.A
-					set_global_register(SRC_CODE, READ_HW(extra_s));
-				break;
-
-			case 3:
-				switch (extra_s & 3)
-				{
-					case 0: // LDW.A
-						set_global_register(SRC_CODE, READ_W(extra_s));
-						break;
-					case 1: // LDD.A
-						set_global_register(SRC_CODE, READ_W(extra_s));
-						set_global_register(SRC_CODE + 1, READ_W(extra_s + 4));
-						m_icount -= m_clock_cycles_1; // extra cycle
-						break;
-					case 2: // LDW.IOA
-						set_global_register(SRC_CODE, IO_READ_W(extra_s));
-						break;
-					case 3: // LDD.IOA
-						set_global_register(SRC_CODE, IO_READ_W(extra_s));
-						set_global_register(SRC_CODE + 1, IO_READ_W((extra_s & ~3) + 4));
-						m_icount -= m_clock_cycles_1; // extra cycle
-						break;
-				}
-				break;
-		}
-	}
-	else
-	{
-		const uint32_t dreg = m_local_regs[(DST_CODE + GET_FP) & 0x3f];
-		switch (sub_type)
-		{
-			case 0: // LDBS.D
-				set_global_register(SRC_CODE, (int32_t)(int8_t)READ_B(dreg + extra_s));
-				break;
-
-			case 1: // LDBU.D
-				set_global_register(SRC_CODE, READ_B(dreg + extra_s));
-				break;
-
-			case 2:
-				if (extra_s & 1)
-					set_global_register(SRC_CODE, (int32_t)(int16_t)READ_HW(dreg + (extra_s & ~1)));
-				else
-					set_global_register(SRC_CODE, READ_HW(dreg + (extra_s & ~1)));
-				break;
-
-			case 3:
-				switch (extra_s & 3)
-				{
-					case 0: // LDW.D
-						set_global_register(SRC_CODE, READ_W(dreg + (extra_s & ~1)));
-						break;
-					case 1: // LDD.D
-						set_global_register(SRC_CODE, READ_W(dreg + (extra_s & ~1)));
-						set_global_register(SRC_CODE + 1, READ_W(dreg + (extra_s & ~1) + 4));
-						m_icount -= m_clock_cycles_1; // extra cycle
-						break;
-					case 2: // LDW.IOD
-						set_global_register(SRC_CODE, IO_READ_W(dreg + (extra_s & ~3)));
-						break;
-					case 3: // LDD.IOD
-						set_global_register(SRC_CODE, IO_READ_W(dreg + (extra_s & ~3)));
-						set_global_register(SRC_CODE + 1, IO_READ_W(dreg + (extra_s & ~3) + 4));
-						m_icount -= m_clock_cycles_1; // extra cycle
-						break;
-				}
-				break;
-		}
-	}
-
-	m_icount -= m_clock_cycles_1;
-}
-
-void hyperstone_device::hyperstone_ldxx1_local_local()
+template <hyperstone_device::reg_bank DST_GLOBAL, hyperstone_device::reg_bank SRC_GLOBAL>
+void hyperstone_device::hyperstone_ldxx1()
 {
 	uint16_t next_1 = READ_OP(PC);
 	PC += 2;
@@ -2201,48 +1834,170 @@ void hyperstone_device::hyperstone_ldxx1_local_local()
 	check_delay_PC();
 
 	const uint32_t fp = GET_FP;
-	const uint32_t src_code = (SRC_CODE + fp) & 0x3f;
-	const uint32_t dst_code = (DST_CODE + fp) & 0x3f;
-	const uint32_t dreg = m_local_regs[dst_code];
+	const uint32_t src_code = SRC_GLOBAL ? SRC_CODE : ((SRC_CODE + fp) & 0x3f);
+	const uint32_t srcf_code = SRC_GLOBAL ? (src_code + 1) : ((src_code + 1) & 0x3f);
+	const uint32_t dst_code = DST_GLOBAL ? DST_CODE : ((DST_CODE + fp) & 0x3f);
 
-	switch (sub_type)
+	if (DST_GLOBAL && dst_code == SR_REGISTER)
 	{
-		case 0: // LDBS.D
-			m_local_regs[src_code] = (int32_t)(int8_t)READ_B(dreg + extra_s);
-			break;
+		switch (sub_type)
+		{
+			case 0: // LDBS.A
+				if (SRC_GLOBAL)
+					set_global_register(src_code, (int32_t)(int8_t)READ_B(extra_s));
+				else
+					m_local_regs[src_code] = (int32_t)(int8_t)READ_B(extra_s);
+				break;
 
-		case 1: // LDBU.D
-			m_local_regs[src_code] = READ_B(dreg + extra_s);
-			break;
+			case 1: // LDBU.A
+				if (SRC_GLOBAL)
+					m_global_regs[src_code] = READ_B(extra_s);
+				else
+					m_local_regs[src_code] = READ_B(extra_s);
+				break;
 
-		case 2:
-			if (extra_s & 1)
-				m_local_regs[src_code] = (int32_t)(int16_t)READ_HW(dreg + (extra_s & ~1));
-			else
-				m_local_regs[src_code] = READ_HW(dreg + (extra_s & ~1));
-			break;
+			case 2:
+				if (SRC_GLOBAL)
+				{
+					if (extra_s & 1) // LDHS.A
+						set_global_register(src_code, (int32_t)(int16_t)READ_HW(extra_s));
+					else // LDHU.A
+						set_global_register(src_code, READ_HW(extra_s));
+				}
+				else
+				{
+					if (extra_s & 1) // LDHS.A
+						m_local_regs[src_code] = (int32_t)(int16_t)READ_HW(extra_s);
+					else // LDHU.A
+						m_local_regs[src_code] = READ_HW(extra_s);
+				}
+				break;
 
-		case 3:
-			switch (extra_s & 3)
-			{
-				case 0: // LDW.D
-					m_local_regs[src_code] = READ_W(dreg + (extra_s & ~1));
-					break;
-				case 1: // LDD.D
-					m_local_regs[src_code] = READ_W(dreg + (extra_s & ~1));
-					m_local_regs[(src_code + 1) & 0x3f] = READ_W(dreg + (extra_s & ~1) + 4);
-					m_icount -= m_clock_cycles_1; // extra cycle
-					break;
-				case 2: // LDW.IOD
-					m_local_regs[src_code] = IO_READ_W(dreg + (extra_s & ~3));
-					break;
-				case 3: // LDD.IOD
-					m_local_regs[src_code] = IO_READ_W(dreg + (extra_s & ~3));
-					m_local_regs[(src_code + 1) & 0x3f] = IO_READ_W(dreg + (extra_s & ~3) + 4);
-					m_icount -= m_clock_cycles_1; // extra cycle
-					break;
-			}
-			break;
+			case 3:
+				switch (extra_s & 3)
+				{
+					case 0: // LDW.A
+						if (SRC_GLOBAL)
+							set_global_register(src_code, READ_W(extra_s));
+						else
+							m_local_regs[src_code] = READ_W(extra_s);
+						break;
+					case 1: // LDD.A
+						if (SRC_GLOBAL)
+						{
+							set_global_register(src_code, READ_W(extra_s));
+							set_global_register(srcf_code, READ_W(extra_s + 4));
+						}
+						else
+						{
+							m_local_regs[src_code] = READ_W(extra_s);
+							m_local_regs[srcf_code] = READ_W(extra_s + 4);
+						}
+						m_icount -= m_clock_cycles_1; // extra cycle
+						break;
+					case 2: // LDW.IOA
+						if (SRC_GLOBAL)
+							set_global_register(src_code, IO_READ_W(extra_s));
+						else
+							m_local_regs[src_code] = IO_READ_W(extra_s);
+						break;
+					case 3: // LDD.IOA
+						if (SRC_GLOBAL)
+						{
+							set_global_register(src_code, IO_READ_W(extra_s));
+							set_global_register(srcf_code, IO_READ_W(extra_s + 4));
+						}
+						else
+						{
+							m_local_regs[src_code] = IO_READ_W(extra_s);
+							m_local_regs[srcf_code] = IO_READ_W(extra_s + 4);
+						}
+						m_icount -= m_clock_cycles_1; // extra cycle
+						break;
+				}
+				break;
+		}
+	}
+	else
+	{
+		const uint32_t dreg = (DST_GLOBAL ? m_global_regs : m_local_regs)[dst_code];
+		switch (sub_type)
+		{
+			case 0: // LDBS.D
+				if (SRC_GLOBAL)
+					set_global_register(src_code, (int32_t)(int8_t)READ_B(dreg + extra_s));
+				else
+					m_local_regs[src_code] = (int32_t)(int8_t)READ_B(dreg + extra_s);
+				break;
+
+			case 1: // LDBU.D
+				if (SRC_GLOBAL)
+					set_global_register(src_code, READ_B(dreg + extra_s));
+				else
+					m_local_regs[src_code] = READ_B(dreg + extra_s);
+				break;
+
+			case 2:
+				if (SRC_GLOBAL)
+				{
+					if (extra_s & 1)
+						set_global_register(src_code, (int32_t)(int16_t)READ_HW(dreg + (extra_s & ~1)));
+					else
+						set_global_register(src_code, READ_HW(dreg + (extra_s & ~1)));
+				}
+				else
+				{
+					if (extra_s & 1)
+						m_local_regs[src_code] = (int32_t)(int16_t)READ_HW(dreg + (extra_s & ~1));
+					else
+						m_local_regs[src_code] = READ_HW(dreg + (extra_s & ~1));
+				}
+				break;
+
+			case 3:
+				switch (extra_s & 3)
+				{
+					case 0: // LDW.D
+						if (SRC_GLOBAL)
+							set_global_register(src_code, READ_W(dreg + extra_s));
+						else
+							m_local_regs[src_code] = READ_W(dreg + extra_s);
+						break;
+					case 1: // LDD.D
+						if (SRC_GLOBAL)
+						{
+							set_global_register(src_code, READ_W(dreg + (extra_s & ~1)));
+							set_global_register(srcf_code, READ_W(dreg + (extra_s & ~1) + 4));
+						}
+						else
+						{
+							m_local_regs[src_code] = READ_W(dreg + (extra_s & ~1));
+							m_local_regs[srcf_code] = READ_W(dreg + (extra_s & ~1) + 4);
+						}
+						m_icount -= m_clock_cycles_1; // extra cycle
+						break;
+					case 2: // LDW.IOD
+						if (SRC_GLOBAL)
+							set_global_register(src_code, IO_READ_W(dreg + (extra_s & ~3)));
+						else
+							m_local_regs[src_code] = IO_READ_W(dreg + (extra_s & ~3));
+						break;
+					case 3: // LDD.IOD
+						if (SRC_GLOBAL)
+						{
+							set_global_register(src_code, IO_READ_W(dreg + (extra_s & ~3)));
+							set_global_register(srcf_code, IO_READ_W(dreg + (extra_s & ~3) + 4));
+						}
+						else
+						{
+							m_local_regs[src_code] = IO_READ_W(dreg + (extra_s & ~3));
+							m_local_regs[srcf_code] = IO_READ_W(dreg + (extra_s & ~3) + 4);
+						}
+						m_icount -= m_clock_cycles_1; // extra cycle
+						break;
+				}
+				break;
+		}
 	}
 
 	m_icount -= m_clock_cycles_1;
