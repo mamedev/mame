@@ -719,7 +719,6 @@ void mpeg_audio::retrieve_subbuffer(int step)
 		memcpy(subbuffer[chan], bdata[chan][step], 32*sizeof(subbuffer[0][0]));
 }
 
-
 const double mpeg_sincos[] = {
 	0.6715589548 /*sin15pi/64*/	, 0.7409511254, /*cos*/
 	0.8032075315 /*cos13pi/64*/	, 0.5956993045, /*sin*/
@@ -738,6 +737,7 @@ const double mpeg_sincos[] = {
 	0.3826834324 /*sinpi/8*/	, 0.9238795325, /*cos*/
 	0.7071067812 /*sinpi/4*/,
 };
+
 const uint32_t mpeg_sin_15pi_div_64 = 0, mpeg_cos_15pi_div_64 = 1;
 const uint32_t mpeg_cos_13pi_div_64 = 2, mpeg_sin_13pi_div_64 = 3;
 const uint32_t mpeg_cos_11pi_div_64 = 4, mpeg_sin_11pi_div_64 = 5;
@@ -754,10 +754,6 @@ const uint32_t mpeg_cos_3pi_div_16 = 24, mpeg_sin_3pi_div_16 = 25;
 const uint32_t mpeg_sin_pi_div_16 = 26, mpeg_cos_pi_div_16 = 27;
 const uint32_t mpeg_sin_pi_div_8 = 28, mpeg_cos_pi_div_8 = 29;
 const uint32_t mpeg_sin_pi_div_4 = 30;
-
-
-
-
 
 void mpeg_audio::idct32(const double *input, double *output)
 {
