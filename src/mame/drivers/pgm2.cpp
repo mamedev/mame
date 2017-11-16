@@ -570,7 +570,7 @@ void pgm2_state::draw_sprites(screen_device &screen, const rectangle &cliprect, 
 
 	int endoflist = -1;
 
-//	printf("frame\n");
+	//printf("frame\n");
 
 	for (int i = 0;i < 0x2000 / 4;i++)
 	{
@@ -592,12 +592,21 @@ void pgm2_state::draw_sprites(screen_device &screen, const rectangle &cliprect, 
 			int pal =   (spriteram[i + 0] & 0x0fc00000) >> 22;
 			int pri =   (spriteram[i + 0] & 0x80000000) >> 31;
 
+			//int unk0 =  (spriteram[i + 0] & 0x70000000) >> 0;
+
 			int sizex = (spriteram[i + 1] & 0x0000003f) >> 0;
 			int sizey = (spriteram[i + 1] & 0x00007fc0) >> 6;
 			int flipx = (spriteram[i + 1] & 0x00800000) >> 23;
 			int flipy = (spriteram[i + 1] & 0x80000000) >> 31; // more of a 'reverse entire drawing' flag than y-flip, but used for that purpose
-			//int zoomx = (spriteram[i + 1] & 0x001f0000) >> 16; // might be 7f
-			int zoomy = (spriteram[i + 1] & 0x1f000000) >> 24; // might be 7f
+			//int zoomx = (spriteram[i + 1] & 0x001f0000) >> 16;
+			//int growx = (spriteram[i + 1] & 0x00200000) >> 21;
+			int zoomy = (spriteram[i + 1] & 0x1f000000) >> 24;
+			int growy = (spriteram[i + 1] & 0x20000000) >> 29;
+			//int unk1 = (spriteram[i + 1] & 0x40408000) >> 0;
+
+			//if (unk0 || unk1)
+			//	printf("unused bits set unk0 %08x unk1 %08x\n", unk0, unk1);
+
 
 			int mask_offset = (spriteram[i + 2]<<1);
 			int palette_offset = (spriteram[i + 3]);
@@ -617,12 +626,34 @@ void pgm2_state::draw_sprites(screen_device &screen, const rectangle &cliprect, 
 
 			int realy = y;
 
-			for (int ydraw = 0; ydraw < sizey; ydraw++)
+			int sourceline = 0;
+			for (int ydraw = 0; ydraw < sizey;sourceline++)
 			{
-				int zoomy_bit = (zoomy_bits >> (ydraw & 0x1f)) & 1;
+				int zoomy_bit = (zoomy_bits >> (sourceline & 0x1f)) & 1;
 
-				draw_sprite_line(cliprect, mask_offset, palette_offset, x, realy, flipx, flipy, sizex, pal, zoomy_bit);
-				if (zoomy_bit) realy++;
+				// store these for when we need to draw a line twice
+				uint32_t pre_palette_offset = palette_offset;
+				uint32_t pre_mask_offset = mask_offset;
+
+				if (!growy) // skipping lines
+				{
+					draw_sprite_line(cliprect, mask_offset, palette_offset, x, realy, flipx, flipy, sizex, pal, zoomy_bit);
+					if (zoomy_bit) realy++;
+
+					ydraw++;
+				}
+				else // doubling lines
+				{
+					draw_sprite_line(cliprect, mask_offset, palette_offset, x, realy, flipx, flipy, sizex, pal, 1);
+					realy++;
+
+					if (zoomy_bit)
+					{
+						palette_offset = pre_palette_offset;
+						mask_offset = pre_mask_offset;
+					}
+					else ydraw++;
+				}
 			}
 		}
 
