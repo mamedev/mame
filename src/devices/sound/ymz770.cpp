@@ -51,7 +51,6 @@ ymz770_device::ymz770_device(const machine_config &mconfig, device_type type, co
 	, m_bsl(0)
 	, m_cpl(0)
 	, m_rom(*this, DEVICE_SELF)
-	, m_use_fast_decoder(false)
 {
 }
 
@@ -131,7 +130,6 @@ void ymz770_device::device_reset()
 		channel.is_playing = false;
 		channel.output_remaining = 0;
 		channel.decoder->clear();
-		channel.decoder->set_fast_idct32(m_use_fast_decoder);
 	}
 	for (auto & sequence : m_sequences)
 	{

@@ -55,8 +55,6 @@ public:
 
 	// Clear audio buffer
 	void clear();
-
-	void set_fast_idct32(bool fast) { m_fast_idct32 = fast; }
 private:
 	struct limit_hit {};
 
@@ -93,6 +91,7 @@ private:
 	double subbuffer[2][32];
 	double audio_buffer[2][32*32];
 	int audio_buffer_pos[2];
+	double m_cos_cache[32][32];
 
 	int current_pos, current_limit;
 
@@ -126,8 +125,6 @@ private:
 
 		return do_gb(base, current_pos, count);
 	}
-
-	bool m_fast_idct32;
 };
 
 #endif // MAME_SOUND_MPEG_AUDIO_H
