@@ -264,9 +264,13 @@ private:
 
 	bitmap_ind16 m_sprite_bitmap;
 	
-	void skip_sprite_chunk(int &palette_offset, uint32_t maskdata, int flipy);
-	void draw_sprite_chunk(const rectangle &cliprect, int &palette_offset, int x, int realy, int flipx, int flipy, int sizex, int xdraw, int pal, uint32_t maskdata);
-	void draw_sprite_line(const rectangle &cliprect, int &mask_offset, int &palette_offset, int x, int realy, int flipx, int flipy, int sizex, int pal, int zoomybit);
+	void skip_sprite_chunk(int &palette_offset, uint32_t maskdata, int reverse);
+	void draw_sprite_pixel(const rectangle &cliprect, int palette_offset, int realx, int realy, int pal);
+	void draw_sprite_chunk(const rectangle &cliprect, int &palette_offset, int x, int realy, int sizex, int xdraw, int pal, uint32_t maskdata, uint32_t zoomx_bits, int growx, int &realxdraw);
+	void draw_sprite_chunk_reverse(const rectangle &cliprect, int &palette_offset, int x, int realy, int sizex, int xdraw, int pal, uint32_t maskdata, uint32_t zoomx_bits, int growx, int &realxdraw);
+	void draw_sprite_chunk_flipx(const rectangle &cliprect, int &palette_offset, int x, int realy, int sizex, int xdraw, int pal, uint32_t maskdata, uint32_t zoomx_bits, int growx, int &realxdraw);
+	void draw_sprite_chunk_flipx_reverse(const rectangle &cliprect, int &palette_offset, int x, int realy, int sizex, int xdraw, int pal, uint32_t maskdata, uint32_t zoomx_bits, int growx, int &realxdraw);
+	void draw_sprite_line(const rectangle &cliprect, int &mask_offset, int &palette_offset, int x, int realy, int flipx, int reverse, int sizex, int pal, int zoomybit, int zoomx_bits, int growx);
 	void draw_sprites(screen_device &screen, const rectangle &cliprect, uint32_t* spriteram);
 	void copy_sprites_from_bitmap(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int pri);
 
@@ -464,66 +468,124 @@ static INPUT_PORTS_START( pgm2 )
 	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
 INPUT_PORTS_END
 
+inline void pgm2_state::draw_sprite_pixel(const rectangle &cliprect, int palette_offset, int realx, int realy, int pal)
+{
+	if (cliprect.contains(realx, realy))
+	{
+		uint16_t pix = m_sprites_colour[palette_offset] & 0x3f; // there are some stray 0xff bytes in some roms, so mask
+		uint16_t pendat = pix + (pal * 0x40);
+		uint16_t* dstptr_bitmap = &m_sprite_bitmap.pix16(realy);
+		dstptr_bitmap[realx] = pendat;
+	}
+}
 
-inline void pgm2_state::draw_sprite_chunk(const rectangle &cliprect, int &palette_offset, int x, int realy, int flipx, int flipy, int sizex, int xdraw, int pal, uint32_t maskdata)
+inline void pgm2_state::draw_sprite_chunk(const rectangle &cliprect, int &palette_offset, int x, int realy, int sizex, int xdraw, int pal, uint32_t maskdata, uint32_t zoomx_bits, int growx, int &realxdraw)
+{
+	for (int xchunk = 0; xchunk < 32; xchunk++)
+	{
+		int pix = (maskdata >> (31 - xchunk)) & 1;
+		int xzoombit = (zoomx_bits >> (31 - xchunk)) & 1;
+
+		if (growx)
+		{
+			if (pix)
+			{
+				draw_sprite_pixel(cliprect, palette_offset, x + realxdraw, realy, pal);
+				realxdraw++;
+
+				if (xzoombit)
+				{
+					draw_sprite_pixel(cliprect, palette_offset, x + realxdraw, realy, pal);
+					realxdraw++;
+				}
+
+				palette_offset++;
+				palette_offset &= 0x7ffffff;
+			}
+			else
+			{
+				realxdraw++;
+				if (xzoombit) realxdraw++;
+			}
+		}
+		else
+		{
+			if (pix)
+			{
+				if (xzoombit) draw_sprite_pixel(cliprect, palette_offset, x + realxdraw, realy, pal);
+			
+				palette_offset++;
+				palette_offset &= 0x7ffffff;
+			}
+
+			if (xzoombit)
+				realxdraw++;
+		}
+	}
+}
+
+inline void pgm2_state::draw_sprite_chunk_reverse(const rectangle &cliprect, int &palette_offset, int x, int realy, int sizex, int xdraw, int pal, uint32_t maskdata, uint32_t zoomx_bits, int growx, int &realxdraw)
 {
 	for (int xchunk = 0; xchunk < 32; xchunk++)
 	{
 		int realx, pix;
 
-		if (!flipx)
-		{
-			if (!flipy) realx = x + (xdraw * 32) + xchunk;
-			else realx = ((x + sizex * 32) - 1) - ((xdraw * 32) + xchunk);
-		}
-		else
-		{
-			if (!flipy) realx = ((x + sizex * 32) - 1) - ((xdraw * 32) + xchunk);
-			else realx = x + (xdraw * 32) + xchunk;
-		}
-
-		if (!flipy)
-		{
-			pix = (maskdata >> (31 - xchunk)) & 1;
-		}
-		else
-		{
-			pix = (maskdata >> xchunk) & 1;
-		}
+		realx = ((x + sizex * 32) - 1) - ((xdraw * 32) + xchunk);
+		pix = (maskdata >> xchunk) & 1;
 
 		if (pix)
 		{
-			if (cliprect.contains(realx, realy))
-			{
-				uint16_t pix = m_sprites_colour[palette_offset] & 0x3f; // there are some stray 0xff bytes in some roms, so mask
-
-				uint16_t pendat = pix + (pal * 0x40);
-
-				uint16_t* dstptr_bitmap = &m_sprite_bitmap.pix16(realy);
-				dstptr_bitmap[realx] = pendat;
-			}
-
-
-			if (!flipy)
-			{
-				palette_offset++;
-			}
-			else
-			{
-				palette_offset--;
-			}
-
+			draw_sprite_pixel(cliprect, palette_offset, realx, realy, pal);
+			palette_offset--;
 			palette_offset &= 0x7ffffff;
 		}
 	}
 }
 
 
-inline void pgm2_state::skip_sprite_chunk(int &palette_offset, uint32_t maskdata, int flipy)
+inline void pgm2_state::draw_sprite_chunk_flipx(const rectangle &cliprect, int &palette_offset, int x, int realy, int sizex, int xdraw, int pal, uint32_t maskdata, uint32_t zoomx_bits, int growx, int &realxdraw)
+{
+	for (int xchunk = 0; xchunk < 32; xchunk++)
+	{
+		int realx, pix;
+
+		realx = ((x + sizex * 32) - 1) - ((xdraw * 32) + xchunk);
+		pix = (maskdata >> (31 - xchunk)) & 1;
+
+		if (pix)
+		{
+			draw_sprite_pixel(cliprect, palette_offset, realx, realy, pal);
+			palette_offset++;
+			palette_offset &= 0x7ffffff;
+		}
+	}
+}
+
+inline void pgm2_state::draw_sprite_chunk_flipx_reverse(const rectangle &cliprect, int &palette_offset, int x, int realy, int sizex, int xdraw, int pal, uint32_t maskdata, uint32_t zoomx_bits, int growx, int &realxdraw)
+{
+	for (int xchunk = 0; xchunk < 32; xchunk++)
+	{
+		int realx, pix;
+
+		realx = x + (xdraw * 32) + xchunk;
+		pix = (maskdata >> xchunk) & 1;
+
+		if (pix)
+		{
+			draw_sprite_pixel(cliprect, palette_offset, realx, realy, pal);
+			palette_offset--;
+			palette_offset &= 0x7ffffff;
+		}
+	}
+}
+
+
+
+inline void pgm2_state::skip_sprite_chunk(int &palette_offset, uint32_t maskdata, int reverse)
 {
 	int bits = population_count_32(maskdata);
 
-	if (!flipy)
+	if (!reverse)
 	{
 		palette_offset+=bits;
 	}
@@ -538,8 +600,10 @@ inline void pgm2_state::skip_sprite_chunk(int &palette_offset, uint32_t maskdata
 
 
 
-inline void pgm2_state::draw_sprite_line(const rectangle &cliprect, int &mask_offset, int &palette_offset, int x, int realy, int flipx, int flipy, int sizex, int pal, int zoomybit)
+inline void pgm2_state::draw_sprite_line(const rectangle &cliprect, int &mask_offset, int &palette_offset, int x, int realy, int flipx, int reverse, int sizex, int pal, int zoomybit, int zoomx_bits, int growx)
 {
+	int realxdraw = 0;
+
 	for (int xdraw = 0; xdraw < sizex; xdraw++)
 	{
 		uint32_t maskdata = m_sprites_mask[mask_offset + 0] << 24;
@@ -547,11 +611,11 @@ inline void pgm2_state::draw_sprite_line(const rectangle &cliprect, int &mask_of
 		maskdata |= m_sprites_mask[mask_offset + 2] << 8;
 		maskdata |= m_sprites_mask[mask_offset + 3] << 0;
 
-		if (flipy)
+		if (reverse)
 		{
 			mask_offset -= 4;
 		}
-		else if (!flipy)
+		else if (!reverse)
 		{
 			mask_offset += 4;
 		}
@@ -559,8 +623,21 @@ inline void pgm2_state::draw_sprite_line(const rectangle &cliprect, int &mask_of
 
 		mask_offset &= 0x3ffffff;
 
-		if (zoomybit) draw_sprite_chunk(cliprect, palette_offset, x, realy, flipx, flipy, sizex, xdraw, pal, maskdata);
-		else skip_sprite_chunk(palette_offset, maskdata, flipy);
+		if (zoomybit)
+		{
+			if (!flipx)
+			{
+				if (!reverse) draw_sprite_chunk(cliprect, palette_offset, x, realy, sizex, xdraw, pal, maskdata, zoomx_bits, growx, realxdraw);
+				else draw_sprite_chunk_reverse(cliprect, palette_offset, x, realy, sizex, xdraw, pal, maskdata, zoomx_bits, growx, realxdraw);
+			}
+			else
+			{
+				if (!reverse) draw_sprite_chunk_flipx(cliprect, palette_offset, x, realy, sizex, xdraw, pal, maskdata, zoomx_bits, growx, realxdraw);
+				else draw_sprite_chunk_flipx_reverse(cliprect, palette_offset, x, realy, sizex, xdraw, pal, maskdata, zoomx_bits, growx, realxdraw);
+
+			}
+		}
+		else skip_sprite_chunk(palette_offset, maskdata, reverse);
 	}
 }
 
@@ -597,9 +674,9 @@ void pgm2_state::draw_sprites(screen_device &screen, const rectangle &cliprect, 
 			int sizex = (spriteram[i + 1] & 0x0000003f) >> 0;
 			int sizey = (spriteram[i + 1] & 0x00007fc0) >> 6;
 			int flipx = (spriteram[i + 1] & 0x00800000) >> 23;
-			int flipy = (spriteram[i + 1] & 0x80000000) >> 31; // more of a 'reverse entire drawing' flag than y-flip, but used for that purpose
-			//int zoomx = (spriteram[i + 1] & 0x001f0000) >> 16;
-			//int growx = (spriteram[i + 1] & 0x00200000) >> 21;
+			int reverse = (spriteram[i + 1] & 0x80000000) >> 31; // more of a 'reverse entire drawing' flag than y-flip, but used for that purpose
+			int zoomx = (spriteram[i + 1] & 0x001f0000) >> 16;
+			int growx = (spriteram[i + 1] & 0x00200000) >> 21;
 			int zoomy = (spriteram[i + 1] & 0x1f000000) >> 24;
 			int growy = (spriteram[i + 1] & 0x20000000) >> 29;
 			//int unk1 = (spriteram[i + 1] & 0x40408000) >> 0;
@@ -612,11 +689,12 @@ void pgm2_state::draw_sprites(screen_device &screen, const rectangle &cliprect, 
 			int palette_offset = (spriteram[i + 3]);
 
 			uint32_t zoomy_bits = m_sp_zoom[zoomy];
+			uint32_t zoomx_bits = m_sp_zoom[zoomx];
 
 			if (x & 0x400) x -=0x800;
 			if (y & 0x400) y -=0x800;
 
-			if (flipy)
+			if (reverse)
 				mask_offset -= 2;
 
 			mask_offset &= 0x3ffffff;
@@ -637,14 +715,14 @@ void pgm2_state::draw_sprites(screen_device &screen, const rectangle &cliprect, 
 
 				if (!growy) // skipping lines
 				{
-					draw_sprite_line(cliprect, mask_offset, palette_offset, x, realy, flipx, flipy, sizex, pal, zoomy_bit);
+					draw_sprite_line(cliprect, mask_offset, palette_offset, x, realy, flipx, reverse, sizex, pal, zoomy_bit, zoomx_bits, growx);
 					if (zoomy_bit) realy++;
 
 					ydraw++;
 				}
 				else // doubling lines
 				{
-					draw_sprite_line(cliprect, mask_offset, palette_offset, x, realy, flipx, flipy, sizex, pal, 1);
+					draw_sprite_line(cliprect, mask_offset, palette_offset, x, realy, flipx, reverse, sizex, pal, 1, zoomx_bits, growx);
 					realy++;
 
 					if (zoomy_bit)
