@@ -2401,15 +2401,13 @@ void hyperstone_device::hyperstone_stxx2()
 	m_icount -= m_clock_cycles_1;
 }
 
-
-
-void hyperstone_device::hyperstone_shri_global()
+template <hyperstone_device::reg_bank DST_GLOBAL>
+void hyperstone_device::hyperstone_shri()
 {
 	check_delay_PC();
 
-	const uint32_t dst_code = DST_CODE;
-
-	uint32_t val = m_global_regs[dst_code];
+	const uint32_t dst_code = DST_GLOBAL ? DST_CODE : ((DST_CODE + GET_FP) & 0x3f);
+	uint32_t val = (DST_GLOBAL ? m_global_regs : m_local_regs)[dst_code];
 
 	SR &= ~(C_MASK | Z_MASK | N_MASK);
 
@@ -2419,30 +2417,10 @@ void hyperstone_device::hyperstone_shri_global()
 
 	val >>= n;
 
-	m_global_regs[dst_code] = val;
-	if (val == 0)
-		SR |= Z_MASK;
-	SR |= SIGN_TO_N(val);
-
-	m_icount -= m_clock_cycles_1;
-}
-
-void hyperstone_device::hyperstone_shri_local()
-{
-	check_delay_PC();
-
-	const uint32_t dst_code = (DST_CODE + GET_FP) & 0x3f;
-	uint32_t val = m_local_regs[dst_code];
-
-	SR &= ~(C_MASK | Z_MASK | N_MASK);
-
-	const uint32_t n = N_VALUE;
-	if (n)
-		SR |= (val >> (n - 1)) & 1;
-
-	val >>= n;
-
-	m_local_regs[dst_code] = val;
+	if (DST_GLOBAL)
+		set_global_register(dst_code, val);
+	else
+		m_local_regs[dst_code] = val;
 
 	if (val == 0)
 		SR |= Z_MASK;
@@ -2451,12 +2429,13 @@ void hyperstone_device::hyperstone_shri_local()
 	m_icount -= m_clock_cycles_1;
 }
 
-void hyperstone_device::hyperstone_sari_global()
+template <hyperstone_device::reg_bank DST_GLOBAL>
+void hyperstone_device::hyperstone_sari()
 {
 	check_delay_PC();
 
-	const uint32_t dst_code = DST_CODE;
-	uint32_t val = m_global_regs[dst_code];
+	const uint32_t dst_code = DST_GLOBAL ? DST_CODE : ((DST_CODE + GET_FP) & 0x3f);
+	uint32_t val = (DST_GLOBAL ? m_global_regs : m_local_regs)[dst_code];
 
 	const uint32_t n = N_VALUE;
 
@@ -2472,7 +2451,11 @@ void hyperstone_device::hyperstone_sari_global()
 			val |= 0xffffffff << (32 - n);
 	}
 
-	set_global_register(dst_code, val);
+	if (DST_GLOBAL)
+		set_global_register(dst_code, val);
+	else
+		m_local_regs[dst_code] = val;
+
 	if (val == 0)
 		SR |= Z_MASK;
 	SR |= SIGN_TO_N(val);
@@ -2480,43 +2463,14 @@ void hyperstone_device::hyperstone_sari_global()
 	m_icount -= m_clock_cycles_1;
 }
 
-void hyperstone_device::hyperstone_sari_local()
+template <hyperstone_device::reg_bank DST_GLOBAL>
+void hyperstone_device::hyperstone_shli()
 {
 	check_delay_PC();
 
-	const uint32_t dst_code = (DST_CODE + GET_FP) & 0x3f;
+	const uint32_t dst_code = DST_GLOBAL ? DST_CODE : ((DST_CODE + GET_FP) & 0x3f);
+	uint32_t val = (DST_GLOBAL ? m_global_regs : m_local_regs)[dst_code];
 
-	uint32_t val = m_local_regs[dst_code];
-	uint32_t sign_bit = val & 0x80000000;
-
-	const uint32_t n = N_VALUE;
-
-	SR &= ~(C_MASK | Z_MASK | N_MASK);
-	if (n)
-	{
-		SR |= (val >> (n - 1)) & 1;
-
-		val >>= n;
-
-		if (sign_bit)
-			val |= 0xffffffff << (32 - n);
-	}
-
-	m_local_regs[dst_code] = val;
-	if (val == 0)
-		SR |= Z_MASK;
-	SR |= SIGN_TO_N(val);
-
-	m_icount -= m_clock_cycles_1;
-}
-
-void hyperstone_device::hyperstone_shli_global()
-{
-	check_delay_PC();
-
-	const uint32_t dst_code = DST_CODE;
-
-	uint32_t val = m_global_regs[dst_code];
 	const uint32_t n = N_VALUE;
 	SR &= ~(C_MASK | V_MASK | Z_MASK | N_MASK);
 	SR |= n ? (((val << (n - 1)) & 0x80000000) ? 1 : 0) : 0;
@@ -2526,31 +2480,11 @@ void hyperstone_device::hyperstone_shli_global()
 	if (((val & mask) && (!(val2 & 0x80000000))) || (((val & mask) ^ mask) && (val2 & 0x80000000)))
 		SR |= V_MASK;
 
-	set_global_register(dst_code, val2);
-	if (val2 == 0)
-		SR |= Z_MASK;
-	SR |= SIGN_TO_N(val2);
+	if (DST_GLOBAL)
+		set_global_register(dst_code, val2);
+	else
+		m_local_regs[dst_code] = val2;
 
-	m_icount -= m_clock_cycles_1;
-}
-
-void hyperstone_device::hyperstone_shli_local()
-{
-	check_delay_PC();
-
-	const uint32_t dst_code = (DST_CODE + GET_FP) & 0x3f;
-
-	uint32_t val = m_local_regs[dst_code];
-	const uint32_t n = N_VALUE;
-	SR &= ~(C_MASK | V_MASK | Z_MASK | N_MASK);
-	SR |= n ? (((val << (n - 1)) & 0x80000000) ? 1 : 0) : 0;
-	uint64_t mask = ((1U << (32 - n)) - 1) ^ 0xffffffff;
-	uint32_t val2 = val << n;
-
-	if (((val & mask) && (!(val2 & 0x80000000))) || (((val & mask) ^ mask) && (val2 & 0x80000000)))
-		SR |= V_MASK;
-
-	m_local_regs[dst_code] = val2;
 	if (val2 == 0)
 		SR |= Z_MASK;
 	SR |= SIGN_TO_N(val2);
