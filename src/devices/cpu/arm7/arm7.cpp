@@ -68,6 +68,7 @@ arm7_cpu_device::arm7_cpu_device(const machine_config &mconfig, device_type type
 	, m_endian(endianness)
 	, m_archRev(archRev)
 	, m_archFlags(archFlags)
+	, m_vectorbase(0)
 	, m_pc(0)
 {
 	memset(m_r, 0x00, sizeof(m_r));
@@ -662,7 +663,7 @@ void arm7_cpu_device::device_reset()
 	/* start up in SVC mode with interrupts disabled. */
 	m_r[eCPSR] = I_MASK | F_MASK | 0x10;
 	SwitchMode(eARM7_MODE_SVC);
-	m_r[eR15] = 0;
+	m_r[eR15] = 0 | m_vectorbase;
 
 	m_impstate.cache_dirty = true;
 }

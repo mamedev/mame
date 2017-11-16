@@ -105,16 +105,17 @@ WRITE32_MEMBER(nds_state::arm9_io_w)
 }
 
 static ADDRESS_MAP_START( nds_arm7_map, AS_PROGRAM, 32, nds_state )
-	AM_RANGE(0x00000000, 0x00003fff) AM_ROM
-	AM_RANGE(0x02000000, 0x023fffff) AM_RAM AM_SHARE("mainram")
+	AM_RANGE(0x00000000, 0x00003fff) AM_ROM AM_REGION("arm7", 0)
+	AM_RANGE(0x02000000, 0x023fffff) AM_RAM AM_MIRROR(0x00400000) AM_SHARE("mainram")
 	AM_RANGE(0x03800000, 0x0380ffff) AM_RAM
 	AM_RANGE(0x04000000, 0x0400ffff) AM_READWRITE(arm7_io_r, arm7_io_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( nds_arm9_map, AS_PROGRAM, 32, nds_state )
-	AM_RANGE(0x00000000, 0x00000fff) AM_ROM
+	AM_RANGE(0x00000000, 0x00007fff) AM_RAM // Instruction TCM
 	AM_RANGE(0x02000000, 0x023fffff) AM_RAM AM_SHARE("mainram")
 	AM_RANGE(0x04000000, 0x0400ffff) AM_READWRITE(arm9_io_r, arm9_io_w)
+	AM_RANGE(0xffff0000, 0xffff0fff) AM_ROM AM_MIRROR(0x1000) AM_REGION("arm9", 0)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( nds )
@@ -134,9 +135,12 @@ void nds_state::machine_start()
 static MACHINE_CONFIG_START( nds )
 	MCFG_CPU_ADD("arm7", ARM7, XTAL_33_333MHz)
 	MCFG_CPU_PROGRAM_MAP(nds_arm7_map)
+	MCFG_DEVICE_DISABLE()
 
 	MCFG_CPU_ADD("arm9", ARM946ES, XTAL_66_6667MHz)
+	MCFG_ARM_HIGH_VECTORS()
 	MCFG_CPU_PROGRAM_MAP(nds_arm9_map)
+
 MACHINE_CONFIG_END
 
 /* Help identifying the region and revisions of the set would be greatly appreciated! */

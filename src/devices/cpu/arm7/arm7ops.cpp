@@ -380,8 +380,8 @@ void arm7_cpu_device::HandleBranch(uint32_t insn, bool h_bit)
 		off |= (insn & 0x01000000) >> 23;
 	}
 
-	/* Save PC into LR if this is a branch with link */
-	if (insn & INSN_BL)
+	/* Save PC into LR if this is a branch with link or a BLX */
+	if ((insn & INSN_BL) || ((m_archRev >= 5) && ((insn & 0xfe000000) == 0xfa000000)))
 	{
 		SetRegister(14, R15 + 4);
 	}

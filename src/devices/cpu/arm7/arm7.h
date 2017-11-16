@@ -31,6 +31,9 @@
 #define ARM7_MAX_FASTRAM       4
 #define ARM7_MAX_HOTSPOTS      16
 
+#define MCFG_ARM_HIGH_VECTORS() \
+	arm7_cpu_device::set_high_vectors(*device);
+
 
 /***************************************************************************
     COMPILER-SPECIFIC OPTIONS
@@ -51,6 +54,12 @@ class arm7_cpu_device : public cpu_device
 public:
 	// construction/destruction
 	arm7_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	static void set_high_vectors(device_t &device)
+	{
+		arm7_cpu_device &dev = downcast<arm7_cpu_device &>(device);
+		dev.m_vectorbase = 0xffff0000;
+	}
 
 protected:
 	enum
@@ -167,6 +176,8 @@ protected:
 
 	uint8_t m_archRev;          // ARM architecture revision (3, 4, and 5 are valid)
 	uint8_t m_archFlags;        // architecture flags
+
+	uint32_t m_vectorbase;
 
 //#if ARM7_MMU_ENABLE_HACK
 //  uint32_t mmu_enable_addr; // workaround for "MMU is enabled when PA != VA" problem
