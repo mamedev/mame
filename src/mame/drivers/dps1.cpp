@@ -17,6 +17,7 @@ ToDo:
 #include "machine/upd765.h"
 #include "machine/mc2661.h"
 #include "bus/rs232/rs232.h"
+//#include "bus/s100/s100.h"
 #include "softlist.h"
 
 class dps1_state : public driver_device
