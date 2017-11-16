@@ -75,9 +75,9 @@ private:
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_p_rom;
-	optional_device<ay31015_device> m_uart1;
-	optional_device<ay31015_device> m_uart2;
-	optional_device<ay31015_device> m_uart3;
+	required_device<ay31015_device> m_uart1;
+	required_device<ay31015_device> m_uart2;
+	required_device<ay31015_device> m_uart3;
 };
 
 READ8_MEMBER( hpz80unk_state::port00_r )
@@ -90,7 +90,8 @@ READ8_MEMBER( hpz80unk_state::port01_r )
 	m_uart1->set_input_pin(AY31015_RDAV, 0);
 	uint8_t result = m_uart1->get_received_data();
 	m_uart1->set_input_pin(AY31015_RDAV, 1);
-	return result;}
+	return result;
+}
 
 WRITE8_MEMBER( hpz80unk_state::port01_w )
 {
