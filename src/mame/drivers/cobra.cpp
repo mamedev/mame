@@ -3627,7 +3627,7 @@ ROM_START(bujutsu)
 	ROM_LOAD("645a03.u17", 0x00000, 0x80000, CRC(086abd0b) SHA1(24df439eb9828ed3842f43f5f4014a3fc746e1e3) )
 
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)
-	ROM_LOAD( "m48t58-70pc1.17l", 0x000000, 0x002000, NO_DUMP )
+	ROM_LOAD( "m48t58-70pc1_JAA.17l", 0x000000, 0x002000, CRC(9e92b504) SHA1(12aa0ba6f283942d8b0f96158563df5feef5f8af) ) 
 
 	ROM_REGION16_LE(0x1000000, "rfsnd", ROMREGION_ERASE00)
 
@@ -3656,5 +3656,5 @@ ROM_END
 
 /*************************************************************************/
 
-GAME( 1997, bujutsu,  0, cobra, cobra, cobra_state, bujutsu,  ROT0, "Konami", "Fighting Bujutsu", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 1997, bujutsu,  0, cobra, cobra, cobra_state, bujutsu,  ROT0, "Konami", "Fighting Wu-Shu 2nd! (Ver. JAA)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 GAME( 1997, racjamdx, 0, cobra, cobra, cobra_state, racjamdx, ROT0, "Konami", "Racing Jam DX",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
