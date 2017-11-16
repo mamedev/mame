@@ -70,7 +70,7 @@ public:
 
 TIMER_DEVICE_CALLBACK_MEMBER(dotrikun_state::interrupt)
 {
-	m_maincpu->pulse_input_line(0, attotime::from_hz(MASTER_CLOCK/256));
+	m_maincpu->pulse_input_line(0, attotime::from_hz(MASTER_CLOCK/128));
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(dotrikun_state::scanline_off)
