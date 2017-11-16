@@ -138,7 +138,7 @@ Information by The Sheep, rtw, Ex-Cyber, BrianT & Guru
 
 ------------------------------------------------------
 
- To enter service mode in most cases hold down 0 (Service 2) for a few seconds
+ To enter service mode in most cases hold down Service (F2) for a few seconds
   (I believe it's the test button on the PCB)
  Some games also use the test dipswitch as an alternative method.
 
@@ -367,7 +367,7 @@ static ADDRESS_MAP_START( cv1k_port, AS_IO, 64, cv1k_state )
 ADDRESS_MAP_END
 
 
-static INPUT_PORTS_START( cv1k )
+static INPUT_PORTS_START( cv1k_base )
 	PORT_START("DSW")       // 18000050.l (18000050.b + 3 i.e. MSB + 3, is shown as DIPSW)
 	// note: physical switch have default/Off position marked as "ON" which is a bit confusing
 	PORT_DIPUNUSED_DIPLOC( 0x01, 0x00, "S2:1" )
@@ -378,7 +378,7 @@ static INPUT_PORTS_START( cv1k )
 
 	PORT_START("PORT_C")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 ) // Service coin
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 ) // Test Button on JAMMA Edge
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE2 ) // Test Button on JAMMA Edge
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1  ) // TODO: IMPLEMENT COIN ERROR!
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2  )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
@@ -396,7 +396,7 @@ static INPUT_PORTS_START( cv1k )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4        ) PORT_PLAYER(1)
 
 	PORT_START("PORT_F")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_SERVICE2 ) // S3 Test Push Button
+	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_SERVICE3 ) // S3 Test Push Button
 	PORT_BIT( 0xfd, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
 	PORT_START("PORT_L")    // 4000134.b, 4000136.b
@@ -423,8 +423,15 @@ static INPUT_PORTS_START( cv1k )
 	PORT_ADJUSTER(50, "Blitter Delay")
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( cv1k )
+	PORT_INCLUDE( cv1k_base )
+
+	PORT_MODIFY("PORT_F")
+	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW ) // S3 Test Push Button
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( cv1ks )
-	PORT_INCLUDE( cv1k )
+	PORT_INCLUDE( cv1k_base )
 
 	PORT_MODIFY("DSW")
 	PORT_SERVICE_DIPLOC( 0x01, IP_ACTIVE_HIGH, "S2:1")
