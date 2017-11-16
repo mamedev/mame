@@ -114,11 +114,7 @@ public:
 		m_hopper(*this, "hopper")
 		{ }
 
-	required_shared_ptr<uint8_t> m_videoram;
-	tilemap_t *m_bg_tilemap;
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	virtual void video_start() override;
-	virtual void machine_start() override;
 	DECLARE_WRITE_LINE_MEMBER(coin_irq);
 	DECLARE_READ8_MEMBER(mc6845_r);
 	DECLARE_WRITE8_MEMBER(mc6845_w);
@@ -131,6 +127,13 @@ public:
 	DECLARE_WRITE8_MEMBER(rtc_control_w);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_addr);
 	MC6845_UPDATE_ROW(update_row);
+	DECLARE_PALETTE_INIT(amusco);
+protected:
+	virtual void video_start() override;
+	virtual void machine_start() override;	
+private:
+	required_shared_ptr<uint8_t> m_videoram;
+	tilemap_t *m_bg_tilemap;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -439,7 +442,7 @@ static const gfx_layout charlayout =
 ******************************/
 
 static GFXDECODE_START( amusco )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, /*8*/ 1 ) // current palette has only 8 colors...
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 8 ) // current palette has only 8 colors...
 GFXDECODE_END
 
 
@@ -463,6 +466,50 @@ MC6845_UPDATE_ROW(amusco_state::update_row)
 
 	const rectangle rowrect(0, 8 * x_count - 1, y, y);
 	m_bg_tilemap->draw(*m_screen, bitmap, rowrect, 0, 0);
+}
+
+PALETTE_INIT_MEMBER(amusco_state,amusco)
+{
+	// add some templates first
+	for (int i = 0; i < 8; i++)
+	{
+		for(int j=0;j<8;j++)
+			palette.set_pen_color(i*8+j, pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i >> 0));
+	}
+
+	// override colors
+/**/palette.set_pen_color(0, pal1bit(0), pal1bit(0), pal1bit(0));
+/**/palette.set_pen_color(1, pal1bit(1), pal1bit(1), pal1bit(1));
+
+/**/palette.set_pen_color(1*8+0, pal1bit(0), pal1bit(0), pal1bit(0));
+/**/palette.set_pen_color(1*8+1, pal1bit(1), pal1bit(0), pal1bit(0));
+
+/**/palette.set_pen_color(2*8+0, pal1bit(0), pal1bit(0), pal1bit(0));
+/**/palette.set_pen_color(2*8+1, pal1bit(0), pal1bit(0), pal1bit(1));
+
+/**/palette.set_pen_color(3*8+0, pal1bit(0), pal1bit(0), pal1bit(0));
+/**/palette.set_pen_color(3*8+1, pal1bit(0), pal1bit(1), pal1bit(0));
+	
+	
+	palette.set_pen_color(5*8+0, pal1bit(0), pal1bit(0), pal1bit(0));
+/**/palette.set_pen_color(5*8+1, pal2bit(0), pal2bit(0), pal2bit(1));
+/**/palette.set_pen_color(5*8+2, pal1bit(1), pal1bit(1), pal1bit(0));
+	palette.set_pen_color(5*8+3, pal1bit(0), pal1bit(0), pal1bit(0));
+	palette.set_pen_color(5*8+4, pal1bit(1), pal1bit(1), pal1bit(1));
+	palette.set_pen_color(5*8+5, pal2bit(2), pal2bit(1), pal2bit(0));
+/**/palette.set_pen_color(5*8+6, pal1bit(0), pal1bit(0), pal1bit(1));
+/**/palette.set_pen_color(5*8+7, pal1bit(1), pal1bit(1), pal1bit(1));
+
+	palette.set_pen_color(6*8+0, pal1bit(0), pal1bit(0), pal1bit(0));
+/**/palette.set_pen_color(6*8+1, pal2bit(1), pal2bit(0), pal2bit(0));
+/**/palette.set_pen_color(6*8+2, pal1bit(1), pal1bit(1), pal1bit(0));
+	palette.set_pen_color(6*8+3, pal1bit(0), pal1bit(0), pal1bit(0));
+	palette.set_pen_color(6*8+4, pal1bit(1), pal1bit(1), pal1bit(1));
+	palette.set_pen_color(6*8+5, pal2bit(2), pal2bit(1), pal2bit(0));
+/**/palette.set_pen_color(6*8+6, pal1bit(0), pal1bit(0), pal1bit(1));
+/**/palette.set_pen_color(6*8+7, pal1bit(1), pal1bit(1), pal1bit(1));
+
+
 }
 
 /*************************
@@ -520,7 +567,8 @@ static MACHINE_CONFIG_START( amusco )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", amusco)
 
-	MCFG_PALETTE_ADD_3BIT_GBR("palette")
+	MCFG_PALETTE_ADD("palette",8*8)
+	MCFG_PALETTE_INIT_OWNER(amusco_state, amusco)
 
 	MCFG_MC6845_ADD("crtc", R6545_1, "screen", CRTC_CLOCK) /* guess */
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
