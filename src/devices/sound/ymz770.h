@@ -27,6 +27,9 @@
 #define MCFG_YMZ774_REPLACE(_tag, _clock) \
 	MCFG_DEVICE_REPLACE(_tag, YMZ774, _clock)
 
+#define MCFG_YMZ77x_USE_FAST_DECODER \
+	ymz770_device::set_fast_decoder(*device);
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -43,6 +46,8 @@ public:
 	ymz770_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_WRITE8_MEMBER(write);
+
+	static void set_fast_decoder(device_t &device) { ymz770_device &dev = downcast<ymz770_device &>(device); dev.m_use_fast_decoder = true; }
 
 protected:
 	// device-level overrides
@@ -104,6 +109,8 @@ protected:
 
 	ymz_channel m_channels[16];
 	ymz_sequence m_sequences[8];
+
+	bool m_use_fast_decoder;
 };
 
 // ======================> ymz774_device

@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Olivier Galibert
+// copyright-holders:Olivier Galibert, MetalliC
 /***************************************************************************
 
     MPEG audio support.  Only layer2 and variants for now.
@@ -719,14 +719,290 @@ void mpeg_audio::retrieve_subbuffer(int step)
 		memcpy(subbuffer[chan], bdata[chan][step], 32*sizeof(subbuffer[0][0]));
 }
 
+
+const double mpeg_sincos[] = {
+	0.6715589548 /*sin15pi/64*/	, 0.7409511254, /*cos*/
+	0.8032075315 /*cos13pi/64*/	, 0.5956993045, /*sin*/
+	0.8577286100 /*cos11pi/64*/	, 0.5141027442, /*sin*/
+	0.9039892931 /*cos9pi/64*/	, 0.4275550934, /*sin*/
+	0.9415440652 /*cos7pi/64*/	, 0.3368898534, /*sin*/
+	0.2429801799 /*sin5pi/64*/	, 0.9700312532, /*cos*/
+	0.9891765100 /*cos3pi/64*/	, 0.1467304745, /*sin*/
+	0.9987954562 /*cospi/64*/	, 0.0490676743, /*sin*/
+	0.6343932842 /*sin7pi/32*/	, 0.7730104534, /*cos*/
+	0.4713967368 /*sin5pi/32*/	, 0.8819212643, /*cos*/
+	0.2902846773 /*sin3pi/32*/	, 0.9569403357, /*cos*/
+	0.0980171403 /*sinpi/32*/	, 0.9951847267, /*cos*/
+	0.8314696123 /*cos3pi/16*/	, 0.5555702330, /*sin*/
+	0.1950903220 /*sinpi/16*/	, 0.9807852804, /*cos*/
+	0.3826834324 /*sinpi/8*/	, 0.9238795325, /*cos*/
+	0.7071067812 /*sinpi/4*/,
+};
+const uint32_t mpeg_sin_15pi_div_64 = 0, mpeg_cos_15pi_div_64 = 1;
+const uint32_t mpeg_cos_13pi_div_64 = 2, mpeg_sin_13pi_div_64 = 3;
+const uint32_t mpeg_cos_11pi_div_64 = 4, mpeg_sin_11pi_div_64 = 5;
+const uint32_t mpeg_cos_9pi_div_64 = 6, mpeg_sin_9pi_div_64 = 7;
+const uint32_t mpeg_cos_7pi_div_64 = 8, mpeg_sin_7pi_div_64 = 9;
+const uint32_t mpeg_sin_5pi_div_64 = 10, mpeg_cos_5pi_div_64 = 11;
+const uint32_t mpeg_cos_3pi_div_64 = 12, mpeg_sin_3pi_div_64 = 13;
+const uint32_t mpeg_cos_pi_div_64 = 14, mpeg_sin_pi_div_64 = 15;
+const uint32_t mpeg_sin_7pi_div_32 = 16, mpeg_cos_7pi_div_32 = 17;
+const uint32_t mpeg_sin_5pi_div_32 = 18, mpeg_cos_5pi_div_32 = 19;
+const uint32_t mpeg_sin_3pi_div_32 = 20, mpeg_cos_3pi_div_32 = 21;
+const uint32_t mpeg_sin_pi_div_32 = 22, mpeg_cos_pi_div_32 = 23;
+const uint32_t mpeg_cos_3pi_div_16 = 24, mpeg_sin_3pi_div_16 = 25;
+const uint32_t mpeg_sin_pi_div_16 = 26, mpeg_cos_pi_div_16 = 27;
+const uint32_t mpeg_sin_pi_div_8 = 28, mpeg_cos_pi_div_8 = 29;
+const uint32_t mpeg_sin_pi_div_4 = 30;
+
+
+
+
+
 void mpeg_audio::idct32(const double *input, double *output)
 {
-	// Simplest idct32 ever, non-fast at all
-	for(int i=0; i<32; i++) {
-		double s = 0;
-		for(int j=0; j<32; j++)
-			s += input[j] * cos(i*(2*j+1)*M_PI/64);
-		output[i] = s;
+	if (!m_fast_idct32)
+	{
+		// Simplest idct32 ever, non-fast at all
+		for (int i = 0; i < 32; i++) {
+			double s = 0;
+			for (int j = 0; j < 32; j++)
+				s += input[j] * cos(i*(2 * j + 1)*M_PI / 64);
+			output[i] = s;
+		}
+	}
+	else
+	{
+		// ugly fast 'reference' implementation
+		double v53, v58, v59, v60, v74, v78, v79, v80, v81;
+		double v82, v83, v129, v142, v143, v144, v145, v146;
+		double v147, v148, v149, v150, v151, v152, v153, v154;
+		double v155, v200, v201, v202, v203, v204, v205, v206;
+		double t0, t1, t2, t3, t4, t5, t6, t7;
+
+		t0 = input[0] + input[31];
+		v142 = input[0] - input[31];
+		t1 = input[1] + input[30];
+		v152 = input[1] - input[30];
+		v74 = input[2] + input[29];
+		v200 = input[2] - input[29];
+		v146 = input[3] + input[28];
+		v144 = input[3] - input[28];
+		v81 = input[4] + input[27];
+		v150 = input[4] - input[27];
+		v79 = input[5] + input[26];
+		v154 = input[5] - input[26];
+		v201 = input[6] + input[25];
+		v129 = input[6] - input[25];
+		v82 = input[7] + input[24];
+		v148 = input[7] - input[24];
+		v53 = input[8] + input[23];
+		v153 = input[8] - input[23];
+		v60 = input[9] + input[22];
+		v151 = input[9] - input[22];
+		v202 = input[10] + input[21];
+		v203 = input[10] - input[21];
+		v204 = input[11] + input[20];
+		v145 = input[11] - input[20];
+		v205 = input[12] + input[19];
+		v149 = input[12] - input[19];
+		v58 = input[13] + input[18];
+		v155 = input[13] - input[18];
+		t2 = input[17] + input[14];
+		v143 = input[14] - input[17];
+		t3 = input[16] + input[15];
+		v147 = input[15] - input[16];
+
+		v83 = t0 + t3;
+		v80 = t0 - t3;
+		v59 = t1 + t2;
+		v78 = t1 - t2;
+		t0 = v74 + v58;
+		v74 = v74 - v58;
+		t1 = v146 + v205;
+		v146 = v146 - v205;
+		t2 = v81 + v204;
+		v81 = v81 - v204;
+		t3 = v79 + v202;
+		v79 = v79 - v202;
+		t4 = v201 + v60;
+		v201 = v201 - v60;
+		t5 = v82 + v53;
+		v82 = v82 - v53;
+
+		v53 = v83 + t5;
+		v83 = v83 - t5;
+		v60 = v59 + t4;
+		v59 = v59 - t4;
+		v202 = t0 + t3;
+		v206 = t0 - t3;
+		v204 = t1 + t2;
+		v58 = t1 - t2;
+
+		t0 = v53 + v204;
+		v53 = v53 - v204;
+		t1 = v60 + v202;
+		v60 = v60 - v202;
+
+		v202 = t0 + t1;
+
+		t1 = (t0 - t1)*mpeg_sincos[mpeg_sin_pi_div_4];
+		t2 = v53 * mpeg_sincos[mpeg_cos_pi_div_8] + v60 * mpeg_sincos[mpeg_sin_pi_div_8];
+		v53 = v53 * mpeg_sincos[mpeg_sin_pi_div_8] - v60 * mpeg_sincos[mpeg_cos_pi_div_8];
+		v60 = v83 * mpeg_sincos[mpeg_cos_pi_div_16] + v58 * mpeg_sincos[mpeg_sin_pi_div_16];
+		v83 = v83 * mpeg_sincos[mpeg_sin_pi_div_16] - v58 * mpeg_sincos[mpeg_cos_pi_div_16];
+		v58 = v206 * mpeg_sincos[mpeg_sin_3pi_div_16] + v59 * mpeg_sincos[mpeg_cos_3pi_div_16];
+		v59 = v206 * mpeg_sincos[mpeg_cos_3pi_div_16] - v59 * mpeg_sincos[mpeg_sin_3pi_div_16];
+		t3 = v60 + v58;
+		t4 = (v60 - v58)*mpeg_sincos[mpeg_sin_pi_div_4];
+		v58 = v83 + v59;
+		t5 = (v83 - v59)*mpeg_sincos[mpeg_sin_pi_div_4];
+		v59 = t4 + t5;
+		v60 = t4 - t5;
+		t4 = v80 * mpeg_sincos[mpeg_cos_pi_div_32] + v82 * mpeg_sincos[mpeg_sin_pi_div_32];
+		v80 = v80 * mpeg_sincos[mpeg_sin_pi_div_32] - v82 * mpeg_sincos[mpeg_cos_pi_div_32];
+		t5 = v201 * mpeg_sincos[mpeg_sin_3pi_div_32] + v78 * mpeg_sincos[mpeg_cos_3pi_div_32];
+		v78 = v201 * mpeg_sincos[mpeg_cos_3pi_div_32] - v78 * mpeg_sincos[mpeg_sin_3pi_div_32];
+		t6 = v74 * mpeg_sincos[mpeg_cos_5pi_div_32] + v79 * mpeg_sincos[mpeg_sin_5pi_div_32];
+		v74 = v74 * mpeg_sincos[mpeg_sin_5pi_div_32] - v79 * mpeg_sincos[mpeg_cos_5pi_div_32];
+		v79 = v81 * mpeg_sincos[mpeg_sin_7pi_div_32] + v146 * mpeg_sincos[mpeg_cos_7pi_div_32];
+		v146 = v81 * mpeg_sincos[mpeg_cos_7pi_div_32] - v146 * mpeg_sincos[mpeg_sin_7pi_div_32];
+		v81 = t4 + v79;
+		v83 = t4 - v79;
+		v79 = t5 + t6;
+		v82 = t5 - t6;
+		t4 = v81 + v79;
+		t5 = (v81 - v79)*mpeg_sincos[mpeg_sin_pi_div_4];
+		t6 = v83 * mpeg_sincos[mpeg_cos_pi_div_8] + v82 * mpeg_sincos[mpeg_sin_pi_div_8];
+		v83 = v83 * mpeg_sincos[mpeg_sin_pi_div_8] - v82 * mpeg_sincos[mpeg_cos_pi_div_8];
+		t7 = v80 + v146;
+		v80 = v80 - v146;
+		v146 = v78 + v74;
+		v78 = v78 - v74;
+		v74 = t7 + v146;
+		v82 = (t7 - v146)*mpeg_sincos[mpeg_sin_pi_div_4];
+		v146 = v80 * mpeg_sincos[mpeg_cos_pi_div_8] + v78 * mpeg_sincos[mpeg_sin_pi_div_8];
+		v80 = v80 * mpeg_sincos[mpeg_sin_pi_div_8] - v78 * mpeg_sincos[mpeg_cos_pi_div_8];
+		v78 = t6 + v80;
+		v79 = t6 - v80;
+		v80 = t5 + v82;
+		v81 = t5 - v82;
+		v82 = v83 + v146;
+		v83 = v83 - v146;
+		t5 = v142 * mpeg_sincos[mpeg_cos_pi_div_64] + v147 * mpeg_sincos[mpeg_sin_pi_div_64];
+		v142 = v142 * mpeg_sincos[mpeg_sin_pi_div_64] - v147 * mpeg_sincos[mpeg_cos_pi_div_64];
+		t6 = v143 * mpeg_sincos[mpeg_sin_3pi_div_64] + v152 * mpeg_sincos[mpeg_cos_3pi_div_64];
+		v152 = v143 * mpeg_sincos[mpeg_cos_3pi_div_64] - v152 * mpeg_sincos[mpeg_sin_3pi_div_64];
+		v143 = v200 * mpeg_sincos[mpeg_cos_5pi_div_64] + v155 * mpeg_sincos[mpeg_sin_5pi_div_64];
+		v200 = v200 * mpeg_sincos[mpeg_sin_5pi_div_64] - v155 * mpeg_sincos[mpeg_cos_5pi_div_64];
+		v155 = v149 * mpeg_sincos[mpeg_sin_7pi_div_64] + v144 * mpeg_sincos[mpeg_cos_7pi_div_64];
+		v144 = v149 * mpeg_sincos[mpeg_cos_7pi_div_64] - v144 * mpeg_sincos[mpeg_sin_7pi_div_64];
+		v149 = v150 * mpeg_sincos[mpeg_cos_9pi_div_64] + v145 * mpeg_sincos[mpeg_sin_9pi_div_64];
+		v150 = v150 * mpeg_sincos[mpeg_sin_9pi_div_64] - v145 * mpeg_sincos[mpeg_cos_9pi_div_64];
+		v145 = v203 * mpeg_sincos[mpeg_sin_11pi_div_64] + v154 * mpeg_sincos[mpeg_cos_11pi_div_64];
+		v154 = v203 * mpeg_sincos[mpeg_cos_11pi_div_64] - v154 * mpeg_sincos[mpeg_sin_11pi_div_64];
+		v203 = v129 * mpeg_sincos[mpeg_cos_13pi_div_64] + v151 * mpeg_sincos[mpeg_sin_13pi_div_64];
+		v129 = v129 * mpeg_sincos[mpeg_sin_13pi_div_64] - v151 * mpeg_sincos[mpeg_cos_13pi_div_64];
+		v151 = v153 * mpeg_sincos[mpeg_sin_15pi_div_64] + v148 * mpeg_sincos[mpeg_cos_15pi_div_64];
+		v148 = v153 * mpeg_sincos[mpeg_cos_15pi_div_64] - v148 * mpeg_sincos[mpeg_sin_15pi_div_64];
+		v153 = t5 + v151;
+		v146 = t5 - v151;
+		v151 = t6 + v203;
+		v147 = t6 - v203;
+		t5 = v143 + v145;
+		v143 = v143 - v145;
+		t6 = v155 + v149;
+		v155 = v155 - v149;
+		v149 = v153 + t6;
+		v153 = v153 - t6;
+		v145 = v151 + t5;
+		v151 = v151 - t5;
+		t5 = v149 + v145;
+		t6 = (v149 - v145)*mpeg_sincos[mpeg_sin_pi_div_4];
+		v145 = v153 * mpeg_sincos[mpeg_cos_pi_div_8] + v151 * mpeg_sincos[mpeg_sin_pi_div_8];
+		v153 = v153 * mpeg_sincos[mpeg_sin_pi_div_8] - v151 * mpeg_sincos[mpeg_cos_pi_div_8];
+		v151 = v146 * mpeg_sincos[mpeg_cos_pi_div_16] + v155 * mpeg_sincos[mpeg_sin_pi_div_16];
+		v146 = v146 * mpeg_sincos[mpeg_sin_pi_div_16] - v155 * mpeg_sincos[mpeg_cos_pi_div_16];
+		v155 = v143 * mpeg_sincos[mpeg_sin_3pi_div_16] + v147 * mpeg_sincos[mpeg_cos_3pi_div_16];
+		v147 = v143 * mpeg_sincos[mpeg_cos_3pi_div_16] - v147 * mpeg_sincos[mpeg_sin_3pi_div_16];
+		v143 = v155 + v151;
+		t7 = (v151 - v155)*mpeg_sincos[mpeg_sin_pi_div_4];
+		v155 = v147 + v146;
+		v146 = (v146 - v147)*mpeg_sincos[mpeg_sin_pi_div_4];
+		v147 = t7 + v146;
+		v151 = t7 - v146;
+		t7 = v142 + v148;
+		v142 = v142 - v148;
+		v148 = v152 + v129;
+		v152 = v152 - v129;
+		v129 = v200 + v154;
+		v200 = v200 - v154;
+		v154 = v144 + v150;
+		v144 = v144 - v150;
+		v150 = t7 + v154;
+		v146 = t7 - v154;
+		t7 = v148 + v129;
+		v148 = v148 - v129;
+		v129 = v150 + t7;
+		v150 = (v150 - t7)*mpeg_sincos[mpeg_sin_pi_div_4];
+		v154 = v146 * mpeg_sincos[mpeg_cos_pi_div_8] + v148 * mpeg_sincos[mpeg_sin_pi_div_8];
+		v146 = v146 * mpeg_sincos[mpeg_sin_pi_div_8] - v148 * mpeg_sincos[mpeg_cos_pi_div_8];
+		v148 = v142 * mpeg_sincos[mpeg_cos_pi_div_16] + v144 * mpeg_sincos[mpeg_sin_pi_div_16];
+		v142 = v142 * mpeg_sincos[mpeg_sin_pi_div_16] - v144 * mpeg_sincos[mpeg_cos_pi_div_16];
+		v144 = v200 * mpeg_sincos[mpeg_sin_3pi_div_16] + v152 * mpeg_sincos[mpeg_cos_3pi_div_16];
+		v152 = v200 * mpeg_sincos[mpeg_cos_3pi_div_16] - v152 * mpeg_sincos[mpeg_sin_3pi_div_16];
+		t7 = v148 + v144;
+		v148 = (v148 - v144)*mpeg_sincos[mpeg_sin_pi_div_4];
+		v144 = v142 + v152;
+		v142 = (v142 - v152)*mpeg_sincos[mpeg_sin_pi_div_4];
+		v152 = v148 + v142;
+		v148 = v148 - v142;
+		v142 = v143 + v144;
+		v143 = v143 - v144;
+		output[3] = v142;
+		output[6] = v78;
+		v144 = v145 + v146;
+		v145 = v145 - v146;
+		output[5] = v143;
+		output[7] = v144;
+		output[10] = v79;
+		output[9] = v145;
+		output[12] = v59;
+		v146 = v147 + v148;
+		v147 = v147 - v148;
+		output[14] = v80;
+		output[11] = v146;
+		output[13] = v147;
+		v148 = t6 + v150;
+		v149 = t6 - v150;
+		output[15] = v148;
+		output[18] = v81;
+		output[17] = v149;
+		output[20] = v60;
+		v150 = v151 + v152;
+		v151 = v151 - v152;
+		output[19] = v150;
+		output[21] = v151;
+		v152 = v153 + v154;
+		v153 = v153 - v154;
+		v154 = v155 + t7;
+		v155 = v155 - t7;
+		output[0] = v202;
+		output[1] = t5;
+		output[2] = t4;
+		output[4] = t3;
+		output[8] = t2;
+		output[16] = t1;
+		output[22] = v82;
+		output[23] = v152;
+		output[24] = v53;
+		output[25] = v153;
+		output[26] = v83;
+		output[27] = v154;
+		output[28] = v58;
+		output[29] = v155;
+		output[30] = v74;
+		output[31] = v129;
 	}
 }
 
