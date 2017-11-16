@@ -638,9 +638,11 @@ void pgm2_state::draw_sprites(screen_device &screen, const rectangle &cliprect, 
 			int unk1 =  (spriteram[i + 1] & 0x40408000) >> 0;
 
 			if (unk0 || unk1)
-				popmessage("sprite rendering unused bits set unk0 %08x unk1 %08x\n", unk0, unk1);
-
-
+			{
+				// unk0 & 0x40000000 set during gameplay on kov2nl, why? more pri bits?
+				//popmessage("sprite rendering unused bits set unk0 %08x unk1 %08x\n", unk0, unk1);
+			}
+			
 			int mask_offset = (spriteram[i + 2]<<1);
 			int palette_offset = (spriteram[i + 3]);
 
