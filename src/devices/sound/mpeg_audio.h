@@ -55,6 +55,7 @@ public:
 
 	// Clear audio buffer
 	void clear();
+
 private:
 	struct limit_hit {};
 
