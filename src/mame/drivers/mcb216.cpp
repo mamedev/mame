@@ -2,39 +2,39 @@
 // copyright-holders:Robbbert
 /***************************************************************************
 
-    2013-12-01 Driver for Cromemco MCB-216 SCC (Single Card Computer),
-    and also the earlier CB-308.
+2013-12-01 Driver for Cromemco MCB-216 SCC (Single Card Computer),
+and also the earlier CB-308.
 
-    The driver is working, just missing some hardware info (see ToDo).
+TODO:
+- Confirm cpu clock speed
 
-    TODO:
-    - Find out cpu clock speed
-    - Find out what UART type is used (init byte = 94)
+Memory allocation
+- 0000 to 0FFF - standard roms
+- 1000 to 1FFF - optional roms or ram (expect roms)
+- 2000 to 23FF - standard ram
+- 2400 to FFFF - optional whatever the user wants (expect ram)
 
-    Memory allocation
-    - 0000 to 0FFF - standard roms
-    - 1000 to 1FFF - optional roms or ram (expect roms)
-    - 2000 to 23FF - standard ram
-    - 2400 to FFFF - optional whatever the user wants (expect ram)
+All commands to be in uppercase.
 
-    MCB-216:
-    Press Enter twice. You will see the Basic OK prompt. To get into the
-    monitor, use the QUIT command, and to return use the B command.
+MCB-216:
+Press Enter twice. You will see the Basic OK prompt. To get into the
+monitor, use the QUIT command, and to return use the B command.
 
-    The mcb216 can use an optional floppy-disk-drive unit. The only other
-    storage is paper-tape, which is expected to be attached to the terminal.
+The mcb216 can use an optional floppy-disk-drive unit. The only other
+storage is paper-tape, which is expected to be attached to the terminal.
 
-    CB-308:
-    Press Enter twice. You will see the Monitor logo. To get into the BASIC,
-    enter GE400. To return to the monitor, use the QUIT command followed by
-    pressing Enter twice. All monitor commands must be in uppercase. The
-    only storage is paper-tape.
+CB-308:
+Press Enter twice. You will see the Monitor logo. To get into the BASIC,
+enter GE400. To return to the monitor, use the QUIT command followed by
+pressing Enter twice. All monitor commands must be in uppercase. The
+only storage is paper-tape.
 
 ****************************************************************************/
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "machine/terminal.h"
+#include "machine/ay31015.h"
+#include "bus/rs232/rs232.h"
 
 
 class mcb216_state : public driver_device
@@ -43,19 +43,18 @@ public:
 	mcb216_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_terminal(*this, "terminal")
+		, m_uart(*this, "uart")
 	{ }
 
-	void kbd_put(u8 data);
-	DECLARE_READ8_MEMBER(keyin_r);
-	DECLARE_READ8_MEMBER(status_r);
+	DECLARE_READ8_MEMBER(port00_r);
+	DECLARE_READ8_MEMBER(port01_r);
+	DECLARE_WRITE8_MEMBER(port01_w);
 	DECLARE_MACHINE_RESET(mcb216);
 	DECLARE_MACHINE_RESET(cb308);
 
 private:
-	uint8_t m_term_data;
 	required_device<cpu_device> m_maincpu;
-	required_device<generic_terminal_device> m_terminal;
+	required_device<ay31015_device> m_uart;
 };
 
 static ADDRESS_MAP_START(mcb216_mem, AS_PROGRAM, 8, mcb216_state)
@@ -67,8 +66,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(mcb216_io, AS_IO, 8, mcb216_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(status_r)
-	AM_RANGE(0x01, 0x01) AM_READ(keyin_r) AM_DEVWRITE("terminal", generic_terminal_device, write)
+	AM_RANGE(0x00, 0x00) AM_READ(port00_r)
+	AM_RANGE(0x01, 0x01) AM_READWRITE(port01_r,port01_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(cb308_mem, AS_PROGRAM, 8, mcb216_state)
@@ -83,33 +82,52 @@ static INPUT_PORTS_START( mcb216 )
 INPUT_PORTS_END
 
 
-READ8_MEMBER( mcb216_state::keyin_r )
+READ8_MEMBER( mcb216_state::port01_r )
 {
-	uint8_t ret = m_term_data;
-	m_term_data = 0;
-	return ret;
+	m_uart->set_input_pin(AY31015_RDAV, 0);
+	u8 result = m_uart->get_received_data();
+	m_uart->set_input_pin(AY31015_RDAV, 1);
+	return result;
 }
 
 // 0x40 - a keystroke is available
 // 0x80 - ok to send to terminal
-READ8_MEMBER( mcb216_state::status_r )
+READ8_MEMBER( mcb216_state::port00_r )
 {
-	return (m_term_data) ? 0xc0 : 0x80;
+	return (m_uart->get_output_pin(AY31015_DAV) << 6) | (m_uart->get_output_pin(AY31015_TBMT) << 7);
 }
 
-void mcb216_state::kbd_put(u8 data)
+WRITE8_MEMBER( mcb216_state::port01_w )
 {
-	m_term_data = data;
+	m_uart->set_transmit_data(data);
 }
 
 MACHINE_RESET_MEMBER( mcb216_state, mcb216 )
 {
-	m_term_data = 0;
+	m_uart->set_input_pin(AY31015_XR, 0);
+	m_uart->set_input_pin(AY31015_XR, 1);
+	m_uart->set_input_pin(AY31015_SWE, 0);
+	m_uart->set_input_pin(AY31015_NP, 1);
+	m_uart->set_input_pin(AY31015_TSB, 0);
+	m_uart->set_input_pin(AY31015_NB1, 1);
+	m_uart->set_input_pin(AY31015_NB2, 1);
+	m_uart->set_input_pin(AY31015_EPS, 1);
+	m_uart->set_input_pin(AY31015_CS, 1);
+	m_uart->set_input_pin(AY31015_CS, 0);
 }
 
 MACHINE_RESET_MEMBER( mcb216_state, cb308 )
 {
-	m_term_data = 0;
+	m_uart->set_input_pin(AY31015_XR, 0);
+	m_uart->set_input_pin(AY31015_XR, 1);
+	m_uart->set_input_pin(AY31015_SWE, 0);
+	m_uart->set_input_pin(AY31015_NP, 1);
+	m_uart->set_input_pin(AY31015_TSB, 0);
+	m_uart->set_input_pin(AY31015_NB1, 1);
+	m_uart->set_input_pin(AY31015_NB2, 1);
+	m_uart->set_input_pin(AY31015_EPS, 1);
+	m_uart->set_input_pin(AY31015_CS, 1);
+	m_uart->set_input_pin(AY31015_CS, 0);
 	m_maincpu->set_state_int(Z80_PC, 0xe000);
 }
 
@@ -121,8 +139,12 @@ static MACHINE_CONFIG_START( mcb216 )
 	MCFG_MACHINE_RESET_OVERRIDE(mcb216_state, mcb216)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(mcb216_state, kbd_put))
+	MCFG_DEVICE_ADD("uart", AY51013, 0) // exact uart type is unknown
+	MCFG_AY51013_TX_CLOCK(153600)
+	MCFG_AY51013_RX_CLOCK(153600)
+	MCFG_AY51013_READ_SI_CB(DEVREADLINE("rs232", rs232_port_device, rxd_r))
+	MCFG_AY51013_WRITE_SO_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( cb308 )
@@ -133,8 +155,12 @@ static MACHINE_CONFIG_START( cb308 )
 	MCFG_MACHINE_RESET_OVERRIDE(mcb216_state, cb308)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(mcb216_state, kbd_put))
+	MCFG_DEVICE_ADD("uart", AY51013, 0) // exact uart type is unknown
+	MCFG_AY51013_TX_CLOCK(153600)
+	MCFG_AY51013_RX_CLOCK(153600)
+	MCFG_AY51013_READ_SI_CB(DEVREADLINE("rs232", rs232_port_device, rxd_r))
+	MCFG_AY51013_WRITE_SO_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -155,5 +181,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   CLASS          INIT  COMPANY      FULLNAME  FLAGS */
-COMP( 1979, mcb216, 0,      0,       mcb216,    mcb216, mcb216_state,  0,    "Cromemco", "MCB-216", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
-COMP( 1977, cb308,  mcb216, 0,       cb308,     mcb216, mcb216_state,  0,    "Cromemco", "CB-308",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1979, mcb216, 0,      0,       mcb216,    mcb216, mcb216_state,  0,    "Cromemco", "MCB-216", MACHINE_NO_SOUND_HW )
+COMP( 1977, cb308,  mcb216, 0,       cb308,     mcb216, mcb216_state,  0,    "Cromemco", "CB-308",  MACHINE_NO_SOUND_HW )

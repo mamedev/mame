@@ -401,9 +401,9 @@ static MACHINE_CONFIG_START( micral )
 	MCFG_DEVICE_ADD("uart", AY51013, 0) // CDP6402
 	MCFG_AY51013_TX_CLOCK(153600)
 	MCFG_AY51013_RX_CLOCK(153600)
-	MCFG_AY51013_READ_SI_CB(DEVREADLINE("rs232a", rs232_port_device, rxd_r))
-	MCFG_AY51013_WRITE_SO_CB(DEVWRITELINE("rs232a", rs232_port_device, write_txd))
-	MCFG_RS232_PORT_ADD("rs232a", default_rs232_devices, "keyboard")
+	MCFG_AY51013_READ_SI_CB(DEVREADLINE("rs232", rs232_port_device, rxd_r))
+	MCFG_AY51013_WRITE_SO_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "keyboard")
 MACHINE_CONFIG_END
 
 ROM_START( micral )

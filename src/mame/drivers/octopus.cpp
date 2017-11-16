@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Barry Rodewald, Robbbert
+// copyright-holders:Barry Rodewald
 /***************************************************************************
 
 Hilger Analytical AB6089 Mk. 1 (LSI Octopus)
