@@ -128,7 +128,7 @@ WRITE8_MEMBER( micral_state::video_w )
 			s_curpos = (s_curpos & 0xff00) | s_data;
 		else
 		if (s_command == 0x0d)
-			s_curpos = (s_curpos & 0xff) | (s_data << 8);
+			s_curpos = (s_curpos & 0xff) | ((s_data & 0x1f) << 8);
 		else
 		if (s_command == 0xa0)
 			m_p_videoram[s_curpos] = s_data;
@@ -413,7 +413,7 @@ ROM_START( micral )
 	ROM_REGION( 0x400, "keyboard", 0 )
 	ROM_LOAD( "2010221.rom", 0x000, 0x400, CRC(65123378) SHA1(401f0a648b78bf1662a1cd2546e83ba8e3cb7a42) )
 
-	ROM_REGION( 0x10000, "vram", ROMREGION_ERASEFF )
+	ROM_REGION( 0x2000, "vram", ROMREGION_ERASEFF )
 
 	// Using the chargen from 'c10' for now.
 	ROM_REGION( 0x2000, "chargen", 0 )
