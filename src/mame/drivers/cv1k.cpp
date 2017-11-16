@@ -369,6 +369,7 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( cv1k )
 	PORT_START("DSW")       // 18000050.l (18000050.b + 3 i.e. MSB + 3, is shown as DIPSW)
+	// note: physical switch have default/Off position marked as "ON" which is a bit confusing
 	PORT_DIPUNUSED_DIPLOC( 0x01, 0x00, "S2:1" )
 	PORT_DIPUNUSED_DIPLOC( 0x02, 0x00, "S2:2" )
 	PORT_DIPUNUSED_DIPLOC( 0x04, 0x00, "S2:3" )
