@@ -131,6 +131,9 @@ public:
 	DECLARE_WRITE8_MEMBER( pulsar_audio_1_w );
 	DECLARE_WRITE8_MEMBER( pulsar_audio_2_w );
 
+	/*----------- defined in audio/tranqgun.c -----------*/
+	DECLARE_WRITE8_MEMBER( tranqgun_audio_w );
+
 	DECLARE_CUSTOM_INPUT_MEMBER(read_coin_status);
 	DECLARE_CUSTOM_INPUT_MEMBER(get_64v);
 	DECLARE_CUSTOM_INPUT_MEMBER(get_vblank_comp);

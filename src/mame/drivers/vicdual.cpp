@@ -57,6 +57,7 @@
 #include "audio/depthch.h"
 #include "audio/invinco.h"
 #include "audio/pulsar.h"
+#include "audio/tranqgun.h"
 #include "audio/vicdual.h"
 #include "audio/vicdual-97271p.h"
 #include "video/vicdual-97269pb.h"
@@ -1075,7 +1076,7 @@ WRITE8_MEMBER(vicdual_state::sspacaho_io_w)
 
 WRITE8_MEMBER(vicdual_state::tranqgun_io_w)
 {
-	if (offset & 0x01) { /* tranqgun_audio_w(space, 0, data) */ }
+	if (offset & 0x01)  tranqgun_audio_w(space, 0, data);
 	if (offset & 0x02)  palette_bank_w(space, 0, data);
 	if (offset & 0x08)  assert_coin_status();
 }
@@ -2060,6 +2061,10 @@ static MACHINE_CONFIG_DERIVED( tranqgun, vicdual_dualgame_root )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(tranqgun_io_map)
+
+	/* audio hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_FRAGMENT_ADD(tranqgun_audio)
 MACHINE_CONFIG_END
 
 
@@ -3666,7 +3671,7 @@ GAME( 1980, samurai,    0,        samurai,   samurai,   vicdual_state, 0, ROT270
 GAME( 1979, invinco,    0,        invinco,   invinco,   vicdual_state, 0, ROT270, "Sega", "Invinco", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, invds,      0,        invds,     invds,     vicdual_state, 0, ROT270, "Sega", "Invinco / Deep Scan", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, carhntds,   0,        carhntds,  carhntds,  vicdual_state, 0, ROT270, "Sega", "Car Hunt / Deep Scan (France)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, tranqgun,   0,        tranqgun,  tranqgun,  vicdual_state, 0, ROT270, "Sega", "Tranquillizer Gun", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, tranqgun,   0,        tranqgun,  tranqgun,  vicdual_state, 0, ROT270, "Sega", "Tranquillizer Gun", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1980, spacetrk,   0,        spacetrk,  spacetrk,  vicdual_state, 0, ROT270, "Sega", "Space Trek (upright)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1980, spacetrkc,  spacetrk, spacetrk,  spacetrkc, vicdual_state, 0, ROT270, "Sega", "Space Trek (cocktail)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1980, carnival,   0,        carnival,  carnival,  vicdual_state, 0, ROT270, "Sega", "Carnival (upright)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
