@@ -2003,112 +2003,8 @@ void hyperstone_device::hyperstone_ldxx1()
 	m_icount -= m_clock_cycles_1;
 }
 
-void hyperstone_device::hyperstone_ldxx2_global_global()
-{
-	uint16_t next_1 = READ_OP(PC);
-	PC += 2;
-
-	const uint16_t sub_type = (next_1 & 0x3000) >> 12;
-
-	uint32_t extra_s;
-	if (next_1 & 0x8000)
-	{
-		const uint16_t next_2 = READ_OP(PC);
-		PC += 2;
-		m_instruction_length = (3<<19);
-
-		extra_s = next_2;
-		extra_s |= ((next_1 & 0xfff) << 16);
-
-		if (next_1 & 0x4000)
-			extra_s |= 0xf0000000;
-	}
-	else
-	{
-		m_instruction_length = (2<<19);
-		extra_s = next_1 & 0xfff;
-
-		if (next_1 & 0x4000)
-			extra_s |= 0xfffff000;
-	}
-
-	check_delay_PC();
-
-	const uint32_t dst_code = DST_CODE;
-
-	if (dst_code < 2)
-	{
-		m_icount -= m_clock_cycles_1;
-		LOG("Denoted PC or SR in hyperstone_ldxx2. PC = %08X\n", PC);
-		return;
-	}
-
-	const uint32_t src_code = SRC_CODE;
-	const uint32_t dreg = m_global_regs[dst_code];
-
-	switch (sub_type)
-	{
-		case 0: // LDBS.N
-			m_global_regs[src_code] = (int32_t)(int8_t)READ_B(dreg);
-			if (src_code != dst_code)
-				m_global_regs[dst_code] += extra_s;
-			break;
-
-		case 1: // LDBU.N
-			m_global_regs[src_code] = READ_B(dreg);
-			if(src_code != dst_code)
-				m_global_regs[dst_code] += extra_s;
-			break;
-
-		case 2:
-			if (extra_s & 1) // LDHS.N
-				m_global_regs[src_code] = (int32_t)(int16_t)READ_HW(dreg);
-			else // LDHU.N
-				m_global_regs[src_code] = READ_HW(dreg);
-
-			if(src_code != dst_code)
-				m_global_regs[dst_code] += (extra_s & ~1);
-			break;
-
-		case 3:
-			switch (extra_s & 3)
-			{
-				case 0: // LDW.N
-					m_global_regs[src_code] = READ_W(dreg);
-					if(src_code != dst_code)
-						m_global_regs[dst_code] += extra_s & ~1;
-					break;
-				case 1: // LDD.N
-					m_global_regs[src_code] = READ_W(dreg);
-					m_global_regs[src_code + 1] = READ_W(dreg + 4);
-
-					if (src_code != dst_code && (src_code + 1) != dst_code)
-						m_global_regs[dst_code] += extra_s & ~1;
-
-					m_icount -= m_clock_cycles_1; // extra cycle
-					break;
-				case 2: // Reserved
-					LOG("Executed Reserved instruction in hyperstone_ldxx2. PC = %08X\n", PC);
-					break;
-				case 3: // LDW.S
-					if (dreg < SP)
-						m_global_regs[src_code] = READ_W(dreg);
-					else
-						m_global_regs[src_code] = m_local_regs[(dreg & 0xfc) >> 2];
-
-					if (src_code != dst_code)
-						m_global_regs[dst_code] += extra_s & ~3;
-
-					m_icount -= m_clock_cycles_2; // extra cycles
-					break;
-			}
-			break;
-	}
-
-	m_icount -= m_clock_cycles_1;
-}
-
-void hyperstone_device::hyperstone_ldxx2_global_local()
+template <hyperstone_device::reg_bank DST_GLOBAL, hyperstone_device::reg_bank SRC_GLOBAL>
+void hyperstone_device::hyperstone_ldxx2()
 {
 	uint16_t next_1 = READ_OP(PC);
 	PC += 2;
@@ -2140,242 +2036,109 @@ void hyperstone_device::hyperstone_ldxx2_global_local()
 	check_delay_PC();
 
 	const uint32_t fp = GET_FP;
-	const uint32_t src_code = (SRC_CODE + fp) & 0x3f;
-	const uint32_t srcf_code = (SRC_CODE + fp + 1) & 0x3f;
+	const uint32_t dst_code = DST_GLOBAL ? DST_CODE : (DST_CODE + fp) & 0x3f;
 
-	const uint32_t dst_code = DST_CODE;
-	const uint32_t dreg = m_global_regs[dst_code];
-
-	if (dst_code < 2)
+	if (DST_GLOBAL && dst_code < 2)
 	{
-		LOG("Denoted PC or SR in hyperstone_ldxx2. PC = %08X\n", PC);
 		m_icount -= m_clock_cycles_1;
+		LOG("Denoted PC or SR in hyperstone_ldxx2. PC = %08X\n", PC);
 		return;
 	}
 
+	const uint32_t src_code = SRC_GLOBAL ? SRC_CODE : (SRC_CODE + fp) & 0x3f;
+	const uint32_t srcf_code = SRC_GLOBAL ? (src_code + 1) : ((src_code + 1) & 0x3f);
+	const uint32_t dreg = (DST_GLOBAL ? m_global_regs : m_local_regs)[dst_code];
+
 	switch (sub_type)
 	{
 		case 0: // LDBS.N
-			m_local_regs[src_code] = (int32_t)(int8_t)READ_B(dreg);
-			set_global_register(dst_code, dreg + extra_s);
+			if (SRC_GLOBAL)
+				set_global_register(src_code, (int32_t)(int8_t)READ_B(dreg));
+			else
+				m_local_regs[src_code] = (int32_t)(int8_t)READ_B(dreg);
+			if (DST_GLOBAL != SRC_GLOBAL || src_code != dst_code)
+				(DST_GLOBAL ? m_global_regs : m_local_regs)[dst_code] += extra_s;
 			break;
 
 		case 1: // LDBU.N
-			m_local_regs[src_code] = READ_B(dreg);
-			set_global_register(dst_code, dreg + extra_s);
+			if (SRC_GLOBAL)
+				set_global_register(src_code, READ_B(dreg));
+			else
+				m_local_regs[src_code] = READ_B(dreg);
+			if(DST_GLOBAL != SRC_GLOBAL || src_code != dst_code)
+				(DST_GLOBAL ? m_global_regs : m_local_regs)[dst_code] += extra_s;
 			break;
 
 		case 2:
-			if (extra_s & 1) // LDHS.N
-				m_local_regs[src_code] = (int32_t)(int16_t)READ_HW(dreg);
-			else // LDHU.N
-				m_local_regs[src_code] = READ_HW(dreg);
-			set_global_register(dst_code, dreg + (extra_s & ~1));
-			break;
-
-		case 3:
-			switch (extra_s & 3)
+			if (SRC_GLOBAL)
 			{
-				case 0: // LDW.N
-					m_local_regs[src_code] = READ_W(dreg);
-					set_global_register(dst_code, dreg + (extra_s & ~1));
-					break;
-				case 1: // LDD.N
-					m_local_regs[src_code] = READ_W(dreg);
-					m_local_regs[srcf_code] = READ_W(dreg + 4);
-					set_global_register(dst_code, dreg + (extra_s & ~1));
-					m_icount -= m_clock_cycles_1; // extra cycle
-					break;
-				case 2: // Reserved
-					LOG("Executed Reserved instruction in hyperstone_ldxx2. PC = %08X\n", PC);
-					break;
-				case 3: // LDW.S
-					if (dreg < SP)
-						m_local_regs[src_code] = READ_W(dreg);
-					else
-						m_local_regs[src_code] = m_local_regs[(dreg & 0xfc) >> 2];
-					set_global_register(dst_code, dreg + (extra_s & ~3));
-					m_icount -= m_clock_cycles_2; // extra cycles
-					break;
+				if (extra_s & 1) // LDHS.N
+					set_global_register(src_code, (int32_t)(int16_t)READ_HW(dreg));
+				else // LDHU.N
+					set_global_register(src_code, READ_HW(dreg));
 			}
-			break;
-	}
+			else
+			{
+				if (extra_s & 1) // LDHS.N
+					m_local_regs[src_code] = (int32_t)(int16_t)READ_HW(dreg);
+				else // LDHU.N
+					m_local_regs[src_code] = READ_HW(dreg);
+			}
 
-	m_icount -= m_clock_cycles_1;
-}
-
-void hyperstone_device::hyperstone_ldxx2_local_global()
-{
-	uint16_t next_1 = READ_OP(PC);
-	PC += 2;
-
-	const uint16_t sub_type = (next_1 & 0x3000) >> 12;
-
-	uint32_t extra_s;
-	if (next_1 & 0x8000)
-	{
-		const uint16_t next_2 = READ_OP(PC);
-		PC += 2;
-		m_instruction_length = (3<<19);
-
-		extra_s = next_2;
-		extra_s |= ((next_1 & 0xfff) << 16);
-
-		if (next_1 & 0x4000)
-			extra_s |= 0xf0000000;
-	}
-	else
-	{
-		m_instruction_length = (2<<19);
-		extra_s = next_1 & 0xfff;
-
-		if (next_1 & 0x4000)
-			extra_s |= 0xfffff000;
-	}
-
-	check_delay_PC();
-
-	const uint32_t src_code = SRC_CODE;
-	const uint32_t dst_code = (DST_CODE + GET_FP) & 0x3f;
-	const uint32_t dreg = m_local_regs[dst_code];
-
-	switch (sub_type)
-	{
-		case 0: // LDBS.N
-			set_global_register(src_code, (int32_t)(int8_t)READ_B(dreg));
-			m_local_regs[dst_code] += extra_s;
-			break;
-
-		case 1: // LDBU.N
-			set_global_register(src_code, READ_B(dreg));
-			m_local_regs[dst_code] += extra_s;
-			break;
-
-		case 2:
-			if (extra_s & 1) // LDHS.N
-				set_global_register(src_code, (int32_t)(int16_t)READ_HW(dreg));
-			else // LDHU.N
-				set_global_register(src_code, READ_HW(dreg));
-			m_local_regs[dst_code] += extra_s & ~1;
+			if(DST_GLOBAL != SRC_GLOBAL || src_code != dst_code)
+				(DST_GLOBAL ? m_global_regs : m_local_regs)[dst_code] += (extra_s & ~1);
 			break;
 
 		case 3:
 			switch (extra_s & 3)
 			{
 				case 0: // LDW.N
-					set_global_register(src_code, READ_W(dreg));
-					m_local_regs[dst_code] += extra_s & ~1;
-					break;
-				case 1: // LDD.N
-					set_global_register(src_code, READ_W(dreg));
-					set_global_register(src_code + 1, READ_W(dreg + 4));
-					m_local_regs[dst_code] += extra_s & ~1;
-					m_icount -= m_clock_cycles_1; // extra cycle
-					break;
-				case 2: // Reserved
-					LOG("Executed Reserved instruction in hyperstone_ldxx2. PC = %08X\n", PC);
-					break;
-				case 3: // LDW.S
-					if (dreg < SP)
+					if (SRC_GLOBAL)
 						set_global_register(src_code, READ_W(dreg));
 					else
-						set_global_register(src_code, m_local_regs[(dreg & 0xfc) >> 2]);
-					m_local_regs[dst_code] += extra_s & ~3;
-					m_icount -= m_clock_cycles_2; // extra cycles
-					break;
-			}
-			break;
-	}
-
-	m_icount -= m_clock_cycles_1;
-}
-
-void hyperstone_device::hyperstone_ldxx2_local_local()
-{
-	uint16_t next_1 = READ_OP(PC);
-	PC += 2;
-
-	const uint16_t sub_type = (next_1 & 0x3000) >> 12;
-
-	uint32_t extra_s;
-	if (next_1 & 0x8000)
-	{
-		const uint16_t next_2 = READ_OP(PC);
-		PC += 2;
-		m_instruction_length = (3<<19);
-
-		extra_s = next_2;
-		extra_s |= ((next_1 & 0xfff) << 16);
-
-		if (next_1 & 0x4000)
-			extra_s |= 0xf0000000;
-	}
-	else
-	{
-		m_instruction_length = (2<<19);
-		extra_s = next_1 & 0xfff;
-
-		if (next_1 & 0x4000)
-			extra_s |= 0xfffff000;
-	}
-
-	check_delay_PC();
-
-	const uint32_t fp = GET_FP;
-	const uint32_t src_code = (SRC_CODE + fp) & 0x3f;
-	const uint32_t srcf_code = (SRC_CODE + fp + 1) & 0x3f;
-
-	const uint32_t dst_code = (DST_CODE + fp) & 0x3f;
-	const uint32_t dreg = m_local_regs[dst_code];
-
-	switch (sub_type)
-	{
-		case 0: // LDBS.N
-			m_local_regs[src_code] = (int32_t)(int8_t)READ_B(dreg);
-			if(src_code != dst_code)
-				m_local_regs[dst_code] += extra_s;
-			break;
-
-		case 1: // LDBU.N
-			m_local_regs[src_code] = READ_B(dreg);
-			if(src_code != dst_code)
-				m_local_regs[dst_code] += extra_s;
-			break;
-
-		case 2:
-			if (extra_s & 1) // LDHS.N
-				m_local_regs[src_code] = (int32_t)(int16_t)READ_HW(dreg);
-			else // LDHU.N
-				m_local_regs[src_code] = READ_HW(dreg);
-			if(src_code != dst_code)
-				m_local_regs[dst_code] += extra_s & ~1;
-			break;
-
-		case 3:
-			switch (extra_s & 3)
-			{
-				case 0: // LDW.N
-					m_local_regs[src_code] = READ_W(dreg);
-					if(src_code != dst_code)
-						m_local_regs[dst_code] += extra_s & ~1;
+						m_local_regs[src_code] = READ_W(dreg);
+					if(DST_GLOBAL != SRC_GLOBAL || src_code != dst_code)
+						(DST_GLOBAL ? m_global_regs : m_local_regs)[dst_code] += extra_s;
 					break;
 				case 1: // LDD.N
-					m_local_regs[src_code] = READ_W(dreg);
-					m_local_regs[srcf_code] = READ_W(dreg + 4);
-					if(src_code != dst_code)
-						m_local_regs[dst_code] += extra_s & ~1;
+					if (SRC_GLOBAL)
+					{
+						set_global_register(src_code, READ_W(dreg));
+						set_global_register(srcf_code, READ_W(dreg + 4));
+					}
+					else
+					{
+						m_local_regs[src_code] = READ_W(dreg);
+						m_local_regs[srcf_code] = READ_W(dreg + 4);
+					}
+
+					if (DST_GLOBAL != SRC_GLOBAL || (src_code != dst_code && srcf_code != dst_code))
+						(DST_GLOBAL ? m_global_regs : m_local_regs)[dst_code] += extra_s & ~1;
+
 					m_icount -= m_clock_cycles_1; // extra cycle
 					break;
 				case 2: // Reserved
 					LOG("Executed Reserved instruction in hyperstone_ldxx2. PC = %08X\n", PC);
 					break;
 				case 3: // LDW.S
-					if (dreg < SP)
-						m_local_regs[src_code] = READ_W(dreg);
+					if (SRC_GLOBAL)
+					{
+						if (dreg < SP)
+							set_global_register(src_code, READ_W(dreg));
+						else
+							set_global_register(src_code, m_local_regs[(dreg & 0xfc) >> 2]);
+					}
 					else
-						m_local_regs[src_code] = m_local_regs[(dreg & 0xfc) >> 2];
-					if(src_code != dst_code)
-						m_local_regs[dst_code] += extra_s & ~3;
+					{
+						if (dreg < SP)
+							m_local_regs[src_code] = READ_W(dreg);
+						else
+							m_local_regs[src_code] = m_local_regs[(dreg & 0xfc) >> 2];
+					}
+
+					if (DST_GLOBAL != SRC_GLOBAL || src_code != dst_code)
+						(DST_GLOBAL ? m_global_regs : m_local_regs)[dst_code] += extra_s & ~3;
+
 					m_icount -= m_clock_cycles_2; // extra cycles
 					break;
 			}
