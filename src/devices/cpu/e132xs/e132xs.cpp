@@ -1787,10 +1787,10 @@ void hyperstone_device::execute_run()
 			case 0x99: hyperstone_stxx1<GLOBAL, LOCAL>(); break;
 			case 0x9a: hyperstone_stxx1<LOCAL, GLOBAL>(); break;
 			case 0x9b: hyperstone_stxx1<LOCAL, LOCAL>(); break;
-			case 0x9c: hyperstone_stxx2_global_global(); break;
-			case 0x9d: hyperstone_stxx2_global_local(); break;
-			case 0x9e: hyperstone_stxx2_local_global(); break;
-			case 0x9f: hyperstone_stxx2_local_local(); break;
+			case 0x9c: hyperstone_stxx2<GLOBAL, GLOBAL>(); break;
+			case 0x9d: hyperstone_stxx2<GLOBAL, LOCAL>(); break;
+			case 0x9e: hyperstone_stxx2<LOCAL, GLOBAL>(); break;
+			case 0x9f: hyperstone_stxx2<LOCAL, LOCAL>(); break;
 			case 0xa0: hyperstone_shri_global(); break;
 			case 0xa1: hyperstone_shri_global(); break;
 			case 0xa2: hyperstone_shri_local(); break;

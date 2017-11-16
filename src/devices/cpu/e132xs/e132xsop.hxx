@@ -2278,7 +2278,8 @@ void hyperstone_device::hyperstone_stxx1()
 	m_icount -= m_clock_cycles_1;
 }
 
-void hyperstone_device::hyperstone_stxx2_global_global()
+template <hyperstone_device::reg_bank DST_GLOBAL, hyperstone_device::reg_bank SRC_GLOBAL>
+void hyperstone_device::hyperstone_stxx2()
 {
 	uint16_t next_1 = READ_OP(PC);
 	PC += 2;
@@ -2309,13 +2310,13 @@ void hyperstone_device::hyperstone_stxx2_global_global()
 
 	check_delay_PC();
 
-	const uint32_t src_code = SRC_CODE;
-	uint32_t sreg = (src_code == SR_REGISTER) ? 0 : m_global_regs[src_code];
-	uint32_t sregf = (src_code == SR_REGISTER) ? 0 : m_global_regs[src_code + 1];
-	const uint32_t dst_code = DST_CODE;
-	const uint32_t dreg = m_global_regs[dst_code];
+	const uint32_t fp = GET_FP;
+	const uint32_t src_code = SRC_GLOBAL ? SRC_CODE : ((SRC_CODE + fp) & 0x3f);
+	const uint32_t sreg = (SRC_GLOBAL && src_code == SR_REGISTER) ? 0 : (SRC_GLOBAL ? m_global_regs : m_local_regs)[src_code];
+	const uint32_t dst_code = DST_GLOBAL ? DST_CODE : ((DST_CODE + fp) & 0x3f);
+	const uint32_t dreg = (DST_GLOBAL ? m_global_regs : m_local_regs)[dst_code];
 
-	if (dst_code < 2)
+	if (DST_GLOBAL && dst_code < 2)
 	{
 		m_icount -= m_clock_cycles_1;
 		return;
@@ -2326,17 +2327,26 @@ void hyperstone_device::hyperstone_stxx2_global_global()
 		case 0: // STBS.N
 			// TODO: missing trap on range error
 			WRITE_B(dreg, (uint8_t)sreg);
-			m_global_regs[dst_code] += extra_s;
+			if (DST_GLOBAL)
+				set_global_register(dst_code, dreg + extra_s);
+			else
+				m_local_regs[dst_code] += extra_s;
 			break;
 
 		case 1: // STBU.N
 			WRITE_B(dreg, (uint8_t)sreg);
-			m_global_regs[dst_code] += extra_s;
+			if (DST_GLOBAL)
+				set_global_register(dst_code, dreg + extra_s);
+			else
+				m_local_regs[dst_code] += extra_s;
 			break;
 
 		case 2: // STHS.N, STHU.N
 			WRITE_HW(dreg, (uint16_t)sreg);
-			m_global_regs[dst_code] += extra_s & ~1;
+			if (DST_GLOBAL)
+				set_global_register(dst_code, dreg + (extra_s & ~1));
+			else
+				m_local_regs[dst_code] += extra_s & ~1;
 			// TODO: missing trap on range error with STHS.N
 			break;
 
@@ -2345,290 +2355,29 @@ void hyperstone_device::hyperstone_stxx2_global_global()
 			{
 				case 0: // STW.N
 					WRITE_W(dreg, sreg);
-					m_global_regs[dst_code] += extra_s & ~1;
+					if (DST_GLOBAL)
+						set_global_register(dst_code, dreg + extra_s);
+					else
+						m_local_regs[dst_code] += extra_s;
 					break;
 				case 1: // STD.N
+				{
+					const uint32_t srcf_code = SRC_GLOBAL ? (src_code + 1) : ((src_code + 1) & 0x3f);
+					const uint32_t sregf = (SRC_GLOBAL && src_code == SR_REGISTER) ? 0 : (SRC_GLOBAL ? m_global_regs : m_local_regs)[srcf_code];
 					WRITE_W(dreg, sreg);
-					m_global_regs[dst_code] += extra_s & ~1;
+					if (DST_GLOBAL)
+						set_global_register(dst_code, dreg + (extra_s & ~1));
+					else
+						m_local_regs[dst_code] += extra_s & ~1;
 
-					if((src_code + 1) == dst_code)
+					if(DST_GLOBAL == SRC_GLOBAL && (src_code + 1) == dst_code)
 						WRITE_W(dreg + 4, sregf + (extra_s & ~1));  // because DREG == SREGF and DREG has been incremented
 					else
 						WRITE_W(dreg + 4, sregf);
+
 					m_icount -= m_clock_cycles_1; // extra cycle
 					break;
-				case 2: // Reserved
-					LOG("Executed Reserved instruction in hyperstone_stxx2. PC = %08X\n", PC);
-					break;
-				case 3: // STW.S
-					if(dreg < SP)
-						WRITE_W(dreg, sreg);
-					else
-						m_local_regs[(dreg & 0xfc) >> 2] = sreg;
-					m_global_regs[dst_code] += (extra_s & ~3);
-					m_icount -= m_clock_cycles_2; // extra cycles
-					break;
-			}
-			break;
-	}
-
-	m_icount -= m_clock_cycles_1;
-}
-
-void hyperstone_device::hyperstone_stxx2_global_local()
-{
-	uint16_t next_1 = READ_OP(PC);
-	PC += 2;
-
-	const uint16_t sub_type = (next_1 & 0x3000) >> 12;
-
-	uint32_t extra_s;
-	if (next_1 & 0x8000)
-	{
-		const uint16_t next_2 = READ_OP(PC);
-		PC += 2;
-		m_instruction_length = (3<<19);
-
-		extra_s = next_2;
-		extra_s |= ((next_1 & 0xfff) << 16);
-
-		if (next_1 & 0x4000)
-			extra_s |= 0xf0000000;
-	}
-	else
-	{
-		m_instruction_length = (2<<19);
-		extra_s = next_1 & 0xfff;
-
-		if (next_1 & 0x4000)
-			extra_s |= 0xfffff000;
-	}
-
-	check_delay_PC();
-
-	const uint32_t dst_code = DST_CODE;
-
-	if (dst_code < 2)
-	{
-		LOG("Denoted PC or SR in hyperstone_stxx2. PC = %08X\n", PC);
-		m_icount -= m_clock_cycles_1;
-		return;
-	}
-
-	const uint32_t src_code = (SRC_CODE + GET_FP) & 0x3f;
-	const uint32_t sreg = m_local_regs[src_code];
-	const uint32_t sregf = m_local_regs[(src_code + 1) & 0x3f];
-	const uint32_t dreg = m_global_regs[dst_code];
-
-	switch (sub_type)
-	{
-		case 0: // STBS.N
-			// TODO: missing trap on range error
-			WRITE_B(dreg, (uint8_t)sreg);
-			set_global_register(dst_code, dreg + extra_s);
-			break;
-
-		case 1: // STBU.N
-
-			WRITE_B(dreg, (uint8_t)sreg);
-			set_global_register(dst_code, dreg + extra_s);
-			break;
-
-		case 2: // STHS.N, STHU.N
-			WRITE_HW(dreg, (uint16_t)sreg);
-			set_global_register(dst_code, dreg + (extra_s & ~1));
-			// TODO: Missing trap on range error with STHS.N
-			break;
-
-		case 3:
-			switch (extra_s & 3)
-			{
-				case 0: // STW.N
-					WRITE_W(dreg, sreg);
-					set_global_register(dst_code, dreg + extra_s);
-					break;
-				case 1: // STD.N
-					WRITE_W(dreg, sreg);
-					WRITE_W(dreg + 4, sregf);
-					set_global_register(dst_code, dreg + (extra_s & ~1));
-					m_icount -= m_clock_cycles_1; // extra cycle
-					break;
-				case 2: // Reserved
-					LOG("Executed Reserved instruction in hyperstone_stxx2. PC = %08X\n", PC);
-					break;
-				case 3: // STW.S
-					if(dreg < SP)
-						WRITE_W(dreg, sreg);
-					else
-						m_local_regs[(dreg & 0xfc) >> 2] = sreg;
-					set_global_register(dst_code, dreg + (extra_s & ~3));
-					m_icount -= m_clock_cycles_2; // extra cycles
-					break;
-			}
-			break;
-	}
-
-	m_icount -= m_clock_cycles_1;
-}
-
-void hyperstone_device::hyperstone_stxx2_local_global()
-{
-	uint16_t next_1 = READ_OP(PC);
-	PC += 2;
-
-	const uint16_t sub_type = (next_1 & 0x3000) >> 12;
-
-	uint32_t extra_s;
-	if (next_1 & 0x8000)
-	{
-		const uint16_t next_2 = READ_OP(PC);
-		PC += 2;
-		m_instruction_length = (3<<19);
-
-		extra_s = next_2;
-		extra_s |= ((next_1 & 0xfff) << 16);
-
-		if (next_1 & 0x4000)
-			extra_s |= 0xf0000000;
-	}
-	else
-	{
-		m_instruction_length = (2<<19);
-		extra_s = next_1 & 0xfff;
-
-		if (next_1 & 0x4000)
-			extra_s |= 0xfffff000;
-	}
-
-	check_delay_PC();
-
-	const uint32_t fp = GET_FP;
-	const uint32_t src_code = SRC_CODE;
-	const uint32_t sreg = (src_code == SR_REGISTER) ? 0 : m_global_regs[src_code];
-	const uint32_t d_code = DST_CODE;
-	const uint32_t dst_code = (d_code + fp) & 0x3f;
-	const uint32_t dreg = m_local_regs[dst_code];
-
-	switch (sub_type)
-	{
-		case 0: // STBS.N
-			// TODO: missing trap on range error
-			WRITE_B(dreg, (uint8_t)sreg);
-			m_local_regs[dst_code] += extra_s;
-			break;
-
-		case 1: // STBU.N
-			WRITE_B(dreg, (uint8_t)sreg);
-			m_local_regs[dst_code] += extra_s;
-			break;
-
-		case 2: // STHS.N, STHU.N
-			WRITE_HW(dreg, (uint16_t)sreg);
-			m_local_regs[dst_code] += extra_s & ~1;
-			// TODO: missing trap on range error for STHS.N
-			break;
-
-		case 3:
-			switch (extra_s & 3)
-			{
-				case 0: // STW.N
-					WRITE_W(dreg, sreg);
-					m_local_regs[dst_code] += extra_s & ~1;
-					break;
-				case 1: // STD.N
-					WRITE_W(dreg, sreg);
-					m_local_regs[dst_code] += extra_s & ~1;
-					WRITE_W(dreg + 4, (src_code == SR_REGISTER) ? 0 : m_global_regs[src_code + 1]);
-					m_icount -= m_clock_cycles_1; // extra cycle
-					break;
-				case 2: // Reserved
-					LOG("Executed Reserved instruction in hyperstone_stxx2. PC = %08X\n", PC);
-					break;
-				case 3: // STW.S
-					if(dreg < SP)
-						WRITE_W(dreg, sreg);
-					else
-						m_local_regs[(dreg & 0xfc) >> 2] = sreg;
-					m_local_regs[dst_code] += extra_s & ~3;
-					m_icount -= m_clock_cycles_2; // extra cycles
-					break;
-			}
-			break;
-	}
-
-	m_icount -= m_clock_cycles_1;
-}
-
-void hyperstone_device::hyperstone_stxx2_local_local()
-{
-	uint16_t next_1 = READ_OP(PC);
-	PC += 2;
-
-	const uint16_t sub_type = (next_1 & 0x3000) >> 12;
-
-	uint32_t extra_s;
-	if (next_1 & 0x8000)
-	{
-		const uint16_t next_2 = READ_OP(PC);
-		PC += 2;
-		m_instruction_length = (3<<19);
-
-		extra_s = next_2;
-		extra_s |= ((next_1 & 0xfff) << 16);
-
-		if (next_1 & 0x4000)
-			extra_s |= 0xf0000000;
-	}
-	else
-	{
-		m_instruction_length = (2<<19);
-		extra_s = next_1 & 0xfff;
-
-		if (next_1 & 0x4000)
-			extra_s |= 0xfffff000;
-	}
-
-	check_delay_PC();
-	const uint32_t fp = GET_FP;
-	const uint32_t sreg = m_local_regs[(SRC_CODE + fp) & 0x3f];
-	const uint32_t dst_code = (DST_CODE + fp) & 0x3f;
-	const uint32_t dreg = m_local_regs[dst_code];
-
-	switch (sub_type)
-	{
-		case 0: // STBS.N
-			/* TODO: missing trap on range error */
-			WRITE_B(dreg, (uint8_t)sreg);
-			m_local_regs[dst_code] += extra_s;
-			break;
-
-		case 1: // STBU.N
-			WRITE_B(dreg, (uint8_t)sreg);
-			m_local_regs[dst_code] += extra_s;
-			break;
-
-		case 2:
-			WRITE_HW(dreg, (uint16_t)sreg);
-			m_local_regs[dst_code] += extra_s & ~1;
-			// Missing trap on range error with STHS.N
-			break;
-
-		case 3:
-			switch (extra_s & 3)
-			{
-				case 0: // STW.N
-					WRITE_W(dreg, sreg);
-					m_local_regs[dst_code] += extra_s & ~1;
-					break;
-				case 1: // STD.N
-					WRITE_W(dreg, sreg);
-					m_local_regs[dst_code] += extra_s & ~1;
-					if (((SRC_CODE + 1) & 0x3f) == DST_CODE)
-						WRITE_W(dreg + 4, m_local_regs[(SRC_CODE + fp + 1) & 0x3f] + (extra_s & ~1));  // because DREG == SREGF and DREG has been incremented
-					else
-						WRITE_W(dreg + 4, m_local_regs[(SRC_CODE + fp + 1) & 0x3f]);
-					m_icount -= m_clock_cycles_1; // extra cycle
-					break;
+				}
 				case 2: // Reserved
 					LOG("Executed Reserved instruction in hyperstone_stxx2. PC = %08X\n", PC);
 					break;
@@ -2638,10 +2387,15 @@ void hyperstone_device::hyperstone_stxx2_local_local()
 					else
 						m_local_regs[(dreg & 0xfc) >> 2] = sreg;
 
-					m_local_regs[dst_code] += extra_s & ~3;
+					if (DST_GLOBAL)
+						set_global_register(dst_code, dreg + (extra_s & ~3));
+					else
+						m_local_regs[dst_code] += (extra_s & ~3);
+
 					m_icount -= m_clock_cycles_2; // extra cycles
 					break;
 			}
+			break;
 	}
 
 	m_icount -= m_clock_cycles_1;
