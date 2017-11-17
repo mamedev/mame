@@ -311,7 +311,7 @@ COMP( 1983, qvt103, 0, 0, terminals, terminals, terminals_state, 0, "Qume", "QVT
 /**************************************************************************************************************
 
 Qume QVT-190.
-Chips: MC68B00P, MC68850P, MC68B45P, V61C16P55L, M5M5165P-70L, ABHGA101006, button battery, 7-DIL-jumper
+Chips: MC68B00P, 2x MC68B50P, MC68B45P, V61C16P55L, M5M5165P-70L, ABHGA101006, button battery, 7-DIL-jumper
 Crystal: unreadable
 
 ***************************************************************************************************************/
@@ -331,8 +331,8 @@ COMP( 1987, qvt190, 0, 0, terminals, terminals, terminals_state, 0, "Qume", "QVT
 /**************************************************************************************************************
 
 Qume QVT-201.
-Chips: Z80A, SCN2681A, unreadable, 4x HM6116P-2, D446C-2, button battery
-Crystal: unreadable
+Chips: Z80A, SCN2681A, SCN2672B, 4x HM6116P-2, D446C-2, button battery
+Crystals: (from schematics, unreadable on photo) 48.654 MHz (Y1), 3.6864 MHz (Y2)
 Board is marked QVT-202.
 
 ***************************************************************************************************************/
@@ -434,7 +434,7 @@ COMP( 1990, vt420, 0, 0, terminals, terminals, terminals_state, 0, "DEC", "VT-24
 /**************************************************************************************************************
 
 Zentec Zephyr (Model 00-441-01).
-Chips: COM2017, i8085A, 3x unreadable, Beeper
+Chips: COM2017, i8085A, 2x unreadable (40-pin AMI DIP), Beeper
 Crystal: 45.582000
 
 ***************************************************************************************************************/
