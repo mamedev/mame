@@ -216,6 +216,14 @@ protected:
 		REG_WR7_SYNC_OR_SDLC_F  = 7
 	};
 
+	// used in a flag bitmap variable
+	enum : uint8_t
+	{
+		TX_FLAG_CRC     = 1U << 0,  // include in checksum calculation
+		TX_FLAG_FRAMING = 1U << 1,  // tranmitting framing bits
+		TX_FLAG_SPECIAL = 1U << 2   // transmitting checksum or abort sequence
+	};
+
 	z80sio_channel(
 			const machine_config &mconfig,
 			device_type type,
@@ -263,11 +271,10 @@ protected:
 	int m_tx_count;     // clocks until next bit transition
 	int m_tx_bits;      // remaining bits in shift register
 	int m_tx_parity;    // parity enable/disable
-	int m_tx_framing;   // currnetly transmitting framing bits
-	int m_tx_special;   // special conditions (SDLC FCS/abort)
 	uint16_t m_tx_sr;   // transmit shift register
 	uint16_t m_tx_crc;  // calculated transmit checksum
 	uint8_t m_tx_hist;  // transmit history (for bitstuffing)
+	uint8_t m_tx_flags; // internal transmit control flags
 
 	int m_txd;
 	int m_dtr;          // data terminal ready
@@ -275,6 +282,7 @@ protected:
 
 	// external/status monitoring
 	int m_ext_latched;  // changed data lines
+	int m_brk_latched;  // break status latched
 	int m_cts;          // clear to send line state
 	int m_dcd;          // data carrier detect line state
 	int m_sync;         // sync line state
@@ -297,9 +305,9 @@ private:
 	void transmit_enable();
 	void transmit_complete();
 	void async_tx_setup();
-	void sdlc_tx_sr_empty();
-	void tx_setup(uint16_t data, int bits, int parity, int framing);
-	void tx_setup_flag();
+	void sync_tx_sr_empty();
+	void tx_setup(uint16_t data, int bits, int parity, bool framing, bool special);
+	void tx_setup_idle();
 
 	void reset_ext_status();
 	void read_ext();

@@ -135,6 +135,7 @@ sdlc_logger_device::sdlc_logger_device(machine_config const &mconfig, char const
 	m_last_data(1U),
 	m_current_clock(1U),
 	m_frame_bits(0U),
+	m_expected_fcs(0U),
 	m_buffer()
 {
 }
@@ -164,6 +165,7 @@ void sdlc_logger_device::device_start()
 	save_item(NAME(m_last_data));
 	save_item(NAME(m_current_clock));
 	save_item(NAME(m_frame_bits));
+	save_item(NAME(m_expected_fcs));
 	save_pointer(NAME(m_buffer.get()), BUFFER_BYTES);
 }
 
@@ -181,6 +183,7 @@ void sdlc_logger_device::frame_end()
 {
 	shift_residual_bits();
 	log_frame(false);
+	m_frame_bits = 0;
 }
 
 void sdlc_logger_device::frame_abort()
@@ -188,6 +191,7 @@ void sdlc_logger_device::frame_abort()
 	logerror("Frame aborted!\n");
 	shift_residual_bits();
 	log_frame(true);
+	m_frame_bits = 0U;
 }
 
 void sdlc_logger_device::data_bit(bool value)

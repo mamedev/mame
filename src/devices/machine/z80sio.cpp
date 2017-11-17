@@ -201,10 +201,10 @@ enum : uint8_t
 	WR4_STOP_BITS_1_5         = 0x08,
 	WR4_STOP_BITS_2           = 0x0c,
 	WR4_SYNC_MODE_MASK        = 0x30, // partially supported
-	WR4_SYNC_MODE_8_BIT       = 0x00, // not supported
-	WR4_SYNC_MODE_16_BIT      = 0x10, // not supported
+	WR4_SYNC_MODE_8_BIT       = 0x00, // partially supported
+	WR4_SYNC_MODE_16_BIT      = 0x10, // partially supported
 	WR4_SYNC_MODE_SDLC        = 0x20, // partially supported
-	WR4_SYNC_MODE_EXT         = 0x30, // not supported
+	WR4_SYNC_MODE_EXT         = 0x30, // partially supported
 	WR4_CLOCK_RATE_MASK       = 0xc0,
 	WR4_CLOCK_RATE_X1         = 0x00,
 	WR4_CLOCK_RATE_X16        = 0x40,
@@ -295,12 +295,10 @@ inline void z80sio_channel::set_dtr(int state)
 	}
 }
 
-inline void z80sio_channel::tx_setup(uint16_t data, int bits, int parity, int framing)
+inline void z80sio_channel::tx_setup(uint16_t data, int bits, int parity, bool framing, bool special)
 {
-	// TODO: what does enabling parity in SDLC mode do on a real chip?
 	m_tx_bits = bits;
 	m_tx_parity = parity;
-	m_tx_framing = framing;
 	m_tx_sr = data | (~uint16_t(0) << bits);
 	if (parity)
 	{
@@ -308,12 +306,32 @@ inline void z80sio_channel::tx_setup(uint16_t data, int bits, int parity, int fr
 			m_tx_sr &= ~(uint16_t(1) << m_tx_bits);
 		++m_tx_bits;
 	}
+	m_tx_flags =
+			((!framing && (m_wr5 & WR5_TX_CRC_ENABLE)) ? TX_FLAG_CRC : 0U) |
+			(framing ? TX_FLAG_FRAMING : 0U) |
+			(special ? TX_FLAG_SPECIAL : 0U);
 }
 
-inline void z80sio_channel::tx_setup_flag()
+inline void z80sio_channel::tx_setup_idle()
 {
-	// SDLC transmit examples don't show flag being loaded, implying it's hard-coded on the transmit side
-	tx_setup(0x7e, 8, 0, 1);
+	switch (m_wr4 & WR4_SYNC_MODE_MASK)
+	{
+	case WR4_SYNC_MODE_8_BIT:
+		tx_setup(m_wr6, 8, 0, true, false);
+		break;
+	case WR4_SYNC_MODE_16_BIT:
+		tx_setup(uint16_t(m_wr6) | (uint16_t(m_wr7) << 8), 16, 0, true, false);
+		break;
+	case WR4_SYNC_MODE_SDLC:
+		// SDLC transmit examples don't show flag being loaded, implying it's hard-coded on the transmit side
+		tx_setup(0x7e, 8, 0, true, false);
+		break;
+	case WR4_SYNC_MODE_EXT:
+		// TODO: what does a real chip do for sync idle in external sync mode?
+		// This is based on the assumption that bit 4 controls 8-/16-bit idle pattern (fits for monosync/bisync/SDLC).
+		tx_setup(uint16_t(m_wr6) | (uint16_t(m_wr7) << 8), 16, 0, true, false);
+		break;
+	}
 }
 
 
@@ -894,9 +912,9 @@ z80sio_channel::z80sio_channel(
 	, m_rx_rr0_latch(0)
 	, m_rxd(1)
 	, m_tx_data(0)
-	, m_tx_clock(0), m_tx_count(0), m_tx_bits(0), m_tx_parity(0), m_tx_framing(0), m_tx_special(0), m_tx_sr(0), m_tx_crc(0), m_tx_hist(0)
+	, m_tx_clock(0), m_tx_count(0), m_tx_bits(0), m_tx_parity(0), m_tx_sr(0), m_tx_crc(0), m_tx_hist(0), m_tx_flags(0)
 	, m_txd(1), m_dtr(0), m_rts(0)
-	, m_ext_latched(0), m_cts(0), m_dcd(0), m_sync(0)
+	, m_ext_latched(0), m_brk_latched(0), m_cts(0), m_dcd(0), m_sync(0)
 	, m_rr1_auto_reset(rr1_auto_reset)
 {
 	LOG("%s\n",FUNCNAME);
@@ -960,15 +978,15 @@ void z80sio_channel::device_start()
 	save_item(NAME(m_tx_count));
 	save_item(NAME(m_tx_bits));
 	save_item(NAME(m_tx_parity));
-	save_item(NAME(m_tx_framing));
-	save_item(NAME(m_tx_special));
 	save_item(NAME(m_tx_sr));
 	save_item(NAME(m_tx_crc));
 	save_item(NAME(m_tx_hist));
+	save_item(NAME(m_tx_flags));
 	save_item(NAME(m_txd));
 	save_item(NAME(m_dtr));
 	save_item(NAME(m_rts));
 	save_item(NAME(m_ext_latched));
+	save_item(NAME(m_brk_latched));
 	save_item(NAME(m_dcd));
 	save_item(NAME(m_sync));
 	save_item(NAME(m_cts));
@@ -996,12 +1014,17 @@ void z80sio_channel::device_reset()
 	m_wr5 &= ~WR5_TX_ENABLE;
 	m_rr0 |= RR0_TX_BUFFER_EMPTY | RR0_TX_UNDERRUN;
 	m_rr1 |= RR1_ALL_SENT;
+	m_tx_flags = 0U;
 
 	// reset external lines
 	out_rts_cb(m_rts = 1);
 	out_dtr_cb(m_dtr = 1);
 
 	// reset interrupts
+	m_uart->clear_interrupt(m_index, INT_TRANSMIT);
+	m_uart->clear_interrupt(m_index, INT_RECEIVE);
+	reset_ext_status();
+	// FIXME: should this actually reset all the interrtupts, or just the prioritisation (daisy chain) logic?
 	if (m_index == z80sio_device::CHANNEL_A)
 		m_uart->reset_interrupts();
 }
@@ -1017,17 +1040,8 @@ void z80sio_channel::transmit_enable()
 	{
 		if ((m_wr4 & WR4_STOP_BITS_MASK) == WR4_STOP_BITS_SYNC)
 		{
-			switch (m_wr4 & WR4_SYNC_MODE_MASK)
-			{
-			// SDLC/HDLC - enabling transmit loads a flag byte
-			case WR4_SYNC_MODE_SDLC:
-				LOGTX("Channel %c SDLC transmit enabled - load initial flag\n", 'A' + m_index);
-				tx_setup_flag();
-				m_tx_special = 0;
-				break;
-			default:
-				logerror("unsupported synchronous mode transmit\n");
-			}
+			LOGTX("Channel %c synchronous transmit enabled - load sync pattern\n", 'A' + m_index);
+			tx_setup_idle();
 		}
 		else if (!(m_rr0 & RR0_TX_BUFFER_EMPTY))
 		{
@@ -1044,62 +1058,47 @@ void z80sio_channel::transmit_complete()
 {
 	LOG("%s %s\n",FUNCNAME, tag());
 
-	if (transmit_allowed())
-	{
-		// transmit enabled, let's go
-		if ((m_wr4 & WR4_STOP_BITS_MASK) == WR4_STOP_BITS_SYNC)
-		{
-			switch (m_wr4 & WR4_SYNC_MODE_MASK)
-			{
-			// SDLC/HDLC - enabling transmit loads a flag character
-			case WR4_SYNC_MODE_SDLC:
-				sdlc_tx_sr_empty();
-				break;
-			default:
-				logerror("unsupported synchronous mode transmit\n");
-			}
-		}
-		else if (!(m_rr0 & RR0_TX_BUFFER_EMPTY))
-		{
-			// async mode, with data available
-			async_tx_setup();
-		}
-		else
-		{
-			LOGTX("%s() \"%s \"Channel %c Transmit buffer empty m_wr5:%02x\n", FUNCNAME, owner()->tag(), 'A' + m_index, m_wr5);
-		}
-	}
+	if ((m_wr4 & WR4_STOP_BITS_MASK) == WR4_STOP_BITS_SYNC)
+		sync_tx_sr_empty();
+	else if (transmit_allowed() && !(m_rr0 & RR0_TX_BUFFER_EMPTY))
+		async_tx_setup(); // async mode, with data available
+	else
+		LOGTX("%s() \"%s \"Channel %c Transmit buffer empty m_wr5:%02x\n", FUNCNAME, owner()->tag(), 'A' + m_index, m_wr5);
 }
 
 //-------------------------------------------------
-//  sdlc_tx_sr_empty - set up next chunk of bits
+//  sync_tx_sr_empty - set up next chunk of bits
 //  to send
 //-------------------------------------------------
-void z80sio_channel::sdlc_tx_sr_empty()
+void z80sio_channel::sync_tx_sr_empty()
 {
-	if (!(m_rr0 & RR0_TX_BUFFER_EMPTY))
+	if (!transmit_allowed())
+	{
+		LOGTX("%s() Channel %c Transmitter Disabled m_wr5:%02x\n", FUNCNAME, 'A' + m_index, m_wr5);
+
+		// transmit disabled, set flag if nothing pending
+		if (m_rr0 & RR0_TX_BUFFER_EMPTY)
+			m_rr1 |= RR1_ALL_SENT;
+	}
+	else if (!(m_rr0 & RR0_TX_BUFFER_EMPTY))
 	{
 		LOGTX("%s() Channel %c Transmit Data Byte '%02x' m_wr5:%02x\n", FUNCNAME, 'A' + m_index, m_tx_data, m_wr5);
-		tx_setup(m_tx_data, get_tx_word_length(m_tx_data), (m_wr4 & WR4_PARITY_ENABLE) ? 1 : 0, 0);
+		tx_setup(m_tx_data, get_tx_word_length(m_tx_data), (m_wr4 & WR4_PARITY_ENABLE) ? 1 : 0, false, false);
 
 		// empty transmit buffer
-		m_tx_special = 0;
 		m_rr0 |= RR0_TX_BUFFER_EMPTY;
 		if (m_wr1 & WR1_TX_INT_ENABLE)
 			m_uart->trigger_interrupt(m_index, INT_TRANSMIT);
 	}
 	else if (m_rr0 & RR0_TX_UNDERRUN)
 	{
-		LOGTX("%s() Channel %c Underrun - load flag m_wr5:%02x\n", FUNCNAME, 'A' + m_index, m_wr5);
-		tx_setup_flag();
+		LOGTX("%s() Channel %c Underrun - load sync pattern m_wr5:%02x\n", FUNCNAME, 'A' + m_index, m_wr5);
+		bool const first_idle((m_tx_flags & TX_FLAG_SPECIAL) || !(m_tx_flags & TX_FLAG_FRAMING));
+		tx_setup_idle();
 
-		// if the CRC was just sent, generate an interrupt indicating that the next frame can be sent
-		if (m_tx_special)
-		{
-			m_tx_special = 0;
-			if (m_wr1 & WR1_TX_INT_ENABLE)
-				m_uart->trigger_interrupt(m_index, INT_TRANSMIT);
-		}
+		// if this is the first sync pattern, generate an interrupt indicating that the next frame can be sent
+		if (first_idle && (m_wr1 & WR1_TX_INT_ENABLE))
+			m_uart->trigger_interrupt(m_index, INT_TRANSMIT);
 		m_rr1 |= RR1_ALL_SENT;
 	}
 	else
@@ -1107,11 +1106,11 @@ void z80sio_channel::sdlc_tx_sr_empty()
 		LOGTX("%s() Channel %c Transmit FCS '%04x' m_wr5:%02x\n", FUNCNAME, 'A' + m_index, m_tx_crc, m_wr5);
 
 		// just for fun, SDLC sends the FCS inverted in reverse bit order
-		tx_setup(~BITSWAP16(m_tx_crc, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15), 16, 0, 0);
+		uint16_t const fcs(BITSWAP16(m_tx_crc, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
+		tx_setup(((m_wr4 & WR4_SYNC_MODE_MASK) == WR4_SYNC_MODE_SDLC) ? ~fcs : fcs, 16, 0, false, true);
 
 		// set the underrun flag so it will send a flag next time
 		m_rr0 |= RR0_TX_UNDERRUN;
-		m_tx_special = 1;
 		trigger_ext_int();
 	}
 }
@@ -1125,7 +1124,7 @@ void z80sio_channel::async_tx_setup()
 {
 	LOGTX("%s() Channel %c Transmit Data Byte '%02x' m_wr5:%02x\n", FUNCNAME, 'A' + m_index, m_tx_data, m_wr5);
 
-	tx_setup(uint16_t(m_tx_data) << 1, get_tx_word_length(m_tx_data) + 1, (m_wr4 & WR4_PARITY_ENABLE) ? 2 : 0, 0);
+	tx_setup(uint16_t(m_tx_data) << 1, get_tx_word_length(m_tx_data) + 1, (m_wr4 & WR4_PARITY_ENABLE) ? 2 : 0, false, false);
 	++m_tx_bits; // stop bit
 
 	// empty transmit buffer
@@ -1143,6 +1142,7 @@ void z80sio_channel::reset_ext_status()
 {
 	// this will clear latched external pin state
 	m_ext_latched = 0;
+	m_break_latched = 0;
 	read_ext();
 
 	// Clear any pending External interrupt
@@ -1303,7 +1303,7 @@ int z80sio_channel::get_tx_word_length(uint8_t data) const
 uint8_t z80sio_channel::do_sioreg_rr0()
 {
 	LOGR("%s\n", FUNCNAME);
-	if (m_tx_special)
+	if (m_tx_flags & TX_FLAG_SPECIAL)
 		return m_rr0 & ~RR0_TX_BUFFER_EMPTY;
 	else
 		return m_rr0;
@@ -1418,11 +1418,9 @@ void z80sio_channel::do_sioreg_wr0(uint8_t data)
 	case WR0_SEND_ABORT:
 		LOGCMD("%s Ch:%c : Send abort command\n", FUNCNAME, 'A' + m_index);
 		// TODO: what actually happens if you try this in a mode other than SDLC?
-		tx_setup(0xff, 8, 0, 1);
-
 		// FIXME: how does this interact with interrupts?
 		// For now assume it behaves like automatically sending CRC and generates a transmit interrupt when a new frame can be sent.
-		m_tx_special = 1;
+		tx_setup(0xff, 8, 0, true, true);
 		m_rr0 |= RR0_TX_BUFFER_EMPTY;
 		m_rr1 &= ~RR1_ALL_SENT;
 		break;
@@ -1610,6 +1608,7 @@ void z80sio_channel::data_write(uint8_t data)
 {
 	if (!(m_rr0 & RR0_TX_BUFFER_EMPTY))
 		LOGTX("Z80SIO \"%s\" Channel %c : Dropped Data Byte '%02x'\n", owner()->tag(), 'A' + m_index, m_tx_data);
+	LOGTX("Z80SIO Channel %c : Queue Data Byte '%02x'\n", 'A' + m_index, data);
 
 	// fill transmit buffer
 	m_tx_data = data;
@@ -1624,18 +1623,9 @@ void z80sio_channel::data_write(uint8_t data)
 	// clear transmit interrupt
 	m_uart->clear_interrupt(m_index, INT_TRANSMIT);
 
-	// may be possible to transmit immediately
-	if (!m_tx_bits && transmit_allowed())
-	{
-		if (async)
-		{
-			async_tx_setup();
-		}
-		else
-		{
-			logerror("unsupported synchronous mode transmit\n");
-		}
-	}
+	// may be possible to transmit immediately (synchronous mode will load when sync pattern completes)
+	if (async && !m_tx_bits && transmit_allowed())
+		async_tx_setup();
 }
 
 
@@ -1691,12 +1681,13 @@ void z80sio_channel::advance_rx_fifo()
 //-------------------------------------------------
 void z80sio_channel::receive_data()
 {
-	LOGRCV("%s(%04x) %s:%c\n",FUNCNAME, m_rx_sr, tag(), 'A' + m_index);
+	LOGRCV("%s(%04x) Chan:%c\n", FUNCNAME, m_rx_sr, 'A' + m_index);
 
-	// check for parity and framing errors
+	// check for parity and framing errors and break condition
 	int const word_length = get_rx_word_length();
 	bool const parity = 0U != (m_wr4 & WR4_PARITY_ENABLE);
 	uint16_t const stop_bit = uint16_t(1U) << (word_length + (parity ? 1 : 0));
+	bool const brk(!(m_rx_sr & ((stop_bit << 1) - 1)));
 	uint32_t rx_error = (m_rx_sr & stop_bit) ? 0U : RR1_CRC_FRAMING_ERROR;
 	m_rx_sr |= stop_bit;
 	if (parity)
@@ -1746,7 +1737,16 @@ void z80sio_channel::receive_data()
 		break;
 
 	default:
-		LOG("No interrupt triggered\n");
+		LOG("No receive interrupt triggered\n");
+	}
+
+	// break interrupt
+	if (brk && !m_brk_latched && !(m_rr0 & RR0_BREAK_ABORT))
+	{
+		LOGRCV("Break detected\n");
+		m_rr0 |= RR0_BREAK_ABORT;
+		m_brk_latched = 1;
+		trigger_ext_int();
 	}
 }
 
@@ -1813,6 +1813,15 @@ WRITE_LINE_MEMBER( z80sio_channel::rxc_w )
 	{
 		// RxD sampled on rising edge
 		int const clocks = get_clock_mode() - 1;
+
+		// break termination detection
+		if (m_rxd && !m_brk_latched && (m_rr0 & RR0_BREAK_ABORT))
+		{
+			LOGRCV("Break termination detected\n");
+			m_rr0 &= ~RR0_BREAK_ABORT;
+			m_brk_latched = 1;
+			trigger_ext_int();
+		}
 
 		if (!m_rx_bit)
 		{
@@ -1905,20 +1914,21 @@ WRITE_LINE_MEMBER( z80sio_channel::txc_w )
 		else
 		{
 			bool const sdlc_mode((m_wr4 & (WR4_STOP_BITS_MASK | WR4_SYNC_MODE_MASK)) == (WR4_STOP_BITS_SYNC | WR4_SYNC_MODE_SDLC));
-			bool const stuff_zero(sdlc_mode && !m_tx_framing && ((m_tx_hist & 0x1fU) == 0x1fU));
+			bool const framing(m_tx_flags & TX_FLAG_FRAMING);
+			bool const stuff_zero(sdlc_mode && !framing && ((m_tx_hist & 0x1fU) == 0x1fU));
 
 			// have bits, shift out
 			int const db(stuff_zero ? 0 : BIT(m_tx_sr, 0));
 			if (!stuff_zero)
 			{
-				LOGBIT("%s() Channel %c transmit %s bit %d m_wr5:%02x\n", FUNCNAME, 'A' + m_index, m_tx_framing ? "framing" : "data", db, m_wr5);
+				LOGBIT("%s() Channel %c transmit %s bit %d m_wr5:%02x\n", FUNCNAME, 'A' + m_index, framing ? "framing" : "data", db, m_wr5);
 				if (m_tx_parity >= m_tx_bits)
 					m_tx_parity = 0;
 				else if (m_tx_parity)
 					m_tx_sr ^= uint16_t(db) << (m_tx_bits - m_tx_parity);
 				m_tx_sr >>= 1;
 
-				if ((m_wr5 & WR5_TX_CRC_ENABLE) & !m_tx_framing)
+				if (m_tx_flags & TX_FLAG_CRC)
 				{
 					uint16_t const poly((m_wr5 & WR5_CRC16) ? 0x8005U : device_sdlc_consumer_interface::POLY_SDLC);
 					m_tx_crc = device_sdlc_consumer_interface::update_frame_check(poly, m_tx_crc, db);
