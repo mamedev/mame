@@ -675,6 +675,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/atmel_arm_aic.h,MACHINES["ARM_AIC"] = true
+---------------------------------------------------
+
+if (MACHINES["ARM_AIC"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/atmel_arm_aic.cpp",
+		MAME_DIR .. "src/devices/machine/atmel_arm_aic.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/ay31015.h,MACHINES["AY31015"] = true
 ---------------------------------------------------
 
