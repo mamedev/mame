@@ -55,8 +55,6 @@ DEFINE_DEVICE_TYPE(CLIPPER_C100, clipper_c100_device, "clipper_c100", "C100 CLIP
 DEFINE_DEVICE_TYPE(CLIPPER_C300, clipper_c300_device, "clipper_c300", "C300 CLIPPER")
 DEFINE_DEVICE_TYPE(CLIPPER_C400, clipper_c400_device, "clipper_c400", "C400 CLIPPER")
 
-ALLOW_SAVE_TYPE(clipper_device::fpregs);
-
 clipper_c100_device::clipper_c100_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: clipper_device(mconfig, CLIPPER_C100, tag, owner, clock, 0) { }
 
@@ -153,26 +151,26 @@ void clipper_device::device_start()
 	state_add(CLIPPER_R14, "r14", m_r[14]);
 	state_add(CLIPPER_R15, "r15", m_r[15]);
 
-	state_add(CLIPPER_F0, "f0", m_f[0].d);
-	state_add(CLIPPER_F1, "f1", m_f[1].d);
-	state_add(CLIPPER_F2, "f2", m_f[2].d);
-	state_add(CLIPPER_F3, "f3", m_f[3].d);
-	state_add(CLIPPER_F4, "f4", m_f[4].d);
-	state_add(CLIPPER_F5, "f5", m_f[5].d);
-	state_add(CLIPPER_F6, "f6", m_f[6].d);
-	state_add(CLIPPER_F7, "f7", m_f[7].d);
+	state_add(CLIPPER_F0, "f0", m_f[0]);
+	state_add(CLIPPER_F1, "f1", m_f[1]);
+	state_add(CLIPPER_F2, "f2", m_f[2]);
+	state_add(CLIPPER_F3, "f3", m_f[3]);
+	state_add(CLIPPER_F4, "f4", m_f[4]);
+	state_add(CLIPPER_F5, "f5", m_f[5]);
+	state_add(CLIPPER_F6, "f6", m_f[6]);
+	state_add(CLIPPER_F7, "f7", m_f[7]);
 
 	// C400 has 8 additional floating point registers
 	if (type() == CLIPPER_C400)
 	{
-		state_add(CLIPPER_F8, "f8", m_f[8].d);
-		state_add(CLIPPER_F9, "f9", m_f[9].d);
-		state_add(CLIPPER_F10, "f10", m_f[10].d);
-		state_add(CLIPPER_F11, "f11", m_f[11].d);
-		state_add(CLIPPER_F12, "f12", m_f[12].d);
-		state_add(CLIPPER_F13, "f13", m_f[13].d);
-		state_add(CLIPPER_F14, "f14", m_f[14].d);
-		state_add(CLIPPER_F15, "f15", m_f[15].d);
+		state_add(CLIPPER_F8, "f8", m_f[8]);
+		state_add(CLIPPER_F9, "f9", m_f[9]);
+		state_add(CLIPPER_F10, "f10", m_f[10]);
+		state_add(CLIPPER_F11, "f11", m_f[11]);
+		state_add(CLIPPER_F12, "f12", m_f[12]);
+		state_add(CLIPPER_F13, "f13", m_f[13]);
+		state_add(CLIPPER_F14, "f14", m_f[14]);
+		state_add(CLIPPER_F15, "f15", m_f[15]);
 	}
 }
 
@@ -484,125 +482,89 @@ int clipper_device::execute_instruction ()
 
 	case 0x20:
 		// adds: add single floating
-		m_fp_pc = m_pc;
-		m_fp_dst = m_f[R2].s;
-
-		m_f[R2].s = float32_add(m_f[R2].s, m_f[R1].s);
-		m_ssw |= SSW_FRD;
+		set_fp32(R2, float32_add(get_fp32(R2), get_fp32(R1)));
 		// TRAPS: F_IVUX
 		float_exception_flags &= (float_flag_invalid | float_flag_overflow | float_flag_underflow | float_flag_inexact);
 		break;
 	case 0x21:
-		// subs: subtract single floating (exception state not documented)
-		m_fp_pc = m_pc;
-		m_fp_dst = m_f[R2].s;
-
-		m_f[R2].s = float32_sub(m_f[R2].s, m_f[R1].s);
-		m_ssw |= SSW_FRD;
+		// subs: subtract single floating
+		set_fp32(R2, float32_sub(get_fp32(R2), get_fp32(R1)));
 		// TRAPS: F_IVUX
 		float_exception_flags &= (float_flag_invalid | float_flag_overflow | float_flag_underflow | float_flag_inexact);
 		break;
 	case 0x22:
 		// addd: add double floating
-		m_fp_pc = m_pc;
-		m_fp_dst = m_f[R2].d;
-
-		m_f[R2].d = float64_add(m_f[R2].d, m_f[R1].d);
-		m_ssw |= SSW_FRD;
+		set_fp64(R2, float64_add(get_fp64(R2), get_fp64(R1)));
 		// TRAPS: F_IVUX
 		float_exception_flags &= (float_flag_invalid | float_flag_overflow | float_flag_underflow | float_flag_inexact);
 		break;
 	case 0x23:
-		// subd: subtract double floating (exception state not documented)
-		m_fp_pc = m_pc;
-		m_fp_dst = m_f[R2].d;
-
-		m_f[R2].d = float64_sub(m_f[R2].d, m_f[R1].d);
-		m_ssw |= SSW_FRD;
+		// subd: subtract double floating
+		set_fp64(R2, float64_sub(get_fp64(R2), get_fp64(R1)));
 		// TRAPS: F_IVUX
 		float_exception_flags &= (float_flag_invalid | float_flag_overflow | float_flag_underflow | float_flag_inexact);
 		break;
 	case 0x24:
 		// movs: move single floating
-		m_f[R2].s = m_f[R1].s;
-		m_ssw |= SSW_FRD;
+		set_fp32(R2, get_fp32(R1));
 		break;
 	case 0x25:
 		// cmps: compare single floating
-		FLAGS(0, 0, float32_eq(m_f[R2].s, m_f[R1].s), float32_lt(m_f[R2].s, m_f[R1].s))
+		FLAGS(0, 0, float32_eq(get_fp32(R2), get_fp32(R1)), float32_lt(get_fp32(R2), get_fp32(R1)))
 		if (float_exception_flags & float_flag_invalid)
 			m_psw |= PSW_Z | PSW_N;
 		float_exception_flags &= (0);
 		break;
 	case 0x26:
 		// movd: move double floating
-		m_f[R2].d = m_f[R1].d;
-		m_ssw |= SSW_FRD;
+		set_fp64(R2, get_fp64(R1));
 		break;
 	case 0x27:
 		// cmpd: compare double floating
-		FLAGS(0, 0, float64_eq(m_f[R2].d, m_f[R1].d), float64_lt(m_f[R2].d, m_f[R1].d))
+		FLAGS(0, 0, float64_eq(get_fp64(R2), get_fp64(R1)), float64_lt(get_fp64(R2), get_fp64(R1)))
 		if (float_exception_flags & float_flag_invalid)
 			m_psw |= PSW_Z | PSW_N;
 		float_exception_flags &= (0);
 		break;
 	case 0x28:
 		// muls: multiply single floating
-		m_fp_pc = m_pc;
-		m_fp_dst = m_f[R2].s;
-
-		m_f[R2].s = float32_mul(m_f[R2].s, m_f[R1].s);
-		m_ssw |= SSW_FRD;
+		set_fp32(R2, float32_mul(get_fp32(R2), get_fp32(R1)));
 		// TRAPS: F_IVUX
 		float_exception_flags &= (float_flag_invalid | float_flag_overflow | float_flag_underflow | float_flag_inexact);
 		break;
 	case 0x29:
 		// divs: divide single floating
-		m_fp_pc = m_pc;
-		m_fp_dst = m_f[R2].s;
-
-		m_f[R2].s = float32_div(m_f[R2].s, m_f[R1].s);
-		m_ssw |= SSW_FRD;
+		set_fp32(R2, float32_div(get_fp32(R2), get_fp32(R1)));
 		// TRAPS: F_IVDUX
 		float_exception_flags &= (float_flag_invalid | float_flag_overflow | float_flag_divbyzero | float_flag_underflow | float_flag_inexact);
 		break;
 	case 0x2a:
 		// muld: multiply double floating
-		m_fp_pc = m_pc;
-		m_fp_dst = m_f[R2].d;
-
-		m_f[R2].d = float64_mul(m_f[R2].d, m_f[R1].d);
-		m_ssw |= SSW_FRD;
+		set_fp64(R2, float64_mul(get_fp64(R2), get_fp64(R1)));
 		// TRAPS: F_IVUX
 		float_exception_flags &= (float_flag_invalid | float_flag_overflow | float_flag_underflow | float_flag_inexact);
 		break;
 	case 0x2b:
 		// divd: divide double floating
-		m_fp_pc = m_pc;
-		m_fp_dst = m_f[R2].d;
-
-		m_f[R2].d = float64_div(m_f[R2].d, m_f[R1].d);
-		m_ssw |= SSW_FRD;
+		set_fp64(R2, float64_div(get_fp64(R2), get_fp64(R1)));
 		// TRAPS: F_IVDUX
 		float_exception_flags &= (float_flag_invalid | float_flag_overflow | float_flag_divbyzero | float_flag_underflow | float_flag_inexact);
 		break;
 	case 0x2c:
 		// movsw: move single floating to word
-		m_r[R2] = m_f[R1].s;
+		m_r[R2] = get_fp32(R1);
 		break;
 	case 0x2d:
 		// movws: move word to single floating
-		m_f[R2].s = m_r[R1];
-		m_ssw |= SSW_FRD;
+		set_fp32(R2, m_r[R1]);
 		break;
 	case 0x2e:
 		// movdl: move double floating to longword
-		((u64 *)m_r)[R2 >> 1] = m_f[R1].d;
+		((u64 *)m_r)[R2 >> 1] = get_fp64(R1);
 		break;
 	case 0x2f:
 		// movld: move longword to double floating
-		m_f[R2].d = ((u64 *)m_r)[R1 >> 1];
-		m_ssw |= SSW_FRD;
+		set_fp64(R2, ((u64 *)m_r)[R1 >> 1]);
 		break;
 	case 0x30:
 		// shaw: shift arithmetic word
@@ -821,15 +783,13 @@ int clipper_device::execute_instruction ()
 	case 0x64:
 	case 0x65:
 		// loads: load single floating
-		m_f[R2].s = m_data->read_dword(m_info.address);
-		m_ssw |= SSW_FRD;
+		set_fp32(R2, m_data->read_dword(m_info.address));
 		// TRAPS: C,U,A,P,R,I
 		break;
 	case 0x66:
 	case 0x67:
 		// loadd: load double floating
-		m_f[R2].d = m_data->read_qword(m_info.address);
-		m_ssw |= SSW_FRD;
+		set_fp64(R2, m_data->read_qword(m_info.address));
 		// TRAPS: C,U,A,P,R,I
 		break;
 	case 0x68:
@@ -872,13 +832,13 @@ int clipper_device::execute_instruction ()
 	case 0x74:
 	case 0x75:
 		// stors: store single floating
-		m_data->write_dword(m_info.address, m_f[R2].s);
+		m_data->write_dword(m_info.address, get_fp32(R2));
 		// TRAPS: A,P,W,I
 		break;
 	case 0x76:
 	case 0x77:
 		// stord: store double floating
-		m_data->write_qword(m_info.address, m_f[R2].d);
+		m_data->write_qword(m_info.address, get_fp64(R2));
 		// TRAPS: A,P,W,I
 		break;
 	case 0x78:
@@ -1222,7 +1182,7 @@ int clipper_device::execute_instruction ()
 
 			// store fi at sp - 8 * (8 - i)
 			for (int i = R2; i < 8; i++)
-				m_data->write_qword(m_r[15] - 8 * (8 - i), m_f[i].d);
+				m_data->write_qword(m_r[15] - 8 * (8 - i), get_fp64(i));
 
 			// decrement sp after push to allow restart on exceptions
 			m_r[15] -= 8 * (8 - R2);
@@ -1234,8 +1194,7 @@ int clipper_device::execute_instruction ()
 
 			// load fi from sp + 8 * (i - N)
 			for (int i = R2; i < 8; i++)
-				m_f[i].d = m_data->read_qword(m_r[15] + 8 * (i - R2));
-			m_ssw |= SSW_FRD;
+				set_fp64(i, m_data->read_qword(m_r[15] + 8 * (i - R2)));
 
 			// increment sp after pop to allow restart on exceptions
 			m_r[15] += 8 * (8 - R2);
@@ -1245,7 +1204,7 @@ int clipper_device::execute_instruction ()
 			// cnvsw: convert single floating to word
 			m_fp_pc = m_pc;
 
-			m_r[m_info.macro & 0xf] = float32_to_int32(m_f[(m_info.macro >> 4) & 0xf].s);
+			m_r[m_info.macro & 0xf] = float32_to_int32(get_fp32((m_info.macro >> 4) & 0xf));
 			// TRAPS: F_IX
 			float_exception_flags &= (float_flag_invalid | float_flag_inexact);
 			break;
@@ -1253,11 +1212,11 @@ int clipper_device::execute_instruction ()
 			// cnvrsw: convert rounding single floating to word (non-IEEE +0.5/-0.5 rounding)
 			m_fp_pc = m_pc;
 
-			if (float32_lt(m_f[(m_info.macro >> 4) & 0xf].s, 0))
-				m_r[m_info.macro & 0xf] = float32_to_int32_round_to_zero(float32_sub(m_f[(m_info.macro >> 4) & 0xf].s,
+			if (float32_lt(get_fp32((m_info.macro >> 4) & 0xf), 0))
+				m_r[m_info.macro & 0xf] = float32_to_int32_round_to_zero(float32_sub(get_fp32((m_info.macro >> 4) & 0xf),
 					float32_div(int32_to_float32(1), int32_to_float32(2))));
 			else
-				m_r[m_info.macro & 0xf] = float32_to_int32_round_to_zero(float32_add(m_f[(m_info.macro >> 4) & 0xf].s,
+				m_r[m_info.macro & 0xf] = float32_to_int32_round_to_zero(float32_add(get_fp32((m_info.macro >> 4) & 0xf),
 					float32_div(int32_to_float32(1), int32_to_float32(2))));
 			// TRAPS: F_IX
 			float_exception_flags &= (float_flag_invalid | float_flag_inexact);
@@ -1266,14 +1225,13 @@ int clipper_device::execute_instruction ()
 			// cnvtsw: convert truncating single floating to word
 			m_fp_pc = m_pc;
 
-			m_r[m_info.macro & 0xf] = float32_to_int32_round_to_zero(m_f[(m_info.macro >> 4) & 0xf].s);
+			m_r[m_info.macro & 0xf] = float32_to_int32_round_to_zero(get_fp32((m_info.macro >> 4) & 0xf));
 			// TRAPS: F_IX
 			float_exception_flags &= (float_flag_invalid | float_flag_inexact);
 			break;
 		case 0x33:
 			// cnvws: convert word to single floating
-			m_f[m_info.macro & 0xf].s = int32_to_float32(m_r[(m_info.macro >> 4) & 0xf]);
-			m_ssw |= SSW_FRD;
+			set_fp32(m_info.macro & 0xf, int32_to_float32(m_r[(m_info.macro >> 4) & 0xf]));
 			// TRAPS: F_X
 			float_exception_flags &= (float_flag_inexact);
 			break;
@@ -1281,7 +1239,7 @@ int clipper_device::execute_instruction ()
 			// cnvdw: convert double floating to word
 			m_fp_pc = m_pc;
 
-			m_r[m_info.macro & 0xf] = float64_to_int32(m_f[(m_info.macro >> 4) & 0xf].d);
+			m_r[m_info.macro & 0xf] = float64_to_int32(get_fp64((m_info.macro >> 4) & 0xf));
 			// TRAPS: F_IX
 			float_exception_flags &= (float_flag_invalid | float_flag_inexact);
 			break;
@@ -1289,11 +1247,11 @@ int clipper_device::execute_instruction ()
 			// cnvrdw: convert rounding double floating to word (non-IEEE +0.5/-0.5 rounding)
 			m_fp_pc = m_pc;
 
-			if (float64_lt(m_f[(m_info.macro >> 4) & 0xf].d, 0))
-				m_r[m_info.macro & 0xf] = float64_to_int32_round_to_zero(float64_sub(m_f[(m_info.macro >> 4) & 0xf].d,
+			if (float64_lt(get_fp64((m_info.macro >> 4) & 0xf), 0))
+				m_r[m_info.macro & 0xf] = float64_to_int32_round_to_zero(float64_sub(get_fp64((m_info.macro >> 4) & 0xf),
 					float64_div(int32_to_float64(1), int32_to_float64(2))));
 			else
-				m_r[m_info.macro & 0xf] = float64_to_int32_round_to_zero(float64_add(m_f[(m_info.macro >> 4) & 0xf].d,
+				m_r[m_info.macro & 0xf] = float64_to_int32_round_to_zero(float64_add(get_fp64((m_info.macro >> 4) & 0xf),
 					float64_div(int32_to_float64(1), int32_to_float64(2))));
 			// TRAPS: F_IX
 			float_exception_flags &= (float_flag_invalid | float_flag_inexact);
@@ -1302,43 +1260,35 @@ int clipper_device::execute_instruction ()
 			// cnvtdw: convert truncating double floating to word
 			m_fp_pc = m_pc;
 
-			m_r[m_info.macro & 0xf] = float64_to_int32_round_to_zero(m_f[(m_info.macro >> 4) & 0xf].d);
+			m_r[m_info.macro & 0xf] = float64_to_int32_round_to_zero(get_fp64((m_info.macro >> 4) & 0xf));
 			// TRAPS: F_IX
 			float_exception_flags &= (float_flag_invalid | float_flag_inexact);
 			break;
 		case 0x37:
 			// cnvwd: convert word to double floating
-			m_f[m_info.macro & 0xf].d = int32_to_float64(m_r[(m_info.macro >> 4) & 0xf]);
-			m_ssw |= SSW_FRD;
+			set_fp64(m_info.macro & 0xf, int32_to_float64(m_r[(m_info.macro >> 4) & 0xf]));
 			float_exception_flags &= (0);
 			break;
 		case 0x38:
 			// cnvsd: convert single to double floating
-			m_f[m_info.macro & 0xf].d = float32_to_float64(m_f[(m_info.macro >> 4) & 0xf].s);
-			m_ssw |= SSW_FRD;
+			set_fp64(m_info.macro & 0xf, float32_to_float64(get_fp32((m_info.macro >> 4) & 0xf)));
 			// TRAPS: F_I
 			float_exception_flags &= (float_flag_invalid);
 			break;
 		case 0x39:
 			// cnvds: convert double to single floating
-			m_fp_pc = m_pc;
-			m_fp_dst = m_f[m_info.macro & 0xf].s;
-
-			m_f[m_info.macro & 0xf].s = float64_to_float32(m_f[(m_info.macro >> 4) & 0xf].d);
-			m_ssw |= SSW_FRD;
+			set_fp32(m_info.macro & 0xf, float64_to_float32(get_fp64((m_info.macro >> 4) & 0xf)));
 			// TRAPS: F_IVUX
 			float_exception_flags &= (float_flag_invalid | float_flag_overflow | float_flag_underflow | float_flag_inexact);
 			break;
 		case 0x3a:
 			// negs: negate single floating
-			m_f[m_info.macro & 0xf].s = float32_mul(m_f[(m_info.macro >> 4) & 0xf].s, int32_to_float32(-1));
-			m_ssw |= SSW_FRD;
+			set_fp32(m_info.macro & 0xf, float32_mul(get_fp32((m_info.macro >> 4) & 0xf), int32_to_float32(-1)));
 			float_exception_flags &= (0);
 			break;
 		case 0x3b:
 			// negd: negate double floating
-			m_f[m_info.macro & 0xf].d = float64_mul(m_f[(m_info.macro >> 4) & 0xf].d, int32_to_float64(-1));
-			m_ssw |= SSW_FRD;
+			set_fp64(m_info.macro & 0xf, float64_mul(get_fp64((m_info.macro >> 4) & 0xf), int32_to_float64(-1)));
 			float_exception_flags &= (0);
 			break;
 		case 0x3c:
@@ -1352,27 +1302,19 @@ int clipper_device::execute_instruction ()
 			* correct exception flags are set.
 			*/
 			// scalbs: scale by, single floating
-			m_fp_pc = m_pc;
-			m_fp_dst = m_f[m_info.macro & 0xf].s;
-
-			m_f[m_info.macro & 0xf].s = float32_mul(m_f[m_info.macro & 0xf].s,
+			set_fp32(m_info.macro & 0xf, float32_mul(get_fp32(m_info.macro & 0xf),
 				(((s32)m_r[(m_info.macro >> 4) & 0xf] > -127 && (s32)m_r[(m_info.macro >> 4) & 0xf] < 128)
 					? (float32)(((s32)m_r[(m_info.macro >> 4) & 0xf] + 127) << 23)
-					: (float32)~u32(0)));
-			m_ssw |= SSW_FRD;
+					: (float32)~u32(0))));
 			// TRAPS: F_IVUX
 			float_exception_flags &= (float_flag_invalid | float_flag_overflow | float_flag_underflow | float_flag_inexact);
 			break;
 		case 0x3d:
 			// scalbd: scale by, double floating
-			m_fp_pc = m_pc;
-			m_fp_dst = m_f[m_info.macro & 0xf].d;
-
-			m_f[m_info.macro & 0xf].d = float64_mul(m_f[m_info.macro & 0xf].d,
+			set_fp64(m_info.macro & 0xf, float64_mul(get_fp64(m_info.macro & 0xf),
 				((s32)m_r[(m_info.macro >> 4) & 0xf] > -1023 && (s32)m_r[(m_info.macro >> 4) & 0xf] < 1024)
 					? (float64)((u64)((s32)m_r[(m_info.macro >> 4) & 0xf] + 1023) << 52)
-					: (float64)~u64(0));
-			m_ssw |= SSW_FRD;
+					: (float64)~u64(0)));
 			// TRAPS: F_IVUX
 			float_exception_flags &= (float_flag_invalid | float_flag_overflow | float_flag_underflow | float_flag_inexact);
 			break;
@@ -1384,7 +1326,7 @@ int clipper_device::execute_instruction ()
 		case 0x3f:
 			// loadfs: load floating status
 			m_r[(m_info.macro >> 4) & 0xf] = m_fp_pc;
-			m_f[m_info.macro & 0xf].d = m_fp_dst;
+			m_f[m_info.macro & 0xf] = m_fp_dst;
 			m_ssw |= SSW_FRD;
 			break;
 
@@ -1682,6 +1624,32 @@ void clipper_device::fp_exception()
 	// trigger a floating point exception
 	if (PSW(EFT) && vector)
 		m_pc = intrap(vector, m_pc);
+}
+
+inline void clipper_device::set_fp32(const u8 reg, const float32 data)
+{
+	// save floating exception state
+	m_fp_pc = m_pc;
+	m_fp_dst = m_f[reg & 0xf];
+
+	// assign data
+	m_f[reg & 0xf] = data;
+
+	// set floating dirty flag
+	m_ssw |= SSW_FRD;
+}
+
+inline void clipper_device::set_fp64(const u8 reg, const float64 data)
+{
+	// save floating exception state
+	m_fp_pc = m_pc;
+	m_fp_dst = m_f[reg & 0xf];
+
+	// assign data
+	m_f[reg & 0xf] = data;
+
+	// set floating dirty flag
+	m_ssw |= SSW_FRD;
 }
 
 offs_t clipper_device::disasm_disassemble(std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, u32 options)

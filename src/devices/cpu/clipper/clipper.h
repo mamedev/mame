@@ -227,6 +227,11 @@ protected:
 
 	void set_ssw(u32 data) { m_ssw = (m_ssw & SSW(ID)) | (data & ~SSW(ID)); }
 
+	inline float32 get_fp32(const u8 reg) const { return m_f[reg & 0xf]; };
+	inline float64 get_fp64(const u8 reg) const { return m_f[reg & 0xf]; };
+	inline void set_fp32(const u8 reg, const float32 data);
+	inline void set_fp64(const u8 reg, const float64 data);
+
 	// core registers
 	u32 m_pc;
 	u32 m_psw;
@@ -237,13 +242,8 @@ protected:
 	u32 m_ru[16]; // user registers
 	u32 m_rs[16]; // supervisor registers
 
-	// floating registers
-	union fpregs
-	{
-		float64 d; // double precision floating point
-		float32 s; // single precision floating point
-	}
-	m_f[16];
+	// floating point registers
+	u64 m_f[16];
 
 	u32 m_fp_pc;  // address of floating point instruction causing exception
 	u64 m_fp_dst; // original value of destination register during fp exception
