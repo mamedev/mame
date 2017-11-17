@@ -111,7 +111,13 @@ protected:
 	enum shift_type
 	{
 		N_LO = 0,
-		N_HI = 1,
+		N_HI = 1
+	};
+
+	enum sign_mode
+	{
+		IS_UNSIGNED = 0,
+		IS_SIGNED = 1
 	};
 
 	// construction/destruction
@@ -216,8 +222,7 @@ private:
 
 	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void hyperstone_chk();
 	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void hyperstone_movd();
-	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void hyperstone_divu();
-	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void hyperstone_divs();
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL, sign_mode SIGNED> void hyperstone_divsu();
 	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void hyperstone_xm();
 	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void hyperstone_mask();
 	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void hyperstone_sum();
@@ -265,8 +270,7 @@ private:
 	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void hyperstone_stxx1();
 	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void hyperstone_stxx2();
 
-	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void hyperstone_mulu();
-	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void hyperstone_muls();
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL, sign_mode SIGNED> void hyperstone_mulsu();
 	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void hyperstone_mul();
 
 	template <shift_type HI_N, reg_bank DST_GLOBAL> void hyperstone_set();
