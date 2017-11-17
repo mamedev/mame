@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Zsolt Vasvari
+// copyright-holders:Zsolt Vasvari, Jim Hernandez
 /*
  *  Tranquillizer Gun audio routines
  */
@@ -8,8 +8,14 @@
 #include "includes/vicdual.h"
 
 /* output port 0x01 definitions - sound effect drive outputs */
-#define OUT_PORT_1_STUFF1       0x01
-#define OUT_PORT_1_STUFF2       0x02
+#define OUT_PORT_1_ANIMAL    0x01
+#define OUT_PORT_1_CRY       0x02
+#define OUT_PORT_1_WALK      0x04
+#define OUT_PORT_1_EMAR      0x08
+#define OUT_PORT_1_ANIMALHIT 0x10
+#define OUT_PORT_1_POINT     0x20
+#define OUT_PORT_1_JEEP      0x40
+#define OUT_PORT_1_GUN       0x80
 
 
 #define PLAY(samp,id,loop)      samp->start( id, id, loop )
@@ -20,8 +26,14 @@
 static const char *const tranqgun_sample_names[] =
 {
 	"*tranqgun",
-	"stuff1",
-	"stuff2",
+	"cry",
+	"walk",
+	"emar",
+	"animalhit",
+	"point",
+	"jeep",
+	"gun",
+	"animal",
 	nullptr
 };
 
@@ -29,8 +41,14 @@ static const char *const tranqgun_sample_names[] =
 /* sample IDs - must match sample file name table above */
 enum
 {
-	SND_STUFF1 = 0,
-	SND_STUFF2
+	SND_CRY = 0,
+	SND_WALK,
+	SND_EMAR,
+	SND_ANIMALHIT,
+	SND_POINT,
+	SND_JEEP,
+	SND_GUN,
+	SND_ANIMAL,
 };
 
 
@@ -46,13 +64,78 @@ WRITE8_MEMBER( vicdual_state::tranqgun_audio_w )
 
 	m_port1State = data;
 
-	if ( bitsGoneHigh & OUT_PORT_1_STUFF1 )
+	if ( bitsGoneHigh & OUT_PORT_1_ANIMAL )
 	{
-		PLAY( m_samples, SND_STUFF1, 0 );
+		PLAY( m_samples, SND_ANIMAL, 0 );
 	}
-	if ( bitsGoneLow & OUT_PORT_1_STUFF1 )
+	if ( bitsGoneLow & OUT_PORT_1_ANIMAL )
 	{
-		STOP( m_samples, SND_STUFF1 );
+		STOP( m_samples, SND_ANIMAL );
+	}
+
+	if ( bitsGoneHigh & OUT_PORT_1_CRY )
+	{
+		PLAY( m_samples, SND_CRY, 0 );
+	}
+	if ( bitsGoneLow & OUT_PORT_1_CRY )
+	{
+		STOP( m_samples, SND_CRY );
+	}
+
+	if ( bitsGoneHigh & OUT_PORT_1_WALK )
+	{
+		PLAY( m_samples, SND_WALK, 0 );
+	}
+	if ( bitsGoneLow & OUT_PORT_1_WALK )
+	{
+		STOP( m_samples, SND_WALK );
+	}
+
+	if ( bitsGoneLow & OUT_PORT_1_ANIMAL )
+	{
+		PLAY( m_samples, SND_ANIMAL,0 );
+	}
+
+	if ( bitsGoneHigh & OUT_PORT_1_ANIMALHIT )
+	{
+		PLAY( m_samples, SND_ANIMALHIT, 0 );
+	}
+	if ( bitsGoneLow & OUT_PORT_1_ANIMALHIT )
+	{
+		STOP( m_samples, SND_ANIMALHIT );
+	}
+
+	if ( bitsGoneHigh & OUT_PORT_1_POINT )
+	{
+		PLAY( m_samples, SND_POINT, 0 );
+	}
+	if ( bitsGoneLow & OUT_PORT_1_POINT )
+	{
+		STOP( m_samples, SND_POINT );
+	}
+
+	if ( bitsGoneLow & OUT_PORT_1_JEEP )
+	{
+		PLAY( m_samples, SND_JEEP, 1 );
+
+	}
+	if ( bitsGoneHigh & OUT_PORT_1_JEEP )
+	{
+		STOP( m_samples, SND_JEEP );
+	}
+
+	if ( bitsGoneLow & OUT_PORT_1_EMAR )
+	{
+		PLAY( m_samples, SND_EMAR, 0 );
+	}
+
+	if ( bitsGoneHigh & OUT_PORT_1_GUN )
+	{
+		PLAY( m_samples, SND_GUN, 0 );
+	}
+	if ( bitsGoneLow & OUT_PORT_1_GUN )
+	{
+		STOP( m_samples, SND_GUN );
 	}
 }
 
@@ -61,7 +144,7 @@ MACHINE_CONFIG_START( tranqgun_audio )
 
 	/* samples */
 	MCFG_SOUND_ADD("samples", SAMPLES, 0)
-	MCFG_SAMPLES_CHANNELS(2)
+	MCFG_SAMPLES_CHANNELS(8)
 	MCFG_SAMPLES_NAMES(tranqgun_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
