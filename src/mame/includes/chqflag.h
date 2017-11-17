@@ -41,6 +41,7 @@ public:
 	DECLARE_WRITE8_MEMBER(k007232_extvolume_w);
 	DECLARE_WRITE8_MEMBER(volume_callback0);
 	DECLARE_WRITE8_MEMBER(volume_callback1);
+	DECLARE_WRITE_LINE_MEMBER(background_brt_w);
 	K051316_CB_MEMBER(zoom_callback_1);
 	K051316_CB_MEMBER(zoom_callback_2);
 	K051960_CB_MEMBER(sprite_callback);

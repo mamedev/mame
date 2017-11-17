@@ -57,14 +57,6 @@ WRITE8_MEMBER(chqflag_state::chqflag_bankswitch_w)
 	/* other bits unknown/unused */
 }
 
-inline void chqflag_state::update_background_shadows(uint8_t data)
-{
-	double brt = (data & 0x80) ? PALETTE_DEFAULT_SHADOW_FACTOR : 1.0;
-
-	for (int i = 512; i < 1024; i++)
-		m_palette->set_pen_contrast(i, brt);
-}
-
 WRITE8_MEMBER(chqflag_state::chqflag_vreg_w)
 {
 	/* bits 0 & 1 = coin counters */
@@ -86,12 +78,13 @@ WRITE8_MEMBER(chqflag_state::chqflag_vreg_w)
 	 * 0x88 is for when night shows up (max amount of highlight)
 	 * 0x08 is used at dawn after 0x88 state
 	 * The shadow part looks ugly when rain starts/ends pouring (-> black colored with a setting of 0x00), 
-	 * apparently the reference shows dimmed background when car pits in which maybe translates in a 
-	 * global zoomed sprite that gets clipped in emulation?
+	 * the reference shows dimmed background when this event occurs (which is handled via reg 1 bit 0 of k051960 device), 
+	 * might be actually disabling the shadow here (-> setting 1.0f instead), but can't say for sure from the available reference.
 	 */
 	const float shadow_factors[4] = {PALETTE_DEFAULT_SHADOW_FACTOR, 1.33f, 1.66f, 2.0f };
 	m_palette->set_shadow_factor(shadow_factors[((data & 0x80) >> 6) | ((data & 0x08) >> 3)]);
 	
+	#if 0
 	if ((data & 0x80) != m_last_vreg)
 	{
 		m_last_vreg = data & 0x80;
@@ -99,7 +92,8 @@ WRITE8_MEMBER(chqflag_state::chqflag_vreg_w)
 		/* only affect the background */
 		update_background_shadows(data);
 	}
-
+	#endif
+	
 //if ((data & 0xf8) && (data & 0xf8) != 0x88)
 //  popmessage("chqflag_vreg_w %02x",data);
 
@@ -301,6 +295,26 @@ void chqflag_state::machine_reset()
 	update_background_shadows(0);
 }
 
+inline void chqflag_state::update_background_shadows(uint8_t data)
+{
+	double brt = (data & 1) ? PALETTE_DEFAULT_SHADOW_FACTOR : 1.0;
+
+	for (int i = 512; i < 1024; i++)
+		m_palette->set_pen_contrast(i, brt);
+}
+
+
+WRITE_LINE_MEMBER(chqflag_state::background_brt_w)
+{
+//	popmessage("%d",state);
+	
+	if (state != m_last_vreg)
+	{
+		m_last_vreg = state;
+		update_background_shadows(state);
+	}
+}
+
 static MACHINE_CONFIG_START( chqflag )
 
 	/* basic machine hardware */
@@ -339,7 +353,8 @@ static MACHINE_CONFIG_START( chqflag )
 	MCFG_K051960_CB(chqflag_state, sprite_callback)
 	MCFG_K051960_IRQ_HANDLER(INPUTLINE("maincpu", KONAMI_IRQ_LINE))
 	MCFG_K051960_NMI_HANDLER(INPUTLINE("maincpu", INPUT_LINE_NMI))
-
+	MCFG_K051960_VREG_CONTRAST_HANDLER(WRITELINE(chqflag_state,background_brt_w))
+	
 	MCFG_DEVICE_ADD("k051316_1", K051316, 0)
 	MCFG_GFX_PALETTE("palette")
 	MCFG_K051316_OFFSETS(7, 0)
