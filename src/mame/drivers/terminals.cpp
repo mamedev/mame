@@ -372,8 +372,8 @@ COMP( 1982, tr175, 0, 0, terminals, terminals, terminals_state, 0, "Relisys", "T
 /**************************************************************************************************************
 
 Visual 100. (VT-100 clone)
-Chips: D780C-1 (Z80), CRT5037, D8255AC-5, uPB8214C, D8251AC, 8-sw dip
-Crystal: unreadable
+Chips: D780C-1 (Z80), CRT5037, D8255AC-5, uPB8214C, COM8116T-020, D8251AC, 8-sw dip
+Crystal: 47.736
 
 ***************************************************************************************************************/
 
@@ -386,7 +386,7 @@ ROM_START( v100 )
 	ROM_LOAD( "241-001.u29",   0x0000, 0x0800, CRC(ef807141) SHA1(cbf3fed001811c5840b9a131d2d3133843cb3b6a) )
 ROM_END
 
-COMP( 1982, v100, 0, 0, terminals, terminals, terminals_state, 0, "Visual", "Visual 100", MACHINE_IS_SKELETON )
+COMP( 1982, v100, 0, 0, terminals, terminals, terminals_state, 0, "Visual Technology", "Visual 100", MACHINE_IS_SKELETON )
 
 
 
@@ -410,7 +410,7 @@ ROM_START( v102 )
 	ROM_LOAD( "150.kbd",     0x0000, 0x0800, CRC(afe55cff) SHA1(b26ebdde63ec0e94c08780285def39a282e128b3) )
 ROM_END
 
-COMP( 1984, v102, 0, 0, terminals, terminals, terminals_state, 0, "Visual", "Visual 102", MACHINE_IS_SKELETON )
+COMP( 1984, v102, 0, 0, terminals, terminals, terminals_state, 0, "Visual Technology", "Visual 102", MACHINE_IS_SKELETON )
 
 
 
@@ -435,7 +435,7 @@ COMP( 1990, vt420, 0, 0, terminals, terminals, terminals_state, 0, "DEC", "VT-24
 
 Zentec Zephyr (Model 00-441-01).
 Chips: COM2017, i8085A, 3x unreadable, Beeper
-Crystal: unreadable
+Crystal: 45.582000
 
 ***************************************************************************************************************/
 
