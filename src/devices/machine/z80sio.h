@@ -75,47 +75,47 @@
 
 // Port A callbacks
 #define MCFG_Z80SIO_OUT_TXDA_CB(_devcb) \
-	devcb = &z80sio_device::set_out_txda_callback(*device, DEVCB_##_devcb);
+	devcb = &z80sio_device::set_out_txd_callback<0>(*device, DEVCB_##_devcb);
 
 #define MCFG_Z80SIO_OUT_DTRA_CB(_devcb) \
-	devcb = &z80sio_device::set_out_dtra_callback(*device, DEVCB_##_devcb);
+	devcb = &z80sio_device::set_out_dtr_callback<0>(*device, DEVCB_##_devcb);
 
 #define MCFG_Z80SIO_OUT_RTSA_CB(_devcb) \
-	devcb = &z80sio_device::set_out_rtsa_callback(*device, DEVCB_##_devcb);
+	devcb = &z80sio_device::set_out_rts_callback<0>(*device, DEVCB_##_devcb);
 
 #define MCFG_Z80SIO_OUT_WRDYA_CB(_devcb) \
-	devcb = &z80sio_device::set_out_wrdya_callback(*device, DEVCB_##_devcb);
+	devcb = &z80sio_device::set_out_wrdy_callback<0>(*device, DEVCB_##_devcb);
 
 #define MCFG_Z80SIO_OUT_SYNCA_CB(_devcb) \
-	devcb = &z80sio_device::set_out_synca_callback(*device, DEVCB_##_devcb);
+	devcb = &z80sio_device::set_out_sync_callback<0>(*device, DEVCB_##_devcb);
 
 #define MCFG_Z80SIO_OUT_RXDRQA_CB(_devcb) \
-	devcb = &z80sio_device::set_out_rxdrqa_callback(*device, DEVCB_##_devcb);
+	devcb = &z80sio_device::set_out_rxdrq_callback<0>(*device, DEVCB_##_devcb);
 
 #define MCFG_Z80SIO_OUT_TXDRQA_CB(_devcb) \
-	devcb = &z80sio_device::set_out_txdrqa_callback(*device, DEVCB_##_devcb);
+	devcb = &z80sio_device::set_out_txdrq_callback<0>(*device, DEVCB_##_devcb);
 
 // Port B callbacks
 #define MCFG_Z80SIO_OUT_TXDB_CB(_devcb) \
-	devcb = &z80sio_device::set_out_txdb_callback(*device, DEVCB_##_devcb);
+	devcb = &z80sio_device::set_out_txd_callback<1>(*device, DEVCB_##_devcb);
 
 #define MCFG_Z80SIO_OUT_DTRB_CB(_devcb) \
-	devcb = &z80sio_device::set_out_dtrb_callback(*device, DEVCB_##_devcb);
+	devcb = &z80sio_device::set_out_dtr_callback<1>(*device, DEVCB_##_devcb);
 
 #define MCFG_Z80SIO_OUT_RTSB_CB(_devcb) \
-	devcb = &z80sio_device::set_out_rtsb_callback(*device, DEVCB_##_devcb);
+	devcb = &z80sio_device::set_out_rts_callback<1>(*device, DEVCB_##_devcb);
 
 #define MCFG_Z80SIO_OUT_WRDYB_CB(_devcb) \
-	devcb = &z80sio_device::set_out_wrdyb_callback(*device, DEVCB_##_devcb);
+	devcb = &z80sio_device::set_out_wrdy_callback<1>(*device, DEVCB_##_devcb);
 
 #define MCFG_Z80SIO_OUT_SYNCB_CB(_devcb) \
-	devcb = &z80sio_device::set_out_syncb_callback(*device, DEVCB_##_devcb);
+	devcb = &z80sio_device::set_out_sync_callback<1>(*device, DEVCB_##_devcb);
 
 #define MCFG_Z80SIO_OUT_RXDRQB_CB(_devcb) \
-	devcb = &z80sio_device::set_out_rxdrqb_callback(*device, DEVCB_##_devcb);
+	devcb = &z80sio_device::set_out_rxdrq_callback<1>(*device, DEVCB_##_devcb);
 
 #define MCFG_Z80SIO_OUT_TXDRQB_CB(_devcb) \
-	devcb = &z80sio_device::set_out_txdrqb_callback(*device, DEVCB_##_devcb);
+	devcb = &z80sio_device::set_out_txdrq_callback<1>(*device, DEVCB_##_devcb);
 
 
 //**************************************************************************
@@ -297,6 +297,7 @@ private:
 	void out_txd_cb(int state);
 	void out_rts_cb(int state);
 	void out_dtr_cb(int state);
+	void set_ready(bool ready);
 	bool transmit_allowed() const;
 
 	void receive_data();
@@ -337,21 +338,14 @@ public:
 	// construction/destruction
 	z80sio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_out_txda_callback(device_t &device, Object &&cb) { return downcast<z80sio_device &>(device).m_out_txda_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_dtra_callback(device_t &device, Object &&cb) { return downcast<z80sio_device &>(device).m_out_dtra_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_rtsa_callback(device_t &device, Object &&cb) { return downcast<z80sio_device &>(device).m_out_rtsa_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_wrdya_callback(device_t &device, Object &&cb) { return downcast<z80sio_device &>(device).m_out_wrdya_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_synca_callback(device_t &device, Object &&cb) { return downcast<z80sio_device &>(device).m_out_synca_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_txdb_callback(device_t &device, Object &&cb) { return downcast<z80sio_device &>(device).m_out_txdb_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_dtrb_callback(device_t &device, Object &&cb) { return downcast<z80sio_device &>(device).m_out_dtrb_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_rtsb_callback(device_t &device, Object &&cb) { return downcast<z80sio_device &>(device).m_out_rtsb_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_wrdyb_callback(device_t &device, Object &&cb) { return downcast<z80sio_device &>(device).m_out_wrdyb_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_syncb_callback(device_t &device, Object &&cb) { return downcast<z80sio_device &>(device).m_out_syncb_cb.set_callback(std::forward<Object>(cb)); }
+	template <unsigned N, class Object> static devcb_base &set_out_txd_callback(device_t &device, Object &&cb) { return downcast<z80sio_device &>(device).m_out_txd_cb[N].set_callback(std::forward<Object>(cb)); }
+	template <unsigned N, class Object> static devcb_base &set_out_dtr_callback(device_t &device, Object &&cb) { return downcast<z80sio_device &>(device).m_out_dtr_cb[N].set_callback(std::forward<Object>(cb)); }
+	template <unsigned N, class Object> static devcb_base &set_out_rts_callback(device_t &device, Object &&cb) { return downcast<z80sio_device &>(device).m_out_rts_cb[N].set_callback(std::forward<Object>(cb)); }
+	template <unsigned N, class Object> static devcb_base &set_out_wrdy_callback(device_t &device, Object &&cb) { return downcast<z80sio_device &>(device).m_out_wrdy_cb[N].set_callback(std::forward<Object>(cb)); }
+	template <unsigned N, class Object> static devcb_base &set_out_sync_callback(device_t &device, Object &&cb) { return downcast<z80sio_device &>(device).m_out_sync_cb[N].set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_out_int_callback(device_t &device, Object &&cb) { return downcast<z80sio_device &>(device).m_out_int_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_rxdrqa_callback(device_t &device, Object &&cb) { return downcast<z80sio_device &>(device).m_out_rxdrqa_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_txdrqa_callback(device_t &device, Object &&cb) { return downcast<z80sio_device &>(device).m_out_txdrqa_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_rxdrqb_callback(device_t &device, Object &&cb) { return downcast<z80sio_device &>(device).m_out_rxdrqb_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_txdrqb_callback(device_t &device, Object &&cb) { return downcast<z80sio_device &>(device).m_out_txdrqb_cb.set_callback(std::forward<Object>(cb)); }
+	template <unsigned N, class Object> static devcb_base &set_out_rxdrq_callback(device_t &device, Object &&cb) { return downcast<z80sio_device &>(device).m_out_rxdrq_cb[N].set_callback(std::forward<Object>(cb)); }
+	template <unsigned N, class Object> static devcb_base &set_out_txdrq_callback(device_t &device, Object &&cb) { return downcast<z80sio_device &>(device).m_out_txdrq_cb[N].set_callback(std::forward<Object>(cb)); }
 
 	static void static_set_cputag(device_t &device, const char *tag)
 	{
@@ -426,23 +420,15 @@ protected:
 	required_device<z80sio_channel> m_chanB;
 
 	// internal state
-	devcb_write_line    m_out_txda_cb;
-	devcb_write_line    m_out_dtra_cb;
-	devcb_write_line    m_out_rtsa_cb;
-	devcb_write_line    m_out_wrdya_cb;
-	devcb_write_line    m_out_synca_cb;
-
-	devcb_write_line    m_out_txdb_cb;
-	devcb_write_line    m_out_dtrb_cb;
-	devcb_write_line    m_out_rtsb_cb;
-	devcb_write_line    m_out_wrdyb_cb;
-	devcb_write_line    m_out_syncb_cb;
+	devcb_write_line    m_out_txd_cb[2];
+	devcb_write_line    m_out_dtr_cb[2];
+	devcb_write_line    m_out_rts_cb[2];
+	devcb_write_line    m_out_wrdy_cb[2];
+	devcb_write_line    m_out_sync_cb[2];
 
 	devcb_write_line    m_out_int_cb;
-	devcb_write_line    m_out_rxdrqa_cb;
-	devcb_write_line    m_out_txdrqa_cb;
-	devcb_write_line    m_out_rxdrqb_cb;
-	devcb_write_line    m_out_txdrqb_cb;
+	devcb_write_line    m_out_rxdrq_cb[2];
+	devcb_write_line    m_out_txdrq_cb[2];
 
 	int m_int_state[8]; // interrupt state
 	int m_int_source[8]; // interrupt source

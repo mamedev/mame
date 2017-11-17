@@ -154,9 +154,9 @@ enum : uint8_t
 	WR1_RX_INT_FIRST          = 0x08,
 	WR1_RX_INT_ALL_PARITY     = 0x10,
 	WR1_RX_INT_ALL            = 0x18,
-	WR1_WRDY_ON_RX_TX         = 0x20, // not supported
-	WR1_WRDY_FUNCTION         = 0x40, // not supported
-	WR1_WRDY_ENABLE           = 0x80  // not supported
+	WR1_WRDY_ON_RX_TX         = 0x20,
+	WR1_WRDY_FUNCTION         = 0x40, // WAIT not supported
+	WR1_WRDY_ENABLE           = 0x80
 };
 
 enum : uint8_t
@@ -259,17 +259,24 @@ MACHINE_CONFIG_END
 
 inline void z80sio_channel::out_txd_cb(int state)
 {
-	((m_index == z80sio_device::CHANNEL_A) ? m_uart->m_out_txda_cb : m_uart->m_out_txdb_cb)(state);
+	m_uart->m_out_txd_cb[m_index](state);
 }
 
 inline void z80sio_channel::out_rts_cb(int state)
 {
-	((m_index == z80sio_device::CHANNEL_A) ? m_uart->m_out_rtsa_cb : m_uart->m_out_rtsb_cb)(state);
+	m_uart->m_out_rts_cb[m_index](state);
 }
 
 inline void z80sio_channel::out_dtr_cb(int state)
 {
-	((m_index == z80sio_device::CHANNEL_A) ? m_uart->m_out_dtra_cb : m_uart->m_out_dtrb_cb)(state);
+	m_uart->m_out_dtr_cb[m_index](state);
+}
+
+inline void z80sio_channel::set_ready(bool ready)
+{
+	// WAIT mode not supported yet
+	if (m_wr1 & WR1_WRDY_FUNCTION)
+		m_uart->m_out_wrdy_cb[m_index](ready ? 0 : 1);
 }
 
 inline bool z80sio_channel::transmit_allowed() const
@@ -343,21 +350,14 @@ z80sio_device::z80sio_device(const machine_config &mconfig, device_type type, co
 	device_z80daisy_interface(mconfig, *this),
 	m_chanA(*this, CHANA_TAG),
 	m_chanB(*this, CHANB_TAG),
-	m_out_txda_cb(*this),
-	m_out_dtra_cb(*this),
-	m_out_rtsa_cb(*this),
-	m_out_wrdya_cb(*this),
-	m_out_synca_cb(*this),
-	m_out_txdb_cb(*this),
-	m_out_dtrb_cb(*this),
-	m_out_rtsb_cb(*this),
-	m_out_wrdyb_cb(*this),
-	m_out_syncb_cb(*this),
+	m_out_txd_cb{ { *this }, { *this } },
+	m_out_dtr_cb{ { *this }, { *this } },
+	m_out_rts_cb{ { *this }, { *this } },
+	m_out_wrdy_cb{ { *this }, { *this } },
+	m_out_sync_cb{ { *this }, { *this } },
 	m_out_int_cb(*this),
-	m_out_rxdrqa_cb(*this),
-	m_out_txdrqa_cb(*this),
-	m_out_rxdrqb_cb(*this),
-	m_out_txdrqb_cb(*this),
+	m_out_rxdrq_cb{ { *this }, { *this } },
+	m_out_txdrq_cb{ { *this }, { *this } },
 	m_cputag(nullptr)
 {
 	for (auto & elem : m_int_state)
@@ -392,21 +392,21 @@ void z80sio_device::device_resolve_objects()
 	LOG("%s\n", FUNCNAME);
 
 	// resolve callbacks
-	m_out_txda_cb.resolve_safe();
-	m_out_dtra_cb.resolve_safe();
-	m_out_rtsa_cb.resolve_safe();
-	m_out_wrdya_cb.resolve_safe();
-	m_out_synca_cb.resolve_safe();
-	m_out_txdb_cb.resolve_safe();
-	m_out_dtrb_cb.resolve_safe();
-	m_out_rtsb_cb.resolve_safe();
-	m_out_wrdyb_cb.resolve_safe();
-	m_out_syncb_cb.resolve_safe();
+	m_out_txd_cb[CHANNEL_A].resolve_safe();
+	m_out_dtr_cb[CHANNEL_A].resolve_safe();
+	m_out_rts_cb[CHANNEL_A].resolve_safe();
+	m_out_wrdy_cb[CHANNEL_A].resolve_safe();
+	m_out_sync_cb[CHANNEL_A].resolve_safe();
+	m_out_txd_cb[CHANNEL_B].resolve_safe();
+	m_out_dtr_cb[CHANNEL_B].resolve_safe();
+	m_out_rts_cb[CHANNEL_B].resolve_safe();
+	m_out_wrdy_cb[CHANNEL_B].resolve_safe();
+	m_out_sync_cb[CHANNEL_B].resolve_safe();
 	m_out_int_cb.resolve_safe();
-	m_out_rxdrqa_cb.resolve_safe();
-	m_out_txdrqa_cb.resolve_safe();
-	m_out_rxdrqb_cb.resolve_safe();
-	m_out_txdrqb_cb.resolve_safe();
+	m_out_rxdrq_cb[CHANNEL_A].resolve_safe();
+	m_out_txdrq_cb[CHANNEL_A].resolve_safe();
+	m_out_rxdrq_cb[CHANNEL_B].resolve_safe();
+	m_out_txdrq_cb[CHANNEL_B].resolve_safe();
 }
 
 //-------------------------------------------------
@@ -1016,6 +1016,8 @@ void z80sio_channel::device_reset()
 	m_rr1 |= RR1_ALL_SENT;
 	m_tx_flags = 0U;
 
+	// TODO: what happens to WAIT/READY?
+
 	// reset external lines
 	out_rts_cb(m_rts = 1);
 	out_dtr_cb(m_dtr = 1);
@@ -1042,6 +1044,8 @@ void z80sio_channel::transmit_enable()
 		{
 			LOGTX("Channel %c synchronous transmit enabled - load sync pattern\n", 'A' + m_index);
 			tx_setup_idle();
+			if ((m_wr1 & WR1_WRDY_ENABLE) && !(m_wr1 & WR1_WRDY_ON_RX_TX))
+				set_ready(true);
 		}
 		else if (!(m_rr0 & RR0_TX_BUFFER_EMPTY))
 		{
@@ -1077,6 +1081,7 @@ void z80sio_channel::sync_tx_sr_empty()
 		LOGTX("%s() Channel %c Transmitter Disabled m_wr5:%02x\n", FUNCNAME, 'A' + m_index, m_wr5);
 
 		// transmit disabled, set flag if nothing pending
+		m_tx_flags &= ~TX_FLAG_SPECIAL;
 		if (m_rr0 & RR0_TX_BUFFER_EMPTY)
 			m_rr1 |= RR1_ALL_SENT;
 	}
@@ -1087,6 +1092,8 @@ void z80sio_channel::sync_tx_sr_empty()
 
 		// empty transmit buffer
 		m_rr0 |= RR0_TX_BUFFER_EMPTY;
+		if ((m_wr1 & WR1_WRDY_ENABLE) && !(m_wr1 & WR1_WRDY_ON_RX_TX))
+			set_ready(true);
 		if (m_wr1 & WR1_TX_INT_ENABLE)
 			m_uart->trigger_interrupt(m_index, INT_TRANSMIT);
 	}
@@ -1097,6 +1104,8 @@ void z80sio_channel::sync_tx_sr_empty()
 		tx_setup_idle();
 
 		// if this is the first sync pattern, generate an interrupt indicating that the next frame can be sent
+		if ((m_wr1 & WR1_WRDY_ENABLE) && !(m_wr1 & WR1_WRDY_ON_RX_TX))
+			set_ready(true);
 		if (first_idle && (m_wr1 & WR1_TX_INT_ENABLE))
 			m_uart->trigger_interrupt(m_index, INT_TRANSMIT);
 		m_rr1 |= RR1_ALL_SENT;
@@ -1129,6 +1138,8 @@ void z80sio_channel::async_tx_setup()
 
 	// empty transmit buffer
 	m_rr0 |= RR0_TX_BUFFER_EMPTY;
+	if ((m_wr1 & WR1_WRDY_ENABLE) && !(m_wr1 & WR1_WRDY_ON_RX_TX))
+		set_ready(true);
 	if (m_wr1 & WR1_TX_INT_ENABLE)
 		m_uart->trigger_interrupt(m_index, INT_TRANSMIT);
 }
@@ -1423,6 +1434,8 @@ void z80sio_channel::do_sioreg_wr0(uint8_t data)
 		tx_setup(0xff, 8, 0, true, true);
 		m_rr0 |= RR0_TX_BUFFER_EMPTY;
 		m_rr1 &= ~RR1_ALL_SENT;
+		if ((m_wr1 & WR1_WRDY_ENABLE) && !(m_wr1 & WR1_WRDY_ON_RX_TX))
+			set_ready(false);
 		break;
 	case WR0_RESET_EXT_STATUS:
 		reset_ext_status();
@@ -1499,6 +1512,13 @@ void z80sio_channel::do_sioreg_wr1(uint8_t data)
 		LOG("Z80SIO \"%s\" Channel %c : Receiver Interrupt on All Characters\n", owner()->tag(), 'A' + m_index);
 		break;
 	}
+
+	if (!(data & WR1_WRDY_ENABLE))
+		set_ready(false);
+	else if (data & WR1_WRDY_ON_RX_TX)
+		set_ready(bool(m_rr0 & RR0_RX_CHAR_AVAILABLE));
+	else
+		set_ready((m_rr0 & RR0_TX_BUFFER_EMPTY) && !(m_tx_flags & TX_FLAG_SPECIAL));
 }
 
 void z80sio_channel::do_sioreg_wr2(uint8_t data)
@@ -1614,6 +1634,8 @@ void z80sio_channel::data_write(uint8_t data)
 	m_tx_data = data;
 	m_rr0 &= ~RR0_TX_BUFFER_EMPTY;
 	m_rr1 &= ~RR1_ALL_SENT;
+	if ((m_wr1 & WR1_WRDY_ENABLE) && !(m_wr1 & WR1_WRDY_ON_RX_TX))
+		set_ready(false);
 
 	// handle automatic RTS
 	bool const async((m_wr4 & WR4_STOP_BITS_MASK) != WR4_STOP_BITS_SYNC);
@@ -1670,6 +1692,8 @@ void z80sio_channel::advance_rx_fifo()
 		{
 			// no more characters available in the FIFO
 			m_rr0 &= ~RR0_RX_CHAR_AVAILABLE;
+			if ((m_wr1 & WR1_WRDY_ENABLE) && (m_wr1 & WR1_WRDY_ON_RX_TX))
+				set_ready(false);
 			m_uart->clear_interrupt(m_index, INT_RECEIVE);
 		}
 	}
@@ -1719,6 +1743,8 @@ void z80sio_channel::receive_data()
 	}
 
 	m_rr0 |= RR0_RX_CHAR_AVAILABLE;
+	if ((m_wr1 & WR1_WRDY_ENABLE) && (m_wr1 & WR1_WRDY_ON_RX_TX))
+		set_ready(true);
 	if (!m_rx_fifo_depth)
 		m_rr1 |= uint8_t(rx_error);
 
@@ -1849,15 +1875,16 @@ WRITE_LINE_MEMBER( z80sio_channel::rxc_w )
 			// sample a data/parity/stop bit
 			if (!m_rxd)
 				m_rx_sr &= ~uint16_t(1U << (m_rx_bit - 1));
-			LOGBIT("%s() \"%s \"Channel %c Received Data Bit %d\n", FUNCNAME, owner()->tag(), 'A' + m_index, m_rxd);
+			bool const stop_reached((get_rx_word_length() + ((m_wr4 & WR4_PARITY_ENABLE) ? 1 : 0) + 1) == m_rx_bit);
+			LOGBIT("%s() Channel %c Received %s Bit %d\n", FUNCNAME, 'A' + m_index, stop_reached ? "Stop" : "Data", m_rxd);
 
-			if ((get_rx_word_length() + ((m_wr4 & WR4_PARITY_ENABLE) ? 1 : 0) + 1) == m_rx_bit)
+			if (stop_reached)
 			{
 				// this is the stop bit - framing error adds a half bit period
 				m_rx_count = m_rxd ? (clocks / 2) : clocks;
 				m_rx_bit = 0;
 
-				LOGRCV("%s() \"%s \"Channel %c Received Data %02x\n", FUNCNAME, owner()->tag(), 'A' + m_index, m_rx_sr & 0xff);
+				LOGRCV("%s() Channel %c Received Data %02x&\n", FUNCNAME, 'A' + m_index, m_rx_sr & 0xff);
 				receive_data();
 			}
 			else
