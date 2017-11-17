@@ -15,7 +15,7 @@
 #include "machine/interpro_arbga.h"
 
 #include "machine/ram.h"
-#include "machine/eeprom.h"
+#include "machine/28fxxx.h"
 #include "machine/mc146818.h"
 #include "machine/z80scc.h"
 #include "machine/upd765.h"
@@ -55,29 +55,9 @@
 
 #define INTERPRO_IDPROM_TAG        "idprom"
 #define INTERPRO_EPROM_TAG         "eprom"
-#define INTERPRO_EEPROM_TAG        "eeprom"
+#define INTERPRO_FLASH_TAG         "flash"
 
 #define INTERPRO_SRBUS_TAG         "sr"
-
-class interpro_eeprom_device : public eeprom_base_device
-{
-public:
-	interpro_eeprom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	DECLARE_READ16_MEMBER(eeprom_r) { return read(offset); }
-	DECLARE_WRITE16_MEMBER(eeprom_w) { if (m_write_enable) write(offset, data); }
-
-	DECLARE_WRITE_LINE_MEMBER(write_enable) { m_write_enable = state; }
-
-protected:
-	virtual void device_start() override { eeprom_base_device::device_start(); }
-	virtual void device_reset() override { eeprom_base_device::device_reset(); }
-
-private:
-	int m_write_enable;
-};
-
-DECLARE_DEVICE_TYPE(INTERPRO_EEPROM, interpro_eeprom_device)
 
 class interpro_state : public driver_device
 {
@@ -210,10 +190,12 @@ class sapphire_state : public interpro_state
 public:
 	sapphire_state(const machine_config &mconfig, device_type type, const char *tag)
 		: interpro_state(mconfig, type, tag)
-		, m_eeprom(*this, INTERPRO_EEPROM_TAG)
+		, m_flash_lo(*this, INTERPRO_FLASH_TAG "_lo")
+		, m_flash_hi(*this, INTERPRO_FLASH_TAG "_hi")
 	{}
 
-	required_device<interpro_eeprom_device> m_eeprom;
+	required_device<intel_28f010_device> m_flash_lo;
+	required_device<intel_28f010_device> m_flash_hi;
 
 	virtual DECLARE_WRITE16_MEMBER(sreg_ctrl2_w) override;
 };
