@@ -1142,7 +1142,7 @@ void z80sio_channel::reset_ext_status()
 {
 	// this will clear latched external pin state
 	m_ext_latched = 0;
-	m_break_latched = 0;
+	m_brk_latched = 0;
 	read_ext();
 
 	// Clear any pending External interrupt
