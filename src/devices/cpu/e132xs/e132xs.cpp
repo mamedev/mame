@@ -697,6 +697,8 @@ void hyperstone_device::set_global_register(uint8_t code, uint32_t val)
 #define S_BIT                   ((OP & 0x100) >> 8)
 #define D_BIT                   ((OP & 0x200) >> 9)
 #define N_VALUE                 (((OP & 0x100) >> 4) | (OP & 0x0f))
+#define HI_N_VALUE				(0x10 | (OP & 0x0f))
+#define LO_N_VALUE				(OP & 0x0f)
 #define N_OP_MASK               (m_op & 0x10f)
 #define DST_CODE                ((OP & 0xf0) >> 4)
 #define SRC_CODE                (OP & 0x0f)
@@ -1759,16 +1761,16 @@ void hyperstone_device::execute_run()
 			case 0x7d: hyperstone_xori<GLOBAL, LIMM>(); break;
 			case 0x7e: hyperstone_xori<LOCAL, SIMM>(); break;
 			case 0x7f: hyperstone_xori<LOCAL, LIMM>(); break;
-			case 0x80: hyperstone_shrdi(); break;
-			case 0x81: hyperstone_shrdi(); break;
+			case 0x80: hyperstone_shrdi<N_LO>(); break;
+			case 0x81: hyperstone_shrdi<N_HI>(); break;
 			case 0x82: hyperstone_shrd(); break;
 			case 0x83: hyperstone_shr(); break;
-			case 0x84: hyperstone_sardi(); break;
-			case 0x85: hyperstone_sardi(); break;
+			case 0x84: hyperstone_sardi<N_LO>(); break;
+			case 0x85: hyperstone_sardi<N_HI>(); break;
 			case 0x86: hyperstone_sard(); break;
 			case 0x87: hyperstone_sar(); break;
-			case 0x88: hyperstone_shldi(); break;
-			case 0x89: hyperstone_shldi(); break;
+			case 0x88: hyperstone_shldi<N_LO>(); break;
+			case 0x89: hyperstone_shldi<N_HI>(); break;
 			case 0x8a: hyperstone_shld(); break;
 			case 0x8b: hyperstone_shl(); break;
 			case 0x8c: hyperstone_reserved(); break;
@@ -1791,18 +1793,18 @@ void hyperstone_device::execute_run()
 			case 0x9d: hyperstone_stxx2<GLOBAL, LOCAL>(); break;
 			case 0x9e: hyperstone_stxx2<LOCAL, GLOBAL>(); break;
 			case 0x9f: hyperstone_stxx2<LOCAL, LOCAL>(); break;
-			case 0xa0: hyperstone_shri<GLOBAL>(); break;
-			case 0xa1: hyperstone_shri<GLOBAL>(); break;
-			case 0xa2: hyperstone_shri<LOCAL>(); break;
-			case 0xa3: hyperstone_shri<LOCAL>(); break;
-			case 0xa4: hyperstone_sari<GLOBAL>(); break;
-			case 0xa5: hyperstone_sari<GLOBAL>(); break;
-			case 0xa6: hyperstone_sari<LOCAL>(); break;
-			case 0xa7: hyperstone_sari<LOCAL>(); break;
-			case 0xa8: hyperstone_shli<GLOBAL>(); break;
-			case 0xa9: hyperstone_shli<GLOBAL>(); break;
-			case 0xaa: hyperstone_shli<LOCAL>(); break;
-			case 0xab: hyperstone_shli<LOCAL>(); break;
+			case 0xa0: hyperstone_shri<N_LO, GLOBAL>(); break;
+			case 0xa1: hyperstone_shri<N_HI, GLOBAL>(); break;
+			case 0xa2: hyperstone_shri<N_LO, LOCAL>(); break;
+			case 0xa3: hyperstone_shri<N_HI, LOCAL>(); break;
+			case 0xa4: hyperstone_sari<N_LO, GLOBAL>(); break;
+			case 0xa5: hyperstone_sari<N_HI, GLOBAL>(); break;
+			case 0xa6: hyperstone_sari<N_LO, LOCAL>(); break;
+			case 0xa7: hyperstone_sari<N_HI, LOCAL>(); break;
+			case 0xa8: hyperstone_shli<N_LO, GLOBAL>(); break;
+			case 0xa9: hyperstone_shli<N_HI, GLOBAL>(); break;
+			case 0xaa: hyperstone_shli<N_LO, LOCAL>(); break;
+			case 0xab: hyperstone_shli<N_HI, LOCAL>(); break;
 			case 0xac: hyperstone_reserved(); break;
 			case 0xad: hyperstone_reserved(); break;
 			case 0xae: hyperstone_reserved(); break;
@@ -1815,10 +1817,10 @@ void hyperstone_device::execute_run()
 			case 0xb5: hyperstone_muls<GLOBAL, LOCAL>(); break;
 			case 0xb6: hyperstone_muls<LOCAL, GLOBAL>(); break;
 			case 0xb7: hyperstone_muls<LOCAL, LOCAL>(); break;
-			case 0xb8: hyperstone_set<GLOBAL>(); break;
-			case 0xb9: hyperstone_set<GLOBAL>(); break;
-			case 0xba: hyperstone_set<LOCAL>(); break;
-			case 0xbb: hyperstone_set<LOCAL>(); break;
+			case 0xb8: hyperstone_set<N_LO, GLOBAL>(); break;
+			case 0xb9: hyperstone_set<N_HI, GLOBAL>(); break;
+			case 0xba: hyperstone_set<N_LO, LOCAL>(); break;
+			case 0xbb: hyperstone_set<N_HI, LOCAL>(); break;
 			case 0xbc: hyperstone_mul<GLOBAL, GLOBAL>(); break;
 			case 0xbd: hyperstone_mul<GLOBAL, LOCAL>(); break;
 			case 0xbe: hyperstone_mul<LOCAL, GLOBAL>(); break;
