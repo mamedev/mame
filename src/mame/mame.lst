@@ -36296,6 +36296,28 @@ terak                           //
 @source:terco.cpp
 t4490                           // Terco 4490 Mill CNC Control (c) 1986
 
+@source:terminals.cpp
+aaa
+att630
+cit220p
+d461
+hp700_92
+hp2622a
+mt5510
+mt420
+qvt70
+qvt102
+qvt103
+qvt190
+qvt201
+tr175
+v100
+v102
+vp60
+vp122
+vt420
+zephyr
+
 @source:terracre.cpp
 amatelas                        // (c) 1986
 amazon                          // (c) 1986

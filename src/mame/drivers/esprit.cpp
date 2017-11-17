@@ -6,7 +6,9 @@
 
 Hazeltine Esprit terminals.
 
-2 zipfiles were found: "Hazeltine_Esprit" and "Hazeltine_EspritIII".
+Espirit: R6502P, R6531, HD46505RP, MC6850P, 16.5888
+
+Espirit3: 2x R6551AP, HD46850P (6850), R6502BP, R6545-1AP, R6522AP, 1.8432, 17.9712
 
 
 ************************************************************************************************************************************/
