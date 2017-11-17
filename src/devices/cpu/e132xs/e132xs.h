@@ -108,6 +108,12 @@ protected:
 		LIMM = 1
 	};
 
+	enum shift_type
+	{
+		N_LO = 0,
+		N_HI = 1,
+	};
+
 	// construction/destruction
 	hyperstone_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock,
 						const device_type type, uint32_t prg_data_width, uint32_t io_data_width, address_map_constructor internal_map);
@@ -240,18 +246,18 @@ private:
 	template <reg_bank DST_GLOBAL, imm_size IMM_LONG> void hyperstone_andni();
 	template <reg_bank DST_GLOBAL, imm_size IMM_LONG> void hyperstone_ori();
 	template <reg_bank DST_GLOBAL, imm_size IMM_LONG> void hyperstone_xori();
-	void hyperstone_shrdi();
+	template <shift_type HI_N> void hyperstone_shrdi();
 	void hyperstone_shrd();
 	void hyperstone_shr();
-	template <reg_bank DST_GLOBAL> void hyperstone_shri();
-	void hyperstone_sardi();
+	template <shift_type HI_N, reg_bank DST_GLOBAL> void hyperstone_shri();
+	template <shift_type HI_N> void hyperstone_sardi();
 	void hyperstone_sard();
 	void hyperstone_sar();
-	template <reg_bank DST_GLOBAL> void hyperstone_sari();
-	void hyperstone_shldi();
+	template <shift_type HI_N, reg_bank DST_GLOBAL> void hyperstone_sari();
+	template <shift_type HI_N> void hyperstone_shldi();
 	void hyperstone_shld();
 	void hyperstone_shl();
-	template <reg_bank DST_GLOBAL> void hyperstone_shli();
+	template <shift_type HI_N, reg_bank DST_GLOBAL> void hyperstone_shli();
 	void hyperstone_testlz();
 	void hyperstone_rol();
 	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void hyperstone_ldxx1();
@@ -263,7 +269,7 @@ private:
 	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void hyperstone_muls();
 	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void hyperstone_mul();
 
-	template <reg_bank DST_GLOBAL> void hyperstone_set();
+	template <shift_type HI_N, reg_bank DST_GLOBAL> void hyperstone_set();
 
 	template <reg_bank SRC_GLOBAL> void hyperstone_ldwr();
 	template <reg_bank SRC_GLOBAL> void hyperstone_lddr();
