@@ -32,7 +32,7 @@
 
  TODO:
  - some wrong cycle counts
-
+ - verify register wrapping with sregf/dregf on hardware
  CHANGELOG:
 
  Pierpaolo Prazzoli
@@ -101,10 +101,6 @@
  Pierpaolo Prazzoli
     - Same fix in get_const
 
- Ryan Holtz - 02/27/04
-    - Fixed delayed branching
-    - const_val for CALL should always have bit 0 clear
-
  Pierpaolo Prazzoli - 02/25/04
     - Fixed some wrong addresses to address local registers instead of memory
     - Fixed FRAME and RET instruction
@@ -133,83 +129,15 @@
       (From the doc: A Call, Trap or Software instruction increments the FP and sets FL
       to 6, thus creating a new stack frame with the length of 6 registers).
 
- Ryan Holtz - 10/25/03
-    - Fixed CALL enough that it at least jumps to the right address, no word
-      yet as to whether or not it's working enough to return.
-    - Added get_lrconst() to get the const value for the CALL operand, since
-      apparently using immediate_value() was wrong. The code is ugly, but it
-      works properly. Vampire 1/2 now gets far enough to try to test its RAM.
-    - Just from looking at it, CALL apparently doesn't frame properly. I'm not
-      sure about FRAME, but perhaps it doesn't work properly - I'm not entirely
-      positive. The return address when vamphalf's memory check routine is
-      called at FFFFFD7E is stored in register L8, and then the RET instruction
-      at the end of the routine uses L1 as the return address, so that might
-      provide some clues as to how it works.
-    - I'd almost be willing to bet money that there's no framing at all since
-      the values in L0 - L15 as displayed by the debugger would change during a
-      CALL or FRAME operation. I'll look when I'm in the mood.
-    - The mood struck me, and I took a look at set_local_register and GET_L_REG.
-      Apparently no matter what the current frame pointer is they'll always use
-      local_regs[0] through local_regs[15].
-
- Ryan Holtz - 08/20/03
-    - Added H flag support for MOV and MOVI
-    - Changed init routine to set S flag on boot. Apparently the CPU defaults to
-      supervisor mode as opposed to user mode when it powers on, as shown by the
-      vamphalf power-on routines. Makes sense, too, since if the machine booted
-      in user mode, it would be impossible to get into supervisor mode.
-
  Pierpaolo Prazzoli - 08/19/03
     - Added check for D_BIT and S_BIT where PC or SR must or must not be denoted.
       (movd, divu, divs, ldxx1, ldxx2, stxx1, stxx2, mulu, muls, set, mul
       call, chk)
 
- Ryan Holtz - 08/17/03
-    - Working on support for H flag, nothing quite done yet
-    - Added trap Range Error for CHK PC, PC
-    - Fixed relative jumps, they have to be taken from the opcode following the
-      jump instead of the jump opcode itself.
-
  Pierpaolo Prazzoli - 08/17/03
     - Fixed get_pcrel() when OP & 0x80 is set.
     - Decremented PC by 2 also in MOV, ADD, ADDI, SUM, SUB and added the check if
       D_BIT is not set. (when pc is changed they are implicit branch)
-
- Ryan Holtz - 08/17/03
-    - Implemented a crude hack to set FL in the SR to 6, since according to the docs
-      that's supposed to happen each time a trap occurs, apparently including when
-      the processor starts up. The 3rd opcode executed in vamphalf checks to see if
-      the FL flag in SR 6, so it's apparently the "correct" behaviour despite the
-      docs not saying anything on it. If FL is not 6, the branch falls through and
-      encounters a CHK PC, L2, which at that point will always throw a range trap.
-      The range trap vector contains 00000000 (CHK PC, PC), which according to the
-      docs will always throw a range trap (which would effectively lock the system).
-      This revealed a bug: CHK PC, PC apparently does not throw a range trap, which
-      needs to be fixed. Now that the "correct" behaviour is hacked in with the FL
-      flags, it reveals yet another bug in that the branch is interpreted as being
-      +0x8700. This means that the PC then wraps around to 000082B0, give or take
-      a few bytes. While it does indeed branch to valid code, I highly doubt that
-      this is the desired effect. Check for signed/unsigned relative branch, maybe?
-
- Ryan Holtz - 08/16/03
-    - Fixed the debugger at least somewhat so that it displays hex instead of decimal,
-      and so that it disassembles opcodes properly.
-    - Fixed hyperstone_execute() to increment PC *after* executing the opcode instead of
-      before. This is probably why vamphalf was booting to fffffff8, but executing at
-      fffffffa instead.
-    - Changed execute_trap to decrement PC by 2 so that the next opcode isn't skipped
-      after a trap
-    - Changed execute_br to decrement PC by 2 so that the next opcode isn't skipped
-      after a branch
-    - Changed hyperstone_movi to decrement PC by 2 when G0 (PC) is modified so that the
-      next opcode isn't skipped after a branch
-    - Changed hyperstone_movi to default to a uint32_t being moved into the register
-      as opposed to a uint8_t. This is wrong, the bit width is quite likely to be
-      dependent on the n field in the Rimm instruction type. However, vamphalf uses
-      MOVI G0,[FFFF]FBAC (n=$13) since there's apparently no absolute branch opcode.
-      What kind of CPU is this that it doesn't have an absolute jump in its branch
-      instructions and you have to use an immediate MOV to do an abs. jump!?
-    - Replaced usage of logerror() with smf's verboselog()
 
 *********************************************************************/
 
