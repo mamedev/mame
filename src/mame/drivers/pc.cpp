@@ -1000,10 +1000,6 @@ ROM_START( kaypro16 )
 	ROM_LOAD("pc102782.bin", 0xe000, 0x2000, CRC(ade4ed14) SHA1(de6d87ae83a71728d60df6a5964e680487ea8400))
 ROM_END
 
-ROM_START( ericsson )
-	ROM_REGION(0x10000, "bios", 0)
-	ROM_LOAD("ericsson_8088.bin", 0xe000, 0x2000, CRC(3953c38d) SHA1(2bfc1f1d11d0da5664c3114994fc7aa3d6dd010d))
-ROM_END
 
 /***************************************************************************
 
