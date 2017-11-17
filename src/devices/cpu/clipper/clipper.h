@@ -7,6 +7,8 @@
 #pragma once
 
 #include <limits.h>
+#include "softfloat/milieu.h"
+#include "softfloat/softfloat.h"
 
 // convenience macros for dealing with the psw and ssw
 #define PSW(mask) (m_psw & PSW_##mask)
@@ -91,13 +93,21 @@ protected:
 		PSW_MTS = 0xf0000000, // memory trap status (4 bits)
 	};
 
-	enum clipper_ssw
+	enum psw_fr
+	{
+		FR_0 = 0x00000000, // round to nearest
+		FR_1 = 0x00008000, // round toward + infinity
+		FR_2 = 0x00010000, // round toward - infinity
+		FR_3 = 0x00018000  // round toward zero
+	};
+
+	enum ssw
 	{
 		SSW_IN  = 0x0000000f, // interrupt number (4 bits)
 		SSW_IL  = 0x000000f0, // interrupt level (4 bits)
 		SSW_EI  = 0x00000100, // enable interrupts
 		SSW_ID  = 0x0001fe00, // cpu rev # and type (8 bits)
-						  // unused (5 bits)
+							  // unused (5 bits)
 		SSW_FRD = 0x00400000, // floating registers dirty
 		SSW_TP  = 0x00800000, // trace trap pending
 		SSW_ECM = 0x01000000, // enabled corrected memory error
@@ -110,7 +120,7 @@ protected:
 		SSW_P   = 0x80000000, // previous mode
 	};
 
-	enum clipper_ssw_id
+	enum ssw_id
 	{
 		SSW_ID_C400R0 = 0x00000,
 		SSW_ID_C400R1 = 0x04000,
@@ -211,11 +221,16 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual uint32_t disasm_min_opcode_bytes() const override { return 2; } // smallest instruction
-	virtual uint32_t disasm_max_opcode_bytes() const override { return 8; } // largest instruction
+	virtual u32 disasm_min_opcode_bytes() const override { return 2; } // smallest instruction
+	virtual u32 disasm_max_opcode_bytes() const override { return 8; } // largest instruction
 	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, u32 options) override;
 
 	void set_ssw(u32 data) { m_ssw = (m_ssw & SSW(ID)) | (data & ~SSW(ID)); }
+
+	inline float32 get_fp32(const u8 reg) const { return m_f[reg & 0xf]; };
+	inline float64 get_fp64(const u8 reg) const { return m_f[reg & 0xf]; };
+	inline void set_fp32(const u8 reg, const float32 data);
+	inline void set_fp64(const u8 reg, const float64 data);
 
 	// core registers
 	u32 m_pc;
@@ -223,12 +238,15 @@ protected:
 	u32 m_ssw;
 
 	// integer registers
-	s32 *m_r;     // active registers
-	s32 m_ru[16]; // user registers
-	s32 m_rs[16]; // supervisor registers
+	u32 *m_r;     // active registers
+	u32 m_ru[16]; // user registers
+	u32 m_rs[16]; // supervisor registers
 
-	// floating registers
-	double m_f[16];
+	// floating point registers
+	u64 m_f[16];
+
+	u32 m_fp_pc;  // address of floating point instruction causing exception
+	u64 m_fp_dst; // original value of destination register during fp exception
 
 	address_space_config m_insn_config;
 	address_space_config m_data_config;
@@ -244,12 +262,12 @@ private:
 	u8 m_ivec;
 
 	// decoded instruction information
-	struct
+	struct decode
 	{
+		// various decoded instruction fields
 		u8 opcode, subopcode;
 		u8 r1, r2;
-
-		s32 imm;
+		u32 imm;
 		u16 macro;
 
 		// total size of instruction in bytes
@@ -257,14 +275,18 @@ private:
 
 		// computed effective address
 		u32 address;
-	} m_info;
+	}
+	m_info;
 
 	void decode_instruction(u16 insn);
 	int execute_instruction();
 	bool evaluate_branch() const;
 
+	void fp_rounding();
+	void fp_exception();
+
 protected:
-	virtual uint32_t intrap(u32 vector, u32 pc, u32 cts = CTS_NO_CPU_TRAP, u32 mts = MTS_NO_MEMORY_TRAP);
+	virtual u32 intrap(u16 vector, u32 pc, u32 cts = CTS_NO_CPU_TRAP, u32 mts = MTS_NO_MEMORY_TRAP);
 };
 
 class clipper_c100_device : public clipper_device
@@ -285,7 +307,7 @@ public:
 	clipper_c400_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
-	virtual uint32_t intrap(u32 vector, u32 pc, u32 cts = CTS_NO_CPU_TRAP, u32 mts = MTS_NO_MEMORY_TRAP) override;
+	virtual u32 intrap(u16 vector, u32 pc, u32 cts = CTS_NO_CPU_TRAP, u32 mts = MTS_NO_MEMORY_TRAP) override;
 };
 
 DECLARE_DEVICE_TYPE(CLIPPER_C100, clipper_c100_device)
