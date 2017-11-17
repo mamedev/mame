@@ -45,260 +45,23 @@
 	Support remaining games (need IGS036 dumps)
 	Identify which regions each game was released in and either dump alt. internal ROMs for each region, or
 	  create them until that can be done.
-	RTC
+	RTC (integrated into the CPU with the SRAM?)
 	Memory Card system (there's an MCU on the motherboard that will need simulating or dumping somehow)
-	Sprite Zoom (Dodonpachi Daioujou Tamashii will likely provide test case for this)
+	Verify Sprite Zoom (check exactly which pixels are doubled / missed on hardware for flipped , non-flipped cases etc.)
 	Simplify IGS036 encryption based on tables in internal roms
-	Fix ARM? bug that means Oriental Legend 2 needs a patch
+	Fix ARM? bug that means Oriental Legend 2 needs a patch (might also be that it needs the card reader, and is running a
+	 codepath that would not exist in a real environment at the moment)
 	Fix Save States (is this a driver problem or an ARM core problem, they don't work unless you get through the startup tests)
 
 */
 
-#include "emu.h"
-#include "cpu/arm7/arm7.h"
-#include "cpu/arm7/arm7core.h"
-#include "sound/ymz770.h"
-#include "machine/igs036crypt.h"
-#include "screen.h"
-#include "speaker.h"
-#include "machine/nvram.h"
-#include "machine/timer.h"
-
-// see http://sam7-ex256.narod.ru/include/HTML/AT91SAM7X256_AIC.html
-DECLARE_DEVICE_TYPE(ARM_AIC, arm_aic_device)
-
-#define MCFG_ARM_AIC_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, ARM_AIC, 0)
-
-#define MCFG_IRQ_LINE_CB(_devcb) \
-	devcb = &arm_aic_device::set_line_callback(*device, DEVCB_##_devcb);
-
-class arm_aic_device : public device_t
-{
-public:
-	// construction/destruction
-	arm_aic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		device_t(mconfig, ARM_AIC, tag, owner, clock),
-		m_irq_out(*this)
-	{ 
-	}
-
-	// configuration
-	template <class Object> static devcb_base &set_line_callback(device_t &device, Object &&cb) { return downcast<arm_aic_device &>(device).m_irq_out.set_callback(std::forward<Object>(cb)); }
-
-	DECLARE_ADDRESS_MAP(regs_map, 32);
-
-	DECLARE_READ32_MEMBER(irq_vector_r);
-	DECLARE_READ32_MEMBER(firq_vector_r);
-
-	// can't use AM_RAM and AM_SHARE in device submaps
-	DECLARE_READ32_MEMBER(aic_smr_r) { return m_aic_smr[offset]; };
-	DECLARE_READ32_MEMBER(aic_svr_r) { return m_aic_svr[offset]; };
-	DECLARE_WRITE32_MEMBER(aic_smr_w) { COMBINE_DATA(&m_aic_smr[offset]); };
-	DECLARE_WRITE32_MEMBER(aic_svr_w) { COMBINE_DATA(&m_aic_svr[offset]); };
-
-	DECLARE_WRITE32_MEMBER(aic_iecr_w) { /*logerror("%s: aic_iecr_w  %08x (Interrupt Enable Command Register)\n", machine().describe_context().c_str(), data);*/ COMBINE_DATA(&m_irqs_enabled); };
-	DECLARE_WRITE32_MEMBER(aic_idcr_w) { /*logerror("%s: aic_idcr_w  %08x (Interrupt Disable Command Register)\n", machine().describe_context().c_str(), data);*/ };
-	DECLARE_WRITE32_MEMBER(aic_iccr_w);
-	DECLARE_WRITE32_MEMBER(aic_eoicr_w){ /*logerror("%s: aic_eoicr_w (End of Interrupt Command Register)\n", machine().describe_context().c_str());*/ }; // value doesn't matter
-
-	void set_irq(int identity);
-
-protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	
-private:
-	uint32_t m_irqs_enabled;
-	uint32_t m_current_irq_vector;
-	uint32_t m_current_firq_vector;
-
-	uint32_t m_aic_smr[32];
-	uint32_t m_aic_svr[32];
-
-	devcb_write_line    m_irq_out;
-};
-
-DEFINE_DEVICE_TYPE(ARM_AIC, arm_aic_device, "arm_aic", "ARM Advanced Interrupt Controller")
-
-DEVICE_ADDRESS_MAP_START( regs_map, 32, arm_aic_device )
-	AM_RANGE(0x000, 0x07f) AM_READWRITE(aic_smr_r, aic_smr_w) // AIC_SMR[32] (AIC_SMR)	Source Mode Register
-	AM_RANGE(0x080, 0x0ff) AM_READWRITE(aic_svr_r, aic_svr_w) // AIC_SVR[32] (AIC_SVR)	Source Vector Register
-	AM_RANGE(0x100, 0x103) AM_READ(irq_vector_r)      // AIC_IVR	IRQ Vector Register
-	AM_RANGE(0x104, 0x107) AM_READ(firq_vector_r)     // AIC_FVR	FIQ Vector Register
-// 0x108	AIC_ISR	Interrupt Status Register
-// 0x10C	AIC_IPR	Interrupt Pending Register
-// 0x110	AIC_IMR	Interrupt Mask Register
-// 0x114	AIC_CISR	Core Interrupt Status Register
-	AM_RANGE(0x120, 0x123) AM_WRITE(aic_iecr_w) // 0x120	AIC_IECR	Interrupt Enable Command Register
-	AM_RANGE(0x124, 0x127) AM_WRITE(aic_idcr_w) // 0x124	AIC_IDCR	Interrupt Disable Command Register
-	AM_RANGE(0x128, 0x12b) AM_WRITE(aic_iccr_w) // 0x128	AIC_ICCR	Interrupt Clear Command Register
-// 0x12C	AIC_ISCR	Interrupt Set Command Register
-	AM_RANGE(0x130, 0x133) AM_WRITE(aic_eoicr_w) // 0x130	AIC_EOICR	End of Interrupt Command Register
-// 0x134	AIC_SPU	Spurious Vector Register
-// 0x138	AIC_DCR	Debug Control Register (Protect)
-// 0x140	AIC_FFER	Fast Forcing Enable Register
-// 0x144	AIC_FFDR	Fast Forcing Disable Register
-// 0x148	AIC_FFSR	Fast Forcing Status Register
-ADDRESS_MAP_END
-
-
-READ32_MEMBER(arm_aic_device::irq_vector_r)
-{
-	return m_current_irq_vector;
-}
-
-READ32_MEMBER(arm_aic_device::firq_vector_r)
-{
-	return m_current_firq_vector;
-}
-
-void arm_aic_device::device_start()
-{
-	m_irq_out.resolve_safe();
-
-	save_item(NAME(m_irqs_enabled));
-	save_item(NAME(m_current_irq_vector));
-	save_item(NAME(m_current_firq_vector));
-
-	save_item(NAME(m_aic_smr));
-	save_item(NAME(m_aic_svr));
-
-}
-
-void arm_aic_device::device_reset()
-{
-	m_irqs_enabled = 0;
-	m_current_irq_vector = 0;
-	m_current_firq_vector = 0;
-
-	for(auto & elem : m_aic_smr) { elem = 0; }
-	for(auto & elem : m_aic_svr) { elem = 0; }
-}
-
-void arm_aic_device::set_irq(int identity)
-{
-	for (int i = 0;i < 32;i++)
-	{
-		if (m_aic_smr[i] == identity)
-		{
-			if ((m_irqs_enabled >> i) & 1)
-			{
-				m_current_irq_vector = m_aic_svr[i];
-				m_irq_out(ASSERT_LINE);
-				return;
-			}
-		}
-	}
-}
-
-WRITE32_MEMBER(arm_aic_device::aic_iccr_w)
-{
-	//logerror("%s: aic_iccr_w  %08x (Interrupt Clear Command Register)\n", machine().describe_context().c_str(), data);
-	m_irq_out(CLEAR_LINE);
-};
-
-
-
-class pgm2_state : public driver_device
-{
-public:
-	pgm2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_screen(*this, "screen"),
-		m_lineram(*this, "lineram"),
-		m_sp_zoom(*this, "sp_zoom"),
-		m_mainram(*this, "mainram"),
-		m_fg_videoram(*this, "fg_videoram"),
-		m_bg_videoram(*this, "bg_videoram"),
-		m_sp_videoram(*this, "sp_videoram"),
-		m_vid_regs(*this, "vid_regs"),
-		m_gfxdecode2(*this, "gfxdecode2"),
-		m_gfxdecode3(*this, "gfxdecode3"),
-		m_arm_aic(*this, "arm_aic"),
-		m_sprites_mask(*this, "sprites_mask"),
-		m_sprites_colour(*this, "sprites_colour"),
-		m_sp_palette(*this, "sp_palette"),
-		m_bg_palette(*this, "bg_palette"),
-		m_tx_palette(*this, "tx_palette")
-	{ }
-
-	DECLARE_READ32_MEMBER(unk_startup_r);
-	DECLARE_WRITE32_MEMBER(fg_videoram_w);
-	DECLARE_WRITE32_MEMBER(bg_videoram_w);
-
-	DECLARE_READ32_MEMBER(orleg2_speedup_r);
-	DECLARE_READ32_MEMBER(kov2nl_speedup_r);
-
-	DECLARE_DRIVER_INIT(kov2nl);
-	DECLARE_DRIVER_INIT(orleg2);
-	DECLARE_DRIVER_INIT(ddpdojh);
-	DECLARE_DRIVER_INIT(kov3);
-	DECLARE_DRIVER_INIT(kov3_104);
-	DECLARE_DRIVER_INIT(kov3_102);
-	DECLARE_DRIVER_INIT(kov3_100);
-
-	uint32_t screen_update_pgm2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank_pgm2);
-	DECLARE_WRITE_LINE_MEMBER(irq);
-
-	INTERRUPT_GEN_MEMBER(igs_interrupt);
-	TIMER_DEVICE_CALLBACK_MEMBER(igs_interrupt2);
-
-private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-
-	void pgm_create_dummy_internal_arm_region();
-	void decrypt_kov3_module(uint32_t addrxor, uint16_t dataxor);
-
-	tilemap_t    *m_fg_tilemap;
-	tilemap_t    *m_bg_tilemap;
-
-	std::unique_ptr<uint32_t[]>     m_spritebufferram; // buffered spriteram
-
-	bitmap_ind16 m_sprite_bitmap;
-	
-	void skip_sprite_chunk(int &palette_offset, uint32_t maskdata, int reverse);
-	void draw_sprite_pixel(const rectangle &cliprect, int palette_offset, int realx, int realy, int pal);
-	void draw_sprite_chunk(const rectangle &cliprect, int &palette_offset, int x, int realy, int sizex, int xdraw, int pal, uint32_t maskdata, uint32_t zoomx_bits, int growx, int &realxdraw, int realdraw_inc, int palette_inc);
-	void draw_sprite_line(const rectangle &cliprect, int &mask_offset, int &palette_offset, int x, int realy, int flipx, int reverse, int sizex, int pal, int zoomybit, int zoomx_bits, int growx);
-	void draw_sprites(screen_device &screen, const rectangle &cliprect, uint32_t* spriteram);
-	void copy_sprites_from_bitmap(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int pri);
-
-	uint32_t m_sprites_mask_mask;
-	uint32_t m_sprites_colour_mask;
-
-	// devices
-	required_device<cpu_device> m_maincpu;
-	required_device<screen_device> m_screen;
-	required_shared_ptr<uint32_t> m_lineram;
-	required_shared_ptr<uint32_t> m_sp_zoom;
-	required_shared_ptr<uint32_t> m_mainram;
-	required_shared_ptr<uint32_t> m_fg_videoram;
-	required_shared_ptr<uint32_t> m_bg_videoram;
-	required_shared_ptr<uint32_t> m_sp_videoram;
-	required_shared_ptr<uint32_t> m_vid_regs;
-	required_device<gfxdecode_device> m_gfxdecode2;
-	required_device<gfxdecode_device> m_gfxdecode3;
-	required_device<arm_aic_device> m_arm_aic;
-	required_region_ptr<uint8_t> m_sprites_mask;
-	required_region_ptr<uint8_t> m_sprites_colour;
-	required_device<palette_device> m_sp_palette;
-	required_device<palette_device> m_bg_palette;
-	required_device<palette_device> m_tx_palette;
-};
+#include "includes/pgm2.h"
 
 // checked on startup, or doesn't boot
 READ32_MEMBER(pgm2_state::unk_startup_r)
 {
 	logerror("%s: unk_startup_r\n", machine().describe_context().c_str());
-	return 0xffffffff;
+	return 0x00000180;
 }
 
 INTERRUPT_GEN_MEMBER(pgm2_state::igs_interrupt)
@@ -317,8 +80,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(pgm2_state::igs_interrupt2)
 static ADDRESS_MAP_START( pgm2_map, AS_PROGRAM, 32, pgm2_state )
 	AM_RANGE(0x00000000, 0x00003fff) AM_ROM //AM_REGION("user1", 0x00000) // internal ROM
 
-	AM_RANGE(0x02000000, 0x0200ffff) AM_RAM AM_SHARE("sram") // 'battery ram'
+	AM_RANGE(0x02000000, 0x0200ffff) AM_RAM AM_SHARE("sram") // 'battery ram' (in CPU?)
 	
+	// could be the card reader, looks a bit like a standard IGS MCU comms protocol going on here
 	AM_RANGE(0x03600000, 0x03600003) AM_WRITENOP
 	AM_RANGE(0x03620000, 0x03620003) AM_WRITENOP
 	AM_RANGE(0x03640000, 0x03640003) AM_WRITENOP
@@ -330,7 +94,7 @@ static ADDRESS_MAP_START( pgm2_map, AS_PROGRAM, 32, pgm2_state )
 	AM_RANGE(0x03a00000, 0x03a00003) AM_READ_PORT("INPUTS1")
 
 	AM_RANGE(0x10000000, 0x107fffff) AM_ROM AM_REGION("user1", 0) // external ROM
-	AM_RANGE(0x20000000, 0x207fffff) AM_RAM AM_SHARE("mainram")
+	AM_RANGE(0x20000000, 0x2007ffff) AM_RAM AM_SHARE("mainram")
 
 	AM_RANGE(0x30000000, 0x30001fff) AM_RAM AM_SHARE("sp_videoram") // spriteram ('move' ram in test mode)
 
@@ -351,15 +115,16 @@ static ADDRESS_MAP_START( pgm2_map, AS_PROGRAM, 32, pgm2_state )
 	what is the real size? */
 	AM_RANGE(0x300e0000, 0x300e03ff) AM_RAM AM_SHARE("lineram") AM_MIRROR(0x000fc00)
 
-	AM_RANGE(0x30100000, 0x301000ff) AM_RAM // unknown 
+	AM_RANGE(0x30100000, 0x301000ff) AM_RAM // unknown mask 00ff00ff, seems to be banked with 0x30120030 too?
 
-	AM_RANGE(0x30120000, 0x3012003f) AM_RAM AM_SHARE("vid_regs") // scroll etc.?
+	AM_RANGE(0x30120000, 0x30120003) AM_RAM AM_SHARE("bgscroll") // scroll
+	// there are other 0x301200xx regs
 
 	AM_RANGE(0x40000000, 0x40000003) AM_DEVREADWRITE8("ymz774", ymz774_device, read, write, 0xffffffff)
 	
-	// internal to IGS036? - various other writes down here on startup too
-	AM_RANGE(0xffffec00, 0xffffec5f) AM_RAM // other encryption data?
-	AM_RANGE(0xfffffc00, 0xfffffcff) AM_RAM // encryption table (see code at 3950)
+	// internal to IGS036? - various other writes down here on startup too - could be other standard ATMEL peripherals like the ARM_AIC mixed with custom bits
+	AM_RANGE(0xffffec00, 0xffffec5f) AM_RAM
+	AM_RANGE(0xfffffc00, 0xfffffcff) AM_RAM // confirmed as encryption table for main program rom (see code at 3950)
 
 	AM_RANGE(0xfffff000, 0xfffff14b) AM_DEVICE("arm_aic", arm_aic_device, regs_map)
 
@@ -372,17 +137,14 @@ static ADDRESS_MAP_START( pgm2_map, AS_PROGRAM, 32, pgm2_state )
 	AM_RANGE(0xfffffa0c, 0xfffffa0f) AM_READ(unk_startup_r)
 ADDRESS_MAP_END
 
-
-
-
 static INPUT_PORTS_START( pgm2 )
 // probably not inputs
 	PORT_START("UNK1")
-	PORT_BIT( 0xffffffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0xffffffff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 // probably not inputs
 	PORT_START("UNK2")
-	PORT_BIT( 0xffffffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0xffffffff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("INPUTS0")
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
@@ -438,9 +200,9 @@ static INPUT_PORTS_START( pgm2 )
 	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_COIN3 )
 	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_COIN4 )
 	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_SERVICE1 ) // test key p1+p2
-	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_UNUSED ) // should be test key p3+p4 but doesn't work in test mode?
+	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_SERVICE2 ) // test key p3+p4
 	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_SERVICE3 ) // service key p1+p2
-	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_SERVICE2 ) // service key p3+p4
+	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_SERVICE4 ) // service key p3+p4
 	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x00800000, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -468,354 +230,12 @@ static INPUT_PORTS_START( pgm2 )
 	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
 INPUT_PORTS_END
 
-inline void pgm2_state::draw_sprite_pixel(const rectangle &cliprect, int palette_offset, int realx, int realy, int pal)
-{
-	if (cliprect.contains(realx, realy))
-	{
-		uint16_t pix = m_sprites_colour[palette_offset] & 0x3f; // there are some stray 0xff bytes in some roms, so mask
-		uint16_t pendat = pix + (pal * 0x40);
-		uint16_t* dstptr_bitmap = &m_sprite_bitmap.pix16(realy);
-		dstptr_bitmap[realx] = pendat;
-	}
-}
-
-inline void pgm2_state::draw_sprite_chunk(const rectangle &cliprect, int &palette_offset, int x, int realy, int sizex, int xdraw, int pal, uint32_t maskdata, uint32_t zoomx_bits, int growx, int &realxdraw, int realdraw_inc, int palette_inc)
-{
-	for (int xchunk = 0; xchunk < 32; xchunk++)
-	{
-		int pix, xzoombit;
-		if (palette_inc == -1)
-		{
-			pix = (maskdata >> xchunk) & 1;
-			xzoombit = (zoomx_bits >> xchunk) & 1;
-		}
-		else
-		{
-			pix = (maskdata >> (31 - xchunk)) & 1;
-			xzoombit = (zoomx_bits >> (31 - xchunk)) & 1;
-		}
-
-		if (growx)
-		{
-			if (pix)
-			{
-				draw_sprite_pixel(cliprect, palette_offset, x + realxdraw, realy, pal);
-				realxdraw += realdraw_inc;
-
-				if (xzoombit)
-				{
-					draw_sprite_pixel(cliprect, palette_offset, x + realxdraw, realy, pal);
-					realxdraw += realdraw_inc;
-				}
-
-				palette_offset += palette_inc;
-				palette_offset &= m_sprites_colour_mask;
-			}
-			else
-			{
-				realxdraw += realdraw_inc;
-				if (xzoombit) realxdraw += realdraw_inc;
-			}
-		}
-		else
-		{
-			if (pix)
-			{
-				if (xzoombit) draw_sprite_pixel(cliprect, palette_offset, x + realxdraw, realy, pal);
-			
-				palette_offset += palette_inc;
-				palette_offset &= m_sprites_colour_mask;
-			}
-
-			if (xzoombit) realxdraw += realdraw_inc;
-		}
-	}
-}
-
-
-
-inline void pgm2_state::skip_sprite_chunk(int &palette_offset, uint32_t maskdata, int reverse)
-{
-	int bits = population_count_32(maskdata);
-
-	if (!reverse)
-	{
-		palette_offset+=bits;
-	}
-	else
-	{
-		palette_offset-=bits;
-	}
-
-	palette_offset &= m_sprites_colour_mask;
-
-}
-
-
-
-inline void pgm2_state::draw_sprite_line(const rectangle &cliprect, int &mask_offset, int &palette_offset, int x, int realy, int flipx, int reverse, int sizex, int pal, int zoomybit, int zoomx_bits, int growx)
-{
-	int realxdraw = 0;
-
-	if (flipx ^ reverse)
-		realxdraw = (population_count_32(zoomx_bits) * sizex) - 1;
-
-	for (int xdraw = 0; xdraw < sizex; xdraw++)
-	{
-		uint32_t maskdata = m_sprites_mask[mask_offset + 0] << 24;
-		maskdata |= m_sprites_mask[mask_offset + 1] << 16;
-		maskdata |= m_sprites_mask[mask_offset + 2] << 8;
-		maskdata |= m_sprites_mask[mask_offset + 3] << 0;
-
-		if (reverse)
-		{
-			mask_offset -= 4;
-		}
-		else if (!reverse)
-		{
-			mask_offset += 4;
-		}
-
-
-		mask_offset &= m_sprites_mask_mask;
-
-		if (zoomybit)
-		{
-			if (!flipx)
-			{
-				if (!reverse) draw_sprite_chunk(cliprect, palette_offset, x, realy, sizex, xdraw, pal, maskdata, zoomx_bits, growx, realxdraw, 1, 1);
-				else draw_sprite_chunk(cliprect, palette_offset, x, realy, sizex, xdraw, pal, maskdata, zoomx_bits, growx, realxdraw, -1, -1);
-			}
-			else
-			{
-				if (!reverse) draw_sprite_chunk(cliprect, palette_offset, x, realy, sizex, xdraw, pal, maskdata, zoomx_bits, growx, realxdraw, -1, 1);
-				else draw_sprite_chunk(cliprect, palette_offset, x, realy, sizex, xdraw, pal, maskdata, zoomx_bits, growx, realxdraw, 1, -1);
-
-			}
-		}
-		else skip_sprite_chunk(palette_offset, maskdata, reverse);
-	}
-}
-
-void pgm2_state::draw_sprites(screen_device &screen, const rectangle &cliprect, uint32_t* spriteram)
-{
-	m_sprite_bitmap.fill(0x8000, cliprect);
-
-	int endoflist = -1;
-
-	//printf("frame\n");
-
-	for (int i = 0;i < 0x2000 / 4;i++)
-	{
-		if (spriteram[i] == 0x80000000)
-		{
-			endoflist = i;
-			break;
-		}
-	}
-
-	if (endoflist != -1)
-	{
-		for (int i = 0; i < endoflist-2; i += 4)
-		{
-			//printf("sprite with %08x %08x %08x %08x\n", spriteram[i + 0], spriteram[i + 1], spriteram[i + 2], spriteram[i + 3]);
-		
-			int x =     (spriteram[i + 0] & 0x000007ff) >> 0;
-			int y =     (spriteram[i + 0] & 0x003ff800) >> 11;
-			int pal =   (spriteram[i + 0] & 0x0fc00000) >> 22;
-			int pri =   (spriteram[i + 0] & 0x80000000) >> 31;
-
-			int unk0 =  (spriteram[i + 0] & 0x70000000) >> 0;
-
-			int sizex = (spriteram[i + 1] & 0x0000003f) >> 0;
-			int sizey = (spriteram[i + 1] & 0x00007fc0) >> 6;
-			int flipx = (spriteram[i + 1] & 0x00800000) >> 23;
-			int reverse = (spriteram[i + 1] & 0x80000000) >> 31; // more of a 'reverse entire drawing' flag than y-flip, but used for that purpose
-			int zoomx = (spriteram[i + 1] & 0x001f0000) >> 16;
-			int growx = (spriteram[i + 1] & 0x00200000) >> 21;
-			int zoomy = (spriteram[i + 1] & 0x1f000000) >> 24;
-			int growy = (spriteram[i + 1] & 0x20000000) >> 29;
-			int unk1 =  (spriteram[i + 1] & 0x40408000) >> 0;
-
-			if (unk0 || unk1)
-			{
-				// unk0 & 0x40000000 set during gameplay on kov2nl, why? more pri bits?
-				//popmessage("sprite rendering unused bits set unk0 %08x unk1 %08x\n", unk0, unk1);
-			}
-			
-			int mask_offset = (spriteram[i + 2]<<1);
-			int palette_offset = (spriteram[i + 3]);
-
-			uint32_t zoomy_bits = m_sp_zoom[zoomy];
-			uint32_t zoomx_bits = m_sp_zoom[zoomx];
-
-			if (x & 0x400) x -=0x800;
-			if (y & 0x400) y -=0x800;
-
-			if (reverse)
-				mask_offset -= 2;
-
-			mask_offset &= m_sprites_mask_mask;
-			palette_offset &= m_sprites_colour_mask;
-
-			pal |= (pri << 6); // encode priority with the palette for manual mixing later
-
-			int realy = y;
-
-			int sourceline = 0;
-			for (int ydraw = 0; ydraw < sizey;sourceline++)
-			{
-				int zoomy_bit = (zoomy_bits >> (sourceline & 0x1f)) & 1;
-
-				// store these for when we need to draw a line twice
-				uint32_t pre_palette_offset = palette_offset;
-				uint32_t pre_mask_offset = mask_offset;
-
-				if (!growy) // skipping lines
-				{
-					draw_sprite_line(cliprect, mask_offset, palette_offset, x, realy, flipx, reverse, sizex, pal, zoomy_bit, zoomx_bits, growx);
-					if (zoomy_bit) realy++;
-
-					ydraw++;
-				}
-				else // doubling lines
-				{
-					draw_sprite_line(cliprect, mask_offset, palette_offset, x, realy, flipx, reverse, sizex, pal, 1, zoomx_bits, growx);
-					realy++;
-
-					if (zoomy_bit)
-					{
-						palette_offset = pre_palette_offset;
-						mask_offset = pre_mask_offset;
-					}
-					else ydraw++;
-				}
-			}
-		}
-
-	}
-}
-
-void pgm2_state::copy_sprites_from_bitmap(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int pri)
-{
-	pri <<= 12;
-
-	const pen_t *paldata = m_sp_palette->pens();
-	uint16_t* srcptr_bitmap;
-	uint32_t* dstptr_bitmap;
-
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
-	{
-		srcptr_bitmap = &m_sprite_bitmap.pix16(y);
-		dstptr_bitmap = &bitmap.pix32(y);
-
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
-		{
-			uint16_t pix = srcptr_bitmap[x];
-
-			if (pix != 0x8000)
-			{
-				if ((pix&0x1000) == pri)
-					dstptr_bitmap[x] = paldata[pix & 0xfff];
-			}
-		}
-
-	}
-}
-
-
-
-uint32_t pgm2_state::screen_update_pgm2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	m_bg_tilemap->set_scrolly(0, (m_vid_regs[0x0/4] & 0xffff0000)>>16 );
-
-	for (int y = 0; y < 224; y++)
-	{
-		uint16_t linescroll = (y & 1) ? ((m_lineram[(y >> 1)] & 0xffff0000) >> 16) : (m_lineram[(y >> 1)] & 0x0000ffff);
-		m_bg_tilemap->set_scrollx((y + ((m_vid_regs[0x0 / 4] & 0xffff0000) >> 16)) & 0x3ff, ((m_vid_regs[0x0 / 4] & 0x0000ffff) >> 0) + linescroll);
-	}
-
-	const pen_t *paldata = m_bg_palette->pens();
-
-	bitmap.fill(paldata[0], cliprect); // are there any places bg pen is showing so we know what it should be?
-
-	draw_sprites(screen, cliprect, m_spritebufferram.get());
-
-	copy_sprites_from_bitmap(screen, bitmap, cliprect, 1);
-
-	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-
-	copy_sprites_from_bitmap(screen, bitmap, cliprect, 0);
-
-	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	return 0;
-}
-
-WRITE_LINE_MEMBER(pgm2_state::screen_vblank_pgm2)
-{
-	// rising edge
-	if (state)
-	{
-		memcpy(m_spritebufferram.get(), m_sp_videoram, 0x2000);
-	}
-}
 
 WRITE_LINE_MEMBER(pgm2_state::irq)
 {
 //	printf("irq\n");
 	if (state == ASSERT_LINE) m_maincpu->set_input_line(ARM7_IRQ_LINE, ASSERT_LINE);
 	else m_maincpu->set_input_line(ARM7_IRQ_LINE, CLEAR_LINE);
-
-}
-
-WRITE32_MEMBER(pgm2_state::fg_videoram_w)
-{
-	COMBINE_DATA(&m_fg_videoram[offset]);
-	m_fg_tilemap->mark_tile_dirty(offset);
-}
-
-TILE_GET_INFO_MEMBER(pgm2_state::get_fg_tile_info)
-{
-	int tileno = (m_fg_videoram[tile_index] & 0x0003ffff) >> 0;
-	int colour = (m_fg_videoram[tile_index] & 0x007c0000) >> 18; // 5 bits
-	int flipxy = (m_fg_videoram[tile_index] & 0x01800000) >> 23;
-
-	SET_TILE_INFO_MEMBER(0, tileno, colour, TILE_FLIPXY(flipxy));
-}
-
-
-WRITE32_MEMBER(pgm2_state::bg_videoram_w)
-{
-	COMBINE_DATA(&m_bg_videoram[offset]);
-	m_bg_tilemap->mark_tile_dirty(offset);
-}
-
-TILE_GET_INFO_MEMBER(pgm2_state::get_bg_tile_info)
-{
-	int tileno = (m_bg_videoram[tile_index] & 0x0003ffff) >> 0;
-	int colour = (m_bg_videoram[tile_index] & 0x003c0000) >> 18; // 4 bits
-	int flipxy = (m_bg_videoram[tile_index] & 0x01800000) >> 23;
-
-	SET_TILE_INFO_MEMBER(0, tileno, colour, TILE_FLIPXY(flipxy));
-}
-
-void pgm2_state::video_start()
-{
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode2, tilemap_get_info_delegate(FUNC(pgm2_state::get_fg_tile_info), this), TILEMAP_SCAN_ROWS, 8, 8, 96, 48); // 0x4800 bytes
-	m_fg_tilemap->set_transparent_pen(0);
-
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode3, tilemap_get_info_delegate(FUNC(pgm2_state::get_bg_tile_info), this), TILEMAP_SCAN_ROWS, 32, 32, 64, 32); // 0x2000 bytes
-	m_bg_tilemap->set_transparent_pen(0);
-	m_bg_tilemap->set_scroll_rows(32 * 32);
-
-	m_spritebufferram = make_unique_clear<uint32_t[]>(0x2000 / 4);
-
-	m_screen->register_screen_bitmap(m_sprite_bitmap);
-
-	save_pointer(NAME(m_spritebufferram.get()), 0x2000 / 4);
-
-	m_sprites_mask_mask = memregion("sprites_mask")->bytes() - 1;
-	m_sprites_colour_mask = memregion("sprites_colour")->bytes() - 1;
 }
 
 void pgm2_state::machine_start()
@@ -949,7 +369,6 @@ static MACHINE_CONFIG_START( pgm2 )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pgm2_state,  igs_interrupt)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", pgm2_state, igs_interrupt2, "screen", 0, 1)
 
-
 	MCFG_ARM_AIC_ADD("arm_aic")
 	MCFG_IRQ_LINE_CB(WRITELINE(pgm2_state, irq))
 
@@ -986,6 +405,8 @@ MACHINE_CONFIG_END
 /* using macros for the video / sound roms because the locations never change between sets, and
    we're going to have a LOT of clones to cover all the internal rom regions and external rom revision
    combinations, so it keeps things readable */
+
+// Oriental Legend 2
 
 #define ORLEG2_VIDEO_SOUND_ROMS \
 	ROM_REGION( 0x200000, "tiles", ROMREGION_ERASEFF ) \
@@ -1044,6 +465,8 @@ ROM_START( orleg2_101 )
 	ORLEG2_VIDEO_SOUND_ROMS
 ROM_END
 
+// Knights of Valour 2 New Legend
+
 #define KOV2NL_VIDEO_SOUND_ROMS \
 	ROM_REGION( 0x200000, "tiles", ROMREGION_ERASEFF ) \
 	ROM_LOAD( "ig-a3_text.u4",           0x00000000, 0x0200000, CRC(214530ff) SHA1(4231a02054b0345392a077042b95779fd45d6c22) ) \
@@ -1066,9 +489,6 @@ ROM_END
 	ROM_REGION(0x10000, "sram", 0) \
 	ROM_LOAD("gsyx_nvram", 0x00000000, 0x10000, CRC(22400c16) SHA1(f775a16299c30f2ce23d683161b910e06eff37c1) )
 
-
-
-
 #define KOV2NL_PROGRAM_302 \
 	ROM_REGION( 0x800000, "user1", 0 ) \
 	ROM_LOAD("gsyx_v302cn.u7", 0x00000000, 0x0800000, CRC(b19cf540) SHA1(25da5804bbfd7ef2cdf5cc5aabaa803d18b98929) )
@@ -1084,7 +504,6 @@ ROM_END
 #define KOV2NL_INTERNAL_CHINA \
 	ROM_REGION( 0x04000, "maincpu", 0 ) \
 	ROM_LOAD( "gsyx_igs036_china.rom", 0x00000000, 0x0004000, CRC(e09fe4ce) SHA1(c0cac64ef8727cbe79d503ec4df66ddb6f2c925e) )
-
 
 ROM_START( kov2nl )
 	KOV2NL_INTERNAL_CHINA
@@ -1103,6 +522,8 @@ ROM_START( kov2nl_300 )
 	KOV2NL_PROGRAM_300
 	KOV2NL_VIDEO_SOUND_ROMS
 ROM_END
+
+// Dodonpachi Daioujou Tamashii
 
 #define DDPDOJH_VIDEO_SOUND_ROMS \
 	ROM_REGION( 0x200000, "tiles", ROMREGION_ERASEFF ) \
@@ -1123,8 +544,6 @@ ROM_END
 	ROM_REGION( 0x1000000, "ymz774", ROMREGION_ERASEFF ) /* ymz770 */ \
 	ROM_LOAD16_WORD_SWAP( "ddpdoj_wave0.u12",        0x00000000, 0x1000000, CRC(2b71a324) SHA1(f69076cc561f40ca564d804bc7bd455066f8d77c) )
 
-
-
 ROM_START( ddpdojh )
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	ROM_LOAD( "ddpdoj_igs036.rom",       0x00000000, 0x0004000, NO_DUMP )
@@ -1134,6 +553,8 @@ ROM_START( ddpdojh )
 
 	DDPDOJH_VIDEO_SOUND_ROMS
 ROM_END
+
+// Knights of Valour 3
 
 /*
    The Kov3 Program rom is a module consisting of a NOR flash and a FPGA, this provides an extra layer of encryption on top of the usual
@@ -1160,7 +581,6 @@ ROM_END
 	\
 	ROM_REGION( 0x4000000, "ymz774", ROMREGION_ERASEFF ) /* ymz770 */ \
 	ROM_LOAD16_WORD_SWAP( "kov3_wave0.u13",              0x00000000, 0x4000000, CRC(aa639152) SHA1(2314c6bd05524525a31a2a4668a36a938b924ba4) )
-
 
 ROM_START( kov3 )
 	ROM_REGION( 0x04000, "maincpu", 0 )
