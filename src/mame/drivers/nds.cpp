@@ -30,11 +30,15 @@ READ32_MEMBER(nds_state::arm7_io_r)
 {
 	switch(offset)
 	{
+		case IPCSYNC_OFFSET:
+			return m_arm7_ipcsync;
+
 		case POSTFLG_OFFSET:
 			/* Bit   Use
 			*  0     0=Booting, 1=Booted (set by BIOS/firmware)
 			*/
 			return m_arm7_postflg;
+
 		default:
 			verboselog(*this, 0, "[ARM7] [IO] Unknown read: %08x (%08x)\n", offset*4, mem_mask);
 			break;
@@ -47,6 +51,14 @@ WRITE32_MEMBER(nds_state::arm7_io_w)
 {
 	switch(offset)
 	{
+		case IPCSYNC_OFFSET:
+			printf("ARM7: %x to IPCSYNC\n", data);
+			m_arm9_ipcsync &= ~0xf;
+			m_arm9_ipcsync |= ((data >> 8) & 0xf);
+			m_arm7_ipcsync &= 0xf;
+			m_arm7_ipcsync |= (data & ~0xf);
+			break;
+
 		case POSTFLG_OFFSET:
 			/* Bit   Use
 			*  0     0=Booting, 1=Booted (set by BIOS/firmware)
@@ -67,6 +79,9 @@ READ32_MEMBER(nds_state::arm9_io_r)
 {
 	switch(offset)
 	{
+		case IPCSYNC_OFFSET:
+			return m_arm9_ipcsync;
+
 		case POSTFLG_OFFSET:
 			/* Bit   Use
 			*  0     0=Booting, 1=Booted (set by BIOS/firmware)
@@ -85,6 +100,14 @@ WRITE32_MEMBER(nds_state::arm9_io_w)
 {
 	switch(offset)
 	{
+		case IPCSYNC_OFFSET:
+			printf("ARM9: %x to IPCSYNC\n", data);
+			m_arm7_ipcsync &= ~0xf;
+			m_arm7_ipcsync |= ((data >> 8) & 0xf);
+			m_arm9_ipcsync &= 0xf;
+			m_arm9_ipcsync |= (data & ~0xf);
+			break;
+
 		case POSTFLG_OFFSET:
 			/* Bit   Use
 			*  0     0=Booting, 1=Booted (set by BIOS/firmware)
@@ -135,7 +158,6 @@ void nds_state::machine_start()
 static MACHINE_CONFIG_START( nds )
 	MCFG_CPU_ADD("arm7", ARM7, XTAL_33_333MHz)
 	MCFG_CPU_PROGRAM_MAP(nds_arm7_map)
-	MCFG_DEVICE_DISABLE()
 
 	MCFG_CPU_ADD("arm9", ARM946ES, XTAL_66_6667MHz)
 	MCFG_ARM_HIGH_VECTORS()
