@@ -33,7 +33,6 @@ public:
 private:
 	uint8_t m_unit;
 	uint8_t m_cmd;
-	uint16_t m_data;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	required_device<cpu_device> m_maincpu;
