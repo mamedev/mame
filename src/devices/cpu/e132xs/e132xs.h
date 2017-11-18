@@ -161,7 +161,6 @@ protected:
 	uint32_t  m_local_regs[64];
 
 	/* internal stuff */
-	uint32_t  m_ppc;          // previous pc
 	uint16_t  m_op;           // opcode
 	uint32_t  m_trap_entry;   // entry point to get trap address
 
