@@ -221,6 +221,9 @@ static MACHINE_CONFIG_START( uts20 )
 	MCFG_DEVICE_ADD("uart", Z80SIO, XTAL_4MHz)
 	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_Z80SIO_OUT_TXDA_CB(DEVWRITELINE("uart", z80sio_device, rxa_w)) // FIXME: hacked in permanent loopback to pass test
+	MCFG_Z80SIO_OUT_TXDB_CB(DEVWRITELINE("uart", z80sio_device, rxb_w)) // FIXME: hacked in permanent loopback to pass test
+	MCFG_Z80SIO_OUT_WRDYB_CB(DEVWRITELINE("uart", z80sio_device, dcdb_w)) // FIXME: hacked in permanent loopback to pass test
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart", z80sio_device, ctsb_w)) // FIXME: hacked in permanent loopback to pass test
 
 	/* Sound */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -239,8 +242,7 @@ ROM_START( uts20 )
 	ROM_LOAD( "uts20e.rom", 0x4000, 0x1000, CRC(0dfc8062) SHA1(cd681020bfb4829d4cebaf1b5bf618e67b55bda3) )
 	// Patches, see notes at top.
 	ROM_FILL(0x2bd,1,0xaf) // test 2
-	ROM_FILL(0x48f1,1,0xa3) // test 5, patch unused byte to fix checksum
-	ROM_FILL(0x928,1,0x00) // upon failure keep going
+	ROM_FILL(0x48f1,1,0xa6) // test 5, patch unused byte to fix checksum
 
 	/* character generator not dumped, using the one from 'c10' for now */
 	ROM_REGION( 0x2000, "chargen", 0 )
