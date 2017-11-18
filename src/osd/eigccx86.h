@@ -472,13 +472,13 @@ _count_leading_zeros(uint32_t value)
 {
 	uint32_t result;
 	__asm__ (
-		"   bsrl  %[value], %[result] ;"
-		"   jnz   1f                  ;"
-		"   movl  $63, %[result]      ;"
-		"1: xorl  $31, %[result]      ;"
-		: [result] "=r" (result)    // result can be in any register
-		: [value]  "rm" (value)     // 'value' can be register or memory
-		: "cc"                      // clobbers condition codes
+		" bsrl    %[value], %[result] ;"
+		" cmovzl  %[bias], %[result]  ;"
+		" xorl    $31, %[result]      ;"
+		: [result] "=&r" (result)       // result can be in any register
+		: [value]  "rm"  (value)        // 'value' can be register or memory
+		, [bias]   "rm"  (uint32_t(63)) // 'bias' can be register or memory
+		: "cc"                          // clobbers condition codes
 	);
 	return result;
 }
@@ -495,15 +495,13 @@ _count_leading_ones(uint32_t value)
 {
 	uint32_t result;
 	__asm__ (
-		"   movl  %[value], %[result]  ;"
-		"   notl  %[result]            ;"
-		"   bsrl  %[result], %[result] ;"
-		"   jnz   1f                   ;"
-		"   movl  $63, %[result]       ;"
-		"1: xorl  $31, %[result]       ;"
-		: [result] "=r"  (result)   // result can be in any register
-		: [value]  "rmi" (value)    // 'value' can be register, memory or immediate
-		: "cc"                      // clobbers condition codes
+		" bsrl    %[value], %[result] ;"
+		" cmovzl  %[bias], %[result]  ;"
+		" xorl    $31, %[result]      ;"
+		: [result] "=&r" (result)       // result can be in any register
+		: [value]  "rm"  (~value)       // 'value' can be register or memory
+		, [bias]   "rm"  (uint32_t(63)) // 'bias' can be register or memory
+		: "cc"                          // clobbers condition codes
 	);
 	return result;
 }
