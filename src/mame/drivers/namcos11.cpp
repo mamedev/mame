@@ -1676,7 +1676,7 @@ GAME( 1995, xevi3dgj,   xevi3dg,  xevi3dg,    namcos11,   namcos11_state, 0, ROT
 GAME( 1996, primglex,   0,        primglex,   tekken,     namcos11_state, 0, ROT0, "Namco",         "Prime Goal EX (Japan, PG1/VER.A)",             MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, danceyes,   0,        danceyes,   namcos11,   namcos11_state, 0, ROT0, "Namco",         "Dancing Eyes (US, DC3/VER.C)",                 MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, danceyesj,  danceyes, danceyes,   namcos11,   namcos11_state, 0, ROT0, "Namco",         "Dancing Eyes (Japan, DC1/VER.A)",              MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, pocketrc,   0,        pocketrc,   pocketrc,   namcos11_state, 0, ROT0, "Namco",         "Pocket Racer (Japan, PKR1/VER.B)",             MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, pocketrc,   0,        pocketrc,   pocketrc,   namcos11_state, 0, ROT0, "Namco",         "Pocket Racer (Japan, PKR1/VER.B)",             MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
 GAME( 1997, starswep,   0,        starswep,   namcos11,   namcos11_state, 0, ROT0, "Axela / Namco", "Star Sweep (World, STP2/VER.A)",               MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, starswepj,  starswep, starswep,   namcos11,   namcos11_state, 0, ROT0, "Axela / Namco", "Star Sweep (Japan, STP1/VER.A)",               MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1998, myangel3,   0,        myangel3,   myangel3,   namcos11_state, 0, ROT0, "MOSS / Namco",  "Kosodate Quiz My Angel 3 (Japan, KQT1/VER.A)", MACHINE_IMPERFECT_GRAPHICS )

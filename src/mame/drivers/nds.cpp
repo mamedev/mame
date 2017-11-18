@@ -30,11 +30,15 @@ READ32_MEMBER(nds_state::arm7_io_r)
 {
 	switch(offset)
 	{
+		case IPCSYNC_OFFSET:
+			return m_arm7_ipcsync;
+
 		case POSTFLG_OFFSET:
 			/* Bit   Use
 			*  0     0=Booting, 1=Booted (set by BIOS/firmware)
 			*/
 			return m_arm7_postflg;
+
 		default:
 			verboselog(*this, 0, "[ARM7] [IO] Unknown read: %08x (%08x)\n", offset*4, mem_mask);
 			break;
@@ -47,6 +51,14 @@ WRITE32_MEMBER(nds_state::arm7_io_w)
 {
 	switch(offset)
 	{
+		case IPCSYNC_OFFSET:
+			printf("ARM7: %x to IPCSYNC\n", data);
+			m_arm9_ipcsync &= ~0xf;
+			m_arm9_ipcsync |= ((data >> 8) & 0xf);
+			m_arm7_ipcsync &= 0xf;
+			m_arm7_ipcsync |= (data & ~0xf);
+			break;
+
 		case POSTFLG_OFFSET:
 			/* Bit   Use
 			*  0     0=Booting, 1=Booted (set by BIOS/firmware)
@@ -67,6 +79,9 @@ READ32_MEMBER(nds_state::arm9_io_r)
 {
 	switch(offset)
 	{
+		case IPCSYNC_OFFSET:
+			return m_arm9_ipcsync;
+
 		case POSTFLG_OFFSET:
 			/* Bit   Use
 			*  0     0=Booting, 1=Booted (set by BIOS/firmware)
@@ -85,6 +100,14 @@ WRITE32_MEMBER(nds_state::arm9_io_w)
 {
 	switch(offset)
 	{
+		case IPCSYNC_OFFSET:
+			printf("ARM9: %x to IPCSYNC\n", data);
+			m_arm7_ipcsync &= ~0xf;
+			m_arm7_ipcsync |= ((data >> 8) & 0xf);
+			m_arm9_ipcsync &= 0xf;
+			m_arm9_ipcsync |= (data & ~0xf);
+			break;
+
 		case POSTFLG_OFFSET:
 			/* Bit   Use
 			*  0     0=Booting, 1=Booted (set by BIOS/firmware)
@@ -105,16 +128,17 @@ WRITE32_MEMBER(nds_state::arm9_io_w)
 }
 
 static ADDRESS_MAP_START( nds_arm7_map, AS_PROGRAM, 32, nds_state )
-	AM_RANGE(0x00000000, 0x00003fff) AM_ROM
-	AM_RANGE(0x02000000, 0x023fffff) AM_RAM AM_SHARE("mainram")
+	AM_RANGE(0x00000000, 0x00003fff) AM_ROM AM_REGION("arm7", 0)
+	AM_RANGE(0x02000000, 0x023fffff) AM_RAM AM_MIRROR(0x00400000) AM_SHARE("mainram")
 	AM_RANGE(0x03800000, 0x0380ffff) AM_RAM
 	AM_RANGE(0x04000000, 0x0400ffff) AM_READWRITE(arm7_io_r, arm7_io_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( nds_arm9_map, AS_PROGRAM, 32, nds_state )
-	AM_RANGE(0x00000000, 0x00000fff) AM_ROM
-	AM_RANGE(0x02000000, 0x023fffff) AM_RAM AM_SHARE("mainram")
+	AM_RANGE(0x00000000, 0x00007fff) AM_RAM // Instruction TCM
+	AM_RANGE(0x02000000, 0x023fffff) AM_RAM AM_MIRROR(0x00400000) AM_SHARE("mainram")
 	AM_RANGE(0x04000000, 0x0400ffff) AM_READWRITE(arm9_io_r, arm9_io_w)
+	AM_RANGE(0xffff0000, 0xffff0fff) AM_ROM AM_MIRROR(0x1000) AM_REGION("arm9", 0)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( nds )
@@ -136,7 +160,9 @@ static MACHINE_CONFIG_START( nds )
 	MCFG_CPU_PROGRAM_MAP(nds_arm7_map)
 
 	MCFG_CPU_ADD("arm9", ARM946ES, XTAL_66_6667MHz)
+	MCFG_ARM_HIGH_VECTORS()
 	MCFG_CPU_PROGRAM_MAP(nds_arm9_map)
+
 MACHINE_CONFIG_END
 
 /* Help identifying the region and revisions of the set would be greatly appreciated! */

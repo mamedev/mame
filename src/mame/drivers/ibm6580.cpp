@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Robbbert, Sergey Svishchev
+// copyright-holders:Sergey Svishchev
 /***************************************************************************
 
 IBM 6580 Displaywriter.

@@ -32,11 +32,12 @@ function hiscore.startplugin()
 	local scores_have_been_read = false;
 	local mem_check_passed = false;
 	local found_hiscore_entry = false;
+	local timed_save = true;
 
 	local positions = {};
 	-- Configuration file will be searched in the first path defined
 	-- in mame inipath option.
-		local function read_config()
+	local function read_config()
 	  if config_read then return true end;
 	  local file = io.open( config_path, "r" );
 	  if file then
@@ -45,9 +46,11 @@ function hiscore.startplugin()
 		local _conf = {}
 		for line in io.lines(config_path) do
 		  token, value = string.match(line, '([^ ]+) ([^ ]+)');
-		  _conf[token] = lfs.env_replace(value);
+		  _conf[token] = value;
 		end
-		hiscore_path = _conf["hi_path"];
+		hiscore_path = lfs.env_replace(_conf["hi_path"] or hiscore_path);
+		timed_save = _conf["only_save_at_exit"] ~= "1"
+		print(timed_save)
 		-- hiscoredata_path = _conf["dat_path"]; -- don't know if I should do it, but wathever
 		return true
 	  end
@@ -233,7 +236,7 @@ function hiscore.startplugin()
 	  -- set up scores if they have been
 	  init();
 	  -- only allow save check to run when
-	  if mem_check_passed then
+	  if mem_check_passed and timed_save then
 		-- The reason for this complicated mess is that
 		-- MAME does expose a hook for "exit". Once it does,
 		-- this should obviously just be done when the emulator

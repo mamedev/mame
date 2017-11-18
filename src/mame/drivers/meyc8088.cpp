@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:hap, Roberto Fresca
+// thanks-to:Darrell Hal Smith, Kevin Mullins
 /****************************************************************
 
   Meyco 8088 based hardware
@@ -8,10 +9,6 @@
   3 x 8KB EPROM (max 4), 3 x 8KB RAM (max 4), 2KB battery RAM,
   2 x i8155, optional i8251A + RS232 for factory debug
 
-  driver by MAME team
-  also thanks to Darrell Hal Smith, Kevin Mullins
-
-
   To initialize battery RAM, go into Meter Read mode (F1 -> 9),
   and then press the Meter Read + Reset buttons (9 + 0).
 
@@ -19,9 +16,9 @@
   in mid-game, it may run faulty on the next boot.
   Enable the Night Switch to prevent this.
 
-
   TODO:
   - coincounters/hopper
+  - correct CPU speed (currently underclocked)
 
 ****************************************************************/
 
@@ -163,8 +160,9 @@ uint32_t meyc8088_state::screen_update_meyc8088(screen_device &screen, bitmap_in
 
 WRITE_LINE_MEMBER(meyc8088_state::screen_vblank_meyc8088)
 {
-	// INTR on LC255 (pulses at start and end of vblank), INTA hardwired to $20
-	generic_pulse_irq_line_and_vector(*m_maincpu, 0, 0x20, 1);
+	// LC255(200ns pulse) rising edge asserts INTR at start and end of vblank
+	// INTA wired back to INTR to clear it, vector is hardwired to $20
+	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x20);
 }
 
 

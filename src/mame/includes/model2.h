@@ -50,9 +50,12 @@ public:
 		m_scsp(*this, "scsp"),
 		m_cryptdevice(*this, "315_5881"),
 		m_0229crypt(*this, "317_0229"),
-		m_in0(*this, "IN0"),
+		m_in(*this, "IN%u", 0),
+		m_steer(*this, "STEER"),
+		m_accel(*this, "ACCEL"),
+		m_brake(*this, "BRAKE"),
 		m_gears(*this, "GEARS"),
-		m_analog_ports(*this, {"ANA0", "ANA1", "ANA2", "ANA3"}),
+		m_analog_ports(*this, "ANA%u", 0),
 		m_lightgun_ports(*this, {"P1_Y", "P1_X", "P2_Y", "P2_X"})
 	{ }
 
@@ -86,10 +89,19 @@ public:
 	optional_device<sega_315_5881_crypt_device> m_cryptdevice;
 	optional_device<sega_315_5838_comp_device> m_0229crypt;
 
-	required_ioport m_in0;
+	optional_ioport_array<5> m_in;
+	optional_ioport m_steer;
+	optional_ioport m_accel;
+	optional_ioport m_brake;
 	optional_ioport m_gears;
 	optional_ioport_array<4> m_analog_ports;
 	optional_ioport_array<4> m_lightgun_ports;
+
+	int m_port_1c00004;
+	int m_port_1c00006;
+	int m_port_1c00010;
+	int m_port_1c00012;
+	int m_port_1c00014;
 
 	uint32_t m_intreq;
 	uint32_t m_intena;
@@ -134,8 +146,7 @@ public:
 	uint8_t m_gearsel;
 	uint8_t m_lightgun_mux;
 
-	DECLARE_CUSTOM_INPUT_MEMBER(_1c00000_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(_1c0001c_r);
+	DECLARE_READ8_MEMBER(model2_crx_in_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(srallyc_gearbox_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(rchase2_devices_r);
 	DECLARE_READ32_MEMBER(timers_r);
@@ -146,6 +157,7 @@ public:
 	DECLARE_WRITE32_MEMBER(analog_2b_w);
 	DECLARE_READ32_MEMBER(fifoctl_r);
 	DECLARE_READ32_MEMBER(model2o_fifoctrl_r);
+	DECLARE_READ8_MEMBER(model2o_in_r);
 	DECLARE_READ32_MEMBER(videoctl_r);
 	DECLARE_WRITE32_MEMBER(videoctl_w);
 	DECLARE_WRITE32_MEMBER(rchase2_devices_w);
@@ -163,7 +175,7 @@ public:
 	DECLARE_WRITE32_MEMBER(geo_prg_w);
 	DECLARE_READ32_MEMBER(geo_r);
 	DECLARE_WRITE32_MEMBER(geo_w);
-	DECLARE_READ32_MEMBER(hotd_lightgun_r);
+	DECLARE_READ8_MEMBER(hotd_lightgun_r);
 	DECLARE_WRITE32_MEMBER(hotd_lightgun_w);
 	DECLARE_READ32_MEMBER(daytona_unk_r);
 	DECLARE_READ32_MEMBER(model2_irq_r);
@@ -209,6 +221,7 @@ public:
 	DECLARE_DRIVER_INIT(zerogun);
 	DECLARE_DRIVER_INIT(sgt24h);
 	DECLARE_MACHINE_START(model2);
+	DECLARE_MACHINE_START(srallyc);
 	DECLARE_MACHINE_RESET(model2o);
 	DECLARE_VIDEO_START(model2);
 	DECLARE_MACHINE_RESET(model2);

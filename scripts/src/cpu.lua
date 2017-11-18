@@ -832,7 +832,6 @@ if (CPUS["I8085"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/cpu/i8085/i8085.cpp",
 		MAME_DIR .. "src/devices/cpu/i8085/i8085.h",
-		MAME_DIR .. "src/devices/cpu/i8085/i8085cpu.h",
 	}
 end
 

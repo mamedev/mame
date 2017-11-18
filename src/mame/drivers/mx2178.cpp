@@ -23,9 +23,10 @@ TODO:
 ***************************************************************************************************/
 
 #include "emu.h"
-#include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
+//#include "cpu/8x300/8x300.h" // device = N8X300
 #include "machine/6850acia.h"
+#include "bus/rs232/rs232.h"
 #include "machine/clock.h"
 #include "video/mc6845.h"
 #include "screen.h"

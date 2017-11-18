@@ -34,6 +34,7 @@ protected:
 	required_region_ptr<uint32_t> m_firmware;
 
 	enum {
+		IPCSYNC_OFFSET = 0x180/4,
 		POSTFLG_OFFSET = 0x300/4,
 		POSTFLG_PBF_SHIFT = 0,
 		POSTFLG_RAM_SHIFT = 1,
@@ -43,6 +44,7 @@ protected:
 
 	uint32_t m_arm7_postflg;
 	uint32_t m_arm9_postflg;
+	uint16_t m_arm7_ipcsync, m_arm9_ipcsync;
 };
 
 #endif // INCLUDES_NDS_H

@@ -96,6 +96,30 @@ protected:
 		E132XS_L60, E132XS_L61, E132XS_L62, E132XS_L63
 	};
 
+	enum reg_bank
+	{
+		LOCAL = 0,
+		GLOBAL = 1
+	};
+
+	enum imm_size
+	{
+		SIMM = 0,
+		LIMM = 1
+	};
+
+	enum shift_type
+	{
+		N_LO = 0,
+		N_HI = 1
+	};
+
+	enum sign_mode
+	{
+		IS_UNSIGNED = 0,
+		IS_SIGNED = 1
+	};
+
 	// construction/destruction
 	hyperstone_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock,
 						const device_type type, uint32_t prg_data_width, uint32_t io_data_width, address_map_constructor internal_map);
@@ -132,13 +156,6 @@ protected:
 	direct_read_data *m_direct;
 	address_space *m_io;
 
-	/* Delay information */
-	struct delay_info
-	{
-		int32_t   delay_cmd;
-		uint32_t  delay_pc;
-	};
-
 	// CPU registers
 	uint32_t  m_global_regs[32];
 	uint32_t  m_local_regs[64];
@@ -152,6 +169,7 @@ protected:
 	uint8_t   m_clck_scale;
 	uint8_t   m_clock_cycles_1;
 	uint8_t   m_clock_cycles_2;
+	uint8_t   m_clock_cycles_3;
 	uint8_t   m_clock_cycles_4;
 	uint8_t   m_clock_cycles_6;
 
@@ -161,7 +179,8 @@ protected:
 	uint8_t   m_timer_int_pending;
 	emu_timer *m_timer;
 
-	delay_info m_delay;
+	uint32_t m_delay_pc;
+	bool m_delay_slot;
 
 	uint32_t m_opcodexor;
 
@@ -171,33 +190,9 @@ protected:
 	// other internal state
 	int     m_icount;
 
-	typedef void (hyperstone_device::*ophandler)();
-
-	ophandler m_opcode[256];
-
-	static const ophandler s_opcodetable[256];
+	uint8_t m_fl_lut[16];
 
 private:
-	struct regs_decode
-	{
-		uint8_t   src, dst;       // destination and source register code
-		uint32_t  src_value;      // current source register value
-		uint32_t  next_src_value; // current next source register value
-		uint32_t  dst_value;      // current destination register value
-		uint32_t  next_dst_value; // current next destination register value
-		uint8_t   sub_type;       // sub type opcode (for DD and X_CODE bits)
-		union
-		{
-			uint32_t u;
-			int32_t  s;
-		} extra;                // extra value such as immediate value, const, pcrel, ...
-		uint8_t   src_is_local;
-		uint8_t   dst_is_local;
-		uint8_t   same_src_dst;
-		uint8_t   same_src_dstf;
-		uint8_t   same_srcf_dst;
-	};
-
 	// internal functions
 	void check_interrupts();
 
@@ -215,130 +210,120 @@ private:
 
 	TIMER_CALLBACK_MEMBER(timer_callback);
 
-	void execute_br(regs_decode &decode);
-	void execute_dbr(regs_decode &decode);
+	void execute_br();
 	void execute_trap(uint32_t addr);
 	void execute_int(uint32_t addr);
 	void execute_exception(uint32_t addr);
-	void execute_software(regs_decode &decode);
+	void execute_software();
 
-	void hyperstone_chk(regs_decode &decode);
-	void hyperstone_movd(regs_decode &decode);
-	void hyperstone_divu(regs_decode &decode);
-	void hyperstone_divs(regs_decode &decode);
-	void hyperstone_xm(regs_decode &decode);
-	void hyperstone_mask(regs_decode &decode);
-	void hyperstone_sum(regs_decode &decode);
-	void hyperstone_sums(regs_decode &decode);
-	void hyperstone_cmp(regs_decode &decode);
-	void hyperstone_mov(regs_decode &decode);
-	void hyperstone_add(regs_decode &decode);
-	void hyperstone_adds(regs_decode &decode);
-	void hyperstone_cmpb(regs_decode &decode);
-	void hyperstone_andn(regs_decode &decode);
-	void hyperstone_or(regs_decode &decode);
-	void hyperstone_xor(regs_decode &decode);
-	void hyperstone_subc(regs_decode &decode);
-	void hyperstone_not(regs_decode &decode);
-	void hyperstone_sub(regs_decode &decode);
-	void hyperstone_subs(regs_decode &decode);
-	void hyperstone_addc(regs_decode &decode);
-	void hyperstone_and(regs_decode &decode);
-	void hyperstone_neg(regs_decode &decode);
-	void hyperstone_negs(regs_decode &decode);
-	void hyperstone_cmpi(regs_decode &decode);
-	void hyperstone_movi(regs_decode &decode);
-	void hyperstone_addi(regs_decode &decode);
-	void hyperstone_addsi(regs_decode &decode);
-	void hyperstone_cmpbi(regs_decode &decode);
-	void hyperstone_andni(regs_decode &decode);
-	void hyperstone_ori(regs_decode &decode);
-	void hyperstone_xori(regs_decode &decode);
-	void hyperstone_shrdi(regs_decode &decode);
-	void hyperstone_shrd(regs_decode &decode);
-	void hyperstone_shr(regs_decode &decode);
-	void hyperstone_shri(regs_decode &decode);
-	void hyperstone_sardi(regs_decode &decode);
-	void hyperstone_sard(regs_decode &decode);
-	void hyperstone_sar(regs_decode &decode);
-	void hyperstone_sari(regs_decode &decode);
-	void hyperstone_shldi(regs_decode &decode);
-	void hyperstone_shld(regs_decode &decode);
-	void hyperstone_shl(regs_decode &decode);
-	void hyperstone_shli(regs_decode &decode);
-	void hyperstone_testlz(regs_decode &decode);
-	void hyperstone_rol(regs_decode &decode);
-	void hyperstone_ldxx1(regs_decode &decode);
-	void hyperstone_ldxx2(regs_decode &decode);
-	void hyperstone_stxx1(regs_decode &decode);
-	void hyperstone_stxx2(regs_decode &decode);
-	void hyperstone_mulu(regs_decode &decode);
-	void hyperstone_muls(regs_decode &decode);
-	void hyperstone_mul(regs_decode &decode);
-	void hyperstone_set(regs_decode &decode);
+	void ignore_immediate_s();
+	uint32_t decode_immediate_s();
+	uint32_t decode_const();
 
-	void hyperstone_fadd(regs_decode &decode);
-	void hyperstone_faddd(regs_decode &decode);
-	void hyperstone_fsub(regs_decode &decode);
-	void hyperstone_fsubd(regs_decode &decode);
-	void hyperstone_fmul(regs_decode &decode);
-	void hyperstone_fmuld(regs_decode &decode);
-	void hyperstone_fdiv(regs_decode &decode);
-	void hyperstone_fdivd(regs_decode &decode);
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void hyperstone_chk();
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void hyperstone_movd();
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL, sign_mode SIGNED> void hyperstone_divsu();
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void hyperstone_xm();
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void hyperstone_mask();
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void hyperstone_sum();
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void hyperstone_sums();
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void hyperstone_cmp();
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void hyperstone_mov();
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void hyperstone_add();
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void hyperstone_adds();
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void hyperstone_cmpb();
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void hyperstone_subc();
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void hyperstone_sub();
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void hyperstone_subs();
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void hyperstone_addc();
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void hyperstone_neg();
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void hyperstone_negs();
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void hyperstone_and();
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void hyperstone_andn();
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void hyperstone_or();
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void hyperstone_xor();
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void hyperstone_not();
+	template <reg_bank DST_GLOBAL, imm_size IMM_LONG> void hyperstone_cmpi();
+	template <reg_bank DST_GLOBAL, imm_size IMM_LONG> void hyperstone_movi();
+	template <reg_bank DST_GLOBAL, imm_size IMM_LONG> void hyperstone_addi();
+	template <reg_bank DST_GLOBAL, imm_size IMM_LONG> void hyperstone_addsi();
+	template <reg_bank DST_GLOBAL, imm_size IMM_LONG> void hyperstone_cmpbi();
+	template <reg_bank DST_GLOBAL, imm_size IMM_LONG> void hyperstone_andni();
+	template <reg_bank DST_GLOBAL, imm_size IMM_LONG> void hyperstone_ori();
+	template <reg_bank DST_GLOBAL, imm_size IMM_LONG> void hyperstone_xori();
+	template <shift_type HI_N> void hyperstone_shrdi();
+	void hyperstone_shrd();
+	void hyperstone_shr();
+	template <shift_type HI_N, reg_bank DST_GLOBAL> void hyperstone_shri();
+	template <shift_type HI_N> void hyperstone_sardi();
+	void hyperstone_sard();
+	void hyperstone_sar();
+	template <shift_type HI_N, reg_bank DST_GLOBAL> void hyperstone_sari();
+	template <shift_type HI_N> void hyperstone_shldi();
+	void hyperstone_shld();
+	void hyperstone_shl();
+	template <shift_type HI_N, reg_bank DST_GLOBAL> void hyperstone_shli();
+	void hyperstone_testlz();
+	void hyperstone_rol();
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void hyperstone_ldxx1();
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void hyperstone_ldxx2();
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void hyperstone_stxx1();
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void hyperstone_stxx2();
 
-	void hyperstone_fcmp(regs_decode &decode);
-	void hyperstone_fcmpd(regs_decode &decode);
-	void hyperstone_fcmpu(regs_decode &decode);
-	void hyperstone_fcmpud(regs_decode &decode);
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL, sign_mode SIGNED> void hyperstone_mulsu();
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void hyperstone_mul();
 
-	void hyperstone_fcvt(regs_decode &decode);
-	void hyperstone_fcvtd(regs_decode &decode);
+	template <shift_type HI_N, reg_bank DST_GLOBAL> void hyperstone_set();
 
-	void hyperstone_extend(regs_decode &decode);
+	template <reg_bank SRC_GLOBAL> void hyperstone_ldwr();
+	template <reg_bank SRC_GLOBAL> void hyperstone_lddr();
+	template <reg_bank SRC_GLOBAL> void hypesrtone_ldwp();
+	template <reg_bank SRC_GLOBAL> void hyperstone_lddp();
 
-	void hyperstone_ldwr(regs_decode &decode);
-	void hyperstone_lddr(regs_decode &decode);
-	void hyperstone_ldwp(regs_decode &decode);
-	void hyperstone_lddp(regs_decode &decode);
+	template <reg_bank SRC_GLOBAL> void hyperstone_stwr();
+	template <reg_bank SRC_GLOBAL> void hyperstone_stdr();
+	template <reg_bank SRC_GLOBAL> void hyperstone_stwp();
+	template <reg_bank SRC_GLOBAL> void hyperstone_stdp();
 
-	void hyperstone_stwr(regs_decode &decode);
-	void hyperstone_stdr(regs_decode &decode);
-	void hyperstone_stwp(regs_decode &decode);
-	void hyperstone_stdp(regs_decode &decode);
+	void hyperstone_dbv();
+	void hyperstone_dbnv();
+	void hyperstone_dbe();
+	void hyperstone_dbne();
+	void hyperstone_dbc();
+	void hyperstone_dbnc();
+	void hyperstone_dbse();
+	void hyperstone_dbht();
+	void hyperstone_dbn();
+	void hyperstone_dbnn();
+	void hyperstone_dble();
+	void hyperstone_dbgt();
+	void hyperstone_dbr();
 
-	void hyperstone_dbv(regs_decode &decode);
-	void hyperstone_dbnv(regs_decode &decode);
-	void hyperstone_dbe(regs_decode &decode);
-	void hyperstone_dbne(regs_decode &decode);
-	void hyperstone_dbc(regs_decode &decode);
-	void hyperstone_dbnc(regs_decode &decode);
-	void hyperstone_dbse(regs_decode &decode);
-	void hyperstone_dbht(regs_decode &decode);
-	void hyperstone_dbn(regs_decode &decode);
-	void hyperstone_dbnn(regs_decode &decode);
-	void hyperstone_dble(regs_decode &decode);
-	void hyperstone_dbgt(regs_decode &decode);
-	void hyperstone_dbr(regs_decode &decode);
+	void hyperstone_frame();
+	void hyperstone_call_global();
+	void hyperstone_call_local();
 
-	void hyperstone_frame(regs_decode &decode);
-	void hyperstone_call(regs_decode &decode);
+	void hyperstone_bv();
+	void hyperstone_bnv();
+	void hyperstone_be();
+	void hyperstone_bne();
+	void hyperstone_bc();
+	void hyperstone_bnc();
+	void hyperstone_bse();
+	void hyperstone_bht();
+	void hyperstone_bn();
+	void hyperstone_bnn();
+	void hyperstone_ble();
+	void hyperstone_bgt();
 
-	void hyperstone_bv(regs_decode &decode);
-	void hyperstone_bnv(regs_decode &decode);
-	void hyperstone_be(regs_decode &decode);
-	void hyperstone_bne(regs_decode &decode);
-	void hyperstone_bc(regs_decode &decode);
-	void hyperstone_bnc(regs_decode &decode);
-	void hyperstone_bse(regs_decode &decode);
-	void hyperstone_bht(regs_decode &decode);
-	void hyperstone_bn(regs_decode &decode);
-	void hyperstone_bnn(regs_decode &decode);
-	void hyperstone_ble(regs_decode &decode);
-	void hyperstone_bgt(regs_decode &decode);
-	void hyperstone_br(regs_decode &decode);
+	void hyperstone_trap();
+	void hyperstone_extend();
 
-	void hyperstone_trap(regs_decode &decode);
-	void hyperstone_do(regs_decode &decode);
+	void hyperstone_reserved();
+	void hyperstone_do();
+
+	int32_t decode_pcrel();
+	void ignore_pcrel();
 
 #if 0
 	void execute_run_drc();
@@ -355,39 +340,6 @@ private:
 	void generate_sequence_instruction(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
 	bool generate_opcode(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
 #endif
-
-	void op00();    void op01();    void op02();    void op03();    void op04();    void op05();    void op06();    void op07();
-	void op08();    void op09();    void op0a();    void op0b();    void op0c();    void op0d();    void op0e();    void op0f();
-	void op10();    void op11();    void op12();    void op13();    void op14();    void op15();    void op16();    void op17();
-	void op18();    void op19();    void op1a();    void op1b();    void op1c();    void op1d();    void op1e();    void op1f();
-	void op20();    void op21();    void op22();    void op23();    void op24();    void op25();    void op26();    void op27();
-	void op28();    void op29();    void op2a();    void op2b();    void op2c();    void op2d();    void op2e();    void op2f();
-	void op30();    void op31();    void op32();    void op33();    void op34();    void op35();    void op36();    void op37();
-	void op38();    void op39();    void op3a();    void op3b();    void op3c();    void op3d();    void op3e();    void op3f();
-	void op40();    void op41();    void op42();    void op43();    void op44();    void op45();    void op46();    void op47();
-	void op48();    void op49();    void op4a();    void op4b();    void op4c();    void op4d();    void op4e();    void op4f();
-	void op50();    void op51();    void op52();    void op53();    void op54();    void op55();    void op56();    void op57();
-	void op58();    void op59();    void op5a();    void op5b();    void op5c();    void op5d();    void op5e();    void op5f();
-	void op60();    void op61();    void op62();    void op63();    void op64();    void op65();    void op66();    void op67();
-	void op68();    void op69();    void op6a();    void op6b();    void op6c();    void op6d();    void op6e();    void op6f();
-	void op70();    void op71();    void op72();    void op73();    void op74();    void op75();    void op76();    void op77();
-	void op78();    void op79();    void op7a();    void op7b();    void op7c();    void op7d();    void op7e();    void op7f();
-	void op80();    void op81();    void op82();    void op83();    void op84();    void op85();    void op86();    void op87();
-	void op88();    void op89();    void op8a();    void op8b();    void op8c();    void op8d();    void op8e();    void op8f();
-	void op90();    void op91();    void op92();    void op93();    void op94();    void op95();    void op96();    void op97();
-	void op98();    void op99();    void op9a();    void op9b();    void op9c();    void op9d();    void op9e();    void op9f();
-	void opa0();    void opa1();    void opa2();    void opa3();    void opa4();    void opa5();    void opa6();    void opa7();
-	void opa8();    void opa9();    void opaa();    void opab();    void opac();    void opad();    void opae();    void opaf();
-	void opb0();    void opb1();    void opb2();    void opb3();    void opb4();    void opb5();    void opb6();    void opb7();
-	void opb8();    void opb9();    void opba();    void opbb();    void opbc();    void opbd();    void opbe();    void opbf();
-	void opc0();    void opc1();    void opc2();    void opc3();    void opc4();    void opc5();    void opc6();    void opc7();
-	void opc8();    void opc9();    void opca();    void opcb();    void opcc();    void opcd();    void opce();    void opcf();
-	void opd0();    void opd1();    void opd2();    void opd3();    void opd4();    void opd5();    void opd6();    void opd7();
-	void opd8();    void opd9();    void opda();    void opdb();    void opdc();    void opdd();    void opde();    void opdf();
-	void ope0();    void ope1();    void ope2();    void ope3();    void ope4();    void ope5();    void ope6();    void ope7();
-	void ope8();    void ope9();    void opea();    void opeb();    void opec();    void oped();    void opee();    void opef();
-	void opf0();    void opf1();    void opf2();    void opf3();    void opf4();    void opf5();    void opf6();    void opf7();
-	void opf8();    void opf9();    void opfa();    void opfb();    void opfc();    void opfd();    void opfe();    void opff();
 
 #if 0
 	void generate_op00(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_op01(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);

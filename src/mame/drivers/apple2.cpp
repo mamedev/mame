@@ -147,8 +147,19 @@ public:
 
 	DECLARE_READ8_MEMBER(ram_r);
 	DECLARE_WRITE8_MEMBER(ram_w);
-	DECLARE_READ8_MEMBER(c000_r);
-	DECLARE_WRITE8_MEMBER(c000_w);
+	DECLARE_READ8_MEMBER(keyb_data_r);
+	DECLARE_READ8_MEMBER(keyb_strobe_r);
+	DECLARE_WRITE8_MEMBER(keyb_strobe_w);
+	DECLARE_READ8_MEMBER(cassette_toggle_r);
+	DECLARE_WRITE8_MEMBER(cassette_toggle_w);
+	DECLARE_READ8_MEMBER(speaker_toggle_r);
+	DECLARE_WRITE8_MEMBER(speaker_toggle_w);
+	DECLARE_READ8_MEMBER(utility_strobe_r);
+	DECLARE_WRITE8_MEMBER(utility_strobe_w);
+	DECLARE_READ8_MEMBER(switches_r);
+	DECLARE_READ8_MEMBER(flags_r);
+	DECLARE_READ8_MEMBER(controller_strobe_r);
+	DECLARE_WRITE8_MEMBER(controller_strobe_w);
 	DECLARE_WRITE_LINE_MEMBER(txt_w);
 	DECLARE_WRITE_LINE_MEMBER(mix_w);
 	DECLARE_WRITE_LINE_MEMBER(scr_w);
@@ -201,7 +212,6 @@ private:
 
 	device_a2bus_card_interface *m_slotdevice[8];
 
-	void do_io(address_space &space, int offset);
 	uint8_t read_floatingbus();
 };
 
@@ -483,43 +493,6 @@ uint32_t napple2_state::screen_update_jp(screen_device &screen, bitmap_ind16 &bi
 /***************************************************************************
     I/O
 ***************************************************************************/
-// most softswitches don't care about read vs write, so handle them here
-void napple2_state::do_io(address_space &space, int offset)
-{
-	if(machine().side_effect_disabled())
-	{
-		return;
-	}
-
-	switch (offset)
-	{
-		case 0x20:
-			m_cassette_state ^= 1;
-			m_cassette->output(m_cassette_state ? 1.0f : -1.0f);
-			break;
-
-		case 0x30:
-			m_speaker_state ^= 1;
-			m_speaker->level_w(m_speaker_state);
-			break;
-
-		case 0x50: case 0x51: case 0x52: case 0x53: case 0x54: case 0x55: case 0x56: case 0x57:
-		case 0x58: case 0x59: case 0x5a: case 0x5b: case 0x5c: case 0x5d: case 0x5e: case 0x5f:
-			m_softlatch->write_bit((offset & 0x0e) >> 1, offset & 0x01);
-			break;
-
-		case 0x68:  // IIgs STATE register, which ProDOS touches
-			break;
-
-		case 0x70: case 0x71: case 0x72: case 0x73: case 0x74: case 0x75: case 0x76: case 0x77:
-		case 0x78: case 0x79: case 0x7a: case 0x7b: case 0x7c: case 0x7d: case 0x7e: case 0x7f:
-			m_joystick_x1_time = machine().time().as_double() + m_x_calibration * m_joy1x->read();
-			m_joystick_y1_time = machine().time().as_double() + m_y_calibration * m_joy1y->read();
-			m_joystick_x2_time = machine().time().as_double() + m_x_calibration * m_joy2x->read();
-			m_joystick_y2_time = machine().time().as_double() + m_y_calibration * m_joy2y->read();
-			break;
-	}
-}
 
 WRITE_LINE_MEMBER(napple2_state::txt_w)
 {
@@ -574,77 +547,124 @@ WRITE_LINE_MEMBER(napple2_state::an3_w)
 	m_an3 = state;
 }
 
-READ8_MEMBER(napple2_state::c000_r)
+READ8_MEMBER(napple2_state::keyb_data_r)
 {
-	switch (offset)
-	{
-		case 0x00:  // keyboard latch
-			return m_transchar | m_strobe;
+	// keyboard latch
+	return m_transchar | m_strobe;
+}
 
-		case 0x10:  // reads any key down, clears strobe
-			{
-				uint8_t rv = m_transchar | (m_anykeydown ? 0x80 : 0x00);
-				m_strobe = 0;
-				return rv;
-			}
+READ8_MEMBER(napple2_state::keyb_strobe_r)
+{
+	// reads any key down, clears strobe
+	uint8_t rv = m_transchar | (m_anykeydown ? 0x80 : 0x00);
+	if (!machine().side_effect_disabled())
+		m_strobe = 0;
+	return rv;
+}
 
-		case 0x60: // cassette in
-		case 0x68:
-			return m_cassette->input() > 0.0 ? 0x80 : 0;
+WRITE8_MEMBER(napple2_state::keyb_strobe_w)
+{
+	// clear keyboard latch
+	m_strobe = 0;
+}
 
-		case 0x61:  // button 0
-		case 0x69:
-			return (m_joybuttons->read() & 0x10) ? 0x80 : 0;
-
-		case 0x62:  // button 1
-		case 0x6a:
-			return (m_joybuttons->read() & 0x20) ? 0x80 : 0;
-
-		case 0x63:  // button 2
-		case 0x6b:
-			// check if SHIFT key mod configured
-			if (m_sysconfig->read() & 0x04)
-			{
-				return ((m_joybuttons->read() & 0x40) || (m_kbspecial->read() & 0x06)) ? 0x80 : 0;
-			}
-			return (m_joybuttons->read() & 0x40) ? 0x80 : 0;
-
-		case 0x64:  // joy 1 X axis
-		case 0x6c:
-			return (space.machine().time().as_double() < m_joystick_x1_time) ? 0x80 : 0;
-
-		case 0x65:  // joy 1 Y axis
-		case 0x6d:
-			return (space.machine().time().as_double() < m_joystick_y1_time) ? 0x80 : 0;
-
-		case 0x66: // joy 2 X axis
-		case 0x6e:
-			return (space.machine().time().as_double() < m_joystick_x2_time) ? 0x80 : 0;
-
-		case 0x67: // joy 2 Y axis
-		case 0x6f:
-			return (space.machine().time().as_double() < m_joystick_y2_time) ? 0x80 : 0;
-
-		default:
-			do_io(space, offset);
-			break;
-	}
-
+READ8_MEMBER(napple2_state::cassette_toggle_r)
+{
+	if (!machine().side_effect_disabled())
+		cassette_toggle_w(space, offset, 0);
 	return read_floatingbus();
 }
 
-WRITE8_MEMBER(napple2_state::c000_w)
+WRITE8_MEMBER(napple2_state::cassette_toggle_w)
 {
+	m_cassette_state ^= 1;
+	m_cassette->output(m_cassette_state ? 1.0f : -1.0f);
+}
+
+READ8_MEMBER(napple2_state::speaker_toggle_r)
+{
+	if (!machine().side_effect_disabled())
+		speaker_toggle_w(space, offset, 0);
+	return read_floatingbus();
+}
+
+WRITE8_MEMBER(napple2_state::speaker_toggle_w)
+{
+	m_speaker_state ^= 1;
+	m_speaker->level_w(m_speaker_state);
+}
+
+READ8_MEMBER(napple2_state::utility_strobe_r)
+{
+	if (!machine().side_effect_disabled())
+		utility_strobe_w(space, offset, 0);
+	return read_floatingbus();
+}
+
+WRITE8_MEMBER(napple2_state::utility_strobe_w)
+{
+	// pulses pin 5 of game I/O connector
+}
+
+READ8_MEMBER(napple2_state::switches_r)
+{
+	if (!machine().side_effect_disabled())
+		m_softlatch->write_bit((offset & 0x0e) >> 1, offset & 0x01);
+	return read_floatingbus();
+}
+
+READ8_MEMBER(napple2_state::flags_r)
+{
+	// Y output of 74LS251 at H14 read as D7
 	switch (offset)
 	{
-		case 0x10:  // clear keyboard latch
-			m_strobe = 0;
-			break;
+	case 0: // cassette in
+		return m_cassette->input() > 0.0 ? 0x80 : 0;
 
-		default:
-			do_io(space, offset);
-			break;
+	case 1:  // button 0
+		return (m_joybuttons->read() & 0x10) ? 0x80 : 0;
+
+	case 2:  // button 1
+		return (m_joybuttons->read() & 0x20) ? 0x80 : 0;
+
+	case 3:  // button 2
+		// check if SHIFT key mod configured
+		if (m_sysconfig->read() & 0x04)
+		{
+			return ((m_joybuttons->read() & 0x40) || (m_kbspecial->read() & 0x06)) ? 0x80 : 0;
+		}
+		return (m_joybuttons->read() & 0x40) ? 0x80 : 0;
+
+	case 4:  // joy 1 X axis
+		return (space.machine().time().as_double() < m_joystick_x1_time) ? 0x80 : 0;
+
+	case 5:  // joy 1 Y axis
+		return (space.machine().time().as_double() < m_joystick_y1_time) ? 0x80 : 0;
+
+	case 6: // joy 2 X axis
+		return (space.machine().time().as_double() < m_joystick_x2_time) ? 0x80 : 0;
+
+	case 7: // joy 2 Y axis
+		return (space.machine().time().as_double() < m_joystick_y2_time) ? 0x80 : 0;
 	}
+
+	// this is never reached
+	return 0;
+}
+
+READ8_MEMBER(napple2_state::controller_strobe_r)
+{
+	if (!machine().side_effect_disabled())
+		controller_strobe_w(space, offset, 0);
+	return read_floatingbus();
+}
+
+WRITE8_MEMBER(napple2_state::controller_strobe_w)
+{
+	m_joystick_x1_time = machine().time().as_double() + m_x_calibration * m_joy1x->read();
+	m_joystick_y1_time = machine().time().as_double() + m_y_calibration * m_joy1y->read();
+	m_joystick_x2_time = machine().time().as_double() + m_x_calibration * m_joy2x->read();
+	m_joystick_y2_time = machine().time().as_double() + m_y_calibration * m_joy2y->read();
 }
 
 READ8_MEMBER(napple2_state::c080_r)
@@ -925,7 +945,14 @@ WRITE8_MEMBER(napple2_state::ram_w)
 
 static ADDRESS_MAP_START( apple2_map, AS_PROGRAM, 8, napple2_state )
 	AM_RANGE(0x0000, 0xbfff) AM_READWRITE(ram_r, ram_w)
-	AM_RANGE(0xc000, 0xc07f) AM_READWRITE(c000_r, c000_w)
+	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0xf) AM_READ(keyb_data_r) AM_WRITENOP
+	AM_RANGE(0xc010, 0xc010) AM_MIRROR(0xf) AM_READWRITE(keyb_strobe_r, keyb_strobe_w)
+	AM_RANGE(0xc020, 0xc020) AM_MIRROR(0xf) AM_READWRITE(cassette_toggle_r, cassette_toggle_w)
+	AM_RANGE(0xc030, 0xc030) AM_MIRROR(0xf) AM_READWRITE(speaker_toggle_r, speaker_toggle_w)
+	AM_RANGE(0xc040, 0xc040) AM_MIRROR(0xf) AM_READWRITE(utility_strobe_r, utility_strobe_w)
+	AM_RANGE(0xc050, 0xc05f) AM_READ(switches_r) AM_DEVWRITE("softlatch", addressable_latch_device, write_a0)
+	AM_RANGE(0xc060, 0xc067) AM_MIRROR(0x8) AM_READ(flags_r) AM_WRITENOP // includes IIgs STATE register, which ProDOS touches
+	AM_RANGE(0xc070, 0xc070) AM_MIRROR(0xf) AM_READWRITE(controller_strobe_r, controller_strobe_w)
 	AM_RANGE(0xc080, 0xc0ff) AM_READWRITE(c080_r, c080_w)
 	AM_RANGE(0xc100, 0xc7ff) AM_READWRITE(c100_r, c100_w)
 	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(c800_r, c800_w)

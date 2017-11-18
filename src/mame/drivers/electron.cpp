@@ -57,12 +57,7 @@ Incomplete:
     - Graphics (seems to be wrong for several games)
     - 1 MHz bus is not emulated
     - Bus claiming by ULA is not implemented
-    - Currently the cartridge support always loads the upper rom in page 12
-      and the lower rom in page 0. This might need further documentation in
-      the software list and loading code.
 
-Missing:
-    - Other peripherals
 ******************************************************************************/
 
 #include "emu.h"
@@ -229,9 +224,6 @@ static MACHINE_CONFIG_START( electron )
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY)
 	MCFG_CASSETTE_INTERFACE("electron_cass")
 
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "electron_cart")
-	MCFG_GENERIC_LOAD(electron_state, electron_cart)
-
 	/* expansion port */
 	MCFG_ELECTRON_EXPANSION_SLOT_ADD("exp", electron_expansion_devices, "plus3", false)
 	MCFG_ELECTRON_EXPANSION_SLOT_IRQ_HANDLER(INPUTLINE("maincpu", M6502_IRQ_LINE))
@@ -240,6 +232,7 @@ static MACHINE_CONFIG_START( electron )
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "electron_cass")
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "electron_cart")
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "electron_flop")
 MACHINE_CONFIG_END
 
 
@@ -259,7 +252,7 @@ MACHINE_CONFIG_END
 /* Electron Rom Load */
 ROM_START(electron)
 	ROM_REGION( 0x44000, "user1", 0 ) /* OS Rom */
-	ROM_LOAD( "os.rom", 0x40000, 0x4000, CRC(bf63fb1f) SHA1(a48b8fa0cfb09140e808ac8a187316c605a0b32e) ) /* OS rom */
+	ROM_LOAD( "b02_acornos-1.rom", 0x40000, 0x4000, CRC(a0c2cf43) SHA1(a27ce645472cc5497690e4bfab43710efbb0792d) ) /* OS rom */
 	/* 00000  0 Second external socket on the expansion module (SK2) */
 	/* 04000  1 Second external socket on the expansion module (SK2) */
 	/* 08000  2 First external socket on the expansion module (SK1)  */

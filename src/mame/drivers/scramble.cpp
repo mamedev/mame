@@ -962,7 +962,7 @@ static INPUT_PORTS_START( cavelon )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* protection check? */
 INPUT_PORTS_END
 
-/* Same as 'mimonkey' (scobra.c driver) */
+/* Same as 'mimonkey' (scobra.cpp driver) */
 static INPUT_PORTS_START( mimonscr )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
@@ -1394,24 +1394,6 @@ static MACHINE_CONFIG_DERIVED( newsin7, scramble )
 	MCFG_VIDEO_START_OVERRIDE(scramble_state,newsin7)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mrkougar, scramble )
-
-	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(mrkougar_map)
-
-	MCFG_DEVICE_REMOVE("ppi8255_1")
-	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(DEVWRITE8("soundlatch", generic_latch_8_device, write))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(scramble_state, mrkougar_sh_irqtrigger_w))
-
-	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", mrkougar)
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(32+64+2+0)  /* 32 for characters, 64 for stars, 2 for bullets, 0/1 for background */
-	MCFG_PALETTE_INIT_OWNER(scramble_state,galaxold)
-MACHINE_CONFIG_END
-
 static MACHINE_CONFIG_DERIVED( mrkougb, scramble )
 
 	/* basic machine hardware */
@@ -1427,6 +1409,12 @@ static MACHINE_CONFIG_DERIVED( mrkougb, scramble )
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(32+64+2+0)  /* 32 for characters, 64 for stars, 2 for bullets, 0/1 for background */
 	MCFG_PALETTE_INIT_OWNER(scramble_state,galaxold)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( mrkougar, mrkougb )
+
+	/* video hardware */
+	MCFG_GFXDECODE_MODIFY("gfxdecode", mrkougar)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ckongs, scramble )
@@ -1969,6 +1957,25 @@ ROM_START( mrkougb2 )
 	ROM_LOAD( "atw-prom.bin", 0x0000, 0x0020, CRC(c65db188) SHA1(90f0a5f22bb761693ab5895da08b20821e79ba65) )
 ROM_END
 
+ROM_START( troopy )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ic2cb.bin",   0x0000, 0x1000, CRC(a1798961) SHA1(45a1f6183016229fced3b459c95c99d83408151a) )
+	ROM_LOAD( "ic2eb.bin",   0x1000, 0x1000, CRC(7f3572f9) SHA1(2f89f743a32378ed4ac4184627ed9be007c3334a) )
+	ROM_LOAD( "ic2fb.bin",   0x2000, 0x1000, CRC(42e666fd) SHA1(caa6a2b07098ef1d6203309ddd3a591194b4ac70) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "ic5c.bin", 0x0000, 0x1000, CRC(af42a371) SHA1(edacbb29df34fdf400a5c726d851af1479a34c70) )
+	ROM_LOAD( "ic5d.bin", 0x1000, 0x1000, CRC(862b8902) SHA1(91dcbc634f7c7ed78dfbd0be5cf1e0631429cfbf) )
+	ROM_LOAD( "ic5e.bin", 0x2000, 0x1000, CRC(a0396cc8) SHA1(c8266b58b144a4bc564f3a2503d5b953c0ba6ca7) )
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "ic5h_neu.bin",      0x0000, 0x0800, CRC(0f4a2394) SHA1(a6c309ca6afa59fbe6549d6fd282902f018a1a48) )
+	ROM_LOAD( "ic5f_neu.bin",      0x0800, 0x0800, CRC(cbbfefc2) SHA1(2378949275b8d3fc69551b00d9b2c654b91fd780) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "82s123", 0x0000, 0x0020, CRC(4e3caeab) SHA1(a25083c3e36d28afdefe4af6e6d4f3155e303625) )
+ROM_END
+
 ROM_START( hotshock )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "0d.l10", 0x0000, 0x1000, CRC(3e8aeaeb) SHA1(0572623928d36d106c9d8028d92fbd02375291a5) )
@@ -2204,7 +2211,7 @@ ROM_START( ad2083 )
 ROM_END
 
 
-ROM_START( harem ) /* Main PCB version simular to Scorpion (also developed by I.G.R), sound PCB is identical to Scorpion */
+ROM_START( harem ) /* Main PCB version similar to Scorpion (also developed by I.G.R), sound PCB is identical to Scorpion */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "harem_prom0.ic85", 0x0000, 0x2000, CRC(4521b753) SHA1(9033f9c3be8fec1e5ff251e9f60faaf3848a1a1e) )
 	ROM_LOAD( "harem_prom1.ic87", 0x8000, 0x2000, CRC(3cc5d1e8) SHA1(827e2d20de2a00ec016ead249ed3afdccd0c856c) ) // encrypted
@@ -2213,7 +2220,7 @@ ROM_START( harem ) /* Main PCB version simular to Scorpion (also developed by I.
 	ROM_LOAD( "harem_sound1.ic12", 0x0000, 0x2000, CRC(b54799dd) SHA1(b6aeb010257cba48a52afd33b4f8031c7d99550c) )
 	ROM_LOAD( "harem_sound2.ic13", 0x2000, 0x1000, CRC(2d5573a4) SHA1(1fdcd99d89e078509634742b2116a35bb199fe4b) )
 
-	ROM_REGION( 0x2000, "digitalker", 0 ) // DigiTalker ROM (same exact sound PCB as Scorpion (galaxian.c))
+	ROM_REGION( 0x2000, "digitalker", 0 ) // DigiTalker ROM (same exact sound PCB as Scorpion (galaxian.cpp))
 	ROM_LOAD( "harem_h1+h2.ic25",  0x0000, 0x2000, CRC(279f923a) SHA1(166b1b625997766f0de7cc18af52c42268022fcb) )
 
 	ROM_REGION( 0x4000, "gfx1", 0 )
@@ -2245,8 +2252,9 @@ GAME( 1982, newsin7a, newsin7,  newsin7,  newsin7,  scramble_state, newsin7a,   
 
 GAME( 1984, mrkougar, 0,        mrkougar, mrkougar, scramble_state, mrkougar,     ROT90, "ATW",                 "Mr. Kougar",                     MACHINE_SUPPORTS_SAVE )
 GAME( 1983, mrkougar2,mrkougar, mrkougar, mrkougar, scramble_state, mrkougar,     ROT90, "ATW",                 "Mr. Kougar (earlier)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1983, mrkougb,  mrkougar, mrkougb,  mrkougar, scramble_state, mrkougb,      ROT90, "bootleg",             "Mr. Kougar (bootleg set 1)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1983, mrkougb2, mrkougar, mrkougb,  mrkougar, scramble_state, mrkougb,      ROT90, "bootleg",             "Mr. Kougar (bootleg set 2)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1984, mrkougb,  mrkougar, mrkougb,  mrkougar, scramble_state, 0,            ROT90, "bootleg (Gross)",     "Mr. Kougar (German bootleg)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1983, mrkougb2, mrkougar, mrkougb,  mrkougar, scramble_state, 0,            ROT90, "bootleg",             "Mr. Kougar (bootleg)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1984, troopy,   mrkougar, mrkougb,  mrkougar, scramble_state, mrkougar,     ROT90, "bootleg",             "Troopy (bootleg of Mr. Kougar)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // wrong loading / decoding or bad GFX ROMs?
 
 GAME( 1982, hotshock, 0,        hotshock, hotshock, scramble_state, hotshock,     ROT90, "E.G. Felaco (Domino license)", "Hot Shocker",           MACHINE_SUPPORTS_SAVE )
 GAME( 1982, hotshockb,hotshock, hotshock, hotshock, scramble_state, hotshock,     ROT90, "E.G. Felaco",         "Hot Shocker (early revision?)",  MACHINE_SUPPORTS_SAVE ) // has "Dudley presents" (protagonist of the game), instead of Domino

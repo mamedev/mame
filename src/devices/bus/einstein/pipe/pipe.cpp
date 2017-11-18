@@ -10,6 +10,7 @@
 #include "pipe.h"
 
 // supported devices
+#include "silicon_disc.h"
 #include "tk02.h"
 
 
@@ -115,5 +116,6 @@ device_tatung_pipe_interface::~device_tatung_pipe_interface()
 //**************************************************************************
 
 SLOT_INTERFACE_START( tatung_pipe_cards )
+	SLOT_INTERFACE("silicon_disc", EINSTEIN_SILICON_DISC)
 	SLOT_INTERFACE("tk02", TK02_80COL)
 SLOT_INTERFACE_END

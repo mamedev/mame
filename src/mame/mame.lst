@@ -2659,6 +2659,7 @@ cshift                          // (c) 1984
 gghost                          // (c) 1984
 gimeabrk                        // (c) 1985
 grudge                          // prototype - Bally/Midway
+grudgep							//
 hattrick                        // (c) 1984
 teamht                          //
 minigolf                        // (c) 1985
@@ -9333,6 +9334,7 @@ mazinger                        // (c) 1994 Banpresto (country is in EEPROM)
 mazingerj                       // (c) 1994 Banpresto (country is in EEPROM)
 metmqstr                        // (c) 1995 Banpresto / Pandorabox
 nmaster                         // (c) 1995 Banpresto / Pandorabox
+paceight                        // (c) 1996 Namco
 pacslot                         // (c) 1996 Namco
 plegends                        // (c) 1994 Atlus
 plegendsj                       // (c) 1994 Atlus
@@ -15514,7 +15516,7 @@ jackie                          // (c) 1993 IGS
 jackpool                        // (c) 1997 Electronic Projects
 
 @source:jade.cpp
-jade                            //
+jgz80                           // Jade JGZ-80
 
 @source:jaguar.cpp
 a51mxr3k                        // ??           (c) 1998
@@ -20716,7 +20718,11 @@ mhavocp                         // 136025           (c) 1983
 mhavocrv                        // (hack)
 
 @source:mice.cpp
-mice                            //
+mice_6502                       // (c) 1981 Microtek International, Inc.
+mice2_z80                       // (c) 1986 Microtek International, Inc.
+mice2_6502                      // (c) 1986 Microtek International, Inc.
+mice2_8085                      // (c) 1986 Microtek International, Inc.
+mice2_6809                      // (c) 1986 Microtek International, Inc.
 
 @source:micral.cpp
 micral                          //
@@ -21231,6 +21237,7 @@ monzagpb                        // bootleg
 
 @source:moo.cpp
 bucky                           // GX173 (c) 1992 (World)
+buckyaa                         // GX173 (c) 1992 (Asia)
 buckyaab                        // GX173 (c) 1992 (Asia)
 buckyea                         // GX173 (c) 1992 (World)
 buckyjaa                        // GX173 (c) 1992 (Japan)
@@ -28944,11 +28951,12 @@ moeru                           // 2002.12 Moeru Casinyo
 mok                             // 2002.03.06 The Maze of the Kings
 monkeyba                        // 2001.05 Monkey Ball
 mslug6                          // 2006.02 Metal Slug 6
-mtkob2                          // 2003.02 MushiKing The King Of Beetle (World)
 mushi2k4                        // 2004.?? MushiKing The King Of Beetles 2004 Second (Japan)
 mushi2k5                        // 2005.?? MushiKing The King Of Beetles 2005 First (Japan)
+mushike                         // 2004.?? MushiKing The King Of Beetle (World)
 mushi2eo                        // 2005.?? Mushiking The King Of Beetles II / III / III+ (Ver. 1.001) (World)
 mushik2e                        // 2005.?? Mushiking The King Of Beetles II / III / III+ (Ver. 2.001) (World)
+mushik4e                        // 2007.?? Mushiking The King Of Beetles IV / V / VI (World)
 mvsc2                           // 2000.03 Marvel Vs. Capcom 2 New Age of Heroes (Export, Korea) (Rev A)
 mvsc2u                          // 2000.03 Marvel Vs. Capcom 2 New Age of Heroes (USA) (Rev A)
 naomi                           // 1998.?? Naomi BIOS
@@ -31231,14 +31239,14 @@ thegladpcb                      //
 @source:pgm2.cpp
 ddpdojh                         //
 kov2nl                          // (c) 2008
-kov2nlo                         //
-kov2nloa                        //
+kov2nl_301                      //
+kov2nl_300                      //
 kov3                            //
 kov3_102                        //
 kov3_100                        //
 orleg2                          // (c) 2007
-orleg2o                         //
-orleg2oa                        //
+orleg2_103                      //
+orleg2_101                      //
 
 @source:pgm3.cpp
 kov3hd
@@ -33176,6 +33184,7 @@ newsin7                         // (c) 1983 ATW USA, Inc.
 newsin7a                        // (c) 1982 ATW USA, Inc.
 triplep                         // (c) 1982 KKI / made by Sanritsu?
 triplepa                        // (c) 1982 KKI / made by Sanritsu?
+troopy                          // bootleg
 
 @source:scregg.cpp
 dommy                           // TA-00?? (c) 1983 (Arcade TV Game List - P.90, Left, 13 from top)
@@ -33243,7 +33252,7 @@ vaportrxp                       // (c) 1998 Atari Games
 wg3dh                           // (c) 1996 Atari Games
 
 @source:seattlecmp.cpp
-seattle                         //
+scp300f                         // Seattle SCP-300F
 
 @source:sega_sawatte.cpp
 sawatte                         //
@@ -33404,6 +33413,10 @@ segapm                          // 1996 Sega Picture Magic (32x type hardware)
 @source:segas16a.cpp
 aceattaca                       // (c) 1988 (FD1094)
 afighter                        // (c) 1986 (FD1089A)
+afightera
+afighterb
+afighterc
+afighterd
 alexkidd                        // (c) 1986 (Unprotected)
 alexkidd1                       // (c) 1986 (FD1089A)
 aliensyn2                       // (c) 1987 (FD1089A)
@@ -33441,6 +33454,10 @@ wb35d                           //
 
 @source:segas16b.cpp
 aceattac                        // (c) 1988 (FD1094)
+afightere
+afighterf
+afighterg
+afighterh
 aliensyn                        // (c) 1987 (Unprotected)
 aliensyn3                       // (c) 1987 (FD1089A)
 aliensyn7                       // (c) 1987 (MC-8123B)
@@ -36112,6 +36129,7 @@ batlgear                        // E68 (c) 1999 Taito
 batlgr2                         // E87 (c) 2000 Taito (2.04J)
 batlgr2a                        // E87 (c) 2000 Taito (2.01J)
 landhigh                        // E82 (c) 1999 Taito
+landhigha                       // E82 (c) 1999 Taito
 pwrshovl                        // E74 (c) 1999 Taito
 pwrshovla                       //
 raizpin                         // F14 (c) 2002 Taito
@@ -36278,6 +36296,28 @@ terak                           //
 
 @source:terco.cpp
 t4490                           // Terco 4490 Mill CNC Control (c) 1986
+
+@source:terminals.cpp
+aaa
+att630
+cit220p
+d461
+hp700_92
+hp2622a
+mt5510
+mt420
+qvt70
+qvt102
+qvt103
+qvt190
+qvt201
+tr175
+v100
+v102
+vp60
+vp122
+vt420
+zephyr
 
 @source:terracre.cpp
 amatelas                        // (c) 1986
@@ -38548,6 +38588,10 @@ wwfsstaru4                      // TA-0024 (c) 1989 (US)
 
 @source:wyse.cpp
 wy50                            // WY-50
+wy55                            // WY-55
+wy60                            // WY-60
+wy85                            // WY-85
+wy150                           // WY-150
 wy160                           // WY-160
 wy30p                           // WY-30+
 

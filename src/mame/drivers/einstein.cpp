@@ -6,9 +6,7 @@
     Tatung Einstein
 
     TODO:
-    - Verify centronics printer
-    - Hook up RS232 port
-    - Einstein 256 support
+    - Einstein 256 support (need bios dump)
 
  ******************************************************************************/
 
@@ -19,10 +17,12 @@
 #include "bus/centronics/ctronics.h"
 #include "bus/einstein/pipe/pipe.h"
 #include "bus/einstein/userport/userport.h"
+#include "bus/rs232/rs232.h"
 #include "machine/adc0844.h"
 #include "machine/clock.h"
 #include "machine/i8251.h"
 #include "machine/ram.h"
+#include "machine/rescap.h"
 #include "machine/timer.h"
 #include "machine/wd_fdc.h"
 #include "machine/z80ctc.h"
@@ -72,6 +72,7 @@ public:
 		m_ram(*this, RAM_TAG),
 		m_psg(*this, IC_I030),
 		m_centronics(*this, "centronics"),
+		m_strobe_timer(*this, "strobe"),
 		m_bios(*this, "bios"),
 		m_bank1(*this, "bank1"),
 		m_bank2(*this, "bank2"),
@@ -101,6 +102,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_perror);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_fault);
+	DECLARE_WRITE_LINE_MEMBER(ardy_w);
+	TIMER_DEVICE_CALLBACK_MEMBER(strobe_callback);
 
 protected:
 	virtual void machine_start() override;
@@ -118,6 +121,7 @@ private:
 	required_device<ram_device> m_ram;
 	required_device<ay8910_device> m_psg;
 	required_device<centronics_device> m_centronics;
+	required_device<timer_device> m_strobe_timer;
 	required_memory_region m_bios;
 	required_memory_bank m_bank1;
 	required_memory_bank m_bank2;
@@ -224,19 +228,33 @@ WRITE8_MEMBER(einstein_state::drsel_w)
     CENTRONICS
 ***************************************************************************/
 
-WRITE_LINE_MEMBER(einstein_state::write_centronics_busy)
+WRITE_LINE_MEMBER( einstein_state::write_centronics_busy )
 {
 	m_centronics_busy = state;
 }
 
-WRITE_LINE_MEMBER(einstein_state::write_centronics_perror)
+WRITE_LINE_MEMBER( einstein_state::write_centronics_perror )
 {
 	m_centronics_perror = state;
 }
 
-WRITE_LINE_MEMBER(einstein_state::write_centronics_fault)
+WRITE_LINE_MEMBER( einstein_state::write_centronics_fault )
 {
 	m_centronics_fault = state;
+}
+
+WRITE_LINE_MEMBER( einstein_state::ardy_w )
+{
+	if (state)
+	{
+		m_centronics->write_strobe(1);
+		m_strobe_timer->adjust(attotime::from_double(TIME_OF_74LS123(RES_K(10), CAP_N(1))));
+	}
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER( einstein_state::strobe_callback )
+{
+	m_centronics->write_strobe(0);
 }
 
 
@@ -532,7 +550,7 @@ static MACHINE_CONFIG_START( einstein )
 	MCFG_DEVICE_ADD(IC_I063, Z80PIO, XTAL_X002 / 2)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(IC_I001, INPUT_LINE_IRQ0))
 	MCFG_Z80PIO_OUT_PA_CB(DEVWRITE8("cent_data_out", output_latch_device, write))
-	MCFG_Z80PIO_OUT_ARDY_CB(DEVWRITELINE("centronics", centronics_device, write_strobe))
+	MCFG_Z80PIO_OUT_ARDY_CB(WRITELINE(einstein_state, ardy_w))
 	MCFG_Z80PIO_IN_PB_CB(DEVREAD8("user", einstein_userport_device, read))
 	MCFG_Z80PIO_OUT_PB_CB(DEVWRITE8("user", einstein_userport_device, write))
 	MCFG_Z80PIO_OUT_BRDY_CB(DEVWRITELINE("user", einstein_userport_device, brdy_w))
@@ -583,9 +601,21 @@ static MACHINE_CONFIG_START( einstein )
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
-	/* uart */
-	MCFG_DEVICE_ADD(IC_I060, I8251, 0)
+	MCFG_TIMER_DRIVER_ADD("strobe", einstein_state, strobe_callback)
 
+	// uart
+	MCFG_DEVICE_ADD(IC_I060, I8251, XTAL_X002 / 4)
+	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_I8251_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
+	MCFG_I8251_DTR_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
+
+	// rs232 port
+	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(IC_I060, i8251_device, write_rxd))
+	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(IC_I060, i8251_device, write_dsr))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(IC_I060, i8251_device, write_cts))
+
+	// floppy
 	MCFG_WD1770_ADD(IC_I042, XTAL_X002)
 
 	MCFG_FLOPPY_DRIVE_ADD(IC_I042 ":0", einstein_floppies, "3ss", floppy_image_device::default_floppy_formats)
@@ -633,7 +663,7 @@ ROM_END
 
 ROM_START( einst256 )
 	ROM_REGION(0x8000, "bios", 0)
-	ROM_LOAD("tc256.rom", 0x0000, 0x4000, CRC(ef8dad88) SHA1(eb2102d3bef572db7161c26a7c68a5fcf457b4d0) )
+	ROM_LOAD("tc256.rom", 0x0000, 0x4000, BAD_DUMP CRC(ef8dad88) SHA1(eb2102d3bef572db7161c26a7c68a5fcf457b4d0) )
 ROM_END
 
 
@@ -643,4 +673,4 @@ ROM_END
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     STATE           INIT  COMPANY   FULLNAME          FLAGS
 COMP( 1984, einstein, 0,      0,      einstein, einstein, einstein_state, 0,    "Tatung", "Einstein TC-01", 0 )
-COMP( 1984, einst256, 0,      0,      einstein, einstein, einstein_state, 0,    "Tatung", "Einstein 256",   MACHINE_NOT_WORKING )
+COMP( 1986, einst256, 0,      0,      einstein, einstein, einstein_state, 0,    "Tatung", "Einstein 256",   MACHINE_NOT_WORKING )

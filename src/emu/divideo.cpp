@@ -134,9 +134,6 @@ void device_video_interface::interface_pre_start()
 			throw device_missing_dependencies();
 		else
 		{
-			// resolve the palette for the sake of register_screen_bitmap
-			m_screen->resolve_palette();
-
 			// no other palette may be specified
 			if (m_screen->has_palette() && palintf != &m_screen->palette())
 				throw emu_fatalerror("Device '%s' cannot control screen '%s' with palette '%s'", device().tag(), m_screen_tag, m_screen->palette().device().tag());

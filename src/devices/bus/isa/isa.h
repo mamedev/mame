@@ -269,7 +269,7 @@ protected:
 	virtual void device_reset() override;
 
 	// internal state
-	cpu_device   *m_maincpu;
+	required_device<cpu_device> m_maincpu;
 
 	// address spaces
 	address_space *m_iospace, *m_memspace;
@@ -288,7 +288,6 @@ protected:
 
 	device_isa8_card_interface *m_dma_device[8];
 	bool                        m_dma_eop[8];
-	const char                 *m_cputag;
 	bool                        m_nmi_enabled;
 
 private:

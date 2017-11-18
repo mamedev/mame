@@ -138,7 +138,7 @@ Information by The Sheep, rtw, Ex-Cyber, BrianT & Guru
 
 ------------------------------------------------------
 
- To enter service mode in most cases hold down 0 (Service 2) for a few seconds
+ To enter service mode in most cases hold down Service (F2) for a few seconds
   (I believe it's the test button on the PCB)
  Some games also use the test dipswitch as an alternative method.
 
@@ -367,17 +367,18 @@ static ADDRESS_MAP_START( cv1k_port, AS_IO, 64, cv1k_state )
 ADDRESS_MAP_END
 
 
-static INPUT_PORTS_START( cv1k )
+static INPUT_PORTS_START( cv1k_base )
 	PORT_START("DSW")       // 18000050.l (18000050.b + 3 i.e. MSB + 3, is shown as DIPSW)
-//  PORT_BIT(        0xfcfffffc, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_DIPNAME(    0x00000002, 0x00000000, DEF_STR( Unknown ) ) // S2 2
-	PORT_DIPSETTING( 0x00000000, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00000002, DEF_STR( On ) )
-	PORT_SERVICE(    0x00000001, IP_ACTIVE_HIGH ) // S2 1
+	// note: physical switch have default/Off position marked as "ON" which is a bit confusing
+	PORT_DIPUNUSED_DIPLOC( 0x01, 0x00, "S2:1" )
+	PORT_DIPUNUSED_DIPLOC( 0x02, 0x00, "S2:2" )
+	PORT_DIPUNUSED_DIPLOC( 0x04, 0x00, "S2:3" )
+	PORT_DIPUNUSED_DIPLOC( 0x08, 0x00, "S2:4" )
+	PORT_BIT(0xfffffff0, IP_ACTIVE_HIGH, IPT_UNKNOWN)
 
 	PORT_START("PORT_C")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 ) // Service coin
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 ) // Test Button on JAMMA Edge
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE2 ) // Test Button on JAMMA Edge
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1  ) // TODO: IMPLEMENT COIN ERROR!
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2  )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
@@ -395,7 +396,7 @@ static INPUT_PORTS_START( cv1k )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4        ) PORT_PLAYER(1)
 
 	PORT_START("PORT_F")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_SERVICE2 ) // S3 Test Push Button
+	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_SERVICE3 ) // S3 Test Push Button
 	PORT_BIT( 0xfd, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
 	PORT_START("PORT_L")    // 4000134.b, 4000136.b
@@ -422,6 +423,22 @@ static INPUT_PORTS_START( cv1k )
 	PORT_ADJUSTER(50, "Blitter Delay")
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( cv1k )
+	PORT_INCLUDE( cv1k_base )
+
+	PORT_MODIFY("PORT_F")
+	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW ) // S3 Test Push Button
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( cv1ks )
+	PORT_INCLUDE( cv1k_base )
+
+	PORT_MODIFY("DSW")
+	PORT_SERVICE_DIPLOC( 0x01, IP_ACTIVE_HIGH, "S2:1")
+	PORT_DIPNAME( 0x02, 0x00, "Special Mode" ) PORT_DIPLOCATION("S2:2") // also require hold P1 A+B while booting
+	PORT_DIPSETTING( 0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x02, DEF_STR( On ) )
+INPUT_PORTS_END
 
 void cv1k_state::machine_reset()
 {
@@ -916,11 +933,11 @@ GAME( 2004, mushisama,  mushisam, cv1k,   cv1k, cv1k_state, ibara,     ROT270, "
 GAME( 2004, mushisamb,  mushisam, cv1k,   cv1k, cv1k_state, mushisam,  ROT270, "Cave (AMI license)", "Mushihime-Sama (2004/10/12 MASTER VER)",                          GAME_FLAGS )
 
 // CA012  Ibara
-GAME( 2005, ibara,      0,        cv1k,   cv1k, cv1k_state, ibara,     ROT270, "Cave (AMI license)", "Ibara (2005/03/22 MASTER VER..)",                                 GAME_FLAGS )
+GAME( 2005, ibara,      0,        cv1k,   cv1ks,cv1k_state, ibara,     ROT270, "Cave (AMI license)", "Ibara (2005/03/22 MASTER VER..)",                                 GAME_FLAGS )
 
 // CA012B Ibara Kuro Black Label
-GAME( 2006, ibarablk,   0,        cv1k,   cv1k, cv1k_state, pinkswts,  ROT270, "Cave (AMI license)", "Ibara Kuro Black Label (2006/02/06. MASTER VER.)",                GAME_FLAGS )
-GAME( 2006, ibarablka,  ibarablk, cv1k,   cv1k, cv1k_state, pinkswts,  ROT270, "Cave (AMI license)", "Ibara Kuro Black Label (2006/02/06 MASTER VER.)",                 GAME_FLAGS )
+GAME( 2006, ibarablk,   0,        cv1k,   cv1ks,cv1k_state, pinkswts,  ROT270, "Cave (AMI license)", "Ibara Kuro Black Label (2006/02/06. MASTER VER.)",                GAME_FLAGS )
+GAME( 2006, ibarablka,  ibarablk, cv1k,   cv1ks,cv1k_state, pinkswts,  ROT270, "Cave (AMI license)", "Ibara Kuro Black Label (2006/02/06 MASTER VER.)",                 GAME_FLAGS )
 
 // CA013  Espgaluda II
 GAME( 2005, espgal2,    0,        cv1k,   cv1k, cv1k_state, espgal2,   ROT270, "Cave (AMI license)", "Espgaluda II (2005/11/14 MASTER VER)",                            GAME_FLAGS )
@@ -930,10 +947,10 @@ GAME( 2005, mushitam,   0,        cv1k,   cv1k, cv1k_state, mushitam,  ROT0,   "
 GAME( 2005, mushitama,  mushitam, cv1k,   cv1k, cv1k_state, mushitam,  ROT0,   "Cave (AMI license)", "Puzzle! Mushihime-Tama (2005/09/09 MASTER VER)",                  GAME_FLAGS )
 
 // CA014  Pink Sweets: Ibara Sorekara
-GAME( 2006, pinkswts,   0,        cv1k,   cv1k, cv1k_state, pinkswts,  ROT270, "Cave (AMI license)", "Pink Sweets: Ibara Sorekara (2006/04/06 MASTER VER....)",         GAME_FLAGS )
-GAME( 2006, pinkswtsa,  pinkswts, cv1k,   cv1k, cv1k_state, pinkswts,  ROT270, "Cave (AMI license)", "Pink Sweets: Ibara Sorekara (2006/04/06 MASTER VER...)",          GAME_FLAGS )
-GAME( 2006, pinkswtsb,  pinkswts, cv1k,   cv1k, cv1k_state, pinkswts,  ROT270, "Cave (AMI license)", "Pink Sweets: Ibara Sorekara (2006/04/06 MASTER VER.)",            GAME_FLAGS )
-GAME( 2006, pinkswtsx,  pinkswts, cv1k,   cv1k, cv1k_state, pinkswts,  ROT270, "Cave (AMI license)", "Pink Sweets: Ibara Sorekara (2006/xx/xx MASTER VER.)",            GAME_FLAGS ) // defaults to freeplay, possibly bootlegged from show/dev version?
+GAME( 2006, pinkswts,   0,        cv1k,   cv1ks,cv1k_state, pinkswts,  ROT270, "Cave (AMI license)", "Pink Sweets: Ibara Sorekara (2006/04/06 MASTER VER....)",         GAME_FLAGS )
+GAME( 2006, pinkswtsa,  pinkswts, cv1k,   cv1ks,cv1k_state, pinkswts,  ROT270, "Cave (AMI license)", "Pink Sweets: Ibara Sorekara (2006/04/06 MASTER VER...)",          GAME_FLAGS )
+GAME( 2006, pinkswtsb,  pinkswts, cv1k,   cv1ks,cv1k_state, pinkswts,  ROT270, "Cave (AMI license)", "Pink Sweets: Ibara Sorekara (2006/04/06 MASTER VER.)",            GAME_FLAGS )
+GAME( 2006, pinkswtsx,  pinkswts, cv1k,   cv1ks,cv1k_state, pinkswts,  ROT270, "Cave (AMI license)", "Pink Sweets: Ibara Sorekara (2006/xx/xx MASTER VER.)",            GAME_FLAGS ) // defaults to freeplay, possibly bootlegged from show/dev version?
 
 // CA015  Mushihime-Sama Futari
 GAME( 2006, futari15,   0,        cv1k,   cv1k, cv1k_state, pinkswts,  ROT270, "Cave (AMI license)", "Mushihime-Sama Futari Ver 1.5 (2006/12/8.MASTER VER. 1.54.)",     GAME_FLAGS )
@@ -945,7 +962,7 @@ GAME( 2007, futaribl,   0,        cv1k,   cv1k, cv1k_state, pinkswts,  ROT270, "
 GAME( 2007, futariblj,  futaribl, cv1k,   cv1k, cv1k_state, pinkswts,  ROT270, "Cave (AMI license)", "Mushihime-Sama Futari Black Label (2007/12/11 BLACK LABEL VER)",  GAME_FLAGS )
 
 // CA016  Muchi Muchi Pork!
-GAME( 2007, mmpork,     0,        cv1k,   cv1k, cv1k_state, pinkswts,  ROT270, "Cave (AMI license)", "Muchi Muchi Pork! (2007/ 4/17 MASTER VER.)",                      GAME_FLAGS )
+GAME( 2007, mmpork,     0,        cv1k,   cv1ks,cv1k_state, pinkswts,  ROT270, "Cave (AMI license)", "Muchi Muchi Pork! (2007/ 4/17 MASTER VER.)",                      GAME_FLAGS )
 
 // CA017  Deathsmiles
 GAME( 2007, deathsml,   0,        cv1k,   cv1k, cv1k_state, deathsml,  ROT0,   "Cave (AMI license)", "Deathsmiles (2007/10/09 MASTER VER)",                             GAME_FLAGS )

@@ -2,17 +2,39 @@
 // copyright-holders:Miodrag Milanovic, Robbbert
 /**********************************************************************************
 
-    General Processor Modello T
+General Processor Modello T
 
-    2012-12-10 Skeleton driver.
-    2013-09-27 Added keyboard and cursor.
+2012-12-10 Skeleton driver.
+2013-09-27 Added keyboard and cursor.
 
-    Made in Italy, a single board with numerous small daughter boards.
-    The 3 units (keyboard, disk drives, main unit) had wooden cabinets.
-    It had an inbuilt small green-screen CRT, like a Kaypro, and the RAM could
-    be 16, 32, or 48k. The FDC is a FD1791.
+Made in Italy, a single board with numerous small daughter boards.
+The 3 units (keyboard, disk drives, main unit) had wooden cabinets.
+It had an inbuilt small green-screen CRT, like a Kaypro, and the RAM could
+be 16, 32, or 48k. The FDC is a FD1791.
 
-    All the articles and doco (what there is of it) is all in Italian.
+All the articles and doco (what there is of it) is all in Italian.
+
+Doco found...
+
+Port 77 out (cassette control):
+- d0 = recording signal #1
+- d1 = relay #1 (0 = open)
+- d2 = recording signal #2
+- d3 = relay #2 (0 = open)
+
+Port 77 in:
+- d0 = free
+- d1 = playback signal
+- d2 = signal from the anti-glare circuit
+- d3 = same as d2
+
+Optional ports:
+- 3c to 3f (FDC)
+- 5c to 5f (PRT)
+- 6c to 6f (US2)
+- 78 to 7b (US1)
+It's not clear if these are meant to be 3881 PIOs connected to the devices, or for
+the devices themselves. An example shows a i8251 used as the US1 device.
 
 ***********************************************************************************/
 
@@ -30,8 +52,7 @@ public:
 		, m_p_videoram(*this, "videoram")
 		, m_maincpu(*this, "maincpu")
 		, m_p_chargen(*this, "chargen")
-	{
-	}
+	{ }
 
 	DECLARE_READ8_MEMBER(port77_r);
 	DECLARE_READ8_MEMBER(portff_r);
@@ -46,14 +67,14 @@ private:
 	required_region_ptr<u8> m_p_chargen;
 };
 
-static ADDRESS_MAP_START(modellot_mem, AS_PROGRAM, 8, modellot_state)
+static ADDRESS_MAP_START(mem_map, AS_PROGRAM, 8, modellot_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xbfff) AM_RAM // 48k ram
 	AM_RANGE(0xc000, 0xc3ff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(modellot_io, AS_IO, 8, modellot_state)
+static ADDRESS_MAP_START(io_map, AS_IO, 8, modellot_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x77, 0x77) AM_READ(port77_r)
@@ -152,8 +173,8 @@ uint32_t modellot_state::screen_update_modellot(screen_device &screen, bitmap_in
 static MACHINE_CONFIG_START( modellot )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
-	MCFG_CPU_PROGRAM_MAP(modellot_mem)
-	MCFG_CPU_IO_MAP(modellot_io)
+	MCFG_CPU_PROGRAM_MAP(mem_map)
+	MCFG_CPU_IO_MAP(io_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())

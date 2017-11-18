@@ -22,6 +22,9 @@
             - CPU/Video Board: XTAL 16.000MHz at 1D, XTAL 20.000MHz at 1F
             - Sound Board:     XTAL 16.000MHz
 
+    Spy Hunter II reads its extra analog inputs through the "Reflective
+    Sensor Control" board (A084-91854-B000), which is also used by Max RPM.
+
 ****************************************************************************
 
     Memory map
@@ -102,10 +105,8 @@ WRITE16_MEMBER(mcr68_state::blasted_control_w)
 
 READ16_MEMBER(mcr68_state::spyhunt2_port_0_r)
 {
-	static const char *const portnames[] = { "AN1", "AN2", "AN3", "AN4" };
 	int result = ioport("IN0")->read();
-	int which = (m_control_word >> 3) & 3;
-	int analog = ioport(portnames[which])->read();
+	int analog = m_adc->read(space, 0);
 
 	return result | ((m_sounds_good->read(space, 0) & 1) << 5) | (analog << 8);
 }
@@ -127,6 +128,8 @@ WRITE16_MEMBER(mcr68_state::spyhunt2_control_w)
 
 	m_sounds_good->reset_write(~m_control_word & 0x2000);
 	m_sounds_good->write(space, offset, (m_control_word >> 8) & 0x001f);
+
+	m_adc->write(space, 0, (m_control_word >> 3) & 0x0f);
 }
 
 
@@ -950,6 +953,12 @@ static MACHINE_CONFIG_DERIVED( spyhunt2, mcr68 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 	MCFG_SOUND_ADD("tcs", MIDWAY_TURBO_CHEAP_SQUEAK, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
+
+	MCFG_ADC0844_ADD("adc")
+	MCFG_ADC0844_CH1_CB(IOPORT("AN1"))
+	MCFG_ADC0844_CH2_CB(IOPORT("AN2"))
+	MCFG_ADC0844_CH3_CB(IOPORT("AN3"))
+	MCFG_ADC0844_CH4_CB(IOPORT("AN4"))
 MACHINE_CONFIG_END
 
 

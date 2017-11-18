@@ -90,6 +90,18 @@
         93Cxx has ERASE command; this maps to WRITE on ER5911
         93Cxx has WRITEALL command; no equivalent on ER5911
 
+    The Xicor X2444 NOVRAM (static RAM/EEPROM overlay) has a pin-compatible
+    serial interface, but its commands follow a rather different format:
+
+        Start   Address     Opcode      Command
+          1      aaaa        011        WRITE data
+          1      aaaa        11x        READ data
+          1      xxxx        000        WRDS = WRite DiSable
+          1      xxxx        001        STO = STOre RAM data in EEPROM
+          1      xxxx        010        SLEEP mode (not in CMOS version)
+          1      xxxx        100        WREN = WRite ENable
+          1      xxxx        101        RCL = ReCaLl RAM data from EEPROM
+
 ****************************************************************************
 
     Issues with:
@@ -148,6 +160,7 @@ eeprom_serial_base_device::eeprom_serial_base_device(const machine_config &mconf
 		m_command_address_bits(0),
 		m_streaming_enabled(false),
 		m_output_on_falling_clock_enabled(false),
+		m_do_cb(*this),
 		m_state(STATE_IN_RESET),
 		m_cs_state(CLEAR_LINE),
 		m_last_cs_rising_edge_time(attotime::zero),
@@ -210,6 +223,9 @@ void eeprom_serial_base_device::device_start()
 
 	// start the base class
 	eeprom_base_device::device_start();
+
+	// resolve callback
+	m_do_cb.resolve_safe();
 
 	// save the current state
 	save_item(NAME(m_state));
@@ -368,6 +384,9 @@ void eeprom_serial_base_device::set_state(eeprom_state newstate)
 
 	// switch to the new state
 	m_state = newstate;
+
+	// set DO high (actually high impedance; pullup assumed)
+	m_do_cb(1);
 }
 
 
@@ -443,6 +462,9 @@ void eeprom_serial_base_device::handle_event(eeprom_event event)
 					m_shift_register = read((m_address + m_bits_accum / m_data_bits) & ((1 << m_address_bits) - 1)) << (32 - m_data_bits);
 				else
 					m_shift_register = (m_shift_register << 1) | 1;
+
+				// update DO
+				m_do_cb(BIT(m_shift_register, 31));
 			}
 			else if (event == EVENT_CS_FALLING_EDGE)
 			{
@@ -785,12 +807,8 @@ eeprom_serial_x24c44_device::eeprom_serial_x24c44_device(const machine_config &m
 
 void eeprom_serial_x24c44_device::device_start()
 {
-	// if no command address bits set, just inherit from the address bits
-	if (m_command_address_bits == 0)
-		m_command_address_bits = m_address_bits;
-
 	// start the base class
-	eeprom_base_device::device_start();
+	eeprom_serial_base_device::device_start();
 
 	int16_t i=0;
 	m_ram_length=0xf;
@@ -800,18 +818,8 @@ void eeprom_serial_x24c44_device::device_start()
 	}
 	m_reading=0;
 	m_store_latch=0;
+
 	// save the current state
-	save_item(NAME(m_state));
-	save_item(NAME(m_cs_state));
-	save_item(NAME(m_oe_state));
-	save_item(NAME(m_clk_state));
-	save_item(NAME(m_di_state));
-	save_item(NAME(m_locked));
-	save_item(NAME(m_bits_accum));
-	save_item(NAME(m_command_address_accum));
-	save_item(NAME(m_command));
-	save_item(NAME(m_address));
-	save_item(NAME(m_shift_register));
 	save_item(NAME(m_ram_data));
 	save_item(NAME(m_reading));
 	save_item(NAME(m_store_latch));
@@ -1012,6 +1020,9 @@ void eeprom_serial_x24c44_device::handle_event(eeprom_event event)
 					m_shift_register = (m_shift_register << 1) | 1;
 
 				}
+
+				// update DO
+				m_do_cb(BIT(m_shift_register, 31));
 			}
 			else if (event == EVENT_CS_FALLING_EDGE)
 			{

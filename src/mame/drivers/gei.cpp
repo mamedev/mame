@@ -99,28 +99,9 @@ public:
 	DECLARE_WRITE8_MEMBER(gei_drawctrl_w);
 	DECLARE_WRITE8_MEMBER(gei_bitmap_w);
 	DECLARE_READ8_MEMBER(catchall);
-	DECLARE_WRITE8_MEMBER(banksel_main_w);
-	DECLARE_WRITE8_MEMBER(banksel_1_w);
-	DECLARE_WRITE8_MEMBER(banksel_2_w);
-	DECLARE_WRITE8_MEMBER(banksel_3_w);
-	DECLARE_WRITE8_MEMBER(banksel_4_w);
-	DECLARE_WRITE8_MEMBER(banksel_5_w);
-	DECLARE_WRITE8_MEMBER(banksel_1_1_w);
-	DECLARE_WRITE8_MEMBER(banksel_2_1_w);
-	DECLARE_WRITE8_MEMBER(banksel_3_1_w);
-	DECLARE_WRITE8_MEMBER(banksel_4_1_w);
-	DECLARE_WRITE8_MEMBER(banksel_5_1_w);
-	DECLARE_WRITE8_MEMBER(banksel_1_2_w);
-	DECLARE_WRITE8_MEMBER(banksel_2_2_w);
-	DECLARE_WRITE8_MEMBER(banksel_3_2_w);
-	DECLARE_WRITE8_MEMBER(banksel_4_2_w);
-	DECLARE_WRITE8_MEMBER(banksel_5_2_w);
+	template <unsigned N> DECLARE_WRITE8_MEMBER(banksel_w) { m_rombank->set_entry(N); }
 	DECLARE_WRITE8_MEMBER(geimulti_bank_w);
-	DECLARE_READ8_MEMBER(banksel_1_r);
-	DECLARE_READ8_MEMBER(banksel_2_r);
-	DECLARE_READ8_MEMBER(banksel_3_r);
-	DECLARE_READ8_MEMBER(banksel_4_r);
-	DECLARE_READ8_MEMBER(banksel_5_r);
+	template <unsigned N> DECLARE_READ8_MEMBER(banksel_r);
 	DECLARE_READ8_MEMBER(signature_r);
 	DECLARE_WRITE8_MEMBER(signature_w);
 	DECLARE_WRITE8_MEMBER(lamps_w);
@@ -211,24 +192,24 @@ uint32_t gei_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 WRITE8_MEMBER(gei_state::lamps_w)
 {
 	/* 5 button lamps */
-	output().set_led_value(0, data & 0x01);
-	output().set_led_value(1, data & 0x02);
-	output().set_led_value(2, data & 0x04);
-	output().set_led_value(3, data & 0x08);
-	output().set_led_value(4, data & 0x10);
+	output().set_led_value(0, BIT(data, 0));
+	output().set_led_value(1, BIT(data, 1));
+	output().set_led_value(2, BIT(data, 2));
+	output().set_led_value(3, BIT(data, 3));
+	output().set_led_value(4, BIT(data, 4));
 
 	/* 3 button lamps for deal, cancel, stand in poker games;
 	lamp order verified in poker and selection self tests */
-	output().set_led_value(7, data & 0x20);
-	output().set_led_value(5, data & 0x40);
-	output().set_led_value(6, data & 0x80);
+	output().set_led_value(7, BIT(data, 5));
+	output().set_led_value(5, BIT(data, 6));
+	output().set_led_value(6, BIT(data, 7));
 }
 
 WRITE8_MEMBER(gei_state::sound_w)
 {
 	/* bit 3 - coin lockout, lamp10 in poker / lamp6 in trivia test modes */
-	machine().bookkeeping().coin_lockout_global_w(~data & 0x08);
-	output().set_led_value(9, data & 0x08);
+	machine().bookkeeping().coin_lockout_global_w(BIT(~data, 3));
+	output().set_led_value(9, BIT(data, 3));
 
 	/* bit 5 - ticket out in trivia games */
 	if (m_ticket != nullptr)
@@ -244,15 +225,15 @@ WRITE8_MEMBER(gei_state::sound_w)
 WRITE8_MEMBER(gei_state::sound2_w)
 {
 	/* bit 3,6 - coin lockout, lamp 10 + 11 in selection test mode */
-	machine().bookkeeping().coin_lockout_w(0, ~data & 0x08);
-	machine().bookkeeping().coin_lockout_w(1, ~data & 0x40);
-	output().set_led_value(9, data & 0x08);
-	output().set_led_value(10, data & 0x40);
+	machine().bookkeeping().coin_lockout_w(0, BIT(~data, 3));
+	machine().bookkeeping().coin_lockout_w(1, BIT(~data, 6));
+	output().set_led_value(9, BIT(data, 3));
+	output().set_led_value(10, BIT(data, 6));
 
 	/* bit 4,5 - lamps 12, 13 in selection test mode;
 	12 lights up if dsw maximum bet = 30 an bet > 15 or if dsw maximum bet = 10 an bet = 10 */
-	output().set_led_value(11, data & 0x10);
-	output().set_led_value(12, data & 0x20);
+	output().set_led_value(11, BIT(data, 4));
+	output().set_led_value(12, BIT(data, 5));
 
 	/* bit 7 goes directly to the sound amplifier */
 	m_dac->write(BIT(data, 7));
@@ -261,13 +242,13 @@ WRITE8_MEMBER(gei_state::sound2_w)
 WRITE8_MEMBER(gei_state::lamps2_w)
 {
 	/* bit 4 - play/raise button lamp, lamp 9 in poker test mode  */
-	output().set_led_value(8, data & 0x10);
+	output().set_led_value(8, BIT(data, 4));
 }
 
 WRITE8_MEMBER(gei_state::nmi_w)
 {
 	/* bit 4 - play/raise button lamp, lamp 9 in selection test mode  */
-	output().set_led_value(8, data & 0x10);
+	output().set_led_value(8, BIT(data, 4));
 
 	/* bit 6 enables NMI */
 	m_nmi_mask = data & 0x40;
@@ -288,71 +269,6 @@ READ8_MEMBER(gei_state::portC_r)
 	return 4;
 }
 
-WRITE8_MEMBER(gei_state::banksel_main_w)
-{
-	m_rombank->set_entry(0);
-}
-WRITE8_MEMBER(gei_state::banksel_1_w)
-{
-	m_rombank->set_entry(1);
-}
-WRITE8_MEMBER(gei_state::banksel_2_w)
-{
-	m_rombank->set_entry(2);
-}
-WRITE8_MEMBER(gei_state::banksel_3_w)
-{
-	m_rombank->set_entry(3);
-}
-WRITE8_MEMBER(gei_state::banksel_4_w)
-{
-	m_rombank->set_entry(4);
-}
-WRITE8_MEMBER(gei_state::banksel_5_w)
-{
-	m_rombank->set_entry(5);
-}
-
-WRITE8_MEMBER(gei_state::banksel_1_1_w)
-{
-	m_rombank->set_entry(0);
-}
-WRITE8_MEMBER(gei_state::banksel_2_1_w)
-{
-	m_rombank->set_entry(2);
-}
-WRITE8_MEMBER(gei_state::banksel_3_1_w)
-{
-	m_rombank->set_entry(4);
-}
-WRITE8_MEMBER(gei_state::banksel_4_1_w)
-{
-	m_rombank->set_entry(6);
-}
-WRITE8_MEMBER(gei_state::banksel_5_1_w)
-{
-	m_rombank->set_entry(8);
-}
-WRITE8_MEMBER(gei_state::banksel_1_2_w)
-{
-	m_rombank->set_entry(1);
-}
-WRITE8_MEMBER(gei_state::banksel_2_2_w)
-{
-	m_rombank->set_entry(3);
-}
-WRITE8_MEMBER(gei_state::banksel_3_2_w)
-{
-	m_rombank->set_entry(5);
-}
-WRITE8_MEMBER(gei_state::banksel_4_2_w)
-{
-	m_rombank->set_entry(7);
-}
-WRITE8_MEMBER(gei_state::banksel_5_2_w)
-{
-	m_rombank->set_entry(9);
-}
 
 WRITE8_MEMBER(gei_state::geimulti_bank_w)
 {
@@ -382,33 +298,11 @@ WRITE8_MEMBER(gei_state::geimulti_bank_w)
 		m_rombank->set_entry(bank);
 }
 
-READ8_MEMBER(gei_state::banksel_1_r)
+template <unsigned N>
+READ8_MEMBER(gei_state::banksel_r)
 {
-	m_rombank->set_entry(1);
-	return 0x03;
-}
-
-READ8_MEMBER(gei_state::banksel_2_r)
-{
-	m_rombank->set_entry(2);
-	return 0x03;
-}
-
-READ8_MEMBER(gei_state::banksel_3_r)
-{
-	m_rombank->set_entry(3);
-	return 0x03;
-}
-
-READ8_MEMBER(gei_state::banksel_4_r)
-{
-	m_rombank->set_entry(4);
-	return 0x03;
-}
-
-READ8_MEMBER(gei_state::banksel_5_r)
-{
-	m_rombank->set_entry(5);
+	if (!machine().side_effect_disabled())
+		m_rombank->set_entry(N);
 	return 0x03;
 }
 
@@ -437,16 +331,16 @@ static ADDRESS_MAP_START( getrivia_map, AS_PROGRAM, 8, gei_state )
 	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x4800, 0x4803) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
 	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
-	AM_RANGE(0x600f, 0x600f) AM_WRITE(banksel_5_1_w)
-	AM_RANGE(0x6017, 0x6017) AM_WRITE(banksel_4_1_w)
-	AM_RANGE(0x601b, 0x601b) AM_WRITE(banksel_3_1_w)
-	AM_RANGE(0x601d, 0x601d) AM_WRITE(banksel_2_1_w)
-	AM_RANGE(0x601e, 0x601e) AM_WRITE(banksel_1_1_w)
-	AM_RANGE(0x608f, 0x608f) AM_WRITE(banksel_5_2_w)
-	AM_RANGE(0x6097, 0x6097) AM_WRITE(banksel_4_2_w)
-	AM_RANGE(0x609b, 0x609b) AM_WRITE(banksel_3_2_w)
-	AM_RANGE(0x609d, 0x609d) AM_WRITE(banksel_2_2_w)
-	AM_RANGE(0x609e, 0x609e) AM_WRITE(banksel_1_2_w)
+	AM_RANGE(0x600f, 0x600f) AM_WRITE(banksel_w<8>)
+	AM_RANGE(0x6017, 0x6017) AM_WRITE(banksel_w<6>)
+	AM_RANGE(0x601b, 0x601b) AM_WRITE(banksel_w<4>)
+	AM_RANGE(0x601d, 0x601d) AM_WRITE(banksel_w<2>)
+	AM_RANGE(0x601e, 0x601e) AM_WRITE(banksel_w<0>)
+	AM_RANGE(0x608f, 0x608f) AM_WRITE(banksel_w<9>)
+	AM_RANGE(0x6097, 0x6097) AM_WRITE(banksel_w<7>)
+	AM_RANGE(0x609b, 0x609b) AM_WRITE(banksel_w<5>)
+	AM_RANGE(0x609d, 0x609d) AM_WRITE(banksel_w<3>)
+	AM_RANGE(0x609e, 0x609e) AM_WRITE(banksel_w<1>)
 	AM_RANGE(0x8000, 0x8002) AM_WRITE(gei_drawctrl_w)
 	AM_RANGE(0x8000, 0x9fff) AM_ROM /* space for diagnostic ROM? */
 	AM_RANGE(0xa000, 0xbfff) AM_ROM
@@ -457,10 +351,10 @@ static ADDRESS_MAP_START( gselect_map, AS_PROGRAM, 8, gei_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("rombank")
 	AM_RANGE(0x4000, 0x40ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x4400, 0x4400) AM_WRITE(banksel_1_1_w)
-	AM_RANGE(0x4401, 0x4401) AM_WRITE(banksel_1_2_w)
-	AM_RANGE(0x4402, 0x4402) AM_WRITE(banksel_2_1_w)
-	AM_RANGE(0x4403, 0x4403) AM_WRITE(banksel_2_2_w)
+	AM_RANGE(0x4400, 0x4400) AM_WRITE(banksel_w<0>)
+	AM_RANGE(0x4401, 0x4401) AM_WRITE(banksel_w<1>)
+	AM_RANGE(0x4402, 0x4402) AM_WRITE(banksel_w<2>)
+	AM_RANGE(0x4403, 0x4403) AM_WRITE(banksel_w<3>)
 	AM_RANGE(0x4800, 0x4803) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
 	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
 	AM_RANGE(0x8000, 0x8002) AM_WRITE(gei_drawctrl_w)
@@ -474,11 +368,11 @@ static ADDRESS_MAP_START( amuse_map, AS_PROGRAM, 8, gei_state )
 	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x4800, 0x4803) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
 	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
-	AM_RANGE(0x606f, 0x606f) AM_WRITE(banksel_5_1_w)
-	AM_RANGE(0x6077, 0x6077) AM_WRITE(banksel_4_1_w)
-	AM_RANGE(0x607b, 0x607b) AM_WRITE(banksel_3_1_w)
-	AM_RANGE(0x607d, 0x607d) AM_WRITE(banksel_2_1_w)
-	AM_RANGE(0x607e, 0x607e) AM_WRITE(banksel_1_1_w)
+	AM_RANGE(0x606f, 0x606f) AM_WRITE(banksel_w<8>)
+	AM_RANGE(0x6077, 0x6077) AM_WRITE(banksel_w<6>)
+	AM_RANGE(0x607b, 0x607b) AM_WRITE(banksel_w<4>)
+	AM_RANGE(0x607d, 0x607d) AM_WRITE(banksel_w<2>)
+	AM_RANGE(0x607e, 0x607e) AM_WRITE(banksel_w<0>)
 	AM_RANGE(0x8000, 0x8002) AM_WRITE(gei_drawctrl_w)
 	AM_RANGE(0x8000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xffff) AM_RAM_WRITE(gei_bitmap_w)
@@ -490,11 +384,11 @@ static ADDRESS_MAP_START( gepoker_map, AS_PROGRAM, 8, gei_state )
 	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x4800, 0x4803) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
 	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
-	AM_RANGE(0x60ef, 0x60ef) AM_WRITE(banksel_3_1_w)
-	AM_RANGE(0x60f7, 0x60f7) AM_WRITE(banksel_2_2_w)
-	AM_RANGE(0x60fb, 0x60fb) AM_WRITE(banksel_2_1_w)
-	AM_RANGE(0x60fd, 0x60fd) AM_WRITE(banksel_1_2_w)
-	AM_RANGE(0x60fe, 0x60fe) AM_WRITE(banksel_1_1_w)
+	AM_RANGE(0x60ef, 0x60ef) AM_WRITE(banksel_w<4>)
+	AM_RANGE(0x60f7, 0x60f7) AM_WRITE(banksel_w<3>)
+	AM_RANGE(0x60fb, 0x60fb) AM_WRITE(banksel_w<2>)
+	AM_RANGE(0x60fd, 0x60fd) AM_WRITE(banksel_w<1>)
+	AM_RANGE(0x60fe, 0x60fe) AM_WRITE(banksel_w<0>)
 	AM_RANGE(0x8000, 0x8002) AM_WRITE(gei_drawctrl_w)
 	AM_RANGE(0x8000, 0xbfff) AM_ROM /* space for diagnostic ROM? */
 	AM_RANGE(0xe000, 0xffff) AM_ROM
@@ -505,10 +399,10 @@ static ADDRESS_MAP_START( amuse1_map, AS_PROGRAM, 8, gei_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("rombank")
 	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x4400, 0x4400) AM_WRITE(banksel_1_1_w)
-	AM_RANGE(0x4401, 0x4401) AM_WRITE(banksel_2_1_w)
-	AM_RANGE(0x4402, 0x4402) AM_WRITE(banksel_3_1_w)
-	AM_RANGE(0x4403, 0x4403) AM_WRITE(banksel_4_1_w)
+	AM_RANGE(0x4400, 0x4400) AM_WRITE(banksel_w<0>)
+	AM_RANGE(0x4401, 0x4401) AM_WRITE(banksel_w<2>)
+	AM_RANGE(0x4402, 0x4402) AM_WRITE(banksel_w<4>)
+	AM_RANGE(0x4403, 0x4403) AM_WRITE(banksel_w<6>)
 	AM_RANGE(0x4800, 0x4803) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
 	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
 	AM_RANGE(0x5800, 0x5fff) AM_ROM
@@ -524,12 +418,12 @@ static ADDRESS_MAP_START( findout_map, AS_PROGRAM, 8, gei_state )
 	AM_RANGE(0x4800, 0x4803) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
 	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
 	/* banked ROMs are enabled by low 6 bits of the address */
-	AM_RANGE(0x601f, 0x601f) AM_WRITE(banksel_main_w)
-	AM_RANGE(0x602f, 0x602f) AM_WRITE(banksel_5_w)
-	AM_RANGE(0x6037, 0x6037) AM_WRITE(banksel_4_w)
-	AM_RANGE(0x603b, 0x603b) AM_WRITE(banksel_3_w)
-	AM_RANGE(0x603d, 0x603d) AM_WRITE(banksel_2_w)
-	AM_RANGE(0x603e, 0x603e) AM_WRITE(banksel_1_w)
+	AM_RANGE(0x601f, 0x601f) AM_WRITE(banksel_w<0>)
+	AM_RANGE(0x602f, 0x602f) AM_WRITE(banksel_w<5>)
+	AM_RANGE(0x6037, 0x6037) AM_WRITE(banksel_w<4>)
+	AM_RANGE(0x603b, 0x603b) AM_WRITE(banksel_w<3>)
+	AM_RANGE(0x603d, 0x603d) AM_WRITE(banksel_w<2>)
+	AM_RANGE(0x603e, 0x603e) AM_WRITE(banksel_w<1>)
 	AM_RANGE(0x6200, 0x6200) AM_WRITE(signature_w)
 	AM_RANGE(0x6400, 0x6400) AM_READ(signature_r)
 	AM_RANGE(0x7800, 0x7fff) AM_ROM /*space for diagnostic ROM?*/
@@ -545,11 +439,11 @@ static ADDRESS_MAP_START( quizvid_map, AS_PROGRAM, 8, gei_state )
 	AM_RANGE(0x4800, 0x4803) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
 	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
 	/* banked ROMs are enabled by low 6 bits of the address */
-	AM_RANGE(0x602f, 0x602f) AM_READ(banksel_5_r)
-	AM_RANGE(0x6037, 0x6037) AM_READ(banksel_4_r)
-	AM_RANGE(0x603b, 0x603b) AM_READ(banksel_3_r)
-	AM_RANGE(0x603d, 0x603d) AM_READ(banksel_2_r)
-	AM_RANGE(0x603e, 0x603e) AM_READ(banksel_1_r)
+	AM_RANGE(0x602f, 0x602f) AM_READ(banksel_r<5>)
+	AM_RANGE(0x6037, 0x6037) AM_READ(banksel_r<4>)
+	AM_RANGE(0x603b, 0x603b) AM_READ(banksel_r<3>)
+	AM_RANGE(0x603d, 0x603d) AM_READ(banksel_r<2>)
+	AM_RANGE(0x603e, 0x603e) AM_READ(banksel_r<1>)
 	AM_RANGE(0x7800, 0x7fff) AM_ROM /*space for diagnostic ROM?*/
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("rombank")
 	AM_RANGE(0x8000, 0x8002) AM_WRITE(gei_drawctrl_w)
@@ -567,19 +461,6 @@ static ADDRESS_MAP_START( suprpokr_map, AS_PROGRAM, 8, gei_state )
 	AM_RANGE(0x8000, 0x8002) AM_WRITE(gei_drawctrl_w)
 	AM_RANGE(0xc000, 0xffff) AM_WRITE(gei_bitmap_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( geimulti_map, AS_PROGRAM, 8, gei_state )
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x4800, 0x4803) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
-	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
-	AM_RANGE(0x5800, 0x5fff) AM_ROM
-	AM_RANGE(0x5a00, 0x5cff) AM_WRITE(geimulti_bank_w)
-	AM_RANGE(0x6000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x8002) AM_WRITE(gei_drawctrl_w)
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("rombank")
-	AM_RANGE(0xc000, 0xffff) AM_RAM_WRITE(gei_bitmap_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sprtauth_map, AS_PROGRAM, 8, gei_state )
@@ -1179,12 +1060,6 @@ static MACHINE_CONFIG_DERIVED( suprpokr, getrivia )
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(suprpokr_map)
-MACHINE_CONFIG_END
-
-static MACHINE_CONFIG_DERIVED( geimulti, getrivia )
-
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(geimulti_map)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( sprtauth, getrivia )
@@ -1963,6 +1838,12 @@ ROM_START( geimulti )
 	ROM_LOAD( "entr#1",    0x60000, 0x8000, CRC(caceaa7b) SHA1(c51f10f5acd3d3fedce43103b9f11d006139043c) )
 	ROM_LOAD( "grph",      0x68000, 0x8000, CRC(25e265db) SHA1(6e184309ee67dbe7930570b135ace09eeb1eb333) )
 
+	ROM_REGION( 0x0800, "nvram", 0 )
+	ROM_LOAD( "geimulti.nvram",   0x0000, 0x0800, CRC(232bbad1) SHA1(23a4011ad3b322cbda40859a1619dc1f5472fdfc) ) /* Defaults */
+
+	// strangely checks the signature only for questions "fact#1", "adltsex#1", "nfl#1" and "entr#1"
+	ROM_REGION( 0x0008, "signature", 0 ) // bytes 0x03 through 0x0a of the listed question ROMs - to prevent ROM swaps
+	ROM_LOAD( "geimulti.sig",   0x0000, 0x0008, CRC(c8e944a3) SHA1(d34de9e3163ba61fa4e4f2264caff40434fcc9b0) )
 ROM_END
 
 ROM_START( sprtauth )
@@ -2074,5 +1955,5 @@ GAME( 1991, quiz211,   0,        findout,   quiz,     gei_state, bank8k,   ROT0,
 
 GAME( 1992, sexappl,   0,        findout,   sexappl,  gei_state, bank8k,   ROT0, "Grayhound Electronics",  "Sex Appeal (Version 6.02)",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1992, geimulti,  0,        geimulti,  geimulti, gei_state, geimulti, ROT0, "Grayhound Electronics",  "GEI Multi Game",                         MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, geimulti,  0,        sprtauth,  geimulti, gei_state, geimulti, ROT0, "Grayhound Electronics",  "GEI Multi Game",                         MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1992, sprtauth,  0,        sprtauth,  sprtauth, gei_state, geimulti, ROT0, "Classic Games",          "Sports Authority",                       MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

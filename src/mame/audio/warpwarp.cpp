@@ -16,7 +16,7 @@
 #define CLOCK_1V    (18432000/3/2/384)
 
 
-DEFINE_DEVICE_TYPE(WARPWARP, warpwarp_sound_device, "warpwarp_sound", "Warp Warp Audio Custom")
+DEFINE_DEVICE_TYPE(WARPWARP, warpwarp_sound_device, "warpwarp_sound", "Warp Warp Custom Sound")
 
 warpwarp_sound_device::warpwarp_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, WARPWARP, tag, owner, clock),

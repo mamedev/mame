@@ -9,10 +9,13 @@
 
 #define PC_REGISTER          0
 #define SR_REGISTER          1
+#define SP_REGISTER         18
+#define UB_REGISTER         19
 #define BCR_REGISTER        20
 #define TPR_REGISTER        21
 #define TCR_REGISTER        22
 #define TR_REGISTER         23
+#define WCR_REGISTER        24
 #define ISR_REGISTER        25
 #define FCR_REGISTER        26
 #define MCR_REGISTER        27
@@ -38,10 +41,6 @@
 #define EHCSUMD         0x086
 #define EHCFFTD         0x096
 #define EHCFFTSD        0x296
-
-/* Delay values */
-#define NO_DELAY        0
-#define DELAY_EXECUTE   1
 
 /* IRQ numbers */
 #define IRQ_INT1        0
@@ -147,31 +146,6 @@
 #define SAME_SRCF_DST  decode.same_srcf_dst
 
 
-/* Memory access */
-/* read byte */
-#define READ_B(addr)            m_program->read_byte((addr))
-/* read half-word */
-#define READ_HW(addr)           m_program->read_word((addr) & ~1)
-/* read word */
-#define READ_W(addr)            m_program->read_dword((addr) & ~3)
-
-/* write byte */
-#define WRITE_B(addr, data)     m_program->write_byte(addr, data)
-/* write half-word */
-#define WRITE_HW(addr, data)    m_program->write_word((addr) & ~1, data)
-/* write word */
-#define WRITE_W(addr, data)     m_program->write_dword((addr) & ~3, data)
-
-
-/* I/O access */
-/* read word */
-#define IO_READ_W(addr)         m_io->read_dword(((addr) >> 11) & 0x7ffc)
-/* write word */
-#define IO_WRITE_W(addr, data)  m_io->write_dword(((addr) >> 11) & 0x7ffc, data)
-
-
-#define READ_OP(addr)          m_direct->read_word((addr), m_opcodexor)
-
 #define OP              m_op
 #define PPC             m_ppc //previous pc
 #define PC              m_global_regs[0] //Program Counter
@@ -220,7 +194,7 @@
 #define GET_S                   ((SR & S_MASK)>>18)     // bit 18 //SUPERVISOR STATE
 #define GET_ILC                 ((SR & 0x00180000)>>19) // bits 20 - 19 //INSTRUCTION-LENGTH
 /* if FL is zero it is always interpreted as 16 */
-#define GET_FL                  ((SR & 0x01e00000) ? ((SR & 0x01e00000)>>21) : 16) // bits 24 - 21 //FRAME LENGTH
+#define GET_FL                  m_fl_lut[((SR >> 21) & 0xf)] // bits 24 - 21 //FRAME LENGTH
 #define GET_FP                  ((SR & 0xfe000000)>>25) // bits 31 - 25 //FRAME POINTER
 
 #define SET_C(val)              (SR = (SR & ~C_MASK) | (val))
@@ -247,10 +221,10 @@
 #define SET_LOW_SR(val)         (SR = (SR & 0xffff0000) | ((val) & 0x0000ffff)) // when SR is addressed, only low 16 bits can be changed
 
 
-#define CHECK_C(x)              (SR = (SR & ~0x00000001) | (((x) & (((uint64_t)1) << 32)) ? 1 : 0 ))
-#define CHECK_VADD(x,y,z)       (SR = (SR & ~0x00000008) | ((((x) ^ (z)) & ((y) ^ (z)) & 0x80000000) ? 8: 0))
-#define CHECK_VADD3(x,y,w,z)    (SR = (SR & ~0x00000008) | ((((x) ^ (z)) & ((y) ^ (z)) & ((w) ^ (z)) & 0x80000000) ? 8: 0))
-#define CHECK_VSUB(x,y,z)       (SR = (SR & ~0x00000008) | ((((z) ^ (y)) & ((y) ^ (x)) & 0x80000000) ? 8: 0))
+#define CHECK_C(x)              (SR = (SR & ~0x00000001) | (uint32_t)((x & 0x100000000L) >> 32))
+#define CHECK_VADD(x,y,z)       (SR = (SR & ~0x00000008) | ((((x) ^ (z)) & ((y) ^ (z)) & 0x80000000) >> 29))
+#define CHECK_VADD3(x,y,w,z)    (SR = (SR & ~0x00000008) | ((((x) ^ (z)) & ((y) ^ (z)) & ((w) ^ (z)) & 0x80000000) >> 29))
+#define CHECK_VSUB(x,y,z)       (SR = (SR & ~0x00000008) | (((z ^ y) & (y ^ x) & 0x80000000) >> 29))
 
 
 /* FER flags */

@@ -130,10 +130,6 @@ public:
 	// output heler
 	output_manager &output() const { return machine().output(); }
 
-	// generic interrupt generators
-	void generic_pulse_irq_line(device_execute_interface &exec, int irqline, int cycles);
-	void generic_pulse_irq_line_and_vector(device_execute_interface &exec, int irqline, int vector, int cycles);
-
 	INTERRUPT_GEN_MEMBER( nmi_line_pulse );
 	INTERRUPT_GEN_MEMBER( nmi_line_assert );
 
@@ -196,7 +192,6 @@ protected:
 
 private:
 	// helpers
-	void irq_pulse_clear(void *ptr, s32 param);
 	void updateflip();
 
 	// internal state

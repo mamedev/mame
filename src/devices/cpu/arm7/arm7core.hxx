@@ -136,6 +136,7 @@ void arm7_cpu_device::arm7_check_irq_state()
 		set_cpsr(GET_CPSR | I_MASK | F_MASK);   /* Mask both IRQ & FIQ */
 		set_cpsr(GET_CPSR & ~T_MASK);
 		R15 = 0x1c;                             /* IRQ Vector address */
+		R15 |= m_vectorbase;
 		if ((COPRO_CTRL & COPRO_CTRL_MMU_EN) && (COPRO_CTRL & COPRO_CTRL_INTVEC_ADJUST)) R15 |= 0xFFFF0000;
 		return;
 	}
@@ -159,6 +160,7 @@ void arm7_cpu_device::arm7_check_irq_state()
 			temp = (GET_CPSR & 0x0FFFFF3F) /* N Z C V I F */ | (R15 & 0xF0000000) /* N Z C V */ | ((R15 & 0x0C000000) >> (26 - 6)) /* I F */;
 			set_cpsr(temp);            /* Mask IRQ */
 		}
+		R15 |= m_vectorbase;
 		if ((COPRO_CTRL & COPRO_CTRL_MMU_EN) && (COPRO_CTRL & COPRO_CTRL_INTVEC_ADJUST)) R15 |= 0xFFFF0000;
 		return;
 	}
@@ -172,7 +174,7 @@ void arm7_cpu_device::arm7_check_irq_state()
 		SetRegister(SPSR, cpsr);               /* Save current CPSR */
 		set_cpsr(GET_CPSR | I_MASK);            /* Mask IRQ */
 		set_cpsr(GET_CPSR & ~T_MASK);
-		R15 = 0x0c;                             /* IRQ Vector address */
+		R15 = 0x0c | m_vectorbase;                             /* IRQ Vector address */
 		if ((COPRO_CTRL & COPRO_CTRL_MMU_EN) && (COPRO_CTRL & COPRO_CTRL_INTVEC_ADJUST)) R15 |= 0xFFFF0000;
 		m_pendingAbtP = false;
 		update_irq_state();
@@ -196,7 +198,7 @@ void arm7_cpu_device::arm7_check_irq_state()
 		SetRegister(SPSR, cpsr);               /* Save current CPSR */
 		set_cpsr(GET_CPSR | I_MASK);            /* Mask IRQ */
 		set_cpsr(GET_CPSR & ~T_MASK);
-		R15 = 0x04;                             /* IRQ Vector address */
+		R15 = 0x04 | m_vectorbase;                             /* IRQ Vector address */
 		if ((COPRO_CTRL & COPRO_CTRL_MMU_EN) && (COPRO_CTRL & COPRO_CTRL_INTVEC_ADJUST)) R15 |= 0xFFFF0000;
 		m_pendingUnd = false;
 		update_irq_state();
@@ -230,6 +232,7 @@ void arm7_cpu_device::arm7_check_irq_state()
 			temp = (GET_CPSR & 0x0FFFFF3F) /* N Z C V I F */ | (R15 & 0xF0000000) /* N Z C V */ | ((R15 & 0x0C000000) >> (26 - 6)) /* I F */;
 			set_cpsr(temp);            /* Mask IRQ */
 		}
+		R15 |= m_vectorbase;
 		if ((COPRO_CTRL & COPRO_CTRL_MMU_EN) && (COPRO_CTRL & COPRO_CTRL_INTVEC_ADJUST)) R15 |= 0xFFFF0000;
 		m_pendingSwi = false;
 		update_irq_state();

@@ -571,7 +571,7 @@ READ8_MEMBER(apple2e_state::memexp_r)
 
 	if (!m_exp_ram)
 	{
-		return 0xff;
+		return read_floatingbus();
 	}
 
 	if (offset == 3)

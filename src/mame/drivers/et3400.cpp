@@ -2,23 +2,23 @@
 // copyright-holders:Robbbert
 /***************************************************************************
 
-    ET-3400
+ET-3400
 
-    2009-05-12 Skeleton driver.
-    2016-04-29 Added Accessory.
+2009-05-12 Skeleton driver.
+2016-04-29 Added Accessory.
 
-    ETA-3400 Memory I/O Accessory
-    - Provides Tiny Basic, a Terminal, a Serial Interface, a Cassette
-      interface, and 1k to 4k of expansion RAM. All parts are working.
-    - The roms are U105 (Monitor), U106 (Tiny Basic), both type NMOS2316E,
-      and U108 (address decoder PROM).
-    - Navigating:
-           LED to Monitor: D1400
-           Monitor to Basic: G 1C00
-           Monitor to LED: G FC00
-           Basic to Monitor: BYE
-    - All commands in Basic and Monitor are UPPERCASE only.
-    - Terminal is defaulted to 9600 baud, 7 bits, 2 stop bits.
+ETA-3400 Memory I/O Accessory
+- Provides Tiny Basic, a Terminal, a Serial Interface, a Cassette
+  interface, and 1k to 4k of expansion RAM. All parts are working.
+- The roms are U105 (Monitor), U106 (Tiny Basic), both type NMOS2316E,
+  and U108 (address decoder PROM).
+- Navigating:
+    LED to Monitor: D1400
+    Monitor to Basic: G 1C00
+    Monitor to LED: G FC00
+    Basic to Monitor: BYE
+- All commands in Basic and Monitor are UPPERCASE only.
+- Terminal is defaulted to 9600 baud, 7 bits, 2 stop bits.
 
 
 ****************************************************************************/
@@ -118,7 +118,7 @@ WRITE8_MEMBER( et3400_state::pia_bw )
 }
 
 
-static ADDRESS_MAP_START(et3400_mem, AS_PROGRAM, 8, et3400_state)
+static ADDRESS_MAP_START(mem_map, AS_PROGRAM, 8, et3400_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x0fff ) AM_RAM
 	AM_RANGE( 0x1000, 0x1003 ) AM_MIRROR(0x03fc) AM_DEVREADWRITE("pia", pia6821_device, read, write)
@@ -180,7 +180,7 @@ DEVICE_INPUT_DEFAULTS_END
 static MACHINE_CONFIG_START( et3400 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, XTAL_4MHz / 4 ) // 1MHz with memory i/o accessory, or 500khz without it
-	MCFG_CPU_PROGRAM_MAP(et3400_mem)
+	MCFG_CPU_PROGRAM_MAP(mem_map)
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_et3400)

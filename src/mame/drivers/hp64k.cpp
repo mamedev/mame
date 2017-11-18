@@ -210,8 +210,8 @@ public:
 	void hp64k_update_floppy_dma(void);
 	void hp64k_update_floppy_irq(void);
 	void hp64k_update_drv_ctrl(void);
-	DECLARE_WRITE8_MEMBER(hp64k_floppy0_rdy);
-	DECLARE_WRITE8_MEMBER(hp64k_floppy1_rdy);
+	DECLARE_WRITE_LINE_MEMBER(hp64k_floppy0_rdy);
+	DECLARE_WRITE_LINE_MEMBER(hp64k_floppy1_rdy);
 	void hp64k_floppy_idx_cb(floppy_image_device *floppy , int state);
 	void hp64k_floppy_wpt_cb(floppy_image_device *floppy , int state);
 
@@ -877,18 +877,18 @@ void hp64k_state::hp64k_update_drv_ctrl(void)
 		}
 }
 
-WRITE8_MEMBER(hp64k_state::hp64k_floppy0_rdy)
+WRITE_LINE_MEMBER(hp64k_state::hp64k_floppy0_rdy)
 {
-		if (data) {
+		if (state) {
 				BIT_CLR(m_floppy_status , 0);
 		} else {
 				BIT_SET(m_floppy_status , 0);
 		}
 }
 
-WRITE8_MEMBER(hp64k_state::hp64k_floppy1_rdy)
+WRITE_LINE_MEMBER(hp64k_state::hp64k_floppy1_rdy)
 {
-		if (data) {
+		if (state) {
 				BIT_CLR(m_floppy_status , 3);
 		} else {
 				BIT_SET(m_floppy_status , 3);
@@ -898,9 +898,9 @@ WRITE8_MEMBER(hp64k_state::hp64k_floppy1_rdy)
 void hp64k_state::hp64k_floppy_idx_cb(floppy_image_device *floppy , int state)
 {
 		if (floppy == m_floppy0->get_device()) {
-				m_ss0->a_w(machine().dummy_space(), 0, !state);
+				m_ss0->a_w(!state);
 		} else if (floppy == m_floppy1->get_device()) {
-				m_ss1->a_w(machine().dummy_space(), 0, !state);
+				m_ss1->a_w(!state);
 		}
 
 		if (floppy == m_current_floppy) {
@@ -1374,7 +1374,7 @@ static MACHINE_CONFIG_START(hp64k)
 	MCFG_TTL74123_CAPACITOR_VALUE(CAP_U(16))
 	MCFG_TTL74123_B_PIN_VALUE(1)
 	MCFG_TTL74123_CLEAR_PIN_VALUE(1)
-	MCFG_TTL74123_OUTPUT_CHANGED_CB(WRITE8(hp64k_state , hp64k_floppy0_rdy));
+	MCFG_TTL74123_OUTPUT_CHANGED_CB(WRITELINE(hp64k_state , hp64k_floppy0_rdy));
 
 	MCFG_DEVICE_ADD("fdc_rdy1" , TTL74123 , 0)
 	MCFG_TTL74123_CONNECTION_TYPE(TTL74123_NOT_GROUNDED_NO_DIODE)
@@ -1382,7 +1382,7 @@ static MACHINE_CONFIG_START(hp64k)
 	MCFG_TTL74123_CAPACITOR_VALUE(CAP_U(16))
 	MCFG_TTL74123_B_PIN_VALUE(1)
 	MCFG_TTL74123_CLEAR_PIN_VALUE(1)
-	MCFG_TTL74123_OUTPUT_CHANGED_CB(WRITE8(hp64k_state , hp64k_floppy1_rdy));
+	MCFG_TTL74123_OUTPUT_CHANGED_CB(WRITELINE(hp64k_state , hp64k_floppy1_rdy));
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("beeper" , BEEP , 2500)

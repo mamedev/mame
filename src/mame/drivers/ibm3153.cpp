@@ -61,12 +61,12 @@ private:
 };
 
 
-static ADDRESS_MAP_START(ibm3153_mem, AS_PROGRAM, 8, ibm3153_state)
+static ADDRESS_MAP_START(mem_map, AS_PROGRAM, 8, ibm3153_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000,0x0ffff) AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(ibm3153_io, AS_IO, 8, ibm3153_state)
+static ADDRESS_MAP_START(io_map, AS_IO, 8, ibm3153_state)
 	AM_RANGE(0x0000,0xffff) AM_RAM
 	//ADDRESS_MAP_UNMAP_HIGH
 	//ADDRESS_MAP_GLOBAL_MASK(0xff)
@@ -96,8 +96,8 @@ void ibm3153_state::machine_reset()
 static MACHINE_CONFIG_START( ibm3153 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I80C32, XTAL_16MHz) // no idea of clock
-	MCFG_CPU_PROGRAM_MAP(ibm3153_mem)
-	MCFG_CPU_IO_MAP(ibm3153_io)
+	MCFG_CPU_PROGRAM_MAP(mem_map)
+	MCFG_CPU_IO_MAP(io_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

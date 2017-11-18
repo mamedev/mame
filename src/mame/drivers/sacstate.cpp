@@ -38,28 +38,27 @@ Other input will either result in '!' message, or halt.
 #include "cpu/i8008/i8008.h"
 #include "machine/terminal.h"
 
-#define TERMINAL_TAG "terminal"
 
 class sacstate_state : public driver_device
 {
 public:
 	sacstate_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_terminal(*this, TERMINAL_TAG)
-	{
-	}
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_terminal(*this, "terminal")
+	{ }
 
-	required_device<cpu_device> m_maincpu;
-	required_device<generic_terminal_device> m_terminal;
 	DECLARE_READ8_MEMBER(port00_r);
 	DECLARE_READ8_MEMBER(port01_r);
 	DECLARE_READ8_MEMBER(port04_r);
 	DECLARE_WRITE8_MEMBER(port08_w);
 	void kbd_put(u8 data);
+private:
 	uint8_t m_term_data;
 	uint8_t m_val;
 	virtual void machine_reset() override;
+	required_device<cpu_device> m_maincpu;
+	required_device<generic_terminal_device> m_terminal;
 };
 
 READ8_MEMBER( sacstate_state::port01_r )
@@ -105,7 +104,7 @@ static ADDRESS_MAP_START(sacstate_io, AS_IO, 8, sacstate_state)
 	AM_RANGE(0x01,0x01) AM_READ(port01_r)
 	AM_RANGE(0x04,0x04) AM_READ(port04_r)
 	AM_RANGE(0x08,0x08) AM_WRITE(port08_w)
-	AM_RANGE(0x16,0x16) AM_DEVWRITE(TERMINAL_TAG, generic_terminal_device, write)
+	AM_RANGE(0x16,0x16) AM_DEVWRITE("terminal", generic_terminal_device, write)
 	AM_RANGE(0x17,0x1f) AM_WRITENOP
 ADDRESS_MAP_END
 
@@ -135,7 +134,7 @@ static MACHINE_CONFIG_START( sacstate )
 	MCFG_CPU_IO_MAP(sacstate_io)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
+	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
 	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(sacstate_state, kbd_put))
 MACHINE_CONFIG_END
 

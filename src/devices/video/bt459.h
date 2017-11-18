@@ -202,7 +202,7 @@ private:
 	// helper functions
 	u8 get_component(rgb_t *arr, int index);
 	void set_component(rgb_t *arr, int index, u8 data);
-	u32 get_rgb(u8 data) const { return m_palette_ram[data & m_pixel_read_mask]; }
+	u32 get_rgb(u8 data, u8 mask) const { return m_palette_ram[data & mask]; }
 
 	// device state in memory map order
 	u16 m_address;
@@ -237,6 +237,8 @@ private:
 
 	u8 m_cursor_ram[1024];
 	rgb_t m_palette_ram[BT459_PIXEL_COLORS];
+
+	u64 m_blink_start;
 };
 
 DECLARE_DEVICE_TYPE(BT459, bt459_device)

@@ -2243,6 +2243,15 @@ enum
 	CR7 = 0x01
 };
 
+/* Line */
+enum
+{
+	LINE_HSK = 0x10,
+	LINE_BAV = 0x04,
+	LINE_BIT32 = 0xc0,
+	LINE_BIT10 = 0x03
+};
+
 oso_device::oso_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	bus::hexbus::hexbus_chained_device(mconfig, TI99_OSO, tag, owner, clock),
 	m_int(*this),
@@ -2250,17 +2259,16 @@ oso_device::oso_device(const machine_config &mconfig, const char *tag, device_t 
 	m_status(0xff),
 	m_control(0),
 	m_xmit(0), m_lasthxvalue(0x01),
-	m_clkcount(0),
-	m_sbav(false), m_sbavold(true),
-	m_bav(false), m_bavhold(false),
-	m_shsk(false), m_shskold(true),
-	m_hsk(false), m_hskhold(false),
-	m_wq1(false), m_wq1old(true), m_wq2(false), m_wq2old(true),
-	m_wnp(false),
-	m_wbusy(false), m_wbusyold(false),
-	m_sendbyte(false),
-	m_wrst(false), m_counting(false),
-	m_rq2(false), m_rq2old(true)
+	m_bav(false), m_sbav(false), m_sbavold(false), m_bavhold(false),
+	m_hsk(false), m_shsk(false), m_shskold(false), m_hskhold(false),
+	m_wq1(false), m_wq1old(false), m_wq2(false), m_wq2old(false),
+	m_wnp(false), m_wbusyold(false), m_sendbyte(false),
+	m_wrset(false), m_counting(false), m_clkcount(0),
+	m_rq1(false), m_rq2(false), m_rq2old(false),
+	m_rnib(false), m_rnibcold(false),
+	m_rdset(false), m_rdsetold(false),
+	m_msns(false), m_lsns(false),
+	m_rhsus(false)
 {
 	(void)m_shskold;
 	m_hexbus_inbound = nullptr;
@@ -2277,6 +2285,8 @@ READ8_MEMBER( oso_device::read )
 		// read 5FF8: read data register
 		if (TRACE_OSO) logerror("Read data register = %02x\n", value);
 		value = m_data;
+		// Release the handshake
+		m_rhsus = false;
 		break;
 	case 1:
 		// read 5FFA: read status register
@@ -2314,9 +2324,8 @@ WRITE8_MEMBER( oso_device::write )
 		m_sendbyte = true;
 		if (!m_wq1)
 		{
-			m_wbusy = true;
 			m_wbusyold = true;
-			set_status(WBUSY, m_wbusy);
+			set_status(WBUSY, true);
 		}
 
 		m_xmit = data;
@@ -2327,12 +2336,16 @@ WRITE8_MEMBER( oso_device::write )
 			data, (data & WIEN)? 1:0, (data & RIEN)? 1:0, (data&BAVIAEN)? 1:0, (data&BAVAIEN)? 1:0,
 			(data & BAVC)? 1:0, (data & WEN)? 1:0, (data & REN)? 1:0);
 		m_control = data;
+
+		// Reset some flipflops in the write/read timing section
 		if (!control_bit(WEN))
 		{
-			// Reset some flipflops in the write timing section
-			m_wq1 = m_wq2 = m_wrst = false;
+			m_wq1 = m_wq2 = m_wrset = false;
 		}
-		m_bav = control_bit(BAVC);
+		if (!control_bit(REN))
+		{
+			m_rq1 = m_rq2 = m_rdset = false;
+		}
 		break;
 	default:
 		// write 5FFC, 5FFE: undefined
@@ -2350,6 +2363,15 @@ void oso_device::clear_int_status()
 void oso_device::hexbus_value_changed(uint8_t data)
 {
 	if (TRACE_OSO) logerror("Hexbus value changed to %02x\n", data);
+
+	m_bav = ((data & LINE_BAV)==0) | control_bit(BAVC);
+
+	m_hsk = (data & LINE_HSK)==0;
+	int nibble = ((data & LINE_BIT32)>>4) | (data & LINE_BIT10);
+	if (m_msns)
+		m_data = (m_data & 0x0f) | (nibble<<4);
+	if (m_lsns)
+		m_data = (m_data & 0xf0) | nibble;
 }
 
 /*
@@ -2363,12 +2385,20 @@ WRITE_LINE_MEMBER( oso_device::clock_in )
 		// When BAV/HSK is 0/1 for two rising edges of Phi3*, SBAV/SHSK goes to
 		// 0/1 at the following falling edge of Phi3*.
 		// Page 5
-		m_sbav = m_bavhold && m_bav;
+		m_sbav = m_bavhold && m_bav;   // could mean "stable BAV"
 		m_bavhold = m_bav;
 		m_shsk = m_hskhold && m_hsk;
 		m_hskhold = m_hsk;
 		set_status(SHSK, m_shsk);
 		set_status(SBAV, m_sbav);
+
+		// Raising edge of SBAV*
+		if (m_sbav == true && m_sbavold == false)
+			set_status(BAVIAS, true);
+		// Falling edge of SBAV*
+		if (m_sbav == false && m_sbavold == true)
+			set_status(BAVAIS, true);
+		m_sbavold = m_sbav;
 
 		// Implement the write timing logic
 		// This subcircuit in the OSO chip autonomously runs the Hexbus
@@ -2382,11 +2412,11 @@ WRITE_LINE_MEMBER( oso_device::clock_in )
 
 		if (control_bit(WEN))  // Nothing happens without WEN
 		{
-			if (TRACE_OSO) if (!m_wrst && m_sendbyte) logerror("Starting write process\n");
+			if (TRACE_OSO) if (!m_wrset && m_sendbyte) logerror("Starting write process\n");
 			// Page 3: Write timing
 			// Note: First pass counts to 30, second to 31
 			bool cnt30 = ((m_clkcount & 0x1e) == 30);
-			bool cont = (m_wrst && !m_wq2 && !m_wq1) || (cnt30 && m_wq2 && !m_wq1)
+			bool cont = (m_wrset && !m_wq2 && !m_wq1) || (cnt30 && m_wq2 && !m_wq1)
 			|| (cnt30 && !m_wq2 && m_wq1) || (m_shsk && m_wq2 && m_wq1);
 
 			bool jwq1 = cont && m_wq2;
@@ -2401,37 +2431,17 @@ WRITE_LINE_MEMBER( oso_device::clock_in )
 			if (m_wq1 == true)
 				m_sendbyte = false;
 
+			// logerror("sendbyte=%d, wq1=%d, wq2=%d, jwq1=%d, kwq1=%d, jwq2=%d, kwq2=%d, shsk=%d\n", m_sendbyte, m_wq1, m_wq2, jwq1, kwq1, jwq2, kwq2, m_shsk);
 			// WBUSY is asserted on byte load, during phase 1, and phase 2.
-			m_wbusy = m_sendbyte || m_wq1 || m_wq2;
+			bool wbusy = m_sendbyte || m_wq1 || m_wq2;
 
 			// Set status bits and raise interrupt (p. 4)
-			set_status(WBUSY, m_wbusy);
-			if (m_wbusy != m_wbusyold)
-			{
-				// Raising edge of wbusy*
-				if (!m_wbusy) set_status(HSKWT, !m_wbusy);
-				m_wbusyold = m_wbusy;
-			}
+			set_status(WBUSY, wbusy);
 
-			if (m_rq2 != m_rq2old)
-			{
-				// Raising edge of RQ2*
-				if (!m_rq2)
-				{
-					set_status(HSKRD, m_rq2);
-				}
-				m_wbusyold = m_wbusy;
-			}
-
-			if (m_sbav != m_sbavold)
-			{
-				// Raising edge of SBAV -> BAVIA
-				// Falling edge of SBAV -> BAVAI
-				if (m_sbav)
-					set_status(BAVIAS, m_sbav);
-				else
-					set_status(BAVAIS, !m_sbav);
-			}
+			// Raising edge of wbusy*
+			if (m_wbusyold == true && wbusy == false)
+				set_status(HSKWT, true);
+			m_wbusyold = wbusy;
 
 			// Operate flipflops
 			// Write phases
@@ -2462,26 +2472,79 @@ WRITE_LINE_MEMBER( oso_device::clock_in )
 			}
 			m_wq1old = m_wq1;
 
-			// Set HSK
-			m_hsk = !m_wq1 && m_wq2;
-
 			// Reset WNP if phases are done
 			if (!m_wq2 && !m_wq1)
 			{
 				m_wnp = false;
 			}
-			update_hexbus();
+		}
+
+		// This is the reading behavior. In this case, the master (this
+		// component) pulls down BAV*, then the slave sets the data lines
+		// with the back nibble, pulls down HSK*, then releases HSK*,
+		// puts the front nibble on the data lines, pulls down HSK* again,
+		// releases it, and this continues until the master releases BAV*
+
+		if (control_bit(REN))
+		{
+			bool rbusy = m_rq1 || m_rq2;
+			set_status(RBUSY, rbusy);
+
+			// Flipflop resets
+			if (!rbusy) m_rnib = false;
+			if (m_rq2) m_rdset = false;
+
+			bool rdsetin = !control_bit(WBUSY) && m_sbav && m_shsk;
+			bool next = (m_rdset && !m_rq2) || (m_shsk && m_rq2);
+			bool drq1 = (next && m_rq2) || (m_rq2 && m_rq1 && !m_rnib);
+			bool jrq2 = next && !m_rq1;
+			bool krq2 = m_rq1 && !m_rnib;
+			m_msns = m_rnib && !m_rq1 && m_rq2;
+			m_lsns = !m_rnib && !m_rq1 && m_rq2;
+			bool rnibc = m_rq1;
+
+			// Next state
+			if (!m_rdsetold && rdsetin) m_rdset = true; // raising edge
+			m_rdsetold = rdsetin;
+			m_rq1 = drq1;
+
+			if (jrq2)
+			{
+				if (!krq2) m_rq2 = !m_rq2;
+				else m_rq2 = true;
+			}
+			else
+				if (!krq2) m_rq2 = false;
+
+			if (m_rnibcold == false && rnibc == true) m_rnib = !m_rnib;  // raising edge
+			m_rnibcold = rnibc;
+
+			// Raising edge of RQ2*
+			if (m_rq2old == true && m_rq2 == false)
+			{
+				set_status(HSKRD, true);
+				m_rhsus = true;  // byte is available for reading
+			}
+			m_rq2old = m_rq2;
 		}
 		else
 		{
-			m_wq1 = m_wq2 = m_wrst = m_counting = false;
-			m_clkcount = 0;
+			m_rhsus = false;
 		}
+
+		// Handshake control
+		// Set HSK (Page 6, RHSUS*)
+		bool hskwrite = !m_wq1 && m_wq2;
+
+		// We can simplify this to a single flag because the CPU read operation
+		// is atomic here (starts and immediately terminates)
+		m_hsk = hskwrite || m_rhsus;
+		update_hexbus();
 	}
 	// Actions that occur for Phi3=0
 	else
 	{
-		m_wrst = m_sendbyte;
+		m_wrset = m_sendbyte;
 		// Only count when one phase is active
 		m_counting = !(m_wq1==m_wq2);
 
@@ -2491,12 +2554,15 @@ WRITE_LINE_MEMBER( oso_device::clock_in )
 			m_clkcount = 0; // Reset when not counting
 	}
 
-	// Show some lines in log
-	if (TRACE_OSO) {
-		if (m_sbav != m_sbavold) {
-			logerror("SBAV = %d\n", m_sbav? 1 : 0);
-			m_sbavold = m_sbav;
-		}
+	// Flipflop resets (not related to clock)
+	if (!control_bit(WEN))
+	{
+		m_wq1 = m_wq2 = m_wrset = m_counting = false;
+		m_clkcount = 0;
+	}
+	if (!control_bit(REN))
+	{
+		m_rq1 = m_rq2 = m_rdset = false;
 	}
 
 	// Raise interrupt
@@ -2517,7 +2583,7 @@ void oso_device::update_hexbus()
 
 	value = ((m_xmit & 0x0c)<<4) | (m_xmit & 0x03);
 	if (!m_hsk) value |= 0x10;
-	if (!m_bav) value |= 0x04;
+	if (!control_bit(BAVC)) value |= 0x04;
 	if (value != m_lasthxvalue)
 	{
 		if (TRACE_OSO) logerror("Set hexbus = %02x (BAV*=%d, HSK*=%d, data=%01x)\n", value, (value & 0x04)? 1:0, (value & 0x10)? 1:0, ((value>>4)&0x0c) | (value&0x03));

@@ -103,14 +103,14 @@ WRITE8_MEMBER( univac_state::vram_w )
 }
 
 
-static ADDRESS_MAP_START(uts20_mem, AS_PROGRAM, 8, univac_state)
+static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, univac_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x4fff ) AM_ROM AM_REGION("roms", 0)
 	AM_RANGE( 0x8000, 0xbfff ) AM_READWRITE(vram_r,vram_w)
 	AM_RANGE( 0xc000, 0xffff ) AM_RAM AM_SHARE("videoram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( uts20_io, AS_IO, 8, univac_state)
+static ADDRESS_MAP_START( io_map, AS_IO, 8, univac_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("uart", z80sio_device, cd_ba_r, cd_ba_w)
@@ -185,9 +185,9 @@ static const z80_daisy_config daisy_chain[] =
 
 static MACHINE_CONFIG_START( uts20 )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz) // unknown clock
-	MCFG_CPU_PROGRAM_MAP(uts20_mem)
-	MCFG_CPU_IO_MAP(uts20_io)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_4MHz) // unknown clock
+	MCFG_CPU_PROGRAM_MAP(mem_map)
+	MCFG_CPU_IO_MAP(io_map)
 	MCFG_Z80_DAISY_CHAIN(daisy_chain)
 
 	/* video hardware */

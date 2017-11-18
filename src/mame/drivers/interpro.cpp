@@ -104,8 +104,10 @@
  *   U35   128 kB EPROM (MPRGW510B)  Boot ROM
  *   U43?  (MPRGM610P)               Bitstream for XC3020?
  *   U44   Intel 82596SX             Ethernet controller (20MHz)
+ *   U67   Intel N28F010-200         128Kx8 flash memory (200ns)
  *   U68   CYID21603 TC150G89AF
  *   U71   LSI L1A6104 CICD 95801    Intergraph I/O gate array
+ *   U76   Intel N28F010-200         128Kx8 flash memory (200ns)
  *   U81   NCR 53C94                 SCSI controller
  *   U86   24.0 MHz crystal          Clock source for 53C94?
  *   U87   4.9152 MHz crystal        Clock source for 8530s?
@@ -129,7 +131,9 @@
  *   U43?  (MPRGM610P)               Bitstream for XC3020?
  *   U44   Intel 82596SX?            Ethernet controller
  *   U68   CYID21603 TC150G89AF
+ *   U67   Intel N28F010             128Kx8 flash memory
  *   U71   LSI L1A7374 CIDC094A3     Intergraph I/O gate array
+ *   U76   Intel N28F010             128Kx8 flash memory
  *   U81   NCR 53C94                 SCSI controller
  *   U86   24.0 MHz crystal          Clock source for 53C94?
  *   U87   4.9152 MHz crystal        Clock source for 8530s?
@@ -154,14 +158,6 @@
 
 #define VERBOSE 0
 #include "logmacro.h"
-
-// FIXME: eeprom/flash device embedded here until real device is known
-DEFINE_DEVICE_TYPE(INTERPRO_EEPROM, interpro_eeprom_device, "interpro_eeprom", "InterPro Flash EEPROM");
-
-interpro_eeprom_device::interpro_eeprom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: eeprom_base_device(mconfig, INTERPRO_EEPROM, tag, owner)
-{
-}
 
 void interpro_state::machine_start()
 {
@@ -242,7 +238,9 @@ WRITE16_MEMBER(sapphire_state::sreg_ctrl2_w)
 {
 	interpro_state::sreg_ctrl2_w(space, offset, data, mem_mask);
 
-	m_eeprom->write_enable(data & CTRL2_FLASHEN ? ASSERT_LINE : CLEAR_LINE);
+	// enable/disable programming power on both flash devices
+	m_flash_lo->vpp(data & CTRL2_FLASHEN ? ASSERT_LINE : CLEAR_LINE);
+	m_flash_hi->vpp(data & CTRL2_FLASHEN ? ASSERT_LINE : CLEAR_LINE);
 }
 
 READ16_MEMBER(interpro_state::sreg_error_r)
@@ -376,7 +374,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(sapphire_main_map, 0, 32, sapphire_state)
 	AM_RANGE(0x00000000, 0x00ffffff) AM_RAM AM_SHARE(RAM_TAG)
 	AM_RANGE(0x7f100000, 0x7f11ffff) AM_ROM AM_REGION(INTERPRO_EPROM_TAG, 0)
-	AM_RANGE(0x7f180000, 0x7f1bffff) AM_DEVREADWRITE16(INTERPRO_EEPROM_TAG, interpro_eeprom_device, eeprom_r, eeprom_w, 0xffffffff)
+	AM_RANGE(0x7f180000, 0x7f1fffff) AM_DEVREADWRITE8(INTERPRO_FLASH_TAG "_lo", intel_28f010_device, read, write, 0x00ff00ff) AM_MASK(0x3ffff)
+	AM_RANGE(0x7f180000, 0x7f1fffff) AM_DEVREADWRITE8(INTERPRO_FLASH_TAG "_hi", intel_28f010_device, read, write, 0xff00ff00) AM_MASK(0x3ffff)
 
 	AM_IMPORT_FROM(sapphire_base_map)
 ADDRESS_MAP_END
@@ -635,10 +634,9 @@ static MACHINE_CONFIG_DERIVED(sapphire, interpro)
 	MCFG_DEVICE_ADD(INTERPRO_IOGA_TAG, SAPPHIRE_IOGA, 0)
 	MCFG_FRAGMENT_ADD(ioga)
 
-	// eeprom
-	MCFG_DEVICE_ADD(INTERPRO_EEPROM_TAG, INTERPRO_EEPROM, 0)
-	MCFG_EEPROM_SIZE(0x20000, 16)
-	MCFG_EEPROM_WRITE_TIME(attotime::from_usec(1000))
+	// flash memory
+	MCFG_DEVICE_ADD(INTERPRO_FLASH_TAG "_lo", INTEL_28F010, 0)
+	MCFG_DEVICE_ADD(INTERPRO_FLASH_TAG "_hi", INTEL_28F010, 0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED(ip2000, turquoise)
@@ -684,8 +682,11 @@ ROM_START(ip2400)
 	ROM_SYSTEM_BIOS(0, "ip2400", "InterPro 2400 EPROM")
 	ROMX_LOAD("mprgw510b__05_16_92.u35", 0x00000, 0x20000, CRC(3b2c4545) SHA1(4e4c98d1cd1035a04be8527223f44d0b687ec3ef), ROM_BIOS(1))
 
-	ROM_REGION16_LE(0x0040000, INTERPRO_EEPROM_TAG, 0)
-	ROM_LOAD_OPTIONAL("c4saph.bin", 0x00000, 0x40000, CRC(a0c0899f) SHA1(dda6fbca81f9885a1a76ca3c25e80463a83a0ef7))
+	ROM_REGION(0x20000, INTERPRO_FLASH_TAG "_lo", 0)
+	ROM_LOAD_OPTIONAL("y225.u76", 0x00000, 0x20000, CRC(46c0b105) SHA1(7c4a104e4fb3d0e5e8db7c911cdfb3f5c4fb0218))
+
+	ROM_REGION(0x20000, INTERPRO_FLASH_TAG "_hi", 0)
+	ROM_LOAD_OPTIONAL("y226.u67", 0x00000, 0x20000, CRC(54d95730) SHA1(a4e114dee1567d8aa31eed770f7cc366588f395c))
 ROM_END
 
 ROM_START(ip2500)
@@ -696,8 +697,11 @@ ROM_START(ip2500)
 	ROM_SYSTEM_BIOS(0, "ip2500", "InterPro 2500 EPROM")
 	ROMX_LOAD("ip2500_eprom.bin", 0x00000, 0x20000, NO_DUMP, ROM_BIOS(1))
 
-	ROM_REGION16_LE(0x0040000, INTERPRO_EEPROM_TAG, 0)
-	ROM_LOAD_OPTIONAL("c4saph.bin", 0x00000, 0x40000, CRC(a0c0899f) SHA1(dda6fbca81f9885a1a76ca3c25e80463a83a0ef7))
+	ROM_REGION(0x20000, INTERPRO_FLASH_TAG "_lo", 0)
+	ROM_LOAD_OPTIONAL("y225.u76", 0x00000, 0x20000, CRC(46c0b105) SHA1(7c4a104e4fb3d0e5e8db7c911cdfb3f5c4fb0218))
+
+	ROM_REGION(0x20000, INTERPRO_FLASH_TAG "_hi", 0)
+	ROM_LOAD_OPTIONAL("y226.u67", 0x00000, 0x20000, CRC(54d95730) SHA1(a4e114dee1567d8aa31eed770f7cc366588f395c))
 ROM_END
 
 ROM_START(ip2700)
@@ -708,8 +712,11 @@ ROM_START(ip2700)
 	ROM_SYSTEM_BIOS(0, "ip2700", "InterPro 2700 EPROM")
 	ROMX_LOAD("mprgz530a__9405181.u35", 0x00000, 0x20000, CRC(467ce7bd) SHA1(53faee40d5df311f53b24c930e434cbf94a5c4aa), ROM_BIOS(1))
 
-	ROM_REGION16_LE(0x0040000, INTERPRO_EEPROM_TAG, 0)
-	ROM_LOAD_OPTIONAL("c4saph.bin", 0x00000, 0x40000, CRC(a0c0899f) SHA1(dda6fbca81f9885a1a76ca3c25e80463a83a0ef7))
+	ROM_REGION(0x20000, INTERPRO_FLASH_TAG "_lo", 0)
+	ROM_LOAD_OPTIONAL("y225.u76", 0x00000, 0x20000, CRC(46c0b105) SHA1(7c4a104e4fb3d0e5e8db7c911cdfb3f5c4fb0218))
+
+	ROM_REGION(0x20000, INTERPRO_FLASH_TAG "_hi", 0)
+	ROM_LOAD_OPTIONAL("y226.u67", 0x00000, 0x20000, CRC(54d95730) SHA1(a4e114dee1567d8aa31eed770f7cc366588f395c))
 ROM_END
 
 ROM_START(ip2800)
@@ -720,8 +727,11 @@ ROM_START(ip2800)
 	ROM_SYSTEM_BIOS(0, "ip2800", "InterPro 2800 EPROM")
 	ROMX_LOAD("ip2800_eprom.bin", 0x00000, 0x20000, CRC(467ce7bd) SHA1(53faee40d5df311f53b24c930e434cbf94a5c4aa), ROM_BIOS(1))
 
-	ROM_REGION16_LE(0x0040000, INTERPRO_EEPROM_TAG, 0)
-	ROM_LOAD_OPTIONAL("c4saph.bin", 0x00000, 0x40000, CRC(a0c0899f) SHA1(dda6fbca81f9885a1a76ca3c25e80463a83a0ef7))
+	ROM_REGION(0x20000, INTERPRO_FLASH_TAG "_lo", 0)
+	ROM_LOAD_OPTIONAL("y225.u76", 0x00000, 0x20000, CRC(46c0b105) SHA1(7c4a104e4fb3d0e5e8db7c911cdfb3f5c4fb0218))
+
+	ROM_REGION(0x20000, INTERPRO_FLASH_TAG "_hi", 0)
+	ROM_LOAD_OPTIONAL("y226.u67", 0x00000, 0x20000, CRC(54d95730) SHA1(a4e114dee1567d8aa31eed770f7cc366588f395c))
 ROM_END
 
 /*    YEAR   NAME        PARENT  COMPAT  MACHINE     INPUT     CLASS            INIT      COMPANY         FULLNAME         FLAGS */

@@ -1155,6 +1155,30 @@ ADDRESS_MAP_END
 
 
 /***************************************************************************
+                                   Pac-Eight
+***************************************************************************/
+
+//TODO: leds need verifying
+
+static ADDRESS_MAP_START( paceight_map, AS_PROGRAM, 16, cave_state )
+	AM_RANGE(0x000000, 0x07ffff) AM_ROM                                                                 // ROM
+	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_SHARE("nvram")                                               // RAM (battery)
+	AM_RANGE(0x200000, 0x207fff) AM_RAM AM_SHARE("spriteram.0")       // Sprites
+	AM_RANGE(0x208000, 0x20ffff) AM_RAM AM_SHARE("spriteram_2.0")                         // Sprite bank 2
+	AM_RANGE(0x300000, 0x307fff) AM_RAM_WRITE(cave_vram_0_w) AM_SHARE("vram.0")         // Layer 0
+	AM_RANGE(0x400000, 0x40ffff) AM_RAM AM_SHARE("paletteram.0")  // Palette
+	AM_RANGE(0x500000, 0x500001) AM_READ_PORT("IN0")                                                    // Inputs + EEPROM + Hopper
+	AM_RANGE(0x500002, 0x500003) AM_READ_PORT("IN1")                                                    // Inputs
+	AM_RANGE(0x600000, 0x600005) AM_WRITEONLY AM_SHARE("vctrl.0")                       // Layer 0 Control
+	AM_RANGE(0x700000, 0x700007) AM_READ(cave_irq_cause_r)                                              // IRQ Cause
+	AM_RANGE(0x700068, 0x700069) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)              // Watchdog
+	AM_RANGE(0x700000, 0x70007f) AM_WRITEONLY AM_SHARE("videoregs.0")                     // Video Regs
+	AM_RANGE(0x800000, 0x800001) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff) // M6295
+	AM_RANGE(0xc00000, 0xc00001) AM_WRITE(pacslot_leds_w)                                               // Leds + Hopper
+	AM_RANGE(0xe00000, 0xe00001) AM_WRITE(tjumpman_eeprom_lsb_w)                            // EEPROM
+ADDRESS_MAP_END
+
+/***************************************************************************
                                     Uo Poko
 ***************************************************************************/
 
@@ -1728,7 +1752,7 @@ static INPUT_PORTS_START( pacslot )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_OTHER   ) PORT_NAME( "Pac-Man" ) PORT_CODE(KEYCODE_Y)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_GAMBLE_PAYOUT )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_NAME( "Bet" )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, cave_state,tjumpman_hopper_r, nullptr)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, cave_state, tjumpman_hopper_r, nullptr)
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1743,6 +1767,16 @@ static INPUT_PORTS_START( pacslot )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( paceight )
+	PORT_INCLUDE( pacslot )
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_OTHER   ) PORT_NAME( "Left" ) PORT_CODE(KEYCODE_Y)
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER   ) PORT_NAME( "Right" ) PORT_CODE(KEYCODE_N)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME( "Max Bet" )
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( ppsatan )
 	PORT_START("SYSTEM")   // $200000
@@ -2569,7 +2603,10 @@ static MACHINE_CONFIG_START( pacslot )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-
+static MACHINE_CONFIG_DERIVED( paceight, pacslot )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(paceight_map)
+MACHINE_CONFIG_END
 /***************************************************************************
                                Poka Poka Satan
 ***************************************************************************/
@@ -4244,9 +4281,52 @@ ROM_START( pacslot )
 	ROM_REGION( 0x117 * 3, "plds", 0 )
 	ROM_LOAD( "n44u1a.u1",   0x117*0, 0x117, NO_DUMP )  // GAL16V8B-15LP (Protected)
 	ROM_LOAD( "n44u3a.u3",   0x117*1, 0x117, NO_DUMP )  // GAL16V8B-15LP (Protected)
-	ROM_LOAD( "n44u51a.u51", 0x117*2, 0x117, NO_DUMP )  // GAL16V8B-15LP (Protected)
+	ROM_LOAD( "n44u51a.u51", 0x117*2, 0x117, CRC(3c5e9bc5) SHA1(b4e04c4fa91ff33542b73971f67e71d13e24c5ec) )  // GAL16V8B-15LP (Protected, dumped from the paceight PCB)
 ROM_END
 
+
+/***************************************************************************
+
+  Pac-Eight by Namco, 1996 (according to http://pacman.com/ja/museum/index.html)
+  Namco N-44 EM VIDEO platform, PCB C0348
+
+  TMP 68HC000P-16
+
+  013 9341E7002
+  038 9635WY003
+
+  OKI M6295 x 2
+
+  Battery
+  93C46 EEPROM (at U24)
+
+  28MHz XTAL
+
+***************************************************************************/
+
+ROM_START( paceight )
+	ROM_REGION( 0x80000, "maincpu", 0 )        /* 68000 code */
+	ROM_LOAD16_WORD_SWAP( "pae1-mpro.u41", 0x00000, 0x80000, CRC(bb026f97) SHA1(70d48f05275c64b25f37f03206219ef3ee9c0ee2) ) // 27c240
+
+	ROM_REGION( 0x100000 * 2, "sprites0", 0 )        /* Sprites: * 2 */
+	ROM_LOAD16_BYTE( "pae1-obj0.u52", 0x00000, 0x80000, CRC(2cd99155) SHA1(146ed2b3f2763232a60e6b238a16067d3ccfa959) ) // 27c040
+	ROM_LOAD16_BYTE( "pae1-obj1.u53", 0x00001, 0x80000, CRC(9ae2685b) SHA1(5eed5f00d28d803358c8ffaf42c4979af23a0a8c) ) // ""
+
+	ROM_REGION( 0x80000, "layer0", 0 )  /* Layer 0 */
+	ROM_LOAD( "pae1-cha0.u60", 0x00000, 0x40000, CRC(757263e3) SHA1(668060e9e209752474f48362752a3f819ff82d72) ) // 27c020? not readable
+	ROM_LOAD( "pae1-cha1.u61", 0x40000, 0x40000, CRC(0396d241) SHA1(79382805fa4486d8dae792f9afc0f02aee1bbb33) ) // ""
+
+	ROM_REGION( 0x40000, "oki1", 0 )    /* OKIM6295 #1 Samples */
+	ROM_LOAD( "pae1-vo10.u27", 0x00000, 0x40000, CRC(0be7b94f) SHA1(4179e2ab2d2d1df0cc6cfd71e277ea114578f147) ) // 27c? not readable
+
+	ROM_REGION( 0x40000, "oki2", ROMREGION_ERASE00 )    /* OKIM6295 #2 Samples */
+	// empty ROM socket
+
+	ROM_REGION( 0x117 * 3, "plds", 0 )
+	ROM_LOAD( "n44u1c.u1",   0x117*0, 0x117, CRC(903fc2d8) SHA1(becbae356efde873225ef64af462d9702aac03f0) )  // GAL16V8B-15LP
+	ROM_LOAD( "n44u3c.u3",   0x117*1, 0x117, CRC(72201412) SHA1(6ad7d22e612e27343eac5c38f00d548df644d52c) )  // GAL16V8B-15LP
+	ROM_LOAD( "n44u51a.u51", 0x117*2, 0x117, CRC(3c5e9bc5) SHA1(b4e04c4fa91ff33542b73971f67e71d13e24c5ec) )  // GAL16V8B-15LP
+ROM_END
 
 /***************************************************************************
 
@@ -5346,7 +5426,8 @@ GAME( 1996, agalletah,   agallet,  sailormn, cave,     cave_state, agallet,   RO
 
 GAME( 1996, hotdogst,    0,        hotdogst, cave,     cave_state, hotdogst,  ROT90,  "Marble",                                 "Hotdog Storm (International)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1996, pacslot,     0,        pacslot,  pacslot,  cave_state, tjumpman,  ROT0,   "Namco",                                  "Pac-Slot", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, pacslot,     0,        pacslot,  pacslot,  cave_state, tjumpman,  ROT0,   "Namco",                                  "Pac-Slot",  MACHINE_SUPPORTS_SAVE )
+GAME( 1996, paceight,    0,        paceight, paceight, cave_state, tjumpman,  ROT0,   "Namco",                                  "Pac-Eight", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1996, ppsatan,     0,        ppsatan,  ppsatan,  cave_state, ppsatan,   ROT0,   "Kato Seisakujo Co., Ltd.",               "Poka Poka Satan (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
 

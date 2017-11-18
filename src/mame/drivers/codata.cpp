@@ -21,11 +21,10 @@ class codata_state : public driver_device
 {
 public:
 	codata_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_p_base(*this, "rambase"),
-		m_maincpu(*this, "maincpu")
-	{
-	}
+		: driver_device(mconfig, type, tag)
+		, m_p_base(*this, "rambase")
+		, m_maincpu(*this, "maincpu")
+	{ }
 
 private:
 	virtual void machine_reset() override;
@@ -33,7 +32,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 };
 
-static ADDRESS_MAP_START(codata_mem, AS_PROGRAM, 16, codata_state)
+static ADDRESS_MAP_START(mem_map, AS_PROGRAM, 16, codata_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x1fffff) AM_RAM AM_SHARE("rambase")
 	AM_RANGE(0x200000, 0x203fff) AM_ROM AM_REGION("user1", 0);
@@ -63,7 +62,7 @@ void codata_state::machine_reset()
 static MACHINE_CONFIG_START( codata )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000, XTAL_16MHz / 2)
-	MCFG_CPU_PROGRAM_MAP(codata_mem)
+	MCFG_CPU_PROGRAM_MAP(mem_map)
 
 	MCFG_DEVICE_ADD("uart", UPD7201_NEW, XTAL_16MHz / 4)
 	MCFG_Z80SIO_OUT_TXDA_CB(DEVWRITELINE("rs423a", rs232_port_device, write_txd))

@@ -16,7 +16,7 @@ static constexpr int defgain = 48;
 
 
 // device type definition
-DEFINE_DEVICE_TYPE(GOMOKU, gomoku_sound_device, "gomoku_sound", "Gomoku Narabe Renju Audio Custom")
+DEFINE_DEVICE_TYPE(GOMOKU, gomoku_sound_device, "gomoku_sound", "Gomoku Narabe Renju Custom Sound")
 
 
 //**************************************************************************

@@ -60,16 +60,20 @@
  *
  *  Video registers:
  *
- *  0:  Graphic layer(s) type: (others likely exist)
- *      bit 4 = 2 layers
+ *  0:  Control register:
+ *      bit 4 = PMODE - enable 2 layers
  *      bits 2-3 = layer 1 mode
  *      bits 0-1 = layer 0 mode
- *          mode: 1 = 16 colours, 2 = 256 colours, 3 = highcolour (16-bit)
- *                0 = disabled?
+ *          mode: 1 = 16 colours (PMODE=1 only), 2 = 256 colours (PMODE=0 only),
+ *                3 = highcolour (16-bit), 0 = display off
  *
- *  1:  Layer reverse (priority?) (bit 0)
- *      YM (bit 2) - unknown
- *      peltype (bits 4 and 5)
+ *  1:  Priority register (bit 0)
+ *      bit 0: PR1 - layer priority (0 = layer 0 before)
+ *      bit 2: YM - screen brightness (0 = high brightness)
+ *      bit 3: YS - 0 = valid.  Used for 256 colour external sync
+ *      bits 4-5: Palette select
+ *        0 = layer 0, 16 colours, 1 or 3 = 256 colours
+ *        2 = layer 1, 16 colours
  *
  *
  *  Sprite registers:
@@ -487,31 +491,50 @@ void towns_state::towns_update_palette()
 	uint8_t r = m_video.towns_palette_r[entry];
 	uint8_t g = m_video.towns_palette_g[entry];
 	uint8_t b = m_video.towns_palette_b[entry];
-	m_palette->set_pen_color(entry, r, g, b);
+	switch(m_video.towns_video_reg[1] & 0x30)  // Palette select
+	{
+		case 0x00:
+			m_palette16_0->set_pen_color(entry, r, g, b);
+			break;
+		case 0x20:
+			m_palette16_1->set_pen_color(entry, r, g, b);
+			break;
+		case 0x10:
+		case 0x30:
+			m_palette->set_pen_color(entry, r, g, b);
+			break;
+	}
 }
 
 /* Video/CRTC
  *
  * 0xfd90 - palette colour select
  * 0xfd92/4/6 - BRG value
- * 0xfd98-9f  - degipal(?)
+ * 0xfd98-9f  - Digital palette registers (FMR-50 compatibility)
  */
 READ8_MEMBER(towns_state::towns_video_fd90_r)
 {
 	uint8_t ret = 0;
 	uint16_t xpos;
+	palette_device* pal;
 
+	if(m_video.towns_video_reg[1] & 0x10)
+		pal = m_palette;
+	else if(m_video.towns_video_reg[1] & 0x20)
+		pal = m_palette16_1;
+	else
+		pal = m_palette16_0;
 //    if(LOG_VID) logerror("VID: read port %04x\n",offset+0xfd90);
 	switch(offset)
 	{
 		case 0x00:
 			return m_video.towns_palette_select;
 		case 0x02:
-			return m_video.towns_palette_b[m_video.towns_palette_select];
+			return pal->pen_color(m_video.towns_palette_select).b();
 		case 0x04:
-			return m_video.towns_palette_r[m_video.towns_palette_select];
+			return pal->pen_color(m_video.towns_palette_select).r();
 		case 0x06:
-			return m_video.towns_palette_g[m_video.towns_palette_select];
+			return pal->pen_color(m_video.towns_palette_select).g();
 		case 0x08:
 		case 0x09:
 		case 0x0a:
@@ -1249,7 +1272,8 @@ void towns_state::towns_crtc_draw_scan_layer_16(bitmap_rgb32 &bitmap,const recta
 	int hzoom = 1;
 	int linesize;
 	uint32_t scroll;
-
+	palette_device* pal = (layer == 0) ? m_palette16_0 : m_palette16_1;
+	
 	if(m_video.towns_display_page_sel != 0)
 		off = 0x20000;
 
@@ -1266,7 +1290,7 @@ void towns_state::towns_crtc_draw_scan_layer_16(bitmap_rgb32 &bitmap,const recta
 		if(!(m_video.towns_video_reg[0] & 0x10))
 			return;
 		if(!(m_video.towns_crtc_reg[28] & 0x10))
-			off += m_video.towns_crtc_reg[21];  // initial offset
+			off += m_video.towns_crtc_reg[21] << 2;  // initial offset
 		else
 		{
 			scroll = ((m_video.towns_crtc_reg[21] & 0xfc00)<<2) | (((m_video.towns_crtc_reg[21] & 0x3ff)<<2));
@@ -1278,7 +1302,7 @@ void towns_state::towns_crtc_draw_scan_layer_16(bitmap_rgb32 &bitmap,const recta
 	else
 	{
 		if(!(m_video.towns_crtc_reg[28] & 0x20))
-			off += m_video.towns_crtc_reg[17];  // initial offset
+			off += m_video.towns_crtc_reg[17] << 2;  // initial offset
 		else
 		{
 			scroll = ((m_video.towns_crtc_reg[17] & 0xfc00)<<2) | (((m_video.towns_crtc_reg[17] & 0x3ff)<<2));
@@ -1301,12 +1325,12 @@ void towns_state::towns_crtc_draw_scan_layer_16(bitmap_rgb32 &bitmap,const recta
 			colour = m_towns_gfxvram[off+(layer*0x40000)] >> 4;
 			if(colour != 0)
 			{
-				bitmap.pix32(scanline, x+1) = m_palette->pen(colour);
+				bitmap.pix32(scanline, x+1) = pal->pen(colour);
 			}
 			colour = m_towns_gfxvram[off+(layer*0x40000)] & 0x0f;
 			if(colour != 0)
 			{
-				bitmap.pix32(scanline, x) = m_palette->pen(colour);
+				bitmap.pix32(scanline, x) = pal->pen(colour);
 			}
 			off++;
 		}
@@ -1323,14 +1347,14 @@ void towns_state::towns_crtc_draw_scan_layer_16(bitmap_rgb32 &bitmap,const recta
 			colour = m_towns_gfxvram[off+(layer*0x40000)] >> 4;
 			if(colour != 0)
 			{
-				bitmap.pix32(scanline, x+2) = m_palette->pen(colour);
-				bitmap.pix32(scanline, x+3) = m_palette->pen(colour);
+				bitmap.pix32(scanline, x+2) = pal->pen(colour);
+				bitmap.pix32(scanline, x+3) = pal->pen(colour);
 			}
 			colour = m_towns_gfxvram[off+(layer*0x40000)] & 0x0f;
 			if(colour != 0)
 			{
-				bitmap.pix32(scanline, x) = m_palette->pen(colour);
-				bitmap.pix32(scanline, x+1) = m_palette->pen(colour);
+				bitmap.pix32(scanline, x) = pal->pen(colour);
+				bitmap.pix32(scanline, x+1) = pal->pen(colour);
 			}
 			off++;
 		}
@@ -1347,16 +1371,16 @@ void towns_state::towns_crtc_draw_scan_layer_16(bitmap_rgb32 &bitmap,const recta
 			colour = m_towns_gfxvram[off+(layer*0x40000)] >> 4;
 			if(colour != 0)
 			{
-				bitmap.pix32(scanline, x+3) = m_palette->pen(colour);
-				bitmap.pix32(scanline, x+4) = m_palette->pen(colour);
-				bitmap.pix32(scanline, x+5) = m_palette->pen(colour);
+				bitmap.pix32(scanline, x+3) = pal->pen(colour);
+				bitmap.pix32(scanline, x+4) = pal->pen(colour);
+				bitmap.pix32(scanline, x+5) = pal->pen(colour);
 			}
 			colour = m_towns_gfxvram[off+(layer*0x40000)] & 0x0f;
 			if(colour != 0)
 			{
-				bitmap.pix32(scanline, x) = m_palette->pen(colour);
-				bitmap.pix32(scanline, x+1) = m_palette->pen(colour);
-				bitmap.pix32(scanline, x+2) = m_palette->pen(colour);
+				bitmap.pix32(scanline, x) = pal->pen(colour);
+				bitmap.pix32(scanline, x+1) = pal->pen(colour);
+				bitmap.pix32(scanline, x+2) = pal->pen(colour);
 			}
 			off++;
 		}
@@ -1373,18 +1397,18 @@ void towns_state::towns_crtc_draw_scan_layer_16(bitmap_rgb32 &bitmap,const recta
 			colour = m_towns_gfxvram[off+(layer*0x40000)] >> 4;
 			if(colour != 0)
 			{
-				bitmap.pix32(scanline, x+4) = m_palette->pen(colour);
-				bitmap.pix32(scanline, x+5) = m_palette->pen(colour);
-				bitmap.pix32(scanline, x+6) = m_palette->pen(colour);
-				bitmap.pix32(scanline, x+7) = m_palette->pen(colour);
+				bitmap.pix32(scanline, x+4) = pal->pen(colour);
+				bitmap.pix32(scanline, x+5) = pal->pen(colour);
+				bitmap.pix32(scanline, x+6) = pal->pen(colour);
+				bitmap.pix32(scanline, x+7) = pal->pen(colour);
 			}
 			colour = m_towns_gfxvram[off+(layer*0x40000)] & 0x0f;
 			if(colour != 0)
 			{
-				bitmap.pix32(scanline, x) = m_palette->pen(colour);
-				bitmap.pix32(scanline, x+1) = m_palette->pen(colour);
-				bitmap.pix32(scanline, x+2) = m_palette->pen(colour);
-				bitmap.pix32(scanline, x+3) = m_palette->pen(colour);
+				bitmap.pix32(scanline, x) = pal->pen(colour);
+				bitmap.pix32(scanline, x+1) = pal->pen(colour);
+				bitmap.pix32(scanline, x+2) = pal->pen(colour);
+				bitmap.pix32(scanline, x+3) = pal->pen(colour);
 			}
 			off++;
 		}
@@ -1401,20 +1425,20 @@ void towns_state::towns_crtc_draw_scan_layer_16(bitmap_rgb32 &bitmap,const recta
 			colour = m_towns_gfxvram[off+(layer*0x40000)] >> 4;
 			if(colour != 0)
 			{
-				bitmap.pix32(scanline, x+5) = m_palette->pen(colour);
-				bitmap.pix32(scanline, x+6) = m_palette->pen(colour);
-				bitmap.pix32(scanline, x+7) = m_palette->pen(colour);
-				bitmap.pix32(scanline, x+8) = m_palette->pen(colour);
-				bitmap.pix32(scanline, x+9) = m_palette->pen(colour);
+				bitmap.pix32(scanline, x+5) = pal->pen(colour);
+				bitmap.pix32(scanline, x+6) = pal->pen(colour);
+				bitmap.pix32(scanline, x+7) = pal->pen(colour);
+				bitmap.pix32(scanline, x+8) = pal->pen(colour);
+				bitmap.pix32(scanline, x+9) = pal->pen(colour);
 			}
 			colour = m_towns_gfxvram[off+(layer*0x40000)] & 0x0f;
 			if(colour != 0)
 			{
-				bitmap.pix32(scanline, x) = m_palette->pen(colour);
-				bitmap.pix32(scanline, x+1) = m_palette->pen(colour);
-				bitmap.pix32(scanline, x+2) = m_palette->pen(colour);
-				bitmap.pix32(scanline, x+3) = m_palette->pen(colour);
-				bitmap.pix32(scanline, x+4) = m_palette->pen(colour);
+				bitmap.pix32(scanline, x) = pal->pen(colour);
+				bitmap.pix32(scanline, x+1) = pal->pen(colour);
+				bitmap.pix32(scanline, x+2) = pal->pen(colour);
+				bitmap.pix32(scanline, x+3) = pal->pen(colour);
+				bitmap.pix32(scanline, x+4) = pal->pen(colour);
 			}
 			off++;
 		}

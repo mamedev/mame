@@ -99,7 +99,7 @@ constexpr unsigned PRTSTS_PAPER_OK_BIT  = 7;
 constexpr unsigned PRTSTS_DATARDY_BIT   = 6;
 constexpr unsigned PRTSTS_PRTRDY_BIT    = 0;
 constexpr unsigned PRTCTL_GRAPHIC_BIT   = 7;
-constexpr unsigned PRTCTL_POWERUP_BIT   = 6;
+//constexpr unsigned PRTCTL_POWERUP_BIT = 6;
 constexpr unsigned PRTCTL_READGEN_BIT   = 5;
 // Time to print a line (nominal speed is 2 lines/s)
 constexpr unsigned PRT_BUSY_MSEC        = 500;
@@ -112,7 +112,7 @@ constexpr unsigned PRT_ALPHA_HEIGHT     = 10;
 // Width of character cells
 constexpr unsigned PRT_CELL_WIDTH       = 7;
 // Height of graphic rows
-constexpr unsigned PRT_GRAPH_HEIGHT     = 8;
+//constexpr unsigned PRT_GRAPH_HEIGHT   = 8;
 // Width of graphic sweeps
 constexpr unsigned PRT_GRAPH_WIDTH      = 192;
 // Width of printhead sweeps

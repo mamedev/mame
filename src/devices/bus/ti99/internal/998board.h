@@ -446,41 +446,50 @@ private:
 	void set_status(int bit, bool set) { m_status = (set)? (m_status | bit) : (m_status & ~bit); }
 	void update_hexbus();
 
+	// Registers
 	uint8_t m_data;
 	uint8_t m_status;
 	uint8_t m_control;
 	uint8_t m_xmit;
 
+	// Last hexbus value; when the new value is different, send it via the hexbus
 	uint8_t m_lasthxvalue;
 
-	int m_clkcount;
+	bool m_bav;         // Bus available; when true, a communication is about to happen
+	bool m_sbav;        // Stable BAV; the BAV signal is true for two clock cycles
+	bool m_sbavold;     // Old SBAV state
+	bool m_bavhold;     // For computing the SBAV signal
 
-	bool m_sbav;
-	bool m_sbavold;
-	bool m_bav;
-	bool m_bavhold;
+	bool m_hsk;         // Handshake line; when true, a bus member needs more time to process the message
+	bool m_shsk;        // Stable HSK
+	bool m_shskold;     // see above
+	bool m_hskhold;     // see above
 
-	bool m_shsk;
-	bool m_shskold;
-	bool m_hsk;
-	bool m_hskhold;
+	// Page 3 in OSO schematics: Write timing
+	bool m_wq1;         // Flipflop 1
+	bool m_wq1old;      // Previous state
+	bool m_wq2;         // Flipflop 2
+	bool m_wq2old;      // Previous state
+	bool m_wnp;         // Write nibble selection; true means upper 4 bits
+	bool m_wbusyold;    // Old state of the WBUSY line
+	bool m_sendbyte;    // Byte has been loaded into the XMIT register
+	bool m_wrset;       // Start sending
+	bool m_counting;    // Counter running
+	int m_clkcount;     // Counter for 30 cycles
 
-	// Page 3 in OSO schematics
-	bool m_wq1;
-	bool m_wq1old;
-	bool m_wq2;
-	bool m_wq2old;
-	bool m_wnp;
-	bool m_wbusy;
-	bool m_wbusyold;
-	bool m_sendbyte;
+	// Page 4 in OSO schematics: Read timing
+	bool m_rq1;         // Flipflop 1
+	bool m_rq2;         // Flipflop 2
+	bool m_rq2old;      // Previous state
+	bool m_rnib;        // Read nibble, true means upper 4 bits
+	bool m_rnibcold;    // Needed to detect the raising edge
+	bool m_rdset;       // Start reading
+	bool m_rdsetold;    // Old state
+	bool m_msns;        // Upper 4 bits
+	bool m_lsns;        // Lower 4 bits
 
-	bool m_wrst;
-
-	bool m_counting;
-
-	bool m_rq2;
-	bool m_rq2old;
+	// Page 6 (RHSUS*)
+	bool m_rhsus;       // Needed to assert the HSK line until the CPU has read the byte
 };
 
 class mainboard8_device : public device_t
