@@ -22,7 +22,7 @@ This document covers all the known Namco System 10 games, including....
 *GAHAHA Ippatsu-dou 2                            (C) Namco/Metro, 2001
 Gamshara (10021 Ver.A)                           (C) Mitchell, 2003
 Gekitoride-Jong Space (10011 Ver.A)              (C) Namco/Metro, 2001
-*Golgo-13 3 : Juusei no Chinkonka                (C) Namco/8ing/Raizing, 2001
+Golgo-13 Part 3 : Juusei no Chinkonka            (C) Namco/8ing/Raizing, 2001
 *Hard Puncher Hajime no Ippo 2 Ouja e no Chousen (C) Namco/Taito, 2002
 *Honne Hakkenki                                  (C) Namco, 2001
 Kotoba no Puzzle Mojipittan (KPM1 Ver.A)         (C) Namco, 2001
@@ -264,6 +264,44 @@ Kono Tako                             10021 Ver.A   KC034A   8E, 8D
 
       Note
       1. The ROM PCB has locations for 16x 128MBit FlashROMs (Total capacity = 2048MBits) but usually only a few are populated.
+
+********
+*Type 3*
+********
+System10 MEM(P3) PCB 8906962201 (8906972201)
+|-------------------------------------|
+|                             K6R1008 |
+|                       |-------|     +-
+|                       |       |     +-
+|                       |CY37256|     +-
+|                       |VP208  |     +-
+|                       |       |     +-
+|                       |-------|     +-
+|                                     |
+|               CY37256VP208          |
+|           HY57V641620               |
+|                                     |
+|                                     |
+|                  16.344MHz          |
+|                                     |
+|     5      4                        |
+|                                     |
+|     3      2                        |
+|                                     |
+|     1      0                        |
+|                                     |
+|-------------------------------------|
+Notes:
+      CY37128VP160: CY37128VP160 Cypress Complex Programmable Logic Device (TQFP160)
+      0-5         : Samsung Electronics K3N9V1000A-YC 128MBit MASK ROM (TSOP48)
+      6 pin header: (purpose unknown, probably for programming the CPLD)
+
+This PCB is used on:
+
+                              MEM PCB
+Game                          Sticker      KEYCUS   ROMs Populated
+------------------------------------------------------------------------------------
+Golgo 13 Juusei no Chinkonka  GLT1 Ver.A   KC009A   GLT1VERA.0, GLT1VERA.1, GLT1VERA.2, GLT1VERA.3, GLT1VERA.4, GLT1VERA.5
 */
 
 #include "emu.h"
@@ -945,6 +983,20 @@ ROM_START( gjspace )
 	ROM_LOAD( "10011a_3.bin", 0x3180000, 0x1080000, CRC(fb0de5ca) SHA1(50a462a52ff4a0bc112b9d89f2b2d032c60cf59c) )
 ROM_END
 
+
+ROM_START( g13jnc )
+	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 ) /* bios */
+	ROM_FILL( 0x0000000, 0x400000, 0x55 )
+
+	ROM_REGION16_LE( 0x6300000, "user2", 0 ) /* main prg */
+	ROM_LOAD( "GLT1_Ver.A.0", 0x0000000, 0x1080000, CRC(e60f78d3) SHA1(5c876ac7366b5c46b5229a6b6f694ad222f36195) )
+	ROM_LOAD( "GLT1_Ver.A.1", 0x1080000, 0x1080000, CRC(c3f31dd9) SHA1(05e6d39f33191979bcc00a585b64904a077000dc) )
+	ROM_LOAD( "GLT1_Ver.A.2", 0x2100000, 0x1080000, CRC(e464e03a) SHA1(751f6bd753dacbb881fb47bc1b146ef59245bd10) )
+	ROM_LOAD( "GLT1_Ver.A.3", 0x3180000, 0x1080000, CRC(f7486979) SHA1(a44c33ae7004e79fe66c6d2cba3d11671ce2582c) )
+	ROM_LOAD( "GLT1_Ver.A.4", 0x4200000, 0x1080000, CRC(e39969b4) SHA1(3348839c0cc4a4bcaa7803ef22981420c527e1a4) )
+	ROM_LOAD( "GLT1_Ver.A.5", 0x5280000, 0x1080000, CRC(a82800b4) SHA1(ce4cc479acdf7ac5a7237d07422ea3ee580d899a) )
+ROM_END
+
 ROM_START( mrdrilrg )
 	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 ) /* bios */
 	ROM_FILL( 0x0000000, 0x400000, 0x55 )
@@ -1070,6 +1122,7 @@ GAME( 2000, mrdrlr2a,  mrdrilr2, ns10_mrdrilr2, namcos10, namcos10_state, mrdril
 GAME( 2000, ptblank3,  0,        namcos10_memn, namcos10, namcos10_state, gunbalna, ROT0, "Namco", "Point Blank 3 (Asia, GNN2 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2000, gunbalina, ptblank3, namcos10_memn, namcos10, namcos10_state, gunbalna, ROT0, "Namco", "Gunbalina (Japan, GNN1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2001, gjspace,   0,        ns10_gjspace , namcos10, namcos10_state, gjspace,  ROT0, "Namco / Metro", "Gekitoride-Jong Space (10011 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2001, g13jnc,    0,        namcos10_memn, namcos10, namcos10_state, 0,        ROT0, "Eighting / Raizing / Namco", "Golgo 13: Juusei no Chinkonka (Japan, GLT1 VER.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2001, mrdrilrg,  0,        namcos10_memn, namcos10, namcos10_state, mrdrilrg, ROT0, "Namco", "Mr. Driller G (Japan, DRG1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // PORT_4WAY joysticks
 GAME( 2001, mrdrilrga, mrdrilrg, namcos10_memn, namcos10, namcos10_state, mrdrilrg, ROT0, "Namco", "Mr. Driller G ALT (Japan, DRG1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // PORT_4WAY joysticks
 GAME( 2001, knpuzzle,  0,        ns10_knpuzzle, namcos10, namcos10_state, knpuzzle, ROT0, "Namco", "Kotoba no Puzzle Mojipittan (Japan, KPM1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
