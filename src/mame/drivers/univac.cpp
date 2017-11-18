@@ -220,6 +220,7 @@ static MACHINE_CONFIG_START( uts20 )
 
 	MCFG_DEVICE_ADD("uart", Z80SIO, XTAL_4MHz)
 	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MCFG_Z80SIO_OUT_TXDA_CB(DEVWRITELINE("uart", z80sio_device, rxa_w)) // FIXME: hacked in permanent loopback to pass test
 
 	/* Sound */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
