@@ -92,14 +92,12 @@ WRITE8_MEMBER( univac_state::port43_w )
 
 READ8_MEMBER( univac_state::vram_r )
 {
-	offs_t offs = (offset & 0x1fff) ^ (BIT(offset, 13) ? 0x2000 : 0) ^ (m_screen_num ? 0x2000 : 0);
-	return m_p_videoram[offs];
+	return m_p_videoram[offset ^ (m_screen_num ? 0x2000 : 0)];
 }
 
 WRITE8_MEMBER( univac_state::vram_w )
 {
-	offs_t offs = (offset & 0x1fff) ^ (BIT(offset, 13) ? 0x2000 : 0) ^ (m_screen_num ? 0x2000 : 0);
-	m_p_videoram[offs] = data;
+	m_p_videoram[offset ^ (m_screen_num ? 0x2000 : 0)] = data;
 }
 
 
