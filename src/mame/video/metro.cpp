@@ -708,8 +708,14 @@ if (machine().input().code_pressed(KEYCODE_Z))
 #endif
 
 	if (m_has_zoom)
+	{
+		/* TODO: bit 5 of reg 7 is off when ROZ is supposed to be disabled
+		 * (Blazing Tornado title screen/character select/ending and Grand Striker 2 title/how to play transition)
+		 */
+		
 		m_k053936->zoom_draw(screen, bitmap, cliprect, m_k053936_tilemap, 0, 0, 1);
-
+	}
+	
 	for (pri = 3; pri >= 0; pri--)
 		draw_layers(screen, bitmap, cliprect, pri, layers_ctrl);
 

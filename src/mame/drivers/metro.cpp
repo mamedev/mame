@@ -778,7 +778,7 @@ static ADDRESS_MAP_START( balcube_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x6788a4, 0x6788a5) AM_WRITEONLY AM_SHARE("irq_enable")                // IRQ Enable
 	AM_RANGE(0x6788aa, 0x6788ab) AM_WRITEONLY AM_SHARE("rombank")                   // Rom Bank
 	AM_RANGE(0x6788ac, 0x6788ad) AM_WRITEONLY AM_SHARE("screenctrl")                // Screen Control
-	AM_RANGE(0x679700, 0x679713) AM_WRITEONLY AM_SHARE("videoregs")                 // Video Registers
+	AM_RANGE(0x679700, 0x679713) AM_RAM AM_SHARE("videoregs")                 // Video Registers
 	AM_RANGE(0xf00000, 0xf0ffff) AM_RAM AM_MIRROR(0x0f0000)                         // RAM (mirrored)
 ADDRESS_MAP_END
 
@@ -807,7 +807,7 @@ static ADDRESS_MAP_START( daitoa_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x1788a4, 0x1788a5) AM_WRITEONLY AM_SHARE("irq_enable")                // IRQ Enable
 	AM_RANGE(0x1788aa, 0x1788ab) AM_WRITEONLY AM_SHARE("rombank")                   // Rom Bank
 	AM_RANGE(0x1788ac, 0x1788ad) AM_WRITEONLY AM_SHARE("screenctrl")                // Screen Control
-	AM_RANGE(0x179700, 0x179713) AM_WRITEONLY AM_SHARE("videoregs")                 // Video Registers
+	AM_RANGE(0x179700, 0x179713) AM_RAM AM_SHARE("videoregs")                 // Video Registers
 	AM_RANGE(0x200000, 0x200001) AM_READ_PORT("IN0")                                // Inputs
 	AM_RANGE(0x200002, 0x200003) AM_READ_PORT("IN1")                                //
 	AM_RANGE(0x200006, 0x200007) AM_READNOP                                         //
@@ -849,7 +849,7 @@ static ADDRESS_MAP_START( bangball_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0xe788a4, 0xe788a5) AM_WRITEONLY AM_SHARE("irq_enable")                // IRQ Enable
 	AM_RANGE(0xe788aa, 0xe788ab) AM_WRITEONLY AM_SHARE("rombank")                   // Rom Bank
 	AM_RANGE(0xe788ac, 0xe788ad) AM_WRITEONLY AM_SHARE("screenctrl")                // Screen Control
-	AM_RANGE(0xe79700, 0xe79713) AM_WRITEONLY AM_SHARE("videoregs")                 // Video Registers
+	AM_RANGE(0xe79700, 0xe79713) AM_RAM AM_SHARE("videoregs")                 // Video Registers
 	AM_RANGE(0xf00000, 0xf0ffff) AM_RAM AM_MIRROR(0x0f0000)                         // RAM (mirrored)
 ADDRESS_MAP_END
 
@@ -877,7 +877,7 @@ static ADDRESS_MAP_START( batlbubl_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x1788a4, 0x1788a5) AM_WRITEONLY AM_SHARE("irq_enable")                // IRQ Enable
 	AM_RANGE(0x1788aa, 0x1788ab) AM_WRITEONLY AM_SHARE("rombank")                   // Rom Bank
 	AM_RANGE(0x1788ac, 0x1788ad) AM_WRITEONLY AM_SHARE("screenctrl")                // Screen Control
-	AM_RANGE(0x179700, 0x179713) AM_WRITEONLY AM_SHARE("videoregs")                 // Video Registers
+	AM_RANGE(0x179700, 0x179713) AM_RAM AM_SHARE("videoregs")                 // Video Registers
 	AM_RANGE(0x200000, 0x200001) AM_READ_PORT("IN1")                                // Inputs
 	AM_RANGE(0x200002, 0x200003) AM_READ_PORT("DSW0")                               //
 	AM_RANGE(0x200004, 0x200005) AM_READ_PORT("IN0")                                //
@@ -913,7 +913,7 @@ static ADDRESS_MAP_START( msgogo_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x1788a4, 0x1788a5) AM_WRITEONLY AM_SHARE("irq_enable")                // IRQ Enable
 	AM_RANGE(0x1788aa, 0x1788ab) AM_WRITEONLY AM_SHARE("rombank")                   // Rom Bank
 	AM_RANGE(0x1788ac, 0x1788ad) AM_WRITEONLY AM_SHARE("screenctrl")                // Screen Control
-	AM_RANGE(0x179700, 0x179713) AM_WRITEONLY AM_SHARE("videoregs")                 // Video Registers
+	AM_RANGE(0x179700, 0x179713) AM_RAM AM_SHARE("videoregs")                 // Video Registers
 	AM_RANGE(0x200000, 0x200001) AM_READ_PORT("COINS")                              // Inputs
 	AM_RANGE(0x200002, 0x200003) AM_READ_PORT("JOYS")                               //
 	AM_RANGE(0x200006, 0x200007) AM_READNOP                                         //
@@ -948,7 +948,7 @@ static ADDRESS_MAP_START( daitorid_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x4788a8, 0x4788a9) AM_WRITE(metro_soundlatch_w)                       // To Sound CPU
 	AM_RANGE(0x4788aa, 0x4788ab) AM_WRITEONLY AM_SHARE("rombank")                   // Rom Bank
 	AM_RANGE(0x4788ac, 0x4788ad) AM_WRITEONLY AM_SHARE("screenctrl")                // Screen Control
-	AM_RANGE(0x479700, 0x479713) AM_WRITEONLY AM_SHARE("videoregs")                 // Video Registers
+	AM_RANGE(0x479700, 0x479713) AM_RAM AM_SHARE("videoregs")                 // Video Registers
 	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_MIRROR(0x0f0000)                         // RAM (mirrored)
 	AM_RANGE(0xc00000, 0xc00001) AM_READ_PORT("IN0") AM_WRITE(metro_soundstatus_w)  // To Sound CPU
 	AM_RANGE(0xc00002, 0xc00003) AM_READ_PORT("IN1")                                //
@@ -983,7 +983,7 @@ static ADDRESS_MAP_START( dharma_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x8788a8, 0x8788a9) AM_WRITE(metro_soundlatch_w)                       // To Sound CPU
 	AM_RANGE(0x8788aa, 0x8788ab) AM_WRITEONLY AM_SHARE("rombank")                   // Rom Bank
 	AM_RANGE(0x8788ac, 0x8788ad) AM_WRITEONLY AM_SHARE("screenctrl")                // Screen Control
-	AM_RANGE(0x879700, 0x879713) AM_WRITEONLY AM_SHARE("videoregs")                 // Video Registers
+	AM_RANGE(0x879700, 0x879713) AM_RAM AM_SHARE("videoregs")                 // Video Registers
 	AM_RANGE(0xc00000, 0xc00001) AM_READ_PORT("IN0") AM_WRITE(metro_soundstatus_w)  // To Sound CPU
 	AM_RANGE(0xc00002, 0xc00003) AM_READ_PORT("IN1")                                //
 	AM_RANGE(0xc00004, 0xc00005) AM_READ_PORT("DSW0")                               //
@@ -1027,7 +1027,7 @@ static ADDRESS_MAP_START( karatour_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x876000, 0x876fff) AM_READWRITE(karatour_vram_1_r, karatour_vram_1_w) // Layer 1 (Part of)
 	AM_RANGE(0x877000, 0x877fff) AM_READWRITE(karatour_vram_2_r, karatour_vram_2_w) // Layer 2 (Part of)
 	AM_RANGE(0x878000, 0x8787ff) AM_RAM AM_SHARE("tiletable")                       // Tiles Set
-	AM_RANGE(0x878800, 0x878813) AM_WRITEONLY AM_SHARE("videoregs")                 // Video Registers
+	AM_RANGE(0x878800, 0x878813) AM_RAM AM_SHARE("videoregs")                 // Video Registers
 	AM_RANGE(0x878840, 0x87884d) AM_WRITE(metro_blitter_w) AM_SHARE("blitter_regs") // Tiles Blitter
 	AM_RANGE(0x878860, 0x87886b) AM_WRITE(metro_window_w) AM_SHARE("window")        // Tilemap Window
 	AM_RANGE(0x878870, 0x87887b) AM_WRITEONLY AM_SHARE("scroll")                    // Scroll
@@ -1069,7 +1069,7 @@ static ADDRESS_MAP_START( kokushi_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x8788a8, 0x8788a9) AM_WRITE(metro_soundlatch_w)                       // To Sound CPU
 	AM_RANGE(0x8788aa, 0x8788ab) AM_WRITEONLY AM_SHARE("rombank")                   // Rom Bank
 	AM_RANGE(0x8788ac, 0x8788ad) AM_WRITEONLY AM_SHARE("screenctrl")                // Screen Control
-	AM_RANGE(0x879700, 0x879713) AM_WRITEONLY AM_SHARE("videoregs")                 // Video Registers
+	AM_RANGE(0x879700, 0x879713) AM_RAM AM_SHARE("videoregs")                 // Video Registers
 	AM_RANGE(0xc00000, 0xc00001) AM_READ_PORT("IN0") AM_WRITE(metro_soundstatus_w)  // To Sound CPU
 	AM_RANGE(0xc00002, 0xc00003) AM_READ_PORT("IN1")                                // Inputs
 	AM_RANGE(0xc00004, 0xc00005) AM_READ_PORT("DSW0")                               //
@@ -1092,7 +1092,7 @@ static ADDRESS_MAP_START( lastfort_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x872000, 0x873fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    // Palette
 	AM_RANGE(0x874000, 0x874fff) AM_RAM AM_SHARE("spriteram")                       // Sprites
 	AM_RANGE(0x878000, 0x8787ff) AM_RAM AM_SHARE("tiletable")                       // Tiles Set
-	AM_RANGE(0x878800, 0x878813) AM_WRITEONLY AM_SHARE("videoregs")                 // Video Registers
+	AM_RANGE(0x878800, 0x878813) AM_RAM AM_SHARE("videoregs")                 // Video Registers
 	AM_RANGE(0x878840, 0x87884d) AM_WRITE(metro_blitter_w) AM_SHARE("blitter_regs") // Tiles Blitter
 	AM_RANGE(0x878860, 0x87886b) AM_WRITE(metro_window_w) AM_SHARE("window")        // Tilemap Window
 	AM_RANGE(0x878870, 0x87887b) AM_WRITEONLY AM_SHARE("scroll")                    // Scroll
@@ -1133,7 +1133,7 @@ static ADDRESS_MAP_START( lastforg_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x8f2000, 0x8f3fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    // Palette
 	AM_RANGE(0x8f4000, 0x8f4fff) AM_RAM AM_SHARE("spriteram")                       // Sprites
 	AM_RANGE(0x8f8000, 0x8f87ff) AM_RAM AM_SHARE("tiletable")                       // Tiles Set
-	AM_RANGE(0x8f8800, 0x8f8813) AM_WRITEONLY AM_SHARE("videoregs")                 // Video Registers
+	AM_RANGE(0x8f8800, 0x8f8813) AM_RAM AM_SHARE("videoregs")                 // Video Registers
 	AM_RANGE(0x8f8840, 0x8f884d) AM_WRITE(metro_blitter_w) AM_SHARE("blitter_regs") // Tiles Blitter
 	AM_RANGE(0x8f8860, 0x8f886b) AM_WRITE(metro_window_w) AM_SHARE("window")        // Tilemap Window
 	AM_RANGE(0x8f8870, 0x8f887b) AM_WRITEONLY AM_SHARE("scroll")                    // Scroll
@@ -1223,7 +1223,7 @@ static ADDRESS_MAP_START( gakusai_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x278880, 0x278881) AM_READ(gakusai_input_r)                           // Inputs
 	AM_RANGE(0x278882, 0x278883) AM_READ_PORT("IN0")                                //
 	AM_RANGE(0x278888, 0x278889) AM_WRITEONLY AM_SHARE("input_sel")                 // Inputs
-	AM_RANGE(0x279700, 0x279713) AM_WRITEONLY AM_SHARE("videoregs")                 // Video Registers
+	AM_RANGE(0x279700, 0x279713) AM_RAM AM_SHARE("videoregs")                 // Video Registers
 	AM_RANGE(0x400000, 0x400001) AM_WRITENOP                                        // ? 5
 	AM_RANGE(0x500000, 0x500001) AM_WRITE8(gakusai_oki_bank_lo_w, 0x00ff)           // Sound
 	AM_RANGE(0x600000, 0x600003) AM_DEVWRITE8("ymsnd", ym2413_device, write, 0x00ff)
@@ -1262,7 +1262,7 @@ static ADDRESS_MAP_START( gakusai2_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x678880, 0x678881) AM_READ(gakusai_input_r)                           // Inputs
 	AM_RANGE(0x678882, 0x678883) AM_READ_PORT("IN0")                                //
 	AM_RANGE(0x678888, 0x678889) AM_WRITEONLY AM_SHARE("input_sel")                 // Inputs
-	AM_RANGE(0x679700, 0x679713) AM_WRITEONLY AM_SHARE("videoregs")                 // Video Registers
+	AM_RANGE(0x679700, 0x679713) AM_RAM AM_SHARE("videoregs")                 // Video Registers
 	AM_RANGE(0x800000, 0x800001) AM_WRITENOP                                        // ? 5
 	AM_RANGE(0x900000, 0x900001) AM_WRITE8(gakusai_oki_bank_lo_w, 0x00ff)           // Sound bank
 	AM_RANGE(0xa00000, 0xa00001) AM_WRITE8(gakusai_oki_bank_hi_w, 0x00ff)           //
@@ -1325,7 +1325,7 @@ static ADDRESS_MAP_START( dokyusp_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x278880, 0x278881) AM_READ(gakusai_input_r)                           // Inputs
 	AM_RANGE(0x278882, 0x278883) AM_READ_PORT("IN0")                                //
 	AM_RANGE(0x278888, 0x278889) AM_WRITEONLY AM_SHARE("input_sel")                 //
-	AM_RANGE(0x279700, 0x279713) AM_WRITEONLY AM_SHARE("videoregs")                 // Video Registers
+	AM_RANGE(0x279700, 0x279713) AM_RAM AM_SHARE("videoregs")                 // Video Registers
 	AM_RANGE(0x400000, 0x400001) AM_WRITENOP                                        // ? 5
 	AM_RANGE(0x500000, 0x500001) AM_WRITE8(gakusai_oki_bank_lo_w, 0x00ff)           // Sound
 	AM_RANGE(0x600000, 0x600003) AM_DEVWRITE8("ymsnd", ym2413_device, write, 0x00ff)
@@ -1367,7 +1367,7 @@ static ADDRESS_MAP_START( dokyusei_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x478884, 0x478885) AM_READ_PORT("DSW0")                               // 2 x DSW
 	AM_RANGE(0x478886, 0x478887) AM_READ_PORT("DSW1")                               //
 	AM_RANGE(0x478888, 0x478889) AM_WRITEONLY AM_SHARE("input_sel")                 // Inputs
-	AM_RANGE(0x479700, 0x479713) AM_WRITEONLY AM_SHARE("videoregs")                 // Video Registers
+	AM_RANGE(0x479700, 0x479713) AM_RAM AM_SHARE("videoregs")                 // Video Registers
 	AM_RANGE(0x800000, 0x800001) AM_WRITE8(gakusai_oki_bank_hi_w, 0x00ff)           // Samples Bank?
 	AM_RANGE(0x900000, 0x900001) AM_WRITENOP                                        // ? 4
 	AM_RANGE(0xa00000, 0xa00001) AM_WRITE8(gakusai_oki_bank_lo_w, 0x00ff)           // Samples Bank
@@ -1434,7 +1434,7 @@ static ADDRESS_MAP_START( poitto_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0xc72000, 0xc73fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    // Palette
 	AM_RANGE(0xc74000, 0xc74fff) AM_RAM AM_SHARE("spriteram")                       // Sprites
 	AM_RANGE(0xc78000, 0xc787ff) AM_RAM AM_SHARE("tiletable")                       // Tiles Set
-	AM_RANGE(0xc78800, 0xc78813) AM_WRITEONLY AM_SHARE("videoregs")                 // Video Registers
+	AM_RANGE(0xc78800, 0xc78813) AM_RAM AM_SHARE("videoregs")                 // Video Registers
 	AM_RANGE(0xc78840, 0xc7884d) AM_WRITE(metro_blitter_w) AM_SHARE("blitter_regs") // Tiles Blitter
 	AM_RANGE(0xc78860, 0xc7886b) AM_WRITE(metro_window_w) AM_SHARE("window")        // Tilemap Window
 	AM_RANGE(0xc78870, 0xc7887b) AM_WRITEONLY AM_SHARE("scroll")                    // Scroll Regs
@@ -1470,7 +1470,7 @@ static ADDRESS_MAP_START( skyalert_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x872000, 0x873fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    // Palette
 	AM_RANGE(0x874000, 0x874fff) AM_RAM AM_SHARE("spriteram")                       // Sprites
 	AM_RANGE(0x878000, 0x8787ff) AM_RAM AM_SHARE("tiletable")                       // Tiles Set
-	AM_RANGE(0x878800, 0x878813) AM_WRITEONLY AM_SHARE("videoregs")                 // Video Registers
+	AM_RANGE(0x878800, 0x878813) AM_RAM AM_SHARE("videoregs")                 // Video Registers
 	AM_RANGE(0x878840, 0x87884d) AM_WRITE(metro_blitter_w) AM_SHARE("blitter_regs") // Tiles Blitter
 	AM_RANGE(0x878860, 0x87886b) AM_WRITE(metro_window_w) AM_SHARE("window")        // Tilemap Window
 	AM_RANGE(0x878870, 0x87887b) AM_WRITEONLY AM_SHARE("scroll")                    // Scroll
@@ -1515,7 +1515,7 @@ static ADDRESS_MAP_START( pururun_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0xc788a8, 0xc788a9) AM_WRITE(metro_soundlatch_w)                       // To Sound CPU
 	AM_RANGE(0xc788aa, 0xc788ab) AM_WRITEONLY AM_SHARE("rombank")                   // Rom Bank
 	AM_RANGE(0xc788ac, 0xc788ad) AM_WRITEONLY AM_SHARE("screenctrl")                // Screen Control
-	AM_RANGE(0xc79700, 0xc79713) AM_WRITEONLY AM_SHARE("videoregs")                 // Video Registers
+	AM_RANGE(0xc79700, 0xc79713) AM_RAM AM_SHARE("videoregs")                 // Video Registers
 ADDRESS_MAP_END
 
 
@@ -1549,7 +1549,7 @@ static ADDRESS_MAP_START( toride2g_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0xc788a8, 0xc788a9) AM_WRITE(metro_soundlatch_w)                       // To Sound CPU
 	AM_RANGE(0xc788aa, 0xc788ab) AM_WRITEONLY AM_SHARE("rombank")                   // Rom Bank
 	AM_RANGE(0xc788ac, 0xc788ad) AM_WRITEONLY AM_SHARE("screenctrl")                // Screen Control
-	AM_RANGE(0xc79700, 0xc79713) AM_WRITEONLY AM_SHARE("videoregs")                 // Video Registers
+	AM_RANGE(0xc79700, 0xc79713) AM_RAM AM_SHARE("videoregs")                 // Video Registers
 ADDRESS_MAP_END
 
 
@@ -1603,7 +1603,7 @@ static ADDRESS_MAP_START( blzntrnd_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x2788a4, 0x2788a5) AM_WRITEONLY AM_SHARE("irq_enable")                // IRQ Enable
 	AM_RANGE(0x2788aa, 0x2788ab) AM_WRITEONLY AM_SHARE("rombank")                   // Rom Bank
 	AM_RANGE(0x2788ac, 0x2788ad) AM_WRITEONLY AM_SHARE("screenctrl")                // Screen Control
-	AM_RANGE(0x279700, 0x279713) AM_WRITEONLY AM_SHARE("videoregs")                 // Video Registers
+	AM_RANGE(0x279700, 0x279713) AM_RAM AM_SHARE("videoregs")                 		// Video Registers
 //  AM_RANGE(0x300000, 0x300001) AM_READNOP                                         // Sound
 
 	AM_RANGE(0x400000, 0x43ffff) AM_RAM_WRITE(metro_k053936_w) AM_SHARE("k053936_ram")  // 053936
@@ -1651,7 +1651,7 @@ static ADDRESS_MAP_START( mouja_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x478884, 0x478885) AM_READ_PORT("DSW0")                               //
 	AM_RANGE(0x478886, 0x478887) AM_READ_PORT("IN2")                                //
 	AM_RANGE(0x478888, 0x478889) AM_WRITENOP                                        // ??
-	AM_RANGE(0x479700, 0x479713) AM_WRITEONLY AM_SHARE("videoregs")                 // Video Registers
+	AM_RANGE(0x479700, 0x479713) AM_RAM AM_SHARE("videoregs")                 // Video Registers
 	AM_RANGE(0x800000, 0x800001) AM_WRITE8(mouja_sound_rombank_w, 0x00ff)
 	AM_RANGE(0xc00000, 0xc00003) AM_DEVWRITE8("ymsnd", ym2413_device, write, 0x00ff)
 	AM_RANGE(0xd00000, 0xd00001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0xffff)
@@ -1808,7 +1808,7 @@ static ADDRESS_MAP_START( puzzlet_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x776000, 0x776fff) AM_RAM_WRITE(vram_1_clr_w)
 	AM_RANGE(0x777000, 0x777fff) AM_RAM_WRITE(vram_2_clr_w)
 	AM_RANGE(0x778000, 0x7787ff) AM_RAM AM_SHARE("tiletable")                       // Tiles Set
-	AM_RANGE(0x778800, 0x778813) AM_WRITEONLY AM_SHARE("videoregs")                 // Video Registers
+	AM_RANGE(0x778800, 0x778813) AM_RAM AM_SHARE("videoregs")                 // Video Registers
 	AM_RANGE(0x778840, 0x77884f) AM_WRITE(metro_blitter_w) AM_SHARE("blitter_regs") // Tiles Blitter
 	AM_RANGE(0x778860, 0x77886b) AM_WRITE(metro_window_w) AM_SHARE("window")        // Tilemap Window
 	AM_RANGE(0x778870, 0x77887b) AM_WRITEONLY AM_SHARE("scroll")                    // Scroll
@@ -1895,7 +1895,7 @@ static ADDRESS_MAP_START( vmetal_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x1788a4, 0x1788a5) AM_WRITEONLY AM_SHARE("irq_enable")                // IRQ Enable
 	AM_RANGE(0x1788aa, 0x1788ab) AM_WRITEONLY AM_SHARE("rombank")                   // Rom Bank
 	AM_RANGE(0x1788ac, 0x1788ad) AM_WRITEONLY AM_SHARE("screenctrl")                // Screen Control
-	AM_RANGE(0x179700, 0x179713) AM_WRITEONLY AM_SHARE("videoregs")                 // Video Registers
+	AM_RANGE(0x179700, 0x179713) AM_RAM AM_SHARE("videoregs")                 // Video Registers
 	AM_RANGE(0x200000, 0x200001) AM_READ_PORT("P1_P2") AM_WRITE8(vmetal_control_w, 0x00ff)
 	AM_RANGE(0x200002, 0x200003) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x300000, 0x31ffff) AM_READ(balcube_dsw_r)                             // DSW x 3
