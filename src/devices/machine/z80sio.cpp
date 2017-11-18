@@ -1560,7 +1560,7 @@ void z80sio_channel::do_sioreg_wr3(uint8_t data)
 	else if ((data & WR3_ENTER_HUNT_PHASE) && ((m_wr4 & WR4_STOP_BITS_MASK) == WR4_STOP_BITS_SYNC))
 	{
 		// TODO: should this re-initialise hunt logic if already in hunt phase for 8-bit/16-bit/SDLC sync?
-		if ((m_wr4 && WR4_SYNC_MODE_MASK) == WR4_SYNC_MODE_EXT)
+		if ((m_wr4 & WR4_SYNC_MODE_MASK) == WR4_SYNC_MODE_EXT)
 		{
 			m_rx_bit = 0;
 		}
@@ -1596,7 +1596,7 @@ void z80sio_channel::do_sioreg_wr5(uint8_t data)
 	LOG("Z80SIO Channel %c : Request to Send %u\n", 'A' + m_index, (data & WR5_RTS) ? 1 : 0);
 	LOG("Z80SIO Channel %c : Data Terminal Ready %u\n", 'A' + m_index, (data & WR5_DTR) ? 1 : 0);
 
-	if (!data & WR5_TX_ENABLE)
+	if (~data & WR5_TX_ENABLE)
 		m_uart->clear_interrupt(m_index, INT_TRANSMIT);
 }
 
@@ -1745,7 +1745,7 @@ void z80sio_channel::receive_enabled()
 	bool const sync_mode((m_wr4 & WR4_STOP_BITS_MASK) == WR4_STOP_BITS_SYNC);
 	m_rx_count = sync_mode ? 0 : ((get_clock_mode() - 1) / 2);
 	m_rx_bit = 0;
-	if (sync_mode && ((m_wr4 && WR4_SYNC_MODE_MASK) != WR4_SYNC_MODE_EXT))
+	if (sync_mode && ((m_wr4 & WR4_SYNC_MODE_MASK) != WR4_SYNC_MODE_EXT))
 		m_rr0 |= RR0_SYNC_HUNT;
 }
 
