@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Robbbert
+// copyright-holders:Robbbert,Vas Crabb
 /***************************************************************************
 
 Univac Terminals
@@ -20,16 +20,6 @@ This driver is all guesswork; Unisys never released technical info
 to customers. All parts on the PCBs have internal Unisys part numbers
 instead of the manufacturer's numbers.
 
-Notes on failures in power-on test:
-* Test 2 checks RAM parity. Patched out
-* Test 5 tests ROM checksum. It seems one or more roms is a bad dump.
-* Test 7 tests SIO ch B. The SIO should cause 9 interrupts. The CTC is
-  programmed as a time-out. But SIO only does first interrupt then hangs.
-  CTC then fires causing the failure message. It's unknown which CTC
-  channel drives Ch B, none seem to work. CTC trigger frequencies are
-  all guesswork too, but the present setup allows Tests 3 and 6 to pass.
-
-
 ****************************************************************************/
 
 #include "emu.h"
@@ -43,6 +33,14 @@ Notes on failures in power-on test:
 #include "sound/beep.h"
 #include "speaker.h"
 
+#define LOG_GENERAL (1U << 0)
+#define LOG_PARITY	(1U << 1)
+
+//#define VERBOSE (LOG_GENERAL | LOG_PARITY)
+#include "logmacro.h"
+
+#define LOGPARITY(...)  LOGMASKED(LOG_PARITY, __VA_ARGS__)
+
 
 class univac_state : public driver_device
 {
@@ -50,62 +48,125 @@ public:
 	univac_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_p_videoram(*this, "videoram")
 		, m_nvram(*this, "nvram")
 		, m_ctc(*this, "ctc")
 		, m_uart(*this, "uart")
-		, m_p_chargen(*this, "chargen")
 		, m_beep(*this, "beeper")
+		, m_p_chargen(*this, "chargen")
+		, m_p_videoram(*this, "videoram")
+		, m_bank_mask(0)
+		, m_parity_check(0)
+		, m_parity_poison(0)
+		, m_framecnt(0)
 	{ }
 
-	DECLARE_READ8_MEMBER(vram_r);
-	DECLARE_WRITE8_MEMBER(vram_w);
-	DECLARE_WRITE8_MEMBER(port43_w);
-	DECLARE_WRITE8_MEMBER(porte6_w);
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_READ8_MEMBER(ram_r);
+	DECLARE_READ8_MEMBER(bank_r);
+	DECLARE_WRITE8_MEMBER(ram_w);
+	DECLARE_WRITE8_MEMBER(bank_w);
 
-private:
-	bool m_screen_num;
-	uint8_t m_framecnt;
+	DECLARE_WRITE8_MEMBER(port43_w);
+	DECLARE_WRITE8_MEMBER(portc4_w);
+	DECLARE_WRITE8_MEMBER(porte6_w);
+
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	required_device<cpu_device> m_maincpu;
-	required_shared_ptr<uint8_t> m_p_videoram;
-	required_device<nvram_device> m_nvram;
-	required_device<z80ctc_device> m_ctc;
-	required_device<z80sio_device> m_uart;
+	virtual void device_post_load() override;
+
+private:
+	required_device<cpu_device>		m_maincpu;
+	required_device<nvram_device>   m_nvram;
+	required_device<z80ctc_device>  m_ctc;
+	required_device<z80sio_device>  m_uart;
+	required_device<beep_device>    m_beep;
+
 	required_region_ptr<u8> m_p_chargen;
-	required_device<beep_device> m_beep;
+	required_shared_ptr<u8> m_p_videoram;
+	std::unique_ptr<u8 []>  m_p_parity;
+
+	u16 m_bank_mask;
+	u8  m_parity_check;
+	u8  m_parity_poison;
+	u8  m_framecnt;
 };
 
 
+
+READ8_MEMBER( univac_state::ram_r )
+{
+	if (BIT(m_p_parity[offset >> 3], offset & 0x07) && !machine().side_effect_disabled())
+	{
+		LOGPARITY("parity check failed offset = %04X\n", offset);
+		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	}
+	return m_p_videoram[offset];
+}
+
+READ8_MEMBER( univac_state::bank_r )
+{
+	return space.read_byte((0xc000 | offset) ^ m_bank_mask);
+}
+
+WRITE8_MEMBER( univac_state::ram_w )
+{
+	if (m_parity_poison)
+	{
+		LOGPARITY("poison parity offset = %04X\n", offset);
+		m_p_parity[offset >> 3] |= u8(1) << (offset & 0x07);
+	}
+	else
+	{
+		m_p_parity[offset >> 3] &= ~(u8(1) << (offset & 0x07));
+	}
+	m_p_videoram[offset] = data;
+}
+
+WRITE8_MEMBER( univac_state::bank_w )
+{
+	space.write_byte((0xc000 | offset) ^ m_bank_mask, data);
+}
+
+WRITE8_MEMBER( univac_state::port43_w )
+{
+	m_bank_mask = BIT(data, 0) ? 0x2000 : 0x0000;
+}
+
+WRITE8_MEMBER( univac_state::portc4_w )
+{
+	m_parity_poison = BIT(data, 0);
+	u8 const check = BIT(data, 1);
+	if (check != m_parity_check)
+	{
+		m_parity_check = check;
+		address_space &space(m_maincpu->space(AS_PROGRAM));
+		space.unmap_read(0xc000, 0xffff);
+		if (check)
+		{
+			LOGPARITY("parity check enabled\n");
+			space.install_read_handler(0xc000, 0xffff, read8_delegate(FUNC(univac_state::ram_r), this));
+		}
+		else
+		{
+			LOGPARITY("parity check disabled\n");
+			space.install_rom(0xc000, 0xffff, &m_p_videoram[0]);
+		}
+	}
+}
 
 WRITE8_MEMBER( univac_state::porte6_w )
 {
 	m_beep->set_state(BIT(data, 0));
 }
 
-WRITE8_MEMBER( univac_state::port43_w )
-{
-	m_screen_num = BIT(data, 0);
-}
-
-READ8_MEMBER( univac_state::vram_r )
-{
-	return m_p_videoram[offset ^ (m_screen_num ? 0x2000 : 0)];
-}
-
-WRITE8_MEMBER( univac_state::vram_w )
-{
-	m_p_videoram[offset ^ (m_screen_num ? 0x2000 : 0)] = data;
-}
-
 
 static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, univac_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x4fff ) AM_ROM AM_REGION("roms", 0)
-	AM_RANGE( 0x8000, 0xbfff ) AM_READWRITE(vram_r,vram_w)
-	AM_RANGE( 0xc000, 0xffff ) AM_RAM AM_SHARE("videoram")
+	AM_RANGE( 0x8000, 0xbfff ) AM_READWRITE(bank_r, bank_w)
+	AM_RANGE( 0xc000, 0xffff ) AM_RAM_WRITE(ram_w) AM_SHARE("videoram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_map, AS_IO, 8, univac_state )
@@ -115,6 +176,7 @@ static ADDRESS_MAP_START( io_map, AS_IO, 8, univac_state )
 	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("ctc", z80ctc_device, read, write)
 	AM_RANGE(0x43, 0x43) AM_WRITE(port43_w)
 	AM_RANGE(0x80, 0xbf) AM_RAM AM_SHARE("nvram")
+	AM_RANGE(0xc4, 0xc4) AM_WRITE(portc4_w)
 	AM_RANGE(0xe6, 0xe6) AM_WRITE(porte6_w)
 ADDRESS_MAP_END
 
@@ -125,20 +187,43 @@ INPUT_PORTS_END
 
 void univac_state::machine_start()
 {
-// D7DC and D7DD are checked for valid RID and SID (usually 21 and 51) if not valid then NVRAM gets initialised.
+	// D7DC and D7DD are checked for valid RID and SID (usually 21 and 51) if not valid then NVRAM gets initialised.
+
+	std::size_t const parity_bytes = (m_p_videoram.bytes() + 7) / 8;
+	m_p_parity.reset(new u8[parity_bytes]);
+	std::fill_n(m_p_parity.get(), parity_bytes, 0);
+
+	save_pointer(NAME(m_p_parity.get()), parity_bytes);
+	save_item(NAME(m_bank_mask));
+	save_item(NAME(m_parity_check));
+	save_item(NAME(m_parity_poison));
+	save_item(NAME(m_framecnt));
 }
 
 void univac_state::machine_reset()
 {
-	m_screen_num = 0;
 	m_beep->set_state(0);
+
+	m_bank_mask = 0x0000;
+	m_parity_check = 0;
+	m_parity_poison = 0;
+}
+
+void univac_state::device_post_load()
+{
+	if (m_parity_check)
+	{
+		address_space &space(m_maincpu->space(AS_PROGRAM));
+		space.unmap_read(0xc000, 0xffff);
+		space.install_read_handler(0xc000, 0xffff, read8_delegate(FUNC(univac_state::ram_r), this));
+	}
 }
 
 uint32_t univac_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	uint8_t y,ra,chr,gfx;
 	uint16_t sy=0,ma=0,x;
-	uint8_t *videoram = m_p_videoram;//+(m_screen_num ? 0x2000 : 0);
+	uint8_t *videoram = m_p_videoram;//^ m_bank_mask;
 
 	m_framecnt++;
 
@@ -238,9 +323,6 @@ ROM_START( uts20 )
 	ROM_LOAD( "uts20c.rom", 0x2000, 0x1000, CRC(4e334705) SHA1(ff1a730551b42f29d20af8ecc4495fd30567d35b) )
 	ROM_LOAD( "uts20d.rom", 0x3000, 0x1000, CRC(76757cf7) SHA1(b0509d9a35366b21955f83ec3685163844c4dbf1) )
 	ROM_LOAD( "uts20e.rom", 0x4000, 0x1000, CRC(0dfc8062) SHA1(cd681020bfb4829d4cebaf1b5bf618e67b55bda3) )
-	// Patches, see notes at top.
-	ROM_FILL(0x2bd,1,0xaf) // test 2
-	ROM_FILL(0x48f1,1,0xa6) // test 5, patch unused byte to fix checksum
 
 	/* character generator not dumped, using the one from 'c10' for now */
 	ROM_REGION( 0x2000, "chargen", 0 )
@@ -250,4 +332,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  CLASS           INIT    COMPANY            FULLNAME  FLAGS
-COMP( 1980, uts20,  0,      0,       uts20,     uts20, univac_state,   0,      "Sperry Univac",   "UTS-20", MACHINE_NOT_WORKING )
+COMP( 1980, uts20,  0,      0,       uts20,     uts20, univac_state,   0,      "Sperry Univac",   "UTS-20", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
