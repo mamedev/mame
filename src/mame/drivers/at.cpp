@@ -3,6 +3,20 @@
 /***************************************************************************
 
     IBM AT Compatibles
+	
+Commodore PC 30-III and PC 40-III
+=================================
+Links: http://www.richardlagendijk.nl/cip/computer/item/pc30iii/en , ftp://ftp.zimmers.net/pub/cbm-pc/firmware/pc30/
+Info: The PC 30-III and PC 40-III share the same mainboard. On a PC 30-III the onboard Paradise VGA is not populated.
+Form factor: Desktop PC
+CPU: Intel 80286-12
+RAM: 1MB on board
+Chipset: Faraday
+Bus: 3x16 bit ISA, 1x8 bit ISA
+Video: PC 30-III: ATI EGA Wonder 800+, PC 40-III: Onboard Paradise VGA, 256KB
+Mass storage: One HD disk drive standard, second drive optional; PC 30-III: 20MB, PC 40-III: 40MB AT-IDE HD standard, 80MB or 100MB optional
+On board: Serial, Parallel, Commodore 1532 Mouse port (MS Bus mouse compatible), Keyboard, Beeper, Floppy (2 devices), AT-IDE (1 device)
+Options: 80287
 
 ***************************************************************************/
 
@@ -432,6 +446,22 @@ static MACHINE_CONFIG_DERIVED( ct386sx, at386sx )
 	MCFG_CS8221_ADD("cs8221", "maincpu", "mb:isa", "maincpu")
 MACHINE_CONFIG_END
 
+// Commodore PC 30-III
+static MACHINE_CONFIG_DERIVED( pc30iii, ibm5170 )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_CLOCK(6000000) // should be XTAL_24MHz/2, but doesn't post with that setting
+	MCFG_DEVICE_MODIFY("isa1")
+	MCFG_DEVICE_SLOT_INTERFACE(pc_isa16_cards, "vga", false) // should be ATI EGA Wonder 800+
+MACHINE_CONFIG_END
+
+// Commodore PC 40-III
+static MACHINE_CONFIG_DERIVED( pc40iii, ibm5170 )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_CLOCK(6000000) // should be XTAL_24MHz/2, but doesn't post with that setting
+	MCFG_DEVICE_MODIFY("isa1")
+	MCFG_DEVICE_SLOT_INTERFACE(pc_isa16_cards, "vga", false) // should be onboard Paradise VGA, see ROM declarations
+MACHINE_CONFIG_END
+
 static MACHINE_CONFIG_START( megapc )
 	MCFG_CPU_ADD("maincpu", I386SX, XTAL_50MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(megapc_map)
@@ -730,11 +760,6 @@ ROM_START( at )
 	ROMX_LOAD( "aw303gs-lo.bin",  0x18000, 0x4000, CRC(a4cf8ba1) SHA1(b73e34be3b2754aaed1ac06471f4441fea06c67c), ROM_SKIP(1) | ROM_BIOS(14) )
 ROM_END
 
-ROM_START( cmdpc30 )
-	ROM_REGION(0x20000,"bios", 0)
-	ROMX_LOAD( "commodore pc 30 iii even.bin", 0x18000, 0x4000, CRC(36307aa9) SHA1(50237ffea703b867de426ab9ebc2af46bac1d0e1),ROM_SKIP(1))
-	ROMX_LOAD( "commodore pc 30 iii odd.bin",  0x18001, 0x4000, CRC(41bae42d) SHA1(27d6ad9554be86359d44331f25591e3122a31519),ROM_SKIP(1))
-ROM_END
 
 ROM_START( atvga )
 	ROM_REGION(0x20000,"bios", 0)
@@ -936,6 +961,32 @@ ROM_START( c386sx16 )
 	/* Copyright (C) 1985-1990 Phoenix Technologies Ltd. */
 	ROM_LOAD16_BYTE( "390914-01.u39", 0x10000, 0x8000, CRC(8f849198) SHA1(550b04bac0d0807d6e95ec25391a81272779b41b)) /* 390914-01 V1.03 CS-2100 U39 Copyright (C) 1990 CBM */
 	ROM_LOAD16_BYTE( "390915-01.u38", 0x10001, 0x8000, CRC(ee4bad92) SHA1(6e02ef97a7ce336485814c06a1693bc099ce5cfb)) /* 390915-01 V1.03 CS-2100 U38 Copyright (C) 1990 CBM */
+ROM_END
+
+// Commodore PC 30-III
+ROM_START( pc30iii )
+	ROM_REGION(0x20000,"bios", 0)
+	ROM_SYSTEM_BIOS(0, "pc30iii_v200", "PC 30-III v2.00")
+	ROMX_LOAD( "pc30iii_390339-02_3e58.bin", 0x18000, 0x4000, CRC(f4a5860e) SHA1(b843744fe928bcfd8e037b0208cc85c0746535cf),ROM_SKIP(1) | ROM_BIOS(1) )
+	ROMX_LOAD( "pc30iii_390340-02_42a8.bin",  0x18001, 0x4000, CRC(934df54a) SHA1(3b1c8916ba2b2517bc9f26dd74254586bcf0e91d),ROM_SKIP(1) | ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS(1, "pc30iii_v201", "PC 30-III v2.01")
+	ROMX_LOAD( "cbm-pc30c-bios-lo-v2.01-390339-03-35c1.bin", 0x18000, 0x4000, CRC(36307aa9) SHA1(50237ffea703b867de426ab9ebc2af46bac1d0e1),ROM_SKIP(1) | ROM_BIOS(2) )
+	ROMX_LOAD( "cbm-pc30c-bios-hi-v2.01-390340-03-3f3f.bin",  0x18001, 0x4000, CRC(41bae42d) SHA1(27d6ad9554be86359d44331f25591e3122a31519),ROM_SKIP(1) | ROM_BIOS(2) )
+ROM_END
+
+// Commodore PC 40-III
+ROM_START( pc40iii )
+	// VGA BIOS
+	// ROM_LOAD( "pc40iii_390337-01_v2.0_f930.bin", 0x00000, 0x4000, CRC(82b210d3) SHA1(1380107deef02455c6ce4d12162fdc32e375cbde))
+	// ROM_LOAD( "pc40iii_390338-01_v2.0_b6d0.bin", 0x00001, 0x4000, CRC(526d7424) SHA1(60511ca0e856b7611d556aa82219d646f96c9b94))
+
+	ROM_REGION(0x20000,"bios", 0)
+	ROM_SYSTEM_BIOS(0, "pc40iii_v200", "PC 40-III v2.00")
+	ROMX_LOAD( "pc40iii_390339-01_v2.0_473a.bin", 0x18000, 0x4000, CRC(2ad2dc0f) SHA1(b41d5988fda8cc23418c3f665d780c617aa3fc2b),ROM_SKIP(1) | ROM_BIOS(1) )
+	ROMX_LOAD( "pc40iii_390340-01_v2.0_4bc6.bin",  0x18001, 0x4000, CRC(62dc7d93) SHA1(e741528697b1d00450fd18e3db8b925606e0bd22),ROM_SKIP(1) | ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS(1, "pc40iii_v201", "PC 40-III v2.03")
+	ROMX_LOAD( "cbm-pc40c-bios-lo-v2.03-390339-04-03bc.bin", 0x18000, 0x4000, CRC(e5fd11c6) SHA1(18c21d9a4ae687eef5464b76a0d614b9dfd30ec8),ROM_SKIP(1) | ROM_BIOS(2) )
+	ROMX_LOAD( "cbm-pc40c-bios-hi-v2.03-390340-04-3344.bin",  0x18001, 0x4000, CRC(63d6f0f7) SHA1(a88dee7694baa71913acbe76cb4e2a4e95979ad9),ROM_SKIP(1) | ROM_BIOS(2) )
 ROM_END
 
 ROM_START( xb42663 )
@@ -1146,7 +1197,8 @@ COMP ( 1990, xb42664a, ibm5170, 0,       at386,     0,    at_state,      at,    
 COMP ( 1993, apxena1,  ibm5170, 0,       at486,     0,    at_state,      at,      "Apricot",  "Apricot XEN PC (A1 Motherboard)", MACHINE_NOT_WORKING )
 COMP ( 1993, apxenp2,  ibm5170, 0,       at486,     0,    at_state,      at,      "Apricot",  "Apricot XEN PC (P2 Motherboard)", MACHINE_NOT_WORKING )
 COMP ( 1990, c386sx16, ibm5170, 0,       at386sx,   0,    at_state,      at,      "Commodore Business Machines", "Commodore 386SX-16", MACHINE_NOT_WORKING )
-COMP ( 1988, cmdpc30,  ibm5170, 0,       ibm5162,   0,    at_state,      at,      "Commodore Business Machines",  "PC 30 III", MACHINE_NOT_WORKING )
+COMP ( 1988, pc30iii,  ibm5170, 0,       pc30iii,	0,    at_state,      at,      "Commodore Business Machines",  "PC 30-III", MACHINE_NOT_WORKING )
+COMP ( 1988, pc40iii,  ibm5170, 0,       pc40iii,	0,    at_state,      at,      "Commodore Business Machines",  "PC 40-III", MACHINE_NOT_WORKING )
 COMP ( 1995, ficpio2,  ibm5170, 0,       ficpio2,   0,    at_state,      atpci,   "FIC", "486-PIO-2", MACHINE_NOT_WORKING )
 COMP ( 1985, k286i,    ibm5170, 0,       k286i,     0,    at_state,      at,      "Kaypro",   "286i", MACHINE_NOT_WORKING )
 COMP ( 1991, t2000sx,  ibm5170, 0,       at386sx,   0,    at_state,      at,      "Toshiba",  "T2000SX", MACHINE_NOT_WORKING )
