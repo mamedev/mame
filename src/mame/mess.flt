@@ -345,6 +345,7 @@ lwriter.cpp
 lynx.cpp
 m20.cpp
 m24.cpp
+m3.cpp
 m5.cpp
 m6805evs.cpp
 m68705prg.cpp
