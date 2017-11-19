@@ -1,3 +1,4 @@
+
 // license:BSD-3-Clause
 // copyright-holders:Pierpaolo Prazzoli
 /********************************************************************
@@ -33,6 +34,7 @@
  TODO:
  - some wrong cycle counts
  - verify register wrapping with sregf/dregf on hardware
+
  CHANGELOG:
 
  Pierpaolo Prazzoli
@@ -143,6 +145,7 @@
 
 #include "emu.h"
 #include "e132xs.h"
+#include "e132xsfe.h"
 
 #include "debugger.h"
 
@@ -151,6 +154,9 @@
 
 //#define VERBOSE 1
 #include "logmacro.h"
+
+/* size of the execution code cache */
+#define CACHE_SIZE                      (32 * 1024 * 1024)
 
 //**************************************************************************
 //  INTERNAL ADDRESS MAP
@@ -195,10 +201,31 @@ ADDRESS_MAP_END
 
 hyperstone_device::hyperstone_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock,
 										const device_type type, uint32_t prg_data_width, uint32_t io_data_width, address_map_constructor internal_map)
-	: cpu_device(mconfig, type, tag, owner, clock),
-		m_program_config("program", ENDIANNESS_BIG, prg_data_width, 32, 0, internal_map),
-		m_io_config("io", ENDIANNESS_BIG, io_data_width, 15),
-		m_icount(0)
+	: cpu_device(mconfig, type, tag, owner, clock)
+	, m_program_config("program", ENDIANNESS_BIG, prg_data_width, 32, 0, internal_map)
+	, m_io_config("io", ENDIANNESS_BIG, io_data_width, 15)
+	, m_icount(0)
+	, m_cache(CACHE_SIZE + sizeof(hyperstone_device))
+	, m_drcuml(nullptr)
+	, m_drcfe(nullptr)
+	, m_drcoptions(0)
+	, m_cache_dirty(0)
+	, m_entry(nullptr)
+	, m_nocode(nullptr)
+	, m_out_of_cycles(nullptr)
+	, m_drc_arg0(0)
+	, m_drc_arg1(0)
+	, m_drc_arg2(0)
+	, m_drc_arg3(0)
+	, m_mem_read8(nullptr)
+	, m_mem_write8(nullptr)
+	, m_mem_read16(nullptr)
+	, m_mem_write16(nullptr)
+	, m_mem_read32(nullptr)
+	, m_mem_write32(nullptr)
+	, m_io_read32(nullptr)
+	, m_io_write32(nullptr)
+	, m_enable_drc(false)
 {
 }
 
@@ -777,24 +804,18 @@ void hyperstone_device::execute_br()
 
 void hyperstone_device::execute_trap(uint32_t addr)
 {
-	uint8_t reg;
-	uint32_t oldSR;
-	reg = GET_FP + GET_FL;
-
+	const uint8_t reg = GET_FP + GET_FL;
 	SET_ILC(m_instruction_length);
-
-	oldSR = SR;
+	const uint32_t oldSR = SR;
 
 	SET_FL(6);
 	SET_FP(reg);
 
-	set_local_register(0, (PC & 0xfffffffe) | GET_S);
-	set_local_register(1, oldSR);
+	m_local_regs[(0 + reg) & 0x3f] = (PC & ~1) | GET_S;
+	m_local_regs[(1 + reg) & 0x3f] = oldSR;
 
-	SET_M(0);
-	SET_T(0);
-	SET_L(1);
-	SET_S(1);
+	SR &= ~(M_MASK | T_MASK);
+	SR |= (L_MASK | S_MASK);
 
 	PC = addr;
 
@@ -829,8 +850,8 @@ void hyperstone_device::execute_exception(uint32_t addr)
 	SET_ILC(m_instruction_length);
 	const uint32_t oldSR = SR;
 
-	SET_FP(reg);
 	SET_FL(2);
+	SET_FP(reg);
 
 	m_local_regs[(0 + reg) & 0x3f] = (PC & ~1) | GET_S;
 	m_local_regs[(1 + reg) & 0x3f] = oldSR;
@@ -1008,6 +1029,8 @@ void hyperstone_device::device_start()
 
 void hyperstone_device::init(int scale_mask)
 {
+	m_enable_drc = false;//allow_drc();
+
 	memset(m_global_regs, 0, sizeof(uint32_t) * 32);
 	memset(m_local_regs, 0, sizeof(uint32_t) * 64);
 	m_op = 0;
@@ -1040,6 +1063,38 @@ void hyperstone_device::init(int scale_mask)
 	{
 		m_fl_lut[i] = (i ? i : 16);
 	}
+
+	uint32_t umlflags = 0;
+	m_drcuml = std::make_unique<drcuml_state>(*this, m_cache, umlflags, 1, 32, 1);
+
+	// add UML symbols-
+	m_drcuml->symbol_add(&m_global_regs[0], sizeof(uint32_t), "pc");
+	m_drcuml->symbol_add(&m_global_regs[1], sizeof(uint32_t), "sr");
+	m_drcuml->symbol_add(&m_icount, sizeof(m_icount), "icount");
+
+	char buf[4];
+	for (int i=0; i < 32; i++)
+	{
+		sprintf(buf, "g%d", i);
+		m_drcuml->symbol_add(&m_global_regs[i], sizeof(uint32_t), buf);
+	}
+
+	for (int i=0; i < 64; i++)
+	{
+		sprintf(buf, "l%d", i);
+		m_drcuml->symbol_add(&m_global_regs[i], sizeof(uint32_t), buf);
+	}
+
+	m_drcuml->symbol_add(&m_drc_arg0, sizeof(uint32_t), "arg0");
+	m_drcuml->symbol_add(&m_drc_arg1, sizeof(uint32_t), "arg1");
+	m_drcuml->symbol_add(&m_drc_arg2, sizeof(uint32_t), "arg2");
+	m_drcuml->symbol_add(&m_drc_arg3, sizeof(uint32_t), "arg3");
+
+	/* initialize the front-end helper */
+	m_drcfe = std::make_unique<e132xs_frontend>(this, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, SINGLE_INSTRUCTION_MODE ? 1 : COMPILE_MAX_SEQUENCE);
+
+	/* mark the cache dirty so it is updated on next execute */
+	m_cache_dirty = true;
 
 	// register our state for the debugger
 	state_add(STATE_GENPC,    "GENPC",     m_global_regs[0]).noshow();
@@ -1299,6 +1354,14 @@ void hyperstone_device::device_reset()
 
 void hyperstone_device::device_stop()
 {
+	if (m_drcfe != nullptr)
+	{
+		m_drcfe = nullptr;
+	}
+	if (m_drcuml != nullptr)
+	{
+		m_drcuml = nullptr;
+	}
 }
 
 
@@ -1499,6 +1562,12 @@ void hyperstone_device::hyperstone_do()
 
 void hyperstone_device::execute_run()
 {
+	if (m_enable_drc)
+	{
+		execute_run_drc();
+		return;
+	}
+
 	if (m_intblock < 0)
 		m_intblock = 0;
 
@@ -1741,34 +1810,34 @@ void hyperstone_device::execute_run()
 			case 0xdd: hyperstone_stwp<LOCAL>(); break;
 			case 0xde: hyperstone_stdp<GLOBAL>(); break;
 			case 0xdf: hyperstone_stdp<LOCAL>(); break;
-			case 0xe0: hyperstone_dbv(); break;
-			case 0xe1: hyperstone_dbnv(); break;
-			case 0xe2: hyperstone_dbe(); break;
-			case 0xe3: hyperstone_dbne(); break;
-			case 0xe4: hyperstone_dbc(); break;
-			case 0xe5: hyperstone_dbnc(); break;
-			case 0xe6: hyperstone_dbse(); break;
-			case 0xe7: hyperstone_dbht(); break;
-			case 0xe8: hyperstone_dbn(); break;
-			case 0xe9: hyperstone_dbnn(); break;
-			case 0xea: hyperstone_dble(); break;
-			case 0xeb: hyperstone_dbgt(); break;
+			case 0xe0: hyperstone_db<COND_V,  IS_SET>(); break;
+			case 0xe1: hyperstone_db<COND_V,  IS_CLEAR>(); break;
+			case 0xe2: hyperstone_db<COND_Z,  IS_SET>(); break;
+			case 0xe3: hyperstone_db<COND_Z,  IS_CLEAR>(); break;
+			case 0xe4: hyperstone_db<COND_C,  IS_SET>(); break;
+			case 0xe5: hyperstone_db<COND_C,  IS_CLEAR>(); break;
+			case 0xe6: hyperstone_db<COND_CZ, IS_SET>(); break;
+			case 0xe7: hyperstone_db<COND_CZ, IS_CLEAR>(); break;
+			case 0xe8: hyperstone_db<COND_N,  IS_SET>(); break;
+			case 0xe9: hyperstone_db<COND_N,  IS_CLEAR>(); break;
+			case 0xea: hyperstone_db<COND_NZ, IS_SET>(); break;
+			case 0xeb: hyperstone_db<COND_NZ, IS_CLEAR>(); break;
 			case 0xec: hyperstone_dbr(); break;
 			case 0xed: hyperstone_frame(); break;
 			case 0xee: hyperstone_call_global(); break;
 			case 0xef: hyperstone_call_local(); break;
-			case 0xf0: hyperstone_bv(); break;
-			case 0xf1: hyperstone_bnv(); break;
-			case 0xf2: hyperstone_be(); break;
-			case 0xf3: hyperstone_bne(); break;
-			case 0xf4: hyperstone_bc(); break;
-			case 0xf5: hyperstone_bnc(); break;
-			case 0xf6: hyperstone_bse(); break;
-			case 0xf7: hyperstone_bht(); break;
-			case 0xf8: hyperstone_bn(); break;
-			case 0xf9: hyperstone_bnn(); break;
-			case 0xfa: hyperstone_ble(); break;
-			case 0xfb: hyperstone_bgt(); break;
+			case 0xf0: hyperstone_b<COND_V,  IS_SET>(); break;
+			case 0xf1: hyperstone_b<COND_V,  IS_CLEAR>(); break;
+			case 0xf2: hyperstone_b<COND_Z,  IS_SET>(); break;
+			case 0xf3: hyperstone_b<COND_Z,  IS_CLEAR>(); break;
+			case 0xf4: hyperstone_b<COND_C,  IS_SET>(); break;
+			case 0xf5: hyperstone_b<COND_C,  IS_CLEAR>(); break;
+			case 0xf6: hyperstone_b<COND_CZ, IS_SET>(); break;
+			case 0xf7: hyperstone_b<COND_CZ, IS_CLEAR>(); break;
+			case 0xf8: hyperstone_b<COND_N,  IS_SET>(); break;
+			case 0xf9: hyperstone_b<COND_N,  IS_CLEAR>(); break;
+			case 0xfa: hyperstone_b<COND_NZ, IS_SET>(); break;
+			case 0xfb: hyperstone_b<COND_NZ, IS_CLEAR>(); break;
 			case 0xfc: execute_br(); break;
 			case 0xfd: hyperstone_trap(); break;
 			case 0xfe: hyperstone_trap(); break;
