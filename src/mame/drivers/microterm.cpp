@@ -9,7 +9,7 @@ Skeleton driver for Micro-Term terminals.
 #include "emu.h"
 #include "cpu/z80/z80.h"
 //#include "machine/eepromser.h"
-//#include "machine/mc68681.h"
+#include "machine/mc68681.h"
 //#include "video/scn2674.h"
 //#include "screen.h"
 
@@ -35,6 +35,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mt420_io_map, AS_IO, 8, microterm_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0xe0, 0xef) AM_DEVREADWRITE("duart", mc68681_device, read, write)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mt5510_mem_map, AS_PROGRAM, 8, microterm_state )
@@ -45,6 +46,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mt5510_io_map, AS_IO, 8, microterm_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x60, 0x6f) AM_DEVREADWRITE("duart", mc68681_device, read, write)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( microterm )
@@ -54,12 +56,18 @@ static MACHINE_CONFIG_START( mt420 )
 	MCFG_CPU_ADD("maincpu", Z80, 4'000'000)
 	MCFG_CPU_PROGRAM_MAP(mt420_mem_map)
 	MCFG_CPU_IO_MAP(mt420_io_map)
+
+	MCFG_DEVICE_ADD("duart", MC68681, XTAL_3_6864MHz)
+	MCFG_MC68681_IRQ_CALLBACK(INPUTLINE("maincpu", 0))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( mt5510 )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_6MHz)
 	MCFG_CPU_PROGRAM_MAP(mt5510_mem_map)
 	MCFG_CPU_IO_MAP(mt5510_io_map)
+
+	MCFG_DEVICE_ADD("duart", MC68681, XTAL_3_6864MHz)
+	MCFG_MC68681_IRQ_CALLBACK(INPUTLINE("maincpu", 0))
 MACHINE_CONFIG_END
 
 
