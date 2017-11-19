@@ -20,17 +20,26 @@ This driver is all guesswork; Unisys never released technical info
 to customers. All parts on the PCBs have internal Unisys part numbers
 instead of the manufacturer's numbers.
 
+Notes:
+* Port $C6 probably controls serial loopback
+  - at a guess, bit 0 enables loopback on both channels
+* The NVRAM is 4 bits wide on the LSBs, but (0x81) & 0x10 does something
+  - NVRAM nybbles are read/written on the LSBs of 64 ports 0x80 to 0xb4
+  - Nybbles are packed/unpacked into 32 bytes starting at 0xd7d7
+  - On boot it reads (0x81) & 0x10, and if set preserves 0xd831 to 0xd863
+  - This has to be some kind of warm boot detection, but how does it work?
+
 ****************************************************************************/
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
+#include "machine/clock.h"
 #include "machine/nvram.h"
 #include "machine/z80ctc.h"
 #include "machine/z80sio.h"
-#include "machine/clock.h"
-#include "screen.h"
 #include "sound/beep.h"
+#include "screen.h"
 #include "speaker.h"
 
 #define LOG_GENERAL (1U << 0)
@@ -54,6 +63,7 @@ public:
 		, m_beep(*this, "beeper")
 		, m_p_chargen(*this, "chargen")
 		, m_p_videoram(*this, "videoram")
+		, m_p_nvram(*this, "nvram")
 		, m_bank_mask(0)
 		, m_parity_check(0)
 		, m_parity_poison(0)
@@ -64,6 +74,7 @@ public:
 	DECLARE_READ8_MEMBER(bank_r);
 	DECLARE_WRITE8_MEMBER(ram_w);
 	DECLARE_WRITE8_MEMBER(bank_w);
+	DECLARE_WRITE8_MEMBER(nvram_w);
 
 	DECLARE_WRITE8_MEMBER(port43_w);
 	DECLARE_WRITE8_MEMBER(portc4_w);
@@ -85,6 +96,7 @@ private:
 
 	required_region_ptr<u8> m_p_chargen;
 	required_shared_ptr<u8> m_p_videoram;
+	required_shared_ptr<u8> m_p_nvram;
 	std::unique_ptr<u8 []>  m_p_parity;
 
 	u16 m_bank_mask;
@@ -127,6 +139,13 @@ WRITE8_MEMBER( univac_state::ram_w )
 WRITE8_MEMBER( univac_state::bank_w )
 {
 	space.write_byte((0xc000 | offset) ^ m_bank_mask, data);
+}
+
+WRITE8_MEMBER( univac_state::nvram_w )
+{
+	// NVRAM is four bits wide, accessed in the low nybble
+	// It's simplest to hack it when writing to make the upper bits read back high on the open bus
+	m_p_nvram[offset] = data | 0xf0;
 }
 
 WRITE8_MEMBER( univac_state::port43_w )
@@ -175,7 +194,7 @@ static ADDRESS_MAP_START( io_map, AS_IO, 8, univac_state )
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("uart", z80sio_device, cd_ba_r, cd_ba_w)
 	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("ctc", z80ctc_device, read, write)
 	AM_RANGE(0x43, 0x43) AM_WRITE(port43_w)
-	AM_RANGE(0x80, 0xbf) AM_RAM AM_SHARE("nvram")
+	AM_RANGE(0x80, 0xbf) AM_RAM_WRITE(nvram_w) AM_SHARE("nvram")
 	AM_RANGE(0xc4, 0xc4) AM_WRITE(portc4_w)
 	AM_RANGE(0xe6, 0xe6) AM_WRITE(porte6_w)
 ADDRESS_MAP_END
