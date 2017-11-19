@@ -18,6 +18,7 @@ public:
 		m_vram_2(*this, "vram_2"),
 		m_paletteram(*this, "paletteram"),
 		m_spriteram(*this, "spriteram"),
+		m_spriteregs(*this, "spriteregs"),
 		m_tiletable(*this, "tiletable"),
 		m_blitter_regs(*this, "blitter_regs"),
 		m_window(*this, "window"),
@@ -34,12 +35,49 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette") { }
 
+	DECLARE_READ16_MEMBER(irq_cause_r);
+	DECLARE_WRITE16_MEMBER(irq_cause_w);
+	DECLARE_WRITE16_MEMBER(subcpu_control_w);
+	DECLARE_READ16_MEMBER(hyprduel_cpusync_trigger1_r);
+	DECLARE_WRITE16_MEMBER(hyprduel_cpusync_trigger1_w);
+	DECLARE_READ16_MEMBER(hyprduel_cpusync_trigger2_r);
+	DECLARE_WRITE16_MEMBER(hyprduel_cpusync_trigger2_w);
+	DECLARE_READ16_MEMBER(bankedrom_r);
+	DECLARE_WRITE16_MEMBER(blitter_w);
+	DECLARE_WRITE16_MEMBER(paletteram_w);
+	DECLARE_WRITE16_MEMBER(vram_0_w);
+	DECLARE_WRITE16_MEMBER(vram_1_w);
+	DECLARE_WRITE16_MEMBER(vram_2_w);
+	DECLARE_WRITE16_MEMBER(window_w);
+	DECLARE_WRITE16_MEMBER(scrollreg_w);
+	DECLARE_WRITE16_MEMBER(scrollreg_init_w);
+	DECLARE_DRIVER_INIT(magerror);
+	DECLARE_DRIVER_INIT(hyprduel);
+	TILE_GET_INFO_MEMBER(get_tile_info_0_8bit);
+	TILE_GET_INFO_MEMBER(get_tile_info_1_8bit);
+	TILE_GET_INFO_MEMBER(get_tile_info_2_8bit);
+	DECLARE_MACHINE_START(hyprduel);
+	DECLARE_VIDEO_START(hyprduel_14220);
+	DECLARE_MACHINE_START(magerror);
+	DECLARE_VIDEO_START(magerror_14220);
+	DECLARE_VIDEO_START(common_14220);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_CALLBACK_MEMBER(vblank_end_callback);
+	TIMER_CALLBACK_MEMBER(magerror_irq_callback);
+	TIMER_CALLBACK_MEMBER(blit_done);
+	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
+
+protected:
+	virtual void machine_reset() override;
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_vram_0;
 	required_shared_ptr<uint16_t> m_vram_1;
 	required_shared_ptr<uint16_t> m_vram_2;
 	required_shared_ptr<uint16_t> m_paletteram;
 	required_shared_ptr<uint16_t> m_spriteram;
+	required_shared_ptr<uint16_t> m_spriteregs;
 	required_shared_ptr<uint16_t> m_tiletable;
 	required_shared_ptr<uint16_t> m_blitter_regs;
 	required_shared_ptr<uint16_t> m_window;
@@ -58,7 +96,6 @@ public:
 	std::unique_ptr<uint8_t[]>     m_dirtyindex;
 	int       m_sprite_xoffs;
 	int       m_sprite_yoffs;
-	int       m_sprite_yoffs_sub;
 	std::unique_ptr<uint8_t[]>   m_expanded_gfx1;
 
 	/* misc */
@@ -78,39 +115,6 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
-	DECLARE_READ16_MEMBER(irq_cause_r);
-	DECLARE_WRITE16_MEMBER(irq_cause_w);
-	DECLARE_WRITE16_MEMBER(subcpu_control_w);
-	DECLARE_READ16_MEMBER(hyprduel_cpusync_trigger1_r);
-	DECLARE_WRITE16_MEMBER(hyprduel_cpusync_trigger1_w);
-	DECLARE_READ16_MEMBER(hyprduel_cpusync_trigger2_r);
-	DECLARE_WRITE16_MEMBER(hyprduel_cpusync_trigger2_w);
-	DECLARE_READ16_MEMBER(bankedrom_r);
-	DECLARE_WRITE16_MEMBER(blitter_w);
-	DECLARE_WRITE16_MEMBER(paletteram_w);
-	DECLARE_WRITE16_MEMBER(vram_0_w);
-	DECLARE_WRITE16_MEMBER(vram_1_w);
-	DECLARE_WRITE16_MEMBER(vram_2_w);
-	DECLARE_WRITE16_MEMBER(window_w);
-	DECLARE_WRITE16_MEMBER(scrollreg_w);
-	DECLARE_WRITE16_MEMBER(scrollreg_init_w);
-	void blt_write( address_space &space, const int tmap, const offs_t offs, const uint16_t data, const uint16_t mask );
-	DECLARE_DRIVER_INIT(magerror);
-	DECLARE_DRIVER_INIT(hyprduel);
-	TILE_GET_INFO_MEMBER(get_tile_info_0_8bit);
-	TILE_GET_INFO_MEMBER(get_tile_info_1_8bit);
-	TILE_GET_INFO_MEMBER(get_tile_info_2_8bit);
-	virtual void machine_reset() override;
-	DECLARE_MACHINE_START(hyprduel);
-	DECLARE_VIDEO_START(hyprduel_14220);
-	DECLARE_MACHINE_START(magerror);
-	DECLARE_VIDEO_START(magerror_14220);
-	DECLARE_VIDEO_START(common_14220);
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(vblank_end_callback);
-	TIMER_CALLBACK_MEMBER(magerror_irq_callback);
-	TIMER_CALLBACK_MEMBER(blit_done);
-	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 	void postload();
 	inline void get_tile_info( tile_data &tileinfo, int tile_index, int layer, uint16_t *vram);
 	inline void get_tile_info_8bit( tile_data &tileinfo, int tile_index, int layer, uint16_t *vram );
@@ -123,4 +127,5 @@ public:
 	void dirty_tiles( int layer, uint16_t *vram );
 	void update_irq_state(  );
 	inline int blt_read( const uint8_t *ROM, const int offs );
+	void blt_write( address_space &space, const int tmap, const offs_t offs, const uint16_t data, const uint16_t mask );
 };
