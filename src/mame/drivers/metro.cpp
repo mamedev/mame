@@ -770,6 +770,7 @@ static ADDRESS_MAP_START( balcube_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x674000, 0x674fff) AM_RAM AM_SHARE("spriteram")                       // Sprites
 	AM_RANGE(0x678000, 0x6787ff) AM_RAM AM_SHARE("tiletable")                       // Tiles Set
 	AM_RANGE(0x678840, 0x67884d) AM_WRITE(metro_blitter_w) AM_SHARE("blitter_regs") // Tiles Blitter
+	AM_RANGE(0x678850, 0x678853) AM_RAM AM_SHARE("spriteregs")
 	AM_RANGE(0x678860, 0x67886b) AM_WRITE(metro_window_w) AM_SHARE("window")        // Tilemap Window
 	AM_RANGE(0x678870, 0x67887b) AM_WRITEONLY AM_SHARE("scroll")                    // Scroll
 	AM_RANGE(0x678880, 0x678881) AM_WRITENOP                                        // ? CRT
@@ -799,6 +800,7 @@ static ADDRESS_MAP_START( daitoa_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x174000, 0x174fff) AM_RAM AM_SHARE("spriteram")                       // Sprites
 	AM_RANGE(0x178000, 0x1787ff) AM_RAM AM_SHARE("tiletable")                       // Tiles Set
 	AM_RANGE(0x178840, 0x17884d) AM_WRITE(metro_blitter_w) AM_SHARE("blitter_regs") // Tiles Blitter
+	AM_RANGE(0x178850, 0x178853) AM_RAM AM_SHARE("spriteregs")
 	AM_RANGE(0x178860, 0x17886b) AM_WRITE(metro_window_w) AM_SHARE("window")        // Tilemap Window
 	AM_RANGE(0x178870, 0x17887b) AM_WRITEONLY AM_SHARE("scroll")                    // Scroll
 	AM_RANGE(0x178880, 0x178881) AM_WRITENOP                                        // ? CRT
@@ -841,6 +843,7 @@ static ADDRESS_MAP_START( bangball_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0xe74000, 0xe74fff) AM_RAM AM_SHARE("spriteram")                       // Sprites
 	AM_RANGE(0xe78000, 0xe787ff) AM_RAM AM_SHARE("tiletable")                       // Tiles Set
 	AM_RANGE(0xe78840, 0xe7884d) AM_WRITE(metro_blitter_w) AM_SHARE("blitter_regs") // Tiles Blitter
+	AM_RANGE(0xe78850, 0xe78853) AM_RAM AM_SHARE("spriteregs")
 	AM_RANGE(0xe78860, 0xe7886b) AM_WRITE(metro_window_w) AM_SHARE("window")        // Tilemap Window
 	AM_RANGE(0xe78870, 0xe7887b) AM_WRITEONLY AM_SHARE("scroll")                    // Scroll
 	AM_RANGE(0xe78880, 0xe78881) AM_WRITENOP                                        // ? CRT
@@ -869,6 +872,7 @@ static ADDRESS_MAP_START( batlbubl_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x174000, 0x174fff) AM_RAM AM_SHARE("spriteram")                       // Sprites
 	AM_RANGE(0x178000, 0x1787ff) AM_RAM AM_SHARE("tiletable")                       // Tiles Set
 	AM_RANGE(0x178840, 0x17884d) AM_WRITE(metro_blitter_w) AM_SHARE("blitter_regs") // Tiles Blitter
+	AM_RANGE(0x178850, 0x178853) AM_RAM AM_SHARE("spriteregs")
 	AM_RANGE(0x178860, 0x17886b) AM_WRITE(metro_window_w) AM_SHARE("window")        // Tilemap Window
 	AM_RANGE(0x178870, 0x17887b) AM_WRITEONLY AM_SHARE("scroll")                    // Scroll
 	AM_RANGE(0x178880, 0x178881) AM_WRITENOP                                        // ? CRT
@@ -905,6 +909,7 @@ static ADDRESS_MAP_START( msgogo_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x174000, 0x174fff) AM_RAM AM_SHARE("spriteram")                       // Sprites
 	AM_RANGE(0x178000, 0x1787ff) AM_RAM AM_SHARE("tiletable")                       // Tiles Set
 	AM_RANGE(0x178840, 0x17884d) AM_WRITE(metro_blitter_w) AM_SHARE("blitter_regs") // Tiles Blitter
+	AM_RANGE(0x178850, 0x178853) AM_RAM AM_SHARE("spriteregs")
 	AM_RANGE(0x178860, 0x17886b) AM_WRITE(metro_window_w) AM_SHARE("window")        // Tilemap Window
 	AM_RANGE(0x178870, 0x17887b) AM_WRITEONLY AM_SHARE("scroll")                    // Scroll
 	AM_RANGE(0x178880, 0x178881) AM_WRITENOP                                        // ? CRT
@@ -939,6 +944,7 @@ static ADDRESS_MAP_START( daitorid_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x474000, 0x474fff) AM_RAM AM_SHARE("spriteram")                       // Sprites
 	AM_RANGE(0x478000, 0x4787ff) AM_RAM AM_SHARE("tiletable")                       // Tiles Set
 	AM_RANGE(0x478840, 0x47884d) AM_WRITE(metro_blitter_w) AM_SHARE("blitter_regs") // Tiles Blitter
+	AM_RANGE(0x478850, 0x478853) AM_RAM AM_SHARE("spriteregs")
 	AM_RANGE(0x478860, 0x47886b) AM_WRITE(metro_window_w) AM_SHARE("window")        // Tilemap Window
 	AM_RANGE(0x478870, 0x47887b) AM_WRITEONLY AM_SHARE("scroll")                    // Scroll
 	AM_RANGE(0x478880, 0x478881) AM_WRITENOP                                        // ? CRT
@@ -974,6 +980,7 @@ static ADDRESS_MAP_START( dharma_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x874000, 0x874fff) AM_RAM AM_SHARE("spriteram")                       // Sprites
 	AM_RANGE(0x878000, 0x8787ff) AM_RAM AM_SHARE("tiletable")                       // Tiles Set
 	AM_RANGE(0x878840, 0x87884d) AM_WRITE(metro_blitter_w) AM_SHARE("blitter_regs") // Tiles Blitter
+	AM_RANGE(0x878850, 0x878853) AM_RAM AM_SHARE("spriteregs")
 	AM_RANGE(0x878860, 0x87886b) AM_WRITE(metro_window_w) AM_SHARE("window")        // Tilemap Window
 	AM_RANGE(0x878870, 0x87887b) AM_WRITEONLY AM_SHARE("scroll")                    // Scroll Regs
 	AM_RANGE(0x878880, 0x878881) AM_WRITENOP                                        // ? CRT
@@ -1029,8 +1036,9 @@ static ADDRESS_MAP_START( karatour_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x878000, 0x8787ff) AM_RAM AM_SHARE("tiletable")                       // Tiles Set
 	AM_RANGE(0x878800, 0x878813) AM_RAM AM_SHARE("videoregs")                 // Video Registers
 	AM_RANGE(0x878840, 0x87884d) AM_WRITE(metro_blitter_w) AM_SHARE("blitter_regs") // Tiles Blitter
-	AM_RANGE(0x878860, 0x87886b) AM_WRITE(metro_window_w) AM_SHARE("window")        // Tilemap Window
-	AM_RANGE(0x878870, 0x87887b) AM_WRITEONLY AM_SHARE("scroll")                    // Scroll
+	AM_RANGE(0x878850, 0x878853) AM_RAM AM_SHARE("spriteregs")
+	AM_RANGE(0x878860, 0x87886b) AM_RAM_WRITE(metro_window_w) AM_SHARE("window")        // Tilemap Window
+	AM_RANGE(0x878870, 0x87887b) AM_RAM AM_SHARE("scroll")                    // Scroll
 	AM_RANGE(0x878880, 0x878881) AM_WRITENOP                                        // ? CRT
 	AM_RANGE(0x878890, 0x878891) AM_WRITENOP                                        // ? CRT
 	AM_RANGE(0x8788a2, 0x8788a3) AM_READWRITE(metro_irq_cause_r, metro_irq_cause_w) // IRQ Cause / IRQ Acknowledge
@@ -1060,6 +1068,7 @@ static ADDRESS_MAP_START( kokushi_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x877000, 0x877fff) AM_READWRITE(karatour_vram_2_r, karatour_vram_2_w) // Layer 2 (Part of)
 	AM_RANGE(0x878000, 0x8787ff) AM_RAM AM_SHARE("tiletable")                       // Tiles Set
 	AM_RANGE(0x878840, 0x87884d) AM_WRITE(metro_blitter_w) AM_SHARE("blitter_regs") // Tiles Blitter
+	AM_RANGE(0x878850, 0x878853) AM_RAM AM_SHARE("spriteregs")
 	AM_RANGE(0x878860, 0x87886b) AM_WRITE(metro_window_w) AM_SHARE("window")        // Tilemap Window
 	AM_RANGE(0x878870, 0x87887b) AM_WRITEONLY AM_SHARE("scroll")                    // Scroll Regs - WRONG
 //  AM_RANGE(0x878880, 0x878881) AM_WRITENOP                                        // ? CRT
@@ -1094,6 +1103,7 @@ static ADDRESS_MAP_START( lastfort_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x878000, 0x8787ff) AM_RAM AM_SHARE("tiletable")                       // Tiles Set
 	AM_RANGE(0x878800, 0x878813) AM_RAM AM_SHARE("videoregs")                 // Video Registers
 	AM_RANGE(0x878840, 0x87884d) AM_WRITE(metro_blitter_w) AM_SHARE("blitter_regs") // Tiles Blitter
+	AM_RANGE(0x878850, 0x878853) AM_RAM AM_SHARE("spriteregs")
 	AM_RANGE(0x878860, 0x87886b) AM_WRITE(metro_window_w) AM_SHARE("window")        // Tilemap Window
 	AM_RANGE(0x878870, 0x87887b) AM_WRITEONLY AM_SHARE("scroll")                    // Scroll
 	AM_RANGE(0x878880, 0x878881) AM_WRITENOP                                        // ? CRT
@@ -1135,6 +1145,7 @@ static ADDRESS_MAP_START( lastforg_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x8f8000, 0x8f87ff) AM_RAM AM_SHARE("tiletable")                       // Tiles Set
 	AM_RANGE(0x8f8800, 0x8f8813) AM_RAM AM_SHARE("videoregs")                 // Video Registers
 	AM_RANGE(0x8f8840, 0x8f884d) AM_WRITE(metro_blitter_w) AM_SHARE("blitter_regs") // Tiles Blitter
+	AM_RANGE(0x8f8850, 0x8f8853) AM_RAM AM_SHARE("spriteregs")
 	AM_RANGE(0x8f8860, 0x8f886b) AM_WRITE(metro_window_w) AM_SHARE("window")        // Tilemap Window
 	AM_RANGE(0x8f8870, 0x8f887b) AM_WRITEONLY AM_SHARE("scroll")                    // Scroll
 	AM_RANGE(0x8f8880, 0x8f8881) AM_WRITENOP                                        // ? CRT
@@ -1200,6 +1211,17 @@ WRITE8_MEMBER(metro_state::gakusai_eeprom_w)
 	m_eeprom->clk_write(BIT(data, 1) ? ASSERT_LINE : CLEAR_LINE );
 }
 
+// inverted than default, also different location than the other games on this HW
+READ16_MEMBER(metro_state::gakusai_spriteregs_r)
+{
+	return m_spriteregs[offset ^ 1];
+}
+
+WRITE16_MEMBER(metro_state::gakusai_spriteregs_w)
+{
+	COMBINE_DATA(&m_spriteregs[offset ^ 1]);
+}
+
 static ADDRESS_MAP_START( gakusai_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM                                             // ROM
 	AM_RANGE(0x200000, 0x21ffff) AM_RAM_WRITE(metro_vram_0_w) AM_SHARE("vram_0")    // Layer 0
@@ -1210,16 +1232,17 @@ static ADDRESS_MAP_START( gakusai_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x272000, 0x273fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    // Palette
 	AM_RANGE(0x274000, 0x274fff) AM_RAM AM_SHARE("spriteram")                       // Sprites
 	AM_RANGE(0x278000, 0x2787ff) AM_RAM AM_SHARE("tiletable")                       // Tiles Set
+	AM_RANGE(0x278808, 0x27880b) AM_READWRITE(gakusai_spriteregs_r,gakusai_spriteregs_w) AM_SHARE("spriteregs") // 
 	AM_RANGE(0x27880e, 0x27880f) AM_RAM AM_SHARE("screenctrl")                      // Screen Control
 	AM_RANGE(0x278810, 0x27881f) AM_WRITEONLY AM_SHARE("irq_levels")                // IRQ Levels
 	AM_RANGE(0x278820, 0x27882f) AM_WRITEONLY AM_SHARE("irq_vectors")               // IRQ Vectors
 	AM_RANGE(0x278830, 0x278831) AM_WRITEONLY AM_SHARE("irq_enable")                // IRQ Enable
 	AM_RANGE(0x278832, 0x278833) AM_READWRITE(metro_irq_cause_r, metro_irq_cause_w) // IRQ Cause / IRQ Acknowledge
-	AM_RANGE(0x278836, 0x278837) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
+	AM_RANGE(0x278836, 0x278837) AM_READNOP AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 	AM_RANGE(0x278840, 0x27884d) AM_WRITE(metro_blitter_w) AM_SHARE("blitter_regs") // Tiles Blitter
-	AM_RANGE(0x278850, 0x27885b) AM_WRITEONLY AM_SHARE("scroll")                    // Scroll Regs
+	AM_RANGE(0x278850, 0x27885b) AM_RAM AM_SHARE("scroll")                    // Scroll Regs
 	AM_RANGE(0x278860, 0x27886b) AM_WRITE(metro_window_w) AM_SHARE("window")        // Tilemap Window
-	AM_RANGE(0x278870, 0x278871) AM_WRITEONLY AM_SHARE("rombank")                   // Rom Bank
+	AM_RANGE(0x278870, 0x278871) AM_READNOP AM_WRITEONLY AM_SHARE("rombank")                   // Rom Bank
 	AM_RANGE(0x278880, 0x278881) AM_READ(gakusai_input_r)                           // Inputs
 	AM_RANGE(0x278882, 0x278883) AM_READ_PORT("IN0")                                //
 	AM_RANGE(0x278888, 0x278889) AM_WRITEONLY AM_SHARE("input_sel")                 // Inputs
@@ -1249,12 +1272,13 @@ static ADDRESS_MAP_START( gakusai2_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x674000, 0x674fff) AM_RAM AM_SHARE("spriteram")                       // Sprites
 	AM_RANGE(0x675000, 0x675fff) AM_RAM                                             // Sprites?
 	AM_RANGE(0x678000, 0x6787ff) AM_RAM AM_SHARE("tiletable")                       // Tiles Set
+	AM_RANGE(0x678808, 0x67880b) AM_READWRITE(gakusai_spriteregs_r,gakusai_spriteregs_w) AM_SHARE("spriteregs") // 
 	AM_RANGE(0x67880e, 0x67880f) AM_RAM AM_SHARE("screenctrl")                      // Screen Control
 	AM_RANGE(0x678810, 0x67881f) AM_WRITEONLY AM_SHARE("irq_levels")                // IRQ Levels
 	AM_RANGE(0x678820, 0x67882f) AM_WRITEONLY AM_SHARE("irq_vectors")               // IRQ Vectors
 	AM_RANGE(0x678830, 0x678831) AM_WRITEONLY AM_SHARE("irq_enable")                // IRQ Enable
 	AM_RANGE(0x678832, 0x678833) AM_READWRITE(metro_irq_cause_r,metro_irq_cause_w)  // IRQ Cause / IRQ Acknowledge
-	AM_RANGE(0x678836, 0x678837) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
+	AM_RANGE(0x678836, 0x678837) AM_READNOP AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 	AM_RANGE(0x678840, 0x67884d) AM_WRITE(metro_blitter_w) AM_SHARE("blitter_regs") // Tiles Blitter
 	AM_RANGE(0x678850, 0x67885b) AM_WRITEONLY AM_SHARE("scroll")                    // Scroll Regs
 	AM_RANGE(0x678860, 0x67886b) AM_WRITE(metro_window_w) AM_SHARE("window")        // Tilemap Window
@@ -1312,6 +1336,7 @@ static ADDRESS_MAP_START( dokyusp_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x272000, 0x273fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    // Palette
 	AM_RANGE(0x274000, 0x274fff) AM_RAM AM_SHARE("spriteram")                       // Sprites
 	AM_RANGE(0x278000, 0x2787ff) AM_RAM AM_SHARE("tiletable")                       // Tiles Set
+	AM_RANGE(0x278808, 0x27880b) AM_READWRITE(gakusai_spriteregs_r,gakusai_spriteregs_w) AM_SHARE("spriteregs") // 
 	AM_RANGE(0x27880e, 0x27880f) AM_RAM AM_SHARE("screenctrl")                      // Screen Control
 	AM_RANGE(0x278810, 0x27881f) AM_WRITEONLY AM_SHARE("irq_levels")                // IRQ Levels
 	AM_RANGE(0x278820, 0x27882f) AM_WRITEONLY AM_SHARE("irq_vectors")               // IRQ Vectors
@@ -1351,6 +1376,7 @@ static ADDRESS_MAP_START( dokyusei_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x472000, 0x473fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    // Palette
 	AM_RANGE(0x474000, 0x474fff) AM_RAM AM_SHARE("spriteram")                       // Sprites
 	AM_RANGE(0x478000, 0x4787ff) AM_RAM AM_SHARE("tiletable")                       // Tiles Set
+	AM_RANGE(0x478808, 0x47880b) AM_READWRITE(gakusai_spriteregs_r,gakusai_spriteregs_w) AM_SHARE("spriteregs") // 
 	AM_RANGE(0x47880e, 0x47880f) AM_WRITEONLY AM_SHARE("screenctrl")                // Screen Control
 	AM_RANGE(0x478810, 0x47881f) AM_WRITEONLY AM_SHARE("irq_levels")                // IRQ Levels
 	AM_RANGE(0x478820, 0x47882f) AM_WRITEONLY AM_SHARE("irq_vectors")               // IRQ Vectors
@@ -1393,6 +1419,7 @@ static ADDRESS_MAP_START( pangpoms_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x478000, 0x4787ff) AM_RAM AM_SHARE("tiletable")                       // Tiles Set
 	AM_RANGE(0x478800, 0x478813) AM_RAM AM_SHARE("videoregs")                       // Video Registers
 	AM_RANGE(0x478840, 0x47884d) AM_WRITE(metro_blitter_w) AM_SHARE("blitter_regs") // Tiles Blitter
+	AM_RANGE(0x478850, 0x478853) AM_RAM AM_SHARE("spriteregs")
 	AM_RANGE(0x478860, 0x47886b) AM_WRITE(metro_window_w) AM_SHARE("window")        // Tilemap Window
 	AM_RANGE(0x478870, 0x47887b) AM_WRITEONLY AM_SHARE("scroll")                    // Scroll Regs
 	AM_RANGE(0x478880, 0x478881) AM_WRITENOP                                        // ? CRT
@@ -1436,6 +1463,7 @@ static ADDRESS_MAP_START( poitto_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0xc78000, 0xc787ff) AM_RAM AM_SHARE("tiletable")                       // Tiles Set
 	AM_RANGE(0xc78800, 0xc78813) AM_RAM AM_SHARE("videoregs")                 // Video Registers
 	AM_RANGE(0xc78840, 0xc7884d) AM_WRITE(metro_blitter_w) AM_SHARE("blitter_regs") // Tiles Blitter
+	AM_RANGE(0xc78850, 0xc78853) AM_RAM AM_SHARE("spriteregs")
 	AM_RANGE(0xc78860, 0xc7886b) AM_WRITE(metro_window_w) AM_SHARE("window")        // Tilemap Window
 	AM_RANGE(0xc78870, 0xc7887b) AM_WRITEONLY AM_SHARE("scroll")                    // Scroll Regs
 	AM_RANGE(0xc78880, 0xc78881) AM_WRITENOP                                        // ? CRT
@@ -1472,6 +1500,7 @@ static ADDRESS_MAP_START( skyalert_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x878000, 0x8787ff) AM_RAM AM_SHARE("tiletable")                       // Tiles Set
 	AM_RANGE(0x878800, 0x878813) AM_RAM AM_SHARE("videoregs")                 // Video Registers
 	AM_RANGE(0x878840, 0x87884d) AM_WRITE(metro_blitter_w) AM_SHARE("blitter_regs") // Tiles Blitter
+	AM_RANGE(0x878850, 0x878853) AM_RAM AM_SHARE("spriteregs")
 	AM_RANGE(0x878860, 0x87886b) AM_WRITE(metro_window_w) AM_SHARE("window")        // Tilemap Window
 	AM_RANGE(0x878870, 0x87887b) AM_WRITEONLY AM_SHARE("scroll")                    // Scroll
 	AM_RANGE(0x878880, 0x878881) AM_WRITENOP                                        // ? CRT
@@ -1506,8 +1535,9 @@ static ADDRESS_MAP_START( pururun_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0xc74000, 0xc74fff) AM_RAM AM_SHARE("spriteram")                       // Sprites
 	AM_RANGE(0xc78000, 0xc787ff) AM_RAM AM_SHARE("tiletable")                       // Tiles Set
 	AM_RANGE(0xc78840, 0xc7884d) AM_WRITE(metro_blitter_w) AM_SHARE("blitter_regs") // Tiles Blitter
-	AM_RANGE(0xc78860, 0xc7886b) AM_WRITE(metro_window_w) AM_SHARE("window")        // Tilemap Window
-	AM_RANGE(0xc78870, 0xc7887b) AM_WRITEONLY AM_SHARE("scroll")                    // Scroll Regs
+	AM_RANGE(0xc78850, 0xc78853) AM_RAM AM_SHARE("spriteregs")
+	AM_RANGE(0xc78860, 0xc7886b) AM_RAM_WRITE(metro_window_w) AM_SHARE("window")        // Tilemap Window
+	AM_RANGE(0xc78870, 0xc7887b) AM_RAM AM_SHARE("scroll")                    // Scroll Regs
 	AM_RANGE(0xc78880, 0xc78881) AM_WRITENOP                                        // ? CRT
 	AM_RANGE(0xc78890, 0xc78891) AM_WRITENOP                                        // ? CRT
 	AM_RANGE(0xc788a2, 0xc788a3) AM_READWRITE(metro_irq_cause_r,metro_irq_cause_w)  // IRQ Cause / IRQ Acknowledge
@@ -1540,6 +1570,7 @@ static ADDRESS_MAP_START( toride2g_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0xc74000, 0xc74fff) AM_RAM AM_SHARE("spriteram")                       // Sprites
 	AM_RANGE(0xc78000, 0xc787ff) AM_RAM AM_SHARE("tiletable")                       // Tiles Set
 	AM_RANGE(0xc78840, 0xc7884d) AM_WRITE(metro_blitter_w) AM_SHARE("blitter_regs") // Tiles Blitter
+	AM_RANGE(0xc78850, 0xc78853) AM_RAM AM_SHARE("spriteregs")
 	AM_RANGE(0xc78860, 0xc7886b) AM_WRITE(metro_window_w) AM_SHARE("window")        // Tilemap Window
 	AM_RANGE(0xc78870, 0xc7887b) AM_WRITEONLY AM_SHARE("scroll")                    // Scroll Regs
 	AM_RANGE(0xc78880, 0xc78881) AM_WRITENOP                                        // ? CRT
@@ -1596,6 +1627,7 @@ static ADDRESS_MAP_START( blzntrnd_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x272000, 0x273fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    // Palette
 	AM_RANGE(0x274000, 0x274fff) AM_RAM AM_SHARE("spriteram")                       // Sprites
 	AM_RANGE(0x278000, 0x2787ff) AM_RAM AM_SHARE("tiletable")                       // Tiles Set
+	AM_RANGE(0x278850, 0x278853) AM_RAM AM_SHARE("spriteregs")
 	AM_RANGE(0x278860, 0x27886b) AM_WRITE(metro_window_w) AM_SHARE("window")        // Tilemap Window
 	AM_RANGE(0x278870, 0x27887b) AM_WRITEONLY AM_SHARE("scroll")                    // Scroll
 	AM_RANGE(0x278890, 0x278891) AM_WRITENOP                                        // ? CRT
@@ -1637,6 +1669,7 @@ static ADDRESS_MAP_START( mouja_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x472000, 0x473fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    // Palette
 	AM_RANGE(0x474000, 0x474fff) AM_RAM AM_SHARE("spriteram")                       // Sprites
 	AM_RANGE(0x478000, 0x4787ff) AM_RAM AM_SHARE("tiletable")                       // Tiles Set
+	AM_RANGE(0x478808, 0x47880b) AM_READWRITE(gakusai_spriteregs_r,gakusai_spriteregs_w) AM_SHARE("spriteregs") // 
 	AM_RANGE(0x47880e, 0x47880f) AM_WRITEONLY AM_SHARE("screenctrl")                // Screen Control
 	AM_RANGE(0x478810, 0x47881f) AM_WRITEONLY AM_SHARE("irq_levels")                // IRQ Levels
 	AM_RANGE(0x478820, 0x47882f) AM_WRITEONLY AM_SHARE("irq_vectors")               // IRQ Vectors
@@ -1810,6 +1843,7 @@ static ADDRESS_MAP_START( puzzlet_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x778000, 0x7787ff) AM_RAM AM_SHARE("tiletable")                       // Tiles Set
 	AM_RANGE(0x778800, 0x778813) AM_RAM AM_SHARE("videoregs")                 // Video Registers
 	AM_RANGE(0x778840, 0x77884f) AM_WRITE(metro_blitter_w) AM_SHARE("blitter_regs") // Tiles Blitter
+	AM_RANGE(0x778850, 0x778853) AM_RAM AM_SHARE("spriteregs")
 	AM_RANGE(0x778860, 0x77886b) AM_WRITE(metro_window_w) AM_SHARE("window")        // Tilemap Window
 	AM_RANGE(0x778870, 0x77887b) AM_WRITEONLY AM_SHARE("scroll")                    // Scroll
 	AM_RANGE(0x778890, 0x778891) AM_WRITENOP                                        // ? CRT
@@ -1887,6 +1921,7 @@ static ADDRESS_MAP_START( vmetal_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x174000, 0x174fff) AM_RAM AM_SHARE("spriteram")                       // Sprites
 	AM_RANGE(0x178000, 0x1787ff) AM_RAM AM_SHARE("tiletable")                       // Tiles Set
 	AM_RANGE(0x178840, 0x17884d) AM_WRITE(metro_blitter_w) AM_SHARE("blitter_regs") // Tiles Blitter
+	AM_RANGE(0x178850, 0x178853) AM_RAM AM_SHARE("spriteregs")
 	AM_RANGE(0x178860, 0x17886b) AM_WRITE(metro_window_w) AM_SHARE("window")        // Tilemap Window
 	AM_RANGE(0x178870, 0x17887b) AM_WRITEONLY AM_SHARE("scroll")                    // Scroll
 	AM_RANGE(0x178880, 0x178881) AM_WRITENOP                                        // ? CRT
@@ -2754,9 +2789,10 @@ static INPUT_PORTS_START( lastfort )
 	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Demo_Sounds ) )      PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0040, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, "Tiles" )             PORT_DIPLOCATION("SW2:8")
-	PORT_DIPSETTING(      0x0080, "Mahjong" )
-//  PORT_DIPSETTING(      0x0000, "Cards" )             // Not working - See notes
+//	PORT_DIPNAME( 0x0080, 0x0080, "Tiles" )             PORT_DIPLOCATION("SW2:8")
+//	PORT_DIPSETTING(      0x0080, "Mahjong" )
+//	PORT_DIPSETTING(      0x0000, "Cards" )             // Not working - See notes
+	PORT_DIPUNUSED_DIPLOC( 0x0080, 0x0080, "SW2:8" )
 
 	PORT_START("IN3")   // $c0000e
 	PORT_BIT(  0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -4180,7 +4216,7 @@ static MACHINE_CONFIG_START( pururun )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(320, 224)
+	MCFG_SCREEN_SIZE(320, 260)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(metro_state, screen_update_metro)
 	MCFG_SCREEN_PALETTE("palette")
@@ -4326,7 +4362,7 @@ static MACHINE_CONFIG_START( vmetal )
 	MCFG_SCREEN_REFRESH_RATE(58.2328) // VSync 58.2328Hz, HSync 15.32kHz
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(320, 224)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 224-1)
+	MCFG_SCREEN_VISIBLE_AREA(0, 304-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(metro_state, screen_update_metro)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -4366,7 +4402,7 @@ static MACHINE_CONFIG_START( blzntrnd )
 	MCFG_SCREEN_REFRESH_RATE(58)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(320, 224)
-	MCFG_SCREEN_VISIBLE_AREA(8, 320-8-1, 0, 224-1)
+	MCFG_SCREEN_VISIBLE_AREA(0, 304-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(metro_state, screen_update_metro)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -4376,7 +4412,7 @@ static MACHINE_CONFIG_START( blzntrnd )
 	MCFG_PALETTE_FORMAT(GGGGGRRRRRBBBBBx)
 
 	MCFG_DEVICE_ADD("k053936", K053936, 0)
-	MCFG_K053936_OFFSETS(-69, -21)
+	MCFG_K053936_OFFSETS(-77, -21)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -4395,7 +4431,7 @@ static MACHINE_CONFIG_DERIVED( gstrik2, blzntrnd )
 	MCFG_VIDEO_START_OVERRIDE(metro_state,gstrik2)
 
 	MCFG_DEVICE_MODIFY("k053936")
-	MCFG_K053936_OFFSETS(-69, -19)
+	MCFG_K053936_OFFSETS(-77, -19)
 MACHINE_CONFIG_END
 
 
@@ -6217,14 +6253,16 @@ DRIVER_INIT_MEMBER(metro_state,metro)
 
 DRIVER_INIT_MEMBER(metro_state,karatour)
 {
-	m_vram_0.allocate(0x20000/2);
-	m_vram_1.allocate(0x20000/2);
-	m_vram_2.allocate(0x20000/2);
-	for (int i = 0; i < 0x20000 / 2; i++)
+	m_vram_0.allocate(m_vram_size);
+	m_vram_1.allocate(m_vram_size);
+	m_vram_2.allocate(m_vram_size);
+	for (int i = 0; i < m_vram_size; i++)
 	{
-		m_vram_0[i] = machine().rand();
-		m_vram_1[i] = machine().rand();
-		m_vram_2[i] = machine().rand();
+		// sane init VRAM for Lady Killer 
+		// TODO: stage select still looks bogus tho 
+		m_vram_0[i] = 0xffff; //machine().rand();
+		m_vram_1[i] = 0xffff; //machine().rand();
+		m_vram_2[i] = 0xffff; //machine().rand();
 	}
 
 	m_karatour_irq_timer = timer_alloc(TIMER_KARATOUR_IRQ);
@@ -6348,11 +6386,11 @@ GAME( 1994, blzntrnd,  0,        blzntrnd, blzntrnd, metro_state, blzntrnd, ROT0
 GAME( 1994, dharma,    0,        dharma,   dharma,   metro_state, dharmak,  ROT0,   "Metro",                                           "Dharma Doujou",                          MACHINE_SUPPORTS_SAVE )
 GAME( 1994, dharmaj,   dharma,   dharma,   dharma,   metro_state, metro,    ROT0,   "Metro",                                           "Dharma Doujou (Japan)",                  MACHINE_SUPPORTS_SAVE )
 GAME( 1994, dharmak,   dharma,   dharma,   dharma,   metro_state, dharmak,  ROT0,   "Metro",                                           "Dharma Doujou (Korea)",                  MACHINE_SUPPORTS_SAVE )
-GAME( 1994, lastfort,  0,        lastfort, lastfort, metro_state, metro,    ROT0,   "Metro",                                           "Last Fortress - Toride",                 MACHINE_SUPPORTS_SAVE )
-GAME( 1994, lastforte, lastfort, lastfort, lastfero, metro_state, metro,    ROT0,   "Metro",                                           "Last Fortress - Toride (Erotic, Rev C)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, lastfortea,lastfort, lastfort, lastfero, metro_state, metro,    ROT0,   "Metro",                                           "Last Fortress - Toride (Erotic, Rev A)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, lastfort,  0,        lastfort, lastfort, metro_state, metro,    ROT0,   "Metro",                                           "Last Fortress - Toride (Japan)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1994, lastforte, lastfort, lastfort, lastfero, metro_state, metro,    ROT0,   "Metro",                                           "Last Fortress - Toride (China, Rev C)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, lastfortea,lastfort, lastfort, lastfero, metro_state, metro,    ROT0,   "Metro",                                           "Last Fortress - Toride (China, Rev A)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, lastfortk, lastfort, lastfort, lastfero, metro_state, metro,    ROT0,   "Metro",                                           "Last Fortress - Toride (Korea)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1994, lastfortg, lastfort, lastforg, ladykill, metro_state, lastfortg,ROT0,   "Metro",                                           "Last Fortress - Toride (German)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1994, lastfortg, lastfort, lastforg, ladykill, metro_state, lastfortg,ROT0,   "Metro",                                           "Last Fortress - Toride (Germany)",        MACHINE_SUPPORTS_SAVE )
 GAME( 1994, toride2g,  0,        toride2g, toride2g, metro_state, metro,    ROT0,   "Metro",                                           "Toride II Adauchi Gaiden",               MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1994, toride2gg, toride2g, toride2g, toride2g, metro_state, metro,    ROT0,   "Metro",                                           "Toride II Adauchi Gaiden (German)",      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1994, toride2gk, toride2g, toride2g, toride2g, metro_state, metro,    ROT0,   "Metro",                                           "Toride II Bok Su Oi Jeon Adauchi Gaiden (Korea)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
