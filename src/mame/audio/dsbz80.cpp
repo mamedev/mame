@@ -54,6 +54,7 @@ MACHINE_CONFIG_MEMBER( dsbz80_device::device_add_mconfig )
 
 	MCFG_CLOCK_ADD("uart_clock", 500000) // 16 times 31.25MHz (standard Sega/MIDI sound data rate)
 	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("uart", i8251_device, write_rxc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart", i8251_device, write_txc))
 MACHINE_CONFIG_END
 
 //**************************************************************************
