@@ -3316,7 +3316,7 @@ bool ppc_device::generate_instruction_1f(drcuml_block *block, compiler_state *co
 				UML_MOV(block, R32(G_RD(op)), m_flavor);                         // mov     rd,flavor
 			else
 			{
-				generate_update_cycles(block, compiler, desc->pc, true);           // <update cycles>
+				generate_update_cycles(block, compiler, desc->pc, false);           // <update cycles>
 				UML_MOV(block, mem(&m_core->param0), spr);                             // mov     [param0],spr
 				UML_CALLC(block, (c_function)cfunc_ppccom_execute_mfspr, this);                                // callc   ppccom_execute_mfspr,ppc
 				UML_MOV(block, R32(G_RD(op)), mem(&m_core->param1));                           // mov     rd,[param1]
@@ -3338,7 +3338,7 @@ bool ppc_device::generate_instruction_1f(drcuml_block *block, compiler_state *co
 			uint32_t tbr = compute_spr(G_SPR(op));
 			if (tbr != SPRVEA_TBL_R && tbr != SPRVEA_TBU_R)
 				return false;
-			generate_update_cycles(block, compiler, desc->pc, true);               // <update cycles>
+			generate_update_cycles(block, compiler, desc->pc, false);               // <update cycles>
 			UML_MOV(block, mem(&m_core->param0), tbr);                                 // mov     [param0],tbr
 			UML_CALLC(block, (c_function)cfunc_ppccom_execute_mftb, this);                                     // callc   ppccom_execute_mftb,ppc
 			UML_MOV(block, R32(G_RD(op)), mem(&m_core->param1));                               // mov     rd,[param1]
@@ -3383,7 +3383,7 @@ bool ppc_device::generate_instruction_1f(drcuml_block *block, compiler_state *co
 				;                                                                           // read only
 			else
 			{
-				generate_update_cycles(block, compiler, desc->pc, true);           // <update cycles>
+				generate_update_cycles(block, compiler, desc->pc, false);           // <update cycles>
 				UML_MOV(block, mem(&m_core->param0), spr);                             // mov     [param0],spr
 				UML_MOV(block, mem(&m_core->param1), R32(G_RS(op)));                           // mov     [param1],rs
 				UML_CALLC(block, (c_function)cfunc_ppccom_execute_mtspr, this);                                // callc   ppccom_execute_mtspr,ppc
@@ -3429,7 +3429,7 @@ bool ppc_device::generate_instruction_1f(drcuml_block *block, compiler_state *co
 		{
 			uint32_t spr = compute_spr(G_SPR(op));
 			assert(m_cap & PPCCAP_4XX);
-			generate_update_cycles(block, compiler, desc->pc, true);               // <update cycles>
+			generate_update_cycles(block, compiler, desc->pc, false);               // <update cycles>
 			UML_MOV(block, mem(&m_core->param0), spr);                                 // mov     [param0],spr
 			UML_CALLC(block, (c_function)cfunc_ppccom_execute_mfdcr, this);                                    // callc   ppccom_execute_mfdcr,ppc
 			UML_MOV(block, R32(G_RD(op)), mem(&m_core->param1));                               // mov     rd,[param1]
@@ -3440,7 +3440,7 @@ bool ppc_device::generate_instruction_1f(drcuml_block *block, compiler_state *co
 		{
 			uint32_t spr = compute_spr(G_SPR(op));
 			assert(m_cap & PPCCAP_4XX);
-			generate_update_cycles(block, compiler, desc->pc, true);               // <update cycles>
+			generate_update_cycles(block, compiler, desc->pc, false);               // <update cycles>
 			UML_MOV(block, mem(&m_core->param0), spr);                                 // mov     [param0],spr
 			UML_MOV(block, mem(&m_core->param1), R32(G_RS(op)));                               // mov     [param1],rs
 			UML_CALLC(block, (c_function)cfunc_ppccom_execute_mtdcr, this);                                    // callc   ppccom_execute_mtdcr,ppc
