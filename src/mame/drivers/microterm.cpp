@@ -22,20 +22,29 @@ public:
 		//, m_p_chargen(*this, "chargen")
 	{ }
 
+	DECLARE_READ8_MEMBER(c000_r);
+
 private:
 	required_device<cpu_device> m_maincpu;
 	//required_region_ptr<u8> m_p_chargen;
 };
 
+READ8_MEMBER(microterm_state::c000_r)
+{
+	return machine().rand() & 0x80;
+}
+
 static ADDRESS_MAP_START( mt420_mem_map, AS_PROGRAM, 8, microterm_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("maincpu", 0)
-	AM_RANGE(0xc000, 0xc000) AM_READNOP
+	AM_RANGE(0xc000, 0xc000) AM_READ(c000_r) AM_WRITENOP
+	AM_RANGE(0xe000, 0xefff) AM_RAM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mt420_io_map, AS_IO, 8, microterm_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xe0, 0xef) AM_DEVREADWRITE("duart", mc68681_device, read, write)
+	AM_RANGE(0xf1, 0xf1) AM_READNOP
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mt5510_mem_map, AS_PROGRAM, 8, microterm_state )
@@ -59,6 +68,12 @@ static MACHINE_CONFIG_START( mt420 )
 
 	MCFG_DEVICE_ADD("duart", MC68681, XTAL_3_6864MHz)
 	MCFG_MC68681_IRQ_CALLBACK(INPUTLINE("maincpu", 0))
+	MCFG_MC68681_OUTPORT_CALLBACK(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, di_write)) MCFG_DEVCB_BIT(5)
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, cs_write)) MCFG_DEVCB_BIT(4)
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, clk_write)) MCFG_DEVCB_BIT(3)
+
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_EEPROM_SERIAL_DO_CALLBACK(DEVWRITELINE("duart", mc68681_device, ip6_w))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( mt5510 )
