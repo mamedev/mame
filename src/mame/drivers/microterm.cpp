@@ -27,23 +27,39 @@ private:
 	//required_region_ptr<u8> m_p_chargen;
 };
 
-static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, microterm_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
+static ADDRESS_MAP_START( mt420_mem_map, AS_PROGRAM, 8, microterm_state )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0xc000, 0xc000) AM_READNOP
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, microterm_state )
+static ADDRESS_MAP_START( mt420_io_map, AS_IO, 8, microterm_state )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( mt5510_mem_map, AS_PROGRAM, 8, microterm_state )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("maincpu", 0)
+	AM_RANGE(0x8000, 0xbfff) AM_RAM
+	AM_RANGE(0xc000, 0xffff) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( mt5510_io_map, AS_IO, 8, microterm_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( microterm )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( microterm )
-	MCFG_CPU_ADD("maincpu", Z80, 2'000'000)
-	MCFG_CPU_PROGRAM_MAP(mem_map)
-	MCFG_CPU_IO_MAP(io_map)
+static MACHINE_CONFIG_START( mt420 )
+	MCFG_CPU_ADD("maincpu", Z80, 4'000'000)
+	MCFG_CPU_PROGRAM_MAP(mt420_mem_map)
+	MCFG_CPU_IO_MAP(mt420_io_map)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_START( mt5510 )
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_6MHz)
+	MCFG_CPU_PROGRAM_MAP(mt5510_mem_map)
+	MCFG_CPU_IO_MAP(mt5510_io_map)
 MACHINE_CONFIG_END
 
 
@@ -81,5 +97,5 @@ ROM_END
 
 
 
-COMP( 1986, mt420, 0, 0, microterm, microterm, microterm_state, 0, "Micro-Term", "Micro-Term 420", MACHINE_IS_SKELETON )
-COMP( 1988, mt5510, 0, 0, microterm, microterm, microterm_state, 0, "Micro-Term", "Micro-Term 5510", MACHINE_IS_SKELETON )
+COMP( 1986, mt420, 0, 0, mt420, microterm, microterm_state, 0, "Micro-Term", "Micro-Term 420", MACHINE_IS_SKELETON )
+COMP( 1988, mt5510, 0, 0, mt5510, microterm, microterm_state, 0, "Micro-Term", "Micro-Term 5510", MACHINE_IS_SKELETON )
