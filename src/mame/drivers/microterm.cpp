@@ -9,6 +9,7 @@ Skeleton driver for Micro-Term terminals.
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
+#include "machine/mc2661.h"
 #include "machine/mc68681.h"
 //#include "video/scn2674.h"
 //#include "screen.h"
@@ -44,7 +45,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( mt420_io_map, AS_IO, 8, microterm_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xe0, 0xef) AM_DEVREADWRITE("duart", mc68681_device, read, write)
-	AM_RANGE(0xf1, 0xf1) AM_READNOP
+	AM_RANGE(0xf0, 0xf3) AM_DEVREADWRITE("asci", mc2661_device, read, write)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mt5510_mem_map, AS_PROGRAM, 8, microterm_state )
@@ -66,11 +67,13 @@ static MACHINE_CONFIG_START( mt420 )
 	MCFG_CPU_PROGRAM_MAP(mt420_mem_map)
 	MCFG_CPU_IO_MAP(mt420_io_map)
 
-	MCFG_DEVICE_ADD("duart", MC68681, XTAL_3_6864MHz)
+	MCFG_DEVICE_ADD("duart", MC68681, XTAL_3_6864MHz) // SCN2681
 	MCFG_MC68681_IRQ_CALLBACK(INPUTLINE("maincpu", 0))
 	MCFG_MC68681_OUTPORT_CALLBACK(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, di_write)) MCFG_DEVCB_BIT(5)
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, cs_write)) MCFG_DEVCB_BIT(4)
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, clk_write)) MCFG_DEVCB_BIT(3)
+
+	MCFG_DEVICE_ADD("asci", MC2661, XTAL_3_6864MHz) // SCN2641
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 	MCFG_EEPROM_SERIAL_DO_CALLBACK(DEVWRITELINE("duart", mc68681_device, ip6_w))
@@ -81,7 +84,7 @@ static MACHINE_CONFIG_START( mt5510 )
 	MCFG_CPU_PROGRAM_MAP(mt5510_mem_map)
 	MCFG_CPU_IO_MAP(mt5510_io_map)
 
-	MCFG_DEVICE_ADD("duart", MC68681, XTAL_3_6864MHz)
+	MCFG_DEVICE_ADD("duart", MC68681, XTAL_3_6864MHz) // SCN2681
 	MCFG_MC68681_IRQ_CALLBACK(INPUTLINE("maincpu", 0))
 	MCFG_MC68681_OUTPORT_CALLBACK(DEVWRITELINE("eeprom1", eeprom_serial_93cxx_device, di_write)) MCFG_DEVCB_BIT(6)
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("eeprom2", eeprom_serial_93cxx_device, di_write)) MCFG_DEVCB_BIT(5)
