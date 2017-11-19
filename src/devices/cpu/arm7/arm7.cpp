@@ -149,12 +149,23 @@ arm920t_cpu_device::arm920t_cpu_device(const machine_config &mconfig, const char
 
 
 arm946es_cpu_device::arm946es_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: arm9_cpu_device(mconfig, ARM946ES, tag, owner, clock, 5, ARCHFLAG_T | ARCHFLAG_E, ENDIANNESS_LITTLE)
+	: arm9_cpu_device(mconfig, ARM946ES, tag, owner, clock, 5, ARCHFLAG_T | ARCHFLAG_E, ENDIANNESS_LITTLE),
+	cp15_control(0x78)
 {
 	m_copro_id = ARM9_COPRO_ID_MFR_ARM
 			   | ARM9_COPRO_ID_ARCH_V5TE
 			   | ARM9_COPRO_ID_PART_ARM946
 			   | ARM9_COPRO_ID_STEP_ARM946_A0;
+
+	memset(ITCM, 0, 0x8000);
+	memset(DTCM, 0, 0x4000);
+
+	cp15_itcm_base = 0xffffffff;
+	cp15_itcm_size = 0;
+	cp15_itcm_end = 0;
+	cp15_dtcm_base = 0xffffffff;
+	cp15_dtcm_size = 0;
+	cp15_dtcm_end = 0;
 }
 
 pxa255_cpu_device::pxa255_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -1229,6 +1240,291 @@ WRITE32_MEMBER( arm7_cpu_device::arm7_rt_w_callback )
 			LOG( ( "arm7_rt_w_callback Test / Clock / Idle = %08x (%d) (%d)\n", data, op2, op3 ) );
 			break;
 	}
+}
+
+READ32_MEMBER( arm946es_cpu_device::arm7_rt_r_callback )
+{
+	uint32_t opcode = offset;
+	uint8_t cReg = ( opcode & INSN_COPRO_CREG ) >> INSN_COPRO_CREG_SHIFT;
+	uint8_t op2 =  ( opcode & INSN_COPRO_OP2 )  >> INSN_COPRO_OP2_SHIFT;
+	uint8_t op3 =    opcode & INSN_COPRO_OP3;
+	uint8_t cpnum = (opcode & INSN_COPRO_CPNUM) >> INSN_COPRO_CPNUM_SHIFT;
+	uint32_t data = 0;
+
+    //printf("arm7946: read cpnum %d cReg %d op2 %d op3 %d (%x)\n", cpnum, cReg, op2, op3, opcode);
+	if (cpnum == 15)
+	{
+		switch( cReg )
+		{
+			case 0:	
+				switch (op2)
+				{
+					case 0:	// chip ID
+						data = 0x41059461;
+						break;
+
+					case 1: // cache ID
+						data = 0x0f0d2112;
+						break;
+
+					case 2: // TCM size
+						data = (6 << 6) || (5 << 18);
+						break;
+				}
+				break;
+
+			case 1:
+				return cp15_control;
+				break;
+
+			case 9:
+				if (op3 == 1)
+				{
+					if (op2 == 0)
+					{
+						return cp15_dtcm_reg;
+					}
+					else
+					{
+						return cp15_itcm_reg;
+					}
+				}
+				break;
+		}
+	}
+
+	return data;
+}
+
+WRITE32_MEMBER( arm946es_cpu_device::arm7_rt_w_callback )
+{
+	uint32_t opcode = offset;
+	uint8_t cReg = ( opcode & INSN_COPRO_CREG ) >> INSN_COPRO_CREG_SHIFT;
+	uint8_t op2 =  ( opcode & INSN_COPRO_OP2 )  >> INSN_COPRO_OP2_SHIFT;
+	uint8_t op3 =    opcode & INSN_COPRO_OP3;
+	uint8_t cpnum = (opcode & INSN_COPRO_CPNUM) >> INSN_COPRO_CPNUM_SHIFT;
+
+//	printf("arm7946: copro %d write %x to cReg %d op2 %d op3 %d (mask %08x)\n", cpnum, data, cReg, op2, op3, mem_mask);
+
+	if (cpnum == 15)
+	{
+		switch (cReg)
+		{
+			case 1:	// control
+				cp15_control = data;
+				RefreshDTCM();
+				RefreshITCM();
+				break;
+
+			case 2: // Protection Unit cacheability bits
+				break;
+
+			case 3: // write bufferability bits for PU
+				break;
+
+			case 5: // protection unit region controls
+				break;
+
+			case 6: // protection unit region controls 2
+				break;
+
+			case 7: // cache commands
+				break;
+
+			case 9: // cache lockdown & TCM controls
+				if (op3 == 1)
+				{
+					if (op2 == 0)
+					{
+						cp15_dtcm_reg = data;
+						RefreshDTCM();
+					}
+					else if (op2 == 1)
+					{
+						cp15_itcm_reg = data;
+						RefreshITCM();
+					} 
+				}
+				break;
+		}
+	}
+}
+
+void arm946es_cpu_device::RefreshDTCM()
+{
+	if (cp15_control & (1<<16))
+	{
+		cp15_dtcm_base = (cp15_dtcm_reg & ~0xfff);
+		cp15_dtcm_size = 512 << ((cp15_dtcm_reg & 0x3f) >> 1);
+		cp15_dtcm_end = cp15_dtcm_base + cp15_dtcm_size;
+		//printf("DTCM enabled: base %08x size %x\n", cp15_dtcm_base, cp15_dtcm_size);
+	}
+	else
+	{
+		cp15_dtcm_base = 0xffffffff;
+		cp15_dtcm_size = cp15_dtcm_end = 0;
+	}
+}
+
+void arm946es_cpu_device::RefreshITCM()
+{
+	if (cp15_control & (1<<18))
+	{
+		cp15_itcm_base = 0; //(cp15_itcm_reg & ~0xfff);
+		cp15_itcm_size = 512 << ((cp15_itcm_reg & 0x3f) >> 1);
+		cp15_itcm_end = cp15_itcm_base + cp15_itcm_size;
+		//printf("ITCM enabled: base %08x size %x\n", cp15_dtcm_base, cp15_dtcm_size);
+	}
+	else
+	{
+		cp15_itcm_base = 0xffffffff;
+		cp15_itcm_size = cp15_itcm_end = 0;
+	}
+}
+
+void arm946es_cpu_device::arm7_cpu_write32(uint32_t addr, uint32_t data)
+{
+	addr &= ~3;
+
+	if ((addr >= cp15_itcm_base) && (addr <= cp15_itcm_end))
+	{
+		uint32_t *wp = (uint32_t *)&ITCM[addr&0x7fff];
+		*wp = data;
+		return;
+	}
+	else if ((addr >= cp15_dtcm_base) && (addr <= cp15_dtcm_end))
+	{
+		uint32_t *wp = (uint32_t *)&DTCM[addr&0x3fff];
+		*wp = data;
+		return;
+	}
+
+	m_program->write_dword(addr, data);
+}
+
+
+void arm946es_cpu_device::arm7_cpu_write16(uint32_t addr, uint16_t data)
+{
+	addr &= ~1;
+	if ((addr >= cp15_itcm_base) && (addr <= cp15_itcm_end))
+	{
+		uint16_t *wp = (uint16_t *)&ITCM[addr&0x7fff];
+		*wp = data;
+		return;
+	}
+	else if ((addr >= cp15_dtcm_base) && (addr <= cp15_dtcm_end))
+	{
+		uint16_t *wp = (uint16_t *)&DTCM[addr&0x3fff];
+		*wp = data;
+		return;
+	}
+
+	m_program->write_word(addr, data);
+}
+
+void arm946es_cpu_device::arm7_cpu_write8(uint32_t addr, uint8_t data)
+{
+	if ((addr >= cp15_itcm_base) && (addr <= cp15_itcm_end))
+	{
+		ITCM[addr&0x7fff] = data;
+		return;
+	}
+	else if ((addr >= cp15_dtcm_base) && (addr <= cp15_dtcm_end))
+	{
+		DTCM[addr&0x3fff] = data;
+		return;
+	}
+
+	m_program->write_byte(addr, data);
+}
+
+uint32_t arm946es_cpu_device::arm7_cpu_read32(uint32_t addr)
+{
+	uint32_t result;
+
+	if ((addr >= cp15_itcm_base) && (addr <= cp15_itcm_end))
+	{
+		if (addr & 3)
+		{
+			uint32_t *wp = (uint32_t *)&ITCM[(addr & ~3)&0x7fff];
+			result = *wp;
+			result = (result >> (8 * (addr & 3))) | (result << (32 - (8 * (addr & 3))));
+		}
+		else
+		{
+			uint32_t *wp = (uint32_t *)&ITCM[addr&0x7fff];
+			result = *wp;
+		}
+	}
+	else if ((addr >= cp15_dtcm_base) && (addr <= cp15_dtcm_end))
+	{
+		if (addr & 3)
+		{
+			uint32_t *wp = (uint32_t *)&DTCM[(addr & ~3)&0x3fff];
+			result = *wp;
+			result = (result >> (8 * (addr & 3))) | (result << (32 - (8 * (addr & 3))));
+		}
+		else
+		{
+			uint32_t *wp = (uint32_t *)&DTCM[addr&0x3fff];
+			result = *wp;
+		}
+	}
+	else
+	{
+		if (addr & 3)
+		{
+			result = m_program->read_dword(addr & ~3);
+			result = (result >> (8 * (addr & 3))) | (result << (32 - (8 * (addr & 3))));
+		}
+		else
+		{
+			result = m_program->read_dword(addr);
+		}
+	}
+	return result;
+}
+
+uint16_t arm946es_cpu_device::arm7_cpu_read16(uint32_t addr)
+{
+	uint16_t result;
+
+	if ((addr >= cp15_itcm_base) && (addr <= cp15_itcm_end))
+	{
+		uint16_t *wp = (uint16_t *)&ITCM[(addr & ~1)&0x7fff];
+		result = *wp;
+	}
+	else if ((addr >= cp15_dtcm_base) && (addr <= cp15_dtcm_end))
+	{
+		uint16_t *wp = (uint16_t *)&DTCM[(addr & ~1)&0x3fff];
+		result = *wp;
+	}
+	else
+	{
+		result = m_program->read_word(addr & ~1);
+	}
+
+	if (addr & 1)
+	{
+		result = ((result >> 8) & 0xff) | ((result & 0xff) << 8);
+	}
+
+	return result;
+}
+
+uint8_t arm946es_cpu_device::arm7_cpu_read8(uint32_t addr)
+{
+	if ((addr >= cp15_itcm_base) && (addr <= cp15_itcm_end))
+	{
+		return ITCM[addr & 0x7fff];
+	}
+	else if ((addr >= cp15_dtcm_base) && (addr <= cp15_dtcm_end))
+	{
+		return DTCM[addr & 0x3fff];
+	}
+
+	// Handle through normal 8 bit handler (for 32 bit cpu)
+	return m_program->read_byte(addr);
 }
 
 WRITE32_MEMBER(igs036_cpu_device::arm7_rt_w_callback)
