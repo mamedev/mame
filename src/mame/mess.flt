@@ -375,6 +375,7 @@ microdec.cpp
 microkit.cpp
 micronic.cpp
 microtan.cpp
+microterm.cpp
 microvsn.cpp
 mikro80.cpp
 mikromik.cpp

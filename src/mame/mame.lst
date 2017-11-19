@@ -20754,6 +20754,10 @@ pentacup2                       //
 @source:microtan.cpp
 microtan                        // 1979 Microtan 65
 
+@source:microterm.cpp
+mt420                           //
+mt5510                          //
+
 @source:microvsn.cpp
 microvsn                        // Milton Bradley
 
@@ -36305,8 +36309,6 @@ cit220p
 d461
 hp700_92
 hp2622a
-mt5510
-mt420
 qvt70
 qvt102
 qvt103
