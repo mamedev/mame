@@ -1,7 +1,21 @@
 // license:GPL-2.0+
 // copyright-holders:Felipe Sanches; Werner Moecke
 /*
-    Zezinho
+    Zezinho - Instituto Tecnológico da Aeronáutica (ITA)
+
+    Presumably the first computer designed and built in Brazil.
+    There are 2 variants. The first one, from 1961, is clearly not a turing-complete machine since
+    it only has got 4 instructions (add, subtract, data input and data output).
+
+    The second one, from 1962, was also called ITA-II, and has got 14 instructions including things like branching.
+    Unfortunately I am unaware of any software for the second iteration.
+
+    This driver only emulates the second variant, but runs a demo from the manual of the first one.
+    While there's now proper artwork, the only useful way to use this driver is by running it with MAME's debugger
+    to run the example code step-by-step.
+
+    See also the "Patinho Feio" driver in MAME, for info on another early Brazilian computer (which was
+    designed a decade later in 1971).
 */
 
 #include "emu.h"
