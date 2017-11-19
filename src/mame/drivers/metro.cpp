@@ -1026,6 +1026,9 @@ static ADDRESS_MAP_START( karatour_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x400006, 0x400007) AM_READ_PORT("DSW0")                               //
 	AM_RANGE(0x40000a, 0x40000b) AM_READ_PORT("DSW1")                               //
 	AM_RANGE(0x40000c, 0x40000d) AM_READ_PORT("IN2")                                //
+/**/AM_RANGE(0x800000, 0x81ffff) AM_RAM_WRITE(metro_vram_0_w) AM_SHARE("vram_0")    // Layer 0
+/**/AM_RANGE(0x820000, 0x83ffff) AM_RAM_WRITE(metro_vram_1_w) AM_SHARE("vram_1")    // Layer 1
+/**/AM_RANGE(0x840000, 0x85ffff) AM_RAM_WRITE(metro_vram_2_w) AM_SHARE("vram_2")    // Layer 2
 	AM_RANGE(0x860000, 0x86ffff) AM_READ(metro_bankedrom_r)                         // Banked ROM
 	AM_RANGE(0x870000, 0x871fff) AM_RAM                                             // ???
 	AM_RANGE(0x872000, 0x873fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    // Palette
@@ -1059,6 +1062,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( kokushi_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM                                             // ROM
 	AM_RANGE(0x700000, 0x70ffff) AM_RAM AM_MIRROR(0x0f0000)                         // RAM (mirrored)
+/**/AM_RANGE(0x800000, 0x81ffff) AM_RAM_WRITE(metro_vram_0_w) AM_SHARE("vram_0")    // Layer 0
+/**/AM_RANGE(0x820000, 0x83ffff) AM_RAM_WRITE(metro_vram_1_w) AM_SHARE("vram_1")    // Layer 1
+/**/AM_RANGE(0x840000, 0x85ffff) AM_RAM_WRITE(metro_vram_2_w) AM_SHARE("vram_2")    // Layer 2
 	AM_RANGE(0x860000, 0x86ffff) AM_READ(metro_bankedrom_r)                         // Banked ROM
 	AM_RANGE(0x870000, 0x871fff) AM_RAM                                             // ???
 	AM_RANGE(0x872000, 0x873fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    // Palette
@@ -1792,34 +1798,6 @@ WRITE16_MEMBER(metro_state::puzzlet_irq_enable_w)
 		*m_irq_enable = data ^ 0xffff;
 }
 
-/* FIXME: algorithm not yet understood. */
-WRITE16_MEMBER(metro_state::vram_0_clr_w)
-{
-	static int i;
-
-//  printf("0 %04x %04x\n",offset,data);
-	for(i=0;i<0x20/2;i++)
-		m_vram_0[(offset*0x10+i)/2] = 0xffff;
-}
-
-WRITE16_MEMBER(metro_state::vram_1_clr_w)
-{
-	static int i;
-
-//  printf("0 %04x %04x\n",offset,data);
-	for(i=0;i<0x20/2;i++)
-		m_vram_1[(offset*0x10+i)/2] = 0xffff;
-}
-
-WRITE16_MEMBER(metro_state::vram_2_clr_w)
-{
-	static int i;
-
-//  printf("0 %04x %04x\n",offset,data);
-	for(i=0;i<0x20/2;i++)
-		m_vram_2[(offset*0x10+i)/2] = 0xffff;
-}
-
 
 // H8/3007 CPU
 static ADDRESS_MAP_START( puzzlet_map, AS_PROGRAM, 16, metro_state )
@@ -1837,9 +1815,9 @@ static ADDRESS_MAP_START( puzzlet_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x770000, 0x771fff) AM_RAM                                             // ???
 	AM_RANGE(0x772000, 0x773fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    // Palette
 	AM_RANGE(0x774000, 0x774fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x775000, 0x775fff) AM_RAM_WRITE(vram_0_clr_w)
-	AM_RANGE(0x776000, 0x776fff) AM_RAM_WRITE(vram_1_clr_w)
-	AM_RANGE(0x777000, 0x777fff) AM_RAM_WRITE(vram_2_clr_w)
+	AM_RANGE(0x775000, 0x775fff) AM_READWRITE(karatour_vram_0_r, karatour_vram_0_w) // Layer 0 (Part of)
+	AM_RANGE(0x776000, 0x776fff) AM_READWRITE(karatour_vram_1_r, karatour_vram_1_w) // Layer 1 (Part of)
+	AM_RANGE(0x777000, 0x777fff) AM_READWRITE(karatour_vram_2_r, karatour_vram_2_w) // Layer 2 (Part of)
 	AM_RANGE(0x778000, 0x7787ff) AM_RAM AM_SHARE("tiletable")                       // Tiles Set
 	AM_RANGE(0x778800, 0x778813) AM_RAM AM_SHARE("videoregs")                 // Video Registers
 	AM_RANGE(0x778840, 0x77884f) AM_WRITE(metro_blitter_w) AM_SHARE("blitter_regs") // Tiles Blitter
@@ -6253,18 +6231,6 @@ DRIVER_INIT_MEMBER(metro_state,metro)
 
 DRIVER_INIT_MEMBER(metro_state,karatour)
 {
-	m_vram_0.allocate(m_vram_size);
-	m_vram_1.allocate(m_vram_size);
-	m_vram_2.allocate(m_vram_size);
-	for (int i = 0; i < m_vram_size; i++)
-	{
-		// sane init VRAM for Lady Killer 
-		// TODO: stage select still looks bogus tho 
-		m_vram_0[i] = 0xffff; //machine().rand();
-		m_vram_1[i] = 0xffff; //machine().rand();
-		m_vram_2[i] = 0xffff; //machine().rand();
-	}
-
 	m_karatour_irq_timer = timer_alloc(TIMER_KARATOUR_IRQ);
 
 	DRIVER_INIT_CALL(metro);

@@ -83,9 +83,6 @@ public:
 	DECLARE_WRITE16_MEMBER(blzntrnd_sound_w);
 	DECLARE_WRITE8_MEMBER(blzntrnd_sh_bankswitch_w);
 	DECLARE_WRITE16_MEMBER(puzzlet_irq_enable_w);
-	DECLARE_WRITE16_MEMBER(vram_0_clr_w);
-	DECLARE_WRITE16_MEMBER(vram_1_clr_w);
-	DECLARE_WRITE16_MEMBER(vram_2_clr_w);
 	DECLARE_WRITE16_MEMBER(puzzlet_portb_w);
 	DECLARE_WRITE16_MEMBER(metro_k053936_w);
 	DECLARE_WRITE16_MEMBER(metro_vram_0_w);
@@ -210,7 +207,6 @@ private:
 	/* misc */
 	int         m_gakusai_oki_bank_lo;
 	int         m_gakusai_oki_bank_hi;
-	static constexpr uint32_t m_vram_size = 0x20000 / 2;
 	
 	void update_irq_state();
 	inline uint8_t get_tile_pix( uint16_t code, uint8_t x, uint8_t y, int big, uint16_t *pix );
