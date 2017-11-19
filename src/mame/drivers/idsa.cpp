@@ -9,10 +9,10 @@ Hardware:
 ---------
 CPU:     Z80 @ 4 MHz
     INT: IRQ @ 977 Hz (4MHz/2048/2) or 488 Hz (4MHz/2048/4)
-IO:      DMA, AY8910 ports
+DRIVERS: 2 x 8255 driving lamps and coils, used as demultiplexers only (no read access)
 DISPLAY: bsktball: 7-digit 7-segment panels with PROM-based 5-bit BCD data (allowing a simple alphabet)
          v1: 6-digit 7-segment panels with BCD decoding
-SOUND:   2 x AY8910 @ 2 MHz plus SP0256 @ 3.12 MHz on board
+SOUND:   2 x AY8910 @ 2 MHz (also used as output interface) plus SP0256 @ 3.12 MHz on board
 
 Schematic is terrible, lots of important info left out. Need the V1 manual & schematic.
 
