@@ -8,7 +8,7 @@ Skeleton driver for Micro-Term terminals.
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-//#include "machine/eepromser.h"
+#include "machine/eepromser.h"
 #include "machine/mc68681.h"
 //#include "video/scn2674.h"
 //#include "screen.h"
@@ -39,7 +39,7 @@ static ADDRESS_MAP_START( mt420_io_map, AS_IO, 8, microterm_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mt5510_mem_map, AS_PROGRAM, 8, microterm_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("maincpu", 0)
+	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("maincpu", 0) AM_WRITENOP
 	AM_RANGE(0x8000, 0xbfff) AM_RAM
 	AM_RANGE(0xc000, 0xffff) AM_RAM
 ADDRESS_MAP_END
@@ -68,6 +68,18 @@ static MACHINE_CONFIG_START( mt5510 )
 
 	MCFG_DEVICE_ADD("duart", MC68681, XTAL_3_6864MHz)
 	MCFG_MC68681_IRQ_CALLBACK(INPUTLINE("maincpu", 0))
+	MCFG_MC68681_OUTPORT_CALLBACK(DEVWRITELINE("eeprom1", eeprom_serial_93cxx_device, di_write)) MCFG_DEVCB_BIT(6)
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("eeprom2", eeprom_serial_93cxx_device, di_write)) MCFG_DEVCB_BIT(5)
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("eeprom1", eeprom_serial_93cxx_device, cs_write)) MCFG_DEVCB_BIT(4)
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("eeprom2", eeprom_serial_93cxx_device, cs_write)) MCFG_DEVCB_BIT(4)
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("eeprom1", eeprom_serial_93cxx_device, clk_write)) MCFG_DEVCB_BIT(3)
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("eeprom2", eeprom_serial_93cxx_device, clk_write)) MCFG_DEVCB_BIT(3)
+
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom1")
+	MCFG_EEPROM_SERIAL_DO_CALLBACK(DEVWRITELINE("duart", mc68681_device, ip6_w))
+
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom2")
+	MCFG_EEPROM_SERIAL_DO_CALLBACK(DEVWRITELINE("duart", mc68681_device, ip5_w))
 MACHINE_CONFIG_END
 
 

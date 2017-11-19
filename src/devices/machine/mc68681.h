@@ -149,6 +149,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( ip3_w );
 	DECLARE_WRITE_LINE_MEMBER( ip4_w );
 	DECLARE_WRITE_LINE_MEMBER( ip5_w );
+	DECLARE_WRITE_LINE_MEMBER( ip6_w );
 
 protected:
 	mc68681_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
