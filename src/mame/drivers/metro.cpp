@@ -1276,7 +1276,7 @@ static ADDRESS_MAP_START( gakusai2_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x670000, 0x671fff) AM_RAM                                             // ???
 	AM_RANGE(0x672000, 0x673fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    // Palette
 	AM_RANGE(0x674000, 0x674fff) AM_RAM AM_SHARE("spriteram")                       // Sprites
-	AM_RANGE(0x675000, 0x675fff) AM_RAM                                             // Sprites?
+	AM_RANGE(0x675000, 0x675fff) AM_READWRITE(karatour_vram_0_r, karatour_vram_0_w)	// Sprites?
 	AM_RANGE(0x678000, 0x6787ff) AM_RAM AM_SHARE("tiletable")                       // Tiles Set
 	AM_RANGE(0x678808, 0x67880b) AM_READWRITE(gakusai_spriteregs_r,gakusai_spriteregs_w) AM_SHARE("spriteregs") // 
 	AM_RANGE(0x67880e, 0x67880f) AM_RAM AM_SHARE("screenctrl")                      // Screen Control
