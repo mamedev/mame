@@ -10,6 +10,7 @@ Skeleton driver for Micro-Term terminals.
 #include "cpu/z80/z80.h"
 //#include "machine/eepromser.h"
 //#include "machine/mc68681.h"
+//#include "video/scn2674.h"
 //#include "screen.h"
 
 class microterm_state : public driver_device
@@ -27,6 +28,13 @@ private:
 };
 
 static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, microterm_state )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0xc000, 0xc000) AM_READNOP
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( io_map, AS_IO, 8, microterm_state )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( microterm )
@@ -35,6 +43,7 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( microterm )
 	MCFG_CPU_ADD("maincpu", Z80, 2'000'000)
 	MCFG_CPU_PROGRAM_MAP(mem_map)
+	MCFG_CPU_IO_MAP(io_map)
 MACHINE_CONFIG_END
 
 
