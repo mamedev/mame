@@ -225,7 +225,7 @@ static ADDRESS_MAP_START( bbcbp_mem, AS_PROGRAM, 8, bbc_state )
 	AM_RANGE(0xb000, 0xbfff) AM_READ_BANK("bank6")                                              /*    b000-bfff                 Rest of paged ROM area          */
 	AM_RANGE(0xfe30, 0xfe3f) AM_READWRITE(bbc_fe_r, bbc_page_selectbp_w)                        /* R: fe30-fe3f  NC             Not Connected                   */
 																																															/* W: fe30-fe3f  84LS161        Paged ROM selector              */
-	AM_RANGE(0xfe80, 0xfe83) AM_WRITE(bbc_wd1770_status_w)                                      /*    fe80-fe83  1770 FDC       Drive control register          */
+	AM_RANGE(0xfe80, 0xfe83) AM_READWRITE(bbc_fe_r, bbc_wd1770_status_w)                        /*    fe80-fe83  1770 FDC       Drive control register          */
 	AM_RANGE(0xfe84, 0xfe9f) AM_DEVREADWRITE("wd1770", wd1770_device, read, write)              /*    fe84-fe9f  1770 FDC       Floppy disc controller          */
 	AM_RANGE(0xfee0, 0xfeff) AM_DEVREADWRITE("tube", bbc_tube_slot_device, host_r, host_w)      /*    fee0-feff  Tube ULA       Tube system interface           */
 	AM_IMPORT_FROM(bbc_base)
@@ -239,7 +239,7 @@ static ADDRESS_MAP_START( bbcbp128_mem, AS_PROGRAM, 8, bbc_state )
 	AM_RANGE(0xb000, 0xbfff) AM_READ_BANK("bank6") AM_WRITE(bbc_memorybp6_128_w)                /*    b000-bfff                 Rest of paged ROM area          */
 	AM_RANGE(0xfe30, 0xfe3f) AM_READWRITE(bbc_fe_r, bbc_page_selectbp_w)                        /* R: fe30-fe3f  NC             Not Connected                   */
 																																															/* W: fe30-fe3f  84LS161        Paged ROM selector              */
-	AM_RANGE(0xfe80, 0xfe83) AM_WRITE(bbc_wd1770_status_w)                                      /*    fe80-fe83  1770 FDC       Drive control register          */
+	AM_RANGE(0xfe80, 0xfe83) AM_READWRITE(bbc_fe_r, bbc_wd1770_status_w)                        /*    fe80-fe83  1770 FDC       Drive control register          */
 	AM_RANGE(0xfe84, 0xfe9f) AM_DEVREADWRITE("wd1770", wd1770_device, read, write)              /*    fe84-fe9f  1770 FDC       Floppy disc controller          */
 	AM_RANGE(0xfee0, 0xfeff) AM_DEVREADWRITE("tube", bbc_tube_slot_device, host_r, host_w)      /*    fee0-feff  Tube ULA       Tube system interface           */
 	AM_IMPORT_FROM(bbc_base)
@@ -422,8 +422,13 @@ static INPUT_PORTS_START(bbc_keyboard)
 
 	/* Keyboard columns 10 -> 12 are reserved for BBC Master */
 	PORT_START("COL10")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
+
 	PORT_START("COL11")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
+
 	PORT_START("COL12")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
 
@@ -526,7 +531,7 @@ static INPUT_PORTS_START(bbc_dipswitch)
 
 	PORT_MODIFY("COL6")
 	PORT_DIPNAME(0x01, 0x01, "Boot") PORT_DIPLOCATION("KBD:5")
-	PORT_DIPSETTING(   0x00, "SHIFT" )
+	PORT_DIPSETTING(   0x00, "BREAK" )
 	PORT_DIPSETTING(   0x01, "SHIFT-BREAK" )
 
 	PORT_MODIFY("COL7")
@@ -778,7 +783,7 @@ FLOPPY_FORMATS_MEMBER( bbc_state::floppy_formats_bbc )
 	FLOPPY_OPUS_DDCPM_FORMAT,
 	FLOPPY_FSD_FORMAT,
 	FLOPPY_PC_FORMAT
-FLOPPY_FORMATS_END0
+FLOPPY_FORMATS_END
 
 FLOPPY_FORMATS_MEMBER( bbc_state::floppy_formats_bbcm )
 	FLOPPY_ACORN_SSD_FORMAT,
@@ -788,11 +793,11 @@ FLOPPY_FORMATS_MEMBER( bbc_state::floppy_formats_bbcm )
 	FLOPPY_ACORN_DOS_FORMAT,
 	FLOPPY_FSD_FORMAT,
 	FLOPPY_PC_FORMAT
-FLOPPY_FORMATS_END0
+FLOPPY_FORMATS_END
 
 FLOPPY_FORMATS_MEMBER( bbc_state::floppy_formats_bbcmc )
 	FLOPPY_ACORN_ADFS_OLD_FORMAT
-FLOPPY_FORMATS_END0
+FLOPPY_FORMATS_END
 
 static SLOT_INTERFACE_START( bbc_floppies_525 )
 	SLOT_INTERFACE("525sssd", FLOPPY_525_SSSD)
@@ -1429,7 +1434,7 @@ static MACHINE_CONFIG_START( bbcm )
 	MCFG_ECONET_SLOT_ADD("econet254", 254, econet_devices, nullptr)
 
 	/* analogue port */
-	MCFG_BBC_ANALOGUE_SLOT_ADD("analogue", bbc_analogue_devices, "acornjoy")
+	MCFG_BBC_ANALOGUE_SLOT_ADD("analogue", bbc_analogue_devices, nullptr)
 
 	/* 1mhz bus port */
 	MCFG_BBC_1MHZBUS_SLOT_ADD("1mhzbus", bbc_1mhzbus_devices, nullptr)
@@ -1510,12 +1515,9 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( bbcmarm, bbcm )
 	/* Add ARM co-processor */
-	//MCFG_DEVICE_MODIFY("extube")
-	//MCFG_SLOT_DEFAULT_OPTION("arm")
-	//MCFG_SLOT_FIXED(true)
-
-	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("flop_ls_arm", "bbc_flop_arm")
+	MCFG_DEVICE_MODIFY("extube")
+	MCFG_SLOT_DEFAULT_OPTION("arm")
+	MCFG_SLOT_FIXED(true)
 MACHINE_CONFIG_END
 
 
@@ -2023,7 +2025,7 @@ ROM_START(bbcm)
 	ROM_SYSTEM_BIOS( 1, "mos350", "Enhanced MOS 3.50" )
 	ROMX_LOAD("mos350.ic24", 0x20000, 0x20000, CRC(141027b9) SHA1(85211b5bc7c7a269952d2b063b7ec0e1f0196803), ROM_BIOS(2))
 	ROM_COPY("option", 0x20000, 0x40000, 0x4000) /* Move loaded roms into place */
-	ROM_FILL(0x20000, 0x4000, 0xFFFF)
+	ROM_FILL(0x20000, 0x4000, 0xff)
 	/* 00000 rom 0   SK3 Rear Cartridge bottom 16K */
 	/* 04000 rom 1   SK3 Rear Cartridge top 16K */
 	/* 08000 rom 2   SK4 Front Cartridge bottom 16K */
@@ -2064,7 +2066,7 @@ ROM_START(bbcmaiv)
 	ROM_SYSTEM_BIOS( 0, "mos320", "MOS 3.20" )
 	ROMX_LOAD("mos320.ic24", 0x20000, 0x20000, CRC(0f747ebe) SHA1(eacacbec3892dc4809ad5800e6c8299ff9eb528f), ROM_BIOS(1))
 	ROM_COPY("option", 0x20000, 0x40000, 0x4000) /* Move loaded roms into place */
-	ROM_FILL(0x20000, 0x4000, 0xFFFF)
+	ROM_FILL(0x20000, 0x4000, 0xff)
 	/* 00000 rom 0   SK3 Rear Cartridge bottom 16K */
 	/* 04000 rom 1   SK3 Rear Cartridge top 16K */
 	/* 08000 rom 2   SK4 Front Cartridge bottom 16K */
@@ -2101,7 +2103,7 @@ ROM_START(bbcmet)
 	ROMX_LOAD("mos400.ic24", 0x30000, 0x10000, CRC(81729034) SHA1(d4bc2c7f5e66b5298786138f395908e70c772971), ROM_BIOS(1))
 	ROM_COPY("option", 0x34000, 0x24000, 0xC000) /* Mirror */
 	ROM_COPY("option", 0x30000, 0x40000, 0x4000) /* Move loaded roms into place */
-	ROM_FILL(0x30000, 0x4000, 0xFFFF)
+	ROM_FILL(0x30000, 0x4000, 0xff)
 	/* 00000 rom 0   SK3 Rear Cartridge bottom 16K */
 	/* 04000 rom 1   SK3 Rear Cartridge top 16K */
 	/* 08000 rom 2   SK4 Front Cartridge bottom 16K */
@@ -2136,7 +2138,7 @@ ROM_START(bbcmarm)
 	ROM_SYSTEM_BIOS( 0, "mos320", "Original MOS 3.20" )
 	ROMX_LOAD("mos320.ic24", 0x20000, 0x20000, CRC(0f747ebe) SHA1(eacacbec3892dc4809ad5800e6c8299ff9eb528f), ROM_BIOS(1))
 	ROM_COPY("option", 0x20000, 0x40000, 0x4000) /* Move loaded roms into place */
-	ROM_FILL(0x20000, 0x4000, 0xFFFF)
+	ROM_FILL(0x20000, 0x4000, 0xff)
 	/* 00000 rom 0   SK3 Rear Cartridge bottom 16K */
 	/* 04000 rom 1   SK3 Rear Cartridge top 16K */
 	/* 08000 rom 2   SK4 Front Cartridge bottom 16K */
@@ -2174,7 +2176,7 @@ ROM_START(bbcmc)
 	ROM_SYSTEM_BIOS( 1, "mos500", "Original MOS 5.00" )
 	ROMX_LOAD("mos500.ic49", 0x30000, 0x10000, CRC(f6170023) SHA1(140d002d2d9cd34b47197a2ba823505af2a84633), ROM_BIOS(2))
 	ROM_COPY("option", 0x30000, 0x40000, 0x4000) /* Move loaded roms into place */
-	ROM_FILL(0x30000, 0x4000, 0xFFFF)
+	ROM_FILL(0x30000, 0x4000, 0xff)
 	/* 00000 rom 0   EXTERNAL */
 	/* 04000 rom 1   EXTERNAL */
 	/* 08000 rom 2   IC23 SPARE SOCKET */
@@ -2205,7 +2207,7 @@ ROM_START(bbcmc_ar)
 	ROM_SYSTEM_BIOS( 0, "mos511i", "International MOS 5.11" )
 	ROMX_LOAD("mos511.ic49", 0x30000, 0x10000, BAD_DUMP CRC(8708803c) SHA1(d2170c8b9b536f3ad84a4a603a7fe712500cc751), ROM_BIOS(1)) /* Merged individual ROM bank dumps */
 	ROM_COPY("option", 0x30000, 0x40000, 0x4000) /* Move loaded roms into place */
-	ROM_FILL(0x30000, 0x4000, 0xFFFF)
+	ROM_FILL(0x30000, 0x4000, 0xff)
 	/* 00000 rom 0   EXTERNAL */
 	/* 04000 rom 1   EXTERNAL */
 	/* 08000 rom 2   IC23 International */
@@ -2238,7 +2240,7 @@ ROM_START(pro128s)
 	ROM_SYSTEM_BIOS(0, "mos510o", "Olivetti MOS 5.10")
 	ROMX_LOAD("mos510o.ic49", 0x30000, 0x10000, CRC(c16858d3) SHA1(ad231ed21a55e493b553703285530d1cacd3de7a), ROM_BIOS(1))
 	ROM_COPY("option", 0x30000, 0x40000, 0x4000) /* Move loaded roms into place */
-	ROM_FILL(0x30000, 0x4000, 0xFFFF)
+	ROM_FILL(0x30000, 0x4000, 0xff)
 	/* 00000 rom 0   EXTERNAL */
 	/* 04000 rom 1   EXTERNAL */
 	/* 08000 rom 2   IC23 SPARE SOCKET */
@@ -2269,7 +2271,7 @@ ROM_START(discmate)
 	ROM_SYSTEM_BIOS(0, "mos320", "Original MOS 3.20")
 	ROMX_LOAD("mos320.ic24", 0x20000, 0x20000, CRC(0f747ebe) SHA1(eacacbec3892dc4809ad5800e6c8299ff9eb528f), ROM_BIOS(1))
 	ROM_COPY("option", 0x20000, 0x40000, 0x4000) /* Move loaded roms into place */
-	ROM_FILL(0x20000, 0x4000, 0xFFFF)
+	ROM_FILL(0x20000, 0x4000, 0xff)
 	/* 00000 rom 0   SK3 Rear Cartridge bottom 16K */
 	/* 04000 rom 1   SK3 Rear Cartridge top 16K */
 	/* 08000 rom 2   SK4 Front Cartridge bottom 16K */
@@ -2306,7 +2308,7 @@ ROM_START(cfa3000)
 	ROM_LOAD("Acorn_MOS_(Tinsley_64K)_Iss10.3.ic24", 0x30000, 0x10000, CRC(4413c3ee) SHA1(76d0462b4dabe2461010fce2341570ff3d606d54))
 	//ROM_COPY("option", 0x20000, 0x30000, 0x10000) /* Mirror MOS */
 	ROM_COPY("option", 0x30000, 0x40000, 0x04000) /* Move loaded roms into place */
-	ROM_FILL(0x30000, 0x4000, 0xFFFF)
+	ROM_FILL(0x30000, 0x4000, 0xff)
 	/* 00000 rom 0   SK3 Rear Cartridge bottom 16K */
 	/* 04000 rom 1   SK3 Rear Cartridge top 16K */
 	/* 08000 rom 2   SK4 Front Cartridge bottom 16K */
@@ -2358,7 +2360,7 @@ COMP ( 1986, bbcmt,    bbcm,    0,     bbcmt,    bbcm,   bbc_state,      bbc,   
 COMP ( 1986, bbcmaiv,  bbcm,    0,     bbcmaiv,  bbcm,   bbc_state,      bbc,     "Acorn",           "BBC Master AIV",                MACHINE_NOT_WORKING)
 COMP ( 1986, bbcmet,   bbcm,    0,     bbcmet,   bbcm,   bbc_state,      bbc,     "Acorn",           "BBC Master ET",                 MACHINE_IMPERFECT_GRAPHICS)
 COMP ( 1986, bbcm512,  bbcm,    0,     bbcm512,  bbcm,   bbc_state,      bbc,     "Acorn",           "BBC Master 512",                MACHINE_NOT_WORKING)
-COMP ( 1986, bbcmarm,  bbcm,    0,     bbcmarm,  bbcm,   bbc_state,      bbc,     "Acorn",           "ARM Evaluation System",         MACHINE_NOT_WORKING)
+COMP ( 1986, bbcmarm,  bbcm,    0,     bbcmarm,  bbcm,   bbc_state,      bbc,     "Acorn",           "BBC Master (ARM Evaluation)",   MACHINE_NOT_WORKING)
 COMP ( 1986, ltmpm,    bbcm,    0,     ltmpm,    ltmpm,  bbc_state,      bbc,     "Lawrie T&M Ltd.", "LTM Portable (Master)",         MACHINE_IMPERFECT_GRAPHICS)
 COMP ( 1986, bbcmc,    0,       bbcm,  bbcmc,    bbcm,   bbc_state,      bbc,     "Acorn",           "BBC Master Compact",            MACHINE_IMPERFECT_GRAPHICS)
 COMP ( 1986, bbcmc_ar, bbcmc,   0,     bbcmc,    bbcm,   bbc_state,      bbc,     "Acorn",           "BBC Master Compact (Arabic)",   MACHINE_IMPERFECT_GRAPHICS)
