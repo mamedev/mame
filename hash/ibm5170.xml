@@ -41,6 +41,53 @@
 	</software>
 
 <!-- OS Disks -->
+	<software name="alflinux" supported="no">
+		<description>Alfalinux 0.3.1 -Laetitia-</description>
+		<year>2000</year>
+		<publisher>Giancarlo -rofus- Erra</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="alinuz1.img" size="1474560" crc="f27d81af" sha1="ffa85a3b9f272fb14f10157ab8e769d6c18627fe" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="alinuz2.img" size="1474560" crc="1091fe7b" sha1="b26301b0321bb5defec42a5ef2f879b91ef85f5f" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="brutware" supported="no">
+		<description>Brutalware Linux 1.1</description>
+		<year>1999</year>
+		<publisher>Brutalware</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Load disk for MS-DOS" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk1.img" size="1474560" crc="a2c0a65b" sha1="0031606a050c5b8ddd3311cb9fcdbe65620845ce" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Ramdisk floppy" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk2.img" size="1474560" crc="5cbf7168" sha1="f58737892b666edf49e032e6ad29811a47a8ca07" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Supplementary floppy" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk3.img" size="1474560" crc="cc43bd24" sha1="a3970a76ce5855666cd101f47bf0b1400da5ab97" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Direct boot disk" />
+			<dataarea name="flop" size = "1474560">
+				<!-- source image is 441761 bytes, added 0xF6 padding -->
+				<rom name="direct_boot disk1.img" size="1474560" crc="bd4dca6a" sha1="1c448dd937d53daef314a92a92c7914237002cff" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="cdos3862">
 		<description>Concurrent DOS 386 2.0</description>
 		<year>1987</year>
@@ -74,6 +121,17 @@
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Disk2.img" size="737280" crc="5d363b4d" sha1="6f2d55a0c9aa457379cf5f95e715e9455008cd5b" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dlxdemo" supported="no">
+		<description>DLX Linux Demodisk V1.0</description>
+		<year>1997</year>
+		<publisher>Erich and Hannes Boem</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="demodisk" size="1474560" crc="436652e2" sha1="c0a0506b7228915fcd3490515b0faea51b47ad16" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -421,6 +479,35 @@
 			<feature name="part_id" value="GeoWorks Art &amp; Font Sampler"/>
 			<dataarea name="flop" size="368640">
 				<rom name="50-2030-5101.ima" size="368640" crc="6f12fe02" sha1="c439c38a75b235b50475c814c4ba2b2446c6abe4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hal91">
+		<description>HAL91 0.4.5</description>
+		<year>2002</year>
+		<publisher>Øyvind Kolås and Christian Perle</publisher>
+		<info name="version" value="0.4.5" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="hal91.img" size="1474560" crc="341cc88a" sha1="ef4511322177f109ea0b4cf6d3df3d6f9f129bde" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hal91a" cloneof="hal91">
+		<description>hal91 0.2.0</description>
+		<year>1997</year>
+		<publisher>Øyvind Kolås</publisher>
+		<info name="version" value="0.2.0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="hal91-0.2.0.img" size="1474560" crc="708b3f03" sha1="620999ffb9857a4ef8bfa9674a594efd7b17dba0" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="HAL91_Data.img" size="1474560" crc="cf0e9fba" sha1="bdd5f32cf93c3e153247a1b9973ebbdf79dd1ed6" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2219,22 +2306,22 @@
 		<year>1994</year>
 		<publisher>Microsoft</publisher>
 		<info name="version" value="6.22" />
-		<part name="disk1" interface="floppy_3_5">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="disk1a.img" size="1474560" crc="69d8cfdd" sha1="30b4b2e99b26b0e5e7dbe61b9892e45fe751a3e8" offset="0" />
 			</dataarea>
 		</part>
-		<part name="disk2" interface="floppy_3_5">
+		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="disk2a.img" size="1474560" crc="76258952" sha1="1f268c5487f31982848461b9d628ef10b552c849" offset="0" />
 			</dataarea>
 		</part>
-		<part name="disk3" interface="floppy_3_5">
+		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="disk3a.img" size="1474560" crc="808b208d" sha1="06de13364e906c4ed69f19627ae0e682eb419078" offset="0" />
 			</dataarea>
 		</part>
-		<part name="disk4" interface="floppy_3_5">
+		<part name="flop4" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="disk4a.img" size="1474560" crc="21b6d623" sha1="2f096a5d9cd00677de3aca30b01b52b24776c59a" offset="0" />
 			</dataarea>
@@ -2268,17 +2355,17 @@
 		<year>1994</year>
 		<publisher>Microsoft</publisher>
 		<info name="version" value="6.22" />
-		<part name="disk1" interface="floppy_3_5">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="disk1up.img" size="1474560" crc="b4df72ec" sha1="b34723a322c380121101cbdace5f5ae66a71e97c" offset="0" />
 			</dataarea>
 		</part>
-		<part name="disk2" interface="floppy_3_5">
+		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="disk2up.img" size="1474560" crc="285879b4" sha1="873945a89367499bfdc80c1284923bbf30bb010c" offset="0" />
 			</dataarea>
 		</part>
-		<part name="disk3" interface="floppy_3_5">
+		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="disk3up.img" size="1474560" crc="3004d02f" sha1="788f63944403c77ca96418372cdd68bb415c8160" offset="0" />
 			</dataarea>
@@ -2373,17 +2460,17 @@
 		<year>1994</year>
 		<publisher>Microsoft</publisher>
 		<info name="version" value="6.22" />
-		<part name="disk1" interface="floppy_3_5">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="disk 1 (1.4mb).img" size="1474560" crc="ac432292" sha1="a60876af212ffc9dd38529ee327adea4b10448f5" offset="0" status="baddump" />
 			</dataarea>
 		</part>
-		<part name="disk2" interface="floppy_3_5">
+		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="disk 1 (720kb).img" size="737280" crc="6a73c20b" sha1="46b05c8fc4b53f2ebeaecc0deb27e5384ccefc99" offset="0" status="baddump" />
 			</dataarea>
 		</part>
-		<part name="disk3" interface="floppy_3_5">
+		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="disk 2 (720kb).img" size="737280" crc="2626ae5b" sha1="9f80740f91d62996952ced0fa69dc83bd1521567" offset="0" status="baddump" />
 			</dataarea>
@@ -2395,13 +2482,13 @@
 		<year>1991</year>
 		<publisher>Digital Research</publisher>
 		<info name="serial" value="E1182-2160" />
-		<part name="disk1" interface="floppy_3_5">
+		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Start Up"/>
 			<dataarea name="flop" size="1474560">
 				<rom name="dr dos 6.0 start up.img" size="1474560" crc="d9c340bd" sha1="77d72c23f79c9037dbc0de66cc92e8da2c7b1e9f" offset="0" />
 			</dataarea>
 		</part>
-		<part name="disk2" interface="floppy_3_5">
+		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Viewmax"/>
 			<dataarea name="flop" size="1474560">
 				<rom name="dr dos 6.0 viewmax.img" size="1474560" crc="46b02859" sha1="dcb33437585ab8e34e93980d12c11b6e36f82e74" offset="0" />
@@ -2415,7 +2502,7 @@
 		<publisher>The Software Link</publisher>
 		<info name="version" value="1.02" />
 		<info name="serial" value="05-04648" />
-		<part name="disk1" interface="floppy_3_5">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Disk1.img" size="1474560" crc="615acf20" sha1="6e5b14f2c457f653cf09c8b4c0cb7ef7b2d56573" offset="0"/>
 			</dataarea>
@@ -2428,7 +2515,7 @@
 		<publisher>The Software Link</publisher>
 		<info name="version" value="3.00" />
 		<info name="serial" value="05-018868" />
-		<part name="disk1" interface="floppy_3_5">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Disk1.img" size="1474560" crc="06981cb6" sha1="23ee2c0646cae310f8c8db5fd74200d641dfa9b0" offset="0"/>
 			</dataarea>
@@ -2441,9 +2528,105 @@
 		<publisher>The Software Link</publisher>
 		<info name="version" value="5.01" />
 		<info name="serial" value="09-50003953" />
-		<part name="disk1" interface="floppy_3_5">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="PCMOS386-9-user.img" size="1474560" crc="936c016a" sha1="d31ef3d07b11b12085546e1b5a45f8ecfa4163d3" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="picobsd">
+		<description>PicoBSD 0.43 (Dialup)</description>
+		<year>1998</year>
+		<publisher>FreeBSD</publisher>
+		<info name="version" value="0.43" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="bootldr.bin" size="1474560" crc="ef66aa85" sha1="b8dee4e1d1b06c828bd6f8150a43cb6a670e5b7d" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="picobsdad" cloneof="picobsd">
+		<description>PicoBSD 0.41 (Dialup)</description>
+		<year>1998</year>
+		<publisher>FreeBSD</publisher>
+		<info name="version" value="0.41" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="pb_en-D.bin" size="1474560" crc="4818b80d" sha1="366a6d2d5baa61e352a072dafa97260f9e7442a6" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="picobsdadpl" cloneof="picobsd">
+		<description>PicoBSD 0.41 (Dialup) (Polish)</description>
+		<year>1998</year>
+		<publisher>FreeBSD</publisher>
+		<info name="version" value="0.41" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="pb_pl-D.bin" size="1474560" crc="1ff4e6e2" sha1="8fedecfef058e4cb559da3a04703607dd75f431c" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="picobsdai" cloneof="picobsd">
+		<description>PicoBSD 0.41 (ISP-alpha)</description>
+		<year>1998</year>
+		<publisher>FreeBSD</publisher>
+		<info name="version" value="0.41" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="pb_en-I.bin" size="1474560" crc="17e8f287" sha1="999f864dacd68f5c37d09add6988d76ed2aa174b" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="picobsdan" cloneof="picobsd">
+		<description>PicoBSD 0.41 (Network)</description>
+		<year>1998</year>
+		<publisher>FreeBSD</publisher>
+		<info name="version" value="0.41" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="pb_en-N.bin" size="1474560" crc="cc131803" sha1="1a48330bc05105a73b9f385c552f999105256078" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="picobsdanpl" cloneof="picobsd">
+		<description>PicoBSD 0.41 (Network) (Polish)</description>
+		<year>1998</year>
+		<publisher>FreeBSD</publisher>
+		<info name="version" value="0.41" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="pb_pl-N.bin" size="1474560" crc="d433f002" sha1="674c05d0ccf7b36af16b4fd3aca61a83807333e7" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="picobsdar" cloneof="picobsd">
+		<description>PicoBSD 0.41 (Router)</description>
+		<year>1998</year>
+		<publisher>FreeBSD</publisher>
+		<info name="version" value="0.41" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="pb_en-R.bin" size="1474560" crc="f4844939" sha1="b0fa5e692dcb95af1c07f84a10f9b316d5f741c1" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="picobsdarpl" cloneof="picobsd">
+		<description>PicoBSD 0.41 (Router) (Polish)</description>
+		<year>1998</year>
+		<publisher>FreeBSD</publisher>
+		<info name="version" value="0.41" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="pb_pl-R.bin" size="1474560" crc="4ea3ec45" sha1="b2c2cba44efc3e36f0ca24c25bc446ab2798d284" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2454,37 +2637,37 @@
 		<publisher>QNX Software Systems</publisher>
 		<info name="version" value="4.25" />
 		<info name="user_notes" value="Type 'install' at the boot prompt" />
-		<part name="disk1" interface="floppy_3_5">
+		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Boot disk"/>
 			<dataarea name="flop" size = "1474560">
 				<rom name="bootdisk 425.img" size="1474560" crc="2b2d2c78" sha1="5e9f00cd2ec2991312bedb5d23f5b0c59aaa7a5c" offset="0"/>
 			</dataarea>
 		</part>
-		<part name="disk2" interface="floppy_3_5">
+		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Install disk 1"/>
 			<dataarea name="flop" size = "1474560">
 				<rom name="qnxinst1 425.img" size="1474560" crc="40156bb3" sha1="b9be8f1099ade78c436be3b346bb90399e3e868c" offset="0"/>
 			</dataarea>
 		</part>
-		<part name="disk3" interface="floppy_3_5">
+		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="Install disk 2"/>
 			<dataarea name="flop" size = "1474560">
 				<rom name="qnxinst2 425.img" size="1474560" crc="daca8b12" sha1="e49ad74d03e4b794ee2f6160bc761370c34b1b9a" offset="0"/>
 			</dataarea>
 		</part>
-		<part name="disk4" interface="floppy_3_5">
+		<part name="flop4" interface="floppy_3_5">
 			<feature name="part_id" value="Install disk 3"/>
 			<dataarea name="flop" size = "1474560">
 				<rom name="qnxinst3 425.img" size="1474560" crc="9805b210" sha1="27c417c377e728812da3baf51de6cd717266f9bb" offset="0"/>
 			</dataarea>
 		</part>
-		<part name="disk5" interface="floppy_3_5">
+		<part name="flop5" interface="floppy_3_5">
 			<feature name="part_id" value="Install disk 4"/>
 			<dataarea name="flop" size = "1474560">
 				<rom name="qnxinst4 425.img" size="1474560" crc="ee630bb6" sha1="178fbea1886e5eb338947341fa81d2cea6503a0a" offset="0"/>
 			</dataarea>
 		</part>
-		<part name="disk6" interface="floppy_3_5">
+		<part name="flop6" interface="floppy_3_5">
 			<feature name="part_id" value="Install disk 5"/>
 			<dataarea name="flop" size = "1474560">
 				<rom name="qnxinst5 425.img" size="1474560" crc="cd1391e6" sha1="a5aca97bb94e058da30505748f9a76118adda248" offset="0"/>
@@ -2498,37 +2681,37 @@
 		<publisher>QNX Software Systems</publisher>
 		<info name="version" value="4.24" />
 		<info name="user_notes" value="Type 'install' at the boot prompt" />
-		<part name="disk1" interface="floppy_3_5">
+		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Boot disk"/>
 			<dataarea name="flop" size = "1474560">
 				<rom name="bootdsk.img" size="1474560" crc="b646d935" sha1="5f7afdbfc40170214008e3469382fad755e79fd1" offset="0"/>
 			</dataarea>
 		</part>
-		<part name="disk2" interface="floppy_3_5">
+		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Licenses disk"/>
 			<dataarea name="flop" size = "1474560">
 				<rom name="lcnsdsk.img" size="1474560" crc="4112c372" sha1="00cd4eb98b9f768bb58f21351bfceac9e9f5e255" offset="0"/>
 			</dataarea>
 		</part>
-		<part name="disk3" interface="floppy_3_5">
+		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="Install disk 1"/>
 			<dataarea name="flop" size = "1474560">
 				<rom name="disk1.img" size="1474560" crc="3aa5716e" sha1="4742a3e82c37fe0539f3062477efb9488b0f16f0" offset="0"/>
 			</dataarea>
 		</part>
-		<part name="disk4" interface="floppy_3_5">
+		<part name="flop4" interface="floppy_3_5">
 			<feature name="part_id" value="Install disk 2"/>
 			<dataarea name="flop" size = "1474560">
 				<rom name="disk2.img" size="1474560" crc="d9d7bddd" sha1="3713a4f5ff41e709f60a6b46972b3a7dd69e9f3c" offset="0"/>
 			</dataarea>
 		</part>
-		<part name="disk5" interface="floppy_3_5">
+		<part name="flop5" interface="floppy_3_5">
 			<feature name="part_id" value="Install disk 3"/>
 			<dataarea name="flop" size = "1474560">
 				<rom name="disk3.img" size="1474560" crc="95f0372b" sha1="15ce5ea6c0da0becdbf4c2f0bc416ae4dfb1544a" offset="0"/>
 			</dataarea>
 		</part>
-		<part name="disk6" interface="floppy_3_5">
+		<part name="flop6" interface="floppy_3_5">
 			<feature name="part_id" value="Install disk 4"/>
 			<dataarea name="flop" size = "1474560">
 				<rom name="disk4.img" size="1474560" crc="6b2eb5f3" sha1="5fb4272cede31ee017913fc24b421083707740d3" offset="0"/>
@@ -2542,31 +2725,31 @@
 		<publisher>QNX Software Systems</publisher>
 		<info name="version" value="4.23" />
 		<info name="user_notes" value="Type 'install' at the boot prompt" />
-		<part name="disk1" interface="floppy_3_5">
+		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Boot disk"/>
 			<dataarea name="flop" size = "1474560">
 				<rom name="bootdisk 423.img" size="1474560" crc="c72b0bca" sha1="7f744eae1e6b4bd9e8135591ce70d0c6bf18f616" offset="0"/>
 			</dataarea>
 		</part>
-		<part name="disk2" interface="floppy_3_5">
+		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Install disk 1"/>
 			<dataarea name="flop" size = "1474560">
 				<rom name="qnxinst1 423.img" size="1474560" crc="e767f0c7" sha1="a71c39302c76d5d919ac632ca0cffa0c30cb24d3" offset="0"/>
 			</dataarea>
 		</part>
-		<part name="disk3" interface="floppy_3_5">
+		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="Install disk 2"/>
 			<dataarea name="flop" size = "1474560">
 				<rom name="qnxinst2 423.img" size="1474560" crc="8fdebd7f" sha1="d86216e0d4f39d55911ae58c87564c33e7f1ff1b" offset="0"/>
 			</dataarea>
 		</part>
-		<part name="disk4" interface="floppy_3_5">
+		<part name="flop4" interface="floppy_3_5">
 			<feature name="part_id" value="Install disk 3"/>
 			<dataarea name="flop" size = "1474560">
 				<rom name="qnxinst3 423.img" size="1474560" crc="da05915b" sha1="4057ab9f2312ff42e34c7e11a906a51d18f78f4c" offset="0"/>
 			</dataarea>
 		</part>
-		<part name="disk5" interface="floppy_3_5">
+		<part name="flop5" interface="floppy_3_5">
 			<feature name="part_id" value="Install disk 4"/>
 			<dataarea name="flop" size = "1474560">
 				<rom name="qnxinst4 423.img" size="1474560" crc="d5fa29e1" sha1="9afbbc5275019bbb91e8effe5d15884ee76803e1" offset="0"/>
@@ -2580,7 +2763,7 @@
 		<publisher>QNX Software Systems</publisher>
 		<info name="version" value="1.0a" />
 		<info name="user_notes" value="8MB RAM required" />
-		<part name="disk1" interface="floppy_3_5">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<!-- source image is only 1469440 bytes, added 0xF6 padding -->
 				<rom name="qnxdemo v10a.dat" size="1474560" crc="909bb0ae" sha1="a234d02397d4af648a77d46ab277c5e674b4f1cb" offset="0"/>
@@ -2594,7 +2777,7 @@
 		<publisher>QNX Software Systems</publisher>
 		<info name="version" value="1.0a" />
 		<info name="user_notes" value="8MB RAM required" />
-		<part name="disk1" interface="floppy_3_5">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<!-- source image is only 1469440 bytes, added 0xF6 padding -->
 				<rom name="qnxdemo v10a beta.dat" size="1474560" crc="e5df63c4" sha1="0c9423ede835c7f867baf945bab52ebdae40183a" offset="0"/>
@@ -2608,7 +2791,7 @@
 		<publisher>QNX Software Systems</publisher>
 		<info name="version" value="1.0" />
 		<info name="user_notes" value="8MB RAM required" />
-		<part name="disk1" interface="floppy_3_5">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<!-- source image is only 1469440 bytes, added 0xF6 padding -->
 				<rom name="qnxdemo v10.dat" size="1474560" crc="c0a120e4" sha1="bf8fbf753e978e00bb95f1da4a6d2e37a91092e7" offset="0"/>
@@ -2622,7 +2805,7 @@
 		<publisher>QNX Software Systems</publisher>
 		<info name="version" value="1.1" />
 		<info name="user_notes" value="8MB RAM required" />
-		<part name="disk1" interface="floppy_3_5">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<!-- source image is only 1469440 bytes, added 0xF6 padding -->
 				<rom name="qnxdemo v11 russian.dat" size="1474560" crc="3e50f719" sha1="9336ff81e57169baa363108cde8a9b2babe77765" offset="0"/>
@@ -2636,7 +2819,7 @@
 		<publisher>QNX Software Systems</publisher>
 		<info name="version" value="4.05" />
 		<info name="user_notes" value="8MB RAM required" />
-		<part name="disk1" interface="floppy_3_5">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="qnxdemo modem v405.dat" size="1474560" crc="1449909a" sha1="e35b2822eb2391ebcac04cb5f3ec8a284f601bb8" offset="0"/>
 			</dataarea>
@@ -2649,7 +2832,7 @@
 		<publisher>QNX Software Systems</publisher>
 		<info name="version" value="4.00" />
 		<info name="user_notes" value="8MB RAM required" />
-		<part name="disk1" interface="floppy_3_5">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="qnxdemo modem v400.dat" size="1474560" crc="7cc3be15" sha1="3ded9ef17784b18f1c356e2bfeacfd9ecef4f716" offset="0"/>
 			</dataarea>
@@ -2662,7 +2845,7 @@
 		<publisher>QNX Software Systems</publisher>
 		<info name="version" value="3.03" />
 		<info name="user_notes" value="8MB RAM required" />
-		<part name="disk1" interface="floppy_3_5">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="qnxdemo modem v303.dat" size="1474560" crc="de42476d" sha1="b330dc04a920886f2243377c9edd80c23bc3e90a" offset="0"/>
 			</dataarea>
@@ -2675,7 +2858,7 @@
 		<publisher>QNX Software Systems</publisher>
 		<info name="version" value="4.05" />
 		<info name="user_notes" value="8MB RAM required" />
-		<part name="disk1" interface="floppy_3_5">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="qnxdemo network v405.dat" size="1474560" crc="315a822c" sha1="c8baa52161c069dae25410ce09a3b1c095961323" offset="0"/>
 			</dataarea>
@@ -2688,7 +2871,7 @@
 		<publisher>QNX Software Systems</publisher>
 		<info name="version" value="4.00" />
 		<info name="user_notes" value="8MB RAM required" />
-		<part name="disk1" interface="floppy_3_5">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="qnxdemo network v400.dat" size="1474560" crc="72d7de91" sha1="bcc589a419500376cf5101ddf80d416ee43c0c1d" offset="0"/>
 			</dataarea>
@@ -2701,7 +2884,7 @@
 		<publisher>QNX Software Systems</publisher>
 		<info name="version" value="3.03" />
 		<info name="user_notes" value="8MB RAM required" />
-		<part name="disk1" interface="floppy_3_5">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="qnxdemo network v303.dat" size="1474560" crc="694a0448" sha1="d1bb83273ae2da9fb1fe93ae08c951ec91d6ea3f" offset="0"/>
 			</dataarea>
@@ -2714,9 +2897,69 @@
 		<publisher>QNX Software Systems</publisher>
 		<info name="version" value="2.0" />
 		<info name="user_notes" value="8MB RAM required" />
-		<part name="disk1" interface="floppy_3_5">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="qnxdemo network v20.dat" size="1474560" crc="2026021a" sha1="a8a49d60accc19f67b09e8fe5b84ae6c3c18806e" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="serlinux">
+		<description>Serial Terminal Linux (0.3)</description>
+		<year>2000</year>
+		<publisher>Jonathan Bartlett</publisher>
+		<info name="version" value="0.3" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="seriallinux-0-3.img.bin" size="1474560" crc="fa85211f" sha1="6cebdb159b0a92e9b26e8bb039408635f80893a1" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="serlinuxa" cloneof="serlinux">
+		<description>Serial Terminal Linux (0.2)</description>
+		<year>2000</year>
+		<publisher>Jonathan Bartlett</publisher>
+		<info name="version" value="0.2" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="seriallinux-0-2.img.bin" size="1474560" crc="f3404523" sha1="192fcc112d6ec6f451dbb74c941067867374d5cb" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="serlinuxb" cloneof="serlinux">
+		<description>Serial Terminal Linux (0.1)</description>
+		<year>1999</year>
+		<publisher>Jonathan Bartlett</publisher>
+		<info name="version" value="0.1" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="seriallinux-0-1.img.bin" size="1474560" crc="2951ee04" sha1="d5b82e6a97b9f66b8de5e82aaf3b82ec56f9cb3b" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tomsrtbt" supported="no">
+		<description>tomsrtbt (2.0.103)</description>
+		<year>2002</year>
+		<publisher>Tom Oehser</publisher>
+		<info name="version" value="2.0.103" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1763328">
+				<rom name="tomsrtbt-2.0.103.raw" size="1763328" crc="53a9ba34" sha1="5220865b28562a3e93effd66a1f81433eacb614f" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tomsrtbta" cloneof="tomsrtbt" supported="no">
+		<description>tomsrtbt (1.7.185)</description>
+		<year>1999</year>
+		<publisher>Tom Oehser</publisher>
+		<info name="version" value="1.7.185" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1763328">
+				<rom name="tomsrtbt-1.7.185.raw" size="1763328" crc="555ec5e7" sha1="9b559fa2087455b9d7e40998f2e6b81394a7de86" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7975,6 +8218,49 @@
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="tleodoomcd.img" size="1474560" crc="e2ad041a" sha1="e820373ae6bd18282bec8f3aa5b40c71a6105637" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="laca">
+		<description>LucasArts Classic Adventures</description>
+		<year>1992</year>
+		<publisher>LucasArts</publisher>
+		<info name="developer" value="LucasArts" />
+		<info name="version" value="1.1" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="LucasArts Classic Adventures [LucasArts] [1992] [3.5HD] [Disk 1 of 7].img" size="1474560" crc="dfabfa9c" sha1="922f7b4f8121279af4f7792639a961ee8e8db192" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="LucasArts Classic Adventures [LucasArts] [1992] [3.5HD] [Disk 2 of 7].img" size="1474560" crc="3751873c" sha1="5435468da13d6eae0772518c3144551ebfe2220a" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="LucasArts Classic Adventures [LucasArts] [1992] [3.5HD] [Disk 3 of 7].img" size="1474560" crc="335f62a1" sha1="79bb9eb49c50fcb7a9456798d60c0a5144ef4881" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="LucasArts Classic Adventures [LucasArts] [1992] [3.5HD] [Disk 4 of 7].img" size="1474560" crc="38de5987" sha1="5303c8acf50d101e3db1fc28b4a91aafbabf3a00" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="LucasArts Classic Adventures [LucasArts] [1992] [3.5HD] [Disk 5 of 7].img" size="1474560" crc="37fc83b4" sha1="c1d927d39970658294daff35340eb0bbbbffd9e0" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="LucasArts Classic Adventures [LucasArts] [1992] [3.5HD] [Disk 6 of 7].img" size="1474560" crc="303df668" sha1="e6e246d4913c835dbeacf74840ca2c377f2037b3" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="LucasArts Classic Adventures [LucasArts] [1992] [3.5DD] [Disk 7 of 7].img" size="737280" crc="143bfe75" sha1="fc2f93bbee279ed590e0fbdd54b629483944caf0" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
