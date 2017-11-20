@@ -1925,48 +1925,32 @@ ADDRESS_MAP_END
                     and Zombie Raid (with slight variations)
 ***************************************************************************/
 
+ADC083X_INPUT_CB(seta_state::zombraid_adc_cb)
+{
+	if (input == ADC083X_AGND)
+		return 0.0;
+	else if (input == ADC083X_VREF)
+		return 1.0;
+	else
+		return m_gun_inputs[input - ADC083X_CH0]->read() / 255.0;
+}
+
 READ16_MEMBER(seta_state::zombraid_gun_r)// Serial interface
 {
-	static const char *const portnames[] = { "GUNX1", "GUNY1", "GUNX2", "GUNY2" };
-
-	int data = ioport(portnames[m_gun_input_src])->read();  // Input Ports 5-8
-	return (data >> m_gun_input_bit) & 1;
+	return m_adc->do_read();
 }
 
 // Bit 0 is clock, 1 is data, 2 is reset
 WRITE16_MEMBER(seta_state::zombraid_gun_w)
 {
-	if(data&4) { m_gun_bit_count = 0; return; } // Reset
+	m_adc->cs_write(BIT(data, 2));
+	m_adc->di_write(BIT(data, 1));
+	m_adc->clk_write(BIT(data, 0));
 
-	if((data&1) == m_gun_old_clock) return; // No change
-
-	if(m_gun_old_clock == 0) // Rising edge
-	{
-		switch (m_gun_bit_count)
-		{
-			case 0:
-			case 1: // Starting sequence 2,3,2,3. Other inputs?
-				break;
-			case 2: // First bit of source
-				m_gun_input_src = (m_gun_input_src&2) | (data>>1);
-				break;
-			case 3: // Second bit of source
-				m_gun_input_src = (m_gun_input_src&1) | (data&2);
-				break;
-			default:
-				/* Gun Recoils */
-				/* Note:  In debug menu recoil solenoids strobe when held down.  Is this correct?? */
-				output().set_value("Player1_Gun_Recoil", (data & 0x10)>>4 );
-				output().set_value("Player2_Gun_Recoil", (data & 0x8)>>3 );
-
-				m_gun_input_bit = m_gun_bit_count - 4;
-				m_gun_input_bit = 8 - m_gun_input_bit; // Reverse order
-				break;
-		}
-		m_gun_bit_count++;
-	}
-
-	m_gun_old_clock = data & 1;
+	/* Gun Recoils */
+	/* Note:  In debug menu recoil solenoids strobe when held down.  Is this correct?? */
+	output().set_value("Player1_Gun_Recoil", BIT(data, 4));
+	output().set_value("Player2_Gun_Recoil", BIT(data, 3));
 }
 
 READ16_MEMBER(seta_state::extra_r)
@@ -8694,6 +8678,9 @@ static MACHINE_CONFIG_DERIVED( zombraid, gundhara )
 	MCFG_CPU_PROGRAM_MAP(zombraid_map)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
+
+	MCFG_DEVICE_ADD("adc", ADC0834, 0)
+	MCFG_ADC083X_INPUT_CB(seta_state, zombraid_adc_cb)
 MACHINE_CONFIG_END
 
 /***************************************************************************

@@ -8,6 +8,7 @@
 ***************************************************************************/
 
 #include "machine/74157.h"
+#include "machine/adc083x.h"
 #include "machine/gen_latch.h"
 #include "machine/ticket.h"
 #include "machine/timer.h"
@@ -48,8 +49,10 @@ public:
 		m_soundlatch2(*this, "soundlatch2"),
 		m_upd4701(*this, "upd4701"),
 		m_buttonmux(*this, "buttonmux"),
+		m_adc(*this, "adc"),
 		m_dsw(*this, "DSW"),
 		m_rot(*this, {"ROT1", "ROT2"}),
+		m_gun_inputs(*this, {"GUNX1", "GUNY1", "GUNX2", "GUNY2"}),
 		m_p1(*this, "P1"),
 		m_p2(*this, "P2"),
 		m_coins(*this, "COINS"),
@@ -78,9 +81,11 @@ public:
 	optional_device<generic_latch_8_device> m_soundlatch2;
 	optional_device<upd4701_device> m_upd4701;
 	optional_device<hc157_device> m_buttonmux;
+	optional_device<adc083x_device> m_adc;
 
 	optional_ioport m_dsw;
 	optional_ioport_array<2> m_rot;
+	optional_ioport_array<4> m_gun_inputs;
 	optional_ioport m_p1;
 	optional_ioport m_p2;
 	optional_ioport m_coins;
@@ -120,11 +125,6 @@ public:
 
 	int m_sub_ctrl_data;
 
-	int m_gun_input_bit;
-	int m_gun_input_src;
-	int m_gun_bit_count;
-	int m_gun_old_clock;
-
 	uint8_t m_usclssic_port_select;
 	int m_keroppi_prize_hop;
 	int m_keroppi_protection_count;
@@ -155,6 +155,7 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(usclssic_trackball_x_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(usclssic_trackball_y_r);
 	DECLARE_WRITE8_MEMBER(usclssic_lockout_w);
+	ADC083X_INPUT_CB(zombraid_adc_cb);
 	DECLARE_READ16_MEMBER(zombraid_gun_r);
 	DECLARE_WRITE16_MEMBER(zombraid_gun_w);
 	DECLARE_READ16_MEMBER(zingzipbl_unknown_r);
