@@ -147,7 +147,6 @@
 
 
 #define OP              m_op
-#define PPC             m_ppc //previous pc
 #define PC              m_global_regs[0] //Program Counter
 #define SR              m_global_regs[1] //Status Register
 #define FER             m_global_regs[2] //Floating-Point Exception Register

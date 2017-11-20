@@ -231,16 +231,16 @@ protected:
 	int detect_fault(int desc_lvl1, int ap, int flags);
 	void arm7_check_irq_state();
 	void update_irq_state();
-	void arm7_cpu_write32(uint32_t addr, uint32_t data);
-	void arm7_cpu_write16(uint32_t addr, uint16_t data);
-	void arm7_cpu_write8(uint32_t addr, uint8_t data);
-	uint32_t arm7_cpu_read32(uint32_t addr);
-	uint16_t arm7_cpu_read16(uint32_t addr);
-	uint8_t arm7_cpu_read8(uint32_t addr);
+	virtual void arm7_cpu_write32(uint32_t addr, uint32_t data);
+	virtual void arm7_cpu_write16(uint32_t addr, uint16_t data);
+	virtual void arm7_cpu_write8(uint32_t addr, uint8_t data);
+	virtual uint32_t arm7_cpu_read32(uint32_t addr);
+	virtual uint16_t arm7_cpu_read16(uint32_t addr);
+	virtual uint8_t arm7_cpu_read8(uint32_t addr);
 
 	// Coprocessor support
 	DECLARE_WRITE32_MEMBER( arm7_do_callback );
-	DECLARE_READ32_MEMBER( arm7_rt_r_callback );
+	virtual DECLARE_READ32_MEMBER( arm7_rt_r_callback );
 	virtual DECLARE_WRITE32_MEMBER( arm7_rt_w_callback );
 	void arm7_dt_r_callback(uint32_t insn, uint32_t *prn);
 	void arm7_dt_w_callback(uint32_t insn, uint32_t *prn);
@@ -613,6 +613,25 @@ class arm946es_cpu_device : public arm9_cpu_device
 public:
 	// construction/destruction
 	arm946es_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	// 946E-S has Protection Unit instead of ARM MMU so CP15 is quite different
+	virtual DECLARE_READ32_MEMBER( arm7_rt_r_callback ) override;
+	virtual DECLARE_WRITE32_MEMBER( arm7_rt_w_callback ) override;
+
+	virtual void arm7_cpu_write32(uint32_t addr, uint32_t data) override;
+	virtual void arm7_cpu_write16(uint32_t addr, uint16_t data) override;
+	virtual void arm7_cpu_write8(uint32_t addr, uint8_t data) override;
+	virtual uint32_t arm7_cpu_read32(uint32_t addr) override;
+	virtual uint16_t arm7_cpu_read16(uint32_t addr) override;
+	virtual uint8_t arm7_cpu_read8(uint32_t addr) override;
+
+private:
+	uint32_t cp15_control, cp15_itcm_base, cp15_dtcm_base, cp15_itcm_size, cp15_dtcm_size;
+	uint32_t cp15_itcm_end, cp15_dtcm_end, cp15_itcm_reg, cp15_dtcm_reg;
+	uint8_t ITCM[0x8000], DTCM[0x4000];
+
+	void RefreshITCM();
+	void RefreshDTCM();
 };
 
 

@@ -85,6 +85,7 @@ Notes:
         Xilinx 1718DPC
         74F244N (2 of these)
         LVT245SS (2 of theses)
+        On Simpsons Bowling, this also has one µPD4701AC and an empty space for a second.
 
       - 000180 is used for driving the RGB output. It's a very thin piece of very brittle ceramic
         containing a circuit, a LM1203 chip, some smt transistors/caps/resistors etc (let's just say

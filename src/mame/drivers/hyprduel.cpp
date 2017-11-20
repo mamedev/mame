@@ -424,6 +424,7 @@ static ADDRESS_MAP_START( hyprduel_map, AS_PROGRAM, 16, hyprduel_state )
 	AM_RANGE(0x475000, 0x477fff) AM_RAM         /* only used memory test */
 	AM_RANGE(0x478000, 0x4787ff) AM_RAM AM_SHARE("tiletable")   /* Tiles Set */
 	AM_RANGE(0x478840, 0x47884d) AM_WRITE(blitter_w) AM_SHARE("blitter_regs")  /* Tiles Blitter */
+	AM_RANGE(0x478850, 0x478853) AM_RAM AM_SHARE("spriteregs")
 	AM_RANGE(0x478860, 0x47886b) AM_WRITE(window_w) AM_SHARE("window")         /* Tilemap Window */
 	AM_RANGE(0x478870, 0x47887b) AM_RAM_WRITE(scrollreg_w) AM_SHARE("scroll")      /* Scroll Regs */
 	AM_RANGE(0x47887c, 0x47887d) AM_WRITE(scrollreg_init_w)
@@ -471,6 +472,7 @@ static ADDRESS_MAP_START( magerror_map, AS_PROGRAM, 16, hyprduel_state )
 	AM_RANGE(0x875000, 0x877fff) AM_RAM         /* only used memory test */
 	AM_RANGE(0x878000, 0x8787ff) AM_RAM AM_SHARE("tiletable")   /* Tiles Set */
 	AM_RANGE(0x878840, 0x87884d) AM_WRITE(blitter_w) AM_SHARE("blitter_regs")  /* Tiles Blitter */
+	AM_RANGE(0x878850, 0x878853) AM_RAM AM_SHARE("spriteregs")
 	AM_RANGE(0x878860, 0x87886b) AM_WRITE(window_w) AM_SHARE("window")         /* Tilemap Window */
 	AM_RANGE(0x878870, 0x87887b) AM_RAM_WRITE(scrollreg_w) AM_SHARE("scroll")      /* Scroll Regs */
 	AM_RANGE(0x87887c, 0x87887d) AM_WRITE(scrollreg_init_w)

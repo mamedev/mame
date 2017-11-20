@@ -50,7 +50,7 @@ private:
 	address_space *m_space;
 	uint8_t *m_rom;
 
-	uint32_t m_regs[8];
+	uint32_t m_regs[8*256];
 	uint32_t m_bios_ram[0x40000 / 4];
 };
 

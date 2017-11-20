@@ -763,6 +763,13 @@ WRITE_LINE_MEMBER( mc68681_base_device::ip5_w )
 	IP_last_state = newIP;
 }
 
+WRITE_LINE_MEMBER( mc68681_base_device::ip6_w )
+{
+	uint8_t newIP = (IP_last_state & ~0x40) | ((state == ASSERT_LINE) ? 0x40 : 0);
+// TODO: special mode for ip6 (Ch. B Rx clock)
+	IP_last_state = newIP;
+}
+
 mc68681_channel *mc68681_base_device::get_channel(int chan)
 {
 	if (chan == 0)

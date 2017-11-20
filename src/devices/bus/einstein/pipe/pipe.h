@@ -90,6 +90,9 @@ public:
 	template <class Object> static devcb_base &set_reset_handler(device_t &device, Object &&cb)
 	{ return downcast<tatung_pipe_device &>(device).m_reset_handler.set_callback(std::forward<Object>(cb)); }
 
+	// called from host
+	DECLARE_WRITE_LINE_MEMBER( host_int_w );
+
 	// called from card device
 	DECLARE_WRITE_LINE_MEMBER( int_w ) { m_int_handler(state); }
 	DECLARE_WRITE_LINE_MEMBER( nmi_w ) { m_nmi_handler(state); }
@@ -118,6 +121,9 @@ public:
 	// construction/destruction
 	device_tatung_pipe_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_tatung_pipe_interface();
+
+	// host to card
+	virtual void int_w(int state) { }
 
 protected:
 	address_space &program_space() { return *m_slot->m_program; }

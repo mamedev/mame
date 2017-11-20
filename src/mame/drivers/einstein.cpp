@@ -83,7 +83,8 @@ public:
 		m_buttons(*this, "BUTTONS"),
 		m_rom_enabled(0),
 		m_keyboard_line(0), m_keyboard_data(0xff),
-		m_centronics_busy(0), m_centronics_perror(0), m_centronics_fault(0)
+		m_centronics_busy(0), m_centronics_perror(0), m_centronics_fault(0), m_strobe(-1),
+		m_int(0)
 	{}
 
 	DECLARE_INPUT_CHANGED_MEMBER(joystick_button);
@@ -94,6 +95,7 @@ public:
 	DECLARE_WRITE8_MEMBER(reset_w);
 	DECLARE_READ8_MEMBER(rom_r);
 	DECLARE_WRITE8_MEMBER(rom_w);
+	template <int src> DECLARE_WRITE_LINE_MEMBER(int_w);
 	DECLARE_READ8_MEMBER(kybint_msk_r);
 	DECLARE_WRITE8_MEMBER(kybint_msk_w);
 	DECLARE_WRITE8_MEMBER(adcint_msk_w);
@@ -139,6 +141,9 @@ private:
 	int m_centronics_busy;
 	int m_centronics_perror;
 	int m_centronics_fault;
+	int m_strobe;
+
+	int m_int;
 };
 
 
@@ -245,11 +250,13 @@ WRITE_LINE_MEMBER( einstein_state::write_centronics_fault )
 
 WRITE_LINE_MEMBER( einstein_state::ardy_w )
 {
-	if (state)
+	if (m_strobe == 0 && state == 1)
 	{
 		m_centronics->write_strobe(1);
 		m_strobe_timer->adjust(attotime::from_double(TIME_OF_74LS123(RES_K(10), CAP_N(1))));
 	}
+
+	m_strobe = state;
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER( einstein_state::strobe_callback )
@@ -271,6 +278,30 @@ static const z80_daisy_config einstein_daisy_chain[] =
 	{ "fire_daisy" },
 	{ nullptr }
 };
+
+template <int src> WRITE_LINE_MEMBER( einstein_state::int_w )
+{
+	int old = m_int;
+
+	if (state)
+	{
+		m_int |= (1 << src);
+		if (!old)
+		{
+			m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
+			m_pipe->host_int_w(ASSERT_LINE);
+		}
+	}
+	else
+	{
+		m_int &= ~(1 << src);
+		if (old && !m_int)
+		{
+			m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
+			m_pipe->host_int_w(CLEAR_LINE);
+		}
+	}
+}
 
 READ8_MEMBER( einstein_state::kybint_msk_r )
 {
@@ -370,6 +401,8 @@ void einstein_state::machine_reset()
 	m_keyboard_daisy->mask_w(1);
 	m_adc_daisy->mask_w(1);
 	m_fire_daisy->mask_w(1);
+
+	m_strobe = -1;
 }
 
 
@@ -548,7 +581,7 @@ static MACHINE_CONFIG_START( einstein )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard", einstein_state, keyboard_timer_callback, attotime::from_hz(50))
 
 	MCFG_DEVICE_ADD(IC_I063, Z80PIO, XTAL_X002 / 2)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(IC_I001, INPUT_LINE_IRQ0))
+	MCFG_Z80PIO_OUT_INT_CB(WRITELINE(einstein_state, int_w<0>))
 	MCFG_Z80PIO_OUT_PA_CB(DEVWRITE8("cent_data_out", output_latch_device, write))
 	MCFG_Z80PIO_OUT_ARDY_CB(WRITELINE(einstein_state, ardy_w))
 	MCFG_Z80PIO_IN_PB_CB(DEVREAD8("user", einstein_userport_device, read))
@@ -556,7 +589,7 @@ static MACHINE_CONFIG_START( einstein )
 	MCFG_Z80PIO_OUT_BRDY_CB(DEVWRITELINE("user", einstein_userport_device, brdy_w))
 
 	MCFG_DEVICE_ADD(IC_I058, Z80CTC, XTAL_X002 / 2)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE(IC_I001, INPUT_LINE_IRQ0))
+	MCFG_Z80CTC_INTR_CB(WRITELINE(einstein_state, int_w<1>))
 	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE(IC_I060, i8251_device, write_txc))
 	MCFG_Z80CTC_ZC1_CB(DEVWRITELINE(IC_I060, i8251_device, write_rxc))
 	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE(IC_I058, z80ctc_device, trg3))
@@ -568,8 +601,11 @@ static MACHINE_CONFIG_START( einstein )
 
 	/* Einstein daisy chain support for non-Z80 devices */
 	MCFG_Z80DAISY_GENERIC_ADD("keyboard_daisy", 0xf7)
+	MCFG_Z80DAISY_GENERIC_INT_CB(WRITELINE(einstein_state, int_w<2>))
 	MCFG_Z80DAISY_GENERIC_ADD("adc_daisy", 0xfb)
+	MCFG_Z80DAISY_GENERIC_INT_CB(WRITELINE(einstein_state, int_w<3>))
 	MCFG_Z80DAISY_GENERIC_ADD("fire_daisy", 0xfd)
+	MCFG_Z80DAISY_GENERIC_INT_CB(WRITELINE(einstein_state, int_w<4>))
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("vdp", TMS9129, XTAL_10_738635MHz / 2)
@@ -633,6 +669,7 @@ static MACHINE_CONFIG_START( einstein )
 
 	// tatung pipe connector
 	MCFG_TATUNG_PIPE_ADD("pipe")
+	MCFG_TATUNG_PIPE_NMI_HANDLER(INPUTLINE(IC_I001, INPUT_LINE_NMI))
 
 	// user port
 	MCFG_EINSTEIN_USERPORT_ADD("user")

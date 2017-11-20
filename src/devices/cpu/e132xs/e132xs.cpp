@@ -768,7 +768,6 @@ void hyperstone_device::execute_br()
 	const int32_t offset = decode_pcrel();
 	check_delay_PC();
 
-	PPC = PC;
 	PC += offset;
 	SR &= ~M_MASK;
 
@@ -796,7 +795,6 @@ void hyperstone_device::execute_trap(uint32_t addr)
 	SET_L(1);
 	SET_S(1);
 
-	PPC = PC;
 	PC = addr;
 
 	m_icount -= m_clock_cycles_2;
@@ -805,27 +803,19 @@ void hyperstone_device::execute_trap(uint32_t addr)
 
 void hyperstone_device::execute_int(uint32_t addr)
 {
-	uint8_t reg;
-	uint32_t oldSR;
-	reg = GET_FP + GET_FL;
-
+	const uint8_t reg = GET_FP + GET_FL;
 	SET_ILC(m_instruction_length);
-
-	oldSR = SR;
+	const uint32_t oldSR = SR;
 
 	SET_FL(2);
 	SET_FP(reg);
 
-	set_local_register(0, (PC & 0xfffffffe) | GET_S);
-	set_local_register(1, oldSR);
+	m_local_regs[(0 + reg) & 0x3f] = (PC & ~1) | GET_S;
+	m_local_regs[(1 + reg) & 0x3f] = oldSR;
 
-	SET_M(0);
-	SET_T(0);
-	SET_L(1);
-	SET_S(1);
-	SET_I(1);
+	SR &= ~(M_MASK | T_MASK);
+	SR |= (L_MASK | S_MASK | I_MASK);
 
-	PPC = PC;
 	PC = addr;
 
 	m_icount -= m_clock_cycles_2;
@@ -834,29 +824,21 @@ void hyperstone_device::execute_int(uint32_t addr)
 /* TODO: mask Parity Error and Extended Overflow exceptions */
 void hyperstone_device::execute_exception(uint32_t addr)
 {
-	uint8_t reg;
-	uint32_t oldSR;
-	reg = GET_FP + GET_FL;
-
+	const uint8_t reg = GET_FP + GET_FL;
 	SET_ILC(m_instruction_length);
-
-	oldSR = SR;
+	const uint32_t oldSR = SR;
 
 	SET_FP(reg);
 	SET_FL(2);
 
-	set_local_register(0, (PC & 0xfffffffe) | GET_S);
-	set_local_register(1, oldSR);
+	m_local_regs[(0 + reg) & 0x3f] = (PC & ~1) | GET_S;
+	m_local_regs[(1 + reg) & 0x3f] = oldSR;
 
-	SET_M(0);
-	SET_T(0);
-	SET_L(1);
-	SET_S(1);
+	SR &= ~(M_MASK | T_MASK);
+	SR |= (L_MASK | S_MASK);
 
-	PPC = PC;
 	PC = addr;
 
-	LOG("EXCEPTION! PPC = %08X PC = %08X\n",PPC-2,PC-2);
 	m_icount -= m_clock_cycles_2;
 }
 
@@ -893,7 +875,6 @@ void hyperstone_device::execute_software()
 	SR &= ~(M_MASK | T_MASK);
 	SR |= L_MASK;
 
-	PPC = PC;
 	PC = addr;
 
 	m_icount -= m_clock_cycles_6;
@@ -1028,7 +1009,6 @@ void hyperstone_device::init(int scale_mask)
 {
 	memset(m_global_regs, 0, sizeof(uint32_t) * 32);
 	memset(m_local_regs, 0, sizeof(uint32_t) * 64);
-	m_ppc = 0;
 	m_op = 0;
 	m_trap_entry = 0;
 	m_clock_scale_mask = 0;
@@ -1179,7 +1159,6 @@ void hyperstone_device::init(int scale_mask)
 
 	save_item(NAME(m_global_regs));
 	save_item(NAME(m_local_regs));
-	save_item(NAME(m_ppc));
 	save_item(NAME(m_trap_entry));
 	save_item(NAME(m_delay_pc));
 	save_item(NAME(m_instruction_length));
@@ -1532,7 +1511,7 @@ void hyperstone_device::hyperstone_reserved()
 
 void hyperstone_device::hyperstone_do()
 {
-	fatalerror("Executed hyperstone_do instruction. PC = %08X\n", PPC);
+	fatalerror("Executed hyperstone_do instruction. PC = %08X\n", PC-4);
 }
 
 //-------------------------------------------------
@@ -1551,7 +1530,6 @@ void hyperstone_device::execute_run()
 	{
 		uint32_t oldh = SR & 0x00000020;
 
-		PPC = PC;   /* copy PC to previous PC */
 		debugger_instruction_hook(this, PC);
 
 		OP = READ_OP(PC);

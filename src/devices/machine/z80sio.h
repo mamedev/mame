@@ -157,8 +157,6 @@ public:
 	uint8_t data_read();
 	void data_write(uint8_t data);
 
-	void receive_reset();
-
 	DECLARE_WRITE_LINE_MEMBER( write_rx ) { m_rxd = state; }
 	DECLARE_WRITE_LINE_MEMBER( cts_w );
 	DECLARE_WRITE_LINE_MEMBER( dcd_w );
@@ -237,7 +235,6 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	void update_serial();
 	void update_dtr_rts_break();
 	void set_dtr(int state);
 	void set_rts(int state);
@@ -259,7 +256,6 @@ protected:
 
 	int m_rx_first;     // first character received
 	int m_rx_break;     // receive break condition
-	uint8_t m_rx_rr0_latch;   // read register 0 latched
 
 	int m_rxd;
 	int m_sh;           // sync hunt
@@ -270,7 +266,7 @@ protected:
 	int m_tx_clock;     // transmit clock line state
 	int m_tx_count;     // clocks until next bit transition
 	int m_tx_bits;      // remaining bits in shift register
-	int m_tx_parity;    // parity enable/disable
+	int m_tx_parity;    // parity bit position or zero if disabled
 	uint16_t m_tx_sr;   // transmit shift register
 	uint16_t m_tx_crc;  // calculated transmit checksum
 	uint8_t m_tx_hist;  // transmit history (for bitstuffing)
@@ -298,9 +294,13 @@ private:
 	void out_rts_cb(int state);
 	void out_dtr_cb(int state);
 	void set_ready(bool ready);
+	bool receive_allowed() const;
 	bool transmit_allowed() const;
 
+	void receive_enabled();
+	void sync_receive();
 	void receive_data();
+	void queue_received(uint16_t data, uint32_t error);
 	void advance_rx_fifo();
 
 	void transmit_enable();

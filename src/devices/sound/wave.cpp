@@ -47,13 +47,13 @@ wave_device::wave_device(const machine_config &mconfig, const char *tag, device_
 
 void wave_device::device_start()
 {
-	speaker_device_iterator spkiter(machine().root_device());
+	speaker_device_iterator spkiter(*owner());
 	int speakers = spkiter.count();
 	if (speakers > 1)
 		machine().sound().stream_alloc(*this, 0, 2, machine().sample_rate());
 	else
 		machine().sound().stream_alloc(*this, 0, 1, machine().sample_rate());
-	m_cass = machine().device<cassette_image_device>(m_cassette_tag);
+	m_cass = owner()->subdevice<cassette_image_device>(m_cassette_tag);
 }
 
 //-------------------------------------------------
@@ -69,7 +69,7 @@ void wave_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 	stream_sample_t *right_buffer = nullptr;
 	int i;
 
-	speaker_device_iterator spkiter(m_cass->machine().root_device());
+	speaker_device_iterator spkiter(*owner());
 	int speakers = spkiter.count();
 	if (speakers>1)
 		right_buffer = outputs[1];

@@ -303,7 +303,10 @@ VIDEO_START_MEMBER(metro_state,metro_i4220_dx_sprite)
 {
 	VIDEO_START_CALL_MEMBER(metro_i4220);
 
-	m_sprite_xoffs_dx = 8;
+	m_tilemap_scrolldx[0] = -16;
+	m_tilemap_scrolldx[1] = -16;
+	m_tilemap_scrolldx[2] = -16;
+	m_sprite_xoffs_dx = 0;
 }
 
 VIDEO_START_MEMBER(metro_state,metro_i4300)
@@ -321,9 +324,10 @@ VIDEO_START_MEMBER(metro_state,blzntrnd)
 
 	m_k053936_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(metro_state::metro_k053936_get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 256, 512);
 
-	m_tilemap_scrolldx[0] = 8;
-	m_tilemap_scrolldx[1] = 8;
-	m_tilemap_scrolldx[2] = 8;
+	m_tilemap_scrolldx[0] = 0;
+	m_tilemap_scrolldx[1] = 0;
+	m_tilemap_scrolldx[2] = 0;
+	m_sprite_xoffs_dx = 0;
 }
 
 VIDEO_START_MEMBER(metro_state,gstrik2)
@@ -334,9 +338,10 @@ VIDEO_START_MEMBER(metro_state,gstrik2)
 
 	m_k053936_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(metro_state::metro_k053936_gstrik2_get_tile_info),this), tilemap_mapper_delegate(FUNC(metro_state::tilemap_scan_gstrik2),this), 16, 16, 128, 256);
 
-	m_tilemap_scrolldx[0] = 8;
-	m_tilemap_scrolldx[1] = 0;
-	m_tilemap_scrolldx[2] = 8;
+	m_tilemap_scrolldx[0] = 0;
+	m_tilemap_scrolldx[1] = -8;
+	m_tilemap_scrolldx[2] = 0;
+	m_sprite_xoffs_dx = 0;
 }
 
 /***************************************************************************
@@ -369,7 +374,17 @@ VIDEO_START_MEMBER(metro_state,gstrik2)
 
 ***************************************************************************/
 
+/***************************************************************************
 
+                                Sprite Registers
+
+
+        Offset:     Bits:                   Value:
+
+        0.w                                 Sprite Y center point
+        2.w         						Sprite X center point
+
+***************************************************************************/
 
 /***************************************************************************
 
@@ -405,8 +420,8 @@ void metro_state::metro_draw_sprites( screen_device &screen, bitmap_ind16 &bitma
 	uint8_t *base_gfx8 = memregion("gfx1")->base();
 	uint32_t gfx_size = memregion("gfx1")->bytes();
 
-	int max_x = m_screen->width();
-	int max_y = m_screen->height();
+	int max_x = (m_spriteregs[1]+1)*2;
+	int max_y = (m_spriteregs[0]+1)*2;
 
 	int max_sprites = m_spriteram.bytes() / 8;
 	int sprites     = m_videoregs[0x00/2] % max_sprites;
@@ -663,9 +678,9 @@ uint32_t metro_state::screen_update_metro(screen_device &screen, bitmap_ind16 &b
 {
 	int pri, layers_ctrl = -1;
 	uint16_t screenctrl = *m_screenctrl;
-
-	m_sprite_xoffs = m_videoregs[0x06 / 2] - screen.width()  / 2 + m_sprite_xoffs_dx;
-	m_sprite_yoffs = m_videoregs[0x04 / 2] - screen.height() / 2;
+	
+	m_sprite_xoffs = m_videoregs[0x06 / 2] - (m_spriteregs[1]+1) + m_sprite_xoffs_dx;
+	m_sprite_yoffs = m_videoregs[0x04 / 2] - (m_spriteregs[0]+1);
 
 	screen.priority().fill(0, cliprect);
 
@@ -708,8 +723,14 @@ if (machine().input().code_pressed(KEYCODE_Z))
 #endif
 
 	if (m_has_zoom)
+	{
+		/* TODO: bit 5 of reg 7 is off when ROZ is supposed to be disabled
+		 * (Blazing Tornado title screen/character select/ending and Grand Striker 2 title/how to play transition)
+		 */
+		
 		m_k053936->zoom_draw(screen, bitmap, cliprect, m_k053936_tilemap, 0, 0, 1);
-
+	}
+	
 	for (pri = 3; pri >= 0; pri--)
 		draw_layers(screen, bitmap, cliprect, pri, layers_ctrl);
 
