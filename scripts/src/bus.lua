@@ -3300,6 +3300,8 @@ if (BUSES["TATUNG_PIPE"]~=null) then
 		MAME_DIR .. "src/devices/bus/einstein/pipe/pipe.h",
 		MAME_DIR .. "src/devices/bus/einstein/pipe/silicon_disc.cpp",
 		MAME_DIR .. "src/devices/bus/einstein/pipe/silicon_disc.h",
+		MAME_DIR .. "src/devices/bus/einstein/pipe/speculator.cpp",
+		MAME_DIR .. "src/devices/bus/einstein/pipe/speculator.h",
 		MAME_DIR .. "src/devices/bus/einstein/pipe/tk02.cpp",
 		MAME_DIR .. "src/devices/bus/einstein/pipe/tk02.h",
 	}
