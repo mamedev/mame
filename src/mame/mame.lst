@@ -9808,10 +9808,12 @@ coco                            // Color Computer
 coco2                           // Color Computer 2
 coco2b                          // Color Computer 2B (uses M6847T1 video chip)
 cocoe                           // Color Computer (Extended BASIC 1.0)
-cp400                           // Prologica CP400
-cp400c2                         // Prologica CP400 Color II
-lzcolor64                       // Digiponto LZ Color64
+cp400                           // Prológica CP400
+cp400c2                         // Prológica CP400 Color II
+lzcolor64                       // Novo Tempo / LZ Equipamentos Color64
 mx1600                          // Dynacom MX-1600
+cd6809_83                       // Codimex CD-6809 (1983 version)
+cd6809_84                       // Codimex CD-6809 (1984 version)
 t4426                           // Terco 4426 CNC programming station
 
 @source:coco3.cpp

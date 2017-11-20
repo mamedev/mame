@@ -587,29 +587,43 @@ ROM_START(mx1600 )
 	ROM_LOAD("mx1600extbas.rom", 0x0000, 0x2000, CRC(322a3d58) SHA1(9079a477c3f22e46cebb1e68b61df5bd607c71a4))
 ROM_END
 
-ROM_START( t4426 )
+ROM_START(t4426)
 	ROM_REGION(0x8000,MAINCPU_TAG,0)
 	ROM_LOAD("SOFT4426-U13-1.2.bin", 0x2000, 0x2000, CRC(3c1af94a) SHA1(1dc57b3e4a6ef6a743ca21d8f111a74b1ea9d54e))
 	ROM_LOAD("SOFT4426-U14-1.2.bin", 0x0000, 0x2000, CRC(e031d076) SHA1(7275f1e3f165ff6a4657e4e5e24cb8b817239f54))
 ROM_END
 
-ROM_START(lzcolor64 )
+ROM_START(lzcolor64)
 	ROM_REGION(0x8000,MAINCPU_TAG,0)
 	ROM_LOAD("color64bas.rom",    0x2000, 0x2000, CRC(b0717d71) SHA1(ad1beef9d6f095ada69f91d0b8ad75985172d86f))
 	ROM_LOAD("color64extbas.rom", 0x0000, 0x2000, CRC(d1b1560d) SHA1(7252de9df405ade453282e992eb1f1910adc8e50))
+ROM_END
+
+ROM_START(cd6809_83)
+	ROM_REGION(0x8000,MAINCPU_TAG,0)
+	ROM_LOAD("cd6809bas83.rom",    0x2000, 0x2000, CRC(f8e64142) SHA1(c0fd689119e2619ec226a2d67aeeb32070c14e38))
+	ROM_LOAD("cd6809extbas83.rom", 0x0000, 0x2000, CRC(e5d5aa15) SHA1(0cd4a3d9e4af1d0176964e35e3d15a9fa0e68ac4))
+ROM_END
+
+ROM_START(cd6809_84)
+	ROM_REGION(0x8000,MAINCPU_TAG,0)
+	ROM_LOAD("cd6809bas84.rom",    0x2000, 0x2000, CRC(8a9971da) SHA1(5cb5f1ffc983a85ba92af68b1d571b270f6db559))
+	ROM_LOAD("cd6809extbas84.rom", 0x0000, 0x2000, CRC(8dc853e2) SHA1(d572ce4497c115af53d2b0feeb52d3c7a7fec175))
 ROM_END
 
 //**************************************************************************
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//     YEAR     NAME        PARENT  COMPAT  MACHINE  INPUT     STATE         INIT  COMPANY              FULLNAME                               FLAGS
-COMP(  1980,    coco,       0,      0,      coco,    coco,     coco12_state, 0,    "Tandy Radio Shack", "Color Computer",                      0 )
-COMP(  1981,    cocoe,      coco,   0,      cocoe,   coco,     coco12_state, 0,    "Tandy Radio Shack", "Color Computer (Extended BASIC 1.0)", 0 )
-COMP(  1983,    coco2,      coco,   0,      coco2,   coco,     coco12_state, 0,    "Tandy Radio Shack", "Color Computer 2",                    0 )
-COMP(  1985?,   coco2b,     coco,   0,      coco2b,  coco,     coco12_state, 0,    "Tandy Radio Shack", "Color Computer 2B",                   0 )
-COMP(  1983,    cp400,      coco,   0,      cp400,   coco,     coco12_state, 0,    "Prológica",         "CP400 Color",                         0 )
-COMP(  1985,    cp400c2,    coco,   0,      cp400,   cp400c2,  coco12_state, 0,    "Prológica",         "CP400 Color II",                      0 )
-COMP(  1983,    lzcolor64,  coco,   0,      coco,    coco,     coco12_state, 0,    "Novo Tempo/LZ",     "Color64",                             0 )
-COMP(  1984,    mx1600,     coco,   0,      coco,    coco,     coco12_state, 0,    "Dynacom",           "MX-1600",                             0 )
-COMP(  1986,    t4426,      coco,   0,      t4426,   coco,     coco12_state, 0,    "Terco AB",          "Terco 4426 CNC Programming station",  0 )
+//     YEAR     NAME        PARENT  COMPAT  MACHINE  INPUT     STATE         INIT  COMPANY                         FULLNAME                               FLAGS
+COMP(  1980,    coco,       0,      0,      coco,    coco,     coco12_state, 0,    "Tandy Radio Shack",            "Color Computer",                      0 )
+COMP(  1981,    cocoe,      coco,   0,      cocoe,   coco,     coco12_state, 0,    "Tandy Radio Shack",            "Color Computer (Extended BASIC 1.0)", 0 )
+COMP(  1983,    coco2,      coco,   0,      coco2,   coco,     coco12_state, 0,    "Tandy Radio Shack",            "Color Computer 2",                    0 )
+COMP(  1985?,   coco2b,     coco,   0,      coco2b,  coco,     coco12_state, 0,    "Tandy Radio Shack",            "Color Computer 2B",                   0 )
+COMP(  1983,    cp400,      coco,   0,      cp400,   coco,     coco12_state, 0,    "Prológica",                    "CP400",                               0 )
+COMP(  1985,    cp400c2,    coco,   0,      cp400,   cp400c2,  coco12_state, 0,    "Prológica",                    "CP400 Color II",                      0 )
+COMP(  1983,    lzcolor64,  coco,   0,      coco,    coco,     coco12_state, 0,    "Novo Tempo / LZ Equipamentos", "Color64",                             0 )
+COMP(  1983,    cd6809_83,  coco,   0,      coco,    coco,     coco12_state, 0,    "Codimex",                      "CD-6809",                             0 )
+COMP(  1984,    cd6809_84,  coco,   0,      coco,    coco,     coco12_state, 0,    "Codimex",                      "CD-6809",                             0 )
+COMP(  1984,    mx1600,     coco,   0,      coco,    coco,     coco12_state, 0,    "Dynacom",                      "MX-1600",                             0 )
+COMP(  1986,    t4426,      coco,   0,      t4426,   coco,     coco12_state, 0,    "Terco AB",                     "Terco 4426 CNC Programming station",  0 )
