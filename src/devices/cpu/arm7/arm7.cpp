@@ -1268,7 +1268,7 @@ READ32_MEMBER( arm946es_cpu_device::arm7_rt_r_callback )
 						break;
 
 					case 2: // TCM size
-						data = (6 << 6) || (5 << 18);
+						data = (6 << 6) | (5 << 18);
 						break;
 				}
 				break;
