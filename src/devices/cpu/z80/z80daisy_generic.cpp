@@ -28,6 +28,7 @@ DEFINE_DEVICE_TYPE(Z80DAISY_GENERIC, z80daisy_generic_device, "z80daisy_generic"
 z80daisy_generic_device::z80daisy_generic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, Z80DAISY_GENERIC, tag, owner, clock),
 	device_z80daisy_interface(mconfig, *this),
+	m_int_handler(*this),
 	m_int(0), m_mask(0), m_vector(0xff)
 {
 }
@@ -48,6 +49,9 @@ void z80daisy_generic_device::static_set_vector(device_t &device, uint8_t vector
 
 void z80daisy_generic_device::device_start()
 {
+	// resolve callbacks
+	m_int_handler.resolve_safe();
+
 	// register for save states
 	save_item(NAME(m_int));
 	save_item(NAME(m_mask));
@@ -86,6 +90,15 @@ void z80daisy_generic_device::z80daisy_irq_reti()
 {
 }
 
+//-------------------------------------------------
+//  update_interrupt() - check interrupt status
+//-------------------------------------------------
+
+void z80daisy_generic_device::update_interrupt()
+{
+	m_int_handler(m_int & ~m_mask ? ASSERT_LINE : CLEAR_LINE);
+}
+
 
 //**************************************************************************
 //  INTERFACE
@@ -94,9 +107,11 @@ void z80daisy_generic_device::z80daisy_irq_reti()
 WRITE_LINE_MEMBER( z80daisy_generic_device::int_w )
 {
 	m_int = state;
+	update_interrupt();
 }
 
 WRITE_LINE_MEMBER( z80daisy_generic_device::mask_w )
 {
 	m_mask = state;
+	update_interrupt();
 }
