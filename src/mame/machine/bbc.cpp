@@ -501,7 +501,11 @@ READ8_MEMBER(bbc_state::bbcm_r)
 		if ((myo>=0x80) && (myo<=0x9f))                   return 0xfe;
 		if ((myo>=0xa0) && (myo<=0xbf))                   return m_adlc ? m_adlc->read(space, myo & 0x03) : 0xfe;
 		if ((myo>=0xc0) && (myo<=0xdf))                   return 0xff;
-		if ((myo>=0xe0) && (myo<=0xff))                   return m_intube ? m_intube->host_r(space, myo-0xe0) : 0xff;
+		if ((myo>=0xe0) && (myo<=0xff))
+		{
+			if (m_intube &&  m_ACCCON_ITU)                  return m_intube->host_r(space, myo-0xe0);                       /* Internal TUBE */
+			if (m_extube && !m_ACCCON_ITU)                  return m_extube->host_r(space, myo-0xe0);                       /* External TUBE */
+		}
 	}
 	return 0xfe;
 }
@@ -532,7 +536,11 @@ WRITE8_MEMBER(bbc_state::bbcm_w)
 		//if ((myo>=0x80) && (myo<=0x9f))
 		if ((myo>=0xa0) && (myo<=0xbf) && (m_adlc))       m_adlc->write(space, myo & 0x03, data);
 		//if ((myo>=0xc0) && (myo<=0xdf))
-		if ((myo>=0xe0) && (myo<=0xff) && (m_intube))     m_intube->host_w(space, myo-0xe0, data);
+		if ((myo>=0xe0) && (myo<=0xff))
+		{
+			if (m_intube &&  m_ACCCON_ITU)                  m_intube->host_w(space, myo-0xe0, data);                        /* Internal TUBE */
+			if (m_extube && !m_ACCCON_ITU)                  m_extube->host_w(space, myo-0xe0, data);                        /* External TUBE */
+		}
 	}
 }
 
