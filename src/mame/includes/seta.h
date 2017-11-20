@@ -170,7 +170,7 @@ public:
 	DECLARE_WRITE16_MEMBER(thunderl_protection_w);
 	DECLARE_READ8_MEMBER(wiggie_soundlatch_r);
 	DECLARE_WRITE16_MEMBER(wiggie_soundlatch_w);
-	DECLARE_WRITE16_MEMBER(utoukond_soundlatch_w);
+	DECLARE_WRITE8_MEMBER(utoukond_sound_control_w);
 	DECLARE_READ16_MEMBER(pairlove_prot_r);
 	DECLARE_WRITE16_MEMBER(pairlove_prot_w);
 	DECLARE_WRITE8_MEMBER(sub_bankswitch_w);

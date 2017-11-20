@@ -2960,13 +2960,12 @@ ADDRESS_MAP_END
                             Ultra Toukond Densetsu
 ***************************************************************************/
 
-WRITE16_MEMBER(seta_state::utoukond_soundlatch_w)
+WRITE8_MEMBER(seta_state::utoukond_sound_control_w)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		m_audiocpu->set_input_line(0, HOLD_LINE);
-		m_soundlatch->write(space, 0, data & 0xff);
-	}
+	if (!BIT(data, 6))
+		m_soundlatch->acknowledge_w(space, 0, 0);
+
+	// other bits used for banking? (low nibble seems to always be 2)
 }
 
 static ADDRESS_MAP_START( utoukond_map, AS_PROGRAM, 16, seta_state )
@@ -2985,7 +2984,7 @@ static ADDRESS_MAP_START( utoukond_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0xa00000, 0xa005ff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spriteylow_r16, spriteylow_w16)     // Sprites Y
 	AM_RANGE(0xa00600, 0xa00607) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritectrl_r16, spritectrl_w16)
 	AM_RANGE(0xb00000, 0xb03fff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritecode_r16, spritecode_w16)     // Sprites Code + X + Attr
-	AM_RANGE(0xc00000, 0xc00001) AM_WRITE(utoukond_soundlatch_w)    // To Sound CPU (cause an IRQ)
+	AM_RANGE(0xc00000, 0xc00001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0xe00000, 0xe00001) AM_WRITENOP                        // ? ack
 ADDRESS_MAP_END
 
@@ -3512,7 +3511,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( utoukond_sound_io_map, AS_IO, 8, seta_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ymsnd", ym3438_device, read, write)
-	AM_RANGE(0x80, 0x80) AM_WRITENOP //?
+	AM_RANGE(0x80, 0x80) AM_WRITE(utoukond_sound_control_w)
 	AM_RANGE(0xc0, 0xc0) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
@@ -9455,6 +9454,8 @@ static MACHINE_CONFIG_START( utoukond )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
+	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
 	MCFG_SOUND_ADD("x1snd", X1_010, 16000000)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
