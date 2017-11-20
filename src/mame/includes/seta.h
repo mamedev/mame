@@ -191,7 +191,6 @@ public:
 	DECLARE_DRIVER_INIT(downtown);
 	DECLARE_DRIVER_INIT(rezon);
 	DECLARE_DRIVER_INIT(twineagl);
-	DECLARE_DRIVER_INIT(zombraid);
 	DECLARE_DRIVER_INIT(crazyfgt);
 	DECLARE_DRIVER_INIT(metafox);
 	DECLARE_DRIVER_INIT(arbalest);
