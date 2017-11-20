@@ -9809,6 +9809,7 @@ coco2                           // Color Computer 2
 coco2b                          // Color Computer 2B (uses M6847T1 video chip)
 cocoe                           // Color Computer (Extended BASIC 1.0)
 cp400                           // Prologica CP400
+cp400c2                         // Prologica CP400 Color II
 lzcolor64                       // Digiponto LZ Color64
 mx1600                          // Dynacom MX-1600
 t4426                           // Terco 4426 CNC programming station
