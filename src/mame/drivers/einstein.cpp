@@ -95,7 +95,7 @@ public:
 	DECLARE_WRITE8_MEMBER(reset_w);
 	DECLARE_READ8_MEMBER(rom_r);
 	DECLARE_WRITE8_MEMBER(rom_w);
-	template <int source> DECLARE_WRITE_LINE_MEMBER(int_w);
+	template <int src> DECLARE_WRITE_LINE_MEMBER(int_w);
 	DECLARE_READ8_MEMBER(kybint_msk_r);
 	DECLARE_WRITE8_MEMBER(kybint_msk_w);
 	DECLARE_WRITE8_MEMBER(adcint_msk_w);
@@ -279,13 +279,13 @@ static const z80_daisy_config einstein_daisy_chain[] =
 	{ nullptr }
 };
 
-template <int source> WRITE_LINE_MEMBER( einstein_state::int_w )
+template <int src> WRITE_LINE_MEMBER( einstein_state::int_w )
 {
 	int old = m_int;
 
 	if (state)
 	{
-		m_int |= (1 << source);
+		m_int |= (1 << src);
 		if (!old)
 		{
 			m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
@@ -294,7 +294,7 @@ template <int source> WRITE_LINE_MEMBER( einstein_state::int_w )
 	}
 	else
 	{
-		m_int &= ~(1 << source);
+		m_int &= ~(1 << src);
 		if (old && !m_int)
 		{
 			m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
