@@ -122,7 +122,7 @@ Notes:
 ------
       CXD8606BQ   : SONY CXD8606BQ Central Processing Unit / GTE     (QFP208)
                      - replaced by CXD8606CQ on Revision 3 Main PCB
-      CXD8561CQ   : SONY CXD8561CQ Graphics Processsor Unit          (QFP208)
+      CXD8561CQ   : SONY CXD8561CQ Graphics Processor Unit           (QFP208)
       CXD2938Q    : SONY CXD2938Q  Sound Processor Unit              (QFP208)
       CXD1178Q    : SONY CXD1178Q  8-bit RGB 3-channel D/A converter (QFP48)
       CXA2067AS   : SONY CXA2067AS TV/Video circuit RGB Pre-Driver   (SDIP30)
@@ -270,38 +270,66 @@ Kono Tako                             10021 Ver.A   KC034A   8E, 8D
 ********
 System10 MEM(P3) PCB 8906962201 (8906972201)
 |-------------------------------------|
-|                             K6R1008 |
-|                       |-------|     +-
-|                       |       |     +-
-|                       |CY37256|     +-
-|                       |VP208  |     +-
-|                       |       |     +-
-|                       |-------|     +-
-|                                     |
-|               CY37256VP208          |
-|           HY57V641620               |
-|                                     |
-|                                     |
-|                  16.344MHz          |
-|                                     |
-|     5      4                        |
-|                                     |
-|     3      2                        |
-|                                     |
-|     1      0                        |
-|                                     |
+|TMP95C061       J101     L   K6R1008 |
+|                PST575D              +-
+|      LLLL   |-------|               +-
+|VHCT245      |       |    |-------|  +-
+|      LCX245 |CY37256|    |       |  +-
+|  07VZ5M     |VP208  |    |CY37256|  +-
+|  07VZ5M     |(2)    |    |VP208  |  +-
+|             |-------|    |(1)    |  |
+|J3                        |-------|  |
+|           HY57V641620    DSW(4)     |
+|                        LCX245 LCX245|
+|         LC82310        LCX245 LCX245|
+|   3414      16.9344MHz              |
+|                VHC14    L           |
+|                         L           |
+|                         L           |
+|                         L           |
+|     0  2  4  6  8  10  12  14       |
+|J2                                   |
+|     1  3  5  7  9  11  13  15       |
 |-------------------------------------|
 Notes:
-      CY37128VP160: CY37128VP160 Cypress Complex Programmable Logic Device (TQFP160)
-      0-5         : Samsung Electronics K3N9V1000A-YC 128MBit MASK ROM (TSOP48)
-      6 pin header: (purpose unknown, probably for programming the CPLD)
+      TMP95C061      : Toshiba TMP95C061 TLCS-900 Series CMOS 16-bit Microcontroller; No internal ROM or RAM (QFP100)
+      CY37256VP208(1): Cypress CY37256VP208 Complex Programmable Logic Device, marked with code 'KC' and a number. 
+                       This is the Namco KEYCUS chip which is unique to each game (TQFP208)
+      CY37256VP208(2): Cypress CY37256VP208 Complex Programmable Logic Device, marked 'S10MEP2A' (TQFP208)
+      K6R1008        : Samsung Electronics K6R1008V1C-JC15 128k x8-bit 3.3V High Speed CMOS Static Ram (SOJ32)
+      HY57V641620    : Hyundai HY57V641620 4 Banks x1M x16-bit Synchronous DRAM (TSOP54 Type II)
+      0-15           : Samsung Electronics K9F2808U0A-YCBO 16Mx8-bit (128M-bit) NAND Flash ROM (TSOP48)
+                       Note! These ROMs also hold data for high scores and play time and coin history. 
+                       They must be reset to factory defaults before dumping so the dump is clean. 
+      LC82310        : Sanyo LC82310 MP3 decoder IC (QFP64)
+      3414           : New Japan Co Ltd JRC3414 Single-Supply Dual High Current Operational Amplifier (SOIC8)
+      07VZ5M         : Sharp 07VZ5M Variable Voltage Regulator
+      PST575D        : Mitsumi PST575D System reset IC. Available in voltage detection C through L with voltages 4.5V-2.3V 
+                       This D version triggers a reset at 4.2V (MMP-4A)
+      J1             : 6 pin header, purpose unknown. Probably for programming the CPLDs via JTAG
+      J2             : 4 pin connector joined to main board for MP3 audio output from ROM board
+      J3             : 6 pin connector joined to V278 EMI PCB (filter board on outside of metal box) via 16-pin IDC connector
+                       This connector is probably for extra controls
+      L              : LED (SMD 0603)
+
+      Note
+      1. The ROM PCB has locations for 16x Flash ROMs (Total capacity = 2048M-bits) but usually only a few are populated.
 
 This PCB is used on:
 
-                              MEM PCB
-Game                          Sticker      KEYCUS   ROMs Populated
-------------------------------------------------------------------------------------
-Golgo 13 Juusei no Chinkonka  GLT1 Ver.A   KC009A   GLT1VERA.0, GLT1VERA.1, GLT1VERA.2, GLT1VERA.3, GLT1VERA.4, GLT1VERA.5
+                                   MEM PCB
+Game                               Sticker      KEYCUS   ROMs Populated
+---------------------------------------------------------------------------------------------
+Golgo 13 Juusei no Chinkonka       GLT1 Ver.A   KC009A   GLT1_Ver.A.0  GLT1_Ver.A.1  GLT1_Ver.A.2
+                                                         GLT1_Ver.A.3  GLT1_Ver.A.4  GLT1_Ver.A.5
+Tsukkomi Yousei Gips Nice Tsukkomi NTK1 Ver.A   KC018A   NTK1_Ver.A.0  NTK1_Ver.A.1  NTK1_Ver.A.2
+                                                         NTK1_Ver.A.3  NTK1_Ver.A.4  NTK1_Ver.A.5
+                                                         NTK1_Ver.A.6  NTK1_Ver.A.7
+Seishun Quiz Colorful High School  CHS1 Ver.A   KC025A   CHS1_Ver.A.0  CHS1_Ver.A.1  CHS1_Ver.A.2
+                                                         CHS1_Ver.A.3  CHS1_Ver.A.4  CHS1_Ver.A.5
+                                                         CHS1_Ver.A.6  CHS1_Ver.A.7  CHS1_Ver.A.8
+                                                         CHS1_Ver.A.9  CHS1_Ver.A.10 CHS1_Ver.A.11
+                                                         CHS1_Ver.A.12 CHS1_Ver.A.13
 */
 
 #include "emu.h"
