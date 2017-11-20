@@ -962,12 +962,12 @@ static MACHINE_CONFIG_DERIVED( bbcb, bbca )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	/* user via */
-		MCFG_DEVICE_ADD("via6522_1", VIA6522, XTAL_16MHz / 16)
-		MCFG_VIA6522_READPB_HANDLER(READ8(bbc_state, bbcb_via_user_read_portb))
-		MCFG_VIA6522_WRITEPA_HANDLER(DEVWRITE8("cent_data_out", output_latch_device, write))
-		MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(bbc_state, bbcb_via_user_write_portb))
-		MCFG_VIA6522_CA2_HANDLER(DEVWRITELINE("centronics", centronics_device, write_strobe))
-		MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("irqs", input_merger_device, in_w<2>))
+	MCFG_DEVICE_ADD("via6522_1", VIA6522, XTAL_16MHz / 16)
+	MCFG_VIA6522_WRITEPA_HANDLER(DEVWRITE8("cent_data_out", output_latch_device, write))
+	MCFG_VIA6522_READPB_HANDLER(DEVREAD8("userport", bbc_userport_slot_device, pb_r))
+	MCFG_VIA6522_WRITEPB_HANDLER(DEVWRITE8("userport", bbc_userport_slot_device, pb_w))
+	MCFG_VIA6522_CA2_HANDLER(DEVWRITELINE("centronics", centronics_device, write_strobe))
+	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("irqs", input_merger_device, in_w<2>))
 
 	/* adc */
 	MCFG_DEVICE_ADD("upd7002", UPD7002, 0)
@@ -994,7 +994,7 @@ static MACHINE_CONFIG_DERIVED( bbcb, bbca )
 	MCFG_ECONET_SLOT_ADD("econet254", 254, econet_devices, nullptr)
 
 	/* analogue port */
-	MCFG_BBC_ANALOGUE_SLOT_ADD("analogue", bbc_analogue_devices, "acornjoy")
+	MCFG_BBC_ANALOGUE_SLOT_ADD("analogue", bbc_analogue_devices, nullptr)
 
 	/* 1mhz bus port */
 	MCFG_BBC_1MHZBUS_SLOT_ADD("1mhzbus", bbc_1mhzbus_devices, nullptr)
@@ -1007,6 +1007,8 @@ static MACHINE_CONFIG_DERIVED( bbcb, bbca )
 
 	/* user port */
 	MCFG_BBC_USERPORT_SLOT_ADD("userport", bbc_userport_devices, nullptr)
+	MCFG_BBC_USERPORT_CB1_HANDLER(DEVWRITELINE("via6522_1", via6522_device, write_cb1))
+	MCFG_BBC_USERPORT_CB2_HANDLER(DEVWRITELINE("via6522_1", via6522_device, write_cb2))
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("cass_ls_b",      "bbcb_cass")
@@ -1407,12 +1409,12 @@ static MACHINE_CONFIG_START( bbcm )
 	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("irqs", input_merger_device, in_w<1>))
 
 	/* user via */
-		MCFG_DEVICE_ADD("via6522_1", VIA6522, XTAL_16MHz / 16)
-		MCFG_VIA6522_READPB_HANDLER(READ8(bbc_state, bbcb_via_user_read_portb))
-		MCFG_VIA6522_WRITEPA_HANDLER(DEVWRITE8("cent_data_out", output_latch_device, write))
-		MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(bbc_state, bbcb_via_user_write_portb))
-		MCFG_VIA6522_CA2_HANDLER(DEVWRITELINE("centronics", centronics_device, write_strobe))
-		MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("irqs", input_merger_device, in_w<2>))
+	MCFG_DEVICE_ADD("via6522_1", VIA6522, XTAL_16MHz / 16)
+	MCFG_VIA6522_WRITEPA_HANDLER(DEVWRITE8("cent_data_out", output_latch_device, write))
+	MCFG_VIA6522_READPB_HANDLER(DEVREAD8("userport", bbc_userport_slot_device, pb_r))
+	MCFG_VIA6522_WRITEPB_HANDLER(DEVWRITE8("userport", bbc_userport_slot_device, pb_w))
+	MCFG_VIA6522_CA2_HANDLER(DEVWRITELINE("centronics", centronics_device, write_strobe))
+	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("irqs", input_merger_device, in_w<2>))
 
 	/* fdc */
 	MCFG_WD1770_ADD("wd1770", XTAL_16MHz / 2)
@@ -1449,6 +1451,8 @@ static MACHINE_CONFIG_START( bbcm )
 
 	/* user port */
 	MCFG_BBC_USERPORT_SLOT_ADD("userport", bbc_userport_devices, nullptr)
+	MCFG_BBC_USERPORT_CB1_HANDLER(DEVWRITELINE("via6522_1", via6522_device, write_cb1))
+	MCFG_BBC_USERPORT_CB2_HANDLER(DEVWRITELINE("via6522_1", via6522_device, write_cb2))
 MACHINE_CONFIG_END
 
 
@@ -1537,6 +1541,26 @@ MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( cfa3000, bbcm )
+	MCFG_MACHINE_START_OVERRIDE(bbc_state, cfa3000)
+
+	/* fdc */
+	MCFG_DEVICE_MODIFY("wd1770:0")
+	MCFG_DEVICE_SLOT_INTERFACE(bbc_floppies_525, nullptr, false)
+	MCFG_DEVICE_MODIFY("wd1770:1")
+	MCFG_DEVICE_SLOT_INTERFACE(bbc_floppies_525, nullptr, false)
+
+	/* keyboard */
+	MCFG_DEVICE_MODIFY("userport")
+	MCFG_SLOT_DEFAULT_OPTION("cfa3000kbd")
+
+	/* option board */
+	MCFG_DEVICE_MODIFY("1mhzbus")
+	MCFG_SLOT_DEFAULT_OPTION("cfa3000opt")
+
+	/* analogue dials/sensors */
+	MCFG_DEVICE_MODIFY("analogue")
+	MCFG_SLOT_DEFAULT_OPTION("cfa3000a")
+
 	/* software lists */
 	MCFG_SOFTWARE_LIST_REMOVE("cass_ls_m")
 	MCFG_SOFTWARE_LIST_REMOVE("cass_ls_a")
@@ -2305,8 +2329,8 @@ ROM_START(cfa3000)
 	ROM_REGION(0x44000, "option", 0) /* ROM */
 	ROM_LOAD("CFA3000_3_4_Iss10.3.ic41",             0x10000, 0x08000, CRC(ecb385ab) SHA1(eafa9b34cb1cf63790f74332bb7d85ee356b6973))
 	ROM_LOAD("CFA3000_SM_Iss10.3.ic37",              0x18000, 0x08000, CRC(c07aee5f) SHA1(1994e3755dc15d1ea7e105bc19cd57893b719779))
-	ROM_LOAD("Acorn_MOS_(Tinsley_64K)_Iss10.3.ic24", 0x30000, 0x10000, CRC(4413c3ee) SHA1(76d0462b4dabe2461010fce2341570ff3d606d54))
-	//ROM_COPY("option", 0x20000, 0x30000, 0x10000) /* Mirror MOS */
+	ROM_LOAD("Acorn_MOS_(Tinsley_64K)_Iss10.3.ic24", 0x20000, 0x10000, CRC(4413c3ee) SHA1(76d0462b4dabe2461010fce2341570ff3d606d54))
+	ROM_COPY("option", 0x20000, 0x30000, 0x10000) /* Mirror MOS */
 	ROM_COPY("option", 0x30000, 0x40000, 0x04000) /* Move loaded roms into place */
 	ROM_FILL(0x30000, 0x4000, 0xff)
 	/* 00000 rom 0   SK3 Rear Cartridge bottom 16K */
@@ -2317,13 +2341,13 @@ ROM_START(cfa3000)
 	/* 14000 rom 5   IC41 SWRAM or top 16K */
 	/* 18000 rom 6   IC37 SWRAM or bottom 16K */
 	/* 1c000 rom 7   IC37 SWRAM or top 16K */
-	/* 20000 rom 8   IC27 ANFS */
-	/* 24000 rom 9   IC24 DFS + SRAM */
-	/* 28000 rom 10  IC24 Viewsheet */
-	/* 2c000 rom 11  IC24 Edit */
-	/* 30000 rom 12  IC24 BASIC */
-	/* 34000 rom 13  IC24 ADFS */
-	/* 38000 rom 14  IC24 View + MOS code */
+	/* 20000 rom 8   IC27 */
+	/* 24000 rom 9   IC24 */
+	/* 28000 rom 10  IC24 */
+	/* 2c000 rom 11  IC24 */
+	/* 30000 rom 12  IC24 */
+	/* 34000 rom 13  IC24 DFS */
+	/* 38000 rom 14  IC24 BASIC */
 	/* 3c000 rom 15  IC24 Terminal + Tube host + CFS */
 
 	ROM_REGION(0x4000, "os", 0)
@@ -2368,4 +2392,4 @@ COMP ( 1987, pro128s,  bbcmc,   0,     pro128s,  bbcm,   bbc_state,      bbc,   
 //COMP ( 1988, discmon,  bbcm,    0,     discmon,  bbcm,   bbc_state,      bbc,     "Arbiter Leisure", "Arbiter Discmonitor A-01",      MACHINE_NOT_WORKING)
 COMP ( 1988, discmate, bbcm,    0,     discmate, bbcm,   bbc_state,      bbc,     "Arbiter Leisure", "Arbiter Discmate A-02",         MACHINE_NOT_WORKING)
 //COMP ( 1988, discmast, bbcm,    0,     discmast, bbcm,   bbc_state,      bbc,     "Arbiter Leisure", "Arbiter Discmaster A-03",       MACHINE_NOT_WORKING)
-COMP ( 1988, cfa3000,  bbcm,    0,     cfa3000,  bbcm,   bbc_state,      bbc,     "Tinsley Medical Instruments",  "Henson CFA 3000",  MACHINE_NOT_WORKING)
+COMP ( 1989, cfa3000,  bbcm,    0,     cfa3000,  bbcm,   bbc_state,      bbc,     "Tinsley Medical Instruments",  "Henson CFA 3000",  MACHINE_NOT_WORKING)
