@@ -70,9 +70,9 @@ private:
 	u8 datasize(u8 op);
 	void read_reg(int size, u8 op1);
 	void write_reg(int size, u8 op1);
-	void read_regreg(int size, u8 op1, u8 op2, bool op_is_logical);
+	void read_regreg(int size, u8 op1, u8 op2, bool copy_extend_immediate);
 	void write_regreg(int size, u8 op1, u8 op2);
-	void read_iregreg(int size, u8 op1, u8 op2);
+	void read_iregreg(int size, u8 op1, u8 op2, bool copy_extend_immediate);
 	void write_iregreg(int size, u8 op1, u8 op2);
 	void write_iregreg2(int size, u8 op1, u8 op2);
 	bool check_cond(u8 op);
@@ -82,12 +82,12 @@ private:
 	void set_zh_flag(bool is_zh);
 	void set_cl_flag(bool is_cl);
 	void op_msk(int size);
-	void op_imsk(int size);
 	void op_and(int size);
 	void op_or(int size);
 	void op_xor(int size);
 	void op_add(int size);
 	void op_addb(int size);
+	void op_subb(int size);
 	void op_sub(int size);
 	void op_pushw(u16 source);
 	u16 op_popw();
