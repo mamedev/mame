@@ -3429,7 +3429,7 @@ inline s32 analog_field::apply_min_max(s32 value) const
 
 inline s32 analog_field::apply_sensitivity(s32 value) const
 {
-	return s32((s64(value) * m_sensitivity) / 100.0 + 0.5);
+	return lround((s64(value) * m_sensitivity) / 100.0);
 }
 
 
