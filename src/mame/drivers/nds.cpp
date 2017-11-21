@@ -28,6 +28,7 @@ static inline void ATTR_PRINTF(3,4) verboselog(device_t &device, int n_level, co
 
 READ32_MEMBER(nds_state::arm7_io_r)
 {
+	uint8_t temp1, temp2;
 	switch(offset)
 	{
 		case IPCSYNC_OFFSET:
@@ -43,8 +44,9 @@ READ32_MEMBER(nds_state::arm7_io_r)
 			return m_arm7_postflg;
 
 		case WRAMSTAT_OFFSET:
-			printf("ARM7: read WRAMSTAT mask %08x\n", mem_mask);
-			return m_wramcnt;
+			temp1 = (((m_vramcntc & 3) == 2) && (m_vramcntc & 0x80)) ? 1 : 0;
+			temp2 = (((m_vramcntd & 3) == 2) && (m_vramcntd & 0x80)) ? 2 : 0;
+			return (m_wramcnt << 8) | temp1 | temp2;
 
 		default:
 			verboselog(*this, 0, "[ARM7] [IO] Unknown read: %08x (%08x)\n", offset*4, mem_mask);
@@ -115,10 +117,55 @@ WRITE32_MEMBER(nds_state::arm9_io_w)
 			m_arm9_ipcsync |= (data & ~0xf);
 			break;
 
+		case VRAMCNT_A_OFFSET:
+			if (ACCESSING_BITS_0_7)	// VRAMCNT_A
+			{
+				m_vramcnta = data & 0xff;
+			}
+			if (ACCESSING_BITS_8_15) // VRAMCNT_B
+			{
+				m_vramcntb = (data >> 8) & 0xff;
+			}
+			if (ACCESSING_BITS_16_23) // VRAMCNT_C
+			{
+				m_vramcntc = (data >> 16) & 0xff;
+			}
+			if (ACCESSING_BITS_24_31) // VRAMCNT_D
+			{
+				m_vramcntd = (data >> 24) & 0xff;
+			}
+			break;
+
 		case WRAMCNT_OFFSET:
-			m_wramcnt = (data>>24) & 0x3;
-			m_arm7wrambnk->set_bank(m_wramcnt);
-			m_arm9wrambnk->set_bank(m_wramcnt);
+			if (ACCESSING_BITS_0_7)	// VRAMCNT_E
+			{
+				m_vramcnte = data & 0xff;
+			}
+			if (ACCESSING_BITS_8_15) // VRAMCNT_F
+			{
+				m_vramcntf = (data >> 8) & 0xff;
+			}
+			if (ACCESSING_BITS_16_23) // VRAMCNT_G
+			{
+				m_vramcntg = (data >> 16) & 0xff;
+			}
+			if (ACCESSING_BITS_24_31) // WRAMCNT
+			{
+				m_wramcnt = (data>>24) & 0x3;
+				m_arm7wrambnk->set_bank(m_wramcnt);
+				m_arm9wrambnk->set_bank(m_wramcnt);
+			}
+			break;
+
+		case VRAMCNT_H_OFFSET:
+			if (ACCESSING_BITS_0_7)	// VRAMCNT_H
+			{
+				m_vramcnth = data & 0xff;
+			}
+			if (ACCESSING_BITS_8_15) // VRAMCNT_I
+			{
+				m_vramcnti = (data >> 8) & 0xff;
+			}
 			break;
 
 		case POSTFLG_OFFSET:

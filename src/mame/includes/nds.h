@@ -51,7 +51,9 @@ protected:
 		IPCSYNC_OFFSET = 0x180/4,
 		GAMECARD_BUS_CTRL_OFFSET = 0x1a4/4,
 		WRAMSTAT_OFFSET = 0x241/4,
-		WRAMCNT_OFFSET = 0x247/4,
+		VRAMCNT_A_OFFSET = 0x240/4,
+		WRAMCNT_OFFSET = 0x244/4,
+		VRAMCNT_H_OFFSET = 0x248/4,
 		POSTFLG_OFFSET = 0x300/4,
 		POSTFLG_PBF_SHIFT = 0,
 		POSTFLG_RAM_SHIFT = 1,
@@ -64,6 +66,7 @@ protected:
 	uint16_t m_arm7_ipcsync, m_arm9_ipcsync;
 	uint8_t m_WRAM[0x8000];
 	uint8_t m_wramcnt;
+	uint8_t m_vramcnta, m_vramcntb, m_vramcntc, m_vramcntd, m_vramcnte, m_vramcntf, m_vramcntg, m_vramcnth, m_vramcnti;
 };
 
 #endif // INCLUDES_NDS_H
