@@ -1262,7 +1262,6 @@ static MACHINE_CONFIG_DERIVED( reutapm, bbcbp )
 	/* expansion ports */
 	MCFG_DEVICE_REMOVE("analogue")
 	MCFG_DEVICE_REMOVE("1mhzbus")
-	MCFG_DEVICE_REMOVE("userport")
 MACHINE_CONFIG_END
 
 
