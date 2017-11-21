@@ -1480,6 +1480,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( bbcmet, bbcm )
 	/* printer */
 	MCFG_DEVICE_REMOVE("centronics")
+	MCFG_DEVICE_REMOVE("cent_data_out")
 
 	/* cassette */
 	MCFG_DEVICE_REMOVE("cassette")
@@ -1506,6 +1507,9 @@ static MACHINE_CONFIG_DERIVED( bbcmet, bbcm )
 
 	/* expansion ports */
 	MCFG_DEVICE_REMOVE("analogue")
+	MCFG_DEVICE_REMOVE("extube")
+	MCFG_DEVICE_REMOVE("1mhzbus")
+	MCFG_DEVICE_REMOVE("userport")
 MACHINE_CONFIG_END
 
 
