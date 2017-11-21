@@ -427,8 +427,8 @@ READ8_MEMBER(ymz774_device::read)
 		{
 			m_stream->update();
 			uint8_t res = 0;
-			auto bank = (m_cur_reg == 0xe3) ? 8 : 0;
-			for (auto i = 0; i < 8; i++)
+			int bank = (m_cur_reg == 0xe3) ? 8 : 0;
+			for (int i = 0; i < 8; i++)
 				if (m_channels[i + bank].is_playing)
 					res |= 1 << i;
 			return res;
