@@ -11,6 +11,8 @@
 	- interrupt enable/acknowledge/vector;
 	- soundlatch delegate;
 	- inputs for i4300;
+	- hyprduel.cpp uses scanline attribute which crawls to unusable state 
+	  with current video routines here;
 
 ============================================================================
 
