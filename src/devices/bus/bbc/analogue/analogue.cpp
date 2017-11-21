@@ -103,10 +103,12 @@ void bbc_analogue_slot_device::device_reset()
 // slot devices
 #include "joystick.h"
 //#include "quinkey.h"
+#include "cfa3000a.h"
 
 
 SLOT_INTERFACE_START( bbc_analogue_devices )
 	SLOT_INTERFACE("acornjoy",    BBC_ACORNJOY)         /* Acorn ANH01 Joysticks */
 	SLOT_INTERFACE("voltmace3b",  BBC_VOLTMACE3B)       /* Voltmace Delta 3b "Twin" Joysticks */
 //  SLOT_INTERFACE("quinkey",   BBC_QUINKEY)          /* Microwriter Quinkey */
+	SLOT_INTERFACE("cfa3000a",    CFA3000_ANLG)         /* Hanson CFA 3000 Analogue */
 SLOT_INTERFACE_END
