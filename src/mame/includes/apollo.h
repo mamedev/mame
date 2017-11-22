@@ -340,7 +340,6 @@ protected:
 
 private:
 	uint8_t m_csrb;
-	uint8_t m_ip6;
 };
 
 DECLARE_DEVICE_TYPE(APOLLO_SIO, apollo_sio)
