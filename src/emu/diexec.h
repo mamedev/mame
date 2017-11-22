@@ -164,8 +164,6 @@ public:
 	int input_state(int linenum) const { return m_input[linenum].m_curstate; }
 	void pulse_input_line(int irqline, const attotime &duration);
 	void pulse_input_line_and_vector(int irqline, int vector, const attotime &duration);
-	void pulse_input_line(int irqline, int cycles) { pulse_input_line(irqline, cycles_to_attotime(cycles * min_cycles())); }
-	void pulse_input_line_and_vector(int irqline, int vector, int cycles) { pulse_input_line_and_vector(irqline, vector, cycles_to_attotime(cycles * min_cycles())); }
 
 	// suspend/resume
 	void suspend(u32 reason, bool eatcycles);
@@ -300,6 +298,9 @@ private:
 	void suspend_resume_changed();
 
 	attoseconds_t minimum_quantum() const;
+
+public:
+	attotime minimum_quantum_time() const { return attotime(0, minimum_quantum()); }
 };
 
 // iterator

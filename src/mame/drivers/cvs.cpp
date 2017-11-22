@@ -227,7 +227,7 @@ WRITE8_MEMBER(cvs_state::cvs_s2636_2_or_character_ram_w)
 
 INTERRUPT_GEN_MEMBER(cvs_state::cvs_main_cpu_interrupt)
 {
-	device.execute().pulse_input_line_and_vector(0, 0x03, 1);
+	device.execute().pulse_input_line_and_vector(0, 0x03, device.execute().minimum_quantum_time());
 
 	cvs_scroll_stars();
 }
