@@ -6,12 +6,6 @@
 #pragma once
 
 
-#define MCFG_MC68681_ADD(_tag, _clock) \
-	MCFG_DEVICE_ADD(_tag, MC68681, _clock)
-
-#define MCFG_MC68681_REPLACE(_tag, _clock) \
-	MCFG_DEVICE_REPLACE(_tag, MC68681, _clock)
-
 #define MCFG_MC68681_IRQ_CALLBACK(_cb) \
 	devcb = &duart_base_device::set_irq_cb(*device, DEVCB_##_cb);
 
