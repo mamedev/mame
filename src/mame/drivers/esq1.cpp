@@ -409,7 +409,6 @@ public:
 	DECLARE_WRITE8_MEMBER(mapper_w);
 	DECLARE_WRITE8_MEMBER(analog_w);
 
-	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
 	DECLARE_WRITE_LINE_MEMBER(duart_tx_a);
 	DECLARE_WRITE_LINE_MEMBER(duart_tx_b);
 	DECLARE_WRITE8_MEMBER(duart_output);
@@ -537,11 +536,6 @@ ADDRESS_MAP_END
 // OP5 = metronome hi
 // OP6/7 = tape out
 
-WRITE_LINE_MEMBER(esq1_state::duart_irq_handler)
-{
-	m_maincpu->set_input_line(M6809_IRQ_LINE, state);
-}
-
 WRITE8_MEMBER(esq1_state::duart_output)
 {
 	int bank = ((data >> 1) & 0x7);
@@ -590,7 +584,7 @@ static MACHINE_CONFIG_START( esq1 )
 
 	MCFG_DEVICE_ADD("duart", MC68681, 4000000)
 	MCFG_MC68681_SET_EXTERNAL_CLOCKS(500000, 500000, 1000000, 1000000)
-	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(esq1_state, duart_irq_handler))
+	MCFG_MC68681_IRQ_CALLBACK(INPUTLINE("maincpu", M6809_IRQ_LINE))
 	MCFG_MC68681_A_TX_CALLBACK(WRITELINE(esq1_state, duart_tx_a))
 	MCFG_MC68681_B_TX_CALLBACK(WRITELINE(esq1_state, duart_tx_b))
 	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(esq1_state, duart_output))
