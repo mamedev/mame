@@ -50,7 +50,7 @@
 #define RS232A_TAG  "rs232a"
 #define RS232B_TAG  "rs232b"
 
-#define MASTER_CLOCK (23814000)
+#define MASTER_CLOCK XTAL_23_814MHz
 
 class tv950_state : public driver_device
 {
@@ -329,4 +329,4 @@ ROM_END
 
 /* Driver */
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  STATE        INIT  COMPANY      FULLNAME  FLAGS
-COMP( 1981, tv950,  0,      0,      tv950,   tv950, tv950_state, 0,    "TeleVideo", "TV950",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1981, tv950,  0,      0,      tv950,   tv950, tv950_state, 0,    "TeleVideo", "Model 950 Video Display Terminal",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
