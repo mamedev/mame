@@ -11,6 +11,12 @@
     Improved interrupt handling by R. Belmont
     Rewrite and modernization in progress by R. Belmont
     Addition of the duart compatible 68340 serial module support by Edstrom
+
+    The main incompatibility between the 2681 and 68681 (Signetics and Motorola each
+    manufactured both versions of the chip) is that the 68681 has a R/W input and
+    generates a 68000-compatible DTACK signal, instead of using generic RD and WR
+    strobes as the 2681 does. The 68681 also adds a programmable interrupt vector,
+    with an IACK input replacing IP6.
 */
 
 #include "emu.h"
