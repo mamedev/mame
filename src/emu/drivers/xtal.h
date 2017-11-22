@@ -152,6 +152,7 @@ enum
 	XTAL_14MHz          = 14000000,
 	XTAL_14_112MHz      = 14112000,     /* Timex/Sinclair TS2068 */
 	XTAL_14_192640MHz   = 14192640,     /* Reported by Central Data 2650 document, true xtal unchecked on PCB */
+	XTAL_14_218MHz      = 14218000,     /* Dragon */
 	XTAL_14_3MHz        = 14300000,     /* Agat-7 */
 	XTAL_14_314MHz      = 14314000,     /* Taito TTL Board  */
 	XTAL_14_31818MHz    = 14318181,     /* Extremely common, used on 100's of PCBs (4x NTSC subcarrier) */
