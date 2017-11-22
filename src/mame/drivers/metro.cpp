@@ -3154,6 +3154,10 @@ static MACHINE_CONFIG_DERIVED( bangball, msgogo )
 	MCFG_CPU_PROGRAM_MAP(bangball_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  60) // ?
+	
+	// doesn't like 58.2 Hz
+	MCFG_DEVICE_MODIFY("screen")
+	MCFG_SCREEN_REFRESH_RATE(60)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( batlbubl, msgogo )
@@ -3161,6 +3165,10 @@ static MACHINE_CONFIG_DERIVED( batlbubl, msgogo )
 	MCFG_CPU_PROGRAM_MAP(batlbubl_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  60) // ?
+	
+	// doesn't like 58.2 Hz
+	MCFG_DEVICE_MODIFY("screen")
+	MCFG_SCREEN_REFRESH_RATE(60)
 MACHINE_CONFIG_END
 
 
