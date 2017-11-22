@@ -50,7 +50,7 @@ static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, cit220_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_map, AS_IO, 8, cit220_state )
-	AM_RANGE(0x00, 0x0f) AM_DEVREADWRITE("duart", mc68681_device, read, write)
+	AM_RANGE(0x00, 0x0f) AM_DEVREADWRITE("duart", scn2681_device, read, write)
 	AM_RANGE(0x10, 0x10) AM_DEVREADWRITE("usart", i8251_device, data_r, data_w)
 	AM_RANGE(0x11, 0x11) AM_DEVREADWRITE("usart", i8251_device, status_r, control_w)
 	AM_RANGE(0x20, 0x27) AM_DEVREADWRITE("avdc", scn2674_device, read, write)
@@ -92,7 +92,7 @@ static MACHINE_CONFIG_START( cit220p )
 	MCFG_DEVICE_ADDRESS_MAP(0, vram_map)
 	MCFG_VIDEO_SET_SCREEN("screen")
 
-	MCFG_DEVICE_ADD("duart", MC68681, 3686400)
+	MCFG_DEVICE_ADD("duart", SCN2681, 3686400)
 	MCFG_MC68681_IRQ_CALLBACK(INPUTLINE("maincpu", I8085_RST55_LINE))
 
 	MCFG_DEVICE_ADD("usart", I8251, 3000000)

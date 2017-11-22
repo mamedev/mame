@@ -713,7 +713,7 @@ TIMER_CALLBACK_MEMBER( apollo_state::apollo_rtc_timer )
 #define VERBOSE 0
 
 apollo_sio::apollo_sio(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	mc68681_base_device(mconfig, APOLLO_SIO, tag, owner, clock),
+	duart_base_device(mconfig, APOLLO_SIO, tag, owner, clock),
 	m_csrb(0),
 	m_ip6(0)
 {
@@ -744,7 +744,7 @@ READ8_MEMBER( apollo_sio::read )
 			"1X/16X Test", "RHRB", "IVR", "Input Ports", "Start Counter",
 			"Stop Counter" };
 
-	int data = mc68681_base_device::read(space, offset/2, mem_mask);
+	int data = duart_base_device::read(space, offset/2, mem_mask);
 
 	switch (offset / 2)
 	{
@@ -804,7 +804,7 @@ WRITE8_MEMBER( apollo_sio::write )
 		break;
 #endif
 	}
-	mc68681_base_device::write(space, offset/2, data, mem_mask);
+	duart_base_device::write(space, offset/2, data, mem_mask);
 }
 
 // device type definition
