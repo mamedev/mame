@@ -11,6 +11,8 @@ enough to provoke a lawsuit, which led to its eventual withdrawal in favor of it
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
+#include "machine/i8251.h"
+#include "machine/mc68681.h"
 #include "video/scn2674.h"
 #include "screen.h"
 
@@ -37,17 +39,23 @@ private:
 
 WRITE_LINE_MEMBER(cit220_state::sod_w)
 {
-	logerror("SOD set %s\n", state ? "high" : "low");
+	// controls access to memory at Exxx?
 }
 
 static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, cit220_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xa1ff) AM_ROM AM_REGION("eeprom", 0x800)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM // ???
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_map, AS_IO, 8, cit220_state )
+	AM_RANGE(0x00, 0x0f) AM_DEVREADWRITE("duart", mc68681_device, read, write)
+	AM_RANGE(0x10, 0x10) AM_DEVREADWRITE("usart", i8251_device, data_r, data_w)
+	AM_RANGE(0x11, 0x11) AM_DEVREADWRITE("usart", i8251_device, status_r, control_w)
 	AM_RANGE(0x20, 0x27) AM_DEVREADWRITE("avdc", scn2674_device, read, write)
+	AM_RANGE(0xa0, 0xa0) AM_UNMAP // ???
+	AM_RANGE(0xc0, 0xc0) AM_UNMAP // ???
 ADDRESS_MAP_END
 
 
@@ -56,6 +64,7 @@ SCN2674_DRAW_CHARACTER_MEMBER(cit220_state::draw_character)
 }
 
 static ADDRESS_MAP_START( vram_map, 0, 8, cit220_state )
+	AM_RANGE(0x0000, 0x27ff) AM_NOP
 ADDRESS_MAP_END
 
 
@@ -82,6 +91,11 @@ static MACHINE_CONFIG_START( cit220p )
 	MCFG_SCN2674_DRAW_CHARACTER_CALLBACK_OWNER(cit220_state, draw_character)
 	MCFG_DEVICE_ADDRESS_MAP(0, vram_map)
 	MCFG_VIDEO_SET_SCREEN("screen")
+
+	MCFG_DEVICE_ADD("duart", MC68681, 3686400)
+	MCFG_MC68681_IRQ_CALLBACK(INPUTLINE("maincpu", I8085_RST55_LINE))
+
+	MCFG_DEVICE_ADD("usart", I8251, 3000000)
 MACHINE_CONFIG_END
 
 
