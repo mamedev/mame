@@ -114,7 +114,7 @@ public:
 
 	required_device<m68ec020_device> m_maincpu;
 	required_device<es5510_device> m_esp;
-	required_device<mc68681_device> m_duart;
+	required_device<scn2681_device> m_duart;
 	required_device<esqpanel2x16_sq1_device> m_sq1panel;
 	required_device<midi_port_device> m_mdout;
 
