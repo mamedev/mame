@@ -85,7 +85,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( slicer_io, AS_IO, 16, slicer_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x007f) AM_DEVREADWRITE8("fdc", fd1797_device, read, write, 0x00ff) //PCS0
-	AM_RANGE(0x0080, 0x00ff) AM_DEVREADWRITE8("sc2681", mc68681_device, read, write, 0x00ff) //PCS1
+	AM_RANGE(0x0080, 0x00ff) AM_DEVREADWRITE8("duart", scn2681_device, read, write, 0x00ff) //PCS1
 	AM_RANGE(0x0100, 0x017f) AM_WRITE8(drive_sel_w, 0x00ff) //PCS2
 	// TODO: 0x180 sets ack
 	AM_RANGE(0x0180, 0x0181) AM_DEVREAD8("sasi_data_in", input_buffer_device, read, 0x00ff) AM_DEVWRITE8("sasi_data_out", output_latch_device, write, 0x00ff) //PCS3
@@ -104,16 +104,16 @@ static MACHINE_CONFIG_START( slicer )
 	MCFG_CPU_PROGRAM_MAP(slicer_map)
 	MCFG_CPU_IO_MAP(slicer_io)
 
-	MCFG_MC68681_ADD("sc2681", XTAL_3_6864MHz)
+	MCFG_DEVICE_ADD("duart", SCN2681, XTAL_3_6864MHz)
 	MCFG_MC68681_IRQ_CALLBACK(DEVWRITELINE("maincpu", i80186_cpu_device, int0_w))
 	MCFG_MC68681_A_TX_CALLBACK(DEVWRITELINE("rs232_1", rs232_port_device, write_txd))
 	MCFG_MC68681_B_TX_CALLBACK(DEVWRITELINE("rs232_2", rs232_port_device, write_txd))
 	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(slicer_state, sio_out_w))
 
 	MCFG_RS232_PORT_ADD("rs232_1", default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("sc2681", mc68681_device, rx_a_w))
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("duart", scn2681_device, rx_a_w))
 	MCFG_RS232_PORT_ADD("rs232_2", default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("sc2681", mc68681_device, rx_b_w))
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("duart", scn2681_device, rx_b_w))
 
 	MCFG_FD1797_ADD("fdc", XTAL_16MHz/2/8)
 	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE("maincpu", i80186_cpu_device, int1_w))
