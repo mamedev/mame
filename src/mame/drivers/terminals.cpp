@@ -126,30 +126,6 @@ COMP( 1987, att630, 0, 0, terminals, terminals, terminals_state, 0, "AT&T", "630
 
 /**************************************************************************************************************
 
-C. Itoh CIT-220+
-Code looks like Z80/8080/8085
-
-***************************************************************************************************************/
-
-ROM_START( cit220p )
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD( "v17_001a.ic23", 0x0000, 0x4000, CRC(2cc43026) SHA1(366f57292c6e44571368c29e3258203779847356) )
-	ROM_LOAD( "v17_001b.ic24", 0x4000, 0x4000, CRC(a56b16f1) SHA1(c68f26b35453153f7defcf1cf2b7ad7fe36cc9e7) )
-	ROM_LOAD( "eeprom.bin",    0xf000, 0x1000, CRC(7b24878a) SHA1(20086fb792a24339b65abe627aefbcf48e2abcf4) ) // don't know where this fits in
-
-	ROM_REGION(0x1000, "chargen", 0)
-	ROM_LOAD( "v20_cg.ic17",   0x0000, 0x1000, CRC(76ef7ca9) SHA1(6e7799ca0a41350fbc369bbbd4ab581150f37b10) )
-
-	ROM_REGION(0x10000, "keyboard", 0)
-	ROM_LOAD( "v00_kbd.bin",   0x0000, 0x1000, CRC(f9d24190) SHA1(c4e9ef8188afb18de373f2a537ca9b7a315bfb76) )
-ROM_END
-
-COMP( 1985, cit220p, 0, 0, terminals, terminals, terminals_state, 0, "C. Itoh", "CIT-220+", MACHINE_IS_SKELETON )
-
-
-
-/**************************************************************************************************************
-
 Data General D461.
 Chips: SCN2681A, X2210P, 2x HM6116P-2, 2x HM6264P-20, HD68B09EP, CRT9007, 1x 8-sw dip.
 Crystals: 3.6864, 59.2920

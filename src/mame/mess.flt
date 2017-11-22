@@ -125,6 +125,7 @@ channelf.cpp
 chaos.cpp
 chessmst.cpp
 chesstrv.cpp
+cit220.cpp
 clcd.cpp
 cm1800.cpp
 cmi.cpp
