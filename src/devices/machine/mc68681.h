@@ -165,6 +165,9 @@ protected:
 	devcb_write8 write_outport;
 	int32_t ip3clk, ip4clk, ip5clk, ip6clk;
 
+protected:
+	virtual void update_interrupts();
+
 private:
 	TIMER_CALLBACK_MEMBER( duart_timer_callback );
 
@@ -190,7 +193,6 @@ private:
 	int calc_baud(int ch, uint8_t data);
 	void clear_ISR_bits(int mask);
 	void set_ISR_bits(int mask);
-	virtual void update_interrupts();
 
 	int get_ch(duart_channel *ch)
 	{

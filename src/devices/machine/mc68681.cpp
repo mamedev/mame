@@ -280,6 +280,8 @@ void duart_base_device::update_interrupts()
 
 void mc68681_device::update_interrupts()
 {
+	duart_base_device::update_interrupts();
+
 	if (!irq_pending())
 		m_read_vector = false;  // clear IACK too
 }
