@@ -215,5 +215,4 @@ private:
 #define MCFG_COCO_CARTRIDGE_REMOVE(_tag)        \
 	MCFG_DEVICE_REMOVE(_tag)
 
-
 #endif // MAME_BUS_COCO_COCOCART_H

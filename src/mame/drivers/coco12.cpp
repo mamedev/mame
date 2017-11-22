@@ -354,6 +354,7 @@ SLOT_INTERFACE_START( coco_cart )
 	SLOT_INTERFACE("fdcv11", COCO_FDC_V11)
 	SLOT_INTERFACE("cc3hdb1", COCO3_HDB1)
 	SLOT_INTERFACE("cp400_fdc", CP400_FDC)
+	SLOT_INTERFACE("cd6809_fdc", CD6809_FDC)
 	SLOT_INTERFACE("rs232", COCO_RS232)
 	SLOT_INTERFACE("dcmodem", COCO_DCMODEM)
 	SLOT_INTERFACE("orch90", COCO_ORCH90)
@@ -544,6 +545,14 @@ static MACHINE_CONFIG_DERIVED( t4426, coco2 )
 	MCFG_SLOT_FIXED(true) // This cart is fixed so no way to change it
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( cd6809, coco )
+	MCFG_COCO_CARTRIDGE_REMOVE(CARTRIDGE_TAG)
+	MCFG_COCO_CARTRIDGE_ADD(CARTRIDGE_TAG, coco_cart, "cd6809_fdc")
+	MCFG_COCO_CARTRIDGE_CART_CB(WRITELINE(coco_state, cart_w))
+	MCFG_COCO_CARTRIDGE_NMI_CB(INPUTLINE(MAINCPU_TAG, INPUT_LINE_NMI))
+	MCFG_COCO_CARTRIDGE_HALT_CB(INPUTLINE(MAINCPU_TAG, INPUT_LINE_HALT))
+MACHINE_CONFIG_END
+
 //**************************************************************************
 //  ROMS
 //**************************************************************************
@@ -581,7 +590,7 @@ ROM_START(cp400c2)
 	ROM_LOAD("cp400bas.rom",  0x0000, 0x4000, CRC(878396a5) SHA1(292c545da3c77978e043b00a3dbc317201d18c3b))
 ROM_END
 
-ROM_START(mx1600 )
+ROM_START(mx1600)
 	ROM_REGION(0x8000,MAINCPU_TAG,0)
 	ROM_LOAD("mx1600bas.rom",    0x2000, 0x2000, CRC(d918156e) SHA1(70a464edf3a654ed4ffe687e6dee4f0d2acc758b))
 	ROM_LOAD("mx1600extbas.rom", 0x0000, 0x2000, CRC(322a3d58) SHA1(9079a477c3f22e46cebb1e68b61df5bd607c71a4))
@@ -623,7 +632,7 @@ COMP(  1985?,   coco2b,     coco,   0,      coco2b,  coco,     coco12_state, 0, 
 COMP(  1983,    cp400,      coco,   0,      cp400,   coco,     coco12_state, 0,    "Prológica",                    "CP400",                               0 )
 COMP(  1985,    cp400c2,    coco,   0,      cp400,   cp400c2,  coco12_state, 0,    "Prológica",                    "CP400 Color II",                      0 )
 COMP(  1983,    lzcolor64,  coco,   0,      coco,    coco,     coco12_state, 0,    "Novo Tempo / LZ Equipamentos", "Color64",                             0 )
-COMP(  1983,    cd6809_83,  coco,   0,      coco,    coco,     coco12_state, 0,    "Codimex",                      "CD-6809",                             0 )
-COMP(  1984,    cd6809_84,  coco,   0,      coco,    coco,     coco12_state, 0,    "Codimex",                      "CD-6809",                             0 )
+COMP(  1983,    cd6809_83,  coco,   0,      cd6809,  coco,     coco12_state, 0,    "Codimex",                      "CD-6809 (1983 version)",              0 )
+COMP(  1984,    cd6809_84,  coco,   0,      cd6809,  coco,     coco12_state, 0,    "Codimex",                      "CD-6809 (1984 version)",              0 )
 COMP(  1984,    mx1600,     coco,   0,      coco,    coco,     coco12_state, 0,    "Dynacom",                      "MX-1600",                             0 )
 COMP(  1986,    t4426,      coco,   0,      t4426,   coco,     coco12_state, 0,    "Terco AB",                     "Terco 4426 CNC Programming station",  0 )
