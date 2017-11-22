@@ -151,6 +151,7 @@ cxgz80.cpp
 cxhumax.cpp
 cybiko.cpp
 czk80.cpp
+d400.cpp
 d6800.cpp
 d6809.cpp
 dai.cpp

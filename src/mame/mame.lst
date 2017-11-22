@@ -10728,6 +10728,9 @@ skydest                         // PD0 (c) 1985 Taito Corporation
 @source:czk80.cpp
 czk80                           //
 
+@source:d400.cpp
+d461                            //
+
 @source:d6800.cpp
 d6800                           // Dream 6800
 
@@ -36319,7 +36322,6 @@ t4490                           // Terco 4490 Mill CNC Control (c) 1986
 @source:terminals.cpp
 aaa
 att630
-d461
 hp700_92
 hp2622a
 qvt70

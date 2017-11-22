@@ -3455,6 +3455,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/cxhumax.cpp",
 	MAME_DIR .. "src/mame/includes/cxhumax.h",
 	MAME_DIR .. "src/mame/drivers/czk80.cpp",
+	MAME_DIR .. "src/mame/drivers/d400.cpp",
 	MAME_DIR .. "src/mame/drivers/d6800.cpp",
 	MAME_DIR .. "src/mame/drivers/d6809.cpp",
 	MAME_DIR .. "src/mame/drivers/daruma.cpp",

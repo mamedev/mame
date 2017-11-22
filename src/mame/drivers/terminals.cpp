@@ -126,23 +126,6 @@ COMP( 1987, att630, 0, 0, terminals, terminals, terminals_state, 0, "AT&T", "630
 
 /**************************************************************************************************************
 
-Data General D461.
-Chips: SCN2681A, X2210P, 2x HM6116P-2, 2x HM6264P-20, HD68B09EP, CRT9007, 1x 8-sw dip.
-Crystals: 3.6864, 59.2920
-
-***************************************************************************************************************/
-
-ROM_START( d461 )
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD( "dgc_100_5776-05.bin", 0x0000, 0x8000, CRC(fdce2132) SHA1(82eac1751c31f99d4490505e16af5e7e7a52b310) )
-ROM_END
-
-COMP( 1985, d461, 0, 0, terminals, terminals, terminals_state, 0, "Data General", "D461", MACHINE_IS_SKELETON )
-
-
-
-/**************************************************************************************************************
-
 Hewlett-Packard HP-700/92.
 Chips: TC5564APL-15, proprietory square chip, D70108C (V20), SCN2681, Beeper
 Crystals: 29.4912
