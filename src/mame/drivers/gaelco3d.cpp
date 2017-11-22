@@ -366,7 +366,7 @@ WRITE_LINE_MEMBER(gaelco3d_state::fp_analog_clock_w)
 		if (m_fp_clock == 28)
 		{
 			m_fp_clock = 0;
-			for (auto i = 0; i < 2; i++)
+			for (int i = 0; i < 2; i++)
 			{
 				u32 ay = m_analog[i * 2].read_safe(0);
 				u32 ax = m_analog[i * 2 + 1].read_safe(0);

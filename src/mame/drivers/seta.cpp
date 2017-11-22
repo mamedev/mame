@@ -8,16 +8,16 @@
 
 
 CPU    :    68000 + [65C02] (only in the earlier games)
-Custom :    X1-001A  X1-002A (SDIP64)   Sprites
+Custom :    X1-001A, X1-002A (SDIP64)   Sprites
             X1-001
             X1-002
-            X1-003
+            X1-003 or X1-007 (SDIP42)   Video blanking (feeds RGB DACs)
             X1-004           (SDIP52)   Inputs
-            X1-005   X0-005
-            X1-006   X0-006
-            X1-007           (SDIP42)   Video DAC
+            X1-005
+            X1-006           (SDIP64)   Palette
             X1-010           (QFP80)    Sound: 16 Bit PCM
-            X1-011   X1-012  (QFP100)   Tilemaps
+            X1-011           (QFP80)    Graphics mixing
+            X1-012           (QFP100)   Tilemaps
             X1-014                      Sprites?
 
 -------------------------------------------------------------------------------

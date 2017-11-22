@@ -128,7 +128,7 @@ DONE (x) (p=partly)         NMOS         CMOS       ESCC      EMSCC
 #define CHANA_TAG   "cha"
 #define CHANB_TAG   "chb"
 
-enum
+enum : uint8_t
 {
 	RR0_RX_CHAR_AVAILABLE       = 0x01,
 	RR0_ZC                      = 0x02,
@@ -140,7 +140,7 @@ enum
 	RR0_BREAK_ABORT             = 0x80
 };
 
-enum
+enum : uint8_t
 {
 	RR1_ALL_SENT                = 0x01,
 	RR1_RESIDUE_CODE_MASK       = 0x0e,
@@ -150,15 +150,7 @@ enum
 	RR1_END_OF_FRAME            = 0x80
 };
 
-enum
-{
-	RR2_INT_VECTOR_MASK         = 0xff, // SCC channel A, SIO channel B (special case)
-	RR2_INT_VECTOR_V1           = 0x02, // SIO (special case) /SCC Channel B
-	RR2_INT_VECTOR_V2           = 0x04, // SIO (special case) /SCC Channel B
-	RR2_INT_VECTOR_V3           = 0x08  // SIO (special case) /SCC Channel B
-};
-
-enum
+enum : uint8_t
 {
 	RR3_CHANB_EXT_IP            = 0x01, // SCC IP pending registers
 	RR3_CHANB_TX_IP             = 0x02, //  only read in Channel A (for both channels)
@@ -169,7 +161,7 @@ enum
 };
 
 // Universal Bus WR0 commands for 85X30
-enum
+enum : uint8_t
 {
 	WR0_REGISTER_MASK           = 0x07,
 	WR0_COMMAND_MASK            = 0x38, // COMMANDS
@@ -188,7 +180,7 @@ enum
 	WR0_CRC_RESET_TX_UNDERRUN   = 0xc0  // 1 1
 };
 
-enum // ZBUS WR0 commands or 80X30
+enum : uint8_t // ZBUS WR0 commands or 80X30
 {
 	WR0_Z_COMMAND_MASK          = 0x38, // COMMANDS
 	WR0_Z_NULL_1                = 0x00, // 0 0 0
@@ -204,7 +196,7 @@ enum // ZBUS WR0 commands or 80X30
 	WR0_Z_SEL_SHFT_RIGHT        = 0x03  // 1 1
 };
 
-enum
+enum : uint8_t
 {
 	WR1_EXT_INT_ENABLE          = 0x01,
 	WR1_TX_INT_ENABLE           = 0x02,
@@ -219,7 +211,7 @@ enum
 	WR1_WREQ_ENABLE             = 0x80
 };
 
-enum
+enum : uint8_t
 {
 	WR3_RX_ENABLE               = 0x01,
 	WR3_SYNC_CHAR_LOAD_INHIBIT  = 0x02,
@@ -234,7 +226,7 @@ enum
 	WR3_RX_WORD_LENGTH_8        = 0xc0
 };
 
-enum
+enum : uint8_t
 {
 	WR4_PARITY_ENABLE           = 0x01,
 	WR4_PARITY_EVEN             = 0x02,
@@ -256,7 +248,7 @@ enum
 	WR4_CLOCK_RATE_X64          = 0xc0
 };
 
-enum
+enum : uint8_t
 {
 	WR5_TX_CRC_ENABLE           = 0x01,
 	WR5_RTS                     = 0x02,
@@ -271,12 +263,12 @@ enum
 	WR5_DTR                     = 0x80
 };
 
-enum
+enum : uint8_t
 {
 	WR7P_TX_FIFO_EMPTY          = 0x04
 };
 
-enum
+enum : uint8_t
 {
 	WR9_CMD_MASK                = 0xC0,
 	WR9_CMD_NORESET             = 0x00,
@@ -291,7 +283,7 @@ enum
 	WR9_BIT_IACK                = 0x20
 };
 
-enum
+enum : uint8_t
 {
 	WR10_8_6_BIT_SYNC           = 0x01,
 	WR10_LOOP_MODE              = 0x02,
@@ -308,7 +300,7 @@ enum
 	WR10_CRC_PRESET             = 0x80
 };
 
-enum
+enum : uint8_t
 {
 	WR11_RCVCLK_TYPE            = 0x80,
 	WR11_RCVCLK_SRC_MASK        = 0x60, // RCV CLOCK
@@ -329,7 +321,7 @@ enum
 	WR11_TRXSRC_SRC_DPLL        = 0x03  //  1 1
 };
 
-enum
+enum : uint8_t
 {
 	WR14_DPLL_CMD_MASK          = 0xe0, // Command
 	WR14_CMD_NULL               = 0x00, // 0 0 0
@@ -347,7 +339,7 @@ enum
 	WR14_LOCAL_LOOPBACK         = 0x10
 };
 
-enum
+enum : uint8_t
 {
 	WR15_WR7PRIME               = 0x01,
 	WR15_ZEROCOUNT              = 0x02,
@@ -1814,7 +1806,7 @@ uint8_t z80scc_channel::scc_register_read( uint8_t reg)
 	{
 	case REG_RR0_STATUS:         data = do_sccreg_rr0(); break; // TODO: verify handling of SCC specific bits: D6 and D1
 	case REG_RR1_SPEC_RCV_COND:  data = do_sccreg_rr1(); break;
-	case REG_RR2_INTERRUPT_VECT: data = do_sccreg_rr2(); break; // Channel dependent and SCC specific handling compared to SIO
+	case REG_RR2_INTERRUPT_VECT: data = do_sccreg_rr2(); break;
 		/* registers 3-7 are specific to SCC. TODO: Check variant and log/stop misuse */
 	case REG_RR3_INTERUPPT_PEND: data = wreg ? m_wr3 : do_sccreg_rr3(); break;
 	case REG_RR4_WR4_OR_RR0:     data = wreg ? m_wr4 : do_sccreg_rr4(); break;
@@ -1999,7 +1991,7 @@ void z80scc_channel::do_sccreg_wr0(uint8_t data)
 void z80scc_channel::do_sccreg_wr1(uint8_t data)
 {
 	LOG("%s(%02x) \"%s\": %c : %s - %02x\n", FUNCNAME, data, owner()->tag(), 'A' + m_index, FUNCNAME, data);
-	/* TODO: Sort out SCC specific behaviours  from legacy SIO behaviours:
+	/* TODO: Sort out SCC specific behaviours  from legacy SIO behaviours inherited from z80dart.cpp:
 	   - Channel B only bits vs
 	   - Parity Is Special Condition, bit2 */
 	m_wr1 = data;
@@ -2807,31 +2799,6 @@ WRITE_LINE_MEMBER( z80scc_channel::dcd_w )
 WRITE_LINE_MEMBER( z80scc_channel::ri_w )
 {
 	LOGINT("\"%s\": %c : RI %u - not implemented\n", owner()->tag(), 'A' + m_index, state);
-
-#if 0 // TODO: This code is inherited from another device driver and not correct for SCC
-	if (m_ri != state)
-	{
-		// set ring indicator state
-		m_ri = state;
-
-		if (!m_rx_rr0_latch)
-		{
-			if (m_ri)
-				m_rr0 |= RR0_RI;
-			else
-				m_rr0 &= ~RR0_RI;
-
-			if (m_wr1 & WR1_EXT_INT_ENABLE)
-			{
-				// trigger interrupt
-				m_uart->trigger_interrupt(m_index, INT_EXTERNAL);
-
-				// latch read register 0
-				m_rx_rr0_latch = 1;
-			}
-		}
-	}
-#endif
 }
 
 //-------------------------------------------------

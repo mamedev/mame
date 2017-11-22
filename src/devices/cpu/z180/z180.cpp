@@ -34,7 +34,7 @@ Package: P = 60-Pin Plastic DIP
    Temp: S = 0C to +70C
          E = -40C to +85C
 
-Environmanetal Flow: C = Plastic Standard
+Environmental Flow: C = Plastic Standard
 
 
 Example from Ms.Pac-Man/Galaga - 20 year Reunion hardare (see src/mame/drivers/20pacgal.c):
@@ -2538,12 +2538,12 @@ void z180_device::execute_set_input(int irqline, int state)
 
 			/* the main execute loop will take the interrupt */
 		} else if(irqline == Z180_INPUT_LINE_DREQ0) {
-			auto iol = m_iol & ~Z180_DREQ0;
+			uint32_t iol = m_iol & ~Z180_DREQ0;
 			if(state == ASSERT_LINE)
 				iol |= Z180_DREQ0;
 			z180_write_iolines(iol);
 		} else if(irqline == Z180_INPUT_LINE_DREQ1) {
-			auto iol = m_iol & ~Z180_DREQ1;
+			uint32_t iol = m_iol & ~Z180_DREQ1;
 			if(state == ASSERT_LINE)
 				iol |= Z180_DREQ1;
 			z180_write_iolines(iol);

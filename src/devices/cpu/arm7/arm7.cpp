@@ -166,6 +166,7 @@ arm946es_cpu_device::arm946es_cpu_device(const machine_config &mconfig, const ch
 	cp15_dtcm_base = 0xffffffff;
 	cp15_dtcm_size = 0;
 	cp15_dtcm_end = 0;
+	cp15_itcm_reg = cp15_dtcm_reg = 0;
 }
 
 pxa255_cpu_device::pxa255_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
