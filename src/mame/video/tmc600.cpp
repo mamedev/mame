@@ -69,18 +69,19 @@ CDP1869_PCB_READ_MEMBER( tmc600_state::tmc600_pcb_r )
 
 WRITE_LINE_MEMBER( tmc600_state::prd_w )
 {
-	if (state) {
+	if (!state) {
 		m_frame++;
+
+		switch (m_frame) {
+		case 8:
+			m_maincpu->int_w(CLEAR_LINE);
+			break;
 		
-		switch (m_frame)
-		{
-			case 31:
-				m_frame = 0;
-				m_blink = !m_blink;
-				// fallthru
-			case 15:
-				m_maincpu->int_w(m_rtc_int);
-				break;
+		case 16:
+			m_maincpu->int_w(m_rtc_int);
+			m_blink = !m_blink;
+			m_frame = 0;
+			break;
 		}
 	}
 }
