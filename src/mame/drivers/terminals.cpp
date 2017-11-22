@@ -310,6 +310,70 @@ COMP( 1982, tr175, 0, 0, terminals, terminals, terminals_state, 0, "Relisys", "T
 
 /**************************************************************************************************************
 
+Televideo TVI-912C.
+Chips: i8035, TMS9927NL, AY5-1013A (COM2502)
+Crystals: 23.814 (divide by 4 for CPU clock)
+Other: 1x 8-sw DIP, 1x 10-sw DIP (internal), 2x 10-sw DIP (available to user at the back)
+
+***************************************************************************************************************/
+
+ROM_START( tv912c )
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD( "a49c1.bin",    0x0000, 0x1000, CRC(d21851bf) SHA1(28fe77a218a5eee11de376f5d16e9380b616b3ca) ) // last half is all FF
+
+	ROM_REGION(0x0800, "chargen", 0)
+	ROM_LOAD( "a3-2.bin",     0x0000, 0x0800, CRC(bb9a7fbd) SHA1(5f1c4d41b25bd3ca4dbc336873362935daf283da) )
+ROM_END
+
+COMP( 1978, tv912c, 0, 0, terminals, terminals, terminals_state, 0, "TeleVideo", "TVI-912C", MACHINE_IS_SKELETON )
+
+
+
+/**************************************************************************************************************
+
+Televideo TVI-955
+Chips: G65SC02P-3, 3x S6551AP, SCN2674B, AMI 131406-00 (unknown 40-pin DIL), odd round silver thing, might be a battery
+Crystals: 19.3396, 31.684, 3.6864
+Keyboard: M5L8049-230P-6, 5.7143, Beeper
+
+***************************************************************************************************************/
+
+ROM_START( tv955 )
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD( "t180002-88d_955.u4",  0x0000, 0x4000, CRC(5767fbe7) SHA1(49a2241612af5c3af09778ffa541ac0bc186e05a) )
+	ROM_LOAD( "t180002-91a_calc.u5", 0x4000, 0x2000, CRC(f86c103a) SHA1(fa3ada3a5d8913e519e2ea4817e96166c1fedd32) ) // first half is all FF
+
+	ROM_REGION(0x1000, "chargen", 0)
+	ROM_LOAD( "t180002-26b.u45",     0x0000, 0x1000, CRC(69c9ebc7) SHA1(32282c816ec597a7c45e939acb7a4155d35ea584) )
+
+	ROM_REGION(0x10000, "keyboard", 0)
+	ROM_LOAD( "8049.kbd",            0x0000, 0x0800, CRC(bc86e349) SHA1(0b62003ab7931822f1bcac8370517c685849f62c) )
+ROM_END
+
+COMP( 1985, tv955, 0, 0, terminals, terminals, terminals_state, 0, "TeleVideo", "TVI-955", MACHINE_IS_SKELETON )
+
+
+
+/**************************************************************************************************************
+
+Televideo TVI-965
+Chips: G65SC816P-5, SCN2672TC5N40, 271582-00 (unknown square chip), 2x UM6551A, Beeper
+Crystals: 44.4528, 26.9892, 3.6864
+
+***************************************************************************************************************/
+
+ROM_START( tv965 )
+	ROM_REGION(0x20000, "maincpu", 0)
+	ROM_LOAD( "180003-30h.u8", 0x00000, 0x010000, CRC(c7b9ca39) SHA1(1d95a8b0a4ea5caf3fb628c44c7a3567700a0b59) )
+	ROM_LOAD( "180003-38h.u9", 0x10000, 0x008000, CRC(30fae408) SHA1(f05bb2a9ce2df60b046733f746d8d8a1eb3ac8bc) )
+ROM_END
+
+COMP( 1989, tv965, 0, 0, terminals, terminals, terminals_state, 0, "TeleVideo", "TVI-965", MACHINE_IS_SKELETON )
+
+
+
+/**************************************************************************************************************
+
 Visual 100. (VT-100 clone)
 Chips: D780C-1 (Z80), CRT5037, D8255AC-5, uPB8214C, COM8116T-020, D8251AC, ER1400, 8-sw dip
 Crystal: 47.736
