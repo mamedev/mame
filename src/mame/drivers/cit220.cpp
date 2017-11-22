@@ -11,6 +11,8 @@ enough to provoke a lawsuit, which led to its eventual withdrawal in favor of it
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
+#include "video/scn2674.h"
+#include "screen.h"
 
 
 class cit220_state : public driver_device
@@ -19,13 +21,16 @@ public:
 	cit220_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_screen(*this, "screen")
 		//, m_p_chargen(*this, "chargen")
 	{ }
 
 	DECLARE_WRITE_LINE_MEMBER(sod_w);
+	SCN2674_DRAW_CHARACTER_MEMBER(draw_character);
 
 private:
 	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
 	//required_region_ptr<u8> m_p_chargen;
 };
 
@@ -42,7 +47,15 @@ static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, cit220_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_map, AS_IO, 8, cit220_state )
-	AM_RANGE(0x21, 0x21) AM_READNOP
+	AM_RANGE(0x20, 0x27) AM_DEVREADWRITE("avdc", scn2674_device, read, write)
+ADDRESS_MAP_END
+
+
+SCN2674_DRAW_CHARACTER_MEMBER(cit220_state::draw_character)
+{
+}
+
+static ADDRESS_MAP_START( vram_map, 0, 8, cit220_state )
 ADDRESS_MAP_END
 
 
@@ -51,10 +64,24 @@ INPUT_PORTS_END
 
 
 static MACHINE_CONFIG_START( cit220p )
-	MCFG_CPU_ADD("maincpu", I8085A, 6'000'000)
+	MCFG_CPU_ADD("maincpu", I8085A, 6000000)
 	MCFG_CPU_PROGRAM_MAP(mem_map)
 	MCFG_CPU_IO_MAP(io_map)
 	MCFG_I8085A_SOD(WRITELINE(cit220_state, sod_w))
+
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_SIZE(720, 360)
+	MCFG_SCREEN_VISIBLE_AREA(0, 720-1, 0, 360-1)
+	MCFG_SCREEN_UPDATE_DEVICE("avdc", scn2674_device, screen_update)
+
+	MCFG_SCN2674_VIDEO_ADD("avdc", 4000000, INPUTLINE("maincpu", I8085_RST65_LINE))
+	MCFG_SCN2674_TEXT_CHARACTER_WIDTH(8)
+	MCFG_SCN2674_GFX_CHARACTER_WIDTH(8)
+	MCFG_SCN2674_DRAW_CHARACTER_CALLBACK_OWNER(cit220_state, draw_character)
+	MCFG_DEVICE_ADDRESS_MAP(0, vram_map)
+	MCFG_VIDEO_SET_SCREEN("screen")
 MACHINE_CONFIG_END
 
 
