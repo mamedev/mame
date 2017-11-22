@@ -13,6 +13,7 @@
 #include "video/imagetek_i4100.h"
 #include "machine/eepromser.h"
 #include "machine/gen_latch.h"
+#include "machine/timer.h"
 #include "screen.h"
 
 class metro_state : public driver_device
@@ -102,6 +103,7 @@ public:
 	uint32_t screen_update_psac_vdp2_mix(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(metro_vblank_interrupt);
 	INTERRUPT_GEN_MEMBER(metro_periodic_interrupt);
+	TIMER_DEVICE_CALLBACK_MEMBER(bangball_scanline);
 	INTERRUPT_GEN_MEMBER(karatour_interrupt);
 	INTERRUPT_GEN_MEMBER(puzzlet_interrupt);
 	IRQ_CALLBACK_MEMBER(metro_irq_callback);

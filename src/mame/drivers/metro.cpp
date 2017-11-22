@@ -108,7 +108,6 @@ driver modified by Hau
 #include "sound/ym2413.h"
 #include "sound/2610intf.h"
 #include "sound/ymf278b.h"
-
 #include "speaker.h"
 
 
@@ -224,6 +223,25 @@ INTERRUPT_GEN_MEMBER(metro_state::metro_periodic_interrupt)
 {
 	m_requested_int[4] = 1;
 	update_irq_state();
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(metro_state::bangball_scanline)
+{
+	int scanline = param;
+	
+	// vblank irq
+	if(scanline == 224)
+	{
+		m_requested_int[m_vblank_bit] = 1;
+		m_requested_int[4] = 1; // ???
+		update_irq_state();
+	}
+	else if(scanline < 224 && (*m_irq_enable & 2) == 0)
+	{
+		// pretty likely hblank irq (pressing a button when clearing a stage)
+		m_requested_int[1] = 1;
+		update_irq_state();
+	}
 }
 
 /* lev 2-7 (lev 1 seems sound related) */
@@ -3152,9 +3170,10 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( bangball, msgogo )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(bangball_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
-	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  60) // ?
-	
+	MCFG_CPU_VBLANK_INT_REMOVE()
+	MCFG_CPU_PERIODIC_INT_REMOVE()
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", metro_state, bangball_scanline, "screen", 0, 1)
+
 	// doesn't like 58.2 Hz
 	MCFG_DEVICE_MODIFY("screen")
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -3163,8 +3182,9 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( batlbubl, msgogo )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(batlbubl_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
-	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  60) // ?
+	MCFG_CPU_VBLANK_INT_REMOVE()
+	MCFG_CPU_PERIODIC_INT_REMOVE()
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", metro_state, bangball_scanline, "screen", 0, 1)
 	
 	// doesn't like 58.2 Hz
 	MCFG_DEVICE_MODIFY("screen")
