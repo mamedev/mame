@@ -4962,16 +4962,15 @@ ROM_START( partygrsa )
 	    Checksum code found at 0x000d18
 	    0x000000-0x0a69d3 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
 	        Expected Checksum   0xf4a004d3
-	        Calculated Checksum 0x221d04d3  (BAD)
+	        Calculated Checksum 0xf4a004d3  (OK)
 	    0x0a69d4-0x1b953f is the non-Checksummed range still containing data but NOT covered by Checksum
 	    0x0a69d4-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
-	// the checksum only covers part of the first 2 roms, marked all as BAD_DUMP because it can't be trusted without a full redump.
-	ROM_LOAD32_WORD( "bhg1284.u7",  0x000000, 0x80000, BAD_DUMP CRC(02ed0631) SHA1(ae2c89c876a030d325ec94490d293deba772630e) )
-	ROM_LOAD32_WORD( "bhg1284.u11", 0x000002, 0x80000, BAD_DUMP CRC(7ac80cd9) SHA1(70e910784a1e1ea8820005082e76223a85a3c346) )
-	ROM_LOAD32_WORD( "bhg1284.u8",  0x100000, 0x80000, BAD_DUMP CRC(28774b9a) SHA1(ebdd738a73ffa7c5238640f4d7956751f7bb6243) )
-	ROM_LOAD32_WORD( "bhg1284.u12", 0x100002, 0x80000, BAD_DUMP CRC(942835c1) SHA1(fefc509311716559ac6b836a56b2c981907d499b) )
+	ROM_LOAD32_WORD( "bhg1284.u7",  0x000000, 0x80000, CRC(e9d2248a) SHA1(a010c722129cd78d14043356a24218d20d127a84) )
+	ROM_LOAD32_WORD( "bhg1284.u11", 0x000002, 0x80000, CRC(d5da519b) SHA1(44b44b3839c63cde8fd6dee333b8fd70d89a5213) )
+	ROM_LOAD32_WORD( "bhg1284.u8",  0x100000, 0x80000, CRC(3f72c99b) SHA1(df3a21d8c644ffa87d6c3ab091df03fa3e0ca4a4) )
+	ROM_LOAD32_WORD( "bhg1284.u12", 0x100002, 0x80000, CRC(090ce72f) SHA1(a4783ca84aabd365613357a53a19a3dd48f4df0c) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
 	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
@@ -7042,6 +7041,7 @@ GAMEL( 1996, oscara5a,  oscara5,  aristmk5,     aristmk5_9, aristmk5_state, aris
 GAMEL( 1999, pantmag,   aristmk5, aristmk5,     kgalah,   aristmk5_state, aristmk5, ROT0, "Aristocrat", "Panther Magic (0101046V, NSW/ACT)",            MACHINE_FLAGS, layout_kgalah )    // 594/7, A - 06/10/99, Rev 16
 GAMEL( 1999, pantmaga,  pantmag,  aristmk5,     pantmaga, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Panther Magic (0100716V, NSW/ACT)",            MACHINE_FLAGS, layout_pantmaga )  // 594/4, A - 13/05/98, Rev 9
 GAMEL( 2001, partygrs,  aristmk5, aristmk5_usa_touch, aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Party Gras (AHG1567, US)",           MACHINE_FLAGS, layout_magimaska ) // MV4115/6, A - 10/11/01
+GAMEL( 2001, partygrsa, partygrs, aristmk5_usa_touch, bootsctnua, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Party Gras (BHG1284, US)",             MACHINE_FLAGS, layout_aristmk5_us_200 ) // MV4115/3, B - 06/02/01
 GAMEL( 2000, peaflut,   aristmk5, aristmk5,     trstrove, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Peacock Flutter (02J00011, NSW/ACT)",          MACHINE_FLAGS, layout_trstrove )  // JB001, A - 10/03/00, Rev 8
 GAMEL( 1997, pengpay,   aristmk5, aristmk5,     cashchama, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Penguin Pays (0200460V, NSW/ACT)",            MACHINE_FLAGS, layout_cashchama ) // 586/4(a), D - 03/06/97, Rev 3
 GAMEL( 1996, pengpaya,  pengpay,  aristmk5,     cashchama, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Penguin Pays (0200357V, NSW/ACT)",            MACHINE_FLAGS, layout_cashchama ) // 586/4, C - 12/11/96
@@ -7132,7 +7132,6 @@ GAMEL( 2001, locolootu, locoloot, aristmk5_usa, aristmk5_usa, aristmk5_state, ar
 GAMEL( 2000, marmagicub, marmagic, aristmk5_usa, bootsctnua,  aristmk5_state, aristmk5, ROT0, "Aristocrat", "Margarita Magic (EHG1559, US, set 2)",     MACHINE_FLAGS, layout_aristmk5_us_200 ) // US003, A - 07/07/00
 GAMEL( 2001, mountmonce, mountmon, aristmk5_usa, aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Mountain Money - Cash Express (AHG1629, US)", MACHINE_FLAGS, layout_aristmk5_us ) // MV4108/5, A - 10/03/01
 GAMEL( 2001, mountmonu, mountmon, aristmk5_usa, aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Mountain Money (BHG1465, US)",             MACHINE_FLAGS, layout_aristmk5_us )  // MV4108/5, A - 10/03/01
-GAMEL( 2001, partygrsa, partygrs, aristmk5_usa_touch, bootsctnua, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Party Gras (BHG1284, US)",             MACHINE_FLAGS, layout_aristmk5_us_200 ) // MV4115/3, B - 06/02/01
 GAMEL( 2001, partygrsb, partygrs, aristmk5_usa_touch, bootsctnua, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Party Gras (AHG1568, US)",             MACHINE_FLAGS, layout_aristmk5_us_200 ) // MV4115/6, A - 10/11/2001, 20 lines
 GAMEL( 1995, pengpayd,  pengpay,  aristmk5,     wcougar,      aristmk5_state, aristmk5, ROT0, "Aristocrat", "Penguin Pays (0300113V, NSW/ACT)",         MACHINE_FLAGS, layout_wcougar )      // 586, A - 12/10/95, Rev 4
 GAMEL( 1998, petshopa,  petshop,  aristmk5,     snowcat,      aristmk5_state, aristmk5, ROT0, "Aristocrat", "Pet Shop (0100679V, NSW/ACT)",             MACHINE_FLAGS, layout_snowcat )      // 618, A - 09/03/98, Rev 10
