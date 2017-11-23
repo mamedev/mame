@@ -34,6 +34,11 @@
     MAME doesn't yet support fractions in crystal frequencies. For example,
     XTAL_3_579545MHz should actually be 3579545.454545...Hz (39375000/11).
     This is no problem though: see above note about tolerance.
+    
+    In the "Examples" column, please don't add 1000 examples, this is just
+    for interest, so two or three examples is enough.
+    The actual reference where the xtals are used can be found in the
+    driver files by searching for the frequency (e.g. "XTAL_4_9152MHz")
 
     (Thanks to Guru for starting this documentation.)
 
@@ -92,7 +97,7 @@ enum
 	XTAL_5_911MHz       = 5911000,      /* Philips Videopac Plus G7400 */
 	XTAL_5_9904MHz      = 5990400,      /* Luxor ABC 800 keyboard (Keytronic custom part #48-300-008 is equivalent) */
 	XTAL_6MHz           = 6000000,      /* American Poker II, Taito SJ System */
-	XTAL_6_144MHz       = 6144000,      /* Used on Alpha Denshi early 80's games sound board, Casio FP-200 and Namco System 16 */
+	XTAL_6_144MHz       = 6144000,      /* Used on Alpha Denshi early 80's games sound board, Casio FP-200 and Namco Universal System 16 */
 	XTAL_6_5MHz         = 6500000,      /* Jupiter Ace */
 	XTAL_6_9MHz         = 6900000,      /* BBN BitGraph CPU */
 	XTAL_7MHz           = 7000000,      /* Jaleco Mega System PCBs */
