@@ -3512,11 +3512,10 @@ ROM_START( gambler )
 	    0x08f46c-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
-	// if you enable the additional debug output you get 'Error2 in graphics EPROMs' so these ROMs are also bad even if the above passes
-	ROM_LOAD32_WORD( "ehg091602.u7",  0x000000, 0x80000, BAD_DUMP CRC(7524c954) SHA1(0a895d1e2d09a2c873bbbbeb37bc59c25f3c577c) )  // 92.268%
-	ROM_LOAD32_WORD( "ehg091602.u11", 0x000002, 0x80000, BAD_DUMP CRC(f29a6932) SHA1(17761218a04d36a599c987b4e13c0e3f46b7793f) )  // 92.268%
-	ROM_LOAD32_WORD( "ehg091602.u8",  0x100000, 0x80000, BAD_DUMP CRC(e2221fdf) SHA1(8a7b2d5de68ae66fe1915a6faac6277249e3fb53) )  // base
-	ROM_LOAD32_WORD( "ehg091602.u12", 0x100002, 0x80000, BAD_DUMP CRC(ebe957f9) SHA1(539945ec9beafe2c83051208370588fce2334f16) )  // base
+	ROM_LOAD32_WORD( "ehg091602.u7",  0x000000, 0x80000, CRC(084167e3) SHA1(ec10a3f1a52ec4a2e2b4e1f303c1cbc048d1331b) )  // 92.268%
+	ROM_LOAD32_WORD( "ehg091602.u11", 0x000002, 0x80000, CRC(049b027c) SHA1(8212708c63003e6fd95ce2ee32d46dc4a26ab3c3) )  // 92.268%
+	ROM_LOAD32_WORD( "ehg091602.u8",  0x100000, 0x80000, CRC(e2221fdf) SHA1(8a7b2d5de68ae66fe1915a6faac6277249e3fb53) )  // base
+	ROM_LOAD32_WORD( "ehg091602.u12", 0x100002, 0x80000, CRC(ebe957f9) SHA1(539945ec9beafe2c83051208370588fce2334f16) )  // base
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
 	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
@@ -6988,6 +6987,7 @@ GAMEL( 1995, eforsta5,  aristmk5, aristmk5,     swhr2,    aristmk5_state, aristm
 GAMEL( 1997, eforsta5u, eforsta5, aristmk5_usa, aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Enchanted Forest (JHG0415-03, US)",        MACHINE_FLAGS, layout_aristmk5_us )  // MV4033, B - 10/02/97
 GAMEL( 1998, fastfort,  aristmk5, aristmk5,     wildbill, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Fast Fortune (0100651V, NSW/ACT)",             MACHINE_FLAGS, layout_wildbill )  // 624, D - 07/05/98, Rev 5
 GAMEL( 2000, fortellr,  aristmk5, aristmk5,     goldenra, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Fortune Teller (01J00131, NSW/ACT)",           MACHINE_FLAGS, layout_fortellr )  // JB006, D - 24/11/2000, Rev 17
+GAMEL( 1998, gambler,   aristmk5, aristmk5_usa, aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "The Gambler (EHG0916-02, US)",             MACHINE_FLAGS, layout_aristmk5_us )  // MV4084/1, A - 30/10/98
 GAMEL( 2001, geisha,    aristmk5, aristmk5,     geisha,   aristmk5_state, aristmk5, ROT0, "Aristocrat", "Geisha (0101408V, New Zealand)",               MACHINE_FLAGS, layout_geisha )    // MV4127, A - 05/03/01, Rev 25
 GAMEL( 1999, genmagi,   aristmk5, aristmk5_touch, genmagi, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Genie Magic (0200894V, NSW/ACT)",             MACHINE_FLAGS, layout_genmagi )   // 632/1, C - 15/02/99, Rev 20
 GAMEL( 1998, gnomeatw,  aristmk5, aristmk5,     kgalah,   aristmk5_state, aristmk5, ROT0, "Aristocrat", "Gnome Around The World (0100767V, NSW/ACT)",   MACHINE_FLAGS, layout_kgalah )    // 625, C - 18/12/98, Rev 16
@@ -7117,7 +7117,6 @@ GAMEL( 1996, blackpnt,  aristmk5, aristmk5,     wildbill,     aristmk5_state, ar
 GAMEL( 1996, canrose,   aristmk5, aristmk5_usa, aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Canyon Rose (AHG1463, US)",                MACHINE_FLAGS, layout_aristmk5_us )  // 603(a), B - 06/12/96 (same as Cash Chameleon)
 GAMEL( 2000, diamdest,  aristmk5, aristmk5_usa, bootsctnua,   aristmk5_state, aristmk5, ROT0, "Aristocrat", "Diamond Destiny (AHG1533, US)",            MACHINE_FLAGS, layout_aristmk5_us_200 ) // MV4115_5, A - 09/05/2000 (same as Magic Mask)
 GAMEL( 2001, fortfvr,   aristmk5, aristmk5_usa, aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Fortune Fever (BHG1566, US)",              MACHINE_FLAGS, layout_aristmk5_us )  // MV4122/2, A - 13/05/01
-GAMEL( 1998, gambler,   aristmk5, aristmk5_usa, aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "The Gambler (EHG0916-02, US)",             MACHINE_FLAGS, layout_aristmk5_us )  // MV4084/1, A - 30/10/98
 GAMEL( 1996, jumpbean,  aristmk5, aristmk5,     swhr2,        aristmk5_state, aristmk5, ROT0, "Aristocrat", "Jumping Beans (0100161V, NSW/ACT)",        MACHINE_FLAGS, layout_swhr2 )        // 586/2, A - 25/01/96
 GAMEL( 1999, sbuk2,     aristmk5, aristmk5,     sbuk2,        aristmk5_state, aristmk5, ROT0, "Aristocrat", "Super Bucks II (0400501V, NSW/ACT)",       MACHINE_FLAGS, layout_sbuk2 )        // 578, G - 26/07/99, Rev 7
 GAMEL( 2001, sldeluxe,  aristmk5, aristmk5_usa, bootsctnua,   aristmk5_state, aristmk5, ROT0, "Aristocrat", "Sweet Liberty Deluxe (AHG1575, US)",       MACHINE_FLAGS, layout_aristmk5_us_200 ) // MV4137, A - 11/02/01
