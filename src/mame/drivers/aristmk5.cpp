@@ -2619,16 +2619,15 @@ ROM_START( cashchamu )
 	    Checksum code found at 0x000d08
 	    0x000000-0x09b413 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
 	        Expected Checksum   0x741cd9a0
-	        Calculated Checksum 0x740e5ad7  (BAD)
+	        Calculated Checksum 0x741cd9a0  (OK)
 	    0x09b414-0x1b550b is the non-Checksummed range still containing data but NOT covered by Checksum
 	    0x09b414-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
-	// the checksum only covers part of the first 2 roms, marked all as BAD_DUMP because it can't be trusted without a full redump.
-	ROM_LOAD32_WORD( "dhg407899.u7",  0x000000, 0x80000, BAD_DUMP CRC(cb407a19) SHA1(d98421d6548e48b413f6dfcab4e240e98fcc9a69) )
-	ROM_LOAD32_WORD( "dhg407899.u11", 0x000002, 0x80000, BAD_DUMP CRC(94d73843) SHA1(ab236750c67e7fff3af831f1d03f45c45f280fd1) )
-	ROM_LOAD32_WORD( "dhg407899.u8",  0x100000, 0x80000, BAD_DUMP CRC(4cae8a5d) SHA1(3232461afd75ce71f8a2cb4ac7e9a3caeb8aabcd) )
-	ROM_LOAD32_WORD( "dhg407899.u12", 0x100002, 0x80000, BAD_DUMP CRC(39e17f0b) SHA1(25a0364fa45e4e78d6c365b0739606e71597bd71) )
+	ROM_LOAD32_WORD( "dhg407899.u7",  0x000000, 0x80000, CRC(9944fe04) SHA1(5f68b08e3480c0c8c1a29fe40e0221e9aeb969b7) )
+	ROM_LOAD32_WORD( "dhg407899.u11", 0x000002, 0x80000, CRC(1f7fa88a) SHA1(6ca40c5edba758084fd4d4cc0899584fd2d72ad3) )
+	ROM_LOAD32_WORD( "dhg407899.u8",  0x100000, 0x80000, CRC(6630b35b) SHA1(0126be7a73460fc70c7f1527a3eb0c9a0c58618e) )
+	ROM_LOAD32_WORD( "dhg407899.u12", 0x100002, 0x80000, CRC(2fd087f8) SHA1(f16414abf58e1a7a8ca08380993bdeca6f9c7317) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
 	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
@@ -6963,6 +6962,7 @@ GAMEL( 1999, cashcatnz, cashcat,  aristmk5,     aristmk5, aristmk5_state, aristm
 GAMEL( 1997, cashcham,  aristmk5, aristmk5,     cashcham, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Cash Chameleon (0100438V, NSW/ACT)",           MACHINE_FLAGS, layout_cashcham )  // 603/1, C  - 15/4/97, Rev 1.25.3.0
 GAMEL( 1998, cashchama, cashcham, aristmk5,     cashchama, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Cash Chameleon (0200437V, NSW/ACT)",          MACHINE_FLAGS, layout_cashchama ) // 603(a), D - 18/02/98, Rev 3
 GAMEL( 1998, cashchamnz,cashcham, aristmk5,     cashchamnz, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Cash Chameleon (0300781V, New Zealand)",     MACHINE_FLAGS, layout_cashchamnz ) // MV4067, A - 31/08/98, Rev 21
+GAMEL( 1996, cashchamu, cashcham, aristmk5_usa, aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Cash Chameleon (DHG4078-99, US)",          MACHINE_FLAGS, layout_aristmk5_us )  // 603(a), B - 06/12/96
 GAMEL( 1997, cashcra5,  aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Cash Crop (0300467V, NSW/ACT)",                MACHINE_FLAGS, layout_aristmk5 )  // 607, C - 14/07/97, Rev 6
 GAMEL( 1998, chariotc,  aristmk5, aristmk5,     chariotc, aristmk5_state, aristmk5, ROT0, "Aristocrat", "The Chariot Challenge (0100787V, NSW/ACT)",    MACHINE_FLAGS, layout_aristmk5 )  // 630/1, A - 10/08/98, Rev 11
 GAMEL( 1998, chariotcv, chariotc, aristmk5,     chariotcv, aristmk5_state, aristmk5, ROT0, "Aristocrat", "The Chariot Challenge (04J00714, Venezuela)", MACHINE_FLAGS, layout_snowcat )   // 630, A - 10/08/98, Rev 12
@@ -7124,7 +7124,6 @@ GAMEL( 2001, sldeluxe,  aristmk5, aristmk5_usa, bootsctnua,   aristmk5_state, ar
 GAMEL( 2001, wcoyote,   aristmk5, aristmk5_usa, aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Wild Coyote (AHG1515, US)",                MACHINE_FLAGS, layout_aristmk5_us )  // MV4134, A - 30/07/01
 // the following clone sets are known bad dumps, and do not boot (confirmed)
 GAMEL( 2000, bpartya,   bparty,   aristmk5_usa_touch, bootsctnua, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Bachelorette Party (BHG1579, US)",     MACHINE_FLAGS, layout_bparty )       // MV4119/1, B - 25/08/2000
-GAMEL( 1996, cashchamu, cashcham, aristmk5_usa, aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Cash Chameleon (DHG4078-99, US)",          MACHINE_FLAGS, layout_aristmk5_us )  // 603(a), B - 06/12/96
 GAMEL( 1997, cashcra5a, cashcra5, aristmk5,     aristmk5_9,   aristmk5_state, aristmk5, ROT0, "Aristocrat", "Cash Crop (0300447V, NSW/ACT)",            MACHINE_FLAGS, layout_dolphntrb )    // 607/2, C - 29/08/97, Rev 7
 GAMEL( 2001, dynajacku, dynajack, aristmk5_usa, aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Dynamite Jack (CHG1562, US)",              MACHINE_FLAGS, layout_aristmk5_us )  // US002, A - 11/07/01
 GAMEL( 2000, eforsta5ce, eforsta5, aristmk5_usa, aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Enchanted Forest - Cash Express (CHG1536, US)", MACHINE_FLAGS, layout_aristmk5_us ) // MV4108/6, C - 17/01/00
