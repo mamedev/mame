@@ -18,15 +18,6 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_I4100_ADD(tag) \
-		MCFG_DEVICE_ADD((tag), I4100, (0))
-		
-#define MCFG_I4220_ADD(tag) \
-		MCFG_DEVICE_ADD((tag), I4220, (0))
-
-#define MCFG_I4300_ADD(tag) \
-		MCFG_DEVICE_ADD((tag), I4300, (0))
-
 #define MCFG_I4100_GFXDECODE(gfxtag) \
 	imagetek_i4100_device::static_set_gfxdecode_tag(*device, ("^" gfxtag));
 	

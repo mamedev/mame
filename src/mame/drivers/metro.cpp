@@ -3042,7 +3042,7 @@ void metro_state::machine_start()
 }
 
 static MACHINE_CONFIG_START( i4100_config )
-	MCFG_I4100_ADD("vdp")
+	MCFG_DEVICE_ADD("vdp", I4100, XTAL_26_666MHz)
 	MCFG_I4100_GFXDECODE("gfxdecode")
 	MCFG_I4100_BLITTER_END_CALLBACK(WRITELINE(metro_state,vdp_blit_end_w))
 
@@ -3058,7 +3058,7 @@ static MACHINE_CONFIG_START( i4100_config )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( i4220_config )
-	MCFG_I4220_ADD("vdp2")
+	MCFG_DEVICE_ADD("vdp2", I4220, XTAL_26_666MHz)
 	MCFG_I4100_GFXDECODE("gfxdecode")
 	MCFG_I4100_BLITTER_END_CALLBACK(WRITELINE(metro_state,vdp_blit_end_w))
 
@@ -3074,7 +3074,7 @@ static MACHINE_CONFIG_START( i4220_config )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( i4300_config )
-	MCFG_I4300_ADD("vdp3")
+	MCFG_DEVICE_ADD("vdp3", I4300, XTAL_26_666MHz)
 	MCFG_I4100_GFXDECODE("gfxdecode")
 	MCFG_I4100_BLITTER_END_CALLBACK(WRITELINE(metro_state,vdp_blit_end_w))
 
@@ -3663,7 +3663,7 @@ static MACHINE_CONFIG_START( blzntrnd )
 	MCFG_CPU_IO_MAP(blzntrnd_sound_io_map)
 
 	/* video hardware */
-	MCFG_I4220_ADD("vdp2")
+	MCFG_DEVICE_ADD("vdp2", I4220, XTAL_26_666MHz)
 	MCFG_I4100_GFXDECODE("gfxdecode")
 	MCFG_I4100_BLITTER_END_CALLBACK(WRITELINE(metro_state,vdp_blit_end_w))
 
