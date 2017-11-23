@@ -4182,22 +4182,22 @@ ROM_END
 // MV4033 / 10 Credit Multiplier / 9 Line Multiline
 // Magic Garden / Export / B - 10/02/97
 // Marked as AHG1211 and 88.26%
+// (Same game as Enchanted Forest?)
 ROM_START( mgarden )
 	ARISTOCRAT_MK5_BIOS
 	/*
 	    Checksum code found at 0x000d08
 	    0x000000-0x0a522b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
 	        Expected Checksum   0x8b0f5dae
-	        Calculated Checksum 0x8afcb91f  (BAD)
+	        Calculated Checksum 0x8b0f5dae  (OK)
 	    0x0a522c-0x15dbd7 is the non-Checksummed range still containing data but NOT covered by Checksum
 	    0x0a522c-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
-	// the checksum only covers part of the first 2 roms, marked all as BAD_DUMP because it can't be trusted without a full redump.
-	ROM_LOAD32_WORD( "ahg121199.u7",  0x000000, 0x80000, BAD_DUMP CRC(4fe50505) SHA1(6cde87a8a6748af792a1fb101829491367bd4487) )
-	ROM_LOAD32_WORD( "ahg121199.u11", 0x000002, 0x80000, BAD_DUMP CRC(723ffeee) SHA1(9eab33c9dbf656489914e539a28da5ae289e8df7) )
-	ROM_LOAD32_WORD( "ahg121199.u8",  0x100000, 0x80000, BAD_DUMP CRC(a315ca28) SHA1(0309789362a945d592ee2eda912e4fc2e6ea5be6) )
-	ROM_LOAD32_WORD( "ahg121199.u12", 0x100002, 0x80000, BAD_DUMP CRC(4b252c2c) SHA1(8be41fb2b8f8d2829c18ea123a02f3e61c136206) )
+	ROM_LOAD32_WORD( "ahg121199.u7",  0x000000, 0x80000, CRC(12b9aaf2) SHA1(1cc86a0c8daefc1e5b5a4ff710319a85f573f526) )
+	ROM_LOAD32_WORD( "ahg121199.u11", 0x000002, 0x80000, CRC(b6095f2c) SHA1(d36ceaa0e6545f594f6a50ddfa71d84ca7128f3b) )
+	ROM_LOAD32_WORD( "ahg121199.u8",  0x100000, 0x80000, CRC(a315ca28) SHA1(0309789362a945d592ee2eda912e4fc2e6ea5be6) )  // confirmed good
+	ROM_LOAD32_WORD( "ahg121199.u12", 0x100002, 0x80000, CRC(4b252c2c) SHA1(8be41fb2b8f8d2829c18ea123a02f3e61c136206) )  // confirmed good
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
 	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
@@ -7024,6 +7024,7 @@ GAMEL( 1997, magtcha5a, magtcha5, aristmk5_touch, dimtouch, aristmk5_state, aris
 GAMEL( 1997, mammothm,  aristmk5, aristmk5,     kgalah,   aristmk5_state, aristmk5, ROT0, "Aristocrat", "Mammoth Money (0100425V, NSW/ACT)",            MACHINE_FLAGS, layout_kgalah )    // 595/5, D - 07/04/97, Rev 1.22.14.1
 GAMEL( 2000, marmagic,  aristmk5, aristmk5,     goldenra, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Margarita Magic (01J00101, NSW/ACT)",          MACHINE_FLAGS, layout_marmagic )  // JB005, A - 07/07/00, Rev 17
 GAMEL( 2000, marmagicu, marmagic, aristmk5_usa, aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Margarita Magic (EHG1558, US)",            MACHINE_FLAGS, layout_aristmk5_us ) // US003, 07/07/2000
+GAMEL( 1997, mgarden,   aristmk5, aristmk5_usa, aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Magic Garden (AHG1211-99, US)",            MACHINE_FLAGS, layout_aristmk5_us )  // MV4033, B - 10/02/97 (alt title for enchanted forest?)
 GAMEL( 1996, minemine,  aristmk5, aristmk5,     swhr2,    aristmk5_state, aristmk5, ROT0, "Aristocrat", "Mine, Mine, Mine (0400115V, NSW/ACT)",         MACHINE_FLAGS, layout_swhr2 )     // 559/2, D - 16/01/96, Rev 1.18.3.0
 GAMEL( 1996, minemineu, minemine, aristmk5_usa, aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Mine, Mine, Mine (VHG0416-99, US)",        MACHINE_FLAGS, layout_aristmk5_us ) // 559/2, E - 14/02/96
 GAMEL( 1997, monmouse,  aristmk5, aristmk5,     cashcham, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Money Mouse (0400469V, NSW/ACT)",              MACHINE_FLAGS, layout_cashcham )  // 607/1, B - 08/04/97, Rev 6
@@ -7118,7 +7119,6 @@ GAMEL( 2000, diamdest,  aristmk5, aristmk5_usa, bootsctnua,   aristmk5_state, ar
 GAMEL( 2001, fortfvr,   aristmk5, aristmk5_usa, aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Fortune Fever (BHG1566, US)",              MACHINE_FLAGS, layout_aristmk5_us )  // MV4122/2, A - 13/05/01
 GAMEL( 1998, gambler,   aristmk5, aristmk5_usa, aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "The Gambler (EHG0916-02, US)",             MACHINE_FLAGS, layout_aristmk5_us )  // MV4084/1, A - 30/10/98
 GAMEL( 1996, jumpbean,  aristmk5, aristmk5,     swhr2,        aristmk5_state, aristmk5, ROT0, "Aristocrat", "Jumping Beans (0100161V, NSW/ACT)",        MACHINE_FLAGS, layout_swhr2 )        // 586/2, A - 25/01/96
-GAMEL( 1997, mgarden,   aristmk5, aristmk5_usa, aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Magic Garden (AHG1211-99, US)",            MACHINE_FLAGS, layout_aristmk5_us )  // MV4033, B - 10/02/97
 GAMEL( 1999, sbuk2,     aristmk5, aristmk5,     sbuk2,        aristmk5_state, aristmk5, ROT0, "Aristocrat", "Super Bucks II (0400501V, NSW/ACT)",       MACHINE_FLAGS, layout_sbuk2 )        // 578, G - 26/07/99, Rev 7
 GAMEL( 2001, sldeluxe,  aristmk5, aristmk5_usa, bootsctnua,   aristmk5_state, aristmk5, ROT0, "Aristocrat", "Sweet Liberty Deluxe (AHG1575, US)",       MACHINE_FLAGS, layout_aristmk5_us_200 ) // MV4137, A - 11/02/01
 GAMEL( 2001, wcoyote,   aristmk5, aristmk5_usa, aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Wild Coyote (AHG1515, US)",                MACHINE_FLAGS, layout_aristmk5_us )  // MV4134, A - 30/07/01
