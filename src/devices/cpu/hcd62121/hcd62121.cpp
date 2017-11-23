@@ -701,10 +701,12 @@ inline void hcd62121_cpu_device::op_addb(int size)
 	bool zero_low = true;
 	u8 carry = 0;
 
-	set_cl_flag((m_temp1[size-1] & 0x0f) + (m_temp2[size-1] & 0x0f) > 9);
-
 	for (int i = 0; i < size; i++)
 	{
+		if (i == size - 1) {
+			set_cl_flag((m_temp1[i] & 0x0f) + (m_temp2[i] & 0x0f) + carry > 9);
+		}
+
 		int num1 = (m_temp1[i] & 0x0f) + ((m_temp1[i] & 0xf0) >> 4) * 10;
 		int num2 = (m_temp2[i] & 0x0f) + ((m_temp2[i] & 0xf0) >> 4) * 10;
 
@@ -734,10 +736,12 @@ inline void hcd62121_cpu_device::op_subb(int size)
 	bool zero_low = true;
 	u8 carry = 0;
 
-	set_cl_flag((m_temp1[size-1] & 0x0f) < (m_temp2[size-1] & 0x0f));
-
 	for (int i = 0; i < size; i++)
 	{
+		if (i == size - 1) {
+			set_cl_flag((m_temp1[i] & 0x0f) - (m_temp2[i] & 0x0f) - carry < 0);
+		}
+
 		int num1 = (m_temp1[i] & 0x0f) + ((m_temp1[i] & 0xf0) >> 4) * 10;
 		int num2 = (m_temp2[i] & 0x0f) + ((m_temp2[i] & 0xf0) >> 4) * 10;
 
@@ -765,8 +769,6 @@ inline void hcd62121_cpu_device::op_sub(int size)
 	bool zero_high = true;
 	bool zero_low = true;
 	u8 carry = 0;
-
-	set_cl_flag((m_temp1[0] & 0x0f) < (m_temp2[0] & 0x0f));
 
 	for (int i = 0; i < size; i++)
 	{
