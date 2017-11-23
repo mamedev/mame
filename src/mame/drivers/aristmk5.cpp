@@ -3626,16 +3626,15 @@ ROM_START( goldpyra )
 	    Checksum code found at 0x000d08
 	    0x000000-0x08ef13 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
 	        Expected Checksum   0xd3126f08
-	        Calculated Checksum 0x26ee6f08  (BAD)
+	        Calculated Checksum 0xd3126f08  (OK)
 	    0x08ef14-0x1aca3b is the non-Checksummed range still containing data but NOT covered by Checksum
 	    0x08ef14-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
-	// the checksum only covers part of the first 2 roms, marked all as BAD_DUMP because it can't be trusted without a full redump.
-	ROM_LOAD32_WORD( "ahg120699.u7",  0x000000, 0x80000, BAD_DUMP CRC(e6c80f67) SHA1(901cf8f8fd46c1c4a70e1954d2d2d88e7acd07a8) )
-	ROM_LOAD32_WORD( "ahg120699.u11", 0x000002, 0x80000, BAD_DUMP CRC(3cc221ea) SHA1(a71d16b818110f5b632e996e9f2fcb8be17b2aee) )
-	ROM_LOAD32_WORD( "ahg120699.u8",  0x100000, 0x80000, BAD_DUMP CRC(df1ffb31) SHA1(1cf9d008b1f8fdb06ba050c97dae79f272c8063c) )
-	ROM_LOAD32_WORD( "ahg120699.u12", 0x100002, 0x80000, BAD_DUMP CRC(d2c8f786) SHA1(a9efa35c8f2833a2b77f092398ca959d5fe6194e) )
+	ROM_LOAD32_WORD( "ahg120699.u7",  0x000000, 0x80000, CRC(19d21119) SHA1(de809e098a676f3d5f2c2750c5f7c97ee4c836a7) )
+	ROM_LOAD32_WORD( "ahg120699.u11", 0x000002, 0x80000, CRC(0f585009) SHA1(2e93caba45d5a79db2d7fd3a15da432afe05e59c) )
+	ROM_LOAD32_WORD( "ahg120699.u8",  0x100000, 0x80000, CRC(df1ffb31) SHA1(1cf9d008b1f8fdb06ba050c97dae79f272c8063c) )
+	ROM_LOAD32_WORD( "ahg120699.u12", 0x100002, 0x80000, CRC(13021157) SHA1(6beb8dea66659b5ec9cbb8dcd921c30a621049a9) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
 	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
@@ -6996,6 +6995,7 @@ GAMEL( 2001, geisha,    aristmk5, aristmk5,     geisha,   aristmk5_state, aristm
 GAMEL( 1999, genmagi,   aristmk5, aristmk5_touch, genmagi, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Genie Magic (0200894V, NSW/ACT)",             MACHINE_FLAGS, layout_genmagi )   // 632/1, C - 15/02/99, Rev 20
 GAMEL( 1998, gnomeatw,  aristmk5, aristmk5,     kgalah,   aristmk5_state, aristmk5, ROT0, "Aristocrat", "Gnome Around The World (0100767V, NSW/ACT)",   MACHINE_FLAGS, layout_kgalah )    // 625, C - 18/12/98, Rev 16
 GAMEL( 1997, goldpyr,   aristmk5, aristmk5_usa, dolphntru, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Golden Pyramids (AHG1205-03, US)",            MACHINE_FLAGS, layout_aristmk5_us ) // MV4091, B - 13/05/97
+GAMEL( 1997, goldpyra,  goldpyr,  aristmk5_usa, aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Golden Pyramids (AHG1206-99, US)",         MACHINE_FLAGS, layout_aristmk5_us )  // 602/2, B - 13/05/97
 GAMEL( 1998, goldpyrb,  goldpyr,  aristmk5,     goldpyrb, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Golden Pyramids (0100878V, Victoria)",         MACHINE_FLAGS, layout_goldpyrb )  // 602/5, C - 19/06/98
 GAMEL( 2000, goldenra,  aristmk5, aristmk5,     goldenra, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Golden Ra (0101164V, NSW/ACT)",                MACHINE_FLAGS, layout_goldenra )  // 661, A - 10/04/00, Rev 15
 GAMEL( 2000, honeypot,  aristmk5, aristmk5,     goldenra, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Honey Pot (03J00241, NSW/ACT)",                MACHINE_FLAGS, layout_yukongld )  // JB008, A - 21/11/2000, Rev 17
@@ -7127,7 +7127,6 @@ GAMEL( 2000, bpartya,   bparty,   aristmk5_usa_touch, bootsctnua, aristmk5_state
 GAMEL( 1997, cashcra5a, cashcra5, aristmk5,     aristmk5_9,   aristmk5_state, aristmk5, ROT0, "Aristocrat", "Cash Crop (0300447V, NSW/ACT)",            MACHINE_FLAGS, layout_dolphntrb )    // 607/2, C - 29/08/97, Rev 7
 GAMEL( 2001, dynajacku, dynajack, aristmk5_usa, aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Dynamite Jack (CHG1562, US)",              MACHINE_FLAGS, layout_aristmk5_us )  // US002, A - 11/07/01
 GAMEL( 2000, eforsta5ce, eforsta5, aristmk5_usa, aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Enchanted Forest - Cash Express (CHG1536, US)", MACHINE_FLAGS, layout_aristmk5_us ) // MV4108/6, C - 17/01/00
-GAMEL( 1997, goldpyra,  goldpyr,  aristmk5_usa, aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Golden Pyramids (AHG1206-99, US)",         MACHINE_FLAGS, layout_aristmk5_us )  // 602/2, B - 13/05/97
 GAMEL( 2000, incasunua, incasun,  aristmk5_usa, bootsctnua,   aristmk5_state, aristmk5, ROT0, "Aristocrat", "Inca Sun (DHG1577, US)",                   MACHINE_FLAGS, layout_aristmk5_us_200 ) // MV4130, A - 05/09/00
 GAMEL( 2001, locolootu, locoloot, aristmk5_usa, aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Loco Loot (AHG1513, US)",                  MACHINE_FLAGS, layout_aristmk5_us )  // MV4134, A - 30/07/01
 GAMEL( 2000, marmagicua, marmagic, aristmk5_usa, bootsctnua,  aristmk5_state, aristmk5, ROT0, "Aristocrat", "Margarita Magic (EHG1559, US, set 1)",     MACHINE_FLAGS, layout_aristmk5_us_200 ) // US003, A - 07/07/00
