@@ -22,6 +22,7 @@
 #include "cpu/tms7000/tms7000.h"
 #include "machine/mos6551.h"
 #include "machine/6850acia.h"
+#include "machine/mc14411.h"
 #include "machine/msm6242.h"
 #include "machine/ds1315.h"
 #include "machine/wd_fdc.h"

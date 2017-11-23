@@ -322,7 +322,7 @@ INTERRUPT_GEN_MEMBER(namcond1_state::mcu_interrupt)
 {
 	if( m_h8_irq5_enabled )
 	{
-		device.execute().pulse_input_line(5, 1);
+		device.execute().pulse_input_line(5, device.execute().minimum_quantum_time());
 	}
 }
 

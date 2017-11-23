@@ -2285,6 +2285,9 @@ at386sx                         // 19?? AT VGA 386sx
 c386sx16                        // 1990 Commodore 386SX-16
 pc30iii							// Commodore PC 30-III
 pc40iii  						// Commodore PC 40-III
+mbc28							// Sanyo MBC-28
+comportiii						// Compaq Portable III
+pcd2							// Siemens PCD-2
 ct386sx                         //
 ec1842                          //
 ec1849                          //
@@ -9713,6 +9716,9 @@ f1gpstr2                        // (c) 1993 Jaleco
 scudhamm                        // (c) 1994 Jaleco
 wildplt                         // (c) 1992 Jaleco
 
+@source:cit220.cpp
+cit220p                         // (c) 1984 C. Itoh
+
 @source:citycon.cpp
 citycon                         // (c) 1985 Jaleco
 citycona                        // (c) 1985 Jaleco
@@ -10721,6 +10727,9 @@ skydest                         // PD0 (c) 1985 Taito Corporation
 
 @source:czk80.cpp
 czk80                           //
+
+@source:d400.cpp
+d461                            //
 
 @source:d6800.cpp
 d6800                           // Dream 6800
@@ -36313,8 +36322,6 @@ t4490                           // Terco 4490 Mill CNC Control (c) 1986
 @source:terminals.cpp
 aaa
 att630
-cit220p
-d461
 hp700_92
 hp2622a
 qvt70
@@ -36323,6 +36330,9 @@ qvt103
 qvt190
 qvt201
 tr175
+tv912c
+tv955
+tv965
 v100
 v102
 vp60
