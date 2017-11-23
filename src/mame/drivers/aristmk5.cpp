@@ -2109,7 +2109,6 @@ ROM_START( adonisu )
 	    0x0e8a7c-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
-	// the checksum only covers part of the first 2 roms, marked all as BAD_DUMP because it can't be trusted without a full redump.
 	ROM_LOAD32_WORD( "bhg1508.u7",  0x000000, 0x80000, CRC(09107577) SHA1(6cb525a96cdcb414ae7a45b5a5853d94059bc333) )
 	ROM_LOAD32_WORD( "bhg1508.u11", 0x000002, 0x80000, CRC(45630329) SHA1(a2c8e3ae786948135797a80ae12bf3ba2e6192a8) )
 	ROM_LOAD32_WORD( "bhg1508.u8",  0x100000, 0x80000, CRC(c572e39b) SHA1(e6ca864b620a17f8b963d4917cbdc894b9b275dc) )
