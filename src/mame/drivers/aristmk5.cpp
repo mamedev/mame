@@ -2104,16 +2104,16 @@ ROM_START( adonisu )
 	    Checksum code found at 0x000d18
 	    0x000000-0x0e8a7b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
 	        Expected Checksum   0xe6715f98
-	        Calculated Checksum 0xc80cd95e  (BAD)
+	        Calculated Checksum 0xe6715f98  (OK)
 	    0x0e8a7c-0x1c5f47 is the non-Checksummed range still containing data but NOT covered by Checksum
 	    0x0e8a7c-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	// the checksum only covers part of the first 2 roms, marked all as BAD_DUMP because it can't be trusted without a full redump.
-	ROM_LOAD32_WORD( "bhg1508.u7",  0x000000, 0x80000, BAD_DUMP CRC(ed6254d7) SHA1(d2b790fdd7f5fc7b78fcfc4c96d0fc272ccf8da6) )
-	ROM_LOAD32_WORD( "bhg1508.u11", 0x000002, 0x80000, BAD_DUMP CRC(1f629286) SHA1(bce380a6a76c77bc790436bd6f94474a1db0c231) )
-	ROM_LOAD32_WORD( "bhg1508.u8",  0x100000, 0x80000, BAD_DUMP CRC(b756c96d) SHA1(494df20090d415e83d599023203c13273e7925ad) )
-	ROM_LOAD32_WORD( "bhg1508.u12", 0x100002, 0x80000, BAD_DUMP CRC(1d3b6b8f) SHA1(1ddcfd7323cc7e79d3e39d913fdb5cf5cd53d56d) )
+	ROM_LOAD32_WORD( "bhg1508.u7",  0x000000, 0x80000, CRC(09107577) SHA1(6cb525a96cdcb414ae7a45b5a5853d94059bc333) )
+	ROM_LOAD32_WORD( "bhg1508.u11", 0x000002, 0x80000, CRC(45630329) SHA1(a2c8e3ae786948135797a80ae12bf3ba2e6192a8) )
+	ROM_LOAD32_WORD( "bhg1508.u8",  0x100000, 0x80000, CRC(c572e39b) SHA1(e6ca864b620a17f8b963d4917cbdc894b9b275dc) )
+	ROM_LOAD32_WORD( "bhg1508.u12", 0x100002, 0x80000, CRC(b8995b25) SHA1(ad39ad11dc02dbbe8be99d81c96e9fc3191726ad) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
 	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
@@ -6949,6 +6949,7 @@ GAME(  1995, aristmk5,  0,        aristmk5,     aristmk5, aristmk5_state, aristm
 GAMEL( 1998, adonis,    aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Adonis (0200751V, NSW/ACT)",                   MACHINE_FLAGS, layout_aristmk5 )  // 602/9, A - 25/05/98, Rev 10
 GAMEL( 1998, adonisa,   adonis,   aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Adonis (0100751V, NSW/ACT)",                   MACHINE_FLAGS, layout_aristmk5 )  // 602/9, A - 25/05/98, Rev 9
 GAMEL( 1999, adonisce,  adonis,   aristmk5,     adonisce, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Adonis - Cash Express (0201005V, NSW/ACT)",    MACHINE_FLAGS, layout_aristmk5 )  // 602/9, C - 06/07/99, Rev 12
+GAMEL( 2001, adonisu,   adonis,   aristmk5_usa, aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Adonis (BHG1508, US)",                     MACHINE_FLAGS, layout_aristmk5_us )  // MV4124/1, B - 31/07/01
 GAMEL( 2002, alchemst,  aristmk5, aristmk5,     goldenra, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Alchemist (01J02046, Venezuela)",              MACHINE_FLAGS, layout_yukongld )  // JB013/1, A - 22/01/02, Rev 17
 GAMEL( 2000, bparty,    aristmk5, aristmk5_usa_touch, bootsctnua, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Bachelorette Party (BHG1248, US)",     MACHINE_FLAGS, layout_bparty )    // MV4119/1, B - 25/08/2000
 GAMEL( 1996, baddog,    aristmk5, aristmk5,     baddog,   aristmk5_state, aristmk5, ROT0, "Aristocrat", "Bad Dog Poker (0200428V, NSW/ACT)",            MACHINE_FLAGS, layout_baddog )    // 386/56, A - 17/12/96
@@ -7123,7 +7124,6 @@ GAMEL( 1999, sbuk2,     aristmk5, aristmk5,     sbuk2,        aristmk5_state, ar
 GAMEL( 2001, sldeluxe,  aristmk5, aristmk5_usa, bootsctnua,   aristmk5_state, aristmk5, ROT0, "Aristocrat", "Sweet Liberty Deluxe (AHG1575, US)",       MACHINE_FLAGS, layout_aristmk5_us_200 ) // MV4137, A - 11/02/01
 GAMEL( 2001, wcoyote,   aristmk5, aristmk5_usa, aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Wild Coyote (AHG1515, US)",                MACHINE_FLAGS, layout_aristmk5_us )  // MV4134, A - 30/07/01
 // the following clone sets are known bad dumps, and do not boot (confirmed)
-GAMEL( 2001, adonisu,   adonis,   aristmk5_usa, aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Adonis (BHG1508, US)",                     MACHINE_FLAGS, layout_aristmk5_us )  // MV4124/1, B - 31/07/01
 GAMEL( 1999, bootsctnu, bootsctn, aristmk5_usa, aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Boot Scootin' (GHG1012-02, US)",           MACHINE_FLAGS, layout_aristmk5_us )  // MV4098, A - 25/08/99
 GAMEL( 2000, bpartya,   bparty,   aristmk5_usa_touch, bootsctnua, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Bachelorette Party (BHG1579, US)",     MACHINE_FLAGS, layout_bparty )       // MV4119/1, B - 25/08/2000
 GAMEL( 1997, bumblbugu, bumblbug, aristmk5_usa, aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Bumble Bugs (CHG0479-03, US)",             MACHINE_FLAGS, layout_aristmk5_us )  // 593, D - 05/07/97
