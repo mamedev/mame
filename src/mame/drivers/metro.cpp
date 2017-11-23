@@ -3632,10 +3632,11 @@ static MACHINE_CONFIG_START( vmetal )
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( i4220_config_304x224 )
-	
+
 	MCFG_DEVICE_MODIFY("vdp2")
 	MCFG_I4100_TILEMAP_XOFFSETS(-16,-16,-16)
-	
+	MCFG_I4100_TILEMAP_YOFFSETS(-16,-16,-16)
+
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
