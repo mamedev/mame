@@ -2824,6 +2824,43 @@ ROM_START( headon1 )
 	ROM_LOAD( "316-0042.u88", 0x0020, 0x0020, CRC(a1506b9d) SHA1(037c3db2ea40eca459e8acba9d1506dd28d72d10) )    /* sequence PROM */
 ROM_END
 
+/*
+Head-On N (Nintendo)
+
+EPROMS were all Intel 2708's.
+
+Bi-polar proms were Signetics 82s123's
+
+prom B6 = lines on screen when removed, address decoding?
+prom G2 = white screen when removed, colour prom?
+prom F2 = blank screen, audio screeches - no booting...
+
+CPU clock pin 6 = 1933520 hz
+
+PCBs:
+THO CPU PI-500890
+THO VIDEO PI-500891
+*/
+
+ROM_START( headonn )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ROM.E4", 0x0000, 0x0400, CRC(a6cd13fc) SHA1(0fda6b06e7864feae8e4e94cf17f50c9c033aa39) )
+	ROM_LOAD( "ROM.F4", 0x0400, 0x0400, CRC(d1cd498f) SHA1(ded1a97c7f76af195b247135469b84c25d4096c4) )
+	ROM_LOAD( "ROM.G4", 0x0800, 0x0400, CRC(0fb02db2) SHA1(6e9ad34a205838339a76ba6eeaf02cf663c2b750) )
+	ROM_LOAD( "ROM.H4", 0x0c00, 0x0400, CRC(38db2d02) SHA1(a86c4208154f65a83f55c1fbfd041b56ebd11106) )
+	ROM_LOAD( "ROM.I4", 0x1000, 0x0400, CRC(a04d8522) SHA1(58d6c3168ac7227e78ff699449008dbf999ea794) )
+	ROM_LOAD( "ROM.J4", 0x1400, 0x0400, CRC(52bd2151) SHA1(4f6bc10dabadf65f638aed46b0f0a1ba00e83afd) )
+	ROM_LOAD( "ROM.K4", 0x1800, 0x0400, CRC(9488a8b3) SHA1(a7e8bc341c839eba3b84af78f19cefafe91d42e3) )
+	ROM_LOAD( "ROM.L4", 0x1c00, 0x0400, CRC(a37f0be0) SHA1(4548cf05256764588feeade29368f5abfbf75a7d) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "PROM.G2", 0x0000, 0x0020, CRC(67104ea9) SHA1(26b6bd2a1973b83bb9af4e3385d8cb14cb3f62f2) )
+
+	ROM_REGION( 0x0040, "user1", 0 )    /* timing PROMs */
+	ROM_LOAD( "PROM.B6", 0x0000, 0x0020, CRC(67104ea9) SHA1(26b6bd2a1973b83bb9af4e3385d8cb14cb3f62f2) )    /* control PROM */
+	ROM_LOAD( "PROM.F2", 0x0020, 0x0020, CRC(a1506b9d) SHA1(037c3db2ea40eca459e8acba9d1506dd28d72d10) )    /* sequence PROM */
+ROM_END
+
 ROM_START( headonmz )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "0.bin",      0x0000, 0x0400, CRC(1febc85a) SHA1(7cc422d6819d5a2507467bdf91f82e76b0d12643) ) // this ROM was loose from the rest, but should be correct..
@@ -3657,6 +3694,7 @@ GAME( 1979, sspaceatc,  sspaceat, sspaceat,  sspaceat,  vicdual_state, 0, ROT270
 GAME( 1979, sspacaho,   0,        sspacaho,  sspacaho,  vicdual_state, 0, ROT270, "Sega", "Space Attack / Head On", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, headon,     0,        headon,    headon,    vicdual_state, 0, ROT0,   "Gremlin", "Head On (2 players)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, headon1,    headon,   headon,    headon,    vicdual_state, 0, ROT0,   "Gremlin", "Head On (1 player)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, headonn,    headon,   headon,    headon,    vicdual_state, 0, ROT270, "Nintendo", "Head On N", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // won't coin up? different IO map
 GAME( 1979, headons,    headon,   headons,   headons,   vicdual_state, 0, ROT0,   "bootleg (Sidam)", "Head On (Sidam bootleg, set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, headonsa,   headon,   headons,   headons,   vicdual_state, 0, ROT0,   "bootleg (Sidam)", "Head On (Sidam bootleg, set 2)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // won't coin up?
 GAME( 1979, headonmz,   headon,   headon,    headonmz,  vicdual_state, 0, ROT0,   "bootleg", "Head On (bootleg, alt maze)", MACHINE_SUPPORTS_SAVE )
