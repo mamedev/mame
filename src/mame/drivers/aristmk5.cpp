@@ -2416,16 +2416,15 @@ ROM_START( bumblbugu )
 	    Checksum code found at 0x000d08
 	    0x000000-0x0b1f47 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
 	        Expected Checksum   0x9f3936f9
-	        Calculated Checksum 0x16f5c058  (BAD)
+	        Calculated Checksum 0x9f3936f9  (OK)
 	    0x0b1f48-0x183c1f is the non-Checksummed range still containing data but NOT covered by Checksum
 	    0x0b1f48-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
-	// the checksum only covers part of the first 2 roms, marked all as BAD_DUMP because it can't be trusted without a full redump.
-	ROM_LOAD32_WORD( "chg047903.u7",  0x000000, 0x80000, BAD_DUMP CRC(ec605a36) SHA1(114e0840cfbd0c64645a5a33065db85462a0ba2d) )  // 92.691%
-	ROM_LOAD32_WORD( "chg047903.u11", 0x000002, 0x80000, BAD_DUMP CRC(17b154bd) SHA1(efdf307670a3d74f7980fec2d2197d837d4c26e2) )  // 92.691%
-	ROM_LOAD32_WORD( "chg047903.u8",  0x100000, 0x80000, BAD_DUMP CRC(e0c01d01) SHA1(9153129fd348a97da7cccf002e5d03e4b4db9264) )  // base
-	ROM_LOAD32_WORD( "chg047903.u12", 0x100002, 0x80000, BAD_DUMP CRC(28700d5d) SHA1(87a583cd487da6cb4c2da5f62297f0e577269fae) )  // base
+	ROM_LOAD32_WORD( "chg047903.u7",  0x000000, 0x80000, CRC(ae49d394) SHA1(fae7db8193915a3307e89a4623289fcbf9486283) )  // 92.691%
+	ROM_LOAD32_WORD( "chg047903.u11", 0x000002, 0x80000, CRC(6da81e81) SHA1(a9e7aff23b24213ce2c68f672a9e22088cf53f3f) )  // 92.691%
+	ROM_LOAD32_WORD( "chg047903.u8",  0x100000, 0x80000, CRC(e0c01d01) SHA1(9153129fd348a97da7cccf002e5d03e4b4db9264) )  // base
+	ROM_LOAD32_WORD( "chg047903.u12", 0x100002, 0x80000, CRC(7dbb634b) SHA1(f7a752240989032af142f4cd6e4260a12a5b4c0a) )  // base
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
 	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
@@ -6956,6 +6955,7 @@ GAMEL( 1999, bootsctnu, bootsctn, aristmk5_usa, aristmk5_usa, aristmk5_state, ar
 GAMEL( 1999, bootsctnua,bootsctn, aristmk5_usa, pengpuck, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Boot Scootin' (GHG1008-03, US)",               MACHINE_FLAGS, layout_aristmk5_us_200 ) // MV4098/1, A - 27/07/99
 GAMEL( 1996, bumblbug,  aristmk5, aristmk5,     swhr2,    aristmk5_state, aristmk5, ROT0, "Aristocrat", "Bumble Bugs (0200510V, NSW/ACT)",              MACHINE_FLAGS, layout_swhr2 )     // 593, D - 5/07/96, Rev 3
 GAMEL( 1996, bumblbugql,bumblbug, aristmk5,     swhr2,    aristmk5_state, aristmk5, ROT0, "Aristocrat", "Bumble Bugs (0200456V, Queensland)",           MACHINE_FLAGS, layout_swhr2 )     // 593, D - 5/07/96, Rev 1.0
+GAMEL( 1997, bumblbugu, bumblbug, aristmk5_usa, aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Bumble Bugs (CHG0479-03, US)",             MACHINE_FLAGS, layout_aristmk5_us )  // 593, D - 05/07/97
 GAMEL( 1995, buttdeli,  aristmk5, aristmk5,     swhr2,    aristmk5_state, aristmk5, ROT0, "Aristocrat", "Butterfly Delight (0200143V, NSW/ACT)",        MACHINE_FLAGS, layout_swhr2 )     // 571/4, A - 19/12/95, Rev 1.8.1.0
 GAMEL( 1998, cashcat,   aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Cash Cat (0100676V, NSW/ACT)",                 MACHINE_FLAGS, layout_aristmk5 )  // 614/3, A - 03/04/98, Rev 7
 GAMEL( 1997, cashcata,  cashcat,  aristmk5,     aristmk5_9, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Cash Cat (0100557V, NSW/ACT)",               MACHINE_FLAGS, layout_dolphntrb ) // 614/1, B - 01/12/97, Rev 7
@@ -7124,7 +7124,6 @@ GAMEL( 2001, sldeluxe,  aristmk5, aristmk5_usa, bootsctnua,   aristmk5_state, ar
 GAMEL( 2001, wcoyote,   aristmk5, aristmk5_usa, aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Wild Coyote (AHG1515, US)",                MACHINE_FLAGS, layout_aristmk5_us )  // MV4134, A - 30/07/01
 // the following clone sets are known bad dumps, and do not boot (confirmed)
 GAMEL( 2000, bpartya,   bparty,   aristmk5_usa_touch, bootsctnua, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Bachelorette Party (BHG1579, US)",     MACHINE_FLAGS, layout_bparty )       // MV4119/1, B - 25/08/2000
-GAMEL( 1997, bumblbugu, bumblbug, aristmk5_usa, aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Bumble Bugs (CHG0479-03, US)",             MACHINE_FLAGS, layout_aristmk5_us )  // 593, D - 05/07/97
 GAMEL( 1996, cashchamu, cashcham, aristmk5_usa, aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Cash Chameleon (DHG4078-99, US)",          MACHINE_FLAGS, layout_aristmk5_us )  // 603(a), B - 06/12/96
 GAMEL( 1997, cashcra5a, cashcra5, aristmk5,     aristmk5_9,   aristmk5_state, aristmk5, ROT0, "Aristocrat", "Cash Crop (0300447V, NSW/ACT)",            MACHINE_FLAGS, layout_dolphntrb )    // 607/2, C - 29/08/97, Rev 7
 GAMEL( 2001, dynajacku, dynajack, aristmk5_usa, aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Dynamite Jack (CHG1562, US)",              MACHINE_FLAGS, layout_aristmk5_us )  // US002, A - 11/07/01
