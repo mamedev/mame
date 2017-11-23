@@ -2264,20 +2264,19 @@ ROM_START( bootsctnu )
 	    Checksum code found at 0x000d08
 	    0x000000-0x0941ab is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
 	        Expected Checksum   0xdf68cecf
-	        Calculated Checksum 0xed145d01  (BAD)
+	        Calculated Checksum 0xdf68cecf  (OK)
 	    0x0941ac-0x328187 is the non-Checksummed range (suspicious endpoint)
 	*/
 
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
-	// the checksum only covers part of the first 2 roms, marked all as BAD_DUMP because it can't be trusted without a full redump.
-	ROM_LOAD32_WORD( "ghg101202.u7",  0x000000, 0x80000, BAD_DUMP CRC(ca26f31e) SHA1(e8da31cc8d12bf8a28f1ca4d796259ae9010f8af) )  // 92.767%
-	ROM_LOAD32_WORD( "ghg101202.u11", 0x000002, 0x80000, BAD_DUMP CRC(61da1767) SHA1(83d4df1060975f03f291b9119c0d2b8debb0fb60) )  // 92.767%
-	ROM_LOAD32_WORD( "ghg101202.u8",  0x100000, 0x80000, BAD_DUMP CRC(9ae4d616) SHA1(60d4d36f75685dfe21f914fa4682cd6a64fcfa58) )  // base
-	ROM_LOAD32_WORD( "ghg101202.u12", 0x100002, 0x80000, BAD_DUMP CRC(2c50c083) SHA1(ae3b01200d152df9b2966b5308c71e9d1ad43d78) )  // base
-	ROM_LOAD32_WORD( "ghg101202.u9",  0x200000, 0x80000, BAD_DUMP CRC(c0a4920d) SHA1(d2c6d259d2e067b6e5ad72a6ef164aac7d72bc5a) )  // base
-	ROM_LOAD32_WORD( "ghg101202.u13", 0x200002, 0x80000, BAD_DUMP CRC(55716d82) SHA1(5b9982a49201842e9551a9c763a6babbb47a863e) )  // base
-	ROM_LOAD32_WORD( "ghg101202.u10", 0x300000, 0x80000, BAD_DUMP CRC(3ecdf7ee) SHA1(9d658a22da737daafdf6cb0d49009796036d04b1) )  // base
-	ROM_LOAD32_WORD( "ghg101202.u14", 0x300002, 0x80000, BAD_DUMP CRC(18934c51) SHA1(f7c9c95c687dbfe89747e7877157fde37bc1119e) )  // base
+	ROM_LOAD32_WORD( "ghg101202.u7",  0x000000, 0x80000, CRC(ea389201) SHA1(a838a9115ca3101cb06ec86e955294d51f8d65e4) )  // 92.767%
+	ROM_LOAD32_WORD( "ghg101202.u11", 0x000002, 0x80000, CRC(af6f2142) SHA1(200be993ad21643c46995d68a119fd8c1d2fedbe) )  // 92.767%
+	ROM_LOAD32_WORD( "ghg101202.u8",  0x100000, 0x80000, CRC(7b9c153e) SHA1(2144a208d2fd2f993e113d809045e864d89df7ec) )  // base
+	ROM_LOAD32_WORD( "ghg101202.u12", 0x100002, 0x80000, CRC(565ce1ca) SHA1(a9a64027d78f9ca7036b5b299040e1a7c776b617) )  // base
+	ROM_LOAD32_WORD( "ghg101202.u9",  0x200000, 0x80000, CRC(b60ea737) SHA1(847cdb4a6bf887a08dd525320aeffc74fcc10643) )  // base
+	ROM_LOAD32_WORD( "ghg101202.u13", 0x200002, 0x80000, CRC(55ddba7b) SHA1(3a43e577e8bc72aa1c09b131ec8b2a87eaeccf9f) )  // base
+	ROM_LOAD32_WORD( "ghg101202.u10", 0x300000, 0x80000, CRC(230725bc) SHA1(85320b1b72c7f83f57bc8cc861e5a6323750ff4f) )  // base
+	ROM_LOAD32_WORD( "ghg101202.u14", 0x300002, 0x80000, CRC(18934c51) SHA1(f7c9c95c687dbfe89747e7877157fde37bc1119e) )  // base
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
 	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
@@ -6954,6 +6953,7 @@ GAMEL( 2002, alchemst,  aristmk5, aristmk5,     goldenra, aristmk5_state, aristm
 GAMEL( 2000, bparty,    aristmk5, aristmk5_usa_touch, bootsctnua, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Bachelorette Party (BHG1248, US)",     MACHINE_FLAGS, layout_bparty )    // MV4119/1, B - 25/08/2000
 GAMEL( 1996, baddog,    aristmk5, aristmk5,     baddog,   aristmk5_state, aristmk5, ROT0, "Aristocrat", "Bad Dog Poker (0200428V, NSW/ACT)",            MACHINE_FLAGS, layout_baddog )    // 386/56, A - 17/12/96
 GAMEL( 1998, bootsctn,  aristmk5, aristmk5,     cashcham, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Boot Scootin' (0100812V, NSW/ACT)",            MACHINE_FLAGS, layout_cashcham )  // 616/1, B - 11/12/98, Rev 20
+GAMEL( 1999, bootsctnu, bootsctn, aristmk5_usa, aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Boot Scootin' (GHG1012-02, US)",           MACHINE_FLAGS, layout_aristmk5_us )  // MV4098, A - 25/08/99
 GAMEL( 1999, bootsctnua,bootsctn, aristmk5_usa, pengpuck, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Boot Scootin' (GHG1008-03, US)",               MACHINE_FLAGS, layout_aristmk5_us_200 ) // MV4098/1, A - 27/07/99
 GAMEL( 1996, bumblbug,  aristmk5, aristmk5,     swhr2,    aristmk5_state, aristmk5, ROT0, "Aristocrat", "Bumble Bugs (0200510V, NSW/ACT)",              MACHINE_FLAGS, layout_swhr2 )     // 593, D - 5/07/96, Rev 3
 GAMEL( 1996, bumblbugql,bumblbug, aristmk5,     swhr2,    aristmk5_state, aristmk5, ROT0, "Aristocrat", "Bumble Bugs (0200456V, Queensland)",           MACHINE_FLAGS, layout_swhr2 )     // 593, D - 5/07/96, Rev 1.0
@@ -7124,7 +7124,6 @@ GAMEL( 1999, sbuk2,     aristmk5, aristmk5,     sbuk2,        aristmk5_state, ar
 GAMEL( 2001, sldeluxe,  aristmk5, aristmk5_usa, bootsctnua,   aristmk5_state, aristmk5, ROT0, "Aristocrat", "Sweet Liberty Deluxe (AHG1575, US)",       MACHINE_FLAGS, layout_aristmk5_us_200 ) // MV4137, A - 11/02/01
 GAMEL( 2001, wcoyote,   aristmk5, aristmk5_usa, aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Wild Coyote (AHG1515, US)",                MACHINE_FLAGS, layout_aristmk5_us )  // MV4134, A - 30/07/01
 // the following clone sets are known bad dumps, and do not boot (confirmed)
-GAMEL( 1999, bootsctnu, bootsctn, aristmk5_usa, aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Boot Scootin' (GHG1012-02, US)",           MACHINE_FLAGS, layout_aristmk5_us )  // MV4098, A - 25/08/99
 GAMEL( 2000, bpartya,   bparty,   aristmk5_usa_touch, bootsctnua, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Bachelorette Party (BHG1579, US)",     MACHINE_FLAGS, layout_bparty )       // MV4119/1, B - 25/08/2000
 GAMEL( 1997, bumblbugu, bumblbug, aristmk5_usa, aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Bumble Bugs (CHG0479-03, US)",             MACHINE_FLAGS, layout_aristmk5_us )  // 593, D - 05/07/97
 GAMEL( 1996, cashchamu, cashcham, aristmk5_usa, aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Cash Chameleon (DHG4078-99, US)",          MACHINE_FLAGS, layout_aristmk5_us )  // 603(a), B - 06/12/96
