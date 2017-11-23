@@ -211,10 +211,9 @@ imagetek_i4100_device::imagetek_i4100_device(const machine_config &mconfig, devi
 	, m_blit_irq_cb(*this)
 	, m_support_8bpp( has_ext_tiles )
 	, m_support_16x16( has_ext_tiles )
+	, m_tilemap_scrolldx{0, 0, 0}
+	, m_tilemap_scrolldy{0, 0, 0}
 {
-	m_tilemap_scrolldx[0] = 0;
-	m_tilemap_scrolldx[1] = 0;
-	m_tilemap_scrolldx[2] = 0;
 }
 
 imagetek_i4100_device::imagetek_i4100_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -260,6 +259,14 @@ void imagetek_i4100_device::static_set_tmap_xoffsets(device_t &device, int x1, i
 	downcast<imagetek_i4100_device &>(device).m_tilemap_scrolldx[0] = x1;
 	downcast<imagetek_i4100_device &>(device).m_tilemap_scrolldx[1] = x2;
 	downcast<imagetek_i4100_device &>(device).m_tilemap_scrolldx[2] = x3;
+}
+
+
+void imagetek_i4100_device::static_set_tmap_yoffsets(device_t &device, int y1, int y2, int y3)
+{
+	downcast<imagetek_i4100_device &>(device).m_tilemap_scrolldy[0] = y1;
+	downcast<imagetek_i4100_device &>(device).m_tilemap_scrolldy[1] = y2;
+	downcast<imagetek_i4100_device &>(device).m_tilemap_scrolldy[2] = y3;
 }
 
 
@@ -1065,6 +1072,7 @@ void imagetek_i4100_device::draw_tilemap( screen_device &screen, bitmap_ind16 &b
 	int windowheight = height >> 3;
 
 	sx += m_tilemap_scrolldx[layer] * (m_screen_flip ? 1 : -1);
+	sy += m_tilemap_scrolldy[layer] * (m_screen_flip ? 1 : -1);
 
 	for (y = 0; y < scrheight; y++)
 	{
