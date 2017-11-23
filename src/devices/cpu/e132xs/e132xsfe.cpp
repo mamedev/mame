@@ -10,6 +10,7 @@
 
 #include "emu.h"
 #include "e132xsfe.h"
+#include "32xsdefs.h"
 
 #define FE_FP ((m_cpu->m_global_regs[1] & 0xfe000000) >> 25)
 #define FE_FL (m_cpu->m_fl_lut[((m_cpu->m_global_regs[1] >> 21) & 0xf)])
@@ -69,6 +70,30 @@ inline uint32_t e132xs_frontend::read_ldstxx_imm(opcode_desc &desc)
 	return extra_s;
 }
 
+inline uint32_t e132xs_frontend::read_limm(opcode_desc &desc, uint16_t op)
+{
+	static const int32_t immediate_values[16] =
+	{
+		16, 0, 0, 0, 32, 64, 128, int32_t(0x80000000),
+		-8, -7, -6, -5, -4, -3, -2, -1
+	};
+
+	uint8_t nybble = op & 0xf;
+	switch (nybble)
+	{
+		case 0:
+			return 16;
+		case 1:
+			return (read_imm1(desc) << 16) | read_imm2(desc);
+		case 2:
+			return read_imm1(desc);
+		case 3:
+			return 0xffff0000 | read_imm1(desc);
+		default:
+			return immediate_values[nybble];
+	}
+}
+
 inline int32_t e132xs_frontend::decode_pcrel(opcode_desc &desc, uint16_t op)
 {
 	if (op & 0x80)
@@ -119,7 +144,7 @@ inline int32_t e132xs_frontend::decode_call(opcode_desc &desc)
 
 bool e132xs_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 {
-	uint16_t op = read_word(desc);
+	uint16_t op = desc.opptr.w[0] = read_word(desc);
 
 	/* most instructions are 2 bytes and a single cycle */
 	desc.length = 2;
@@ -326,6 +351,7 @@ bool e132xs_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			desc.regout[0] |= 1 << gdst_code;
 			desc.regout[0] |= SR_CODE;
 			desc.length = (read_imm1(desc) & 0x8000) ? 6 : 4;
+			if (op & 0x4 && gsrc_code != SR_REGISTER) desc.flags |= OPFLAG_CAN_CAUSE_EXCEPTION;
 			break;
 		case 0x19: // sum global,local
 		case 0x1d: // sums global,local
@@ -334,6 +360,7 @@ bool e132xs_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			desc.regout[0] |= 1 << gdst_code;
 			desc.regout[0] |= SR_CODE;
 			desc.length = (read_imm1(desc) & 0x8000) ? 6 : 4;
+			if (op & 0x4) desc.flags |= OPFLAG_CAN_CAUSE_EXCEPTION;
 			break;
 		case 0x1a: // sum local,global
 		case 0x1e: // sums local,global
@@ -342,6 +369,7 @@ bool e132xs_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			desc.regout[ldst_group] |= 1 << ldst_code;
 			desc.regout[0] |= SR_CODE;
 			desc.length = (read_imm1(desc) & 0x8000) ? 6 : 4;
+			if (op & 0x4 && gsrc_code != SR_REGISTER) desc.flags |= OPFLAG_CAN_CAUSE_EXCEPTION;
 			break;
 		case 0x1b: // sum local,local
 		case 0x1f: // sums local,local
@@ -350,6 +378,7 @@ bool e132xs_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			desc.regout[ldst_group] |= 1 << ldst_code;
 			desc.regout[0] |= SR_CODE;
 			desc.length = (read_imm1(desc) & 0x8000) ? 6 : 4;
+			if (op & 0x4) desc.flags |= OPFLAG_CAN_CAUSE_EXCEPTION;
 			break;
 		case 0x20: // cmp global,global
 		case 0x30: // cmpb global,global
@@ -384,12 +413,14 @@ bool e132xs_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			desc.regin[0] |= 1 << (gsrc_code + 16);
 			desc.regout[0] |= 1 << gdst_code;
 			desc.regout[0] |= SR_CODE;
+			desc.flags |= OPFLAG_CAN_CAUSE_EXCEPTION;
 			break;
 		case 0x25: // mov global,local
 			desc.regin[0] |= SR_CODE;
 			desc.regin[lsrc_group] |= 1 << lsrc_code;
 			desc.regout[0] |= 1 << gdst_code;
 			desc.regout[0] |= SR_CODE;
+			desc.flags |= OPFLAG_CAN_CAUSE_EXCEPTION;
 			break;
 		case 0x26: // mov local,global
 			desc.regin[0] |= SR_CODE;
@@ -549,24 +580,28 @@ bool e132xs_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			desc.regin[0] |= 1 << gsrc_code;
 			desc.regout[0] |= 1 << gdst_code;
 			desc.regout[0] |= SR_CODE;
+			desc.flags |= OPFLAG_CAN_CAUSE_EXCEPTION;
 			break;
 		case 0x5d: // negs global,local
 			desc.regin[0] |= SR_CODE;
 			desc.regin[lsrc_group] |= 1 << lsrc_code;
 			desc.regout[0] |= 1 << gdst_code;
 			desc.regout[0] |= SR_CODE;
+			desc.flags |= OPFLAG_CAN_CAUSE_EXCEPTION;
 			break;
 		case 0x5e: // negs local,global
 			desc.regin[0] |= SR_CODE;
 			desc.regin[0] |= 1 << gsrc_code;
 			desc.regout[ldst_group] |= 1 << ldst_code;
 			desc.regout[0] |= SR_CODE;
+			desc.flags |= OPFLAG_CAN_CAUSE_EXCEPTION;
 			break;
 		case 0x5f: // negs local,local
 			desc.regin[0] |= SR_CODE;
 			desc.regin[lsrc_group] |= 1 << lsrc_code;
 			desc.regout[ldst_group] |= 1 << ldst_code;
 			desc.regout[0] |= SR_CODE;
+			desc.flags |= OPFLAG_CAN_CAUSE_EXCEPTION;
 			break;
 		case 0x60: // cmpi global,simm
 		case 0x70: // cmpbi global,simm
@@ -597,6 +632,12 @@ bool e132xs_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			desc.regout[0] |= 1 << gdst_code;
 			desc.regout[0] |= 1 << (gdst_code + 16);
 			desc.regout[0] |= SR_CODE;
+			desc.flags |= OPFLAG_CAN_CAUSE_EXCEPTION;
+			if (gdst_code == PC_REGISTER)
+			{
+				desc.targetpc = op & 0xf;
+				desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
+			}
 			break;
 		case 0x65: // movi global,limm
 			desc.regin[0] |= SR_CODE;
@@ -604,6 +645,12 @@ bool e132xs_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			desc.regout[0] |= 1 << (gdst_code + 16);
 			desc.regout[0] |= SR_CODE;
 			desc.length = (read_imm1(desc) & 0x8000) ? 6 : 4;
+			desc.flags |= OPFLAG_CAN_CAUSE_EXCEPTION;
+			if (gdst_code == PC_REGISTER)
+			{
+				desc.targetpc = read_limm(desc, op);
+				desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
+			}
 			break;
 		case 0x66: // movi local,simm
 			desc.regin[0] |= SR_CODE;

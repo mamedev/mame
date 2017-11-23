@@ -23,6 +23,7 @@ private:
 	inline uint16_t read_imm1(opcode_desc &desc);
 	inline uint16_t read_imm2(opcode_desc &desc);
 	inline uint32_t read_ldstxx_imm(opcode_desc &desc);
+	inline uint32_t read_limm(opcode_desc &desc, uint16_t op);
 	inline int32_t decode_pcrel(opcode_desc &desc, uint16_t op);
 	inline int32_t decode_call(opcode_desc &desc);
 

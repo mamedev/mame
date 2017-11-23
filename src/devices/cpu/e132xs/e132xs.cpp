@@ -661,10 +661,8 @@ void hyperstone_device::set_global_register(uint8_t code, uint32_t val)
 #define SIGN_BIT(val)           ((val & 0x80000000) >> 31)
 #define SIGN_TO_N(val)          ((val & 0x80000000) >> 29)
 
-static constexpr int32_t immediate_values[32] =
+/*static*/ const int32_t hyperstone_device::s_immediate_values[16] =
 {
-	0, 1, 2, 3, 4, 5, 6, 7,
-	8, 9, 10, 11, 12, 13, 14, 15,
 	16, 0, 0, 0, 32, 64, 128, int32_t(0x80000000),
 	-8, -7, -6, -5, -4, -3, -2, -1
 };
@@ -678,7 +676,7 @@ do                                                                              
 	if (m_delay_slot)                                                               \
 	{                                                                               \
 		PC = m_delay_pc;                                                            \
-		m_delay_slot = false;                                                       \
+		m_delay_slot = 0;                                                       	\
 	}                                                                               \
 } while (0)
 
@@ -697,8 +695,7 @@ uint32_t hyperstone_device::decode_immediate_s()
 	switch (nybble)
 	{
 		case 0:
-		default:
-			return immediate_values[0x10 + nybble];
+			return 16;
 		case 1:
 		{
 			m_instruction_length = (3<<19);
@@ -720,6 +717,8 @@ uint32_t hyperstone_device::decode_immediate_s()
 			PC += 2;
 			return extra_u;
 		}
+		default:
+			return s_immediate_values[nybble];
 	}
 }
 
@@ -791,7 +790,7 @@ void hyperstone_device::ignore_pcrel()
 	}
 }
 
-void hyperstone_device::execute_br()
+void hyperstone_device::hyperstone_br()
 {
 	const int32_t offset = decode_pcrel();
 	check_delay_PC();
@@ -1029,7 +1028,7 @@ void hyperstone_device::device_start()
 
 void hyperstone_device::init(int scale_mask)
 {
-	m_enable_drc = false;//allow_drc();
+	m_enable_drc = allow_drc();
 
 	memset(m_global_regs, 0, sizeof(uint32_t) * 32);
 	memset(m_local_regs, 0, sizeof(uint32_t) * 64);
@@ -1584,7 +1583,7 @@ void hyperstone_device::execute_run()
 
 		m_instruction_length = (1<<19);
 
-		switch ((OP >> 8) & 0x00ff)
+		switch (m_op >> 8)
 		{
 			case 0x00: hyperstone_chk<GLOBAL, GLOBAL>(); break;
 			case 0x01: hyperstone_chk<GLOBAL, LOCAL>(); break;
@@ -1798,8 +1797,8 @@ void hyperstone_device::execute_run()
 			case 0xd1: hyperstone_ldwr<LOCAL>(); break;
 			case 0xd2: hyperstone_lddr<GLOBAL>(); break;
 			case 0xd3: hyperstone_lddr<LOCAL>(); break;
-			case 0xd4: hypesrtone_ldwp<GLOBAL>(); break;
-			case 0xd5: hypesrtone_ldwp<LOCAL>(); break;
+			case 0xd4: hyperstone_ldwp<GLOBAL>(); break;
+			case 0xd5: hyperstone_ldwp<LOCAL>(); break;
 			case 0xd6: hyperstone_lddp<GLOBAL>(); break;
 			case 0xd7: hyperstone_lddp<LOCAL>(); break;
 			case 0xd8: hyperstone_stwr<GLOBAL>(); break;
@@ -1838,7 +1837,7 @@ void hyperstone_device::execute_run()
 			case 0xf9: hyperstone_b<COND_N,  IS_CLEAR>(); break;
 			case 0xfa: hyperstone_b<COND_NZ, IS_SET>(); break;
 			case 0xfb: hyperstone_b<COND_NZ, IS_CLEAR>(); break;
-			case 0xfc: execute_br(); break;
+			case 0xfc: hyperstone_br(); break;
 			case 0xfd: hyperstone_trap(); break;
 			case 0xfe: hyperstone_trap(); break;
 			case 0xff: hyperstone_trap(); break;

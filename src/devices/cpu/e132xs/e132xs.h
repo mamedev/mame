@@ -64,6 +64,7 @@ class hyperstone_device : public cpu_device
 
 public:
 	inline void ccfunc_unimplemented();
+	inline void ccfunc_print();
 
 protected:
 	enum
@@ -165,6 +166,8 @@ protected:
 	enum
 	{
 		EXCEPTION_INTERRUPT = 0,
+		EXCEPTION_PRIVILEGE_ERROR,
+		EXCEPTION_TRACE,
 		EXCEPTION_COUNT
 	};
 
@@ -225,7 +228,7 @@ protected:
 	emu_timer *m_timer;
 
 	uint32_t m_delay_pc;
-	bool m_delay_slot;
+	uint32_t m_delay_slot;
 
 	uint32_t m_opcodexor;
 
@@ -236,6 +239,7 @@ protected:
 	int     m_icount;
 
 	uint8_t m_fl_lut[16];
+	static const int32_t s_immediate_values[16];
 
 	uint32_t get_trap_addr(uint8_t trapno);
 
@@ -256,15 +260,17 @@ private:
 
 	TIMER_CALLBACK_MEMBER(timer_callback);
 
-	void execute_br();
+	uint32_t decode_const();
+	uint32_t decode_immediate_s();
+	void ignore_immediate_s();
+	int32_t decode_pcrel();
+	void ignore_pcrel();
+
+	void hyperstone_br();
 	void execute_trap(uint32_t addr);
 	void execute_int(uint32_t addr);
 	void execute_exception(uint32_t addr);
 	void execute_software();
-
-	void ignore_immediate_s();
-	uint32_t decode_immediate_s();
-	uint32_t decode_const();
 
 	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void hyperstone_chk();
 	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void hyperstone_movd();
@@ -323,7 +329,7 @@ private:
 
 	template <reg_bank SRC_GLOBAL> void hyperstone_ldwr();
 	template <reg_bank SRC_GLOBAL> void hyperstone_lddr();
-	template <reg_bank SRC_GLOBAL> void hypesrtone_ldwp();
+	template <reg_bank SRC_GLOBAL> void hyperstone_ldwp();
 	template <reg_bank SRC_GLOBAL> void hyperstone_lddp();
 
 	template <reg_bank SRC_GLOBAL> void hyperstone_stwr();
@@ -345,9 +351,6 @@ private:
 	void hyperstone_reserved();
 	void hyperstone_do();
 
-	int32_t decode_pcrel();
-	void ignore_pcrel();
-
 	drc_cache m_cache;
 	std::unique_ptr<drcuml_state> m_drcuml;
 	std::unique_ptr<e132xs_frontend> m_drcfe;
@@ -364,6 +367,7 @@ private:
 	uint32_t m_drc_arg1;
 	uint32_t m_drc_arg2;
 	uint32_t m_drc_arg3;
+	uint32_t m_branch_dest;
 
 	uml::code_handle *m_mem_read8;
 	uml::code_handle *m_mem_write8;
@@ -394,139 +398,109 @@ private:
 	void static_generate_entry_point();
 	void static_generate_nocode_handler();
 	void static_generate_out_of_cycles();
-	void static_generate_exception(uint8_t exception, const char *name);
+	void static_generate_exception(uint32_t exception, const char *name);
 	void static_generate_memory_accessor(int size, int iswrite, bool isio, const char *name, uml::code_handle *&handleptr);
-	void generate_update_cycles(drcuml_block *block, compiler_state *compiler, uml::parameter param, bool allow_exception);
+	void generate_delay_slot_and_branch(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	void generate_update_cycles(drcuml_block *block, compiler_state *compiler, uml::parameter param);
 	void generate_checksum_block(drcuml_block *block, compiler_state *compiler, const opcode_desc *seqhead, const opcode_desc *seqlast);
 	void generate_sequence_instruction(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
 	void log_add_disasm_comment(drcuml_block *block, uint32_t pc, uint32_t op);
 	bool generate_opcode(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
 
-	void generate_op00(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_op01(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_op02(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_op03(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_op04(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_op05(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_op06(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_op07(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_op08(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_op09(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_op0a(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_op0b(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_op0c(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_op0d(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_op0e(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_op0f(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_op10(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_op11(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_op12(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_op13(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_op14(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_op15(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_op16(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_op17(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_op18(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_op19(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_op1a(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_op1b(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_op1c(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_op1d(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_op1e(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_op1f(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_op20(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_op21(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_op22(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_op23(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_op24(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_op25(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_op26(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_op27(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_op28(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_op29(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_op2a(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_op2b(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_op2c(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_op2d(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_op2e(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_op2f(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_op30(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_op31(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_op32(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_op33(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_op34(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_op35(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_op36(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_op37(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_op38(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_op39(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_op3a(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_op3b(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_op3c(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_op3d(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_op3e(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_op3f(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_op40(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_op41(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_op42(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_op43(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_op44(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_op45(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_op46(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_op47(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_op48(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_op49(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_op4a(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_op4b(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_op4c(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_op4d(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_op4e(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_op4f(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_op50(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_op51(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_op52(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_op53(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_op54(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_op55(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_op56(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_op57(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_op58(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_op59(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_op5a(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_op5b(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_op5c(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_op5d(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_op5e(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_op5f(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_op60(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_op61(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_op62(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_op63(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_op64(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_op65(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_op66(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_op67(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_op68(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_op69(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_op6a(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_op6b(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_op6c(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_op6d(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_op6e(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_op6f(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_op70(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_op71(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_op72(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_op73(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_op74(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_op75(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_op76(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_op77(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_op78(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_op79(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_op7a(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_op7b(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_op7c(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_op7d(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_op7e(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_op7f(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_op80(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_op81(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_op82(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_op83(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_op84(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_op85(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_op86(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_op87(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_op88(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_op89(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_op8a(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_op8b(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_op8e(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_op8f(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_op90(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_op91(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_op92(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_op93(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_op94(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_op95(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_op96(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_op97(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_op98(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_op99(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_op9a(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_op9b(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_op9c(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_op9d(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_op9e(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_op9f(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_opa0(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_opa1(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_opa2(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_opa3(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_opa4(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_opa5(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_opa6(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_opa7(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_opa8(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_opa9(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_opaa(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_opab(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_opb0(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_opb1(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_opb2(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_opb3(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_opb4(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_opb5(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_opb6(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_opb7(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_opb8(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_opb9(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_opba(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_opbb(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_opbc(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_opbd(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_opbe(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_opbf(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_opc0(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_opc1(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_opc2(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_opc3(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_opc4(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_opc5(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_opc6(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_opc7(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_opc8(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_opc9(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_opca(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_opcb(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_opcc(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_opcd(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_opce(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_opcf(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_opd0(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_opd1(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_opd2(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_opd3(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_opd4(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_opd5(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_opd6(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_opd7(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_opd8(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_opd9(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_opda(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_opdb(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_opdc(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_opdd(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_opde(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_opdf(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_ope0(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_ope1(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_ope2(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_ope3(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_ope4(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_ope5(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_ope6(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_ope7(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_ope8(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_ope9(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_opea(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_opeb(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_opec(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_oped(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_opee(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_opef(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_opf0(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_opf1(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_opf2(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_opf3(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_opf4(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_opf5(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_opf6(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_opf7(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_opf8(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_opf9(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_opfa(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_opfb(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_opfc(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_opfd(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_opfe(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);	void generate_opff(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	int generate_get_trap_addr(drcuml_block *block, int label, uint32_t trapno);
+	void generate_check_delay_pc(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	void generate_decode_const(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	int generate_decode_immediate_s(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	void generate_ignore_immediate_s(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	void generate_decode_pcrel(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	void generate_ignore_pcrel(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+
+	int generate_set_global_register(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, int label);
+
+	void generate_trap(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint32_t addr);
+	void generate_int(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint32_t addr);
+	void generate_exception(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint32_t addr);
+	void generate_software(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void generate_chk(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void generate_movd(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL, sign_mode SIGNED> void generate_divsu(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void generate_xm(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void generate_mask(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void generate_sum(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void generate_sums(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void generate_cmp(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void generate_mov(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void generate_add(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void generate_adds(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void generate_cmpb(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void generate_subc(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void generate_sub(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void generate_subs(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void generate_addc(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void generate_neg(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void generate_negs(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void generate_and(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void generate_andn(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void generate_or(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void generate_xor(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void generate_not(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	template <reg_bank DST_GLOBAL, imm_size IMM_LONG> void generate_cmpi(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	template <reg_bank DST_GLOBAL, imm_size IMM_LONG> int generate_movi(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	template <reg_bank DST_GLOBAL, imm_size IMM_LONG> void generate_addi(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	template <reg_bank DST_GLOBAL, imm_size IMM_LONG> void generate_addsi(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	template <reg_bank DST_GLOBAL, imm_size IMM_LONG> void generate_cmpbi(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	template <reg_bank DST_GLOBAL, imm_size IMM_LONG> void generate_andni(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	template <reg_bank DST_GLOBAL, imm_size IMM_LONG> void generate_ori(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	template <reg_bank DST_GLOBAL, imm_size IMM_LONG> void generate_xori(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	template <shift_type HI_N> void generate_shrdi(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	void generate_shrd(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	void generate_shr(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	template <shift_type HI_N, reg_bank DST_GLOBAL> void generate_shri(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	template <shift_type HI_N> void generate_sardi(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	void generate_sard(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	void generate_sar(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	template <shift_type HI_N, reg_bank DST_GLOBAL> void generate_sari(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	template <shift_type HI_N> void generate_shldi(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	void generate_shld(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	void generate_shl(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	template <shift_type HI_N, reg_bank DST_GLOBAL> void generate_shli(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	void generate_testlz(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	void generate_rol(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void generate_ldxx1(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void generate_ldxx2(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void generate_stxx1(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void generate_stxx2(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL, sign_mode SIGNED> void generate_mulsu(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void generate_mul(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+
+	template <shift_type HI_N, reg_bank DST_GLOBAL> void generate_set(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+
+	template <reg_bank SRC_GLOBAL> void generate_ldwr(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	template <reg_bank SRC_GLOBAL> void generate_lddr(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	template <reg_bank SRC_GLOBAL> void generate_ldwp(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	template <reg_bank SRC_GLOBAL> void generate_lddp(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+
+	template <reg_bank SRC_GLOBAL> void generate_stwr(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	template <reg_bank SRC_GLOBAL> void generate_stdr(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	template <reg_bank SRC_GLOBAL> void generate_stwp(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	template <reg_bank SRC_GLOBAL> void generate_stdp(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+
+	template <branch_condition CONDITION, condition_set COND_SET> void generate_b(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	void generate_br(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	template <branch_condition CONDITION, condition_set COND_SET> void generate_db(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	void generate_dbr(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+
+	void generate_frame(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	void generate_call_global(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	void generate_call_local(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+
+	void generate_trap_op(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	void generate_extend(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+
+	void generate_reserved(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	void generate_do(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
 };
 
 // device type definition
