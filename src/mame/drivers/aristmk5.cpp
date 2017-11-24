@@ -6446,16 +6446,15 @@ ROM_START( trpdlghtu )
 	    Checksum code found at 0x000d08
 	    0x000000-0x0b2d1f is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
 	        Expected Checksum   0x910fae87
-	        Calculated Checksum 0x2485ae87  (BAD)
+	        Calculated Checksum 0x910fae87  (OK)
 	    0x0b2d20-0x15384f is the non-Checksummed range still containing data but NOT covered by Checksum
 	    0x0b2d20-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
-	// the checksum only covers part of the first 2 roms, marked all as BAD_DUMP because it can't be trusted without a full redump.
-	ROM_LOAD32_WORD( "phg062502.u7",  0x000000, 0x80000, BAD_DUMP CRC(3d06765f) SHA1(737d714e4ec48eb6283489f745dd305e7d70dad2) )  // 92.25%
-	ROM_LOAD32_WORD( "phg062502.u11", 0x000002, 0x80000, BAD_DUMP CRC(3963a3de) SHA1(fc2b06af3d1eba87407425dc4296a8b602952775) )  // 92.25%
-	ROM_LOAD32_WORD( "phg062502.u8",  0x100000, 0x80000, BAD_DUMP CRC(d4858407) SHA1(acf6776f19448648a26aaf53fcb4bc227c546033) )  // base
-	ROM_LOAD32_WORD( "phg062502.u12", 0x100002, 0x80000, BAD_DUMP CRC(852e433e) SHA1(17ec568edbabe3ee8649b26f4c5d0f501494f823) )  // base
+	ROM_LOAD32_WORD( "phg062502.u7",  0x000000, 0x80000, CRC(fe556566) SHA1(fe8c6d699d08577691c766477530abf5cddccf6c) )  // 92.25%
+	ROM_LOAD32_WORD( "phg062502.u11", 0x000002, 0x80000, CRC(67e77c32) SHA1(178e6bbe2bb8b55afbe97177920b5f3c4a989adf) )  // 92.25%
+	ROM_LOAD32_WORD( "phg062502.u8",  0x100000, 0x80000, CRC(d4858407) SHA1(acf6776f19448648a26aaf53fcb4bc227c546033) )  // base
+	ROM_LOAD32_WORD( "phg062502.u12", 0x100002, 0x80000, CRC(0190804b) SHA1(7acb29fb7f77e78bb2afeb74d341475cd089dafb) )  // base
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
 	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
@@ -7094,6 +7093,7 @@ GAMEL( 2000, trstrove,  aristmk5, aristmk5,     trstrove, aristmk5_state, aristm
 GAMEL( 2002, tritreat,  aristmk5, aristmk5,     trstrove, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Triple Treat (0201692V, NSW/ACT)",             MACHINE_FLAGS, layout_trstrove )  // 692, A - 17/05/02, Rev 25
 GAMEL( 2001, trojhors,  aristmk5, aristmk5,     goldenra, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Trojan Horse (01J00851, NSW/ACT)",             MACHINE_FLAGS, layout_marmagic )  // JB001/5, A - 30/10/01, Rev 17
 GAMEL( 1996, trpdlght,  aristmk5, aristmk5,     swhr2,    aristmk5_state, aristmk5, ROT0, "Aristocrat", "Tropical Delight (0100269V, NSW/ACT)",         MACHINE_FLAGS, layout_swhr2 )     // 577/3, B - 15/05/96, Rev 1.22.2.0
+GAMEL( 1997, trpdlghtu, trpdlght, aristmk5_usa, aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Tropical Delight (PHG0625-02, US)",        MACHINE_FLAGS, layout_aristmk5_us )  // 577/3, D - 24/09/97
 GAMEL( 1998, unicornd,  aristmk5, aristmk5,     aristmk5, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Unicorn Dreaming (0100791V, NSW/ACT)",         MACHINE_FLAGS, layout_aristmk5 )  // 631/1 A, A - 31/08/98, Rev 12
 GAMEL( 1998, unicornda, unicornd, aristmk5,     aristmk5_9, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Unicorn Dreaming (0100813V, NSW/ACT)",       MACHINE_FLAGS, layout_dolphntrb ) // 631 A, A - 02/09/98, Rev 14
 GAMEL( 2000, unicorndnz,unicornd, aristmk5,     unicorndnz, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Unicorn Dreaming (0101228V, New Zealand)",   MACHINE_FLAGS, layout_aristmk5 )  // MV4113/1, A - 05/04/2000, Rev 27
@@ -7135,6 +7135,5 @@ GAMEL( 2001, partygrsb, partygrs, aristmk5_usa_touch, bootsctnua, aristmk5_state
 GAMEL( 1995, pengpayd,  pengpay,  aristmk5,     wcougar,      aristmk5_state, aristmk5, ROT0, "Aristocrat", "Penguin Pays (0300113V, NSW/ACT)",         MACHINE_FLAGS, layout_wcougar )      // 586, A - 12/10/95, Rev 4
 GAMEL( 1998, petshopa,  petshop,  aristmk5,     snowcat,      aristmk5_state, aristmk5, ROT0, "Aristocrat", "Pet Shop (0100679V, NSW/ACT)",             MACHINE_FLAGS, layout_snowcat )      // 618, A - 09/03/98, Rev 10
 GAMEL( 1995, sbuk2a,    sbuk2,    aristmk5,     sbuk2,        aristmk5_state, aristmk5, ROT0, "Aristocrat", "Super Bucks II (0300006V, NSW/ACT)",       MACHINE_FLAGS, layout_sbuk2 )        // no data due to missing ROMs
-GAMEL( 1997, trpdlghtu, trpdlght, aristmk5_usa, aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Tropical Delight (PHG0625-02, US)",        MACHINE_FLAGS, layout_aristmk5_us )  // 577/3, D - 24/09/97
 GAMEL( 2001, unicorndu, unicornd, aristmk5_usa, bootsctnua,   aristmk5_state, aristmk5, ROT0, "Aristocrat", "Unicorn Dreaming (BHG1584, US)",           MACHINE_FLAGS, layout_aristmk5_us_200 ) // MV4130/1, C - 10/17/01
 GAMEL( 2000, wthinga,   wthing,   aristmk5,     aristmk5,     aristmk5_state, aristmk5, ROT0, "Aristocrat", "Wild Thing (0201176V, NSW/ACT)",           MACHINE_FLAGS, layout_aristmk5 )     // 608/5, B - 25/02/00, Rev 11
