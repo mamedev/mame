@@ -2314,6 +2314,7 @@ ROM_END
 // Bachelorette Party / Export / B - 25/08/2000
 // ROM says "9 Line Multiline" but this is a 20 line game, it cannot be set to 9 lines at all
 // Touchscreen game
+// Game requires set chip version: 4.01.xx
 ROM_START( bparty )
 	ARISTOCRAT_MK5_BIOS
 	/*
