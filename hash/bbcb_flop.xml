@@ -2982,6 +2982,18 @@
 		</part>
 	</software>
 
+	<software name="beebsid18">
+		<description>BeebSID 18 - Club Hits</description>
+		<year>2017</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="author" value="PitfallJones" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="107520">
+				<rom name="beebsid18.ssd" size="107520" crc="f332ef9f" sha1="6a9946ad960b07758490d7b23b7a6453b27d8baa" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sidquiz">
 		<description>Beeb SID Quiz</description>
 		<year>2010</year>
