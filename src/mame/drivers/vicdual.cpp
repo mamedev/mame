@@ -1997,13 +1997,13 @@ static INPUT_PORTS_START( alphaho )
 INPUT_PORTS_END
 
 
-// there is a dip switch with 8 switches on the board, where do they map? only one seems to be used
+// there is a dip switch with 8 switches on the board, but only switch a is used
 static INPUT_PORTS_START( headonn )
 	PORT_START("IN0")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)    PORT_4WAY PORT_COCKTAIL
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON1)                  PORT_COCKTAIL
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_DIPNAME(0x08, 0x00, DEF_STR(Lives))
+	PORT_DIPNAME(0x08, 0x00, DEF_STR(Lives))          PORT_DIPLOCATION("DSW:1")
 	PORT_DIPSETTING(   0x00, "3")
 	PORT_DIPSETTING(   0x08, "4")
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)  PORT_4WAY
