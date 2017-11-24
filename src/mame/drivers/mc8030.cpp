@@ -14,14 +14,12 @@ mc8030: very little info available. The area from FFD8-FFFF is meant for
 interrupt vectors and so on, but most of it is zeroes. Appears the keyboard
 is an ascii keyboard with built-in beeper. It communicates via the SIO.
 The asp ctc needs at least 2 triggers. The purpose of the zve pio is unknown.
-The system uses interrupts for various things, but none of that is working.
-
-Looks like maybe a sio bug is preventing the keyboard from working.
 
 ****************************************************************************/
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "cpu/z80/z80daisy.h"
 #include "screen.h"
 #include "machine/clock.h"
 #include "bus/rs232/rs232.h"
@@ -231,6 +229,7 @@ static MACHINE_CONFIG_START( mc8030 )
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("asp_sio", z80sio_device, rxca_w))
 
 	MCFG_DEVICE_ADD("asp_sio", Z80SIO, 4800)
+	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	// SIO CH A in = keyboard; out = beeper; CH B = IFSS (??)
 	MCFG_Z80SIO_OUT_TXDA_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
 	MCFG_Z80SIO_OUT_DTRA_CB(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
