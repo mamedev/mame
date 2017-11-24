@@ -50,7 +50,7 @@ Video: AT&T 6300/Olivetti M24 driver compatible "Super CGA" with a 640x400 red/a
 Mass storage: One 1.2MB floppy disk drive, no/20MB/40MB hard disk
 On board: Serial, Parallel, RTC, RGBI (external Monitor), keyboard
 Options: 80827, Expansion box with 2 ISA slots, 300/1200Baud internal Modem, Compaq EGA Board
-To-Do: Emulate Graphics card fully
+To-Do: Emulate Graphics card
 
 ***************************************************************************/
 
@@ -331,6 +331,17 @@ MACHINE_START_MEMBER(at_state,vrom_fix)
 static SLOT_INTERFACE_START( pci_devices )
 	SLOT_INTERFACE_INTERNAL("vt82c505", VT82C505)
 SLOT_INTERFACE_END
+
+static MACHINE_CONFIG_START( cfg_single_1200K )
+	MCFG_DEVICE_MODIFY("fdc:0")
+	MCFG_SLOT_DEFAULT_OPTION("525hd")
+	MCFG_DEVICE_MODIFY("fdc:1")
+	MCFG_SLOT_DEFAULT_OPTION("")
+MACHINE_CONFIG_END
+
+//**************************************************************************
+//  MACHINE CONFIGURATIONS
+//**************************************************************************
 
 static MACHINE_CONFIG_START( ibm5170 )
 	/* basic machine hardware */
@@ -657,17 +668,36 @@ static MACHINE_CONFIG_START( ficpio2 )
 	MCFG_VT82C496_REGION("isa")
 MACHINE_CONFIG_END
 
-// Compaq Portable III
-static MACHINE_CONFIG_DERIVED( comportiii, ibm5170 )
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(XTAL_48MHz / 4) 
-	MCFG_DEVICE_MODIFY(RAM_TAG)
+
+// Compaq Portable III - approximating a configuration with the two-slot expansion box
+static MACHINE_CONFIG_START( comportiii ) 
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", I80286, XTAL_48MHz/4 /*12000000*/)
+	MCFG_CPU_PROGRAM_MAP(at16_map)
+	MCFG_CPU_IO_MAP(at16_io)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259_master", pic8259_device, inta_cb)
+	MCFG_80286_SHUTDOWN(DEVWRITELINE("mb", at_mb_device, shutdown))
+
+	MCFG_DEVICE_ADD("mb", AT_MB, 0)
+	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	MCFG_FRAGMENT_ADD(at_softlists)
+	
+	// on board devices
+	MCFG_ISA16_SLOT_ADD("mb:isabus","board1", pc_isa16_cards, "fdc", false)
+	MCFG_SLOT_OPTION_MACHINE_CONFIG("fdc", cfg_single_1200K)
+	MCFG_ISA16_SLOT_ADD("mb:isabus","board2", pc_isa16_cards, "comat", false)
+	MCFG_ISA16_SLOT_ADD("mb:isabus","board3", pc_isa16_cards, "hdc", false)
+	// ISA cards
+	MCFG_ISA16_SLOT_ADD("mb:isabus","isa1", pc_isa16_cards, "cga", false) // AT&T PC 6300/Olivetti M24 graphics mode needs to be emulated and moved on board, Windows 3.0 & 3.1 have drivers for Compaq Portables
+	MCFG_ISA16_SLOT_ADD("mb:isabus","isa2", pc_isa16_cards, nullptr, false)
+	MCFG_ISA16_SLOT_ADD("mb:isabus","isa3", pc_isa16_cards, nullptr, false)	
+	
+	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_at_keyboards, STR_KBD_IBM_PC_AT_84)
+
+	/* internal ram */
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("640K")
 	MCFG_RAM_EXTRA_OPTIONS("1152K,1664K,2176K,2688K,4736K,6784K")
-	MCFG_DEVICE_MODIFY("isa1")
-	MCFG_DEVICE_SLOT_INTERFACE(pc_isa8_cards, "cga_m24", false)
-	MCFG_DEVICE_MODIFY("isa4")
-	MCFG_DEVICE_SLOT_INTERFACE(pc_isa16_cards, "hdc", false) 
 MACHINE_CONFIG_END
 
 //**************************************************************************
@@ -1293,5 +1323,5 @@ COMP ( 1985, k286i,     ibm5170, 0,       k286i,     0,    at_state,      at,   
 COMP ( 1991, t2000sx,   ibm5170, 0,       at386sx,   0,    at_state,      at,      "Toshiba",  "T2000SX", MACHINE_NOT_WORKING )
 COMP ( 199?, mbc28,     ibm5170, 0,       at386sx,   0,    at_state,      at,      "Sanyo",  "MBC-28", MACHINE_NOT_WORKING )
 COMP ( 1986, pcd2,      ibm5170, 0,       ibm5170,   0,    at_state,      at,      "Siemens",  "PCD-2", MACHINE_NOT_WORKING )
-COMP ( 1987, comportiii,ibm5170, 0,       comportiii,0,    at_state,      at,      "Compaq",   "Portable III", MACHINE_NOT_WORKING )
+COMP ( 1987, comportiii,0,		 0,       comportiii,0,    at_state,      at,      "Compaq",   "Portable III", MACHINE_NOT_WORKING )
 
