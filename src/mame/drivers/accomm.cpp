@@ -15,6 +15,10 @@
 #include "emu.h"
 #include "cpu/g65816/g65816.h"
 #include "machine/6522via.h"
+#include "machine/6850acia.h"
+#include "machine/clock.h"
+#include "machine/mc6854.h"
+#include "machine/ram.h"
 #include "machine/nvram.h"
 #include "machine/bankdev.h"
 #include "sound/beep.h"
@@ -70,12 +74,16 @@ public:
 	accomm_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
-			m_bank0dev(*this, "bank0dev"),
 			m_beeper(*this, "beeper"),
+			m_ram(*this, RAM_TAG),
 			m_via(*this, "via6522"),
+			m_acia(*this, "acia"),
+			m_acia_clock(*this, "acia_clock"),
+			m_adlc(*this, "mc6854"),
 			m_vram(*this, "vram"),
 			m_keybd1(*this, "LINE1.%u", 0),
-			m_keybd2(*this, "LINE2.%u", 0)
+			m_keybd2(*this, "LINE2.%u", 0),
+			m_ch00rom_enabled(true)
 	{ }
 
 	virtual void machine_reset() override;
@@ -83,11 +91,15 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE8_MEMBER(b0_rom_disable_w);
+	DECLARE_WRITE8_MEMBER(ch00switch_w);
 	DECLARE_READ8_MEMBER(read_keyboard1);
 	DECLARE_READ8_MEMBER(read_keyboard2);
+	DECLARE_READ8_MEMBER(ram_r);
+	DECLARE_WRITE8_MEMBER(ram_w);
 	DECLARE_READ8_MEMBER(sheila_r);
 	DECLARE_WRITE8_MEMBER(sheila_w);
+	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
+	DECLARE_WRITE_LINE_MEMBER(econet_clk_w);
 
 	DECLARE_PALETTE_INIT(accomm);
 	INTERRUPT_GEN_MEMBER(vbl_int);
@@ -95,9 +107,12 @@ public:
 protected:
 	// devices
 	required_device<g65816_device> m_maincpu;
-	required_device<address_map_bank_device> m_bank0dev;
 	required_device<beep_device> m_beeper;
+	required_device<ram_device> m_ram;
 	required_device<via6522_device> m_via;
+	required_device<acia6850_device> m_acia;
+	required_device<clock_device> m_acia_clock;
+	required_device<mc6854_device> m_adlc;
 	required_shared_ptr<uint8_t> m_vram;
 	required_ioport_array<14> m_keybd1, m_keybd2;
 
@@ -109,6 +124,7 @@ protected:
 	inline void plot_pixel(bitmap_ind16 &bitmap, int x, int y, uint32_t color);
 
 private:
+	bool m_ch00rom_enabled;
 	ULA m_ula;
 	int m_map4[256];
 	int m_map16[256];
@@ -178,6 +194,8 @@ void accomm_state::machine_reset()
 	m_ula.interrupt_status = 0x82;
 	m_ula.interrupt_control = 0;
 	m_ula.vram = (uint8_t *)m_vram.target() + m_ula.screen_base;
+
+	m_ch00rom_enabled = true;
 }
 
 void accomm_state::machine_start()
@@ -195,9 +213,10 @@ void accomm_state::video_start()
 	}
 }
 
-WRITE8_MEMBER(accomm_state::b0_rom_disable_w)
+WRITE8_MEMBER(accomm_state::ch00switch_w)
 {
-	m_bank0dev->set_bank(1);
+	if (!machine().side_effect_disabled())
+		m_ch00rom_enabled = false;
 }
 
 inline uint8_t accomm_state::read_vram(uint16_t addr)
@@ -411,6 +430,45 @@ uint32_t accomm_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 }
 
 
+READ8_MEMBER(accomm_state::ram_r)
+{
+	uint8_t data = 0xff;
+
+	if (m_ch00rom_enabled && (offset < 0x10000))
+	{
+		data = memregion("maincpu")->base()[0x30000 + offset];
+	}
+	else
+	{
+		switch (m_ram->size())
+		{
+		case 512 * 1024:
+			data = m_ram->pointer()[offset & 0x7ffff];
+			break;
+
+		case 1024 * 1024:
+			data = m_ram->pointer()[offset & 0xfffff];
+			break;
+		}
+	}
+	return data;
+}
+
+WRITE8_MEMBER(accomm_state::ram_w)
+{
+	switch (m_ram->size())
+	{
+	case 512 * 1024:
+		m_ram->pointer()[offset & 0x7ffff] = data;
+		break;
+
+	case 1024 * 1024:
+		m_ram->pointer()[offset & 0xfffff] = data;
+		break;
+	}
+}
+
+
 READ8_MEMBER(accomm_state::sheila_r)
 {
 	uint8_t data = 0;
@@ -560,23 +618,42 @@ void accomm_state::interrupt_handler(int mode, int interrupt)
 	}
 }
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, accomm_state )
-	AM_RANGE(0x000000, 0x007fff) AM_RAM
-	AM_RANGE(0x008000, 0x00ffff) AM_DEVICE("bank0dev", address_map_bank_device, amap8)
-	AM_RANGE(0x010000, 0x08ffff) AM_RAM // "576K RAM"
-	AM_RANGE(0x420000, 0x42000f) AM_DEVREADWRITE("via6522", via6522_device, read, write)
-	AM_RANGE(0x440000, 0x440000) AM_WRITE(b0_rom_disable_w)
-	AM_RANGE(0x450000, 0x457fff) AM_RAM AM_SHARE("vram")
-	AM_RANGE(0x458000, 0x459fff) AM_READ(read_keyboard1)
-	AM_RANGE(0x45a000, 0x45bfff) AM_READ(read_keyboard2)
-	AM_RANGE(0x45fe00, 0x45feff) AM_READWRITE(sheila_r, sheila_w)
-	AM_RANGE(0x460000, 0x467fff) AM_RAM // nvram?
-	AM_RANGE(0xfc0000, 0xffffff) AM_ROM AM_REGION("maincpu", 0)
-ADDRESS_MAP_END
+WRITE_LINE_MEMBER(accomm_state::write_acia_clock)
+{
+	m_acia->write_txc(state);
+	m_acia->write_rxc(state);
+}
 
-static ADDRESS_MAP_START( b0dev_map, AS_PROGRAM, 8, accomm_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("maincpu", 0x38000)
-	AM_RANGE(0x8000, 0xffff) AM_RAM
+WRITE_LINE_MEMBER(accomm_state::econet_clk_w)
+{
+	m_adlc->rxc_w(state);
+	m_adlc->txc_w(state);
+}
+
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, accomm_state )
+	AM_RANGE(0x000000, 0x1fffff) AM_READWRITE(ram_r, ram_w)                                       /* System RAM */
+	AM_RANGE(0x200000, 0x3fffff) AM_NOP                                                           /* External expansion RAM */
+	AM_RANGE(0x400000, 0x400000) AM_NOP                                                           /* MODEM */
+	AM_RANGE(0x410000, 0x410000) AM_RAM                                                           /* Econet ID */
+	AM_RANGE(0x420000, 0x42000f) AM_DEVREADWRITE("via6522", via6522_device, read, write)          /* 6522 VIA (printer etc) */
+	AM_RANGE(0x430000, 0x430000) AM_DEVREADWRITE("acia", acia6850_device, status_r, control_w)    /* 2641 ACIA (RS423) */
+	AM_RANGE(0x430001, 0x430001) AM_DEVREADWRITE("acia", acia6850_device, data_r, data_w)         /* 2641 ACIA (RS423) */
+	AM_RANGE(0x440000, 0x440000) AM_WRITE(ch00switch_w)                                           /* CH00SWITCH */
+	AM_RANGE(0x450000, 0x457fff) AM_RAM AM_SHARE("vram")                                          /* Video RAM */
+	AM_RANGE(0x458000, 0x459fff) AM_READ(read_keyboard1)                                          /* Video ULA */
+	AM_RANGE(0x45a000, 0x45bfff) AM_READ(read_keyboard2)                                          /* Video ULA */
+	AM_RANGE(0x45fe00, 0x45feff) AM_READWRITE(sheila_r, sheila_w)                                 /* Video ULA */
+	AM_RANGE(0x460000, 0x467fff) AM_RAM AM_SHARE("nvram")                                         /* CMOS RAM */
+	AM_RANGE(0x470000, 0x47001f) AM_DEVREADWRITE("mc6854", mc6854_device, read, write)            /* 68B54 (Econet) */
+	AM_RANGE(0x480000, 0x7fffff) AM_NOP                                                           /* Reserved */
+	AM_RANGE(0x800000, 0xbfffff) AM_NOP                                                           /* External expansion IO  */
+	AM_RANGE(0xc00000, 0xf7ffff) AM_NOP                                                           /* External expansion ROM */
+	AM_RANGE(0xf80000, 0xf9ffff) AM_NOP                                                           /* Empty */
+	AM_RANGE(0xfa0000, 0xfbffff) AM_NOP                                                           /* ROM bank 4 */
+	AM_RANGE(0xfc0000, 0xfcffff) AM_ROM AM_REGION("maincpu", 0x000000)                            /* ROM bank 3 */
+	AM_RANGE(0xfd0000, 0xfdffff) AM_ROM AM_REGION("maincpu", 0x010000)                            /* ROM bank 2 */
+	AM_RANGE(0xfe0000, 0xfeffff) AM_ROM AM_REGION("maincpu", 0x020000)                            /* ROM bank 0 */
+	AM_RANGE(0xff0000, 0xffffff) AM_ROM AM_REGION("maincpu", 0x030000)                            /* ROM bank 1 */
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( accomm )
@@ -767,23 +844,51 @@ static MACHINE_CONFIG_START( accomm )
 
 	MCFG_DEFAULT_LAYOUT(layout_accomm)
 
-	MCFG_DEVICE_ADD("bank0dev", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(b0dev_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x8000)
+	/* internal ram */
+	MCFG_RAM_ADD(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("512K")
+	MCFG_RAM_EXTRA_OPTIONS("1M")
 
-	MCFG_DEVICE_ADD("via6522", VIA6522, XTAL_16MHz / 16)
-	MCFG_VIA6522_WRITEPA_HANDLER(DEVWRITE8("cent_data_out", output_latch_device, write))
-	MCFG_VIA6522_CA2_HANDLER(DEVWRITELINE("centronics", centronics_device, write_strobe))
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
+	/* sound */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("beeper", BEEP, 300)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
+	/* rtc pcf8573 */
+
+	/* via */
+	MCFG_DEVICE_ADD("via6522", VIA6522, XTAL_16MHz / 16)
+	MCFG_VIA6522_WRITEPA_HANDLER(DEVWRITE8("cent_data_out", output_latch_device, write))
+	MCFG_VIA6522_CA2_HANDLER(DEVWRITELINE("centronics", centronics_device, write_strobe))
+
+	/* acia */
+	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
+	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("serial", rs232_port_device, write_txd))
+	MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE("serial", rs232_port_device, write_rts))
+	MCFG_ACIA6850_IRQ_HANDLER(INPUTLINE("maincpu", G65816_LINE_IRQ))
+
+	MCFG_RS232_PORT_ADD("serial", default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("acia", acia6850_device, write_rxd))
+	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("acia", acia6850_device, write_dcd))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("acia", acia6850_device, write_cts))
+
+	MCFG_DEVICE_ADD("acia_clock", CLOCK, XTAL_16MHz / 13)
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(accomm_state, write_acia_clock))
+
+	/* econet */
+	MCFG_DEVICE_ADD("mc6854", MC6854, 0)
+	MCFG_MC6854_OUT_TXD_CB(DEVWRITELINE(ECONET_TAG, econet_device, data_w))
+	MCFG_MC6854_OUT_IRQ_CB(INPUTLINE("maincpu", G65816_LINE_NMI))
+	MCFG_ECONET_ADD()
+	MCFG_ECONET_CLK_CALLBACK(WRITELINE(accomm_state, econet_clk_w))
+	MCFG_ECONET_DATA_CALLBACK(DEVWRITELINE("mc6854", mc6854_device, set_rx))
+	MCFG_ECONET_SLOT_ADD("econet254", 254, econet_devices, nullptr)
+
 	/* printer */
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
-	MCFG_CENTRONICS_ACK_HANDLER(DEVWRITELINE("via6522", via6522_device, write_ca1)) MCFG_DEVCB_INVERT /* ack seems to be inverted? */
+	MCFG_CENTRONICS_ACK_HANDLER(DEVWRITELINE("via6522", via6522_device, write_ca1))
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 MACHINE_CONFIG_END
 
