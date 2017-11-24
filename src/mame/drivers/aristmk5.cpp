@@ -5139,6 +5139,7 @@ ROM_END
 // BHI0417-03 / 586/7(b) / 10 Credit Multiplier / 9 Line Multiline
 // Penguin Pays / Export / B - 14/07/97
 // All devices are 27c4002 instead of 27c4096
+// marked as 92.130%
 ROM_START( pengpayu )
 	ARISTOCRAT_MK5_BIOS_HAVE_EEPROMS
 	/*
