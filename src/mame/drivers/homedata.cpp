@@ -1825,14 +1825,14 @@ ROM_START( battlcryp ) // prototype presented at AOU 1989
 	ROM_REGION( 0x080000, "gfx3", 0 ) /* identical to the released game but split in 27C1000 ROMs  */
 	ROM_LOAD16_BYTE( "S88_B08_1.V10",  0x000000, 0x20000, CRC(5132cd98) SHA1(8999aa64ff6f5c483ae71aab4699fe6ee3169382) )
 	ROM_LOAD16_BYTE( "S88_B08_2.V11",  0x000001, 0x20000, CRC(fa661846) SHA1(745a15b801479e451fdb513ec4f334f438ba92c8) )
-	ROM_LOAD16_BYTE( "S88_B08_3.V12",  0x020000, 0x20000, CRC(caabbf44) SHA1(d1957121012797372a93689a34ab8f0c3a5130af) )
-	ROM_LOAD16_BYTE( "S88_B08_4.V13",  0x020001, 0x20000, CRC(257aacde) SHA1(0ac577864eedc2f778224f91235a011110a7006a) )
+	ROM_LOAD16_BYTE( "S88_B08_3.V12",  0x040000, 0x20000, CRC(caabbf44) SHA1(d1957121012797372a93689a34ab8f0c3a5130af) )
+	ROM_LOAD16_BYTE( "S88_B08_4.V13",  0x040001, 0x20000, CRC(257aacde) SHA1(0ac577864eedc2f778224f91235a011110a7006a) )
 
 	ROM_REGION( 0x080000, "gfx4", 0 ) /* identical to the released game but split in 27C1000 ROMs  */
 	ROM_LOAD16_BYTE( "S88_B05_1.V00",  0x000000, 0x20000, CRC(913e11df) SHA1(766b9cb1a39697db88f25a9ffc58724699ab9283) )
 	ROM_LOAD16_BYTE( "S88_B05_2.V01",  0x000001, 0x20000, CRC(16069926) SHA1(502795838740b7d8641ae3308b7c56f540a9719b) )
-	ROM_LOAD16_BYTE( "S88_B05_3.V02",  0x020000, 0x20000, CRC(3bca50bd) SHA1(b9b8c19ea4e6ff09c3032c18d246ed496552741e) )
-	ROM_LOAD16_BYTE( "S88_B05_4.V03",  0x020001, 0x20000, CRC(c526d508) SHA1(fa7ec24a9f6fdaaf1a1b32b4b383e8738ad1c7d1) )
+	ROM_LOAD16_BYTE( "S88_B05_3.V02",  0x040000, 0x20000, CRC(3bca50bd) SHA1(b9b8c19ea4e6ff09c3032c18d246ed496552741e) )
+	ROM_LOAD16_BYTE( "S88_B05_4.V03",  0x040001, 0x20000, CRC(c526d508) SHA1(fa7ec24a9f6fdaaf1a1b32b4b383e8738ad1c7d1) )
 
 	ROM_REGION( 0x010000, "proms", 0 )  /* static palette */
 	ROM_LOAD16_BYTE( "S88_B18", 0x00000, 0x8000, CRC(fa432edc) SHA1(55c01b6a1175539facdfdd0c3c49d878a59156a4) ) // 27c256
@@ -2171,7 +2171,7 @@ GAME( 1988, mrokumei,  0,        mrokumei, mjhokite, homedata_state, 0,         
 GAME( 1988, reikaids,  0,        reikaids, reikaids, homedata_state, reikaids,   ROT0, "Home Data",  "Reikai Doushi (Japan)",                               MACHINE_SUPPORTS_SAVE )
 GAME( 1991, battlcry,  0,        reikaids, battlcry, homedata_state, battlcry,   ROT0, "Home Data",  "Battlecry (Version E)",                               MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1989, battlcryc, battlcry, reikaids, battlcry, homedata_state, battlcry,   ROT0, "Home Data",  "Battlecry (Version C)",                               MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, battlcryp, battlcry, reikaids, battlcry, homedata_state, battlcry,   ROT0, "Home Data",  "Battlecry (Prototype)",                               MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // partially different GFX hardware?
+GAME( 1989, battlcryp, battlcry, reikaids, battlcry, homedata_state, battlcry,   ROT0, "Home Data",  "Battlecry (Prototype)",                               MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1989, mjkojink,  0,        pteacher, pteacher, homedata_state, 0,          ROT0, "Home Data",  "Mahjong Kojinkyouju (Private Teacher) (Japan)",       MACHINE_SUPPORTS_SAVE )
 GAME( 1988, mjjoship,  0,        pteacher, mjjoship, homedata_state, 0,          ROT0, "Home Data",  "Mahjong Joshi Pro-wres -Give up 5 byou mae- (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, vitaminc,  0,        pteacher, pteacher, homedata_state, 0,          ROT0, "Home Data",  "Mahjong Vitamin C (Japan)",                           MACHINE_SUPPORTS_SAVE )
