@@ -76,7 +76,7 @@ static ADDRESS_MAP_START( io_map, AS_IO, 8, mc8030_state )
 	AM_RANGE(0x84, 0x87) AM_MIRROR(0xff00) AM_DEVREADWRITE("zve_pio", z80pio_device, read, write) // PIO unknown usage
 	AM_RANGE(0x88, 0x8f) AM_MIRROR(0xff00) AM_WRITE(zve_write_protect_w)
 	AM_RANGE(0xc0, 0xcf) AM_SELECT(0xff00) AM_WRITE(vis_w)
-	AM_RANGE(0xd0, 0xd3) AM_MIRROR(0xff00) AM_DEVREADWRITE("asp_sio", z80sio_device, cd_ba_r, cd_ba_w) // keyboard & IFSS?
+	AM_RANGE(0xd0, 0xd3) AM_MIRROR(0xff00) AM_DEVREADWRITE("asp_sio", z80sio_device, ba_cd_r, ba_cd_w) // keyboard & IFSS?
 	AM_RANGE(0xd4, 0xd7) AM_MIRROR(0xff00) AM_DEVREADWRITE("asp_ctc", z80ctc_device, read, write) // sio bauds, KMBG? and kbd
 	AM_RANGE(0xd8, 0xdb) AM_MIRROR(0xff00) AM_DEVREADWRITE("asp_pio", z80pio_device, read, write) // external bus
 	AM_RANGE(0xe0, 0xef) AM_MIRROR(0xff00) AM_WRITE(eprom_prog_w)
