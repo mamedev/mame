@@ -1633,6 +1633,7 @@ void sh34_base_device::device_reset()
 	m_sh2_state->sleep_mode = 0;
 
 	m_sh4_mmu_enabled = 0;
+	m_cache_dirty = true;
 }
 
 /*-------------------------------------------------
