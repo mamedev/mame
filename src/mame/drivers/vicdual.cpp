@@ -1145,8 +1145,9 @@ WRITE8_MEMBER(vicdual_state::headonn_io_w)
 	{
 		// 7654----  unused?
 		// ----32--  always 1
-		// ------1-  1 written after reset, then always 0
-		// -------0  always 0
+		// ------10  palette bank (bit 0 inverted)
+
+		palette_bank_w(space, 0, (data & 3) ^ 1);
 	}
 	if (offset & 0x08) assert_coin_status();
 }
