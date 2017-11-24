@@ -20254,8 +20254,10 @@ mc1000                          //
 mc1502                          //
 pk88                            //
 
-@source:mc80.cpp
+@source:mc8020.cpp
 mc8020                          // MC 80.2x
+
+@source:mc8030.cpp
 mc8030                          // MC 80.3x
 
 @source:mcatadv.cpp
