@@ -104,9 +104,11 @@ WRITE8_MEMBER( mc8030_state::vis_w )
 	// reg B
 	//
 	uint16_t addr = ((offset & 0xff00) >> 2) | ((offset & 0x08) << 2) | (data >> 3);
-	static const uint8_t val[] = { 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80 };
-	int c = offset & 1;
-	m_p_videoram[addr] = m_p_videoram[addr] | (val[data & 7]*c);
+	u8 c = 1 << (data & 7);
+	if (BIT(offset, 0))
+		m_p_videoram[addr] |= c;
+	else
+		m_p_videoram[addr] &= ~c;
 }
 
 WRITE8_MEMBER( mc8030_state::eprom_prog_w )
