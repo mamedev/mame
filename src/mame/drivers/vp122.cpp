@@ -10,6 +10,7 @@ Skeleton driver for ADDS Viewpoint 122 terminal.
 #include "cpu/i8085/i8085.h"
 #include "machine/i8251.h"
 #include "machine/mc68681.h"
+#include "machine/nvram.h"
 #include "machine/pit8253.h"
 //#include "video/scn2674.h"
 
@@ -29,7 +30,7 @@ private:
 
 static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, vp122_state )
 	AM_RANGE(0x0000, 0x9fff) AM_ROM AM_REGION("maincpu", 0)
-	AM_RANGE(0xa000, 0xa7ff) AM_RAM
+	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_map, AS_IO, 8, vp122_state )
@@ -48,6 +49,8 @@ static MACHINE_CONFIG_START( vp122 )
 	MCFG_CPU_PROGRAM_MAP(mem_map)
 	MCFG_CPU_IO_MAP(io_map)
 
+	MCFG_NVRAM_ADD_0FILL("nvram") // MK48Z02
+
 	MCFG_DEVICE_ADD("duart", SCN2681, XTAL_3_6864MHz)
 	MCFG_MC68681_IRQ_CALLBACK(INPUTLINE("maincpu", I8085_RST55_LINE))
 
@@ -59,7 +62,7 @@ MACHINE_CONFIG_END
 /**************************************************************************************************************
 
 ADDS Viewpoint 122 (VPT-122).
-Chips: D8085AC-2, SCN2674B, SCB2675T, D8251AFC, SCN2681A, D8253C-2, 5x MB8129-15, MX462020-20 (guess, it's unreadable)
+Chips: D8085AC-2, SCN2674B, SCB2675T, D8251AFC, SCN2681A, D8253C-2, 5x MB8128-15, MK48Z028-20
 Crystals: 22.096, 14.916, 3.6864, 8.000
 
 ***************************************************************************************************************/
