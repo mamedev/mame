@@ -362,7 +362,8 @@ mbee.cpp
 mc10.cpp
 mc1000.cpp
 mc1502.cpp
-mc80.cpp
+mc8020.cpp
+mc8030.cpp
 mcb216.cpp
 mccpm.cpp
 megadriv.cpp
