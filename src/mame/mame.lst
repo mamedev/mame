@@ -36345,7 +36345,6 @@ tv955
 tv965
 v100
 v102
-vp60
 vt420
 zephyr
 
@@ -37680,6 +37679,9 @@ zoofari                         // (c) 2006 ICE/Play Mechanix
 
 @source:vp122.cpp
 vp122                           //
+
+@source:vp60.cpp
+vp60                            //
 
 @source:vpoker.cpp
 5acespkr                        // (c) 198?
