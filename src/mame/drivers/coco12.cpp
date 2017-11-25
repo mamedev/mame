@@ -608,16 +608,17 @@ ROM_START(lzcolor64)
 	ROM_LOAD("extendido.ci23",   0x0000, 0x2000, CRC(d1b1560d) SHA1(7252de9df405ade453282e992eb1f1910adc8e50))
 ROM_END
 
-ROM_START(cd6809_83)
+ROM_START(cd6809)
 	ROM_REGION(0x8000,MAINCPU_TAG,0)
-	ROM_LOAD("cd6809bas83.rom",    0x2000, 0x2000, CRC(f8e64142) SHA1(c0fd689119e2619ec226a2d67aeeb32070c14e38))
-	ROM_LOAD("cd6809extbas83.rom", 0x0000, 0x2000, CRC(e5d5aa15) SHA1(0cd4a3d9e4af1d0176964e35e3d15a9fa0e68ac4))
-ROM_END
+        ROM_DEFAULT_BIOS("1984")
 
-ROM_START(cd6809_84)
-	ROM_REGION(0x8000,MAINCPU_TAG,0)
-	ROM_LOAD("cd6809bas84.rom",    0x2000, 0x2000, CRC(8a9971da) SHA1(5cb5f1ffc983a85ba92af68b1d571b270f6db559))
-	ROM_LOAD("cd6809extbas84.rom", 0x0000, 0x2000, CRC(8dc853e2) SHA1(d572ce4497c115af53d2b0feeb52d3c7a7fec175))
+        ROM_SYSTEM_BIOS( 0, "83", "1983" )
+	ROMX_LOAD("cd6809bas83.rom",    0x2000, 0x2000, CRC(f8e64142) SHA1(c0fd689119e2619ec226a2d67aeeb32070c14e38), ROM_BIOS(1))
+	ROMX_LOAD("cd6809extbas83.rom", 0x0000, 0x2000, CRC(e5d5aa15) SHA1(0cd4a3d9e4af1d0176964e35e3d15a9fa0e68ac4), ROM_BIOS(1))
+
+        ROM_SYSTEM_BIOS( 0, "84", "1984" )
+	ROMX_LOAD("cd6809bas84.rom",    0x2000, 0x2000, CRC(8a9971da) SHA1(5cb5f1ffc983a85ba92af68b1d571b270f6db559), ROM_BIOS(2))
+	ROMX_LOAD("cd6809extbas84.rom", 0x0000, 0x2000, CRC(8dc853e2) SHA1(d572ce4497c115af53d2b0feeb52d3c7a7fec175), ROM_BIOS(2))
 ROM_END
 
 //**************************************************************************
@@ -632,7 +633,6 @@ COMP(  1985?,   coco2b,     coco,   0,      coco2b,  coco,     coco12_state, 0, 
 COMP(  1983,    cp400,      coco,   0,      cp400,   coco,     coco12_state, 0,    "Prológica",                    "CP400",                               0 )
 COMP(  1985,    cp400c2,    coco,   0,      cp400,   cp400c2,  coco12_state, 0,    "Prológica",                    "CP400 Color II",                      0 )
 COMP(  1983,    lzcolor64,  coco,   0,      coco,    coco,     coco12_state, 0,    "Novo Tempo / LZ Equipamentos", "Color64",                             0 )
-COMP(  1983,    cd6809_83,  coco,   0,      cd6809,  coco,     coco12_state, 0,    "Codimex",                      "CD-6809 (1983 version)",              0 )
-COMP(  1984,    cd6809_84,  coco,   0,      cd6809,  coco,     coco12_state, 0,    "Codimex",                      "CD-6809 (1984 version)",              0 )
+COMP(  1983,    cd6809,     coco,   0,      cd6809,  coco,     coco12_state, 0,    "Codimex",                      "CD-6809",              0 )
 COMP(  1984,    mx1600,     coco,   0,      coco,    coco,     coco12_state, 0,    "Dynacom",                      "MX-1600",                             0 )
 COMP(  1986,    t4426,      coco,   0,      t4426,   coco,     coco12_state, 0,    "Terco AB",                     "Terco 4426 CNC Programming station",  0 )

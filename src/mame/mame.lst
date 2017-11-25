@@ -9812,8 +9812,7 @@ cp400                           // Prológica CP400
 cp400c2                         // Prológica CP400 Color II
 lzcolor64                       // Novo Tempo / LZ Equipamentos Color64
 mx1600                          // Dynacom MX-1600
-cd6809_83                       // Codimex CD-6809 (1983 version)
-cd6809_84                       // Codimex CD-6809 (1984 version)
+cd6809                          // Codimex CD-6809
 t4426                           // Terco 4426 CNC programming station
 
 @source:coco3.cpp
