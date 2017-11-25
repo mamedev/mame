@@ -49,7 +49,6 @@ public:
 	DECLARE_WRITE8_MEMBER(asp_port_a_w);
 	DECLARE_WRITE8_MEMBER(asp_port_b_w);
 	uint32_t screen_update_mc8030(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	IRQ_CALLBACK_MEMBER(irq_callback);
 
 private:
 	required_region_ptr<u8> m_p_videoram;
@@ -113,11 +112,6 @@ WRITE8_MEMBER( mc8030_state::vis_w )
 
 WRITE8_MEMBER( mc8030_state::eprom_prog_w )
 {
-}
-
-IRQ_CALLBACK_MEMBER(mc8030_state::irq_callback )
-{
-	return 0x20;
 }
 
 READ8_MEMBER( mc8030_state::zve_port_a_r )
@@ -188,7 +182,6 @@ static MACHINE_CONFIG_START( mc8030 )
 	MCFG_CPU_PROGRAM_MAP(mem_map)
 	MCFG_CPU_IO_MAP(io_map)
 	MCFG_Z80_DAISY_CHAIN(daisy_chain)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(mc8030_state, irq_callback)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
