@@ -2580,6 +2580,9 @@ tajmah                          // Tajmahal
 @source:att4425.cpp
 att4425                         //
 
+@source:att630.cpp
+att630                          //
+
 @source:attache.cpp
 attache                         // (c) 1982 Otrona
 attache816                      // (c) 1983 Otrona
@@ -36326,7 +36329,6 @@ t4490                           // Terco 4490 Mill CNC Control (c) 1986
 
 @source:terminals.cpp
 aaa
-att630
 hp700_92
 hp2622a
 qvt70

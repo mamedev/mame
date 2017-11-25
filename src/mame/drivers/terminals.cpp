@@ -106,26 +106,6 @@ COMP( 1981, aaa, 0, 0, terminals, terminals, terminals_state, 0, "Ann Arbor", "A
 
 /**************************************************************************************************************
 
-AT&T 630 MTG.
-Chips: 2x SCN2681A, AT&T 492F proprietory, blank chip, MC68000P10, MB113F316 (square), MB113F316 (DIL), PAL16R4ACN
-Crystals: 40MHz, 87.18336, 3.6864? (hard to read)
-
-***************************************************************************************************************/
-
-ROM_START( att630 )
-	ROM_REGION(0x40000, "maincpu", 0)
-	ROM_LOAD16_BYTE( "460621-1.bin", 0x00000, 0x10000, CRC(136749cd) SHA1(15378c292ddc7384cc69a35de55b69257a9f2a1c) )
-	ROM_LOAD16_BYTE( "460620-1.bin", 0x00001, 0x10000, CRC(27ab77f0) SHA1(5ff1d9ee5a69dee308d62c447ee67e1888afab0e) )
-	ROM_LOAD16_BYTE( "460623-1.bin", 0x20000, 0x10000, CRC(aeae12fb) SHA1(fa3ce26e4622875aa1dea7cf1bd1df237010ff2b) )
-	ROM_LOAD16_BYTE( "460622-1.bin", 0x20001, 0x10000, CRC(c108c1e0) SHA1(ef01349e890b8a4117c01e78d1c23fbd113ba58f) )
-ROM_END
-
-COMP( 1987, att630, 0, 0, terminals, terminals, terminals_state, 0, "AT&T", "630 MTG", MACHINE_IS_SKELETON )
-
-
-
-/**************************************************************************************************************
-
 Hewlett-Packard HP-700/92.
 Chips: TC5564APL-15, proprietory square chip, D70108C (V20), SCN2681, Beeper
 Crystals: 29.4912
