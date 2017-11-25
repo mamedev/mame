@@ -42,7 +42,7 @@
 #include "machine/ldstub.h"
 #include "machine/watchdog.h"
 #include "machine/z80ctc.h"
-#include "machine/z80dart.h"
+#include "machine/z80sio.h"
 #include "sound/ay8910.h"
 #include "sound/spkrdev.h"
 #include "render.h"
@@ -408,7 +408,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( dleuro_io_map, AS_IO, 8, dlair_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_MIRROR(0x7c) AM_DEVREADWRITE("ctc", z80ctc_device, read, write)
-	AM_RANGE(0x80, 0x83) AM_MIRROR(0x7c) AM_DEVREADWRITE("sio", z80dart_device, ba_cd_r, ba_cd_w)
+	AM_RANGE(0x80, 0x83) AM_MIRROR(0x7c) AM_DEVREADWRITE("sio", z80sio_device, ba_cd_r, ba_cd_w)
 ADDRESS_MAP_END
 
 
@@ -755,8 +755,8 @@ static MACHINE_CONFIG_START( dleuro )
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_Z80CTC_ZC0_CB(WRITELINE(dlair_state, write_speaker))
 
-	MCFG_DEVICE_ADD("sio", Z80SIO0, MASTER_CLOCK_EURO/4 /* same as "maincpu" */)
-	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MCFG_DEVICE_ADD("sio", Z80SIO, MASTER_CLOCK_EURO/4 /* same as "maincpu" */)
+	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	// TODO: hook up tx and rx callbacks
 
 	MCFG_WATCHDOG_ADD("watchdog")

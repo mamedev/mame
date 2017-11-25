@@ -1962,7 +1962,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( dcs_audio_device::dcs_irq )
 		/* generate the (internal, thats why the pulse) irq */
 		if (LOG_DCS_IO)
 			logerror("dcs_irq: Genrating interrupt\n");
-		m_cpu->machine().driver_data()->generic_pulse_irq_line(*m_cpu,  ADSP2105_IRQ1, 1);
+		m_cpu->pulse_input_line(ADSP2105_IRQ1, m_cpu->minimum_quantum_time());
 	}
 
 	/* store it */

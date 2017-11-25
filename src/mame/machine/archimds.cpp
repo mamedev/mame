@@ -67,7 +67,7 @@ void archimedes_state::archimedes_request_fiq(int mask)
 
 	if (m_ioc_regs[FIQ_STATUS] & m_ioc_regs[FIQ_MASK])
 	{
-		generic_pulse_irq_line(*m_maincpu, ARM_FIRQ_LINE, 1);
+		m_maincpu->pulse_input_line(ARM_FIRQ_LINE, m_maincpu->minimum_quantum_time());
 
 		//m_maincpu->set_input_line(ARM_FIRQ_LINE, CLEAR_LINE);
 		//m_maincpu->set_input_line(ARM_FIRQ_LINE, ASSERT_LINE);

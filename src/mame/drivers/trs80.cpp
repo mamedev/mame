@@ -302,6 +302,27 @@ static ADDRESS_MAP_START( meritum_io, AS_IO, 8, trs80_state )
 	AM_RANGE(0xff, 0xff) AM_READWRITE(trs80_ff_r, trs80_ff_w)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( cp500_io, AS_IO, 8, trs80_state )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0xe0, 0xe3) AM_READWRITE(trs80m4_e0_r, trs80m4_e0_w)
+	AM_RANGE(0xe4, 0xe4) AM_READWRITE(trs80m4_e4_r, trs80m4_e4_w)
+	AM_RANGE(0xe8, 0xe8) AM_READWRITE(trs80m4_e8_r, trs80m4_e8_w)
+	AM_RANGE(0xe9, 0xe9) AM_READ_PORT("E9") AM_WRITE(trs80m4_e9_w)
+	AM_RANGE(0xea, 0xea) AM_READWRITE(trs80m4_ea_r, trs80m4_ea_w)
+	AM_RANGE(0xeb, 0xeb) AM_READWRITE(trs80m4_eb_r, trs80m4_eb_w)
+	AM_RANGE(0xec, 0xef) AM_READWRITE(trs80m4_ec_r, trs80m4_ec_w)
+	AM_RANGE(0xf0, 0xf0) AM_READ(trs80_wd179x_r)
+	AM_RANGE(0xf0, 0xf0) AM_DEVWRITE("fdc", fd1793_device, cmd_w)
+	AM_RANGE(0xf1, 0xf1) AM_DEVREADWRITE("fdc", fd1793_device, track_r, track_w)
+	AM_RANGE(0xf2, 0xf2) AM_DEVREADWRITE("fdc", fd1793_device, sector_r, sector_w)
+	AM_RANGE(0xf3, 0xf3) AM_DEVREADWRITE("fdc", fd1793_device, data_r, data_w)
+	AM_RANGE(0xf4, 0xf4) AM_WRITE(trs80m4_f4_w)
+	AM_RANGE(0xf4, 0xf7) AM_READ(cp500_a11_flipflop_toggle)
+	AM_RANGE(0xf8, 0xfb) AM_READWRITE(trs80_printer_r, trs80_printer_w)
+	AM_RANGE(0xfc, 0xff) AM_READWRITE(trs80m4_ff_r, trs80m4_ff_w)
+ADDRESS_MAP_END
+
 /**************************************************************************
    w/o SHIFT                             with SHIFT
    +-------------------------------+     +-------------------------------+
@@ -709,6 +730,13 @@ static MACHINE_CONFIG_DERIVED( meritum, sys80 )
 	MCFG_GFXDECODE_MODIFY("gfxdecode", meritum)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( cp500, model3 )
+	MCFG_CPU_MODIFY( "maincpu" )
+	MCFG_CPU_IO_MAP( cp500_io)
+
+	MCFG_MACHINE_RESET_OVERRIDE(trs80_state, cp500 )
+MACHINE_CONFIG_END
+
 /***************************************************************************
 
   Game driver(s)
@@ -890,6 +918,17 @@ ROM_START( meritum_net )
 	ROM_LOAD( "char.bin", 0x0000, 0x1000, CRC(2c09a5a7) SHA1(146891b3ddfc2de95e6a5371536394a657880054))
 ROM_END
 
+ROM_START( cp500 )
+	ROM_REGION(0x20000, "maincpu", 0)
+	ROM_LOAD("s_8407_cn62516n_cp500a_prologica_83.ci111", 0x0000, 0x4000, CRC(c2fc1b92) SHA1(0eb07baee80f1ee1f28a609eb63a9245dcb68adb))
+
+	ROM_REGION(0x20000, "bootrom", 0)
+	ROM_LOAD("s_8407_cn62516n_cp500a_prologica_83.ci111", 0x0000, 0x4000, CRC(c2fc1b92) SHA1(0eb07baee80f1ee1f28a609eb63a9245dcb68adb))
+
+	ROM_REGION(0x0800, "chargen", 0)
+	ROM_LOAD( "100.105.ci36", 0x0000, 0x800, CRC(1765931e) SHA1(49176ceea6cc003efa04fad2f31829b9432fe10f))
+ROM_END
+
 DRIVER_INIT_MEMBER(trs80_state,trs80)
 {
 	m_mode = 0;
@@ -938,3 +977,4 @@ COMP( 1984, ht1080z2,    trs80,  0,      ht1080z,  trs80,   trs80_state, trs80l2
 COMP( 1985, ht108064,    trs80,  0,      ht1080z,  trs80,   trs80_state, trs80,    "Hiradastechnika Szovetkezet", "HT-1080Z/64",                     0 )
 COMP( 1985, meritum,     trs80,  0,      meritum,  trs80,   trs80_state, trs80l2,  "Mera-Elzab",                  "Meritum I (Model 2)",             0 )
 COMP( 1985, meritum_net, trs80,  0,      meritum,  trs80,   trs80_state, trs80l2,  "Mera-Elzab",                  "Meritum I (Model 2) (network)",   0 )
+COMP( 1982, cp500,       trs80,  0,      cp500,    trs80m3, trs80_state, trs80m4,  "Prológica",                   "CP-500 (PVIII REV.3)",            0 )

@@ -589,6 +589,8 @@ static MACHINE_CONFIG_START( dc )
 	MCFG_SH4_CLOCK(CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(dc_map)
 	MCFG_CPU_IO_MAP(dc_port)
+	MCFG_CPU_FORCE_NO_DRC()
+
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", dc_state, dc_scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("soundcpu", ARM7, ((XTAL_33_8688MHz*2)/3)/8)   // AICA bus clock is 2/3rds * 33.8688.  ARM7 gets 1 bus cycle out of each 8.
@@ -750,5 +752,5 @@ ROM_END
 CONS( 1999, dc,     dcjp,   0,      dc,     dc,   dc_cons_state,   dcus,   "Sega", "Dreamcast (USA, NTSC)", MACHINE_NOT_WORKING )
 CONS( 1998, dcjp,   0,      0,      dc,     dc,   dc_cons_state,   dcjp,   "Sega", "Dreamcast (Japan, NTSC)", MACHINE_NOT_WORKING )
 CONS( 1999, dceu,   dcjp,   0,      dc,     dc,   dc_cons_state,   dcus,   "Sega", "Dreamcast (Europe, PAL)", MACHINE_NOT_WORKING )
-CONS( 200?, dctream,dcjp,   0,      dc,     dc,   dc_cons_state,   dcus,"unknown", "Treamcast", MACHINE_NOT_WORKING )
+CONS( 200?, dctream,dcjp,   0,      dc,     dc,   dc_cons_state,   dcus,   "<unknown>", "Treamcast", MACHINE_NOT_WORKING )
 CONS( 1998, dcdev,  0,      0,      dc,     dc,   dc_cons_state,   dc,     "Sega", "HKT-0120 Sega Dreamcast Development Box", MACHINE_NOT_WORKING )

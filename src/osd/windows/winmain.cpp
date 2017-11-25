@@ -619,6 +619,17 @@ void windows_osd_interface::osd_exit()
 }
 
 
+//============================================================
+//  osd_setup_osd_specific_emu_options
+//============================================================
+
+void osd_setup_osd_specific_emu_options(emu_options &opts)
+{
+	opts.add_entries(osd_options::s_option_entries);
+	opts.add_entries(windows_options::s_option_entries);
+}
+
+
 #if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
 
 //============================================================

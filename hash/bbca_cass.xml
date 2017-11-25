@@ -16,6 +16,26 @@
 
 	<!-- Games -->
 
+	<software name="100progs">
+		<description>100 Programs for the BBC Microcomputer</description>
+		<year>1983</year>
+		<publisher>Acornsoft</publisher>
+		<info name="author" value="John Gordon" />
+		<info name="release" value="SBX12" />
+		<part name="cass1" interface="bbc_cass">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="cass" size="31073">
+				<rom name="100a SomeErrs P35 40 51.uef" size="31073" crc="4cf8cb6b" sha1="71f601d9406f7e1a602f8f380ec2733c5d17d19e" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="bbc_cass">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="cass" size="32750">
+				<rom name="100b.uef" size="32750" crc="85f0d76e" sha1="b9b334cd206e1a34af471489acf8f98d77e9d125" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="adventur">
 		<description>Adventure</description>
 		<year>1983</year>
@@ -80,6 +100,18 @@
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="7168">
 				<rom name="beebtrek(epsilon).uef" size="7168" crc="729eef94" sha1="c6062440f4624d5d217a9a4deb073d45eb5144fe" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="birdspre">
+		<description>Birds of Prey</description>
+		<year>1983</year>
+		<publisher>Romik</publisher>
+		<info name="author" value="Clive Webster" />
+		<part name="cass" interface="bbc_cass">
+			<dataarea name="cass" size="4192">
+				<rom name="birdsofprey(1983)(romik).uef" size="4192" crc="8c9e7abd" sha1="884f8830c9ec21070ab75edbd9d7d4de252c0269" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -245,6 +277,17 @@
 		</part>
 	</software>
 
+	<software name="mindbend">
+		<description>Mind Bender</description>
+		<year>1982</year>
+		<publisher>Beebug</publisher>
+		<part name="cass" interface="bbc_cass">
+			<dataarea name="cass" size="3346">
+				<rom name="mindbender.uef" size="3346" crc="32e27c6d" sha1="62118f9c6279e2d3ad2994deb4e35b9872054d04" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="munchyma">
 		<description>Munchyman</description>
 		<year>1981</year>
@@ -351,6 +394,17 @@
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="4805">
 				<rom name="seek(1982)(micropower).uef" size="4805" crc="0234d741" sha1="04c583b9defd2f819f6bccc4d2304af576598922" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shapemat">
+		<description>Shape Match</description>
+		<year>1982</year>
+		<publisher>Beebug</publisher>
+		<part name="cass" interface="bbc_cass">
+			<dataarea name="cass" size="3596">
+				<rom name="shapematch(beebug).uef" size="3596" crc="2fc477ce" sha1="2c36bb23b9cb7fbcf2c695ea162c999d2ba57af8" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -509,7 +563,7 @@
 
 	<software name="physic">
 		<description>Physics</description>
-		<year>198?</year>
+		<year>1983</year>
 		<publisher>Micro Power</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="3111">

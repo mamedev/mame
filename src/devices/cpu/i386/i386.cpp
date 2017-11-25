@@ -2199,10 +2199,10 @@ void i386_device::i386_protected_mode_retf(uint8_t count, uint8_t operand32)
 				FAULT(FAULT_SS,0)
 			}
 		}
-		if(operand32 == 0)
-			REG16(SP) += (4+count);
+		if(STACK_32BIT)
+			REG32(ESP) += (operand32 ? 8 : 4) + count;
 		else
-			REG32(ESP) += (8+count);
+			REG16(SP) +=  (operand32 ? 8 : 4) + count;
 	}
 	else if(RPL > CPL)
 	{

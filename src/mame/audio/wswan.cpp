@@ -18,7 +18,7 @@ The noise taps and behavior are the same as the Virtual Boy.
 
 
 // device type definition
-DEFINE_DEVICE_TYPE(WSWAN_SND, wswan_sound_device, "wswan_sound", "WonderSwan Audio Custom")
+DEFINE_DEVICE_TYPE(WSWAN_SND, wswan_sound_device, "wswan_sound", "WonderSwan Custom Sound")
 
 
 //**************************************************************************

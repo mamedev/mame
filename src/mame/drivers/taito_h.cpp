@@ -15,8 +15,9 @@ Yasuhiro Ogawa. Thank you, Yasu.
 
 Supported games :
 ==================
- Syvalion                           (C) 1988 Taito
  Record Breaker / Go For The Gold   (C) 1988 Taito
+ Syvalion                           (C) 1988 Taito
+ Tetris                             (C) 1988 Taito
  Dynamite League                    (C) 1990 Taito
 
 
@@ -967,7 +968,6 @@ ROM_START( syvalionp )
 ROM_END
 
 
-
 ROM_START( recordbr )
 	ROM_REGION( 0x80000, "maincpu", 0 )     /* main cpu */
 	ROM_LOAD16_BYTE( "b56-17.bin", 0x00000, 0x20000, CRC(3e0a9c35) SHA1(900a741b2abbbbe883b9d78162a88b4397af1a56) )
@@ -1028,7 +1028,10 @@ ROM_START( gogold )
 	ROM_LOAD( "b56-18.bin", 0x00000, 0x02000, CRC(c88f0bbe) SHA1(18c87c744fbeca35d13033e50f62e5383eb4ec2c) )
 ROM_END
 
-// Sega Tetris on a Taito H-System board, with some roms from ?Go For The Gold? still on the board.
+
+// Sega Tetris on a Taito H-System board, with some roms from Go For The Gold left in place on the board.
+//  These are required to produce proper sounds and music.  This was also done for the Tetris conversion
+//  of Nastar / Nastar Warrior / Rastan Saga 2 on Taito's B-System plaform (see taito_b.cpp)
 ROM_START( tetristh )
 	ROM_REGION( 0x40000, "maincpu", 0 )     /* main cpu */
 	ROM_LOAD16_BYTE( "c26-12-1.ic36", 0x00000, 0x20000, CRC(77e80c82) SHA1(840dc5a54a865b8cd2e0d03001a493987d66c23b) )
@@ -1056,6 +1059,7 @@ ROM_START( tetristh )
 	ROM_REGION( 0x02000, "user1", 0 ) /* zoom table / mixing? */
 	ROM_LOAD( "b56-18.bin", 0x00000, 0x02000, CRC(c88f0bbe) SHA1(18c87c744fbeca35d13033e50f62e5383eb4ec2c) )
 ROM_END
+
 
 ROM_START( dleague )
 	ROM_REGION( 0x60000, "maincpu", 0 )

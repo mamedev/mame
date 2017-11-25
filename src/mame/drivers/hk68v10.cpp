@@ -6,7 +6,7 @@
  *
  *  21/08/2015
  *
- * I baught this board from http://www.retrotechnology.com without documentation.
+ * I bought this board from http://www.retrotechnology.com without documentation.
  * It has a Motorola 68010 CPU @ 10MHz and two 2764 EPROMS with HBUG firmware
  * The board is very populated and suitable to run a real server OS supported by
  * FPU,MMU and DMA controller chips. The firmware supports SCSI, Centronics/FPI
@@ -73,7 +73,7 @@
  *---------------------
  * The company was founded 1972 as cellar company. Heurikon was aquired
  * 1989 by Computer Products, 1990 by Artesyn and finally in 2005 by Emerson
- * Electric who consilidated it fully by 2009 and closed the office.
+ * Electric who consolidated it fully by 2009 and closed the office.
  *
  * Misc links about Heurikon and this board:
  * http://www.heurikon.com/
@@ -279,7 +279,7 @@ WRITE16_MEMBER (hk68v10_state::bootvect_w){
 	LOG (("%s offset %08x, mask %08x, data %04x\n", FUNCNAME, offset, mem_mask, data));
 	m_sysram[offset % sizeof(m_sysram)] &= ~mem_mask;
 	m_sysram[offset % sizeof(m_sysram)] |= (data & mem_mask);
-	m_sysrom = &m_sysram[0]; // redirect all upcomming accesses to masking RAM until reset.
+	m_sysrom = &m_sysram[0]; // redirect all upcoming accesses to masking RAM until reset.
 }
 
 #if 0

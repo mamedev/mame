@@ -877,6 +877,8 @@ WRITE32_MEMBER(vrc5074_device::cpu_reg_w)
 		map_cpu_space();
 		break;
 	case NREG_CPUSTAT + 0:    /* CPU status */
+		if (data & 0x1) logerror("cpu_reg_w: System Cold Reset\n");
+		if (data & 0x2) logerror("cpu_reg_w: CPU Warm Reset\n");
 	case NREG_CPUSTAT + 1:    /* CPU status */
 		if (LOG_NILE) logerror("%08X:NILE WRITE: CPU status(%03X) = %08X & %08X\n", m_cpu_space->device().safe_pc(), offset * 4, data, mem_mask);
 		logit = 0;
@@ -1003,7 +1005,7 @@ READ32_MEMBER(vrc5074_device::serial_r)
 {
 	uint32_t result = m_uart->ins8250_r(space, offset>>1);
 
-	if (LOG_NILE)
+	if (0 && LOG_NILE)
 		logerror("%06X:serial_r offset %03X = %08X (%08x)\n", m_cpu_space->device().safe_pc(), offset>>1, result, offset*4);
 	return result;
 }
@@ -1011,8 +1013,17 @@ READ32_MEMBER(vrc5074_device::serial_r)
 WRITE32_MEMBER(vrc5074_device::serial_w)
 {
 	m_uart->ins8250_w(space, offset>>1, data);
-	if (PRINTF_SERIAL && offset == NREG_UARTTHR)
+	if (PRINTF_SERIAL && offset == NREG_UARTTHR) {
+		static std::string debugStr;
 		printf("%c", data);
-	if (LOG_NILE)
+		if (data == 0xd || debugStr.length()>=80) {
+			logerror("%s", debugStr.c_str());
+			debugStr.clear();
+		}
+		else {
+			debugStr += char(data);
+		}
+	}
+	if (0 && LOG_NILE)
 		logerror("%06X:serial_w offset %03X = %08X & %08X (%08x)\n", m_cpu_space->device().safe_pc(), offset>>1, data, mem_mask, offset*4);
 }

@@ -16,9 +16,9 @@ class wgp_state : public driver_device
 public:
 	enum
 	{
-		TIMER_WGP_INTERRUPT4,
-		TIMER_WGP_INTERRUPT6,
-		TIMER_WGP_CPUB_INTERRUPT6
+		TIMER_INTERRUPT4,
+		TIMER_INTERRUPT6,
+		TIMER_CPUB_INTERRUPT6
 	};
 
 	wgp_state(const machine_config &mconfig, device_type type, const char *tag)
@@ -41,6 +41,39 @@ public:
 		m_fake(*this, "FAKE")
 	{ }
 
+	DECLARE_WRITE8_MEMBER(coins_w);
+	DECLARE_WRITE16_MEMBER(cpua_ctrl_w);
+	DECLARE_READ16_MEMBER(lan_status_r);
+	DECLARE_WRITE16_MEMBER(rotate_port_w);
+	DECLARE_READ16_MEMBER(adinput_r);
+	DECLARE_WRITE16_MEMBER(adinput_w);
+	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
+	DECLARE_WRITE16_MEMBER(pivram_word_w);
+	DECLARE_WRITE16_MEMBER(piv_ctrl_word_w);
+	DECLARE_DRIVER_INIT(wgp);
+	DECLARE_DRIVER_INIT(wgp2);
+	DECLARE_VIDEO_START(wgp2);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(cpub_interrupt);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+private:
+	TILE_GET_INFO_MEMBER(get_piv0_tile_info);
+	TILE_GET_INFO_MEMBER(get_piv1_tile_info);
+	TILE_GET_INFO_MEMBER(get_piv2_tile_info);
+
+	void postload();
+	inline void common_get_piv_tile_info(tile_data &tileinfo, int tile_index, int num);
+	void core_vh_start(int piv_xoffs, int piv_yoffs);
+	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs);
+	void piv_layer_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, uint32_t priority);
+	void parse_control();
+
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_spritemap;
 	required_shared_ptr<uint16_t> m_spriteram;
@@ -61,6 +94,8 @@ public:
 	/* misc */
 	uint16_t      m_cpua_ctrl;
 	uint16_t      m_port_sel;
+	emu_timer     *m_int6_timer;
+	emu_timer     *m_cpub_int6_timer;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -75,38 +110,4 @@ public:
 	optional_ioport m_steer;
 	optional_ioport m_unknown;
 	optional_ioport m_fake;
-
-	DECLARE_WRITE8_MEMBER(coins_w);
-	DECLARE_WRITE16_MEMBER(cpua_ctrl_w);
-	DECLARE_READ16_MEMBER(lan_status_r);
-	DECLARE_WRITE16_MEMBER(rotate_port_w);
-	DECLARE_READ16_MEMBER(wgp_adinput_r);
-	DECLARE_WRITE16_MEMBER(wgp_adinput_w);
-	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
-	DECLARE_WRITE16_MEMBER(wgp_sound_w);
-	DECLARE_READ16_MEMBER(wgp_sound_r);
-	DECLARE_READ16_MEMBER(wgp_pivram_word_r);
-	DECLARE_WRITE16_MEMBER(wgp_pivram_word_w);
-	DECLARE_READ16_MEMBER(wgp_piv_ctrl_word_r);
-	DECLARE_WRITE16_MEMBER(wgp_piv_ctrl_word_w);
-	DECLARE_DRIVER_INIT(wgp);
-	DECLARE_DRIVER_INIT(wgp2);
-	TILE_GET_INFO_MEMBER(get_piv0_tile_info);
-	TILE_GET_INFO_MEMBER(get_piv1_tile_info);
-	TILE_GET_INFO_MEMBER(get_piv2_tile_info);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	DECLARE_VIDEO_START(wgp2);
-	uint32_t screen_update_wgp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(wgp_cpub_interrupt);
-	void wgp_postload();
-	inline void common_get_piv_tile_info( tile_data &tileinfo, int tile_index, int num );
-	void wgp_core_vh_start( int piv_xoffs, int piv_yoffs );
-	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs );
-	void wgp_piv_layer_draw( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, uint32_t priority );
-	void parse_control();
-
-protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

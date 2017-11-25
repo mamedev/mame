@@ -132,6 +132,7 @@ out:
 
 #include "cpu/tms32010/tms32010.h"
 #include "cpu/z80/z80.h"
+#include "machine/74259.h"
 #include "machine/bankdev.h"
 #include "sound/3812intf.h"
 #include "speaker.h"
@@ -200,8 +201,8 @@ static ADDRESS_MAP_START( main_io_map, AS_IO, 8, wardner_state )
 	AM_RANGE(0x54, 0x54) AM_READ_PORT("P1")
 	AM_RANGE(0x56, 0x56) AM_READ_PORT("P2")
 	AM_RANGE(0x58, 0x58) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x5a, 0x5a) AM_WRITE(wardner_coin_dsp_w)       /* Machine system control */
-	AM_RANGE(0x5c, 0x5c) AM_WRITE(wardner_control_w)        /* Machine system control */
+	AM_RANGE(0x5a, 0x5a) AM_DEVWRITE("coinlatch", ls259_device, write_nibble_d0)
+	AM_RANGE(0x5c, 0x5c) AM_DEVWRITE("mainlatch", ls259_device, write_nibble_d0)
 	AM_RANGE(0x60, 0x65) AM_READWRITE(wardner_videoram_r, wardner_videoram_w)
 	AM_RANGE(0x70, 0x70) AM_WRITE(wardner_bank_w)
 ADDRESS_MAP_END
@@ -356,9 +357,6 @@ void wardner_state::machine_reset()
 {
 	MACHINE_RESET_CALL_MEMBER(twincobr);
 
-	m_toaplan_main_cpu = 1;     /* Z80 */
-	twincobr_display(1);
-
 	m_membank->set_bank(0);
 }
 
@@ -388,6 +386,20 @@ static MACHINE_CONFIG_START( wardner )
 	MCFG_TMS32010_BIO_IN_CB(READLINE(wardner_state, twincobr_BIO_r))
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))      /* 100 CPU slices per frame */
+
+	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(wardner_state, int_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(wardner_state, flipscreen_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(wardner_state, bg_ram_bank_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(wardner_state, fg_rom_bank_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(wardner_state, display_on_w))
+
+	MCFG_DEVICE_ADD("coinlatch", LS259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(wardner_state, dsp_int_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(wardner_state, coin_counter_1_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(wardner_state, coin_counter_2_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(wardner_state, coin_lockout_1_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(wardner_state, coin_lockout_2_w))
 
 	/* video hardware */
 	MCFG_MC6845_ADD("crtc", HD6845, "screen", XTAL_14MHz/4) /* 3.5MHz measured on CLKin */

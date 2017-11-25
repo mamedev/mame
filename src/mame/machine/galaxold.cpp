@@ -171,7 +171,7 @@ DRIVER_INIT_MEMBER(galaxold_state,4in1)
 
 INTERRUPT_GEN_MEMBER(galaxold_state::hunchbks_vh_interrupt)
 {
-	generic_pulse_irq_line_and_vector(device.execute(),0,0x03,1);
+	device.execute().pulse_input_line_and_vector(0, 0x03, device.execute().minimum_quantum_time());
 }
 
 DRIVER_INIT_MEMBER(galaxold_state,bullsdrtg)

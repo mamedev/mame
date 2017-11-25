@@ -51,10 +51,6 @@ DEFINE_DEVICE_TYPE(TMS70C46, tms70c46_device, "tms70c46", "TMC70C46")
 
 
 // internal memory maps
-static ADDRESS_MAP_START(tms7000_io, AS_IO, 8, tms7000_device)
-	AM_RANGE(TMS7000_PORTB, TMS7000_PORTB) AM_READNOP
-ADDRESS_MAP_END
-
 static ADDRESS_MAP_START(tms7000_mem, AS_PROGRAM, 8, tms7000_device )
 	AM_RANGE(0x0000, 0x007f) AM_RAM // 128 bytes internal RAM
 	AM_RANGE(0x0080, 0x00ff) AM_READWRITE(tms7000_unmapped_rf_r, tms7000_unmapped_rf_w)
@@ -114,7 +110,8 @@ tms7000_device::tms7000_device(const machine_config &mconfig, const char *tag, d
 tms7000_device::tms7000_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal, uint32_t info_flags)
 	: cpu_device(mconfig, type, tag, owner, clock),
 	m_program_config("program", ENDIANNESS_BIG, 8, 16, 0, internal),
-	m_io_config("io", ENDIANNESS_BIG, 8, 8, 0, ADDRESS_MAP_NAME(tms7000_io)),
+	m_port_in_cb{{*this}, {*this}, {*this}, {*this}, {*this}},
+	m_port_out_cb{{*this}, {*this}, {*this}, {*this}, {*this}},
 	m_info_flags(info_flags)
 {
 }
@@ -177,8 +174,7 @@ tms70c46_device::tms70c46_device(const machine_config &mconfig, const char *tag,
 device_memory_interface::space_config_vector tms7000_device::memory_space_config() const
 {
 	return space_config_vector {
-		std::make_pair(AS_PROGRAM, &m_program_config),
-		std::make_pair(AS_IO,      &m_io_config)
+		std::make_pair(AS_PROGRAM, &m_program_config)
 	};
 }
 
@@ -192,12 +188,16 @@ void tms7000_device::device_start()
 	// init/zerofill
 	m_program = &space(AS_PROGRAM);
 	m_direct = &m_program->direct();
-	m_io = &space(AS_IO);
 
 	m_icountptr = &m_icount;
 
 	m_irq_state[TMS7000_INT1_LINE] = false;
 	m_irq_state[TMS7000_INT3_LINE] = false;
+
+	for (auto &cb : m_port_in_cb)
+		cb.resolve_safe(0xff);
+	for (auto &cb : m_port_out_cb)
+		cb.resolve_safe();
 
 	m_idle_state = false;
 	m_idle_halt = false;
@@ -512,7 +512,7 @@ READ8_MEMBER(tms7000_device::tms7000_pf_r)
 			// note: port B is write-only, reading it returns the output value as if ddr is 0xff
 			int port = offset / 2 - 2;
 			if (!machine().side_effect_disabled())
-				return (m_io->read_byte(port) & ~m_port_ddr[port]) | (m_port_latch[port] & m_port_ddr[port]);
+				return (m_port_in_cb[port]() & ~m_port_ddr[port]) | (m_port_latch[port] & m_port_ddr[port]);
 			break;
 		}
 
@@ -594,7 +594,7 @@ WRITE8_MEMBER(tms7000_device::tms7000_pf_w)
 			// note: in memory expansion modes, some port output pins are used for memory strobes.
 			// this is currently ignored, since port writes will always be visible externally on peripheral expansion anyway.
 			int port = offset / 2 - 2;
-			m_io->write_byte(port, data & m_port_ddr[port]);
+			m_port_out_cb[port](data & m_port_ddr[port]);
 			m_port_latch[port] = data;
 			break;
 		}
@@ -888,7 +888,9 @@ void tms70c46_device::device_start()
 void tms70c46_device::device_reset()
 {
 	m_control = 0;
-	m_io->write_byte(TMS7000_PORTE, 0xff);
+
+	// reset port E
+	m_port_out_cb[4](0xff);
 
 	tms7000_device::device_reset();
 }
@@ -902,7 +904,7 @@ WRITE8_MEMBER(tms70c46_device::control_w)
 {
 	// d5: enable external databus
 	if (~m_control & data & 0x20)
-		m_io->write_byte(TMS7000_PORTE, 0xff); // go into high impedance
+		m_port_out_cb[4](0xff); // put port E into high impedance
 
 	// d4: enable clock divider when accessing slow memory (not emulated)
 	// known fast memory areas: internal ROM/RAM, system RAM

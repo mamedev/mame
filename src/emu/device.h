@@ -541,6 +541,7 @@ public:
 protected:
 	// miscellaneous helpers
 	void set_machine(running_machine &machine);
+	void resolve_objects();
 	void start();
 	void stop();
 	void debug_setup();
@@ -557,6 +558,7 @@ protected:
 	virtual ioport_constructor device_input_ports() const;
 	virtual void device_config_complete();
 	virtual void device_validity_check(validity_checker &valid) const ATTR_COLD;
+	virtual void device_resolve_objects() ATTR_COLD;
 	virtual void device_start() ATTR_COLD = 0;
 	virtual void device_stop() ATTR_COLD;
 	virtual void device_reset() ATTR_COLD;

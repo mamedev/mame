@@ -1021,7 +1021,7 @@ void netlist_mame_cpu_device::device_start()
 		}
 		else
 		{
-			state_add(i*2+1, n->name().c_str(), *downcast<netlist::analog_net_t *>(n)->Q_Analog_state_ptr()).formatstr("%20s");
+			state_add(i*2+1, n->name().c_str(), *downcast<netlist::analog_net_t *>(n)->Q_Analog_state_ptr());
 		}
 	}
 

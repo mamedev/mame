@@ -258,7 +258,7 @@ WRITE8_MEMBER(fitfight_state::snd_portc_w)
 
 INTERRUPT_GEN_MEMBER(fitfight_state::snd_irq)
 {
-	generic_pulse_irq_line(device.execute(), UPD7810_INTF2, 1);
+	device.execute().pulse_input_line(UPD7810_INTF2, device.execute().minimum_quantum_time());
 }
 
 

@@ -795,10 +795,10 @@ static MACHINE_CONFIG_START( px8 )
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 
 	/* cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("capsule1", generic_plain_slot, nullptr)
+	MCFG_GENERIC_CARTSLOT_ADD("capsule1", generic_plain_slot, "px8_cart")
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
 
-	MCFG_GENERIC_CARTSLOT_ADD("capsule2", generic_plain_slot, nullptr)
+	MCFG_GENERIC_CARTSLOT_ADD("capsule2", generic_plain_slot, "px8_cart")
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
 
 	/* devices */
@@ -812,6 +812,7 @@ static MACHINE_CONFIG_START( px8 )
 	MCFG_RAM_DEFAULT_SIZE("64K")
 
 	// software
+	MCFG_SOFTWARE_LIST_ADD("cart_list", "px8_cart")
 	MCFG_SOFTWARE_LIST_ADD("epson_cpm_list", "epson_cpm")
 MACHINE_CONFIG_END
 
@@ -835,6 +836,10 @@ ROM_START( px8 )
 
 	ROM_REGION( 0x1000, UPD7508_TAG, 0 )
 	ROM_LOAD( "upd7508 sub cpu internal rom.2e", 0x0000, 0x1000, NO_DUMP )
+
+	// Possibly cartridges
+	ROM_REGION( 0x8000, "carts", 0 )
+	ROM_LOAD( "px8-util.rom",           0x00000, 0x8000, CRC(4430a271) SHA1(58c23a5f25ad9cdb70ada44dc773e6899e9bd8bf) ) // various utilities
 ROM_END
 
 /***************************************************************************

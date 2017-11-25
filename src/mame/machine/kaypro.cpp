@@ -72,7 +72,7 @@ WRITE8_MEMBER( kaypro_state::kayproii_pio_system_w )
 	m_system_port = data;
 }
 
-WRITE8_MEMBER( kaypro_state::kaypro4_pio_system_w )
+WRITE8_MEMBER( kaypro_state::kayproiv_pio_system_w )
 {
 	kayproii_pio_system_w(space, offset, data);
 
@@ -82,19 +82,19 @@ WRITE8_MEMBER( kaypro_state::kaypro4_pio_system_w )
 
 /***********************************************************
 
-    KAYPRO2X SYSTEM PORT
+    KAYPRO484 SYSTEM PORT
 
     The PIOs were replaced by a few standard 74xx chips
 
 ************************************************************/
 
-READ8_MEMBER( kaypro_state::kaypro2x_system_port_r )
+READ8_MEMBER( kaypro_state::kaypro484_system_port_r )
 {
 	uint8_t data = m_centronics_busy << 6;
 	return (m_system_port & 0xbf) | data;
 }
 
-WRITE8_MEMBER( kaypro_state::kaypro2x_system_port_w )
+WRITE8_MEMBER( kaypro_state::kaypro484_system_port_w )
 {
 /*  d7 bank select
     d6 alternate character set (write only)
@@ -138,7 +138,7 @@ WRITE8_MEMBER( kaypro_state::kaypro2x_system_port_w )
 
     SIO
 
-    On Kaypro2x, Channel B on both SIOs is hardwired to 300 baud.
+    On Kaypro484, Channel B on both SIOs is hardwired to 300 baud.
 
     Both devices on sio2 (printer and modem) are not emulated.
 
@@ -163,29 +163,9 @@ WRITE8_MEMBER( kaypro_state::kaypro2x_system_port_w )
     FFh    19200 */
 
 
-READ8_MEMBER(kaypro_state::kaypro_sio_r)
-{
-	if (offset == 1)
-		return kay_kbd_d_r();
-	else
-	if (offset == 3)
-		return kay_kbd_c_r();
-	else
-		return m_sio->cd_ba_r(space, offset);
-}
-
-WRITE8_MEMBER(kaypro_state::kaypro_sio_w)
-{
-	if (offset == 1)
-		kay_kbd_d_w(data);
-	else
-		m_sio->cd_ba_w(space, offset, data);
-}
-
-
 /*************************************************************************************
 
-    Floppy DIsk
+    Floppy Disk
 
     If DRQ or IRQ is set, and cpu is halted, the NMI goes low.
     Since the HALT occurs last (and has no callback mechanism), we need to set
@@ -248,7 +228,6 @@ MACHINE_START_MEMBER( kaypro_state,kayproii )
 
 MACHINE_RESET_MEMBER( kaypro_state,kaypro )
 {
-	MACHINE_RESET_CALL_MEMBER(kay_kbd);
 	membank("bankr0")->set_entry(1); // point at rom
 	membank("bankw0")->set_entry(0); // always write to ram
 	membank("bank3")->set_entry(1); // point at video ram

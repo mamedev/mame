@@ -13,7 +13,8 @@ initial sector from the disk and transfers control to it. All the used memory
 locations in the EA00-EB40 range are listed in the memory map. It does not
 use the IO map, and has no text.
 
-Without schematics and technical manuals, it is not possible to progress.
+The 2MHz downgrade is suggested in the manual for the CPU board (ZPB-A). It
+involves replacing the XTAL and reconnecting one jumper.
 
 ****************************************************************************/
 
@@ -168,7 +169,7 @@ SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_START( horizon )
 	// basic machine hardware
-	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_4MHz)
+	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_8MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(horizon_mem)
 	MCFG_CPU_IO_MAP(horizon_io)
 
@@ -193,23 +194,31 @@ static MACHINE_CONFIG_START( horizon )
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(I8251_R_TAG, i8251_device, write_dsr))
 
 	// S-100
-	MCFG_S100_BUS_ADD()
+	MCFG_DEVICE_ADD("s100", S100_BUS, XTAL_8MHz / 4)
 	MCFG_S100_RDY_CALLBACK(INPUTLINE(Z80_TAG, Z80_INPUT_LINE_BOGUSWAIT))
-	//MCFG_S100_SLOT_ADD("s100_1", horizon_s100_cards, nullptr, nullptr) // CPU
-	MCFG_S100_SLOT_ADD("s100_2", horizon_s100_cards, nullptr) // RAM
-	MCFG_S100_SLOT_ADD("s100_3", horizon_s100_cards, "mdsad") // MDS
-	MCFG_S100_SLOT_ADD("s100_4", horizon_s100_cards, nullptr) // FPB
-	MCFG_S100_SLOT_ADD("s100_5", horizon_s100_cards, nullptr)
-	MCFG_S100_SLOT_ADD("s100_6", horizon_s100_cards, nullptr)
-	MCFG_S100_SLOT_ADD("s100_7", horizon_s100_cards, nullptr)
-	MCFG_S100_SLOT_ADD("s100_8", horizon_s100_cards, nullptr)
-	MCFG_S100_SLOT_ADD("s100_9", horizon_s100_cards, nullptr)
-	MCFG_S100_SLOT_ADD("s100_10", horizon_s100_cards, nullptr)
-	MCFG_S100_SLOT_ADD("s100_11", horizon_s100_cards, nullptr)
-	MCFG_S100_SLOT_ADD("s100_12", horizon_s100_cards, nullptr)
+	//MCFG_S100_SLOT_ADD("s100:1", horizon_s100_cards, nullptr, nullptr) // CPU
+	MCFG_S100_SLOT_ADD("s100:2", horizon_s100_cards, nullptr) // RAM
+	MCFG_S100_SLOT_ADD("s100:3", horizon_s100_cards, "mdsad") // MDS
+	MCFG_S100_SLOT_ADD("s100:4", horizon_s100_cards, nullptr) // FPB
+	MCFG_S100_SLOT_ADD("s100:5", horizon_s100_cards, nullptr)
+	MCFG_S100_SLOT_ADD("s100:6", horizon_s100_cards, nullptr)
+	MCFG_S100_SLOT_ADD("s100:7", horizon_s100_cards, nullptr)
+	MCFG_S100_SLOT_ADD("s100:8", horizon_s100_cards, nullptr)
+	MCFG_S100_SLOT_ADD("s100:9", horizon_s100_cards, nullptr)
+	MCFG_S100_SLOT_ADD("s100:10", horizon_s100_cards, nullptr)
+	MCFG_S100_SLOT_ADD("s100:11", horizon_s100_cards, nullptr)
+	MCFG_S100_SLOT_ADD("s100:12", horizon_s100_cards, nullptr)
 
 	// software list
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "horizon")
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( horizon2mhz, horizon )
+	MCFG_CPU_MODIFY("z80")
+	MCFG_CPU_CLOCK(XTAL_4MHz / 2)
+
+	MCFG_DEVICE_MODIFY("s100")
+	MCFG_DEVICE_CLOCK(XTAL_4MHz / 2)
 MACHINE_CONFIG_END
 
 
@@ -226,6 +235,8 @@ ROM_START( nshrz )
 	ROM_REGION( 0x400, "roms", 0 )
 	ROM_LOAD( "option.prom", 0x000, 0x400, NO_DUMP )
 ROM_END
+
+#define rom_nshrz2mhz rom_nshrz
 
 
 //-------------------------------------------------
@@ -244,5 +255,8 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    STATE          INIT  COMPANY                 FULLNAME                          FLAGS
-COMP( 1976, nshrz,   0,      0,      horizon, horizon, horizon_state, 0,    "North Star Computers", "Horizon (North Star Computers)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
-COMP( 1979, vector1, nshrz,  0,      horizon, horizon, horizon_state, 0,    "Vector Graphic",       "Vector 1+ (DD drive)",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1976, nshrz,     0,     0, horizon,     horizon, horizon_state, 0, "North Star Computers", "Horizon (North Star Computers, 4MHz)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1976, nshrz2mhz, nshrz, 0, horizon2mhz, horizon, horizon_state, 0, "North Star Computers", "Horizon (North Star Computers, 2MHz)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+
+// This really should be in its own driver
+COMP( 1979, vector1,  0,      0, horizon,     horizon, horizon_state, 0, "Vector Graphic",       "Vector 1+ (DD drive)",                  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

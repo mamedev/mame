@@ -393,6 +393,16 @@ void sdl_osd_interface::output_oslog(const char *buffer)
 
 
 //============================================================
+//  osd_setup_osd_specific_emu_options
+//============================================================
+
+void osd_setup_osd_specific_emu_options(emu_options &opts)
+{
+	opts.add_entries(osd_options::s_option_entries);
+}
+
+
+//============================================================
 //  init
 //============================================================
 

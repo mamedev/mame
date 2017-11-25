@@ -53,8 +53,6 @@ public:
 
 	DECLARE_WRITE16_MEMBER(lemmings_control_w);
 	DECLARE_READ16_MEMBER(lemmings_trackball_r);
-	void lemmings_sound_cb( address_space &space, uint16_t data, uint16_t mem_mask );
-	DECLARE_WRITE8_MEMBER(lemmings_sound_ack_w);
 	DECLARE_WRITE16_MEMBER(lemmings_pixel_0_w);
 	DECLARE_WRITE16_MEMBER(lemmings_pixel_1_w);
 	DECLARE_WRITE16_MEMBER(lemmings_vram_w);

@@ -122,14 +122,24 @@ VIDEO_START_MEMBER(twincobr_state,toaplan0)
     Video I/O interface
 ***************************************************************************/
 
-void twincobr_state::twincobr_display(int enable)
+WRITE_LINE_MEMBER(twincobr_state::display_on_w)
 {
-	m_display_on = enable;
+	m_display_on = state;
 }
 
-void twincobr_state::twincobr_flipscreen(int flip)
+WRITE_LINE_MEMBER(twincobr_state::flipscreen_w)
 {
-	machine().tilemap().set_flip_all((flip ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0));
+	machine().tilemap().set_flip_all((state ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0));
+}
+
+WRITE_LINE_MEMBER(twincobr_state::bg_ram_bank_w)
+{
+	m_bg_ram_bank = state ? 0x1000 : 0x0000;
+}
+
+WRITE_LINE_MEMBER(twincobr_state::fg_rom_bank_w)
+{
+	m_fg_rom_bank = state ? 0x1000 : 0x0000;
 }
 
 

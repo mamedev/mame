@@ -37,6 +37,12 @@ public:
 		m_b = b;
 	}
 	void set(const rgb_t& rgba) { set(rgba.a(), rgba.r(), rgba.g(), rgba.b()); }
+	// This function sets all elements to the same val
+	void set_all(const s32& val) { set(val, val, val, val); }
+	// This function zeros all elements
+	void zero() { set_all(0); }
+	// This function zeros only the alpha element
+	void zero_alpha() { m_a = 0; }
 
 	rgb_t to_rgba() const { return rgb_t(get_a(), get_r(), get_g(), get_b()); }
 
@@ -49,6 +55,7 @@ public:
 		return rgb_t(a, r, g, b);
 	}
 
+	void set_a16(const s32 value) { m_a = value; }
 	void set_a(const s32 value) { m_a = value; }
 	void set_r(const s32 value) { m_r = value; }
 	void set_g(const s32 value) { m_g = value; }
@@ -63,6 +70,12 @@ public:
 	s32 get_r32() const { return m_r; }
 	s32 get_g32() const { return m_g; }
 	s32 get_b32() const { return m_b; }
+
+	// These selects return an rgbaint_t with all fields set to the element choosen (a, r, g, or b)
+	rgbaint_t select_alpha32() const { return rgbaint_t(get_a32(), get_a32(), get_a32(), get_a32()); }
+	rgbaint_t select_red32() const { return rgbaint_t(get_r32(), get_r32(), get_r32(), get_r32()); }
+	rgbaint_t select_green32() const { return rgbaint_t(get_g32(), get_g32(), get_g32(), get_g32()); }
+	rgbaint_t select_blue32() const { return rgbaint_t(get_b32(), get_b32(), get_b32(), get_b32()); }
 
 	inline void add(const rgbaint_t& color)
 	{
@@ -304,7 +317,6 @@ public:
 	void scale_imm_and_clamp(const s32 scale);
 	void scale2_add_and_clamp(const rgbaint_t& scale, const rgbaint_t& other, const rgbaint_t& scale2);
 	void scale_add_and_clamp(const rgbaint_t& scale, const rgbaint_t& other);
-	void scale_imm_add_and_clamp(const s32 scale, const rgbaint_t& other);
 
 	void cmpeq(const rgbaint_t& value) { cmpeq_imm_rgba(value.m_a, value.m_r, value.m_g, value.m_b); }
 	void cmpgt(const rgbaint_t& value) { cmpgt_imm_rgba(value.m_a, value.m_r, value.m_g, value.m_b); }
@@ -336,6 +348,11 @@ public:
 		m_r = (m_r < r) ? 0xffffffff : 0;
 		m_g = (m_g < g) ? 0xffffffff : 0;
 		m_b = (m_b < b) ? 0xffffffff : 0;
+	}
+
+	void merge_alpha16(const rgbaint_t& alpha)
+	{
+		m_a = alpha.m_a;
 	}
 
 	void merge_alpha(const rgbaint_t& alpha)

@@ -1431,7 +1431,7 @@ inline int32_t voodoo_device::tmu_state::prepare()
 	return (-lodbase + (12 << 8)) / 2;
 #else
 	double tmpTex = texdx;
-	lodbase = new_log2(tmpTex);
+	lodbase = new_log2(tmpTex, 0);
 	return (lodbase + (12 << 8)) / 2;
 #endif
 }
@@ -2588,8 +2588,8 @@ int32_t voodoo_device::register_w(voodoo_device *vd, offs_t offset, uint32_t dat
 					visarea.set(hbp, hbp + hvis - 1, vbp, vbp + vvis - 1);
 
 					/* keep within bounds */
-					visarea.max_x = std::min(visarea.max_x, htotal - 1);
-					visarea.max_y = std::min(visarea.max_y, vtotal - 1);
+					visarea.max_x = (std::min)(visarea.max_x, htotal - 1);
+					visarea.max_y = (std::min)(visarea.max_y, vtotal - 1);
 
 					/* compute the new period for standard res, medium res, and VGA res */
 					stdperiod = HZ_TO_ATTOSECONDS(15750) * vtotal;
@@ -3319,8 +3319,8 @@ int32_t voodoo_device::lfb_w(voodoo_device* vd, offs_t offset, uint32_t data, ui
 				//PIXEL_PIPELINE_BEGIN(v, stats, x, y, vd->reg[fbzColorPath].u, vd->reg[fbzMode].u, iterz, iterw);
 // Start PIXEL_PIPE_BEGIN copy
 				//#define PIXEL_PIPELINE_BEGIN(VV, STATS, XX, YY, FBZCOLORPATH, FBZMODE, ITERZ, ITERW)
-					int32_t fogdepth, biasdepth;
-					int32_t r, g, b, a;
+					int32_t biasdepth;
+					int32_t r, g, b;
 
 					(stats)->pixels_in++;
 
@@ -3355,34 +3355,44 @@ int32_t voodoo_device::lfb_w(voodoo_device* vd, offs_t offset, uint32_t data, ui
 // End PIXEL_PIPELINE_BEGIN COPY
 
 				// Depth testing value for lfb pipeline writes is directly from write data, no biasing is used
-				fogdepth = biasdepth = (uint32_t) sz[pix];
+				biasdepth = (uint32_t) sz[pix];
 
 
 				/* Perform depth testing */
-				if (!depthTest((uint16_t) vd->reg[zaColor].u, stats, depth[x], vd->reg[fbzMode].u, biasdepth))
-					goto nextpixel;
+				if (FBZMODE_ENABLE_DEPTHBUF(vd->reg[fbzMode].u))
+					if (!depthTest((uint16_t) vd->reg[zaColor].u, stats, depth[x], vd->reg[fbzMode].u, biasdepth))
+						goto nextpixel;
 
 				/* use the RGBA we stashed above */
 				color.set(sa[pix], sr[pix], sg[pix], sb[pix]);
 
 				/* handle chroma key */
-				if (!chromaKeyTest(vd, stats, vd->reg[fbzMode].u, color))
-					goto nextpixel;
+				if (FBZMODE_ENABLE_CHROMAKEY(vd->reg[fbzMode].u))
+					if (!chromaKeyTest(vd, stats, vd->reg[fbzMode].u, color))
+						goto nextpixel;
 				/* handle alpha mask */
-				if (!alphaMaskTest(stats, vd->reg[fbzMode].u, color.get_a()))
-					goto nextpixel;
+				if (FBZMODE_ENABLE_ALPHA_MASK(vd->reg[fbzMode].u))
+					if (!alphaMaskTest(stats, vd->reg[fbzMode].u, color.get_a()))
+						goto nextpixel;
 				/* handle alpha test */
-				if (!alphaTest(vd, stats, vd->reg[alphaMode].u, color.get_a()))
-					goto nextpixel;
+				if (ALPHAMODE_ALPHATEST(vd->reg[alphaMode].u))
+					if (!alphaTest(vd->reg[alphaMode].rgb.a, stats, vd->reg[alphaMode].u, color.get_a()))
+						goto nextpixel;
 
+				/* perform fogging */
+				preFog.set(color);
+				if (FOGMODE_ENABLE_FOG(vd->reg[fogMode].u))
+					applyFogging(vd, vd->reg[fbzMode].u, vd->reg[fogMode].u, vd->reg[fbzColorPath].u, x, dither4, biasdepth, color, iterz, iterw, iterargb);
 
 				/* wait for any outstanding work to finish */
 				poly_wait(vd->poly, "LFB Write");
 
-				/* pixel pipeline part 2 handles color blending, fog, alpha, and final output */
-				PIXEL_PIPELINE_END(vd, stats, dither, dither4, dither_lookup, x, dest, depth,
-					vd->reg[fbzMode].u, vd->reg[fbzColorPath].u, vd->reg[alphaMode].u, vd->reg[fogMode].u,
-					iterz, iterw, iterargb) { };
+				/* perform alpha blending */
+				if (ALPHAMODE_ALPHABLEND(vd->reg[alphaMode].u))
+					alphaBlend(vd->reg[fbzMode].u, vd->reg[alphaMode].u, x, dither, dest[x], depth, preFog, color, vd->fbi.rgb565);
+
+				/* pixel pipeline part 2 handles final output */
+				PIXEL_PIPELINE_END(stats, dither_lookup, x, dest, depth, vd->reg[fbzMode].u) { };
 nextpixel:
 			/* advance our pointers */
 			x++;
@@ -5248,7 +5258,7 @@ int32_t voodoo_device::fastfill(voodoo_device *vd)
 	for (y = sy; y < ey; y += ARRAY_LENGTH(extents))
 	{
 		poly_extra_data *extra = (poly_extra_data *)poly_get_extra_data(vd->poly);
-		int count = std::min(ey - y, int(ARRAY_LENGTH(extents)));
+		int count = (std::min)(ey - y, int(ARRAY_LENGTH(extents)));
 
 		extra->device = vd;
 		memcpy(extra->dither, dithermatrix, sizeof(extra->dither));

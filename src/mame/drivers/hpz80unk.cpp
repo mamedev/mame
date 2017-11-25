@@ -12,17 +12,26 @@ Looks like roms are in 2 banks in range C000-FFFF.
 BASIC is included, if we can find out how to access it.
 
 Commands:
-A disassemble
-D
+Axxxx         Disassemble (. to quit)
+DAxxxx,yyyy   Ascii Dump of memory
+DBxxxx,yyyy   Binary Dump of memory
+DHxxxx,yyyy   Hex Dump of memory
+DOxxxx,yyyy   Octal dump of memory
 G
 H
 L
-M
-P Read Port
-R
-U
-W Punch papertape
-X choose Q,V,R,P (Q to quit; others ask for ram and prom ranges)
+MMxxxx        Modify Memory (. to quit)
+Pxx           Binary Display of Port
+Pxx,xx        Write to port
+RC            ???
+RF            ???
+RM            ???
+RT            ???
+UC            Displays 11111111
+US            ???
+UZ            Displays FFFF
+W             Punch papertape
+X             choose Q,V,R,P (Q to quit; others ask for ram and prom ranges)
 Y nothing
 Z nothing
 
@@ -34,33 +43,60 @@ Z nothing
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "machine/terminal.h"
+#include "machine/ay31015.h"
+#include "bus/rs232/rs232.h"
 
-#define TERMINAL_TAG "terminal"
 
 class hpz80unk_state : public driver_device
 {
 public:
 	hpz80unk_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_terminal(*this, TERMINAL_TAG),
-		m_p_rom(*this, "p_rom")
-	{
-	}
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_p_rom(*this, "rom")
+		, m_uart1(*this, "uart1")
+		, m_uart2(*this, "uart2")
+		, m_uart3(*this, "uart3")
+	{ }
 
-	required_device<cpu_device> m_maincpu;
-	required_device<generic_terminal_device> m_terminal;
+	DECLARE_READ8_MEMBER(port00_r);
+	DECLARE_READ8_MEMBER(port01_r);
 	DECLARE_READ8_MEMBER(port02_r);
 	DECLARE_READ8_MEMBER(port03_r);
 	DECLARE_READ8_MEMBER(port04_r);
+	DECLARE_READ8_MEMBER(port0d_r);
+	DECLARE_WRITE8_MEMBER(port01_w);
+	DECLARE_WRITE8_MEMBER(port04_w);
+	DECLARE_WRITE8_MEMBER(port0e_w);
 	DECLARE_READ8_MEMBER(portfc_r);
-	void kbd_put(u8 data);
-	required_shared_ptr<uint8_t> m_p_rom;
-	uint8_t m_term_data;
+
+private:
 	uint8_t m_port02_data;
 	virtual void machine_reset() override;
+	required_device<cpu_device> m_maincpu;
+	required_shared_ptr<uint8_t> m_p_rom;
+	required_device<ay31015_device> m_uart1;
+	required_device<ay31015_device> m_uart2;
+	required_device<ay31015_device> m_uart3;
 };
+
+READ8_MEMBER( hpz80unk_state::port00_r )
+{
+	return (m_uart1->get_output_pin(AY31015_DAV) << 1) | (m_uart1->get_output_pin(AY31015_TBMT)) | 0xfc;
+}
+
+READ8_MEMBER( hpz80unk_state::port01_r )
+{
+	m_uart1->set_input_pin(AY31015_RDAV, 0);
+	uint8_t result = m_uart1->get_received_data();
+	m_uart1->set_input_pin(AY31015_RDAV, 1);
+	return result;
+}
+
+WRITE8_MEMBER( hpz80unk_state::port01_w )
+{
+	m_uart1->set_transmit_data(data);
+}
 
 READ8_MEMBER( hpz80unk_state::port02_r )
 {
@@ -70,14 +106,30 @@ READ8_MEMBER( hpz80unk_state::port02_r )
 
 READ8_MEMBER( hpz80unk_state::port03_r )
 {
-	return (m_term_data) ? 0xff : 0xfd;
+	return (m_uart2->get_output_pin(AY31015_DAV) << 1) | (m_uart2->get_output_pin(AY31015_TBMT)) | 0xfc;
 }
 
 READ8_MEMBER( hpz80unk_state::port04_r )
 {
-	uint8_t ret = m_term_data;
-	m_term_data = 0;
-	return ret;
+	m_uart2->set_input_pin(AY31015_RDAV, 0);
+	uint8_t result = m_uart2->get_received_data();
+	m_uart2->set_input_pin(AY31015_RDAV, 1);
+	return result;
+}
+
+WRITE8_MEMBER( hpz80unk_state::port04_w )
+{
+	m_uart2->set_transmit_data(data);
+}
+
+READ8_MEMBER( hpz80unk_state::port0d_r )
+{
+	return (m_uart3->get_output_pin(AY31015_DAV) << 1) | (m_uart3->get_output_pin(AY31015_TBMT)) | 0xfc;
+}
+
+WRITE8_MEMBER( hpz80unk_state::port0e_w )
+{
+	m_uart3->set_transmit_data(data);
 }
 
 READ8_MEMBER( hpz80unk_state::portfc_r )
@@ -88,21 +140,33 @@ READ8_MEMBER( hpz80unk_state::portfc_r )
 static ADDRESS_MAP_START( hpz80unk_mem, AS_PROGRAM, 8, hpz80unk_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xbfff) AM_RAM
-	AM_RANGE(0xc000, 0xffff) AM_ROM AM_SHARE("p_rom")
+	AM_RANGE(0xc000, 0xffff) AM_ROM AM_SHARE("rom")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hpz80unk_io, AS_IO, 8, hpz80unk_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x01, 0x01) AM_DEVWRITE(TERMINAL_TAG, generic_terminal_device, write)
+	AM_RANGE(0x00, 0x00) AM_READ(port00_r) // uart1 status
+	AM_RANGE(0x01, 0x01) AM_READWRITE(port01_r,port01_w) // uart1 data
 	AM_RANGE(0x02, 0x02) AM_READ(port02_r)
-	AM_RANGE(0x03, 0x03) AM_READ(port03_r)
-	AM_RANGE(0x04, 0x04) AM_READ(port04_r)
+	AM_RANGE(0x03, 0x03) AM_READ(port03_r) // uart2 status
+	AM_RANGE(0x04, 0x04) AM_READWRITE(port04_r,port04_w) // uart2 data
+	AM_RANGE(0x0d, 0x0d) AM_READ(port0d_r) // uart3 status
+	AM_RANGE(0x0e, 0x0e) AM_WRITE(port0e_w) // uart3 data
+	AM_RANGE(0x1d, 0x1e) // top of memory is written here, big-endian
+	AM_RANGE(0x1f, 0x1f) AM_READ_PORT("DSW") // select which uarts to use
 	AM_RANGE(0xfc, 0xfc) AM_READ(portfc_r)
 ADDRESS_MAP_END
 
 /* Input ports */
 static INPUT_PORTS_START( hpz80unk )
+	// this is a theoretical switch
+	PORT_START("DSW")
+	PORT_DIPNAME( 0x03, 0x00, "UART selection")
+	PORT_DIPSETTING(    0x00, "In UART1, Out UART1")
+	PORT_DIPSETTING(    0x01, "In UART1, Out UART2")
+	PORT_DIPSETTING(    0x02, "In UART1, Out UART3")
+	PORT_DIPSETTING(    0x03, "In UART2, Out UART1")
 INPUT_PORTS_END
 
 
@@ -110,14 +174,44 @@ void hpz80unk_state::machine_reset()
 {
 	uint8_t* user1 = memregion("user1")->base();
 	memcpy((uint8_t*)m_p_rom, user1, 0x4000);
+	m_maincpu->set_pc(0xc000);
 
+	// no idea if these are hard-coded, or programmable
+	m_uart1->set_input_pin(AY31015_XR, 0);
+	m_uart1->set_input_pin(AY31015_XR, 1);
+	m_uart1->set_input_pin(AY31015_SWE, 0);
+	m_uart1->set_input_pin(AY31015_NP, 1);
+	m_uart1->set_input_pin(AY31015_TSB, 0);
+	m_uart1->set_input_pin(AY31015_NB1, 1);
+	m_uart1->set_input_pin(AY31015_NB2, 1);
+	m_uart1->set_input_pin(AY31015_EPS, 1);
+	m_uart1->set_input_pin(AY31015_CS, 1);
+	m_uart1->set_input_pin(AY31015_CS, 0);
+
+	m_uart2->set_input_pin(AY31015_XR, 0);
+	m_uart2->set_input_pin(AY31015_XR, 1);
+	m_uart2->set_input_pin(AY31015_SWE, 0);
+	m_uart2->set_input_pin(AY31015_NP, 1);
+	m_uart2->set_input_pin(AY31015_TSB, 0);
+	m_uart2->set_input_pin(AY31015_NB1, 1);
+	m_uart2->set_input_pin(AY31015_NB2, 1);
+	m_uart2->set_input_pin(AY31015_EPS, 1);
+	m_uart2->set_input_pin(AY31015_CS, 1);
+	m_uart2->set_input_pin(AY31015_CS, 0);
+
+	m_uart3->set_input_pin(AY31015_XR, 0);
+	m_uart3->set_input_pin(AY31015_XR, 1);
+	m_uart3->set_input_pin(AY31015_SWE, 0);
+	m_uart3->set_input_pin(AY31015_NP, 1);
+	m_uart3->set_input_pin(AY31015_TSB, 0);
+	m_uart3->set_input_pin(AY31015_NB1, 1);
+	m_uart3->set_input_pin(AY31015_NB2, 1);
+	m_uart3->set_input_pin(AY31015_EPS, 1);
+	m_uart3->set_input_pin(AY31015_CS, 1);
+	m_uart3->set_input_pin(AY31015_CS, 0);
 	// this should be rom/ram banking
 }
 
-void hpz80unk_state::kbd_put(u8 data)
-{
-	m_term_data = data;
-}
 
 static MACHINE_CONFIG_START( hpz80unk )
 	/* basic machine hardware */
@@ -126,8 +220,26 @@ static MACHINE_CONFIG_START( hpz80unk )
 	MCFG_CPU_IO_MAP(hpz80unk_io)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(hpz80unk_state, kbd_put))
+	MCFG_DEVICE_ADD("uart1", AY51013, 0) // COM2502
+	MCFG_AY51013_TX_CLOCK(153600)
+	MCFG_AY51013_RX_CLOCK(153600)
+	MCFG_AY51013_READ_SI_CB(DEVREADLINE("rs232a", rs232_port_device, rxd_r))
+	MCFG_AY51013_WRITE_SO_CB(DEVWRITELINE("rs232a", rs232_port_device, write_txd))
+	MCFG_RS232_PORT_ADD("rs232a", default_rs232_devices, "terminal")
+
+	MCFG_DEVICE_ADD("uart2", AY51013, 0) // COM2502
+	MCFG_AY51013_TX_CLOCK(153600)
+	MCFG_AY51013_RX_CLOCK(153600)
+	MCFG_AY51013_READ_SI_CB(DEVREADLINE("rs232b", rs232_port_device, rxd_r))
+	MCFG_AY51013_WRITE_SO_CB(DEVWRITELINE("rs232b", rs232_port_device, write_txd))
+	MCFG_RS232_PORT_ADD("rs232b", default_rs232_devices, nullptr)
+
+	MCFG_DEVICE_ADD("uart3", AY51013, 0) // COM2502
+	MCFG_AY51013_TX_CLOCK(153600)
+	MCFG_AY51013_RX_CLOCK(153600)
+	MCFG_AY51013_READ_SI_CB(DEVREADLINE("rs232c", rs232_port_device, rxd_r))
+	MCFG_AY51013_WRITE_SO_CB(DEVWRITELINE("rs232c", rs232_port_device, write_txd))
+	MCFG_RS232_PORT_ADD("rs232c", default_rs232_devices, nullptr)
 MACHINE_CONFIG_END
 
 /* ROM definition */

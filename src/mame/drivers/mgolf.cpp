@@ -159,7 +159,7 @@ TIMER_CALLBACK_MEMBER(mgolf_state::interrupt_callback)
 
 	update_plunger();
 
-	generic_pulse_irq_line(*m_maincpu, 0, 1);
+	m_maincpu->pulse_input_line(0, m_maincpu->minimum_quantum_time());
 
 	scanline = scanline + 32;
 

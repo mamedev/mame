@@ -4,79 +4,266 @@
 
 <!--
 
-Known undumped discs (possibly more exist), based on Blitzkrieg's researches
+Missing list based on http://fmtowns.a.la9.jp/db/sdb.html
 
-:Loop: Izanahi no Kaikiten                              Sep-95  Grocer  (FDx5)
-? Dennou Sakka DX                                       XXX-93  Nichikonren Kikaku  (FDx2)
-2069 A.D.                                               Nov-91  Homedata    (FDx3)
-A Ressha de Ikou 4: Map Construction + Power-Up Kit     Apr-94  Artdink (FDx3)
-Ai Shimai: Futari no Kajitsu                            Sep-94  Silky's  (FDx4)
-Cameltry                                                Nov-94  KID Corporation (FDx1)
-Cannon Sight                                            XXX-93  Nichikonren Kikaku  (FDx2)
-Crescent                                                Nov-93  Silky's  (FDx4)
-D-Return                                                Nov-90  Nichikonren Kikaku  (FDx2)
-Daisenryaku 3'90 Map Collection Vol.1                   Jul-92  Pegasus Japan   (FDx1)
-Daisenryaku 3'90 Map Collection Vol.2                   Jul-92  Pegasus Japan   (FDx1)
-Darwin's Dilemma                                        Aug-91  Star Craft  (FDx1)
-DOR                                                     May-92  D.O.    (FDx4)
-DOR Part 2                                              XXX-92  D.O.    (FDx1)
-DOR Part 3                                              Nov-92  D.O.    (FDx4)
-Dragon Slayer: The Legend of Heroes                     Jun-90  Falcom  (FDx3)
-Dragon Slayer: The Legend of Heroes 2                   Feb-93  Falcom  (FDx5)
-Elle                                                    Nov-91  Elf (FDx5)
-Fukkatsusai Asticaya no Majo                            Nov-92  Grocer  (FDx7)
-Go Taishou                                              ===     Shoudai Sangyou (FDx3)
-Go Taishou 2                                            Feb-93  Shoudai Sangyou (FDx2)
-Gokanshi                                                Jul-95  Tensui Software (FDx1)
-Gorby no Pipeline Daisakusen                            Apr-91  Compile (FDx1)
-Gyakutama Ou: Wedding Errantry                          Jan-95  Grocer  (FDx5)
-Hana Yori Dango                                         Apr-92  Active  (FDx3)
-Igo DB                                                  Jul-92  Fujitsu (FDx2)
-Image                                                   May-94  Software House Parsley  (FDx2)
-Image 2                                                 Jun-94  Software House Parsley  (FDx4)
-Kiwame Jouseki Shuu                                     Nov-92  Log (FDx1)
-Links Championship Course: Banff Springs                Feb-95  Cybelle (FDx3)
-Links Championship Course: Firestone Country Club       Feb-95  Cybelle (FDx2)
-Links Championship Course: Innisbrook                   Feb-95  Cybelle (FDx3)
-Links Championship Course: Mauna Kea                    Feb-95  Cybelle (FDx3)
-Loop Eraser                                             Sep-94  Nichikonren Kikaku  (FDx2)
-Lord Monarch                                            Nov-91  Falcom  (FDx3)
-Magic Ayako Suzume                                      May-92  Computer Cosmos (FDx3)
-Mahjong Clinic Zoukan Gou                               Nov-91  Homedata    (FDx2)
-Mahjong Elegance                                        Nov-94  C-CLASS (FDx2)
-Mahjong Fantasia                                        Jul-92  Active  (FDx4)
-Misty Mei Tantei Toujou                                 Jun-89  Data West   (FDx1)
-Misty Mei Tantei Toujou 2                               Nov-89  Data West   (FDx1)
-Misty Mei Tantei Toujou 3                               Jan-90  Data West   (FDx1)
-Misty Mei Tantei Toujou 4                               Jul-90  Data West   (FDx1)
-Misty Mei Tantei Toujou 5                               Sep-90  Data West   (FDx1)
-Misty Mei Tantei Toujou 6                               Nov-90  Data West   (FDx1)
-Misty Mei Tantei Toujou 7                               Jan-91  Data West   (FDx1)
-Nonomura Byouin no Hitobito                             Jul-94  Silky's  (FDx5)
-Oh! Pai                                                 Sep-93  Silky's  (FDx5)
-Planetary Campaign                                      XXX-93  Nichikonren Kikaku  (FDx1)
-Pleria: The Royal Emblem                                Jul-92  Orange House    (FDx5)
-Ponyon                                                  Sep-92  Ponytail Soft   (FDx4)
-Premium                                                 Nov-92  Silky's  (FDx4)
-Present 2                                               Oct-92  Orange House    (FDx5)
-Quiz Banchou Santa-kun 2                                May-92  Active  (FDx3)
-Shangrlia                                               Jan-92  Elf (FDx4)
-Shangrlia 2                                             Oct-94  Elf (FDx1)
-Shisetsu Sangokushi                                     Sep-93  Tensui Software (FDx1)
-Shisetsu Sangokushi Jidai                               Jun-94  Tensui Software (FDx1)
-Shogi Taisho                                            Dec-92  Shoudai Sangyou (FDx2)
-Shogi Taisho 2                                          Jan-93  Shoudai Sangyou (FDx1)
-Sim City Terrain Editor                                 Jun-92  Fujitsu (FDx1)
-Super Daisenryaku                                       XXX-89  System Soft (FDx1)
-Super Ultra Mucchin Puripuri Cyborg Marilyn DX          Apr-94  Jast    (FDx4)
-Sweet Angel                                             Nov-92  Active  (FDx2)
-Tenshi-Tachi no Gogo 6: My Fair Teacher                 Aug-93  Jast    (FDx3)
-Tenshi-Tachi no Gogo Collection                         Mar-95  Jast    (FDx4)
-Totsugeki! Bakkon Street                                Jan-94  Jast    (FDx2)
-Totsugeki! Bakkon Street 2: Hunting Roulette            Sep-94  Jast    (FDx3)
-Traffic Confusion                                       Jun-92  Masterpiece (FDx2)
-Youjuu Club                                             Mar-92  D.O.    (FDx3)
-Yuki Neko                                               Apr-95  Jast    (FDx4)
+Some titles / company names are quite obscure and may be badly transliterated. Also, different versions of some software (TownsOS, etc.) may exist.
+
+Items with * are in the list, but are bad dumps or incomplete.
+
+TODO:
+
+- Check if the MS-DOS entries are the "Basic" or "Extended" versions. Not sure of the difference. Keeping both for now.
+
+                            Title                                         Publisher             Release date  Media
+2069 AD                                                       Mahou (Nihon Home Data)           1991/11    FD×03
+A4 Map Construction + A4 Power-up Kit                         Artdink                           1994/4     FD×03
+ADPCM Kaihatsu Shien Library V1.1                             Fujitsu                           1991/7     FD
+ADPCM Kaihatsu Shien Library V2.1                             Fujitsu                           1992/6     FD
+AgentNet V1.0 (V1.1)                                          CSK Research Institute (CRI)      1990/12    FD
+Ai Shimai                                                     Silky's                           1994/9     FD×04
+ASM-386 Tool Kit V2.2                                         Fujitsu                           1995/3     FD
+Cameltry                                                      Dempa Shinbunsha                  1994/11    FD
+Cannon Sight                                                  Nikkonren Kikaku                  1993/?     FD×02
+CB Trainer Jikkou System V1.1                                 Fujitsu                           1993/5     FD
+CD Graphics Player V1.1                                       Fujitsu                           1990/5     FD
+CD-ROM XA Kyoutsuu Library V1.1                               Fujitsu                           1991/7     FD
+Champion Course Vol. 1 - Mauna Kea Beach Golf Course          Cybelle                           1995/2     FD×03
+Champion Course Vol. 2 - Firestone Country Club               Cybelle                           1995/2     FD×02
+Champion Course Vol. 3 - Banff Springs                        Cybelle                           1995/2     FD×03
+Champion Course Vol. 4 - Innisbrook                           Cybelle                           1995/2     FD×03
+Chuugakkou Ongaku: Ongakushi                                  Musical Plan                      1991/6     FD
+Chuugakkou Subaru-kun Series                                  Uchida Youkou                     1993/4     FD
+Chuugakkou Suugaku New Simulation Zukei-hen 1-nen             Tokyo Shoseki                     1994/3     FD
+Chuugakkou Suugaku New Simulation Zukei-hen 2-nen             Tokyo Shoseki                     1994/3     FD
+Chuugakkou Suugaku New Simulation Zukei-hen 3-nen             Tokyo Shoseki                     1994/3     FD
+Crescent                                                      Silky's                           1993/11    FD×04
+CRI Postman (Full Color)                                      CSK Research Institute (CRI)      1990/10    FD
+Cross Eitan Chinchin Hametaoshi                               Nikkonren Kikaku                  1995/12    FD×02
+Cross Eitan Hametaoshi                                        Nikkonren Kikaku                  1993/?     FD
+Cross Eitan Junior Hametaoshi                                 Nikkonren Kikaku                  1993/?     FD
+CS-1 Towns                                                    Unitek Japan                      1991/1     FD
+Cyber Animater                                                Fujitsu                           1992/7     FD
+CyberMotion                                                   Fujitsu                           1993/3     FD
+D.O. Kaizokuban                                               Brother Kougyou (Takeru)          1993/5     FD×03
+Daisenryaku 3 '90 Map Collection Vol. 1                       Pegasus Japan                     1992/5     FD
+Daisenryaku 3 '90 Map Collection Vol. 2                       Pegasus Japan                     1992/7     FD
+Darwin's Dilemma                                              Starcraft                         1991/8     FD
+Data Townsman                                                 Log                               1991/7     FD
+Dennou Kyoushi (Cyber Teacher)                                Nikkonren Kikaku                  1993/?     FD
+Dennou Sakka DX                                               Nikkonren Kikaku                  1993/?     FD×02
+Dennou Sakka DX (Cyber Writer Deluxe)                         Nikkonren Kikaku                  1993/?     FD
+Dennou Seito (Cyber Pupil)                                    Nikkonren Kikaku                  1993/?     FD
+Dor                                                           D.O.                              1992/5     FD×04
+Dor Part 3                                                    D.O.                              1992/11    FD×04
+Dragon Slayer                                                 Nihon Falcom                      1990/6     FD×03
+Dragon Slayer: Eiyuu Densetsu 2                               Brother Kougyou (Takeru)          1993/2     FD×05
+D-Return                                                      Nikkonren Kikaku                  1990/11    FD×02
+Elle                                                          Elf                               1991/11    FD×05
+Euphony V1.1                                                  Fujitsu                           1989/7     FD
+F-ISAM386 V1.1                                                Fujitsu                           1991/3     FD
+F-ISAM386 V3.1                                                Fujitsu                           1992/11    FD
+FM Towns 386-ASM Tool Kit V1.1                                Fujitsu                           1989/12    FD
+FM TOWNS 386-ASM Tool Kit V2.2                                Fujitsu                           1992/12    FD
+FM Towns BSC Tejun Library V1.1                               Fujitsu                           ?          FD
+FM Towns F6650 WS Library V1.1                                Fujitsu                           1992/5     FD
+FM Towns F6680 Emulator Pack V1.1                             Fujitsu                           1992/5     FD
+FM Towns High C Compiler V1.4                                 Fujitsu                           1991/1     FD
+FM Towns High C Compiler V1.7                                 Fujitsu                           1992/12    FD
+FM Towns High C Compiler V1.7 Kaihatsu Kit                    Fujitsu                           1992/12    FD
+FM Towns Kakuchou Library 1 V2.1                              Fujitsu                           1992/12    FD
+FM Towns Kakuchou Library 2 V2.1                              Fujitsu                           1993/1     FD
+FM Towns OmoshiroTV                                           Fujitsu Ooita Software Laboratory 1991/9     FD
+FM Towns Paso-Rika                                            Maris                             1991/1     FD×02
+FM-OASYS V1.0 Fax Soushin                                     Fujitsu                           1994/9     FD
+FM-OASYS V1.0 Floppy Disk System                              Fujitsu                           1993/3     FD
+FM-OASYS V1.0 L54                                             Fujitsu                           1995/3     FD
+FM-OASYS V1.0 Print Requester                                 Fujitsu                           1992/12    FD
+FM-OASYS V1.0 Tsuushin (WS)                                   Fujitsu                           1992/12    FD
+FM-OASYS V1.0 Vector Moji Pattern (Maru Gothic)               Fujitsu                           1992/12    FD
+FM-OASYS V1.0 Vector Moji Pattern (Mincho / Gothic)           Fujitsu                           1992/12    FD
+FM-OASYS V1.0 Vector Moji Pattern (Mouhitsu)                  Fujitsu                           1992/12    FD
+Fukkatsusai: Astikaya no Majo                                 Grocer                            1992/11    FD×07
+GaDB                                                          Fujitsu OA                        1992/7     FD×02
+Gear Base                                                     Inter Limited Logic               1991/10    FD
+Gear Video                                                    Inter Limited Logic               1991/8     FD
+Geitassha Towns (Data Shuu)                                   Shoubi Gakuen                     1990/6     FD×63
+Gokanshi                                                      Tensui Software                   1995/7     FD
+Gorby no Pipeline Daisakusen                                  Compile                           1991/4     FD
+Grapharmony V1.0                                              Fujitsu                           1992/3     FD
+Gyakutama Ou                                                  Grocer                            1995/1     FD×05
+Hametaoshi Tool                                               Nikkonren Kikaku                  1995/12    FD×02
+Hana yori Dango                                               Active                            1992/4     FD×03
+Healthy Life 2 Ryouri Data                                    Top Business System               1993/7     FD
+Hometown, U.S.A.                                              Fujitsu                           1990/3     FD×02
+Hon'yaku Helper Zurukamashi                                   Nikkonren Kikaku                  1991/1     FD×02
+Hunting Roulette                                              JAST                              1994/9     FD×03
+Hyper Album Omoide-kun                                        Computer System                   1991/2     FD×02
+Igo Taishou                                                   Shoudai Sangyou                   ?          FD×02
+Igo Taishou V2                                                Shoudai Sangyou                   1993/2     FD×02
+Image                                                         Software House Parsley            1994/5     FD×02
+Image II                                                      Software House Parsley            1994/6     FD×04
+Image Color System Pro                                        Raison                            1989/11    FD
+Jiman Grand Prix                                              Map Japan                         1992/3     FD
+Joou-sama ga Oshiete Ageru: Eigo no Bunpou                    Nikkonren Kikaku                  1994/11    FD
+Joou-sama ga Oshiete Ageru: Kagaku no Busshitsu               Nikkonren Kikaku                  1993/?     FD
+Joou-sama ga Oshiete Ageru: Kanji no Gakushuu                 Nikkonren Kikaku                  1994/11    FD
+Joou-sama ga Oshiete Ageru: Rekishi Nengou: Eitango 600       Nikkonren Kikaku                  1994/7     FD
+Jouhou Kiso Lunch Box                                         Uchida Youkou                     1994/3     FD×04
+JPEG Support Library V2.1                                     Fujitsu                           1993/1     FD
+Kakeibo + Fukubukuro                                          Cosmos Computer                   1989/11    FD×02
+Kakikomi Jiyuu na Gakushuu Note                               Nihon Kyouiku Shinbunsha          1992/5     FD
+Kakitaoshi Ver 2.0                                            Nikkonren Kikaku                  1993/?     FD
+Kanji Match                                                   Tokyo Shoseki                     1993/4     FD
+Kanji-ru Teacher Junior Kokitaoshi                            Nikkonren Kikaku                  1993/?     FD×02
+Kanji-ru Teacher Kokitaoshi                                   Nikkonren Kikaku                  1993/?     FD×02
+Keyword Eiwa Jiten (Kenkyuusha-hen)                           Camp                              1989/12    FD×02
+Keyword Waei Jiten (Kenkyuusha-hen)                           Camp                              1989/12    FD×02
+Kimi Toshitai You-jan Part 1                                  System Pro                        1989/9     FD
+Kiwame Jouseki Shuu                                           Log                               1992/11    FD
+LiveMotion Support Library                                    Fujitsu                           1993/1     FD
+Loop Eraser                                                   Nikkonren Kikaku                  1994/9     FD×02
+Loop: Izanahi no Kaikiten                                     Grocer                            1995/10    FD×05
+Lord Monarch                                                  Nihon Falcom                      1991/11    FD×03
+LPACK                                                         Kansai Denki                      1991/10    FD
+Lucid ASM & Debugger Ver. 1.1                                 Kansai Denki                      1990/4     FD
+Magic Ayako Suzume                                            Cosmos Computer                   1992/5     FDx03
+Mahjong Clinic Soukangou                                      Mahou (Nihon Home Data)           1991/11    FD×02
+Mahjong Elegance                                              C-Class                           1994/11    FD×02
+Mahjong Gensoukyouku - Mahjong Fantasia                       Active                            1992/7     FD×04
+Ma-Saiko-Jong                                                 Cosmos Computer                   1992/5     FD×03
+Media 4                                                       Fujitsu Social Science Laboratory 1993/4     FD
+Melody Surf: Oto Monogatari                                   TDK                               1994/1     FD
+Micom Drill Chuugaku Suugaku 1-nen~3-nen                      Kyouiku Soft Kenkyuusho           1993/4     FD
+Micom Drill Chuugaku Suugaku 1-nen~3-nen Gakuzai-you          Kyouiku Soft Kenkyuusho           1993/4     FD
+Micom Drill Chuugaku Suugaku 1-nen~3-nen Gakuzai-you Set 500  Kyouiku Soft Kenkyuusho           1993/4     FD
+Microsoft Windows 95 (Tsuujou Package)                        Fujitsu                           1996/6     FD×20
+Microsoft Windows Software Kaihatsu Kit V3.1                  Fujitsu                           1993/8     FD
+MIDI World Towns                                              Musical Plan                      1991/10    FD
+Migenerator Jikkou System V1.1                                Fujitsu                           1992/8     FD
+Misty 2                                                       Data West                         1989/11    FD
+Misty Vol. 3                                                  Data West                         1990/1     FD
+Misty Vol. 4                                                  Data West                         1990/7     FD
+Misty Vol. 5                                                  Data West                         1990/9     FD
+Misty Vol. 6                                                  Data West                         1990/11    FD
+Misty Vol. 7                                                  Data West                         1991/1     FD
+Mixing Pro-Towns                                              Musical Plan                      1992/9     FD
+MoviE Towns V1.00 (1.10)                                      CSK Research Institute (CRI)      1990/1     FD
+Music Drill Ongaku Kokuban                                    Kawai                             1993/2     FD
+Music Pro-Towns                                               Musical Plan                      1989/9     FD
+Music Pro-Towns (MIDI)                                        Musical Plan                      1990/7     FD
+Natya                                                         Rimshot                           1990/6     FD×02
+Nihongo Microsoft Windows V3.0 Multimedia Kaihatsu Kit        Fujitsu                           1992/12    FD×03
+Nihongo Microsoft Windows V3.0 Multimedia Kaihatsu Kit        Fujitsu                           1992/12    FD×03
+Nihongo MS-DOS V3.1 (Basic)                                   Fujitsu                           1992/11    FD
+Nihongo MS-DOS V3.1 (Extended)                                Fujitsu                           1992/7     FD
+Nihongo MS-DOS V5.0 (Basic)                                   Fujitsu                           1992/11    FD
+Nihongo MS-DOS V5.0 (Extended)                                Fujitsu                           1993/6     FD
+Nihongo MS-DOS V6.2 (Basic)                                   Fujitsu                           1994/2     FD
+Nihongo MS-DOS V6.2 (Extended)                                Fujitsu                           1994/2     FD
+Nihongo MS-Windows V3.0                                       Fujitsu                           1992/12    FD
+Nonomura Byouin no Hitobito                                   Silky's                           1994/7     FD×05
+Oh! Pai                                                       Silky's                           1993/9     FD×05
+Orihime V1.0                                                  Yoshikawa Systec                  1993/8     FD
+Otoko to Onna no Aishou Shindan                               System House Space                1993/6     FD
+PC Globe 5.0                                                  Hiro                              1995/3     FD×04
+Planetary Campaign                                            Nikkonren Kikaku                  1993/?     FD
+Pleria                                                        Orange House                      1992/7     FD×05
+Ponyon                                                        Ponytail Soft                     1992/9     FD×04
+Premium                                                       Silky's                           1992/11    FD×04
+Present 2                                                     Orange House                      1992/10    FD×05
+Purple Cat Vol. 1                                             Palm Tree                         1993/3     FD×02
+Purple Cat Vol. 2                                             Palm Tree                         1993/6     FD×04
+Purple Cat Vol. 3                                             Palm Tree                         1993/10    FD×05
+Purupuru Paradise                                             Palm Tree                         1994/1     FD×05
+Quiz Banchou                                                  Active                            1992/5     FD×03
+School-Ace Alpha HG Seito-you                                 Fujitsu                           1994/7     FD×03
+School-Ace Alpha: Seito-you                                   Fujitsu                           1991/7     FD
+School-Ace Alpha: Sensei-you                                  Fujitsu                           1991/7     FD
+School-Card Alpha                                             Fujitsu                           1991/5     FD×05
+School-Card Alpha Anime Option                                Fujitsu                           1993/4     FD
+School-Card Alpha Eizou Shori Option                          Fujitsu                           1993/4     FD
+School-Card Alpha Junior                                      Fujitsu                           1994/7     FD×02
+School-Card Alpha Sensei Kit                                  Fujitsu                           1993/4     FD
+School-Edin Alpha Sensei-you V1.1 L10                         Fujitsu                           1993/5     FD
+Schoolmenu Henshuu-you                                        Fujitsu                           1994/9     FD
+Schoolmenu Jikkou-you                                         Fujitsu                           1994/9     FD
+Shangrlia                                                     Elf                               1992/1     FD×04
+Shin Kakeibo Good Manager                                     Cosmos Computer                   1992/7     FD×02
+Shisetsu Sangokushi                                           Tensui Software                   1993/9     FD
+Shisetsu Sengoku Jidai                                        Tensui Software                   1994/6     FD
+Shougakkou Sansuu Simulation 4-nen                            Tokyo Shoseki                     1991/9     FD
+Shougakkou Sansuu Simulation 5-nen                            Tokyo Shoseki                     1991/9     FD
+Shougakkou Sansuu Simulation 6-nen                            Tokyo Shoseki                     1991/9     FD
+Shougi Shouten                                                Mahou (Nihon Home Data)           1992/4     FD×02
+Shougi Taishou V2                                             Shoudai Sangyou                   1993/1     FD×02
+Shougi Taishoui                                               Shoudai Sangyou                   1992/12    FD×02
+SimCity Terrain Editor                                        Fujitsu                           1992/6     FD
+Sokudoku-kun                                                  OBIC Office Automation            1990/12    FD×02
+Sougen Towns: Nihongo Expert Shell                            AI Soft                           1990/4     FD×03
+Soukou Towns: Idea Processor                                  AI Soft                           1990/9     FD×29
+Spell Master Junior Kakitaoshi                                Nikkonren Kikaku                  1991/8     FD×02
+Spell Master Kakitaoshi                                       Nikkonren Kikaku                  1991/8     FD×02
+Super Daisenryaku                                             System Soft                       1990/3     FD×02
+Super Itekomashi Perfect                                      Nikkonren Kikaku                  1994/12    FD
+Super Paso-rika Keisuke                                       Fujitsu Ooita Software Laboratory 1993/7     FD×02
+Super Ultra Mucchin Puripuri Cyborg Marilyn DX                JAST                              1994/4     FD×03
+Symmetry 17                                                   Jouhou Suuri Kenkyuusho           1992/2     FD
+Tablet Keyboard Driver V1.1                                   Fujitsu                           1993/7     FD
+Tenshi-tachi no Gogo Collection                               JAST                              1995/3     FD×04
+Tenshi-tachi no Gogo VI: My Fair Teacher                      JAST                              1993/8     FD×03
+TISP V1.1                                                     Fujitsu                           1992/12    FD
+TL-1 Tapeless Recording System                                Fujitsu Ooita Software Laboratory 1994/3     FD
+Together                                                      JEL                               1989/3     FD
+Tops CAI Kyougaku Hakase <Chuugaku 1-nen> Houteishiki         Tokyo Shuppan                     1990/5     FD
+Tops CAI Kyougaku Hakase <Chuugaku 1-nen> Moji no Shiki       Tokyo Shuppan                     1993/9     FD
+Tops CAI Kyougaku Hakase <Chuugaku 1-nen> Seifu no Kazu       Tokyo Shuppan                     1992/8     FD
+Tops CAI Kyougaku Hakase <Chuugaku 1-nen> Seisuu              Tokyo Shuppan                     1993/9     FD
+Tops CAI Kyougaku Hakase <Chuugaku 2-nen> Fudoushiki          Tokyo Shuppan                     1990/5     FD
+Tops CAI Kyougaku Hakase <Chuugaku 2-nen> Ichiji Kansou       Tokyo Shuppan                     1990/5     FD
+Tops CAI Kyougaku Hakase <Chuugaku 2-nen> Renritsu Houteishiki  Tokyo Shuppan                     1990/5     FD
+Tops CAI Kyougaku Hakase <Chuugaku 3-nen> 2-ji Houteishiki    Tokyo Shuppan                     1990/6     FD
+Tops CAI Kyougaku Hakase <Chuugaku 3-nen> 2-ji Kansou         Tokyo Shuppan                     1990/6     FD
+Tops CAI Kyougaku Hakase <Chuugaku 3-nen> Heihoukon           Tokyo Shuppan                     1992/9     FD
+Tops CAI Kyougaku Hakase <Chuugaku 3-nen> Kiso kara no Kakuritsu    Tokyo Shuppan                     1993/2     FD
+Tops CAI Kyougaku Hakase <Koukou Nyuushi> Kuukan Zukei - 1    Tokyo Shuppan                     1992/8     FD
+Tops CAI Kyougaku Hakase <Koukou Nyuushi> Kuukan Zukei - 2    Tokyo Shuppan                     1992/8     FD
+Totsugeki! Bakkon Street                                      JAST                              1994/1     FD×02
+Totsugeki! Bakkon Street 2: Hunting Roulette                  JAST                              1994/9     FDx03
+Towns Butsuri Newton-kun                                      Fujitsu Ooita Software Laboratory 1991/4     FD
+Towns Drill Sansuu 1-nen Gear V1.1.L20                        Kyouiku Soft Kenkyuusho           1989/9     FD
+Towns Drill Sansuu 1-nen Gear V2.1                            Kyouiku Soft Kenkyuusho           1992/3     FD
+Towns Drill Shougaku Sansuu 1-nen~3-nen                       Kyouiku Soft Kenkyuusho           1994/3     FD×03
+Towns Drill Shougaku Sansuu 1-nen~6-nen (Gakkou-you Set 500)  Kyouiku Soft Kenkyuusho           1992/4     FD×07
+Towns Drill Shougaku Sansuu 1-nen~6-nen (Gakkou-you)          Kyouiku Soft Kenkyuusho           1992/4     FD×07
+Towns Drill Shougaku Sansuu 2-nen Gear V1.1L20                Kyouiku Soft Kenkyuusho           1992/3     FD
+Towns Drill Shougaku Sansuu 2-nen Gear V2.1                   Kyouiku Soft Kenkyuusho           1989/9     FD×02
+Towns Drill Shougaku Sansuu 3-nen Gear V1.1L20                Kyouiku Soft Kenkyuusho           1992/3     FD
+Towns Drill Shougaku Sansuu 3-nen Gear V2.1                   Kyouiku Soft Kenkyuusho           1989/9     FD
+Towns Drill Shougaku Sansuu 4-nen Gear V1.1L20                Kyouiku Soft Kenkyuusho           1992/3     FD
+Towns Drill Shougaku Sansuu 4-nen Gear V2.1                   Kyouiku Soft Kenkyuusho           1989/9     FD
+Towns Drill Shougaku Sansuu 4-nen~6-nen                       Kyouiku Soft Kenkyuusho           1994/3     FD×03
+Towns Drill Shougaku Sansuu 5-nen Gear V1.1L20                Kyouiku Soft Kenkyuusho           1992/3     FD
+Towns Drill Shougaku Sansuu 5-nen Gear V2.1                   Kyouiku Soft Kenkyuusho           1990/2     FD
+Towns Drill Shougaku Sansuu 6-nen Gear V1.1L20                Kyouiku Soft Kenkyuusho           1992/3     FD
+Towns Drill Shougaku Sansuu 6-nen Gear V2.1                   Kyouiku Soft Kenkyuusho           1990/2     FD
+Towns Hair Simulator: Hair Maker Towns                        Computer System                   1991/12    FD×10
+Towns Jouhou Kiso Select-F                                    Tokyo Shoseki                     1993/3     FD×03
+Towns Karaoke V1.1                                            Fujitsu                           1989/7     FD
+TownsGEAR de Obenkyou Dai-1-kan: Seigo Mondai                 Kyouiku Soft Kenkyuusho           1992/3     FD×02
+TownsGEAR de Obenkyou Dai-2-kan: Sentaku Mondai               Kyouiku Soft Kenkyuusho           1992/3     FD×02
+TownsGEAR de Obenkyou Dai-3-kan: Suuchi Mondai                Kyouiku Soft Kenkyuusho           1992/3     FD×02
+Traffic Confusion                                             Masterpiece                       1992/6     FD×02
+Type Master Oshitaoshi                                        Nikkonren Kikaku                  1992/7     FD
+Video Library V1.1                                            Fujitsu                           1991/10    FD
+Video Library V2.1                                            Fujitsu                           1992/12    FD
+VideoCD Saisei Kit V1.1 L10                                   Fujitsu                           1995/1     FD
+VIP Karaoke                                                   CSK Research Institute (CRI)      1992/4     FD
+WordLook                                                      CSK Research Institute (CRI)      1991/4     FD
+Youjuu Club Custom                                            D.O.                              1992/3     FD×03
+Yukineko                                                      JAST                              1995/4     FD×04
+Zurukamashi Adult Jisho                                      Nikkonren Kikaku                  1992/2     FD
+Zurukamashi Junior Jisho                                      Nikkonren Kikaku                  1991/5     FD
+Zurukamashi Ver 2.0                                           Nikkonren Kikaku                  1993/?     FD×02
 
 -->
 
@@ -1259,6 +1446,23 @@ Yuki Neko                                               Apr-95  Jast    (FDx4)
 			<feature name="part_id" value="Tonoo no Mori Disk B" />
 			<dataarea name="flop" size="1261568">
 				<rom name="super d.p.s. (disk 6 - toono no mori b).hdm" size="1261568" crc="78ae11c6" sha1="8410d7c8932eb94178d821d93afd6ce3f03b0c00" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sweetang">
+		<description>Sweet Angel</description>
+		<year>1992</year>
+		<publisher>アクティブ (Active)</publisher>
+		<info name="release" value="199211xx" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="sweetangel1.hdm" size="1261568" crc="2d128f6f" sha1="9003bab991a3eee955b62b333787779b850b0253" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="sweetangel2.hdm" size="1261568" crc="e0f4017c" sha1="447c3e91b01396d249b2aad08001339148df7bf9" offset="0" />
 			</dataarea>
 		</part>
 	</software>

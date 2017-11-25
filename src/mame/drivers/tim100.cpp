@@ -10,7 +10,6 @@ Mihajlo Pupin Institute
 
 Notes:
 - Serial terminals appear to need 8 bits, 2 stop bits, odd parity @ 9600
-- Unable to set these settings as default, because std::bad_cast fatal error occurs at start
 - Unable to type anything as it seems uarts want BRKDET activated all the time, which we cannot do.
 - Unable to find any technical info at all, so it's all guesswork.
 

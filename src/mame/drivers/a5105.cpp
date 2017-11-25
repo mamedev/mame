@@ -13,7 +13,6 @@
 
 
 ToDo:
-- Fix hang when it should scroll
 - Cassette Load (bit 7 of port 91)
 
 
@@ -42,31 +41,21 @@ class a5105_state : public driver_device
 {
 public:
 	a5105_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_hgdc(*this, "upd7220"),
-			m_cass(*this, "cassette"),
-			m_beep(*this, "beeper"),
-			m_fdc(*this, "upd765a"),
-			m_floppy0(*this, "upd765a:0"),
-			m_floppy1(*this, "upd765a:1"),
-			m_floppy2(*this, "upd765a:2"),
-			m_floppy3(*this, "upd765a:3"),
-			m_video_ram(*this, "video_ram"),
-			m_ram(*this, RAM_TAG),
-			m_gfxdecode(*this, "gfxdecode"),
-			m_palette(*this, "palette")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_hgdc(*this, "upd7220")
+		, m_cass(*this, "cassette")
+		, m_beep(*this, "beeper")
+		, m_fdc(*this, "upd765a")
+		, m_floppy0(*this, "upd765a:0")
+		, m_floppy1(*this, "upd765a:1")
+		, m_floppy2(*this, "upd765a:2")
+		, m_floppy3(*this, "upd765a:3")
+		, m_video_ram(*this, "video_ram")
+		, m_ram(*this, RAM_TAG)
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_palette(*this, "palette")
 		{ }
-
-	required_device<cpu_device> m_maincpu;
-	required_device<upd7220_device> m_hgdc;
-	required_device<cassette_image_device> m_cass;
-	required_device<beep_device> m_beep;
-	required_device<upd765a_device> m_fdc;
-	required_device<floppy_connector> m_floppy0;
-	required_device<floppy_connector> m_floppy1;
-	required_device<floppy_connector> m_floppy2;
-	required_device<floppy_connector> m_floppy3;
 
 	DECLARE_READ8_MEMBER(a5105_memsel_r);
 	DECLARE_READ8_MEMBER(key_r);
@@ -77,7 +66,12 @@ public:
 	DECLARE_WRITE8_MEMBER( a5105_upd765_w );
 	DECLARE_WRITE8_MEMBER(pcg_addr_w);
 	DECLARE_WRITE8_MEMBER(pcg_val_w);
-	required_shared_ptr<uint16_t> m_video_ram;
+	DECLARE_PALETTE_INIT(a5105);
+	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
+	UPD7220_DRAW_TEXT_LINE_MEMBER( hgdc_draw_text );
+
+private:
 	uint8_t *m_ram_base;
 	uint8_t *m_rom_base;
 	uint8_t *m_char_ram;
@@ -87,13 +81,19 @@ public:
 	uint8_t m_memsel[4];
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(a5105);
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	required_device<cpu_device> m_maincpu;
+	required_device<upd7220_device> m_hgdc;
+	required_device<cassette_image_device> m_cass;
+	required_device<beep_device> m_beep;
+	required_device<upd765a_device> m_fdc;
+	required_device<floppy_connector> m_floppy0;
+	required_device<floppy_connector> m_floppy1;
+	required_device<floppy_connector> m_floppy2;
+	required_device<floppy_connector> m_floppy3;
+	required_shared_ptr<uint16_t> m_video_ram;
 	required_device<ram_device> m_ram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
-	UPD7220_DRAW_TEXT_LINE_MEMBER( hgdc_draw_text );
 };
 
 /* TODO */

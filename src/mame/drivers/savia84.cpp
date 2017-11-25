@@ -58,14 +58,14 @@ private:
 	required_device<i8255_device> m_ppi8255;
 };
 
-static ADDRESS_MAP_START( savia84_mem, AS_PROGRAM, 8, savia84_state )
+static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, savia84_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff) // A15 not connected at the CPU
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
 	AM_RANGE(0x1800, 0x1fff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( savia84_io, AS_IO, 8, savia84_state )
+static ADDRESS_MAP_START( io_map, AS_IO, 8, savia84_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x07)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ppi8255", i8255_device, read, write) // ports F8-FB
@@ -173,8 +173,8 @@ READ8_MEMBER( savia84_state::savia84_8255_portc_r ) // IN FA - read keyboard
 static MACHINE_CONFIG_START( savia84 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz / 2)
-	MCFG_CPU_PROGRAM_MAP(savia84_mem)
-	MCFG_CPU_IO_MAP(savia84_io)
+	MCFG_CPU_PROGRAM_MAP(mem_map)
+	MCFG_CPU_IO_MAP(io_map)
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_savia84)

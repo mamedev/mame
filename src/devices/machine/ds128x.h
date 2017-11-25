@@ -18,6 +18,7 @@ public:
 
 protected:
 	virtual int data_size() override { return 128; }
+	virtual int get_timer_bypass() override;
 };
 
 // device type definition

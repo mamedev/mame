@@ -100,6 +100,9 @@ DEFINE_DEVICE_TYPE(SONY_OA_D31V, sony_oa_d31v, "sony_oa_d31v", "Sony OA-D31V Mic
 DEFINE_DEVICE_TYPE(SONY_OA_D32W, sony_oa_d32w, "sony_oa_d32w", "Sony OA-D32W Micro Floppydisk Drive")
 DEFINE_DEVICE_TYPE(SONY_OA_D32V, sony_oa_d32v, "sony_oa_d32v", "Sony OA-D32V Micro Floppydisk Drive")
 
+// TEAC 3" drives
+DEFINE_DEVICE_TYPE(TEAC_FD_30A, teac_fd_30a, "teac_fd_30a", "TEAC FD-30A FDD")
+
 // TEAC 5.25" drives
 #if 0
 DEFINE_DEVICE_TYPE(TEAC_FD_55A, teac_fd_55a, "teac_fd_55a", "TEAC FD-55A FDD")
@@ -785,8 +788,9 @@ attotime floppy_image_device::get_next_transition(const attotime &from_when)
 	// TODO: Implement a proper spin-up ramp for transition times, also in order
 	// to cover potential copy protection measures that have direct device
 	// access (mz)
-	if (ready_counter > 0)
-		return attotime::never;
+	// MORE TODO: this breaks the tandy2k and pcjr.  needs investigation.
+	//if (ready_counter > 0)
+	//  return attotime::never;
 
 	std::vector<uint32_t> &buf = image->get_buffer(cyl, ss, subcyl);
 	uint32_t cells = buf.size();
@@ -2147,6 +2151,39 @@ void sony_oa_d32v::handled_variants(uint32_t *variants, int &var_count) const
 	var_count = 0;
 	variants[var_count++] = floppy_image::SSSD;
 	variants[var_count++] = floppy_image::SSDD;
+}
+
+//-------------------------------------------------
+//  TEAC FD-30A
+//
+//  track to track: 12 ms
+//  average: 171 ms
+//  setting time: 15 ms
+//  motor start time: 400 ms
+//
+//-------------------------------------------------
+
+teac_fd_30a::teac_fd_30a(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	floppy_image_device(mconfig, TEAC_FD_30A, tag, owner, clock)
+{
+}
+
+teac_fd_30a::~teac_fd_30a()
+{
+}
+
+void teac_fd_30a::setup_characteristics()
+{
+	form_factor = floppy_image::FF_3;
+	tracks = 40;
+	sides = 1;
+	set_rpm(300);
+}
+
+void teac_fd_30a::handled_variants(uint32_t *variants, int &var_count) const
+{
+	var_count = 0;
+	variants[var_count++] = floppy_image::SSSD;
 }
 
 //-------------------------------------------------

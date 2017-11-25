@@ -11,7 +11,7 @@
 
 
 // device type definition
-DEFINE_DEVICE_TYPE(SVISION_SND, svision_sound_device, "svision_sound", "Super Vision Audio Custom")
+DEFINE_DEVICE_TYPE(SVISION_SND, svision_sound_device, "svision_sound", "Super Vision Custom Sound")
 
 
 //**************************************************************************

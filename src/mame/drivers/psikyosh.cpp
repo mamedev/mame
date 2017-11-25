@@ -972,11 +972,49 @@ ROM_END
 
 /* PS5 */
 
-ROM_START( gunbird2 )
+ROM_START( gunbird2 ) /* Internal date string shows Oct 07 16:05 */
 	ROM_REGION( 0x180000, "maincpu", 0)
 	ROM_LOAD32_WORD_SWAP( "2_prog_l.u16", 0x000002, 0x080000, CRC(76f934f0) SHA1(cf197796d66f15639a6b3d5311c18da33cefd06b) )
 	ROM_LOAD32_WORD_SWAP( "1_prog_h.u17", 0x000000, 0x080000, CRC(7328d8bf) SHA1(c640de1ab5b32400b2d77e0dc6e3ee0f78ab7803) )
 	ROM_LOAD16_WORD_SWAP( "3_pdata.u1",   0x100000, 0x080000, CRC(a5b697e6) SHA1(947f124fa585c2cf77c6571af7559bd652897b89) )
+
+	ROM_REGION( 0x3800000, "gfx1", 0 )
+	ROM_LOAD32_WORD( "0l.u3",  0x0000000, 0x800000, CRC(5c826bc8) SHA1(74fb6b242b4c5fe5365cfcc3029ed6da4cf3a621) )
+	ROM_LOAD32_WORD( "0h.u10", 0x0000002, 0x800000, CRC(3df0cb6c) SHA1(271d276fa0f63d84e458223316a9517865fc2255) )
+	ROM_LOAD32_WORD( "1l.u4",  0x1000000, 0x800000, CRC(1558358d) SHA1(e3b9c3da4e9b29ffa9568b57d14fe2b600aead68) )
+	ROM_LOAD32_WORD( "1h.u11", 0x1000002, 0x800000, CRC(4ee0103b) SHA1(29bbe0162dda39919fcd188ea4a6b7b5f20366ff) )
+	ROM_LOAD32_WORD( "2l.u5",  0x2000000, 0x800000, CRC(e1c7a7b8) SHA1(b5f6e5d53e21928197773df7dde0e7c83f4082af) )
+	ROM_LOAD32_WORD( "2h.u12", 0x2000002, 0x800000, CRC(bc8a41df) SHA1(90460b11eea778f17cf8be67430e2ab149680686) )
+	ROM_LOAD32_WORD( "3l.u6",  0x3000000, 0x400000, CRC(0229d37f) SHA1(f9d98d1d2dda2d552b2a46c76b4c7fc84b1aa4c6) )
+	ROM_LOAD32_WORD( "3h.u13", 0x3000002, 0x400000, CRC(f41bbf2b) SHA1(b705274e392541e2f513a4ae4bae543c03be0913) )
+
+	ROM_REGION( 0x400000, "ymf", 0 ) /* Samples */
+	ROM_LOAD( "sound.u9", 0x000000, 0x400000, CRC(f19796ab) SHA1(b978f0550ebd675e8ce9d9edcfcc3f6214e49e8b) )
+
+	ROM_REGION( 0x100, "eeprom", 0 )
+	ROM_LOAD( "eeprom-gunbird2.bin", 0x0000, 0x0100, CRC(7ac38846) SHA1(c5f4b05a94211f3c96b8c472adbe634f2e77d753) )
+ROM_END
+
+/*
+This Program & Data ROM set came from a PCB in Korea.
+
+Notable differences:
+ On initial bootup, no sound of "Marion...."
+ On inserting coins, no "Gunbird 2" wave, just a tone pattern
+ On selecting a character to play, no character name wave, just a simple tone
+ On capturing a power-up there's no "Power Up" in character voice, just a simple tone
+
+Seems to have minimal changes, probably just the sound table.  Internal date string
+shows Oct 08 17:02, while the above parent set shows Oct 07 16:05
+
+This set can still be set Japan, International Ver A. or International Ver B. via jumper pads
+*/
+
+ROM_START( gunbird2a ) /* Internal date string shows Oct 08 17:02 - No specific Korean copyright / message, but made for the Korean market? */
+	ROM_REGION( 0x180000, "maincpu", 0)
+	ROM_LOAD32_WORD_SWAP( "prog_l.u16", 0x000002, 0x080000, CRC(974f85ba) SHA1(4e19b12bd5f268088317ea231bbe7f9d2d694b2b) ) /* these roms had no labels */
+	ROM_LOAD32_WORD_SWAP( "prog_h.u17", 0x000000, 0x080000, CRC(cb0cb826) SHA1(8827e9ebfedbc63dbf41c6a5c994a691a6d63fdb) )
+	ROM_LOAD16_WORD_SWAP( "pdata.u1",   0x100000, 0x080000, CRC(23751839) SHA1(4762685d1f6843e8e53eae6c014e66b98fa15eb7) )
 
 	ROM_REGION( 0x3800000, "gfx1", 0 )
 	ROM_LOAD32_WORD( "0l.u3",  0x0000000, 0x800000, CRC(5c826bc8) SHA1(74fb6b242b4c5fe5365cfcc3029ed6da4cf3a621) )
@@ -1229,7 +1267,8 @@ GAME( 1998, sbomber,   0,        psikyo3v1,   sbomberb, psikyosh_state, ps3,    
 GAME( 1998, sbombera,  sbomber,  psikyo3v1,   sbomberb, psikyosh_state, ps3,      ROT270, "Psikyo", "Space Bomber", MACHINE_SUPPORTS_SAVE )
 
 /* ps5 */
-GAME( 1998, gunbird2,  0,        psikyo5,     gunbird2, psikyosh_state, ps5,      ROT270, "Psikyo", "Gunbird 2", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, gunbird2,  0,        psikyo5,     gunbird2, psikyosh_state, ps5,      ROT270, "Psikyo", "Gunbird 2 (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, gunbird2a, gunbird2, psikyo5,     gunbird2, psikyosh_state, ps5,      ROT270, "Psikyo", "Gunbird 2 (set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1999, s1945iii,  0,        psikyo5,     s1945iii, psikyosh_state, ps5,      ROT270, "Psikyo", "Strikers 1945 III (World) / Strikers 1999 (Japan)", MACHINE_SUPPORTS_SAVE )
 
 /* ps5v2 */

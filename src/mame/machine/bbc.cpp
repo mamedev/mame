@@ -346,6 +346,9 @@ WRITE8_MEMBER(bbc_state::page_selectbm_w)
 	m_pagedRAM = (data & 0x80) >> 7;
 	m_rombank = data & 0x0f;
 
+	if (m_lk19_ic37_paged_rom && (m_rombank == 4 || m_rombank == 5)) m_pagedRAM = 0;
+	if (m_lk18_ic41_paged_rom && (m_rombank == 6 || m_rombank == 7)) m_pagedRAM = 0;
+
 	if (m_pagedRAM)
 	{
 		m_bank4->set_entry(0x10);
@@ -359,12 +362,10 @@ WRITE8_MEMBER(bbc_state::page_selectbm_w)
 }
 
 
-
 WRITE8_MEMBER(bbc_state::bbc_memorybm1_w)
 {
 	m_region_maincpu->base()[offset] = data;
 }
-
 
 
 WRITE8_MEMBER(bbc_state::bbc_memorybm2_w)
@@ -387,11 +388,6 @@ WRITE8_MEMBER(bbc_state::bbc_memorybm2_w)
 	}
 }
 
-static const unsigned short bbc_master_sideways_ram_banks[16]=
-{
-	0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0
-};
-
 
 WRITE8_MEMBER(bbc_state::bbc_memorybm4_w)
 {
@@ -401,7 +397,7 @@ WRITE8_MEMBER(bbc_state::bbc_memorybm4_w)
 	}
 	else
 	{
-		if (bbc_master_sideways_ram_banks[m_rombank])
+		if ((!m_lk18_ic41_paged_rom && (m_rombank == 6 || m_rombank == 7)) || (!m_lk19_ic37_paged_rom && (m_rombank == 4 || m_rombank == 5)))
 		{
 			m_region_opt->base()[offset+(m_rombank<<14)] = data;
 		}
@@ -411,9 +407,9 @@ WRITE8_MEMBER(bbc_state::bbc_memorybm4_w)
 
 WRITE8_MEMBER(bbc_state::bbc_memorybm5_w)
 {
-	if (bbc_master_sideways_ram_banks[m_rombank])
+	if ((!m_lk18_ic41_paged_rom && (m_rombank == 6 || m_rombank == 7)) || (!m_lk19_ic37_paged_rom && (m_rombank == 4 || m_rombank == 5)))
 	{
-		m_region_opt->base()[offset+(m_rombank<<14)+0x1000] = data;
+		m_region_opt->base()[offset+(m_rombank<<14) + 0x1000] = data;
 	}
 }
 
@@ -505,7 +501,11 @@ READ8_MEMBER(bbc_state::bbcm_r)
 		if ((myo>=0x80) && (myo<=0x9f))                   return 0xfe;
 		if ((myo>=0xa0) && (myo<=0xbf))                   return m_adlc ? m_adlc->read(space, myo & 0x03) : 0xfe;
 		if ((myo>=0xc0) && (myo<=0xdf))                   return 0xff;
-		if ((myo>=0xe0) && (myo<=0xff))                   return m_intube ? m_intube->host_r(space, myo-0xe0) : 0xff;
+		if ((myo>=0xe0) && (myo<=0xff))
+		{
+			if (m_intube &&  m_ACCCON_ITU)                  return m_intube->host_r(space, myo-0xe0);                       /* Internal TUBE */
+			if (m_extube && !m_ACCCON_ITU)                  return m_extube->host_r(space, myo-0xe0);                       /* External TUBE */
+		}
 	}
 	return 0xfe;
 }
@@ -536,7 +536,11 @@ WRITE8_MEMBER(bbc_state::bbcm_w)
 		//if ((myo>=0x80) && (myo<=0x9f))
 		if ((myo>=0xa0) && (myo<=0xbf) && (m_adlc))       m_adlc->write(space, myo & 0x03, data);
 		//if ((myo>=0xc0) && (myo<=0xdf))
-		if ((myo>=0xe0) && (myo<=0xff) && (m_intube))     m_intube->host_w(space, myo-0xe0, data);
+		if ((myo>=0xe0) && (myo<=0xff))
+		{
+			if (m_intube &&  m_ACCCON_ITU)                  m_intube->host_w(space, myo-0xe0, data);                        /* Internal TUBE */
+			if (m_extube && !m_ACCCON_ITU)                  m_extube->host_w(space, myo-0xe0, data);                        /* External TUBE */
+		}
 	}
 }
 
@@ -1759,6 +1763,9 @@ MACHINE_START_MEMBER(bbc_state, bbcm)
 	m_machinetype = MASTER;
 	m_mc6850_clock = 0;
 
+	m_lk18_ic41_paged_rom = false; /* Link set for RAM in slots 6 and 7 */
+	m_lk19_ic37_paged_rom = false; /* Link set for RAM in slots 4 and 5 */
+
 	bbcm_setup_banks(m_bank4, 16, 0, 0x1000);
 	m_bank4->configure_entries(16, 1, m_region_maincpu->base() + 0x8000, 0x1000);   // additional bank for paged ram
 	bbcm_setup_banks(m_bank5, 16, 0x1000, 0x3000);
@@ -1815,4 +1822,13 @@ MACHINE_RESET_MEMBER(bbc_state, ltmpm)
 	m_monitortype = monitor_type_t::GREEN;
 	m_Speech      = 0;
 	m_SWRAMtype   = 0;
+}
+
+
+MACHINE_START_MEMBER(bbc_state, cfa3000)
+{
+	MACHINE_START_CALL_MEMBER(bbcm);
+
+	m_lk18_ic41_paged_rom = true; /* Link set for ROM in slots 6 and 7 */
+	m_lk19_ic37_paged_rom = true; /* Link set for ROM in slots 4 and 5 */
 }

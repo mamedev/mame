@@ -155,6 +155,29 @@ READ8_MEMBER( mc6845_device::status_r )
 }
 
 
+void mc6845_device::transparent_update()
+{
+	if (m_supports_transparent && MODE_TRANSPARENT)
+	{
+		if (MODE_TRANSPARENT_PHI2)
+		{
+			m_update_addr++;
+			m_update_addr &= 0x3fff;
+			call_on_update_address(0);
+		}
+		else
+		{
+			/* MODE_TRANSPARENT_BLANK */
+			if (m_update_ready_bit)
+			{
+				m_update_ready_bit = false;
+				update_upd_adr_timer();
+			}
+		}
+	}
+}
+
+
 READ8_MEMBER( mc6845_device::register_r )
 {
 	uint8_t ret = 0;
@@ -167,26 +190,7 @@ READ8_MEMBER( mc6845_device::register_r )
 		case 0x0f:  ret = (m_cursor_addr    >> 0) & 0xff; break;
 		case 0x10:  ret = (m_light_pen_addr >> 8) & 0xff; m_light_pen_latched = false; break;
 		case 0x11:  ret = (m_light_pen_addr >> 0) & 0xff; m_light_pen_latched = false; break;
-		case 0x1f:
-			if (m_supports_transparent && MODE_TRANSPARENT)
-			{
-				if(MODE_TRANSPARENT_PHI2)
-				{
-					m_update_addr++;
-					m_update_addr &= 0x3fff;
-					call_on_update_address(0);
-				}
-				else
-				{
-					/* MODE_TRANSPARENT_BLANK */
-					if(m_update_ready_bit)
-					{
-						m_update_ready_bit = false;
-						update_upd_adr_timer();
-					}
-				}
-			}
-			break;
+		case 0x1f:  transparent_update(); break;
 
 		/* all other registers are write only and return 0 */
 		default: break;
@@ -236,26 +240,7 @@ WRITE8_MEMBER( mc6845_device::register_w )
 					call_on_update_address(0);
 			}
 			break;
-		case 0x1f:
-			if (m_supports_transparent && MODE_TRANSPARENT)
-			{
-				if(MODE_TRANSPARENT_PHI2)
-				{
-					m_update_addr++;
-					m_update_addr &= 0x3fff;
-					call_on_update_address(0);
-				}
-				else
-				{
-					/* MODE_TRANSPARENT_BLANK */
-					if(m_update_ready_bit)
-					{
-						m_update_ready_bit = false;
-						update_upd_adr_timer();
-					}
-				}
-			}
-			break;
+		case 0x1f:  transparent_update(); break;
 		default: break;
 	}
 

@@ -279,9 +279,9 @@ private:
 	uint8_t m_tsr;                            /* transmitter status register */
 	uint8_t m_rsr;                            /* receiver status register */
 	uint8_t m_transmit_buffer;                /* USART data register */
-	int m_transmit_pending;
+	bool m_transmit_pending;
 	uint8_t m_receive_buffer;
-	int m_receive_pending;
+	bool m_overrun_pending;
 	uint8_t m_gpio_input;
 	uint8_t m_gpio_output;
 

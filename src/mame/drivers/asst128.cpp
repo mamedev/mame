@@ -99,7 +99,7 @@ static MACHINE_CONFIG_START( asst128 )
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
 
 	MCFG_DEVICE_ADD("mb", ASST128_MOTHERBOARD, 0)
-	asst128_mb_device::static_set_cputag(*device, "maincpu");
+	asst128_mb_device::static_set_cputag(*device, "^maincpu");
 	MCFG_DEVICE_INPUT_DEFAULTS(asst128)
 
 	MCFG_DEVICE_MODIFY("mb:cassette")

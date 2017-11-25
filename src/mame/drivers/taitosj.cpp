@@ -1799,12 +1799,12 @@ static MACHINE_CONFIG_START( nomcu )
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
 	MCFG_AY8910_PORT_A_WRITE_CB(DEVWRITE8("dac", dac_byte_interface, write))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(taitosj_state, taitosj_dacvol_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.15)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 
 	MCFG_SOUND_ADD("ay3", AY8910, XTAL_6MHz/4) // 6mhz/4 on GAME board, AY-3-8910 @ IC49
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(taitosj_state, input_port_4_f0_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.15)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 
 	MCFG_SOUND_ADD("ay4", AY8910, XTAL_6MHz/4) // 6mhz/4 on GAME board, AY-3-8910 @ IC50
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
@@ -1815,12 +1815,12 @@ static MACHINE_CONFIG_START( nomcu )
 	   Bio Attack uses this?
 	*/
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(taitosj_state, taitosj_sndnmi_msk_w)) /* port Bwrite */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_VBLANK_INIT("screen", 128); // 74LS393 on CPU board, counts 128 vblanks before firing watchdog
 
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2) // 30k r-2r network
+	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.15) // 30k r-2r network
 	MCFG_SOUND_ADD("dacvol", DISCRETE, 0) MCFG_DISCRETE_INTF(taitosj_dacvol)
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END

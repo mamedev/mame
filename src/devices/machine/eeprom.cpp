@@ -258,8 +258,8 @@ void eeprom_base_device::nvram_default()
 			fatalerror("eeprom region '%s' wrong size (expected size = 0x%X)\n", tag(), eeprom_bytes);
 		if (m_data_bits == 8 && m_region->bytewidth() != 1)
 			fatalerror("eeprom region '%s' needs to be an 8-bit region\n", tag());
-		if (m_data_bits == 16 && (m_region->bytewidth() != 2 || m_region->endianness() != ENDIANNESS_BIG))
-			fatalerror("eeprom region '%s' needs to be a 16-bit big-endian region\n", tag());
+		if (m_data_bits == 16 && m_region->bytewidth() != 2)
+			fatalerror("eeprom region '%s' needs to be a 16-bit region\n", tag());
 		osd_printf_verbose("Loading data from EEPROM region '%s'\n", tag());
 
 		memcpy(&m_data[0], m_region->base(), eeprom_bytes);
@@ -317,8 +317,8 @@ void eeprom_base_device::internal_write(offs_t address, uint32_t data)
 {
 	if (m_data_bits == 16)
 	{
-		m_data[address*2] = data;
-		m_data[address*2+1] = data >> 8;
+		m_data[address * 2] = data;
+		m_data[address * 2 + 1] = data >> 8;
 	} else
 		m_data[address] = data;
 }

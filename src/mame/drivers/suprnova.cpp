@@ -1906,8 +1906,8 @@ GAME( 1997, vblokbrk,  skns,     sknse, vblokbrk, skns_state, sarukani,  ROT0,  
 GAME( 1997, vblokbrka, vblokbrk, sknsa, vblokbrk, skns_state, sarukani,  ROT0,  "Kaneko / Mediaworks", "VS Block Breaker (Asia)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, sarukani,  vblokbrk, sknsj, vblokbrk, skns_state, sarukani,  ROT0,  "Kaneko / Mediaworks", "Saru-Kani-Hamu-Zou (Japan)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1998, cyvern,    skns,     sknsu, cyvern,   skns_state, cyvern,    ROT90, "Kaneko", "Cyvern (US)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1998, cyvernj,   cyvern,   sknsj, cyvern,   skns_state, cyvern,    ROT90, "Kaneko", "Cyvern (Japan)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, cyvern,    skns,     sknsu, cyvern,   skns_state, cyvern,    ROT90, "Kaneko", "Cyvern - The Dragon Weapons (US)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, cyvernj,   cyvern,   sknsj, cyvern,   skns_state, cyvern,    ROT90, "Kaneko", "Cyvern - The Dragon Weapons (Japan)", MACHINE_IMPERFECT_GRAPHICS )
 
 GAME( 1998, puzzloop,  skns,     sknse, puzzloop, skns_state, puzzloopu, ROT0,  "Mitchell", "Puzz Loop (Europe, v0.94)", MACHINE_IMPERFECT_GRAPHICS ) // Same speed up as US version
 GAME( 1998, puzzloope, puzzloop, sknse, puzzloop, skns_state, puzzloope, ROT0,  "Mitchell", "Puzz Loop (Europe, v0.93)", MACHINE_IMPERFECT_GRAPHICS )

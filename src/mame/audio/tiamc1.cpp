@@ -46,7 +46,7 @@
 
 
 // device type definition
-DEFINE_DEVICE_TYPE(TIAMC1, tiamc1_sound_device, "tiamc1_sound", "TIA-MC1 Audio Custom")
+DEFINE_DEVICE_TYPE(TIAMC1, tiamc1_sound_device, "tiamc1_sound", "TIA-MC1 Custom Sound")
 
 
 //**************************************************************************

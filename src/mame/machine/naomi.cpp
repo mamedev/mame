@@ -201,10 +201,14 @@ void naomi_state::create_pic_from_retdat()
 	}
 }
 
-DRIVER_INIT_MEMBER(naomi_state,naomi)
+DRIVER_INIT_MEMBER(naomi_state, naomi)
 {
 	//m_maincpu->space(AS_PROGRAM).install_read_handler(0xc2ad238, 0xc2ad23f, read64_delegate(FUNC(naomi_state::naomi_biose_idle_skip_r),this); // rev e bios
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc2b0600, 0xc2b0607, read64_delegate(FUNC(naomi_state::naomi_biosh_idle_skip_r),this)); // rev h bios
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc2b0600, 0xc2b0607, read64_delegate(FUNC(naomi_state::naomi_biosh_idle_skip_r), this)); // rev h bios
+
+	m_maincpu->sh2drc_set_options(SH2DRC_FASTEST_OPTIONS);
+	m_maincpu->sh2drc_add_fastram(0x00000000, 0x001fffff, true, m_rombase);
+	m_maincpu->sh2drc_add_fastram(0x0c000000, 0x0dffffff, false, dc_ram);
 
 	create_pic_from_retdat();
 }

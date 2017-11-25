@@ -103,7 +103,7 @@ DEFINE_DEVICE_TYPE(ISA8, isa8_device, "isa8", "8-bit ISA bus")
 void isa8_device::static_set_cputag(device_t &device, const char *tag)
 {
 	isa8_device &isa = downcast<isa8_device &>(device);
-	isa.m_cputag = tag;
+	isa.m_maincpu.set_tag(tag);
 }
 
 void isa8_device::static_set_custom_spaces(device_t &device)
@@ -133,7 +133,7 @@ isa8_device::isa8_device(const machine_config &mconfig, device_type type, const 
 	m_io_config("ISA 8-bit I/O", ENDIANNESS_LITTLE, 8, 16, 0, nullptr),
 	m_mem16_config("ISA 16-bit mem", ENDIANNESS_LITTLE, 16, 24, 0, nullptr),
 	m_io16_config("ISA 16-bit I/O", ENDIANNESS_LITTLE, 16, 16, 0, nullptr),
-	m_maincpu(nullptr),
+	m_maincpu(*this, finder_base::DUMMY_TAG),
 	m_iospace(nullptr),
 	m_memspace(nullptr),
 	m_out_irq2_cb(*this),
@@ -144,7 +144,7 @@ isa8_device::isa8_device(const machine_config &mconfig, device_type type, const 
 	m_out_irq7_cb(*this),
 	m_out_drq1_cb(*this),
 	m_out_drq2_cb(*this),
-	m_out_drq3_cb(*this), m_cputag(nullptr),
+	m_out_drq3_cb(*this),
 	m_write_iochck(*this)
 {
 	for(int i=0;i<8;i++)
@@ -221,8 +221,6 @@ void isa8_device::device_start()
 	m_out_drq1_cb.resolve_safe();
 	m_out_drq2_cb.resolve_safe();
 	m_out_drq3_cb.resolve_safe();
-
-	m_maincpu = subdevice<cpu_device>(m_cputag);
 
 	if (m_allocspaces)
 	{
@@ -337,7 +335,6 @@ void isa8_device::unmap_rom(offs_t start, offs_t end)
 
 bool isa8_device::is_option_rom_space_available(offs_t start, int size)
 {
-	m_maincpu = machine().device<cpu_device>(m_cputag);
 	for(int i = 0; i < size; i += 4096) // 4KB granularity should be enough
 		if(m_memspace->get_read_ptr(start + i)) return false;
 	return true;

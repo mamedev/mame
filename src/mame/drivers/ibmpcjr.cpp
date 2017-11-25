@@ -692,7 +692,10 @@ MACHINE_CONFIG_END
 
 ROM_START( ibmpcjr )
 	ROM_REGION(0x10000,"bios", 0)
-	ROM_LOAD("bios.rom", 0x0000, 0x10000,CRC(31e3a7aa) SHA1(1f5f7013f18c08ff50d7942e76c4fbd782412414))
+	ROM_SYSTEM_BIOS( 0, "default", "Default" )
+	ROMX_LOAD("bios.rom", 0x0000, 0x10000,CRC(31e3a7aa) SHA1(1f5f7013f18c08ff50d7942e76c4fbd782412414), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS( 1, "quiksilver", "Quicksilver" ) // Alternate bios to boot up faster (Synectics)
+	ROMX_LOAD("quiksilv.rom", 0x0000, 0x10000, CRC(86aaa1c4) SHA1(b3d7e8ce5de17441891e0b71e5261ed01a169dc1), ROM_BIOS(2))
 
 	ROM_REGION(0x08100,"gfx1", 0)
 	ROM_LOAD("cga.chr",     0x00000, 0x01000, CRC(42009069) SHA1(ed08559ce2d7f97f68b9f540bddad5b6295294dd)) // from an unknown clone cga card

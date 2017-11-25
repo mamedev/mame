@@ -584,8 +584,8 @@ WRITE8_MEMBER( i8275_device::dack_w )
 	}
 	else
 	{
-		assert(m_buffer_idx >= 0 && m_buffer_idx < ARRAY_LENGTH(m_buffer[m_buffer_dma]));
-		m_buffer[m_buffer_dma][m_buffer_idx++] = data;
+		if (m_buffer_idx < ARRAY_LENGTH(m_buffer[m_buffer_dma]))
+			m_buffer[m_buffer_dma][m_buffer_idx++] = data;
 
 		if (!VISIBLE_FIELD_ATTRIBUTE && ((data & 0xc0) == 0x80))
 		{

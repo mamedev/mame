@@ -145,6 +145,7 @@ ZDIPSW      EQU 0FFH    ; Configuration dip switches
 
 #include "emu.h"
 #include "cpu/i86/i86.h"
+//#include "bus/s100/s100.h"
 #include "imagedev/flopdrv.h"
 #include "machine/6821pia.h"
 #include "machine/pic8259.h"

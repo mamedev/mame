@@ -11,6 +11,7 @@
 
 #define Z80_TAG         "17a"
 #define AM9512_TAG      "17d"
+#define S100_TAG        "s100"
 
 class mpz80_state : public driver_device
 {

@@ -643,18 +643,21 @@ end
 
 if (CPUS["SH"]~=null) then
 	files {
+		MAME_DIR .. "src/devices/cpu/sh/sh.cpp",
+		MAME_DIR .. "src/devices/cpu/sh/sh.h",
 		MAME_DIR .. "src/devices/cpu/sh/sh2.cpp",
 		MAME_DIR .. "src/devices/cpu/sh/sh2.h",
 		MAME_DIR .. "src/devices/cpu/sh/sh2comn.cpp",
 		MAME_DIR .. "src/devices/cpu/sh/sh2comn.h",
+		MAME_DIR .. "src/devices/cpu/sh/sh_fe.cpp",
 		MAME_DIR .. "src/devices/cpu/sh/sh2fe.cpp",
+		MAME_DIR .. "src/devices/cpu/sh/sh4fe.cpp",
 		MAME_DIR .. "src/devices/cpu/sh/sh7604_bus.cpp",
 		MAME_DIR .. "src/devices/cpu/sh/sh7604_bus.h",
 		MAME_DIR .. "src/devices/cpu/sh/sh7604_sci.cpp",
 		MAME_DIR .. "src/devices/cpu/sh/sh7604_sci.h",
 		MAME_DIR .. "src/devices/cpu/sh/sh7604_wdt.cpp",
 		MAME_DIR .. "src/devices/cpu/sh/sh7604_wdt.h",
-		--MAME_DIR .. "src/devices/cpu/sh/sh2drc.cpp",
 		MAME_DIR .. "src/devices/cpu/sh/sh4.cpp",
 		MAME_DIR .. "src/devices/cpu/sh/sh4.h",
 		MAME_DIR .. "src/devices/cpu/sh/sh4comn.cpp",
@@ -665,13 +668,12 @@ if (CPUS["SH"]~=null) then
 		MAME_DIR .. "src/devices/cpu/sh/sh4tmu.h",
 		MAME_DIR .. "src/devices/cpu/sh/sh4dmac.cpp",
 		MAME_DIR .. "src/devices/cpu/sh/sh4dmac.h",
-		MAME_DIR .. "src/devices/cpu/sh/sh4regs.h",		
+		MAME_DIR .. "src/devices/cpu/sh/sh4regs.h",
 	}
 end
 
 if (CPUS["SH"]~=null or _OPTIONS["with-tools"]) then
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/sh/sh2dasm.cpp")
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/sh/sh4dasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/sh/sh_dasm.cpp")
 end
 
 --------------------------------------------------
@@ -830,7 +832,6 @@ if (CPUS["I8085"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/cpu/i8085/i8085.cpp",
 		MAME_DIR .. "src/devices/cpu/i8085/i8085.h",
-		MAME_DIR .. "src/devices/cpu/i8085/i8085cpu.h",
 	}
 end
 
@@ -2176,6 +2177,8 @@ if (CPUS["Z80"]~=null) then
 		MAME_DIR .. "src/devices/cpu/z80/z80.h",
 		MAME_DIR .. "src/devices/cpu/z80/z80daisy.cpp",
 		MAME_DIR .. "src/devices/cpu/z80/z80daisy.h",
+		MAME_DIR .. "src/devices/cpu/z80/z80daisy_generic.cpp",
+		MAME_DIR .. "src/devices/cpu/z80/z80daisy_generic.h",
 		MAME_DIR .. "src/devices/cpu/z80/tmpz84c011.cpp",
 		MAME_DIR .. "src/devices/cpu/z80/tmpz84c011.h",
 		MAME_DIR .. "src/devices/cpu/z80/tmpz84c015.cpp",

@@ -770,6 +770,38 @@ void validity_checker::validate_rgb()
 	rgb.mul_imm_rgba(actual_a, actual_r, actual_g, actual_b);
 	check_expected("rgbaint_t::mul_imm_rgba");
 
+	// test select alpha element multiplication
+	expected_a *= actual_a = random_i32();
+	expected_r *= actual_a;
+	expected_g *= actual_a;
+	expected_b *= actual_a;
+	rgb.mul(rgbaint_t(actual_a, actual_r, actual_g, actual_b).select_alpha32());
+	check_expected("rgbaint_t::mul(select_alpha32)");
+
+	// test select red element multiplication
+	expected_a *= actual_r = random_i32();
+	expected_r *= actual_r;
+	expected_g *= actual_r;
+	expected_b *= actual_r;
+	rgb.mul(rgbaint_t(actual_a, actual_r, actual_g, actual_b).select_red32());
+	check_expected("rgbaint_t::mul(select_red32)");
+
+	// test select green element multiplication
+	expected_a *= actual_g = random_i32();
+	expected_r *= actual_g;
+	expected_g *= actual_g;
+	expected_b *= actual_g;
+	rgb.mul(rgbaint_t(actual_a, actual_r, actual_g, actual_b).select_green32());
+	check_expected("rgbaint_t::mul(select_green32)");
+
+	// test select blue element multiplication
+	expected_a *= actual_b = random_i32();
+	expected_r *= actual_b;
+	expected_g *= actual_b;
+	expected_b *= actual_b;
+	rgb.mul(rgbaint_t(actual_a, actual_r, actual_g, actual_b).select_blue32());
+	check_expected("rgbaint_t::mul(select_blue32)");
+
 	// test RGB and not
 	expected_a &= ~(actual_a = random_i32());
 	expected_r &= ~(actual_r = random_i32());
@@ -1844,13 +1876,16 @@ void validity_checker::validate_inputs()
 				// verify natural keyboard codes
 				for (int which = 0; which < 1 << (UCHAR_SHIFT_END - UCHAR_SHIFT_BEGIN + 1); which++)
 				{
-					char32_t code = field.keyboard_code(which);
-					if (code && !uchar_isvalid(code))
+					std::vector<char32_t> codes = field.keyboard_codes(which);
+					for (char32_t code : codes)
 					{
-						osd_printf_error("Field '%s' has non-character U+%04X in PORT_CHAR(%d)\n",
-							name,
-							(unsigned)code,
-							(int)code);
+						if (!uchar_isvalid(code))
+						{
+							osd_printf_error("Field '%s' has non-character U+%04X in PORT_CHAR(%d)\n",
+								name,
+								(unsigned)code,
+								(int)code);
+						}
 					}
 				}
 			}

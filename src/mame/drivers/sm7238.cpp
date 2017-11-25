@@ -3,16 +3,15 @@
 /***************************************************************************
 
     SM 7238 (aka T3300) color/mono text terminal, compatible with DEC VT 240.
-    Graphics option adds Tek 401x and DEC ReGIS support on a 512x250 bitmap.
+    Graphics options add Tek 401x and DEC ReGIS support
 
     Technical manual and schematics: http://doc.pdp-11.org.ru/Terminals/CM7238/
 
     To do:
-    - handle more text_control_w bits
-    - 80/132 columns switching on the fly, reverse video
-    - graphics option
+    . handle more text_control_w bits
+    - downloadable fonts (stored in nvram)
+    - graphics options
     - colors
-    - run vblank from timer output?
     - document hardware and ROM variants, verify if pixel stretching is done
 
 ****************************************************************************/
@@ -21,6 +20,7 @@
 
 #include "bus/rs232/rs232.h"
 #include "cpu/i8085/i8085.h"
+#include "machine/bankdev.h"
 #include "machine/clock.h"
 #include "machine/i8251.h"
 #include "machine/pit8253.h"
@@ -29,15 +29,15 @@
 #include "machine/nvram.h"
 #include "screen.h"
 
-#define KSM_COLUMNS 80  // or 132
 
-#define KSM_TOTAL_HORZ KSM_COLUMNS*10
-#define KSM_DISP_HORZ  KSM_COLUMNS*8
-#define KSM_HORZ_START KSM_COLUMNS
+#define KSM_COLUMNS_MAX 132
+
+#define KSM_TOTAL_HORZ (KSM_COLUMNS_MAX*10)
+#define KSM_DISP_HORZ  (KSM_COLUMNS_MAX*8)
 
 #define KSM_TOTAL_VERT 260
 #define KSM_DISP_VERT  250
-#define KSM_VERT_START 5
+
 
 #define VERBOSE_DBG 1       /* general debug messages */
 
@@ -59,6 +59,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_nvram(*this, "nvram")
+		, m_videobank(*this, "videobank")
 		, m_p_videoram(*this, "videoram")
 		, m_p_chargen(*this, "chargen")
 		, m_pic8259(*this, "pic8259")
@@ -84,10 +85,11 @@ public:
 
 	DECLARE_WRITE8_MEMBER(control_w);
 	DECLARE_WRITE8_MEMBER(text_control_w);
+	DECLARE_WRITE8_MEMBER(vmem_w);
+
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 private:
-	void text_memory_clear();
 	void recompute_parameters();
 
 	struct
@@ -95,12 +97,14 @@ private:
 		uint8_t control;
 		uint16_t ptr;
 		int stride;
+		bool reverse;
 	} m_video;
 
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<nvram_device> m_nvram;
+	required_device<address_map_bank_device> m_videobank;
 	required_shared_ptr<uint8_t> m_p_videoram;
 	required_region_ptr<u8> m_p_chargen;
 	required_device<pic8259_device> m_pic8259;
@@ -125,7 +129,12 @@ static ADDRESS_MAP_START( sm7238_mem, AS_PROGRAM, 8, sm7238_state )
 	AM_RANGE (0xb800, 0xb800) AM_WRITE(text_control_w)
 	AM_RANGE (0xbc00, 0xbc00) AM_WRITE(control_w)
 	AM_RANGE (0xc000, 0xcfff) AM_RAM // chargen
-	AM_RANGE (0xe000, 0xffff) AM_RAM AM_SHARE("videoram") // e000 -- chars, f000 -- attrs
+	AM_RANGE (0xe000, 0xffff) AM_DEVICE("videobank", address_map_bank_device, amap8)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( videobank_map, AS_PROGRAM, 8, sm7238_state )
+	AM_RANGE (0x0000, 0x1fff) AM_RAM AM_SHARE("videoram")
+	AM_RANGE (0x2000, 0x2fff) AM_MIRROR(0x1000) AM_WRITE(vmem_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sm7238_io, AS_IO, 8, sm7238_state )
@@ -147,6 +156,7 @@ ADDRESS_MAP_END
 void sm7238_state::machine_reset()
 {
 	memset(&m_video, 0, sizeof(m_video));
+	m_videobank->set_bank(0);
 }
 
 void sm7238_state::video_start()
@@ -155,26 +165,37 @@ void sm7238_state::video_start()
 
 WRITE8_MEMBER(sm7238_state::control_w)
 {
-	DBG_LOG(1,"Control Write", ("%02xh: lut %d nvram %d c2 %d iack %d\n",
+	DBG_LOG(1, "Control Write", ("%02xh: lut %d nvram %d c2 %d iack %d\n",
 		data, BIT(data, 0), BIT(data, 2), BIT(data, 3), BIT(data, 5)));
 }
 
 WRITE8_MEMBER(sm7238_state::text_control_w)
 {
 	if (data ^ m_video.control)
-	DBG_LOG(1,"Text Control Write", ("%02xh: 80/132 %d dma %d clr %d dlt %d inv %d ?? %d\n",
-		data, BIT(data, 0), BIT(data, 1), BIT(data, 2), BIT(data, 3), BIT(data, 4), BIT(data, 5)));
-
-	if (!BIT(data, 2) && !BIT(data, 3))
-		text_memory_clear();
+	{
+		DBG_LOG(1, "Text Control Write", ("%02xh: 80/132 %d dma %d clr %d dlt %d inv %d ?? %d\n",
+			data, BIT(data, 0), BIT(data, 1), BIT(data, 2), BIT(data, 3), BIT(data, 4), BIT(data, 5)));
+	}
 
 	if (BIT((data ^ m_video.control), 0))
 	{
 		m_video.stride = BIT(data, 0) ? 80 : 132;
-//      recompute_parameters();
+		recompute_parameters();
 	}
 
+	if (BIT((data ^ m_video.control), 2))
+	{
+		m_videobank->set_bank(1 - BIT(data, 2));
+	}
+
+	m_video.reverse = BIT(data, 4);
 	m_video.control = data;
+}
+
+WRITE8_MEMBER(sm7238_state::vmem_w)
+{
+	m_p_videoram[offset] = data;
+	m_p_videoram[offset + 0x1000] = data;
 }
 
 WRITE_LINE_MEMBER(sm7238_state::write_keyboard_clock)
@@ -189,34 +210,29 @@ WRITE_LINE_MEMBER(sm7238_state::write_printer_clock)
 	m_i8251prn->write_rxc(state);
 }
 
-void sm7238_state::text_memory_clear()
-{
-	int y = 0, ptr = 0;
-
-	do
-	{
-		memset(&m_p_videoram[ptr], 0x20, m_video.stride);
-		memset(&m_p_videoram[ptr + 0x1000], 0x20, m_video.stride);
-		ptr = m_p_videoram[ptr + m_video.stride + 1] | (m_p_videoram[ptr + 0x1000 + m_video.stride + 1] << 8);
-		ptr &= 0x0fff;
-		y++;
-	} while (y < 26);
-}
-
 void sm7238_state::recompute_parameters()
 {
 	rectangle visarea;
-	int horiz_pix_total = m_video.stride * 8;
+	attoseconds_t refresh;
 
-	visarea.set(0, horiz_pix_total - 1, 0, KSM_DISP_VERT - 1);
-	machine().first_screen()->configure(horiz_pix_total, KSM_DISP_VERT, visarea,
-		HZ_TO_ATTOSECONDS((m_video.stride == 80) ? 60 : 57.1 ));
+	visarea.set(0, m_video.stride * 8 - 1, 0, KSM_DISP_VERT - 1);
+
+	if (m_video.stride == 80)
+	{
+		refresh = HZ_TO_ATTOSECONDS(XTAL_12_5MHz) * m_video.stride * 10 * KSM_TOTAL_VERT;
+	}
+	else
+	{
+		refresh = HZ_TO_ATTOSECONDS(XTAL_20_625MHz) * m_video.stride * 10 * KSM_TOTAL_VERT;
+	}
+
+	machine().first_screen()->configure(m_video.stride * 10, KSM_TOTAL_VERT, visarea, refresh);
 }
 
 uint32_t sm7238_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	uint8_t y, ra, gfx, fg, bg, attr, ctl1, ctl2 = 0;
-	uint16_t chr, sy = KSM_VERT_START, ma = 0, x = 0;
+	uint16_t chr, sy = 0, ma = 0, x = 0;
 	bool double_width = false, double_height = false, bottom_half = false;
 
 	if (!BIT(m_video.control, 3))
@@ -232,12 +248,27 @@ uint32_t sm7238_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 			if (y == 1 && ctl2 && ra < ctl2)
 				continue;
 
-			uint16_t *p = &bitmap.pix16(sy++, KSM_HORZ_START);
+			uint16_t *p = &bitmap.pix16(sy++, 0);
 
 			for (x = ma; x < ma + m_video.stride; x++)
 			{
 				chr = m_p_videoram[x] << 4;
 				attr = m_p_videoram[x + 0x1000];
+
+				// alternate font 1
+				if (BIT(attr, 6))
+				{
+					chr += 0x1000;
+				}
+				// alternate font 2 -- only in models .05 and .06
+				if (BIT(attr, 7))
+				{
+					chr = 0x11a << 4;
+				}
+
+				bg = 0;
+				fg = 1;
+
 				if (double_height)
 				{
 					gfx = m_p_chargen[chr | (bottom_half ? (5 + (ra >> 1)) : (ra >> 1))] ^ 255;
@@ -246,9 +277,6 @@ uint32_t sm7238_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 				{
 					gfx = m_p_chargen[chr | ra] ^ 255;
 				}
-
-				bg = 0;
-				fg = 1;
 
 				/* Process attributes */
 				if ((BIT(attr, 1)) && (ra == 9))
@@ -261,42 +289,33 @@ uint32_t sm7238_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 					gfx ^= 0xff; // reverse video
 				}
 				if (BIT(attr, 4))
+				{
 					fg = 2; // highlight
+				}
 				else
+				{
 					fg = 1;
+				}
+				if (m_video.reverse)
+				{
+					bg = fg;
+					fg = 0;
+				}
 
-				*p++ = BIT(gfx, 7) ? fg : bg;
-				if (double_width)
-				*p++ = BIT(gfx, 7) ? fg : bg;
-				*p++ = BIT(gfx, 6) ? fg : bg;
-				if (double_width)
-				*p++ = BIT(gfx, 6) ? fg : bg;
-				*p++ = BIT(gfx, 5) ? fg : bg;
-				if (double_width)
-				*p++ = BIT(gfx, 5) ? fg : bg;
-				*p++ = BIT(gfx, 4) ? fg : bg;
-				if (double_width)
-				*p++ = BIT(gfx, 4) ? fg : bg;
-				*p++ = BIT(gfx, 3) ? fg : bg;
-				if (double_width)
-				*p++ = BIT(gfx, 3) ? fg : bg;
-				*p++ = BIT(gfx, 2) ? fg : bg;
-				if (double_width)
-				*p++ = BIT(gfx, 2) ? fg : bg;
-				*p++ = BIT(gfx, 1) ? fg : bg;
-				if (double_width)
-				*p++ = BIT(gfx, 1) ? fg : bg;
-				*p++ = BIT(gfx, 0) ? fg : bg;
-				if (double_width)
-				*p++ = BIT(gfx, 0) ? fg : bg;
+				for (int i = 7; i >= 0; i--)
+				{
+					*p++ = BIT(gfx, i) ? fg : bg;
+					if (double_width)
+						*p++ = BIT(gfx, i) ? fg : bg;
+				}
 
 				if (double_width) x++;
 			}
 		}
 		ctl1 = m_p_videoram[ma + 0x1000 + m_video.stride];
-		double_width  = BIT(ctl1, 6);
+		double_width = BIT(ctl1, 6);
 		double_height = BIT(ctl1, 7);
-		bottom_half   = BIT(ctl1, 5);
+		bottom_half = BIT(ctl1, 5);
 
 		ctl2 = m_p_videoram[ma + 0x1000 + m_video.stride + 1] >> 4;
 
@@ -313,7 +332,7 @@ uint32_t sm7238_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 static const gfx_layout sm7238_charlayout =
 {
 	8, 12,                  /* most chars use 8x10 pixels */
-	256,                    /* 256 characters */
+	512,                    /* 512 characters */
 	1,                      /* 1 bits per pixel */
 	{ 0 },                  /* no bitplanes */
 	/* x offsets */
@@ -340,18 +359,16 @@ static MACHINE_CONFIG_START( sm7238 )
 	MCFG_CPU_IO_MAP(sm7238_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
 
+	MCFG_DEVICE_ADD("videobank", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(videobank_map)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
+	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x2000)
+
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-#if KSM_COLUMNS == 80
-	MCFG_SCREEN_RAW_PARAMS(XTAL_12_5MHz,
-		KSM_TOTAL_HORZ, KSM_HORZ_START, KSM_HORZ_START+KSM_DISP_HORZ,
-		KSM_TOTAL_VERT, KSM_VERT_START, KSM_VERT_START+KSM_DISP_VERT);
-#else
-	MCFG_SCREEN_RAW_PARAMS(XTAL_20_625MHz,
-		KSM_TOTAL_HORZ, KSM_HORZ_START, KSM_HORZ_START+KSM_DISP_HORZ,
-		KSM_TOTAL_VERT, KSM_VERT_START, KSM_VERT_START+KSM_DISP_VERT);
-#endif
+	MCFG_SCREEN_RAW_PARAMS(XTAL_20_625MHz, KSM_TOTAL_HORZ, 0, KSM_DISP_HORZ, KSM_TOTAL_VERT, 0, KSM_DISP_VERT);
 	MCFG_SCREEN_UPDATE_DRIVER(sm7238_state, screen_update)
 	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("pic8259", pic8259_device, ir2_w))
 	MCFG_SCREEN_PALETTE("palette")

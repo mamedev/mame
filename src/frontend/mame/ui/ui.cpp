@@ -2165,7 +2165,10 @@ void mame_ui_manager::save_main_option()
 {
 	// parse the file
 	std::string error;
-	emu_options options(emu_options::option_support::GENERAL_ONLY); // This way we make sure that all OSD parts are in
+	emu_options options(emu_options::option_support::GENERAL_ONLY);
+
+	// This way we make sure that all OSD parts are in
+	osd_setup_osd_specific_emu_options(options);
 
 	options.copy_from(machine().options());
 

@@ -164,6 +164,11 @@ WRITE_LINE_MEMBER(ibm5160_mb_device::pc_speaker_set_spkrdata)
 	m_speaker->level_w(m_pc_spkrdata & m_pit_out2);
 }
 
+WRITE_LINE_MEMBER(ibm5160_mb_device::pic_int_w)
+{
+	m_maincpu->set_input_line(0, state);
+}
+
 
 /*************************************************************
  *
@@ -427,7 +432,7 @@ MACHINE_CONFIG_MEMBER( ibm5160_mb_device::device_add_mconfig )
 	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(ibm5160_mb_device, pc_dack3_w))
 
 	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(INPUTLINE(":maincpu", 0))
+	MCFG_PIC8259_OUT_INT_CB(WRITELINE(ibm5160_mb_device, pic_int_w))
 
 	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(READ8(ibm5160_mb_device, pc_ppi_porta_r))
@@ -494,7 +499,7 @@ ioport_constructor ibm5160_mb_device::device_input_ports() const
 void ibm5160_mb_device::static_set_cputag(device_t &device, const char *tag)
 {
 	ibm5160_mb_device &board = downcast<ibm5160_mb_device &>(device);
-	board.m_cputag = tag;
+	board.m_maincpu.set_tag(tag);
 }
 
 //**************************************************************************
@@ -517,7 +522,7 @@ ibm5160_mb_device::ibm5160_mb_device(
 		device_t *owner,
 		uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
-	, m_maincpu(*owner, "maincpu")
+	, m_maincpu(*this, finder_base::DUMMY_TAG)
 	, m_pic8259(*this, "pic8259")
 	, m_pit8253(*this, "pit8253")
 	, m_dma8237(*this, "dma8237")

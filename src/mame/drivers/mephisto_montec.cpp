@@ -317,11 +317,11 @@ WRITE8_MEMBER(mephisto_montec_state::mondial2_input_mux_w)
 	{
 		if (!BIT(leds_data, i))
 		{
-			if (data & 0x10)	output().set_led_value(100 + i, 1);
-			if (data & 0x20)	output().set_led_value(  8 + i, 1);
-			if (data & 0x40)	output().set_led_value(  0 + i, 1);
+			if (data & 0x10)    output().set_led_value(100 + i, 1);
+			if (data & 0x20)    output().set_led_value(  8 + i, 1);
+			if (data & 0x40)    output().set_led_value(  0 + i, 1);
 		}
-	}	
+	}
 
 	m_input_mux = data ^ 0xff;
 	m_beeper->set_state(BIT(data, 7));

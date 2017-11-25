@@ -30,6 +30,26 @@ public:
 		m_soundlatch2(*this, "soundlatch2"),
 		m_rombank(*this, "rombank") { }
 
+	DECLARE_READ8_MEMBER(k051316_1_ramrom_r);
+	DECLARE_READ8_MEMBER(k051316_2_ramrom_r);
+	DECLARE_WRITE8_MEMBER(chqflag_bankswitch_w);
+	DECLARE_WRITE8_MEMBER(chqflag_vreg_w);
+	DECLARE_WRITE8_MEMBER(select_analog_ctrl_w);
+	DECLARE_READ8_MEMBER(analog_read_r);
+	DECLARE_WRITE8_MEMBER(chqflag_sh_irqtrigger_w);
+	DECLARE_WRITE8_MEMBER(k007232_bankswitch_w);
+	DECLARE_WRITE8_MEMBER(k007232_extvolume_w);
+	DECLARE_WRITE8_MEMBER(volume_callback0);
+	DECLARE_WRITE8_MEMBER(volume_callback1);
+	DECLARE_WRITE_LINE_MEMBER(background_brt_w);
+	K051316_CB_MEMBER(zoom_callback_1);
+	K051316_CB_MEMBER(zoom_callback_2);
+	K051960_CB_MEMBER(sprite_callback);
+	uint32_t screen_update_chqflag(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+private:
 	/* misc */
 	int        m_k051316_readroms;
 	int        m_last_vreg;
@@ -51,22 +71,5 @@ public:
 
 	/* memory pointers */
 	required_memory_bank m_rombank;
-
-	DECLARE_READ8_MEMBER(k051316_1_ramrom_r);
-	DECLARE_READ8_MEMBER(k051316_2_ramrom_r);
-	DECLARE_WRITE8_MEMBER(chqflag_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(chqflag_vreg_w);
-	DECLARE_WRITE8_MEMBER(select_analog_ctrl_w);
-	DECLARE_READ8_MEMBER(analog_read_r);
-	DECLARE_WRITE8_MEMBER(chqflag_sh_irqtrigger_w);
-	DECLARE_WRITE8_MEMBER(k007232_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(k007232_extvolume_w);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	uint32_t screen_update_chqflag(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE8_MEMBER(volume_callback0);
-	DECLARE_WRITE8_MEMBER(volume_callback1);
-	K051316_CB_MEMBER(zoom_callback_1);
-	K051316_CB_MEMBER(zoom_callback_2);
-	K051960_CB_MEMBER(sprite_callback);
+	void update_background_shadows(uint8_t data);
 };

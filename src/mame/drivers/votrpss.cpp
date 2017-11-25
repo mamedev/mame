@@ -70,7 +70,6 @@ Notes:
 //#include "votrpss.lh"
 
 /* Components */
-#include "machine/clock.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
 #include "machine/pit8253.h"

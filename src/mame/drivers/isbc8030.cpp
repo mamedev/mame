@@ -35,7 +35,6 @@ X  Examine and modify CPU registers
 #include "machine/pit8253.h"
 #include "machine/i8255.h"
 #include "machine/i8251.h"
-#include "machine/clock.h"
 #include "bus/rs232/rs232.h"
 
 #define I8259A_TAG      "pic8259"
@@ -56,14 +55,7 @@ public:
 		, m_pic(*this, I8259A_TAG)
 		, m_pit(*this, I8253_TAG)
 		, m_rs232(*this, RS232_TAG)
-		, m_usart_baud_rate(*this, I8251A_BAUD_TAG)
-		, m_usart_divide_counter(0)
-		, m_usart_clock_state(0)
 	{ }
-
-	DECLARE_WRITE_LINE_MEMBER( usart_clock_tick );
-
-	DECLARE_WRITE_LINE_MEMBER( isbc8030_tmr2_w );
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -72,10 +64,6 @@ private:
 	required_device<pic8259_device> m_pic;
 	required_device<pit8253_device> m_pit;
 	required_device<rs232_port_device> m_rs232;
-	required_ioport m_usart_baud_rate;
-
-	uint8_t m_usart_divide_counter;
-	uint8_t m_usart_clock_state;
 };
 
 static ADDRESS_MAP_START(isbc8030_mem, AS_PROGRAM, 8, isbc8030_state)
@@ -95,45 +83,7 @@ static ADDRESS_MAP_START(isbc8030_io, AS_IO, 8, isbc8030_state)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( isbc8030 )
-	PORT_START(I8251A_BAUD_TAG)
-	PORT_DIPNAME( 0x3f, 0x01, "i8251 Baud Rate" )
-	PORT_DIPSETTING(    0x01, "4800")
-	PORT_DIPSETTING(    0x02, "2400")
-	PORT_DIPSETTING(    0x04, "1200")
-	PORT_DIPSETTING(    0x08, "600")
-	PORT_DIPSETTING(    0x10, "300")
-	PORT_DIPSETTING(    0x20, "150")
-	PORT_DIPSETTING(    0x40, "75")
 INPUT_PORTS_END
-
-WRITE_LINE_MEMBER( isbc8030_state::usart_clock_tick )
-{
-	uint8_t old_counter = m_usart_divide_counter;
-	m_usart_divide_counter++;
-
-	uint8_t transition = (old_counter ^ m_usart_divide_counter) & m_usart_baud_rate->read();
-	if (transition)
-	{
-		m_usart->write_txc(m_usart_clock_state);
-		m_usart->write_rxc(m_usart_clock_state);
-		m_usart_clock_state ^= 1;
-	}
-}
-
-WRITE_LINE_MEMBER( isbc8030_state::isbc8030_tmr2_w )
-{
-	m_usart->write_rxc(state);
-	m_usart->write_txc(state);
-}
-
-static DEVICE_INPUT_DEFAULTS_START( terminal ) // set up terminal to default to 4800
-	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_4800 )
-	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_4800 )
-	DEVICE_INPUT_DEFAULTS( "RS232_STARTBITS", 0xff, RS232_STARTBITS_1 )
-	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_8 )
-	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_NONE )
-	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
-DEVICE_INPUT_DEFAULTS_END
 
 static MACHINE_CONFIG_START( isbc8030 )
 	/* basic machine hardware */
@@ -149,7 +99,8 @@ static MACHINE_CONFIG_START( isbc8030 )
 	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE(I8259A_TAG, pic8259_device, ir0_w))
 	MCFG_PIT8253_CLK1(XTAL_22_1184MHz / 18)
 	MCFG_PIT8253_CLK2(XTAL_22_1184MHz / 18)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(isbc8030_state, isbc8030_tmr2_w))
+	MCFG_PIT8253_OUT2_HANDLER(DEVWRITELINE(I8251A_TAG, i8251_device, write_rxc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE(I8251A_TAG, i8251_device, write_txc))
 
 	MCFG_DEVICE_ADD(I8251A_TAG, I8251, 0)
 	MCFG_I8251_TXD_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_txd))
@@ -162,10 +113,6 @@ static MACHINE_CONFIG_START( isbc8030 )
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(I8251A_TAG, i8251_device, write_rxd))
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(I8251A_TAG, i8251_device, write_dsr))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(I8251A_TAG, i8251_device, write_cts))
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", terminal)
-
-	MCFG_DEVICE_ADD("usart_clock", CLOCK, XTAL_18_432MHz/60)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(isbc8030_state, usart_clock_tick))
 MACHINE_CONFIG_END
 
 /* ROM definition */

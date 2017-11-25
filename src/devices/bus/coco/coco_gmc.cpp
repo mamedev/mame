@@ -17,6 +17,8 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "coco_gmc.h"
+
 #include "coco_pak.h"
 #include "sound/sn76496.h"
 #include "speaker.h"

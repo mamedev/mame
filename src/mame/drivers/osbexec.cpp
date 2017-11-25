@@ -16,7 +16,7 @@
 #include "machine/pit8253.h"
 #include "machine/ram.h"
 #include "machine/wd_fdc.h"
-#include "machine/z80dart.h"
+#include "machine/z80sio.h"
 #include "sound/spkrdev.h"
 
 #include "screen.h"
@@ -51,7 +51,7 @@ public:
 	required_device<ram_device> m_messram;
 	required_device<pia6821_device> m_pia_0;
 	required_device<pia6821_device> m_pia_1;
-	required_device<z80dart_device> m_sio;
+	required_device<z80sio_device> m_sio;
 	required_device<speaker_sound_device>   m_speaker;
 	required_device<floppy_image_device> m_floppy0;
 	required_device<floppy_image_device> m_floppy1;
@@ -221,7 +221,7 @@ static ADDRESS_MAP_START( osbexec_io, AS_IO, 8, osbexec_state )
 	AM_RANGE( 0x00, 0x03 ) AM_MIRROR( 0xff00 ) AM_DEVREADWRITE( "pia_0", pia6821_device, read, write)       /* 6821 PIA @ UD12 */
 	AM_RANGE( 0x04, 0x07 ) AM_MIRROR( 0xff00 ) AM_DEVREADWRITE("ctc", pit8253_device, read, write)          /* 8253 @UD1 */
 	AM_RANGE( 0x08, 0x0B ) AM_MIRROR( 0xff00 ) AM_DEVREADWRITE("mb8877", wd_fdc_device_base, read, write )  /* MB8877 @ UB17 input clock = 1MHz */
-	AM_RANGE( 0x0C, 0x0F ) AM_MIRROR( 0xff00 ) AM_DEVREADWRITE("sio", z80sio2_device, ba_cd_r, ba_cd_w )    /* SIO @ UD4 */
+	AM_RANGE( 0x0C, 0x0F ) AM_MIRROR( 0xff00 ) AM_DEVREADWRITE("sio", z80sio_device, ba_cd_r, ba_cd_w )    /* SIO @ UD4 */
 	AM_RANGE( 0x10, 0x13 ) AM_MIRROR( 0xff00 ) AM_DEVREADWRITE( "pia_1", pia6821_device, read, write)       /* 6821 PIA @ UD8 */
 	AM_RANGE( 0x14, 0x17 ) AM_SELECT( 0xff00 ) AM_READ(osbexec_kbd_r )                                      /* KBD */
 	AM_RANGE( 0x18, 0x1b ) AM_MIRROR( 0xff00 ) AM_READ(osbexec_rtc_r )                                      /* "RTC" @ UE13/UF13 */
@@ -590,34 +590,34 @@ static MACHINE_CONFIG_START( osbexec )
 	MCFG_INPUT_MERGER_ANY_HIGH("mainirq")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", 0))
 
-	MCFG_DEVICE_ADD("sio", Z80SIO2, MAIN_CLOCK/6)
-	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE(MODEM_PORT_TAG, rs232_port_device, write_txd)) MCFG_DEVCB_INVERT
-	MCFG_Z80DART_OUT_DTRA_CB(DEVWRITELINE(MODEM_PORT_TAG, rs232_port_device, write_dtr)) MCFG_DEVCB_INVERT
-	MCFG_Z80DART_OUT_RTSA_CB(DEVWRITELINE(MODEM_PORT_TAG, rs232_port_device, write_rts)) MCFG_DEVCB_INVERT
-	MCFG_Z80DART_OUT_TXDB_CB(DEVWRITELINE(PRINTER_PORT_TAG, rs232_port_device, write_txd)) MCFG_DEVCB_INVERT
-	MCFG_Z80DART_OUT_DTRB_CB(DEVWRITELINE(PRINTER_PORT_TAG, rs232_port_device, write_dtr)) MCFG_DEVCB_INVERT
-	MCFG_Z80DART_OUT_RTSB_CB(DEVWRITELINE(PRINTER_PORT_TAG, rs232_port_device, write_rts)) MCFG_DEVCB_INVERT
-	MCFG_Z80DART_OUT_INT_CB(DEVWRITELINE("mainirq", input_merger_device, in_w<4>))
+	MCFG_DEVICE_ADD("sio", Z80SIO, MAIN_CLOCK/6)
+	MCFG_Z80SIO_OUT_TXDA_CB(DEVWRITELINE(MODEM_PORT_TAG, rs232_port_device, write_txd)) MCFG_DEVCB_INVERT
+	MCFG_Z80SIO_OUT_DTRA_CB(DEVWRITELINE(MODEM_PORT_TAG, rs232_port_device, write_dtr)) MCFG_DEVCB_INVERT
+	MCFG_Z80SIO_OUT_RTSA_CB(DEVWRITELINE(MODEM_PORT_TAG, rs232_port_device, write_rts)) MCFG_DEVCB_INVERT
+	MCFG_Z80SIO_OUT_TXDB_CB(DEVWRITELINE(PRINTER_PORT_TAG, rs232_port_device, write_txd)) MCFG_DEVCB_INVERT
+	MCFG_Z80SIO_OUT_DTRB_CB(DEVWRITELINE(PRINTER_PORT_TAG, rs232_port_device, write_dtr)) MCFG_DEVCB_INVERT
+	MCFG_Z80SIO_OUT_RTSB_CB(DEVWRITELINE(PRINTER_PORT_TAG, rs232_port_device, write_rts)) MCFG_DEVCB_INVERT
+	MCFG_Z80SIO_OUT_INT_CB(DEVWRITELINE("mainirq", input_merger_device, in_w<4>))
 
 	MCFG_DEVICE_ADD("ctc", PIT8253, 0)
 	MCFG_PIT8253_CLK0(MAIN_CLOCK / 13) // divided by 74S161 @ UC25
 	MCFG_PIT8253_CLK1(MAIN_CLOCK / 13) // divided by 74S161 @ UC25
 	MCFG_PIT8253_CLK2(MAIN_CLOCK / 12)
 	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(osbexec_state, comm_clk_a_w))
-	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE("sio", z80sio2_device, rxtxcb_w))
+	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE("sio", z80sio_device, rxtxcb_w))
 	//MCFG_PIT8253_OUT2_HANDLER(WRITELINE(osbexec_state, spindle_clk_w))
 
 	MCFG_RS232_PORT_ADD(MODEM_PORT_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("sio", z80sio2_device, rxa_w)) MCFG_DEVCB_INVERT
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("sio", z80sio2_device, dcda_w)) MCFG_DEVCB_INVERT
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("sio", z80sio_device, rxa_w)) MCFG_DEVCB_INVERT
+	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("sio", z80sio_device, dcda_w)) MCFG_DEVCB_INVERT
 	MCFG_RS232_DSR_HANDLER(WRITELINE(osbexec_state, modem_dsr_w))
 	MCFG_RS232_RI_HANDLER(WRITELINE(osbexec_state, modem_ri_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("sio", z80sio2_device, ctsa_w)) MCFG_DEVCB_INVERT
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("sio", z80sio_device, ctsa_w)) MCFG_DEVCB_INVERT
 
 	MCFG_RS232_PORT_ADD(PRINTER_PORT_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("sio", z80sio2_device, rxb_w)) MCFG_DEVCB_INVERT
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("sio", z80sio2_device, dcdb_w)) MCFG_DEVCB_INVERT
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("sio", z80sio2_device, ctsb_w)) MCFG_DEVCB_INVERT
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("sio", z80sio_device, rxb_w)) MCFG_DEVCB_INVERT
+	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("sio", z80sio_device, dcdb_w)) MCFG_DEVCB_INVERT
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("sio", z80sio_device, ctsb_w)) MCFG_DEVCB_INVERT
 
 	MCFG_DEVICE_ADD("mb8877", MB8877, MAIN_CLOCK/24)
 	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE("pia_1", pia6821_device, cb1_w))

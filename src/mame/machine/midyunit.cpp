@@ -130,14 +130,7 @@ READ16_MEMBER(midyunit_state::term2_input_r)
 	if (offset != 2)
 		return m_ports[offset]->read();
 
-	switch (m_term2_analog_select)
-	{
-		default:
-		case 0:  return ioport("STICK0_X")->read();
-		case 1:  return ioport("STICK0_Y")->read();
-		case 2:  return ioport("STICK1_X")->read();
-		case 3:  return ioport("STICK1_Y")->read();
-	}
+	return m_term2_adc->read(space, 0) | 0xff00;
 }
 
 WRITE16_MEMBER(midyunit_state::term2_sound_w)
@@ -167,7 +160,7 @@ WRITE16_MEMBER(midyunit_state::term2_sound_w)
 	}
 
 	if (offset == 0)
-		m_term2_analog_select = (data >> 12) & 3;
+		m_term2_adc->write(space, 0, ((data >> 12) & 3) | 4);
 
 	m_adpcm_sound->reset_write((~data & 0x100) >> 1);
 	m_adpcm_sound->write(space, offset, data);

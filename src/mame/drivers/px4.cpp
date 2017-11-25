@@ -74,7 +74,7 @@ public:
 		m_frc_value(0), m_frc_latch(0),
 		m_vadr(0), m_yoff(0),
 		m_artdir(0xff), m_artdor(0xff), m_artsr(0), m_artcr(0),
-		m_one_sec_int_enabled(true),
+		m_one_sec_int_enabled(true), m_key_int_enabled(true),
 		m_key_status(0), m_interrupt_status(0),
 		m_time(), m_clock_state(0),
 		m_ear_last_state(0),
@@ -594,16 +594,22 @@ WRITE8_MEMBER( px4_state::sior_w )
 		{
 		case 1:
 			{
-				int year = dec_2_bcd(m_time.local_time.year);
-				year = (year & 0xff0f) | ((data & 0xf) << 4);
-				t->tm_year = bcd_2_dec(year) - 1900;
+				if (data < 10)
+				{
+					int year = dec_2_bcd(m_time.local_time.year);
+					year = (year & 0xff0f) | ((data & 0xf) << 4);
+					t->tm_year = bcd_2_dec(year) - 1900;
+				}
 			}
 			break;
 		case 2:
 			{
-				int year = dec_2_bcd(m_time.local_time.year);
-				year = (year & 0xfff0) | (data & 0xf);
-				t->tm_year = bcd_2_dec(year) - 1900;
+				if (data < 10)
+				{
+					int year = dec_2_bcd(m_time.local_time.year);
+					year = (year & 0xfff0) | (data & 0xf);
+					t->tm_year = bcd_2_dec(year) - 1900;
+				}
 			}
 			break;
 		case 3: t->tm_mon = bcd_2_dec(data & 0x7f) - 1; break;
