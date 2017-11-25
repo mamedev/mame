@@ -205,7 +205,7 @@ Notes:
       DSW(2)       : 2-Position DIP Switch (All OFF)
       N341256      : NKK N341256 32k x8 SRAM (x2, SOJ28)
       H8/3002      : Sound CPU, Hitachi H8/3002 HD6413002F17 (QFP100), clocked at 16.737MHz
-      C416         : Namco custom C416 (QFP176)
+      C416         : Namco custom C416 (QFP176), Memory/DMA Controller 
       C352         : Namco custom C352 PCM sound chip (QFP100), clocked at 29.168MHz, from 2061 pin 9
       MOT1         : PALCE 22V10H (PLCC28, labelled 'S12MOT1A')
                      *Replaced by PALCE 22V10H (PLCC28, labelled 'S12MOT1C') on MOTHER (C) PCB
