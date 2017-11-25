@@ -90,7 +90,7 @@ READ16_MEMBER(pgm_arm_type3_state::svg_68k_nmi_r )
 
 WRITE16_MEMBER(pgm_arm_type3_state::svg_68k_nmi_w )
 {
-	m_prot->pulse_input_line(ARM7_FIRQ_LINE, 1);
+	m_prot->pulse_input_line(ARM7_FIRQ_LINE, m_prot->minimum_quantum_time());
 }
 
 WRITE16_MEMBER(pgm_arm_type3_state::svg_latch_68k_w )

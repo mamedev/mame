@@ -114,7 +114,7 @@ TIMER_CALLBACK_MEMBER(cball_state::interrupt_callback)
 {
 	int scanline = param;
 
-	m_maincpu->pulse_input_line(0, 1);
+	m_maincpu->pulse_input_line(0, m_maincpu->minimum_quantum_time());
 
 	scanline = scanline + 32;
 

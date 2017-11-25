@@ -1138,6 +1138,21 @@ WRITE8_MEMBER(vicdual_state::alphaho_io_w)
 }
 
 
+WRITE8_MEMBER(vicdual_state::headonn_io_w)
+{
+	if (offset & 0x01) invho2_audio_w(space, 0, data);
+	if (offset & 0x02)
+	{
+		// 7654----  unused?
+		// ----32--  always 1
+		// ------10  palette bank (bit 0 inverted)
+
+		palette_bank_w(space, 0, (data & 3) ^ 1);
+	}
+	if (offset & 0x08) assert_coin_status();
+}
+
+
 static ADDRESS_MAP_START( vicdual_dualgame_map, AS_PROGRAM, 8, vicdual_state )
 	AM_RANGE(0x0000, 0x3fff) AM_MIRROR(0x4000) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x7000) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
@@ -1301,6 +1316,20 @@ static ADDRESS_MAP_START( alphaho_io_map, AS_IO, 8, vicdual_state )
 	/* no decoder, just logic gates, so in theory the
 	   game can write to multiple locations at once */
 	AM_RANGE(0x00, 0x7f) AM_WRITE(alphaho_io_w)
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( headonn_io_map, AS_IO, 8, vicdual_state )
+	ADDRESS_MAP_GLOBAL_MASK(0x7f)
+
+	AM_RANGE(0x00, 0x00) AM_MIRROR(0x7c) AM_READ_PORT("IN0")
+	AM_RANGE(0x01, 0x01) AM_MIRROR(0x7c) AM_READ_PORT("IN1")
+	AM_RANGE(0x02, 0x02) AM_MIRROR(0x7c) AM_READ_PORT("IN2")
+	AM_RANGE(0x03, 0x03) AM_MIRROR(0x7c) AM_READ_PORT("IN3")
+
+	/* no decoder, just logic gates, so in theory the
+	   game can write to multiple locations at once */
+	AM_RANGE(0x00, 0x7f) AM_WRITE(headonn_io_w)
 ADDRESS_MAP_END
 
 
@@ -1968,6 +1997,50 @@ static INPUT_PORTS_START( alphaho )
 INPUT_PORTS_END
 
 
+// there is a dip switch with 8 switches on the board, but only switch a is used
+static INPUT_PORTS_START( headonn )
+	PORT_START("IN0")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)    PORT_4WAY PORT_COCKTAIL
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON1)                  PORT_COCKTAIL
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_DIPNAME(0x08, 0x00, DEF_STR(Lives))          PORT_DIPLOCATION("DSW:1")
+	PORT_DIPSETTING(   0x00, "3")
+	PORT_DIPSETTING(   0x08, "4")
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)  PORT_4WAY
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)    PORT_4WAY
+	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("IN1")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_4WAY PORT_COCKTAIL
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)  PORT_4WAY
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_4WAY
+	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("IN2")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)  PORT_4WAY PORT_COCKTAIL
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_START1)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON1)
+	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("IN3")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)  PORT_4WAY PORT_COCKTAIL
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, read_coin_status, nullptr)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_START2)
+	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_COIN_DEFAULT
+INPUT_PORTS_END
+
+
 static MACHINE_CONFIG_DERIVED( vicdual_dualgame_root, vicdual_root )
 
 	/* basic machine hardware */
@@ -2107,6 +2180,17 @@ static MACHINE_CONFIG_DERIVED( alphaho, vicdual_dualgame_root )
 	MCFG_CPU_IO_MAP(alphaho_io_map)
 MACHINE_CONFIG_END
 
+
+static MACHINE_CONFIG_DERIVED( headonn, vicdual_dualgame_root )
+
+	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_IO_MAP(headonn_io_map)
+
+	/* audio hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_FRAGMENT_ADD(headon_audio)
+MACHINE_CONFIG_END
 
 
 /*************************************
@@ -2822,6 +2906,43 @@ ROM_START( headon1 )
 	ROM_REGION( 0x0040, "user1", 0 )    /* timing PROMs */
 	ROM_LOAD( "316-0043.u87", 0x0000, 0x0020, CRC(e60a7960) SHA1(b8b8716e859c57c35310efc4594262afedb84823) )    /* control PROM */
 	ROM_LOAD( "316-0042.u88", 0x0020, 0x0020, CRC(a1506b9d) SHA1(037c3db2ea40eca459e8acba9d1506dd28d72d10) )    /* sequence PROM */
+ROM_END
+
+/*
+Head-On N (Nintendo)
+
+EPROMS were all Intel 2708's.
+
+Bi-polar proms were Signetics 82s123's
+
+prom B6 = lines on screen when removed, address decoding?
+prom G2 = white screen when removed, colour prom?
+prom F2 = blank screen, audio screeches - no booting...
+
+CPU clock pin 6 = 1933520 hz
+
+PCBs:
+THO CPU PI-500890
+THO VIDEO PI-500891
+*/
+
+ROM_START( headonn )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ROM.E4", 0x0000, 0x0400, CRC(a6cd13fc) SHA1(0fda6b06e7864feae8e4e94cf17f50c9c033aa39) )
+	ROM_LOAD( "ROM.F4", 0x0400, 0x0400, CRC(d1cd498f) SHA1(ded1a97c7f76af195b247135469b84c25d4096c4) )
+	ROM_LOAD( "ROM.G4", 0x0800, 0x0400, CRC(0fb02db2) SHA1(6e9ad34a205838339a76ba6eeaf02cf663c2b750) )
+	ROM_LOAD( "ROM.H4", 0x0c00, 0x0400, CRC(38db2d02) SHA1(a86c4208154f65a83f55c1fbfd041b56ebd11106) )
+	ROM_LOAD( "ROM.I4", 0x1000, 0x0400, CRC(a04d8522) SHA1(58d6c3168ac7227e78ff699449008dbf999ea794) )
+	ROM_LOAD( "ROM.J4", 0x1400, 0x0400, CRC(52bd2151) SHA1(4f6bc10dabadf65f638aed46b0f0a1ba00e83afd) )
+	ROM_LOAD( "ROM.K4", 0x1800, 0x0400, CRC(9488a8b3) SHA1(a7e8bc341c839eba3b84af78f19cefafe91d42e3) )
+	ROM_LOAD( "ROM.L4", 0x1c00, 0x0400, CRC(a37f0be0) SHA1(4548cf05256764588feeade29368f5abfbf75a7d) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "PROM.G2", 0x0000, 0x0020, CRC(67104ea9) SHA1(26b6bd2a1973b83bb9af4e3385d8cb14cb3f62f2) )
+
+	ROM_REGION( 0x0040, "user1", 0 )    /* timing PROMs */
+	ROM_LOAD( "PROM.B6", 0x0000, 0x0020, CRC(67104ea9) SHA1(26b6bd2a1973b83bb9af4e3385d8cb14cb3f62f2) )    /* control PROM */
+	ROM_LOAD( "PROM.F2", 0x0020, 0x0020, CRC(a1506b9d) SHA1(037c3db2ea40eca459e8acba9d1506dd28d72d10) )    /* sequence PROM */
 ROM_END
 
 ROM_START( headonmz )
@@ -3657,6 +3778,7 @@ GAME( 1979, sspaceatc,  sspaceat, sspaceat,  sspaceat,  vicdual_state, 0, ROT270
 GAME( 1979, sspacaho,   0,        sspacaho,  sspacaho,  vicdual_state, 0, ROT270, "Sega", "Space Attack / Head On", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, headon,     0,        headon,    headon,    vicdual_state, 0, ROT0,   "Gremlin", "Head On (2 players)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, headon1,    headon,   headon,    headon,    vicdual_state, 0, ROT0,   "Gremlin", "Head On (1 player)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, headonn,    headon,   headonn,   headonn,   vicdual_state, 0, ROT270, "Nintendo", "Head On N", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, headons,    headon,   headons,   headons,   vicdual_state, 0, ROT0,   "bootleg (Sidam)", "Head On (Sidam bootleg, set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, headonsa,   headon,   headons,   headons,   vicdual_state, 0, ROT0,   "bootleg (Sidam)", "Head On (Sidam bootleg, set 2)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // won't coin up?
 GAME( 1979, headonmz,   headon,   headon,    headonmz,  vicdual_state, 0, ROT0,   "bootleg", "Head On (bootleg, alt maze)", MACHINE_SUPPORTS_SAVE )

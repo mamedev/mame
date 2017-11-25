@@ -364,7 +364,7 @@ static MACHINE_CONFIG_START( tm )
 	MCFG_CPU_PROGRAM_MAP(tmaster_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", tmaster_state, scanline_interrupt, "screen", 0, 1)
 
-	MCFG_MC68681_ADD( "duart68681", XTAL_8_664MHz / 2 /*??*/)
+	MCFG_DEVICE_ADD( "duart68681", MC68681, XTAL_8_664MHz / 2 /*??*/)
 	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(tmaster_state, duart_irq_handler))
 	MCFG_MC68681_A_TX_CALLBACK(DEVWRITELINE("microtouch", microtouch_device, rx))
 

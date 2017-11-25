@@ -62,28 +62,6 @@ COMP( 1982, vp60, 0, 0, terminals, terminals, terminals_state, 0, "ADDS", "Viewp
 
 /**************************************************************************************************************
 
-ADDS Viewpoint 122 (VPT-122).
-Chips: D8085AC-2, SCN2674B, SCB2675T, D8251AFC, SCN2681A, D8253C-2, 5x MB8129-15, MX462020-20 (guess, it's unreadable)
-Crystals: 22.096, 14.916, 3.6864, 8.000
-
-***************************************************************************************************************/
-
-ROM_START( vp122 )
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD( "223-48600.uj1", 0x0000, 0x4000, CRC(4d140c69) SHA1(04aa5a4f0c0e0d07b9dc983a6d626ee88ef8b8ba) )
-	ROM_LOAD( "223-48500.ug1", 0x4000, 0x4000, CRC(4e98554d) SHA1(0cbb9cb7efd02a3209caed410ccc8495a5ec1772) )
-	ROM_LOAD( "223-49400.uj2", 0x8000, 0x4000, CRC(447d90d3) SHA1(f8c0db824198b5a571eef80cc3eaf1e829aa2c2a) )
-
-	ROM_REGION(0x2000, "chargen", 0)
-	ROM_LOAD( "223-48700.uk4", 0x0000, 0x2000, CRC(4dbab4bd) SHA1(18e9a23ba22e2096fa529541fa329f5a56740e62) )
-ROM_END
-
-COMP( 1985, vp122, 0, 0, terminals, terminals, terminals_state, 0, "ADDS", "Viewpoint 122", MACHINE_IS_SKELETON )
-
-
-
-/**************************************************************************************************************
-
 Ann Arbor Ambassador.
 Chips: Z80A, M58725P (16k RAM), 2x SCN2651C, nvram, button-battery
 Crystals: 18.414, 6.0688
@@ -101,43 +79,6 @@ ROM_START( aaa )
 ROM_END
 
 COMP( 1981, aaa, 0, 0, terminals, terminals, terminals_state, 0, "Ann Arbor", "Ambassador", MACHINE_IS_SKELETON )
-
-
-
-/**************************************************************************************************************
-
-AT&T 630 MTG.
-Chips: 2x SCN2681A, AT&T 492F proprietory, blank chip, MC68000P10, MB113F316 (square), MB113F316 (DIL), PAL16R4ACN
-Crystals: 40MHz, 87.18336, 3.6864? (hard to read)
-
-***************************************************************************************************************/
-
-ROM_START( att630 )
-	ROM_REGION(0x40000, "maincpu", 0)
-	ROM_LOAD16_BYTE( "460621-1.bin", 0x00000, 0x10000, CRC(136749cd) SHA1(15378c292ddc7384cc69a35de55b69257a9f2a1c) )
-	ROM_LOAD16_BYTE( "460620-1.bin", 0x00001, 0x10000, CRC(27ab77f0) SHA1(5ff1d9ee5a69dee308d62c447ee67e1888afab0e) )
-	ROM_LOAD16_BYTE( "460623-1.bin", 0x20000, 0x10000, CRC(aeae12fb) SHA1(fa3ce26e4622875aa1dea7cf1bd1df237010ff2b) )
-	ROM_LOAD16_BYTE( "460622-1.bin", 0x20001, 0x10000, CRC(c108c1e0) SHA1(ef01349e890b8a4117c01e78d1c23fbd113ba58f) )
-ROM_END
-
-COMP( 1987, att630, 0, 0, terminals, terminals, terminals_state, 0, "AT&T", "630 MTG", MACHINE_IS_SKELETON )
-
-
-
-/**************************************************************************************************************
-
-Data General D461.
-Chips: SCN2681A, X2210P, 2x HM6116P-2, 2x HM6264P-20, HD68B09EP, CRT9007, 1x 8-sw dip.
-Crystals: 3.6864, 59.2920
-
-***************************************************************************************************************/
-
-ROM_START( d461 )
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD( "dgc_100_5776-05.bin", 0x0000, 0x8000, CRC(fdce2132) SHA1(82eac1751c31f99d4490505e16af5e7e7a52b310) )
-ROM_END
-
-COMP( 1985, d461, 0, 0, terminals, terminals, terminals_state, 0, "Data General", "D461", MACHINE_IS_SKELETON )
 
 
 
@@ -305,6 +246,70 @@ ROM_START( tr175 )
 ROM_END
 
 COMP( 1982, tr175, 0, 0, terminals, terminals, terminals_state, 0, "Relisys", "TR175II", MACHINE_IS_SKELETON )
+
+
+
+/**************************************************************************************************************
+
+Televideo TVI-912C.
+Chips: i8035, TMS9927NL, AY5-1013A (COM2502)
+Crystals: 23.814 (divide by 4 for CPU clock)
+Other: 1x 8-sw DIP, 1x 10-sw DIP (internal), 2x 10-sw DIP (available to user at the back)
+
+***************************************************************************************************************/
+
+ROM_START( tv912c )
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD( "a49c1.bin",    0x0000, 0x1000, CRC(d21851bf) SHA1(28fe77a218a5eee11de376f5d16e9380b616b3ca) ) // last half is all FF
+
+	ROM_REGION(0x0800, "chargen", 0)
+	ROM_LOAD( "a3-2.bin",     0x0000, 0x0800, CRC(bb9a7fbd) SHA1(5f1c4d41b25bd3ca4dbc336873362935daf283da) )
+ROM_END
+
+COMP( 1978, tv912c, 0, 0, terminals, terminals, terminals_state, 0, "TeleVideo", "TVI-912C", MACHINE_IS_SKELETON )
+
+
+
+/**************************************************************************************************************
+
+Televideo TVI-955
+Chips: G65SC02P-3, 3x S6551AP, SCN2674B, AMI 131406-00 (unknown 40-pin DIL), odd round silver thing, might be a battery
+Crystals: 19.3396, 31.684, 3.6864
+Keyboard: M5L8049-230P-6, 5.7143, Beeper
+
+***************************************************************************************************************/
+
+ROM_START( tv955 )
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD( "t180002-88d_955.u4",  0x0000, 0x4000, CRC(5767fbe7) SHA1(49a2241612af5c3af09778ffa541ac0bc186e05a) )
+	ROM_LOAD( "t180002-91a_calc.u5", 0x4000, 0x2000, CRC(f86c103a) SHA1(fa3ada3a5d8913e519e2ea4817e96166c1fedd32) ) // first half is all FF
+
+	ROM_REGION(0x1000, "chargen", 0)
+	ROM_LOAD( "t180002-26b.u45",     0x0000, 0x1000, CRC(69c9ebc7) SHA1(32282c816ec597a7c45e939acb7a4155d35ea584) )
+
+	ROM_REGION(0x10000, "keyboard", 0)
+	ROM_LOAD( "8049.kbd",            0x0000, 0x0800, CRC(bc86e349) SHA1(0b62003ab7931822f1bcac8370517c685849f62c) )
+ROM_END
+
+COMP( 1985, tv955, 0, 0, terminals, terminals, terminals_state, 0, "TeleVideo", "TVI-955", MACHINE_IS_SKELETON )
+
+
+
+/**************************************************************************************************************
+
+Televideo TVI-965
+Chips: G65SC816P-5, SCN2672TC5N40, 271582-00 (unknown square chip), 2x UM6551A, Beeper
+Crystals: 44.4528, 26.9892, 3.6864
+
+***************************************************************************************************************/
+
+ROM_START( tv965 )
+	ROM_REGION(0x20000, "maincpu", 0)
+	ROM_LOAD( "180003-30h.u8", 0x00000, 0x010000, CRC(c7b9ca39) SHA1(1d95a8b0a4ea5caf3fb628c44c7a3567700a0b59) )
+	ROM_LOAD( "180003-38h.u9", 0x10000, 0x008000, CRC(30fae408) SHA1(f05bb2a9ce2df60b046733f746d8d8a1eb3ac8bc) )
+ROM_END
+
+COMP( 1989, tv965, 0, 0, terminals, terminals, terminals_state, 0, "TeleVideo", "TVI-965", MACHINE_IS_SKELETON )
 
 
 

@@ -1919,7 +1919,12 @@ MACHINE_CONFIG_MEMBER( isa8_cga_m24_device::device_add_mconfig )
 MACHINE_CONFIG_END
 
 isa8_cga_m24_device::isa8_cga_m24_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	isa8_cga_device(mconfig, ISA8_CGA_M24, tag, owner, clock), m_mode2(0), m_index(0)
+	isa8_cga_m24_device(mconfig, ISA8_CGA_M24, tag, owner, clock)
+{
+}
+
+isa8_cga_m24_device::isa8_cga_m24_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	isa8_cga_device(mconfig, type, tag, owner, clock), m_mode2(0), m_index(0)
 {
 	m_vram_size = 0x8000;
 }
@@ -2039,4 +2044,71 @@ MC6845_UPDATE_ROW( isa8_cga_m24_device::m24_gfx_1bpp_m24_update_row )
 		*p = palette[( data & 0x02 ) ? fg : 0]; p++;
 		*p = palette[( data & 0x01 ) ? fg : 0]; p++;
 	}
+}
+
+DEFINE_DEVICE_TYPE(ISA8_CGA_CPORTIII, isa8_cga_cportiii_device, "cga_cportiii", "Compaq Portable III CGA")
+
+MACHINE_CONFIG_MEMBER( isa8_cga_cportiii_device::device_add_mconfig )
+	isa8_cga_m24_device::device_add_mconfig(config);
+
+	MCFG_DEVICE_MODIFY(CGA_SCREEN_NAME)
+	MCFG_SCREEN_COLOR(rgb_t(255, 125, 0))
+MACHINE_CONFIG_END
+
+isa8_cga_cportiii_device::isa8_cga_cportiii_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	isa8_cga_m24_device(mconfig, ISA8_CGA_CPORTIII, tag, owner, clock)
+{
+}
+
+ROM_START(cga_cportiii)
+	ROM_REGION(0x2000, "gfx1", 0)
+	ROM_FILL(0, 0x2000, 0)
+ROM_END
+
+const tiny_rom_entry *isa8_cga_cportiii_device::device_rom_region() const
+{
+	return ROM_NAME(cga_cportiii);
+}
+
+void isa8_cga_cportiii_device::device_reset()
+{
+	isa8_cga_m24_device::device_reset();
+	m_isa->install_device(0x13c6, 0x13c7, read8_delegate(FUNC(isa8_cga_cportiii_device::port_13c6_r), this), write8_delegate(FUNC(isa8_cga_cportiii_device::port_13c6_w), this));
+	m_isa->install_device(0x23c6, 0x23c7, read8_delegate(FUNC(isa8_cga_cportiii_device::port_23c6_r), this), write8_delegate(FUNC(isa8_cga_cportiii_device::port_23c6_w), this));
+	m_palette->set_pen_color(0, 100, 25, 0);
+
+}
+
+WRITE8_MEMBER(isa8_cga_cportiii_device::char_ram_write)
+{
+	if(!BIT(offset, 0)) // FIXME: the font is 16 chars high, this needs it's own text drawing
+		m_chr_gen_base[(offset >> 1) + 0x1000] = data;
+}
+
+READ8_MEMBER(isa8_cga_cportiii_device::char_ram_read)
+{
+	return m_chr_gen_base[(offset >> 1) + 0x1000];
+}
+
+READ8_MEMBER(isa8_cga_cportiii_device::port_13c6_r)
+{
+	return 0x04;
+}
+
+WRITE8_MEMBER(isa8_cga_cportiii_device::port_13c6_w)
+{
+}
+
+READ8_MEMBER(isa8_cga_cportiii_device::port_23c6_r)
+{
+	return 0;
+}
+
+WRITE8_MEMBER(isa8_cga_cportiii_device::port_23c6_w)
+{
+	io_write(space, 0x0e, BIT(data, 0));
+	if(BIT(data, 3))
+		m_isa->install_memory(0xb8000, 0xb9fff, read8_delegate(FUNC(isa8_cga_cportiii_device::char_ram_read), this), write8_delegate(FUNC(isa8_cga_cportiii_device::char_ram_write), this));
+	else
+		m_isa->install_bank(0xb8000, 0xb8000 + 0x8000 - 1, "bank_cga", &m_vram[0]);
 }

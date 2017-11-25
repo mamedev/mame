@@ -701,10 +701,12 @@ inline void hcd62121_cpu_device::op_addb(int size)
 	bool zero_low = true;
 	u8 carry = 0;
 
-	set_cl_flag((m_temp1[size-1] & 0x0f) + (m_temp2[size-1] & 0x0f) > 9);
-
 	for (int i = 0; i < size; i++)
 	{
+		if (i == size - 1) {
+			set_cl_flag((m_temp1[i] & 0x0f) + (m_temp2[i] & 0x0f) + carry > 9);
+		}
+
 		int num1 = (m_temp1[i] & 0x0f) + ((m_temp1[i] & 0xf0) >> 4) * 10;
 		int num2 = (m_temp2[i] & 0x0f) + ((m_temp2[i] & 0xf0) >> 4) * 10;
 
@@ -734,10 +736,12 @@ inline void hcd62121_cpu_device::op_subb(int size)
 	bool zero_low = true;
 	u8 carry = 0;
 
-	set_cl_flag((m_temp1[size-1] & 0x0f) < (m_temp2[size-1] & 0x0f));
-
 	for (int i = 0; i < size; i++)
 	{
+		if (i == size - 1) {
+			set_cl_flag((m_temp1[i] & 0x0f) - (m_temp2[i] & 0x0f) - carry < 0);
+		}
+
 		int num1 = (m_temp1[i] & 0x0f) + ((m_temp1[i] & 0xf0) >> 4) * 10;
 		int num2 = (m_temp2[i] & 0x0f) + ((m_temp2[i] & 0xf0) >> 4) * 10;
 
@@ -765,8 +769,6 @@ inline void hcd62121_cpu_device::op_sub(int size)
 	bool zero_high = true;
 	bool zero_low = true;
 	u8 carry = 0;
-
-	set_cl_flag((m_temp1[0] & 0x0f) < (m_temp2[0] & 0x0f));
 
 	for (int i = 0; i < size; i++)
 	{
@@ -1480,10 +1482,10 @@ void hcd62121_cpu_device::execute_run()
 			}
 			break;
 
-		case 0xC0:      /* movb reg,i8 */  // TODO - test
+		//case 0xC0:      /* movb reg,i8 */  // TODO - test
 		case 0xC1:      /* movw reg,i16 */
-		case 0xC2:      /* movw reg,i64 */ // TODO - test
-		case 0xC3:      /* movw reg,i80 */ // TODO - test
+		//case 0xC2:      /* movw reg,i64 */ // TODO - test
+		//case 0xC3:      /* movw reg,i80 */ // TODO - test
 			{
 				int size = datasize(op);
 				u8 reg = read_op();
@@ -1669,7 +1671,12 @@ void hcd62121_cpu_device::execute_run()
 			break;
 
 		case 0xE3:      /* movb reg,dsize */
-			m_reg[read_op() & 0x7f] = m_dsize;
+			{
+				u8 reg = read_op();
+				if (reg & 0x80)
+					fatalerror("%02x:%04x: unimplemented instruction %02x encountered with (arg & 0x80) != 0\n", m_cseg, m_ip-1, op);
+				m_reg[reg & 0x7f] = m_dsize;
+			}
 			break;
 
 		case 0xE4:      /* movb reg,f */
@@ -1719,9 +1726,7 @@ void hcd62121_cpu_device::execute_run()
 
 		case 0xF1:      /* unk_F1 reg/i8 (out?) */
 		case 0xF3:      /* unk_F3 reg/i8 (out?) */
-		case 0xF4:      /* unk_F4 reg/i8 (out?) */
 		case 0xF5:      /* unk_F5 reg/i8 (out?) */
-		case 0xF6:      /* unk_F6 reg/i8 (out?) */
 		case 0xF7:      /* unk_F7 reg/i8 (out?) */
 			logerror("%02x:%04x: unimplemented instruction %02x encountered\n", m_cseg, m_ip-1, op);
 			read_op();

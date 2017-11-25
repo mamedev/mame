@@ -19,6 +19,11 @@
 #include "formats/sdf_dsk.h"
 #include "imagedev/flopdrv.h"
 
+#include "bus/coco/dragon_fdc.h"
+#include "bus/coco/dragon_jcbsnd.h"
+#include "bus/coco/coco_pak.h"
+#include "bus/coco/coco_ssc.h"
+
 
 //**************************************************************************
 //  ADDRESS MAPS
@@ -175,7 +180,7 @@ SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_START( dragon_base )
 	MCFG_DEVICE_MODIFY(":")
-	MCFG_DEVICE_CLOCK(XTAL_4_433619MHz)
+	MCFG_DEVICE_CLOCK(XTAL_14_218MHz/4)
 
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", M6809E, DERIVED_CLOCK(1, 1))
@@ -200,7 +205,7 @@ static MACHINE_CONFIG_START( dragon_base )
 	MCFG_PIA_IRQA_HANDLER(WRITELINE(coco_state, pia1_firq_a))
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(coco_state, pia1_firq_b))
 
-	MCFG_SAM6883_ADD(SAM_TAG, XTAL_4_433619MHz, MAINCPU_TAG, AS_PROGRAM)
+	MCFG_SAM6883_ADD(SAM_TAG, XTAL_14_218MHz/4, MAINCPU_TAG, AS_PROGRAM)
 	MCFG_SAM6883_RES_CALLBACK(READ8(dragon_state, sam_read))
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_FORMATS(coco_cassette_formats)
@@ -280,7 +285,7 @@ static MACHINE_CONFIG_DERIVED( d64plus, dragon64 )
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	// crtc
-	MCFG_MC6845_ADD("crtc", HD6845, "plus_screen", 14218000 / 8) /* unknown clock, hand tuned to get ~50 fps */
+	MCFG_MC6845_ADD("crtc", HD6845, "plus_screen", XTAL_14_218MHz/4/2)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(d64plus_state, crtc_update_row)

@@ -352,7 +352,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(changela_state::changela_scanline)
 
 INTERRUPT_GEN_MEMBER(changela_state::chl_mcu_irq)
 {
-	m_mcu->pulse_input_line(0, 1);
+	m_mcu->pulse_input_line(0, m_mcu->minimum_quantum_time());
 }
 
 void changela_state::machine_start()

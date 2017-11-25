@@ -79,10 +79,15 @@ WRITE8_MEMBER(chqflag_state::chqflag_vreg_w)
 	 * 0x08 is used at dawn after 0x88 state
 	 * The shadow part looks ugly when rain starts/ends pouring (-> black colored with a setting of 0x00), 
 	 * the reference shows dimmed background when this event occurs (which is handled via reg 1 bit 0 of k051960 device), 
-	 * might be actually disabling the shadow here (-> setting 1.0f instead), but can't say for sure from the available reference.
+	 * might be actually disabling the shadow here (-> setting 1.0f instead).
+	 *
+	 * TODO: true values aren't known, also shadow_factors table probably scales towards zero instead (game doesn't use those)
 	 */
-	const float shadow_factors[4] = {PALETTE_DEFAULT_SHADOW_FACTOR, 1.33f, 1.66f, 2.0f };
-	m_palette->set_shadow_factor(shadow_factors[((data & 0x80) >> 6) | ((data & 0x08) >> 3)]);
+	const float shadow_factors[4] = {0.8, 1.33, 1.66, 2.0 };
+	const float highlight_factors[4] = {1.0, 1.33, 1.66, 2.0 };
+	uint8_t shadow_value = ((data & 0x80) >> 6) | ((data & 0x08) >> 3);
+	
+	m_palette->set_shadow_factor(m_last_vreg != 0 ? highlight_factors[shadow_value] : shadow_factors[shadow_value] );
 	
 	#if 0
 	if ((data & 0x80) != m_last_vreg)
@@ -297,7 +302,7 @@ void chqflag_state::machine_reset()
 
 inline void chqflag_state::update_background_shadows(uint8_t data)
 {
-	double brt = (data & 1) ? PALETTE_DEFAULT_SHADOW_FACTOR : 1.0;
+	double brt = (data & 1) ? 0.8 : 1.0;
 
 	for (int i = 512; i < 1024; i++)
 		m_palette->set_pen_contrast(i, brt);

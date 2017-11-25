@@ -319,7 +319,7 @@ static MACHINE_CONFIG_START( micro3d )
 	MCFG_MCS51_SERIAL_TX_CB(WRITE8(micro3d_state, data_from_i8031))
 	MCFG_MCS51_SERIAL_RX_CB(READ8(micro3d_state, data_to_i8031))
 
-	MCFG_MC68681_ADD("duart", XTAL_3_6864MHz)
+	MCFG_DEVICE_ADD("duart", MC68681, XTAL_3_6864MHz)
 	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(micro3d_state, duart_irq_handler))
 	MCFG_MC68681_A_TX_CALLBACK(DEVWRITELINE("monitor", rs232_port_device, write_txd))
 	MCFG_MC68681_B_TX_CALLBACK(WRITELINE(micro3d_state, duart_txb))

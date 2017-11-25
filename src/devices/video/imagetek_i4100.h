@@ -18,15 +18,6 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_I4100_ADD(tag) \
-		MCFG_DEVICE_ADD((tag), I4100, (0))
-		
-#define MCFG_I4220_ADD(tag) \
-		MCFG_DEVICE_ADD((tag), I4220, (0))
-
-#define MCFG_I4300_ADD(tag) \
-		MCFG_DEVICE_ADD((tag), I4300, (0))
-
 #define MCFG_I4100_GFXDECODE(gfxtag) \
 	imagetek_i4100_device::static_set_gfxdecode_tag(*device, ("^" gfxtag));
 	
@@ -35,7 +26,10 @@
 
 #define MCFG_I4100_TILEMAP_XOFFSETS(_a, _b, _c) \
 	imagetek_i4100_device::static_set_tmap_xoffsets(*device, _a, _b, _c);
-	
+
+#define MCFG_I4100_TILEMAP_YOFFSETS(_a, _b, _c) \
+	imagetek_i4100_device::static_set_tmap_yoffsets(*device, _a, _b, _c);
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -54,6 +48,7 @@ public:
 
 	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
 	static void static_set_tmap_xoffsets(device_t &device, int x1, int x2, int x3);
+	static void static_set_tmap_yoffsets(device_t &device, int y1, int y2, int y3);
 
 	template <class Object> static devcb_base &static_set_blitter_irq_callback(device_t &device, Object &&cb) { return downcast<imagetek_i4100_device &>(device).m_blit_irq_cb.set_callback(std::forward<Object>(cb)); }
 
@@ -157,6 +152,7 @@ protected:
 	bool m_screen_flip;
 	const bool m_support_8bpp, m_support_16x16;
 	int  m_tilemap_scrolldx[3];
+	int  m_tilemap_scrolldy[3];
 
 	void blt_write( address_space &space, const int tmap, const offs_t offs, const uint16_t data, const uint16_t mask );
 

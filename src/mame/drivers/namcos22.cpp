@@ -2978,7 +2978,7 @@ ADDRESS_MAP_END
 
 TIMER_DEVICE_CALLBACK_MEMBER(namcos22_state::propcycl_pedal_interrupt)
 {
-	m_mcu->pulse_input_line(M37710_LINE_TIMERA3TICK, 1);
+	m_mcu->pulse_input_line(M37710_LINE_TIMERA3TICK, m_mcu->minimum_quantum_time());
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(namcos22_state::propcycl_pedal_update)
@@ -3013,7 +3013,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos22_state::propcycl_pedal_update)
 
 TIMER_CALLBACK_MEMBER(namcos22_state::adillor_trackball_interrupt)
 {
-	m_mcu->pulse_input_line(param ? M37710_LINE_TIMERA2TICK : M37710_LINE_TIMERA3TICK, 1);
+	m_mcu->pulse_input_line(param ? M37710_LINE_TIMERA2TICK : M37710_LINE_TIMERA3TICK, m_mcu->minimum_quantum_time());
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(namcos22_state::adillor_trackball_update)

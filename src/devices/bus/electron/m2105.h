@@ -46,7 +46,7 @@ private:
 	required_memory_region m_exp_rom;
 	required_device<via6522_device> m_via6522_0;
 	required_device<via6522_device> m_via6522_1;
-	required_device<mc68681_device> m_duart;
+	required_device<scn2681_device> m_duart;
 	required_device<tms5220_device> m_tms;
 	required_device<centronics_device> m_centronics;
 	required_device<input_merger_device> m_irqs;
