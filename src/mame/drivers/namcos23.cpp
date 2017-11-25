@@ -281,7 +281,7 @@ Notes:
                     C404 (QFP208)
                     C412 (QFP256)
                     C413 (QFP208)
-                    C416 (QFP176)
+                    C416 (QFP176), Memory/DMA Controller
                     C417 (QFP208)
                     C421 (QFP208)
                     C422 (QFP64)
@@ -397,7 +397,7 @@ Notes:
                     C361 (QFP120)
                     C404 (QFP208)
                     C413 (QFP208)
-                    C416 (QFP176)
+                    C416 (QFP176), Memory/DMA Controller
                     C417 (QFP208)
                     C421 (QFP208)
                     C422 (QFP64)
@@ -1124,7 +1124,7 @@ Notes:
      C406 (QFP120)
      C407 (QFP64)
      C413 (QFP208)
-     C416 (QFP176)
+     C416 (QFP176), Memory/DMA Controller
      C417 (QFP208)
      C422 (QFP64)
      C435 (x2, TQFP144)
