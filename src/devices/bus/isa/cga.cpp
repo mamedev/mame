@@ -1721,11 +1721,26 @@ isa8_cga_m24_device::isa8_cga_m24_device(const machine_config &mconfig, device_t
 	m_vram_size = 0x8000;
 }
 
+ROM_START(cga_m24)
+	ROM_REGION(0x2000, "gfx1", 0)
+	ROM_LOAD("m24 graphics board go380 258 pqbq.bin", 0x00000, 0x1000, CRC(04495786) SHA1(ea34ee527c5632d049ec11a7ae0fde9e6dee545f))
+
+	ROM_REGION(0x1000, "crtc_prom", 0)
+	ROM_LOAD("m24 graphics board go380 gi 9433-0088.bin", 0x00000, 0x1000, CRC(5725e660) SHA1(634c2d165d401883a955e144a0abfa2078a47013))
+ROM_END
+
+const tiny_rom_entry *isa8_cga_m24_device::device_rom_region() const
+{
+	return ROM_NAME(cga_m24);
+}
+
 void isa8_cga_m24_device::device_reset()
 {
 	isa8_cga_device::device_reset();
 	m_mode2 = 0;
 	m_start_offset = 0;
+	m_chr_gen_offset[0] = m_chr_gen_offset[2] = 0x0000;
+	m_chr_gen_offset[1] = m_chr_gen_offset[3] = 0x0000;
 }
 
 MC6845_RECONFIGURE( isa8_cga_m24_device::reconfigure )
@@ -1794,12 +1809,50 @@ READ8_MEMBER( isa8_cga_m24_device::io_read )
 	return data;
 }
 
-MC6845_UPDATE_ROW( isa8_cga_m24_device::crtc_update_row )
+
+MC6845_UPDATE_ROW(isa8_cga_m24_device::crtc_update_row)
 {
 	if(m_mode2 & 1)
 		m24_gfx_1bpp_m24_update_row(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp);
-	else
-		isa8_cga_device::crtc_update_row(bitmap, cliprect, ma, ra >> 1, y, x_count, cursor_x, de, hbp, vbp);
+
+	if (m_update_row_type == -1)
+		return;
+
+	y = m_y;
+	if(m_y >= bitmap.height())
+		return;
+
+	switch (m_update_row_type)
+	{
+		case CGA_TEXT_INTEN:
+			cga_text<false, false, false, false, 16>(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp);
+			break;
+		case CGA_TEXT_INTEN_ALT:
+			cga_text<false, false, false, true, 16>(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp);
+			break;
+		case CGA_TEXT_INTEN_CG: // this hardware doesn't support composite
+			break;
+		case CGA_TEXT_BLINK:
+			cga_text<true, false, false, false, 16>(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp);
+			break;
+		case CGA_TEXT_BLINK_ALT:
+			cga_text<true, false, false, true, 16>(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp);
+			break;
+		case CGA_TEXT_BLINK_SI:
+			break;
+		case CGA_GFX_1BPP:
+			cga_gfx_1bpp_update_row(bitmap, cliprect, ma, ra >> 1, y, x_count, cursor_x, de, hbp, vbp);
+			break;
+		case CGA_GFX_2BPP:
+			cga_gfx_2bpp_update_row(bitmap, cliprect, ma, ra >> 1, y, x_count, cursor_x, de, hbp, vbp);
+			break;
+		case CGA_GFX_4BPPL:
+			cga_gfx_4bppl_update_row(bitmap, cliprect, ma, ra >> 1, y, x_count, cursor_x, de, hbp, vbp);
+			break;
+		case CGA_GFX_4BPPH:
+			cga_gfx_4bpph_update_row(bitmap, cliprect, ma, ra >> 1, y, x_count, cursor_x, de, hbp, vbp);
+			break;
+	}
 }
 
 MC6845_UPDATE_ROW( isa8_cga_m24_device::m24_gfx_1bpp_m24_update_row )
@@ -1903,50 +1956,5 @@ WRITE8_MEMBER(isa8_cga_cportiii_device::port_23c6_w)
 		m_isa->install_memory(0xb8000, 0xb9fff, read8_delegate(FUNC(isa8_cga_cportiii_device::char_ram_read), this), write8_delegate(FUNC(isa8_cga_cportiii_device::char_ram_write), this));
 	else
 		m_isa->install_bank(0xb8000, 0xb8000 + 0x8000 - 1, "bank_cga", &m_vram[0]);
-}
-
-MC6845_UPDATE_ROW(isa8_cga_cportiii_device::crtc_update_row)
-{
-	if(m_mode2 & 1)
-		m24_gfx_1bpp_m24_update_row(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp);
-
-	if (m_update_row_type == -1)
-		return;
-
-	y = m_y;
-	if(m_y >= bitmap.height())
-		return;
-
-	switch (m_update_row_type)
-	{
-		case CGA_TEXT_INTEN:
-			cga_text<false, false, false, false, 16>(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp);
-			break;
-		case CGA_TEXT_INTEN_ALT:
-			cga_text<false, false, false, true, 16>(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp);
-			break;
-		case CGA_TEXT_INTEN_CG: // this hardware doesn't support composite
-			break;
-		case CGA_TEXT_BLINK:
-			cga_text<true, false, false, false, 16>(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp);
-			break;
-		case CGA_TEXT_BLINK_ALT:
-			cga_text<true, false, false, true, 16>(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp);
-			break;
-		case CGA_TEXT_BLINK_SI:
-			break;
-		case CGA_GFX_1BPP:
-			cga_gfx_1bpp_update_row(bitmap, cliprect, ma, ra >> 1, y, x_count, cursor_x, de, hbp, vbp);
-			break;
-		case CGA_GFX_2BPP:
-			cga_gfx_2bpp_update_row(bitmap, cliprect, ma, ra >> 1, y, x_count, cursor_x, de, hbp, vbp);
-			break;
-		case CGA_GFX_4BPPL:
-			cga_gfx_4bppl_update_row(bitmap, cliprect, ma, ra >> 1, y, x_count, cursor_x, de, hbp, vbp);
-			break;
-		case CGA_GFX_4BPPH:
-			cga_gfx_4bpph_update_row(bitmap, cliprect, ma, ra >> 1, y, x_count, cursor_x, de, hbp, vbp);
-			break;
-	}
 }
 

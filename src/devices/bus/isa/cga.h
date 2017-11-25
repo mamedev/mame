@@ -284,6 +284,7 @@ protected:
 	virtual void device_reset() override;
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 	uint8_t m_mode2, m_index;
 };
 
@@ -301,7 +302,6 @@ public:
 	DECLARE_WRITE8_MEMBER(port_23c6_w);
 	DECLARE_READ8_MEMBER(char_ram_read);
 	DECLARE_WRITE8_MEMBER(char_ram_write);
-	virtual MC6845_UPDATE_ROW( crtc_update_row ) override;
 protected:
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
