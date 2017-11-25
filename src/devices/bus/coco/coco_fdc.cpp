@@ -523,3 +523,37 @@ namespace
 }
 
 DEFINE_DEVICE_TYPE(CP400_FDC, cp400_fdc_device, "cp400_fdc", "CP400 FDC")
+
+//**************************************************************************
+//              Codimex CD-6809 FDC (1986)
+//
+// Seems to be a clone of the JFD-COCO originally manufactured by J&M
+// More ifo at: http://amxproject.com/?p=2747
+//**************************************************************************
+
+ROM_START(cd6809_fdc)
+	ROM_REGION(0x4000, "eprom", ROMREGION_ERASE00)
+	ROM_LOAD("cd6809dsk.u16", 0x0000, 0x2000, CRC(3c35bda8) SHA1(9b2eec25188bed4326b84739a666435884e4ddf4))
+ROM_END
+
+namespace
+{
+	class cd6809_fdc_device : public coco_fdc_device_base
+	{
+	public:
+		// construction/destruction
+		cd6809_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+			: coco_fdc_device_base(mconfig, CD6809_FDC, tag, owner, clock)
+		{
+		}
+
+	protected:
+		// optional information overrides
+		virtual const tiny_rom_entry *device_rom_region() const override
+		{
+			return ROM_NAME(cd6809_fdc);
+		}
+	};
+}
+
+DEFINE_DEVICE_TYPE(CD6809_FDC, cd6809_fdc_device, "cd6809_fdc", "CD6809 FDC")
