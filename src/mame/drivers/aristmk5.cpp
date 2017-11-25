@@ -983,11 +983,12 @@ INPUT_CHANGED_MEMBER(aristmk5_state::coin_start)
 static INPUT_PORTS_START( aristmk5_usa )
 	/* This simulates the ROM swap */
 	PORT_START("ROM_LOAD")
-	PORT_CONFNAME( 0x03, 0x03, "System Mode" )
+	PORT_CONFNAME( 0x07, 0x04, "System Mode" )
 	PORT_CONFSETTING(    0x00, "USA Set Chip v4.04.09 Mode" )
-	PORT_CONFSETTING(    0x01, "USA Set Chip v4.04.00 Mode" )
-	PORT_CONFSETTING(    0x02, "USA Set Chip v4.02.04 Mode" )
-	PORT_CONFSETTING(    0x03, "Game Mode" )
+	PORT_CONFSETTING(    0x01, "USA Set Chip v4.04.08 Mode" )
+	PORT_CONFSETTING(    0x02, "USA Set Chip v4.04.00 Mode" )
+	PORT_CONFSETTING(    0x03, "USA Set Chip v4.02.04 Mode" )
+	PORT_CONFSETTING(    0x04, "Game Mode" )
 
 	PORT_START("DSW1")
 	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "DSW1:1")
@@ -1056,11 +1057,12 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( aristmk5 )
 	/* This simulates the ROM swap */
 	PORT_START("ROM_LOAD")
-	PORT_CONFNAME( 0x03, 0x03, "System Mode" )
+	PORT_CONFNAME( 0x07, 0x04, "System Mode" )
 	PORT_CONFSETTING(    0x00, "USA Set Chip v4.04.09 Mode" )
-	PORT_CONFSETTING(    0x01, "USA Set Chip v4.04.00 Mode" )
-	PORT_CONFSETTING(    0x02, "USA Set Chip v4.02.04 Mode" )
-	PORT_CONFSETTING(    0x03, "Game Mode" )
+	PORT_CONFSETTING(    0x01, "USA Set Chip v4.04.08 Mode" )
+	PORT_CONFSETTING(    0x02, "USA Set Chip v4.04.00 Mode" )
+	PORT_CONFSETTING(    0x03, "USA Set Chip v4.02.04 Mode" )
+	PORT_CONFSETTING(    0x04, "Game Mode" )
 
 	PORT_START("P1")
 	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_J) PORT_NAME("Gamble")
@@ -1881,11 +1883,11 @@ void aristmk5_state::machine_reset()
 		uint8_t *PRG;// = memregion("prg_code")->base();
 		int i;
 		uint8_t op_mode;
-		static const char *const rom_region[] = { "set_4.04.09", "set_4.04.00", "set_4.02.04", "game_prg" };
+		static const char *const rom_region[] = { "set_4.04.09", "set_4.04.08", "set_4.04.00", "set_4.02.04", "game_prg" };
 
 		op_mode = ioport("ROM_LOAD")->read();
 
-		PRG = memregion(rom_region[op_mode & 3])->base();
+		PRG = memregion(rom_region[op_mode & 7])->base();
 
 		if(PRG!=nullptr)
 
@@ -2004,6 +2006,9 @@ MACHINE_CONFIG_END
 	ROM_REGION( 0x400000, "set_4.04.09", ROMREGION_ERASEFF ) /* setchip v4.04.09 4meg */ \
 	ROM_LOAD32_WORD( "setchip v4.04.09.u7",  0x000000, 0x80000, CRC(e8e8dc75) SHA1(201fe95256459ce34fdb6f7498135ab5016d07f3) ) \
 	ROM_LOAD32_WORD( "setchip v4.04.09.u11", 0x000002, 0x80000, CRC(ff7a9035) SHA1(4352c4336e61947c555fdc80c61f944076f64b64) ) \
+	ROM_REGION( 0x400000, "set_4.04.08", ROMREGION_ERASEFF ) /* setchip v4.04.08 4meg */ \
+	ROM_LOAD32_WORD( "setchip v4.04.08.u7",  0x000000, 0x80000, CRC(7c4b7fe4) SHA1(39dd39c794c0cb6abc1b7503650643a8131468d1) ) \
+	ROM_LOAD32_WORD( "setchip v4.04.08.u11", 0x000002, 0x80000, CRC(d3234a28) SHA1(8ff112ee4aadf1d359ca8ffe0cfa9c7400aa0595) ) \
 	ROM_REGION( 0x400000, "set_4.04.00", ROMREGION_ERASEFF ) /* setchip v4.04.00 4meg 42pin */ \
 	ROM_LOAD32_WORD( "setchip v4.04.00.u7",  0x000000, 0x80000, CRC(2453137e) SHA1(b59998e75ae3924da16faf47b9cfe9afd60d810c) ) \
 	ROM_LOAD32_WORD( "setchip v4.04.00.u11", 0x000002, 0x80000, CRC(82dfa12a) SHA1(86fd0f0ad8d5d1bc503392a40bbcdadb055b2765) ) \
@@ -2022,6 +2027,9 @@ MACHINE_CONFIG_END
 	ROM_REGION( 0x400000, "set_4.04.09", ROMREGION_ERASEFF ) /* setchip v4.04.09 4meg */ \
 	ROM_LOAD32_WORD( "setchip v4.04.09.u7",  0x000000, 0x80000, CRC(e8e8dc75) SHA1(201fe95256459ce34fdb6f7498135ab5016d07f3) ) \
 	ROM_LOAD32_WORD( "setchip v4.04.09.u11", 0x000002, 0x80000, CRC(ff7a9035) SHA1(4352c4336e61947c555fdc80c61f944076f64b64) ) \
+	ROM_REGION( 0x400000, "set_4.04.08", ROMREGION_ERASEFF ) /* setchip v4.04.08 4meg */ \
+	ROM_LOAD32_WORD( "setchip v4.04.08.u7",  0x000000, 0x80000, CRC(7c4b7fe4) SHA1(39dd39c794c0cb6abc1b7503650643a8131468d1) ) \
+	ROM_LOAD32_WORD( "setchip v4.04.08.u11", 0x000002, 0x80000, CRC(d3234a28) SHA1(8ff112ee4aadf1d359ca8ffe0cfa9c7400aa0595) ) \
 	ROM_REGION( 0x400000, "set_4.04.00", ROMREGION_ERASEFF ) /* setchip v4.04.00 4meg 42pin */ \
 	ROM_LOAD32_WORD( "setchip v4.04.00.u7",  0x000000, 0x80000, CRC(2453137e) SHA1(b59998e75ae3924da16faf47b9cfe9afd60d810c) ) \
 	ROM_LOAD32_WORD( "setchip v4.04.00.u11", 0x000002, 0x80000, CRC(82dfa12a) SHA1(86fd0f0ad8d5d1bc503392a40bbcdadb055b2765) ) \
