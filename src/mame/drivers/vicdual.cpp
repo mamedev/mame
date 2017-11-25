@@ -1169,10 +1169,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( invho2_io_map, AS_IO, 8, vicdual_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7f)
 
-	AM_RANGE(0x00, 0x00) /*AM_MIRROR(0x7c)*/ AM_READ_PORT("IN0")
-	AM_RANGE(0x01, 0x01) /*AM_MIRROR(0x7c)*/ AM_READ_PORT("IN1")
-	AM_RANGE(0x02, 0x02) /* AM_MIRROR(0x7c)*/ AM_READ_PORT("IN2")
-	AM_RANGE(0x03, 0x03) /*AM_MIRROR(0x7c)*/ AM_READ_PORT("IN3")
+	AM_RANGE(0x00, 0x00) AM_MIRROR(0x7c) AM_READ_PORT("IN0")
+	AM_RANGE(0x01, 0x01) AM_MIRROR(0x7c) AM_READ_PORT("IN1")
+	AM_RANGE(0x02, 0x02) AM_MIRROR(0x7c) AM_READ_PORT("IN2")
+	AM_RANGE(0x03, 0x03) AM_MIRROR(0x7c) AM_READ_PORT("IN3")
 
 	/* no decoder, just logic gates, so in theory the
 	   game can write to multiple locations at once */
