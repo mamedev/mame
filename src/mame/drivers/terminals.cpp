@@ -62,28 +62,6 @@ COMP( 1982, vp60, 0, 0, terminals, terminals, terminals_state, 0, "ADDS", "Viewp
 
 /**************************************************************************************************************
 
-ADDS Viewpoint 122 (VPT-122).
-Chips: D8085AC-2, SCN2674B, SCB2675T, D8251AFC, SCN2681A, D8253C-2, 5x MB8129-15, MX462020-20 (guess, it's unreadable)
-Crystals: 22.096, 14.916, 3.6864, 8.000
-
-***************************************************************************************************************/
-
-ROM_START( vp122 )
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD( "223-48600.uj1", 0x0000, 0x4000, CRC(4d140c69) SHA1(04aa5a4f0c0e0d07b9dc983a6d626ee88ef8b8ba) )
-	ROM_LOAD( "223-48500.ug1", 0x4000, 0x4000, CRC(4e98554d) SHA1(0cbb9cb7efd02a3209caed410ccc8495a5ec1772) )
-	ROM_LOAD( "223-49400.uj2", 0x8000, 0x4000, CRC(447d90d3) SHA1(f8c0db824198b5a571eef80cc3eaf1e829aa2c2a) )
-
-	ROM_REGION(0x2000, "chargen", 0)
-	ROM_LOAD( "223-48700.uk4", 0x0000, 0x2000, CRC(4dbab4bd) SHA1(18e9a23ba22e2096fa529541fa329f5a56740e62) )
-ROM_END
-
-COMP( 1985, vp122, 0, 0, terminals, terminals, terminals_state, 0, "ADDS", "Viewpoint 122", MACHINE_IS_SKELETON )
-
-
-
-/**************************************************************************************************************
-
 Ann Arbor Ambassador.
 Chips: Z80A, M58725P (16k RAM), 2x SCN2651C, nvram, button-battery
 Crystals: 18.414, 6.0688
