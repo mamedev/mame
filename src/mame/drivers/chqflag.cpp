@@ -83,8 +83,8 @@ WRITE8_MEMBER(chqflag_state::chqflag_vreg_w)
 	 *
 	 * TODO: true values aren't known, also shadow_factors table probably scales towards zero instead (game doesn't use those)
 	 */
-	const float shadow_factors[4] = {0.8, 1.33, 1.66, 2.0 };
-	const float highlight_factors[4] = {1.0, 1.33, 1.66, 2.0 };
+	const double shadow_factors[4] = {0.8, 1.33, 1.66, 2.0 };
+	const double highlight_factors[4] = {1.0, 1.33, 1.66, 2.0 };
 	uint8_t shadow_value = ((data & 0x80) >> 6) | ((data & 0x08) >> 3);
 	
 	m_palette->set_shadow_factor(m_last_vreg != 0 ? highlight_factors[shadow_value] : shadow_factors[shadow_value] );
