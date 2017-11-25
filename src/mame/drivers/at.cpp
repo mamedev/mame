@@ -328,6 +328,13 @@ MACHINE_START_MEMBER(at_state,vrom_fix)
 	membank("vrom_bank")->set_base(machine().root_device().memregion("bios")->base());
 }
 
+static MACHINE_CONFIG_START( cfg_single_1200K )
+	MCFG_DEVICE_MODIFY("fdc:0")
+	MCFG_SLOT_DEFAULT_OPTION("525hd")
+	MCFG_DEVICE_MODIFY("fdc:1")
+	MCFG_SLOT_DEFAULT_OPTION("")
+MACHINE_CONFIG_END
+
 static SLOT_INTERFACE_START( pci_devices )
 	SLOT_INTERFACE_INTERNAL("vt82c505", VT82C505)
 SLOT_INTERFACE_END
@@ -658,16 +665,32 @@ static MACHINE_CONFIG_START( ficpio2 )
 MACHINE_CONFIG_END
 
 // Compaq Portable III
-static MACHINE_CONFIG_DERIVED( comportiii, ibm5170 )
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(XTAL_48MHz / 4) 
-	MCFG_DEVICE_MODIFY(RAM_TAG)
+static MACHINE_CONFIG_START( comportiii )
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", I80286, XTAL_48MHz/4 /*12000000*/)
+	MCFG_CPU_PROGRAM_MAP(at16_map)
+	MCFG_CPU_IO_MAP(at16_io)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259_master", pic8259_device, inta_cb)
+	MCFG_80286_SHUTDOWN(DEVWRITELINE("mb", at_mb_device, shutdown))
+
+	MCFG_DEVICE_ADD("mb", AT_MB, 0)
+	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	MCFG_FRAGMENT_ADD(at_softlists)
+
+	MCFG_ISA16_SLOT_ADD("mb:isabus","board1", pc_isa16_cards, "fdc", true)
+	MCFG_SLOT_OPTION_MACHINE_CONFIG("fdc", cfg_single_1200K)
+	MCFG_ISA16_SLOT_ADD("mb:isabus","board2", pc_isa16_cards, "comat", true)
+	MCFG_ISA16_SLOT_ADD("mb:isabus","board3", pc_isa16_cards, "hdc", true)
+	MCFG_ISA16_SLOT_ADD("mb:isabus","board4", pc_isa16_cards, "cga_cportiii", true)
+	MCFG_ISA16_SLOT_ADD("mb:isabus","isa1", pc_isa16_cards, nullptr, false)
+	MCFG_ISA16_SLOT_ADD("mb:isabus","isa2", pc_isa16_cards, nullptr, false)
+
+	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_at_keyboards, STR_KBD_IBM_PC_AT_84)
+
+	/* internal ram */
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("640K")
 	MCFG_RAM_EXTRA_OPTIONS("1152K,1664K,2176K,2688K,4736K,6784K")
-	MCFG_DEVICE_MODIFY("isa1")
-	MCFG_DEVICE_SLOT_INTERFACE(pc_isa8_cards, "cga_m24", false)
-	MCFG_DEVICE_MODIFY("isa4")
-	MCFG_DEVICE_SLOT_INTERFACE(pc_isa16_cards, "hdc", false) 
 MACHINE_CONFIG_END
 
 //**************************************************************************
