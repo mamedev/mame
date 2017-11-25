@@ -121,7 +121,7 @@ ioport_constructor a2bus_transwarp_device::device_input_ports() const
 //-------------------------------------------------
 
 MACHINE_CONFIG_MEMBER( a2bus_transwarp_device::device_add_mconfig )
-	MCFG_CPU_ADD(CPU_TAG, M65C02, XTAL_14_31818MHz/4)
+	MCFG_CPU_ADD(CPU_TAG, M65C02, A2BUS_7M_CLOCK / 2)
 	MCFG_CPU_PROGRAM_MAP(m65c02_mem)
 MACHINE_CONFIG_END
 
@@ -168,13 +168,9 @@ void a2bus_transwarp_device::device_reset()
 	if (!(m_dsw2->read() & 0x80))
 	{
 		if (m_dsw1->read() & 0x80)
-		{
-			m_ourcpu->set_unscaled_clock(XTAL_14_31818MHz/8);			
-		}
+			m_ourcpu->set_unscaled_clock(A2BUS_7M_CLOCK / 4);
 		else
-		{
-			m_ourcpu->set_unscaled_clock(XTAL_14_31818MHz/4);			
-		}
+			m_ourcpu->set_unscaled_clock(A2BUS_7M_CLOCK / 2);
 	}
 	else
 	{
@@ -187,13 +183,9 @@ void a2bus_transwarp_device::device_timer(emu_timer &timer, device_timer_id id, 
 	if (!(m_dsw2->read() & 0x80))
 	{
 		if (m_dsw1->read() & 0x80)
-		{
-			m_ourcpu->set_unscaled_clock(XTAL_14_31818MHz/8);			
-		}
+			m_ourcpu->set_unscaled_clock(A2BUS_7M_CLOCK / 4);
 		else
-		{
-			m_ourcpu->set_unscaled_clock(XTAL_14_31818MHz/4);			
-		}
+			m_ourcpu->set_unscaled_clock(A2BUS_7M_CLOCK / 2);
 	}
 	m_timer->adjust(attotime::never);	
 }

@@ -51,6 +51,9 @@
 	MCFG_DEVICE_INPUT_DEFAULTS(_def_inp) \
 	device_a2bus_card_interface::static_set_a2bus_tag(*device, _nbtag, _tag);
 
+// 7M = XTAL_14_31818MHz / 2 or XTAL_28_63636MHz / 4 (for IIgs)
+static constexpr uint32_t A2BUS_7M_CLOCK = 7159090;
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
