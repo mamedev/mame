@@ -32,10 +32,10 @@ script:
     date;
     if [ $CC == 'clang' ]; then
     timeout 5m make -j2 IGNORE_GIT=1 OVERRIDE_CXX="clang++-3.6" OVERRIDE_CC="clang-3.6" && ./$MAME -validate ||
-    if [ $? == 124 ]; then echo "Build exceeded timelimit" 1>&2; fi && (exit 1);
+    { export ERROR=$?; if [ $ERROR == 124 ]; then echo "Build exceeded estimated timelimit" 1>&2; fi; echo exiting with code $ERROR; (exit $ERROR); } ;
     else
     timeout 5m make -j4 IGNORE_GIT=1 OVERRIDE_CC="gcc-5" OVERRIDE_CXX="g++-5" TOOLS=1 && ./$MAME -validate ||
-    if [ $? == 124 ]; then echo "Build exceeded timelimit" 1>&2; fi && (exit 1);
+    { export ERROR=$?; if [ $ERROR == 124 ]; then echo "Build exceeded estimated timelimit" 1>&2; fi; echo exiting with code $ERROR; (exit $ERROR); } ;
     fi
     elif [ $TRAVIS_OS_NAME == 'osx' ]; then
     unset LDOPTS && make -j2 OPTIMIZE=0 USE_LIBSDL=1 && ./$MAME -validate;
