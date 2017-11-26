@@ -186,7 +186,7 @@ tms32010_disassembler::tms32010_disassembler()
 				ops[0],ops[1],bit);
 		}
 		while (isspace((uint8_t)*p)) p++;
-		Op.emplace_back(bits, mask, *p, ops[0], ops[1]);
+		Op.emplace_back(mask, bits, *p, ops[0], ops[1]);
 
 		ops += 2;
 		i++;
@@ -209,6 +209,9 @@ offs_t tms32010_disassembler::disassemble(std::ostream &stream, offs_t pc, const
 	code = opcodes.r16(pc);
 	for ( i = 0; i < int(Op.size()); i++)
 	{
+		if(pc == 0)
+			fprintf(stderr, "op=%04x mask=%04x bits=%04x %s\n", code, Op[i].mask, Op[i].bits, Op[i].fmt);
+
 		if ((code & Op[i].mask) == Op[i].bits)
 		{
 			if (op != -1)

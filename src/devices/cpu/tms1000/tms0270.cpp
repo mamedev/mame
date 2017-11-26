@@ -23,7 +23,7 @@ DEFINE_DEVICE_TYPE(TMS0270, tms0270_cpu_device, "tms0270", "TMS0270") // 40-pin 
 
 // internal memory maps
 static ADDRESS_MAP_START(program_11bit_9, AS_PROGRAM, 16, tms1k_base_device)
-	AM_RANGE(0x000, 0xfff) AM_ROM
+	AM_RANGE(0x000, 0x7ff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(data_144x4, AS_DATA, 8, tms1k_base_device)

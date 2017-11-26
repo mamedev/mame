@@ -110,7 +110,7 @@ pic16c5x_disassembler::pic16c5x_disassembler()
 				ops[0],ops[1],bit);
 		}
 		while (isspace((uint8_t)*p)) p++;
-		Op.emplace_back(bits, mask, *p, ops[0], ops[1]);
+		Op.emplace_back(mask, bits, *p, ops[0], ops[1]);
 
 		ops += 2;
 		i++;
