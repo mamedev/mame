@@ -2,7 +2,7 @@
 // copyright-holders: Olivier Galibert, Juergen Buchmueller, Krzysztof Strzecha, Robbbert
 /***************************************************************************
 
-	ZX-80/ZX-81 and derivatives
+    ZX-80/ZX-81 and derivatives
 
     Original driver by:
     Juergen Buchmueller, Dec 1999

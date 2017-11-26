@@ -452,7 +452,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	</software>
 
 	<software name="cloderun">
-		<description>Championship Loderunner</description>
+		<description>Championship Lode Runner</description>
 		<year>1984</year>
 		<publisher>Brøderbund Software</publisher>
 		<info name="usage" value="PC Booter" />
@@ -5896,6 +5896,19 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="4dsboxina" cloneof="4dboxing">
+		<description>4D Sports Boxing (Euro, Alt)</description>
+		<year>1991</year>
+		<publisher>Mindscape International Ltd.</publisher>
+		<info name="version" value="1.0" />
+		<info name="developer" value="Distinctive Software, Inc." />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="4D Sports Boxing (Europe) (3.5'').img" size="737280" crc="a464aacf" sha1="6f7b2171faedb74c8f328795cef72e348182b477" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="688atsub">
 		<description>688 Attack Sub (5.25")</description>
 		<year>1989</year>
@@ -7599,6 +7612,19 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="linesand">
+		<description>A Line in the Sand</description>
+		<year>1992</year>
+		<publisher>SSI</publisher>
+		<info name="version" value="1.0" />
+		<info name="usage" value="EGA or VGA required" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="A Line in the Sand (USA) (v1.0).img" size="737280" crc="d526c959" sha1="a0e4e75a57bab5ca7276636789ae85bb84999eb5" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="links">
 		<description>Links - The Challenge of Golf v1.10</description>
 		<year>1990</year>
@@ -8059,6 +8085,24 @@ has been replaced with an all-zero block. -->
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="Monty Python's Flying Circus (1990)(Virgin Games)(Disk 2 of 2).dsk" size="368640" crc="c1c40d8c" sha1="b724017f7a314cac625463d1aa106eaeac669288" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nightmar">
+		<description>A Nightmare on Elm Street</description>
+		<year>1989</year>
+		<info name="version" value="2.00" />
+		<info name="developer" value="Westwood Associates" />
+		<publisher>Monarch Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="A Nightmare on Elm Street (USA) (v2.00) (Disk 1).img" size="368640" crc="fed37ad6" sha1="f0adcd8164d3bdc7bb2ca742067ce1cc3ea1a4c2" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="A Nightmare on Elm Street (USA) (v2.00) (Disk 2).img" size="368640" crc="2cd9e970" sha1="e44da88f148cd7799b6e6ef4ec91cfdf7026efda" offset="0"/>
 			</dataarea>
 		</part>
 	</software>

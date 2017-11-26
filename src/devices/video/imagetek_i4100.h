@@ -2,7 +2,7 @@
 // copyright-holders:Luca Elia,David Haywood,Angelo Salese
 /***************************************************************************
 
-	Imagetek I4100 / I4220 / I4300 device files
+    Imagetek I4100 / I4220 / I4300 device files
 
 ***************************************************************************/
 
@@ -20,7 +20,7 @@
 
 #define MCFG_I4100_GFXDECODE(gfxtag) \
 	imagetek_i4100_device::static_set_gfxdecode_tag(*device, ("^" gfxtag));
-	
+
 #define MCFG_I4100_BLITTER_END_CALLBACK(_devcb) \
 	devcb = &imagetek_i4100_device::static_set_blitter_irq_callback(*device, DEVCB_##_devcb);
 
@@ -38,7 +38,7 @@
 // ======================> i4100_device
 
 class imagetek_i4100_device : public device_t,
-						      public device_video_interface
+							  public device_video_interface
 {
 public:
 	// construction/destruction
@@ -52,7 +52,7 @@ public:
 
 	template <class Object> static devcb_base &static_set_blitter_irq_callback(device_t &device, Object &&cb) { return downcast<imagetek_i4100_device &>(device).m_blit_irq_cb.set_callback(std::forward<Object>(cb)); }
 
-	
+
 	// I/O operations
 	DECLARE_READ16_MEMBER( vram_0_r );
 	DECLARE_READ16_MEMBER( vram_1_r );
@@ -91,13 +91,13 @@ public:
 	DECLARE_WRITE16_MEMBER( screen_xoffset_w );
 	DECLARE_READ16_MEMBER( screen_yoffset_r );
 	DECLARE_WRITE16_MEMBER( screen_yoffset_w );
-	
+
 	DECLARE_READ16_MEMBER( window_r );
 	DECLARE_WRITE16_MEMBER( window_w );
 	DECLARE_READ16_MEMBER( scroll_r );
 	DECLARE_WRITE16_MEMBER( scroll_w );
 
-	
+
 	DECLARE_READ16_MEMBER( gfxrom_r );
 	DECLARE_WRITE16_MEMBER( crtc_vert_w );
 	DECLARE_WRITE16_MEMBER( crtc_horz_w );
@@ -106,7 +106,7 @@ public:
 	DECLARE_WRITE16_MEMBER( screen_ctrl_w );
 	DECLARE_WRITE16_MEMBER( rombank_w );
 
-	
+
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
@@ -128,7 +128,7 @@ protected:
 	required_shared_ptr<uint16_t> m_tiletable;
 	required_shared_ptr<uint16_t> m_window;
 	required_shared_ptr<uint16_t> m_scroll;
-	
+
 	required_device<palette_device> m_palette;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_region_ptr<uint8_t> m_gfxrom;
@@ -160,10 +160,10 @@ protected:
 	{
 		TIMER_BLIT_END = 1
 	};
-	
+
 	emu_timer *m_blit_done_timer;
-	
-	void draw_layers( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri );	
+
+	void draw_layers( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri );
 	inline uint8_t get_tile_pix( uint16_t code, uint8_t x, uint8_t y, bool big, uint16_t *pix );
 	void draw_tilemap( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t flags, uint32_t pcode,
 					int sx, int sy, int wx, int wy, bool big, uint16_t *tilemapram, int layer );
@@ -177,7 +177,7 @@ protected:
 // A smaller 512 x 256 window defines the actual tilemap
 	static constexpr uint32_t WIN_NX = (0x40);
 	static constexpr uint32_t WIN_NY = (0x20);
-	
+
 	bool m_inited_hack;
 };
 

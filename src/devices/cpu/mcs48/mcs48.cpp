@@ -8,12 +8,12 @@
     - T0 output clock
     - get rid of i/o addressmap, use devcb for mcu pins
     - add CMOS devices, 1 new opcode (01 HALT)
-	- make timer update cleaner:
-	  timer is updated on S4 while I/O happens on S5
-	  due to very bad coding, Kaypro 10 keyboard depends on being able to see T=0 before interrupt is taken
-	  right now this is implemented with a hack in the mov_a_t handler
-	  in theory it should also be possible to see the timer flag before the interrupt is taken
-	  mov_t_a should also update the T register after it's incremented
+    - make timer update cleaner:
+      timer is updated on S4 while I/O happens on S5
+      due to very bad coding, Kaypro 10 keyboard depends on being able to see T=0 before interrupt is taken
+      right now this is implemented with a hack in the mov_a_t handler
+      in theory it should also be possible to see the timer flag before the interrupt is taken
+      mov_t_a should also update the T register after it's incremented
 */
 
 /***************************************************************************
@@ -85,6 +85,7 @@
 #include "emu.h"
 #include "debugger.h"
 #include "mcs48.h"
+#include "mcs48dsm.h"
 
 
 /***************************************************************************
@@ -329,17 +330,14 @@ device_memory_interface::space_config_vector mcs48_cpu_device::memory_space_conf
 	};
 }
 
-offs_t mcs48_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *mcs48_cpu_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( mcs48 );
-	return CPU_DISASSEMBLE_NAME(mcs48)(this, stream, pc, oprom, opram, options);
+	return new mcs48_disassembler(false);
 }
 
-
-offs_t upi41_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *upi41_cpu_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( upi41 );
-	return CPU_DISASSEMBLE_NAME(upi41)(this, stream, pc, oprom, opram, options);
+	return new mcs48_disassembler(true);
 }
 
 /***************************************************************************

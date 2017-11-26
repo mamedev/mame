@@ -120,6 +120,7 @@ Table 3-2.  TMS32025/26 Memory Blocks
 
 #include "emu.h"
 #include "tms32025.h"
+#include "32025dsm.h"
 #include "debugger.h"
 
 
@@ -253,11 +254,9 @@ device_memory_interface::space_config_vector tms32025_device::memory_space_confi
 	};
 }
 
-
-offs_t tms32025_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *tms32025_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( tms32025 );
-	return CPU_DISASSEMBLE_NAME(tms32025)(this, stream, pc, oprom, opram, options);
+	return new tms32025_disassembler;
 }
 
 READ16_MEMBER( tms32025_device::drr_r)

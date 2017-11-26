@@ -91,6 +91,7 @@
 
 #include "emu.h"
 #include "tms9995.h"
+#include "9900dasm.h"
 
 #define NOPRG -1
 
@@ -3514,20 +3515,9 @@ uint32_t tms9995_device::execute_input_lines() const
 	return 2;
 }
 
-uint32_t tms9995_device::disasm_min_opcode_bytes() const
+util::disasm_interface *tms9995_device::create_disassembler()
 {
-	return 2;
-}
-
-uint32_t tms9995_device::disasm_max_opcode_bytes() const
-{
-	return 6;
-}
-
-offs_t tms9995_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
-{
-	extern CPU_DISASSEMBLE( tms9995 );
-	return CPU_DISASSEMBLE_NAME(tms9995)(this, stream, pc, oprom, opram, options);
+	return new tms9900_disassembler(TMS9995_ID);
 }
 
 

@@ -86,6 +86,7 @@ public:
 	DECLARE_READ8_MEMBER(headon_io_r);
 	DECLARE_READ8_MEMBER(sspaceat_io_r);
 	DECLARE_WRITE8_MEMBER(headon_io_w);
+	DECLARE_MACHINE_RESET(headon2);
 	DECLARE_READ8_MEMBER(headon2_io_r);
 	DECLARE_WRITE8_MEMBER(headon2_io_w);
 	DECLARE_WRITE8_MEMBER(digger_io_w);

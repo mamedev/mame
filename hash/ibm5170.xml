@@ -6534,6 +6534,66 @@
 
 <!-- Game Disks -->
 
+	<software name="1830rail" supported="no">
+		<description>1830 - Railroads &amp; Robber Barons</description>
+		<year>1995</year>
+		<publisher>Avalon Hill</publisher>
+		<info name="developer" value="Simtex" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="1830 Railroads &amp; Robber Barons (USA, Europe) (Disk 1).img" size="1474560" crc="c91a1322" sha1="91120df39f996d8713840dccf0ee322aa07a07e2" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="1830 Railroads &amp; Robber Barons (USA, Europe) (Disk 2).img" size="1474560" crc="f00758ba" sha1="0588634cee114f697d9e97254e188f4223627993" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="1830 Railroads &amp; Robber Barons (USA, Europe) (Disk 3).img" size="1474560" crc="d6d9a334" sha1="4d644adc76af7e04213237a3047fe6de761cbd5b" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="1830 Railroads &amp; Robber Barons (USA, Europe) (Disk 4).img" size="1474560" crc="2d61f1b1" sha1="728b2d863c985a250fbd41024ed289704836cc9f" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="5thfleet" supported="partial">
+		<description>5th Fleet</description>
+		<year>1994</year>
+		<publisher>Avalon Hill</publisher>
+		<info name="developer" value="Stanley Associates" />
+		<info name="version" value="1.0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="5th Fleet (USA, Europe) (Disk 1).img" size="1474560" crc="9ffabd3e" sha1="93384c74a53a84e9e84715c03d602631e533c64c" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="5th Fleet (USA, Europe) (Disk 2).img" size="1474560" crc="cd2c986b" sha1="cb599a740e3408f115732d2a43294a8c315e654b" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="5th Fleet (USA, Europe) (Disk 3).img" size="1474560" crc="22d1d148" sha1="f3344a8afef48daa41ceb42ca51850e5ee9c4770" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="5th Fleet (USA, Europe) (Disk 4).img" size="1474560" crc="c285cacd" sha1="b55026ee7d5d069afa71ad8fddbae1b3fa93036d" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="5th Fleet (USA, Europe) (Disk 5).img" size="1474560" crc="7a34c3ad" sha1="ef609fd1a47b881345e1f04483510b009eb736dc" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="amazon">
 		<description>Amazon - Guardians of Eden</description>
 		<year>1992</year>
@@ -7267,7 +7327,7 @@
 	</software>
 
 	<software name="duke">
-		<!-- Dumped via Kryoflux, all tracks show as modified - most likely not professionally duplicated -->
+		<!-- Dumped via Kryoflux from an original disk, all tracks show as modified - most likely not professionally duplicated -->
 		<!-- from a registered version ordered circa 2004 -->
 		<description>Duke Nukum (V 2.0, 3.5" HD)</description>
 		<year>1991</year>
@@ -9231,6 +9291,35 @@
 		</part>
 	</software>
 
+	<software name="warcraft">
+		<!-- Dumped via Kryoflux from original disks, all tracks show as modified -->
+		<description>WarCraft - Orcs &amp; Humans</description>
+		<year>1994</year>
+		<info name="version" value="1.05" />
+		<info name="developer" value="Blizzard Entertainment" />
+		<publisher>Interplay</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="[PC] Warcraft Orcs and Humans [3.5HD] [Disk 1 of 4].img" size="1474560" crc="528d9208" sha1="4a3fb4cf21acce1a51754e4cdd29d906d6cff6c4" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="[PC] Warcraft Orcs and Humans [3.5HD] [Disk 2 of 4].img" size="1474560" crc="535cac38" sha1="159748e9ad379f0376367e1418b5bba7293c3f37" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="[PC] Warcraft Orcs and Humans [3.5HD] [Disk 3 of 4].img" size="1474560" crc="1e899011" sha1="9a1d68aae10783f9722c9676143706cf783a6ae6" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="[PC] Warcraft Orcs and Humans [3.5HD] [Disk 4 of 4].img" size="1474560" crc="ac4678fc" sha1="dc1c6d4fdc220016416bd0a5799505fa31f271b6" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="wingcom">
 		<description>Wing Commander</description>
 		<year>1990</year>
@@ -9402,6 +9491,7 @@
 	</software>
 
 	<software name="wngcm2s1">
+		<!-- Dumped via Kryoflux, all tracks show as good and unmodified -->
 		<description>Wing Commander II - Vengeance of the Kilrathi - Special Operations 1</description>
 		<year>1991</year>
 		<publisher>ORIGIN Systems</publisher>
@@ -9421,6 +9511,7 @@
 	</software>
 
 	<software name="wngcm2s2">
+		<!-- Dumped via Kryoflux, all tracks show as good and unmodified -->
 		<description>Wing Commander II - Vengeance of the Kilrathi - Special Operations 2</description>
 		<year>1992</year>
 		<publisher>ORIGIN Systems</publisher>

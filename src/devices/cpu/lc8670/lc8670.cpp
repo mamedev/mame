@@ -18,6 +18,7 @@
 #include "emu.h"
 #include "debugger.h"
 #include "lc8670.h"
+#include "lc8670dsm.h"
 
 //***************************************************************************
 //    DEBUGGING
@@ -1776,4 +1777,9 @@ int lc8670_cpu_device::op_xor()
 	CHECK_P();
 
 	return 1;
+}
+
+util::disasm_interface *lc8670_cpu_device::create_disassembler()
+{
+	return new lc8670_disassembler;
 }

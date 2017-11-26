@@ -10,15 +10,16 @@
 
 #include "emu.h"
 #include "i8xc196.h"
+#include "i8xc196d.h"
 
 i8xc196_device::i8xc196_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	mcs96_device(mconfig, type, tag, owner, clock, 16)
 {
 }
 
-offs_t i8xc196_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *i8xc196_device::create_disassembler()
 {
-	return disasm_generic(stream, pc, oprom, opram, options, disasm_entries);
+	return new i8xc196_disassembler;
 }
 
 void i8xc196_device::io_w8(uint8_t adr, uint8_t data)

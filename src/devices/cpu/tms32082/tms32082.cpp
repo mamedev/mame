@@ -9,10 +9,9 @@
 
 #include "emu.h"
 #include "tms32082.h"
+#include "dis_pp.h"
+#include "dis_mp.h"
 #include "debugger.h"
-
-extern CPU_DISASSEMBLE(tms32082_mp);
-extern CPU_DISASSEMBLE(tms32082_pp);
 
 DEFINE_DEVICE_TYPE(TMS32082_MP, tms32082_mp_device, "tms32082_mp", "TMS32082 MP")
 DEFINE_DEVICE_TYPE(TMS32082_PP, tms32082_pp_device, "tms32082_pp", "TMS32082 PP")
@@ -64,12 +63,11 @@ device_memory_interface::space_config_vector tms32082_pp_device::memory_space_co
 	};
 }
 
-offs_t tms32082_mp_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+
+util::disasm_interface *tms32082_mp_device::create_disassembler()
 {
-	return CPU_DISASSEMBLE_NAME(tms32082_mp)(this, stream, pc, oprom, opram, options);
+	return new tms32082_mp_disassembler;
 }
-
-
 
 void tms32082_mp_device::set_command_callback(write32_delegate callback)
 {
@@ -502,9 +500,9 @@ tms32082_pp_device::tms32082_pp_device(const machine_config &mconfig, const char
 }
 
 
-offs_t tms32082_pp_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *tms32082_pp_device::create_disassembler()
 {
-	return CPU_DISASSEMBLE_NAME(tms32082_pp)(this, stream, pc, oprom, opram, options);
+	return new tms32082_pp_disassembler;
 }
 
 void tms32082_pp_device::device_start()

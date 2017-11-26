@@ -11,6 +11,7 @@
 
 #include "emu.h"
 #include "tp0320.h"
+#include "tms1k_dasm.h"
 #include "debugger.h"
 
 // TP0320 is TI's first CMOS MCU with integrated LCD controller, the die is still very similar to TMS0980
@@ -55,10 +56,9 @@ MACHINE_CONFIG_END
 
 
 // disasm
-offs_t tp0320_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, u32 options)
+util::disasm_interface *tp0320_cpu_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE(tp0320);
-	return CPU_DISASSEMBLE_NAME(tp0320)(this, stream, pc, oprom, opram, options);
+	return new tp0320_disassembler;
 }
 
 

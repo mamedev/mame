@@ -4,7 +4,7 @@
     Time Attacker
 
     driver by Tomasz Slanina analog[at]op.pl
-	improvements by Angelo Salese
+    improvements by Angelo Salese
 
     Z80A,
     xtal 8MHz,
@@ -17,12 +17,12 @@
 
     TODO:
     - non-tilemap video offsets/sizes are guessworked;
-	- random brick flickering effect is guessworked too, leave MACHINE_IMPERFECT_COLORS in until is tested on HW.
-	- outputs (coin counter port same as sound writes?);
-	- some dipswitches;
+    - random brick flickering effect is guessworked too, leave MACHINE_IMPERFECT_COLORS in until is tested on HW.
+    - outputs (coin counter port same as sound writes?);
+    - some dipswitches;
     - sound (requires Epson 7910 Multi-Melody emulation?)
-	\- victory BGM cuts off too late?
-	
+    \- victory BGM cuts off too late?
+
     Connector pinout from manual
 
           Solder Side      Parts Side
@@ -92,10 +92,10 @@ private:
 	int m_paddle_ysize;
 	bool m_bottom_edge_enable;
 	bool m_bricks_color_bank;
-	
+
 	void draw_gameplay_bitmap(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_edge_bitmap(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	
+
 	static const uint8_t white_pen = 0xf;
 	static const uint8_t green_pen = 0x5;
 	static const uint8_t yellow_pen = 0x7;
@@ -122,7 +122,7 @@ TILE_GET_INFO_MEMBER(tattack_state::get_tile_info)
 }
 
 void tattack_state::draw_edge_bitmap(bitmap_ind16 &bitmap, const rectangle &cliprect)
-{	
+{
 	// left column
 	bitmap.plot_box(0,16,216,4,white_pen);
 	// upper row
@@ -144,25 +144,25 @@ void tattack_state::draw_gameplay_bitmap(bitmap_ind16 &bitmap, const rectangle &
 	for(ram_offs=ram_base;ram_offs<ram_base+0xe;ram_offs++)
 	{
 		uint8_t cur_column = m_ram[ram_offs];
-		
+
 		for(int bit=7;bit>-1;bit--)
 		{
 			bool draw_block = ((cur_column >> bit) & 1) == 1;
-			
+
 			// blinking
 			// If player hits a blinking brick then a 30 seconds bonus is awarded.
 			// Sometimes game forgets to update the location or the blinking itself (both bits 0)
 			// can be either intentional or a game bug.
-			// TODO: the mask used here is guessed 
+			// TODO: the mask used here is guessed
 			if((m_ram[0x33] & 0x3) == 3)
 			{
 				int blink_row = m_ram[0x2b];
 				int blink_col = m_ram[0x2c];
-				
+
 				if(bit == blink_col && (ram_offs & 0xf) == blink_row)
 					draw_block = false;
 			}
-		
+
 			if(draw_block == true)
 			{
 				for(xi=0;xi<3;xi++)
@@ -171,7 +171,7 @@ void tattack_state::draw_gameplay_bitmap(bitmap_ind16 &bitmap, const rectangle &
 					{
 						int resx = bit*4+xi+160+x_base;
 						int resy = (ram_offs & 0xf)*16+yi+16;
-						
+
 						if(cliprect.contains(resx,resy))
 							bitmap.pix16(resy, resx) = m_bricks_color_bank == true ? red_pen : (bit & 4 ? yellow_pen : green_pen);
 					}
@@ -179,7 +179,7 @@ void tattack_state::draw_gameplay_bitmap(bitmap_ind16 &bitmap, const rectangle &
 			}
 		}
 	}
-	
+
 	// draw paddle
 	if(m_bottom_edge_enable == false)
 	{
@@ -192,7 +192,7 @@ void tattack_state::draw_gameplay_bitmap(bitmap_ind16 &bitmap, const rectangle &
 				if(cliprect.contains(resx,resy))
 					bitmap.pix16(resy, resx) = white_pen;
 			}
-	}	
+	}
 	// draw ball
 	for(xi=0;xi<3;xi++)
 		for(yi=0;yi<3;yi++)
@@ -209,7 +209,7 @@ uint32_t tattack_state::screen_update_tattack(screen_device &screen, bitmap_ind1
 {
 	m_tmap->mark_all_dirty();
 	m_tmap->draw(screen, bitmap, cliprect, 0,0);
-	
+
 	// draw bricks/ball/paddle
 	draw_gameplay_bitmap(bitmap, cliprect);
 	// draw edges
@@ -237,7 +237,7 @@ WRITE8_MEMBER(tattack_state::ball_w)
 WRITE8_MEMBER(tattack_state::brick_dma_w)
 {
 	// bit 7: 0->1 transfers from RAM to internal video buffer
-	// bit 6: bricks color bank 
+	// bit 6: bricks color bank
 	m_bricks_color_bank = BIT(data,6);
 	// bit 5: flip screen
 	flip_screen_set(!(data & 0x20));
@@ -245,7 +245,7 @@ WRITE8_MEMBER(tattack_state::brick_dma_w)
 	m_paddle_ysize = data & 0x10 ? 8 : 16;
 	// bit 3: enable bottom edge
 	m_bottom_edge_enable = BIT(data,3);
-//	popmessage("%02x",data&0x7f);
+//  popmessage("%02x",data&0x7f);
 }
 
 WRITE8_MEMBER(tattack_state::sound_w)
@@ -258,7 +258,7 @@ WRITE8_MEMBER(tattack_state::sound_w)
 		if(data & 1 << i && m_samples->playing(i) == false)
 			m_samples->start(i,i);
 		//if((data & 1 << i) == 0 && m_samples->playing(i) == true)
-		//	m_samples->stop(i);
+		//  m_samples->stop(i);
 	}
 }
 
@@ -345,7 +345,7 @@ static INPUT_PORTS_START( tattack )
 	PORT_DIPSETTING(    0x40, "5" )
 	PORT_DIPSETTING(    0x80, "7" )
 	PORT_DIPSETTING(    0xc0, DEF_STR( Infinite ) )
-	
+
 	PORT_START("AN_PADDLE")
 	PORT_BIT( 0xff, 0x00, IPT_PADDLE ) PORT_MINMAX(0,0xff) PORT_SENSITIVITY(10) PORT_KEYDELTA(10) PORT_CENTERDELTA(0)
 INPUT_PORTS_END
@@ -391,9 +391,9 @@ static const char *const tattack_sample_names[] =
 {
 	"*tattack",
 	"paddle_hit",
-	"wall_hit",     
-	"brick_destroy", 
-	"win_bgm", 
+	"wall_hit",
+	"brick_destroy",
+	"win_bgm",
 	nullptr
 };
 
@@ -446,18 +446,18 @@ ROM_END
 
 DRIVER_INIT_MEMBER(tattack_state,tattack)
 {
-//	uint8_t *rom = memregion("maincpu")->base();
+//  uint8_t *rom = memregion("maincpu")->base();
 
-//	rom[0x1b4]=0;
-//	rom[0x1b5]=0;
+//  rom[0x1b4]=0;
+//  rom[0x1b5]=0;
 
-//	rom[0x262]=0;
-//	rom[0x263]=0;
-//	rom[0x264]=0;
+//  rom[0x262]=0;
+//  rom[0x263]=0;
+//  rom[0x264]=0;
 
-//	rom[0x32a]=0;
-//	rom[0x32b]=0;
-//	rom[0x32c]=0;
+//  rom[0x32a]=0;
+//  rom[0x32b]=0;
+//  rom[0x32c]=0;
 
 /*
     possible jumps to 0 (protection checks?)

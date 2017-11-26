@@ -22,7 +22,7 @@ DEFINE_DEVICE_TYPE(TK02_80COL, tk02_device, "tk02", "TK02 80 Column Monochrome U
 //-------------------------------------------------
 
 DEVICE_ADDRESS_MAP_START(map, 8, tk02_device)
-//	AM_RANGE(0x00, 0x07) AM_SELECT(0xff00) AM_READWRITE(ram_r, ram_w) // no AM_SELECT (or AM_MASK) support here
+//  AM_RANGE(0x00, 0x07) AM_SELECT(0xff00) AM_READWRITE(ram_r, ram_w) // no AM_SELECT (or AM_MASK) support here
 	AM_RANGE(0x08, 0x08) AM_MIRROR(0xff00) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0x09, 0x09) AM_MIRROR(0xff00) AM_DEVWRITE("crtc", mc6845_device, register_w)
 	AM_RANGE(0x0c, 0x0c) AM_MIRROR(0xff00) AM_READ(status_r)

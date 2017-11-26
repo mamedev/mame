@@ -25,7 +25,7 @@ protected:
 	// overrides
 	virtual void device_reset() override;
 
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, u32 options) override;
+	virtual util::disasm_interface *create_disassembler() override;
 
 	virtual void op_setr() override;
 	virtual void op_rstr() override;

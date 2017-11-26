@@ -8,9 +8,9 @@
     original "wiped off due of not anymore licenseable" driver by insideoutboy.
 
     TODO:
-	- priority might be wrong in some places (title screen stars around the
-	  galaxy, planet ship 3rd boss, 2nd boss);
-	- sound chips (similar to Namco custom chips?)
+    - priority might be wrong in some places (title screen stars around the
+      galaxy, planet ship 3rd boss, 2nd boss);
+    - sound chips (similar to Namco custom chips?)
 
 ===============================================================================
 

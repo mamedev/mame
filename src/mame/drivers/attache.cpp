@@ -49,12 +49,12 @@
  *  ( - GPIB Listener/Talker Test
  *  ) - GPIB Controller Test
  *
- *  The Attache 8:16 is an upgraded Attache adding an 8086 (+ optional 8087) board with its own 256kB of RAM, 
+ *  The Attache 8:16 is an upgraded Attache adding an 8086 (+ optional 8087) board with its own 256kB of RAM,
  *  and optionally a GPIB controller (TMS9914A) and serial synchronous port (Z8530 SCC).  It also has modifications
  *  to the main Z80 board, specifically the display circuitry, adding a high-resolution display, and replacing
  *  the character ROM with a larger ROM containing an IBM character set.
  *  It effectively allows the Attache to run MS-DOS and use a 10MB hard disk.
- * 
+ *
  *  TODO:
  *    - Keyboard repeat
  *    - Get at least some of the system tests to pass
@@ -241,7 +241,7 @@ public:
 		  m_z80_rx_ready(false),
 		  m_z80_tx_ready(false)
 	{ }
-	
+
 	DECLARE_WRITE8_MEMBER(x86_comms_w);
 	DECLARE_READ8_MEMBER(x86_comms_r);
 	DECLARE_WRITE8_MEMBER(x86_irq_enable);
@@ -258,7 +258,7 @@ public:
 private:
 	required_device<cpu_device> m_extcpu;
 	required_device<i8255_device> m_ppi;
-	
+
 	uint8_t m_comms_val;
 	uint8_t m_x86_irq_enable;
 	bool m_z80_rx_ready;
@@ -862,7 +862,7 @@ WRITE8_MEMBER(attache816_state::z80_comms_w)
 	m_z80_tx_ready = true;
 	m_ppi->pc4_w(0);
 	machine().scheduler().synchronize();
-//	m_ppi->write(space,0,data);
+//  m_ppi->write(space,0,data);
 }
 
 // Z80 comms status
@@ -871,7 +871,7 @@ WRITE8_MEMBER(attache816_state::z80_comms_w)
 READ8_MEMBER(attache816_state::z80_comms_status_r)
 {
 	uint8_t ret = 0xf0;  // low nibble always high?
-	
+
 	if(m_z80_rx_ready)
 		ret |= 0x01;
 	if(m_z80_tx_ready)
@@ -1106,7 +1106,7 @@ static MACHINE_CONFIG_START( attache )
 	MCFG_Z80_DAISY_CHAIN(attache_daisy_chain)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
-	
+
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(64)) /* not accurate */
@@ -1167,7 +1167,7 @@ static MACHINE_CONFIG_START( attache816 )
 	MCFG_Z80_DAISY_CHAIN(attache_daisy_chain)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
-	
+
 	MCFG_CPU_ADD("extcpu",I8086,XTAL_24MHz / 3)
 	MCFG_CPU_PROGRAM_MAP(attache_x86_map)
 	MCFG_CPU_IO_MAP(attache_x86_io)
@@ -1198,7 +1198,7 @@ static MACHINE_CONFIG_START( attache816 )
 
 	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL_8MHz / 4)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	
+
 	MCFG_DEVICE_ADD("ppi", I8255A, 0)
 	MCFG_I8255_OUT_PORTA_CB(WRITE8(attache816_state, x86_comms_w))
 	MCFG_I8255_IN_PORTA_CB(READ8(attache816_state, x86_comms_r))
@@ -1286,7 +1286,7 @@ ROM_START( attache816 )
 	ROM_REGION(0x2000, "x86bios", 0)
 	ROM_LOAD16_BYTE("u4.bin",  0x0000, 0x1000, CRC(658c8f93) SHA1(ce4b388af5b73884194f548afa706964305462f7) )
 	ROM_LOAD16_BYTE("u9.bin",  0x0001, 0x1000, CRC(cc4cd938) SHA1(6a1d316628641f9b4de5c8c46f9430ef5bd6120f) )
-	
+
 ROM_END
 
 //    YEAR  NAME    PARENT  COMPAT      MACHINE     INPUT    DEVICE            INIT    COMPANY     FULLNAME             FLAGS

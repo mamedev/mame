@@ -1,20 +1,24 @@
 // license:BSD-3-Clause
-// copyright-holders:Miodrag Milanovic
+// copyright-holders:Miodrag Milanovic, Robbbert
 /***************************************************************************
 
 MC-80.20 driver by Miodrag Milanovic
 
 2009-05-12 Skeleton driver.
 2009-05-15 Initial implementation
-2011-09-01 Modernised, added a keyboard to mc8020
+2011-09-01 Modernised, added a keyboard
 
-Real workings of mc8020 keyboard need to be understood and implemented.
+ToDo:
+- Find out if it has sound hardware, add if so
+- What port B on PIO is for
+- Find out the correct frequencies and connections for the CTC
 
 ****************************************************************************/
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "machine/timer.h"
+#include "cpu/z80/z80daisy.h"
+#include "machine/clock.h"
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
 #include "screen.h"
@@ -26,17 +30,19 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_p_videoram(*this, "videoram")
 		, m_maincpu(*this, "maincpu")
+		, m_keyboard(*this, "X%u", 0)
 		{ }
 
-	DECLARE_READ8_MEMBER(mc80_port_b_r);
-	DECLARE_READ8_MEMBER(mc80_port_a_r);
+	DECLARE_READ8_MEMBER(port_b_r);
+	DECLARE_WRITE8_MEMBER(port_a_w);
+	DECLARE_WRITE8_MEMBER(port_b_w);
 	uint32_t screen_update_mc8020(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(mc8020_kbd);
-	IRQ_CALLBACK_MEMBER(mc8020_irq_callback);
 
 private:
+	u8 m_row;
 	required_shared_ptr<u8> m_p_videoram;
 	required_device<cpu_device> m_maincpu;
+	required_ioport_array<7> m_keyboard;
 };
 
 static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, mc8020_state )
@@ -51,13 +57,13 @@ static ADDRESS_MAP_START( io_map, AS_IO, 8, mc8020_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xf0, 0xf3) AM_DEVREADWRITE("ctc", z80ctc_device, read, write)
-	AM_RANGE(0xf4, 0xf7) AM_DEVREADWRITE("pio", z80pio_device, read, write)
+	AM_RANGE(0xf4, 0xf7) AM_DEVREADWRITE("pio", z80pio_device, read_alt, write_alt)
 ADDRESS_MAP_END
 
 
 /* Input ports */
 static INPUT_PORTS_START( mc8020 )
-	PORT_START("X1")
+	PORT_START("X0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_CHAR('0') PORT_CHAR('!')
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_CHAR('@')
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('#')
@@ -67,7 +73,7 @@ static INPUT_PORTS_START( mc8020 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_CHAR('\'')
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('(')
 
-	PORT_START("X2")
+	PORT_START("X1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_CHAR('9') PORT_CHAR(')')
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CHAR('0') PORT_CHAR('\"')
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_QUOTE) PORT_CHAR('+') PORT_CHAR('*')
@@ -77,7 +83,7 @@ static INPUT_PORTS_START( mc8020 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-') PORT_CHAR('/')
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR('>')
 
-	PORT_START("X3")
+	PORT_START("X2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A) PORT_CHAR('A')
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_B) PORT_CHAR('B')
@@ -87,7 +93,7 @@ static INPUT_PORTS_START( mc8020 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F) PORT_CHAR('F')
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_G) PORT_CHAR('G')
 
-	PORT_START("X4")
+	PORT_START("X3")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_H) PORT_CHAR('H')
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_I) PORT_CHAR('I')
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_J) PORT_CHAR('J')
@@ -97,7 +103,7 @@ static INPUT_PORTS_START( mc8020 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_N) PORT_CHAR('N')
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_O) PORT_CHAR('O')
 
-	PORT_START("X5")
+	PORT_START("X4")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_P) PORT_CHAR('P')
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q) PORT_CHAR('Q')
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R) PORT_CHAR('R')
@@ -107,7 +113,7 @@ static INPUT_PORTS_START( mc8020 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_V) PORT_CHAR('V')
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_W) PORT_CHAR('W')
 
-	PORT_START("X6")
+	PORT_START("X5")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_X) PORT_CHAR('X')
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Y) PORT_CHAR('Y')
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Z) PORT_CHAR('Z')
@@ -117,7 +123,7 @@ static INPUT_PORTS_START( mc8020 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)
 
-	PORT_START("X7")
+	PORT_START("X6")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_UP)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ESC) PORT_CHAR(27)
@@ -129,30 +135,39 @@ static INPUT_PORTS_START( mc8020 )
 INPUT_PORTS_END
 
 
-TIMER_DEVICE_CALLBACK_MEMBER( mc8020_state::mc8020_kbd )
+READ8_MEMBER( mc8020_state::port_b_r )
 {
-	address_space &mem = m_maincpu->space(AS_PROGRAM);
-	char kbdrow[6];
-	for (u8 i = 1; i < 8; i++)
-	{
-		sprintf(kbdrow,"X%X", i);
-		mem.write_word(0xd20+i, ioport(kbdrow)->read());
-	}
+	if (m_row == 0x40)
+		return m_keyboard[0]->read();
+	else
+	if (m_row == 0x20)
+		return m_keyboard[1]->read();
+	else
+	if (m_row == 0x10)
+		return m_keyboard[2]->read();
+	else
+	if (m_row == 0x08)
+		return m_keyboard[3]->read();
+	else
+	if (m_row == 0x04)
+		return m_keyboard[4]->read();
+	else
+	if (m_row == 0x02)
+		return m_keyboard[5]->read();
+	else
+	if (m_row == 0x01)
+		return m_keyboard[6]->read();
+	else
+		return 0;
 }
 
-IRQ_CALLBACK_MEMBER(mc8020_state::mc8020_irq_callback)
+WRITE8_MEMBER( mc8020_state::port_a_w )
 {
-	return 0x00;
+	m_row = data;
 }
 
-READ8_MEMBER( mc8020_state::mc80_port_b_r )
+WRITE8_MEMBER( mc8020_state::port_b_w )
 {
-	return 0;
-}
-
-READ8_MEMBER( mc8020_state::mc80_port_a_r )
-{
-	return 0;
 }
 
 
@@ -268,12 +283,18 @@ uint32_t mc8020_state::screen_update_mc8020(screen_device &screen, bitmap_ind16 
 	return 0;
 }
 
+static const z80_daisy_config daisy_chain[] =
+{
+	{ "ctc" },
+	{ nullptr }
+};
+
 static MACHINE_CONFIG_START( mc8020 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_2_4576MHz)
 	MCFG_CPU_PROGRAM_MAP(mem_map)
 	MCFG_CPU_IO_MAP(io_map)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(mc8020_state, mc8020_irq_callback)
+	MCFG_Z80_DAISY_CHAIN(daisy_chain)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -288,19 +309,17 @@ static MACHINE_CONFIG_START( mc8020 )
 
 	/* devices */
 	MCFG_DEVICE_ADD("pio", Z80PIO, XTAL_2_4576MHz)
-	MCFG_Z80PIO_IN_PA_CB(READ8(mc8020_state, mc80_port_a_r))
-	//MCFG_Z80PIO_OUT_PA_CB(WRITE8(mc8020_state, mc80_port_a_w))
-	MCFG_Z80PIO_IN_PB_CB(READ8(mc8020_state, mc80_port_b_r))
-	//MCFG_Z80PIO_OUT_PB_CB(WRITE8(mc8020_state, mc80_port_b_w))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(mc8020_state, port_a_w))
+	MCFG_Z80PIO_IN_PB_CB(READ8(mc8020_state, port_b_r))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8(mc8020_state, port_b_w))
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL_2_4576MHz / 100)
+	MCFG_DEVICE_ADD("ctc_clock", CLOCK, XTAL_2_4576MHz / 64) // guess
+	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("ctc", z80ctc_device, trg2))
+
+	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL_2_4576MHz)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	//MCFG_Z80CTC_ZC0_CB(WRITELINE(mc8020_state, ctc_z0_w))
-	//MCFG_Z80CTC_ZC1_CB(WRITELINE(mc8020_state, ctc_z1_w))
-	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE("ctc", z80ctc_device, trg0))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("ctc", z80ctc_device, trg1))
-
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("mc8020_kbd", mc8020_state, mc8020_kbd, attotime::from_hz(50))
+	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE("ctc", z80ctc_device, trg1))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("ctc", z80ctc_device, trg0))
 MACHINE_CONFIG_END
 
 

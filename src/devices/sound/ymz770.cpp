@@ -81,7 +81,7 @@ void ymz770_device::device_start()
 	save_item(NAME(m_bsl));
 	save_item(NAME(m_cpl));
 
-	for (int ch = 0; ch < 16; ch++)	// TODO array size
+	for (int ch = 0; ch < 16; ch++) // TODO array size
 	{
 		save_item(NAME(m_channels[ch].phrase), ch);
 		save_item(NAME(m_channels[ch].pan), ch);
@@ -166,9 +166,9 @@ void ymz770_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 			if (channel.output_remaining > 0)
 			{
 				// force finish current block
-				int32_t smpl = (channel.output_data[channel.output_ptr++] * channel.volume) >> 7;	// volume is linear, 0 - 128 (100%)
+				int32_t smpl = (channel.output_data[channel.output_ptr++] * channel.volume) >> 7;   // volume is linear, 0 - 128 (100%)
 				smpl = (smpl * channel.volume2) >> 7;
-				mixr += (smpl * channel.pan) >> 7;	// pan seems linear, 0 - 128, where 0 = 100% left, 128 = 100% right, 64 = 50% left 50% right
+				mixr += (smpl * channel.pan) >> 7;  // pan seems linear, 0 - 128, where 0 = 100% left, 128 = 100% right, 64 = 50% left 50% right
 				mixl += (smpl * (128 - channel.pan)) >> 7;
 				channel.output_remaining--;
 
@@ -222,7 +222,7 @@ retry:
 			}
 		}
 
-		mixr *= m_vlma;	// main volume is linear, 0 - 255, where 128 = 100%
+		mixr *= m_vlma; // main volume is linear, 0 - 255, where 128 = 100%
 		mixl *= m_vlma;
 		mixr >>= 7 - m_bsl;
 		mixl >>= 7 - m_bsl;

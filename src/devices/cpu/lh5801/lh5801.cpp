@@ -16,6 +16,7 @@
 
 #include "emu.h"
 #include "lh5801.h"
+#include "5801dasm.h"
 
 #include "debugger.h"
 
@@ -256,8 +257,7 @@ void lh5801_cpu_device::execute_set_input(int irqline, int state)
 	}
 }
 
-offs_t lh5801_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *lh5801_cpu_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( lh5801 );
-	return CPU_DISASSEMBLE_NAME(lh5801)(this, stream, pc, oprom, opram, options);
+	return new lh5801_disassembler;
 }

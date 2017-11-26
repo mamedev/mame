@@ -163,7 +163,7 @@ Timming
 #include "emu.h"
 #include "alph8201.h"
 #include "debugger.h"
-
+#include "8201dasm.h"
 
 DEFINE_DEVICE_TYPE(ALPHA8201L, alpha8201_cpu_device, "alpha8201l", "ALPHA-8201L")
 DEFINE_DEVICE_TYPE(ALPHA8301L, alpha8301_cpu_device, "alpha8301l", "ALPHA-8301L")
@@ -690,9 +690,7 @@ void alpha8201_cpu_device::execute_set_input(int inputnum, int state)
 	}
 }
 
-
-offs_t alpha8201_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, u32 options)
+util::disasm_interface *alpha8201_cpu_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( alpha8201 );
-	return CPU_DISASSEMBLE_NAME(alpha8201)(this, stream, pc, oprom, opram, options);
+	return new alpha8201_disassembler;
 }

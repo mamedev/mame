@@ -228,7 +228,7 @@ INTERRUPT_GEN_MEMBER(metro_state::metro_periodic_interrupt)
 TIMER_DEVICE_CALLBACK_MEMBER(metro_state::bangball_scanline)
 {
 	int scanline = param;
-	
+
 	// vblank irq
 	if(scanline == 224)
 	{
@@ -2151,9 +2151,9 @@ static INPUT_PORTS_START( lastfort )
 	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Demo_Sounds ) )      PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0040, DEF_STR( On ) )
-//	PORT_DIPNAME( 0x0080, 0x0080, "Tiles" )             PORT_DIPLOCATION("SW2:8")
-//	PORT_DIPSETTING(      0x0080, "Mahjong" )
-//	PORT_DIPSETTING(      0x0000, "Cards" )             // Not working - See notes
+//  PORT_DIPNAME( 0x0080, 0x0080, "Tiles" )             PORT_DIPLOCATION("SW2:8")
+//  PORT_DIPSETTING(      0x0080, "Mahjong" )
+//  PORT_DIPSETTING(      0x0000, "Cards" )             // Not working - See notes
 	PORT_DIPUNUSED_DIPLOC( 0x0080, 0x0080, "SW2:8" )
 
 	PORT_START("IN3")   // $c0000e
@@ -3092,7 +3092,7 @@ MACHINE_CONFIG_END
 // TODO: these comes from the CRTC inside the i4100
 static MACHINE_CONFIG_START( i4100_config_360x224 )
 	MCFG_FRAGMENT_ADD( i4100_config )
-	
+
 	MCFG_DEVICE_MODIFY("screen")
 	MCFG_SCREEN_SIZE(360, 224)
 	MCFG_SCREEN_VISIBLE_AREA(0, 360-1, 0, 224-1)
@@ -3100,7 +3100,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( i4220_config_320x240 )
 	MCFG_FRAGMENT_ADD( i4220_config )
-	
+
 	MCFG_DEVICE_MODIFY("screen")
 	MCFG_SCREEN_SIZE(320, 240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
@@ -3185,7 +3185,7 @@ static MACHINE_CONFIG_DERIVED( batlbubl, msgogo )
 	MCFG_CPU_VBLANK_INT_REMOVE()
 	MCFG_CPU_PERIODIC_INT_REMOVE()
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", metro_state, bangball_scanline, "screen", 0, 1)
-	
+
 	// doesn't like 58.2 Hz
 	MCFG_DEVICE_MODIFY("screen")
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -3254,7 +3254,7 @@ static MACHINE_CONFIG_START( dharma )
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD(i4220_config)
-	
+
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
@@ -3276,7 +3276,7 @@ static MACHINE_CONFIG_START( karatour )
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
 
 	MCFG_FRAGMENT_ADD(metro_upd7810_sound)
-	
+
 	/* video hardware */
 	MCFG_FRAGMENT_ADD(i4100_config)
 
@@ -3305,7 +3305,7 @@ static MACHINE_CONFIG_START( 3kokushi )
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( i4220_config_320x240 )
-	
+
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
@@ -3403,7 +3403,7 @@ static MACHINE_CONFIG_START( dokyusp )
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( i4300_config_384x224 )
-	
+
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
@@ -3429,7 +3429,7 @@ static MACHINE_CONFIG_START( gakusai )
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( i4300_config_320x240 )
-	
+
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
@@ -3531,7 +3531,7 @@ static MACHINE_CONFIG_START( pururun )
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( i4220_config )
-	
+
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
@@ -3555,7 +3555,7 @@ static MACHINE_CONFIG_START( skyalert )
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
 
 	MCFG_FRAGMENT_ADD(metro_upd7810_sound)
-	
+
 	MCFG_FRAGMENT_ADD(i4100_config_360x224)
 
 
@@ -3701,7 +3701,7 @@ static MACHINE_CONFIG_DERIVED( gstrik2, blzntrnd )
 
 	MCFG_DEVICE_MODIFY("k053936")
 	MCFG_K053936_OFFSETS(-77, -19)
-	
+
 	MCFG_DEVICE_MODIFY("vdp2")
 	MCFG_I4100_TILEMAP_XOFFSETS(0,-8,0)
 MACHINE_CONFIG_END

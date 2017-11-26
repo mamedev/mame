@@ -31,12 +31,7 @@ public:
 	isa8_cga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual MC6845_UPDATE_ROW( crtc_update_row );
-	MC6845_UPDATE_ROW( cga_text_inten_update_row );
-	MC6845_UPDATE_ROW( cga_text_inten_comp_grey_update_row );
-	MC6845_UPDATE_ROW( cga_text_inten_alt_update_row );
-	MC6845_UPDATE_ROW( cga_text_blink_update_row );
-	MC6845_UPDATE_ROW( cga_text_blink_update_row_si );
-	MC6845_UPDATE_ROW( cga_text_blink_alt_update_row );
+	template<bool blink, bool si, bool comp, bool alt, int width> MC6845_UPDATE_ROW( cga_text );
 	MC6845_UPDATE_ROW( cga_gfx_4bppl_update_row );
 	MC6845_UPDATE_ROW( cga_gfx_4bpph_update_row );
 	MC6845_UPDATE_ROW( cga_gfx_2bpp_update_row );
@@ -289,8 +284,7 @@ protected:
 	virtual void device_reset() override;
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;
-
-private:
+	virtual const tiny_rom_entry *device_rom_region() const override;
 	uint8_t m_mode2, m_index;
 };
 

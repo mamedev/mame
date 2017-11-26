@@ -16,6 +16,7 @@ TODO:
 #include "emu.h"
 #include "debugger.h"
 #include "mc68hc11.h"
+#include "hc11dasm.h"
 
 enum
 {
@@ -61,10 +62,9 @@ device_memory_interface::space_config_vector mc68hc11_cpu_device::memory_space_c
 	};
 }
 
-offs_t mc68hc11_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *mc68hc11_cpu_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( hc11 );
-	return CPU_DISASSEMBLE_NAME(hc11)(this, stream, pc, oprom, opram, options);
+	return new hc11_disassembler;
 }
 
 

@@ -15,8 +15,7 @@
 #include "emu.h"
 #include "debugger.h"
 #include "tlcs90.h"
-
-static const char *const op_names[] =   {   "??",       "nop",  "ex",   "exx",  "ld",   "ldw",  "lda",  "ldi",  "ldir", "ldd",  "lddr", "cpi",  "cpir", "cpd",  "cpdr", "push", "pop",  "jp",   "jr",   "call", "callr",    "ret",  "reti", "halt", "di",   "ei",   "swi",  "daa",  "cpl",  "neg",  "ldar", "rcf",  "scf",  "ccf",  "tset", "bit",  "set",  "res",  "inc",  "dec",  "incx", "decx", "incw", "decw", "add",  "adc",  "sub",  "sbc",  "and",  "xor",  "or",   "cp",   "rlc",  "rrc",  "rl",   "rr",   "sla",  "sra",  "sll",  "srl",  "rld",  "rrd",  "djnz", "mul",  "div"   };
+#include "tlcs90d.h"
 
 ALLOW_SAVE_TYPE(tlcs90_device::e_mode); // allow save_item on a non-fundamental type
 
@@ -154,9 +153,6 @@ enum    {
 
 #define F   m_af.b.l
 
-static const char *const r8_names[] =   {   "b",    "c",    "d",    "e",    "h",    "l",    "a"                             };
-static const char *const r16_names[]    =   {   "bc",   "de",   "hl",   "??",   "ix",   "iy",   "sp",   "af",   "af'",  "pc"    };
-
 // Condition Codes
 
 #define FLS 0x0
@@ -197,8 +193,6 @@ static uint8_t SZ_BIT[256];   /* zero, sign and parity/overflow (=zero) flags fo
 static uint8_t SZP[256];      /* zero, sign and parity flags */
 static uint8_t SZHV_inc[256]; /* zero, sign, half carry and overflow flags INC r8 */
 static uint8_t SZHV_dec[256]; /* zero, sign, half carry and overflow flags DEC r8 */
-
-static const char *const cc_names[] =   {   "f",    "lt",   "le",   "ule",  "ov",   "mi",   "z",    "c",    "",     "ge",   "gt",   "ugt",  "nov",  "pl",   "nz",   "nc"    };
 
 // Opcodes
 
@@ -1008,81 +1002,6 @@ void tlcs90_device::decode()
 
 	OP( UNKNOWN,2 )     NONE( 1 )       NONE( 2 )
 }
-
-static const char *const ir_names[] =   {
-	"P0",       "P1",       "P01CR/IRFL",   "IRFH",     "P2",       "P2CR",     "P3",       "P3CR",
-	"P4",       "P4CR",     "P5",           "SMMOD",    "P6",       "P7",       "P67CR",    "SMCR",
-	"P8",       "P8CR",     "WDMOD",        "WDCR",     "TREG0",    "TREG1",    "TREG2",    "TREG3",
-	"TCLK",     "TFFCR",    "TMOD",         "TRUN",     "CAP1L",    "CAP1H",    "CAP2L",    "CAL2H",
-	"TREG4L",   "TREG4H",   "TREG5L",       "TREG5H",   "T4MOD",    "T4FFCR",   "INTEL",    "INTEH",
-	"DMAEH",    "SCMOD",    "SCCR",         "SCBUF",    "BX",       "BY",       "ADREG",    "ADMOD"
-};
-
-const char *tlcs90_device::internal_registers_names(uint16_t x)
-{
-	if (type() != TMP90PH44)
-	{
-		// FIXME: TMP90PH44 and many other models have completely different SFR maps
-		int ir = x - 0xffc0;
-		if ( ir >= 0 && ir < ARRAY_LENGTH(ir_names) )
-			return ir_names[ir];
-	}
-	return nullptr;
-}
-
-bool tlcs90_device::stream_arg(std::ostream &stream, uint32_t pc, const char *pre, const e_mode mode, const uint16_t r, const uint16_t rb)
-{
-	const char *reg_name;
-	switch ( mode )
-	{
-	case e_mode::NONE:   return false;
-
-	case e_mode::BIT8:   util::stream_format(stream, "%s%d",            pre,    r                                   );   return true;
-	case e_mode::I8:     util::stream_format(stream, "%s$%02X",         pre,    r                                   );   return true;
-	case e_mode::D8:     util::stream_format(stream, "%s$%04X",         pre,    (pc+2+(r&0x7f)-(r&0x80))&0xffff     );   return true;
-	case e_mode::I16:    util::stream_format(stream, "%s$%04X",         pre,    r                                   );   return true;
-	case e_mode::D16:    util::stream_format(stream, "%s$%04X",         pre,    (pc+2+(r&0x7fff)-(r&0x8000))&0xffff );   return true;
-	case e_mode::MI16:
-		reg_name = internal_registers_names(r);
-		if (reg_name)
-			util::stream_format(stream, "%s(%s)", pre, reg_name);
-		else
-			util::stream_format(stream, "%s($%04X)",       pre,    r                                   );
-		return true;
-	case e_mode::R8:     util::stream_format(stream, "%s%s",            pre,    r8_names[r]                         );   return true;
-	case e_mode::R16:    util::stream_format(stream, "%s%s",            pre,    r16_names[r]                        );   return true;
-	case e_mode::MR16:   util::stream_format(stream, "%s(%s)",          pre,    r16_names[r]                        );   return true;
-
-	case e_mode::MR16R8: util::stream_format(stream, "%s(%s+%s)",       pre,    r16_names[r],   r8_names[rb]        );   return true;
-	case e_mode::MR16D8: util::stream_format(stream, "%s(%s%c$%02X)",   pre,    r16_names[r],   (rb&0x80)?'-':'+',  (rb&0x80)?((rb^0xff)+1):rb  );   return true;
-
-	case e_mode::CC:     util::stream_format(stream, "%s%s",            pre,    cc_names[r]                         );   return true;
-
-	case e_mode::R16R8:  util::stream_format(stream, "%s%s+%s",         pre,    r16_names[r],   r8_names[rb]        );   return true;
-	case e_mode::R16D8:  util::stream_format(stream, "%s%s%c$%02X",     pre,    r16_names[r],   (rb&0x80)?'-':'+',  (rb&0x80)?((rb^0xff)+1):rb  );   return true;
-
-	default:
-		fatalerror("%04x: unimplemented addr mode = %d\n",pc,std::underlying_type_t<e_mode>(mode));
-	}
-
-	// never executed
-	return false;
-}
-
-offs_t tlcs90_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
-{
-	m_addr = pc;
-
-	decode();
-	m_op &= ~OP_16;
-
-	util::stream_format         (stream, "%-5s",                op_names[ m_op ] ); // strlen("callr") == 5
-	bool streamed = stream_arg  (stream, pc,       " ",         m_mode1, m_r1, m_r1b );
-	stream_arg                  (stream, pc, streamed ?",":"",  m_mode2, m_r2, m_r2b );
-
-	return (m_addr - pc) | DASMFLAG_SUPPORTED;
-}
-
 
 uint16_t tlcs90_device::r8( const uint16_t r )
 {
@@ -2937,4 +2856,9 @@ void tlcs90_device::state_string_export(const device_state_entry &entry, std::st
 			);
 			break;
 	}
+}
+
+util::disasm_interface *tlcs90_device::create_disassembler()
+{
+	return new tlcs90_disassembler;
 }

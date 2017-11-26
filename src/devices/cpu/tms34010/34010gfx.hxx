@@ -207,6 +207,11 @@ int tms340x0_device::compute_pixblt_b_cycles(int left_partials, int right_partia
 /* Shift register handling */
 void tms340x0_device::memory_w(address_space &space, offs_t offset,uint16_t data)
 {
+	logerror("memory_w %08x %04x\n", offset << 3, data);
+	if((offset << 3) == 0x02005010 && data == 0x0000) {
+		machine().debug_break();
+		//		abort();
+	}
 	space.write_word(offset, data);
 }
 
@@ -217,6 +222,7 @@ uint16_t tms340x0_device::memory_r(address_space &space, offs_t offset)
 
 void tms340x0_device::shiftreg_w(address_space &space, offs_t offset,uint16_t data)
 {
+	logerror("shiftreg_w %08x %04x\n", offset << 3, data);
 	if (!m_from_shiftreg_cb.isnull())
 		m_from_shiftreg_cb(space, (uint32_t)(offset << 3) & ~15, &m_shiftreg[0]);
 	else

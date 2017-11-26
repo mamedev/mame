@@ -170,65 +170,21 @@ WRITE16_MEMBER(darius_state::cpua_ctrl_w)
                         GAME INPUTS
 **********************************************************/
 
-READ16_MEMBER(darius_state::darius_ioc_r)
+READ16_MEMBER(darius_state::coin_r)
 {
-	switch (offset)
-	{
-		case 0x01:
-			return (m_ciu->master_comm_r(space, 0) & 0xff);    /* sound interface read */
-
-		case 0x04:
-			return ioport("P1")->read();
-
-		case 0x05:
-			return ioport("P2")->read();
-
-		case 0x06:
-			return ioport("SYSTEM")->read();
-
-		case 0x07:
-			return m_coin_word; /* bits 3&4 coin lockouts, must return zero */
-
-		case 0x08:
-			return ioport("DSW")->read();
-	}
-
-logerror("CPU #0 PC %06x: warning - read unmapped ioc offset %06x\n",space.device().safe_pc(),offset);
-
-	return 0xff;
+	return m_coin_word; /* bits 3&4 coin lockouts, must return zero */
 }
 
-WRITE16_MEMBER(darius_state::darius_ioc_w)
+WRITE16_MEMBER(darius_state::coin_w)
 {
-	switch (offset)
-	{
-		case 0x00:  /* sound interface write */
-
-			m_ciu->master_port_w(space, 0, data & 0xff);
-			return;
-
-		case 0x01:  /* sound interface write */
-
-			m_ciu->master_comm_w(space, 0, data & 0xff);
-			return;
-
-		case 0x28:  /* unknown, written by both cpus - always 0? */
-//popmessage(" address %04x value %04x",offset,data);
-			return;
-
-		case 0x30:  /* coin control */
-			/* bits 7,5,4,0 used on reset */
-			/* bit 4 used whenever bg is blanked ? */
-			machine().bookkeeping().coin_lockout_w(0, ~data & 0x02);
-			machine().bookkeeping().coin_lockout_w(1, ~data & 0x04);
-			machine().bookkeeping().coin_counter_w(0, data & 0x08);
-			machine().bookkeeping().coin_counter_w(1, data & 0x40);
-			m_coin_word = data & 0xffff;
-//popmessage(" address %04x value %04x",offset,data);
-			return;
-	}
-
-logerror("CPU #0 PC %06x: warning - write unmapped ioc offset %06x with %04x\n",space.device().safe_pc(),offset,data);
+	/* coin control */
+	/* bits 7,5,4,0 used on reset */
+	/* bit 4 used whenever bg is blanked ? */
+	machine().bookkeeping().coin_lockout_w(0, ~data & 0x02);
+	machine().bookkeeping().coin_lockout_w(1, ~data & 0x04);
+	machine().bookkeeping().coin_counter_w(0, data & 0x08);
+	machine().bookkeeping().coin_counter_w(1, data & 0x40);
+	m_coin_word = data;
 }
 
 
@@ -240,8 +196,16 @@ static ADDRESS_MAP_START( darius_map, AS_PROGRAM, 16, darius_state )
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 	AM_RANGE(0x080000, 0x08ffff) AM_RAM                                             /* main RAM */
 	AM_RANGE(0x0a0000, 0x0a0001) AM_WRITE(cpua_ctrl_w)
-	AM_RANGE(0x0b0000, 0x0b0001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
-	AM_RANGE(0xc00000, 0xc0007f) AM_READWRITE(darius_ioc_r, darius_ioc_w)           /* inputs, sound */
+	AM_RANGE(0x0b0000, 0x0b0001) AM_DEVREADWRITE("watchdog", watchdog_timer_device, reset16_r, reset16_w)
+	AM_RANGE(0xc00000, 0xc00001) AM_READNOP AM_DEVWRITE8("ciu", pc060ha_device, master_port_w, 0x00ff)
+	AM_RANGE(0xc00002, 0xc00003) AM_DEVREADWRITE8("ciu", pc060ha_device, master_comm_r, master_comm_w, 0x00ff)
+	AM_RANGE(0xc00008, 0xc00009) AM_READ_PORT("P1")
+	AM_RANGE(0xc0000a, 0xc0000b) AM_READ_PORT("P2")
+	AM_RANGE(0xc0000c, 0xc0000d) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0xc0000e, 0xc0000f) AM_READ(coin_r)
+	AM_RANGE(0xc00010, 0xc00011) AM_READ_PORT("DSW")
+	AM_RANGE(0xc00050, 0xc00051) AM_NOP // unknown, written by both cpus - always 0?
+	AM_RANGE(0xc00060, 0xc00061) AM_WRITE(coin_w)
 	AM_RANGE(0xd00000, 0xd0ffff) AM_DEVREADWRITE("pc080sn", pc080sn_device, word_r, word_w)  /* tilemaps */
 	AM_RANGE(0xd20000, 0xd20003) AM_DEVWRITE("pc080sn", pc080sn_device, yscroll_word_w)
 	AM_RANGE(0xd40000, 0xd40003) AM_DEVWRITE("pc080sn", pc080sn_device, xscroll_word_w)
@@ -256,7 +220,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( darius_cpub_map, AS_PROGRAM, 16, darius_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x04ffff) AM_RAM             /* local RAM */
-	AM_RANGE(0xc00000, 0xc0007f) AM_WRITE(darius_ioc_w) /* only writes $c00050 (?) */
+	AM_RANGE(0xc00050, 0xc00051) AM_NOP // unknown, written by both cpus - always 0?
 	AM_RANGE(0xd80000, 0xd80fff) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xe00100, 0xe00fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xe01000, 0xe02fff) AM_RAM AM_SHARE("share2")

@@ -33,6 +33,7 @@
 
 #include "emu.h"
 #include "dsp56k.h"
+#include "dsp56dsm.h"
 
 #include "opcode.h"
 
@@ -503,9 +504,9 @@ void dsp56k_device::execute_run()
 }
 
 
-offs_t dsp56k_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *dsp56k_device::create_disassembler()
 {
-	return CPU_DISASSEMBLE_NAME(dsp56k)(this, stream, pc, oprom, opram, options);
+	return new dsp56k_disassembler;
 }
 
 } // namespace DSP56K

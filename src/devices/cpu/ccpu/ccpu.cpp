@@ -12,6 +12,7 @@
 
 #include "emu.h"
 #include "ccpu.h"
+#include "ccpudasm.h"
 #include "debugger.h"
 
 
@@ -695,8 +696,7 @@ void ccpu_cpu_device::execute_run()
 }
 
 
-offs_t ccpu_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *ccpu_cpu_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( ccpu );
-	return CPU_DISASSEMBLE_NAME(ccpu)(this, stream, pc, oprom, opram, options);
+	return new ccpu_disassembler;
 }

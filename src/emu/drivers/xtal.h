@@ -34,7 +34,7 @@
     MAME doesn't yet support fractions in crystal frequencies. For example,
     XTAL_3_579545MHz should actually be 3579545.454545...Hz (39375000/11).
     This is no problem though: see above note about tolerance.
-    
+
     In the "Examples" column, please don't add 1000 examples, this is just
     for interest, so two or three examples is enough.
     The actual reference where the xtals are used can be found in the
@@ -58,6 +58,7 @@ enum
 	XTAL_1MHz           = 1000000,      /* Used to drive OKI M6295 chips */
 	XTAL_1_2944MHz      = 1294400,      /* BBN BitGraph PSG */
 	XTAL_1_75MHz        = 1750000,      /* RCA CDP1861 */
+	XTAL_1_7971MHz      = 1797100,      /* SWTPC 6800 (with MIKBUG) */
 	XTAL_1_8432MHz      = 1843200,      /* Bondwell 12/14 */
 	XTAL_1_9968MHz      = 1996800,      /* NEC PC-98xx */
 	XTAL_2MHz           = 2000000,

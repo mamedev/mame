@@ -11,6 +11,7 @@
 #include "emu.h"
 #include "debugger.h"
 #include "m6502.h"
+#include "m6502d.h"
 
 DEFINE_DEVICE_TYPE(M6502, m6502_device, "m6502", "M6502")
 
@@ -453,179 +454,6 @@ void m6502_device::state_string_export(const device_state_entry &entry, std::str
 	}
 }
 
-
-uint32_t m6502_device::disasm_min_opcode_bytes() const
-{
-	return 1;
-}
-
-uint32_t m6502_device::disasm_max_opcode_bytes() const
-{
-	return 4;
-}
-
-offs_t m6502_device::disassemble_generic(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options, const disasm_entry *table)
-{
-	const disasm_entry &e = table[oprom[0] | inst_state_base];
-	uint32_t flags = e.flags | DASMFLAG_SUPPORTED;
-	util::stream_format(stream, "%s", e.opcode);
-
-	switch(e.mode) {
-	case DASM_non:
-		flags |= 1;
-		break;
-
-	case DASM_aba:
-		util::stream_format(stream, " $%02x%02x", opram[2], opram[1]);
-		flags |= 3;
-		break;
-
-	case DASM_abx:
-		util::stream_format(stream, " $%02x%02x, x", opram[2], opram[1]);
-		flags |= 3;
-		break;
-
-	case DASM_aby:
-		util::stream_format(stream, " $%02x%02x, y", opram[2], opram[1]);
-		flags |= 3;
-		break;
-
-	case DASM_acc:
-		util::stream_format(stream, " a");
-		flags |= 1;
-		break;
-
-	case DASM_adr:
-		util::stream_format(stream, " $%02x%02x", opram[2], opram[1]);
-		flags |= 3;
-		break;
-
-	case DASM_bzp:
-		util::stream_format(stream, "%d $%02x", (oprom[0] >> 4) & 7, opram[1]);
-		flags |= 2;
-		break;
-
-	case DASM_iax:
-		util::stream_format(stream, " ($%02x%02x, x)", opram[2], opram[1]);
-		flags |= 3;
-		break;
-
-	case DASM_idx:
-		util::stream_format(stream, " ($%02x, x)", opram[1]);
-		flags |= 2;
-		break;
-
-	case DASM_idy:
-		util::stream_format(stream, " ($%02x), y", opram[1]);
-		flags |= 2;
-		break;
-
-	case DASM_idz:
-		util::stream_format(stream, " ($%02x), z", opram[1]);
-		flags |= 2;
-		break;
-
-	case DASM_imm:
-		util::stream_format(stream, " #$%02x", opram[1]);
-		flags |= 2;
-		break;
-
-	case DASM_imp:
-		flags |= 1;
-		break;
-
-	case DASM_ind:
-		util::stream_format(stream, " ($%02x%02x)", opram[2], opram[1]);
-		flags |= 3;
-		break;
-
-	case DASM_isy:
-		util::stream_format(stream, " ($%02x, s), y", opram[1]);
-		flags |= 2;
-		break;
-
-	case DASM_iw2:
-		util::stream_format(stream, " #$%02x%02x", opram[2], opram[1]);
-		flags |= 3;
-		break;
-
-	case DASM_iw3:
-		util::stream_format(stream, " #$%02x%02x%02x", opram[3], opram[2], opram[1]);
-		flags |= 4;
-		break;
-
-	case DASM_rel:
-		util::stream_format(stream, " $%04x", (pc & 0xf0000) | uint16_t(pc + 2 + int8_t(opram[1])));
-		flags |= 2;
-		break;
-
-	case DASM_rw2:
-		util::stream_format(stream, " $%04x", (pc & 0xf0000) | uint16_t(pc + 2 + int16_t((opram[2] << 8) | opram[1])));
-		flags |= 3;
-		break;
-
-	case DASM_zpb:
-		util::stream_format(stream, "%d $%02x, $%04x", (oprom[0] >> 4) & 7, opram[1], (pc & 0xf0000) | uint16_t(pc + 3 + int8_t(opram[2])));
-		flags |= 3;
-		break;
-
-	case DASM_zpg:
-		util::stream_format(stream, " $%02x", opram[1]);
-		flags |= 2;
-		break;
-
-	case DASM_zpi:
-		util::stream_format(stream, " ($%02x)", opram[1]);
-		flags |= 2;
-		break;
-
-	case DASM_zpx:
-		util::stream_format(stream, " $%02x, x", opram[1]);
-		flags |= 2;
-		break;
-
-	case DASM_zpy:
-		util::stream_format(stream, " $%02x, y", opram[1]);
-		flags |= 2;
-		break;
-
-	case DASM_imz:
-		util::stream_format(stream, " #$%02x, $%02x", opram[1], opram[2]);
-		flags |= 3;
-		break;
-
-	case DASM_spg:
-		util::stream_format(stream, " \\$%02x", opram[1]);
-		flags |= 2;
-		break;
-
-	case DASM_biz:
-		util::stream_format(stream, " %d, $%02x", (opram[0] >> 5) & 7, opram[1]);
-		flags |= 2;
-		break;
-
-	case DASM_bzr:
-		util::stream_format(stream, " %d, $%02x, $%04x", (opram[0] >> 5) & 7, opram[1], (pc & 0xf0000) | uint16_t(pc + 3 + int8_t(opram[2])));
-		flags |= 3;
-		break;
-
-	case DASM_bar:
-		util::stream_format(stream, " %d, a, $%04x", (opram[0] >> 5) & 7, (pc & 0xf0000) | uint16_t(pc + 3 + int8_t(opram[1])));
-		flags |= 2;
-		break;
-
-	case DASM_bac:
-		util::stream_format(stream, " %d, a", (opram[0] >> 5) & 7);
-		flags |= 1;
-		break;
-
-	default:
-		fprintf(stderr, "Unhandled dasm mode %d\n", e.mode);
-		abort();
-	}
-	return flags;
-}
-
 void m6502_device::prefetch()
 {
 	sync = true;
@@ -662,11 +490,10 @@ void m6502_device::set_nz(uint8_t v)
 		P |= F_Z;
 }
 
-offs_t m6502_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *m6502_device::create_disassembler()
 {
-	return disassemble_generic(stream, pc, oprom, opram, options, disasm_entries);
+	return new m6502_disassembler;
 }
-
 
 uint8_t m6502_device::memory_interface::read_9(uint16_t adr)
 {

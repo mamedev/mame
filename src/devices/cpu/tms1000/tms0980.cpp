@@ -8,6 +8,7 @@
 
 #include "emu.h"
 #include "tms0980.h"
+#include "tms1k_dasm.h"
 #include "debugger.h"
 
 // TMS0980
@@ -31,7 +32,7 @@ DEFINE_DEVICE_TYPE(TMS1980, tms1980_cpu_device, "tms1980", "TMS1980") // 28-pin 
 
 // internal memory maps
 static ADDRESS_MAP_START(program_11bit_9, AS_PROGRAM, 16, tms1k_base_device)
-	AM_RANGE(0x000, 0xfff) AM_ROM
+	AM_RANGE(0x000, 0x7ff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(data_144x4, AS_DATA, 8, tms1k_base_device)
@@ -84,10 +85,9 @@ MACHINE_CONFIG_END
 
 
 // disasm
-offs_t tms0980_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, u32 options)
+util::disasm_interface *tms0980_cpu_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE(tms0980);
-	return CPU_DISASSEMBLE_NAME(tms0980)(this, stream, pc, oprom, opram, options);
+	return new tms0980_disassembler;
 }
 
 

@@ -43,7 +43,6 @@ const int mb86901_device::NWINDOWS = 7;
 mb86901_device::mb86901_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, MB86901, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_BIG, 32, 32)
-	, m_dasm(this, 7)
 {
 }
 
@@ -520,36 +519,15 @@ void mb86901_device::state_string_export(const device_state_entry &entry, std::s
 
 
 //-------------------------------------------------
-//  disasm_min_opcode_bytes - return the length
-//  of the shortest instruction, in bytes
-//-------------------------------------------------
-
-uint32_t mb86901_device::disasm_min_opcode_bytes() const
-{
-	return 4;
-}
-
-
-//-------------------------------------------------
-//  disasm_max_opcode_bytes - return the length
-//  of the longest instruction, in bytes
-//-------------------------------------------------
-
-uint32_t mb86901_device::disasm_max_opcode_bytes() const
-{
-	return 4;
-}
-
-
-//-------------------------------------------------
-//  disasm_disassemble - call the disassembly
+//  disassemble - call the disassembly
 //  helper function
 //-------------------------------------------------
 
-offs_t mb86901_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *mb86901_device::create_disassembler()
 {
-	uint32_t op = *reinterpret_cast<const uint32_t *>(oprom);
-	return m_dasm.dasm(stream, pc, big_endianize_int32(op));
+	auto dasm = new sparc_disassembler(this, 7);
+	m_asi_desc_adder(dasm);
+	return dasm;
 }
 
 

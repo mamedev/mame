@@ -110,8 +110,6 @@ enum
 	M68K_FPSR, M68K_FPCR
 };
 
-unsigned int m68k_disassemble_raw(std::ostream &stream, unsigned int pc, const unsigned char* opdata, const unsigned char* argdata, unsigned int cpu_type);
-
 class m68000_base_device;
 
 
@@ -129,12 +127,8 @@ public:
 
 	void clear_all(void);
 
-	virtual uint32_t disasm_min_opcode_bytes() const override { return 2; };
-	virtual uint32_t disasm_max_opcode_bytes() const override { return 10; };
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
-
-
-
+	// device_disasm_interface overrides
+	virtual util::disasm_interface *create_disassembler() override;
 
 	// device_execute_interface overrides
 	virtual uint32_t execute_min_cycles() const override { return 4; };
@@ -407,9 +401,7 @@ public:
 	m68000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 
-	virtual uint32_t disasm_min_opcode_bytes() const override { return 2; };
-	virtual uint32_t disasm_max_opcode_bytes() const override { return 10; };
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
 
 	virtual uint32_t execute_min_cycles() const override { return 4; };
 	virtual uint32_t execute_max_cycles() const override { return 158; };
@@ -432,9 +424,7 @@ public:
 	// construction/destruction
 	m68301_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual uint32_t disasm_min_opcode_bytes() const override { return 2; };
-	virtual uint32_t disasm_max_opcode_bytes() const override { return 10; };
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
 
 	virtual uint32_t execute_min_cycles() const override { return 4; };
 	virtual uint32_t execute_max_cycles() const override { return 158; };
@@ -454,9 +444,7 @@ public:
 	// construction/destruction
 	m68008_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual uint32_t disasm_min_opcode_bytes() const override { return 2; };
-	virtual uint32_t disasm_max_opcode_bytes() const override { return 10; };
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
 
 	virtual uint32_t execute_min_cycles() const override { return 4; };
 	virtual uint32_t execute_max_cycles() const override { return 158; };
@@ -473,9 +461,7 @@ public:
 	// construction/destruction
 	m68008plcc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual uint32_t disasm_min_opcode_bytes() const override { return 2; };
-	virtual uint32_t disasm_max_opcode_bytes() const override { return 10; };
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
 
 	virtual uint32_t execute_min_cycles() const override { return 4; };
 	virtual uint32_t execute_max_cycles() const override { return 158; };
@@ -492,9 +478,7 @@ public:
 	// construction/destruction
 	m68010_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual uint32_t disasm_min_opcode_bytes() const override { return 2; };
-	virtual uint32_t disasm_max_opcode_bytes() const override { return 10; };
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
 
 	virtual uint32_t execute_min_cycles() const override { return 4; };
 	virtual uint32_t execute_max_cycles() const override { return 158; };
@@ -511,9 +495,7 @@ public:
 	// construction/destruction
 	m68ec020_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual uint32_t disasm_min_opcode_bytes() const override { return 2; };
-	virtual uint32_t disasm_max_opcode_bytes() const override { return 20; };
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
 
 	virtual uint32_t execute_min_cycles() const override { return 2; };
 	virtual uint32_t execute_max_cycles() const override { return 158; };
@@ -530,9 +512,7 @@ public:
 	// construction/destruction
 	m68020_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual uint32_t disasm_min_opcode_bytes() const override { return 2; };
-	virtual uint32_t disasm_max_opcode_bytes() const override { return 20; };
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
 
 	virtual uint32_t execute_min_cycles() const override { return 2; };
 	virtual uint32_t execute_max_cycles() const override { return 158; };
@@ -549,9 +529,7 @@ public:
 	// construction/destruction
 	m68020fpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual uint32_t disasm_min_opcode_bytes() const override { return 2; };
-	virtual uint32_t disasm_max_opcode_bytes() const override { return 20; };
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
 
 	virtual uint32_t execute_min_cycles() const override { return 2; };
 	virtual uint32_t execute_max_cycles() const override { return 158; };
@@ -568,9 +546,7 @@ public:
 	// construction/destruction
 	m68020pmmu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual uint32_t disasm_min_opcode_bytes() const override { return 2; };
-	virtual uint32_t disasm_max_opcode_bytes() const override { return 20; };
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
 
 	virtual uint32_t execute_min_cycles() const override { return 2; };
 	virtual uint32_t execute_max_cycles() const override { return 158; };
@@ -587,9 +563,7 @@ public:
 	// construction/destruction
 	m68020hmmu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual uint32_t disasm_min_opcode_bytes() const override { return 2; };
-	virtual uint32_t disasm_max_opcode_bytes() const override { return 20; };
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
 
 	virtual uint32_t execute_min_cycles() const override { return 2; };
 	virtual uint32_t execute_max_cycles() const override { return 158; };
@@ -608,9 +582,7 @@ public:
 	// construction/destruction
 	m68ec030_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual uint32_t disasm_min_opcode_bytes() const override { return 2; };
-	virtual uint32_t disasm_max_opcode_bytes() const override { return 20; };
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
 
 	virtual uint32_t execute_min_cycles() const override { return 2; };
 	virtual uint32_t execute_max_cycles() const override { return 158; };
@@ -627,9 +599,7 @@ public:
 	// construction/destruction
 	m68030_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual uint32_t disasm_min_opcode_bytes() const override { return 2; };
-	virtual uint32_t disasm_max_opcode_bytes() const override { return 20; };
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
 
 	virtual uint32_t execute_min_cycles() const override { return 2; };
 	virtual uint32_t execute_max_cycles() const override { return 158; };
@@ -646,9 +616,7 @@ public:
 	// construction/destruction
 	m68ec040_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual uint32_t disasm_min_opcode_bytes() const override { return 2; };
-	virtual uint32_t disasm_max_opcode_bytes() const override { return 20; };
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
 
 	virtual uint32_t execute_min_cycles() const override { return 2; };
 	virtual uint32_t execute_max_cycles() const override { return 158; };
@@ -665,9 +633,7 @@ public:
 	// construction/destruction
 	m68lc040_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual uint32_t disasm_min_opcode_bytes() const override { return 2; };
-	virtual uint32_t disasm_max_opcode_bytes() const override { return 20; };
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
 
 	virtual uint32_t execute_min_cycles() const override { return 2; };
 	virtual uint32_t execute_max_cycles() const override { return 158; };
@@ -684,9 +650,7 @@ public:
 	// construction/destruction
 	m68040_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual uint32_t disasm_min_opcode_bytes() const override { return 2; };
-	virtual uint32_t disasm_max_opcode_bytes() const override { return 20; };
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
 
 	virtual uint32_t execute_min_cycles() const override { return 2; };
 	virtual uint32_t execute_max_cycles() const override { return 158; };
@@ -703,9 +667,7 @@ public:
 	// construction/destruction
 	scc68070_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual uint32_t disasm_min_opcode_bytes() const override { return 2; };
-	virtual uint32_t disasm_max_opcode_bytes() const override { return 10; };
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
 
 	virtual uint32_t execute_min_cycles() const override { return 4; };
 	virtual uint32_t execute_max_cycles() const override { return 158; };
@@ -725,9 +687,7 @@ public:
 	// construction/destruction
 	fscpu32_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual uint32_t disasm_min_opcode_bytes() const override { return 2; };
-	virtual uint32_t disasm_max_opcode_bytes() const override { return 20; };
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
 
 	virtual uint32_t execute_min_cycles() const override { return 2; };
 	virtual uint32_t execute_max_cycles() const override { return 158; };
@@ -750,9 +710,7 @@ public:
 	// construction/destruction
 	mcf5206e_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual uint32_t disasm_min_opcode_bytes() const override { return 2; };
-	virtual uint32_t disasm_max_opcode_bytes() const override { return 20; };
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
 
 	virtual uint32_t execute_min_cycles() const override { return 2; };
 	virtual uint32_t execute_max_cycles() const override { return 158; };

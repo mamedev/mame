@@ -129,8 +129,6 @@ public:
 	int m_keroppi_prize_hop;
 	int m_keroppi_protection_count;
 
-	int m_wiggie_soundlatch;
-
 	uint8_t m_twineagl_xram[8];
 	int m_twineagl_tilebank[4];
 
@@ -168,8 +166,6 @@ public:
 	DECLARE_READ16_MEMBER(kiwame_input_r);
 	DECLARE_READ16_MEMBER(thunderl_protection_r);
 	DECLARE_WRITE16_MEMBER(thunderl_protection_w);
-	DECLARE_READ8_MEMBER(wiggie_soundlatch_r);
-	DECLARE_WRITE16_MEMBER(wiggie_soundlatch_w);
 	DECLARE_WRITE8_MEMBER(utoukond_sound_control_w);
 	DECLARE_READ16_MEMBER(pairlove_prot_r);
 	DECLARE_WRITE16_MEMBER(pairlove_prot_w);

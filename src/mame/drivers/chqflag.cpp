@@ -77,18 +77,18 @@ WRITE8_MEMBER(chqflag_state::chqflag_vreg_w)
 	 * 0x80 is used when rain shows up (which should be white/highlighted)
 	 * 0x88 is for when night shows up (max amount of highlight)
 	 * 0x08 is used at dawn after 0x88 state
-	 * The shadow part looks ugly when rain starts/ends pouring (-> black colored with a setting of 0x00), 
-	 * the reference shows dimmed background when this event occurs (which is handled via reg 1 bit 0 of k051960 device), 
+	 * The shadow part looks ugly when rain starts/ends pouring (-> black colored with a setting of 0x00),
+	 * the reference shows dimmed background when this event occurs (which is handled via reg 1 bit 0 of k051960 device),
 	 * might be actually disabling the shadow here (-> setting 1.0f instead).
 	 *
 	 * TODO: true values aren't known, also shadow_factors table probably scales towards zero instead (game doesn't use those)
 	 */
-	const float shadow_factors[4] = {0.8, 1.33, 1.66, 2.0 };
-	const float highlight_factors[4] = {1.0, 1.33, 1.66, 2.0 };
+	const double shadow_factors[4] = {0.8, 1.33, 1.66, 2.0 };
+	const double highlight_factors[4] = {1.0, 1.33, 1.66, 2.0 };
 	uint8_t shadow_value = ((data & 0x80) >> 6) | ((data & 0x08) >> 3);
-	
+
 	m_palette->set_shadow_factor(m_last_vreg != 0 ? highlight_factors[shadow_value] : shadow_factors[shadow_value] );
-	
+
 	#if 0
 	if ((data & 0x80) != m_last_vreg)
 	{
@@ -98,7 +98,7 @@ WRITE8_MEMBER(chqflag_state::chqflag_vreg_w)
 		update_background_shadows(data);
 	}
 	#endif
-	
+
 //if ((data & 0xf8) && (data & 0xf8) != 0x88)
 //  popmessage("chqflag_vreg_w %02x",data);
 
@@ -311,8 +311,8 @@ inline void chqflag_state::update_background_shadows(uint8_t data)
 
 WRITE_LINE_MEMBER(chqflag_state::background_brt_w)
 {
-//	popmessage("%d",state);
-	
+//  popmessage("%d",state);
+
 	if (state != m_last_vreg)
 	{
 		m_last_vreg = state;
@@ -359,7 +359,7 @@ static MACHINE_CONFIG_START( chqflag )
 	MCFG_K051960_IRQ_HANDLER(INPUTLINE("maincpu", KONAMI_IRQ_LINE))
 	MCFG_K051960_NMI_HANDLER(INPUTLINE("maincpu", INPUT_LINE_NMI))
 	MCFG_K051960_VREG_CONTRAST_HANDLER(WRITELINE(chqflag_state,background_brt_w))
-	
+
 	MCFG_DEVICE_ADD("k051316_1", K051316, 0)
 	MCFG_GFX_PALETTE("palette")
 	MCFG_K051316_OFFSETS(7, 0)

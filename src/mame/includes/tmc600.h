@@ -16,13 +16,13 @@
 #include "sound/cdp1869.h"
 #include "speaker.h"
 
-#define SCREEN_TAG      	"screen"
-#define CDP1802_TAG     	"cdp1802"
-#define CDP1869_TAG     	"cdp1869"
-#define CDP1852_KB_TAG		"cdp1852_kb"
-#define CDP1852_BUS_TAG		"cdp1852_bus"
-#define CDP1852_TMC700_TAG	"cdp1852_printer"
-#define CENTRONICS_TAG  	"centronics"
+#define SCREEN_TAG          "screen"
+#define CDP1802_TAG         "cdp1802"
+#define CDP1869_TAG         "cdp1869"
+#define CDP1852_KB_TAG      "cdp1852_kb"
+#define CDP1852_BUS_TAG     "cdp1852_bus"
+#define CDP1852_TMC700_TAG  "cdp1852_printer"
+#define CENTRONICS_TAG      "centronics"
 
 #define TMC600_PAGE_RAM_SIZE    0x400
 #define TMC600_PAGE_RAM_MASK    0x3ff

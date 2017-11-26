@@ -2,17 +2,17 @@
 // copyright-holders:Luca Elia,David Haywood,Angelo Salese
 /***************************************************************************
 
-	Imagetek I4100 / I4220 / I4300 device files
-	
-    device emulation by Angelo Salese, based off from original metro.cpp 
-	implementation by Luca Elia & David Haywood
-	
-	TODO:
-	- interrupt enable/acknowledge/vector;
-	- soundlatch delegate;
-	- inputs for i4300;
-	- hyprduel.cpp uses scanline attribute which crawls to unusable state 
-	  with current video routines here;
+    Imagetek I4100 / I4220 / I4300 device files
+
+    device emulation by Angelo Salese, based off from original metro.cpp
+    implementation by Luca Elia & David Haywood
+
+    TODO:
+    - interrupt enable/acknowledge/vector;
+    - soundlatch delegate;
+    - inputs for i4300;
+    - hyprduel.cpp uses scanline attribute which crawls to unusable state
+      with current video routines here;
 
 ============================================================================
 
@@ -51,7 +51,7 @@
         an exponential curve of sizes (with one zoom value for both width
         and height)
 
-	
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -94,7 +94,7 @@ DEVICE_ADDRESS_MAP_START( map, 16, imagetek_i4100_device)
 	AM_RANGE(0x78852, 0x78853) AM_READWRITE(screen_xoffset_r,    screen_xoffset_w)
 	AM_RANGE(0x78860, 0x7886b) AM_READWRITE(window_r, window_w) AM_SHARE("windowregs")
 	AM_RANGE(0x78870, 0x7887b) AM_READWRITE(scroll_r, scroll_w) AM_SHARE("scrollregs")
-	
+
 	AM_RANGE(0x78880, 0x78881) AM_WRITE(crtc_vert_w)
 	AM_RANGE(0x78890, 0x78891) AM_WRITE(crtc_horz_w)
 	AM_RANGE(0x788a0, 0x788a1) AM_WRITE(crtc_unlock_w)
@@ -121,7 +121,7 @@ DEVICE_ADDRESS_MAP_START( v2_map, 16, imagetek_i4220_device)
 	AM_RANGE(0x78852, 0x78853) AM_READWRITE(screen_xoffset_r,    screen_xoffset_w)
 	AM_RANGE(0x78860, 0x7886b) AM_READWRITE(window_r, window_w) AM_SHARE("windowregs")
 	AM_RANGE(0x78870, 0x7887b) AM_READWRITE(scroll_r, scroll_w) AM_SHARE("scrollregs")
-	
+
 	AM_RANGE(0x78880, 0x78881) AM_WRITE(crtc_vert_w)
 	AM_RANGE(0x78890, 0x78891) AM_WRITE(crtc_horz_w)
 	AM_RANGE(0x788a0, 0x788a1) AM_WRITE(crtc_unlock_w)
@@ -139,7 +139,7 @@ DEVICE_ADDRESS_MAP_START( v2_map, 16, imagetek_i4220_device)
 	// repeated here in Puzzlet compatibility mode
 	AM_RANGE(0x78800, 0x78801) AM_READWRITE(sprite_count_r,      sprite_count_w)
 	// ... this one breaks Blazing Tornado tho
-//	AM_RANGE(0x78802, 0x78803) AM_READWRITE(sprite_priority_r,   sprite_priority_w)
+//  AM_RANGE(0x78802, 0x78803) AM_READWRITE(sprite_priority_r,   sprite_priority_w)
 	AM_RANGE(0x78804, 0x78805) AM_READWRITE(sprite_yoffset_r,    sprite_yoffset_w)
 	AM_RANGE(0x78806, 0x78807) AM_READWRITE(sprite_xoffset_r,    sprite_xoffset_w)
 	AM_RANGE(0x78808, 0x78809) AM_READWRITE(sprite_color_code_r, sprite_color_code_w)
@@ -279,12 +279,12 @@ void imagetek_i4100_device::expand_gfx1()
 	// TODO: remove from device_reset (otherwise you get broken sprites in i4220+ games because gfx rom isn't yet inited!)
 	if(m_inited_hack == true)
 		return;
-	
+
 	m_inited_hack = true;
 	uint32_t length   =   m_gfxrom_size * 2;
 
 	m_expanded_gfx1 = std::make_unique<uint8_t[]>(length);
-	
+
 	for (int i = 0; i < length; i += 2)
 	{
 		uint8_t src = m_gfxrom[i / 2];
@@ -311,21 +311,21 @@ void imagetek_i4100_device::device_start()
 	save_item(NAME(m_screen_yoffset));
 	save_item(NAME(m_layer_priority));
 	save_item(NAME(m_background_color));
-//	save_item(NAME(m_window));
-//	save_item(NAME(m_scroll));
+//  save_item(NAME(m_window));
+//  save_item(NAME(m_scroll));
 	save_item(NAME(m_screen_blank));
 	save_item(NAME(m_screen_flip));
-	
-//	memory_region *devregion =  machine().root_device().memregion(":gfx1");
-//	m_gfxrom = devregion->base();
+
+//  memory_region *devregion =  machine().root_device().memregion(":gfx1");
+//  m_gfxrom = devregion->base();
 	if (m_gfxrom == nullptr)
 		fatalerror("Imagetek i4100 %s: \"gfx1\" memory base not found",this->tag());
-	
+
 	m_gfxrom_size = m_gfxrom.bytes();
-	
+
 	m_blit_irq_cb.resolve_safe();
 	m_blit_done_timer = timer_alloc(TIMER_BLIT_END);
-	
+
 }
 
 
@@ -432,9 +432,9 @@ WRITE16_MEMBER(imagetek_i4100_device::sprite_color_code_w) { COMBINE_DATA(&m_spr
  *
  ************************************************************/
 
-READ16_MEMBER(imagetek_i4100_device::layer_priority_r) 
-{ 
-	return (m_layer_priority[2]<<4) | (m_layer_priority[1]<<2) | m_layer_priority[0]; 
+READ16_MEMBER(imagetek_i4100_device::layer_priority_r)
+{
+	return (m_layer_priority[2]<<4) | (m_layer_priority[1]<<2) | m_layer_priority[0];
 }
 
 WRITE16_MEMBER(imagetek_i4100_device::layer_priority_w)
@@ -460,7 +460,7 @@ READ16_MEMBER(imagetek_i4100_device::background_color_r)
 WRITE16_MEMBER(imagetek_i4100_device::background_color_w)
 {
 	COMBINE_DATA(&m_background_color);
-	
+
 	m_background_color &= 0x0fff;
 	if(data & 0xf000)
 		logerror("%s warning: background_color_w write with %04x %04x\n",this->tag(),data,mem_mask);
@@ -469,9 +469,9 @@ WRITE16_MEMBER(imagetek_i4100_device::background_color_w)
 /***************************************************************************
  *
  *  0.w                                 Sprite Y center point
- *  2.w         						Sprite X center point
+ *  2.w                                 Sprite X center point
  *
- * Appears to apply only for sprites, maybe they applies to tilemaps too under 
+ * Appears to apply only for sprites, maybe they applies to tilemaps too under
  * certain conditions
  *
  ***************************************************************************/
@@ -498,7 +498,7 @@ WRITE16_MEMBER(imagetek_i4100_device::scroll_w) { COMBINE_DATA(&m_scroll[offset]
  * ---- ---- ---- ---0     Flip  Screen
  *
  ****************************************************/
-WRITE16_MEMBER(imagetek_i4100_device::screen_ctrl_w) 
+WRITE16_MEMBER(imagetek_i4100_device::screen_ctrl_w)
 {
 	m_layer_tile_select[2] = BIT(data,7);
 	m_layer_tile_select[1] = BIT(data,6);
@@ -507,7 +507,7 @@ WRITE16_MEMBER(imagetek_i4100_device::screen_ctrl_w)
 	// TODO: some of these must be externalized
 	m_screen_blank = BIT(data,1);
 	m_screen_flip = BIT(data,0);
-	
+
 	if(data & 0xff1c)
 		logerror("%s warning: screen_ctrl_w write with %04x %04x\n",this->tag(),data,mem_mask);
 
@@ -950,7 +950,7 @@ void imagetek_i4100_device::draw_sprites( screen_device &screen, bitmap_ind16 &b
 	}
 }
 
- 
+
  inline uint8_t imagetek_i4100_device::get_tile_pix( uint16_t code, uint8_t x, uint8_t y, bool big, uint16_t *pix )
 {
 	int table_index;
@@ -1054,7 +1054,7 @@ void imagetek_i4100_device::draw_sprites( screen_device &screen, bitmap_ind16 &b
 * 00-ff, but on later chips supporting it, xf means 256 color tile and palette x
 
 ***************************************************************************/
- 
+
 void imagetek_i4100_device::draw_tilemap( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t flags, uint32_t pcode,
 							int sx, int sy, int wx, int wy, bool big, uint16_t *tilemapram, int layer )
 {
@@ -1134,7 +1134,7 @@ void imagetek_i4100_device::draw_tilemap( screen_device &screen, bitmap_ind16 &b
 	}
 }
 
- 
+
 void imagetek_i4100_device::draw_layers( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri )
 {
 	// Draw all the layers with priority == pri
@@ -1162,11 +1162,11 @@ void imagetek_i4100_device::draw_layers( screen_device &screen, bitmap_ind16 &bi
 	}
 }
 
- 
+
 uint32_t imagetek_i4100_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	screen.priority().fill(0, cliprect);
-	
+
 	bitmap.fill(m_background_color, cliprect);
 
 	if (m_screen_blank == true)
@@ -1176,6 +1176,6 @@ uint32_t imagetek_i4100_device::screen_update(screen_device &screen, bitmap_ind1
 		draw_layers(screen, bitmap, cliprect, pri);
 
 	draw_sprites(screen, bitmap, cliprect);
-	
+
 	return 0;
 }

@@ -8,6 +8,7 @@
 #include "emu.h"
 #include "sharc.h"
 #include "sharcfe.h"
+#include "sharcdsm.h"
 
 #include "debugger.h"
 
@@ -96,10 +97,9 @@ device_memory_interface::space_config_vector adsp21062_device::memory_space_conf
 	};
 }
 
-offs_t adsp21062_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *adsp21062_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( sharc );
-	return CPU_DISASSEMBLE_NAME(sharc)(this, stream, pc, oprom, opram, options);
+	return new sharc_disassembler;
 }
 
 void adsp21062_device::enable_recompiler()

@@ -17,6 +17,10 @@
     generates a 68000-compatible DTACK signal, instead of using generic RD and WR
     strobes as the 2681 does. The 68681 also adds a programmable interrupt vector,
     with an IACK input replacing IP6.
+
+    The command register addresses should never be read from. Doing so may place
+    the baud rate generator into a test mode which drives the parallel outputs with
+    internal counters and causes serial ports to operate at uncontrollable rates.
 */
 
 #include "emu.h"

@@ -85,9 +85,7 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual uint32_t disasm_min_opcode_bytes() const override { return 2; }
-	virtual uint32_t disasm_max_opcode_bytes() const override { return 2; }
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
 
 	// Different cases of memory access
 	// See patent @ pg 361
@@ -181,7 +179,7 @@ protected:
 	void do_mpy();
 
 	virtual uint16_t execute_no_bpc_ioc(uint16_t opcode) override;
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
 	virtual uint32_t add_mae(aec_cases_t aec_case, uint16_t addr) override;
 	virtual uint16_t read_non_common_reg(uint16_t addr) override;
 	virtual void write_non_common_reg(uint16_t addr , uint16_t v) override;

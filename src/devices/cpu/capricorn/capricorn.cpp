@@ -7,6 +7,7 @@
 //
 #include "emu.h"
 #include "capricorn.h"
+#include "capricorn_dasm.h"
 #include "debugger.h"
 
 // Register indexes
@@ -237,10 +238,9 @@ void capricorn_cpu_device::state_string_export(const device_state_entry &entry, 
 	}
 }
 
-offs_t capricorn_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, u32 options)
+util::disasm_interface *capricorn_cpu_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE(capricorn);
-	return CPU_DISASSEMBLE_NAME(capricorn)(this, stream, pc, oprom, opram, options);
+	return new capricorn_disassembler;
 }
 
 void capricorn_cpu_device::start_mem_burst(ea_addr_t addr)

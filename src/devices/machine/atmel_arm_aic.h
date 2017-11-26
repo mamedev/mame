@@ -21,7 +21,7 @@ public:
 	arm_aic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 		device_t(mconfig, ARM_AIC, tag, owner, clock),
 		m_irq_out(*this)
-	{ 
+	{
 	}
 
 	// configuration
@@ -48,7 +48,7 @@ public:
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	
+
 private:
 	uint32_t m_irqs_enabled;
 	uint32_t m_current_irq_vector;

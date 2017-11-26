@@ -109,6 +109,7 @@
 #include "emu.h"
 #include "debugger.h"
 #include "i8085.h"
+#include "8085dasm.h"
 
 #define VERBOSE 0
 #include "logmacro.h"
@@ -456,10 +457,9 @@ void i8085a_cpu_device::state_string_export(const device_state_entry &entry, std
 	}
 }
 
-offs_t i8085a_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, u32 options)
+util::disasm_interface *i8085a_cpu_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( i8085 );
-	return CPU_DISASSEMBLE_NAME(i8085)(this, stream, pc, oprom, opram, options);
+	return new i8085_disassembler;
 }
 
 

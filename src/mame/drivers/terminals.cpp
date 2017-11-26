@@ -38,30 +38,6 @@ MACHINE_CONFIG_END
 
 /**************************************************************************************************************
 
-ADDS Viewpoint 60.
-Chips: P8051, P8275, Earom ER-2055 (hard to read), 6116
-Crystals: 25.92, 10.920
-Keyboard: INS8035N-6, unknown crystal marked 48-300-010.
-
-***************************************************************************************************************/
-
-ROM_START( vp60 )
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD( "pgm.uc1",    0x0000, 0x2000, CRC(714ca569) SHA1(405424369fd5458e02c845c104b2cb386bd857d2) )
-
-	ROM_REGION(0x1000, "chargen", 0)
-	ROM_LOAD( "font.uc4",   0x0000, 0x1000, CRC(3c4d39c0) SHA1(9503c0d5a76e8073c94c86be57bcb312641f6cc4) )
-
-	ROM_REGION(0x10000, "keyboard", 0)
-	ROM_LOAD( "195.kbd",    0x0000, 0x0400, CRC(14885da3) SHA1(3b06f658af1a62b28e62d8b3a557b74169917a12) )
-ROM_END
-
-COMP( 1982, vp60, 0, 0, terminals, terminals, terminals_state, 0, "ADDS", "Viewpoint 60", MACHINE_IS_SKELETON )
-
-
-
-/**************************************************************************************************************
-
 Ann Arbor Ambassador.
 Chips: Z80A, M58725P (16k RAM), 2x SCN2651C, nvram, button-battery
 Crystals: 18.414, 6.0688

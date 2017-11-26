@@ -59,6 +59,7 @@
 
 #include "emu.h"
 #include "tms32010.h"
+#include "32010dsm.h"
 #include "debugger.h"
 
 
@@ -134,10 +135,9 @@ device_memory_interface::space_config_vector tms32010_device::memory_space_confi
 	};
 }
 
-offs_t tms32010_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *tms32010_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( tms32010 );
-	return CPU_DISASSEMBLE_NAME(tms32010)(this, stream, pc, oprom, opram, options);
+	return new tms32010_disassembler;
 }
 
 

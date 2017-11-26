@@ -63,7 +63,7 @@ SLOT_INTERFACE_START( tmc600_euro_bus_cards )
 	//SLOT_INTERFACE("tmc710", TMC710) // 5-way expander
 	//SLOT_INTERFACE("tmc720", TMC720) // 5-way expander (new model)
 	//SLOT_INTERFACE("tmce200", TMCE200) // 8 KB RAM (CMOS)
-	//SLOT_INTERFACE("tmce220", TMCE220) // 16/32 KB RAM/EPROM 
+	//SLOT_INTERFACE("tmce220", TMCE220) // 16/32 KB RAM/EPROM
 	//SLOT_INTERFACE("tmce225", TMCE225) // 16 KB RAM (CMOS)
 	//SLOT_INTERFACE("tmce250", TMCE250) // 32-way input/output
 	//SLOT_INTERFACE("tmce260", TMCE260) // RS-232

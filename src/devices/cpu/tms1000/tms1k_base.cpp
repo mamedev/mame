@@ -5,7 +5,6 @@
   TMS1000 family - base/shared
 
   TODO:
-  - fix debugger disasm view
   - INIT pin
 
 
@@ -72,7 +71,7 @@ unknown cycle: CME, SSE, SSS
 
 tms1k_base_device::tms1k_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 o_pins, u8 r_pins, u8 pc_bits, u8 byte_bits, u8 x_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data)
 	: cpu_device(mconfig, type, tag, owner, clock)
-	, m_program_config("program", ENDIANNESS_BIG, byte_bits > 8 ? 16 : 8, prgwidth, 0, program)
+	, m_program_config("program", ENDIANNESS_BIG, byte_bits > 8 ? 16 : 8, prgwidth, byte_bits > 8 ? -1 : 0, program)
 	, m_data_config("data", ENDIANNESS_BIG, 8, datawidth, 0, data)
 	, m_mpla(*this, "mpla")
 	, m_ipla(*this, "ipla")

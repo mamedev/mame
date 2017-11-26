@@ -39,6 +39,7 @@
 
 #include "emu.h"
 #include "melps4.h"
+#include "melps4d.h"
 #include "debugger.h"
 
 
@@ -470,4 +471,9 @@ void melps4_cpu_device::execute_run()
 		else
 			execute_one();
 	}
+}
+
+util::disasm_interface *melps4_cpu_device::create_disassembler()
+{
+	return new melps4_disassembler;
 }

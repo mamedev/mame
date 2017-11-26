@@ -8,6 +8,7 @@
 
 #include "emu.h"
 #include "i8089.h"
+#include "i8089_dasm.h"
 #include "i8089_channel.h"
 
 
@@ -144,13 +145,12 @@ device_memory_interface::space_config_vector i8089_device::memory_space_config()
 }
 
 //-------------------------------------------------
-//  disasm_disassemble - disassembler
+//  disassemble - disassembler
 //-------------------------------------------------
 
-offs_t i8089_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *i8089_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE(i8089);
-	return CPU_DISASSEMBLE_NAME(i8089)(this, stream, pc, oprom, opram, options);
+	return new i8089_disassembler();
 }
 
 //-------------------------------------------------

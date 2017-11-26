@@ -12,6 +12,9 @@ M37710 CPU Emulator v0.1
 
 */
 
+#include "m7700ds.h"
+
+
 /* ======================================================================== */
 /* =============================== DEFINES ================================ */
 /* ======================================================================== */
@@ -94,7 +97,7 @@ enum
 #define M37710_INTERNAL_ROM_REGION "internal"
 #define M37710_INTERNAL_ROM(_tag) (_tag ":" M37710_INTERNAL_ROM_REGION)
 
-class m37710_cpu_device : public cpu_device
+class m37710_cpu_device : public cpu_device, public m7700_disassembler::config
 {
 public:
 	DECLARE_READ8_MEMBER( m37710_internal_r );
@@ -124,9 +127,9 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual uint32_t disasm_min_opcode_bytes() const override { return 1; }
-	virtual uint32_t disasm_max_opcode_bytes() const override { return 6; }
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
+	virtual bool get_m_flag() const override;
+	virtual bool get_x_flag() const override;
 
 private:
 	address_space_config m_program_config;
