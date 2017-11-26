@@ -30,19 +30,13 @@ script:
     echo "Spinup $T_SPINUP, Estimated remaining $T_REMAINING, $T_START, $T_SPINUP" 1>&2;
     date;
     if [ $CC == 'clang' ]; then
-    timeout 10m make -j2 IGNORE_GIT=1 OVERRIDE_CXX="clang++-3.6" OVERRIDE_CC="clang-3.6" || \
-    case $? in
-    124) echo "Build exceeded timelimit" 1>&2; exit 124 ;;
-    0) ./$MAME -validate ;;
-    *) exit $? ;;
-    esac;
+    timeout 10m make -j2 IGNORE_GIT=1 OVERRIDE_CXX="clang++-3.6" OVERRIDE_CC="clang-3.6" ||
+    if [ $? == 124 ]; then echo "Build exceeded timelimit" 1>&2; exit 124; else exit $?; fi
+    ./$MAME -validate;
     else
-    timeout 10m make -j4 IGNORE_GIT=1 OVERRIDE_CC="gcc-5" OVERRIDE_CXX="g++-5" TOOLS=1 || \
-    case $? in
-    124) echo "Build exceeded timelimit" 1>&2; exit 124 ;;
-    0) ./$MAME -validate ;;
-    *) exit $? ;;
-    esac;
+    timeout 10m make -j4 IGNORE_GIT=1 OVERRIDE_CC="gcc-5" OVERRIDE_CXX="g++-5" TOOLS=1 ||
+    if [ $? == 124 ]; then echo "Build exceeded timelimit" 1>&2; exit 124; else exit $?; fi
+    ./$MAME -validate;
     fi
     elif [ $TRAVIS_OS_NAME == 'osx' ]; then
     unset LDOPTS && make -j2 OPTIMIZE=0 USE_LIBSDL=1 && ./$MAME -validate;
