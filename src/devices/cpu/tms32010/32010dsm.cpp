@@ -209,9 +209,6 @@ offs_t tms32010_disassembler::disassemble(std::ostream &stream, offs_t pc, const
 	code = opcodes.r16(pc);
 	for ( i = 0; i < int(Op.size()); i++)
 	{
-		if(pc == 0)
-			fprintf(stderr, "op=%04x mask=%04x bits=%04x %s\n", code, Op[i].mask, Op[i].bits, Op[i].fmt);
-
 		if ((code & Op[i].mask) == Op[i].bits)
 		{
 			if (op != -1)
