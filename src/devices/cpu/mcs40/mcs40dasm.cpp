@@ -62,6 +62,7 @@ u32 mcs40_disassembler::opcode_alignment() const
 
 mcs40_disassembler::mcs40_disassembler(level lvl, unsigned pcmask) : m_lvl(lvl), m_pcmask(pcmask)
 {
+	(void)m_pcmask;
 }
 
 offs_t mcs40_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)

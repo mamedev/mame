@@ -65,7 +65,6 @@ private:
 
 	int m_param1_type;
 	uint16_t m_param1;
-	uint16_t m_temppc; // this is just PPC? use generic reg?
 
 	uint8_t m_bitpos;
 	uint8_t m_flagsaffected;
