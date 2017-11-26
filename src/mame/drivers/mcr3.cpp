@@ -248,7 +248,7 @@ WRITE8_MEMBER(mcr3_state::maxrpm_op6_w)
 	        4 bits of input from OP5 are routed to a transceiver at U2, and
 	        ultimately on to the low 4 I/O pins of the ADC0844. The /EN on
 	        the transceiver is directly connected to J2-2. Note that two bits
-                get swapped in the process: OP53 = MA3 and OP54 = MA2.
+	            get swapped in the process: OP53 = MA3 and OP54 = MA2.
 
 	        In order to perform a read or a write to the ADC0844, the /RD and
 	        /WR signals are directly controlled via J2-8 and J2-7 respectively.

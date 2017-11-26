@@ -1660,7 +1660,7 @@ void arm7_cpu_device::arm7ops_0123(uint32_t insn)
 			R15--;
 		}
 	}
-	else if ((insn & 0x0ff000f0) == 0x01200030)	// BLX Rn - v5
+	else if ((insn & 0x0ff000f0) == 0x01200030) // BLX Rn - v5
 	{
 		// save link address
 		SetRegister(14, R15 + 4);

@@ -9,7 +9,7 @@ driver by Nicola Salmoria
 TODO:
 - games are currently too fast (especially noticeable with kothello screen transitions), maybe unemulated HD63484 wait state penalties?
 - minor glitch with gfx copy on shanghai stage info panel (garbage on right);
-- irq ack, shanghai and shangha2 uses it, kothello auto acks, maybe latter really runs on NMI instead 
+- irq ack, shanghai and shangha2 uses it, kothello auto acks, maybe latter really runs on NMI instead
   (vector 2 matches same pattern as shanghai games);
 - shanghai: IC37 returns bad in service mode;
 
@@ -42,7 +42,7 @@ public:
 	DECLARE_WRITE8_MEMBER(shanghai_coin_w);
 	DECLARE_PALETTE_INIT(shanghai);
 	INTERRUPT_GEN_MEMBER(half_vblank_irq);
-	
+
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
@@ -261,7 +261,7 @@ static INPUT_PORTS_START( shanghai_common )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Cancel Button")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("P2 Help Button")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	
+
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -271,11 +271,11 @@ static INPUT_PORTS_START( shanghai_common )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-INPUT_PORTS_END 
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( shanghai )
 	PORT_INCLUDE( shanghai_common )
- 
+
 	PORT_START("DSW1")
 	PORT_SERVICE_DIPLOC( 0x01, IP_ACTIVE_LOW, "SW1:8" )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Allow_Continue ) )   PORT_DIPLOCATION("SW1:7")

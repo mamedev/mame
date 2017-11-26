@@ -4,8 +4,8 @@
 
     ssbapple.c
 
-	Implementation of the SSB Apple speech card
-	Must be in slot 2 for the provided software to work!
+    Implementation of the SSB Apple speech card
+    Must be in slot 2 for the provided software to work!
 
 *********************************************************************/
 
@@ -82,7 +82,7 @@ bool a2bus_ssb_device::take_c800()
 
 uint8_t a2bus_ssb_device::read_cnxx(address_space &space, uint8_t offset)
 {
-	return 0x1f | m_tms->status_r(space, 0);	
+	return 0x1f | m_tms->status_r(space, 0);
 }
 
 void a2bus_ssb_device::write_cnxx(address_space &space, uint8_t offset, uint8_t data)

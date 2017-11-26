@@ -2283,11 +2283,11 @@ at486                           // 19?? IBM AT 486
 atvga                           // 19?? AT VGA
 at386sx                         // 19?? AT VGA 386sx
 c386sx16                        // 1990 Commodore 386SX-16
-pc30iii							// Commodore PC 30-III
-pc40iii  						// Commodore PC 40-III
-mbc28							// Sanyo MBC-28
-comportiii						// Compaq Portable III
-pcd2							// Siemens PCD-2
+pc30iii                         // Commodore PC 30-III
+pc40iii                         // Commodore PC 40-III
+mbc28                           // Sanyo MBC-28
+comportiii                      // Compaq Portable III
+pcd2                            // Siemens PCD-2
 ct386sx                         //
 ec1842                          //
 ec1849                          //
@@ -2666,7 +2666,7 @@ cshift                          // (c) 1984
 gghost                          // (c) 1984
 gimeabrk                        // (c) 1985
 grudge                          // prototype - Bally/Midway
-grudgep							//
+grudgep                         //
 hattrick                        // (c) 1984
 teamht                          //
 minigolf                        // (c) 1985
@@ -17166,18 +17166,18 @@ wndrplnt                        // (c) 1987 Data East Corporation (Japan)
 kas89                           // 1989, SFC S.R.L.
 
 @source:kaypro.cpp
-kaypro1							// Kaypro 1
-kaypro10						// Kaypro 10/83
+kaypro1                         // Kaypro 1
+kaypro10                        // Kaypro 10/83
 kaypro1084                      // Kaypro 10/84
 kaypro2x                        // Kaypro 2x
 kaypro4x                        // Kaypro 4x
-kaypro284						// Kaypro 2 - 2/84
+kaypro284                       // Kaypro 2 - 2/84
 kaypro484                       // Kaypro 4 - 4/84
 kayproiip88                     // Kaypro II - 4/83 w/plus88 board installed
 kaypro484p88                    // Kaypro 4/84 - 4/84 w/plus88 board installed
 kayproii                        // Kaypro II - 2/83
-kayproiv						// Kaypro IV - 4/83
-kaypronew2						// Kaypro new 2
+kayproiv                        // Kaypro IV - 4/83
+kaypronew2                      // Kaypro new 2
 omni2                           // Omni II
 omni4                           // Omni 4
 robie                           // Kaypro Robie

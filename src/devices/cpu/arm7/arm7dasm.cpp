@@ -220,7 +220,7 @@ static uint32_t arm7_disasm( std::ostream &stream, uint32_t pc, uint32_t opcode 
 
 		WriteBranchAddress( stream, pc, opcode, true );
 	}
-	else if( (opcode&0x0ff000f0)==0x01200030 )	// (BLX - v5)
+	else if( (opcode&0x0ff000f0)==0x01200030 )  // (BLX - v5)
 	{
 		/* BLX(2) */
 		util::stream_format( stream, "BLX" );

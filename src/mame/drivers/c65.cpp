@@ -458,7 +458,7 @@ READ8_MEMBER(c65_state::cia0_portb_r)
 WRITE8_MEMBER(c65_state::cia0_porta_w)
 {
 	m_keyb_c0_c7 = ~data;
-//	printf("%02x\n",m_keyb_c0_c7);
+//  printf("%02x\n",m_keyb_c0_c7);
 }
 
 WRITE8_MEMBER(c65_state::cia0_portb_w)

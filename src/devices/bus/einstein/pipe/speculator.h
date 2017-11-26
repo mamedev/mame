@@ -49,7 +49,7 @@ protected:
 
 private:
 	offs_t address_translate(offs_t offset);
-	
+
 	required_device<ttl74123_device> m_ic5a;
 	required_device<ttl74123_device> m_ic5b;
 	required_device<cassette_image_device> m_cassette;

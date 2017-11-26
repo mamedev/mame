@@ -397,27 +397,27 @@ READ8_MEMBER(ppking_state::ppking_f1_r)
  *
  * Ping Pong King MCU simulation
  *
- * 0x8ad = 
+ * 0x8ad =
  * 0x8f6 = IO check (must return 0x40)
- * 
+ *
  **********************************/
 
 //#include "debugger.h"
- 
+
 inline bool ppking_state::mcu_parity_check()
 {
 	int i;
 	uint8_t res = 0;
-	
+
 	for(i=0;i<8;i++)
 	{
 		if(m_mcu[0].rxd & (1 << i))
 			res++;
 	}
-	
+
 	if(res % 2)
 		return false;
-	
+
 	return true;
 }
 
@@ -442,7 +442,7 @@ inline void ppking_state::mcu_input_check()
 
 READ8_MEMBER(ppking_state::ppking_qx0_r)
 {
-	// status 
+	// status
 	if(offset == 1)
 		return 1;
 
@@ -461,11 +461,11 @@ READ8_MEMBER(ppking_state::ppking_qx0_r)
 				else
 				{
 					m_mcu[0].rxd = ((ioport("SYSTEM")->read()) & 0x9f);
-				}				
+				}
 
 				break;
 			}
-			
+
 			case 2:
 			{
 				m_mcu[0].packet_type^=1;
@@ -479,10 +479,10 @@ READ8_MEMBER(ppking_state::ppking_qx0_r)
 					m_mcu[0].rxd = ((ioport("P1")->read()) & 0x3f);
 					m_mcu[0].rxd |= ((ioport("SYSTEM")->read()) & 0x80);
 				}
-				
+
 				break;
 			}
-			
+
 			case 3:
 			{
 				m_mcu[0].packet_type^=1;
@@ -496,22 +496,22 @@ READ8_MEMBER(ppking_state::ppking_qx0_r)
 					m_mcu[0].rxd = ((ioport("P2")->read()) & 0x3f);
 					m_mcu[0].rxd |= ((ioport("SYSTEM")->read()) & 0x80);
 				}
-				
+
 				break;
 			}
 		}
-		
+
 		if(mcu_parity_check() == false)
 			m_mcu[0].rxd |= 0x40;
 	}
 
 	//printf("%04x rst %d\n",m_maincpu->pc(),m_mcu[0].rst);
-	
+
 	return m_mcu[0].rxd;
 }
 
 WRITE8_MEMBER(ppking_state::ppking_qx0_w)
-{	
+{
 	if(offset == 1)
 	{
 		switch(data)
@@ -580,10 +580,10 @@ READ8_MEMBER(ppking_state::ppking_qx1_r)
 	// status
 	if(offset == 1)
 		return 1;
-	
+
 	if(m_mcu[1].rst == 1)
 		return 0x40;
-	
+
 	return m_soundlatch2->read(space,0);
 }
 
@@ -591,7 +591,7 @@ READ8_MEMBER(ppking_state::ppking_qx3_r)
 {
 	if(offset == 1)
 		return 1;
-	
+
 	return 0;
 }
 
@@ -602,7 +602,7 @@ READ8_MEMBER(ppking_state::ppking_qxcomu_r)
 {
 	if(offset == 1)
 		return 1;
-	
+
 	return 0;
 }
 
@@ -612,7 +612,7 @@ WRITE8_MEMBER(ppking_state::ppking_qxcomu_w)
 }
 
 MACHINE_RESET_MEMBER(ppking_state, ppking)
-{	
+{
 	// yes, it expects to read DSW1 without sending commands first ...
 	m_mcu[0].rxd = (ioport("DSW1")->read() & 0x1f) << 2;;
 	m_mcu[0].rst = 0;
@@ -640,7 +640,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( ppking_cpu1_io, AS_IO, 8, ppking_state )
 //  ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xc000, 0xc007) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
-//	AM_RANGE(0xc004, 0xc004) AM_NOP // WRITE(ppking_irq_patch_w)
+//  AM_RANGE(0xc004, 0xc004) AM_NOP // WRITE(ppking_irq_patch_w)
 	AM_RANGE(0xc09e, 0xc09f) AM_READ(ppking_qx0_r) AM_WRITE(ppking_qx0_w)
 	AM_RANGE(0xc0bf, 0xc0bf) AM_NOP // watchdog
 	AM_RANGE(0xc0c0, 0xc0c1) AM_READ(ppking_qxcomu_r) AM_WRITE(ppking_qxcomu_w)
@@ -708,9 +708,9 @@ static INPUT_PORTS_START( ppking )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_8WAY
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )  PORT_8WAY
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 ) 
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 )
 	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNUSED )
-	
+
 	PORT_START("P2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_8WAY PORT_PLAYER(2)
@@ -734,7 +734,7 @@ static INPUT_PORTS_START( ppking )
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
 	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(2)
-	
+
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW1:7,6")
 	PORT_DIPSETTING(    0x03, DEF_STR( Easy ) )
@@ -749,7 +749,7 @@ static INPUT_PORTS_START( ppking )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( No ) )
 	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_UNUSED )
-	
+
 	PORT_START("DSW2")
 	// TODO: coinage not working (controlled by MCU)
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW2:8,7")
@@ -766,7 +766,7 @@ static INPUT_PORTS_START( ppking )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Cocktail ) )
 	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_UNUSED )
-	
+
 	PORT_START("DSW3")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Free_Play ) ) PORT_DIPLOCATION("SW3:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
@@ -956,19 +956,19 @@ static MACHINE_CONFIG_START( ppking )
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 5L on main board
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(ppking_state, spritebuffer_w))
-//	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(gladiatr_state, spritebank_w))
-//	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(MEMBANK("bank1"))
-//	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(ppking_state, nmi_mask_w))
-//	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(INPUTLINE("sub", INPUT_LINE_RESET)) // shadowed by aforementioned hack
+//  MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(gladiatr_state, spritebank_w))
+//  MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(MEMBANK("bank1"))
+//  MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(ppking_state, nmi_mask_w))
+//  MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(INPUTLINE("sub", INPUT_LINE_RESET)) // shadowed by aforementioned hack
 //  Q6 used
 	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(ppking_state, flipscreen_w))
-	
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-//	MCFG_SCREEN_REFRESH_RATE(60)
-//	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-//	MCFG_SCREEN_SIZE(32*8, 32*8)
-//	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+//  MCFG_SCREEN_REFRESH_RATE(60)
+//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+//  MCFG_SCREEN_SIZE(32*8, 32*8)
+//  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_12MHz/2,384,0,256,264,16,240) // assume same as Arkanoid
 	MCFG_SCREEN_UPDATE_DRIVER(ppking_state, screen_update_ppking)
 	MCFG_SCREEN_PALETTE("palette")
@@ -1115,7 +1115,7 @@ ROM_START( ppking )
 	ROM_RELOAD(                 0x08000, 0x2000 )
 	ROM_LOAD( "q0_18.5m",       0x0e000, 0x2000, CRC(89ba64f8) SHA1(fa01316ea744b4277ee64d5f14cb6d7e3a949f2b) )
 	ROM_RELOAD(                 0x0c000, 0x2000 )
-	
+
 	ROM_REGION( 0x02000, "gfx1", 0 )
 	ROM_LOAD( "q0_15.1r",       0x00000, 0x2000, CRC(fbd33219) SHA1(78b9bb327ededaa818d26c41c5e8fd1c041ef142) )
 

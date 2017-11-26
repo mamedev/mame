@@ -58,7 +58,7 @@ public:
 	template <class Object> static devcb_base &set_vreg_contrast_handler(device_t &device, Object &&cb)
 	{ return downcast<k051960_device &>(device).m_vreg_contrast_handler.set_callback(std::forward<Object>(cb)); }
 
-	
+
 	// static configuration
 	static void set_k051960_callback(device_t &device, k051960_cb_delegate callback) { downcast<k051960_device &>(device).m_k051960_cb = callback; }
 	static void set_plane_order(device_t &device, int order);

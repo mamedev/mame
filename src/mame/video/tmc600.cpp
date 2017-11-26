@@ -76,7 +76,7 @@ WRITE_LINE_MEMBER( tmc600_state::prd_w )
 		case 8:
 			m_maincpu->int_w(CLEAR_LINE);
 			break;
-		
+
 		case 16:
 			m_maincpu->int_w(m_rtc_int);
 			m_blink = !m_blink;

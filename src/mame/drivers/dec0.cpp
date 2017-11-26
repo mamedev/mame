@@ -503,7 +503,7 @@ READ16_MEMBER(dec0_state::slyspy_controls_r)
 // TODO: this can be a timer access, maybe video counter returns (and used as RNG in both games)
 READ16_MEMBER(dec0_state::slyspy_protection_r)
 {
-	switch (offset<<1) 
+	switch (offset<<1)
 	{
 		/* These values are for Boulderdash, I have no idea what they do in Slyspy */
 		case 0:     return 0;
@@ -513,7 +513,7 @@ READ16_MEMBER(dec0_state::slyspy_protection_r)
 		// sly spy uses this port as RNG, for now let's do same thing as bootleg (i.e. reads 0x306028)
 		// chances are that it actually ties to the main CPU xtal instead.
 		// (reads at 6958 6696)
-		case 0xc:	return m_ram[0x2028/2] >> 8;
+		case 0xc:   return m_ram[0x2028/2] >> 8;
 	}
 
 	logerror("%04x, Unknown protection read at 30c000 %d\n", space.device().safe_pc(), offset);
@@ -688,7 +688,7 @@ READ8_MEMBER(dec0_state::slyspy_sound_state_r)
 	m_slyspy_sound_state ++;
 	m_slyspy_sound_state &= 3;
 	m_sndprotect->set_bank(m_slyspy_sound_state);
-	
+
 	// returned value doesn't matter
 	return 0xff;
 }
@@ -697,7 +697,7 @@ READ8_MEMBER(dec0_state::slyspy_sound_state_reset_r)
 {
 	m_slyspy_sound_state = 0;
 	m_sndprotect->set_bank(m_slyspy_sound_state);
-	
+
 	// returned value doesn't matter
 	return 0xff;
 }
@@ -1980,7 +1980,7 @@ static MACHINE_CONFIG_DERIVED( slyspy, dec1 )
 	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(21)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x80000)
 
-	
+
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(dec0_state, screen_update_slyspy)

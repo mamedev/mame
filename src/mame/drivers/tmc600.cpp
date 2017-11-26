@@ -88,9 +88,9 @@ Notes:
 
 /*
 
-	TODO
+    TODO
 
-	- connect expansion bus
+    - connect expansion bus
 
 */
 
@@ -260,7 +260,7 @@ static MACHINE_CONFIG_START( tmc600 )
 	MCFG_COSMAC_EF2_CALLBACK(READLINE(tmc600_state, ef2_r))
 	MCFG_COSMAC_EF3_CALLBACK(READLINE(tmc600_state, ef3_r))
 	MCFG_COSMAC_Q_CALLBACK(WRITELINE(tmc600_state, q_w))
-	MCFG_COSMAC_SC_CALLBACK(WRITE8(tmc600_state, sc_w))	
+	MCFG_COSMAC_SC_CALLBACK(WRITE8(tmc600_state, sc_w))
 
 	// sound and video hardware
 	MCFG_FRAGMENT_ADD(tmc600_video)
@@ -269,7 +269,7 @@ static MACHINE_CONFIG_START( tmc600 )
 	MCFG_DEVICE_ADD(CDP1852_KB_TAG, CDP1852, XTAL_3_57MHz/8) // clock is CDP1802 TPB
 	MCFG_CDP1852_MODE_CALLBACK(VCC)
 
- 	// address bus demux for expansion bus
+	// address bus demux for expansion bus
 	MCFG_DEVICE_ADD(CDP1852_BUS_TAG, CDP1852, 0) // clock is expansion bus TPA
 	MCFG_CDP1852_MODE_CALLBACK(GND)
 
@@ -306,8 +306,8 @@ ROM_START( tmc600s1 )
 	ROM_SYSTEM_BIOS( 0, "sb040282", "SB040282" )
 	ROMX_LOAD( "190482",    0x4000, 0x1000, NO_DUMP, ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "sbdos", "SBDOS" )
-	ROMX_LOAD( "190482_",	0x4000, 0x1000, NO_DUMP, ROM_BIOS(2) )
-	ROMX_LOAD( "190482_v",	0x5000, 0x1000, NO_DUMP, ROM_BIOS(2) )
+	ROMX_LOAD( "190482_",   0x4000, 0x1000, NO_DUMP, ROM_BIOS(2) )
+	ROMX_LOAD( "190482_v",  0x5000, 0x1000, NO_DUMP, ROM_BIOS(2) )
 
 	ROM_REGION( 0x1000, "chargen", 0 )
 	ROM_LOAD( "chargen",    0x0000, 0x1000, CRC(93f92cbf) SHA1(371156fb38fa5319c6fde537ccf14eed94e7adfb) )
@@ -323,8 +323,8 @@ ROM_START( tmc600s2 )
 	ROM_SYSTEM_BIOS( 0, "sb040282", "SB040282" )
 	ROMX_LOAD( "151182",    0x4000, 0x1000, CRC(c1a8d9d8) SHA1(4552e1f06d0e338ba7b0f1c3a20b8a51c27dafde), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "sbdos", "SBDOS" )
-	ROMX_LOAD( "151182_",	0x4000, 0x1000, NO_DUMP, ROM_BIOS(2) )
-	ROMX_LOAD( "151182_v",	0x5000, 0x1000, NO_DUMP, ROM_BIOS(2) )
+	ROMX_LOAD( "151182_",   0x4000, 0x1000, NO_DUMP, ROM_BIOS(2) )
+	ROMX_LOAD( "151182_v",  0x5000, 0x1000, NO_DUMP, ROM_BIOS(2) )
 
 	ROM_REGION( 0x1000, "chargen", 0 )
 	ROM_LOAD( "chargen",    0x0000, 0x1000, CRC(93f92cbf) SHA1(371156fb38fa5319c6fde537ccf14eed94e7adfb) )

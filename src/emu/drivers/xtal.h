@@ -34,7 +34,7 @@
     MAME doesn't yet support fractions in crystal frequencies. For example,
     XTAL_3_579545MHz should actually be 3579545.454545...Hz (39375000/11).
     This is no problem though: see above note about tolerance.
-    
+
     In the "Examples" column, please don't add 1000 examples, this is just
     for interest, so two or three examples is enough.
     The actual reference where the xtals are used can be found in the

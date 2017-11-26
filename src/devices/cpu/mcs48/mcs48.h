@@ -243,11 +243,11 @@ protected:
 	static const mcs48_ophandler s_opcode_table[256];
 
 	/* ROM is mapped to AS_PROGRAM */
-    uint8_t program_r(offs_t a)         { return m_program->read_byte(a); }
+	uint8_t program_r(offs_t a)         { return m_program->read_byte(a); }
 
 	/* RAM is mapped to AS_DATA */
-    uint8_t ram_r(offs_t a)             { return m_data->read_byte(a); }
-    void    ram_w(offs_t a, uint8_t v)  { m_data->write_byte(a, v); }
+	uint8_t ram_r(offs_t a)             { return m_data->read_byte(a); }
+	void    ram_w(offs_t a, uint8_t v)  { m_data->write_byte(a, v); }
 
 	/* ports are mapped to AS_IO and callbacks */
 	uint8_t ext_r(offs_t a)             { return m_io->read_byte(a); }

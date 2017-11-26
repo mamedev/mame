@@ -1195,7 +1195,7 @@ void hp85_state::prt_do_printing()
 	m_prt_busy_timer->adjust(attotime::from_msec(PRT_BUSY_MSEC));
 }
 
-#define IOP_MASK(x)	BIT_MASK<ioport_value>((x))
+#define IOP_MASK(x) BIT_MASK<ioport_value>((x))
 
 static INPUT_PORTS_START(hp85)
 	// Keyboard is arranged in a matrix of 10 rows and 8 columns. In addition there are 3 keys with

@@ -18,24 +18,24 @@ DEFINE_DEVICE_TYPE(ARM_AIC, arm_aic_device, "arm_aic", "ARM Advanced Interrupt C
 
 
 DEVICE_ADDRESS_MAP_START( regs_map, 32, arm_aic_device )
-	AM_RANGE(0x000, 0x07f) AM_READWRITE(aic_smr_r, aic_smr_w) // AIC_SMR[32] (AIC_SMR)	Source Mode Register
-	AM_RANGE(0x080, 0x0ff) AM_READWRITE(aic_svr_r, aic_svr_w) // AIC_SVR[32] (AIC_SVR)	Source Vector Register
-	AM_RANGE(0x100, 0x103) AM_READ(irq_vector_r)      // AIC_IVR	IRQ Vector Register
-	AM_RANGE(0x104, 0x107) AM_READ(firq_vector_r)     // AIC_FVR	FIQ Vector Register
-// 0x108	AIC_ISR	Interrupt Status Register
-// 0x10C	AIC_IPR	Interrupt Pending Register
-// 0x110	AIC_IMR	Interrupt Mask Register
-// 0x114	AIC_CISR	Core Interrupt Status Register
-	AM_RANGE(0x120, 0x123) AM_WRITE(aic_iecr_w) // 0x120	AIC_IECR	Interrupt Enable Command Register
-	AM_RANGE(0x124, 0x127) AM_WRITE(aic_idcr_w) // 0x124	AIC_IDCR	Interrupt Disable Command Register
-	AM_RANGE(0x128, 0x12b) AM_WRITE(aic_iccr_w) // 0x128	AIC_ICCR	Interrupt Clear Command Register
-// 0x12C	AIC_ISCR	Interrupt Set Command Register
-	AM_RANGE(0x130, 0x133) AM_WRITE(aic_eoicr_w) // 0x130	AIC_EOICR	End of Interrupt Command Register
-// 0x134	AIC_SPU	Spurious Vector Register
-// 0x138	AIC_DCR	Debug Control Register (Protect)
-// 0x140	AIC_FFER	Fast Forcing Enable Register
-// 0x144	AIC_FFDR	Fast Forcing Disable Register
-// 0x148	AIC_FFSR	Fast Forcing Status Register
+	AM_RANGE(0x000, 0x07f) AM_READWRITE(aic_smr_r, aic_smr_w) // AIC_SMR[32] (AIC_SMR)  Source Mode Register
+	AM_RANGE(0x080, 0x0ff) AM_READWRITE(aic_svr_r, aic_svr_w) // AIC_SVR[32] (AIC_SVR)  Source Vector Register
+	AM_RANGE(0x100, 0x103) AM_READ(irq_vector_r)      // AIC_IVR    IRQ Vector Register
+	AM_RANGE(0x104, 0x107) AM_READ(firq_vector_r)     // AIC_FVR    FIQ Vector Register
+// 0x108    AIC_ISR Interrupt Status Register
+// 0x10C    AIC_IPR Interrupt Pending Register
+// 0x110    AIC_IMR Interrupt Mask Register
+// 0x114    AIC_CISR    Core Interrupt Status Register
+	AM_RANGE(0x120, 0x123) AM_WRITE(aic_iecr_w) // 0x120    AIC_IECR    Interrupt Enable Command Register
+	AM_RANGE(0x124, 0x127) AM_WRITE(aic_idcr_w) // 0x124    AIC_IDCR    Interrupt Disable Command Register
+	AM_RANGE(0x128, 0x12b) AM_WRITE(aic_iccr_w) // 0x128    AIC_ICCR    Interrupt Clear Command Register
+// 0x12C    AIC_ISCR    Interrupt Set Command Register
+	AM_RANGE(0x130, 0x133) AM_WRITE(aic_eoicr_w) // 0x130   AIC_EOICR   End of Interrupt Command Register
+// 0x134    AIC_SPU Spurious Vector Register
+// 0x138    AIC_DCR Debug Control Register (Protect)
+// 0x140    AIC_FFER    Fast Forcing Enable Register
+// 0x144    AIC_FFDR    Fast Forcing Disable Register
+// 0x148    AIC_FFSR    Fast Forcing Status Register
 ADDRESS_MAP_END
 
 READ32_MEMBER(arm_aic_device::irq_vector_r)

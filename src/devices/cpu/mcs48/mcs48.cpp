@@ -8,12 +8,12 @@
     - T0 output clock
     - get rid of i/o addressmap, use devcb for mcu pins
     - add CMOS devices, 1 new opcode (01 HALT)
-	- make timer update cleaner:
-	  timer is updated on S4 while I/O happens on S5
-	  due to very bad coding, Kaypro 10 keyboard depends on being able to see T=0 before interrupt is taken
-	  right now this is implemented with a hack in the mov_a_t handler
-	  in theory it should also be possible to see the timer flag before the interrupt is taken
-	  mov_t_a should also update the T register after it's incremented
+    - make timer update cleaner:
+      timer is updated on S4 while I/O happens on S5
+      due to very bad coding, Kaypro 10 keyboard depends on being able to see T=0 before interrupt is taken
+      right now this is implemented with a hack in the mov_a_t handler
+      in theory it should also be possible to see the timer flag before the interrupt is taken
+      mov_t_a should also update the T register after it's incremented
 */
 
 /***************************************************************************

@@ -28,7 +28,7 @@ public:
 	// construction/destruction
 	a2bus_ssb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	static constexpr feature_type imperfect_features() { return feature::SOUND; }
-	
+
 	required_device<tms5220_device> m_tms;
 
 protected:
@@ -39,8 +39,8 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 	// overrides of standard a2bus slot functions
-	virtual uint8_t read_cnxx(address_space &space, uint8_t offset) override;	
-	virtual void write_cnxx(address_space &space, uint8_t offset, uint8_t data) override;	
+	virtual uint8_t read_cnxx(address_space &space, uint8_t offset) override;
+	virtual void write_cnxx(address_space &space, uint8_t offset, uint8_t data) override;
 	virtual bool take_c800() override;
 };
 

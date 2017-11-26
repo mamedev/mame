@@ -80,7 +80,7 @@ private:
 	std::unique_ptr<uint32_t[]>     m_spritebufferram; // buffered spriteram
 
 	bitmap_ind16 m_sprite_bitmap;
-	
+
 	void skip_sprite_chunk(int &palette_offset, uint32_t maskdata, int reverse);
 	void draw_sprite_pixel(const rectangle &cliprect, int palette_offset, int realx, int realy, int pal);
 	void draw_sprite_chunk(const rectangle &cliprect, int &palette_offset, int x, int realy, int sizex, int xdraw, int pal, uint32_t maskdata, uint32_t zoomx_bits, int growx, int &realxdraw, int realdraw_inc, int palette_inc);

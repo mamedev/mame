@@ -9,8 +9,8 @@
   Tech info: http://problemkaputt.de/gbatek.htm
 
   Notes:
-	Timers and DMAs 0-3 are ARM9's, 4-7 are ARM7's.
-	Interrupt registers [0] is ARM9, [1] is ARM7.
+    Timers and DMAs 0-3 are ARM9's, 4-7 are ARM7's.
+    Interrupt registers [0] is ARM9, [1] is ARM7.
 
 ***************************************************************************/
 
@@ -29,31 +29,31 @@
 #define INT_TM1_OVERFLOW        0x00000010
 #define INT_TM2_OVERFLOW        0x00000020
 #define INT_TM3_OVERFLOW        0x00000040
-#define INT_SIO                 0x00000080	// also RCNT/RTC (arm7 only)
+#define INT_SIO                 0x00000080  // also RCNT/RTC (arm7 only)
 #define INT_DMA0                0x00000100
 #define INT_DMA1                0x00000200
 #define INT_DMA2                0x00000400
 #define INT_DMA3                0x00000800
 #define INT_KEYPAD              0x00001000
-#define INT_GAMEPAK             0x00002000	// GBA slot IRQ line (never used?)
-#define INT_NA1					0x00004000  // unused
-#define INT_NA2					0x00008000  // unused
-#define INT_IPCSYNC				0x00010000
-#define INT_IPCSENDEMPTY		0x00020000
-#define INT_IPCRECVNOTEMPTY		0x00040000
-#define INT_CARDXFERCOMPLETE	0x00080000
-#define INT_CARDIREQ			0x00100000
-#define INT_GEOCMDFIFO			0x00200000	// arm9 only
-#define INT_SCREENUNFOLD		0x00400000	// arm7 only
-#define INT_SPIBUS				0x00800000  // arm7 only
-#define INT_WIFI				0x01000000  // arm7 only - also DSP on DSi
-#define INT_CAMERA				0x02000000  // DSi only
-#define INT_NA3					0x04000000
-#define INT_NA4					0x08000000
-#define INT_NEWDMA0				0x10000000  // DSi only
-#define INT_NEWDMA1				0x20000000  // DSi only
-#define INT_NEWDMA2				0x40000000  // DSi only
-#define INT_NEWDMA3				0x80000000  // DSi only
+#define INT_GAMEPAK             0x00002000  // GBA slot IRQ line (never used?)
+#define INT_NA1                 0x00004000  // unused
+#define INT_NA2                 0x00008000  // unused
+#define INT_IPCSYNC             0x00010000
+#define INT_IPCSENDEMPTY        0x00020000
+#define INT_IPCRECVNOTEMPTY     0x00040000
+#define INT_CARDXFERCOMPLETE    0x00080000
+#define INT_CARDIREQ            0x00100000
+#define INT_GEOCMDFIFO          0x00200000  // arm9 only
+#define INT_SCREENUNFOLD        0x00400000  // arm7 only
+#define INT_SPIBUS              0x00800000  // arm7 only
+#define INT_WIFI                0x01000000  // arm7 only - also DSP on DSi
+#define INT_CAMERA              0x02000000  // DSi only
+#define INT_NA3                 0x04000000
+#define INT_NA4                 0x08000000
+#define INT_NEWDMA0             0x10000000  // DSi only
+#define INT_NEWDMA1             0x20000000  // DSi only
+#define INT_NEWDMA2             0x40000000  // DSi only
+#define INT_NEWDMA3             0x80000000  // DSi only
 
 static const uint32_t timer_clks[4] = { MASTER_CLOCK, MASTER_CLOCK / 64, MASTER_CLOCK / 256, MASTER_CLOCK / 1024 };
 
@@ -84,7 +84,7 @@ READ32_MEMBER(nds_state::arm7_io_r)
 				double time, ticks;
 				int timer = (offset - TIMER_OFFSET) + 4;
 
-                printf("Read timer reg %x (PC=%x)\n", timer, space.device().safe_pc());
+				printf("Read timer reg %x (PC=%x)\n", timer, space.device().safe_pc());
 
 				// update times for
 				if (m_timer_regs[timer] & 0x800000)
@@ -213,7 +213,7 @@ WRITE32_MEMBER(nds_state::arm7_io_w)
 
 				m_timer_regs[timer] = (m_timer_regs[timer] & ~(mem_mask & 0xFFFF0000)) | (data & (mem_mask & 0xFFFF0000));
 
-                printf("%08x to timer %d (mask %08x PC %x)\n", data, timer, ~mem_mask, space.device().safe_pc());
+				printf("%08x to timer %d (mask %08x PC %x)\n", data, timer, ~mem_mask, space.device().safe_pc());
 
 				if (ACCESSING_BITS_0_15)
 				{
@@ -241,7 +241,7 @@ WRITE32_MEMBER(nds_state::arm7_io_w)
 
 					m_timer_recalc[timer] = 0;
 
-                    printf("Enabling timer %d @ %f Hz regs %08x\n", timer, final, m_timer_regs[timer]);
+					printf("Enabling timer %d @ %f Hz regs %08x\n", timer, final, m_timer_regs[timer]);
 
 					// enable the timer
 					if( !(data & 0x40000) ) // if we're not in Count-Up mode
@@ -346,7 +346,7 @@ WRITE32_MEMBER(nds_state::arm7_io_w)
 			{
 				if ((data>>8) & 0x80)
 				{
-					printf("arm7: HALT\n");	// halts the arm7 until an interrupt occurs
+					printf("arm7: HALT\n"); // halts the arm7 until an interrupt occurs
 					m_arm7->suspend(SUSPEND_REASON_HALT, 1);
 					m_arm7halted = true;
 				}
@@ -371,7 +371,7 @@ READ32_MEMBER(nds_state::arm9_io_r)
 				double time, ticks;
 				int timer = (offset - TIMER_OFFSET);
 
-                //printf("Read timer reg %x (PC=%x)\n", timer, space.device().safe_pc());
+				//printf("Read timer reg %x (PC=%x)\n", timer, space.device().safe_pc());
 
 				// update times for
 				if (m_timer_regs[timer] & 0x800000)
@@ -450,7 +450,7 @@ WRITE32_MEMBER(nds_state::arm9_io_w)
 
 				m_timer_regs[timer] = (m_timer_regs[timer] & ~(mem_mask & 0xFFFF0000)) | (data & (mem_mask & 0xFFFF0000));
 
-                printf("%x to timer %d (mask %x PC %x)\n", data, timer, ~mem_mask, space.device().safe_pc());
+				printf("%x to timer %d (mask %x PC %x)\n", data, timer, ~mem_mask, space.device().safe_pc());
 
 				if (ACCESSING_BITS_0_15)
 				{
@@ -478,7 +478,7 @@ WRITE32_MEMBER(nds_state::arm9_io_w)
 
 					m_timer_recalc[timer] = 0;
 
-                  	printf("Enabling timer %d @ %f Hz\n", timer, final);
+					printf("Enabling timer %d @ %f Hz\n", timer, final);
 
 					// enable the timer
 					if( !(data & 0x40000) ) // if we're not in Count-Up mode
@@ -513,7 +513,7 @@ WRITE32_MEMBER(nds_state::arm9_io_w)
 			break;
 
 		case VRAMCNT_A_OFFSET:
-			if (ACCESSING_BITS_0_7)	// VRAMCNT_A
+			if (ACCESSING_BITS_0_7) // VRAMCNT_A
 			{
 				m_vramcnta = data & 0xff;
 			}
@@ -532,7 +532,7 @@ WRITE32_MEMBER(nds_state::arm9_io_w)
 			break;
 
 		case WRAMCNT_OFFSET:
-			if (ACCESSING_BITS_0_7)	// VRAMCNT_E
+			if (ACCESSING_BITS_0_7) // VRAMCNT_E
 			{
 				m_vramcnte = data & 0xff;
 			}
@@ -553,7 +553,7 @@ WRITE32_MEMBER(nds_state::arm9_io_w)
 			break;
 
 		case VRAMCNT_H_OFFSET:
-			if (ACCESSING_BITS_0_7)	// VRAMCNT_H
+			if (ACCESSING_BITS_0_7) // VRAMCNT_H
 			{
 				m_vramcnth = data & 0xff;
 			}
@@ -614,7 +614,7 @@ static ADDRESS_MAP_START( nds9_wram_map, AS_PROGRAM, 32, nds_state )
 	AM_RANGE(0x0c000, 0x0ffff) AM_READWRITE(wram_second_half_r, wram_second_half_w)
 	AM_RANGE(0x10000, 0x13fff) AM_READWRITE(wram_first_half_r, wram_first_half_w)
 	AM_RANGE(0x14000, 0x17fff) AM_READWRITE(wram_first_half_r, wram_first_half_w)
-	AM_RANGE(0x18000, 0x1ffff) AM_NOP AM_WRITENOP		// probably actually open bus?  GBATEK describes as "random"
+	AM_RANGE(0x18000, 0x1ffff) AM_NOP AM_WRITENOP       // probably actually open bus?  GBATEK describes as "random"
 ADDRESS_MAP_END
 
 READ32_MEMBER(nds_state::wram_first_half_r) { return m_WRAM[offset]; }

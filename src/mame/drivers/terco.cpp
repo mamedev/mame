@@ -71,7 +71,7 @@
  * 555     - analog timer circuit
  * 6800    - 8 bit CPU
  * 6821    - PIA paralell interface
- * 6850    - ACIA serial interface 
+ * 6850    - ACIA serial interface
  * 7400    - Quad 2 input NAND gates
  * 7402    - Quad 2 input NOR gates
  * 7408    - Quad 2 input AND gates
@@ -81,15 +81,15 @@
  * 7476    - Dual JK flip flops with preset and clear
  * 7490    - Decade Counters, divide by 2 and divide by 5 outputs
  * 74116   - Dual 4-bit latches
- * 74138   - 3 to 8 line decoder/demultiplexer 
- * 74139   - Dual 2 to 4 line decoder/demultiplexer 
+ * 74138   - 3 to 8 line decoder/demultiplexer
+ * 74139   - Dual 2 to 4 line decoder/demultiplexer
  * 74154   - 4 line to 16 line decoders/multiplexers
  * 74164   - 8 bit paralell output serial shift register
  * 74174   - 6 D-type flip flops
  * 74240   - Inverted 3-state outputs
  * 74244   - Non-inverted 3-state outputs
  * AY3600  - Keyboard Controller
- * CA339   - Quad Voltage Comparators 
+ * CA339   - Quad Voltage Comparators
  * CD4050B - CMOS Hex Non-Inverting Buffer and Converter
  * CIC2414 - CMOS RAM suspects
  * DS1210  - NVRAM controller, inhibits access and supply battery power on power down
@@ -267,7 +267,7 @@ public:
 	{ }
 private:
 	required_device<m6800_cpu_device> m_maincpu;
-  //	virtual void machine_reset() override { m_maincpu->reset(); LOG("--->%s()\n", FUNCNAME); };
+  //    virtual void machine_reset() override { m_maincpu->reset(); LOG("--->%s()\n", FUNCNAME); };
 	required_device<pia6821_device> m_pia1;
 	required_device<pia6821_device> m_pia2;
 	//required_device<pia6821_device> m_pia3;

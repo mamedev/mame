@@ -1252,15 +1252,15 @@ READ32_MEMBER( arm946es_cpu_device::arm7_rt_r_callback )
 	uint8_t cpnum = (opcode & INSN_COPRO_CPNUM) >> INSN_COPRO_CPNUM_SHIFT;
 	uint32_t data = 0;
 
-    //printf("arm7946: read cpnum %d cReg %d op2 %d op3 %d (%x)\n", cpnum, cReg, op2, op3, opcode);
+	//printf("arm7946: read cpnum %d cReg %d op2 %d op3 %d (%x)\n", cpnum, cReg, op2, op3, opcode);
 	if (cpnum == 15)
 	{
 		switch( cReg )
 		{
-			case 0:	
+			case 0:
 				switch (op2)
 				{
-					case 0:	// chip ID
+					case 0: // chip ID
 						data = 0x41059461;
 						break;
 
@@ -1305,13 +1305,13 @@ WRITE32_MEMBER( arm946es_cpu_device::arm7_rt_w_callback )
 	uint8_t op3 =    opcode & INSN_COPRO_OP3;
 	uint8_t cpnum = (opcode & INSN_COPRO_CPNUM) >> INSN_COPRO_CPNUM_SHIFT;
 
-//	printf("arm7946: copro %d write %x to cReg %d op2 %d op3 %d (mask %08x)\n", cpnum, data, cReg, op2, op3, mem_mask);
+//  printf("arm7946: copro %d write %x to cReg %d op2 %d op3 %d (mask %08x)\n", cpnum, data, cReg, op2, op3, mem_mask);
 
 	if (cpnum == 15)
 	{
 		switch (cReg)
 		{
-			case 1:	// control
+			case 1: // control
 				cp15_control = data;
 				RefreshDTCM();
 				RefreshITCM();
@@ -1344,7 +1344,7 @@ WRITE32_MEMBER( arm946es_cpu_device::arm7_rt_w_callback )
 					{
 						cp15_itcm_reg = data;
 						RefreshITCM();
-					} 
+					}
 				}
 				break;
 		}
