@@ -12,6 +12,8 @@
 #include "imagedev/snapquik.h"
 #include "imagedev/cassette.h"
 #include "bus/centronics/ctronics.h"
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
 #include "machine/z80dart.h"
 #include "machine/z80ctc.h"
 #include "sound/sn76496.h"
@@ -40,6 +42,8 @@ public:
 		, m_cassette(*this, "cassette")
 		, m_centronics(*this, CENTRONICS_TAG)
 		, m_ram(*this, RAM_TAG)
+		, m_extrom(*this, "extrom")
+		, m_rompak(*this, "rompak")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -49,6 +53,8 @@ public:
 	required_device<cassette_image_device> m_cassette;
 	required_device<centronics_device> m_centronics;
 	required_device<ram_device> m_ram;
+	required_device<generic_slot_device> m_extrom;
+	required_device<generic_slot_device> m_rompak;
 
 	/* keyboard state */
 	uint8_t m_key_sense;
@@ -68,6 +74,7 @@ public:
 	int m_centronics_perror;
 	int m_centronics_select;
 
+	DECLARE_WRITE8_MEMBER(mtx_subpage_w);
 	DECLARE_WRITE8_MEMBER(mtx_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(mtx_sound_latch_w);
 	DECLARE_WRITE8_MEMBER(mtx_sense_w);
@@ -88,13 +95,16 @@ public:
 	DECLARE_READ8_MEMBER(mtx_strobe_r);
 	DECLARE_READ8_MEMBER(mtx_sound_strobe_r);
 	DECLARE_WRITE8_MEMBER(mtx_cst_w);
+	DECLARE_WRITE8_MEMBER(mtx_cst_motor_w);
 	DECLARE_READ8_MEMBER(mtx_prt_r);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_fault);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_perror);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_select);
 	void bankswitch(uint8_t data);
-	DECLARE_SNAPSHOT_LOAD_MEMBER( mtx );
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(extrom_load);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(rompak_load);
+	DECLARE_SNAPSHOT_LOAD_MEMBER(mtx);
 };
 
 #endif /* __MTX_H__ */

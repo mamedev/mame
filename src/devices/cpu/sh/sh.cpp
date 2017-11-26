@@ -3,6 +3,7 @@
 
 #include "emu.h"
 #include "sh.h"
+#include "sh_dasm.h"
 
 void sh_common_execution::device_start()
 {
@@ -2229,7 +2230,10 @@ void sh_common_execution::log_opcode_desc(drcuml_state *drcuml, const opcode_des
 			if (desclist->flags & OPFLAG_VIRTUAL_NOOP)
 				stream << "<virtual nop>";
 			else
-				DasmSH2(stream, desclist->pc, desclist->opptr.w[0]);
+			{
+				sh_disassembler sh2d(false);
+				sh2d.dasm_one(stream, desclist->pc, desclist->opptr.w[0]);
+			}
 		}
 		else
 			stream << "???";
@@ -2259,8 +2263,9 @@ void sh_common_execution::log_add_disasm_comment(drcuml_block *block, uint32_t p
 {
 	if (m_drcuml->logging())
 	{
+		sh_disassembler sh2d(false);
 		std::ostringstream stream;
-		DasmSH2(stream, pc, op);
+		sh2d.dasm_one(stream, pc, op);
 		block->append_comment("%08X: %s", pc, stream.str().c_str());
 	}
 }

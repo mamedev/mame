@@ -72,7 +72,7 @@ public:
 protected:
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	
+
 private:
 	required_shared_ptr<uint16_t> m_npvidram;
 	required_shared_ptr<uint16_t> m_npvidregs;

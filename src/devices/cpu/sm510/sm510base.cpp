@@ -12,7 +12,6 @@
 
   TODO:
   - source organiziation between files is a mess
-  - proper support for LFSR program counter in debugger
   - LCD bs pin blink mode via Y register (0.5s off, 0.5s on)
   - wake up after CEND doesn't work right
 

@@ -20,6 +20,7 @@
 
 #include "emu.h"
 #include "e0c6200.h"
+#include "e0c6200d.h"
 #include "debugger.h"
 
 
@@ -49,10 +50,9 @@ void e0c6200_cpu_device::state_string_export(const device_state_entry &entry, st
 	}
 }
 
-offs_t e0c6200_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, u32 options)
+util::disasm_interface *e0c6200_cpu_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE(e0c6200);
-	return CPU_DISASSEMBLE_NAME(e0c6200)(this, stream, pc, oprom, opram, options);
+	return new e0c6200_disassembler;
 }
 
 

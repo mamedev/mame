@@ -9,27 +9,9 @@
 */
 
 #include "emu.h"
-#include "debugger.h"
-#include "hmcs40.h"
+#include "hmcs40d.h"
 
-
-enum e_mnemonics
-{
-	mILL,
-	mLAB, mLBA, mLAY, mLASPX, mLASPY, mXAMR,
-	mLXA, mLYA, mLXI, mLYI, mIY, mDY, mAYY, mSYY, mXSP,
-	mLAM, mLBM, mXMA, mXMB, mLMAIY, mLMADY,
-	mLMIIY, mLAI, mLBI,
-	mAI, mIB, mDB, mAMC, mSMC, mAM, mDAA, mDAS, mNEGA, mCOMB, mSEC, mREC, mTC, mROTL, mROTR, mOR,
-	mMNEI, mYNEI, mANEM, mBNEM, mALEI, mALEM, mBLEM,
-	mSEM, mREM, mTM,
-	mBR, mCAL, mLPU, mTBR, mRTN,
-	mSEIE, mSEIF0, mSEIF1, mSETF, mSECF, mREIE, mREIF0, mREIF1, mRETF, mRECF, mTI0, mTI1, mTIF0, mTIF1, mTTF, mLTI, mLTA, mLAT, mRTNI,
-	mSED, mRED, mTD, mSEDD, mREDD, mLAR, mLBR, mLRA, mLRB, mP,
-	mNOP
-};
-
-static const char *const s_mnemonics[] =
+const char *const hmcs40_disassembler::s_mnemonics[] =
 {
 	"?",
 	"LAB", "LBA", "LAY", "LASPX", "LASPY", "XAMR",
@@ -46,7 +28,7 @@ static const char *const s_mnemonics[] =
 };
 
 // number of bits per opcode parameter, 99 means (XY) parameter, negative means reversed bit-order
-static const s8 s_bits[] =
+const s8 hmcs40_disassembler::s_bits[] =
 {
 	0,
 	0, 0, 0, 0, 0, 4,
@@ -62,10 +44,7 @@ static const s8 s_bits[] =
 	0
 };
 
-#define _OVER DASMFLAG_STEP_OVER
-#define _OUT  DASMFLAG_STEP_OUT
-
-static const u32 s_flags[] =
+const u32 hmcs40_disassembler::s_flags[] =
 {
 	0,
 	0, 0, 0, 0, 0, 0,
@@ -75,14 +54,13 @@ static const u32 s_flags[] =
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0,
-	0, _OVER, 0, 0, _OUT,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, _OUT,
+	0, STEP_OVER, 0, 0, STEP_OUT,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, STEP_OUT,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0
 };
 
-
-static const u8 hmcs40_mnemonic[0x400] =
+const u8 hmcs40_disassembler::hmcs40_mnemonic[0x400] =
 {
 /*  0      1      2      3      4      5      6      7      8      9      A      B      C      D      E      F  */
 	/* 0x000 */
@@ -175,9 +153,9 @@ static const u8 hmcs40_mnemonic[0x400] =
 
 
 
-CPU_DISASSEMBLE(hmcs40)
+offs_t hmcs40_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
-	u16 op = (oprom[0] | oprom[1] << 8) & 0x3ff;
+	u16 op = opcodes.r16(pc) & 0x3ff;
 	u8 instr = hmcs40_mnemonic[op];
 	s8 bits = s_bits[instr];
 
@@ -217,5 +195,43 @@ CPU_DISASSEMBLE(hmcs40)
 		}
 	}
 
-	return 1 | s_flags[instr] | DASMFLAG_SUPPORTED;
+	return 1 | s_flags[instr] | SUPPORTED;
 }
+
+u32 hmcs40_disassembler::opcode_alignment() const
+{
+	return 1;
+}
+
+u32 hmcs40_disassembler::interface_flags() const
+{
+	return NONLINEAR_PC | PAGED;
+}
+
+u32 hmcs40_disassembler::page_address_bits() const
+{
+	return 6;
+}
+
+offs_t hmcs40_disassembler::pc_linear_to_real(offs_t pc) const
+{
+	static const u8 l2r[64] = {
+		0x00, 0x01, 0x03, 0x07, 0x0f, 0x1f, 0x3f, 0x3e, 0x3d, 0x3b, 0x37, 0x2f, 0x1e, 0x3c, 0x39, 0x33,
+		0x27, 0x0e, 0x1d, 0x3a, 0x35, 0x2b, 0x16, 0x2c, 0x18, 0x30, 0x21, 0x02, 0x05, 0x0b, 0x17, 0x2e,
+		0x1c, 0x38, 0x31, 0x23, 0x06, 0x0d, 0x1b, 0x36, 0x2d, 0x1a, 0x34, 0x29, 0x12, 0x24, 0x08, 0x11,
+		0x22, 0x04, 0x09, 0x13, 0x26, 0x0c, 0x19, 0x32, 0x25, 0x0a, 0x15, 0x2a, 0x14, 0x28, 0x10, 0x20,
+	};
+	return (pc & ~0x3f) | l2r[pc & 0x3f];
+}
+
+offs_t hmcs40_disassembler::pc_real_to_linear(offs_t pc) const
+{
+	static const u8 r2l[64] = {
+		0x00, 0x01, 0x1b, 0x02, 0x31, 0x1c, 0x24, 0x03, 0x2e, 0x32, 0x39, 0x1d, 0x35, 0x25, 0x11, 0x04,
+		0x3e, 0x2f, 0x2c, 0x33, 0x3c, 0x3a, 0x16, 0x1e, 0x18, 0x36, 0x29, 0x26, 0x20, 0x12, 0x0c, 0x05,
+		0x3f, 0x1a, 0x30, 0x23, 0x2d, 0x38, 0x34, 0x10, 0x3d, 0x2b, 0x3b, 0x15, 0x17, 0x28, 0x1f, 0x0b,
+		0x19, 0x22, 0x37, 0x0f, 0x2a, 0x14, 0x27, 0x0a, 0x21, 0x0e, 0x13, 0x09, 0x0d, 0x08, 0x07, 0x06,
+	};
+	return (pc & ~0x3f) | r2l[pc & 0x3f];
+}
+

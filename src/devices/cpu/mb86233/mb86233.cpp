@@ -18,6 +18,7 @@
 #include "emu.h"
 #include "debugger.h"
 #include "mb86233.h"
+#include "mb86233d.h"
 
 
 DEFINE_DEVICE_TYPE(MB86233, mb86233_cpu_device, "mb86233", "MB86233")
@@ -46,10 +47,9 @@ device_memory_interface::space_config_vector mb86233_cpu_device::memory_space_co
 }
 
 
-offs_t mb86233_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *mb86233_cpu_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( mb86233 );
-	return CPU_DISASSEMBLE_NAME(mb86233)(this, stream, pc, oprom, opram, options);
+	return new mb86233_disassembler;
 }
 
 

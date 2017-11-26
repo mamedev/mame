@@ -10,6 +10,7 @@
 
 #include "emu.h"
 #include "scmp.h"
+#include "scmpdasm.h"
 
 #include "debugger.h"
 
@@ -54,10 +55,9 @@ ins8060_device::ins8060_device(const machine_config &mconfig, const char *tag, d
 }
 
 
-offs_t scmp_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *scmp_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( scmp );
-	return CPU_DISASSEMBLE_NAME(scmp)(this, stream, pc, oprom, opram, options);
+	return new scmp_disassembler;
 }
 
 

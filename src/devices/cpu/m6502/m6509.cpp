@@ -10,6 +10,7 @@
 
 #include "emu.h"
 #include "m6509.h"
+#include "m6509d.h"
 
 DEFINE_DEVICE_TYPE(M6509, m6509_device, "m6509", "M6509")
 
@@ -54,11 +55,10 @@ void m6509_device::state_export(const device_state_entry &entry)
 	}
 }
 
-offs_t m6509_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *m6509_device::create_disassembler()
 {
-	return disassemble_generic(stream, pc, oprom, opram, options, disasm_entries);
+	return new m6509_disassembler;
 }
-
 
 m6509_device::mi_6509_normal::mi_6509_normal(m6509_device *_base)
 {

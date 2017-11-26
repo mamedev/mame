@@ -147,6 +147,7 @@
 #include "debugger.h"
 
 #include "32xsdefs.h"
+#include "32xsdasm.h"
 
 //#define VERBOSE 1
 #include "logmacro.h"
@@ -625,8 +626,8 @@ void hyperstone_device::set_global_register(uint8_t code, uint32_t val)
 #define S_BIT                   ((OP & 0x100) >> 8)
 #define D_BIT                   ((OP & 0x200) >> 9)
 #define N_VALUE                 (((OP & 0x100) >> 4) | (OP & 0x0f))
-#define HI_N_VALUE				(0x10 | (OP & 0x0f))
-#define LO_N_VALUE				(OP & 0x0f)
+#define HI_N_VALUE              (0x10 | (OP & 0x0f))
+#define LO_N_VALUE              (OP & 0x0f)
 #define N_OP_MASK               (m_op & 0x10f)
 #define DST_CODE                ((OP & 0xf0) >> 4)
 #define SRC_CODE                (OP & 0x0f)
@@ -1349,36 +1350,13 @@ void hyperstone_device::state_string_export(const device_state_entry &entry, std
 
 
 //-------------------------------------------------
-//  disasm_min_opcode_bytes - return the length
-//  of the shortest instruction, in bytes
-//-------------------------------------------------
-
-uint32_t hyperstone_device::disasm_min_opcode_bytes() const
-{
-	return 2;
-}
-
-
-//-------------------------------------------------
-//  disasm_max_opcode_bytes - return the length
-//  of the longest instruction, in bytes
-//-------------------------------------------------
-
-uint32_t hyperstone_device::disasm_max_opcode_bytes() const
-{
-	return 6;
-}
-
-
-//-------------------------------------------------
-//  disasm_disassemble - call the disassembly
+//  disassemble - call the disassembly
 //  helper function
 //-------------------------------------------------
 
-offs_t hyperstone_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *hyperstone_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( hyperstone );
-	return dasm_hyperstone(stream, pc, oprom, GET_H, GET_FP);
+	return new hyperstone_disassembler;
 }
 
 /* Opcodes */

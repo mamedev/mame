@@ -9,10 +9,13 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
-#include "tms57002.h"
+#include "57002dsm.h"
 
-static std::string get_memadr(uint32_t opcode, char type)
+tms57002_disassembler::tms57002_disassembler()
+{
+}
+
+std::string tms57002_disassembler::get_memadr(uint32_t opcode, char type)
 {
 	std::string buf;
 
@@ -30,11 +33,15 @@ static std::string get_memadr(uint32_t opcode, char type)
 	return buf;
 }
 
+u32 tms57002_disassembler::opcode_alignment() const
+{
+	return 1;
+}
 
-CPU_DISASSEMBLE(tms57002)
+offs_t tms57002_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
 	std::streampos original_pos = stream.tellp();
-	uint32_t opcode = opram[0] | (opram[1] << 8) | (opram[2] << 16);
+	uint32_t opcode = opcodes.r32(pc);
 	uint8_t fa = opcode >> 18;
 	if(fa == 0x3f) {
 		switch((opcode >> 11) & 0x7f) { // category 3

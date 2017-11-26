@@ -328,6 +328,13 @@ MACHINE_START_MEMBER(at_state,vrom_fix)
 	membank("vrom_bank")->set_base(machine().root_device().memregion("bios")->base());
 }
 
+static MACHINE_CONFIG_START( cfg_single_1200K )
+	MCFG_DEVICE_MODIFY("fdc:0")
+	MCFG_SLOT_DEFAULT_OPTION("525hd")
+	MCFG_DEVICE_MODIFY("fdc:1")
+	MCFG_SLOT_DEFAULT_OPTION("")
+MACHINE_CONFIG_END
+
 static SLOT_INTERFACE_START( pci_devices )
 	SLOT_INTERFACE_INTERNAL("vt82c505", VT82C505)
 SLOT_INTERFACE_END
@@ -658,16 +665,32 @@ static MACHINE_CONFIG_START( ficpio2 )
 MACHINE_CONFIG_END
 
 // Compaq Portable III
-static MACHINE_CONFIG_DERIVED( comportiii, ibm5170 )
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(XTAL_48MHz / 4) 
-	MCFG_DEVICE_MODIFY(RAM_TAG)
+static MACHINE_CONFIG_START( comportiii )
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", I80286, XTAL_48MHz/4 /*12000000*/)
+	MCFG_CPU_PROGRAM_MAP(at16_map)
+	MCFG_CPU_IO_MAP(at16_io)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259_master", pic8259_device, inta_cb)
+	MCFG_80286_SHUTDOWN(DEVWRITELINE("mb", at_mb_device, shutdown))
+
+	MCFG_DEVICE_ADD("mb", AT_MB, 0)
+	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	MCFG_FRAGMENT_ADD(at_softlists)
+
+	MCFG_ISA16_SLOT_ADD("mb:isabus","board1", pc_isa16_cards, "fdc", true)
+	MCFG_SLOT_OPTION_MACHINE_CONFIG("fdc", cfg_single_1200K)
+	MCFG_ISA16_SLOT_ADD("mb:isabus","board2", pc_isa16_cards, "comat", true)
+	MCFG_ISA16_SLOT_ADD("mb:isabus","board3", pc_isa16_cards, "hdc", true)
+	MCFG_ISA16_SLOT_ADD("mb:isabus","board4", pc_isa16_cards, "cga_cportiii", true)
+	MCFG_ISA16_SLOT_ADD("mb:isabus","isa1", pc_isa16_cards, nullptr, false)
+	MCFG_ISA16_SLOT_ADD("mb:isabus","isa2", pc_isa16_cards, nullptr, false)
+
+	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_at_keyboards, STR_KBD_IBM_PC_AT_84)
+
+	/* internal ram */
+	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("640K")
 	MCFG_RAM_EXTRA_OPTIONS("1152K,1664K,2176K,2688K,4736K,6784K")
-	MCFG_DEVICE_MODIFY("isa1")
-	MCFG_DEVICE_SLOT_INTERFACE(pc_isa8_cards, "cga_m24", false)
-	MCFG_DEVICE_MODIFY("isa4")
-	MCFG_DEVICE_SLOT_INTERFACE(pc_isa16_cards, "hdc", false) 
 MACHINE_CONFIG_END
 
 //**************************************************************************
@@ -964,7 +987,7 @@ ROM_START( at486 )
 
 	ROM_SYSTEM_BIOS(8, "ficgiovt2_326", "FIC 486-GIO-VT2 3.26G")  /* 1994-07-06 */
 	ROMX_LOAD("326g1c00.awd", 0x10000, 0x10000, CRC(2e729ab5) SHA1(b713f97fa0e0b62856dab917f417f5b21020b354), ROM_BIOS(9))
-	ROM_SYSTEM_BIOS(9, "486_gio_vt2","VBS1.08H 486-GVT-2")		  /* 1995-06-19 */
+	ROM_SYSTEM_BIOS(9, "486_gio_vt2","VBS1.08H 486-GVT-2")        /* 1995-06-19 */
 	ROMX_LOAD("award_486_gio_vt2.bin", 0x10000, 0x10000, CRC(58d7c7f9) SHA1(097f15ec2bd672cb3f1763298ca802c7ff26021f), ROM_BIOS(10)) // Vobis version, Highscreen boot logo
 	ROM_SYSTEM_BIOS(10, "ficgiovt2_3276", "FIC 486-GIO-VT2 3.276") /* 1997-07-17 */
 	ROMX_LOAD("32760000.bin", 0x10000, 0x10000, CRC(ad179128) SHA1(595f67ba4a1c8eb5e118d75bf657fff3803dcf4f), ROM_BIOS(11))
@@ -1237,7 +1260,7 @@ ROM_START( comportiii )
 	ROMX_LOAD( "cpiii_87c128_106778-002.bin", 0x18001, 0x4000, CRC(c259f628) SHA1(df0ca8aaead617114fbecb4ececbd1a3bb1d5f30), ROM_SKIP(1) | ROM_BIOS(1) )
 	// ROM_LOAD( "cpiii_106436-001.bin", 0x0000, 0x1000, CRC(5acc716b) SHA(afe166ecf99136d15269e44ebf2d66317945bf9c) ) // keyboard
 	ROM_SYSTEM_BIOS(1, "109737-002", "109737-002")
-	ROMX_LOAD( "109738-002.bin", 0x10000, 0x8000, CRC(db131b8a) SHA1(6a8517a771272edf16870501fc1ed94c7555ef45), ROM_SKIP(1) | ROM_BIOS(2) )	
+	ROMX_LOAD( "109738-002.bin", 0x10000, 0x8000, CRC(db131b8a) SHA1(6a8517a771272edf16870501fc1ed94c7555ef45), ROM_SKIP(1) | ROM_BIOS(2) )
 	ROMX_LOAD( "109737-002.bin", 0x10001, 0x8000, CRC(8463cc41) SHA1(cb9801591e4a2cd13bbcc40739c9e675ba84c079), ROM_SKIP(1) | ROM_BIOS(2) )
 ROM_END
 
@@ -1286,8 +1309,8 @@ COMP ( 1990, xb42664a,  ibm5170, 0,       at386,     0,    at_state,      at,   
 COMP ( 1993, apxena1,   ibm5170, 0,       at486,     0,    at_state,      at,      "Apricot",  "Apricot XEN PC (A1 Motherboard)", MACHINE_NOT_WORKING )
 COMP ( 1993, apxenp2,   ibm5170, 0,       at486,     0,    at_state,      at,      "Apricot",  "Apricot XEN PC (P2 Motherboard)", MACHINE_NOT_WORKING )
 COMP ( 1990, c386sx16,  ibm5170, 0,       at386sx,   0,    at_state,      at,      "Commodore Business Machines", "Commodore 386SX-16", MACHINE_NOT_WORKING )
-COMP ( 1988, pc30iii,   ibm5170, 0,       pc30iii,	 0,    at_state,      at,      "Commodore Business Machines",  "PC 30-III", MACHINE_NOT_WORKING )
-COMP ( 1988, pc40iii,   ibm5170, 0,       pc40iii,	 0,    at_state,      at,      "Commodore Business Machines",  "PC 40-III", MACHINE_NOT_WORKING )
+COMP ( 1988, pc30iii,   ibm5170, 0,       pc30iii,   0,    at_state,      at,      "Commodore Business Machines",  "PC 30-III", MACHINE_NOT_WORKING )
+COMP ( 1988, pc40iii,   ibm5170, 0,       pc40iii,   0,    at_state,      at,      "Commodore Business Machines",  "PC 40-III", MACHINE_NOT_WORKING )
 COMP ( 1995, ficpio2,   ibm5170, 0,       ficpio2,   0,    at_state,      atpci,   "FIC", "486-PIO-2", MACHINE_NOT_WORKING )
 COMP ( 1985, k286i,     ibm5170, 0,       k286i,     0,    at_state,      at,      "Kaypro",   "286i", MACHINE_NOT_WORKING )
 COMP ( 1991, t2000sx,   ibm5170, 0,       at386sx,   0,    at_state,      at,      "Toshiba",  "T2000SX", MACHINE_NOT_WORKING )

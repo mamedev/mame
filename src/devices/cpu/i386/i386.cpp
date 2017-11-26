@@ -4021,11 +4021,15 @@ bool i386_device::memory_translate(int spacenum, int intention, offs_t &address)
 	return ret;
 }
 
-offs_t i386_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+int i386_device::get_mode() const
 {
-	return i386_dasm_one(stream, pc, oprom, m_sreg[CS].d ? 32 : 16);
+	return m_sreg[CS].d ? 32 : 16;
 }
 
+util::disasm_interface *i386_device::create_disassembler()
+{
+	return new i386_disassembler(this);
+}
 
 /*****************************************************************************/
 /* Intel 486 */

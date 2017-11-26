@@ -13,6 +13,7 @@
 
 #include "emu.h"
 #include "tms1000.h"
+#include "tms1k_dasm.h"
 #include "debugger.h"
 
 // TMS1000
@@ -112,10 +113,9 @@ mc141200_cpu_device::mc141200_cpu_device(const machine_config &mconfig, const ch
 MACHINE_CONFIG_END
 
 // disasm
-offs_t tms1000_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, u32 options)
+util::disasm_interface *tms1000_cpu_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE(tms1000);
-	return CPU_DISASSEMBLE_NAME(tms1000)(this, stream, pc, oprom, opram, options);
+	return new tms1000_disassembler;
 }
 
 

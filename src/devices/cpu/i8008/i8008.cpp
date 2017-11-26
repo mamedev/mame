@@ -9,6 +9,7 @@
  *****************************************************************************/
 #include "emu.h"
 #include "i8008.h"
+#include "8008dasm.h"
 #include "debugger.h"
 
 //**************************************************************************
@@ -203,34 +204,13 @@ void i8008_device::state_string_export(const device_state_entry &entry, std::str
 }
 
 //-------------------------------------------------
-//  disasm_min_opcode_bytes - return the length
-//  of the shortest instruction, in bytes
-//-------------------------------------------------
-
-uint32_t i8008_device::disasm_min_opcode_bytes() const
-{
-	return 1;
-}
-
-//-------------------------------------------------
-//  disasm_max_opcode_bytes - return the length
-//  of the longest instruction, in bytes
-//-------------------------------------------------
-
-uint32_t i8008_device::disasm_max_opcode_bytes() const
-{
-	return 3;
-}
-
-//-------------------------------------------------
-//  disasm_disassemble - call the disassembly
+//  disassemble - call the disassembly
 //  helper function
 //-------------------------------------------------
 
-offs_t i8008_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *i8008_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( i8008 );
-	return CPU_DISASSEMBLE_NAME(i8008)(this, stream, pc, oprom, opram, options);
+	return new i8008_disassembler;
 }
 
 //**************************************************************************

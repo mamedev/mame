@@ -158,9 +158,7 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual uint32_t disasm_min_opcode_bytes() const override { return 1; }
-	virtual uint32_t disasm_max_opcode_bytes() const override { return 4; }
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
 
 private:
 	address_space_config m_program_config;
@@ -202,6 +200,9 @@ private:
 	static const opcode_func s_z180ops[6][0x100];
 
 	inline void z180_mmu();
+	inline u8 RM(offs_t addr);
+	inline u8 IN(u16 port);
+	inline void OUT(u16 port, u8 value);
 	inline void RM16( offs_t addr, PAIR *r );
 	inline void WM16( offs_t addr, PAIR *r );
 	inline uint8_t ROP();

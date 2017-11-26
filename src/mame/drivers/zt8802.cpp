@@ -22,15 +22,15 @@ class zt8802_state : public driver_device
 public:
 	zt8802_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-//		, m_maincpu(*this, "maincpu")
+//      , m_maincpu(*this, "maincpu")
 	{ }
 
 private:
-//	required_device<cpu_device> m_maincpu;
+//  required_device<cpu_device> m_maincpu;
 };
 
 //static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, zt8802_state )
-//	AM_RANGE(0x80000,0xfffff) AM_ROM AM_REGION("roms", 0)
+//  AM_RANGE(0x80000,0xfffff) AM_ROM AM_REGION("roms", 0)
 //ADDRESS_MAP_END
 
 static INPUT_PORTS_START( zt8802 )

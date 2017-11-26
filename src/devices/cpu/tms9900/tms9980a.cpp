@@ -53,6 +53,7 @@
 
 #include "emu.h"
 #include "tms9980a.h"
+#include "9900dasm.h"
 
 /*
     The following defines can be set to 0 or 1 to disable or enable certain
@@ -282,20 +283,10 @@ uint32_t tms9980a_device::execute_input_lines() const
 // execute_burn = nop
 
 // device_disasm_interface overrides
-uint32_t tms9980a_device::disasm_min_opcode_bytes() const
-{
-	return 2;
-}
 
-uint32_t tms9980a_device::disasm_max_opcode_bytes() const
+util::disasm_interface *tms9980a_device::create_disassembler()
 {
-	return 6;
-}
-
-offs_t tms9980a_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
-{
-	extern CPU_DISASSEMBLE( tms9980 );
-	return CPU_DISASSEMBLE_NAME(tms9980)(this, stream, pc, oprom, opram, options);
+	return new tms9900_disassembler(TMS9980_ID);
 }
 
 DEFINE_DEVICE_TYPE(TMS9980A, tms9980a_device, "tms9980a", "TMS9980A")

@@ -207,7 +207,7 @@ READ8_MEMBER( trs80_state::trs80m4_ff_r )
 READ8_MEMBER( trs80_state::cp500_a11_flipflop_toggle )
 {
 	/* The A11 flipflop is used for enabling access to
-           the system monitor code at the EPROM address range 3800-3fff */
+	       the system monitor code at the EPROM address range 3800-3fff */
 	uint8_t *rom = memregion("maincpu")->base();
 	uint8_t *bootrom = memregion("bootrom")->base();
 	int block;

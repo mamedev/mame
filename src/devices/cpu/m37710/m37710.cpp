@@ -939,21 +939,20 @@ void m37710_cpu_device::m37710_set_irq_line(int line, int state)
 	(this->*m_set_line)(line, state);
 }
 
-/* Disassemble an instruction */
-#include "m7700ds.h"
-
-
-CPU_DISASSEMBLE( m37710 )
+bool m37710_cpu_device::get_m_flag() const
 {
-	return m7700_disassemble(stream, (pc&0xffff), pc>>16, oprom, 0, 0);
+	return FLAG_M;
 }
 
-
-offs_t m37710_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+bool m37710_cpu_device::get_x_flag() const
 {
-	return m7700_disassemble(stream, (pc&0xffff), pc>>16, oprom, FLAG_M, FLAG_X);
+	return FLAG_X;
 }
 
+util::disasm_interface *m37710_cpu_device::create_disassembler()
+{
+	return new m7700_disassembler(this);
+}
 
 void m37710_cpu_device::m37710_restore_state()
 {

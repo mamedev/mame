@@ -1273,7 +1273,7 @@ void towns_state::towns_crtc_draw_scan_layer_16(bitmap_rgb32 &bitmap,const recta
 	int linesize;
 	uint32_t scroll;
 	palette_device* pal = (layer == 0) ? m_palette16_0 : m_palette16_1;
-	
+
 	if(m_video.towns_display_page_sel != 0)
 		off = 0x20000;
 

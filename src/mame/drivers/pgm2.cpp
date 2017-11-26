@@ -40,18 +40,18 @@
     Puzzle of Ocha / Ochainu No Pazuru
 
 
-	ToDo (emulation issues):
+    ToDo (emulation issues):
 
-	Support remaining games (need IGS036 dumps)
-	Identify which regions each game was released in and either dump alt. internal ROMs for each region, or
-	  create them until that can be done.
-	RTC (integrated into the CPU with the SRAM?)
-	Memory Card system (there's an MCU on the motherboard that will need simulating or dumping somehow)
-	Verify Sprite Zoom (check exactly which pixels are doubled / missed on hardware for flipped , non-flipped cases etc.)
-	Simplify IGS036 encryption based on tables in internal roms
-	Fix ARM? bug that means Oriental Legend 2 needs a patch (might also be that it needs the card reader, and is running a
-	 codepath that would not exist in a real environment at the moment)
-	Fix Save States (is this a driver problem or an ARM core problem, they don't work unless you get through the startup tests)
+    Support remaining games (need IGS036 dumps)
+    Identify which regions each game was released in and either dump alt. internal ROMs for each region, or
+      create them until that can be done.
+    RTC (integrated into the CPU with the SRAM?)
+    Memory Card system (there's an MCU on the motherboard that will need simulating or dumping somehow)
+    Verify Sprite Zoom (check exactly which pixels are doubled / missed on hardware for flipped , non-flipped cases etc.)
+    Simplify IGS036 encryption based on tables in internal roms
+    Fix ARM? bug that means Oriental Legend 2 needs a patch (might also be that it needs the card reader, and is running a
+     codepath that would not exist in a real environment at the moment)
+    Fix Save States (is this a driver problem or an ARM core problem, they don't work unless you get through the startup tests)
 
 */
 
@@ -81,7 +81,7 @@ static ADDRESS_MAP_START( pgm2_map, AS_PROGRAM, 32, pgm2_state )
 	AM_RANGE(0x00000000, 0x00003fff) AM_ROM //AM_REGION("user1", 0x00000) // internal ROM
 
 	AM_RANGE(0x02000000, 0x0200ffff) AM_RAM AM_SHARE("sram") // 'battery ram' (in CPU?)
-	
+
 	// could be the card reader, looks a bit like a standard IGS MCU comms protocol going on here
 	AM_RANGE(0x03600000, 0x03600003) AM_WRITENOP
 	AM_RANGE(0x03620000, 0x03620003) AM_WRITENOP
@@ -103,9 +103,9 @@ static ADDRESS_MAP_START( pgm2_map, AS_PROGRAM, 32, pgm2_state )
 
 	AM_RANGE(0x30060000, 0x30063fff) AM_RAM_DEVWRITE("sp_palette", palette_device, write) AM_SHARE("sp_palette")
 
-	AM_RANGE(0x30080000, 0x30081fff) AM_RAM_DEVWRITE("bg_palette", palette_device, write) AM_SHARE("bg_palette") 
+	AM_RANGE(0x30080000, 0x30081fff) AM_RAM_DEVWRITE("bg_palette", palette_device, write) AM_SHARE("bg_palette")
 
-	AM_RANGE(0x300a0000, 0x300a07ff) AM_RAM_DEVWRITE("tx_palette", palette_device, write) AM_SHARE("tx_palette") 
+	AM_RANGE(0x300a0000, 0x300a07ff) AM_RAM_DEVWRITE("tx_palette", palette_device, write) AM_SHARE("tx_palette")
 
 	AM_RANGE(0x300c0000, 0x300c01ff) AM_RAM AM_SHARE("sp_zoom") // sprite zoom table - it uploads the same data 4x, maybe xshrink,xgrow,yshrink,ygrow or just redundant mirrors
 
@@ -121,7 +121,7 @@ static ADDRESS_MAP_START( pgm2_map, AS_PROGRAM, 32, pgm2_state )
 	// there are other 0x301200xx regs
 
 	AM_RANGE(0x40000000, 0x40000003) AM_DEVREADWRITE8("ymz774", ymz774_device, read, write, 0xffffffff)
-	
+
 	// internal to IGS036? - various other writes down here on startup too - could be other standard ATMEL peripherals like the ARM_AIC mixed with custom bits
 	AM_RANGE(0xffffec00, 0xffffec5f) AM_RAM
 	AM_RANGE(0xfffffc00, 0xfffffcff) AM_RAM // confirmed as encryption table for main program rom (see code at 3950)
@@ -133,7 +133,7 @@ static ADDRESS_MAP_START( pgm2_map, AS_PROGRAM, 32, pgm2_state )
 
 	AM_RANGE(0xfffffd28, 0xfffffd2b) AM_READNOP // often
 
-//	AM_RANGE(0xfffffa08, 0xfffffa0b) AM_WRITE(table_done_w) // after uploading encryption? table might actually send it or enable external ROM?
+//  AM_RANGE(0xfffffa08, 0xfffffa0b) AM_WRITE(table_done_w) // after uploading encryption? table might actually send it or enable external ROM?
 	AM_RANGE(0xfffffa0c, 0xfffffa0f) AM_READ(unk_startup_r)
 ADDRESS_MAP_END
 
@@ -233,7 +233,7 @@ INPUT_PORTS_END
 
 WRITE_LINE_MEMBER(pgm2_state::irq)
 {
-//	printf("irq\n");
+//  printf("irq\n");
 	if (state == ASSERT_LINE) m_maincpu->set_input_line(ARM7_IRQ_LINE, ASSERT_LINE);
 	else m_maincpu->set_input_line(ARM7_IRQ_LINE, CLEAR_LINE);
 }
@@ -382,12 +382,12 @@ static MACHINE_CONFIG_START( pgm2 )
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(pgm2_state, screen_vblank_pgm2))
 
 	MCFG_GFXDECODE_ADD("gfxdecode2", "tx_palette", pgm2_tx)
-	
+
 	MCFG_GFXDECODE_ADD("gfxdecode3", "bg_palette", pgm2_bg)
 
 	MCFG_PALETTE_ADD("sp_palette", 0x4000/4) // sprites
 	MCFG_PALETTE_FORMAT(XRGB)
-	
+
 	MCFG_PALETTE_ADD("tx_palette", 0x800/4) // text
 	MCFG_PALETTE_FORMAT(XRGB)
 
@@ -670,11 +670,11 @@ static void sprite_colour_decode(uint16_t* rom, int len)
 	for (i = 0; i < len / 2; i++)
 	{
 		rom[i] = BITSWAP16(rom[i], 15, 14, /* unused - 6bpp */
-			                       13, 12, 11,
-			                       5, 4, 3,
-			                       7, 6, /* unused - 6bpp */
-			                       10, 9, 8,  
-			                       2, 1, 0  );
+								   13, 12, 11,
+								   5, 4, 3,
+								   7, 6, /* unused - 6bpp */
+								   10, 9, 8,
+								   2, 1, 0  );
 	}
 }
 
@@ -688,7 +688,7 @@ READ32_MEMBER(pgm2_state::orleg2_speedup_r)
 	}
 	/*else
 	{
-		printf("pc is %08x\n", pc);
+	    printf("pc is %08x\n", pc);
 	}*/
 
 	return m_mainram[0x20114 / 4];
@@ -706,7 +706,7 @@ READ32_MEMBER(pgm2_state::kov2nl_speedup_r)
 	/*
 	else
 	{
-		printf("pc is %08x\n", pc);
+	    printf("pc is %08x\n", pc);
 	}
 	*/
 
@@ -731,7 +731,7 @@ DRIVER_INIT_MEMBER(pgm2_state,orleg2)
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x20020114, 0x20020117, read32_delegate(FUNC(pgm2_state::orleg2_speedup_r),this));
 
 	/* HACK!
-	   patch out an ingame assert that ends up being triggered after the 5 element / fire chariot boss due to an invalid value in R3 
+	   patch out an ingame assert that ends up being triggered after the 5 element / fire chariot boss due to an invalid value in R3
 	   todo: why does this happen? ARM core bug? is patching out the assert actually safe? game continues as normal like this, but there could be memory corruption.
 	*/
 	uint16_t* rom;
@@ -844,7 +844,7 @@ GAME( 2007, orleg2,       0,         pgm2,    pgm2, pgm2_state,     orleg2,     
 GAME( 2007, orleg2_103,   orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V103, China)", MACHINE_NOT_WORKING )
 GAME( 2007, orleg2_101,   orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V101, China)", MACHINE_NOT_WORKING )
 
-// Knights of Valour 2 New Legend 
+// Knights of Valour 2 New Legend
 GAME( 2008, kov2nl,       0,         pgm2,    pgm2, pgm2_state,     kov2nl,       ROT0, "IGS", "Knights of Valour 2 New Legend (V302, China)", MACHINE_NOT_WORKING )
 GAME( 2008, kov2nl_301,   kov2nl,    pgm2,    pgm2, pgm2_state,     kov2nl,       ROT0, "IGS", "Knights of Valour 2 New Legend (V301, China)", MACHINE_NOT_WORKING )
 GAME( 2008, kov2nl_300,   kov2nl,    pgm2,    pgm2, pgm2_state,     kov2nl,       ROT0, "IGS", "Knights of Valour 2 New Legend (V300, China)", MACHINE_NOT_WORKING ) // was dumped from a Taiwan board tho

@@ -72,6 +72,7 @@ atm.cpp
 atom.cpp
 atpci.cpp
 att4425.cpp
+att630.cpp
 attache.cpp
 aussiebyte.cpp
 avigo.cpp
@@ -362,7 +363,8 @@ mbee.cpp
 mc10.cpp
 mc1000.cpp
 mc1502.cpp
-mc80.cpp
+mc8020.cpp
+mc8030.cpp
 mcb216.cpp
 mccpm.cpp
 megadriv.cpp
@@ -734,6 +736,8 @@ vixen.cpp
 vk100.cpp
 votrpss.cpp
 votrtnt.cpp
+vp122.cpp
+vp60.cpp
 vsmilepro.cpp
 vt100.cpp
 vt220.cpp

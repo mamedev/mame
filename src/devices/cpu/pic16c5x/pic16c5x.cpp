@@ -73,6 +73,7 @@
 
 #include "emu.h"
 #include "pic16c5x.h"
+#include "16c5xdsm.h"
 #include "debugger.h"
 
 
@@ -183,10 +184,9 @@ device_memory_interface::space_config_vector pic16c5x_device::memory_space_confi
 	};
 }
 
-offs_t pic16c5x_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *pic16c5x_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( pic16c5x );
-	return CPU_DISASSEMBLE_NAME(pic16c5x)(this, stream, pc, oprom, opram, options);
+	return new pic16c5x_disassembler;
 }
 
 

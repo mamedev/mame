@@ -60,4 +60,11 @@ private:
 	bool m_drq;
 };
 
+// device type definitions - CoCo FDC
+extern const device_type COCO_FDC;
+extern const device_type COCO_FDC_V11;
+extern const device_type COCO3_HDB1;
+extern const device_type CP400_FDC;
+extern const device_type CD6809_FDC;
+
 #endif // MAME_BUS_COCO_COCO_FDC_H

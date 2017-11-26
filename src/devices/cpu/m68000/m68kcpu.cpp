@@ -31,6 +31,7 @@ static const char copyright_notice[] =
 
 #include "m68kfpu.hxx"
 #include "m68kmmu.h"
+#include "m68kdasm.h"
 
 extern void m68040_fpu_op0(m68000_base_device *m68k);
 extern void m68040_fpu_op1(m68000_base_device *m68k);
@@ -2134,80 +2135,100 @@ void m68000_base_device::init_cpu_coldfire(void)
 	define_state();
 }
 
-CPU_DISASSEMBLE( dasm_m68000 )
+util::disasm_interface *m68000_base_device::create_disassembler()
 {
-	return m68k_disassemble_raw(stream, pc, oprom, opram, M68K_CPU_TYPE_68000);
+	return new m68k_disassembler(m68k_disassembler::TYPE_68000);
 }
 
-CPU_DISASSEMBLE( dasm_m68008 )
+util::disasm_interface *m68000_device::create_disassembler()
 {
-	return m68k_disassemble_raw(stream, pc, oprom, opram, M68K_CPU_TYPE_68008);
+	return new m68k_disassembler(m68k_disassembler::TYPE_68000);
 }
 
-CPU_DISASSEMBLE( dasm_m68010 )
+util::disasm_interface *m68301_device::create_disassembler()
 {
-	return m68k_disassemble_raw(stream, pc, oprom, opram, M68K_CPU_TYPE_68010);
+	return new m68k_disassembler(m68k_disassembler::TYPE_68000);
 }
 
-CPU_DISASSEMBLE( dasm_m68020 )
+util::disasm_interface *m68008_device::create_disassembler()
 {
-	return m68k_disassemble_raw(stream, pc, oprom, opram, M68K_CPU_TYPE_68020);
+	return new m68k_disassembler(m68k_disassembler::TYPE_68008);
 }
 
-CPU_DISASSEMBLE( dasm_m68030 )
+util::disasm_interface *m68008plcc_device::create_disassembler()
 {
-	return m68k_disassemble_raw(stream, pc, oprom, opram, M68K_CPU_TYPE_68030);
+	return new m68k_disassembler(m68k_disassembler::TYPE_68008);
 }
 
-CPU_DISASSEMBLE( dasm_m68ec030 )
+util::disasm_interface *m68010_device::create_disassembler()
 {
-	return m68k_disassemble_raw(stream, pc, oprom, opram, M68K_CPU_TYPE_68EC030);
+	return new m68k_disassembler(m68k_disassembler::TYPE_68010);
 }
 
-CPU_DISASSEMBLE( dasm_m68040 )
+util::disasm_interface *m68ec020_device::create_disassembler()
 {
-	return m68k_disassemble_raw(stream, pc, oprom, opram, M68K_CPU_TYPE_68040);
+	return new m68k_disassembler(m68k_disassembler::TYPE_68020);
 }
 
-CPU_DISASSEMBLE( dasm_m68ec040 )
+util::disasm_interface *m68020_device::create_disassembler()
 {
-	return m68k_disassemble_raw(stream, pc, oprom, opram, M68K_CPU_TYPE_68EC040);
+	return new m68k_disassembler(m68k_disassembler::TYPE_68020);
 }
 
-CPU_DISASSEMBLE( dasm_m68lc040 )
+util::disasm_interface *m68020fpu_device::create_disassembler()
 {
-	return m68k_disassemble_raw(stream, pc, oprom, opram, M68K_CPU_TYPE_68LC040);
+	return new m68k_disassembler(m68k_disassembler::TYPE_68020);
 }
 
-CPU_DISASSEMBLE( dasm_fscpu32 )
+util::disasm_interface *m68020pmmu_device::create_disassembler()
 {
-	return m68k_disassemble_raw(stream, pc, oprom, opram, M68K_CPU_TYPE_FSCPU32);
+	return new m68k_disassembler(m68k_disassembler::TYPE_68020);
 }
 
-CPU_DISASSEMBLE( dasm_coldfire )
+util::disasm_interface *m68020hmmu_device::create_disassembler()
 {
-	return m68k_disassemble_raw(stream, pc, oprom, opram, M68K_CPU_TYPE_COLDFIRE);
+	return new m68k_disassembler(m68k_disassembler::TYPE_68020);
 }
 
-offs_t m68000_base_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) { return CPU_DISASSEMBLE_NAME(dasm_m68000)(this, stream, pc, oprom, opram, options); }
-offs_t m68000_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) { return CPU_DISASSEMBLE_NAME(dasm_m68000)(this, stream, pc, oprom, opram, options); }
-offs_t m68301_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) { return CPU_DISASSEMBLE_NAME(dasm_m68000)(this, stream, pc, oprom, opram, options); }
-offs_t m68008_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) { return CPU_DISASSEMBLE_NAME(dasm_m68008)(this, stream, pc, oprom, opram, options); }
-offs_t m68008plcc_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) { return CPU_DISASSEMBLE_NAME(dasm_m68008)(this, stream, pc, oprom, opram, options); }
-offs_t m68010_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) { return CPU_DISASSEMBLE_NAME(dasm_m68010)(this, stream, pc, oprom, opram, options); }
-offs_t m68ec020_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) { return CPU_DISASSEMBLE_NAME(dasm_m68020)(this, stream, pc, oprom, opram, options); }
-offs_t m68020_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) { return CPU_DISASSEMBLE_NAME(dasm_m68020)(this, stream, pc, oprom, opram, options); }
-offs_t m68020fpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) { return CPU_DISASSEMBLE_NAME(dasm_m68020)(this, stream, pc, oprom, opram, options); }
-offs_t m68020pmmu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) { return CPU_DISASSEMBLE_NAME(dasm_m68020)(this, stream, pc, oprom, opram, options); }
-offs_t m68020hmmu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) { return CPU_DISASSEMBLE_NAME(dasm_m68020)(this, stream, pc, oprom, opram, options); }
-offs_t m68ec030_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) { return CPU_DISASSEMBLE_NAME(dasm_m68ec030)(this, stream, pc, oprom, opram, options); }
-offs_t m68030_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) { return CPU_DISASSEMBLE_NAME(dasm_m68030)(this, stream, pc, oprom, opram, options); }
-offs_t m68ec040_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) { return CPU_DISASSEMBLE_NAME(dasm_m68ec040)(this, stream, pc, oprom, opram, options); }
-offs_t m68lc040_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) { return CPU_DISASSEMBLE_NAME(dasm_m68lc040)(this, stream, pc, oprom, opram, options); }
-offs_t m68040_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) { return CPU_DISASSEMBLE_NAME(dasm_m68040)(this, stream, pc, oprom, opram, options); }
-offs_t scc68070_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) { return CPU_DISASSEMBLE_NAME(dasm_m68000)(this, stream, pc, oprom, opram, options); }
-offs_t fscpu32_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) { return CPU_DISASSEMBLE_NAME(dasm_fscpu32)(this, stream, pc, oprom, opram, options); }
-offs_t mcf5206e_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) { return CPU_DISASSEMBLE_NAME(dasm_coldfire)(this, stream, pc, oprom, opram, options); }
+util::disasm_interface *m68ec030_device::create_disassembler()
+{
+	return new m68k_disassembler(m68k_disassembler::TYPE_68030);
+}
+
+util::disasm_interface *m68030_device::create_disassembler()
+{
+	return new m68k_disassembler(m68k_disassembler::TYPE_68030);
+}
+
+util::disasm_interface *m68ec040_device::create_disassembler()
+{
+	return new m68k_disassembler(m68k_disassembler::TYPE_68040);
+}
+
+util::disasm_interface *m68lc040_device::create_disassembler()
+{
+	return new m68k_disassembler(m68k_disassembler::TYPE_68040);
+}
+
+util::disasm_interface *m68040_device::create_disassembler()
+{
+	return new m68k_disassembler(m68k_disassembler::TYPE_68040);
+}
+
+util::disasm_interface *scc68070_device::create_disassembler()
+{
+	return new m68k_disassembler(m68k_disassembler::TYPE_68000);
+}
+
+util::disasm_interface *fscpu32_device::create_disassembler()
+{
+	return new m68k_disassembler(m68k_disassembler::TYPE_68340);
+}
+
+util::disasm_interface *mcf5206e_device::create_disassembler()
+{
+	return new m68k_disassembler(m68k_disassembler::TYPE_COLDFIRE);
+}
 
 
 /* Service an interrupt request and start exception processing */

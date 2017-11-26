@@ -7,24 +7,9 @@
 */
 
 #include "emu.h"
-#include "debugger.h"
-#include "ucom4.h"
+#include "ucom4d.h"
 
-
-enum e_mnemonics
-{
-	mLI, mL, mLM, mLDI, mLDZ, mS, mTAL, mTLA,
-	mX, mXI, mXD, mXM, mXMI, mXMD, mAD, mADC, mADS, mDAA, mDAS,
-	mEXL, mCLA, mCMA, mCIA, mCLC, mSTC, mTC, mINC, mDEC, mIND, mDED,
-	mRMB, mSMB, mREB, mSEB, mRPB, mSPB, mJMP, mJCP, mJPA, mCAL, mCZP, mRT, mRTS,
-	mCI, mCM, mCMB, mTAB, mCLI, mTMB, mTPA, mTPB,
-	mTIT, mIA, mIP, mOE, mOP, mOCD, mNOP,
-	mILL,
-	mTAW, mTAZ, mTHX, mTLY, mXAW, mXAZ, mXHR, mXHX, mXLS, mXLY, mXC,
-	mSFB, mRFB, mFBT, mFBF, mRAR, mINM, mDEM, mSTM, mTTM, mEI, mDI
-};
-
-static const char *const s_mnemonics[] =
+const char *const ucom4_disassembler::s_mnemonics[] =
 {
 	"LI", "L", "LM", "LDI", "LDZ", "S", "TAL", "TLA",
 	"X", "XI", "XD", "XM", "XMI", "XMD", "AD", "ADC", "ADS", "DAA", "DAS",
@@ -38,7 +23,7 @@ static const char *const s_mnemonics[] =
 };
 
 // number of bits per opcode parameter, 2 digits means opcode is 2 bytes
-static const u8 s_bits[] =
+const u8 ucom4_disassembler::s_bits[] =
 {
 	4, 0, 2, 80, 4, 0, 0, 0,
 	0, 0, 0, 2, 2, 2, 0, 0, 0, 0, 0,
@@ -51,15 +36,12 @@ static const u8 s_bits[] =
 	2, 2, 2, 2, 0, 0, 0, 80, 0, 0, 0
 };
 
-#define _OVER DASMFLAG_STEP_OVER
-#define _OUT  DASMFLAG_STEP_OUT
-
-static const u32 s_flags[] =
+const u32 ucom4_disassembler::s_flags[] =
 {
 	0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, _OVER, _OVER, _OUT, _OUT,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, STEP_OVER, STEP_OVER, STEP_OUT, STEP_OUT,
 	0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0,
 	0,
@@ -68,7 +50,7 @@ static const u32 s_flags[] =
 };
 
 
-static const u8 ucom4_mnemonic[0x100] =
+const u8 ucom4_disassembler::ucom4_mnemonic[0x100] =
 {
 	/* 0x00 */
 	mNOP, mDI, mS, mTIT, mTC, mTTM, mDAA, mTAL,
@@ -112,11 +94,31 @@ static const u8 ucom4_mnemonic[0x100] =
 };
 
 
-
-CPU_DISASSEMBLE(ucom4)
+u32 ucom4_disassembler::opcode_alignment() const
 {
-	int pos = 0;
-	u8 op = oprom[pos++];
+	return 1;
+}
+
+u32 ucom4_disassembler::interface_flags() const
+{
+	return PAGED2LEVEL;
+}
+
+u32 ucom4_disassembler::page_address_bits() const
+{
+	return 6;
+}
+
+u32 ucom4_disassembler::page2_address_bits() const
+{
+	return 2;
+}
+
+
+offs_t ucom4_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
+{
+	offs_t pos = pc;
+	u8 op = opcodes.r8(pos++);
 	u8 instr = ucom4_mnemonic[op];
 
 	util::stream_format(stream,"%-4s ", s_mnemonics[instr]);
@@ -128,7 +130,7 @@ CPU_DISASSEMBLE(ucom4)
 		u16 param = op & ((1 << (bits % 10)) - 1);
 		if (bits / 10)
 		{
-			u8 op2 = oprom[pos++];
+			u8 op2 = opcodes.r8(pos++);
 			param = (param << (bits / 10)) | (op2 & ((1 << (bits / 10)) - 1));
 			bits = (bits % 10) + (bits / 10);
 		}
@@ -148,5 +150,5 @@ CPU_DISASSEMBLE(ucom4)
 			util::stream_format(stream, "$%03X", param);
 	}
 
-	return pos | s_flags[instr] | DASMFLAG_SUPPORTED;
+	return (pos - pc) | s_flags[instr] | SUPPORTED;
 }

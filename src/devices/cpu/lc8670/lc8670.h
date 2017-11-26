@@ -115,9 +115,7 @@ protected:
 	virtual space_config_vector memory_space_config() const override;
 
 	// device_disasm_interface overrides
-	virtual uint32_t disasm_min_opcode_bytes() const override { return 1; }
-	virtual uint32_t disasm_max_opcode_bytes() const override { return 4; }
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
 
 private:
 	// helpers
@@ -142,7 +140,6 @@ private:
 	void timer0_tick(bool ext_line = false);
 	void timer1_tick();
 	void base_timer_tick();
-	static void dasm_arg(uint8_t op, char *buffer, offs_t pc, int arg, const uint8_t *oprom, int &pos);
 
 	// opcodes handlers
 	int op_nop();
@@ -240,33 +237,6 @@ private:
 	// opcodes table
 	typedef int (lc8670_cpu_device::*op_handler)();
 	static const op_handler s_opcode_table[80];
-
-	// disassembler
-	enum
-	{
-		OP_NULL,
-		OP_R8,
-		OP_R8RI,
-		OP_R16,
-		OP_RI,
-		OP_A12,
-		OP_A16,
-		OP_I8,
-		OP_B3,
-		OP_D9,
-		OP_D9B3,
-		OP_RII8
-	};
-
-	// disasm table
-	struct dasm_entry
-	{
-		const char *str;
-		uint8_t       arg1;
-		uint8_t       arg2;
-		bool        inv;
-	};
-	static const dasm_entry s_dasm_table[80];
 };
 
 DECLARE_DEVICE_TYPE(LC8670, lc8670_cpu_device)

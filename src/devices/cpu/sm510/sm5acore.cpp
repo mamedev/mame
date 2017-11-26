@@ -11,6 +11,7 @@
 
 #include "emu.h"
 #include "sm500.h"
+#include "sm510d.h"
 #include "debugger.h"
 
 
@@ -63,12 +64,10 @@ kb1013vk12_device::kb1013vk12_device(const machine_config &mconfig, const char *
 
 
 // disasm
-offs_t sm5a_device::disasm_disassemble(std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, u32 options)
+util::disasm_interface *sm5a_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE(sm5a);
-	return CPU_DISASSEMBLE_NAME(sm5a)(this, stream, pc, oprom, opram, options);
+	return new sm5a_disassembler;
 }
-
 
 
 //-------------------------------------------------

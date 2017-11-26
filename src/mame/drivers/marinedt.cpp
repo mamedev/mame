@@ -2,19 +2,19 @@
 // copyright-holders:Angelo Salese
 /*****************************************************************************************************************
 
-	Marine Date (c) 1981 Taito
+    Marine Date (c) 1981 Taito
 
     driver by Angelo Salese,
     original "wiped off due of not anymore licenseable" driver by insideoutboy.
-	
-	TODO:
-	- discrete sound
-	- imperfect colors: unused bit 2 of color prom, guesswokred sea gradient, mg16 entirely unused.
-	  also unused colors 0x10-0x1f (might be a flashing bank)
-	- collision detection isn't perfect, sometimes octopus gets stuck and dies even if moves are still available.
-	  HW collision detection isn't perfect even from the reference, presumably needs a trojan run on the real HW.
-	- ROM writes (irq mask?)
-	- Merge devices with crbaloon/bking/grchamp drivers (PC3259).
+
+    TODO:
+    - discrete sound
+    - imperfect colors: unused bit 2 of color prom, guesswokred sea gradient, mg16 entirely unused.
+      also unused colors 0x10-0x1f (might be a flashing bank)
+    - collision detection isn't perfect, sometimes octopus gets stuck and dies even if moves are still available.
+      HW collision detection isn't perfect even from the reference, presumably needs a trojan run on the real HW.
+    - ROM writes (irq mask?)
+    - Merge devices with crbaloon/bking/grchamp drivers (PC3259).
 
 *****************************************************************************************************************
 
@@ -97,7 +97,7 @@ Notes:
                                            J4 1-2, 4-5, 7-8, 10-11
 Top and Middle PCBs are plugged in with the solder-sides together.
 Lower PCB is plugged in with components facing up.
-	
+
 *****************************************************************************************************************/
 
 #include "emu.h"
@@ -132,7 +132,7 @@ public:
 	DECLARE_WRITE8_MEMBER(sfx_w);
 	DECLARE_WRITE8_MEMBER(layer_enable_w);
 	DECLARE_WRITE8_MEMBER(output_w);
-	TILE_GET_INFO_MEMBER(get_tile_info); 
+	TILE_GET_INFO_MEMBER(get_tile_info);
 
 protected:
 	// driver_device overrides
@@ -146,7 +146,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_shared_ptr<uint8_t> m_vram;
-	required_device<gfxdecode_device> m_gfxdecode; 
+	required_device<gfxdecode_device> m_gfxdecode;
 	required_ioport_array<4> m_in_track;
 
 	tilemap_t *m_tilemap;
@@ -158,12 +158,12 @@ private:
 		uint8_t y;
 		bitmap_ind16 bitmap;
 	}m_obj[2];
-	
+
 	uint8_t m_layer_en;
 	uint8_t m_in_select;
 	bool m_screen_flip;
 	uint8_t m_sea_bank;
-	
+
 	void init_seabitmap();
 	void obj_reg_w(uint8_t which,uint8_t reg, uint8_t data);
 	uint32_t obj_to_obj_collision();
@@ -184,8 +184,8 @@ void marinedt_state::init_seabitmap()
 	m_seabitmap[0] = std::make_unique<bitmap_ind16>(512, 512);
 	m_seabitmap[1] = std::make_unique<bitmap_ind16>(512, 512);
 
-	m_seabitmap[0]->fill(64, clip);	
-	m_seabitmap[1]->fill(64+32, clip);	
+	m_seabitmap[0]->fill(64, clip);
+	m_seabitmap[1]->fill(64+32, clip);
 
 	for (int y = clip.min_y; y <= clip.max_y; y++)
 	{
@@ -196,7 +196,7 @@ void marinedt_state::init_seabitmap()
 			// clamp
 			if(blue_pen > 0x5f)
 				blue_pen = 0x5f;
-			
+
 			m_seabitmap[0]->pix16(y, x) = blue_pen;
 			m_seabitmap[1]->pix16(y, x) = blue_pen+0x20;
 		}
@@ -206,18 +206,18 @@ void marinedt_state::init_seabitmap()
 void marinedt_state::video_start()
 {
 	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(marinedt_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	
-	m_tilemap->set_transparent_pen(0);
-	
-	init_seabitmap();
-	
-//	m_obj[0].bitmap = std::make_unique<bitmap_ind16>(512, 512);
-//	m_obj[1].bitmap = std::make_unique<bitmap_ind16>(512, 512);
 
-//	m_screen->register_screen_bitmap(m_seabitmap);
+	m_tilemap->set_transparent_pen(0);
+
+	init_seabitmap();
+
+//  m_obj[0].bitmap = std::make_unique<bitmap_ind16>(512, 512);
+//  m_obj[1].bitmap = std::make_unique<bitmap_ind16>(512, 512);
+
+//  m_screen->register_screen_bitmap(m_seabitmap);
 	m_screen->register_screen_bitmap(m_obj[0].bitmap);
 	m_screen->register_screen_bitmap(m_obj[1].bitmap);
-	
+
 	save_item(NAME(m_obj[0].x));
 	save_item(NAME(m_obj[0].y));
 	save_item(NAME(m_obj[0].offs));
@@ -237,12 +237,12 @@ uint32_t marinedt_state::screen_update( screen_device &screen, bitmap_ind16 &bit
 	else
 		bitmap.fill(0,cliprect);
 
-	m_tilemap->draw(screen, bitmap, cliprect, 0, 0); 
+	m_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	if(m_layer_en & 2)
-		copybitmap_trans(bitmap, m_obj[1].bitmap, 0, 0, 0, 0, cliprect, 0); 
+		copybitmap_trans(bitmap, m_obj[1].bitmap, 0, 0, 0, 0, cliprect, 0);
 	if(m_layer_en & 1)
-		copybitmap_trans(bitmap, m_obj[0].bitmap, 0, 0, 0, 0, cliprect, 0); 
+		copybitmap_trans(bitmap, m_obj[0].bitmap, 0, 0, 0, 0, cliprect, 0);
 
 	return 0;
 }
@@ -258,7 +258,7 @@ inline void marinedt_state::obj_reg_w(uint8_t which, uint8_t reg,uint8_t data)
 	rectangle visarea = m_screen->visible_area();
 	//const uint8_t base_pen;// = which == 0 ? 0x30 : 0x20;
 	gfx_element *gfx = m_gfxdecode->gfx(which+1);
-	
+
 	switch(reg)
 	{
 		case 0: m_obj[which].offs = data; break;
@@ -266,12 +266,12 @@ inline void marinedt_state::obj_reg_w(uint8_t which, uint8_t reg,uint8_t data)
 		case 1: m_obj[which].x = (data + 4) & 0xff; break;
 		case 2: m_obj[which].y = (data + 1) & 0xff; break;
 	}
-	
+
 	const uint8_t tilenum = ((m_obj[which].offs & 4) << 1) | ( (m_obj[which].offs & 0x38) >> 3);
 	const uint8_t color = (m_obj[which].offs & 3);
 	const bool fx = BIT(m_obj[which].offs,6);
 	const bool fy = BIT(m_obj[which].offs,7);
-	
+
 	//base_pen = (which == 0 ? 0x30 : 0x20) + color*4;
 	m_obj[which].bitmap.fill(0,visarea);
 	// redraw sprite in framebuffer using above
@@ -296,25 +296,25 @@ WRITE8_MEMBER(marinedt_state::bgm_w)
 WRITE8_MEMBER(marinedt_state::sfx_w)
 {
 	/*
-     x--- ---- unknown, probably ties to PC3259 pin 16 like crbaloon
- 	 --x- ---- jet sound SFX
+	 x--- ---- unknown, probably ties to PC3259 pin 16 like crbaloon
+	 --x- ---- jet sound SFX
 	 ---x ---- foam SFX
 	 ---- x--- ink SFX
 	 ---- -x-- collision SFX
 	 ---- --x- dots hit SFX
 	 ---- ---x irq mask in crbaloon, doesn't seem to apply here?
 	 */
-//	if(data & 0x7e)
-//		popmessage("%02x",data);
+//  if(data & 0x7e)
+//      popmessage("%02x",data);
 }
 
-WRITE8_MEMBER(marinedt_state::layer_enable_w) 
+WRITE8_MEMBER(marinedt_state::layer_enable_w)
 {
 	/*
 	    ---x ---- enabled when shark appears (enables red gradient on sea bitmap apparently)
-		---- x--- sea layer draw enable (disabled in test mode)
-		---- --x- obj 2 draw enable
-		---- ---x obj 1 draw enable
+	    ---- x--- sea layer draw enable (disabled in test mode)
+	    ---- --x- obj 2 draw enable
+	    ---- ---x obj 1 draw enable
 	*/
 	m_layer_en = data & 0xf;
 	m_sea_bank = (data & 0x10) >> 4;
@@ -323,12 +323,12 @@ WRITE8_MEMBER(marinedt_state::layer_enable_w)
 WRITE8_MEMBER(marinedt_state::output_w)
 {
 	/*
-		---- x--- trackball input select (x/y)
-		---- -x-- trackball player select
-		---- --x- flipscreen
-		---- ---x global coin lockout (disabled in service mode)
+	    ---- x--- trackball input select (x/y)
+	    ---- -x-- trackball player select
+	    ---- --x- flipscreen
+	    ---- ---x global coin lockout (disabled in service mode)
 	*/
-	
+
 	m_in_select = (data & 0xc) >> 2;
 	m_screen_flip = BIT(data,1);
 	flip_screen_set(!m_screen_flip);
@@ -348,19 +348,19 @@ inline uint32_t marinedt_state::obj_to_obj_collision()
 		for(int x=0;x<32;x++)
 		{
 			int resx,resy;
-			
+
 			resx = m_obj[0].x + x;
 			resy = m_obj[0].y + y;
-			
+
 			if((m_obj[0].bitmap.pix16(resy,resx) & 3) == 0)
 				continue;
-			
+
 			// return value is never read most likely
 			if(m_obj[1].bitmap.pix16(resy,resx) != 0)
 				return ((resy / 8) * 32) | (((resx / 8) - 1) & 0x1f);
 		}
 	}
-	
+
 	return 0;
 }
 
@@ -375,16 +375,16 @@ inline uint32_t marinedt_state::obj_to_layer_collision()
 		for(int x=0;x<32;x++)
 		{
 			uint16_t resx,resy;
-			
+
 			resx = m_obj[0].x + x;
 			resy = m_obj[0].y + y;
-			
+
 			if((m_obj[0].bitmap.pix16(resy,resx) & 3) == 0)
 				continue;
-			
+
 			if(!m_screen_flip)
 				resy -= 32;
-		
+
 			// TODO: non screen flip path doesn't work properly
 			if(m_tilemap->pixmap().pix16(resy,resx) != 0)
 			{
@@ -395,7 +395,7 @@ inline uint32_t marinedt_state::obj_to_layer_collision()
 			}
 		}
 	}
-	
+
 	return 0;
 }
 
@@ -414,7 +414,7 @@ READ8_MEMBER(marinedt_state::pc3259_r)
 			xo = reso & 0xf;
 			return xt|(xo<<4);
 		case 1:
-			xt = (rest & 0xf0) >> 4; 
+			xt = (rest & 0xf0) >> 4;
 			xo = (reso & 0xf0) >> 4;
 			return xt|(xo<<4);
 		case 2:
@@ -429,7 +429,7 @@ READ8_MEMBER(marinedt_state::pc3259_r)
 			return res;
 		}
 	}
-	
+
 
 	return 0;
 }
@@ -437,7 +437,7 @@ READ8_MEMBER(marinedt_state::pc3259_r)
 static ADDRESS_MAP_START( marinedt_map, AS_PROGRAM, 8, marinedt_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff) /* A15 is not decoded */
 	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_REGION("ipl",0)
-	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x0400) AM_RAM	
+	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x0400) AM_RAM
 	AM_RANGE(0x4800, 0x4bff) AM_MIRROR(0x0400) AM_RAM_WRITE(vram_w) AM_SHARE("vram")
 ADDRESS_MAP_END
 
@@ -447,11 +447,11 @@ static ADDRESS_MAP_START( marinedt_io, AS_IO, 8, marinedt_state )
 	AM_RANGE(0x01, 0x01) AM_READ(trackball_r)
 	AM_RANGE(0x02, 0x02) AM_SELECT(0xc) AM_READ(pc3259_r)
 	AM_RANGE(0x02, 0x04) AM_WRITE(obj_0_w)
-	AM_RANGE(0x03, 0x03) AM_READ_PORT("SYSTEM") 
+	AM_RANGE(0x03, 0x03) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW2")
 	AM_RANGE(0x05, 0x05) AM_WRITE(bgm_w)
 	AM_RANGE(0x06, 0x06) AM_WRITE(sfx_w)
-	AM_RANGE(0x08, 0x0b) AM_WRITE(obj_1_w) 
+	AM_RANGE(0x08, 0x0b) AM_WRITE(obj_1_w)
 	AM_RANGE(0x0d, 0x0d) AM_WRITE(layer_enable_w)
 	AM_RANGE(0x0e, 0x0e) AM_WRITENOP // watchdog
 	AM_RANGE(0x0f, 0x0f) AM_WRITE(output_w)
@@ -467,7 +467,7 @@ static INPUT_PORTS_START( marinedt )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P2 Ink Button") PORT_COCKTAIL
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_START1 )
-	
+
 	// TODO: diplocations needs to be verified
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x0f, 0x00, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SWA:4,3,2,1")
@@ -504,7 +504,7 @@ static INPUT_PORTS_START( marinedt )
 	PORT_DIPSETTING(    0x50, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(    0x60, DEF_STR( 1C_7C ) )
 	PORT_DIPSETTING(    0x70, DEF_STR( 1C_8C ) )
-	
+
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x01, 0x00, "DSWB" ) PORT_DIPLOCATION("SWB:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
@@ -512,7 +512,7 @@ static INPUT_PORTS_START( marinedt )
 	PORT_DIPNAME( 0x02, 0x00, "Disable sprite-tile collision (Cheat)" ) PORT_DIPLOCATION("SWB:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Yes ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
- 	PORT_SERVICE_DIPLOC( 0x04, IP_ACTIVE_HIGH, "SWB:3")
+	PORT_SERVICE_DIPLOC( 0x04, IP_ACTIVE_HIGH, "SWB:3")
 	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SWB:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
@@ -586,13 +586,13 @@ PALETTE_INIT_MEMBER(marinedt_state, marinedt)
 	int i;
 	int bit0, bit1, bit2;
 	int r, g, b;
-	
+
 	for (i = 0; i < 64; i++)
 	{
 		/* red component */
 		bit0 = (color_prom[i] >> 0) & 0x01;
 		bit1 = (color_prom[i] >> 1) & 0x01;
-//		bit2 = (color_prom[i] >> 2) & 0x01;
+//      bit2 = (color_prom[i] >> 2) & 0x01;
 		r = (0x55 * bit0 + 0xaa * bit1);
 
 		/* green component */
@@ -608,11 +608,11 @@ PALETTE_INIT_MEMBER(marinedt_state, marinedt)
 		// matches yellow haired siren
 		if(bit2 == 0)
 			b/=2;
-		
+
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 
-	
+
 	for (i = 0; i < 32; i++)
 	{
 		b = color_prom[i+0x60];
@@ -627,8 +627,8 @@ static MACHINE_CONFIG_START( marinedt )
 	MCFG_CPU_ADD("maincpu",Z80,MAIN_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(marinedt_map)
 	MCFG_CPU_IO_MAP(marinedt_io)
- 	MCFG_CPU_VBLANK_INT_DRIVER("screen", marinedt_state,  irq0_line_hold)
-	
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", marinedt_state,  irq0_line_hold)
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_UPDATE_DRIVER(marinedt_state, screen_update)

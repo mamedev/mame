@@ -11,6 +11,7 @@
 #include "emu.h"
 #include "debugger.h"
 #include "dsp16.h"
+#include "dsp16dis.h"
 
 //
 // TODO:
@@ -321,40 +322,15 @@ void dsp16_device::state_string_export(const device_state_entry &entry, std::str
 	}
 }
 
-
 //-------------------------------------------------
-//  disasm_min_opcode_bytes - return the length
-//  of the shortest instruction, in bytes
-//-------------------------------------------------
-
-uint32_t dsp16_device::disasm_min_opcode_bytes() const
-{
-	return 2;
-}
-
-
-//-------------------------------------------------
-//  disasm_max_opcode_bytes - return the length
-//  of the longest instruction, in bytes
-//-------------------------------------------------
-
-uint32_t dsp16_device::disasm_max_opcode_bytes() const
-{
-	return 4;
-}
-
-
-//-------------------------------------------------
-//  disasm_disassemble - call the disassembly
+//  disassemble - call the disassembly
 //  helper function
 //-------------------------------------------------
 
-offs_t dsp16_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *dsp16_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( dsp16a );
-	return CPU_DISASSEMBLE_NAME(dsp16a)(this, stream, pc, oprom, opram, options);
+	return new dsp16a_disassembler;
 }
-
 
 
 /***************************************************************************

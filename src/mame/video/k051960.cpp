@@ -38,7 +38,7 @@ memory map:
 001     W  Devastators sets bit 1, function unknown.
            Ultraman sets the register to 0x0f.
            None of the other games I tested seem to set this register to other than 0.
-		   Update: Chequered Flag sets bit 0 when background should be dimmed (palette control?)
+           Update: Chequered Flag sets bit 0 when background should be dimmed (palette control?)
 002-003 W  selects the portion of the gfx ROMs to be read.
 004     W  Aliens uses this to select the ROM bank to be read, but Punk Shot
            and TMNT don't, they use another bit of the registers above. Many
@@ -347,7 +347,7 @@ WRITE8_MEMBER( k051960_device::k051937_w )
 	}
 	else
 	{
-	//	popmessage("%04x: write %02x to 051937 address %x", space.device().safe_pc(), data, offset);
+	//  popmessage("%04x: write %02x to 051937 address %x", space.device().safe_pc(), data, offset);
 	//logerror("%04x: write %02x to unknown 051937 address %x\n", space.device().safe_pc(), data, offset);
 	}
 }

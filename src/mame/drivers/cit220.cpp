@@ -39,7 +39,7 @@ private:
 
 WRITE_LINE_MEMBER(cit220_state::sod_w)
 {
-	// controls access to memory at Exxx?
+	// probably asserts PBREQ on SCN2674 to access memory at Exxx
 }
 
 static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, cit220_state )
@@ -85,7 +85,8 @@ static MACHINE_CONFIG_START( cit220p )
 	MCFG_SCREEN_VISIBLE_AREA(0, 720-1, 0, 360-1)
 	MCFG_SCREEN_UPDATE_DEVICE("avdc", scn2674_device, screen_update)
 
-	MCFG_SCN2674_VIDEO_ADD("avdc", 4000000, INPUTLINE("maincpu", I8085_RST65_LINE))
+	MCFG_DEVICE_ADD("avdc", SCN2674, 4000000)
+	MCFG_SCN2674_INTR_CALLBACK(INPUTLINE("maincpu", I8085_RST65_LINE))
 	MCFG_SCN2674_TEXT_CHARACTER_WIDTH(8)
 	MCFG_SCN2674_GFX_CHARACTER_WIDTH(8)
 	MCFG_SCN2674_DRAW_CHARACTER_CALLBACK_OWNER(cit220_state, draw_character)

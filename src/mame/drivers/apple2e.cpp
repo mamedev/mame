@@ -80,11 +80,11 @@
         Like IIc with memory expansion, but with licensed built-in Zip Chip which
         runs the 65C02 at 4 MHz turbo speed with a small cache RAM.
 
-		The machine has an internal "Apple 3.5" drive plus a custom chip
-		named "MIG" (Multidrive Interface Glue) which helps with the control 
-		of the drive.  This gets around the fact that 1 MHz isn't 
-		sufficient to handle direct Woz-style control of a double-density 
-		3.5" drive.
+        The machine has an internal "Apple 3.5" drive plus a custom chip
+        named "MIG" (Multidrive Interface Glue) which helps with the control
+        of the drive.  This gets around the fact that 1 MHz isn't
+        sufficient to handle direct Woz-style control of a double-density
+        3.5" drive.
 
         External drive port allows IIgs-style daisy-chaining.
 
@@ -464,7 +464,7 @@ uint8_t apple2e_state::mig_r(uint16_t offset)
 	if (offset == 0x20)
 	{
 		m_migpage += 0x20;
-		m_migpage &= 0x7ff;	// make sure we wrap
+		m_migpage &= 0x7ff; // make sure we wrap
 	}
 
 	// reset MIG RAM window
@@ -489,7 +489,7 @@ void apple2e_state::mig_w(uint16_t offset, uint8_t data)
 	if (offset == 0x20)
 	{
 		m_migpage += 0x20;
-		m_migpage &= 0x7ff;	// make sure we wrap
+		m_migpage &= 0x7ff; // make sure we wrap
 	}
 
 	// reset MIG RAM window
@@ -3823,8 +3823,8 @@ static SLOT_INTERFACE_START(apple2_cards)
 //  SLOT_INTERFACE("magicmusician", A2BUS_MAGICMUSICIAN)    /* Magic Musician Card */
 	SLOT_INTERFACE("pcxport", A2BUS_PCXPORTER) /* Applied Engineering PC Transporter */
 	SLOT_INTERFACE("ssprite", A2BUS_SSPRITE)    /* Synetix SuperSprite Board */
-	SLOT_INTERFACE("ssbapple", A2BUS_SSBAPPLE)	/* SSB Apple speech board */
-	SLOT_INTERFACE("twarp", A2BUS_TRANSWARP)	/* AE TransWarp accelerator */
+	SLOT_INTERFACE("ssbapple", A2BUS_SSBAPPLE)  /* SSB Apple speech board */
+	SLOT_INTERFACE("twarp", A2BUS_TRANSWARP)    /* AE TransWarp accelerator */
 SLOT_INTERFACE_END
 
 static SLOT_INTERFACE_START(apple2eaux_cards)

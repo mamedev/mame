@@ -20,43 +20,9 @@
  */
 
 #include "emu.h"
-#include "debugger.h"
-#include "m6800.h"
+#include "6800dasm.h"
 
-enum addr_mode {
-	inh,    /* inherent */
-	rel,    /* relative */
-	imb,    /* immediate (byte) */
-	imw,    /* immediate (word) */
-	dir,    /* direct address */
-	imd,    /* HD63701YO: immediate, direct address */
-	ext,    /* extended address */
-	idx,    /* x + byte offset */
-	imx,    /* HD63701YO: immediate, x + byte offset */
-	sx1     /* HD63701YO: undocumented opcodes: byte from (s+1) */
-};
-
-enum op_names {
-	aba=0,  abx,    adca,   adcb,   adda,   addb,   addd,   aim,
-	anda,   andb,   asl,    asla,   aslb,   asld,   asr,    asra,
-	asrb,   bcc,    bcs,    beq,    bge,    bgt,    bhi,    bita,
-	bitb,   ble,    bls,    blt,    bmi,    bne,    bpl,    bra,
-	brn,    bsr,    bvc,    bvs,    cba,    clc,    cli,    clr,
-	clra,   clrb,   clv,    cmpa,   cmpb,   cmpx,   com,    coma,
-	comb,   daa,    dec,    deca,   decb,   des,    dex,    eim,
-	eora,   eorb,   ill,    inc,    inca,   incb,   ins,    inx,
-	jmp,    jsr,    lda,    ldb,    ldd,    lds,    ldx,    lsr,
-	lsra,   lsrb,   lsrd,   mul,    neg,    nega,   negb,   nop,
-	oim,    ora,    orb,    psha,   pshb,   pshx,   pula,   pulb,
-	pulx,   rol,    rola,   rolb,   ror,    rora,   rorb,   rti,
-	rts,    sba,    sbca,   sbcb,   sec,    sev,    sta,    stb,
-	_std,   sei,    sts,    stx,    suba,   subb,   subd,   swi,
-	wai,    tab,    tap,    tba,    tim,    tpa,    tst,    tsta,
-	tstb,   tsx,    txs,    asx1,   asx2,   xgdx,   addx,   adcx,
-	bitx
-};
-
-static const char *const op_name_str[] = {
+const char *const m680x_disassembler::op_name_str[] = {
 	"aba",   "abx",   "adca",  "adcb",  "adda",  "addb",  "addd",  "aim",
 	"anda",  "andb",  "asl",   "asla",  "aslb",  "asld",  "asr",   "asra",
 	"asrb",  "bcc",   "bcs",   "beq",   "bge",   "bgt",   "bhi",   "bita",
@@ -84,7 +50,7 @@ static const char *const op_name_str[] = {
  * 2    invalid opcode for 1:6800/6802/6808, 2:6801/6803, 4:HD63701
  */
 
-static const uint8_t table[0x104][3] = {
+const uint8_t m680x_disassembler::table[0x104][3] = {
 	{ill, inh,7},{nop, inh,0},{ill, inh,7},{ill, inh,7},/* 00 */
 	{lsrd,inh,1},{asld,inh,1},{tap, inh,0},{tpa, inh,0},
 	{inx, inh,0},{dex, inh,0},{clv, inh,0},{sev, inh,0},
@@ -160,20 +126,23 @@ static const uint8_t table[0x104][3] = {
 	{stx,imx,0}
 };
 
-/* some macros to keep things short */
-#define OP      oprom[0]
-#define ARG1    opram[1]
-#define ARG2    opram[2]
-#define ARGW    (opram[1]<<8) + opram[2]
-
-static unsigned Dasm680x (int subtype, std::ostream &stream, unsigned pc, const uint8_t *oprom, const uint8_t *opram)
+m680x_disassembler::m680x_disassembler(int subtype) : m_subtype(subtype)
 {
-	uint32_t flags = 0;
+}
+
+u32 m680x_disassembler::opcode_alignment() const
+{
+	return 1;
+}
+
+offs_t m680x_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
+{
+	offs_t flags = 0;
 	int invalid_mask;
-	int code = OP;
+	int code = opcodes.r8(pc);
 	uint8_t opcode, args, invalid;
 
-	switch( subtype )
+	switch( m_subtype )
 	{
 		case 6800: case 6802: case 6808: case 8105:
 			invalid_mask = 1;
@@ -186,14 +155,14 @@ static unsigned Dasm680x (int subtype, std::ostream &stream, unsigned pc, const 
 	}
 
 	/* NSC-8105 is a special case */
-	if (subtype == 8105)
+	if (m_subtype == 8105)
 	{
 		/* swap bits */
 		code = (code & 0x3c) | ((code & 0x41) << 1) | ((code & 0x82) >> 1);
 
 		/* and check for extra instruction */
-		if (code == 0xfc)  code = 0x0100;
-		if (code == 0xec)  code = 0x0101;
+		if (code == 0xfc) code = 0x0100;
+		if (code == 0xec) code = 0x0101;
 		if (code == 0x7b) code = 0x0102;
 		if (code == 0x71) code = 0x0103;
 	}
@@ -203,14 +172,14 @@ static unsigned Dasm680x (int subtype, std::ostream &stream, unsigned pc, const 
 	invalid = table[code][2];
 
 	if (opcode == bsr || opcode == jsr)
-		flags = DASMFLAG_STEP_OVER;
+		flags = STEP_OVER;
 	else if (opcode == rti || opcode == rts)
-		flags = DASMFLAG_STEP_OUT;
+		flags = STEP_OUT;
 
 	if ( invalid & invalid_mask )   /* invalid for this cpu type ? */
 	{
 		stream << "illegal";
-		return 1 | flags | DASMFLAG_SUPPORTED;
+		return 1 | flags | SUPPORTED;
 	}
 
 	util::stream_format(stream, "%-5s", op_name_str[opcode]);
@@ -218,73 +187,33 @@ static unsigned Dasm680x (int subtype, std::ostream &stream, unsigned pc, const 
 	switch( args )
 	{
 		case rel:  /* relative */
-			util::stream_format(stream, "$%04X", pc + (int8_t)ARG1 + 2);
-			return 2 | flags | DASMFLAG_SUPPORTED;
+			util::stream_format(stream, "$%04X", pc + (int8_t)params.r8(pc+1) + 2);
+			return 2 | flags | SUPPORTED;
 		case imb:  /* immediate (byte) */
-			util::stream_format(stream, "#$%02X", ARG1);
-			return 2 | flags | DASMFLAG_SUPPORTED;
+			util::stream_format(stream, "#$%02X", params.r8(pc+1));
+			return 2 | flags | SUPPORTED;
 		case imw:  /* immediate (word) */
-			util::stream_format(stream, "#$%04X", ARGW);
-			return 3 | flags | DASMFLAG_SUPPORTED;
+			util::stream_format(stream, "#$%04X", params.r16(pc+1));
+			return 3 | flags | SUPPORTED;
 		case idx:  /* indexed + byte offset */
-			util::stream_format(stream, "(x+$%02X)", ARG1);
-			return 2 | flags | DASMFLAG_SUPPORTED;
+			util::stream_format(stream, "(x+$%02X)", params.r8(pc+1));
+			return 2 | flags | SUPPORTED;
 		case imx:  /* immediate, indexed + byte offset */
-			util::stream_format(stream, "#$%02X,(x+$%02x)", ARG1, ARG2);
-			return 3 | flags | DASMFLAG_SUPPORTED;
+			util::stream_format(stream, "#$%02X,(x+$%02x)", params.r8(pc+1), params.r8(pc+2));
+			return 3 | flags | SUPPORTED;
 		case dir:  /* direct address */
-			util::stream_format(stream, "$%02X", ARG1);
-			return 2 | flags | DASMFLAG_SUPPORTED;
+			util::stream_format(stream, "$%02X", params.r8(pc+1));
+			return 2 | flags | SUPPORTED;
 		case imd:  /* immediate, direct address */
-			util::stream_format(stream, "#$%02X,$%02X", ARG1, ARG2);
-			return 3 | flags | DASMFLAG_SUPPORTED;
+			util::stream_format(stream, "#$%02X,$%02X", params.r8(pc+1), params.r8(pc+2));
+			return 3 | flags | SUPPORTED;
 		case ext:  /* extended address */
-			util::stream_format(stream, "$%04X", ARGW);
-			return 3 | flags | DASMFLAG_SUPPORTED;
+			util::stream_format(stream, "$%04X", params.r16(pc+1));
+			return 3 | flags | SUPPORTED;
 		case sx1:  /* byte from address (s + 1) */
 			util::stream_format(stream, "(s+1)");
-			return 1 | flags | DASMFLAG_SUPPORTED;
+			return 1 | flags | SUPPORTED;
 		default:
-			return 1 | flags | DASMFLAG_SUPPORTED;
+			return 1 | flags | SUPPORTED;
 	}
-}
-
-CPU_DISASSEMBLE( m6800 )
-{
-	return Dasm680x(6800,stream,pc,oprom,opram);
-}
-
-CPU_DISASSEMBLE( m6801 )
-{
-	return Dasm680x(6801,stream,pc,oprom,opram);
-}
-
-CPU_DISASSEMBLE( m6802 )
-{
-	return Dasm680x(6802,stream,pc,oprom,opram);
-}
-
-CPU_DISASSEMBLE( m6803 )
-{
-	return Dasm680x(6803,stream,pc,oprom,opram);
-}
-
-CPU_DISASSEMBLE( m6808 )
-{
-	return Dasm680x(6808,stream,pc,oprom,opram);
-}
-
-CPU_DISASSEMBLE( hd6301 )
-{
-	return Dasm680x(6301,stream,pc,oprom,opram);
-}
-
-CPU_DISASSEMBLE( hd63701 )
-{
-	return Dasm680x(63701,stream,pc,oprom,opram);
-}
-
-CPU_DISASSEMBLE( nsc8105 )
-{
-	return Dasm680x(8105,stream,pc,oprom,opram);
 }

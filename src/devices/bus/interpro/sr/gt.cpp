@@ -83,7 +83,7 @@ gt_device_base::gt_device_base(const machine_config &mconfig, device_type type, 
 
 mpcb963_device::mpcb963_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: gt_device_base(mconfig, MPCB963, tag, owner, clock)
-	, m_screen{	{ { *this, "ramdac0" }, {}, true } }
+	, m_screen{ { { *this, "ramdac0" }, {}, true } }
 {
 }
 

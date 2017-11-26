@@ -106,6 +106,7 @@
 
 #include "emu.h"
 #include "nec.h"
+#include "necdasm.h"
 #include "debugger.h"
 
 typedef uint8_t BOOLEAN;
@@ -169,10 +170,9 @@ v33a_device::v33a_device(const machine_config &mconfig, const char *tag, device_
 }
 
 
-offs_t nec_common_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *nec_common_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( nec );
-	return CPU_DISASSEMBLE_NAME(nec)(this, stream, pc, oprom, opram, options);
+	return new nec_disassembler;
 }
 
 
@@ -223,8 +223,8 @@ uint8_t nec_common_device::fetch()
 
 uint16_t nec_common_device::fetchword()
 {
-	uint16_t r = FETCH();
-	r |= (FETCH()<<8);
+	uint16_t r = fetch();
+	r |= (fetch()<<8);
 	return r;
 }
 

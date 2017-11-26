@@ -19,6 +19,7 @@
 #include "emu.h"
 #include "debugger.h"
 #include "clipper.h"
+#include "clipperd.h"
 
 #define LOG_GENERAL   (1U << 0)
 #define LOG_INTERRUPT (1U << 1)
@@ -1652,7 +1653,7 @@ inline void clipper_device::set_fp64(const u8 reg, const float64 data)
 	m_ssw |= SSW_FRD;
 }
 
-offs_t clipper_device::disasm_disassemble(std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, u32 options)
+util::disasm_interface *clipper_device::create_disassembler()
 {
-	return CPU_DISASSEMBLE_NAME(clipper)(this, stream, pc, oprom, opram, options);
+	return new clipper_disassembler;
 }

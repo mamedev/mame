@@ -110,6 +110,7 @@
 #include "emu.h"
 #include "debugger.h"
 #include "z80.h"
+#include "z80dasm.h"
 
 #define VERBOSE             0
 
@@ -3667,14 +3668,13 @@ void z80_device::state_string_export(const device_state_entry &entry, std::strin
 }
 
 //-------------------------------------------------
-//  disasm_disassemble - call the disassembly
+//  disassemble - call the disassembly
 //  helper function
 //-------------------------------------------------
 
-offs_t z80_device::disasm_disassemble( std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options )
+util::disasm_interface *z80_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( z80 );
-	return CPU_DISASSEMBLE_NAME(z80)(this, stream, pc, oprom, opram, options);
+	return new z80_disassembler;
 }
 
 

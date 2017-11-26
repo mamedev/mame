@@ -929,83 +929,14 @@ void arm7_cpu_device::execute_set_input(int irqline, int state)
 }
 
 
-offs_t arm7_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *arm7_cpu_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( arm7arm );
-	extern CPU_DISASSEMBLE( arm7thumb );
-	extern CPU_DISASSEMBLE( arm7arm_be );
-	extern CPU_DISASSEMBLE( arm7thumb_be );
+	return new arm7_disassembler(this);
+}
 
-	uint8_t fetched_op[4];
-	uint32_t op = 0;
-	int prefetch_index = get_insn_prefetch_index(pc);
-	if (prefetch_index < 0)
-	{
-		memcpy(fetched_op, oprom, 4);
-		if (T_IS_SET(m_r[eCPSR]))
-		{
-			if ( m_endian == ENDIANNESS_BIG )
-			{
-				return CPU_DISASSEMBLE_NAME(arm7thumb_be)(this, stream, pc, fetched_op, opram, options);
-			}
-			else
-			{
-				return CPU_DISASSEMBLE_NAME(arm7thumb)(this, stream, pc, fetched_op, opram, options);
-			}
-		}
-		else
-		{
-			if ( m_endian == ENDIANNESS_BIG )
-			{
-				return CPU_DISASSEMBLE_NAME(arm7arm_be)(this, stream, pc, fetched_op, opram, options);
-			}
-			else
-			{
-				return CPU_DISASSEMBLE_NAME(arm7arm)(this, stream, pc, fetched_op, opram, options);
-			}
-		}
-	}
-	else
-	{
-		op = m_insn_prefetch_buffer[prefetch_index];
-		if (T_IS_SET(m_r[eCPSR]))
-		{
-			if (m_endian == ENDIANNESS_BIG)
-			{
-				op >>= ((pc & 2) ? 0 : 16);
-				fetched_op[1] = op & 0xff;
-				fetched_op[0] = (op >> 8) & 0xff;
-				return CPU_DISASSEMBLE_NAME(arm7thumb_be)(this, stream, pc, fetched_op, opram, options);
-			}
-			else
-			{
-				op >>= ((pc & 2) ? 16 : 0);
-				fetched_op[0] = op & 0xff;
-				fetched_op[1] = (op >> 8) & 0xff;
-				return CPU_DISASSEMBLE_NAME(arm7thumb)(this, stream, pc, fetched_op, opram, options);
-			}
-		}
-		else
-		{
-			if (m_endian == ENDIANNESS_BIG)
-			{
-				fetched_op[3] = op & 0xff;
-				fetched_op[2] = (op >> 8) & 0xff;
-				fetched_op[1] = (op >> 16) & 0xff;
-				fetched_op[0] = (op >> 24) & 0xff;
-				return CPU_DISASSEMBLE_NAME(arm7arm_be)(this, stream, pc, fetched_op, opram, options);
-			}
-			else
-			{
-				fetched_op[0] = op & 0xff;
-				fetched_op[1] = (op >> 8) & 0xff;
-				fetched_op[2] = (op >> 16) & 0xff;
-				fetched_op[3] = (op >> 24) & 0xff;
-				return CPU_DISASSEMBLE_NAME(arm7arm)(this, stream, pc, fetched_op, opram, options);
-			}
-		}
-	}
-	return 0;
+bool arm7_cpu_device::get_t_flag() const
+{
+	return T_IS_SET(m_r[eCPSR]);
 }
 
 
@@ -1252,15 +1183,15 @@ READ32_MEMBER( arm946es_cpu_device::arm7_rt_r_callback )
 	uint8_t cpnum = (opcode & INSN_COPRO_CPNUM) >> INSN_COPRO_CPNUM_SHIFT;
 	uint32_t data = 0;
 
-    //printf("arm7946: read cpnum %d cReg %d op2 %d op3 %d (%x)\n", cpnum, cReg, op2, op3, opcode);
+	//printf("arm7946: read cpnum %d cReg %d op2 %d op3 %d (%x)\n", cpnum, cReg, op2, op3, opcode);
 	if (cpnum == 15)
 	{
 		switch( cReg )
 		{
-			case 0:	
+			case 0:
 				switch (op2)
 				{
-					case 0:	// chip ID
+					case 0: // chip ID
 						data = 0x41059461;
 						break;
 
@@ -1305,13 +1236,13 @@ WRITE32_MEMBER( arm946es_cpu_device::arm7_rt_w_callback )
 	uint8_t op3 =    opcode & INSN_COPRO_OP3;
 	uint8_t cpnum = (opcode & INSN_COPRO_CPNUM) >> INSN_COPRO_CPNUM_SHIFT;
 
-//	printf("arm7946: copro %d write %x to cReg %d op2 %d op3 %d (mask %08x)\n", cpnum, data, cReg, op2, op3, mem_mask);
+//  printf("arm7946: copro %d write %x to cReg %d op2 %d op3 %d (mask %08x)\n", cpnum, data, cReg, op2, op3, mem_mask);
 
 	if (cpnum == 15)
 	{
 		switch (cReg)
 		{
-			case 1:	// control
+			case 1: // control
 				cp15_control = data;
 				RefreshDTCM();
 				RefreshITCM();
@@ -1344,7 +1275,7 @@ WRITE32_MEMBER( arm946es_cpu_device::arm7_rt_w_callback )
 					{
 						cp15_itcm_reg = data;
 						RefreshITCM();
-					} 
+					}
 				}
 				break;
 		}

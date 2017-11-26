@@ -44,7 +44,7 @@ typedef uint32_t DWORD;
 
 #include "v25.h"
 #include "v25priv.h"
-#include "nec_common.h"
+#include "necdasm.h"
 
 DEFINE_DEVICE_TYPE(V25, v25_device, "v25", "V25")
 DEFINE_DEVICE_TYPE(V35, v35_device, "v35", "V35")
@@ -142,8 +142,8 @@ uint8_t v25_common_device::fetch()
 
 uint16_t v25_common_device::fetchword()
 {
-	uint16_t r = FETCH();
-	r |= (FETCH()<<8);
+	uint16_t r = fetch();
+	r |= (fetch()<<8);
 	return r;
 }
 
@@ -419,9 +419,9 @@ void v25_common_device::execute_set_input(int irqline, int state)
 	}
 }
 
-offs_t v25_common_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *v25_common_device::create_disassembler()
 {
-	return necv_dasm_one(stream, pc, oprom, m_v25v35_decryptiontable);
+	return new nec_disassembler(m_v25v35_decryptiontable);
 }
 
 void v25_common_device::device_start()
