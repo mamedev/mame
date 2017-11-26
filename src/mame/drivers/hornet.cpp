@@ -1312,12 +1312,6 @@ DRIVER_INIT_MEMBER(hornet_state,hornet_2board)
 	m_maincpu->ppc4xx_spu_set_tx_handler(write8_delegate(FUNC(hornet_state::jamma_jvs_w), this));
 }
 
-DRIVER_INIT_MEMBER(hornet_state, gradius4)
-{
-	DRIVER_INIT_CALL(hornet);
-	m_dsp->enable_recompiler();
-}
-
 DRIVER_INIT_MEMBER(hornet_state, nbapbp)
 {
 	DRIVER_INIT_CALL(hornet);
@@ -1591,7 +1585,7 @@ ROM_END
 
 /*************************************************************************/
 
-GAME(  1998, gradius4,  0,        hornet,           hornet,  hornet_state, gradius4,      ROT0, "Konami", "Gradius IV: Fukkatsu (ver JAC)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME(  1998, gradius4,  0,        hornet,           hornet,  hornet_state, hornet,        ROT0, "Konami", "Gradius IV: Fukkatsu (ver JAC)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME(  1998, nbapbp,    0,        hornet,           hornet,  hornet_state, nbapbp,        ROT0, "Konami", "NBA Play By Play (ver JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME(  1998, nbapbpa,   nbapbp,   hornet,           hornet,  hornet_state, nbapbp,        ROT0, "Konami", "NBA Play By Play (ver AAB)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME(  1998, terabrst,  0,        terabrst,         hornet,  hornet_state, terabrst,      ROT0, "Konami", "Teraburst (1998/07/17 ver UEL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
