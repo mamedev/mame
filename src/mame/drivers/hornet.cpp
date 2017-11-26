@@ -1351,7 +1351,6 @@ ROM_START(sscope)
 	ROM_LOAD( "830a10.14p", 0x400000, 0x400000, CRC(8b8aaf7e) SHA1(49b694dc171c149056b87c15410a6bf37ff2987f) )
 
 	ROM_REGION(0x2000, "m48t58",0)
-	ROM_LOAD( "m48t58y.35d",   0x000000, 0x002000, CRC(b077e262) SHA1(5cdcc1b742bf23562f4558216063fea903f045ab) ) // this is set to the JXD, I don't think it's valid.
 	ROM_LOAD( "m48t58y-70pc1", 0x000000, 0x002000, CRC(ee815325) SHA1(91b10802791b68a8360c0cd6c376c0c4bbbc6fa0) ) // so just load over it with the US one, we know works.
 ROM_END
 
@@ -1597,12 +1596,11 @@ GAME(  1998, nbapbpa,   nbapbp,   hornet,           hornet,  hornet_state, nbapb
 GAME(  1998, terabrst,  0,        terabrst,         hornet,  hornet_state, terabrst,      ROT0, "Konami", "Teraburst (1998/07/17 ver UEL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME(  1998, terabrsta, terabrst, terabrst,         hornet,  hornet_state, terabrst,      ROT0, "Konami", "Teraburst (1998/02/25 ver AAA)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
-// The region comes from the Timekeeper NVRAM, without a valid default all sets except 'xxD, Ver 1.33' will init their NVRAM to UAx versions, the xxD set seems to incorrectly init it to JXD, which isn't a valid
-// version, and thus can't be booted.  If you copy the NVRAM from another already initialized set, it will boot as UAD.
+// If you copy the NVRAM from another already initialized set, it will boot as UAD.
 // to get the actual game to boot you must calibrate the guns etc.
-GAMEL( 2000, sscope,    0,        hornet_2board,    sscope,  hornet_state, hornet_2board, ROT0, "Konami", "Silent Scope (ver xxD, Ver 1.33)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_dualhsxs )
-GAMEL( 2000, sscopec,   sscope,   hornet_2board,    sscope,  hornet_state, hornet_2board, ROT0, "Konami", "Silent Scope (ver xxC, Ver 1.30)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_dualhsxs )
-GAMEL( 2000, sscopeb,   sscope,   hornet_2board,    sscope,  hornet_state, hornet_2board, ROT0, "Konami", "Silent Scope (ver xxB, Ver 1.20)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_dualhsxs )
-GAMEL( 2000, sscopea,   sscope,   hornet_2board,    sscope,  hornet_state, hornet_2board, ROT0, "Konami", "Silent Scope (ver xxA, Ver 1.00)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_dualhsxs )
+GAMEL( 2000, sscope,    0,        hornet_2board,    sscope,  hornet_state, hornet_2board, ROT0, "Konami", "Silent Scope (ver UAD, Ver 1.33)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_dualhsxs )
+GAMEL( 2000, sscopec,   sscope,   hornet_2board,    sscope,  hornet_state, hornet_2board, ROT0, "Konami", "Silent Scope (ver UAC, Ver 1.30)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_dualhsxs )
+GAMEL( 2000, sscopeb,   sscope,   hornet_2board,    sscope,  hornet_state, hornet_2board, ROT0, "Konami", "Silent Scope (ver UAB, Ver 1.20)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_dualhsxs )
+GAMEL( 2000, sscopea,   sscope,   hornet_2board,    sscope,  hornet_state, hornet_2board, ROT0, "Konami", "Silent Scope (ver UAA, Ver 1.00)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_dualhsxs )
 
 GAMEL( 2000, sscope2,   0,        sscope2,          sscope2, hornet_state, hornet_2board, ROT0, "Konami", "Silent Scope 2 : Dark Silhouette (ver UAD)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_dualhsxs )
