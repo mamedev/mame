@@ -12,7 +12,6 @@ compiler:
   - clang
 os:
   - linux
-  - osx-notrightnow
 matrix:
   exclude:
     - os: osx
@@ -25,8 +24,8 @@ env:
     - CCACHE_COMPRESS=1
 script:
   - if [ $TRAVIS_OS_NAME == 'linux' ]; then
-    export
-    ccache -s
+    export;
+    ccache -s;
     if [ $CC == 'clang' ]; then
     make -j2 IGNORE_GIT=1 OVERRIDE_CXX="clang++-3.6" OVERRIDE_CC="clang-3.6" && ./$MAME -validate;
     else make -j3 IGNORE_GIT=1 OVERRIDE_CC="gcc-5" OVERRIDE_CXX="g++-5" REGENIE=1 TOOLS=1 && ./$MAME -validate;
