@@ -202,6 +202,9 @@ private:
 	static const opcode_func s_z180ops[6][0x100];
 
 	inline void z180_mmu();
+	inline u8 RM(offs_t addr);
+	inline u8 IN(u16 port);
+	inline void OUT(u16 port, u8 value);
 	inline void RM16( offs_t addr, PAIR *r );
 	inline void WM16( offs_t addr, PAIR *r );
 	inline uint8_t ROP();
