@@ -67,23 +67,14 @@ no PCB number but all look identical to each other.
 
 To Do:
 
--   Tilemaps/sprites offsets may be emulated understanding what appear to be CRT registers
-    at c78880 (sequence of 4 values), c78890 (sequence of 5 values) and c788a0 (start sequence).
--   Wrong color bars in service mode (e.g. balcube, toride2g).
-    They use solid color tiles (80xx), but the right palette is not at 00-ff.
-    Related to the unknown table in the RAM mapped just before the palette?
+-   For video related issues @see devices/video/imagetek_i4100.cpp
 -   Most games, in service mode, seem to require that you press start1&2 *exactly at once*
     in order to advance to the next screen (e.g. holding 1 then pressing 2 doesn't work).
 -   Coin lockout
--   Some gfx problems in ladykill, 3kokushi, puzzli, gakusai,
-    seem related to how we handle windows and wrapping
 -   Interrupt timing needs figuring out properly, having it incorrect
     causes scrolling glitches in some games.  Test cases Mouse Go Go
     title screen, GunMaster title screen.  Changing it can cause
     excessive slowdown in said games however.
--   Bang Bang Ball / Bubble Buster slow to a crawl when you press a
-    button between levels, on a real PCB it speeds up instead (related
-    to above?)
 -   vmetal: ES8712 actually controls a M6585 and an unknown logic selector chip.
 
 Notes:
@@ -124,7 +115,11 @@ READ16_MEMBER(metro_state::metro_irq_cause_r)
 	/* interrupt cause, used by
 
 	int[0] vblank
-	int[1] ?            DAITORIDE, BALCUBE, KARATOUR, MOUJA
+	int[1] hblank (bangball for faster intermission skip, 
+	               puzzli for gameplay water effect, 
+				   blzntrnd title screen scroll (enabled all the time then?),
+				   unused/empty in balcube, daitoride, karatour,
+				   unchecked mouja & other i4300 games )
 	int[2] blitter
 	int[3] ?            KARATOUR
 	int[4] ?
