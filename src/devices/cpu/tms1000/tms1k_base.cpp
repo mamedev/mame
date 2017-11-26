@@ -5,7 +5,6 @@
   TMS1000 family - base/shared
 
   TODO:
-  - fix debugger disasm view
   - INIT pin
 
 
