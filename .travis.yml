@@ -28,7 +28,7 @@ script:
     ccache -s;
     T_START=$(date -d "$TRAVIS_STACK_TIMESTAMP" +%s); T_NOW=$(date +%s); T_SPINUP=$(($T_NOW - $T_START));
     T_LIMIT=$((48 * 60)); T_REMAINING=$(( $T_LIMIT - $T_SPINUP ));
-    echo "Spinup: $T_SPINUP, Estimated remaining: $T_REMAINING";
+    echo "Spinup $T_SPINUP, Estimated remaining $T_REMAINING" 1>&2;
     date;
     if [ $CC == 'clang' ]; then
     timeout 10m make -j2 IGNORE_GIT=1 OVERRIDE_CXX="clang++-3.6" OVERRIDE_CC="clang-3.6" || \
