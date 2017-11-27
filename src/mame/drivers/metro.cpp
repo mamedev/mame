@@ -453,22 +453,23 @@ WRITE8_MEMBER(metro_state::daitorid_portb_w)
 
 ***************************************************************************/
 
-/* IT DOESN'T WORK PROPERLY */
-
 WRITE16_MEMBER(metro_state::metro_coin_lockout_1word_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-//      machine().bookkeeping().coin_lockout_w(0, data & 1);
-//      machine().bookkeeping().coin_lockout_w(1, data & 2);
+		machine().bookkeeping().coin_counter_w(0, data & 1);
+		machine().bookkeeping().coin_counter_w(1, data & 2);
 	}
 	if (data & ~3)  logerror("CPU #0 PC %06X : unknown bits of coin lockout written: %04X\n", space.device().safe_pc(), data);
 }
 
-
+// value written doesn't matter, also each counted coin gets reported after one full second.
+// TODO: maybe the counter also controls lockout?
 WRITE16_MEMBER(metro_state::metro_coin_lockout_4words_w)
 {
+	machine().bookkeeping().coin_counter_w((offset >> 1) & 1, offset & 1);
 //  machine().bookkeeping().coin_lockout_w((offset >> 1) & 1, offset & 1);
+
 	if (data & ~1)  logerror("CPU #0 PC %06X : unknown bits of coin lockout written: %04X\n", space.device().safe_pc(), data);
 }
 
@@ -715,7 +716,7 @@ static ADDRESS_MAP_START( kokushi_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0xc00000, 0xc00001) AM_READ_PORT("IN0") AM_WRITE(metro_soundstatus_w)  // To Sound CPU
 	AM_RANGE(0xc00002, 0xc00003) AM_READ_PORT("IN1")                                // Inputs
 	AM_RANGE(0xc00004, 0xc00005) AM_READ_PORT("DSW0")                               //
-	AM_RANGE(0xc00002, 0xc00009) AM_WRITE(metro_coin_lockout_4words_w   )           // Coin Lockout
+	AM_RANGE(0xc00002, 0xc00009) AM_WRITE(metro_coin_lockout_4words_w)              // Coin Lockout
 ADDRESS_MAP_END
 
 
