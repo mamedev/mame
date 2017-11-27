@@ -3467,4 +3467,4 @@ GAME( 1994, mscoutm,  0,        mscoutm,  mscoutm,  nbmj9195_state, nbmj9195, RO
 GAME( 1994, imekura,  0,        imekura,  imekura,  nbmj9195_state, nbmj9195, ROT0,    "Sphinx / AV Japan", "Imekura Mahjong (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, mjegolf,  0,        mjegolf,  mjegolf,  nbmj9195_state, nbmj9195, ROT0,    "Fujic / AV Japan", "Mahjong Erotica Golf (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 199?, shabdama, 0,        shabdama, mjuraden, nbmj9195_state, nbmj9195, ROT0,    "Nichibutsu", "LD Mahjong #4 Shabon-Dama", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, shabdama, 0,        shabdama, mjuraden, nbmj9195_state, nbmj9195, ROT0,    "Nichibutsu", "LD Mahjong #4 Shabon-Dama", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
