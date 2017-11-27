@@ -219,10 +219,7 @@ offs_t tms1000_base_disassembler::disassemble(std::ostream &stream, offs_t pc, c
 			util::stream_format(stream, "%d", i4_value[op & 0x0f]);
 			break;
 		case zB7:
-			if (m_opcode_9bits)
-				util::stream_format(stream, "$%02X", op << 1 & 0xfe);
-			else
-				util::stream_format(stream, "$%02X", op & 0x3f);
+			util::stream_format(stream, "$%02X", op & (m_opcode_9bits ? 0x7f : 0x3f));
 			break;
 		default:
 			break;
