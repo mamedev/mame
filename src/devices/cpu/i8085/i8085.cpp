@@ -735,7 +735,7 @@ void i8085a_cpu_device::op_ana(u8 v)
 u8 i8085a_cpu_device::op_inr(u8 v)
 {
 	u8 hc = ((v & 0x0f) == 0x0f) ? HF : 0;
-	m_AF.b.l = (m_AF.b.l & CF ) | lut_zsp[++v] | hc;
+	m_AF.b.l = (m_AF.b.l & CF) | lut_zsp[++v] | hc;
 	return v;
 }
 
@@ -906,7 +906,7 @@ void i8085a_cpu_device::execute_one(int opcode)
 				m_HL.b.l = q;
 				q = m_HL.b.h - m_BC.b.h - (m_AF.b.l & CF);
 				m_AF.b.l = lut_zs[q & 0xff] | ((q >> 8) & CF) | VF | ((m_HL.b.h ^ q ^ m_BC.b.h) & HF) | (((m_BC.b.h ^ m_HL.b.h) & (m_HL.b.h ^ q) & SF) >> 5);
-				if (m_HL.b.l != 0 )
+				if (m_HL.b.l != 0)
 					m_AF.b.l &= ~ZF;
 			}
 			break;
