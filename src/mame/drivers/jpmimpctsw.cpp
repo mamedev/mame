@@ -7886,18 +7886,18 @@ GAME( 199?, j6acehi     , 0         , impctawp, tbirds, jpmimpct_state, 0, ROT0,
 
 GAMEL( 199?, j6amdrm     , 0         , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Mdm", "American Dream (Mdm) (IMPACT)", GAME_FLAGS, layout_j6amdrm )
 
-GAMEL( 199?, j6arcade    , 0         , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Arcadia (JPM) (IMPACT) (V9, set 1)", GAME_FLAGS, layout_j6arcadee )
-GAMEL( 199?, j6arcadea   , j6arcade  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Arcadia (JPM) (IMPACT) (V9, set 2)", GAME_FLAGS, layout_j6arcadee )
-GAMEL( 199?, j6arcadeb   , j6arcade  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Arcadia (JPM) (IMPACT) (V9, set 3)", GAME_FLAGS, layout_j6arcadee )
-GAMEL( 199?, j6arcadec   , j6arcade  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Arcadia (JPM) (IMPACT) (V9, set 4)", GAME_FLAGS, layout_j6arcadee )
-GAMEL( 199?, j6arcaded   , j6arcade  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Arcadia (JPM) (IMPACT) (V9, set 5)", GAME_FLAGS, layout_j6arcadee )
-GAMEL( 199?, j6arcadee   , j6arcade  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Arcadia (JPM) (IMPACT) (V10, set 1)", GAME_FLAGS, layout_j6arcadee )
-GAMEL( 199?, j6arcadef   , j6arcade  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Arcadia (JPM) (IMPACT) (V10, set 2)", GAME_FLAGS, layout_j6arcadee )
-GAMEL( 199?, j6arcadeg   , j6arcade  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Arcadia (JPM) (IMPACT) (V10, set 3)", GAME_FLAGS, layout_j6arcadee )
-GAMEL( 199?, j6arcadeh   , j6arcade  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Arcadia (JPM) (IMPACT) (V10, set 4)", GAME_FLAGS, layout_j6arcadee )
-GAMEL( 199?, j6arcadei   , j6arcade  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Arcadia (JPM) (IMPACT) (V10, set 5)", GAME_FLAGS, layout_j6arcadee )
-GAMEL( 199?, j6arcadej   , j6arcade  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Arcadia (JPM) (IMPACT) (V10, set 6)", GAME_FLAGS, layout_j6arcadee )
-GAMEL( 199?, j6arcadek   , j6arcade  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Arcadia (JPM) (IMPACT) (V10, set 7)", GAME_FLAGS, layout_j6arcadee )
+GAMEL( 2000, j6arcade    , 0         , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Arcadia (JPM) (IMPACT) (V9, set 1)", GAME_FLAGS, layout_j6arcadee )
+GAMEL( 2000, j6arcadea   , j6arcade  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Arcadia (JPM) (IMPACT) (V9, set 2)", GAME_FLAGS, layout_j6arcadee )
+GAMEL( 2000, j6arcadeb   , j6arcade  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Arcadia (JPM) (IMPACT) (V9, set 3)", GAME_FLAGS, layout_j6arcadee )
+GAMEL( 2000, j6arcadec   , j6arcade  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Arcadia (JPM) (IMPACT) (V9, set 4)", GAME_FLAGS, layout_j6arcadee )
+GAMEL( 2000, j6arcaded   , j6arcade  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Arcadia (JPM) (IMPACT) (V9, set 5)", GAME_FLAGS, layout_j6arcadee )
+GAMEL( 2000, j6arcadee   , j6arcade  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Arcadia (JPM) (IMPACT) (V10, set 1)", GAME_FLAGS, layout_j6arcadee )
+GAMEL( 2000, j6arcadef   , j6arcade  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Arcadia (JPM) (IMPACT) (V10, set 2)", GAME_FLAGS, layout_j6arcadee )
+GAMEL( 2000, j6arcadeg   , j6arcade  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Arcadia (JPM) (IMPACT) (V10, set 3)", GAME_FLAGS, layout_j6arcadee )
+GAMEL( 2000, j6arcadeh   , j6arcade  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Arcadia (JPM) (IMPACT) (V10, set 4)", GAME_FLAGS, layout_j6arcadee )
+GAMEL( 2000, j6arcadei   , j6arcade  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Arcadia (JPM) (IMPACT) (V10, set 5)", GAME_FLAGS, layout_j6arcadee )
+GAMEL( 2000, j6arcadej   , j6arcade  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Arcadia (JPM) (IMPACT) (V10, set 6)", GAME_FLAGS, layout_j6arcadee )
+GAMEL( 2000, j6arcadek   , j6arcade  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Arcadia (JPM) (IMPACT) (V10, set 7)", GAME_FLAGS, layout_j6arcadee )
 
 GAMEL( 199?, j6bnkrcl    , 0         , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Banker Club (JPM) (IMPACT) (V6, set 1)", GAME_FLAGS, layout_j6bnkrcl )
 GAMEL( 199?, j6bnkrcla   , j6bnkrcl  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Banker Club (JPM) (IMPACT) (V6, set 2)", GAME_FLAGS, layout_j6bnkrcl )
@@ -7951,10 +7951,10 @@ GAME( 199?, j6bigpct    , 0         , impctawp, tbirds, jpmimpct_state, 0, ROT0,
 GAME( 199?, j6bigpcta   , j6bigpct  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Ace", "Big Picture (Ace) (IMPACT) (set 2)", GAME_FLAGS )
 GAME( 199?, j6bigpctb   , j6bigpct  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Ace", "Big Picture (Ace) (IMPACT) (set 3)", GAME_FLAGS )
 
-GAMEL( 199?, j6bigtop    , 0         , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Big Top Club (JPM) (IMPACT) (set 1)", GAME_FLAGS, layout_j6bigtopa )
-GAMEL( 199?, j6bigtopa   , j6bigtop  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Big Top Club (JPM) (IMPACT) (set 2)", GAME_FLAGS, layout_j6bigtopa )
-GAMEL( 199?, j6bigtopb   , j6bigtop  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Big Top Club (JPM) (IMPACT) (set 3)", GAME_FLAGS, layout_j6bigtopa )
-GAMEL( 199?, j6bigtopc   , j6bigtop  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Big Top Club (JPM) (IMPACT) (set 4)", GAME_FLAGS, layout_j6bigtopa )
+GAMEL( 1999, j6bigtop    , 0         , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Big Top Club (JPM) (IMPACT) (set 1)", GAME_FLAGS, layout_j6bigtopa )
+GAMEL( 1999, j6bigtopa   , j6bigtop  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Big Top Club (JPM) (IMPACT) (set 2)", GAME_FLAGS, layout_j6bigtopa )
+GAMEL( 1999, j6bigtopb   , j6bigtop  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Big Top Club (JPM) (IMPACT) (set 3)", GAME_FLAGS, layout_j6bigtopa )
+GAMEL( 1999, j6bigtopc   , j6bigtop  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Big Top Club (JPM) (IMPACT) (set 4)", GAME_FLAGS, layout_j6bigtopa )
 
 GAME( 199?, j6bigwhl    , 0         , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Big Wheel (JPM) (IMPACT) (set 1)", GAME_FLAGS )
 GAME( 199?, j6bigwhla   , j6bigwhl  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Big Wheel (JPM) (IMPACT) (set 2)", GAME_FLAGS )
@@ -8013,11 +8013,11 @@ GAME( 199?, j6cshbstd   , j6cshbst  , impctawp, tbirds, jpmimpct_state, 0, ROT0,
 GAME( 199?, j6cshcnt    , 0         , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Cash Countdown (JPM) (IMPACT) (set 1)", GAME_FLAGS )
 GAME( 199?, j6cshcnta   , j6cshcnt  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Cash Countdown (JPM) (IMPACT) (set 2)", GAME_FLAGS )
 
-GAME( 199?, j6cshrd     , 0         , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Ace", "Cash Raider (Ace) (IMPACT) (set 1)", GAME_FLAGS )
-GAME( 199?, j6cshrda    , j6cshrd   , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Ace", "Cash Raider (Ace) (IMPACT) (set 2)", GAME_FLAGS )
-GAME( 199?, j6cshrdb    , j6cshrd   , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Ace", "Cash Raider (Ace) (IMPACT) (set 3)", GAME_FLAGS )
-GAME( 199?, j6cshrdc    , j6cshrd   , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Ace", "Cash Raider (Ace) (IMPACT) (set 4)", GAME_FLAGS )
-GAME( 199?, j6cshrdd    , j6cshrd   , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Ace", "Cash Raider (Ace) (IMPACT) (set 5)", GAME_FLAGS )
+GAME( 1998, j6cshrd     , 0         , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Ace", "Cash Raider (Ace) (IMPACT) (set 1)", GAME_FLAGS )
+GAME( 1998, j6cshrda    , j6cshrd   , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Ace", "Cash Raider (Ace) (IMPACT) (set 2)", GAME_FLAGS )
+GAME( 1998, j6cshrdb    , j6cshrd   , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Ace", "Cash Raider (Ace) (IMPACT) (set 3)", GAME_FLAGS )
+GAME( 1998, j6cshrdc    , j6cshrd   , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Ace", "Cash Raider (Ace) (IMPACT) (set 4)", GAME_FLAGS )
+GAME( 1998, j6cshrdd    , j6cshrd   , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Ace", "Cash Raider (Ace) (IMPACT) (set 5)", GAME_FLAGS )
 
 GAME( 199?, j6cshtwr    , 0         , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Cash Towers (JPM) (IMPACT)", GAME_FLAGS )
 
@@ -8042,19 +8042,19 @@ GAME( 199?, j6cshvgsq   , j6cshvgs  , impctawp, tbirds, jpmimpct_state, 0, ROT0,
 GAME( 199?, j6cshvgsr   , j6cshvgs  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Cash Vegas Strip (JPM) (IMPACT) (set 19)", GAME_FLAGS )
 
 
-GAME( 199?, j6cas5      , 0         , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Casino 5ive Liner (JPM) (IMPACT) (set 1)", GAME_FLAGS )
-GAME( 199?, j6cas5a     , j6cas5    , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Casino 5ive Liner (JPM) (IMPACT) (set 2)", GAME_FLAGS )
-GAME( 199?, j6cas5b     , j6cas5    , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Casino 5ive Liner (JPM) (IMPACT) (set 3)", GAME_FLAGS )
-GAME( 199?, j6cas5c     , j6cas5    , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Casino 5ive Liner (JPM) (IMPACT) (set 4)", GAME_FLAGS )
-GAME( 199?, j6cas5d     , j6cas5    , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Casino 5ive Liner (JPM) (IMPACT) (set 5)", GAME_FLAGS )
-GAME( 199?, j6cas5e     , j6cas5    , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Casino 5ive Liner (JPM) (IMPACT) (set 6)", GAME_FLAGS )
-GAME( 199?, j6cas5f     , j6cas5    , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Casino 5ive Liner (JPM) (IMPACT) (set 7)", GAME_FLAGS )
-GAME( 199?, j6cas5g     , j6cas5    , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Casino 5ive Liner (JPM) (IMPACT) (set 8)", GAME_FLAGS )
-GAME( 199?, j6cas5h     , j6cas5    , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Casino 5ive Liner (JPM) (IMPACT) (set 9)", GAME_FLAGS )
-GAME( 199?, j6cas5i     , j6cas5    , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Casino 5ive Liner (JPM) (IMPACT) (set 10)", GAME_FLAGS )
-GAME( 199?, j6cas5j     , j6cas5    , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Casino 5ive Liner (JPM) (IMPACT) (set 11)", GAME_FLAGS )
-GAME( 199?, j6cas5k     , j6cas5    , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Casino 5ive Liner (JPM) (IMPACT) (set 12)", GAME_FLAGS )
-GAME( 199?, j6cas5l     , j6cas5    , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Casino 5ive Liner (JPM) (IMPACT) (set 13)", GAME_FLAGS )
+GAME( 1999, j6cas5      , 0         , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Casino 5ive Liner (JPM) (IMPACT) (set 1)", GAME_FLAGS )
+GAME( 1999, j6cas5a     , j6cas5    , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Casino 5ive Liner (JPM) (IMPACT) (set 2)", GAME_FLAGS )
+GAME( 1999, j6cas5b     , j6cas5    , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Casino 5ive Liner (JPM) (IMPACT) (set 3)", GAME_FLAGS )
+GAME( 1999, j6cas5c     , j6cas5    , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Casino 5ive Liner (JPM) (IMPACT) (set 4)", GAME_FLAGS )
+GAME( 1999, j6cas5d     , j6cas5    , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Casino 5ive Liner (JPM) (IMPACT) (set 5)", GAME_FLAGS )
+GAME( 1999, j6cas5e     , j6cas5    , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Casino 5ive Liner (JPM) (IMPACT) (set 6)", GAME_FLAGS )
+GAME( 1999, j6cas5f     , j6cas5    , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Casino 5ive Liner (JPM) (IMPACT) (set 7)", GAME_FLAGS )
+GAME( 1999, j6cas5g     , j6cas5    , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Casino 5ive Liner (JPM) (IMPACT) (set 8)", GAME_FLAGS )
+GAME( 1999, j6cas5h     , j6cas5    , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Casino 5ive Liner (JPM) (IMPACT) (set 9)", GAME_FLAGS )
+GAME( 1999, j6cas5i     , j6cas5    , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Casino 5ive Liner (JPM) (IMPACT) (set 10)", GAME_FLAGS )
+GAME( 1999, j6cas5j     , j6cas5    , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Casino 5ive Liner (JPM) (IMPACT) (set 11)", GAME_FLAGS )
+GAME( 1999, j6cas5k     , j6cas5    , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Casino 5ive Liner (JPM) (IMPACT) (set 12)", GAME_FLAGS )
+GAME( 1999, j6cas5l     , j6cas5    , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Casino 5ive Liner (JPM) (IMPACT) (set 13)", GAME_FLAGS )
 
 
 GAMEL( 199?, j6cascz     , 0         , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Casino Crazy (JPM) (IMPACT) (set 1)", GAME_FLAGS, layout_j6cascze )
@@ -8118,19 +8118,19 @@ GAME( 199?, j6caslasc   , j6caslas  , impctawp, tbirds, jpmimpct_state, 0, ROT0,
 
 GAME( 199?, j6cheque    , 0         , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Cheque Mate (JPM) (IMPACT)", GAME_FLAGS )
 
-GAME( 199?, j6cluclb    , 0         , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Cluedo Club (JPM) (IMPACT) (set 1)", GAME_FLAGS )
-GAME( 199?, j6cluclba   , j6cluclb  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Cluedo Club (JPM) (IMPACT) (set 2)", GAME_FLAGS )
-GAME( 199?, j6cluclbb   , j6cluclb  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Cluedo Club (JPM) (IMPACT) (set 3)", GAME_FLAGS )
-GAME( 199?, j6cluclbc   , j6cluclb  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Cluedo Club (JPM) (IMPACT) (set 4)", GAME_FLAGS )
-GAME( 199?, j6cluclbd   , j6cluclb  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Cluedo Club (JPM) (IMPACT) (set 5)", GAME_FLAGS )
-GAME( 199?, j6cluclbe   , j6cluclb  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Cluedo Club (JPM) (IMPACT) (set 6)", GAME_FLAGS )
-GAME( 199?, j6cluclbf   , j6cluclb  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Cluedo Club (JPM) (IMPACT) (set 7)", GAME_FLAGS )
-GAME( 199?, j6cluclbg   , j6cluclb  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Cluedo Club (JPM) (IMPACT) (set 8)", GAME_FLAGS )
-GAME( 199?, j6cluclbh   , j6cluclb  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Cluedo Club (JPM) (IMPACT) (set 9)", GAME_FLAGS )
-GAME( 199?, j6cluclbi   , j6cluclb  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Cluedo Club (JPM) (IMPACT) (set 10)", GAME_FLAGS )
-GAME( 199?, j6cluclbj   , j6cluclb  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Cluedo Club (JPM) (IMPACT) (set 11)", GAME_FLAGS )
-GAME( 199?, j6cluclbk   , j6cluclb  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Cluedo Club (JPM) (IMPACT) (set 12)", GAME_FLAGS )
-GAME( 199?, j6cluclbl   , j6cluclb  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Cluedo Club (JPM) (IMPACT) (set 13)", GAME_FLAGS )
+GAME( 2002, j6cluclb    , 0         , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Cluedo Club (JPM) (IMPACT) (set 1)", GAME_FLAGS )
+GAME( 2002, j6cluclba   , j6cluclb  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Cluedo Club (JPM) (IMPACT) (set 2)", GAME_FLAGS )
+GAME( 2002, j6cluclbb   , j6cluclb  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Cluedo Club (JPM) (IMPACT) (set 3)", GAME_FLAGS )
+GAME( 2002, j6cluclbc   , j6cluclb  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Cluedo Club (JPM) (IMPACT) (set 4)", GAME_FLAGS )
+GAME( 2002, j6cluclbd   , j6cluclb  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Cluedo Club (JPM) (IMPACT) (set 5)", GAME_FLAGS )
+GAME( 2002, j6cluclbe   , j6cluclb  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Cluedo Club (JPM) (IMPACT) (set 6)", GAME_FLAGS )
+GAME( 2002, j6cluclbf   , j6cluclb  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Cluedo Club (JPM) (IMPACT) (set 7)", GAME_FLAGS )
+GAME( 2002, j6cluclbg   , j6cluclb  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Cluedo Club (JPM) (IMPACT) (set 8)", GAME_FLAGS )
+GAME( 2002, j6cluclbh   , j6cluclb  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Cluedo Club (JPM) (IMPACT) (set 9)", GAME_FLAGS )
+GAME( 2002, j6cluclbi   , j6cluclb  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Cluedo Club (JPM) (IMPACT) (set 10)", GAME_FLAGS )
+GAME( 2002, j6cluclbj   , j6cluclb  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Cluedo Club (JPM) (IMPACT) (set 11)", GAME_FLAGS )
+GAME( 2002, j6cluclbk   , j6cluclb  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Cluedo Club (JPM) (IMPACT) (set 12)", GAME_FLAGS )
+GAME( 2002, j6cluclbl   , j6cluclb  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Cluedo Club (JPM) (IMPACT) (set 13)", GAME_FLAGS )
 
 
 GAME( 199?, j6col       , 0         , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Mdm", "Coliseum (Mdm) (IMPACT) (set 1)", GAME_FLAGS )
@@ -8363,10 +8363,10 @@ GAMEL( 199?, j6hapyhrb   , j6hapyhr  , impctawp, tbirds, jpmimpct_state, 0, ROT0
 GAME( 199?, j6hifly     , 0         , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Crystal", "Hi Flyer (Crystal) (IMPACT)", GAME_FLAGS )
 
 
-GAME( 199?, j6impact    , 0         , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Hi Impact (JPM) (IMPACT) (set 1)", GAME_FLAGS )
-GAME( 199?, j6impacta   , j6impact  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Hi Impact (JPM) (IMPACT) (set 2)", GAME_FLAGS )
-GAME( 199?, j6impactb   , j6impact  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Hi Impact (JPM) (IMPACT) (set 3)", GAME_FLAGS )
-GAME( 199?, j6impactc   , j6impact  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Hi Impact (JPM) (IMPACT) (15GBP Jackpot)", GAME_FLAGS )
+GAME( 1999, j6impact    , 0         , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Hi Impact (JPM) (IMPACT) (set 1)", GAME_FLAGS )
+GAME( 1999, j6impacta   , j6impact  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Hi Impact (JPM) (IMPACT) (set 2)", GAME_FLAGS )
+GAME( 1999, j6impactb   , j6impact  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Hi Impact (JPM) (IMPACT) (set 3)", GAME_FLAGS )
+GAME( 1999, j6impactc   , j6impact  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Hi Impact (JPM) (IMPACT) (15GBP Jackpot)", GAME_FLAGS )
 
 GAME( 199?, j6hilosv    , 0         , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Hi Lo Silver (JPM) (IMPACT) (set 1)", GAME_FLAGS )
 GAME( 199?, j6hilosva   , j6hilosv  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Hi Lo Silver (JPM) (IMPACT) (set 2)", GAME_FLAGS )
@@ -8400,28 +8400,28 @@ GAME( 199?, j6hiphopc   , j6hiphop  , impctawp, tbirds, jpmimpct_state, 0, ROT0,
 GAME( 199?, j6hiphopd   , j6hiphop  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Ace", "Hip Hopper (Ace) (IMPACT) (set 5)", GAME_FLAGS )
 
 
-GAME( 199?, j6hotsht    , 0         , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Ace", "Hot Shot (Ace) (IMPACT) (set 1)", GAME_FLAGS )
-GAME( 199?, j6hotshta   , j6hotsht  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Ace", "Hot Shot (Ace) (IMPACT) (set 2)", GAME_FLAGS )
-GAME( 199?, j6hotshtb   , j6hotsht  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Ace", "Hot Shot (Ace) (IMPACT) (set 3)", GAME_FLAGS )
-GAME( 199?, j6hotshtc   , j6hotsht  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Ace", "Hot Shot (Ace) (IMPACT) (set 4)", GAME_FLAGS )
-GAME( 199?, j6hotshtd   , j6hotsht  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Ace", "Hot Shot (Ace) (IMPACT) (set 5)", GAME_FLAGS )
-GAME( 199?, j6hotshte   , j6hotsht  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Ace", "Hot Shot (Ace) (IMPACT) (set 6)", GAME_FLAGS )
-GAME( 199?, j6hotshtf   , j6hotsht  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Ace", "Hot Shot (Ace) (IMPACT) (set 7)", GAME_FLAGS )
-GAME( 199?, j6hotshtg   , j6hotsht  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Ace", "Hot Shot (Ace) (IMPACT) (set 8)", GAME_FLAGS )
-GAME( 199?, j6hotshth   , j6hotsht  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Ace", "Hot Shot (Ace) (IMPACT) (set 9)", GAME_FLAGS )
-GAME( 199?, j6hotshti   , j6hotsht  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Ace", "Hot Shot (Ace) (IMPACT) (set 10)", GAME_FLAGS )
-GAME( 199?, j6hotshtj   , j6hotsht  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Ace", "Hot Shot (Ace) (IMPACT) (set 11)", GAME_FLAGS )
-GAME( 199?, j6hotshtk   , j6hotsht  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Ace", "Hot Shot (Ace) (IMPACT) (set 12)", GAME_FLAGS )
-GAME( 199?, j6hotshtl   , j6hotsht  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Ace", "Hot Shot (Ace) (IMPACT) (set 13)", GAME_FLAGS )
+GAME( 1999, j6hotsht    , 0         , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Ace", "Hot Shot (Ace) (IMPACT) (set 1)", GAME_FLAGS )
+GAME( 1999, j6hotshta   , j6hotsht  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Ace", "Hot Shot (Ace) (IMPACT) (set 2)", GAME_FLAGS )
+GAME( 1999, j6hotshtb   , j6hotsht  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Ace", "Hot Shot (Ace) (IMPACT) (set 3)", GAME_FLAGS )
+GAME( 1999, j6hotshtc   , j6hotsht  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Ace", "Hot Shot (Ace) (IMPACT) (set 4)", GAME_FLAGS )
+GAME( 1999, j6hotshtd   , j6hotsht  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Ace", "Hot Shot (Ace) (IMPACT) (set 5)", GAME_FLAGS )
+GAME( 1999, j6hotshte   , j6hotsht  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Ace", "Hot Shot (Ace) (IMPACT) (set 6)", GAME_FLAGS )
+GAME( 1999, j6hotshtf   , j6hotsht  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Ace", "Hot Shot (Ace) (IMPACT) (set 7)", GAME_FLAGS )
+GAME( 1999, j6hotshtg   , j6hotsht  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Ace", "Hot Shot (Ace) (IMPACT) (set 8)", GAME_FLAGS )
+GAME( 1999, j6hotshth   , j6hotsht  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Ace", "Hot Shot (Ace) (IMPACT) (set 9)", GAME_FLAGS )
+GAME( 1999, j6hotshti   , j6hotsht  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Ace", "Hot Shot (Ace) (IMPACT) (set 10)", GAME_FLAGS )
+GAME( 1999, j6hotshtj   , j6hotsht  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Ace", "Hot Shot (Ace) (IMPACT) (set 11)", GAME_FLAGS )
+GAME( 1999, j6hotshtk   , j6hotsht  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Ace", "Hot Shot (Ace) (IMPACT) (set 12)", GAME_FLAGS )
+GAME( 1999, j6hotshtl   , j6hotsht  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Ace", "Hot Shot (Ace) (IMPACT) (set 13)", GAME_FLAGS )
 
 
-GAMEL( 199?, j6impuls    , 0         , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Impulse (JPM) (IMPACT) (set 1)", GAME_FLAGS, layout_j6impulsc )
-GAMEL( 199?, j6impulsa   , j6impuls  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Impulse (JPM) (IMPACT) (set 2)", GAME_FLAGS, layout_j6impulsc )
-GAMEL( 199?, j6impulsb   , j6impuls  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Impulse (JPM) (IMPACT) (set 3)", GAME_FLAGS, layout_j6impulsc )
-GAMEL( 199?, j6impulsc   , j6impuls  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Impulse (JPM) (IMPACT) (set 4)", GAME_FLAGS, layout_j6impulsc )
-GAMEL( 199?, j6impulsd   , j6impuls  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Impulse (JPM) (IMPACT) (set 5)", GAME_FLAGS, layout_j6impulsc )
-GAMEL( 199?, j6impulse   , j6impuls  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Impulse (JPM) (IMPACT) (set 6)", GAME_FLAGS, layout_j6impulsc )
-GAMEL( 199?, j6impulsf   , j6impuls  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Impulse (JPM) (IMPACT) (set 7)", GAME_FLAGS, layout_j6impulsc )
+GAMEL( 1998, j6impuls    , 0         , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Impulse (JPM) (IMPACT) (set 1)", GAME_FLAGS, layout_j6impulsc )
+GAMEL( 1998, j6impulsa   , j6impuls  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Impulse (JPM) (IMPACT) (set 2)", GAME_FLAGS, layout_j6impulsc )
+GAMEL( 1998, j6impulsb   , j6impuls  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Impulse (JPM) (IMPACT) (set 3)", GAME_FLAGS, layout_j6impulsc )
+GAMEL( 1998, j6impulsc   , j6impuls  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Impulse (JPM) (IMPACT) (set 4)", GAME_FLAGS, layout_j6impulsc )
+GAMEL( 1998, j6impulsd   , j6impuls  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Impulse (JPM) (IMPACT) (set 5)", GAME_FLAGS, layout_j6impulsc )
+GAMEL( 1998, j6impulse   , j6impuls  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Impulse (JPM) (IMPACT) (set 6)", GAME_FLAGS, layout_j6impulsc )
+GAMEL( 1998, j6impulsf   , j6impuls  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Impulse (JPM) (IMPACT) (set 7)", GAME_FLAGS, layout_j6impulsc )
 
 
 GAMEL( 199?, j6indy      , 0         , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Indiana Jones (JPM) (IMPACT) (set 1)", GAME_FLAGS, layout_j6indyi )
@@ -8602,12 +8602,12 @@ GAME( 199?, j6pnxmilb   , j6pnxmil  , impctawp, tbirds, jpmimpct_state, 0, ROT0,
 GAME( 199?, j6pnxmilc   , j6pnxmil  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Phoenix Millennium (JPM) (IMPACT) (set 4)", GAME_FLAGS )
 
 
-GAME( 199?, j6pinwzd    , 0         , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Pinball Wizard (JPM) (IMPACT) (set 1)", GAME_FLAGS )
-GAME( 199?, j6pinwzda   , j6pinwzd  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Pinball Wizard (JPM) (IMPACT) (set 2)", GAME_FLAGS )
-GAME( 199?, j6pinwzdb   , j6pinwzd  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Pinball Wizard (JPM) (IMPACT) (set 3)", GAME_FLAGS )
-GAME( 199?, j6pinwzdc   , j6pinwzd  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Pinball Wizard (JPM) (IMPACT) (set 4)", GAME_FLAGS )
-GAME( 199?, j6pinwzdd   , j6pinwzd  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Pinball Wizard (JPM) (IMPACT) (set 5)", GAME_FLAGS )
-GAME( 199?, j6pinwzde   , j6pinwzd  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Pinball Wizard (JPM) (IMPACT) (set 6)", GAME_FLAGS )
+GAME( 1998, j6pinwzd    , 0         , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Pinball Wizard (JPM) (IMPACT) (set 1)", GAME_FLAGS )
+GAME( 1998, j6pinwzda   , j6pinwzd  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Pinball Wizard (JPM) (IMPACT) (set 2)", GAME_FLAGS )
+GAME( 1998, j6pinwzdb   , j6pinwzd  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Pinball Wizard (JPM) (IMPACT) (set 3)", GAME_FLAGS )
+GAME( 1998, j6pinwzdc   , j6pinwzd  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Pinball Wizard (JPM) (IMPACT) (set 4)", GAME_FLAGS )
+GAME( 1998, j6pinwzdd   , j6pinwzd  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Pinball Wizard (JPM) (IMPACT) (set 5)", GAME_FLAGS )
+GAME( 1998, j6pinwzde   , j6pinwzd  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Pinball Wizard (JPM) (IMPACT) (set 6)", GAME_FLAGS )
 GAME( 199?, j6pinwzc    , j6pinwzd  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Crystal", "Pinball Wizard (Crystal) (IMPACT) (set 1)", GAME_FLAGS )
 GAME( 199?, j6pinwzca   , j6pinwzd  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Crystal", "Pinball Wizard (Crystal) (IMPACT) (set 2)", GAME_FLAGS )
 GAME( 199?, j6pinwzcb   , j6pinwzd  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Crystal", "Pinball Wizard (Crystal) (IMPACT) (set 3)", GAME_FLAGS )
@@ -8652,11 +8652,11 @@ GAMEL( 199?, j6quick     , 0         , impctawp, tbirds, jpmimpct_state, 0, ROT0
 
 GAME( 199?, j6rager     , 0         , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Red Alert (JPM) [German] (IMPACT)", GAME_FLAGS )
 
-GAMEL( 199?, j6ra        , 0         , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Red Alert (JPM) (IMPACT) (set 1)", GAME_FLAGS, layout_j6ra )
-GAMEL( 199?, j6raa       , j6ra      , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Red Alert (JPM) (IMPACT) (set 2)", GAME_FLAGS, layout_j6ra )
-GAMEL( 199?, j6rab       , j6ra      , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Red Alert (JPM) (IMPACT) (set 3)", GAME_FLAGS, layout_j6ra )
-GAMEL( 199?, j6rac       , j6ra      , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Red Alert (JPM) (IMPACT) (set 4)", GAME_FLAGS, layout_j6ra )
-GAMEL( 199?, j6rad       , j6ra      , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Red Alert (JPM) (IMPACT) (set 5)", GAME_FLAGS, layout_j6ra )
+GAMEL( 1998, j6ra        , 0         , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Red Alert (JPM) (IMPACT) (set 1)", GAME_FLAGS, layout_j6ra )
+GAMEL( 1998, j6raa       , j6ra      , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Red Alert (JPM) (IMPACT) (set 2)", GAME_FLAGS, layout_j6ra )
+GAMEL( 1998, j6rab       , j6ra      , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Red Alert (JPM) (IMPACT) (set 3)", GAME_FLAGS, layout_j6ra )
+GAMEL( 1998, j6rac       , j6ra      , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Red Alert (JPM) (IMPACT) (set 4)", GAME_FLAGS, layout_j6ra )
+GAMEL( 1998, j6rad       , j6ra      , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Red Alert (JPM) (IMPACT) (set 5)", GAME_FLAGS, layout_j6ra )
 
 GAME( 199?, j6raclb     , 0         , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Red Alert Club (JPM) (IMPACT) (set 1)", GAME_FLAGS )
 GAME( 199?, j6raclba    , j6raclb   , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Red Alert Club (JPM) (IMPACT) (set 2)", GAME_FLAGS )
@@ -8954,12 +8954,12 @@ GAMEL( 199?, j6wizardd   , j6wizard  , impctawp, tbirds, jpmimpct_state, 0, ROT0
 GAMEL( 199?, j6wizarde   , j6wizard  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Wizard Of Odds (JPM) (IMPACT) (set 6)", GAME_FLAGS, layout_j6wizardd )
 
 
-GAME( 199?, j6knight    , 0         , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Your Lucky Knight (JPM) (IMPACT) (set 1)", GAME_FLAGS )
-GAME( 199?, j6knighta   , j6knight  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Your Lucky Knight (JPM) (IMPACT) (set 2)", GAME_FLAGS )
-GAME( 199?, j6knightb   , j6knight  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Your Lucky Knight (JPM) (IMPACT) (set 3)", GAME_FLAGS )
-GAME( 199?, j6knightc   , j6knight  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Your Lucky Knight (JPM) (IMPACT) (set 4)", GAME_FLAGS )
-GAME( 199?, j6knightd   , j6knight  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Your Lucky Knight (JPM) (IMPACT) (set 5)", GAME_FLAGS )
-GAME( 199?, j6knighte   , j6knight  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Your Lucky Knight (JPM) (IMPACT) (set 6)", GAME_FLAGS )
+GAME( 2002, j6knight    , 0         , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Your Lucky Knight (JPM) (IMPACT) (set 1)", GAME_FLAGS )
+GAME( 2002, j6knighta   , j6knight  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Your Lucky Knight (JPM) (IMPACT) (set 2)", GAME_FLAGS )
+GAME( 2002, j6knightb   , j6knight  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Your Lucky Knight (JPM) (IMPACT) (set 3)", GAME_FLAGS )
+GAME( 2002, j6knightc   , j6knight  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Your Lucky Knight (JPM) (IMPACT) (set 4)", GAME_FLAGS )
+GAME( 2002, j6knightd   , j6knight  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Your Lucky Knight (JPM) (IMPACT) (set 5)", GAME_FLAGS )
+GAME( 2002, j6knighte   , j6knight  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "Your Lucky Knight (JPM) (IMPACT) (set 6)", GAME_FLAGS )
 
 
 GAME( 199?, j6svndb     , 0         , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Ace", "7 Deadly Bins (Ace) (IMPACT)", GAME_FLAGS )
@@ -8997,13 +8997,13 @@ GAME( 199?, j6h5clb     , 0         , impctawp, tbirds, jpmimpct_state, 0, ROT0,
 GAME( 199?, j6h5clba    , j6h5clb   , impctawp, tbirds, jpmimpct_state, 0, ROT0, "JPM", "High Five Club (JPM) (IMPACT) (set 2)", GAME_FLAGS )
 
 
-GAME( 199?, j6bmc       , 0         , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Crystal", "Big Money Club (Crystal) (IMPACT) (set 1)", GAME_FLAGS )
-GAME( 199?, j6bmca      , j6bmc     , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Crystal", "Big Money Club (Crystal) (IMPACT) (set 2)", GAME_FLAGS )
+GAME( 199?, j6bmc       , 0         , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Crystal", "Club Big Money (Crystal) (IMPACT) (set 1)", GAME_FLAGS )
+GAME( 199?, j6bmca      , j6bmc     , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Crystal", "Club Big Money (Crystal) (IMPACT) (set 2)", GAME_FLAGS )
 
-GAME( 199?, j6bno       , 0         , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Crystal", "Big Nite Out (Crystal) (IMPACT) (set 1)", GAME_FLAGS )
-GAME( 199?, j6bnoa      , j6bno     , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Crystal", "Big Nite Out (Crystal) (IMPACT) (set 2)", GAME_FLAGS )
-GAME( 199?, j6bnob      , j6bno     , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Crystal", "Big Nite Out (Crystal) (IMPACT) (set 3)", GAME_FLAGS )
-GAME( 199?, j6bnoc      , j6bno     , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Crystal", "Big Nite Out (Crystal) (IMPACT) (set 4)", GAME_FLAGS )
+GAME( 2000, j6bno       , 0         , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Crystal", "Big Nite Out (Crystal) (IMPACT) (set 1)", GAME_FLAGS )
+GAME( 2000, j6bnoa      , j6bno     , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Crystal", "Big Nite Out (Crystal) (IMPACT) (set 2)", GAME_FLAGS )
+GAME( 2000, j6bnob      , j6bno     , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Crystal", "Big Nite Out (Crystal) (IMPACT) (set 3)", GAME_FLAGS )
+GAME( 2000, j6bnoc      , j6bno     , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Crystal", "Big Nite Out (Crystal) (IMPACT) (set 4)", GAME_FLAGS )
 
 
 GAMEL( 199?, j6btbw      , 0         , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Crystal", "Born To Be Wild Club (Crystal) (IMPACT) (set 1)", GAME_FLAGS, layout_j6btbwd )
@@ -9013,8 +9013,8 @@ GAMEL( 199?, j6btbwc     , j6btbw    , impctawp, tbirds, jpmimpct_state, 0, ROT0
 GAMEL( 199?, j6btbwd     , j6btbw    , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Crystal", "Born To Be Wild Club (Crystal) (IMPACT) (set 5)", GAME_FLAGS, layout_j6btbwd )
 
 
-GAMEL( 199?, j6cpal      , 0         , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Whitbread / Crystal", "Caesars Palace (Whitbread / Crystal) (IMPACT) (set 1)", GAME_FLAGS, layout_j6cpal )
-GAMEL( 199?, j6cpala     , j6cpal    , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Whitbread / Crystal", "Caesars Palace (Whitbread / Crystal) (IMPACT) (set 2)", GAME_FLAGS, layout_j6cpal ) // marked as ACE
+GAMEL( 1999, j6cpal      , 0         , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Whitbread / Crystal", "Caesars Palace (Whitbread / Crystal) (IMPACT) (set 1)", GAME_FLAGS, layout_j6cpal )
+GAMEL( 1999, j6cpala     , j6cpal    , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Whitbread / Crystal", "Caesars Palace (Whitbread / Crystal) (IMPACT) (set 2)", GAME_FLAGS, layout_j6cpal ) // marked as ACE
 GAMEL( 1998, j6cpalb     , j6cpal    , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Whitbread / Crystal", "Caesars Palace (Whitbread / Crystal) (IMPACT) (set 3)", GAME_FLAGS, layout_j6cpal )
 GAMEL( 1998, j6cpalc     , j6cpal    , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Whitbread / Crystal", "Caesars Palace (Whitbread / Crystal) (IMPACT) (set 4)", GAME_FLAGS, layout_j6cpal )
 GAMEL( 1998, j6cpald     , j6cpal    , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Whitbread / Crystal", "Caesars Palace (Whitbread / Crystal) (IMPACT) (set 5)", GAME_FLAGS, layout_j6cpal )
@@ -9075,8 +9075,8 @@ GAME( 199?, j6hdcg      , j6hdc     , impctawp, tbirds, jpmimpct_state, 0, ROT0,
 GAME( 199?, j6impls     , 0         , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Crystal", "Impulse (Crystal) (IMPACT)", GAME_FLAGS )
 
 
-GAME( 199?, j6kapang    , 0         , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Crystal", "Kapang! (Crystal) (IMPACT) (set 1)", GAME_FLAGS )
-GAME( 199?, j6kapanga   , j6kapang  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Crystal", "Kapang! (Crystal) (IMPACT) (set 2)", GAME_FLAGS )
+GAME( 2001, j6kapang    , 0         , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Crystal", "Kapang! (Crystal) (IMPACT) (set 1)", GAME_FLAGS )
+GAME( 2001, j6kapanga   , j6kapang  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Crystal", "Kapang! (Crystal) (IMPACT) (set 2)", GAME_FLAGS )
 
 GAMEL( 199?, j6kfc       , 0         , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Crystal", "Kung Fu Club (Crystal) (IMPACT) (set 1)", GAME_FLAGS, layout_j6kfc )
 GAMEL( 199?, j6kfca      , j6kfc     , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Crystal", "Kung Fu Club (Crystal) (IMPACT) (set 2)", GAME_FLAGS, layout_j6kfc )
@@ -9110,12 +9110,12 @@ GAME( 199?, j6ramesee   , j6ramese  , impctawp, tbirds, jpmimpct_state, 0, ROT0,
 GAME( 199?, j6ramesef   , j6ramese  , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Crystal", "Rameses' Riches Club (Crystal) (IMPACT) (set 7)", GAME_FLAGS )
 
 
-GAME( 199?, j6r2rum     , 0         , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Crystal", "Ready To Rumble (Crystal) (IMPACT) (set 1)", GAME_FLAGS )
-GAME( 199?, j6r2ruma    , j6r2rum   , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Crystal", "Ready To Rumble (Crystal) (IMPACT) (set 2)", GAME_FLAGS )
-GAME( 199?, j6r2rumb    , j6r2rum   , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Crystal", "Ready To Rumble (Crystal) (IMPACT) (set 3)", GAME_FLAGS )
-GAME( 199?, j6r2rumc    , j6r2rum   , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Crystal", "Ready To Rumble (Crystal) (IMPACT) (set 4)", GAME_FLAGS )
-GAME( 199?, j6r2rumd    , j6r2rum   , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Crystal", "Ready To Rumble (Crystal) (IMPACT) (set 5)", GAME_FLAGS )
-GAME( 199?, j6r2rume    , j6r2rum   , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Crystal", "Ready To Rumble (Crystal) (IMPACT) (set 6)", GAME_FLAGS )
+GAME( 2000, j6r2rum     , 0         , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Crystal", "Ready To Rumble (Crystal) (IMPACT) (set 1)", GAME_FLAGS )
+GAME( 2000, j6r2ruma    , j6r2rum   , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Crystal", "Ready To Rumble (Crystal) (IMPACT) (set 2)", GAME_FLAGS )
+GAME( 2000, j6r2rumb    , j6r2rum   , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Crystal", "Ready To Rumble (Crystal) (IMPACT) (set 3)", GAME_FLAGS )
+GAME( 2000, j6r2rumc    , j6r2rum   , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Crystal", "Ready To Rumble (Crystal) (IMPACT) (set 4)", GAME_FLAGS )
+GAME( 2000, j6r2rumd    , j6r2rum   , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Crystal", "Ready To Rumble (Crystal) (IMPACT) (set 5)", GAME_FLAGS )
+GAME( 2000, j6r2rume    , j6r2rum   , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Crystal", "Ready To Rumble (Crystal) (IMPACT) (set 6)", GAME_FLAGS )
 
 
 GAME( 199?, j6redal     , 0         , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Crystal", "Red Alert (Crystal) (IMPACT) (set 1)", GAME_FLAGS )
@@ -9125,15 +9125,15 @@ GAME( 199?, j6redala    , j6redal   , impctawp, tbirds, jpmimpct_state, 0, ROT0,
 GAME( 199?, j6reelb     , 0         , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Crystal", "Reel Bingo Classic Club (Crystal) (IMPACT) (set 1)", GAME_FLAGS )
 GAME( 199?, j6reelba    , j6reelb   , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Crystal", "Reel Bingo Classic Club (Crystal) (IMPACT) (set 2)", GAME_FLAGS )
 
-GAMEL( 199?, j6slagn     , 0         , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Crystal", "Snakes & Ladders Slides Again (Crystal) (IMPACT) (set 1)", GAME_FLAGS, layout_j6slagng )
-GAMEL( 199?, j6slagna    , j6slagn   , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Crystal", "Snakes & Ladders Slides Again (Crystal) (IMPACT) (set 2)", GAME_FLAGS, layout_j6slagng )
-GAMEL( 199?, j6slagnb    , j6slagn   , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Crystal", "Snakes & Ladders Slides Again (Crystal) (IMPACT) (set 3)", GAME_FLAGS, layout_j6slagng )
-GAMEL( 199?, j6slagnc    , j6slagn   , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Crystal", "Snakes & Ladders Slides Again (Crystal) (IMPACT) (set 4)", GAME_FLAGS, layout_j6slagng )
-GAMEL( 199?, j6slagnd    , j6slagn   , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Crystal", "Snakes & Ladders Slides Again (Crystal) (IMPACT) (set 5)", GAME_FLAGS, layout_j6slagng )
-GAMEL( 199?, j6slagne    , j6slagn   , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Crystal", "Snakes & Ladders Slides Again (Crystal) (IMPACT) (set 6)", GAME_FLAGS, layout_j6slagng )
-GAMEL( 199?, j6slagnf    , j6slagn   , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Crystal", "Snakes & Ladders Slides Again (Crystal) (IMPACT) (set 7)", GAME_FLAGS, layout_j6slagng )
-GAMEL( 199?, j6slagng    , j6slagn   , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Crystal", "Snakes & Ladders Slides Again (Crystal) (IMPACT) (set 8)", GAME_FLAGS, layout_j6slagng )
-GAMEL( 199?, j6slagnh    , j6slagn   , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Crystal", "Snakes & Ladders Slides Again (Crystal) (IMPACT) (set 9)", GAME_FLAGS, layout_j6slagng )
+GAMEL( 2001, j6slagn     , 0         , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Crystal", "Snakes & Ladders Slides Again (Crystal) (IMPACT) (set 1)", GAME_FLAGS, layout_j6slagng )
+GAMEL( 2001, j6slagna    , j6slagn   , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Crystal", "Snakes & Ladders Slides Again (Crystal) (IMPACT) (set 2)", GAME_FLAGS, layout_j6slagng )
+GAMEL( 2001, j6slagnb    , j6slagn   , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Crystal", "Snakes & Ladders Slides Again (Crystal) (IMPACT) (set 3)", GAME_FLAGS, layout_j6slagng )
+GAMEL( 2001, j6slagnc    , j6slagn   , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Crystal", "Snakes & Ladders Slides Again (Crystal) (IMPACT) (set 4)", GAME_FLAGS, layout_j6slagng )
+GAMEL( 2001, j6slagnd    , j6slagn   , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Crystal", "Snakes & Ladders Slides Again (Crystal) (IMPACT) (set 5)", GAME_FLAGS, layout_j6slagng )
+GAMEL( 2001, j6slagne    , j6slagn   , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Crystal", "Snakes & Ladders Slides Again (Crystal) (IMPACT) (set 6)", GAME_FLAGS, layout_j6slagng )
+GAMEL( 2001, j6slagnf    , j6slagn   , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Crystal", "Snakes & Ladders Slides Again (Crystal) (IMPACT) (set 7)", GAME_FLAGS, layout_j6slagng )
+GAMEL( 2001, j6slagng    , j6slagn   , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Crystal", "Snakes & Ladders Slides Again (Crystal) (IMPACT) (set 8)", GAME_FLAGS, layout_j6slagng )
+GAMEL( 2001, j6slagnh    , j6slagn   , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Crystal", "Snakes & Ladders Slides Again (Crystal) (IMPACT) (set 9)", GAME_FLAGS, layout_j6slagng )
 
 
 GAME( 199?, j6thril     , 0         , impctawp, tbirds, jpmimpct_state, 0, ROT0, "Crystal", "Thriller (Crystal) (IMPACT) (set 1)", GAME_FLAGS )
