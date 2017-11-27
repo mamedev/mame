@@ -248,26 +248,6 @@ tms1000_base_disassembler::tms1000_base_disassembler(const u8 *lut_mnemonic, boo
 {
 }
 
-u32 tms1000_base_disassembler::opcode_alignment() const
-{
-	return 1;
-}
-
-u32 tms1000_base_disassembler::interface_flags() const
-{
-	return NONLINEAR_PC | PAGED2LEVEL;
-}
-
-u32 tms1000_base_disassembler::page_address_bits() const
-{
-	return m_pc_bits;
-}
-
-u32 tms1000_base_disassembler::page2_address_bits() const
-{
-	return 4;
-}
-
 offs_t tms1000_base_disassembler::pc_linear_to_real(offs_t pc) const
 {
 	switch(m_pc_bits) {

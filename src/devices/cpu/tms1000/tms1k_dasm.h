@@ -17,10 +17,9 @@ public:
 	tms1000_base_disassembler(const u8 *lut_mnemonic, bool opcode_9bits, int pc_bits);
 	virtual ~tms1000_base_disassembler() = default;
 
-	virtual u32 opcode_alignment() const override;
-	virtual u32 interface_flags() const override;
-	virtual u32 page_address_bits() const override;
-	virtual u32 page2_address_bits() const override;
+	virtual u32 opcode_alignment() const override { return 1; }
+	virtual u32 interface_flags() const override { return NONLINEAR_PC | PAGED; }
+	virtual u32 page_address_bits() const override { return m_pc_bits; }
 	virtual offs_t pc_linear_to_real(offs_t pc) const override;
 	virtual offs_t pc_real_to_linear(offs_t pc) const override;
 	virtual offs_t disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params) override;
@@ -70,6 +69,9 @@ class tms1100_disassembler : public tms1000_base_disassembler
 public:
 	tms1100_disassembler();
 	virtual ~tms1100_disassembler() = default;
+
+	virtual u32 interface_flags() const override { return NONLINEAR_PC | PAGED2LEVEL; }
+	virtual u32 page2_address_bits() const override { return 4; }
 
 protected:
 	static const u8 tms1100_mnemonic[256];
