@@ -361,6 +361,11 @@ ROM_START( groundfx )
 	ROM_LOAD( "93c46.164", 0x0000, 0x0080, CRC(6f58851d) SHA1(33bd4478f097dca6b5d222adb89699c6d35ed009) )
 ROM_END
 
+/*The World version of Ground Effects is not dumped and has the following EPROM labels:
+'D51 28' @ IC59
+'D51 31' @ IC77
+'D51 32' @ IC61
+'D51 33' @ IC79*/
 
 READ32_MEMBER(groundfx_state::irq_speedup_r)
 {
