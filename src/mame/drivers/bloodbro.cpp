@@ -760,10 +760,10 @@ ROM_START( weststory )
 
 	ROM_REGION( 0x100000, "gfx3", ROMREGION_INVERT )
 	ROM_LOAD( "ws25.bin", 0x00000, 0x20000, CRC(8092e8e9) SHA1(eabe58ac0f88234b0dddf361f56aad509a83012e) ) /* sprites */
-	ROM_LOAD( "ws26.bin", 0x20000, 0x20000, CRC(f6a1f42c) SHA1(6d5503e1a9b00104970292d22301ed28893c5223) ) /* WS25 & WS26 contain bad sprites, but verified correct on 2 different PCBs */
+	ROM_LOAD( "ws26.bin", 0x20000, 0x20000, CRC(f6a1f42c) SHA1(6d5503e1a9b00104970292d22301ed28893c5223) )
 	ROM_LOAD( "ws23.bin", 0x40000, 0x20000, CRC(43d58e24) SHA1(99e255faa9716d9102a1223419084fc209ab4024) )
-	ROM_LOAD( "ws24.bin", 0x60000, 0x20000, CRC(20a867ea) SHA1(d3985002931fd4180fc541d61a94371871f3709d) )
-	ROM_LOAD( "ws21.bin", 0x80000, 0x20000, CRC(e23d7296) SHA1(33bbced960be22efc7d2681e06a27feba09e0fc0) )
+	ROM_LOAD( "ws24.bin", 0x60000, 0x20000, CRC(20a867ea) SHA1(d3985002931fd4180fc541d61a94371871f3709d) ) /* if the original MASK rom is converted then offset 1ECFE = 06 not 02, confirmed on 2 bootlegs, maybe original mask dump is bad? */
+	ROM_LOAD( "ws21.bin", 0x80000, 0x20000, CRC(5ef55779) SHA1(8ca786ef56173305a01452defc2be6e775bef374) )
 	ROM_LOAD( "ws22.bin", 0xa0000, 0x20000, CRC(7150a060) SHA1(73bdd7d6752f7fe9e23073d835dbc468d57865fa) )
 	ROM_LOAD( "ws19.bin", 0xc0000, 0x20000, CRC(c5dd0a96) SHA1(4696ab1b02d40c54a7dacf0bdf90b624b7d6812e) )
 	ROM_LOAD( "ws20.bin", 0xe0000, 0x20000, CRC(f1245c16) SHA1(f3941bf5830995f65a5378326fdb72687fbbddcf) )
@@ -806,10 +806,10 @@ ROM_START( weststorya )
 
 	ROM_REGION( 0x100000, "gfx3", ROMREGION_INVERT )
 	ROM_LOAD( "ws25.bin", 0x00000, 0x20000, CRC(8092e8e9) SHA1(eabe58ac0f88234b0dddf361f56aad509a83012e) ) /* sprites */
-	ROM_LOAD( "ws26.bin", 0x20000, 0x20000, CRC(f6a1f42c) SHA1(6d5503e1a9b00104970292d22301ed28893c5223) ) /* WS25 & WS26 contain bad sprites, but verified correct on 2 different PCBs */
+	ROM_LOAD( "ws26.bin", 0x20000, 0x20000, CRC(f6a1f42c) SHA1(6d5503e1a9b00104970292d22301ed28893c5223) )
 	ROM_LOAD( "ws23.bin", 0x40000, 0x20000, CRC(43d58e24) SHA1(99e255faa9716d9102a1223419084fc209ab4024) )
-	ROM_LOAD( "ws24.bin", 0x60000, 0x20000, CRC(20a867ea) SHA1(d3985002931fd4180fc541d61a94371871f3709d) )
-	ROM_LOAD( "ws21.bin", 0x80000, 0x20000, CRC(e23d7296) SHA1(33bbced960be22efc7d2681e06a27feba09e0fc0) )
+	ROM_LOAD( "ws24.bin", 0x60000, 0x20000, CRC(20a867ea) SHA1(d3985002931fd4180fc541d61a94371871f3709d) ) /* if the original MASK rom is converted then offset 1ECFE = 06 not 02, confirmed on 2 bootlegs, maybe original mask dump is bad? */
+	ROM_LOAD( "ws21.bin", 0x80000, 0x20000, CRC(5ef55779) SHA1(8ca786ef56173305a01452defc2be6e775bef374) )
 	ROM_LOAD( "ws22.bin", 0xa0000, 0x20000, CRC(7150a060) SHA1(73bdd7d6752f7fe9e23073d835dbc468d57865fa) )
 	ROM_LOAD( "ws19.bin", 0xc0000, 0x20000, CRC(c5dd0a96) SHA1(4696ab1b02d40c54a7dacf0bdf90b624b7d6812e) )
 	ROM_LOAD( "ws20.bin", 0xe0000, 0x20000, CRC(f1245c16) SHA1(f3941bf5830995f65a5378326fdb72687fbbddcf) )
@@ -854,6 +854,16 @@ DRIVER_INIT_MEMBER(bloodbro_state,weststry)
 	memory_region *z80_rom = memregion("audiocpu");
 	z80_rom->as_u8(0x160e) = 0x00;
 	z80_rom->as_u8(0x1610) = 0x00;
+
+
+	uint8_t *sprites = memregion("gfx3")->base();
+
+	for (int i = 0; i < 0x40000; i++)
+	{	
+		/* sprite roms ws25 and ws26 have 2 bits swapped
+		   there is also an address swap but that is currently handled in the video implementation */
+		sprites[i] = BITSWAP8(sprites[i],7,6,4,5,3,2,1,0);
+	}
 
 	m_weststry_opl_irq = false;
 	m_weststry_soundnmi_mask = true;
