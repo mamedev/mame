@@ -28,7 +28,7 @@ DEFINE_DEVICE_TYPE(TP0320, tp0320_cpu_device, "tp0320", "TP0320") // 28-pin SDIP
 
 // internal memory maps
 static ADDRESS_MAP_START(program_11bit_9, AS_PROGRAM, 16, tms1k_base_device)
-	AM_RANGE(0x000, 0xfff) AM_ROM
+	AM_RANGE(0x000, 0x7ff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(data_192x4, AS_DATA, 8, tms1k_base_device)
@@ -39,7 +39,7 @@ ADDRESS_MAP_END
 
 // device definitions
 tp0320_cpu_device::tp0320_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: tms0980_cpu_device(mconfig, TP0320, tag, owner, clock, 7 /* o pins */, 10 /* r pins */, 7 /* pc bits */, 9 /* byte width */, 4 /* x width */, 12 /* prg width */, ADDRESS_MAP_NAME(program_11bit_9), 8 /* data width */, ADDRESS_MAP_NAME(data_192x4))
+	: tms0980_cpu_device(mconfig, TP0320, tag, owner, clock, 7 /* o pins */, 10 /* r pins */, 7 /* pc bits */, 9 /* byte width */, 4 /* x width */, 11 /* prg width */, ADDRESS_MAP_NAME(program_11bit_9), 8 /* data width */, ADDRESS_MAP_NAME(data_192x4))
 {
 }
 

@@ -43,7 +43,7 @@ ADDRESS_MAP_END
 
 // device definitions
 tms0980_cpu_device::tms0980_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: tms0980_cpu_device(mconfig, TMS0980, tag, owner, clock, 8 /* o pins */, 9 /* r pins */, 7 /* pc bits */, 9 /* byte width */, 4 /* x width */, 12 /* prg width */, ADDRESS_MAP_NAME(program_11bit_9), 8 /* data width */, ADDRESS_MAP_NAME(data_144x4))
+	: tms0980_cpu_device(mconfig, TMS0980, tag, owner, clock, 8 /* o pins */, 9 /* r pins */, 7 /* pc bits */, 9 /* byte width */, 4 /* x width */, 11 /* prg width */, ADDRESS_MAP_NAME(program_11bit_9), 8 /* data width */, ADDRESS_MAP_NAME(data_144x4))
 {
 }
 
@@ -53,7 +53,7 @@ tms0980_cpu_device::tms0980_cpu_device(const machine_config &mconfig, device_typ
 }
 
 tms1980_cpu_device::tms1980_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: tms0980_cpu_device(mconfig, TMS1980, tag, owner, clock, 7, 10, 7, 9, 4, 12, ADDRESS_MAP_NAME(program_11bit_9), 8, ADDRESS_MAP_NAME(data_144x4))
+	: tms0980_cpu_device(mconfig, TMS1980, tag, owner, clock, 7, 10, 7, 9, 4, 11, ADDRESS_MAP_NAME(program_11bit_9), 8, ADDRESS_MAP_NAME(data_144x4))
 {
 }
 
