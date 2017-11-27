@@ -695,7 +695,7 @@ u32 arm7_disassembler::arm7_disasm( std::ostream &stream, uint32_t pc, uint32_t 
 	{
 		util::stream_format( stream, "Undefined" );
 	}
-	return dasmflags | SUPPORTED;
+	return 4 | dasmflags | SUPPORTED;
 }
 
 u32 arm7_disassembler::thumb_disasm(std::ostream &stream, uint32_t pc, uint16_t opcode)
@@ -1322,7 +1322,7 @@ u32 arm7_disassembler::thumb_disasm(std::ostream &stream, uint32_t pc, uint16_t 
 				break;
 		}
 
-	return dasmflags | SUPPORTED;
+	return 2 | dasmflags | SUPPORTED;
 }
 
 arm7_disassembler::arm7_disassembler(config *conf) : m_config(conf)
@@ -1337,7 +1337,7 @@ u32 arm7_disassembler::opcode_alignment() const
 offs_t arm7_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
 	if(m_config->get_t_flag())
-		return arm7_disasm(stream, pc, opcodes.r32(pc));
-	else
 		return thumb_disasm(stream, pc, opcodes.r16(pc));
+	else
+		return arm7_disasm(stream, pc, opcodes.r32(pc));
 }
