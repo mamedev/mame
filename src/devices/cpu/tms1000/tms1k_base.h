@@ -93,6 +93,26 @@ public:
 
 	u8 debug_peek_o_index() { return m_o_index; } // get output PLA index, for debugging (don't use in emulation)
 
+protected:
+	// construction/destruction
+	tms1k_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 o_pins, u8 r_pins, u8 pc_bits, u8 byte_bits, u8 x_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data);
+
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+	// device_execute_interface overrides
+	virtual u32 execute_min_cycles() const override { return 1; }
+	virtual u32 execute_max_cycles() const override { return 6; }
+	virtual u32 execute_input_lines() const override { return 1; }
+	virtual void execute_run() override;
+
+	// device_memory_interface overrides
+	virtual space_config_vector memory_space_config() const override;
+
+	// device_state_interface overrides
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
+
 	// microinstructions
 	enum
 	{
@@ -150,26 +170,6 @@ public:
 		F_SEAC =  (1<<19),
 		F_XDA =   (1<<20)
 	};
-
-protected:
-	// construction/destruction
-	tms1k_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 o_pins, u8 r_pins, u8 pc_bits, u8 byte_bits, u8 x_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data);
-
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-
-	// device_execute_interface overrides
-	virtual u32 execute_min_cycles() const override { return 1; }
-	virtual u32 execute_max_cycles() const override { return 6; }
-	virtual u32 execute_input_lines() const override { return 1; }
-	virtual void execute_run() override;
-
-	// device_memory_interface overrides
-	virtual space_config_vector memory_space_config() const override;
-
-	// device_state_interface overrides
-	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	void next_pc();
 
