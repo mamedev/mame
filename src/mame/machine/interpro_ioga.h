@@ -29,7 +29,8 @@
 #define MCFG_INTERPRO_IOGA_ETH_CA_CB(_ca) \
 	devcb = &interpro_ioga_device::static_set_eth_ca_callback(*device, DEVCB_##_ca);
 
-#define MCFG_INTERPRO_IOGA_DMA_BUS(_mmu, _space)
+#define MCFG_INTERPRO_IOGA_MEMORY(_tag, _spacenum) \
+	interpro_ioga_device::static_set_memory(*device, _tag, _spacenum);
 
 class interpro_ioga_device : public device_t
 {
@@ -114,6 +115,8 @@ public:
 	template<class _Object> static devcb_base &static_set_serial_dma_w_callback(device_t &device, int channel, _Object object) { return downcast<interpro_ioga_device &>(device).m_serial_dma_channel[channel].device_w.set_callback(object); }
 	template<class _Object> static devcb_base &static_set_fdc_tc_callback(device_t &device, _Object object) { return downcast<interpro_ioga_device &>(device).m_fdc_tc_func.set_callback(object); }
 	template<class _Object> static devcb_base &static_set_eth_ca_callback(device_t &device, _Object object) { return downcast<interpro_ioga_device &>(device).m_eth_ca_func.set_callback(object); }
+
+	static void static_set_memory(device_t &device, const char *const tag, const int spacenum);
 
 	virtual DECLARE_ADDRESS_MAP(map, 32) = 0;
 
@@ -317,6 +320,8 @@ protected:
 	virtual void device_reset() override;
 	virtual ioport_constructor device_input_ports() const override;
 
+	const char *m_memory_tag;
+	int m_memory_spacenum;
 	address_space *m_memory_space;
 
 	// callbacks

@@ -65,7 +65,6 @@ public:
 	interpro_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, INTERPRO_CPU_TAG)
-		, m_mmu(*this, INTERPRO_MMU_TAG)
 		, m_ram(*this, RAM_TAG)
 		, m_mcga(*this, INTERPRO_MCGA_TAG)
 		, m_sga(*this, INTERPRO_SGA_TAG)
@@ -78,10 +77,10 @@ public:
 		, m_scsi(*this, INTERPRO_SCSI_DEVICE_TAG)
 		, m_eth(*this, INTERPRO_ETH_TAG)
 		, m_ioga(*this, INTERPRO_IOGA_TAG)
-		{ }
+	{
+	}
 
 	required_device<clipper_device> m_maincpu;
-	required_device<cammu_device> m_mmu;
 	required_device<ram_device> m_ram;
 
 	required_device<interpro_mcga_device> m_mcga;
@@ -96,7 +95,7 @@ public:
 	required_device<i82586_base_device> m_eth;
 	required_device<interpro_ioga_device> m_ioga;
 
-	DECLARE_DRIVER_INIT(interpro);
+	DECLARE_DRIVER_INIT(common);
 
 	enum sreg_error_mask
 	{
@@ -180,9 +179,17 @@ class turquoise_state : public interpro_state
 public:
 	turquoise_state(const machine_config &mconfig, device_type type, const char *tag)
 		: interpro_state(mconfig, type, tag)
-	{}
+		, m_d_cammu(*this, INTERPRO_MMU_TAG "_d")
+		, m_i_cammu(*this, INTERPRO_MMU_TAG "_i")
+	{
+	}
+
+	DECLARE_DRIVER_INIT(turquoise);
 
 	DECLARE_WRITE8_MEMBER(sreg_error_w) { m_sreg_error = data; }
+
+	required_device<cammu_c3_device> m_d_cammu;
+	required_device<cammu_c3_device> m_i_cammu;
 };
 
 class sapphire_state : public interpro_state
@@ -190,14 +197,20 @@ class sapphire_state : public interpro_state
 public:
 	sapphire_state(const machine_config &mconfig, device_type type, const char *tag)
 		: interpro_state(mconfig, type, tag)
+		, m_mmu(*this, INTERPRO_MMU_TAG)
 		, m_flash_lo(*this, INTERPRO_FLASH_TAG "_lo")
 		, m_flash_hi(*this, INTERPRO_FLASH_TAG "_hi")
-	{}
+	{
+	}
+
+	DECLARE_DRIVER_INIT(sapphire);
+
+	virtual DECLARE_WRITE16_MEMBER(sreg_ctrl2_w) override;
+
+	required_device<cammu_c4_device> m_mmu;
 
 	required_device<intel_28f010_device> m_flash_lo;
 	required_device<intel_28f010_device> m_flash_hi;
-
-	virtual DECLARE_WRITE16_MEMBER(sreg_ctrl2_w) override;
 };
 
 #endif // MAME_INCLUDES_INTERPRO_H
