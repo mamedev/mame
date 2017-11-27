@@ -72,7 +72,8 @@ static ADDRESS_MAP_START(cfx9850, AS_PROGRAM, 8, cfx9850_state)
 //  AM_RANGE( 0x100000, 0x10ffff ) // some memory mapped i/o???
 //  AM_RANGE( 0x110000, 0x11ffff ) // some memory mapped i/o???
 	AM_RANGE( 0x200000, 0x27ffff ) AM_ROM AM_REGION( "bios", 0 )
-	AM_RANGE( 0x400000, 0x40ffff ) AM_RAM
+	AM_RANGE( 0x400000, 0x407fff ) AM_RAM AM_SHARE("data_ram")
+	AM_RANGE( 0x408000, 0x40ffff ) AM_RAM AM_SHARE("data_ram") // Memory size detection is done by checking whether 7FFF points at the same byte as FFFF
 	AM_RANGE( 0x600000, 0x6007ff ) AM_MIRROR(0xf800) AM_RAM AM_SHARE("display_ram")
 //  AM_RANGE( 0xe10000, 0xe1ffff ) // some memory mapped i/o???
 ADDRESS_MAP_END
