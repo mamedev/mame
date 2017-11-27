@@ -62,6 +62,19 @@ public:
 };
 
 
+class tms1000c_cpu_device : public tms1000_cpu_device
+{
+public:
+	tms1000c_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+protected:
+	// overrides
+	virtual void op_br() override { op_br3(); } // 3-level stack
+	virtual void op_call() override { op_call3(); } // "
+	virtual void op_retn() override { op_retn3(); } // "
+};
+
+
 class mc141000_cpu_device : public tms1000_cpu_device
 {
 public:
@@ -76,6 +89,7 @@ public:
 
 
 DECLARE_DEVICE_TYPE(TMS1000,  tms1000_cpu_device)
+DECLARE_DEVICE_TYPE(TMS1000C, tms1000c_cpu_device)
 DECLARE_DEVICE_TYPE(TMS1070,  tms1070_cpu_device)
 DECLARE_DEVICE_TYPE(TMS1040,  tms1040_cpu_device)
 DECLARE_DEVICE_TYPE(TMS1200,  tms1200_cpu_device)
