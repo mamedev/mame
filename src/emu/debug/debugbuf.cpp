@@ -60,8 +60,6 @@ address_space *debug_disasm_buffer::debug_data_buffer::get_underlying_space() co
 
 void debug_disasm_buffer::debug_data_buffer::fill(offs_t lstart, offs_t size) const
 {
-	if(lstart & ~m_pc_mask)
-		abort();
 	offs_t lend = (lstart + size) & m_pc_mask;
 	if(m_page_mask) {
 		if((lstart ^ lend) & ~m_page_mask) {
