@@ -219,7 +219,7 @@ The actual carts are mostly only about 1/3rd to 1/2 populated.
 Some of the IC locations between DG1 and DG2 are different also. See the source code below
 for the exact number of ROMs used per game and ROM placements.
 
-Games that use the LVS-DG1 cart: Road's Edge
+Games that use the LVS-DG1 cart: Road's Edge, Samurai Shodown 64 / Samurai Spirits 64
 
 Games that use the LVS-DG2 cart: Fatal Fury: Wild Ambition, Buriki One, SS 64 II
 
