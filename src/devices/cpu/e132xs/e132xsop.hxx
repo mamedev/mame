@@ -1101,11 +1101,11 @@ void hyperstone_device::hyperstone_ori()
 
 	if (!IMM_LONG)
 		imm = m_op & 0x0f;
-	uint32_t dreg;
+
 	if (DST_GLOBAL)
 	{
 		const uint32_t dst_code = DST_CODE;
-		dreg = m_global_regs[dst_code] | imm;
+		const uint32_t dreg = m_global_regs[dst_code] | imm;
 
 		if (dreg)
 			SR &= ~Z_MASK;
@@ -1117,7 +1117,7 @@ void hyperstone_device::hyperstone_ori()
 	else
 	{
 		const uint32_t dst_code = (DST_CODE + GET_FP) & 0x3f;
-		dreg = m_local_regs[dst_code] |= imm;
+		const uint32_t dreg = m_local_regs[dst_code] |= imm;
 
 		if (dreg)
 			SR &= ~Z_MASK;

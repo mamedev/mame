@@ -1,4 +1,3 @@
-
 // license:BSD-3-Clause
 // copyright-holders:Pierpaolo Prazzoli
 /********************************************************************
@@ -401,46 +400,26 @@ uint32_t hyperstone_device::get_emu_code_addr(uint8_t num) /* num is OP */
 	return addr;
 }
 
-void hyperstone_device::hyperstone_set_trap_entry(int which)
-{
-	switch( which )
-	{
-		case E132XS_ENTRY_MEM0:
-			m_trap_entry = 0x00000000;
-			break;
+/*static*/ const uint32_t hyperstone_device::s_trap_entries[8] = {
+	0x00000000, // MEM0
+	0x40000000, // MEM1
+	0x80000000, // MEM2
+	0xc0000000, // IRAM
+	0,
+	0,
+	0,
+	0xffffff00, // MEM3
+};
 
-		case E132XS_ENTRY_MEM1:
-			m_trap_entry = 0x40000000;
-			break;
-
-		case E132XS_ENTRY_MEM2:
-			m_trap_entry = 0x80000000;
-			break;
-
-		case E132XS_ENTRY_MEM3:
-			m_trap_entry = 0xffffff00;
-			break;
-
-		case E132XS_ENTRY_IRAM:
-			m_trap_entry = 0xc0000000;
-			break;
-
-		default:
-			LOG("Set entry point to a reserved value: %d\n", which);
-			break;
-	}
-}
-
-uint32_t hyperstone_device::compute_tr()
+void hyperstone_device::compute_tr()
 {
 	uint64_t cycles_since_base = total_cycles() - m_tr_base_cycles;
 	uint64_t clocks_since_base = cycles_since_base >> m_clck_scale;
-	return m_tr_base_value + (clocks_since_base / m_tr_clocks_per_tick);
+	m_tr_result = m_tr_base_value + (clocks_since_base / m_tr_clocks_per_tick);
 }
 
 void hyperstone_device::update_timer_prescale()
 {
-	uint32_t prevtr = compute_tr();
 	TPR &= ~0x80000000;
 	m_clck_scale = (TPR >> 26) & m_clock_scale_mask;
 	m_clock_cycles_1 = 1 << m_clck_scale;
@@ -449,7 +428,7 @@ void hyperstone_device::update_timer_prescale()
 	m_clock_cycles_4 = 4 << m_clck_scale;
 	m_clock_cycles_6 = 6 << m_clck_scale;
 	m_tr_clocks_per_tick = ((TPR >> 16) & 0xff) + 2;
-	m_tr_base_value = prevtr;
+	m_tr_base_value = m_tr_result;
 	m_tr_base_cycles = total_cycles();
 }
 
@@ -499,10 +478,13 @@ TIMER_CALLBACK_MEMBER( hyperstone_device::timer_callback )
 
 	/* update the values if necessary */
 	if (update)
+	{
+		compute_tr();
 		update_timer_prescale();
+	}
 
 	/* see if the timer is right for firing */
-	if (!((compute_tr() - TCR) & 0x80000000))
+	if (!((m_tr_result - TCR) & 0x80000000))
 		m_timer_int_pending = 1;
 
 	/* adjust ourselves for the next time */
@@ -552,7 +534,8 @@ uint32_t hyperstone_device::get_global_register(uint8_t code)
 		/* it is common to poll this in a loop */
 		if (m_icount > m_tr_clocks_per_tick / 2)
 			m_icount -= m_tr_clocks_per_tick / 2;
-		return compute_tr();
+		compute_tr();
+		return m_tr_result;
 	}
 	return m_global_regs[code & 0x1f];
 }
@@ -606,7 +589,10 @@ void hyperstone_device::set_global_register(uint8_t code, uint32_t val)
 		case TPR_REGISTER:
 			m_global_regs[code] = val;
 			if (!(val & 0x80000000)) /* change immediately */
+			{
+				compute_tr();
 				update_timer_prescale();
+			}
 			adjust_timer_interrupt();
 			return;
 		case TCR_REGISTER:
@@ -632,15 +618,19 @@ void hyperstone_device::set_global_register(uint8_t code, uint32_t val)
 		case FCR_REGISTER:
 			if ((m_global_regs[code] ^ val) & 0x00800000)
 				adjust_timer_interrupt();
-			m_global_regs[code] = val;
+				m_global_regs[code] = val;
 			if (m_intblock < 1)
 				m_intblock = 1;
 			return;
 		case MCR_REGISTER:
+		{
 			// bits 14..12 EntryTableMap
-			hyperstone_set_trap_entry((val & 0x7000) >> 12);
+			const int which = (val & 0x7000) >> 12;
+			assert(which < 4 || which == 7);
+			m_trap_entry = s_trap_entries[which];
 			m_global_regs[code] = val;
 			return;
+		}
 		case 28:
 		case 29:
 		case 30:
@@ -1043,6 +1033,7 @@ void hyperstone_device::init(int scale_mask)
 
 	m_tr_base_cycles = 0;
 	m_tr_base_value = 0;
+	m_tr_result = 0;
 	m_tr_clocks_per_tick = 0;
 	m_timer_int_pending = 0;
 
@@ -1081,7 +1072,7 @@ void hyperstone_device::init(int scale_mask)
 	for (int i=0; i < 64; i++)
 	{
 		sprintf(buf, "l%d", i);
-		m_drcuml->symbol_add(&m_global_regs[i], sizeof(uint32_t), buf);
+		m_drcuml->symbol_add(&m_local_regs[i], sizeof(uint32_t), buf);
 	}
 
 	m_drcuml->symbol_add(&m_drc_arg0, sizeof(uint32_t), "arg0");
@@ -1328,7 +1319,7 @@ void hyperstone_device::device_reset()
 
 	m_tr_clocks_per_tick = 2;
 
-	hyperstone_set_trap_entry(E132XS_ENTRY_MEM3); /* default entry point @ MEM3 */
+	m_trap_entry = s_trap_entries[E132XS_ENTRY_MEM3]; // default entry point @ MEM3
 
 	set_global_register(BCR_REGISTER, ~0);
 	set_global_register(MCR_REGISTER, ~0);

@@ -7,6 +7,7 @@
 
 using namespace uml;
 
+#define DRC_PC mem(m_global_regs)
 #define DRC_SR mem(&m_global_regs[1])
 
 void hyperstone_device::execute_run_drc()
@@ -42,6 +43,66 @@ void hyperstone_device::execute_run_drc()
 			code_flush_cache();
 		}
 	} while (execute_result != EXECUTE_OUT_OF_CYCLES);
+}
+
+
+/***************************************************************************
+    C FUNCTION CALLBACKS
+***************************************************************************/
+
+/*-------------------------------------------------
+    cfunc_unimplemented - handler for
+    unimplemented opcdes
+-------------------------------------------------*/
+
+inline void hyperstone_device::ccfunc_unimplemented()
+{
+	fatalerror("PC=%08X: Unimplemented op %08X\n", PC, m_drc_arg0);
+}
+
+inline void hyperstone_device::ccfunc_print()
+{
+	printf("%c: %08X\n", (char)m_drc_arg0, m_drc_arg1);
+}
+
+static void cfunc_unimplemented(void *param)
+{
+	((hyperstone_device *)param)->ccfunc_unimplemented();
+}
+
+static void cfunc_adjust_timer_interrupt(void *param)
+{
+	((hyperstone_device *)param)->adjust_timer_interrupt();
+}
+
+static void cfunc_compute_tr(void *param)
+{
+	((hyperstone_device *)param)->compute_tr();
+}
+
+static void cfunc_update_timer_prescale(void *param)
+{
+	((hyperstone_device *)param)->update_timer_prescale();
+}
+
+static void cfunc_print(void *param)
+{
+	((hyperstone_device *)param)->ccfunc_print();
+}
+
+/*-------------------------------------------------
+    ccfunc_total_cycles - compute the total number
+    of cycles executed so far
+-------------------------------------------------*/
+
+void hyperstone_device::ccfunc_total_cycles()
+{
+	m_numcycles = total_cycles();
+}
+
+static void cfunc_total_cycles(void *param)
+{
+	((hyperstone_device *)param)->ccfunc_total_cycles();
 }
 
 /***************************************************************************
@@ -99,7 +160,7 @@ void hyperstone_device::code_flush_cache()
 }
 
 /* Return the entry point for a determinated trap */
-int hyperstone_device::generate_get_trap_addr(drcuml_block *block, int label, uint32_t trapno)
+void hyperstone_device::generate_get_trap_addr(drcuml_block *block, uml::code_label &label, uint32_t trapno)
 {
 	int no_mem3;
 	UML_MOV(block, I0, trapno);
@@ -110,7 +171,6 @@ int hyperstone_device::generate_get_trap_addr(drcuml_block *block, int label, ui
 	UML_LABEL(block, no_mem3);
 	UML_SHL(block, I0, I0, 2);
 	UML_OR(block, I0, I0, mem(&m_trap_entry));
-	return label;
 }
 
 /*-------------------------------------------------
@@ -196,7 +256,9 @@ void hyperstone_device::code_compile_block(offs_t pc)
 
 				/* otherwise we just go to the next instruction */
 				else
-					nextpc = seqlast->pc + (seqlast->skipslots + 1) * 2;
+				{
+					nextpc = seqlast->pc + seqlast->length;
+				}
 
 				/* count off cycles and go there */
 				generate_update_cycles(block, &compiler, nextpc);            // <subtract cycles>
@@ -219,37 +281,6 @@ void hyperstone_device::code_compile_block(offs_t pc)
 		}
 	}
 }
-
-/***************************************************************************
-    C FUNCTION CALLBACKS
-***************************************************************************/
-
-/*-------------------------------------------------
-    cfunc_unimplemented - handler for
-    unimplemented opcdes
--------------------------------------------------*/
-
-inline void hyperstone_device::ccfunc_unimplemented()
-{
-	fatalerror("PC=%08X: Unimplemented op %08X\n", PC, m_drc_arg0);
-}
-
-inline void hyperstone_device::ccfunc_print()
-{
-	printf("%c: %08X\n", (char)m_drc_arg0, m_drc_arg1);
-}
-
-static void cfunc_unimplemented(void *param)
-{
-	((hyperstone_device *)param)->ccfunc_unimplemented();
-}
-
-#if 0
-static void cfunc_print(void *param)
-{
-	((hyperstone_device *)param)->ccfunc_print();
-}
-#endif
 
 /***************************************************************************
     STATIC CODEGEN
@@ -294,7 +325,8 @@ void hyperstone_device::static_generate_exception(uint32_t exception, const char
 	alloc_handle(drcuml, &exception_handle, name);
 	UML_HANDLE(block, *exception_handle);
 
-	generate_get_trap_addr(block, 1, exception);
+	uml::code_label label = 1;
+	generate_get_trap_addr(block, label, exception);
 	UML_ROLAND(block, I1, DRC_SR, 7, 0x7f);
 	UML_ROLAND(block, I2, DRC_SR, 11, 0xf);
 	UML_TEST(block, I2, 0xf);
@@ -309,7 +341,7 @@ void hyperstone_device::static_generate_exception(uint32_t exception, const char
 	UML_ROLINS(block, DRC_SR, I1, 25, 0xfe000000);
 
 	UML_AND(block, I3, I1, 0x3f);
-	UML_AND(block, I1, mem(m_global_regs), ~1);
+	UML_AND(block, I1, DRC_PC, ~1);
 	UML_ROLAND(block, I2, DRC_SR, 14, 1);
 	UML_OR(block, I1, I1, I2);
 	UML_STORE(block, (void *)m_local_regs, I3, I1, SIZE_DWORD, SCALE_x4);
@@ -320,7 +352,7 @@ void hyperstone_device::static_generate_exception(uint32_t exception, const char
 	UML_AND(block, DRC_SR, DRC_SR, ~(M_MASK | T_MASK));
 	UML_OR(block, DRC_SR, DRC_SR, (L_MASK | S_MASK));
 
-	UML_MOV(block, mem(m_global_regs), I0);
+	UML_MOV(block, DRC_PC, I0);
 	UML_SUB(block, mem(&m_icount), mem(&m_icount), 2);
 	UML_EXHc(block, COND_S, *m_out_of_cycles, 0);
 
@@ -622,7 +654,7 @@ void hyperstone_device::generate_sequence_instruction(drcuml_block *block, compi
 	/* if we are debugging, call the debugger */
 	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
 	{
-		UML_MOV(block, mem(m_global_regs), desc->pc);
+		UML_MOV(block, DRC_PC, desc->pc);
 		//save_fast_iregs(block);
 		UML_DEBUG(block, desc->pc);
 	}
@@ -632,7 +664,7 @@ void hyperstone_device::generate_sequence_instruction(drcuml_block *block, compi
 		/* compile the instruction */
 		if (!generate_opcode(block, compiler, desc))
 		{
-			UML_MOV(block, mem(m_global_regs), desc->pc);
+			UML_MOV(block, DRC_PC, desc->pc);
 			UML_MOV(block, mem(&m_drc_arg0), desc->opptr.l[0]);
 			UML_CALLC(block, cfunc_unimplemented, this);
 		}
@@ -649,10 +681,9 @@ bool hyperstone_device::generate_opcode(drcuml_block *block, compiler_state *com
 
 	UML_MOV(block, I0, op);
 	UML_AND(block, I7, DRC_SR, H_MASK);
-	UML_ADD(block, mem(m_global_regs), mem(m_global_regs), 2);
+	UML_ADD(block, DRC_PC, DRC_PC, 2);
 	UML_MOV(block, mem(&m_instruction_length), (1 << 19));
 
-	int label = 1;
 	switch (op >> 8)
 	{
 		case 0x00: generate_chk<GLOBAL, GLOBAL>(block, compiler, desc); break;
@@ -755,10 +786,10 @@ bool hyperstone_device::generate_opcode(drcuml_block *block, compiler_state *com
 		case 0x61: generate_cmpi<GLOBAL, LIMM>(block, compiler, desc); break;
 		case 0x62: generate_cmpi<LOCAL, SIMM>(block, compiler, desc); break;
 		case 0x63: generate_cmpi<LOCAL, LIMM>(block, compiler, desc); break;
-		case 0x64: label = generate_movi<GLOBAL, SIMM>(block, compiler, desc); break;
-		case 0x65: label = generate_movi<GLOBAL, LIMM>(block, compiler, desc); break;
-		case 0x66: label = generate_movi<LOCAL, SIMM>(block, compiler, desc); break;
-		case 0x67: label = generate_movi<LOCAL, LIMM>(block, compiler, desc); break;
+		case 0x64: generate_movi<GLOBAL, SIMM>(block, compiler, desc); break;
+		case 0x65: generate_movi<GLOBAL, LIMM>(block, compiler, desc); break;
+		case 0x66: generate_movi<LOCAL, SIMM>(block, compiler, desc); break;
+		case 0x67: generate_movi<LOCAL, LIMM>(block, compiler, desc); break;
 		case 0x68: generate_addi<GLOBAL, SIMM>(block, compiler, desc); break;
 		case 0x69: generate_addi<GLOBAL, LIMM>(block, compiler, desc); break;
 		case 0x6a: generate_addi<LOCAL, SIMM>(block, compiler, desc); break;
@@ -919,7 +950,7 @@ bool hyperstone_device::generate_opcode(drcuml_block *block, compiler_state *com
 	int done;
 	UML_AND(block, I0, DRC_SR, (T_MASK | P_MASK));
 	UML_CMP(block, I0, (T_MASK | P_MASK));
-	UML_JMPc(block, uml::COND_NE, done = label++);
+	UML_JMPc(block, uml::COND_NE, done = compiler->m_labelnum++);
 	UML_TEST(block, mem(&m_delay_slot), 1);
 	UML_EXHc(block, uml::COND_E, *m_exception[EXCEPTION_TRACE], 0);
 

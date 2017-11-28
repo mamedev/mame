@@ -65,6 +65,10 @@ class hyperstone_device : public cpu_device
 public:
 	inline void ccfunc_unimplemented();
 	inline void ccfunc_print();
+	inline void ccfunc_total_cycles();
+	void update_timer_prescale();
+	void compute_tr();
+	void adjust_timer_interrupt();
 
 protected:
 	enum
@@ -223,9 +227,12 @@ protected:
 
 	uint64_t  m_tr_base_cycles;
 	uint32_t  m_tr_base_value;
+	uint32_t  m_tr_result;
 	uint32_t  m_tr_clocks_per_tick;
 	uint8_t   m_timer_int_pending;
 	emu_timer *m_timer;
+
+	uint64_t m_numcycles;
 
 	uint32_t m_delay_pc;
 	uint32_t m_delay_slot;
@@ -239,6 +246,7 @@ protected:
 	int     m_icount;
 
 	uint8_t m_fl_lut[16];
+	static const uint32_t s_trap_entries[8];
 	static const int32_t s_immediate_values[16];
 
 	uint32_t get_trap_addr(uint8_t trapno);
@@ -253,10 +261,6 @@ private:
 	uint32_t get_global_register(uint8_t code);
 
 	uint32_t get_emu_code_addr(uint8_t num);
-	void hyperstone_set_trap_entry(int which);
-	uint32_t compute_tr();
-	void update_timer_prescale();
-	void adjust_timer_interrupt();
 
 	TIMER_CALLBACK_MEMBER(timer_callback);
 
@@ -407,15 +411,15 @@ private:
 	void log_add_disasm_comment(drcuml_block *block, uint32_t pc, uint32_t op);
 	bool generate_opcode(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
 
-	int generate_get_trap_addr(drcuml_block *block, int label, uint32_t trapno);
-	void generate_check_delay_pc(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	void generate_get_trap_addr(drcuml_block *block, uml::code_label &label, uint32_t trapno);
+	void generate_check_delay_pc(drcuml_block *block);
 	void generate_decode_const(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	int generate_decode_immediate_s(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	void generate_decode_immediate_s(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
 	void generate_ignore_immediate_s(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
 	void generate_decode_pcrel(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
 	void generate_ignore_pcrel(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
 
-	int generate_set_global_register(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, int label);
+	void generate_set_global_register(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
 
 	void generate_trap(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint32_t addr);
 	void generate_int(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint32_t addr);
@@ -446,7 +450,7 @@ private:
 	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void generate_xor(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
 	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void generate_not(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
 	template <reg_bank DST_GLOBAL, imm_size IMM_LONG> void generate_cmpi(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	template <reg_bank DST_GLOBAL, imm_size IMM_LONG> int generate_movi(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	template <reg_bank DST_GLOBAL, imm_size IMM_LONG> void generate_movi(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
 	template <reg_bank DST_GLOBAL, imm_size IMM_LONG> void generate_addi(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
 	template <reg_bank DST_GLOBAL, imm_size IMM_LONG> void generate_addsi(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
 	template <reg_bank DST_GLOBAL, imm_size IMM_LONG> void generate_cmpbi(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
