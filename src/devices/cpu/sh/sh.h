@@ -99,8 +99,6 @@
 
 #define R32(reg)        m_regmap[reg]
 
-extern unsigned DasmSH2(std::ostream &stream, unsigned pc, uint16_t opcode);
-
 enum
 {
 	SH4_PC = 1, SH_SR, SH4_PR, SH4_GBR, SH4_VBR, SH4_DBR, SH4_MACH, SH4_MACL,

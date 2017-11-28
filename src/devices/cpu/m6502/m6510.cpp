@@ -10,6 +10,7 @@
 
 #include "emu.h"
 #include "m6510.h"
+#include "m6510d.h"
 
 DEFINE_DEVICE_TYPE(M6510, m6510_device, "m6510", "M6510")
 
@@ -33,9 +34,9 @@ void m6510_device::set_pulls(uint8_t _pullup, uint8_t _floating)
 	floating = _floating;
 }
 
-offs_t m6510_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *m6510_device::create_disassembler()
 {
-	return disassemble_generic(stream, pc, oprom, opram, options, disasm_entries);
+	return new m6510_disassembler;
 }
 
 void m6510_device::device_start()

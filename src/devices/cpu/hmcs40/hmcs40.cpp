@@ -14,6 +14,7 @@
 #include "emu.h"
 #include "hmcs40.h"
 #include "debugger.h"
+#include "hmcs40d.h"
 
 #define IS_PMOS 0
 #define IS_CMOS ~0
@@ -173,12 +174,10 @@ void hmcs40_cpu_device::state_string_export(const device_state_entry &entry, std
 	}
 }
 
-offs_t hmcs40_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, u32 options)
+util::disasm_interface *hmcs40_cpu_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE(hmcs40);
-	return CPU_DISASSEMBLE_NAME(hmcs40)(this, stream, pc, oprom, opram, options);
+	return new hmcs40_disassembler;
 }
-
 
 
 //-------------------------------------------------

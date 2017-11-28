@@ -25,6 +25,7 @@ ETA-3400 Memory I/O Accessory
 
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
+#include "machine/74259.h"
 #include "machine/6821pia.h"
 #include "bus/rs232/rs232.h"
 #include "imagedev/cassette.h"
@@ -41,26 +42,31 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_pia(*this, "pia")
+		, m_displatch(*this, "displatch%u", 1)
 		, m_rs232(*this, "rs232")
 		, m_cass(*this, "cassette")
 	{ }
 
 	DECLARE_READ8_MEMBER(keypad_r);
 	DECLARE_WRITE8_MEMBER(display_w);
+	template<int digit> DECLARE_WRITE8_MEMBER(led_w);
 	DECLARE_READ8_MEMBER(pia_ar);
 	DECLARE_WRITE8_MEMBER(pia_aw);
 	DECLARE_READ8_MEMBER(pia_br);
 	DECLARE_WRITE8_MEMBER(pia_bw);
+	DECLARE_WRITE_LINE_MEMBER(reset_key_w);
+	DECLARE_WRITE_LINE_MEMBER(segment_test_w);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<pia6821_device> m_pia;
+	required_device_array<ls259_device, 6> m_displatch;
 	required_device<rs232_port_device> m_rs232;
 	required_device<cassette_image_device> m_cass;
 };
 
 
 
-READ8_MEMBER( et3400_state::keypad_r )
+READ8_MEMBER(et3400_state::keypad_r)
 {
 	uint8_t data = 0xff;
 
@@ -74,45 +80,44 @@ READ8_MEMBER( et3400_state::keypad_r )
 	return data;
 }
 
-WRITE8_MEMBER( et3400_state::display_w )
+WRITE8_MEMBER(et3400_state::display_w)
+{
+	// A6-A4 decoded by IC22 (74LS42); D0 inverted by one gate of IC21 (74S00)
+	uint8_t digit = (offset >> 4) & 7;
+	if (digit >= 1 && digit <= 6)
+		m_displatch[digit - 1]->write_bit(offset & 7, !BIT(data, 0));
+}
+
+template<int digit>
+WRITE8_MEMBER(et3400_state::led_w)
 {
 /* This computer sets each segment, one at a time. */
-
-	static const uint8_t segments[8]={0x40,0x20,0x10,0x08,0x04,0x02,0x01,0x80};
-	uint8_t digit = (offset >> 4) & 7;
-	uint8_t segment = segments[offset & 7];
-	uint8_t segdata = output().get_digit_value(digit);
-
-	if (data & 1)
-		segdata |= segment;
-	else
-		segdata &= ~segment;
-
+	uint8_t segdata = BITSWAP8(~data, 7, 0, 1, 2, 3, 4, 5, 6);
 	output().set_digit_value(digit, segdata);
 }
 
 // d1,2,3 = Baud rate
 // d4 = gnd
 // d7 = rs232 in
-READ8_MEMBER( et3400_state::pia_ar )
+READ8_MEMBER(et3400_state::pia_ar)
 {
 	return ioport("BAUD")->read() | (m_rs232->rxd_r() << 7);
 }
 
 // d0 = rs232 out
-WRITE8_MEMBER( et3400_state::pia_aw )
+WRITE8_MEMBER(et3400_state::pia_aw)
 {
 	m_rs232->write_txd(BIT(data, 0));
 }
 
 // d7 = cass in
-READ8_MEMBER( et3400_state::pia_br )
+READ8_MEMBER(et3400_state::pia_br)
 {
 	return (m_cass->input() > +0.0) << 7;
 }
 
 // d0 = cass out
-WRITE8_MEMBER( et3400_state::pia_bw )
+WRITE8_MEMBER(et3400_state::pia_bw)
 {
 	m_cass->output(BIT(data, 0) ? -1.0 : +1.0);
 }
@@ -127,6 +132,22 @@ static ADDRESS_MAP_START(mem_map, AS_PROGRAM, 8, et3400_state)
 	AM_RANGE( 0xc100, 0xc1ff ) AM_WRITE(display_w)
 	AM_RANGE( 0xfc00, 0xffff ) AM_ROM AM_REGION("roms", 0x1000)
 ADDRESS_MAP_END
+
+WRITE_LINE_MEMBER(et3400_state::reset_key_w)
+{
+	// delivered through MC6875 (or 74LS241 on ET-3400A)
+	m_maincpu->set_input_line(INPUT_LINE_RESET, state ? CLEAR_LINE : ASSERT_LINE);
+
+	// PIA also uses reset line
+	if (!state)
+		m_pia->reset();
+}
+
+WRITE_LINE_MEMBER(et3400_state::segment_test_w)
+{
+	for (int d = 0; d < 6; d++)
+		m_displatch[d]->clear_w(state);
+}
 
 /* Input ports */
 static INPUT_PORTS_START( et3400 )
@@ -145,8 +166,7 @@ static INPUT_PORTS_START( et3400 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("8 SS") PORT_CODE(KEYCODE_8) PORT_CHAR('8')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("5 CC") PORT_CODE(KEYCODE_5) PORT_CHAR('5')
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("2 ACCB") PORT_CODE(KEYCODE_2) PORT_CHAR('2')
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(".") PORT_CODE(KEYCODE_STOP) PORT_CHAR('.')
-	PORT_BIT( 0xc0, 0xc0, IPT_UNUSED )
+	PORT_BIT( 0xe0, 0xe0, IPT_UNUSED )
 
 	PORT_START("X2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("F FWD") PORT_CODE(KEYCODE_F) PORT_CHAR('F')
@@ -165,6 +185,12 @@ static INPUT_PORTS_START( et3400 )
 	PORT_DIPSETTING(    0x06, "2400" )
 	PORT_DIPSETTING(    0x04, "4800" )
 	PORT_DIPSETTING(    0x02, "9600" )
+
+	PORT_START("RESET") // RESET is directly next to 0, but electrically separate from key matrix
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RESET") PORT_CODE(KEYCODE_STOP) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, et3400_state, reset_key_w)
+
+	PORT_START("TEST") // No input mechanism for "Segment Test" defined other than shorting pins together
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Segment Test") PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, et3400_state, segment_test_w)
 INPUT_PORTS_END
 
 
@@ -194,6 +220,19 @@ static MACHINE_CONFIG_START( et3400 )
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
 	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 
+	MCFG_DEVICE_ADD("displatch1", LS259, 0) // IC28
+	MCFG_ADDRESSABLE_LATCH_PARALLEL_OUT_CB(WRITE8(et3400_state, led_w<1>))
+	MCFG_DEVICE_ADD("displatch2", LS259, 0) // IC27
+	MCFG_ADDRESSABLE_LATCH_PARALLEL_OUT_CB(WRITE8(et3400_state, led_w<2>))
+	MCFG_DEVICE_ADD("displatch3", LS259, 0) // IC26
+	MCFG_ADDRESSABLE_LATCH_PARALLEL_OUT_CB(WRITE8(et3400_state, led_w<3>))
+	MCFG_DEVICE_ADD("displatch4", LS259, 0) // IC25
+	MCFG_ADDRESSABLE_LATCH_PARALLEL_OUT_CB(WRITE8(et3400_state, led_w<4>))
+	MCFG_DEVICE_ADD("displatch5", LS259, 0) // IC24
+	MCFG_ADDRESSABLE_LATCH_PARALLEL_OUT_CB(WRITE8(et3400_state, led_w<5>))
+	MCFG_DEVICE_ADD("displatch6", LS259, 0) // IC23
+	MCFG_ADDRESSABLE_LATCH_PARALLEL_OUT_CB(WRITE8(et3400_state, led_w<6>))
+
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -213,4 +252,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   CLASS          INIT    COMPANY       FULLNAME       FLAGS */
-COMP( 1976, et3400,  0,     0,       et3400,    et3400, et3400_state,  0,    "Heath Inc", "Heathkit ET-3400", 0 )
+COMP( 1976, et3400,  0,     0,       et3400,    et3400, et3400_state,  0,    "Heath Company", "Heathkit Model ET-3400 Microprocessor Trainer", 0 )

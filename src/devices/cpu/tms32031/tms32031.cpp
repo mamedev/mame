@@ -10,6 +10,7 @@
 
 #include "emu.h"
 #include "tms32031.h"
+#include "dis32031.h"
 #include "debugger.h"
 
 
@@ -553,36 +554,13 @@ void tms3203x_device::state_string_export(const device_state_entry &entry, std::
 
 
 //-------------------------------------------------
-//  disasm_min_opcode_bytes - return the length
-//  of the shortest instruction, in bytes
-//-------------------------------------------------
-
-uint32_t tms3203x_device::disasm_min_opcode_bytes() const
-{
-	return 4;
-}
-
-
-//-------------------------------------------------
-//  disasm_max_opcode_bytes - return the length
-//  of the longest instruction, in bytes
-//-------------------------------------------------
-
-uint32_t tms3203x_device::disasm_max_opcode_bytes() const
-{
-	return 4;
-}
-
-
-//-------------------------------------------------
-//  disasm_disassemble - call the disassembly
+//  disassemble - call the disassembly
 //  helper function
 //-------------------------------------------------
 
-offs_t tms3203x_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *tms3203x_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( tms3203x );
-	return CPU_DISASSEMBLE_NAME(tms3203x)(this, stream, pc, oprom, opram, options);
+	return new tms32031_disassembler;
 }
 
 

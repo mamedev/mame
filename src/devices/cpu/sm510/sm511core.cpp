@@ -15,6 +15,7 @@
 
 #include "emu.h"
 #include "sm510.h"
+#include "sm510d.h"
 #include "debugger.h"
 
 
@@ -43,10 +44,9 @@ ADDRESS_MAP_END
 
 
 // disasm
-offs_t sm511_device::disasm_disassemble(std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, u32 options)
+util::disasm_interface *sm511_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE(sm511);
-	return CPU_DISASSEMBLE_NAME(sm511)(this, stream, pc, oprom, opram, options);
+	return new sm511_disassembler;
 }
 
 

@@ -2067,13 +2067,13 @@ void psxcpu_device::state_string_export( const device_state_entry &entry, std::s
 
 
 //-------------------------------------------------
-//  disasm_disassemble - call the disassembly
+//  disassemble - call the disassembly
 //  helper function
 //-------------------------------------------------
 
-offs_t psxcpu_device::disasm_disassemble( std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options )
+util::disasm_interface *psxcpu_device::create_disassembler()
 {
-	return DasmPSXCPU( this, stream, pc, opram );
+	return new psxcpu_disassembler(this);
 }
 
 

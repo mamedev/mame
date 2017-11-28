@@ -10,6 +10,7 @@
 
 #include "emu.h"
 #include "r3000.h"
+#include "r3kdasm.h"
 #include "debugger.h"
 
 
@@ -453,41 +454,13 @@ void r3000_device::state_string_export(const device_state_entry &entry, std::str
 
 
 //-------------------------------------------------
-//  disasm_min_opcode_bytes - return the length
-//  of the shortest instruction, in bytes
-//-------------------------------------------------
-
-uint32_t r3000_device::disasm_min_opcode_bytes() const
-{
-	return 4;
-}
-
-
-//-------------------------------------------------
-//  disasm_max_opcode_bytes - return the length
-//  of the longest instruction, in bytes
-//-------------------------------------------------
-
-uint32_t r3000_device::disasm_max_opcode_bytes() const
-{
-	return 4;
-}
-
-
-//-------------------------------------------------
-//  disasm_disassemble - call the disassembly
+//  disassemble - call the disassembly
 //  helper function
 //-------------------------------------------------
 
-offs_t r3000_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *r3000_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( r3000le );
-	extern CPU_DISASSEMBLE( r3000be );
-
-	if (m_endianness == ENDIANNESS_BIG)
-		return CPU_DISASSEMBLE_NAME(r3000be)(this, stream, pc, oprom, opram, options);
-	else
-		return CPU_DISASSEMBLE_NAME(r3000le)(this, stream, pc, oprom, opram, options);
+	return new r3000_disassembler;
 }
 
 

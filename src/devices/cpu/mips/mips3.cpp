@@ -12,6 +12,7 @@
 #include "debugger.h"
 #include "mips3.h"
 #include "mips3com.h"
+#include "mips3dsm.h"
 
 
 #define ENABLE_OVERFLOWS    0
@@ -975,14 +976,9 @@ bool mips3_device::memory_translate(int spacenum, int intention, offs_t &address
 }
 
 
-offs_t mips3_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *mips3_device::create_disassembler()
 {
-	uint32_t op = *(uint32_t *)oprom;
-	if (m_bigendian)
-		op = big_endianize_int32(op);
-	else
-		op = little_endianize_int32(op);
-	return dasmmips3(stream, pc, op);
+	return new mips3_disassembler;
 }
 
 

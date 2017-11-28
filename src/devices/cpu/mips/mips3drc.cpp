@@ -27,6 +27,7 @@
 #include "debugger.h"
 #include "mips3com.h"
 #include "mips3fe.h"
+#include "mips3dsm.h"
 #include "cpu/drcfe.h"
 #include "cpu/drcuml.h"
 #include "cpu/drcumlsh.h"
@@ -3286,8 +3287,9 @@ void mips3_device::log_add_disasm_comment(drcuml_block *block, uint32_t pc, uint
 {
 	if (m_drcuml->logging())
 	{
+		mips3_disassembler mips3d;
 		std::ostringstream stream;
-		dasmmips3(stream, pc, op);
+		mips3d.dasm_one(stream, pc, op);
 		const std::string stream_string = stream.str();
 		block->append_comment("%08X: %s", pc, stream_string.c_str());                                  // comment
 	}
@@ -3425,7 +3427,10 @@ void mips3_device::log_opcode_desc(drcuml_state *drcuml, const opcode_desc *desc
 			if (desclist->flags & OPFLAG_VIRTUAL_NOOP)
 				buffer << "<virtual nop>";
 			else
-				dasmmips3(buffer, desclist->pc, desclist->opptr.l[0]);
+			{
+				mips3_disassembler mips3d;
+				mips3d.dasm_one(buffer, desclist->pc, desclist->opptr.l[0]);
+			}
 		}
 		else
 			buffer << "???";

@@ -21,7 +21,7 @@
 #include "emu.h"
 #include "debugger.h"
 #include "arcompact.h"
-#include "arcompact_common.h"
+#include "arcompactdasm.h"
 
 
 DEFINE_DEVICE_TYPE(ARCA5, arcompact_device, "arc_a5", "ARCtangent A5")
@@ -64,10 +64,9 @@ device_memory_interface::space_config_vector arcompact_device::memory_space_conf
 	};
 }
 
-offs_t arcompact_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *arcompact_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( arcompact );
-	return CPU_DISASSEMBLE_NAME(arcompact)(this, stream, pc, oprom, opram, options);
+	return new arcompact_disassembler;
 }
 
 
@@ -104,7 +103,7 @@ void arcompact_device::device_start()
 
 	for (int i = 0x100; i < 0x140; i++)
 	{
-		state_add(i, regnames[i-0x100], m_debugger_temp).callimport().callexport().formatstr("%08X");
+		state_add(i, arcompact_disassembler::regnames[i-0x100], m_debugger_temp).callimport().callexport().formatstr("%08X");
 	}
 
 

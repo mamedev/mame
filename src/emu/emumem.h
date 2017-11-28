@@ -185,6 +185,7 @@ public:
 	endianness_t endianness() const { return m_endianness; }
 	int data_width() const { return m_databus_width; }
 	int addr_width() const { return m_addrbus_width; }
+	int addrbus_shift() const { return m_addrbus_shift; }
 
 	// address-to-byte conversion helpers
 	inline offs_t addr2byte(offs_t address) const { return (m_addrbus_shift < 0) ? (address << -m_addrbus_shift) : (address >> m_addrbus_shift); }
@@ -240,6 +241,7 @@ public:
 	int data_width() const { return m_config.data_width(); }
 	int addr_width() const { return m_config.addr_width(); }
 	endianness_t endianness() const { return m_config.endianness(); }
+	int addrbus_shift() const { return m_config.addrbus_shift(); }
 	u64 unmap() const { return m_unmap; }
 	bool is_octal() const { return m_config.m_is_octal; }
 

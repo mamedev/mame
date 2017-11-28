@@ -5,7 +5,6 @@
   TMS1000 family - base/shared
 
   TODO:
-  - fix debugger disasm view
   - INIT pin
 
 
@@ -72,7 +71,7 @@ unknown cycle: CME, SSE, SSS
 
 tms1k_base_device::tms1k_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 o_pins, u8 r_pins, u8 pc_bits, u8 byte_bits, u8 x_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data)
 	: cpu_device(mconfig, type, tag, owner, clock)
-	, m_program_config("program", ENDIANNESS_BIG, byte_bits > 8 ? 16 : 8, prgwidth, 0, program)
+	, m_program_config("program", ENDIANNESS_BIG, byte_bits > 8 ? 16 : 8, prgwidth, byte_bits > 8 ? -1 : 0, program)
 	, m_data_config("data", ENDIANNESS_BIG, 8, datawidth, 0, data)
 	, m_mpla(*this, "mpla")
 	, m_ipla(*this, "ipla")
@@ -402,6 +401,62 @@ void tms1k_base_device::op_retn()
 	m_add = 0;
 	m_bl = 0;
 	m_pa = m_pb;
+}
+
+
+// TMS1400/TMS1000C 3-level stack version
+
+void tms1k_base_device::op_br3()
+{
+	// BR/BL: conditional branch
+	if (m_status)
+	{
+		m_pa = m_pb; // don't care about clatch
+		m_ca = m_cb;
+		m_pc = m_opcode & m_pc_mask;
+	}
+}
+
+void tms1k_base_device::op_call3()
+{
+	// CALL/CALLL: conditional call
+	if (m_status)
+	{
+		// mask clatch 3 bits (no need to mask others)
+		m_clatch = (m_clatch << 1 | 1) & 7;
+
+		m_sr = m_sr << m_pc_bits | m_pc;
+		m_pc = m_opcode & m_pc_mask;
+
+		m_ps = m_ps << 4 | m_pa;
+		m_pa = m_pb;
+
+		m_cs = m_cs << 2 | m_ca;
+		m_ca = m_cb;
+	}
+	else
+	{
+		m_pb = m_pa;
+		m_cb = m_ca;
+	}
+}
+
+void tms1k_base_device::op_retn3()
+{
+	// RETN: return from subroutine
+	if (m_clatch & 1)
+	{
+		m_clatch >>= 1;
+
+		m_pc = m_sr & m_pc_mask;
+		m_sr >>= m_pc_bits;
+
+		m_pa = m_pb = m_ps & 0xf;
+		m_ps >>= 4;
+
+		m_ca = m_cb = m_cs & 3;
+		m_cs >>= 2;
+	}
 }
 
 

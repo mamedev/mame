@@ -58,6 +58,7 @@ enum
 	XTAL_1MHz           = 1000000,      /* Used to drive OKI M6295 chips */
 	XTAL_1_2944MHz      = 1294400,      /* BBN BitGraph PSG */
 	XTAL_1_75MHz        = 1750000,      /* RCA CDP1861 */
+	XTAL_1_7971MHz      = 1797100,      /* SWTPC 6800 (with MIKBUG) */
 	XTAL_1_8432MHz      = 1843200,      /* Bondwell 12/14 */
 	XTAL_1_9968MHz      = 1996800,      /* NEC PC-98xx */
 	XTAL_2MHz           = 2000000,

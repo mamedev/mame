@@ -79,15 +79,11 @@ if #disasm_files > 0 then
 	}
 
 	if #disasm_dependency > 0 then
-		dependency {
-			disasm_dependency[1]
-		}
+		dependency(disasm_dependency)
 	end
 
 	if #disasm_custombuildtask > 0 then
-		custombuildtask {
-			disasm_custombuildtask[1]
-		}
+		custombuildtask(disasm_custombuildtask)
 	end
 end
 

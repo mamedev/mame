@@ -118,6 +118,7 @@ March 2013 NPW:
 #include "debugger.h"
 #include "hd6309.h"
 #include "m6809inl.h"
+#include "6x09dasm.h"
 
 
 //**************************************************************************
@@ -285,38 +286,13 @@ void hd6309_device::device_post_load()
 
 
 //-------------------------------------------------
-//  disasm_min_opcode_bytes - return the length
-//  of the shortest instruction, in bytes
-//-------------------------------------------------
-
-uint32_t hd6309_device::disasm_min_opcode_bytes() const
-{
-	return 1;
-}
-
-
-
-//-------------------------------------------------
-//  disasm_max_opcode_bytes - return the length
-//  of the longest instruction, in bytes
-//-------------------------------------------------
-
-uint32_t hd6309_device::disasm_max_opcode_bytes() const
-{
-	return 5;
-}
-
-
-
-//-------------------------------------------------
-//  disasm_disassemble - call the disassembly
+//  disassemble - call the disassembly
 //  helper function
 //-------------------------------------------------
 
-offs_t hd6309_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *hd6309_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( hd6309 );
-	return CPU_DISASSEMBLE_NAME(hd6309)(this, stream, pc, oprom, opram, options);
+	return new hd6309_disassembler;
 }
 
 

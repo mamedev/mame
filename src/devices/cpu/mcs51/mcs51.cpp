@@ -130,6 +130,7 @@
 #include "emu.h"
 #include "debugger.h"
 #include "mcs51.h"
+#include "mcs51dasm.h"
 
 #define VERBOSE 0
 
@@ -2506,45 +2507,32 @@ void ds5002fp_device::nvram_write( emu_file &file )
 	file.write( m_sfr_ram, 0x80 );
 }
 
-
-
-offs_t mcs51_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *mcs51_cpu_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( i8051 );
-	return CPU_DISASSEMBLE_NAME(i8051)(this, stream, pc, oprom, opram, options);
+	return new i8051_disassembler;
 }
 
-
-offs_t i8052_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *i8052_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( i8052 );
-	return CPU_DISASSEMBLE_NAME(i8052)(this, stream, pc, oprom, opram, options);
+	return new i8052_disassembler;
 }
 
-
-offs_t i80c31_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *i80c31_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( i80c51 );
-	return CPU_DISASSEMBLE_NAME(i80c51)(this, stream, pc, oprom, opram, options);
+	return new i80c51_disassembler;
 }
 
-
-offs_t i80c51_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *i80c51_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( i80c51 );
-	return CPU_DISASSEMBLE_NAME(i80c51)(this, stream, pc, oprom, opram, options);
+	return new i80c51_disassembler;
 }
 
-
-offs_t i80c52_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *i80c52_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( i80c52 );
-	return CPU_DISASSEMBLE_NAME(i80c52)(this, stream, pc, oprom, opram, options);
+	return new i80c52_disassembler;
 }
 
-
-offs_t ds5002fp_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *ds5002fp_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( ds5002fp );
-	return CPU_DISASSEMBLE_NAME(ds5002fp)(this, stream, pc, oprom, opram, options);
+	return new ds5002fp_disassembler;
 }

@@ -64,7 +64,7 @@ enum BREGS {
 
 /************************************************************************/
 
-#define CHANGE_PC do { EMPTY_PREFETCH(); } while (0)
+#define CHANGE_PC do { EMPTY_PREfetch(); } while (0)
 
 #define SegBase(Seg) (Sreg(Seg) << 4)
 
@@ -78,15 +78,13 @@ enum BREGS {
 
 /* prefetch timing */
 
-#define FETCH()             fetch()
-#define FETCHWORD()         fetchword()
-#define EMPTY_PREFETCH()    m_prefetch_reset = 1
+#define EMPTY_PREfetch()    m_prefetch_reset = 1
 
 
 #define PUSH(val) { Wreg(SP) -= 2; write_mem_word(((Sreg(SS)<<4)+Wreg(SP)), val); }
 #define POP(var) { Wreg(SP) += 2; var = read_mem_word(((Sreg(SS)<<4) + ((Wreg(SP)-2) & 0xffff))); }
 
-#define GetModRM uint32_t ModRM=FETCH()
+#define GetModRM uint32_t ModRM=fetch()
 
 /* Cycle count macros:
     CLK  - cycle count is the same on all processors

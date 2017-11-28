@@ -10,6 +10,7 @@
 
 #include "emu.h"
 #include "i8x9x.h"
+#include "i8x9xd.h"
 
 i8x9x_device::i8x9x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	mcs96_device(mconfig, type, tag, owner, clock, 8),
@@ -18,9 +19,9 @@ i8x9x_device::i8x9x_device(const machine_config &mconfig, device_type type, cons
 {
 }
 
-offs_t i8x9x_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *i8x9x_device::create_disassembler()
 {
-	return disasm_generic(stream, pc, oprom, opram, options, disasm_entries);
+	return new i8x9x_disassembler;
 }
 
 device_memory_interface::space_config_vector i8x9x_device::memory_space_config() const

@@ -9,7 +9,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "dsp32.h"
+#include "dsp32dis.h"
 
 
 /***************************************************************************
@@ -23,17 +23,17 @@
     CODE CODE
 ***************************************************************************/
 
-static const char *const sizesuffix[] = { "", "e" };
-static const char *const unarysign[] = { "", "-" };
-static const char *const sign[] = { "+", "-" };
-static const char *const aMvals[] = { "a0", "a1", "a2", "a3", "0.0", "1.0", "Format 4", "Reserved" };
-static const char *const memsuffix[] = { "h", "l", "", "e" };
-static const char *const functable[] =
+const char *const dsp32c_disassembler::sizesuffix[] = { "", "e" };
+const char *const dsp32c_disassembler::unarysign[] = { "", "-" };
+const char *const dsp32c_disassembler::sign[] = { "+", "-" };
+const char *const dsp32c_disassembler::aMvals[] = { "a0", "a1", "a2", "a3", "0.0", "1.0", "Format 4", "Reserved" };
+const char *const dsp32c_disassembler::memsuffix[] = { "h", "l", "", "e" };
+const char *const dsp32c_disassembler::functable[] =
 {
 	"ic", "oc", "float", "int", "round", "ifalt", "ifaeq", "ifagt",
 	"reserved8", "reserved9", "float24", "int24", "ieee", "dsp", "seed", "reservedf"
 };
-static const char *const condtable[] =
+const char *const dsp32c_disassembler::condtable[] =
 {
 	"false", "true",
 	"pl", "mi",
@@ -68,14 +68,14 @@ static const char *const condtable[] =
 	"!?1e", "?1e",
 	"!?1f", "?1f"
 };
-static const char *const regname[] =
+const char *const dsp32c_disassembler::regname[] =
 {
 	"0", "r1", "r2", "r3", "r4", "r5", "r6", "r7",
 	"r8", "r9", "r10", "r11", "r12", "r13", "r14", "pc",
 	"0", "r15", "r16", "r17", "r18", "r19", "-1", "1",
 	"r20", "r21", "dauc", "ioc", "res1c", "r22", "pcsh", "res1f"
 };
-static const char *const regnamee[] =
+const char *const dsp32c_disassembler::regnamee[] =
 {
 	"0", "r1e", "r2e", "r3e", "r4e", "r5e", "r6e", "r7e",
 	"r8e", "r9e", "r10e", "r11e", "r12e", "r13e", "r14e", "pce",
@@ -83,48 +83,39 @@ static const char *const regnamee[] =
 	"r20e", "r21e", "dauce", "ioce", "res1ce", "r22e", "pcshe", "res1fe"
 };
 
-static inline char *signed_16bit_unary(int16_t val)
+std::string dsp32c_disassembler::signed_16bit_unary(int16_t val)
 {
-	static char temp[10];
 	if (val < 0)
-		sprintf(temp, "-$%x", -val);
+		return util::string_format("-$%x", -val);
 	else
-		sprintf(temp, "$%x", val);
-	return temp;
+		return util::string_format("$%x", val);
 }
 
-static inline char *signed_16bit_sep(int16_t val)
+std::string dsp32c_disassembler::signed_16bit_sep(int16_t val)
 {
-	static char temp[10];
 	if (val < 0)
-		sprintf(temp, " - $%x", -val);
+		return util::string_format(" - $%x", -val);
 	else
-		sprintf(temp, " + $%x", val);
-	return temp;
+		return util::string_format(" + $%x", val);
 }
 
-static inline char *signed_16bit_sep_nospace(int16_t val)
+std::string dsp32c_disassembler::signed_16bit_sep_nospace(int16_t val)
 {
-	static char temp[10];
 	if (val < 0)
-		sprintf(temp, "-$%x", -val);
+		return util::string_format("-$%x", -val);
 	else
-		sprintf(temp, "+$%x", val);
-	return temp;
+		return util::string_format("+$%x", val);
 }
 
-static inline char *unsigned_16bit_size(int16_t val, uint8_t size)
+std::string dsp32c_disassembler::unsigned_16bit_size(int16_t val, uint8_t size)
 {
-	static char temp[10];
 	if (size)
-		sprintf(temp, "$%06x", (int32_t)val & 0xffffff);
+		return util::string_format("$%06x", (int32_t)val & 0xffffff);
 	else
-		sprintf(temp, "$%04x", val & 0xffff);
-	return temp;
+		return util::string_format("$%04x", val & 0xffff);
 }
 
-static uint8_t lastp;
-static std::string dasm_XYZ(uint8_t bits)
+std::string dsp32c_disassembler::dasm_XYZ(uint8_t bits)
 {
 	std::string buffer;
 	uint8_t p = bits >> 3;
@@ -164,7 +155,7 @@ static std::string dasm_XYZ(uint8_t bits)
 }
 
 
-static std::string dasm_PI(uint16_t bits)
+std::string dsp32c_disassembler::dasm_PI(uint16_t bits)
 {
 	std::string buffer;
 	uint8_t p = bits >> 5;
@@ -199,10 +190,11 @@ static std::string dasm_PI(uint16_t bits)
 }
 
 
-static unsigned dasm_dsp32(std::ostream &stream, unsigned pc, uint32_t op)
+offs_t dsp32c_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
 	uint32_t flags = 0;
 
+	uint32_t op = opcodes.r32(pc);
 	switch (op >> 25)
 	{
 		/* DA format 1 */
@@ -344,7 +336,7 @@ static unsigned dasm_dsp32(std::ostream &stream, unsigned pc, uint32_t op)
 				else
 				{
 					if (((op >> 16) & 0x1f) == 20)
-						flags = DASMFLAG_STEP_OUT;
+						flags = STEP_OUT;
 					util::stream_format(stream, "goto %s", rH);
 				}
 			}
@@ -359,7 +351,7 @@ static unsigned dasm_dsp32(std::ostream &stream, unsigned pc, uint32_t op)
 				else
 				{
 					if (((op >> 16) & 0x1f) == 20)
-						flags = DASMFLAG_STEP_OUT;
+						flags = STEP_OUT;
 					util::stream_format(stream, "if (%s) goto %s", condtable[C], rH);
 				}
 			}
@@ -377,7 +369,7 @@ static unsigned dasm_dsp32(std::ostream &stream, unsigned pc, uint32_t op)
 			{
 				util::stream_format(stream, "if (%s-- >= 0) goto %s%s [%x]", rM, rH, signed_16bit_sep_nospace(N), (pc + 8 + N) & 0xffffff);
 				if (((pc + 8 + N) & 0xffffff) < pc)
-					flags = DASMFLAG_STEP_OVER;
+					flags = STEP_OVER;
 			}
 			else if (N && rH[0] != '0')
 				util::stream_format(stream, "if (%s-- >= 0) goto %s%s", rM, rH, signed_16bit_sep_nospace(N));
@@ -385,13 +377,13 @@ static unsigned dasm_dsp32(std::ostream &stream, unsigned pc, uint32_t op)
 			{
 				util::stream_format(stream, "if (%s-- >= 0) goto $%x", rM, ((int32_t)N & 0xffffff));
 				if (((int32_t)N & 0xffffff) < pc)
-					flags = DASMFLAG_STEP_OVER;
+					flags = STEP_OVER;
 			}
 			else
 			{
 				util::stream_format(stream, "if (%s-- >= 0) goto %s", rM, rH);
 				if (((op >> 16) & 0x1f) == 20)
-					flags = DASMFLAG_STEP_OUT;
+					flags = STEP_OUT;
 			}
 			break;
 		}
@@ -419,7 +411,7 @@ static unsigned dasm_dsp32(std::ostream &stream, unsigned pc, uint32_t op)
 				util::stream_format(stream, "call $%x (%s)", ((int32_t)N & 0xffffff), rM);
 			else
 				util::stream_format(stream, "call %s (%s)", rH, rM);
-			flags = DASMFLAG_STEP_OVER | DASMFLAG_STEP_OVER_EXTRA(1);
+			flags = STEP_OVER | step_over_extra(1);
 			break;
 		}
 
@@ -659,7 +651,7 @@ static unsigned dasm_dsp32(std::ostream &stream, unsigned pc, uint32_t op)
 			else
 			{
 				if (((op >> 16) & 0x1f) == 20)
-					flags = DASMFLAG_STEP_OUT;
+					flags = STEP_OUT;
 				util::stream_format(stream, "goto %s", rH);
 			}
 			break;
@@ -685,20 +677,15 @@ static unsigned dasm_dsp32(std::ostream &stream, unsigned pc, uint32_t op)
 			int32_t N = (op & 0xffff) | ((int32_t)((op & 0x1fe00000) << 3) >> 8);
 			const char *rM = regname[(op >> 16) & 0x1f];
 			util::stream_format(stream, "call $%x (%s)", N & 0xffffff, rM);
-			flags = DASMFLAG_STEP_OVER | DASMFLAG_STEP_OVER_EXTRA(1);
+			flags = STEP_OVER | step_over_extra(1);
 			break;
 		}
 	}
 
-	return 4 | flags | DASMFLAG_SUPPORTED;
+	return 4 | flags | SUPPORTED;
 }
 
-
-/***************************************************************************
-    DISASSEMBLY HOOK
-***************************************************************************/
-
-CPU_DISASSEMBLE( dsp32c )
+uint32_t dsp32c_disassembler::opcode_alignment() const
 {
-	return dasm_dsp32(stream, pc, oprom[0] | (oprom[1] << 8) | (oprom[2] << 16) | (oprom[3] << 24));
+	return 4;
 }

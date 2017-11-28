@@ -13,6 +13,7 @@
 
 #include "emu.h"
 #include "asap.h"
+#include "asapdasm.h"
 #include "debugger.h"
 
 
@@ -300,38 +301,14 @@ void asap_device::state_string_export(const device_state_entry &entry, std::stri
 
 
 //-------------------------------------------------
-//  disasm_min_opcode_bytes - return the length
-//  of the shortest instruction, in bytes
-//-------------------------------------------------
-
-uint32_t asap_device::disasm_min_opcode_bytes() const
-{
-	return 4;
-}
-
-
-//-------------------------------------------------
-//  disasm_max_opcode_bytes - return the length
-//  of the longest instruction, in bytes
-//-------------------------------------------------
-
-uint32_t asap_device::disasm_max_opcode_bytes() const
-{
-	return 12;
-}
-
-
-//-------------------------------------------------
-//  disasm_disassemble - call the disassembly
+//  disassemble - call the disassembly
 //  helper function
 //-------------------------------------------------
 
-offs_t asap_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *asap_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( asap );
-	return CPU_DISASSEMBLE_NAME(asap)(this, stream, pc, oprom, opram, options);
+	return new asap_disassembler;
 }
-
 
 
 //**************************************************************************

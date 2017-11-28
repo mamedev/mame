@@ -8811,10 +8811,12 @@ blockoutj                       // TA-0029 (c) 1989 + California Dreams (Japan)
 
 @source:bloodbro.cpp
 bloodbro                        // (c) 1990 Tad
-bloodbroa                       // (c) 1990 Tad
-bloodbrob                       // (c) 1990 Tad
+bloodbroj                       // (c) 1990 Tad
+bloodbroja                      // (c) 1990 Tad
+bloodbrou                       // (c) 1990 Tad + Fabtek license
 skysmash                        // (c) 1990 Nihon System Inc.
-weststry                        // bootleg
+weststory                       // bootleg
+weststorya                      // bootleg
 
 @source:blstroid.cpp
 blstroid                        // 136057           (c) 1987
@@ -32388,7 +32390,8 @@ rbislande                       // B39 (c) 1988 Taito Corporation
 rbislando                       // B22 (c) 1987 Taito Corporation
 
 @source:rbmk.cpp
-rbmk                            // (c) 1995 GMS
+rbmk                            // (c) 1998 GMS
+rbspm                           // (c) 1998 GMS
 
 @source:rc702.cpp
 rc702                           // 1979 RC702
@@ -35566,6 +35569,7 @@ svmu                            // 1998 Sega Visual Memory Unit
 
 @source:swtpc.cpp
 swtpc                           //
+swtpcm                          //
 
 @source:swtpc09.cpp
 swtpc09                         // S09, DMF2 Floppy SBUG rom - FLEX

@@ -18,6 +18,7 @@
 
 #include "emu.h"
 #include "ssp1601.h"
+#include "ssp1601d.h"
 
 #include "debugger.h"
 
@@ -209,10 +210,9 @@ device_memory_interface::space_config_vector ssp1601_device::memory_space_config
 }
 
 
-offs_t ssp1601_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *ssp1601_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( ssp1601 );
-	return CPU_DISASSEMBLE_NAME(ssp1601)(this, stream, pc, oprom, opram, options);
+	return new ssp1601_disassembler;
 }
 
 

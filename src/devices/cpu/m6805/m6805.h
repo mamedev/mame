@@ -119,9 +119,7 @@ protected:
 	virtual space_config_vector memory_space_config() const override;
 
 	// device_disasm_interface overrides
-	virtual uint32_t disasm_min_opcode_bytes() const override;
-	virtual uint32_t disasm_max_opcode_bytes() const override;
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
 
 	// device_state_interface overrides
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
@@ -361,9 +359,5 @@ protected:
 #define HD63705_INT_SCI             0x06
 #define HD63705_INT_ADCONV          0x07
 #define HD63705_INT_NMI             0x08
-
-CPU_DISASSEMBLE( m6805 );
-CPU_DISASSEMBLE( m146805 );
-CPU_DISASSEMBLE( m68hc05 );
 
 #endif // MAME_CPU_M6805_M6805_H

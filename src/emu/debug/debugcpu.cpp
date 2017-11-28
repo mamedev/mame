@@ -10,6 +10,7 @@
 
 #include "emu.h"
 #include "debugcpu.h"
+#include "debugbuf.h"
 
 #include "express.h"
 #include "debugcon.h"
@@ -2487,33 +2488,15 @@ bool device_debug::comment_import(util::xml::data_node const &cpunode, bool is_i
 
 u32 device_debug::compute_opcode_crc32(offs_t pc) const
 {
-	// Basically the same thing as dasm_wrapped, but with some tiny savings
-	assert(m_memory != nullptr);
+	std::vector<u8> opbuf;
+	debug_disasm_buffer buffer(device());
 
-	// determine the adjusted PC
-	address_space &decrypted_space = m_memory->has_space(AS_OPCODES) ? m_memory->space(AS_OPCODES) : m_memory->space(AS_PROGRAM);
-	address_space &space = m_memory->space(AS_PROGRAM);
-	offs_t pcbyte = space.address_to_byte(pc) & space.bytemask();
-
-	// fetch the bytes up to the maximum
-	u8 opbuf[64], argbuf[64];
-	int maxbytes = (m_disasm != nullptr) ? m_disasm->max_opcode_bytes() : 1;
-	for (int numbytes = 0; numbytes < maxbytes; numbytes++)
-	{
-		opbuf[numbytes] = m_device.machine().debugger().cpu().read_opcode(decrypted_space, pcbyte + numbytes, 1);
-		argbuf[numbytes] = m_device.machine().debugger().cpu().read_opcode(space, pcbyte + numbytes, 1);
-	}
-
-	u32 numbytes = maxbytes;
-	if (m_disasm != nullptr)
-	{
-		// disassemble to our buffer
-		std::ostringstream diasmbuf;
-		numbytes = m_disasm->disassemble(diasmbuf, pc, opbuf, argbuf) & DASMFLAG_LENGTHMASK;
-	}
+	// disassemble the current instruction and get the flags
+	u32 dasmresult = buffer.disassemble_info(pc);
+	buffer.data_get(pc, dasmresult & util::disasm_interface::LENGTHMASK, true, opbuf);
 
 	// return a CRC of the exact count of opcode bytes
-	return core_crc32(0, opbuf, numbytes);
+	return core_crc32(0, &opbuf[0], opbuf.size());
 }
 
 
@@ -2593,26 +2576,29 @@ void device_debug::compute_debug_flags()
 
 void device_debug::prepare_for_step_overout(offs_t pc)
 {
+	debug_disasm_buffer buffer(device());
+
 	// disassemble the current instruction and get the flags
-	std::string dasmbuffer;
-	offs_t dasmresult = dasm_wrapped(dasmbuffer, pc);
+	u32 dasmresult = buffer.disassemble_info(pc);
 
 	// if flags are supported and it's a call-style opcode, set a temp breakpoint after that instruction
-	if ((dasmresult & DASMFLAG_SUPPORTED) != 0 && (dasmresult & DASMFLAG_STEP_OVER) != 0)
+	if ((dasmresult & util::disasm_interface::SUPPORTED) != 0 && (dasmresult & util::disasm_interface::STEP_OVER) != 0)
 	{
-		int extraskip = (dasmresult & DASMFLAG_OVERINSTMASK) >> DASMFLAG_OVERINSTSHIFT;
-		pc += dasmresult & DASMFLAG_LENGTHMASK;
+		int extraskip = (dasmresult & util::disasm_interface::OVERINSTMASK) >> util::disasm_interface::OVERINSTSHIFT;
+		pc = buffer.next_pc_wrap(pc, dasmresult & util::disasm_interface::LENGTHMASK);
 
 		// if we need to skip additional instructions, advance as requested
-		while (extraskip-- > 0)
-			pc += dasm_wrapped(dasmbuffer, pc) & DASMFLAG_LENGTHMASK;
+		while (extraskip-- > 0) {
+			u32 result = buffer.disassemble_info(pc);
+			pc += buffer.next_pc_wrap(pc, result & util::disasm_interface::LENGTHMASK);
+		}
 		m_stepaddr = pc;
 	}
 
 	// if we're stepping out and this isn't a step out instruction, reset the steps until stop to a high number
 	if ((m_flags & DEBUG_FLAG_STEPPING_OUT) != 0)
 	{
-		if ((dasmresult & DASMFLAG_SUPPORTED) != 0 && (dasmresult & DASMFLAG_STEP_OUT) == 0)
+		if ((dasmresult & util::disasm_interface::SUPPORTED) != 0 && (dasmresult & util::disasm_interface::STEP_OUT) == 0)
 			m_stepsleft = 100;
 		else
 			m_stepsleft = 1;
@@ -2881,38 +2867,6 @@ void device_debug::hotspot_check(address_space &space, offs_t address)
 			m_hotspots[0] = temp;
 		}
 	}
-}
-
-
-//-------------------------------------------------
-//  dasm_wrapped - wraps calls to the disassembler
-//  by fetching the opcode bytes to a temporary
-//  buffer and then disassembling them
-//-------------------------------------------------
-
-u32 device_debug::dasm_wrapped(std::string &buffer, offs_t pc)
-{
-	assert(m_memory != nullptr && m_disasm != nullptr);
-
-	// determine the adjusted PC
-	address_space &decrypted_space = m_memory->has_space(AS_OPCODES) ? m_memory->space(AS_OPCODES) : m_memory->space(AS_PROGRAM);
-	address_space &space = m_memory->space(AS_PROGRAM);
-	offs_t pcbyte = space.address_to_byte(pc) & space.bytemask();
-
-	// fetch the bytes up to the maximum
-	u8 opbuf[64], argbuf[64];
-	int maxbytes = m_disasm->max_opcode_bytes();
-	for (int numbytes = 0; numbytes < maxbytes; numbytes++)
-	{
-		opbuf[numbytes] = m_device.machine().debugger().cpu().read_opcode(decrypted_space, pcbyte + numbytes, 1);
-		argbuf[numbytes] = m_device.machine().debugger().cpu().read_opcode(space, pcbyte + numbytes, 1);
-	}
-
-	// disassemble to our buffer
-	std::ostringstream stream;
-	uint32_t result = m_disasm->disassemble(stream, pc, opbuf, argbuf);
-	buffer = stream.str();
-	return result;
 }
 
 
@@ -3257,35 +3211,24 @@ void device_debug::tracer::update(offs_t pc)
 	if (!m_action.empty())
 		m_debug.m_device.machine().debugger().console().execute_command(m_action, false);
 
-	// print the address
-	std::string buffer;
-	int logaddrchars = m_debug.logaddrchars();
-	if (m_debug.is_octal())
-	{
-		buffer = string_format("%0*o: ", logaddrchars*3/2, pc);
-	}
-	else
-	{
-		buffer = string_format("%0*X: ", logaddrchars, pc);
-	}
-
-	// print the disassembly
-	std::string dasm;
-	offs_t dasmresult = m_debug.dasm_wrapped(dasm, pc);
-	buffer.append(dasm);
+	debug_disasm_buffer buffer(m_debug.device());
+	std::string instruction;
+	offs_t next_pc, size;
+	u32 dasmresult;
+	buffer.disassemble(pc, instruction, next_pc, size, dasmresult);
 
 	// output the result
-	fprintf(&m_file, "%s\n", buffer.c_str());
+	fprintf(&m_file, "%s: %s\n", buffer.pc_to_string(pc).c_str(), instruction.c_str());
 
 	// do we need to step the trace over this instruction?
-	if (m_trace_over && (dasmresult & DASMFLAG_SUPPORTED) != 0 && (dasmresult & DASMFLAG_STEP_OVER) != 0)
+	if (m_trace_over && (dasmresult & util::disasm_interface::SUPPORTED) != 0 && (dasmresult & util::disasm_interface::STEP_OVER) != 0)
 	{
-		int extraskip = (dasmresult & DASMFLAG_OVERINSTMASK) >> DASMFLAG_OVERINSTSHIFT;
-		offs_t trace_over_target = pc + (dasmresult & DASMFLAG_LENGTHMASK);
+		int extraskip = (dasmresult & util::disasm_interface::OVERINSTMASK) >> util::disasm_interface::OVERINSTSHIFT;
+		offs_t trace_over_target = buffer.next_pc_wrap(pc, dasmresult & util::disasm_interface::LENGTHMASK);
 
 		// if we need to skip additional instructions, advance as requested
 		while (extraskip-- > 0)
-			trace_over_target += m_debug.dasm_wrapped(dasm, trace_over_target) & DASMFLAG_LENGTHMASK;
+			trace_over_target = buffer.next_pc_wrap(trace_over_target, buffer.disassemble_info(trace_over_target) & util::disasm_interface::LENGTHMASK);
 
 		m_trace_over_target = trace_over_target;
 	}

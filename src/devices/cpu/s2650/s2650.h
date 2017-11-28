@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "2650dasm.h"
 
 #define S2650_SENSE_LINE INPUT_LINE_IRQ1
 
@@ -35,7 +36,7 @@ DECLARE_DEVICE_TYPE(S2650, s2650_device)
 #define MCFG_S2650_INTACK_HANDLER(_devcb) \
 	devcb = &s2650_device::set_intack_handler(*device, DEVCB_##_devcb);
 
-class s2650_device : public cpu_device
+	class s2650_device : public cpu_device, public s2650_disassembler::config
 {
 public:
 	// construction/destruction
@@ -68,9 +69,8 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual uint32_t disasm_min_opcode_bytes() const override { return 1; }
-	virtual uint32_t disasm_max_opcode_bytes() const override { return 3; }
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
+	virtual bool get_z80_mnemonics_mode() const override;
 
 private:
 	address_space_config m_program_config;

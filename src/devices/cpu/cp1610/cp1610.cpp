@@ -16,7 +16,7 @@
 #include "emu.h"
 #include "cp1610.h"
 #include "debugger.h"
-
+#include "1610dasm.h"
 
 DEFINE_DEVICE_TYPE(CP1610, cp1610_cpu_device, "cp1610", "GI CP1610")
 
@@ -3422,9 +3422,7 @@ void cp1610_cpu_device::state_string_export(const device_state_entry &entry, std
 	}
 }
 
-
-offs_t cp1610_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *cp1610_cpu_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( cp1610 );
-	return CPU_DISASSEMBLE_NAME(cp1610)(this, stream, pc, oprom, opram, options);
+	return new cp1610_disassembler;
 }

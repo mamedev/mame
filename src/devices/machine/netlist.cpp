@@ -1045,23 +1045,6 @@ ATTR_COLD uint64_t netlist_mame_cpu_device::execute_cycles_to_clocks(uint64_t cy
 	return cycles;
 }
 
-ATTR_COLD offs_t netlist_mame_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
-{
-	//char tmp[16];
-	unsigned startpc = pc;
-	int relpc = pc - m_genPC;
-	if (relpc >= 0 && relpc < netlist().queue().size())
-	{
-		int dpc = netlist().queue().size() - relpc - 1;
-		// FIXME: 50 below fixes crash in mame-debugger. It's based on try on error.
-		util::stream_format(stream, "%c %s @%10.7f", (relpc == 0) ? '*' : ' ', netlist().queue()[dpc].m_object->name().c_str(),
-				netlist().queue()[dpc].m_exec_time.as_double());
-	}
-
-	pc+=1;
-	return (pc - startpc);
-}
-
 ATTR_HOT void netlist_mame_cpu_device::execute_run()
 {
 	bool check_debugger = ((device_t::machine().debug_flags & DEBUG_FLAG_ENABLED) != 0);
@@ -1083,6 +1066,35 @@ ATTR_HOT void netlist_mame_cpu_device::execute_run()
 		netlist().process_queue(m_div * m_icount);
 		update_time_x();
 	}
+}
+
+util::disasm_interface *netlist_mame_cpu_device::create_disassembler()
+{
+	return new netlist_disassembler(this);
+}
+
+netlist_disassembler::netlist_disassembler(netlist_mame_cpu_device *dev) : m_dev(dev)
+{
+}
+
+u32 netlist_disassembler::opcode_alignment() const
+{
+	return 1;
+}
+
+offs_t netlist_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
+{
+	unsigned startpc = pc;
+	int relpc = pc - m_dev->genPC();
+	if (relpc >= 0 && relpc < m_dev->netlist().queue().size())
+	{
+		int dpc = m_dev->netlist().queue().size() - relpc - 1;
+		util::stream_format(stream, "%c %s @%10.7f", (relpc == 0) ? '*' : ' ', m_dev->netlist().queue()[dpc].m_object->name().c_str(),
+				m_dev->netlist().queue()[dpc].m_exec_time.as_double());
+	}
+
+	pc+=1;
+	return (pc - startpc);
 }
 
 // ----------------------------------------------------------------------------------------

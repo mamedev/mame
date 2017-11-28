@@ -338,7 +338,6 @@ Interactive Business English 4                                DynEd Japan       
 Interactive Business English 5                                DynEd Japan                       1992/7     SET(CD+FD)
 Interactive Business English 6                                DynEd Japan                       1992/7     SET(CD+FD)
 Iris-tei Sayokyoku                                            Agumix                            1992/11    CD
-Ishin no Arashi                                               Koei                              1990/3     SET(CD+FD)
 Iwanami Bungakukan: Natsume Souseki                           Iwanami Shoten                    1994/2     CD
 Iwanami Denshi Nihon Sougou Nendo CD-ROM                      Fujitsu                           1993/10    CD
 J.League Professional Soccer 1994                             Victor Entertainment              1994/9     CD
@@ -585,14 +584,13 @@ Saishin Igaku Daijiten CD-ROM                                 Fujitsu           
 Saishin Igaku Daijiten Standard-ban CD-ROM                    Fujitsu                           1993/2     CD
 Sakura no Mori                                                Active                            1995/10    CD
 * Samurai Spirits                                             Japan Home Video (JHV)            1995/9     SET(CD+FD)
-Sangokushi 2                                                  Koei                              1990/6     SET(CD+FD)
 Sangokushi 4                                                  Koei                              1994/6     SET(CD+FD)
 Sanseido Word Hunter Multi CD-ROM Jiten                       Fujitsu                           1991/10    CD
 Sargon 5                                                      GAM                               1992/11    CD
 Sayonara no Mukougawa                                         Foster                            1997/8     CD
 School Accessory Illust-hen V1.0                              Fujitsu                           1993/2     CD
-School Navi Nihon no Rekishi CD : Heian, Kamakura             Unitybell                         1995/8     CD
-School Navi Nihon no Rekishi CD : Kodai, Asuka-Nara           Unitybell                         1995/7     CD
+School Navi Nihon no Rekishi CD: Heian, Kamakura             Unitybell                         1995/8     CD
+School Navi Nihon no Rekishi CD: Kodai, Asuka-Nara           Unitybell                         1995/7     CD
 School Navi Nihon no Rekishi CD: Azuchi-Momoyama, Edo         Unitybell                         1995/9     CD
 School Navi Nihon no Rekishi CD: Meiji, Gendai                Unitybell                         1995/9     CD
 School-Ace Alpha HG Sensei-you                                Fujitsu                           1994/7     SET(CD+FD)
@@ -750,6 +748,7 @@ Vanishing Point: Tenshi no Kieta Machi                        Tiara             
 Vector Moji Pattern 2                                         Fujitsu                           1992/12    IC
 Video Koubou V1.1                                             Fujitsu                           1992/6     SET(CD+FD)
 Video Koubou V1.2                                             Fujitsu                           1993/4     CD
+* Video Koubou V1.3                                             Fujitsu                           1994/2     CD
 Video Koubou V1.4                                             Fujitsu                           1995/11    SET(CD+FD)
 VIP Ball                                                      CSK Research Institute (CRI)      1991/8     CD
 VIP Tone                                                      CSK Research Institute (CRI)      1991/9     CD
@@ -781,7 +780,6 @@ Youki de Cool na LA Towns                                     Media Art         
 Yubiwa Monogatari Daiikkan: Tabi no Nakama                    Starcraft                         1992/3     CD
 Yubiwa Monogatari Dainikan: Futatsu no Tou                    Starcraft                         1993/4     SET(CD+FD)
 Yumeutsutsu                                                   Megami                            1992/5     CD
-Zan 3: Ten'un Ware ni Ari                                     Nihon Telenet                     1994/4     SET(CD+FD)
 Zoku Youjuu Senki: Suna no Mokushiroku                        D.O.                              1994/2     CD
 Z's Staff Pro Towns                                           Zeit                              1991/7     CD
 Z's Triphony DigitalCraft Towns                               Zeit                              1990/12    CD
@@ -4975,6 +4973,44 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
+	<software name="ishin">
+		<!--
+		Origin: Private dump (Reuental)
+		<rom name="ISHIN_NO_ARASHI.mdf" size="502741200" crc="33a4b201" sha1="4666a1c55405acefd13f17608645df0bac1583fc"/>
+		<rom name="ISHIN_NO_ARASHI.mds" size="1024" crc="cfb06454" sha1="05e023f2567feca6c984aeba9385cbfaac878cab"/>
+		
+		*after conversion with IsoBuster+EAC *
+		<rom name="ishin.cue" size="1123" crc="ab69674c" sha1="6ac864e1572e04e6382fe4bac453bc14ba8ef461"/>
+		<rom name="ishin_track01.bin" size="20462400" crc="be4b061a" sha1="99fca8c1ef5dedb879d82eb932b6cf1f70a8659a"/>
+		<rom name="ishin_track02.bin" size="53409216" crc="62115ac9" sha1="6ab76f1d439cb0a2fe4a0c8922031aa04b183ed9"/>
+		<rom name="ishin_track03.bin" size="48004320" crc="426ee287" sha1="43ff60a150b80802f988235e561e9e175c4e7413"/>
+		<rom name="ishin_track04.bin" size="37008720" crc="281c033b" sha1="254d876a746b23673c4f8123e767e23eb5082c7e"/>
+		<rom name="ishin_track05.bin" size="35456400" crc="3e8f4123" sha1="246cd999e86dd536f3be6d3676577bcb5d71d8e5"/>
+		<rom name="ishin_track06.bin" size="30822960" crc="ccf11e55" sha1="bf4710e6bba7e030db428d95cbde4975573597b7"/>
+		<rom name="ishin_track07.bin" size="39160800" crc="40ec9d8f" sha1="d20cc12e917c12207467a27439dd14bed9da0f45"/>
+		<rom name="ishin_track08.bin" size="54731040" crc="c35f12a6" sha1="6aa8fc2f8aadb2c8f55157aa24a6c8de3ec78970"/>
+		<rom name="ishin_track09.bin" size="24507840" crc="bb01cf0d" sha1="4a0435f05e7c17c1b024e69fbd77122bee765ca3"/>
+		<rom name="ishin_track10.bin" size="43542576" crc="b1d9a332" sha1="0da9c7fc70a0d6ee46e67ce4daa0066a152f55db"/>
+		<rom name="ishin_track11.bin" size="35886816" crc="c5998c45" sha1="161fd150ae83c1670621a1aec326ef9191050a25"/>
+		<rom name="ishin_track12.bin" size="85920912" crc="8e65d944" sha1="bc24be3f270455e879218ba842f6a18133b76e40"/>
+		-->
+		<description>Ishin no Arashi</description>
+		<year>1990</year>
+		<publisher>光栄 (Koei)</publisher>
+		<info name="alt_title" value="維新の嵐" />
+		<info name="release" value="199003xx" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1281968">
+				<rom name="ishin.d88" size="1281968" crc="5885c76c" sha1="29b0773c95d1f69d943c1ee47e957f7b7eb6cb55" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="ishin" sha1="e5aaf3d9e6fb44aec09b6586adfe72e872c9b85d" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="janjaka">
 		<!--
 		Origin: Neo Kobe Collection
@@ -7888,6 +7924,30 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
+	<software name="sangoku2">
+		<!--
+		Origin: Private dump (Reuental)
+		<rom name="SANGOKUSHI_2.ccd" size="3832" crc="6bbbdec6" sha1="1ad024f2e10d5ba0d5eb95281e1e94879a741a25"/>
+		<rom name="SANGOKUSHI_2.cue" size="920" crc="8dd872dc" sha1="540efad426d2a82dfe547f8424115db6465cf093"/>
+		<rom name="SANGOKUSHI_2.img" size="445635792" crc="a82468d9" sha1="68064b8a3cfbfe1e5c7e0c38d7e9c3b24e51fa45"/>
+		<rom name="SANGOKUSHI_2.sub" size="18189216" crc="4042bd7b" sha1="9df79c40b18cbaf2c8e3ab89e444a2f0e6b8932f"/>
+		-->
+		<description>Sangokushi II</description>
+		<year>1990</year>
+		<publisher>光栄 (Koei)</publisher>
+		<info name="alt_title" value="三国志II" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1281968">
+				<rom name="sango2.d88" size="1281968" crc="40a7015d" sha1="79ae6709d7ee2c7f35c07f967e032f790565278b" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="sangokushi_2" sha1="f4ecb67518eb27c0ba5d6d01b945f89aa056535d" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="sangoku3">
 		<!--
 		Origin: P2P
@@ -10087,6 +10147,33 @@ User/save disks that can be created from the game itself are not included.
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="zan 2 towns special" sha1="e1a85e9691abb531bdef1cdf9373630ffa2338d7" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="zan3">
+		<!--
+		Origin: Private dump (Reuental)
+		<rom name="ZAN3.mdf" size="8908800" crc="df3ca4de" sha1="21479d715e7a32ed3f93a6eb1d3d3690fd2ee0ec"/>
+		<rom name="ZAN3.mds" size="688" crc="beb71eb0" sha1="a82d8b7783e9087b0b32241208ceed2db2d1e9d8"/>
+
+		The MDF file is a single track, so a CUE file was created for conversion:
+		<rom name="zan3.cue" size="65" crc="09d4a494" sha1="65cb0a7c4333779fb2f13c60ad2cb69749e1ea0c"/>
+		-->
+		<description>Zan III - Ten'un Ware ni Ari</description>
+		<year>1994</year>
+		<publisher>日本テレネット (Nihon Telenet)</publisher>
+		<info name="alt_title" value="斬III　～天運我にあり～" />
+		<info name="release" value="199404xx" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="System Disk" />
+			<dataarea name="flop" size="1281968">
+				<rom name="zan3 system disk.d88" size="1281968" crc="cbe7152b" sha1="eed29400e2d84788871027d3fc88c2297aa6a8b7" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="zan3" sha1="375d3a88e0c6990137cb7b054ffc4785e6475584" />
 			</diskarea>
 		</part>
 	</software>

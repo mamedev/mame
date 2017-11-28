@@ -9,22 +9,22 @@
 \**************************/
 
 #include "emu.h"
-#include <stdarg.h>
+#include "unspdasm.h"
 
 /*****************************************************************************/
 
-static const char *reg[] =
+const char *unsp_disassembler::reg[] =
 {
 	"sp", "r1", "r2", "r3", "r4", "bp", "sr", "pc"
 };
 
-static const char *jmp[] =
+const char *unsp_disassembler::jmp[] =
 {
 	"jb", "jae", "jge", "jl", "jne", "je", "jpl", "jmi",
 	"jbe", "ja", "jle", "jg", "jvc", "jvs", "jmp", "<inv>"
 };
 
-static const char *alu[] =
+const char *unsp_disassembler::alu[] =
 {
 	"add",  "adc",   "sub",   "sbc",
 	"cmp",  "<inv>", "neg",   "<inv>",
@@ -44,12 +44,17 @@ static const char *alu[] =
 
 /*****************************************************************************/
 
-#define UNSP_DASM_OK ((OP2X ? 2 : 1) | DASMFLAG_SUPPORTED)
+#define UNSP_DASM_OK ((OP2X ? 2 : 1) | SUPPORTED)
 
-CPU_DISASSEMBLE(unsp)
+u32 unsp_disassembler::opcode_alignment() const
 {
-	uint16_t op = *(uint16_t *)oprom;
-	uint16_t imm16 = *(uint16_t *)(oprom + 2);
+	return 1;
+}
+
+offs_t unsp_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
+{
+	uint16_t op = opcodes.r16(pc);
+	uint16_t imm16 = opcodes.r16(pc+1);
 	op = big_endianize_int16(op);
 	imm16 = big_endianize_int16(imm16);
 

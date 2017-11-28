@@ -24,6 +24,7 @@
 
 #include "emu.h"
 #include "hd61700.h"
+#include "hd61700d.h"
 
 #include "debugger.h"
 
@@ -296,17 +297,14 @@ void hd61700_cpu_device::state_string_export(const device_state_entry &entry, st
 
 
 //-------------------------------------------------
-//  disasm_disassemble - call the disassembly
+//  disassemble - call the disassembly
 //  helper function
 //-------------------------------------------------
 
-offs_t hd61700_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *hd61700_cpu_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( hd61700 );
-	return CPU_DISASSEMBLE_NAME(hd61700)(this, stream, pc, oprom, opram, options);
+	return new hd61700_disassembler;
 }
-
-
 
 //-------------------------------------------------
 //  check_irqs - check if need interrupts

@@ -119,9 +119,7 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual uint32_t disasm_min_opcode_bytes() const override { return 1; }
-	virtual uint32_t disasm_max_opcode_bytes() const override { return 6; }
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
 
 private:
 	enum class e_mode : u8 {
@@ -190,8 +188,6 @@ private:
 	inline uint8_t  READ8();
 	inline uint16_t READ16();
 	void decode();
-	const char *internal_registers_names(uint16_t x);
-	bool stream_arg(std::ostream &stream, uint32_t pc, const char *pre, const e_mode mode, const uint16_t r, const uint16_t rb);
 	inline uint16_t r8( const uint16_t r );
 	inline void w8( const uint16_t r, uint16_t value );
 	inline uint16_t r16( const uint16_t r );

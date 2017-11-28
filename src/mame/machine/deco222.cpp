@@ -34,7 +34,20 @@ uint8_t deco_222_device::mi_decrypt::read_sync(uint16_t adr)
 	return BITSWAP8(direct->read_byte(adr) ,7,5,6,4,3,2,1,0);
 }
 
+util::disasm_interface *deco_222_device::create_disassembler()
+{
+	return new disassembler;
+}
 
+u32 deco_222_device::disassembler::interface_flags() const
+{
+	return SPLIT_DECRYPTION;
+}
+
+u8 deco_222_device::disassembler::decrypt8(u8 value, offs_t pc, bool opcode) const
+{
+	return opcode ? BITSWAP8(value,7,5,6,4,3,2,1,0) : value;
+}
 
 deco_c10707_device::deco_c10707_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	m6502_device(mconfig, DECO_C10707, tag, owner, clock)
@@ -56,4 +69,19 @@ void deco_c10707_device::device_reset()
 uint8_t deco_c10707_device::mi_decrypt::read_sync(uint16_t adr)
 {
 	return BITSWAP8(direct->read_byte(adr) ,7,5,6,4,3,2,1,0);
+}
+
+util::disasm_interface *deco_c10707_device::create_disassembler()
+{
+	return new disassembler;
+}
+
+u32 deco_c10707_device::disassembler::interface_flags() const
+{
+	return SPLIT_DECRYPTION;
+}
+
+u8 deco_c10707_device::disassembler::decrypt8(u8 value, offs_t pc, bool opcode) const
+{
+	return opcode ? BITSWAP8(value,7,5,6,4,3,2,1,0) : value;
 }

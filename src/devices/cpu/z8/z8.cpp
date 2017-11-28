@@ -22,6 +22,7 @@
 
 #include "emu.h"
 #include "z8.h"
+#include "z8dasm.h"
 #include "debugger.h"
 
 /***************************************************************************
@@ -207,12 +208,11 @@ z8681_device::z8681_device(const machine_config &mconfig, const char *tag, devic
 {
 }
 
-
-offs_t z8_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *z8_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( z8 );
-	return CPU_DISASSEMBLE_NAME(z8)(this, stream, pc, oprom, opram, options);
+	return new z8_disassembler;
 }
+
 
 device_memory_interface::space_config_vector z8_device::memory_space_config() const
 {
