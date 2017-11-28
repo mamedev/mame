@@ -32390,7 +32390,8 @@ rbislande                       // B39 (c) 1988 Taito Corporation
 rbislando                       // B22 (c) 1987 Taito Corporation
 
 @source:rbmk.cpp
-rbmk                            // (c) 1995 GMS
+rbmk                            // (c) 1998 GMS
+rbspm                           // (c) 1998 GMS
 
 @source:rc702.cpp
 rc702                           // 1979 RC702
