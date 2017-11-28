@@ -815,7 +815,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 					m_do_r64 = [this](offs_t pc) -> u64 { 
 						fill(pc, 4);
 						const u16 *src = get_ptr<u16>(pc);
-						return (u64(src[0]) << 48) | (u64(src[1]) << 32) | (src[2] << 16) | src[3];
+						return (u64(src[0]) << 48) | (u64(src[1]) << 32) | u32(src[2] << 16) | src[3];
 					};
 				}
 				break;
@@ -872,7 +872,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 					m_do_r64 = [this](offs_t pc) -> u64 { 
 						fill(pc, 8);
 						const u8 *src = get_ptr<u8>(pc);
-						return src[0] | (src[1] << 8) | (src[2] << 16) | (src[3] << 24) |
+						return src[0] | (src[1] << 8) | (src[2] << 16) | u32(src[3] << 24) |
 						(u64(src[4]) << 32) | (u64(src[5]) << 40) | (u64(src[6]) << 48) | (u64(src[7]) << 56);
 					};
 				}
