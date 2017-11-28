@@ -7,6 +7,7 @@
  *
  ***************************************************************************/
 
+#include "emu.h"
 #include "es5510d.h"
 
 u32 es5510_disassembler::opcode_alignment() const
