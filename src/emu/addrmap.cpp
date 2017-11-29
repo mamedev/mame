@@ -52,7 +52,6 @@ address_map_entry::address_map_entry(device_t &device, address_map &map, offs_t 
 
 address_map_entry &address_map_entry::mask(offs_t _mask)
 {
-	printf("mask %x\n", _mask);
 	m_addrmask = _mask;
 	if (m_map.m_globalmask != 0)
 		m_addrmask &= m_map.m_globalmask;
