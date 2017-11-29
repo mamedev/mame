@@ -885,7 +885,7 @@ class address_space_specific : public address_space
 
 	// constants describing the native size
 	static const u32 NATIVE_BYTES = sizeof(_NativeType);
-	static const u32 NATIVE_STEP = _Shift >= 0 ? NATIVE_BYTES << _Shift : NATIVE_BYTES >> -_Shift;
+	static const u32 NATIVE_STEP = _Shift >= 0 ? NATIVE_BYTES << iabs(_Shift) : NATIVE_BYTES >> iabs(_Shift);
 	static const u32 NATIVE_MASK = NATIVE_STEP - 1;
 	static const u32 NATIVE_BITS = 8 * NATIVE_BYTES;
 
@@ -894,7 +894,7 @@ class address_space_specific : public address_space
 	u32 write_lookup(offs_t address) const { return _Large ? m_write.lookup_live_large(address) : m_write.lookup_live_small(address); }
 	u32 setoffset_lookup(offs_t address) const { return _Large ? m_setoffset.lookup_live_large(address) : m_setoffset.lookup_live_small(address); }
 
-	static inline offs_t offset_to_byte(offs_t offset) { return _Shift < 0 ? offset << -_Shift : offset >> _Shift; }
+	static inline offs_t offset_to_byte(offs_t offset) { return _Shift < 0 ? offset << iabs(_Shift) : offset >> iabs(_Shift); }
 
 public:
 	// construction/destruction
