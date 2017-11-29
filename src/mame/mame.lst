@@ -31351,6 +31351,9 @@ photoply                        //
 @source:phunsy.cpp
 phunsy                          //
 
+@source:picno.cpp
+picno                           // Konami Picno (1993)
+
 @source:piggypas.cpp
 3lilpigs                        //
 dumpump                         //
