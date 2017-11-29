@@ -111,8 +111,8 @@ public:
 	uint32_t screen_update_m15(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(m15_interrupt);
 	TIMER_CALLBACK_MEMBER(interrupt_callback);
-	DECLARE_WRITE8_MEMBER(ic8j1_output_changed);
-	DECLARE_WRITE8_MEMBER(ic8j2_output_changed);
+	DECLARE_WRITE_LINE_MEMBER(ic8j1_output_changed);
+	DECLARE_WRITE_LINE_MEMBER(ic8j2_output_changed);
 	inline void plot_pixel_m10( bitmap_ind16 &bm, int x, int y, int col );
 
 protected:

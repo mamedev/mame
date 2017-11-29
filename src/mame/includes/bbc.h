@@ -161,6 +161,7 @@ public:
 	DECLARE_MACHINE_RESET(bbcmc);
 	DECLARE_MACHINE_RESET(ltmpbp);
 	DECLARE_MACHINE_RESET(ltmpm);
+	DECLARE_MACHINE_START(cfa3000);
 
 	DECLARE_PALETTE_INIT(bbc);
 	INTERRUPT_GEN_MEMBER(bbcb_vsync);
@@ -277,6 +278,9 @@ public: // HACK FOR MC6845
 
 	int m_pagedRAM;         // BBC B+ memory handling
 	int m_vdusel;           // BBC B+ memory handling
+
+	bool m_lk18_ic41_paged_rom;  // BBC Master Paged ROM/RAM select IC41
+	bool m_lk19_ic37_paged_rom;  // BBC Master Paged ROM/RAM select IC37
 
 							/*
 							ACCCON

@@ -970,24 +970,48 @@ WRITE32_MEMBER(gba_state::gba_io_w)
 			}
 			break;
 		case 0x00a0/4:
-			m_fifo_a_in %= 17;
-			m_fifo_a[m_fifo_a_in++] = (data)&0xff;
-			m_fifo_a_in %= 17;
-			m_fifo_a[m_fifo_a_in++] = (data>>8)&0xff;
-			m_fifo_a_in %= 17;
-			m_fifo_a[m_fifo_a_in++] = (data>>16)&0xff;
-			m_fifo_a_in %= 17;
-			m_fifo_a[m_fifo_a_in++] = (data>>24)&0xff;
+			if (ACCESSING_BITS_0_7)
+			{
+				m_fifo_a_in %= 17;
+				m_fifo_a[m_fifo_a_in++] = (data)&0xff;
+			}
+			if (ACCESSING_BITS_8_15)
+			{
+				m_fifo_a_in %= 17;
+				m_fifo_a[m_fifo_a_in++] = (data>>8)&0xff;
+			}
+			if (ACCESSING_BITS_16_23)
+			{
+				m_fifo_a_in %= 17;
+				m_fifo_a[m_fifo_a_in++] = (data>>16)&0xff;
+			}
+			if (ACCESSING_BITS_24_31)
+			{
+				m_fifo_a_in %= 17;
+				m_fifo_a[m_fifo_a_in++] = (data>>24)&0xff;
+			}
 			break;
 		case 0x00a4/4:
-			m_fifo_b_in %= 17;
-			m_fifo_b[m_fifo_b_in++] = (data)&0xff;
-			m_fifo_b_in %= 17;
-			m_fifo_b[m_fifo_b_in++] = (data>>8)&0xff;
-			m_fifo_b_in %= 17;
-			m_fifo_b[m_fifo_b_in++] = (data>>16)&0xff;
-			m_fifo_b_in %= 17;
-			m_fifo_b[m_fifo_b_in++] = (data>>24)&0xff;
+			if (ACCESSING_BITS_0_7)
+			{
+				m_fifo_b_in %= 17;
+				m_fifo_b[m_fifo_b_in++] = (data)&0xff;
+			}
+			if (ACCESSING_BITS_8_15)
+			{
+				m_fifo_b_in %= 17;
+				m_fifo_b[m_fifo_b_in++] = (data>>8)&0xff;
+			}
+			if (ACCESSING_BITS_16_23)
+			{
+				m_fifo_b_in %= 17;
+				m_fifo_b[m_fifo_b_in++] = (data>>16)&0xff;
+			}
+			if (ACCESSING_BITS_24_31)
+			{
+				m_fifo_b_in %= 17;
+				m_fifo_b[m_fifo_b_in++] = (data>>24)&0xff;
+			}
 			break;
 		case 0x00b8/4:
 		case 0x00c4/4:
@@ -1157,6 +1181,10 @@ READ32_MEMBER(gba_state::gba_10000000_r)
 {
 	uint32_t data;
 	uint32_t pc = m_maincpu->state_int(ARM7_PC);
+	if (pc >= 0x10000000)
+	{
+		return 0;
+	}
 	uint32_t cpsr = m_maincpu->state_int(ARM7_CPSR);
 	if (T_IS_SET( cpsr))
 	{

@@ -91,7 +91,6 @@ protected:
 
 	virtual int data_size() { return 64; }
 
-private:
 	enum
 	{
 		REG_SECONDS = 0,
@@ -153,7 +152,7 @@ private:
 	void set_base_datetime();
 	void update_irq();
 	void update_timer();
-
+	virtual int get_timer_bypass();
 	int get_seconds();
 	void set_seconds(int seconds);
 	int get_minutes();

@@ -102,7 +102,7 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	required_device<generic_latch_8_device> m_soundlatch;
+	optional_device<generic_latch_8_device> m_soundlatch;
 
 	required_shared_ptr<uint8_t> m_vram;
 	required_shared_ptr<uint8_t> m_cram;
@@ -127,6 +127,9 @@ public:
 	DECLARE_WRITE8_MEMBER(cyclemb_flip_w);
 	DECLARE_READ8_MEMBER(skydest_i8741_0_r);
 	DECLARE_WRITE8_MEMBER(skydest_i8741_0_w);
+	DECLARE_READ8_MEMBER(skydest_i8741_1_r);
+	DECLARE_WRITE8_MEMBER(skydest_i8741_1_w);
+//  DECLARE_WRITE_LINE_MEMBER(ym_irq);
 
 	DECLARE_DRIVER_INIT(skydest);
 	DECLARE_DRIVER_INIT(cyclemb);
@@ -542,16 +545,22 @@ WRITE8_MEMBER( cyclemb_state::skydest_i8741_0_w )
 	}
 	else
 	{
-		//printf("%02x DATA PC=%04x\n",data,m_maincpu->pc());
-
 		m_mcu[0].txd = data;
+
+		m_mcu[1].rst = 0;
+		m_soundlatch->write(space, 0, data & 0xff);
 
 		if(m_mcu[0].txd == 0x41)
 			m_mcu[0].state = 1;
-		if(m_mcu[0].txd == 0x42)
+		else if(m_mcu[0].txd == 0x42)
 			m_mcu[0].state = 2;
-		if(m_mcu[0].txd == 0x44)
+		else if(m_mcu[0].txd == 0x44)
 			m_mcu[0].state = 3;
+		else
+		{
+
+			//m_audiocpu->set_input_line(0, HOLD_LINE);
+		}
 	}
 }
 
@@ -592,10 +601,35 @@ static ADDRESS_MAP_START( cyclemb_sound_map, AS_PROGRAM, 8, cyclemb_state )
 
 ADDRESS_MAP_END
 
+READ8_MEMBER(cyclemb_state::skydest_i8741_1_r)
+{
+	// status
+	if(offset == 1)
+		return 1;
+
+	if(m_mcu[1].rst == 1)
+		return 0x40;
+
+	return m_soundlatch->read(space,0);
+}
+
+WRITE8_MEMBER(cyclemb_state::skydest_i8741_1_w)
+{
+//  printf("%02x %02x\n",offset,data);
+	if(offset == 1)
+	{
+		if(data == 0xf0)
+			m_mcu[1].rst = 1;
+	}
+	//else
+	//  m_soundlatch->clear_w(space, 0, 0);
+}
+
+
 static ADDRESS_MAP_START( cyclemb_sound_io, AS_IO, 8, cyclemb_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
-	AM_RANGE(0x40, 0x40) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_DEVWRITE("soundlatch2", generic_latch_8_device, write)
+	AM_RANGE(0x40, 0x41) AM_READWRITE(skydest_i8741_1_r, skydest_i8741_1_w)
 ADDRESS_MAP_END
 
 
@@ -822,12 +856,11 @@ static INPUT_PORTS_START( skydest )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x18, 0x10, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x00, "4" )
+	PORT_DIPSETTING(    0x08, "3" )
+	PORT_DIPSETTING(    0x10, "2" )
+	PORT_DIPSETTING(    0x18, "1" )
 	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("DSW2")
@@ -849,7 +882,7 @@ static INPUT_PORTS_START( skydest )
 	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("DSW3")
-	PORT_DIPNAME( 0x01, 0x01, "DSW3" )
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Free_Play ) )
@@ -868,6 +901,8 @@ static INPUT_PORTS_START( skydest )
 	PORT_DIPNAME( 0x80, 0x00, "Invincibility (Cheat)" )
 	PORT_DIPSETTING(    0x80, DEF_STR( Yes ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+
+
 INPUT_PORTS_END
 
 static const gfx_layout charlayout =
@@ -927,6 +962,7 @@ static MACHINE_CONFIG_START( cyclemb )
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_18MHz/6)
 	MCFG_CPU_PROGRAM_MAP(cyclemb_sound_map)
 	MCFG_CPU_IO_MAP(cyclemb_sound_io)
+	MCFG_CPU_PERIODIC_INT_DRIVER(cyclemb_state,  irq0_line_hold, 60)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -949,6 +985,8 @@ static MACHINE_CONFIG_START( cyclemb )
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_18MHz/12)
+//  MCFG_YM2203_IRQ_HANDLER(WRITELINE(cyclemb_state, ym_irq))
+//  MCFG_AY8910_PORT_B_READ_CB(IOPORT("UNK")) /* port B read */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -1042,15 +1080,35 @@ ROM_END
 
 DRIVER_INIT_MEMBER(cyclemb_state,cyclemb)
 {
+	uint8_t *rom = memregion("audiocpu")->base();
+
 	membank("bank1")->configure_entries(0, 4, memregion("maincpu")->base() + 0x10000, 0x1000);
 	m_dsw_pc_hack = 0x760;
+
+	// patch audio CPU crash + ROM checksum
+	rom[0x282] = 0x00;
+	rom[0x283] = 0x00;
+	rom[0x284] = 0x00;
+	rom[0xa36] = 0x00;
+	rom[0xa37] = 0x00;
+	rom[0xa38] = 0x00;
 }
 
 DRIVER_INIT_MEMBER(cyclemb_state,skydest)
 {
+	uint8_t *rom = memregion("audiocpu")->base();
+
 	membank("bank1")->configure_entries(0, 4, memregion("maincpu")->base() + 0x10000, 0x1000);
 	m_dsw_pc_hack = 0x554;
+
+	// patch audio CPU crash + ROM checksum
+	rom[0x286] = 0x00;
+	rom[0x287] = 0x00;
+	rom[0x288] = 0x00;
+	rom[0xa36] = 0x00;
+	rom[0xa37] = 0x00;
+	rom[0xa38] = 0x00;
 }
 
-GAME( 1984, cyclemb,  0,   cyclemb,  cyclemb, cyclemb_state,  cyclemb, ROT0, "Taito Corporation", "Cycle Maabou (Japan)",  MACHINE_NO_COCKTAIL | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1985, skydest,  0,   skydest,  skydest, cyclemb_state,  skydest, ROT0, "Taito Corporation", "Sky Destroyer (Japan)", MACHINE_NO_COCKTAIL | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, cyclemb,  0,   cyclemb,  cyclemb, cyclemb_state,  cyclemb, ROT0, "Taito Corporation", "Cycle Maabou (Japan)",  MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, skydest,  0,   skydest,  skydest, cyclemb_state,  skydest, ROT0, "Taito Corporation", "Sky Destroyer (Japan)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

@@ -18,6 +18,7 @@
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
+//#include "bus/s100/s100.h"
 #include "machine/i8251.h"
 #include "machine/pit8253.h"
 #include "machine/terminal.h"

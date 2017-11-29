@@ -1300,7 +1300,7 @@ static void tilemap_update_bitmap(running_machine &machine, ui_gfx_state &state,
 		std::swap(width, height);
 
 	// realloc the bitmap if it is too small
-	if (state.bitmap_dirty || state.bitmap == nullptr || state.texture == nullptr || state.bitmap->width() != width || state.bitmap->height() != height)
+	if (state.bitmap == nullptr || state.texture == nullptr || state.bitmap->width() != width || state.bitmap->height() != height)
 	{
 		// free the old stuff
 		machine.render().texture_free(state.texture);
@@ -1318,6 +1318,7 @@ static void tilemap_update_bitmap(running_machine &machine, ui_gfx_state &state,
 	// handle the redraw
 	if (state.bitmap_dirty)
 	{
+		state.bitmap->fill(0);
 		tilemap_t *tilemap = machine.tilemap().find(state.tilemap.which);
 		tilemap->draw_debug(*machine.first_screen(), *state.bitmap, state.tilemap.xoffs, state.tilemap.yoffs, state.tilemap.flags);
 

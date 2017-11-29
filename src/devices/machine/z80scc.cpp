@@ -90,8 +90,9 @@ DONE (x) (p=partly)         NMOS         CMOS       ESCC      EMSCC
 #define LOG_DCD     (1U <<  8)
 #define LOG_SYNC    (1U <<  9)
 
-//#define VERBOSE (LOG_INT|LOG_READ|LOG_SETUP|LOG_TX|LOG_CMD)
-//#define LOG_OUTPUT_FUNC printf
+//#define VERBOSE (LOG_TX)
+//#define LOG_OUTPUT_STREAM std::cout
+
 #include "logmacro.h"
 
 #define LOGSETUP(...) LOGMASKED(LOG_SETUP,   __VA_ARGS__)
@@ -111,10 +112,8 @@ DONE (x) (p=partly)         NMOS         CMOS       ESCC      EMSCC
 
 #ifdef _MSC_VER
 #define FUNCNAME __func__
-#define LLFORMAT "%I64d"
 #else
 #define FUNCNAME __PRETTY_FUNCTION__
-#define LLFORMAT "%lld"
 #endif
 
 /* LOCAL _BRG is set in z80scc.h, local timer based BRG is not complete and will be removed if not needed for synchrounous mode */
@@ -128,6 +127,231 @@ DONE (x) (p=partly)         NMOS         CMOS       ESCC      EMSCC
 
 #define CHANA_TAG   "cha"
 #define CHANB_TAG   "chb"
+
+enum : uint8_t
+{
+	RR0_RX_CHAR_AVAILABLE       = 0x01,
+	RR0_ZC                      = 0x02,
+	RR0_TX_BUFFER_EMPTY         = 0x04,
+	RR0_DCD                     = 0x08,
+	RR0_SYNC_HUNT               = 0x10,
+	RR0_CTS                     = 0x20,
+	RR0_TX_UNDERRUN             = 0x40,
+	RR0_BREAK_ABORT             = 0x80
+};
+
+enum : uint8_t
+{
+	RR1_ALL_SENT                = 0x01,
+	RR1_RESIDUE_CODE_MASK       = 0x0e,
+	RR1_PARITY_ERROR            = 0x10,
+	RR1_RX_OVERRUN_ERROR        = 0x20,
+	RR1_CRC_FRAMING_ERROR       = 0x40,
+	RR1_END_OF_FRAME            = 0x80
+};
+
+enum : uint8_t
+{
+	RR3_CHANB_EXT_IP            = 0x01, // SCC IP pending registers
+	RR3_CHANB_TX_IP             = 0x02, //  only read in Channel A (for both channels)
+	RR3_CHANB_RX_IP             = 0x04, //  channel B return all zero
+	RR3_CHANA_EXT_IP            = 0x08,
+	RR3_CHANA_TX_IP             = 0x10,
+	RR3_CHANA_RX_IP             = 0x20
+};
+
+// Universal Bus WR0 commands for 85X30
+enum : uint8_t
+{
+	WR0_REGISTER_MASK           = 0x07,
+	WR0_COMMAND_MASK            = 0x38, // COMMANDS
+	WR0_NULL                    = 0x00, // 0 0 0
+	WR0_POINT_HIGH              = 0x08, // 0 0 1
+	WR0_RESET_EXT_STATUS        = 0x10, // 0 1 0
+	WR0_SEND_ABORT              = 0x18, // 0 1 1
+	WR0_ENABLE_INT_NEXT_RX      = 0x20, // 1 0 0
+	WR0_RESET_TX_INT            = 0x28, // 1 0 1
+	WR0_ERROR_RESET             = 0x30, // 1 1 0
+	WR0_RESET_HIGHEST_IUS       = 0x38, // 1 1 1
+	WR0_CRC_RESET_CODE_MASK     = 0xc0, // RESET
+	WR0_CRC_RESET_NULL          = 0x00, // 0 0
+	WR0_CRC_RESET_RX            = 0x40, // 0 1
+	WR0_CRC_RESET_TX            = 0x80, // 1 0
+	WR0_CRC_RESET_TX_UNDERRUN   = 0xc0  // 1 1
+};
+
+enum : uint8_t // ZBUS WR0 commands or 80X30
+{
+	WR0_Z_COMMAND_MASK          = 0x38, // COMMANDS
+	WR0_Z_NULL_1                = 0x00, // 0 0 0
+	WR0_Z_NULL_2                = 0x08, // 0 0 1
+	WR0_Z_RESET_EXT_STATUS      = 0x10, // 0 1 0
+	WR0_Z_SEND_ABORT            = 0x18, // 0 1 1
+	WR0_Z_ENABLE_INT_NEXT_RX    = 0x20, // 1 0 0
+	WR0_Z_RESET_TX_INT          = 0x28, // 1 0 1
+	WR0_Z_ERROR_RESET           = 0x30, // 1 1 0
+	WR0_Z_RESET_HIGHEST_IUS     = 0x38, // 1 1 1
+	WR0_Z_SHIFT_MASK            = 0x03, // SHIFT mode SDLC chan B
+	WR0_Z_SEL_SHFT_LEFT         = 0x02, // 1 0
+	WR0_Z_SEL_SHFT_RIGHT        = 0x03  // 1 1
+};
+
+enum : uint8_t
+{
+	WR1_EXT_INT_ENABLE          = 0x01,
+	WR1_TX_INT_ENABLE           = 0x02,
+	WR1_PARITY_IS_SPEC_COND     = 0x04,
+	WR1_RX_INT_MODE_MASK        = 0x18,
+	WR1_RX_INT_DISABLE          = 0x00,
+	WR1_RX_INT_FIRST            = 0x08,
+	WR1_RX_INT_ALL              = 0x10,
+	WR1_RX_INT_PARITY           = 0x18,
+	WR1_WREQ_ON_RX_TX           = 0x20,
+	WR1_WREQ_FUNCTION           = 0x40,
+	WR1_WREQ_ENABLE             = 0x80
+};
+
+enum : uint8_t
+{
+	WR3_RX_ENABLE               = 0x01,
+	WR3_SYNC_CHAR_LOAD_INHIBIT  = 0x02,
+	WR3_ADDRESS_SEARCH_MODE     = 0x04,
+	WR3_RX_CRC_ENABLE           = 0x08,
+	WR3_ENTER_HUNT_MODE         = 0x10,
+	WR3_AUTO_ENABLES            = 0x20,
+	WR3_RX_WORD_LENGTH_MASK     = 0xc0,
+	WR3_RX_WORD_LENGTH_5        = 0x00,
+	WR3_RX_WORD_LENGTH_7        = 0x40,
+	WR3_RX_WORD_LENGTH_6        = 0x80,
+	WR3_RX_WORD_LENGTH_8        = 0xc0
+};
+
+enum : uint8_t
+{
+	WR4_PARITY_ENABLE           = 0x01,
+	WR4_PARITY_EVEN             = 0x02,
+	WR4_STOP_BITS_MASK          = 0x0c,
+	WR4_STOP_BITS_1             = 0x04,
+	WR4_STOP_BITS_1_5           = 0x08,
+	WR4_STOP_BITS_2             = 0x0c,
+	WR4_SYNC_MODE_MASK          = 0x30,
+	WR4_SYNC_MODE_8_BIT         = 0x00,
+	WR4_SYNC_MODE_16_BIT        = 0x10,
+	WR4_BIT4                    = 0x10,
+	WR4_SYNC_MODE_SDLC          = 0x20,
+	WR4_BIT5                    = 0x20,
+	WR4_SYNC_MODE_EXT           = 0x30,
+	WR4_CLOCK_RATE_MASK         = 0xc0,
+	WR4_CLOCK_RATE_X1           = 0x00,
+	WR4_CLOCK_RATE_X16          = 0x40,
+	WR4_CLOCK_RATE_X32          = 0x80,
+	WR4_CLOCK_RATE_X64          = 0xc0
+};
+
+enum : uint8_t
+{
+	WR5_TX_CRC_ENABLE           = 0x01,
+	WR5_RTS                     = 0x02,
+	WR5_CRC16                   = 0x04,
+	WR5_TX_ENABLE               = 0x08,
+	WR5_SEND_BREAK              = 0x10,
+	WR5_TX_WORD_LENGTH_MASK     = 0x60,
+	WR5_TX_WORD_LENGTH_5        = 0x00,
+	WR5_TX_WORD_LENGTH_6        = 0x40,
+	WR5_TX_WORD_LENGTH_7        = 0x20,
+	WR5_TX_WORD_LENGTH_8        = 0x60,
+	WR5_DTR                     = 0x80
+};
+
+enum : uint8_t
+{
+	WR7P_TX_FIFO_EMPTY          = 0x04
+};
+
+enum : uint8_t
+{
+	WR9_CMD_MASK                = 0xC0,
+	WR9_CMD_NORESET             = 0x00,
+	WR9_CMD_CHNB_RESET          = 0x40,
+	WR9_CMD_CHNA_RESET          = 0x80,
+	WR9_CMD_HW_RESET            = 0xC0,
+	WR9_BIT_VIS                 = 0x01,
+	WR9_BIT_NV                  = 0x02,
+	WR9_BIT_DLC                 = 0x04,
+	WR9_BIT_MIE                 = 0x08,
+	WR9_BIT_SHSL                = 0x10,
+	WR9_BIT_IACK                = 0x20
+};
+
+enum : uint8_t
+{
+	WR10_8_6_BIT_SYNC           = 0x01,
+	WR10_LOOP_MODE              = 0x02,
+	WR10_ABORT_FLAG_UNDERRUN    = 0x04,
+	WR10_MARK_FLAG_IDLE         = 0x08,
+	WR10_GO_ACTIVE_ON_POLL      = 0x10,
+	WR10_ENCODING_MASK          = 0x60,
+	WR10_NRZ_ENCODING           = 0x00,
+	WR10_NRZI_ENCODING          = 0x20,
+	WR10_BIT5                   = 0x20,
+	WR10_FM1_ENCODING           = 0x40,
+	WR10_BIT6                   = 0x40,
+	WR10_FM0_ENCODING           = 0x60,
+	WR10_CRC_PRESET             = 0x80
+};
+
+enum : uint8_t
+{
+	WR11_RCVCLK_TYPE            = 0x80,
+	WR11_RCVCLK_SRC_MASK        = 0x60, // RCV CLOCK
+	WR11_RCVCLK_SRC_RTXC        = 0x00, //  0 0
+	WR11_RCVCLK_SRC_TRXC        = 0x20, //  0 1
+	WR11_RCVCLK_SRC_BR          = 0x40, //  1 0
+	WR11_RCVCLK_SRC_DPLL        = 0x60, //  1 1
+	WR11_TRACLK_SRC_MASK        = 0x18, // TRA CLOCK
+	WR11_TRACLK_SRC_RTXC        = 0x00, //  0 0
+	WR11_TRACLK_SRC_TRXC        = 0x08, //  0 1
+	WR11_TRACLK_SRC_BR          = 0x10, //  1 0
+	WR11_TRACLK_SRC_DPLL        = 0x18, //  1 1
+	WR11_TRXC_DIRECTION         = 0x04,
+	WR11_TRXSRC_SRC_MASK        = 0x03, // TRXX CLOCK
+	WR11_TRXSRC_SRC_XTAL        = 0x00, //  0 0
+	WR11_TRXSRC_SRC_TRA         = 0x01, //  0 1
+	WR11_TRXSRC_SRC_BR          = 0x02, //  1 0
+	WR11_TRXSRC_SRC_DPLL        = 0x03  //  1 1
+};
+
+enum : uint8_t
+{
+	WR14_DPLL_CMD_MASK          = 0xe0, // Command
+	WR14_CMD_NULL               = 0x00, // 0 0 0
+	WR14_CMD_ESM                = 0x20, // 0 0 1
+	WR14_CMD_RMC                = 0x40, // 0 1 0
+	WR14_CMD_DISABLE_DPLL       = 0x60, // 0 1 1
+	WR14_CMD_SS_BRG             = 0x80, // 1 0 0
+	WR14_CMD_SS_RTXC            = 0xa0, // 1 0 1
+	WR14_CMD_SET_FM             = 0xc0, // 1 1 0
+	WR14_CMD_SET_NRZI           = 0xe0, // 1 1 1
+	WR14_BRG_ENABLE             = 0x01,
+	WR14_BRG_SOURCE             = 0x02,
+	WR14_DTR_REQ_FUNC           = 0x04,
+	WR14_AUTO_ECHO              = 0x08,
+	WR14_LOCAL_LOOPBACK         = 0x10
+};
+
+enum : uint8_t
+{
+	WR15_WR7PRIME               = 0x01,
+	WR15_ZEROCOUNT              = 0x02,
+	WR15_STATUS_FIFO            = 0x04,
+	WR15_DCD                    = 0x08,
+	WR15_SYNC                   = 0x10,
+	WR15_CTS                    = 0x20,
+	WR15_TX_EOM                 = 0x40,
+	WR15_BREAK_ABORT            = 0x80
+};
+
+
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
@@ -157,10 +381,24 @@ MACHINE_CONFIG_END
 //  LIVE DEVICE
 //**************************************************************************
 
+inline void z80scc_channel::out_txd_cb(int state)
+{
+	m_uart->m_out_txd_cb[m_index](state);
+}
+
+inline void z80scc_channel::out_rts_cb(int state)
+{
+	m_uart->m_out_rts_cb[m_index](state);
+}
+
+inline void z80scc_channel::out_dtr_cb(int state)
+{
+	m_uart->m_out_dtr_cb[m_index](state);
+}
+
 //-------------------------------------------------
 //  z80scc_device - constructor
 //-------------------------------------------------
-
 z80scc_device::z80scc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant)
 	: device_t(mconfig, type, tag, owner, clock),
 	device_z80daisy_interface(mconfig, *this),
@@ -170,21 +408,14 @@ z80scc_device::z80scc_device(const machine_config &mconfig, device_type type, co
 	m_txca(0),
 	m_rxcb(0),
 	m_txcb(0),
-	m_out_txda_cb(*this),
-	m_out_dtra_cb(*this),
-	m_out_rtsa_cb(*this),
-	m_out_wreqa_cb(*this),
-	m_out_synca_cb(*this),
-	m_out_txdb_cb(*this),
-	m_out_dtrb_cb(*this),
-	m_out_rtsb_cb(*this),
-	m_out_wreqb_cb(*this),
-	m_out_syncb_cb(*this),
+	m_out_txd_cb{ { *this }, { *this } },
+	m_out_dtr_cb{ { *this }, { *this } },
+	m_out_rts_cb{ { *this }, { *this } },
+	m_out_wreq_cb{ { *this }, { *this } },
+	m_out_sync_cb{ { *this }, { *this } },
+	m_out_rxdrq_cb{ { *this }, { *this } },
+	m_out_txdrq_cb{ { *this }, { *this } },
 	m_out_int_cb(*this),
-	m_out_rxdrqa_cb(*this),
-	m_out_txdrqa_cb(*this),
-	m_out_rxdrqb_cb(*this),
-	m_out_txdrqb_cb(*this),
 	m_variant(variant),
 	m_wr0_ptrbits(0),
 	m_cputag(nullptr)
@@ -239,28 +470,36 @@ scc8523l_device::scc8523l_device(const machine_config &mconfig, const char *tag,
 }
 
 //-------------------------------------------------
+//  device_resolve_objects - device-specific setup
+//-------------------------------------------------
+void z80scc_device::device_resolve_objects()
+{
+	LOG("%s\n", FUNCNAME);
+
+	// resolve callbacks
+	m_out_txd_cb[CHANNEL_A].resolve_safe();
+	m_out_dtr_cb[CHANNEL_A].resolve_safe();
+	m_out_rts_cb[CHANNEL_A].resolve_safe();
+	m_out_wreq_cb[CHANNEL_A].resolve_safe();
+	m_out_sync_cb[CHANNEL_A].resolve_safe();
+	m_out_txd_cb[CHANNEL_B].resolve_safe();
+	m_out_dtr_cb[CHANNEL_B].resolve_safe();
+	m_out_rts_cb[CHANNEL_B].resolve_safe();
+	m_out_wreq_cb[CHANNEL_B].resolve_safe();
+	m_out_sync_cb[CHANNEL_B].resolve_safe();
+	m_out_rxdrq_cb[CHANNEL_A].resolve_safe();
+	m_out_txdrq_cb[CHANNEL_A].resolve_safe();
+	m_out_rxdrq_cb[CHANNEL_B].resolve_safe();
+	m_out_txdrq_cb[CHANNEL_B].resolve_safe();
+	m_out_int_cb.resolve_safe();
+}
+
+//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
-
 void z80scc_device::device_start()
 {
-	LOGSETUP("%s\n", FUNCNAME);
-	// resolve callbacks
-	m_out_txda_cb.resolve_safe();
-	m_out_dtra_cb.resolve_safe();
-	m_out_rtsa_cb.resolve_safe();
-	m_out_wreqa_cb.resolve_safe();
-	m_out_synca_cb.resolve_safe();
-	m_out_txdb_cb.resolve_safe();
-	m_out_dtrb_cb.resolve_safe();
-	m_out_rtsb_cb.resolve_safe();
-	m_out_wreqb_cb.resolve_safe();
-	m_out_syncb_cb.resolve_safe();
-	m_out_int_cb.resolve_safe();
-	m_out_rxdrqa_cb.resolve_safe();
-	m_out_txdrqa_cb.resolve_safe();
-	m_out_rxdrqb_cb.resolve_safe();
-	m_out_txdrqb_cb.resolve_safe();
+	LOG("%s", FUNCNAME);
 
 	// state saving
 	save_item(NAME(m_int_state));
@@ -274,16 +513,15 @@ void z80scc_device::device_start()
 //-------------------------------------------------
 //  device_reset - device-specific reset
 //-------------------------------------------------
-
 void z80scc_device::device_reset()
 {
-	LOGSETUP("%s %s \n",tag(), FUNCNAME);
+	LOG("%s %s \n",tag(), FUNCNAME);
 
 	// Do channel reset on both channels
 	m_chanA->reset();
 	m_chanB->reset();
 
-	// Fix hardware reset values for registers where it differs from channel reset values
+	// Hardware reset values for registers where it differs from channel reset values
 	m_wr9  &= 0x3c;
 	m_wr9  |= 0xc0;
 	m_chanA->m_wr10  = 0x00;
@@ -358,7 +596,7 @@ int z80scc_device::z80daisy_irq_state()
 	}
 
 	// Last chance to keep the control of the interrupt line
-	state |= (m_wr9 & z80scc_channel::WR9_BIT_DLC) ? Z80_DAISY_IEO : 0;
+	state |= (m_wr9 & WR9_BIT_DLC) ? Z80_DAISY_IEO : 0;
 
 	LOGINT("- Interrupt State %u\n", state);
 
@@ -383,7 +621,7 @@ int z80scc_device::z80daisy_irq_ack()
 			elem = Z80_DAISY_IEO; // Set IUS bit (called IEO in z80 daisy lingo)
 			check_interrupts();
 			LOGINT(" - Found an INT request, ");
-			if (m_wr9 & z80scc_channel::WR9_BIT_VIS)
+			if (m_wr9 & WR9_BIT_VIS)
 			{
 				LOGINT("but WR9 D1 set to use autovector, returning the default vector\n");
 				break;
@@ -429,7 +667,6 @@ void z80scc_device::z80daisy_irq_reti()
 //-------------------------------------------------
 //  check_interrupts -
 //-------------------------------------------------
-
 void z80scc_device::check_interrupts()
 {
 	int state = (z80daisy_irq_state() & Z80_DAISY_INT) ? ASSERT_LINE : CLEAR_LINE;
@@ -441,7 +678,6 @@ void z80scc_device::check_interrupts()
 //-------------------------------------------------
 //  reset_interrupts -
 //-------------------------------------------------
-
 void z80scc_device::reset_interrupts()
 {
 	LOGINT("%s %s \n",tag(), FUNCNAME);
@@ -476,7 +712,7 @@ uint8_t z80scc_device::modify_vector(uint8_t vec, int i, uint8_t src)
 	src |= (i == CHANNEL_A ? 0x04 : 0x00 );
 
 	// Modify vector according to Hi/lo bit of WR9
-	if (m_wr9 & z80scc_channel::WR9_BIT_SHSL) // Affect V4-V6
+	if (m_wr9 & WR9_BIT_SHSL) // Affect V4-V6
 	{
 		vec &= 0x8f;
 		vec |= src << 4;
@@ -518,7 +754,7 @@ void z80scc_device::trigger_interrupt(int index, int type)
 	LOGINT("%s %s:%c %02x \n",FUNCNAME, tag(), 'A' + index, type);
 
 	/* The Master Interrupt Enable (MIE) bit, WR9 D3, must be set to enable the SCC to generate interrupts.*/
-	if (!(m_wr9 & z80scc_channel::WR9_BIT_MIE))
+	if (!(m_wr9 & WR9_BIT_MIE))
 	{
 		LOGINT("Master Interrupt Enable is not set, blocking attempt to interrupt\n");
 		return;
@@ -532,7 +768,7 @@ void z80scc_device::trigger_interrupt(int index, int type)
 		return;
 	}
 	// Vector modification requested?
-	if (m_wr9 & z80scc_channel::WR9_BIT_VIS)
+	if (m_wr9 & WR9_BIT_VIS)
 	{
 		vector = modify_vector(vector, index, source);
 	}
@@ -597,7 +833,6 @@ int z80scc_device::update_extint(int index)
 //-------------------------------------------------
 //  m1_r - interrupt acknowledge
 //-------------------------------------------------
-
 int z80scc_device::m1_r()
 {
 	return z80daisy_irq_ack();
@@ -622,8 +857,8 @@ READ8_MEMBER( z80scc_device::zbus_r )
 
 	switch ((m_chanB->m_wr0) & 7)
 	{
-	case z80scc_channel::WR0_Z_SEL_SHFT_LEFT:  ba = offset & 0x01; reg = (offset >> 1) & 0x0f; break; /* Shift Left mode */
-	case z80scc_channel::WR0_Z_SEL_SHFT_RIGHT: ba = offset & 0x10; reg = (offset >> 1) & 0x0f; break; /* Shift Right mode */
+	case WR0_Z_SEL_SHFT_LEFT:  ba = offset & 0x01; reg = (offset >> 1) & 0x0f; break; /* Shift Left mode */
+	case WR0_Z_SEL_SHFT_RIGHT: ba = offset & 0x10; reg = (offset >> 1) & 0x0f; break; /* Shift Right mode */
 	default:
 		logerror("Malformed Z-bus SCC read: offset %02x WR0 bits %02x\n", offset, m_chanB->m_wr0);
 		LOG("Malformed Z-bus SCC read: offset %02x WR0 bits %02x\n", offset, m_chanB->m_wr0);
@@ -655,8 +890,8 @@ WRITE8_MEMBER( z80scc_device::zbus_w )
 
 	switch ((m_chanB->m_wr0) & 7)
 	{
-	case z80scc_channel::WR0_Z_SEL_SHFT_LEFT:  ba = offset & 0x01; reg = (offset >> 1) & 0x0f; break; /* Shift Left mode */
-	case z80scc_channel::WR0_Z_SEL_SHFT_RIGHT: ba = offset & 0x10; reg = (offset >> 1) & 0x0f; break; /* Shift Right mode */
+	case WR0_Z_SEL_SHFT_LEFT:  ba = offset & 0x01; reg = (offset >> 1) & 0x0f; break; /* Shift Left mode */
+	case WR0_Z_SEL_SHFT_RIGHT: ba = offset & 0x10; reg = (offset >> 1) & 0x0f; break; /* Shift Right mode */
 	default:
 		logerror("Malformed Z-bus SCC write: offset %02x WR0 bits %02x\n", offset, m_chanB->m_wr0);
 		LOG("Malformed Z-bus SCC write: offset %02x WR0 bits %02x\n", offset, m_chanB->m_wr0);
@@ -760,7 +995,6 @@ WRITE8_MEMBER( z80scc_device::cd_ba_w )
 //-------------------------------------------------
 //  ba_cd_r - Universal Bus read
 //-------------------------------------------------
-
 READ8_MEMBER( z80scc_device::ba_cd_r )
 {
 	int ba = BIT(offset, 1);
@@ -782,7 +1016,6 @@ READ8_MEMBER( z80scc_device::ba_cd_r )
 //-------------------------------------------------
 //  ba_cd_w - Universal Bus write
 //-------------------------------------------------
-
 WRITE8_MEMBER( z80scc_device::ba_cd_w )
 {
 	int ba = BIT(offset, 1);
@@ -807,7 +1040,6 @@ WRITE8_MEMBER( z80scc_device::ba_cd_w )
 //-------------------------------------------------
 //  ba_cd_inv_r - Universal Bus read
 //-------------------------------------------------
-
 READ8_MEMBER( z80scc_device::ba_cd_inv_r )
 {
 	int ba = BIT(offset, 1);
@@ -829,7 +1061,6 @@ READ8_MEMBER( z80scc_device::ba_cd_inv_r )
 //-------------------------------------------------
 //  ba_cd_inv_w - Universal Bus read
 //-------------------------------------------------
-
 WRITE8_MEMBER( z80scc_device::ba_cd_inv_w )
 {
 	int ba = BIT(offset, 1);
@@ -858,7 +1089,6 @@ WRITE8_MEMBER( z80scc_device::ba_cd_inv_w )
 //-------------------------------------------------
 //  SCC_channel - constructor
 //-------------------------------------------------
-
 z80scc_channel::z80scc_channel(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, Z80SCC_CHANNEL, tag, owner, clock),
 		device_serial_interface(mconfig, *this),
@@ -906,7 +1136,6 @@ z80scc_channel::z80scc_channel(const machine_config &mconfig, const char *tag, d
 //-------------------------------------------------
 //  start - channel startup
 //-------------------------------------------------
-
 void z80scc_channel::device_start()
 {
 	LOGSETUP("%s\n", FUNCNAME);
@@ -987,7 +1216,6 @@ void z80scc_channel::device_start()
 //-------------------------------------------------
 //  reset - reset channel status
 //-------------------------------------------------
-
 void z80scc_channel::device_reset()
 {
 	LOGSETUP("%s\n", FUNCNAME);
@@ -1003,7 +1231,7 @@ void z80scc_channel::device_reset()
 	m_wr4   = 0x04;
 	m_wr5   = 0x00;
 	if (m_uart->m_variant & (z80scc_device::TYPE_SCC85C30 | z80scc_device::SET_ESCC))
-		m_wr7 = 0x20;
+	m_wr7 = 0x20;
 	//  WR9,WR10,WR11 and WR14 has a different hard reset (see z80scc_device::device_reset()) values
 	m_uart->m_wr9 &= 0xdf;
 	m_wr10 &= 0x60;
@@ -1020,9 +1248,8 @@ void z80scc_channel::device_reset()
 	m_rr10 &= 0x40;
 
 	// reset external lines
-	set_rts(m_wr5 & WR5_RTS ? 0 : 1);
-	set_dtr(m_wr14 & WR14_DTR_REQ_FUNC ? 0 : (m_wr5 & WR5_DTR ? 0 : 1));
-
+	out_rts_cb(m_rts = m_wr5 & WR5_RTS ? 0 : 1);
+	out_dtr_cb(m_dtr = m_wr14 & WR14_DTR_REQ_FUNC ? 0 : (m_wr5 & WR5_DTR ? 0 : 1));
 	// reset interrupts
 	if (m_index == z80scc_device::CHANNEL_A)
 	{
@@ -1067,50 +1294,38 @@ void z80scc_channel::device_timer(emu_timer &timer, device_timer_id id, int para
 //-------------------------------------------------
 //  tra_callback -
 //-------------------------------------------------
-
 void z80scc_channel::tra_callback()
 {
 	if (!(m_wr5 & WR5_TX_ENABLE))
 	{
-		LOG(LLFORMAT " %s() \"%s \"Channel %c transmit mark 1 m_wr5:%02x\n", machine().firstcpu->total_cycles(), FUNCNAME, owner()->tag(), 'A' + m_index, m_wr5);
+		LOGTX("%s \"%s \"Channel %c transmit mark 1 m_wr5:%02x\n", FUNCNAME, owner()->tag(), 'A' + m_index, m_wr5);
 		// transmit mark
-		if (m_index == z80scc_device::CHANNEL_A)
-			m_uart->m_out_txda_cb(1);
-		else
-			m_uart->m_out_txdb_cb(1);
+		out_txd_cb(1);
 	}
 	else if (m_wr5 & WR5_SEND_BREAK)
 	{
-		LOG(LLFORMAT " %s() \"%s \"Channel %c send break 1 m_wr5:%02x\n", machine().firstcpu->total_cycles(), FUNCNAME, owner()->tag(), 'A' + m_index, m_wr5);
+		LOGTX("%s \"%s \"Channel %c send break 1 m_wr5:%02x\n", FUNCNAME, owner()->tag(), 'A' + m_index, m_wr5);
 		// transmit break
-		if (m_index == z80scc_device::CHANNEL_A)
-			m_uart->m_out_txda_cb(0);
-		else
-			m_uart->m_out_txdb_cb(0);
+		out_txd_cb(0);
 	}
 	else if (!is_transmit_register_empty())
 	{
 		int db = transmit_register_get_data_bit();
 
-		LOG(LLFORMAT " %s() \"%s \"Channel %c transmit data bit %d m_wr5:%02x\n", machine().firstcpu->total_cycles(), FUNCNAME, owner()->tag(), 'A' + m_index, db, m_wr5);
+		LOGTX("%s \"%s \"Channel %c transmit data bit %d m_wr5:%02x\n", FUNCNAME, owner()->tag(), 'A' + m_index, db, m_wr5);
 		// transmit data
-		if (m_index == z80scc_device::CHANNEL_A)
-			m_uart->m_out_txda_cb(db);
-		else
-			m_uart->m_out_txdb_cb(db);
+		out_txd_cb(db);
 	}
 	else
 	{
-		LOG(LLFORMAT " %s() \"%s \"Channel %c Failed to transmit m_wr5:%02x\n", machine().firstcpu->total_cycles(), FUNCNAME, owner()->tag(), 'A' + m_index, m_wr5);
+		LOGTX("%s \"%s \"Channel %c Failed to transmit m_wr5:%02x\n", FUNCNAME, owner()->tag(), 'A' + m_index, m_wr5);
 		logerror("%s \"%s \"Channel %c Failed to transmit\n", FUNCNAME, owner()->tag(), 'A' + m_index);
 	}
 }
 
-
 //-------------------------------------------------
 //  tra_complete -
 //-------------------------------------------------
-
 void z80scc_channel::tra_complete()
 {
 	// Delayed baudrate change according to SCC specs
@@ -1118,7 +1333,7 @@ void z80scc_channel::tra_complete()
 	{
 		m_delayed_tx_brg_change = 0;
 		set_tra_rate(m_brg_rate);
-		LOG("Delayed Init - Baud Rate Generator: %d mode: %dx\n", m_brg_rate, get_clock_mode() );
+		LOGTX("Delayed Init - Baud Rate Generator: %d mode: %dx\n", m_brg_rate, get_clock_mode() );
 	}
 
 	if ((m_wr5 & WR5_TX_ENABLE) && !(m_wr5 & WR5_SEND_BREAK))
@@ -1126,7 +1341,7 @@ void z80scc_channel::tra_complete()
 		if ( (m_rr0 & RR0_TX_BUFFER_EMPTY) == 0 || // Takes care of the NMOS/CMOS 1 slot TX FIFO
 			 m_tx_fifo_rp != m_tx_fifo_wp) // or there are more characters to send in a longer FIFO.
 		{
-			LOGTX(" %s() %s %c done sending, loading data from fifo:%02x '%c'\n", FUNCNAME, owner()->tag(), 'A' + m_index,
+			LOGTX("%s %s %c done sending, loading data from fifo:%02x '%c'\n", FUNCNAME, owner()->tag(), 'A' + m_index,
 				   m_tx_data_fifo[m_tx_fifo_rp], isascii(m_tx_data_fifo[m_tx_fifo_rp]) ? m_tx_data_fifo[m_tx_fifo_rp] : ' ');
 			transmit_register_setup(m_tx_data_fifo[m_tx_fifo_rp]); // Reload the shift register
 			m_tx_fifo_rp_step();
@@ -1134,7 +1349,7 @@ void z80scc_channel::tra_complete()
 		}
 		else
 		{
-			LOGTX(" %s() %s %c done sending, setting all sent bit\n", FUNCNAME, owner()->tag(), 'A' + m_index);
+			LOGTX("%s %s %c done sending, setting all sent bit\n", FUNCNAME, owner()->tag(), 'A' + m_index);
 			m_rr1 |= RR1_ALL_SENT;
 
 			// when the RTS bit is reset, the _RTS output goes high after the transmitter empties
@@ -1163,21 +1378,15 @@ void z80scc_channel::tra_complete()
 	}
 	else if (m_wr5 & WR5_SEND_BREAK)
 	{
-		LOG(LLFORMAT " %s() \"%s \"Channel %c Transmit Break 0 m_wr5:%02x\n", machine().firstcpu->total_cycles(), FUNCNAME, owner()->tag(), 'A' + m_index, m_wr5);
+		LOG("%s \"%s \"Channel %c Transmit Break 0 m_wr5:%02x\n", FUNCNAME, owner()->tag(), 'A' + m_index, m_wr5);
 		// transmit break
-		if (m_index == z80scc_device::CHANNEL_A)
-			m_uart->m_out_txda_cb(0);
-		else
-			m_uart->m_out_txdb_cb(0);
+		out_txd_cb(0);
 	}
 	else
 	{
-		LOG(LLFORMAT " %s() \"%s \"Channel %c Transmit Mark 1 m_wr5:%02x\n", machine().firstcpu->total_cycles(), FUNCNAME, owner()->tag(), 'A' + m_index, m_wr5);
+		LOG("%s \"%s \"Channel %c Transmit Mark 1 m_wr5:%02x\n", FUNCNAME, owner()->tag(), 'A' + m_index, m_wr5);
 		// transmit mark
-		if (m_index == z80scc_device::CHANNEL_A)
-			m_uart->m_out_txda_cb(1);
-		else
-			m_uart->m_out_txdb_cb(1);
+		out_txd_cb(1);
 	}
 }
 
@@ -1185,18 +1394,17 @@ void z80scc_channel::tra_complete()
 //-------------------------------------------------
 //  rcv_callback -
 //-------------------------------------------------
-
 void z80scc_channel::rcv_callback()
 {
 	if (m_wr3 & WR3_RX_ENABLE)
 	{
-		LOG(LLFORMAT " %s() \"%s \"Channel %c receive data bit %d m_wr3:%02x\n", machine().firstcpu->total_cycles(), FUNCNAME, owner()->tag(), 'A' + m_index, m_rxd, m_wr3);
+		LOG("%s \"%s \"Channel %c receive data bit %d m_wr3:%02x\n", FUNCNAME, owner()->tag(), 'A' + m_index, m_rxd, m_wr3);
 		receive_register_update_bit(m_rxd);
 	}
 #if 1
 	else
 	{
-		LOG(LLFORMAT " %s() \"%s \"Channel %c Received Data Bit but receiver is disabled\n", machine().firstcpu->total_cycles(), FUNCNAME, owner()->tag(), 'A' + m_index);
+		LOG("%s \"%s \"Channel %c Received Data Bit but receiver is disabled\n", FUNCNAME, owner()->tag(), 'A' + m_index);
 		logerror("%s \"%s \"Channel %c Received data dit but receiver is disabled\n", FUNCNAME, owner()->tag(), 'A' + m_index);
 	}
 #endif
@@ -1206,14 +1414,13 @@ void z80scc_channel::rcv_callback()
 //-------------------------------------------------
 //  rcv_complete -
 //-------------------------------------------------
-
 void z80scc_channel::rcv_complete()
 {
 	uint8_t data;
 
 	receive_register_extract();
 	data = get_received_char();
-	LOG(LLFORMAT " %s() \"%s \"Channel %c Received Data %c\n", machine().firstcpu->total_cycles(), FUNCNAME, owner()->tag(), 'A' + m_index, data);
+	LOG("%s \"%s \"Channel %c Received Data %c\n", FUNCNAME, owner()->tag(), 'A' + m_index, data);
 	receive_data(data);
 #if START_BIT_HUNT
 	m_rcv_mode = RCV_SEEKING;
@@ -1224,7 +1431,6 @@ void z80scc_channel::rcv_complete()
 //-------------------------------------------------
 //  get_clock_mode - get clock divisor
 //-------------------------------------------------
-
 int z80scc_channel::get_clock_mode()
 {
 	int clocks = 1;
@@ -1254,10 +1460,7 @@ TODO:
 void z80scc_channel::set_rts(int state)
 {
 	LOG("%s(%d) \"%s\": %c \n", FUNCNAME, state, owner()->tag(), 'A' + m_index);
-	if (m_index == z80scc_device::CHANNEL_A)
-		m_uart->m_out_rtsa_cb(state);
-	else
-		m_uart->m_out_rtsb_cb(state);
+	out_rts_cb(state);
 }
 
 void z80scc_channel::update_rts()
@@ -1282,7 +1485,6 @@ void z80scc_channel::update_rts()
 //-------------------------------------------------
 //  get_stop_bits - get number of stop bits
 //-------------------------------------------------
-
 device_serial_interface::stop_bits_t z80scc_channel::get_stop_bits()
 {
 	switch (m_wr4 & WR4_STOP_BITS_MASK)
@@ -1299,7 +1501,6 @@ device_serial_interface::stop_bits_t z80scc_channel::get_stop_bits()
 //-------------------------------------------------
 //  get_rx_word_length - get receive word length
 //-------------------------------------------------
-
 int z80scc_channel::get_rx_word_length()
 {
 	int bits = 5;
@@ -1319,7 +1520,6 @@ int z80scc_channel::get_rx_word_length()
 //-------------------------------------------------
 //  get_tx_word_length - get transmit word length
 //-------------------------------------------------
-
 int z80scc_channel::get_tx_word_length()
 {
 	int bits = 5;
@@ -1482,7 +1682,7 @@ uint8_t z80scc_channel::do_sccreg_rr7()
 	LOGR("%s\n", FUNCNAME);
 	if (!(m_uart->m_variant & (z80scc_device::SET_NMOS)))
 	{
-		logerror(" %s() not implemented feature\n", FUNCNAME);
+		logerror("%s not implemented feature\n", FUNCNAME);
 		return 0;
 	}
 	return m_rr3;
@@ -1513,7 +1713,7 @@ uint8_t z80scc_channel::do_sccreg_rr9()
 uint8_t z80scc_channel::do_sccreg_rr10()
 {
 	LOGR("%s\n", FUNCNAME);
-	logerror("%s() not implemented feature\n", FUNCNAME);
+	logerror("%s not implemented feature\n", FUNCNAME);
 	return m_rr10;
 }
 
@@ -1606,7 +1806,7 @@ uint8_t z80scc_channel::scc_register_read( uint8_t reg)
 	{
 	case REG_RR0_STATUS:         data = do_sccreg_rr0(); break; // TODO: verify handling of SCC specific bits: D6 and D1
 	case REG_RR1_SPEC_RCV_COND:  data = do_sccreg_rr1(); break;
-	case REG_RR2_INTERRUPT_VECT: data = do_sccreg_rr2(); break; // Channel dependent and SCC specific handling compared to SIO
+	case REG_RR2_INTERRUPT_VECT: data = do_sccreg_rr2(); break;
 		/* registers 3-7 are specific to SCC. TODO: Check variant and log/stop misuse */
 	case REG_RR3_INTERUPPT_PEND: data = wreg ? m_wr3 : do_sccreg_rr3(); break;
 	case REG_RR4_WR4_OR_RR0:     data = wreg ? m_wr4 : do_sccreg_rr4(); break;
@@ -1623,7 +1823,7 @@ uint8_t z80scc_channel::scc_register_read( uint8_t reg)
 	case REG_RR14_WR7_OR_R10:    data = do_sccreg_rr14(); break;
 	case REG_RR15_WR15_EXT_STAT: data = do_sccreg_rr15(); break;
 	default:
-		logerror(" \"%s\" %s: %c : Unsupported RRx register:%02x\n", owner()->tag(), FUNCNAME, 'A' + m_index, reg);
+		logerror(" \"%s\"%s: %c : Unsupported RRx register:%02x\n", owner()->tag(), FUNCNAME, 'A' + m_index, reg);
 	}
 	return data;
 }
@@ -1791,7 +1991,7 @@ void z80scc_channel::do_sccreg_wr0(uint8_t data)
 void z80scc_channel::do_sccreg_wr1(uint8_t data)
 {
 	LOG("%s(%02x) \"%s\": %c : %s - %02x\n", FUNCNAME, data, owner()->tag(), 'A' + m_index, FUNCNAME, data);
-	/* TODO: Sort out SCC specific behaviours  from legacy SIO behaviours:
+	/* TODO: Sort out SCC specific behaviours  from legacy SIO behaviours inherited from z80dart.cpp:
 	   - Channel B only bits vs
 	   - Parity Is Special Condition, bit2 */
 	m_wr1 = data;
@@ -1927,7 +2127,7 @@ void z80scc_channel::do_sccreg_wr7(uint8_t data)
 /* WR8 is the transmit buffer register */
 void z80scc_channel::do_sccreg_wr8(uint8_t data)
 {
-	LOG("%s(%02x) \"%s\": %c : Transmit Buffer write %02x\n", FUNCNAME, data, owner()->tag(), 'A' + m_index, data);
+	LOGTX("%s(%02x) \"%s\": %c : Transmit Buffer write %02x\n", FUNCNAME, data, owner()->tag(), 'A' + m_index, data);
 	data_write(data);
 }
 
@@ -2257,7 +2457,6 @@ with 0 before accessing WR0 or RR0.*/
 //-------------------------------------------------
 //  control_write - write control register
 //-------------------------------------------------
-
 void z80scc_channel::control_write(uint8_t data)
 {
 	uint8_t reg = m_uart->m_wr0_ptrbits; //m_wr0;
@@ -2286,7 +2485,6 @@ void z80scc_channel::control_write(uint8_t data)
 //-------------------------------------------------
 //  data_read - read data register from fifo
 //-------------------------------------------------
-
 uint8_t z80scc_channel::data_read()
 {
 	uint8_t data = 0;
@@ -2383,7 +2581,7 @@ WRITE8_MEMBER (z80scc_device::db_w) { m_chanB->data_write(data); }
 void z80scc_channel::data_write(uint8_t data)
 {
 	/* Tx FIFO is full or...? */
-	LOGTX("%s \"%s\": %c : Data Register Write: %02d '%c'\n", FUNCNAME, owner()->tag(), 'A' + m_index, data, isprint(data) ? data : ' ');
+	LOG("%s \"%s\": %c : Data Register Write: %02d '%c'\n", FUNCNAME, owner()->tag(), 'A' + m_index, data, isprint(data) ? data : ' ');
 
 	if ( !(m_rr0 & RR0_TX_BUFFER_EMPTY) && // NMOS/CMOS 1 slot "FIFO" is controlled by the TBE bit instead of fifo logic
 		( (m_tx_fifo_wp + 1 == m_tx_fifo_rp) || ( (m_tx_fifo_wp + 1 == m_tx_fifo_sz) && (m_tx_fifo_rp == 0) )))
@@ -2469,7 +2667,6 @@ void z80scc_channel::data_write(uint8_t data)
 //-------------------------------------------------
 //  receive_data - put received data word into fifo
 //-------------------------------------------------
-
 void z80scc_channel::receive_data(uint8_t data)
 {
 	LOGRCV("\"%s\": %c : Received Data Byte '%c'/%02x put into FIFO\n", owner()->tag(), 'A' + m_index, isprint(data) ? data : ' ', data);
@@ -2522,10 +2719,9 @@ void z80scc_channel::receive_data(uint8_t data)
 //-------------------------------------------------
 //  cts_w - clear to send handler
 //-------------------------------------------------
-
 WRITE_LINE_MEMBER( z80scc_channel::cts_w )
 {
-	LOG("\"%s\" %s: %c : CTS %u\n", owner()->tag(), FUNCNAME, 'A' + m_index, state);
+	LOG("\"%s\"%s: %c : CTS %u\n", owner()->tag(), FUNCNAME, 'A' + m_index, state);
 
 	if ((m_rr0 & RR0_CTS) != (state ? RR0_CTS : 0)) //  SCC change detection logic
 	{
@@ -2603,31 +2799,6 @@ WRITE_LINE_MEMBER( z80scc_channel::dcd_w )
 WRITE_LINE_MEMBER( z80scc_channel::ri_w )
 {
 	LOGINT("\"%s\": %c : RI %u - not implemented\n", owner()->tag(), 'A' + m_index, state);
-
-#if 0 // TODO: This code is inherited from another device driver and not correct for SCC
-	if (m_ri != state)
-	{
-		// set ring indicator state
-		m_ri = state;
-
-		if (!m_rx_rr0_latch)
-		{
-			if (m_ri)
-				m_rr0 |= RR0_RI;
-			else
-				m_rr0 &= ~RR0_RI;
-
-			if (m_wr1 & WR1_EXT_INT_ENABLE)
-			{
-				// trigger interrupt
-				m_uart->trigger_interrupt(m_index, INT_EXTERNAL);
-
-				// latch read register 0
-				m_rx_rr0_latch = 1;
-			}
-		}
-	}
-#endif
 }
 
 //-------------------------------------------------
@@ -2782,7 +2953,7 @@ void z80scc_channel::update_serial()
 		parity = PARITY_NONE;
 	}
 
-	LOG(" %s() \"%s \"Channel %c setting data frame %d+%d%c%d\n", FUNCNAME, owner()->tag(), 'A' + m_index, 1,
+	LOG("%s \"%s \"Channel %c setting data frame %d+%d%c%d\n", FUNCNAME, owner()->tag(), 'A' + m_index, 1,
 		 data_bit_count, parity == PARITY_NONE ? 'N' : parity == PARITY_EVEN ? 'E' : 'O', (stop_bits + 1) / 2);
 
 	set_data_frame(1, data_bit_count, parity, stop_bits);
@@ -2841,10 +3012,7 @@ void z80scc_channel::set_dtr(int state)
 	LOG("%s(%d)\n", FUNCNAME, state);
 	m_dtr = state;
 
-	if (m_index == z80scc_device::CHANNEL_A)
-		m_uart->m_out_dtra_cb(m_dtr);
-	else
-		m_uart->m_out_dtrb_cb(m_dtr);
+	out_dtr_cb(m_dtr);
 }
 
 //-------------------------------------------------
@@ -2893,8 +3061,6 @@ void z80scc_channel::check_waitrequest()
 	if (m_wr1 & WR1_WREQ_FUNCTION)
 	{
 		// assert /W//REQ if transmit buffer is empty, clear if it's not
-		int state = (m_rr0 & RR0_TX_BUFFER_EMPTY) ? ASSERT_LINE : CLEAR_LINE;
-
-		(m_index ? m_uart->m_out_wreqb_cb : m_uart->m_out_wreqa_cb)(state);
+		m_uart->m_out_wreq_cb[m_index]((m_rr0 & RR0_TX_BUFFER_EMPTY) ? ASSERT_LINE : CLEAR_LINE);
 	}
 }

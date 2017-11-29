@@ -85,6 +85,7 @@ Notes:
         Xilinx 1718DPC
         74F244N (2 of these)
         LVT245SS (2 of theses)
+        On Simpsons Bowling, this also has one µPD4701AC and an empty space for a second.
 
       - 000180 is used for driving the RGB output. It's a very thin piece of very brittle ceramic
         containing a circuit, a LM1203 chip, some smt transistors/caps/resistors etc (let's just say
@@ -129,6 +130,7 @@ Notes:
 #include "machine/eepromser.h"
 #include "machine/intelfsh.h"
 #include "machine/mb89371.h"
+#include "machine/upd4701.h"
 #include "machine/ram.h"
 #include "sound/cdda.h"
 #include "sound/spu.h"
@@ -143,15 +145,13 @@ public:
 	konamigv_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_am53cf96(*this, "am53cf96"),
+		m_btc_trackball(*this, "upd%u", 1),
 		m_maincpu(*this, "maincpu")
 	{
 	}
 
 	DECLARE_READ16_MEMBER(flash_r);
 	DECLARE_WRITE16_MEMBER(flash_w);
-	DECLARE_READ16_MEMBER(trackball_r);
-	DECLARE_READ16_MEMBER(unknown_r);
-	DECLARE_READ16_MEMBER(btc_trackball_r);
 	DECLARE_WRITE16_MEMBER(btc_trackball_w);
 	DECLARE_READ16_MEMBER(tokimeki_serial_r);
 	DECLARE_WRITE16_MEMBER(tokimeki_serial_w);
@@ -164,13 +164,9 @@ protected:
 
 private:
 	required_device<am53cf96_device> m_am53cf96;
+	optional_device_array<upd4701_device, 2> m_btc_trackball;
 
 	uint32_t m_flash_address;
-
-	uint16_t m_trackball_prev[ 2 ];
-	uint16_t m_trackball_data[ 2 ];
-	uint16_t m_btc_trackball_prev[ 4 ];
-	uint16_t m_btc_trackball_data[ 4 ];
 
 	fujitsu_29f016a_device *m_flash8[4];
 
@@ -192,16 +188,17 @@ static ADDRESS_MAP_START( simpbowl_map, AS_PROGRAM, 32, konamigv_state )
 	AM_IMPORT_FROM( konamigv_map )
 
 	AM_RANGE(0x1f680080, 0x1f68008f) AM_READWRITE16(flash_r, flash_w, 0xffffffff)
-	AM_RANGE(0x1f6800c0, 0x1f6800c7) AM_READ16(trackball_r, 0xffffffff)
-	AM_RANGE(0x1f6800c8, 0x1f6800cb) AM_READ16(unknown_r, 0x0000ffff) /* ?? */
+	AM_RANGE(0x1f6800c0, 0x1f6800c7) AM_DEVREAD8("upd", upd4701_device, read_xy, 0xff00ff00)
+	AM_RANGE(0x1f6800c8, 0x1f6800cb) AM_DEVREAD8("upd", upd4701_device, reset_xy, 0x0000ff00)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( btchamp_map, AS_PROGRAM, 32, konamigv_state )
 	AM_IMPORT_FROM( konamigv_map )
 
 	AM_RANGE(0x1f380000, 0x1f3fffff) AM_DEVREADWRITE16("flash", intelfsh16_device, read, write, 0xffffffff)
-	AM_RANGE(0x1f680080, 0x1f680087) AM_READ16(btc_trackball_r, 0xffffffff)
-	AM_RANGE(0x1f680088, 0x1f68008b) AM_WRITE16(btc_trackball_w, 0xffffffff)
+	AM_RANGE(0x1f680080, 0x1f680087) AM_DEVREAD8("upd1", upd4701_device, read_xy, 0xff00ff00)
+	AM_RANGE(0x1f680080, 0x1f680087) AM_DEVREAD8("upd2", upd4701_device, read_xy, 0x00ff00ff)
+	AM_RANGE(0x1f680088, 0x1f68008b) AM_WRITE16(btc_trackball_w, 0x0000ffff)
 	AM_RANGE(0x1f6800e0, 0x1f6800e3) AM_WRITENOP
 ADDRESS_MAP_END
 
@@ -308,10 +305,6 @@ void konamigv_state::driver_start()
 {
 	save_item(NAME(m_sector_buffer));
 	save_item(NAME(m_flash_address));
-	save_item(NAME(m_trackball_prev));
-	save_item(NAME(m_trackball_data));
-	save_item(NAME(m_btc_trackball_prev));
-	save_item(NAME(m_btc_trackball_data));
 }
 
 static MACHINE_CONFIG_START( cdrom_config )
@@ -471,33 +464,6 @@ WRITE16_MEMBER(konamigv_state::flash_w)
 	}
 }
 
-READ16_MEMBER(konamigv_state::trackball_r)
-{
-	if( offset == 0 )
-	{
-		static const char *const axisnames[] = { "TRACK0_X", "TRACK0_Y" };
-
-		for( int axis = 0; axis < 2; axis++ )
-		{
-			uint16_t value = ioport(axisnames[axis])->read();
-			m_trackball_data[ axis ] = value - m_trackball_prev[ axis ];
-			m_trackball_prev[ axis ] = value;
-		}
-	}
-
-	if( ( offset & 1 ) == 0 )
-	{
-		return m_trackball_data[ offset >> 1 ] << 8;
-	}
-
-	return m_trackball_data[ offset >> 1 ] & 0xf00;
-}
-
-READ16_MEMBER(konamigv_state::unknown_r)
-{
-	return 0xffff;
-}
-
 DRIVER_INIT_MEMBER(konamigv_state,simpbowl)
 {
 	m_flash8[0] = machine().device<fujitsu_29f016a_device>("flash0");
@@ -514,48 +480,35 @@ static MACHINE_CONFIG_DERIVED( simpbowl, konamigv )
 	MCFG_FUJITSU_29F016A_ADD("flash1")
 	MCFG_FUJITSU_29F016A_ADD("flash2")
 	MCFG_FUJITSU_29F016A_ADD("flash3")
+
+	MCFG_DEVICE_ADD("upd", UPD4701A, 0)
+	MCFG_UPD4701_PORTX("TRACK0_X")
+	MCFG_UPD4701_PORTY("TRACK0_Y")
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( simpbowl )
 	PORT_INCLUDE( konamigv )
 
 	PORT_START("TRACK0_X")
-	PORT_BIT( 0xfff, 0x0000, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(63) PORT_REVERSE PORT_PLAYER(1)
+	PORT_BIT( 0xfff, 0x000, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(63) PORT_REVERSE PORT_RESET PORT_PLAYER(1)
 
 	PORT_START("TRACK0_Y")
-	PORT_BIT( 0xfff, 0x0000, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(63) PORT_PLAYER(1)
+	PORT_BIT( 0xfff, 0x000, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(63) PORT_RESET PORT_PLAYER(1)
 
 INPUT_PORTS_END
 
 /* Beat the Champ */
 
-READ16_MEMBER(konamigv_state::btc_trackball_r)
-{
-//  osd_printf_debug( "r %08x %08x %08x\n", space.device().safe_pc(), offset, mem_mask );
-
-	if( offset == 3 )
-	{
-		static const char *const axisnames[] = { "TRACK0_X", "TRACK0_Y", "TRACK1_X", "TRACK1_Y" };
-
-		for( int axis = 0; axis < 4; axis++ )
-		{
-			uint16_t value = ioport(axisnames[axis])->read();
-			m_btc_trackball_data[ axis ] = value - m_btc_trackball_prev[ axis ];
-			m_btc_trackball_prev[ axis ] = value;
-		}
-	}
-
-	if( ( offset & 1 ) == 0 )
-	{
-		return ( m_btc_trackball_data[ offset >> 1 ] << 8 ) | ( m_btc_trackball_data[ ( offset >> 1 ) + 2 ] & 0xff );
-	}
-
-	return ( m_btc_trackball_data[ offset >> 1 ] & 0xf00 ) | ( m_btc_trackball_data[ ( offset >> 1 ) + 2 ] >> 8 );
-}
-
 WRITE16_MEMBER(konamigv_state::btc_trackball_w)
 {
 //  osd_printf_debug( "w %08x %08x %08x %08x\n", space.device().safe_pc(), offset, data, mem_mask );
+
+	for (int i = 0; i < 2; i++)
+	{
+		m_btc_trackball[i]->cs_w(BIT(data, 1));
+		m_btc_trackball[i]->resetx_w(!BIT(data, 0));
+		m_btc_trackball[i]->resety_w(!BIT(data, 0));
+	}
 }
 
 static MACHINE_CONFIG_DERIVED( btchamp, konamigv )
@@ -563,22 +516,30 @@ static MACHINE_CONFIG_DERIVED( btchamp, konamigv )
 	MCFG_CPU_PROGRAM_MAP( btchamp_map )
 
 	MCFG_SHARP_LH28F400_ADD("flash")
+
+	MCFG_DEVICE_ADD("upd1", UPD4701A, 0)
+	MCFG_UPD4701_PORTX("TRACK0_X")
+	MCFG_UPD4701_PORTY("TRACK0_Y")
+
+	MCFG_DEVICE_ADD("upd2", UPD4701A, 0)
+	MCFG_UPD4701_PORTX("TRACK1_X")
+	MCFG_UPD4701_PORTY("TRACK1_Y")
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( btchamp )
 	PORT_INCLUDE( konamigv )
 
 	PORT_START("TRACK0_X")
-	PORT_BIT( 0x7ff, 0x0000, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(63) PORT_REVERSE PORT_PLAYER(1)
+	PORT_BIT( 0xfff, 0x000, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(63) PORT_RESET PORT_PLAYER(1)
 
 	PORT_START("TRACK0_Y")
-	PORT_BIT( 0x7ff, 0x0000, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(63) PORT_PLAYER(1)
+	PORT_BIT( 0xfff, 0x000, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(63) PORT_RESET PORT_PLAYER(1)
 
 	PORT_START("TRACK1_X")
-	PORT_BIT( 0x7ff, 0x0000, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(63) PORT_REVERSE PORT_PLAYER(2)
+	PORT_BIT( 0xfff, 0x000, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(63) PORT_RESET PORT_PLAYER(2)
 
 	PORT_START("TRACK1_Y")
-	PORT_BIT( 0x7ff, 0x0000, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(63) PORT_PLAYER(2)
+	PORT_BIT( 0xfff, 0x000, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(63) PORT_RESET PORT_PLAYER(2)
 INPUT_PORTS_END
 
 /* Tokimeki Memorial games - have a mouse and printer and who knows what else */

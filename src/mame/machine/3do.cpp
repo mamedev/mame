@@ -121,7 +121,7 @@ void _3do_state::m_3do_request_fiq(uint32_t irq_req, uint8_t type)
 	if((m_clio.irq0 & m_clio.irq0_enable) || (m_clio.irq1 & m_clio.irq1_enable))
 	{
 		//printf("Go irq %08x & %08x %08x & %08x\n",m_clio.irq0, m_clio.irq0_enable, m_clio.irq1, m_clio.irq1_enable);
-		generic_pulse_irq_line(*m_maincpu, ARM7_FIRQ_LINE, 1);
+		m_maincpu->pulse_input_line(ARM7_FIRQ_LINE, m_maincpu->minimum_quantum_time());
 	}
 }
 

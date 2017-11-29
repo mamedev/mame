@@ -26,6 +26,7 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "coco_orch90.h"
 #include "cococart.h"
 
 #include "sound/dac.h"

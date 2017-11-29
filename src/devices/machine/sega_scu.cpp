@@ -162,14 +162,6 @@ void sega_scu_device::static_set_hostcpu(device_t &device, const char *cputag)
 //  configuration addiitons
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( scudsp_mem, AS_PROGRAM, 32, sega_scu_device )
-	AM_RANGE(0x00, 0xff) AM_RAM
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( scudsp_data, AS_DATA, 32, sega_scu_device )
-	AM_RANGE(0x00, 0xff) AM_RAM
-ADDRESS_MAP_END
-
 READ16_MEMBER(sega_scu_device::scudsp_dma_r)
 {
 	//address_space &program = m_maincpu->space(AS_PROGRAM);
@@ -193,8 +185,6 @@ WRITE16_MEMBER(sega_scu_device::scudsp_dma_w)
 
 MACHINE_CONFIG_MEMBER(sega_scu_device::device_add_mconfig)
 	MCFG_CPU_ADD("scudsp", SCUDSP, XTAL_57_2727MHz/4) // 14 MHz
-	MCFG_CPU_PROGRAM_MAP(scudsp_mem)
-	MCFG_CPU_DATA_MAP(scudsp_data)
 	MCFG_SCUDSP_OUT_IRQ_CB(DEVWRITELINE(DEVICE_SELF, sega_scu_device, scudsp_end_w))
 	MCFG_SCUDSP_IN_DMA_CB(READ16(sega_scu_device, scudsp_dma_r))
 	MCFG_SCUDSP_OUT_DMA_CB(WRITE16(sega_scu_device, scudsp_dma_w))

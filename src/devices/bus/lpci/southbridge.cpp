@@ -17,12 +17,9 @@
 #include "speaker.h"
 
 
-static SLOT_INTERFACE_START(pc_isa_onboard)
-	SLOT_INTERFACE("comat", ISA8_COM_AT)
-	SLOT_INTERFACE("lpt", ISA8_LPT)
-	SLOT_INTERFACE("fdcsmc", ISA8_FDC_SMC)
-SLOT_INTERFACE_END
-
+/***************************************************************************
+  Southbridge Device
+***************************************************************************/
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
@@ -30,11 +27,11 @@ SLOT_INTERFACE_END
 
 MACHINE_CONFIG_MEMBER( southbridge_device::device_add_mconfig )
 	MCFG_DEVICE_ADD("pit8254", PIT8254, 0)
-	MCFG_PIT8253_CLK0(4772720/4) /* heartbeat IRQ */
+	MCFG_PIT8253_CLK0(4772720/4) // heartbeat IRQ
 	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(southbridge_device, at_pit8254_out0_changed))
-	MCFG_PIT8253_CLK1(4772720/4) /* dram refresh */
+	MCFG_PIT8253_CLK1(4772720/4) // dram refresh
 	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(southbridge_device, at_pit8254_out1_changed))
-	MCFG_PIT8253_CLK2(4772720/4) /* pio port c pin 4, and speaker polling enough */
+	MCFG_PIT8253_CLK2(4772720/4) // pio port c pin 4, and speaker polling enough
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(southbridge_device, at_pit8254_out2_changed))
 
 	MCFG_DEVICE_ADD( "dma8237_1", AM9517A, XTAL_14_31818MHz/3 )
@@ -79,21 +76,6 @@ MACHINE_CONFIG_MEMBER( southbridge_device::device_add_mconfig )
 	MCFG_PIC8259_OUT_INT_CB(DEVWRITELINE("pic8259_master", pic8259_device, ir2_w))
 	MCFG_PIC8259_IN_SP_CB(GND)
 
-	MCFG_DEVICE_ADD("keybc", AT_KEYBOARD_CONTROLLER, XTAL_12MHz)
-	MCFG_AT_KEYBOARD_CONTROLLER_SYSTEM_RESET_CB(INPUTLINE(":maincpu", INPUT_LINE_RESET))
-	MCFG_AT_KEYBOARD_CONTROLLER_GATE_A20_CB(INPUTLINE(":maincpu", INPUT_LINE_A20))
-	MCFG_AT_KEYBOARD_CONTROLLER_INPUT_BUFFER_FULL_CB(DEVWRITELINE("pic8259_master", pic8259_device, ir1_w))
-	MCFG_AT_KEYBOARD_CONTROLLER_KEYBOARD_CLOCK_CB(DEVWRITELINE("pc_kbdc", pc_kbdc_device, clock_write_from_mb))
-	MCFG_AT_KEYBOARD_CONTROLLER_KEYBOARD_DATA_CB(DEVWRITELINE("pc_kbdc", pc_kbdc_device, data_write_from_mb))
-	MCFG_DEVICE_ADD("pc_kbdc", PC_KBDC, 0)
-	MCFG_PC_KBDC_OUT_CLOCK_CB(DEVWRITELINE("keybc", at_keyboard_controller_device, keyboard_clock_w))
-	MCFG_PC_KBDC_OUT_DATA_CB(DEVWRITELINE("keybc", at_keyboard_controller_device, keyboard_data_w))
-	MCFG_PC_KBDC_SLOT_ADD("pc_kbdc", "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL)
-
-	MCFG_DS12885_ADD("rtc")
-	MCFG_MC146818_IRQ_HANDLER(DEVWRITELINE("pic8259_slave", pic8259_device, ir0_w))
-	MCFG_MC146818_CENTURY_INDEX(0x32)
-
 	MCFG_BUS_MASTER_IDE_CONTROLLER_ADD("ide", ata_devices, "hdd", nullptr, false)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("pic8259_slave", pic8259_device, ir6_w))
 	MCFG_BUS_MASTER_IDE_CONTROLLER_SPACE(":maincpu", AS_PROGRAM)
@@ -102,7 +84,7 @@ MACHINE_CONFIG_MEMBER( southbridge_device::device_add_mconfig )
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("pic8259_slave", pic8259_device, ir7_w))
 	MCFG_BUS_MASTER_IDE_CONTROLLER_SPACE(":maincpu", AS_PROGRAM)
 
-	/* sound hardware */
+	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -127,10 +109,6 @@ MACHINE_CONFIG_MEMBER( southbridge_device::device_add_mconfig )
 	MCFG_ISA_OUT_DRQ5_CB(DEVWRITELINE("dma8237_2", am9517a_device, dreq1_w))
 	MCFG_ISA_OUT_DRQ6_CB(DEVWRITELINE("dma8237_2", am9517a_device, dreq2_w))
 	MCFG_ISA_OUT_DRQ7_CB(DEVWRITELINE("dma8237_2", am9517a_device, dreq3_w))
-	// on board devices
-	MCFG_ISA16_SLOT_ADD("isabus","board1", pc_isa_onboard, "fdcsmc", true)
-	MCFG_ISA16_SLOT_ADD("isabus","board2", pc_isa_onboard, "comat", true)
-	MCFG_ISA16_SLOT_ADD("isabus","board3", pc_isa_onboard, "lpt", true)
 MACHINE_CONFIG_END
 
 southbridge_device::southbridge_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
@@ -141,15 +119,14 @@ southbridge_device::southbridge_device(const machine_config &mconfig, device_typ
 	m_dma8237_1(*this, "dma8237_1"),
 	m_dma8237_2(*this, "dma8237_2"),
 	m_pit8254(*this, "pit8254"),
-	m_keybc(*this, "keybc"),
 	m_isabus(*this, "isabus"),
 	m_speaker(*this, "speaker"),
-	m_ds12885(*this, "rtc"),
-	m_pc_kbdc(*this, "pc_kbdc"),
 	m_ide(*this, "ide"),
-	m_ide2(*this, "ide2"), m_at_spkrdata(0), m_pit_out2(0), m_dma_channel(0), m_cur_eop(false), m_dma_high_byte(0), m_at_speaker(0), m_refresh(false), m_channel_check(0), m_nmi_enabled(0)
+	m_ide2(*this, "ide2"),
+	m_at_spkrdata(0), m_pit_out2(0), m_dma_channel(0), m_cur_eop(false), m_dma_high_byte(0), m_at_speaker(0), m_refresh(false), m_channel_check(0), m_nmi_enabled(0)
 {
 }
+
 /**********************************************************
  *
  * Init functions
@@ -188,10 +165,7 @@ void southbridge_device::device_start()
 	spaceio.install_readwrite_handler(0x0000, 0x001f, read8_delegate(FUNC(am9517a_device::read),&(*m_dma8237_1)), write8_delegate(FUNC(am9517a_device::write),&(*m_dma8237_1)), 0xffffffff);
 	spaceio.install_readwrite_handler(0x0020, 0x003f, read8_delegate(FUNC(pic8259_device::read),&(*m_pic8259_master)), write8_delegate(FUNC(pic8259_device::write),&(*m_pic8259_master)), 0xffffffff);
 	spaceio.install_readwrite_handler(0x0040, 0x005f, read8_delegate(FUNC(pit8254_device::read),&(*m_pit8254)), write8_delegate(FUNC(pit8254_device::write),&(*m_pit8254)), 0xffffffff);
-	spaceio.install_readwrite_handler(0x0060, 0x0063, read8_delegate(FUNC(at_keyboard_controller_device::data_r), &(*m_keybc)), write8_delegate(FUNC(at_keyboard_controller_device::data_w), &(*m_keybc)), 0x000000ff);
 	spaceio.install_readwrite_handler(0x0060, 0x0063, read8_delegate(FUNC(southbridge_device::at_portb_r), this), write8_delegate(FUNC(southbridge_device::at_portb_w), this), 0x0000ff00);
-	spaceio.install_readwrite_handler(0x0064, 0x0067, read8_delegate(FUNC(at_keyboard_controller_device::status_r),&(*m_keybc)), write8_delegate(FUNC(at_keyboard_controller_device::command_w),&(*m_keybc)), 0xffffffff);
-	spaceio.install_readwrite_handler(0x0070, 0x007f, read8_delegate(FUNC(ds12885_device::read),&(*m_ds12885)), write8_delegate(FUNC(ds12885_device::write),&(*m_ds12885)), 0xffffffff);
 	spaceio.install_readwrite_handler(0x0080, 0x009f, read8_delegate(FUNC(southbridge_device::at_page8_r),this), write8_delegate(FUNC(southbridge_device::at_page8_w),this), 0xffffffff);
 	spaceio.install_readwrite_handler(0x00a0, 0x00bf, read8_delegate(FUNC(pic8259_device::read),&(*m_pic8259_slave)), write8_delegate(FUNC(pic8259_device::write),&(*m_pic8259_slave)), 0xffffffff);
 	spaceio.install_readwrite_handler(0x00c0, 0x00df, read8_delegate(FUNC(southbridge_device::at_dma8237_2_r),this), write8_delegate(FUNC(southbridge_device::at_dma8237_2_w),this), 0xffffffff);
@@ -328,7 +302,7 @@ WRITE_LINE_MEMBER( southbridge_device::pc_dma_hrq_changed )
 {
 	m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
-	/* Assert HLDA */
+	// Assert HLDA
 	m_dma8237_2->hack_w( state );
 }
 
@@ -433,15 +407,15 @@ WRITE_LINE_MEMBER( southbridge_device::pc_dack7_w ) { pc_select_dma_channel(7, s
 READ8_MEMBER( southbridge_device::at_portb_r )
 {
 	uint8_t data = m_at_speaker;
-	data &= ~0xd0; /* AT BIOS don't likes this being set */
+	data &= ~0xd0; // AT BIOS don't likes this being set
 
-	/* 0x10 is the dram refresh line bit on the 5170, just a timer here, 15.085us. */
+	// 0x10 is the dram refresh line bit on the 5170, just a timer here, 15.085us.
 	data |= m_refresh ? 0x10 : 0;
 
 	if (m_pit_out2)
 		data |= 0x20;
 	else
-		data &= ~0x20; /* ps2m30 wants this */
+		data &= ~0x20; // ps2m30 wants this
 
 	return data;
 }
@@ -465,7 +439,77 @@ WRITE8_MEMBER( southbridge_device::at_dma8237_2_w )
 	m_dma8237_2->write( space, offset / 2, data);
 }
 
-WRITE8_MEMBER( southbridge_device::write_rtc )
+/***************************************************************************
+  Extended Southbridge Device
+***************************************************************************/
+
+static SLOT_INTERFACE_START(pc_isa_onboard)
+	SLOT_INTERFACE("comat", ISA8_COM_AT)
+	SLOT_INTERFACE("lpt", ISA8_LPT)
+	SLOT_INTERFACE("fdcsmc", ISA8_FDC_SMC)
+SLOT_INTERFACE_END
+
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+MACHINE_CONFIG_MEMBER(southbridge_extended_device::device_add_mconfig)
+	southbridge_device::device_add_mconfig(config);
+
+	MCFG_DEVICE_ADD("keybc", AT_KEYBOARD_CONTROLLER, XTAL_12MHz)
+	MCFG_AT_KEYBOARD_CONTROLLER_SYSTEM_RESET_CB(INPUTLINE(":maincpu", INPUT_LINE_RESET))
+	MCFG_AT_KEYBOARD_CONTROLLER_GATE_A20_CB(INPUTLINE(":maincpu", INPUT_LINE_A20))
+	MCFG_AT_KEYBOARD_CONTROLLER_INPUT_BUFFER_FULL_CB(DEVWRITELINE("pic8259_master", pic8259_device, ir1_w))
+	MCFG_AT_KEYBOARD_CONTROLLER_KEYBOARD_CLOCK_CB(DEVWRITELINE("pc_kbdc", pc_kbdc_device, clock_write_from_mb))
+	MCFG_AT_KEYBOARD_CONTROLLER_KEYBOARD_DATA_CB(DEVWRITELINE("pc_kbdc", pc_kbdc_device, data_write_from_mb))
+	MCFG_DEVICE_ADD("pc_kbdc", PC_KBDC, 0)
+	MCFG_PC_KBDC_OUT_CLOCK_CB(DEVWRITELINE("keybc", at_keyboard_controller_device, keyboard_clock_w))
+	MCFG_PC_KBDC_OUT_DATA_CB(DEVWRITELINE("keybc", at_keyboard_controller_device, keyboard_data_w))
+	MCFG_PC_KBDC_SLOT_ADD("pc_kbdc", "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL)
+
+	MCFG_DS12885_ADD("rtc")
+	MCFG_MC146818_IRQ_HANDLER(DEVWRITELINE("pic8259_slave", pic8259_device, ir0_w))
+	MCFG_MC146818_CENTURY_INDEX(0x32)
+
+	// on board devices
+	MCFG_ISA16_SLOT_ADD("isabus", "board1", pc_isa_onboard, "fdcsmc", true)
+	MCFG_ISA16_SLOT_ADD("isabus", "board2", pc_isa_onboard, "comat", true)
+	MCFG_ISA16_SLOT_ADD("isabus", "board3", pc_isa_onboard, "lpt", true)
+MACHINE_CONFIG_END
+
+southbridge_extended_device::southbridge_extended_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: southbridge_device(mconfig, type, tag, owner, clock),
+	m_keybc(*this, "keybc"),
+	m_ds12885(*this, "rtc"),
+	m_pc_kbdc(*this, "pc_kbdc")
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void southbridge_extended_device::device_start()
+{
+	address_space& spaceio = machine().device(":maincpu")->memory().space(AS_IO);
+
+	southbridge_device::device_start();
+
+	spaceio.install_readwrite_handler(0x0060, 0x0063, read8_delegate(FUNC(at_keyboard_controller_device::data_r), &(*m_keybc)), write8_delegate(FUNC(at_keyboard_controller_device::data_w), &(*m_keybc)), 0x000000ff);
+	spaceio.install_readwrite_handler(0x0064, 0x0067, read8_delegate(FUNC(at_keyboard_controller_device::status_r), &(*m_keybc)), write8_delegate(FUNC(at_keyboard_controller_device::command_w), &(*m_keybc)), 0xffffffff);
+	spaceio.install_readwrite_handler(0x0070, 0x007f, read8_delegate(FUNC(ds12885_device::read), &(*m_ds12885)), write8_delegate(FUNC(ds12885_device::write), &(*m_ds12885)), 0xffffffff);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void southbridge_extended_device::device_reset()
+{
+	southbridge_device::device_reset();
+}
+
+WRITE8_MEMBER( southbridge_extended_device::write_rtc )
 {
 	if (offset==0) {
 		m_nmi_enabled = BIT(data,7);

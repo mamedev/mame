@@ -8,7 +8,7 @@
 
     Hardware:
         CPU: 68EC020-16 CPU
-        Serial/timers: SCN2681 (MC68681 clone)
+        Serial/timers: SCN2681
         Sound: 2xES5506
         Effects: ES5510
 
@@ -114,7 +114,7 @@ public:
 
 	required_device<m68ec020_device> m_maincpu;
 	required_device<es5510_device> m_esp;
-	required_device<mc68681_device> m_duart;
+	required_device<scn2681_device> m_duart;
 	required_device<esqpanel2x16_sq1_device> m_sq1panel;
 	required_device<midi_port_device> m_mdout;
 
@@ -144,7 +144,7 @@ static ADDRESS_MAP_START( kt_map, AS_PROGRAM, 32, esqkt_state )
 	AM_RANGE(0x200000, 0x20003f) AM_DEVREADWRITE8("ensoniq", es5506_device, read, write, 0xffffffff)
 	AM_RANGE(0x240000, 0x24003f) AM_DEVREADWRITE8("ensoniq2", es5506_device, read, write, 0xffffffff)
 	AM_RANGE(0x280000, 0x2801ff) AM_DEVREADWRITE8("esp", es5510_device, host_r, host_w, 0xffffffff)
-	AM_RANGE(0x300000, 0x30001f) AM_DEVREADWRITE8("duart", mc68681_device, read, write, 0xffffffff)
+	AM_RANGE(0x300000, 0x30001f) AM_DEVREADWRITE8("duart", scn2681_device, read, write, 0xffffffff)
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM AM_SHARE("osram")
 ADDRESS_MAP_END
 
@@ -209,9 +209,9 @@ static MACHINE_CONFIG_START( kt )
 	MCFG_DEVICE_DISABLE()
 
 	MCFG_ESQPANEL2X16_SQ1_ADD("sq1panel")
-	MCFG_ESQPANEL_TX_CALLBACK(DEVWRITELINE("duart", mc68681_device, rx_b_w))
+	MCFG_ESQPANEL_TX_CALLBACK(DEVWRITELINE("duart", scn2681_device, rx_b_w))
 
-	MCFG_MC68681_ADD("duart", 4000000)
+	MCFG_DEVICE_ADD("duart", SCN2681, 4000000)
 	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(esqkt_state, duart_irq_handler))
 	MCFG_MC68681_A_TX_CALLBACK(WRITELINE(esqkt_state, duart_tx_a))
 	MCFG_MC68681_B_TX_CALLBACK(WRITELINE(esqkt_state, duart_tx_b))
@@ -220,7 +220,7 @@ static MACHINE_CONFIG_START( kt )
 	MCFG_MC68681_SET_EXTERNAL_CLOCKS(500000, 500000, 1000000, 1000000)
 
 	MCFG_MIDI_PORT_ADD("mdin", midiin_slot, "midiin")
-	MCFG_MIDI_RX_HANDLER(DEVWRITELINE("duart", mc68681_device, rx_a_w)) // route MIDI Tx send directly to 68681 channel A Rx
+	MCFG_MIDI_RX_HANDLER(DEVWRITELINE("duart", scn2681_device, rx_a_w)) // route MIDI Tx send directly to 68681 channel A Rx
 
 	MCFG_MIDI_PORT_ADD("mdout", midiout_slot, "midiout")
 

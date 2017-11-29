@@ -13,6 +13,9 @@
 #define MCFG_Z80_SET_REFRESH_CALLBACK(_devcb) \
 	devcb = &z80_device::set_refresh_cb(*device, DEVCB_##_devcb);
 
+#define MCFG_Z80_SET_HALT_CALLBACK(_devcb) \
+	devcb = &z80_device::set_halt_cb(*device, DEVCB_##_devcb);
+
 enum
 {
 	NSC800_RSTA = INPUT_LINE_IRQ0 + 1,
@@ -41,6 +44,7 @@ public:
 	void z80_set_cycle_tables(const uint8_t *op, const uint8_t *cb, const uint8_t *ed, const uint8_t *xy, const uint8_t *xycb, const uint8_t *ex);
 	template<class _Object> static devcb_base &set_irqack_cb(device_t &device, _Object object) { return downcast<z80_device &>(device).m_irqack_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_refresh_cb(device_t &device, _Object object) { return downcast<z80_device &>(device).m_refresh_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_halt_cb(device_t &device, _Object object) { return downcast<z80_device &>(device).m_halt_cb.set_callback(object); }
 
 protected:
 	z80_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -246,6 +250,7 @@ protected:
 	direct_read_data *m_decrypted_opcodes_direct;
 	devcb_write_line m_irqack_cb;
 	devcb_write16 m_refresh_cb;
+	devcb_write_line m_halt_cb;
 
 	PAIR            m_prvpc;
 	PAIR            m_pc;

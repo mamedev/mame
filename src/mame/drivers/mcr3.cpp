@@ -233,8 +233,8 @@ READ8_MEMBER(mcr3_state::maxrpm_ip2_r)
 
 WRITE8_MEMBER(mcr3_state::maxrpm_op5_w)
 {
-	/* latch the low 4 bits as input to the ADC0844 */
-	m_maxrpm_adc_control = data & 0x0f;
+	/* latch bits 1-4 as input to the ADC0844 */
+	m_maxrpm_adc_control = (data >> 1) & 0x0f;
 
 	/* remaining bits go to standard connections */
 	mcrmono_control_port_w(space, offset, data);
@@ -243,12 +243,12 @@ WRITE8_MEMBER(mcr3_state::maxrpm_op5_w)
 
 WRITE8_MEMBER(mcr3_state::maxrpm_op6_w)
 {
-	static const char *const inputs[] = { "MONO.IP1", "MONO.IP1.ALT1", "MONO.IP1.ALT2", "MONO.IP1.ALT3" };
 	/*
 	    Reflective Sensor Control:
 	        4 bits of input from OP5 are routed to a transceiver at U2, and
 	        ultimately on to the low 4 I/O pins of the ADC0844. The /EN on
-	        the transceiver is directly connected to J2-2.
+	        the transceiver is directly connected to J2-2. Note that two bits
+	            get swapped in the process: OP53 = MA3 and OP54 = MA2.
 
 	        In order to perform a read or a write to the ADC0844, the /RD and
 	        /WR signals are directly controlled via J2-8 and J2-7 respectively.
@@ -264,13 +264,11 @@ WRITE8_MEMBER(mcr3_state::maxrpm_op6_w)
 
 	/* when the read is toggled is when the ADC value is latched */
 	if (!(data & 0x80))
-		m_latched_input = ioport(inputs[m_maxrpm_adc_select])->read();
+		m_latched_input = m_maxrpm_adc->read(space, 0);
 
 	/* when both the write and the enable are low, it's a write to the ADC0844 */
-	/* unfortunately the behavior below doesn't match up with the inputs on the */
-	/* schematics and wiring diagrams, so they must be wrong */
 	if (!(data & 0x40) && !(data & 0x20))
-		m_maxrpm_adc_select = (m_maxrpm_adc_control >> 1) & 3;
+		m_maxrpm_adc->write(space, 0, BITSWAP8(m_maxrpm_adc_control, 7, 6, 5, 4, 2, 3, 1, 0));
 
 	/* low 5 bits control the turbo CS */
 	m_turbo_cheap_squeak->write(space, offset, data);
@@ -1136,6 +1134,14 @@ static MACHINE_CONFIG_DERIVED( mono_tcs, mcrmono )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( maxrpm, mono_tcs )
+	MCFG_ADC0844_ADD("adc")
+	MCFG_ADC0844_CH1_CB(IOPORT("MONO.IP1"))
+	MCFG_ADC0844_CH2_CB(IOPORT("MONO.IP1.ALT1"))
+	MCFG_ADC0844_CH3_CB(IOPORT("MONO.IP1.ALT2"))
+	MCFG_ADC0844_CH4_CB(IOPORT("MONO.IP1.ALT3"))
+MACHINE_CONFIG_END
+
 
 /* Rampage/Power Drive/Star Guards = MCR monoboard with Sounds Good */
 static MACHINE_CONFIG_DERIVED( mono_sg, mcrmono )
@@ -1581,7 +1587,6 @@ DRIVER_INIT_MEMBER(mcr3_state,maxrpm)
 	m_maincpu->space(AS_IO).install_write_handler(0x06, 0x06, write8_delegate(FUNC(mcr3_state::maxrpm_op6_w),this));
 
 	save_item(NAME(m_maxrpm_adc_control));
-	save_item(NAME(m_maxrpm_adc_select));
 	save_item(NAME(m_maxrpm_last_shift));
 	save_item(NAME(m_maxrpm_p1_shift));
 	save_item(NAME(m_maxrpm_p2_shift));
@@ -1664,7 +1669,7 @@ DRIVER_INIT_MEMBER(mcr3_state,turbotag)
 /* MCR monoboard games */
 GAME( 1984, demoderm, demoderb, mono_tcs,  demoderm, mcr3_state, demoderm, ROT0,  "Bally Midway", "Demolition Derby (MCR-3 Mono Board Version)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, sarge,    0,        mono_tcs,  sarge,    mcr3_state, sarge,    ROT0,  "Bally Midway", "Sarge", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, maxrpm,   0,        mono_tcs,  maxrpm,   mcr3_state, maxrpm,   ROT0,  "Bally Midway", "Max RPM (ver 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, maxrpm,   0,        maxrpm,    maxrpm,   mcr3_state, maxrpm,   ROT0,  "Bally Midway", "Max RPM (ver 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, rampage,  0,        mono_sg,   rampage,  mcr3_state, rampage,  ROT0,  "Bally Midway", "Rampage (Rev 3, 8/27/86)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, rampage2, rampage,  mono_sg,   rampage,  mcr3_state, rampage,  ROT0,  "Bally Midway", "Rampage (Rev 2, 8/4/86)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, powerdrv, 0,        mono_sg,   powerdrv, mcr3_state, powerdrv, ROT0,  "Bally Midway", "Power Drive", MACHINE_SUPPORTS_SAVE )

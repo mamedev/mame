@@ -13,7 +13,6 @@
 
 #define LOG_DSP_CALLS 0
 #define LOG(x) do { if (LOG_DSP_CALLS) logerror x; } while (0)
-static const int toaplan_port_type[2] = { 0x7800c, 0x5c };
 
 
 INTERRUPT_GEN_MEMBER(twincobr_state::twincobr_interrupt)
@@ -176,64 +175,55 @@ READ_LINE_MEMBER(twincobr_state::twincobr_BIO_r)
 }
 
 
-void twincobr_state::twincobr_dsp(int enable)
+WRITE_LINE_MEMBER(twincobr_state::int_enable_w)
 {
-	m_dsp_on = enable;
-	if (enable) {
+	m_intenable = state;
+}
+
+WRITE_LINE_MEMBER(twincobr_state::dsp_int_w)
+{
+	m_dsp_on = state;
+	if (state)
+	{
+		// assert the INT line to the DSP
 		LOG(("Turning DSP on and main CPU off\n"));
 		m_dsp->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
-		m_dsp->set_input_line(0, ASSERT_LINE); /* TMS32010 INT */
+		m_dsp->set_input_line(0, ASSERT_LINE); // TMS32010 INT
 		m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 	}
-	else {
+	else
+	{
+		// inhibit the INT line to the DSP
 		LOG(("Turning DSP off\n"));
-		m_dsp->set_input_line(0, CLEAR_LINE); /* TMS32010 INT */
+		m_dsp->set_input_line(0, CLEAR_LINE); // TMS32010 INT
 		m_dsp->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 	}
 }
 
 void twincobr_state::twincobr_restore_dsp()
 {
-	twincobr_dsp(m_dsp_on);
+	dsp_int_w(m_dsp_on);
 }
 
 
-void twincobr_state::toaplan0_control_w(int offset, int data)
+WRITE_LINE_MEMBER(twincobr_state::coin_counter_1_w)
 {
-	LOG(("%s:Writing %08x to %08x.\n",machine().describe_context(),data,toaplan_port_type[m_toaplan_main_cpu] - offset));
-
-	if (m_toaplan_main_cpu == 1) {
-		if (data == 0x0c) { data = 0x1c; }  /* Z80 ? */
-		if (data == 0x0d) { data = 0x1d; }  /* Z80 ? */
-	}
-
-	switch (data) {
-		case 0x0004: m_intenable = 0; break;
-		case 0x0005: m_intenable = 1; break;
-		case 0x0006: twincobr_flipscreen(0); break;
-		case 0x0007: twincobr_flipscreen(1); break;
-		case 0x0008: m_bg_ram_bank = 0x0000; break;
-		case 0x0009: m_bg_ram_bank = 0x1000; break;
-		case 0x000a: m_fg_rom_bank = 0x0000; break;
-		case 0x000b: m_fg_rom_bank = 0x1000; break;
-		case 0x000c: twincobr_dsp(1); break;    /* Enable the INT line to the DSP */
-		case 0x000d: twincobr_dsp(0); break;    /* Inhibit the INT line to the DSP */
-		case 0x000e: twincobr_display(0); break; /* Turn display off */
-		case 0x000f: twincobr_display(1); break; /* Turn display on */
-	}
+	machine().bookkeeping().coin_counter_w(0, state);
 }
 
-WRITE16_MEMBER(twincobr_state::twincobr_control_w)
+WRITE_LINE_MEMBER(twincobr_state::coin_counter_2_w)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		toaplan0_control_w(offset, data & 0xff);
-	}
+	machine().bookkeeping().coin_counter_w(1, state);
 }
 
-WRITE8_MEMBER(twincobr_state::wardner_control_w)
+WRITE_LINE_MEMBER(twincobr_state::coin_lockout_1_w)
 {
-	toaplan0_control_w(offset, data);
+	machine().bookkeeping().coin_counter_w(0, !state);
+}
+
+WRITE_LINE_MEMBER(twincobr_state::coin_lockout_2_w)
+{
+	machine().bookkeeping().coin_counter_w(1, !state);
 }
 
 
@@ -251,59 +241,8 @@ WRITE16_MEMBER(twincobr_state::twincobr_sharedram_w)
 }
 
 
-void twincobr_state::toaplan0_coin_dsp_w(address_space &space, int offset, int data)
-{
-	if (data > 1)
-		LOG(("%s:Writing %08x to %08x.\n",machine().describe_context(),data,toaplan_port_type[m_toaplan_main_cpu] - offset));
-	switch (data) {
-		case 0x08: machine().bookkeeping().coin_counter_w(0,0); break;
-		case 0x09: machine().bookkeeping().coin_counter_w(0,1); break;
-		case 0x0a: machine().bookkeeping().coin_counter_w(1,0); break;
-		case 0x0b: machine().bookkeeping().coin_counter_w(1,1); break;
-		case 0x0c: machine().bookkeeping().coin_lockout_w(0,1); break;
-		case 0x0d: machine().bookkeeping().coin_lockout_w(0,0); break;
-		case 0x0e: machine().bookkeeping().coin_lockout_w(1,1); break;
-		case 0x0f: machine().bookkeeping().coin_lockout_w(1,0); break;
-		/****** The following apply to Flying Shark/Wardner only ******/
-		case 0x00:  /* This means assert the INT line to the DSP */
-					LOG(("Turning DSP on and main CPU off\n"));
-					m_dsp->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
-					m_dsp->set_input_line(0, ASSERT_LINE); /* TMS32010 INT */
-					m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
-					break;
-		case 0x01:  /* This means inhibit the INT line to the DSP */
-					LOG(("Turning DSP off\n"));
-					m_dsp->set_input_line(0, CLEAR_LINE); /* TMS32010 INT */
-					m_dsp->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
-					break;
-	}
-}
-
-
-WRITE16_MEMBER(twincobr_state::fshark_coin_dsp_w)
-{
-	if (ACCESSING_BITS_0_7)
-	{
-		toaplan0_coin_dsp_w(space, offset, data & 0xff);
-	}
-}
-
-WRITE8_MEMBER(twincobr_state::twincobr_coin_w)
-{
-	toaplan0_coin_dsp_w(space, offset, data);
-}
-
-WRITE8_MEMBER(twincobr_state::wardner_coin_dsp_w)
-{
-	toaplan0_coin_dsp_w(space, offset, data);
-}
-
-
 MACHINE_RESET_MEMBER(twincobr_state,twincobr)
 {
-	m_toaplan_main_cpu = 0;     /* 68000 */
-	twincobr_display(0);
-	m_intenable = 0;
 	m_dsp_addr_w = 0;
 	m_main_ram_seg = 0;
 	m_dsp_execute = 0;
@@ -313,7 +252,6 @@ MACHINE_RESET_MEMBER(twincobr_state,twincobr)
 
 void twincobr_state::twincobr_driver_savestate()
 {
-	save_item(NAME(m_toaplan_main_cpu));
 	save_item(NAME(m_intenable));
 	save_item(NAME(m_dsp_on));
 	save_item(NAME(m_dsp_addr_w));

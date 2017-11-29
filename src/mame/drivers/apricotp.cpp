@@ -35,7 +35,7 @@
 #include "machine/pit8253.h"
 #include "machine/ram.h"
 #include "machine/wd_fdc.h"
-#include "machine/z80dart.h"
+#include "machine/z80sio.h"
 #include "sound/sn76496.h"
 #include "video/mc6845.h"
 #include "screen.h"
@@ -111,7 +111,7 @@ public:
 	required_device<am9517a_device> m_dmac;
 	required_device<pic8259_device> m_pic;
 	required_device<pit8253_device> m_pit;
-	required_device<z80dart_device> m_sio;
+	required_device<z80sio_device> m_sio;
 	required_device<wd2797_device> m_fdc;
 	required_device<mc6845_device> m_crtc;
 	required_device<ram_device> m_ram;
@@ -435,7 +435,7 @@ static ADDRESS_MAP_START( fp_io, AS_IO, 16, fp_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000, 0x007) AM_DEVREADWRITE8(WD2797_TAG, wd2797_device, read, write, 0x00ff)
 	AM_RANGE(0x008, 0x00f) AM_DEVREADWRITE8(I8253A5_TAG, pit8253_device, read, write, 0x00ff)
-	AM_RANGE(0x018, 0x01f) AM_DEVREADWRITE8(Z80SIO0_TAG, z80sio0_device, ba_cd_r, ba_cd_w, 0x00ff)
+	AM_RANGE(0x018, 0x01f) AM_DEVREADWRITE8(Z80SIO0_TAG, z80sio_device, ba_cd_r, ba_cd_w, 0x00ff)
 	AM_RANGE(0x020, 0x021) AM_DEVWRITE8("cent_data_out", output_latch_device, write, 0x00ff)
 	AM_RANGE(0x022, 0x023) AM_WRITE8(pint_clr_w, 0x00ff)
 	AM_RANGE(0x024, 0x025) AM_READ8(prtr_snd_r, 0x00ff)
@@ -634,8 +634,8 @@ static MACHINE_CONFIG_START( fp )
 	MCFG_PIT8253_CLK1(2000000)
 	MCFG_PIT8253_CLK2(2000000)
 
-	MCFG_DEVICE_ADD(Z80SIO0_TAG, Z80SIO0, 2500000)
-	MCFG_Z80DART_OUT_INT_CB(DEVWRITELINE(I8259A_TAG, pic8259_device, ir4_w))
+	MCFG_DEVICE_ADD(Z80SIO0_TAG, Z80SIO, 2500000)
+	MCFG_Z80SIO_OUT_INT_CB(DEVWRITELINE(I8259A_TAG, pic8259_device, ir4_w))
 
 	MCFG_WD2797_ADD(WD2797_TAG, 2000000)
 	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE(I8259A_TAG, pic8259_device, ir1_w))

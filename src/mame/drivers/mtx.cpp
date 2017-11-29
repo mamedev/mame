@@ -15,7 +15,6 @@
     - SDX/FDX floppy
     - HDX hard disk
     - HRX high resolution graphics
-    - CBM (all RAM) mode
     - "Silicon" disks
     - Multi Effect Video Wall
 
@@ -48,11 +47,6 @@
 -------------------------------------------------*/
 
 static ADDRESS_MAP_START( mtx_mem, AS_PROGRAM, 8, mtx_state )
-	AM_RANGE(0x0000, 0x1fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank2")
-	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK("bank3")
-	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK("bank4")
-	AM_RANGE(0xc000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 /*-------------------------------------------------
@@ -70,6 +64,7 @@ static ADDRESS_MAP_START( mtx_io, AS_IO, 8, mtx_state )
 	AM_RANGE(0x06, 0x06) AM_READWRITE(mtx_key_hi_r, mtx_sound_latch_w)
 //  AM_RANGE(0x07, 0x07) PIO
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_device, read, write)
+	AM_RANGE(0x1f, 0x1f) AM_WRITE(mtx_cst_motor_w)
 	AM_RANGE(0x30, 0x31) AM_WRITE(hrx_address_w)
 	AM_RANGE(0x32, 0x32) AM_READWRITE(hrx_data_r, hrx_data_w)
 	AM_RANGE(0x33, 0x33) AM_READWRITE(hrx_attr_r, hrx_attr_w)
@@ -326,7 +321,7 @@ static MACHINE_CONFIG_START( mtx512 )
 
 	MCFG_SNAPSHOT_ADD("snapshot", mtx_state, mtx, "mtx", 1)
 	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED)
 	MCFG_CASSETTE_INTERFACE("mtx_cass")
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("cassette_timer", mtx_state, cassette_tick, attotime::from_hz(44100))
@@ -334,9 +329,22 @@ static MACHINE_CONFIG_START( mtx512 )
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
-	MCFG_RAM_EXTRA_OPTIONS("96K,128K,160K,192K,224K,256K,288K,320K,352K,384K,416K,448K,480K,512K")
+	MCFG_RAM_EXTRA_OPTIONS("96K,128K,192K,320K,448K,512K")
 
+	/* rom extension board */
+	MCFG_GENERIC_SOCKET_ADD("extrom", generic_plain_slot, "mtx_rom")
+	MCFG_GENERIC_EXTENSIONS("bin,rom")
+	MCFG_GENERIC_LOAD(mtx_state, extrom_load)
+
+	/* cartridge slot */
+	MCFG_GENERIC_SOCKET_ADD("rompak", generic_plain_slot, "mtx_cart")
+	MCFG_GENERIC_EXTENSIONS("bin,rom")
+	MCFG_GENERIC_LOAD(mtx_state, rompak_load)
+
+	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "mtx_cass")
+	MCFG_SOFTWARE_LIST_ADD("cart_list", "mtx_cart")
+	MCFG_SOFTWARE_LIST_ADD("rom_list", "mtx_rom")
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------
@@ -348,7 +356,7 @@ static MACHINE_CONFIG_DERIVED( mtx500, mtx512 )
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("32K")
-	MCFG_RAM_EXTRA_OPTIONS("64K,96K,128K,160K,192K,224K,256K,288K,320K,352K,384K,416K,448K,480K,512K")
+	MCFG_RAM_EXTRA_OPTIONS("64K,96K,128K,160K,288K,416K")
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------
@@ -369,7 +377,7 @@ static MACHINE_CONFIG_DERIVED( rs128, mtx512 )
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("128K")
-	MCFG_RAM_EXTRA_OPTIONS("160K,192K,224K,256K,288K,320K,352K,384K,416K,448K,480K,512K")
+	MCFG_RAM_EXTRA_OPTIONS("192K,320K,448K,512K")
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -380,13 +388,19 @@ ROM_START( mtx512 )
 	ROM_REGION( 0x02000, "user1", 0 )
 	ROM_LOAD( "osrom",    0x0000, 0x2000, CRC(9ca858cc) SHA1(3804503a58f0bcdea96bb6488833782ebd03976d) )
 
-	ROM_REGION( 0x10000, "user2", 0 )
+	ROM_REGION( 0x10000, "user2", ROMREGION_ERASEFF )
 	ROM_LOAD( "basicrom", 0x0000, 0x2000, CRC(87b4e59c) SHA1(c49782a82a7f068c1195cd967882ba9edd546eaf) )
 	ROM_LOAD( "assemrom", 0x2000, 0x2000, CRC(9d7538c3) SHA1(d1882c4ea61a68b1715bd634ded5603e18a99c5f) )
-	ROM_LOAD( "newword0", 0x4000, 0x2000, CRC(5433bd01) SHA1(56897f385476864337b7b994c1b46f50eaa57128) )
-	ROM_LOAD( "newword1", 0x6000, 0x2000, CRC(10980c03) SHA1(8245c42fb1eda43b67fa483e50e4ee3bc5f3f29f) )
-	ROM_LOAD( "newword2", 0x8000, 0x2000, CRC(cbff7130) SHA1(b4ab27def6020ba8e32959a1b988fce77bcc1d7f) )
-	ROM_LOAD( "newword3", 0xa000, 0x2000, CRC(e6bbc33b) SHA1(26faa4a8d952c4659f610e94608b630456ab89aa) )
+
+	/* Keyboard ROMs are piggy-backed on top of the OS ROM, wired to be selected as ROM 7 */
+	/* Country character sets documented in the Operators Manual are:
+	    U.S.A, France, Germany, England, Denmark, Sweden, Italy, Spain */
+	ROM_DEFAULT_BIOS("us")
+	ROM_SYSTEM_BIOS( 0, "us", "U.S.A." )
+	ROM_SYSTEM_BIOS( 1, "dk", "Denmark" )
+	ROMX_LOAD( "danish.rom",  0xe000, 0x2000, CRC(9c1b3fae) SHA1(82bc021660d88eebcf0c4d3856558ee9acc1c348), ROM_BIOS(2) )
+	ROM_SYSTEM_BIOS( 2, "fi", "Finland" )
+	ROMX_LOAD( "finnish.rom", 0xe000, 0x2000, CRC(9b96cf72) SHA1(b46d1a733e0e635ccdaf4752cc370d793c3b5c55), ROM_BIOS(3) )
 
 	ROM_REGION( 0x2000, "sdx", 0 )
 	ROM_LOAD( "sdx", 0x0000, 0x2000, NO_DUMP )

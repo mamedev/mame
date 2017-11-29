@@ -339,7 +339,7 @@ TIMER_CALLBACK_MEMBER(ssfindo_state::PS7500_Timer0_callback)
 	m_PS7500_IO[IRQSTA]|=0x20;
 	if(m_PS7500_IO[IRQMSKA]&0x20)
 	{
-		generic_pulse_irq_line(*m_maincpu, ARM7_IRQ_LINE, 1);
+		m_maincpu->pulse_input_line(ARM7_IRQ_LINE, m_maincpu->minimum_quantum_time());
 	}
 }
 
@@ -358,7 +358,7 @@ TIMER_CALLBACK_MEMBER(ssfindo_state::PS7500_Timer1_callback)
 	m_PS7500_IO[IRQSTA]|=0x40;
 	if(m_PS7500_IO[IRQMSKA]&0x40)
 	{
-		generic_pulse_irq_line(*m_maincpu, ARM7_IRQ_LINE, 1);
+		m_maincpu->pulse_input_line(ARM7_IRQ_LINE, m_maincpu->minimum_quantum_time());
 	}
 }
 
@@ -376,7 +376,7 @@ INTERRUPT_GEN_MEMBER(ssfindo_state::interrupt)
 	m_PS7500_IO[IRQSTA]|=0x08;
 		if(m_PS7500_IO[IRQMSKA]&0x08)
 		{
-			generic_pulse_irq_line(device.execute(), ARM7_IRQ_LINE, 1);
+			device.execute().pulse_input_line(ARM7_IRQ_LINE, device.execute().minimum_quantum_time());
 		}
 }
 

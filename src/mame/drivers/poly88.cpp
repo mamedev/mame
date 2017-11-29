@@ -30,6 +30,7 @@
 #include "includes/poly88.h"
 
 #include "cpu/i8085/i8085.h"
+//#include "bus/s100/s100.h"
 #include "imagedev/cassette.h"
 #include "sound/wave.h"
 #include "screen.h"

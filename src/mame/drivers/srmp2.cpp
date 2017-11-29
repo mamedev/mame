@@ -30,17 +30,19 @@ System specs :
    CPU       : 68000 (8MHz)
    Sound     : AY8910 + MSM5205
    Chips     : X1-001, X1-002A, X1-003, X1-004x2, X0-005 x2
-           X1-001, X1-002A  : Sprites
-           X1-003           : Video output
-           X1-004           : ???
-           X1-005           : ???
+           X1-001, X1-002A (64 pins) : Sprites
+           X1-003          (?? pins) : Video output
+           X1-004          (52 pins) : Inputs
+           X0-005          (40 pins) : Interface
 
 
 Known issues :
 ===============
  - IOX might be either a shared component between PCBs or every game have its own configuration.
    For now I've opted for the latter solution, until an HW test will be done ...
-   Could also be that's a MCU of some sort.
+ - X0-005 is a probable MCU, most likely a 8741/8742 UPI type like the "M-Chip" in tnzs.cpp.
+   One X0-005 handles the inputs; the other drives the MSM5205 with the aid of a 8243 expander.
+   Are both of these functions really performed by the same (undumped) internal program?
  - AY-3-8910 sound may be wrong.
  - CPU clock of srmp3 does not match the real machine.
  - MSM5205 clock frequency in srmp3 is wrong.

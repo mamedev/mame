@@ -2,24 +2,24 @@
 // copyright-holders:Robbbert
 /***************************************************************************
 
-    Argo
+Argo
 
-    16/03/2011 Skeleton driver.
+2011-03-16 Skeleton driver.
 
-    Some info obtained from EMU-80.
-    There are no manuals, diagrams, or anything else available afaik.
-    The entire driver is guesswork.
+Some info obtained from EMU-80.
+There are no manuals, diagrams, or anything else available afaik.
+The entire driver is guesswork.
 
-    The monitor will only allow certain characters to be typed, thus the
-    modifier keys appear to do nothing. There is no need to use the enter
-    key; using spacebar and the correct parameters is enough.
+The monitor will only allow certain characters to be typed, thus the
+modifier keys appear to do nothing. There is no need to use the enter
+key; using spacebar and the correct parameters is enough.
 
-    Commands: same as UNIOR
+Commands: same as UNIOR
 
-    ToDo:
-    - Add devices
-    - There is no obvious evidence of sound.
-    - Cassette UART on ports C1 and C3.
+ToDo:
+- Add devices
+- There is no obvious evidence of sound.
+- Cassette UART on ports C1 and C3.
 
 ****************************************************************************/
 
@@ -141,7 +141,7 @@ WRITE8_MEMBER(argo_state::argo_io_w)
 
 
 
-static ADDRESS_MAP_START(argo_mem, AS_PROGRAM, 8, argo_state)
+static ADDRESS_MAP_START(mem_map, AS_PROGRAM, 8, argo_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_RAMBANK("boot")
 	AM_RANGE(0x0800, 0xf7af) AM_RAM
@@ -149,7 +149,7 @@ static ADDRESS_MAP_START(argo_mem, AS_PROGRAM, 8, argo_state)
 	AM_RANGE(0xf800, 0xffff) AM_ROM AM_WRITE(argo_videoram_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(argo_io, AS_IO, 8, argo_state)
+static ADDRESS_MAP_START(io_map, AS_IO, 8, argo_state)
 	AM_RANGE(0x0000, 0xFFFF) AM_READWRITE(argo_io_r,argo_io_w)
 ADDRESS_MAP_END
 
@@ -345,8 +345,8 @@ uint32_t argo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 static MACHINE_CONFIG_START( argo )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 3500000)
-	MCFG_CPU_PROGRAM_MAP(argo_mem)
-	MCFG_CPU_IO_MAP(argo_io)
+	MCFG_CPU_PROGRAM_MAP(mem_map)
+	MCFG_CPU_IO_MAP(io_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

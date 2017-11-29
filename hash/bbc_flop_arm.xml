@@ -10,7 +10,7 @@
 
 <softwarelist name="bbc_flop_arm" description="ARM Co-Processor Discs">
 
-	<software name="armevals" supported="no">
+	<software name="armevals">
 		<description>ARM Evaluation System Discs</description>
 		<year>1986</year>
 		<publisher>Acorn Computers</publisher>

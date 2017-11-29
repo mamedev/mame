@@ -12,16 +12,11 @@
     bios 1 (MIKBUG) is made for a ACIA (serial) interface at the same address.
     MIKBUG will actually read the bits as they arrive and assemble a byte.
 
-    Since the interface is optional, it is not on the schematics, so I've
-    looked at the code and come up with something horrible that works.
-
     Note: All commands must be in uppercase. See the SWTBUG manual.
 
     ToDo:
-        - Add PIA and work out the best way to hook up the keyboard. As can be
-          seen from the code below, it might be tricky.
+        - Split into 2 systems each with different hardware.
 
-        - Finish conversion to modern.
 
 Commands:
 B Breakpoint
@@ -42,59 +37,28 @@ Z Goto Prom (0xC000)
 
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
-#include "machine/terminal.h"
-
-#define TERMINAL_TAG "terminal"
+#include "machine/6850acia.h"
+#include "machine/clock.h"
+#include "bus/rs232/rs232.h"
 
 class swtpc_state : public driver_device
 {
 public:
 	swtpc_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_terminal(*this, TERMINAL_TAG)
-	{
-	}
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+	{ }
 
-	DECLARE_READ8_MEMBER(swtpc_status_r);
-	DECLARE_READ8_MEMBER(swtpc_terminal_r);
-	DECLARE_READ8_MEMBER(swtpc_tricky_r);
-	void kbd_put(u8 data);
-
-protected:
-	virtual void machine_reset() override;
-
+private:
 	required_device<cpu_device> m_maincpu;
-	required_device<generic_terminal_device> m_terminal;
-	uint8_t m_term_data;
 };
 
-// bit 0 - ready to receive a character; bit 1 - ready to send a character to the terminal
-READ8_MEMBER( swtpc_state::swtpc_status_r )
-{
-	return (m_term_data) ? 3 : 0x82;
-}
-
-READ8_MEMBER( swtpc_state::swtpc_terminal_r )
-{
-	uint8_t ret = m_term_data;
-	m_term_data = 0;
-	return ret;
-}
-
-READ8_MEMBER( swtpc_state::swtpc_tricky_r )
-{
-	uint8_t ret = m_term_data;
-	return ret;
-}
-
-static ADDRESS_MAP_START(swtpc_mem, AS_PROGRAM, 8, swtpc_state)
+static ADDRESS_MAP_START(mem_map, AS_PROGRAM, 8, swtpc_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x8004, 0x8004 ) AM_READ(swtpc_status_r)
-	AM_RANGE( 0x8005, 0x8005 ) AM_READ(swtpc_terminal_r) AM_DEVWRITE(TERMINAL_TAG, generic_terminal_device, write)
-	AM_RANGE( 0x8007, 0x8007 ) AM_READ(swtpc_tricky_r)
-	AM_RANGE( 0xa000, 0xa07f ) AM_RAM
-	AM_RANGE( 0xe000, 0xe3ff ) AM_MIRROR(0x1c00) AM_ROM
+	AM_RANGE(0x8004, 0x8004) AM_MIRROR(2) AM_DEVREADWRITE("uart", acia6850_device, status_r, control_w)
+	AM_RANGE(0x8005, 0x8005) AM_MIRROR(2) AM_DEVREADWRITE("uart", acia6850_device, data_r, data_w)
+	AM_RANGE(0xa000, 0xa07f) AM_RAM
+	AM_RANGE(0xe000, 0xe3ff) AM_MIRROR(0x1c00) AM_ROM
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -102,24 +66,23 @@ static INPUT_PORTS_START( swtpc )
 INPUT_PORTS_END
 
 
-void swtpc_state::machine_reset()
-{
-}
-
-void swtpc_state::kbd_put(u8 data)
-{
-	m_term_data = data;
-}
-
 static MACHINE_CONFIG_START( swtpc )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, XTAL_1MHz)
-	MCFG_CPU_PROGRAM_MAP(swtpc_mem)
-
+	MCFG_CPU_PROGRAM_MAP(mem_map)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(swtpc_state, kbd_put))
+	MCFG_DEVICE_ADD("uart_clock", CLOCK, 153600)
+	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("uart", acia6850_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart", acia6850_device, write_rxc))
+
+	MCFG_DEVICE_ADD("uart", ACIA6850, XTAL_1MHz)
+	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
+
+	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart", acia6850_device, write_rxd))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart", acia6850_device, write_cts))
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -134,4 +97,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  STATE        INIT  COMPANY                                     FULLNAME      FLAGS
-COMP( 1975, swtpc,  0,      0,      swtpc,   swtpc, swtpc_state, 0,    "Southwest Technical Products Corporation", "SWTPC 6800", MACHINE_NO_SOUND)
+COMP( 1975, swtpc,  0,      0,      swtpc,   swtpc, swtpc_state, 0,    "Southwest Technical Products Corporation", "SWTPC 6800", MACHINE_NO_SOUND_HW )

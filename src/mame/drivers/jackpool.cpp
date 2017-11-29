@@ -19,7 +19,9 @@ TODO:
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
+#include "machine/74259.h"
 #include "machine/eepromser.h"
+#include "machine/ins8250.h"
 #include "sound/okim6295.h"
 #include "screen.h"
 #include "speaker.h"
@@ -31,22 +33,20 @@ public:
 	jackpool_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_vram(*this, "vram"),
-		m_io(*this, "io"),
 		m_maincpu(*this, "maincpu"),
 		m_eeprom(*this, "eeprom"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")  { }
 
-	required_shared_ptr<uint16_t> m_vram;
-	uint8_t m_map_vreg;
-	required_shared_ptr<uint16_t> m_io;
-	DECLARE_READ16_MEMBER(jackpool_ff_r);
-	DECLARE_READ16_MEMBER(jackpool_io_r);
-	DECLARE_WRITE16_MEMBER(jackpool_io_w);
+	DECLARE_READ8_MEMBER(jackpool_io_r);
+	DECLARE_WRITE_LINE_MEMBER(map_vreg_w);
 	DECLARE_DRIVER_INIT(jackpool);
 	virtual void video_start() override;
 	uint32_t screen_update_jackpool(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(jackpool_interrupt);
+
+	required_shared_ptr<uint16_t> m_vram;
+	uint8_t m_map_vreg;
 	required_device<cpu_device> m_maincpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -102,13 +102,7 @@ uint32_t jackpool_state::screen_update_jackpool(screen_device &screen, bitmap_in
 	return 0;
 }
 
-/*Communication ram*/
-READ16_MEMBER(jackpool_state::jackpool_ff_r)
-{
-	return 0xffff;
-}
-
-READ16_MEMBER(jackpool_state::jackpool_io_r)
+READ8_MEMBER(jackpool_state::jackpool_io_r)
 {
 	switch(offset*2)
 	{
@@ -134,54 +128,12 @@ READ16_MEMBER(jackpool_state::jackpool_io_r)
 	}
 
 //  printf("R %02x\n",offset*2);
-	return m_io[offset];
+	return 0xff;
 }
 
-WRITE16_MEMBER(jackpool_state::jackpool_io_w)
+WRITE_LINE_MEMBER(jackpool_state::map_vreg_w)
 {
-	COMBINE_DATA(&m_io[offset]);
-
-	switch(offset*2)
-	{
-		case 0x30: /* ---- ---x HOLD3 lamp */  break;
-		case 0x32: /* ---- ---x HOLD4 lamp */  break;
-		case 0x34: /* ---- ---x HOLD2 lamp */  break;
-		case 0x36: /* ---- ---x HOLD1 lamp */  break;
-		case 0x38: /* ---- ---x HOLD5 lamp */  break;
-		case 0x3a: /* ---- ---x START1 lamp */ break;
-		case 0x3c: /* ---- ---x BET lamp */    break;
-		case 0x3e: break;
-		case 0x40: /* ---- ---x PAYOUT lamp */ break;
-		case 0x46: /* ---- ---x coin counter */break;
-		case 0x4a: /* ---- ---x Ticket motor */break;
-		case 0x4c: /* ---- ---x Hopper motor */break;
-		case 0x4e: m_map_vreg = data & 1;        break;
-		case 0x50: m_eeprom->cs_write((data & 1) ? ASSERT_LINE : CLEAR_LINE ); break;
-		case 0x52: m_eeprom->clk_write((data & 1) ? ASSERT_LINE : CLEAR_LINE ); break;
-		case 0x54: m_eeprom->di_write(data & 1); break;
-//      case 0x5a: m_eeprom->cs_write((data & 1) ? ASSERT_LINE : CLEAR_LINE ); break;
-//      case 0x5c: m_eeprom->cs_write((data & 1) ? ASSERT_LINE : CLEAR_LINE ); break;
-		case 0x60: break;
-//      default: printf("[%02x] <- %02x W\n",offset*2,data);      break;
-	}
-
-	#if 0
-	if(offset*2 == 0x54)
-	{
-		printf("Write bit %02x\n",data);
-		m_eeprom->di_write(data & 1);
-	}
-	if(offset*2 == 0x52)
-	{
-		printf("Clock bit %02x\n",data);
-		m_eeprom->clk_write((data & 1) ? ASSERT_LINE : CLEAR_LINE );
-	}
-	if(offset*2 == 0x50)
-	{
-		printf("chip select bit %02x\n",data);
-		m_eeprom->cs_write((data & 1) ? ASSERT_LINE : CLEAR_LINE );
-	}
-	#endif
+	m_map_vreg = state;
 }
 
 static ADDRESS_MAP_START( jackpool_mem, AS_PROGRAM, 16, jackpool_state )
@@ -192,9 +144,13 @@ static ADDRESS_MAP_START( jackpool_mem, AS_PROGRAM, 16, jackpool_state )
 	AM_RANGE(0x348000, 0x34ffff) AM_RAM //<- vram banks 2 & 3?
 
 	AM_RANGE(0x360000, 0x3603ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x380000, 0x380061) AM_READWRITE(jackpool_io_r,jackpool_io_w) AM_SHARE("io")//AM_READ(jackpool_io_r)
+	AM_RANGE(0x380000, 0x38002f) AM_READ8(jackpool_io_r, 0x00ff)
+	AM_RANGE(0x380030, 0x38003f) AM_DEVWRITE8("latch1", ls259_device, write_d0, 0x00ff)
+	AM_RANGE(0x380040, 0x38004f) AM_DEVWRITE8("latch2", ls259_device, write_d0, 0x00ff)
+	AM_RANGE(0x380050, 0x38005f) AM_DEVWRITE8("latch3", ls259_device, write_d0, 0x00ff)
+	AM_RANGE(0x380060, 0x380061) AM_WRITENOP // another single-bit output?
 
-	AM_RANGE(0x800000, 0x80000f) AM_READ(jackpool_ff_r) AM_WRITENOP //UART
+	AM_RANGE(0x800000, 0x80000f) AM_DEVREADWRITE8("uart", ns16550_device, ins8250_r, ins8250_w, 0x00ff)
 	AM_RANGE(0xa00000, 0xa00001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 ADDRESS_MAP_END
 
@@ -282,7 +238,30 @@ static MACHINE_CONFIG_START( jackpool )
 	MCFG_SCREEN_UPDATE_DRIVER(jackpool_state, screen_update_jackpool)
 	MCFG_SCREEN_PALETTE("palette")
 
+	MCFG_DEVICE_ADD("latch1", LS259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(NOOP) // HOLD3 lamp
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(NOOP) // HOLD4 lamp
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(NOOP) // HOLD2 lamp
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(NOOP) // HOLD1 lamp
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(NOOP) // HOLD5 lamp
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(NOOP) // START1 lamp
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(NOOP) // BET lamp
+
+	MCFG_DEVICE_ADD("latch2", LS259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(NOOP) // PAYOUT lamp
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(NOOP) // Coin counter
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(NOOP) // Ticket motor
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(NOOP) // Hopper motor
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(jackpool_state, map_vreg_w))
+
+	MCFG_DEVICE_ADD("latch3", LS259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, cs_write))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, clk_write))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, di_write))
+
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+
+	MCFG_DEVICE_ADD("uart", NS16550, 1843200) // exact type and clock unknown
 
 	MCFG_PALETTE_ADD("palette", 0x200)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)

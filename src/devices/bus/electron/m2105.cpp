@@ -78,13 +78,13 @@ MACHINE_CONFIG_MEMBER( electron_m2105_device::device_add_mconfig )
 	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("irqs", input_merger_device, in_w<1>))
 
 	/* duart */
-	MCFG_MC68681_ADD("sc2681", XTAL_3_6864MHz)
+	MCFG_DEVICE_ADD("duart", SCN2681, XTAL_3_6864MHz)
 	MCFG_MC68681_IRQ_CALLBACK(DEVWRITELINE("irqs", input_merger_device, in_w<2>))
 	MCFG_MC68681_A_TX_CALLBACK(DEVWRITELINE("rs232", rs232_port_device, write_txd))
 	//MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(electron_m2105_device, sio_out_w))
 
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("sc2681", mc68681_device, rx_a_w))
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("duart", scn2681_device, rx_a_w))
 
 	/* printer */
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
@@ -117,7 +117,7 @@ electron_m2105_device::electron_m2105_device(const machine_config &mconfig, cons
 	, m_exp_rom(*this, "exp_rom")
 	, m_via6522_0(*this, "via6522_0")
 	, m_via6522_1(*this, "via6522_1")
-	, m_duart(*this, "sc2681")
+	, m_duart(*this, "duart")
 	, m_tms(*this, "tms5220")
 	, m_centronics(*this, "centronics")
 	, m_irqs(*this, "irqs")
@@ -134,7 +134,7 @@ void electron_m2105_device::device_start()
 	m_slot = dynamic_cast<electron_expansion_slot_device *>(owner());
 
 	space.install_readwrite_handler(0xfc40, 0xfc5f, READ8_DEVICE_DELEGATE(m_via6522_1, via6522_device, read), WRITE8_DEVICE_DELEGATE(m_via6522_1, via6522_device, write));
-	space.install_readwrite_handler(0xfc60, 0xfc6f, READ8_DEVICE_DELEGATE(m_duart, mc68681_device, read), WRITE8_DEVICE_DELEGATE(m_duart, mc68681_device, write));
+	space.install_readwrite_handler(0xfc60, 0xfc6f, READ8_DEVICE_DELEGATE(m_duart, scn2681_device, read), WRITE8_DEVICE_DELEGATE(m_duart, scn2681_device, write));
 	space.install_readwrite_handler(0xfc70, 0xfc8f, READ8_DEVICE_DELEGATE(m_via6522_0, via6522_device, read), WRITE8_DEVICE_DELEGATE(m_via6522_0, via6522_device, write));
 }
 

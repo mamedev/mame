@@ -2,19 +2,23 @@
 // copyright-holders:Patrick Mackinlay
 
 /*
-* An implementation of the SGA device found on Intergraph InterPro family workstations. There is no
-* public documentation on this device, so the implementation is being built to follow the logic of the
-* system boot ROM and its diagnostic tests.
-*
-* Please be aware that code in here is not only broken, it's likely wrong in many cases.
-*
-* TODO
-*   - too long to list
-*/
+ * An implementation of the SGA (SRX Gate Array) device found in Intergraph
+ * InterPro family systems. There is no public documentation on this device,
+ * so the implementation is being built to follow the logic of the system boot
+ * ROM and its diagnostic tests.
+ *
+ * Please be aware that code in here is not only broken, it's likely wrong in
+ * many cases.
+ *
+ * TODO
+ *   - too long to list
+ */
+
 #include "emu.h"
 #include "interpro_sga.h"
 
 #define VERBOSE 0
+#include "logmacro.h"
 
 DEVICE_ADDRESS_MAP_START(map, 32, interpro_sga_device)
 	AM_RANGE(0x00, 0x03) AM_READWRITE(gcsr_r, gcsr_w)
@@ -62,7 +66,7 @@ DEVICE_ADDRESS_MAP_START(map, 32, interpro_sga_device)
 	AM_RANGE(0xec, 0xef) AM_READWRITE(dcksum1_r, dcksum1_w) // dma 1 device checksum register 1 (esga)
 ADDRESS_MAP_END
 
-DEFINE_DEVICE_TYPE(INTERPRO_SGA, interpro_sga_device, "sga", "InterPro SGA")
+DEFINE_DEVICE_TYPE(INTERPRO_SGA, interpro_sga_device, "sga", "SRX Gate Array")
 
 interpro_sga_device::interpro_sga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, INTERPRO_SGA, tag, owner, clock),
@@ -73,6 +77,48 @@ interpro_sga_device::interpro_sga_device(const machine_config &mconfig, const ch
 void interpro_sga_device::device_start()
 {
 	out_berr_func.resolve();
+
+	save_item(NAME(m_gcsr));
+	save_item(NAME(m_ipoll));
+	save_item(NAME(m_imask));
+	save_item(NAME(m_range_base));
+	save_item(NAME(m_range_end));
+	save_item(NAME(m_cttag));
+	save_item(NAME(m_address));
+	save_item(NAME(m_dmacsr));
+
+	save_item(NAME(m_edmacsr));
+	save_item(NAME(m_reg6_range));
+
+	save_item(NAME(m_ddpta0));
+	save_item(NAME(m_ddpad0));
+	save_item(NAME(m_ddoff0));
+	save_item(NAME(m_ddtc0));
+	save_item(NAME(m_dspta0));
+	save_item(NAME(m_dspad0));
+	save_item(NAME(m_dsoff0));
+	save_item(NAME(m_dstc0));
+
+	save_item(NAME(m_dspad1));
+	save_item(NAME(m_dsoff1));
+	save_item(NAME(m_dstc1));
+	save_item(NAME(m_ddpad1));
+	save_item(NAME(m_ddoff1));
+	save_item(NAME(m_ddtc1));
+
+	save_item(NAME(m_ddpta2));
+	save_item(NAME(m_ddpad2));
+	save_item(NAME(m_ddoff2));
+	save_item(NAME(m_ddtc2));
+	save_item(NAME(m_dspta2));
+	save_item(NAME(m_dspad2));
+	save_item(NAME(m_dsoff2));
+	save_item(NAME(m_dstc2));
+
+	save_item(NAME(m_ddrd2));
+	save_item(NAME(m_dsrd2));
+	save_item(NAME(m_dcksum0));
+	save_item(NAME(m_dcksum1));
 }
 
 void interpro_sga_device::device_reset()
@@ -86,10 +132,10 @@ WRITE32_MEMBER(interpro_sga_device::ddtc1_w)
 	// assume that when this register is written, we should start a
 	// memory to memory dma transfer
 
-	logerror("  gcsr = 0x%08x dmacsr = 0x%08x\n", m_gcsr, m_dmacsr);
-	logerror(" ipoll = 0x%08x  imask = 0x%08x\n", m_ipoll, m_imask);
-	logerror("dspad1 = 0x%08x dsoff1 = 0x%08x dstc1 = 0x%08x\n", m_dspad1, m_dsoff1, m_dstc1);
-	logerror("ddpad1 = 0x%08x ddoff1 = 0x%08x ddtc1 = 0x%08x\n", m_ddpad1, m_ddoff1, m_ddtc1);
+	LOG("  gcsr = 0x%08x dmacsr = 0x%08x\n", m_gcsr, m_dmacsr);
+	LOG(" ipoll = 0x%08x  imask = 0x%08x\n", m_ipoll, m_imask);
+	LOG("dspad1 = 0x%08x dsoff1 = 0x%08x dstc1 = 0x%08x\n", m_dspad1, m_dsoff1, m_dstc1);
+	LOG("ddpad1 = 0x%08x ddoff1 = 0x%08x ddtc1 = 0x%08x\n", m_ddpad1, m_ddoff1, m_ddtc1);
 
 	// when complete, we indicate by setting DMAEND(2) - 2 is probably the channel
 	// we also turn off the INTBERR and INTMMBE flags

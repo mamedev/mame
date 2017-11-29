@@ -329,7 +329,7 @@ INPUT_PORTS_END
 
 INTERRUPT_GEN_MEMBER(igs_m027_state::igs_majhong_interrupt)
 {
-	generic_pulse_irq_line(device.execute(), ARM7_FIRQ_LINE, 1);
+	device.execute().pulse_input_line(ARM7_FIRQ_LINE, device.execute().minimum_quantum_time());
 }
 
 

@@ -12,6 +12,8 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "coco_dcmodem.h"
+
 #include "cococart.h"
 #include "machine/mos6551.h"
 

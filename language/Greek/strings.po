@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-10-03 10:32+1100\n"
-"PO-Revision-Date: 2017-09-29 23:45+0300\n"
+"PO-Revision-Date: 2017-10-26 15:00+0300\n"
 "Last-Translator: Mame.gr\n"
 "Language-Team: MAME Language Team\n"
 "Language: el\n"
@@ -1263,93 +1263,95 @@ msgstr "Χρονισμός\tΑτελής\n"
 
 #: src/frontend/mame/ui/selgame.cpp:945
 msgid "Mechanical Machine\tYes\n"
-msgstr ""
+msgstr "Μηχανική Συσκευή\tΝαι\n"
 
 #: src/frontend/mame/ui/selgame.cpp:945
 msgid "Mechanical Machine\tNo\n"
-msgstr ""
+msgstr "Μηχανική Συσκευή\tΌχι\n"
 
 #: src/frontend/mame/ui/selgame.cpp:946
 msgid "Requires Artwork\tYes\n"
-msgstr ""
+msgstr "Απαιτεί Artwork\tΝαι\n"
 
 #: src/frontend/mame/ui/selgame.cpp:946
 msgid "Requires Artwork\tNo\n"
-msgstr ""
+msgstr "Απαιτεί Artwork\tΌχι\n"
 
 #: src/frontend/mame/ui/selgame.cpp:947
 msgid "Requires Clickable Artwork\tYes\n"
-msgstr ""
+msgstr "Απαιτεί Artwork για επιλογή\tΝαι\n"
 
 #: src/frontend/mame/ui/selgame.cpp:947
 msgid "Requires Clickable Artwork\tNo\n"
-msgstr ""
+msgstr "Απαιτεί Artwork για επιλογή\tΌχι\n"
 
 #: src/frontend/mame/ui/selgame.cpp:948
 msgid "Support Cocktail\tYes\n"
-msgstr ""
+msgstr "Υποστήριξη Κοκτέιλ\tΝαι\n"
 
 #: src/frontend/mame/ui/selgame.cpp:948
 msgid "Support Cocktail\tNo\n"
-msgstr ""
+msgstr "Υποστήριξη Κοκτέιλ\tΌχι\n"
 
 #: src/frontend/mame/ui/selgame.cpp:949
 msgid "Driver is BIOS\tYes\n"
-msgstr ""
+msgstr "Ο οδηγός είναι BIOS\tΝαι\n"
 
 #: src/frontend/mame/ui/selgame.cpp:949
 msgid "Driver is BIOS\tNo\n"
-msgstr ""
+msgstr "Ο οδηγός είναι BIOS\tΌχι\n"
 
 #: src/frontend/mame/ui/selgame.cpp:950
 msgid "Support Save\tYes\n"
-msgstr ""
+msgstr "Υποστήριξη Αποθήκευσης\tΝαι\n"
 
 #: src/frontend/mame/ui/selgame.cpp:950
 msgid "Support Save\tNo\n"
-msgstr ""
+msgstr "Υποστήριξη Αποθήκευσης\tΌχι\n"
 
 #: src/frontend/mame/ui/selgame.cpp:951
 msgid "Screen Orientation\tVertical\n"
-msgstr ""
+msgstr "Προσανατολισμός Οθόνης\tΚάθετος\n"
 
 #: src/frontend/mame/ui/selgame.cpp:951
 msgid "Screen Orientation\tHorizontal\n"
-msgstr ""
+msgstr "Προσανατολισμός Οθόνης\tΟριζόντιος\n"
 
 #: src/frontend/mame/ui/selgame.cpp:961
 msgid "Requires CHD\tYes\n"
-msgstr ""
+msgstr "Απαιτεί CHD\tΝαι\n"
 
 #: src/frontend/mame/ui/selgame.cpp:961
 msgid "Requires CHD\tNo\n"
-msgstr ""
+msgstr "Απαιτεί CHD\tΌχι\n"
 
 #: src/frontend/mame/ui/selgame.cpp:974
 msgid "ROM Audit Result\tOK\n"
-msgstr ""
+msgstr "Έλεγχος ROMs\tOK\n"
 
 #: src/frontend/mame/ui/selgame.cpp:976
 msgid "ROM Audit Result\tBAD\n"
-msgstr ""
+msgstr "Έλεγχος ROMs\tΛΑΘΟΣ\n"
 
 #: src/frontend/mame/ui/selgame.cpp:979
 msgid "Samples Audit Result\tNone Needed\n"
-msgstr ""
+msgstr "Έλεγχος Δειγμάτων Ήχου\tΔεν απαιτείται\n"
 
 #: src/frontend/mame/ui/selgame.cpp:981
 msgid "Samples Audit Result\tOK\n"
-msgstr ""
+msgstr "Έλεγχος Δειγμάτων Ήχου\tOK\n"
 
 #: src/frontend/mame/ui/selgame.cpp:983
 msgid "Samples Audit Result\tBAD\n"
-msgstr ""
+msgstr "Έλεγχος Δειγμάτων Ήχου\tΛΑΘΟΣ\n"
 
 #: src/frontend/mame/ui/selgame.cpp:987
 msgid ""
 "ROM Audit Disabled\t\n"
 "Samples Audit Disabled\t\n"
 msgstr ""
+"Έλεγχος ROMs Απενεργοποιημένος\t\n"
+"Έλεγχος Δειγμάτων Ήχου Απενεργοποιημένος\t\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1171
 #, c-format
@@ -1820,7 +1822,7 @@ msgstr "Έναρξή Ελέγχου"
 
 #: src/frontend/mame/ui/datmenu.cpp:80
 msgid "Software Usage"
-msgstr "Χρήση λογισμικού"
+msgstr "Χρήση Λογισμικού"
 
 #: src/frontend/mame/ui/datmenu.cpp:362
 msgid "Revision: "
@@ -1861,7 +1863,7 @@ msgstr "Επιλογή BIOS:"
 #: src/frontend/mame/ui/selmenu.cpp:574
 #, c-format
 msgid "Software is clone of: %1$-.100s"
-msgstr "Το Λογισμικό είναι κλώνος του: %1$-.100s"
+msgstr "Το λογισμικό είναι κλώνος του: %1$-.100s"
 
 #: src/frontend/mame/ui/selmenu.cpp:576
 msgid "Software is parent"
@@ -2521,27 +2523,27 @@ msgstr "Ρύθμιση συντομεύσεων"
 #: plugins/cheat/init.lua:668
 #, lua-format
 msgid "Activated: %s = %s"
-msgstr ""
+msgstr "Ενεργοποιήθηκε: %s = %s"
 
 #: plugins/cheat/init.lua:671 plugins/cheat/init.lua:729
 #, lua-format
 msgid "Activated: %s"
-msgstr ""
+msgstr "Ενεργοποιήθηκε: %s"
 
 #: plugins/cheat/init.lua:733
 #, lua-format
 msgid "Enabled: %s"
-msgstr ""
+msgstr "Ενεργοποιημένο: %s"
 
 #: plugins/cheat/init.lua:738
 #, lua-format
 msgid "Disabled: %s"
-msgstr ""
+msgstr "Απενεργοποιημένο: %s"
 
 #: plugins/cheat/init.lua:776
 #, lua-format
 msgid "%s added"
-msgstr ""
+msgstr "%s προστέθηκε"
 
 #: plugins/data/data_command.lua:19
 msgid "Command"
@@ -2610,7 +2612,7 @@ msgstr "Όνομα Cheat"
 #: plugins/cheatfind/init.lua:354
 #, lua-format
 msgid "Default name is %s"
-msgstr ""
+msgstr "Το προεπιλεγμένο όνομα είναι %s"
 
 #: plugins/cheatfind/init.lua:362
 msgid "Player"
@@ -2627,7 +2629,7 @@ msgstr "Αποθήκευση"
 #: plugins/cheatfind/init.lua:399
 #, lua-format
 msgid "Cheat written to %s and added to cheat.simple"
-msgstr ""
+msgstr "Το Cheat γράφτηκε στο %s και προστέθηκε στο cheat.simple"
 
 #: plugins/cheatfind/init.lua:407
 msgid "Cheat added to cheat.simple"
@@ -2638,6 +2640,8 @@ msgid ""
 "Unable to write file\n"
 "Ensure that cheatpath folder exists"
 msgstr ""
+"Αδύνατη η εγγραφή του αρχείου\n"
+"Ελέγξτε ότι υπάρχει ο φάκελος του cheatpath"
 
 #: plugins/cheatfind/init.lua:421
 msgid "Cancel"
@@ -2793,113 +2797,3 @@ msgstr "Καθαρισμός Επιτηρήσεων"
 #: plugins/cheatfind/init.lua:786
 msgid "Cheat Finder"
 msgstr "Εύρεση Cheat"
-
-#~ msgid "Mechanical Machine\t%1$s\n"
-#~ msgstr "Μηχανική Συσκευή\t%1$s\n"
-
-#~ msgid "Requires Artwork\t%1$s\n"
-#~ msgstr "Απαιτεί Artwork\t%1$s\n"
-
-#~ msgid "Requires Clickable Artwork\t%1$s\n"
-#~ msgstr "Απαιτεί Artwork για κλικ\t%1$s\n"
-
-#~ msgid "Support Cocktail\t%1$s\n"
-#~ msgstr "Υποστήριξη Κοκτέιλ\t%1$s\n"
-
-#~ msgid "Driver is BIOS\t%1$s\n"
-#~ msgstr "Ο οδηγός είναι BIOS\t%1$s\n"
-
-#~ msgid "Support Save\t%1$s\n"
-#~ msgstr "Υποστήριξη Αποθήκευσης\t%1$s\n"
-
-#~ msgid "Screen Orientation\t%1$s\n"
-#~ msgstr "Προσανατολισμός Οθόνης\t%1$s\n"
-
-#~ msgid "Vertical"
-#~ msgstr "Κάθετος"
-
-#~ msgid "Horizontal"
-#~ msgstr "Οριζόντιος"
-
-#~ msgid "Requires CHD\t%1$s\n"
-#~ msgstr "Απαιτεί CHD\t%1$s\n"
-
-#~ msgid "Roms Audit Pass\tOK\n"
-#~ msgstr "Έλεγχος ROMs\tOK\n"
-
-#~ msgid "Roms Audit Pass\tBAD\n"
-#~ msgstr "Έλεγχος ROMs\tΛΑΘΟΣ\n"
-
-#~ msgid "Samples Audit Pass\tNone Needed\n"
-#~ msgstr "Έλεγχος Δειγμάτων Ήχου\tΔεν απαιτείται\n"
-
-#~ msgid "Samples Audit Pass\tOK\n"
-#~ msgstr "Έλεγχος Δειγμάτων Ήχου\tOK\n"
-
-#~ msgid "Samples Audit Pass\tBAD\n"
-#~ msgstr "Έλεγχος Δειγμάτων Ήχου\tΛΑΘΟΣ\n"
-
-#~ msgid ""
-#~ "Roms Audit Pass\tDisabled\n"
-#~ "Samples Audit Pass\tDisabled\n"
-#~ msgstr ""
-#~ "Έλεγχος ROMs\tΑπενεργοποιημένος\n"
-#~ "Έλεγχος Δειγμάτων Ήχου\tΑπενεργοποιημένος\n"
-
-#~ msgid "Unimplemented"
-#~ msgstr "Δεν έχει υλοποιηθεί"
-
-#~ msgid "Imperfect"
-#~ msgstr "Ατελής"
-
-#~ msgid "OK"
-#~ msgstr "OK"
-
-#~ msgid "Gfx: %s, Sound: %s"
-#~ msgstr "Gfx: %s, Ήχος: %s"
-
-#~ msgid "Cheat Comment:\n"
-#~ msgstr "Σχόλιο Cheat:\n"
-
-#~ msgid "Activated"
-#~ msgstr "Ενεργοποιήθηκε"
-
-#~ msgid " added"
-#~ msgstr " προστέθηκε"
-
-#~ msgid "Cheat written to "
-#~ msgstr "Το Cheat γράφτηκε στο "
-
-#~ msgid " and added to cheat.simple"
-#~ msgstr " και προστέθηκε στο cheat.simple"
-
-#~ msgid ""
-#~ "Unable to write file\n"
-#~ "Check cheatpath dir exists"
-#~ msgstr ""
-#~ "Αδύνατη η εγγραφή του αρχείου\n"
-#~ "Ελέγξτε ότι υπάρχει ο φάκελος του cheatpath"
-
-#~ msgid "Audit in progress..."
-#~ msgstr "Ελέγχος σε εξέλιξη..."
-
-#~ msgid "Extra INIs"
-#~ msgstr "Επιπλέον INIs"
-
-#~ msgid " ^!File"
-#~ msgstr " ^!Αρχείο"
-
-#~ msgid "Main filter"
-#~ msgstr "Κύριο φίλτρο"
-
-#~ msgid "Other filter"
-#~ msgstr "Άλλο φίλτρο"
-
-#~ msgid "^!Region"
-#~ msgstr "^!Περιοχή"
-
-#~ msgid "^!Setup custom filter"
-#~ msgstr "^!Ρύθμιση προσαρμοσμένου φίλτρου"
-
-#~ msgid "Region: %1$s -"
-#~ msgstr "Περιοχή: %1$s -"

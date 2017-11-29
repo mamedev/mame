@@ -1714,6 +1714,7 @@ void m68000_base_device::define_state(void)
 	state_add(M68K_USP,        "USP",       iotemp).callimport().callexport();
 	if (cpu_type & MASK_020_OR_LATER)
 		state_add(M68K_MSP,    "MSP",       iotemp).callimport().callexport();
+	state_add(M68K_SR,         "SR",        iotemp).noshow().callimport().callexport();
 
 	for (int regnum = 0; regnum < 8; regnum++) {
 		state_add(M68K_D0 + regnum, string_format("D%d", regnum).c_str(), dar[regnum]);

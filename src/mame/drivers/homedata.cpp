@@ -253,7 +253,7 @@ INTERRUPT_GEN_MEMBER(homedata_state::homedata_irq)
 
 INTERRUPT_GEN_MEMBER(homedata_state::upd7807_irq)
 {
-	generic_pulse_irq_line(device.execute(), UPD7810_INTF1, 1);
+	device.execute().pulse_input_line(UPD7810_INTF1, device.execute().minimum_quantum_time());
 }
 
 
@@ -1749,6 +1749,103 @@ ROM_START( battlcry )
 ROM_END
 
 
+ROM_START( battlcryc )
+	ROM_REGION( 0x02c000, "maincpu", 0 ) /* 6809 Code */
+	ROM_LOAD( "s88c01.j14", 0x010000, 0x01c000, CRC(4aa6d637) SHA1(e10c6c4a6adeb3b4837ebe5ff0a49ec1204b2e54) ) // 27C1000
+	ROM_CONTINUE(           0x00c000, 0x004000             )
+
+	ROM_REGION( 0x40000, "audiocpu", 0) /* uPD7807 code */
+	ROM_LOAD( "s88b04.f20", 0x000000, 0x040000, CRC(c54b5a5e) SHA1(421082af349b170d74f5214d8b5eed44db472749) )
+
+	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_LOAD( "s88c13.e2",  0x000000, 0x80000, CRC(8103f007) SHA1(fcc51e57a1df572ad00000e03db1f5f949dea619) )
+	ROM_LOAD( "s88c14.e1",  0x080000, 0x80000, CRC(a7b5fafb) SHA1(7a9448bf13ee680c99bc19a6fac7a14d6ce8ddfc) )
+	ROM_LOAD( "s88c15.f2",  0x100000, 0x80000, CRC(597d833b) SHA1(d0c22981b105c1b4b37eae64964af8b683cc4687) )
+	ROM_LOAD( "s88c16.f1",  0x180000, 0x80000, CRC(9ca1c1a1) SHA1(30bbb47503631295a16bdd77a5bc08681dd7c63e) )
+
+	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_LOAD( "s88c09.e5",  0x000000, 0x80000, CRC(8f77ac3e) SHA1(5903a167ddf69284035967876ef46d7d09582574) )
+	ROM_LOAD( "s88c10.e4",  0x080000, 0x80000, CRC(cb44371e) SHA1(96ac9aa0034152ba88afc373475928ad6d9ecd29) )
+
+	ROM_REGION( 0x080000, "gfx3", 0 )
+	ROM_LOAD( "s88c08.e6",  0x000000, 0x80000, CRC(a989cfc2) SHA1(11c39a2ddd5e4be150d2f2ce332e312907df2377) )
+
+	ROM_REGION( 0x080000, "gfx4", 0 )
+	ROM_LOAD( "s88c05.e7",  0x000000, 0x80000, CRC(e7f13340) SHA1(05b0f3ca369c95d4fd50cd9617fc044ad7bdf0d3) )
+
+	ROM_REGION( 0x010000, "proms", 0 )  /* static palette */
+	ROM_LOAD16_BYTE( "s88b18.f10", 0x00000, 0x8000, CRC(fa432edc) SHA1(55c01b6a1175539facdfdd0c3c49d878a59156a4) )
+	ROM_LOAD16_BYTE( "s88b17.f9",  0x00001, 0x8000, CRC(7c55568e) SHA1(1e599cd00abe7b67bcb0c8d3f0c467a99ef79658) )
+
+	ROM_REGION( 0x40000, "user1", 0 ) /* blitter data */
+	ROM_LOAD( "s88b02.f19", 0x00000, 0x040000, CRC(7044a542) SHA1(8efaa512f62fe9a37d2474c435c549118c019d67) )
+
+	ROM_REGION( 0x0100, "user2", 0 )
+	ROM_LOAD( "s88a19.l5", 0x0000, 0x0100, CRC(c8ead41e) SHA1(d1e733691de9f9b71c9724de73086d36f381fc74) )   // priority (not used)
+ROM_END
+
+
+ROM_START( battlcryp ) // prototype presented at AOU 1989
+	ROM_REGION( 0x02c000, "maincpu", 0 ) /* 6809 Code */
+	ROM_LOAD( "S88_B01.IC31", 0x010000, 0x01c000, CRC(8dae51b5) SHA1(52a4ec602c9c5bb185dd66b4b98dbfaa91189ced) ) // 27C1000
+	ROM_CONTINUE(           0x00c000, 0x004000             )
+
+	ROM_REGION( 0x40000, "audiocpu", 0) /* uPD7807 code, identical to the released game but split in 27C1000 ROMs */
+	ROM_LOAD( "S88_B04_1.IC32", 0x000000, 0x020000, CRC(9995c869) SHA1(9b68d1a15499fed216966ef3a3b68e6381dc01ad) )
+	ROM_LOAD( "S88_B04_2.IC55", 0x020000, 0x020000, CRC(aaa2dabe) SHA1(5928c5d265a5d6e521285a8ba29e70ed1887a5c9) )
+
+	ROM_REGION( 0x200000, "gfx1", 0 ) /* identical to the released game but split in 27C1000 ROMs  */
+	ROM_LOAD16_BYTE( "S88_B13_1.V30",  0x000000, 0x20000, CRC(913e11df) SHA1(766b9cb1a39697db88f25a9ffc58724699ab9283) )
+	ROM_LOAD16_BYTE( "S88_B13_2.V31",  0x000001, 0x20000, CRC(16069926) SHA1(502795838740b7d8641ae3308b7c56f540a9719b) )
+	ROM_LOAD16_BYTE( "S88_B13_3.V32",  0x040000, 0x20000, CRC(95fc246f) SHA1(7b5d24cb7529aa4064f6bafa75172e3ce63d17c1) )
+	ROM_LOAD16_BYTE( "S88_B13_4.V33",  0x040001, 0x20000, CRC(0eeb1374) SHA1(cae2890248b502888836d73d2d2067fae1a4d589) )
+	ROM_LOAD16_BYTE( "S88_B14_1.V34",  0x080000, 0x20000, CRC(61beb857) SHA1(29d390b7f844905ad07e8c6b9fb87b3f7e01cae0) )
+	ROM_LOAD16_BYTE( "S88_B14_2.V35",  0x080001, 0x20000, CRC(4a1fec65) SHA1(7f69cdb7e2140114a40562865bf9bdd3df4d2205) )
+	ROM_LOAD16_BYTE( "S88_B14_3.V36",  0x0c0000, 0x20000, CRC(2c95a5b4) SHA1(2e2e5206b20b1f3c9323e2e4c78ea29e3dabb1b8) )
+	ROM_LOAD16_BYTE( "S88_B14_4.V37",  0x0c0001, 0x20000, CRC(96f713a3) SHA1(97fd143341e267344dd40df71a586bc25540aa95) )
+	ROM_LOAD16_BYTE( "S88_B15_1.V38",  0x100000, 0x20000, CRC(e106bc68) SHA1(1e049bf3c705db33b4629d3f8da3011a2aaaf7dd) )
+	ROM_LOAD16_BYTE( "S88_B15_2.V39",  0x100001, 0x20000, CRC(cb6d7f09) SHA1(334d89ffe74f067820ef34a68ff70a2b2d0480a7) )
+	ROM_LOAD16_BYTE( "S88_B15_3.V3A",  0x140000, 0x20000, CRC(4bc06e17) SHA1(681b994f090799e68922c2de2a0c7d2ccceec5dc) )
+	ROM_LOAD16_BYTE( "S88_B15_4.V3B",  0x140001, 0x20000, CRC(ffeb09c3) SHA1(667893d589634cddb87fd459dceb0fd7bb151730) )
+	ROM_LOAD16_BYTE( "S88_B16_1.V3C",  0x180000, 0x20000, CRC(bf6fc926) SHA1(3c084d5e742cfd093246e05b1c9537af944ff080) )
+	ROM_LOAD16_BYTE( "S88_B16_2.V3D",  0x180001, 0x20000, CRC(5b3afa9c) SHA1(08e65108ba2ae8e9f01104961d9c5462b5607ad5) )
+	ROM_LOAD16_BYTE( "S88_B16_3.V3E",  0x1c0000, 0x20000, CRC(df7a54e8) SHA1(a76a5f80a43b54800eb56fe5c20fb2b582b6d737) )
+	ROM_LOAD16_BYTE( "S88_B16_4.V3F",  0x1c0001, 0x20000, CRC(fdbff33d) SHA1(10f4ebc1f7e42063b5ee10cb2e2f6b904bff4bc8) )
+
+	ROM_REGION( 0x100000, "gfx2", 0 ) /* identical to the released game but split in 27C1000 ROMs  */
+	ROM_LOAD16_BYTE( "S88_B09_1.V20",  0x000000, 0x20000, CRC(bfa2d6d3) SHA1(a10c9433c3215a80a74a8e46bd92595811073237) )
+	ROM_LOAD16_BYTE( "S88_B09_2.V21",  0x000001, 0x20000, CRC(e1430cf9) SHA1(ec9b373b050f34219791f6309166a2d3abc43bc9) )
+	ROM_LOAD16_BYTE( "S88_B09_3.V22",  0x040000, 0x20000, CRC(54cb22c7) SHA1(5c705fc13f7c866ecf3f51bd115c3dc58884a545) )
+	ROM_LOAD16_BYTE( "S88_B09_4.V23",  0x040001, 0x20000, CRC(544f313d) SHA1(cec44c863737e80a2909f0b84d05802048bcb7a3) )
+	ROM_LOAD16_BYTE( "S88_B10_1.V24",  0x080000, 0x20000, CRC(9bc86933) SHA1(56fdc99636262683bd6651b4ab021a5e34524c76) )
+	ROM_LOAD16_BYTE( "S88_B10_2.V25",  0x080001, 0x20000, CRC(43e3ba91) SHA1(ddd69c0513c865ea1322784b275622bc41464c9b) )
+	ROM_LOAD16_BYTE( "S88_B10_3.V26",  0x0c0000, 0x20000, CRC(d3672c33) SHA1(27c81d2c2257c613975e0b8dc41753c85305ddce) )
+	ROM_LOAD16_BYTE( "S88_B10_4.V27",  0x0c0001, 0x20000, CRC(ae73723e) SHA1(49e1ab0a2626149f5986bbecf531685375b3695a) )
+
+	ROM_REGION( 0x080000, "gfx3", 0 ) /* identical to the released game but split in 27C1000 ROMs  */
+	ROM_LOAD16_BYTE( "S88_B08_1.V10",  0x000000, 0x20000, CRC(5132cd98) SHA1(8999aa64ff6f5c483ae71aab4699fe6ee3169382) )
+	ROM_LOAD16_BYTE( "S88_B08_2.V11",  0x000001, 0x20000, CRC(fa661846) SHA1(745a15b801479e451fdb513ec4f334f438ba92c8) )
+	ROM_LOAD16_BYTE( "S88_B08_3.V12",  0x040000, 0x20000, CRC(caabbf44) SHA1(d1957121012797372a93689a34ab8f0c3a5130af) )
+	ROM_LOAD16_BYTE( "S88_B08_4.V13",  0x040001, 0x20000, CRC(257aacde) SHA1(0ac577864eedc2f778224f91235a011110a7006a) )
+
+	ROM_REGION( 0x080000, "gfx4", 0 ) /* identical to the released game but split in 27C1000 ROMs  */
+	ROM_LOAD16_BYTE( "S88_B05_1.V00",  0x000000, 0x20000, CRC(913e11df) SHA1(766b9cb1a39697db88f25a9ffc58724699ab9283) )
+	ROM_LOAD16_BYTE( "S88_B05_2.V01",  0x000001, 0x20000, CRC(16069926) SHA1(502795838740b7d8641ae3308b7c56f540a9719b) )
+	ROM_LOAD16_BYTE( "S88_B05_3.V02",  0x040000, 0x20000, CRC(3bca50bd) SHA1(b9b8c19ea4e6ff09c3032c18d246ed496552741e) )
+	ROM_LOAD16_BYTE( "S88_B05_4.V03",  0x040001, 0x20000, CRC(c526d508) SHA1(fa7ec24a9f6fdaaf1a1b32b4b383e8738ad1c7d1) )
+
+	ROM_REGION( 0x010000, "proms", 0 )  /* static palette */
+	ROM_LOAD16_BYTE( "S88_B18", 0x00000, 0x8000, CRC(fa432edc) SHA1(55c01b6a1175539facdfdd0c3c49d878a59156a4) ) // 27c256
+	ROM_LOAD16_BYTE( "S88_B17", 0x00001, 0x8000, CRC(7c55568e) SHA1(1e599cd00abe7b67bcb0c8d3f0c467a99ef79658) ) // 27c256
+
+	ROM_REGION( 0x40000, "user1", 0 ) /* blitter data, identical to the released game but split in 27C1000 ROMs */
+	ROM_LOAD( "S88_B02_1.IC28", 0x00000, 0x020000, CRC(93d8c8ec) SHA1(bb1fcf4d32db6885d0c78416211c20decc48d266) )
+	ROM_LOAD( "S88_B02_2.IC27", 0x20000, 0x020000, CRC(8918327b) SHA1(445c0252ec8e71423e77c75190f9524a90f918a9) )
+
+	ROM_REGION( 0x0100, "user2", 0 )
+	ROM_LOAD( "S88_A19.IC42", 0x0000, 0x0100, CRC(c8ead41e) SHA1(d1e733691de9f9b71c9724de73086d36f381fc74) )   // 82s129, priority (not used)
+ROM_END
+
 
 ROM_START( mjkojink )
 	ROM_REGION( 0x01c000, "maincpu", 0 ) /* 6809 Code */
@@ -2072,7 +2169,9 @@ GAME( 1988, mjclinica, mjclinic, mrokumei, mjhokite, homedata_state, 0,         
 GAME( 1988, mrokumei,  0,        mrokumei, mjhokite, homedata_state, 0,          ROT0, "Home Data",  "Mahjong Rokumeikan (Japan)",                          MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1988, reikaids,  0,        reikaids, reikaids, homedata_state, reikaids,   ROT0, "Home Data",  "Reikai Doushi (Japan)",                               MACHINE_SUPPORTS_SAVE )
-GAME( 1991, battlcry,  0,        reikaids, battlcry, homedata_state, battlcry,   ROT0, "Home Data",  "Battlecry",                                           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, battlcry,  0,        reikaids, battlcry, homedata_state, battlcry,   ROT0, "Home Data",  "Battlecry (Version E)",                               MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, battlcryc, battlcry, reikaids, battlcry, homedata_state, battlcry,   ROT0, "Home Data",  "Battlecry (Version C)",                               MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, battlcryp, battlcry, reikaids, battlcry, homedata_state, battlcry,   ROT0, "Home Data",  "Battlecry (Prototype)",                               MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1989, mjkojink,  0,        pteacher, pteacher, homedata_state, 0,          ROT0, "Home Data",  "Mahjong Kojinkyouju (Private Teacher) (Japan)",       MACHINE_SUPPORTS_SAVE )
 GAME( 1988, mjjoship,  0,        pteacher, mjjoship, homedata_state, 0,          ROT0, "Home Data",  "Mahjong Joshi Pro-wres -Give up 5 byou mae- (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, vitaminc,  0,        pteacher, pteacher, homedata_state, 0,          ROT0, "Home Data",  "Mahjong Vitamin C (Japan)",                           MACHINE_SUPPORTS_SAVE )

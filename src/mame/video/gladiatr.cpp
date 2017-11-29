@@ -252,6 +252,12 @@ void gladiatr_state_base::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cl
 						color,
 						xflip, yflip,
 						sx+x*16, sy+y*16,0);
+				// wraparound, used by Ping Pong King when scrolling from right to left
+				m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
+						t,
+						color,
+						xflip, yflip,
+						sx+x*16, sy+y*16+256,0);
 			}
 		}
 	}

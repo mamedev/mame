@@ -54,7 +54,16 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "coco_multi.h"
+
 #include "cococart.h"
+#include "coco_dcmodem.h"
+#include "coco_fdc.h"
+#include "coco_gmc.h"
+#include "coco_orch90.h"
+#include "coco_pak.h"
+#include "coco_rs232.h"
+#include "coco_ssc.h"
 
 #define SLOT1_TAG           "slot1"
 #define SLOT2_TAG           "slot2"

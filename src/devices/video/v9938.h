@@ -36,8 +36,7 @@
 		v99x8_device::VTOTAL_NTSC * 2, \
 		v99x8_device::VERTICAL_ADJUST * 2, \
 		v99x8_device::VVISIBLE_NTSC * 2 - 1 - v99x8_device::VERTICAL_ADJUST * 2) \
-	MCFG_SCREEN_UPDATE_DEVICE(_v9938_tag, v9938_device, screen_update) \
-	MCFG_SCREEN_PALETTE(_v9938_tag)
+	MCFG_SCREEN_UPDATE_DEVICE(_v9938_tag, v9938_device, screen_update)
 
 #define MCFG_V99X8_SCREEN_ADD_PAL(_screen_tag, _v9938_tag, _clock) \
 	MCFG_SCREEN_ADD(_screen_tag, RASTER) \
@@ -48,8 +47,7 @@
 		v99x8_device::VTOTAL_PAL * 2, \
 		v99x8_device::VERTICAL_ADJUST * 2, \
 		v99x8_device::VVISIBLE_PAL * 2 - 1 - v99x8_device::VERTICAL_ADJUST * 2) \
-	MCFG_SCREEN_UPDATE_DEVICE(_v9938_tag, v9938_device, screen_update) \
-	MCFG_SCREEN_PALETTE(_v9938_tag)
+	MCFG_SCREEN_UPDATE_DEVICE(_v9938_tag, v9938_device, screen_update)
 
 #define MCFG_V99X8_INTERRUPT_CALLBACK(_irq) \
 	devcb = &downcast<v99x8_device *>(device)->set_interrupt_callback(DEVCB_##_irq);
@@ -78,11 +76,10 @@ class v99x8_device :    public device_t,
 {
 public:
 	template <class Object> devcb_base &set_interrupt_callback(Object &&irq) { return m_int_callback.set_callback(std::forward<Object>(irq)); }
-	int get_transpen();
-	bitmap_ind16 &get_bitmap() { return m_bitmap; }
+	bitmap_rgb32 &get_bitmap() { return m_bitmap; }
 	void update_mouse_state(int mx_delta, int my_delta, int button_state);
 
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -132,12 +129,18 @@ protected:
 	virtual space_config_vector memory_space_config() const override;
 
 	virtual void palette_init() = 0;
+	virtual u32 palette_entries() const override { return 16 + 256; }
 
 	void configure_pal_ntsc();
 	void set_screen_parameters();
 
 private:
 	// internal helpers
+	pen_t pen16(int index) const { return uint32_t(pen_color(index)); }
+	pen_t pen256(int index) const { return uint32_t(pen_color(index + 16)); }
+	void set_pen16(int index, pen_t pen) { set_pen_color(index, rgb_t(pen).set_a(index != 0 ? 0xff : 0x00)); }
+	void set_pen256(int index, pen_t pen) { set_pen_color(index + 16, rgb_t(pen).set_a(index != 0 ? 0xff : 0x00)); }
+
 	inline int position_offset(uint8_t value) { value &= 0x0f; return (value < 8) ? -value : 16 - value; }
 	void reset_palette();
 	void vram_write(int offset, int data);
@@ -145,29 +148,29 @@ private:
 	void check_int();
 	void register_write(int reg, int data);
 
-	void default_border(uint16_t *ln);
-	void graphic7_border(uint16_t *ln);
-	void graphic5_border(uint16_t *ln);
-	void mode_text1(uint16_t *ln, int line);
-	void mode_text2(uint16_t *ln, int line);
-	void mode_multi(uint16_t *ln, int line);
-	void mode_graphic1(uint16_t *ln, int line);
-	void mode_graphic23(uint16_t *ln, int line);
-	void mode_graphic4(uint16_t *ln, int line);
-	void mode_graphic5(uint16_t *ln, int line);
-	void mode_graphic6(uint16_t *ln, int line);
-	void mode_graphic7(uint16_t *ln, int line);
+	void default_border(uint32_t *ln);
+	void graphic7_border(uint32_t *ln);
+	void graphic5_border(uint32_t *ln);
+	void mode_text1(uint32_t *ln, int line);
+	void mode_text2(uint32_t *ln, int line);
+	void mode_multi(uint32_t *ln, int line);
+	void mode_graphic1(uint32_t *ln, int line);
+	void mode_graphic23(uint32_t *ln, int line);
+	void mode_graphic4(uint32_t *ln, int line);
+	void mode_graphic5(uint32_t *ln, int line);
+	void mode_graphic6(uint32_t *ln, int line);
+	void mode_graphic7(uint32_t *ln, int line);
 //  template<typename _PixelType, int _Width> void mode_yae(_PixelType *ln, int line);
 //  template<typename _PixelType, int _Width> void mode_yjk(_PixelType *ln, int line);
-	void mode_unknown(uint16_t *ln, int line);
-	void default_draw_sprite(uint16_t *ln, uint8_t *col);
-	void graphic5_draw_sprite(uint16_t *ln, uint8_t *col);
-	void graphic7_draw_sprite(uint16_t *ln, uint8_t *col);
+	void mode_unknown(uint32_t *ln, int line);
+	void default_draw_sprite(uint32_t *ln, uint8_t *col);
+	void graphic5_draw_sprite(uint32_t *ln, uint8_t *col);
+	void graphic7_draw_sprite(uint32_t *ln, uint8_t *col);
 
 	void sprite_mode1(int line, uint8_t *col);
 	void sprite_mode2(int line, uint8_t *col);
 	void set_mode();
-	void refresh_16(int line);
+	void refresh_32(int line);
 	void refresh_line(int line);
 
 	void interrupt_start_vblank();
@@ -233,11 +236,8 @@ private:
 	uint8_t m_mx_delta, m_my_delta;
 	// mouse & lightpen
 	uint8_t m_button_state;
-	// palette
-	uint16_t m_pal_ind16[16];
-	uint16_t m_pal_ind256[256];
 	// render bitmap
-	bitmap_ind16 m_bitmap;
+	bitmap_rgb32 m_bitmap;
 	// Command unit
 	struct {
 		int SX,SY;
@@ -257,10 +257,10 @@ private:
 	struct v99x8_mode
 	{
 		uint8_t m;
-		void (v99x8_device::*visible_16)(uint16_t*, int);
-		void (v99x8_device::*border_16)(uint16_t*);
+		void (v99x8_device::*visible_32)(uint32_t*, int);
+		void (v99x8_device::*border_32)(uint32_t*);
 		void (v99x8_device::*sprites)(int, uint8_t*);
-		void (v99x8_device::*draw_sprite_16)(uint16_t*, uint8_t*);
+		void (v99x8_device::*draw_sprite_32)(uint32_t*, uint8_t*);
 	} ;
 	static const v99x8_mode s_modes[];
 	emu_timer *m_line_timer;
@@ -270,7 +270,7 @@ private:
 	int m_scanline_max;
 	int m_height;
 protected:
-	static uint16_t s_pal_indYJK[0x20000];
+	static uint32_t s_pal_indYJK[0x20000];
 };
 
 
@@ -281,7 +281,6 @@ public:
 
 protected:
 	virtual void palette_init() override;
-	virtual u32 palette_entries() const override { return 512; }
 };
 
 class v9958_device : public v99x8_device
@@ -291,7 +290,6 @@ public:
 
 protected:
 	virtual void palette_init() override;
-	virtual u32 palette_entries() const override { return 19780; }
 };
 
 

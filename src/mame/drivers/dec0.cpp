@@ -48,7 +48,7 @@ ToDo:
 - graphics are completely broken in Secret Agent (bootleg);
 - Fighting Fantasy (bootleg) doesn't move on when killing the Lamia, is the MCU involved?
 - Hook up the 68705 in Midnight Resistance (bootleg) (it might not be used, leftover from the Fighting Fantasy bootleg on the same PCB?)
-- Get rid of ROM patches in Sly Spy and Hippodrome;
+- Get rid of ROM patch in Hippodrome;
 - background pen in Birdie Try is presumably wrong.
 - Pixel clock frequency isn't verified;
 - Finally, get a proper decap of the MCUs used by Dragonninja and Birdie Try;
@@ -500,14 +500,20 @@ READ16_MEMBER(dec0_state::slyspy_controls_r)
 	return ~0;
 }
 
+// TODO: this can be a timer access, maybe video counter returns (and used as RNG in both games)
 READ16_MEMBER(dec0_state::slyspy_protection_r)
 {
-	/* These values are for Boulderdash, I have no idea what they do in Slyspy */
-	switch (offset<<1) {
+	switch (offset<<1)
+	{
+		/* These values are for Boulderdash, I have no idea what they do in Slyspy */
 		case 0:     return 0;
 		case 2:     return 0x13;
 		case 4:     return 0;
 		case 6:     return 0x2;
+		// sly spy uses this port as RNG, for now let's do same thing as bootleg (i.e. reads 0x306028)
+		// chances are that it actually ties to the main CPU xtal instead.
+		// (reads at 6958 6696)
+		case 0xc:   return m_ram[0x2028/2] >> 8;
 	}
 
 	logerror("%04x, Unknown protection read at 30c000 %d\n", space.device().safe_pc(), offset);
@@ -564,7 +570,7 @@ READ16_MEMBER(dec0_state::slyspy_state_r)
 
 
 static ADDRESS_MAP_START( slyspy_protection_map, AS_PROGRAM, 16, dec0_state )
-	AM_RANGE(0x04000, 0x04001) AM_MIRROR(0x30000) AM_READ(slyspy_state_r)
+	AM_RANGE(0x04000, 0x04001) AM_MIRROR(0x30000) AM_READ(slyspy_state_r) AM_WRITENOP
 	AM_RANGE(0x0a000, 0x0a001) AM_MIRROR(0x30000) AM_WRITE(slyspy_state_w)
 	// Default state (called by Traps 1, 3, 4, 7, C)
 	AM_RANGE(0x00000, 0x00007) AM_DEVWRITE("tilegen2", deco_bac06_device, pf_control_0_w)
@@ -669,14 +675,58 @@ ADDRESS_MAP_END
 /* Physical memory map (21 bits) */
 static ADDRESS_MAP_START( slyspy_s_map, AS_PROGRAM, 8, dec0_state )
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
-	AM_RANGE(0x090000, 0x090001) AM_DEVWRITE("ym2", ym3812_device, write)
-	AM_RANGE(0x0a0000, 0x0a0001) AM_READNOP /* Protection counter */
-	AM_RANGE(0x0b0000, 0x0b0001) AM_DEVWRITE("ym1", ym2203_device, write)
-	AM_RANGE(0x0e0000, 0x0e0001) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0x0f0000, 0x0f0001) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
+	AM_RANGE(0x080000, 0x0fffff) AM_DEVICE("sndprotect", address_map_bank_device, amap8 )
 	AM_RANGE(0x1f0000, 0x1f1fff) AM_RAMBANK("bank8")
 	AM_RANGE(0x1ff400, 0x1ff403) AM_DEVWRITE("audiocpu", h6280_device, irq_status_w)
 ADDRESS_MAP_END
+
+// sly spy sound state protection machine emulation
+// similar to the video state machine
+// current bank is at 0x1f0045, incremented by 1 then here is read
+READ8_MEMBER(dec0_state::slyspy_sound_state_r)
+{
+	m_slyspy_sound_state ++;
+	m_slyspy_sound_state &= 3;
+	m_sndprotect->set_bank(m_slyspy_sound_state);
+
+	// returned value doesn't matter
+	return 0xff;
+}
+
+READ8_MEMBER(dec0_state::slyspy_sound_state_reset_r)
+{
+	m_slyspy_sound_state = 0;
+	m_sndprotect->set_bank(m_slyspy_sound_state);
+
+	// returned value doesn't matter
+	return 0xff;
+}
+
+static ADDRESS_MAP_START( slyspy_sound_protection_map, AS_PROGRAM, 8, dec0_state )
+	AM_RANGE(0x020000, 0x020001) AM_MIRROR(0x180000) AM_READ(slyspy_sound_state_r) /* Protection counter */
+	AM_RANGE(0x050000, 0x050001) AM_MIRROR(0x180000) AM_READ(slyspy_sound_state_reset_r)
+	// state 0
+	AM_RANGE(0x010000, 0x010001) AM_DEVWRITE("ym2", ym3812_device, write)
+	AM_RANGE(0x030000, 0x030001) AM_DEVWRITE("ym1", ym2203_device, write)
+	AM_RANGE(0x060000, 0x060001) AM_DEVREADWRITE("oki", okim6295_device, read, write)
+	AM_RANGE(0x070000, 0x070001) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
+	// state 1
+	AM_RANGE(0x090000, 0x090001) AM_DEVREADWRITE("oki", okim6295_device, read, write)
+	AM_RANGE(0x0c0000, 0x0c0001) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
+	AM_RANGE(0x0e0000, 0x0e0001) AM_DEVWRITE("ym1", ym2203_device, write)
+	AM_RANGE(0x0f0000, 0x0f0001) AM_DEVWRITE("ym2", ym3812_device, write)
+	// state 2
+	AM_RANGE(0x110000, 0x110001) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
+	AM_RANGE(0x130000, 0x130001) AM_DEVREADWRITE("oki", okim6295_device, read, write)
+	AM_RANGE(0x140000, 0x140001) AM_DEVWRITE("ym1", ym2203_device, write)
+	AM_RANGE(0x170000, 0x170001) AM_DEVWRITE("ym2", ym3812_device, write)
+	// state 3
+	AM_RANGE(0x190000, 0x190001) AM_DEVWRITE("ym2", ym3812_device, write)
+	AM_RANGE(0x1c0000, 0x1c0001) AM_DEVWRITE("ym1", ym2203_device, write)
+	AM_RANGE(0x1e0000, 0x1e0001) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
+	AM_RANGE(0x1f0000, 0x1f0001) AM_DEVREADWRITE("oki", okim6295_device, read, write)
+ADDRESS_MAP_END
+
 
 static ADDRESS_MAP_START( midres_s_map, AS_PROGRAM, 8, dec0_state )
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
@@ -1543,15 +1593,10 @@ GFXDECODE_END
 
 
 
-/* This is guesswork, in order to get ~57,41 Hz.
- * If real Pixel Clock isn't 5 MHz then htotal/vtotal is different too ... */
-#define DEC0_PIXEL_CLOCK XTAL_20MHz/4
-#define DEC0_HTOTAL 320
-#define DEC0_HBEND 0
-#define DEC0_HBSTART 256
-#define DEC0_VTOTAL 272
-#define DEC0_VBEND 8
-#define DEC0_VBSTART 256-8
+// DECO video CRTC, pixel clock is unverified (actually 24MHz/4?)
+#define MCFG_SCREEN_RAW_PARAMS_DATA_EAST \
+		MCFG_SCREEN_RAW_PARAMS(XTAL_12MHz/2,384,0,256,272,8,248)
+
 
 
 static MACHINE_CONFIG_START( dec0_base )
@@ -1560,7 +1605,7 @@ static MACHINE_CONFIG_START( dec0_base )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	//MCFG_SCREEN_REFRESH_RATE(57.41)
 	//MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529) /* 57.41 Hz, 529us Vblank */)
-	MCFG_SCREEN_RAW_PARAMS(DEC0_PIXEL_CLOCK,DEC0_HTOTAL,DEC0_HBEND,DEC0_HBSTART,DEC0_VTOTAL,DEC0_VBEND,DEC0_VBSTART)
+	MCFG_SCREEN_RAW_PARAMS_DATA_EAST
 	//MCFG_SCREEN_SIZE(32*8, 32*8)
 	//MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	//MCFG_SCREEN_UPDATE_DRIVER differs per game
@@ -1693,7 +1738,7 @@ static MACHINE_CONFIG_START( automat )
 	MCFG_SCREEN_ADD("screen", RASTER)
 //  MCFG_SCREEN_REFRESH_RATE(57.41)
 //  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529) /* 57.41 Hz, 529us Vblank */)
-	MCFG_SCREEN_RAW_PARAMS(DEC0_PIXEL_CLOCK,DEC0_HTOTAL,DEC0_HBEND,DEC0_HBSTART,DEC0_VTOTAL,DEC0_VBEND,DEC0_VBSTART)
+	MCFG_SCREEN_RAW_PARAMS_DATA_EAST
 	MCFG_SCREEN_UPDATE_DRIVER(dec0_automat_state, screen_update_automat)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -1768,7 +1813,7 @@ static MACHINE_CONFIG_START( secretab )
 	MCFG_SCREEN_ADD("screen", RASTER)
 //  MCFG_SCREEN_REFRESH_RATE(57.41)
 //  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529) /* 57.41 Hz, 529us Vblank */)
-	MCFG_SCREEN_RAW_PARAMS(DEC0_PIXEL_CLOCK,DEC0_HTOTAL,DEC0_HBEND,DEC0_HBSTART,DEC0_VTOTAL,DEC0_VBEND,DEC0_VBSTART)
+	MCFG_SCREEN_RAW_PARAMS_DATA_EAST
 	MCFG_SCREEN_UPDATE_DRIVER(dec0_automat_state, screen_update_secretab)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -1906,6 +1951,8 @@ MACHINE_RESET_MEMBER(dec0_state,slyspy)
 	// set initial memory map
 	m_slyspy_state = 0;
 	m_pfprotect->set_bank(m_slyspy_state);
+	m_slyspy_sound_state = 0;
+	m_sndprotect->set_bank(m_slyspy_sound_state);
 }
 
 static MACHINE_CONFIG_DERIVED( slyspy, dec1 )
@@ -1915,7 +1962,8 @@ static MACHINE_CONFIG_DERIVED( slyspy, dec1 )
 	MCFG_CPU_PROGRAM_MAP(slyspy_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", dec0_state,  irq6_line_hold) /* VBL, apparently it auto-acks */
 
-	MCFG_CPU_ADD("audiocpu", H6280, XTAL_12MHz/2/3) /* verified on pcb (6Mhz is XIN on pin 10 of H6280, verified on pcb */
+	// TODO: both games doesn't like /3 here, MT #06740
+	MCFG_CPU_ADD("audiocpu", H6280, XTAL_12MHz/2/2) /* verified on pcb (6Mhz is XIN on pin 10 of H6280) */
 	MCFG_CPU_PROGRAM_MAP(slyspy_s_map)
 
 	MCFG_DEVICE_ADD("pfprotect", ADDRESS_MAP_BANK, 0)
@@ -1924,6 +1972,14 @@ static MACHINE_CONFIG_DERIVED( slyspy, dec1 )
 	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(16)
 	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(18)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x10000)
+
+	MCFG_DEVICE_ADD("sndprotect", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(slyspy_sound_protection_map)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
+	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(21)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x80000)
+
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")

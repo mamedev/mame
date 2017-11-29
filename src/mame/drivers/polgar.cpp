@@ -12,6 +12,7 @@
 #include "cpu/arm/arm.h"
 #include "machine/nvram.h"
 #include "machine/mmboard.h"
+#include "machine/ram.h"
 #include "machine/timer.h"
 #include "video/hd44780.h"
 #include "screen.h"
@@ -45,6 +46,7 @@ public:
 		: mephisto_polgar_state(mconfig, type, tag)
 		, m_subcpu(*this, "subcpu")
 		, m_rombank(*this, "rombank")
+		, m_ram(*this, "ram")
 	{ }
 
 	DECLARE_WRITE8_MEMBER(bank_w);
@@ -52,26 +54,22 @@ public:
 	DECLARE_WRITE8_MEMBER(latch0_w);
 	DECLARE_WRITE8_MEMBER(latch1_w);
 	DECLARE_READ8_MEMBER(latch1_r);
+	DECLARE_READ32_MEMBER(disable_boot_rom_r);
 
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+	void remove_boot_rom();
+	TIMER_CALLBACK_MEMBER(disable_boot_rom);
 
 private:
 	required_device<arm_cpu_device> m_subcpu;
 	required_memory_bank m_rombank;
+	required_device<ram_device> m_ram;
 	uint8_t m_bank;
 	uint8_t m_com_latch0;
 	uint8_t m_com_latch1;
-
-	// ARM bootstrap HLE
-	void arm_bootstrap(uint8_t data);
-	TIMER_CALLBACK_MEMBER(clean_com_flag)   { m_com_latch0 &= ~0x01; }
-
-	emu_timer* m_arm_bootstrap_timer;
-	uint16_t m_com_offset;
-	uint8_t m_com_bits;
-	uint8_t m_com_data;
+	emu_timer* m_disable_boot_rom_timer;
 };
 
 class mephisto_milano_state : public mephisto_polgar_state
@@ -183,41 +181,8 @@ WRITE8_MEMBER(mephisto_risc_state::bank_w)
 	m_rombank->set_entry(m_bank);
 }
 
-void mephisto_risc_state::arm_bootstrap(uint8_t data)
-{
-	if (data & 0x02)
-	{
-		m_subcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-		m_com_offset = 0;
-	}
-
-	if (m_com_offset < 0x100 && ((m_com_latch1 ^ data) & 0x80))
-	{
-		m_com_data |= (data & 1) << (7-m_com_bits);
-		m_com_bits++;
-
-		if (m_com_bits == 8)
-		{
-			m_subcpu->space(AS_PROGRAM).write_byte(m_com_offset, m_com_data);
-			m_com_bits = 0;
-			m_com_data = 0;
-			m_com_offset++;
-
-			if (m_com_offset == 0x100)
-				m_subcpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
-		}
-
-		if (m_com_offset < 0x100)
-		{
-			m_com_latch0 |= 0x01;
-			m_arm_bootstrap_timer->adjust(attotime::from_usec(15));
-		}
-	}
-}
-
 WRITE8_MEMBER(mephisto_risc_state::latch1_w)
 {
-	arm_bootstrap(data);
 	m_com_latch1 = data;
 	m_subcpu->set_input_line(ARM_FIRQ_LINE, ASSERT_LINE);
 }
@@ -239,6 +204,23 @@ READ8_MEMBER(mephisto_risc_state::latch0_r)
 	return m_com_latch0;
 }
 
+READ32_MEMBER(mephisto_risc_state::disable_boot_rom_r)
+{
+	m_disable_boot_rom_timer->adjust(m_subcpu->cycles_to_attotime(10));
+	return space.unmap();
+}
+
+void mephisto_risc_state::remove_boot_rom()
+{
+	m_subcpu->space(AS_PROGRAM).install_ram(0x00000000, m_ram->size() - 1, m_ram->pointer());
+}
+
+
+TIMER_CALLBACK_MEMBER(mephisto_risc_state::disable_boot_rom)
+{
+	remove_boot_rom();
+}
+
 static ADDRESS_MAP_START(mrisc_mem, AS_PROGRAM, 8, mephisto_risc_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x1fff ) AM_RAM AM_SHARE("nvram")
@@ -252,6 +234,7 @@ static ADDRESS_MAP_START(mrisc_mem, AS_PROGRAM, 8, mephisto_risc_state)
 	AM_RANGE( 0x3406, 0x3407 ) AM_WRITE(bank_w)
 	AM_RANGE( 0x3800, 0x3800 ) AM_WRITE(latch1_w)
 	AM_RANGE( 0x3c00, 0x3c00 ) AM_READ(latch0_r)
+	AM_RANGE( 0x4000, 0x7fff ) AM_ROM
 	AM_RANGE( 0x8000, 0xffff ) AM_ROMBANK("rombank")
 ADDRESS_MAP_END
 
@@ -259,6 +242,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(mrisc_arm_mem, AS_PROGRAM, 32, mephisto_risc_state)
 	AM_RANGE( 0x00000000, 0x000fffff )  AM_RAM
 	AM_RANGE( 0x00400000, 0x007fffff )  AM_READWRITE8(latch1_r, latch0_w, 0x000000ff)
+	AM_RANGE( 0x01800000, 0x01800003 )  AM_READ(disable_boot_rom_r)
 ADDRESS_MAP_END
 
 
@@ -424,15 +408,14 @@ INPUT_PORTS_END
 
 void mephisto_risc_state::machine_start()
 {
-	m_arm_bootstrap_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mephisto_risc_state::clean_com_flag), this));
+	m_disable_boot_rom_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mephisto_risc_state::disable_boot_rom), this));
 	m_rombank->configure_entries(0, 4, memregion("maincpu")->base(), 0x8000);
 
 	save_item(NAME(m_bank));
 	save_item(NAME(m_com_latch0));
 	save_item(NAME(m_com_latch1));
-	save_item(NAME(m_com_offset));
-	save_item(NAME(m_com_bits));
-	save_item(NAME(m_com_data));
+
+	machine().save().register_postload(save_prepost_delegate(FUNC(mephisto_risc_state::remove_boot_rom), this));
 }
 
 void mephisto_risc_state::machine_reset()
@@ -441,12 +424,10 @@ void mephisto_risc_state::machine_reset()
 	m_com_latch0 = 0;
 	m_com_latch1 = 0;
 	m_rombank->set_entry(m_bank);
+	m_subcpu->space(AS_PROGRAM).install_ram(0x00, m_ram->size() - 1, m_ram->pointer());
 
-	// ARM bootstrap HLE
-	m_com_offset = 0;
-	m_com_bits = 0;
-	m_com_data = 0;
-	m_subcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	// ARM bootstrap code
+	m_subcpu->space(AS_PROGRAM).install_rom(0x00000000, 0x0000007f, memregion("arm_bootstrap")->base());
 }
 
 void mephisto_milano_state::machine_start()
@@ -506,6 +487,9 @@ static MACHINE_CONFIG_START( mrisc )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
+	MCFG_RAM_ADD("ram")
+	MCFG_RAM_DEFAULT_SIZE("1M")
+
 	MCFG_MEPHISTO_SENSORS_BOARD_ADD("board")
 	MCFG_MEPHISTO_DISPLAY_MODUL_ADD("display")
 	MCFG_DEFAULT_LAYOUT(layout_mephisto_lcd)
@@ -564,22 +548,22 @@ ROM_START(mrisc)
 	ROM_REGION(0x20000, "maincpu", 0)
 	ROM_LOAD("Meph-RiscI-V1-2.bin", 0x00000, 0x20000, CRC(19c6ab83) SHA1(0baab84e5aa6999c24250938d207145144945fd5))
 
-	ROM_REGION(0x80, "arm_bootstrap", 0)
-	ROM_LOAD32_BYTE( "74s288.1", 0x00, 0x20, NO_DUMP )
-	ROM_LOAD32_BYTE( "74s288.2", 0x01, 0x20, NO_DUMP )
-	ROM_LOAD32_BYTE( "74s288.3", 0x02, 0x20, NO_DUMP )
-	ROM_LOAD32_BYTE( "74s288.4", 0x03, 0x20, NO_DUMP )
+	ROM_REGION32_LE(0x80, "arm_bootstrap", 0)
+	ROM_LOAD32_BYTE( "74s288.1", 0x00, 0x20, CRC(284114e2) SHA1(df4037536d505d7240bb1d70dc58f59a34ab77b4) )
+	ROM_LOAD32_BYTE( "74s288.2", 0x01, 0x20, CRC(9f239c75) SHA1(aafaf30dac90f36b01f9ee89903649fc4ea0480d) )
+	ROM_LOAD32_BYTE( "74s288.3", 0x02, 0x20, CRC(0455360b) SHA1(f1486142330f2c39a4d6c479646030d31443d1c8) )
+	ROM_LOAD32_BYTE( "74s288.4", 0x03, 0x20, CRC(c7c9aba8) SHA1(cbb5b12b5917e36679d45bcbc36ea9285223a75d) )
 ROM_END
 
 ROM_START(mrisc2)
 	ROM_REGION(0x20000, "maincpu", 0)
 	ROM_LOAD("Meph-RiscII-V2.bin", 0x00000, 0x20000, CRC(9ecf9cd3) SHA1(7bfc628183037a172242c9589f15aca218d8fb12))
 
-	ROM_REGION(0x80, "arm_bootstrap", 0)
-	ROM_LOAD32_BYTE( "74s288.1", 0x00, 0x20, NO_DUMP )
-	ROM_LOAD32_BYTE( "74s288.2", 0x01, 0x20, NO_DUMP )
-	ROM_LOAD32_BYTE( "74s288.3", 0x02, 0x20, NO_DUMP )
-	ROM_LOAD32_BYTE( "74s288.4", 0x03, 0x20, NO_DUMP )
+	ROM_REGION32_LE(0x80, "arm_bootstrap", 0)
+	ROM_LOAD32_BYTE( "74s288.1", 0x00, 0x20, CRC(284114e2) SHA1(df4037536d505d7240bb1d70dc58f59a34ab77b4) )
+	ROM_LOAD32_BYTE( "74s288.2", 0x01, 0x20, CRC(9f239c75) SHA1(aafaf30dac90f36b01f9ee89903649fc4ea0480d) )
+	ROM_LOAD32_BYTE( "74s288.3", 0x02, 0x20, CRC(0455360b) SHA1(f1486142330f2c39a4d6c479646030d31443d1c8) )
+	ROM_LOAD32_BYTE( "74s288.4", 0x03, 0x20, CRC(c7c9aba8) SHA1(cbb5b12b5917e36679d45bcbc36ea9285223a75d) )
 ROM_END
 
 ROM_START(academy)
@@ -624,8 +608,8 @@ ROM_END
 /*    YEAR  NAME      PARENT   COMPAT  MACHINE    INPUT     CLASS                   INIT COMPANY             FULLNAME                     FLAGS */
 CONS( 1989, polgar,   0,       0,      polgar,    polgar,   mephisto_polgar_state,  0,   "Hegener & Glaser", "Mephisto Polgar",           MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1990, polgar10, polgar,  0,      polgar10,  polgar,   mephisto_polgar_state,  0,   "Hegener & Glaser", "Mephisto Polgar 10MHz",     MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1992, mrisc,    0,       0,      mrisc,     polgar,   mephisto_risc_state,    0,   "Hegener & Glaser", "Mephisto RISC 1MB",         MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1994, mrisc2,   mrisc,   0,      mrisc,     polgar,   mephisto_risc_state,    0,   "Hegener & Glaser", "Mephisto RISC II",          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1992, mrisc,    0,       0,      mrisc,     polgar,   mephisto_risc_state,    0,   "Hegener & Glaser", "Mephisto RISC 1MB",         MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1994, mrisc2,   mrisc,   0,      mrisc,     polgar,   mephisto_risc_state,    0,   "Hegener & Glaser", "Mephisto RISC II",          MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
 // not modular boards
 CONS( 1989, academy,  0,       0,      academy,   polgar,   mephisto_academy_state, 0,   "Hegener & Glaser", "Mephisto Academy",          MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

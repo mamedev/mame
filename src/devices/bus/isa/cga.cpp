@@ -190,22 +190,22 @@ MC6845_UPDATE_ROW( isa8_cga_device::crtc_update_row )
 	switch (m_update_row_type)
 	{
 		case CGA_TEXT_INTEN:
-			cga_text_inten_update_row(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp);
+			cga_text<false, false, false, false, 8>(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp);
 			break;
 		case CGA_TEXT_INTEN_ALT:
-			cga_text_inten_alt_update_row(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp);
+			cga_text<false, false, false, true, 8>(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp);
 			break;
 		case CGA_TEXT_INTEN_CG:
-			cga_text_inten_comp_grey_update_row(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp);
+			cga_text<false, false, true, false, 8>(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp);
 			break;
 		case CGA_TEXT_BLINK:
-			cga_text_blink_update_row(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp);
+			cga_text<true, false, false, false, 8>(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp);
 			break;
 		case CGA_TEXT_BLINK_ALT:
-			cga_text_blink_alt_update_row(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp);
+			cga_text<true, false, false, true, 8>(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp);
 			break;
 		case CGA_TEXT_BLINK_SI:
-			cga_text_blink_update_row_si(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp);
+			cga_text<true, true, false, false, 8>(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp);
 			break;
 		case CGA_GFX_1BPP:
 			cga_gfx_1bpp_update_row(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp);
@@ -467,200 +467,41 @@ isa8_cga_superimpose_device::isa8_cga_superimpose_device(const machine_config &m
 	m_superimpose = true;
 }
 
-/***************************************************************************
-  Draw text mode with 40x25 characters (default) with high intensity bg.
-  The character cell size is 16x8
-***************************************************************************/
-
-MC6845_UPDATE_ROW( isa8_cga_device::cga_text_inten_update_row )
+template<bool blink, bool si, bool comp, bool alt, int width>
+MC6845_UPDATE_ROW( isa8_cga_device::cga_text )
 {
 	uint8_t *videoram = &m_vram[m_start_offset];
 	uint32_t  *p = &bitmap.pix32(y);
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	int i;
 
-	if ( y == 0 ) CGA_LOG(1,"cga_text_inten_update_row",("\n"));
+	if ( y == 0 ) CGA_LOG(1,"cga_text_8",("\n"));
 	for ( i = 0; i < x_count; i++ )
 	{
 		uint16_t offset = ( ( ma + i ) << 1 ) & 0x3fff;
 		uint8_t chr = videoram[ offset ];
 		uint8_t attr = videoram[ offset +1 ];
-		uint8_t data = m_chr_gen[ chr * 8 + ra ];
-		uint16_t fg = attr & 0x0F;
-		uint16_t bg = attr >> 4;
-
-		if ( i == cursor_x && ( m_framecnt & 0x08 ) )
-		{
-			data = 0xFF;
-		}
-
-		*p = palette[( data & 0x80 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x40 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x20 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x10 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x08 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x04 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x02 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x01 ) ? fg : bg]; p++;
-	}
-}
-
-
-/***************************************************************************
-  Draw text mode with 40x25 characters (default) with high intensity bg.
-  The character cell size is 16x8. Composite monitor, greyscale.
-***************************************************************************/
-
-MC6845_UPDATE_ROW( isa8_cga_device::cga_text_inten_comp_grey_update_row )
-{
-	uint8_t *videoram = &m_vram[m_start_offset];
-	uint32_t  *p = &bitmap.pix32(y);
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	int i;
-
-	if ( y == 0 ) CGA_LOG(1,"cga_text_inten_comp_grey_update_row",("\n"));
-	for ( i = 0; i < x_count; i++ )
-	{
-		uint16_t offset = ( ( ma + i ) << 1 ) & 0x3fff;
-		uint8_t chr = videoram[ offset ];
-		uint8_t attr = videoram[ offset +1 ];
-		uint8_t data = m_chr_gen[ chr * 8 + ra ];
-		uint16_t fg = 0x10 + ( attr & 0x0F );
-		uint16_t bg = 0x10 + ( ( attr >> 4 ) & 0x07 );
-
-		if ( i == cursor_x && ( m_framecnt & 0x08 ) )
-		{
-			data = 0xFF;
-		}
-
-		*p = palette[( data & 0x80 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x40 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x20 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x10 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x08 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x04 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x02 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x01 ) ? fg : bg]; p++;
-	}
-}
-
-/***************************************************************************
-  Draw text mode with 40x25 characters (default) with high intensity bg.
-  The character cell size is 16x8
-***************************************************************************/
-
-MC6845_UPDATE_ROW( isa8_cga_device::cga_text_inten_alt_update_row )
-{
-	uint8_t *videoram = &m_vram[m_start_offset];
-	uint32_t  *p = &bitmap.pix32(y);
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	int i;
-
-	if ( y == 0 ) CGA_LOG(1,"cga_text_inten_alt_update_row",("\n"));
-	for ( i = 0; i < x_count; i++ )
-	{
-		uint16_t offset = ( ( ma + i ) << 1 ) & 0x3fff;
-		uint8_t chr = videoram[ offset ];
-		uint8_t attr = videoram[ offset +1 ];
-		uint8_t data = m_chr_gen[ chr * 8 + ra ];
-		uint16_t fg = attr & 0x0F;
-
-		if ( i == cursor_x && ( m_framecnt & 0x08 ) )
-		{
-			data = 0xFF;
-		}
-
-		*p = palette[( data & 0x80 ) ? fg : 0]; p++;
-		*p = palette[( data & 0x40 ) ? fg : 0]; p++;
-		*p = palette[( data & 0x20 ) ? fg : 0]; p++;
-		*p = palette[( data & 0x10 ) ? fg : 0]; p++;
-		*p = palette[( data & 0x08 ) ? fg : 0]; p++;
-		*p = palette[( data & 0x04 ) ? fg : 0]; p++;
-		*p = palette[( data & 0x02 ) ? fg : 0]; p++;
-		*p = palette[( data & 0x01 ) ? fg : 0]; p++;
-	}
-}
-
-
-/***************************************************************************
-  Draw text mode with 40x25 characters (default) and blinking colors.
-  The character cell size is 16x8
-***************************************************************************/
-
-MC6845_UPDATE_ROW( isa8_cga_device::cga_text_blink_update_row )
-{
-	uint8_t *videoram = &m_vram[m_start_offset];
-	uint32_t  *p = &bitmap.pix32(y);
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	int i;
-
-	if ( y == 0 ) CGA_LOG(1,"cga_text_blink_update_row",("\n"));
-	for ( i = 0; i < x_count; i++ )
-	{
-		uint16_t offset = ( ( ma + i ) << 1 ) & 0x3fff;
-		uint8_t chr = videoram[ offset ];
-		uint8_t attr = videoram[ offset +1 ];
-		uint8_t data = m_chr_gen[ chr * 8 + ra ];
-		uint16_t fg = attr & 0x0F;
-		uint16_t bg = (attr >> 4) & 0x07;
-
-		if ( i == cursor_x )
-		{
-			if ( m_framecnt & 0x08 )
-			{
-				data = 0xFF;
-			}
-		}
-		else
-		{
-			if ( ( attr & 0x80 ) && ( m_framecnt & 0x10 ) )
-			{
-				data = 0x00;
-			}
-		}
-
-		*p = palette[( data & 0x80 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x40 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x20 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x10 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x08 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x04 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x02 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x01 ) ? fg : bg]; p++;
-	}
-}
-
-MC6845_UPDATE_ROW( isa8_cga_device::cga_text_blink_update_row_si )
-{
-	uint8_t *videoram = &m_vram[m_start_offset];
-	uint32_t  *p = &bitmap.pix32(y);
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	int i;
-
-	if ( y == 0 ) CGA_LOG(1,"cga_text_blink_update_row_si",("\n"));
-	for ( i = 0; i < x_count; i++ )
-	{
-		uint16_t offset = ( ( ma + i ) << 1 ) & 0x3fff;
-		uint8_t chr = videoram[ offset ];
-		uint8_t attr = videoram[ offset +1 ];
-		uint8_t data = m_chr_gen[ chr * 8 + ra ];
-		uint16_t fg = attr & 0x0F;
-		uint16_t bg = (attr >> 4) & 0x07;
+		uint8_t data = m_chr_gen[ chr * width + ra ];
+		uint16_t fg, bg;
 		uint8_t xi;
 
-		if ( i == cursor_x )
+		if ( comp )
 		{
-			if ( m_framecnt & 0x08 )
-			{
-				data = 0xFF;
-			}
+			fg = 0x10 + ( attr & 0x0F );
+			bg = alt ? 0 : ( 0x10 + ( ( attr >> 4 ) & 0x07 ) );
 		}
 		else
 		{
-			if ( ( attr & 0x80 ) && ( m_framecnt & 0x10 ) )
-			{
-				data = 0x00;
-			}
+			fg = attr & 0x0F;
+			bg = alt ? 0 : ( ( attr >> 4 ) & ( blink ? 0x07 : 0x0f ) );
+		}
+
+		if ( ( i == cursor_x ) && ( m_framecnt & 0x08 ) )
+			data = 0xFF;
+		else if ( blink && ( attr & 0x80 ) && ( m_framecnt & 0x10 ) )
+		{
+			data = 0x00;
+			bg = ( attr >> 4 ) & 0x07;
 		}
 
 		for(xi=0;xi<8;xi++)
@@ -669,59 +510,10 @@ MC6845_UPDATE_ROW( isa8_cga_device::cga_text_blink_update_row_si )
 
 			dot = (data & (1 << (7-xi)));
 			pen_data = dot ? fg : bg;
-			if(pen_data || dot)
+			if(!si || (pen_data || dot))
 				*p = palette[pen_data];
 			p++;
 		}
-	}
-}
-
-/***************************************************************************
-  Draw text mode with 40x25 characters (default) and blinking colors.
-  The character cell size is 16x8
-***************************************************************************/
-
-MC6845_UPDATE_ROW( isa8_cga_device::cga_text_blink_alt_update_row )
-{
-	uint8_t *videoram = &m_vram[m_start_offset];
-	uint32_t  *p = &bitmap.pix32(y);
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	int i;
-
-	if ( y == 0 ) CGA_LOG(1,"cga_text_blink_alt_update_row",("\n"));
-	for ( i = 0; i < x_count; i++ )
-	{
-		uint16_t offset = ( ( ma + i ) << 1 ) & 0x3fff;
-		uint8_t chr = videoram[ offset ];
-		uint8_t attr = videoram[ offset +1 ];
-		uint8_t data = m_chr_gen[ chr * 8 + ra ];
-		uint16_t fg = attr & 0x07;
-		uint16_t bg = 0;
-
-		if ( i == cursor_x )
-		{
-			if ( m_framecnt & 0x08 )
-			{
-				data = 0xFF;
-			}
-		}
-		else
-		{
-			if ( ( attr & 0x80 ) && ( m_framecnt & 0x10 ) )
-			{
-				data = 0x00;
-				bg = ( attr >> 4 ) & 0x07;
-			}
-		}
-
-		*p = palette[( data & 0x80 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x40 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x20 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x10 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x08 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x04 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x02 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x01 ) ? fg : bg]; p++;
 	}
 }
 
@@ -1919,9 +1711,27 @@ MACHINE_CONFIG_MEMBER( isa8_cga_m24_device::device_add_mconfig )
 MACHINE_CONFIG_END
 
 isa8_cga_m24_device::isa8_cga_m24_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	isa8_cga_device(mconfig, ISA8_CGA_M24, tag, owner, clock), m_mode2(0), m_index(0)
+	isa8_cga_m24_device(mconfig, ISA8_CGA_M24, tag, owner, clock)
+{
+}
+
+isa8_cga_m24_device::isa8_cga_m24_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	isa8_cga_device(mconfig, type, tag, owner, clock), m_mode2(0), m_index(0)
 {
 	m_vram_size = 0x8000;
+}
+
+ROM_START(cga_m24)
+	ROM_REGION(0x2000, "gfx1", 0)
+	ROM_LOAD("m24 graphics board go380 258 pqbq.bin", 0x00000, 0x1000, CRC(04495786) SHA1(ea34ee527c5632d049ec11a7ae0fde9e6dee545f))
+
+	ROM_REGION(0x1000, "crtc_prom", 0)
+	ROM_LOAD("m24 graphics board go380 gi 9433-0088.bin", 0x00000, 0x1000, CRC(5725e660) SHA1(634c2d165d401883a955e144a0abfa2078a47013))
+ROM_END
+
+const tiny_rom_entry *isa8_cga_m24_device::device_rom_region() const
+{
+	return ROM_NAME(cga_m24);
 }
 
 void isa8_cga_m24_device::device_reset()
@@ -1929,6 +1739,8 @@ void isa8_cga_m24_device::device_reset()
 	isa8_cga_device::device_reset();
 	m_mode2 = 0;
 	m_start_offset = 0;
+	m_chr_gen_offset[0] = m_chr_gen_offset[2] = 0x0000;
+	m_chr_gen_offset[1] = m_chr_gen_offset[3] = 0x0000;
 }
 
 MC6845_RECONFIGURE( isa8_cga_m24_device::reconfigure )
@@ -1997,12 +1809,50 @@ READ8_MEMBER( isa8_cga_m24_device::io_read )
 	return data;
 }
 
-MC6845_UPDATE_ROW( isa8_cga_m24_device::crtc_update_row )
+
+MC6845_UPDATE_ROW(isa8_cga_m24_device::crtc_update_row)
 {
 	if(m_mode2 & 1)
 		m24_gfx_1bpp_m24_update_row(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp);
-	else
-		isa8_cga_device::crtc_update_row(bitmap, cliprect, ma, ra >> 1, y, x_count, cursor_x, de, hbp, vbp);
+
+	if (m_update_row_type == -1)
+		return;
+
+	y = m_y;
+	if(m_y >= bitmap.height())
+		return;
+
+	switch (m_update_row_type)
+	{
+		case CGA_TEXT_INTEN:
+			cga_text<false, false, false, false, 16>(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp);
+			break;
+		case CGA_TEXT_INTEN_ALT:
+			cga_text<false, false, false, true, 16>(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp);
+			break;
+		case CGA_TEXT_INTEN_CG: // this hardware doesn't support composite
+			break;
+		case CGA_TEXT_BLINK:
+			cga_text<true, false, false, false, 16>(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp);
+			break;
+		case CGA_TEXT_BLINK_ALT:
+			cga_text<true, false, false, true, 16>(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp);
+			break;
+		case CGA_TEXT_BLINK_SI:
+			break;
+		case CGA_GFX_1BPP:
+			cga_gfx_1bpp_update_row(bitmap, cliprect, ma, ra >> 1, y, x_count, cursor_x, de, hbp, vbp);
+			break;
+		case CGA_GFX_2BPP:
+			cga_gfx_2bpp_update_row(bitmap, cliprect, ma, ra >> 1, y, x_count, cursor_x, de, hbp, vbp);
+			break;
+		case CGA_GFX_4BPPL:
+			cga_gfx_4bppl_update_row(bitmap, cliprect, ma, ra >> 1, y, x_count, cursor_x, de, hbp, vbp);
+			break;
+		case CGA_GFX_4BPPH:
+			cga_gfx_4bpph_update_row(bitmap, cliprect, ma, ra >> 1, y, x_count, cursor_x, de, hbp, vbp);
+			break;
+	}
 }
 
 MC6845_UPDATE_ROW( isa8_cga_m24_device::m24_gfx_1bpp_m24_update_row )
@@ -2040,3 +1890,71 @@ MC6845_UPDATE_ROW( isa8_cga_m24_device::m24_gfx_1bpp_m24_update_row )
 		*p = palette[( data & 0x01 ) ? fg : 0]; p++;
 	}
 }
+
+DEFINE_DEVICE_TYPE(ISA8_CGA_CPORTIII, isa8_cga_cportiii_device, "cga_cportiii", "Compaq Portable III CGA")
+
+MACHINE_CONFIG_MEMBER( isa8_cga_cportiii_device::device_add_mconfig )
+	isa8_cga_m24_device::device_add_mconfig(config);
+
+	MCFG_DEVICE_MODIFY(CGA_SCREEN_NAME)
+	MCFG_SCREEN_COLOR(rgb_t(255, 125, 0))
+MACHINE_CONFIG_END
+
+isa8_cga_cportiii_device::isa8_cga_cportiii_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	isa8_cga_m24_device(mconfig, ISA8_CGA_CPORTIII, tag, owner, clock)
+{
+}
+
+ROM_START(cga_cportiii)
+	ROM_REGION(0x2000, "gfx1", 0)
+	ROM_FILL(0, 0x2000, 0)
+ROM_END
+
+const tiny_rom_entry *isa8_cga_cportiii_device::device_rom_region() const
+{
+	return ROM_NAME(cga_cportiii);
+}
+
+void isa8_cga_cportiii_device::device_reset()
+{
+	isa8_cga_m24_device::device_reset();
+	m_isa->install_device(0x13c6, 0x13c7, read8_delegate(FUNC(isa8_cga_cportiii_device::port_13c6_r), this), write8_delegate(FUNC(isa8_cga_cportiii_device::port_13c6_w), this));
+	m_isa->install_device(0x23c6, 0x23c7, read8_delegate(FUNC(isa8_cga_cportiii_device::port_23c6_r), this), write8_delegate(FUNC(isa8_cga_cportiii_device::port_23c6_w), this));
+	m_palette->set_pen_color(0, 100, 25, 0);
+	m_chr_gen_offset[0] = m_chr_gen_offset[2] = 0x0000;
+	m_chr_gen_offset[1] = m_chr_gen_offset[3] = 0x1000;
+}
+
+WRITE8_MEMBER(isa8_cga_cportiii_device::char_ram_write)
+{
+	m_chr_gen_base[offset] = data;
+}
+
+READ8_MEMBER(isa8_cga_cportiii_device::char_ram_read)
+{
+	return m_chr_gen_base[offset];
+}
+
+READ8_MEMBER(isa8_cga_cportiii_device::port_13c6_r)
+{
+	return 0x04;
+}
+
+WRITE8_MEMBER(isa8_cga_cportiii_device::port_13c6_w)
+{
+}
+
+READ8_MEMBER(isa8_cga_cportiii_device::port_23c6_r)
+{
+	return 0;
+}
+
+WRITE8_MEMBER(isa8_cga_cportiii_device::port_23c6_w)
+{
+	m_mode2 = data & 1;
+	if(BIT(data, 3))
+		m_isa->install_memory(0xb8000, 0xb9fff, read8_delegate(FUNC(isa8_cga_cportiii_device::char_ram_read), this), write8_delegate(FUNC(isa8_cga_cportiii_device::char_ram_write), this));
+	else
+		m_isa->install_bank(0xb8000, 0xb8000 + 0x8000 - 1, "bank_cga", &m_vram[0]);
+}
+

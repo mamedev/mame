@@ -699,7 +699,7 @@ INTERRUPT_GEN_MEMBER(m90_state::bomblord_fake_nmi)
 
 INTERRUPT_GEN_MEMBER(m90_state::m90_interrupt)
 {
-	generic_pulse_irq_line(device.execute(), NEC_INPUT_LINE_INTP0, 1);
+	device.execute().pulse_input_line(NEC_INPUT_LINE_INTP0, device.execute().minimum_quantum_time());
 }
 
 INTERRUPT_GEN_MEMBER(m90_state::dynablsb_interrupt)

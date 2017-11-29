@@ -120,11 +120,6 @@ DEFINE_DEVICE_TYPE(VME_MZR8300, vme_mzr8300_card_device, "mzr8300", "Mizar 8300 
  * once a proper serial board hardware (ie MZ 8300) is found and emulated. */
 
 
-static DEVICE_INPUT_DEFAULTS_START( terminal )
-	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_9615 )
-	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_9615 )
-DEVICE_INPUT_DEFAULTS_END
-
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
@@ -137,10 +132,9 @@ MACHINE_CONFIG_MEMBER( vme_mzr8300_card_device::device_add_mconfig )
 
 	MCFG_DEVICE_ADD("sio1", UPD7201_NEW, XTAL_4MHz)
 
-	MCFG_RS232_PORT_ADD ("rs232p1", default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER (DEVWRITELINE ("sio0", upd7201_new_device, rxb_w))
-	MCFG_RS232_CTS_HANDLER (DEVWRITELINE ("sio0", upd7201_new_device, ctsb_w))
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", terminal)
+	MCFG_RS232_PORT_ADD("rs232p1", default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("sio0", upd7201_new_device, rxb_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("sio0", upd7201_new_device, ctsb_w))
 
 	MCFG_DEVICE_ADD("stc", AM9513, XTAL_4MHz)
 	MCFG_AM9513_OUT1_CALLBACK(DEVWRITELINE("sio0", upd7201_new_device, rxca_w))

@@ -14,6 +14,7 @@ abc80.cpp
 abc80x.cpp
 ac1.cpp
 accomm.cpp
+acd.cpp
 aceex.cpp
 acrnsys1.cpp
 acvirus.cpp
@@ -29,13 +30,17 @@ alphasma.cpp
 alphatpx.cpp
 alphatro.cpp
 altair.cpp
+alto1.cpp
 alto2.cpp
+altos2.cpp
 altos5.cpp
 altos486.cpp
 altos8600.cpp
 amico2k.cpp
 amiga.cpp
+ampex.cpp
 ampro.cpp
+ampscarp.cpp
 amstr_pc.cpp
 amstrad.cpp
 amust.cpp
@@ -67,6 +72,7 @@ atm.cpp
 atom.cpp
 atpci.cpp
 att4425.cpp
+att630.cpp
 attache.cpp
 aussiebyte.cpp
 avigo.cpp
@@ -120,6 +126,7 @@ channelf.cpp
 chaos.cpp
 chessmst.cpp
 chesstrv.cpp
+cit220.cpp
 clcd.cpp
 cm1800.cpp
 cmi.cpp
@@ -145,6 +152,7 @@ cxgz80.cpp
 cxhumax.cpp
 cybiko.cpp
 czk80.cpp
+d400.cpp
 d6800.cpp
 d6809.cpp
 dai.cpp
@@ -183,6 +191,7 @@ elf.cpp
 elwro800.cpp
 enmirage.cpp
 ep64.cpp
+esprit.cpp
 esq1.cpp
 esq5505.cpp
 esqasr.cpp
@@ -257,6 +266,7 @@ homez80.cpp
 horizon.cpp
 hp_ipc.cpp
 hp16500.cpp
+hp2100.cpp
 hp48.cpp
 hp49gp.cpp
 hp64k.cpp
@@ -329,6 +339,7 @@ leapster.cpp
 learnwin.cpp
 lft.cpp
 lg-dvd.cpp
+lilith.cpp
 lisa.cpp
 llc.cpp
 lola8a.cpp
@@ -337,6 +348,7 @@ lwriter.cpp
 lynx.cpp
 m20.cpp
 m24.cpp
+m3.cpp
 m5.cpp
 m6805evs.cpp
 m68705prg.cpp
@@ -351,7 +363,8 @@ mbee.cpp
 mc10.cpp
 mc1000.cpp
 mc1502.cpp
-mc80.cpp
+mc8020.cpp
+mc8030.cpp
 mcb216.cpp
 mccpm.cpp
 megadriv.cpp
@@ -367,10 +380,13 @@ microdec.cpp
 microkit.cpp
 micronic.cpp
 microtan.cpp
+microterm.cpp
 microvsn.cpp
 mikro80.cpp
 mikromik.cpp
 mikrosha.cpp
+mightyframe.cpp
+milwaukee.cpp
 mini2440.cpp
 minicom.cpp
 miniforce.cpp
@@ -484,6 +500,7 @@ pegasus.cpp
 pencil2.cpp
 pentagon.cpp
 peoplepc.cpp
+perq.cpp
 pes.cpp
 pet.cpp
 pg685.cpp
@@ -509,6 +526,7 @@ polgar.cpp
 poly.cpp
 poly88.cpp
 poly880.cpp
+powerstack.cpp
 pp01.cpp
 prestige.cpp
 primo.cpp
@@ -519,6 +537,7 @@ prof80.cpp
 prophet600.cpp
 proteus3.cpp
 ps2.cpp
+ps2sony.cpp
 psion.cpp
 psx.cpp
 pt68k4.cpp
@@ -590,6 +609,7 @@ snes.cpp
 socrates.cpp
 softbox.cpp
 sorcerer.cpp
+solbourne.cpp
 spc1000.cpp
 spc1500.cpp
 spec128.cpp
@@ -636,6 +656,8 @@ tek410x.cpp
 tek440x.cpp
 tekxp33x.cpp
 terak.cpp
+terco.cpp
+terminals.cpp
 test_t400.cpp
 testconsole.cpp
 tg100.cpp
@@ -669,11 +691,14 @@ tr606.cpp
 tranz330.cpp
 tricep.cpp
 trs80.cpp
+trs80dt1.cpp
 trs80m2.cpp
 ts802.cpp
 ts803.cpp
 ts816.cpp
+ts3000.cpp
 tsispch.cpp
+tti.cpp
 tutor.cpp
 tv910.cpp
 tv950.cpp
@@ -698,6 +723,7 @@ vcs80.cpp
 vector06.cpp
 vector4.cpp
 vectrex.cpp
+vectrix.cpp
 vg5k.cpp
 vic10.cpp
 vic20.cpp
@@ -710,6 +736,8 @@ vixen.cpp
 vk100.cpp
 votrpss.cpp
 votrtnt.cpp
+vp122.cpp
+vp60.cpp
 vsmilepro.cpp
 vt100.cpp
 vt220.cpp
@@ -722,6 +750,7 @@ vtech2.cpp
 wangpc.cpp
 wicat.cpp
 wswan.cpp
+wyse.cpp
 x07.cpp
 x1.cpp
 x1twin.cpp
@@ -743,6 +772,7 @@ zexall.cpp
 zorba.cpp
 zrt80.cpp
 zsbc3.cpp
+zt8802.cpp
 zx.cpp
 //exceptions + to add - to remove from imported list
 //3do.cpp

@@ -2,9 +2,16 @@
 // copyright-holders:Joakim Larsson Edstrom
 /******************************************************************************
 
-    ACI Prodigy chess computer driver
+    ACI Prodigy chess computer driver.
 
-    TODO: Everything
+    http://www.spacious-mind.com/html/destiny_prodigy.html
+    Morphy software ELO rating: 1559
+
+    TODO:
+    - Sound
+    - Row/column LEDs
+    - Chess board sensors
+    - Support for SVG/CSS based browser UI
 
     +-------------------------------------------------------------------------------------+
     |LEDS--------------------------------------------+        +-----------------+         |
@@ -28,7 +35,7 @@
     |   |                                            || 74145N | |  RAM        |     |LS| |
     |   |   A     B    C    D    E    F     G    H   |+--------+ | M58725P     |     |00| |
     |   +--------------------------------------------+           +-------------+     +--+ |
-    |LEDS-> O     O    O    O    O    O     O    O                 OOOOOOOOOOO KPDCN      |
+    |LEDS-> O     O    O    O    O    O     O    O                OOOOOOOOOOOO KPDCN      |
     +-------------------------------------------------------------------------------------+
 
  Tracing the image shows that VIA Port A is used on the ROWCN and Port B on COLCN
@@ -49,6 +56,15 @@
 |||||||||||||||||||            PB2--->|145|=/4/=/R/=>b(4x    )c=/4/==============>
                                       +---+           (PN2907)e=+     anodes
                                                                 |+5v
+
+ The keypad is connected to the 12 pin KPDCN connector left to right KP1:
+
+  Pin #: KP1 KP2 KP3 KP4 KP5 KP6 KP7 KP8 KP9 KP10 KP11 K12
+  VIA  :     PB4 PB5 PA0 PA1 PA2 PA3 PA4 PA5 PA6       PA7
+  74145:  Q8                                       Q9      - used to decode/ground one half of the KPAD at a time
+
+ Q7 is suspected to be ground for the chessboard buttons
+
 *******************************************************************************************/
 
 #include "emu.h"
@@ -57,6 +73,7 @@
 #include "machine/netlist.h"
 #include "machine/nl_prodigy.h"
 #include "machine/6522via.h"
+
 // Generated artwork includes
 #include "prodigy.lh"
 
@@ -65,9 +82,11 @@
 #define LOG_BCD     (1U <<  3)
 #define LOG_NETLIST (1U <<  4)
 #define LOG_CLK     (1U <<  5)
+#define LOG_KBD     (1U <<  6)
+#define LOG_AW      (1U <<  7)
 
-//#define VERBOSE (LOG_BCD|LOG_NETLIST|LOG_SETUP)
-//#define LOG_OUTPUT_FUNC printf
+//#define VERBOSE (LOG_KBD|LOG_AW) // (LOG_BCD|LOG_NETLIST|LOG_SETUP)
+//#define LOG_OUTPUT_STREAM std::cout
 
 #include "logmacro.h"
 
@@ -76,6 +95,8 @@
 #define LOGBCD(...)   LOGMASKED(LOG_BCD,     __VA_ARGS__)
 #define LOGNL(...)    LOGMASKED(LOG_NETLIST, __VA_ARGS__)
 #define LOGCLK(...)   LOGMASKED(LOG_CLK,     __VA_ARGS__)
+#define LOGKBD(...)   LOGMASKED(LOG_KBD,     __VA_ARGS__)
+#define LOGAW(...)    LOGMASKED(LOG_AW,      __VA_ARGS__)
 
 #ifdef _MSC_VER
 #define FUNCNAME __func__
@@ -84,7 +105,6 @@
 #endif
 
 #define NETLIST_TAG "bcd"
-#define TTL74164DEV 0
 
 class prodigy_state : public driver_device
 {
@@ -99,6 +119,7 @@ public:
 		, m_cb1(*this, "bcd:cb1")
 		, m_cb2(*this, "bcd:cb2")
 		, m_digit(0.0)
+		, m_io_line(*this, "LINE%u", 0)
 	{ }
 
 	NETDEV_LOGIC_CALLBACK_MEMBER(bcd_bit0_cb);
@@ -110,6 +131,9 @@ public:
 	NETDEV_LOGIC_CALLBACK_MEMBER(bcd_bit6_cb);
 	NETDEV_LOGIC_CALLBACK_MEMBER(bcd_bit7_cb);
 
+	DECLARE_READ8_MEMBER( via_pa_r );
+	DECLARE_READ8_MEMBER( via_pb_r );
+	DECLARE_WRITE8_MEMBER( via_pa_w );
 	DECLARE_WRITE8_MEMBER( via_pb_w );
 	DECLARE_WRITE_LINE_MEMBER(via_cb1_w);
 	DECLARE_WRITE_LINE_MEMBER(via_cb2_w);
@@ -120,17 +144,15 @@ private:
 	required_device<ttl74145_device> m_74145;
 	uint8_t m_segments;
 	required_device<via6522_device> m_via;
-#if TTL74164DEV
-	required_device<ttl74164_device> m_shift;
-#else
 	required_device<netlist_mame_device> m_bcd;
 	required_device<netlist_mame_logic_input_device> m_cb1;
 	required_device<netlist_mame_logic_input_device> m_cb2;
-#endif
 	uint8_t m_digit;
 	void update_bcd();
 
-	virtual void device_reset() override;
+	virtual void device_start() override;
+	required_ioport_array<5> m_io_line;
+	uint16_t m_line[5];
 };
 
 NETDEV_LOGIC_CALLBACK_MEMBER(prodigy_state::bcd_bit0_cb) { if (data != 0) m_digit |= 0x01; else m_digit &= ~(0x01); LOGBCD("%s: %d m_digit: %02x\n", FUNCNAME, data, m_digit); }
@@ -142,12 +164,9 @@ NETDEV_LOGIC_CALLBACK_MEMBER(prodigy_state::bcd_bit5_cb) { if (data != 0) m_digi
 NETDEV_LOGIC_CALLBACK_MEMBER(prodigy_state::bcd_bit6_cb) { if (data != 0) m_digit |= 0x40; else m_digit &= ~(0x40); LOGBCD("%s: %d m_digit: %02x\n", FUNCNAME, data, m_digit); }
 NETDEV_LOGIC_CALLBACK_MEMBER(prodigy_state::bcd_bit7_cb) { if (data != 0) m_digit |= 0x80; else m_digit &= ~(0x80); LOGBCD("%s: %d m_digit: %02x\n", FUNCNAME, data, m_digit); }
 
-void prodigy_state::device_reset()
+void prodigy_state::device_start()
 {
-#if TTL74164DEV
-	m_shift->b_w(1);
-	m_shift->clear_w(1);
-#endif
+	memset(m_line, 0, sizeof(m_line));
 }
 
 WRITE_LINE_MEMBER(prodigy_state::via_cb1_w)
@@ -175,20 +194,61 @@ WRITE_LINE_MEMBER(prodigy_state::irq_handler)
 
    PB2 and PB3 is also connected to the 74145, usage to be traced....
 */
-WRITE8_MEMBER( prodigy_state::via_pb_w ) // Needs to trace which port decides what digit
+
+READ8_MEMBER( prodigy_state::via_pa_r )
 {
-	LOGBCD("%s: %02x ANODE %02x\n", FUNCNAME, data, data & 0x03);
-	m_74145->write( data & 0x0f ); // Write PB0-PB3 to the 74145
+	LOGKBD("%s: Port A <- %02x\n", FUNCNAME, 0);
+	uint16_t ttl74145_data = m_74145->read();
+
+	LOGKBD(" - 74145: %03x\n", ttl74145_data);
+	if (ttl74145_data & 0x100) return (m_line[0] | m_line[1]);
+	if (ttl74145_data & 0x200) return (m_line[4] | m_line[3]);
+
+	return 0xff;
+}
+
+READ8_MEMBER( prodigy_state::via_pb_r )
+{
+	LOGKBD("%s: Port B <- %02x\n", FUNCNAME, 0);
+	uint16_t ttl74145_data = m_74145->read();
+	if (ttl74145_data & 0x100) return (((m_line[2] >>  8) & 3) << 4);
+	if (ttl74145_data & 0x200) return (((m_line[2] >> 10) & 3) << 4);
+
+	return 0xff;
+}
+
+WRITE8_MEMBER( prodigy_state::via_pa_w )
+{
+	LOGKBD("%s: Port A -> %02x\n", FUNCNAME, data);
+}
+
+WRITE8_MEMBER( prodigy_state::via_pb_w )
+{
+	LOGBCD("%s: %02x ANODE %c\n", FUNCNAME, data, (data & 0x0f) <= 3 ? ('0' + (data & 0x03)) : 'x');
+	LOGKBD("%s: %02x KBD Q8:%c Q9:%c\n", FUNCNAME, data, (data & 0x0f) == 8 ? '0' : '1', (data & 0x0f) == 9 ? '0' : '1');
+	// Write PB0-PB3 to the 74145
+	// Q0-Q3 => BCD0-BCD3 (PB0-PB1, PB2=0 PB3=0)
+	// Q8-Q9 => KPDCN (PB0:0=Q8 1=Q9, PB1=0 PB2=0 PB3=1)
+	m_74145->write( data & 0x0f );
+
+	// Read the artwork
+	int i = 0;
+	for (auto & elem : m_io_line)
+	{
+		m_line[i] = elem->read();
+		LOGAW("-LINE%u: %02x\n", i, m_line[i]);
+		i++;
+	}
 }
 
 void prodigy_state::update_bcd()
 {
 	LOGBCD("%s\n", FUNCNAME);
-	uint8_t ttl74145_data;
+	uint16_t ttl74145_data;
 	uint8_t digit_nbr = 4;
 
 	ttl74145_data = m_74145->read();
-	LOGBCD(" - 74145: %02x\n", ttl74145_data);
+	LOGBCD(" - 74145: %03x\n", ttl74145_data);
 
 	if ((ttl74145_data & 0x0f) != 0x00)
 	{
@@ -215,7 +275,64 @@ static ADDRESS_MAP_START( maincpu_map, AS_PROGRAM, 8, prodigy_state )
 	AM_RANGE(0x6000, 0x7fff) AM_ROM AM_REGION("roms", 0x0000) AM_MIRROR(0x8000)
 ADDRESS_MAP_END
 
+/*
+ * The keypad was modelled after the physical appearance but altered after finding out how it was working so
+ * LINE0 to LINE4 has no correlation to the actual keypad anymore, which is connected like this:
+ *
+ * con  KP1/KP11
+ *-----------------------
+ * KP1  GND/HIZ
+ * KP2  GO/BLACK
+ * KP3  A1/B2
+ * KP4  D4/E5
+ * KP5  G7/E8
+ * KP6  RESTORE/HALT&HINT
+ * KP7  CE/AUDIO
+ * KP8  LEVEL/TIME&NUMBER
+ * KP9  CHANGE BOARD/F6
+ * KP10 VERIFY/C3
+ * KP11 HIZ/GND
+ * KP12 ENTER/WHITE
+ *-----------------------
+ * KP1 and KP11 alternates as GND enabling 10 pads at a time which are read on VIA port A and B.
+ * TODO: Refactor as two 10 bit LINEs rather then matrix in order to match circuit
+ *
+*/
 static INPUT_PORTS_START( prodigy )
+	PORT_START("LINE0") /* KEY ROW 0 */
+	PORT_BIT(0x001, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("D_4")     PORT_CODE(KEYCODE_D) PORT_CHAR('D') PORT_CHAR('4')
+	PORT_BIT(0x002, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("G_7")     PORT_CODE(KEYCODE_G) PORT_CHAR('G') PORT_CHAR('7')
+	PORT_BIT(0x004, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("RESTORE") PORT_CODE(KEYCODE_Q) PORT_CHAR('Q')
+	PORT_BIT(0x008, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CE")      PORT_CODE(KEYCODE_T) PORT_CHAR('T')
+	PORT_BIT(0xc00, 0x00, IPT_UNUSED )
+
+	PORT_START("LINE1") /* KEY ROW 1 */
+	PORT_BIT(0x010, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("LEVEL")        PORT_CODE(KEYCODE_L) PORT_CHAR('L')
+	PORT_BIT(0x020, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CHANGE_BOARD") PORT_CODE(KEYCODE_X) PORT_CHAR('X')
+	PORT_BIT(0x040, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("VERIFY")       PORT_CODE(KEYCODE_V) PORT_CHAR('V')
+	PORT_BIT(0x080, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("ENTER")        PORT_CODE(KEYCODE_S)  PORT_CHAR('S')
+	PORT_BIT(0xc00, 0x00, IPT_UNUSED )
+
+	PORT_START("LINE2") /* KEY ROW 2 */
+	PORT_BIT(0x100, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("GO")    PORT_CODE(KEYCODE_O)  PORT_CHAR('O')
+	PORT_BIT(0x200, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("A_1")   PORT_CODE(KEYCODE_A) PORT_CHAR('A') PORT_CHAR('1')
+	PORT_BIT(0x400, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("BLACK") PORT_CODE(KEYCODE_P)  PORT_CHAR('P')
+	PORT_BIT(0x800, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("B_2")   PORT_CODE(KEYCODE_B) PORT_CHAR('B') PORT_CHAR('2')
+	PORT_BIT(0x000, 0x00, IPT_UNUSED )
+
+	PORT_START("LINE3") /* KEY ROW 3 */
+	PORT_BIT(0x001, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("E_5")       PORT_CODE(KEYCODE_E) PORT_CHAR('E') PORT_CHAR('5')
+	PORT_BIT(0x002, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("H_8")       PORT_CODE(KEYCODE_H) PORT_CHAR('H') PORT_CHAR('8')
+	PORT_BIT(0x004, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("HALT_HINT") PORT_CODE(KEYCODE_Y) PORT_CHAR('Y')
+	PORT_BIT(0x008, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("AUDIO")     PORT_CODE(KEYCODE_R) PORT_CHAR('R')
+	PORT_BIT(0xc00, 0x00, IPT_UNUSED )
+
+	PORT_START("LINE4") /* KEY ROW 4 */
+	PORT_BIT(0x010, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("TIME_NUMBER") PORT_CODE(KEYCODE_N) PORT_CHAR('N')
+	PORT_BIT(0x020, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F_6")         PORT_CODE(KEYCODE_F) PORT_CHAR('F') PORT_CHAR('6')
+	PORT_BIT(0x040, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("C_3")         PORT_CODE(KEYCODE_C) PORT_CHAR('C') PORT_CHAR('3')
+	PORT_BIT(0x080, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("WHITE")       PORT_CODE(KEYCODE_W)  PORT_CHAR('W')
+	PORT_BIT(0xc00, 0x00, IPT_UNUSED )
 INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( prodigy )
@@ -228,7 +345,10 @@ static MACHINE_CONFIG_START( prodigy )
 
 	MCFG_DEVICE_ADD("via", VIA6522, XTAL_2MHz)
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(prodigy_state, irq_handler));
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(prodigy_state, via_pa_w))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(prodigy_state, via_pb_w))
+	MCFG_VIA6522_READPA_HANDLER(READ8(prodigy_state, via_pa_r))
+	MCFG_VIA6522_READPB_HANDLER(READ8(prodigy_state, via_pb_r))
 	MCFG_VIA6522_CB1_HANDLER(WRITELINE(prodigy_state, via_cb1_w))
 	MCFG_VIA6522_CB2_HANDLER(WRITELINE(prodigy_state, via_cb2_w))
 
@@ -294,4 +414,4 @@ ROM_START(prodigy)
 ROM_END
 
 //    YEAR  NAME        PARENT    COMPAT  MACHINE    INPUT      STATE          INIT  COMPANY,                FULLNAME,              FLAGS
-CONS( 1981, prodigy,    0,        0,      prodigy,   prodigy,   prodigy_state, 0,    "Applied Concepts Inc", "ACI Destiny Prodigy", MACHINE_IS_SKELETON )
+CONS( 1981, prodigy,    0,        0,      prodigy,   prodigy,   prodigy_state, 0,    "Applied Concepts Inc", "ACI Destiny Prodigy", MACHINE_NO_SOUND )

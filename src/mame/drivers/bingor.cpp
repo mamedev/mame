@@ -914,4 +914,4 @@ GAME( 2002, bingor3,    0,      bingor,   bingor, bingor_state,   0,       ROT0,
 GAME( 2002, bingor4,    0,      bingor,   bingor, bingor_state,   0,       ROT0,  "<unknown>",          "Bingo Roll / Bell Star? (set 4)",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2002, bingor5,    0,      bingor,   bingor, bingor_state,   0,       ROT0,  "<unknown>",          "Bingo Roll / Bell Star V3? (set 5)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
-GAME( 2001, vip2000,    0,      vip2000,  bingor, bingor_state,   0,       ROT0,  "Paloma-Elektronik?", "Unknown 'VIP 2000' game",             MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2001, vip2000,    0,      vip2000,  bingor, bingor_state,   0,       ROT0,  "Paloma-Elektronik?", "unknown 'VIP 2000' game",             MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

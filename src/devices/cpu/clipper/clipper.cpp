@@ -4,12 +4,11 @@
 /*
  * An implementation of the Fairchild/Intergraph CLIPPER CPU family.
  *
- * Primary source: http://bitsavers.trailing-edge.com/pdf/fairchild/clipper/Clipper_Instruction_Set_Oct85.pdf
+ * Primary source: http://bitsavers.org/pdf/fairchild/clipper/Clipper_Instruction_Set_Oct85.pdf
  *
  * TODO:
  *   - save/restore state
- *   - unimplemented instructions
- *   - C100, C300, C400 variants
+ *   - unimplemented C400 instructions
  *   - correct boot logic
  *   - condition codes for multiply instructions
  *   - most cpu traps/faults
@@ -119,6 +118,8 @@ void clipper_device::device_start()
 	save_item(NAME(m_ru));
 	save_item(NAME(m_rs));
 	save_item(NAME(m_f));
+	save_item(NAME(m_fp_pc));
+	save_item(NAME(m_fp_dst));
 
 	save_item(NAME(m_nmi));
 	save_item(NAME(m_irq));
@@ -181,13 +182,13 @@ void clipper_device::device_reset()
 	 *   ssw: EI, TP, M, U, K, KU, UU, P cleared, ID set from hardware, others undefined
 	 */
 	m_psw = 0;
+	float_rounding_mode = float_round_nearest_even;
+
+	// clear the ssw
 	set_ssw(0);
 
+	// select the register file according to the ssw
 	m_r = SSW(U) ? m_ru : m_rs;
-
-	// we'll opt to clear the integer and floating point registers too
-	memset(m_r, 0, sizeof(s32)*16);
-	memset(m_f, 0, sizeof(m_f));
 
 	// FIXME: figure out how to branch to the boot code properly
 	m_pc = 0x7f100000;
@@ -248,8 +249,15 @@ void clipper_device::execute_run()
 		// decode instruction
 		decode_instruction(insn);
 
+		// clear floating point exceptions
+		float_exception_flags = 0;
+
 		// execute instruction, return next pc
 		m_pc = execute_instruction();
+
+		// handle floating point exceptions
+		if (float_exception_flags)
+			fp_exception();
 
 		// FIXME: some instructions take longer (significantly) than one cycle
 		// and also the timings are often slower for the C100 and C300
@@ -321,8 +329,8 @@ void clipper_device::decode_instruction (u16 insn)
 		}
 		else
 		{
-			// fetch 32 bit immediate and sign extend
-			m_info.imm = (s32)m_insn->read_dword_unaligned(m_pc + 2);
+			// fetch 32 bit immediate
+			m_info.imm = m_insn->read_dword_unaligned(m_pc + 2);
 			m_info.size = 6;
 		}
 	}
@@ -337,7 +345,7 @@ void clipper_device::decode_instruction (u16 insn)
 			switch (insn & 0x00f0)
 			{
 			case ADDR_MODE_PC32:
-				m_info.address = m_pc + (s32)m_insn->read_dword_unaligned(m_pc + 2);
+				m_info.address = m_pc + m_insn->read_dword_unaligned(m_pc + 2);
 				m_info.size = 6;
 				break;
 
@@ -348,7 +356,7 @@ void clipper_device::decode_instruction (u16 insn)
 
 			case ADDR_MODE_REL32:
 				m_info.r2 = m_insn->read_word(m_pc + 2) & 0xf;
-				m_info.address = m_r[insn & 0xf] + (s32)m_insn->read_dword_unaligned(m_pc + 4);
+				m_info.address = m_r[insn & 0xf] + m_insn->read_dword_unaligned(m_pc + 4);
 				m_info.size = 8;
 				break;
 
@@ -429,7 +437,10 @@ int clipper_device::execute_instruction ()
 		// treated as a noop if target ssw in user mode
 		// R1 == 3 means "fast" mode - avoids pipeline flush
 		if (R1 == 0)
+		{
 			m_psw = m_r[R2];
+			fp_rounding();
+		}
 		else if (!SSW(U) && (R1 == 1 || R1 == 3))
 		{
 			set_ssw(m_r[R2]);
@@ -471,229 +482,242 @@ int clipper_device::execute_instruction ()
 
 	case 0x20:
 		// adds: add single floating
-		*((float *)&m_f[R2]) += *((float *)&m_f[R1]);
+		set_fp32(R2, float32_add(get_fp32(R2), get_fp32(R1)));
 		// TRAPS: F_IVUX
+		float_exception_flags &= (float_flag_invalid | float_flag_overflow | float_flag_underflow | float_flag_inexact);
 		break;
 	case 0x21:
 		// subs: subtract single floating
-		*((float *)&m_f[R2]) -= *((float *)&m_f[R1]);
+		set_fp32(R2, float32_sub(get_fp32(R2), get_fp32(R1)));
 		// TRAPS: F_IVUX
+		float_exception_flags &= (float_flag_invalid | float_flag_overflow | float_flag_underflow | float_flag_inexact);
 		break;
 	case 0x22:
 		// addd: add double floating
-		m_f[R2] += m_f[R1];
+		set_fp64(R2, float64_add(get_fp64(R2), get_fp64(R1)));
 		// TRAPS: F_IVUX
+		float_exception_flags &= (float_flag_invalid | float_flag_overflow | float_flag_underflow | float_flag_inexact);
 		break;
 	case 0x23:
 		// subd: subtract double floating
-		m_f[R2] -= m_f[R1];
+		set_fp64(R2, float64_sub(get_fp64(R2), get_fp64(R1)));
 		// TRAPS: F_IVUX
+		float_exception_flags &= (float_flag_invalid | float_flag_overflow | float_flag_underflow | float_flag_inexact);
 		break;
 	case 0x24:
 		// movs: move single floating
-		*((float *)&m_f[R2]) = *((float *)&m_f[R1]);
+		set_fp32(R2, get_fp32(R1));
 		break;
 	case 0x25:
 		// cmps: compare single floating
-		FLAGS(0, 0, *((float *)&m_f[R2]) == *((float *)&m_f[R1]), *((float *)&m_f[R2]) < *((float *)&m_f[R1]))
+		FLAGS(0, 0, float32_eq(get_fp32(R2), get_fp32(R1)), float32_lt(get_fp32(R2), get_fp32(R1)))
+		if (float_exception_flags & float_flag_invalid)
+			m_psw |= PSW_Z | PSW_N;
+		float_exception_flags &= (0);
 		break;
 	case 0x26:
 		// movd: move double floating
-		m_f[R2] = m_f[R1];
+		set_fp64(R2, get_fp64(R1));
 		break;
 	case 0x27:
 		// cmpd: compare double floating
-		FLAGS(0, 0, m_f[R2] == m_f[R1], m_f[R2] < m_f[R1])
-		// FLAGS: 00ZN
+		FLAGS(0, 0, float64_eq(get_fp64(R2), get_fp64(R1)), float64_lt(get_fp64(R2), get_fp64(R1)))
+		if (float_exception_flags & float_flag_invalid)
+			m_psw |= PSW_Z | PSW_N;
+		float_exception_flags &= (0);
 		break;
 	case 0x28:
 		// muls: multiply single floating
-		*((float *)&m_f[R2]) *= *((float *)&m_f[R1]);
+		set_fp32(R2, float32_mul(get_fp32(R2), get_fp32(R1)));
 		// TRAPS: F_IVUX
+		float_exception_flags &= (float_flag_invalid | float_flag_overflow | float_flag_underflow | float_flag_inexact);
 		break;
 	case 0x29:
 		// divs: divide single floating
-		*((float *)&m_f[R2]) /= *((float *)&m_f[R1]);
+		set_fp32(R2, float32_div(get_fp32(R2), get_fp32(R1)));
 		// TRAPS: F_IVDUX
+		float_exception_flags &= (float_flag_invalid | float_flag_overflow | float_flag_divbyzero | float_flag_underflow | float_flag_inexact);
 		break;
 	case 0x2a:
 		// muld: multiply double floating
-		m_f[R2] *= m_f[R1];
+		set_fp64(R2, float64_mul(get_fp64(R2), get_fp64(R1)));
 		// TRAPS: F_IVUX
+		float_exception_flags &= (float_flag_invalid | float_flag_overflow | float_flag_underflow | float_flag_inexact);
 		break;
 	case 0x2b:
 		// divd: divide double floating
-		m_f[R2] /= m_f[R1];
+		set_fp64(R2, float64_div(get_fp64(R2), get_fp64(R1)));
 		// TRAPS: F_IVDUX
+		float_exception_flags &= (float_flag_invalid | float_flag_overflow | float_flag_divbyzero | float_flag_underflow | float_flag_inexact);
 		break;
 	case 0x2c:
 		// movsw: move single floating to word
-		m_r[R2] = *((s32 *)&m_f[R1]);
+		m_r[R2] = get_fp32(R1);
 		break;
 	case 0x2d:
 		// movws: move word to single floating
-		*((s32 *)&m_f[R2]) = m_r[R1];
+		set_fp32(R2, m_r[R1]);
 		break;
 	case 0x2e:
 		// movdl: move double floating to longword
-		((double *)m_r)[R2 >> 1] = m_f[R1];
+		((u64 *)m_r)[R2 >> 1] = get_fp64(R1);
 		break;
 	case 0x2f:
 		// movld: move longword to double floating
-		m_f[R2] = ((double *)m_r)[R1 >> 1];
+		set_fp64(R2, ((u64 *)m_r)[R1 >> 1]);
 		break;
 	case 0x30:
 		// shaw: shift arithmetic word
-		if (m_r[R1] > 0)
+		if ((s32)m_r[R1] > 0)
 		{
 			// save the bits that will be shifted out plus new sign bit
-			s32 v = m_r[R2] >> (31 - m_r[R1]);
+			s32 v = (s32)m_r[R2] >> (31 - m_r[R1]);
 
 			m_r[R2] <<= m_r[R1];
 
 			// overflow is set if sign changes during shift
-			FLAGS(0, v != 0 && v != -1, m_r[R2] == 0, m_r[R2] < 0)
+			FLAGS(0, v != 0 && v != -1, m_r[R2] == 0, (s32)m_r[R2] < 0)
 		}
 		else
 		{
-			m_r[R2] >>= -m_r[R1];
-			FLAGS(0, 0, m_r[R2] == 0, m_r[R2] < 0)
+			((s32 *)m_r)[R2] >>= -m_r[R1];
+			FLAGS(0, 0, m_r[R2] == 0, (s32)m_r[R2] < 0)
 		}
 		// FLAGS: 0VZN
 		break;
 	case 0x31:
 		// shal: shift arithmetic longword
-		if (m_r[R1] > 0)
+		if ((s32)m_r[R1] > 0)
 		{
 			// save the bits that will be shifted out plus new sign bit
 			s64 v = ((s64 *)m_r)[R2 >> 1] >> (63 - m_r[R1]);
 
-			((s64 *)m_r)[R2 >> 1] <<= m_r[R1];
+			((u64 *)m_r)[R2 >> 1] <<= m_r[R1];
 
 			// overflow is set if sign changes during shift
-			FLAGS(0, v != 0 && v != -1, ((s64 *)m_r)[R2 >> 1] == 0, ((s64 *)m_r)[R2 >> 1] < 0)
+			FLAGS(0, v != 0 && v != -1, ((u64 *)m_r)[R2 >> 1] == 0, ((s64 *)m_r)[R2 >> 1] < 0)
 		}
 		else
 		{
 			((s64 *)m_r)[R2 >> 1] >>= -m_r[R1];
-			FLAGS(0, 0, ((s64 *)m_r)[R2 >> 1] == 0, ((s64 *)m_r)[R2 >> 1] < 0)
+			FLAGS(0, 0, ((u64 *)m_r)[R2 >> 1] == 0, ((s64 *)m_r)[R2 >> 1] < 0)
 		}
 		// FLAGS: 0VZN
 		break;
 	case 0x32:
 		// shlw: shift logical word
-		if (m_r[R1] > 0)
+		if ((s32)m_r[R1] > 0)
 			m_r[R2] <<= m_r[R1];
 		else
-			((u32 *)m_r)[R2] >>= -m_r[R1];
+			m_r[R2] >>= -m_r[R1];
 		// FLAGS: 00ZN
-		FLAGS(0, 0, m_r[R2] == 0, m_r[R2] < 0);
+		FLAGS(0, 0, m_r[R2] == 0, (s32)m_r[R2] < 0);
 		break;
 	case 0x33:
 		// shll: shift logical longword
-		if (m_r[R1] > 0)
+		if ((s32)m_r[R1] > 0)
 			((u64 *)m_r)[R2 >> 1] <<= m_r[R1];
 		else
 			((u64 *)m_r)[R2 >> 1] >>= -m_r[R1];
 		// FLAGS: 00ZN
-		FLAGS(0, 0, ((s64 *)m_r)[R2 >> 1] == 0, ((s64 *)m_r)[R2 >> 1] < 0);
+		FLAGS(0, 0, ((u64 *)m_r)[R2 >> 1] == 0, ((s64 *)m_r)[R2 >> 1] < 0);
 		break;
 	case 0x34:
 		// rotw: rotate word
-		if (m_r[R1] > 0)
+		if ((s32)m_r[R1] > 0)
 			m_r[R2] = rotl32(m_r[R2], m_r[R1]);
 		else
 			m_r[R2] = rotr32(m_r[R2], -m_r[R1]);
 		// FLAGS: 00ZN
-		FLAGS(0, 0, m_r[R2] == 0, m_r[R2] < 0);
+		FLAGS(0, 0, m_r[R2] == 0, (s32)m_r[R2] < 0);
 		break;
 	case 0x35:
 		// rotl: rotate longword
-		if (m_r[R1] > 0)
+		if ((s32)m_r[R1] > 0)
 			((u64 *)m_r)[R2 >> 1] = rotl64(((u64 *)m_r)[R2 >> 1], m_r[R1]);
 		else
 			((u64 *)m_r)[R2 >> 1] = rotr64(((u64 *)m_r)[R2 >> 1], -m_r[R1]);
 		// FLAGS: 00ZN
-		FLAGS(0, 0, ((s64 *)m_r)[R2 >> 1] == 0, ((s64 *)m_r)[R2 >> 1] < 0);
+		FLAGS(0, 0, ((u64 *)m_r)[R2 >> 1] == 0, ((s64 *)m_r)[R2 >> 1] < 0);
 		break;
 
 	case 0x38:
 		// shai: shift arithmetic immediate
-		if (m_info.imm > 0)
+		if ((s32)m_info.imm > 0)
 		{
 			// save the bits that will be shifted out plus new sign bit
-			s32 v = m_r[R2] >> (31 - m_info.imm);
+			s32 v = (s32)m_r[R2] >> (31 - m_info.imm);
 
 			m_r[R2] <<= m_info.imm;
 
 			// overflow is set if sign changes during shift
-			FLAGS(0, v != 0 && v != -1, m_r[R2] == 0, m_r[R2] < 0)
+			FLAGS(0, v != 0 && v != -1, m_r[R2] == 0, (s32)m_r[R2] < 0)
 		}
 		else
 		{
-			m_r[R2] >>= -m_info.imm;
-			FLAGS(0, 0, m_r[R2] == 0, m_r[R2] < 0)
+			((s32 *)m_r)[R2] >>= -m_info.imm;
+			FLAGS(0, 0, m_r[R2] == 0, (s32)m_r[R2] < 0)
 		}
 		// FLAGS: 0VZN
 		// TRAPS: I
 		break;
 	case 0x39:
 		// shali: shift arithmetic longword immediate
-		if (m_info.imm > 0)
+		if ((s32)m_info.imm > 0)
 		{
 			// save the bits that will be shifted out plus new sign bit
 			s64 v = ((s64 *)m_r)[R2 >> 1] >> (63 - m_info.imm);
 
-			((s64 *)m_r)[R2 >> 1] <<= m_info.imm;
+			((u64 *)m_r)[R2 >> 1] <<= m_info.imm;
 
 			// overflow is set if sign changes during shift
-			FLAGS(0, v != 0 && v != -1, ((s64 *)m_r)[R2 >> 1] == 0, ((s64 *)m_r)[R2 >> 1] < 0)
+			FLAGS(0, v != 0 && v != -1, ((u64 *)m_r)[R2 >> 1] == 0, ((s64 *)m_r)[R2 >> 1] < 0)
 		}
 		else
 		{
 			((s64 *)m_r)[R2 >> 1] >>= -m_info.imm;
-			FLAGS(0, 0, ((s64 *)m_r)[R2 >> 1] == 0, ((s64 *)m_r)[R2 >> 1] < 0)
+			FLAGS(0, 0, ((u64 *)m_r)[R2 >> 1] == 0, ((s64 *)m_r)[R2 >> 1] < 0)
 		}
 		// FLAGS: 0VZN
 		// TRAPS: I
 		break;
 	case 0x3a:
 		// shli: shift logical immediate
-		if (m_info.imm > 0)
+		if ((s32)m_info.imm > 0)
 			m_r[R2] <<= m_info.imm;
 		else
-			((u32 *)m_r)[R2] >>= -m_info.imm;
-		FLAGS(0, 0, m_r[R2] == 0, m_r[R2] < 0);
+			m_r[R2] >>= -m_info.imm;
+		FLAGS(0, 0, m_r[R2] == 0, (s32)m_r[R2] < 0);
 		// FLAGS: 00ZN
 		// TRAPS: I
 		break;
 	case 0x3b:
 		// shlli: shift logical longword immediate
-		if (m_info.imm > 0)
+		if ((s32)m_info.imm > 0)
 			((u64 *)m_r)[R2 >> 1] <<= m_info.imm;
 		else
 			((u64 *)m_r)[R2 >> 1] >>= -m_info.imm;
-		FLAGS(0, 0, ((s64 *)m_r)[R2 >> 1] == 0, ((s64 *)m_r)[R2 >> 1] < 0);
+		FLAGS(0, 0, ((u64 *)m_r)[R2 >> 1] == 0, ((s64 *)m_r)[R2 >> 1] < 0);
 		// FLAGS: 00ZN
 		// TRAPS: I
 		break;
 	case 0x3c:
 		// roti: rotate immediate
-		if (m_info.imm > 0)
+		if ((s32)m_info.imm > 0)
 			m_r[R2] = rotl32(m_r[R2], m_info.imm);
 		else
 			m_r[R2] = rotr32(m_r[R2], -m_info.imm);
-		FLAGS(0, 0, m_r[R2] == 0, m_r[R2] < 0);
+		FLAGS(0, 0, m_r[R2] == 0, (s32)m_r[R2] < 0);
 		// FLAGS: 00ZN
 		// TRAPS: I
 		break;
 	case 0x3d:
 		// rotli: rotate longword immediate
-		if (m_info.imm > 0)
+		if ((s32)m_info.imm > 0)
 			((u64 *)m_r)[R2 >> 1] = rotl64(((u64 *)m_r)[R2 >> 1], m_info.imm);
 		else
 			((u64 *)m_r)[R2 >> 1] = rotr64(((u64 *)m_r)[R2 >> 1], -m_info.imm);
-		FLAGS(0, 0, ((s64 *)m_r)[R2 >> 1] == 0, ((s64 *)m_r)[R2 >> 1] < 0);
+		FLAGS(0, 0, ((u64 *)m_r)[R2 >> 1] == 0, ((s64 *)m_r)[R2 >> 1] < 0);
 		// FLAGS: 00ZN
 		// TRAPS: I
 		break;
@@ -759,13 +783,13 @@ int clipper_device::execute_instruction ()
 	case 0x64:
 	case 0x65:
 		// loads: load single floating
-		((u64 *)&m_f)[R2] = m_data->read_dword(m_info.address);
+		set_fp32(R2, m_data->read_dword(m_info.address));
 		// TRAPS: C,U,A,P,R,I
 		break;
 	case 0x66:
 	case 0x67:
 		// loadd: load double floating
-		((u64 *)&m_f)[R2] = m_data->read_qword(m_info.address);
+		set_fp64(R2, m_data->read_qword(m_info.address));
 		// TRAPS: C,U,A,P,R,I
 		break;
 	case 0x68:
@@ -808,13 +832,13 @@ int clipper_device::execute_instruction ()
 	case 0x74:
 	case 0x75:
 		// stors: store single floating
-		m_data->write_dword(m_info.address, *((u32 *)&m_f[R2]));
+		m_data->write_dword(m_info.address, get_fp32(R2));
 		// TRAPS: A,P,W,I
 		break;
 	case 0x76:
 	case 0x77:
 		// stord: store double floating
-		m_data->write_qword(m_info.address, *((u64 *)&m_f[R2]));
+		m_data->write_qword(m_info.address, get_fp64(R2));
 		// TRAPS: A,P,W,I
 		break;
 	case 0x78:
@@ -835,7 +859,7 @@ int clipper_device::execute_instruction ()
 		// addw: add word
 		FLAGS_CV(C_ADD(m_r[R2], m_r[R1]), V_ADD(m_r[R2], m_r[R1]))
 		m_r[R2] += m_r[R1];
-		FLAGS_ZN(m_r[R2] == 0, m_r[R2] < 0)
+		FLAGS_ZN(m_r[R2] == 0, (s32)m_r[R2] < 0)
 		// FLAGS: CVZN
 		break;
 
@@ -843,21 +867,21 @@ int clipper_device::execute_instruction ()
 		// addq: add quick
 		FLAGS_CV(C_ADD(m_r[R2], R1), V_ADD(m_r[R2], R1))
 		m_r[R2] += R1;
-		FLAGS_ZN(m_r[R2] == 0, m_r[R2] < 0)
+		FLAGS_ZN(m_r[R2] == 0, (s32)m_r[R2] < 0)
 		// FLAGS: CVZN
 		break;
 	case 0x83:
 		// addi: add immediate
 		FLAGS_CV(C_ADD(m_r[R2], m_info.imm), V_ADD(m_r[R2], m_info.imm))
 		m_r[R2] += m_info.imm;
-		FLAGS_ZN(m_r[R2] == 0, m_r[R2] < 0)
+		FLAGS_ZN(m_r[R2] == 0, (s32)m_r[R2] < 0)
 		// FLAGS: CVZN
 		// TRAPS: I
 		break;
 	case 0x84:
 		// movw: move word
 		m_r[R2] = m_r[R1];
-		FLAGS(0, 0, m_r[R2] == 0, m_r[R2] < 0)
+		FLAGS(0, 0, m_r[R2] == 0, (s32)m_r[R2] < 0)
 		// FLAGS: 00ZN
 		break;
 
@@ -870,35 +894,35 @@ int clipper_device::execute_instruction ()
 	case 0x87:
 		// loadi: load immediate
 		m_r[R2] = m_info.imm;
-		FLAGS(0, 0, m_r[R2] == 0, m_r[R2] < 0)
+		FLAGS(0, 0, m_r[R2] == 0, (s32)m_r[R2] < 0)
 		// FLAGS: 00ZN
 		// TRAPS: I
 		break;
 	case 0x88:
 		// andw: and word
 		m_r[R2] &= m_r[R1];
-		FLAGS(0, 0, m_r[R2] == 0, m_r[R2] < 0)
+		FLAGS(0, 0, m_r[R2] == 0, (s32)m_r[R2] < 0)
 		// FLAGS: 00ZN
 		break;
 
 	case 0x8b:
 		// andi: and immediate
 		m_r[R2] &= m_info.imm;
-		FLAGS(0, 0, m_r[R2] == 0, m_r[R2] < 0)
+		FLAGS(0, 0, m_r[R2] == 0, (s32)m_r[R2] < 0)
 		// FLAGS: 00ZN
 		// TRAPS: I
 		break;
 	case 0x8c:
 		// orw: or word
 		m_r[R2] |= m_r[R1];
-		FLAGS(0, 0, m_r[R2] == 0, m_r[R2] < 0)
+		FLAGS(0, 0, m_r[R2] == 0, (s32)m_r[R2] < 0)
 		// FLAGS: 00ZN
 		break;
 
 	case 0x8f:
 		// ori: or immediate
 		m_r[R2] |= m_info.imm;
-		FLAGS(0, 0, m_r[R2] == 0, m_r[R2] < 0)
+		FLAGS(0, 0, m_r[R2] == 0, (s32)m_r[R2] < 0)
 		// FLAGS: 00ZN
 		// TRAPS: I
 		break;
@@ -906,14 +930,14 @@ int clipper_device::execute_instruction ()
 		// addwc: add word with carry
 		FLAGS_CV(C_ADD(m_r[R2], (m_r[R1] + (PSW(C) ? 1 : 0))), V_ADD(m_r[R2], (m_r[R1] + (PSW(C) ? 1 : 0))))
 		m_r[R2] += m_r[R1] + (PSW(C) ? 1 : 0);
-		FLAGS_ZN(m_r[R2] == 0, m_r[R2] < 0)
+		FLAGS_ZN(m_r[R2] == 0, (s32)m_r[R2] < 0)
 		// FLAGS: CVZN
 		break;
 	case 0x91:
 		// subwc: subtract word with carry
 		FLAGS_CV(C_SUB(m_r[R2], (m_r[R1] + (PSW(C) ? 1 : 0))), V_SUB(m_r[R2], (m_r[R1] + (PSW(C) ? 1 : 0))))
 		m_r[R2] -= m_r[R1] + (PSW(C) ? 1 : 0);
-		FLAGS_ZN(m_r[R2] == 0, m_r[R2] < 0)
+		FLAGS_ZN(m_r[R2] == 0, (s32)m_r[R2] < 0)
 		// FLAGS: CVZN
 		break;
 
@@ -921,13 +945,13 @@ int clipper_device::execute_instruction ()
 		// negw: negate word
 		FLAGS_CV(m_r[R1] != 0, m_r[R1] == INT32_MIN)
 		m_r[R2] = -m_r[R1];
-		FLAGS_ZN(m_r[R2] == 0, m_r[R2] < 0)
+		FLAGS_ZN(m_r[R2] == 0, (s32)m_r[R2] < 0)
 		// FLAGS: CVZN
 		break;
 
 	case 0x98:
 		// mulw: multiply word
-		m_r[R2] = m_r[R2] * m_r[R1];
+		m_r[R2] = (s32)m_r[R2] * (s32)m_r[R1];
 		// FLAGS: 0V00
 		break;
 	case 0x99:
@@ -937,7 +961,7 @@ int clipper_device::execute_instruction ()
 		break;
 	case 0x9a:
 		// mulwu: multiply word unsigned
-		m_r[R2] = (u32)m_r[R2] * (u32)m_r[R1];
+		m_r[R2] = m_r[R2] * m_r[R1];
 		// FLAGS: 0V00
 		break;
 	case 0x9b:
@@ -950,7 +974,7 @@ int clipper_device::execute_instruction ()
 		if (m_r[R1] != 0)
 		{
 			FLAGS(0, m_r[R2] == INT32_MIN && m_r[R1] == -1, 0, 0)
-			m_r[R2] = m_r[R2] / m_r[R1];
+			m_r[R2] = (s32)m_r[R2] / (s32)m_r[R1];
 		}
 		else
 			next_pc = intrap(EXCEPTION_INTEGER_DIVIDE_BY_ZERO, next_pc, CTS_DIVIDE_BY_ZERO);
@@ -962,7 +986,7 @@ int clipper_device::execute_instruction ()
 		if (m_r[R1] != 0)
 		{
 			FLAGS(0, m_r[R2] == INT32_MIN && m_r[R1] == -1, 0, 0)
-			m_r[R2] = m_r[R2] % m_r[R1];
+			m_r[R2] = (s32)m_r[R2] % (s32)m_r[R1];
 		}
 		else
 			next_pc = intrap(EXCEPTION_INTEGER_DIVIDE_BY_ZERO, next_pc, CTS_DIVIDE_BY_ZERO);
@@ -971,8 +995,8 @@ int clipper_device::execute_instruction ()
 		break;
 	case 0x9e:
 		// divwu: divide word unsigned
-		if ((u32)m_r[R1] != 0)
-			m_r[R2] = (u32)m_r[R2] / (u32)m_r[R1];
+		if (m_r[R1] != 0)
+			m_r[R2] = m_r[R2] / m_r[R1];
 		else
 			next_pc = intrap(EXCEPTION_INTEGER_DIVIDE_BY_ZERO, next_pc, CTS_DIVIDE_BY_ZERO);
 		FLAGS(0, 0, 0, 0)
@@ -981,8 +1005,8 @@ int clipper_device::execute_instruction ()
 		break;
 	case 0x9f:
 		// modwu: modulus word unsigned
-		if ((u32)m_r[R1] != 0)
-			m_r[R2] = (u32)m_r[R2] % (u32)m_r[R1];
+		if (m_r[R1] != 0)
+			m_r[R2] = m_r[R2] % m_r[R1];
 		else
 			next_pc = intrap(EXCEPTION_INTEGER_DIVIDE_BY_ZERO, next_pc, CTS_DIVIDE_BY_ZERO);
 		FLAGS(0, 0, 0, 0)
@@ -993,7 +1017,7 @@ int clipper_device::execute_instruction ()
 		// subw: subtract word
 		FLAGS_CV(C_SUB(m_r[R2], m_r[R1]), V_SUB(m_r[R2], m_r[R1]))
 		m_r[R2] -= m_r[R1];
-		FLAGS_ZN(m_r[R2] == 0, m_r[R2] < 0)
+		FLAGS_ZN(m_r[R2] == 0, (s32)m_r[R2] < 0)
 		// FLAGS: CVZN
 		break;
 
@@ -1001,52 +1025,52 @@ int clipper_device::execute_instruction ()
 		// subq: subtract quick
 		FLAGS_CV(C_SUB(m_r[R2], R1), V_SUB(m_r[R2], R1))
 		m_r[R2] -= R1;
-		FLAGS_ZN(m_r[R2] == 0, m_r[R2] < 0)
+		FLAGS_ZN(m_r[R2] == 0, (s32)m_r[R2] < 0)
 		// FLAGS: CVZN
 		break;
 	case 0xa3:
 		// subi: subtract immediate
 		FLAGS_CV(C_SUB(m_r[R2], m_info.imm), V_SUB(m_r[R2], m_info.imm))
 		m_r[R2] -= m_info.imm;
-		FLAGS_ZN(m_r[R2] == 0, m_r[R2] < 0)
+		FLAGS_ZN(m_r[R2] == 0, (s32)m_r[R2] < 0)
 		// FLAGS: CVZN
 		// TRAPS: I
 		break;
 	case 0xa4:
 		// cmpw: compare word
-		FLAGS(C_SUB(m_r[R2], m_r[R1]), V_SUB(m_r[R2], m_r[R1]), m_r[R2] == m_r[R1], m_r[R2] < m_r[R1])
+		FLAGS(C_SUB(m_r[R2], m_r[R1]), V_SUB(m_r[R2], m_r[R1]), m_r[R2] == m_r[R1], (s32)m_r[R2] < (s32)m_r[R1])
 		// FLAGS: CVZN
 		break;
 
 	case 0xa6:
 		// cmpq: compare quick
-		FLAGS(C_SUB(m_r[R2], R1), V_SUB(m_r[R2], R1), m_r[R2] == (s32)R1, m_r[R2] < (s32)R1)
+		FLAGS(C_SUB(m_r[R2], R1), V_SUB(m_r[R2], R1), m_r[R2] == R1, (s32)m_r[R2] < (s32)R1)
 		// FLAGS: CVZN
 		break;
 	case 0xa7:
 		// cmpi: compare immediate
-		FLAGS(C_SUB(m_r[R2], m_info.imm), V_SUB(m_r[R2], m_info.imm), m_r[R2] == m_info.imm, m_r[R2] < m_info.imm)
+		FLAGS(C_SUB(m_r[R2], m_info.imm), V_SUB(m_r[R2], m_info.imm), m_r[R2] == m_info.imm, (s32)m_r[R2] < (s32)m_info.imm)
 		// FLAGS: CVZN
 		// TRAPS: I
 		break;
 	case 0xa8:
 		// xorw: exclusive or word
 		m_r[R2] ^= m_r[R1];
-		FLAGS(0, 0, m_r[R2] == 0, m_r[R2] < 0)
+		FLAGS(0, 0, m_r[R2] == 0, (s32)m_r[R2] < 0)
 		// FLAGS: 00ZN
 		break;
 
 	case 0xab:
 		// xori: exclusive or immediate
 		m_r[R2] ^= m_info.imm;
-		FLAGS(0, 0, m_r[R2] == 0, m_r[R2] < 0)
+		FLAGS(0, 0, m_r[R2] == 0, (s32)m_r[R2] < 0)
 		// FLAGS: 00ZN
 		// TRAPS: I
 		break;
 	case 0xac:
 		// notw: not word
 		m_r[R2] = ~m_r[R1];
-		FLAGS(0, 0, m_r[R2] == 0, m_r[R2] < 0)
+		FLAGS(0, 0, m_r[R2] == 0, (s32)m_r[R2] < 0)
 		// FLAGS: 00ZN
 		break;
 
@@ -1158,7 +1182,7 @@ int clipper_device::execute_instruction ()
 
 			// store fi at sp - 8 * (8 - i)
 			for (int i = R2; i < 8; i++)
-				m_data->write_qword(m_r[15] - 8 * (8 - i), m_f[i]);
+				m_data->write_qword(m_r[15] - 8 * (8 - i), get_fp64(i));
 
 			// decrement sp after push to allow restart on exceptions
 			m_r[15] -= 8 * (8 - R2);
@@ -1170,71 +1194,148 @@ int clipper_device::execute_instruction ()
 
 			// load fi from sp + 8 * (i - N)
 			for (int i = R2; i < 8; i++)
-				m_f[i] = m_data->read_qword(m_r[15] + 8 * (i - R2));
+				set_fp64(i, m_data->read_qword(m_r[15] + 8 * (i - R2)));
 
 			// increment sp after pop to allow restart on exceptions
 			m_r[15] += 8 * (8 - R2);
 			// TRAPS: C,U,A,P,R
 			break;
-#ifdef UNIMPLEMENTED
 		case 0x30:
-			// cnvsw
+			// cnvsw: convert single floating to word
+			m_fp_pc = m_pc;
+
+			m_r[m_info.macro & 0xf] = float32_to_int32(get_fp32((m_info.macro >> 4) & 0xf));
+			// TRAPS: F_IX
+			float_exception_flags &= (float_flag_invalid | float_flag_inexact);
+			break;
 		case 0x31:
-			// cnvrsw
+			// cnvrsw: convert rounding single floating to word (non-IEEE +0.5/-0.5 rounding)
+			m_fp_pc = m_pc;
+
+			if (float32_lt(get_fp32((m_info.macro >> 4) & 0xf), 0))
+				m_r[m_info.macro & 0xf] = float32_to_int32_round_to_zero(float32_sub(get_fp32((m_info.macro >> 4) & 0xf),
+					float32_div(int32_to_float32(1), int32_to_float32(2))));
+			else
+				m_r[m_info.macro & 0xf] = float32_to_int32_round_to_zero(float32_add(get_fp32((m_info.macro >> 4) & 0xf),
+					float32_div(int32_to_float32(1), int32_to_float32(2))));
 			// TRAPS: F_IX
+			float_exception_flags &= (float_flag_invalid | float_flag_inexact);
+			break;
 		case 0x32:
-			// cnvtsw
+			// cnvtsw: convert truncating single floating to word
+			m_fp_pc = m_pc;
+
+			m_r[m_info.macro & 0xf] = float32_to_int32_round_to_zero(get_fp32((m_info.macro >> 4) & 0xf));
 			// TRAPS: F_IX
+			float_exception_flags &= (float_flag_invalid | float_flag_inexact);
+			break;
 		case 0x33:
-			// cnvws
+			// cnvws: convert word to single floating
+			set_fp32(m_info.macro & 0xf, int32_to_float32(m_r[(m_info.macro >> 4) & 0xf]));
 			// TRAPS: F_X
+			float_exception_flags &= (float_flag_inexact);
+			break;
 		case 0x34:
-			// cnvdw
+			// cnvdw: convert double floating to word
+			m_fp_pc = m_pc;
+
+			m_r[m_info.macro & 0xf] = float64_to_int32(get_fp64((m_info.macro >> 4) & 0xf));
 			// TRAPS: F_IX
+			float_exception_flags &= (float_flag_invalid | float_flag_inexact);
+			break;
 		case 0x35:
-			// cnvrdw
+			// cnvrdw: convert rounding double floating to word (non-IEEE +0.5/-0.5 rounding)
+			m_fp_pc = m_pc;
+
+			if (float64_lt(get_fp64((m_info.macro >> 4) & 0xf), 0))
+				m_r[m_info.macro & 0xf] = float64_to_int32_round_to_zero(float64_sub(get_fp64((m_info.macro >> 4) & 0xf),
+					float64_div(int32_to_float64(1), int32_to_float64(2))));
+			else
+				m_r[m_info.macro & 0xf] = float64_to_int32_round_to_zero(float64_add(get_fp64((m_info.macro >> 4) & 0xf),
+					float64_div(int32_to_float64(1), int32_to_float64(2))));
 			// TRAPS: F_IX
+			float_exception_flags &= (float_flag_invalid | float_flag_inexact);
 			break;
-#endif
-		case 0x36: // cnvtdw
-			m_r[m_info.macro & 0xf] = (s32)m_f[(m_info.macro >> 4) & 0xf];
+		case 0x36:
+			// cnvtdw: convert truncating double floating to word
+			m_fp_pc = m_pc;
+
+			m_r[m_info.macro & 0xf] = float64_to_int32_round_to_zero(get_fp64((m_info.macro >> 4) & 0xf));
 			// TRAPS: F_IX
+			float_exception_flags &= (float_flag_invalid | float_flag_inexact);
 			break;
-		case 0x37: // cnvwd
-			m_f[m_info.macro & 0xf] = (double)m_r[(m_info.macro >> 4) & 0xf];
+		case 0x37:
+			// cnvwd: convert word to double floating
+			set_fp64(m_info.macro & 0xf, int32_to_float64(m_r[(m_info.macro >> 4) & 0xf]));
+			float_exception_flags &= (0);
 			break;
-#ifdef UNIMPLEMENTED
 		case 0x38:
-			// cnvsd
+			// cnvsd: convert single to double floating
+			set_fp64(m_info.macro & 0xf, float32_to_float64(get_fp32((m_info.macro >> 4) & 0xf)));
 			// TRAPS: F_I
+			float_exception_flags &= (float_flag_invalid);
+			break;
 		case 0x39:
-			// cnvds
+			// cnvds: convert double to single floating
+			set_fp32(m_info.macro & 0xf, float64_to_float32(get_fp64((m_info.macro >> 4) & 0xf)));
 			// TRAPS: F_IVUX
+			float_exception_flags &= (float_flag_invalid | float_flag_overflow | float_flag_underflow | float_flag_inexact);
+			break;
 		case 0x3a:
-			// negs
+			// negs: negate single floating
+			set_fp32(m_info.macro & 0xf, float32_mul(get_fp32((m_info.macro >> 4) & 0xf), int32_to_float32(-1)));
+			float_exception_flags &= (0);
+			break;
 		case 0x3b:
-			// negds
+			// negd: negate double floating
+			set_fp64(m_info.macro & 0xf, float64_mul(get_fp64((m_info.macro >> 4) & 0xf), int32_to_float64(-1)));
+			float_exception_flags &= (0);
+			break;
 		case 0x3c:
-			// scalbs
+			/*
+			* This implementation for scalbd and scalbs is a bit opaque, but
+			* essentially we check if the integer value is within range, and
+			* directly create a floating constant representing 2^n or NaN
+			* respectively, which is used as an input to a multiply, producing
+			* the desired result. While doing an actual multiply is both
+			* inefficient and unnecessary, it's a tidy way to ensure the
+			* correct exception flags are set.
+			*/
+			// scalbs: scale by, single floating
+			set_fp32(m_info.macro & 0xf, float32_mul(get_fp32(m_info.macro & 0xf),
+				(((s32)m_r[(m_info.macro >> 4) & 0xf] > -127 && (s32)m_r[(m_info.macro >> 4) & 0xf] < 128)
+					? (float32)(((s32)m_r[(m_info.macro >> 4) & 0xf] + 127) << 23)
+					: (float32)~u32(0))));
 			// TRAPS: F_IVUX
+			float_exception_flags &= (float_flag_invalid | float_flag_overflow | float_flag_underflow | float_flag_inexact);
+			break;
 		case 0x3d:
-			// scalbd
-			// FLAGS: N
+			// scalbd: scale by, double floating
+			set_fp64(m_info.macro & 0xf, float64_mul(get_fp64(m_info.macro & 0xf),
+				((s32)m_r[(m_info.macro >> 4) & 0xf] > -1023 && (s32)m_r[(m_info.macro >> 4) & 0xf] < 1024)
+					? (float64)((u64)((s32)m_r[(m_info.macro >> 4) & 0xf] + 1023) << 52)
+					: (float64)~u64(0)));
 			// TRAPS: F_IVUX
+			float_exception_flags &= (float_flag_invalid | float_flag_overflow | float_flag_underflow | float_flag_inexact);
+			break;
 		case 0x3e:
-			// trapfn
+			// trapfn: trap floating unordered
+			if (PSW(Z) && PSW(N))
+				next_pc = intrap(EXCEPTION_ILLEGAL_OPERATION, next_pc, CTS_ILLEGAL_OPERATION);
 			// TRAPS: I
 		case 0x3f:
-			// loadfs
+			// loadfs: load floating status
+			m_r[(m_info.macro >> 4) & 0xf] = m_fp_pc;
+			m_f[m_info.macro & 0xf] = m_fp_dst;
+			m_ssw |= SSW_FRD;
 			break;
-#endif
+
 		default:
 			LOG("illegal unprivileged macro opcode at 0x%08x\n", m_pc);
 			next_pc = intrap(EXCEPTION_ILLEGAL_OPERATION, next_pc, CTS_ILLEGAL_OPERATION);
 			machine().debug_break();
 			break;
 		}
-
 		break;
 
 	case 0xb6:
@@ -1246,14 +1347,14 @@ int clipper_device::execute_instruction ()
 			case 0x00:
 				// movus: move user to supervisor
 				m_rs[m_info.macro & 0xf] = m_ru[(m_info.macro >> 4) & 0xf];
-				FLAGS(0, 0, m_rs[m_info.macro & 0xf] == 0, m_rs[m_info.macro & 0xf] < 0)
+				FLAGS(0, 0, m_rs[m_info.macro & 0xf] == 0, (s32)m_rs[m_info.macro & 0xf] < 0)
 				// FLAGS: 00ZN
 				// TRAPS: S
 				break;
 			case 0x01:
 				// movsu: move supervisor to user
 				m_ru[m_info.macro & 0xf] = m_rs[(m_info.macro >> 4) & 0xf];
-				FLAGS(0, 0, m_ru[m_info.macro & 0xf] == 0, m_ru[m_info.macro & 0xf] < 0)
+				FLAGS(0, 0, m_ru[m_info.macro & 0xf] == 0, (s32)m_ru[m_info.macro & 0xf] < 0)
 				// FLAGS: 00ZN
 				// TRAPS: S
 				break;
@@ -1285,6 +1386,9 @@ int clipper_device::execute_instruction ()
 				m_rs[(m_info.macro >> 4) & 0xf] += 12;
 
 				m_r = SSW(U) ? m_ru : m_rs;
+
+				fp_rounding();
+
 				// TRAPS: S
 				break;
 			case 0x05:
@@ -1330,15 +1434,17 @@ int clipper_device::execute_instruction ()
 }
 
 /*
-* Common entry point for transferring control in the event of an interrupt or exception.
-*/
-u32 clipper_device::intrap(u32 vector, u32 pc, u32 cts, u32 mts)
+ * Common entry point for transferring control in the event of an interrupt or
+ * exception. Reading between the lines, it appears this logic was implemented
+ * using the macro instruction ROM and a special macro instruction (intrap).
+ */
+u32 clipper_device::intrap(u16 vector, u32 pc, u32 cts, u32 mts)
 {
 	// fetch pc and ssw from interrupt vector
 	u32 next_pc = m_data->read_dword(vector + 0);
 	u32 next_ssw = m_data->read_dword(vector + 4);
 
-	LOGMASKED(LOG_INTERRUPT, "intrap vector 0x%08x pc 0x%08x next_pc 0x%08x ssp 0x%08x\n", vector, pc, next_pc, m_rs[15]);
+	LOGMASKED(LOG_INTERRUPT, "intrap vector 0x%04x pc 0x%08x next_pc 0x%08x ssp 0x%08x\n", vector, pc, next_pc, m_rs[15]);
 
 	// set cts and mts to indicate source of exception
 	m_psw = (m_psw & ~(PSW_CTS | PSW_MTS)) | mts | cts;
@@ -1356,6 +1462,7 @@ u32 clipper_device::intrap(u32 vector, u32 pc, u32 cts, u32 mts)
 
 	// clear psw
 	m_psw = 0;
+	float_rounding_mode = float_round_nearest_even;
 
 	m_r = SSW(U) ? m_ru : m_rs;
 
@@ -1363,13 +1470,13 @@ u32 clipper_device::intrap(u32 vector, u32 pc, u32 cts, u32 mts)
 	return next_pc;
 }
 
-u32 clipper_c400_device::intrap(u32 vector, u32 pc, u32 cts, u32 mts)
+u32 clipper_c400_device::intrap(u16 vector, u32 pc, u32 cts, u32 mts)
 {
 	// C400 reverses order of pc and ssw in interrupt vector
 	u32 next_pc = m_data->read_dword(vector + 4);
 	u32 next_ssw = m_data->read_dword(vector + 0);
 
-	LOGMASKED(LOG_INTERRUPT, "intrap vector 0x%08x pc 0x%08x next_pc 0x%08x ssp 0x%08x\n", vector, pc, next_pc, m_rs[15]);
+	LOGMASKED(LOG_INTERRUPT, "intrap vector 0x%04x pc 0x%08x next_pc 0x%08x ssp 0x%08x\n", vector, pc, next_pc, m_rs[15]);
 
 	// set cts and mts to indicate source of exception
 	m_psw = (m_psw & ~(PSW_CTS | PSW_MTS)) | mts | cts;
@@ -1393,6 +1500,7 @@ u32 clipper_c400_device::intrap(u32 vector, u32 pc, u32 cts, u32 mts)
 
 	// clear psw
 	m_psw = 0;
+	float_rounding_mode = float_round_nearest_even;
 
 	m_r = SSW(U) ? m_ru : m_rs;
 
@@ -1458,6 +1566,90 @@ bool clipper_device::evaluate_branch() const
 	}
 
 	return false;
+}
+
+void clipper_device::fp_rounding()
+{
+	// set the softfloat rounding mode based on the psw rounding mode
+	switch (PSW(FR))
+	{
+	case FR_0: float_rounding_mode = float_round_nearest_even; break;
+	case FR_1: float_rounding_mode = float_round_up; break;
+	case FR_2: float_rounding_mode = float_round_down; break;
+	case FR_3: float_rounding_mode = float_round_to_zero; break;
+	}
+}
+
+void clipper_device::fp_exception()
+{
+	u16 vector = 0;
+
+	/*
+	 * Set the psw floating exception flags, and identify any enabled
+	 * exceptions. The order here is important, but since the documentation
+	 * doesn't explicitly specify, this is a guess. Simply put, exceptions
+	 * are considered in sequence with an increasing order of priority.
+	 */
+	if (float_exception_flags & float_flag_inexact)
+	{
+		m_psw |= PSW_FX;
+		if (PSW(EFX))
+			vector = EXCEPTION_FLOATING_INEXACT;
+	}
+	if (float_exception_flags & float_flag_underflow)
+	{
+		m_psw |= PSW_FU;
+		if (PSW(EFU))
+			vector = EXCEPTION_FLOATING_UNDERFLOW;
+	}
+	if (float_exception_flags & float_flag_overflow)
+	{
+		m_psw |= PSW_FV;
+		if (PSW(EFV))
+			vector = EXCEPTION_FLOATING_OVERFLOW;
+	}
+	if (float_exception_flags & float_flag_divbyzero)
+	{
+		m_psw |= PSW_FD;
+		if (PSW(EFD))
+			vector = EXCEPTION_FLOATING_DIVIDE_BY_ZERO;
+	}
+	if (float_exception_flags & float_flag_invalid)
+	{
+		m_psw |= PSW_FI;
+		if (PSW(EFI))
+			vector = EXCEPTION_FLOATING_INVALID_OPERATION;
+	}
+
+	// trigger a floating point exception
+	if (PSW(EFT) && vector)
+		m_pc = intrap(vector, m_pc);
+}
+
+inline void clipper_device::set_fp32(const u8 reg, const float32 data)
+{
+	// save floating exception state
+	m_fp_pc = m_pc;
+	m_fp_dst = m_f[reg & 0xf];
+
+	// assign data
+	m_f[reg & 0xf] = data;
+
+	// set floating dirty flag
+	m_ssw |= SSW_FRD;
+}
+
+inline void clipper_device::set_fp64(const u8 reg, const float64 data)
+{
+	// save floating exception state
+	m_fp_pc = m_pc;
+	m_fp_dst = m_f[reg & 0xf];
+
+	// assign data
+	m_f[reg & 0xf] = data;
+
+	// set floating dirty flag
+	m_ssw |= SSW_FRD;
 }
 
 offs_t clipper_device::disasm_disassemble(std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, u32 options)

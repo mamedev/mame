@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-10-03 10:32+1100\n"
-"PO-Revision-Date: 2017-09-02 21:31+0200\n"
+"PO-Revision-Date: 2017-11-14 14:25+0100\n"
 "Last-Translator: Jos van Mourik\n"
 "Language-Team: MAME Language Team\n"
 "Language: nl\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 2.0.3\n"
+"X-Generator: Poedit 2.0.4\n"
 
 #: src/frontend/mame/ui/slotopt.cpp:192
 #, c-format
@@ -835,7 +835,7 @@ msgid ""
 "\n"
 "Press any key to continue."
 msgstr ""
-"Het geselecteerde spel mist één of meer benodigde ROM or CHD-bestanden. "
+"Het geselecteerde spel mist één of meer benodigde ROM- of CHD-bestanden. "
 "Selecteer een ander spel.\n"
 "\n"
 "Druk op een toets om door te gaan."
@@ -848,7 +848,7 @@ msgid ""
 "If this is your first time using %2$s, please see the config.txt file in the "
 "docs directory for information on configuring %2$s."
 msgstr ""
-"Geen machines gevonden. Controleer de rom mapinstellingen in het bestand "
+"Geen machines gevonden. Controleer de ROM-mapinstellingen in het bestand "
 "%1$s.ini.\n"
 "\n"
 "Als dit de eerste keer is dat je %2$s gebruikt, lees dan het bestand config."
@@ -1324,29 +1324,31 @@ msgstr "Vereist CHD\tNee\n"
 
 #: src/frontend/mame/ui/selgame.cpp:974
 msgid "ROM Audit Result\tOK\n"
-msgstr ""
+msgstr "ROM-controle Resultaat\tOK\n"
 
 #: src/frontend/mame/ui/selgame.cpp:976
 msgid "ROM Audit Result\tBAD\n"
-msgstr ""
+msgstr "ROM-controle Resultaat\tSLECHT\n"
 
 #: src/frontend/mame/ui/selgame.cpp:979
 msgid "Samples Audit Result\tNone Needed\n"
-msgstr ""
+msgstr "Samplecontrole Resultaat\tNiet Nodig\n"
 
 #: src/frontend/mame/ui/selgame.cpp:981
 msgid "Samples Audit Result\tOK\n"
-msgstr ""
+msgstr "Samplecontrole Resultaat\tOK\n"
 
 #: src/frontend/mame/ui/selgame.cpp:983
 msgid "Samples Audit Result\tBAD\n"
-msgstr ""
+msgstr "Samplecontrole Resultaat\tSLECHT\n"
 
 #: src/frontend/mame/ui/selgame.cpp:987
 msgid ""
 "ROM Audit Disabled\t\n"
 "Samples Audit Disabled\t\n"
 msgstr ""
+"ROM-controle Uitgeschakeld\t\n"
+"Samplecontrole Uitgeschakeld\t\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1171
 #, c-format
@@ -1379,7 +1381,7 @@ msgid ""
 "Please select a different machine.\n"
 "\n"
 msgstr ""
-"De geselecteerde machine mist één of meerdere benodigde ROM of CHD-"
+"De geselecteerde machine mist één of meerdere benodigde ROM- of CHD-"
 "bestanden. Druk op een toets om door te gaan.\n"
 "\n"
 
@@ -1664,7 +1666,7 @@ msgid ""
 "The software selected is missing one or more required ROM or CHD images. "
 "Please select a different one."
 msgstr ""
-"De geselecteerde software mist één of meerdere benodigde ROM of CHD-"
+"De geselecteerde software mist één of meerdere benodigde ROM- of CHD-"
 "bestanden. Kies een andere."
 
 #: src/frontend/mame/ui/info_pty.cpp:30 src/frontend/mame/ui/mainmenu.cpp:99
@@ -1790,12 +1792,12 @@ msgstr " PENNEN"
 #: src/frontend/mame/ui/auditmenu.cpp:96
 #, c-format
 msgid "Audit ROMs for %1$u machines marked unavailable?"
-msgstr "Controleer ROMS voor %1$u onbeschikbaar gemarkeerde machines?"
+msgstr "Controleer ROMs voor %1$u onbeschikbaar gemarkeerde machines?"
 
 #: src/frontend/mame/ui/auditmenu.cpp:99
 #, c-format
 msgid "Audit ROMs for all %1$u machines?"
-msgstr "Controleer ROMS voor alle %1$u machines?"
+msgstr "Controleer ROMs voor alle %1$u machines?"
 
 #: src/frontend/mame/ui/auditmenu.cpp:104
 #, c-format
@@ -1808,7 +1810,7 @@ msgid ""
 "Auditing ROMs for machine %2$u of %3$u...\n"
 "%1$s"
 msgstr ""
-"ROMS controleren voor machine %2$u van %3$u...\n"
+"ROMs controleren voor machine %2$u van %3$u...\n"
 "%1$s"
 
 #: src/frontend/mame/ui/auditmenu.cpp:142
@@ -1953,7 +1955,7 @@ msgstr "Softwareonderdelen selectiemenu overslaan"
 
 #: src/frontend/mame/ui/submenu.cpp:33
 msgid "Info auto audit"
-msgstr "Info romcontrole"
+msgstr "Info auto controle"
 
 #: src/frontend/mame/ui/submenu.cpp:34
 msgid "Hide romless machine from available list"
@@ -2476,27 +2478,27 @@ msgstr "Instellingen"
 
 #: plugins/timer/init.lua:94
 msgid "Current time"
-msgstr ""
+msgstr "Huidige tijd"
 
 #: plugins/timer/init.lua:96
 msgid "Total time"
-msgstr ""
+msgstr "Totale tijd"
 
 #: plugins/timer/init.lua:98
 msgid "Play Count"
-msgstr ""
+msgstr "Speelteller"
 
 #: plugins/timer/init.lua:106
 msgid "Timer"
-msgstr ""
+msgstr "Timer"
 
 #: plugins/cheat/init.lua:458
 msgid "Select cheat to set hotkey"
-msgstr ""
+msgstr "Selecteer cheat om sneltoets te maken"
 
 #: plugins/cheat/init.lua:464
 msgid "Press button for hotkey or wait to clear"
-msgstr ""
+msgstr "Druk op knop voor sneltoets of wacht om te herstellen"
 
 #: plugins/cheat/init.lua:476
 msgid "None"
@@ -2504,40 +2506,40 @@ msgstr "Geen"
 
 #: plugins/cheat/init.lua:481
 msgid "Done"
-msgstr ""
+msgstr "Klaar"
 
 #: plugins/cheat/init.lua:495 plugins/cheat/init.lua:509
 msgid "Set"
-msgstr ""
+msgstr "Kies"
 
 #: plugins/cheat/init.lua:528
 msgid "Set hotkeys"
-msgstr ""
+msgstr "Kies sneltoets"
 
 #: plugins/cheat/init.lua:668
 #, lua-format
 msgid "Activated: %s = %s"
-msgstr ""
+msgstr "Geactiveerd: %s = %s"
 
 #: plugins/cheat/init.lua:671 plugins/cheat/init.lua:729
 #, lua-format
 msgid "Activated: %s"
-msgstr ""
+msgstr "Geactiveerd: %s"
 
 #: plugins/cheat/init.lua:733
 #, lua-format
 msgid "Enabled: %s"
-msgstr ""
+msgstr "Ingeschakeld: %s"
 
 #: plugins/cheat/init.lua:738
 #, lua-format
 msgid "Disabled: %s"
-msgstr ""
+msgstr "Uitgeschakeld: %s"
 
 #: plugins/cheat/init.lua:776
 #, lua-format
 msgid "%s added"
-msgstr ""
+msgstr "%s toegevoegd"
 
 #: plugins/data/data_command.lua:19
 msgid "Command"
@@ -2562,6 +2564,10 @@ msgid ""
 "--- DRIVER INFO ---\n"
 "Driver: "
 msgstr ""
+"\n"
+"\n"
+"--- DRIVER INFO ---\n"
+"Driver: "
 
 #: plugins/data/data_mameinfo.lua:20
 msgid "MAMEinfo"
@@ -2585,244 +2591,205 @@ msgstr "MARPScore"
 
 #: plugins/cheatfind/init.lua:344
 msgid "Save Cheat"
-msgstr ""
+msgstr "Sla cheat op"
 
 #: plugins/cheatfind/init.lua:347
 msgid "Default"
-msgstr ""
+msgstr "Standaard"
 
 #: plugins/cheatfind/init.lua:347
 msgid "Custom"
-msgstr ""
+msgstr "Eigen"
 
 #: plugins/cheatfind/init.lua:348
 msgid "Cheat Name"
-msgstr ""
+msgstr "Cheatnaam"
 
 #: plugins/cheatfind/init.lua:354
 #, lua-format
 msgid "Default name is %s"
-msgstr ""
+msgstr "Standaardnaam is %s"
 
 #: plugins/cheatfind/init.lua:362
 msgid "Player"
-msgstr ""
+msgstr "Speler"
 
 #: plugins/cheatfind/init.lua:367
 msgid "Type"
-msgstr ""
+msgstr "Type"
 
 #: plugins/cheatfind/init.lua:373
 msgid "Save"
-msgstr ""
+msgstr "Opslaan"
 
 #: plugins/cheatfind/init.lua:399
 #, lua-format
 msgid "Cheat written to %s and added to cheat.simple"
-msgstr ""
+msgstr "Cheat geschreven naar %s en toegevoegd aan cheat.simple"
 
 #: plugins/cheatfind/init.lua:407
 msgid "Cheat added to cheat.simple"
-msgstr ""
+msgstr "Cheat toegevoegd aan cheat.simple"
 
 #: plugins/cheatfind/init.lua:412
 msgid ""
 "Unable to write file\n"
 "Ensure that cheatpath folder exists"
 msgstr ""
+"Niet in staat om bestand te schrijven\n"
+"Zorg ervoor dat de cheatpath map bestaat"
 
 #: plugins/cheatfind/init.lua:421
 msgid "Cancel"
-msgstr ""
+msgstr "Annuleer"
 
 #: plugins/cheatfind/init.lua:426
 msgid "CPU or RAM"
-msgstr ""
+msgstr "CPU of RAM"
 
 #: plugins/cheatfind/init.lua:430
 msgid "Changes to this only take effect when \"Start new search\" is selected"
 msgstr ""
+"Veranderingen hieraan hebben alleen effect wanneer \"Start nieuwe "
+"zoekopdracht\" is geselecteerd"
 
 #: plugins/cheatfind/init.lua:449
 msgid "Data cleared and current state saved"
-msgstr ""
+msgstr "Data hersteld en huidige staat opgeslagen"
 
 #: plugins/cheatfind/init.lua:457
 msgid "Start new search"
-msgstr ""
+msgstr "Start nieuwe zoekopdracht"
 
 #: plugins/cheatfind/init.lua:467
 msgid "Current state saved"
-msgstr ""
+msgstr "Huidige staat opgeslagen"
 
 #: plugins/cheatfind/init.lua:474
 msgid "Save current -- #"
-msgstr ""
+msgstr "Sla huidige -- # op"
 
 #: plugins/cheatfind/init.lua:506
 msgid " total matches found"
-msgstr ""
+msgstr " totale overeenkomsten gevonden"
 
 #: plugins/cheatfind/init.lua:513
 msgid "Compare"
-msgstr ""
+msgstr "Vergelijk"
 
 #: plugins/cheatfind/init.lua:516
 msgid "Left operand"
-msgstr ""
+msgstr "Linkse operand"
 
 #: plugins/cheatfind/init.lua:519
 msgid "Current"
-msgstr ""
+msgstr "Huidige"
 
 #: plugins/cheatfind/init.lua:524
 msgid "Operator"
-msgstr ""
+msgstr "Operator"
 
 #: plugins/cheatfind/init.lua:531
 msgid "Left less than right, value is difference"
-msgstr ""
+msgstr "Links kleiner dan rechts, waarde is verschil"
 
 #: plugins/cheatfind/init.lua:533
 msgid "Left greater than right, value is difference"
-msgstr ""
+msgstr "Links groter dan rechts, waarde is verschil"
 
 #: plugins/cheatfind/init.lua:535
 msgid "Left equal to right"
-msgstr ""
+msgstr "Links gelijk aan rechts"
 
 #: plugins/cheatfind/init.lua:537
 msgid "Left not equal to right, value is difference"
-msgstr ""
+msgstr "Links niet gelijk aan rechts, waarde is verschil"
 
 #: plugins/cheatfind/init.lua:539
 msgid "Left equal to right with bitmask"
-msgstr ""
+msgstr "Links gelijk aan rechts met bitmasker"
 
 #: plugins/cheatfind/init.lua:541
 msgid "Left not equal to right with bitmask"
-msgstr ""
+msgstr "Links niet gelijk aan rechts met bitmasker"
 
 #: plugins/cheatfind/init.lua:543
 msgid "Left less than value"
-msgstr ""
+msgstr "Links kleiner dan waarde"
 
 #: plugins/cheatfind/init.lua:545
 msgid "Left greater than value"
-msgstr ""
+msgstr "Links groter dan waarde"
 
 #: plugins/cheatfind/init.lua:547
 msgid "Left equal to value"
-msgstr ""
+msgstr "Links gelijk aan waarde"
 
 #: plugins/cheatfind/init.lua:549
 msgid "Left not equal to value"
-msgstr ""
+msgstr "Links niet gelijk aan waarde"
 
 #: plugins/cheatfind/init.lua:560
 msgid "Right operand"
-msgstr ""
+msgstr "Rechtse operand"
 
 #: plugins/cheatfind/init.lua:568
 msgid "Value"
-msgstr ""
+msgstr "Waarde"
 
 #: plugins/cheatfind/init.lua:572
 msgid "Any"
-msgstr ""
+msgstr "Willekeurige"
 
 #: plugins/cheatfind/init.lua:578
 msgid "Data Format"
-msgstr ""
+msgstr "Data Format"
 
 #: plugins/cheatfind/init.lua:602
 msgid "Undo last search -- #"
-msgstr ""
+msgstr "Laatste zoekopdracht ongedaan maken -- #"
 
 #: plugins/cheatfind/init.lua:606
 msgid "Match block"
-msgstr ""
+msgstr "Paar blok"
 
 #: plugins/cheatfind/init.lua:609
 msgid "All"
-msgstr ""
+msgstr "Alle"
 
 #: plugins/cheatfind/init.lua:660
 #, lua-format
 msgid "Test cheat at addr %08X"
-msgstr ""
+msgstr "Test cheat op addr %08X"
 
 #: plugins/cheatfind/init.lua:692
 msgid "Cheat engine not available"
-msgstr ""
+msgstr "Cheat engine niet beschikbaar"
 
 #: plugins/cheatfind/init.lua:718
 msgid "Default name is "
-msgstr ""
+msgstr "Standaardnaam is "
 
 #: plugins/cheatfind/init.lua:741
 msgid "Test"
-msgstr ""
+msgstr "Test"
 
 #: plugins/cheatfind/init.lua:741
 msgid "Write"
-msgstr ""
+msgstr "Schrijf"
 
 #: plugins/cheatfind/init.lua:741
 msgid "Watch"
-msgstr ""
+msgstr "Watch"
 
 #: plugins/cheatfind/init.lua:758
 msgid "Page"
-msgstr ""
+msgstr "Pagina"
 
 #: plugins/cheatfind/init.lua:776
 msgid "Clear Watches"
-msgstr ""
+msgstr "Herstel Watches"
 
 #: plugins/cheatfind/init.lua:786
 msgid "Cheat Finder"
-msgstr ""
-
-#~ msgid "Requires CHD\t%1$s\n"
-#~ msgstr "Vereist CHD\t%1$s\n"
-
-#~ msgid "Roms Audit Pass\tOK\n"
-#~ msgstr "Romcontrole geslaagd\tOK\n"
-
-#~ msgid "Roms Audit Pass\tBAD\n"
-#~ msgstr "Romcontrole geslaagd\tSLECHT\n"
-
-#~ msgid "Samples Audit Pass\tNone Needed\n"
-#~ msgstr "Samplecontrole geslaagd\tNiet nodig\n"
-
-#~ msgid "Samples Audit Pass\tOK\n"
-#~ msgstr "Samplecontrole geslaagd\tOK\n"
-
-#~ msgid "Samples Audit Pass\tBAD\n"
-#~ msgstr "Samplecontrole geslaagd\tSLECHT\n"
-
-#~ msgid ""
-#~ "Roms Audit Pass\tDisabled\n"
-#~ "Samples Audit Pass\tDisabled\n"
-#~ msgstr ""
-#~ "Romcontrole geslaagd\tUitgeschakeld\n"
-#~ "Samplecontrole geslaagd\tUitgeschakeld\n"
-
-#~ msgid "Unimplemented"
-#~ msgstr "Ongeïmplementeerd"
-
-#~ msgid "Imperfect"
-#~ msgstr "Onvolledig"
-
-#~ msgid "OK"
-#~ msgstr "OK"
-
-#~ msgid "No Infos Available"
-#~ msgstr "Geen informatie beschikbaar"
-
-#~ msgid "Dummy"
-#~ msgstr "Dummie"
-
-#~ msgid "Display Options"
-#~ msgstr "Videoopties"
+msgstr "Cheatzoeker"

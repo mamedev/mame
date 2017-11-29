@@ -450,10 +450,11 @@ bool device_t::findit(bool isvalidation) const
 }
 
 //-------------------------------------------------
-//  start - start a device
+//  resolve_objects - find objects referenced in
+//  configuration
 //-------------------------------------------------
 
-void device_t::start()
+void device_t::resolve_objects()
 {
 	// prepare the logerror buffer
 	if (m_machine->allow_logging())
@@ -462,6 +463,20 @@ void device_t::start()
 	// find all the registered devices
 	if (!findit(false))
 		throw emu_fatalerror("Missing some required objects, unable to proceed");
+
+	// allow implementation to do additional setup
+	device_resolve_objects();
+}
+
+//-------------------------------------------------
+//  start - start a device
+//-------------------------------------------------
+
+void device_t::start()
+{
+	// prepare the logerror buffer
+	if (m_machine->allow_logging())
+		m_string_buffer.reserve(1024);
 
 	// let the interfaces do their pre-work
 	for (device_interface &intf : interfaces())
@@ -675,6 +690,18 @@ void device_t::device_reset()
 //-------------------------------------------------
 
 void device_t::device_reset_after_children()
+{
+	// do nothing by default
+}
+
+
+//-------------------------------------------------
+//  device_resolve_objects - resolve objects that
+//  may be needed for other devices to set
+//  initial conditions at start time
+//-------------------------------------------------
+
+void device_t::device_resolve_objects()
 {
 	// do nothing by default
 }

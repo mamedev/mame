@@ -29,6 +29,19 @@ DEFINE_DEVICE_TYPE(TMP91641,  tmp91641_device,  "tmp91641",  "TMP91641")
 DEFINE_DEVICE_TYPE(TMP90PH44, tmp90ph44_device, "tmp90ph44", "TMP90PH44")
 
 
+#define T90_IOBASE  0xffc0
+
+enum e_ir
+{
+	T90_P0=T90_IOBASE,  T90_P1,     T90_P01CR_IRFL, T90_IRFH,   T90_P2,     T90_P2CR,   T90_P3,     T90_P3CR,
+	T90_P4,             T90_P4CR,   T90_P5,         T90_SMMOD,  T90_P6,     T90_P7,     T90_P67CR,  T90_SMCR,
+	T90_P8,             T90_P8CR,   T90_WDMOD,      T90_WDCR,   T90_TREG0,  T90_TREG1,  T90_TREG2,  T90_TREG3,
+	T90_TCLK,           T90_TFFCR,  T90_TMOD,       T90_TRUN,   T90_CAP1L,  T90_CAP1H,  T90_CAP2L,  T90_CAL2H,
+	T90_TREG4L,         T90_TREG4H, T90_TREG5L,     T90_TREG5H, T90_T4MOD,  T90_T4FFCR, T90_INTEL,  T90_INTEH,
+	T90_DMAEH,          T90_SCMOD,  T90_SCCR,       T90_SCBUF,  T90_BX,     T90_BY,     T90_ADREG,  T90_ADMOD
+};
+
+
 static ADDRESS_MAP_START(tmp90840_mem, AS_PROGRAM, 8, tlcs90_device)
 	AM_RANGE(   0x0000,     0x1fff          )   AM_ROM  // 8KB ROM (internal)
 	AM_RANGE(   0xfec0,     0xffbf          )   AM_RAM  // 256b RAM (internal)
@@ -1007,11 +1020,16 @@ static const char *const ir_names[] =   {
 
 const char *tlcs90_device::internal_registers_names(uint16_t x)
 {
-	int ir = x - T90_IOBASE;
-	if ( ir >= 0 && ir < ARRAY_LENGTH(ir_names) )
-		return ir_names[ir];
+	if (type() != TMP90PH44)
+	{
+		// FIXME: TMP90PH44 and many other models have completely different SFR maps
+		int ir = x - 0xffc0;
+		if ( ir >= 0 && ir < ARRAY_LENGTH(ir_names) )
+			return ir_names[ir];
+	}
 	return nullptr;
 }
+
 bool tlcs90_device::stream_arg(std::ostream &stream, uint32_t pc, const char *pre, const e_mode mode, const uint16_t r, const uint16_t rb)
 {
 	const char *reg_name;
@@ -2055,7 +2073,22 @@ void tlcs90_device::device_reset()
     dedicated input ports and CPU registers remain unchanged,
     but PC IFF BX BY = 0, A undefined
 */
-	memset(m_internal_registers, 0, sizeof(m_internal_registers));
+
+	std::fill(std::begin(m_port_latch), std::end(m_port_latch), 0);
+	m_p4cr = 0;
+	m_p67cr = 0;
+	m_p8cr = 0;
+	m_smmod = 0;
+
+	m_ixbase = 0;
+	m_iybase = 0;
+
+	m_tmod = 0;
+	m_tclk = 0;
+	m_trun = 0;
+	m_t4mod = 0;
+	std::fill(std::begin(m_treg_8bit), std::end(m_treg_8bit), 0);
+	std::fill(std::begin(m_treg_16bit), std::end(m_treg_16bit), 0);
 }
 
 void tlcs90_device::execute_burn(int32_t cycles)
@@ -2337,32 +2370,47 @@ FFED    BX      R/W     Reset   Description
 
 READ8_MEMBER( tlcs90_device::t90_internal_registers_r )
 {
-	uint8_t data = m_internal_registers[offset];
 	switch ( T90_IOBASE + offset )
 	{
 		case T90_P3:    // 7,4,1,0
-			return (data & 0x6c) | (m_port_read_cb[3]() & 0x93);
+			return (m_port_latch[3] & 0x6c) | (m_port_read_cb[3]() & 0x93);
 
 		case T90_P4:    // only output
-			return data & 0x0f;
+			return m_port_latch[4] & 0x0f;
 
 		case T90_P5:
 			return (m_port_read_cb[5]() & 0x3f);
 
 		case T90_P6:
-			return (data & 0xf0) | (m_port_read_cb[6]() & 0x0f);
+			return (m_port_latch[6] & 0xf0) | (m_port_read_cb[6]() & 0x0f);
 
 		case T90_P7:
-			return (data & 0xf0) | (m_port_read_cb[7]() & 0x0f);
+			return (m_port_latch[7] & 0xf0) | (m_port_read_cb[7]() & 0x0f);
 
 		case T90_P8:    // 2,1,0
-			return (data & 0x08) | (m_port_read_cb[8]() & 0x07);
+			return (m_port_latch[8] & 0x08) | (m_port_read_cb[8]() & 0x07);
 
 		case T90_BX:
+			return 0xf0 | (m_ixbase >> 16);
+
 		case T90_BY:
-			return 0xf0 | data;
+			return 0xf0 | (m_iybase >> 16);
+
+		case T90_TMOD:
+			return m_tmod;
+
+		case T90_TCLK:
+			return m_tclk;
+
+		case T90_TRUN:
+			return m_trun;
+
+		case T90_T4MOD:
+			return m_t4mod;
 	}
-	return data;
+
+	logerror("Read from unimplemented SFR at %04X\n", T90_IOBASE + offset);
+	return 0;
 }
 
 void tlcs90_device::t90_start_timer(int i)
@@ -2372,7 +2420,7 @@ void tlcs90_device::t90_start_timer(int i)
 
 	m_timer_value[i] = 0;
 
-	switch((m_internal_registers[ T90_TMOD - T90_IOBASE ] >> (i * 2)) & 0x03)
+	switch((m_tmod >> (i * 2)) & 0x03)
 	{
 		case 0:
 			// 8-bit mode
@@ -2388,7 +2436,7 @@ void tlcs90_device::t90_start_timer(int i)
 			return;
 	}
 
-	switch((m_internal_registers[ T90_TCLK - T90_IOBASE ] >> (i * 2)) & 0x03)
+	switch((m_tclk >> (i * 2)) & 0x03)
 	{
 		case 0: if (i & 1)  logerror("%04X: CPU Timer %d clocked by Timer %d match signal\n", m_pc.w.l, i,i-1);
 				else        logerror("%04X: CPU Timer %d, unsupported TCLK = 0\n", m_pc.w.l, i);
@@ -2414,11 +2462,11 @@ void tlcs90_device::t90_start_timer4()
 
 	m_timer4_value = 0;
 
-	switch(m_internal_registers[ T90_T4MOD - T90_IOBASE ] & 0x03)
+	switch(m_t4mod & 0x03)
 	{
 		case 1:     prescaler =   1;    break;
 		case 2:     prescaler =  16;    break;
-		default:    logerror("%04X: CPU Timer 4, unsupported T4MOD = %d\n", m_pc.w.l,m_internal_registers[ T90_T4MOD - T90_IOBASE ] & 0x03);
+		default:    logerror("%04X: CPU Timer 4, unsupported T4MOD = %d\n", m_pc.w.l,m_t4mod & 0x03);
 					return;
 	}
 
@@ -2447,12 +2495,12 @@ TIMER_CALLBACK_MEMBER( tlcs90_device::t90_timer_callback )
 	int i = param;
 
 	int mask = 0x20 | (1 << i);
-	if ( (m_internal_registers[ T90_TRUN - T90_IOBASE ] & mask) != mask )
+	if ( (m_trun & mask) != mask )
 		return;
 
 	timer_fired = 0;
 
-	mode = (m_internal_registers[ T90_TMOD - T90_IOBASE ] >> ((i & ~1) + 2)) & 0x03;
+	mode = (m_tmod >> ((i & ~1) + 2)) & 0x03;
 	// Match
 	switch (mode)
 	{
@@ -2462,7 +2510,7 @@ TIMER_CALLBACK_MEMBER( tlcs90_device::t90_timer_callback )
 		// TODO: hmm...
 	case 0x00: // 8bit
 		m_timer_value[i]++;
-		if ( m_timer_value[i] == m_internal_registers[ T90_TREG0+i - T90_IOBASE ] )
+		if ( m_timer_value[i] == m_treg_8bit[i] )
 		timer_fired = 1;
 		break;
 
@@ -2471,8 +2519,8 @@ TIMER_CALLBACK_MEMBER( tlcs90_device::t90_timer_callback )
 		break;
 		m_timer_value[i]++;
 		if(m_timer_value[i] == 0) m_timer_value[i+1]++;
-		if(m_timer_value[i+1] == m_internal_registers[ T90_TREG0+i+1 - T90_IOBASE ])
-		if(m_timer_value[i] == m_internal_registers[ T90_TREG0+i - T90_IOBASE ])
+		if(m_timer_value[i+1] == m_treg_8bit[i+1])
+		if(m_timer_value[i] == m_treg_8bit[i])
 			timer_fired = 1;
 		break;
 	}
@@ -2486,7 +2534,7 @@ TIMER_CALLBACK_MEMBER( tlcs90_device::t90_timer_callback )
 		case 0x00: // 8bit
 		if(i & 1)
 			break;
-		if ( (m_internal_registers[ T90_TCLK - T90_IOBASE ] & (0x0C << (i * 2))) == 0 ) // T0/T1 match signal clocks T1/T3
+		if ( (m_tclk & (0x0C << (i * 2))) == 0 ) // T0/T1 match signal clocks T1/T3
 			t90_timer_callback(ptr, i+1);
 		break;
 		case 0x01: // 16bit, only can happen for i=0,2
@@ -2508,16 +2556,16 @@ TIMER_CALLBACK_MEMBER( tlcs90_device::t90_timer4_callback )
 
 	// Match
 
-	if ( m_timer4_value == (m_internal_registers[ T90_TREG4L - T90_IOBASE ] + (m_internal_registers[ T90_TREG4H - T90_IOBASE ] << 8)) )
+	if ( m_timer4_value == m_treg_16bit[0] )
 	{
 //      logerror("CPU Timer 4 matches TREG4\n");
 		set_irq_line(INTT4, 1);
 	}
-	if ( m_timer4_value == (m_internal_registers[ T90_TREG5L - T90_IOBASE ] + (m_internal_registers[ T90_TREG5H - T90_IOBASE ] << 8)) )
+	if ( m_timer4_value == m_treg_16bit[1] )
 	{
 //      logerror("CPU Timer 4 matches TREG5\n");
 		set_irq_line(INTT5, 1);
-		if (m_internal_registers[ T90_T4MOD - T90_IOBASE ] & 0x04)
+		if (m_t4mod & 0x04)
 			m_timer4_value = 0;
 	}
 
@@ -2532,13 +2580,58 @@ TIMER_CALLBACK_MEMBER( tlcs90_device::t90_timer4_callback )
 WRITE8_MEMBER( tlcs90_device::t90_internal_registers_w )
 {
 	uint8_t out_mask;
-	uint8_t old = m_internal_registers[offset];
+
 	switch ( T90_IOBASE + offset )
 	{
+		case T90_TMOD:
+			m_tmod = data;
+			break;
+
+		case T90_TCLK:
+			m_tclk = data;
+			break;
+
+		case T90_TREG0:
+			m_treg_8bit[0] = data;
+			break;
+
+		case T90_TREG1:
+			m_treg_8bit[1] = data;
+			break;
+
+		case T90_TREG2:
+			m_treg_8bit[2] = data;
+			break;
+
+		case T90_TREG3:
+			m_treg_8bit[3] = data;
+			break;
+
+		case T90_T4MOD:
+			m_t4mod = data;
+			break;
+
+		case T90_TREG4L:
+			m_treg_16bit[0] = (m_treg_16bit[0] & 0xff00) | data;
+			break;
+
+		case T90_TREG4H:
+			m_treg_16bit[0] = (m_treg_16bit[0] & 0x00ff) | (data << 8);
+			break;
+
+		case T90_TREG5L:
+			m_treg_16bit[1] = (m_treg_16bit[1] & 0xff00) | data;
+			break;
+
+		case T90_TREG5H:
+			m_treg_16bit[1] = (m_treg_16bit[1] & 0x00ff) | (data << 8);
+			break;
+
 		case T90_TRUN:
 		{
 			int i;
 			uint8_t mask;
+			uint8_t old = m_trun;
 			// Timers 0-3
 			for (i = 0; i < 4; i++)
 			{
@@ -2557,6 +2650,8 @@ WRITE8_MEMBER( tlcs90_device::t90_internal_registers_w )
 				if ( (data & mask) == mask )    t90_start_timer4();
 				else                            t90_stop_timer4();
 			}
+
+			m_trun = data;
 			break;
 		}
 
@@ -2590,24 +2685,29 @@ WRITE8_MEMBER( tlcs90_device::t90_internal_registers_w )
 								((data & 0x01) ? (1 << INTT1) : 0) ;
 			break;
 
+		case T90_IRFH:
+			if (data >= int(INTSWI) + 2 && data < int(INTMAX) + 2)
+				m_irq_state &= ~(1 << (data - 2));
+			break;
+
 		case T90_P3:
-			data &= 0x6c;
-			m_port_write_cb[3](data);
+			m_port_latch[3] = data & 0x6c;
+			m_port_write_cb[3](m_port_latch[3]);
 			break;
 
 		case T90_P4:
-			data &= 0x0f;
-			out_mask = (~m_internal_registers[ T90_P4CR - T90_IOBASE ]) & 0x0f;
+			m_port_latch[4] = data & 0x0f;
+			out_mask = ~m_p4cr & 0x0f;
 			if (out_mask)
 			{
-				data &= out_mask;
-				m_port_write_cb[4](data);
+				m_port_write_cb[4](m_port_latch[4] & out_mask);
 			}
 			break;
 
 		case T90_P6:
-			out_mask = m_internal_registers[ T90_P67CR - T90_IOBASE ] & 0x0f;
-			switch (m_internal_registers[ T90_SMMOD - T90_IOBASE ] & 0x03)
+			m_port_latch[6] = data & 0x0f;
+			out_mask = m_p67cr & 0x0f;
+			switch (m_smmod & 0x03)
 			{
 				case 1:
 					data &= ~0x01;
@@ -2622,14 +2722,14 @@ WRITE8_MEMBER( tlcs90_device::t90_internal_registers_w )
 
 			if (out_mask)
 			{
-				data &= out_mask;
-				m_port_write_cb[6](data);
+				m_port_write_cb[6](m_port_latch[6] & out_mask);
 			}
 			break;
 
 		case T90_P7:
-			out_mask = (m_internal_registers[ T90_P67CR - T90_IOBASE ] & 0xf0) >> 4;
-			switch ((m_internal_registers[ T90_SMMOD - T90_IOBASE ]>>4) & 0x03)
+			m_port_latch[7] = data & 0x0f;
+			out_mask = m_p67cr >> 4;
+			switch ((m_smmod >> 4) & 0x03)
 			{
 				case 1:
 					data &= ~0x01;
@@ -2644,29 +2744,47 @@ WRITE8_MEMBER( tlcs90_device::t90_internal_registers_w )
 
 			if (out_mask)
 			{
-				data &= out_mask;
-				m_port_write_cb[7](data);
+				m_port_write_cb[7](m_port_latch[7] & out_mask);
 			}
 			break;
 
 		case T90_P8:
-			data &= 0x0f;
-			out_mask = (~m_internal_registers[ T90_P8CR - T90_IOBASE ]) & 0x08;
+			m_port_latch[8] = data & 0x0f;
+			out_mask = ~m_p8cr & 0x08;
 			if (out_mask)
 			{
-				data &= out_mask;
-				m_port_write_cb[8](data);
+				m_port_write_cb[8](m_port_latch[8] & out_mask);
 			}
+			break;
+
+		case T90_P4CR:
+			m_p4cr = data;
+			break;
+
+		case T90_P67CR:
+			m_p67cr = data;
+			break;
+
+		case T90_P8CR:
+			m_p8cr = data;
+			break;
+
+		case T90_SMMOD:
+			m_smmod = data;
 			break;
 
 		case T90_BX:
 			m_ixbase = (data & 0xf) << 16;
 			break;
+
 		case T90_BY:
 			m_iybase = (data & 0xf) << 16;
 			break;
+
+		default:
+			logerror("Write to unimplemented SFR at %04X\n", T90_IOBASE + offset);
+			break;
 	}
-	m_internal_registers[offset] = data;
 }
 
 
@@ -2696,12 +2814,22 @@ void tlcs90_device::device_start()
 	save_item(NAME(m_irq_mask));
 	save_item(NAME(m_extra_cycles));
 
-	save_item(NAME(m_internal_registers));
+	save_item(NAME(m_port_latch));
+	save_item(NAME(m_p4cr));
+	save_item(NAME(m_p67cr));
+	save_item(NAME(m_p8cr));
+	save_item(NAME(m_smmod));
 	save_item(NAME(m_ixbase));
 	save_item(NAME(m_iybase));
 
 	save_item(NAME(m_timer_value));
 	save_item(NAME(m_timer4_value));
+	save_item(NAME(m_tmod));
+	save_item(NAME(m_tclk));
+	save_item(NAME(m_trun));
+	save_item(NAME(m_treg_8bit));
+	save_item(NAME(m_t4mod));
+	save_item(NAME(m_treg_16bit));
 
 	// Work registers
 	save_item(NAME(m_op));
@@ -2745,7 +2873,6 @@ void tlcs90_device::device_start()
 	m_halt = m_after_EI = 0;
 	m_irq_state = m_irq_mask = 0;
 	m_extra_cycles = 0;
-	memset(m_internal_registers, 0, sizeof(m_internal_registers));
 	m_ixbase = m_iybase = 0;
 	m_timer_value[0] = m_timer_value[1] = m_timer_value[2] = m_timer_value[3] = 0;
 	m_timer4_value = 0;

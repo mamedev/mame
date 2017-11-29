@@ -4,6 +4,54 @@
 
     IBM AT Compatibles
 
+Commodore PC 30-III and PC 40-III
+=================================
+Links: http://www.richardlagendijk.nl/cip/computer/item/pc30iii/en , ftp://ftp.zimmers.net/pub/cbm-pc/firmware/pc30/
+Info: The PC 30-III and PC 40-III share the same mainboard. On a PC 30-III the onboard Paradise VGA is not populated.
+Form factor: Desktop PC
+CPU: Intel 80286-12
+RAM: 1MB on board
+Chipset: Faraday
+Bus: 3x16 bit ISA, 1x8 bit ISA
+Video: PC 30-III: ATI EGA Wonder 800+, PC 40-III: Onboard Paradise VGA, 256KB
+Mass storage: One HD disk drive standard, second drive optional; PC 30-III: 20MB, PC 40-III: 40MB AT-IDE HD standard, 80MB or 100MB optional
+On board: Serial, Parallel, Commodore 1532 Mouse port (MS Bus mouse compatible), Keyboard, Beeper, Floppy (2 devices), AT-IDE (1 device)
+Options: 80287
+
+Sanyo MBC-28
+============
+Links: http://www.cc-computerarchiv.de/CC-Archiv/bc-alt/gb-san/gb-san-12_91.html
+Form factor: Desktop
+CPU: 80386sx-20
+RAM: 1MB - 8MB on board
+Mass storage: 1.44MB Floppy disk drive and 80MB IDE hard disk
+On board: 2xserial, parallel, bus mouse, keyboard
+To-Do: Complains about missing mouse hardware (Bus Mouse), hangs in POST
+
+Siemens PCD-2
+=============
+Links: http://www.z80.eu/siemenspcd2.html , http://www.z80.eu/downloads/Siemens_PCD-2_SW-Monitor-Buchse-Belegung.pdf , https://www.computerwoche.de/a/at-klon-und-lan-ergaenzen-siemens-palette,1166395
+Form Factor: low profile desktop
+CPU: 80286-12 on a Tandon supplied slot CPU card
+RAM: 1MB - 4MB in four SIMM modules
+Mass storage: 1.2MB Floppy disk drive and 20MB or 40MB MFM harddisk
+Bus: Vertical passive ISA backplane with six slots
+On board: 2xserial, parallel, floppy, keyboard, RTC, MFM harddisk controller piggybacked to bus extension on slot CPU
+Options: 80287
+
+Compaq Portable III
+===================
+Links: http://www.old-computers.com/museum/computer.asp?c=1064 , http://www.freakedenough.at/infoseiten/read.php?id=66 , http://www.1000bit.it/ad/bro/compaq/CompaqProtable3.pdf , http://oldcomputers.net/compaqiii.pdf
+Info: The later Compaq Portable 386 uses the same case, screen and video adapter; Models: 1 (no), 20 (20MB) and 40 (40MB harddisk)
+Form factor: Luggable
+CPU: AMD N80L286-12/S 12MHz (could be downclocked to 8MHz)
+RAM: 640KB, attitional RAM cards were 512KB or 2MB to give 1.1MB, 1.6MB, 2.1MB, 2.6MB, 4.6MB or 6.6MB of total RAM
+Video: AT&T 6300/Olivetti M24 driver compatible "Super CGA" with a 640x400 red/amber Plasma screen
+Mass storage: One 1.2MB floppy disk drive, no/20MB/40MB hard disk
+On board: Serial, Parallel, RTC, RGBI (external Monitor), keyboard
+Options: 80827, Expansion box with 2 ISA slots, 300/1200Baud internal Modem, Compaq EGA Board
+To-Do: Emulate Graphics card fully
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -280,6 +328,13 @@ MACHINE_START_MEMBER(at_state,vrom_fix)
 	membank("vrom_bank")->set_base(machine().root_device().memregion("bios")->base());
 }
 
+static MACHINE_CONFIG_START( cfg_single_1200K )
+	MCFG_DEVICE_MODIFY("fdc:0")
+	MCFG_SLOT_DEFAULT_OPTION("525hd")
+	MCFG_DEVICE_MODIFY("fdc:1")
+	MCFG_SLOT_DEFAULT_OPTION("")
+MACHINE_CONFIG_END
+
 static SLOT_INTERFACE_START( pci_devices )
 	SLOT_INTERFACE_INTERNAL("vt82c505", VT82C505)
 SLOT_INTERFACE_END
@@ -430,6 +485,22 @@ static MACHINE_CONFIG_DERIVED( ct386sx, at386sx )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(neat_io)
 	MCFG_CS8221_ADD("cs8221", "maincpu", "mb:isa", "maincpu")
+MACHINE_CONFIG_END
+
+// Commodore PC 30-III
+static MACHINE_CONFIG_DERIVED( pc30iii, ibm5170 )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_CLOCK(6000000) // should be XTAL_24MHz/2, but doesn't post with that setting
+	MCFG_DEVICE_MODIFY("isa1")
+	MCFG_DEVICE_SLOT_INTERFACE(pc_isa16_cards, "vga", false) // should be ATI EGA Wonder 800+
+MACHINE_CONFIG_END
+
+// Commodore PC 40-III
+static MACHINE_CONFIG_DERIVED( pc40iii, ibm5170 )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_CLOCK(6000000) // should be XTAL_24MHz/2, but doesn't post with that setting
+	MCFG_DEVICE_MODIFY("isa1")
+	MCFG_DEVICE_SLOT_INTERFACE(pc_isa16_cards, "vga", false) // should be onboard Paradise VGA, see ROM declarations
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( megapc )
@@ -593,6 +664,38 @@ static MACHINE_CONFIG_START( ficpio2 )
 	MCFG_VT82C496_REGION("isa")
 MACHINE_CONFIG_END
 
+// Compaq Portable III
+static MACHINE_CONFIG_START( comportiii )
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", I80286, XTAL_48MHz/4 /*12000000*/)
+	MCFG_CPU_PROGRAM_MAP(at16_map)
+	MCFG_CPU_IO_MAP(at16_io)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259_master", pic8259_device, inta_cb)
+	MCFG_80286_SHUTDOWN(DEVWRITELINE("mb", at_mb_device, shutdown))
+
+	MCFG_DEVICE_ADD("mb", AT_MB, 0)
+	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	MCFG_FRAGMENT_ADD(at_softlists)
+
+	MCFG_ISA16_SLOT_ADD("mb:isabus","board1", pc_isa16_cards, "fdc", true)
+	MCFG_SLOT_OPTION_MACHINE_CONFIG("fdc", cfg_single_1200K)
+	MCFG_ISA16_SLOT_ADD("mb:isabus","board2", pc_isa16_cards, "comat", true)
+	MCFG_ISA16_SLOT_ADD("mb:isabus","board3", pc_isa16_cards, "hdc", true)
+	MCFG_ISA16_SLOT_ADD("mb:isabus","board4", pc_isa16_cards, "cga_cportiii", true)
+	MCFG_ISA16_SLOT_ADD("mb:isabus","isa1", pc_isa16_cards, nullptr, false)
+	MCFG_ISA16_SLOT_ADD("mb:isabus","isa2", pc_isa16_cards, nullptr, false)
+
+	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_at_keyboards, STR_KBD_IBM_PC_AT_84)
+
+	/* internal ram */
+	MCFG_RAM_ADD(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("640K")
+	MCFG_RAM_EXTRA_OPTIONS("1152K,1664K,2176K,2688K,4736K,6784K")
+MACHINE_CONFIG_END
+
+//**************************************************************************
+//  ROM DEFINITIONS
+//**************************************************************************
 ROM_START( ibm5170 )
 	ROM_REGION(0x20000,"bios", 0)
 
@@ -728,13 +831,15 @@ ROM_START( at )
 	ROM_SYSTEM_BIOS(13, "aw303gs", "Award 303GS")
 	ROMX_LOAD( "aw303gs-hi.bin",  0x18001, 0x4000, CRC(82392e18) SHA1(042453b7b29933a1b72301d21fcf8fa6b293c9c9), ROM_SKIP(1) | ROM_BIOS(14) )
 	ROMX_LOAD( "aw303gs-lo.bin",  0x18000, 0x4000, CRC(a4cf8ba1) SHA1(b73e34be3b2754aaed1ac06471f4441fea06c67c), ROM_SKIP(1) | ROM_BIOS(14) )
+	ROM_SYSTEM_BIOS(14, "ami_200960", "AMI 200960")
+	ROMX_LOAD( "ami_286_bios_sn200960_even.bin", 0x10000, 0x8000, CRC(67745815) SHA1(ca6886c7a0716a92a8720fc71ff2d95328c467a5), ROM_SKIP(1) | ROM_BIOS(15) )
+	ROMX_LOAD( "ami_286_bios_sn200960_odd.bin", 0x10001, 0x8000, CRC(360a5f73) SHA1(1b1980fd99779d0cdc4764928a641e081b35ee9f), ROM_SKIP(1) | ROM_BIOS(15) )
+	ROM_SYSTEM_BIOS(15, "magitronic_b233", "Magitronic B233") // SUNTAC Chipset, http://toastytech.com/manuals/Magitronic%20B233%20Manual.pdf
+	ROMX_LOAD( "magitronic_b233_ami_1986_286_bios_plus_even_sa027343.bin", 0x10000, 0x8000, CRC(d4a18444) SHA1(d95242104fc9b51cf26de72ef5b6c52d99ccce30), ROM_SKIP(1) | ROM_BIOS(16) )
+	ROMX_LOAD( "magitronic_b233_ami_1986_286_bios_plus_odd_sa027343.bin", 0x10001, 0x8000, CRC(7ac3db56) SHA1(4340140450c4f8b4f6a19eae50a5dc5449edfdf6), ROM_SKIP(1) | ROM_BIOS(16) )
+	// ROM_LOAD("magitronic_b233_ami_1986_keyboard_bios_plus_a025352.bin", 0x0000, 0x1000), CRC(84fd28fd) SHA1(43da0f49e52c921844e60b6f3d22f2a316d865cc) )
 ROM_END
 
-ROM_START( cmdpc30 )
-	ROM_REGION(0x20000,"bios", 0)
-	ROMX_LOAD( "commodore pc 30 iii even.bin", 0x18000, 0x4000, CRC(36307aa9) SHA1(50237ffea703b867de426ab9ebc2af46bac1d0e1),ROM_SKIP(1))
-	ROMX_LOAD( "commodore pc 30 iii odd.bin",  0x18001, 0x4000, CRC(41bae42d) SHA1(27d6ad9554be86359d44331f25591e3122a31519),ROM_SKIP(1))
-ROM_END
 
 ROM_START( atvga )
 	ROM_REGION(0x20000,"bios", 0)
@@ -882,34 +987,36 @@ ROM_START( at486 )
 
 	ROM_SYSTEM_BIOS(8, "ficgiovt2_326", "FIC 486-GIO-VT2 3.26G")  /* 1994-07-06 */
 	ROMX_LOAD("326g1c00.awd", 0x10000, 0x10000, CRC(2e729ab5) SHA1(b713f97fa0e0b62856dab917f417f5b21020b354), ROM_BIOS(9))
-	ROM_SYSTEM_BIOS(9, "ficgiovt2_3276", "FIC 486-GIO-VT2 3.276") /* 1997-07-17 */
-	ROMX_LOAD("32760000.bin", 0x10000, 0x10000, CRC(ad179128) SHA1(595f67ba4a1c8eb5e118d75bf657fff3803dcf4f), ROM_BIOS(10))
+	ROM_SYSTEM_BIOS(9, "486_gio_vt2","VBS1.08H 486-GVT-2")        /* 1995-06-19 */
+	ROMX_LOAD("award_486_gio_vt2.bin", 0x10000, 0x10000, CRC(58d7c7f9) SHA1(097f15ec2bd672cb3f1763298ca802c7ff26021f), ROM_BIOS(10)) // Vobis version, Highscreen boot logo
+	ROM_SYSTEM_BIOS(10, "ficgiovt2_3276", "FIC 486-GIO-VT2 3.276") /* 1997-07-17 */
+	ROMX_LOAD("32760000.bin", 0x10000, 0x10000, CRC(ad179128) SHA1(595f67ba4a1c8eb5e118d75bf657fff3803dcf4f), ROM_BIOS(11))
 
-	ROM_SYSTEM_BIOS(10, "ficgvt2", "FIC 486-GVT-2 3.07G") /* 1994-11-02 */
-	ROMX_LOAD("3073.bin",     0x10000, 0x10000, CRC(a6723863) SHA1(ee93a2f1ec84a3d67e267d0a490029f9165f1533), ROM_BIOS(11))
-	ROM_SYSTEM_BIOS(11, "ficgpak2", "FIC 486-PAK-2 5.15S") /* 1995-06-27, includes Phoenix S3 TRIO64 Enhanced VGA BIOS 1.4-01 */
-	ROMX_LOAD("515sbd8a.awd", 0x00000, 0x20000, CRC(778247e1) SHA1(07d8f0f2464abf507be1e8dfa06cd88737782411), ROM_BIOS(12))
+	ROM_SYSTEM_BIOS(11, "ficgvt2", "FIC 486-GVT-2 3.07G") /* 1994-11-02 */
+	ROMX_LOAD("3073.bin",     0x10000, 0x10000, CRC(a6723863) SHA1(ee93a2f1ec84a3d67e267d0a490029f9165f1533), ROM_BIOS(12))
+	ROM_SYSTEM_BIOS(12, "ficgpak2", "FIC 486-PAK-2 5.15S") /* 1995-06-27, includes Phoenix S3 TRIO64 Enhanced VGA BIOS 1.4-01 */
+	ROMX_LOAD("515sbd8a.awd", 0x00000, 0x20000, CRC(778247e1) SHA1(07d8f0f2464abf507be1e8dfa06cd88737782411), ROM_BIOS(13))
 
-	ROM_SYSTEM_BIOS(12, "ficpio3g7", "FIC 486-PIO-3 1.15G705") /* pnp */
-	ROMX_LOAD("115g705.awd",  0x00000, 0x20000, CRC(ddb1544a) SHA1(d165c9ecdc9397789abddfe0fef69fdf954fa41b), ROM_BIOS(13))
-	ROM_SYSTEM_BIOS(13, "ficpio3g1", "FIC 486-PIO-3 1.15G105") /* non-pnp */
-	ROMX_LOAD("115g105.awd",  0x00000, 0x20000, CRC(b327eb83) SHA1(9e1ff53e07ca035d8d43951bac345fec7131678d), ROM_BIOS(14))
+	ROM_SYSTEM_BIOS(13, "ficpio3g7", "FIC 486-PIO-3 1.15G705") /* pnp */
+	ROMX_LOAD("115g705.awd",  0x00000, 0x20000, CRC(ddb1544a) SHA1(d165c9ecdc9397789abddfe0fef69fdf954fa41b), ROM_BIOS(14))
+	ROM_SYSTEM_BIOS(14, "ficpio3g1", "FIC 486-PIO-3 1.15G105") /* non-pnp */
+	ROMX_LOAD("115g105.awd",  0x00000, 0x20000, CRC(b327eb83) SHA1(9e1ff53e07ca035d8d43951bac345fec7131678d), ROM_BIOS(15))
 
-	ROM_SYSTEM_BIOS(14, "ficpos", "FIC 486-POS")
-	ROMX_LOAD("116di6b7.bin", 0x00000, 0x20000, CRC(d1d84616) SHA1(2f2b27ce100cf784260d8e155b48db8cfbc63285), ROM_BIOS(15))
-	ROM_SYSTEM_BIOS(15, "ficpvt", "FIC 486-PVT 5.15")          /* 1995-06-27 */
-	ROMX_LOAD("5150eef3.awd", 0x00000, 0x20000, CRC(eb35785d) SHA1(1e601bc8da73f22f11effe9cdf5a84d52576142b), ROM_BIOS(16))
-	ROM_SYSTEM_BIOS(16, "ficpvtio", "FIC 486-PVT-IO 5.162W2")  /* 1995-10-05 */
-	ROMX_LOAD("5162cf37.awd", 0x00000, 0x20000, CRC(378d813d) SHA1(aa674eff5b972b31924941534c3c988f6f78dc93), ROM_BIOS(17))
-	ROM_SYSTEM_BIOS(17, "ficvipio426", "FIC 486-VIP-IO 4.26GN2") /* 1994-12-07 */
-	ROMX_LOAD("426gn2.awd",   0x00000, 0x20000, CRC(5f472aa9) SHA1(9160abefae32b450e973651c052657b4becc72ba), ROM_BIOS(18))
-	ROM_SYSTEM_BIOS(18, "ficvipio427", "FIC 486-VIP-IO 4.27GN2A") /* 1996-02-14 */
-	ROMX_LOAD("427gn2a.awd",  0x00000, 0x20000, CRC(035ad56d) SHA1(0086db3eff711fc710b30e7f422fc5b4ab8d47aa), ROM_BIOS(19))
-	ROM_SYSTEM_BIOS(19, "ficvipio2", "FIC 486-VIP-IO2")
-	ROMX_LOAD("1164g701.awd", 0x00000, 0x20000, CRC(7b762683) SHA1(84debce7239c8b1978246688ae538f7c4f519d13), ROM_BIOS(20))
+	ROM_SYSTEM_BIOS(15, "ficpos", "FIC 486-POS")
+	ROMX_LOAD("116di6b7.bin", 0x00000, 0x20000, CRC(d1d84616) SHA1(2f2b27ce100cf784260d8e155b48db8cfbc63285), ROM_BIOS(16))
+	ROM_SYSTEM_BIOS(16, "ficpvt", "FIC 486-PVT 5.15")          /* 1995-06-27 */
+	ROMX_LOAD("5150eef3.awd", 0x00000, 0x20000, CRC(eb35785d) SHA1(1e601bc8da73f22f11effe9cdf5a84d52576142b), ROM_BIOS(17))
+	ROM_SYSTEM_BIOS(17, "ficpvtio", "FIC 486-PVT-IO 5.162W2")  /* 1995-10-05 */
+	ROMX_LOAD("5162cf37.awd", 0x00000, 0x20000, CRC(378d813d) SHA1(aa674eff5b972b31924941534c3c988f6f78dc93), ROM_BIOS(18))
+	ROM_SYSTEM_BIOS(18, "ficvipio426", "FIC 486-VIP-IO 4.26GN2") /* 1994-12-07 */
+	ROMX_LOAD("426gn2.awd",   0x00000, 0x20000, CRC(5f472aa9) SHA1(9160abefae32b450e973651c052657b4becc72ba), ROM_BIOS(19))
+	ROM_SYSTEM_BIOS(19, "ficvipio427", "FIC 486-VIP-IO 4.27GN2A") /* 1996-02-14 */
+	ROMX_LOAD("427gn2a.awd",  0x00000, 0x20000, CRC(035ad56d) SHA1(0086db3eff711fc710b30e7f422fc5b4ab8d47aa), ROM_BIOS(20))
+	ROM_SYSTEM_BIOS(20, "ficvipio2", "FIC 486-VIP-IO2")
+	ROMX_LOAD("1164g701.awd", 0x00000, 0x20000, CRC(7b762683) SHA1(84debce7239c8b1978246688ae538f7c4f519d13), ROM_BIOS(21))
 
-	ROM_SYSTEM_BIOS(20, "qdi", "QDI PX486DX33/50P3")
-	ROMX_LOAD("qdi_px486.u23", 0x10000, 0x10000, CRC(c80ecfb6) SHA1(34cc9ef68ff719cd0771297bf184efa83a805f3e), ROM_BIOS(21))
+	ROM_SYSTEM_BIOS(21, "qdi", "QDI PX486DX33/50P3")
+	ROMX_LOAD("qdi_px486.u23", 0x10000, 0x10000, CRC(c80ecfb6) SHA1(34cc9ef68ff719cd0771297bf184efa83a805f3e), ROM_BIOS(22))
 ROM_END
 
 
@@ -936,6 +1043,32 @@ ROM_START( c386sx16 )
 	/* Copyright (C) 1985-1990 Phoenix Technologies Ltd. */
 	ROM_LOAD16_BYTE( "390914-01.u39", 0x10000, 0x8000, CRC(8f849198) SHA1(550b04bac0d0807d6e95ec25391a81272779b41b)) /* 390914-01 V1.03 CS-2100 U39 Copyright (C) 1990 CBM */
 	ROM_LOAD16_BYTE( "390915-01.u38", 0x10001, 0x8000, CRC(ee4bad92) SHA1(6e02ef97a7ce336485814c06a1693bc099ce5cfb)) /* 390915-01 V1.03 CS-2100 U38 Copyright (C) 1990 CBM */
+ROM_END
+
+// Commodore PC 30-III
+ROM_START( pc30iii )
+	ROM_REGION(0x20000,"bios", 0)
+	ROM_SYSTEM_BIOS(0, "pc30iii_v200", "PC 30-III v2.00")
+	ROMX_LOAD( "pc30iii_390339-02_3e58.bin", 0x18000, 0x4000, CRC(f4a5860e) SHA1(b843744fe928bcfd8e037b0208cc85c0746535cf),ROM_SKIP(1) | ROM_BIOS(1) )
+	ROMX_LOAD( "pc30iii_390340-02_42a8.bin",  0x18001, 0x4000, CRC(934df54a) SHA1(3b1c8916ba2b2517bc9f26dd74254586bcf0e91d),ROM_SKIP(1) | ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS(1, "pc30iii_v201", "PC 30-III v2.01")
+	ROMX_LOAD( "cbm-pc30c-bios-lo-v2.01-390339-03-35c1.bin", 0x18000, 0x4000, CRC(36307aa9) SHA1(50237ffea703b867de426ab9ebc2af46bac1d0e1),ROM_SKIP(1) | ROM_BIOS(2) )
+	ROMX_LOAD( "cbm-pc30c-bios-hi-v2.01-390340-03-3f3f.bin",  0x18001, 0x4000, CRC(41bae42d) SHA1(27d6ad9554be86359d44331f25591e3122a31519),ROM_SKIP(1) | ROM_BIOS(2) )
+ROM_END
+
+// Commodore PC 40-III
+ROM_START( pc40iii )
+	// VGA BIOS
+	// ROM_LOAD( "pc40iii_390337-01_v2.0_f930.bin", 0x00000, 0x4000, CRC(82b210d3) SHA1(1380107deef02455c6ce4d12162fdc32e375cbde))
+	// ROM_LOAD( "pc40iii_390338-01_v2.0_b6d0.bin", 0x00001, 0x4000, CRC(526d7424) SHA1(60511ca0e856b7611d556aa82219d646f96c9b94))
+
+	ROM_REGION(0x20000,"bios", 0)
+	ROM_SYSTEM_BIOS(0, "pc40iii_v200", "PC 40-III v2.00")
+	ROMX_LOAD( "pc40iii_390339-01_v2.0_473a.bin", 0x18000, 0x4000, CRC(2ad2dc0f) SHA1(b41d5988fda8cc23418c3f665d780c617aa3fc2b),ROM_SKIP(1) | ROM_BIOS(1) )
+	ROMX_LOAD( "pc40iii_390340-01_v2.0_4bc6.bin",  0x18001, 0x4000, CRC(62dc7d93) SHA1(e741528697b1d00450fd18e3db8b925606e0bd22),ROM_SKIP(1) | ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS(1, "pc40iii_v201", "PC 40-III v2.03")
+	ROMX_LOAD( "cbm-pc40c-bios-lo-v2.03-390339-04-03bc.bin", 0x18000, 0x4000, CRC(e5fd11c6) SHA1(18c21d9a4ae687eef5464b76a0d614b9dfd30ec8),ROM_SKIP(1) | ROM_BIOS(2) )
+	ROMX_LOAD( "cbm-pc40c-bios-hi-v2.03-390340-04-3344.bin",  0x18001, 0x4000, CRC(63d6f0f7) SHA1(a88dee7694baa71913acbe76cb4e2a4e95979ad9),ROM_SKIP(1) | ROM_BIOS(2) )
 ROM_END
 
 ROM_START( xb42663 )
@@ -1095,10 +1228,40 @@ ROM_START( pc2386 )
 	ROM_LOAD( "40211.ic801", 0x000, 0x1000, CRC(4440d981) SHA1(a76006a929f26c178e09908c66f28abc92e7744c) )
 ROM_END
 
+// Kaypro 286i
 ROM_START( k286i )
 	ROM_REGION(0x20000,"bios", 0)
 	ROM_LOAD16_BYTE( "81_1598", 0x18000, 0x4000, CRC(e25a1e43) SHA1(d00b976ac94323f3867b1c256e315839c906dd5a) )
 	ROM_LOAD16_BYTE( "81_1599", 0x18001, 0x4000, CRC(08e2a17b) SHA1(a86ef116e82eb9240e60b52f76e5e510cdd393fd) )
+ROM_END
+
+// Sanyo MBC-28
+ROM_START( mbc28 ) // Complains about missing mouse hardware
+	ROM_REGION(0x20000,"bios", 0)
+		ROM_LOAD16_BYTE( "mbc-28_sl-dt_ver.1620_low_din_checksum_(454f00)_27c256-15.bin", 0x10000, 0x8000, CRC(423b4693) SHA1(08e877baa59ebd9a1817dcdd27138c638edcbb84) )
+		ROM_LOAD16_BYTE( "mbc-28_sl-dt_ver.1620_high_din_checksum_(45ae00)_27c256-15.bin", 0x10001, 0x8000, CRC(557b7346) SHA1(c0dca88627f8451211172441fefb4020839fb87f) )
+ROM_END
+
+// Siemens PCD-2
+ROM_START( pcd2 )
+	ROM_REGION(0x20000,"bios", 0)
+	ROM_LOAD16_BYTE( "bios_tandon_188782-032a_rev_5.21_low.bin", 0x10000, 0x8000, CRC(a8fbffd3) SHA1(8a3ad5bc7f86ff984be10a8b1ae4542be4c80e5f) )
+	ROM_LOAD16_BYTE( "bios_tandon_188782-031a_rev_5.21_high.bin", 0x10001, 0x8000, CRC(8d7dfdcc) SHA1(d1d58c0ad7db60399f9a93db48feb10e44ffd624) )
+	// ROM_LOAD( "kbd_8742_award_upi_1.61_rev_1.01.bin", 0x0000, 0x0800, CRC(bb8a1979) SHA(43d35ecf76e5e8d5ddf6c32b0f6f628a7542d6e4) ) // 8742 keyboard controller
+	// ROM_LOAD( "vga_nmc27c256q_435-0029-04_1988_video7_arrow.bin", 0x8000, 0x0800, CRC(0d8d7dff) SHA(cb5b2ab78d480ec3164d16c9c75f1449fa81a0e7) ) // Video7 VGA card
+	// ROM_LOAD( "vga_nmc27c256q_435-0030-04_1988_video7_arrow.bin", 0x8000, 0x0800, CRC(0935c003) SHA(35ac571818f616b856da8bbf6a7a9172f68b3ab6) )
+ROM_END
+
+// Compaq Portable III
+ROM_START( comportiii )
+	ROM_REGION(0x20000,"bios", 0)
+	ROM_SYSTEM_BIOS(0, "106779-002", "106779-002")
+	ROMX_LOAD( "cpiii_87c128_106779-002.bin", 0x18000, 0x4000, CRC(aef8f532) SHA1(b0374d5aa8766f11043cbaee007e6d311f792e44), ROM_SKIP(1) | ROM_BIOS(1) )
+	ROMX_LOAD( "cpiii_87c128_106778-002.bin", 0x18001, 0x4000, CRC(c259f628) SHA1(df0ca8aaead617114fbecb4ececbd1a3bb1d5f30), ROM_SKIP(1) | ROM_BIOS(1) )
+	// ROM_LOAD( "cpiii_106436-001.bin", 0x0000, 0x1000, CRC(5acc716b) SHA(afe166ecf99136d15269e44ebf2d66317945bf9c) ) // keyboard
+	ROM_SYSTEM_BIOS(1, "109737-002", "109737-002")
+	ROMX_LOAD( "109738-002.bin", 0x10000, 0x8000, CRC(db131b8a) SHA1(6a8517a771272edf16870501fc1ed94c7555ef45), ROM_SKIP(1) | ROM_BIOS(2) )
+	ROMX_LOAD( "109737-002.bin", 0x10001, 0x8000, CRC(8463cc41) SHA1(cb9801591e4a2cd13bbcc40739c9e675ba84c079), ROM_SKIP(1) | ROM_BIOS(2) )
 ROM_END
 
 /***************************************************************************
@@ -1107,46 +1270,51 @@ ROM_END
 
 ***************************************************************************/
 
-/*     YEAR  NAME      PARENT   COMPAT   MACHINE    INPUT       INIT    COMPANY     FULLNAME */
-COMP ( 1984, ibm5170,  0,       ibm5150, ibm5170,   0,    at_state,      at,      "International Business Machines",  "IBM PC/AT 5170", MACHINE_NOT_WORKING )
-COMP ( 1985, ibm5170a, ibm5170, 0,       ibm5170a,  0,    at_state,      at,      "International Business Machines",  "IBM PC/AT 5170 8MHz", MACHINE_NOT_WORKING )
-COMP ( 1985, ibm5162,  ibm5170, 0,       ibm5162,   0,    at_state,      at,      "International Business Machines",  "IBM PC/XT-286 5162", MACHINE_NOT_WORKING )
-COMP ( 1989, ibmps1es, ibm5170, 0,       ibmps1,    0,    at_state,      at,      "International Business Machines",  "IBM PS/1 (Spanish)", MACHINE_NOT_WORKING )
-COMP ( 1987, at,       ibm5170, 0,       ibm5162,   0,    at_state,      at,      "<generic>",  "PC/AT (CGA, MF2 Keyboard)", MACHINE_NOT_WORKING )
-COMP ( 1987, atvga,    ibm5170, 0,       atvga,     0,    at_state,      at,      "<generic>",  "PC/AT (VGA, MF2 Keyboard)" , MACHINE_NOT_WORKING )
-COMP ( 1988, at386,    ibm5170, 0,       at386,     0,    at_state,      at,      "<generic>",  "PC/AT 386 (VGA, MF2 Keyboard)", MACHINE_NOT_WORKING )
-COMP ( 1988, ct386sx,  ibm5170, 0,       ct386sx,   0,    at_state,      at,      "<generic>",  "NEAT 386SX (VGA, MF2 Keyboard)", MACHINE_NOT_WORKING )
-COMP ( 1988, at386sx,  ibm5170, 0,       at386sx,   0,    at_state,      at,      "<generic>",  "PC/AT 386SX (VGA, MF2 Keyboard)", MACHINE_NOT_WORKING )
-COMP ( 1990, at486,    ibm5170, 0,       at486,     0,    at_state,      at,      "<generic>",  "PC/AT 486 (VGA, MF2 Keyboard)", MACHINE_NOT_WORKING )
-COMP ( 1989, neat,     ibm5170, 0,       neat,      0,    at_state,      at,      "<generic>",  "NEAT (VGA, MF2 Keyboard)", MACHINE_NOT_WORKING )
-COMP ( 1989, ec1842,   ibm5150, 0,       ec1842,    0,    at_state,      at,      "<unknown>",  "EC-1842", MACHINE_NOT_WORKING )
-COMP ( 1993, ec1849,   ibm5170, 0,       ec1842,    0,    at_state,      at,      "<unknown>",  "EC-1849", MACHINE_NOT_WORKING )
-COMP ( 1993, megapc,   0,       0,       megapc,    0,    megapc_state,  megapc,   "Amstrad plc", "MegaPC", MACHINE_NOT_WORKING )
-COMP ( 199?, megapcpl, megapc,  0,       megapcpl,  0,    megapc_state,  megapcpl, "Amstrad plc", "MegaPC Plus", MACHINE_NOT_WORKING )
-COMP ( 199?, megapcpla, megapc, 0,       megapcpla, 0,    at_state,      megapcpla,"Amstrad plc", "MegaPC Plus (WINBUS chipset)", MACHINE_NOT_WORKING )
-COMP ( 1989, pc2386,   ibm5170, 0,       at386l,    0,    at_state,      at,      "Amstrad plc", "Amstrad PC2386", MACHINE_NOT_WORKING )
-COMP ( 1991, aprfte,   ibm5170, 0,       at486,     0,    at_state,      at,      "Apricot",  "Apricot FT//ex 486 (J3 Motherboard)", MACHINE_NOT_WORKING )
-COMP ( 1991, ftsserv,  ibm5170, 0,       at486,     0,    at_state,      at,      "Apricot",  "Apricot FTs (Scorpion)", MACHINE_NOT_WORKING )
-COMP ( 1992, aprpand,  ibm5170, 0,       at486,     0,    at_state,      at,      "Apricot",  "Apricot FTs (Panther Rev F 1.02.26)", MACHINE_NOT_WORKING )
-COMP ( 1990, aplanst,  ibm5170, 0,       at386,     0,    at_state,      at,      "Apricot",  "Apricot LANstation (Krypton Motherboard)", MACHINE_NOT_WORKING )
-COMP ( 1990, aplannb,  ibm5170, 0,       at386,     0,    at_state,      at,      "Apricot",  "Apricot LANstation (Novell Remote Boot)", MACHINE_NOT_WORKING )
-COMP ( 1992, aplscar,  ibm5170, 0,       at486l,    0,    at_state,      at,      "Apricot",  "Apricot LS Pro (Caracal Motherboard)", MACHINE_NOT_WORKING )
-COMP ( 1992, aplsbon,  ibm5170, 0,       at486,     0,    at_state,      at,      "Apricot",  "Apricot LS Pro (Bonsai Motherboard)", MACHINE_NOT_WORKING )
-COMP ( 1988, xb42663,  ibm5170, 0,       at386,     0,    at_state,      at,      "Apricot",  "Apricot Qi 300 (Rev D,E & F Motherboard)", MACHINE_NOT_WORKING )
-COMP ( 1988, qi600,    ibm5170, 0,       at386,     0,    at_state,      at,      "Apricot",  "Apricot Qi 600 (Neptune Motherboard)", MACHINE_NOT_WORKING )
-COMP ( 1990, qi900,    ibm5170, 0,       at486,     0,    at_state,      at,      "Apricot",  "Apricot Qi 900 (Scorpion Motherboard)", MACHINE_NOT_WORKING )
-COMP ( 1989, apvxft,   ibm5170, 0,       at486,     0,    at_state,      at,      "Apricot",  "Apricot VX FT server", MACHINE_NOT_WORKING )
-COMP ( 1991, apxenls3, ibm5170, 0,       at486,     0,    at_state,      at,      "Apricot",  "Apricot XEN-LS (Venus IV Motherboard)", MACHINE_NOT_WORKING )
-COMP ( 1993, apxlsam,  ibm5170, 0,       at486,     0,    at_state,      at,      "Apricot",  "Apricot XEN-LS II (Samurai Motherboard)", MACHINE_NOT_WORKING )
-COMP ( 1987, apxeni,   ibm5170, 0,       at386,     0,    at_state,      at,      "Apricot",  "Apricot XEN-i 386 (Leopard Motherboard)" , MACHINE_NOT_WORKING )
-COMP ( 1989, xb42639,  ibm5170, 0,       xb42639,   0,    at_state,      at,      "Apricot",  "Apricot XEN-S (Venus I Motherboard 286)" , MACHINE_NOT_WORKING )
-COMP ( 1990, xb42639a, ibm5170, 0,       xb42639,   0,    at_state,      at,      "Apricot",  "Apricot XEN-S (Venus II Motherboard 286)" , MACHINE_NOT_WORKING )
-COMP ( 1989, xb42664,  ibm5170, 0,       at386,     0,    at_state,      at,      "Apricot",  "Apricot XEN-S (Venus I Motherboard 386)" , MACHINE_NOT_WORKING )
-COMP ( 1990, xb42664a, ibm5170, 0,       at386,     0,    at_state,      at,      "Apricot",  "Apricot XEN-S (Venus II Motherboard 386)" , MACHINE_NOT_WORKING )
-COMP ( 1993, apxena1,  ibm5170, 0,       at486,     0,    at_state,      at,      "Apricot",  "Apricot XEN PC (A1 Motherboard)", MACHINE_NOT_WORKING )
-COMP ( 1993, apxenp2,  ibm5170, 0,       at486,     0,    at_state,      at,      "Apricot",  "Apricot XEN PC (P2 Motherboard)", MACHINE_NOT_WORKING )
-COMP ( 1990, c386sx16, ibm5170, 0,       at386sx,   0,    at_state,      at,      "Commodore Business Machines", "Commodore 386SX-16", MACHINE_NOT_WORKING )
-COMP ( 1988, cmdpc30,  ibm5170, 0,       ibm5162,   0,    at_state,      at,      "Commodore Business Machines",  "PC 30 III", MACHINE_NOT_WORKING )
-COMP ( 1995, ficpio2,  ibm5170, 0,       ficpio2,   0,    at_state,      atpci,   "FIC", "486-PIO-2", MACHINE_NOT_WORKING )
-COMP ( 1985, k286i,    ibm5170, 0,       k286i,     0,    at_state,      at,      "Kaypro",   "286i", MACHINE_NOT_WORKING )
-COMP ( 1991, t2000sx,  ibm5170, 0,       at386sx,   0,    at_state,      at,      "Toshiba",  "T2000SX", MACHINE_NOT_WORKING )
+//     YEAR  NAME       PARENT   COMPAT   MACHINE    INIT  INPUT          STATE    COMPANY                              FULLNAME                FLAGS
+COMP ( 1984, ibm5170,   0,       ibm5150, ibm5170,   0,    at_state,      at,      "International Business Machines",  "IBM PC/AT 5170", MACHINE_NOT_WORKING )
+COMP ( 1985, ibm5170a,  ibm5170, 0,       ibm5170a,  0,    at_state,      at,      "International Business Machines",  "IBM PC/AT 5170 8MHz", MACHINE_NOT_WORKING )
+COMP ( 1985, ibm5162,   ibm5170, 0,       ibm5162,   0,    at_state,      at,      "International Business Machines",  "IBM PC/XT-286 5162", MACHINE_NOT_WORKING )
+COMP ( 1989, ibmps1es,  ibm5170, 0,       ibmps1,    0,    at_state,      at,      "International Business Machines",  "IBM PS/1 (Spanish)", MACHINE_NOT_WORKING )
+COMP ( 1987, at,        ibm5170, 0,       ibm5162,   0,    at_state,      at,      "<generic>",  "PC/AT (CGA, MF2 Keyboard)", MACHINE_NOT_WORKING )
+COMP ( 1987, atvga,     ibm5170, 0,       atvga,     0,    at_state,      at,      "<generic>",  "PC/AT (VGA, MF2 Keyboard)" , MACHINE_NOT_WORKING )
+COMP ( 1988, at386,     ibm5170, 0,       at386,     0,    at_state,      at,      "<generic>",  "PC/AT 386 (VGA, MF2 Keyboard)", MACHINE_NOT_WORKING )
+COMP ( 1988, ct386sx,   ibm5170, 0,       ct386sx,   0,    at_state,      at,      "<generic>",  "NEAT 386SX (VGA, MF2 Keyboard)", MACHINE_NOT_WORKING )
+COMP ( 1988, at386sx,   ibm5170, 0,       at386sx,   0,    at_state,      at,      "<generic>",  "PC/AT 386SX (VGA, MF2 Keyboard)", MACHINE_NOT_WORKING )
+COMP ( 1990, at486,     ibm5170, 0,       at486,     0,    at_state,      at,      "<generic>",  "PC/AT 486 (VGA, MF2 Keyboard)", MACHINE_NOT_WORKING )
+COMP ( 1989, neat,      ibm5170, 0,       neat,      0,    at_state,      at,      "<generic>",  "NEAT (VGA, MF2 Keyboard)", MACHINE_NOT_WORKING )
+COMP ( 1989, ec1842,    ibm5150, 0,       ec1842,    0,    at_state,      at,      "<unknown>",  "EC-1842", MACHINE_NOT_WORKING )
+COMP ( 1993, ec1849,    ibm5170, 0,       ec1842,    0,    at_state,      at,      "<unknown>",  "EC-1849", MACHINE_NOT_WORKING )
+COMP ( 1993, megapc,    0,       0,       megapc,    0,    megapc_state,  megapc,   "Amstrad plc", "MegaPC", MACHINE_NOT_WORKING )
+COMP ( 199?, megapcpl,  megapc,  0,       megapcpl,  0,    megapc_state,  megapcpl, "Amstrad plc", "MegaPC Plus", MACHINE_NOT_WORKING )
+COMP ( 199?, megapcpla, megapc,  0,       megapcpla, 0,    at_state,      megapcpla,"Amstrad plc", "MegaPC Plus (WINBUS chipset)", MACHINE_NOT_WORKING )
+COMP ( 1989, pc2386,    ibm5170, 0,       at386l,    0,    at_state,      at,      "Amstrad plc", "Amstrad PC2386", MACHINE_NOT_WORKING )
+COMP ( 1991, aprfte,    ibm5170, 0,       at486,     0,    at_state,      at,      "Apricot",  "Apricot FT//ex 486 (J3 Motherboard)", MACHINE_NOT_WORKING )
+COMP ( 1991, ftsserv,   ibm5170, 0,       at486,     0,    at_state,      at,      "Apricot",  "Apricot FTs (Scorpion)", MACHINE_NOT_WORKING )
+COMP ( 1992, aprpand,   ibm5170, 0,       at486,     0,    at_state,      at,      "Apricot",  "Apricot FTs (Panther Rev F 1.02.26)", MACHINE_NOT_WORKING )
+COMP ( 1990, aplanst,   ibm5170, 0,       at386,     0,    at_state,      at,      "Apricot",  "Apricot LANstation (Krypton Motherboard)", MACHINE_NOT_WORKING )
+COMP ( 1990, aplannb,   ibm5170, 0,       at386,     0,    at_state,      at,      "Apricot",  "Apricot LANstation (Novell Remote Boot)", MACHINE_NOT_WORKING )
+COMP ( 1992, aplscar,   ibm5170, 0,       at486l,    0,    at_state,      at,      "Apricot",  "Apricot LS Pro (Caracal Motherboard)", MACHINE_NOT_WORKING )
+COMP ( 1992, aplsbon,   ibm5170, 0,       at486,     0,    at_state,      at,      "Apricot",  "Apricot LS Pro (Bonsai Motherboard)", MACHINE_NOT_WORKING )
+COMP ( 1988, xb42663,   ibm5170, 0,       at386,     0,    at_state,      at,      "Apricot",  "Apricot Qi 300 (Rev D,E & F Motherboard)", MACHINE_NOT_WORKING )
+COMP ( 1988, qi600,     ibm5170, 0,       at386,     0,    at_state,      at,      "Apricot",  "Apricot Qi 600 (Neptune Motherboard)", MACHINE_NOT_WORKING )
+COMP ( 1990, qi900,     ibm5170, 0,       at486,     0,    at_state,      at,      "Apricot",  "Apricot Qi 900 (Scorpion Motherboard)", MACHINE_NOT_WORKING )
+COMP ( 1989, apvxft,    ibm5170, 0,       at486,     0,    at_state,      at,      "Apricot",  "Apricot VX FT server", MACHINE_NOT_WORKING )
+COMP ( 1991, apxenls3,  ibm5170, 0,       at486,     0,    at_state,      at,      "Apricot",  "Apricot XEN-LS (Venus IV Motherboard)", MACHINE_NOT_WORKING )
+COMP ( 1993, apxlsam,   ibm5170, 0,       at486,     0,    at_state,      at,      "Apricot",  "Apricot XEN-LS II (Samurai Motherboard)", MACHINE_NOT_WORKING )
+COMP ( 1987, apxeni,    ibm5170, 0,       at386,     0,    at_state,      at,      "Apricot",  "Apricot XEN-i 386 (Leopard Motherboard)" , MACHINE_NOT_WORKING )
+COMP ( 1989, xb42639,   ibm5170, 0,       xb42639,   0,    at_state,      at,      "Apricot",  "Apricot XEN-S (Venus I Motherboard 286)" , MACHINE_NOT_WORKING )
+COMP ( 1990, xb42639a,  ibm5170, 0,       xb42639,   0,    at_state,      at,      "Apricot",  "Apricot XEN-S (Venus II Motherboard 286)" , MACHINE_NOT_WORKING )
+COMP ( 1989, xb42664,   ibm5170, 0,       at386,     0,    at_state,      at,      "Apricot",  "Apricot XEN-S (Venus I Motherboard 386)" , MACHINE_NOT_WORKING )
+COMP ( 1990, xb42664a,  ibm5170, 0,       at386,     0,    at_state,      at,      "Apricot",  "Apricot XEN-S (Venus II Motherboard 386)" , MACHINE_NOT_WORKING )
+COMP ( 1993, apxena1,   ibm5170, 0,       at486,     0,    at_state,      at,      "Apricot",  "Apricot XEN PC (A1 Motherboard)", MACHINE_NOT_WORKING )
+COMP ( 1993, apxenp2,   ibm5170, 0,       at486,     0,    at_state,      at,      "Apricot",  "Apricot XEN PC (P2 Motherboard)", MACHINE_NOT_WORKING )
+COMP ( 1990, c386sx16,  ibm5170, 0,       at386sx,   0,    at_state,      at,      "Commodore Business Machines", "Commodore 386SX-16", MACHINE_NOT_WORKING )
+COMP ( 1988, pc30iii,   ibm5170, 0,       pc30iii,   0,    at_state,      at,      "Commodore Business Machines",  "PC 30-III", MACHINE_NOT_WORKING )
+COMP ( 1988, pc40iii,   ibm5170, 0,       pc40iii,   0,    at_state,      at,      "Commodore Business Machines",  "PC 40-III", MACHINE_NOT_WORKING )
+COMP ( 1995, ficpio2,   ibm5170, 0,       ficpio2,   0,    at_state,      atpci,   "FIC", "486-PIO-2", MACHINE_NOT_WORKING )
+COMP ( 1985, k286i,     ibm5170, 0,       k286i,     0,    at_state,      at,      "Kaypro",   "286i", MACHINE_NOT_WORKING )
+COMP ( 1991, t2000sx,   ibm5170, 0,       at386sx,   0,    at_state,      at,      "Toshiba",  "T2000SX", MACHINE_NOT_WORKING )
+COMP ( 199?, mbc28,     ibm5170, 0,       at386sx,   0,    at_state,      at,      "Sanyo",  "MBC-28", MACHINE_NOT_WORKING )
+COMP ( 1986, pcd2,      ibm5170, 0,       ibm5170,   0,    at_state,      at,      "Siemens",  "PCD-2", MACHINE_NOT_WORKING )
+COMP ( 1987, comportiii,ibm5170, 0,       comportiii,0,    at_state,      at,      "Compaq",   "Portable III", MACHINE_NOT_WORKING )
+

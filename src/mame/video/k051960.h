@@ -33,6 +33,9 @@ typedef device_delegate<void (int *code, int *color, int *priority, int *shadow)
 #define MCFG_K051960_NMI_HANDLER(_devcb) \
 	devcb = &k051960_device::set_nmi_handler(*device, DEVCB_##_devcb);
 
+#define MCFG_K051960_VREG_CONTRAST_HANDLER(_devcb) \
+	devcb = &k051960_device::set_vreg_contrast_handler(*device, DEVCB_##_devcb);
+
 
 class k051960_device : public device_t, public device_gfx_interface
 {
@@ -51,6 +54,10 @@ public:
 
 	template <class Object> static devcb_base &set_nmi_handler(device_t &device, Object &&cb)
 	{ return downcast<k051960_device &>(device).m_nmi_handler.set_callback(std::forward<Object>(cb)); }
+
+	template <class Object> static devcb_base &set_vreg_contrast_handler(device_t &device, Object &&cb)
+	{ return downcast<k051960_device &>(device).m_vreg_contrast_handler.set_callback(std::forward<Object>(cb)); }
+
 
 	// static configuration
 	static void set_k051960_callback(device_t &device, k051960_cb_delegate callback) { downcast<k051960_device &>(device).m_k051960_cb = callback; }
@@ -98,8 +105,10 @@ private:
 	k051960_cb_delegate m_k051960_cb;
 
 	devcb_write_line m_irq_handler;
+	// TODO: is this even used by anything?
 	devcb_write_line m_firq_handler;
 	devcb_write_line m_nmi_handler;
+	devcb_write_line m_vreg_contrast_handler;
 
 	uint8_t    m_spriterombank[3];
 	int      m_romoffset;

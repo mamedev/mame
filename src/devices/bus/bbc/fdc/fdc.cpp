@@ -102,7 +102,7 @@ void bbc_fdc_slot_device::device_reset()
 // slot devices
 #include "acorn.h"
 #include "cumana.h"
-//#include "cv1797.h"
+#include "cv1797.h"
 //#include "microware.h"
 #include "opus.h"
 //#include "solidisk.h"
@@ -115,7 +115,7 @@ SLOT_INTERFACE_START( bbc_fdc_devices )
 	SLOT_INTERFACE("acorn1770", BBC_ACORN1770)
 	SLOT_INTERFACE("cumana1",   BBC_CUMANA1)
 	SLOT_INTERFACE("cumana2",   BBC_CUMANA2)
-	//SLOT_INTERFACE("cv1797",    BBC_CV1797)
+	SLOT_INTERFACE("cv1797",    BBC_CV1797)
 	//SLOT_INTERFACE("microware", BBC_MICROWARE)
 	SLOT_INTERFACE("opus8272",  BBC_OPUS8272)
 	SLOT_INTERFACE("opus2791",  BBC_OPUS2791)

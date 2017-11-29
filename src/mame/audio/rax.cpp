@@ -227,7 +227,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( acclaim_rax_device::dma_timer_callback )
 	if (m_control_regs[BDMA_CONTROL_REG] & 8)
 		m_cpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 	else
-		m_cpu->machine().driver_data()->generic_pulse_irq_line(*m_cpu, ADSP2181_BDMA, 1);
+		m_cpu->pulse_input_line(ADSP2181_BDMA, m_cpu->minimum_quantum_time());
 
 	timer.adjust(attotime::never);
 }

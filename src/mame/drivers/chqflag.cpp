@@ -71,22 +71,33 @@ WRITE8_MEMBER(chqflag_state::chqflag_vreg_w)
 	/* Bits 3 and 7 are set in night stages, where the background should get darker and */
 	/* the headlight (which have the shadow bit set) become highlights */
 	/* Maybe one of the bits inverts the SHAD line while the other darkens the background. */
-	if (data & 0x08)
-		m_palette->set_shadow_factor(1 / PALETTE_DEFAULT_SHADOW_FACTOR);
-	else
-		m_palette->set_shadow_factor(PALETTE_DEFAULT_SHADOW_FACTOR);
+	/*
+	 * Update according to a reference:
+	 * 0x00 is certainly shadow (car pit-in shadow when zoomed in/clouds before rain)
+	 * 0x80 is used when rain shows up (which should be white/highlighted)
+	 * 0x88 is for when night shows up (max amount of highlight)
+	 * 0x08 is used at dawn after 0x88 state
+	 * The shadow part looks ugly when rain starts/ends pouring (-> black colored with a setting of 0x00),
+	 * the reference shows dimmed background when this event occurs (which is handled via reg 1 bit 0 of k051960 device),
+	 * might be actually disabling the shadow here (-> setting 1.0f instead).
+	 *
+	 * TODO: true values aren't known, also shadow_factors table probably scales towards zero instead (game doesn't use those)
+	 */
+	const double shadow_factors[4] = {0.8, 1.33, 1.66, 2.0 };
+	const double highlight_factors[4] = {1.0, 1.33, 1.66, 2.0 };
+	uint8_t shadow_value = ((data & 0x80) >> 6) | ((data & 0x08) >> 3);
 
+	m_palette->set_shadow_factor(m_last_vreg != 0 ? highlight_factors[shadow_value] : shadow_factors[shadow_value] );
+
+	#if 0
 	if ((data & 0x80) != m_last_vreg)
 	{
-		double brt = (data & 0x80) ? PALETTE_DEFAULT_SHADOW_FACTOR : 1.0;
-		int i;
-
 		m_last_vreg = data & 0x80;
 
 		/* only affect the background */
-		for (i = 512; i < 1024; i++)
-			m_palette->set_pen_contrast(i, brt);
+		update_background_shadows(data);
 	}
+	#endif
 
 //if ((data & 0xf8) && (data & 0xf8) != 0x88)
 //  popmessage("chqflag_vreg_w %02x",data);
@@ -286,6 +297,27 @@ void chqflag_state::machine_reset()
 	m_analog_ctrl = 0;
 	m_accel = 0;
 	m_wheel = 0;
+	update_background_shadows(0);
+}
+
+inline void chqflag_state::update_background_shadows(uint8_t data)
+{
+	double brt = (data & 1) ? 0.8 : 1.0;
+
+	for (int i = 512; i < 1024; i++)
+		m_palette->set_pen_contrast(i, brt);
+}
+
+
+WRITE_LINE_MEMBER(chqflag_state::background_brt_w)
+{
+//  popmessage("%d",state);
+
+	if (state != m_last_vreg)
+	{
+		m_last_vreg = state;
+		update_background_shadows(state);
+	}
 }
 
 static MACHINE_CONFIG_START( chqflag )
@@ -326,6 +358,7 @@ static MACHINE_CONFIG_START( chqflag )
 	MCFG_K051960_CB(chqflag_state, sprite_callback)
 	MCFG_K051960_IRQ_HANDLER(INPUTLINE("maincpu", KONAMI_IRQ_LINE))
 	MCFG_K051960_NMI_HANDLER(INPUTLINE("maincpu", INPUT_LINE_NMI))
+	MCFG_K051960_VREG_CONTRAST_HANDLER(WRITELINE(chqflag_state,background_brt_w))
 
 	MCFG_DEVICE_ADD("k051316_1", K051316, 0)
 	MCFG_GFX_PALETTE("palette")

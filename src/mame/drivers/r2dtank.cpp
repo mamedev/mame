@@ -81,10 +81,9 @@ public:
 	DECLARE_READ8_MEMBER(AY8910_port_r);
 	DECLARE_WRITE8_MEMBER(AY8910_port_w);
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
-	DECLARE_WRITE_LINE_MEMBER(display_enable_changed);
 	DECLARE_WRITE8_MEMBER(pia_comp_w);
 	virtual void machine_start() override;
-	DECLARE_WRITE8_MEMBER(ttl74123_output_changed);
+	DECLARE_WRITE_LINE_MEMBER(ttl74123_output_changed);
 
 	MC6845_UPDATE_ROW(crtc_update_row);
 
@@ -223,11 +222,11 @@ WRITE8_MEMBER(r2dtank_state::AY8910_port_w)
  *
  *************************************/
 
-WRITE8_MEMBER(r2dtank_state::ttl74123_output_changed)
+WRITE_LINE_MEMBER(r2dtank_state::ttl74123_output_changed)
 {
 	pia6821_device *pia = machine().device<pia6821_device>("pia_main");
-	pia->ca1_w(data);
-	m_ttl74123_output = data;
+	pia->ca1_w(state);
+	m_ttl74123_output = state;
 }
 
 
@@ -309,11 +308,6 @@ MC6845_UPDATE_ROW( r2dtank_state::crtc_update_row )
 	}
 }
 
-
-WRITE_LINE_MEMBER(r2dtank_state::display_enable_changed)
-{
-	machine().device<ttl74123_device>("74123")->a_w(generic_space(), 0, state);
-}
 
 
 /*************************************
@@ -461,7 +455,7 @@ static MACHINE_CONFIG_START( r2dtank )
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(r2dtank_state, crtc_update_row)
-	MCFG_MC6845_OUT_DE_CB(WRITELINE(r2dtank_state, display_enable_changed))
+	MCFG_MC6845_OUT_DE_CB(DEVWRITELINE("74123", ttl74123_device, a_w))
 
 	/* 74LS123 */
 
@@ -472,7 +466,7 @@ static MACHINE_CONFIG_START( r2dtank )
 	MCFG_TTL74123_A_PIN_VALUE(1)                  /* A pin - driven by the CRTC */
 	MCFG_TTL74123_B_PIN_VALUE(1)                  /* B pin - pulled high */
 	MCFG_TTL74123_CLEAR_PIN_VALUE(1)                  /* Clear pin - pulled high */
-	MCFG_TTL74123_OUTPUT_CHANGED_CB(WRITE8(r2dtank_state, ttl74123_output_changed))
+	MCFG_TTL74123_OUTPUT_CHANGED_CB(WRITELINE(r2dtank_state, ttl74123_output_changed))
 
 	MCFG_DEVICE_ADD("pia_main", PIA6821, 0)
 	MCFG_PIA_READPA_HANDLER(IOPORT("IN0"))

@@ -324,8 +324,8 @@ cdp1802_device::cdp1802_device(const machine_config &mconfig, const char *tag, d
 void cosmac_device::device_start()
 {
 	// resolve callbacks
-	m_read_wait.resolve_safe(0);
-	m_read_clear.resolve_safe(0);
+	m_read_wait.resolve();
+	m_read_clear.resolve();
 	m_read_ef1.resolve();
 	m_read_ef2.resolve();
 	m_read_ef3.resolve();
@@ -648,6 +648,14 @@ void cosmac_device::execute_set_input(int inputnum, int state)
 	case COSMAC_INPUT_LINE_EF4:
 		EF[inputnum - COSMAC_INPUT_LINE_EF1] = state;
 		break;
+
+	case COSMAC_INPUT_LINE_CLEAR:
+		m_clear = state;
+		break;
+
+	case COSMAC_INPUT_LINE_WAIT:
+		m_wait = state;
+		break;
 	}
 }
 
@@ -792,11 +800,11 @@ inline void cosmac_device::debug()
 
 inline void cosmac_device::sample_wait_clear()
 {
-	int wait = m_read_wait();
-	int clear = m_read_clear();
+	if (!m_read_wait.isnull()) m_wait = m_read_wait();
+	if (!m_read_clear.isnull()) m_clear = m_read_clear();
 
 	m_pmode = m_mode;
-	m_mode = (cosmac_mode) ((clear << 1) | wait);
+	m_mode = (cosmac_mode) ((m_clear << 1) | m_wait);
 }
 
 

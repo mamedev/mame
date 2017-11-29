@@ -86,6 +86,7 @@ public:
 	DECLARE_READ8_MEMBER(headon_io_r);
 	DECLARE_READ8_MEMBER(sspaceat_io_r);
 	DECLARE_WRITE8_MEMBER(headon_io_w);
+	DECLARE_MACHINE_RESET(headon2);
 	DECLARE_READ8_MEMBER(headon2_io_r);
 	DECLARE_WRITE8_MEMBER(headon2_io_w);
 	DECLARE_WRITE8_MEMBER(digger_io_w);
@@ -93,6 +94,7 @@ public:
 	DECLARE_WRITE8_MEMBER(invds_io_w);
 	DECLARE_WRITE8_MEMBER(carhntds_io_w);
 	DECLARE_WRITE8_MEMBER(sspacaho_io_w);
+	DECLARE_WRITE8_MEMBER(headonn_io_w);
 	DECLARE_WRITE8_MEMBER(tranqgun_io_w);
 	DECLARE_WRITE8_MEMBER(spacetrk_io_w);
 	DECLARE_WRITE8_MEMBER(carnival_io_w);
@@ -130,6 +132,9 @@ public:
 	/*----------- defined in audio/pulsar.c -----------*/
 	DECLARE_WRITE8_MEMBER( pulsar_audio_1_w );
 	DECLARE_WRITE8_MEMBER( pulsar_audio_2_w );
+
+	/*----------- defined in audio/tranqgun.c -----------*/
+	DECLARE_WRITE8_MEMBER( tranqgun_audio_w );
 
 	DECLARE_CUSTOM_INPUT_MEMBER(read_coin_status);
 	DECLARE_CUSTOM_INPUT_MEMBER(get_64v);

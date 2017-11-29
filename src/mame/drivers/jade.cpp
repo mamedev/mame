@@ -22,6 +22,7 @@
 #include "machine/z80ctc.h"
 #include "machine/z80sio.h"
 #include "bus/rs232/rs232.h"
+//#include "bus/s100/s100.h"
 
 
 class jade_state : public driver_device
@@ -37,13 +38,13 @@ private:
 };
 
 
-static ADDRESS_MAP_START(jade_mem, AS_PROGRAM, 8, jade_state)
+static ADDRESS_MAP_START(mem_map, AS_PROGRAM, 8, jade_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_ROM AM_REGION("roms", 0)
 	AM_RANGE(0x0800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(jade_io, AS_IO, 8, jade_state)
+static ADDRESS_MAP_START(io_map, AS_IO, 8, jade_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x28, 0x2b) AM_DEVREADWRITE("ctc2", z80ctc_device, read, write)
@@ -55,17 +56,12 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( jade )
 INPUT_PORTS_END
 
-static DEVICE_INPUT_DEFAULTS_START( terminal )
-	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_9615 )
-	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_9615 )
-DEVICE_INPUT_DEFAULTS_END
-
 
 static MACHINE_CONFIG_START( jade )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
-	MCFG_CPU_PROGRAM_MAP(jade_mem)
-	MCFG_CPU_IO_MAP(jade_io)
+	MCFG_CPU_PROGRAM_MAP(mem_map)
+	MCFG_CPU_IO_MAP(io_map)
 
 	MCFG_DEVICE_ADD("ctc1", Z80CTC, XTAL_4MHz)
 
@@ -86,16 +82,15 @@ static MACHINE_CONFIG_START( jade )
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("sio", z80sio_device, rxa_w))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("sio", z80sio_device, ctsa_w))
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 MACHINE_CONFIG_END
 
 /* ROM definition */
-ROM_START( jade )
+ROM_START( jgz80 )
 	ROM_REGION( 0x800, "roms", 0 )
 	ROM_LOAD( "jgz80.rom",   0x0000, 0x0800, CRC(90c4a1ef) SHA1(8a93a11051cc27f3edca24f0f4297ebe0099964e) )
 ROM_END
 
 /* Driver */
 
-//    YEAR  NAME     PARENT  COMPAT   MACHINE  INPUT  CLASS       INIT  COMPANY  FULLNAME   FLAGS
-COMP( 1983, jade,    0,      0,       jade,    jade,  jade_state, 0,    "Jade Computer Products",  "JGZ80",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME     PARENT  COMPAT   MACHINE  INPUT  CLASS       INIT      COMPANY               FULLNAME   FLAGS
+COMP( 1983, jgz80,   0,      0,       jade,    jade,  jade_state, 0,    "Jade Computer Products",  "JGZ80",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

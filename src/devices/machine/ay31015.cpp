@@ -8,8 +8,9 @@
     and AY-6-1013 UARTs (Universal Asynchronous Receiver/Transmitters).
 
     Compatible UARTs were produced by Harris (HD6402), TI (TMS6011),
-    Western Digital (TR1602/TR1402/TR1863/TR1865), AMI (S1883), Standard
-    Microsystems (COM2502/COM2017), Tesla (MHB1012) and other companies.
+    Western Digital (TR1602/TR1402/TR1863/TR1865), AMI (S1883), Signetics
+    (2536), National (MM5303), Standard Microsystems (COM2502/COM2017),
+    Tesla (MHB1012) and other companies.
 
     This is cycle-accurate according to the specifications.
 

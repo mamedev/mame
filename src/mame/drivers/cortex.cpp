@@ -37,12 +37,13 @@ public:
 		, m_p_ram(*this, "ram")
 		{ }
 
+private:
 	virtual void machine_reset() override;
 	required_device<tms9995_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_p_ram;
 };
 
-static ADDRESS_MAP_START( cortex_mem, AS_PROGRAM, 8, cortex_state )
+static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, cortex_state )
 	AM_RANGE(0x0000, 0xefff) AM_RAM AM_SHARE("ram")
 	AM_RANGE(0xf100, 0xf11f) AM_RAM // memory mapping unit
 	AM_RANGE(0xf120, 0xf120) AM_DEVREADWRITE("tms9928a", tms9928a_device, vram_read, vram_write)
@@ -50,7 +51,7 @@ static ADDRESS_MAP_START( cortex_mem, AS_PROGRAM, 8, cortex_state )
 	//AM_RANGE(0xf140, 0xf147) // fdc tms9909
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cortex_io, AS_IO, 8, cortex_state )
+static ADDRESS_MAP_START( io_map, AS_IO, 8, cortex_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x000f) AM_MIRROR(0x0030) AM_DEVWRITE("control", ls259_device, write_a0)
 	//AM_RANGE(0x0000, 0x000f) AM_MIRROR(0x0020) AM_READ(pio_r)
@@ -81,7 +82,7 @@ static MACHINE_CONFIG_START( cortex )
 	/* TMS9995 CPU @ 12.0 MHz */
 	// Standard variant, no overflow int
 	// No lines connected yet
-	MCFG_TMS99xx_ADD("maincpu", TMS9995, 12000000, cortex_mem, cortex_io)
+	MCFG_TMS99xx_ADD("maincpu", TMS9995, 12000000, mem_map, io_map)
 
 	MCFG_DEVICE_ADD("control", LS259, 0) // IC64
 	//MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(cortex_state, basic_led_w))
@@ -103,12 +104,12 @@ MACHINE_CONFIG_END
 ROM_START( cortex )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "basic", "Cortex Bios")
-	ROMX_LOAD( "cortex_ic47.bin", 0x0000, 0x2000, CRC(bdb8c7bd) SHA1(340829dcb7a65f2e830fd5aff82a312e3ed7918f), ROM_BIOS(1))
-	ROMX_LOAD( "cortex_ic46.bin", 0x2000, 0x2000, CRC(4de459ea) SHA1(00a42fe556d4ffe1f85b2ce369f544b07fbd06d9), ROM_BIOS(1))
-	ROMX_LOAD( "cortex_ic45.bin", 0x4000, 0x2000, CRC(b0c9b6e8) SHA1(4e20c3f0b7546b803da4805cd3b8616f96c3d923), ROM_BIOS(1))
+	ROMX_LOAD( "cortex.ic47", 0x0000, 0x2000, CRC(bdb8c7bd) SHA1(340829dcb7a65f2e830fd5aff82a312e3ed7918f), ROM_BIOS(1))
+	ROMX_LOAD( "cortex.ic46", 0x2000, 0x2000, CRC(4de459ea) SHA1(00a42fe556d4ffe1f85b2ce369f544b07fbd06d9), ROM_BIOS(1))
+	ROMX_LOAD( "cortex.ic45", 0x4000, 0x2000, CRC(b0c9b6e8) SHA1(4e20c3f0b7546b803da4805cd3b8616f96c3d923), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(1, "forth", "FIG-Forth")
-	ROMX_LOAD( "forth_ic47.bin",  0x0000, 0x2000, CRC(999034be) SHA1(0dcc7404c38aa0ae913101eb0aa98da82104b5d4), ROM_BIOS(2))
-	ROMX_LOAD( "forth_ic46.bin",  0x2000, 0x2000, CRC(8eca54cc) SHA1(0f1680e941ef60bb9bde9a4b843b78f30dff3202), ROM_BIOS(2))
+	ROMX_LOAD( "forth.ic47",  0x0000, 0x2000, CRC(999034be) SHA1(0dcc7404c38aa0ae913101eb0aa98da82104b5d4), ROM_BIOS(2))
+	ROMX_LOAD( "forth.ic46",  0x2000, 0x2000, CRC(8eca54cc) SHA1(0f1680e941ef60bb9bde9a4b843b78f30dff3202), ROM_BIOS(2))
 ROM_END
 
 /* Driver */

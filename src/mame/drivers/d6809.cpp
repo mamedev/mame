@@ -87,25 +87,25 @@ devices.
 #include "machine/mos6551.h"
 #include "machine/terminal.h"
 
-#define TERMINAL_TAG "terminal"
 
 class d6809_state : public driver_device
 {
 public:
 	d6809_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_terminal(*this, TERMINAL_TAG)
-	{
-	}
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_terminal(*this, "terminal")
+	{ }
 
-	required_device<cpu_device> m_maincpu;
-	required_device<generic_terminal_device> m_terminal;
-	void kbd_put(u8 data);
 	DECLARE_READ8_MEMBER( term_r );
 	DECLARE_WRITE8_MEMBER( term_w );
+	void kbd_put(u8 data);
+
+private:
 	uint8_t m_term_data;
 	virtual void machine_reset() override;
+	required_device<cpu_device> m_maincpu;
+	required_device<generic_terminal_device> m_terminal;
 };
 
 READ8_MEMBER( d6809_state::term_r )
@@ -121,14 +121,14 @@ WRITE8_MEMBER( d6809_state::term_w )
 		m_terminal->write(space, 0, data);
 }
 
-static ADDRESS_MAP_START( d6809_mem, AS_PROGRAM, 8, d6809_state )
+static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, d6809_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	// 00-FF is for various devices.
 	AM_RANGE(0x0000, 0x0003) AM_DEVREADWRITE("acia1", mos6551_device, read, write)
 	AM_RANGE(0x0004, 0x0007) AM_DEVREADWRITE("acia2", mos6551_device, read, write)
 	AM_RANGE(0x00ff, 0x00ff) AM_READWRITE(term_r,term_w)
 	AM_RANGE(0x1000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xffff) AM_ROM
+	AM_RANGE(0xe000, 0xffff) AM_ROM AM_REGION("roms", 0)
 ADDRESS_MAP_END
 
 
@@ -150,20 +150,20 @@ void d6809_state::machine_reset()
 static MACHINE_CONFIG_START( d6809 )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, XTAL_14_7456MHz / 8) // MC68B09EP
-	MCFG_CPU_PROGRAM_MAP(d6809_mem)
+	MCFG_CPU_PROGRAM_MAP(mem_map)
 
 	MCFG_DEVICE_ADD("acia1", MOS6551, XTAL_14_7456MHz / 8) // uses Q clock
 	MCFG_DEVICE_ADD("acia2", MOS6551, XTAL_14_7456MHz / 8) // uses Q clock
 
 	/* video hardware */
-	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
+	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
 	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(d6809_state, kbd_put))
 MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( d6809 )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "d6809.rom", 0xe000, 0x2000, CRC(2ceb40b8) SHA1(780111541234b4f0f781a118d955df61daa56e7e))
+	ROM_REGION( 0x2000, "roms", 0 )
+	ROM_LOAD( "d6809.rom", 0x0000, 0x2000, CRC(2ceb40b8) SHA1(780111541234b4f0f781a118d955df61daa56e7e))
 ROM_END
 
 /* Driver */

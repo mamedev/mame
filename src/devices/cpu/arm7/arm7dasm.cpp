@@ -212,13 +212,21 @@ static uint32_t arm7_disasm( std::ostream &stream, uint32_t pc, uint32_t opcode 
 
 	if( (opcode&0xfe000000)==0xfa000000 ) //bits 31-25 == 1111 101 (BLX - v5)
 	{
-		/* BLX */
+		/* BLX(1) */
 		util::stream_format( stream, "BLX" );
 		dasmflags = DASMFLAG_STEP_OVER;
 
 		WritePadding(stream, start_position);
 
 		WriteBranchAddress( stream, pc, opcode, true );
+	}
+	else if( (opcode&0x0ff000f0)==0x01200030 )  // (BLX - v5)
+	{
+		/* BLX(2) */
+		util::stream_format( stream, "BLX" );
+		dasmflags = DASMFLAG_STEP_OVER;
+		WritePadding(stream, start_position);
+		util::stream_format( stream, "R%d",(opcode&0xf));
 	}
 	else if( (opcode&0x0ffffff0)==0x012fff10 ) //bits 27-4 == 000100101111111111110001
 	{

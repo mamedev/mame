@@ -95,7 +95,9 @@ class towns_state : public driver_device
 			m_pit(*this, "pit"),
 			m_dma_1(*this, "dma_1"),
 			m_dma_2(*this, "dma_2"),
-			m_palette(*this, "palette"),
+			m_palette(*this, "palette256"),
+			m_palette16_0(*this, "palette16_0"),
+			m_palette16_1(*this, "palette16_1"),
 			m_ram(*this, RAM_TAG),
 			m_fdc(*this, "fdc"),
 			m_flop0(*this, "fdc:0"),
@@ -131,6 +133,8 @@ class towns_state : public driver_device
 	required_device<upd71071_device> m_dma_1;
 	required_device<upd71071_device> m_dma_2;
 	required_device<palette_device> m_palette;
+	required_device<palette_device> m_palette16_0;
+	required_device<palette_device> m_palette16_1;
 	required_device<ram_device> m_ram;
 	required_device<mb8877_device> m_fdc;
 	required_device<floppy_connector> m_flop0;

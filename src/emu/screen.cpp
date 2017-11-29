@@ -804,6 +804,39 @@ void screen_device::device_validity_check(validity_checker &valid) const
 
 
 //-------------------------------------------------
+//  device_resolve_objects - resolve objects that
+//  may be needed for other devices to set
+//  initial conditions at start time
+//-------------------------------------------------
+
+void screen_device::device_resolve_objects()
+{
+	// bind our handlers
+	m_screen_update_ind16.bind_relative_to(*owner());
+	m_screen_update_rgb32.bind_relative_to(*owner());
+	m_screen_vblank.resolve_safe();
+
+	// find the specified palette
+	if (m_palette_tag != nullptr && m_palette == nullptr)
+	{
+		// find our palette as a sibling device
+		device_t *palette = owner()->subdevice(m_palette_tag);
+		if (palette == nullptr)
+			fatalerror("Screen '%s' specifies nonexistent device '%s' as palette\n",
+									tag(),
+									m_palette_tag);
+		if (!palette->interface(m_palette))
+			fatalerror("Screen '%s' specifies device '%s' as palette, but it has no palette interface\n",
+									tag(),
+									m_palette_tag);
+
+		// assign our format to the palette before it starts
+		m_palette->m_format = format();
+	}
+}
+
+
+//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
@@ -826,13 +859,7 @@ void screen_device::device_start()
 		}
 	}
 
-	// bind our handlers
-	m_screen_update_ind16.bind_relative_to(*owner());
-	m_screen_update_rgb32.bind_relative_to(*owner());
-	m_screen_vblank.resolve_safe();
-
 	// if we have a palette and it's not started, wait for it
-	resolve_palette();
 	if (m_palette != nullptr && !m_palette->device().started())
 		throw device_missing_dependencies();
 
@@ -1478,28 +1505,6 @@ void screen_device::register_screen_bitmap(bitmap_t &bitmap)
 	bitmap.allocate(width(), height());
 	if (m_palette != nullptr)
 		bitmap.set_palette(m_palette->palette());
-}
-
-
-//-------------------------------------------------
-//  resolve_palette - find the specified palette
-//-------------------------------------------------
-
-void screen_device::resolve_palette()
-{
-	if (m_palette_tag != nullptr && m_palette == nullptr)
-	{
-		// find our palette as a sibling device
-		device_t *palette = owner()->subdevice(m_palette_tag);
-		if (palette == nullptr)
-			fatalerror("Screen '%s' specifies nonexistent device '%s' as palette\n",
-									tag(),
-									m_palette_tag);
-		if (!palette->interface(m_palette))
-			fatalerror("Screen '%s' specifies device '%s' as palette, but it has no palette interface\n",
-									tag(),
-									m_palette_tag);
-	}
 }
 
 

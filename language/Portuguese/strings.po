@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-10-03 10:32+1100\n"
-"PO-Revision-Date: 2016-02-20 18:03+0100\n"
+"PO-Revision-Date: 2017-10-26 22:51+0100\n"
 "Last-Translator: pmos69\n"
 "Language-Team: MAME Language Team\n"
 "Language: pt\n"
@@ -501,7 +501,7 @@ msgstr "Cor de fundo do rato-premido"
 
 #: src/frontend/mame/ui/custui.cpp:469
 msgid "Restore originals colors"
-msgstr "restaurar cores originais"
+msgstr "Restaurar cores originais"
 
 #: src/frontend/mame/ui/custui.cpp:481
 msgid "UI Colors Settings"
@@ -677,7 +677,7 @@ msgstr "Não Mecânico"
 
 #: src/frontend/mame/ui/utils.cpp:64
 msgid "Category"
-msgstr "categoria"
+msgstr "Categoria"
 
 #: src/frontend/mame/ui/utils.cpp:65
 msgid "Favorites"
@@ -1272,11 +1272,11 @@ msgstr "Requer Artwork\tNão\n"
 
 #: src/frontend/mame/ui/selgame.cpp:947
 msgid "Requires Clickable Artwork\tYes\n"
-msgid "Requer Artwork Clicável\tSim\n"
+msgstr "Requer Artwork Clicável\tSim\n"
 
 #: src/frontend/mame/ui/selgame.cpp:947
 msgid "Requires Clickable Artwork\tNo\n"
-msgid "Requer Artwork Clicável\tNão\n"
+msgstr "Requer Artwork Clicável\tNão\n"
 
 #: src/frontend/mame/ui/selgame.cpp:948
 msgid "Support Cocktail\tYes\n"
@@ -1312,31 +1312,31 @@ msgstr "Orientação de Ecrã\tHorizontal\n"
 
 #: src/frontend/mame/ui/selgame.cpp:961
 msgid "Requires CHD\tYes\n"
-msgid "Requer CHD\tSim\n"
+msgstr "Requer CHD\tSim\n"
 
 #: src/frontend/mame/ui/selgame.cpp:961
 msgid "Requires CHD\tNo\n"
-msgid "Requer CHD\tNão\n"
+msgstr "Requer CHD\tNão\n"
 
 #: src/frontend/mame/ui/selgame.cpp:974
 msgid "ROM Audit Result\tOK\n"
-msgid "Resultado da Audit à ROM\tOK\n"
+msgstr "Resultado da Audit à ROM\tOK\n"
 
 #: src/frontend/mame/ui/selgame.cpp:976
 msgid "ROM Audit Result\tBAD\n"
-msgid "Resultado da Audit à ROM\tFALHA\n"
+msgstr "Resultado da Audit à ROM\tFALHA\n"
 
 #: src/frontend/mame/ui/selgame.cpp:979
 msgid "Samples Audit Result\tNone Needed\n"
-msgid "Resultado da Audit às Samples\tNenhuma Necessária\n"
+msgstr "Resultado da Audit às Samples\tNenhuma Necessária\n"
 
 #: src/frontend/mame/ui/selgame.cpp:981
 msgid "Samples Audit Result\tOK\n"
-msgid "Resultado da Audit às Samples\tOK\n"
+msgstr "Resultado da Audit às Samples\tOK\n"
 
 #: src/frontend/mame/ui/selgame.cpp:983
 msgid "Samples Audit Result\tBAD\n"
-msgid "Resultado da Audit às Samples\tFALHA\n"
+msgstr "Resultado da Audit às Samples\tFALHA\n"
 
 #: src/frontend/mame/ui/selgame.cpp:987
 msgid ""
@@ -2124,7 +2124,7 @@ msgstr "Impulso da Moeda"
 
 #: src/frontend/mame/ui/submenu.cpp:87
 msgid "Device Mapping"
-msgstr "mapeamento de Dispositivos"
+msgstr "Mapeamento de Dispositivos"
 
 #: src/frontend/mame/ui/submenu.cpp:88
 msgid "Lightgun Device Assignment"
@@ -2132,7 +2132,7 @@ msgstr "Atribuição do Dispositivo Pistola de Luz"
 
 #: src/frontend/mame/ui/submenu.cpp:89
 msgid "Trackball Device Assignment"
-msgstr "Atribuição do Dispositivo trackball"
+msgstr "Atribuição do Dispositivo Trackball"
 
 #: src/frontend/mame/ui/submenu.cpp:90
 msgid "Pedal Device Assignment"
@@ -2184,7 +2184,7 @@ msgstr "Filtragem Bi-linear"
 
 #: src/frontend/mame/ui/submenu.cpp:108
 msgid "Bitmap Prescaling"
-msgstr "Bitmap Prescaling"
+msgstr "Prescaling de Bitmaps"
 
 #: src/frontend/mame/ui/submenu.cpp:109
 msgid "Window Mode"

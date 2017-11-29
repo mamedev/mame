@@ -15,24 +15,6 @@
 
 #include "softlist_dev.h"
 
-// The following are modules included by the various CoCo cartridge
-// devices.  For some reason, the build system will not necessarily
-// identify them as dependencies.  Adding these #include's here seems
-// to rectify the problem
-#include "cpu/tms7000/tms7000.h"
-#include "machine/mos6551.h"
-#include "machine/6850acia.h"
-#include "machine/msm6242.h"
-#include "machine/ds1315.h"
-#include "machine/wd_fdc.h"
-#include "sound/ay8910.h"
-#include "sound/sp0256.h"
-#include "sound/sn76496.h"
-#include "formats/dmk_dsk.h"
-#include "formats/sdf_dsk.h"
-#include "formats/jvc_dsk.h"
-#include "formats/vdk_dsk.h"
-
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -232,32 +214,5 @@ private:
 
 #define MCFG_COCO_CARTRIDGE_REMOVE(_tag)        \
 	MCFG_DEVICE_REMOVE(_tag)
-
-
-/***************************************************************************
-    COCO CARTRIDGE DEVICES
-***************************************************************************/
-
-// device type definitions - CoCo FDC
-extern const device_type COCO_FDC;
-extern const device_type COCO_FDC_V11;
-extern const device_type COCO3_HDB1;
-extern const device_type CP400_FDC;
-
-// device type definitions - Dragon FDC
-extern const device_type DRAGON_FDC;
-extern const device_type SDTANDY_FDC;
-
-// device type definitions - other
-extern const device_type COCO_ORCH90;
-extern const device_type COCO_MULTIPAK;
-extern const device_type COCO_RS232;
-extern const device_type COCO_DCMODEM;
-extern const device_type COCO_SSC;
-extern const device_type COCO_PAK;
-extern const device_type COCO_PAK_BANKED;
-extern const device_type COCO_PAK_GMC;
-extern const device_type COCO_T4426;
-extern const device_type DRAGON_JCBSND;
 
 #endif // MAME_BUS_COCO_COCOCART_H

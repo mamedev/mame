@@ -92,6 +92,7 @@ private:
 	double subbuffer[2][32];
 	double audio_buffer[2][32*32];
 	int audio_buffer_pos[2];
+	double m_cos_cache[32][32];
 
 	int current_pos, current_limit;
 

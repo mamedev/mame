@@ -13,7 +13,7 @@
 #include "logmacro.h"
 
 
-DEFINE_DEVICE_TYPE(SCN2674_VIDEO, scn2674_device, "scn2674", "Signetics SCN2674 AVDC")
+DEFINE_DEVICE_TYPE(SCN2674, scn2674_device, "scn2674", "Signetics SCN2674 AVDC")
 
 
 // default address map
@@ -22,10 +22,10 @@ static ADDRESS_MAP_START( scn2674_vram, 0, 8, scn2674_device )
 ADDRESS_MAP_END
 
 scn2674_device::scn2674_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, SCN2674_VIDEO, tag, owner, clock)
+	: device_t(mconfig, SCN2674, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
 	, device_memory_interface(mconfig, *this)
-	, m_irq_cb(*this)
+	, m_intr_cb(*this)
 	, m_IR_pointer(0)
 	, m_screen1_l(0), m_screen1_h(0), m_cursor_l(0), m_cursor_h(0), m_screen2_l(0), m_screen2_h(0)
 	, m_irq_register(0), m_status_register(0), m_irq_mask(0)
@@ -64,7 +64,7 @@ void scn2674_device::device_start()
 {
 	// resolve callbacks
 	m_display_cb.bind_relative_to(*owner());
-	m_irq_cb.resolve_safe();
+	m_intr_cb.resolve_safe();
 	m_scanline_timer = timer_alloc(TIMER_SCANLINE);
 	m_screen->register_screen_bitmap(m_bitmap);
 
@@ -410,7 +410,7 @@ void scn2674_device::write_command(uint8_t data)
 				m_irq_state = 1;
 			}
 		}
-		m_irq_cb(m_irq_register ? 1 : 0);
+		m_intr_cb(m_irq_register ? ASSERT_LINE : CLEAR_LINE);
 
 	}
 	if ((data&0xe0)==0x80)
@@ -685,7 +685,7 @@ void scn2674_device::device_timer(emu_timer &timer, device_timer_id id, int para
 					LOG("vblank irq\n");
 					m_irq_state = 1;
 					m_irq_register |= 0x10;
-					m_irq_cb(1);
+					m_intr_cb(ASSERT_LINE);
 				}
 			}
 
@@ -704,7 +704,7 @@ void scn2674_device::device_timer(emu_timer &timer, device_timer_id id, int para
 					LOG("SCN2674 Line Zero\n");
 					m_irq_state = 1;
 					m_irq_register |= 0x08;
-					m_irq_cb(1);
+					m_intr_cb(ASSERT_LINE);
 				}
 			}
 
@@ -716,7 +716,7 @@ void scn2674_device::device_timer(emu_timer &timer, device_timer_id id, int para
 					LOG("SCN2674 Split Screen 1 irq\n");
 					m_irq_state = 1;
 					m_irq_register |= 0x04;
-					m_irq_cb(1);
+					m_intr_cb(ASSERT_LINE);
 				}
 				if(m_spl1)
 					m_address = (m_screen2_h << 8) | m_screen2_l;
@@ -732,7 +732,7 @@ void scn2674_device::device_timer(emu_timer &timer, device_timer_id id, int para
 					LOG("SCN2674 Split Screen 2 irq\n");
 					m_irq_state = 1;
 					m_irq_register |= 0x01;
-					m_irq_cb(1);
+					m_intr_cb(ASSERT_LINE);
 				}
 				if(m_spl2)
 					m_address = (m_screen2_h << 8) | m_screen2_l;

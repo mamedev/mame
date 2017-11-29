@@ -45,7 +45,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(CRT9007, crt9007_device, "crt9007", "SMC SRT9007 VPAC")
+DEFINE_DEVICE_TYPE(CRT9007, crt9007_device, "crt9007", "SMC CRT9007 VPAC")
 
 
 

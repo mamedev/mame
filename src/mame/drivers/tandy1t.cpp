@@ -622,7 +622,7 @@ GFXDECODE_END
 
 static MACHINE_CONFIG_START(tandy1000_common)
 	MCFG_DEVICE_ADD("mb", T1000_MOTHERBOARD, 0)
-	t1000_mb_device::static_set_cputag(*device, "maincpu");
+	t1000_mb_device::static_set_cputag(*device, "^maincpu");
 
 	/* video hardware */
 	MCFG_PCVIDEO_T1000_ADD("pcvideo_t1000")
