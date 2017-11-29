@@ -1657,6 +1657,7 @@ void debugger_commands::execute_save(int ref, const std::vector<std::string> &pa
 	/* determine the addresses to write */
 	endoffset = (offset + length - 1) & space->addrmask();
 	offset = offset & space->addrmask();
+	endoffset ++;
 
 	/* open the file */
 	f = fopen(params[0].c_str(), "wb");
@@ -1694,7 +1695,7 @@ void debugger_commands::execute_save(int ref, const std::vector<std::string> &pa
 	case  0:
 		for (offs_t i = offset; i != endoffset; i++)
 		{
-			u8 byte = space->read_word(i);
+			u8 byte = space->read_byte(i);
 			fwrite(&byte, 1, 1, f);
 		}
 		break;
