@@ -2241,6 +2241,7 @@ void tlcs870_disassembler::disassemble_param(std::ostream &stream, offs_t pc, co
 offs_t tlcs870_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
 	m_addr = pc;
+	m_opcodes = &opcodes;
 
 	decode();
 

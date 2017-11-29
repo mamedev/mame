@@ -724,17 +724,18 @@ offs_t z8000_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 						src++;
 						i = *src++ - '0';
 						if (m_config->get_segmented_mode()) {
+							uint32_t address;
 							if (w[i] & 0x8000) {
 								old_w = w[i];
 								for (j = i; j < o.size; j++)
 									w[j] = w[j + 1];
 								get_op(opcodes, o.size - 1, new_pc, w, b, n);
-								w[i] = ((old_w & 0x7f00) << 16) | (w[i] & 0xffff);
+								address = ((old_w & 0x7f00) << 16) | (w[i] & 0xffff);
 							}
 							else {
-								w[i] = ((w[i] & 0x7f00) << 16) | (w[i] & 0xff);
+								address = ((w[i] & 0x7f00) << 16) | (w[i] & 0xff);
 							}
-							util::stream_format(stream, "<%%%02X>%%%04X", (w[i] >> 24) & 0xff, w[i] & 0xffff);
+							util::stream_format(stream, "<%%%02X>%%%04X", (address >> 24) & 0xff, address & 0xffff);
 						}
 						else util::stream_format(stream, "%%%04x", w[i]);
 						break;

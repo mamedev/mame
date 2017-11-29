@@ -710,7 +710,7 @@ unidasm_data_buffer::unidasm_data_buffer(util::disasm_interface *_disasm, const 
 			break;
 
 		case -1:
-			lr8 = [this](offs_t pc) -> u8 { abort(); };
+			lr8 = [](offs_t pc) -> u8 { abort(); };
 			lr16 = [this](offs_t pc) -> u16 {
 				const u16 *p = get_ptr<u16>(pc);
 				return p ?
@@ -758,8 +758,8 @@ unidasm_data_buffer::unidasm_data_buffer(util::disasm_interface *_disasm, const 
 			break;
 
 		case -2:
-			lr8 = [this](offs_t pc) -> u8 { abort(); };
-			lr16 = [this](offs_t pc) -> u16 { abort(); };
+			lr8 = [](offs_t pc) -> u8 { abort(); };
+			lr16 = [](offs_t pc) -> u16 { abort(); };
 			lr32 = [this](offs_t pc) -> u16 {
 				const u32 *p = get_ptr<u32>(pc);
 				return p ?
@@ -789,9 +789,9 @@ unidasm_data_buffer::unidasm_data_buffer(util::disasm_interface *_disasm, const 
 			break;
 
 		case -3:
-			lr8 = [this](offs_t pc) -> u8 { abort(); };
-			lr16 = [this](offs_t pc) -> u16 { abort(); };
-			lr32 = [this](offs_t pc) -> u32 { abort(); };
+			lr8 = [](offs_t pc) -> u8 { abort(); };
+			lr16 = [](offs_t pc) -> u16 { abort(); };
+			lr32 = [](offs_t pc) -> u32 { abort(); };
 			lr64 = [this](offs_t pc) -> u64 {
 				const u64 *p = get_ptr<u64>(pc);
 				return p ?
@@ -801,10 +801,9 @@ unidasm_data_buffer::unidasm_data_buffer(util::disasm_interface *_disasm, const 
 			break;
 
 		case 3:
-			assert(entry->endian == );
-			lr8 = [this](offs_t pc) -> u8 { abort(); };
-			lr32 = [this](offs_t pc) -> u32 { abort(); };
-			lr64 = [this](offs_t pc) -> u64 { abort(); };
+			lr8 = [](offs_t pc) -> u8 { abort(); };
+			lr32 = [](offs_t pc) -> u32 { abort(); };
+			lr64 = [](offs_t pc) -> u64 { abort(); };
 			lr16 = [this](offs_t pc) -> u16 {
 				if(pc < base_pc)
 					return 0x0000;
@@ -1028,7 +1027,7 @@ int main(int argc, char *argv[])
 			lpce &= pc_mask;
 			return dis->pc_linear_to_real(lpce);
 		};
-		next_pc_wrap = [pc_mask, page_mask, dis = disasm.get()](offs_t pc, offs_t size) {
+		next_pc_wrap = [page_mask, dis = disasm.get()](offs_t pc, offs_t size) {
 			offs_t lpc = dis->pc_real_to_linear(pc);
 			offs_t lpce = (lpc & ~page_mask) | ((lpc + size) & page_mask);
 			return dis->pc_linear_to_real(lpce);
@@ -1042,7 +1041,7 @@ int main(int argc, char *argv[])
 			pce &= pc_mask;
 			return pce;
 		};
-		next_pc_wrap = [pc_mask, page_mask](offs_t pc, offs_t size) {
+		next_pc_wrap = [page_mask](offs_t pc, offs_t size) {
 			offs_t pce = (pc & ~page_mask) | ((pc + size) & page_mask);
 			return pce;
 		};

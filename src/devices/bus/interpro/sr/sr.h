@@ -23,6 +23,9 @@
 #define MCFG_SR_SLOT_REMOVE(_tag)    \
 	MCFG_DEVICE_REMOVE(_tag)
 
+#define MCFG_SR_MEMORY(_tag, _data_spacenum, _io_spacenum) \
+	sr_device::static_set_memory(*device, _tag, _data_spacenum, _io_spacenum);
+
 class sr_slot_device : public device_t, public device_slot_interface
 {
 public:
@@ -30,7 +33,8 @@ public:
 	sr_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// inline configuration
-	static void static_set_sr_slot(device_t &device, const char *tag, const char *slottag);
+	static void static_set_sr_slot(device_t &device, const char *tag, const char *slot_tag);
+
 protected:
 	sr_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
@@ -38,7 +42,8 @@ protected:
 	virtual void device_start() override;
 
 	// configuration
-	const char *m_sr_tag, *m_sr_slottag;
+	const char *m_sr_tag;
+	const char *m_sr_slot_tag;
 };
 
 class device_sr_card_interface;
@@ -53,6 +58,8 @@ public:
 	template <class Object> static devcb_base &set_out_irq0_callback(device_t &device, Object &&cb) { return downcast<sr_device &>(device).m_out_irq0_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_out_irq1_callback(device_t &device, Object &&cb) { return downcast<sr_device &>(device).m_out_irq1_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_out_irq2_callback(device_t &device, Object &&cb) { return downcast<sr_device &>(device).m_out_irq2_cb.set_callback(std::forward<Object>(cb)); }
+
+	static void static_set_memory(device_t &device, const char *const tag, const int data_spacenum, const int io_spacenum);
 
 	static const u32 SR_BASE = 0x87000000;
 	static const u32 SR_SIZE = 0x08000000;
@@ -97,6 +104,10 @@ protected:
 private:
 	device_sr_card_interface *m_slot[SR_COUNT];
 	int m_slot_count;
+
+	const char *m_memory_tag;
+	int m_data_spacenum;
+	int m_io_spacenum;
 };
 
 class device_sr_card_interface : public device_slot_card_interface
@@ -110,13 +121,14 @@ public:
 	void set_sr_device();
 
 	// inline configuration
-	static void static_set_sr_tag(device_t &device, const char *tag, const char *slottag);
+	static void static_set_sr_tag(device_t &device, const char *tag, const char *slot_tag);
 
 protected:
 	device_sr_card_interface(const machine_config &mconfig, device_t &device);
 
 	sr_device  *m_sr;
-	const char *m_sr_tag, *m_sr_slottag;
+	const char *m_sr_tag;
+	const char *m_sr_slot_tag;
 };
 
 class sr_card_device_base : public device_t, public device_sr_card_interface

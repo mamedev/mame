@@ -219,10 +219,7 @@ offs_t tms1000_base_disassembler::disassemble(std::ostream &stream, offs_t pc, c
 			util::stream_format(stream, "%d", i4_value[op & 0x0f]);
 			break;
 		case zB7:
-			if (m_opcode_9bits)
-				util::stream_format(stream, "$%02X", op << 1 & 0xfe);
-			else
-				util::stream_format(stream, "$%02X", op & 0x3f);
+			util::stream_format(stream, "$%02X", op & (m_opcode_9bits ? 0x7f : 0x3f));
 			break;
 		default:
 			break;
@@ -249,26 +246,6 @@ tp0320_disassembler::tp0320_disassembler() : tms1000_base_disassembler(tp0320_mn
 
 tms1000_base_disassembler::tms1000_base_disassembler(const u8 *lut_mnemonic, bool opcode_9bits, int pc_bits) : m_lut_mnemonic(lut_mnemonic), m_opcode_9bits(opcode_9bits), m_pc_bits(pc_bits)
 {
-}
-
-u32 tms1000_base_disassembler::opcode_alignment() const
-{
-	return 1;
-}
-
-u32 tms1000_base_disassembler::interface_flags() const
-{
-	return NONLINEAR_PC | PAGED2LEVEL;
-}
-
-u32 tms1000_base_disassembler::page_address_bits() const
-{
-	return m_pc_bits;
-}
-
-u32 tms1000_base_disassembler::page2_address_bits() const
-{
-	return 4;
 }
 
 offs_t tms1000_base_disassembler::pc_linear_to_real(offs_t pc) const

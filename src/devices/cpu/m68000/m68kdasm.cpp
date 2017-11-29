@@ -3454,7 +3454,7 @@ bool m68k_disassembler::compare_nof_true_bits(const opcode_struct *aptr, const o
 	b = ((b & 0xF0F0) >> 4) + (b & 0x0F0F);
 	b = ((b & 0xFF00) >> 8) + (b & 0x00FF);
 
-	return b > a; /* reversed to get greatest to least sorting */
+	return b < a; /* reversed to get greatest to least sorting */
 }
 
 /* build the opcode handler jump table */
