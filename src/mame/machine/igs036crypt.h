@@ -32,5 +32,6 @@ extern const uint16_t   cjdh2_key[0x100];
 extern const uint16_t    kov3_key[0x100];
 extern const uint16_t    kov2_key[0x100];
 extern const uint16_t  ddpdoj_key[0x100];
+extern const uint16_t  kof98umh_key[0x100];
 
 #endif
