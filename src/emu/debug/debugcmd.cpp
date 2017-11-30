@@ -100,15 +100,15 @@ debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu
 	, m_cpu(cpu)
 	, m_console(console)
 {
-	m_global_array = auto_alloc_array_clear(m_machine, global_entry, MAX_GLOBALS);
+	m_global_array = std::make_unique<global_entry []>(MAX_GLOBALS);
 
 	symbol_table *symtable = m_cpu.get_global_symtable();
 
 	/* add a few simple global functions */
 	using namespace std::placeholders;
-	symtable->add("min", nullptr, 2, 2, std::bind(&debugger_commands::execute_min, this, _1, _2, _3, _4));
-	symtable->add("max", nullptr, 2, 2, std::bind(&debugger_commands::execute_max, this, _1, _2, _3, _4));
-	symtable->add("if", nullptr, 3, 3, std::bind(&debugger_commands::execute_if, this, _1, _2, _3, _4));
+	symtable->add("min", 2, 2, std::bind(&debugger_commands::execute_min, this, _1, _2, _3));
+	symtable->add("max", 2, 2, std::bind(&debugger_commands::execute_max, this, _1, _2, _3));
+	symtable->add("if", 3, 3, std::bind(&debugger_commands::execute_if, this, _1, _2, _3));
 
 	/* add all single-entry save state globals */
 	for (int itemnum = 0; itemnum < MAX_GLOBALS; itemnum++)
@@ -128,7 +128,10 @@ debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu
 			sprintf(symname, ".%s", strrchr(name, '/') + 1);
 			m_global_array[itemnum].base = base;
 			m_global_array[itemnum].size = valsize;
-			symtable->add(symname, &m_global_array, std::bind(&debugger_commands::global_get, this, _1, _2), std::bind(&debugger_commands::global_set, this, _1, _2, _3));
+			symtable->add(
+					symname,
+					std::bind(&debugger_commands::global_get, this, _1, &m_global_array[itemnum]),
+					std::bind(&debugger_commands::global_set, this, _1, &m_global_array[itemnum], _2));
 		}
 	}
 
@@ -293,7 +296,7 @@ debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu
     execute_min - return the minimum of two values
 -------------------------------------------------*/
 
-u64 debugger_commands::execute_min(symbol_table &table, void *ref, int params, const u64 *param)
+u64 debugger_commands::execute_min(symbol_table &table, int params, const u64 *param)
 {
 	return (param[0] < param[1]) ? param[0] : param[1];
 }
@@ -303,7 +306,7 @@ u64 debugger_commands::execute_min(symbol_table &table, void *ref, int params, c
     execute_max - return the maximum of two values
 -------------------------------------------------*/
 
-u64 debugger_commands::execute_max(symbol_table &table, void *ref, int params, const u64 *param)
+u64 debugger_commands::execute_max(symbol_table &table, int params, const u64 *param)
 {
 	return (param[0] > param[1]) ? param[0] : param[1];
 }
@@ -313,7 +316,7 @@ u64 debugger_commands::execute_max(symbol_table &table, void *ref, int params, c
     execute_if - if (a) return b; else return c;
 -------------------------------------------------*/
 
-u64 debugger_commands::execute_if(symbol_table &table, void *ref, int params, const u64 *param)
+u64 debugger_commands::execute_if(symbol_table &table, int params, const u64 *param)
 {
 	return param[0] ? param[1] : param[2];
 }
@@ -328,9 +331,8 @@ u64 debugger_commands::execute_if(symbol_table &table, void *ref, int params, co
     global_get - symbol table getter for globals
 -------------------------------------------------*/
 
-u64 debugger_commands::global_get(symbol_table &table, void *ref)
+u64 debugger_commands::global_get(symbol_table &table, global_entry *global)
 {
-	global_entry *global = (global_entry *)ref;
 	switch (global->size)
 	{
 		case 1:     return *(u8 *)global->base;
@@ -346,9 +348,8 @@ u64 debugger_commands::global_get(symbol_table &table, void *ref)
     global_set - symbol table setter for globals
 -------------------------------------------------*/
 
-void debugger_commands::global_set(symbol_table &table, void *ref, u64 value)
+void debugger_commands::global_set(symbol_table &table, global_entry *global, u64 value)
 {
-	global_entry *global = (global_entry *)ref;
 	switch (global->size)
 	{
 		case 1:     *(u8 *)global->base = value; break;
