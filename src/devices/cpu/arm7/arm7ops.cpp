@@ -492,7 +492,7 @@ void arm7_cpu_device::HandleMemSingle(uint32_t insn)
 						R15 = data - 4;
 					else
 						R15 = (R15 & ~0x03FFFFFC) /* N Z C V I F M1 M0 */ | ((data - 4) & 0x03FFFFFC);
-				// LDR, PC takes 2S + 2N + 1I (5 total cycles)
+					// LDR, PC takes 2S + 2N + 1I (5 total cycles)
 					ARM7_ICOUNT -= 2;
 					if ((data & 1) && m_archRev >= 5)
 					{
@@ -648,10 +648,10 @@ void arm7_cpu_device::HandleHalfWordDT(uint32_t insn)
 
 			// Signed Half Word?
 			if (insn & 0x20) {
-				uint16_t signbyte, databyte;
-				databyte = READ16(rnv) & 0xFFFF;
-				signbyte = (databyte & 0x8000) ? 0xffff : 0;
-				newval = (uint32_t)(signbyte << 16)|databyte;
+				uint32_t databyte = READ16(rnv);
+				uint32_t mask = 0x0000ffff;
+				mask >>= (rnv & 1) ? 8 : 0;
+				newval = databyte | ((databyte & ((mask + 1) >> 1)) ? ~mask : 0);
 			}
 			// Signed Byte
 			else {

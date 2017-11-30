@@ -236,7 +236,7 @@ protected:
 	virtual void arm7_cpu_write16(uint32_t addr, uint16_t data);
 	virtual void arm7_cpu_write8(uint32_t addr, uint8_t data);
 	virtual uint32_t arm7_cpu_read32(uint32_t addr);
-	virtual uint16_t arm7_cpu_read16(uint32_t addr);
+	virtual uint32_t arm7_cpu_read16(uint32_t addr);
 	virtual uint8_t arm7_cpu_read8(uint32_t addr);
 
 	// Coprocessor support
@@ -623,7 +623,7 @@ public:
 	virtual void arm7_cpu_write16(uint32_t addr, uint16_t data) override;
 	virtual void arm7_cpu_write8(uint32_t addr, uint8_t data) override;
 	virtual uint32_t arm7_cpu_read32(uint32_t addr) override;
-	virtual uint16_t arm7_cpu_read16(uint32_t addr) override;
+	virtual uint32_t arm7_cpu_read16(uint32_t addr) override;
 	virtual uint8_t arm7_cpu_read8(uint32_t addr) override;
 
 private:
