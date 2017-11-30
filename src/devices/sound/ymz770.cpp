@@ -519,7 +519,7 @@ void ymz774_device::internal_reg_write(uint8_t reg, uint8_t data)
 				case 0x60: // sequence num H and L
 				case 0x68:
 					sq = (reg >> 1) & 7;
-					if (sq & 1)
+					if (reg & 1)
 						m_sequences[sq].sequence = (m_sequences[sq].sequence & 0xff00) | data;
 					else
 						m_sequences[sq].sequence = (m_sequences[sq].sequence & 0x00ff) | ((data & 0x0f) << 8); // TODO check if total number really upto 0x1000
@@ -546,7 +546,7 @@ void ymz774_device::internal_reg_write(uint8_t reg, uint8_t data)
 				case 0x88: // timer H and L
 				case 0x90:
 					sq = (reg >> 1) & 7;
-					if (sq & 1)
+					if (reg & 1)
 						m_sequences[sq].timer = (m_sequences[sq].timer & 0xff00) | data;
 					else
 						m_sequences[sq].timer = (m_sequences[sq].timer & 0x00ff) | (data << 8);
@@ -557,7 +557,7 @@ void ymz774_device::internal_reg_write(uint8_t reg, uint8_t data)
 				case 0xa0: // stop channel mask H and L, what it for ? stop chanels immediatelly or when sequence ends (so far assuming later) ?
 				case 0xa8:
 					sq = (reg >> 1) & 7;
-					if (sq & 1)
+					if (reg & 1)
 						m_sequences[sq].stopchan = (m_sequences[sq].stopchan & 0xff00) | data;
 					else
 						m_sequences[sq].stopchan = (m_sequences[sq].stopchan & 0x00ff) | (data << 8);
