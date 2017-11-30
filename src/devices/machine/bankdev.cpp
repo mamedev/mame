@@ -10,8 +10,8 @@ address_map_bank_device::address_map_bank_device( const machine_config &mconfig,
 	: device_t(mconfig, ADDRESS_MAP_BANK, tag, owner, clock),
 		device_memory_interface(mconfig, *this),
 		m_endianness(ENDIANNESS_NATIVE),
-		m_databus_width(0),
-		m_addrbus_width(32),
+		m_data_width(0),
+		m_addr_width(32),
 		m_stride(1),
 		m_program(nullptr),
 		m_offset(0)
@@ -83,7 +83,7 @@ READ64_MEMBER(address_map_bank_device::read64)
 
 void address_map_bank_device::device_config_complete()
 {
-	m_program_config = address_space_config( "program", m_endianness, m_databus_width, m_addrbus_width );
+	m_program_config = address_space_config( "program", m_endianness, m_data_width, m_addr_width );
 }
 
 void address_map_bank_device::device_start()

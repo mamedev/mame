@@ -114,12 +114,12 @@ typedef device_delegate<void (address_space &, offs_t)> setoffset_delegate;
 // ======================> direct_read_data
 
 // direct_read_data contains state data for direct read access
-template<int addr_shift> class direct_read_data
+template<int AddrShift> class direct_read_data
 {
 	friend class address_table;
 
 public:
-	using direct_update_delegate = delegate<offs_t (direct_read_data<addr_shift> &, offs_t)>;
+	using direct_update_delegate = delegate<offs_t (direct_read_data<AddrShift> &, offs_t)>;
 
 	// direct_range is an internal class that is part of a list of start/end ranges
 	class direct_range
@@ -162,6 +162,8 @@ public:
 
 	void remove_intersecting_ranges(offs_t start, offs_t end);
 
+	static inline constexpr offs_t offset_to_byte(offs_t offset) { return AddrShift < 0 ? offset << iabs(AddrShift) : offset >> iabs(AddrShift); }
+
 private:
 	// internal helpers
 	bool set_direct_region(offs_t address);
@@ -194,27 +196,27 @@ public:
 	// getters
 	const char *name() const { return m_name; }
 	endianness_t endianness() const { return m_endianness; }
-	int data_width() const { return m_databus_width; }
-	int addr_width() const { return m_addrbus_width; }
-	int addrbus_shift() const { return m_addrbus_shift; }
+	int data_width() const { return m_data_width; }
+	int addr_width() const { return m_addr_width; }
+	int addr_shift() const { return m_addr_shift; }
 
 	// Actual alignment of the bus addresses
-	int alignment() const { int bytes = m_databus_width / 8; return m_addrbus_shift < 0 ? bytes >> -m_addrbus_shift : bytes << m_addrbus_shift; }
+	int alignment() const { int bytes = m_data_width / 8; return m_addr_shift < 0 ? bytes >> -m_addr_shift : bytes << m_addr_shift; }
 
 	// Address delta to byte delta helpers
-	inline offs_t addr2byte(offs_t address) const { return (m_addrbus_shift < 0) ? (address << -m_addrbus_shift) : (address >> m_addrbus_shift); }
-	inline offs_t byte2addr(offs_t address) const { return (m_addrbus_shift > 0) ? (address << m_addrbus_shift) : (address >> -m_addrbus_shift); }
+	inline offs_t addr2byte(offs_t address) const { return (m_addr_shift < 0) ? (address << -m_addr_shift) : (address >> m_addr_shift); }
+	inline offs_t byte2addr(offs_t address) const { return (m_addr_shift > 0) ? (address << m_addr_shift) : (address >> -m_addr_shift); }
 
 	// address-to-byte conversion helpers
-	inline offs_t addr2byte_end(offs_t address) const { return (m_addrbus_shift < 0) ? ((address << -m_addrbus_shift) | ((1 << -m_addrbus_shift) - 1)) : (address >> m_addrbus_shift); }
-	inline offs_t byte2addr_end(offs_t address) const { return (m_addrbus_shift > 0) ? ((address << m_addrbus_shift) | ((1 << m_addrbus_shift) - 1)) : (address >> -m_addrbus_shift); }
+	inline offs_t addr2byte_end(offs_t address) const { return (m_addr_shift < 0) ? ((address << -m_addr_shift) | ((1 << -m_addr_shift) - 1)) : (address >> m_addr_shift); }
+	inline offs_t byte2addr_end(offs_t address) const { return (m_addr_shift > 0) ? ((address << m_addr_shift) | ((1 << m_addr_shift) - 1)) : (address >> -m_addr_shift); }
 
 	// state
 	const char *        m_name;
 	endianness_t        m_endianness;
-	u8                  m_databus_width;
-	u8                  m_addrbus_width;
-	s8                  m_addrbus_shift;
+	u8                  m_data_width;
+	u8                  m_addr_width;
+	s8                  m_addr_shift;
 	u8                  m_logaddr_width;
 	u8                  m_page_shift;
 	bool                m_is_octal;                 // to determine if messages/debugger will show octal or hex
@@ -256,18 +258,18 @@ public:
 	int spacenum() const { return m_spacenum; }
 	address_map *map() const { return m_map.get(); }
 
-	template<int addr_shift> direct_read_data<addr_shift> *direct() const {
-		static_assert(addr_shift == 3 || addr_shift == 0 || addr_shift == -1 || addr_shift == -2 || addr_shift == -3, "Unsupported addr_shift in direct()");
-		if(addr_shift != m_config.addrbus_shift())
-			fatalerror("Requesing direct() with address shift %d while the config says %d\n", addr_shift, m_config.addrbus_shift());
-		return static_cast<direct_read_data<addr_shift> *>(m_direct);
+	template<int AddrShift> direct_read_data<AddrShift> *direct() const {
+		static_assert(AddrShift == 3 || AddrShift == 0 || AddrShift == -1 || AddrShift == -2 || AddrShift == -3, "Unsupported AddrShift in direct()");
+		if(AddrShift != m_config.addr_shift())
+			fatalerror("Requesing direct() with address shift %d while the config says %d\n", AddrShift, m_config.addr_shift());
+		return static_cast<direct_read_data<AddrShift> *>(m_direct);
 	}
 
 	int data_width() const { return m_config.data_width(); }
 	int addr_width() const { return m_config.addr_width(); }
 	int alignment() const { return m_config.alignment(); }
 	endianness_t endianness() const { return m_config.endianness(); }
-	int addrbus_shift() const { return m_config.addrbus_shift(); }
+	int addr_shift() const { return m_config.addr_shift(); }
 	u64 unmap() const { return m_unmap; }
 	bool is_octal() const { return m_config.m_is_octal; }
 
@@ -819,16 +821,10 @@ private:
 //  backing that address
 //-------------------------------------------------
 
-template<int addr_shift> inline void *direct_read_data<addr_shift>::read_ptr(offs_t address, offs_t directxor)
+template<int AddrShift> inline void *direct_read_data<AddrShift>::read_ptr(offs_t address, offs_t directxor)
 {
-	if (address_is_valid(address)) {
-		if(addr_shift < 0)
-			return &m_ptr[((address ^ directxor) & m_addrmask) << iabs(addr_shift)];
-		else if(addr_shift == 0)
-			return &m_ptr[(address ^ directxor) & m_addrmask];
-		else
-			return &m_ptr[((address ^ directxor) & m_addrmask) >> iabs(addr_shift)];
-	}
+	if (address_is_valid(address))
+		return &m_ptr[offset_to_byte(((address ^ directxor) & m_addrmask))];
 	return nullptr;
 }
 
@@ -838,16 +834,12 @@ template<int addr_shift> inline void *direct_read_data<addr_shift>::read_ptr(off
 //  direct_read_data class
 //-------------------------------------------------
 
-template<int addr_shift> inline u8 direct_read_data<addr_shift>::read_byte(offs_t address, offs_t directxor)
+template<int AddrShift> inline u8 direct_read_data<AddrShift>::read_byte(offs_t address, offs_t directxor)
 {
-	if(addr_shift <= -1)
-		fatalerror("Can't direct_read_data::read_byte on a memory space with address shift %d", addr_shift);
-	if (address_is_valid(address)) {
-		if(addr_shift == 0)
-			return m_ptr[(address ^ directxor) & m_addrmask];
-		else
-			return m_ptr[((address ^ directxor) & m_addrmask) >> iabs(addr_shift)];
-	}
+	if(AddrShift <= -1)
+		fatalerror("Can't direct_read_data::read_byte on a memory space with address shift %d", AddrShift);
+	if (address_is_valid(address))
+		return m_ptr[offset_to_byte((address ^ directxor) & m_addrmask)];
 	return m_space.read_byte(address);
 }
 
@@ -857,18 +849,12 @@ template<int addr_shift> inline u8 direct_read_data<addr_shift>::read_byte(offs_
 //  direct_read_data class
 //-------------------------------------------------
 
-template<int addr_shift> inline u16 direct_read_data<addr_shift>::read_word(offs_t address, offs_t directxor)
+template<int AddrShift> inline u16 direct_read_data<AddrShift>::read_word(offs_t address, offs_t directxor)
 {
-	if(addr_shift <= -2)
-		fatalerror("Can't direct_read_data::read_word on a memory space with address shift %d", addr_shift);
-	if (address_is_valid(address)) {
-		if(addr_shift < 0)
-			return *reinterpret_cast<u16 *>(&m_ptr[((address ^ directxor) & m_addrmask) << iabs(addr_shift)]);
-		else if(addr_shift == 0)
-			return *reinterpret_cast<u16 *>(&m_ptr[(address ^ directxor) & m_addrmask]);
-		else
-			return *reinterpret_cast<u16 *>(&m_ptr[((address ^ directxor) & m_addrmask) >> iabs(addr_shift)]);
-	}
+	if(AddrShift <= -2)
+		fatalerror("Can't direct_read_data::read_word on a memory space with address shift %d", AddrShift);
+	if (address_is_valid(address))
+		return *reinterpret_cast<u16 *>(&m_ptr[offset_to_byte((address ^ directxor) & m_addrmask)]);
 	return m_space.read_word(address);
 }
 
@@ -878,18 +864,12 @@ template<int addr_shift> inline u16 direct_read_data<addr_shift>::read_word(offs
 //  direct_read_data class
 //-------------------------------------------------
 
-template<int addr_shift> inline u32 direct_read_data<addr_shift>::read_dword(offs_t address, offs_t directxor)
+template<int AddrShift> inline u32 direct_read_data<AddrShift>::read_dword(offs_t address, offs_t directxor)
 {
-	if(addr_shift <= -3)
-		fatalerror("Can't direct_read_data::read_dword on a memory space with address shift %d", addr_shift);
-	if (address_is_valid(address)) {
-		if(addr_shift < 0)
-			return *reinterpret_cast<u32 *>(&m_ptr[((address ^ directxor) & m_addrmask) << iabs(addr_shift)]);
-		else if(addr_shift == 0)
-			return *reinterpret_cast<u32 *>(&m_ptr[(address ^ directxor) & m_addrmask]);
-		else
-			return *reinterpret_cast<u32 *>(&m_ptr[((address ^ directxor) & m_addrmask) >> iabs(addr_shift)]);
-	}
+	if(AddrShift <= -3)
+		fatalerror("Can't direct_read_data::read_dword on a memory space with address shift %d", AddrShift);
+	if (address_is_valid(address))
+		return *reinterpret_cast<u32 *>(&m_ptr[offset_to_byte((address ^ directxor) & m_addrmask)]);
 	return m_space.read_dword(address);
 }
 
@@ -899,16 +879,10 @@ template<int addr_shift> inline u32 direct_read_data<addr_shift>::read_dword(off
 //  direct_read_data class
 //-------------------------------------------------
 
-template<int addr_shift> inline u64 direct_read_data<addr_shift>::read_qword(offs_t address, offs_t directxor)
+template<int AddrShift> inline u64 direct_read_data<AddrShift>::read_qword(offs_t address, offs_t directxor)
 {
-	if (address_is_valid(address)) {
-		if(addr_shift < 0)
-			return *reinterpret_cast<u64 *>(&m_ptr[((address ^ directxor) & m_addrmask) << iabs(addr_shift)]);
-		else if(addr_shift == 0)
-			return *reinterpret_cast<u64 *>(&m_ptr[(address ^ directxor) & m_addrmask]);
-		else
-			return *reinterpret_cast<u64 *>(&m_ptr[((address ^ directxor) & m_addrmask) >> iabs(addr_shift)]);
-	}
+	if (address_is_valid(address))
+		return *reinterpret_cast<u64 *>(&m_ptr[offset_to_byte((address ^ directxor) & m_addrmask)]);
 	return m_space.read_qword(address);
 }
 

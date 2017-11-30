@@ -232,9 +232,9 @@ void isa8_device::device_start()
 	else    // use host CPU's program and I/O spaces directly
 	{
 		m_iospace = &m_maincpu->space(AS_IO);
-		m_iowidth = m_maincpu->space_config(AS_IO)->m_databus_width;
+		m_iowidth = m_maincpu->space_config(AS_IO)->m_data_width;
 		m_memspace = &m_maincpu->space(AS_PROGRAM);
-		m_memwidth = m_maincpu->space_config(AS_PROGRAM)->m_databus_width;
+		m_memwidth = m_maincpu->space_config(AS_PROGRAM)->m_data_width;
 	}
 }
 

@@ -605,7 +605,7 @@ void address_map::map_validity_check(validity_checker &valid, int spacenum) cons
 {
 	// it's safe to assume here that the device has a memory interface and a config for this space
 	const address_space_config &spaceconfig = *m_device->memory().space_config(spacenum);
-	int datawidth = spaceconfig.m_databus_width;
+	int datawidth = spaceconfig.m_data_width;
 	int alignunit = spaceconfig.alignment();
 
 	bool detected_overlap = DETECT_OVERLAPPING_MEMORY ? false : true;
@@ -620,7 +620,7 @@ void address_map::map_validity_check(validity_checker &valid, int spacenum) cons
 	if (m_databits != datawidth)
 		osd_printf_error("Wrong memory handlers provided for %s space! (width = %d, memory = %08x)\n", spaceconfig.m_name, datawidth, m_databits);
 
-	offs_t globalmask = 0xffffffffUL >> (32 - spaceconfig.m_addrbus_width);
+	offs_t globalmask = 0xffffffffUL >> (32 - spaceconfig.m_addr_width);
 	if (m_globalmask != 0)
 		globalmask = m_globalmask;
 

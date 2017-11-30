@@ -1669,7 +1669,7 @@ void debugger_commands::execute_save(int ref, const std::vector<std::string> &pa
 
 	/* now write the data out */
 	auto dis = space->machine().disable_side_effect();
-	switch (space->addrbus_shift())
+	switch (space->addr_shift())
 	{
 	case -3:
 		for (offs_t i = offset; i != endoffset; i++)
@@ -1748,10 +1748,10 @@ void debugger_commands::execute_load(int ref, const std::vector<std::string> &pa
 		f.seekg(0, std::ios::end);
 		length = f.tellg();
 		f.seekg(0);
-		if (space->addrbus_shift() < 0)
-			length >>= -space->addrbus_shift();
-		else if (space->addrbus_shift() > 0)
-			length <<= space->addrbus_shift();
+		if (space->addr_shift() < 0)
+			length >>= -space->addr_shift();
+		else if (space->addr_shift() > 0)
+			length <<= space->addr_shift();
 	}
 
 	// determine the addresses to read
@@ -1759,7 +1759,7 @@ void debugger_commands::execute_load(int ref, const std::vector<std::string> &pa
 	offset = offset & space->addrmask();
 	offs_t i = 0;
 	// now read the data in, ignore endoffset and load entire file if length has been set to zero (offset-1)
-	switch (space->addrbus_shift())
+	switch (space->addr_shift())
 	{
 	case -3:
 		for (i = offset; f.good() && (i <= endoffset || endoffset == offset - 1); i++)
@@ -1850,7 +1850,7 @@ void debugger_commands::execute_dump(int ref, const std::vector<std::string> &pa
 	if (!validate_cpu_space_parameter((params.size() > 6) ? params[6].c_str() : nullptr, ref, space))
 		return;
 
-	int shift = space->addrbus_shift();
+	int shift = space->addr_shift();
 	u64 granularity = shift > 0 ? 2 : 1 << -shift;
 
 	/* further validation */
@@ -2453,7 +2453,7 @@ void debugger_commands::execute_find(int ref, const std::vector<std::string> &pa
 	/* further validation */
 	endoffset = (offset + length - 1) & space->addrmask();
 	offset = offset & space->addrmask();
-	cur_data_size = space->addrbus_shift() > 0 ? 2 : 1 << -space->addrbus_shift();
+	cur_data_size = space->addr_shift() > 0 ? 2 : 1 << -space->addr_shift();
 	if (cur_data_size == 0)
 		cur_data_size = 1;
 

@@ -176,7 +176,7 @@ void debug_disasm_buffer::debug_data_buffer::data_get(offs_t pc, offs_t size, st
 void debug_disasm_buffer::debug_data_buffer::setup_methods()
 {
 	address_space *space = m_space ? m_space : m_back->get_underlying_space();
-	int shift = space->addrbus_shift();
+	int shift = space->addr_shift();
 	int alignment = m_intf->opcode_alignment();
 	endianness_t endian = space->endianness();
 

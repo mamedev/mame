@@ -231,7 +231,7 @@ bool debug_view_disasm::generate_with_pc(debug_disasm_buffer &buffer, offs_t pc)
 {
 	// Consider that instructions are 64 bytes max
 	const debug_view_disasm_source &source = downcast<const debug_view_disasm_source &>(*m_source);
-	int shift = source.m_space.addrbus_shift();
+	int shift = source.m_space.addr_shift();
 
 	offs_t backwards_offset;
 	if(shift < 0)

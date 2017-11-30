@@ -40,7 +40,7 @@ i8089_device::i8089_device(const machine_config &mconfig, const char *tag, devic
 	m_ch1(*this, "1"),
 	m_ch2(*this, "2"),
 	m_write_sintr1(*this),
-	m_write_sintr2(*this), m_databus_width(0), m_mem(nullptr), m_io(nullptr),
+	m_write_sintr2(*this), m_data_width(0), m_mem(nullptr), m_io(nullptr),
 	m_sysbus(0),
 	m_scb(0),
 	m_soc(0), m_initialized(false),
@@ -117,8 +117,8 @@ void i8089_device::device_start()
 
 void i8089_device::device_config_complete()
 {
-	m_program_config = address_space_config("program", ENDIANNESS_LITTLE, m_databus_width, 20);
-	m_io_config = address_space_config("io", ENDIANNESS_LITTLE, m_databus_width, 16);
+	m_program_config = address_space_config("program", ENDIANNESS_LITTLE, m_data_width, 20);
+	m_io_config = address_space_config("io", ENDIANNESS_LITTLE, m_data_width, 16);
 }
 
 //-------------------------------------------------

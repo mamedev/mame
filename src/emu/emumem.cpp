@@ -414,8 +414,8 @@ private:
 	u64 read_stub_64(address_space &space, offs_t offset, u64 mask);
 
 	// stubs for reading I/O ports
-	template<typename _UintType>
-	_UintType read_stub_ioport(address_space &space, offs_t offset, _UintType mask) { return m_ioport->read(); }
+	template<typename UintType>
+	UintType read_stub_ioport(address_space &space, offs_t offset, UintType mask) { return m_ioport->read(); }
 
 	// internal helper
 	virtual void remove_subunit(int entry) override;
@@ -477,8 +477,8 @@ private:
 	void write_stub_64(address_space &space, offs_t offset, u64 data, u64 mask);
 
 	// stubs for writing I/O ports
-	template<typename _UintType>
-	void write_stub_ioport(address_space &space, offs_t offset, _UintType data, _UintType mask) { m_ioport->write(data, mask); }
+	template<typename UintType>
+	void write_stub_ioport(address_space &space, offs_t offset, UintType data, UintType mask) { m_ioport->write(data, mask); }
 
 	// internal helper
 	virtual void remove_subunit(int entry) override;
@@ -521,15 +521,15 @@ private:
 
 // A proxy class that contains an handler_entry_read or _write and forwards the setter calls
 
-template<typename _HandlerEntry>
+template<typename HandlerEntry>
 class handler_entry_proxy
 {
 public:
-	handler_entry_proxy(std::list<_HandlerEntry *> _handlers, u64 _mask) : handlers(std::move(_handlers)), mask(_mask) {}
-	handler_entry_proxy(const handler_entry_proxy<_HandlerEntry> &hep) : handlers(hep.handlers), mask(hep.mask) {}
+	handler_entry_proxy(std::list<HandlerEntry *> _handlers, u64 _mask) : handlers(std::move(_handlers)), mask(_mask) {}
+	handler_entry_proxy(const handler_entry_proxy<HandlerEntry> &hep) : handlers(hep.handlers), mask(hep.mask) {}
 
 	// forward delegate callbacks configuration
-	template<typename _delegate> void set_delegate(_delegate delegate) const {
+	template<typename Delegate> void set_delegate(Delegate delegate) const {
 		for (const auto & elem : handlers)
 			(elem)->set_delegate(delegate, mask);
 	}
@@ -541,7 +541,7 @@ public:
 	}
 
 private:
-	std::list<_HandlerEntry *> handlers;
+	std::list<HandlerEntry *> handlers;
 	u64 mask;
 };
 
@@ -714,8 +714,8 @@ public:
 
 private:
 	// internal unmapped handler
-	template<typename _UintType>
-	_UintType unmap_r(address_space &space, offs_t offset, _UintType mask)
+	template<typename UintType>
+	UintType unmap_r(address_space &space, offs_t offset, UintType mask)
 	{
 		if (m_space.log_unmap() && !m_space.machine().side_effect_disabled())
 		{
@@ -724,32 +724,32 @@ private:
 						? "%s: unmapped %s memory read from %0*o & %0*o\n"
 						: "%s: unmapped %s memory read from %0*X & %0*X\n",
 					m_space.machine().describe_context(), m_space.name(),
-					m_space.addrchars(), m_space.byte_to_address(offset * sizeof(_UintType)),
-					2 * sizeof(_UintType), mask);
+					m_space.addrchars(), m_space.byte_to_address(offset * sizeof(UintType)),
+					2 * sizeof(UintType), mask);
 		}
 		return m_space.unmap();
 	}
 
 	// internal no-op handler
-	template<typename _UintType>
-	_UintType nop_r(address_space &space, offs_t offset, _UintType mask)
+	template<typename UintType>
+	UintType nop_r(address_space &space, offs_t offset, UintType mask)
 	{
 		return m_space.unmap();
 	}
 
 	// internal watchpoint handler
-	template<typename _UintType>
-	_UintType watchpoint_r(address_space &space, offs_t offset, _UintType mask)
+	template<typename UintType>
+	UintType watchpoint_r(address_space &space, offs_t offset, UintType mask)
 	{
-		m_space.device().debug()->memory_read_hook(m_space, offset * sizeof(_UintType), mask);
+		m_space.device().debug()->memory_read_hook(m_space, offset * sizeof(UintType), mask);
 
 		u16 *oldtable = m_live_lookup;
 		m_live_lookup = &m_table[0];
-		_UintType result;
-		if (sizeof(_UintType) == 1) result = m_space.read_byte(offset);
-		if (sizeof(_UintType) == 2) result = m_space.read_word(offset << 1, mask);
-		if (sizeof(_UintType) == 4) result = m_space.read_dword(offset << 2, mask);
-		if (sizeof(_UintType) == 8) result = m_space.read_qword(offset << 3, mask);
+		UintType result;
+		if (sizeof(UintType) == 1) result = m_space.read_byte(offset);
+		if (sizeof(UintType) == 2) result = m_space.read_word(offset << 1, mask);
+		if (sizeof(UintType) == 4) result = m_space.read_dword(offset << 2, mask);
+		if (sizeof(UintType) == 8) result = m_space.read_qword(offset << 3, mask);
 		m_live_lookup = oldtable;
 		return result;
 	}
@@ -785,8 +785,8 @@ public:
 
 private:
 	// internal handlers
-	template<typename _UintType>
-	void unmap_w(address_space &space, offs_t offset, _UintType data, _UintType mask)
+	template<typename UintType>
+	void unmap_w(address_space &space, offs_t offset, UintType data, UintType mask)
 	{
 		if (m_space.log_unmap() && !m_space.machine().side_effect_disabled())
 		{
@@ -795,28 +795,28 @@ private:
 						? "%s: unmapped %s memory write to %0*o = %0*o & %0*o\n"
 						: "%s: unmapped %s memory write to %0*X = %0*X & %0*X\n",
 					m_space.machine().describe_context(), m_space.name(),
-					m_space.addrchars(), m_space.byte_to_address(offset * sizeof(_UintType)),
-					2 * sizeof(_UintType), data,
-					2 * sizeof(_UintType), mask);
+					m_space.addrchars(), m_space.byte_to_address(offset * sizeof(UintType)),
+					2 * sizeof(UintType), data,
+					2 * sizeof(UintType), mask);
 		}
 	}
 
-	template<typename _UintType>
-	void nop_w(address_space &space, offs_t offset, _UintType data, _UintType mask)
+	template<typename UintType>
+	void nop_w(address_space &space, offs_t offset, UintType data, UintType mask)
 	{
 	}
 
-	template<typename _UintType>
-	void watchpoint_w(address_space &space, offs_t offset, _UintType data, _UintType mask)
+	template<typename UintType>
+	void watchpoint_w(address_space &space, offs_t offset, UintType data, UintType mask)
 	{
-		m_space.device().debug()->memory_write_hook(m_space, offset * sizeof(_UintType), data, mask);
+		m_space.device().debug()->memory_write_hook(m_space, offset * sizeof(UintType), data, mask);
 
 		u16 *oldtable = m_live_lookup;
 		m_live_lookup = &m_table[0];
-		if (sizeof(_UintType) == 1) m_space.write_byte(offset, data);
-		if (sizeof(_UintType) == 2) m_space.write_word(offset << 1, data, mask);
-		if (sizeof(_UintType) == 4) m_space.write_dword(offset << 2, data, mask);
-		if (sizeof(_UintType) == 8) m_space.write_qword(offset << 3, data, mask);
+		if (sizeof(UintType) == 1) m_space.write_byte(offset, data);
+		if (sizeof(UintType) == 2) m_space.write_word(offset << 1, data, mask);
+		if (sizeof(UintType) == 4) m_space.write_dword(offset << 2, data, mask);
+		if (sizeof(UintType) == 8) m_space.write_qword(offset << 3, data, mask);
 		m_live_lookup = oldtable;
 	}
 
@@ -878,31 +878,31 @@ private:
 // ======================> address_space_specific
 
 // this is a derived class of address_space with specific width, endianness, and table size
-template<typename _NativeType, endianness_t _Endian, int _Shift, bool _Large>
+template<typename NativeType, endianness_t Endian, int AddrShift, bool Large>
 class address_space_specific : public address_space
 {
-	typedef address_space_specific<_NativeType, _Endian, _Shift, _Large> this_type;
+	typedef address_space_specific<NativeType, Endian, AddrShift, Large> this_type;
 
 	// constants describing the native size
-	static const u32 NATIVE_BYTES = sizeof(_NativeType);
-	static const u32 NATIVE_STEP = _Shift >= 0 ? NATIVE_BYTES << iabs(_Shift) : NATIVE_BYTES >> iabs(_Shift);
-	static const u32 NATIVE_MASK = NATIVE_STEP - 1;
-	static const u32 NATIVE_BITS = 8 * NATIVE_BYTES;
+	static constexpr u32 NATIVE_BYTES = sizeof(NativeType);
+	static constexpr u32 NATIVE_STEP = AddrShift >= 0 ? NATIVE_BYTES << iabs(AddrShift) : NATIVE_BYTES >> iabs(AddrShift);
+	static constexpr u32 NATIVE_MASK = NATIVE_STEP - 1;
+	static constexpr u32 NATIVE_BITS = 8 * NATIVE_BYTES;
 
 	// helpers to simplify core code
-	u32 read_lookup(offs_t address) const { return _Large ? m_read.lookup_live_large(address) : m_read.lookup_live_small(address); }
-	u32 write_lookup(offs_t address) const { return _Large ? m_write.lookup_live_large(address) : m_write.lookup_live_small(address); }
-	u32 setoffset_lookup(offs_t address) const { return _Large ? m_setoffset.lookup_live_large(address) : m_setoffset.lookup_live_small(address); }
+	u32 read_lookup(offs_t address) const { return Large ? m_read.lookup_live_large(address) : m_read.lookup_live_small(address); }
+	u32 write_lookup(offs_t address) const { return Large ? m_write.lookup_live_large(address) : m_write.lookup_live_small(address); }
+	u32 setoffset_lookup(offs_t address) const { return Large ? m_setoffset.lookup_live_large(address) : m_setoffset.lookup_live_small(address); }
 
-	static inline offs_t offset_to_byte(offs_t offset) { return _Shift < 0 ? offset << iabs(_Shift) : offset >> iabs(_Shift); }
+	static inline constexpr offs_t offset_to_byte(offs_t offset) { return AddrShift < 0 ? offset << iabs(AddrShift) : offset >> iabs(AddrShift); }
 
 public:
 	// construction/destruction
 	address_space_specific(memory_manager &manager, device_memory_interface &memory, int spacenum)
-		: address_space(manager, memory, spacenum, _Large),
-			m_read(*this, _Large),
-			m_write(*this, _Large),
-			m_setoffset(*this, _Large)
+		: address_space(manager, memory, spacenum, Large),
+			m_read(*this, Large),
+			m_write(*this, Large),
+			m_setoffset(*this, Large)
 	{
 #if (TEST_HANDLER)
 		// test code to verify the read/write handlers are touching the correct bits
@@ -911,25 +911,25 @@ public:
 		// install some dummy RAM for the first 16 bytes with well-known values
 		u8 buffer[16];
 		for (int index = 0; index < 16; index++)
-			buffer[index ^ ((_Endian == ENDIANNESS_NATIVE) ? 0 : (data_width()/8 - 1))] = index * 0x11;
+			buffer[index ^ ((Endian == ENDIANNESS_NATIVE) ? 0 : (data_width()/8 - 1))] = index * 0x11;
 		install_ram_generic(0x00, 0x0f, 0x0f, 0, read_or_write::READWRITE, buffer);
-		printf("\n\naddress_space(%d, %s, %s)\n", NATIVE_BITS, (_Endian == ENDIANNESS_LITTLE) ? "little" : "big", _Large ? "large" : "small");
+		printf("\n\naddress_space(%d, %s, %s)\n", NATIVE_BITS, (Endian == ENDIANNESS_LITTLE) ? "little" : "big", Large ? "large" : "small");
 
 		// walk through the first 8 addresses
 		for (int address = 0; address < 8; address++)
 		{
 			// determine expected values
-			u64 expected64 = (u64((address + ((_Endian == ENDIANNESS_LITTLE) ? 7 : 0)) * 0x11) << 56) |
-								(u64((address + ((_Endian == ENDIANNESS_LITTLE) ? 6 : 1)) * 0x11) << 48) |
-								(u64((address + ((_Endian == ENDIANNESS_LITTLE) ? 5 : 2)) * 0x11) << 40) |
-								(u64((address + ((_Endian == ENDIANNESS_LITTLE) ? 4 : 3)) * 0x11) << 32) |
-								(u64((address + ((_Endian == ENDIANNESS_LITTLE) ? 3 : 4)) * 0x11) << 24) |
-								(u64((address + ((_Endian == ENDIANNESS_LITTLE) ? 2 : 5)) * 0x11) << 16) |
-								(u64((address + ((_Endian == ENDIANNESS_LITTLE) ? 1 : 6)) * 0x11) <<  8) |
-								(u64((address + ((_Endian == ENDIANNESS_LITTLE) ? 0 : 7)) * 0x11) <<  0);
-			u32 expected32 = (_Endian == ENDIANNESS_LITTLE) ? expected64 : (expected64 >> 32);
-			u16 expected16 = (_Endian == ENDIANNESS_LITTLE) ? expected32 : (expected32 >> 16);
-			u8 expected8 = (_Endian == ENDIANNESS_LITTLE) ? expected16 : (expected16 >> 8);
+			u64 expected64 = (u64((address + ((Endian == ENDIANNESS_LITTLE) ? 7 : 0)) * 0x11) << 56) |
+								(u64((address + ((Endian == ENDIANNESS_LITTLE) ? 6 : 1)) * 0x11) << 48) |
+								(u64((address + ((Endian == ENDIANNESS_LITTLE) ? 5 : 2)) * 0x11) << 40) |
+								(u64((address + ((Endian == ENDIANNESS_LITTLE) ? 4 : 3)) * 0x11) << 32) |
+								(u64((address + ((Endian == ENDIANNESS_LITTLE) ? 3 : 4)) * 0x11) << 24) |
+								(u64((address + ((Endian == ENDIANNESS_LITTLE) ? 2 : 5)) * 0x11) << 16) |
+								(u64((address + ((Endian == ENDIANNESS_LITTLE) ? 1 : 6)) * 0x11) <<  8) |
+								(u64((address + ((Endian == ENDIANNESS_LITTLE) ? 0 : 7)) * 0x11) <<  0);
+			u32 expected32 = (Endian == ENDIANNESS_LITTLE) ? expected64 : (expected64 >> 32);
+			u16 expected16 = (Endian == ENDIANNESS_LITTLE) ? expected32 : (expected32 >> 16);
+			u8 expected8 = (Endian == ENDIANNESS_LITTLE) ? expected16 : (expected16 >> 8);
 
 			u64 result64;
 			u32 result32;
@@ -1098,11 +1098,11 @@ public:
 	}
 
 	// native read
-	_NativeType read_native(offs_t offset, _NativeType mask)
+	NativeType read_native(offs_t offset, NativeType mask)
 	{
 		g_profiler.start(PROFILER_MEMREAD);
 
-		if (TEST_HANDLER) printf("[r%X,%s]", offset, core_i64_hex_format(mask, sizeof(_NativeType) * 2));
+		if (TEST_HANDLER) printf("[r%X,%s]", offset, core_i64_hex_format(mask, sizeof(NativeType) * 2));
 
 		// look up the handler
 		offs_t address = offset & m_addrmask;
@@ -1111,19 +1111,19 @@ public:
 
 		// either read directly from RAM, or call the delegate
 		offset = offset_to_byte(handler.offset(address));
-		_NativeType result;
-		if (entry <= STATIC_BANKMAX) result = *reinterpret_cast<_NativeType *>(handler.ramptr(offset));
-		else if (sizeof(_NativeType) == 1) result = handler.read8(*this, offset, mask);
-		else if (sizeof(_NativeType) == 2) result = handler.read16(*this, offset >> 1, mask);
-		else if (sizeof(_NativeType) == 4) result = handler.read32(*this, offset >> 2, mask);
-		else if (sizeof(_NativeType) == 8) result = handler.read64(*this, offset >> 3, mask);
+		NativeType result;
+		if (entry <= STATIC_BANKMAX) result = *reinterpret_cast<NativeType *>(handler.ramptr(offset));
+		else if (sizeof(NativeType) == 1) result = handler.read8(*this, offset, mask);
+		else if (sizeof(NativeType) == 2) result = handler.read16(*this, offset >> 1, mask);
+		else if (sizeof(NativeType) == 4) result = handler.read32(*this, offset >> 2, mask);
+		else if (sizeof(NativeType) == 8) result = handler.read64(*this, offset >> 3, mask);
 
 		g_profiler.stop();
 		return result;
 	}
 
 	// mask-less native read
-	_NativeType read_native(offs_t offset)
+	NativeType read_native(offs_t offset)
 	{
 		g_profiler.start(PROFILER_MEMREAD);
 
@@ -1136,19 +1136,19 @@ public:
 
 		// either read directly from RAM, or call the delegate
 		offset = offset_to_byte(handler.offset(address));
-		_NativeType result;
-		if (entry <= STATIC_BANKMAX) result = *reinterpret_cast<_NativeType *>(handler.ramptr(offset));
-		else if (sizeof(_NativeType) == 1) result = handler.read8(*this, offset, 0xff);
-		else if (sizeof(_NativeType) == 2) result = handler.read16(*this, offset >> 1, 0xffff);
-		else if (sizeof(_NativeType) == 4) result = handler.read32(*this, offset >> 2, 0xffffffff);
-		else if (sizeof(_NativeType) == 8) result = handler.read64(*this, offset >> 3, 0xffffffffffffffffU);
+		NativeType result;
+		if (entry <= STATIC_BANKMAX) result = *reinterpret_cast<NativeType *>(handler.ramptr(offset));
+		else if (sizeof(NativeType) == 1) result = handler.read8(*this, offset, 0xff);
+		else if (sizeof(NativeType) == 2) result = handler.read16(*this, offset >> 1, 0xffff);
+		else if (sizeof(NativeType) == 4) result = handler.read32(*this, offset >> 2, 0xffffffff);
+		else if (sizeof(NativeType) == 8) result = handler.read64(*this, offset >> 3, 0xffffffffffffffffU);
 
 		g_profiler.stop();
 		return result;
 	}
 
 	// native write
-	void write_native(offs_t offset, _NativeType data, _NativeType mask)
+	void write_native(offs_t offset, NativeType data, NativeType mask)
 	{
 		g_profiler.start(PROFILER_MEMWRITE);
 
@@ -1161,19 +1161,19 @@ public:
 		offset = offset_to_byte(handler.offset(address));
 		if (entry <= STATIC_BANKMAX)
 		{
-			_NativeType *dest = reinterpret_cast<_NativeType *>(handler.ramptr(offset));
+			NativeType *dest = reinterpret_cast<NativeType *>(handler.ramptr(offset));
 			*dest = (*dest & ~mask) | (data & mask);
 		}
-		else if (sizeof(_NativeType) == 1) handler.write8(*this, offset, data, mask);
-		else if (sizeof(_NativeType) == 2) handler.write16(*this, offset >> 1, data, mask);
-		else if (sizeof(_NativeType) == 4) handler.write32(*this, offset >> 2, data, mask);
-		else if (sizeof(_NativeType) == 8) handler.write64(*this, offset >> 3, data, mask);
+		else if (sizeof(NativeType) == 1) handler.write8(*this, offset, data, mask);
+		else if (sizeof(NativeType) == 2) handler.write16(*this, offset >> 1, data, mask);
+		else if (sizeof(NativeType) == 4) handler.write32(*this, offset >> 2, data, mask);
+		else if (sizeof(NativeType) == 8) handler.write64(*this, offset >> 3, data, mask);
 
 		g_profiler.stop();
 	}
 
 	// mask-less native write
-	void write_native(offs_t offset, _NativeType data)
+	void write_native(offs_t offset, NativeType data)
 	{
 		g_profiler.start(PROFILER_MEMWRITE);
 
@@ -1184,34 +1184,34 @@ public:
 
 		// either write directly to RAM, or call the delegate
 		offset = offset_to_byte(handler.offset(address));
-		if (entry <= STATIC_BANKMAX) *reinterpret_cast<_NativeType *>(handler.ramptr(offset)) = data;
-		else if (sizeof(_NativeType) == 1) handler.write8(*this, offset, data, 0xff);
-		else if (sizeof(_NativeType) == 2) handler.write16(*this, offset >> 1, data, 0xffff);
-		else if (sizeof(_NativeType) == 4) handler.write32(*this, offset >> 2, data, 0xffffffff);
-		else if (sizeof(_NativeType) == 8) handler.write64(*this, offset >> 3, data, 0xffffffffffffffffU);
+		if (entry <= STATIC_BANKMAX) *reinterpret_cast<NativeType *>(handler.ramptr(offset)) = data;
+		else if (sizeof(NativeType) == 1) handler.write8(*this, offset, data, 0xff);
+		else if (sizeof(NativeType) == 2) handler.write16(*this, offset >> 1, data, 0xffff);
+		else if (sizeof(NativeType) == 4) handler.write32(*this, offset >> 2, data, 0xffffffff);
+		else if (sizeof(NativeType) == 8) handler.write64(*this, offset >> 3, data, 0xffffffffffffffffU);
 
 		g_profiler.stop();
 	}
 
 	// generic direct read
-	template<typename _TargetType, bool _Aligned>
-	_TargetType read_direct(offs_t address, _TargetType mask)
+	template<typename TargetType, bool Aligned>
+	TargetType read_direct(offs_t address, TargetType mask)
 	{
-		const u32 TARGET_BYTES = sizeof(_TargetType);
+		const u32 TARGET_BYTES = sizeof(TargetType);
 		const u32 TARGET_BITS = 8 * TARGET_BYTES;
 
 		// equal to native size and aligned; simple pass-through to the native reader
-		if (NATIVE_BYTES == TARGET_BYTES && (_Aligned || (address & NATIVE_MASK) == 0))
+		if (NATIVE_BYTES == TARGET_BYTES && (Aligned || (address & NATIVE_MASK) == 0))
 			return read_native(address & ~NATIVE_MASK, mask);
 
 		// if native size is larger, see if we can do a single masked read (guaranteed if we're aligned)
 		if (NATIVE_BYTES > TARGET_BYTES)
 		{
-			u32 offsbits = 8 * (offset_to_byte(address) & (NATIVE_BYTES - (_Aligned ? TARGET_BYTES : 1)));
-			if (_Aligned || (offsbits + TARGET_BITS <= NATIVE_BITS))
+			u32 offsbits = 8 * (offset_to_byte(address) & (NATIVE_BYTES - (Aligned ? TARGET_BYTES : 1)));
+			if (Aligned || (offsbits + TARGET_BITS <= NATIVE_BITS))
 			{
-				if (_Endian != ENDIANNESS_LITTLE) offsbits = NATIVE_BITS - TARGET_BITS - offsbits;
-				return read_native(address & ~NATIVE_MASK, (_NativeType)mask << offsbits) >> offsbits;
+				if (Endian != ENDIANNESS_LITTLE) offsbits = NATIVE_BITS - TARGET_BITS - offsbits;
+				return read_native(address & ~NATIVE_MASK, (NativeType)mask << offsbits) >> offsbits;
 			}
 		}
 
@@ -1223,11 +1223,11 @@ public:
 		if (NATIVE_BYTES >= TARGET_BYTES)
 		{
 			// little-endian case
-			if (_Endian == ENDIANNESS_LITTLE)
+			if (Endian == ENDIANNESS_LITTLE)
 			{
 				// read lower bits from lower address
-				_TargetType result = 0;
-				_NativeType curmask = (_NativeType)mask << offsbits;
+				TargetType result = 0;
+				NativeType curmask = (NativeType)mask << offsbits;
 				if (curmask != 0) result = read_native(address, curmask) >> offsbits;
 
 				// read upper bits from upper address
@@ -1242,9 +1242,9 @@ public:
 			{
 				// left-justify the mask to the target type
 				const u32 LEFT_JUSTIFY_TARGET_TO_NATIVE_SHIFT = ((NATIVE_BITS >= TARGET_BITS) ? (NATIVE_BITS - TARGET_BITS) : 0);
-				_NativeType result = 0;
-				_NativeType ljmask = (_NativeType)mask << LEFT_JUSTIFY_TARGET_TO_NATIVE_SHIFT;
-				_NativeType curmask = ljmask >> offsbits;
+				NativeType result = 0;
+				NativeType ljmask = (NativeType)mask << LEFT_JUSTIFY_TARGET_TO_NATIVE_SHIFT;
+				NativeType curmask = ljmask >> offsbits;
 
 				// read upper bits from lower address
 				if (curmask != 0) result = read_native(address, curmask) << offsbits;
@@ -1265,13 +1265,13 @@ public:
 			// compute the maximum number of loops; we do it this way so that there are
 			// a fixed number of loops for the compiler to unroll if it desires
 			const u32 MAX_SPLITS_MINUS_ONE = TARGET_BYTES / NATIVE_BYTES - 1;
-			_TargetType result = 0;
+			TargetType result = 0;
 
 			// little-endian case
-			if (_Endian == ENDIANNESS_LITTLE)
+			if (Endian == ENDIANNESS_LITTLE)
 			{
 				// read lowest bits from first address
-				_NativeType curmask = mask << offsbits;
+				NativeType curmask = mask << offsbits;
 				if (curmask != 0) result = read_native(address, curmask) >> offsbits;
 
 				// read middle bits from subsequent addresses
@@ -1280,15 +1280,15 @@ public:
 				{
 					address += NATIVE_STEP;
 					curmask = mask >> offsbits;
-					if (curmask != 0) result |= (_TargetType)read_native(address, curmask) << offsbits;
+					if (curmask != 0) result |= (TargetType)read_native(address, curmask) << offsbits;
 					offsbits += NATIVE_BITS;
 				}
 
 				// if we're not aligned and we still have bits left, read uppermost bits from last address
-				if (!_Aligned && offsbits < TARGET_BITS)
+				if (!Aligned && offsbits < TARGET_BITS)
 				{
 					curmask = mask >> offsbits;
-					if (curmask != 0) result |= (_TargetType)read_native(address + NATIVE_STEP, curmask) << offsbits;
+					if (curmask != 0) result |= (TargetType)read_native(address + NATIVE_STEP, curmask) << offsbits;
 				}
 			}
 
@@ -1297,8 +1297,8 @@ public:
 			{
 				// read highest bits from first address
 				offsbits = TARGET_BITS - (NATIVE_BITS - offsbits);
-				_NativeType curmask = mask >> offsbits;
-				if (curmask != 0) result = (_TargetType)read_native(address, curmask) << offsbits;
+				NativeType curmask = mask >> offsbits;
+				if (curmask != 0) result = (TargetType)read_native(address, curmask) << offsbits;
 
 				// read middle bits from subsequent addresses
 				for (u32 index = 0; index < MAX_SPLITS_MINUS_ONE; index++)
@@ -1306,11 +1306,11 @@ public:
 					offsbits -= NATIVE_BITS;
 					address += NATIVE_STEP;
 					curmask = mask >> offsbits;
-					if (curmask != 0) result |= (_TargetType)read_native(address, curmask) << offsbits;
+					if (curmask != 0) result |= (TargetType)read_native(address, curmask) << offsbits;
 				}
 
 				// if we're not aligned and we still have bits left, read lowermost bits from the last address
-				if (!_Aligned && offsbits != 0)
+				if (!Aligned && offsbits != 0)
 				{
 					offsbits = NATIVE_BITS - offsbits;
 					curmask = mask << offsbits;
@@ -1322,24 +1322,24 @@ public:
 	}
 
 	// generic direct write
-	template<typename _TargetType, bool _Aligned>
-	void write_direct(offs_t address, _TargetType data, _TargetType mask)
+	template<typename TargetType, bool Aligned>
+	void write_direct(offs_t address, TargetType data, TargetType mask)
 	{
-		const u32 TARGET_BYTES = sizeof(_TargetType);
+		const u32 TARGET_BYTES = sizeof(TargetType);
 		const u32 TARGET_BITS = 8 * TARGET_BYTES;
 
 		// equal to native size and aligned; simple pass-through to the native writer
-		if (NATIVE_BYTES == TARGET_BYTES && (_Aligned || (address & NATIVE_MASK) == 0))
+		if (NATIVE_BYTES == TARGET_BYTES && (Aligned || (address & NATIVE_MASK) == 0))
 			return write_native(address & ~NATIVE_MASK, data, mask);
 
 		// if native size is larger, see if we can do a single masked write (guaranteed if we're aligned)
 		if (NATIVE_BYTES > TARGET_BYTES)
 		{
-			u32 offsbits = 8 * (offset_to_byte(address) & (NATIVE_BYTES - (_Aligned ? TARGET_BYTES : 1)));
-			if (_Aligned || (offsbits + TARGET_BITS <= NATIVE_BITS))
+			u32 offsbits = 8 * (offset_to_byte(address) & (NATIVE_BYTES - (Aligned ? TARGET_BYTES : 1)));
+			if (Aligned || (offsbits + TARGET_BITS <= NATIVE_BITS))
 			{
-				if (_Endian != ENDIANNESS_LITTLE) offsbits = NATIVE_BITS - TARGET_BITS - offsbits;
-				return write_native(address & ~NATIVE_MASK, (_NativeType)data << offsbits, (_NativeType)mask << offsbits);
+				if (Endian != ENDIANNESS_LITTLE) offsbits = NATIVE_BITS - TARGET_BITS - offsbits;
+				return write_native(address & ~NATIVE_MASK, (NativeType)data << offsbits, (NativeType)mask << offsbits);
 			}
 		}
 
@@ -1351,11 +1351,11 @@ public:
 		if (NATIVE_BYTES >= TARGET_BYTES)
 		{
 			// little-endian case
-			if (_Endian == ENDIANNESS_LITTLE)
+			if (Endian == ENDIANNESS_LITTLE)
 			{
 				// write lower bits to lower address
-				_NativeType curmask = (_NativeType)mask << offsbits;
-				if (curmask != 0) write_native(address, (_NativeType)data << offsbits, curmask);
+				NativeType curmask = (NativeType)mask << offsbits;
+				if (curmask != 0) write_native(address, (NativeType)data << offsbits, curmask);
 
 				// write upper bits to upper address
 				offsbits = NATIVE_BITS - offsbits;
@@ -1368,11 +1368,11 @@ public:
 			{
 				// left-justify the mask and data to the target type
 				const u32 LEFT_JUSTIFY_TARGET_TO_NATIVE_SHIFT = ((NATIVE_BITS >= TARGET_BITS) ? (NATIVE_BITS - TARGET_BITS) : 0);
-				_NativeType ljdata = (_NativeType)data << LEFT_JUSTIFY_TARGET_TO_NATIVE_SHIFT;
-				_NativeType ljmask = (_NativeType)mask << LEFT_JUSTIFY_TARGET_TO_NATIVE_SHIFT;
+				NativeType ljdata = (NativeType)data << LEFT_JUSTIFY_TARGET_TO_NATIVE_SHIFT;
+				NativeType ljmask = (NativeType)mask << LEFT_JUSTIFY_TARGET_TO_NATIVE_SHIFT;
 
 				// write upper bits to lower address
-				_NativeType curmask = ljmask >> offsbits;
+				NativeType curmask = ljmask >> offsbits;
 				if (curmask != 0) write_native(address, ljdata >> offsbits, curmask);
 
 				// write lower bits to upper address
@@ -1390,10 +1390,10 @@ public:
 			const u32 MAX_SPLITS_MINUS_ONE = TARGET_BYTES / NATIVE_BYTES - 1;
 
 			// little-endian case
-			if (_Endian == ENDIANNESS_LITTLE)
+			if (Endian == ENDIANNESS_LITTLE)
 			{
 				// write lowest bits to first address
-				_NativeType curmask = mask << offsbits;
+				NativeType curmask = mask << offsbits;
 				if (curmask != 0) write_native(address, data << offsbits, curmask);
 
 				// write middle bits to subsequent addresses
@@ -1407,7 +1407,7 @@ public:
 				}
 
 				// if we're not aligned and we still have bits left, write uppermost bits to last address
-				if (!_Aligned && offsbits < TARGET_BITS)
+				if (!Aligned && offsbits < TARGET_BITS)
 				{
 					curmask = mask >> offsbits;
 					if (curmask != 0) write_native(address + NATIVE_STEP, data >> offsbits, curmask);
@@ -1419,7 +1419,7 @@ public:
 			{
 				// write highest bits to first address
 				offsbits = TARGET_BITS - (NATIVE_BITS - offsbits);
-				_NativeType curmask = mask >> offsbits;
+				NativeType curmask = mask >> offsbits;
 				if (curmask != 0) write_native(address, data >> offsbits, curmask);
 
 				// write middle bits to subsequent addresses
@@ -1432,7 +1432,7 @@ public:
 				}
 
 				// if we're not aligned and we still have bits left, write lowermost bits to the last address
-				if (!_Aligned && offsbits != 0)
+				if (!Aligned && offsbits != 0)
 				{
 					offsbits = NATIVE_BITS - offsbits;
 					curmask = mask << offsbits;
@@ -1452,7 +1452,7 @@ public:
 		const handler_entry_setoffset &handler = m_setoffset.handler_setoffset(entry);
 
 		offs_t offset = handler.offset(address);
-		handler.setoffset(*this, offset / sizeof(_NativeType));
+		handler.setoffset(*this, offset / sizeof(NativeType));
 	}
 
 	// virtual access to these functions
@@ -1601,7 +1601,7 @@ void memory_manager::allocate(device_memory_interface &memory)
 		if (spaceconfig)
 		{
 			// allocate one of the appropriate type
-			bool const large(spaceconfig->addr2byte_end(0xffffffffUL >> (32 - spaceconfig->m_addrbus_width)) >= (1 << 18));
+			bool const large(spaceconfig->addr2byte_end(0xffffffffUL >> (32 - spaceconfig->m_addr_width)) >= (1 << 18));
 
 			switch (spaceconfig->data_width())
 			{
@@ -1623,7 +1623,7 @@ void memory_manager::allocate(device_memory_interface &memory)
 				break;
 	
 			case 16:
-				switch (spaceconfig->addrbus_shift())
+				switch (spaceconfig->addr_shift())
 				{
 				case  3:
 					if (spaceconfig->endianness() == ENDIANNESS_LITTLE)
@@ -1679,7 +1679,7 @@ void memory_manager::allocate(device_memory_interface &memory)
 				break;
 	
 			case 32:
-				switch (spaceconfig->addrbus_shift())
+				switch (spaceconfig->addr_shift())
 				{
 				case  0:
 					if (spaceconfig->endianness() == ENDIANNESS_LITTLE)
@@ -1735,7 +1735,7 @@ void memory_manager::allocate(device_memory_interface &memory)
 				break;
 	
 			case 64:
-				switch (spaceconfig->addrbus_shift())
+				switch (spaceconfig->addr_shift())
 				{
 				case  0:
 					if (spaceconfig->endianness() == ENDIANNESS_LITTLE)
@@ -1954,24 +1954,24 @@ void memory_manager::bank_reattach()
 address_space::address_space(memory_manager &manager, device_memory_interface &memory, int spacenum, bool large)
 	: m_config(*memory.space_config(spacenum)),
 		m_device(memory.device()),
-		m_addrmask(0xffffffffUL >> (32 - m_config.m_addrbus_width)),
+		m_addrmask(0xffffffffUL >> (32 - m_config.m_addr_width)),
 		m_logaddrmask(0xffffffffUL >> (32 - m_config.m_logaddr_width)),
 		m_unmap(0),
 		m_spacenum(spacenum),
 		m_log_unmap(true),
 		m_name(memory.space_config(spacenum)->name()),
-		m_addrchars((m_config.m_addrbus_width + 3) / 4),
+		m_addrchars((m_config.m_addr_width + 3) / 4),
 		m_logaddrchars((m_config.m_logaddr_width + 3) / 4),
 		m_manager(manager),
 		m_machine(memory.device().machine())
 {
-	switch(m_config.addrbus_shift()) {
+	switch(m_config.addr_shift()) {
 	case  3: m_direct = static_cast<void *>(new direct_read_data< 3>(*this)); break;
 	case  0: m_direct = static_cast<void *>(new direct_read_data< 0>(*this)); break;
 	case -1: m_direct = static_cast<void *>(new direct_read_data<-1>(*this)); break;
 	case -2: m_direct = static_cast<void *>(new direct_read_data<-2>(*this)); break;
 	case -3: m_direct = static_cast<void *>(new direct_read_data<-3>(*this)); break;
-	default: fatalerror("Unsupported address shift %d\n", m_config.addrbus_shift());
+	default: fatalerror("Unsupported address shift %d\n", m_config.addr_shift());
 	}
 }
 
@@ -1982,7 +1982,7 @@ address_space::address_space(memory_manager &manager, device_memory_interface &m
 
 address_space::~address_space()
 {
-	switch(m_config.addrbus_shift()) {
+	switch(m_config.addr_shift()) {
 	case  3: delete static_cast<direct_read_data< 3> *>(m_direct); break;
 	case  0: delete static_cast<direct_read_data< 0> *>(m_direct); break;
 	case -1: delete static_cast<direct_read_data<-1> *>(m_direct); break;
@@ -2014,7 +2014,7 @@ void address_space::check_optimize_all(const char *function, offs_t addrstart, o
 	if (addrend & ~m_addrmask)
 		fatalerror("%s: In range %x-%x mask %x mirror %x select %x, end address is outside of the global address mask %x, did you mean %x ?\n", function, addrstart, addrend, addrmask, addrmirror, addrselect, m_addrmask, addrend & m_addrmask);
 
-	offs_t lowbits_mask = (m_config.data_width() >> (3 - m_config.m_addrbus_shift)) - 1;
+	offs_t lowbits_mask = (m_config.data_width() >> (3 - m_config.m_addr_shift)) - 1;
 	if (addrstart & lowbits_mask)
 		fatalerror("%s: In range %x-%x mask %x mirror %x select %x, start address has low bits set, did you mean %x ?\n", function, addrstart, addrend, addrmask, addrmirror, addrselect, addrstart & ~lowbits_mask);
 	if ((~addrend) & lowbits_mask)
@@ -2075,7 +2075,7 @@ void address_space::check_optimize_mirror(const char *function, offs_t addrstart
 	if (addrend & ~m_addrmask)
 		fatalerror("%s: In range %x-%x mirror %x, end address is outside of the global address mask %x, did you mean %x ?\n", function, addrstart, addrend, addrmirror, m_addrmask, addrend & m_addrmask);
 
-	offs_t lowbits_mask = (m_config.data_width() >> (3 - m_config.m_addrbus_shift)) - 1;
+	offs_t lowbits_mask = (m_config.data_width() >> (3 - m_config.m_addr_shift)) - 1;
 	if (addrstart & lowbits_mask)
 		fatalerror("%s: In range %x-%x mirror %x, start address has low bits set, did you mean %x ?\n", function, addrstart, addrend, addrmirror, addrstart & ~lowbits_mask);
 	if ((~addrend) & lowbits_mask)
@@ -2125,7 +2125,7 @@ void address_space::check_address(const char *function, offs_t addrstart, offs_t
 	if (addrend & ~m_addrmask)
 		fatalerror("%s: In range %x-%x, end address is outside of the global address mask %x, did you mean %x ?\n", function, addrstart, addrend, m_addrmask, addrend & m_addrmask);
 
-	offs_t lowbits_mask = (m_config.data_width() >> (3 - m_config.m_addrbus_shift)) - 1;
+	offs_t lowbits_mask = (m_config.data_width() >> (3 - m_config.m_addr_shift)) - 1;
 	if (addrstart & lowbits_mask)
 		fatalerror("%s: In range %x-%x, start address has low bits set, did you mean %x ?\n", function, addrstart, addrend, addrstart & ~lowbits_mask);
 	if ((~addrend) & lowbits_mask)
@@ -2509,8 +2509,8 @@ void address_space::dump_map(FILE *file, read_or_write readorwrite)
 	const address_table &table = (readorwrite == read_or_write::READ) ? static_cast<address_table &>(read()) : static_cast<address_table &>(write());
 
 	// dump generic information
-	fprintf(file, "  Address bits = %d\n", m_config.m_addrbus_width);
-	fprintf(file, "     Data bits = %d\n", m_config.m_databus_width);
+	fprintf(file, "  Address bits = %d\n", m_config.m_addr_width);
+	fprintf(file, "     Data bits = %d\n", m_config.m_data_width);
 	fprintf(file, "  Address mask = %X\n", m_addrmask);
 	fprintf(file, "\n");
 
@@ -3048,7 +3048,7 @@ memory_bank *address_space::bank_find_anonymous(offs_t addrstart, offs_t addrend
 
 void address_space::invalidate_read_caches()
 {
-	switch(m_config.addrbus_shift()) {
+	switch(m_config.addr_shift()) {
 	case  3: static_cast<direct_read_data< 3> *>(m_direct)->force_update(); break;
 	case  0: static_cast<direct_read_data< 0> *>(m_direct)->force_update(); break;
 	case -1: static_cast<direct_read_data<-1> *>(m_direct)->force_update(); break;
@@ -3059,7 +3059,7 @@ void address_space::invalidate_read_caches()
 
 void address_space::invalidate_read_caches(u16 entry)
 {
-	switch(m_config.addrbus_shift()) {
+	switch(m_config.addr_shift()) {
 	case  3: static_cast<direct_read_data< 3> *>(m_direct)->force_update(entry); break;
 	case  0: static_cast<direct_read_data< 0> *>(m_direct)->force_update(entry); break;
 	case -1: static_cast<direct_read_data<-1> *>(m_direct)->force_update(entry); break;
@@ -3070,7 +3070,7 @@ void address_space::invalidate_read_caches(u16 entry)
 
 void address_space::invalidate_read_caches(offs_t start, offs_t end)
 {
-	switch(m_config.addrbus_shift()) {
+	switch(m_config.addr_shift()) {
 	case  3: static_cast<direct_read_data< 3> *>(m_direct)->remove_intersecting_ranges(start, end); break;
 	case  0: static_cast<direct_read_data< 0> *>(m_direct)->remove_intersecting_ranges(start, end); break;
 	case -1: static_cast<direct_read_data<-1> *>(m_direct)->remove_intersecting_ranges(start, end); break;
@@ -4049,7 +4049,7 @@ handler_entry &address_table_write::handler(u32 index) const
 //  direct_read_data - constructor
 //-------------------------------------------------
 
-template<int addr_shift> direct_read_data<addr_shift>::direct_read_data(address_space &space)
+template<int AddrShift> direct_read_data<AddrShift>::direct_read_data(address_space &space)
 	: m_space(space),
 		m_ptr(nullptr),
 		m_addrmask(space.addrmask()),
@@ -4064,7 +4064,7 @@ template<int addr_shift> direct_read_data<addr_shift>::direct_read_data(address_
 //  ~direct_read_data - destructor
 //-------------------------------------------------
 
-template<int addr_shift> direct_read_data<addr_shift>::~direct_read_data()
+template<int AddrShift> direct_read_data<AddrShift>::~direct_read_data()
 {
 }
 
@@ -4074,7 +4074,7 @@ template<int addr_shift> direct_read_data<addr_shift>::~direct_read_data()
 //  update the opcode base for the given address
 //-------------------------------------------------
 
-template<int addr_shift> bool direct_read_data<addr_shift>::set_direct_region(offs_t address)
+template<int AddrShift> bool direct_read_data<AddrShift>::set_direct_region(offs_t address)
 {
 	// find or allocate a matching range
 	direct_range *range = find_range(address, m_entry);
@@ -4095,10 +4095,10 @@ template<int addr_shift> bool direct_read_data<addr_shift>::set_direct_region(of
 	const handler_entry_read &handler = m_space.read().handler_read(m_entry);
 	m_addrmask = handler.addrmask();
 	u32 delta = handler.addrstart() & m_addrmask;
-	if(addr_shift < 0)
-		delta = delta << iabs(addr_shift);
-	else if(addr_shift > 0)
-		delta = delta >> iabs(addr_shift);
+	if(AddrShift < 0)
+		delta = delta << iabs(AddrShift);
+	else if(AddrShift > 0)
+		delta = delta >> iabs(AddrShift);
 
 	m_ptr = base - delta;
 	m_addrstart = maskedbits | range->m_addrstart;
@@ -4111,7 +4111,7 @@ template<int addr_shift> bool direct_read_data<addr_shift>::set_direct_region(of
 //  find_range - find a byte address in a range
 //-------------------------------------------------
 
-template<int addr_shift> typename direct_read_data<addr_shift>::direct_range *direct_read_data<addr_shift>::find_range(offs_t address, u16 &entry)
+template<int AddrShift> typename direct_read_data<AddrShift>::direct_range *direct_read_data<AddrShift>::find_range(offs_t address, u16 &entry)
 {
 	// determine which entry
 	address &= m_space.m_addrmask;
@@ -4136,7 +4136,7 @@ template<int addr_shift> typename direct_read_data<addr_shift>::direct_range *di
 //  ranges that intersect the given address range
 //-------------------------------------------------
 
-template<int addr_shift> void direct_read_data<addr_shift>::remove_intersecting_ranges(offs_t addrstart, offs_t addrend)
+template<int AddrShift> void direct_read_data<AddrShift>::remove_intersecting_ranges(offs_t addrstart, offs_t addrend)
 {
 	// loop over all entries
 	for (auto & elem : m_rangelist)
