@@ -2169,7 +2169,7 @@ void address_space::prepare_map()
 			if (manager().m_sharelist.find(fulltag.c_str()) == manager().m_sharelist.end())
 			{
 				VPRINTF(("Creating share '%s' of length 0x%X\n", fulltag.c_str(), entry.m_addrend + 1 - entry.m_addrstart));
-				manager().m_sharelist.emplace(fulltag.c_str(), std::make_unique<memory_share>(m_map->m_databits, entry.m_addrend + 1 - entry.m_addrstart, endianness()));
+				manager().m_sharelist.emplace(fulltag.c_str(), std::make_unique<memory_share>(m_map->m_databits, address_to_byte(entry.m_addrend + 1 - entry.m_addrstart), endianness()));
 			}
 		}
 
