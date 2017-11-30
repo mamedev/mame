@@ -15,14 +15,25 @@
         Poly-8813 is a disk-based computer with 3 mini-floppy drives.
         Booting is done by pressing the "Load" button, mounted on the
         front panel near the power switch. Although user manuals are easy
-        to obtain, technical information and schematics are not. The bios
-        makes use of illegal instructions which we do not correctly emulate.
-        The first of these is at 0x006A (print a character routine), while
-        the other is at 0x0100 (an internal copy routine). The code at 0x100
-        can be replaced by 7E 12 13 23 03 79 B0 C2 00 01 C9, which exactly
-        fits into the available space. The disk format is known to be
-        256 bytes per sector, 10 sectors per track, 35 tracks, single sided,
-        for a total of 89600 bytes.
+        to obtain, technical information and drive controller schematics
+        are not. The disk format is known to be 256 bytes per sector, 10
+        sectors per track, 35 tracks, single sided, for a total of 89600
+        bytes.
+
+        The Poly-8813 BIOS makes use of undocumented instructions which we
+        do not currently emulate. These are at 006A (print a character
+        routine - ED ED 05); another is at 0100 (move memory routine -
+        ED ED 03); the last is at 087B (disk I/O routine - ED ED 01). The
+        code at 0100 can be replaced by 7E 12 13 23 03 79 B0 C2 00 01 C9,
+        which exactly fits into the available space. The routine at 006A is
+        likewise could be exactly replaced with F5 C5 D5 E5, which enters
+        a display routine that appears in other assembly listings but seems
+        to have no entry point here. Since the ED ED opcode is defined as
+        for CALLN in the NEC V20/V30's 8080 mode, it might be the case that
+        these are actually hooks patched into the original code for
+        emulation purposes. (There is also a slim possibility that this
+        opcode invokes an undocumented feature of the NEC uPD8080AF, which
+        at least some models of the Poly-88 are known to have used.)
 
 ****************************************************************************/
 
