@@ -186,29 +186,6 @@ READ16_MEMBER(micro3d_state::micro3d_ti_uart_r)
 }
 
 
-/*************************************
- *
- *  Z8530 SCC (Am29000)
- *
- *************************************/
-
-WRITE32_MEMBER(micro3d_state::micro3d_scc_w)
-{
-#if DRMATH_MONITOR_DISPLAY
-	if (offset == 1)
-		osd_printf_debug("%c", data);
-#endif
-}
-
-READ32_MEMBER(micro3d_state::micro3d_scc_r)
-{
-	if (offset == 1)
-		return 0xd;
-	else
-		return 5;
-}
-
-
 
 /*************************************
  *
