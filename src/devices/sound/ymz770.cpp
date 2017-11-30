@@ -107,6 +107,7 @@ void ymz770_device::device_start()
 		save_item(NAME(m_sequences[ch].timer), ch);
 		save_item(NAME(m_sequences[ch].stopchan), ch);
 		save_item(NAME(m_sequences[ch].loop), ch);
+		save_item(NAME(m_sequences[ch].bank), ch);
 		save_item(NAME(m_sequences[ch].is_playing), ch);
 	}
 }
@@ -140,6 +141,7 @@ void ymz770_device::device_reset()
 		sequence.timer = 0;
 		sequence.stopchan = 0;
 		sequence.loop = 0;
+		sequence.bank = 0;
 		sequence.is_playing = false;
 	}
 }
@@ -626,7 +628,13 @@ void ymz774_device::sequencer()
 				case 0xfe: // timer delay
 					sequence.delay = sequence.timer * 32; // possible needed -1 or +(32-1)
 					break;
+				case 0xf0:
+					sequence.bank = data & 1;
+					break;
 				default:
+				{
+					uint8_t temp = m_bank;
+					m_bank = sequence.bank;
 					if (m_bank == 0 && reg >= 0x60 && reg < 0xb0) // if we hit SEQ registers need to add this sequence offset
 					{
 						int sqn = i;
@@ -636,6 +644,8 @@ void ymz774_device::sequencer()
 					}
 					else
 						internal_reg_write(reg, data);
+					m_bank = temp;
+				}
 					break;
 				}
 			}

@@ -101,6 +101,7 @@ protected:
 		uint16_t stopchan;
 		uint8_t loop;
 		uint8_t *data;
+		uint8_t bank;
 		bool is_playing;
 	};
 
