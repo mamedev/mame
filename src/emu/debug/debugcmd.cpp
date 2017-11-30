@@ -762,7 +762,7 @@ void debugger_commands::execute_tracesym(int ref, const std::vector<std::string>
 
 void debugger_commands::execute_quit(int ref, const std::vector<std::string> &params)
 {
-	osd_printf_error("Exited via the debugger\n");
+	osd_printf_warning("Exited via the debugger\n");
 	m_machine.schedule_exit();
 }
 
