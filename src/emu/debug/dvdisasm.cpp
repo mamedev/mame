@@ -559,3 +559,13 @@ void debug_view_disasm::set_selected_address(offs_t address)
 			break;
 		}
 }
+
+//-------------------------------------------------
+//  set_source - set the current subview
+//-------------------------------------------------
+
+void debug_view_disasm::set_source(const debug_view_source &source)
+{
+	debug_view::set_source(source);
+	m_dasm.clear();
+}
