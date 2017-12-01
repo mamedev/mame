@@ -37,47 +37,6 @@ BX_PRAGMA_DIAGNOSTIC_IGNORED_GCC("-Wunused-result");
 #include "fontstash.h"
 BX_PRAGMA_DIAGNOSTIC_POP();
 
-BX_PRAGMA_DIAGNOSTIC_PUSH();
-BX_PRAGMA_DIAGNOSTIC_IGNORED_MSVC(4127) // warning C4127: conditional expression is constant
-#define LODEPNG_NO_COMPILE_ENCODER
-#define LODEPNG_NO_COMPILE_DISK
-#define LODEPNG_NO_COMPILE_ANCILLARY_CHUNKS
-#define LODEPNG_NO_COMPILE_ERROR_TEXT
-#define LODEPNG_NO_COMPILE_ALLOCATORS
-#define LODEPNG_NO_COMPILE_CPP
-#include <lodepng/lodepng.cpp>
-BX_PRAGMA_DIAGNOSTIC_POP();
-
-void* lodepng_malloc(size_t _size)
-{
-	return ::malloc(_size);
-}
-
-void* lodepng_realloc(void* _ptr, size_t _size)
-{
-	return ::realloc(_ptr, _size);
-}
-
-void lodepng_free(void* _ptr)
-{
-	::free(_ptr);
-}
-
-BX_PRAGMA_DIAGNOSTIC_PUSH();
-BX_PRAGMA_DIAGNOSTIC_IGNORED_CLANG_GCC("-Wmissing-field-initializers");
-BX_PRAGMA_DIAGNOSTIC_IGNORED_CLANG_GCC("-Wshadow");
-BX_PRAGMA_DIAGNOSTIC_IGNORED_CLANG_GCC("-Wint-to-pointer-cast")
-#if BX_COMPILER_GCC >= 60000
-BX_PRAGMA_DIAGNOSTIC_IGNORED_GCC("-Wmisleading-indentation");
-BX_PRAGMA_DIAGNOSTIC_IGNORED_GCC("-Wshift-negative-value");
-#endif // BX_COMPILER_GCC >= 60000_
-#define STBI_MALLOC(_size)        lodepng_malloc(_size)
-#define STBI_REALLOC(_ptr, _size) lodepng_realloc(_ptr, _size)
-#define STBI_FREE(_ptr)           lodepng_free(_ptr)
-#define STB_IMAGE_IMPLEMENTATION
-#include <stb/stb_image.c>
-BX_PRAGMA_DIAGNOSTIC_POP();
-
 #ifdef _MSC_VER
 #pragma warning(disable: 4100)  // unreferenced formal parameter
 #pragma warning(disable: 4127)  // conditional expression is constant
@@ -829,35 +788,6 @@ void nvgFillPaint(NVGcontext* ctx, NVGpaint paint)
 	NVGstate* state = nvg__getState(ctx);
 	state->fill = paint;
 	nvgTransformMultiply(state->fill.xform, state->xform);
-}
-
-int nvgCreateImage(NVGcontext* ctx, const char* filename, int imageFlags)
-{
-	int w, h, n, image;
-	unsigned char* img;
-	stbi_set_unpremultiply_on_load(1);
-	stbi_convert_iphone_png_to_rgb(1);
-	img = stbi_load(filename, &w, &h, &n, 4);
-	if (img == NULL) {
-//		printf("Failed to load %s - %s\n", filename, stbi_failure_reason());
-		return 0;
-	}
-	image = nvgCreateImageRGBA(ctx, w, h, imageFlags, img);
-	stbi_image_free(img);
-	return image;
-}
-
-int nvgCreateImageMem(NVGcontext* ctx, int imageFlags, unsigned char* data, int ndata)
-{
-	int w, h, n, image;
-	unsigned char* img = stbi_load_from_memory(data, ndata, &w, &h, &n, 4);
-	if (img == NULL) {
-//		printf("Failed to load %s - %s\n", filename, stbi_failure_reason());
-		return 0;
-	}
-	image = nvgCreateImageRGBA(ctx, w, h, imageFlags, img);
-	stbi_image_free(img);
-	return image;
 }
 
 int nvgCreateImageRGBA(NVGcontext* ctx, int w, int h, int imageFlags, const unsigned char* data)

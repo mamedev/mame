@@ -45,5 +45,5 @@ bgfx_texture::bgfx_texture(std::string name, bgfx::TextureFormat::Enum format, u
 
 bgfx_texture::~bgfx_texture()
 {
-	bgfx::destroyTexture(m_texture);
+	bgfx::destroy(m_texture);
 }
