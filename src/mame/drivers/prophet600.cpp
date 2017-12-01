@@ -241,10 +241,8 @@ static ADDRESS_MAP_START( cpu_map, AS_PROGRAM, 8, prophet600_state )
 	AM_RANGE(0x2000, 0x27ff) AM_RAM
 	AM_RANGE(0x3000, 0x37ff) AM_RAM
 	AM_RANGE(0x4000, 0x4001) AM_WRITE(dac_w)
-	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE(UART_TAG, acia6850_device, control_w)
-	AM_RANGE(0x6001, 0x6001) AM_DEVWRITE(UART_TAG, acia6850_device, data_w)
-	AM_RANGE(0xe000, 0xe000) AM_DEVREAD(UART_TAG, acia6850_device, status_r)
-	AM_RANGE(0xe001, 0xe001) AM_DEVREAD(UART_TAG, acia6850_device, data_r)
+	AM_RANGE(0x6000, 0x6001) AM_DEVWRITE(UART_TAG, acia6850_device, write)
+	AM_RANGE(0xe000, 0xe001) AM_DEVREAD(UART_TAG, acia6850_device, read)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_map, AS_IO, 8, prophet600_state )

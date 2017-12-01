@@ -107,11 +107,8 @@ uint8_t c64_maplin_midi_cartridge_device::c64_cd_r(address_space &space, offs_t 
 		switch (offset & 0xff)
 		{
 		case 0:
-			data = m_acia->status_r(space, 0);
-			break;
-
 		case 1:
-			data = m_acia->data_r(space, 0);
+			data = m_acia->read(space, offset & 1);
 			break;
 		}
 	}
@@ -131,11 +128,8 @@ void c64_maplin_midi_cartridge_device::c64_cd_w(address_space &space, offs_t off
 		switch (offset & 0xff)
 		{
 		case 0:
-			m_acia->control_w(space, 0, data);
-			break;
-
 		case 1:
-			m_acia->data_w(space, 0, data);
+			m_acia->write(space, offset & 1, data);
 			break;
 		}
 	}

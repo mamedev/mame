@@ -68,8 +68,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(flex_dmf2_mem, AS_PROGRAM, 8, swtpc09_state)
 	AM_RANGE(0xe000, 0xe003) AM_MIRROR(0xf0000) AM_NOP
-	AM_RANGE(0xe004, 0xe004) AM_MIRROR(0xf0000) AM_DEVREADWRITE("acia", acia6850_device, status_r, control_w)
-	AM_RANGE(0xe005, 0xe005) AM_MIRROR(0xf0000) AM_DEVREADWRITE("acia", acia6850_device, data_r, data_w)
+	AM_RANGE(0xe004, 0xe005) AM_MIRROR(0xf0000) AM_DEVREADWRITE("acia", acia6850_device, read, write)
 	AM_RANGE(0xe080, 0xe083) AM_MIRROR(0xf000c) AM_DEVREADWRITE("pia", pia6821_device, read, write)
 	AM_RANGE(0xe090, 0xe097) AM_MIRROR(0xf0008) AM_DEVREADWRITE("ptm", ptm6840_device, read, write)
 	AM_RANGE(0xe0a0, 0xefff) AM_MIRROR(0xf0000) AM_NOP
@@ -83,8 +82,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(flex_dc4_piaide_mem, AS_PROGRAM, 8, swtpc09_state)
 	AM_RANGE(0xe000, 0xe003) AM_MIRROR(0xf0000) AM_NOP
-	AM_RANGE(0xe004, 0xe004) AM_MIRROR(0xf0000) AM_DEVREADWRITE("acia", acia6850_device, status_r, control_w)
-	AM_RANGE(0xe005, 0xe005) AM_MIRROR(0xf0000) AM_DEVREADWRITE("acia", acia6850_device, data_r, data_w)
+	AM_RANGE(0xe004, 0xe005) AM_MIRROR(0xf0000) AM_DEVREADWRITE("acia", acia6850_device, read, write)
 	AM_RANGE(0xe014, 0xe014) AM_MIRROR(0xf0000) AM_WRITE(dc4_control_reg_w)
 	AM_RANGE(0xe018, 0xe01b) AM_MIRROR(0xf0000) AM_DEVREADWRITE("fdc", fd1793_device, read, write)
 	//AM_RANGE(0xe01c, 0xe05f) AM_MIRROR(0xf0000) AM_NOP
@@ -104,8 +102,7 @@ static ADDRESS_MAP_START(flex_dc4_piaide_mem, AS_PROGRAM, 8, swtpc09_state)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(uniflex_dmf2_mem, AS_PROGRAM, 8, swtpc09_state)
-	AM_RANGE(0xe000, 0xe000) AM_MIRROR(0xf0000) AM_DEVREADWRITE("acia", acia6850_device, status_r, control_w)
-	AM_RANGE(0xe001, 0xe001) AM_MIRROR(0xf0000) AM_DEVREADWRITE("acia", acia6850_device, data_r, data_w)
+	AM_RANGE(0xe000, 0xe001) AM_MIRROR(0xf0000) AM_DEVREADWRITE("acia", acia6850_device, read, write)
 	AM_RANGE(0xe002, 0xe07f) AM_MIRROR(0xf0000) AM_NOP
 	AM_RANGE(0xe080, 0xe083) AM_MIRROR(0xf000c) AM_DEVREADWRITE("pia", pia6821_device, read, write)
 	AM_RANGE(0xe090, 0xe097) AM_MIRROR(0xf0008) AM_DEVREADWRITE("ptm", ptm6840_device, read, write)
@@ -119,8 +116,7 @@ static ADDRESS_MAP_START(uniflex_dmf2_mem, AS_PROGRAM, 8, swtpc09_state)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(uniflex_dmf3_mem, AS_PROGRAM, 8, swtpc09_state)
-	AM_RANGE(0xe000, 0xe000) AM_MIRROR(0xf0000) AM_DEVREADWRITE("acia", acia6850_device, status_r, control_w)
-	AM_RANGE(0xe001, 0xe001) AM_MIRROR(0xf0000) AM_DEVREADWRITE("acia", acia6850_device, data_r, data_w)
+	AM_RANGE(0xe000, 0xe001) AM_MIRROR(0xf0000) AM_DEVREADWRITE("acia", acia6850_device, read, write)
 	AM_RANGE(0xe002, 0xe07f) AM_MIRROR(0xf0000) AM_NOP
 	AM_RANGE(0xe080, 0xe083) AM_MIRROR(0xf000c) AM_DEVREADWRITE("pia", pia6821_device, read, write)
 	AM_RANGE(0xe090, 0xe097) AM_MIRROR(0xf0008) AM_DEVREADWRITE("ptm", ptm6840_device, read, write)

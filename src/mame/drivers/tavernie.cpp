@@ -116,8 +116,7 @@ static ADDRESS_MAP_START(cpu09_mem, AS_PROGRAM, 8, tavernie_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x1000, 0x1fff) AM_NOP
 	AM_RANGE(0xeb00, 0xeb03) AM_DEVREADWRITE("pia", pia6821_device, read, write)
-	AM_RANGE(0xeb04, 0xeb04) AM_DEVREADWRITE("acia", acia6850_device, status_r, control_w)
-	AM_RANGE(0xeb05, 0xeb05) AM_DEVREADWRITE("acia", acia6850_device, data_r, data_w)
+	AM_RANGE(0xeb04, 0xeb05) AM_DEVREADWRITE("acia", acia6850_device, read, write)
 	AM_RANGE(0xeb08, 0xeb0f) AM_DEVREADWRITE("ptm", ptm6840_device, read, write)
 	AM_RANGE(0xec00, 0xefff) AM_RAM // 1Kx8 RAM MK4118
 	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION("roms", 0)
@@ -132,8 +131,7 @@ static ADDRESS_MAP_START(ivg09_mem, AS_PROGRAM, 8, tavernie_state)
 	AM_RANGE(0xe000, 0xe003) AM_DEVREADWRITE("fdc", fd1795_device, read, write)
 	AM_RANGE(0xe080, 0xe080) AM_WRITE(ds_w)
 	AM_RANGE(0xeb00, 0xeb03) AM_DEVREADWRITE("pia", pia6821_device, read, write)
-	AM_RANGE(0xeb04, 0xeb04) AM_DEVREADWRITE("acia", acia6850_device, status_r, control_w)
-	AM_RANGE(0xeb05, 0xeb05) AM_DEVREADWRITE("acia", acia6850_device, data_r, data_w)
+	AM_RANGE(0xeb04, 0xeb05) AM_DEVREADWRITE("acia", acia6850_device, read, write)
 	AM_RANGE(0xeb08, 0xeb0f) AM_DEVREADWRITE("ptm", ptm6840_device, read, write)
 	AM_RANGE(0xec00, 0xefff) AM_RAM // 1Kx8 RAM MK4118
 	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION("roms", 0)

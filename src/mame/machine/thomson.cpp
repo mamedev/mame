@@ -769,10 +769,8 @@ READ8_MEMBER( thomson_state::to7_modem_mea8000_r )
 		switch (offset)
 		{
 		case 0:
-			return m_acia->status_r(space, offset );
-
 		case 1:
-			return m_acia->data_r(space, offset );
+			return m_acia->read(space, offset & 1);
 
 		default:
 			return 0;
@@ -793,11 +791,8 @@ WRITE8_MEMBER( thomson_state::to7_modem_mea8000_w )
 		switch (offset)
 		{
 		case 0:
-			m_acia->control_w( space, offset, data );
-			break;
-
 		case 1:
-			m_acia->data_w( space, offset, data );
+			m_acia->write(space, offset & 1, data);
 			break;
 		}
 	}

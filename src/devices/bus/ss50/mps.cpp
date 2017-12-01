@@ -80,10 +80,7 @@ MACHINE_CONFIG_END
 
 READ8_MEMBER(ss50_mps_device::register_read)
 {
-	if (BIT(offset, 0))
-		return m_acia->data_r(space, 0);
-	else
-		return m_acia->status_r(space, 0);
+	return m_acia->read(space, offset & 1, 0);
 }
 
 //-------------------------------------------------
@@ -92,10 +89,7 @@ READ8_MEMBER(ss50_mps_device::register_read)
 
 WRITE8_MEMBER(ss50_mps_device::register_write)
 {
-	if (BIT(offset, 0))
-		m_acia->data_w(space, 0, data);
-	else
-		m_acia->control_w(space, 0, data);
+	m_acia->write(space, offset & 1, data);
 }
 
 

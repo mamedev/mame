@@ -125,8 +125,7 @@ static ADDRESS_MAP_START( mirage_map, AS_PROGRAM, 8, enmirage_state )
 	AM_RANGE(0x0000, 0x7fff) AM_RAMBANK("sndbank")  // 32k window on 128k of wave RAM
 	AM_RANGE(0x8000, 0xbfff) AM_RAM         // main RAM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM         // expansion RAM
-	AM_RANGE(0xe100, 0xe100) AM_DEVREADWRITE("acia6850", acia6850_device, status_r, control_w)
-	AM_RANGE(0xe101, 0xe101) AM_DEVREADWRITE("acia6850", acia6850_device, data_r, data_w)
+	AM_RANGE(0xe100, 0xe101) AM_DEVREADWRITE("acia6850", acia6850_device, read, write)
 	AM_RANGE(0xe200, 0xe2ff) AM_DEVREADWRITE("via6522", via6522_device, read, write)
 	AM_RANGE(0xe400, 0xe4ff) AM_NOP
 	AM_RANGE(0xe800, 0xe803) AM_DEVREADWRITE("wd1772", wd1772_device, read, write)

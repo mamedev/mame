@@ -37,10 +37,8 @@ private:
 static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, milwaukee_state )
 	AM_RANGE(0x0000, 0xf7ff) AM_RAM
 	//AM_RANGE(0xf800, 0xf87f) expansion i/o
-	AM_RANGE(0xf880, 0xf880) AM_DEVREADWRITE("acia1", acia6850_device, status_r, control_w) // terminal
-	AM_RANGE(0xf881, 0xf881) AM_DEVREADWRITE("acia1", acia6850_device, data_r, data_w)
-	AM_RANGE(0xf882, 0xf882) AM_DEVREADWRITE("acia2", acia6850_device, status_r, control_w) // remote
-	AM_RANGE(0xf883, 0xf883) AM_DEVREADWRITE("acia2", acia6850_device, data_r, data_w)
+	AM_RANGE(0xf880, 0xf881) AM_DEVREADWRITE("acia1", acia6850_device, read, write) // terminal
+	AM_RANGE(0xf882, 0xf883) AM_DEVREADWRITE("acia2", acia6850_device, read, write) // remote
 	AM_RANGE(0xf884, 0xf887) AM_DEVREADWRITE("pia1", pia6821_device, read, write) // centronics
 	AM_RANGE(0xf888, 0xf88b) AM_DEVREADWRITE("pit", pit8253_device, read, write)
 	AM_RANGE(0xf88c, 0xf88f) AM_DEVREADWRITE("pia2", pia6821_device, read, write) // disk controller
