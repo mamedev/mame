@@ -34,7 +34,6 @@ public:
 	swtpc09_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_bank(*this, "bank%x", 0)
 		, m_brg(*this, "brg")
 		, m_pia(*this, "pia")
 		, m_ptm(*this, "ptm")
@@ -48,6 +47,7 @@ public:
 		, m_piaide(*this, "piaide")
 		, m_harddisk(*this, "harddisk")
 		, m_ide(*this, "ide")
+		, m_dat(*this, "dat")
 	{ }
 
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
@@ -88,6 +88,8 @@ public:
 	DECLARE_WRITE8_MEMBER ( dc4_control_reg_w );
 
 	DECLARE_WRITE8_MEMBER(dat_w);
+	DECLARE_READ8_MEMBER(main_r);
+	DECLARE_WRITE8_MEMBER(main_w);
 
 	DECLARE_DRIVER_INIT( swtpc09 );
 	DECLARE_DRIVER_INIT( swtpc09i );
@@ -103,8 +105,9 @@ protected:
 	void swtpc09_fdc_dma_transfer();
 	void swtpc09_irq_handler(uint8_t peripheral, uint8_t state);
 
+	offs_t dat_translate(offs_t offset) const;
+
 	required_device<cpu_device> m_maincpu;
-	required_device_array<address_map_bank_device, 16> m_bank;
 	required_device<mc14411_device> m_brg;
 	required_device<pia6821_device> m_pia;
 	required_device<ptm6840_device> m_ptm;
@@ -118,6 +121,7 @@ protected:
 	optional_device<pia6821_device> m_piaide;
 	optional_device<device_t> m_harddisk;
 	optional_device<ide_controller_device> m_ide;
+	required_shared_ptr<uint8_t> m_dat;
 
 	uint8_t m_term_data;               // terminal keyboard value
 	uint8_t m_pia_counter;             // this is the counter on pia porta
@@ -130,6 +134,8 @@ protected:
 	uint8_t m_piaide_portb;
 	uint8_t m_active_interrupt;
 	uint8_t m_interrupt;
+
+	address_space *m_banked_space;
 
 	// TODO: move this in proper device
 

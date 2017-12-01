@@ -151,7 +151,7 @@ WRITE8_MEMBER ( swtpc09_state::dmf2_control_reg_w )
 void swtpc09_state::swtpc09_fdc_dma_transfer()
 {
 	uint32_t offset;
-	address_space &space = m_bank[0]->space(AS_PROGRAM);
+	address_space &space = *m_banked_space;
 
 	offset = (m_fdc_dma_address_reg & 0x0f)<<16;
 
@@ -452,18 +452,20 @@ WRITE8_MEMBER( swtpc09_state::piaide_b_w )
 /* memory map is created based on system_type flag       */
 /* this is accommodate the different cards installed     */
 
-WRITE8_MEMBER(swtpc09_state::dat_w)
+offs_t swtpc09_state::dat_translate(offs_t offset) const
 {
-	uint8_t a16_to_a19, a12_to_a15;
-	uint32_t physical_address, logical_address;
+	// lower 4 bits are inverted
+	return offs_t(m_dat[offset >> 12] ^ 0x0f) << 12 | (offset & 0x0fff);
+}
 
-	a16_to_a19 = data & 0xf0;
-	a12_to_a15 = ~data & 0x0f; //lower 4 bits are inverted
-	physical_address = ((a16_to_a19 + a12_to_a15) << 12);
-	logical_address = offset << 12;
-	LOG(("swtpc09_dat_bank_set dat:%02X Logical address:%04X Physical address:%05X\n", data, offset << 12,  physical_address ));
+READ8_MEMBER(swtpc09_state::main_r)
+{
+	return m_banked_space->read_byte(dat_translate(offset));
+}
 
-	m_bank[logical_address >> 12]->set_bank(physical_address >> 12);
+WRITE8_MEMBER(swtpc09_state::main_w)
+{
+	m_banked_space->write_byte(dat_translate(offset), data);
 }
 
 /*  MC6844 DMA controller I/O */
@@ -677,6 +679,8 @@ void swtpc09_state::machine_start()
 	m_m6844_priority = 0x00;
 	m_m6844_interrupt = 0x00;
 	m_m6844_chain = 0x00;
+
+	m_banked_space = &subdevice<address_map_bank_device>("bankdev")->space(AS_PROGRAM);
 
 	m_brg->rsa_w(0);
 	m_brg->rsb_w(1);
