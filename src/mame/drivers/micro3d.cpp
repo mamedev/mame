@@ -359,7 +359,7 @@ static MACHINE_CONFIG_START( micro3d )
 
 	MCFG_RS232_PORT_ADD("monitor_vgb", default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart", mc2661_device, rx_w))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart", mc2661_device, dsr_w)) //MCFG_DEVCB_XOR(1)
+	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart", mc2661_device, dsr_w))
 
 	MCFG_RS232_PORT_ADD("monitor_host", default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("duart", mc68681_device, rx_a_w))
