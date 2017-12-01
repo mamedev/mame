@@ -22,6 +22,7 @@
 #include "machine/terminal.h"
 #include "imagedev/harddriv.h"
 #include "machine/idectrl.h"
+#include "machine/bankdev.h"
 #include "machine/mc14411.h"
 #include "bus/rs232/rs232.h"
 
@@ -33,6 +34,7 @@ public:
 	swtpc09_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_bank(*this, "bank%x", 0)
 		, m_brg(*this, "brg")
 		, m_pia(*this, "pia")
 		, m_ptm(*this, "ptm")
@@ -102,6 +104,7 @@ protected:
 	void swtpc09_irq_handler(uint8_t peripheral, uint8_t state);
 
 	required_device<cpu_device> m_maincpu;
+	required_device_array<address_map_bank_device, 16> m_bank;
 	required_device<mc14411_device> m_brg;
 	required_device<pia6821_device> m_pia;
 	required_device<ptm6840_device> m_ptm;
