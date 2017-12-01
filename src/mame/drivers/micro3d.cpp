@@ -30,11 +30,11 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/mcs51/mcs51.h"
 #include "bus/rs232/rs232.h"
-#include "machine/z80scc.h"
 #include "machine/adc0844.h"
 #include "machine/mc68681.h"
 #include "machine/mc68901.h"
 #include "machine/nvram.h"
+#include "machine/z80scc.h"
 #include "sound/ym2151.h"
 
 #include "screen.h"
@@ -235,8 +235,8 @@ static ADDRESS_MAP_START( vgbmem, AS_PROGRAM, 16, micro3d_state )
 	AM_RANGE(0x00e00000, 0x00e0000f) AM_WRITE(micro3d_xfer3dk_w)
 	AM_RANGE(0x02000000, 0x0200ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette") // clut
 	AM_RANGE(0x02600000, 0x0260000f) AM_WRITE(micro3d_creg_w)
-	AM_RANGE(0x02c00000, 0x02c0003f) AM_READ(micro3d_ti_uart_r)
-	AM_RANGE(0x02e00000, 0x02e0003f) AM_WRITE(micro3d_ti_uart_w)
+	AM_RANGE(0x02c00000, 0x02c0003f) AM_READ8(vgb_uart_r, 0x00ff)
+	AM_RANGE(0x02e00000, 0x02e0003f) AM_WRITE8(vgb_uart_w, 0x00ff)
 	AM_RANGE(0x03800000, 0x03dfffff) AM_ROM AM_REGION("tms_gfx", 0)
 	AM_RANGE(0x03e00000, 0x03ffffff) AM_ROM AM_REGION("tms34010", 0)
 	AM_RANGE(0xc0000000, 0xc00001ff) AM_DEVREADWRITE("vgb", tms34010_device, io_register_r, io_register_w)
@@ -353,6 +353,13 @@ static MACHINE_CONFIG_START( micro3d )
 	MCFG_SCREEN_RAW_PARAMS(XTAL_40MHz/8*4, 192*4, 0, 144*4, 434, 0, 400)
 	MCFG_SCREEN_UPDATE_DEVICE("vgb", tms34010_device, tms340x0_ind16)
 	MCFG_SCREEN_PALETTE("palette")
+
+	MCFG_DEVICE_ADD("uart", MC2661, XTAL_40MHz / 8) // actually SCN2651
+	MCFG_MC2661_TXD_HANDLER(DEVWRITELINE("monitor_vgb", rs232_port_device, write_txd))
+
+	MCFG_RS232_PORT_ADD("monitor_vgb", default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart", mc2661_device, rx_w))
+	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart", mc2661_device, dsr_w)) //MCFG_DEVCB_XOR(1)
 
 	MCFG_RS232_PORT_ADD("monitor_host", default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("duart", mc68681_device, rx_a_w))
