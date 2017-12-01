@@ -894,7 +894,7 @@ class address_space_specific : public address_space
 	u32 write_lookup(offs_t address) const { return Large ? m_write.lookup_live_large(address) : m_write.lookup_live_small(address); }
 	u32 setoffset_lookup(offs_t address) const { return Large ? m_setoffset.lookup_live_large(address) : m_setoffset.lookup_live_small(address); }
 
-	static inline constexpr offs_t offset_to_byte(offs_t offset) { return AddrShift < 0 ? offset << iabs(AddrShift) : offset >> iabs(AddrShift); }
+	static constexpr offs_t offset_to_byte(offs_t offset) { return AddrShift < 0 ? offset << iabs(AddrShift) : offset >> iabs(AddrShift); }
 
 public:
 	// construction/destruction

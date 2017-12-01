@@ -162,7 +162,7 @@ public:
 
 	void remove_intersecting_ranges(offs_t start, offs_t end);
 
-	static inline constexpr offs_t offset_to_byte(offs_t offset) { return AddrShift < 0 ? offset << iabs(AddrShift) : offset >> iabs(AddrShift); }
+	static constexpr offs_t offset_to_byte(offs_t offset) { return AddrShift < 0 ? offset << iabs(AddrShift) : offset >> iabs(AddrShift); }
 
 private:
 	// internal helpers
