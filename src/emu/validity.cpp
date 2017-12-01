@@ -1921,7 +1921,8 @@ void validity_checker::validate_devices()
 		validate_tag(device.basetag());
 
 		// look for duplicates
-		if (!device_map.insert(device.tag()).second)
+		bool duplicate = !device_map.insert(device.tag()).second;
+		if (duplicate)
 			osd_printf_error("Multiple devices with the same tag defined\n");
 
 		// check for device-specific validity check
@@ -1932,7 +1933,7 @@ void validity_checker::validate_devices()
 
 		// if it's a slot, iterate over possible cards (don't recurse, or you'll stack infinite tee connectors)
 		device_slot_interface *const slot = dynamic_cast<device_slot_interface *>(&device);
-		if (slot != nullptr && !slot->fixed())
+		if (slot != nullptr && !slot->fixed() && !duplicate)
 		{
 			for (auto &option : slot->option_list())
 			{
