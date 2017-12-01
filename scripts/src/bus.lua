@@ -1400,6 +1400,8 @@ if (BUSES["SS50"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/ss50/interface.cpp",
 		MAME_DIR .. "src/devices/bus/ss50/interface.h",
+		MAME_DIR .. "src/devices/bus/ss50/mpc.cpp",
+		MAME_DIR .. "src/devices/bus/ss50/mpc.h",
 		MAME_DIR .. "src/devices/bus/ss50/mps.cpp",
 		MAME_DIR .. "src/devices/bus/ss50/mps.h",
 	}
