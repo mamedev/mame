@@ -22,7 +22,7 @@
 #include "machine/terminal.h"
 #include "imagedev/harddriv.h"
 #include "machine/idectrl.h"
-#include "machine/clock.h"
+#include "machine/mc14411.h"
 #include "bus/rs232/rs232.h"
 
 
@@ -33,6 +33,7 @@ public:
 	swtpc09_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_brg(*this, "brg")
 		, m_pia(*this, "pia")
 		, m_ptm(*this, "ptm")
 		, m_acia(*this, "acia")
@@ -95,10 +96,13 @@ public:
 	DECLARE_WRITE8_MEMBER ( m6844_w );
 
 protected:
+	virtual void machine_start() override;
+
 	void swtpc09_fdc_dma_transfer();
 	void swtpc09_irq_handler(uint8_t peripheral, uint8_t state);
 
 	required_device<cpu_device> m_maincpu;
+	required_device<mc14411_device> m_brg;
 	required_device<pia6821_device> m_pia;
 	required_device<ptm6840_device> m_ptm;
 	required_device<acia6850_device> m_acia;

@@ -771,18 +771,16 @@ WRITE8_MEMBER( swtpc09_state::m6844_w )
 }
 
 
-DRIVER_INIT_MEMBER( swtpc09_state, swtpc09 )
+void swtpc09_state::machine_start()
 {
-	int i;
 	m_pia_counter = 0;  // init ptm/pia counter to 0
 	m_term_data = 0;    // terminal keyboard input
 	m_fdc_status = 0;    // for floppy controller
-	m_system_type = FLEX_DMF2;
 	m_interrupt = 0;
 	m_active_interrupt = false;
 
-	/* reset the 6844 */
-	for (i = 0; i < 4; i++)
+	// reset the 6844
+	for (int i = 0; i < 4; i++)
 	{
 		m_m6844_channel[i].active = 0;
 		m_m6844_channel[i].control = 0x00;
@@ -791,72 +789,27 @@ DRIVER_INIT_MEMBER( swtpc09_state, swtpc09 )
 	m_m6844_interrupt = 0x00;
 	m_m6844_chain = 0x00;
 
+	m_brg->rsa_w(0);
+	m_brg->rsb_w(1);
+}
+
+DRIVER_INIT_MEMBER( swtpc09_state, swtpc09 )
+{
+	m_system_type = FLEX_DMF2;
 }
 
 DRIVER_INIT_MEMBER( swtpc09_state, swtpc09i )
 {
-	int i;
-	m_pia_counter = 0;  // init ptm/pia counter to 0
-	m_term_data = 0;    // terminal keyboard input
-	m_fdc_status = 0;    // for floppy controller
 	m_system_type = FLEX_DC4_PIAIDE;
-	m_interrupt = 0;
-	m_active_interrupt = false;
-
-	/* reset the 6844 */
-	for (i = 0; i < 4; i++)
-	{
-		m_m6844_channel[i].active = 0;
-		m_m6844_channel[i].control = 0x00;
-	}
-	m_m6844_priority = 0x00;
-	m_m6844_interrupt = 0x00;
-	m_m6844_chain = 0x00;
-
 }
 
 DRIVER_INIT_MEMBER( swtpc09_state, swtpc09u )
 {
-	int i;
-	m_pia_counter = 0;  //init ptm/pia counter to 0
-	m_term_data = 0;  //terminal keyboard input
-	m_fdc_status = 0;    // for floppy controller
 	m_system_type = UNIFLEX_DMF2;
-	m_interrupt = 0;
-	m_active_interrupt = false;
-
-	/* reset the 6844 */
-	for (i = 0; i < 4; i++)
-	{
-		m_m6844_channel[i].active = 0;
-		m_m6844_channel[i].control = 0x00;
-	}
-	m_m6844_priority = 0x00;
-	m_m6844_interrupt = 0x00;
-	m_m6844_chain = 0x00;
-
 }
 
 DRIVER_INIT_MEMBER( swtpc09_state, swtpc09d3 )
 {
-	int i;
-	m_pia_counter = 0;  //init ptm/pia counter to 0
-	m_term_data = 0;  //terminal keyboard input
-	m_fdc_status = 0;    // for floppy controller
 	m_via_ca1_input = 0;
 	m_system_type = UNIFLEX_DMF3;
-	m_interrupt = 0;
-	m_active_interrupt = false;
-
-
-	/* reset the 6844 */
-	for (i = 0; i < 4; i++)
-	{
-		m_m6844_channel[i].active = 0;
-		m_m6844_channel[i].control = 0x00;
-	}
-	m_m6844_priority = 0x00;
-	m_m6844_interrupt = 0x00;
-	m_m6844_chain = 0x00;
-
 }
