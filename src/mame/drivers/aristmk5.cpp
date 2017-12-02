@@ -4137,12 +4137,17 @@ ROM_END
 // Loco Loot / Export / A - 30/07/01
 ROM_START( locolootu )
 	ARISTOCRAT_MK5_BIOS
-	// checksum code not found due to ROMs being corrupted, all files are missing bytes consisting of 0x0D
+/*
+	Checksum code found at 0x000d18
+	Checksum is stored at 0x000020-0x000027
+	    Expected Checksum   0xbd28f614
+	    Calculated Checksum 0xbd28f614  (OK)
+*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
-	ROM_LOAD32_WORD( "ahg1513.u7",  0x000000, 0x7f06f, BAD_DUMP CRC(c0e769a1) SHA1(df0dedf6dc9412efccd26ad16ab0d316863f9488) )
-	ROM_LOAD32_WORD( "ahg1513.u11", 0x000002, 0x7ff6c, BAD_DUMP CRC(f60c2e0b) SHA1(d3ba83eb458ab99d28a910688e63c9dd5ae6570b) )
-	ROM_LOAD32_WORD( "ahg1513.u8",  0x100000, 0x7fede, BAD_DUMP CRC(c24cfe7b) SHA1(7f1f02a4e77ad178c7e08362feb1ec4b064e539c) )
-	ROM_LOAD32_WORD( "ahg1513.u12", 0x100002, 0x7ff14, BAD_DUMP CRC(73e30f47) SHA1(eb12716f3c384901cd80b2f43760b522150c64b0) )
+	ROM_LOAD32_WORD( "ahg1513.u7",  0x000000, 0x80000, CRC(16854250) SHA1(a3b6e112dcce38310ca13eb9e9851901ee213fcf) )
+	ROM_LOAD32_WORD( "ahg1513.u11", 0x000002, 0x80000, CRC(0abe509a) SHA1(a5d0b870390e7f4b38d7685c09c079acb198dd42) )
+	ROM_LOAD32_WORD( "ahg1513.u8",  0x100000, 0x80000, CRC(bd9d2ad7) SHA1(5e5eaf2521473246fb54175f88521b43b9b86f9f) )
+	ROM_LOAD32_WORD( "ahg1513.u12", 0x100002, 0x80000, CRC(5bf7b4b1) SHA1(2282ec8d0ddd1aea715005fba2171468831513f4) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
 	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
@@ -7000,6 +7005,7 @@ GAMEL( 1998, kookabuk,   aristmk5,  aristmk5,           aristmk5,     aristmk5_s
 GAMEL( 1997, locoloot,   aristmk5,  aristmk5,           cashcham,     aristmk5_state, aristmk5, ROT0, "Aristocrat", "Loco Loot (0100473V, NSW/ACT)",                        MACHINE_FLAGS, layout_cashcham )        // 599/3, C - 17/06/97, Rev 1.26.13.0
 GAMEL( 1997, locoloota,  locoloot,  aristmk5,           locoloota,    aristmk5_state, aristmk5, ROT0, "Aristocrat", "Loco Loot (0100472V, NSW/ACT)",                        MACHINE_FLAGS, layout_locoloota )       // 599/2, C - 17/06/97, Rev 1.26.13.0
 GAMEL( 1998, locolootnz, locoloot,  aristmk5,           cashchamnz,   aristmk5_state, aristmk5, ROT0, "Aristocrat", "Loco Loot (0600725V, New Zealand)",                    MACHINE_FLAGS, layout_cashchamnz )      // MV4064, A - 8/7/98, Rev 24
+GAMEL( 2001, locolootu,  locoloot,  aristmk5_usa,       aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Loco Loot (AHG1513, US)",                              MACHINE_FLAGS, layout_aristmk5_us )     // MV4134, A - 30/07/01
 GAMEL( 1997, lonewolf,   aristmk5,  aristmk5,           wildbill,     aristmk5_state, aristmk5, ROT0, "Aristocrat", "Lone Wolf (0100587V, NSW/ACT)",                        MACHINE_FLAGS, layout_wildbill )        // 621, A - 29/10/97, Rev 1.27.17.0
 GAMEL( 1995, luckyclo,   aristmk5,  aristmk5,           wcougar,      aristmk5_state, aristmk5, ROT0, "Aristocrat", "Lucky Clover (0300109V, NSW/ACT)",                     MACHINE_FLAGS, layout_wcougar )         // 570/6, A - 12/10/95
 GAMEL( 2000, magimask,   aristmk5,  aristmk5_usa_touch, bootsctnua,   aristmk5_state, aristmk5, ROT0, "Aristocrat", "Magic Mask (AHG1549, US)",                             MACHINE_FLAGS, layout_dolphntrce )      // MV4115_1, A - 09/05/00
@@ -7117,7 +7123,6 @@ GAMEL( 2000, bpartya,    bparty,    aristmk5_usa_touch, bootsctnua,   aristmk5_s
 GAMEL( 1997, cashcra5a,  cashcra5,  aristmk5,           aristmk5_9,   aristmk5_state, aristmk5, ROT0, "Aristocrat", "Cash Crop (0300447V, NSW/ACT)",                        MACHINE_FLAGS, layout_dolphntrb )       // 607/2, C - 29/08/97, Rev 7
 GAMEL( 2001, dynajacku,  dynajack,  aristmk5_usa,       aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Dynamite Jack (CHG1562, US)",                          MACHINE_FLAGS, layout_aristmk5_us )     // US002, A - 11/07/01
 GAMEL( 2000, eforsta5ce, eforsta5,  aristmk5_usa,       aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Enchanted Forest - Cash Express (CHG1536, US)",        MACHINE_FLAGS, layout_aristmk5_us )     // MV4108/6, C - 17/01/00
-GAMEL( 2001, locolootu,  locoloot,  aristmk5_usa,       aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Loco Loot (AHG1513, US)",                              MACHINE_FLAGS, layout_aristmk5_us )     // MV4134, A - 30/07/01
 GAMEL( 2001, mountmonce, mountmon,  aristmk5_usa,       aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Mountain Money - Cash Express (AHG1629, US)",          MACHINE_FLAGS, layout_aristmk5_us )     // MV4108/5, A - 10/03/01
 GAMEL( 2001, mountmonu,  mountmon,  aristmk5_usa,       aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Mountain Money (BHG1465, US)",                         MACHINE_FLAGS, layout_aristmk5_us )     // MV4108/5, A - 10/03/01
 GAMEL( 2001, partygrsb,  partygrs,  aristmk5_usa_touch, bootsctnua,   aristmk5_state, aristmk5, ROT0, "Aristocrat", "Party Gras (AHG1568, US)",                             MACHINE_FLAGS, layout_aristmk5_us_200 ) // MV4115/6, A - 10/11/2001, 20 lines
