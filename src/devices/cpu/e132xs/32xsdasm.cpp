@@ -391,6 +391,10 @@ u32 hyperstone_disassembler::opcode_alignment() const
 	return 2;
 }
 
+hyperstone_disassembler::hyperstone_disassembler(config *conf) : m_config(conf)
+{
+}
+
 /*****************************/
 /* Main disassembly function */
 /*****************************/
@@ -408,8 +412,8 @@ offs_t hyperstone_disassembler::disassemble(std::ostream &stream, offs_t pc, con
 	uint8_t source_bit = SOURCEBIT(op);
 	uint8_t dest_bit = DESTBIT(op);
 
-	global_fp = 0;
-	int h_flag = 0;
+	global_fp = m_config->get_fp();
+	int h_flag = m_config->get_h();
 
 	uint8_t op_num = (op & 0xff00) >> 8;
 

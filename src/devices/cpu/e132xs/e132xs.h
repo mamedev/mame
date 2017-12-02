@@ -8,6 +8,7 @@
 #include "cpu/drcfe.h"
 #include "cpu/drcuml.h"
 #include "cpu/drcumlsh.h"
+#include "32xsdasm.h"
 
 /*
     A note about clock multipliers and dividers:
@@ -60,7 +61,7 @@ class e132xs_frontend;
 // ======================> hyperstone_device
 
 // Used by core CPU interface
-class hyperstone_device : public cpu_device
+class hyperstone_device : public cpu_device, public hyperstone_disassembler::config
 {
 	friend class e132xs_frontend;
 
@@ -215,6 +216,8 @@ protected:
 
 	// device_disasm_interface overrides
 	virtual util::disasm_interface *create_disassembler() override;
+	virtual u8 get_fp() const override;
+	virtual bool get_h() const override;
 
 	// device_state_interface overrides
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;

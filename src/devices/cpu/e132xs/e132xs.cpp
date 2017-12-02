@@ -149,7 +149,6 @@
 #include "debugger.h"
 
 #include "32xsdefs.h"
-#include "32xsdasm.h"
 
 //#define VERBOSE 1
 #include "logmacro.h"
@@ -1413,7 +1412,17 @@ void hyperstone_device::state_string_export(const device_state_entry &entry, std
 
 util::disasm_interface *hyperstone_device::create_disassembler()
 {
-	return new hyperstone_disassembler;
+	return new hyperstone_disassembler(this);
+}
+
+u8 hyperstone_device::get_fp() const
+{
+	return GET_FP;
+}
+
+bool hyperstone_device::get_h() const
+{
+	return GET_H;
 }
 
 /* Opcodes */

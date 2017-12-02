@@ -15,7 +15,14 @@
 class hyperstone_disassembler : public util::disasm_interface
 {
 public:
-	hyperstone_disassembler() = default;
+	struct config {
+		virtual ~config() = default;
+
+		virtual u8 get_fp() const = 0;
+		virtual bool get_h() const = 0;
+	};
+
+	hyperstone_disassembler(config *conf);
 	virtual ~hyperstone_disassembler() = default;
 
 	virtual u32 opcode_alignment() const override;
@@ -26,8 +33,11 @@ private:
 	static const char *const G_REG[];
 	static const char *const SETxx[];
 
-	int size, global_fp;
+	config *m_config;
 
+	int size;
+	u8 global_fp;
+	
 	void LL_format(char *source, char *dest, uint16_t op);
 	void LR_format(char *source, char *dest, uint16_t op);
 	void RR_format(char *source, char *dest, uint16_t op, unsigned h_flag);
