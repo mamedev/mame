@@ -275,7 +275,7 @@ WRITE8_MEMBER(fidel68k_state::fdes2265_control_w)
 
 READ8_MEMBER(fidel68k_state::fdes2265_input_r)
 {
-	// a1-a3,d7: multiplexed inputs (active low)
+	// a1-a3,d7(d15): multiplexed inputs (active low)
 	return (read_inputs(9) >> offset & 1) ? 0 : 0x80;
 }
 

@@ -53,7 +53,7 @@
  @MP1312   TMS1100   1983, Gakken FX-Micom R-165/Tandy Radio Shack Science Fair Microcomputer Trainer
  *MP1359   TMS1100?  1985, Capsela CRC2000
  @MP1525   TMS1170   1980, Coleco Head to Head Baseball
- *MP1604   ?         1982, Gakken Invader 2000/Tandy Cosmic Fire Away 3000 (? note: VFD-capable)
+ *MP1604   TMS1370   1982, Gakken Invader 2000/Tandy Cosmic Fire Away 3000
  @MP1801   TMS1700   1981, Tiger Ditto/Tandy Pocket Repeat (model 60-2152)
  @MP2105   TMS1370   1979, Gakken/Entex Poker (6005)
  @MP2139   TMS1370   1982, Gakken Galaxy Invader 1000/Tandy Cosmic 1000 Fire Away
@@ -99,7 +99,7 @@
  @M34038   TMS1100   1982, Parker Brothers Lost Treasure
   M34047   TMS1100   1982, MicroVision cartridge: Super Blockbuster
  @M34078A  TMS1100   1983, Milton Bradley Electronic Arcade Mania
- *MP4486A  TMS1000C  1983, Vulcan XL 25
+ @MP4486A  TMS1000C  1983, Vulcan XL 25
  @MP6100A  TMS0980   1979, Ideal Electronic Detective
  @MP6101B  TMS0980   1979, Parker Brothers Stop Thief
  *MP6361   ?         1983, Defender Strikes (? note: VFD-capable)
@@ -6924,12 +6924,18 @@ public:
 		: hh_tms1k_state(mconfig, type, tag)
 	{ }
 
+	void prepare_display();
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
 };
 
 // handlers
+
+void bankshot_state::prepare_display()
+{
+	display_matrix(7, 11, m_o, m_r & ~3);
+}
 
 WRITE16_MEMBER(bankshot_state::write_r)
 {
@@ -6940,8 +6946,8 @@ WRITE16_MEMBER(bankshot_state::write_r)
 	m_inp_mux = data >> 2 & 3;
 
 	// R2-R10: led select
-	m_r = data & ~3;
-	display_matrix(7, 11, m_o, m_r);
+	m_r = data;
+	prepare_display();
 }
 
 WRITE16_MEMBER(bankshot_state::write_o)
@@ -6949,7 +6955,7 @@ WRITE16_MEMBER(bankshot_state::write_o)
 	// O0-O6: led state
 	// O7: N/C
 	m_o = data & 0x7f;
-	display_matrix(7, 11, m_o, m_r);
+	prepare_display();
 }
 
 READ8_MEMBER(bankshot_state::read_k)
@@ -7047,12 +7053,18 @@ public:
 		: hh_tms1k_state(mconfig, type, tag)
 	{ }
 
+	void prepare_display();
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
 };
 
 // handlers
+
+void splitsec_state::prepare_display()
+{
+	display_matrix(7, 8, m_o, m_r);
+}
 
 WRITE16_MEMBER(splitsec_state::write_r)
 {
@@ -7064,7 +7076,7 @@ WRITE16_MEMBER(splitsec_state::write_r)
 
 	// R0-R7: led select
 	m_r = data;
-	display_matrix(7, 8, m_o, m_r);
+	prepare_display();
 }
 
 WRITE16_MEMBER(splitsec_state::write_o)
@@ -7072,7 +7084,7 @@ WRITE16_MEMBER(splitsec_state::write_o)
 	// O0-O6: led state
 	// O7: N/C
 	m_o = data & 0x7f;
-	display_matrix(7, 8, m_o, m_r);
+	prepare_display();
 }
 
 READ8_MEMBER(splitsec_state::read_k)
@@ -8664,6 +8676,148 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
+  Vulcan XL 25
+  * TMS1000SLC MP4486A (die label 1000C/, MP4486A)
+  * 28 LEDs, 1-bit sound
+
+***************************************************************************/
+
+class xl25_state : public hh_tms1k_state
+{
+public:
+	xl25_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	void prepare_display();
+	DECLARE_WRITE16_MEMBER(write_r);
+	DECLARE_WRITE16_MEMBER(write_o);
+	DECLARE_READ8_MEMBER(read_k);
+};
+
+// handlers
+
+void xl25_state::prepare_display()
+{
+	display_matrix(3, 10, m_o >> 1, m_r);
+}
+
+WRITE16_MEMBER(xl25_state::write_r)
+{
+	// R0-R9: input mux, led select
+	m_inp_mux = data;
+	m_r = data;
+	prepare_display();
+}
+
+WRITE16_MEMBER(xl25_state::write_o)
+{
+	// O1-O3: led data
+	m_o = data;
+	prepare_display();
+
+	// O5(+K4): MCU halt
+	//if (~data & 0x20) printf("X");
+
+	// O6: speaker out
+	m_speaker->level_w(data >> 6 & 1);
+}
+
+READ8_MEMBER(xl25_state::read_k)
+{
+	// K: multiplexed inputs
+	// K4 also goes to MCU halt
+	return read_inputs(10);
+}
+
+
+// config
+
+static INPUT_PORTS_START( xl25 )
+	PORT_START("IN.0") // R0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_3)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // R1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_4)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_5)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_6)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.2") // R2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_7)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_8)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.3") // R3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_W)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_E)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.4") // R4
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_T)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Y)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.5") // R5
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_U)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_I)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_O) // halt
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.6") // R6
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_D)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.7") // R7
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_F)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_G)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_H)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.8") // R8
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_J)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_K)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_L)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.9") // R9
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_C)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+static MACHINE_CONFIG_START( xl25 )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", TMS1000C, 330000) // approximation - RC osc. R=5.6K, C=47pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(xl25_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(xl25_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(xl25_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_hh_tms1k_test)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
   Game driver(s)
 
 ***************************************************************************/
@@ -9428,6 +9582,17 @@ ROM_START( ssports4 )
 ROM_END
 
 
+ROM_START( xl25 )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "mp4486a", 0x0000, 0x0400, CRC(bd84b515) SHA1(377fcc68a517260acd51eb9746cd62914a75d739) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000_common2_micro.pla", 0, 867, BAD_DUMP CRC(d33da3cf) SHA1(13c4ebbca227818db75e6db0d45b66ba5e207776) ) // placeholder
+	ROM_REGION( 558, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1000c_xl25_output.pla", 0, 558, CRC(06ecc6e0) SHA1(e0fa1b9388948197b4de2edd3cd02fbde1dbabbb) )
+ROM_END
+
+
 
 //    YEAR  NAME        PARENT    CMP MACHINE    INPUT      STATE         INIT  COMPANY, FULLNAME, FLAGS
 CONS( 1979, matchnum,   0,         0, matchnum,  matchnum,  matchnum_state,  0, "A-One LSI", "Match Number", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
@@ -9516,6 +9681,8 @@ CONS( 1979, tbreakup,   0,         0, tbreakup,  tbreakup,  tbreakup_state,  0, 
 CONS( 1980, phpball,    0,         0, phpball,   phpball,   phpball_state,   0, "Tomy", "Power House Pinball", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
 CONS( 1980, ssports4,   0,         0, ssports4,  ssports4,  ssports4_state,  0, "U.S. Games", "Super Sports-4", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+
+CONS( 1983, xl25,       0,         0, xl25,      xl25,      xl25_state,      0, "Vulcan Electronics", "XL 25", MACHINE_SUPPORTS_SAVE )
 
 // ***: As far as MAME is concerned, the game is emulated fine. But for it to be playable, it requires interaction
 // with other, unemulatable, things eg. game board/pieces, playing cards, pen & paper, etc.

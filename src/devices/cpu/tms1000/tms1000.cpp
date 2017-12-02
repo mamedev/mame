@@ -122,6 +122,16 @@ MACHINE_CONFIG_MEMBER(tms1000_cpu_device::device_add_mconfig)
 	MCFG_PLA_FILEFORMAT(BERKELEY)
 MACHINE_CONFIG_END
 
+MACHINE_CONFIG_MEMBER(tms1000c_cpu_device::device_add_mconfig)
+
+	// microinstructions PLA, output PLA
+	MCFG_PLA_ADD("mpla", 8, 16, 30)
+	MCFG_PLA_FILEFORMAT(BERKELEY)
+	MCFG_PLA_ADD("opla", 5, 8, 32)
+	MCFG_PLA_FILEFORMAT(BERKELEY)
+MACHINE_CONFIG_END
+
+
 // disasm
 util::disasm_interface *tms1000_cpu_device::create_disassembler()
 {

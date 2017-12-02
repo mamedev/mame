@@ -14778,6 +14778,7 @@ tbreakup                        // Tomy
 tc4                             // Coleco
 tcfball                         // Tandy Radio Shack
 tcfballa                        // Tandy Radio Shack
+xl25                            // Vulcan
 zodiac                          // Coleco
 
 @source:hh_ucom4.cpp
