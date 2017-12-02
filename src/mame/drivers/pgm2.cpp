@@ -64,6 +64,13 @@ READ32_MEMBER(pgm2_state::unk_startup_r)
 	return 0x00000180;
 }
 
+READ32_MEMBER(pgm2_state::rtc_r)
+{
+	// write to FFFFFD20 if bit 18 set (0x40000) probably reset this RTC timer
+	// TODO: somehow hook here current time/date, which is a bit complicated because value is relative, later to it added "base time" stored in SRAM
+	return machine().time().seconds();
+}
+
 INTERRUPT_GEN_MEMBER(pgm2_state::igs_interrupt)
 {
 	m_arm_aic->set_irq(0x47);
@@ -131,7 +138,7 @@ static ADDRESS_MAP_START( pgm2_map, AS_PROGRAM, 32, pgm2_state )
 	AM_RANGE(0xfffff430, 0xfffff433) AM_WRITENOP // often
 	AM_RANGE(0xfffff434, 0xfffff437) AM_WRITENOP // often
 
-	AM_RANGE(0xfffffd28, 0xfffffd2b) AM_READNOP // often
+	AM_RANGE(0xfffffd28, 0xfffffd2b) AM_READ(rtc_r)
 
 //  AM_RANGE(0xfffffa08, 0xfffffa0b) AM_WRITE(table_done_w) // after uploading encryption? table might actually send it or enable external ROM?
 	AM_RANGE(0xfffffa0c, 0xfffffa0f) AM_READ(unk_startup_r)
@@ -690,38 +697,6 @@ DRIVER_INIT_MEMBER(pgm2_state,orleg2)
 	decrypter.decrypter_rom(memregion("user1"));
 
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x20020114, 0x20020117, read32_delegate(FUNC(pgm2_state::orleg2_speedup_r),this));
-
-	/* HACK!
-	   patch out an ingame assert that ends up being triggered after the 5 element / fire chariot boss due to an invalid value in R3
-	   todo: why does this happen? ARM core bug? is patching out the assert actually safe? game continues as normal like this, but there could be memory corruption.
-	*/
-	uint16_t* rom;
-	rom = (uint16_t*)memregion("user1")->base();
-	int hackaddress = -1;
-
-	if (rom[0x12620 / 2] == 0xd301) // 104 / 103
-	{
-		hackaddress = 0x12620; // RAM: 10012620
-	}
-	else if (rom[0x1257C / 2] == 0xd301) // 101
-	{
-		hackaddress = 0x1257C;
-	}
-
-	if (hackaddress != -1)
-	{
-		rom[(hackaddress + 2) / 2] = 0x2300;
-		rom[(hackaddress + 4) / 2] = 0x2300;
-		rom = (uint16_t*)memregion("maincpu")->base(); // BEQ -> BNE for checksum
-		rom[0x39f2 / 2] = 0x1a00;
-
-		// set a breakpoint on 0x10000000 + hackaddress to see when it triggers
-	}
-	else
-	{
-		fatalerror("no patch for this set \n");
-	}
-
 }
 
 DRIVER_INIT_MEMBER(pgm2_state,kov2nl)

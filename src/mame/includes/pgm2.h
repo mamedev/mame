@@ -42,6 +42,7 @@ public:
 	{ }
 
 	DECLARE_READ32_MEMBER(unk_startup_r);
+	DECLARE_READ32_MEMBER(rtc_r);
 	DECLARE_WRITE32_MEMBER(fg_videoram_w);
 	DECLARE_WRITE32_MEMBER(bg_videoram_w);
 
