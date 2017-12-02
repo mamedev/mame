@@ -268,6 +268,7 @@ public:
 	uint16_t m_spu_ctrl;      // SPU board control register
 	uint8_t m_spu_shared[0x400];  // SPU/PSX shared dual-ported RAM
 	uint32_t m_spu_ata_dma;
+	uint32_t m_wave_bank;
 	int m_spu_ata_dmarq;
 
 	int m_io_offset;
@@ -287,6 +288,7 @@ public:
 	DECLARE_WRITE16_MEMBER(twinkle_waveram_w);
 	DECLARE_READ16_MEMBER(shared_68k_r);
 	DECLARE_WRITE16_MEMBER(shared_68k_w);
+	DECLARE_WRITE16_MEMBER(spu_wavebank_w);
 	DECLARE_READ16_MEMBER(unk_68k_r);
 	DECLARE_WRITE_LINE_MEMBER(spu_ata_irq);
 	DECLARE_WRITE_LINE_MEMBER(spu_ata_dmarq);
@@ -764,7 +766,8 @@ WRITE16_MEMBER(twinkle_state::spu_ata_dma_low_w)
 
 WRITE16_MEMBER(twinkle_state::spu_ata_dma_high_w)
 {
-	m_spu_ata_dma = (m_spu_ata_dma & 0xffff) | (data << 16);
+	m_spu_ata_dma = (m_spu_ata_dma & 0xffff) | ((uint32_t)data << 16);
+	//printf("DMA now %x\n", m_spu_ata_dma);
 }
 
 WRITE_LINE_MEMBER(twinkle_state::spu_ata_dmarq)
@@ -781,17 +784,10 @@ WRITE_LINE_MEMBER(twinkle_state::spu_ata_dmarq)
 			{
 				uint16_t data = m_ata->read_dma();
 				//printf("spu_ata_dmarq %08x %04x\n", m_spu_ata_dma * 2, data);
-				//waveram[m_spu_ata_dma++] = (data >> 8) | (data << 8);
+				m_waveram[m_wave_bank+m_spu_ata_dma] = data; //(data >> 8) | (data << 8);
+				m_spu_ata_dma++;
 				// bp 4a0e ;bmiidx4 checksum
 				// bp 4d62 ;bmiidx4 dma
-
-				// $$$HACK - game DMAs nothing useful to 0x400000 but all sound plays are 0x400000 or above
-				//           so limit sound RAM to 4MB (there's 6 MB on the board) and let the 5c400's address masking
-				//           work for us until we figure out what's actually going on.
-				if (m_spu_ata_dma < 0x200000)
-				{
-					m_waveram[m_spu_ata_dma++] = data;
-				}
 			}
 
 			m_ata->write_dmack(CLEAR_LINE);
@@ -799,14 +795,30 @@ WRITE_LINE_MEMBER(twinkle_state::spu_ata_dmarq)
 	}
 }
 
+WRITE16_MEMBER(twinkle_state::spu_wavebank_w)
+{
+	//printf("%x to wavebank_w, mask %04x\n", data, mem_mask);
+
+	// banks are fairly clearly 8MB, so there's 3 of them in the 24 MB of RAM.
+	// the games load up the full 24MB of RAM 8 MB at a time, first to bank 1,
+	// then to bank 2, and finally to bank 3.
+	//
+	// neither the 68k nor DMA access wave RAM when the bank is 0.
+	if (data == 0)
+	{
+		data = 1;
+	}
+	m_wave_bank = ((data-1) * (4*1024*1024));
+}
+
 READ16_MEMBER(twinkle_state::twinkle_waveram_r)
 {
-	return m_waveram[offset];
+	return m_waveram[offset+m_wave_bank];
 }
 
 WRITE16_MEMBER(twinkle_state::twinkle_waveram_w)
 {
-	COMBINE_DATA(&m_waveram[offset]);
+	COMBINE_DATA(&m_waveram[offset+m_wave_bank]);
 }
 
 READ16_MEMBER(twinkle_state::shared_68k_r)
@@ -838,14 +850,13 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 16, twinkle_state )
 	AM_RANGE(0x230000, 0x230003) AM_WRITE(twinkle_spu_ctrl_w)
 	AM_RANGE(0x240000, 0x240003) AM_WRITE(spu_ata_dma_low_w)
 	AM_RANGE(0x250000, 0x250003) AM_WRITE(spu_ata_dma_high_w)
-	// 260000 = ???
+	AM_RANGE(0x260000, 0x260001) AM_WRITE(spu_wavebank_w)
 	AM_RANGE(0x280000, 0x280fff) AM_READWRITE(shared_68k_r, shared_68k_w)
 	AM_RANGE(0x300000, 0x30000f) AM_DEVREADWRITE("ata", ata_interface_device, read_cs0, write_cs0)
 	// 34000E = ???
 	AM_RANGE(0x34000e, 0x34000f) AM_WRITENOP
 	AM_RANGE(0x400000, 0x400fff) AM_DEVREADWRITE("rfsnd", rf5c400_device, rf5c400_r, rf5c400_w)
-	AM_RANGE(0x800000, 0xbfffff) AM_READWRITE(twinkle_waveram_r, twinkle_waveram_w )
-	AM_RANGE(0xfe0000, 0xffffff) AM_RAM // ...and the RAM test checks this last 128k (mirror of the work RAM at 0x100000?)
+	AM_RANGE(0x800000, 0xffffff) AM_READWRITE(twinkle_waveram_r, twinkle_waveram_w )
 ADDRESS_MAP_END
 
 /* SCSI */
@@ -1087,7 +1098,7 @@ INPUT_PORTS_END
 	ROM_REGION32_LE( 0x080000, "audiocpu", 0 )\
 	ROM_LOAD16_WORD_SWAP( "863a05.2x",    0x000000, 0x080000, CRC(6f42a09e) SHA1(cab5209f90f47b9ee6e721479913ad74e3ba84b1) )\
 \
-	ROM_REGION16_LE(0x400000, "rfsnd", ROMREGION_ERASE00)
+	ROM_REGION16_LE(0x1800000, "rfsnd", ROMREGION_ERASE00)
 
 ROM_START( gq863 )
 	TWINKLE_BIOS
