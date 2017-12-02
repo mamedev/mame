@@ -618,7 +618,7 @@ void hyperstone_device::set_global_register(uint8_t code, uint32_t val)
 		case FCR_REGISTER:
 			if ((m_global_regs[code] ^ val) & 0x00800000)
 				adjust_timer_interrupt();
-				m_global_regs[code] = val;
+			m_global_regs[code] = val;
 			if (m_intblock < 1)
 				m_intblock = 1;
 			return;
