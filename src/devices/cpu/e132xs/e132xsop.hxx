@@ -1584,167 +1584,84 @@ void hyperstone_device::hyperstone_ldxx1()
 	const uint32_t src_code = SRC_GLOBAL ? SRC_CODE : ((SRC_CODE + fp) & 0x3f);
 	const uint32_t srcf_code = SRC_GLOBAL ? (src_code + 1) : ((src_code + 1) & 0x3f);
 	const uint32_t dst_code = DST_GLOBAL ? DST_CODE : ((DST_CODE + fp) & 0x3f);
+	const uint32_t dreg = ((DST_GLOBAL && dst_code == SR_REGISTER) ? 0 : (DST_GLOBAL ? m_global_regs : m_local_regs)[dst_code]);
 
-	if (DST_GLOBAL && dst_code == SR_REGISTER)
+	switch (sub_type)
 	{
-		switch (sub_type)
-		{
-			case 0: // LDBS.A
-				if (SRC_GLOBAL)
-					set_global_register(src_code, (int32_t)(int8_t)READ_B(extra_s));
-				else
-					m_local_regs[src_code] = (int32_t)(int8_t)READ_B(extra_s);
-				break;
+		case 0: // LDBS.D
+			if (SRC_GLOBAL)
+				set_global_register(src_code, (int32_t)(int8_t)READ_B(dreg + extra_s));
+			else
+				m_local_regs[src_code] = (int32_t)(int8_t)READ_B(dreg + extra_s);
+			break;
 
-			case 1: // LDBU.A
-				if (SRC_GLOBAL)
-					m_global_regs[src_code] = READ_B(extra_s);
-				else
-					m_local_regs[src_code] = READ_B(extra_s);
-				break;
+		case 1: // LDBU.D
+			if (SRC_GLOBAL)
+				set_global_register(src_code, READ_B(dreg + extra_s));
+			else
+				m_local_regs[src_code] = READ_B(dreg + extra_s);
+			break;
 
-			case 2:
-				if (SRC_GLOBAL)
-				{
-					if (extra_s & 1) // LDHS.A
-						set_global_register(src_code, (int32_t)(int16_t)READ_HW(extra_s));
-					else // LDHU.A
-						set_global_register(src_code, READ_HW(extra_s));
-				}
+		case 2:
+			if (SRC_GLOBAL)
+			{
+				if (extra_s & 1)
+					set_global_register(src_code, (int32_t)(int16_t)READ_HW(dreg + (extra_s & ~1)));
 				else
-				{
-					if (extra_s & 1) // LDHS.A
-						m_local_regs[src_code] = (int32_t)(int16_t)READ_HW(extra_s);
-					else // LDHU.A
-						m_local_regs[src_code] = READ_HW(extra_s);
-				}
-				break;
-
-			case 3:
-				switch (extra_s & 3)
-				{
-					case 0: // LDW.A
-						if (SRC_GLOBAL)
-							set_global_register(src_code, READ_W(extra_s));
-						else
-							m_local_regs[src_code] = READ_W(extra_s);
-						break;
-					case 1: // LDD.A
-						if (SRC_GLOBAL)
-						{
-							set_global_register(src_code, READ_W(extra_s));
-							set_global_register(srcf_code, READ_W(extra_s + 4));
-						}
-						else
-						{
-							m_local_regs[src_code] = READ_W(extra_s);
-							m_local_regs[srcf_code] = READ_W(extra_s + 4);
-						}
-						m_icount -= m_clock_cycles_1; // extra cycle
-						break;
-					case 2: // LDW.IOA
-						if (SRC_GLOBAL)
-							set_global_register(src_code, IO_READ_W(extra_s));
-						else
-							m_local_regs[src_code] = IO_READ_W(extra_s);
-						break;
-					case 3: // LDD.IOA
-						if (SRC_GLOBAL)
-						{
-							set_global_register(src_code, IO_READ_W(extra_s));
-							set_global_register(srcf_code, IO_READ_W(extra_s + 4));
-						}
-						else
-						{
-							m_local_regs[src_code] = IO_READ_W(extra_s);
-							m_local_regs[srcf_code] = IO_READ_W(extra_s + 4);
-						}
-						m_icount -= m_clock_cycles_1; // extra cycle
-						break;
-				}
-				break;
-		}
-	}
-	else
-	{
-		const uint32_t dreg = (DST_GLOBAL ? m_global_regs : m_local_regs)[dst_code];
-		switch (sub_type)
-		{
-			case 0: // LDBS.D
-				if (SRC_GLOBAL)
-					set_global_register(src_code, (int32_t)(int8_t)READ_B(dreg + extra_s));
+					set_global_register(src_code, READ_HW(dreg + (extra_s & ~1)));
+			}
+			else
+			{
+				if (extra_s & 1)
+					m_local_regs[src_code] = (int32_t)(int16_t)READ_HW(dreg + (extra_s & ~1));
 				else
-					m_local_regs[src_code] = (int32_t)(int8_t)READ_B(dreg + extra_s);
-				break;
+					m_local_regs[src_code] = READ_HW(dreg + (extra_s & ~1));
+			}
+			break;
 
-			case 1: // LDBU.D
-				if (SRC_GLOBAL)
-					set_global_register(src_code, READ_B(dreg + extra_s));
-				else
-					m_local_regs[src_code] = READ_B(dreg + extra_s);
-				break;
-
-			case 2:
-				if (SRC_GLOBAL)
-				{
-					if (extra_s & 1)
-						set_global_register(src_code, (int32_t)(int16_t)READ_HW(dreg + (extra_s & ~1)));
+		case 3:
+			switch (extra_s & 3)
+			{
+				case 0: // LDW.D
+					if (SRC_GLOBAL)
+						set_global_register(src_code, READ_W(dreg + extra_s));
 					else
-						set_global_register(src_code, READ_HW(dreg + (extra_s & ~1)));
-				}
-				else
-				{
-					if (extra_s & 1)
-						m_local_regs[src_code] = (int32_t)(int16_t)READ_HW(dreg + (extra_s & ~1));
+						m_local_regs[src_code] = READ_W(dreg + extra_s);
+					break;
+				case 1: // LDD.D
+					if (SRC_GLOBAL)
+					{
+						set_global_register(src_code, READ_W(dreg + (extra_s & ~1)));
+						set_global_register(srcf_code, READ_W(dreg + (extra_s & ~1) + 4));
+					}
 					else
-						m_local_regs[src_code] = READ_HW(dreg + (extra_s & ~1));
-				}
-				break;
-
-			case 3:
-				switch (extra_s & 3)
-				{
-					case 0: // LDW.D
-						if (SRC_GLOBAL)
-							set_global_register(src_code, READ_W(dreg + extra_s));
-						else
-							m_local_regs[src_code] = READ_W(dreg + extra_s);
-						break;
-					case 1: // LDD.D
-						if (SRC_GLOBAL)
-						{
-							set_global_register(src_code, READ_W(dreg + (extra_s & ~1)));
-							set_global_register(srcf_code, READ_W(dreg + (extra_s & ~1) + 4));
-						}
-						else
-						{
-							m_local_regs[src_code] = READ_W(dreg + (extra_s & ~1));
-							m_local_regs[srcf_code] = READ_W(dreg + (extra_s & ~1) + 4);
-						}
-						m_icount -= m_clock_cycles_1; // extra cycle
-						break;
-					case 2: // LDW.IOD
-						if (SRC_GLOBAL)
-							set_global_register(src_code, IO_READ_W(dreg + (extra_s & ~3)));
-						else
-							m_local_regs[src_code] = IO_READ_W(dreg + (extra_s & ~3));
-						break;
-					case 3: // LDD.IOD
-						if (SRC_GLOBAL)
-						{
-							set_global_register(src_code, IO_READ_W(dreg + (extra_s & ~3)));
-							set_global_register(srcf_code, IO_READ_W(dreg + (extra_s & ~3) + 4));
-						}
-						else
-						{
-							m_local_regs[src_code] = IO_READ_W(dreg + (extra_s & ~3));
-							m_local_regs[srcf_code] = IO_READ_W(dreg + (extra_s & ~3) + 4);
-						}
-						m_icount -= m_clock_cycles_1; // extra cycle
-						break;
-				}
-				break;
-		}
+					{
+						m_local_regs[src_code] = READ_W(dreg + (extra_s & ~1));
+						m_local_regs[srcf_code] = READ_W(dreg + (extra_s & ~1) + 4);
+					}
+					m_icount -= m_clock_cycles_1; // extra cycle
+					break;
+				case 2: // LDW.IOD
+					if (SRC_GLOBAL)
+						set_global_register(src_code, IO_READ_W(dreg + (extra_s & ~3)));
+					else
+						m_local_regs[src_code] = IO_READ_W(dreg + (extra_s & ~3));
+					break;
+				case 3: // LDD.IOD
+					if (SRC_GLOBAL)
+					{
+						set_global_register(src_code, IO_READ_W(dreg + (extra_s & ~3)));
+						set_global_register(srcf_code, IO_READ_W(dreg + (extra_s & ~3) + 4));
+					}
+					else
+					{
+						m_local_regs[src_code] = IO_READ_W(dreg + (extra_s & ~3));
+						m_local_regs[srcf_code] = IO_READ_W(dreg + (extra_s & ~3) + 4);
+					}
+					m_icount -= m_clock_cycles_1; // extra cycle
+					break;
+			}
+			break;
 	}
 
 	m_icount -= m_clock_cycles_1;
@@ -1930,110 +1847,56 @@ void hyperstone_device::hyperstone_stxx1()
 	const uint32_t fp = GET_FP;
 	const uint32_t src_code = SRC_GLOBAL ? SRC_CODE : ((SRC_CODE + fp) & 0x3f);
 	const uint32_t dst_code = DST_GLOBAL ? DST_CODE : ((DST_CODE + fp) & 0x3f);
-	const uint32_t dreg = (DST_GLOBAL ? m_global_regs : m_local_regs)[dst_code];
+	const uint32_t dreg = ((DST_GLOBAL && dst_code == SR_REGISTER) ? 0 : (DST_GLOBAL ? m_global_regs : m_local_regs)[dst_code]);
 	const uint32_t sreg = ((SRC_GLOBAL && src_code == SR_REGISTER) ? 0 : (SRC_GLOBAL ? m_global_regs : m_local_regs)[src_code]);
 
-	if (DST_GLOBAL && dst_code == SR_REGISTER)
+	switch (sub_type)
 	{
-		switch (sub_type)
-		{
-			case 0: // STBS.A
-				// TODO: missing trap on range error
-				WRITE_B(extra_s, (uint8_t)sreg);
-				break;
+		case 0: // STBS.D
+			// TODO: missing trap on range error
+			WRITE_B(dreg + extra_s, (uint8_t)sreg);
+			break;
 
-			case 1: // STBU.A
-				WRITE_B(extra_s, (uint8_t)sreg);
-				break;
+		case 1: // STBU.D
+			WRITE_B(dreg + extra_s, (uint8_t)sreg);
+			break;
 
-			case 2: // STHS.A, STHU.A
-				WRITE_HW(extra_s, (uint16_t)sreg);
-				// TODO: missing trap on range error with STHS.A
-				break;
+		case 2: // STHS.D, STHU.D
+			WRITE_HW(dreg + (extra_s & ~1), (uint16_t)sreg);
+			// TODO: missing trap on range error with STHS.D
+			break;
 
-			case 3:
-				switch (extra_s & 3)
+		case 3:
+			switch (extra_s & 3)
+			{
+				case 0: // STW.D
+					WRITE_W(dreg + (extra_s & ~1), sreg);
+					break;
+				case 1: // STD.D
 				{
-					case 0: // STW.A
-						WRITE_W(extra_s & ~1, sreg);
-						break;
-					case 1: // STD.A
-					{
-						const uint32_t srcf_code = SRC_GLOBAL ? (src_code + 1) : ((src_code + 1) & 0x3f);
-						const uint32_t sregf = ((SRC_GLOBAL && src_code == SR_REGISTER) ? 0 : (SRC_GLOBAL ? m_global_regs : m_local_regs)[srcf_code]);
-						extra_s &= ~1;
-						WRITE_W(extra_s, sreg);
-						WRITE_W(extra_s + 4, sregf);
-						m_icount -= m_clock_cycles_1; // extra cycle
-						break;
-					}
-					case 2: // STW.IOA
-						IO_WRITE_W(extra_s & ~3, sreg);
-						break;
-					case 3: // STD.IOA
-					{
-						const uint32_t srcf_code = SRC_GLOBAL ? (src_code + 1) : ((src_code + 1) & 0x3f);
-						const uint32_t sregf = ((SRC_GLOBAL && src_code == SR_REGISTER) ? 0 : (SRC_GLOBAL ? m_global_regs : m_local_regs)[srcf_code]);
-						extra_s &= ~3;
-						IO_WRITE_W(extra_s, sreg);
-						IO_WRITE_W(extra_s + 4, sregf);
-						m_icount -= m_clock_cycles_1; // extra cycle
-						break;
-					}
+					const uint32_t srcf_code = SRC_GLOBAL ? (src_code + 1) : ((src_code + 1) & 0x3f);
+					const uint32_t sregf = ((SRC_GLOBAL && src_code == SR_REGISTER) ? 0 : (SRC_GLOBAL ? m_global_regs : m_local_regs)[srcf_code]);
+					extra_s &= ~1;
+					WRITE_W(dreg + extra_s, sreg);
+					WRITE_W(dreg + extra_s + 4, sregf);
+					m_icount -= m_clock_cycles_1; // extra cycle
+					break;
 				}
-				break;
-		}
-	}
-	else
-	{
-		switch (sub_type)
-		{
-			case 0: // STBS.D
-				// TODO: missing trap on range error
-				WRITE_B(dreg + extra_s, (uint8_t)sreg);
-				break;
-
-			case 1: // STBU.D
-				WRITE_B(dreg + extra_s, (uint8_t)sreg);
-				break;
-
-			case 2: // STHS.D, STHU.D
-				WRITE_HW(dreg + (extra_s & ~1), (uint16_t)sreg);
-				// TODO: missing trap on range error with STHS.D
-				break;
-
-			case 3:
-				switch (extra_s & 3)
+				case 2: // STW.IOD
+					IO_WRITE_W(dreg + (extra_s & ~3), sreg);
+					break;
+				case 3: // STD.IOD
 				{
-					case 0: // STW.D
-						WRITE_W(dreg + (extra_s & ~1), sreg);
-						break;
-					case 1: // STD.D
-					{
-						const uint32_t srcf_code = SRC_GLOBAL ? (src_code + 1) : ((src_code + 1) & 0x3f);
-						const uint32_t sregf = ((SRC_GLOBAL && src_code == SR_REGISTER) ? 0 : (SRC_GLOBAL ? m_global_regs : m_local_regs)[srcf_code]);
-						extra_s &= ~1;
-						WRITE_W(dreg + extra_s, sreg);
-						WRITE_W(dreg + extra_s + 4, sregf);
-						m_icount -= m_clock_cycles_1; // extra cycle
-						break;
-					}
-					case 2: // STW.IOD
-						IO_WRITE_W(dreg + (extra_s & ~3), sreg);
-						break;
-					case 3: // STD.IOD
-					{
-						const uint32_t srcf_code = SRC_GLOBAL ? (src_code + 1) : ((src_code + 1) & 0x3f);
-						const uint32_t sregf = ((SRC_GLOBAL && src_code == SR_REGISTER) ? 0 : (SRC_GLOBAL ? m_global_regs : m_local_regs)[srcf_code]);
-						extra_s &= ~3;
-						IO_WRITE_W(dreg + extra_s, sreg);
-						IO_WRITE_W(dreg + extra_s + 4, sregf);
-						m_icount -= m_clock_cycles_1; // extra cycle
-						break;
-					}
+					const uint32_t srcf_code = SRC_GLOBAL ? (src_code + 1) : ((src_code + 1) & 0x3f);
+					const uint32_t sregf = ((SRC_GLOBAL && src_code == SR_REGISTER) ? 0 : (SRC_GLOBAL ? m_global_regs : m_local_regs)[srcf_code]);
+					extra_s &= ~3;
+					IO_WRITE_W(dreg + extra_s, sreg);
+					IO_WRITE_W(dreg + extra_s + 4, sregf);
+					m_icount -= m_clock_cycles_1; // extra cycle
+					break;
 				}
-				break;
-		}
+			}
+			break;
 	}
 
 	m_icount -= m_clock_cycles_1;

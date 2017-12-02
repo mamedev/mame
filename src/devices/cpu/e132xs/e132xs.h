@@ -513,8 +513,7 @@ private:
 	void generate_dbr(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
 
 	void generate_frame(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_call_global(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_call_local(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	template <hyperstone_device::reg_bank SRC_GLOBAL> void generate_call(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
 
 	void generate_trap_op(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
 	void generate_extend(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);

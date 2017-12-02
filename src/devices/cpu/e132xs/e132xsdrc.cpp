@@ -937,8 +937,8 @@ bool hyperstone_device::generate_opcode(drcuml_block *block, compiler_state *com
 		case 0xeb: generate_db<COND_NZ, IS_CLEAR>(block, compiler, desc); break;
 		case 0xec: generate_dbr(block, compiler, desc); break;
 		case 0xed: generate_frame(block, compiler, desc); break;
-		case 0xee: generate_call_global(block, compiler, desc); break;
-		case 0xef: generate_call_local(block, compiler, desc); break;
+		case 0xee: generate_call<GLOBAL>(block, compiler, desc); break;
+		case 0xef: generate_call<LOCAL>(block, compiler, desc); break;
 		case 0xf0: generate_b<COND_V,  IS_SET>(block, compiler, desc); break;
 		case 0xf1: generate_b<COND_V,  IS_CLEAR>(block, compiler, desc); break;
 		case 0xf2: generate_b<COND_Z,  IS_SET>(block, compiler, desc); break;
