@@ -363,8 +363,7 @@ private:
 	void hyperstone_dbr();
 
 	void hyperstone_frame();
-	void hyperstone_call_global();
-	void hyperstone_call_local();
+	template <hyperstone_device::reg_bank SRC_GLOBAL> void hyperstone_call();
 
 	void hyperstone_trap();
 	void hyperstone_extend();

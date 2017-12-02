@@ -1818,8 +1818,8 @@ void hyperstone_device::execute_run()
 			case 0xeb: hyperstone_db<COND_NZ, IS_CLEAR>(); break;
 			case 0xec: hyperstone_dbr(); break;
 			case 0xed: hyperstone_frame(); break;
-			case 0xee: hyperstone_call_global(); break;
-			case 0xef: hyperstone_call_local(); break;
+			case 0xee: hyperstone_call<GLOBAL>(); break;
+			case 0xef: hyperstone_call<LOCAL>(); break;
 			case 0xf0: hyperstone_b<COND_V,  IS_SET>(); break;
 			case 0xf1: hyperstone_b<COND_V,  IS_CLEAR>(); break;
 			case 0xf2: hyperstone_b<COND_Z,  IS_SET>(); break;

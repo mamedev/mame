@@ -2756,7 +2756,8 @@ void hyperstone_device::hyperstone_frame()
 	m_icount -= m_clock_cycles_1;
 }
 
-void hyperstone_device::hyperstone_call_global()
+template <hyperstone_device::reg_bank SRC_GLOBAL>
+void hyperstone_device::hyperstone_call()
 {
 	uint16_t imm_1 = READ_OP(PC);
 	PC += 2;
@@ -2791,10 +2792,7 @@ void hyperstone_device::hyperstone_call_global()
 	uint32_t src_code = SRC_CODE;
 	uint32_t dst_code = DST_CODE;
 
-	uint32_t sreg = m_global_regs[src_code];
-
-	if (src_code == SR_REGISTER)
-		sreg = 0;
+	uint32_t sreg = (SRC_GLOBAL && src_code == SR_REGISTER) ? 0 : (SRC_GLOBAL ? m_global_regs : m_local_regs)[src_code];
 
 	if (!DST_CODE)
 		dst_code = 16;
@@ -2809,65 +2807,6 @@ void hyperstone_device::hyperstone_call_global()
 	SR &= ~M_MASK;
 
 	PC = (extra_s & ~1) + sreg;
-
-	m_intblock = 2;
-
-	//TODO: add interrupt locks, errors, ....
-
-	//TODO: no 1!
-	m_icount -= m_clock_cycles_1;
-}
-
-void hyperstone_device::hyperstone_call_local()
-{
-	uint16_t imm_1 = READ_OP(PC);
-	PC += 2;
-
-	int32_t extra_s = 0;
-
-	if (imm_1 & 0x8000)
-	{
-		uint16_t imm_2 = READ_OP(PC);
-
-		PC += 2;
-		SET_ILC(3<<19);
-
-		extra_s = imm_2;
-		extra_s |= ((imm_1 & 0x3fff) << 16);
-
-		if (imm_1 & 0x4000)
-			extra_s |= 0xc0000000;
-	}
-	else
-	{
-		extra_s = imm_1 & 0x3fff;
-
-		SET_ILC(2<<19);
-
-		if (imm_1 & 0x4000)
-			extra_s |= 0xffffc000;
-	}
-
-	check_delay_PC();
-
-	uint32_t src_code = SRC_CODE;
-	uint32_t dst_code = DST_CODE;
-
-	if (!DST_CODE)
-		dst_code = 16;
-
-	uint32_t fp = GET_FP;
-	extra_s = (extra_s & ~1) + m_local_regs[(src_code + fp) & 0x3f];
-
-	uint32_t dreg_index = dst_code + fp;
-	m_local_regs[dreg_index & 0x3f] = (PC & ~1) | GET_S;
-	m_local_regs[(dreg_index + 1) & 0x3f] = SR;
-
-	SET_FP(fp + dst_code);
-	SET_FL(6); //default value for call
-	SR &= ~M_MASK;
-
-	PC = extra_s;
 
 	m_intblock = 2;
 
