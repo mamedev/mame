@@ -479,11 +479,11 @@ TIMER_CALLBACK_MEMBER( hyperstone_device::timer_callback )
 	/* update the values if necessary */
 	if (update)
 	{
-		compute_tr();
 		update_timer_prescale();
 	}
 
 	/* see if the timer is right for firing */
+	compute_tr();
 	if (!((m_tr_result - TCR) & 0x80000000))
 		m_timer_int_pending = 1;
 
@@ -1018,7 +1018,11 @@ void hyperstone_device::device_start()
 
 void hyperstone_device::init(int scale_mask)
 {
+#if ENABLE_E132XS_DRC
 	m_enable_drc = allow_drc();
+#else
+	m_enable_drc = false;
+#endif
 
 	memset(m_global_regs, 0, sizeof(uint32_t) * 32);
 	memset(m_local_regs, 0, sizeof(uint32_t) * 64);

@@ -45,9 +45,11 @@
 #define EXECUTE_UNMAPPED_CODE           2
 #define EXECUTE_RESET_CACHE             3
 
-#define E132XS_STRICT_VERIFY      0x0001          /* verify all instructions */
+#define E132XS_STRICT_VERIFY      		0x0001          /* verify all instructions */
 
 #define SINGLE_INSTRUCTION_MODE         (1)
+
+#define ENABLE_E132XS_DRC				(0)
 
 //**************************************************************************
 //  TYPE DEFINITIONS
