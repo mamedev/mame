@@ -958,7 +958,7 @@ void towns_state::towns_crtc_draw_scan_layer_hicolour(bitmap_rgb32 &bitmap,const
 			scroll = ((m_video.towns_crtc_reg[21] & 0xfc00) << 2) | (((m_video.towns_crtc_reg[21] & 0x3ff) << 2));
 			off += scroll;
 		}
-		off += (m_video.towns_crtc_reg[11] - m_video.towns_crtc_reg[22]);
+		off += (m_video.towns_crtc_reg[11] - m_video.towns_crtc_reg[22]) / 2;
 		hzoom = ((m_video.towns_crtc_reg[27] & 0x0f00) >> 8) + 1;
 	}
 	else
@@ -970,7 +970,7 @@ void towns_state::towns_crtc_draw_scan_layer_hicolour(bitmap_rgb32 &bitmap,const
 			scroll = ((m_video.towns_crtc_reg[17] & 0xfc00) << 2) | (((m_video.towns_crtc_reg[17] & 0x3ff) << 2));
 			off += scroll;
 		}
-		off += (m_video.towns_crtc_reg[9] - m_video.towns_crtc_reg[18]);
+		off += (m_video.towns_crtc_reg[9] - m_video.towns_crtc_reg[18]) / 2;
 		hzoom = (m_video.towns_crtc_reg[27] & 0x000f) + 1;
 	}
 
@@ -1150,7 +1150,7 @@ void towns_state::towns_crtc_draw_scan_layer_256(bitmap_rgb32 &bitmap,const rect
 			scroll = ((m_video.towns_crtc_reg[21] & 0xfc00) << 3) | (((m_video.towns_crtc_reg[21] & 0x3ff) << 3));
 			off += scroll;
 		}
-		off += (m_video.towns_crtc_reg[11] - m_video.towns_crtc_reg[22]);
+		off += (m_video.towns_crtc_reg[11] - m_video.towns_crtc_reg[22]) / 2;
 		hzoom = ((m_video.towns_crtc_reg[27] & 0x0f00) >> 8) + 1;
 	}
 	else
@@ -1162,7 +1162,7 @@ void towns_state::towns_crtc_draw_scan_layer_256(bitmap_rgb32 &bitmap,const rect
 			scroll = ((m_video.towns_crtc_reg[17] & 0xfc00) << 3) | (((m_video.towns_crtc_reg[17] & 0x3ff) << 3));
 			off += scroll;
 		}
-		off += (m_video.towns_crtc_reg[9] - m_video.towns_crtc_reg[18]);
+		off += (m_video.towns_crtc_reg[9] - m_video.towns_crtc_reg[18]) / 2;
 		hzoom = (m_video.towns_crtc_reg[27] & 0x000f) + 1;
 	}
 
@@ -1296,7 +1296,7 @@ void towns_state::towns_crtc_draw_scan_layer_16(bitmap_rgb32 &bitmap,const recta
 			scroll = ((m_video.towns_crtc_reg[21] & 0xfc00)<<2) | (((m_video.towns_crtc_reg[21] & 0x3ff)<<2));
 			off += scroll;
 		}
-		off += (m_video.towns_crtc_reg[11] - m_video.towns_crtc_reg[22]);
+		off += (m_video.towns_crtc_reg[11] - m_video.towns_crtc_reg[22]) / 2;
 		hzoom = ((m_video.towns_crtc_reg[27] & 0x0f00) >> 8) + 1;
 	}
 	else
@@ -1308,7 +1308,7 @@ void towns_state::towns_crtc_draw_scan_layer_16(bitmap_rgb32 &bitmap,const recta
 			scroll = ((m_video.towns_crtc_reg[17] & 0xfc00)<<2) | (((m_video.towns_crtc_reg[17] & 0x3ff)<<2));
 			off += scroll;
 		}
-		off += (m_video.towns_crtc_reg[9] - m_video.towns_crtc_reg[18]);
+		off += (m_video.towns_crtc_reg[9] - m_video.towns_crtc_reg[18]) / 2;
 		hzoom = (m_video.towns_crtc_reg[27] & 0x000f) + 1;
 	}
 
