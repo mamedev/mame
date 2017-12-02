@@ -4466,36 +4466,6 @@ ROM_START( marmagicua )
 ROM_END
 
 
-// US003 / Multi credit / Multi line
-// Margarita Magic / NSW/ACT / A - 07/07/2000
-// EHG1559 / This is a twenty-line game
-// The playlines are 1, 5, 10, 15 and 20
-// For 20 credit per line the max bet is 400
-// ROM has NSW/ACT strings but it is for US platform
-ROM_START( marmagicub )
-	ARISTOCRAT_MK5_BIOS
-	/*
-	    This ROM set is exactly the same version as the parent, yet is bad in a completely different way!
-	    Comparing the ROM data between this one and the above bad dump, it is highly possible that this set can be repaired as this ROM set came from a good dump until it was stripped of carriage return symbols (0x0D) by a web server
-	    The "_a" suffix is to differentiate the ROMs from the above set and does not correspond to the label, the correct label is simply EHG1559.
-	    checksum code not found due to ROMs being corrupted, all files except the last 2 are missing bytes consisting of 0x0D
-	*/
-	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
-	ROM_LOAD32_WORD( "ehg1559_a.u7",  0x000000, 0x7f03e, BAD_DUMP CRC(473afd5b) SHA1(823f8ad8cd5c3676feba8d740b50f25544a6c046) )
-	ROM_LOAD32_WORD( "ehg1559_a.u11", 0x000002, 0x7ff66, BAD_DUMP CRC(c66df0dc) SHA1(015e6aed905bfef2f152137aa8aaaeaae41bc90e) )
-	ROM_LOAD32_WORD( "ehg1559_a.u8",  0x100000, 0x7fcfe, BAD_DUMP CRC(5d2760d6) SHA1(655da82ae5dca1bb498399d2ee1efad7a3811cba) )
-	ROM_LOAD32_WORD( "ehg1559_a.u12", 0x100002, 0x7fce2, BAD_DUMP CRC(56f9dcab) SHA1(2951a7189e5aa6e7338eb11f929fd6eea2541f0d) )
-	ROM_LOAD32_WORD( "ehg1559_a.u9",  0x200000, 0x7ff4d, BAD_DUMP CRC(60323004) SHA1(8f188c7109538454a9ad5e14f21ab4ef76115153) )
-	ROM_LOAD32_WORD( "ehg1559_a.u13", 0x200002, 0x7ff61, BAD_DUMP CRC(34320e8d) SHA1(b266d9c53cf746f1a164e006f14079bced2887ed) )
-	ROM_LOAD32_WORD( "ehg1559.u10",   0x300000, 0x80000, CRC(3db4e373) SHA1(7150242253ae4a1c4f3211e3068f00e8b1ed51b1) )
-	ROM_LOAD32_WORD( "ehg1559.u14",   0x300002, 0x80000, CRC(bdfdc0e4) SHA1(0e56f08abc0cdd9dfa5d8e51bb6fe06fa356b3b3) )
-
-	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
-	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
-ROM_END
-
-
 // 0400115V / 559/2 / 10 Credit Multiplier/9 Line Multiline
 // Mine, Mine, Mine / Local / D - 16/01/96
 ROM_START( minemine )
@@ -7034,7 +7004,7 @@ GAMEL( 1997, magtcha5a,  magtcha5,  aristmk5_touch,     dimtouch,     aristmk5_s
 GAMEL( 1997, mammothm,   aristmk5,  aristmk5,           kgalah,       aristmk5_state, aristmk5, ROT0, "Aristocrat", "Mammoth Money (0100425V, NSW/ACT)",                    MACHINE_FLAGS, layout_kgalah )          // 595/5, D - 07/04/97, Rev 1.22.14.1
 GAMEL( 2000, marmagic,   aristmk5,  aristmk5,           goldenra,     aristmk5_state, aristmk5, ROT0, "Aristocrat", "Margarita Magic (01J00101, NSW/ACT)",                  MACHINE_FLAGS, layout_marmagic )        // JB005, A - 07/07/00, Rev 17
 GAMEL( 2000, marmagicu,  marmagic,  aristmk5_usa,       aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Margarita Magic (EHG1558, US)",                        MACHINE_FLAGS, layout_aristmk5_us )     // US003, 07/07/2000
-GAMEL( 2000, marmagicua, marmagic,  aristmk5_usa,       bootsctnua,   aristmk5_state, aristmk5, ROT0, "Aristocrat", "Margarita Magic (EHG1559, US, set 1)",                 MACHINE_FLAGS, layout_aristmk5_us_200 ) // US003, A - 07/07/00
+GAMEL( 2000, marmagicua, marmagic,  aristmk5_usa,       bootsctnua,   aristmk5_state, aristmk5, ROT0, "Aristocrat", "Margarita Magic (EHG1559, US)",                        MACHINE_FLAGS, layout_aristmk5_us_200 ) // US003, A - 07/07/00
 GAMEL( 1997, mgarden,    aristmk5,  aristmk5_usa,       aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Magic Garden (AHG1211-99, US)",                        MACHINE_FLAGS, layout_aristmk5_us )     // MV4033, B - 10/02/97 (alt title for enchanted forest?)
 GAMEL( 1996, minemine,   aristmk5,  aristmk5,           swhr2,        aristmk5_state, aristmk5, ROT0, "Aristocrat", "Mine, Mine, Mine (0400115V, NSW/ACT)",                 MACHINE_FLAGS, layout_swhr2 )           // 559/2, D - 16/01/96, Rev 1.18.3.0
 GAMEL( 1996, minemineu,  minemine,  aristmk5_usa,       aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Mine, Mine, Mine (VHG0416-99, US)",                    MACHINE_FLAGS, layout_aristmk5_us )     // 559/2, E - 14/02/96
@@ -7143,7 +7113,6 @@ GAMEL( 2001, dynajacku,  dynajack,  aristmk5_usa,       aristmk5_usa, aristmk5_s
 GAMEL( 2000, eforsta5ce, eforsta5,  aristmk5_usa,       aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Enchanted Forest - Cash Express (CHG1536, US)",        MACHINE_FLAGS, layout_aristmk5_us )     // MV4108/6, C - 17/01/00
 GAMEL( 2000, incasunua,  incasun,   aristmk5_usa,       bootsctnua,   aristmk5_state, aristmk5, ROT0, "Aristocrat", "Inca Sun (DHG1577, US)",                               MACHINE_FLAGS, layout_aristmk5_us_200 ) // MV4130, A - 05/09/00
 GAMEL( 2001, locolootu,  locoloot,  aristmk5_usa,       aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Loco Loot (AHG1513, US)",                              MACHINE_FLAGS, layout_aristmk5_us )     // MV4134, A - 30/07/01
-GAMEL( 2000, marmagicub, marmagic,  aristmk5_usa,       bootsctnua,   aristmk5_state, aristmk5, ROT0, "Aristocrat", "Margarita Magic (EHG1559, US, set 2)",                 MACHINE_FLAGS, layout_aristmk5_us_200 ) // US003, A - 07/07/00
 GAMEL( 2001, mountmonce, mountmon,  aristmk5_usa,       aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Mountain Money - Cash Express (AHG1629, US)",          MACHINE_FLAGS, layout_aristmk5_us )     // MV4108/5, A - 10/03/01
 GAMEL( 2001, mountmonu,  mountmon,  aristmk5_usa,       aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Mountain Money (BHG1465, US)",                         MACHINE_FLAGS, layout_aristmk5_us )     // MV4108/5, A - 10/03/01
 GAMEL( 2001, partygrsb,  partygrs,  aristmk5_usa_touch, bootsctnua,   aristmk5_state, aristmk5, ROT0, "Aristocrat", "Party Gras (AHG1568, US)",                             MACHINE_FLAGS, layout_aristmk5_us_200 ) // MV4115/6, A - 10/11/2001, 20 lines
