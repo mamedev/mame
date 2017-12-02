@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz
 
+#include "emu.h"
 #include "e132xs.h"
 #include "e132xsfe.h"
 #include "32xsdefs.h"
