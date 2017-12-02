@@ -2475,7 +2475,7 @@ msgstr "Impostazioni"
 
 #: plugins/timer/init.lua:94
 msgid "Current time"
-msgstr "Ora attuale"
+msgstr "Tempo corrente"
 
 #: plugins/timer/init.lua:96
 msgid "Total time"
@@ -2757,7 +2757,7 @@ msgstr "Cheat engine non disponibile"
 
 #: plugins/cheatfind/init.lua:718
 msgid "Default name is "
-msgstr "Il nome predefinito è"
+msgstr "Il nome predefinito è "
 
 #: plugins/cheatfind/init.lua:741
 msgid "Test"
