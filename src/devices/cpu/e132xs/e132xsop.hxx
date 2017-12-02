@@ -2789,7 +2789,8 @@ void hyperstone_device::hyperstone_call()
 
 	check_delay_PC();
 
-	uint32_t src_code = SRC_CODE;
+	uint32_t fp = GET_FP;
+	uint32_t src_code = SRC_GLOBAL ? SRC_CODE : ((SRC_CODE + fp) & 0x3f);
 	uint32_t dst_code = DST_CODE;
 
 	uint32_t sreg = (SRC_GLOBAL && src_code == SR_REGISTER) ? 0 : (SRC_GLOBAL ? m_global_regs : m_local_regs)[src_code];
@@ -2797,7 +2798,6 @@ void hyperstone_device::hyperstone_call()
 	if (!DST_CODE)
 		dst_code = 16;
 
-	uint32_t fp = GET_FP;
 	uint32_t dreg_index = dst_code + fp;
 	m_local_regs[dreg_index & 0x3f] = (PC & ~1) | GET_S;
 	m_local_regs[(dreg_index + 1) & 0x3f] = SR;
