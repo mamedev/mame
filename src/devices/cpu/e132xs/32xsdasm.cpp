@@ -399,10 +399,7 @@ offs_t hyperstone_disassembler::disassemble(std::ostream &stream, offs_t pc, con
 	char source[5] = "\0", dest[5] = "\0";
 	uint32_t flags = 0;
 
-	base_pc = pc;
-	base_oprom = oprom;
-
-	uint16_t op = READ_OP_DASM(pc);
+	uint16_t op = opcodes.r16(pc);
 
 	size = 2;
 
