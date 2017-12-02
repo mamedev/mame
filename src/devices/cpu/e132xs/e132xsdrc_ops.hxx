@@ -3,6 +3,8 @@
 
 #include "e132xs.h"
 
+constexpr uint32_t WRITE_ONLY_REGMASK = (1 << BCR_REGISTER) | (1 << TPR_REGISTER) | (1 << FCR_REGISTER) | (1 << MCR_REGISTER);
+
 void hyperstone_device::generate_check_delay_pc(drcuml_block *block)
 {
 	/* if PC is used in a delay instruction, the delayed PC should be used */
@@ -516,6 +518,62 @@ void hyperstone_device::generate_cmp(drcuml_block *block, compiler_state *compil
 template <hyperstone_device::reg_bank DST_GLOBAL, hyperstone_device::reg_bank SRC_GLOBAL>
 void hyperstone_device::generate_mov(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
 {
+	uint16_t op = desc->opptr.w[0];
+	const uint32_t src_code = op & 0xf;
+	const uint32_t dst_code = (op & 0xf0) >> 4;
+
+	generate_check_delay_pc(block);
+
+	if (DST_GLOBAL)
+	{
+		int no_exception;
+		UML_TEST(block, DRC_SR, H_MASK);
+		UML_JMPc(block, uml::COND_Z, no_exception = compiler->m_labelnum++);
+		UML_TEST(block, DRC_SR, S_MASK);
+		UML_JMPc(block, uml::COND_NZ, no_exception);
+		UML_EXH(block, *m_exception[EXCEPTION_PRIVILEGE_ERROR], 0);
+		UML_LABEL(block, no_exception);
+	}
+
+	if (!SRC_GLOBAL || !DST_GLOBAL)
+		UML_ROLAND(block, I1, DRC_SR, 7, 0x7f);
+
+	if (SRC_GLOBAL)
+	{
+		UML_TEST(block, DRC_SR, H_MASK);
+		UML_MOVc(block, uml::COND_NZ, I1, 16 + src_code);
+		UML_MOVc(block, uml::COND_Z, I1, src_code);
+		UML_LOAD(block, I5, (void *)m_global_regs, I1, SIZE_DWORD, SCALE_x4);
+		UML_SHL(block, I2, 1, I1);
+		UML_TEST(block, I2, WRITE_ONLY_REGMASK);
+		UML_MOVc(block, uml::COND_NZ, I5, 0);
+	}
+	else
+	{
+		UML_ADD(block, I2, I1, src_code);
+		UML_AND(block, I2, I2, 0x3f);
+		UML_LOAD(block, I5, (void *)m_local_regs, I2, SIZE_DWORD, SCALE_x4);
+	}
+
+	UML_AND(block, DRC_SR, DRC_SR, ~(Z_MASK | N_MASK));
+	UML_TEST(block, I3, ~0);
+	UML_SETc(block, uml::COND_Z, I2);
+	UML_ROLINS(block, DRC_SR, I2, 0, Z_MASK);
+	UML_ROLINS(block, DRC_SR, I3, 3, N_MASK);
+
+	if (DST_GLOBAL)
+	{
+		UML_TEST(block, DRC_SR, H_MASK);
+		UML_MOVc(block, uml::COND_NZ, I4, 16 + dst_code);
+		UML_MOVc(block, uml::COND_Z, I4, dst_code);
+		generate_set_global_register(block, compiler, desc);
+	}
+	else
+	{
+		UML_ADD(block, I2, I1, dst_code);
+		UML_AND(block, I2, I2, 0x3f);
+		UML_STORE(block, (void *)m_local_regs, I2, I5, SIZE_DWORD, SCALE_x4);
+	}
 }
 
 
