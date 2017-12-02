@@ -51,7 +51,7 @@ void hyperstone_device::hyperstone_movd()
 		const uint32_t old_s = SR & S_MASK;
 		const uint32_t old_l = SR & L_MASK;
 		PC = sreg & ~1;
-		SR = (sregf & 0xffe00000) | ((sreg & 0x01) << 18 ) | (sregf & 0x3ffff);
+		SR = (sregf & 0xffe3ffff) | ((sreg & 0x01) << 18);
 		if (m_intblock < 1)
 			m_intblock = 1;
 

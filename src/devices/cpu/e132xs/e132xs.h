@@ -169,9 +169,24 @@ protected:
 
 	enum
 	{
-		EXCEPTION_INTERRUPT = 0,
-		EXCEPTION_PRIVILEGE_ERROR,
-		EXCEPTION_TRACE,
+		EXCEPTION_IO2                  = 48,
+		EXCEPTION_IO1                  = 49,
+		EXCEPTION_INT4                 = 50,
+		EXCEPTION_INT3                 = 51,
+		EXCEPTION_INT2                 = 52,
+		EXCEPTION_INT1                 = 53,
+		EXCEPTION_IO3                  = 54,
+		EXCEPTION_TIMER                = 55,
+		EXCEPTION_RESERVED1            = 56,
+		EXCEPTION_TRACE                = 57,
+		EXCEPTION_PARITY_ERROR         = 58,
+		EXCEPTION_EXTENDED_OVERFLOW    = 59,
+		EXCEPTION_RANGE_ERROR          = 60,
+		EXCEPTION_PRIVILEGE_ERROR      = EXCEPTION_RANGE_ERROR,
+		EXCEPTION_FRAME_ERROR          = EXCEPTION_RANGE_ERROR,
+		EXCEPTION_RESERVED2            = 61,
+		EXCEPTION_RESET                = 62,  // reserved if not mapped @ MEM3
+		EXCEPTION_ERROR_ENTRY          = 63,  // for instruction code of all ones
 		EXCEPTION_COUNT
 	};
 

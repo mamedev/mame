@@ -181,7 +181,6 @@ bool e132xs_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 	const uint32_t lsrc_group = 1 + (((SRC_CODE + fp) & 0x20) >> 5);
 	const uint32_t lsrcf_group = 1 + ((SRC_CODE + fp + 1) >> 5);
 
-	printf("physpc: %08x\n", desc.physpc);
 	switch (op >> 8)
 	{
 		case 0x00: // chk global,global
@@ -644,7 +643,6 @@ bool e132xs_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			desc.regout[ldst_group] |= 1 << ldst_code;
 			desc.regout[0] |= SR_CODE;
 			desc.length = imm_length(desc, op);
-			printf("%04x, %d\n", read_imm1(desc), desc.length);
 			break;
 		case 0x64: // movi global,simm
 			desc.regin[0] |= SR_CODE;

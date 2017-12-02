@@ -54,15 +54,15 @@
 /* Trap numbers */
 #define TRAPNO_IO2                  48
 #define TRAPNO_IO1                  49
-#define TRAPNO_INT4             50
-#define TRAPNO_INT3             51
-#define TRAPNO_INT2             52
-#define TRAPNO_INT1             53
+#define TRAPNO_INT4                 50
+#define TRAPNO_INT3                 51
+#define TRAPNO_INT2                 52
+#define TRAPNO_INT1                 53
 #define TRAPNO_IO3                  54
 #define TRAPNO_TIMER                55
 #define TRAPNO_RESERVED1            56
 #define TRAPNO_TRACE_EXCEPTION      57
-#define TRAPNO_PARITY_ERROR     58
+#define TRAPNO_PARITY_ERROR         58
 #define TRAPNO_EXTENDED_OVERFLOW    59
 #define TRAPNO_RANGE_ERROR          60
 #define TRAPNO_PRIVILEGE_ERROR      TRAPNO_RANGE_ERROR
@@ -155,6 +155,8 @@
 #define P_MASK                  0x00020000
 #define S_MASK                  0x00040000
 #define ILC_MASK                0x00180000
+
+#define S_SHIFT                 18
 
 /* SR flags */
 #define GET_C                   ( SR & C_MASK)          // bit 0 //CARRY
