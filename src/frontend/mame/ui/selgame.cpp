@@ -848,7 +848,7 @@ void menu_select_game::general_info(const game_driver *driver, std::string &buff
 
 	util::stream_format(str, _("Romset\t%1$-.100s\n"), driver->name);
 	util::stream_format(str, _("Year\t%1$s\n"), driver->year);
-	util::stream_format(str, _("Manufacturer\t%1$-.100s\n"), driver->manufacturer);
+	util::stream_format(str, _("Manufacturer\t%1$-.100s\n"), driver->type.manufacturer());
 
 	int cloneof = driver_list::non_bios_clone(*driver);
 	if (cloneof != -1)
@@ -1038,7 +1038,7 @@ void menu_select_game::init_sorted_list()
 				m_isabios++;
 
 			m_sortedlist.push_back(&driver);
-			manufacturers.emplace(c_mnfct::getname(driver.manufacturer));
+			manufacturers.emplace(c_mnfct::getname(driver.type.manufacturer()));
 			years.emplace(driver.year);
 		}
 	}

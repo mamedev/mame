@@ -154,14 +154,18 @@ private:
 
 
 template <class DeviceClass, char const *ShortName, char const *FullName, char const *Source>
+struct generic_device_tag_struct { typedef DeviceClass type; };
+template <class DeviceClass, char const *ShortName, char const *Manufacturer, char const *FullName, char const *Source>
 struct device_tag_struct { typedef DeviceClass type; };
-template <class DriverClass, char const *ShortName, char const *FullName, char const *Source, device_feature::type Unemulated, device_feature::type Imperfect>
+template <class DriverClass, char const *ShortName, char const *Manufacturer, char const *FullName, char const *Source, device_feature::type Unemulated, device_feature::type Imperfect>
 struct driver_tag_struct { typedef DriverClass type; };
 
 template <class DeviceClass, char const *ShortName, char const *FullName, char const *Source>
-auto device_tag_func() { return device_tag_struct<DeviceClass, ShortName, FullName, Source>{ }; };
-template <class DriverClass, char const *ShortName, char const *FullName, char const *Source, device_feature::type Unemulated, device_feature::type Imperfect>
-auto driver_tag_func() { return driver_tag_struct<DriverClass, ShortName, FullName, Source, Unemulated, Imperfect>{ }; };
+auto device_tag_func() { return generic_device_tag_struct<DeviceClass, ShortName, FullName, Source>{ }; };
+template <class DeviceClass, char const *ShortName, char const *Manufacturer, char const *FullName, char const *Source>
+auto device_tag_func() { return device_tag_struct<DeviceClass, ShortName, Manufacturer, FullName, Source>{ }; };
+template <class DriverClass, char const *ShortName, char const *Manufacturer, char const *FullName, char const *Source, device_feature::type Unemulated, device_feature::type Imperfect>
+auto driver_tag_func() { return driver_tag_struct<DriverClass, ShortName, Manufacturer, FullName, Source, Unemulated, Imperfect>{ }; };
 
 class device_type_impl
 {
@@ -193,6 +197,7 @@ private:
 	create_func const m_creator;
 	std::type_info const &m_type;
 	char const *const m_shortname;
+	char const *const m_manufacturer;
 	char const *const m_fullname;
 	char const *const m_source;
 	device_feature::type const m_unemulated_features;
@@ -205,6 +210,7 @@ public:
 		: m_creator(nullptr)
 		, m_type(typeid(std::nullptr_t))
 		, m_shortname(nullptr)
+		, m_manufacturer(nullptr)
 		, m_fullname(nullptr)
 		, m_source(nullptr)
 		, m_unemulated_features(device_feature::NONE)
@@ -214,10 +220,11 @@ public:
 	}
 
 	template <class DeviceClass, char const *ShortName, char const *FullName, char const *Source>
-	device_type_impl(device_tag_struct<DeviceClass, ShortName, FullName, Source> (*)())
+	device_type_impl(generic_device_tag_struct<DeviceClass, ShortName, FullName, Source> (*)())
 		: m_creator(&create_device<DeviceClass>)
 		, m_type(typeid(DeviceClass))
 		, m_shortname(ShortName)
+		, m_manufacturer(nullptr)
 		, m_fullname(FullName)
 		, m_source(Source)
 		, m_unemulated_features(DeviceClass::unemulated_features())
@@ -226,11 +233,26 @@ public:
 	{
 	}
 
-	template <class DriverClass, char const *ShortName, char const *FullName, char const *Source, device_feature::type Unemulated, device_feature::type Imperfect>
-	device_type_impl(driver_tag_struct<DriverClass, ShortName, FullName, Source, Unemulated, Imperfect> (*)())
+	template <class DeviceClass, char const *ShortName, char const *Manufacturer, char const *FullName, char const *Source>
+	device_type_impl(device_tag_struct<DeviceClass, ShortName, Manufacturer, FullName, Source> (*)())
+		: m_creator(&create_device<DeviceClass>)
+		, m_type(typeid(DeviceClass))
+		, m_shortname(ShortName)
+		, m_manufacturer(Manufacturer)
+		, m_fullname(FullName)
+		, m_source(Source)
+		, m_unemulated_features(DeviceClass::unemulated_features())
+		, m_imperfect_features(DeviceClass::imperfect_features())
+		, m_next(device_registrar::register_device(*this))
+	{
+	}
+
+	template <class DriverClass, char const *ShortName, char const *Manufacturer, char const *FullName, char const *Source, device_feature::type Unemulated, device_feature::type Imperfect>
+	device_type_impl(driver_tag_struct<DriverClass, ShortName, Manufacturer, FullName, Source, Unemulated, Imperfect> (*)())
 		: m_creator(&create_driver<DriverClass>)
 		, m_type(typeid(DriverClass))
 		, m_shortname(ShortName)
+		, m_manufacturer(Manufacturer)
 		, m_fullname(FullName)
 		, m_source(Source)
 		, m_unemulated_features(DriverClass::unemulated_features() | Unemulated)
@@ -241,6 +263,8 @@ public:
 
 	std::type_info const &type() const { return m_type; }
 	char const *shortname() const { return m_shortname; }
+	bool has_manufacturer() const { return m_manufacturer != nullptr; }
+	char const *manufacturer() const { return m_manufacturer; }
 	char const *fullname() const { return m_fullname; }
 	char const *source() const { return m_source; }
 	device_feature::type unemulated_features() const { return m_unemulated_features; }
@@ -272,16 +296,25 @@ template <
 		char const *ShortName,
 		char const *FullName,
 		char const *Source>
-constexpr auto device_creator = &emu::detail::device_tag_func<DeviceClass, ShortName, FullName, Source>;
+constexpr auto generic_device_creator = &emu::detail::device_tag_func<DeviceClass, ShortName, FullName, Source>;
+
+template <
+		typename DeviceClass,
+		char const *ShortName,
+		char const *Manufacturer,
+		char const *FullName,
+		char const *Source>
+constexpr auto device_creator = &emu::detail::device_tag_func<DeviceClass, ShortName, Manufacturer, FullName, Source>;
 
 template <
 		typename DriverClass,
 		char const *ShortName,
+		char const *Manufacturer,
 		char const *FullName,
 		char const *Source,
 		emu::detail::device_feature::type Unemulated,
 		emu::detail::device_feature::type Imperfect>
-constexpr auto driver_device_creator = &emu::detail::driver_tag_func<DriverClass, ShortName, FullName, Source, Unemulated, Imperfect>;
+constexpr auto driver_device_creator = &emu::detail::driver_tag_func<DriverClass, ShortName, Manufacturer, FullName, Source, Unemulated, Imperfect>;
 
 #define DECLARE_DEVICE_TYPE(Type, Class) \
 		extern device_type const Type; \
@@ -299,7 +332,16 @@ constexpr auto driver_device_creator = &emu::detail::driver_tag_func<DriverClass
 			struct Class##_device_traits { static constexpr char const shortname[] = ShortName, fullname[] = FullName, source[] = __FILE__; }; \
 			constexpr char const Class##_device_traits::shortname[], Class##_device_traits::fullname[], Class##_device_traits::source[]; \
 		} \
-		device_type const Type = device_creator<Class, (Class##_device_traits::shortname), (Class##_device_traits::fullname), (Class##_device_traits::source)>; \
+		device_type const Type = generic_device_creator<Class, (Class##_device_traits::shortname), (Class##_device_traits::fullname), (Class##_device_traits::source)>; \
+		template class device_finder<Class, false>; \
+		template class device_finder<Class, true>;
+
+#define DEFINE_DEVICE_TYPE_MFG(Type, Class, ShortName, Manufacturer, FullName) \
+		namespace { \
+			struct Class##_device_traits { static constexpr char const shortname[] = ShortName, manufacturer[] = Manufacturer, fullname[] = FullName, source[] = __FILE__; }; \
+			constexpr char const Class##_device_traits::shortname[], Class##_device_traits::manufacturer[], Class##_device_traits::fullname[], Class##_device_traits::source[]; \
+		} \
+		device_type const Type = device_creator<Class, (Class##_device_traits::shortname), (Class##_device_traits::manufacturer), (Class##_device_traits::fullname), (Class##_device_traits::source)>; \
 		template class device_finder<Class, false>; \
 		template class device_finder<Class, true>;
 
@@ -308,7 +350,16 @@ constexpr auto driver_device_creator = &emu::detail::driver_tag_func<DriverClass
 			struct Class##_device_traits { static constexpr char const shortname[] = ShortName, fullname[] = FullName, source[] = __FILE__; }; \
 			constexpr char const Class##_device_traits::shortname[], Class##_device_traits::fullname[], Class##_device_traits::source[]; \
 		} \
-		device_type const Type = device_creator<Namespace::Class, (Class##_device_traits::shortname), (Class##_device_traits::fullname), (Class##_device_traits::source)>; \
+		device_type const Type = generic_device_creator<Namespace::Class, (Class##_device_traits::shortname), (Class##_device_traits::fullname), (Class##_device_traits::source)>; \
+		template class device_finder<Namespace::Class, false>; \
+		template class device_finder<Namespace::Class, true>;
+
+#define DEFINE_DEVICE_TYPE_NS_MFG(Type, Namespace, Class, ShortName, Manufacturer, FullName) \
+		namespace { \
+			struct Class##_device_traits { static constexpr char const shortname[] = ShortName, fullname[] = FullName, manufacturer[] = Manufacturer, source[] = __FILE__; }; \
+			constexpr char const Class##_device_traits::shortname[], Class##_device_traits::fullname[], Class##_device_traits::manufacturer[], Class##_device_traits::source[]; \
+		} \
+		device_type const Type = device_creator<Namespace::Class, (Class##_device_traits::shortname), (Class##_device_traits::manufacturer), (Class##_device_traits::fullname), (Class##_device_traits::source)>; \
 		template class device_finder<Namespace::Class, false>; \
 		template class device_finder<Namespace::Class, true>;
 
@@ -444,7 +495,6 @@ public:
 	const char *name() const { return m_type.fullname(); }
 	const char *shortname() const { return m_type.shortname(); }
 	const char *searchpath() const { return m_searchpath.c_str(); }
-	const char *source() const { return m_type.source(); }
 	device_t *owner() const { return m_owner; }
 	device_t *next() const { return m_next; }
 	u32 configured_clock() const { return m_configured_clock; }

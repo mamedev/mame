@@ -467,8 +467,8 @@ void info_xml_creator::output_one(driver_enumerator &drivlist, device_type_set *
 		fprintf(m_output, "\t\t<year>%s</year>\n", util::xml::normalize_string(driver.year));
 
 	// print the manufacturer information
-	if (driver.manufacturer != nullptr)
-		fprintf(m_output, "\t\t<manufacturer>%s</manufacturer>\n", util::xml::normalize_string(driver.manufacturer));
+	if (driver.type.manufacturer() != nullptr)
+		fprintf(m_output, "\t\t<manufacturer>%s</manufacturer>\n", util::xml::normalize_string(driver.type.manufacturer()));
 
 	// now print various additional information
 	output_bios(config->root_device());
@@ -531,11 +531,13 @@ void info_xml_creator::output_one_device(machine_config &config, device_t &devic
 
 	// start to output info
 	fprintf(m_output, "\t<%s name=\"%s\"", XML_TOP, util::xml::normalize_string(device.shortname()));
-	std::string src(device.source());
+	std::string src(device.type().source());
 	strreplace(src,"../", "");
 	fprintf(m_output, " sourcefile=\"%s\" isdevice=\"yes\" runnable=\"no\"", util::xml::normalize_string(src.c_str()));
 	output_sampleof(device);
 	fprintf(m_output, ">\n\t\t<description>%s</description>\n", util::xml::normalize_string(device.name()));
+	if (device.type().has_manufacturer())
+		fprintf(m_output, "\t\t<manufacturer>%s</manufacturer>\n", util::xml::normalize_string(device.type().manufacturer()));
 
 	output_bios(device);
 	output_rom(nullptr, device);

@@ -308,7 +308,7 @@ void simple_menu_select_game::custom_render(void *selectedref, float top, float 
 		tempbuf[0] = string_format(_("%1$-.100s"), driver->type.fullname());
 
 		// next line is year, manufacturer
-		tempbuf[1] = string_format(_("%1$s, %2$-.100s"), driver->year, driver->manufacturer);
+		tempbuf[1] = string_format(_("%1$s, %2$-.100s"), driver->year, driver->type.manufacturer());
 
 		// next line source path
 		tempbuf[2] = string_format(_("Driver: %1$-.100s"), core_filename_extract_base(driver->type.source()));
