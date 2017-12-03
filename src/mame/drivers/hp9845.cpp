@@ -1046,7 +1046,7 @@ void hp9845b_state::video_fill_buff(bool buff_idx)
 				// Limit on accesses per row reached
 				break;
 			}
-			m_video_word = prog_space.read_word(m_video_mar << 1);
+			m_video_word = prog_space.read_word(m_video_mar);
 			if (m_video_load_mar) {
 				// Load new address into MAR after start of a new frame or NWA instruction
 				if (m_video_first_mar) {
@@ -1620,7 +1620,7 @@ void hp9845ct_base_state::video_fill_buff(bool buff_idx)
 			// Limit on accesses per row reached
 			break;
 		}
-		m_video_word = prog_space.read_word(m_video_mar << 1);
+		m_video_word = prog_space.read_word(m_video_mar);
 		if (m_video_load_mar) {
 			// Load new address into MAR after start of a new frame or NWA instruction
 			if (m_video_first_mar) {
