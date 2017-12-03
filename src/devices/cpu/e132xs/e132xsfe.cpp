@@ -1270,7 +1270,7 @@ bool e132xs_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			desc.regin[0] |= 1 << gsrc_code;
 			desc.regout[ldst_group] |= 1 << ldst_code;
 			desc.regout[ldstf_group] |= 1 << ldstf_code;
-			desc.targetpc = desc.pc + decode_call(desc);
+			desc.targetpc = BRANCH_TARGET_DYNAMIC;
 			desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
 			break;
 		case 0xef: // call local
@@ -1278,14 +1278,15 @@ bool e132xs_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			desc.regin[lsrc_group] |= 1 << lsrc_code;
 			desc.regout[ldst_group] |= 1 << ldst_code;
 			desc.regout[ldstf_group] |= 1 << ldstf_code;
-			desc.targetpc = desc.pc + decode_call(desc);
+			desc.targetpc = BRANCH_TARGET_DYNAMIC;
 			desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
 			break;
 		case 0xf0: case 0xf1: case 0xf2: case 0xf3: // bv, bnv, be, bne
 		case 0xf4: case 0xf5: case 0xf6: case 0xf7: // bc, bnc, bse, bht
 		case 0xf8: case 0xf9: case 0xfa: case 0xfb: // bn, bnn, blt, bgt
+			decode_pcrel(desc, op);
 			desc.regin[0] |= SR_CODE;
-			desc.targetpc = desc.pc + decode_pcrel(desc, op);
+			desc.targetpc = BRANCH_TARGET_DYNAMIC;
 			desc.flags |= OPFLAG_IS_CONDITIONAL_BRANCH;
 			break;
 		case 0xfc: // br

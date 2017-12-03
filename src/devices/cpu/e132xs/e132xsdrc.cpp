@@ -85,12 +85,10 @@ static void cfunc_update_timer_prescale(void *param)
 	((hyperstone_device *)param)->update_timer_prescale();
 }
 
-/*
 static void cfunc_print(void *param)
 {
 	((hyperstone_device *)param)->ccfunc_print();
 }
-*/
 
 /*-------------------------------------------------
     ccfunc_total_cycles - compute the total number
@@ -617,7 +615,7 @@ void hyperstone_device::generate_delay_slot_and_branch(drcuml_block *block, comp
 	/* fetch the target register if dynamic, in case it is modified by the delay slot */
 	if (desc->targetpc == BRANCH_TARGET_DYNAMIC)
 	{
-		UML_MOV(block, mem(&m_branch_dest), I0);
+		UML_MOV(block, mem(&m_branch_dest), DRC_PC);
 	}
 
 	/* update the cycles and jump through the hash table to the target */
@@ -951,7 +949,7 @@ bool hyperstone_device::generate_opcode(drcuml_block *block, compiler_state *com
 		case 0xf9: generate_b<COND_N,  IS_CLEAR>(block, compiler, desc); break;
 		case 0xfa: generate_b<COND_NZ, IS_SET>(block, compiler, desc); break;
 		case 0xfb: generate_b<COND_NZ, IS_CLEAR>(block, compiler, desc); break;
-		case 0xfc: generate_br(block, compiler, desc); break;
+		case 0xfc: generate_br(block, desc); break;
 		case 0xfd: generate_trap_op(block, compiler, desc); break;
 		case 0xfe: generate_trap_op(block, compiler, desc); break;
 		case 0xff: generate_trap_op(block, compiler, desc); break;
@@ -969,5 +967,6 @@ bool hyperstone_device::generate_opcode(drcuml_block *block, compiler_state *com
 
 	UML_LABEL(block, done);
 	UML_XOR(block, DRC_SR, DRC_SR, I7);
+
 	return true;
 }
