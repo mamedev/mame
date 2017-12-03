@@ -1249,12 +1249,12 @@ bool e132xs_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 		case 0xe4: case 0xe5: case 0xe6: case 0xe7: // dbc, dbnc, dbse, dbht - could be 4 bytes (pcrel)
 		case 0xe8: case 0xe9: case 0xea: case 0xeb: // dbn, dbnn, dblt, dbgt - could be 4 bytes (pcrel)
 			desc.regin[0] |= SR_CODE;
-			desc.targetpc = desc.pc + decode_pcrel(desc, op);
+			desc.targetpc = BRANCH_TARGET_DYNAMIC;
 			desc.flags |= OPFLAG_IS_CONDITIONAL_BRANCH;
 			desc.delayslots = 1;
 			break;
 		case 0xec: // dbr - could be 4 bytes (pcrel)
-			desc.targetpc = desc.pc + decode_pcrel(desc, op);
+			desc.targetpc = BRANCH_TARGET_DYNAMIC;
 			desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
 			desc.delayslots = 1;
 			break;

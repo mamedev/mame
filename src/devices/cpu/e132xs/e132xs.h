@@ -50,7 +50,7 @@
 
 #define SINGLE_INSTRUCTION_MODE         (1)
 
-#define ENABLE_E132XS_DRC				(1)
+#define ENABLE_E132XS_DRC				(0)
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -254,6 +254,7 @@ protected:
 
 	uint64_t m_numcycles;
 
+	uint32_t m_prev_pc;
 	uint32_t m_delay_pc;
 	uint32_t m_delay_slot;
 
@@ -511,7 +512,7 @@ private:
 	template <reg_bank SRC_GLOBAL> void generate_stdp(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
 
 	template <branch_condition CONDITION, condition_set COND_SET> void generate_b(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_br(drcuml_block *block, const opcode_desc *desc);
+	void generate_br(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
 	template <branch_condition CONDITION, condition_set COND_SET> void generate_db(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
 	void generate_dbr(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
 
