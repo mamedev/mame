@@ -275,9 +275,29 @@ void hyperstone_device::generate_movd(drcuml_block *block, compiler_state *compi
 		}
 
 		UML_AND(block, I1, DRC_SR, (S_MASK | L_MASK));
-		UML_LOAD(block, I2, (void *)m_global_regs, src_code, SIZE_DWORD, SCALE_x4);
-		UML_LOAD(block, I3, (void *)m_global_regs, srcf_code, SIZE_DWORD, SCALE_x4);
+		if (SRC_GLOBAL)
+		{
+			UML_LOAD(block, I2, (void *)m_global_regs, src_code, SIZE_DWORD, SCALE_x4);
+			UML_LOAD(block, I3, (void *)m_global_regs, srcf_code, SIZE_DWORD, SCALE_x4);
+		}
+		else
+		{
+			UML_ROLAND(block, I2, DRC_SR, 7, 0x7f);
+			UML_ADD(block, I3, I2, src_code);
+			UML_AND(block, I4, I3, 0x3f);
+			UML_LOAD(block, I2, (void *)m_local_regs, I4, SIZE_DWORD, SCALE_x4);
+
+			UML_ADD(block, I6, I2, srcf_code);
+			UML_AND(block, I5, I6, 0x3f);
+			UML_LOAD(block, I3, (void *)m_local_regs, I5, SIZE_DWORD, SCALE_x4);
+		}
+
 		UML_AND(block, DRC_PC, I2, ~1);
+
+		UML_MOV(block, mem(&m_drc_arg0), (uint32_t)'0');
+		UML_MOV(block, mem(&m_drc_arg1), I2);
+		UML_CALLC(block, cfunc_print, this);
+
 		UML_AND(block, DRC_SR, I3, 0xffe3ffff);
 		UML_ROLINS(block, DRC_SR, I2, S_SHIFT, S_MASK);
 
@@ -318,10 +338,10 @@ void hyperstone_device::generate_movd(drcuml_block *block, compiler_state *compi
 		UML_SEXT(block, I3, I3, SIZE_BYTE);
 		UML_LABEL(block, diff_in_range);
 
-		int pop_next;
+		int pop_next, done_ret;
 		UML_LABEL(block, pop_next = compiler->m_labelnum++);
 		UML_CMP(block, I3, 0);
-		UML_JMPc(block, uml::COND_GE, done);
+		UML_JMPc(block, uml::COND_GE, done_ret = compiler->m_labelnum++);
 		UML_SUB(block, I0, I0, 4);
 		UML_CALLH(block, *m_mem_read32);
 		UML_ROLAND(block, I2, I0, 30, 0x3f);
@@ -329,6 +349,9 @@ void hyperstone_device::generate_movd(drcuml_block *block, compiler_state *compi
 		UML_ADD(block, I3, I3, 1);
 		UML_TEST(block, I3, ~0);
 		UML_JMP(block, pop_next);
+
+		UML_LABEL(block, done_ret);
+		generate_delay_slot_and_branch(block, compiler, desc);
 	}
 	else if (SRC_GLOBAL && (src_code == SR_REGISTER)) // Rd doesn't denote PC and Rs denotes SR
 	{
@@ -833,6 +856,75 @@ void hyperstone_device::generate_subc(drcuml_block *block, compiler_state *compi
 template <hyperstone_device::reg_bank DST_GLOBAL, hyperstone_device::reg_bank SRC_GLOBAL>
 void hyperstone_device::generate_sub(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
 {
+	uint16_t op = desc->opptr.w[0];
+	const uint32_t src_code = op & 0xf;
+	const uint32_t dst_code = (op & 0xf0) >> 4;
+
+	generate_check_delay_pc(block);
+
+	if (!SRC_GLOBAL || !DST_GLOBAL)
+		UML_ROLAND(block, I3, DRC_SR, 7, 0x7f);
+
+	UML_DMOV(block, I0, 0);
+	UML_DMOV(block, I1, 0);
+
+	if (SRC_GLOBAL)
+	{
+		UML_LOAD(block, I0, (void *)m_global_regs, src_code, SIZE_DWORD, SCALE_x4);
+	}
+	else
+	{
+		UML_ADD(block, I2, I3, src_code);
+		UML_AND(block, I4, I2, 0x3f);
+		UML_LOAD(block, I0, (void *)m_local_regs, I4, SIZE_DWORD, SCALE_x4);
+	}
+
+	if (DST_GLOBAL)
+	{
+		UML_LOAD(block, I1, (void *)m_global_regs, dst_code, SIZE_DWORD, SCALE_x4);
+	}
+	else
+	{
+		UML_ADD(block, I2, I3, dst_code);
+		UML_AND(block, I4, I2, 0x3f);
+		UML_LOAD(block, I1, (void *)m_local_regs, I4, SIZE_DWORD, SCALE_x4);
+	}
+
+	UML_DSUB(block, I2, I1, I0);
+
+	UML_AND(block, DRC_SR, DRC_SR, ~(C_MASK | V_MASK | Z_MASK | N_MASK));
+
+	UML_DTEST(block, I2, 0x100000000U);
+	UML_SETc(block, uml::COND_NZ, I4);
+	UML_ROLINS(block, DRC_SR, I4, 0, C_MASK);
+
+	UML_XOR(block, I4, I0, I2);
+	UML_XOR(block, I5, I1, I2);
+	UML_AND(block, I6, I4, I5);
+	UML_ROLINS(block, DRC_SR, I6, 4, V_MASK);
+
+	UML_SUB(block, I2, I1, I0);
+
+	UML_TEST(block, I2, ~0);
+	UML_SETc(block, uml::COND_Z, I4);
+	UML_ROLINS(block, DRC_SR, I4, 0, Z_MASK);
+	UML_ROLINS(block, DRC_SR, I2, 3, N_MASK);
+
+	if (DST_GLOBAL)
+	{
+		UML_MOV(block, I4, dst_code);
+		UML_MOV(block, I5, I2);
+		generate_set_global_register(block, compiler, desc);
+
+		if (dst_code == 0)
+			UML_AND(block, DRC_SR, DRC_SR, ~M_MASK);
+	}
+	else
+	{
+		UML_ADD(block, I4, I3, dst_code);
+		UML_AND(block, I5, I4, 0x3f);
+		UML_STORE(block, (void *)m_local_regs, I5, I2, SIZE_DWORD, SCALE_x4);
+	}
 }
 
 

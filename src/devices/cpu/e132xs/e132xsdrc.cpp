@@ -86,12 +86,10 @@ static void cfunc_update_timer_prescale(void *param)
 	((hyperstone_device *)param)->update_timer_prescale();
 }
 
-/*
 static void cfunc_print(void *param)
 {
 	((hyperstone_device *)param)->ccfunc_print();
 }
-*/
 
 /*-------------------------------------------------
     ccfunc_total_cycles - compute the total number
