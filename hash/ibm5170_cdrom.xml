@@ -23,6 +23,35 @@
 		</part>
 	</software>
 
+	<software name="ultrasnd" supported="partial">
+		<!-- includes Gravis UltraSound (GUS) Installation - V4.11 -->
+		<description>The UltraSound CD</description>
+		<year>1995</year>
+		<publisher>Advanced Gravis</publisher>
+		<info name="version" value="1.1" />
+
+		<part name="cdrom" interface="cdrom">
+			<feature name="disk_serial" value="490-0028-XX" />
+			<diskarea name="cdrom">
+				<disk name="ultrasnd_cd" sha1="3fe3d683131e5f94bebf25a69c0cd4e496d4891e" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="ultraexp" supported="partial">
+		<!-- includes Gravis UltraSound (GUS) Installation - V3.59 -->
+		<description>The UltraSound Experience</description>
+		<year>1994</year>
+		<publisher>Advanced Gravis</publisher>
+		<info name="version" value="1.0e" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="ultraexp" sha1="145027e33e8ed4f342209ec41f9f13e7b8d5ba26" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="pcdos2k">
 		<description>PC DOS 2000</description>
 		<year>1998</year>
