@@ -102,9 +102,12 @@ void ymz770_device::device_start()
 	}
 	for (int ch = 0; ch < 8; ch++)
 	{
-		save_item(NAME(m_sequences[ch].sequence), ch);
-		save_item(NAME(m_sequences[ch].control), ch);
 		save_item(NAME(m_sequences[ch].delay), ch);
+		save_item(NAME(m_sequences[ch].sequence), ch);
+		save_item(NAME(m_sequences[ch].timer), ch);
+		save_item(NAME(m_sequences[ch].stopchan), ch);
+		save_item(NAME(m_sequences[ch].loop), ch);
+		save_item(NAME(m_sequences[ch].bank), ch);
 		save_item(NAME(m_sequences[ch].is_playing), ch);
 	}
 }
@@ -133,9 +136,12 @@ void ymz770_device::device_reset()
 	}
 	for (auto & sequence : m_sequences)
 	{
-		sequence.sequence = 0;
-		sequence.control = 0;
 		sequence.delay = 0;
+		sequence.sequence = 0;
+		sequence.timer = 0;
+		sequence.stopchan = 0;
+		sequence.loop = 0;
+		sequence.bank = 0;
 		sequence.is_playing = false;
 	}
 }
@@ -268,7 +274,7 @@ void ymz770_device::sequencer()
 				switch (reg)
 				{
 				case 0x0f:
-					if (sequence.control & 1)
+					if (sequence.loop)
 					{
 						// loop sequence
 						uint8_t sqn = sequence.sequence;
@@ -401,7 +407,7 @@ void ymz770_device::internal_reg_write(uint8_t reg, uint8_t data)
 					m_sequences[ch].is_playing = false;
 				}
 
-				m_sequences[ch].control = data;
+				m_sequences[ch].loop = data & 1;
 				break;
 
 			default:
@@ -503,9 +509,65 @@ void ymz774_device::internal_reg_write(uint8_t reg, uint8_t data)
 	}
 	else if (reg < 0xd0)
 	{
-		if (m_bank == 0) // Sequencer, in PGM2 games not used at all
+		if (m_bank == 0)
 		{
-			if (data) logerror("sequencer unimplemented %02X %02X\n", reg, data);
+			if (reg < 0xb0)
+			{
+				int sq = reg & 7;
+				switch (reg & 0xf8)
+				{
+				case 0x60: // sequence num H and L
+				case 0x68:
+					sq = (reg >> 1) & 7;
+					if (reg & 1)
+						m_sequences[sq].sequence = (m_sequences[sq].sequence & 0xff00) | data;
+					else
+						m_sequences[sq].sequence = (m_sequences[sq].sequence & 0x00ff) | ((data & 0x0f) << 8); // TODO check if total number really upto 0x1000
+					break;
+				case 0x70: // Start / Stop
+					if (data)
+					{
+						uint32_t pptr = get_seq_offs(m_sequences[sq].sequence);
+						m_sequences[sq].data = &m_rom[pptr];
+						m_sequences[sq].delay = 0;
+						m_sequences[sq].is_playing = true;
+					}
+					else
+					{
+						m_sequences[sq].is_playing = false;
+					}
+					break;
+				case 0x78: // Pause / Resume
+					if (data) logerror("SEQ pause/resume unimplemented %02X %02X\n", reg, data);
+					break;
+				case 0x80: // Loop count, 0 = off, 255 - infinite
+					m_sequences[sq].loop = data;
+					break;
+				case 0x88: // timer H and L
+				case 0x90:
+					sq = (reg >> 1) & 7;
+					if (reg & 1)
+						m_sequences[sq].timer = (m_sequences[sq].timer & 0xff00) | data;
+					else
+						m_sequences[sq].timer = (m_sequences[sq].timer & 0x00ff) | (data << 8);
+					break;
+				case 0x98: // Off trigger, bit4 = on/off, bits0-3 channel (end sequence when channel playback ends)
+					if (data) logerror("SEQ Off trigger unimplemented %02X %02X\n", reg, data);
+					break;
+				case 0xa0: // stop channel mask H and L, what it for ? stop chanels immediatelly or when sequence ends (so far assuming later) ?
+				case 0xa8:
+					sq = (reg >> 1) & 7;
+					if (reg & 1)
+						m_sequences[sq].stopchan = (m_sequences[sq].stopchan & 0xff00) | data;
+					else
+						m_sequences[sq].stopchan = (m_sequences[sq].stopchan & 0x00ff) | (data << 8);
+					break;
+				}
+			}
+			else
+			{
+				if (data) logerror("SQC unimplemented %02X %02X\n", reg, data);
+			}
 		}
 		// else bank1 - Equalizer control
 	}
@@ -526,6 +588,67 @@ void ymz774_device::internal_reg_write(uint8_t reg, uint8_t data)
 			m_bank = data & 1;
 			if (data > 1) logerror("Set bank %02X!\n", data);
 			break;
+		}
+	}
+}
+
+void ymz774_device::sequencer()
+{
+	for (int i = 0; i < 8; i++)
+	{
+		auto & sequence = m_sequences[i];
+		if (sequence.is_playing)
+		{
+			if (sequence.delay > 0)
+			{
+				--sequence.delay;
+			}
+			else
+			{
+				int reg = *sequence.data++;
+				uint8_t data = *sequence.data++;
+				switch (reg)
+				{
+				case 0xff: // end
+					for (int ch = 0; ch < 16; ch++)	// check this
+						if (sequence.stopchan & (1 << ch))
+							m_channels[ch].is_playing = false;
+					if (sequence.loop)
+					{
+						if (sequence.loop != 255)
+							--sequence.loop;
+						uint32_t pptr = get_seq_offs(sequence.sequence);
+						sequence.data = &m_rom[pptr];
+					}
+					else
+					{
+						sequence.is_playing = false;
+					}
+					break;
+				case 0xfe: // timer delay
+					sequence.delay = sequence.timer * 32; // possible needed -1 or +(32-1)
+					break;
+				case 0xf0:
+					sequence.bank = data & 1;
+					break;
+				default:
+				{
+					uint8_t temp = m_bank;
+					m_bank = sequence.bank;
+					if (m_bank == 0 && reg >= 0x60 && reg < 0xb0) // if we hit SEQ registers need to add this sequence offset
+					{
+						int sqn = i;
+						if (reg < 0x70 || (reg >= 0x88 && reg < 0x98) || reg >= 0xa0)
+							sqn = i * 2;
+						internal_reg_write(reg + sqn, data);
+					}
+					else
+						internal_reg_write(reg, data);
+					m_bank = temp;
+				}
+					break;
+				}
+			}
 		}
 	}
 }

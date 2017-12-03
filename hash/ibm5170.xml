@@ -4511,6 +4511,71 @@
 		</part>
 	</software>
 
+	<software name="gravutil">
+		<!-- included with UltraSound MAX card; includes Commander Keen 4 shareware -->
+		<description>Gravis Utilities V2.1</description>
+		<year>1993</year>
+		<publisher>Advanced Gravis</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="GravisUtilities.img" size="737280" crc="35973f99" sha1="74a4bf84ba452f3d86420dcf28f9dd5b0d0aa19e" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ultrasnd">
+		<description>Gravis UltraSound (GUS) Installation - V3.53</description>
+		<year>1994</year>
+		<publisher>Advanced Gravis</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="353_Disk1.img" size="1474560" crc="d1a8b7ab" sha1="e0027ee4cc10077a97d1e21e250bf159253b345f" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="353_Disk2.img" size="1474560" crc="7b7e4f0e" sha1="1eb3fd5564dae4e5993a2c9f3398c5a260b197a5" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="353_Disk3.img" size="1474560" crc="c57f118e" sha1="715d5769729bc7b15b03748c1c63e092393dbfa6" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="353_Disk4.img" size="1474560" crc="1fafddb9" sha1="4cc40f709be068156b62029336acd03f7afa016b" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="353_Disk5.img" size="1474560" crc="c6f8c717" sha1="04f275b0e0cbb676cea73597a1516afae2eb4b9b" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="353_Disk6.img" size="1474560" crc="59b15abe" sha1="35e485e64dd4828a935a25a8cf71fcfb11d371ec" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gusbonus" supported="no">
+		<!-- includes WinSoft Sound Station, UltraSound Studio -->
+		<description>Gravis UltraSound BONUS Software Installation v. 1.52</description>
+		<year>1994</year>
+		<publisher>Advanced Gravis</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="bonus152_1.img" size="1474560" crc="b6fdc5b1" sha1="72c66435c1af013ccfe7be1031eeccc01311be31" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="bonus152_2.img" size="1474560" crc="af96295d" sha1="5927d4503dc27accc6602f01bfea1530b8af35a0" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="hscd414">
 		<description>High-Speed CD-ROM Driver (Version 4.14)</description>
 		<year>199?</year>
@@ -6561,6 +6626,58 @@
 		</part>
 	</software>
 
+	<software name="1869de">
+		<description>1869 - Erlebte Geschichte Teil I (German)</description>
+		<year>1992</year>
+		<publisher>Max Design</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="1869 - Erlebte Geschichte Teil I (Germany) (Disk 1).img" size="1474560" crc="9af274d0" sha1="8569faeab7b3499b0e45efd2d8f5c4e20a63c62e" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="1869 - Erlebte Geschichte Teil I (Germany) (Disk 2).img" size="1474560" crc="ce359b07" sha1="eb09902d9d62fb52ee743d278ff4c51144fcdebb" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="1942" supported="no">
+		<description>1942 - The Pacific Air War</description>
+		<year>1994</year>
+		<publisher>MicroProse</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="1942 - The Pacific Air War (USA, Europe) (Disk 1).img" size="1474560" crc="a7610577" sha1="f63934123a61164459ae2bac9da618acc2888a64" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="1942 - The Pacific Air War (USA, Europe) (Disk 2).img" size="1474560" crc="88a0a99c" sha1="e86d85a60a63be3bfb6066f51b2ef2f23535f8de" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="1942 - The Pacific Air War (USA, Europe) (Disk 3).img" size="1474560" crc="06f5a0eb" sha1="d71013af36546e7006508c3a96c50efbffd14398" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="1942 - The Pacific Air War (USA, Europe) (Disk 4).img" size="1474560" crc="45b22ba1" sha1="d7858c3ace3e10bd95a2b96375db35724b4c935c" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="1942 - The Pacific Air War (USA, Europe) (Disk 5).img" size="1474560" crc="5c03ea3f" sha1="32d3661cede5ef47fc04b45183db20e8dce5ee51" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="1942 - The Pacific Air War (USA, Europe) (Disk 6).img" size="1474560" crc="0bdf1618" sha1="5401ce331d8d7b4ef3c117088f00b853f7c75f33" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="5thfleet" supported="partial">
 		<description>5th Fleet</description>
 		<year>1994</year>
@@ -6780,6 +6897,33 @@
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Boppin' - Super Ultimate (USA) (v1.1) (Disk 2).img" size="1474560" crc="20c4dc37" sha1="e39ac3f58f81813e515e8fa203dff7e9b9ebf9d3" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wincr2">
+		<!-- converted from DDI format -->
+		<description>Classic Road 2</description>
+		<year>1994</year>
+		<publisher>Progress</publisher>
+		<info name="alt_title" value="クラシック・ロード2" />
+		<info name="usage" value="Requires Japanese Windows 3.x" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<!-- <rom name="0509_1.DDI" size="820224" crc="3a728485" sha1="ffb9f55a775a9fd221be3a3abf3eec1ab5042986" offset="0"/> -->
+				<rom name="0509_1.img" size="1474560" crc="4ad1ee23" sha1="575079823ab1cd9db22f6e86b42c5b08a2a9518e" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<!-- <rom name="0509_2.DDI" size="783360" crc="6b932508" sha1="030f516ce91c2b9d6b99293ad644dad84f7361f4" offset="0"/> -->
+				<rom name="0509_2.img" size="1474560" crc="90a0f484" sha1="6ca68e4a0787590b60da923c0355a9f65c47d6d6" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<!-- <rom name="0509_3.DDI" size="552960" crc="8d2ee3c4" sha1="c2a50a9d5347632345eea0f49d489dfa7617c1dc" offset="0"/> -->
+				<rom name="0509_3.img" size="1474560" crc="92441ad3" sha1="8765cc260b2e921a60d4b3b6ab3e8b13430bfc9e" offset="0"/>
 			</dataarea>
 		</part>
 	</software>

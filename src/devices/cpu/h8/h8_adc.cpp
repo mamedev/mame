@@ -168,7 +168,7 @@ void h8_adc_device::conversion_wait(bool first, bool poweron, uint64_t current_t
 
 void h8_adc_device::buffer_value(int port, int buffer)
 {
-	buf[buffer] = io->read_word(2*(h8_device::ADC_0 + port));
+	buf[buffer] = io->read_word(h8_device::ADC_0 + port);
 	if(V>=1) logerror("adc buffer %d -> %d:%03x\n", port, buffer, buf[buffer]);
 }
 

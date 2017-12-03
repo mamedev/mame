@@ -231,21 +231,23 @@ osd_file::error osd_file::open(std::string const &orig_path, uint32_t openflags,
 
 	// get the file size
 	DWORD upper, lower;
-	if (is_path_to_physical_drive(path.c_str())) {
-
+	if (is_path_to_physical_drive(path.c_str()))
+	{
 		GET_LENGTH_INFORMATION gli;
 		DWORD ret;
-		int getsize = DeviceIoControl(h, IOCTL_DISK_GET_LENGTH_INFO, 0, 0, &gli, sizeof(gli), &ret, 0);
-		if (getsize==0) {
+		if (!DeviceIoControl(h, IOCTL_DISK_GET_LENGTH_INFO, nullptr, 0, &gli, sizeof(gli), &ret, nullptr))
+		{
 			upper = 0;
 			lower = INVALID_FILE_SIZE;
 		}
-		else {
+		else
+		{
 			lower = gli.Length.LowPart;
 			upper = gli.Length.HighPart;
 		}
 	}
-	else {
+	else
+	{
 		lower = GetFileSize(h, &upper);
 	}
 	if (INVALID_FILE_SIZE == lower)

@@ -280,8 +280,7 @@ static ADDRESS_MAP_START( t4490_map, AS_PROGRAM, 8, t4490_state )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x3000, 0x3fff) AM_ROM AM_REGION("maincpu", 0x3000)
 	AM_RANGE(0x9500, 0x95ff) AM_RAM
-	AM_RANGE(0x9030, 0x9030) AM_DEVREADWRITE("acia", acia6850_device, status_r, control_w)
-	AM_RANGE(0x9031, 0x9031) AM_DEVREADWRITE("acia", acia6850_device, data_r, data_w)
+	AM_RANGE(0x9030, 0x9031) AM_DEVREADWRITE("acia", acia6850_device, read, write)
 	AM_RANGE(0x9034, 0x9037) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
 	AM_RANGE(0x9038, 0x903b) AM_DEVREADWRITE("pia2", pia6821_device, read, write)
 	AM_RANGE(0xa000, 0xffff) AM_ROM AM_REGION("maincpu", 0xa000)

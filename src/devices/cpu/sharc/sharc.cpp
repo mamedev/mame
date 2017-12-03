@@ -400,7 +400,7 @@ void adsp21062_device::external_iop_write(uint32_t address, uint32_t data)
 	else
 	{
 		osd_printf_debug("SHARC IOP write %08X, %08X\n", address, data);
-		m_data->write_dword(address << 2, data);
+		m_data->write_dword(address, data);
 	}
 }
 
@@ -1031,7 +1031,7 @@ void adsp21062_device::execute_run()
 
 			debugger_instruction_hook(this, m_core->pc);
 
-			m_core->opcode = m_program->read_qword(m_core->pc << 3);
+			m_core->opcode = m_program->read_qword(m_core->pc);
 
 			// handle looping
 			if (m_core->pc == m_core->laddr.addr)

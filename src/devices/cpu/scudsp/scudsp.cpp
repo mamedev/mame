@@ -125,10 +125,10 @@ DEFINE_DEVICE_TYPE(SCUDSP, scudsp_cpu_device, "scudsp", "Sega SCUDSP")
 #define FLAGS_MASK 0x06ff8000
 #define INSTA_DMA 1
 
-#define scudsp_readop(A) m_program->read_dword(A << 2)
-#define scudsp_writeop(A, B) m_program->write_dword(A << 2, B)
-#define scudsp_readmem(A,MD) m_data->read_dword((A | (MD << 6)) << 2)
-#define scudsp_writemem(A,MD,B) m_data->write_dword((A | (MD << 6)) << 2, B)
+#define scudsp_readop(A) m_program->read_dword(A)
+#define scudsp_writeop(A, B) m_program->write_dword(A, B)
+#define scudsp_readmem(A,MD) m_data->read_dword(A | (MD << 6))
+#define scudsp_writemem(A,MD,B) m_data->write_dword(A | (MD << 6), B)
 
 uint32_t scudsp_cpu_device::scudsp_get_source_mem_reg_value( uint32_t mode )
 {

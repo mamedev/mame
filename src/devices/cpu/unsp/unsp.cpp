@@ -116,12 +116,12 @@ void unsp_device::unimplemented_opcode(uint16_t op)
 
 uint16_t unsp_device::READ16(uint32_t address)
 {
-	return m_program->read_word(address<<1);
+	return m_program->read_word(address);
 }
 
 void unsp_device::WRITE16(uint32_t address, uint16_t data)
 {
-	m_program->write_word(address<<1, data);
+	m_program->write_word(address, data);
 }
 
 /*****************************************************************************/

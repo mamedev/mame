@@ -69,7 +69,7 @@ WRITE16_MEMBER(midyunit_state::midyunit_cmos_enable_w)
 		{
 			if (data == 0x500)
 			{
-				m_prot_result = space.read_word(TOBYTE(0x10a4390)) << 4;
+				m_prot_result = space.read_word(0x8521c80) << 4;
 				logerror("  desired result = %04X\n", m_prot_result);
 			}
 		}

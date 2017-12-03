@@ -401,8 +401,7 @@ static ADDRESS_MAP_START(bml3_mem, AS_PROGRAM, 8, bml3_state)
 	AM_RANGE(0x4400, 0x9fff) AM_RAM
 	AM_RANGE(0xff40, 0xff46) AM_NOP // lots of unknown reads and writes
 	AM_RANGE(0xffc0, 0xffc3) AM_DEVREADWRITE("pia", pia6821_device, read, write)
-	AM_RANGE(0xffc4, 0xffc4) AM_DEVREADWRITE("acia", acia6850_device, status_r, control_w)
-	AM_RANGE(0xffc5, 0xffc5) AM_DEVREADWRITE("acia", acia6850_device, data_r, data_w)
+	AM_RANGE(0xffc4, 0xffc5) AM_DEVREADWRITE("acia", acia6850_device, read, write)
 	AM_RANGE(0xffc6, 0xffc7) AM_READWRITE(bml3_6845_r,bml3_6845_w)
 	// KBNMI - Keyboard "Break" key non-maskable interrupt
 	AM_RANGE(0xffc8, 0xffc8) AM_READ(bml3_keyb_nmi_r) // keyboard nmi

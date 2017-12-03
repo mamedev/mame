@@ -511,7 +511,7 @@ void v25_common_device::device_start()
 	save_item(NAME(m_prefetch_reset));
 
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<0>();
 	m_io = &space(AS_IO);
 
 	m_pt_in.resolve_safe(0xff);

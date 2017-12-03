@@ -175,12 +175,12 @@ void skimaxx_state::video_start()
 // TODO: Might not be used
 TMS340X0_TO_SHIFTREG_CB_MEMBER(skimaxx_state::to_shiftreg)
 {
-	memcpy(shiftreg, &m_fg_buffer[TOWORD(address)], 512 * sizeof(uint16_t));
+	memcpy(shiftreg, &m_fg_buffer[address >> 4], 512 * sizeof(uint16_t));
 }
 
 TMS340X0_FROM_SHIFTREG_CB_MEMBER(skimaxx_state::from_shiftreg)
 {
-	memcpy(&m_fg_buffer[TOWORD(address)], shiftreg, 512 * sizeof(uint16_t));
+	memcpy(&m_fg_buffer[address >> 4], shiftreg, 512 * sizeof(uint16_t));
 }
 
 

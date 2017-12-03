@@ -238,6 +238,17 @@ struct z8000_unidasm_t : z8000_disassembler::config
 	virtual bool get_segmented_mode() const override { return segmented_mode; }
 } z8000_unidasm;
 
+// Configuration missing
+struct hyperstone_unidasm_t : hyperstone_disassembler::config
+{
+	bool h;
+	u8 fp;
+	hyperstone_unidasm_t() { h = false; fp = 0; }
+	virtual ~hyperstone_unidasm_t() = default;
+
+	virtual u8 get_fp() const { return fp; }
+	virtual bool get_h() const { return h; }
+} hyperstone_unidasm;
 
 
 
@@ -322,7 +333,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "hmcs40",          le, -1, []() -> util::disasm_interface * { return new hmcs40_disassembler; } },
 	{ "hp_hybrid",       be, -1, []() -> util::disasm_interface * { return new hp_hybrid_disassembler; } },
 	{ "hp_5061_3001",    be, -1, []() -> util::disasm_interface * { return new hp_5061_3001_disassembler; } },
-	{ "hyperstone",      be,  0, []() -> util::disasm_interface * { return new hyperstone_disassembler; } },
+	{ "hyperstone",      be,  0, []() -> util::disasm_interface * { return new hyperstone_disassembler(&hyperstone_unidasm); } },
 	{ "i4004",           le,  0, []() -> util::disasm_interface * { return new i4004_disassembler; } },
 	{ "i4040",           le,  0, []() -> util::disasm_interface * { return new i4040_disassembler; } },
 	{ "i8008",           le,  0, []() -> util::disasm_interface * { return new i8008_disassembler; } },
@@ -710,7 +721,7 @@ unidasm_data_buffer::unidasm_data_buffer(util::disasm_interface *_disasm, const 
 			break;
 
 		case -1:
-			lr8 = [this](offs_t pc) -> u8 { abort(); };
+			lr8 = [](offs_t pc) -> u8 { abort(); };
 			lr16 = [this](offs_t pc) -> u16 {
 				const u16 *p = get_ptr<u16>(pc);
 				return p ?
@@ -758,8 +769,8 @@ unidasm_data_buffer::unidasm_data_buffer(util::disasm_interface *_disasm, const 
 			break;
 
 		case -2:
-			lr8 = [this](offs_t pc) -> u8 { abort(); };
-			lr16 = [this](offs_t pc) -> u16 { abort(); };
+			lr8 = [](offs_t pc) -> u8 { abort(); };
+			lr16 = [](offs_t pc) -> u16 { abort(); };
 			lr32 = [this](offs_t pc) -> u16 {
 				const u32 *p = get_ptr<u32>(pc);
 				return p ?
@@ -789,9 +800,9 @@ unidasm_data_buffer::unidasm_data_buffer(util::disasm_interface *_disasm, const 
 			break;
 
 		case -3:
-			lr8 = [this](offs_t pc) -> u8 { abort(); };
-			lr16 = [this](offs_t pc) -> u16 { abort(); };
-			lr32 = [this](offs_t pc) -> u32 { abort(); };
+			lr8 = [](offs_t pc) -> u8 { abort(); };
+			lr16 = [](offs_t pc) -> u16 { abort(); };
+			lr32 = [](offs_t pc) -> u32 { abort(); };
 			lr64 = [this](offs_t pc) -> u64 {
 				const u64 *p = get_ptr<u64>(pc);
 				return p ?
@@ -801,10 +812,9 @@ unidasm_data_buffer::unidasm_data_buffer(util::disasm_interface *_disasm, const 
 			break;
 
 		case 3:
-			assert(entry->endian == );
-			lr8 = [this](offs_t pc) -> u8 { abort(); };
-			lr32 = [this](offs_t pc) -> u32 { abort(); };
-			lr64 = [this](offs_t pc) -> u64 { abort(); };
+			lr8 = [](offs_t pc) -> u8 { abort(); };
+			lr32 = [](offs_t pc) -> u32 { abort(); };
+			lr64 = [](offs_t pc) -> u64 { abort(); };
 			lr16 = [this](offs_t pc) -> u16 {
 				if(pc < base_pc)
 					return 0x0000;
@@ -1028,7 +1038,7 @@ int main(int argc, char *argv[])
 			lpce &= pc_mask;
 			return dis->pc_linear_to_real(lpce);
 		};
-		next_pc_wrap = [pc_mask, page_mask, dis = disasm.get()](offs_t pc, offs_t size) {
+		next_pc_wrap = [page_mask, dis = disasm.get()](offs_t pc, offs_t size) {
 			offs_t lpc = dis->pc_real_to_linear(pc);
 			offs_t lpce = (lpc & ~page_mask) | ((lpc + size) & page_mask);
 			return dis->pc_linear_to_real(lpce);
@@ -1042,7 +1052,7 @@ int main(int argc, char *argv[])
 			pce &= pc_mask;
 			return pce;
 		};
-		next_pc_wrap = [pc_mask, page_mask](offs_t pc, offs_t size) {
+		next_pc_wrap = [page_mask](offs_t pc, offs_t size) {
 			offs_t pce = (pc & ~page_mask) | ((pc + size) & page_mask);
 			return pce;
 		};

@@ -421,7 +421,7 @@ void v60_device::device_start()
 	m_moddim = 0;
 
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<0>();
 	m_io = &space(AS_IO);
 
 	save_item(NAME(m_fetch_xor));

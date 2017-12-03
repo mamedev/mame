@@ -189,7 +189,7 @@ private:
 	// 2 = next opcode is the second half of int firing 'CALL 0100'
 	int m_irq_firing;
 	address_space *m_program, *m_data;
-	direct_read_data *m_direct;
+	direct_read_data<-2> *m_direct;
 
 protected:
 // device callbacks

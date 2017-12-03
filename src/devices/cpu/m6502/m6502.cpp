@@ -45,8 +45,8 @@ void m6502_device::init()
 	mintf->program  = &space(AS_PROGRAM);
 	mintf->sprogram = has_space(AS_OPCODES) ? &space(AS_OPCODES) : mintf->program;
 
-	mintf->direct  = &mintf->program->direct();
-	mintf->sdirect = &mintf->sprogram->direct();
+	mintf->direct  = mintf->program->direct<0>();
+	mintf->sdirect = mintf->sprogram->direct<0>();
 
 	sync_w.resolve_safe();
 

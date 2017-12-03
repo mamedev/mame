@@ -636,8 +636,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, accomm_state )
 	AM_RANGE(0x400000, 0x400000) AM_NOP                                                           /* MODEM */
 	AM_RANGE(0x410000, 0x410000) AM_RAM                                                           /* Econet ID */
 	AM_RANGE(0x420000, 0x42000f) AM_DEVREADWRITE("via6522", via6522_device, read, write)          /* 6522 VIA (printer etc) */
-	AM_RANGE(0x430000, 0x430000) AM_DEVREADWRITE("acia", acia6850_device, status_r, control_w)    /* 2641 ACIA (RS423) */
-	AM_RANGE(0x430001, 0x430001) AM_DEVREADWRITE("acia", acia6850_device, data_r, data_w)         /* 2641 ACIA (RS423) */
+	AM_RANGE(0x430000, 0x430001) AM_DEVREADWRITE("acia", acia6850_device, read, write)            /* 2641 ACIA (RS423) */
 	AM_RANGE(0x440000, 0x440000) AM_WRITE(ch00switch_w)                                           /* CH00SWITCH */
 	AM_RANGE(0x450000, 0x457fff) AM_RAM AM_SHARE("vram")                                          /* Video RAM */
 	AM_RANGE(0x458000, 0x459fff) AM_READ(read_keyboard1)                                          /* Video ULA */

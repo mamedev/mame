@@ -1,10 +1,7 @@
 /*
- * Copyright 2010-2016 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
-
-#ifndef BX_SIMD_NI_H_HEADER_GUARD
-#define BX_SIMD_NI_H_HEADER_GUARD
 
 namespace bx
 {
@@ -554,5 +551,3 @@ namespace bx
 	}
 
 } // namespace bx
-
-#endif // BX_SIMD_NI_H_HEADER_GUARD

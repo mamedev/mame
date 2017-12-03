@@ -37,8 +37,10 @@ public:
 private:
 	struct global_entry
 	{
-		void *      base;
-		u32         size;
+		global_entry() { }
+
+		void *      base = nullptr;
+		u32         size = 0;
 	};
 
 
@@ -79,12 +81,12 @@ private:
 	u64 cheat_byte_swap(const cheat_system *cheatsys, u64 value);
 	u64 cheat_read_extended(const cheat_system *cheatsys, address_space &space, offs_t address);
 
-	u64 execute_min(symbol_table &table, void *ref, int params, const u64 *param);
-	u64 execute_max(symbol_table &table, void *ref, int params, const u64 *param);
-	u64 execute_if(symbol_table &table, void *ref, int params, const u64 *param);
+	u64 execute_min(symbol_table &table, int params, const u64 *param);
+	u64 execute_max(symbol_table &table, int params, const u64 *param);
+	u64 execute_if(symbol_table &table, int params, const u64 *param);
 
-	u64 global_get(symbol_table &table, void *ref);
-	void global_set(symbol_table &table, void *ref, u64 value);
+	u64 global_get(symbol_table &table, global_entry *global);
+	void global_set(symbol_table &table, global_entry *global, u64 value);
 
 	int mini_printf(char *buffer, const char *format, int params, u64 *param);
 
@@ -162,7 +164,7 @@ private:
 	debugger_cpu&       m_cpu;
 	debugger_console&   m_console;
 
-	global_entry *m_global_array;
+	std::unique_ptr<global_entry []> m_global_array;
 	cheat_system m_cheat;
 
 	static const size_t MAX_GLOBALS;

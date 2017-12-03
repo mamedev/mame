@@ -171,7 +171,7 @@ private:
 	uint32_t m_source;        /* temp register */
 	uint32_t m_destination;   /* temp register */
 	address_space *m_program;
-	direct_read_data *m_direct;
+	direct_read_data<0> *m_direct;
 	address_space *m_io;
 	uint32_t m_stopped;       /* Sets how the CPU is stopped */
 

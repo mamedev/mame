@@ -73,7 +73,7 @@ protected:
 	// device_disasm_interface overrides
 	virtual util::disasm_interface *create_disassembler() override;
 
-	direct_read_data *m_direct;
+	direct_read_data<-3> *m_direct;
 
 private:
 

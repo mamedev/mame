@@ -1570,7 +1570,7 @@ void pps4_device::execute_run()
 void pps4_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<0>();
 	m_data = &space(AS_DATA);
 	m_io = &space(AS_IO);
 

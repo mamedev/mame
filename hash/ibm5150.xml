@@ -5226,6 +5226,40 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="pcdos11m" cloneof="pcdos11">
+		<description>IBM Personal Computer DOS (Version 1.10, Master diskette)</description>
+		<year>1982</year>
+		<publisher>IBM</publisher>
+		<info name="version" value="1.10" />
+		<info name="usage" value="Requires ROM BASIC" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="disk_serial" value="6936918" />
+			<feature name="part_id" value="DOS" />
+			<dataarea name="flop" size = "142637">
+				<rom name="PC-DOS_1.1_IBM.td0" size="142637" crc="54515c60" sha1="2e9d88a08f754740de0c0a9fd3702076dcd4abf3" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="disk_serial" value="6936920" />
+			<feature name="part_id" value="Samples" />
+			<dataarea name="flop" size = "48311">
+				<rom name="PC-DOS_1.1_Samples_IBM.td0" size="48311" crc="64075a0c" sha1="b4d129b8d0dd4f3db2a38fb4792165b172555d3f" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pcdos11ma" cloneof="pcdos11" supported="no">
+		<description>IBM Personal Computer DOS (Version 1.10) (Master diskette, alt)</description>
+		<year>1982</year>
+		<publisher>IBM</publisher>
+		<info name="version" value="1.10" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "146929">
+				<rom name="dos1.td0" size="146929" crc="52f54b0d" sha1="ff156f90f22329f19684111cd84b7b353d5917b3" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pcdos2">
 		<description>IBM Personal Computer DOS (Version 2.00)</description>
 		<year>1983</year>
@@ -5284,8 +5318,30 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="pcdos2m" cloneof="pcdos2">
+		<description>IBM Personal Computer DOS (Version 2.00, Master diskette)</description>
+		<year>1983</year>
+		<publisher>IBM</publisher>
+		<info name="version" value="2.00" />
+		<info name="usage" value="Requires ROM BASIC" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="disk_serial" value="6183372" />
+			<feature name="part_id" value="DOS" />
+			<dataarea name="flop" size = "184320">
+				<rom name="PC-DOS_2.00_IBM.img" size="184320" crc="6042591e" sha1="b1616436809a894d1c968582c563255b999fe4c2" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="disk_serial" value="6183373" />
+			<feature name="part_id" value="Supplemental Programs" />
+			<dataarea name="flop" size = "184320">
+				<rom name="PC-DOS_2.00_Supplement_IBM.img" size="184320" crc="cf37729c" sha1="4f6fcc26d4382a8fed950bfaa8961669d513f93b" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pcdos21">
-		<description>IBM Personal Computer DOS (Version 2.10)</description>
+		<description>IBM Personal Computer DOS (Version 2.10, set 1)</description>
 		<year>1983</year>
 		<publisher>IBM</publisher>
 		<info name="version" value="2.10" />
@@ -5302,7 +5358,7 @@ has been replaced with an all-zero block. -->
 	</software>
 
 	<software name="pcdos21a" cloneof="pcdos21">
-		<description>IBM Personal Computer DOS (Version 2.10, Alt)</description>
+		<description>IBM Personal Computer DOS (Version 2.10, set 2)</description>
 		<year>1983</year>
 		<publisher>IBM</publisher>
 		<info name="version" value="2.10" />
@@ -5314,6 +5370,23 @@ has been replaced with an all-zero block. -->
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size = "184320">
 				<rom name="pcdos21s.img" size="184320" crc="66a85cd4" sha1="d87f5542579eebcc6ea3e7d9c316fc23fd1b5318" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pcdos21b" cloneof="pcdos21">
+		<description>IBM Personal Computer DOS (Version 2.10, set 3)</description>
+		<year>1983</year>
+		<publisher>IBM</publisher>
+		<info name="version" value="2.10" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "184320">
+				<rom name="D210_d1_180.img" size="184320" crc="22632195" sha1="0135f3be1ebb7569022ac10e9fc3986465b13dcd" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "184320">
+				<rom name="D210_d2_180.img" size="184320" crc="ab27cfdd" sha1="ac298822576c1c6b952f4e1d60ff50488d542168" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5948,6 +6021,52 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="a10tank">
+		<description>A-10 Tank Killer (1.5)</description>
+		<year>1991</year>
+		<publisher>Dynamix</publisher>
+		<info name="version" value="1.5" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="A-10 Tank Killer (USA) (v1.5) (Disk 1).img" size="737280" crc="f57f0bf1" sha1="80793adc8ff57b68e650997640cfc14ac11dd1f9" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="A-10 Tank Killer (USA) (v1.5) (Disk 2).img" size="737280" crc="527bdd8b" sha1="698c199ad675186f2cbc3effd9eb6385d4db58c4" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="A-10 Tank Killer (USA) (v1.5) (Disk 3).img" size="737280" crc="067de72a" sha1="c825880206cad14620a50e323c26823504963a41" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="A-10 Tank Killer (USA) (v1.5) (Disk 4).img" size="737280" crc="05c0aa0c" sha1="ba019c8fc98ca7b29fdb31737ddec58d256a9908" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="a10tanka" cloneof="a10tank">
+		<!-- Dumped via Kryoflux, all tracks show as good and unmodified -->
+		<description>A-10 Tank Killer (1.1)</description>
+		<year>1990</year>
+		<publisher>Dynamix</publisher>
+		<info name="version" value="Ver#1.1 / 5.14.90" />
+		<info name="serial" value="316010062809139" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="a10tank11_1.img" size="737280" crc="91db1441" sha1="4ac1cf90e768f0f1db8268fd20dd91ea7f39c081" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="a10tank11_2.img" size="737280" crc="a65ceec8" sha1="cd6fd61fc58ec666a2e65accaff9f3c74bd85955" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="academy" supported="no">
 		<description>Academy - Tau Ceti 2</description>
 		<year>1987</year>
@@ -6049,8 +6168,57 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="azurebndb" cloneof="azurebnd">
+		<description>Advanced Dungeons &amp; Dragons - Curse of the Azure Bonds (V1.0)</description>
+		<year>1989</year>
+		<publisher>SSI</publisher>
+		<info name="developer" value="SSI" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Curse of the Azure Bonds (V1.0) [SSI] [1989] [5.25DD] [disk A].img" size="368640" crc="37a54248" sha1="81c63263b52a39d2e38ab1fb71ab4568fe1419c2" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Curse of the Azure Bonds (V1.0) [SSI] [1989] [5.25DD] [disk B].img" size="368640" crc="014bb852" sha1="73eea7540f6edc512ed89d73d7faefe0abd8400a" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Curse of the Azure Bonds (V1.0) [SSI] [1989] [5.25DD] [disk C].img" size="368640" crc="f86fea1b" sha1="b1e1f4daa42abb7738309bfc4afad65d2883a5e8" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Curse of the Azure Bonds (V1.0) [SSI] [1989] [5.25DD] [disk D].img" size="368640" crc="7aa75fa1" sha1="62659d805a255fa640e4a24ffb7dcff51a4da68e" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="poolrad">
-		<description>Advanced Dungeons &amp; Dragons - Pool of Radiance</description>
+		<description>Advanced Dungeons &amp; Dragons - Pool of Radiance (5.25")</description>
+		<year>1988</year>
+		<publisher>SSI</publisher>
+		<info name="developer" value="SSI" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Pool of Radiance [1988] [SSI] [5.25DD] [disk A].img" size="368640" crc="83b031fa" sha1="7b3bd9c4e37b925a9bed895317aefcfe1298f206" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Pool of Radiance [1988] [SSI] [5.25DD] [disk B].img" size="368640" crc="82ae7aed" sha1="71bc17c47ecbb42d650fc6797b8cccfba7876f99" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Pool of Radiance [1988] [SSI] [5.25DD] [disk C].img" size="368640" crc="c10a2962" sha1="0452af2639973bda8630cc5f13333e63f7677537" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="poolrad35" cloneof="poolrad">
+		<description>Advanced Dungeons &amp; Dragons - Pool of Radiance (3.5")</description>
 		<year>1988</year>
 		<publisher>SSI</publisher>
 		<info name="version" value="1.2" />

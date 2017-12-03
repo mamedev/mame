@@ -19,10 +19,10 @@ m4510_device::m4510_device(const machine_config &mconfig, const char *tag, devic
 	map_enable(0),
 	nomap(false)
 {
-	program_config.m_addrbus_width = 20;
+	program_config.m_addr_width = 20;
 	program_config.m_logaddr_width = 16;
 	program_config.m_page_shift = 13;
-	sprogram_config.m_addrbus_width = 20;
+	sprogram_config.m_addr_width = 20;
 	sprogram_config.m_logaddr_width = 16;
 	sprogram_config.m_page_shift = 13;
 }

@@ -847,6 +847,7 @@ void atarisy4_state::load_ldafile(address_space &space, const uint8_t *file)
 		uint8_t sum = 1;
 		uint16_t len;
 		uint16_t addr;
+		uint8_t pval = 0;
 
 		if (READ_CHAR() != 0x01)
 			fatalerror("Bad .LDA file\n");
@@ -879,7 +880,11 @@ void atarisy4_state::load_ldafile(address_space &space, const uint8_t *file)
 		{
 			uint8_t data = READ_CHAR();
 			sum += data;
-			space.write_byte(addr++, data);
+			if (addr & 1)
+				space.write_word(addr >> 1, (pval << 8) | data);
+			else
+				pval = data;
+			addr ++;
 		} while (--len);
 
 		sum += READ_CHAR();

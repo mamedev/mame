@@ -329,7 +329,7 @@ inline uint32_t tms3203x_device::ROPCODE(offs_t pc)
 	if (m_mcbl_mode && pc < 0x1000)
 		return m_bootrom[pc];
 
-	return m_direct->read_dword(pc << 2);
+	return m_direct->read_dword(pc);
 }
 
 
@@ -342,7 +342,7 @@ inline uint32_t tms3203x_device::RMEM(offs_t addr)
 	if (m_mcbl_mode && addr < 0x1000)
 		return m_bootrom[addr];
 
-	return m_program->read_dword(addr << 2);
+	return m_program->read_dword(addr);
 }
 
 
@@ -352,7 +352,7 @@ inline uint32_t tms3203x_device::RMEM(offs_t addr)
 
 inline void tms3203x_device::WMEM(offs_t addr, uint32_t data)
 {
-	m_program->write_dword(addr << 2, data);
+	m_program->write_dword(addr, data);
 }
 
 
@@ -364,7 +364,7 @@ void tms3203x_device::device_start()
 {
 	// find address spaces
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<-2>();
 
 	// resolve devcb handlers
 	m_xf0_cb.resolve_safe();

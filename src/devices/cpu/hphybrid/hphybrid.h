@@ -140,7 +140,7 @@ private:
 	address_space_config m_io_config;
 
 	address_space *m_program;
-	direct_read_data *m_direct;
+	direct_read_data<-1> *m_direct;
 	address_space *m_io;
 
 	uint32_t get_ea(uint16_t opcode);

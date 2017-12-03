@@ -49,8 +49,7 @@ static ADDRESS_MAP_START(c68ksbc_mem, AS_PROGRAM, 16, c68ksbc_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x002fff) AM_ROM
 	AM_RANGE(0x003000, 0x5fffff) AM_RAM
-	AM_RANGE(0x600000, 0x600001) AM_DEVREADWRITE8("acia", acia6850_device, status_r, control_w, 0x00ff)
-	AM_RANGE(0x600002, 0x600003) AM_DEVREADWRITE8("acia", acia6850_device, data_r, data_w, 0x00ff)
+	AM_RANGE(0x600000, 0x600003) AM_DEVREADWRITE8("acia", acia6850_device, read, write, 0x00ff)
 ADDRESS_MAP_END
 
 

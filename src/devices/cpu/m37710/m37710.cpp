@@ -998,7 +998,7 @@ void m37710_cpu_device::device_start()
 	memset(m_m37710_regs, 0, sizeof(m_m37710_regs));
 
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<0>();
 	m_io = &space(AS_IO);
 
 	m_ICount = 0;

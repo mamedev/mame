@@ -1081,10 +1081,8 @@ static ADDRESS_MAP_START( muskeys_map, AS_PROGRAM, 8, cmi_state)
 	AM_RANGE(0x0000, 0x007f) AM_RAM
 	AM_RANGE(0x0080, 0x0083) AM_DEVREADWRITE("cmi10_pia_u21", pia6821_device, read, write)
 	AM_RANGE(0x0090, 0x0093) AM_DEVREADWRITE("cmi10_pia_u20", pia6821_device, read, write)
-	AM_RANGE(0x00a0, 0x00a0) AM_DEVREADWRITE("acia_mkbd_kbd", acia6850_device, status_r, control_w)
-	AM_RANGE(0x00a1, 0x00a1) AM_DEVREADWRITE("acia_mkbd_kbd", acia6850_device, data_r, data_w)
-	AM_RANGE(0x00b0, 0x00b0) AM_DEVREADWRITE("acia_mkbd_cmi", acia6850_device, status_r, control_w)
-	AM_RANGE(0x00b1, 0x00b1) AM_DEVREADWRITE("acia_mkbd_cmi", acia6850_device, data_r, data_w)
+	AM_RANGE(0x00a0, 0x00a1) AM_DEVREADWRITE("acia_mkbd_kbd", acia6850_device, read, write)
+	AM_RANGE(0x00b0, 0x00b1) AM_DEVREADWRITE("acia_mkbd_cmi", acia6850_device, read, write)
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0xb000, 0xb400) AM_ROM
 	AM_RANGE(0xf000, 0xffff) AM_ROM

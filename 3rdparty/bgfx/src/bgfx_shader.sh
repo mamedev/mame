@@ -28,6 +28,14 @@
 #	define EARLY_DEPTH_STENCIL
 #endif // BGFX_SHADER_LANGUAGE_HLSL > 3 && BGFX_SHADER_TYPE_FRAGMENT
 
+#if BGFX_SHADER_LANGUAGE_GLSL
+#   define ARRAY_BEGIN(_type, _name, _count) _type _name[_count] = _type[](
+#   define ARRAY_END() )
+#else
+#   define ARRAY_BEGIN(_type, _name, _count) _type _name[_count] = {
+#   define ARRAY_END() }
+#endif // BGFX_SHADER_LANGUAGE_GLSL
+
 #if BGFX_SHADER_LANGUAGE_HLSL || BGFX_SHADER_LANGUAGE_PSSL || BGFX_SHADER_LANGUAGE_SPIRV
 #	define CONST(_x) static const _x
 #	define dFdx(_x) ddx(_x)
@@ -83,12 +91,12 @@ uint4 bitfieldReverse(uint4 _x) { return reversebits(_x); }
 #		if !BGFX_SHADER_LANGUAGE_SPIRV
 uint packHalf2x16(vec2 _x)
 {
-	return (f32tof16(_x.x)<<16) | f32tof16(_x.y);
+	return (f32tof16(_x.y)<<16) | f32tof16(_x.x);
 }
 
 vec2 unpackHalf2x16(uint _x)
 {
-	return vec2(f16tof32(_x >> 16), f16tof32(_x) );
+	return vec2(f16tof32(_x & 0xffff), f16tof32(_x >> 16) );
 }
 #		endif // !BGFX_SHADER_LANGUAGE_SPIRV
 
@@ -353,6 +361,10 @@ float bgfxShadow2DProj(sampler2DShadow _sampler, vec4 _coord)
 #		define SAMPLER2DMS(_name, _reg) uniform sampler2DMS _name : REGISTER(s, _reg)
 #		define texture2D(_sampler, _coord) tex2D(_sampler, _coord)
 #		define texture2DProj(_sampler, _coord) bgfxTexture2DProj(_sampler, _coord)
+
+#		define SAMPLER2DARRAY(_name, _reg) SAMPLER2D(_name, _reg)
+#		define texture2DArray(_sampler, _coord) texture2D(_sampler, (_coord).xy)
+#		define texture2DArrayLod(_sampler, _coord, _lod) texture2DLod(_sampler, _coord, _lod)
 
 #		define SAMPLER2DSHADOW(_name, _reg) uniform sampler2DShadow _name : REGISTER(s, _reg)
 #		define shadow2D(_sampler, _coord) bgfxShadow2D(_sampler, _coord)

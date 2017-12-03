@@ -109,7 +109,7 @@ private:
 	uint32_t          m_extport[0x30];
 
 	address_space *m_program;
-	direct_read_data *m_direct;
+	direct_read_data<-2> *m_direct;
 	int m_icount;
 
 	/* FIFO */

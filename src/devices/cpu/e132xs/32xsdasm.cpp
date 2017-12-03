@@ -391,32 +391,31 @@ u32 hyperstone_disassembler::opcode_alignment() const
 	return 2;
 }
 
+hyperstone_disassembler::hyperstone_disassembler(config *conf) : m_config(conf)
+{
+}
+
 /*****************************/
 /* Main disassembly function */
 /*****************************/
 offs_t hyperstone_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
-	uint16_t op;
-	uint8_t op_num;
-
-	uint8_t source_code, dest_code, source_bit, dest_bit;
-
 	char source[5] = "\0", dest[5] = "\0";
 	uint32_t flags = 0;
 
-	op = opcodes.r16(pc);
+	uint16_t op = opcodes.r16(pc);
 
 	size = 2;
 
-	source_code = SOURCECODE(op);
-	dest_code = DESTCODE(op);
-	source_bit = SOURCEBIT(op);
-	dest_bit = DESTBIT(op);
+	uint8_t source_code = SOURCECODE(op);
+	uint8_t dest_code = DESTCODE(op);
+	uint8_t source_bit = SOURCEBIT(op);
+	uint8_t dest_bit = DESTBIT(op);
 
-	global_fp = 0;
-	int h_flag = 0;
+	global_fp = m_config->get_fp();
+	int h_flag = m_config->get_h();
 
-	op_num = (op & 0xff00) >> 8;
+	uint8_t op_num = (op & 0xff00) >> 8;
 
 	switch( op_num )
 	{

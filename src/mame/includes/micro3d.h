@@ -13,6 +13,7 @@
 #include "cpu/tms34010/tms34010.h"
 #include "cpu/mcs51/mcs51.h"
 #include "sound/upd7759.h"
+#include "machine/mc2661.h"
 #include "machine/mc68681.h"
 
 
@@ -64,7 +65,9 @@ public:
 		m_joystick_y(*this, "JOYSTICK_Y"),
 		m_shared_ram(*this, "shared_ram"),
 		m_mac_sram(*this, "mac_sram"),
-		m_sprite_vram(*this, "sprite_vram") { }
+		m_sprite_vram(*this, "sprite_vram"),
+		m_vgb_uart(*this, "uart")
+	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<i8051_device> m_audiocpu;
@@ -87,11 +90,6 @@ public:
 
 	/* Sound */
 	uint8_t               m_sound_port_latch[4];
-
-	/* TI UART */
-	uint8_t               m_ti_uart[9];
-	int                 m_ti_uart_mode_cycle;
-	int                 m_ti_uart_sync_cycle;
 
 	/* Hardware version-check latch for BOTSS 1.1a */
 	uint8_t               m_botss_latch;
@@ -132,10 +130,8 @@ public:
 	int                 m_drawing_buffer;
 	int                 m_display_buffer;
 
-	DECLARE_WRITE16_MEMBER(micro3d_ti_uart_w);
-	DECLARE_READ16_MEMBER(micro3d_ti_uart_r);
-	DECLARE_WRITE32_MEMBER(micro3d_scc_w);
-	DECLARE_READ32_MEMBER(micro3d_scc_r);
+	DECLARE_WRITE8_MEMBER(vgb_uart_w);
+	DECLARE_READ8_MEMBER(vgb_uart_r);
 	DECLARE_WRITE32_MEMBER(micro3d_mac1_w);
 	DECLARE_READ32_MEMBER(micro3d_mac2_r);
 	DECLARE_WRITE32_MEMBER(micro3d_mac2_w);
@@ -189,6 +185,9 @@ public:
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+private:
+	required_device<mc2661_device> m_vgb_uart;
 };
 
 #endif // MAME_INCLUDES_MICRO3D_H

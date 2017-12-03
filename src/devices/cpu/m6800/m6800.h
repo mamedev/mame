@@ -85,7 +85,7 @@ protected:
 
 	/* Memory spaces */
 	address_space *m_program, *m_decrypted_opcodes;
-	direct_read_data *m_direct, *m_decrypted_opcodes_direct;
+	direct_read_data<0> *m_direct, *m_decrypted_opcodes_direct;
 
 	const op_func *m_insn;
 	const uint8_t *m_cycles;            /* clock cycle of instruction table */

@@ -323,7 +323,7 @@ protected:
 	uint8_t            m_external_host_access;
 	uint8_t            m_executing;
 	address_space *m_program;
-	direct_read_data *m_direct;
+	direct_read_data<3> *m_direct;
 	uint32_t  m_pixclock;                           /* the pixel clock (0 means don't adjust screen size) */
 	int     m_pixperclock;                        /* pixels per clock */
 	emu_timer *m_scantimer;
@@ -1050,9 +1050,5 @@ DECLARE_DEVICE_TYPE(TMS34020, tms34020_device)
 #define TMS34010_HOST_ADDRESS_H     1
 #define TMS34010_HOST_DATA          2
 #define TMS34010_HOST_CONTROL       3
-
-/* Use this macro in the memory definitions to specify bit-based addresses */
-#define TOBYTE(bitaddr) ((offs_t)(bitaddr) >> 3)
-#define TOWORD(bitaddr) ((offs_t)(bitaddr) >> 4)
 
 #endif // MAME_CPU_TMS34010_TMS34010_H

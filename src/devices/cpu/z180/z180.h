@@ -186,9 +186,9 @@ private:
 	uint8_t   m_dma0_cnt;                       /* dma0 counter / divide by 20 */
 	uint8_t   m_dma1_cnt;                       /* dma1 counter / divide by 20 */
 	address_space *m_program;
-	direct_read_data *m_direct;
+	direct_read_data<0> *m_direct;
 	address_space *m_oprogram;
-	direct_read_data *m_odirect;
+	direct_read_data<0> *m_odirect;
 	address_space *m_iospace;
 	uint8_t   m_rtemp;
 	uint32_t  m_ioltemp;

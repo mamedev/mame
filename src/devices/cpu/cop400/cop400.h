@@ -205,7 +205,7 @@ protected:
 	bool m_has_inil;
 
 	address_space *m_program;
-	direct_read_data *m_direct;
+	direct_read_data<0> *m_direct;
 	address_space *m_data;
 
 	uint8_t m_featuremask;

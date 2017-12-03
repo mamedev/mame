@@ -1275,7 +1275,7 @@ void rom_load_manager::normalize_flags_for_device(running_machine &machine, cons
 				endian = ENDIANNESS_BIG;
 
 			/* set the width */
-			buswidth = spaceconfig->m_databus_width;
+			buswidth = spaceconfig->m_data_width;
 			if (buswidth <= 8)
 				width = 1;
 			else if (buswidth <= 16)

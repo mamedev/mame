@@ -502,7 +502,7 @@ void scmp_device::device_start()
 	}
 
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<0>();
 
 	/* resolve callbacks */
 	m_flag_out_func.resolve_safe();

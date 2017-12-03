@@ -178,7 +178,7 @@ protected:
 			device_type type,
 			char const *tag,
 			device_t *owner,
-			uint32_t clock,
+			u32 clock,
 			bool extended_cm,
 			unsigned rom_width,
 			unsigned stack_ptr_mask,
@@ -291,7 +291,7 @@ private:
 	// address spaces
 	address_space_config const  m_space_config[7];
 	address_space               *m_spaces[7];
-	direct_read_data            *m_direct;
+	direct_read_data<0>         *m_direct;
 
 	// bus snooping callback
 	bus_cycle_delegate      m_bus_cycle_cb;
@@ -364,7 +364,7 @@ public:
 	template <unsigned N, typename Obj> static devcb_base &set_cm_ram_cb(device_t &device, Obj &&cb)
 	{ return downcast<i4004_cpu_device &>(device).set_cm_ram_cb<N>(std::forward<Obj>(cb)); }
 
-	i4004_cpu_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock);
+	i4004_cpu_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
 protected:
 	using mcs40_cpu_device_base::mcs40_cpu_device_base;
@@ -404,7 +404,7 @@ public:
 	template <typename Obj> static devcb_base &set_stp_ack_cb(device_t &device, Obj &&cb)
 	{ return downcast<i4040_cpu_device &>(device).set_stp_ack_cb(std::forward<Obj>(cb)); }
 
-	i4040_cpu_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock);
+	i4040_cpu_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
 protected:
 	// device_disasm_interface implementation

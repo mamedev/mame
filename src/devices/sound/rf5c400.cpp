@@ -181,7 +181,7 @@ void rf5c400_device::device_start()
 
 	m_stream = stream_alloc(0, 2, clock() / 384);
 
-	m_rommask = m_rom.length() - 1;
+	m_rommask = (m_rom.length()/2) - 1;
 }
 
 //-------------------------------------------------
@@ -258,7 +258,7 @@ void rf5c400_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 				{
 					env_phase = PHASE_DECAY;
 					env_level = 1.0;
-					if (channel->decay & 0x0080)
+					if ((channel->decay & 0x0080) || (channel->decay == 0x100))
 					{
 						env_step = 0.0;
 					}

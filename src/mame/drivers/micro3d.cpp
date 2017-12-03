@@ -34,6 +34,7 @@
 #include "machine/mc68681.h"
 #include "machine/mc68901.h"
 #include "machine/nvram.h"
+#include "machine/z80scc.h"
 #include "sound/ym2151.h"
 
 #include "screen.h"
@@ -234,8 +235,8 @@ static ADDRESS_MAP_START( vgbmem, AS_PROGRAM, 16, micro3d_state )
 	AM_RANGE(0x00e00000, 0x00e0000f) AM_WRITE(micro3d_xfer3dk_w)
 	AM_RANGE(0x02000000, 0x0200ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette") // clut
 	AM_RANGE(0x02600000, 0x0260000f) AM_WRITE(micro3d_creg_w)
-	AM_RANGE(0x02c00000, 0x02c0003f) AM_READ(micro3d_ti_uart_r)
-	AM_RANGE(0x02e00000, 0x02e0003f) AM_WRITE(micro3d_ti_uart_w)
+	AM_RANGE(0x02c00000, 0x02c0003f) AM_READ8(vgb_uart_r, 0x00ff)
+	AM_RANGE(0x02e00000, 0x02e0003f) AM_WRITE8(vgb_uart_w, 0x00ff)
 	AM_RANGE(0x03800000, 0x03dfffff) AM_ROM AM_REGION("tms_gfx", 0)
 	AM_RANGE(0x03e00000, 0x03ffffff) AM_ROM AM_REGION("tms34010", 0)
 	AM_RANGE(0xc0000000, 0xc00001ff) AM_DEVREADWRITE("vgb", tms34010_device, io_register_r, io_register_w)
@@ -265,7 +266,7 @@ static ADDRESS_MAP_START( drmath_data, AS_DATA, 32, micro3d_state )
 	AM_RANGE(0x01400000, 0x01400003) AM_READWRITE(micro3d_pipe_r, micro3d_fifo_w)
 	AM_RANGE(0x01600000, 0x01600003) AM_WRITE(drmath_intr2_ack)
 	AM_RANGE(0x01800000, 0x01800003) AM_WRITE(micro3d_alt_fifo_w)
-	AM_RANGE(0x03fffff0, 0x03fffff7) AM_READWRITE(micro3d_scc_r, micro3d_scc_w)
+	AM_RANGE(0x03fffff0, 0x03fffff7) AM_DEVREADWRITE8("scc", z80scc_device, ba_cd_inv_r, ba_cd_inv_w, 0x000000ff)
 ADDRESS_MAP_END
 
 /*************************************
@@ -313,6 +314,13 @@ static MACHINE_CONFIG_START( micro3d )
 	MCFG_CPU_PROGRAM_MAP(drmath_prg)
 	MCFG_CPU_DATA_MAP(drmath_data)
 
+	MCFG_SCC8530_ADD("scc", XTAL_32MHz / 2 / 2, 0, 0, 0, 0)
+	MCFG_Z80SCC_OUT_TXDB_CB(DEVWRITELINE("monitor_drmath", rs232_port_device, write_txd))
+
+	MCFG_RS232_PORT_ADD("monitor_drmath", default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("scc", z80scc_device, rxb_w))
+	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("scc", z80scc_device, dcdb_w)) MCFG_DEVCB_XOR(1)
+
 	MCFG_CPU_ADD("audiocpu", I8051, XTAL_11_0592MHz)
 	MCFG_CPU_PROGRAM_MAP(soundmem_prg)
 	MCFG_CPU_IO_MAP(soundmem_io)
@@ -321,7 +329,7 @@ static MACHINE_CONFIG_START( micro3d )
 
 	MCFG_DEVICE_ADD("duart", MC68681, XTAL_3_6864MHz)
 	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(micro3d_state, duart_irq_handler))
-	MCFG_MC68681_A_TX_CALLBACK(DEVWRITELINE("monitor", rs232_port_device, write_txd))
+	MCFG_MC68681_A_TX_CALLBACK(DEVWRITELINE("monitor_host", rs232_port_device, write_txd))
 	MCFG_MC68681_B_TX_CALLBACK(WRITELINE(micro3d_state, duart_txb))
 	MCFG_MC68681_INPORT_CALLBACK(READ8(micro3d_state, duart_input_r))
 	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(micro3d_state, duart_output_w))
@@ -346,7 +354,14 @@ static MACHINE_CONFIG_START( micro3d )
 	MCFG_SCREEN_UPDATE_DEVICE("vgb", tms34010_device, tms340x0_ind16)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_RS232_PORT_ADD("monitor", default_rs232_devices, nullptr)
+	MCFG_DEVICE_ADD("uart", MC2661, XTAL_40MHz / 8) // actually SCN2651
+	MCFG_MC2661_TXD_HANDLER(DEVWRITELINE("monitor_vgb", rs232_port_device, write_txd))
+
+	MCFG_RS232_PORT_ADD("monitor_vgb", default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart", mc2661_device, rx_w))
+	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart", mc2661_device, dsr_w))
+
+	MCFG_RS232_PORT_ADD("monitor_host", default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("duart", mc68681_device, rx_a_w))
 
 	MCFG_ADC0844_ADD("adc")

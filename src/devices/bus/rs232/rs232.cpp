@@ -1,5 +1,39 @@
 // license:BSD-3-Clause
 // copyright-holders:smf
+/***************************************************************************
+
+    Generic EIA RS-232/CCITT V.24 serial port emulation
+
+****************************************************************************
+
+    Source  DB-25  DB-9
+             1          AA  Protective Ground [Shield]
+             7      5   AB  Signal Ground [Common Return]
+    DTE →    2      3   BA  Transmitted Data
+    ← DCE    3      2   BB  Received Data
+    DTE →    4      7   CA  Request to Send
+    ← DCE    5      8   CB  Clear to Send
+    ← DCE    6      6   CC  Data Set Ready [Data Mode]
+    DTE →   20      4   CD  Data Terminal Ready
+    ← DCE   22      9   CE  Ring Indicator
+    ← DCE    8      1   CF  Received Line Signal Detector [Data Carrier Detect]
+    ← DCE   21          CG  Signal Quality Detector
+    DTE →   23          CH  Data Signal Rate Selector
+    ← DCE   23          CI  Data Signal Rate Selector [Signaling Rate Indicator]
+    DTE →   24          DA  Transmitter Signal Element Timing [External Tx Clock]
+    ← DCE   15          DB  Transmitter Signal Element Timing
+    ← DCE   17          DD  Receiver Signal Element Timing
+    DTE →   14         SBA  Secondary Transmitted Data
+    ← DCE   16         SBB  Secondary Received Data
+    DTE →   19         SCA  Secondary Request to Send
+    ← DCE   13         SCB  Secondary Clear to Send
+    ← DCE   12         SCF  Secondary Received Line Signal Detector
+    DTE →   18          LL  Local Loopback
+    DTE →   21          RL  Remote Loopback
+    ← DCE   25          TM  Test Mode
+
+***************************************************************************/
+
 #include "emu.h"
 #include "rs232.h"
 
@@ -18,11 +52,15 @@ rs232_port_device::rs232_port_device(const machine_config &mconfig, device_type 
 	m_dsr(0),
 	m_ri(0),
 	m_cts(0),
+	m_dce_rxc(0),
+	m_dce_txc(0),
 	m_rxd_handler(*this),
 	m_dcd_handler(*this),
 	m_dsr_handler(*this),
 	m_ri_handler(*this),
 	m_cts_handler(*this),
+	m_rxc_handler(*this),
+	m_txc_handler(*this),
 	m_dev(nullptr)
 {
 }
@@ -43,12 +81,16 @@ void rs232_port_device::device_start()
 	m_dsr_handler.resolve_safe();
 	m_ri_handler.resolve_safe();
 	m_cts_handler.resolve_safe();
+	m_rxc_handler.resolve_safe();
+	m_txc_handler.resolve_safe();
 
 	save_item(NAME(m_rxd));
 	save_item(NAME(m_dcd));
 	save_item(NAME(m_dsr));
 	save_item(NAME(m_ri));
 	save_item(NAME(m_cts));
+	save_item(NAME(m_dce_rxc));
+	save_item(NAME(m_dce_txc));
 
 	m_rxd = 1;
 	m_dcd = 1;

@@ -234,7 +234,7 @@ protected:
 	// address spaces
 	const address_space_config m_program_config;
 	address_space *m_program;
-	direct_read_data *m_direct;
+	direct_read_data<0> *m_direct;
 
 	// other internal states
 	int m_icount;

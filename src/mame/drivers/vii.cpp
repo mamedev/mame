@@ -294,7 +294,7 @@ void vii_state::blit(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint32_t x
 			bits <<= nc;
 			if(nbits < nc)
 			{
-				uint16_t b = space.read_word((m++ & 0x3fffff) << 1);
+				uint16_t b = space.read_word(m++ & 0x3fffff);
 				b = (b << 8) | (b >> 8);
 				bits |= b << (nc - nbits);
 				nbits += 16;
@@ -360,7 +360,7 @@ void vii_state::blit_page(bitmap_rgb32 &bitmap, const rectangle &cliprect, int d
 	{
 		for(x0 = 0; x0 < wn; x0++)
 		{
-			uint16_t tile = space.read_word((tilemap + x0 + wn * y0) << 1);
+			uint16_t tile = space.read_word(tilemap + x0 + wn * y0);
 			uint16_t palette = 0;
 			uint32_t xx, yy;
 
@@ -369,7 +369,7 @@ void vii_state::blit_page(bitmap_rgb32 &bitmap, const rectangle &cliprect, int d
 				continue;
 			}
 
-			palette = space.read_word((palette_map + (x0 + wn * y0) / 2) << 1);
+			palette = space.read_word(palette_map + (x0 + wn * y0) / 2);
 			if(x0 & 1)
 			{
 				palette >>= 8;
@@ -405,10 +405,10 @@ void vii_state::blit_sprite(bitmap_rgb32 &bitmap, const rectangle &cliprect, int
 	uint32_t h, w;
 	uint32_t bitmap_addr = 0x40 * m_video_regs[0x22];
 
-	tile = space.read_word((base_addr + 0) << 1);
-	x = space.read_word((base_addr + 1) << 1);
-	y = space.read_word((base_addr + 2) << 1);
-	attr = space.read_word((base_addr + 3) << 1);
+	tile = space.read_word(base_addr + 0);
+	x = space.read_word(base_addr + 1);
+	y = space.read_word(base_addr + 2);
+	attr = space.read_word(base_addr + 3);
 
 	if(!tile)
 	{
@@ -449,7 +449,7 @@ void vii_state::blit_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, in
 
 	for(n = 0; n < 256; n++)
 	{
-		//if(space.read_word((0x2c00 + 4*n) << 1))
+		//if(space.read_word(0x2c00 + 4*n)
 		{
 			blit_sprite(bitmap, cliprect, depth, 0x2c00 + 4*n);
 		}
@@ -495,7 +495,7 @@ void vii_state::do_dma(uint32_t len)
 
 	for(j = 0; j < len; j++)
 	{
-		mem.write_word((dst+j) << 1, mem.read_word((src+j) << 1));
+		mem.write_word(dst+j, mem.read_word(src+j));
 	}
 
 	m_video_regs[0x72] = 0;
@@ -697,7 +697,7 @@ void vii_state::spg_do_dma(uint32_t len)
 	uint32_t j;
 
 	for(j = 0; j < len; j++)
-		mem.write_word((dst+j) << 1, mem.read_word((src+j) << 1));
+		mem.write_word(dst+j, mem.read_word(src+j));
 
 	m_io_regs[0x102] = 0;
 }

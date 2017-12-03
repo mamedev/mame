@@ -663,7 +663,7 @@ void z8001_device::device_start()
 		m_data = &space(AS_DATA);
 	else
 		m_data = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<0>();
 	m_io = &space(AS_IO);
 
 	init_tables();
@@ -686,7 +686,7 @@ void z8002_device::device_start()
 		m_data = &space(AS_DATA);
 	else
 		m_data = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<0>();
 	m_io = &space(AS_IO);
 
 	init_tables();

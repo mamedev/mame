@@ -41,11 +41,7 @@ address_map_entry::address_map_entry(device_t &device, address_map &map, offs_t 
 		m_region(nullptr),
 		m_rgnoffs(0),
 		m_submap_bits(0),
-		m_memory(nullptr),
-		m_bytestart(0),
-		m_byteend(0),
-		m_bytemirror(0),
-		m_bytemask(0)
+		m_memory(nullptr)
 {
 }
 
@@ -404,7 +400,7 @@ address_map::address_map(const address_space &space, offs_t start, offs_t end, i
 		m_device(&device),
 		m_databits(space.data_width()),
 		m_unmapval(space.unmap()),
-		m_globalmask(space.bytemask())
+		m_globalmask(space.addrmask())
 {
 	range(start, end).set_submap(DEVICE_SELF, submap_delegate, bits, unitmask);
 }
@@ -609,8 +605,8 @@ void address_map::map_validity_check(validity_checker &valid, int spacenum) cons
 {
 	// it's safe to assume here that the device has a memory interface and a config for this space
 	const address_space_config &spaceconfig = *m_device->memory().space_config(spacenum);
-	int datawidth = spaceconfig.m_databus_width;
-	int alignunit = datawidth / 8;
+	int datawidth = spaceconfig.m_data_width;
+	int alignunit = spaceconfig.alignment();
 
 	bool detected_overlap = DETECT_OVERLAPPING_MEMORY ? false : true;
 
@@ -624,16 +620,13 @@ void address_map::map_validity_check(validity_checker &valid, int spacenum) cons
 	if (m_databits != datawidth)
 		osd_printf_error("Wrong memory handlers provided for %s space! (width = %d, memory = %08x)\n", spaceconfig.m_name, datawidth, m_databits);
 
-	offs_t globalmask = 0xffffffffUL >> (32 - spaceconfig.m_addrbus_width);
+	offs_t globalmask = 0xffffffffUL >> (32 - spaceconfig.m_addr_width);
 	if (m_globalmask != 0)
 		globalmask = m_globalmask;
 
 	// loop over entries and look for errors
 	for (address_map_entry &entry : m_entrylist)
 	{
-		u32 bytestart = spaceconfig.addr2byte(entry.m_addrstart);
-		u32 byteend = spaceconfig.addr2byte_end(entry.m_addrend);
-
 		// look for overlapping entries
 		if (!detected_overlap)
 		{
@@ -653,7 +646,7 @@ void address_map::map_validity_check(validity_checker &valid, int spacenum) cons
 		}
 
 		// look for inverted start/end pairs
-		if (byteend < bytestart)
+		if (entry.m_addrend < entry.m_addrstart)
 			osd_printf_error("Wrong %s memory read handler start = %08x > end = %08x\n", spaceconfig.m_name, entry.m_addrstart, entry.m_addrend);
 
 		// look for ranges outside the global mask
@@ -663,7 +656,7 @@ void address_map::map_validity_check(validity_checker &valid, int spacenum) cons
 			osd_printf_error("In %s memory range %x-%x, end address is outside of the global address mask %x\n", spaceconfig.m_name, entry.m_addrstart, entry.m_addrend, globalmask);
 
 		// look for misaligned entries
-		if ((bytestart & (alignunit - 1)) != 0 || (byteend & (alignunit - 1)) != (alignunit - 1))
+		if ((entry.m_addrstart & (alignunit - 1)) != 0 || (entry.m_addrend & (alignunit - 1)) != (alignunit - 1))
 			osd_printf_error("Wrong %s memory read handler start = %08x, end = %08x ALIGN = %d\n", spaceconfig.m_name, entry.m_addrstart, entry.m_addrend, alignunit);
 
 		// verify mask/mirror/select
@@ -715,7 +708,7 @@ void address_map::map_validity_check(validity_checker &valid, int spacenum) cons
 					{
 						// verify the address range is within the region's bounds
 						offs_t const length = region.get_length();
-						if (entry.m_rgnoffs + (byteend - bytestart + 1) > length)
+						if (entry.m_rgnoffs + spaceconfig.addr2byte(entry.m_addrend - entry.m_addrstart + 1) > length)
 							osd_printf_error("%s space memory map entry %X-%X extends beyond region '%s' size (%X)\n", spaceconfig.m_name, entry.m_addrstart, entry.m_addrend, entry.m_region, length);
 						found = true;
 					}

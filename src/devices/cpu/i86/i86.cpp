@@ -417,8 +417,8 @@ void i8086_common_cpu_device::device_start()
 	m_stack = m_program;
 	m_code = m_program;
 	m_extra = m_program;
-	m_direct = &m_program->direct();
-	m_direct_opcodes = &m_opcodes->direct();
+	m_direct = m_program->direct<0>();
+	m_direct_opcodes = m_opcodes->direct<0>();
 	m_io = &space(AS_IO);
 
 	save_item(NAME(m_regs.w));

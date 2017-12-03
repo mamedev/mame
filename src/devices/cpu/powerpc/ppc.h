@@ -490,7 +490,7 @@ protected:
 	int             m_buffered_dma_rate[4];
 
 	/* internal stuff */
-	direct_read_data *m_direct;
+	direct_read_data<0> *m_direct;
 	offs_t          m_codexor;
 	uint32_t          m_system_clock;
 	uint32_t          m_cpu_clock;

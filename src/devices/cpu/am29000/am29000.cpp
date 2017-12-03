@@ -131,9 +131,9 @@ device_memory_interface::space_config_vector am29000_cpu_device::memory_space_co
 void am29000_cpu_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<0>();
 	m_data = &space(AS_DATA);
-	m_datadirect = &m_data->direct();
+	m_datadirect = m_data->direct<0>();
 	m_io = &space(AS_IO);
 	m_cfg = (PRL_AM29000 | PRL_REV_D) << CFG_PRL_SHIFT;
 

@@ -64,7 +64,7 @@ public:
 
 protected:
 	tms99xx_device(const machine_config &mconfig, device_type type,
-				const char *tag, int databus_width, int prg_addr_bits, int cru_addr_bits,
+				const char *tag, int data_width, int prg_addr_bits, int cru_addr_bits,
 				device_t *owner, uint32_t clock);
 
 	// device-level overrides

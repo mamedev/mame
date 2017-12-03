@@ -282,14 +282,11 @@ READ16_MEMBER(jpmsys5_state::jpm_upd7759_r)
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM \
 	AM_RANGE(0x040000, 0x043fff) AM_RAM AM_SHARE("nvram") \
 	AM_RANGE(0x046000, 0x046001) AM_WRITENOP \
-	AM_RANGE(0x046020, 0x046021) AM_DEVREADWRITE8("acia6850_0", acia6850_device, status_r, control_w, 0xff) \
-	AM_RANGE(0x046022, 0x046023) AM_DEVREADWRITE8("acia6850_0", acia6850_device, data_r, data_w, 0xff) \
+	AM_RANGE(0x046020, 0x046023) AM_DEVREADWRITE8("acia6850_0", acia6850_device, read, write, 0xff) \
 	AM_RANGE(0x046040, 0x04604f) AM_DEVREADWRITE8("6840ptm", ptm6840_device, read, write, 0xff) \
 	AM_RANGE(0x046060, 0x046067) AM_DEVREADWRITE8("6821pia", pia6821_device, read, write,0xff) \
-	AM_RANGE(0x046080, 0x046081) AM_DEVREADWRITE8("acia6850_1", acia6850_device, status_r, control_w, 0xff) \
-	AM_RANGE(0x046082, 0x046083) AM_DEVREADWRITE8("acia6850_1", acia6850_device, data_r, data_w, 0xff) \
-	AM_RANGE(0x04608c, 0x04608d) AM_DEVREADWRITE8("acia6850_2", acia6850_device, status_r, control_w, 0xff) \
-	AM_RANGE(0x04608e, 0x04608f) AM_DEVREADWRITE8("acia6850_2", acia6850_device, data_r, data_w, 0xff) \
+	AM_RANGE(0x046080, 0x046083) AM_DEVREADWRITE8("acia6850_1", acia6850_device, read, write, 0xff) \
+	AM_RANGE(0x04608c, 0x04608f) AM_DEVREADWRITE8("acia6850_2", acia6850_device, read, write, 0xff) \
 	AM_RANGE(0x0460c0, 0x0460c1) AM_WRITENOP \
 	AM_RANGE(0x048000, 0x04801f) AM_READWRITE(coins_r, coins_w) \
 	AM_RANGE(0x04c000, 0x04c0ff) AM_READ(mux_r) AM_WRITE(mux_w)

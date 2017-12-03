@@ -214,7 +214,7 @@ void r3000_device::device_start()
 {
 	// get our address spaces
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<0>();
 
 	// determine the cache sizes
 	switch (m_chip_type)

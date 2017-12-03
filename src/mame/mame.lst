@@ -1079,7 +1079,9 @@ asma2k                          //
 asmapro                         //
 
 @source:alphatpx.cpp
+alphatp2
 alphatp3                        // 1982 Triumph-Adler
+alphatp30
 
 @source:alphatro.cpp
 alphatro                        //
@@ -1441,6 +1443,7 @@ blackpnt                        // (c) 1996
 bootsctn                        // (c) 1998
 bootsctnu                       // (c) 1999
 bootsctnua                      // (c) 1999
+bootsctnub                      // (c) 1999
 bparty                          // (c) 2000
 bpartya                         // (c) 2000
 bumblbug                        // (c) 1996
@@ -1529,7 +1532,6 @@ mammothm                        // (c) 1997
 marmagic                        // (c) 2000
 marmagicu                       // (c) 2000
 marmagicua                      // (c) 2000
-marmagicub                      // (c) 2000
 minemine                        // (c) 1996
 minemineu                       // (c) 1996
 monmouse                        // (c) 1997
@@ -1558,6 +1560,8 @@ pengpayb                        // (c) 1997
 pengpayc                        // (c) 1995
 pengpayd                        // (c) 1995
 pengpayu                        // (c) 1997
+pengpayua                       // (c) 1997
+pengpayub                       // (c) 1997
 pengpuck                        // (c) 2001
 penpir                          // (c) 1998
 penpira                         // (c) 1998
@@ -12601,6 +12605,7 @@ super9ccg                       // * German
 super9ccsp                      // * Spanish
 
 @source:fidel68k.cpp
+fdes2265                        //
 feagv10                         //
 feagv11                         //
 feagv2                          //
@@ -14741,6 +14746,7 @@ eleciq                          // Conic
 esbattle                        // Entex
 esoccer                         // Entex
 f2pbball                        // Fonas
+f3in1                           // Fonas
 fxmcr165                        // Gakken
 ginv1000                        // Gakken
 gjackpot                        // Gakken
@@ -14775,6 +14781,7 @@ tbreakup                        // Tomy
 tc4                             // Coleco
 tcfball                         // Tandy Radio Shack
 tcfballa                        // Tandy Radio Shack
+xl25                            // Vulcan
 zodiac                          // Coleco
 
 @source:hh_ucom4.cpp
@@ -31282,6 +31289,7 @@ kov3_100                        //
 orleg2                          // (c) 2007
 orleg2_103                      //
 orleg2_101                      //
+kof98umh						// (c) 2009
 
 @source:pgm3.cpp
 kov3hd
@@ -31350,6 +31358,9 @@ photoply                        //
 
 @source:phunsy.cpp
 phunsy                          //
+
+@source:picno.cpp
+picno                           // Konami Picno (1993)
 
 @source:piggypas.cpp
 3lilpigs                        //
@@ -32390,7 +32401,8 @@ rbislande                       // B39 (c) 1988 Taito Corporation
 rbislando                       // B22 (c) 1987 Taito Corporation
 
 @source:rbmk.cpp
-rbmk                            // (c) 1995 GMS
+rbmk                            // (c) 1998 GMS
+rbspm                           // (c) 1998 GMS
 
 @source:rc702.cpp
 rc702                           // 1979 RC702

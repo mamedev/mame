@@ -130,7 +130,7 @@ protected:
 	int m_icount;
 
 	address_space *m_program;
-	direct_read_data* m_direct;
+	direct_read_data<0> * m_direct;
 
 	write32_delegate m_cmd_callback;
 
@@ -189,7 +189,7 @@ protected:
 	int m_icount;
 
 	address_space *m_program;
-	direct_read_data* m_direct;
+	direct_read_data<0> * m_direct;
 };
 
 

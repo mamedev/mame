@@ -139,7 +139,7 @@ protected:
 	optional_shared_ptr<uint16_t> m_b3;
 
 	address_space *m_program;
-	direct_read_data *m_direct;
+	direct_read_data<-1> *m_direct;
 	address_space *m_data;
 	address_space *m_io;
 
@@ -202,10 +202,6 @@ protected:
 	inline void MODIFY_DP(int data);
 	inline void MODIFY_PM(int data);
 	inline void MODIFY_ARP(int data);
-	inline uint16_t M_RDROM(offs_t addr);
-	inline void M_WRTROM(offs_t addr, uint16_t data);
-	inline uint16_t M_RDRAM(offs_t addr);
-	inline void M_WRTRAM(offs_t addr, uint16_t data);
 	uint16_t reverse_carry_add(uint16_t arg0, uint16_t arg1 );
 	inline void MODIFY_AR_ARP();
 	inline void CALCULATE_ADD_CARRY();
