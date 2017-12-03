@@ -2055,7 +2055,7 @@ void sh34_base_device::device_start()
 	m_internal = &space(AS_PROGRAM);
 	m_program = &space(AS_PROGRAM);
 	m_io = &space(AS_IO);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<0>();
 	sh4_default_exception_priorities();
 	m_irln = 15;
 	m_test_irq = 0;

@@ -441,7 +441,7 @@ void sh2_device::device_start()
 	m_ftcsr_read_cb.bind_relative_to(*owner());
 
 	m_decrypted_program = has_space(AS_OPCODES) ? &space(AS_OPCODES) : &space(AS_PROGRAM);
-	m_direct = &m_decrypted_program->direct();
+	m_direct = m_decrypted_program->direct<0>();
 	m_internal = &space(AS_PROGRAM);
 
 	save_item(NAME(m_cpu_off));

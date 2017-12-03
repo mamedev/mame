@@ -484,8 +484,7 @@ READ8_MEMBER(bbc_state::bbcm_r)
 		myo = offset-0x200;
 		if ((myo>=0x00) && (myo<=0x06) && (myo+0x01) & 1) return m_hd6845->status_r(space, myo-0x00);                     /* Video controller */
 		if ((myo>=0x01) && (myo<=0x07) && (myo & 1))      return m_hd6845->register_r(space, myo-0x01);
-		if ((myo>=0x08) && (myo<=0x0e) && (myo+0x01) & 1) return m_acia ? m_acia->status_r(space, myo-0x08) : 0xfe;       /* Serial controller */
-		if ((myo>=0x09) && (myo<=0x0f) && (myo & 1))      return m_acia ? m_acia->data_r(space, myo-0x09) : 0xfe;
+		if ((myo>=0x08) && (myo<=0x0f))                   return m_acia ? m_acia->read(space, myo & 0x01) : 0xfe;         /* Serial controller */
 		if ((myo>=0x10) && (myo<=0x17))                   return 0xfe;                                                    /* Serial System Chip */
 		if ((myo>=0x18) && (myo<=0x1f))                   return m_upd7002 ? m_upd7002->read(space, myo-0x18) : 0xfe;     /* A to D converter */
 		if ((myo>=0x20) && (myo<=0x23))                   return 0xfe;                                                    /* VideoULA */
@@ -519,8 +518,7 @@ WRITE8_MEMBER(bbc_state::bbcm_w)
 		myo=offset-0x200;
 		if ((myo>=0x00) && (myo<=0x06) && (myo+0x01) & 1) m_hd6845->address_w(space, myo-0x00, data);                     /* Video Controller */
 		if ((myo>=0x01) && (myo<=0x07) && (myo & 1))      m_hd6845->register_w(space, myo-0x01, data);
-		if ((myo>=0x08) && (myo<=0x0e) && (myo+0x01) & 1) if (m_acia) m_acia->control_w(space, myo-0x08, data);           /* Serial controller */
-		if ((myo>=0x09) && (myo<=0x0f) && (myo & 1))      if (m_acia) m_acia->data_w(space, myo-0x09, data);
+		if ((myo>=0x08) && (myo<=0x0f))                   if (m_acia) m_acia->write(space, myo & 0x01, data);             /* Serial controller */
 		if ((myo>=0x10) && (myo<=0x17))                   bbc_SerialULA_w(space, myo-0x10, data);                         /* Serial System Chip */
 		if ((myo>=0x18) && (myo<=0x1f) && (m_upd7002))    m_upd7002->write(space, myo-0x18, data);                        /* A to D converter */
 		if ((myo>=0x20) && (myo<=0x23))                   bbc_videoULA_w(space, myo-0x20, data);                          /* VideoULA */

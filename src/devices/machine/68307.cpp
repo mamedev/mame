@@ -158,7 +158,7 @@ void m68307_cpu_device::write_dword_m68307(offs_t address, uint32_t data)
 void m68307_cpu_device::init16_m68307(address_space &space)
 {
 	m_space = &space;
-	m_direct = &space.direct();
+	m_direct = space.direct<0>();
 	opcode_xor = 0;
 
 	readimm16 = m68k_readimm16_delegate(&m68307_cpu_device::simple_read_immediate_16_m68307, this);

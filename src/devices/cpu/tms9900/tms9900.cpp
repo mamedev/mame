@@ -176,9 +176,9 @@ enum
     twice their number. Accordingly, the TMS9900 has a CRU bitmask 0x0fff.
 ****************************************************************************/
 
-tms99xx_device::tms99xx_device(const machine_config &mconfig, device_type type, const char *tag, int databus_width, int prg_addr_bits, int cru_addr_bits, device_t *owner, uint32_t clock)
+tms99xx_device::tms99xx_device(const machine_config &mconfig, device_type type, const char *tag, int data_width, int prg_addr_bits, int cru_addr_bits, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, type, tag, owner, clock),
-		m_program_config("program", ENDIANNESS_BIG, databus_width, prg_addr_bits),
+		m_program_config("program", ENDIANNESS_BIG, data_width, prg_addr_bits),
 		m_io_config("cru", ENDIANNESS_BIG, 8, cru_addr_bits),
 		m_prgspace(nullptr),
 		m_cru(nullptr),

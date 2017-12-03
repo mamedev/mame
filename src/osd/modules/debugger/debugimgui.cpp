@@ -184,7 +184,6 @@ private:
 	const char*      font_name;
 	float            font_size;
 	ImVec2           m_text_size;  // size of character (assumes monospaced font is in use)
-	ImguiFontHandle  m_font;
 	uint8_t            m_key_char;
 	bool             m_hide;
 	int              m_win_count;  // number of active windows, does not decrease, used to ID individual windows
@@ -677,7 +676,7 @@ void debug_imgui::draw_view(debug_area* view_ptr, bool exp_change)
 
 void debug_imgui::draw_bpoints(debug_area* view_ptr, bool* opened)
 {
-	ImGui::SetNextWindowSize(ImVec2(view_ptr->width,view_ptr->height + ImGui::GetTextLineHeight()),ImGuiSetCond_Once);
+	ImGui::SetNextWindowSize(ImVec2(view_ptr->width,view_ptr->height + ImGui::GetTextLineHeight()),ImGuiCond_Once);
 	if(ImGui::Begin(view_ptr->title.c_str(),opened))
 	{
 		view_ptr->is_collapsed = false;
@@ -723,7 +722,7 @@ void debug_imgui::add_wpoints(int id)
 
 void debug_imgui::draw_log(debug_area* view_ptr, bool* opened)
 {
-	ImGui::SetNextWindowSize(ImVec2(view_ptr->width,view_ptr->height + ImGui::GetTextLineHeight()),ImGuiSetCond_Once);
+	ImGui::SetNextWindowSize(ImVec2(view_ptr->width,view_ptr->height + ImGui::GetTextLineHeight()),ImGuiCond_Once);
 	if(ImGui::Begin(view_ptr->title.c_str(),opened))
 	{
 		view_ptr->is_collapsed = false;
@@ -757,7 +756,7 @@ void debug_imgui::draw_disasm(debug_area* view_ptr, bool* opened)
 {
 	const debug_view_source* src;
 
-	ImGui::SetNextWindowSize(ImVec2(view_ptr->width,view_ptr->height + ImGui::GetTextLineHeight()),ImGuiSetCond_Once);
+	ImGui::SetNextWindowSize(ImVec2(view_ptr->width,view_ptr->height + ImGui::GetTextLineHeight()),ImGuiCond_Once);
 	if(ImGui::Begin(view_ptr->title.c_str(),opened,ImGuiWindowFlags_MenuBar))
 	{
 		int idx;
@@ -844,7 +843,7 @@ void debug_imgui::draw_memory(debug_area* view_ptr, bool* opened)
 {
 	const debug_view_source* src;
 
-	ImGui::SetNextWindowSize(ImVec2(view_ptr->width,view_ptr->height + ImGui::GetTextLineHeight()),ImGuiSetCond_Once);
+	ImGui::SetNextWindowSize(ImVec2(view_ptr->width,view_ptr->height + ImGui::GetTextLineHeight()),ImGuiCond_Once);
 	if(ImGui::Begin(view_ptr->title.c_str(),opened,ImGuiWindowFlags_MenuBar))
 	{
 		int idx;
@@ -1241,7 +1240,7 @@ void debug_imgui::draw_console()
 	rgb_t base(0xe6, 0xff, 0xff, 0xff);
 	ImGuiWindowFlags flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse;
 
-	ImGui::SetNextWindowSize(ImVec2(view_main_regs->width + view_main_disasm->width,view_main_disasm->height + view_main_console->height + ImGui::GetTextLineHeight()*3),ImGuiSetCond_Once);
+	ImGui::SetNextWindowSize(ImVec2(view_main_regs->width + view_main_disasm->width,view_main_disasm->height + view_main_console->height + ImGui::GetTextLineHeight()*3),ImGuiCond_Once);
 	if(ImGui::Begin(view_main_console->title.c_str(), nullptr,flags))
 	{
 		std::string str;
@@ -1383,7 +1382,6 @@ void debug_imgui::update()
 	ImGui::PushStyleColor(ImGuiCol_ScrollbarGrabHovered,ImVec4(0.7f,0.7f,0.7f,0.8f));
 	ImGui::PushStyleColor(ImGuiCol_ScrollbarGrabActive,ImVec4(0.9f,0.9f,0.9f,0.8f));
 	ImGui::PushStyleColor(ImGuiCol_Border,ImVec4(0.7f,0.7f,0.7f,0.8f));
-	ImGui::PushStyleColor(ImGuiCol_ComboBg,ImVec4(0.4f,0.4f,0.4f,0.9f));
 	m_text_size = ImGui::CalcTextSize("A");  // hopefully you're using a monospaced font...
 	draw_console();  // We'll always have a console window
 
@@ -1425,7 +1423,7 @@ void debug_imgui::update()
 		global_free(to_delete);
 	}
 
-	ImGui::PopStyleColor(13);
+	ImGui::PopStyleColor(12);
 }
 
 void debug_imgui::init_debugger(running_machine &machine)
@@ -1478,8 +1476,7 @@ void debug_imgui::init_debugger(running_machine &machine)
 		io.Fonts->AddFontDefault();
 	else
 		io.Fonts->AddFontFromFileTTF(font_name,font_size);  // for now, font name must be a path to a TTF file
-	m_font = imguiCreate();
-	imguiSetFont(m_font);
+	imguiCreate();
 }
 
 void debug_imgui::wait_for_debugger(device_t &device, bool firststop)

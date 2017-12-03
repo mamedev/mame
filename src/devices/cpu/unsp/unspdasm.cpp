@@ -55,8 +55,6 @@ offs_t unsp_disassembler::disassemble(std::ostream &stream, offs_t pc, const dat
 {
 	uint16_t op = opcodes.r16(pc);
 	uint16_t imm16 = opcodes.r16(pc+1);
-	op = big_endianize_int16(op);
-	imm16 = big_endianize_int16(imm16);
 
 	if(OP0 < 0xf && OPA == 0x7 && OP1 < 2)
 	{

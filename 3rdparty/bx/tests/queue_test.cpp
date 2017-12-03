@@ -21,14 +21,16 @@ uintptr_t ptrToBits(void* _ptr)
 
 TEST_CASE("SpSc", "")
 {
-	bx::SpScUnboundedQueue queue;
+	bx::DefaultAllocator allocator;
+	bx::SpScUnboundedQueue queue(&allocator);
 	queue.push(bitsToPtr(0xdeadbeef) );
 	REQUIRE(0xdeadbeef == ptrToBits(queue.pop() ) );
 }
 
 TEST_CASE("MpSc", "")
 {
-	bx::MpScUnboundedQueueT<void> queue;
+	bx::DefaultAllocator allocator;
+	bx::MpScUnboundedQueueT<void> queue(&allocator);
 	queue.push(bitsToPtr(0xdeadbeef) );
 	REQUIRE(0xdeadbeef == ptrToBits(queue.pop() ) );
 }

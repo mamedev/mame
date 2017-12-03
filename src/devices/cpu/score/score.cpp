@@ -73,7 +73,7 @@ void score7_cpu_device::device_start()
 {
 	// find address spaces
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<0>();
 
 	// set our instruction counter
 	m_icountptr = &m_icount;

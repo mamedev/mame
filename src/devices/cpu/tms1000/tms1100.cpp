@@ -4,6 +4,9 @@
 
   TMS1000 family - TMS1100, TMS1170, TMS1300, TMS1370
 
+  TODO:
+  - add TMS1100C when needed
+
 */
 
 #include "emu.h"

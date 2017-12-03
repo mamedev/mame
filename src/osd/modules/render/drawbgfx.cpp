@@ -5,7 +5,7 @@
 //  drawbgfx.cpp - BGFX renderer
 //
 //============================================================
-#include <bx/fpumath.h>
+#include <bx/math.h>
 #include <bx/readerwriter.h>
 
 #if defined(SDLMAME_WIN32) || defined(OSD_WINDOWS) || defined(OSD_UWP)
@@ -103,7 +103,7 @@ renderer_bgfx::~renderer_bgfx()
 		m_targets->destroy_target("avibuffer0");
 		m_avi_target = nullptr;
 
-		bgfx::destroyTexture(m_avi_texture);
+		bgfx::destroy(m_avi_texture);
 
 		delete m_avi_writer;
 		delete [] m_avi_data;
@@ -341,7 +341,7 @@ void renderer_bgfx::record()
 		m_avi_writer->stop();
 		m_targets->destroy_target("avibuffer0");
 		m_avi_target = nullptr;
-		bgfx::destroyTexture(m_avi_texture);
+		bgfx::destroy(m_avi_texture);
 	}
 	else
 	{
@@ -474,14 +474,13 @@ void renderer_bgfx::render_post_screen_quad(int view, render_primitive* prim, bg
 	}
 
 	uint32_t blend = PRIMFLAG_GET_BLENDMODE(prim->flags);
-	bgfx::setVertexBuffer(buffer);
+	bgfx::setVertexBuffer(0,buffer);
 	bgfx::setTexture(0, m_screen_effect[blend]->uniform("s_tex")->handle(), m_targets->target(screen, "output")->texture(), texture_flags);
 	m_screen_effect[blend]->submit(view);
 }
 
 void renderer_bgfx::render_avi_quad()
 {
-	bgfx::setViewSeq(s_current_view, true);
 	bgfx::setViewRect(s_current_view, 0, 0, m_width[0], m_height[0]);
 	bgfx::setViewClear(s_current_view, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x00000000, 1.0f, 0);
 
@@ -504,7 +503,7 @@ void renderer_bgfx::render_avi_quad()
 	vertex(&vertices[4], x[2], y[2], 0, rgba, u[2], v[2]);
 	vertex(&vertices[5], x[0], y[0], 0, rgba, u[0], v[0]);
 
-	bgfx::setVertexBuffer(&buffer);
+	bgfx::setVertexBuffer(0,&buffer);
 	bgfx::setTexture(0, m_gui_effect[PRIMFLAG_GET_BLENDMODE(BLENDMODE_NONE)]->uniform("s_tex")->handle(), m_avi_target->texture());
 	m_gui_effect[PRIMFLAG_GET_BLENDMODE(BLENDMODE_NONE)]->submit(s_current_view);
 	s_current_view++;
@@ -544,11 +543,11 @@ void renderer_bgfx::render_textured_quad(render_primitive* prim, bgfx::Transient
 	bgfx_effect** effects = PRIMFLAG_GET_SCREENTEX(prim->flags) ? m_screen_effect : m_gui_effect;
 
 	uint32_t blend = PRIMFLAG_GET_BLENDMODE(prim->flags);
-	bgfx::setVertexBuffer(buffer);
+	bgfx::setVertexBuffer(0,buffer);
 	bgfx::setTexture(0, effects[blend]->uniform("s_tex")->handle(), texture);
 	effects[blend]->submit(m_ui_view);
 
-	bgfx::destroyTexture(texture);
+	bgfx::destroy(texture);
 }
 
 #define MAX_TEMP_COORDS 100
@@ -830,7 +829,7 @@ int renderer_bgfx::draw(int update)
 
 		if (status != BUFFER_EMPTY && status != BUFFER_SCREEN)
 		{
-			bgfx::setVertexBuffer(&buffer);
+			bgfx::setVertexBuffer(0,&buffer);
 			bgfx::setTexture(0, m_gui_effect[blend]->uniform("s_tex")->handle(), m_texture_cache->texture());
 			m_gui_effect[blend]->submit(m_ui_view);
 		}
@@ -948,7 +947,6 @@ void renderer_bgfx::setup_view(uint32_t view_index, bool screen)
 		bgfx::setViewFrameBuffer(view_index, m_framebuffer->target());
 	}
 
-	bgfx::setViewSeq(view_index, true);
 	bgfx::setViewRect(view_index, 0, 0, width, height);
 
 #if SCENE_VIEW
@@ -983,6 +981,7 @@ void renderer_bgfx::setup_matrices(uint32_t view_index, bool screen)
 
 	float proj[16];
 	float view[16];
+	const bgfx::Caps* caps = bgfx::getCaps();
 	if (screen)
 	{
 		static float offset = 0.0f;
@@ -995,12 +994,12 @@ void renderer_bgfx::setup_matrices(uint32_t view_index, bool screen)
 		float eye[3] = { width * 0.5f, eye_height, cam_z };
 		bx::mtxLookAt(view, eye, at, up);
 
-		bx::mtxProj(proj, 90.0f, float(width) / float(height), 0.1f, 5000.0f);
+		bx::mtxProj(proj, 90.0f, float(width) / float(height), 0.1f, 5000.0f, bgfx::getCaps()->homogeneousDepth);
 	}
 	else
 	{
 		bx::mtxIdentity(view);
-		bx::mtxOrtho(proj, 0.0f, width, height, 0.0f, 0.0f, 100.0f);
+		bx::mtxOrtho(proj, 0.0f, width, height, 0.0f, 0.0f, 100.0f, 0.0f, caps->homogeneousDepth);
 	}
 
 	bgfx::setViewTransform(view_index, view, proj);

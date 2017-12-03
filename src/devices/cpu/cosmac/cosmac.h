@@ -437,7 +437,7 @@ protected:
 	int                 m_icount;
 	address_space *     m_program;
 	address_space *     m_io;
-	direct_read_data *  m_direct;
+	direct_read_data<0> *m_direct;
 
 	// opcode/condition tables
 	typedef void (cosmac_device::*ophandler)();

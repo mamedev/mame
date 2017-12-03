@@ -464,9 +464,9 @@ void m6800_cpu_device::EAT_CYCLES()
 void m6800_cpu_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<0>();
 	m_decrypted_opcodes = has_space(AS_OPCODES) ? &space(AS_OPCODES) : m_program;
-	m_decrypted_opcodes_direct = &m_decrypted_opcodes->direct();
+	m_decrypted_opcodes_direct = m_decrypted_opcodes->direct<0>();
 
 	m_pc.d = 0;
 	m_s.d = 0;

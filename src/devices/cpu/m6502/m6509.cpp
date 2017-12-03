@@ -17,9 +17,9 @@ DEFINE_DEVICE_TYPE(M6509, m6509_device, "m6509", "M6509")
 m6509_device::m6509_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	m6502_device(mconfig, M6509, tag, owner, clock), XPC(0), bank_i(0), bank_y(0)
 {
-	program_config.m_addrbus_width = 20;
+	program_config.m_addr_width = 20;
 	program_config.m_logaddr_width = 20;
-	sprogram_config.m_addrbus_width = 20;
+	sprogram_config.m_addr_width = 20;
 	sprogram_config.m_logaddr_width = 20;
 }
 

@@ -5,7 +5,7 @@
   TMS1000 family - base/shared
 
   TODO:
-  - INIT pin
+  - accurate INIT pin (currently, just use INPUT_LINE_RESET)
 
 
 The TMS0980 and TMS1000-family MCU cores are very similar. The TMS0980 has a
@@ -144,6 +144,7 @@ void tms1k_base_device::device_start()
 	m_r = 0;
 	m_o = 0;
 	m_o_index = 0;
+	m_halt = false;
 	m_cki_bus = 0;
 	m_c4 = 0;
 	m_p = 0;
@@ -183,6 +184,7 @@ void tms1k_base_device::device_start()
 	save_item(NAME(m_r));
 	save_item(NAME(m_o));
 	save_item(NAME(m_o_index));
+	save_item(NAME(m_halt));
 	save_item(NAME(m_cki_bus));
 	save_item(NAME(m_c4));
 	save_item(NAME(m_p));
@@ -224,6 +226,14 @@ void tms1k_base_device::device_start()
 	m_icountptr = &m_icount;
 }
 
+device_memory_interface::space_config_vector tms1k_base_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config),
+		std::make_pair(AS_DATA,    &m_data_config)
+	};
+}
+
 
 
 //-------------------------------------------------
@@ -259,13 +269,6 @@ void tms1k_base_device::device_reset()
 	m_power_off(0);
 }
 
-device_memory_interface::space_config_vector tms1k_base_device::memory_space_config() const
-{
-	return space_config_vector {
-		std::make_pair(AS_PROGRAM, &m_program_config),
-		std::make_pair(AS_DATA,    &m_data_config)
-	};
-}
 
 
 //-------------------------------------------------
@@ -304,6 +307,15 @@ void tms1k_base_device::read_opcode()
 //-------------------------------------------------
 //  i/o handling
 //-------------------------------------------------
+
+void tms1k_base_device::execute_set_input(int line, int state)
+{
+	if (line != TMS1XXX_INPUT_LINE_HALT)
+		return;
+
+	// HALT pin (CMOS only)
+	m_halt = bool(state);
+}
 
 void tms1k_base_device::write_o_output(u8 index)
 {
@@ -597,9 +609,17 @@ void tms1k_base_device::op_sbl()
 
 void tms1k_base_device::execute_run()
 {
-	do
+	while (m_icount > 0)
 	{
 		m_icount--;
+
+		if (m_halt)
+		{
+			// not running (output pins remain unchanged)
+			m_icount = 0;
+			return;
+		}
+
 		switch (m_subcycle)
 		{
 		case 0:
@@ -722,6 +742,7 @@ void tms1k_base_device::execute_run()
 			// execute: br/call 1/2
 			break;
 		}
+
 		m_subcycle = (m_subcycle + 1) % 6;
-	} while (m_icount > 0);
+	}
 }

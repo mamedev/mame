@@ -301,7 +301,7 @@ void h6280_device::device_reset()
 	m_io_buffer = 0;
 
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<0>();
 	m_io = &space(AS_IO);
 
 	/* set I and B flags */

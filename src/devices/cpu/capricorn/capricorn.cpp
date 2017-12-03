@@ -170,7 +170,7 @@ void capricorn_cpu_device::device_start()
 	state_add(STATE_GENFLAGS , "GENFLAGS" , m_flags).noshow().formatstr("%9s");
 
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<0>();
 
 	save_item(NAME(m_reg));
 	save_item(NAME(m_arp));

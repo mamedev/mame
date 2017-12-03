@@ -973,7 +973,7 @@ void mcs48_cpu_device::device_start()
 	m_ea = (m_int_rom_size ? 0 : 1);
 
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<0>();
 	m_data = &space(AS_DATA);
 	m_io = &space(AS_IO);
 

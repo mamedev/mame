@@ -71,7 +71,7 @@ private:
 	uint16_t  m_io;     /* last I/O address */
 	uint16_t  m_irq_vector;
 	address_space *m_program;
-	direct_read_data *m_direct;
+	direct_read_data<0> *m_direct;
 	address_space *m_iospace;
 	int m_icount;
 	uint8_t   m_r[64];  /* scratchpad RAM */

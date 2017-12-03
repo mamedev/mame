@@ -34,7 +34,7 @@ protected:
 	class memory_interface {
 	public:
 		address_space *m_program, *m_sprogram;
-		direct_read_data *m_direct, *m_sdirect;
+		direct_read_data<0> *m_direct, *m_sdirect;
 
 		virtual ~memory_interface() {}
 		virtual uint8_t read(uint16_t adr) = 0;

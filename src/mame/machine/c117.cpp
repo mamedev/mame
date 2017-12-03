@@ -79,8 +79,8 @@ void namco_c117_device::device_start()
 
 	m_cpuexec[0] = maincpu;
 	m_cpuexec[1] = subcpu;
-	m_cpudirect[0] = &maincpu->space(AS_PROGRAM).direct();
-	m_cpudirect[1] = &subcpu->space(AS_PROGRAM).direct();
+	m_cpudirect[0] = maincpu->space(AS_PROGRAM).direct<0>();
+	m_cpudirect[1] = subcpu->space(AS_PROGRAM).direct<0>();
 
 	memset(&m_offsets, 0, sizeof(m_offsets));
 	m_subres = m_wdog = 0;

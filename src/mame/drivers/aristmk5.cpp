@@ -3840,14 +3840,19 @@ ROM_END
 // Same strings as incasunu but different version
 ROM_START( incasunua )
 	ARISTOCRAT_MK5_BIOS
-	// checksum code not found due to ROMs being corrupted, all files are missing bytes consisting of 0x0D
+	/*
+	    Checksum code found at 0x000d18
+            Checksum is stored in 0x000020-0x000027
+	        Expected Checksum   0x24e1ed00
+	        Calculated Checksum 0x24e1ed00  (OK)
+	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
-	ROM_LOAD32_WORD( "dhg1577.u7",  0x000000, 0x7f079, BAD_DUMP CRC(ebbd4d54) SHA1(7e5c0da2bc62338dd2148af7fa87745d622b85b9) )
-	ROM_LOAD32_WORD( "dhg1577.u11", 0x000002, 0x7ff6c, BAD_DUMP CRC(fb86c7b2) SHA1(62b1897907ceebcd0c2c0a4da002a783174321e7) )
-	ROM_LOAD32_WORD( "dhg1577.u8",  0x100000, 0x7fcb7, BAD_DUMP CRC(809c5277) SHA1(2efde9a7887d3ca5cb7fa5aebb0b6fcc9aeb880a) )
-	ROM_LOAD32_WORD( "dhg1577.u12", 0x100002, 0x7fc89, BAD_DUMP CRC(dbf26048) SHA1(2fcf1f7d5a0402798b4fe25afd178d8c1db89e3b) )
-	ROM_LOAD32_WORD( "dhg1577.u9",  0x200000, 0x7fd47, BAD_DUMP CRC(046e019e) SHA1(4c6e17562cb337c3d79efc095960c4d1f9d87f39) )
-	ROM_LOAD32_WORD( "dhg1577.u13", 0x200002, 0x7fd62, BAD_DUMP CRC(7299484f) SHA1(f6b75e5be6ef724504a543702692e455437d7046) )
+	ROM_LOAD32_WORD( "dhg1577.u7",  0x000000, 0x80000, CRC(e31e3c81) SHA1(56b00aae1b9385686530e089cad05308e0c0751d) )
+	ROM_LOAD32_WORD( "dhg1577.u11", 0x000002, 0x80000, CRC(68d58ad3) SHA1(c521da10b719250e3f115357c6e4ff51377d4335) )
+	ROM_LOAD32_WORD( "dhg1577.u8",  0x100000, 0x80000, CRC(475db842) SHA1(3c49fbf45a256222e6a5a0343a7dc96386bb8897) )
+	ROM_LOAD32_WORD( "dhg1577.u12", 0x100002, 0x80000, CRC(f1be432e) SHA1(ed4a064e4e8200126bda3f1c25ac5075014c9f94) )
+	ROM_LOAD32_WORD( "dhg1577.u9",  0x200000, 0x80000, CRC(a8956bf5) SHA1(d444a3a64968a6275b38babf23089c7d186f30e6) )
+	ROM_LOAD32_WORD( "dhg1577.u13", 0x200002, 0x80000, CRC(f7c30ef9) SHA1(44d7213e1220d6b89715408d009ef1484de2696f) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
 	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
@@ -4132,12 +4137,17 @@ ROM_END
 // Loco Loot / Export / A - 30/07/01
 ROM_START( locolootu )
 	ARISTOCRAT_MK5_BIOS
-	// checksum code not found due to ROMs being corrupted, all files are missing bytes consisting of 0x0D
+/*
+	Checksum code found at 0x000d18
+	Checksum is stored at 0x000020-0x000027
+	    Expected Checksum   0xbd28f614
+	    Calculated Checksum 0xbd28f614  (OK)
+*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
-	ROM_LOAD32_WORD( "ahg1513.u7",  0x000000, 0x7f06f, BAD_DUMP CRC(c0e769a1) SHA1(df0dedf6dc9412efccd26ad16ab0d316863f9488) )
-	ROM_LOAD32_WORD( "ahg1513.u11", 0x000002, 0x7ff6c, BAD_DUMP CRC(f60c2e0b) SHA1(d3ba83eb458ab99d28a910688e63c9dd5ae6570b) )
-	ROM_LOAD32_WORD( "ahg1513.u8",  0x100000, 0x7fede, BAD_DUMP CRC(c24cfe7b) SHA1(7f1f02a4e77ad178c7e08362feb1ec4b064e539c) )
-	ROM_LOAD32_WORD( "ahg1513.u12", 0x100002, 0x7ff14, BAD_DUMP CRC(73e30f47) SHA1(eb12716f3c384901cd80b2f43760b522150c64b0) )
+	ROM_LOAD32_WORD( "ahg1513.u7",  0x000000, 0x80000, CRC(16854250) SHA1(a3b6e112dcce38310ca13eb9e9851901ee213fcf) )
+	ROM_LOAD32_WORD( "ahg1513.u11", 0x000002, 0x80000, CRC(0abe509a) SHA1(a5d0b870390e7f4b38d7685c09c079acb198dd42) )
+	ROM_LOAD32_WORD( "ahg1513.u8",  0x100000, 0x80000, CRC(bd9d2ad7) SHA1(5e5eaf2521473246fb54175f88521b43b9b86f9f) )
+	ROM_LOAD32_WORD( "ahg1513.u12", 0x100002, 0x80000, CRC(5bf7b4b1) SHA1(2282ec8d0ddd1aea715005fba2171468831513f4) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
 	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
@@ -4459,36 +4469,6 @@ ROM_START( marmagicua )
 	ROM_LOAD32_WORD( "ehg1559.u13", 0x200002, 0x80000, CRC(8c111896) SHA1(60d2ffe82a39ef98d2cf0141773be95381538ace) )
 	ROM_LOAD32_WORD( "ehg1559.u10", 0x300000, 0x80000, CRC(3db4e373) SHA1(7150242253ae4a1c4f3211e3068f00e8b1ed51b1) )
 	ROM_LOAD32_WORD( "ehg1559.u14", 0x300002, 0x80000, CRC(bdfdc0e4) SHA1(0e56f08abc0cdd9dfa5d8e51bb6fe06fa356b3b3) )
-
-	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
-	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
-ROM_END
-
-
-// US003 / Multi credit / Multi line
-// Margarita Magic / NSW/ACT / A - 07/07/2000
-// EHG1559 / This is a twenty-line game
-// The playlines are 1, 5, 10, 15 and 20
-// For 20 credit per line the max bet is 400
-// ROM has NSW/ACT strings but it is for US platform
-ROM_START( marmagicub )
-	ARISTOCRAT_MK5_BIOS
-	/*
-	    This ROM set is exactly the same version as the parent, yet is bad in a completely different way!
-	    Comparing the ROM data between this one and the above bad dump, it is highly possible that this set can be repaired as this ROM set came from a good dump until it was stripped of carriage return symbols (0x0D) by a web server
-	    The "_a" suffix is to differentiate the ROMs from the above set and does not correspond to the label, the correct label is simply EHG1559.
-	    checksum code not found due to ROMs being corrupted, all files except the last 2 are missing bytes consisting of 0x0D
-	*/
-	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
-	ROM_LOAD32_WORD( "ehg1559_a.u7",  0x000000, 0x7f03e, BAD_DUMP CRC(473afd5b) SHA1(823f8ad8cd5c3676feba8d740b50f25544a6c046) )
-	ROM_LOAD32_WORD( "ehg1559_a.u11", 0x000002, 0x7ff66, BAD_DUMP CRC(c66df0dc) SHA1(015e6aed905bfef2f152137aa8aaaeaae41bc90e) )
-	ROM_LOAD32_WORD( "ehg1559_a.u8",  0x100000, 0x7fcfe, BAD_DUMP CRC(5d2760d6) SHA1(655da82ae5dca1bb498399d2ee1efad7a3811cba) )
-	ROM_LOAD32_WORD( "ehg1559_a.u12", 0x100002, 0x7fce2, BAD_DUMP CRC(56f9dcab) SHA1(2951a7189e5aa6e7338eb11f929fd6eea2541f0d) )
-	ROM_LOAD32_WORD( "ehg1559_a.u9",  0x200000, 0x7ff4d, BAD_DUMP CRC(60323004) SHA1(8f188c7109538454a9ad5e14f21ab4ef76115153) )
-	ROM_LOAD32_WORD( "ehg1559_a.u13", 0x200002, 0x7ff61, BAD_DUMP CRC(34320e8d) SHA1(b266d9c53cf746f1a164e006f14079bced2887ed) )
-	ROM_LOAD32_WORD( "ehg1559.u10",   0x300000, 0x80000, CRC(3db4e373) SHA1(7150242253ae4a1c4f3211e3068f00e8b1ed51b1) )
-	ROM_LOAD32_WORD( "ehg1559.u14",   0x300002, 0x80000, CRC(bdfdc0e4) SHA1(0e56f08abc0cdd9dfa5d8e51bb6fe06fa356b3b3) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
 	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
@@ -7013,6 +6993,7 @@ GAMEL( 1999, incasun,    aristmk5,  aristmk5,           incasun,      aristmk5_s
 GAMEL( 1999, incasunsp,  incasun,   aristmk5,           incasun,      aristmk5_state, aristmk5, ROT0, "Aristocrat", "Inca Sun (0100872V, NSW/ACT, Show Program)",           MACHINE_FLAGS, layout_incasun )         // 631/3 B, B - 03/05/99, Rev 15
 GAMEL( 2000, incasunnz,  incasun,   aristmk5,           incasunnz,    aristmk5_state, aristmk5, ROT0, "Aristocrat", "Inca Sun (0101108V, New Zealand)",                     MACHINE_FLAGS, layout_incasunnz )       // MV4113, A - 6/3/00, Rev 25
 GAMEL( 2000, incasunu,   incasun,   aristmk5_usa,       dolphntrce,   aristmk5_state, aristmk5, ROT0, "Aristocrat", "Inca Sun (CHG1458, US)",                               MACHINE_FLAGS, layout_dolphntrce )      // MV4130/3, A - 05/09/00
+GAMEL( 2000, incasunua,  incasun,   aristmk5_usa,       bootsctnua,   aristmk5_state, aristmk5, ROT0, "Aristocrat", "Inca Sun (DHG1577, US)",                               MACHINE_FLAGS, layout_aristmk5_us_200 ) // MV4130, A - 05/09/00
 GAMEL( 1998, indrema5,   aristmk5,  aristmk5,           indrema5,     aristmk5_state, aristmk5, ROT0, "Aristocrat", "Indian Dreaming (0100845V, NSW/ACT)",                  MACHINE_FLAGS, layout_indrema5 )        // 628/1, B - 15/12/98, Rev 7
 GAMEL( 1996, jumpjoey,   aristmk5,  aristmk5,           cashcham,     aristmk5_state, aristmk5, ROT0, "Aristocrat", "Jumpin' Joey (0100383V, NSW/ACT)",                     MACHINE_FLAGS, layout_cashcham )        // 586/6, C - 13/11/96
 GAMEL( 1996, jungjuic,   aristmk5,  aristmk5,           jungjuic,     aristmk5_state, aristmk5, ROT0, "Aristocrat", "Jungle Juice (0200240V, New Zealand)",                 MACHINE_FLAGS, layout_jungjuic )        // 566/3, F - 06/03/96
@@ -7024,6 +7005,7 @@ GAMEL( 1998, kookabuk,   aristmk5,  aristmk5,           aristmk5,     aristmk5_s
 GAMEL( 1997, locoloot,   aristmk5,  aristmk5,           cashcham,     aristmk5_state, aristmk5, ROT0, "Aristocrat", "Loco Loot (0100473V, NSW/ACT)",                        MACHINE_FLAGS, layout_cashcham )        // 599/3, C - 17/06/97, Rev 1.26.13.0
 GAMEL( 1997, locoloota,  locoloot,  aristmk5,           locoloota,    aristmk5_state, aristmk5, ROT0, "Aristocrat", "Loco Loot (0100472V, NSW/ACT)",                        MACHINE_FLAGS, layout_locoloota )       // 599/2, C - 17/06/97, Rev 1.26.13.0
 GAMEL( 1998, locolootnz, locoloot,  aristmk5,           cashchamnz,   aristmk5_state, aristmk5, ROT0, "Aristocrat", "Loco Loot (0600725V, New Zealand)",                    MACHINE_FLAGS, layout_cashchamnz )      // MV4064, A - 8/7/98, Rev 24
+GAMEL( 2001, locolootu,  locoloot,  aristmk5_usa,       aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Loco Loot (AHG1513, US)",                              MACHINE_FLAGS, layout_aristmk5_us )     // MV4134, A - 30/07/01
 GAMEL( 1997, lonewolf,   aristmk5,  aristmk5,           wildbill,     aristmk5_state, aristmk5, ROT0, "Aristocrat", "Lone Wolf (0100587V, NSW/ACT)",                        MACHINE_FLAGS, layout_wildbill )        // 621, A - 29/10/97, Rev 1.27.17.0
 GAMEL( 1995, luckyclo,   aristmk5,  aristmk5,           wcougar,      aristmk5_state, aristmk5, ROT0, "Aristocrat", "Lucky Clover (0300109V, NSW/ACT)",                     MACHINE_FLAGS, layout_wcougar )         // 570/6, A - 12/10/95
 GAMEL( 2000, magimask,   aristmk5,  aristmk5_usa_touch, bootsctnua,   aristmk5_state, aristmk5, ROT0, "Aristocrat", "Magic Mask (AHG1549, US)",                             MACHINE_FLAGS, layout_dolphntrce )      // MV4115_1, A - 09/05/00
@@ -7034,7 +7016,7 @@ GAMEL( 1997, magtcha5a,  magtcha5,  aristmk5_touch,     dimtouch,     aristmk5_s
 GAMEL( 1997, mammothm,   aristmk5,  aristmk5,           kgalah,       aristmk5_state, aristmk5, ROT0, "Aristocrat", "Mammoth Money (0100425V, NSW/ACT)",                    MACHINE_FLAGS, layout_kgalah )          // 595/5, D - 07/04/97, Rev 1.22.14.1
 GAMEL( 2000, marmagic,   aristmk5,  aristmk5,           goldenra,     aristmk5_state, aristmk5, ROT0, "Aristocrat", "Margarita Magic (01J00101, NSW/ACT)",                  MACHINE_FLAGS, layout_marmagic )        // JB005, A - 07/07/00, Rev 17
 GAMEL( 2000, marmagicu,  marmagic,  aristmk5_usa,       aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Margarita Magic (EHG1558, US)",                        MACHINE_FLAGS, layout_aristmk5_us )     // US003, 07/07/2000
-GAMEL( 2000, marmagicua, marmagic,  aristmk5_usa,       bootsctnua,   aristmk5_state, aristmk5, ROT0, "Aristocrat", "Margarita Magic (EHG1559, US, set 1)",                 MACHINE_FLAGS, layout_aristmk5_us_200 ) // US003, A - 07/07/00
+GAMEL( 2000, marmagicua, marmagic,  aristmk5_usa,       bootsctnua,   aristmk5_state, aristmk5, ROT0, "Aristocrat", "Margarita Magic (EHG1559, US)",                        MACHINE_FLAGS, layout_aristmk5_us_200 ) // US003, A - 07/07/00
 GAMEL( 1997, mgarden,    aristmk5,  aristmk5_usa,       aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Magic Garden (AHG1211-99, US)",                        MACHINE_FLAGS, layout_aristmk5_us )     // MV4033, B - 10/02/97 (alt title for enchanted forest?)
 GAMEL( 1996, minemine,   aristmk5,  aristmk5,           swhr2,        aristmk5_state, aristmk5, ROT0, "Aristocrat", "Mine, Mine, Mine (0400115V, NSW/ACT)",                 MACHINE_FLAGS, layout_swhr2 )           // 559/2, D - 16/01/96, Rev 1.18.3.0
 GAMEL( 1996, minemineu,  minemine,  aristmk5_usa,       aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Mine, Mine, Mine (VHG0416-99, US)",                    MACHINE_FLAGS, layout_aristmk5_us )     // 559/2, E - 14/02/96
@@ -7141,9 +7123,6 @@ GAMEL( 2000, bpartya,    bparty,    aristmk5_usa_touch, bootsctnua,   aristmk5_s
 GAMEL( 1997, cashcra5a,  cashcra5,  aristmk5,           aristmk5_9,   aristmk5_state, aristmk5, ROT0, "Aristocrat", "Cash Crop (0300447V, NSW/ACT)",                        MACHINE_FLAGS, layout_dolphntrb )       // 607/2, C - 29/08/97, Rev 7
 GAMEL( 2001, dynajacku,  dynajack,  aristmk5_usa,       aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Dynamite Jack (CHG1562, US)",                          MACHINE_FLAGS, layout_aristmk5_us )     // US002, A - 11/07/01
 GAMEL( 2000, eforsta5ce, eforsta5,  aristmk5_usa,       aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Enchanted Forest - Cash Express (CHG1536, US)",        MACHINE_FLAGS, layout_aristmk5_us )     // MV4108/6, C - 17/01/00
-GAMEL( 2000, incasunua,  incasun,   aristmk5_usa,       bootsctnua,   aristmk5_state, aristmk5, ROT0, "Aristocrat", "Inca Sun (DHG1577, US)",                               MACHINE_FLAGS, layout_aristmk5_us_200 ) // MV4130, A - 05/09/00
-GAMEL( 2001, locolootu,  locoloot,  aristmk5_usa,       aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Loco Loot (AHG1513, US)",                              MACHINE_FLAGS, layout_aristmk5_us )     // MV4134, A - 30/07/01
-GAMEL( 2000, marmagicub, marmagic,  aristmk5_usa,       bootsctnua,   aristmk5_state, aristmk5, ROT0, "Aristocrat", "Margarita Magic (EHG1559, US, set 2)",                 MACHINE_FLAGS, layout_aristmk5_us_200 ) // US003, A - 07/07/00
 GAMEL( 2001, mountmonce, mountmon,  aristmk5_usa,       aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Mountain Money - Cash Express (AHG1629, US)",          MACHINE_FLAGS, layout_aristmk5_us )     // MV4108/5, A - 10/03/01
 GAMEL( 2001, mountmonu,  mountmon,  aristmk5_usa,       aristmk5_usa, aristmk5_state, aristmk5, ROT0, "Aristocrat", "Mountain Money (BHG1465, US)",                         MACHINE_FLAGS, layout_aristmk5_us )     // MV4108/5, A - 10/03/01
 GAMEL( 2001, partygrsb,  partygrs,  aristmk5_usa_touch, bootsctnua,   aristmk5_state, aristmk5, ROT0, "Aristocrat", "Party Gras (AHG1568, US)",                             MACHINE_FLAGS, layout_aristmk5_us_200 ) // MV4115/6, A - 10/11/2001, 20 lines

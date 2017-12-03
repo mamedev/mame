@@ -372,7 +372,7 @@ private:
 	loadstore_func m_sdr;
 
 	address_space *m_program;
-	direct_read_data *m_direct;
+	direct_read_data<0> *m_direct;
 	uint32_t          c_system_clock;
 	uint32_t          m_cpu_clock;
 	emu_timer *     m_compare_int_timer;

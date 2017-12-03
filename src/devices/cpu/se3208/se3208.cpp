@@ -1721,7 +1721,7 @@ void se3208_device::device_reset()
 	m_ER = 0;
 	m_PPC = 0;
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<0>();
 	m_PC=SE3208_Read32(0);
 	m_SR=0;
 	m_IRQ=CLEAR_LINE;
@@ -1786,7 +1786,7 @@ void se3208_device::device_start()
 	BuildTable();
 
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<0>();
 
 	save_item(NAME(m_R));
 	save_item(NAME(m_PC));

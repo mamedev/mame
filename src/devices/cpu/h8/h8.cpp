@@ -32,7 +32,7 @@ h8_device::h8_device(const machine_config &mconfig, device_type type, const char
 void h8_device::device_start()
 {
 	program = &space(AS_PROGRAM);
-	direct = &program->direct();
+	direct  = program->direct<0>();
 	io      = &space(AS_IO);
 
 	state_add(STATE_GENPC,     "GENPC",     NPC).noshow();

@@ -388,7 +388,7 @@ protected:
 	u8    m_halt;     /* halt input line                        */
 
 	address_space *m_program;
-	direct_read_data *m_direct;
+	direct_read_data<0> *m_direct;
 	int m_icount;
 	int m_inst_cycles;
 

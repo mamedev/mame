@@ -238,12 +238,9 @@ static ADDRESS_MAP_START (force68k_mem, AS_PROGRAM, 16, force68k_state)
 	AM_RANGE (0x080000, 0x083fff) AM_ROM /* System EPROM Area 16Kb DEBUGGER supplied as default on CPU-1B/D     */
 	AM_RANGE (0x084000, 0x09ffff) AM_ROM /* System EPROM Area 112Kb additional space for System ROM     */
 //AM_RANGE (0x0a0000, 0x0bffff) AM_ROM /* User EPROM/SRAM Area, max 128Kb mapped by a cartslot  */
-	AM_RANGE (0x0c0040, 0x0c0041) AM_DEVREADWRITE8 ("aciahost", acia6850_device, status_r, control_w, 0x00ff)
-	AM_RANGE (0x0c0042, 0x0c0043) AM_DEVREADWRITE8 ("aciahost", acia6850_device, data_r, data_w, 0x00ff)
-	AM_RANGE (0x0c0080, 0x0c0081) AM_DEVREADWRITE8 ("aciaterm", acia6850_device, status_r, control_w, 0xff00)
-	AM_RANGE (0x0c0082, 0x0c0083) AM_DEVREADWRITE8 ("aciaterm", acia6850_device, data_r, data_w, 0xff00)
-	AM_RANGE (0x0c0100, 0x0c0101) AM_DEVREADWRITE8 ("aciaremt", acia6850_device, status_r, control_w, 0x00ff)
-	AM_RANGE (0x0c0102, 0x0c0103) AM_DEVREADWRITE8 ("aciaremt", acia6850_device, data_r, data_w, 0x00ff)
+	AM_RANGE (0x0c0040, 0x0c0043) AM_DEVREADWRITE8 ("aciahost", acia6850_device, read, write, 0x00ff)
+	AM_RANGE (0x0c0080, 0x0c0083) AM_DEVREADWRITE8 ("aciaterm", acia6850_device, read, write, 0xff00)
+	AM_RANGE (0x0c0100, 0x0c0103) AM_DEVREADWRITE8 ("aciaremt", acia6850_device, read, write, 0x00ff)
 	AM_RANGE (0x0c0400, 0x0c042f) AM_DEVREADWRITE8 ("rtc", mm58167_device, read, write, 0x00ff)
 	AM_RANGE (0x0e0000, 0x0e0035) AM_DEVREADWRITE8 ("pit", pit68230_device, read, write, 0x00ff)
 //AM_RANGE(0x0e0200, 0x0e0380) AM_READWRITE(fpu_r, fpu_w) /* optional FPCP 68881 FPU interface */

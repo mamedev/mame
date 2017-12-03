@@ -112,7 +112,7 @@ protected:
 
 	address_space_config program_config, io_config;
 	address_space *program, *io;
-	direct_read_data *direct;
+	direct_read_data<0> *direct;
 	h8_dma_device *dma_device;
 	h8_dtc_device *dtc_device;
 	h8_dma_state *current_dma;

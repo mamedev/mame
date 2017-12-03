@@ -314,7 +314,7 @@ protected:
 	uint8_t   m_test_state;
 
 	address_space *m_program, *m_opcodes, *m_stack, *m_code, *m_extra;
-	direct_read_data *m_direct, *m_direct_opcodes;
+	direct_read_data<0> *m_direct, *m_direct_opcodes;
 	address_space *m_io;
 	offs_t m_fetch_xor;
 	int m_icount;

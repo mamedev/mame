@@ -8,6 +8,7 @@ project "bx"
 
 	includedirs {
 		path.join(BX_DIR, "include"),
+		path.join(BX_DIR, "3rdparty"),
 	}
 
 	files {
@@ -15,6 +16,11 @@ project "bx"
 		path.join(BX_DIR, "include/**.inl"),
 		path.join(BX_DIR, "src/**.cpp"),
 	}
+
+	configuration { "Debug" }
+		defines {
+			"BX_CONFIG_DEBUG=1",
+		}
 
 	configuration { "linux-*" }
 		buildoptions {
@@ -25,19 +31,27 @@ project "bx"
 
 	if _OPTIONS["with-amalgamated"] then
 		excludes {
+			path.join(BX_DIR, "src/allocator.cpp"),
+			path.join(BX_DIR, "src/bx.cpp"),
 			path.join(BX_DIR, "src/commandline.cpp"),
-			path.join(BX_DIR, "src/crt.cpp"),
-			path.join(BX_DIR, "src/crtimpl.cpp"),
+			path.join(BX_DIR, "src/crtnone.cpp"),
 			path.join(BX_DIR, "src/debug.cpp"),
 			path.join(BX_DIR, "src/dtoa.cpp"),
-			path.join(BX_DIR, "src/fpumath.cpp"),
+			path.join(BX_DIR, "src/easing.cpp"),
+			path.join(BX_DIR, "src/file.cpp"),
+			path.join(BX_DIR, "src/filepath.cpp"),
+			path.join(BX_DIR, "src/hash.cpp"),
+			path.join(BX_DIR, "src/math.cpp"),
 			path.join(BX_DIR, "src/mutex.cpp"),
 			path.join(BX_DIR, "src/os.cpp"),
-			path.join(BX_DIR, "src/sem.cpp"),
+			path.join(BX_DIR, "src/process.cpp"),
+			path.join(BX_DIR, "src/semaphore.cpp"),
+			path.join(BX_DIR, "src/settings.cpp"),
 			path.join(BX_DIR, "src/sort.cpp"),
 			path.join(BX_DIR, "src/string.cpp"),
 			path.join(BX_DIR, "src/thread.cpp"),
 			path.join(BX_DIR, "src/timer.cpp"),
+			path.join(BX_DIR, "src/url.cpp"),
 		}
 	else
 		excludes {

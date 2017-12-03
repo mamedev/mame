@@ -80,7 +80,7 @@ protected:
 	uint8_t               m_irq_state;
 	int                 m_icount;
 	address_space *m_program;
-	direct_read_data *m_direct;
+	direct_read_data<0> *m_direct;
 	devcb_write_line   m_out_reset_func;
 
 	inline int ROPCODE();

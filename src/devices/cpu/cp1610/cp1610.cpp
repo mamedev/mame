@@ -27,9 +27,9 @@ DEFINE_DEVICE_TYPE(CP1610, cp1610_cpu_device, "cp1610", "GI CP1610")
 #define C  0x10
 
 
-#define cp1610_readop(A) m_program->read_word((A)<<1)
-#define cp1610_readmem16(A) m_program->read_word((A)<<1)
-#define cp1610_writemem16(A,B) m_program->write_word((A)<<1,B)
+#define cp1610_readop(A) m_program->read_word(A)
+#define cp1610_readmem16(A) m_program->read_word(A)
+#define cp1610_writemem16(A,B) m_program->write_word(A,B)
 
 /* clear all flags */
 #define CLR_SZOC                \

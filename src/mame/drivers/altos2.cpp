@@ -99,4 +99,4 @@ ROM_START( altos2 )
 	ROM_LOAD( "us_v1.1_14410.u34", 0x0000, 0x2000, CRC(0ebb78bf) SHA1(96a1f7d34ff35037cbbc93049c0e2b9c9f11f1db) )
 ROM_END
 
-COMP( 198?, altos2, 0, 0, altos2, altos2, altos2_state, 0, "Altos", "Altos II Terminal", MACHINE_IS_SKELETON )
+COMP( 1983, altos2, 0, 0, altos2, altos2, altos2_state, 0, "Altos", "Altos II Terminal", MACHINE_IS_SKELETON )

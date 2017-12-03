@@ -94,7 +94,7 @@ namespace bgfx
 		{ 2, 0 }, // SQRT
 		{ 1, 0 }, // SWITCH
 		{ 3, 0 }, // SINCOS
-		{ 3, 0 }, // UDIV
+		{ 4, 0 }, // UDIV
 		{ 3, 0 }, // ULT
 		{ 3, 0 }, // UGE
 		{ 4, 0 }, // UMUL
@@ -1279,12 +1279,12 @@ namespace bgfx
 		_instruction.numOperands = info.numOperands;
 		switch (info.numOperands)
 		{
-		case 6: size += read(_reader, _instruction.operand[currOp++], _err);
-		case 5: size += read(_reader, _instruction.operand[currOp++], _err);
-		case 4: size += read(_reader, _instruction.operand[currOp++], _err);
-		case 3: size += read(_reader, _instruction.operand[currOp++], _err);
-		case 2: size += read(_reader, _instruction.operand[currOp++], _err);
-		case 1: size += read(_reader, _instruction.operand[currOp++], _err);
+		case 6: size += read(_reader, _instruction.operand[currOp++], _err); BX_FALLTHROUGH;
+		case 5: size += read(_reader, _instruction.operand[currOp++], _err); BX_FALLTHROUGH;
+		case 4: size += read(_reader, _instruction.operand[currOp++], _err); BX_FALLTHROUGH;
+		case 3: size += read(_reader, _instruction.operand[currOp++], _err); BX_FALLTHROUGH;
+		case 2: size += read(_reader, _instruction.operand[currOp++], _err); BX_FALLTHROUGH;
+		case 1: size += read(_reader, _instruction.operand[currOp++], _err); BX_FALLTHROUGH;
 		case 0:
 			if (0 < info.numValues)
 			{

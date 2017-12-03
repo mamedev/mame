@@ -23,7 +23,7 @@ mcs96_device::mcs96_device(const machine_config &mconfig, device_type type, cons
 void mcs96_device::device_start()
 {
 	program = &space(AS_PROGRAM);
-	direct = &program->direct();
+	direct = program->direct<0>();
 	m_icountptr = &icount;
 
 	state_add(STATE_GENPC,     "GENPC",     PC).noshow();

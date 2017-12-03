@@ -394,7 +394,7 @@ const alpha8201_cpu_device::s_opcode alpha8201_cpu_device::opcode_8301[256]=
 void alpha8201_cpu_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<0>();
 
 	state_add( ALPHA8201_PC, "PC", m_pc.w.l ).callimport().mask(0x3ff).formatstr("%03X");
 	state_add( ALPHA8201_SP, "SP", m_sp ).callimport().callexport().formatstr("%02X");

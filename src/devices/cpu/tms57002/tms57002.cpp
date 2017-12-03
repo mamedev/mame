@@ -108,7 +108,7 @@ WRITE8_MEMBER(tms57002_device::data_w)
 				sti = (sti & ~SU_MASK) | SU_PRG;
 				break;
 			case SU_PRG:
-				program->write_dword(pc++ << 2, val);
+				program->write_dword(pc++, val);
 				break;
 			}
 		}
@@ -689,7 +689,7 @@ int tms57002_device::decode_get_pc()
 
 	for(;;) {
 		short ipc;
-		uint32_t opcode = program->read_dword(adr << 2);
+		uint32_t opcode = program->read_dword(adr);
 
 		cs.inc = 0;
 

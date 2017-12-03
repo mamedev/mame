@@ -131,7 +131,7 @@ protected:
 	virtual void video_start() override;
 	virtual void machine_start() override;
 private:
-	uint8_t *m_videoram;
+	std::unique_ptr<uint8_t []> m_videoram;
 	tilemap_t *m_bg_tilemap;
 
 	required_device<cpu_device> m_maincpu;
@@ -180,9 +180,10 @@ void amusco_state::video_start()
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(amusco_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 10, 74, 24);
 	m_blink_state = false;
 
-	m_videoram = auto_alloc_array_clear(machine(), uint8_t, videoram_size);
+	m_videoram = std::make_unique<uint8_t []>(videoram_size);
+	std::fill_n(m_videoram.get(), videoram_size, 0);
 
-	save_pointer(NAME(m_videoram), videoram_size);
+	save_pointer(NAME(m_videoram.get()), videoram_size);
 }
 
 void amusco_state::machine_start()

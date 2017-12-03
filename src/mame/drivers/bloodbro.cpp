@@ -12,8 +12,6 @@ TODO:
 West Story:
 - sound (still has IRQ problems) - seems way too fast but using actual
   measurements from a real PCB
-- some bad sprites, WS25 & WS26 appear to contain bad sprites, but verified
-  correct on 2 different PCBs. Should the actual decoded data match?
 
 Blood Bros  (c) 1990 Nihon System [Seibu hardware]
 -----------

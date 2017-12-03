@@ -1049,10 +1049,7 @@ READ8_MEMBER( can09t_state::read )
 		{
 		case X0XX: // ACIA
 			LOGPLA("-- ACIA\n");
-			if (offset & 1)
-				byte = m_acia->data_r(space, 0);
-			else
-				byte = m_acia->status_r(space, 0);
+			byte = m_acia->read(space, offset & 1);
 			break;
 		case X1XX: // SYSPIA
 			LOGPLA("-- SYSPIA\n");
@@ -1134,10 +1131,7 @@ WRITE8_MEMBER( can09t_state::write )
 		{
 		case X0XX: // ACIA
 			LOGPLA("-- ACIA\n");
-			if (offset & 1)
-				m_acia->data_w(space, 0, data);
-			else
-				m_acia->control_w(space, 0, data);
+			m_acia->write(space, offset & 1, data);
 			break;
 		case X1XX: // SYSPIA
 			LOGPLA("-- SYSPIA\n");
@@ -1393,8 +1387,7 @@ static ADDRESS_MAP_START( can09_map, AS_PROGRAM, 8, can09_state )
 	AM_RANGE(0xe034, 0xe037) AM_DEVREADWRITE(PIA1_TAG, pia6821_device, read, write)
 
 #if 0
-	AM_RANGE(0xb100, 0xb100) AM_DEVREADWRITE("acia", acia6850_device, status_r, control_w)
-	AM_RANGE(0xb101, 0xb101) AM_DEVREADWRITE("acia", acia6850_device, data_r, data_w)
+	AM_RANGE(0xb100, 0xb101) AM_DEVREADWRITE("acia", acia6850_device, read, write)
 	AM_RANGE(0xb110, 0xb113) AM_DEVREADWRITE(PIA1_TAG, pia6821_device, read_alt, write_alt)
 	AM_RANGE(0xb120, 0xb123) AM_DEVREADWRITE(PIA2_TAG, pia6821_device, read_alt, write_alt)
 	AM_RANGE(0xb130, 0xb137) AM_DEVREADWRITE("ptm", ptm6840_device, read, write)

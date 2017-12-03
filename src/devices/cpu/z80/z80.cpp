@@ -3407,8 +3407,8 @@ void z80_device::device_start()
 
 	m_program = &space(AS_PROGRAM);
 	m_decrypted_opcodes = has_space(AS_OPCODES) ? &space(AS_OPCODES) : m_program;
-	m_direct = &m_program->direct();
-	m_decrypted_opcodes_direct = &m_decrypted_opcodes->direct();
+	m_direct = m_program->direct<0>();
+	m_decrypted_opcodes_direct = m_decrypted_opcodes->direct<0>();
 	m_io = &space(AS_IO);
 
 	IX = IY = 0xffff; /* IX and IY are FFFF after a reset! */

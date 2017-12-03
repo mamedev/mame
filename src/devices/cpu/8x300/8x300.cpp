@@ -97,7 +97,7 @@ uint8_t n8x300_cpu_device::get_reg(uint8_t reg)
 void n8x300_cpu_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<0>();
 	m_io = &space(AS_IO);
 
 	save_item(NAME(m_PC));

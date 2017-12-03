@@ -95,10 +95,13 @@ protected:
 	};
 	struct ymz_sequence
 	{
+		uint32_t delay;
 		uint16_t sequence;
-		uint8_t control;
-		uint8_t delay;
+		uint16_t timer;
+		uint16_t stopchan;
+		uint8_t loop;
 		uint8_t *data;
+		uint8_t bank;
 		bool is_playing;
 	};
 
@@ -119,7 +122,7 @@ protected:
 	virtual void internal_reg_write(uint8_t reg, uint8_t data) override;
 	virtual uint32_t get_phrase_offs(int phrase) override { int ph = phrase * 4; return ((m_rom[ph] & 0x0f) << 24 | m_rom[ph + 1] << 16 | m_rom[ph + 2] << 8 | m_rom[ph + 3]) * 2; };
 	virtual uint32_t get_seq_offs(int sqn) override { int sq = sqn * 4 + 0x2000; return ((m_rom[sq] & 0x0f) << 24 | m_rom[sq + 1] << 16 | m_rom[sq + 2] << 8 | m_rom[sq + 3]) * 2; };
-	virtual void sequencer() override {};
+	virtual void sequencer() override;
 private:
 	int m_bank;
 };

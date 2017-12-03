@@ -7,6 +7,15 @@
 #	error "Must be included from bx/allocator.h"
 #endif // BX_ALLOCATOR_H_HEADER_GUARD
 
+inline void* operator new(size_t, bx::PlacementNewTag, void* _ptr)
+{
+	return _ptr;
+}
+
+inline void operator delete(void*, bx::PlacementNewTag, void*) throw()
+{
+}
+
 namespace bx
 {
 	inline AllocatorI::~AllocatorI()

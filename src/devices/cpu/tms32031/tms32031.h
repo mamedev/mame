@@ -764,7 +764,7 @@ protected:
 
 	uint32_t              m_iotemp;
 	address_space *     m_program;
-	direct_read_data *  m_direct;
+	direct_read_data<-2> *m_direct;
 	uint32_t *            m_bootrom;
 
 	bool                m_mcbl_mode;

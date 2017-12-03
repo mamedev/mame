@@ -996,7 +996,7 @@ void ppc_device::static_generate_memory_accessor(int mode, int size, int iswrite
 	/* on entry, address is in I0; data for writes is in I1; masks are in I2 */
 	/* on exit, read result is in I0 */
 	/* routine trashes I0-I3 */
-	int fastxor = BYTE8_XOR_BE(0) >> (int)(space_config(AS_PROGRAM)->m_databus_width < 64);
+	int fastxor = BYTE8_XOR_BE(0) >> (int)(space_config(AS_PROGRAM)->m_data_width < 64);
 	drcuml_block *block;
 	int translate_type;
 	int tlbreturn = 0;

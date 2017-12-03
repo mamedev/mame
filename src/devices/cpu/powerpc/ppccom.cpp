@@ -710,7 +710,7 @@ void ppc_device::device_start()
 	m_cache_line_size = 32;
 	m_cpu_clock = clock();
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<0>();
 	m_system_clock = c_bus_frequency != 0 ? c_bus_frequency : clock();
 	m_dcr_read_func = read32_delegate();
 	m_dcr_write_func = write32_delegate();

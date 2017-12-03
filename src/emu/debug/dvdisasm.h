@@ -80,6 +80,7 @@ public:
 	void set_backward_steps(u32 steps);
 	void set_disasm_width(u32 width);
 	void set_selected_address(offs_t address);
+	virtual void set_source(const debug_view_source &source) override;
 
 protected:
 	// view overrides

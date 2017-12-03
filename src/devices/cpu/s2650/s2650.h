@@ -95,7 +95,7 @@ private:
 	uint8_t   m_irq_state;
 
 	int     m_icount;
-	direct_read_data *m_direct;
+	direct_read_data<0> *m_direct;
 
 	// For debugger
 	uint16_t  m_debugger_temp;

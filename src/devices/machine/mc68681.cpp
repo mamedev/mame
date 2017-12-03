@@ -26,7 +26,7 @@
 #include "emu.h"
 #include "mc68681.h"
 
-#define VERBOSE 1
+//#define VERBOSE 1
 //#define LOG_OUTPUT_FUNC printf
 #include "logmacro.h"
 

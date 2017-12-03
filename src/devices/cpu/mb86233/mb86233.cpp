@@ -79,9 +79,9 @@ util::disasm_interface *mb86233_cpu_device::create_disassembler()
 #define GETBRAM()           m_BRAM
 #define GETREPCNT()         m_repcnt
 
-#define ROPCODE(a)          m_direct->read_dword(a<<2)
-#define RDMEM(a)            m_program->read_dword((a<<2))
-#define WRMEM(a,v)          m_program->write_dword((a<<2), v)
+#define ROPCODE(a)          m_direct->read_dword(a)
+#define RDMEM(a)            m_program->read_dword(a)
+#define WRMEM(a,v)          m_program->write_dword((a), v)
 
 /***************************************************************************
     Initialization and Shutdown
@@ -110,7 +110,7 @@ void mb86233_cpu_device::device_start()
 	m_fifo_write_cb.resolve_safe();
 
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<-2>();
 
 	if ( m_tablergn )
 	{

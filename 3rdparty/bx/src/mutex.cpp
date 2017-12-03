@@ -3,13 +3,13 @@
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
+#include "bx_p.h"
 #include <bx/mutex.h>
 
 #if BX_CONFIG_SUPPORTS_THREADING
 
 #if    BX_PLATFORM_ANDROID \
 	|| BX_PLATFORM_LINUX   \
-	|| BX_PLATFORM_NACL    \
 	|| BX_PLATFORM_IOS     \
 	|| BX_PLATFORM_OSX     \
 	|| BX_PLATFORM_PS4     \
@@ -17,7 +17,6 @@
 #	include <pthread.h>
 #elif  BX_PLATFORM_WINDOWS \
 	|| BX_PLATFORM_WINRT   \
-	|| BX_PLATFORM_XBOX360 \
 	|| BX_PLATFORM_XBOXONE
 #	include <windows.h>
 #	include <errno.h>
@@ -25,7 +24,9 @@
 
 namespace bx
 {
-#if BX_PLATFORM_WINDOWS || BX_PLATFORM_XBOX360 || BX_PLATFORM_XBOXONE || BX_PLATFORM_WINRT
+#if    BX_PLATFORM_WINDOWS \
+	|| BX_PLATFORM_XBOXONE \
+	|| BX_PLATFORM_WINRT
 	typedef CRITICAL_SECTION pthread_mutex_t;
 	typedef unsigned pthread_mutexattr_t;
 
@@ -69,7 +70,9 @@ namespace bx
 
 		pthread_mutexattr_t attr;
 
-#if BX_PLATFORM_WINDOWS || BX_PLATFORM_XBOX360 || BX_PLATFORM_XBOXONE || BX_PLATFORM_WINRT
+#if    BX_PLATFORM_WINDOWS \
+	|| BX_PLATFORM_XBOXONE \
+	|| BX_PLATFORM_WINRT
 #else
 		pthread_mutexattr_init(&attr);
 		pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);

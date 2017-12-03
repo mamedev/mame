@@ -626,6 +626,12 @@ static MACHINE_CONFIG_START( to7 )
 	MCFG_CPU_ADD ( "maincpu", M6809, 1000000 )
 	MCFG_CPU_PROGRAM_MAP ( to7)
 
+	MCFG_INPUT_MERGER_ANY_HIGH("mainirq")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
+
+	MCFG_INPUT_MERGER_ANY_HIGH("mainfirq")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", M6809_FIRQ_LINE))
+
 /* video */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE ( /*50*/ 1./0.019968 )
@@ -664,7 +670,7 @@ static MACHINE_CONFIG_START( to7 )
 	MCFG_MC6846_OUT_CP2_CB(DEVWRITELINE("buzzer", dac_bit_interface, write))
 	MCFG_MC6846_IN_PORT_CB(READ8(thomson_state, to7_timer_port_in))
 	MCFG_MC6846_OUT_CTO_CB(WRITELINE(thomson_state, to7_set_cassette))
-	MCFG_MC6846_IRQ_CB(WRITELINE(thomson_state, thom_dev_irq_0))
+	MCFG_MC6846_IRQ_CB(DEVWRITELINE("mainirq", input_merger_device, in_w<0>))
 
 /* floppy */
 	MCFG_DEVICE_ADD("mc6843", MC6843, 0)
@@ -699,16 +705,16 @@ static MACHINE_CONFIG_START( to7 )
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(thomson_state, to7_sys_portb_out))
 	MCFG_PIA_CA2_HANDLER(WRITELINE(thomson_state, to7_set_cassette_motor))
 	MCFG_PIA_CB2_HANDLER(WRITELINE(thomson_state, to7_sys_cb2_out))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(thomson_state, thom_firq_1))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(thomson_state, thom_firq_1))
+	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("mainfirq", input_merger_device, in_w<1>))
+	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("mainfirq", input_merger_device, in_w<1>))
 
 	MCFG_DEVICE_ADD(THOM_PIA_GAME, PIA6821, 0)
 	MCFG_PIA_READPA_HANDLER(READ8(thomson_state, to7_game_porta_in))
 	MCFG_PIA_READPB_HANDLER(READ8(thomson_state, to7_game_portb_in))
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(thomson_state, to7_game_portb_out))
 	MCFG_PIA_CB2_HANDLER(WRITELINE(thomson_state, to7_game_cb2_out))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(thomson_state, thom_irq_1))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(thomson_state, thom_irq_1))
+	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("mainirq", input_merger_device, in_w<1>))
+	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("mainirq", input_merger_device, in_w<1>))
 
 /* TODO: CONVERT THIS TO A SLOT DEVICE (RF 57-932) */
 	MCFG_DEVICE_ADD("acia", MOS6551, 0)
@@ -1130,7 +1136,7 @@ static MACHINE_CONFIG_DERIVED( mo5, to7 )
 	MCFG_PIA_WRITEPB_HANDLER(DEVWRITE8("buzzer", dac_bit_interface, write))
 	MCFG_PIA_CA2_HANDLER(WRITELINE(thomson_state, mo5_set_cassette_motor))
 	MCFG_PIA_CB2_HANDLER(NOOP)
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(thomson_state, thom_irq_1)) /* WARNING: differs from TO7 ! */
+	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("mainirq", input_merger_device, in_w<1>)) // WARNING: differs from TO7 !
 
 	MCFG_DEVICE_REMOVE("cartslot")
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "mo_cart")
@@ -1866,7 +1872,7 @@ static MACHINE_CONFIG_DERIVED( to9p, to7 )
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(thomson_state, to8_sys_portb_out))
 	MCFG_PIA_CB2_HANDLER(NOOP)
 	MCFG_PIA_IRQA_HANDLER(NOOP)
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(thomson_state, thom_firq_1))
+	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("mainfirq", input_merger_device, in_w<1>))
 
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(thomson_state, write_centronics_busy))
@@ -2221,7 +2227,7 @@ static MACHINE_CONFIG_DERIVED( mo6, to7 )
 	MCFG_PIA_WRITEPB_HANDLER(DEVWRITE8("buzzer", dac_bit_interface, write))
 	MCFG_PIA_CA2_HANDLER(WRITELINE(thomson_state, mo5_set_cassette_motor))
 	MCFG_PIA_CB2_HANDLER(WRITELINE(thomson_state, mo6_sys_cb2_out))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(thomson_state, thom_irq_1)) /* differs from TO */
+	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("mainirq", input_merger_device, in_w<1>)) // differs from TO
 
 	MCFG_DEVICE_MODIFY(THOM_PIA_GAME)
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(thomson_state, mo6_game_porta_out))
@@ -2490,7 +2496,7 @@ static MACHINE_CONFIG_DERIVED( mo5nr, to7 )
 	MCFG_PIA_WRITEPB_HANDLER(DEVWRITE8("buzzer", dac_bit_interface, write))
 	MCFG_PIA_CA2_HANDLER(WRITELINE(thomson_state, mo5_set_cassette_motor))
 	MCFG_PIA_CB2_HANDLER(WRITELINE(thomson_state, mo6_sys_cb2_out))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(thomson_state, thom_irq_1)) /* differs from TO */
+	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("mainirq", input_merger_device, in_w<1>)) // differs from TO
 
 	MCFG_DEVICE_MODIFY(THOM_PIA_GAME)
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(thomson_state, mo6_game_porta_out))

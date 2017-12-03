@@ -337,7 +337,7 @@ void mips3_device::device_start()
 
 	m_cpu_clock = clock();
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<0>();
 
 	/* set up the endianness */
 	m_program->accessors(m_memory);

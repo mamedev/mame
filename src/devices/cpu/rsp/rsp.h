@@ -236,7 +236,7 @@ private:
 
 	address_space *m_program;
 protected:
-	direct_read_data *m_direct;
+	direct_read_data<0> *m_direct;
 
 private:
 	std::unique_ptr<rsp_cop2>    m_cop2;

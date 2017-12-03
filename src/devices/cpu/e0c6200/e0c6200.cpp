@@ -211,7 +211,7 @@ void e0c6200_cpu_device::execute_run()
 
 		// fetch next opcode
 		debugger_instruction_hook(this, m_pc);
-		m_op = m_program->read_word(m_pc << 1) & 0xfff;
+		m_op = m_program->read_word(m_pc) & 0xfff;
 		m_pc = (m_pc & 0x1000) | ((m_pc + 1) & 0x0fff);
 
 		// minimal opcode time is 5 clock cycles, opcodes take 5, 7, or 12 clock cycles

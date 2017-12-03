@@ -93,7 +93,7 @@ util::disasm_interface *saturn_device::create_disassembler()
 void saturn_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<0>();
 
 	m_out_func.resolve_safe();
 	m_in_func.resolve_safe(0);

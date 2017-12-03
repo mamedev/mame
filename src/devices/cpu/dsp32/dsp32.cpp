@@ -192,7 +192,7 @@ void dsp32c_device::device_start()
 
 	// get our address spaces
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<0>();
 
 	// register our state for the debugger
 	state_add(STATE_GENPC,     "GENPC",     m_r[15]).noshow();

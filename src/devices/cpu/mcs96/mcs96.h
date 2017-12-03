@@ -65,7 +65,7 @@ protected:
 
 	address_space_config program_config;
 	address_space *program;
-	direct_read_data *direct;
+	direct_read_data<0> *direct;
 
 	int icount, bcount, inst_state, cycles_scaling;
 	uint8_t pending_irq;

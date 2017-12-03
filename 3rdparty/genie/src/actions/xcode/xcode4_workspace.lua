@@ -13,15 +13,31 @@ function xcode4.workspace_tail()
 	_p('</Workspace>')
 end
 
-function xcode4.workspace_file_ref(prj)
+function xcode4.workspace_file_ref(prj, indent)
 
-		local projpath = path.getrelative(prj.solution.location, prj.location)
-		if projpath == '.' then projpath = '' 
-		else projpath = projpath ..'/' 
-		end
-		_p(1,'<FileRef')
-			_p(2,'location = "group:%s">',projpath .. prj.name .. '.xcodeproj')
-		_p(1,'</FileRef>')
+	local projpath = path.getrelative(prj.solution.location, prj.location)
+	if projpath == '.' then projpath = ''
+	else projpath = projpath ..'/'
+	end
+	_p(indent, '<FileRef')
+	_p(indent + 1, 'location = "group:%s">', projpath .. prj.name .. '.xcodeproj')
+	_p(indent, '</FileRef>')
+end
+
+function xcode4.workspace_group(grp, indent)
+	_p(indent, '<Group')
+	_p(indent + 1, 'location = "container:"')
+	_p(indent + 1, 'name = "%s">', grp.name)
+
+	for _, child in ipairs(grp.groups) do
+		xcode4.workspace_group(child, indent + 1)
+	end
+
+	for _, prj in ipairs(grp.projects) do
+		xcode4.workspace_file_ref(prj, indent + 1)
+	end
+
+	_p(indent, '</Group>')
 end
 
 function xcode4.workspace_generate(sln)
@@ -31,8 +47,16 @@ function xcode4.workspace_generate(sln)
 
 	xcode4.reorderProjects(sln)
 
+	for grp in premake.solution.eachgroup(sln) do
+		if grp.parent == nil then
+			xcode4.workspace_group(grp, 1)
+		end
+	end
+
 	for prj in premake.solution.eachproject(sln) do
-		xcode4.workspace_file_ref(prj)
+		if prj.group == nil then
+			xcode4.workspace_file_ref(prj, 1)
+		end
 	end
 	
 	xcode4.workspace_tail()

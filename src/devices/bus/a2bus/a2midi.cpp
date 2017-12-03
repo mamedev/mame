@@ -95,14 +95,9 @@ uint8_t a2bus_midi_device::read_c0nx(address_space &space, uint8_t offset)
 	{
 		return m_ptm->read(space, offset & 7);
 	}
-	else if (offset == 8)
+	else if (offset == 8 || offset == 9)
 	{
-		return m_acia->status_r(space, 0);
-	}
-	else if (offset == 9)
-	{
-		uint8_t ret = m_acia->data_r(space, 0);
-		return ret;
+		return m_acia->read(space, offset & 1);
 	}
 
 	return 0;
@@ -118,13 +113,9 @@ void a2bus_midi_device::write_c0nx(address_space &space, uint8_t offset, uint8_t
 	{
 		m_ptm->write(space, offset & 7, data);
 	}
-	else if (offset == 8)
+	else if (offset == 8 || offset == 9)
 	{
-		m_acia->control_w(space, 0, data);
-	}
-	else if (offset == 9)
-	{
-		m_acia->data_w(space, 0, data);
+		m_acia->write(space, offset & 1, data);
 	}
 }
 

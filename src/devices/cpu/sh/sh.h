@@ -347,7 +347,7 @@ public:
 
 	void sh2drc_add_fastram(offs_t start, offs_t end, uint8_t readonly, void *base);
 
-	direct_read_data *m_direct;
+	direct_read_data<0> *m_direct;
 	address_space *m_program;
 
 	std::unique_ptr<drcuml_state>      m_drcuml;                 /* DRC UML generator state */

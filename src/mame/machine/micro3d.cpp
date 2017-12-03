@@ -84,130 +84,23 @@ WRITE8_MEMBER(micro3d_state::duart_output_w)
  *
  *************************************/
 
-enum
+READ8_MEMBER( micro3d_state::vgb_uart_r )
 {
-	RX, TX, STATUS, SYN1, SYN2, DLE, MODE1, MODE2, COMMAND
-};
+	// the mode and sync registers switched places?
+	if (offset == 1 || offset == 2)
+		offset ^= 3;
 
-
-WRITE16_MEMBER(micro3d_state::micro3d_ti_uart_w)
-{
-	switch (offset)
-	{
-		case 0x0:
-		{
-			m_ti_uart[TX] = data;
-#if VGB_MONITOR_DISPLAY
-			mame_debug_printf("%c",data);
-#endif
-			m_ti_uart[STATUS] |= 1;
-			break;
-		}
-		case 0x1:
-		{
-			if (m_ti_uart_mode_cycle == 0)
-			{
-				m_ti_uart[MODE1] = data;
-				m_ti_uart_mode_cycle = 1;
-			}
-			else
-			{
-				m_ti_uart[MODE2] = data;
-				m_ti_uart_mode_cycle = 0;
-			}
-			break;
-		}
-		case 0x2:
-		{
-			if (m_ti_uart_sync_cycle == 0)
-			{
-				m_ti_uart[SYN1] = data;
-				m_ti_uart_mode_cycle = 1;
-			}
-			else if (m_ti_uart_sync_cycle == 1)
-			{
-				m_ti_uart[SYN2] = data;
-				m_ti_uart_mode_cycle = 2;
-			}
-			else
-			{
-				m_ti_uart[DLE] = data;
-				m_ti_uart_mode_cycle = 0;
-			}
-			break;
-		}
-		case 0x3:
-		{
-			m_ti_uart[COMMAND] = data;
-			m_ti_uart_mode_cycle = 0;
-			m_ti_uart_sync_cycle = 0;
-			break;
-		}
-	}
+	return m_vgb_uart->read(space, offset);
 }
 
-READ16_MEMBER(micro3d_state::micro3d_ti_uart_r)
+WRITE8_MEMBER( micro3d_state::vgb_uart_w )
 {
-	switch (offset)
-	{
-		case 0x0:
-		{
-			m_ti_uart[STATUS] ^= 2;
-			return m_ti_uart[RX];
-		}
-		case 0x1:
-		{
-			if (m_ti_uart_mode_cycle == 0)
-			{
-				m_ti_uart_mode_cycle = 1;
-				return m_ti_uart[MODE1];
-			}
-			else
-			{
-				m_ti_uart_mode_cycle = 0;
-				return m_ti_uart[MODE2];
-			}
-		}
-		case 0x2:
-		{
-			return m_ti_uart[STATUS];
-		}
-		case 0x3:
-		{
-			m_ti_uart_mode_cycle = m_ti_uart_sync_cycle = 0;
-			return m_ti_uart[COMMAND];
-		}
-		default:
-		{
-			logerror("Unknown TI UART access.\n");
-			return 0;
-		}
-	}
+	// the mode and sync registers switched places?
+	if (offset == 1 || offset == 2)
+		offset ^= 3;
+
+	m_vgb_uart->write(space, offset, data);
 }
-
-
-/*************************************
- *
- *  Z8530 SCC (Am29000)
- *
- *************************************/
-
-WRITE32_MEMBER(micro3d_state::micro3d_scc_w)
-{
-#if DRMATH_MONITOR_DISPLAY
-	if (offset == 1)
-		osd_printf_debug("%c", data);
-#endif
-}
-
-READ32_MEMBER(micro3d_state::micro3d_scc_r)
-{
-	if (offset == 1)
-		return 0xd;
-	else
-		return 5;
-}
-
 
 
 /*************************************
@@ -652,8 +545,6 @@ DRIVER_INIT_MEMBER(micro3d_state,botss)
 
 void micro3d_state::machine_reset()
 {
-	m_ti_uart[STATUS] = 1;
-
 	m_vgb->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	m_drmath->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);

@@ -96,7 +96,7 @@ protected:
 	int m_mi;
 	address_space *m_program;
 	address_space *m_data;
-	direct_read_data *m_direct;
+	direct_read_data<0> *m_direct;
 	address_space *m_io;
 	int m_icount;
 	int m_vector_mult;

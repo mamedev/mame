@@ -42,6 +42,7 @@ public:
 	{ }
 
 	DECLARE_READ32_MEMBER(unk_startup_r);
+	DECLARE_READ32_MEMBER(rtc_r);
 	DECLARE_WRITE32_MEMBER(fg_videoram_w);
 	DECLARE_WRITE32_MEMBER(bg_videoram_w);
 
@@ -55,6 +56,7 @@ public:
 	DECLARE_DRIVER_INIT(kov3_104);
 	DECLARE_DRIVER_INIT(kov3_102);
 	DECLARE_DRIVER_INIT(kov3_100);
+	DECLARE_DRIVER_INIT(kof98umh);
 
 	uint32_t screen_update_pgm2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_pgm2);
@@ -71,7 +73,6 @@ private:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
-	void pgm_create_dummy_internal_arm_region();
 	void decrypt_kov3_module(uint32_t addrxor, uint16_t dataxor);
 
 	tilemap_t    *m_fg_tilemap;

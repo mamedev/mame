@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia
+#ifndef MAME_INCLUDES_WECLEMAN_H
+#define MAME_INCLUDES_WECLEMAN_H
+
+#pragma once
 
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
@@ -68,8 +72,6 @@ public:
 	int m_sound_hw_type;
 	bool m_hotchase_sound_hs;
 	pen_t m_black_pen;
-	struct sprite *m_sprite_list;
-	struct sprite **m_spr_ptr_list;
 	DECLARE_READ16_MEMBER(wecleman_protection_r);
 	DECLARE_WRITE16_MEMBER(wecleman_protection_w);
 	DECLARE_WRITE16_MEMBER(irqctrl_w);
@@ -114,8 +116,6 @@ public:
 	void hotchase_sprite_decode( int num16_banks, int bank_size );
 	void get_sprite_info();
 	void sortsprite(int *idx_array, int *key_array, int size);
-	template<class _BitmapClass> void do_blit_zoom32(_BitmapClass &bitmap, const rectangle &cliprect, struct sprite *sprite);
-	template<class _BitmapClass> void sprite_draw(_BitmapClass &bitmap, const rectangle &cliprect);
 	void wecleman_draw_road(bitmap_rgb32 &bitmap, const rectangle &cliprect, int priority);
 	void hotchase_draw_road(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	K051316_CB_MEMBER(hotchase_zoom_callback_1);
@@ -136,4 +136,30 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
 	required_device<generic_latch_8_device> m_soundlatch;
+
+private:
+	struct sprite_t
+	{
+		sprite_t() { }
+
+		uint8_t *pen_data = nullptr;    /* points to top left corner of tile data */
+		int line_offset = 0;
+
+		const pen_t *pal_data = nullptr;
+		rgb_t pal_base;
+
+		int x_offset = 0, y_offset = 0;
+		int tile_width = 0, tile_height = 0;
+		int total_width = 0, total_height = 0;  /* in screen coordinates */
+		int x = 0, y = 0;
+		int shadow_mode = 0, flags = 0;
+	};
+
+	template<class _BitmapClass> void do_blit_zoom32(_BitmapClass &bitmap, const rectangle &cliprect, const sprite_t &sprite);
+	template<class _BitmapClass> void sprite_draw(_BitmapClass &bitmap, const rectangle &cliprect);
+
+	std::unique_ptr<sprite_t []> m_sprite_list;
+	sprite_t **m_spr_ptr_list;
 };
+
+#endif // MAME_INCLUDES_WECLEMAN_H

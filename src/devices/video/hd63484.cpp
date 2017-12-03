@@ -367,7 +367,7 @@ const tiny_rom_entry *hd63484_device::device_rom_region() const
 
 inline uint16_t hd63484_device::readword(offs_t address)
 {
-	return space().read_word(address << 1);
+	return space().read_word(address);
 }
 
 
@@ -377,7 +377,7 @@ inline uint16_t hd63484_device::readword(offs_t address)
 
 inline void hd63484_device::writeword(offs_t address, uint16_t data)
 {
-	space().write_word(address << 1, data);
+	space().write_word(address, data);
 }
 
 

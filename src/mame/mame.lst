@@ -1079,7 +1079,9 @@ asma2k                          //
 asmapro                         //
 
 @source:alphatpx.cpp
+alphatp2
 alphatp3                        // 1982 Triumph-Adler
+alphatp30
 
 @source:alphatro.cpp
 alphatro                        //
@@ -1529,7 +1531,6 @@ mammothm                        // (c) 1997
 marmagic                        // (c) 2000
 marmagicu                       // (c) 2000
 marmagicua                      // (c) 2000
-marmagicub                      // (c) 2000
 minemine                        // (c) 1996
 minemineu                       // (c) 1996
 monmouse                        // (c) 1997
@@ -12601,6 +12602,7 @@ super9ccg                       // * German
 super9ccsp                      // * Spanish
 
 @source:fidel68k.cpp
+fdes2265                        //
 feagv10                         //
 feagv11                         //
 feagv2                          //
@@ -14775,6 +14777,7 @@ tbreakup                        // Tomy
 tc4                             // Coleco
 tcfball                         // Tandy Radio Shack
 tcfballa                        // Tandy Radio Shack
+xl25                            // Vulcan
 zodiac                          // Coleco
 
 @source:hh_ucom4.cpp
@@ -31282,6 +31285,7 @@ kov3_100                        //
 orleg2                          // (c) 2007
 orleg2_103                      //
 orleg2_101                      //
+kof98umh						// (c) 2009
 
 @source:pgm3.cpp
 kov3hd
@@ -31350,6 +31354,9 @@ photoply                        //
 
 @source:phunsy.cpp
 phunsy                          //
+
+@source:picno.cpp
+picno                           // Konami Picno (1993)
 
 @source:piggypas.cpp
 3lilpigs                        //
