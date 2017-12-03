@@ -7,6 +7,9 @@
   List of child drivers:
   - rzone: Tiger R-Zone
 
+  The LCD screen graphics are provided internally with an SVG file.
+  MAME external artwork is recommended for the backgrounds inlays.
+
   TODO:
   - improve LCD segments in SVGs for: gnw_mc25, gnw_eg26, exospace
   - confirm gnw_mc25/gnw_eg26 rom (dumped from Soviet clone, but pretty confident that it's same)
@@ -1875,6 +1878,10 @@ MACHINE_CONFIG_END
   * Sharp SM510 under epoxy (die label M88)
   * lcd screen with custom segments, 1-bit sound
 
+  known releases:
+  - World: Altered Beast
+  - Japan: Juuouki (published by Sega)
+
 ***************************************************************************/
 
 class taltbeast_state : public hh_sm510_state
@@ -1947,6 +1954,98 @@ static MACHINE_CONFIG_START( taltbeast )
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_SIZE(1455, 1080)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1455-1, 0, 1080-1)
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_svg)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
+  Tiger Space Harrier II
+  * Sharp SM510 under epoxy (die label M91)
+  * lcd screen with custom segments, 1-bit sound
+
+  known releases:
+  - World: Space Harrier II
+  - Japan: Space Harrier (published by Sega)
+
+***************************************************************************/
+
+class tsharr2_state : public hh_sm510_state
+{
+public:
+	tsharr2_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_sm510_state(mconfig, type, tag)
+	{
+		m_inp_lines = 5;
+		m_inp_fixed = 5;
+	}
+};
+
+// config
+
+static INPUT_PORTS_START( tsharr2 )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr)
+	PORT_BIT( 0x0b, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr)
+	PORT_BIT( 0x09, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.2") // S3
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr)
+	PORT_BIT( 0x0d, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.3") // S4
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) // Attack
+	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.4") // S5
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Max Score")
+	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.5") // GND!
+	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Power On/Start")
+
+	PORT_START("BA")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_VOLUME_DOWN ) PORT_NAME("Sound")
+
+	PORT_START("B")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POWER_OFF )
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
+INPUT_PORTS_END
+
+static MACHINE_CONFIG_START( tsharr2 )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", SM510, XTAL_32_768kHz)
+	MCFG_SM510_WRITE_SEGS_CB(WRITE16(hh_sm510_state, sm510_lcd_segment_w))
+	MCFG_SM510_READ_K_CB(READ8(hh_sm510_state, input_r))
+	MCFG_SM510_WRITE_S_CB(WRITE8(hh_sm510_state, input_w))
+	MCFG_SM510_WRITE_R_CB(WRITE8(hh_sm510_state, piezo_r1_w))
+	MCFG_SM510_R_DIRECT_CONTROL(true)
+	MCFG_SM510_READ_BA_CB(IOPORT("BA"))
+	MCFG_SM510_READ_B_CB(IOPORT("B"))
+
+	/* video hardware */
+	MCFG_SCREEN_SVG_ADD("screen", "svg")
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_SIZE(1493, 1080)
+	MCFG_SCREEN_VISIBLE_AREA(0, 1493-1, 0, 1080-1)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_svg)
@@ -2615,6 +2714,15 @@ ROM_START( taltbeast )
 ROM_END
 
 
+ROM_START( tsharr2 )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "m91", 0x0000, 0x1000, CRC(b207ac79) SHA1(9889dfec26089313ba2bdac845a75a26742d09e1) )
+
+	ROM_REGION( 516897, "svg", 0)
+	ROM_LOAD( "tsharr2.svg", 0, 516897, CRC(f2d103e4) SHA1(a218b7f51edc2a1e9093ca4930c812e859d997bd) )
+ROM_END
+
+
 ROM_START( tswampt )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "mb0", 0x0000, 0x1000, CRC(8433530c) SHA1(60716d3bba92dc8ac3f1ee29c5734c9e894a1aff) )
@@ -2686,6 +2794,7 @@ CONS( 1988, tgaunt,    0,        0, tgaunt,    tgaunt,    tgaunt_state,    0, "T
 CONS( 1988, tddragon,  0,        0, tddragon,  tddragon,  tddragon_state,  0, "Tiger Electronics (licensed from Tradewest/Technos)", "Double Dragon (handheld)", MACHINE_SUPPORTS_SAVE )
 CONS( 1989, tbatman,   0,        0, tbatman,   tbatman,   tbatman_state,   0, "Tiger Electronics", "Batman (handheld)", MACHINE_SUPPORTS_SAVE )
 CONS( 1990, taltbeast, 0,        0, taltbeast, taltbeast, taltbeast_state, 0, "Tiger Electronics (licensed from Sega)", "Altered Beast (handheld)", MACHINE_SUPPORTS_SAVE )
+CONS( 1990, tsharr2,   0,        0, tsharr2,   tsharr2,   tsharr2_state,   0, "Tiger Electronics (licensed from Sega)", "Space Harrier II (handheld)", MACHINE_SUPPORTS_SAVE )
 CONS( 1991, tswampt,   0,        0, tswampt,   tswampt,   tswampt_state,   0, "Tiger Electronics", "Swamp Thing (handheld)", MACHINE_SUPPORTS_SAVE )
 CONS( 1991, tsonic,    0,        0, tsonic,    tsonic,    tsonic_state,    0, "Tiger Electronics (licensed from Sega)", "Sonic The Hedgehog (handheld)", MACHINE_SUPPORTS_SAVE )
 CONS( 1996, tsjam,     0,        0, tsjam,     tsjam,     tsjam_state,     0, "Tiger Electronics", "Space Jam (handheld)", MACHINE_SUPPORTS_SAVE )
