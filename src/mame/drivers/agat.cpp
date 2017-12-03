@@ -84,8 +84,6 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_READ8_MEMBER(c000_r);
-	DECLARE_WRITE8_MEMBER(c000_w);
 	DECLARE_READ8_MEMBER(c080_r);
 	DECLARE_WRITE8_MEMBER(c080_w);
 	DECLARE_READ8_MEMBER(c100_r);
@@ -106,6 +104,20 @@ public:
 	DECLARE_WRITE8_MEMBER(agat7_membank_w);
 	DECLARE_READ8_MEMBER(agat7_ram_r);
 	DECLARE_WRITE8_MEMBER(agat7_ram_w);
+	DECLARE_READ8_MEMBER(keyb_data_r);
+	DECLARE_READ8_MEMBER(keyb_strobe_r);
+	DECLARE_WRITE8_MEMBER(keyb_strobe_w);
+	DECLARE_READ8_MEMBER(cassette_toggle_r);
+	DECLARE_WRITE8_MEMBER(cassette_toggle_w);
+	DECLARE_READ8_MEMBER(speaker_toggle_r);
+	DECLARE_WRITE8_MEMBER(speaker_toggle_w);
+	DECLARE_READ8_MEMBER(interrupts_on_r);
+	DECLARE_WRITE8_MEMBER(interrupts_on_w);
+	DECLARE_READ8_MEMBER(interrupts_off_r);
+	DECLARE_WRITE8_MEMBER(interrupts_off_w);
+	DECLARE_READ8_MEMBER(flags_r);
+	DECLARE_READ8_MEMBER(controller_strobe_r);
+	DECLARE_WRITE8_MEMBER(controller_strobe_w);
 
 private:
 	int m_speaker_state;
@@ -291,120 +303,123 @@ void agat7_state::machine_reset()
 /***************************************************************************
     I/O
 ***************************************************************************/
-// most softswitches don't care about read vs write, so handle them here
-void agat7_state::do_io(address_space &space, int offset)
+
+READ8_MEMBER(agat7_state::keyb_data_r)
 {
-	if (machine().side_effect_disabled())
-	{
-		return;
-	}
-
-	switch (offset & 0xf0)
-	{
-		case 0x20:
-			m_cassette_state ^= 1;
-			m_cassette->output(m_cassette_state ? 1.0f : -1.0f);
-			break;
-
-		case 0x30:
-			m_speaker_state ^= 1;
-			m_speaker->level_w(m_speaker_state);
-			break;
-
-		// XXX agat7: 0x4N -- enable timer interrupts, 0x5N -- disable (or vice versa depending on hw rev)
-		case 0x40:
-			m_agat7_interrupts = true;
-			break;
-
-		case 0x50:
-			m_agat7_interrupts = false;
-
-		case 0x70:
-			m_joystick_x1_time = machine().time().as_double() + m_x_calibration * m_joy1x->read();
-			m_joystick_y1_time = machine().time().as_double() + m_y_calibration * m_joy1y->read();
-			m_joystick_x2_time = machine().time().as_double() + m_x_calibration * m_joy2x->read();
-			m_joystick_y2_time = machine().time().as_double() + m_y_calibration * m_joy2y->read();
-			break;
-	}
+	return m_strobe ? (m_transchar | m_strobe) : 0;
 }
 
-READ8_MEMBER(agat7_state::c000_r)
+READ8_MEMBER(agat7_state::keyb_strobe_r)
 {
-	if (offset)
-	logerror("%s: c000_r %04X == %02X\n", machine().describe_context(), offset+0xc000, 0);
-	else if (m_strobe)
-	logerror("%s: c000_r %04X == %02X\n", machine().describe_context(), offset+0xc000, m_transchar | m_strobe);
+	// reads any key down, clears strobe
+	uint8_t rv = m_transchar | (m_anykeydown ? 0x80 : 0x00);
+	if (!machine().side_effect_disabled())
+		m_strobe = 0;
+	return rv;
+}
 
-	switch (offset)
-	{
-		// keyboard latch.  NB: agat7 returns 0 if latch is clear, agat9 returns char code.
-		case 0x00: case 0x01: case 0x02: case 0x03: case 0x04: case 0x05: case 0x06: case 0x07:
-		case 0x08: case 0x09: case 0x0a: case 0x0b: case 0x0c: case 0x0d: case 0x0e: case 0x0f:
-			return m_strobe ? (m_transchar | m_strobe) : 0;
+WRITE8_MEMBER(agat7_state::keyb_strobe_w)
+{
+	// clear keyboard latch
+	m_strobe = 0;
+}
 
-		case 0x10:  // reads any key down, clears strobe
-			{
-				uint8_t rv = m_transchar | (m_anykeydown ? 0x80 : 0x00);
-				m_strobe = 0;
-				return rv;
-			}
-
-		case 0x60: // cassette in
-		case 0x68:
-			return m_cassette->input() > 0.0 ? 0x80 : 0;
-
-		case 0x61:  // button 0
-		case 0x69:
-			return (m_joybuttons->read() & 0x10) ? 0x80 : 0;
-
-		case 0x62:  // button 1
-		case 0x6a:
-			return (m_joybuttons->read() & 0x20) ? 0x80 : 0;
-
-		case 0x63:  // button 2
-		case 0x6b:
-			return ((m_joybuttons->read() & 0x40) || (m_kbspecial->read() & 0x06)) ? 0 : 0x80;
-
-		case 0x64:  // joy 1 X axis
-		case 0x6c:
-			return (space.machine().time().as_double() < m_joystick_x1_time) ? 0x80 : 0;
-
-		case 0x65:  // joy 1 Y axis
-		case 0x6d:
-			return (space.machine().time().as_double() < m_joystick_y1_time) ? 0x80 : 0;
-
-		case 0x66: // joy 2 X axis
-		case 0x6e:
-			return (space.machine().time().as_double() < m_joystick_x2_time) ? 0x80 : 0;
-
-		case 0x67: // joy 2 Y axis
-		case 0x6f:
-			return (space.machine().time().as_double() < m_joystick_y2_time) ? 0x80 : 0;
-
-		default:
-			do_io(space, offset);
-			break;
-	}
-
+READ8_MEMBER(agat7_state::cassette_toggle_r)
+{
+	if (!machine().side_effect_disabled())
+		cassette_toggle_w(space, offset, 0);
 	return read_floatingbus();
 }
 
-WRITE8_MEMBER(agat7_state::c000_w)
+WRITE8_MEMBER(agat7_state::cassette_toggle_w)
 {
-	logerror("%s: c000_w %04X <- %02X\n", machine().describe_context(), offset + 0xc000, data);
+	m_cassette_state ^= 1;
+	m_cassette->output(m_cassette_state ? 1.0f : -1.0f);
+}
 
+READ8_MEMBER(agat7_state::speaker_toggle_r)
+{
+	if (!machine().side_effect_disabled())
+		speaker_toggle_w(space, offset, 0);
+	return read_floatingbus();
+}
+
+WRITE8_MEMBER(agat7_state::speaker_toggle_w)
+{
+	m_speaker_state ^= 1;
+	m_speaker->level_w(m_speaker_state);
+}
+
+READ8_MEMBER(agat7_state::interrupts_on_r)
+{
+	if (!machine().side_effect_disabled())
+		interrupts_on_w(space, offset, 0);
+	return read_floatingbus();
+}
+
+WRITE8_MEMBER(agat7_state::interrupts_on_w)
+{
+	m_agat7_interrupts = true;
+}
+
+READ8_MEMBER(agat7_state::interrupts_off_r)
+{
+	if (!machine().side_effect_disabled())
+		interrupts_off_w(space, offset, 0);
+	return read_floatingbus();
+}
+
+WRITE8_MEMBER(agat7_state::interrupts_off_w)
+{
+	m_agat7_interrupts = false;
+}
+
+READ8_MEMBER(agat7_state::flags_r)
+{
 	switch (offset)
 	{
-		// clear keyboard latch
-		case 0x10: case 0x11: case 0x12: case 0x13: case 0x14: case 0x15: case 0x16: case 0x17:
-		case 0x18: case 0x19: case 0x1a: case 0x1b: case 0x1c: case 0x1d: case 0x1e: case 0x1f:
-			m_strobe = 0;
-			break;
+	case 0: // cassette in
+		return m_cassette->input() > 0.0 ? 0x80 : 0;
 
-		default:
-			do_io(space, offset);
-			break;
+	case 1: // button 0
+		return (m_joybuttons->read() & 0x10) ? 0x80 : 0;
+
+	case 2: // button 1
+		return (m_joybuttons->read() & 0x20) ? 0x80 : 0;
+
+	case 3: // button 2
+		return ((m_joybuttons->read() & 0x40) || !(m_kbspecial->read() & 0x06)) ? 0x80 : 0;
+
+	case 4: // joy 1 X axis
+		return (space.machine().time().as_double() < m_joystick_x1_time) ? 0x80 : 0;
+
+	case 5: // joy 1 Y axis
+		return (space.machine().time().as_double() < m_joystick_y1_time) ? 0x80 : 0;
+
+	case 6: // joy 2 X axis
+		return (space.machine().time().as_double() < m_joystick_x2_time) ? 0x80 : 0;
+
+	case 7: // joy 2 Y axis
+		return (space.machine().time().as_double() < m_joystick_y2_time) ? 0x80 : 0;
 	}
+
+	// this is never reached
+	return 0;
+}
+
+READ8_MEMBER(agat7_state::controller_strobe_r)
+{
+	if (!machine().side_effect_disabled())
+		controller_strobe_w(space, offset, 0);
+	return read_floatingbus();
+}
+
+WRITE8_MEMBER(agat7_state::controller_strobe_w)
+{
+	m_joystick_x1_time = machine().time().as_double() + m_x_calibration * m_joy1x->read();
+	m_joystick_y1_time = machine().time().as_double() + m_y_calibration * m_joy1y->read();
+	m_joystick_x2_time = machine().time().as_double() + m_x_calibration * m_joy2x->read();
+	m_joystick_y2_time = machine().time().as_double() + m_y_calibration * m_joy2y->read();
 }
 
 READ8_MEMBER(agat7_state::c080_r)
@@ -479,7 +494,7 @@ WRITE8_MEMBER(agat7_state::c100_w)
 			m_cnxx_slot = slotnum;
 		}
 
-		m_slotdevice[slotnum]->write_cnxx(space, offset&0xff, data);
+		m_slotdevice[slotnum]->write_cnxx(space, offset & 0xff, data);
 	}
 }
 
@@ -633,7 +648,14 @@ WRITE8_MEMBER(agat7_state::agat7_ram_w)
 static ADDRESS_MAP_START( agat7_map, AS_PROGRAM, 8, agat7_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xbfff) AM_READWRITE(agat7_ram_r, agat7_ram_w)
-	AM_RANGE(0xc000, 0xc07f) AM_READWRITE(c000_r, c000_w)
+	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0xf) AM_READ(keyb_data_r) AM_WRITENOP
+	AM_RANGE(0xc010, 0xc010) AM_MIRROR(0xf) AM_READWRITE(keyb_strobe_r, keyb_strobe_w)
+	AM_RANGE(0xc020, 0xc020) AM_MIRROR(0xf) AM_READWRITE(cassette_toggle_r, cassette_toggle_w)
+	AM_RANGE(0xc030, 0xc030) AM_MIRROR(0xf) AM_READWRITE(speaker_toggle_r, speaker_toggle_w)
+	AM_RANGE(0xc040, 0xc040) AM_MIRROR(0xf) AM_READWRITE(interrupts_on_r, interrupts_on_w)
+	AM_RANGE(0xc050, 0xc050) AM_MIRROR(0xf) AM_READWRITE(interrupts_off_r, interrupts_off_w)
+	AM_RANGE(0xc060, 0xc067) AM_MIRROR(0x8) AM_READ(flags_r) AM_WRITENOP
+	AM_RANGE(0xc070, 0xc070) AM_MIRROR(0xf) AM_READWRITE(controller_strobe_r, controller_strobe_w)
 	AM_RANGE(0xc080, 0xc0ef) AM_READWRITE(c080_r, c080_w)
 	AM_RANGE(0xc0f0, 0xc0ff) AM_READWRITE(agat7_membank_r, agat7_membank_w)
 	AM_RANGE(0xc100, 0xc6ff) AM_READWRITE(c100_r, c100_w)
